@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920" />
+<title>BOARD-OS · HOUSE FACE · HAYES · KID BOARD</title>
+<style>
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Regular.ttf") format("truetype");
+    font-weight: 400; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Medium.ttf") format("truetype");
+    font-weight: 500; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-SemiBold.ttf") format("truetype");
+    font-weight: 600; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Bold.ttf") format("truetype");
+    font-weight: 700; font-style: normal;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1920px; height: 1200px; overflow: hidden;
+    background: #d8dadf; color: #121418;
+    font-family: "Inter Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .panel {
+    width: 1920px; height: 1200px;
+    padding: 18px 28px 12px;
+    display: flex; flex-direction: column; gap: 12px;
+    position: relative; overflow: hidden;
+    background-color: #d8dadf;
+    background-image:
+      linear-gradient(165deg, rgba(255,255,255,0.36) 0%, rgba(220,222,226,0.24) 45%, rgba(180,184,190,0.18) 100%),
+      url("camo-glass-tile-house.png");
+    background-size: auto, 420px 420px;
+    background-position: center, 0 0;
+    background-repeat: no-repeat, repeat;
+  }
+  .panel::before {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.46) 0%, transparent 28%, transparent 72%, rgba(40,42,46,0.09) 100%),
+      radial-gradient(ellipse 70% 50% at 18% 12%, rgba(255,255,255,0.46) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 88% 78%, rgba(255,255,255,0.18) 0%, transparent 60%);
+    mix-blend-mode: soft-light;
+    opacity: 0.82;
+  }
+  .panel::after {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      linear-gradient(118deg, transparent 0 34%, rgba(255,255,255,0.30) 34% 38%, transparent 38% 62%, rgba(255,255,255,0.12) 62% 64%, transparent 64%),
+      linear-gradient(0deg, rgba(255,255,255,0.06), rgba(255,255,255,0.06));
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.52),
+      inset 0 -1px 0 rgba(60,62,68,0.14),
+      inset 1px 0 0 rgba(255,255,255,0.20),
+      inset -1px 0 0 rgba(60,62,68,0.09);
+  }
+  .panel > * { position: relative; z-index: 2; }
+
+  /* ── Header ── */
+  .hdr {
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    flex-shrink: 0; padding: 14px 20px; border-radius: 16px;
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.85);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 28px rgba(20,22,28,0.08), 0 2px 6px rgba(20,22,28,0.05);
+  }
+  
+  .brand { flex-shrink: 0; display: flex; align-items: center; }
+  .brand img { display: block; height: 48px; width: auto; }
+
+  .hdr-left { display: flex; align-items: center; gap: 18px; min-width: 0; }
+  .back {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 650; color: #3a3e46; letter-spacing: -0.01em;
+    padding: 10px 16px; border-radius: 999px; min-height: 44px;
+    background: rgba(255,255,255,0.72); border: 1px solid rgba(40,42,48,0.14);
+    box-shadow: 0 2px 8px rgba(20,22,28,0.06);
+    cursor: pointer; flex-shrink: 0;
+  }
+  .back .chev { font-size: 18px; font-weight: 700; color: #5a5e66; line-height: 1; }
+  .identity { display: flex; align-items: center; gap: 16px; min-width: 0; }
+  .avatar {
+    width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; font-weight: 800; color: #fff; letter-spacing: -0.04em;
+    background: linear-gradient(145deg, #3ec9a0 0%, #2a9a78 55%, #1f7a60 100%);
+    box-shadow:
+      0 0 0 4px rgba(255,255,255,0.92),
+      0 0 0 7px rgba(46,173,132,0.35),
+      0 10px 28px rgba(42,154,120,0.35);
+  }
+  .id-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: #5a5e66; }
+  .name { font-size: 42px; font-weight: 800; letter-spacing: -0.05em; color: #0e1014; line-height: 1; }
+  .name-accent { color: #1a9070; }
+  .tagline { font-size: 15px; font-weight: 550; color: #3a5e52; letter-spacing: -0.01em; margin-top: 2px; }
+  .hdr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+  .hot-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; color: #0f4034; letter-spacing: -0.015em;
+    padding: 10px 16px; border-radius: 999px;
+    background: linear-gradient(145deg, rgba(60,210,160,0.38), rgba(40,160,130,0.16));
+    border: 1px solid rgba(40,170,130,0.42);
+    box-shadow: 0 4px 14px rgba(42,154,120,0.18);
+  }
+  .hot-pill .spark { font-size: 16px; line-height: 1; }
+  .mock-tag {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #6a6e76; text-align: right; line-height: 1.45; padding: 7px 11px; border-radius: 10px;
+    background: rgba(40,42,48,0.06); border: 1px solid rgba(40,42,48,0.12);
+  }
+
+  /* ── Hot banner (birthday + glow) ── */
+  .hot-banner {
+    flex-shrink: 0; display: flex; align-items: stretch; border-radius: 16px; overflow: hidden;
+    position: relative;
+    background: linear-gradient(105deg, #1a4038 0%, #1f5a48 28%, #2a7a60 52%, #247056 78%, #1a4038 100%);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.22) inset,
+      0 0 0 1px rgba(0,0,0,0.22),
+      0 10px 28px rgba(20,60,48,0.28),
+      0 0 24px rgba(60,200,160,0.16);
+  }
+  .hot-banner::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 40%, rgba(0,0,0,0.14) 100%),
+      radial-gradient(ellipse 55% 120% at 6% 50%, rgba(255,255,255,0.14) 0%, transparent 55%),
+      linear-gradient(118deg, transparent 0 30%, rgba(255,255,255,0.22) 30% 36%, transparent 36%);
+  }
+  .hot-accent {
+    width: 8px; flex-shrink: 0; position: relative; z-index: 1;
+    background: linear-gradient(180deg, #7ef0c8 0%, #3ec9a0 40%, #2a9a78 100%);
+  }
+  .hot-body {
+    flex: 1; padding: 14px 22px 14px 18px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    position: relative; z-index: 1;
+  }
+  .hot-main { display: flex; flex-direction: column; gap: 2px; }
+  .hot-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.28em;
+    text-transform: uppercase; color: rgba(180,240,210,0.72);
+  }
+  .hot-title {
+    font-size: 28px; font-weight: 800; letter-spacing: -0.04em;
+    color: #f4faf7; line-height: 1.15;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.35);
+  }
+  .hot-title .hl {
+    color: #0e1014; font-weight: 800; padding: 1px 12px 2px; margin: 0 2px;
+    border-radius: 9px; background: linear-gradient(180deg, #fff 0%, #c8f5e4 100%);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.4) inset, 0 3px 12px rgba(0,0,0,0.22);
+  }
+  .hot-sub {
+    font-size: 15px; font-weight: 550; color: rgba(200,240,220,0.9);
+    letter-spacing: -0.015em; margin-top: 2px;
+  }
+  .hot-sub strong { color: #fff; font-weight: 700; }
+  .hot-badges { display: flex; gap: 10px; flex-shrink: 0; }
+  .hot-badge {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(240,252,246,0.92); padding: 10px 14px; border-radius: 999px;
+    background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28);
+    backdrop-filter: blur(8px);
+  }
+
+  /* ── Body grid ── */
+  .body {
+    flex: 1; min-height: 0;
+    display: grid;
+    grid-template-columns: 1.05fr 1.35fr 1fr 0.85fr;
+    gap: 12px;
+  }
+  .sec {
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.88);
+    border-radius: 16px; padding: 14px 14px 12px;
+    display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow: hidden;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 22px rgba(20,22,28,0.07);
+  }
+  .sec-hdr {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+    flex-shrink: 0; padding: 0 2px;
+  }
+  .sec-title {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: #4a4e56;
+  }
+  .sec-meta { font-size: 12px; font-weight: 550; color: #6a6e76; }
+  .sec-list {
+    flex: 1; min-height: 0; overflow: hidden;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+
+  .card {
+    border-radius: 12px; padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 3px;
+    border: 1px solid transparent;
+    box-shadow: 0 3px 10px rgba(20,22,28,0.06);
+    cursor: pointer; position: relative;
+    min-height: 56px; justify-content: center;
+  }
+  .card .when {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    opacity: 0.78;
+  }
+  .card .what {
+    font-size: 16px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; color: #121418;
+  }
+  .card .hint {
+    font-size: 12px; font-weight: 550; color: #5a6e66; letter-spacing: -0.01em; margin-top: 1px;
+  }
+  .card.sport {
+    background: linear-gradient(145deg, rgba(60,200,160,0.22), rgba(40,160,130,0.10));
+    border-color: rgba(40,160,120,0.32); color: #144838;
+  }
+  .card.sport .when { color: #1a9070; }
+  .card.hot {
+    background: linear-gradient(145deg, rgba(60,210,160,0.38), rgba(40,170,130,0.16));
+    border-color: rgba(40,170,130,0.48); color: #0f4034;
+    box-shadow: 0 0 0 1.5px rgba(46,173,132,0.28), 0 6px 18px rgba(42,154,120,0.16);
+    min-height: 72px;
+  }
+  .card.hot .when { color: #1a9070; opacity: 1; }
+  .card.hot .what { font-size: 18px; font-weight: 800; }
+  .card.school {
+    background: linear-gradient(145deg, rgba(90,140,180,0.14), rgba(70,120,160,0.08));
+    border-color: rgba(70,110,150,0.26); color: #1a3050;
+  }
+  .card.school .when { color: #3a6080; }
+  .card.act {
+    background: linear-gradient(145deg, rgba(255,255,255,0.75), rgba(230,250,242,0.55));
+    border-color: rgba(60,170,140,0.28); color: #1a4038;
+  }
+  .card.act .when { color: #2a9a78; }
+  .card.bday {
+    background: linear-gradient(145deg, rgba(255,220,120,0.35), rgba(255,200,80,0.14));
+    border-color: rgba(210,160,40,0.4); color: #5a4010;
+    min-height: 68px;
+  }
+  .card.bday .when { color: #b07810; opacity: 1; }
+  .card.bday .what { font-size: 18px; font-weight: 800; }
+  .card.done-row {
+    background: linear-gradient(160deg, rgba(255,255,255,0.78), rgba(240,248,244,0.55));
+    border: 2px dashed rgba(60,170,130,0.42);
+    color: #2a6a58; flex-direction: row; align-items: center; gap: 12px;
+    min-height: 58px;
+  }
+  .done-ring {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    border: 2.5px solid rgba(60,170,130,0.55);
+    background: rgba(255,255,255,0.9);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 15px; color: #2a9a78; font-weight: 800;
+    box-shadow: 0 2px 8px rgba(40,160,120,0.18);
+  }
+  .card.quiet {
+    background: rgba(255,255,255,0.45);
+    border: 1px dashed rgba(100,110,130,0.28);
+    color: #7a8494; font-weight: 600; font-size: 15px;
+    align-items: center; justify-content: center; text-align: center;
+    min-height: 80px; box-shadow: none;
+  }
+  .card.compact { min-height: 48px; padding: 10px 12px; }
+  .card.compact .what { font-size: 14.5px; }
+
+  .tap-hint {
+    margin-top: auto; flex-shrink: 0;
+    font-size: 12px; font-weight: 650; color: #5a8a78;
+    display: flex; align-items: center; gap: 8px; padding: 6px 4px 0;
+  }
+  .tap-hint .ring {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid rgba(60,170,130,0.5);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #2a9a78; font-weight: 800;
+  }
+
+  /* ── Footer ── */
+  .ftr {
+    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; font-size: 12px; color: #6a6e76; font-weight: 500; padding-top: 2px;
+  }
+  .ftr-left { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .ftr-chip {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #144838; border: 1px solid rgba(40,160,120,0.35);
+    padding: 6px 12px; border-radius: 999px;
+    background: linear-gradient(135deg, rgba(60,200,160,0.22), rgba(255,255,255,0.7));
+  }
+  .ftr-meta { color: #8a8e96; }
+
+  .nav-row { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  a.back { text-decoration: none; color: inherit; }
+  .nav-week {
+    display: inline-flex; align-items: center;
+    font-size: 13px; font-weight: 700; color: #3a3e46; letter-spacing: -0.01em;
+    padding: 10px 14px; border-radius: 999px; min-height: 44px;
+    background: rgba(255,255,255,0.55); border: 1px solid rgba(40,42,48,0.12);
+    box-shadow: 0 2px 8px rgba(20,22,28,0.05);
+    text-decoration: none; flex-shrink: 0;
+  }
+  a.eyebrow { text-decoration: none; color: inherit; cursor: pointer; }
+  a.chip, a.kid-chip { text-decoration: none; color: inherit; cursor: pointer; }
+  a.ftr-chip { text-decoration: none; color: inherit; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="panel">
+  <header class="hdr">
+    <div class="hdr-left">
+      <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
+      <div class="nav-row"><a class="back" href="sheet-index.html" aria-label="Back to Family sheets"><span class="chev">‹</span> Sheets</a><a class="nav-week" href="index.html">Week</a></div>
+      <div class="identity">
+        <div class="avatar" aria-hidden="true">H</div>
+        <div class="id-text">
+          <a class="eyebrow" href="sheet-index.html">Family sheets · home</a>
+          <h1 class="name"><span class="name-accent">Hayes</span></h1>
+          <div class="tagline">Your stuff this week · sports · school · fun</div>
+        </div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="hot-pill"><span class="spark">★</span> Hottest · Sat · Chat &amp; Chew 9:00</div>
+      <div class="mock-tag">LIVE · KIDS-SAFE · NO PIN<br/>as-of Sat Sep 26 2026</div>
+    </div>
+  </header>
+
+  <section class="hot-banner" aria-label="Hottest this week">
+    <div class="hot-accent"></div>
+    <div class="hot-body">
+      <div class="hot-main">
+        <div class="hot-label">Hottest this week</div>
+        <div class="hot-title">Sat Sep 26 · Chat &amp; Chew <span class="hl">9:00</span> · flag <span class="hl">2:45</span></div>
+        <div class="hot-sub"><strong>LOCKED @ home</strong> · then leave ~2:10 · Indian Hills MS 6400 Mission Rd · with Dad @ 147th</div>
+      </div>
+      <div class="hot-badges">
+        <div class="hot-badge">Chat &amp; Chew</div>
+        <div class="hot-badge">Flag</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="body">
+    <!-- Today -->
+    <section class="sec" aria-label="Today">
+      <div class="sec-hdr">
+        <div class="sec-title">Today</div>
+        <div class="sec-meta">Sat Sep 26</div>
+      </div>
+      <div class="sec-list">
+        <div class="card hot">
+          <div class="when">9:00 LOCKED</div>
+          <div class="what">Chat &amp; Chew @ home</div>
+          <div class="hint">Hayes · enrolled</div>
+        </div>
+        <div class="card sport">
+          <div class="when">Leave ~2:10 · game 2:45</div>
+          <div class="what">Flag · Indian Hills MS</div>
+          <div class="hint">6400 Mission Rd</div>
+        </div>
+        <div class="card done-row">
+          <span class="done-ring">✓</span>
+          <div>
+            <div class="what" style="font-size:15px;font-weight:700;color:#144838;">Tap when done</div>
+            <div class="hint">chores · check-ins</div>
+          </div>
+        </div>
+      </div>
+      <div class="tap-hint"><span class="ring">✓</span> Tap-done energy</div>
+    </section>
+
+    <!-- This week sports -->
+    <section class="sec" aria-label="This week sports">
+      <div class="sec-hdr">
+        <div class="sec-title">This week sports</div>
+        <div class="sec-meta">Sat 26 – Mon 28 · known</div>
+      </div>
+      <div class="sec-list">
+        <div class="card hot compact">
+          <div class="when">Sat 26 · leave ~2:10 · game 2:45</div>
+          <div class="what">Flag · Indian Hills MS</div>
+        </div>
+        <div class="card sport compact">
+          <div class="when">Mon 28 · leave ~5:40 · game 6:15</div>
+          <div class="what">Baseball · BV Rec Field 3</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- School & activities -->
+    <section class="sec" aria-label="School and activities">
+      <div class="sec-hdr">
+        <div class="sec-title">School &amp; activities</div>
+        <div class="sec-meta">known only</div>
+      </div>
+      <div class="sec-list">
+        <div class="card hot">
+          <div class="when">Sat Sep 26 · 9:00</div>
+          <div class="what">Chat &amp; Chew @ home</div>
+          <div class="hint">LOCKED</div>
+        </div>
+        <div class="card school">
+          <div class="when">Mon 28 · 7:30</div>
+          <div class="what">Snacks</div>
+        </div>
+        <div class="card school">
+          <div class="when">Mon 28 · leave ~8:10 · drop 8:25</div>
+          <div class="what">SRE drop</div>
+        </div>
+        <div class="card act compact">
+          <div class="when">Mon 28 · 3:15 / 3:40</div>
+          <div class="what">Boys pickup</div>
+        </div>
+        <div class="card act compact">
+          <div class="when">through Fri Oct 2 3:00</div>
+          <div class="what">With Dad @ 147th</div>
+        </div>
+      </div>
+      <div class="tap-hint"><span class="ring">·</span> No invent · empty = unknown</div>
+    </section>
+
+    <!-- Appointments -->
+    <section class="sec" aria-label="Appointments">
+      <div class="sec-hdr">
+        <div class="sec-title">Appointments</div>
+        <div class="sec-meta">this week</div>
+      </div>
+      <div class="sec-list">
+        <div class="card quiet">none on board</div>
+      </div>
+      <div class="tap-hint"><span class="ring">·</span> Quiet is good</div>
+    </section>
+  </div>
+
+  <footer class="ftr">
+    <div class="ftr-left">
+      <span>kids-safe · LIVE · as-of Sat Sep 26 2026</span>
+      <span class="ftr-chip">HAYES · GREEN</span>
+      <a class="ftr-chip" href="sheet-chores.html">Chores</a>
+      <a class="ftr-chip" href="sheet-allowance.html">Stars ★</a>
+    </div>
+    <span class="ftr-meta">House face · white/grey glass camo · no money · no cyan</span>
+  </footer>
+</div>
+</body>
+</html>
