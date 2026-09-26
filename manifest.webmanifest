@@ -1,7 +1,7 @@
 {
   "name": "WardOS House",
-  "short_name": "WardOS House",
-  "description": "Family sheets home \u00b7 kids-safe \u00b7 no money",
+  "short_name": "House",
+  "description": "Family sheets home · kids-safe · no money",
   "start_url": "./sheet-index.html",
   "scope": "./",
   "display": "standalone",
@@ -9,20 +9,10 @@
   "background_color": "#d8dadf",
   "theme_color": "#d8dadf",
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
-    }
+    {"src": "icon-192-20260926c.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512-20260926c.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "apple-touch-icon-20260926c.png", "sizes": "180x180", "type": "image/png", "purpose": "any"},
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
   ]
 }
