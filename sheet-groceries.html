@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" data-sound="on">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="WardOS House" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="theme-color" content="#d8dadf" />
+<title>BOARD-OS · HOUSE FACE · GROCERIES + COSTCO</title>
+<style>
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Regular.ttf") format("truetype");
+    font-weight: 400; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Medium.ttf") format("truetype");
+    font-weight: 500; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-SemiBold.ttf") format("truetype");
+    font-weight: 600; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Bold.ttf") format("truetype");
+    font-weight: 700; font-style: normal;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1920px; height: 1200px; overflow: hidden;
+    background: #d8dadf; color: #121418;
+    font-family: "Inter Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .panel {
+    width: 1920px; height: 1200px;
+    padding: 18px 28px 12px;
+    display: flex; flex-direction: column; gap: 12px;
+    position: relative; overflow: hidden;
+    background-color: #d8dadf;
+    background-image:
+      linear-gradient(165deg, rgba(255,255,255,0.36) 0%, rgba(220,222,226,0.24) 45%, rgba(180,184,190,0.18) 100%),
+      url("camo-glass-tile.png");
+    background-size: auto, 420px 420px;
+    background-position: center, 0 0;
+    background-repeat: no-repeat, repeat;
+  }
+  .panel::before {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.46) 0%, transparent 28%, transparent 72%, rgba(40,42,46,0.09) 100%),
+      radial-gradient(ellipse 70% 50% at 18% 12%, rgba(255,255,255,0.46) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 88% 78%, rgba(255,255,255,0.18) 0%, transparent 60%);
+    mix-blend-mode: soft-light;
+    opacity: 0.82;
+  }
+  .panel::after {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      linear-gradient(118deg, transparent 0 34%, rgba(255,255,255,0.30) 34% 38%, transparent 38% 62%, rgba(255,255,255,0.12) 62% 64%, transparent 64%),
+      linear-gradient(0deg, rgba(255,255,255,0.06), rgba(255,255,255,0.06));
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.52),
+      inset 0 -1px 0 rgba(60,62,68,0.14),
+      inset 1px 0 0 rgba(255,255,255,0.20),
+      inset -1px 0 0 rgba(60,62,68,0.09);
+  }
+  .panel > * { position: relative; z-index: 2; }
+
+  .hdr {
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    flex-shrink: 0; padding: 14px 20px; border-radius: 16px;
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.85);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 28px rgba(20,22,28,0.08), 0 2px 6px rgba(20,22,28,0.05);
+  }
+  .hdr-left { display: flex; align-items: center; gap: 18px; min-width: 0; }
+  .back {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 650; color: #3a3e46; letter-spacing: -0.01em;
+    padding: 10px 16px; border-radius: 999px; min-height: 44px;
+    background: rgba(255,255,255,0.72); border: 1px solid rgba(40,42,48,0.14);
+    box-shadow: 0 2px 8px rgba(20,22,28,0.06);
+    cursor: pointer; flex-shrink: 0;
+  }
+  .back .chev { font-size: 18px; font-weight: 700; color: #5a5e66; line-height: 1; }
+  .identity { display: flex; align-items: center; gap: 16px; min-width: 0; }
+  .avatar {
+    width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -0.04em;
+    background: linear-gradient(145deg, #8a9098 0%, #5a6068 55%, #3a4048 100%);
+    box-shadow:
+      0 0 0 4px rgba(255,255,255,0.92),
+      0 0 0 7px rgba(90,96,104,0.28),
+      0 10px 28px rgba(40,42,48,0.22);
+  }
+  .id-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: #5a5e66; }
+  .name { font-size: 38px; font-weight: 800; letter-spacing: -0.05em; color: #0e1014; line-height: 1; }
+  .name-accent { color: #3a3e46; }
+  .tagline { font-size: 15px; font-weight: 550; color: #4a4e56; letter-spacing: -0.01em; margin-top: 2px; }
+  .hdr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+  .hot-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; color: #2a2e36; letter-spacing: -0.015em;
+    padding: 10px 16px; border-radius: 999px;
+    background: linear-gradient(145deg, rgba(255,180,120,0.42), rgba(255,140,80,0.16));
+    border: 1px solid rgba(220,120,60,0.4);
+    box-shadow: 0 4px 14px rgba(200,100,50,0.14);
+  }
+  .hot-pill .spark { font-size: 16px; line-height: 1; }
+  .mock-tag {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #6a6e76; text-align: right; line-height: 1.45; padding: 7px 11px; border-radius: 10px;
+    background: rgba(40,42,48,0.06); border: 1px solid rgba(40,42,48,0.12);
+  }
+
+  .favs {
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.88);
+    border-radius: 16px; padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 22px rgba(20,22,28,0.07);
+  }
+  .favs-label {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase;
+    color: #4a4e56; flex-shrink: 0;
+  }
+  .fav-chips { display: flex; flex-wrap: wrap; gap: 8px; flex: 1; min-width: 0; }
+  .fav {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 14px; font-weight: 700; letter-spacing: -0.015em;
+    padding: 10px 16px; border-radius: 999px; min-height: 44px; cursor: pointer;
+    background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(240,242,246,0.7));
+    border: 1px solid rgba(40,42,48,0.14);
+    box-shadow: 0 2px 8px rgba(20,22,28,0.05);
+    color: #1a1e24;
+  }
+  .fav .heart { color: #d06080; font-size: 13px; }
+  .fav.add {
+    color: #3a5a78; border-style: dashed; border-color: rgba(60,100,140,0.35);
+    background: rgba(255,255,255,0.5);
+  }
+
+  .body {
+    flex: 1; min-height: 0;
+    display: grid;
+    grid-template-columns: 1.15fr 1.15fr 0.85fr;
+    gap: 12px;
+  }
+  .sec {
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.88);
+    border-radius: 16px; padding: 14px 14px 12px;
+    display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow: hidden;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 22px rgba(20,22,28,0.07);
+  }
+  .sec-hdr {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+    flex-shrink: 0; padding: 0 2px;
+  }
+  .sec-title {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: #4a4e56;
+  }
+  .sec-meta { font-size: 12px; font-weight: 550; color: #6a6e76; }
+  .add-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 800; color: #2a4a68;
+    padding: 8px 14px; border-radius: 999px; min-height: 40px; cursor: pointer;
+    background: linear-gradient(145deg, rgba(100,160,220,0.22), rgba(255,255,255,0.75));
+    border: 1px solid rgba(70,120,180,0.32);
+  }
+
+  .item-list {
+    flex: 1; min-height: 0; overflow: hidden;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .item {
+    border-radius: 14px; padding: 12px 14px;
+    display: flex; align-items: center; gap: 12px;
+    min-height: 58px; cursor: pointer;
+    background: linear-gradient(145deg, rgba(255,255,255,0.82), rgba(240,242,246,0.55));
+    border: 1px solid rgba(40,42,48,0.1);
+    box-shadow: 0 3px 10px rgba(20,22,28,0.05);
+  }
+  .item .ring {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    border: 2.5px solid rgba(100,110,120,0.4);
+    background: rgba(255,255,255,0.95);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 16px; color: transparent; font-weight: 800;
+  }
+  .item .what { font-size: 16px; font-weight: 750; letter-spacing: -0.02em; color: #121418; flex: 1; }
+  .item .tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: #7a8090; padding: 4px 8px; border-radius: 8px;
+    background: rgba(40,42,48,0.06); border: 1px solid rgba(40,42,48,0.1);
+  }
+  .item.done {
+    background: linear-gradient(160deg, rgba(255,255,255,0.88), rgba(235,245,238,0.6));
+    border: 2px solid rgba(60,170,130,0.4);
+  }
+  .item.done .ring {
+    border-color: transparent;
+    background: linear-gradient(145deg, #4ed8a8, #2a9a78);
+    color: #fff;
+  }
+  .item.done .what {
+    color: #144838; text-decoration: line-through; text-decoration-thickness: 2px; opacity: 0.8;
+  }
+  .item.costco {
+    background: linear-gradient(145deg, rgba(100,140,200,0.16), rgba(255,255,255,0.75));
+    border-color: rgba(70,110,170,0.28);
+  }
+  .item.costco .ring { border-color: rgba(70,110,170,0.5); }
+
+  .treats { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; }
+  .treat {
+    border-radius: 14px; padding: 14px 14px;
+    display: flex; flex-direction: column; gap: 8px;
+    min-height: 110px; cursor: pointer;
+    border: 2px dashed rgba(100,110,130,0.28);
+    background: rgba(255,255,255,0.45);
+    box-shadow: 0 3px 10px rgba(20,22,28,0.04);
+  }
+  .treat.picked {
+    border-style: solid;
+    box-shadow: 0 6px 18px rgba(20,22,28,0.1);
+  }
+  .treat.ainsley.picked {
+    background: linear-gradient(145deg, rgba(230,180,245,0.35), rgba(255,255,255,0.8));
+    border-color: rgba(170,100,200,0.45);
+  }
+  .treat.hayes.picked {
+    background: linear-gradient(145deg, rgba(80,210,170,0.28), rgba(255,255,255,0.8));
+    border-color: rgba(40,160,120,0.45);
+  }
+  .treat.harris.picked {
+    background: linear-gradient(145deg, rgba(100,160,230,0.28), rgba(255,255,255,0.8));
+    border-color: rgba(70,120,200,0.45);
+  }
+  .treat-kid {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .treat-kid .dot {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; color: #fff;
+  }
+  .treat.ainsley .treat-kid { color: #6a2a80; }
+  .treat.ainsley .dot { background: linear-gradient(145deg, #d48ae8, #9b55b8); }
+  .treat.hayes .treat-kid { color: #144838; }
+  .treat.hayes .dot { background: linear-gradient(145deg, #3ec9a0, #1f7a60); }
+  .treat.harris .treat-kid { color: #1a3050; }
+  .treat.harris .dot { background: linear-gradient(145deg, #5a9ae8, #2a5aa8); }
+  .treat-pick {
+    font-size: 20px; font-weight: 800; letter-spacing: -0.03em; color: #121418; line-height: 1.15;
+  }
+  .treat-hint {
+    font-size: 12px; font-weight: 600; color: #6a6e76;
+  }
+  .treat.empty .treat-pick { color: #8a9098; font-size: 16px; font-weight: 650; }
+  .stick {
+    align-self: flex-start;
+    font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #fff; padding: 5px 10px; border-radius: 999px;
+    background: linear-gradient(145deg, #3a3e46, #5a6068);
+  }
+
+  .tap-hint {
+    margin-top: auto; flex-shrink: 0;
+    font-size: 12px; font-weight: 650; color: #5a6a78;
+    display: flex; align-items: center; gap: 8px; padding: 6px 4px 0;
+  }
+  .tap-hint .ring {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid rgba(100,110,120,0.4);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #4a5a68; font-weight: 800;
+  }
+
+  .ftr {
+    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; font-size: 12px; color: #6a6e76; font-weight: 500; padding-top: 2px;
+  }
+  .ftr-left { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .ftr-chip {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #3a3e46; border: 1px solid rgba(40,42,48,0.22);
+    padding: 6px 12px; border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(230,232,236,0.7));
+  }
+  .ftr-meta { color: #8a8e96; }
+
+  .nav-row { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  a.back { text-decoration: none; color: inherit; }
+  .nav-week {
+    display: inline-flex; align-items: center;
+    font-size: 13px; font-weight: 700; color: #3a3e46; letter-spacing: -0.01em;
+    padding: 10px 14px; border-radius: 999px; min-height: 44px;
+    background: rgba(255,255,255,0.55); border: 1px solid rgba(40,42,48,0.12);
+    box-shadow: 0 2px 8px rgba(20,22,28,0.05);
+    text-decoration: none; flex-shrink: 0;
+  }
+  a.eyebrow { text-decoration: none; color: inherit; cursor: pointer; }
+  a.chip, a.kid-chip { text-decoration: none; color: inherit; cursor: pointer; }
+  a.ftr-chip { text-decoration: none; color: inherit; cursor: pointer; }
+  a.treat-kid { text-decoration: none; color: inherit; cursor: pointer; }
+
+  /* Interactive checkoffs · soft scale + ✓ fill */
+  .chore, .item, .check, .tap-star {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .chore .ring, .item .ring, .check .box, .tap-star {
+    transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1), background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+  }
+  .chore.pop, .item.pop, .check.pop {
+    animation: check-pop 0.4s cubic-bezier(0.34, 1.55, 0.64, 1);
+  }
+  .tap-star.pop {
+    animation: star-pop 0.42s cubic-bezier(0.34, 1.7, 0.64, 1);
+  }
+  @keyframes check-pop {
+    0% { transform: scale(1); filter: brightness(1); }
+    35% { transform: scale(1.08); filter: brightness(1.14); }
+    60% { transform: scale(0.97); }
+    100% { transform: scale(1); filter: brightness(1); }
+  }
+  @keyframes star-pop {
+    0% { transform: scale(1) rotate(0deg); }
+    40% { transform: scale(1.45) rotate(-12deg); filter: drop-shadow(0 0 12px rgba(255,200,60,0.75)); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  .chore.done .ring, .item.done .ring {
+    animation: ring-fill 0.28s cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  @keyframes ring-fill {
+    0% { transform: scale(0.72); opacity: 0.6; }
+    60% { transform: scale(1.12); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .check { cursor: pointer; transition: transform 0.08s ease; }
+  .check:active { transform: scale(0.98); }
+  .tap-star {
+    cursor: pointer; display: inline-block; line-height: 1;
+    padding: 2px; border-radius: 8px;
+  }
+  .tap-star.lit {
+    color: #d0a010;
+    text-shadow: 0 2px 8px rgba(200,160,40,0.35);
+  }
+  .tap-star.dim { color: rgba(100,110,120,0.28); }
+</style>
+<link rel="stylesheet" href="house-engage.css" />
+</head>
+<body data-clear-label="CLEARED">
+<div class="panel">
+  <header class="hdr">
+    <div class="hdr-left">
+      <div class="nav-row"><a class="back" href="sheet-index.html" aria-label="Back to Family sheets"><span class="chev">‹</span> Sheets</a><a class="nav-week" href="index.html">Week</a></div>
+      <div class="identity">
+        <div class="avatar" aria-hidden="true">🛒</div>
+        <div class="id-text">
+          <a class="eyebrow" href="sheet-index.html">Family sheets · home</a>
+          <h1 class="name"><span class="name-accent">Groceries</span> + Costco</h1>
+          <div class="tagline">Favorites · check off · my treat pick that sticks</div>
+        </div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="hot-pill"><span class="spark">★</span> Kid treats · no dollars here</div>
+      <div class="mock-tag">MOCK · KIDS-SAFE · NO PIN<br/>as-of Sat Sep 19 2026</div>
+    </div>
+  </header>
+
+  <section class="favs" aria-label="Favorites">
+    <div class="favs-label">Favorites</div>
+    <div class="fav-chips">
+      <div class="fav"><span class="heart">♥</span> Milk · EXAMPLE</div>
+      <div class="fav"><span class="heart">♥</span> Bananas · EXAMPLE</div>
+      <div class="fav"><span class="heart">♥</span> Eggs · EXAMPLE</div>
+      <div class="fav"><span class="heart">♥</span> Bread · EXAMPLE</div>
+      <div class="fav"><span class="heart">♥</span> Yogurt · EXAMPLE</div>
+      <div class="fav add">+ add favorite</div>
+    </div>
+  </section>
+
+  <div class="body">
+    <!-- Home groceries -->
+    <section class="sec" aria-label="Home groceries">
+      <div class="sec-hdr">
+        <div class="sec-title">Home groceries</div>
+        <div class="add-btn">+ add</div>
+      </div>
+      <div class="item-list">
+        <div data-check="home-milk" class="item done">
+          <span class="ring">✓</span>
+          <span class="what">Milk</span>
+          <span class="tag">EXAMPLE</span>
+        </div>
+        <div data-check="home-bananas" class="item">
+          <span class="ring"></span>
+          <span class="what">Bananas</span>
+          <span class="tag">EXAMPLE</span>
+        </div>
+        <div data-check="home-eggs" class="item">
+          <span class="ring"></span>
+          <span class="what">Eggs</span>
+          <span class="tag">EXAMPLE</span>
+        </div>
+        <div data-check="home-bread" class="item">
+          <span class="ring"></span>
+          <span class="what">Sandwich bread</span>
+          <span class="tag">EXAMPLE</span>
+        </div>
+        <div data-check="home-apples" class="item">
+          <span class="ring"></span>
+          <span class="what">Apples</span>
+          <span class="tag">EXAMPLE</span>
+        </div>
+        <div data-check="home-pasta" class="item">
+          <span class="ring"></span>
+          <span class="what">Pasta</span>
+          <span class="tag">DEMO</span>
+        </div>
+      </div>
+      <div class="tap-hint"><span class="ring">✓</span> Tap to check off</div>
+    </section>
+
+    <!-- Costco -->
+    <section class="sec" aria-label="Costco run">
+      <div class="sec-hdr">
+        <div class="sec-title">Costco run</div>
+        <div class="sec-meta">bulk · mock</div>
+      </div>
+      <div class="item-list">
+        <div data-check="costco-towels" class="item costco done">
+          <span class="ring">✓</span>
+          <span class="what">Paper towels</span>
+          <span class="tag">EXAMPLE</span>
+        </div>
+        <div data-check="costco-chicken" class="item costco">
+          <span class="ring"></span>
+          <span class="what">Rotisserie chicken</span>
+          <span class="tag">EXAMPLE</span>
+        </div>
+        <div data-check="costco-berries" class="item costco">
+          <span class="ring"></span>
+          <span class="what">Frozen berries</span>
+          <span class="tag">EXAMPLE</span>
+        </div>
+        <div data-check="costco-snacks" class="item costco">
+          <span class="ring"></span>
+          <span class="what">Snack packs</span>
+          <span class="tag">DEMO</span>
+        </div>
+        <div data-check="costco-pods" class="item costco">
+          <span class="ring"></span>
+          <span class="what">Laundry pods</span>
+          <span class="tag">EXAMPLE</span>
+        </div>
+        <div data-check="costco-sparkling" class="item costco">
+          <span class="ring"></span>
+          <span class="what">Sparkling water</span>
+          <span class="tag">DEMO</span>
+        </div>
+      </div>
+      <div class="tap-hint"><span class="ring">✓</span> Costco checklist</div>
+    </section>
+
+    <!-- My treat picks -->
+    <section class="sec" aria-label="My treat picks">
+      <div class="sec-hdr">
+        <div class="sec-title">My treat</div>
+        <div class="sec-meta">picks stick</div>
+      </div>
+      <div class="treats">
+        <div class="treat ainsley picked">
+          <a class="treat-kid" href="kid-ainsley.html"><span class="dot">A</span> Ainsley</a>
+          <div class="treat-pick">🍓 Strawberries</div>
+          <div class="treat-hint">EXAMPLE · my pick · sticks</div>
+          <span class="stick">stuck</span>
+        </div>
+        <div class="treat hayes picked">
+          <a class="treat-kid" href="kid-hayes.html"><span class="dot">H</span> Hayes</a>
+          <div class="treat-pick">🍪 Cookie dough bites</div>
+          <div class="treat-hint">EXAMPLE · my pick · sticks</div>
+          <span class="stick">stuck</span>
+        </div>
+        <div class="treat harris empty">
+          <a class="treat-kid" href="kid-harris.html"><span class="dot">R</span> Harris</a>
+          <div class="treat-pick">Tap to pick your treat</div>
+          <div class="treat-hint">DEMO slot · open</div>
+        </div>
+      </div>
+      <div class="tap-hint"><span class="ring">★</span> My-pick that sticks</div>
+    </section>
+  </div>
+
+  <footer class="ftr">
+    <div class="ftr-left">
+      <span>kids-safe · mock · as-of Sat Sep 19 2026</span>
+      <span class="ftr-chip">GROCERIES · NO $</span>
+    </div>
+    <span class="ftr-meta">House face · white/grey glass camo · no money · no PIN</span>
+  </footer>
+</div>
+<script src="house-checkoffs.js" defer></script>
+</body>
+</html>

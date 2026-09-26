@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="WardOS House" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="theme-color" content="#d8dadf" />
+<title>BOARD-OS · HOUSE FACE · WEEKEND FUN</title>
+<style>
+
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Regular.ttf") format("truetype");
+    font-weight: 400; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Medium.ttf") format("truetype");
+    font-weight: 500; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-SemiBold.ttf") format("truetype");
+    font-weight: 600; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Bold.ttf") format("truetype");
+    font-weight: 700; font-style: normal;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1920px; height: 1200px; overflow: hidden;
+    background: #d8dadf; color: #121418;
+    font-family: "Inter Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .panel {
+    width: 1920px; height: 1200px;
+    padding: 18px 28px 12px;
+    display: flex; flex-direction: column; gap: 12px;
+    position: relative; overflow: hidden;
+    background-color: #d8dadf;
+    background-image:
+      linear-gradient(165deg, rgba(255,255,255,0.36) 0%, rgba(220,222,226,0.24) 45%, rgba(180,184,190,0.18) 100%),
+      url("camo-glass-tile.png");
+    background-size: auto, 420px 420px;
+    background-position: center, 0 0;
+    background-repeat: no-repeat, repeat;
+  }
+  .panel::before {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.46) 0%, transparent 28%, transparent 72%, rgba(40,42,46,0.09) 100%),
+      radial-gradient(ellipse 70% 50% at 18% 12%, rgba(255,255,255,0.46) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 88% 78%, rgba(255,255,255,0.18) 0%, transparent 60%);
+    mix-blend-mode: soft-light;
+    opacity: 0.82;
+  }
+  .panel::after {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      linear-gradient(118deg, transparent 0 34%, rgba(255,255,255,0.30) 34% 38%, transparent 38% 62%, rgba(255,255,255,0.12) 62% 64%, transparent 64%),
+      linear-gradient(0deg, rgba(255,255,255,0.06), rgba(255,255,255,0.06));
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.52),
+      inset 0 -1px 0 rgba(60,62,68,0.14),
+      inset 1px 0 0 rgba(255,255,255,0.20),
+      inset -1px 0 0 rgba(60,62,68,0.09);
+  }
+  .panel > * { position: relative; z-index: 2; }
+
+  .hdr {
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    flex-shrink: 0; padding: 14px 20px; border-radius: 16px;
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.85);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 28px rgba(20,22,28,0.08), 0 2px 6px rgba(20,22,28,0.05);
+  }
+  .hdr-left { display: flex; align-items: center; gap: 18px; min-width: 0; }
+  .back {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 650; color: #3a3e46; letter-spacing: -0.01em;
+    padding: 10px 16px; border-radius: 999px; min-height: 44px;
+    background: rgba(255,255,255,0.72); border: 1px solid rgba(40,42,48,0.14);
+    box-shadow: 0 2px 8px rgba(20,22,28,0.06);
+    cursor: pointer; flex-shrink: 0;
+  }
+  .back .chev { font-size: 18px; font-weight: 700; color: #5a5e66; line-height: 1; }
+  .identity { display: flex; align-items: center; gap: 16px; min-width: 0; }
+  .avatar {
+    width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -0.04em;
+    box-shadow:
+      0 0 0 4px rgba(255,255,255,0.92),
+      0 0 0 7px rgba(90,96,104,0.28),
+      0 10px 28px rgba(40,42,48,0.22);
+  }
+  .id-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: #5a5e66; }
+  .name { font-size: 38px; font-weight: 800; letter-spacing: -0.05em; color: #0e1014; line-height: 1; }
+  .name-accent { color: #3a3e46; }
+  .tagline { font-size: 15px; font-weight: 550; color: #4a4e56; letter-spacing: -0.01em; margin-top: 2px; }
+  .hdr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+  .hot-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; color: #2a2e36; letter-spacing: -0.015em;
+    padding: 10px 16px; border-radius: 999px;
+    background: linear-gradient(145deg, rgba(255,220,100,0.45), rgba(255,200,60,0.18));
+    border: 1px solid rgba(210,160,40,0.42);
+    box-shadow: 0 4px 14px rgba(180,140,40,0.16);
+  }
+  .hot-pill .spark { font-size: 16px; line-height: 1; color: #c09010; }
+  .mock-tag {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #6a6e76; text-align: right; line-height: 1.45; padding: 7px 11px; border-radius: 10px;
+    background: rgba(40,42,48,0.06); border: 1px solid rgba(40,42,48,0.12);
+  }
+
+  .cheer {
+    flex-shrink: 0; display: flex; align-items: stretch; border-radius: 16px; overflow: hidden;
+    position: relative;
+    background: linear-gradient(105deg, #2a2e36 0%, #3a4048 28%, #4a5058 52%, #3a4048 78%, #2a2e36 100%);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.22) inset,
+      0 0 0 1px rgba(0,0,0,0.22),
+      0 10px 28px rgba(20,22,28,0.22);
+  }
+  .cheer::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 40%, rgba(0,0,0,0.14) 100%),
+      linear-gradient(118deg, transparent 0 30%, rgba(255,255,255,0.22) 30% 36%, transparent 36%);
+  }
+  .cheer-accent {
+    width: 8px; flex-shrink: 0; position: relative; z-index: 1;
+    background: linear-gradient(180deg, #ffe08a 0%, #f0c040 40%, #d0a020 100%);
+  }
+  .cheer-body {
+    flex: 1; padding: 12px 22px 12px 18px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    position: relative; z-index: 1;
+  }
+  .cheer-main { display: flex; flex-direction: column; gap: 2px; }
+  .cheer-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.28em;
+    text-transform: uppercase; color: rgba(230,230,235,0.72);
+  }
+  .cheer-title {
+    font-size: 26px; font-weight: 800; letter-spacing: -0.04em;
+    color: #f4f6f8; line-height: 1.15;
+  }
+  .cheer-title .hl {
+    color: #0e1014; font-weight: 800; padding: 1px 12px 2px; margin: 0 2px;
+    border-radius: 9px; background: linear-gradient(180deg, #fff 0%, #ffe8a0 100%);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.4) inset, 0 3px 12px rgba(0,0,0,0.22);
+  }
+  .cheer-sub {
+    font-size: 14px; font-weight: 550; color: rgba(220,222,230,0.9);
+    letter-spacing: -0.015em; margin-top: 2px;
+  }
+  .cheer-sub strong { color: #fff; font-weight: 700; }
+  .cheer-badges { display: flex; gap: 10px; flex-shrink: 0; }
+  .cheer-badge {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(245,246,248,0.92); padding: 10px 14px; border-radius: 999px;
+    background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28);
+  }
+
+  .sec {
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.88);
+    border-radius: 16px; padding: 14px 14px 12px;
+    display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow: hidden;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 22px rgba(20,22,28,0.07);
+  }
+  .sec-hdr {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+    flex-shrink: 0; padding: 0 2px;
+  }
+  .sec-title {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: #4a4e56;
+  }
+  .sec-meta { font-size: 12px; font-weight: 550; color: #6a6e76; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 700; padding: 6px 12px 6px 6px; border-radius: 999px;
+    border: 1px solid transparent; letter-spacing: -0.01em;
+  }
+  .chip .d {
+    width: 22px; height: 22px; border-radius: 50%; color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+  }
+  .chip.ain { color: #4a2a58; background: rgba(210,140,230,0.18); border-color: rgba(170,100,200,0.32); }
+  .chip.ain .d { background: #b468c8; }
+  .chip.hay { color: #144838; background: rgba(60,200,160,0.16); border-color: rgba(40,160,120,0.32); }
+  .chip.hay .d { background: #2fad84; }
+  .chip.har { color: #1a3050; background: rgba(90,154,232,0.16); border-color: rgba(70,120,200,0.32); }
+  .chip.har .d { background: #4a84d4; }
+
+  .ftr {
+    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; font-size: 12px; color: #6a6e76; font-weight: 500; padding-top: 2px;
+  }
+  .ftr-left { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .ftr-chip {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #3a3e46; border: 1px solid rgba(40,42,48,0.22);
+    padding: 6px 12px; border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(230,232,236,0.7));
+  }
+  .ftr-meta { color: #8a8e96; }
+
+
+  .body { flex: 1; min-height: 0; display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; }
+  .options { display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 0; }
+  .opt {
+    border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; gap: 18px;
+    border: 1px solid rgba(40,42,48,0.12); background: rgba(255,255,255,0.72);
+    box-shadow: 0 4px 14px rgba(20,22,28,0.06); position: relative; min-height: 100px;
+  }
+  .opt.win {
+    background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(180,230,210,0.45));
+    border: 2.5px solid rgba(40,160,120,0.55);
+    box-shadow: 0 0 0 4px rgba(60,200,160,0.18), 0 14px 32px rgba(40,140,110,0.16);
+    min-height: 140px;
+  }
+  .opt .emoji {
+    width: 68px; height: 68px; border-radius: 18px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 34px;
+    background: rgba(255,255,255,0.9); border: 1px solid rgba(40,42,48,0.10);
+    box-shadow: 0 4px 12px rgba(20,22,28,0.08);
+  }
+  .opt.win .emoji {
+    width: 84px; height: 84px; font-size: 42px; border-radius: 22px;
+    background: linear-gradient(145deg, #e8fff6, #c8f0e0);
+    border-color: rgba(40,160,120,0.35);
+  }
+  .opt .txt { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .opt .lbl { font-size: 11px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: #6a6e76; }
+  .opt.win .lbl { color: #1a9070; }
+  .opt .title { font-size: 22px; font-weight: 800; letter-spacing: -0.035em; color: #0e1014; }
+  .opt.win .title { font-size: 32px; }
+  .opt .sub { font-size: 14px; font-weight: 550; color: #6a6e76; }
+  .opt .votes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .win-ribbon {
+    position: absolute; top: 14px; right: 14px;
+    font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #0f4034; padding: 10px 16px; border-radius: 999px;
+    background: linear-gradient(145deg, #7aefc8, #3ec9a0);
+    border: 1px solid rgba(40,160,120,0.45);
+    box-shadow: 0 4px 14px rgba(42,154,120,0.28);
+  }
+  .side { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .vote-card {
+    border-radius: 14px; padding: 14px 16px; flex: 1;
+    background: rgba(255,255,255,0.7); border: 1px solid rgba(40,42,48,0.10);
+    display: flex; flex-direction: column; gap: 6px; justify-content: center;
+  }
+  .vote-card .q { font-size: 13px; font-weight: 650; color: #6a6e76; }
+  .vote-card .a { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; }
+  .peace {
+    border-radius: 14px; padding: 16px 18px; flex-shrink: 0;
+    background: linear-gradient(145deg, rgba(255,255,255,0.85), rgba(230,236,255,0.5));
+    border: 1px solid rgba(90,140,200,0.28);
+  }
+  .peace .t { font-size: 11px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: #3a5a80; margin-bottom: 6px; }
+  .peace .b { font-size: 16px; font-weight: 700; color: #1a3050; letter-spacing: -0.02em; line-height: 1.35; }
+
+
+  .nav-row { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  a.back { text-decoration: none; color: inherit; }
+  .nav-week {
+    display: inline-flex; align-items: center;
+    font-size: 13px; font-weight: 700; color: #3a3e46; letter-spacing: -0.01em;
+    padding: 10px 14px; border-radius: 999px; min-height: 44px;
+    background: rgba(255,255,255,0.55); border: 1px solid rgba(40,42,48,0.12);
+    box-shadow: 0 2px 8px rgba(20,22,28,0.05);
+    text-decoration: none; flex-shrink: 0;
+  }
+  a.eyebrow { text-decoration: none; color: inherit; cursor: pointer; }
+  a.chip, a.kid-chip { text-decoration: none; color: inherit; cursor: pointer; }
+  a.ftr-chip { text-decoration: none; color: inherit; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="lock-packet" style="margin:8px 0 12px;padding:14px 18px;border-radius:14px;background:linear-gradient(135deg,#0b1e2e,#12304a);color:#e8f4ff;border:1px solid #3a6a90;">
+    <div style="font-size:12px;font-weight:800;letter-spacing:0.16em;text-transform:uppercase;color:#7ec8ff;">Style B · weekend lock packet · MOCK</div>
+    <div style="font-size:20px;font-weight:850;margin-top:4px;">Fri Sep 25 load day stack known</div>
+    <div style="font-size:14px;opacity:0.85;margin-top:4px;">6:50a Harbor Cove · WN557 · handoff 3:00 · Hayes UA 4–6p · school/weather UNKNOWN</div>
+  </div>
+
+  <header class="hdr">
+    <div class="hdr-left">
+      <div class="nav-row"><a class="back" href="sheet-index.html" aria-label="Back to Family sheets"><span class="chev">‹</span> Sheets</a><a class="nav-week" href="index.html">Week</a></div>
+      <div class="identity">
+        <div class="avatar" aria-hidden="true" style="background:linear-gradient(145deg,#5ae0b0,#2a9a78,#1f7a60);box-shadow:0 0 0 4px rgba(255,255,255,0.92),0 0 0 7px rgba(46,173,132,0.35),0 10px 28px rgba(42,154,120,0.3);">🎯</div>
+        <div class="id-text">
+          <a class="eyebrow" href="sheet-index.html">Family sheets · home</a>
+          <h1 class="name"><span class="name-accent">Weekend fun</span></h1>
+          <div class="tagline">Pick one · not a fight · three options max</div>
+        </div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="hot-pill"><span class="spark">★</span> Park picnic wins</div>
+      <div class="mock-tag">MOCK · KIDS-SAFE · NO PIN<br/>as-of Sat Sep 19 2026</div>
+    </div>
+  </header>
+
+  <section class="cheer" aria-label="Cheer banner">
+    <div class="cheer-accent"></div>
+    <div class="cheer-body">
+      <div class="cheer-main">
+        <div class="cheer-label">One choice wins · MOCK</div>
+        <div class="cheer-title">This weekend · <span class="hl">Park picnic</span></div>
+        <div class="cheer-sub"><strong>Mock vote</strong> · demo fun picks · Sat–Sun vibe</div>
+      </div>
+      <div class="cheer-badges"><div class="cheer-badge">WINS</div><div class="cheer-badge">MOCK</div></div>
+    </div>
+  </section>
+
+  <div class="body">
+    <section class="sec" aria-label="Three fun options">
+      <div class="sec-hdr">
+        <div class="sec-title">Three fun options</div>
+        <div class="sec-meta">one wins · MOCK</div>
+      </div>
+      <div class="options">
+        <div class="opt win">
+          <div class="win-ribbon">★ Wins</div>
+          <div class="emoji">🧺</div>
+          <div class="txt">
+            <div class="lbl">Choice A · winner</div>
+            <div class="title">Park picnic</div>
+            <div class="sub">Blanket · snacks · playground · easy yes</div>
+            <div class="votes">
+              <a class="chip ain" href="kid-ainsley.html"><span class="d">A</span>Ainsley</a>
+              <a class="chip hay" href="kid-hayes.html"><span class="d">H</span>Hayes</a>
+            </div>
+          </div>
+        </div>
+        <div class="opt">
+          <div class="emoji">🎬</div>
+          <div class="txt">
+            <div class="lbl">Choice B</div>
+            <div class="title">Movie couch night</div>
+            <div class="sub">Pajamas · popcorn · one film</div>
+            <div class="votes"><a class="chip har" href="kid-harris.html"><span class="d">R</span>Harris</a></div>
+          </div>
+        </div>
+        <div class="opt">
+          <div class="emoji">🎳</div>
+          <div class="txt">
+            <div class="lbl">Choice C</div>
+            <div class="title">Bowling + treats</div>
+            <div class="sub">Lanes · silly scores · out-of-house</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="side">
+      <section class="sec" style="flex:1;min-height:0">
+        <div class="sec-hdr">
+          <div class="sec-title">Kid chips vote</div>
+          <div class="sec-meta">MOCK</div>
+        </div>
+        <div class="vote-card">
+          <div class="q">Ainsley tapped</div>
+          <div class="a" style="color:#8a3fa8">Park picnic</div>
+        </div>
+        <div class="vote-card">
+          <div class="q">Hayes tapped</div>
+          <div class="a" style="color:#1a9070">Park picnic</div>
+        </div>
+        <div class="vote-card">
+          <div class="q">Harris tapped</div>
+          <div class="a" style="color:#2a5aa8">Movie couch night</div>
+        </div>
+      </section>
+      <div class="peace">
+        <div class="t">Not a fight menu</div>
+        <div class="b">One card wins. Others wait for next weekend. No pile of maybes.</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="ftr">
+    <div class="ftr-left">
+      <span>kids-safe · mock · as-of Sat Sep 19 2026</span>
+      <span class="ftr-chip">WEEKEND FUN · ONE WINS</span>
+    </div>
+    <span class="ftr-meta">House face · white/grey glass camo · no money · no PIN</span>
+  </footer>
+</div>
+</body>
+</html>

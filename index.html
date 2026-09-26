@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="WardOS House" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="theme-color" content="#d8dadf" />
+<meta name="description" content="WardOS House face · family week · kids-safe · no PIN" />
+<title>House · family week</title>
+<style>
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Regular.ttf") format("truetype");
+    font-weight: 400; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Medium.ttf") format("truetype");
+    font-weight: 500; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-SemiBold.ttf") format("truetype");
+    font-weight: 600; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Bold.ttf") format("truetype");
+    font-weight: 700; font-style: normal;
+  }
+  /* WardOS House face — soft white/grey glass camo + Inter Display (updated 19 Sep 2026)
+     Design canvas 1920×1200; scales to tablet / browser viewport. */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #d8dadf;
+    color: #121418;
+    font-family: "Inter Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .stage {
+    width: 100%; height: 100%;
+    min-height: 100dvh;
+    display: flex; align-items: center; justify-content: center;
+    padding:
+      env(safe-area-inset-top, 0px)
+      env(safe-area-inset-right, 0px)
+      env(safe-area-inset-bottom, 0px)
+      env(safe-area-inset-left, 0px);
+    background: #d8dadf;
+  }
+  .scaler {
+    width: 1920px; height: 1200px;
+    flex-shrink: 0;
+    transform-origin: center center;
+  }
+  .panel {
+    width: 1920px; height: 1200px;
+    padding: 22px 36px 14px;
+    display: flex; flex-direction: column; gap: 10px;
+    position: relative; overflow: hidden;
+    background-color: #d8dadf;
+    background-image:
+      linear-gradient(165deg, rgba(255,255,255,0.36) 0%, rgba(220,222,226,0.24) 45%, rgba(180,184,190,0.18) 100%),
+      url("camo-glass-tile-house.png");
+    background-size: auto, 420px 420px;
+    background-position: center, 0 0;
+    background-repeat: no-repeat, repeat;
+  }
+  .panel::before {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.46) 0%, transparent 28%, transparent 72%, rgba(40,42,46,0.09) 100%),
+      radial-gradient(ellipse 70% 50% at 18% 12%, rgba(255,255,255,0.46) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 88% 78%, rgba(255,255,255,0.18) 0%, transparent 60%);
+    mix-blend-mode: soft-light;
+    opacity: 0.82;
+  }
+  .panel::after {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      linear-gradient(118deg, transparent 0 34%, rgba(255,255,255,0.30) 34% 38%, transparent 38% 62%, rgba(255,255,255,0.12) 62% 64%, transparent 64%),
+      linear-gradient(0deg, rgba(255,255,255,0.06), rgba(255,255,255,0.06));
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.52),
+      inset 0 -1px 0 rgba(60,62,68,0.14),
+      inset 1px 0 0 rgba(255,255,255,0.20),
+      inset -1px 0 0 rgba(60,62,68,0.09);
+  }
+  .panel > * { position: relative; z-index: 2; }
+
+  .hdr {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 32px;
+    flex-shrink: 0; padding: 18px 24px 20px; border-radius: 18px;
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.85);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 28px rgba(20,22,28,0.08), 0 2px 6px rgba(20,22,28,0.05);
+  }
+  
+  .brand { flex-shrink: 0; display: flex; align-items: center; }
+  .brand img { display: block; height: 48px; width: auto; }
+
+  .hdr-left { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase; color: #5a5e66; }
+  .title { font-size: 46px; font-weight: 700; letter-spacing: -0.045em; color: #0e1014; line-height: 1; }
+  .title .sep { color: #9a9ea6; font-weight: 400; margin: 0 8px; }
+  .title .sub { color: #4a4e56; font-weight: 500; font-size: 28px; letter-spacing: -0.03em; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; margin-top: 2px; }
+  .meta { font-size: 15px; font-weight: 500; color: #3a3e46; letter-spacing: -0.01em; }
+  .meta::before {
+    content: ""; display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+    background: #5a5e66; margin-right: 12px; vertical-align: middle;
+    box-shadow: 0 0 6px rgba(40,42,48,0.35);
+  }
+  .meta:first-child::before { display: none; }
+  .meta.wx { color: #6a6e76; font-weight: 400; }
+
+  .hdr-right { flex-shrink: 0; padding-top: 2px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .wx-card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 14px; border-radius: 14px;
+    background: rgba(255,255,255,0.62);
+    border: 1px solid rgba(255,255,255,0.88);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 6px 18px rgba(20,22,28,0.07);
+    max-width: 340px;
+  }
+  .wx-card .wx-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .wx-card .wx-kicker {
+    font-size: 9px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: #6a6e76;
+  }
+  .wx-card .wx-line {
+    font-size: 13px; font-weight: 750; letter-spacing: -0.02em; color: #0e1014;
+  }
+  .wx-card .wx-line .mock {
+    font-size: 9px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #5a4010; margin-left: 6px; padding: 2px 6px; border-radius: 999px;
+    background: linear-gradient(145deg, rgba(255,220,100,0.45), rgba(255,200,60,0.18));
+    border: 1px solid rgba(210,160,40,0.42);
+    vertical-align: middle;
+  }
+  .wx-card .wx-sub { font-size: 11px; font-weight: 550; color: #6a6e76; }
+  .wx-card .wx-icons { display: flex; gap: 6px; flex-shrink: 0; }
+  .wx-card .wx-ico {
+    width: 32px; height: 32px; border-radius: 10px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 16px; line-height: 1;
+    background: rgba(255,255,255,0.8);
+    border: 1px solid rgba(40,42,48,0.1);
+  }
+  .wx-card .wx-ico.dim { opacity: 0.45; }
+
+  .mock-tag {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    color: #6a6e76; text-align: right; line-height: 1.55; padding: 10px 14px; border-radius: 10px;
+    background: rgba(40,42,48,0.06); border: 1px solid rgba(40,42,48,0.12);
+  }
+
+  .leaveby {
+    flex-shrink: 0; display: flex; align-items: stretch; border-radius: 16px; overflow: hidden;
+    position: relative;
+    background: linear-gradient(105deg, #262830 0%, #343840 28%, #454952 52%, #3a3e46 78%, #2a2c32 100%);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.24) inset,
+      0 0 0 1px rgba(0,0,0,0.28),
+      0 0 36px rgba(0,0,0,0.22),
+      0 10px 28px rgba(20,22,28,0.28),
+      0 0 20px rgba(220,225,235,0.14);
+  }
+  .leaveby::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 40%, rgba(0,0,0,0.16) 100%),
+      radial-gradient(ellipse 55% 120% at 6% 50%, rgba(255,255,255,0.17) 0%, transparent 55%),
+      linear-gradient(118deg, transparent 0 30%, rgba(255,255,255,0.28) 30% 36%, transparent 36%);
+  }
+  .leaveby-accent {
+    width: 8px; flex-shrink: 0; position: relative; z-index: 1;
+    background: linear-gradient(180deg, #fff 0%, #d8dce2 40%, #8a909a 100%);
+  }
+  .leaveby-body {
+    flex: 1; padding: 12px 24px 12px 20px;
+    display: flex; flex-direction: column; gap: 1px;
+    position: relative; z-index: 1;
+  }
+  .leaveby-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.32em;
+    text-transform: uppercase; color: rgba(220,225,235,0.72);
+  }
+  .leaveby-main {
+    font-size: 30px; font-weight: 700; letter-spacing: -0.04em;
+    color: #f4f6f8; line-height: 1.1;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.45), 0 0 18px rgba(255,255,255,0.12);
+  }
+  .leaveby-main .time {
+    color: #0e1014; font-weight: 800; padding: 1px 12px 2px; margin: 0 4px;
+    border-radius: 9px; background: linear-gradient(180deg, #fff 0%, #e8ebf0 100%);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset, 0 3px 12px rgba(0,0,0,0.28), 0 0 12px rgba(255,255,255,0.18);
+  }
+  .leaveby-detail {
+    font-size: 15px; font-weight: 500; color: rgba(200,206,216,0.88);
+    letter-spacing: -0.015em;
+  }
+  .leaveby-detail strong { color: #ffffff; font-weight: 700; }
+  .leaveby-badge {
+    position: absolute; right: 22px; top: 50%; transform: translateY(-50%); z-index: 2;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(240,242,246,0.85); padding: 9px 14px; border-radius: 999px;
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.28);
+    backdrop-filter: blur(8px);
+  }
+
+  .week-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+  .week-hdr { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 0 4px; flex-wrap: wrap; }
+  .week-title { font-size: 13px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: #4a4e56; }
+  .week-range { font-size: 14px; font-weight: 500; color: #5a5e66; }
+  .banner-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; width: 100%; }
+  .banner {
+    font-size: 14px; font-weight: 650; color: #2a2e34;
+    padding: 11px 18px; border-radius: 999px;
+    background: rgba(255,255,255,0.68); border: 1px solid rgba(255,255,255,0.85);
+    box-shadow: 0 4px 14px rgba(20,22,28,0.06);
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .banner.custody-loud {
+    font-size: 16px; font-weight: 850; color: #fff;
+    padding: 14px 22px; border-radius: 16px;
+    background: linear-gradient(90deg, #262830 0%, #343840 55%, #454952 100%);
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 8px 22px rgba(20,22,28,0.18);
+    gap: 14px; flex-wrap: wrap;
+  }
+  .banner.custody-loud .c-k {
+    font-size: 11px; font-weight: 900; letter-spacing: 0.18em; text-transform: uppercase;
+    color: #7dffd4; background: rgba(125,255,212,0.12); border: 1px solid rgba(125,255,212,0.35);
+    padding: 6px 10px; border-radius: 999px;
+  }
+  .banner.custody-loud .c-main { font-size: 17px; font-weight: 850; letter-spacing: -0.01em; }
+  .banner.custody-loud .c-main em { font-style: normal; color: #7dffd4; }
+  .banner.custody-loud .c-next { font-size: 14px; font-weight: 700; color: #c5d0de; }
+
+  .who {
+    display: inline-flex; gap: 6px; align-items: center; margin-left: auto;
+  }
+  .who-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 700; letter-spacing: -0.02em;
+    padding: 8px 14px 8px 8px; border-radius: 999px;
+    border: 1px solid transparent; min-height: 40px;
+    box-shadow: 0 3px 10px rgba(20,22,28,0.08);
+    cursor: pointer;
+  }
+  .who-chip .dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; color: #fff;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.85);
+  }
+  .who-chip.ain {
+    background: linear-gradient(145deg, rgba(210,140,230,0.32), rgba(180,120,200,0.16));
+    border-color: rgba(170,100,200,0.35); color: #4a2a58;
+  }
+  .who-chip.ain .dot { background: linear-gradient(145deg, #c47ad8, #9b55b8); }
+  .who-chip.hay {
+    background: linear-gradient(145deg, rgba(70,200,160,0.32), rgba(40,160,130,0.14));
+    border-color: rgba(40,160,120,0.35); color: #144838;
+  }
+  .who-chip.hay .dot { background: linear-gradient(145deg, #3ec9a0, #2a9a78); }
+  .who-chip.har {
+    background: linear-gradient(145deg, rgba(100,160,230,0.32), rgba(70,120,200,0.14));
+    border-color: rgba(70,120,200,0.35); color: #1a3050;
+  }
+  .who-chip.har .dot { background: linear-gradient(145deg, #5a9ae8, #3a6fc0); }
+
+  /* Kid entry · magnetic invite */
+  a.who-chip {
+    position: relative;
+    transition: transform 0.14s ease, box-shadow 0.2s ease;
+    animation: who-breathe 2.8s ease-in-out infinite;
+  }
+  a.who-chip.ain { animation-delay: 0s; }
+  a.who-chip.hay { animation-delay: 0.35s; }
+  a.who-chip.har { animation-delay: 0.7s; }
+  a.who-chip::after {
+    content: ""; position: absolute; inset: -3px; border-radius: 999px; pointer-events: none;
+    opacity: 0.55;
+    animation: who-ring 2.8s ease-in-out infinite;
+  }
+  a.who-chip.ain::after {
+    box-shadow: 0 0 0 2px rgba(180,100,200,0.35), 0 0 18px rgba(200,120,220,0.45);
+    animation-delay: 0s;
+  }
+  a.who-chip.hay::after {
+    box-shadow: 0 0 0 2px rgba(40,160,120,0.35), 0 0 18px rgba(60,200,160,0.45);
+    animation-delay: 0.35s;
+  }
+  a.who-chip.har::after {
+    box-shadow: 0 0 0 2px rgba(70,120,200,0.35), 0 0 18px rgba(90,160,230,0.45);
+    animation-delay: 0.7s;
+  }
+  a.who-chip:active {
+    transform: scale(0.94);
+    filter: brightness(1.08);
+  }
+  a.who-chip:active::after { opacity: 1; }
+  @keyframes who-breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.045); }
+  }
+  @keyframes who-ring {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 0.9; }
+  }
+  a.chip.ain, a.chip.hay, a.chip.har {
+    animation: chip-spark 2.6s ease-in-out infinite;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.9), 0 0 10px rgba(140,120,200,0.25);
+  }
+  a.chip.ain { animation-delay: 0s; }
+  a.chip.hay { animation-delay: 0.25s; }
+  a.chip.har { animation-delay: 0.5s; }
+  @keyframes chip-spark {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.12); box-shadow: 0 0 0 1px rgba(255,255,255,1), 0 0 14px rgba(180,140,220,0.45); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    a.who-chip, a.who-chip::after, a.chip.ain, a.chip.hay, a.chip.har {
+      animation: none !important;
+    }
+  }
+
+  .week-grid {
+    flex: 1; display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 12px; min-height: 0;
+  }
+
+  .day {
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.88);
+    border-radius: 20px; padding: 12px 10px 10px;
+    display: flex; flex-direction: column; gap: 8px; min-height: 0;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 12px 28px rgba(20,22,28,0.08), 0 3px 8px rgba(20,22,28,0.04);
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .day:active { transform: scale(0.985); }
+  .day.load {
+    background: linear-gradient(165deg, rgba(255,255,255,0.96) 0%, rgba(248,250,252,0.9) 100%);
+    border-color: rgba(40, 42, 48,0.45);
+    box-shadow:
+      0 0 0 2.5px rgba(30,32,38,0.5),
+      0 1px 0 rgba(255,255,255,0.98) inset,
+      0 0 28px rgba(40, 42, 48,0.22),
+      0 14px 36px rgba(20,22,28,0.14);
+    margin-top: -4px; margin-bottom: 4px;
+  }
+  .day-top { display: flex; align-items: center; justify-content: space-between; gap: 4px; flex-shrink: 0; }
+  .dow { font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #6a7080; }
+  .day.load .dow { color: #2a2e36; }
+  .dom {
+    font-size: 30px; font-weight: 800; letter-spacing: -0.05em; color: #121418;
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .day.load .dom { color: #0e1014; }
+  .blocks { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+
+  .blk {
+    border-radius: 14px; padding: 12px 12px; font-size: 13.5px; font-weight: 650;
+    line-height: 1.25; border: 1px solid transparent; letter-spacing: -0.015em;
+    box-shadow: 0 3px 10px rgba(20,22,28,0.06);
+    min-height: 48px; display: flex; flex-direction: column; justify-content: center;
+    cursor: pointer; position: relative;
+  }
+  .blk .t { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 3px; opacity: 0.75; }
+  .blk .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 800; padding: 4px 9px 4px 5px; border-radius: 999px;
+    background: rgba(255,255,255,0.72); border: 1px solid rgba(255,255,255,0.9);
+    letter-spacing: -0.01em;
+  }
+  .chip .d {
+    width: 16px; height: 16px; border-radius: 50%; color: #fff;
+    font-size: 9px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .chip.ain { color: #4a2a58; } .chip.ain .d { background: #b468c8; }
+  .chip.hay { color: #144838; } .chip.hay .d { background: #2fad84; }
+  .chip.har { color: #1a3050; } .chip.har .d { background: #4a84d4; }
+
+  .blk.kids {
+    background: linear-gradient(155deg, rgba(170,140,220,0.28), rgba(120,160,220,0.14));
+    border-color: rgba(140,120,200,0.32); color: #2a2850;
+    flex: 1; align-items: center; justify-content: center;
+    text-align: center; min-height: 88px; font-size: 14.5px; font-weight: 700;
+  }
+  .day.load .blk.kids {
+    flex: 0; min-height: 52px; align-items: flex-start; justify-content: flex-start;
+    text-align: left; font-size: 13px; padding: 10px 12px;
+  }
+  .blk.flight {
+    background: linear-gradient(135deg, rgba(40,42,48,0.28), rgba(20,22,28,0.14));
+    border-color: rgba(40, 42, 48,0.5); color: #1a1c20;
+    box-shadow: 0 0 16px rgba(20,22,28,0.14), 0 3px 10px rgba(20,22,28,0.08);
+  }
+  .blk.flight .t { color: #3a3e46; opacity: 1; }
+  .blk.handoff {
+    background: linear-gradient(145deg, rgba(255,180,100,0.32), rgba(230,140,70,0.14));
+    border-color: rgba(210,130,60,0.38); color: #5a3210; min-height: 52px;
+  }
+  .blk.handoff .t { color: #c07030; opacity: 0.95; }
+  .blk.urban {
+    background: linear-gradient(145deg, rgba(60,210,160,0.32), rgba(40,160,130,0.14));
+    border-color: rgba(40,170,130,0.4); color: #0f4034; min-height: 52px;
+  }
+  .blk.urban .t { color: #1a9070; opacity: 0.95; }
+  .blk.empty-chore {
+    background: linear-gradient(160deg, rgba(255,255,255,0.72), rgba(240,248,244,0.55));
+    border: 2px dashed rgba(60,170,130,0.4);
+    color: #2a6a58; font-weight: 700; font-size: 14px; margin-top: auto;
+    box-shadow: 0 0 0 0 rgba(60,170,130,0); min-height: 64px;
+    align-items: center; justify-content: center; text-align: center; gap: 6px;
+  }
+  .blk.empty-chore .done-ring {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2.5px solid rgba(60,170,130,0.55);
+    background: rgba(255,255,255,0.85);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #2a9a78; font-weight: 800;
+    box-shadow: 0 2px 8px rgba(40,160,120,0.18);
+  }
+  .tap-add {
+    margin-top: auto; min-height: 44px; border-radius: 14px;
+    border: 1.5px dashed rgba(100,110,130,0.28);
+    background: rgba(255,255,255,0.35);
+    color: #7a8494; font-size: 13px; font-weight: 650;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    letter-spacing: -0.01em;
+  }
+  .tap-add span { font-size: 18px; font-weight: 700; color: #5a6474; line-height: 1; }
+
+  .us-row {
+    display: flex; flex-wrap: wrap; gap: 14px; align-items: center; flex-shrink: 0;
+    padding: 14px 18px; border-radius: 14px;
+    background: rgba(255,255,255,0.62); border: 1px solid rgba(255,255,255,0.8);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 6px 20px rgba(20,22,28,0.07);
+  }
+  .us-label { font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #5a5e66; margin-right: 6px; }
+  .us-item {
+    font-size: 15px; font-weight: 700; color: #1a1c20; letter-spacing: -0.015em;
+    padding: 10px 16px; border-radius: 999px; min-height: 40px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.85), rgba(230,236,250,0.55));
+    border: 1px solid rgba(120,140,180,0.28);
+    box-shadow: 0 3px 10px rgba(20,22,28,0.06);
+    cursor: pointer;
+  }
+
+  .ftr {
+    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding-top: 4px; font-size: 12px; color: #6a6e76; font-weight: 500;
+  }
+  .ftr-left { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .ftr-chip {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #1a1c20; border: 1px solid rgba(40,42,48,0.35);
+    padding: 8px 16px; border-radius: 999px;
+    background: linear-gradient(135deg, rgba(40,42,48,0.18), rgba(255,255,255,0.7));
+    box-shadow: 0 4px 14px rgba(40, 42, 48,0.14);
+  }
+  .ftr-meta { color: #8a8e96; }
+
+  a.who-chip, a.chip { text-decoration: none; color: inherit; }
+  a.blk { text-decoration: none; color: inherit; display: flex; flex-direction: column; justify-content: center; }
+  .nav-row { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  a.sheets-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 700; color: #3a3e46; letter-spacing: -0.01em;
+    padding: 9px 14px; border-radius: 999px; min-height: 40px;
+    background: rgba(255,255,255,0.72); border: 1px solid rgba(40,42,48,0.14);
+    box-shadow: 0 2px 8px rgba(20,22,28,0.06);
+    text-decoration: none;
+  }
+  a.sheets-pill .chev { font-size: 16px; font-weight: 700; color: #5a5e66; line-height: 1; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="scaler" id="scaler">
+    <div class="panel" id="app" role="main" aria-label="House family week"></div>
+  </div>
+</div>
+
+<script>
+/* ─── Morning-refresh facts (swap values only; do not restyle) ───
+   Known facts only · as-of Sat Sep 26 2026 · no money · no invent · Mon LIVE prep */
+const FACTS = {
+  asOf: "Sat Sep 26 2026",
+  asOfShort: "26 Sep 2026",
+  eyebrow: "WardOS · House · KS Hub",
+  title: "House",
+  titleSub: "family week",
+  meta: [
+    "Kids with Dad @ 147th · through Fri Oct 2 3:00",
+    { text: "Weather · mock", className: "wx" },
+    "Mon LIVE · House+Desk 8:00"
+  ],
+  mockTag: "LIVE · HOUSE FACE · NO PIN\nas-of Sat Sep 26 2026 · Mon LIVE prep",
+  
+  leaveCard: {
+    style: "A",
+    label: "weekday leave card",
+    dateLabel: "Sat Sep 26",
+    leaveBy: "7:55",
+    place: "Heritage Park",
+    flight: "",
+    route: "Harris flag",
+    status: "LIVE · leave now · game 8:30"
+  },
+  lockPacket: {
+    style: "B",
+    label: "weekend lock packet",
+    loadDay: "Mon Sep 28",
+    status: "LIVE · House+Desk flip 8:00"
+  },
+  schoolWeather: { school: "UNKNOWN", weather: "UNKNOWN" },
+leaveBy: {
+    label: "Leave now · Sat",
+    date: "Sat Sep 26",
+    time: "7:55",
+    place: "Harris flag",
+    detailHtml: "Game <strong>8:30</strong> · Heritage Park Field 10 · 17255 S Black Bob Rd, Olathe",
+    badge: "Leave now"
+  },
+  week: {
+    title: "This week",
+    range: "Sat Sep 26 – Fri Oct 2 · Dad week @ 147th",
+    banner: "with Dad @ 147th through Fri Oct 2 3:00",
+    who: [
+      { id: "ain", label: "Ainsley" },
+      { id: "hay", label: "Hayes" },
+      { id: "har", label: "Harris" }
+    ],
+    days: [
+      {
+        dow: "Sat", dom: "26", load: true,
+        blocks: [
+          { type: "flight", time: "7:55", text: "Leave · Harris flag · game 8:30 Heritage F10", chips: ["har"] },
+          { type: "kids", time: "9:00", text: "Hayes Chat & Chew @ home · LOCKED", chips: ["hay"] },
+          { type: "urban", time: "10:30–12:45", text: "Quiet errands" },
+          { type: "flight", time: "~2:10", text: "Leave · Hayes flag · game 2:45 Indian Hills", chips: ["hay"] }
+        ]
+      },
+      {
+        dow: "Sun", dom: "27", load: false,
+        blocks: [
+          { type: "kids", time: "9–2", text: "Garage sale / house shake @ 147th", chips: ["ain","hay","har"] },
+          { type: "handoff", time: "3:00", text: "Ainsley vanity · Jessy", chips: ["ain"] },
+          { type: "urban", time: "6:00", text: "Lawn feed" }
+        ]
+      },
+      {
+        dow: "Mon", dom: "28", load: true,
+        blocks: [
+          { type: "kids", time: "7:30", text: "Hayes snacks", chips: ["hay"] },
+          { type: "flight", time: "8:00", text: "House+Desk LIVE" },
+          { type: "flight", time: "~8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
+          { type: "kids", time: "3:00", text: "Ainsley LKMS HW Help", chips: ["ain"] },
+          { type: "kids", time: "3:15/3:40", text: "Boys pickup", chips: ["hay","har"] },
+          { type: "flight", time: "~5:40", text: "Leave · Hayes BB 6:15 BV Rec F3", chips: ["hay"] }
+        ]
+      },
+      { dow: "Tue", dom: "29", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
+      { dow: "Wed", dom: "30", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
+      { dow: "Thu", dom: "1", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
+      {
+        dow: "Fri", dom: "2", load: false,
+        blocks: [
+          { type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"] },
+          { type: "handoff", time: "3:00", text: "Through · kids with Dad ends", chips: ["ain","hay","har"] }
+        ]
+      }
+    ]
+  },
+  nextTogether: {
+    label: "Watch",
+    items: ["Sun 27 · garage sale 9–2", "Mon 28 · House+Desk LIVE 8:00", "Fri Oct 2 3:00 · Dad week end"]
+  },
+  footer: {
+    note: "House face · kids-safe · Ainsley could see · no PIN · as-of 26 Sep 2026 · Mon LIVE prep",
+    chip: "KITCHEN TABLET · MON LIVE",
+    meta: "Soft glass · kid chips · leave-by first — no money on this face"
+  }
+};
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+const CHIP_LETTER = { ain: "A", hay: "H", har: "H" };
+const CHIP_NAME = { ain: "Ainsley", hay: "Hayes", har: "Harris" };
+
+const CHIP_HREF = { ain: "kid-ainsley.html", hay: "kid-hayes.html", har: "kid-harris.html" };
+
+function renderChips(ids) {
+  if (!ids || !ids.length) return "";
+  const inner = ids.map(id => {
+    const letter = CHIP_LETTER[id] || "?";
+    const name = CHIP_NAME[id] || id;
+    const href = CHIP_HREF[id];
+    if (href) {
+      return `<a class="chip ${esc(id)}" href="${esc(href)}"><span class="d">${esc(letter)}</span>${esc(name)}</a>`;
+    }
+    return `<span class="chip ${esc(id)}"><span class="d">${esc(letter)}</span>${esc(name)}</span>`;
+  }).join("");
+  return `<div class="chips">${inner}</div>`;
+}
+
+function renderBlock(b) {
+  const t = b.time ? `<span class="t">${esc(b.time)}</span>` : "";
+  const chips = renderChips(b.chips);
+  if (b.type === "empty-chore" && b.done) {
+    return `<a class="blk empty-chore" href="sheet-chores.html"><span class="done-ring">✓</span>${esc(b.text)}</a>`;
+  }
+  return `<div class="blk ${esc(b.type)}" role="button" tabindex="0">${t}${esc(b.text)}${chips}</div>`;
+}
+
+function renderDay(d) {
+  const load = d.load ? " load" : "";
+  const blocks = (d.blocks || []).map(renderBlock).join("");
+  const wantsTap = (d.blocks || []).some(b => b.tapAdd);
+  const tap = wantsTap ? `<div class="tap-add" role="button" tabindex="0"><span>+</span> add</div>` : "";
+  return `<div class="day${load}" role="group" aria-label="${esc(d.dow)} ${esc(d.dom)}">
+    <div class="day-top"><span class="dow">${esc(d.dow)}</span><span class="dom">${esc(d.dom)}</span></div>
+    <div class="blocks">${blocks}${tap}</div>
+  </div>`;
+}
+
+function render() {
+  const f = FACTS;
+  const metaHtml = f.meta.map((m, i) => {
+    if (typeof m === "string") return `<span class="meta">${esc(m)}</span>`;
+    return `<span class="meta ${esc(m.className || "")}">${esc(m.text)}</span>`;
+  }).join("");
+
+  const daysHtml = f.week.days.map(renderDay).join("");
+  const usItems = f.nextTogether.items.map(t => `<span class="us-item">${esc(t)}</span>`).join("");
+  const lb = f.leaveBy;
+
+  document.getElementById("app").innerHTML = `
+  <header class="hdr">
+    <div class="hdr-left">
+      <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
+      <div class="nav-row">
+        <a class="sheets-pill" href="sheet-index.html"><span class="chev">‹</span> Sheets</a>
+      </div>
+      <div class="eyebrow">${esc(f.eyebrow)}</div>
+      <h1 class="title">${esc(f.title)} <span class="sep">·</span> <span class="sub">${esc(f.titleSub)}</span></h1>
+      <div class="meta-row">${metaHtml}</div>
+    </div>
+    <div class="hdr-right">
+      <div class="wx-card" aria-label="Weather · mock placeholder">
+        <div class="wx-text">
+          <div class="wx-kicker">Outside · glance</div>
+          <div class="wx-line">Weather · mock / wire later <span class="mock">MOCK</span></div>
+          <div class="wx-sub">PLACEHOLDER · no forecast numbers</div>
+        </div>
+        <div class="wx-icons" aria-hidden="true">
+          <span class="wx-ico">☀</span>
+          <span class="wx-ico">☁</span>
+          <span class="wx-ico dim">🌧</span>
+          <span class="wx-ico">⛅</span>
+        </div>
+      </div>
+      <div class="mock-tag">${esc(f.mockTag).replace(/\n/g, "<br/>")}</div>
+    </div>
+  </header>
+
+  <section class="leaveby" aria-label="Next leave-by">
+    <div class="leaveby-accent"></div>
+    <div class="leaveby-body">
+      <div class="leaveby-label">${esc(lb.label)}</div>
+      <div class="leaveby-main">${esc(lb.date)} · <span class="time">${esc(lb.time)}</span> · ${esc(lb.place)}</div>
+      <div class="leaveby-detail">${lb.detailHtml}</div>
+    </div>
+    <div class="leaveby-badge">${esc(lb.badge)}</div>
+  </section>
+
+  <section class="week-wrap">
+    <div class="week-hdr">
+      <div class="week-title">${esc(f.week.title)}</div>
+      <div class="week-range">${esc(f.week.range)}</div>
+    </div>
+    <div class="banner-row">
+      <div class="banner custody-loud" aria-label="Custody">
+        <span class="c-k">Custody</span>
+        <span class="c-main">with <em>Dad</em> @ <em>147th</em> through <em>Fri Oct 2 3:00</em></span>
+        <span class="c-next">leave now · Sat 7:55 Harris flag</span>
+      </div>
+      <div class="who" aria-label="Kids">
+        ${(f.week.who || []).map(w => {
+          const href = CHIP_HREF[w.id];
+          const inner = `<span class="dot">${esc(CHIP_LETTER[w.id] || "?")}</span>${esc(w.label)}`;
+          return href
+            ? `<a class="who-chip ${esc(w.id)}" href="${esc(href)}">${inner}</a>`
+            : `<span class="who-chip ${esc(w.id)}" role="button" tabindex="0">${inner}</span>`;
+        }).join("")}
+      </div>
+    </div>
+    <div class="week-grid">${daysHtml}</div>
+  </section>
+
+  <div class="us-row">
+    <span class="us-label">${esc(f.nextTogether.label)}</span>
+    ${usItems}
+  </div>
+
+  <footer class="ftr">
+    <div class="ftr-left">
+      <span>${esc(f.footer.note)}</span>
+      <span class="ftr-chip">${esc(f.footer.chip)}</span>
+    </div>
+    <span class="ftr-meta">${esc(f.footer.meta)}</span>
+  </footer>`;
+}
+
+function fit() {
+  const scaler = document.getElementById("scaler");
+  const stage = document.querySelector(".stage");
+  const w = stage.clientWidth;
+  const h = stage.clientHeight;
+  const s = Math.min(w / 1920, h / 1200);
+  scaler.style.transform = `scale(${s})`;
+}
+
+render();
+fit();
+window.addEventListener("resize", fit);
+window.addEventListener("orientationchange", () => setTimeout(fit, 100));
+
+/* Optional: double-tap / keyboard F for browser fullscreen */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "f" || e.key === "F") {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+    else document.exitFullscreen?.();
+  }
+});
+</script>
+</body>
+</html>

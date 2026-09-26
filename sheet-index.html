@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="WardOS House" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="theme-color" content="#d8dadf" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<meta name="description" content="Board-OS House face · family sheets home index · 19 tiles · kids-safe · no money · Gallery + Desk gate + Status" />
+<title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
+<style>
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Regular.ttf") format("truetype");
+    font-weight: 400; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Medium.ttf") format("truetype");
+    font-weight: 500; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-SemiBold.ttf") format("truetype");
+    font-weight: 600; font-style: normal;
+  }
+  @font-face {
+    font-family: "Inter Display";
+    src: url("fonts/InterDisplay-Bold.ttf") format("truetype");
+    font-weight: 700; font-style: normal;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1920px; height: 1200px; overflow: hidden;
+    background: #d8dadf; color: #121418;
+    font-family: "Inter Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .panel {
+    width: 1920px; height: 1200px;
+    padding: 18px 28px 12px;
+    display: flex; flex-direction: column; gap: 12px;
+    position: relative; overflow: hidden;
+    background-color: #d8dadf;
+    background-image:
+      linear-gradient(165deg, rgba(255,255,255,0.36) 0%, rgba(220,222,226,0.24) 45%, rgba(180,184,190,0.18) 100%),
+      url("camo-glass-tile-house.png");
+    background-size: auto, 420px 420px;
+    background-position: center, 0 0;
+    background-repeat: no-repeat, repeat;
+  }
+  .panel::before {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.46) 0%, transparent 28%, transparent 72%, rgba(40,42,46,0.09) 100%),
+      radial-gradient(ellipse 70% 50% at 18% 12%, rgba(255,255,255,0.46) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 88% 78%, rgba(255,255,255,0.18) 0%, transparent 60%);
+    mix-blend-mode: soft-light;
+    opacity: 0.82;
+  }
+  .panel::after {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      linear-gradient(118deg, transparent 0 34%, rgba(255,255,255,0.30) 34% 38%, transparent 38% 62%, rgba(255,255,255,0.12) 62% 64%, transparent 64%),
+      linear-gradient(0deg, rgba(255,255,255,0.06), rgba(255,255,255,0.06));
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.52),
+      inset 0 -1px 0 rgba(60,62,68,0.14),
+      inset 1px 0 0 rgba(255,255,255,0.20),
+      inset -1px 0 0 rgba(60,62,68,0.09);
+  }
+  .panel > * { position: relative; z-index: 2; }
+
+  .hdr {
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    flex-shrink: 0; padding: 14px 20px; border-radius: 16px;
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.85);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 28px rgba(20,22,28,0.08), 0 2px 6px rgba(20,22,28,0.05);
+  }
+  
+  .brand { flex-shrink: 0; display: flex; align-items: center; }
+  .brand img { display: block; height: 48px; width: auto; }
+
+  .hdr-left { display: flex; align-items: center; gap: 18px; min-width: 0; }
+  .back {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 650; color: #3a3e46; letter-spacing: -0.01em;
+    padding: 10px 16px; border-radius: 999px; min-height: 44px;
+    background: rgba(255,255,255,0.72); border: 1px solid rgba(40,42,48,0.14);
+    box-shadow: 0 2px 8px rgba(20,22,28,0.06);
+    cursor: pointer; flex-shrink: 0;
+    text-decoration: none;
+  }
+  .back .chev { font-size: 18px; font-weight: 700; color: #5a5e66; line-height: 1; }
+  .identity { display: flex; align-items: center; gap: 16px; min-width: 0; }
+  .avatar {
+    width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -0.04em;
+    background: linear-gradient(145deg, #6a7078 0%, #3a4048 55%, #22262c 100%);
+    box-shadow:
+      0 0 0 4px rgba(255,255,255,0.92),
+      0 0 0 7px rgba(60,64,72,0.28),
+      0 10px 28px rgba(40,42,48,0.22);
+  }
+  .id-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #5a5e66;
+  }
+  .name { font-size: 38px; font-weight: 800; letter-spacing: -0.05em; color: #0e1014; line-height: 1; }
+  .name-accent { color: #2a2e36; }
+  .tagline { font-size: 15px; font-weight: 550; color: #4a4e56; letter-spacing: -0.01em; margin-top: 2px; }
+  .hdr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+  .hot-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; color: #2a2e36; letter-spacing: -0.015em;
+    padding: 10px 16px; border-radius: 999px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.85), rgba(230,234,240,0.55));
+    border: 1px solid rgba(40,42,48,0.16);
+    box-shadow: 0 4px 14px rgba(20,22,28,0.08);
+  }
+  .hot-pill .spark { font-size: 16px; line-height: 1; color: #5a5e66; }
+  .mock-tag {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #6a6e76; text-align: right; line-height: 1.45; padding: 7px 11px; border-radius: 10px;
+    background: rgba(40,42,48,0.06); border: 1px solid rgba(40,42,48,0.12);
+  }
+
+  .leaveby {
+    flex-shrink: 0; display: flex; align-items: stretch; border-radius: 16px; overflow: hidden;
+    position: relative;
+    background: linear-gradient(105deg, #262830 0%, #343840 28%, #454952 52%, #3a3e46 78%, #2a2c32 100%);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.24) inset,
+      0 0 0 1px rgba(0,0,0,0.28),
+      0 0 36px rgba(0,0,0,0.22),
+      0 10px 28px rgba(20,22,28,0.28),
+      0 0 20px rgba(220,225,235,0.14);
+  }
+  .leaveby::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 40%, rgba(0,0,0,0.16) 100%),
+      radial-gradient(ellipse 55% 120% at 6% 50%, rgba(255,255,255,0.17) 0%, transparent 55%),
+      linear-gradient(118deg, transparent 0 30%, rgba(255,255,255,0.28) 30% 36%, transparent 36%);
+  }
+  .leaveby-accent {
+    width: 8px; flex-shrink: 0; position: relative; z-index: 1;
+    background: linear-gradient(180deg, #fff 0%, #d8dce2 40%, #8a909a 100%);
+  }
+  .leaveby-body {
+    flex: 1; padding: 12px 24px 12px 20px;
+    display: flex; flex-direction: column; gap: 1px;
+    position: relative; z-index: 1;
+  }
+  .leaveby-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.32em;
+    text-transform: uppercase; color: rgba(220,225,235,0.72);
+  }
+  .leaveby-main {
+    font-size: 28px; font-weight: 700; letter-spacing: -0.04em;
+    color: #f4f6f8; line-height: 1.15;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.45), 0 0 18px rgba(255,255,255,0.12);
+  }
+  .leaveby-main .time {
+    color: #0e1014; font-weight: 800; padding: 1px 12px 2px; margin: 0 4px;
+    border-radius: 9px; background: linear-gradient(180deg, #fff 0%, #e8ebf0 100%);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset, 0 3px 12px rgba(0,0,0,0.28), 0 0 12px rgba(255,255,255,0.18);
+  }
+  .leaveby-detail {
+    font-size: 14px; font-weight: 500; color: rgba(200,206,216,0.88);
+    letter-spacing: -0.015em;
+  }
+  .leaveby-detail strong { color: #ffffff; font-weight: 700; }
+  .leaveby-badge {
+    position: absolute; right: 22px; top: 50%; transform: translateY(-50%); z-index: 2;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(240,242,246,0.85); padding: 9px 14px; border-radius: 999px;
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.28);
+    backdrop-filter: blur(8px);
+  }
+
+  .grid-wrap {
+    flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px;
+  }
+  .grid-hdr {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 0 4px; flex-shrink: 0;
+  }
+  .grid-title {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: #4a4e56;
+  }
+  .grid-hint {
+    font-size: 14px; font-weight: 550; color: #5a5e66;
+  }
+
+  .tile-grid {
+    flex: 1; min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .tile {
+    display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between;
+    padding: 12px 14px 12px;
+    border-radius: 18px;
+    text-decoration: none; color: inherit;
+    cursor: pointer;
+    position: relative; overflow: hidden;
+    min-height: 0;
+    background: rgba(255,255,255,0.62);
+    border: 1px solid rgba(255,255,255,0.90);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.98) inset,
+      0 12px 28px rgba(20,22,28,0.08),
+      0 3px 8px rgba(20,22,28,0.04);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .tile:active { transform: scale(0.975); }
+  .tile::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, rgba(90,96,104,0.55), rgba(180,186,196,0.35));
+    border-radius: 22px 22px 0 0;
+  }
+  .tile-icon {
+    width: 42px; height: 42px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; line-height: 1;
+    background: rgba(255,255,255,0.72);
+    border: 1px solid rgba(40,42,48,0.10);
+    box-shadow: 0 4px 12px rgba(20,22,28,0.08);
+    flex-shrink: 0;
+  }
+  .tile-label {
+    font-size: 22px; font-weight: 800; letter-spacing: -0.04em;
+    color: #0e1014; line-height: 1.05; margin-top: auto; padding-top: 10px;
+  }
+  .tile-sub {
+    font-size: 13px; font-weight: 600; color: #5a5e66; letter-spacing: -0.01em;
+    margin-top: 6px;
+  }
+  .tile-tap {
+    position: absolute; right: 16px; bottom: 16px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+    color: #7a8090; padding: 6px 10px; border-radius: 999px;
+    background: rgba(40,42,48,0.06); border: 1px solid rgba(40,42,48,0.10);
+  }
+
+  /* Kid tiles — color accents */
+  .tile.hayes {
+    background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(210,245,232,0.72) 100%);
+    border-color: rgba(40,160,120,0.28);
+  }
+  .tile.hayes::before { background: linear-gradient(90deg, #3ec9a0, #2a9a78); }
+  .tile.hayes .tile-icon {
+    background: linear-gradient(145deg, #3ec9a0, #2a9a78); color: #fff;
+    border-color: transparent; font-size: 22px; font-weight: 800;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(42,154,120,0.28);
+  }
+  .tile.hayes .tile-label { color: #144838; }
+
+  .tile.ainsley {
+    background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(240,220,250,0.72) 100%);
+    border-color: rgba(170,100,200,0.28);
+  }
+  .tile.ainsley::before { background: linear-gradient(90deg, #c47ad8, #9b55b8); }
+  .tile.ainsley .tile-icon {
+    background: linear-gradient(145deg, #c47ad8, #9b55b8); color: #fff;
+    border-color: transparent; font-size: 22px; font-weight: 800;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(155,85,184,0.28);
+  }
+  .tile.ainsley .tile-label { color: #4a2a58; }
+
+  .tile.harris {
+    background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(210,228,250,0.72) 100%);
+    border-color: rgba(70,120,200,0.28);
+  }
+  .tile.harris::before { background: linear-gradient(90deg, #5a9ae8, #3a6fc0); }
+  .tile.harris .tile-icon {
+    background: linear-gradient(145deg, #5a9ae8, #3a6fc0); color: #fff;
+    border-color: transparent; font-size: 22px; font-weight: 800;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(58,111,192,0.28);
+  }
+  .tile.harris .tile-label { color: #1a3050; }
+
+  .tile.stars {
+    background: linear-gradient(165deg, rgba(255,255,255,0.90) 0%, rgba(255,236,180,0.55) 100%);
+    border-color: rgba(210,160,40,0.35);
+  }
+  .tile.stars::before { background: linear-gradient(90deg, #f0c040, #d0a020); }
+  .tile.stars .tile-icon {
+    background: linear-gradient(145deg, #f0c040, #d0a020); color: #fff;
+    border-color: transparent;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(180,140,40,0.28);
+  }
+  .tile.stars .tile-label { color: #5a4010; }
+
+  .tile.fun {
+    background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(220,245,255,0.65) 100%);
+    border-color: rgba(80,160,200,0.28);
+  }
+  .tile.fun::before { background: linear-gradient(90deg, #5ec0e0, #3a90b8); }
+
+  .tile.vote {
+    background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(255,230,210,0.55) 100%);
+    border-color: rgba(220,140,80,0.28);
+  }
+  .tile.vote::before { background: linear-gradient(90deg, #f0a060, #d07840); }
+
+  .tile.win {
+    background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(210,245,200,0.55) 100%);
+    border-color: rgba(80,170,100,0.30);
+  }
+  .tile.win::before { background: linear-gradient(90deg, #70d080, #40a850); }
+
+  .tile.count {
+    background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(230,220,255,0.55) 100%);
+    border-color: rgba(120,100,200,0.28);
+  }
+  .tile.count::before { background: linear-gradient(90deg, #9080e0, #6860b8); }
+
+  .tile.us {
+    background: linear-gradient(165deg, rgba(255,255,255,0.90) 0%, rgba(255,230,220,0.60) 100%);
+    border-color: rgba(200,120,100,0.32);
+  }
+  .tile.us::before { background: linear-gradient(90deg, #e8a898, #c87868); }
+  .tile.us .tile-icon {
+    background: linear-gradient(145deg, #f0d0c8, #c87868); color: #fff;
+    border-color: transparent;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(180,100,80,0.25);
+  }
+  .tile.us .tile-label { color: #3a2e2a; }
+
+  .tile.load {
+    background: linear-gradient(165deg, rgba(255,255,255,0.92) 0%, rgba(255,236,160,0.70) 100%);
+    border-color: rgba(210,160,40,0.45);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.98) inset,
+      0 12px 28px rgba(200,150,40,0.14),
+      0 0 0 2px rgba(240,192,64,0.28);
+  }
+  .tile.load::before { background: linear-gradient(90deg, #f0c040, #d0a020); height: 5px; }
+  .tile.load .tile-icon {
+    background: linear-gradient(145deg, #ffe08a, #f0c040); color: #1a1408;
+    border-color: transparent; font-size: 18px; font-weight: 900;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(200,150,40,0.32);
+  }
+  .tile.load .tile-label { color: #5a4010; }
+
+
+  .tile.today {
+    background: linear-gradient(165deg, rgba(255,255,255,0.94) 0%, rgba(255,236,170,0.72) 100%);
+    border-color: rgba(210,160,40,0.48);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.98) inset,
+      0 12px 28px rgba(200,150,40,0.16),
+      0 0 0 2px rgba(240,192,64,0.32);
+  }
+  .tile.today::before { background: linear-gradient(90deg, #ffe08a, #f0c040); height: 5px; }
+  .tile.today .tile-icon {
+    background: linear-gradient(145deg, #ffe08a, #f0c040); color: #1a1408;
+    border-color: transparent; font-size: 26px;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(200,150,40,0.32);
+  }
+  .tile.today .tile-label { color: #5a4010; }
+
+  .tile.desk {
+    background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(70,74,82,0.22) 100%);
+    border-color: rgba(40,42,48,0.35);
+  }
+  .tile.desk::before { background: linear-gradient(90deg, #4a5058, #1e2228); }
+  .tile.desk .tile-icon {
+    background: linear-gradient(145deg, #4a5058, #1e2228); color: #fff;
+    border-color: transparent; font-size: 16px; font-weight: 800;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(20,22,28,0.28);
+  }
+  .tile.desk .tile-label { color: #1a1c20; }
+
+  .tile.status {
+    background: linear-gradient(165deg, rgba(255,255,255,0.90) 0%, rgba(200,220,250,0.65) 100%);
+    border-color: rgba(70,120,200,0.32);
+  }
+  .tile.status::before { background: linear-gradient(90deg, #5a9ae8, #3a6fc0); }
+  .tile.status .tile-icon {
+    background: linear-gradient(145deg, #5a9ae8, #3a6fc0); color: #fff;
+    border-color: transparent; font-size: 20px;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(58,111,192,0.28);
+  }
+  .tile.status .tile-label { color: #1a3050; }
+
+
+  .tile.gallery {
+    background: linear-gradient(165deg, rgba(255,255,255,0.92) 0%, rgba(210,220,240,0.70) 100%);
+    border-color: rgba(80,110,160,0.35);
+  }
+  .tile.gallery::before { background: linear-gradient(90deg, #7a90b8, #4a6088); }
+  .tile.gallery .tile-icon {
+    background: linear-gradient(145deg, #8aa0c0, #4a6088); color: #fff;
+    border-color: transparent; font-size: 18px;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(60,80,120,0.28);
+  }
+  .tile.gallery .tile-label { color: #1a2840; }
+
+  .ftr {
+    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; font-size: 12px; color: #6a6e76; font-weight: 500; padding-top: 2px;
+  }
+  .ftr-left { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .ftr-chip {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #3a3e46; border: 1px solid rgba(40,42,48,0.22);
+    padding: 6px 12px; border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(230,232,236,0.7));
+  }
+  .ftr-meta { color: #8a8e96; }
+
+  /* Kid board entry tiles · magnetic */
+  a.tile.hayes, a.tile.ainsley, a.tile.harris {
+    position: relative;
+    animation: tile-breathe 3s ease-in-out infinite;
+  }
+  a.tile.ainsley { animation-delay: 0s; }
+  a.tile.hayes { animation-delay: 0.4s; }
+  a.tile.harris { animation-delay: 0.8s; }
+  a.tile.hayes::after, a.tile.ainsley::after, a.tile.harris::after {
+    content: ""; position: absolute; inset: -2px; border-radius: inherit; pointer-events: none;
+    opacity: 0.5; z-index: 0;
+    animation: tile-glow 3s ease-in-out infinite;
+  }
+  a.tile.ainsley::after {
+    box-shadow: 0 0 0 2px rgba(180,100,200,0.4), 0 0 28px rgba(200,120,220,0.4);
+  }
+  a.tile.hayes::after {
+    box-shadow: 0 0 0 2px rgba(40,180,140,0.4), 0 0 28px rgba(60,200,160,0.4);
+    animation-delay: 0.4s;
+  }
+  a.tile.harris::after {
+    box-shadow: 0 0 0 2px rgba(70,130,210,0.4), 0 0 28px rgba(90,160,230,0.4);
+    animation-delay: 0.8s;
+  }
+  a.tile.hayes:active, a.tile.ainsley:active, a.tile.harris:active {
+    transform: scale(0.97);
+    filter: brightness(1.08);
+  }
+  @keyframes tile-breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+  }
+  @keyframes tile-glow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.85; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    a.tile.hayes, a.tile.ainsley, a.tile.harris,
+    a.tile.hayes::after, a.tile.ainsley::after, a.tile.harris::after {
+      animation: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="panel">
+  <header class="hdr">
+    <div class="hdr-left">
+      <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
+      <a class="back" href="index.html" aria-label="Back to House week"><span class="chev">‹</span> Week</a>
+      <div class="identity">
+        <div class="avatar" aria-hidden="true">⌂</div>
+        <div class="id-text">
+          <div class="eyebrow">HOUSE · WARD · KS HUB TEST · NO PIN</div>
+          <h1 class="name"><span class="name-accent">Family sheets</span></h1>
+          <div class="tagline">Kitchen tablet · Mon LIVE prep · Sat Sep 26</div>
+        </div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="hot-pill"><span class="spark">◎</span> Tap a tile · open a sheet</div>
+      <div class="mock-tag">LIVE · KIDS-SAFE · NO MONEY<br/>as-of Sat Sep 26 2026</div>
+    </div>
+  </header>
+
+  <section class="leaveby" aria-label="Next leave-by">
+    <div class="leaveby-accent"></div>
+    <div class="leaveby-body">
+      <div class="leaveby-label">Next leave-by · today</div>
+      <div class="leaveby-main">Sat Sep 26 · <span class="time">7:55</span> · Harris flag</div>
+      <div class="leaveby-detail">Game <strong>8:30</strong> · Heritage Park Field 10 · kids with Dad @ <strong>147th</strong> through Fri Oct 2 3:00</div>
+    </div>
+    <div class="leaveby-badge">Sat</div>
+  </section>
+
+  <div class="grid-wrap">
+    <div class="grid-hdr">
+      <div class="grid-title">All sheets</div>
+      <div class="grid-hint">19 tiles · Today first · Gallery · Ainsley-safe</div>
+    </div>
+
+    <nav class="tile-grid" aria-label="Family sheet index">
+      <a class="tile today" href="sheet-today.html">
+        <div class="tile-icon" aria-hidden="true">☀</div>
+        <div>
+          <div class="tile-label">Today</div>
+          <div class="tile-sub">Sat Sep 26 · morning</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile" href="index.html">
+        <div class="tile-icon" aria-hidden="true">📅</div>
+        <div>
+          <div class="tile-label">Week</div>
+          <div class="tile-sub">Family week board</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile" href="month.html">
+        <div class="tile-icon" aria-hidden="true">🗓</div>
+        <div>
+          <div class="tile-label">Month</div>
+          <div class="tile-sub">Bigger calendar</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile hayes" href="kid-hayes.html">
+        <div class="tile-icon" aria-hidden="true">H</div>
+        <div>
+          <div class="tile-label">Hayes</div>
+          <div class="tile-sub">His week · green</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile ainsley" href="kid-ainsley.html">
+        <div class="tile-icon" aria-hidden="true">A</div>
+        <div>
+          <div class="tile-label">Ainsley</div>
+          <div class="tile-sub">Her week · purple</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile harris" href="kid-harris.html">
+        <div class="tile-icon" aria-hidden="true">H</div>
+        <div>
+          <div class="tile-label">Harris</div>
+          <div class="tile-sub">His week · blue</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile" href="sheet-chores.html">
+        <div class="tile-icon" aria-hidden="true">✓</div>
+        <div>
+          <div class="tile-label">Chores</div>
+          <div class="tile-sub">Checkoffs · streaks</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile" href="sheet-groceries.html">
+        <div class="tile-icon" aria-hidden="true">🛒</div>
+        <div>
+          <div class="tile-label">Groceries/Costco</div>
+          <div class="tile-sub">Family list · no $</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile stars" href="sheet-allowance.html">
+        <div class="tile-icon" aria-hidden="true">★</div>
+        <div>
+          <div class="tile-label">Allowance ★</div>
+          <div class="tile-sub">Stars only · cheer</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile vote" href="sheet-dinner.html">
+        <div class="tile-icon" aria-hidden="true">🍽</div>
+        <div>
+          <div class="tile-label">Dinner vote</div>
+          <div class="tile-sub">Pick tonight</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile fun" href="sheet-weekend.html">
+        <div class="tile-icon" aria-hidden="true">🎈</div>
+        <div>
+          <div class="tile-label">Weekend fun</div>
+          <div class="tile-sub">Ideas · play</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile" href="sheet-pack.html">
+        <div class="tile-icon" aria-hidden="true">🎒</div>
+        <div>
+          <div class="tile-label">Pack list</div>
+          <div class="tile-sub">Bags · ready</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile win" href="sheet-win.html">
+        <div class="tile-icon" aria-hidden="true">🏆</div>
+        <div>
+          <div class="tile-label">Week win</div>
+          <div class="tile-sub">Cheer board</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile count" href="sheet-countdowns.html">
+        <div class="tile-icon" aria-hidden="true">⏳</div>
+        <div>
+          <div class="tile-label">Countdowns</div>
+          <div class="tile-sub">Days until fun</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile us" href="sheet-us.html">
+        <div class="tile-icon" aria-hidden="true">◎</div>
+        <div>
+          <div class="tile-label">Us · together</div>
+          <div class="tile-sub">Shared calendar</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile load" href="sheet-load-day.html">
+        <div class="tile-icon" aria-hidden="true">LD</div>
+        <div>
+          <div class="tile-label">Load day</div>
+          <div class="tile-sub">Mon LIVE · House+Desk</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+
+      <a class="tile desk" href="sheet-desk-gate.html">
+        <div class="tile-icon" aria-hidden="true">PIN</div>
+        <div>
+          <div class="tile-label">Desk · PIN</div>
+          <div class="tile-sub">House open · gate</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile status" href="sheet-status.html">
+        <div class="tile-icon" aria-hidden="true">▣</div>
+        <div>
+          <div class="tile-label">Status</div>
+          <div class="tile-sub">Stack · shipped</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile gallery" href="sheet-gallery.html">
+        <div class="tile-icon" aria-hidden="true">▦</div>
+        <div>
+          <div class="tile-label">Gallery</div>
+          <div class="tile-sub">Phone contact sheet</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+    </nav>
+  </div>
+
+  <footer class="ftr">
+    <div class="ftr-left">
+      <span>kids-safe · LIVE · as-of Sat Sep 26 2026</span>
+      <span class="ftr-chip">SHEETS INDEX · NO MONEY</span>
+    </div>
+    <span class="ftr-meta">House face · white/grey glass camo · no PIN · mock nav</span>
+  </footer>
+</div>
+</body>
+</html>
