@@ -400,3 +400,83 @@ body.theme-ainsley.stick-season .saves-add-btn {
   .saves-form { grid-template-columns: 1fr 64px; }
   .saves-add-btn { grid-column: 1 / -1; }
 }
+
+/* —— Dead-easy Home · large tap · not “Sheets” —— */
+a.home-btn, .home-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none !important;
+  font-family: inherit;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  padding: 14px 22px !important;
+  min-height: 52px !important;
+  min-width: 120px;
+  border-radius: 14px !important;
+  box-sizing: border-box;
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  background: linear-gradient(180deg, #ffe080, #e0a020) !important;
+  color: #1a1000 !important;
+  border: 3px solid #8a6010 !important;
+  box-shadow: 0 5px 0 #6a4010, 0 8px 18px rgba(0,0,0,0.22) !important;
+}
+a.home-btn:active, .home-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #6a4010, 0 4px 10px rgba(0,0,0,0.2) !important;
+}
+a.home-btn .chev, .home-btn .chev {
+  font-size: 26px !important;
+  font-weight: 800;
+  line-height: 1;
+  margin-top: -2px;
+}
+.home-dock {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 9000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, transparent, rgba(8,10,14,0.72) 28%, rgba(8,10,14,0.92));
+  pointer-events: none;
+}
+.home-dock .home-btn {
+  pointer-events: auto;
+  min-width: min(92vw, 420px);
+  min-height: 56px !important;
+  font-size: 20px !important;
+  padding: 16px 28px !important;
+  border-radius: 16px !important;
+}
+body.has-home-dock {
+  padding-bottom: 88px !important;
+}
+body.theme-ainsley.stick-season a.home-btn,
+body.theme-ainsley.stick-season .home-btn {
+  background: linear-gradient(180deg, #d4a05a, #c4783a) !important;
+  border-color: #8a5020 !important;
+  box-shadow: 0 5px 0 #3a2810, 0 8px 18px rgba(0,0,0,0.28) !important;
+  color: #1a1208 !important;
+}
+body.theme-hayes a.home-btn,
+body.theme-hayes .home-btn {
+  background: linear-gradient(180deg, #7ec8ff, #2a78c8) !important;
+  border-color: #0a4068 !important;
+  box-shadow: 0 5px 0 #062840, 0 8px 18px rgba(0,0,0,0.28) !important;
+  color: #041018 !important;
+}
+body.theme-harris a.home-btn,
+body.theme-harris .home-btn {
+  background: linear-gradient(180deg, #9ae06a, #3a9010) !important;
+  border-color: #1a5010 !important;
+  box-shadow: 0 5px 0 #0e3008, 0 8px 18px rgba(0,0,0,0.28) !important;
+  color: #061008 !important;
+}

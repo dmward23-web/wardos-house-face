@@ -487,7 +487,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
 
 </style>
 </head>
-<body data-clear-label="TRACKS CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley">
+<body data-clear-label="TRACKS CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley has-home-dock">
 
 <div class="panel">
   <div class="spotlight" aria-hidden="true"></div>
@@ -497,7 +497,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   <header class="hdr">
     <div class="hdr-left">
       <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="40" /></div>
-      <div class="nav-row"><a class="back" href="sheet-index.html">‹ Sheets</a><a class="nav-week" href="index.html">Week</a></div>
+      <div class="nav-row"><a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a><a class="nav-week" href="index.html">Week</a></div>
       <div class="identity">
         <div class="avatar">A</div>
         <div>
@@ -693,5 +693,10 @@ document.addEventListener("DOMContentLoaded", function(){
   }
 });
 </script>
+
+<nav class="home-dock" aria-label="Home">
+  <a class="home-btn home-btn-dock" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
+</nav>
+
 </body>
 </html>

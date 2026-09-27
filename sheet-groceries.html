@@ -366,11 +366,11 @@
 </style>
 <link rel="stylesheet" href="house-engage.css" />
 </head>
-<body data-clear-label="CLEARED">
+<body data-clear-label="CLEARED" class="has-home-dock">
 <div class="panel">
   <header class="hdr">
     <div class="hdr-left">
-      <div class="nav-row"><a class="back" href="sheet-index.html" aria-label="Back to Family sheets"><span class="chev">‹</span> Sheets</a><a class="nav-week" href="index.html">Week</a></div>
+      <div class="nav-row"><a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a><a class="nav-week" href="index.html">Week</a></div>
       <div class="identity">
         <div class="avatar" aria-hidden="true">🛒</div>
         <div class="id-text">
@@ -519,5 +519,10 @@
   </footer>
 </div>
 <script src="house-checkoffs.js" defer></script>
+
+<nav class="home-dock" aria-label="Home">
+  <a class="home-btn home-btn-dock" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
+</nav>
+
 </body>
 </html>

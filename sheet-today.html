@@ -12,6 +12,7 @@
 <meta name="theme-color" content="#d8dadf" />
 <meta name="description" content="WardOS House face · morning TODAY strip · kids-safe · no PIN · no money" />
 <title>BOARD-OS · HOUSE FACE · TODAY</title>
+<link rel="stylesheet" href="house-engage.css" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -496,13 +497,13 @@
 
 </style>
 </head>
-<body>
+<body class="has-home-dock">
 <div class="panel">
   <header class="hdr">
     <div class="hdr-left">
       <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
       <div class="nav-row">
-        <a class="back" href="sheet-index.html" aria-label="Back to Family sheets"><span class="chev">‹</span> Sheets</a>
+        <a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
         <a class="nav-week" href="index.html">Week</a>
       </div>
       <div class="identity">
@@ -666,5 +667,10 @@
     <span class="ftr-meta">House face · white/grey glass camo · no money · no PIN</span>
   </footer>
 </div>
+
+<nav class="home-dock" aria-label="Home">
+  <a class="home-btn home-btn-dock" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
+</nav>
+
 </body>
 </html>
