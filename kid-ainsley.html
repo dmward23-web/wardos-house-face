@@ -483,74 +483,11 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .bag-strip .bag-hint { font-size:13px; font-weight:650; opacity:0.9; }
 
 
-  /* Stick Season vibe — Noah Kahan energy · autumn folk · no lyrics */
-  body.theme-ainsley.stick-season {
-    --ss-spruce: #1a2e24;
-    --ss-moss: #2a4034;
-    --ss-rust: #c4783a;
-    --ss-amber: #d4a05a;
-    --ss-cream: #e8e0d0;
-    --ss-ink: #12140f;
-  }
-  body.theme-ainsley.stick-season .panel {
-    background:
-      radial-gradient(ellipse 70% 50% at 20% 10%, rgba(196,120,58,0.18), transparent 55%),
-      radial-gradient(ellipse 50% 40% at 90% 80%, rgba(42,64,52,0.45), transparent 60%),
-      linear-gradient(165deg, #141810 0%, #1a2e24 40%, #12140f 100%);
-  }
-  body.theme-ainsley.stick-season .hdr {
-    background: linear-gradient(180deg, rgba(26,46,36,.96), rgba(18,20,15,.94));
-    border-color: #5a6a58;
-  }
-  body.theme-ainsley.stick-season .avatar {
-    background: linear-gradient(145deg, #c4783a, #5a3a20 55%, #1a2e24);
-    box-shadow: 0 0 0 3px #e8e0d0, 0 0 0 6px rgba(196,120,58,.35), 0 7px 0 #050805;
-  }
-  body.theme-ainsley.stick-season .name-accent { color: #e8e0d0; }
-  body.theme-ainsley.stick-season .tagline { color: #b8b09a; }
-  body.theme-ainsley.stick-season .hot-banner {
-    background: linear-gradient(105deg, #12140f, #1a2e24 40%, #2a2418 70%, #181410);
-    border-color: #8a7040;
-  }
-  body.theme-ainsley.stick-season .hot-title .hl,
-  body.theme-ainsley.stick-season .hot-badge {
-    border-color: rgba(212,160,90,.45);
-  }
-  body.theme-ainsley.stick-season .sec-bank.bank-card {
-    background: linear-gradient(135deg, #1a2e24, #12140f);
-    border-color: #8a7040;
-    box-shadow: 0 0 28px rgba(196,120,58,.18), 0 8px 0 #050805;
-  }
-  body.theme-ainsley.stick-season .ledger-chip.payday {
-    background: linear-gradient(180deg, #3a3428, #1a1810);
-    border-color: #c4783a;
-    color: #e8e0d0;
-  }
-  body.theme-ainsley.stick-season .ledger-chip.goal-chip.is-active,
-  body.theme-ainsley.stick-season .ledger-chip.goal-chip.is-met {
-    background: linear-gradient(180deg, #d4a05a, #c4783a);
-    color: #14100a;
-    border-color: #8a5020;
-  }
-  body.theme-ainsley.stick-season .quest {
-    --quest-border: #5a7a58;
-    --quest-edge: #0a140c;
-  }
-  body.theme-ainsley.stick-season .harbor-strip {
-    border-color: #8a7040;
-    background: rgba(18,20,15,.94);
-  }
-  body.theme-ainsley.stick-season .harbor-strip .hs-title { color: #d4a05a; }
-  body.theme-ainsley.stick-season .vibe-chip {
-    display:inline-flex; align-items:center; gap:6px;
-    font-size:11px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase;
-    padding:6px 10px; border-radius:6px;
-    background:rgba(196,120,58,0.2); border:2px solid rgba(196,120,58,0.45); color:#e8e0d0;
-  }
+  /* quiet folk autumn — color homage only · no album/artist on glass */
 
 </style>
 </head>
-<body data-clear-label="TRACKS CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley stick-season">
+<body data-clear-label="TRACKS CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley">
 
 <div class="panel">
   <div class="spotlight" aria-hidden="true"></div>
@@ -566,7 +503,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
         <div>
           <a class="eyebrow" href="sheet-index.html">HER TRACKS · HER WEEK</a>
           <h1 class="name"><span class="name-accent">AINSLEY</span></h1>
-          <div class="tagline">Your tracks · Stick Season energy · Tour Jar → Payday with Dad.</div>
+          <div class="tagline">Your tracks · your week · Tour Jar → Payday with Dad.</div>
         </div>
       </div>
     </div>
@@ -578,19 +515,18 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
       </div>
     </div>
   </header>
-  <div class="eras" aria-label="Pick your era">
-    <span class="vibe-chip" data-vibe-chip>Stick Season · her set</span>
-    <span class="eras-lab">ERAS</span>
-    <button type="button" class="era midnight" data-era="midnight">Midnight</button>
-    <button type="button" class="era fog" data-era="fog">Fog</button>
-    <button type="button" class="era gold on" data-era="gold">Stage Gold</button>
-    <button type="button" class="era lilac" data-era="lilac">Violet</button>
-    <button type="button" class="era blush" data-era="blush">Silver</button>
+  <div class="eras" aria-label="Pick your mood">
+    <span class="eras-lab">MOOD</span>
+    <button type="button" class="era midnight" data-era="midnight">Pine Night</button>
+    <button type="button" class="era fog" data-era="fog">Mist</button>
+    <button type="button" class="era gold on" data-era="gold">Honey Amber</button>
+    <button type="button" class="era lilac" data-era="lilac">Dusk</button>
+    <button type="button" class="era blush" data-era="blush">Birch</button>
   </div>
   <div class="xp-stage">
     <div class="xp-stage-lab">TRACKS</div>
     <div class="xp-stage-track"><div class="xp-stage-fill" data-progress-fill></div></div>
-    <div data-progress-meta="{done}/{total} tracks" style="font-size:13px;font-weight:800;color:#9aa4b8">0/6</div>
+    <div data-progress-meta="{done}/{total} tracks" style="font-size:13px;font-weight:800;color:#a8a490">0/6</div>
     <div class="left-chip" data-left-count>···</div>
   </div>
   <section class="hot-banner" aria-label="What’s on the board">
@@ -631,7 +567,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
         <span class="ledger-chip" data-payday-copy>Payday with Dad</span>
       </div>
       <div class="ledger-row">
-        <span class="ledger-chip goal-chip is-empty" data-goal-chip>Stick Season · concert save · 0/40 ★</span>
+        <span class="ledger-chip goal-chip is-empty" data-goal-chip>Set a goal with Dad</span>
       </div>
       <div class="jar-flow" aria-label="stars to jar to payday">
         <span class="step">★ musts</span>
