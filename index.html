@@ -523,10 +523,10 @@
 
 <script>
 /* ─── Morning-refresh facts (swap values only; do not restyle) ───
- Known facts only · as-of Sat Sep 26 2026 · no money · no invent · Mon LIVE prep */
+ Known facts only · as-of LIVE America/Chicago · no money · no invent · Mon LIVE prep */
 const FACTS = {
- asOf: "Sat Sep 26 2026",
- asOfShort: "26 Sep 2026",
+ asOf: "Sun Sep 27 2026",
+ asOfShort: "Sun Sep 27",
  eyebrow: "WardOS · House · KS Hub",
  title: "House",
  titleSub: "family week",
@@ -539,13 +539,13 @@ const FACTS = {
  
  leaveCard: {
  style: "A",
- label: "weekday leave card",
- dateLabel: "Sat Sep 26",
- leaveBy: "7:55",
- place: "Heritage Park",
+ label: "Sunday house card",
+ dateLabel: "Sun Sep 27",
+ leaveBy: "3:00",
+ place: "147th",
  flight: "",
- route: "Harris flag",
- status: "LIVE · leave now · game 8:30"
+ route: "Ainsley vanity",
+ status: "LIVE · garage sale 9–2 · vanity 3:00"
  },
  lockPacket: {
  style: "B",
@@ -555,16 +555,16 @@ const FACTS = {
  },
  schoolWeather: { school: "UNKNOWN", weather: "UNKNOWN" },
 leaveBy: {
- label: "Leave now · Sat",
- date: "Sat Sep 26",
- time: "7:55",
- place: "Harris flag",
- detailHtml: "Game <strong>8:30</strong>Heritage Park Field 10 · 17255 S Black Bob Rd, Olathe",
- badge: "Leave now"
+ label: "Next up · Sun",
+ date: "Sun Sep 27",
+ time: "3:00",
+ place: "Ainsley vanity · Jessy",
+ detailHtml: "Garage sale <strong>9–2</strong> @ 147th · then vanity · kids with Dad @ <strong>147th</strong> through Fri Oct 2 3:00",
+ badge: "Sun"
  },
  week: {
  title: "This week",
- range: "Sat Sep 26 – Fri Oct 2 · Dad week @ 147th",
+ range: "Sun Sep 27 – Fri Oct 2 · Dad week @ 147th",
  banner: "with Dad @ 147th through Fri Oct 2 3:00",
  who: [
  { id: "ain", label: "Ainsley" },
@@ -696,8 +696,8 @@ function render() {
  <div class="wx-card" aria-label="Weather">
  <div class="wx-text">
  <div class="wx-kicker">Outside · glance</div>
- <div class="wx-line">Weather · coming soon</div>
- <div class="wx-sub">PLACEHOLDER · no forecast numbers</div>
+ <div class="wx-line">Weather · loading</div>
+ <div class="wx-sub">Overland Park · 147th</div>
  </div>
  <div class="wx-icons" aria-hidden="true">
  <span class="wx-ico">☀</span>
@@ -728,7 +728,7 @@ function render() {
  <div class="banner custody-loud" aria-label="Custody">
  <span class="c-k">Custody</span>
  <span class="c-main">with <em>Dad</em> @ <em>147th</em> through <em>Fri Oct 2 3:00</em></span>
- <span class="c-next">leave now · Sat 7:55 Harris flag</span>
+ <span class="c-next">next · Sun 3:00 Ainsley vanity</span>
  </div>
  <div class="who" aria-label="Kids">
  ${(f.week.who || []).map(w => {
@@ -782,5 +782,68 @@ document.addEventListener("keydown", (e) => {
 
 <script src="house-zoom.js"></script>
 <script>if (window.HouseZoom) HouseZoom.mount();</script>
+
+<script src="house-clock.js?v=CT1"></script>
+<script src="house-weather.js?v=CT1"></script>
+<script>
+(function () {
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function applyClockToFacts() {
+    if (!window.HouseClock || typeof FACTS === "undefined") return;
+    var c = HouseClock.now();
+    FACTS.asOf = c.long;
+    FACTS.asOfShort = c.short;
+    if (FACTS.leaveCard) FACTS.leaveCard.dateLabel = c.short;
+    if (FACTS.leaveBy) {
+      FACTS.leaveBy.date = c.short;
+      FACTS.leaveBy.badge = FACTS.leaveBy.badge || c.dow;
+      if (/^Leave now/i.test(FACTS.leaveBy.label || "")) {
+        FACTS.leaveBy.label = "Next up · " + c.dow;
+      }
+    }
+    /* Mark today's day column */
+    if (FACTS.week && FACTS.week.days) {
+      var dom = String(Number(c.iso.split("-")[2]));
+      var dow = c.dow;
+      FACTS.week.days.forEach(function (d) {
+        d.isToday = (String(d.dom) === dom) || (d.dow === dow && String(d.dom) === dom);
+      });
+    }
+  }
+  function loadStripIntoFacts(cb) {
+    fetch("kids-week.json?v=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function (data) {
+        var s = data && data.boardStrip;
+        if (s && FACTS.leaveBy) {
+          if (s.time) FACTS.leaveBy.time = s.time;
+          if (s.place) FACTS.leaveBy.place = s.place;
+          if (s.detailHtml) FACTS.leaveBy.detailHtml = s.detailHtml;
+          if (s.label) FACTS.leaveBy.label = s.label;
+          if (s.badge) FACTS.leaveBy.badge = s.badge;
+        }
+        if (data && data.custody && data.custody.throughLabel && FACTS.week) {
+          FACTS.week.banner = data.custody.throughLabel;
+        }
+        cb();
+      })
+      .catch(function () { cb(); });
+  }
+  applyClockToFacts();
+  var _origRender = typeof render === "function" ? render : null;
+  loadStripIntoFacts(function () {
+    applyClockToFacts();
+    if (_origRender) _origRender();
+    /* Live weather into wx-card */
+    var card = document.querySelector(".wx-card");
+    if (card && window.HouseWeather) HouseWeather.mount(card);
+  });
+})();
+</script>
+
 </body>
 </html>

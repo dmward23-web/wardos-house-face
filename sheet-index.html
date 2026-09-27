@@ -121,7 +121,7 @@
   .name { font-size: 42px; font-weight: 850; letter-spacing: -0.05em; color: #0e1014; line-height: 1; }
   .name-accent { color: #121418; }
   .tagline { font-size: 16px; font-weight: 650; color: #3a3e46; letter-spacing: -0.01em; margin-top: 2px; }
-  .hdr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+  .hdr-right { display: flex; flex-direction: row; align-items: center; gap: 12px; flex-shrink: 0; }
   .hot-pill {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 14px; font-weight: 800; color: #1a1000; letter-spacing: -0.015em;
@@ -136,6 +136,31 @@
     color: #6a6e76; text-align: right; line-height: 1.45; padding: 7px 11px; border-radius: 10px;
     background: rgba(40,42,48,0.06); border: 1px solid rgba(40,42,48,0.12);
   }
+
+  /* Live weather · Overland Park / 147th · light camo */
+  .wx-card {
+    display: flex; align-items: center; gap: 14px;
+    min-width: 220px; max-width: 320px;
+    padding: 10px 16px; border-radius: 14px;
+    background: linear-gradient(165deg, rgba(255,255,255,0.88), rgba(220,228,236,0.72));
+    border: 2px solid rgba(40,60,80,0.22);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 4px 0 rgba(40,50,60,0.12);
+  }
+  .wx-card .wx-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .wx-card .wx-kicker {
+    font-size: 10px; font-weight: 750; letter-spacing: 0.14em; text-transform: uppercase; color: #5a6878;
+  }
+  .wx-card .wx-line { font-size: 22px; font-weight: 850; color: #121418; letter-spacing: -0.03em; line-height: 1.1; }
+  .wx-card .wx-temp { font-size: 28px; font-weight: 900; color: #0e1014; }
+  .wx-card .wx-cond { font-size: 16px; font-weight: 700; color: #2a3440; }
+  .wx-card .wx-sub { font-size: 12px; font-weight: 650; color: #4a5868; margin-top: 2px; }
+  .wx-card .wx-icons { display: flex; gap: 4px; flex-shrink: 0; }
+  .wx-card .wx-ico {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; background: rgba(255,255,255,0.7); border: 1px solid rgba(40,50,60,0.12);
+  }
+  .hdr-right { display: flex; flex-direction: row; align-items: center; gap: 12px; flex-shrink: 0; }
 
   .leaveby {
     flex-shrink: 0; display: flex; align-items: stretch; border-radius: 14px; overflow: hidden;
@@ -744,6 +769,7 @@
  </div>
  </div>
  <div class="hdr-right">
+ <div class="wx-card" id="house-wx" data-live="weather" aria-label="Weather · Overland Park"></div>
  <div class="hot-pill"><span class="spark">◎</span> Tap a tile · open a sheet</div>
  </div>
  </header>
@@ -751,11 +777,11 @@
  <section class="leaveby" aria-label="Next leave-by">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
- <div class="leaveby-label">Next leave-by · today</div>
- <div class="leaveby-main">Sat Sep 26 · <span class="time">7:55</span>Harris flag</div>
- <div class="leaveby-detail">Game <strong>8:30</strong>Heritage Park Field 10 · kids with Dad @ <strong>147th</strong> through Fri Oct 2 3:00</div>
+ <div class="leaveby-label" data-live="leaveby-label">Next up · today</div>
+ <div class="leaveby-main" data-live="leaveby-main">Sun Sep 27 · loading</div>
+ <div class="leaveby-detail" data-live="leaveby-detail">America/Chicago · live clock</div>
  </div>
- <div class="leaveby-badge">Sat</div>
+ <div class="leaveby-badge" data-live="leaveby-badge">Sun</div>
  </section>
 
  <div class="grid-wrap">
@@ -768,7 +794,7 @@
  <div class="tile-icon" aria-hidden="true">☀</div>
  <div>
  <div class="tile-label">Today</div>
- <div class="tile-sub">Sat Sep 26 · morning</div>
+ <div class="tile-sub" data-live="today-sub">Sun Sep 27 · morning</div>
  </div>
  <span class="tile-tap">Tap</span>
  </a>
@@ -955,6 +981,9 @@
  </div>
  </footer>
 </div>
+<script src="house-clock.js?v=CT1"></script>
+<script src="house-board-strip.js?v=CT1"></script>
+<script src="house-weather.js?v=CT1"></script>
 <script src="house-sfx.js"></script>
 <script src="house-zoom.js"></script>
 <script>
@@ -964,6 +993,7 @@
  try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
  }, { passive: true });
  });
+ try { if (window.HouseWeather) HouseWeather.mount("#house-wx"); } catch (e) {}
 })();
 </script>
 </body>
