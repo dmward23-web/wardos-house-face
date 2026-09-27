@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HAYES · DROP ZONE</title>
-<link rel="stylesheet" href="house-engage.css?v=GROW2b" />
+<link rel="stylesheet" href="house-engage.css?v=KIDSLAY1" />
 <style>
 
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400}
@@ -124,7 +124,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .body {
     flex:1; min-height:0; display:grid; gap:10px;
     grid-template-columns: 1.7fr 1.1fr 0.95fr;
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: auto minmax(520px, 1fr);
   }
   .body .sec-chores { grid-column: 1; grid-row: 1 / -1; }
   .body .sec-bank { grid-column: 2 / -1; grid-row: 1;  overflow: visible; max-height: none; }
@@ -133,11 +133,11 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .sec-more > .sec-hdr:first-child .sec-title { font-size:16px; letter-spacing:0.1em; }
   /* Boys layout: School = Schedule size (up), Fun bigger, Appointments smaller */
   .sec-schedule > .sec-list[data-mount-today-events],
-  .sec-schedule > .sec-list[data-mount-school] { flex: 1.2 1 0; min-height: 0; }
-  .sec-schedule > .sec-list[data-mount-sports] { flex: 0.65 1 0; min-height: 0; }
-  .sec-more > .sec-list[data-mount-appointments] { flex: 0.45 1 0; min-height: 0; }
-  .sec-more > .sec-list[data-mount-fun] { flex: 1.7 1 0; min-height: 0; }
-  .sec-more > .sec-list[data-mount-missions] { flex: 0.8 1 0; min-height: 0; }
+  .sec-schedule > .sec-list[data-mount-school] { flex: 1.35 1 0; min-height: 88px; }
+  .sec-schedule > .sec-list[data-mount-sports] { flex: 0.75 1 0; min-height: 56px; }
+  .sec-more > .sec-list[data-mount-appointments] { flex: 0.4 1 0; min-height: 44px; }
+  .sec-more > .sec-list[data-mount-fun] { flex: 1.9 1 0; min-height: 110px; }
+  .sec-more > .sec-list[data-mount-missions] { flex: 0.7 1 0; min-height: 48px; }
   .sec-chores { gap:10px; padding:14px; }
   .sec-chores .sec-title { font-size:17px; letter-spacing:0.1em; }
   .sec-chores .quest {
@@ -297,15 +297,19 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   @media (prefers-reduced-motion:reduce){.panel::before,.storm-fill{animation:none!important}}
 
 
-  /* JAR LOUD LOCAL */
-  .body .sec-bank { max-height: none !important; overflow: visible !important; min-height: 320px; }
-  .sec-bank.bank-card { padding: 18px 20px !important; gap: 12px !important; }
-  .sec-bank .bank-count { font-size: 64px !important; }
-  .sec-bank .bank-goal-title { font-size: 28px !important; }
-  .sec-bank .bank-blurb { font-size: 15px !important; line-height: 1.4 !important; }
-  .sec-bank .bank-track { height: 56px !important; }
-  .sec-bank .bank-meta { font-size: 15px !important; font-weight: 800 !important; }
-  .sec-bank .bank-links a { font-size: 15px !important; padding: 12px 16px !important; min-height: 48px !important; }
+  /* KIDSLAY1 · compact jar · air for schedule/school/fun */
+  .body .sec-bank { max-height: none !important; overflow: visible !important; min-height: 0; }
+  .sec-bank.bank-card { padding: 10px 14px !important; gap: 6px !important; }
+  .sec-bank .bank-count { font-size: 34px !important; }
+  .sec-bank .bank-goal-title { font-size: 20px !important; }
+  .sec-bank .bank-blurb { font-size: 12px !important; line-height: 1.25 !important; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .sec-bank .bank-track { display: none !important; }
+  .sec-bank .bank-meta { font-size: 12px !important; font-weight: 800 !important; }
+  .sec-bank .bank-links a { font-size: 13px !important; padding: 8px 12px !important; min-height: 40px !important; }
+  .sec-bank .jar-flow { display: none !important; }
+  .sec-bank .money-chip { padding: 6px 10px !important; font-size: 15px !important; min-height: 36px !important; }
+  /* Right cols may scroll if still clipped */
+  .body .sec-schedule, .body .sec-more { overflow: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 </style>
 </head>
 <body data-clear-label="VICTORY ROYALE" data-kid="hayes" data-theme="hayes" data-chores-shared="1" class="theme-hayes">
