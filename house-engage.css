@@ -401,82 +401,131 @@ body.theme-ainsley.stick-season .saves-add-btn {
   .saves-add-btn { grid-column: 1 / -1; }
 }
 
-/* —— Dead-easy Home · large tap · not “Sheets” —— */
+
+/* —— Home control · header only · min 48px tap —— */
 a.home-btn, .home-btn {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   text-decoration: none !important;
   font-family: inherit;
-  font-size: 18px !important;
+  font-size: 17px !important;
   font-weight: 800 !important;
   letter-spacing: -0.02em;
   line-height: 1;
-  padding: 14px 22px !important;
-  min-height: 52px !important;
-  min-width: 120px;
-  border-radius: 14px !important;
+  padding: 12px 20px !important;
+  min-height: 48px !important;
+  min-width: 112px;
+  border-radius: 12px !important;
   box-sizing: border-box;
   cursor: pointer;
   flex-shrink: 0;
   -webkit-tap-highlight-color: transparent;
-  background: linear-gradient(180deg, #ffe080, #e0a020) !important;
-  color: #1a1000 !important;
-  border: 3px solid #8a6010 !important;
-  box-shadow: 0 5px 0 #6a4010, 0 8px 18px rgba(0,0,0,0.22) !important;
+  background: linear-gradient(180deg, #f4f0e4, #e0d4b8) !important;
+  color: #1a1810 !important;
+  border: 2px solid #6a6450 !important;
+  box-shadow: 0 3px 0 #4a4638 !important;
 }
 a.home-btn:active, .home-btn:active {
-  transform: translateY(3px);
-  box-shadow: 0 2px 0 #6a4010, 0 4px 10px rgba(0,0,0,0.2) !important;
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #4a4638 !important;
 }
 a.home-btn .chev, .home-btn .chev {
-  font-size: 26px !important;
+  font-size: 22px !important;
   font-weight: 800;
   line-height: 1;
-  margin-top: -2px;
 }
-.home-dock {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  z-index: 9000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(180deg, transparent, rgba(8,10,14,0.72) 28%, rgba(8,10,14,0.92));
-  pointer-events: none;
-}
-.home-dock .home-btn {
-  pointer-events: auto;
-  min-width: min(92vw, 420px);
-  min-height: 56px !important;
-  font-size: 20px !important;
-  padding: 16px 28px !important;
-  border-radius: 16px !important;
-}
-body.has-home-dock {
-  padding-bottom: 88px !important;
-}
-body.theme-ainsley.stick-season a.home-btn,
-body.theme-ainsley.stick-season .home-btn {
-  background: linear-gradient(180deg, #d4a05a, #c4783a) !important;
+body.theme-ainsley a.home-btn,
+body.theme-ainsley.stick-season a.home-btn {
+  background: linear-gradient(180deg, #e8d4b0, #c4783a) !important;
   border-color: #8a5020 !important;
-  box-shadow: 0 5px 0 #3a2810, 0 8px 18px rgba(0,0,0,0.28) !important;
+  box-shadow: 0 3px 0 #3a2810 !important;
   color: #1a1208 !important;
 }
-body.theme-hayes a.home-btn,
-body.theme-hayes .home-btn {
-  background: linear-gradient(180deg, #7ec8ff, #2a78c8) !important;
+body.theme-hayes a.home-btn {
+  background: linear-gradient(180deg, #c8e8ff, #4a98d0) !important;
   border-color: #0a4068 !important;
-  box-shadow: 0 5px 0 #062840, 0 8px 18px rgba(0,0,0,0.28) !important;
+  box-shadow: 0 3px 0 #062840 !important;
   color: #041018 !important;
 }
-body.theme-harris a.home-btn,
-body.theme-harris .home-btn {
-  background: linear-gradient(180deg, #9ae06a, #3a9010) !important;
+body.theme-harris a.home-btn {
+  background: linear-gradient(180deg, #c8f0a0, #4aa020) !important;
   border-color: #1a5010 !important;
-  box-shadow: 0 5px 0 #0e3008, 0 8px 18px rgba(0,0,0,0.28) !important;
+  box-shadow: 0 3px 0 #0e3008 !important;
   color: #061008 !important;
 }
+
+/* Allowance sheet · compact banks · no clip */
+.allow-shell .panel { height: auto !important; min-height: 1200px; overflow: visible !important; }
+.allow-shell .body {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  align-items: start !important;
+}
+.allow-shell .bank {
+  overflow: visible !important;
+  min-height: 0;
+  max-height: none !important;
+}
+.allow-shell .star-row { display: none !important; } /* 20 tap-stars = overwhelm; jar count is enough */
+.allow-shell .flow-art { display: none !important; } /* duplicate of banner path */
+.allow-shell .saves-panel {
+  margin-top: 8px;
+  max-height: 220px;
+  overflow: auto;
+}
+.allow-shell .saves-form {
+  grid-template-columns: 1fr 64px auto !important;
+}
+.allow-shell .bank.ainsley {
+  background: linear-gradient(165deg, rgba(40,36,28,0.92), rgba(26,28,22,0.95)) !important;
+  border: 2px solid rgba(196,120,58,0.55) !important;
+  color: #e8e4d4 !important;
+}
+.allow-shell .bank.ainsley .star-big,
+.allow-shell .bank.ainsley .star-label,
+.allow-shell .bank.ainsley .feed-title,
+.allow-shell .bank.ainsley .feed-row,
+.allow-shell .bank.ainsley .cheer-bar { color: #e8e4d4 !important; }
+.allow-shell .bank.ainsley .feed-row {
+  background: rgba(255,255,255,0.08) !important;
+  border-color: rgba(212,168,96,0.28) !important;
+}
+.allow-shell .bank.ainsley .kid-chip.ainsley {
+  color: #e8d4b0 !important;
+  background: rgba(196,120,58,0.22) !important;
+  border-color: rgba(196,120,58,0.5) !important;
+}
+.allow-shell .bank.ainsley .streak-pill {
+  color: #d4a860 !important;
+  background: rgba(196,120,58,0.2) !important;
+  border-color: rgba(196,120,58,0.4) !important;
+}
+.allow-shell .bank.ainsley .cheer-bar {
+  background: rgba(196,120,58,0.18) !important;
+  border-color: rgba(196,120,58,0.35) !important;
+  color: #d4a860 !important;
+}
+.allow-shell .link-banner .link-cta { white-space: nowrap; }
+.allow-shell .link-body { flex-wrap: wrap; }
+.allow-shell .hdr { flex-wrap: wrap; gap: 12px; }
+.allow-shell .hdr-left { flex-wrap: wrap; gap: 12px; }
+
+/* Kid boards · saves don't blow the 1200 panel */
+body.theme-ainsley .sec-bank .saves-panel,
+body.theme-hayes .sec-bank .saves-panel,
+body.theme-harris .sec-bank .saves-panel {
+  max-height: 200px;
+  overflow: auto;
+  margin-top: 6px;
+  padding: 10px 12px;
+}
+body.theme-ainsley .sec-bank .saves-form {
+  grid-template-columns: 1fr 56px !important;
+}
+body.theme-ainsley .sec-bank .saves-add-btn { grid-column: 1 / -1; min-height: 44px !important; font-size: 14px !important; }
+body.theme-ainsley .bank-links a.primary-foil { font-size: 14px; padding: 10px 14px; }
+body.theme-ainsley .jar-flow { margin: 4px 0; }
+body.theme-ainsley .ledger-row { gap: 6px; }

@@ -100,7 +100,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     grid-template-rows: auto minmax(0, 1fr);
   }
   .body .sec-chores { grid-column: 1; grid-row: 1 / -1; }
-  .body .sec-bank { grid-column: 2 / -1; grid-row: 1; }
+  .body .sec-bank { grid-column: 2 / -1; grid-row: 1;  overflow:auto; max-height: 380px; }
   .body .sec-schedule { grid-column: 2; grid-row: 2; min-height:0; }
   .body .sec-more { grid-column: 3; grid-row: 2; min-height:0; }
   .sec-more > .sec-hdr:first-child .sec-title { font-size:16px; letter-spacing:0.1em; }
@@ -264,7 +264,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
 
 </style>
 </head>
-<body data-clear-label="VICTORY ROYALE" data-kid="hayes" data-theme="hayes" data-chores-shared="1" class="theme-hayes has-home-dock">
+<body data-clear-label="VICTORY ROYALE" data-kid="hayes" data-theme="hayes" data-chores-shared="1" class="theme-hayes">
 
 <div class="panel">
   <div class="hud-tick tl"></div><div class="hud-tick tr"></div><div class="hud-tick bl"></div><div class="hud-tick br"></div>
@@ -312,7 +312,6 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
       <div class="sec-list" data-mount-quests></div>
       <div class="tap-hint">TAP A MUST · bank stars into the jar</div>
       <div class="bank-links" style="margin-top:4px">
-        <a href="sheet-allowance.html">★ Open reward jar</a>
         <a class="ghost" href="sheet-chores.html">Family chores</a>
       </div>
     </section>
@@ -334,9 +333,10 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
         <span class="treat-secondary" aria-hidden="true" title="optional treat">☂️ optional</span>
       </div>
             <div class="bank-links">
-        <a href="sheet-allowance.html">★ Reward jar · payday</a>
-        <a class="ghost" href="sheet-chores.html">Family chores</a>
-      </div>
+            <a class="primary-foil" href="sheet-allowance.html">Open Victory Jar →</a>
+            <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">JAR FULL · allowance payday with Dad</a>
+            <button type="button" class="got-it" data-got-it hidden>Got it · jar reset</button>
+          </div>
 
       <div class="saves-panel" data-saves-panel data-kid="hayes">
         <div class="saves-hdr">
@@ -397,10 +397,6 @@ document.addEventListener("DOMContentLoaded", function(){
   if (window.HouseSfx) HouseSfx.wireMute();
 });
 </script>
-
-<nav class="home-dock" aria-label="Home">
-  <a class="home-btn home-btn-dock" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
-</nav>
 
 </body>
 </html>

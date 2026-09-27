@@ -40,10 +40,10 @@
     -webkit-font-smoothing: antialiased;
   }
   .panel {
-    width: 1920px; height: 1200px;
-    padding: 18px 28px 12px;
+    width: 1920px; min-height: 1200px; height: auto;
+    padding: 16px 24px 16px;
     display: flex; flex-direction: column; gap: 12px;
-    position: relative; overflow: hidden;
+    position: relative; overflow: visible;
     background-color: #d8dadf;
     background-image:
       linear-gradient(165deg, rgba(255,255,255,0.36) 0%, rgba(220,222,226,0.24) 45%, rgba(180,184,190,0.18) 100%),
@@ -391,7 +391,7 @@
 </style>
 <link rel="stylesheet" href="house-engage.css" />
 </head>
-<body data-clear-label="ALL CLEAR" data-chores-shared="1" data-theme="house" class="has-home-dock">
+<body data-clear-label="ALL CLEAR" data-chores-shared="1" data-theme="house">
 <div class="panel">
   <header class="hdr">
     <div class="hdr-left">
@@ -400,7 +400,7 @@
       <div class="identity">
         <div class="avatar" aria-hidden="true">✓</div>
         <div class="id-text">
-          <a class="eyebrow" href="sheet-index.html">Family sheets · home</a>
+          <a class="eyebrow" href="sheet-index.html">House · chores</a>
           <h1 class="name"><span class="name-accent">Chores</span></h1>
           <div class="tagline">Musts → ★ → jar → allowance payday with Dad</div>
         </div>
@@ -629,10 +629,6 @@
 <script src="house-sfx.js"></script>
 <script src="house-checkoffs.js" defer></script>
 <script>document.addEventListener("DOMContentLoaded",function(){if(window.WardKids){WardKids.loadJSON(function(e,d){if(d){WardKids._data=d;WardKids.syncBankFromChecks(d);}});}})</script>
-
-<nav class="home-dock" aria-label="Home">
-  <a class="home-btn home-btn-dock" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
-</nav>
 
 </body>
 </html>

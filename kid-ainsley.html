@@ -100,7 +100,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     grid-template-rows: auto minmax(0, 1fr);
   }
   .body .sec-chores { grid-column: 1; grid-row: 1 / -1; }
-  .body .sec-bank { grid-column: 2 / -1; grid-row: 1; }
+  .body .sec-bank { grid-column: 2 / -1; grid-row: 1; overflow:auto; max-height: 520px; }
   .body .sec-schedule { grid-column: 2; grid-row: 2; min-height:0; }
   .body .sec-more { grid-column: 3; grid-row: 2; min-height:0; }
   .sec-chores { gap:10px; padding:14px; }
@@ -487,7 +487,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
 
 </style>
 </head>
-<body data-clear-label="TRACKS CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley has-home-dock">
+<body data-clear-label="TRACKS CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley stick-season">
 
 <div class="panel">
   <div class="spotlight" aria-hidden="true"></div>
@@ -546,7 +546,6 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
       <div class="sec-list" data-mount-quests></div>
       <div class="tap-hint">Clear a track · stars bank into the jar</div>
       <div class="bank-links" style="margin-top:4px">
-        <a class="primary-foil" href="sheet-allowance.html">★ Tour Jar · payday</a>
         <a class="ghost" href="sheet-chores.html">Family chores</a>
       </div>
     </section>
@@ -575,10 +574,9 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
         <span class="step dad">Payday with Dad</span>
       </div>
       <div class="bank-links">
+        <a class="primary-foil" href="sheet-allowance.html">Open Tour Jar →</a>
         <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">JAR FULL · Payday with Dad</a>
         <button type="button" class="got-it" data-got-it hidden>Got it · jar reset</button>
-        <a class="primary-foil" href="sheet-allowance.html">★ Tour Jar</a>
-        <a class="ghost" href="sheet-chores.html">Family chores</a>
       </div>
       <div class="goal-unlock" data-goal-unlock hidden>JAR FULL · Payday with Dad</div>
 
@@ -647,8 +645,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <span>Quiet folk · her board</span>
       <span class="ftr-chip">AINSLEY · HER TRACKS</span>
-      <a class="ftr-chip" href="sheet-chores.html">Family chores</a>
-      <a class="ftr-chip" href="sheet-allowance.html">★ Tour Jar</a>
+      <a class="ftr-chip" href="sheet-allowance.html">Tour Jar</a>
     </div>
     <span>autumn road-trip energy · sound ON</span>
   </footer>
@@ -693,10 +690,6 @@ document.addEventListener("DOMContentLoaded", function(){
   }
 });
 </script>
-
-<nav class="home-dock" aria-label="Home">
-  <a class="home-btn home-btn-dock" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
-</nav>
 
 </body>
 </html>
