@@ -29,10 +29,10 @@
       },
       "bankGoal": {
         "id": "gem-jar",
-        "title": "Fill the Gem Jar",
-        "blurb": "Weekly allowance $10 with Dad. Gem Jar save goal = $8 (1★ = $1).",
+        "title": "Gem Jar · earn then save",
+        "blurb": "Clear musts to earn up to $10/week with Dad (1★=$1). Miss musts = short or no full payday. Gem Jar $8 = save what you earned — not free money.",
         "need": 8,
-        "reward": "allowance payday with Dad · $10/week",
+        "reward": "Payday after honest musts · up to $10",
         "dollarNeed": 8,
         "weeklyAllowance": 10,
         "starDollar": 1
@@ -183,13 +183,13 @@
         {
           "when": "Anytime",
           "what": "🔥 Musts clear = gems in the jar",
-          "hint": "FUN mission",
+          "hint": "earn path · skip = less payday",
           "tone": "fun"
         },
         {
           "when": "Goal",
-          "what": "Jar $8 save goal · weekly pay $10 with Dad",
-          "hint": "1★ = $1 · miss = payday held",
+          "what": "Earn up to $10/week · jar $8 saves what you earned",
+          "hint": "1★=$1 · miss musts = short or no full payday",
           "tone": "fun"
         },
         {
@@ -216,10 +216,10 @@
       },
       "bankGoal": {
         "id": "victory-jar",
-        "title": "Fill the Victory Jar",
-        "blurb": "Weekly allowance $10 with Dad. Victory Jar save goal = $12 (1★ = $1).",
+        "title": "Victory Jar · earn then save",
+        "blurb": "Clear musts to earn up to $10/week with Dad (1★=$1). Miss musts = short or no full payday. Victory Jar $12 = save what you earned — not free money.",
         "need": 12,
-        "reward": "allowance payday with Dad · $10/week",
+        "reward": "Payday after honest musts · up to $10",
         "dollarNeed": 12,
         "weeklyAllowance": 10,
         "starDollar": 1
@@ -388,13 +388,13 @@
         {
           "when": "Every clear",
           "what": "💥 Must done = coin banked in the jar",
-          "hint": "FUN",
+          "hint": "earn path · skip = less payday",
           "tone": "fun"
         },
         {
           "when": "Goal",
-          "what": "Jar $12 save goal · weekly pay $10 with Dad",
-          "hint": "1★ = $1 · miss = payday held",
+          "what": "Earn up to $10/week · jar $12 saves what you earned",
+          "hint": "1★=$1 · miss musts = short or no full payday",
           "tone": "fun"
         },
         {
@@ -421,10 +421,10 @@
       },
       "bankGoal": {
         "id": "tour-jar",
-        "title": "Fill the Tour Jar",
-        "blurb": "Weekly allowance $20 with Dad. Tour Jar save goal = $20 (1★ = $1). Babysitting $15/hr = Dad handout, not jar.",
+        "title": "Tour Jar · earn then save",
+        "blurb": "Clear musts to earn up to $20/week with Dad (1★=$1). Miss musts = short or no full payday. Jar $20 = save what you earned — not free money. Babysit $15/hr = hire add-on, not jar.",
         "need": 20,
-        "reward": "Payday with Dad · $20/week · jar $20",
+        "reward": "Payday after honest musts · up to $20",
         "dollarNeed": 20,
         "starDollar": 1,
         "weeklyAllowance": 20
@@ -580,13 +580,13 @@
         {
           "when": "Every tap",
           "what": "Must clear = ★ banked (1★ = $1)",
-          "hint": "stars → jar → $20",
+          "hint": "earn path · skip = less payday",
           "tone": "fun"
         },
         {
           "when": "Goal",
-          "what": "Hit 20★ = $20 · Payday with Dad",
-          "hint": "1★ = $1 · jar goal",
+          "what": "Earn 20★ = up to $20 · only if musts are honest",
+          "hint": "1★=$1 · miss musts = short or no full payday",
           "tone": "fun"
         },
         {
