@@ -1,24 +1,15 @@
-# House Face · permanent host plan
+# House Face · permanent host (LOCKED)
 
-## Live interim (box-bound)
-Quick Cloudflare tunnel → dies if box sleeps / process stops.
-Use only to Add to Home Screen / Dock today.
+## Live forever URL
+https://dmward23-web.github.io/wardos-house-face/sheet-index.html
 
-## Durable (needed for always-on desktop + home iPad)
-**Blocker now:** GitHub CLI not logged in; Cursor GitHub MCP `needsAuth`.
-No Netlify/Vercel/Cloudflare API token in environment.
+Repo: `dmward23-web/wardos-house-face` · GitHub Pages from `main` · deploy: `/workspace/board-os/scripts/house-face-deploy.sh`
 
-### Preferred next one step (Prism → Dan)
-Connect GitHub on this box (Cursor GitHub MCP auth, or `gh auth login`), then:
-1. Create public repo `wardos-house-face` (or under existing org)
-2. Push `/workspace/board-os/house-face/` (static only)
-3. Enable GitHub Pages → Deploy from `main` / root (or `/docs`)
-4. Lasting URL: `https://<user>.github.io/wardos-house-face/sheet-index.html`
-5. Re-do Add to Home Screen / Dock once from that lasting HTTPS URL
+## Law
+- This HTTPS URL is the only Add to Home Screen / Dock target.
+- Content updates keep the same URL. Never re-upload, re-share, or re-Add after a sheet restamp.
+- Temporary tunnels are not the linchpin. Drive zip = offline backup only.
+- No money on House Face.
 
-### Alternatives (also need one login)
-- Cloudflare named tunnel + custom hostname (Cloudflare account)
-- Netlify Drop / Cloudflare Pages (account once)
-
-## Offline backup
-Drive zip already uploaded (see Prism return).
+## One-time Home Screen
+If the tile was saved from Drive Files, AirDrop, or a tunnel → delete that tile once → open the forever URL in Safari → Share → Add to Home Screen. After that, leave it.
