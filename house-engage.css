@@ -522,10 +522,7 @@ body.theme-harris .sec-bank .saves-panel {
   margin-top: 6px;
   padding: 10px 12px;
 }
-body.theme-ainsley .sec-bank .saves-form {
-  grid-template-columns: 1fr 56px !important;
-}
-body.theme-ainsley .sec-bank .saves-add-btn { grid-column: 1 / -1; min-height: 44px !important; font-size: 14px !important; }
+/* compact saves owned by kid-ainsley.html */
 body.theme-ainsley .bank-links a.primary-foil { font-size: 14px; padding: 10px 14px; }
 body.theme-ainsley .jar-flow { margin: 4px 0; }
 body.theme-ainsley .ledger-row { gap: 6px; }
