@@ -674,8 +674,8 @@ document.addEventListener("house:kid-rendered", function(){
 <script src="house-checkoffs.js" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
-  if (window.WardKids) WardKids.boot("ainsley");
   if (window.HouseSaves) HouseSaves.mount("ainsley");
+  if (window.WardKids) WardKids.boot("ainsley");
   if (window.HouseSfx) HouseSfx.wireMute();
   var got = document.querySelector("[data-got-it]");
   if (got && window.WardKids) {
