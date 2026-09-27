@@ -102,7 +102,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .body .sec-chores { grid-column: 1; grid-row: 1 / -1; }
   .body .sec-bank {
     grid-column: 2 / -1; grid-row: 1;
-    overflow: auto; max-height: 280px;
+    overflow: auto; max-height: 220px;
     padding: 10px 14px; gap: 6px;
   }
   .body .sec-schedule {
@@ -498,10 +498,10 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
 
 
   /* Ainsley first-look · compact jar + scrollable week */
-  body.theme-ainsley .sec-bank.bank-card { padding: 10px 14px !important; gap: 5px !important; }
+  body.theme-ainsley .sec-bank.bank-card { padding: 8px 12px !important; gap: 4px !important; }
   body.theme-ainsley .sec-bank .bank-goal-title { font-size: 18px !important; }
   body.theme-ainsley .sec-bank .bank-count { font-size: 32px !important; }
-  body.theme-ainsley .sec-bank .bank-blurb { font-size: 12px; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  body.theme-ainsley .sec-bank .bank-blurb { display: none !important; }
   body.theme-ainsley .sec-bank .bank-track { height: 16px !important; }
   body.theme-ainsley .sec-bank .bank-meta { font-size: 11px; }
   body.theme-ainsley .sec-bank .ledger-row { margin-top: 2px; gap: 6px; }
@@ -515,7 +515,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   }
   body.theme-ainsley .sec-bank .saves-panel {
     margin-top: 4px !important; padding: 6px 8px !important; gap: 4px !important;
-    max-height: 96px !important; overflow: auto !important;
+    max-height: 72px !important; overflow: auto !important;
     border-width: 2px !important;
   }
   body.theme-ainsley .sec-bank .saves-hdr { gap: 4px; }
@@ -534,11 +534,11 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     grid-template-columns: 1fr 48px auto !important; gap: 4px !important;
   }
   body.theme-ainsley .sec-bank .saves-input {
-    font-size: 13px !important; padding: 6px 8px !important; min-height: 34px !important;
+    font-size: 12px !important; padding: 4px 7px !important; min-height: 30px !important;
     border-width: 2px !important; border-radius: 6px !important;
   }
   body.theme-ainsley .sec-bank .saves-add-btn {
-    font-size: 12px !important; padding: 6px 10px !important; min-height: 34px !important;
+    font-size: 11px !important; padding: 4px 8px !important; min-height: 30px !important;
     border-width: 2px !important; box-shadow: 0 2px 0 #3a2810 !important;
     grid-column: auto !important;
   }
@@ -591,7 +591,6 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
       <div class="hot-pill" data-hot-pill>ON THE BOARD · SUN · vanity 3:00</div>
       <div style="display:flex;gap:8px;align-items:center">
         <button type="button" class="mute-btn" data-mute-toggle>🔊 ON</button>
-        <div class="mock-tag">QUIET FOLK · LIVE<br/>Sun Sep 27</div>
       </div>
     </div>
   </header>
