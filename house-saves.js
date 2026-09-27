@@ -1,4 +1,4 @@
-/* House face · kid save/wishlist write-in · ★ only · localStorage · no $ */
+/* House face · collapsed saves · ★ only · localStorage · no $ */
 (function (global) {
   "use strict";
 
@@ -75,42 +75,69 @@
     saveRoot(root);
   }
 
-  function rowHTML(item) {
-    var need = item.need > 0 ? (" · " + item.need + "★") : "";
+  function bankToward(kidId) {
+    try {
+      if (global.WardKids && global.WardKids._data && global.WardKids.getBankView) {
+        var b = global.WardKids.getBankView(kidId, global.WardKids._data);
+        return b ? (b.lifetime || b.toward || 0) : 0;
+      }
+    } catch (e) { /* */ }
+    return 0;
+  }
+
+  function chipHTML(item, kidId) {
+    var toward = bankToward(kidId);
+    var label;
+    if (item.need > 0) {
+      label = item.name + " · " + Math.min(toward, item.need) + "/" + item.need + " ★";
+    } else {
+      label = item.name + " · ★";
+    }
     return (
-      '<div class="save-row" data-save-id="' + esc(item.id) + '">' +
-        '<div class="save-main">' +
-          '<span class="save-name">' + esc(item.name) + "</span>" +
-          '<span class="save-need">' + esc(need || " · ★ later") + "</span>" +
-        "</div>" +
-        '<div class="save-actions">' +
-          '<button type="button" class="save-btn edit" data-save-edit title="Edit">Edit</button>' +
-          '<button type="button" class="save-btn del" data-save-del title="Remove">✕</button>' +
-        "</div>" +
-      "</div>"
+      '<button type="button" class="save-pill" data-save-id="' + esc(item.id) + '" title="Tap to edit">' +
+        '<span class="save-pill-label">' + esc(label) + "</span>" +
+        '<span class="save-pill-x" data-save-del aria-label="Remove">×</span>' +
+      "</button>"
     );
+  }
+
+  function setOpen(panel, open) {
+    var form = panel.querySelector("[data-saves-form]");
+    if (open) {
+      panel.classList.add("is-open");
+      panel.setAttribute("data-open", "1");
+      if (form) form.hidden = false;
+      var nameEl = panel.querySelector("[data-save-name]");
+      if (nameEl) setTimeout(function () { nameEl.focus(); }, 30);
+    } else {
+      panel.classList.remove("is-open");
+      panel.removeAttribute("data-open");
+      if (form) form.hidden = true;
+    }
+  }
+
+  function renderPanel(panel) {
+    var kidId = panel.getAttribute("data-kid");
+    if (!kidId) return;
+    var items = list(kidId);
+    var pills = panel.querySelector("[data-saves-pills]");
+    if (pills) {
+      if (!items.length) {
+        pills.innerHTML = '<span class="save-pill empty">None yet</span>';
+      } else {
+        pills.innerHTML = items.map(function (it) { return chipHTML(it, kidId); }).join("");
+      }
+    }
+    // legacy list node — keep empty / hidden
+    var legacy = panel.querySelector("[data-saves-list]");
+    if (legacy) legacy.innerHTML = "";
   }
 
   function renderList(kidId, root) {
     root = root || document;
-    var lists = root.querySelectorAll('[data-saves-list="' + kidId + '"], [data-saves-list][data-kid="' + kidId + '"]');
-    // also [data-saves-panel][data-kid=x] .saves-list
-    if (!lists.length) {
-      root.querySelectorAll('[data-saves-panel][data-kid="' + kidId + '"] [data-saves-list]').forEach(function (el) {
-        lists = lists.length ? lists : [];
-      });
-      lists = root.querySelectorAll('[data-saves-panel][data-kid="' + kidId + '"] [data-saves-list]');
-    }
-    var items = list(kidId);
-    lists.forEach(function (el) {
-      if (!items.length) {
-        el.innerHTML = '<div class="save-empty">Nothing yet — add what you\'re saving for</div>';
-      } else {
-        el.innerHTML = items.map(rowHTML).join("");
-      }
-    });
-    // compact chips elsewhere
+    root.querySelectorAll('[data-saves-panel][data-kid="' + kidId + '"]').forEach(renderPanel);
     root.querySelectorAll('[data-saves-chips="' + kidId + '"]').forEach(function (el) {
+      var items = list(kidId);
       if (!items.length) {
         el.innerHTML = '<span class="save-chip empty">No saves yet</span>';
       } else {
@@ -125,45 +152,62 @@
   function wirePanel(panel) {
     var kidId = panel.getAttribute("data-kid");
     if (!kidId) return;
-    renderList(kidId, panel.parentNode || document);
+    renderPanel(panel);
 
-    var form = panel.querySelector("[data-saves-form]");
-    if (form && !form._savesWired) {
-      form._savesWired = true;
-      form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        var nameEl = form.querySelector("[name='save-name'], [data-save-name]");
-        var needEl = form.querySelector("[name='save-need'], [data-save-need]");
-        var name = nameEl ? nameEl.value : "";
-        var need = needEl ? needEl.value : 0;
-        if (!String(name).trim()) {
-          if (nameEl) nameEl.focus();
-          return;
-        }
-        add(kidId, name, need);
-        if (nameEl) nameEl.value = "";
-        if (needEl) needEl.value = "";
-        renderAll(kidId);
-        if (window.HouseSfx) HouseSfx.tap();
-        if (nameEl) nameEl.focus();
-      });
-    }
+    if (!panel._savesWired) {
+      panel._savesWired = true;
 
-    if (!panel._savesClickWired) {
-      panel._savesClickWired = true;
+      var plus = panel.querySelector("[data-saves-plus]");
+      if (plus) {
+        plus.addEventListener("click", function (e) {
+          e.preventDefault();
+          setOpen(panel, !panel.classList.contains("is-open"));
+          if (window.HouseSfx) HouseSfx.tap();
+        });
+      }
+
+      var cancel = panel.querySelector("[data-saves-cancel]");
+      if (cancel) {
+        cancel.addEventListener("click", function (e) {
+          e.preventDefault();
+          setOpen(panel, false);
+        });
+      }
+
+      var form = panel.querySelector("[data-saves-form]");
+      if (form) {
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          var nameEl = form.querySelector("[name='save-name'], [data-save-name]");
+          var needEl = form.querySelector("[name='save-need'], [data-save-need]");
+          var name = nameEl ? nameEl.value : "";
+          var need = needEl ? needEl.value : 0;
+          if (!String(name).trim()) {
+            if (nameEl) nameEl.focus();
+            return;
+          }
+          add(kidId, name, need);
+          if (nameEl) nameEl.value = "";
+          if (needEl) needEl.value = "";
+          setOpen(panel, false);
+          renderAll(kidId);
+          if (window.HouseSfx) HouseSfx.tap();
+        });
+      }
+
       panel.addEventListener("click", function (e) {
         var del = e.target.closest("[data-save-del]");
-        var edit = e.target.closest("[data-save-edit]");
-        var row = e.target.closest(".save-row");
-        if (!row) return;
-        var id = row.getAttribute("data-save-id");
-        if (del) {
-          remove(kidId, id);
+        var pill = e.target.closest(".save-pill[data-save-id]");
+        if (del && pill) {
+          e.preventDefault();
+          e.stopPropagation();
+          remove(kidId, pill.getAttribute("data-save-id"));
           renderAll(kidId);
           if (window.HouseSfx) HouseSfx.tap();
           return;
         }
-        if (edit) {
+        if (pill && !del) {
+          var id = pill.getAttribute("data-save-id");
           var items = list(kidId);
           var cur = null;
           for (var i = 0; i < items.length; i++) if (items[i].id === id) cur = items[i];
@@ -194,10 +238,10 @@
         if (scopeKid && scopeKid !== kidId) return;
         el.classList.remove("is-met", "is-active", "is-empty");
         if (!gv.active) {
-          el.textContent = gv.placeholder || "Add a save on your board";
+          el.textContent = gv.placeholder || "Add a save";
           el.classList.add("is-empty");
         } else if (gv.met) {
-          el.textContent = "Tell Dad — goal met · " + gv.name + " (" + gv.need + "★)";
+          el.textContent = "Goal met · " + gv.name + " (" + gv.need + "★)";
           el.classList.add("is-met", "is-active");
         } else {
           el.textContent = gv.name + " · " + (gv.toward || 0) + "/" + gv.need + " ★";
@@ -206,6 +250,7 @@
       });
     } catch (e) { /* */ }
   }
+
   function renderAll(kidId) {
     document.querySelectorAll('[data-saves-panel][data-kid="' + kidId + '"]').forEach(wirePanel);
     renderList(kidId, document);
@@ -214,31 +259,32 @@
 
   function mount(kidId) {
     if (kidId) {
-      // ensure seed
       list(kidId);
       document.querySelectorAll('[data-saves-panel][data-kid="' + kidId + '"]').forEach(wirePanel);
       renderList(kidId, document);
+      refreshGoalChips(kidId);
     } else {
-      document.querySelectorAll("[data-saves-panel][data-kid]").forEach(function (p) {
-        wirePanel(p);
-      });
+      document.querySelectorAll("[data-saves-panel][data-kid]").forEach(wirePanel);
     }
   }
 
   function panelHTML(kidId, opts) {
     opts = opts || {};
-    var title = opts.title || "Saving for";
-    var ph = opts.placeholder || "What are you saving for?";
+    var ph = opts.placeholder || "Saving for…";
     return (
-      '<div class="saves-panel" data-saves-panel data-kid="' + esc(kidId) + '">' +
-        '<div class="saves-hdr"><span class="saves-title">' + esc(title) + '</span>' +
-        '<span class="saves-hint">write it in · ★ only</span></div>' +
-        '<div class="saves-list" data-saves-list></div>' +
-        '<form class="saves-form" data-saves-form autocomplete="off">' +
+      '<div class="saves-panel saves-compact" data-saves-panel data-kid="' + esc(kidId) + '">' +
+        '<div class="saves-bar">' +
+          '<span class="saves-lab">Saves</span>' +
+          '<div class="saves-pills" data-saves-pills></div>' +
+          '<button type="button" class="saves-plus" data-saves-plus aria-label="Add a save">+</button>' +
+        "</div>" +
+        '<form class="saves-form saves-drawer" data-saves-form autocomplete="off" hidden>' +
           '<input class="saves-input name" type="text" name="save-name" data-save-name maxlength="48" placeholder="' + esc(ph) + '" required />' +
           '<input class="saves-input need" type="number" name="save-need" data-save-need min="0" max="999" inputmode="numeric" placeholder="★" title="Optional ★ target" />' +
-          '<button type="submit" class="saves-add-btn">+ Add a save</button>' +
+          '<button type="submit" class="saves-add-btn">Add</button>' +
+          '<button type="button" class="saves-cancel" data-saves-cancel>✕</button>' +
         "</form>" +
+        '<div class="saves-list" data-saves-list hidden></div>' +
       "</div>"
     );
   }
