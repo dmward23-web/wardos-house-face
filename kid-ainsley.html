@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="theme-color" content="#d8dadf" />
+<meta name="theme-color" content="#0c1020" />
 <title>BOARD-OS · AINSLEY · ERAS STAGE</title>
 <link rel="stylesheet" href="house-engage.css" />
 <style>
@@ -143,88 +143,97 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     background:rgba(255,255,255,0.2); border:3px solid rgba(255,255,255,0.45);
   }
 
-  body.theme-ainsley{background:#2a1450;color:#2a1838}
+  body.theme-ainsley{background:#0a0c14;color:#c8d0e0}
   .panel{width:1920px;height:1200px;padding:12px 20px 6px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;
-    background-color:#3a1870;
-    background-image:radial-gradient(ellipse 75% 50% at 50% -5%,rgba(255,230,160,.45),transparent 55%),
-      radial-gradient(ellipse 50% 40% at 85% 70%,rgba(230,120,255,.3),transparent 60%),
-      radial-gradient(ellipse 40% 40% at 10% 80%,rgba(120,60,200,.35),transparent 55%),
-      url("theme-tiles/ainsley-stars.png"),url("camo-glass-tile-house.png");
-    background-size:auto,auto,auto,128px 128px,420px 420px;background-repeat:no-repeat,no-repeat,no-repeat,repeat,repeat}
-  .vinyl-float{position:absolute;right:40px;top:110px;width:180px;height:180px;z-index:1;pointer-events:none;
-    background:url("theme-tiles/ainsley-vinyl.png") center/contain no-repeat;opacity:.6;animation:vinyl-spin 16s linear infinite;
-    filter:drop-shadow(0 14px 28px rgba(80,20,120,.5))}
+    background-color:#0c1020;
+    background-image:
+      radial-gradient(ellipse 70% 45% at 50% -8%,rgba(180,160,255,.18),transparent 55%),
+      radial-gradient(ellipse 40% 35% at 90% 80%,rgba(90,40,160,.22),transparent 60%),
+      radial-gradient(ellipse 35% 30% at 8% 85%,rgba(200,170,80,.08),transparent 55%),
+      linear-gradient(180deg,rgba(255,255,255,.03) 0 1px,transparent 1px),
+      url("camo-glass-tile-house.png");
+    background-size:auto,auto,auto,100% 28px,420px 420px;
+    background-repeat:no-repeat,no-repeat,no-repeat,repeat,repeat}
+  .vinyl-float{position:absolute;right:36px;top:108px;width:160px;height:160px;z-index:1;pointer-events:none;
+    background:url("theme-tiles/ainsley-vinyl.png") center/contain no-repeat;opacity:.38;animation:vinyl-spin 22s linear infinite;
+    filter:grayscale(.35) brightness(.85) drop-shadow(0 12px 24px rgba(0,0,0,.55))}
   @keyframes vinyl-spin{to{transform:rotate(360deg)}}
-  .sparkle-field{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden}
-  .sparkle-field span{position:absolute;width:5px;height:5px;border-radius:50%;background:#ffe080;box-shadow:0 0 10px #ffe080;animation:sparkle 2.6s ease-in-out infinite}
-  .sparkle-field span:nth-child(odd){background:#e8b0ff;box-shadow:0 0 10px #e8b0ff}
-  .sparkle-field span:nth-child(1){left:8%;top:18%}.sparkle-field span:nth-child(2){left:22%;top:55%;animation-delay:.2s}
-  .sparkle-field span:nth-child(3){left:40%;top:12%;animation-delay:.4s}.sparkle-field span:nth-child(4){left:58%;top:68%;animation-delay:.1s}
-  .sparkle-field span:nth-child(5){left:72%;top:28%;animation-delay:.6s}.sparkle-field span:nth-child(6){left:88%;top:50%;animation-delay:.3s}
-  .sparkle-field span:nth-child(7){left:14%;top:78%;animation-delay:.8s}.sparkle-field span:nth-child(8){left:48%;top:38%;animation-delay:.5s}
-  .sparkle-field span:nth-child(9){left:80%;top:14%;animation-delay:.7s}.sparkle-field span:nth-child(10){left:33%;top:42%;animation-delay:.9s}
-  .sparkle-field span:nth-child(11){left:94%;top:72%;animation-delay:.35s}.sparkle-field span:nth-child(12){left:52%;top:88%;animation-delay:1s}
-  @keyframes sparkle{0%,100%{opacity:.25;transform:scale(.7)}50%{opacity:1;transform:scale(1.5)}}
-  .spotlight{position:absolute;top:0;left:50%;width:70%;height:55%;transform:translateX(-50%);pointer-events:none;z-index:1;
-    background:radial-gradient(ellipse at 50% 0%,rgba(255,240,200,.35),transparent 70%);animation:spot-pulse 3s ease-in-out infinite}
-  @keyframes spot-pulse{0%,100%{opacity:.7}50%{opacity:1}}
+  .stage-grid{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden;opacity:.22;
+    background:
+      repeating-linear-gradient(0deg,transparent 0 47px,rgba(200,210,230,.07) 47px 48px),
+      repeating-linear-gradient(90deg,transparent 0 47px,rgba(200,210,230,.05) 47px 48px)}
+  .stage-ticks{position:absolute;left:0;right:0;top:96px;height:2px;z-index:1;pointer-events:none;
+    background:linear-gradient(90deg,transparent 0%,rgba(200,210,230,.35) 8%,rgba(200,210,230,.15) 50%,rgba(200,210,230,.35) 92%,transparent 100%);
+    box-shadow:0 0 12px rgba(180,160,255,.2)}
+  .stage-ticks::before,.stage-ticks::after{content:"";position:absolute;top:-5px;width:2px;height:12px;background:rgba(210,215,225,.55)}
+  .stage-ticks::before{left:8%}.stage-ticks::after{right:8%}
+  .spotlight{position:absolute;top:0;left:50%;width:62%;height:48%;transform:translateX(-50%);pointer-events:none;z-index:1;
+    background:radial-gradient(ellipse at 50% 0%,rgba(220,230,255,.16),transparent 68%);animation:spot-pulse 4.5s ease-in-out infinite}
+  @keyframes spot-pulse{0%,100%{opacity:.55}50%{opacity:.85}}
   .panel::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
-    box-shadow:inset 0 0 0 6px rgba(200,100,230,.4),inset 0 0 0 12px rgba(255,220,160,.2),inset 0 0 120px rgba(80,20,120,.25)}
+    box-shadow:inset 0 0 0 5px rgba(140,150,180,.28),inset 0 0 0 10px rgba(90,50,160,.18),inset 0 0 100px rgba(0,0,0,.45)}
   /* Deco layers stay absolute — never flex children (was crushing body into bottom strip) */
-  .panel > *:not(.spotlight):not(.vinyl-float):not(.sparkle-field){position:relative;z-index:2}
-  .spotlight,.vinyl-float,.sparkle-field{position:absolute!important;pointer-events:none;z-index:1}
-  .hdr{background:linear-gradient(180deg,rgba(255,250,255,.95),rgba(235,200,250,.88));border:4px solid #7a28a8;box-shadow:inset 0 2px 0 #fff,0 7px 0 #3a1058,0 0 28px rgba(220,120,255,.3);border-radius:18px}
-  .back,.nav-week{background:linear-gradient(180deg,#f0c8ff,#b070e0);color:#3a1058;border-color:#7a28a8;border-radius:999px}
-  .avatar{border-radius:50%;background:linear-gradient(145deg,#f0c0ff,#a050c8 55%,#6a2098);box-shadow:0 0 0 5px #fff,0 0 0 9px rgba(200,100,230,.5),0 8px 0 #3a1058}
-  .eyebrow{color:#8a30b0}.name{color:#2a1040}.name-accent{color:#9018c0;text-shadow:0 0 14px rgba(230,140,255,.6)}
-  .tagline{color:#6a4088}.hot-pill{background:linear-gradient(180deg,#ffe9a0,#e8b040);color:#4a2808;border-color:#b08820;border-radius:999px}
+  .panel > *:not(.spotlight):not(.vinyl-float):not(.stage-grid):not(.stage-ticks){position:relative;z-index:2}
+  .spotlight,.vinyl-float,.stage-grid,.stage-ticks{position:absolute!important;pointer-events:none;z-index:1}
+  .hdr{background:linear-gradient(180deg,rgba(28,32,48,.96),rgba(16,18,30,.94));border:4px solid #8a92a8;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 7px 0 #05060c,0 0 24px rgba(90,60,160,.2);border-radius:8px}
+  .back,.nav-week{background:linear-gradient(180deg,#3a4058,#1c2030);color:#e0e6f0;border-color:#8a92a8;border-radius:6px}
+  .avatar{border-radius:8px;background:linear-gradient(145deg,#6a50b8,#2a1848 55%,#100818);box-shadow:0 0 0 3px #c8d0e0,0 0 0 6px rgba(90,50,160,.45),0 7px 0 #05060c}
+  .eyebrow{color:#a898d8}.name{color:#f0f4fa}.name-accent{color:#c8b0ff;text-shadow:0 0 18px rgba(140,100,220,.45)}
+  .tagline{color:#9aa4b8}.hot-pill{background:linear-gradient(180deg,#2a2840,#18141f);color:#e8e0c8;border-color:#a89840;border-radius:6px}
   .eras{display:flex;align-items:center;gap:6px;padding:2px 4px;flex-shrink:0;flex-wrap:nowrap;min-height:0}
-  .eras-lab{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#f0e0ff;margin-right:2px;flex-shrink:0}
-  .era{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:7px 12px;border-radius:999px;border:3px solid rgba(255,255,255,.4);background:rgba(255,255,255,.18);color:#f8f0ff;cursor:pointer;-webkit-tap-highlight-color:transparent}
-  .era.on{background:linear-gradient(180deg,#ffe9a0,#e8b040);color:#3a2810;border-color:#b08820;box-shadow:0 0 18px rgba(255,220,120,.55)}
-  .era.midnight{background:rgba(30,30,60,.75)}.era.fog{background:rgba(180,190,210,.4)}.era.lilac{background:rgba(200,140,230,.45)}.era.blush{background:rgba(255,150,200,.4)}
-  .xp-stage{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;background:rgba(255,250,255,.92);border:3px solid #8a30b0;box-shadow:0 5px 0 #3a1058}
-  .xp-stage-lab{font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#6a2098}
-  .xp-stage-track{flex:1;height:16px;border-radius:999px;background:#3a1058;overflow:hidden;border:3px solid #8a30b0}
-  .xp-stage-fill{height:100%;width:0%;background:linear-gradient(90deg,#e8b0ff,#ffe080,#e8b0ff);background-size:200% 100%;animation:setlist-shimmer 2.2s linear infinite}
+  .eras-lab{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#a8b0c0;margin-right:2px;flex-shrink:0}
+  .era{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:7px 12px;border-radius:6px;border:3px solid rgba(200,210,230,.28);background:rgba(20,24,40,.75);color:#d8e0f0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .era.on{background:linear-gradient(180deg,#c8b060,#8a7020);color:#14100a;border-color:#c8b060;box-shadow:0 0 14px rgba(200,170,80,.35)}
+  .era.midnight{background:rgba(18,22,40,.9)}.era.fog{background:rgba(120,130,150,.35)}.era.lilac{background:rgba(90,50,160,.45)}.era.blush{background:rgba(180,190,210,.28)}
+  .xp-stage{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;background:rgba(12,14,24,.92);border:3px solid #6a7088;box-shadow:0 5px 0 #05060c}
+  .xp-stage-lab{font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#c8b0ff}
+  .xp-stage-track{flex:1;height:14px;border-radius:4px;background:#080a12;overflow:hidden;border:3px solid #4a4068}
+  .xp-stage-fill{height:100%;width:0%;background:linear-gradient(90deg,#5a48a0,#a898d8,#c8b060);background-size:200% 100%;animation:setlist-shimmer 2.8s linear infinite}
   @keyframes setlist-shimmer{to{background-position:200% 0}}
-  .left-chip{font-size:13px;font-weight:800;padding:8px 12px;border-radius:999px;background:linear-gradient(180deg,#ffe9a0,#e8b040);border:3px solid #b08820;color:#3a2810}
-  .left-chip.is-clear{background:linear-gradient(180deg,#e8b0ff,#b070e0);color:#2a1040;border-color:#6a2098}
-  .hot-banner{background:linear-gradient(105deg,#501878,#8a30b0 35%,#b050d8 55%,#8a30b0);border-radius:20px;border-color:#ffe080;box-shadow:0 0 32px rgba(255,200,120,.35),0 8px 0 #2a0848}
-  .hot-banner::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 45% 90% at 8% 50%,rgba(255,255,255,.3),transparent 60%)}
-  .hot-accent{background:linear-gradient(180deg,#ffe080,#e8b0ff,#ffe080);border-radius:20px 0 0 20px}
-  .hot-label{color:#ffe8ff}.hot-title{color:#fff;text-shadow:0 2px 14px rgba(80,20,120,.55)}
-  .hot-title .hl{background:linear-gradient(180deg,#ffe9a0,#e8b040);color:#3a2810;border-radius:10px}
-  .hot-sub{color:#f0d8ff}.hot-badge{color:#fff;border-radius:999px;background:rgba(255,255,255,.2)}
+  .left-chip{font-size:13px;font-weight:800;padding:8px 12px;border-radius:6px;background:linear-gradient(180deg,#3a3850,#1c1828);border:3px solid #a89840;color:#e8e0c8}
+  .left-chip.is-clear{background:linear-gradient(180deg,#5a48a0,#2a1848);color:#e8e0ff;border-color:#8a70c0}
+  .hot-banner{background:linear-gradient(105deg,#100818,#1c1438 35%,#2a1860 55%,#181028);border-radius:8px;border-color:#8a92a8;box-shadow:0 0 28px rgba(90,50,160,.28),0 8px 0 #05060c}
+  .hot-banner::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 40% 90% at 6% 50%,rgba(200,210,230,.12),transparent 60%)}
+  .hot-accent{background:linear-gradient(180deg,#c8b060,#6a50b8,#c8b060);border-radius:8px 0 0 8px}
+  .hot-label{color:#b8b0d8}.hot-title{color:#f4f6fa;text-shadow:0 2px 12px rgba(0,0,0,.55)}
+  .hot-title .hl{background:linear-gradient(180deg,#c8b060,#8a7020);color:#14100a;border-radius:4px}
+  .hot-sub{color:#b0a8c8}.hot-badge{color:#e8e0f0;border-radius:6px;background:rgba(255,255,255,.08);border-color:rgba(200,210,230,.35)}
   body.theme-ainsley{
-    --sec-bg:rgba(255,250,255,.94);--sec-border:#8a30b0;--sec-shadow:0 6px 0 #3a1058,0 0 22px rgba(200,100,230,.25);
-    --sec-title:#6a2098;--sec-meta:#8a60a8;--sec-rule:rgba(138,48,176,.25);
-    --card-bg:#fff8ff;--card-border:#b070e0;--card-hot-bg:#fff0c8;--card-hot-border:#d0a020;
-    --card-sport-bg:#f0e8ff;--card-act-bg:#f8f0ff;--card-fun-bg:#fff0f8;--card-fun-border:#e080b0;--when:#8a30b0;
-    --quest-bg:linear-gradient(145deg,#fff8ff,#f0e0ff);--quest-border:#a050c8;--quest-edge:#3a1058;
-    --ring-border:#a050c8;--ring-bg:rgba(230,160,255,.4);
-    --quest-done-bg:rgba(230,160,255,.5);--quest-done-border:#8a30b0;
-    --bank-bg:linear-gradient(135deg,#501878,#2a1058);--bank-border:#ffe080;
+    --sec-bg:rgba(18,20,32,.94);--sec-border:#6a7088;--sec-shadow:0 6px 0 #05060c,0 0 18px rgba(0,0,0,.35);
+    --sec-title:#c8b0ff;--sec-meta:#8a92a8;--sec-rule:rgba(140,150,180,.22);
+    --card-bg:#161a28;--card-border:#5a6080;--card-hot-bg:#2a2418;--card-hot-border:#a89840;
+    --card-sport-bg:#141828;--card-act-bg:#181428;--card-fun-bg:#1a1428;--card-fun-border:#6a50b8;--when:#a898d8;
+    --quest-bg:linear-gradient(145deg,#1a1e30,#14101f);--quest-border:#6a50b8;--quest-edge:#05060c;
+    --ring-border:#8a70c0;--ring-bg:rgba(90,50,160,.35);
+    --quest-done-bg:rgba(90,50,160,.45);--quest-done-border:#8a70c0;
+    --bank-bg:linear-gradient(135deg,#14101f,#0a0c14);--bank-border:#8a92a8;
   }
-  .sec{border-radius:16px}
-  .card{border-radius:14px}
-  .quest{border-radius:14px}
-  .bank-card{border-radius:18px;color:#ffeef8;box-shadow:0 0 32px rgba(255,200,140,.3),0 8px 0 #2a0848}
-  .bank-fill{background:linear-gradient(90deg,#e8b0ff,#ffe080,#e8b0ff)}
-  .setlist-foot{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;background:rgba(255,250,255,.92);border:3px solid #8a30b0}
-  .setlist-foot .lab{font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#6a2098}
-  .track-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;background:#3a1058;color:#ffe080;border:3px solid #8a30b0}
-  .track-num.on{background:linear-gradient(180deg,#ffe9a0,#e8b040);color:#3a2810;border-color:#b08820;box-shadow:0 0 12px rgba(255,220,120,.5)}
-  .setlist-foot .note{margin-left:auto;font-size:14px;font-weight:700;color:#6a4088}
-  .ftr{color:#e8d0ff}.ftr-chip{background:rgba(255,250,255,.9);border-color:#8a30b0;color:#6a2098;border-radius:999px}
-  .mute-btn{border-radius:999px;background:rgba(255,250,255,.95);color:#6a2098;border-color:#8a30b0}
-  body.theme-ainsley .hcb-label{color:#ffeef8;text-shadow:0 0 32px #e8b0ff,0 4px 0 #3a1058}
+  body.theme-ainsley .card .what{color:#eef2f8}
+  body.theme-ainsley .card .hint{color:#9aa4b8}
+  body.theme-ainsley .card.quiet{color:#9aa4b8;background:rgba(255,255,255,.04);border-color:rgba(140,150,180,.35)}
+  body.theme-ainsley .quest .what{color:#eef2f8}
+  body.theme-ainsley .quest .hint{color:#a898d8}
+  body.theme-ainsley .quest .star-earn{background:linear-gradient(180deg,#c8b060,#8a7020);border-color:#a89840;color:#14100a;box-shadow:0 3px 0 #3a3010;border-radius:6px}
+  .sec{border-radius:8px}
+  .card{border-radius:6px}
+  .quest{border-radius:6px}
+  .bank-card{border-radius:8px;color:#e0e6f0;box-shadow:0 0 24px rgba(90,50,160,.2),0 8px 0 #05060c}
+  .bank-fill{background:linear-gradient(90deg,#5a48a0,#a898d8,#c8b060)}
+  .goal-unlock{background:linear-gradient(180deg,#c8b060,#8a7020);color:#14100a;border-color:#a89840;border-radius:6px;box-shadow:0 4px 0 #3a3010}
+  .setlist-foot{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px;background:rgba(12,14,24,.92);border:3px solid #6a7088}
+  .setlist-foot .lab{font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#c8b0ff}
+  .track-num{width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;background:#0a0c14;color:#c8b060;border:3px solid #6a7088}
+  .track-num.on{background:linear-gradient(180deg,#c8b060,#8a7020);color:#14100a;border-color:#a89840;box-shadow:0 0 10px rgba(200,170,80,.35)}
+  .setlist-foot .note{margin-left:auto;font-size:14px;font-weight:700;color:#9aa4b8}
+  .ftr{color:#9aa4b8}.ftr-chip{background:rgba(18,20,32,.9);border-color:#6a7088;color:#c8b0ff;border-radius:6px}
+  .mute-btn{border-radius:6px;background:rgba(18,20,32,.95);color:#c8d0e0;border-color:#6a7088}
+  body.theme-ainsley .hcb-label{color:#e8e0f0;text-shadow:0 0 28px #6a50b8,0 4px 0 #05060c}
   /* Era mood — tint only, never changes layout geometry */
-  body[data-era-mood="midnight"] .panel{filter:saturate(.85) brightness(.92)}
-  body[data-era-mood="fog"] .panel{filter:saturate(.7) brightness(1.05)}
+  body[data-era-mood="midnight"] .panel{filter:saturate(.75) brightness(.88)}
+  body[data-era-mood="fog"] .panel{filter:saturate(.55) brightness(1.06)}
   body[data-era-mood="gold"] .panel{filter:none}
-  body[data-era-mood="lilac"] .panel{filter:hue-rotate(-8deg) saturate(1.1)}
-  body[data-era-mood="blush"] .panel{filter:hue-rotate(18deg) saturate(1.15)}
+  body[data-era-mood="lilac"] .panel{filter:hue-rotate(-6deg) saturate(1.05)}
+  body[data-era-mood="blush"] .panel{filter:saturate(.7) brightness(1.08) contrast(1.05)}
   body.theme-ainsley .body{flex:1 1 auto;min-height:0;overflow:hidden}
   body.theme-ainsley .card{padding:10px 12px;min-height:48px}
   body.theme-ainsley .card .what{font-size:16px}
@@ -239,19 +248,20 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   body.theme-ainsley .bank-card{padding:12px 16px;gap:8px}
   body.theme-ainsley .bank-count{font-size:36px}
   body.theme-ainsley .setlist-foot{padding:8px 14px}
-  body.theme-ainsley .tap-hint{font-size:12px;padding:2px}
+  body.theme-ainsley .tap-hint{font-size:12px;padding:2px;color:#9aa4b8}
   .xp-stage{flex-shrink:0}
   .hot-banner{flex-shrink:0}
-  @media (prefers-reduced-motion:reduce){.vinyl-float,.sparkle-field span,.xp-stage-fill,.spotlight{animation:none!important}}
+  @media (prefers-reduced-motion:reduce){.vinyl-float,.xp-stage-fill,.spotlight{animation:none!important}}
 
 </style>
 </head>
-<body data-clear-label="ENCORE!!!" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley">
+<body data-clear-label="SET CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley">
 
 <div class="panel">
   <div class="spotlight" aria-hidden="true"></div>
   <div class="vinyl-float" aria-hidden="true"></div>
-  <div class="sparkle-field" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="stage-grid" aria-hidden="true"></div>
+  <div class="stage-ticks" aria-hidden="true"></div>
   <header class="hdr">
     <div class="hdr-left">
       <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="40" /></div>
@@ -259,81 +269,81 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
       <div class="identity">
         <div class="avatar">A</div>
         <div>
-          <a class="eyebrow" href="sheet-index.html">ERAS STAGE · YOU'RE THE HEADLINER</a>
-          <h1 class="name">HI <span class="name-accent">AINSLEY</span>!!!</h1>
-          <div class="tagline">Clear your setlist · bank stars · feel famous</div>
+          <a class="eyebrow" href="sheet-index.html">ERAS STAGE · YOUR SET</a>
+          <h1 class="name"><span class="name-accent">AINSLEY</span></h1>
+          <div class="tagline">Clear the setlist. Bank stars. Keep it sharp.</div>
         </div>
       </div>
     </div>
     <div class="hdr-right">
-      <div class="hot-pill" data-hot-pill>✨ YOUR SUNDAY · vanity 3:00</div>
+      <div class="hot-pill" data-hot-pill>FEATURED · SUNDAY · vanity 3:00</div>
       <div style="display:flex;gap:8px;align-items:center">
         <button type="button" class="mute-btn" data-mute-toggle>🔊 ON</button>
-        <div class="mock-tag">YOUR SHOW<br/>Sat Sep 26</div>
+        <div class="mock-tag">NIGHT SHOW<br/>Sat Sep 26</div>
       </div>
     </div>
   </header>
   <div class="eras" aria-label="Pick your era">
     <span class="eras-lab">ERAS</span>
-    <button type="button" class="era midnight" data-era="midnight">Night Silver</button>
-    <button type="button" class="era fog" data-era="fog">Fog Soft</button>
+    <button type="button" class="era midnight" data-era="midnight">Midnight</button>
+    <button type="button" class="era fog" data-era="fog">Fog</button>
     <button type="button" class="era gold on" data-era="gold">Stage Gold</button>
-    <button type="button" class="era lilac" data-era="lilac">Lilac Glow</button>
-    <button type="button" class="era blush" data-era="blush">Blush Spark</button>
+    <button type="button" class="era lilac" data-era="lilac">Violet</button>
+    <button type="button" class="era blush" data-era="blush">Silver</button>
   </div>
   <div class="xp-stage">
     <div class="xp-stage-lab">SETLIST</div>
     <div class="xp-stage-track"><div class="xp-stage-fill" data-progress-fill></div></div>
-    <div data-progress-meta="{done}/{total} tracks" style="font-size:14px;font-weight:800;color:#6a4088">tap!</div>
+    <div data-progress-meta="{done}/{total} tracks" style="font-size:14px;font-weight:800;color:#9aa4b8">0/4</div>
     <div class="left-chip" data-left-count>···</div>
   </div>
   <section class="hot-banner">
     <div class="hot-accent"></div>
     <div class="hot-body">
       <div class="hot-main">
-        <div class="hot-label">FEATURED · SPOTLIGHT ON YOU</div>
+        <div class="hot-label">FEATURED · SUNDAY</div>
         <div class="hot-title" data-hot-title>SUN · vanity 3:00 · Jessy</div>
-        <div class="hot-sub" data-hot-sub><strong>YOUR FEATURED SUNDAY ✨</strong> · main character energy</div>
+        <div class="hot-sub" data-hot-sub><strong>FEATURED · SUNDAY</strong> · Vanity 3:00 · with Dad @ 147th</div>
       </div>
-      <div class="hot-badges"><div class="hot-badge">HEADLINER</div><div class="hot-badge">SUNDAY</div></div>
+      <div class="hot-badges"><div class="hot-badge">FEATURED</div><div class="hot-badge">SUNDAY</div></div>
     </div>
   </section>
   <div class="body">
     <section class="sec">
-      <div class="sec-hdr"><div class="sec-title">🎤 Today · setlist</div><div class="sec-meta">Sat</div></div>
+      <div class="sec-hdr"><div class="sec-title">Today · setlist</div><div class="sec-meta">Sat</div></div>
       <div class="sec-list" data-mount-today-events></div>
-      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">⭐ YOUR TRACKS (quests)</div><div class="sec-meta" data-streak-label>streak</div></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">YOUR TRACKS (quests)</div><div class="sec-meta" data-streak-label>streak</div></div>
       <div class="sec-list" data-mount-quests></div>
-      <div class="tap-hint">👆 TAP A TRACK · sparkle rain · +STAR</div>
+      <div class="tap-hint">TAP A TRACK · bank a star</div>
     </section>
     <section class="sec">
-      <div class="sec-hdr"><div class="sec-title">🎶 Sports / B-sides</div></div>
+      <div class="sec-hdr"><div class="sec-title">Sports / B-sides</div></div>
       <div class="sec-list" data-mount-sports></div>
-      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">🏫 School / stage base</div></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">School / base</div></div>
       <div class="sec-list" data-mount-school></div>
     </section>
     <section class="sec">
-      <div class="sec-hdr"><div class="sec-title">🎉 FUN · famous feels</div></div>
+      <div class="sec-hdr"><div class="sec-title">FUN · off-stage</div></div>
       <div class="sec-list" data-mount-fun></div>
-      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">🎯 Bonus missions</div></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Bonus tracks</div></div>
       <div class="sec-list" data-mount-missions></div>
     </section>
     <section class="sec">
-      <div class="sec-hdr"><div class="sec-title">💅 Appointments · encore</div></div>
+      <div class="sec-hdr"><div class="sec-title">Appointments</div></div>
       <div class="sec-list" data-mount-appointments></div>
     </section>
     <section class="sec sec-bank bank-card">
       <div class="bank-top">
         <div>
-          <div class="bank-title">★ ENCORE JAR</div>
-          <div class="bank-goal-title" data-bank-goal-title>Fill the Encore Merch Jar!!!</div>
+          <div class="bank-title">★ TOUR JAR</div>
+          <div class="bank-goal-title" data-bank-goal-title>Fill the Tour Jar</div>
         </div>
         <div class="bank-count"><span data-bank-symbol>★</span> <span data-bank-life>0</span></div>
       </div>
-      <div class="bank-blurb" data-bank-goal-blurb>Finish tracks. Bank stars. Jar goes WHOOSH.</div>
+      <div class="bank-blurb" data-bank-goal-blurb>Clear your setlist. Bank stars. Hit the goal — treat pick with Dad.</div>
       <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
       <div class="bank-meta"><span data-bank-meta>0 / 12 stars</span> · today <span data-bank-today>0</span></div>
-      <div class="goal-unlock" data-goal-unlock hidden>💿 ENCORE UNLOCKED · ask Dad · merch / treat</div>
+      <div class="goal-unlock" data-goal-unlock hidden>★ GOAL HIT · ask Dad · treat</div>
     </section>
   </div>
   <div class="setlist-foot">
@@ -343,11 +353,11 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     <div class="track-num" data-track="3">3</div>
     <div class="track-num" data-track="4">4</div>
     <div class="track-num" data-track="5">5</div>
-    <div class="note">clear setlist = ENCORE fireworks</div>
+    <div class="note">clear setlist = stage lights</div>
   </div>
   <footer class="ftr">
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <span>YOUR show · Eras Stage</span>
+      <span>Night show · Eras Stage</span>
       <span class="ftr-chip">AINSLEY · ERAS STAGE</span>
       <a class="ftr-chip" href="sheet-chores.html">Family chores</a>
     </div>
