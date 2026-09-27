@@ -568,13 +568,13 @@
       "missions": [
         {
           "when": "Every tap",
-          "what": "\u2605 Must clear = star in the jar",
-          "hint": "your pace",
+          "what": "Must clear = star banked in the jar",
+          "hint": "stars \u2192 jar",
           "tone": "fun"
         },
         {
           "when": "Goal",
-          "what": "\u2605 Hit 20 = Payday with Dad",
+          "what": "Hit 20 = Payday with Dad",
           "hint": "crew goal",
           "tone": "fun"
         },
@@ -586,15 +586,16 @@
         },
         {
           "when": "Add-on",
-          "what": "\ud83d\udc76 Babysitting \u2014 hire when Dad books you",
-          "hint": "never fills jar \u00b7 your call",
+          "what": "Babysitting \u2014 optional (Dad books you)",
+          "hint": "not for jar \u00b7 Dad handout",
           "tone": "fun"
         }
       ],
       "goal": {
-        "name": "",
-        "need": 0,
-        "placeholder": "Set a goal with Dad"
+        "name": "Stick Season \u00b7 concert save",
+        "need": 40,
+        "placeholder": "Set a goal with Dad",
+        "vibe": "noah-kahan"
       },
       "bag": {
         "place": "Dad",
@@ -621,7 +622,9 @@
           "clear": true,
           "hours": "leave 4:25 \u00b7 5:00"
         }
-      ]
+      ],
+      "fun": [],
+      "themeVibe": "stick-season"
     },
     "dan": {
       "id": "dan",

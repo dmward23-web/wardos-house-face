@@ -427,9 +427,130 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
 
   @media (prefers-reduced-motion:reduce){.vinyl-float,.xp-stage-fill,.spotlight{animation:none!important}}
 
+
+  /* Ledger glass + Harbor awareness (Ainsley) */
+  .ledger-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:6px; }
+  .ledger-chip {
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:13px; font-weight:800; letter-spacing:0.04em;
+    padding:9px 12px; min-height:40px; border-radius:8px;
+    background:rgba(255,255,255,0.12); border:2px solid rgba(200,176,96,0.45); color:#e8e0c8;
+  }
+  .ledger-chip.payday { background:linear-gradient(180deg,#3a3850,#1c1828); border-color:#a89840; color:#e8e0c8; }
+  .ledger-chip.unlock-left { color:#c8b060; }
+  .ledger-chip.goal-chip.is-empty { opacity:0.75; border-style:dashed; }
+  .ledger-chip.goal-chip.is-met {
+    background:linear-gradient(180deg,#c8b060,#8a7020); color:#14100a; border-color:#a89840;
+  }
+  a.unlock-cta {
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    font-size:15px; font-weight:800; text-decoration:none; cursor:pointer; font-family:inherit;
+    padding:12px 16px; min-height:48px; border-radius:10px;
+    background:linear-gradient(180deg,#ffe080,#e0a020); color:#1a1000;
+    border:3px solid #8a6010; box-shadow:0 4px 0 #6a4010;
+  }
+  a.unlock-cta.is-loud { box-shadow:0 0 22px rgba(255,200,80,.45), 0 5px 0 #6a4010; }
+  button.got-it {
+    font-size:14px; font-weight:800; cursor:pointer; font-family:inherit;
+    padding:10px 14px; min-height:44px; border-radius:8px;
+    background:rgba(255,255,255,0.14); color:#e8e0f0;
+    border:3px solid #6a7088; box-shadow:0 3px 0 #05060c;
+  }
+  .paid-stamp {
+    font-size:12px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase;
+    color:#c8b060; padding:6px 10px; border-radius:6px;
+    border:2px dashed rgba(200,176,96,0.45);
+  }
+  .harbor-strip {
+    display:flex; flex-direction:column; gap:8px;
+    padding:10px 12px; margin-bottom:8px; border-radius:8px;
+    background:rgba(12,14,24,.92); border:3px solid #a89840;
+    box-shadow:0 0 18px rgba(200,176,96,.2), 0 5px 0 #05060c;
+  }
+  .harbor-strip .hs-title {
+    font-size:14px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; color:#c8b060;
+  }
+  .harbor-strip.rides { border-color:#6a50b8; box-shadow:0 0 16px rgba(106,80,184,.25), 0 5px 0 #05060c; }
+  .harbor-strip.rides .hs-title { color:#c8b0ff; }
+  .harbor-strip.her { border-color:#8a70c0; }
+  .bag-strip {
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+    padding:10px 14px; margin:4px 0 8px; border-radius:8px;
+    background:linear-gradient(145deg,#1a1e30,#14101f);
+    border:3px solid #6a7088; color:#e0e6f0;
+  }
+  .bag-strip .bag-lab { font-size:15px; font-weight:800; }
+  .bag-strip .bag-hint { font-size:13px; font-weight:650; opacity:0.9; }
+
+
+  /* Stick Season vibe — Noah Kahan energy · autumn folk · no lyrics */
+  body.theme-ainsley.stick-season {
+    --ss-spruce: #1a2e24;
+    --ss-moss: #2a4034;
+    --ss-rust: #c4783a;
+    --ss-amber: #d4a05a;
+    --ss-cream: #e8e0d0;
+    --ss-ink: #12140f;
+  }
+  body.theme-ainsley.stick-season .panel {
+    background:
+      radial-gradient(ellipse 70% 50% at 20% 10%, rgba(196,120,58,0.18), transparent 55%),
+      radial-gradient(ellipse 50% 40% at 90% 80%, rgba(42,64,52,0.45), transparent 60%),
+      linear-gradient(165deg, #141810 0%, #1a2e24 40%, #12140f 100%);
+  }
+  body.theme-ainsley.stick-season .hdr {
+    background: linear-gradient(180deg, rgba(26,46,36,.96), rgba(18,20,15,.94));
+    border-color: #5a6a58;
+  }
+  body.theme-ainsley.stick-season .avatar {
+    background: linear-gradient(145deg, #c4783a, #5a3a20 55%, #1a2e24);
+    box-shadow: 0 0 0 3px #e8e0d0, 0 0 0 6px rgba(196,120,58,.35), 0 7px 0 #050805;
+  }
+  body.theme-ainsley.stick-season .name-accent { color: #e8e0d0; }
+  body.theme-ainsley.stick-season .tagline { color: #b8b09a; }
+  body.theme-ainsley.stick-season .hot-banner {
+    background: linear-gradient(105deg, #12140f, #1a2e24 40%, #2a2418 70%, #181410);
+    border-color: #8a7040;
+  }
+  body.theme-ainsley.stick-season .hot-title .hl,
+  body.theme-ainsley.stick-season .hot-badge {
+    border-color: rgba(212,160,90,.45);
+  }
+  body.theme-ainsley.stick-season .sec-bank.bank-card {
+    background: linear-gradient(135deg, #1a2e24, #12140f);
+    border-color: #8a7040;
+    box-shadow: 0 0 28px rgba(196,120,58,.18), 0 8px 0 #050805;
+  }
+  body.theme-ainsley.stick-season .ledger-chip.payday {
+    background: linear-gradient(180deg, #3a3428, #1a1810);
+    border-color: #c4783a;
+    color: #e8e0d0;
+  }
+  body.theme-ainsley.stick-season .ledger-chip.goal-chip.is-active,
+  body.theme-ainsley.stick-season .ledger-chip.goal-chip.is-met {
+    background: linear-gradient(180deg, #d4a05a, #c4783a);
+    color: #14100a;
+    border-color: #8a5020;
+  }
+  body.theme-ainsley.stick-season .quest {
+    --quest-border: #5a7a58;
+    --quest-edge: #0a140c;
+  }
+  body.theme-ainsley.stick-season .harbor-strip {
+    border-color: #8a7040;
+    background: rgba(18,20,15,.94);
+  }
+  body.theme-ainsley.stick-season .harbor-strip .hs-title { color: #d4a05a; }
+  body.theme-ainsley.stick-season .vibe-chip {
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:11px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase;
+    padding:6px 10px; border-radius:6px;
+    background:rgba(196,120,58,0.2); border:2px solid rgba(196,120,58,0.45); color:#e8e0d0;
+  }
+
 </style>
 </head>
-<body data-clear-label="SET CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley">
+<body data-clear-label="SET CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley stick-season">
 
 <div class="panel">
   <div class="spotlight" aria-hidden="true"></div>
@@ -445,7 +566,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
         <div>
           <a class="eyebrow" href="sheet-index.html">ERAS STAGE · HER SET</a>
           <h1 class="name"><span class="name-accent">AINSLEY</span></h1>
-          <div class="tagline">Her tracks. Her week. Tour Jar → allowance payday with Dad.</div>
+          <div class="tagline">Your tracks · Stick Season energy · Tour Jar → Payday with Dad.</div>
         </div>
       </div>
     </div>
@@ -458,6 +579,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     </div>
   </header>
   <div class="eras" aria-label="Pick your era">
+    <span class="vibe-chip" data-vibe-chip>Stick Season · her set</span>
     <span class="eras-lab">ERAS</span>
     <button type="button" class="era midnight" data-era="midnight">Midnight</button>
     <button type="button" class="era fog" data-era="fog">Fog</button>
@@ -500,27 +622,55 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
         </div>
         <div class="bank-count"><span data-bank-symbol>★</span> <span data-bank-life>0</span></div>
       </div>
-      <div class="bank-blurb" data-bank-goal-blurb>Clear your musts. Bank Tour Stars. Hit 20 — allowance payday with Dad.</div>
+      <div class="bank-blurb" data-bank-goal-blurb>Clear your musts. Bank Tour Stars. Hit 20 — Payday with Dad.</div>
       <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
-      <div class="bank-meta"><span data-bank-meta>0 / 20 stars</span> · today <span data-bank-today>0</span></div>
+      <div class="bank-meta"><span data-bank-meta>0 / 20 ★</span> · today <span data-bank-today>0</span></div>
+      <div class="ledger-row" aria-label="Ledger glass">
+        <span class="ledger-chip unlock-left" data-bank-left>20 ★ to unlock</span>
+        <span class="ledger-chip payday" data-payday-chip title="Next Payday = next Friday 6:00p CT">Next payday · …</span>
+        <span class="ledger-chip" data-payday-copy>Payday with Dad</span>
+      </div>
+      <div class="ledger-row">
+        <span class="ledger-chip goal-chip is-empty" data-goal-chip>Stick Season · concert save · 0/40 ★</span>
+      </div>
       <div class="jar-flow" aria-label="stars to jar to payday">
         <span class="step">★ musts</span>
         <span class="step">jar</span>
-        <span class="step dad">Dad · payday</span>
+        <span class="step dad">Payday with Dad</span>
       </div>
       <div class="bank-links">
-        <a class="primary-foil" href="sheet-allowance.html">★ Open Tour Jar</a>
+        <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">JAR FULL · Payday with Dad</a>
+        <button type="button" class="got-it" data-got-it hidden>Got it · jar reset</button>
+        <a class="primary-foil" href="sheet-allowance.html">★ Tour Jar</a>
         <a class="ghost" href="sheet-chores.html">Family chores</a>
       </div>
-      <div class="goal-unlock" data-goal-unlock hidden>★ JAR FULL · ask Dad · allowance payday with Dad</div>
+      <div class="goal-unlock" data-goal-unlock hidden>JAR FULL · Payday with Dad</div>
+      <div class="paid-stamp" data-paid-stamp hidden>Paid · jar reset</div>
     </section>
     <section class="sec sec-schedule" aria-label="Her week — schedule appointments school">
       <div class="sec-hdr"><div class="sec-title">HER WEEK · no surprises</div><div class="sec-meta">scan fast</div></div>
+      <div class="harbor-strip" aria-label="No surprises next 24h">
+        <div class="hs-title">No surprises · next 24h</div>
+        <div class="sec-list" data-mount-no-surprise></div>
+      </div>
+      <div class="bag-strip" data-bag-strip aria-label="Two-house bag">
+        <span class="bag-lab" data-bag-label>This week @ Dad · bag</span>
+        <span class="bag-hint" data-bag-hint>147th · pack for Dad week</span>
+      </div>
       <div class="leave-strip" aria-label="Leave-bys">
         <div class="leave-chip"><span class="t">DROP</span><span class="time">8:10</span><span class="arr">→</span><span class="dest">8:25</span></div>
         <div class="leave-chip"><span class="t">PICKUP</span><span class="time">3:15</span><span class="arr">→</span><span class="dest">3:40</span></div>
       </div>
+      <div class="sec-hdr" style="margin-top:4px"><div class="sec-title">Today</div></div>
       <div class="sec-list" data-mount-today-events></div>
+      <div class="harbor-strip rides" aria-label="Your rides">
+        <div class="hs-title">Your rides · your call</div>
+        <div class="sec-list" data-mount-rides></div>
+      </div>
+      <div class="harbor-strip her" aria-label="Your space">
+        <div class="hs-title">Your space</div>
+        <div class="sec-list" data-mount-her-space></div>
+      </div>
       <div class="sec-hdr appt-hdr" style="margin-top:6px"><div class="sec-title">Appointments</div><div class="sec-meta">locked in</div></div>
       <div class="sec-list" data-mount-appointments></div>
       <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Sports</div></div>
@@ -576,6 +726,20 @@ document.addEventListener("house:kid-rendered", function(){
 document.addEventListener("DOMContentLoaded", function(){
   if (window.WardKids) WardKids.boot("ainsley");
   if (window.HouseSfx) HouseSfx.wireMute();
+  var got = document.querySelector("[data-got-it]");
+  if (got && window.WardKids) {
+    got.addEventListener("click", function () {
+      WardKids.resetJarCycle("ainsley");
+      var data = WardKids._data;
+      if (data) {
+        WardKids.syncBankFromChecks(data);
+        var bank = WardKids.getBankView("ainsley", data);
+        WardKids.renderBank(document, bank);
+        WardKids.renderPersonalGoal(document, "ainsley", data, bank);
+      }
+      if (window.HouseSfx) HouseSfx.tap();
+    });
+  }
 });
 </script>
 </body>
