@@ -86,6 +86,33 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .bank-track { height:56px; border-radius:8px; background:rgba(0,0,0,0.72); border:3px solid rgba(255,255,255,0.35); overflow:hidden; box-shadow:inset 0 2px 8px rgba(0,0,0,0.65),0 0 18px rgba(112,224,255,0.3); }
   .bank-fill { height:100%; width:0%; box-shadow:inset 0 3px 0 rgba(255,255,255,0.55),0 0 22px rgba(112,224,255,0.65); filter:saturate(1.35) brightness(1.12); transition:width 0.45s cubic-bezier(0.22,1.2,0.36,1); }
   .bank-meta { font-size:13px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; }
+
+  .money-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+  .money-chip {
+    display:inline-flex; align-items:baseline; gap:6px;
+    padding:8px 12px; border-radius:10px;
+    background:rgba(0,0,0,0.45); border:2px solid rgba(255,255,255,0.28);
+    font-size:18px; font-weight:800; letter-spacing:-0.02em;
+  }
+  .money-chip .lab {
+    font-size:11px; font-weight:800; letter-spacing:0.12em;
+    text-transform:uppercase; opacity:0.85;
+  }
+
+  .paid-stamp {
+    margin-top: 8px; padding: 8px 12px; border-radius: 8px;
+    background: rgba(0,0,0,0.55); border: 2px solid rgba(255,220,100,0.55);
+    font-size: 14px; font-weight: 800; letter-spacing: 0.04em;
+  }
+  button.got-it {
+    appearance: none; cursor: pointer;
+    padding: 12px 16px; min-height: 48px; border-radius: 10px;
+    font-size: 15px; font-weight: 800; letter-spacing: 0.04em;
+    background: linear-gradient(180deg,#ffe080,#e0a020); color:#1a1000;
+    border: 3px solid #8a6010;
+  }
+
+
   .goal-unlock[hidden]{display:none!important}
   .goal-unlock {
     display:inline-flex; align-items:center; gap:8px;
@@ -340,6 +367,12 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="bank-count"><span data-bank-symbol>◎</span> <span data-bank-life>0</span></div>
  </div>
  <div class="bank-blurb" data-bank-goal-blurb>Clear musts to earn up to $10/week with Dad (1★=$1). Miss musts = short or no full payday. Victory Jar $12 = save what you earned — not free money.</div>
+ <div class="money-row" aria-label="Balance carry and this week earn">
+ <div class="money-chip"><span class="lab">Balance</span> $<span data-bank-balance>0</span></div>
+ <div class="money-chip"><span class="lab">This week</span> $<span data-bank-week-earn>0</span></div>
+ <div class="money-chip"><span class="lab">Jar need</span> $<span data-bank-toward>0</span> / $<span data-bank-need>12</span></div>
+ </div>
+
  <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
  <div class="bank-meta"><span data-bank-meta>$0 / $12 · 0/12 ★</span>today <span data-bank-today>0</span></div>
  <div class="jar-flow" aria-label="stars to jar to payday">
@@ -351,7 +384,8 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="bank-links">
  <a class="primary-foil" href="sheet-allowance.html">Victory Jar →</a>
  <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">JAR FULL · saved $12 · show Dad</a>
- <button type="button" class="got-it" data-got-it hidden>Got it · jar reset</button>
+ <button type="button" class="got-it" data-got-it hidden>Got it · payday</button>
+ <div class="paid-stamp" data-paid-stamp hidden>Paid · jar reset</div>
  </div>
  <div class="saves-host" data-saves-panel data-kid="hayes"></div>
  </section>
@@ -390,7 +424,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
 </div>
 
 <script src="house-clock.js?v=CT1"></script>
-<script src="kids-data.js?v=PUTAWAY1"></script>
+<script src="kids-data.js?v=CARRY1"></script>
 <script src="house-saves.js"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
@@ -400,6 +434,32 @@ document.addEventListener("DOMContentLoaded", function(){
  if (window.HouseSaves) HouseSaves.mount("hayes");
  if (window.WardKids) WardKids.boot("hayes");
  if (window.HouseSfx) HouseSfx.wireMute();
+
+ var got = document.querySelector("[data-got-it]");
+ if (got && window.WardKids) {
+ got.addEventListener("click", function () {
+ var data = WardKids._data;
+ var bank = data ? WardKids.getBankView("hayes", data) : null;
+ var weekEarn = bank ? bank.weekEarn : 0;
+ var bal = bank ? bank.balance : 0;
+ var after = bal + weekEarn;
+ var def = String(weekEarn);
+ var paidStr = window.prompt(
+ "Dad paid how many $?\nThis week earn $" + weekEarn + " → balance becomes $" + after + " − paid.\n0 = keep all as carry into next week.",
+ def
+ );
+ if (paidStr == null) return;
+ WardKids.resetJarCycle("hayes", paidStr, data);
+ if (data) {
+ WardKids.syncBankFromChecks(data);
+ var bank2 = WardKids.getBankView("hayes", data);
+ WardKids.renderBank(document, bank2);
+ WardKids.renderPersonalGoal(document, "hayes", data, bank2);
+ }
+ if (window.HouseSfx) HouseSfx.tap();
+ });
+ }
+
 });
 </script>
 

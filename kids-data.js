@@ -164,7 +164,9 @@
 
   function kidDayBank(kidId) {
     var root = loadBankRoot();
-    if (!root[kidId]) root[kidId] = { days: {}, lifetime: 0 };
+    if (!root[kidId]) root[kidId] = { days: {}, lifetime: 0, balance: 0 };
+    if (typeof root[kidId].balance !== "number") root[kidId].balance = Number(root[kidId].balance) || 0;
+    if (typeof root[kidId].lifetime !== "number") root[kidId].lifetime = Number(root[kidId].lifetime) || 0;
     if (!root[kidId].days[DAY_ISO]) root[kidId].days[DAY_ISO] = { stars: 0, earned: {} };
     return { root: root, day: root[kidId].days[DAY_ISO], bag: root[kidId] };
   }
@@ -198,7 +200,68 @@
     return getBankView(kidId, data);
   }
 
+  function allowanceCap(goal) {
+    var g = goal || {};
+    var cap = typeof g.weeklyAllowance === "number" ? g.weeklyAllowance : null;
+    if (cap == null || isNaN(cap)) cap = typeof g.need === "number" ? g.need : 0;
+    return Math.max(0, Number(cap) || 0);
+  }
+
+  function starDollarOf(goal) {
+    var g = goal || {};
+    return g.starDollar != null ? Number(g.starDollar) : 1;
+  }
+
+  function weekEarnDollars(kidId, data) {
+    var kid = (data && data.kids && data.kids[kidId]) || {};
+    var goal = kid.bankGoal || {};
+    var week = weekStarsFor(kidId);
+    var sd = starDollarOf(goal);
+    var cap = allowanceCap(goal);
+    var raw = week * (isNaN(sd) ? 1 : sd);
+    return Math.min(raw, cap);
+  }
+
+  /** Move prior (completed) weeks' stars into durable balance$ so unpaid carry survives rollover. */
+  function settlePriorWeeksIntoBalance(kidId, data) {
+    var pack = kidDayBank(kidId);
+    var bag = pack.bag;
+    if (!bag.days) return;
+    var kid = (data && data.kids && data.kids[kidId]) || {};
+    var goal = kid.bankGoal || {};
+    var sd = starDollarOf(goal);
+    if (isNaN(sd)) sd = 1;
+    var cap = allowanceCap(goal);
+    var curStart = weekStartIso(DAY_ISO);
+    var byWeek = {};
+    Object.keys(bag.days).forEach(function (iso) {
+      var ws = weekStartIso(iso);
+      if (ws >= curStart) return; /* current week stays as week stars */
+      if (!byWeek[ws]) byWeek[ws] = 0;
+      byWeek[ws] += (bag.days[iso] && bag.days[iso].stars) ? bag.days[iso].stars : 0;
+    });
+    var added = 0;
+    Object.keys(byWeek).forEach(function (ws) {
+      var stars = byWeek[ws] || 0;
+      if (stars <= 0) return;
+      var earn = Math.min(stars * sd, cap);
+      bag.balance = (bag.balance || 0) + earn;
+      added += earn;
+      /* clear settled prior-week day buckets */
+      var parts = ws.split("-");
+      var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
+      for (var i = 0; i < 7; i++) {
+        var iso = d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+        if (bag.days[iso]) bag.days[iso] = { stars: 0, earned: {} };
+        d.setDate(d.getDate() + 1);
+      }
+    });
+    if (added) saveBankRoot(pack.root);
+    return added;
+  }
+
   function getBankView(kidId, data) {
+    settlePriorWeeksIntoBalance(kidId, data);
     var pack = kidDayBank(kidId);
     var kid = (data && data.kids && data.kids[kidId]) || {};
     var goal = kid.bankGoal || { need: 8, title: "Goal", blurb: "", reward: "" };
@@ -207,12 +270,23 @@
     /* Week star tally → jar / weekly allowance goal (existing need $ amounts) */
     var week = weekStarsFor(kidId);
     var life = pack.bag.lifetime || 0;
+    var balance = typeof pack.bag.balance === "number" ? pack.bag.balance : (Number(pack.bag.balance) || 0);
+    var weeklyAllowance = allowanceCap(goal);
+    var starDollar = starDollarOf(goal);
+    var weekEarn = Math.min(week * (isNaN(starDollar) ? 1 : starDollar), weeklyAllowance);
     var toward = Math.min(week, goal.need);
     var pct = goal.need ? Math.round((toward / goal.need) * 100) : 0;
+    /* Available $ toward jar / personal saves = carry + this week's earn */
+    var available = balance + weekEarn;
     return {
       kidId: kidId,
       today: today,
       week: week,
+      weekEarn: weekEarn,
+      balance: balance,
+      available: available,
+      weeklyAllowance: weeklyAllowance,
+      starDollar: isNaN(starDollar) ? 1 : starDollar,
       lifetime: life,
       need: goal.need,
       toward: toward,
@@ -369,9 +443,34 @@
     try { return localStorage.getItem("house-bank-paid:" + kidId) || ""; } catch (e) { return ""; }
   }
 
-  function resetJarCycle(kidId) {
+  /**
+   * Payday / jar reset.
+   * 1) Convert this week's stars into durable balance$ (capped by weeklyAllowance).
+   * 2) Subtract what Dad paid (optional paidAmount; default 0 = full carry).
+   * 3) Clear week star buckets. Never zeros lifetime (long save goals stay intact).
+   */
+  function resetJarCycle(kidId, paidAmount, data) {
+    data = data || (global.WardKids && global.WardKids._data) || null;
+    settlePriorWeeksIntoBalance(kidId, data);
     var pack = kidDayBank(kidId);
-    pack.bag.lifetime = 0;
+    var kid = (data && data.kids && data.kids[kidId]) || {};
+    var goal = kid.bankGoal || {};
+    var week = weekStarsFor(kidId);
+    var sd = starDollarOf(goal);
+    if (isNaN(sd)) sd = 1;
+    var cap = allowanceCap(goal);
+    var weekEarn = Math.min(week * sd, cap);
+    if (typeof pack.bag.balance !== "number") pack.bag.balance = Number(pack.bag.balance) || 0;
+    /* Week stars → balance (survive rollover); unpaid stays as carry */
+    pack.bag.balance = (pack.bag.balance || 0) + weekEarn;
+    var paid = 0;
+    if (paidAmount != null && paidAmount !== "") {
+      paid = Math.max(0, Number(paidAmount));
+      if (isNaN(paid)) paid = 0;
+    }
+    paid = Math.min(paid, pack.bag.balance);
+    pack.bag.balance = Math.max(0, pack.bag.balance - paid);
+    /* DO NOT zero lifetime — personal long saves use lifetime/balance separately */
     /* Clear this week's day star buckets so jar/week bar resets */
     var start = weekStartIso(DAY_ISO);
     var parts = start.split("-");
@@ -384,11 +483,15 @@
       d.setDate(d.getDate() + 1);
     }
     saveBankRoot(pack.root);
-    var stamp = "Paid · jar reset";
+    var bal = pack.bag.balance || 0;
+    var stamp = paid > 0
+      ? ("Paid $" + paid + " · $" + bal + " carry")
+      : ("Jar reset · $" + bal + " carry");
     try {
       localStorage.removeItem("house-bank-goal:" + kidId);
       localStorage.setItem("house-bank-paid:" + kidId, stamp);
       localStorage.setItem("house-bank-paid-at:" + kidId, new Date().toISOString());
+      localStorage.setItem("house-bank-paid-amount:" + kidId, String(paid));
     } catch (e) {}
     return stamp;
   }
@@ -421,9 +524,19 @@
     if (!name || need <= 0) {
       return { active: false, placeholder: placeholder, name: name || "", need: need || 0, toward: 0, met: false };
     }
-    var life = bank ? (bank.lifetime || bank.toward || 0) : 0;
-    var toward = Math.min(life, need);
-    return { active: true, placeholder: placeholder, name: name, need: need, toward: toward, met: toward >= need };
+    /* Prefer durable balance$ (+ this week earn) for money carry; lifetime stars remain available */
+    var money = 0;
+    if (bank) {
+      if (bank.balance != null || bank.weekEarn != null) {
+        money = (Number(bank.balance) || 0) + (Number(bank.weekEarn) || 0);
+      } else if (bank.available != null) {
+        money = Number(bank.available) || 0;
+      } else {
+        money = Number(bank.lifetime || bank.toward || 0) || 0;
+      }
+    }
+    var toward = Math.min(money, need);
+    return { active: true, placeholder: placeholder, name: name, need: need, toward: toward, met: toward >= need, unit: "$" };
   }
 
   function buildNoSurprise(kid, data) {
@@ -494,17 +607,31 @@
       el.textContent = sym;
     });
     var dollar = true; // House override 2026-09-27 · show $ deal on kid glass
+    var bal = bank.balance != null ? bank.balance : 0;
+    var we = bank.weekEarn != null ? bank.weekEarn : bank.toward;
+    root.querySelectorAll("[data-bank-balance]").forEach(function (el) {
+      el.textContent = String(bal);
+    });
+    root.querySelectorAll("[data-bank-week-earn]").forEach(function (el) {
+      el.textContent = String(we);
+    });
+    root.querySelectorAll("[data-bank-available]").forEach(function (el) {
+      el.textContent = String(bank.available != null ? bank.available : (bal + we));
+    });
+    root.querySelectorAll("[data-bank-allowance]").forEach(function (el) {
+      el.textContent = String(bank.weeklyAllowance != null ? bank.weeklyAllowance : bank.need);
+    });
     root.querySelectorAll("[data-bank-meta]").forEach(function (el) {
       if (dollar) {
-        el.textContent = "week $" + bank.toward + " / $" + bank.need + " · " + bank.toward + "/" + bank.need + " ★";
+        el.textContent = "Balance $" + bal + " · This week $" + we + " · Jar $" + bank.toward + " / $" + bank.need;
       } else {
         el.textContent = "week " + bank.toward + " / " + bank.need + " ★";
       }
     });
     var left = Math.max(0, bank.need - bank.toward);
     root.querySelectorAll("[data-bank-left]").forEach(function (el) {
-      if (bank.reached) el.textContent = "Jar full · $" + bank.need;
-      else if (dollar) el.textContent = "$" + left + " left · " + left + " ★ to unlock";
+      if (bank.reached) el.textContent = "Jar full · $" + bank.need + " · Balance $" + bal;
+      else if (dollar) el.textContent = "$" + left + " left on jar · Balance $" + bal;
       else el.textContent = left + " ★ to unlock";
     });
     root.querySelectorAll("[data-payday-chip]").forEach(function (el) {
@@ -543,10 +670,10 @@
         el.textContent = gv.placeholder;
         el.classList.add("is-empty");
       } else if (gv.met) {
-        el.textContent = "Tell Dad — goal met · " + gv.name + " (" + gv.need + "★)";
+        el.textContent = "Tell Dad — goal met · " + gv.name + " ($" + gv.need + ")";
         el.classList.add("is-met", "is-active");
       } else {
-        el.textContent = gv.name + " · " + gv.toward + "/" + gv.need + " ★";
+        el.textContent = gv.name + " · $" + gv.toward + "/$" + gv.need;
         el.classList.add("is-active");
       }
     });
@@ -714,6 +841,9 @@
     renderKidPage: renderKidPage,
     nextPaydayInfo: nextPaydayInfo,
     resetJarCycle: resetJarCycle,
+    settlePriorWeeksIntoBalance: settlePriorWeeksIntoBalance,
+    weekEarnDollars: weekEarnDollars,
+    allowanceCap: allowanceCap,
     getPaidStamp: getPaidStamp,
     personalGoalView: personalGoalView,
     buildNoSurprise: buildNoSurprise,

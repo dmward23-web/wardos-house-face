@@ -78,7 +78,13 @@
     try {
       if (global.WardKids && global.WardKids._data && global.WardKids.getBankView) {
         var b = global.WardKids.getBankView(kidId, global.WardKids._data);
-        return b ? (b.lifetime || b.toward || 0) : 0;
+        if (!b) return 0;
+        /* Prefer durable balance$ + this week earn for money carry / personal saves */
+        if (b.balance != null || b.weekEarn != null) {
+          return (Number(b.balance) || 0) + (Number(b.weekEarn) || 0);
+        }
+        if (b.available != null) return Number(b.available) || 0;
+        return b.lifetime || b.toward || 0;
       }
     } catch (e) { /* */ }
     return 0;
@@ -164,7 +170,7 @@
     } else {
       rows = items.map(function (it) {
         var meta = it.need > 0
-          ? (Math.min(toward, it.need) + "/" + it.need + " ★")
+          ? ("$" + Math.min(toward, it.need) + "/$" + it.need)
           : "★ later";
         return (
           '<div class="saves-list-row" data-save-id="' + esc(it.id) + '">' +
@@ -222,7 +228,7 @@
       label = "Saves · tap + to add";
     } else if (item.need > 0) {
       var banked = Math.min(toward, item.need);
-      label = "Saves · " + shortName(item.name, 20) + "  " + banked + "/" + item.need + " ★";
+      label = "Saves · " + shortName(item.name, 20) + "  $" + banked + "/$" + item.need;
       pct = Math.max(0, Math.min(100, Math.round((banked / item.need) * 100)));
     } else {
       label = "Saves · " + shortName(item.name, 24) + "  ★";
