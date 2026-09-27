@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HAYES · DROP ZONE</title>
-<link rel="stylesheet" href="house-engage.css?v=GROW1" />
+<link rel="stylesheet" href="house-engage.css?v=GROW1b" />
 <style>
 
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400}
@@ -369,12 +369,17 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="bank-blurb" data-bank-goal-blurb>Clear musts to earn up to $10/week with Dad (1★=$1). Miss musts = short or no full payday. Victory Jar $12 = save what you earned — not free money.</div>
  <button type="button" class="grow-meter grow-coins" data-grow-meter aria-label="Grow · victory coins">
  <div class="grow-stage">
- <div class="grow-fill" data-grow-fill></div>
+ <div class="grow-fill grow-fill-balance" data-grow-fill-balance></div>
+ <div class="grow-fill grow-fill-week" data-grow-fill-week></div>
+ <div class="grow-goal-line" data-grow-goal-line aria-hidden="true"><span data-grow-goal-lab>GOAL</span></div>
  <div class="grow-icons" data-grow-icons aria-hidden="true"></div>
  <div class="grow-pct" data-grow-pct>0%</div>
  </div>
  <div class="grow-readout">
  <div class="grow-title" data-grow-title>GROW · victory coins</div>
+ <div class="grow-jar-name" data-grow-jar-name>Victory Jar</div>
+ <div class="grow-total"><span data-grow-total>0</span> / <span data-grow-save-need>0</span></div>
+ <div class="grow-week-rising" data-grow-week-rising>week +$0 rising ↑</div>
  <div class="grow-line"><span class="lab">Balance</span><span class="val" data-grow-balance>$0</span></div>
  <div class="grow-line"><span class="lab">This week</span><span class="val" data-grow-week>$0</span></div>
  <div class="grow-line"><span class="lab">Save for</span><span class="val" data-grow-save-line>Add a save</span></div>
@@ -437,8 +442,8 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
 </div>
 
 <script src="house-clock.js?v=CT1"></script>
-<script src="kids-data.js?v=GROW1"></script>
-<script src="house-saves.js?v=GROW1"></script>
+<script src="kids-data.js?v=GROW1b"></script>
+<script src="house-saves.js?v=GROW1b"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
 <script src="house-checkoffs.js" defer></script>
