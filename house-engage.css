@@ -621,6 +621,79 @@ body.theme-ainsley .sec-bank { max-height: 190px !important; }
 
 .allow-shell .saves-host { margin-top: 6px; }
 
+
+/* —— House zoom · Prism [ − | 100% | + ] · 32px strip —— */
+.house-zoom {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
+  flex-shrink: 0;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.house-zoom .hz-btn {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.16);
+  color: inherit;
+  border: 2px solid rgba(255,255,255,0.28);
+  box-sizing: border-box;
+}
+.house-zoom .hz-pct {
+  width: 48px;
+  min-width: 48px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.28);
+  color: inherit;
+  border: 2px solid rgba(255,255,255,0.28);
+  box-sizing: border-box;
+}
+body.theme-ainsley .house-zoom .hz-btn,
+body.theme-ainsley.stick-season .house-zoom .hz-btn {
+  background: rgba(26,46,36,0.9);
+  border-color: #8a7040;
+  color: #e8e4d4;
+}
+body.theme-ainsley .house-zoom .hz-pct,
+body.theme-ainsley.stick-season .house-zoom .hz-pct {
+  background: #1a2e24;
+  border-color: #8a7040;
+  color: #d4a05a;
+}
+.hdr .nav-row, .hdr-left {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 /* —— Home control · header only · min 48px tap —— */
 a.home-btn, .home-btn {
   display: inline-flex !important;

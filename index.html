@@ -767,6 +767,7 @@ function fit() {
 
 render();
 fit();
+if (window.HouseZoom) HouseZoom.mount();
 window.addEventListener("resize", fit);
 window.addEventListener("orientationchange", () => setTimeout(fit, 100));
 
@@ -779,5 +780,7 @@ document.addEventListener("keydown", (e) => {
 });
 </script>
 
+<script src="house-zoom.js"></script>
+<script>if (window.HouseZoom) HouseZoom.mount();</script>
 </body>
 </html>
