@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-<meta name="description" content="Board-OS House face · family sheets home index · 20 tiles · kids-safe · no money · Gallery + Desk gate + Status" />
+<meta name="description" content="Board-OS House face · family sheets home index · jazz glass · 20 tiles · kids-safe · no money" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
 <style>
   @font-face {
@@ -82,10 +82,10 @@
 
   .hdr {
     display: flex; align-items: center; justify-content: space-between; gap: 20px;
-    flex-shrink: 0; padding: 14px 20px; border-radius: 16px;
-    background: rgba(255,255,255,0.78);
-    border: 3px solid rgba(40,42,48,0.45);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 5px 0 rgba(20,22,28,0.18), 0 8px 28px rgba(20,22,28,0.1);
+    flex-shrink: 0; padding: 14px 20px; border-radius: 14px;
+    background: linear-gradient(165deg, rgba(255,255,255,0.92), rgba(230,234,240,0.78));
+    border: 4px solid rgba(20,22,28,0.55);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.98) inset, 0 8px 0 rgba(20,22,28,0.28), 0 14px 28px rgba(20,22,28,0.14);
   }
   
   .brand { flex-shrink: 0; display: flex; align-items: center; }
@@ -117,19 +117,19 @@
   .eyebrow {
     font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #5a5e66;
   }
-  .name { font-size: 38px; font-weight: 800; letter-spacing: -0.05em; color: #0e1014; line-height: 1; }
-  .name-accent { color: #2a2e36; }
-  .tagline { font-size: 15px; font-weight: 550; color: #4a4e56; letter-spacing: -0.01em; margin-top: 2px; }
+  .name { font-size: 42px; font-weight: 850; letter-spacing: -0.05em; color: #0e1014; line-height: 1; }
+  .name-accent { color: #121418; }
+  .tagline { font-size: 16px; font-weight: 650; color: #3a3e46; letter-spacing: -0.01em; margin-top: 2px; }
   .hdr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
   .hot-pill {
     display: inline-flex; align-items: center; gap: 8px;
-    font-size: 13px; font-weight: 700; color: #2a2e36; letter-spacing: -0.015em;
-    padding: 10px 16px; border-radius: 999px;
-    background: linear-gradient(145deg, rgba(255,255,255,0.85), rgba(230,234,240,0.55));
-    border: 1px solid rgba(40,42,48,0.16);
-    box-shadow: 0 4px 14px rgba(20,22,28,0.08);
+    font-size: 14px; font-weight: 800; color: #1a1000; letter-spacing: -0.015em;
+    padding: 11px 18px; border-radius: 999px;
+    background: linear-gradient(145deg, #ffe080, #f0a020);
+    border: 2px solid #8a5010;
+    box-shadow: 0 4px 0 rgba(120,70,10,0.35), 0 0 16px rgba(255,180,40,0.3);
   }
-  .hot-pill .spark { font-size: 16px; line-height: 1; color: #5a5e66; }
+  .hot-pill .spark { font-size: 16px; line-height: 1; color: #5a3010; }
   .mock-tag {
     font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
     color: #6a6e76; text-align: right; line-height: 1.45; padding: 7px 11px; border-radius: 10px;
@@ -137,57 +137,70 @@
   }
 
   .leaveby {
-    flex-shrink: 0; display: flex; align-items: stretch; border-radius: 16px; overflow: hidden;
+    flex-shrink: 0; display: flex; align-items: stretch; border-radius: 14px; overflow: hidden;
     position: relative;
-    background: linear-gradient(105deg, #262830 0%, #343840 28%, #454952 52%, #3a3e46 78%, #2a2c32 100%);
+    min-height: 88px;
+    background: linear-gradient(105deg, #14161c 0%, #22262e 22%, #3a3230 48%, #2a2e36 72%, #121418 100%);
+    border: 3px solid rgba(255,200,80,0.55);
     box-shadow:
-      0 0 0 1px rgba(255,255,255,0.24) inset,
-      0 0 0 1px rgba(0,0,0,0.28),
-      0 0 36px rgba(0,0,0,0.22),
-      0 10px 28px rgba(20,22,28,0.28),
-      0 0 20px rgba(220,225,235,0.14);
+      0 0 0 1px rgba(255,255,255,0.28) inset,
+      0 0 0 1px rgba(0,0,0,0.45),
+      0 0 48px rgba(0,0,0,0.35),
+      0 12px 0 rgba(10,12,16,0.55),
+      0 18px 36px rgba(20,22,28,0.32),
+      0 0 32px rgba(255,180,60,0.22);
+    animation: leaveby-pulse 2.8s ease-in-out infinite;
   }
   .leaveby::before {
     content: ""; position: absolute; inset: 0; pointer-events: none;
     background:
-      linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 40%, rgba(0,0,0,0.16) 100%),
-      radial-gradient(ellipse 55% 120% at 6% 50%, rgba(255,255,255,0.17) 0%, transparent 55%),
-      linear-gradient(118deg, transparent 0 30%, rgba(255,255,255,0.28) 30% 36%, transparent 36%);
+      linear-gradient(180deg, rgba(255,255,255,0.28) 0%, transparent 38%, rgba(0,0,0,0.22) 100%),
+      radial-gradient(ellipse 50% 140% at 4% 50%, rgba(255,200,80,0.28) 0%, transparent 55%),
+      linear-gradient(118deg, transparent 0 28%, rgba(255,255,255,0.38) 28% 34%, transparent 34%);
+    animation: leaveby-sheen 4.5s ease-in-out infinite;
   }
   .leaveby-accent {
-    width: 8px; flex-shrink: 0; position: relative; z-index: 1;
-    background: linear-gradient(180deg, #fff 0%, #d8dce2 40%, #8a909a 100%);
+    width: 10px; flex-shrink: 0; position: relative; z-index: 1;
+    background: linear-gradient(180deg, #ffe080 0%, #f0a020 45%, #c87810 100%);
+    box-shadow: 0 0 18px rgba(255,180,40,0.55);
   }
   .leaveby-body {
-    flex: 1; padding: 12px 24px 12px 20px;
-    display: flex; flex-direction: column; gap: 1px;
+    flex: 1; padding: 14px 28px 14px 22px;
+    display: flex; flex-direction: column; gap: 2px;
     position: relative; z-index: 1;
   }
   .leaveby-label {
-    font-size: 10px; font-weight: 700; letter-spacing: 0.32em;
-    text-transform: uppercase; color: rgba(220,225,235,0.72);
+    font-size: 11px; font-weight: 800; letter-spacing: 0.34em;
+    text-transform: uppercase; color: rgba(255,220,140,0.85);
   }
   .leaveby-main {
-    font-size: 28px; font-weight: 700; letter-spacing: -0.04em;
-    color: #f4f6f8; line-height: 1.15;
-    text-shadow: 0 1px 0 rgba(0,0,0,0.45), 0 0 18px rgba(255,255,255,0.12);
+    font-size: 34px; font-weight: 800; letter-spacing: -0.045em;
+    color: #f8fafc; line-height: 1.1;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.55), 0 0 24px rgba(255,200,80,0.18);
   }
   .leaveby-main .time {
-    color: #0e1014; font-weight: 800; padding: 1px 12px 2px; margin: 0 4px;
-    border-radius: 9px; background: linear-gradient(180deg, #fff 0%, #e8ebf0 100%);
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset, 0 3px 12px rgba(0,0,0,0.28), 0 0 12px rgba(255,255,255,0.18);
+    color: #1a1000; font-weight: 900; padding: 2px 16px 3px; margin: 0 6px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #fff8e0 0%, #ffd246 55%, #f0a020 100%);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.55) inset,
+      0 4px 0 rgba(120,70,10,0.45),
+      0 0 20px rgba(255,180,40,0.45);
+    animation: time-throb 1.8s ease-in-out infinite;
+    display: inline-block;
   }
   .leaveby-detail {
-    font-size: 14px; font-weight: 500; color: rgba(200,206,216,0.88);
+    font-size: 15px; font-weight: 600; color: rgba(220,226,236,0.92);
     letter-spacing: -0.015em;
   }
-  .leaveby-detail strong { color: #ffffff; font-weight: 700; }
+  .leaveby-detail strong { color: #ffe080; font-weight: 800; }
   .leaveby-badge {
     position: absolute; right: 22px; top: 50%; transform: translateY(-50%); z-index: 2;
-    font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
-    color: rgba(240,242,246,0.85); padding: 9px 14px; border-radius: 999px;
-    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.28);
-    backdrop-filter: blur(8px);
+    font-size: 12px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase;
+    color: #1a1000; padding: 11px 18px; border-radius: 999px;
+    background: linear-gradient(145deg, #ffe080, #f0a020);
+    border: 2px solid rgba(255,255,255,0.45);
+    box-shadow: 0 4px 0 rgba(80,50,10,0.4), 0 0 16px rgba(255,180,40,0.35);
   }
 
   .grid-wrap {
@@ -198,10 +211,10 @@
     padding: 0 4px; flex-shrink: 0;
   }
   .grid-title {
-    font-size: 13px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: #4a4e56;
+    font-size: 14px; font-weight: 800; letter-spacing: 0.26em; text-transform: uppercase; color: #2a2e36;
   }
   .grid-hint {
-    font-size: 14px; font-weight: 550; color: #5a5e66;
+    font-size: 15px; font-weight: 650; color: #3a3e46;
   }
 
   .tile-grid {
@@ -209,57 +222,146 @@
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    gap: 10px;
+    gap: 12px;
   }
+
+  /* Base tile · hard edge family language (not soft frosted sludge) */
   .tile {
     display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between;
-    padding: 12px 14px 12px;
-    border-radius: 18px;
+    padding: 14px 16px 14px;
+    border-radius: 14px;
     text-decoration: none; color: inherit;
     cursor: pointer;
     position: relative; overflow: hidden;
     min-height: 0;
-    background: rgba(255,255,255,0.84);
-    border: 3px solid rgba(40,42,48,0.52);
+    background: linear-gradient(165deg, #f4f6f8 0%, #d8dce2 100%);
+    border: 4px solid rgba(20,22,28,0.72);
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.98) inset,
-      0 6px 0 rgba(20,22,28,0.22),
-      0 12px 28px rgba(20,22,28,0.14),
-      0 3px 8px rgba(20,22,28,0.06);
-    transition: transform 0.12s ease, box-shadow 0.12s ease;
+      0 1px 0 rgba(255,255,255,0.95) inset,
+      0 8px 0 rgba(20,22,28,0.32),
+      0 16px 28px rgba(20,22,28,0.18);
+    transition: transform 0.12s ease, filter 0.12s ease;
   }
-  .tile:active { transform: scale(0.975); }
+  .tile:active { transform: scale(0.97); filter: brightness(1.06); }
   .tile::before {
     content: "";
-    position: absolute; top: 0; left: 0; right: 0; height: 4px;
-    background: linear-gradient(90deg, rgba(90,96,104,0.55), rgba(180,186,196,0.35));
-    border-radius: 22px 22px 0 0;
+    position: absolute; top: 0; left: 0; right: 0; height: 5px;
+    background: linear-gradient(90deg, #5a6068, #c8ccd2);
+    border-radius: 10px 10px 0 0;
   }
+  /* shimmer sweep */
+  .tile::after {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    background: linear-gradient(115deg, transparent 0 42%, rgba(255,255,255,0.22) 50%, transparent 58%);
+    background-size: 240% 100%;
+    opacity: 0.4;
+    animation: tile-shimmer 6.5s ease-in-out infinite;
+  }
+  .tile > * { position: relative; z-index: 2; }
   .tile-icon {
-    width: 42px; height: 42px; border-radius: 12px;
+    width: 48px; height: 48px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; line-height: 1;
-    background: rgba(255,255,255,0.72);
-    border: 1px solid rgba(40,42,48,0.10);
-    box-shadow: 0 4px 12px rgba(20,22,28,0.08);
+    font-size: 26px; line-height: 1;
+    background: rgba(255,255,255,0.85);
+    border: 2px solid rgba(40,42,48,0.18);
+    box-shadow: 0 4px 0 rgba(20,22,28,0.18), 0 6px 14px rgba(20,22,28,0.1);
     flex-shrink: 0;
   }
   .tile-label {
-    font-size: 22px; font-weight: 800; letter-spacing: -0.04em;
-    color: #0e1014; line-height: 1.05; margin-top: auto; padding-top: 10px;
+    font-size: 24px; font-weight: 850; letter-spacing: -0.045em;
+    color: #0e1014; line-height: 1.02; margin-top: auto; padding-top: 10px;
   }
   .tile-sub {
-    font-size: 13px; font-weight: 600; color: #5a5e66; letter-spacing: -0.01em;
-    margin-top: 6px;
+    font-size: 14px; font-weight: 650; color: #3a3e48; letter-spacing: -0.01em;
+    margin-top: 5px;
   }
   .tile-tap {
-    position: absolute; right: 16px; bottom: 16px;
-    font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
-    color: #7a8090; padding: 6px 10px; border-radius: 999px;
-    background: rgba(40,42,48,0.06); border: 1px solid rgba(40,42,48,0.10);
+    position: absolute; right: 14px; bottom: 14px; z-index: 3;
+    font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;
+    color: #2a2e36; padding: 7px 12px; border-radius: 999px;
+    background: rgba(255,255,255,0.72); border: 2px solid rgba(40,42,48,0.22);
+    box-shadow: 0 2px 0 rgba(20,22,28,0.15);
   }
 
-  /* Kid tiles — color accents */
+  /* —— Distinct personalities (same family: hard border + deep hard shadow + accent bar) —— */
+  .tile.today {
+    background: linear-gradient(165deg, #ffe890 0%, #f0b020 42%, #c07010 100%);
+    border-color: #8a5010;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 8px 0 rgba(120,70,10,0.45), 0 16px 28px rgba(180,120,20,0.32), 0 0 24px rgba(255,180,40,0.35);
+  }
+  .tile.today::before { background: linear-gradient(90deg, #ffe080, #c87810); height: 6px; }
+  .tile.today .tile-icon {
+    background: linear-gradient(145deg, #fff0b0, #f0a020); color: #1a1000; font-size: 28px;
+    border-color: transparent; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 5px 0 #8a5010;
+  }
+  .tile.today .tile-label { color: #3a2208; font-size: 26px; }
+  .tile.today .tile-sub { color: #5a3810; }
+  .tile.today .tile-tap { background: #1a1000; color: #ffe080; border-color: #8a5010; }
+
+  .tile.week {
+    background: linear-gradient(165deg, #c8dcff 0%, #5080c8 42%, #203868 100%);
+    border-color: #1a2848;
+  }
+  .tile.week::before { background: linear-gradient(90deg, #90b0f0, #304878); }
+  .tile.week .tile-icon {
+    background: linear-gradient(145deg, #a0c0f0, #304878); color: #fff;
+    border-color: transparent; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 5px 0 #1a2848;
+  }
+  .tile.week .tile-label { color: #f0f4ff; }
+  .tile.week .tile-sub { color: #d0dcf0; font-weight: 700; }
+  .tile.week .tile-tap { background: rgba(255,255,255,0.85); color: #1a2848; border-color: #304878; }
+
+  .tile.month {
+    background: linear-gradient(165deg, #d8c8ff 0%, #6850b0 42%, #281858 100%);
+    border-color: #241848;
+  }
+  .tile.month::before { background: linear-gradient(90deg, #b090e8, #382868); }
+  .tile.month .tile-icon {
+    background: linear-gradient(145deg, #c0a0f0, #382868); color: #fff;
+    border-color: transparent; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 5px 0 #241848;
+  }
+  .tile.month .tile-label { color: #f4f0ff; }
+  .tile.month .tile-sub { color: #d8d0f0; font-weight: 700; }
+
+  .tile.chores {
+    background: linear-gradient(165deg, #b8f8b8 0%, #40b858 42%, #186828 100%);
+    border-color: #104820;
+  }
+  .tile.chores::before { background: linear-gradient(90deg, #80e890, #287838); }
+  .tile.chores .tile-icon {
+    background: linear-gradient(145deg, #90f0a0, #287838); color: #fff; font-size: 28px; font-weight: 900;
+    border-color: transparent; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 5px 0 #104820;
+  }
+  .tile.chores .tile-label { color: #f0fff0; }
+  .tile.chores .tile-sub { color: #c8f0c8; font-weight: 700; }
+  .tile.chores .tile-tap { background: #104820; color: #c8ffc8; border-color: #287838; }
+
+  .tile.groceries {
+    background: linear-gradient(165deg, #a8f0d8 0%, #28a888 42%, #105848 100%);
+    border-color: #0e4038;
+  }
+  .tile.groceries::before { background: linear-gradient(90deg, #60e0c0, #186858); }
+  .tile.groceries .tile-icon {
+    background: linear-gradient(145deg, #80f0d0, #186858); color: #fff;
+    border-color: transparent; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 5px 0 #0e4038;
+  }
+  .tile.groceries .tile-label { color: #e8fff8; }
+  .tile.groceries .tile-sub { color: #b8f0e0; font-weight: 700; }
+
+  .tile.pack {
+    background: linear-gradient(165deg, #f8d0a0 0%, #c07830 42%, #603018 100%);
+    border-color: #482018;
+  }
+  .tile.pack::before { background: linear-gradient(90deg, #f0b070, #784028); }
+  .tile.pack .tile-icon {
+    background: linear-gradient(145deg, #f0c090, #784028); color: #fff;
+    border-color: transparent; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 5px 0 #482018;
+  }
+  .tile.pack .tile-label { color: #fff8f0; }
+  .tile.pack .tile-sub { color: #f0d8c0; font-weight: 700; }
+
+  /* Kid tiles — color accents (base, overridden by v3 scream below) */
   .tile.hayes {
     background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(210,245,232,0.72) 100%);
     border-color: rgba(40,160,120,0.28);
@@ -294,152 +396,195 @@
     border-color: transparent; font-size: 22px; font-weight: 800;
     box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(58,111,192,0.28);
   }
-  .tile.dan {
-    background: linear-gradient(165deg, rgba(255,255,255,0.92) 0%, rgba(210,214,220,0.85) 100%);
-    border-color: rgba(40,42,48,0.55);
-  }
-  .tile.dan::before { background: linear-gradient(90deg, #5a6068, #2a2e36); }
-  .tile.dan .tile-icon {
-    background: linear-gradient(145deg, #6a7078, #2a2e36);
-    color: #fff;
-  }
-  .tile.dan .tile-label { color: #1a1e24; }
   .tile.harris .tile-label { color: #1a3050; }
 
+  /* Dad · real seat — charcoal command */
+  .tile.dan {
+    background: linear-gradient(165deg, #3a3e46 0%, #1e2228 55%, #0e1014 100%) !important;
+    border-color: #ffe080 !important;
+    color: #f4f6f8 !important;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.18) inset,
+      0 8px 0 rgba(10,12,16,0.7),
+      0 16px 28px rgba(0,0,0,0.35),
+      0 0 24px rgba(255,200,80,0.22) !important;
+  }
+  .tile.dan::before { background: linear-gradient(90deg, #ffe080, #c87810) !important; height: 6px; }
+  .tile.dan .tile-icon {
+    background: linear-gradient(145deg, #6a7078, #1a1e24) !important;
+    color: #ffe080 !important; font-size: 26px !important; font-weight: 900 !important;
+    border: 2px solid #ffe080 !important;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.35), 0 0 16px rgba(255,200,80,0.35) !important;
+  }
+  .tile.dan .tile-label { color: #ffe080 !important; font-size: 24px !important; }
+  .tile.dan .tile-sub { color: rgba(230,234,240,0.85) !important; font-weight: 650 !important; }
+  .tile.dan .tile-tap {
+    background: #ffe080; color: #1a1000; border: 2px solid #c87810; font-weight: 800;
+  }
+
   .tile.stars {
-    background: linear-gradient(165deg, rgba(255,255,255,0.90) 0%, rgba(255,236,180,0.55) 100%);
-    border-color: rgba(210,160,40,0.35);
+    background: linear-gradient(165deg, #ffe890 0%, #e0a820 42%, #a86808 100%);
+    border-color: #805010;
   }
-  .tile.stars::before { background: linear-gradient(90deg, #f0c040, #d0a020); }
+  .tile.stars::before { background: linear-gradient(90deg, #ffe080, #c88810); }
   .tile.stars .tile-icon {
-    background: linear-gradient(145deg, #f0c040, #d0a020); color: #fff;
+    background: linear-gradient(145deg, #ffe080, #c88810); color: #fff;
     border-color: transparent;
-    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(180,140,40,0.28);
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 5px 0 #805010;
   }
-  .tile.stars .tile-label { color: #5a4010; }
+  .tile.stars .tile-label { color: #3a2808; }
+  .tile.stars .tile-sub { color: #5a4010; font-weight: 700; }
+  .tile.stars .tile-tap { background: #1a1000; color: #ffe080; border-color: #805010; }
 
   .tile.fun {
-    background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(220,245,255,0.65) 100%);
-    border-color: rgba(80,160,200,0.28);
+    background: linear-gradient(165deg, #a8e8ff 0%, #38a8c8 42%, #105868 100%);
+    border-color: #0e4058;
   }
-  .tile.fun::before { background: linear-gradient(90deg, #5ec0e0, #3a90b8); }
+  .tile.fun::before { background: linear-gradient(90deg, #70d8f0, #186888); }
+  .tile.fun .tile-icon {
+    background: linear-gradient(145deg, #90e8ff, #186888); color: #fff;
+    border-color: transparent; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 5px 0 #0e4058;
+  }
+  .tile.fun .tile-label { color: #f0fcff; }
+  .tile.fun .tile-sub { color: #c0e8f8; font-weight: 700; }
 
   .tile.vote {
-    background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(255,230,210,0.55) 100%);
-    border-color: rgba(220,140,80,0.28);
+    background: linear-gradient(165deg, #ffd0a0 0%, #e07028 42%, #902810 100%);
+    border-color: #682010;
   }
-  .tile.vote::before { background: linear-gradient(90deg, #f0a060, #d07840); }
+  .tile.vote::before { background: linear-gradient(90deg, #f0a060, #b04818); }
+  .tile.vote .tile-icon {
+    background: linear-gradient(145deg, #ffb070, #b04818); color: #fff;
+    border-color: transparent; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 5px 0 #682010;
+  }
+  .tile.vote .tile-label { color: #fff8f0; }
+  .tile.vote .tile-sub { color: #ffd8c0; font-weight: 700; }
 
   .tile.win {
-    background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(210,245,200,0.55) 100%);
-    border-color: rgba(80,170,100,0.30);
+    background: linear-gradient(165deg, #c0f8a0 0%, #50c038 42%, #186818 100%);
+    border-color: #104818;
   }
-  .tile.win::before { background: linear-gradient(90deg, #70d080, #40a850); }
+  .tile.win::before { background: linear-gradient(90deg, #90e870, #288820); }
+  .tile.win .tile-icon {
+    background: linear-gradient(145deg, #a0f080, #288820); color: #fff;
+    border-color: transparent; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 5px 0 #104818;
+  }
+  .tile.win .tile-label { color: #f0fff0; }
+  .tile.win .tile-sub { color: #c8f8c0; font-weight: 700; }
+  .tile.win .tile-tap { background: #104818; color: #c8ffb0; border-color: #288820; }
 
   .tile.count {
-    background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(230,220,255,0.55) 100%);
-    border-color: rgba(120,100,200,0.28);
+    background: linear-gradient(165deg, #d0c0ff 0%, #6858c8 42%, #302888 100%);
+    border-color: #241868;
   }
-  .tile.count::before { background: linear-gradient(90deg, #9080e0, #6860b8); }
+  .tile.count::before { background: linear-gradient(90deg, #a090f0, #403898); }
+  .tile.count .tile-icon {
+    background: linear-gradient(145deg, #b0a0ff, #403898); color: #fff;
+    border-color: transparent; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 5px 0 #241868;
+  }
+  .tile.count .tile-label { color: #f4f0ff; }
+  .tile.count .tile-sub { color: #d8d0f8; font-weight: 700; }
 
   .tile.us {
-    background: linear-gradient(165deg, rgba(255,255,255,0.90) 0%, rgba(255,230,220,0.60) 100%);
-    border-color: rgba(200,120,100,0.32);
+    background: linear-gradient(165deg, #ffc8b8 0%, #d86050 42%, #882028 100%);
+    border-color: #581818;
   }
-  .tile.us::before { background: linear-gradient(90deg, #e8a898, #c87868); }
+  .tile.us::before { background: linear-gradient(90deg, #f0a898, #a04038); }
   .tile.us .tile-icon {
-    background: linear-gradient(145deg, #f0d0c8, #c87868); color: #fff;
+    background: linear-gradient(145deg, #f0c0b0, #a04038); color: #fff;
     border-color: transparent;
-    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(180,100,80,0.25);
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 5px 0 #581818;
   }
-  .tile.us .tile-label { color: #3a2e2a; }
+  .tile.us .tile-label { color: #fff4f0; }
+  .tile.us .tile-sub { color: #ffd0c8; font-weight: 700; }
 
   .tile.load {
-    background: linear-gradient(165deg, rgba(255,255,255,0.92) 0%, rgba(255,236,160,0.70) 100%);
-    border-color: rgba(210,160,40,0.45);
+    background: linear-gradient(165deg, #ffe070 0%, #e0a820 48%, #a85808 100%);
+    border-color: #805010;
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.98) inset,
-      0 12px 28px rgba(200,150,40,0.14),
-      0 0 0 2px rgba(240,192,64,0.28);
+      0 1px 0 rgba(255,255,255,0.95) inset,
+      0 8px 0 rgba(120,70,10,0.45),
+      0 16px 28px rgba(200,150,40,0.28),
+      0 0 0 2px rgba(240,192,64,0.45);
   }
-  .tile.load::before { background: linear-gradient(90deg, #f0c040, #d0a020); height: 5px; }
+  .tile.load::before { background: linear-gradient(90deg, #f0c040, #c07010); height: 6px; }
   .tile.load .tile-icon {
     background: linear-gradient(145deg, #ffe08a, #f0c040); color: #1a1408;
     border-color: transparent; font-size: 18px; font-weight: 900;
-    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(200,150,40,0.32);
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 5px 0 #805010;
   }
-  .tile.load .tile-label { color: #5a4010; }
-
-
-  .tile.today {
-    background: linear-gradient(165deg, rgba(255,255,255,0.94) 0%, rgba(255,236,170,0.72) 100%);
-    border-color: rgba(210,160,40,0.48);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.98) inset,
-      0 12px 28px rgba(200,150,40,0.16),
-      0 0 0 2px rgba(240,192,64,0.32);
-  }
-  .tile.today::before { background: linear-gradient(90deg, #ffe08a, #f0c040); height: 5px; }
-  .tile.today .tile-icon {
-    background: linear-gradient(145deg, #ffe08a, #f0c040); color: #1a1408;
-    border-color: transparent; font-size: 26px;
-    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(200,150,40,0.32);
-  }
-  .tile.today .tile-label { color: #5a4010; }
+  .tile.load .tile-label { color: #3a2808; }
+  .tile.load .tile-sub { color: #5a4010; font-weight: 700; }
 
   .tile.desk {
-    background: linear-gradient(165deg, rgba(255,255,255,0.88) 0%, rgba(70,74,82,0.22) 100%);
-    border-color: rgba(40,42,48,0.35);
+    background: linear-gradient(165deg, #a8acb4 0%, #3a4048 42%, #121418 100%);
+    border-color: #0e1014;
   }
-  .tile.desk::before { background: linear-gradient(90deg, #4a5058, #1e2228); }
+  .tile.desk::before { background: linear-gradient(90deg, #8a9098, #1a1e24); }
   .tile.desk .tile-icon {
-    background: linear-gradient(145deg, #4a5058, #1e2228); color: #fff;
+    background: linear-gradient(145deg, #5a6068, #1a1e24); color: #fff;
     border-color: transparent; font-size: 16px; font-weight: 800;
-    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(20,22,28,0.28);
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.5), 0 5px 0 #0e1014;
   }
-  .tile.desk .tile-label { color: #1a1c20; }
+  .tile.desk .tile-label { color: #f4f6f8; }
+  .tile.desk .tile-sub { color: #c8ccd2; font-weight: 700; }
+  .tile.desk .tile-tap { background: #0e1014; color: #e8ebf0; border-color: #4a5058; }
 
   .tile.status {
-    background: linear-gradient(165deg, rgba(255,255,255,0.90) 0%, rgba(200,220,250,0.65) 100%);
-    border-color: rgba(70,120,200,0.32);
+    background: linear-gradient(165deg, #b8d0ff 0%, #4070c8 42%, #183878 100%);
+    border-color: #102848;
   }
-  .tile.status::before { background: linear-gradient(90deg, #5a9ae8, #3a6fc0); }
+  .tile.status::before { background: linear-gradient(90deg, #70a0e8, #204888); }
   .tile.status .tile-icon {
-    background: linear-gradient(145deg, #5a9ae8, #3a6fc0); color: #fff;
-    border-color: transparent; font-size: 20px;
-    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(58,111,192,0.28);
+    background: linear-gradient(145deg, #80b0f0, #204888); color: #fff;
+    border-color: transparent; font-size: 22px;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 5px 0 #102848;
   }
-  .tile.status .tile-label { color: #1a3050; }
-
+  .tile.status .tile-label { color: #f0f6ff; }
+  .tile.status .tile-sub { color: #c8d8f0; font-weight: 700; }
 
   .tile.gallery {
-    background: linear-gradient(165deg, rgba(255,255,255,0.92) 0%, rgba(210,220,240,0.70) 100%);
-    border-color: rgba(80,110,160,0.35);
+    background: linear-gradient(165deg, #c8d0e0 0%, #586888 42%, #283048 100%);
+    border-color: #1a2438;
   }
-  .tile.gallery::before { background: linear-gradient(90deg, #7a90b8, #4a6088); }
+  .tile.gallery::before { background: linear-gradient(90deg, #90a0c0, #384058); }
   .tile.gallery .tile-icon {
-    background: linear-gradient(145deg, #8aa0c0, #4a6088); color: #fff;
-    border-color: transparent; font-size: 18px;
-    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(60,80,120,0.28);
+    background: linear-gradient(145deg, #a0b0d0, #384058); color: #fff;
+    border-color: transparent; font-size: 20px;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 5px 0 #1a2438;
   }
-  .tile.gallery .tile-label { color: #1a2840; }
+  .tile.gallery .tile-label { color: #f0f4f8; }
+  .tile.gallery .tile-sub { color: #d0d8e0; font-weight: 700; }
 
   .ftr {
     flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; font-size: 12px; color: #6a6e76; font-weight: 500; padding-top: 2px;
+    gap: 12px; font-size: 12px; color: #4a4e56; font-weight: 600; padding-top: 2px;
   }
   .ftr-left { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
   .ftr-chip {
-    font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
-    color: #3a3e46; border: 1px solid rgba(40,42,48,0.22);
+    font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #1a1e24; border: 2px solid rgba(40,42,48,0.35);
     padding: 6px 12px; border-radius: 999px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(230,232,236,0.7));
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(230,232,236,0.85));
+    box-shadow: 0 2px 0 rgba(20,22,28,0.15);
   }
-  .ftr-meta { color: #8a8e96; }
+  .ftr-meta { color: #5a5e66; }
+
+  /* Floating accents */
+  .float-orbs { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+  .float-orbs i {
+    position: absolute; width: 10px; height: 10px; border-radius: 50%;
+    opacity: 0.55; animation: orb-float 7s ease-in-out infinite;
+  }
+  .float-orbs i:nth-child(1) { left: 8%; top: 22%; background: #ffd246; box-shadow: 0 0 14px #ffd246; animation-delay: 0s; }
+  .float-orbs i:nth-child(2) { left: 92%; top: 30%; background: #70e0ff; box-shadow: 0 0 14px #70e0ff; width: 8px; height: 8px; animation-delay: 1.2s; }
+  .float-orbs i:nth-child(3) { left: 18%; top: 78%; background: #c47ad8; box-shadow: 0 0 14px #c47ad8; animation-delay: 2s; }
+  .float-orbs i:nth-child(4) { left: 78%; top: 82%; background: #6ad030; box-shadow: 0 0 14px #6ad030; width: 7px; height: 7px; animation-delay: 0.6s; }
+  .float-orbs i:nth-child(5) { left: 48%; top: 14%; background: #ff80c0; box-shadow: 0 0 12px #ff80c0; width: 6px; height: 6px; animation-delay: 1.8s; }
+  .float-orbs i:nth-child(6) { left: 62%; top: 88%; background: #ffe080; box-shadow: 0 0 12px #ffe080; animation-delay: 2.8s; }
 
   /* Kid board entry tiles · magnetic */
   a.tile.hayes, a.tile.ainsley, a.tile.harris {
-    position: relative;
     animation: tile-breathe 3s ease-in-out infinite;
   }
   a.tile.ainsley { animation-delay: 0s; }
@@ -449,6 +594,7 @@
     content: ""; position: absolute; inset: -2px; border-radius: inherit; pointer-events: none;
     opacity: 0.5; z-index: 0;
     animation: tile-glow 3s ease-in-out infinite;
+    background: none !important;
   }
   a.tile.ainsley::after {
     box-shadow: 0 0 0 2px rgba(180,100,200,0.4), 0 0 28px rgba(200,120,220,0.4);
@@ -465,6 +611,32 @@
     transform: scale(0.97);
     filter: brightness(1.08);
   }
+
+  /* Stagger shimmer so tiles don't blink in sync */
+  .tile:nth-child(2n)::after { animation-delay: 0.9s; }
+  .tile:nth-child(3n)::after { animation-delay: 1.8s; }
+  .tile:nth-child(5n)::after { animation-delay: 2.7s; }
+
+  @keyframes leaveby-pulse {
+    0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.28) inset, 0 0 0 1px rgba(0,0,0,0.45), 0 0 48px rgba(0,0,0,0.35), 0 12px 0 rgba(10,12,16,0.55), 0 18px 36px rgba(20,22,28,0.32), 0 0 28px rgba(255,180,60,0.2); }
+    50% { box-shadow: 0 0 0 1px rgba(255,255,255,0.35) inset, 0 0 0 1px rgba(0,0,0,0.45), 0 0 56px rgba(0,0,0,0.4), 0 12px 0 rgba(10,12,16,0.55), 0 18px 36px rgba(20,22,28,0.32), 0 0 42px rgba(255,180,60,0.42); }
+  }
+  @keyframes leaveby-sheen {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 1; }
+  }
+  @keyframes time-throb {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+  }
+  @keyframes tile-shimmer {
+    0% { background-position: 120% 0; }
+    40%, 100% { background-position: -120% 0; }
+  }
+  @keyframes orb-float {
+    0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
+    50% { transform: translateY(-18px) scale(1.25); opacity: 0.75; }
+  }
   @keyframes tile-breathe {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.02); }
@@ -474,6 +646,8 @@
     50% { opacity: 0.85; }
   }
   @media (prefers-reduced-motion: reduce) {
+    .leaveby, .leaveby::before, .leaveby-main .time,
+    .tile::after, .float-orbs i,
     a.tile.hayes, a.tile.ainsley, a.tile.harris,
     a.tile.hayes::after, a.tile.ainsley::after, a.tile.harris::after {
       animation: none !important;
@@ -484,13 +658,15 @@
   .tile.hayes, .tile.ainsley, .tile.harris, .tile.dan {
     border-width: 4px !important;
     min-height: 118px;
+  }
+  .tile.hayes, .tile.ainsley, .tile.harris {
     box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 0 rgba(20,22,28,0.28), 0 14px 28px rgba(20,22,28,0.16) !important;
   }
   .tile.hayes {
     background: linear-gradient(165deg, #1a4060 0%, #0e2848 40%, #2a1860 100%) !important;
     border-color: #70e0ff !important; color: #e8f8ff !important;
   }
-  .tile.hayes .tile-label { color: #7dffc8 !important; font-size: 22px !important; }
+  .tile.hayes .tile-label { color: #7dffc8 !important; font-size: 24px !important; }
   .tile.hayes .tile-sub { color: #a0d0f0 !important; font-weight: 700 !important; }
   .tile.hayes .tile-icon {
     background: linear-gradient(145deg, #3ec9a0, #184878 50%, #7018b0) !important;
@@ -502,7 +678,7 @@
     background: linear-gradient(165deg, #f0d0ff 0%, #c070e0 45%, #7a28a8 100%) !important;
     border-color: #ffe080 !important;
   }
-  .tile.ainsley .tile-label { color: #2a1040 !important; font-size: 22px !important; }
+  .tile.ainsley .tile-label { color: #2a1040 !important; font-size: 24px !important; }
   .tile.ainsley .tile-sub { color: #3a1858 !important; font-weight: 700 !important; }
   .tile.ainsley .tile-icon {
     background: linear-gradient(145deg, #f0c0ff, #6a2098) !important;
@@ -514,7 +690,7 @@
     background: linear-gradient(165deg, #c8f070 0%, #6aaa30 50%, #3a7020 100%) !important;
     border-color: #1a3010 !important;
   }
-  .tile.harris .tile-label { color: #102010 !important; font-size: 22px !important; }
+  .tile.harris .tile-label { color: #102010 !important; font-size: 24px !important; }
   .tile.harris .tile-sub { color: #1a3010 !important; font-weight: 700 !important; }
   .tile.harris .tile-icon {
     background: linear-gradient(145deg, #90e050, #2a8018) !important;
@@ -523,16 +699,12 @@
     box-shadow: 0 4px 0 #0e2008 !important;
   }
   .tile.harris .tile-tap { background: #ffe060; color: #1a1000; border: 2px solid #8a5010; font-weight: 800; }
-  .tile.dan {
-    background: linear-gradient(165deg, #e8ebf0 0%, #8a909a 100%) !important;
-    border-color: #1a1e24 !important;
-  }
-  .tile.dan .tile-label { font-size: 22px !important; }
 
 </style>
 </head>
 <body>
 <div class="panel">
+  <div class="float-orbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <header class="hdr">
     <div class="hdr-left">
       <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
@@ -578,7 +750,7 @@
         <span class="tile-tap">Tap</span>
       </a>
 
-      <a class="tile" href="index.html">
+      <a class="tile week" href="index.html">
         <div class="tile-icon" aria-hidden="true">📅</div>
         <div>
           <div class="tile-label">Week</div>
@@ -587,7 +759,7 @@
         <span class="tile-tap">Tap</span>
       </a>
 
-      <a class="tile" href="month.html">
+      <a class="tile month" href="month.html">
         <div class="tile-icon" aria-hidden="true">🗓</div>
         <div>
           <div class="tile-label">Month</div>
@@ -626,13 +798,13 @@
       <a class="tile dan" href="sheet-dan.html">
         <div class="tile-icon" aria-hidden="true">D</div>
         <div>
-          <div class="tile-label">DAD</div>
-          <div class="tile-sub">Your week box · leave-bys</div>
+          <div class="tile-label">DAD SEAT</div>
+          <div class="tile-sub">Command · leave-bys · week</div>
         </div>
-        <span class="tile-tap">Tap</span>
+        <span class="tile-tap">Open</span>
       </a>
 
-      <a class="tile" href="sheet-chores.html">
+      <a class="tile chores" href="sheet-chores.html">
         <div class="tile-icon" aria-hidden="true">✓</div>
         <div>
           <div class="tile-label">Chores</div>
@@ -641,7 +813,7 @@
         <span class="tile-tap">Tap</span>
       </a>
 
-      <a class="tile" href="sheet-groceries.html">
+      <a class="tile groceries" href="sheet-groceries.html">
         <div class="tile-icon" aria-hidden="true">🛒</div>
         <div>
           <div class="tile-label">Groceries/Costco</div>
@@ -677,7 +849,7 @@
         <span class="tile-tap">Tap</span>
       </a>
 
-      <a class="tile" href="sheet-pack.html">
+      <a class="tile pack" href="sheet-pack.html">
         <div class="tile-icon" aria-hidden="true">🎒</div>
         <div>
           <div class="tile-label">Pack list</div>
@@ -758,8 +930,18 @@
       <span>kids-safe · LIVE · as-of Sat Sep 26 2026</span>
       <span class="ftr-chip">SHEETS INDEX · NO MONEY</span>
     </div>
-    <span class="ftr-meta">House face · white/grey glass camo · no PIN · mock nav</span>
+    <span class="ftr-meta">House face · jazz glass · kids-safe · no money · no PIN</span>
   </footer>
 </div>
+<script src="house-sfx.js"></script>
+<script>
+(function () {
+  document.querySelectorAll("a.tile").forEach(function (a) {
+    a.addEventListener("pointerdown", function () {
+      try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
+    }, { passive: true });
+  });
+})();
+</script>
 </body>
 </html>
