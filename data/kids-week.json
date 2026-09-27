@@ -77,6 +77,12 @@
           "cadence": "daily"
         },
         {
+          "id": "har-backpack",
+          "what": "🎒 Pack backpack (loot ready) — daily must",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
           "id": "har-dishes",
           "what": "🍽️ Dishes helper (mining duty) — daily must",
           "stars": 1,
@@ -89,14 +95,14 @@
           "cadence": "daily"
         },
         {
-          "id": "har-backpack",
-          "what": "🎒 Pack backpack (loot ready) — daily must",
+          "id": "har-postgame",
+          "what": "⚡ Post-game · gear rinsed · bag set",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "har-shower",
-          "what": "🚿 Shower · brush — post-game ritual (daily must)",
+          "what": "🚿 Shower · brush · ready for bed",
           "stars": 1,
           "cadence": "daily"
         },
@@ -115,12 +121,6 @@
         {
           "id": "har-cubby",
           "what": "🎒 Backpack + sports bag in garage cubby — weekly must",
-          "stars": 1,
-          "cadence": "weekly"
-        },
-        {
-          "id": "har-organize",
-          "what": "🧹 Organize chronically — weekly must",
           "stars": 1,
           "cadence": "weekly"
         }
@@ -206,7 +206,7 @@
         },
         {
           "when": "Weekly",
-          "what": "🧸 Toys + 👟 shoes + 🧹 organize + 🎒 garage cubby",
+          "what": "🧸 Toys + 👟 shoes + 🎒 garage cubby",
           "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         }
@@ -276,6 +276,12 @@
           "cadence": "daily"
         },
         {
+          "id": "hay-backpack",
+          "what": "🎒 Backpack — loadout ready (daily must)",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
           "id": "hay-dishes",
           "what": "🍽️ Dishes — wipe the lobby (daily must)",
           "stars": 1,
@@ -288,14 +294,14 @@
           "cadence": "daily"
         },
         {
-          "id": "hay-backpack",
-          "what": "🎒 Backpack — loadout ready (daily must)",
+          "id": "hay-postgame",
+          "what": "⚡ Post-game · gear rinsed · bag set",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "hay-shower",
-          "what": "🚿 Shower · brush — post-game ritual (daily must)",
+          "what": "🚿 Shower · brush · ready for bed",
           "stars": 1,
           "cadence": "daily"
         },
@@ -308,12 +314,6 @@
         {
           "id": "hay-cubby",
           "what": "🎒 Backpack + sports bag in garage cubby — weekly must",
-          "stars": 1,
-          "cadence": "weekly"
-        },
-        {
-          "id": "hay-organize",
-          "what": "🧹 Organize chronically — weekly must",
           "stars": 1,
           "cadence": "weekly"
         }
@@ -417,7 +417,7 @@
         },
         {
           "when": "Weekly",
-          "what": "🧹 Room + 🧹 organize + 🎒 garage cubby = bonus coins",
+          "what": "🧹 Room + 🎒 garage cubby = bonus coins",
           "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         }
@@ -523,12 +523,6 @@
           "cadence": "weekly"
         },
         {
-          "id": "ain-organize",
-          "what": "🧹 Organize chronically — weekly must",
-          "stars": 1,
-          "cadence": "weekly"
-        },
-        {
           "id": "ain-babysit",
           "what": "👶 Babysitting — optional hire (Dad books you)",
           "stars": 0,
@@ -609,7 +603,7 @@
       "missions": [
         {
           "when": "Weekly",
-          "what": "Bath wipe + laundry + organize + garage cubby = big star dump",
+          "what": "Bath wipe + laundry + garage cubby = big star dump",
           "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         },
