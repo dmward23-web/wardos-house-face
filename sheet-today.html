@@ -10,659 +10,659 @@
 <meta name="apple-mobile-web-app-title" content="WardOS House" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
-<meta name="description" content="WardOS House face · morning TODAY strip · no PIN · no money" />
+<meta name="description" content="WardOS House face · morning TODAY strip" />
 <title>BOARD-OS · HOUSE FACE · TODAY</title>
 <link rel="stylesheet" href="house-engage.css" />
 <style>
-  @font-face {
-    font-family: "Inter Display";
-    src: url("fonts/InterDisplay-Regular.ttf") format("truetype");
-    font-weight: 400; font-style: normal;
-  }
-  @font-face {
-    font-family: "Inter Display";
-    src: url("fonts/InterDisplay-Medium.ttf") format("truetype");
-    font-weight: 500; font-style: normal;
-  }
-  @font-face {
-    font-family: "Inter Display";
-    src: url("fonts/InterDisplay-SemiBold.ttf") format("truetype");
-    font-weight: 600; font-style: normal;
-  }
-  @font-face {
-    font-family: "Inter Display";
-    src: url("fonts/InterDisplay-Bold.ttf") format("truetype");
-    font-weight: 700; font-style: normal;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body {
-    width: 1920px; min-height: 1200px; height: auto; overflow: auto;
-    background: #d8dadf; color: #121418;
-    font-family: "Inter Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-  .panel {
-    width: 1920px; height: 1200px;
-    padding: 18px 28px 12px;
-    display: flex; flex-direction: column; gap: 12px;
-    position: relative; overflow: hidden;
-    background-color: #d8dadf;
-    background-image:
-      linear-gradient(165deg, rgba(255,255,255,0.36) 0%, rgba(220,222,226,0.24) 45%, rgba(180,184,190,0.18) 100%),
-      url("camo-glass-tile-house.png");
-    background-size: auto, 420px 420px;
-    background-position: center, 0 0;
-    background-repeat: no-repeat, repeat;
-  }
-  .panel::before {
-    content: "";
-    position: absolute; inset: 0; pointer-events: none; z-index: 0;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.46) 0%, transparent 28%, transparent 72%, rgba(40,42,46,0.09) 100%),
-      radial-gradient(ellipse 70% 50% at 18% 12%, rgba(255,255,255,0.46) 0%, transparent 55%),
-      radial-gradient(ellipse 50% 40% at 88% 78%, rgba(255,255,255,0.18) 0%, transparent 60%);
-    mix-blend-mode: soft-light;
-    opacity: 0.82;
-  }
-  .panel::after {
-    content: "";
-    position: absolute; inset: 0; pointer-events: none; z-index: 0;
-    background:
-      linear-gradient(118deg, transparent 0 34%, rgba(255,255,255,0.30) 34% 38%, transparent 38% 62%, rgba(255,255,255,0.12) 62% 64%, transparent 64%),
-      linear-gradient(0deg, rgba(255,255,255,0.06), rgba(255,255,255,0.06));
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.52),
-      inset 0 -1px 0 rgba(60,62,68,0.14),
-      inset 1px 0 0 rgba(255,255,255,0.20),
-      inset -1px 0 0 rgba(60,62,68,0.09);
-  }
-  .panel > * { position: relative; z-index: 2; }
+ @font-face {
+ font-family: "Inter Display";
+ src: url("fonts/InterDisplay-Regular.ttf") format("truetype");
+ font-weight: 400; font-style: normal;
+ }
+ @font-face {
+ font-family: "Inter Display";
+ src: url("fonts/InterDisplay-Medium.ttf") format("truetype");
+ font-weight: 500; font-style: normal;
+ }
+ @font-face {
+ font-family: "Inter Display";
+ src: url("fonts/InterDisplay-SemiBold.ttf") format("truetype");
+ font-weight: 600; font-style: normal;
+ }
+ @font-face {
+ font-family: "Inter Display";
+ src: url("fonts/InterDisplay-Bold.ttf") format("truetype");
+ font-weight: 700; font-style: normal;
+ }
+ * { box-sizing: border-box; margin: 0; padding: 0; }
+ html, body {
+ width: 1920px; min-height: 1200px; height: auto; overflow: auto;
+ background: #d8dadf; color: #121418;
+ font-family: "Inter Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+ -webkit-font-smoothing: antialiased;
+ -webkit-tap-highlight-color: transparent;
+ touch-action: manipulation;
+ }
+ .panel {
+ width: 1920px; height: 1200px;
+ padding: 18px 28px 12px;
+ display: flex; flex-direction: column; gap: 12px;
+ position: relative; overflow: hidden;
+ background-color: #d8dadf;
+ background-image:
+ linear-gradient(165deg, rgba(255,255,255,0.36) 0%, rgba(220,222,226,0.24) 45%, rgba(180,184,190,0.18) 100%),
+ url("camo-glass-tile-house.png");
+ background-size: auto, 420px 420px;
+ background-position: center, 0 0;
+ background-repeat: no-repeat, repeat;
+ }
+ .panel::before {
+ content: "";
+ position: absolute; inset: 0; pointer-events: none; z-index: 0;
+ background:
+ linear-gradient(180deg, rgba(255,255,255,0.46) 0%, transparent 28%, transparent 72%, rgba(40,42,46,0.09) 100%),
+ radial-gradient(ellipse 70% 50% at 18% 12%, rgba(255,255,255,0.46) 0%, transparent 55%),
+ radial-gradient(ellipse 50% 40% at 88% 78%, rgba(255,255,255,0.18) 0%, transparent 60%);
+ mix-blend-mode: soft-light;
+ opacity: 0.82;
+ }
+ .panel::after {
+ content: "";
+ position: absolute; inset: 0; pointer-events: none; z-index: 0;
+ background:
+ linear-gradient(118deg, transparent 0 34%, rgba(255,255,255,0.30) 34% 38%, transparent 38% 62%, rgba(255,255,255,0.12) 62% 64%, transparent 64%),
+ linear-gradient(0deg, rgba(255,255,255,0.06), rgba(255,255,255,0.06));
+ box-shadow:
+ inset 0 1px 0 rgba(255,255,255,0.52),
+ inset 0 -1px 0 rgba(60,62,68,0.14),
+ inset 1px 0 0 rgba(255,255,255,0.20),
+ inset -1px 0 0 rgba(60,62,68,0.09);
+ }
+ .panel > * { position: relative; z-index: 2; }
 
-  .hdr {
-    display: flex; align-items: center; justify-content: space-between; gap: 20px;
-    flex-shrink: 0; padding: 14px 20px; border-radius: 16px;
-    background: rgba(255,255,255,0.58);
-    border: 1px solid rgba(255,255,255,0.85);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 28px rgba(20,22,28,0.08), 0 2px 6px rgba(20,22,28,0.05);
-  }
-  
-  .brand { flex-shrink: 0; display: flex; align-items: center; }
-  .brand img { display: block; height: 48px; width: auto; }
+ .hdr {
+ display: flex; align-items: center; justify-content: space-between; gap: 20px;
+ flex-shrink: 0; padding: 14px 20px; border-radius: 16px;
+ background: rgba(255,255,255,0.58);
+ border: 1px solid rgba(255,255,255,0.85);
+ box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 28px rgba(20,22,28,0.08), 0 2px 6px rgba(20,22,28,0.05);
+ }
+ 
+ .brand { flex-shrink: 0; display: flex; align-items: center; }
+ .brand img { display: block; height: 48px; width: auto; }
 
-  .hdr-left { display: flex; align-items: center; gap: 18px; min-width: 0; }
-  .nav-row { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
-  .back {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 14px; font-weight: 650; color: #3a3e46; letter-spacing: -0.01em;
-    padding: 10px 16px; border-radius: 999px; min-height: 44px;
-    background: rgba(255,255,255,0.72); border: 1px solid rgba(40,42,48,0.14);
-    box-shadow: 0 2px 8px rgba(20,22,28,0.06);
-    cursor: pointer; flex-shrink: 0; text-decoration: none; color: inherit;
-  }
-  .back .chev { font-size: 18px; font-weight: 700; color: #5a5e66; line-height: 1; }
-  .nav-week {
-    display: inline-flex; align-items: center;
-    font-size: 13px; font-weight: 700; color: #3a3e46; letter-spacing: -0.01em;
-    padding: 10px 14px; border-radius: 999px; min-height: 44px;
-    background: rgba(255,255,255,0.55); border: 1px solid rgba(40,42,48,0.12);
-    box-shadow: 0 2px 8px rgba(20,22,28,0.05);
-    text-decoration: none; flex-shrink: 0;
-  }
-  .identity { display: flex; align-items: center; gap: 16px; min-width: 0; }
-  .avatar {
-    width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 26px; font-weight: 800; color: #1a1408; letter-spacing: -0.04em;
-    background: linear-gradient(145deg, #ffe08a 0%, #f0c040 55%, #d0a020 100%);
-    box-shadow:
-      0 0 0 4px rgba(255,255,255,0.92),
-      0 0 0 7px rgba(210,160,40,0.32),
-      0 10px 28px rgba(180,140,40,0.28);
-  }
-  .id-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .eyebrow {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #5a5e66;
-    text-decoration: none; color: inherit;
-  }
-  a.eyebrow { color: #5a5e66; }
-  .name { font-size: 38px; font-weight: 800; letter-spacing: -0.05em; color: #0e1014; line-height: 1; }
-  .name-accent { color: #5a4010; }
-  .tagline { font-size: 15px; font-weight: 550; color: #4a4e56; letter-spacing: -0.01em; margin-top: 2px; }
-  .hdr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
-  .hot-pill {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 13px; font-weight: 700; color: #2a2e36; letter-spacing: -0.015em;
-    padding: 10px 16px; border-radius: 999px;
-    background: linear-gradient(145deg, rgba(255,220,100,0.45), rgba(255,200,60,0.18));
-    border: 1px solid rgba(210,160,40,0.42);
-    box-shadow: 0 4px 14px rgba(180,140,40,0.16);
-  }
-  .hot-pill .spark { font-size: 16px; line-height: 1; color: #c09010; }
-  .mock-tag {
-    font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
-    color: #6a6e76; text-align: right; line-height: 1.45; padding: 7px 11px; border-radius: 10px;
-    background: rgba(40,42,48,0.06); border: 1px solid rgba(40,42,48,0.12);
-  }
+ .hdr-left { display: flex; align-items: center; gap: 18px; min-width: 0; }
+ .nav-row { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+ .back {
+ display: inline-flex; align-items: center; gap: 8px;
+ font-size: 14px; font-weight: 650; color: #3a3e46; letter-spacing: -0.01em;
+ padding: 10px 16px; border-radius: 999px; min-height: 44px;
+ background: rgba(255,255,255,0.72); border: 1px solid rgba(40,42,48,0.14);
+ box-shadow: 0 2px 8px rgba(20,22,28,0.06);
+ cursor: pointer; flex-shrink: 0; text-decoration: none; color: inherit;
+ }
+ .back .chev { font-size: 18px; font-weight: 700; color: #5a5e66; line-height: 1; }
+ .nav-week {
+ display: inline-flex; align-items: center;
+ font-size: 13px; font-weight: 700; color: #3a3e46; letter-spacing: -0.01em;
+ padding: 10px 14px; border-radius: 999px; min-height: 44px;
+ background: rgba(255,255,255,0.55); border: 1px solid rgba(40,42,48,0.12);
+ box-shadow: 0 2px 8px rgba(20,22,28,0.05);
+ text-decoration: none; flex-shrink: 0;
+ }
+ .identity { display: flex; align-items: center; gap: 16px; min-width: 0; }
+ .avatar {
+ width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+ display: flex; align-items: center; justify-content: center;
+ font-size: 26px; font-weight: 800; color: #1a1408; letter-spacing: -0.04em;
+ background: linear-gradient(145deg, #ffe08a 0%, #f0c040 55%, #d0a020 100%);
+ box-shadow:
+ 0 0 0 4px rgba(255,255,255,0.92),
+ 0 0 0 7px rgba(210,160,40,0.32),
+ 0 10px 28px rgba(180,140,40,0.28);
+ }
+ .id-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+ .eyebrow {
+ font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #5a5e66;
+ text-decoration: none; color: inherit;
+ }
+ a.eyebrow { color: #5a5e66; }
+ .name { font-size: 38px; font-weight: 800; letter-spacing: -0.05em; color: #0e1014; line-height: 1; }
+ .name-accent { color: #5a4010; }
+ .tagline { font-size: 15px; font-weight: 550; color: #4a4e56; letter-spacing: -0.01em; margin-top: 2px; }
+ .hdr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+ .hot-pill {
+ display: inline-flex; align-items: center; gap: 8px;
+ font-size: 13px; font-weight: 700; color: #2a2e36; letter-spacing: -0.015em;
+ padding: 10px 16px; border-radius: 999px;
+ background: linear-gradient(145deg, rgba(255,220,100,0.45), rgba(255,200,60,0.18));
+ border: 1px solid rgba(210,160,40,0.42);
+ box-shadow: 0 4px 14px rgba(180,140,40,0.16);
+ }
+ .hot-pill .spark { font-size: 16px; line-height: 1; color: #c09010; }
+ .mock-tag {
+ font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+ color: #6a6e76; text-align: right; line-height: 1.45; padding: 7px 11px; border-radius: 10px;
+ background: rgba(40,42,48,0.06); border: 1px solid rgba(40,42,48,0.12);
+ }
 
-  .gm {
-    flex-shrink: 0; display: flex; align-items: stretch; border-radius: 16px; overflow: hidden;
-    position: relative;
-    background: linear-gradient(105deg, #2a2e36 0%, #3a4048 28%, #4a5058 52%, #3a4048 78%, #2a2e36 100%);
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,0.22) inset,
-      0 0 0 1px rgba(0,0,0,0.22),
-      0 10px 28px rgba(20,22,28,0.22);
-  }
-  .gm::before {
-    content: ""; position: absolute; inset: 0; pointer-events: none;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 40%, rgba(0,0,0,0.14) 100%),
-      linear-gradient(118deg, transparent 0 30%, rgba(255,255,255,0.22) 30% 36%, transparent 36%);
-  }
-  .gm-accent {
-    width: 8px; flex-shrink: 0; position: relative; z-index: 1;
-    background: linear-gradient(180deg, #ffe08a 0%, #f0c040 40%, #d0a020 100%);
-  }
-  .gm-body {
-    flex: 1; padding: 14px 22px 14px 18px;
-    display: flex; align-items: center; justify-content: space-between; gap: 20px;
-    position: relative; z-index: 1;
-  }
-  .gm-main { display: flex; flex-direction: column; gap: 2px; }
-  .gm-label {
-    font-size: 10px; font-weight: 700; letter-spacing: 0.28em;
-    text-transform: uppercase; color: rgba(230,230,235,0.72);
-  }
-  .gm-title {
-    font-size: 30px; font-weight: 800; letter-spacing: -0.04em;
-    color: #f4f6f8; line-height: 1.15;
-  }
-  .gm-title .hl {
-    color: #0e1014; font-weight: 800; padding: 1px 12px 2px; margin: 0 2px;
-    border-radius: 9px; background: linear-gradient(180deg, #fff 0%, #ffe8a0 100%);
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.4) inset, 0 3px 12px rgba(0,0,0,0.22);
-  }
-  .gm-sub {
-    font-size: 14px; font-weight: 550; color: rgba(220,222,230,0.9);
-    letter-spacing: -0.015em; margin-top: 2px;
-  }
-  .gm-sub strong { color: #fff; font-weight: 700; }
-  .gm-badges { display: flex; gap: 10px; flex-shrink: 0; }
-  .gm-badge {
-    font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
-    color: rgba(245,246,248,0.95); padding: 12px 16px; border-radius: 999px;
-    background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28);
-  }
-  .gm-badge.days {
-    background: linear-gradient(145deg, rgba(255,220,100,0.35), rgba(255,255,255,0.12));
-    border-color: rgba(255,220,100,0.45); color: #fff8e0;
-  }
+ .gm {
+ flex-shrink: 0; display: flex; align-items: stretch; border-radius: 16px; overflow: hidden;
+ position: relative;
+ background: linear-gradient(105deg, #2a2e36 0%, #3a4048 28%, #4a5058 52%, #3a4048 78%, #2a2e36 100%);
+ box-shadow:
+ 0 0 0 1px rgba(255,255,255,0.22) inset,
+ 0 0 0 1px rgba(0,0,0,0.22),
+ 0 10px 28px rgba(20,22,28,0.22);
+ }
+ .gm::before {
+ content: ""; position: absolute; inset: 0; pointer-events: none;
+ background:
+ linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 40%, rgba(0,0,0,0.14) 100%),
+ linear-gradient(118deg, transparent 0 30%, rgba(255,255,255,0.22) 30% 36%, transparent 36%);
+ }
+ .gm-accent {
+ width: 8px; flex-shrink: 0; position: relative; z-index: 1;
+ background: linear-gradient(180deg, #ffe08a 0%, #f0c040 40%, #d0a020 100%);
+ }
+ .gm-body {
+ flex: 1; padding: 14px 22px 14px 18px;
+ display: flex; align-items: center; justify-content: space-between; gap: 20px;
+ position: relative; z-index: 1;
+ }
+ .gm-main { display: flex; flex-direction: column; gap: 2px; }
+ .gm-label {
+ font-size: 10px; font-weight: 700; letter-spacing: 0.28em;
+ text-transform: uppercase; color: rgba(230,230,235,0.72);
+ }
+ .gm-title {
+ font-size: 30px; font-weight: 800; letter-spacing: -0.04em;
+ color: #f4f6f8; line-height: 1.15;
+ }
+ .gm-title .hl {
+ color: #0e1014; font-weight: 800; padding: 1px 12px 2px; margin: 0 2px;
+ border-radius: 9px; background: linear-gradient(180deg, #fff 0%, #ffe8a0 100%);
+ box-shadow: 0 0 0 1px rgba(255,255,255,0.4) inset, 0 3px 12px rgba(0,0,0,0.22);
+ }
+ .gm-sub {
+ font-size: 14px; font-weight: 550; color: rgba(220,222,230,0.9);
+ letter-spacing: -0.015em; margin-top: 2px;
+ }
+ .gm-sub strong { color: #fff; font-weight: 700; }
+ .gm-badges { display: flex; gap: 10px; flex-shrink: 0; }
+ .gm-badge {
+ font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+ color: rgba(245,246,248,0.95); padding: 12px 16px; border-radius: 999px;
+ background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28);
+ }
+ .gm-badge.days {
+ background: linear-gradient(145deg, rgba(255,220,100,0.35), rgba(255,255,255,0.12));
+ border-color: rgba(255,220,100,0.45); color: #fff8e0;
+ }
 
-  .leaveby {
-    flex-shrink: 0; display: flex; align-items: stretch; border-radius: 16px; overflow: hidden;
-    position: relative;
-    background: linear-gradient(105deg, #262830 0%, #343840 28%, #454952 52%, #3a3e46 78%, #2a2c32 100%);
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,0.24) inset,
-      0 0 0 1px rgba(0,0,0,0.28),
-      0 0 36px rgba(0,0,0,0.22),
-      0 10px 28px rgba(20,22,28,0.28);
-  }
-  .leaveby::before {
-    content: ""; position: absolute; inset: 0; pointer-events: none;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 40%, rgba(0,0,0,0.16) 100%),
-      radial-gradient(ellipse 55% 120% at 6% 50%, rgba(255,255,255,0.17) 0%, transparent 55%),
-      linear-gradient(118deg, transparent 0 30%, rgba(255,255,255,0.28) 30% 36%, transparent 36%);
-  }
-  .leaveby-accent {
-    width: 8px; flex-shrink: 0; position: relative; z-index: 1;
-    background: linear-gradient(180deg, #fff 0%, #d8dce2 40%, #8a909a 100%);
-  }
-  .leaveby-body {
-    flex: 1; padding: 12px 24px 12px 20px;
-    display: flex; flex-direction: column; gap: 1px;
-    position: relative; z-index: 1;
-  }
-  .leaveby-label {
-    font-size: 10px; font-weight: 700; letter-spacing: 0.32em;
-    text-transform: uppercase; color: rgba(220,225,235,0.72);
-  }
-  .leaveby-main {
-    font-size: 26px; font-weight: 700; letter-spacing: -0.04em;
-    color: #f4f6f8; line-height: 1.15;
-  }
-  .leaveby-main .time {
-    color: #0e1014; font-weight: 800; padding: 1px 12px 2px; margin: 0 4px;
-    border-radius: 9px; background: linear-gradient(180deg, #fff 0%, #e8ebf0 100%);
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset, 0 3px 12px rgba(0,0,0,0.28);
-  }
-  .leaveby-detail {
-    font-size: 14px; font-weight: 500; color: rgba(200,206,216,0.88);
-    letter-spacing: -0.015em;
-  }
-  .leaveby-detail strong { color: #ffffff; font-weight: 700; }
-  .leaveby-badge {
-    position: absolute; right: 22px; top: 50%; transform: translateY(-50%); z-index: 2;
-    font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
-    color: #1a1408; padding: 12px 18px; border-radius: 999px;
-    background: linear-gradient(145deg, #ffe08a, #f0c040);
-    border: 1px solid rgba(255,255,255,0.45);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.28);
-  }
+ .leaveby {
+ flex-shrink: 0; display: flex; align-items: stretch; border-radius: 16px; overflow: hidden;
+ position: relative;
+ background: linear-gradient(105deg, #262830 0%, #343840 28%, #454952 52%, #3a3e46 78%, #2a2c32 100%);
+ box-shadow:
+ 0 0 0 1px rgba(255,255,255,0.24) inset,
+ 0 0 0 1px rgba(0,0,0,0.28),
+ 0 0 36px rgba(0,0,0,0.22),
+ 0 10px 28px rgba(20,22,28,0.28);
+ }
+ .leaveby::before {
+ content: ""; position: absolute; inset: 0; pointer-events: none;
+ background:
+ linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 40%, rgba(0,0,0,0.16) 100%),
+ radial-gradient(ellipse 55% 120% at 6% 50%, rgba(255,255,255,0.17) 0%, transparent 55%),
+ linear-gradient(118deg, transparent 0 30%, rgba(255,255,255,0.28) 30% 36%, transparent 36%);
+ }
+ .leaveby-accent {
+ width: 8px; flex-shrink: 0; position: relative; z-index: 1;
+ background: linear-gradient(180deg, #fff 0%, #d8dce2 40%, #8a909a 100%);
+ }
+ .leaveby-body {
+ flex: 1; padding: 12px 24px 12px 20px;
+ display: flex; flex-direction: column; gap: 1px;
+ position: relative; z-index: 1;
+ }
+ .leaveby-label {
+ font-size: 10px; font-weight: 700; letter-spacing: 0.32em;
+ text-transform: uppercase; color: rgba(220,225,235,0.72);
+ }
+ .leaveby-main {
+ font-size: 26px; font-weight: 700; letter-spacing: -0.04em;
+ color: #f4f6f8; line-height: 1.15;
+ }
+ .leaveby-main .time {
+ color: #0e1014; font-weight: 800; padding: 1px 12px 2px; margin: 0 4px;
+ border-radius: 9px; background: linear-gradient(180deg, #fff 0%, #e8ebf0 100%);
+ box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset, 0 3px 12px rgba(0,0,0,0.28);
+ }
+ .leaveby-detail {
+ font-size: 14px; font-weight: 500; color: rgba(200,206,216,0.88);
+ letter-spacing: -0.015em;
+ }
+ .leaveby-detail strong { color: #ffffff; font-weight: 700; }
+ .leaveby-badge {
+ position: absolute; right: 22px; top: 50%; transform: translateY(-50%); z-index: 2;
+ font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+ color: #1a1408; padding: 12px 18px; border-radius: 999px;
+ background: linear-gradient(145deg, #ffe08a, #f0c040);
+ border: 1px solid rgba(255,255,255,0.45);
+ box-shadow: 0 4px 16px rgba(0,0,0,0.28);
+ }
 
-  .body {
-    flex: 1; min-height: 0;
-    display: grid;
-    grid-template-columns: 0.95fr 1.35fr 0.95fr;
-    gap: 12px;
-  }
-  .sec {
-    background: rgba(255,255,255,0.58);
-    border: 1px solid rgba(255,255,255,0.88);
-    border-radius: 16px; padding: 14px 14px 12px;
-    display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow: hidden;
-    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 22px rgba(20,22,28,0.07);
-  }
-  .sec-hdr {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    flex-shrink: 0; padding: 2px 4px;
-  }
-  .sec-title {
-    font-size: 12px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: #4a4e56;
-  }
-  .sec-meta { font-size: 12px; font-weight: 650; color: #7a8090; }
+ .body {
+ flex: 1; min-height: 0;
+ display: grid;
+ grid-template-columns: 0.95fr 1.35fr 0.95fr;
+ gap: 12px;
+ }
+ .sec {
+ background: rgba(255,255,255,0.58);
+ border: 1px solid rgba(255,255,255,0.88);
+ border-radius: 16px; padding: 14px 14px 12px;
+ display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow: hidden;
+ box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 22px rgba(20,22,28,0.07);
+ }
+ .sec-hdr {
+ display: flex; align-items: center; justify-content: space-between; gap: 10px;
+ flex-shrink: 0; padding: 2px 4px;
+ }
+ .sec-title {
+ font-size: 12px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: #4a4e56;
+ }
+ .sec-meta { font-size: 12px; font-weight: 650; color: #7a8090; }
 
-  .where-card {
-    border-radius: 14px; padding: 16px 16px 14px;
-    background: linear-gradient(160deg, rgba(255,255,255,0.9), rgba(235,238,244,0.65));
-    border: 1px solid rgba(40,42,48,0.1);
-    box-shadow: 0 4px 14px rgba(20,22,28,0.06);
-    display: flex; flex-direction: column; gap: 8px;
-  }
-  .where-card .lbl {
-    font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #6a6e76;
-  }
-  .where-card .big {
-    font-size: 22px; font-weight: 800; letter-spacing: -0.035em; color: #121418; line-height: 1.2;
-  }
-  .where-card .sub {
-    font-size: 14px; font-weight: 550; color: #4a4e56; letter-spacing: -0.01em;
-  }
-  .where-card .sub strong { color: #121418; font-weight: 750; }
-  .where-card.kids {
-    background: linear-gradient(160deg, rgba(255,255,255,0.92), rgba(220,235,255,0.55));
-    border-color: rgba(70,120,200,0.22);
-  }
-  .where-card.dad {
-    background: linear-gradient(160deg, rgba(255,255,255,0.92), rgba(255,236,200,0.5));
-    border-color: rgba(210,160,40,0.28);
-  }
-  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-  .kchip {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 12px 6px 6px; border-radius: 999px;
-    font-size: 13px; font-weight: 800; letter-spacing: -0.02em;
-    text-decoration: none;
-  }
-  .kchip .d {
-    width: 26px; height: 26px; border-radius: 50%;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 800; color: #fff;
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.9);
-  }
-  .kchip.ain { color: #6a2a80; background: rgba(210,140,230,0.22); border: 1px solid rgba(170,100,200,0.32); }
-  .kchip.ain .d { background: linear-gradient(145deg, #d48ae8, #9b55b8); }
-  .kchip.hay { color: #144838; background: rgba(60,200,160,0.2); border: 1px solid rgba(40,160,120,0.32); }
-  .kchip.hay .d { background: linear-gradient(145deg, #3ec9a0, #1f7a60); }
-  .kchip.har { color: #1a3050; background: rgba(100,160,230,0.2); border: 1px solid rgba(70,120,200,0.32); }
-  .kchip.har .d { background: linear-gradient(145deg, #5a9ae8, #2a5aa8); }
+ .where-card {
+ border-radius: 14px; padding: 16px 16px 14px;
+ background: linear-gradient(160deg, rgba(255,255,255,0.9), rgba(235,238,244,0.65));
+ border: 1px solid rgba(40,42,48,0.1);
+ box-shadow: 0 4px 14px rgba(20,22,28,0.06);
+ display: flex; flex-direction: column; gap: 8px;
+ }
+ .where-card .lbl {
+ font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #6a6e76;
+ }
+ .where-card .big {
+ font-size: 22px; font-weight: 800; letter-spacing: -0.035em; color: #121418; line-height: 1.2;
+ }
+ .where-card .sub {
+ font-size: 14px; font-weight: 550; color: #4a4e56; letter-spacing: -0.01em;
+ }
+ .where-card .sub strong { color: #121418; font-weight: 750; }
+ .where-card.kids {
+ background: linear-gradient(160deg, rgba(255,255,255,0.92), rgba(220,235,255,0.55));
+ border-color: rgba(70,120,200,0.22);
+ }
+ .where-card.dad {
+ background: linear-gradient(160deg, rgba(255,255,255,0.92), rgba(255,236,200,0.5));
+ border-color: rgba(210,160,40,0.28);
+ }
+ .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+ .kchip {
+ display: inline-flex; align-items: center; gap: 6px;
+ padding: 6px 12px 6px 6px; border-radius: 999px;
+ font-size: 13px; font-weight: 800; letter-spacing: -0.02em;
+ text-decoration: none;
+ }
+ .kchip .d {
+ width: 26px; height: 26px; border-radius: 50%;
+ display: inline-flex; align-items: center; justify-content: center;
+ font-size: 12px; font-weight: 800; color: #fff;
+ box-shadow: 0 0 0 2px rgba(255,255,255,0.9);
+ }
+ .kchip.ain { color: #6a2a80; background: rgba(210,140,230,0.22); border: 1px solid rgba(170,100,200,0.32); }
+ .kchip.ain .d { background: linear-gradient(145deg, #d48ae8, #9b55b8); }
+ .kchip.hay { color: #144838; background: rgba(60,200,160,0.2); border: 1px solid rgba(40,160,120,0.32); }
+ .kchip.hay .d { background: linear-gradient(145deg, #3ec9a0, #1f7a60); }
+ .kchip.har { color: #1a3050; background: rgba(100,160,230,0.2); border: 1px solid rgba(70,120,200,0.32); }
+ .kchip.har .d { background: linear-gradient(145deg, #5a9ae8, #2a5aa8); }
 
-  .kid-card {
-    flex: 1; min-height: 0;
-    display: flex; flex-direction: column; gap: 8px;
-    padding: 16px 16px 14px; border-radius: 16px;
-    text-decoration: none; color: inherit;
-    border: 1px solid rgba(40,42,48,0.1);
-    box-shadow: 0 6px 18px rgba(20,22,28,0.07);
-    transition: transform 0.12s ease;
-    position: relative; overflow: hidden;
-  }
-  .kid-card:active { transform: scale(0.98); }
-  .kid-card::before {
-    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-  }
-  .kid-card.harris {
-    background: linear-gradient(165deg, rgba(255,255,255,0.92), rgba(210,228,250,0.7));
-    border-color: rgba(70,120,200,0.28);
-  }
-  .kid-card.harris::before { background: linear-gradient(90deg, #5a9ae8, #3a6fc0); }
-  .kid-card.hayes {
-    background: linear-gradient(165deg, rgba(255,255,255,0.92), rgba(210,245,232,0.7));
-    border-color: rgba(40,160,120,0.28);
-  }
-  .kid-card.hayes::before { background: linear-gradient(90deg, #3ec9a0, #2a9a78); }
-  .kid-card.ainsley {
-    background: linear-gradient(165deg, rgba(255,255,255,0.92), rgba(240,220,250,0.7));
-    border-color: rgba(170,100,200,0.28);
-  }
-  .kid-card.ainsley::before { background: linear-gradient(90deg, #c47ad8, #9b55b8); }
+ .kid-card {
+ flex: 1; min-height: 0;
+ display: flex; flex-direction: column; gap: 8px;
+ padding: 16px 16px 14px; border-radius: 16px;
+ text-decoration: none; color: inherit;
+ border: 1px solid rgba(40,42,48,0.1);
+ box-shadow: 0 6px 18px rgba(20,22,28,0.07);
+ transition: transform 0.12s ease;
+ position: relative; overflow: hidden;
+ }
+ .kid-card:active { transform: scale(0.98); }
+ .kid-card::before {
+ content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+ }
+ .kid-card.harris {
+ background: linear-gradient(165deg, rgba(255,255,255,0.92), rgba(210,228,250,0.7));
+ border-color: rgba(70,120,200,0.28);
+ }
+ .kid-card.harris::before { background: linear-gradient(90deg, #5a9ae8, #3a6fc0); }
+ .kid-card.hayes {
+ background: linear-gradient(165deg, rgba(255,255,255,0.92), rgba(210,245,232,0.7));
+ border-color: rgba(40,160,120,0.28);
+ }
+ .kid-card.hayes::before { background: linear-gradient(90deg, #3ec9a0, #2a9a78); }
+ .kid-card.ainsley {
+ background: linear-gradient(165deg, rgba(255,255,255,0.92), rgba(240,220,250,0.7));
+ border-color: rgba(170,100,200,0.28);
+ }
+ .kid-card.ainsley::before { background: linear-gradient(90deg, #c47ad8, #9b55b8); }
 
-  .kid-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .kid-name {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
-  }
-  .kid-name .dot {
-    width: 36px; height: 36px; border-radius: 50%;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: 15px; font-weight: 800; color: #fff;
-    box-shadow: 0 0 0 3px rgba(255,255,255,0.9);
-  }
-  .harris .kid-name { color: #1a3050; }
-  .harris .kid-name .dot { background: linear-gradient(145deg, #5a9ae8, #2a5aa8); }
-  .hayes .kid-name { color: #144838; }
-  .hayes .kid-name .dot { background: linear-gradient(145deg, #3ec9a0, #1f7a60); }
-  .ainsley .kid-name { color: #4a2a58; }
-  .ainsley .kid-name .dot { background: linear-gradient(145deg, #d48ae8, #9b55b8); }
-  .kid-tap {
-    font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;
-    color: #7a8090; padding: 6px 10px; border-radius: 999px;
-    background: rgba(255,255,255,0.7); border: 1px solid rgba(40,42,48,0.1);
-  }
-  .kid-when {
-    margin-top: auto;
-    font-size: 28px; font-weight: 800; letter-spacing: -0.045em; line-height: 1.05;
-  }
-  .harris .kid-when { color: #1a3050; }
-  .hayes .kid-when { color: #144838; }
-  .ainsley .kid-when { color: #6a6e76; font-size: 22px; }
-  .kid-what {
-    font-size: 18px; font-weight: 750; letter-spacing: -0.025em; color: #121418;
-  }
-  .kid-hint { font-size: 13px; font-weight: 600; color: #5a5e66; margin-top: 2px; }
+ .kid-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+ .kid-name {
+ display: inline-flex; align-items: center; gap: 10px;
+ font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
+ }
+ .kid-name .dot {
+ width: 36px; height: 36px; border-radius: 50%;
+ display: inline-flex; align-items: center; justify-content: center;
+ font-size: 15px; font-weight: 800; color: #fff;
+ box-shadow: 0 0 0 3px rgba(255,255,255,0.9);
+ }
+ .harris .kid-name { color: #1a3050; }
+ .harris .kid-name .dot { background: linear-gradient(145deg, #5a9ae8, #2a5aa8); }
+ .hayes .kid-name { color: #144838; }
+ .hayes .kid-name .dot { background: linear-gradient(145deg, #3ec9a0, #1f7a60); }
+ .ainsley .kid-name { color: #4a2a58; }
+ .ainsley .kid-name .dot { background: linear-gradient(145deg, #d48ae8, #9b55b8); }
+ .kid-tap {
+ font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;
+ color: #7a8090; padding: 6px 10px; border-radius: 999px;
+ background: rgba(255,255,255,0.7); border: 1px solid rgba(40,42,48,0.1);
+ }
+ .kid-when {
+ margin-top: auto;
+ font-size: 28px; font-weight: 800; letter-spacing: -0.045em; line-height: 1.05;
+ }
+ .harris .kid-when { color: #1a3050; }
+ .hayes .kid-when { color: #144838; }
+ .ainsley .kid-when { color: #6a6e76; font-size: 22px; }
+ .kid-what {
+ font-size: 18px; font-weight: 750; letter-spacing: -0.025em; color: #121418;
+ }
+ .kid-hint { font-size: 13px; font-weight: 600; color: #5a5e66; margin-top: 2px; }
 
-  .kids-col {
-    display: flex; flex-direction: column; gap: 10px; min-height: 0;
-  }
+ .kids-col {
+ display: flex; flex-direction: column; gap: 10px; min-height: 0;
+ }
 
-  .quick {
-    display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 0;
-  }
-  .qtile {
-    flex: 1; min-height: 0;
-    display: flex; flex-direction: column; justify-content: space-between;
-    padding: 18px 18px 16px; border-radius: 16px;
-    text-decoration: none; color: inherit;
-    background: rgba(255,255,255,0.72);
-    border: 1px solid rgba(255,255,255,0.9);
-    box-shadow: 0 6px 18px rgba(20,22,28,0.07);
-    transition: transform 0.12s ease;
-    position: relative; overflow: hidden;
-  }
-  .qtile:active { transform: scale(0.98); }
-  .qtile::before {
-    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-    background: linear-gradient(90deg, rgba(90,96,104,0.55), rgba(180,186,196,0.35));
-  }
-  .qtile.chores::before { background: linear-gradient(90deg, #3ec9a0, #2a9a78); }
-  .qtile.pack::before { background: linear-gradient(90deg, #5a9ae8, #3a6fc0); }
-  .qtile.load::before { background: linear-gradient(90deg, #f0c040, #d0a020); height: 5px; }
-  .qtile.load {
-    background: linear-gradient(165deg, rgba(255,255,255,0.92), rgba(255,236,160,0.65));
-    border-color: rgba(210,160,40,0.4);
-  }
-  .qtile-icon {
-    width: 48px; height: 48px; border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
-    background: rgba(255,255,255,0.8);
-    border: 1px solid rgba(40,42,48,0.1);
-    box-shadow: 0 4px 12px rgba(20,22,28,0.08);
-  }
-  .qtile-label {
-    font-size: 24px; font-weight: 800; letter-spacing: -0.04em; color: #0e1014; margin-top: 12px;
-  }
-  .qtile-sub { font-size: 13px; font-weight: 600; color: #5a5e66; margin-top: 4px; }
-  .qtile-tap {
-    position: absolute; right: 14px; bottom: 14px;
-    font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
-    color: #7a8090; padding: 6px 10px; border-radius: 999px;
-    background: rgba(40,42,48,0.06); border: 1px solid rgba(40,42,48,0.1);
-  }
+ .quick {
+ display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 0;
+ }
+ .qtile {
+ flex: 1; min-height: 0;
+ display: flex; flex-direction: column; justify-content: space-between;
+ padding: 18px 18px 16px; border-radius: 16px;
+ text-decoration: none; color: inherit;
+ background: rgba(255,255,255,0.72);
+ border: 1px solid rgba(255,255,255,0.9);
+ box-shadow: 0 6px 18px rgba(20,22,28,0.07);
+ transition: transform 0.12s ease;
+ position: relative; overflow: hidden;
+ }
+ .qtile:active { transform: scale(0.98); }
+ .qtile::before {
+ content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+ background: linear-gradient(90deg, rgba(90,96,104,0.55), rgba(180,186,196,0.35));
+ }
+ .qtile.chores::before { background: linear-gradient(90deg, #3ec9a0, #2a9a78); }
+ .qtile.pack::before { background: linear-gradient(90deg, #5a9ae8, #3a6fc0); }
+ .qtile.load::before { background: linear-gradient(90deg, #f0c040, #d0a020); height: 5px; }
+ .qtile.load {
+ background: linear-gradient(165deg, rgba(255,255,255,0.92), rgba(255,236,160,0.65));
+ border-color: rgba(210,160,40,0.4);
+ }
+ .qtile-icon {
+ width: 48px; height: 48px; border-radius: 14px;
+ display: flex; align-items: center; justify-content: center;
+ font-size: 24px;
+ background: rgba(255,255,255,0.8);
+ border: 1px solid rgba(40,42,48,0.1);
+ box-shadow: 0 4px 12px rgba(20,22,28,0.08);
+ }
+ .qtile-label {
+ font-size: 24px; font-weight: 800; letter-spacing: -0.04em; color: #0e1014; margin-top: 12px;
+ }
+ .qtile-sub { font-size: 13px; font-weight: 600; color: #5a5e66; margin-top: 4px; }
+ .qtile-tap {
+ position: absolute; right: 14px; bottom: 14px;
+ font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+ color: #7a8090; padding: 6px 10px; border-radius: 999px;
+ background: rgba(40,42,48,0.06); border: 1px solid rgba(40,42,48,0.1);
+ }
 
 
-  .wx-card {
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: space-between; gap: 18px;
-    padding: 12px 18px; border-radius: 16px;
-    background: rgba(255,255,255,0.58);
-    border: 1px solid rgba(255,255,255,0.88);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 22px rgba(20,22,28,0.07);
-  }
-  .wx-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-  .wx-kicker {
-    font-size: 10px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase;
-    color: #6a6e76;
-  }
-  .wx-title {
-    font-size: 18px; font-weight: 800; letter-spacing: -0.03em; color: #0e1014;
-  }
-  .wx-title .mock {
-    font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
-    color: #5a4010; margin-left: 8px; padding: 3px 8px; border-radius: 999px;
-    background: linear-gradient(145deg, rgba(255,220,100,0.45), rgba(255,200,60,0.18));
-    border: 1px solid rgba(210,160,40,0.42);
-    vertical-align: middle;
-  }
-  .wx-note { font-size: 13px; font-weight: 550; color: #5a5e66; letter-spacing: -0.01em; }
-  .wx-icons {
-    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
-  }
-  .wx-ico {
-    width: 44px; height: 44px; border-radius: 14px;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: 22px; line-height: 1;
-    background: rgba(255,255,255,0.78);
-    border: 1px solid rgba(40,42,48,0.1);
-    box-shadow: 0 4px 12px rgba(20,22,28,0.06);
-  }
-  .wx-ico.dim { opacity: 0.45; }
+ .wx-card {
+ flex-shrink: 0;
+ display: flex; align-items: center; justify-content: space-between; gap: 18px;
+ padding: 12px 18px; border-radius: 16px;
+ background: rgba(255,255,255,0.58);
+ border: 1px solid rgba(255,255,255,0.88);
+ box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 22px rgba(20,22,28,0.07);
+ }
+ .wx-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+ .wx-kicker {
+ font-size: 10px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase;
+ color: #6a6e76;
+ }
+ .wx-title {
+ font-size: 18px; font-weight: 800; letter-spacing: -0.03em; color: #0e1014;
+ }
+ .wx-title .mock {
+ font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+ color: #5a4010; margin-left: 8px; padding: 3px 8px; border-radius: 999px;
+ background: linear-gradient(145deg, rgba(255,220,100,0.45), rgba(255,200,60,0.18));
+ border: 1px solid rgba(210,160,40,0.42);
+ vertical-align: middle;
+ }
+ .wx-note { font-size: 13px; font-weight: 550; color: #5a5e66; letter-spacing: -0.01em; }
+ .wx-icons {
+ display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+ }
+ .wx-ico {
+ width: 44px; height: 44px; border-radius: 14px;
+ display: inline-flex; align-items: center; justify-content: center;
+ font-size: 22px; line-height: 1;
+ background: rgba(255,255,255,0.78);
+ border: 1px solid rgba(40,42,48,0.1);
+ box-shadow: 0 4px 12px rgba(20,22,28,0.06);
+ }
+ .wx-ico.dim { opacity: 0.45; }
 
-  .ftr {
-    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; font-size: 12px; color: #6a6e76; font-weight: 500; padding-top: 2px;
-  }
-  .ftr-left { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-  .ftr-chip {
-    font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
-    color: #5a4010; border: 1px solid rgba(210,160,40,0.4);
-    padding: 6px 12px; border-radius: 999px;
-    background: linear-gradient(135deg, rgba(255,220,100,0.35), rgba(255,255,255,0.7));
-  }
-  .ftr-meta { color: #8a8e96; }
+ .ftr {
+ flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+ gap: 12px; font-size: 12px; color: #6a6e76; font-weight: 500; padding-top: 2px;
+ }
+ .ftr-left { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+ .ftr-chip {
+ font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+ color: #5a4010; border: 1px solid rgba(210,160,40,0.4);
+ padding: 6px 12px; border-radius: 999px;
+ background: linear-gradient(135deg, rgba(255,220,100,0.35), rgba(255,255,255,0.7));
+ }
+ .ftr-meta { color: #8a8e96; }
 
-  .where-card.custody-loud-card {
-    background: linear-gradient(145deg, #262830 0%, #343840 100%) !important;
-    border-color: rgba(255,255,255,0.18) !important;
-    color: #fff !important;
-    box-shadow: 0 10px 28px rgba(20,22,28,0.18) !important;
-  }
-  .where-card.custody-loud-card .lbl { color: #7dffd4 !important; letter-spacing: 0.16em; font-weight: 900; }
-  .where-card.custody-loud-card .big { color: #fff !important; font-weight: 900; }
-  .where-card.custody-loud-card .sub { color: #c5d0de !important; }
-  .where-card.custody-loud-card .sub strong { color: #7dffd4; }
+ .where-card.custody-loud-card {
+ background: linear-gradient(145deg, #262830 0%, #343840 100%) !important;
+ border-color: rgba(255,255,255,0.18) !important;
+ color: #fff !important;
+ box-shadow: 0 10px 28px rgba(20,22,28,0.18) !important;
+ }
+ .where-card.custody-loud-card .lbl { color: #7dffd4 !important; letter-spacing: 0.16em; font-weight: 900; }
+ .where-card.custody-loud-card .big { color: #fff !important; font-weight: 900; }
+ .where-card.custody-loud-card .sub { color: #c5d0de !important; }
+ .where-card.custody-loud-card .sub strong { color: #7dffd4; }
 
 </style>
 </head>
 <body>
 <div class="panel">
-  <header class="hdr">
-    <div class="hdr-left">
-      <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
-      <div class="nav-row">
-        <a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
-        <a class="nav-week" href="index.html">Week</a>
-      </div>
-      <div class="identity">
-        <div class="avatar" aria-hidden="true">☀</div>
-        <div class="id-text">
-          <a class="eyebrow" href="sheet-index.html">WardOS · House · Today</a>
-          <h1 class="name"><span class="name-accent">Today</span></h1>
-          <div class="tagline">Sat Sep 26 · morning strip · watch through Mon · known facts only</div>
-        </div>
-      </div>
-    </div>
-    <div class="hdr-right">
-      <div class="hot-pill"><span class="spark">★</span> Leave 7:55 · Harris flag</div>
-    </div>
-  </header>
+ <header class="hdr">
+ <div class="hdr-left">
+ <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
+ <div class="nav-row">
+ <a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
+ <a class="nav-week" href="index.html">Week</a>
+ </div>
+ <div class="identity">
+ <div class="avatar" aria-hidden="true">☀</div>
+ <div class="id-text">
+ <a class="eyebrow" href="sheet-index.html">WardOS · House · Today</a>
+ <h1 class="name"><span class="name-accent">Today</span></h1>
+ <div class="tagline">Sat Sep 26 · morning strip · watch through Mon · known facts only</div>
+ </div>
+ </div>
+ </div>
+ <div class="hdr-right">
+ <div class="hot-pill"><span class="spark">★</span> Leave 7:55 · Harris flag</div>
+ </div>
+ </header>
 
-  <section class="gm" aria-label="Good morning">
-    <div class="gm-accent"></div>
-    <div class="gm-body">
-      <div class="gm-main">
-        <div class="gm-label">Good morning · Ward house</div>
-        <div class="gm-title">Hey crew · <span class="hl">Sat Sep 26</span> · what’s on</div>
-        <div class="gm-sub">Kids with <strong>Dad @ 147th</strong> through Fri Oct 2 3:00 · Harris flag AM · Hayes Chat &amp; Chew 9:00</div>
-      </div>
-      <div class="gm-badges">
-        <div class="gm-badge">SAT</div>
-        <div class="gm-badge days">Dad week · → Fri Oct 2</div>
-      </div>
-    </div>
-  </section>
+ <section class="gm" aria-label="Good morning">
+ <div class="gm-accent"></div>
+ <div class="gm-body">
+ <div class="gm-main">
+ <div class="gm-label">Good morning · Ward house</div>
+ <div class="gm-title">Hey crew · <span class="hl">Sat Sep 26</span> · what’s on</div>
+ <div class="gm-sub">Kids with <strong>Dad @ 147th</strong> through Fri Oct 2 3:00 · Harris flag AM · Hayes Chat &amp; Chew 9:00</div>
+ </div>
+ <div class="gm-badges">
+ <div class="gm-badge">SAT</div>
+ <div class="gm-badge days">Dad week · → Fri Oct 2</div>
+ </div>
+ </div>
+ </section>
 
-  
-    <div class="unknown-chips" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;">
-      <span style="font-size:13px;font-weight:850;letter-spacing:0.06em;color:#1a4a6a;background:#e8f4ff;border:1.5px solid #7eb6e0;padding:8px 12px;border-radius:10px;">Custody · with Dad @ 147th through Fri Oct 2 3:00</span>
-      <span style="font-size:13px;font-weight:850;letter-spacing:0.06em;color:#1f6b3a;background:#e8f8ee;border:1.5px solid #7ec99a;padding:8px 12px;border-radius:10px;">Hayes Chat &amp; Chew 9:00 LOCKED</span>
-    </div>
+ 
+ <div class="unknown-chips" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;">
+ <span style="font-size:13px;font-weight:850;letter-spacing:0.06em;color:#1a4a6a;background:#e8f4ff;border:1.5px solid #7eb6e0;padding:8px 12px;border-radius:10px;">Custody · with Dad @ 147th through Fri Oct 2 3:00</span>
+ <span style="font-size:13px;font-weight:850;letter-spacing:0.06em;color:#1f6b3a;background:#e8f8ee;border:1.5px solid #7ec99a;padding:8px 12px;border-radius:10px;">Hayes Chat &amp; Chew 9:00 LOCKED</span>
+ </div>
 <section class="leaveby" aria-label="Leave-by countdown">
-    <div class="leaveby-accent"></div>
-    <div class="leaveby-body">
-      <div class="leaveby-label">Countdown · leave now</div>
-      <div class="leaveby-main">Sat Sep 26 · <span class="time">7:55</span> · Harris flag</div>
-      <div class="leaveby-detail">Game <strong>8:30</strong> · Heritage Park Field 10 · 17255 S Black Bob Rd, Olathe</div>
-    </div>
-    <div class="leaveby-badge">Leave now</div>
-  </section>
+ <div class="leaveby-accent"></div>
+ <div class="leaveby-body">
+ <div class="leaveby-label">Countdown · leave now</div>
+ <div class="leaveby-main">Sat Sep 26 · <span class="time">7:55</span> · Harris flag</div>
+ <div class="leaveby-detail">Game <strong>8:30</strong> · Heritage Park Field 10 · 17255 S Black Bob Rd, Olathe</div>
+ </div>
+ <div class="leaveby-badge">Leave now</div>
+ </section>
 
 
-  <section class="wx-card" aria-label="Weather · mock placeholder">
-    <div class="wx-left">
-      <div class="wx-kicker">Outside · glance</div>
-      <div class="wx-title">Weather · mock / wire later <span class="mock">MOCK</span></div>
-      <div class="wx-note">PLACEHOLDER · no forecast numbers · soft glass slot</div>
-    </div>
-    <div class="wx-icons" aria-hidden="true">
-      <span class="wx-ico">☀</span>
-      <span class="wx-ico">☁</span>
-      <span class="wx-ico dim">🌧</span>
-      <span class="wx-ico">⛅</span>
-    </div>
-  </section>
+ <section class="wx-card" aria-label="Weather · mock placeholder">
+ <div class="wx-left">
+ <div class="wx-kicker">Outside · glance</div>
+ <div class="wx-title">Weather</div>
+ <div class="wx-note">PLACEHOLDER · no forecast numbers · soft glass slot</div>
+ </div>
+ <div class="wx-icons" aria-hidden="true">
+ <span class="wx-ico">☀</span>
+ <span class="wx-ico">☁</span>
+ <span class="wx-ico dim">🌧</span>
+ <span class="wx-ico">⛅</span>
+ </div>
+ </section>
 
-  <div class="body">
-    <section class="sec" aria-label="Who’s where">
-      <div class="sec-hdr">
-        <div class="sec-title">Who’s where</div>
-        <div class="sec-meta">known</div>
-      </div>
-      <div class="where-card kids custody-loud-card">
-        <div class="lbl">Custody · loud</div>
-        <div class="big">With Dad · @ 147th</div>
-        <div class="sub">Through <strong>Fri Oct 2 · 3:00</strong> · leave <strong>7:55</strong> Harris flag · Heritage Park</div>
-        <div class="chip-row">
-          <a class="kchip ain" href="kid-ainsley.html"><span class="d">A</span>Ainsley</a>
-          <a class="kchip hay" href="kid-hayes.html"><span class="d">H</span>Hayes</a>
-          <a class="kchip har" href="kid-harris.html"><span class="d">R</span>Harris</a>
-        </div>
-      </div>
-      <div class="where-card dad">
-        <div class="lbl">Dad</div>
-        <div class="big">Home · 147th</div>
-        <div class="sub">Kids with Dad · watch <strong>Sun</strong> garage sale · <strong>Mon</strong> House+Desk LIVE</div>
-      </div>
-    </section>
+ <div class="body">
+ <section class="sec" aria-label="Who’s where">
+ <div class="sec-hdr">
+ <div class="sec-title">Who’s where</div>
+ <div class="sec-meta">known</div>
+ </div>
+ <div class="where-card kids custody-loud-card">
+ <div class="lbl">Custody · loud</div>
+ <div class="big">With Dad · @ 147th</div>
+ <div class="sub">Through <strong>Fri Oct 2 · 3:00</strong> · leave <strong>7:55</strong> Harris flag · Heritage Park</div>
+ <div class="chip-row">
+ <a class="kchip ain" href="kid-ainsley.html"><span class="d">A</span>Ainsley</a>
+ <a class="kchip hay" href="kid-hayes.html"><span class="d">H</span>Hayes</a>
+ <a class="kchip har" href="kid-harris.html"><span class="d">R</span>Harris</a>
+ </div>
+ </div>
+ <div class="where-card dad">
+ <div class="lbl">Dad</div>
+ <div class="big">Home · 147th</div>
+ <div class="sub">Kids with Dad · watch <strong>Sun</strong> garage sale · <strong>Mon</strong> House+Desk LIVE</div>
+ </div>
+ </section>
 
-    <section class="sec kids-col" aria-label="Each kid today" style="background:transparent;border:none;box-shadow:none;padding:0;">
-      <a class="kid-card harris" href="kid-harris.html">
-        <div class="kid-top">
-          <div class="kid-name"><span class="dot">R</span> Harris</div>
-          <span class="kid-tap">Board</span>
-        </div>
-        <div class="kid-when">Leave 7:55 · game 8:30</div>
-        <div>
-          <div class="kid-what">Flag · Heritage Park F10</div>
-          <div class="kid-hint">Harris · Sat · known</div>
-        </div>
-      </a>
-      <a class="kid-card hayes" href="kid-hayes.html">
-        <div class="kid-top">
-          <div class="kid-name"><span class="dot">H</span> Hayes</div>
-          <span class="kid-tap">Board</span>
-        </div>
-        <div class="kid-when">9:00 · then leave ~2:10</div>
-        <div>
-          <div class="kid-what">Chat &amp; Chew · Flag 2:45</div>
-          <div class="kid-hint">Hayes · Sat · LOCKED + game</div>
-        </div>
-      </a>
-      <a class="kid-card ainsley" href="kid-ainsley.html">
-        <div class="kid-top">
-          <div class="kid-name"><span class="dot">A</span> Ainsley</div>
-          <span class="kid-tap">Board</span>
-        </div>
-        <div class="kid-when">Sat quiet · Sun 3:00</div>
-        <div>
-          <div class="kid-what">Vanity Sun · HW Mon 3:00</div>
-          <div class="kid-hint">Ainsley · watch ahead</div>
-        </div>
-      </a>
-    </section>
+ <section class="sec kids-col" aria-label="Each kid today" style="background:transparent;border:none;box-shadow:none;padding:0;">
+ <a class="kid-card harris" href="kid-harris.html">
+ <div class="kid-top">
+ <div class="kid-name"><span class="dot">R</span> Harris</div>
+ <span class="kid-tap">Board</span>
+ </div>
+ <div class="kid-when">Leave 7:55 · game 8:30</div>
+ <div>
+ <div class="kid-what">Flag · Heritage Park F10</div>
+ <div class="kid-hint">Harris · Sat · known</div>
+ </div>
+ </a>
+ <a class="kid-card hayes" href="kid-hayes.html">
+ <div class="kid-top">
+ <div class="kid-name"><span class="dot">H</span> Hayes</div>
+ <span class="kid-tap">Board</span>
+ </div>
+ <div class="kid-when">9:00 · then leave ~2:10</div>
+ <div>
+ <div class="kid-what">Chat &amp; Chew · Flag 2:45</div>
+ <div class="kid-hint">Hayes · Sat · LOCKED + game</div>
+ </div>
+ </a>
+ <a class="kid-card ainsley" href="kid-ainsley.html">
+ <div class="kid-top">
+ <div class="kid-name"><span class="dot">A</span> Ainsley</div>
+ <span class="kid-tap">Board</span>
+ </div>
+ <div class="kid-when">Sat quiet · Sun 3:00</div>
+ <div>
+ <div class="kid-what">Vanity Sun · HW Mon 3:00</div>
+ <div class="kid-hint">Ainsley · watch ahead</div>
+ </div>
+ </a>
+ </section>
 
-    <section class="sec" aria-label="Quick taps">
-      <div class="sec-hdr">
-        <div class="sec-title">Big taps</div>
-        <div class="sec-meta">open</div>
-      </div>
-      <div class="quick">
-        <a class="qtile chores" href="sheet-chores.html">
-          <div class="qtile-icon" aria-hidden="true">✓</div>
-          <div>
-            <div class="qtile-label">Chores</div>
-            <div class="qtile-sub">Tap-done · streak stars</div>
-          </div>
-          <span class="qtile-tap">Tap</span>
-        </a>
-        <a class="qtile pack" href="sheet-pack.html">
-          <div class="qtile-icon" aria-hidden="true">🎒</div>
-          <div>
-            <div class="qtile-label">Pack list</div>
-            <div class="qtile-sub">Dad week pack</div>
-          </div>
-          <span class="qtile-tap">Tap</span>
-        </a>
-        <a class="qtile load" href="sheet-load-day.html">
-          <div class="qtile-icon" aria-hidden="true">LD</div>
-          <div>
-            <div class="qtile-label">Load day</div>
-            <div class="qtile-sub">Mon 28 · House+Desk LIVE</div>
-          </div>
-          <span class="qtile-tap">Tap</span>
-        </a>
-      </div>
-    </section>
-  </div>
+ <section class="sec" aria-label="Quick taps">
+ <div class="sec-hdr">
+ <div class="sec-title">Big taps</div>
+ <div class="sec-meta">open</div>
+ </div>
+ <div class="quick">
+ <a class="qtile chores" href="sheet-chores.html">
+ <div class="qtile-icon" aria-hidden="true">✓</div>
+ <div>
+ <div class="qtile-label">Chores</div>
+ <div class="qtile-sub">Tap-done · streak stars</div>
+ </div>
+ <span class="qtile-tap">Tap</span>
+ </a>
+ <a class="qtile pack" href="sheet-pack.html">
+ <div class="qtile-icon" aria-hidden="true">🎒</div>
+ <div>
+ <div class="qtile-label">Pack list</div>
+ <div class="qtile-sub">Dad week pack</div>
+ </div>
+ <span class="qtile-tap">Tap</span>
+ </a>
+ <a class="qtile load" href="sheet-load-day.html">
+ <div class="qtile-icon" aria-hidden="true">LD</div>
+ <div>
+ <div class="qtile-label">Load day</div>
+ <div class="qtile-sub">Mon 28 · House+Desk LIVE</div>
+ </div>
+ <span class="qtile-tap">Tap</span>
+ </a>
+ </div>
+ </section>
+ </div>
 
-  <footer class="ftr">
-    <div class="ftr-left">
-      <span class="ftr-chip">TODAY · MORNING STRIP</span>
-    </div>
-  </footer>
+ <footer class="ftr">
+ <div class="ftr-left">
+ <span class="ftr-chip">TODAY · MORNING STRIP</span>
+ </div>
+ </footer>
 </div>
 
 <script src="house-zoom.js"></script>
