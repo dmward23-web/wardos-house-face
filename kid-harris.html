@@ -6,381 +6,327 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="WardOS House" />
 <meta name="theme-color" content="#d8dadf" />
-<title>BOARD-OS · HOUSE · HARRIS · BLOCK WORLD</title>
+<title>BOARD-OS · HARRIS · BLOCK WORLD</title>
 <link rel="stylesheet" href="house-engage.css" />
 <style>
 
-  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
-  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
-  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-SemiBold.ttf") format("truetype");font-weight:600;font-style:normal}
-  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Bold.ttf") format("truetype");font-weight:700;font-style:normal}
+  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400}
+  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500}
+  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-SemiBold.ttf") format("truetype");font-weight:600}
+  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Bold.ttf") format("truetype");font-weight:700}
 
-  * { box-sizing:border-box; margin:0; padding:0; }
-  html, body {
-    width:1920px; min-height:1200px; height:auto; overflow:auto;
-    font-family:"Inter Display","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;min-height:1200px;height:auto;overflow:auto;
+font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+-webkit-font-smoothing:antialiased}
 
   .sec {
     display:flex; flex-direction:column; gap:8px; min-height:0;
-    padding:10px; border-radius:4px;
-    background: var(--sec-bg, rgba(255,255,255,0.82));
-    border: 3px solid var(--sec-border, #2a2e36);
-    box-shadow: var(--sec-shadow, 0 6px 0 rgba(20,22,28,0.35), 0 10px 24px rgba(20,22,28,0.18));
+    padding:12px; border-radius:6px;
+    background: var(--sec-bg, rgba(255,255,255,0.9));
+    border: 4px solid var(--sec-border, #1a2014);
+    box-shadow: var(--sec-shadow, 0 7px 0 rgba(0,0,0,0.4), 0 12px 28px rgba(0,0,0,0.2));
   }
-  .sec-hdr { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 2px 4px; border-bottom:2px solid var(--sec-rule, rgba(0,0,0,0.12)); }
-  .sec-title { font-size:13px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:var(--sec-title, #1a2014); }
-  .sec-meta { font-size:11px; font-weight:700; color:var(--sec-meta, #4a5040); letter-spacing:0.04em; }
-  .sec-list { display:flex; flex-direction:column; gap:6px; flex:1; min-height:0; overflow:auto; }
+  .sec-hdr { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 2px 6px; border-bottom:3px solid var(--sec-rule, rgba(0,0,0,0.15)); }
+  .sec-title { font-size:15px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:var(--sec-title, #1a2014); }
+  .sec-meta { font-size:12px; font-weight:800; color:var(--sec-meta, #4a5040); }
+  .sec-list { display:flex; flex-direction:column; gap:8px; flex:1; min-height:0; overflow:auto; }
   .card {
-    border-radius:4px; padding:10px 12px; min-height:48px;
+    border-radius:8px; padding:12px 14px; min-height:56px;
     background: var(--card-bg, #fff);
-    border: 2px solid var(--card-border, #3a4048);
-    box-shadow: 0 3px 0 var(--card-edge, rgba(20,22,28,0.25));
+    border: 3px solid var(--card-border, #2a2e36);
+    box-shadow: 0 4px 0 var(--card-edge, rgba(0,0,0,0.3));
   }
-  .card.hot { background: var(--card-hot-bg, #fff8d0); border-color: var(--card-hot-border, #c8a020); box-shadow: 0 3px 0 var(--card-hot-edge, #8a6810), 0 0 12px rgba(255,200,60,0.25); }
-  .card.sport { background: var(--card-sport-bg, #e8f8ff); border-color: var(--card-sport-border, #2a80b0); }
-  .card.act { background: var(--card-act-bg, #f0f4ff); border-color: var(--card-act-border, #4060a0); }
-  .card.fun { background: var(--card-fun-bg, #f0ffe8); border-color: var(--card-fun-border, #408020); }
-  .card.quiet { background: rgba(0,0,0,0.06); border-style: dashed; font-size:13px; font-weight:650; color:#4a5048; }
-  .card .when { font-size:11px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:var(--when, #5a4030); margin-bottom:2px; }
-  .card .what { font-size:15px; font-weight:800; letter-spacing:-0.02em; color:#121418; line-height:1.2; }
-  .card .hint { font-size:12px; font-weight:600; color:#5a6058; margin-top:2px; }
-  .card.compact { padding:8px 10px; min-height:40px; }
-  .card.compact .what { font-size:14px; }
+  .card.hot { background: var(--card-hot-bg, #fff3a0); border-color: var(--card-hot-border, #e0a010); box-shadow: 0 4px 0 #8a6010, 0 0 16px rgba(255,200,40,0.35); }
+  .card.sport { background: var(--card-sport-bg, #c8f0ff); border-color: var(--card-sport-border, #1080c0); }
+  .card.act { background: var(--card-act-bg, #dde4ff); border-color: var(--card-act-border, #3040a0); }
+  .card.fun { background: var(--card-fun-bg, #d4ffb0); border-color: var(--card-fun-border, #308010); }
+  .card.quiet { background: rgba(0,0,0,0.08); border-style: dashed; font-size:14px; font-weight:700; color:#3a4038; }
+  .card .when { font-size:12px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; color:var(--when, #5a3010); margin-bottom:3px; }
+  .card .what { font-size:17px; font-weight:800; letter-spacing:-0.025em; color:#0e1014; line-height:1.2; }
+  .card .hint { font-size:13px; font-weight:650; color:#3a4038; margin-top:3px; }
   .quest {
-    border-radius:4px; padding:8px 10px; min-height:48px;
-    display:flex; align-items:center; gap:10px;
+    border-radius:10px; padding:12px 14px; min-height:64px;
+    display:flex; align-items:center; gap:12px;
     background: var(--quest-bg, #fff);
-    border: 2px solid var(--quest-border, #3a7a28);
-    box-shadow: 0 3px 0 var(--quest-edge, rgba(40,50,30,0.3));
-    cursor:pointer;
+    border: 4px solid var(--quest-border, #2a8a20);
+    box-shadow: 0 5px 0 var(--quest-edge, #1a4010);
+    cursor:pointer; -webkit-tap-highlight-color:transparent;
   }
+  .quest:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--quest-edge, #1a4010); }
   .quest .ring {
-    width:28px; height:28px; border-radius:4px; flex-shrink:0;
-    border: 2px solid var(--ring-border, #3a7a28);
-    background: var(--ring-bg, rgba(180,220,100,0.3));
+    width:40px; height:40px; border-radius:8px; flex-shrink:0;
+    border: 3px solid var(--ring-border, #2a8a20);
+    background: var(--ring-bg, rgba(180,230,80,0.4));
     display:inline-flex; align-items:center; justify-content:center;
-    font-size:15px; font-weight:800; color:#1a3010;
+    font-size:22px; font-weight:800; color:#1a3010;
   }
-  .quest .what { font-size:14px; font-weight:800; color:#121418; letter-spacing:-0.02em; }
-  .quest .hint { font-size:11px; font-weight:600; color:#4a6a40; }
-  .quest .star-earn { margin-left:auto; font-size:12px; font-weight:800; color:#8a6a10; flex-shrink:0;
-    padding:4px 8px; border-radius:4px; background:rgba(255,220,100,0.4); border:1px solid rgba(200,160,40,0.45); }
-  .quest.done { background: var(--quest-done-bg, rgba(180,230,100,0.45)); border-color: var(--quest-done-border, #2a7a20); }
-  .quest.done .what { text-decoration:line-through; text-decoration-thickness:2px; opacity:0.85; }
-  .tap-hint { font-size:11px; font-weight:700; color:#5a6058; display:flex; align-items:center; gap:6px; padding:2px 4px; }
-  .tap-hint .ring { width:16px; height:16px; border-radius:3px; border:2px solid currentColor; display:inline-flex; align-items:center; justify-content:center; font-size:10px; }
+  .quest .what { font-size:17px; font-weight:800; color:#0e1014; letter-spacing:-0.02em; }
+  .quest .hint { font-size:12px; font-weight:700; color:#3a6a30; }
+  .quest .star-earn {
+    margin-left:auto; font-size:15px; font-weight:800; color:#6a4010; flex-shrink:0;
+    padding:8px 12px; border-radius:8px; min-height:40px; display:inline-flex; align-items:center;
+    background:linear-gradient(180deg,#ffe080,#e0a020); border:3px solid #8a6010;
+    box-shadow:0 3px 0 #6a4010;
+  }
+  .quest.done { background: var(--quest-done-bg, rgba(160,230,80,0.55)); border-color: var(--quest-done-border, #1a7a18); }
+  .quest.done .what { text-decoration:line-through; text-decoration-thickness:3px; opacity:0.85; }
+  .tap-hint { font-size:13px; font-weight:800; color:#2a3028; display:flex; align-items:center; gap:8px; padding:4px; }
   .bank-card {
-    display:flex; flex-direction:column; gap:8px; padding:12px 14px; border-radius:4px;
+    display:flex; flex-direction:column; gap:10px; padding:16px 18px; border-radius:10px;
     background: var(--bank-bg, #1a2014); color:#e8f0c0;
-    border: 3px solid var(--bank-border, #0e1408);
-    box-shadow: 0 6px 0 #0a1008, 0 0 20px rgba(0,0,0,0.25);
+    border: 4px solid var(--bank-border, #0e1408);
+    box-shadow: 0 8px 0 #050805, 0 0 28px rgba(0,0,0,0.3);
   }
   .bank-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .bank-title { font-size:12px; font-weight:800; letter-spacing:0.2em; text-transform:uppercase; opacity:0.85; }
-  .bank-count { font-size:28px; font-weight:800; letter-spacing:-0.04em; line-height:1; }
-  .bank-count .sym { margin-right:4px; }
-  .bank-goal-title { font-size:15px; font-weight:800; letter-spacing:-0.02em; }
-  .bank-blurb { font-size:12px; font-weight:600; opacity:0.85; line-height:1.35; }
-  .bank-track { height:16px; border-radius:3px; background:rgba(0,0,0,0.45); border:2px solid rgba(255,255,255,0.2); overflow:hidden; }
-  .bank-fill { height:100%; width:0%; background: linear-gradient(90deg, #ffe060, #6ad030); box-shadow:inset 0 2px 0 rgba(255,255,255,0.35); transition:width 0.45s cubic-bezier(0.22,1.2,0.36,1); }
-  .bank-meta { font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; opacity:0.9; }
+  .bank-title { font-size:13px; font-weight:800; letter-spacing:0.16em; text-transform:uppercase; opacity:0.9; }
+  .bank-count { font-size:42px; font-weight:800; letter-spacing:-0.05em; line-height:1; }
+  .bank-goal-title { font-size:20px; font-weight:800; letter-spacing:-0.03em; }
+  .bank-blurb { font-size:14px; font-weight:650; opacity:0.9; line-height:1.35; }
+  .bank-track { height:22px; border-radius:6px; background:rgba(0,0,0,0.5); border:3px solid rgba(255,255,255,0.25); overflow:hidden; }
+  .bank-fill { height:100%; width:0%; box-shadow:inset 0 2px 0 rgba(255,255,255,0.4); transition:width 0.45s cubic-bezier(0.22,1.2,0.36,1); }
+  .bank-meta { font-size:13px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; }
+  .goal-unlock {
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:16px; font-weight:800; padding:12px 16px; border-radius:10px;
+    background:linear-gradient(180deg,#ffe080,#e0a020); color:#1a1000;
+    border:3px solid #8a6010; box-shadow:0 4px 0 #6a4010;
+  }
   .body {
     flex:1; min-height:0; display:grid; gap:10px;
-    grid-template-columns: 1.15fr 1fr 1fr 0.95fr;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr;
     grid-template-rows: 1fr auto;
   }
   .body .sec-bank { grid-column: 1 / -1; }
-  .ftr {
-    flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:12px;
-    font-size:12px; font-weight:600; color:var(--ftr, #3a4030); padding-top:2px;
-  }
-  .ftr-left { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-  .ftr-chip {
-    font-size:10px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase;
-    padding:6px 10px; border-radius:4px; text-decoration:none; color:inherit;
-    background:rgba(255,255,255,0.7); border:2px solid rgba(0,0,0,0.25);
-  }
-  .hdr { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-shrink:0; padding:10px 14px; }
-  .hdr-left { display:flex; align-items:center; gap:12px; min-width:0; }
-  .brand img { display:block; height:44px; width:auto; }
+  .ftr { flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:12px; font-weight:700; padding-top:2px; }
+  .ftr-chip { font-size:11px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; padding:7px 12px; border-radius:8px; text-decoration:none; color:inherit; background:rgba(255,255,255,0.75); border:3px solid rgba(0,0,0,0.3); }
+  .hdr { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0; padding:10px 14px; }
+  .hdr-left { display:flex; align-items:center; gap:10px; min-width:0; }
+  .brand img { display:block; height:40px; width:auto; }
   .nav-row { display:inline-flex; gap:8px; }
   .back, .nav-week {
     display:inline-flex; align-items:center; gap:6px; text-decoration:none;
-    font-size:13px; font-weight:800; padding:8px 12px; min-height:40px; border-radius:4px;
-    border:2px solid rgba(0,0,0,0.35); box-shadow:0 3px 0 rgba(0,0,0,0.25);
+    font-size:14px; font-weight:800; padding:10px 14px; min-height:44px; border-radius:8px;
+    border:3px solid rgba(0,0,0,0.4); box-shadow:0 4px 0 rgba(0,0,0,0.3);
   }
   .identity { display:flex; align-items:center; gap:12px; min-width:0; }
   .avatar {
-    width:64px; height:64px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
-    font-size:30px; font-weight:800; color:#fff; letter-spacing:-0.04em;
-    border:3px solid #1a2014; box-shadow:0 0 0 3px rgba(255,255,255,0.5), 0 6px 0 #0a1008;
+    width:72px; height:72px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    font-size:34px; font-weight:800; color:#fff; letter-spacing:-0.04em;
+    border:4px solid #0e1014; box-shadow:0 0 0 4px rgba(255,255,255,0.55), 0 7px 0 #050805;
   }
-  .eyebrow { font-size:11px; font-weight:800; letter-spacing:0.22em; text-transform:uppercase; text-decoration:none; }
-  .name { font-size:36px; font-weight:800; letter-spacing:-0.05em; line-height:1; }
-  .tagline { font-size:13px; font-weight:650; margin-top:2px; }
+  .eyebrow { font-size:12px; font-weight:800; letter-spacing:0.18em; text-transform:uppercase; text-decoration:none; }
+  .name { font-size:40px; font-weight:800; letter-spacing:-0.05em; line-height:1; }
+  .tagline { font-size:15px; font-weight:700; margin-top:3px; }
   .hdr-right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
   .hot-pill {
     display:inline-flex; align-items:center; gap:8px;
-    font-size:13px; font-weight:800; padding:8px 12px; border-radius:4px;
-    border:2px solid rgba(0,0,0,0.35); box-shadow:0 3px 0 rgba(0,0,0,0.2);
+    font-size:15px; font-weight:800; padding:10px 16px; border-radius:10px;
+    border:3px solid rgba(0,0,0,0.4); box-shadow:0 4px 0 rgba(0,0,0,0.25);
   }
-  .mock-tag {
-    font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
-    text-align:right; line-height:1.35; padding:5px 8px; border-radius:4px;
-    border:2px dashed rgba(0,0,0,0.25); background:rgba(0,0,0,0.06);
-  }
+  .mock-tag { font-size:10px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; text-align:right; line-height:1.35; padding:6px 10px; border-radius:8px; border:3px dashed rgba(0,0,0,0.3); background:rgba(0,0,0,0.08); }
   .hot-banner {
-    flex-shrink:0; display:flex; align-items:stretch; border-radius:4px; overflow:hidden; position:relative;
-    border:3px solid #0e1408; box-shadow:0 6px 0 #0a1008, 0 12px 28px rgba(0,0,0,0.3);
+    flex-shrink:0; display:flex; align-items:stretch; border-radius:10px; overflow:hidden; position:relative;
+    border:4px solid #0e1408; box-shadow:0 8px 0 #050805, 0 14px 32px rgba(0,0,0,0.35);
   }
-  .hot-accent { width:12px; flex-shrink:0; }
-  .hot-body { flex:1; padding:12px 18px; display:flex; align-items:center; justify-content:space-between; gap:16px; position:relative; z-index:1; }
-  .hot-label { font-size:10px; font-weight:800; letter-spacing:0.28em; text-transform:uppercase; opacity:0.8; }
-  .hot-title { font-size:24px; font-weight:800; letter-spacing:-0.03em; line-height:1.15; }
-  .hot-title .hl { padding:0 8px; border-radius:4px; background:rgba(255,255,255,0.92); color:#121418; }
-  .hot-sub { font-size:13px; font-weight:600; opacity:0.9; margin-top:2px; }
-  .hot-badges { display:flex; flex-direction:column; gap:6px; }
+  .hot-accent { width:16px; flex-shrink:0; }
+  .hot-body { flex:1; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; position:relative; z-index:1; }
+  .hot-label { font-size:12px; font-weight:800; letter-spacing:0.22em; text-transform:uppercase; opacity:0.85; }
+  .hot-title { font-size:28px; font-weight:800; letter-spacing:-0.03em; line-height:1.15; }
+  .hot-title .hl { padding:2px 10px; border-radius:8px; background:rgba(255,255,255,0.95); color:#101418; }
+  .hot-sub { font-size:15px; font-weight:700; opacity:0.95; margin-top:4px; }
+  .hot-badges { display:flex; flex-direction:column; gap:8px; }
   .hot-badge {
-    font-size:11px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase;
-    padding:7px 12px; border-radius:4px; text-align:center;
-    background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.35);
+    font-size:13px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase;
+    padding:10px 14px; border-radius:8px; text-align:center; min-width:110px;
+    background:rgba(255,255,255,0.2); border:3px solid rgba(255,255,255,0.45);
   }
 
 
-  body.theme-harris { background:#5a7a48; color:#1a2014; }
-  .panel {
-    width:1920px; height:1200px; padding:14px 22px 8px;
-    display:flex; flex-direction:column; gap:8px; position:relative; overflow:hidden;
-    background-color:#7a9a5a;
-    background-image:
-      linear-gradient(180deg, rgba(120,180,230,0.42) 0%, rgba(120,180,230,0.1) 20%, transparent 40%),
-      linear-gradient(165deg, rgba(90,140,60,0.25), rgba(138,98,58,0.2) 55%, rgba(70,80,70,0.25)),
-      url("theme-tiles/harris-blocks.png"),
-      url("camo-glass-tile-house.png");
-    background-size:auto, auto, 96px 96px, 420px 420px;
-    background-repeat:no-repeat, no-repeat, repeat, repeat;
-  }
-  .panel::before {
-    content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
-    background:
-      repeating-linear-gradient(0deg, transparent 0 7px, rgba(0,0,0,0.04) 7px 8px),
-      repeating-linear-gradient(90deg, transparent 0 7px, rgba(0,0,0,0.04) 7px 8px);
-  }
-  .panel::after {
-    content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
-    box-shadow: inset 0 0 0 6px rgba(40,50,30,0.4), inset 0 0 0 10px rgba(200,220,160,0.3);
-  }
-  .panel > * { position:relative; z-index:2; }
-  .hdr {
-    background: linear-gradient(180deg, #c8d8a8, #9aaa78);
-    border:3px solid #2a3a18;
-    box-shadow: inset 0 2px 0 rgba(255,255,255,0.5), 0 6px 0 #1a2810;
-    border-radius:2px;
-  }
-  .back, .nav-week {
-    background:linear-gradient(180deg,#c8e090,#8aba50); color:#1a3010; border-color:#2a4a18;
-  }
-  .avatar {
-    border-radius:2px; image-rendering:pixelated;
-    background:linear-gradient(145deg,#7ec85a,#3a7a28);
-  }
-  .eyebrow { color:#3a5a28; }
-  .name { color:#1a2014; }
-  .name-accent { color:#2a7a28; text-shadow:2px 2px 0 rgba(180,220,100,0.55); }
-  .tagline { color:#3a5a30; }
-  .hot-pill { background:linear-gradient(180deg,#ffe080,#e0b040); color:#1a3010; border-color:#8a6020; }
-  .xp-row {
-    display:flex; align-items:center; gap:10px; padding:6px 10px; border-radius:2px;
-    background:rgba(20,30,14,0.82); border:2px solid #1a2810;
-  }
-  .xp-label { font-size:11px; font-weight:800; letter-spacing:0.2em; text-transform:uppercase; color:#c8e080; min-width:88px; }
-  .xp-track { flex:1; height:18px; border-radius:2px; background:#1a2810; border:2px solid #3a5a20; overflow:hidden; }
-  .xp-fill {
-    height:100%; width:0%;
-    background:repeating-linear-gradient(90deg,#6ad030 0 10px,#5ab828 10px 12px,#8af048 12px 22px,#5ab828 22px 24px);
-  }
-  .xp-meta { font-size:12px; font-weight:700; color:#e8f0c0; }
-  .left-chip {
-    font-size:11px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase;
-    padding:5px 10px; border-radius:2px; background:linear-gradient(180deg,#ffe080,#e0b040);
-    border:2px solid #8a6020; color:#1a3010; box-shadow:0 2px 0 #6a4810;
-  }
-  .left-chip.is-clear { background:linear-gradient(180deg,#c8f080,#6aba30); }
-  .hot-banner {
-    background:linear-gradient(105deg,#1a4028,#2a6840 35%,#3a8850 55%,#2a6840 80%,#1a4028);
-  }
-  .hot-banner::before {
-    content:""; position:absolute; inset:0; background:url("theme-tiles/harris-blocks.png"); background-size:48px 48px; opacity:0.2; mix-blend-mode:overlay;
-  }
-  .hot-accent { background:repeating-linear-gradient(180deg,#c8e060 0 8px,#6aaa30 8px 16px); border-right:2px solid #0e2014; }
-  .hot-label, .hot-sub { color:rgba(200,230,140,0.85); }
-  .hot-title { color:#f4ffe8; text-shadow:0 2px 0 #0a2010; }
-  .hot-badge { color:#e8ffe0; }
-  --sec-bg: linear-gradient(180deg, rgba(240,245,220,0.92), rgba(200,210,170,0.85));
-  --sec-border: #2a3a18;
-  --sec-shadow: 0 5px 0 #1a2810, 0 10px 20px rgba(20,30,10,0.25);
-  --sec-title: #1a3010;
-  --card-bg: #eef4d8;
-  --card-border: #4a6a30;
-  --quest-bg: linear-gradient(145deg,#f4ffe0,#d0e8a8);
-  --quest-border: #3a7a28;
-  --bank-bg: #1a2810;
-  --bank-border: #0e1808;
-  .bank-fill { background:repeating-linear-gradient(90deg,#6ad030 0 8px,#ffe060 8px 16px); }
-  .hotbar {
-    flex-shrink:0; display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:2px;
-    background:rgba(18,22,14,0.92); border:3px solid #0e1208;
-    box-shadow: inset 0 0 0 2px rgba(200,200,160,0.2), 0 6px 0 #050805;
-  }
-  .hotbar-label { font-size:11px; font-weight:800; letter-spacing:0.2em; text-transform:uppercase; color:#c8e080; margin-right:6px; }
-  .hotbar-slot {
-    width:48px; height:48px; border-radius:2px; position:relative;
-    background:#1a2014; border:2px solid #6a7060;
-    display:flex; align-items:center; justify-content:center;
-    box-shadow: inset 0 0 0 2px #0a1008;
-  }
-  .hotbar-slot.sel { border-color:#ffe060; box-shadow: inset 0 0 0 2px #1a2014, 0 0 0 2px #c8a820, 0 0 14px rgba(255,220,80,0.5); }
-  .hotbar-slot .gem { width:28px; height:28px; border-radius:2px; image-rendering:pixelated; box-shadow:2px 2px 0 rgba(0,0,0,0.35); }
-  .hotbar-slot .n { position:absolute; right:3px; bottom:1px; font-size:10px; font-weight:800; color:#e8f0c0; }
-  .hotbar-note { margin-left:auto; font-size:12px; font-weight:650; color:#a8b890; }
-  .inv-tag {
-    font-size:10px; font-weight:800; letter-spacing:0.16em; text-transform:uppercase;
-    color:#c8e080; background:#1a2810; padding:4px 8px; border-radius:2px; border:2px solid #3a5a20;
-  }
-  body.theme-harris .hcb-label { color:#e8ffe0; text-shadow:0 4px 0 #1a4010, 0 0 36px rgba(140,230,60,0.8); }
+  body.theme-harris{background:#4a7a30;color:#1a2014}
+  .panel{width:1920px;height:1200px;padding:12px 20px 6px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;
+    background-color:#6aaa48;
+    background-image:linear-gradient(180deg,rgba(110,180,240,0.5) 0%,rgba(110,180,240,0.12) 18%,transparent 38%),
+      url("theme-tiles/harris-blocks.png"),url("camo-glass-tile-house.png");
+    background-size:auto,80px 80px,420px 420px;background-repeat:no-repeat,repeat,repeat}
+  .panel::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:repeating-linear-gradient(0deg,transparent 0 7px,rgba(0,0,0,.05) 7px 8px),
+      repeating-linear-gradient(90deg,transparent 0 7px,rgba(0,0,0,.05) 7px 8px)}
+  .panel::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+    box-shadow:inset 0 0 0 8px #2a4018,inset 0 0 0 14px rgba(200,230,120,.35)}
+  .crosshair{position:absolute;top:50%;left:50%;width:28px;height:28px;margin:-14px 0 0 -14px;z-index:1;pointer-events:none;opacity:.25;
+    background:linear-gradient(#fff,#fff) center/100% 2px no-repeat,linear-gradient(#fff,#fff) center/2px 100% no-repeat}
+  .panel>*{position:relative;z-index:2}
+  .hdr{background:linear-gradient(180deg,#d0e890,#8aba40);border:4px solid #1a3010;box-shadow:inset 0 3px 0 rgba(255,255,255,.55),0 7px 0 #0e2008;border-radius:4px}
+  .back,.nav-week{background:linear-gradient(180deg,#c8f060,#6aaa28);color:#102010;border-color:#1a4010}
+  .avatar{border-radius:4px;image-rendering:pixelated;background:linear-gradient(145deg,#90e050,#2a8018);font-size:36px}
+  .eyebrow{color:#2a5018}.name{color:#102010}.name-accent{color:#1a7010;text-shadow:3px 3px 0 rgba(180,230,80,.7)}
+  .tagline{color:#2a5018}.hot-pill{background:linear-gradient(180deg,#ffe060,#e09010);color:#1a1000;border-color:#8a5010}
+  .xp-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:4px;background:rgba(10,20,8,.88);border:3px solid #0a1808}
+  .xp-label{font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#c8f060;min-width:100px}
+  .xp-track{flex:1;height:22px;border-radius:3px;background:#0a1808;border:3px solid #3a7020;overflow:hidden}
+  .xp-fill{height:100%;width:0%;background:repeating-linear-gradient(90deg,#70e030 0 12px,#50b020 12px 14px,#a0ff50 14px 26px,#50b020 26px 28px)}
+  .xp-meta{font-size:14px;font-weight:800;color:#e8f8c0}
+  .left-chip{font-size:13px;font-weight:800;padding:8px 12px;border-radius:4px;background:linear-gradient(180deg,#ffe060,#e09010);border:3px solid #8a5010;color:#1a1000;box-shadow:0 3px 0 #6a4010}
+  .left-chip.is-clear{background:linear-gradient(180deg,#c8ff70,#50b020)}
+  .hot-banner{background:linear-gradient(105deg,#145028,#2a8040 40%,#40a050 60%,#2a8040)}
+  .hot-banner::before{content:"";position:absolute;inset:0;background:url("theme-tiles/harris-blocks.png");background-size:40px 40px;opacity:.25;mix-blend-mode:overlay}
+  .hot-accent{background:repeating-linear-gradient(180deg,#d0f050 0 10px,#50a020 10px 20px)}
+  .hot-label,.hot-sub{color:#d0f090}.hot-title{color:#f8ffe8;text-shadow:0 3px 0 #0a2008}.hot-badge{color:#e8ffe0}
+  --sec-bg:linear-gradient(180deg,#f0f8d0,#c0d080);--sec-border:#1a3010;--sec-shadow:0 6px 0 #0e2008,0 12px 24px rgba(0,0,0,.3);
+  --sec-title:#102010;--card-bg:#e8f4b8;--card-border:#3a7020;--quest-bg:linear-gradient(145deg,#f4ffc8,#c8e870);
+  --quest-border:#2a8018;--bank-bg:#102010;--bank-border:#0a1808;
+  .bank-fill{background:repeating-linear-gradient(90deg,#70e030 0 10px,#ffe060 10px 20px)}
+  .craft-row{display:flex;gap:10px;align-items:stretch;flex-shrink:0}
+  .craft-grid{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);gap:4px;padding:8px;background:#1a2810;border:4px solid #0a1808;border-radius:4px;box-shadow:0 5px 0 #050805}
+  .craft-cell{background:#2a3820;border:2px solid #4a6030;border-radius:2px;image-rendering:pixelated}
+  .craft-cell.on{background:#70e030;box-shadow:inset 0 0 0 2px #d0ff80;animation:juice-ping .6s ease}
+  .craft-arrow{font-size:28px;font-weight:800;color:#1a3010;display:flex;align-items:center;padding:0 6px}
+  .craft-out{width:64px;height:64px;background:linear-gradient(145deg,#90e050,#2a8018);border:4px solid #0a1808;border-radius:4px;box-shadow:0 5px 0 #050805;display:flex;align-items:center;justify-content:center;font-size:28px}
+  .hotbar{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:4px;background:rgba(8,14,6,.95);border:4px solid #050805;box-shadow:inset 0 0 0 2px rgba(200,220,120,.2),0 7px 0 #020402}
+  .hotbar-label{font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#c8f060;margin-right:6px}
+  .hotbar-slot{width:54px;height:54px;border-radius:4px;position:relative;background:#142014;border:3px solid #6a7860;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px #0a1008}
+  .hotbar-slot.sel,.hotbar-slot.lit{border-color:#ffe060;box-shadow:inset 0 0 0 2px #1a2014,0 0 0 3px #c8a020,0 0 18px rgba(255,220,80,.6)}
+  .hotbar-slot .gem{width:32px;height:32px;border-radius:3px;box-shadow:3px 3px 0 rgba(0,0,0,.4)}
+  .hotbar-slot .n{position:absolute;right:4px;bottom:2px;font-size:12px;font-weight:800;color:#e8f0c0}
+  .hotbar-note{margin-left:auto;font-size:14px;font-weight:700;color:#b0c880}
+  .ftr{color:#2a4018}
+  body.theme-harris .hcb-label{color:#e8ffe0;text-shadow:0 4px 0 #1a4010,0 0 40px rgba(140,230,60,.9)}
 
 </style>
 </head>
-<body data-clear-label="LEVEL UP" data-kid="harris" data-theme="harris" data-chores-shared="1" class="theme-harris">
+<body data-clear-label="LEVEL UP!!!" data-kid="harris" data-theme="harris" data-chores-shared="1" class="theme-harris">
 
 <div class="panel">
+  <div class="crosshair" aria-hidden="true"></div>
   <header class="hdr">
     <div class="hdr-left">
-      <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="44" /></div>
-      <div class="nav-row">
-        <a class="back" href="sheet-index.html"><span class="chev">‹</span> Sheets</a>
-        <a class="nav-week" href="index.html">Week</a>
-      </div>
+      <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="40" /></div>
+      <div class="nav-row"><a class="back" href="sheet-index.html">‹ Sheets</a><a class="nav-week" href="index.html">Week</a></div>
       <div class="identity">
-        <div class="avatar" aria-hidden="true">H</div>
-        <div class="id-text">
-          <a class="eyebrow" href="sheet-index.html">Block World · your world</a>
-          <h1 class="name">Hey <span class="name-accent">Harris</span></h1>
-          <div class="tagline">Your quests · your gems · your flag · craft your day</div>
+        <div class="avatar">H</div>
+        <div>
+          <a class="eyebrow" href="sheet-index.html">BLOCK WORLD · SMASH MODE</a>
+          <h1 class="name">HEY <span class="name-accent">HARRIS</span>!!!</h1>
+          <div class="tagline">Smash quests · grab gems · craft the DIAMOND PICK</div>
         </div>
       </div>
     </div>
     <div class="hdr-right">
-      <div class="hot-pill" data-hot-pill><span class="spark">◆</span> Your flag · Leave 7:55</div>
+      <div class="hot-pill" data-hot-pill>⚡ YOUR FLAG · Leave 7:55</div>
       <div style="display:flex;gap:8px;align-items:center">
-        <button type="button" class="mute-btn" data-mute-toggle aria-pressed="false">🔊 Sound</button>
-        <div class="mock-tag">YOUR BOARD · KIDS-SAFE<br/>as-of Sat Sep 26 2026</div>
+        <button type="button" class="mute-btn" data-mute-toggle>🔊 ON</button>
+        <div class="mock-tag">YOUR WORLD<br/>Sat Sep 26</div>
       </div>
     </div>
   </header>
-
-  <div class="xp-row" aria-label="Your XP">
-    <div class="xp-label">XP · craft</div>
+  <div class="xp-row">
+    <div class="xp-label">XP · CRAFT</div>
     <div class="xp-track"><div class="xp-fill" data-progress-fill></div></div>
-    <div class="xp-meta" data-progress-meta="{done}/{total} · {left} left">tap quests to craft</div>
+    <div class="xp-meta" data-progress-meta="{done}/{total} smashed">tap blocks!</div>
     <div class="left-chip" data-left-count>···</div>
-    <span class="inv-tag">Inventory live</span>
   </div>
-
-  <section class="hot-banner" aria-label="Your main quest">
+  <section class="hot-banner">
     <div class="hot-accent"></div>
     <div class="hot-body">
       <div class="hot-main">
-        <div class="hot-label">Main quest · hottest for you</div>
-        <div class="hot-title" data-hot-title>Sat Sep 26 · Leave <span class="hl">7:55</span> · game <span class="hl">8:30</span></div>
-        <div class="hot-sub" data-hot-sub><strong>Your flag game</strong> · Heritage Park Field 10 · with Dad @ 147th</div>
+        <div class="hot-label">MAIN QUEST · GO BEAST MODE</div>
+        <div class="hot-title" data-hot-title>SAT · Leave 7:55 · GAME 8:30</div>
+        <div class="hot-sub" data-hot-sub><strong>YOUR FLAG GAME!!!</strong> · Heritage Park F10</div>
       </div>
-      <div class="hot-badges">
-        <div class="hot-badge">Flag</div>
-        <div class="hot-badge">Leave now</div>
-      </div>
+      <div class="hot-badges"><div class="hot-badge">FLAG TIME</div><div class="hot-badge">GO GO GO</div></div>
     </div>
   </section>
-
   <div class="body">
-    <section class="sec" aria-label="Your today">
-      <div class="sec-hdr"><div class="sec-title">Today · your slots</div><div class="sec-meta">Sat Sep 26</div></div>
+    <section class="sec">
+      <div class="sec-hdr"><div class="sec-title">🎮 Today · smash list</div><div class="sec-meta">Sat</div></div>
       <div class="sec-list" data-mount-today-events></div>
-      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Your quests</div><div class="sec-meta" data-streak-label>craft streak</div></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">⛏️ YOUR QUESTS</div><div class="sec-meta" data-streak-label>streak</div></div>
       <div class="sec-list" data-mount-quests></div>
-      <div class="tap-hint"><span class="ring">✓</span> Tap a block · place it · earn gems</div>
+      <div class="tap-hint">👆 GIANT TAP · hear the block break · +GEM</div>
     </section>
-
-    <section class="sec" aria-label="Your sports">
-      <div class="sec-hdr"><div class="sec-title">Your sports · craft</div><div class="sec-meta">this week</div></div>
+    <section class="sec">
+      <div class="sec-hdr"><div class="sec-title">⚡ Sports</div><div class="sec-meta">your week</div></div>
       <div class="sec-list" data-mount-sports></div>
-    </section>
-
-    <section class="sec" aria-label="Your school">
-      <div class="sec-hdr"><div class="sec-title">Your school</div><div class="sec-meta">known for you</div></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">🏫 School / base</div></div>
       <div class="sec-list" data-mount-school></div>
-      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Your fun picks</div><div class="sec-meta">after quests</div></div>
+    </section>
+    <section class="sec">
+      <div class="sec-hdr"><div class="sec-title">🎉 FUN stuff</div><div class="sec-meta">play</div></div>
       <div class="sec-list" data-mount-fun></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">🎯 Bonus missions</div></div>
+      <div class="sec-list" data-mount-missions></div>
     </section>
-
-    <section class="sec" aria-label="Your appointments">
-      <div class="sec-hdr"><div class="sec-title">Your appointments</div><div class="sec-meta">this week</div></div>
+    <section class="sec">
+      <div class="sec-hdr"><div class="sec-title">📅 Appointments</div></div>
       <div class="sec-list" data-mount-appointments></div>
+      <div class="craft-row" style="margin-top:8px" aria-label="Crafting">
+        <div class="craft-grid" id="craft-grid">
+          <div class="craft-cell" data-craft="0"></div><div class="craft-cell" data-craft="1"></div><div class="craft-cell" data-craft="2"></div>
+          <div class="craft-cell" data-craft="3"></div><div class="craft-cell" data-craft="4"></div><div class="craft-cell" data-craft="5"></div>
+          <div class="craft-cell" data-craft="6"></div><div class="craft-cell" data-craft="7"></div><div class="craft-cell" data-craft="8"></div>
+        </div>
+        <div class="craft-arrow">➜</div>
+        <div class="craft-out" title="Diamond Pick">⛏️</div>
+      </div>
     </section>
-
-    <section class="sec sec-bank bank-card" aria-label="Your gem bank">
+    <section class="sec sec-bank bank-card">
       <div class="bank-top">
         <div>
-          <div class="bank-title">Your gem bank</div>
-          <div class="bank-goal-title" data-bank-goal-title>Craft your Diamond Pick</div>
+          <div class="bank-title">💎 YOUR GEM BANK</div>
+          <div class="bank-goal-title" data-bank-goal-title>Craft the Diamond Pick!!!</div>
         </div>
-        <div class="bank-count"><span class="sym" data-bank-symbol>◆</span><span data-bank-life>0</span></div>
+        <div class="bank-count"><span data-bank-symbol>◆</span> <span data-bank-life>0</span></div>
       </div>
-      <div class="bank-blurb" data-bank-goal-blurb>Stack gems from your quests. Fill the craft bar.</div>
+      <div class="bank-blurb" data-bank-goal-blurb>Smash quests. Stack gems. FILL THE BAR.</div>
       <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
-      <div class="bank-meta"><span data-bank-meta>0 / 8 gems to go</span> · today <span data-bank-today>0</span> · reward: <span data-bank-reward>screen-time craft unlock</span></div>
+      <div class="bank-meta"><span data-bank-meta>0 / 8 gems</span> · today <span data-bank-today>0</span></div>
+      <div class="goal-unlock" data-goal-unlock hidden>UNLOCKED · ask Dad · screen-time craft unlock</div>
     </section>
   </div>
-
-  <div class="hotbar" aria-label="Your hotbar">
-    <div class="hotbar-label">Hotbar</div>
-    <div class="hotbar-slot sel"><div class="gem" style="background:#6ad030"></div><span class="n">1</span></div>
-    <div class="hotbar-slot"><div class="gem" style="background:#8a6238"></div><span class="n">2</span></div>
-    <div class="hotbar-slot"><div class="gem" style="background:#989aa0"></div><span class="n">3</span></div>
-    <div class="hotbar-slot"><div class="gem" style="background:#5aa8d8"></div><span class="n">4</span></div>
-    <div class="hotbar-slot"><div class="gem" style="background:#e0b040"></div><span class="n">5</span></div>
-    <div class="hotbar-slot"><div class="gem" style="background:#c85050"></div><span class="n">6</span></div>
-    <div class="hotbar-slot"><div class="gem" style="background:#a064dc"></div><span class="n">7</span></div>
-    <div class="hotbar-slot"><div class="gem" style="background:#f0f0f0"></div><span class="n">8</span></div>
-    <div class="hotbar-slot"><div class="gem" style="background:#3a3a3a"></div><span class="n">9</span></div>
-    <div class="hotbar-note">your inventory · quests fill gems · craft the pick</div>
+  <div class="hotbar">
+    <div class="hotbar-label">HOTBAR</div>
+    <div class="hotbar-slot sel" data-hot="0"><div class="gem" style="background:#70e030"></div><span class="n">1</span></div>
+    <div class="hotbar-slot" data-hot="1"><div class="gem" style="background:#8a6238"></div><span class="n">2</span></div>
+    <div class="hotbar-slot" data-hot="2"><div class="gem" style="background:#989aa0"></div><span class="n">3</span></div>
+    <div class="hotbar-slot" data-hot="3"><div class="gem" style="background:#5aa8d8"></div><span class="n">4</span></div>
+    <div class="hotbar-slot" data-hot="4"><div class="gem" style="background:#e0b040"></div><span class="n">5</span></div>
+    <div class="hotbar-slot" data-hot="5"><div class="gem" style="background:#c85050"></div><span class="n">6</span></div>
+    <div class="hotbar-slot" data-hot="6"><div class="gem" style="background:#a064dc"></div><span class="n">7</span></div>
+    <div class="hotbar-slot" data-hot="7"><div class="gem" style="background:#f0f0f0"></div><span class="n">8</span></div>
+    <div class="hotbar-slot" data-hot="8"><div class="gem" style="background:#3a3a3a"></div><span class="n">9</span></div>
+    <div class="hotbar-note">quests light slots · BREAK BLOCKS · GET GEMS</div>
   </div>
-
   <footer class="ftr">
-    <div class="ftr-left">
-      <span>your board · kids-safe · Sat Sep 26 2026</span>
+    <div class="ftr-left" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span>YOUR board · smash mode</span>
       <span class="ftr-chip">HARRIS · BLOCK WORLD</span>
       <a class="ftr-chip" href="sheet-chores.html">Family chores</a>
-      <a class="ftr-chip" href="sheet-allowance.html">Stars overview</a>
     </div>
-    <span class="ftr-meta">House · original block homage · no logos · sound on</span>
+    <span class="ftr-meta">original block homage · sound ON</span>
   </footer>
 </div>
+<script>
+document.addEventListener("house:kid-rendered", function(){
+  var done = document.querySelectorAll(".quest.done").length;
+  document.querySelectorAll("[data-craft]").forEach(function(c,i){ c.classList.toggle("on", i < done*2); });
+  document.querySelectorAll("[data-hot]").forEach(function(h,i){ h.classList.toggle("lit", i < done); });
+});
+document.addEventListener("house:cleared", function(){
+  document.querySelectorAll("[data-craft]").forEach(function(c){ c.classList.add("on"); });
+  document.querySelectorAll("[data-hot]").forEach(function(h){ h.classList.add("lit","sel"); });
+});
+</script>
 
 <script src="kids-data.js"></script>
 <script src="house-sfx.js"></script>
 <script src="house-checkoffs.js" defer></script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    if (window.WardKids) WardKids.boot("harris");
-    if (window.HouseSfx) HouseSfx.wireMute();
-  });
+document.addEventListener("DOMContentLoaded", function(){
+  if (window.WardKids) WardKids.boot("harris");
+  if (window.HouseSfx) HouseSfx.wireMute();
+});
 </script>
 </body>
 </html>

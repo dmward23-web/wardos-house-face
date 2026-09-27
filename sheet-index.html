@@ -479,6 +479,56 @@
       animation: none !important;
     }
   }
+
+  /* v3 kid tiles scream themes */
+  .tile.hayes, .tile.ainsley, .tile.harris, .tile.dan {
+    border-width: 4px !important;
+    min-height: 118px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 0 rgba(20,22,28,0.28), 0 14px 28px rgba(20,22,28,0.16) !important;
+  }
+  .tile.hayes {
+    background: linear-gradient(165deg, #1a4060 0%, #0e2848 40%, #2a1860 100%) !important;
+    border-color: #70e0ff !important; color: #e8f8ff !important;
+  }
+  .tile.hayes .tile-label { color: #7dffc8 !important; font-size: 22px !important; }
+  .tile.hayes .tile-sub { color: #a0d0f0 !important; font-weight: 700 !important; }
+  .tile.hayes .tile-icon {
+    background: linear-gradient(145deg, #3ec9a0, #184878 50%, #7018b0) !important;
+    color: #fff !important; font-size: 28px !important;
+    box-shadow: 0 0 16px rgba(80,220,255,0.5) !important;
+  }
+  .tile.hayes .tile-tap { background: rgba(80,220,255,0.25); color: #e0f8ff; border: 2px solid #70e0ff; }
+  .tile.ainsley {
+    background: linear-gradient(165deg, #f0d0ff 0%, #c070e0 45%, #7a28a8 100%) !important;
+    border-color: #ffe080 !important;
+  }
+  .tile.ainsley .tile-label { color: #2a1040 !important; font-size: 22px !important; }
+  .tile.ainsley .tile-sub { color: #3a1858 !important; font-weight: 700 !important; }
+  .tile.ainsley .tile-icon {
+    background: linear-gradient(145deg, #f0c0ff, #6a2098) !important;
+    color: #fff !important; font-size: 28px !important;
+    box-shadow: 0 0 16px rgba(255,220,120,0.45) !important;
+  }
+  .tile.ainsley .tile-tap { background: rgba(255,240,180,0.5); color: #3a1858; border: 2px solid #ffe080; }
+  .tile.harris {
+    background: linear-gradient(165deg, #c8f070 0%, #6aaa30 50%, #3a7020 100%) !important;
+    border-color: #1a3010 !important;
+  }
+  .tile.harris .tile-label { color: #102010 !important; font-size: 22px !important; }
+  .tile.harris .tile-sub { color: #1a3010 !important; font-weight: 700 !important; }
+  .tile.harris .tile-icon {
+    background: linear-gradient(145deg, #90e050, #2a8018) !important;
+    color: #fff !important; font-size: 28px !important;
+    border-radius: 4px !important;
+    box-shadow: 0 4px 0 #0e2008 !important;
+  }
+  .tile.harris .tile-tap { background: #ffe060; color: #1a1000; border: 2px solid #8a5010; font-weight: 800; }
+  .tile.dan {
+    background: linear-gradient(165deg, #e8ebf0 0%, #8a909a 100%) !important;
+    border-color: #1a1e24 !important;
+  }
+  .tile.dan .tile-label { font-size: 22px !important; }
+
 </style>
 </head>
 <body>
@@ -547,28 +597,28 @@
       </a>
 
       <a class="tile hayes" href="kid-hayes.html">
-        <div class="tile-icon" aria-hidden="true">H</div>
+        <div class="tile-icon" aria-hidden="true">⚔️</div>
         <div>
-          <div class="tile-label">Hayes</div>
-          <div class="tile-sub">Drop Zone · his board</div>
+          <div class="tile-label">⚔️ HAYES</div>
+          <div class="tile-sub">DROP ZONE · storm + wins</div>
         </div>
         <span class="tile-tap">Tap</span>
       </a>
 
       <a class="tile ainsley" href="kid-ainsley.html">
-        <div class="tile-icon" aria-hidden="true">A</div>
+        <div class="tile-icon" aria-hidden="true">🎤</div>
         <div>
-          <div class="tile-label">Ainsley</div>
-          <div class="tile-sub">Eras Stage · her board</div>
+          <div class="tile-label">🎤 AINSLEY</div>
+          <div class="tile-sub">ERAS STAGE · spotlight</div>
         </div>
         <span class="tile-tap">Tap</span>
       </a>
 
       <a class="tile harris" href="kid-harris.html">
-        <div class="tile-icon" aria-hidden="true">H</div>
+        <div class="tile-icon" aria-hidden="true">🧱</div>
         <div>
-          <div class="tile-label">Harris</div>
-          <div class="tile-sub">Block World · his board</div>
+          <div class="tile-label">🧱 HARRIS</div>
+          <div class="tile-sub">BLOCK WORLD · smash</div>
         </div>
         <span class="tile-tap">Tap</span>
       </a>
@@ -576,8 +626,8 @@
       <a class="tile dan" href="sheet-dan.html">
         <div class="tile-icon" aria-hidden="true">D</div>
         <div>
-          <div class="tile-label">Dad</div>
-          <div class="tile-sub">Your week · leave-bys</div>
+          <div class="tile-label">DAD</div>
+          <div class="tile-sub">Your week box · leave-bys</div>
         </div>
         <span class="tile-tap">Tap</span>
       </a>
