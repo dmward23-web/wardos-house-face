@@ -12,6 +12,7 @@
 <meta name="theme-color" content="#d8dadf" />
 <meta name="description" content="WardOS House face · family week · kids-safe · no PIN" />
 <title>House · family week</title>
+<link rel="stylesheet" href="house-engage.css" />
 <link rel="icon" href="apple-touch-icon-20260926c.png" />
 <style>
   @font-face {
@@ -513,7 +514,7 @@
   a.sheets-pill .chev { font-size: 16px; font-weight: 700; color: #5a5e66; line-height: 1; }
 </style>
 </head>
-<body>
+<body class="has-home-dock">
 <div class="stage">
   <div class="scaler" id="scaler">
     <div class="panel" id="app" role="main" aria-label="House family week"></div>
@@ -685,7 +686,7 @@ function render() {
     <div class="hdr-left">
       <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
       <div class="nav-row">
-        <a class="sheets-pill" href="sheet-index.html"><span class="chev">‹</span> Sheets</a>
+        <a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
       </div>
       <div class="eyebrow">${esc(f.eyebrow)}</div>
       <h1 class="title">${esc(f.title)} <span class="sep">·</span> <span class="sub">${esc(f.titleSub)}</span></h1>
@@ -779,5 +780,10 @@ document.addEventListener("keydown", (e) => {
   }
 });
 </script>
+
+<nav class="home-dock" aria-label="Home">
+  <a class="home-btn home-btn-dock" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
+</nav>
+
 </body>
 </html>

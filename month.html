@@ -11,6 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE FACE · MONTH · WHITE GREY GLASS CAMO</title>
+<link rel="stylesheet" href="house-engage.css" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -321,12 +322,12 @@
   a.eyebrow { text-decoration: none; color: inherit; cursor: pointer; }
 </style>
 </head>
-<body>
+<body class="has-home-dock">
 <div class="panel">
   <header class="hdr">
     <div class="hdr-left">
       <div class="nav-row">
-        <a class="back" href="sheet-index.html" aria-label="Back to Family sheets"><span class="chev">‹</span> Sheets</a>
+        <a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
         <a class="nav-week" href="index.html">Week</a>
       </div>
       <a class="eyebrow" href="sheet-index.html">House · Ward · KS Hub test</a>
@@ -511,5 +512,10 @@
     <span class="ftr-meta">White/grey glass camo · leave-by first · known-only</span>
   </footer>
 </div>
+
+<nav class="home-dock" aria-label="Home">
+  <a class="home-btn home-btn-dock" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
+</nav>
+
 </body>
 </html>

@@ -426,12 +426,12 @@
 </style>
 <link rel="stylesheet" href="house-engage.css" />
 </head>
-<body data-clear-label="CLEARED" data-chores-shared="1" data-theme="house">
+<body data-clear-label="CLEARED" data-chores-shared="1" data-theme="house" class="has-home-dock">
 <div class="panel">
   <header class="hdr">
     <div class="hdr-left">
       <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
-      <div class="nav-row"><a class="back" href="sheet-index.html" aria-label="Back to Family sheets"><span class="chev">‹</span> Sheets</a><a class="nav-week" href="index.html">Week</a></div>
+      <div class="nav-row"><a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a><a class="nav-week" href="index.html">Week</a></div>
       <div class="identity">
         <div class="avatar" aria-hidden="true">★</div>
         <div class="id-text">
@@ -590,7 +590,7 @@
       <span>kids-safe · LIVE · as-of Sun Sep 27 2026</span>
       <span class="ftr-chip">STARS ONLY · NO MONEY</span>
       <a class="ftr-chip" href="sheet-chores.html" style="text-decoration:none;color:inherit">→ Chores</a>
-      <a class="ftr-chip" href="sheet-index.html" style="text-decoration:none;color:inherit">Sheets home</a>
+      <a class="ftr-chip" href="sheet-index.html" style="text-decoration:none;color:inherit">← Home</a>
     </div>
     <span class="ftr-meta">House face · white/grey glass camo · no money · no PIN</span>
   </footer>
@@ -620,5 +620,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 </script>
+
+<nav class="home-dock" aria-label="Home">
+  <a class="home-btn home-btn-dock" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
+</nav>
+
 </body>
 </html>
