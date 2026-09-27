@@ -243,15 +243,15 @@
   }
   .bank.ainsley .star-count {
     background: linear-gradient(160deg, rgba(230,180,245,0.35), rgba(255,255,255,0.7));
-    border: 1px solid rgba(170,100,200,0.3);
+    border: 3px solid rgba(120,60,160,0.55);
   }
   .bank.hayes .star-count {
     background: linear-gradient(160deg, rgba(80,210,170,0.28), rgba(255,255,255,0.7));
-    border: 1px solid rgba(40,160,120,0.3);
+    border: 3px solid rgba(30,120,90,0.55);
   }
   .bank.harris .star-count {
     background: linear-gradient(160deg, rgba(100,160,230,0.28), rgba(255,255,255,0.7));
-    border: 1px solid rgba(70,120,200,0.3);
+    border: 3px solid rgba(50,90,160,0.55);
   }
   .star-big {
     font-size: 72px; font-weight: 800; letter-spacing: -0.06em; line-height: 1;
@@ -408,7 +408,7 @@
 </style>
 <link rel="stylesheet" href="house-engage.css" />
 </head>
-<body data-clear-label="CLEARED">
+<body data-clear-label="CLEARED" data-chores-shared="1" data-theme="house">
 <div class="panel">
   <header class="hdr">
     <div class="hdr-left">
@@ -425,6 +425,7 @@
     </div>
     <div class="hdr-right">
       <div class="hot-pill"><span class="spark">★</span> Chores feed stars</div>
+      <button type="button" class="mute-btn" data-mute-toggle style="margin-bottom:6px">🔊 Sound</button>
       <div class="mock-tag">LIVE · KIDS-SAFE · NO PIN<br/>as-of Sat Sep 26 2026</div>
     </div>
   </header>
@@ -443,7 +444,7 @@
 
   <div class="body">
     <!-- Ainsley bank -->
-    <section class="bank ainsley" aria-label="Ainsley star bank">
+    <section class="bank ainsley" data-bank-kid="ainsley" aria-label="Ainsley star bank">
       <div class="bank-hdr">
         <a class="kid-chip ainsley" href="kid-ainsley.html"><span class="dot">A</span> Ainsley</a>
         <div class="streak-pill">★ 4-day streak</div>
@@ -464,7 +465,7 @@
     </section>
 
     <!-- Hayes bank -->
-    <section class="bank hayes" aria-label="Hayes star bank">
+    <section class="bank hayes" data-bank-kid="hayes" aria-label="Hayes star bank">
       <div class="bank-hdr">
         <a class="kid-chip hayes" href="kid-hayes.html"><span class="dot">H</span> Hayes</a>
         <div class="streak-pill">★ 6-day streak</div>
@@ -485,7 +486,7 @@
     </section>
 
     <!-- Harris bank -->
-    <section class="bank harris" aria-label="Harris star bank">
+    <section class="bank harris" data-bank-kid="harris" aria-label="Harris star bank">
       <div class="bank-hdr">
         <a class="kid-chip harris" href="kid-harris.html"><span class="dot">R</span> Harris</a>
         <div class="streak-pill">★ 3-day streak</div>
@@ -519,6 +520,28 @@
     <span class="ftr-meta">House face · white/grey glass camo · no money · no PIN</span>
   </footer>
 </div>
+<script src="kids-data.js"></script>
+<script src="house-sfx.js"></script>
 <script src="house-checkoffs.js" defer></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (!window.WardKids) return;
+  WardKids.loadJSON(function (err, data) {
+    if (!data) return;
+    WardKids._data = data;
+    WardKids.syncBankFromChecks(data);
+    ["ainsley","hayes","harris"].forEach(function (id) {
+      var v = WardKids.getBankView(id, data);
+      var root = document.querySelector('[data-bank-kid="'+id+'"]') || document.querySelector('.bank.'+id);
+      if (root) WardKids.renderBank(root, v);
+      var big = document.querySelector('.bank.'+id+' .star-big');
+      if (big) {
+        var sym = (v.currency && v.currency.symbol) || "★";
+        big.innerHTML = '<span class="s">'+sym+'</span>'+v.lifetime;
+      }
+    });
+  });
+});
+</script>
 </body>
 </html>

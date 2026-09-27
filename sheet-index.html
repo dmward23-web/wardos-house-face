@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-<meta name="description" content="Board-OS House face · family sheets home index · 19 tiles · kids-safe · no money · Gallery + Desk gate + Status" />
+<meta name="description" content="Board-OS House face · family sheets home index · 20 tiles · kids-safe · no money · Gallery + Desk gate + Status" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
 <style>
   @font-face {
@@ -83,9 +83,9 @@
   .hdr {
     display: flex; align-items: center; justify-content: space-between; gap: 20px;
     flex-shrink: 0; padding: 14px 20px; border-radius: 16px;
-    background: rgba(255,255,255,0.58);
-    border: 1px solid rgba(255,255,255,0.85);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 28px rgba(20,22,28,0.08), 0 2px 6px rgba(20,22,28,0.05);
+    background: rgba(255,255,255,0.78);
+    border: 3px solid rgba(40,42,48,0.45);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 5px 0 rgba(20,22,28,0.18), 0 8px 28px rgba(20,22,28,0.1);
   }
   
   .brand { flex-shrink: 0; display: flex; align-items: center; }
@@ -219,12 +219,13 @@
     cursor: pointer;
     position: relative; overflow: hidden;
     min-height: 0;
-    background: rgba(255,255,255,0.62);
-    border: 1px solid rgba(255,255,255,0.90);
+    background: rgba(255,255,255,0.84);
+    border: 3px solid rgba(40,42,48,0.52);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.98) inset,
-      0 12px 28px rgba(20,22,28,0.08),
-      0 3px 8px rgba(20,22,28,0.04);
+      0 6px 0 rgba(20,22,28,0.22),
+      0 12px 28px rgba(20,22,28,0.14),
+      0 3px 8px rgba(20,22,28,0.06);
     transition: transform 0.12s ease, box-shadow 0.12s ease;
   }
   .tile:active { transform: scale(0.975); }
@@ -293,6 +294,16 @@
     border-color: transparent; font-size: 22px; font-weight: 800;
     box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(58,111,192,0.28);
   }
+  .tile.dan {
+    background: linear-gradient(165deg, rgba(255,255,255,0.92) 0%, rgba(210,214,220,0.85) 100%);
+    border-color: rgba(40,42,48,0.55);
+  }
+  .tile.dan::before { background: linear-gradient(90deg, #5a6068, #2a2e36); }
+  .tile.dan .tile-icon {
+    background: linear-gradient(145deg, #6a7078, #2a2e36);
+    color: #fff;
+  }
+  .tile.dan .tile-label { color: #1a1e24; }
   .tile.harris .tile-label { color: #1a3050; }
 
   .tile.stars {
@@ -504,7 +515,7 @@
   <div class="grid-wrap">
     <div class="grid-hdr">
       <div class="grid-title">All sheets</div>
-      <div class="grid-hint">19 tiles · Today first · Gallery · Ainsley-safe</div>
+      <div class="grid-hint">20 tiles · Today first · Gallery · Ainsley-safe</div>
     </div>
 
     <nav class="tile-grid" aria-label="Family sheet index">
@@ -539,7 +550,7 @@
         <div class="tile-icon" aria-hidden="true">H</div>
         <div>
           <div class="tile-label">Hayes</div>
-          <div class="tile-sub">His week · green</div>
+          <div class="tile-sub">Drop Zone · his board</div>
         </div>
         <span class="tile-tap">Tap</span>
       </a>
@@ -548,7 +559,7 @@
         <div class="tile-icon" aria-hidden="true">A</div>
         <div>
           <div class="tile-label">Ainsley</div>
-          <div class="tile-sub">Her week · purple</div>
+          <div class="tile-sub">Eras Stage · her board</div>
         </div>
         <span class="tile-tap">Tap</span>
       </a>
@@ -557,7 +568,16 @@
         <div class="tile-icon" aria-hidden="true">H</div>
         <div>
           <div class="tile-label">Harris</div>
-          <div class="tile-sub">His week · blue</div>
+          <div class="tile-sub">Block World · his board</div>
+        </div>
+        <span class="tile-tap">Tap</span>
+      </a>
+
+      <a class="tile dan" href="sheet-dan.html">
+        <div class="tile-icon" aria-hidden="true">D</div>
+        <div>
+          <div class="tile-label">Dad</div>
+          <div class="tile-sub">Your week · leave-bys</div>
         </div>
         <span class="tile-tap">Tap</span>
       </a>
