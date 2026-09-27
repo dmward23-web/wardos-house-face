@@ -76,6 +76,24 @@
   }
   .panel > * { position: relative; z-index: 2; }
 
+  .flow-art{
+    display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;
+    flex-shrink:0;padding:12px 18px;border-radius:14px;
+    background:linear-gradient(180deg,rgba(255,255,255,0.92),rgba(236,238,242,0.95));
+    border:4px solid #2a2e36;box-shadow:0 6px 0 rgba(0,0,0,0.25);
+  }
+  .flow-art .fs{
+    display:flex;flex-direction:column;align-items:center;gap:4px;min-width:120px;
+    padding:10px 14px;border-radius:12px;background:#fff;
+    border:3px solid #2a2e36;box-shadow:0 3px 0 rgba(0,0,0,0.2);
+  }
+  .flow-art .fs .ico{font-size:28px;line-height:1}
+  .flow-art .fs .lab{font-size:12px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#1a2014;text-align:center}
+  .flow-art .fs.dad{background:linear-gradient(180deg,#ffe080,#e0a020);border-color:#8a6010}
+  .flow-art .fs.dad .lab{color:#1a1000}
+  .flow-art .farr{font-size:28px;font-weight:800;color:#2a2e36}
+
+
   .hdr {
     display: flex; align-items: center; justify-content: space-between; gap: 20px;
     flex-shrink: 0; padding: 14px 20px; border-radius: 16px;
@@ -419,14 +437,14 @@
         <div class="id-text">
           <a class="eyebrow" href="sheet-index.html">Family sheets · home</a>
           <h1 class="name"><span class="name-accent">Allowance</span> stars</h1>
-          <div class="tagline">Stars + streaks only · no dollars on House</div>
+          <div class="tagline">Jar goals 20 / 12 / 8 · no dollars on House</div>
         </div>
       </div>
     </div>
     <div class="hdr-right">
-      <div class="hot-pill"><span class="spark">★</span> Chores feed stars</div>
+      <div class="hot-pill"><span class="spark">★</span> Musts → jar → payday</div>
       <button type="button" class="mute-btn" data-mute-toggle style="margin-bottom:6px">🔊 Sound</button>
-      <div class="mock-tag">LIVE · KIDS-SAFE · NO PIN<br/>as-of Sat Sep 26 2026</div>
+      <div class="mock-tag">LIVE · KIDS-SAFE · NO PIN<br/>as-of Sun Sep 27 2026</div>
     </div>
   </header>
 
@@ -435,11 +453,21 @@
     <div class="link-body">
       <div class="link-main">
         <div class="link-label">How stars work</div>
-        <div class="link-title">Chores feed stars · <span class="hl">tap done</span> · bank grows</div>
-        <div class="link-sub"><strong>No money here</strong> · Ainsley-safe · cash lives on Desk PIN</div>
+        <div class="link-title">Musts fill the jar · <span class="hl">tap done</span> · payday with Dad</div>
+        <div class="link-sub"><strong>No money here</strong> · jar stars only · cash / rates live with Dad (Desk PIN)</div>
       </div>
       <a class="link-cta" href="sheet-chores.html" style="text-decoration:none;color:inherit;">→ Open chores</a>
     </div>
+  </section>
+
+  <section class="flow-art" aria-label="stars to jar to payday with Dad">
+    <div class="fs"><span class="ico">★</span><span class="lab">Musts · earn stars</span></div>
+    <span class="farr">→</span>
+    <div class="fs"><span class="ico">🫙</span><span class="lab">Fill the jar</span></div>
+    <span class="farr">→</span>
+    <div class="fs"><span class="ico">✓</span><span class="lab">Dad inspects</span></div>
+    <span class="farr">→</span>
+    <div class="fs dad"><span class="ico">🤝</span><span class="lab">Allowance payday with Dad</span></div>
   </section>
 
   <div class="body">
@@ -447,75 +475,78 @@
     <section class="bank ainsley" data-bank-kid="ainsley" aria-label="Ainsley star bank">
       <div class="bank-hdr">
         <a class="kid-chip ainsley" href="kid-ainsley.html"><span class="dot">A</span> Ainsley</a>
-        <div class="streak-pill">★ 4-day streak</div>
+        <div class="streak-pill">Tour Jar · need 20</div>
       </div>
       <div class="star-count">
-        <div class="star-big"><span class="s">★</span>12</div>
-        <div class="star-label">star bank · EXAMPLE</div>
+        <div class="star-big"><span class="s">★</span>0</div>
+        <div class="star-label">jar goal 20 · Tour Stars</div>
         <div class="star-row">
-          <span class="tap-star lit" data-check="ainsley-star-1" aria-label="Star 1" aria-pressed="true">★</span><span class="tap-star lit" data-check="ainsley-star-2" aria-label="Star 2" aria-pressed="true">★</span><span class="tap-star lit" data-check="ainsley-star-3" aria-label="Star 3" aria-pressed="true">★</span><span class="tap-star lit" data-check="ainsley-star-4" aria-label="Star 4" aria-pressed="true">★</span><span class="tap-star lit" data-check="ainsley-star-5" aria-label="Star 5" aria-pressed="true">★</span><span class="tap-star lit" data-check="ainsley-star-6" aria-label="Star 6" aria-pressed="true">★</span><span class="tap-star lit" data-check="ainsley-star-7" aria-label="Star 7" aria-pressed="true">★</span><span class="tap-star lit" data-check="ainsley-star-8" aria-label="Star 8" aria-pressed="true">★</span><span class="tap-star lit" data-check="ainsley-star-9" aria-label="Star 9" aria-pressed="true">★</span><span class="tap-star lit" data-check="ainsley-star-10" aria-label="Star 10" aria-pressed="true">★</span><span class="tap-star lit" data-check="ainsley-star-11" aria-label="Star 11" aria-pressed="true">★</span><span class="tap-star lit" data-check="ainsley-star-12" aria-label="Star 12" aria-pressed="true">★</span>
+          <span class="tap-star dim" data-check="ainsley-star-1" aria-label="Star 1" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-2" aria-label="Star 2" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-3" aria-label="Star 3" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-4" aria-label="Star 4" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-5" aria-label="Star 5" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-6" aria-label="Star 6" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-7" aria-label="Star 7" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-8" aria-label="Star 8" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-9" aria-label="Star 9" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-10" aria-label="Star 10" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-11" aria-label="Star 11" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-12" aria-label="Star 12" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-13" aria-label="Star 13" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-14" aria-label="Star 14" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-15" aria-label="Star 15" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-16" aria-label="Star 16" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-17" aria-label="Star 17" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-18" aria-label="Star 18" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-19" aria-label="Star 19" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-20" aria-label="Star 20" aria-pressed="false">★</span>
         </div>
       </div>
       <div class="feed">
-        <div class="feed-title">Recent · mock</div>
-        <div class="feed-row"><span class="plus">★ +1</span> Make bed<div class="when">today</div></div>
-        <div class="feed-row"><span class="plus">★ +1</span> Streak bonus<div class="when">yesterday</div></div>
+        <div class="feed-title">Musts that fill the jar</div>
+        <div class="feed-row"><span class="plus">★ +1</span> Bed · room · backpack · kitchen/table<div class="when">daily</div></div>
+        <div class="feed-row"><span class="plus">★ +3</span> Bathroom wipe<div class="when">weekly</div></div>
+        <div class="feed-row"><span class="plus">★ +4</span> Laundry full cycle<div class="when">weekly</div></div>
       </div>
-      <div class="cheer-bar">You’re sparkly · keep going!</div>
+      <div class="cheer-bar">Fill the jar · allowance payday with Dad</div>
     </section>
 
     <!-- Hayes bank -->
     <section class="bank hayes" data-bank-kid="hayes" aria-label="Hayes star bank">
       <div class="bank-hdr">
         <a class="kid-chip hayes" href="kid-hayes.html"><span class="dot">H</span> Hayes</a>
-        <div class="streak-pill">★ 6-day streak</div>
+        <div class="streak-pill">Victory Jar · need 12</div>
       </div>
       <div class="star-count">
-        <div class="star-big"><span class="s">★</span>18</div>
-        <div class="star-label">star bank · EXAMPLE</div>
+        <div class="star-big"><span class="s">◎</span>0</div>
+        <div class="star-label">jar goal 12 · Victory Coins</div>
         <div class="star-row">
-          <span class="tap-star lit" data-check="hayes-star-1" aria-label="Star 1" aria-pressed="true">★</span><span class="tap-star lit" data-check="hayes-star-2" aria-label="Star 2" aria-pressed="true">★</span><span class="tap-star lit" data-check="hayes-star-3" aria-label="Star 3" aria-pressed="true">★</span><span class="tap-star lit" data-check="hayes-star-4" aria-label="Star 4" aria-pressed="true">★</span><span class="tap-star lit" data-check="hayes-star-5" aria-label="Star 5" aria-pressed="true">★</span><span class="tap-star lit" data-check="hayes-star-6" aria-label="Star 6" aria-pressed="true">★</span><span class="tap-star lit" data-check="hayes-star-7" aria-label="Star 7" aria-pressed="true">★</span><span class="tap-star lit" data-check="hayes-star-8" aria-label="Star 8" aria-pressed="true">★</span><span class="tap-star lit" data-check="hayes-star-9" aria-label="Star 9" aria-pressed="true">★</span><span class="tap-star lit" data-check="hayes-star-10" aria-label="Star 10" aria-pressed="true">★</span><span class="tap-star dim" data-check="hayes-star-11" aria-label="Star 11" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-12" aria-label="Star 12" aria-pressed="false">★</span>
+          <span class="tap-star dim" data-check="hayes-star-1" aria-label="Star 1" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-2" aria-label="Star 2" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-3" aria-label="Star 3" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-4" aria-label="Star 4" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-5" aria-label="Star 5" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-6" aria-label="Star 6" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-7" aria-label="Star 7" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-8" aria-label="Star 8" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-9" aria-label="Star 9" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-10" aria-label="Star 10" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-11" aria-label="Star 11" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-12" aria-label="Star 12" aria-pressed="false">★</span>
         </div>
       </div>
       <div class="feed">
-        <div class="feed-title">Recent · mock</div>
-        <div class="feed-row"><span class="plus">★ +1</span> Make bed<div class="when">today</div></div>
-        <div class="feed-row"><span class="plus">★ +1</span> Dishes helper<div class="when">today</div></div>
+        <div class="feed-title">Musts that fill the jar</div>
+        <div class="feed-row"><span class="plus">◎ +1</span> Bed · dishes · trash · backpack<div class="when">daily</div></div>
+        <div class="feed-row"><span class="plus">◎ +2</span> Sports bag / cleats ready<div class="when">weekly</div></div>
+        <div class="feed-row"><span class="plus">◎ +2</span> Room reset<div class="when">weekly</div></div>
       </div>
-      <div class="cheer-bar">Streak king · 6 days!</div>
+      <div class="cheer-bar">Fill the jar · allowance payday with Dad</div>
     </section>
 
     <!-- Harris bank -->
     <section class="bank harris" data-bank-kid="harris" aria-label="Harris star bank">
       <div class="bank-hdr">
         <a class="kid-chip harris" href="kid-harris.html"><span class="dot">R</span> Harris</a>
-        <div class="streak-pill">★ 3-day streak</div>
+        <div class="streak-pill">Gem Jar · need 8</div>
       </div>
       <div class="star-count">
-        <div class="star-big"><span class="s">★</span>9</div>
-        <div class="star-label">star bank · EXAMPLE</div>
+        <div class="star-big"><span class="s">◆</span>0</div>
+        <div class="star-label">jar goal 8 · Gems</div>
         <div class="star-row">
-          <span class="tap-star lit" data-check="harris-star-1" aria-label="Star 1" aria-pressed="true">★</span><span class="tap-star lit" data-check="harris-star-2" aria-label="Star 2" aria-pressed="true">★</span><span class="tap-star lit" data-check="harris-star-3" aria-label="Star 3" aria-pressed="true">★</span><span class="tap-star lit" data-check="harris-star-4" aria-label="Star 4" aria-pressed="true">★</span><span class="tap-star lit" data-check="harris-star-5" aria-label="Star 5" aria-pressed="true">★</span><span class="tap-star lit" data-check="harris-star-6" aria-label="Star 6" aria-pressed="true">★</span><span class="tap-star lit" data-check="harris-star-7" aria-label="Star 7" aria-pressed="true">★</span><span class="tap-star lit" data-check="harris-star-8" aria-label="Star 8" aria-pressed="true">★</span><span class="tap-star lit" data-check="harris-star-9" aria-label="Star 9" aria-pressed="true">★</span><span class="tap-star dim" data-check="harris-star-10" aria-label="Star 10" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-11" aria-label="Star 11" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-12" aria-label="Star 12" aria-pressed="false">★</span>
+          <span class="tap-star dim" data-check="harris-star-1" aria-label="Star 1" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-2" aria-label="Star 2" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-3" aria-label="Star 3" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-4" aria-label="Star 4" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-5" aria-label="Star 5" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-6" aria-label="Star 6" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-7" aria-label="Star 7" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-8" aria-label="Star 8" aria-pressed="false">★</span>
         </div>
       </div>
       <div class="feed">
-        <div class="feed-title">Recent · mock</div>
-        <div class="feed-row"><span class="plus">★ +1</span> Trash out<div class="when">today</div></div>
-        <div class="feed-row"><span class="plus">★ +1</span> Streak start<div class="when">Wed</div></div>
+        <div class="feed-title">Musts that fill the jar</div>
+        <div class="feed-row"><span class="plus">◆ +1</span> Bed · dishes · trash · backpack<div class="when">daily</div></div>
+        <div class="feed-row"><span class="plus">◆ +2</span> Toys reset<div class="when">weekly</div></div>
+        <div class="feed-row"><span class="plus">◆ +1</span> Shoes by door<div class="when">weekly</div></div>
       </div>
-      <div class="cheer-bar">Blue team rising!</div>
+      <div class="cheer-bar">Fill the jar · allowance payday with Dad</div>
     </section>
   </div>
 
   <div class="desk-note">
-    <div class="msg"><strong>Cash / real allowance</strong> lives on Desk PIN — not on House. Stars only here.</div>
+    <div class="msg"><strong>No money here.</strong> Stars fill the jar · allowance payday with Dad · cash rates live on Desk PIN.</div>
     <div class="badge">Desk PIN · adults</div>
   </div>
 
   <footer class="ftr">
     <div class="ftr-left">
-      <span>kids-safe · LIVE · as-of Sat Sep 26 2026</span>
-      <span class="ftr-chip">STARS ONLY · NO $</span>
+      <span>kids-safe · LIVE · as-of Sun Sep 27 2026</span>
+      <span class="ftr-chip">STARS ONLY · NO MONEY</span>
     </div>
     <span class="ftr-meta">House face · white/grey glass camo · no money · no PIN</span>
   </footer>

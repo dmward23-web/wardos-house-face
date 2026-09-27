@@ -251,6 +251,19 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   body.theme-ainsley .tap-hint{font-size:12px;padding:2px;color:#9aa4b8}
   .xp-stage{flex-shrink:0}
   .hot-banner{flex-shrink:0}
+
+.jar-flow{display:flex;align-items:center;justify-content:flex-start;gap:6px;flex-wrap:nowrap;
+    margin-top:4px;padding:4px 8px;border-radius:6px;
+    background:rgba(255,255,255,0.10);border:2px dashed rgba(255,255,255,0.28)}
+  .jar-flow .step{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;
+    letter-spacing:0.04em;text-transform:uppercase;padding:4px 8px;border-radius:6px;
+    background:rgba(0,0,0,0.35);border:2px solid rgba(255,255,255,0.22);white-space:nowrap}
+  .jar-flow .arr{font-size:14px;font-weight:800;opacity:0.85}
+  .jar-flow .dad{background:linear-gradient(180deg,#ffe080,#e0a020);color:#1a1000;border-color:#8a6010}
+  .treat-secondary{display:inline-flex;align-items:center;gap:4px;margin-top:2px;
+    font-size:11px;font-weight:700;opacity:0.7;padding:2px 6px;border-radius:5px;
+    border:1px dashed rgba(255,255,255,0.28)}
+
   @media (prefers-reduced-motion:reduce){.vinyl-float,.xp-stage-fill,.spotlight{animation:none!important}}
 
 </style>
@@ -271,7 +284,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
         <div>
           <a class="eyebrow" href="sheet-index.html">ERAS STAGE · YOUR SET</a>
           <h1 class="name"><span class="name-accent">AINSLEY</span></h1>
-          <div class="tagline">Clear the setlist. Bank stars. Keep it sharp.</div>
+          <div class="tagline">Clear musts. Fill the Tour Jar. Allowance payday with Dad.</div>
         </div>
       </div>
     </div>
@@ -279,7 +292,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
       <div class="hot-pill" data-hot-pill>FEATURED · SUNDAY · vanity 3:00</div>
       <div style="display:flex;gap:8px;align-items:center">
         <button type="button" class="mute-btn" data-mute-toggle>🔊 ON</button>
-        <div class="mock-tag">NIGHT SHOW<br/>Sat Sep 26</div>
+        <div class="mock-tag">NIGHT SHOW · LIVE<br/>Sun Sep 27</div>
       </div>
     </div>
   </header>
@@ -294,7 +307,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   <div class="xp-stage">
     <div class="xp-stage-lab">SETLIST</div>
     <div class="xp-stage-track"><div class="xp-stage-fill" data-progress-fill></div></div>
-    <div data-progress-meta="{done}/{total} tracks" style="font-size:14px;font-weight:800;color:#9aa4b8">0/4</div>
+    <div data-progress-meta="{done}/{total} tracks" style="font-size:14px;font-weight:800;color:#9aa4b8">0/6</div>
     <div class="left-chip" data-left-count>···</div>
   </div>
   <section class="hot-banner">
@@ -340,10 +353,15 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
         </div>
         <div class="bank-count"><span data-bank-symbol>★</span> <span data-bank-life>0</span></div>
       </div>
-      <div class="bank-blurb" data-bank-goal-blurb>Clear your setlist. Bank stars. Hit the goal — treat pick with Dad.</div>
+      <div class="bank-blurb" data-bank-goal-blurb>Clear your musts. Bank Tour Stars. Fill the jar — allowance payday with Dad.</div>
       <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
-      <div class="bank-meta"><span data-bank-meta>0 / 12 stars</span> · today <span data-bank-today>0</span></div>
-      <div class="goal-unlock" data-goal-unlock hidden>★ GOAL HIT · ask Dad · treat</div>
+      <div class="bank-meta"><span data-bank-meta>0 / 20 stars</span> · today <span data-bank-today>0</span></div>
+            <div class="jar-flow" aria-label="stars to jar to payday">
+        <span class="step">★ musts</span><span class="arr">→</span>
+        <span class="step">🫙 jar</span><span class="arr">→</span>
+        <span class="step dad">✓ Dad · payday</span>
+      </div>
+      <div class="goal-unlock" data-goal-unlock hidden>★ JAR FULL · Dad inspects · allowance payday with Dad</div>
     </section>
   </div>
   <div class="setlist-foot">
