@@ -105,6 +105,12 @@
           "what": "👟 Shoes by door — weekly must",
           "stars": 1,
           "cadence": "weekly"
+        },
+        {
+          "id": "har-cubby",
+          "what": "🎒 Backpack + sports bag in garage cubby — weekly must",
+          "stars": 1,
+          "cadence": "weekly"
         }
       ],
       "sports": [
@@ -188,7 +194,7 @@
         },
         {
           "when": "Weekly",
-          "what": "🧸 Toys reset + 👟 shoes by door",
+          "what": "🧸 Toys + 👟 shoes + 🎒 garage cubby",
           "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         }
@@ -285,6 +291,12 @@
           "id": "hay-room",
           "what": "🧹 Room reset — weekly must",
           "stars": 2,
+          "cadence": "weekly"
+        },
+        {
+          "id": "hay-cubby",
+          "what": "🎒 Backpack + sports bag in garage cubby — weekly must",
+          "stars": 1,
           "cadence": "weekly"
         }
       ],
@@ -387,7 +399,7 @@
         },
         {
           "when": "Weekly",
-          "what": "⚽ Gear ready + 🧹 room reset = bonus coins",
+          "what": "⚽ Gear + 🧹 room + 🎒 garage cubby = bonus coins",
           "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         }
@@ -487,6 +499,12 @@
           "cadence": "weekly"
         },
         {
+          "id": "ain-cubby",
+          "what": "🎒 Backpack + sports bag in garage cubby",
+          "stars": 1,
+          "cadence": "weekly"
+        },
+        {
           "id": "ain-babysit",
           "what": "👶 Babysitting — optional hire (Dad books you)",
           "stars": 0,
@@ -567,7 +585,7 @@
       "missions": [
         {
           "when": "Weekly",
-          "what": "Bath wipe + laundry cycle = big star dump",
+          "what": "Bath wipe + laundry + garage cubby = big star dump",
           "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         },
