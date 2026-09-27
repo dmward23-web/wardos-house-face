@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#12140f" />
 <title>BOARD-OS · AINSLEY · HER TRACKS</title>
-<link rel="stylesheet" href="house-engage.css" />
+<link rel="stylesheet" href="house-engage.css?v=BARS2X" />
 <style>
 
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400}
@@ -83,8 +83,8 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .bank-count { font-size:64px; font-weight:800; letter-spacing:-0.05em; line-height:1; }
   .bank-goal-title { font-size:20px; font-weight:800; letter-spacing:-0.03em; }
   .bank-blurb { font-size:14px; font-weight:650; opacity:0.9; line-height:1.35; }
-  .bank-track { height:22px; border-radius:4px; background:rgba(0,0,0,0.5); border:2px solid rgba(255,255,255,0.25); overflow:hidden; }
-  .bank-fill { height:100%; width:0%; box-shadow:inset 0 2px 0 rgba(255,255,255,0.4); transition:width 0.45s cubic-bezier(0.22,1.2,0.36,1); }
+  .bank-track { height:56px; border-radius:8px; background:rgba(0,0,0,0.72); border:3px solid rgba(255,255,255,0.35); overflow:hidden; box-shadow:inset 0 2px 8px rgba(0,0,0,0.65),0 0 18px rgba(255,200,80,0.28); }
+  .bank-fill { height:100%; width:0%; box-shadow:inset 0 3px 0 rgba(255,255,255,0.55),0 0 22px rgba(255,200,80,0.65); filter:saturate(1.35) brightness(1.12); transition:width 0.45s cubic-bezier(0.22,1.2,0.36,1); }
   .bank-meta { font-size:13px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; }
   .goal-unlock[hidden]{display:none!important}
   .goal-unlock {
@@ -293,7 +293,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   }
 
   body.theme-ainsley{background:#12140f;color:#d4d0c0}
-  .panel{width:1920px;height:1200px;padding:12px 20px 6px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;
+  .panel {width:1920px;min-height: 1200px; height: auto;padding:12px 20px 6px;display:flex;flex-direction:column;gap:8px;position:relative;overflow: visible;
     background-color:#12140f;
     background-image:
       radial-gradient(ellipse 65% 42% at 50% -6%,rgba(184,90,40,.14),transparent 55%),
@@ -337,8 +337,8 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .era.midnight{background:rgba(14,16,12,.95);color:#a8b098}.era.fog{background:rgba(120,128,118,.35);color:#d4d0c0}.era.lilac{background:rgba(58,58,80,.55);color:#c8c4d8}.era.blush{background:rgba(200,196,176,.28);color:#e8e4d4}
   .xp-stage{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px;background:rgba(14,16,12,.94);border:2px solid #5a6a50;box-shadow:0 3px 0 #0e100c}
   .xp-stage-lab{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#c87840}
-  .xp-stage-track{flex:1;height:12px;border-radius:3px;background:#0e100c;overflow:hidden;border:2px solid #3a4a38}
-  .xp-stage-fill{height:100%;width:0%;background:linear-gradient(90deg,#3a4a38,#5a6a50,#d4a860,#b85a28);background-size:200% 100%;animation:setlist-shimmer 3.2s linear infinite}
+  .xp-stage-track{flex:1;height:24px;border-radius:4px;background:#0e100c;overflow:hidden;border:2px solid #5a6a50;box-shadow:inset 0 2px 6px rgba(0,0,0,.55),0 0 12px rgba(212,168,96,.28)}
+  .xp-stage-fill{height:100%;width:0%;background:linear-gradient(90deg,#3a4a38,#5a6a50,#d4a860,#b85a28);background-size:200% 100%;animation:setlist-shimmer 3.2s linear infinite;box-shadow:0 0 16px rgba(212,168,96,.55),inset 0 2px 0 rgba(255,255,255,.4);filter:saturate(1.3) brightness(1.1)}
   @keyframes setlist-shimmer{to{background-position:200% 0}}
   .left-chip{font-size:12px;font-weight:800;padding:7px 11px;border-radius:4px;background:linear-gradient(180deg,#3a4a38,#1a1c16);border:2px solid #b85a28;color:#e8e4d4}
   .left-chip.is-clear{background:linear-gradient(180deg,#5a6a50,#3a4a38);color:#e8e4d4;border-color:#c87840}
@@ -387,10 +387,10 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   body.theme-ainsley .bank-goal-title{color:#e8e4d4;font-size:28px}
   body.theme-ainsley .bank-count{font-size:64px;color:#e8d090;text-shadow:0 0 14px rgba(184,90,40,.3)}
   body.theme-ainsley .bank-track{
-    height:28px; border-radius:3px; border:2px solid rgba(200,120,64,.45);
-    background:#0e100c; box-shadow:inset 0 0 0 1px rgba(0,0,0,.5);
+    height:56px; border-radius:8px; border:3px solid rgba(200,120,64,.7);
+    background:#0e100c; box-shadow:inset 0 2px 8px rgba(0,0,0,.65),0 0 18px rgba(184,90,40,.35);
   }
-  .bank-fill{background:linear-gradient(90deg,#3a4a38,#5a6a50,#d4a860,#b85a28)}
+  .bank-fill{background:linear-gradient(90deg,#3a4a38,#5a6a50,#d4a860,#b85a28);box-shadow:inset 0 3px 0 rgba(255,255,255,.55),0 0 22px rgba(212,168,96,.65);filter:saturate(1.35) brightness(1.12)}
   .goal-unlock{background:linear-gradient(180deg,#d4a860,#b85a28);color:#14100a;border-color:#c87840;border-radius:6px;box-shadow:0 3px 0 #3a2410}
   .setlist-foot{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:6px;background:rgba(14,16,12,.94);border:2px solid #5a6a50}
   .setlist-foot .lab{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#c87840}
@@ -405,7 +405,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   body[data-era-mood="gold"] .panel{filter:none}
   body[data-era-mood="lilac"] .panel{filter:hue-rotate(8deg) saturate(.85) brightness(.95)}
   body[data-era-mood="blush"] .panel{filter:saturate(.55) brightness(1.06) contrast(1.02)}
-  body.theme-ainsley .body{flex:1 1 auto;min-height:0;overflow:hidden}
+  body.theme-ainsley .body{flex:1 1 auto;min-height:0;overflow: visible}
   body.theme-ainsley .sec-more .card{padding:10px 12px;min-height:48px}
   body.theme-ainsley .sec-more .card .what{font-size:14px}
   body.theme-ainsley .sec-more .card .hint{font-size:12px;line-height:1.3}
@@ -502,7 +502,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   body.theme-ainsley .sec-bank .bank-goal-title { font-size: 28px !important; }
   body.theme-ainsley .sec-bank .bank-count { font-size: 64px !important; }
   body.theme-ainsley .sec-bank .bank-blurb { font-size: 15px !important; line-height: 1.4; display: block !important; }
-  body.theme-ainsley .sec-bank .bank-track { height: 28px !important; }
+  body.theme-ainsley .sec-bank .bank-track { height: 56px !important; }
   body.theme-ainsley .sec-bank .bank-meta { font-size: 15px !important; font-weight: 800; }
   body.theme-ainsley .sec-bank .ledger-row { margin-top: 8px; gap: 8px; }
   body.theme-ainsley .sec-bank .ledger-chip { font-size: 14px !important; padding: 10px 14px !important; min-height: 44px !important; }
@@ -529,7 +529,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   }
   body.theme-ainsley .sec-schedule .harbor-strip { padding: 8px 10px; margin-bottom: 6px; }
   body.theme-ainsley .sec-schedule .bag-strip { padding: 8px 10px; margin: 2px 0 6px; }
-  body.theme-ainsley .body { overflow: hidden; }
+  body.theme-ainsley .body { overflow: visible; }
 
   /* quiet folk autumn — color homage only · no album/artist on glass */
 

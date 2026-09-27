@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HARRIS · BLOCK WORLD</title>
-<link rel="stylesheet" href="house-engage.css" />
+<link rel="stylesheet" href="house-engage.css?v=BARS2X" />
 <style>
 
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400}
@@ -84,8 +84,8 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .bank-count { font-size:64px; font-weight:800; letter-spacing:-0.05em; line-height:1; }
   .bank-goal-title { font-size:28px; font-weight:800; letter-spacing:-0.03em; }
   .bank-blurb { font-size:15px; font-weight:650; opacity:0.9; line-height:1.35; }
-  .bank-track { height:28px; border-radius:6px; background:rgba(0,0,0,0.5); border:3px solid rgba(255,255,255,0.25); overflow:hidden; }
-  .bank-fill { height:100%; width:0%; box-shadow:inset 0 2px 0 rgba(255,255,255,0.4); transition:width 0.45s cubic-bezier(0.22,1.2,0.36,1); }
+  .bank-track { height:56px; border-radius:8px; background:rgba(0,0,0,0.72); border:3px solid rgba(255,255,255,0.35); overflow:hidden; box-shadow:inset 0 2px 8px rgba(0,0,0,0.65),0 0 18px rgba(112,224,48,0.3); }
+  .bank-fill { height:100%; width:0%; box-shadow:inset 0 3px 0 rgba(255,255,255,0.55),0 0 22px rgba(160,255,80,0.65); filter:saturate(1.35) brightness(1.12); transition:width 0.45s cubic-bezier(0.22,1.2,0.36,1); }
   .bank-meta { font-size:13px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; }
   .goal-unlock[hidden]{display:none!important}
   .goal-unlock {
@@ -183,7 +183,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
 
 
   body.theme-harris{background:#4a7a30;color:#1a2014}
-  .panel{width:1920px;height:1200px;padding:12px 20px 6px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;
+  .panel {width:1920px;min-height: 1200px; height: auto;padding:12px 20px 6px;display:flex;flex-direction:column;gap:8px;position:relative;overflow: visible;
     background-color:#6aaa48;
     background-image:linear-gradient(180deg,rgba(110,180,240,0.5) 0%,rgba(110,180,240,0.12) 18%,transparent 38%),
       url("theme-tiles/harris-blocks.png"),url("camo-glass-tile-house.png");
@@ -204,8 +204,8 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .tagline{color:#2a5018}.hot-pill{background:linear-gradient(180deg,#ffe060,#e09010);color:#1a1000;border-color:#8a5010}
   .xp-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:4px;background:rgba(10,20,8,.88);border:3px solid #0a1808}
   .xp-label{font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#c8f060;min-width:100px}
-  .xp-track{flex:1;height:22px;border-radius:3px;background:#0a1808;border:3px solid #3a7020;overflow:hidden}
-  .xp-fill{height:100%;width:0%;background:repeating-linear-gradient(90deg,#70e030 0 12px,#50b020 12px 14px,#a0ff50 14px 26px,#50b020 26px 28px)}
+  .xp-track{flex:1;height:44px;border-radius:4px;background:#0a1808;border:3px solid #3a7020;overflow:hidden;box-shadow:inset 0 2px 6px rgba(0,0,0,.55),0 0 14px rgba(112,224,48,.32)}
+  .xp-fill{height:100%;width:0%;background:repeating-linear-gradient(90deg,#70e030 0 12px,#50b020 12px 14px,#a0ff50 14px 26px,#50b020 26px 28px);box-shadow:0 0 18px rgba(160,255,80,.6),inset 0 2px 0 rgba(255,255,255,.4);filter:saturate(1.3) brightness(1.1)}
   .xp-meta{font-size:14px;font-weight:800;color:#e8f8c0}
   .left-chip{font-size:13px;font-weight:800;padding:8px 12px;border-radius:4px;background:linear-gradient(180deg,#ffe060,#e09010);border:3px solid #8a5010;color:#1a1000;box-shadow:0 3px 0 #6a4010}
   .left-chip.is-clear{background:linear-gradient(180deg,#c8ff70,#50b020)}
@@ -224,7 +224,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     --quest-done-bg:rgba(160,230,80,.55);--quest-done-border:#1a7a18;
     --bank-bg:#102010;--bank-border:#0a1808;
   }
-  .bank-fill{background:repeating-linear-gradient(90deg,#70e030 0 10px,#ffe060 10px 20px)}
+  .bank-fill{background:repeating-linear-gradient(90deg,#70e030 0 10px,#ffe060 10px 20px);box-shadow:inset 0 3px 0 rgba(255,255,255,.55),0 0 22px rgba(160,255,80,.65);filter:saturate(1.35) brightness(1.12)}
   .craft-row{display:flex;gap:10px;align-items:stretch;flex-shrink:0}
   .craft-grid{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);gap:4px;padding:8px;background:#1a2810;border:4px solid #0a1808;border-radius:4px;box-shadow:0 5px 0 #050805}
   .craft-cell{background:#2a3820;border:2px solid #4a6030;border-radius:2px;image-rendering:pixelated}
@@ -260,7 +260,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .sec-bank .bank-count { font-size: 64px !important; }
   .sec-bank .bank-goal-title { font-size: 28px !important; }
   .sec-bank .bank-blurb { font-size: 15px !important; line-height: 1.4 !important; }
-  .sec-bank .bank-track { height: 28px !important; }
+  .sec-bank .bank-track { height: 56px !important; }
   .sec-bank .bank-meta { font-size: 15px !important; font-weight: 800 !important; }
   .sec-bank .bank-links a { font-size: 15px !important; padding: 12px 16px !important; min-height: 48px !important; }
 </style>
