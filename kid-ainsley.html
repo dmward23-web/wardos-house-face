@@ -93,7 +93,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     background:linear-gradient(180deg,#ffe080,#e0a020); color:#1a1000;
     border:3px solid #8a6010; box-shadow:0 4px 0 #6a4010;
   }
-/* Hierarchy: chores primary · schedule secondary · reward jar linked */
+/* Hierarchy: chores → reward jar → schedule → appointments → rest */
   .body {
     flex:1; min-height:0; display:grid; gap:10px;
     grid-template-columns: 1.7fr 1.1fr 0.95fr;
@@ -103,6 +103,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .body .sec-bank { grid-column: 2 / -1; grid-row: 1; }
   .body .sec-schedule { grid-column: 2; grid-row: 2; min-height:0; }
   .body .sec-more { grid-column: 3; grid-row: 2; min-height:0; }
+  .sec-more > .sec-hdr:first-child .sec-title { font-size:16px; letter-spacing:0.1em; }
   .sec-chores { gap:10px; padding:14px; }
   .sec-chores .sec-title { font-size:17px; letter-spacing:0.1em; }
   .sec-chores .quest {
@@ -397,13 +398,14 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
       <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">School / base</div></div>
       <div class="sec-list" data-mount-school></div>
     </section>
-    <section class="sec sec-more" aria-label="More">
-      <div class="sec-hdr"><div class="sec-title">FUN · off-stage</div></div>
+    <section class="sec sec-more" aria-label="Appointments then more">
+
+      <div class="sec-hdr"><div class="sec-title">Appointments</div></div>
+      <div class="sec-list" data-mount-appointments></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">FUN · off-stage</div></div>
       <div class="sec-list" data-mount-fun></div>
       <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Bonus</div></div>
       <div class="sec-list" data-mount-missions></div>
-      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Appointments</div></div>
-      <div class="sec-list" data-mount-appointments></div>
     </section>
   </div>
   <div class="setlist-foot">
