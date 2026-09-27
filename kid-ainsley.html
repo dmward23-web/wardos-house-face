@@ -93,12 +93,48 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     background:linear-gradient(180deg,#ffe080,#e0a020); color:#1a1000;
     border:3px solid #8a6010; box-shadow:0 4px 0 #6a4010;
   }
+/* Hierarchy: chores primary · schedule secondary · reward jar linked */
   .body {
     flex:1; min-height:0; display:grid; gap:10px;
-    grid-template-columns: 1.2fr 1fr 1fr 1fr;
-    grid-template-rows: 1fr auto;
+    grid-template-columns: 1.7fr 1.1fr 0.95fr;
+    grid-template-rows: auto minmax(0, 1fr);
   }
-  .body .sec-bank { grid-column: 1 / -1; }
+  .body .sec-chores { grid-column: 1; grid-row: 1 / -1; }
+  .body .sec-bank { grid-column: 2 / -1; grid-row: 1; }
+  .body .sec-schedule { grid-column: 2; grid-row: 2; min-height:0; }
+  .body .sec-more { grid-column: 3; grid-row: 2; min-height:0; }
+  .sec-chores { gap:10px; padding:14px; }
+  .sec-chores .sec-title { font-size:17px; letter-spacing:0.1em; }
+  .sec-chores .quest {
+    padding:14px 16px; min-height:72px;
+    border-width:5px;
+  }
+  .sec-chores .quest .what { font-size:18px; }
+  .sec-chores .quest .ring { width:44px; height:44px; font-size:24px; }
+  .sec-chores .quest .star-earn { font-size:16px; padding:10px 14px; min-height:44px; }
+  .sec-chores .sec-list { gap:10px; }
+  .quest.addon {
+    border-style: dashed; border-color: #6a7088;
+    background: rgba(120,130,160,0.12);
+  }
+  .quest .star-earn.addon-tag {
+    background: linear-gradient(180deg,#d8dee8,#8892a8);
+    border-color:#4a5060; color:#101418; box-shadow:0 3px 0 #2a3038;
+  }
+  .bank-links { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+  .bank-links a {
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:13px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase;
+    text-decoration:none; color:inherit;
+    padding:10px 14px; min-height:44px; border-radius:8px;
+    background:linear-gradient(180deg,#ffe080,#e0a020); color:#1a1000;
+    border:3px solid #8a6010; box-shadow:0 4px 0 #6a4010;
+  }
+  .bank-links a.ghost {
+    background:rgba(255,255,255,0.14); color:inherit;
+    border-color:rgba(255,255,255,0.35); box-shadow:0 3px 0 rgba(0,0,0,0.35);
+  }
+
   .ftr { flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:12px; font-weight:700; padding-top:2px; }
   .ftr-chip { font-size:11px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; padding:7px 12px; border-radius:8px; text-decoration:none; color:inherit; background:rgba(255,255,255,0.75); border:3px solid rgba(0,0,0,0.3); }
   .hdr { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0; padding:10px 14px; }
@@ -238,9 +274,9 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   body.theme-ainsley .card{padding:10px 12px;min-height:48px}
   body.theme-ainsley .card .what{font-size:16px}
   body.theme-ainsley .card .hint{font-size:12px;line-height:1.3}
-  body.theme-ainsley .quest{padding:10px 12px;min-height:56px}
-  body.theme-ainsley .quest .what{font-size:16px}
-  body.theme-ainsley .quest .star-earn{padding:6px 10px;min-height:36px;font-size:14px}
+  body.theme-ainsley .sec-chores .quest{padding:14px 16px;min-height:70px}
+  body.theme-ainsley .sec-chores .quest .what{font-size:17px}
+  body.theme-ainsley .sec-chores .quest .star-earn{padding:8px 12px;min-height:40px;font-size:15px}
   body.theme-ainsley .sec{gap:6px;padding:10px}
   body.theme-ainsley .sec-list{gap:6px}
   body.theme-ainsley .hot-banner .hot-title{font-size:26px}
@@ -322,30 +358,16 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     </div>
   </section>
   <div class="body">
-    <section class="sec">
-      <div class="sec-hdr"><div class="sec-title">Today · setlist</div><div class="sec-meta">Sat</div></div>
-      <div class="sec-list" data-mount-today-events></div>
-      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">YOUR TRACKS (quests)</div><div class="sec-meta" data-streak-label>streak</div></div>
+    <section class="sec sec-chores" aria-label="Chores and quests">
+      <div class="sec-hdr"><div class="sec-title">YOUR TRACKS · MUSTS (chores)</div><div class="sec-meta" data-streak-label>streak</div></div>
       <div class="sec-list" data-mount-quests></div>
-      <div class="tap-hint">TAP A TRACK · bank a star</div>
+      <div class="tap-hint">TAP A MUST · bank stars into the jar</div>
+      <div class="bank-links" style="margin-top:4px">
+        <a href="sheet-allowance.html">★ Open reward jar</a>
+        <a class="ghost" href="sheet-chores.html">Family chores</a>
+      </div>
     </section>
-    <section class="sec">
-      <div class="sec-hdr"><div class="sec-title">Sports / B-sides</div></div>
-      <div class="sec-list" data-mount-sports></div>
-      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">School / base</div></div>
-      <div class="sec-list" data-mount-school></div>
-    </section>
-    <section class="sec">
-      <div class="sec-hdr"><div class="sec-title">FUN · off-stage</div></div>
-      <div class="sec-list" data-mount-fun></div>
-      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Bonus tracks</div></div>
-      <div class="sec-list" data-mount-missions></div>
-    </section>
-    <section class="sec">
-      <div class="sec-hdr"><div class="sec-title">Appointments</div></div>
-      <div class="sec-list" data-mount-appointments></div>
-    </section>
-    <section class="sec sec-bank bank-card">
+    <section class="sec sec-bank bank-card" aria-label="Reward collection">
       <div class="bank-top">
         <div>
           <div class="bank-title">★ TOUR JAR</div>
@@ -361,7 +383,27 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
         <span class="step">🫙 jar</span><span class="arr">→</span>
         <span class="step dad">✓ Dad · payday</span>
       </div>
+            <div class="bank-links">
+        <a href="sheet-allowance.html">★ Reward jar · payday</a>
+        <a class="ghost" href="sheet-chores.html">Family chores</a>
+      </div>
       <div class="goal-unlock" data-goal-unlock hidden>★ JAR FULL · Dad inspects · allowance payday with Dad</div>
+    </section>
+    <section class="sec sec-schedule" aria-label="Schedule">
+      <div class="sec-hdr"><div class="sec-title">Schedule · setlist</div><div class="sec-meta">week</div></div>
+      <div class="sec-list" data-mount-today-events></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Sports</div></div>
+      <div class="sec-list" data-mount-sports></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">School / base</div></div>
+      <div class="sec-list" data-mount-school></div>
+    </section>
+    <section class="sec sec-more" aria-label="More">
+      <div class="sec-hdr"><div class="sec-title">FUN · off-stage</div></div>
+      <div class="sec-list" data-mount-fun></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Bonus</div></div>
+      <div class="sec-list" data-mount-missions></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Appointments</div></div>
+      <div class="sec-list" data-mount-appointments></div>
     </section>
   </div>
   <div class="setlist-foot">
@@ -371,6 +413,8 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     <div class="track-num" data-track="3">3</div>
     <div class="track-num" data-track="4">4</div>
     <div class="track-num" data-track="5">5</div>
+    <div class="track-num" data-track="6">6</div>
+    <div class="track-num" data-track="7">7</div>
     <div class="note">clear setlist = stage lights</div>
   </div>
   <footer class="ftr">
@@ -378,6 +422,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
       <span>Night show · Eras Stage</span>
       <span class="ftr-chip">AINSLEY · ERAS STAGE</span>
       <a class="ftr-chip" href="sheet-chores.html">Family chores</a>
+      <a class="ftr-chip" href="sheet-allowance.html">★ Reward jar</a>
     </div>
     <span>original stage homage · sound ON</span>
   </footer>

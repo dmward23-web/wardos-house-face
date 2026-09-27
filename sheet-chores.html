@@ -292,6 +292,14 @@
   }
   .chore.done .what { color: #144838; text-decoration: line-through; text-decoration-thickness: 2px; opacity: 0.85; }
   .chore.done .hint { color: #2a9a78; font-weight: 700; }
+  .chore.addon {
+    border-style: dashed; opacity: 0.95;
+    background: rgba(120,130,160,0.10);
+  }
+  .chore.addon .star-earn {
+    background: linear-gradient(180deg,#d8dee8,#8892a8);
+    border-color:#4a5060; color:#101418;
+  }
   .chore.done .star-earn {
     background: linear-gradient(145deg, rgba(60,210,160,0.35), rgba(255,220,100,0.4));
     border-color: rgba(40,160,120,0.35); color: #144838;
@@ -410,7 +418,7 @@
     <div class="cheer-body">
       <div class="cheer-main">
         <div class="cheer-label">Today’s vibe</div>
-        <div class="cheer-title">Tap musts · <span class="hl">★ into the jar</span> · Dad inspects · payday with Dad</div>
+        <div class="cheer-title">Tap musts · <span class="hl">★ into the jar</span> · Dad inspects · <a href="sheet-allowance.html" style="color:inherit">payday with Dad</a></div>
         <div class="cheer-sub">Sun Sep 27 · Dad week @ 147th · musts fill the jar · no money on House</div>
       </div>
       <div class="cheer-badges">
@@ -452,11 +460,19 @@
           </div>
           <span class="star-earn">★ 1</span>
         </div>
-        <div class="chore open ainsley" data-check="ain-table">
+        <div class="chore open ainsley" data-check="ain-dishwasher">
           <span class="ring"></span>
           <div class="txt">
-            <div class="what">Kitchen help OR table</div>
-            <div class="hint">daily must · set / clear / help</div>
+            <div class="what">Dishwasher load/unload</div>
+            <div class="hint">daily must · stage crew</div>
+          </div>
+          <span class="star-earn">★ 1</span>
+        </div>
+        <div class="chore open ainsley" data-check="ain-living">
+          <span class="ring"></span>
+          <div class="txt">
+            <div class="what">Living room · shoes & coats</div>
+            <div class="hint">daily must · straighten pass</div>
           </div>
           <span class="star-earn">★ 1</span>
         </div>
@@ -476,8 +492,16 @@
           </div>
           <span class="star-earn">★ 4</span>
         </div>
+        <div class="chore open ainsley addon" data-check="ain-babysit" data-optional="1">
+          <span class="ring">＋</span>
+          <div class="txt">
+            <div class="what">Babysitting — optional add-on</div>
+            <div class="hint">when Dad books you · not required for jar</div>
+          </div>
+          <span class="star-earn">ADD-ON</span>
+        </div>
       </div>
-      <div class="tap-hint"><span class="ring">✓</span> Big tap · pink streak</div>
+      <div class="tap-hint"><span class="ring">✓</span> Musts → jar → payday · <a href="sheet-allowance.html" style="color:inherit;font-weight:800">★ Reward jar</a></div>
     </section>
 
     <!-- Hayes -->
@@ -603,6 +627,8 @@
     <div class="ftr-left">
       <span>kids-safe · LIVE · as-of Sun Sep 27 2026</span>
       <span class="ftr-chip">CHORES · STARS ONLY</span>
+      <a class="ftr-chip" href="sheet-allowance.html" style="text-decoration:none;color:inherit">★ Reward jar</a>
+      <a class="ftr-chip" href="sheet-index.html" style="text-decoration:none;color:inherit">Sheets home</a>
     </div>
     <span class="ftr-meta">House face · white/grey glass camo · no money · no PIN</span>
   </footer>
