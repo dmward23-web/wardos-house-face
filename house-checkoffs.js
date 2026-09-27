@@ -1,4 +1,6 @@
-/* House face · client-side checkoffs · localStorage · kids-safe · syncs chores-v2 + bank */
+/* House face · client-side checkoffs · localStorage · kids-safe
+   Daily musts: house-checkoffs:{kid}:{YYYY-MM-DD} (America/Chicago via HouseClock) — resets each morning.
+   Weekly musts: house-checkoffs:{kid}:week:{SunISO}. Stars bank toward the WEEK jar. */
 (function () {
   "use strict";
 
@@ -19,7 +21,30 @@
   }
 
   function keyFor(el) {
-    return usesShared(el) ? SHARED_KEY : PAGE_KEY;
+    if (!usesShared(el)) return PAGE_KEY;
+    var id = el.getAttribute("data-check") || "";
+    if (window.WardKids && typeof window.WardKids.checkKeyFor === "function") {
+      return window.WardKids.checkKeyFor(id, window.WardKids._data);
+    }
+    /* Fallback: kid+YYYY-MM-DD America/Chicago via HouseClock */
+    var iso = (window.HouseClock && HouseClock.iso) ? HouseClock.iso() : "";
+    if (!iso) {
+      try {
+        iso = new Intl.DateTimeFormat("en-CA", {
+          timeZone: "America/Chicago",
+          year: "numeric", month: "2-digit", day: "2-digit"
+        }).format(new Date());
+      } catch (e) {
+        var d = new Date();
+        iso = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      }
+    }
+    var kid = (window.WardKids && window.WardKids.KID_FROM_CHECK && window.WardKids.KID_FROM_CHECK[id]) || "kid";
+    var cadence = el.getAttribute("data-cadence") || "daily";
+    if (cadence === "weekly" && window.WardKids && typeof window.WardKids.weekStartIso === "function") {
+      return "house-checkoffs:" + kid + ":week:" + window.WardKids.weekStartIso(iso);
+    }
+    return "house-checkoffs:" + kid + ":" + iso;
   }
 
   function loadKey(key) {
@@ -161,8 +186,12 @@
   }
 
   function progressStats() {
+    /* Top progress bars = TODAY daily musts only (week jar uses bank fill) */
     var nodes = checkNodes().filter(function (el) {
-      return el.getAttribute("data-optional") !== "1" && !el.classList.contains("addon");
+      if (el.getAttribute("data-optional") === "1" || el.classList.contains("addon")) return false;
+      var cad = el.getAttribute("data-cadence") || "daily";
+      if (cad === "weekly" || cad === "addon") return false;
+      return true;
     });
     var total = nodes.length;
     var done = 0;

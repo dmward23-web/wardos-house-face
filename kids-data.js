@@ -19,8 +19,9 @@
     }
   })();
 
-  var CHECK_KEY = "house-checkoffs:chores-v2";
+  var CHECK_KEY = "house-checkoffs:chores-v2"; /* legacy flat key — migrate-read only */
   var BANK_KEY = "house-bank:v1";
+  var CHECK_PREFIX = "house-checkoffs:";
 
   var KID_FROM_CHECK = {
     "ain-bed": "ainsley", "ain-toys": "ainsley",
@@ -31,6 +32,67 @@
     "har-bed": "harris", "har-backpack": "harris", "har-dishes": "harris", "har-empty": "harris", "har-trash": "harris",
     "har-postgame": "harris", "har-shower": "harris", "har-toys": "harris", "har-shoes": "harris", "har-cubby": "harris"
   };
+
+  function pad2(n) { return String(n).padStart(2, "0"); }
+
+  function weekStartIso(dayIso) {
+    var iso = dayIso || DAY_ISO;
+    var parts = String(iso).split("-");
+    if (parts.length !== 3) return iso;
+    /* Noon CT anchor — box TZ is America/Chicago */
+    var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
+    d.setDate(d.getDate() - d.getDay()); /* Sunday start */
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+  }
+
+  function questMeta(kidId, checkId, data) {
+    var kid = data && data.kids && data.kids[kidId];
+    if (!kid || !kid.quests) return { cadence: "daily", stars: 1, optional: false };
+    for (var i = 0; i < kid.quests.length; i++) {
+      if (kid.quests[i].id === checkId) {
+        var q = kid.quests[i];
+        var optional = !!(q.optional || q.cadence === "addon");
+        var cadence = q.cadence || (optional ? "addon" : "daily");
+        var stars = optional ? 0 : (typeof q.stars === "number" ? q.stars : 1);
+        return { cadence: cadence, stars: stars, optional: optional };
+      }
+    }
+    return { cadence: "daily", stars: 1, optional: false };
+  }
+
+  var WEEKLY_IDS = {
+    "ain-bath": 1, "ain-laundry": 1, "ain-cubby": 1,
+    "hay-room": 1, "hay-cubby": 1,
+    "har-toys": 1, "har-shoes": 1, "har-cubby": 1
+  };
+
+  function checkKeyFor(checkId, data) {
+    var kidId = KID_FROM_CHECK[checkId];
+    if (!kidId) return CHECK_KEY;
+    var meta = questMeta(kidId, checkId, data || (global.WardKids && global.WardKids._data));
+    var weekly = meta.cadence === "weekly" || !!WEEKLY_IDS[checkId];
+    if (weekly) {
+      return CHECK_PREFIX + kidId + ":week:" + weekStartIso(DAY_ISO);
+    }
+    /* daily musts + soft/addon — reset each Chicago morning */
+    return CHECK_PREFIX + kidId + ":" + DAY_ISO;
+  }
+
+  function weekStarsFor(kidId) {
+    var root = loadBankRoot();
+    var bag = root[kidId];
+    if (!bag || !bag.days) return 0;
+    var start = weekStartIso(DAY_ISO);
+    var parts = start.split("-");
+    var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
+    var sum = 0;
+    for (var i = 0; i < 7; i++) {
+      var iso = d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+      if (bag.days[iso] && bag.days[iso].stars) sum += bag.days[iso].stars;
+      d.setDate(d.getDate() + 1);
+    }
+    return sum;
+  }
 
   /* Embedded fallback — same payload as kids-week.json (fetch preferred on Pages) */
   var EMBEDDED = {"asOf":"Sun Sep 27 2026","asOfIso":"2026-09-27","custody":{"with":"Dad","place":"147th","through":"Fri Oct 2 · 3:00","throughLabel":"with Dad @ 147th through Fri Oct 2 3:00"},"leaveBys":{"SRE_drop":"leave 8:10 for 8:25","SRE_pickup":"leave 3:15 for 3:40","note":"sports: event START = leave-by"},"kids":{"harris":{"id":"harris","name":"Harris","you":"you","theme":"block-world","themeLabel":"Block World","gradeVoice":"1st grade","avatar":"H","currency":{"unit":"gem","plural":"gems","symbol":"◆","label":"Gems"},"bankGoal":{"id":"gem-jar","title":"Gem Jar · earn then save","blurb":"Clear musts to earn up to $10/week with Dad (1★=$1). Miss musts = short or no full payday. Gem Jar $8 = save what you earned — not free money.","need":8,"reward":"Payday with Dad after honest musts","dollarNeed":8,"weeklyAllowance":10,"starDollar":1},"hottest":{"when":"SUN · base day @ 147th","what":"YOUR BASE WITH DAD","where":"Garage-sale crew morning · then play · through Fri Oct 2 3:00","badges":["DAD WEEK","147th"]},"today":[{"kind":"event","when":"Morning · 9–2","what":"🏠 House shake / garage-sale crew @ 147th","hint":"Help Dad · then free play","tone":"act"},{"kind":"event","when":"Anytime today","what":"🧱 Block time if musts clear","hint":"gems → jar → payday","tone":"fun"},{"kind":"note","when":"All day","what":"🏡 YOUR BASE with Dad","hint":"through Fri Oct 2 3:00","tone":"hot"}],"quests":[{"id":"har-bed","what":"🛏️ Make bed — pre-game ritual (block rebuild)","stars":1,"cadence":"daily"},{"id":"har-backpack","what":"🎒 Pack backpack (loot ready) — daily must","stars":1,"cadence":"daily"},{"id":"har-dishes","what":"🍽️ Clean up after you · rinse · in dishwasher — daily must","stars":1,"cadence":"daily"},{"id":"har-empty","what":"🍽️ Empty dishwasher — daily must","stars":1,"cadence":"daily"},{"id":"har-trash","what":"🗑️ Trash out (clear the cave) — daily must","stars":1,"cadence":"daily"},{"id":"har-postgame","what":"⚡ Post-game · gear rinsed · bag set","stars":1,"cadence":"daily"},{"id":"har-shower","what":"🚿 Shower · brush · ready for bed","stars":1,"cadence":"daily"},{"id":"har-toys","what":"🧸 Toys reset — weekly must","stars":2,"cadence":"weekly"},{"id":"har-shoes","what":"👟 Shoes · closet / garage cubby / room — weekly must","stars":1,"cadence":"weekly"},{"id":"har-cubby","what":"🎒 Backpack + sports bag in garage cubby — weekly must","stars":1,"cadence":"weekly"}],"sports":[{"when":"Wed 30 · leave ~4:55 · practice","what":"⚡ FLAG practice · Timber Sage grass","hint":"YOUR practice · with Dad","tone":"hot"}],"school":[{"when":"Mon 28 · leave ~8:10","what":"🏫 SRE drop — you're on the crew","tone":"act"},{"when":"Mon 28 · 3:15 / 3:40","what":"🚌 Boys pickup · squad ride","tone":"act"},{"when":"Wed 30 · school day","what":"👂 Hearing / vision screen at SRE","hint":"awareness · normal school","tone":"act"},{"when":"Thu 1 · PE day","what":"👟 Tennis shoes for PE","tone":"act"},{"when":"Fri 2 · leave ~8:10","what":"🏫 SRE drop · then Mom week after 3:00","hint":"Dad handoff Fri 3:00","tone":"act"},{"when":"All week","what":"🏡 YOUR BASE @ 147th with Dad","hint":"through Fri Oct 2 3:00","tone":"hot"}],"fun":[{"when":"Quest reward","what":"🧱 BLOCK BUILD TIME","hint":"gems → jar → payday · craft optional","tone":"fun"},{"when":"Outside","what":"🌳 Backyard boss fight (play)","hint":"ask Dad · run wild","tone":"fun"},{"when":"Tonight","what":"🍪 Snack chest raid","hint":"after quests · with Dad","tone":"fun"},{"when":"Base mission","what":"💎 Gem Jar · save with Dad","hint":"FUN · craft unlock optional","tone":"fun"}],"appointments":[],"appointmentsEmpty":"No doctor stuff on your board — lucky!!! More play time.","streakLabel":"🔥 3-day craft streak — keep smashing","missions":[{"when":"Anytime","what":"🔥 Musts clear = gems in the jar","hint":"earn path · skip = less payday","tone":"fun"},{"when":"Weekly","what":"🧸 Toys + 👟 shoes + 🎒 garage cubby","hint":"musts · ask Dad to inspect","tone":"fun"}]},"hayes":{"id":"hayes","name":"Hayes","you":"you","theme":"drop-zone","themeLabel":"Drop Zone","gradeVoice":"3rd grade","avatar":"H","currency":{"unit":"coin","plural":"coins","symbol":"◎","label":"Victory Coins"},"bankGoal":{"id":"victory-jar","title":"Victory Jar · earn then save","blurb":"Clear musts to earn up to $10/week with Dad (1★=$1). Miss musts = short or no full payday. Victory Jar $12 = save what you earned — not free money.","need":12,"reward":"Payday with Dad after honest musts","dollarNeed":12,"weeklyAllowance":10,"starDollar":1},"hottest":{"when":"MON · leave ~5:40 · BASEBALL 6:15","what":"NEXT DROP · BV REC FIELD 3","where":"Sunday house day · then Mon baseball practice","badges":["LOCKED IN","BASEBALL"]},"today":[{"kind":"event","when":"Morning · 9–2","what":"🏠 House shake / garage-sale loadout @ 147th","hint":"Help the crew · then free time","tone":"act"},{"kind":"event","when":"Anytime today","what":"⚡ Soft warm-up · yard run OK","hint":"ask Dad · Mon baseball next","tone":"fun"},{"kind":"note","when":"All day","what":"🏡 DROP ZONE HQ with Dad","hint":"through Fri Oct 2 3:00","tone":"hot"}],"quests":[{"id":"hay-bed","what":"🛏️ Make bed — pre-game ritual (daily must)","stars":1,"cadence":"daily"},{"id":"hay-backpack","what":"🎒 Backpack — loadout ready (daily must)","stars":1,"cadence":"daily"},{"id":"hay-dishes","what":"🍽️ Clean up after you · rinse · in dishwasher — daily must","stars":1,"cadence":"daily"},{"id":"hay-empty","what":"🍽️ Empty dishwasher — daily must","stars":1,"cadence":"daily"},{"id":"hay-trash","what":"🗑️ Trash out — zone clear (daily must)","stars":1,"cadence":"daily"},{"id":"hay-postgame","what":"⚡ Post-game · gear rinsed · bag set","stars":1,"cadence":"daily"},{"id":"hay-shower","what":"🚿 Shower · brush · ready for bed","stars":1,"cadence":"daily"},{"id":"hay-room","what":"🧹 Room reset — weekly must","stars":2,"cadence":"weekly"},{"id":"hay-cubby","what":"🎒 Backpack + sports bag in garage cubby — weekly must","stars":1,"cadence":"weekly"}],"sports":[{"when":"Mon 28 · leave ~5:40 · practice 6:15","what":"⚾ BASEBALL practice · BV Rec Field 3","hint":"YOUR next challenge","tone":"hot"},{"when":"Tue 29 · leave 5:40 · 6:00","what":"🏁 FLAG practice · SRE / library fields","hint":"friend drop ~4:30 lock pending","tone":"sport"},{"when":"Thu 1 · leave ~4:55 · game 5:30","what":"⚾ BASEBALL · Falcons vs Lions · Field 24","hint":"HOME game","tone":"hot"}],"school":[{"when":"Mon · 7:30","what":"🍎 Snacks in the bag","hint":"late-lunch · Madi OK","tone":"act"},{"when":"Mon · SRE drop","what":"🏫 School drop with the boys","tone":"act"},{"when":"Tue · 8:50","what":"🤝 Madi + provider collab at SRE","hint":"in person","tone":"act"},{"when":"Wed · school day","what":"👂 Hearing / vision screen at SRE","tone":"act"},{"when":"Thu · PE day","what":"👟 Tennis shoes for PE","tone":"act"},{"when":"Fri · field trip","what":"🚌 Museum + Meadowbrook (school day)","hint":"sack lunch · trip shirt · tennis shoes","tone":"act"},{"when":"All week","what":"🏡 DROP ZONE HQ @ 147th","hint":"Dad week through Fri Oct 2","tone":"hot"}],"fun":[{"when":"After clears","what":"👑 Victory round — game pick with Dad","hint":"coins → jar → payday","tone":"fun"},{"when":"Outside","what":"⚡ Sports grind / run the yard","hint":"ask Dad","tone":"fun"},{"when":"Base mission","what":"☂️ Victory Jar · save with Dad","hint":"FUN · umbrella treat optional","tone":"fun"},{"when":"Squad","what":"🤝 Duo queue with Harris / crew","hint":"FUN","tone":"fun"}],"appointments":[],"appointmentsEmpty":"No appointments. Clear skies. GO PLAY.","streakLabel":"🔥 6-day fire streak — don't break it","missions":[{"when":"Every clear","what":"💥 Must done = coin banked in the jar","hint":"earn path · skip = less payday","tone":"fun"},{"when":"Weekly","what":"🧹 Room + 🎒 garage cubby = bonus coins","hint":"musts · ask Dad to inspect","tone":"fun"}]},"ainsley":{"id":"ainsley","name":"Ainsley","you":"you","theme":"quiet-folk","themeLabel":"Quiet Folk","gradeVoice":"8th grade","avatar":"A","currency":{"unit":"star","plural":"stars","symbol":"★","label":"Tour Stars"},"bankGoal":{"id":"tour-jar","title":"Tour Jar · earn then save","blurb":"Clear musts to earn up to $20/week with Dad (1★=$1). Miss musts = short or no full payday. Jar $20 = save what you earned — not free money. Babysit $15/hr = hire add-on, not jar.","need":20,"reward":"Payday with Dad after honest musts","dollarNeed":20,"starDollar":1,"weeklyAllowance":20},"hottest":{"when":"SUN · vanity 3:00 · Jessy","what":"ON THE BOARD","where":"Vanity 3:00 · with Dad @ 147th","badges":["SUNDAY","3:00"]},"today":[{"kind":"event","when":"Morning · 9–2","what":"Garage sale / house shake with crew","hint":"Help the crew","tone":"act"},{"kind":"event","when":"3:00 LOCKED","what":"Vanity install · Jessy","hint":"your board","tone":"hot"},{"kind":"event","when":"After vanity","what":"Playlist + chill with Dad","hint":"your pick","tone":"fun"}],"quests":[{"id":"ain-bed","what":"Make bed — morning reset","stars":1,"cadence":"daily"},{"id":"ain-toys","what":"Room reset — clean pass","stars":1,"cadence":"daily"},{"id":"ain-dishwasher","what":"Clean up after you · rinse · in dishwasher","stars":1,"cadence":"daily"},{"id":"ain-empty","what":"Empty dishwasher","stars":1,"cadence":"daily"},{"id":"ain-living","what":"Shoes & coats · closet / cubby / room","stars":1,"cadence":"daily"},{"id":"ain-bath","what":"Bathroom wipe — weekly","stars":3,"cadence":"weekly"},{"id":"ain-laundry","what":"Laundry full cycle — her clothes","stars":5,"cadence":"weekly"},{"id":"ain-cubby","what":"🎒 Backpack + sports bag in garage cubby","stars":1,"cadence":"weekly"},{"id":"ain-babysit","what":"👶 Babysitting — optional hire (Dad books you)","stars":0,"cadence":"addon","optional":true,"hire":true,"hint":"not for jar · Dad handout","rateLabel":"$15/hr"}],"sports":[{"when":"Tue 29 · leave 4:25 · practice 5:00","what":"SWIM · Coach Ann · Genesis Ridgeview","hint":"YOUR set","tone":"hot"},{"when":"Thu 1 · leave 4:25 · practice 5:00","what":"SWIM · Coach Ann · Genesis Ridgeview","hint":"second set this week","tone":"sport"}],"sportsEmpty":"","school":[{"when":"Sun 27 · 9–2","what":"Garage sale / house shake with crew","tone":"act"},{"when":"Mon 28 · 3:00","what":"LKMS Homework Help","tone":"act"},{"when":"Tue 29 · school day","what":"Hearing / vision screen (volunteers)","hint":"at LKMS","tone":"act"},{"when":"Thu 1 · 3:00","what":"LKMS Homework Help","tone":"act"},{"when":"Fri 2 · due","what":"Yearbook baby photo due (email)","hint":"ask Dad if needed","tone":"act"},{"when":"All week","what":"Base @ 147th","hint":"Dad week through Fri Oct 2","tone":"hot"}],"appointments":[{"when":"Sun 27 · 3:00","what":"Vanity · Jessy","hint":"on your board","tone":"hot","herSpace":true},{"when":"Wed 30 · leave 12:40 · 1:00","what":"appointment · Lindsay","hint":"with Dad","tone":"act"}],"appointmentsEmpty":"","streakLabel":"◆ 4-day streak — hold the line","missions":[{"when":"Weekly","what":"Bath wipe + laundry + garage cubby = big star dump","hint":"musts · ask Dad to inspect","tone":"fun"},{"when":"Add-on","what":"Babysitting — optional · Dad books you","hint":"hire add-on · not for jar","tone":"fun"}],"goal":{"name":"Stick Season · concert save","need":40,"placeholder":"Set a goal with Dad"},"bag":{"place":"Dad","label":"This week @ Dad · bag","hint":"147th through Fri Oct 2 · pack for Dad week"},"rides":[{"id":"scooter","what":"🛴 Scooter run","when":"your call","clear":true},{"id":"bv-rec","what":"🏟️ BV Rec","when":"when you're free","clear":true},{"id":"swim","what":"🏊 Ridgeview swim","when":"Tue/Thu · leave 4:25","clear":true,"hours":"leave 4:25 · 5:00"}],"fun":[]},"dan":{"id":"dan","name":"Dad","theme":"house-dad","themeLabel":"Dad Box","avatar":"D","hottest":{"when":"Sun Sep 27 · kids with you @ 147th","what":"Dad week live","where":"through Fri Oct 2 · 3:00 handoff window","badges":["Dad week","147th"]},"today":[{"when":"Sun · 9–2","what":"Garage sale / whole-house shake @ 147th","tone":"act"},{"when":"Sun · 3:00","what":"Ainsley vanity · Jessy","tone":"hot"},{"when":"Custody","what":"Kids with Dad @ 147th through Fri Oct 2 3:00","tone":"hot"}],"week":[{"when":"Mon 28 · 7:30","what":"Hayes snacks in bag (late-lunch)","tone":"act"},{"when":"Mon 28 · 8:10 / 8:25","what":"SRE drop · Hayes + Harris","tone":"act"},{"when":"Mon 28 · 3:00","what":"Ainsley LKMS HW Help","tone":"act"},{"when":"Mon 28 · 3:15 / 3:40","what":"Boys pickup","tone":"act"},{"when":"Mon 28 · ~5:40 / 6:15","what":"Hayes baseball practice · BV Rec Field 3","tone":"sport"},{"when":"Tue 29 · 8:50","what":"Hayes · Madi + provider collab @ SRE","tone":"act"},{"when":"Tue 29 · leave 4:25 / 5:00","what":"Ainsley swim · Genesis Ridgeview","tone":"sport"},{"when":"Tue 29 · leave 5:40 / 6:00","what":"Hayes flag practice · SRE fields (friend drop ~4:30)","tone":"sport"},{"when":"Wed 30 · 12:40 / 1:00","what":"Ainsley appointment · Lindsay","tone":"act"},{"when":"Wed 30 · ~4:55","what":"Harris flag practice · Timber Sage","tone":"sport"},{"when":"Thu 1 · PE","what":"Boys tennis shoes · SRE PE","tone":"act"},{"when":"Thu 1 · 3:00 / 3:15","what":"Ainsley HW Help · boys pickup","tone":"act"},{"when":"Thu 1 · leave 4:25 / 5:00","what":"Ainsley swim · Genesis","tone":"sport"},{"when":"Thu 1 · leave ~4:55 / 5:30","what":"Hayes baseball game · Falcons vs Lions · Field 24","tone":"sport"},{"when":"Fri 2 · 8:10 drop then 3:00","what":"SRE drop · handoff @ 3:00 · Mom week","tone":"hot"},{"when":"through Fri Oct 2 3:00","what":"Kids with Dad @ 147th","tone":"hot"}],"leaveBys":[{"when":"Weekday school","what":"SRE drop leave 8:10 for 8:25","tone":"act"},{"when":"Weekday pickup","what":"Leave 3:15 for 3:40 boys","tone":"act"},{"when":"Sports rule","what":"Event START = your leave-by","tone":"act"}],"picks":[{"when":"Tonight","what":"Dinner vote with crew","hint":"House · kids-safe","tone":"fun"},{"when":"This week","what":"Sports stack · Mon ball · Tue flag/swim · Wed Harris flag · Thu game/swim","hint":"Dad drives","tone":"fun"}],"note":"Kids-safe Dad box · no money · no Desk · calendar facts from dmward23 / Atlas only"}},"boardStrip":{"label":"Next up · today","time":"3:00","place":"Ainsley vanity · Jessy","detailHtml":"Garage sale <strong>9–2</strong> @ 147th · then vanity · kids with Dad @ <strong>147th</strong> through Fri Oct 2 3:00","badge":"Sun"}};
@@ -75,6 +137,15 @@
     tryNext();
   }
 
+  function loadKeyState(key) {
+    try { return JSON.parse(localStorage.getItem(key) || "{}") || {}; }
+    catch (e) { return {}; }
+  }
+  function saveKeyState(key, state) {
+    try { localStorage.setItem(key, JSON.stringify(state)); } catch (e) { /* */ }
+  }
+
+  /* Legacy flat blob — only for one-shot migrate into day keys */
   function loadChecks() {
     try { return JSON.parse(localStorage.getItem(CHECK_KEY) || "{}") || {}; }
     catch (e) { return {}; }
@@ -99,16 +170,7 @@
   }
 
   function questStarsFor(kidId, checkId, data) {
-    var kid = data && data.kids && data.kids[kidId];
-    if (!kid || !kid.quests) return 1;
-    for (var i = 0; i < kid.quests.length; i++) {
-      if (kid.quests[i].id === checkId) {
-        var q = kid.quests[i];
-        if (q.optional || q.cadence === "addon") return 0;
-        return typeof q.stars === "number" ? q.stars : 1;
-      }
-    }
-    return 1;
+    return questMeta(kidId, checkId, data).stars;
   }
 
   function applyCheckToBank(checkId, done, data) {
@@ -142,31 +204,42 @@
     var goal = kid.bankGoal || { need: 8, title: "Goal", blurb: "", reward: "" };
     var cur = kid.currency || { plural: "stars", symbol: "★", label: "Stars" };
     var today = pack.day.stars || 0;
+    /* Week star tally → jar / weekly allowance goal (existing need $ amounts) */
+    var week = weekStarsFor(kidId);
     var life = pack.bag.lifetime || 0;
-    // goal meter uses lifetime toward need (tangible jar), capped display
-    var toward = Math.min(life, goal.need);
+    var toward = Math.min(week, goal.need);
     var pct = goal.need ? Math.round((toward / goal.need) * 100) : 0;
     return {
       kidId: kidId,
       today: today,
+      week: week,
       lifetime: life,
       need: goal.need,
       toward: toward,
       pct: Math.min(100, pct),
-      reached: life >= goal.need,
+      reached: week >= goal.need,
       goalTitle: goal.title,
       goalBlurb: goal.blurb,
       reward: goal.reward,
       currency: cur,
       dayIso: DAY_ISO,
+      weekStart: weekStartIso(DAY_ISO),
       earned: Object.assign({}, pack.day.earned)
     };
   }
 
   function setCheck(checkId, done, data) {
-    var state = loadChecks();
+    var key = checkKeyFor(checkId, data);
+    var state = loadKeyState(key);
     state[checkId] = !!done;
-    saveChecks(state);
+    saveKeyState(key, state);
+    /* keep legacy blob in sync for old readers */
+    try {
+      var legacy = loadChecks();
+      if (!!done) legacy[checkId] = true;
+      else delete legacy[checkId];
+      saveChecks(legacy);
+    } catch (eL) { /* */ }
     var kidId = KID_FROM_CHECK[checkId];
     var before = kidId ? getBankView(kidId, data) : null;
     var was = before ? before.reached : false;
@@ -180,14 +253,23 @@
     return bank;
   }
 
-  function getCheck(checkId) {
-    var state = loadChecks();
-    return !!state[checkId];
+  function getCheck(checkId, data) {
+    var key = checkKeyFor(checkId, data);
+    var state = loadKeyState(key);
+    if (Object.prototype.hasOwnProperty.call(state, checkId)) return !!state[checkId];
+    /* one-shot migrate from legacy flat key into day/week key */
+    var legacy = loadChecks();
+    if (Object.prototype.hasOwnProperty.call(legacy, checkId)) {
+      state[checkId] = !!legacy[checkId];
+      saveKeyState(key, state);
+      return !!state[checkId];
+    }
+    return false;
   }
 
   function syncBankFromChecks(data) {
     Object.keys(KID_FROM_CHECK).forEach(function (id) {
-      applyCheckToBank(id, getCheck(id), data);
+      applyCheckToBank(id, getCheck(id, data), data);
     });
   }
 
@@ -209,7 +291,8 @@
 
   function questHTML(q, done, kidId) {
     var optional = !!(q.optional || q.cadence === "addon");
-    var stars = typeof q.stars === "number" ? q.stars : 1;
+    var cadence = q.cadence || (optional ? "addon" : "daily");
+    var stars = optional ? 0 : (typeof q.stars === "number" ? q.stars : 1);
     var open = done ? "done" : "open";
     var ring = done ? "✓" : (optional ? "+" : "·");
     var hint;
@@ -223,8 +306,10 @@
           ? (q.hire ? "hire logged · booked" : "logged")
           : (q.hire ? "hire path · Dad books you · never fills jar" : "add-on · never fills jar");
       }
+    } else if (cadence === "weekly") {
+      hint = done ? "weekly clear · banked" : "weekly must · tap once · ★ " + stars;
     } else {
-      hint = done ? "cleared · banked" : "tap when clear · ★ " + stars;
+      hint = done ? "cleared · banked today" : "daily must · tap today · ★ " + stars;
     }
     var earn;
     if (optional) {
@@ -234,11 +319,14 @@
         earn = '<span class="star-earn addon-tag">' + (done ? "OPTIONAL ✓" : "OPTIONAL") + "</span>";
       }
     } else {
-      earn = '<span class="star-earn">' + (done ? "★ +" + stars : "★ " + stars) + "</span>";
+      /* ★ only on musts — soft/addon never earn jar stars */
+      earn = '<span class="star-earn" data-stars="' + stars + '">' + (done ? "★ +" + stars : "★ " + stars) + "</span>";
     }
     var optAttr = optional ? ' data-optional="1"' : "";
+    var cadAttr = ' data-cadence="' + esc(cadence) + '"';
+    var softClass = optional ? " addon soft" : "";
     return (
-      '<div class="quest ' + open + (optional ? " addon" : "") + '" data-check="' + esc(q.id) + '" data-kid-quest="1"' + optAttr + ' role="button" tabindex="0">' +
+      '<div class="quest ' + open + softClass + '" data-check="' + esc(q.id) + '" data-kid-quest="1"' + optAttr + cadAttr + ' role="button" tabindex="0">' +
       '<span class="ring">' + ring + "</span>" +
       "<div><div class=\"what\">" + esc(q.what) + '</div><div class="hint">' + esc(hint) + "</div></div>" +
       earn +
@@ -257,9 +345,8 @@
 
   function renderQuests(el, quests, data, kidId) {
     if (!el) return;
-    var state = loadChecks();
     el.innerHTML = (quests || []).map(function (q) {
-      return questHTML(q, !!state[q.id], kidId);
+      return questHTML(q, getCheck(q.id, data), kidId);
     }).join("");
   }
 
@@ -285,6 +372,17 @@
   function resetJarCycle(kidId) {
     var pack = kidDayBank(kidId);
     pack.bag.lifetime = 0;
+    /* Clear this week's day star buckets so jar/week bar resets */
+    var start = weekStartIso(DAY_ISO);
+    var parts = start.split("-");
+    var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
+    for (var i = 0; i < 7; i++) {
+      var iso = d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+      if (pack.root[kidId] && pack.root[kidId].days) {
+        pack.root[kidId].days[iso] = { stars: 0, earned: {} };
+      }
+      d.setDate(d.getDate() + 1);
+    }
     saveBankRoot(pack.root);
     var stamp = "Paid · jar reset";
     try {
@@ -361,7 +459,11 @@
       el.textContent = String(bank.today);
     });
     root.querySelectorAll("[data-bank-life]").forEach(function (el) {
-      el.textContent = String(bank.lifetime);
+      /* Week star tally drives the jar number */
+      el.textContent = String(bank.week != null ? bank.week : bank.lifetime);
+    });
+    root.querySelectorAll("[data-bank-week]").forEach(function (el) {
+      el.textContent = String(bank.week != null ? bank.week : bank.toward);
     });
     root.querySelectorAll("[data-bank-need]").forEach(function (el) {
       el.textContent = String(bank.need);
@@ -394,9 +496,9 @@
     var dollar = true; // House override 2026-09-27 · show $ deal on kid glass
     root.querySelectorAll("[data-bank-meta]").forEach(function (el) {
       if (dollar) {
-        el.textContent = "$" + bank.toward + " / $" + bank.need + " · " + bank.toward + "/" + bank.need + " ★";
+        el.textContent = "week $" + bank.toward + " / $" + bank.need + " · " + bank.toward + "/" + bank.need + " ★";
       } else {
-        el.textContent = bank.toward + " / " + bank.need + " ★";
+        el.textContent = "week " + bank.toward + " / " + bank.need + " ★";
       }
     });
     var left = Math.max(0, bank.need - bank.toward);
@@ -594,8 +696,13 @@
     CHECK_KEY: CHECK_KEY,
     BANK_KEY: BANK_KEY,
     KID_FROM_CHECK: KID_FROM_CHECK,
+    checkKeyFor: checkKeyFor,
+    weekStartIso: weekStartIso,
+    weekStarsFor: weekStarsFor,
     loadChecks: loadChecks,
     saveChecks: saveChecks,
+    loadKeyState: loadKeyState,
+    saveKeyState: saveKeyState,
     getCheck: getCheck,
     setCheck: setCheck,
     getBankView: getBankView,
