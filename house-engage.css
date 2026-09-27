@@ -187,13 +187,13 @@ body.house-clear-flash .panel {
 .vfx-bit.vfx-hayes:nth-child(2n) { background: #c060ff; box-shadow: 0 0 8px #c060ff; }
 .vfx-bit.vfx-hayes:nth-child(3n) { background: #ffe060; }
 .vfx-bit.vfx-ainsley {
-  background: #e8b0ff;
-  border-radius: 50%;
-  box-shadow: 0 0 10px #ffd0ff;
-  width: 8px; height: 8px;
+  background: #a898d8;
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(140,120,220,0.7);
+  width: 6px; height: 6px;
 }
-.vfx-bit.vfx-ainsley:nth-child(2n) { background: #ffe080; }
-.vfx-bit.vfx-ainsley:nth-child(3n) { background: #fff; width: 5px; height: 5px; }
+.vfx-bit.vfx-ainsley:nth-child(2n) { background: #c8b060; }
+.vfx-bit.vfx-ainsley:nth-child(3n) { background: #c8d0e0; width: 4px; height: 4px; }
 .vfx-bit.vfx-rain {
   animation-name: vfx-rain;
 }
@@ -217,7 +217,7 @@ body.house-clear-flash .panel {
   background: radial-gradient(ellipse 50% 40% at 50% 45%, rgba(100,220,255,0.45), rgba(160,60,255,0.2), transparent 70%);
 }
 .vfx-mega.vfx-ainsley {
-  background: radial-gradient(ellipse 50% 40% at 50% 45%, rgba(255,200,255,0.5), rgba(255,220,120,0.25), transparent 70%);
+  background: radial-gradient(ellipse 50% 40% at 50% 45%, rgba(160,140,220,0.4), rgba(200,176,96,0.18), transparent 70%);
 }
 @keyframes vfx-mega-flash {
   0% { opacity: 1; }
@@ -272,7 +272,7 @@ body.sfx-muted .mute-btn { opacity: 0.7; }
 }
 .vfx-float.vfx-harris { color: #b8ff60; }
 .vfx-float.vfx-hayes { color: #7dffc8; }
-.vfx-float.vfx-ainsley { color: #ffe080; }
+.vfx-float.vfx-ainsley { color: #c8b060; }
 @keyframes vfx-float-up {
   0% { opacity: 0; transform: translate(-50%, 10px) scale(0.6); }
   20% { opacity: 1; transform: translate(-50%, -10px) scale(1.15); }
@@ -297,8 +297,8 @@ body.sfx-muted .mute-btn { opacity: 0.7; }
 .vfx-goal-banner.vfx-harris .g-title { color: #b8ff60; text-shadow: 0 4px 0 #1a4010, 0 0 30px rgba(140,230,60,0.8); }
 .vfx-goal-banner.vfx-hayes { border-color: #70e0ff; }
 .vfx-goal-banner.vfx-hayes .g-title { color: #7dffc8; text-shadow: 0 0 28px #70e0ff, 0 4px 0 #1a0840; }
-.vfx-goal-banner.vfx-ainsley { border-color: #e8b0ff; }
-.vfx-goal-banner.vfx-ainsley .g-title { color: #ffe080; text-shadow: 0 0 28px #e8b0ff, 0 4px 0 #3a1050; }
+.vfx-goal-banner.vfx-ainsley { border-color: #8a92a8; }
+.vfx-goal-banner.vfx-ainsley .g-title { color: #c8b060; text-shadow: 0 0 28px #6a50b8, 0 4px 0 #05060c; }
 @keyframes vfx-goal-in {
   0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
   18% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
