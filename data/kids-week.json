@@ -547,32 +547,6 @@
           "tone": "hot"
         }
       ],
-      "fun": [
-        {
-          "when": "Sun after vanity",
-          "what": "\ud83c\udfb6 Playlist + chill with Dad",
-          "hint": "your call",
-          "tone": "fun"
-        },
-        {
-          "when": "Creative hour",
-          "what": "\u270f\ufe0f Journal / draw / room setup",
-          "hint": "earn stars \u2192 Tour Jar \u2192 payday",
-          "tone": "fun"
-        },
-        {
-          "when": "Base mission",
-          "what": "\u2605 Fill the Tour Jar \u2014 allowance payday with Dad",
-          "hint": "FUN setlist goal \u00b7 treat optional",
-          "tone": "fun"
-        },
-        {
-          "when": "Downtime",
-          "what": "\ud83c\udf19 Quiet hour \u00b7 headphones on",
-          "hint": "FUN \u00b7 keep it sharp",
-          "tone": "fun"
-        }
-      ],
       "appointments": [
         {
           "when": "Sun 27 \u00b7 3:00",
