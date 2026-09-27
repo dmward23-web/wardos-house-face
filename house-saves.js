@@ -4,7 +4,9 @@
 
   var KEY = "house-saves:v1";
   var DEFAULTS = {
-    ainsley: [{ id: "seed-stick-season", name: "Stick Season · concert save", need: 40 }]
+    ainsley: [{ id: "seed-stick-season", name: "Stick Season · concert save", need: 40 }],
+    hayes: [{ id: "seed-victory-stash", name: "Victory stash", need: 12 }],
+    harris: [{ id: "seed-gem-stash", name: "Gem stash", need: 8 }]
   };
 
   function esc(s) {
@@ -287,13 +289,16 @@
           el.textContent = "Add a save";
           el.classList.add("is-empty");
         } else if (gv.met) {
-          el.textContent = "Goal met · " + gv.name + " (" + gv.need + "★)";
+          el.textContent = "Goal met · " + gv.name + " ($" + gv.need + ")";
           el.classList.add("is-met", "is-active");
         } else {
-          el.textContent = gv.name + " · " + (gv.toward || 0) + "/" + gv.need + " ★";
+          el.textContent = gv.name + " · $" + (gv.toward || 0) + "/$" + gv.need;
           el.classList.add("is-active");
         }
       });
+      if (global.WardKids && global.WardKids.renderGrow && bank) {
+        global.WardKids.renderGrow(document, kidId, data, bank);
+      }
     } catch (e) { /* */ }
   }
 
