@@ -317,6 +317,14 @@
     var kidId = KID_FROM_CHECK[checkId];
     var before = kidId ? getBankView(kidId, data) : null;
     var was = before ? before.reached : false;
+    /* Detect NEW bank before apply — no invented / double $ flash */
+    var newlyBanked = false;
+    if (kidId && done) {
+      try {
+        var packPre = kidDayBank(kidId);
+        newlyBanked = !(packPre.day.earned && packPre.day.earned[checkId]);
+      } catch (ePre) { newlyBanked = true; }
+    }
     var bank = applyCheckToBank(checkId, !!done, data);
     if (bank && bank.reached && !was) {
       try { localStorage.setItem("house-bank-goal:" + bank.kidId, "1"); } catch (e) {}
@@ -324,8 +332,8 @@
         document.dispatchEvent(new CustomEvent("house:goal-hit", { detail: { kidId: bank.kidId, reward: bank.reward, bank: bank } }));
       } catch (e) {}
     }
-    /* Flash real $ on must tap — 1★ = $1 */
-    if (bank && done) {
+    /* Flash real $ only when this tap newly banks — 1★ = $1 · hire/addon = 0 */
+    if (bank && done && newlyBanked) {
       try {
         var bucks = questStarsFor(kidId, checkId, data);
         if (bucks > 0) {
@@ -763,7 +771,7 @@
       }
     });
     root.querySelectorAll("[data-grow-total]").forEach(function (el) {
-      el.textContent = String(toward);
+      el.textContent = "$" + toward;
     });
     root.querySelectorAll("[data-grow-week-rising]").forEach(function (el) {
       el.textContent = "week +$" + we + " rising ↑";
@@ -784,7 +792,10 @@
       el.textContent = String(gv.active ? toward : 0);
     });
     root.querySelectorAll("[data-grow-save-need]").forEach(function (el) {
-      el.textContent = String(gv.active ? need : 0);
+      var n = gv.active ? need : 0;
+      /* money-chip already prints $ before this span — keep bare digits there */
+      if (el.closest && el.closest(".grow-total")) el.textContent = "$" + n;
+      else el.textContent = String(n);
     });
     root.querySelectorAll("[data-grow-save-line]").forEach(function (el) {
       if (!gv.active) el.textContent = gv.placeholder || "Add a save";
