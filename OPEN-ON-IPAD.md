@@ -1,17 +1,21 @@
 # House Face · open on iPhone / iPad
 
-**Start file:** `sheet-index.html` (or tap `OPEN.html` / `START-HERE.html`)
+**Forever URL (only one):**  
+https://dmward23-web.github.io/wardos-house-face/sheet-index.html
 
-## iPhone — 3 steps
-1. Drive → **Weekday** → `WardOS-House-Face-Live-….zip` → **Download**
-2. **Files** → Downloads → tap the zip → **Uncompress** → open folder `house-face`
-3. Tap **sheet-index.html** → Share → **Open in Safari** → Share → **Add to Home Screen**
+## Add to Home Screen (once)
+1. Open that URL in **Safari** (not Chrome, not Files).
+2. Share → **Add to Home Screen** → name **House** (or WardOS House).
+3. Done. Landscape on iPad.
 
-## iPad — 3 steps
-1. Same Drive zip → **Download** (or AirDrop the unzipped `house-face` folder from phone)
-2. **Files** → unzip → open `house-face`
-3. Tap **sheet-index.html** → Share → **Open in Safari** → **Add to Home Screen** → use landscape
+## After that
+- Tap the Home Screen tile. Sheet updates ride the same URL when House Face deploys.
+- Do **not** delete / re-upload / re-share / re-Add for a restamp.
+- If a tile looks old: pull to refresh, or wait ~10 minutes (Pages CDN cache). Never make a new link.
 
-After that: one Home Screen tap. Offline works from Files. Money stays out of House Face.
+## Dead paths (do not use for Home Screen)
+- Drive zip / Files / AirDrop HTML
+- Cloudflare quick tunnels
+- Any URL that changes when the box sleeps
 
-**If Add to Home Screen is missing:** keep `house-face` in Files Favorites and open `sheet-index.html` from there.
+Drive zip stays backup only.
