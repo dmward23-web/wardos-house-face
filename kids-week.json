@@ -84,7 +84,13 @@
         },
         {
           "id": "har-dishes",
-          "what": "🍽️ Dishes helper (mining duty) — daily must",
+          "what": "🍽️ Clean up after you · rinse · in dishwasher — daily must",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "har-empty",
+          "what": "🍽️ Empty dishwasher — daily must",
           "stars": 1,
           "cadence": "daily"
         },
@@ -114,7 +120,7 @@
         },
         {
           "id": "har-shoes",
-          "what": "👟 Shoes by door — weekly must",
+          "what": "👟 Shoes · closet / garage cubby / room — weekly must",
           "stars": 1,
           "cadence": "weekly"
         },
@@ -283,7 +289,13 @@
         },
         {
           "id": "hay-dishes",
-          "what": "🍽️ Dishes — wipe the lobby (daily must)",
+          "what": "🍽️ Clean up after you · rinse · in dishwasher — daily must",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "hay-empty",
+          "what": "🍽️ Empty dishwasher — daily must",
           "stars": 1,
           "cadence": "daily"
         },
@@ -494,13 +506,19 @@
         },
         {
           "id": "ain-dishwasher",
-          "what": "Dishwasher load / unload",
+          "what": "Clean up after you · rinse · in dishwasher",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "ain-empty",
+          "what": "Empty dishwasher",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "ain-living",
-          "what": "Living room · shoes & coats",
+          "what": "Shoes & coats · closet / cubby / room",
           "stars": 1,
           "cadence": "daily"
         },
