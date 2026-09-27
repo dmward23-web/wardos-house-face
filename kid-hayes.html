@@ -161,7 +161,8 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .hud-tick{position:absolute;width:32px;height:32px;z-index:3;border-color:#70e0ff;border-style:solid;opacity:.9}
   .hud-tick.tl{top:8px;left:8px;border-width:4px 0 0 4px}.hud-tick.tr{top:8px;right:8px;border-width:4px 4px 0 0}
   .hud-tick.bl{bottom:8px;left:8px;border-width:0 0 4px 4px}.hud-tick.br{bottom:8px;right:8px;border-width:0 4px 4px 0}
-  .panel>*{position:relative;z-index:2}
+  .panel > *:not(.hud-tick){position:relative;z-index:2}
+  .hud-tick{position:absolute!important;pointer-events:none;z-index:3}
   .hdr{background:linear-gradient(180deg,rgba(16,36,80,.95),rgba(8,20,56,.92));border:3px solid #70e0ff;box-shadow:0 0 24px rgba(80,220,255,.35),0 7px 0 #040818;border-radius:4px;color:#e8f8ff}
   .back,.nav-week{background:linear-gradient(180deg,#2a80a0,#183858);color:#e0f8ff;border-color:#70e0ff}
   .avatar{border-radius:6px;background:linear-gradient(145deg,#3ec9a0,#184878 50%,#7018b0);box-shadow:0 0 0 4px rgba(80,230,255,.55),0 7px 0 #040818,0 0 24px rgba(80,220,255,.5)}
@@ -184,18 +185,20 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .hot-label{color:#a0e0ff}.hot-title{color:#fff;text-shadow:0 0 18px rgba(80,230,255,.6)}
   .hot-title .hl{background:linear-gradient(180deg,#ffe060,#e09010);color:#1a1000}
   .hot-sub{color:#c0e0ff}.hot-badge{color:#e0f8ff;background:rgba(80,230,255,.18);border-color:rgba(80,230,255,.5)}
-  --sec-bg:rgba(8,18,48,.92);--sec-border:rgba(80,230,255,.55);--sec-shadow:0 0 18px rgba(80,220,255,.2),0 6px 0 #040818;
-  --sec-title:#70e0ff;--sec-meta:#88b8d8;--sec-rule:rgba(80,230,255,.3);
-  --card-bg:rgba(12,28,64,.96);--card-border:rgba(80,230,255,.5);--card-edge:#040818;
-  --card-hot-bg:rgba(70,40,10,.95);--card-hot-border:#e09010;
-  --card-sport-bg:rgba(12,40,70,.95);--card-sport-border:#3ec9a0;
-  --card-act-bg:rgba(20,24,70,.95);--card-act-border:#8060ff;
-  --card-fun-bg:rgba(12,48,36,.95);--card-fun-border:#3ec9a0;--when:#70e0ff;
+  body.theme-hayes{
+    --sec-bg:rgba(8,18,48,.92);--sec-border:rgba(80,230,255,.55);--sec-shadow:0 0 18px rgba(80,220,255,.2),0 6px 0 #040818;
+    --sec-title:#70e0ff;--sec-meta:#88b8d8;--sec-rule:rgba(80,230,255,.3);
+    --card-bg:rgba(12,28,64,.96);--card-border:rgba(80,230,255,.5);--card-edge:#040818;
+    --card-hot-bg:rgba(70,40,10,.95);--card-hot-border:#e09010;
+    --card-sport-bg:rgba(12,40,70,.95);--card-sport-border:#3ec9a0;
+    --card-act-bg:rgba(20,24,70,.95);--card-act-border:#8060ff;
+    --card-fun-bg:rgba(12,48,36,.95);--card-fun-border:#3ec9a0;--when:#70e0ff;
+    --quest-bg:rgba(10,24,56,.96);--quest-border:#3ec9a0;--quest-edge:#040818;
+    --ring-border:#70e0ff;--ring-bg:rgba(80,230,255,.25);--quest-done-bg:rgba(30,120,90,.6);--quest-done-border:#3ec9a0;
+    --bank-bg:linear-gradient(135deg,#180850,#0a1440);--bank-border:#70e0ff;
+  }
   .card .what{color:#f0f8ff}.card .hint{color:#88b8d8}.card.quiet{color:#88b8d8;background:rgba(0,0,0,.3)}
-  --quest-bg:rgba(10,24,56,.96);--quest-border:#3ec9a0;--quest-edge:#040818;
-  --ring-border:#70e0ff;--ring-bg:rgba(80,230,255,.25);--quest-done-bg:rgba(30,120,90,.6);--quest-done-border:#3ec9a0;
   .quest .what{color:#f0f8ff}.quest .hint{color:#88b8d8}
-  --bank-bg:linear-gradient(135deg,#180850,#0a1440);--bank-border:#70e0ff;
   .bank-card{color:#e8f8ff;box-shadow:0 0 28px rgba(80,220,255,.35),0 8px 0 #040818}
   .bank-fill{background:linear-gradient(90deg,#c060ff,#70e0ff,#ffe060)}
   .loadout{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:4px;background:rgba(6,14,40,.95);border:3px solid rgba(80,230,255,.5)}

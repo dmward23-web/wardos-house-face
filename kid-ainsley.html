@@ -170,15 +170,17 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   @keyframes spot-pulse{0%,100%{opacity:.7}50%{opacity:1}}
   .panel::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
     box-shadow:inset 0 0 0 6px rgba(200,100,230,.4),inset 0 0 0 12px rgba(255,220,160,.2),inset 0 0 120px rgba(80,20,120,.25)}
-  .panel>*{position:relative;z-index:2}
+  /* Deco layers stay absolute — never flex children (was crushing body into bottom strip) */
+  .panel > *:not(.spotlight):not(.vinyl-float):not(.sparkle-field){position:relative;z-index:2}
+  .spotlight,.vinyl-float,.sparkle-field{position:absolute!important;pointer-events:none;z-index:1}
   .hdr{background:linear-gradient(180deg,rgba(255,250,255,.95),rgba(235,200,250,.88));border:4px solid #7a28a8;box-shadow:inset 0 2px 0 #fff,0 7px 0 #3a1058,0 0 28px rgba(220,120,255,.3);border-radius:18px}
   .back,.nav-week{background:linear-gradient(180deg,#f0c8ff,#b070e0);color:#3a1058;border-color:#7a28a8;border-radius:999px}
   .avatar{border-radius:50%;background:linear-gradient(145deg,#f0c0ff,#a050c8 55%,#6a2098);box-shadow:0 0 0 5px #fff,0 0 0 9px rgba(200,100,230,.5),0 8px 0 #3a1058}
   .eyebrow{color:#8a30b0}.name{color:#2a1040}.name-accent{color:#9018c0;text-shadow:0 0 14px rgba(230,140,255,.6)}
   .tagline{color:#6a4088}.hot-pill{background:linear-gradient(180deg,#ffe9a0,#e8b040);color:#4a2808;border-color:#b08820;border-radius:999px}
-  .eras{display:flex;align-items:center;gap:8px;padding:4px;flex-shrink:0}
-  .eras-lab{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#f0e0ff;margin-right:4px}
-  .era{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:9px 14px;border-radius:999px;border:3px solid rgba(255,255,255,.4);background:rgba(255,255,255,.18);color:#f8f0ff;cursor:pointer}
+  .eras{display:flex;align-items:center;gap:6px;padding:2px 4px;flex-shrink:0;flex-wrap:nowrap;min-height:0}
+  .eras-lab{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#f0e0ff;margin-right:2px;flex-shrink:0}
+  .era{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:7px 12px;border-radius:999px;border:3px solid rgba(255,255,255,.4);background:rgba(255,255,255,.18);color:#f8f0ff;cursor:pointer;-webkit-tap-highlight-color:transparent}
   .era.on{background:linear-gradient(180deg,#ffe9a0,#e8b040);color:#3a2810;border-color:#b08820;box-shadow:0 0 18px rgba(255,220,120,.55)}
   .era.midnight{background:rgba(30,30,60,.75)}.era.fog{background:rgba(180,190,210,.4)}.era.lilac{background:rgba(200,140,230,.45)}.era.blush{background:rgba(255,150,200,.4)}
   .xp-stage{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;background:rgba(255,250,255,.92);border:3px solid #8a30b0;box-shadow:0 5px 0 #3a1058}
@@ -194,15 +196,19 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .hot-label{color:#ffe8ff}.hot-title{color:#fff;text-shadow:0 2px 14px rgba(80,20,120,.55)}
   .hot-title .hl{background:linear-gradient(180deg,#ffe9a0,#e8b040);color:#3a2810;border-radius:10px}
   .hot-sub{color:#f0d8ff}.hot-badge{color:#fff;border-radius:999px;background:rgba(255,255,255,.2)}
-  --sec-bg:rgba(255,250,255,.94);--sec-border:#8a30b0;--sec-shadow:0 6px 0 #3a1058,0 0 22px rgba(200,100,230,.25);
-  --sec-title:#6a2098;--sec-meta:#8a60a8;.sec{border-radius:16px}
-  --card-bg:#fff8ff;--card-border:#b070e0;--card-hot-bg:#fff0c8;--card-hot-border:#d0a020;
-  --card-sport-bg:#f0e8ff;--card-act-bg:#f8f0ff;--card-fun-bg:#fff0f8;--card-fun-border:#e080b0;--when:#8a30b0;
+  body.theme-ainsley{
+    --sec-bg:rgba(255,250,255,.94);--sec-border:#8a30b0;--sec-shadow:0 6px 0 #3a1058,0 0 22px rgba(200,100,230,.25);
+    --sec-title:#6a2098;--sec-meta:#8a60a8;--sec-rule:rgba(138,48,176,.25);
+    --card-bg:#fff8ff;--card-border:#b070e0;--card-hot-bg:#fff0c8;--card-hot-border:#d0a020;
+    --card-sport-bg:#f0e8ff;--card-act-bg:#f8f0ff;--card-fun-bg:#fff0f8;--card-fun-border:#e080b0;--when:#8a30b0;
+    --quest-bg:linear-gradient(145deg,#fff8ff,#f0e0ff);--quest-border:#a050c8;--quest-edge:#3a1058;
+    --ring-border:#a050c8;--ring-bg:rgba(230,160,255,.4);
+    --quest-done-bg:rgba(230,160,255,.5);--quest-done-border:#8a30b0;
+    --bank-bg:linear-gradient(135deg,#501878,#2a1058);--bank-border:#ffe080;
+  }
+  .sec{border-radius:16px}
   .card{border-radius:14px}
-  --quest-bg:linear-gradient(145deg,#fff8ff,#f0e0ff);--quest-border:#a050c8;--quest-edge:#3a1058;
-  .quest{border-radius:14px}--ring-border:#a050c8;--ring-bg:rgba(230,160,255,.4);
-  --quest-done-bg:rgba(230,160,255,.5);--quest-done-border:#8a30b0;
-  --bank-bg:linear-gradient(135deg,#501878,#2a1058);--bank-border:#ffe080;
+  .quest{border-radius:14px}
   .bank-card{border-radius:18px;color:#ffeef8;box-shadow:0 0 32px rgba(255,200,140,.3),0 8px 0 #2a0848}
   .bank-fill{background:linear-gradient(90deg,#e8b0ff,#ffe080,#e8b0ff)}
   .setlist-foot{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;background:rgba(255,250,255,.92);border:3px solid #8a30b0}
@@ -213,6 +219,29 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .ftr{color:#e8d0ff}.ftr-chip{background:rgba(255,250,255,.9);border-color:#8a30b0;color:#6a2098;border-radius:999px}
   .mute-btn{border-radius:999px;background:rgba(255,250,255,.95);color:#6a2098;border-color:#8a30b0}
   body.theme-ainsley .hcb-label{color:#ffeef8;text-shadow:0 0 32px #e8b0ff,0 4px 0 #3a1058}
+  /* Era mood — tint only, never changes layout geometry */
+  body[data-era-mood="midnight"] .panel{filter:saturate(.85) brightness(.92)}
+  body[data-era-mood="fog"] .panel{filter:saturate(.7) brightness(1.05)}
+  body[data-era-mood="gold"] .panel{filter:none}
+  body[data-era-mood="lilac"] .panel{filter:hue-rotate(-8deg) saturate(1.1)}
+  body[data-era-mood="blush"] .panel{filter:hue-rotate(18deg) saturate(1.15)}
+  body.theme-ainsley .body{flex:1 1 auto;min-height:0;overflow:hidden}
+  body.theme-ainsley .card{padding:10px 12px;min-height:48px}
+  body.theme-ainsley .card .what{font-size:16px}
+  body.theme-ainsley .card .hint{font-size:12px;line-height:1.3}
+  body.theme-ainsley .quest{padding:10px 12px;min-height:56px}
+  body.theme-ainsley .quest .what{font-size:16px}
+  body.theme-ainsley .quest .star-earn{padding:6px 10px;min-height:36px;font-size:14px}
+  body.theme-ainsley .sec{gap:6px;padding:10px}
+  body.theme-ainsley .sec-list{gap:6px}
+  body.theme-ainsley .hot-banner .hot-title{font-size:26px}
+  body.theme-ainsley .hot-body{padding:12px 18px}
+  body.theme-ainsley .bank-card{padding:12px 16px;gap:8px}
+  body.theme-ainsley .bank-count{font-size:36px}
+  body.theme-ainsley .setlist-foot{padding:8px 14px}
+  body.theme-ainsley .tap-hint{font-size:12px;padding:2px}
+  .xp-stage{flex-shrink:0}
+  .hot-banner{flex-shrink:0}
   @media (prefers-reduced-motion:reduce){.vinyl-float,.sparkle-field span,.xp-stage-fill,.spotlight{animation:none!important}}
 
 </style>
