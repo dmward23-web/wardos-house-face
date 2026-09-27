@@ -207,7 +207,6 @@
     var stars = typeof q.stars === "number" ? q.stars : 1;
     var open = done ? "done" : "open";
     var ring = done ? "✓" : (optional ? "+" : "·");
-    var showCash = kidId === "ainsley" || kidId === "hayes" || kidId === "harris";
     var hint;
     if (optional) {
       if (q.hire && kidId === "ainsley") {
@@ -219,10 +218,6 @@
           ? (q.hire ? "hire logged · booked" : "logged")
           : (q.hire ? "hire path · Dad books you · never fills jar" : "add-on · never fills jar");
       }
-    } else if (showCash) {
-      hint = done
-        ? ("cleared · banked · $" + stars)
-        : ("tap when clear · ★ " + stars + " = $" + stars);
     } else {
       hint = done ? "cleared · banked" : "tap when clear · ★ " + stars;
     }
@@ -233,8 +228,6 @@
       } else {
         earn = '<span class="star-earn addon-tag">' + (done ? "OPTIONAL ✓" : "OPTIONAL") + "</span>";
       }
-    } else if (showCash) {
-      earn = '<span class="star-earn">' + (done ? "★ +$" + stars : "★ $" + stars) + "</span>";
     } else {
       earn = '<span class="star-earn">' + (done ? "★ +" + stars : "★ " + stars) + "</span>";
     }
