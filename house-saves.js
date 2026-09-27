@@ -180,9 +180,36 @@
     }
   }
 
+  function refreshGoalChips(kidId) {
+    if (!global.WardKids || !global.WardKids.personalGoalView) return;
+    try {
+      var data = global.WardKids._data;
+      if (!data) return;
+      var bank = global.WardKids.getBankView ? global.WardKids.getBankView(kidId, data) : null;
+      var gv = global.WardKids.personalGoalView(kidId, data, bank);
+      document.querySelectorAll("[data-goal-chip]").forEach(function (el) {
+        var scopeKid = el.getAttribute("data-kid")
+          || (el.closest("[data-kid]") && el.closest("[data-kid]").getAttribute("data-kid"))
+          || (el.closest("[data-bank-kid]") && el.closest("[data-bank-kid]").getAttribute("data-bank-kid"));
+        if (scopeKid && scopeKid !== kidId) return;
+        el.classList.remove("is-met", "is-active", "is-empty");
+        if (!gv.active) {
+          el.textContent = gv.placeholder || "Add a save on your board";
+          el.classList.add("is-empty");
+        } else if (gv.met) {
+          el.textContent = "Tell Dad — goal met · " + gv.name + " (" + gv.need + "★)";
+          el.classList.add("is-met", "is-active");
+        } else {
+          el.textContent = gv.name + " · " + (gv.toward || 0) + "/" + gv.need + " ★";
+          el.classList.add("is-active");
+        }
+      });
+    } catch (e) { /* */ }
+  }
   function renderAll(kidId) {
     document.querySelectorAll('[data-saves-panel][data-kid="' + kidId + '"]').forEach(wirePanel);
     renderList(kidId, document);
+    refreshGoalChips(kidId);
   }
 
   function mount(kidId) {
