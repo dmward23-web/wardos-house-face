@@ -422,11 +422,12 @@
       "bankGoal": {
         "id": "tour-jar",
         "title": "Fill the Tour Jar",
-        "blurb": "1★ = $1. Fill the Tour Jar to $20 — Payday with Dad. Weekly path ~$20.",
+        "blurb": "Weekly allowance $20 with Dad. Tour Jar save goal = $20 (1★ = $1). Babysitting $15/hr = Dad handout, not jar.",
         "need": 20,
-        "reward": "Payday with Dad · jar = $20",
+        "reward": "Payday with Dad · $20/week · jar $20",
         "dollarNeed": 20,
-        "starDollar": 1
+        "starDollar": 1,
+        "weeklyAllowance": 20
       },
       "hottest": {
         "when": "SUN · vanity 3:00 · Jessy",
