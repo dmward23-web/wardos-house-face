@@ -204,6 +204,18 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .ftr{color:#2a4018}
   body.theme-harris .hcb-label{color:#e8ffe0;text-shadow:0 4px 0 #1a4010,0 0 40px rgba(140,230,60,.9)}
 
+.jar-flow{display:flex;align-items:center;justify-content:flex-start;gap:6px;flex-wrap:nowrap;
+    margin-top:4px;padding:4px 8px;border-radius:6px;
+    background:rgba(255,255,255,0.10);border:2px dashed rgba(255,255,255,0.28)}
+  .jar-flow .step{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;
+    letter-spacing:0.04em;text-transform:uppercase;padding:4px 8px;border-radius:6px;
+    background:rgba(0,0,0,0.35);border:2px solid rgba(255,255,255,0.22);white-space:nowrap}
+  .jar-flow .arr{font-size:14px;font-weight:800;opacity:0.85}
+  .jar-flow .dad{background:linear-gradient(180deg,#ffe080,#e0a020);color:#1a1000;border-color:#8a6010}
+  .treat-secondary{display:inline-flex;align-items:center;gap:4px;margin-top:2px;
+    font-size:11px;font-weight:700;opacity:0.7;padding:2px 6px;border-radius:5px;
+    border:1px dashed rgba(255,255,255,0.28)}
+
 </style>
 </head>
 <body data-clear-label="LEVEL UP!!!" data-kid="harris" data-theme="harris" data-chores-shared="1" class="theme-harris">
@@ -219,7 +231,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
         <div>
           <a class="eyebrow" href="sheet-index.html">BLOCK WORLD · SMASH MODE</a>
           <h1 class="name">HEY <span class="name-accent">HARRIS</span>!!!</h1>
-          <div class="tagline">Smash quests · grab gems · craft the DIAMOND PICK</div>
+          <div class="tagline">Smash musts · fill the Gem Jar · payday with Dad</div>
         </div>
       </div>
     </div>
@@ -227,7 +239,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
       <div class="hot-pill" data-hot-pill>⚡ YOUR FLAG · Leave 7:55</div>
       <div style="display:flex;gap:8px;align-items:center">
         <button type="button" class="mute-btn" data-mute-toggle>🔊 ON</button>
-        <div class="mock-tag">YOUR WORLD<br/>Sat Sep 26</div>
+        <div class="mock-tag">YOUR WORLD · LIVE<br/>Sun Sep 27</div>
       </div>
     </div>
   </header>
@@ -278,21 +290,27 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
           <div class="craft-cell" data-craft="6"></div><div class="craft-cell" data-craft="7"></div><div class="craft-cell" data-craft="8"></div>
         </div>
         <div class="craft-arrow">➜</div>
-        <div class="craft-out" title="Diamond Pick">⛏️</div>
+        <div class="craft-out" title="Diamond Pick (optional)">⛏️</div>
       </div>
     </section>
     <section class="sec sec-bank bank-card">
       <div class="bank-top">
         <div>
-          <div class="bank-title">💎 YOUR GEM BANK</div>
-          <div class="bank-goal-title" data-bank-goal-title>Craft the Diamond Pick!!!</div>
+          <div class="bank-title">💎 GEM JAR</div>
+          <div class="bank-goal-title" data-bank-goal-title>Fill the Gem Jar</div>
         </div>
         <div class="bank-count"><span data-bank-symbol>◆</span> <span data-bank-life>0</span></div>
       </div>
-      <div class="bank-blurb" data-bank-goal-blurb>Smash quests. Stack gems. FILL THE BAR.</div>
+      <div class="bank-blurb" data-bank-goal-blurb>Clear musts. Stack gems. Fill the jar — allowance payday with Dad.</div>
       <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
       <div class="bank-meta"><span data-bank-meta>0 / 8 gems</span> · today <span data-bank-today>0</span></div>
-      <div class="goal-unlock" data-goal-unlock hidden>UNLOCKED · ask Dad · screen-time craft unlock</div>
+            <div class="jar-flow" aria-label="stars to jar to payday">
+        <span class="step">★ musts</span><span class="arr">→</span>
+        <span class="step">🫙 jar</span><span class="arr">→</span>
+        <span class="step dad">✓ Dad · payday</span>
+        <span class="treat-secondary" aria-hidden="true" title="optional craft">⛏️ optional</span>
+      </div>
+      <div class="goal-unlock" data-goal-unlock hidden>◆ JAR FULL · Dad inspects · allowance payday with Dad</div>
     </section>
   </div>
   <div class="hotbar">

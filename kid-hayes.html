@@ -210,6 +210,19 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .ftr{color:#88b8d8}.ftr-chip{background:rgba(16,36,80,.9);border-color:rgba(80,230,255,.45);color:#c8e8ff}
   .mute-btn{background:rgba(16,36,80,.95);color:#e0f8ff;border-color:#70e0ff}
   body.theme-hayes .hcb-label{color:#e0f8ff;text-shadow:0 0 28px #70e0ff,0 4px 0 #180850;font-size:80px}
+
+.jar-flow{display:flex;align-items:center;justify-content:flex-start;gap:6px;flex-wrap:nowrap;
+    margin-top:4px;padding:4px 8px;border-radius:6px;
+    background:rgba(255,255,255,0.10);border:2px dashed rgba(255,255,255,0.28)}
+  .jar-flow .step{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;
+    letter-spacing:0.04em;text-transform:uppercase;padding:4px 8px;border-radius:6px;
+    background:rgba(0,0,0,0.35);border:2px solid rgba(255,255,255,0.22);white-space:nowrap}
+  .jar-flow .arr{font-size:14px;font-weight:800;opacity:0.85}
+  .jar-flow .dad{background:linear-gradient(180deg,#ffe080,#e0a020);color:#1a1000;border-color:#8a6010}
+  .treat-secondary{display:inline-flex;align-items:center;gap:4px;margin-top:2px;
+    font-size:11px;font-weight:700;opacity:0.7;padding:2px 6px;border-radius:5px;
+    border:1px dashed rgba(255,255,255,0.28)}
+
   @media (prefers-reduced-motion:reduce){.panel::before,.storm-fill{animation:none!important}}
 
 </style>
@@ -227,7 +240,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
         <div>
           <a class="eyebrow" href="sheet-index.html">DROP ZONE · MATCH LIVE</a>
           <h1 class="name">LET'S GO <span class="name-accent">HAYES</span>!!!</h1>
-          <div class="tagline">Clear challenges · bank coins · chase that UMBRELLA</div>
+          <div class="tagline">Clear musts · fill the Victory Jar · payday with Dad</div>
         </div>
       </div>
     </div>
@@ -235,7 +248,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
       <div class="hot-pill" data-hot-pill>🎯 SAT DROP · Chat &amp; Chew + FLAG</div>
       <div style="display:flex;gap:8px;align-items:center">
         <button type="button" class="mute-btn" data-mute-toggle>🔊 ON</button>
-        <div class="mock-tag">YOUR MATCH<br/>Sat Sep 26</div>
+        <div class="mock-tag">YOUR MATCH · LIVE<br/>Sun Sep 27</div>
       </div>
     </div>
   </header>
@@ -283,15 +296,21 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     <section class="sec sec-bank bank-card">
       <div class="bank-top">
         <div>
-          <div class="bank-title">◎ VICTORY BANK</div>
-          <div class="bank-goal-title" data-bank-goal-title>Unlock the Victory Umbrella!!!</div>
+          <div class="bank-title">◎ VICTORY JAR</div>
+          <div class="bank-goal-title" data-bank-goal-title>Fill the Victory Jar</div>
         </div>
         <div class="bank-count"><span data-bank-symbol>◎</span> <span data-bank-life>0</span></div>
       </div>
-      <div class="bank-blurb" data-bank-goal-blurb>Wipe challenges. Stack coins. STORM METER GO BRRR.</div>
+      <div class="bank-blurb" data-bank-goal-blurb>Clear musts. Bank Victory Coins. Fill the jar — allowance payday with Dad.</div>
       <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
-      <div class="bank-meta"><span data-bank-meta>0 / 10 coins</span> · today <span data-bank-today>0</span></div>
-      <div class="goal-unlock" data-goal-unlock hidden>🏆 VICTORY ROYALE · ask Dad · umbrella drop</div>
+      <div class="bank-meta"><span data-bank-meta>0 / 12 coins</span> · today <span data-bank-today>0</span></div>
+            <div class="jar-flow" aria-label="stars to jar to payday">
+        <span class="step">★ musts</span><span class="arr">→</span>
+        <span class="step">🫙 jar</span><span class="arr">→</span>
+        <span class="step dad">✓ Dad · payday</span>
+        <span class="treat-secondary" aria-hidden="true" title="optional treat">☂️ optional</span>
+      </div>
+      <div class="goal-unlock" data-goal-unlock hidden>🏆 JAR FULL · Dad inspects · allowance payday with Dad</div>
     </section>
   </div>
   <div class="loadout">
