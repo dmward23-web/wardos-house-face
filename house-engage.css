@@ -1167,3 +1167,77 @@ body.theme-hayes .grow-meter,
 body.theme-harris .grow-meter {
   min-height: 168px;
 }
+
+
+/* GROW1b · dual-layer fill (balance + week) + goal line — Prism kids-grow plates */
+.grow-fill-balance,
+.grow-fill-week {
+  position: absolute;
+  left: 0; right: 0;
+  height: 0%;
+  transform-origin: bottom center;
+  transition: height 0.55s cubic-bezier(0.22, 1.2, 0.36, 1), bottom 0.55s cubic-bezier(0.22, 1.2, 0.36, 1);
+  z-index: 1;
+}
+.grow-fill-balance { bottom: 0; z-index: 1; }
+.grow-fill-week { z-index: 2; }
+.grow-goal-line {
+  position: absolute;
+  left: 0; right: 0;
+  top: 10px;
+  height: 0;
+  border-top: 3px solid #e04040;
+  z-index: 5;
+  pointer-events: none;
+  box-shadow: 0 0 8px rgba(224,64,64,0.55);
+}
+.grow-goal-line span {
+  position: absolute;
+  right: 4px; top: -16px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
+  color: #ff6a6a; text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+}
+.grow-jar-name {
+  font-size: 14px; font-weight: 800; letter-spacing: 0.04em; opacity: 0.9;
+}
+.grow-total {
+  font-size: 36px; font-weight: 800; letter-spacing: -0.04em; line-height: 1;
+  margin: 2px 0 4px;
+}
+.grow-week-rising {
+  font-size: 14px; font-weight: 800; letter-spacing: 0.02em;
+  color: #7ad0ff; margin-bottom: 6px;
+}
+body.theme-harris .grow-week-rising { color: #90e050; }
+body.theme-ainsley .grow-week-rising { color: #c8e080; }
+body.theme-hayes .grow-week-rising { color: #70d8ff; }
+
+.grow-meter.grow-gems .grow-fill-balance {
+  background: linear-gradient(180deg, #70e030 0%, #2a8a20 100%);
+  box-shadow: 0 0 18px rgba(112,224,48,0.45), inset 0 2px 0 rgba(255,255,255,0.3);
+}
+.grow-meter.grow-gems .grow-fill-week {
+  background: linear-gradient(180deg, #60c8ff 0%, #2080c0 100%);
+  box-shadow: 0 0 14px rgba(80,180,255,0.45), inset 0 2px 0 rgba(255,255,255,0.35);
+}
+.grow-meter.grow-coins .grow-fill-balance {
+  background: linear-gradient(180deg, #40d0d0 0%, #108080 100%);
+  box-shadow: 0 0 18px rgba(64,208,208,0.45), inset 0 2px 0 rgba(255,255,255,0.3);
+}
+.grow-meter.grow-coins .grow-fill-week {
+  background: linear-gradient(180deg, #70d8ff 0%, #2080c8 100%);
+  box-shadow: 0 0 14px rgba(80,200,255,0.5), inset 0 2px 0 rgba(255,255,255,0.35);
+}
+.grow-meter.grow-jar .grow-fill-balance {
+  background: linear-gradient(180deg, #d4a860 0%, #8a4a20 100%);
+  box-shadow: 0 0 18px rgba(212,168,96,0.45), inset 0 2px 0 rgba(255,255,255,0.35);
+  border-radius: 0 0 24px 24px;
+}
+.grow-meter.grow-jar .grow-fill-week {
+  background: linear-gradient(180deg, #5a8a50 0%, #3a5a38 100%);
+  box-shadow: 0 0 14px rgba(90,138,80,0.45), inset 0 2px 0 rgba(255,255,255,0.3);
+}
+.grow-meter.is-animating .grow-fill-balance,
+.grow-meter.is-animating .grow-fill-week {
+  animation: grow-bounce 0.7s cubic-bezier(0.22, 1.35, 0.36, 1);
+}

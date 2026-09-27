@@ -718,15 +718,44 @@
       }
     });
 
+    var balPct = need > 0 ? Math.max(0, Math.min(100, (bal / need) * 100)) : 0;
+    var weekPct = need > 0 ? Math.max(0, Math.min(100 - balPct, (we / need) * 100)) : 0;
     root.querySelectorAll("[data-grow-fill]").forEach(function (el) {
       el.style.height = pct + "%";
       el.classList.toggle("is-full", !!(gv.active && gv.met));
+    });
+    root.querySelectorAll("[data-grow-fill-balance]").forEach(function (el) {
+      el.style.height = balPct + "%";
+      el.style.bottom = "0%";
+    });
+    root.querySelectorAll("[data-grow-fill-week]").forEach(function (el) {
+      el.style.height = weekPct + "%";
+      el.style.bottom = balPct + "%";
     });
     root.querySelectorAll("[data-grow-pct]").forEach(function (el) {
       el.textContent = pct + "%";
     });
     root.querySelectorAll("[data-grow-title]").forEach(function (el) {
       el.textContent = theme.label;
+    });
+    root.querySelectorAll("[data-grow-jar-name]").forEach(function (el) {
+      el.textContent = gv.active ? (gv.fallback ? gv.name : gv.name) : (theme.label.split("·")[0].trim() || "Jar");
+      if (gv.active && !gv.fallback) {
+        /* keep jar brand from theme when personal save is active — show save in Save for line */
+        var brands = { harris: "Gem Jar", hayes: "Victory Jar", ainsley: "Tour Jar" };
+        el.textContent = brands[kidId] || gv.name;
+      } else if (gv.active) {
+        el.textContent = gv.name;
+      }
+    });
+    root.querySelectorAll("[data-grow-total]").forEach(function (el) {
+      el.textContent = String(toward);
+    });
+    root.querySelectorAll("[data-grow-week-rising]").forEach(function (el) {
+      el.textContent = "week +$" + we + " rising ↑";
+    });
+    root.querySelectorAll("[data-grow-goal-lab]").forEach(function (el) {
+      el.textContent = need > 0 ? ("GOAL " + need) : "GOAL";
     });
     root.querySelectorAll("[data-grow-balance]").forEach(function (el) {
       el.textContent = "$" + bal;
