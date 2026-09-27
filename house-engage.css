@@ -337,3 +337,5 @@ body.bank-goal-hit .bank-card {
     animation: none !important;
   }
 }
+
+.goal-unlock[hidden], [data-goal-unlock][hidden] { display: none !important; }
