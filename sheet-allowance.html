@@ -576,7 +576,7 @@
  </div>
 
  <div class="desk-note">
- <div class="msg"><strong>Rates above.</strong> Stars fill the jar · payday with Dad after honest musts.</div>
+ <div class="msg"><strong>Rates above.</strong> Stars fill the jar · payday converts week ★→$ balance (carry survives) · Dad subtracts what he paid.</div>
  <div class="badge">Adults · Dad only</div>
  </div>
 
@@ -588,7 +588,7 @@
  </footer>
 </div>
 <script src="house-clock.js?v=CT1"></script>
-<script src="kids-data.js?v=PUTAWAY1"></script>
+<script src="kids-data.js?v=CARRY1"></script>
 <script src="house-saves.js"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
@@ -608,7 +608,11 @@ document.addEventListener("DOMContentLoaded", function () {
  var big = document.querySelector('.bank.'+id+' .star-big');
  if (big) {
  var sym = (v.currency && v.currency.symbol) || "★";
- big.innerHTML = '<span class="s">'+sym+'</span>'+v.lifetime;
+ big.innerHTML = '<span class="s">'+sym+'</span>'+(v.week != null ? v.week : v.lifetime);
+ }
+ var lab = document.querySelector('.bank.'+id+' .star-label');
+ if (lab) {
+ lab.textContent = "Balance $"+v.balance+" · Week $"+v.weekEarn+" · Jar $"+v.toward+"/$"+v.need;
  }
  });
  });
