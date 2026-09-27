@@ -6,398 +6,302 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="WardOS House" />
 <meta name="theme-color" content="#d8dadf" />
-<title>BOARD-OS · HOUSE · HAYES · DROP ZONE</title>
+<title>BOARD-OS · HAYES · DROP ZONE</title>
 <link rel="stylesheet" href="house-engage.css" />
 <style>
 
-  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
-  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
-  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-SemiBold.ttf") format("truetype");font-weight:600;font-style:normal}
-  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Bold.ttf") format("truetype");font-weight:700;font-style:normal}
+  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400}
+  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500}
+  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-SemiBold.ttf") format("truetype");font-weight:600}
+  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Bold.ttf") format("truetype");font-weight:700}
 
-  * { box-sizing:border-box; margin:0; padding:0; }
-  html, body {
-    width:1920px; min-height:1200px; height:auto; overflow:auto;
-    font-family:"Inter Display","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;min-height:1200px;height:auto;overflow:auto;
+font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+-webkit-font-smoothing:antialiased}
 .sec {
     display:flex; flex-direction:column; gap:8px; min-height:0;
-    padding:10px; border-radius:4px;
-    background: var(--sec-bg, rgba(255,255,255,0.82));
-    border: 3px solid var(--sec-border, #2a2e36);
-    box-shadow: var(--sec-shadow, 0 6px 0 rgba(20,22,28,0.35), 0 10px 24px rgba(20,22,28,0.18));
+    padding:12px; border-radius:6px;
+    background: var(--sec-bg, rgba(255,255,255,0.9));
+    border: 4px solid var(--sec-border, #1a2014);
+    box-shadow: var(--sec-shadow, 0 7px 0 rgba(0,0,0,0.4), 0 12px 28px rgba(0,0,0,0.2));
   }
-  .sec-hdr { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 2px 4px; border-bottom:2px solid var(--sec-rule, rgba(0,0,0,0.12)); }
-  .sec-title { font-size:13px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:var(--sec-title, #1a2014); }
-  .sec-meta { font-size:11px; font-weight:700; color:var(--sec-meta, #4a5040); letter-spacing:0.04em; }
-  .sec-list { display:flex; flex-direction:column; gap:6px; flex:1; min-height:0; overflow:auto; }
+  .sec-hdr { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 2px 6px; border-bottom:3px solid var(--sec-rule, rgba(0,0,0,0.15)); }
+  .sec-title { font-size:15px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:var(--sec-title, #1a2014); }
+  .sec-meta { font-size:12px; font-weight:800; color:var(--sec-meta, #4a5040); }
+  .sec-list { display:flex; flex-direction:column; gap:8px; flex:1; min-height:0; overflow:auto; }
   .card {
-    border-radius:4px; padding:10px 12px; min-height:48px;
+    border-radius:8px; padding:12px 14px; min-height:56px;
     background: var(--card-bg, #fff);
-    border: 2px solid var(--card-border, #3a4048);
-    box-shadow: 0 3px 0 var(--card-edge, rgba(20,22,28,0.25));
+    border: 3px solid var(--card-border, #2a2e36);
+    box-shadow: 0 4px 0 var(--card-edge, rgba(0,0,0,0.3));
   }
-  .card.hot { background: var(--card-hot-bg, #fff8d0); border-color: var(--card-hot-border, #c8a020); box-shadow: 0 3px 0 var(--card-hot-edge, #8a6810), 0 0 12px rgba(255,200,60,0.25); }
-  .card.sport { background: var(--card-sport-bg, #e8f8ff); border-color: var(--card-sport-border, #2a80b0); }
-  .card.act { background: var(--card-act-bg, #f0f4ff); border-color: var(--card-act-border, #4060a0); }
-  .card.fun { background: var(--card-fun-bg, #f0ffe8); border-color: var(--card-fun-border, #408020); }
-  .card.quiet { background: rgba(0,0,0,0.06); border-style: dashed; font-size:13px; font-weight:650; color:#4a5048; }
-  .card .when { font-size:11px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:var(--when, #5a4030); margin-bottom:2px; }
-  .card .what { font-size:15px; font-weight:800; letter-spacing:-0.02em; color:#121418; line-height:1.2; }
-  .card .hint { font-size:12px; font-weight:600; color:#5a6058; margin-top:2px; }
-  .card.compact { padding:8px 10px; min-height:40px; }
-  .card.compact .what { font-size:14px; }
+  .card.hot { background: var(--card-hot-bg, #fff3a0); border-color: var(--card-hot-border, #e0a010); box-shadow: 0 4px 0 #8a6010, 0 0 16px rgba(255,200,40,0.35); }
+  .card.sport { background: var(--card-sport-bg, #c8f0ff); border-color: var(--card-sport-border, #1080c0); }
+  .card.act { background: var(--card-act-bg, #dde4ff); border-color: var(--card-act-border, #3040a0); }
+  .card.fun { background: var(--card-fun-bg, #d4ffb0); border-color: var(--card-fun-border, #308010); }
+  .card.quiet { background: rgba(0,0,0,0.08); border-style: dashed; font-size:14px; font-weight:700; color:#3a4038; }
+  .card .when { font-size:12px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; color:var(--when, #5a3010); margin-bottom:3px; }
+  .card .what { font-size:17px; font-weight:800; letter-spacing:-0.025em; color:#0e1014; line-height:1.2; }
+  .card .hint { font-size:13px; font-weight:650; color:#3a4038; margin-top:3px; }
   .quest {
-    border-radius:4px; padding:8px 10px; min-height:48px;
-    display:flex; align-items:center; gap:10px;
+    border-radius:10px; padding:12px 14px; min-height:64px;
+    display:flex; align-items:center; gap:12px;
     background: var(--quest-bg, #fff);
-    border: 2px solid var(--quest-border, #3a7a28);
-    box-shadow: 0 3px 0 var(--quest-edge, rgba(40,50,30,0.3));
-    cursor:pointer;
+    border: 4px solid var(--quest-border, #2a8a20);
+    box-shadow: 0 5px 0 var(--quest-edge, #1a4010);
+    cursor:pointer; -webkit-tap-highlight-color:transparent;
   }
+  .quest:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--quest-edge, #1a4010); }
   .quest .ring {
-    width:28px; height:28px; border-radius:4px; flex-shrink:0;
-    border: 2px solid var(--ring-border, #3a7a28);
-    background: var(--ring-bg, rgba(180,220,100,0.3));
+    width:40px; height:40px; border-radius:8px; flex-shrink:0;
+    border: 3px solid var(--ring-border, #2a8a20);
+    background: var(--ring-bg, rgba(180,230,80,0.4));
     display:inline-flex; align-items:center; justify-content:center;
-    font-size:15px; font-weight:800; color:#1a3010;
+    font-size:22px; font-weight:800; color:#1a3010;
   }
-  .quest .what { font-size:14px; font-weight:800; color:#121418; letter-spacing:-0.02em; }
-  .quest .hint { font-size:11px; font-weight:600; color:#4a6a40; }
-  .quest .star-earn { margin-left:auto; font-size:12px; font-weight:800; color:#8a6a10; flex-shrink:0;
-    padding:4px 8px; border-radius:4px; background:rgba(255,220,100,0.4); border:1px solid rgba(200,160,40,0.45); }
-  .quest.done { background: var(--quest-done-bg, rgba(180,230,100,0.45)); border-color: var(--quest-done-border, #2a7a20); }
-  .quest.done .what { text-decoration:line-through; text-decoration-thickness:2px; opacity:0.85; }
-  .tap-hint { font-size:11px; font-weight:700; color:#5a6058; display:flex; align-items:center; gap:6px; padding:2px 4px; }
-  .tap-hint .ring { width:16px; height:16px; border-radius:3px; border:2px solid currentColor; display:inline-flex; align-items:center; justify-content:center; font-size:10px; }
+  .quest .what { font-size:17px; font-weight:800; color:#0e1014; letter-spacing:-0.02em; }
+  .quest .hint { font-size:12px; font-weight:700; color:#3a6a30; }
+  .quest .star-earn {
+    margin-left:auto; font-size:15px; font-weight:800; color:#6a4010; flex-shrink:0;
+    padding:8px 12px; border-radius:8px; min-height:40px; display:inline-flex; align-items:center;
+    background:linear-gradient(180deg,#ffe080,#e0a020); border:3px solid #8a6010;
+    box-shadow:0 3px 0 #6a4010;
+  }
+  .quest.done { background: var(--quest-done-bg, rgba(160,230,80,0.55)); border-color: var(--quest-done-border, #1a7a18); }
+  .quest.done .what { text-decoration:line-through; text-decoration-thickness:3px; opacity:0.85; }
+  .tap-hint { font-size:13px; font-weight:800; color:#2a3028; display:flex; align-items:center; gap:8px; padding:4px; }
   .bank-card {
-    display:flex; flex-direction:column; gap:8px; padding:12px 14px; border-radius:4px;
+    display:flex; flex-direction:column; gap:10px; padding:16px 18px; border-radius:10px;
     background: var(--bank-bg, #1a2014); color:#e8f0c0;
-    border: 3px solid var(--bank-border, #0e1408);
-    box-shadow: 0 6px 0 #0a1008, 0 0 20px rgba(0,0,0,0.25);
+    border: 4px solid var(--bank-border, #0e1408);
+    box-shadow: 0 8px 0 #050805, 0 0 28px rgba(0,0,0,0.3);
   }
   .bank-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .bank-title { font-size:12px; font-weight:800; letter-spacing:0.2em; text-transform:uppercase; opacity:0.85; }
-  .bank-count { font-size:28px; font-weight:800; letter-spacing:-0.04em; line-height:1; }
-  .bank-count .sym { margin-right:4px; }
-  .bank-goal-title { font-size:15px; font-weight:800; letter-spacing:-0.02em; }
-  .bank-blurb { font-size:12px; font-weight:600; opacity:0.85; line-height:1.35; }
-  .bank-track { height:16px; border-radius:3px; background:rgba(0,0,0,0.45); border:2px solid rgba(255,255,255,0.2); overflow:hidden; }
-  .bank-fill { height:100%; width:0%; background: linear-gradient(90deg, #ffe060, #6ad030); box-shadow:inset 0 2px 0 rgba(255,255,255,0.35); transition:width 0.45s cubic-bezier(0.22,1.2,0.36,1); }
-  .bank-meta { font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; opacity:0.9; }
+  .bank-title { font-size:13px; font-weight:800; letter-spacing:0.16em; text-transform:uppercase; opacity:0.9; }
+  .bank-count { font-size:42px; font-weight:800; letter-spacing:-0.05em; line-height:1; }
+  .bank-goal-title { font-size:20px; font-weight:800; letter-spacing:-0.03em; }
+  .bank-blurb { font-size:14px; font-weight:650; opacity:0.9; line-height:1.35; }
+  .bank-track { height:22px; border-radius:6px; background:rgba(0,0,0,0.5); border:3px solid rgba(255,255,255,0.25); overflow:hidden; }
+  .bank-fill { height:100%; width:0%; box-shadow:inset 0 2px 0 rgba(255,255,255,0.4); transition:width 0.45s cubic-bezier(0.22,1.2,0.36,1); }
+  .bank-meta { font-size:13px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; }
+  .goal-unlock {
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:16px; font-weight:800; padding:12px 16px; border-radius:10px;
+    background:linear-gradient(180deg,#ffe080,#e0a020); color:#1a1000;
+    border:3px solid #8a6010; box-shadow:0 4px 0 #6a4010;
+  }
   .body {
     flex:1; min-height:0; display:grid; gap:10px;
-    grid-template-columns: 1.15fr 1fr 1fr 0.95fr;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr;
     grid-template-rows: 1fr auto;
   }
   .body .sec-bank { grid-column: 1 / -1; }
-  .ftr {
-    flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:12px;
-    font-size:12px; font-weight:600; color:var(--ftr, #3a4030); padding-top:2px;
-  }
-  .ftr-left { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-  .ftr-chip {
-    font-size:10px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase;
-    padding:6px 10px; border-radius:4px; text-decoration:none; color:inherit;
-    background:rgba(255,255,255,0.7); border:2px solid rgba(0,0,0,0.25);
-  }
-  .hdr { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-shrink:0; padding:10px 14px; }
-  .hdr-left { display:flex; align-items:center; gap:12px; min-width:0; }
-  .brand img { display:block; height:44px; width:auto; }
+  .ftr { flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:12px; font-weight:700; padding-top:2px; }
+  .ftr-chip { font-size:11px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; padding:7px 12px; border-radius:8px; text-decoration:none; color:inherit; background:rgba(255,255,255,0.75); border:3px solid rgba(0,0,0,0.3); }
+  .hdr { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0; padding:10px 14px; }
+  .hdr-left { display:flex; align-items:center; gap:10px; min-width:0; }
+  .brand img { display:block; height:40px; width:auto; }
   .nav-row { display:inline-flex; gap:8px; }
   .back, .nav-week {
     display:inline-flex; align-items:center; gap:6px; text-decoration:none;
-    font-size:13px; font-weight:800; padding:8px 12px; min-height:40px; border-radius:4px;
-    border:2px solid rgba(0,0,0,0.35); box-shadow:0 3px 0 rgba(0,0,0,0.25);
+    font-size:14px; font-weight:800; padding:10px 14px; min-height:44px; border-radius:8px;
+    border:3px solid rgba(0,0,0,0.4); box-shadow:0 4px 0 rgba(0,0,0,0.3);
   }
   .identity { display:flex; align-items:center; gap:12px; min-width:0; }
   .avatar {
-    width:64px; height:64px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
-    font-size:30px; font-weight:800; color:#fff; letter-spacing:-0.04em;
-    border:3px solid #1a2014; box-shadow:0 0 0 3px rgba(255,255,255,0.5), 0 6px 0 #0a1008;
+    width:72px; height:72px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    font-size:34px; font-weight:800; color:#fff; letter-spacing:-0.04em;
+    border:4px solid #0e1014; box-shadow:0 0 0 4px rgba(255,255,255,0.55), 0 7px 0 #050805;
   }
-  .eyebrow { font-size:11px; font-weight:800; letter-spacing:0.22em; text-transform:uppercase; text-decoration:none; }
-  .name { font-size:36px; font-weight:800; letter-spacing:-0.05em; line-height:1; }
-  .tagline { font-size:13px; font-weight:650; margin-top:2px; }
+  .eyebrow { font-size:12px; font-weight:800; letter-spacing:0.18em; text-transform:uppercase; text-decoration:none; }
+  .name { font-size:40px; font-weight:800; letter-spacing:-0.05em; line-height:1; }
+  .tagline { font-size:15px; font-weight:700; margin-top:3px; }
   .hdr-right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
   .hot-pill {
     display:inline-flex; align-items:center; gap:8px;
-    font-size:13px; font-weight:800; padding:8px 12px; border-radius:4px;
-    border:2px solid rgba(0,0,0,0.35); box-shadow:0 3px 0 rgba(0,0,0,0.2);
+    font-size:15px; font-weight:800; padding:10px 16px; border-radius:10px;
+    border:3px solid rgba(0,0,0,0.4); box-shadow:0 4px 0 rgba(0,0,0,0.25);
   }
-  .mock-tag {
-    font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
-    text-align:right; line-height:1.35; padding:5px 8px; border-radius:4px;
-    border:2px dashed rgba(0,0,0,0.25); background:rgba(0,0,0,0.06);
-  }
+  .mock-tag { font-size:10px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; text-align:right; line-height:1.35; padding:6px 10px; border-radius:8px; border:3px dashed rgba(0,0,0,0.3); background:rgba(0,0,0,0.08); }
   .hot-banner {
-    flex-shrink:0; display:flex; align-items:stretch; border-radius:4px; overflow:hidden; position:relative;
-    border:3px solid #0e1408; box-shadow:0 6px 0 #0a1008, 0 12px 28px rgba(0,0,0,0.3);
+    flex-shrink:0; display:flex; align-items:stretch; border-radius:10px; overflow:hidden; position:relative;
+    border:4px solid #0e1408; box-shadow:0 8px 0 #050805, 0 14px 32px rgba(0,0,0,0.35);
   }
-  .hot-accent { width:12px; flex-shrink:0; }
-  .hot-body { flex:1; padding:12px 18px; display:flex; align-items:center; justify-content:space-between; gap:16px; position:relative; z-index:1; }
-  .hot-label { font-size:10px; font-weight:800; letter-spacing:0.28em; text-transform:uppercase; opacity:0.8; }
-  .hot-title { font-size:24px; font-weight:800; letter-spacing:-0.03em; line-height:1.15; }
-  .hot-title .hl { padding:0 8px; border-radius:4px; background:rgba(255,255,255,0.92); color:#121418; }
-  .hot-sub { font-size:13px; font-weight:600; opacity:0.9; margin-top:2px; }
-  .hot-badges { display:flex; flex-direction:column; gap:6px; }
+  .hot-accent { width:16px; flex-shrink:0; }
+  .hot-body { flex:1; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; position:relative; z-index:1; }
+  .hot-label { font-size:12px; font-weight:800; letter-spacing:0.22em; text-transform:uppercase; opacity:0.85; }
+  .hot-title { font-size:28px; font-weight:800; letter-spacing:-0.03em; line-height:1.15; }
+  .hot-title .hl { padding:2px 10px; border-radius:8px; background:rgba(255,255,255,0.95); color:#101418; }
+  .hot-sub { font-size:15px; font-weight:700; opacity:0.95; margin-top:4px; }
+  .hot-badges { display:flex; flex-direction:column; gap:8px; }
   .hot-badge {
-    font-size:11px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase;
-    padding:7px 12px; border-radius:4px; text-align:center;
-    background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.35);
+    font-size:13px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase;
+    padding:10px 14px; border-radius:8px; text-align:center; min-width:110px;
+    background:rgba(255,255,255,0.2); border:3px solid rgba(255,255,255,0.45);
   }
 
-  body.theme-hayes { background:#0a1028; color:#e8f4ff; }
-  .panel {
-    width:1920px; height:1200px; padding:14px 22px 8px;
-    display:flex; flex-direction:column; gap:8px; position:relative; overflow:hidden;
-    background-color:#0e1840;
-    background-image:
-      radial-gradient(ellipse 55% 50% at 50% 45%, rgba(80,40,160,0.35), transparent 70%),
-      radial-gradient(circle at 50% 50%, transparent 28%, rgba(40,180,255,0.12) 42%, rgba(120,40,200,0.28) 62%, rgba(10,16,40,0.85) 78%),
-      url("theme-tiles/hayes-storm.png"),
-      url("theme-tiles/hayes-lattice.png"),
-      url("camo-glass-tile-house.png");
-    background-size: auto, auto, 420px 420px, 64px 64px, 420px 420px;
-    background-position: center, center, center, 0 0, 0 0;
-    background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat;
-  }
-  .panel::before {
-    content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
-    background:
-      linear-gradient(180deg, rgba(80,200,255,0.08), transparent 30%, rgba(120,40,200,0.1) 100%);
-    animation: storm-pulse 4.5s ease-in-out infinite;
-  }
-  @keyframes storm-pulse {
-    0%,100% { opacity:0.7; }
-    50% { opacity:1; }
-  }
-  .panel::after {
-    content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
-    box-shadow: inset 0 0 0 4px rgba(80,220,255,0.35), inset 0 0 0 8px rgba(20,20,40,0.8), inset 0 0 80px rgba(100,40,200,0.25);
-  }
-  .hud-tick { position:absolute; width:28px; height:28px; z-index:3; border-color:#70e0ff; border-style:solid; opacity:0.85; }
-  .hud-tick.tl { top:10px; left:10px; border-width:3px 0 0 3px; }
-  .hud-tick.tr { top:10px; right:10px; border-width:3px 3px 0 0; }
-  .hud-tick.bl { bottom:10px; left:10px; border-width:0 0 3px 3px; }
-  .hud-tick.br { bottom:10px; right:10px; border-width:0 3px 3px 0; }
-  .panel > * { position:relative; z-index:2; }
-  .hdr {
-    background: linear-gradient(180deg, rgba(20,40,80,0.92), rgba(12,24,56,0.88));
-    border:2px solid rgba(80,220,255,0.55);
-    box-shadow: 0 0 20px rgba(80,200,255,0.2), 0 6px 0 #060c20;
-    border-radius:2px; color:#e8f8ff;
-  }
-  .back, .nav-week {
-    background:linear-gradient(180deg,#2a6a8a,#1a4058); color:#e0f8ff; border-color:#70e0ff;
-  }
-  .avatar {
-    border-radius:4px;
-    background:linear-gradient(145deg,#3ec9a0,#1a5a80 50%,#6a20a0);
-    box-shadow:0 0 0 3px rgba(80,220,255,0.5), 0 6px 0 #060c20, 0 0 20px rgba(80,200,255,0.4);
-  }
-  .eyebrow { color:#70e0ff; }
-  .name { color:#f0f8ff; }
-  .name-accent { color:#7dffc8; text-shadow:0 0 12px rgba(80,255,180,0.6); }
-  .tagline { color:#a0c8e8; }
-  .hot-pill { background:linear-gradient(180deg,#ffe060,#e8a020); color:#1a1000; border-color:#c08000; }
-  .bars { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; flex-shrink:0; }
-  .bar-card {
-    padding:8px 12px; border-radius:2px;
-    background:rgba(8,16,40,0.85); border:2px solid rgba(80,220,255,0.4);
-    box-shadow:0 0 12px rgba(80,200,255,0.15);
-  }
-  .bar-top { display:flex; justify-content:space-between; font-size:11px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:#a0d8ff; margin-bottom:4px; }
-  .bar-track { height:12px; border-radius:2px; background:#060c20; border:1px solid rgba(80,220,255,0.3); overflow:hidden; }
-  .bar-fill-hp { height:100%; width:0%; background:linear-gradient(90deg,#3ec9a0,#7dffc8); }
-  .bar-fill-sh { height:100%; width:0%; background:linear-gradient(90deg,#3a80ff,#70e0ff); }
-  .bar-fill-ch { height:100%; width:0%; background:linear-gradient(90deg,#c060ff,#ffe060); }
-  .hot-banner {
-    background:linear-gradient(105deg,#1a0840,#2a1860 30%,#183868 55%,#2a1860 80%,#1a0840);
-    border-color:#70e0ff;
-    box-shadow:0 0 24px rgba(80,200,255,0.3), 0 6px 0 #060c20;
-  }
-  .hot-accent { background:linear-gradient(180deg,#70e0ff,#c060ff,#ffe060); }
-  .hot-label { color:rgba(160,220,255,0.85); }
-  .hot-title { color:#fff; text-shadow:0 0 16px rgba(80,220,255,0.5); }
-  .hot-title .hl { background:linear-gradient(180deg,#ffe060,#e8a020); color:#1a1000; }
-  .hot-sub { color:#b8d8f0; }
-  .hot-badge { color:#e0f8ff; background:rgba(80,220,255,0.15); border-color:rgba(80,220,255,0.45); }
-  --sec-bg: rgba(10,20,48,0.88);
-  --sec-border: rgba(80,220,255,0.45);
-  --sec-shadow: 0 0 16px rgba(80,200,255,0.15), 0 5px 0 #060c20;
-  --sec-title: #70e0ff;
-  --sec-meta: #88b0d0;
-  --sec-rule: rgba(80,220,255,0.25);
-  --card-bg: rgba(16,32,64,0.95);
-  --card-border: rgba(80,220,255,0.4);
-  --card-edge: #060c20;
-  --card-hot-bg: rgba(60,40,20,0.95);
-  --card-hot-border: #e8a020;
-  --card-sport-bg: rgba(20,40,80,0.95);
-  --card-sport-border: #3ec9a0;
-  --card-act-bg: rgba(24,28,64,0.95);
-  --card-act-border: #8060ff;
-  --card-fun-bg: rgba(20,48,40,0.95);
-  --card-fun-border: #3ec9a0;
-  --when: #70e0ff;
-  .card .what { color:#f0f8ff; }
-  .card .hint { color:#88b0d0; }
-  .card.quiet { color:#88b0d0; background:rgba(0,0,0,0.25); }
-  --quest-bg: rgba(12,28,56,0.95);
-  --quest-border: #3ec9a0;
-  --quest-edge: #060c20;
-  --ring-border: #70e0ff;
-  --ring-bg: rgba(80,220,255,0.2);
-  --quest-done-bg: rgba(40,120,90,0.55);
-  --quest-done-border: #3ec9a0;
-  .quest .what { color:#f0f8ff; }
-  .quest .hint { color:#88b0d0; }
-  --bank-bg: linear-gradient(135deg,#1a0840,#0e1840);
-  --bank-border: #70e0ff;
-  .bank-card { color:#e8f8ff; box-shadow:0 0 24px rgba(80,200,255,0.25), 0 6px 0 #060c20; }
-  .bank-fill { background:linear-gradient(90deg,#c060ff,#70e0ff,#ffe060); }
-  .loadout {
-    flex-shrink:0; display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:2px;
-    background:rgba(8,16,40,0.92); border:2px solid rgba(80,220,255,0.4);
-  }
-  .loadout-lab { font-size:11px; font-weight:800; letter-spacing:0.2em; text-transform:uppercase; color:#70e0ff; }
-  .loadout-slot {
-    width:44px; height:44px; border-radius:4px;
-    background:rgba(20,40,80,0.9); border:2px solid rgba(80,220,255,0.35);
-    display:flex; align-items:center; justify-content:center; font-size:18px;
-  }
-  .loadout-slot.on { border-color:#ffe060; box-shadow:0 0 12px rgba(255,220,80,0.45); }
-  .loadout-note { margin-left:auto; font-size:12px; font-weight:650; color:#88b0d0; }
-  .ftr { color:#88b0d0; }
-  .ftr-chip { background:rgba(20,40,80,0.8); border-color:rgba(80,220,255,0.4); color:#c8e8ff; }
-  .mute-btn { background:rgba(20,40,80,0.9); color:#e0f8ff; border-color:#70e0ff; }
-  body.theme-hayes .hcb-label { color:#e0f8ff; text-shadow:0 0 24px #70e0ff, 0 4px 0 #1a0840; }
-  @media (prefers-reduced-motion:reduce){ .panel::before{animation:none!important} }
+  body.theme-hayes{background:#060c28;color:#e8f8ff}
+  .panel{width:1920px;height:1200px;padding:12px 20px 6px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;
+    background-color:#0a1440;
+    background-image:radial-gradient(ellipse 60% 55% at 50% 48%,rgba(100,40,180,.4),transparent 70%),
+      radial-gradient(circle at 50% 50%,transparent 26%,rgba(40,200,255,.18) 40%,rgba(140,40,220,.35) 58%,rgba(6,12,40,.92) 76%),
+      url("theme-tiles/hayes-storm.png"),url("theme-tiles/hayes-lattice.png"),url("camo-glass-tile-house.png");
+    background-size:auto,auto,480px 480px,64px 64px,420px 420px;
+    background-position:center,center,center,0 0,0 0;
+    background-repeat:no-repeat,no-repeat,no-repeat,repeat,repeat}
+  .panel::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(circle at 50% 50%,transparent 30%,rgba(80,220,255,.12) 48%,transparent 52%);
+    animation:storm-ring 3.2s ease-in-out infinite}
+  @keyframes storm-ring{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.04);opacity:1}}
+  .panel::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+    box-shadow:inset 0 0 0 5px rgba(80,230,255,.45),inset 0 0 0 12px rgba(10,10,40,.85),inset 0 0 100px rgba(120,40,200,.3)}
+  .hud-tick{position:absolute;width:32px;height:32px;z-index:3;border-color:#70e0ff;border-style:solid;opacity:.9}
+  .hud-tick.tl{top:8px;left:8px;border-width:4px 0 0 4px}.hud-tick.tr{top:8px;right:8px;border-width:4px 4px 0 0}
+  .hud-tick.bl{bottom:8px;left:8px;border-width:0 0 4px 4px}.hud-tick.br{bottom:8px;right:8px;border-width:0 4px 4px 0}
+  .panel>*{position:relative;z-index:2}
+  .hdr{background:linear-gradient(180deg,rgba(16,36,80,.95),rgba(8,20,56,.92));border:3px solid #70e0ff;box-shadow:0 0 24px rgba(80,220,255,.35),0 7px 0 #040818;border-radius:4px;color:#e8f8ff}
+  .back,.nav-week{background:linear-gradient(180deg,#2a80a0,#183858);color:#e0f8ff;border-color:#70e0ff}
+  .avatar{border-radius:6px;background:linear-gradient(145deg,#3ec9a0,#184878 50%,#7018b0);box-shadow:0 0 0 4px rgba(80,230,255,.55),0 7px 0 #040818,0 0 24px rgba(80,220,255,.5)}
+  .eyebrow{color:#70e0ff}.name{color:#f0f8ff}.name-accent{color:#7dffc8;text-shadow:0 0 16px rgba(80,255,180,.75)}
+  .tagline{color:#a8d0f0}.hot-pill{background:linear-gradient(180deg,#ffe060,#e09010);color:#1a1000;border-color:#c08000}
+  .bars{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px}
+  .bar-card{padding:10px 14px;border-radius:4px;background:rgba(6,14,40,.9);border:3px solid rgba(80,230,255,.5);box-shadow:0 0 16px rgba(80,220,255,.2)}
+  .bar-top{display:flex;justify-content:space-between;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#a0e0ff;margin-bottom:6px}
+  .bar-track{height:14px;border-radius:3px;background:#040818;border:2px solid rgba(80,230,255,.35);overflow:hidden}
+  .bar-fill-hp{height:100%;width:0%;background:linear-gradient(90deg,#3ec9a0,#7dffc8)}
+  .bar-fill-sh{height:100%;width:0%;background:linear-gradient(90deg,#3060ff,#70e0ff)}
+  .bar-fill-ch{height:100%;width:0%;background:linear-gradient(90deg,#c060ff,#ffe060)}
+  .storm-meter{flex-shrink:0;padding:8px 12px;border-radius:4px;background:rgba(6,14,40,.9);border:3px solid #c060ff;display:flex;align-items:center;gap:12px}
+  .storm-lab{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#e0a0ff}
+  .storm-track{flex:1;height:16px;border-radius:99px;background:#040818;border:2px solid #c060ff;overflow:hidden;position:relative}
+  .storm-fill{height:100%;width:35%;background:linear-gradient(90deg,#c060ff,#70e0ff,#7dffc8);animation:storm-fill-pulse 2s ease-in-out infinite}
+  @keyframes storm-fill-pulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25)}}
+  .hot-banner{background:linear-gradient(105deg,#180850,#2a1870 30%,#184080 55%,#2a1870);border-color:#70e0ff;box-shadow:0 0 28px rgba(80,220,255,.4),0 8px 0 #040818}
+  .hot-accent{background:linear-gradient(180deg,#70e0ff,#c060ff,#ffe060)}
+  .hot-label{color:#a0e0ff}.hot-title{color:#fff;text-shadow:0 0 18px rgba(80,230,255,.6)}
+  .hot-title .hl{background:linear-gradient(180deg,#ffe060,#e09010);color:#1a1000}
+  .hot-sub{color:#c0e0ff}.hot-badge{color:#e0f8ff;background:rgba(80,230,255,.18);border-color:rgba(80,230,255,.5)}
+  --sec-bg:rgba(8,18,48,.92);--sec-border:rgba(80,230,255,.55);--sec-shadow:0 0 18px rgba(80,220,255,.2),0 6px 0 #040818;
+  --sec-title:#70e0ff;--sec-meta:#88b8d8;--sec-rule:rgba(80,230,255,.3);
+  --card-bg:rgba(12,28,64,.96);--card-border:rgba(80,230,255,.5);--card-edge:#040818;
+  --card-hot-bg:rgba(70,40,10,.95);--card-hot-border:#e09010;
+  --card-sport-bg:rgba(12,40,70,.95);--card-sport-border:#3ec9a0;
+  --card-act-bg:rgba(20,24,70,.95);--card-act-border:#8060ff;
+  --card-fun-bg:rgba(12,48,36,.95);--card-fun-border:#3ec9a0;--when:#70e0ff;
+  .card .what{color:#f0f8ff}.card .hint{color:#88b8d8}.card.quiet{color:#88b8d8;background:rgba(0,0,0,.3)}
+  --quest-bg:rgba(10,24,56,.96);--quest-border:#3ec9a0;--quest-edge:#040818;
+  --ring-border:#70e0ff;--ring-bg:rgba(80,230,255,.25);--quest-done-bg:rgba(30,120,90,.6);--quest-done-border:#3ec9a0;
+  .quest .what{color:#f0f8ff}.quest .hint{color:#88b8d8}
+  --bank-bg:linear-gradient(135deg,#180850,#0a1440);--bank-border:#70e0ff;
+  .bank-card{color:#e8f8ff;box-shadow:0 0 28px rgba(80,220,255,.35),0 8px 0 #040818}
+  .bank-fill{background:linear-gradient(90deg,#c060ff,#70e0ff,#ffe060)}
+  .loadout{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:4px;background:rgba(6,14,40,.95);border:3px solid rgba(80,230,255,.5)}
+  .loadout-lab{font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#70e0ff}
+  .loadout-slot{width:52px;height:52px;border-radius:8px;background:rgba(16,36,80,.95);border:3px solid rgba(80,230,255,.4);display:flex;align-items:center;justify-content:center;font-size:22px}
+  .loadout-slot.on{border-color:#ffe060;box-shadow:0 0 16px rgba(255,220,80,.55)}
+  .loadout-note{margin-left:auto;font-size:14px;font-weight:700;color:#88b8d8}
+  .elim-tag{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#7dffc8;padding:6px 10px;border:2px solid #3ec9a0;border-radius:4px}
+  .ftr{color:#88b8d8}.ftr-chip{background:rgba(16,36,80,.9);border-color:rgba(80,230,255,.45);color:#c8e8ff}
+  .mute-btn{background:rgba(16,36,80,.95);color:#e0f8ff;border-color:#70e0ff}
+  body.theme-hayes .hcb-label{color:#e0f8ff;text-shadow:0 0 28px #70e0ff,0 4px 0 #180850;font-size:80px}
+  @media (prefers-reduced-motion:reduce){.panel::before,.storm-fill{animation:none!important}}
 
 </style>
 </head>
-<body data-clear-label="VICTORY" data-kid="hayes" data-theme="hayes" data-chores-shared="1" class="theme-hayes">
+<body data-clear-label="VICTORY ROYALE" data-kid="hayes" data-theme="hayes" data-chores-shared="1" class="theme-hayes">
 
 <div class="panel">
-  <div class="hud-tick tl" aria-hidden="true"></div>
-  <div class="hud-tick tr" aria-hidden="true"></div>
-  <div class="hud-tick bl" aria-hidden="true"></div>
-  <div class="hud-tick br" aria-hidden="true"></div>
-
+  <div class="hud-tick tl"></div><div class="hud-tick tr"></div><div class="hud-tick bl"></div><div class="hud-tick br"></div>
   <header class="hdr">
     <div class="hdr-left">
-      <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="44" /></div>
-      <div class="nav-row">
-        <a class="back" href="sheet-index.html"><span class="chev">‹</span> Sheets</a>
-        <a class="nav-week" href="index.html">Week</a>
-      </div>
+      <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="40" /></div>
+      <div class="nav-row"><a class="back" href="sheet-index.html">‹ Sheets</a><a class="nav-week" href="index.html">Week</a></div>
       <div class="identity">
-        <div class="avatar" aria-hidden="true">H</div>
-        <div class="id-text">
-          <a class="eyebrow" href="sheet-index.html">Drop Zone · your match</a>
-          <h1 class="name">Let's go <span class="name-accent">Hayes</span></h1>
-          <div class="tagline">Your challenges · your coins · your sports · drop in</div>
+        <div class="avatar">H</div>
+        <div>
+          <a class="eyebrow" href="sheet-index.html">DROP ZONE · MATCH LIVE</a>
+          <h1 class="name">LET'S GO <span class="name-accent">HAYES</span>!!!</h1>
+          <div class="tagline">Clear challenges · bank coins · chase that UMBRELLA</div>
         </div>
       </div>
     </div>
     <div class="hdr-right">
-      <div class="hot-pill" data-hot-pill><span class="spark">◆</span> Your Sat drop · Chat &amp; Chew + flag</div>
+      <div class="hot-pill" data-hot-pill>🎯 SAT DROP · Chat &amp; Chew + FLAG</div>
       <div style="display:flex;gap:8px;align-items:center">
-        <button type="button" class="mute-btn" data-mute-toggle aria-pressed="false">🔊 Sound</button>
-        <div class="mock-tag">YOUR BOARD · KIDS-SAFE<br/>as-of Sat Sep 26 2026</div>
+        <button type="button" class="mute-btn" data-mute-toggle>🔊 ON</button>
+        <div class="mock-tag">YOUR MATCH<br/>Sat Sep 26</div>
       </div>
     </div>
   </header>
-
-  <div class="bars" aria-label="Your HUD">
-    <div class="bar-card">
-      <div class="bar-top"><span>Energy</span><span data-progress-val>0%</span></div>
-      <div class="bar-track"><div class="bar-fill-hp" data-progress-fill></div></div>
-    </div>
-    <div class="bar-card">
-      <div class="bar-top"><span>Shield · prep</span><span data-progress-meta="{pct}%">{pct}</span></div>
-      <div class="bar-track"><div class="bar-fill-sh" data-progress-fill></div></div>
-    </div>
-    <div class="bar-card">
-      <div class="bar-top"><span>Challenges</span><span data-left-count>open</span></div>
-      <div class="bar-track"><div class="bar-fill-ch" data-progress-fill></div></div>
-    </div>
+  <div class="bars">
+    <div class="bar-card"><div class="bar-top"><span>❤️ ENERGY</span><span data-progress-val>0%</span></div><div class="bar-track"><div class="bar-fill-hp" data-progress-fill></div></div></div>
+    <div class="bar-card"><div class="bar-top"><span>🛡️ SHIELD</span><span data-progress-meta="{pct}%">{pct}</span></div><div class="bar-track"><div class="bar-fill-sh" data-progress-fill></div></div></div>
+    <div class="bar-card"><div class="bar-top"><span>⚔️ CHALLENGES</span><span data-left-count>open</span></div><div class="bar-track"><div class="bar-fill-ch" data-progress-fill></div></div></div>
   </div>
-
-  <section class="hot-banner" aria-label="Your drop alert">
+  <div class="storm-meter"><div class="storm-lab">STORM</div><div class="storm-track"><div class="storm-fill" data-bank-fill></div></div><span class="elim-tag">ELIMS = QUESTS</span></div>
+  <section class="hot-banner">
     <div class="hot-accent"></div>
     <div class="hot-body">
       <div class="hot-main">
-        <div class="hot-label">Drop alert · hottest for you</div>
-        <div class="hot-title" data-hot-title>Sat Sep 26 · Chat &amp; Chew 9:00 · flag 2:45</div>
-        <div class="hot-sub" data-hot-sub><strong>Your big Saturday drop</strong> · LOCKED @ home then Indian Hills MS</div>
+        <div class="hot-label">DROP ALERT · GO LEGENDARY</div>
+        <div class="hot-title" data-hot-title>SAT DROP · Chat &amp; Chew 9:00 · FLAG 2:45</div>
+        <div class="hot-sub" data-hot-sub><strong>YOUR BIG SATURDAY LOADOUT</strong> · clutch up</div>
       </div>
-      <div class="hot-badges">
-        <div class="hot-badge">Chat &amp; Chew</div>
-        <div class="hot-badge">Flag</div>
-      </div>
+      <div class="hot-badges"><div class="hot-badge">LOCKED IN</div><div class="hot-badge">FLAG DROP</div></div>
     </div>
   </section>
-
   <div class="body">
-    <section class="sec" aria-label="Your today">
-      <div class="sec-hdr"><div class="sec-title">Today · your loadout</div><div class="sec-meta">Sat Sep 26</div></div>
+    <section class="sec">
+      <div class="sec-hdr"><div class="sec-title">🎮 Today · loadout</div><div class="sec-meta">Sat</div></div>
       <div class="sec-list" data-mount-today-events></div>
-      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Your challenges</div><div class="sec-meta" data-streak-label>fire streak</div></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">⚔️ YOUR CHALLENGES</div><div class="sec-meta" data-streak-label>streak</div></div>
       <div class="sec-list" data-mount-quests></div>
-      <div class="tap-hint"><span class="ring">✓</span> Tap · eliminate · bank victory coins</div>
+      <div class="tap-hint">👆 TAP = ELIMINATION · +COIN boom</div>
     </section>
-    <section class="sec" aria-label="Your sports">
-      <div class="sec-hdr"><div class="sec-title">Your sports · storm</div><div class="sec-meta">this week</div></div>
+    <section class="sec">
+      <div class="sec-hdr"><div class="sec-title">🏁 Sports</div></div>
       <div class="sec-list" data-mount-sports></div>
-    </section>
-    <section class="sec" aria-label="Your school">
-      <div class="sec-hdr"><div class="sec-title">Your school</div><div class="sec-meta">known for you</div></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">🏫 School / HQ</div></div>
       <div class="sec-list" data-mount-school></div>
-      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Your fun picks</div><div class="sec-meta">victory lap</div></div>
-      <div class="sec-list" data-mount-fun></div>
     </section>
-    <section class="sec" aria-label="Your appointments">
-      <div class="sec-hdr"><div class="sec-title">Your appointments</div><div class="sec-meta">clear skies?</div></div>
+    <section class="sec">
+      <div class="sec-hdr"><div class="sec-title">🎉 FUN / victory lap</div></div>
+      <div class="sec-list" data-mount-fun></div>
+      <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">🎯 Bonus missions</div></div>
+      <div class="sec-list" data-mount-missions></div>
+    </section>
+    <section class="sec">
+      <div class="sec-hdr"><div class="sec-title">📅 Appointments</div></div>
       <div class="sec-list" data-mount-appointments></div>
     </section>
-    <section class="sec sec-bank bank-card" aria-label="Your victory bank">
+    <section class="sec sec-bank bank-card">
       <div class="bank-top">
         <div>
-          <div class="bank-title">Your victory bank</div>
-          <div class="bank-goal-title" data-bank-goal-title>Unlock your Victory Umbrella</div>
+          <div class="bank-title">◎ VICTORY BANK</div>
+          <div class="bank-goal-title" data-bank-goal-title>Unlock the Victory Umbrella!!!</div>
         </div>
-        <div class="bank-count"><span class="sym" data-bank-symbol>◎</span><span data-bank-life>0</span></div>
+        <div class="bank-count"><span data-bank-symbol>◎</span> <span data-bank-life>0</span></div>
       </div>
-      <div class="bank-blurb" data-bank-goal-blurb>Clear challenges. Bank coins. Fill the storm meter.</div>
+      <div class="bank-blurb" data-bank-goal-blurb>Wipe challenges. Stack coins. STORM METER GO BRRR.</div>
       <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
-      <div class="bank-meta"><span data-bank-meta>0 / 10 coins to go</span> · today <span data-bank-today>0</span> · reward: <span data-bank-reward>victory umbrella drop</span></div>
+      <div class="bank-meta"><span data-bank-meta>0 / 10 coins</span> · today <span data-bank-today>0</span></div>
+      <div class="goal-unlock" data-goal-unlock hidden>🏆 VICTORY ROYALE · ask Dad · umbrella drop</div>
     </section>
   </div>
-
-  <div class="loadout" aria-label="Your loadout">
-    <div class="loadout-lab">Loadout</div>
-    <div class="loadout-slot on">🎯</div>
-    <div class="loadout-slot">🛡️</div>
-    <div class="loadout-slot">⚡</div>
-    <div class="loadout-slot">🏃</div>
-    <div class="loadout-slot">🎒</div>
-    <div class="loadout-note">your challenges feed the umbrella · storm circle pulse</div>
+  <div class="loadout">
+    <div class="loadout-lab">LOADOUT</div>
+    <div class="loadout-slot on">🎯</div><div class="loadout-slot">🛡️</div><div class="loadout-slot">⚡</div><div class="loadout-slot">🏃</div><div class="loadout-slot">🎒</div>
+    <div class="loadout-note">clear all = VICTORY ROYALE moment</div>
   </div>
-
   <footer class="ftr">
-    <div class="ftr-left">
-      <span>your board · kids-safe · Sat Sep 26 2026</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <span>YOUR match · Drop Zone</span>
       <span class="ftr-chip">HAYES · DROP ZONE</span>
       <a class="ftr-chip" href="sheet-chores.html">Family chores</a>
-      <a class="ftr-chip" href="sheet-allowance.html">Stars overview</a>
     </div>
-    <span class="ftr-meta">House · original storm homage · no logos · sound on</span>
+    <span>original storm homage · sound ON</span>
   </footer>
 </div>
 
@@ -405,10 +309,10 @@
 <script src="house-sfx.js"></script>
 <script src="house-checkoffs.js" defer></script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    if (window.WardKids) WardKids.boot("hayes");
-    if (window.HouseSfx) HouseSfx.wireMute();
-  });
+document.addEventListener("DOMContentLoaded", function(){
+  if (window.WardKids) WardKids.boot("hayes");
+  if (window.HouseSfx) HouseSfx.wireMute();
+});
 </script>
 </body>
 </html>
