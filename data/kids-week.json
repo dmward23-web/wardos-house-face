@@ -466,12 +466,6 @@
           "cadence": "daily"
         },
         {
-          "id": "ain-backpack",
-          "what": "\ud83c\udf92 Backpack ready \u2014 school nights (daily must)",
-          "stars": 1,
-          "cadence": "daily"
-        },
-        {
           "id": "ain-dishwasher",
           "what": "\ud83c\udf7d\ufe0f Dishwasher load/unload \u2014 stage crew (daily must)",
           "stars": 1,
@@ -492,7 +486,7 @@
         {
           "id": "ain-laundry",
           "what": "\ud83d\udc55 Laundry full cycle \u2014 her clothes (weekly must)",
-          "stars": 4,
+          "stars": 5,
           "cadence": "weekly"
         },
         {
