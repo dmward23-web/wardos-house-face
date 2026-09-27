@@ -95,6 +95,12 @@
           "cadence": "daily"
         },
         {
+          "id": "har-shower",
+          "what": "🚿 Shower · brush · ready for bed",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
           "id": "har-toys",
           "what": "🧸 Toys reset — weekly must",
           "stars": 2,
@@ -282,10 +288,10 @@
           "cadence": "daily"
         },
         {
-          "id": "hay-gear",
-          "what": "⚽ Sports bag / cleats ready — weekly must",
-          "stars": 2,
-          "cadence": "weekly"
+          "id": "hay-shower",
+          "what": "🚿 Shower · brush · ready for bed",
+          "stars": 1,
+          "cadence": "daily"
         },
         {
           "id": "hay-room",
@@ -399,7 +405,7 @@
         },
         {
           "when": "Weekly",
-          "what": "⚽ Gear + 🧹 room + 🎒 garage cubby = bonus coins",
+          "what": "🧹 Room + 🎒 garage cubby = bonus coins",
           "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         }
