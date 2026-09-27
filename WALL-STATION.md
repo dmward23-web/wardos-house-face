@@ -1,6 +1,7 @@
 # Wall station · format law
 
 **Locked:** Sun Sep 27 2026 (CT), from the live hallway column photo.
+**Cadence lock (~4:24p CT Sun 27 Sep 2026 — SUPERSEDES any three-week wall rush):** **Prove = home use at 147th through YE26 (2026-12-31).** No rush live. Plumb named installs / public offer from **2027-01-01**. Atlas owns the prove board (`wardos-kit/WALL-STATION-PROVE-PLAN-2026-09-27.md`).
 **Surface:** House Face only. Not Desk. Not money. Not PIN.
 **Home URL (only one):** https://dmward23-web.github.io/wardos-house-face/sheet-index.html
 
@@ -48,7 +49,7 @@ Dad Seat / desk gate may exist as a tile. It stays a grown-ups boundary mock. **
 
 | Seat | On this panel |
 |------|----------------|
-| **Atlas** | Leave-by and family leaves only. One line. No bills. No money events. No person-email. |
+| **Atlas** | Leave-by and family leaves only. One line. No bills. No money events. No person-email. Owns Path A prove cadence through YE26. |
 | **Prism** | The picture. Plates, type size, camo, tile grid. Last-look that it still reads at a walk-by. |
 | **Wright** | The kit. 27" kiosk fit (1920×1080, no chrome). Do not restyle House into Desk. |
 | **Harbor** | Nothing on the glass. Drafts stay off-panel. Last-yes before any person-text. |
@@ -67,3 +68,15 @@ No new bot for the wall. House Face is the face. This file is the format.
 - No horizontal scroll. No browser chrome.
 - No `$` anywhere on the glass.
 - Back path from every sheet is **Sheets**, and Sheets is this home.
+
+---
+
+## Plumb Path A master (locked 2026-09-27; cadence ~4:24p CT)
+
+**Path A Mode A master = prove at 147th home through YE26.** Hang/use when iron last-yes’d. Kids live on House glass. Straight-on column photo when hung. Harden day-7 until boring through holidays. Whole prove window = **now → 2026-12-31** — **not** a 3-week forced ship; **no rush live**.
+
+**Plumb LIVE / Mode B named installs from 2027-01-01** (first named only if Dan names + last-yes).
+
+OP hallway wall station hardware stays **HOLD** until separate Dan last-yes. Ring first extra. No cart. No buy without last-yes on the personal station.
+
+Owned path: `/workspace/wardos-kit/WALL-STATION-PROVE-PLAN-2026-09-27.md`.
