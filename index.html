@@ -516,119 +516,119 @@
 </head>
 <body>
 <div class="stage">
-  <div class="scaler" id="scaler">
-    <div class="panel" id="app" role="main" aria-label="House family week"></div>
-  </div>
+ <div class="scaler" id="scaler">
+ <div class="panel" id="app" role="main" aria-label="House family week"></div>
+ </div>
 </div>
 
 <script>
 /* ─── Morning-refresh facts (swap values only; do not restyle) ───
-   Known facts only · as-of Sat Sep 26 2026 · no money · no invent · Mon LIVE prep */
+ Known facts only · as-of Sat Sep 26 2026 · no money · no invent · Mon LIVE prep */
 const FACTS = {
-  asOf: "Sat Sep 26 2026",
-  asOfShort: "26 Sep 2026",
-  eyebrow: "WardOS · House · KS Hub",
-  title: "House",
-  titleSub: "family week",
-  meta: [
-    "Kids with Dad @ 147th · through Fri Oct 2 3:00",
-    { text: "Weather · mock", className: "wx" },
-    "Mon LIVE · House+Desk 8:00"
-  ],
-  mockTag: "",
-  
-  leaveCard: {
-    style: "A",
-    label: "weekday leave card",
-    dateLabel: "Sat Sep 26",
-    leaveBy: "7:55",
-    place: "Heritage Park",
-    flight: "",
-    route: "Harris flag",
-    status: "LIVE · leave now · game 8:30"
-  },
-  lockPacket: {
-    style: "B",
-    label: "weekend lock packet",
-    loadDay: "Mon Sep 28",
-    status: "LIVE · House+Desk flip 8:00"
-  },
-  schoolWeather: { school: "UNKNOWN", weather: "UNKNOWN" },
+ asOf: "Sat Sep 26 2026",
+ asOfShort: "26 Sep 2026",
+ eyebrow: "WardOS · House · KS Hub",
+ title: "House",
+ titleSub: "family week",
+ meta: [
+ "Kids with Dad @ 147th · through Fri Oct 2 3:00",
+ { text: "Weather", className: "wx" },
+ "Mon LIVE · House+Desk 8:00"
+ ],
+ mockTag: "",
+ 
+ leaveCard: {
+ style: "A",
+ label: "weekday leave card",
+ dateLabel: "Sat Sep 26",
+ leaveBy: "7:55",
+ place: "Heritage Park",
+ flight: "",
+ route: "Harris flag",
+ status: "LIVE · leave now · game 8:30"
+ },
+ lockPacket: {
+ style: "B",
+ label: "weekend lock packet",
+ loadDay: "Mon Sep 28",
+ status: "LIVE · House+Desk flip 8:00"
+ },
+ schoolWeather: { school: "UNKNOWN", weather: "UNKNOWN" },
 leaveBy: {
-    label: "Leave now · Sat",
-    date: "Sat Sep 26",
-    time: "7:55",
-    place: "Harris flag",
-    detailHtml: "Game <strong>8:30</strong> · Heritage Park Field 10 · 17255 S Black Bob Rd, Olathe",
-    badge: "Leave now"
-  },
-  week: {
-    title: "This week",
-    range: "Sat Sep 26 – Fri Oct 2 · Dad week @ 147th",
-    banner: "with Dad @ 147th through Fri Oct 2 3:00",
-    who: [
-      { id: "ain", label: "Ainsley" },
-      { id: "hay", label: "Hayes" },
-      { id: "har", label: "Harris" }
-    ],
-    days: [
-      {
-        dow: "Sat", dom: "26", load: true,
-        blocks: [
-          { type: "flight", time: "7:55", text: "Leave · Harris flag · game 8:30 Heritage F10", chips: ["har"] },
-          { type: "kids", time: "9:00", text: "Hayes Chat & Chew @ home · LOCKED", chips: ["hay"] },
-          { type: "urban", time: "10:30–12:45", text: "Quiet errands" },
-          { type: "flight", time: "~2:10", text: "Leave · Hayes flag · game 2:45 Indian Hills", chips: ["hay"] }
-        ]
-      },
-      {
-        dow: "Sun", dom: "27", load: false,
-        blocks: [
-          { type: "kids", time: "9–2", text: "Garage sale / house shake @ 147th", chips: ["ain","hay","har"] },
-          { type: "handoff", time: "3:00", text: "Ainsley vanity · Jessy", chips: ["ain"] },
-          { type: "urban", time: "6:00", text: "Lawn feed" }
-        ]
-      },
-      {
-        dow: "Mon", dom: "28", load: true,
-        blocks: [
-          { type: "kids", time: "7:30", text: "Hayes snacks", chips: ["hay"] },
-          { type: "flight", time: "8:00", text: "House+Desk LIVE" },
-          { type: "flight", time: "~8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
-          { type: "kids", time: "3:00", text: "Ainsley LKMS HW Help", chips: ["ain"] },
-          { type: "kids", time: "3:15/3:40", text: "Boys pickup", chips: ["hay","har"] },
-          { type: "flight", time: "~5:40", text: "Leave · Hayes BB 6:15 BV Rec F3", chips: ["hay"] }
-        ]
-      },
-      { dow: "Tue", dom: "29", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
-      { dow: "Wed", dom: "30", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
-      { dow: "Thu", dom: "1", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
-      {
-        dow: "Fri", dom: "2", load: false,
-        blocks: [
-          { type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"] },
-          { type: "handoff", time: "3:00", text: "Through · kids with Dad ends", chips: ["ain","hay","har"] }
-        ]
-      }
-    ]
-  },
-  nextTogether: {
-    label: "Watch",
-    items: ["Sun 27 · garage sale 9–2", "Mon 28 · House+Desk LIVE 8:00", "Fri Oct 2 3:00 · Dad week end"]
-  },
-  footer: {
-    note: "House · week board",
-    chip: "WEEK BOARD",
-    meta: ""
-  }
+ label: "Leave now · Sat",
+ date: "Sat Sep 26",
+ time: "7:55",
+ place: "Harris flag",
+ detailHtml: "Game <strong>8:30</strong>Heritage Park Field 10 · 17255 S Black Bob Rd, Olathe",
+ badge: "Leave now"
+ },
+ week: {
+ title: "This week",
+ range: "Sat Sep 26 – Fri Oct 2 · Dad week @ 147th",
+ banner: "with Dad @ 147th through Fri Oct 2 3:00",
+ who: [
+ { id: "ain", label: "Ainsley" },
+ { id: "hay", label: "Hayes" },
+ { id: "har", label: "Harris" }
+ ],
+ days: [
+ {
+ dow: "Sat", dom: "26", load: true,
+ blocks: [
+ { type: "flight", time: "7:55", text: "Leave · Harris flag · game 8:30 Heritage F10", chips: ["har"] },
+ { type: "kids", time: "9:00", text: "Hayes Chat & Chew @ home · LOCKED", chips: ["hay"] },
+ { type: "urban", time: "10:30–12:45", text: "Quiet errands" },
+ { type: "flight", time: "~2:10", text: "Leave · Hayes flag · game 2:45 Indian Hills", chips: ["hay"] }
+ ]
+ },
+ {
+ dow: "Sun", dom: "27", load: false,
+ blocks: [
+ { type: "kids", time: "9–2", text: "Garage sale / house shake @ 147th", chips: ["ain","hay","har"] },
+ { type: "handoff", time: "3:00", text: "Ainsley vanity · Jessy", chips: ["ain"] },
+ { type: "urban", time: "6:00", text: "Lawn feed" }
+ ]
+ },
+ {
+ dow: "Mon", dom: "28", load: true,
+ blocks: [
+ { type: "kids", time: "7:30", text: "Hayes snacks", chips: ["hay"] },
+ { type: "flight", time: "8:00", text: "House+Desk LIVE" },
+ { type: "flight", time: "~8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
+ { type: "kids", time: "3:00", text: "Ainsley LKMS HW Help", chips: ["ain"] },
+ { type: "kids", time: "3:15/3:40", text: "Boys pickup", chips: ["hay","har"] },
+ { type: "flight", time: "~5:40", text: "Leave · Hayes BB 6:15 BV Rec F3", chips: ["hay"] }
+ ]
+ },
+ { dow: "Tue", dom: "29", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
+ { dow: "Wed", dom: "30", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
+ { dow: "Thu", dom: "1", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
+ {
+ dow: "Fri", dom: "2", load: false,
+ blocks: [
+ { type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"] },
+ { type: "handoff", time: "3:00", text: "Through · kids with Dad ends", chips: ["ain","hay","har"] }
+ ]
+ }
+ ]
+ },
+ nextTogether: {
+ label: "Watch",
+ items: ["Sun 27 · garage sale 9–2", "Mon 28 · House+Desk LIVE 8:00", "Fri Oct 2 3:00 · Dad week end"]
+ },
+ footer: {
+ note: "House · week board",
+ chip: "WEEK BOARD",
+ meta: ""
+ }
 };
 
 function esc(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+ return String(s)
+ .replace(/&/g, "&amp;")
+ .replace(/</g, "&lt;")
+ .replace(/>/g, "&gt;")
+ .replace(/"/g, "&quot;");
 }
 
 const CHIP_LETTER = { ain: "A", hay: "H", har: "H" };
@@ -637,132 +637,132 @@ const CHIP_NAME = { ain: "Ainsley", hay: "Hayes", har: "Harris" };
 const CHIP_HREF = { ain: "kid-ainsley.html", hay: "kid-hayes.html", har: "kid-harris.html" };
 
 function renderChips(ids) {
-  if (!ids || !ids.length) return "";
-  const inner = ids.map(id => {
-    const letter = CHIP_LETTER[id] || "?";
-    const name = CHIP_NAME[id] || id;
-    const href = CHIP_HREF[id];
-    if (href) {
-      return `<a class="chip ${esc(id)}" href="${esc(href)}"><span class="d">${esc(letter)}</span>${esc(name)}</a>`;
-    }
-    return `<span class="chip ${esc(id)}"><span class="d">${esc(letter)}</span>${esc(name)}</span>`;
-  }).join("");
-  return `<div class="chips">${inner}</div>`;
+ if (!ids || !ids.length) return "";
+ const inner = ids.map(id => {
+ const letter = CHIP_LETTER[id] || "?";
+ const name = CHIP_NAME[id] || id;
+ const href = CHIP_HREF[id];
+ if (href) {
+ return `<a class="chip ${esc(id)}" href="${esc(href)}"><span class="d">${esc(letter)}</span>${esc(name)}</a>`;
+ }
+ return `<span class="chip ${esc(id)}"><span class="d">${esc(letter)}</span>${esc(name)}</span>`;
+ }).join("");
+ return `<div class="chips">${inner}</div>`;
 }
 
 function renderBlock(b) {
-  const t = b.time ? `<span class="t">${esc(b.time)}</span>` : "";
-  const chips = renderChips(b.chips);
-  if (b.type === "empty-chore" && b.done) {
-    return `<a class="blk empty-chore" href="sheet-chores.html"><span class="done-ring">✓</span>${esc(b.text)}</a>`;
-  }
-  return `<div class="blk ${esc(b.type)}" role="button" tabindex="0">${t}${esc(b.text)}${chips}</div>`;
+ const t = b.time ? `<span class="t">${esc(b.time)}</span>` : "";
+ const chips = renderChips(b.chips);
+ if (b.type === "empty-chore" && b.done) {
+ return `<a class="blk empty-chore" href="sheet-chores.html"><span class="done-ring">✓</span>${esc(b.text)}</a>`;
+ }
+ return `<div class="blk ${esc(b.type)}" role="button" tabindex="0">${t}${esc(b.text)}${chips}</div>`;
 }
 
 function renderDay(d) {
-  const load = d.load ? " load" : "";
-  const blocks = (d.blocks || []).map(renderBlock).join("");
-  const wantsTap = (d.blocks || []).some(b => b.tapAdd);
-  const tap = wantsTap ? `<div class="tap-add" role="button" tabindex="0"><span>+</span> add</div>` : "";
-  return `<div class="day${load}" role="group" aria-label="${esc(d.dow)} ${esc(d.dom)}">
-    <div class="day-top"><span class="dow">${esc(d.dow)}</span><span class="dom">${esc(d.dom)}</span></div>
-    <div class="blocks">${blocks}${tap}</div>
-  </div>`;
+ const load = d.load ? " load" : "";
+ const blocks = (d.blocks || []).map(renderBlock).join("");
+ const wantsTap = (d.blocks || []).some(b => b.tapAdd);
+ const tap = wantsTap ? `<div class="tap-add" role="button" tabindex="0"><span>+</span> add</div>` : "";
+ return `<div class="day${load}" role="group" aria-label="${esc(d.dow)} ${esc(d.dom)}">
+ <div class="day-top"><span class="dow">${esc(d.dow)}</span><span class="dom">${esc(d.dom)}</span></div>
+ <div class="blocks">${blocks}${tap}</div>
+ </div>`;
 }
 
 function render() {
-  const f = FACTS;
-  const metaHtml = f.meta.map((m, i) => {
-    if (typeof m === "string") return `<span class="meta">${esc(m)}</span>`;
-    return `<span class="meta ${esc(m.className || "")}">${esc(m.text)}</span>`;
-  }).join("");
+ const f = FACTS;
+ const metaHtml = f.meta.map((m, i) => {
+ if (typeof m === "string") return `<span class="meta">${esc(m)}</span>`;
+ return `<span class="meta ${esc(m.className || "")}">${esc(m.text)}</span>`;
+ }).join("");
 
-  const daysHtml = f.week.days.map(renderDay).join("");
-  const usItems = f.nextTogether.items.map(t => `<span class="us-item">${esc(t)}</span>`).join("");
-  const lb = f.leaveBy;
+ const daysHtml = f.week.days.map(renderDay).join("");
+ const usItems = f.nextTogether.items.map(t => `<span class="us-item">${esc(t)}</span>`).join("");
+ const lb = f.leaveBy;
 
-  document.getElementById("app").innerHTML = `
-  <header class="hdr">
-    <div class="hdr-left">
-      <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
-      <div class="nav-row">
-        <a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
-      </div>
-      <div class="eyebrow">${esc(f.eyebrow)}</div>
-      <h1 class="title">${esc(f.title)} <span class="sep">·</span> <span class="sub">${esc(f.titleSub)}</span></h1>
-      <div class="meta-row">${metaHtml}</div>
-    </div>
-    <div class="hdr-right">
-      <div class="wx-card" aria-label="Weather · mock placeholder">
-        <div class="wx-text">
-          <div class="wx-kicker">Outside · glance</div>
-          <div class="wx-line">Weather · mock / wire later <span class="mock">MOCK</span></div>
-          <div class="wx-sub">PLACEHOLDER · no forecast numbers</div>
-        </div>
-        <div class="wx-icons" aria-hidden="true">
-          <span class="wx-ico">☀</span>
-          <span class="wx-ico">☁</span>
-          <span class="wx-ico dim">🌧</span>
-          <span class="wx-ico">⛅</span>
-        </div>
-      </div>
-    </div>
-  </header>
+ document.getElementById("app").innerHTML = `
+ <header class="hdr">
+ <div class="hdr-left">
+ <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
+ <div class="nav-row">
+ <a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
+ </div>
+ <div class="eyebrow">${esc(f.eyebrow)}</div>
+ <h1 class="title">${esc(f.title)} <span class="sep">·</span> <span class="sub">${esc(f.titleSub)}</span></h1>
+ <div class="meta-row">${metaHtml}</div>
+ </div>
+ <div class="hdr-right">
+ <div class="wx-card" aria-label="Weather">
+ <div class="wx-text">
+ <div class="wx-kicker">Outside · glance</div>
+ <div class="wx-line">Weather · coming soon</div>
+ <div class="wx-sub">PLACEHOLDER · no forecast numbers</div>
+ </div>
+ <div class="wx-icons" aria-hidden="true">
+ <span class="wx-ico">☀</span>
+ <span class="wx-ico">☁</span>
+ <span class="wx-ico dim">🌧</span>
+ <span class="wx-ico">⛅</span>
+ </div>
+ </div>
+ </div>
+ </header>
 
-  <section class="leaveby" aria-label="Next leave-by">
-    <div class="leaveby-accent"></div>
-    <div class="leaveby-body">
-      <div class="leaveby-label">${esc(lb.label)}</div>
-      <div class="leaveby-main">${esc(lb.date)} · <span class="time">${esc(lb.time)}</span> · ${esc(lb.place)}</div>
-      <div class="leaveby-detail">${lb.detailHtml}</div>
-    </div>
-    <div class="leaveby-badge">${esc(lb.badge)}</div>
-  </section>
+ <section class="leaveby" aria-label="Next leave-by">
+ <div class="leaveby-accent"></div>
+ <div class="leaveby-body">
+ <div class="leaveby-label">${esc(lb.label)}</div>
+ <div class="leaveby-main">${esc(lb.date)} · <span class="time">${esc(lb.time)}</span>${esc(lb.place)}</div>
+ <div class="leaveby-detail">${lb.detailHtml}</div>
+ </div>
+ <div class="leaveby-badge">${esc(lb.badge)}</div>
+ </section>
 
-  <section class="week-wrap">
-    <div class="week-hdr">
-      <div class="week-title">${esc(f.week.title)}</div>
-      <div class="week-range">${esc(f.week.range)}</div>
-    </div>
-    <div class="banner-row">
-      <div class="banner custody-loud" aria-label="Custody">
-        <span class="c-k">Custody</span>
-        <span class="c-main">with <em>Dad</em> @ <em>147th</em> through <em>Fri Oct 2 3:00</em></span>
-        <span class="c-next">leave now · Sat 7:55 Harris flag</span>
-      </div>
-      <div class="who" aria-label="Kids">
-        ${(f.week.who || []).map(w => {
-          const href = CHIP_HREF[w.id];
-          const inner = `<span class="dot">${esc(CHIP_LETTER[w.id] || "?")}</span>${esc(w.label)}`;
-          return href
-            ? `<a class="who-chip ${esc(w.id)}" href="${esc(href)}">${inner}</a>`
-            : `<span class="who-chip ${esc(w.id)}" role="button" tabindex="0">${inner}</span>`;
-        }).join("")}
-      </div>
-    </div>
-    <div class="week-grid">${daysHtml}</div>
-  </section>
+ <section class="week-wrap">
+ <div class="week-hdr">
+ <div class="week-title">${esc(f.week.title)}</div>
+ <div class="week-range">${esc(f.week.range)}</div>
+ </div>
+ <div class="banner-row">
+ <div class="banner custody-loud" aria-label="Custody">
+ <span class="c-k">Custody</span>
+ <span class="c-main">with <em>Dad</em> @ <em>147th</em> through <em>Fri Oct 2 3:00</em></span>
+ <span class="c-next">leave now · Sat 7:55 Harris flag</span>
+ </div>
+ <div class="who" aria-label="Kids">
+ ${(f.week.who || []).map(w => {
+ const href = CHIP_HREF[w.id];
+ const inner = `<span class="dot">${esc(CHIP_LETTER[w.id] || "?")}</span>${esc(w.label)}`;
+ return href
+ ? `<a class="who-chip ${esc(w.id)}" href="${esc(href)}">${inner}</a>`
+ : `<span class="who-chip ${esc(w.id)}" role="button" tabindex="0">${inner}</span>`;
+ }).join("")}
+ </div>
+ </div>
+ <div class="week-grid">${daysHtml}</div>
+ </section>
 
-  <div class="us-row">
-    <span class="us-label">${esc(f.nextTogether.label)}</span>
-    ${usItems}
-  </div>
+ <div class="us-row">
+ <span class="us-label">${esc(f.nextTogether.label)}</span>
+ ${usItems}
+ </div>
 
-  <footer class="ftr">
-    <div class="ftr-left">
-      <span>${esc(f.footer.note)}</span>
-      <span class="ftr-chip">${esc(f.footer.chip)}</span>
-    </div>
-  </footer>`;
+ <footer class="ftr">
+ <div class="ftr-left">
+ <span>${esc(f.footer.note)}</span>
+ <span class="ftr-chip">${esc(f.footer.chip)}</span>
+ </div>
+ </footer>`;
 }
 
 function fit() {
-  const scaler = document.getElementById("scaler");
-  const stage = document.querySelector(".stage");
-  const w = stage.clientWidth;
-  const h = stage.clientHeight;
-  const s = Math.min(w / 1920, h / 1200);
-  scaler.style.transform = `scale(${s})`;
+ const scaler = document.getElementById("scaler");
+ const stage = document.querySelector(".stage");
+ const w = stage.clientWidth;
+ const h = stage.clientHeight;
+ const s = Math.min(w / 1920, h / 1200);
+ scaler.style.transform = `scale(${s})`;
 }
 
 render();
@@ -773,10 +773,10 @@ window.addEventListener("orientationchange", () => setTimeout(fit, 100));
 
 /* Optional: double-tap / keyboard F for browser fullscreen */
 document.addEventListener("keydown", (e) => {
-  if (e.key === "f" || e.key === "F") {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
-    else document.exitFullscreen?.();
-  }
+ if (e.key === "f" || e.key === "F") {
+ if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+ else document.exitFullscreen?.();
+ }
 });
 </script>
 
