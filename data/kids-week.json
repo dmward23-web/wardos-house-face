@@ -416,97 +416,98 @@
       "bankGoal": {
         "id": "tour-jar",
         "title": "Fill the Tour Jar",
-        "blurb": "Clear your musts. Bank Tour Stars into the jar. Hit the fill line \u2014 then allowance payday with Dad. Treat is optional secondary.",
+        "blurb": "Clear your musts. Bank Tour Stars. Hit 20 \u2014 Payday with Dad.",
         "need": 20,
-        "reward": "allowance payday with Dad"
+        "reward": "Payday with Dad"
       },
       "hottest": {
         "when": "SUN \u00b7 vanity 3:00 \u00b7 Jessy",
-        "what": "FEATURED \u00b7 SUNDAY",
+        "what": "ON THE BOARD",
         "where": "Vanity 3:00 \u00b7 with Dad @ 147th",
         "badges": [
-          "FEATURED",
-          "SUNDAY"
+          "SUNDAY",
+          "3:00"
         ]
       },
       "today": [
         {
           "kind": "event",
           "when": "Morning \u00b7 9\u20132",
-          "what": "\ud83c\udfe0 Garage sale / house shake with crew",
+          "what": "Garage sale / house shake with crew",
           "hint": "Help set the stage",
           "tone": "act"
         },
         {
           "kind": "event",
           "when": "3:00 LOCKED",
-          "what": "\ud83d\udc85 Vanity install \u00b7 Jessy",
-          "hint": "FEATURED \u00b7 your board",
+          "what": "Vanity install \u00b7 Jessy",
+          "hint": "your board",
           "tone": "hot"
         },
         {
           "kind": "event",
           "when": "After vanity",
-          "what": "\ud83c\udfa7 Playlist + chill with Dad",
-          "hint": "FUN \u00b7 your pick",
+          "what": "Playlist + chill with Dad",
+          "hint": "your pick",
           "tone": "fun"
         }
       ],
       "quests": [
         {
           "id": "ain-bed",
-          "what": "\ud83d\udecf\ufe0f Make bed \u2014 stage reset (daily must)",
+          "what": "Make bed \u2014 stage reset",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "ain-toys",
-          "what": "\ud83e\uddf9 Room reset \u2014 clean pass (daily must)",
+          "what": "Room reset \u2014 clean pass",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "ain-dishwasher",
-          "what": "\ud83c\udf7d\ufe0f Dishwasher load/unload \u2014 stage crew (daily must)",
+          "what": "Dishwasher load / unload",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "ain-living",
-          "what": "\ud83d\udecb\ufe0f Living room straighten \u00b7 shoes & coats (daily must)",
+          "what": "Living room \u00b7 shoes & coats",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "ain-bath",
-          "what": "\ud83d\udec1 Bathroom wipe \u2014 weekly must",
+          "what": "Bathroom wipe \u2014 weekly",
           "stars": 3,
           "cadence": "weekly"
         },
         {
           "id": "ain-laundry",
-          "what": "\ud83d\udc55 Laundry full cycle \u2014 her clothes (weekly must)",
+          "what": "Laundry full cycle \u2014 her clothes",
           "stars": 5,
           "cadence": "weekly"
         },
         {
           "id": "ain-babysit",
-          "what": "\ud83d\udc76 Babysitting \u2014 optional add-on (when Dad books you)",
+          "what": "\ud83d\udc76 Babysitting \u2014 hire path (Dad books you)",
           "stars": 0,
           "cadence": "addon",
-          "optional": true
+          "optional": true,
+          "hire": true
         }
       ],
       "sports": [
         {
           "when": "Tue 29 \u00b7 leave 4:25 \u00b7 practice 5:00",
-          "what": "\ud83c\udfca SWIM \u00b7 Coach Ann \u00b7 Genesis Ridgeview",
+          "what": "SWIM \u00b7 Coach Ann \u00b7 Genesis Ridgeview",
           "hint": "YOUR set",
           "tone": "hot"
         },
         {
           "when": "Thu 1 \u00b7 leave 4:25 \u00b7 practice 5:00",
-          "what": "\ud83c\udfca SWIM \u00b7 Coach Ann \u00b7 Genesis Ridgeview",
+          "what": "SWIM \u00b7 Coach Ann \u00b7 Genesis Ridgeview",
           "hint": "second set this week",
           "tone": "sport"
         }
@@ -515,34 +516,34 @@
       "school": [
         {
           "when": "Sun 27 \u00b7 9\u20132",
-          "what": "\ud83c\udfe0 Garage sale / house shake with crew",
+          "what": "Garage sale / house shake with crew",
           "tone": "act"
         },
         {
           "when": "Mon 28 \u00b7 3:00",
-          "what": "\ud83d\udcda LKMS Homework Help",
+          "what": "LKMS Homework Help",
           "tone": "act"
         },
         {
           "when": "Tue 29 \u00b7 school day",
-          "what": "\ud83d\udc42 Hearing / vision screen (volunteers)",
+          "what": "Hearing / vision screen (volunteers)",
           "hint": "at LKMS",
           "tone": "act"
         },
         {
           "when": "Thu 1 \u00b7 3:00",
-          "what": "\ud83d\udcda LKMS Homework Help",
+          "what": "LKMS Homework Help",
           "tone": "act"
         },
         {
           "when": "Fri 2 \u00b7 due",
-          "what": "\ud83d\udcf7 Yearbook baby photo due (email)",
+          "what": "Yearbook baby photo due (email)",
           "hint": "ask Dad if needed",
           "tone": "act"
         },
         {
           "when": "All week",
-          "what": "\ud83c\udfe1 Base @ 147th",
+          "what": "Base @ 147th",
           "hint": "Dad week through Fri Oct 2",
           "tone": "hot"
         }
@@ -550,13 +551,14 @@
       "appointments": [
         {
           "when": "Sun 27 \u00b7 3:00",
-          "what": "\ud83d\udc85 Vanity \u00b7 Jessy",
+          "what": "Vanity \u00b7 Jessy",
           "hint": "on your board",
-          "tone": "hot"
+          "tone": "hot",
+          "herSpace": true
         },
         {
           "when": "Wed 30 \u00b7 leave 12:40 \u00b7 1:00",
-          "what": "\ud83d\udc9c Midwest Anxiety \u00b7 Lindsay",
+          "what": "Midwest Anxiety \u00b7 Lindsay",
           "hint": "with Dad",
           "tone": "act"
         }
@@ -566,27 +568,58 @@
       "missions": [
         {
           "when": "Every tap",
-          "what": "\u2605 Must clear = star banked in the jar",
-          "hint": "FUN",
+          "what": "\u2605 Must clear = star in the jar",
+          "hint": "your pace",
           "tone": "fun"
         },
         {
           "when": "Goal",
-          "what": "\u2605 Fill jar (20) = allowance payday with Dad",
-          "hint": "FUN \u00b7 miss = payday held",
+          "what": "\u2605 Hit 20 = Payday with Dad",
+          "hint": "crew goal",
           "tone": "fun"
         },
         {
           "when": "Weekly",
-          "what": "\ud83d\udec1 Bath wipe + \ud83d\udc55 laundry cycle = big star dump",
+          "what": "Bath wipe + laundry cycle = big star dump",
           "hint": "musts \u00b7 ask Dad to inspect",
           "tone": "fun"
         },
         {
           "when": "Add-on",
-          "what": "\ud83d\udc76 Babysitting \u2014 optional (Dad books you)",
-          "hint": "not required for jar \u00b7 ask Dad",
+          "what": "\ud83d\udc76 Babysitting \u2014 hire when Dad books you",
+          "hint": "never fills jar \u00b7 your call",
           "tone": "fun"
+        }
+      ],
+      "goal": {
+        "name": "",
+        "need": 0,
+        "placeholder": "Set a goal with Dad"
+      },
+      "bag": {
+        "place": "Dad",
+        "label": "This week @ Dad \u00b7 bag",
+        "hint": "147th through Fri Oct 2 \u00b7 pack for Dad week"
+      },
+      "rides": [
+        {
+          "id": "scooter",
+          "what": "\ud83d\udef4 Scooter run",
+          "when": "your call",
+          "clear": true
+        },
+        {
+          "id": "bv-rec",
+          "what": "\ud83c\udfdf\ufe0f BV Rec",
+          "when": "when you're free",
+          "clear": true
+        },
+        {
+          "id": "swim",
+          "what": "\ud83c\udfca Ridgeview swim",
+          "when": "Tue/Thu \u00b7 leave 4:25",
+          "clear": true,
+          "hours": "leave 4:25 \u00b7 5:00"
         }
       ]
     },

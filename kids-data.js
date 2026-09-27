@@ -28,7 +28,7 @@
   };
 
   /* Embedded fallback — same payload as kids-week.json (fetch preferred on Pages) */
-  var EMBEDDED = {"asOf":"Sun Sep 27 2026","asOfIso":"2026-09-27","custody":{"with":"Dad","place":"147th","through":"Fri Oct 2 \u00b7 3:00","throughLabel":"with Dad @ 147th through Fri Oct 2 3:00"},"leaveBys":{"SRE_drop":"leave 8:10 for 8:25","SRE_pickup":"leave 3:15 for 3:40","note":"sports: event START = leave-by"},"kids":{"harris":{"id":"harris","name":"Harris","you":"you","theme":"block-world","themeLabel":"Block World","gradeVoice":"1st grade","avatar":"H","currency":{"unit":"gem","plural":"gems","symbol":"\u25c6","label":"Gems"},"bankGoal":{"id":"gem-jar","title":"Fill the Gem Jar","blurb":"Clear your musts. Stack gems into the jar. Hit the fill line \u2014 then allowance payday with Dad. Craft unlock is optional secondary.","need":8,"reward":"allowance payday with Dad"},"hottest":{"when":"SUN \u00b7 base day @ 147th","what":"YOUR BASE WITH DAD","where":"Garage-sale crew morning \u00b7 then play \u00b7 through Fri Oct 2 3:00","badges":["DAD WEEK","147th"]},"today":[{"kind":"event","when":"Morning \u00b7 9\u20132","what":"\ud83c\udfe0 House shake / garage-sale crew @ 147th","hint":"Help Dad \u00b7 then free play","tone":"act"},{"kind":"event","when":"Anytime today","what":"\ud83e\uddf1 Block time if musts clear","hint":"gems \u2192 jar \u2192 payday","tone":"fun"},{"kind":"note","when":"All day","what":"\ud83c\udfe1 YOUR BASE with Dad","hint":"through Fri Oct 2 3:00","tone":"hot"}],"quests":[{"id":"har-bed","what":"\ud83d\udecf\ufe0f Make your bed (block rebuild) \u2014 daily must","stars":1,"cadence":"daily"},{"id":"har-dishes","what":"\ud83c\udf7d\ufe0f Dishes helper (mining duty) \u2014 daily must","stars":1,"cadence":"daily"},{"id":"har-trash","what":"\ud83d\uddd1\ufe0f Trash out (clear the cave) \u2014 daily must","stars":1,"cadence":"daily"},{"id":"har-backpack","what":"\ud83c\udf92 Pack backpack (loot ready) \u2014 daily must","stars":1,"cadence":"daily"},{"id":"har-toys","what":"\ud83e\uddf8 Toys reset \u2014 weekly must","stars":2,"cadence":"weekly"},{"id":"har-shoes","what":"\ud83d\udc5f Shoes by door \u2014 weekly must","stars":1,"cadence":"weekly"}],"sports":[{"when":"Wed 30 \u00b7 leave ~4:55 \u00b7 practice","what":"\u26a1 FLAG practice \u00b7 Timber Sage grass","hint":"YOUR practice \u00b7 with Dad","tone":"hot"}],"school":[{"when":"Mon 28 \u00b7 leave ~8:10","what":"\ud83c\udfeb SRE drop \u2014 you're on the crew","tone":"act"},{"when":"Mon 28 \u00b7 3:15 / 3:40","what":"\ud83d\ude8c Boys pickup \u00b7 squad ride","tone":"act"},{"when":"Wed 30 \u00b7 school day","what":"\ud83d\udc42 Hearing / vision screen at SRE","hint":"awareness \u00b7 normal school","tone":"act"},{"when":"Thu 1 \u00b7 PE day","what":"\ud83d\udc5f Tennis shoes for PE","tone":"act"},{"when":"Fri 2 \u00b7 leave ~8:10","what":"\ud83c\udfeb SRE drop \u00b7 then Mom week after 3:00","hint":"Dad handoff Fri 3:00","tone":"act"},{"when":"All week","what":"\ud83c\udfe1 YOUR BASE @ 147th with Dad","hint":"through Fri Oct 2 3:00","tone":"hot"}],"fun":[{"when":"Quest reward","what":"\ud83e\uddf1 BLOCK BUILD TIME","hint":"gems \u2192 jar \u2192 payday \u00b7 craft optional","tone":"fun"},{"when":"Outside","what":"\ud83c\udf33 Backyard boss fight (play)","hint":"ask Dad \u00b7 run wild","tone":"fun"},{"when":"Tonight","what":"\ud83c\udf6a Snack chest raid","hint":"after quests \u00b7 with Dad","tone":"fun"},{"when":"Base mission","what":"\ud83d\udc8e Fill the Gem Jar \u2014 allowance payday with Dad","hint":"FUN \u00b7 craft unlock optional","tone":"fun"}],"appointments":[],"appointmentsEmpty":"No doctor stuff on your board \u2014 lucky!!! More play time.","streakLabel":"\ud83d\udd25 3-day craft streak \u2014 keep smashing","missions":[{"when":"Anytime","what":"\ud83d\udd25 Musts clear = gems in the jar","hint":"FUN mission","tone":"fun"},{"when":"Goal","what":"\ud83d\udc8e Fill jar (8) = allowance payday with Dad","hint":"FUN \u00b7 miss = payday held","tone":"fun"},{"when":"Weekly","what":"\ud83e\uddf8 Toys reset + \ud83d\udc5f shoes by door","hint":"musts \u00b7 ask Dad to inspect","tone":"fun"}]},"hayes":{"id":"hayes","name":"Hayes","you":"you","theme":"drop-zone","themeLabel":"Drop Zone","gradeVoice":"3rd grade","avatar":"H","currency":{"unit":"coin","plural":"coins","symbol":"\u25ce","label":"Victory Coins"},"bankGoal":{"id":"victory-jar","title":"Fill the Victory Jar","blurb":"Clear your musts. Bank Victory Coins into the jar. Hit the fill line \u2014 then allowance payday with Dad. Umbrella treat is optional secondary.","need":12,"reward":"allowance payday with Dad"},"hottest":{"when":"MON \u00b7 leave ~5:40 \u00b7 BASEBALL 6:15","what":"NEXT DROP \u00b7 BV REC FIELD 3","where":"Sunday house day \u00b7 then Mon baseball practice","badges":["LOCKED IN","BASEBALL"]},"today":[{"kind":"event","when":"Morning \u00b7 9\u20132","what":"\ud83c\udfe0 House shake / garage-sale loadout @ 147th","hint":"Help the crew \u00b7 then free time","tone":"act"},{"kind":"event","when":"Anytime today","what":"\u26a1 Soft warm-up \u00b7 yard run OK","hint":"ask Dad \u00b7 Mon baseball next","tone":"fun"},{"kind":"note","when":"All day","what":"\ud83c\udfe1 DROP ZONE HQ with Dad","hint":"through Fri Oct 2 3:00","tone":"hot"}],"quests":[{"id":"hay-bed","what":"\ud83d\udecf\ufe0f Make bed \u2014 pre-game ritual (daily must)","stars":1,"cadence":"daily"},{"id":"hay-dishes","what":"\ud83c\udf7d\ufe0f Dishes \u2014 wipe the lobby (daily must)","stars":1,"cadence":"daily"},{"id":"hay-trash","what":"\ud83d\uddd1\ufe0f Trash out \u2014 zone clear (daily must)","stars":1,"cadence":"daily"},{"id":"hay-backpack","what":"\ud83c\udf92 Backpack \u2014 loadout ready (daily must)","stars":1,"cadence":"daily"},{"id":"hay-gear","what":"\u26bd Sports bag / cleats ready \u2014 weekly must","stars":2,"cadence":"weekly"},{"id":"hay-room","what":"\ud83e\uddf9 Room reset \u2014 weekly must","stars":2,"cadence":"weekly"}],"sports":[{"when":"Mon 28 \u00b7 leave ~5:40 \u00b7 practice 6:15","what":"\u26be BASEBALL practice \u00b7 BV Rec Field 3","hint":"YOUR next challenge","tone":"hot"},{"when":"Tue 29 \u00b7 leave 5:40 \u00b7 6:00","what":"\ud83c\udfc1 FLAG practice \u00b7 SRE / library fields","hint":"friend drop ~4:30 lock pending","tone":"sport"},{"when":"Thu 1 \u00b7 leave ~4:55 \u00b7 game 5:30","what":"\u26be BASEBALL \u00b7 Falcons vs Lions \u00b7 Field 24","hint":"HOME game","tone":"hot"}],"school":[{"when":"Mon \u00b7 7:30","what":"\ud83c\udf4e Snacks in the bag","hint":"late-lunch \u00b7 Madi OK","tone":"act"},{"when":"Mon \u00b7 SRE drop","what":"\ud83c\udfeb School drop with the boys","tone":"act"},{"when":"Tue \u00b7 8:50","what":"\ud83e\udd1d Madi + Randy collab at SRE","hint":"in person","tone":"act"},{"when":"Wed \u00b7 school day","what":"\ud83d\udc42 Hearing / vision screen at SRE","tone":"act"},{"when":"Thu \u00b7 PE day","what":"\ud83d\udc5f Tennis shoes for PE","tone":"act"},{"when":"Fri \u00b7 field trip","what":"\ud83d\ude8c Museum + Meadowbrook (school day)","hint":"sack lunch \u00b7 trip shirt \u00b7 tennis shoes","tone":"act"},{"when":"All week","what":"\ud83c\udfe1 DROP ZONE HQ @ 147th","hint":"Dad week through Fri Oct 2","tone":"hot"}],"fun":[{"when":"After clears","what":"\ud83d\udc51 Victory round \u2014 game pick with Dad","hint":"coins \u2192 jar \u2192 payday","tone":"fun"},{"when":"Outside","what":"\u26a1 Sports grind / run the yard","hint":"ask Dad","tone":"fun"},{"when":"Base mission","what":"\u2602\ufe0f Fill the Victory Jar \u2014 allowance payday with Dad","hint":"FUN \u00b7 umbrella treat optional","tone":"fun"},{"when":"Squad","what":"\ud83e\udd1d Duo queue with Harris / crew","hint":"FUN","tone":"fun"}],"appointments":[],"appointmentsEmpty":"No appointments. Clear skies. GO PLAY.","streakLabel":"\ud83d\udd25 6-day fire streak \u2014 don't break it","missions":[{"when":"Every clear","what":"\ud83d\udca5 Must done = coin banked in the jar","hint":"FUN","tone":"fun"},{"when":"Goal","what":"\ud83c\udfc6 Fill jar (12) = allowance payday with Dad","hint":"FUN \u00b7 miss = payday held","tone":"fun"},{"when":"Weekly","what":"\u26bd Gear ready + \ud83e\uddf9 room reset = bonus coins","hint":"musts \u00b7 ask Dad to inspect","tone":"fun"}]},"ainsley":{"id":"ainsley","name":"Ainsley","you":"you","theme":"eras-stage","themeLabel":"Eras Stage","gradeVoice":"8th grade","avatar":"A","currency":{"unit":"star","plural":"stars","symbol":"\u2605","label":"Tour Stars"},"bankGoal":{"id":"tour-jar","title":"Fill the Tour Jar","blurb":"Clear your musts. Bank Tour Stars into the jar. Hit the fill line \u2014 then allowance payday with Dad. Treat is optional secondary.","need":20,"reward":"allowance payday with Dad"},"hottest":{"when":"SUN \u00b7 vanity 3:00 \u00b7 Jessy","what":"FEATURED \u00b7 SUNDAY","where":"Vanity 3:00 \u00b7 with Dad @ 147th","badges":["FEATURED","SUNDAY"]},"today":[{"kind":"event","when":"Morning \u00b7 9\u20132","what":"\ud83c\udfe0 Garage sale / house shake with crew","hint":"Help set the stage","tone":"act"},{"kind":"event","when":"3:00 LOCKED","what":"\ud83d\udc85 Vanity install \u00b7 Jessy","hint":"FEATURED \u00b7 your board","tone":"hot"},{"kind":"event","when":"After vanity","what":"\ud83c\udfa7 Playlist + chill with Dad","hint":"FUN \u00b7 your pick","tone":"fun"}],"quests":[{"id":"ain-bed","what":"\ud83d\udecf\ufe0f Make bed \u2014 stage reset (daily must)","stars":1,"cadence":"daily"},{"id":"ain-toys","what":"\ud83e\uddf9 Room reset \u2014 clean pass (daily must)","stars":1,"cadence":"daily"},{"id":"ain-dishwasher","what":"\ud83c\udf7d\ufe0f Dishwasher load/unload \u2014 stage crew (daily must)","stars":1,"cadence":"daily"},{"id":"ain-living","what":"\ud83d\udecb\ufe0f Living room straighten \u00b7 shoes & coats (daily must)","stars":1,"cadence":"daily"},{"id":"ain-bath","what":"\ud83d\udec1 Bathroom wipe \u2014 weekly must","stars":3,"cadence":"weekly"},{"id":"ain-laundry","what":"\ud83d\udc55 Laundry full cycle \u2014 her clothes (weekly must)","stars":5,"cadence":"weekly"},{"id":"ain-babysit","what":"\ud83d\udc76 Babysitting \u2014 optional add-on (when Dad books you)","stars":0,"cadence":"addon","optional":true}],"sports":[{"when":"Tue 29 \u00b7 leave 4:25 \u00b7 practice 5:00","what":"\ud83c\udfca SWIM \u00b7 Coach Ann \u00b7 Genesis Ridgeview","hint":"YOUR set","tone":"hot"},{"when":"Thu 1 \u00b7 leave 4:25 \u00b7 practice 5:00","what":"\ud83c\udfca SWIM \u00b7 Coach Ann \u00b7 Genesis Ridgeview","hint":"second set this week","tone":"sport"}],"sportsEmpty":"","school":[{"when":"Sun 27 \u00b7 9\u20132","what":"\ud83c\udfe0 Garage sale / house shake with crew","tone":"act"},{"when":"Mon 28 \u00b7 3:00","what":"\ud83d\udcda LKMS Homework Help","tone":"act"},{"when":"Tue 29 \u00b7 school day","what":"\ud83d\udc42 Hearing / vision screen (volunteers)","hint":"at LKMS","tone":"act"},{"when":"Thu 1 \u00b7 3:00","what":"\ud83d\udcda LKMS Homework Help","tone":"act"},{"when":"Fri 2 \u00b7 due","what":"\ud83d\udcf7 Yearbook baby photo due (email)","hint":"ask Dad if needed","tone":"act"},{"when":"All week","what":"\ud83c\udfe1 Base @ 147th","hint":"Dad week through Fri Oct 2","tone":"hot"}],"appointments":[{"when":"Sun 27 \u00b7 3:00","what":"\ud83d\udc85 Vanity \u00b7 Jessy","hint":"on your board","tone":"hot"},{"when":"Wed 30 \u00b7 leave 12:40 \u00b7 1:00","what":"\ud83d\udc9c Midwest Anxiety \u00b7 Lindsay","hint":"with Dad","tone":"act"}],"appointmentsEmpty":"","streakLabel":"\u25c6 4-day set streak \u2014 hold the line","missions":[{"when":"Every tap","what":"\u2605 Must clear = star banked in the jar","hint":"FUN","tone":"fun"},{"when":"Goal","what":"\u2605 Fill jar (20) = allowance payday with Dad","hint":"FUN \u00b7 miss = payday held","tone":"fun"},{"when":"Weekly","what":"\ud83d\udec1 Bath wipe + \ud83d\udc55 laundry cycle = big star dump","hint":"musts \u00b7 ask Dad to inspect","tone":"fun"},{"when":"Add-on","what":"\ud83d\udc76 Babysitting \u2014 optional (Dad books you)","hint":"not required for jar \u00b7 ask Dad","tone":"fun"}]},"dan":{"id":"dan","name":"Dad","theme":"house-dad","themeLabel":"Dad Box","avatar":"D","hottest":{"when":"Sun Sep 27 \u00b7 kids with you @ 147th","what":"Dad week live","where":"through Fri Oct 2 \u00b7 3:00 handoff window","badges":["Dad week","147th"]},"today":[{"when":"Sun \u00b7 9\u20132","what":"Garage sale / whole-house shake @ 147th","tone":"act"},{"when":"Sun \u00b7 3:00","what":"Ainsley vanity \u00b7 Jessy","tone":"hot"},{"when":"Custody","what":"Kids with Dad @ 147th through Fri Oct 2 3:00","tone":"hot"}],"week":[{"when":"Mon 28 \u00b7 7:30","what":"Hayes snacks in bag (late-lunch)","tone":"act"},{"when":"Mon 28 \u00b7 8:10 / 8:25","what":"SRE drop \u00b7 Hayes + Harris","tone":"act"},{"when":"Mon 28 \u00b7 3:00","what":"Ainsley LKMS HW Help","tone":"act"},{"when":"Mon 28 \u00b7 3:15 / 3:40","what":"Boys pickup","tone":"act"},{"when":"Mon 28 \u00b7 ~5:40 / 6:15","what":"Hayes baseball practice \u00b7 BV Rec Field 3","tone":"sport"},{"when":"Tue 29 \u00b7 8:50","what":"Hayes \u00b7 Madi + Randy collab @ SRE","tone":"act"},{"when":"Tue 29 \u00b7 leave 4:25 / 5:00","what":"Ainsley swim \u00b7 Genesis Ridgeview","tone":"sport"},{"when":"Tue 29 \u00b7 leave 5:40 / 6:00","what":"Hayes flag practice \u00b7 SRE fields (friend drop ~4:30)","tone":"sport"},{"when":"Wed 30 \u00b7 12:40 / 1:00","what":"Ainsley Midwest Anxiety \u00b7 Lindsay","tone":"act"},{"when":"Wed 30 \u00b7 ~4:55","what":"Harris flag practice \u00b7 Timber Sage","tone":"sport"},{"when":"Thu 1 \u00b7 PE","what":"Boys tennis shoes \u00b7 SRE PE","tone":"act"},{"when":"Thu 1 \u00b7 3:00 / 3:15","what":"Ainsley HW Help \u00b7 boys pickup","tone":"act"},{"when":"Thu 1 \u00b7 leave 4:25 / 5:00","what":"Ainsley swim \u00b7 Genesis","tone":"sport"},{"when":"Thu 1 \u00b7 leave ~4:55 / 5:30","what":"Hayes baseball game \u00b7 Falcons vs Lions \u00b7 Field 24","tone":"sport"},{"when":"Fri 2 \u00b7 8:10 drop then 3:00","what":"SRE drop \u00b7 handoff @ 3:00 \u00b7 Mom week","tone":"hot"},{"when":"through Fri Oct 2 3:00","what":"Kids with Dad @ 147th","tone":"hot"}],"leaveBys":[{"when":"Weekday school","what":"SRE drop leave 8:10 for 8:25","tone":"act"},{"when":"Weekday pickup","what":"Leave 3:15 for 3:40 boys","tone":"act"},{"when":"Sports rule","what":"Event START = your leave-by","tone":"act"}],"picks":[{"when":"Tonight","what":"Dinner vote with crew","hint":"House \u00b7 kids-safe","tone":"fun"},{"when":"This week","what":"Sports stack \u00b7 Mon ball \u00b7 Tue flag/swim \u00b7 Wed Harris flag \u00b7 Thu game/swim","hint":"Dad drives","tone":"fun"}],"note":"Kids-safe Dad box \u00b7 no money \u00b7 no Desk \u00b7 calendar facts from dmward23 / Atlas only"}}};
+  var EMBEDDED = {"asOf":"Sun Sep 27 2026","asOfIso":"2026-09-27","custody":{"with":"Dad","place":"147th","through":"Fri Oct 2 \u00b7 3:00","throughLabel":"with Dad @ 147th through Fri Oct 2 3:00"},"leaveBys":{"SRE_drop":"leave 8:10 for 8:25","SRE_pickup":"leave 3:15 for 3:40","note":"sports: event START = leave-by"},"kids":{"harris":{"id":"harris","name":"Harris","you":"you","theme":"block-world","themeLabel":"Block World","gradeVoice":"1st grade","avatar":"H","currency":{"unit":"gem","plural":"gems","symbol":"\u25c6","label":"Gems"},"bankGoal":{"id":"gem-jar","title":"Fill the Gem Jar","blurb":"Clear your musts. Stack gems into the jar. Hit the fill line \u2014 then allowance payday with Dad. Craft unlock is optional secondary.","need":8,"reward":"allowance payday with Dad"},"hottest":{"when":"SUN \u00b7 base day @ 147th","what":"YOUR BASE WITH DAD","where":"Garage-sale crew morning \u00b7 then play \u00b7 through Fri Oct 2 3:00","badges":["DAD WEEK","147th"]},"today":[{"kind":"event","when":"Morning \u00b7 9\u20132","what":"\ud83c\udfe0 House shake / garage-sale crew @ 147th","hint":"Help Dad \u00b7 then free play","tone":"act"},{"kind":"event","when":"Anytime today","what":"\ud83e\uddf1 Block time if musts clear","hint":"gems \u2192 jar \u2192 payday","tone":"fun"},{"kind":"note","when":"All day","what":"\ud83c\udfe1 YOUR BASE with Dad","hint":"through Fri Oct 2 3:00","tone":"hot"}],"quests":[{"id":"har-bed","what":"\ud83d\udecf\ufe0f Make your bed (block rebuild) \u2014 daily must","stars":1,"cadence":"daily"},{"id":"har-dishes","what":"\ud83c\udf7d\ufe0f Dishes helper (mining duty) \u2014 daily must","stars":1,"cadence":"daily"},{"id":"har-trash","what":"\ud83d\uddd1\ufe0f Trash out (clear the cave) \u2014 daily must","stars":1,"cadence":"daily"},{"id":"har-backpack","what":"\ud83c\udf92 Pack backpack (loot ready) \u2014 daily must","stars":1,"cadence":"daily"},{"id":"har-toys","what":"\ud83e\uddf8 Toys reset \u2014 weekly must","stars":2,"cadence":"weekly"},{"id":"har-shoes","what":"\ud83d\udc5f Shoes by door \u2014 weekly must","stars":1,"cadence":"weekly"}],"sports":[{"when":"Wed 30 \u00b7 leave ~4:55 \u00b7 practice","what":"\u26a1 FLAG practice \u00b7 Timber Sage grass","hint":"YOUR practice \u00b7 with Dad","tone":"hot"}],"school":[{"when":"Mon 28 \u00b7 leave ~8:10","what":"\ud83c\udfeb SRE drop \u2014 you're on the crew","tone":"act"},{"when":"Mon 28 \u00b7 3:15 / 3:40","what":"\ud83d\ude8c Boys pickup \u00b7 squad ride","tone":"act"},{"when":"Wed 30 \u00b7 school day","what":"\ud83d\udc42 Hearing / vision screen at SRE","hint":"awareness \u00b7 normal school","tone":"act"},{"when":"Thu 1 \u00b7 PE day","what":"\ud83d\udc5f Tennis shoes for PE","tone":"act"},{"when":"Fri 2 \u00b7 leave ~8:10","what":"\ud83c\udfeb SRE drop \u00b7 then Mom week after 3:00","hint":"Dad handoff Fri 3:00","tone":"act"},{"when":"All week","what":"\ud83c\udfe1 YOUR BASE @ 147th with Dad","hint":"through Fri Oct 2 3:00","tone":"hot"}],"fun":[{"when":"Quest reward","what":"\ud83e\uddf1 BLOCK BUILD TIME","hint":"gems \u2192 jar \u2192 payday \u00b7 craft optional","tone":"fun"},{"when":"Outside","what":"\ud83c\udf33 Backyard boss fight (play)","hint":"ask Dad \u00b7 run wild","tone":"fun"},{"when":"Tonight","what":"\ud83c\udf6a Snack chest raid","hint":"after quests \u00b7 with Dad","tone":"fun"},{"when":"Base mission","what":"\ud83d\udc8e Fill the Gem Jar \u2014 allowance payday with Dad","hint":"FUN \u00b7 craft unlock optional","tone":"fun"}],"appointments":[],"appointmentsEmpty":"No doctor stuff on your board \u2014 lucky!!! More play time.","streakLabel":"\ud83d\udd25 3-day craft streak \u2014 keep smashing","missions":[{"when":"Anytime","what":"\ud83d\udd25 Musts clear = gems in the jar","hint":"FUN mission","tone":"fun"},{"when":"Goal","what":"\ud83d\udc8e Fill jar (8) = allowance payday with Dad","hint":"FUN \u00b7 miss = payday held","tone":"fun"},{"when":"Weekly","what":"\ud83e\uddf8 Toys reset + \ud83d\udc5f shoes by door","hint":"musts \u00b7 ask Dad to inspect","tone":"fun"}]},"hayes":{"id":"hayes","name":"Hayes","you":"you","theme":"drop-zone","themeLabel":"Drop Zone","gradeVoice":"3rd grade","avatar":"H","currency":{"unit":"coin","plural":"coins","symbol":"\u25ce","label":"Victory Coins"},"bankGoal":{"id":"victory-jar","title":"Fill the Victory Jar","blurb":"Clear your musts. Bank Victory Coins into the jar. Hit the fill line \u2014 then allowance payday with Dad. Umbrella treat is optional secondary.","need":12,"reward":"allowance payday with Dad"},"hottest":{"when":"MON \u00b7 leave ~5:40 \u00b7 BASEBALL 6:15","what":"NEXT DROP \u00b7 BV REC FIELD 3","where":"Sunday house day \u00b7 then Mon baseball practice","badges":["LOCKED IN","BASEBALL"]},"today":[{"kind":"event","when":"Morning \u00b7 9\u20132","what":"\ud83c\udfe0 House shake / garage-sale loadout @ 147th","hint":"Help the crew \u00b7 then free time","tone":"act"},{"kind":"event","when":"Anytime today","what":"\u26a1 Soft warm-up \u00b7 yard run OK","hint":"ask Dad \u00b7 Mon baseball next","tone":"fun"},{"kind":"note","when":"All day","what":"\ud83c\udfe1 DROP ZONE HQ with Dad","hint":"through Fri Oct 2 3:00","tone":"hot"}],"quests":[{"id":"hay-bed","what":"\ud83d\udecf\ufe0f Make bed \u2014 pre-game ritual (daily must)","stars":1,"cadence":"daily"},{"id":"hay-dishes","what":"\ud83c\udf7d\ufe0f Dishes \u2014 wipe the lobby (daily must)","stars":1,"cadence":"daily"},{"id":"hay-trash","what":"\ud83d\uddd1\ufe0f Trash out \u2014 zone clear (daily must)","stars":1,"cadence":"daily"},{"id":"hay-backpack","what":"\ud83c\udf92 Backpack \u2014 loadout ready (daily must)","stars":1,"cadence":"daily"},{"id":"hay-gear","what":"\u26bd Sports bag / cleats ready \u2014 weekly must","stars":2,"cadence":"weekly"},{"id":"hay-room","what":"\ud83e\uddf9 Room reset \u2014 weekly must","stars":2,"cadence":"weekly"}],"sports":[{"when":"Mon 28 \u00b7 leave ~5:40 \u00b7 practice 6:15","what":"\u26be BASEBALL practice \u00b7 BV Rec Field 3","hint":"YOUR next challenge","tone":"hot"},{"when":"Tue 29 \u00b7 leave 5:40 \u00b7 6:00","what":"\ud83c\udfc1 FLAG practice \u00b7 SRE / library fields","hint":"friend drop ~4:30 lock pending","tone":"sport"},{"when":"Thu 1 \u00b7 leave ~4:55 \u00b7 game 5:30","what":"\u26be BASEBALL \u00b7 Falcons vs Lions \u00b7 Field 24","hint":"HOME game","tone":"hot"}],"school":[{"when":"Mon \u00b7 7:30","what":"\ud83c\udf4e Snacks in the bag","hint":"late-lunch \u00b7 Madi OK","tone":"act"},{"when":"Mon \u00b7 SRE drop","what":"\ud83c\udfeb School drop with the boys","tone":"act"},{"when":"Tue \u00b7 8:50","what":"\ud83e\udd1d Madi + Randy collab at SRE","hint":"in person","tone":"act"},{"when":"Wed \u00b7 school day","what":"\ud83d\udc42 Hearing / vision screen at SRE","tone":"act"},{"when":"Thu \u00b7 PE day","what":"\ud83d\udc5f Tennis shoes for PE","tone":"act"},{"when":"Fri \u00b7 field trip","what":"\ud83d\ude8c Museum + Meadowbrook (school day)","hint":"sack lunch \u00b7 trip shirt \u00b7 tennis shoes","tone":"act"},{"when":"All week","what":"\ud83c\udfe1 DROP ZONE HQ @ 147th","hint":"Dad week through Fri Oct 2","tone":"hot"}],"fun":[{"when":"After clears","what":"\ud83d\udc51 Victory round \u2014 game pick with Dad","hint":"coins \u2192 jar \u2192 payday","tone":"fun"},{"when":"Outside","what":"\u26a1 Sports grind / run the yard","hint":"ask Dad","tone":"fun"},{"when":"Base mission","what":"\u2602\ufe0f Fill the Victory Jar \u2014 allowance payday with Dad","hint":"FUN \u00b7 umbrella treat optional","tone":"fun"},{"when":"Squad","what":"\ud83e\udd1d Duo queue with Harris / crew","hint":"FUN","tone":"fun"}],"appointments":[],"appointmentsEmpty":"No appointments. Clear skies. GO PLAY.","streakLabel":"\ud83d\udd25 6-day fire streak \u2014 don't break it","missions":[{"when":"Every clear","what":"\ud83d\udca5 Must done = coin banked in the jar","hint":"FUN","tone":"fun"},{"when":"Goal","what":"\ud83c\udfc6 Fill jar (12) = allowance payday with Dad","hint":"FUN \u00b7 miss = payday held","tone":"fun"},{"when":"Weekly","what":"\u26bd Gear ready + \ud83e\uddf9 room reset = bonus coins","hint":"musts \u00b7 ask Dad to inspect","tone":"fun"}]},"ainsley":{"id":"ainsley","name":"Ainsley","you":"you","theme":"eras-stage","themeLabel":"Eras Stage","gradeVoice":"8th grade","avatar":"A","currency":{"unit":"star","plural":"stars","symbol":"\u2605","label":"Tour Stars"},"bankGoal":{"id":"tour-jar","title":"Fill the Tour Jar","blurb":"Clear your musts. Bank Tour Stars. Hit 20 \u2014 allowance payday with Dad.","need":20,"reward":"allowance payday with Dad"},"hottest":{"when":"SUN \u00b7 vanity 3:00 \u00b7 Jessy","what":"ON THE BOARD","where":"Vanity 3:00 \u00b7 with Dad @ 147th","badges":["SUNDAY","3:00"]},"today":[{"kind":"event","when":"Morning \u00b7 9\u20132","what":"Garage sale / house shake with crew","hint":"Help set the stage","tone":"act"},{"kind":"event","when":"3:00 LOCKED","what":"Vanity install \u00b7 Jessy","hint":"your board","tone":"hot"},{"kind":"event","when":"After vanity","what":"Playlist + chill with Dad","hint":"your pick","tone":"fun"}],"quests":[{"id":"ain-bed","what":"Make bed \u2014 stage reset","stars":1,"cadence":"daily"},{"id":"ain-toys","what":"Room reset \u2014 clean pass","stars":1,"cadence":"daily"},{"id":"ain-dishwasher","what":"Dishwasher load / unload","stars":1,"cadence":"daily"},{"id":"ain-living","what":"Living room \u00b7 shoes & coats","stars":1,"cadence":"daily"},{"id":"ain-bath","what":"Bathroom wipe \u2014 weekly","stars":3,"cadence":"weekly"},{"id":"ain-laundry","what":"Laundry full cycle \u2014 her clothes","stars":5,"cadence":"weekly"},{"id":"ain-babysit","what":"Babysitting \u2014 optional \u00b7 Dad handout","stars":0,"cadence":"addon","optional":true}],"sports":[{"when":"Tue 29 \u00b7 leave 4:25 \u00b7 practice 5:00","what":"SWIM \u00b7 Coach Ann \u00b7 Genesis Ridgeview","hint":"YOUR set","tone":"hot"},{"when":"Thu 1 \u00b7 leave 4:25 \u00b7 practice 5:00","what":"SWIM \u00b7 Coach Ann \u00b7 Genesis Ridgeview","hint":"second set this week","tone":"sport"}],"sportsEmpty":"","school":[{"when":"Sun 27 \u00b7 9\u20132","what":"Garage sale / house shake with crew","tone":"act"},{"when":"Mon 28 \u00b7 3:00","what":"LKMS Homework Help","tone":"act"},{"when":"Tue 29 \u00b7 school day","what":"Hearing / vision screen (volunteers)","hint":"at LKMS","tone":"act"},{"when":"Thu 1 \u00b7 3:00","what":"LKMS Homework Help","tone":"act"},{"when":"Fri 2 \u00b7 due","what":"Yearbook baby photo due (email)","hint":"ask Dad if needed","tone":"act"},{"when":"All week","what":"Base @ 147th","hint":"Dad week through Fri Oct 2","tone":"hot"}],"appointments":[{"when":"Sun 27 \u00b7 3:00","what":"Vanity \u00b7 Jessy","hint":"on your board","tone":"hot","herSpace":true},{"when":"Wed 30 \u00b7 leave 12:40 \u00b7 1:00","what":"Midwest Anxiety \u00b7 Lindsay","hint":"with Dad","tone":"act"}],"appointmentsEmpty":"","streakLabel":"\u25c6 4-day set streak \u2014 hold the line","missions":[{"when":"Every tap","what":"Must clear = star banked in the jar","hint":"stars \u2192 jar","tone":"fun"},{"when":"Goal","what":"Hit 20 = Payday with Dad","hint":"crew goal","tone":"fun"},{"when":"Weekly","what":"Bath wipe + laundry cycle = big star dump","hint":"musts \u00b7 ask Dad to inspect","tone":"fun"},{"when":"Add-on","what":"Babysitting \u2014 optional (Dad books you)","hint":"not for jar \u00b7 Dad handout","tone":"fun"}],"goal":{"name":"","need":0,"placeholder":"Set a goal with Dad"},"bag":{"place":"Dad","label":"This week @ Dad \u00b7 bag","hint":"147th through Fri Oct 2 \u00b7 pack for Dad week"},"rides":[{"id":"scooter","what":"\ud83d\udef4 Scooter run","when":"your call","clear":true},{"id":"bv-rec","what":"\ud83c\udfdf\ufe0f BV Rec","when":"when you're free","clear":true},{"id":"swim","what":"\ud83c\udfca Ridgeview swim","when":"Tue/Thu \u00b7 leave 4:25","clear":true,"hours":"leave 4:25 \u00b7 5:00"}],"fun":[]},"dan":{"id":"dan","name":"Dad","theme":"house-dad","themeLabel":"Dad Box","avatar":"D","hottest":{"when":"Sun Sep 27 \u00b7 kids with you @ 147th","what":"Dad week live","where":"through Fri Oct 2 \u00b7 3:00 handoff window","badges":["Dad week","147th"]},"today":[{"when":"Sun \u00b7 9\u20132","what":"Garage sale / whole-house shake @ 147th","tone":"act"},{"when":"Sun \u00b7 3:00","what":"Ainsley vanity \u00b7 Jessy","tone":"hot"},{"when":"Custody","what":"Kids with Dad @ 147th through Fri Oct 2 3:00","tone":"hot"}],"week":[{"when":"Mon 28 \u00b7 7:30","what":"Hayes snacks in bag (late-lunch)","tone":"act"},{"when":"Mon 28 \u00b7 8:10 / 8:25","what":"SRE drop \u00b7 Hayes + Harris","tone":"act"},{"when":"Mon 28 \u00b7 3:00","what":"Ainsley LKMS HW Help","tone":"act"},{"when":"Mon 28 \u00b7 3:15 / 3:40","what":"Boys pickup","tone":"act"},{"when":"Mon 28 \u00b7 ~5:40 / 6:15","what":"Hayes baseball practice \u00b7 BV Rec Field 3","tone":"sport"},{"when":"Tue 29 \u00b7 8:50","what":"Hayes \u00b7 Madi + Randy collab @ SRE","tone":"act"},{"when":"Tue 29 \u00b7 leave 4:25 / 5:00","what":"Ainsley swim \u00b7 Genesis Ridgeview","tone":"sport"},{"when":"Tue 29 \u00b7 leave 5:40 / 6:00","what":"Hayes flag practice \u00b7 SRE fields (friend drop ~4:30)","tone":"sport"},{"when":"Wed 30 \u00b7 12:40 / 1:00","what":"Ainsley Midwest Anxiety \u00b7 Lindsay","tone":"act"},{"when":"Wed 30 \u00b7 ~4:55","what":"Harris flag practice \u00b7 Timber Sage","tone":"sport"},{"when":"Thu 1 \u00b7 PE","what":"Boys tennis shoes \u00b7 SRE PE","tone":"act"},{"when":"Thu 1 \u00b7 3:00 / 3:15","what":"Ainsley HW Help \u00b7 boys pickup","tone":"act"},{"when":"Thu 1 \u00b7 leave 4:25 / 5:00","what":"Ainsley swim \u00b7 Genesis","tone":"sport"},{"when":"Thu 1 \u00b7 leave ~4:55 / 5:30","what":"Hayes baseball game \u00b7 Falcons vs Lions \u00b7 Field 24","tone":"sport"},{"when":"Fri 2 \u00b7 8:10 drop then 3:00","what":"SRE drop \u00b7 handoff @ 3:00 \u00b7 Mom week","tone":"hot"},{"when":"through Fri Oct 2 3:00","what":"Kids with Dad @ 147th","tone":"hot"}],"leaveBys":[{"when":"Weekday school","what":"SRE drop leave 8:10 for 8:25","tone":"act"},{"when":"Weekday pickup","what":"Leave 3:15 for 3:40 boys","tone":"act"},{"when":"Sports rule","what":"Event START = your leave-by","tone":"act"}],"picks":[{"when":"Tonight","what":"Dinner vote with crew","hint":"House \u00b7 kids-safe","tone":"fun"},{"when":"This week","what":"Sports stack \u00b7 Mon ball \u00b7 Tue flag/swim \u00b7 Wed Harris flag \u00b7 Thu game/swim","hint":"Dad drives","tone":"fun"}],"note":"Kids-safe Dad box \u00b7 no money \u00b7 no Desk \u00b7 calendar facts from dmward23 / Atlas only"}}};
 
   function esc(s) {
     return String(s == null ? "" : s)
@@ -206,15 +206,17 @@
     var optional = !!(q.optional || q.cadence === "addon");
     var stars = typeof q.stars === "number" ? q.stars : 1;
     var open = done ? "done" : "open";
-    var ring = done ? "✓" : (optional ? "＋" : "");
+    var ring = done ? "✓" : (optional ? "+" : "·");
     var hint;
     if (optional) {
-      hint = done ? "logged · ask Dad" : "optional add-on · not required for jar";
+      hint = done
+        ? (q.hire ? "hire logged · booked" : "logged")
+        : (q.hire ? "hire path · Dad books you · never fills jar" : "add-on · never fills jar");
     } else {
-      hint = done ? "done · nice!" : "tap when done · ★ " + stars;
+      hint = done ? "cleared · banked" : "tap when clear · ★ " + stars;
     }
     var earn = optional
-      ? '<span class="star-earn addon-tag">' + (done ? "ADD-ON ✓" : "ADD-ON") + "</span>"
+      ? '<span class="star-earn addon-tag">' + (done ? "OPTIONAL ✓" : "OPTIONAL") + "</span>"
       : '<span class="star-earn">' + (done ? "★ +" + stars : "★ " + stars) + "</span>";
     var optAttr = optional ? ' data-optional="1"' : "";
     return (
@@ -241,6 +243,76 @@
     el.innerHTML = (quests || []).map(function (q) {
       return questHTML(q, !!state[q.id]);
     }).join("");
+  }
+
+
+  /** Next payday = next Friday 6:00p America/Chicago (box TZ). Ledger default. */
+  function nextPaydayInfo(now) {
+    now = now || new Date();
+    var day = now.getDay();
+    var hours = now.getHours();
+    var daysUntilFri = (5 - day + 7) % 7;
+    if (daysUntilFri === 0 && hours >= 18) daysUntilFri = 7;
+    var label;
+    if (daysUntilFri === 0) label = "Tonight · Fri payday";
+    else if (daysUntilFri === 1) label = "Tomorrow · Fri payday";
+    else label = daysUntilFri + " days · Fri payday";
+    return { days: daysUntilFri, label: label, when: "Fri evening CT", rule: "Next Payday = next Friday 6:00p CT" };
+  }
+
+  function getPaidStamp(kidId) {
+    try { return localStorage.getItem("house-bank-paid:" + kidId) || ""; } catch (e) { return ""; }
+  }
+
+  function resetJarCycle(kidId) {
+    var pack = kidDayBank(kidId);
+    pack.bag.lifetime = 0;
+    saveBankRoot(pack.root);
+    var stamp = "Paid · jar reset";
+    try {
+      localStorage.removeItem("house-bank-goal:" + kidId);
+      localStorage.setItem("house-bank-paid:" + kidId, stamp);
+      localStorage.setItem("house-bank-paid-at:" + kidId, new Date().toISOString());
+    } catch (e) {}
+    return stamp;
+  }
+
+  function personalGoalView(kidId, data, bank) {
+    var kid = data && data.kids && data.kids[kidId];
+    var g = (kid && kid.goal) || {};
+    var need = typeof g.need === "number" ? g.need : 0;
+    var name = (g.name || "").trim();
+    var placeholder = g.placeholder || "Set a goal with Dad";
+    if (!name || need <= 0) {
+      return { active: false, placeholder: placeholder, name: "", need: 0, toward: 0, met: false };
+    }
+    var toward = Math.min(bank ? bank.toward : 0, need);
+    return { active: true, placeholder: placeholder, name: name, need: need, toward: toward, met: toward >= need };
+  }
+
+  function buildNoSurprise(kid, data) {
+    var bits = [];
+    var cust = data && data.custody;
+    if (cust) bits.push({ kind: "house", when: "Now", what: "With " + (cust.with || "Dad") + (cust.place ? " @ " + cust.place : ""), hint: cust.throughLabel || cust.through || "", tone: "hot" });
+    if (kid && kid.hottest) bits.push({ kind: "next", when: kid.hottest.when || "Next", what: kid.hottest.what || "Next up", hint: kid.hottest.where || "", tone: "hot" });
+    (kid && kid.today || []).slice(0, 2).forEach(function (t) {
+      bits.push({ kind: "today", when: t.when || "Today", what: t.what || "", hint: t.hint || "next 24h", tone: t.tone || "act" });
+    });
+    (kid && kid.appointments || []).forEach(function (a) {
+      var when = (a.when || "").toLowerCase();
+      // surface near-term appts (Sun/Mon/today-ish labels already in data)
+      if (a.tone === "hot" || /sun|mon|today|tonight/.test(when)) {
+        bits.push({ kind: "appt", when: a.when, what: a.what, hint: a.hint || "on your board", tone: a.tone || "hot" });
+      }
+    });
+    // dedupe by what
+    var seen = {};
+    return bits.filter(function (b) {
+      var k = (b.what || "") + "|" + (b.when || "");
+      if (seen[k]) return false;
+      seen[k] = 1;
+      return !!b.what;
+    }).slice(0, 5);
   }
 
   function renderBank(root, bank) {
@@ -282,10 +354,104 @@
       el.textContent = sym;
     });
     root.querySelectorAll("[data-bank-meta]").forEach(function (el) {
-      el.textContent = bank.toward + " / " + bank.need + " " + plural + (bank.reached ? " · UNLOCKED" : " to go");
+      el.textContent = bank.toward + " / " + bank.need + " ★";
+    });
+    var left = Math.max(0, bank.need - bank.toward);
+    root.querySelectorAll("[data-bank-left]").forEach(function (el) {
+      el.textContent = bank.reached ? "Jar full" : (left + " ★ to unlock");
+    });
+    root.querySelectorAll("[data-payday-chip]").forEach(function (el) {
+      var info = nextPaydayInfo();
+      el.textContent = "Next payday · " + info.label;
+      el.setAttribute("title", info.rule);
+    });
+    root.querySelectorAll("[data-payday-copy]").forEach(function (el) {
+      el.textContent = "Payday with Dad";
+    });
+    root.querySelectorAll("[data-unlock-cta]").forEach(function (el) {
+      el.hidden = !bank.reached;
+      el.classList.toggle("is-loud", !!bank.reached);
+    });
+    var paid = getPaidStamp(bank.kidId);
+    root.querySelectorAll("[data-paid-stamp]").forEach(function (el) {
+      if (paid) { el.hidden = false; el.textContent = paid; }
+      else { el.hidden = true; }
+    });
+    root.querySelectorAll("[data-got-it]").forEach(function (el) {
+      el.hidden = !bank.reached;
     });
     document.body.classList.toggle("bank-goal-hit", !!bank.reached);
   }
+
+  function renderPersonalGoal(root, kidId, data, bank) {
+    if (!root) return;
+    var gv = personalGoalView(kidId, data, bank);
+    root.querySelectorAll("[data-goal-chip]").forEach(function (el) {
+      el.classList.remove("is-met", "is-active", "is-empty");
+      if (!gv.active) {
+        el.textContent = gv.placeholder;
+        el.classList.add("is-empty");
+      } else if (gv.met) {
+        el.textContent = "Tell Dad — goal met · " + gv.name + " (" + gv.need + "★)";
+        el.classList.add("is-met", "is-active");
+      } else {
+        el.textContent = gv.name + " · " + gv.toward + "/" + gv.need + " ★";
+        el.classList.add("is-active");
+      }
+    });
+  }
+
+  function renderHarborStrips(kidId, data) {
+    var kid = data.kids[kidId];
+    if (!kid) return;
+    var ns = document.querySelector("[data-mount-no-surprise]");
+    if (ns) {
+      var items = buildNoSurprise(kid, data);
+      ns.innerHTML = items.length
+        ? items.map(cardHTML).join("")
+        : quietHTML("quiet board · check musts");
+    }
+    var rides = document.querySelector("[data-mount-rides]");
+    if (rides) {
+      var list = kid.rides || [];
+      rides.innerHTML = list.length
+        ? list.map(function (r) {
+            var tone = r.clear ? "fun" : "act";
+            return cardHTML({ when: r.when || (r.clear ? "you're clear" : "check timing"), what: r.what, hint: r.hours || (r.clear ? "your move · no conflict flagged" : "ask Dad"), tone: tone });
+          }).join("")
+        : quietHTML("rides land here when set");
+    }
+    var bag = document.querySelector("[data-bag-strip]");
+    if (bag && kid.bag) {
+      bag.hidden = false;
+      var lab = bag.querySelector("[data-bag-label]");
+      var hint = bag.querySelector("[data-bag-hint]");
+      if (lab) lab.textContent = kid.bag.label || ("This week @ " + (kid.bag.place || "Dad") + " · bag");
+      if (hint) hint.textContent = kid.bag.hint || "";
+    } else if (bag) {
+      bag.hidden = false;
+      var lab2 = bag.querySelector("[data-bag-label]");
+      if (lab2) lab2.textContent = "Bag for Dad week";
+    }
+    var her = document.querySelector("[data-mount-her-space]");
+    if (her) {
+      var space = [];
+      (kid.appointments || []).forEach(function (a) {
+        if (a.herSpace || /vanity|jessy|room/i.test((a.what || "") + (a.hint || ""))) {
+          space.push({ when: a.when, what: a.what, hint: a.hint || "your space", tone: a.tone || "hot" });
+        }
+      });
+      // room reset quest as light status if present
+      (kid.quests || []).forEach(function (q) {
+        if (q.id === "ain-toys" || /room reset/i.test(q.what || "")) {
+          var done = getCheck(q.id);
+          space.push({ when: "Room", what: done ? "Room reset · clear" : "Room reset · still open", hint: "your space · your pace", tone: done ? "fun" : "act" });
+        }
+      });
+      her.innerHTML = space.length ? space.map(cardHTML).join("") : quietHTML("your space · quiet");
+    }
+  }
+
 
   function renderKidPage(kidId, data) {
     var kid = data.kids[kidId];
@@ -325,13 +491,15 @@
     var prevReached = false;
     try { prevReached = localStorage.getItem("house-bank-goal:" + kidId) === "1"; } catch (e) {}
     renderBank(document, bank);
+    renderPersonalGoal(document, kidId, data, bank);
+    if (kidId === "ainsley") renderHarborStrips(kidId, data);
     if (bank.reached) {
       try { localStorage.setItem("house-bank-goal:" + kidId, "1"); } catch (e) {}
       document.body.classList.add("bank-goal-hit");
       var unlock = document.querySelector("[data-goal-unlock]");
       if (unlock) {
         unlock.hidden = false;
-        unlock.textContent = "UNLOCKED · ask Dad · " + (bank.reward || "your reward");
+        unlock.textContent = "JAR FULL · Payday with Dad";
       }
       if (!prevReached) {
         try {
@@ -385,7 +553,14 @@
     applyCheckToBank: applyCheckToBank,
     syncBankFromChecks: syncBankFromChecks,
     renderBank: renderBank,
+    renderPersonalGoal: renderPersonalGoal,
+    renderHarborStrips: renderHarborStrips,
     renderKidPage: renderKidPage,
+    nextPaydayInfo: nextPaydayInfo,
+    resetJarCycle: resetJarCycle,
+    getPaidStamp: getPaidStamp,
+    personalGoalView: personalGoalView,
+    buildNoSurprise: buildNoSurprise,
     boot: boot,
     loadJSON: loadJSON,
     _data: null
