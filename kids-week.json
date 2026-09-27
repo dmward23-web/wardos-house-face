@@ -30,9 +30,12 @@
       "bankGoal": {
         "id": "gem-jar",
         "title": "Fill the Gem Jar",
-        "blurb": "Clear your musts. Stack gems into the jar. Hit the fill line — then allowance payday with Dad. Craft unlock is optional secondary.",
+        "blurb": "Weekly allowance $10 with Dad. Gem Jar save goal = $8 (1★ = $1).",
         "need": 8,
-        "reward": "allowance payday with Dad"
+        "reward": "allowance payday with Dad · $10/week",
+        "dollarNeed": 8,
+        "weeklyAllowance": 10,
+        "starDollar": 1
       },
       "hottest": {
         "when": "SUN · base day @ 147th",
@@ -168,7 +171,7 @@
         },
         {
           "when": "Base mission",
-          "what": "💎 Fill the Gem Jar — allowance payday with Dad",
+          "what": "💎 Gem Jar save $8 · weekly $10 with Dad",
           "hint": "FUN · craft unlock optional",
           "tone": "fun"
         }
@@ -185,8 +188,8 @@
         },
         {
           "when": "Goal",
-          "what": "💎 Fill jar (8) = allowance payday with Dad",
-          "hint": "FUN · miss = payday held",
+          "what": "Jar $8 save goal · weekly pay $10 with Dad",
+          "hint": "1★ = $1 · miss = payday held",
           "tone": "fun"
         },
         {
@@ -214,9 +217,12 @@
       "bankGoal": {
         "id": "victory-jar",
         "title": "Fill the Victory Jar",
-        "blurb": "Clear your musts. Bank Victory Coins into the jar. Hit the fill line — then allowance payday with Dad. Umbrella treat is optional secondary.",
+        "blurb": "Weekly allowance $10 with Dad. Victory Jar save goal = $12 (1★ = $1).",
         "need": 12,
-        "reward": "allowance payday with Dad"
+        "reward": "allowance payday with Dad · $10/week",
+        "dollarNeed": 12,
+        "weeklyAllowance": 10,
+        "starDollar": 1
       },
       "hottest": {
         "when": "MON · leave ~5:40 · BASEBALL 6:15",
@@ -364,7 +370,7 @@
         },
         {
           "when": "Base mission",
-          "what": "☂️ Fill the Victory Jar — allowance payday with Dad",
+          "what": "☂️ Victory Jar save $12 · weekly $10 with Dad",
           "hint": "FUN · umbrella treat optional",
           "tone": "fun"
         },
@@ -387,8 +393,8 @@
         },
         {
           "when": "Goal",
-          "what": "🏆 Fill jar (12) = allowance payday with Dad",
-          "hint": "FUN · miss = payday held",
+          "what": "Jar $12 save goal · weekly pay $10 with Dad",
+          "hint": "1★ = $1 · miss = payday held",
           "tone": "fun"
         },
         {
@@ -416,9 +422,11 @@
       "bankGoal": {
         "id": "tour-jar",
         "title": "Fill the Tour Jar",
-        "blurb": "Clear your musts. Bank Tour Stars. Hit 20 — Payday with Dad.",
+        "blurb": "1★ = $1. Fill the Tour Jar to $20 — Payday with Dad. Weekly path ~$20.",
         "need": 20,
-        "reward": "Payday with Dad"
+        "reward": "Payday with Dad · jar = $20",
+        "dollarNeed": 20,
+        "starDollar": 1
       },
       "hottest": {
         "when": "SUN · vanity 3:00 · Jessy",
@@ -491,11 +499,13 @@
         },
         {
           "id": "ain-babysit",
-          "what": "👶 Babysitting — hire path (Dad books you)",
+          "what": "👶 Babysitting — optional hire · $15/hr (Dad books you)",
           "stars": 0,
           "cadence": "addon",
           "optional": true,
-          "hire": true
+          "hire": true,
+          "hint": "not for jar · Dad handout · $15/hr",
+          "rateLabel": "$15/hr"
         }
       ],
       "sports": [
@@ -568,14 +578,14 @@
       "missions": [
         {
           "when": "Every tap",
-          "what": "Must clear = star banked in the jar",
-          "hint": "stars → jar",
+          "what": "Must clear = ★ banked (1★ = $1)",
+          "hint": "stars → jar → $20",
           "tone": "fun"
         },
         {
           "when": "Goal",
-          "what": "Hit 20 = Payday with Dad",
-          "hint": "crew goal",
+          "what": "Hit 20★ = $20 · Payday with Dad",
+          "hint": "1★ = $1 · jar goal",
           "tone": "fun"
         },
         {
@@ -586,7 +596,7 @@
         },
         {
           "when": "Add-on",
-          "what": "Babysitting — optional (Dad books you)",
+          "what": "Babysitting — optional · $15/hr (Dad books you)",
           "hint": "not for jar · Dad handout",
           "tone": "fun"
         }
