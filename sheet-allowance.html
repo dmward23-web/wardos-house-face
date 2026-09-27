@@ -497,6 +497,18 @@
         <div class="feed-row"><span class="plus">＋</span> Babysitting — optional add-on (not for jar)<div class="when">add-on</div></div>
       </div>
       <div class="cheer-bar">Fill the jar · allowance payday with Dad</div>
+      <div class="saves-panel" data-saves-panel data-kid="ainsley" style="margin-top:10px">
+        <div class="saves-hdr">
+          <span class="saves-title">Saving for</span>
+          <span class="saves-hint"><a href="kid-ainsley.html" style="color:inherit;font-weight:800">Open board</a> · ★ only</span>
+        </div>
+        <div class="saves-list" data-saves-list></div>
+        <form class="saves-form" data-saves-form autocomplete="off">
+          <input class="saves-input name" type="text" name="save-name" data-save-name maxlength="48" placeholder="Add a save…" required />
+          <input class="saves-input need" type="number" name="save-need" data-save-need min="0" max="999" inputmode="numeric" placeholder="★" />
+          <button type="submit" class="saves-add-btn">+ Add</button>
+        </form>
+      </div>
     </section>
 
     <!-- Hayes bank -->
@@ -519,6 +531,18 @@
         <div class="feed-row"><span class="plus">◎ +2</span> Room reset<div class="when">weekly</div></div>
       </div>
       <div class="cheer-bar">Fill the jar · allowance payday with Dad</div>
+      <div class="saves-panel" data-saves-panel data-kid="hayes" style="margin-top:10px">
+        <div class="saves-hdr">
+          <span class="saves-title">Saving for</span>
+          <span class="saves-hint"><a href="kid-hayes.html" style="color:inherit;font-weight:800">Open board</a> · ★ only</span>
+        </div>
+        <div class="saves-list" data-saves-list></div>
+        <form class="saves-form" data-saves-form autocomplete="off">
+          <input class="saves-input name" type="text" name="save-name" data-save-name maxlength="48" placeholder="Add a save…" required />
+          <input class="saves-input need" type="number" name="save-need" data-save-need min="0" max="999" inputmode="numeric" placeholder="★" />
+          <button type="submit" class="saves-add-btn">+ Add</button>
+        </form>
+      </div>
     </section>
 
     <!-- Harris bank -->
@@ -541,6 +565,18 @@
         <div class="feed-row"><span class="plus">◆ +1</span> Shoes by door<div class="when">weekly</div></div>
       </div>
       <div class="cheer-bar">Fill the jar · allowance payday with Dad</div>
+      <div class="saves-panel" data-saves-panel data-kid="harris" style="margin-top:10px">
+        <div class="saves-hdr">
+          <span class="saves-title">Saving for</span>
+          <span class="saves-hint"><a href="kid-harris.html" style="color:inherit;font-weight:800">Open board</a> · ★ only</span>
+        </div>
+        <div class="saves-list" data-saves-list></div>
+        <form class="saves-form" data-saves-form autocomplete="off">
+          <input class="saves-input name" type="text" name="save-name" data-save-name maxlength="48" placeholder="Add a save…" required />
+          <input class="saves-input need" type="number" name="save-need" data-save-need min="0" max="999" inputmode="numeric" placeholder="★" />
+          <button type="submit" class="saves-add-btn">+ Add</button>
+        </form>
+      </div>
     </section>
   </div>
 
@@ -560,10 +596,12 @@
   </footer>
 </div>
 <script src="kids-data.js"></script>
+<script src="house-saves.js"></script>
 <script src="house-sfx.js"></script>
 <script src="house-checkoffs.js" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+  if (window.HouseSaves) { HouseSaves.mount("ainsley"); HouseSaves.mount("hayes"); HouseSaves.mount("harris"); }
   if (!window.WardKids) return;
   WardKids.loadJSON(function (err, data) {
     if (!data) return;
