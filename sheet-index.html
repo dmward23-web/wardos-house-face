@@ -324,6 +324,13 @@
   .tile.month .tile-label { color: #f4f0ff; }
   .tile.month .tile-sub { color: #d8d0f0; font-weight: 700; }
 
+  .tile.primary-tile {
+    box-shadow: 0 0 0 3px rgba(40,120,56,0.45), 0 10px 28px rgba(20,22,28,0.12);
+    transform: scale(1.02);
+  }
+  .tile.stars.primary-tile {
+    box-shadow: 0 0 0 3px rgba(200,150,40,0.55), 0 10px 28px rgba(20,22,28,0.12);
+  }
   .tile.chores {
     background: linear-gradient(165deg, #b8f8b8 0%, #40b858 42%, #186828 100%);
     border-color: #104820;
@@ -772,7 +779,7 @@
         <div class="tile-icon" aria-hidden="true">⚔️</div>
         <div>
           <div class="tile-label">⚔️ HAYES</div>
-          <div class="tile-sub">DROP ZONE · storm + wins</div>
+          <div class="tile-sub">Drop Zone · chores + Victory Jar</div>
         </div>
         <span class="tile-tap">Tap</span>
       </a>
@@ -781,7 +788,7 @@
         <div class="tile-icon" aria-hidden="true">🎤</div>
         <div>
           <div class="tile-label">🎤 AINSLEY</div>
-          <div class="tile-sub">ERAS STAGE · night set</div>
+          <div class="tile-sub">Eras · chores + Tour Jar</div>
         </div>
         <span class="tile-tap">Tap</span>
       </a>
@@ -790,7 +797,7 @@
         <div class="tile-icon" aria-hidden="true">🧱</div>
         <div>
           <div class="tile-label">🧱 HARRIS</div>
-          <div class="tile-sub">BLOCK WORLD · smash</div>
+          <div class="tile-sub">Blocks · chores + Gem Jar</div>
         </div>
         <span class="tile-tap">Tap</span>
       </a>
@@ -804,11 +811,11 @@
         <span class="tile-tap">Open</span>
       </a>
 
-      <a class="tile chores" href="sheet-chores.html">
+      <a class="tile chores primary-tile" href="sheet-chores.html">
         <div class="tile-icon" aria-hidden="true">✓</div>
         <div>
-          <div class="tile-label">Chores</div>
-          <div class="tile-sub">Checkoffs · streaks</div>
+          <div class="tile-label">Chores · MUSTS</div>
+          <div class="tile-sub">Primary · tap musts · stars → jar</div>
         </div>
         <span class="tile-tap">Tap</span>
       </a>
@@ -822,11 +829,11 @@
         <span class="tile-tap">Tap</span>
       </a>
 
-      <a class="tile stars" href="sheet-allowance.html">
+      <a class="tile stars primary-tile" href="sheet-allowance.html">
         <div class="tile-icon" aria-hidden="true">★</div>
         <div>
-          <div class="tile-label">Allowance ★</div>
-          <div class="tile-sub">Stars only · cheer</div>
+          <div class="tile-label">★ Reward jar</div>
+          <div class="tile-sub">Fill jar · payday with Dad</div>
         </div>
         <span class="tile-tap">Tap</span>
       </a>

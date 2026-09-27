@@ -161,7 +161,9 @@
   }
 
   function progressStats() {
-    var nodes = checkNodes();
+    var nodes = checkNodes().filter(function (el) {
+      return el.getAttribute("data-optional") !== "1" && !el.classList.contains("addon");
+    });
     var total = nodes.length;
     var done = 0;
     nodes.forEach(function (el) {
