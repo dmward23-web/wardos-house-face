@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="WardOS House" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
-<meta name="description" content="WardOS House face · family week · kids-safe · no PIN" />
+<meta name="description" content="WardOS House face · family week · no PIN" />
 <title>House · family week</title>
 <link rel="stylesheet" href="house-engage.css" />
 <link rel="icon" href="apple-touch-icon-20260926c.png" />
@@ -535,7 +535,7 @@ const FACTS = {
     { text: "Weather · mock", className: "wx" },
     "Mon LIVE · House+Desk 8:00"
   ],
-  mockTag: "LIVE · HOUSE FACE · NO PIN\nas-of Sat Sep 26 2026 · Mon LIVE prep",
+  mockTag: "",
   
   leaveCard: {
     style: "A",
@@ -617,9 +617,9 @@ leaveBy: {
     items: ["Sun 27 · garage sale 9–2", "Mon 28 · House+Desk LIVE 8:00", "Fri Oct 2 3:00 · Dad week end"]
   },
   footer: {
-    note: "House face · kids-safe · Ainsley could see · no PIN · as-of 26 Sep 2026 · Mon LIVE prep",
-    chip: "KITCHEN TABLET · MON LIVE",
-    meta: "Soft glass · kid chips · leave-by first — no money on this face"
+    note: "House · week board",
+    chip: "WEEK BOARD",
+    meta: ""
   }
 };
 
@@ -706,7 +706,6 @@ function render() {
           <span class="wx-ico">⛅</span>
         </div>
       </div>
-      <div class="mock-tag">${esc(f.mockTag).replace(/\n/g, "<br/>")}</div>
     </div>
   </header>
 
@@ -754,7 +753,6 @@ function render() {
       <span>${esc(f.footer.note)}</span>
       <span class="ftr-chip">${esc(f.footer.chip)}</span>
     </div>
-    <span class="ftr-meta">${esc(f.footer.meta)}</span>
   </footer>`;
 }
 
