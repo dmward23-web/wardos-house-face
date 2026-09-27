@@ -32,7 +32,7 @@
         "title": "Gem Jar · earn then save",
         "blurb": "Clear musts to earn up to $10/week with Dad (1★=$1). Miss musts = short or no full payday. Gem Jar $8 = save what you earned — not free money.",
         "need": 8,
-        "reward": "Payday after honest musts · up to $10",
+        "reward": "Payday with Dad after honest musts",
         "dollarNeed": 8,
         "weeklyAllowance": 10,
         "starDollar": 1
@@ -105,6 +105,12 @@
           "what": "👟 Shoes by door — weekly must",
           "stars": 1,
           "cadence": "weekly"
+        },
+        {
+          "id": "har-cubby",
+          "what": "🎒 Backpack + sports bag in garage cubby — weekly must",
+          "stars": 1,
+          "cadence": "weekly"
         }
       ],
       "sports": [
@@ -171,7 +177,7 @@
         },
         {
           "when": "Base mission",
-          "what": "💎 Gem Jar save $8 · weekly $10 with Dad",
+          "what": "💎 Gem Jar · save with Dad",
           "hint": "FUN · craft unlock optional",
           "tone": "fun"
         }
@@ -187,14 +193,8 @@
           "tone": "fun"
         },
         {
-          "when": "Goal",
-          "what": "Earn up to $10/week · jar $8 saves what you earned",
-          "hint": "1★=$1 · miss musts = short or no full payday",
-          "tone": "fun"
-        },
-        {
           "when": "Weekly",
-          "what": "🧸 Toys reset + 👟 shoes by door",
+          "what": "🧸 Toys + 👟 shoes + 🎒 garage cubby",
           "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         }
@@ -219,7 +219,7 @@
         "title": "Victory Jar · earn then save",
         "blurb": "Clear musts to earn up to $10/week with Dad (1★=$1). Miss musts = short or no full payday. Victory Jar $12 = save what you earned — not free money.",
         "need": 12,
-        "reward": "Payday after honest musts · up to $10",
+        "reward": "Payday with Dad after honest musts",
         "dollarNeed": 12,
         "weeklyAllowance": 10,
         "starDollar": 1
@@ -291,6 +291,12 @@
           "id": "hay-room",
           "what": "🧹 Room reset — weekly must",
           "stars": 2,
+          "cadence": "weekly"
+        },
+        {
+          "id": "hay-cubby",
+          "what": "🎒 Backpack + sports bag in garage cubby — weekly must",
+          "stars": 1,
           "cadence": "weekly"
         }
       ],
@@ -370,7 +376,7 @@
         },
         {
           "when": "Base mission",
-          "what": "☂️ Victory Jar save $12 · weekly $10 with Dad",
+          "what": "☂️ Victory Jar · save with Dad",
           "hint": "FUN · umbrella treat optional",
           "tone": "fun"
         },
@@ -392,14 +398,8 @@
           "tone": "fun"
         },
         {
-          "when": "Goal",
-          "what": "Earn up to $10/week · jar $12 saves what you earned",
-          "hint": "1★=$1 · miss musts = short or no full payday",
-          "tone": "fun"
-        },
-        {
           "when": "Weekly",
-          "what": "⚽ Gear ready + 🧹 room reset = bonus coins",
+          "what": "⚽ Gear + 🧹 room + 🎒 garage cubby = bonus coins",
           "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         }
@@ -409,8 +409,8 @@
       "id": "ainsley",
       "name": "Ainsley",
       "you": "you",
-      "theme": "eras-stage",
-      "themeLabel": "Eras Stage",
+      "theme": "quiet-folk",
+      "themeLabel": "Quiet Folk",
       "gradeVoice": "8th grade",
       "avatar": "A",
       "currency": {
@@ -424,7 +424,7 @@
         "title": "Tour Jar · earn then save",
         "blurb": "Clear musts to earn up to $20/week with Dad (1★=$1). Miss musts = short or no full payday. Jar $20 = save what you earned — not free money. Babysit $15/hr = hire add-on, not jar.",
         "need": 20,
-        "reward": "Payday after honest musts · up to $20",
+        "reward": "Payday with Dad after honest musts",
         "dollarNeed": 20,
         "starDollar": 1,
         "weeklyAllowance": 20
@@ -443,7 +443,7 @@
           "kind": "event",
           "when": "Morning · 9–2",
           "what": "Garage sale / house shake with crew",
-          "hint": "Help set the stage",
+          "hint": "Help the crew",
           "tone": "act"
         },
         {
@@ -464,7 +464,7 @@
       "quests": [
         {
           "id": "ain-bed",
-          "what": "Make bed — stage reset",
+          "what": "Make bed — morning reset",
           "stars": 1,
           "cadence": "daily"
         },
@@ -499,13 +499,19 @@
           "cadence": "weekly"
         },
         {
+          "id": "ain-cubby",
+          "what": "🎒 Backpack + sports bag in garage cubby",
+          "stars": 1,
+          "cadence": "weekly"
+        },
+        {
           "id": "ain-babysit",
-          "what": "👶 Babysitting — optional hire · $15/hr (Dad books you)",
+          "what": "👶 Babysitting — optional hire (Dad books you)",
           "stars": 0,
           "cadence": "addon",
           "optional": true,
           "hire": true,
-          "hint": "not for jar · Dad handout · $15/hr",
+          "hint": "not for jar · Dad handout",
           "rateLabel": "$15/hr"
         }
       ],
@@ -575,38 +581,25 @@
         }
       ],
       "appointmentsEmpty": "",
-      "streakLabel": "◆ 4-day set streak — hold the line",
+      "streakLabel": "◆ 4-day streak — hold the line",
       "missions": [
         {
-          "when": "Every tap",
-          "what": "Must clear = ★ banked (1★ = $1)",
-          "hint": "earn path · skip = less payday",
-          "tone": "fun"
-        },
-        {
-          "when": "Goal",
-          "what": "Earn 20★ = up to $20 · only if musts are honest",
-          "hint": "1★=$1 · miss musts = short or no full payday",
-          "tone": "fun"
-        },
-        {
           "when": "Weekly",
-          "what": "Bath wipe + laundry cycle = big star dump",
+          "what": "Bath wipe + laundry + garage cubby = big star dump",
           "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         },
         {
           "when": "Add-on",
-          "what": "Babysitting — optional · $15/hr (Dad books you)",
-          "hint": "not for jar · Dad handout",
+          "what": "Babysitting — optional · Dad books you",
+          "hint": "hire add-on · not for jar",
           "tone": "fun"
         }
       ],
       "goal": {
         "name": "Stick Season · concert save",
         "need": 40,
-        "placeholder": "Set a goal with Dad",
-        "vibe": "noah-kahan"
+        "placeholder": "Set a goal with Dad"
       },
       "bag": {
         "place": "Dad",
@@ -634,8 +627,7 @@
           "hours": "leave 4:25 · 5:00"
         }
       ],
-      "fun": [],
-      "themeVibe": "stick-season"
+      "fun": []
     },
     "dan": {
       "id": "dan",
