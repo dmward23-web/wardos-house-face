@@ -659,6 +659,104 @@
       el.hidden = !bank.reached;
     });
     document.body.classList.toggle("bank-goal-hit", !!bank.reached);
+    try {
+      renderGrow(root, bank.kidId, global.WardKids && global.WardKids._data, bank);
+    } catch (eG) { /* */ }
+  }
+
+
+  function growGoalView(kidId, data, bank) {
+    var gv = personalGoalView(kidId, data, bank);
+    if (gv && gv.active && gv.need > 0) return gv;
+    var kid = data && data.kids && data.kids[kidId];
+    var bg = (kid && kid.bankGoal) || {};
+    var need = typeof bg.dollarNeed === "number" ? bg.dollarNeed : (typeof bg.need === "number" ? bg.need : 0);
+    var name = String(bg.title || "Jar").split("·")[0].trim() || "Jar";
+    var money = 0;
+    if (bank) {
+      if (bank.available != null) money = Number(bank.available) || 0;
+      else money = (Number(bank.balance) || 0) + (Number(bank.weekEarn) || 0);
+    }
+    if (need <= 0) {
+      return { active: false, placeholder: (gv && gv.placeholder) || "Add a save", name: "", need: 0, toward: 0, met: false, unit: "$" };
+    }
+    var toward = Math.min(money, need);
+    return { active: true, placeholder: "", name: name, need: need, toward: toward, met: toward >= need, unit: "$", fallback: true };
+  }
+
+  var GROW_THEME = {
+    harris: { cls: "grow-gems", token: "◆", label: "GROW · gems" },
+    hayes: { cls: "grow-coins", token: "◎", label: "GROW · victory coins" },
+    ainsley: { cls: "grow-jar", token: "★", label: "GROW · jar" }
+  };
+
+  function renderGrow(root, kidId, data, bank) {
+    if (!root || !bank) return;
+    var theme = GROW_THEME[kidId] || GROW_THEME.harris;
+    var gv = growGoalView(kidId, data || (global.WardKids && global.WardKids._data), bank);
+    var bal = bank.balance != null ? Number(bank.balance) || 0 : 0;
+    var we = bank.weekEarn != null ? Number(bank.weekEarn) || 0 : 0;
+    var available = bank.available != null ? Number(bank.available) || 0 : (bal + we);
+    var need = gv.active ? gv.need : 0;
+    var toward = gv.active ? gv.toward : Math.min(available, need || available);
+    var pct = need > 0 ? Math.max(0, Math.min(100, Math.round((toward / need) * 100))) : 0;
+
+    root.querySelectorAll("[data-grow-meter]").forEach(function (meter) {
+      meter.classList.remove("grow-gems", "grow-coins", "grow-jar");
+      meter.classList.add("grow-meter", theme.cls);
+      meter.setAttribute("data-kid", kidId);
+      meter.setAttribute("aria-label", theme.label + (gv.active ? (" · " + gv.name) : ""));
+      if (!meter._growWired) {
+        meter._growWired = true;
+        meter.addEventListener("click", function () {
+          meter.classList.remove("is-animating");
+          void meter.offsetWidth;
+          meter.classList.add("is-animating");
+          if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap();
+          setTimeout(function () { meter.classList.remove("is-animating"); }, 750);
+        });
+      }
+    });
+
+    root.querySelectorAll("[data-grow-fill]").forEach(function (el) {
+      el.style.height = pct + "%";
+      el.classList.toggle("is-full", !!(gv.active && gv.met));
+    });
+    root.querySelectorAll("[data-grow-pct]").forEach(function (el) {
+      el.textContent = pct + "%";
+    });
+    root.querySelectorAll("[data-grow-title]").forEach(function (el) {
+      el.textContent = theme.label;
+    });
+    root.querySelectorAll("[data-grow-balance]").forEach(function (el) {
+      el.textContent = "$" + bal;
+    });
+    root.querySelectorAll("[data-grow-week]").forEach(function (el) {
+      el.textContent = "$" + we;
+    });
+    root.querySelectorAll("[data-grow-save-name]").forEach(function (el) {
+      el.textContent = gv.active ? gv.name : (gv.placeholder || "Add a save");
+    });
+    root.querySelectorAll("[data-grow-save-toward]").forEach(function (el) {
+      el.textContent = String(gv.active ? toward : 0);
+    });
+    root.querySelectorAll("[data-grow-save-need]").forEach(function (el) {
+      el.textContent = String(gv.active ? need : 0);
+    });
+    root.querySelectorAll("[data-grow-save-line]").forEach(function (el) {
+      if (!gv.active) el.textContent = gv.placeholder || "Add a save";
+      else el.textContent = gv.name + " · $" + toward + "/$" + need;
+    });
+
+    /* Stack tokens scale with fill (max 8) */
+    var n = need > 0 ? Math.max(0, Math.min(8, Math.ceil((pct / 100) * 8))) : 0;
+    root.querySelectorAll("[data-grow-icons]").forEach(function (box) {
+      var html = "";
+      for (var i = 0; i < n; i++) {
+        html += '<span class="grow-token" style="animation-delay:' + (i * 0.04) + 's">' + theme.token + "</span>";
+      }
+      box.innerHTML = html;
+    });
   }
 
   function renderPersonalGoal(root, kidId, data, bank) {
@@ -677,6 +775,7 @@
         el.classList.add("is-active");
       }
     });
+    try { renderGrow(root, kidId, data, bank || getBankView(kidId, data)); } catch (ePG) { /* */ }
   }
 
   function renderHarborStrips(kidId, data) {
@@ -846,6 +945,8 @@
     allowanceCap: allowanceCap,
     getPaidStamp: getPaidStamp,
     personalGoalView: personalGoalView,
+    growGoalView: growGoalView,
+    renderGrow: renderGrow,
     buildNoSurprise: buildNoSurprise,
     boot: boot,
     loadJSON: loadJSON,
