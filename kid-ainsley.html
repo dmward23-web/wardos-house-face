@@ -581,6 +581,19 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
         <a class="ghost" href="sheet-chores.html">Family chores</a>
       </div>
       <div class="goal-unlock" data-goal-unlock hidden>JAR FULL · Payday with Dad</div>
+
+      <div class="saves-panel" data-saves-panel data-kid="ainsley">
+        <div class="saves-hdr">
+          <span class="saves-title">Saving for</span>
+          <span class="saves-hint">write it in · ★ only · no $</span>
+        </div>
+        <div class="saves-list" data-saves-list></div>
+        <form class="saves-form" data-saves-form autocomplete="off">
+          <input class="saves-input name" type="text" name="save-name" data-save-name maxlength="48" placeholder="Stick Season · concert · something else?" required />
+          <input class="saves-input need" type="number" name="save-need" data-save-need min="0" max="999" inputmode="numeric" placeholder="★" title="Optional ★ target" />
+          <button type="submit" class="saves-add-btn">+ Add a save</button>
+        </form>
+      </div>
       <div class="paid-stamp" data-paid-stamp hidden>Paid · jar reset</div>
     </section>
     <section class="sec sec-schedule" aria-label="Her week — schedule appointments school">
@@ -656,11 +669,13 @@ document.addEventListener("house:kid-rendered", function(){
 </script>
 
 <script src="kids-data.js"></script>
+<script src="house-saves.js"></script>
 <script src="house-sfx.js"></script>
 <script src="house-checkoffs.js" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
   if (window.WardKids) WardKids.boot("ainsley");
+  if (window.HouseSaves) HouseSaves.mount("ainsley");
   if (window.HouseSfx) HouseSfx.wireMute();
   var got = document.querySelector("[data-got-it]");
   if (got && window.WardKids) {

@@ -695,18 +695,21 @@
     box-shadow: 0 0 16px rgba(80,220,255,0.5) !important;
   }
   .tile.hayes .tile-tap { background: rgba(80,220,255,0.25); color: #e0f8ff; border: 2px solid #70e0ff; }
+  /* Ainsley loud-tile block · Stick Season (overrides old violet disco) */
   .tile.ainsley {
-    background: linear-gradient(165deg, #1c1830 0%, #2a1860 45%, #0c1020 100%) !important;
-    border-color: #8a92a8 !important;
+    background:
+      radial-gradient(ellipse 80% 60% at 15% 20%, rgba(196,120,58,0.22), transparent 55%),
+      linear-gradient(165deg, #1a2e24 0%, #12140f 55%, #2a2418 100%) !important;
+    border-color: #8a7040 !important;
   }
-  .tile.ainsley .tile-label { color: #f0f4fa !important; font-size: 24px !important; }
-  .tile.ainsley .tile-sub { color: #c8b0ff !important; font-weight: 700 !important; }
+  .tile.ainsley .tile-label { color: #e8e0d0 !important; font-size: 24px !important; }
+  .tile.ainsley .tile-sub { color: #d4a05a !important; font-weight: 700 !important; }
   .tile.ainsley .tile-icon {
-    background: linear-gradient(145deg, #6a50b8, #1c1438) !important;
-    color: #fff !important; font-size: 28px !important;
-    box-shadow: 0 0 16px rgba(90,50,160,0.45) !important;
+    background: linear-gradient(145deg, #c4783a, #5a3a20 55%, #1a2e24) !important;
+    color: #e8e0d0 !important; font-size: 28px !important;
+    box-shadow: 0 0 0 3px rgba(232,224,208,0.35), 0 6px 16px rgba(196,120,58,0.35) !important;
   }
-  .tile.ainsley .tile-tap { background: rgba(200,176,96,0.28); color: #e8e0c8; border: 2px solid #a89840; }
+  .tile.ainsley .tile-tap { background: #1a2e24; color: #e8e0d0; border: 2px solid #8a7040; }
   .tile.harris {
     background: linear-gradient(165deg, #c8f070 0%, #6aaa30 50%, #3a7020 100%) !important;
     border-color: #1a3010 !important;
@@ -799,9 +802,9 @@
       </a>
 
       <a class="tile ainsley" href="kid-ainsley.html">
-        <div class="tile-icon" aria-hidden="true">🎤</div>
+        <div class="tile-icon" aria-hidden="true">A</div>
         <div>
-          <div class="tile-label">🎤 AINSLEY</div>
+          <div class="tile-label">AINSLEY</div>
           <div class="tile-sub">Tour Jar · Payday with Dad</div>
           <span class="vibe-mini">Stick Season · her set</span>
         </div>
@@ -848,7 +851,7 @@
         <div class="tile-icon" aria-hidden="true">★</div>
         <div>
           <div class="tile-label">★ Reward jar</div>
-          <div class="tile-sub">Fill jar · payday with Dad</div>
+          <div class="tile-sub">Jar · payday · write-in saves</div>
         </div>
         <span class="tile-tap">Tap</span>
       </a>
