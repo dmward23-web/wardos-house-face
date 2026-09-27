@@ -1,23 +1,38 @@
-/* House face · client-side checkoffs · localStorage only · kids-safe · no backend */
+/* House face · client-side checkoffs · localStorage · kids-safe · syncs chores-v2 + bank */
 (function () {
   "use strict";
 
   var page = (location.pathname.split("/").pop() || "sheet").replace(/\.html$/i, "");
-  var KEY = "house-checkoffs:" + page;
+  var PAGE_KEY = "house-checkoffs:" + page;
+  var SHARED_KEY = "house-checkoffs:chores-v2";
   var clearedLatch = false;
   var POP_MS = 420;
 
-  function load() {
+  var CHORE_RE = /^(ain|hay|har)-/;
+
+  function usesShared(el) {
+    var id = el.getAttribute("data-check") || "";
+    if (el.getAttribute("data-kid-quest") === "1") return true;
+    if (CHORE_RE.test(id)) return true;
+    if (document.body.getAttribute("data-chores-shared") === "1") return true;
+    return false;
+  }
+
+  function keyFor(el) {
+    return usesShared(el) ? SHARED_KEY : PAGE_KEY;
+  }
+
+  function loadKey(key) {
     try {
-      return JSON.parse(localStorage.getItem(KEY) || "{}") || {};
+      return JSON.parse(localStorage.getItem(key) || "{}") || {};
     } catch (e) {
       return {};
     }
   }
 
-  function save(state) {
+  function saveKey(key, state) {
     try {
-      localStorage.setItem(KEY, JSON.stringify(state));
+      localStorage.setItem(key, JSON.stringify(state));
     } catch (e) { /* private mode / quota — silent */ }
   }
 
@@ -64,7 +79,10 @@
             ? "done · nice!"
             : hint.getAttribute("data-hint-open") || "tap when done";
         }
-        if (earn) earn.textContent = done ? "★ +1" : "★ 1";
+        if (earn) {
+          var n = earn.getAttribute("data-stars") || "1";
+          earn.textContent = done ? "★ +" + n : "★ " + n;
+        }
       }
       var ring = ringEl(el);
       if (ring) ring.textContent = done ? "✓" : "";
@@ -271,7 +289,7 @@
         document.body.classList.add("house-cleared");
         if (fromToggle) {
           fireClearBurst();
-          cheerVictory();
+          if (!window.HouseSfx) cheerVictory();
           try {
             document.dispatchEvent(
               new CustomEvent("house:cleared", {
@@ -290,24 +308,42 @@
     return stats;
   }
 
+  function refreshBankUI(checkId, done) {
+    try {
+      if (!window.WardKids) return;
+      var data = window.WardKids._data;
+      var bank = window.WardKids.setCheck(checkId, done, data);
+      if (bank) window.WardKids.renderBank(document, bank);
+      var kidId = (window.WardKids.KID_FROM_CHECK || {})[checkId];
+      if (kidId && data) {
+        var view = window.WardKids.getBankView(kidId, data);
+        window.WardKids.renderBank(document, view);
+      }
+    } catch (e) { /* */ }
+  }
+
   function wireChecks() {
     if (reducedMotion()) {
       document.documentElement.classList.add("rm-reduce");
       document.body.classList.add("rm-reduce");
     }
 
-    var state = load();
     var nodes = checkNodes();
     nodes.forEach(function (el) {
       var id = el.getAttribute("data-check");
       if (!id) return;
 
+      var key = keyFor(el);
+      var state = loadKey(key);
       if (Object.prototype.hasOwnProperty.call(state, id)) {
         applyDone(el, !!state[id], false);
       }
 
       el.setAttribute("role", el.getAttribute("role") || "button");
       el.setAttribute("tabindex", el.getAttribute("tabindex") || "0");
+
+      if (el.getAttribute("data-wired") === "1") return;
+      el.setAttribute("data-wired", "1");
 
       function toggle(ev) {
         if (ev) {
@@ -318,10 +354,12 @@
           ? !el.classList.contains("lit")
           : !el.classList.contains("done");
         applyDone(el, nowDone, true);
-        if (nowDone) cheerDing();
-        state = load();
-        state[id] = nowDone;
-        save(state);
+        if (nowDone && !(window.HouseSfx && usesShared(el))) cheerDing();
+        var k = keyFor(el);
+        var st = loadKey(k);
+        st[id] = nowDone;
+        saveKey(k, st);
+        if (usesShared(el)) refreshBankUI(id, nowDone);
         evaluateClear(true);
       }
 
@@ -334,9 +372,18 @@
     evaluateClear(false);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", wireChecks);
-  } else {
+  window.HouseCheckoffs = { rewire: wireChecks, syncProgress: syncProgress, evaluateClear: evaluateClear };
+
+  function start() {
+    document.addEventListener("house:kid-rendered", function () {
+      wireChecks();
+    });
     wireChecks();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
   }
 })();

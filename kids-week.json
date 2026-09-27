@@ -1,0 +1,200 @@
+{
+  "asOf": "Sat Sep 26 2026",
+  "asOfIso": "2026-09-26",
+  "custody": {
+    "with": "Dad",
+    "place": "147th",
+    "through": "Fri Oct 2 · 3:00",
+    "throughLabel": "with Dad @ 147th through Fri Oct 2 3:00"
+  },
+  "leaveBys": {
+    "SRE_drop": "leave 8:10 for 8:25",
+    "SRE_pickup": "leave 3:15 for 3:40",
+    "note": "sports: event START = leave-by"
+  },
+  "kids": {
+    "harris": {
+      "id": "harris",
+      "name": "Harris",
+      "you": "you",
+      "theme": "block-world",
+      "themeLabel": "Block World",
+      "gradeVoice": "1st grade",
+      "avatar": "H",
+      "currency": { "unit": "gem", "plural": "gems", "symbol": "◆", "label": "Gems" },
+      "bankGoal": {
+        "id": "craft-diamond-pick",
+        "title": "Craft your Diamond Pick",
+        "blurb": "Stack gems from your quests. Fill the craft bar — then unlock screen-time craft time.",
+        "need": 8,
+        "reward": "screen-time craft unlock"
+      },
+      "hottest": {
+        "when": "Sat Sep 26 · Leave 7:55 · game 8:30",
+        "what": "Your flag game",
+        "where": "Heritage Park Field 10 · 17255 S Black Bob Rd, Olathe",
+        "badges": ["Flag", "Leave now"]
+      },
+      "today": [
+        { "kind": "event", "when": "Leave 7:55 · game 8:30", "what": "Your flag game · Heritage Park F10", "hint": "17255 S Black Bob Rd, Olathe", "tone": "hot" }
+      ],
+      "quests": [
+        { "id": "har-bed", "what": "Make your bed", "stars": 1 },
+        { "id": "har-dishes", "what": "Help with dishes", "stars": 1 },
+        { "id": "har-trash", "what": "Take out trash", "stars": 1 },
+        { "id": "har-backpack", "what": "Pack your backpack", "stars": 1 }
+      ],
+      "sports": [
+        { "when": "Sat 26 · leave 7:55 · game 8:30", "what": "Flag · Heritage Park F10", "hint": "with Dad", "tone": "hot" }
+      ],
+      "school": [
+        { "when": "Mon 28 · leave ~8:10 · drop 8:25", "what": "Your SRE drop · Sunset Ridge", "tone": "act" },
+        { "when": "Mon 28 · 3:15 / 3:40", "what": "Boys pickup · you're in the crew", "tone": "act" },
+        { "when": "through Fri Oct 2 3:00", "what": "With Dad @ 147th · your base", "tone": "act" }
+      ],
+      "fun": [
+        { "when": "Anytime after quests", "what": "Block build time", "hint": "earn gems → craft unlock", "tone": "fun" },
+        { "when": "Dad week", "what": "Outside play @ 147th", "hint": "ask Dad", "tone": "fun" }
+      ],
+      "appointments": [],
+      "appointmentsEmpty": "none on your board · quiet is good",
+      "streakLabel": "3-day craft streak"
+    },
+    "hayes": {
+      "id": "hayes",
+      "name": "Hayes",
+      "you": "you",
+      "theme": "drop-zone",
+      "themeLabel": "Drop Zone",
+      "gradeVoice": "3rd grade",
+      "avatar": "H",
+      "currency": { "unit": "coin", "plural": "coins", "symbol": "◎", "label": "Victory Coins" },
+      "bankGoal": {
+        "id": "victory-umbrella",
+        "title": "Unlock your Victory Umbrella",
+        "blurb": "Clear challenges. Bank coins. Fill the storm meter — umbrella drop when you hit the goal.",
+        "need": 10,
+        "reward": "victory umbrella drop"
+      },
+      "hottest": {
+        "when": "Sat Sep 26 · Chat & Chew 9:00 · flag 2:45",
+        "what": "Your big Saturday drop",
+        "where": "Chat & Chew LOCKED @ home · then Indian Hills MS 6400 Mission Rd",
+        "badges": ["Chat & Chew", "Flag"]
+      },
+      "today": [
+        { "kind": "event", "when": "9:00 LOCKED", "what": "Your Chat & Chew @ home", "hint": "you're enrolled · locked in", "tone": "hot" },
+        { "kind": "event", "when": "Leave ~2:10 · game 2:45", "what": "Your flag game · Indian Hills MS", "hint": "6400 Mission Rd", "tone": "sport" }
+      ],
+      "quests": [
+        { "id": "hay-bed", "what": "Make your bed", "stars": 1 },
+        { "id": "hay-dishes", "what": "Dishes helper", "stars": 1 },
+        { "id": "hay-trash", "what": "Trash out", "stars": 1 },
+        { "id": "hay-backpack", "what": "Pack your backpack", "stars": 1 }
+      ],
+      "sports": [
+        { "when": "Sat 26 · leave ~2:10 · game 2:45", "what": "Flag · Indian Hills MS", "hint": "6400 Mission Rd · with Dad", "tone": "hot" },
+        { "when": "Mon 28 · leave ~5:40 · game 6:15", "what": "Baseball · BV Rec Field 3", "hint": "on your board · known", "tone": "sport" }
+      ],
+      "school": [
+        { "when": "Sat Sep 26 · 9:00", "what": "Chat & Chew @ home", "hint": "LOCKED", "tone": "hot" },
+        { "when": "Mon 28 · 7:30", "what": "Snacks ready", "tone": "act" },
+        { "when": "Mon 28 · leave ~8:10 · drop 8:25", "what": "Your SRE drop", "tone": "act" },
+        { "when": "Mon 28 · 3:15 / 3:40", "what": "Boys pickup", "tone": "act" },
+        { "when": "through Fri Oct 2 3:00", "what": "With Dad @ 147th · Drop Zone HQ", "tone": "act" }
+      ],
+      "fun": [
+        { "when": "After challenges clear", "what": "Victory round · game pick with Dad", "hint": "spend coins toward umbrella", "tone": "fun" },
+        { "when": "Dad week", "what": "Outside + sports grind", "hint": "ask Dad", "tone": "fun" }
+      ],
+      "appointments": [],
+      "appointmentsEmpty": "no appointments on your board · clear skies",
+      "streakLabel": "6-day fire streak"
+    },
+    "ainsley": {
+      "id": "ainsley",
+      "name": "Ainsley",
+      "you": "you",
+      "theme": "eras-stage",
+      "themeLabel": "Eras Stage",
+      "gradeVoice": "8th grade",
+      "avatar": "A",
+      "currency": { "unit": "star", "plural": "stars", "symbol": "★", "label": "Encore Stars" },
+      "bankGoal": {
+        "id": "encore-merch-jar",
+        "title": "Fill your Encore Merch Jar",
+        "blurb": "Finish your setlist quests. Bank stars. When the jar hits the goal — treat / merch pick with Dad.",
+        "need": 12,
+        "reward": "encore merch / treat pick"
+      },
+      "hottest": {
+        "when": "Sun Sep 27 · vanity 3:00 · Jessy",
+        "what": "Your featured Sunday",
+        "where": "With Dad @ 147th · through Fri Oct 2 3:00",
+        "badges": ["Vanity", "Sun"]
+      },
+      "today": [
+        { "kind": "note", "when": "Sat · house day", "what": "House day with the crew · no solo leave", "hint": "your rest beat before Sunday", "tone": "quiet" }
+      ],
+      "quests": [
+        { "id": "ain-bed", "what": "Make your bed", "stars": 1 },
+        { "id": "ain-backpack", "what": "Backpack ready", "stars": 1 },
+        { "id": "ain-toys", "what": "Toys / room reset", "stars": 1 },
+        { "id": "ain-table", "what": "Help clear / set table", "stars": 1 }
+      ],
+      "sports": [],
+      "sportsEmpty": "no sports on your board this weekend · swim returns when calendar posts",
+      "school": [
+        { "when": "Sun 27 · 9–2", "what": "Garage sale / house shake @ 147th", "hint": "with the crew", "tone": "act" },
+        { "when": "Mon 28 · 3:00", "what": "Your LKMS Homework Help", "tone": "act" },
+        { "when": "through Fri Oct 2 3:00", "what": "With Dad @ 147th · your stage base", "tone": "act" }
+      ],
+      "fun": [
+        { "when": "Sun after vanity", "what": "Playlist + chill pick", "hint": "your call with Dad", "tone": "fun" },
+        { "when": "Dad week", "what": "Room vibe / creative hour", "hint": "earn stars → merch jar", "tone": "fun" }
+      ],
+      "appointments": [
+        { "when": "Sun 27 · 3:00", "what": "Vanity · Jessy", "hint": "on your board · known", "tone": "hot" }
+      ],
+      "appointmentsEmpty": "",
+      "streakLabel": "4-day encore streak"
+    },
+    "dan": {
+      "id": "dan",
+      "name": "Dad",
+      "theme": "house-dad",
+      "themeLabel": "Dad Box",
+      "avatar": "D",
+      "hottest": {
+        "when": "Sat Sep 26 · kids with you @ 147th",
+        "what": "Dad week live",
+        "where": "through Fri Oct 2 · 3:00 handoff window",
+        "badges": ["Dad week", "147th"]
+      },
+      "today": [
+        { "when": "Sat · Harris flag", "what": "Leave 7:55 · Heritage Park F10 · Harris game 8:30", "tone": "hot" },
+        { "when": "Sat · Hayes Chat & Chew", "what": "9:00 LOCKED @ home · Hayes enrolled", "tone": "hot" },
+        { "when": "Sat · Hayes flag", "what": "Leave ~2:10 · Indian Hills MS · game 2:45", "tone": "sport" }
+      ],
+      "week": [
+        { "when": "Sun 27 · 9–2", "what": "Garage sale / house shake @ 147th", "tone": "act" },
+        { "when": "Sun 27 · 3:00", "what": "Ainsley vanity · Jessy", "tone": "act" },
+        { "when": "Mon 28 · 8:10 / 8:25", "what": "SRE drop · Hayes + Harris", "tone": "act" },
+        { "when": "Mon 28 · 3:00", "what": "Ainsley LKMS HW Help", "tone": "act" },
+        { "when": "Mon 28 · 3:15 / 3:40", "what": "Boys pickup", "tone": "act" },
+        { "when": "Mon 28 · ~5:40 / 6:15", "what": "Hayes baseball · BV Rec Field 3", "tone": "sport" },
+        { "when": "through Fri Oct 2 3:00", "what": "Kids with Dad @ 147th", "tone": "hot" }
+      ],
+      "leaveBys": [
+        { "when": "Weekday school", "what": "SRE drop leave 8:10 for 8:25", "tone": "act" },
+        { "when": "Weekday pickup", "what": "Leave 3:15 for 3:40 boys", "tone": "act" },
+        { "when": "Sports rule", "what": "Event START = your leave-by", "tone": "act" }
+      ],
+      "picks": [
+        { "when": "Tonight", "what": "Dinner vote with crew", "hint": "House · kids-safe", "tone": "fun" },
+        { "when": "Weekend", "what": "Outside + sports weekends", "hint": "Harris AM · Hayes PM Sat", "tone": "fun" }
+      ],
+      "note": "Kids-safe Dad box · no money · no Desk · calendar facts from House / Atlas only"
+    }
+  }
+}
