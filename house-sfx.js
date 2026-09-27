@@ -283,24 +283,172 @@
     window.setTimeout(function () { banner.remove(); }, 2800);
   }
 
-  function currencyLabel() {
+  /* 1★ = $1 · kids WATCH work earn real money. Themes keep particle chrome. */
+  function dollarsFor(el) {
+    var n = 1;
+    if (el) {
+      var ds = el.getAttribute("data-stars");
+      if (ds == null) {
+        var earn = el.querySelector && el.querySelector("[data-stars]");
+        if (earn) ds = earn.getAttribute("data-stars");
+      }
+      var parsed = parseInt(ds, 10);
+      if (!isNaN(parsed) && parsed >= 0) n = parsed;
+    }
+    return n;
+  }
+  function currencyLabel(el) {
+    var n = dollarsFor(el);
+    if (n <= 0) return "hire · not jar";
     var t = theme();
-    if (t === "harris") return "+1 GEM ◆";
-    if (t === "hayes") return "+1 COIN ◎";
-    if (t === "ainsley") return "+1 STAR ★";
-    return "+1 ★";
+    var cash = "+$" + n;
+    if (t === "harris") return cash + " ◆";
+    if (t === "hayes") return cash + " ◎";
+    if (t === "ainsley") return cash + " ★";
+    return cash;
+  }
+
+  function floatDollar(el, dollars) {
+    if (reducedMotion()) return;
+    var layer = ensureLayer();
+    var r = el && el.getBoundingClientRect ? el.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 0, height: 0 };
+    var pop = document.createElement("div");
+    pop.className = "vfx-float vfx-dollar vfx-" + theme();
+    pop.textContent = "+$" + (dollars == null ? 1 : dollars);
+    pop.style.left = (r.left + r.width / 2) + "px";
+    pop.style.top = (r.top + 8) + "px";
+    layer.appendChild(pop);
+    window.setTimeout(function () { pop.remove(); }, 1200);
   }
 
   function questPop(el) {
+    var n = dollarsFor(el);
     sfxQuest();
     boomAt(el);
-    floatPopup(el, currencyLabel());
+    if (n > 0) floatDollar(el, n);
+    else floatPopup(el, currencyLabel(el));
     // light hotbar / era / loadout react
     document.querySelectorAll(".hotbar-slot, .loadout-slot, .track-dot, .era").forEach(function (s, i) {
       if (i > 4) return;
       s.classList.remove("juice-ping");
       void s.offsetWidth;
       s.classList.add("juice-ping");
+    });
+    // bounce the live grow meter + flash week rising
+    var meter = document.querySelector("[data-grow-meter]");
+    if (meter && n > 0) {
+      meter.classList.remove("is-earning", "is-poking");
+      void meter.offsetWidth;
+      meter.classList.add("is-earning", "is-poking");
+      window.setTimeout(function () {
+        meter.classList.remove("is-earning", "is-poking");
+      }, 700);
+      var stage = meter.querySelector(".grow-stage");
+      if (stage) boomAt(stage);
+    }
+  }
+
+  function jarPoke(meter) {
+    if (!meter) return;
+    sfxTap();
+    meter.classList.remove("is-poking");
+    void meter.offsetWidth;
+    meter.classList.add("is-poking", "is-animating");
+    var stage = meter.querySelector(".grow-stage") || meter;
+    boomAt(stage, theme());
+    spawnParticles(
+      (stage.getBoundingClientRect().left + stage.getBoundingClientRect().width / 2),
+      (stage.getBoundingClientRect().top + stage.getBoundingClientRect().height / 2),
+      theme(),
+      28
+    );
+    window.setTimeout(function () {
+      meter.classList.remove("is-poking", "is-animating");
+    }, 750);
+  }
+
+  function pulseGoalLine(line) {
+    if (!line || reducedMotion()) return;
+    line.classList.add("is-pulse");
+    window.setTimeout(function () { line.classList.remove("is-pulse"); }, 900);
+  }
+
+  function streakSparks(root) {
+    if (reducedMotion()) return;
+    var chip = (root || document).querySelector("[data-streak], .streak, .streak-sparks");
+    if (chip) {
+      chip.classList.add("streak-sparks", "is-pop");
+      window.setTimeout(function () { chip.classList.remove("is-pop"); }, 600);
+    }
+    var layer = ensureLayer();
+    for (var i = 0; i < 12; i++) {
+      var p = document.createElement("i");
+      p.className = "vfx-bit vfx-" + theme();
+      p.style.left = (40 + Math.random() * (window.innerWidth - 80)) + "px";
+      p.style.top = (60 + Math.random() * 80) + "px";
+      p.style.setProperty("--dx", (Math.random() * 80 - 40) + "px");
+      p.style.setProperty("--dy", (-40 - Math.random() * 120) + "px");
+      p.style.setProperty("--rot", (Math.random() * 200 - 100) + "deg");
+      layer.appendChild(p);
+      (function (node) { window.setTimeout(function () { node.remove(); }, 1100); })(p);
+    }
+  }
+
+  function wireGrowFx() {
+    document.querySelectorAll("[data-grow-meter]").forEach(function (meter) {
+      if (meter.getAttribute("data-grow-fx") === "1") return;
+      meter.setAttribute("data-grow-fx", "1");
+      meter.addEventListener("pointerdown", function (ev) {
+        if (ev.target.closest && ev.target.closest("[data-grow-goal-line]")) return;
+        jarPoke(meter);
+      });
+      var line = meter.querySelector("[data-grow-goal-line]");
+      if (line && line.getAttribute("data-goal-fx") !== "1") {
+        line.setAttribute("data-goal-fx", "1");
+        var dragging = false;
+        line.addEventListener("pointerdown", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          dragging = true;
+          line.classList.add("is-dragging", "is-pulse");
+          try { line.setPointerCapture(ev.pointerId); } catch (e) {}
+          sfxTap();
+        });
+        line.addEventListener("pointermove", function (ev) {
+          if (!dragging) return;
+          pulseGoalLine(line);
+        });
+        function endDrag(ev) {
+          if (!dragging) return;
+          dragging = false;
+          line.classList.remove("is-dragging");
+          pulseGoalLine(line);
+        }
+        line.addEventListener("pointerup", endDrag);
+        line.addEventListener("pointercancel", endDrag);
+      }
+    });
+  }
+
+  function wireMustHold() {
+    document.querySelectorAll(".quest, .chore, [data-check]").forEach(function (el) {
+      if (el.getAttribute("data-hold-fx") === "1") return;
+      el.setAttribute("data-hold-fx", "1");
+      var t = null;
+      el.addEventListener("pointerdown", function () {
+        el.classList.add("is-holding");
+        t = window.setTimeout(function () {
+          streakSparks(document);
+          if (!isMuted()) sfxTap();
+        }, 380);
+      });
+      function clearHold() {
+        el.classList.remove("is-holding");
+        if (t) { window.clearTimeout(t); t = null; }
+      }
+      el.addEventListener("pointerup", clearHold);
+      el.addEventListener("pointerleave", clearHold);
+      el.addEventListener("pointercancel", clearHold);
     });
   }
 
@@ -317,9 +465,32 @@
     });
   }
 
-  document.addEventListener("house:cleared", function () { celebrateClear(); });
+  document.addEventListener("house:cleared", function () {
+    celebrateClear();
+    streakSparks(document);
+  });
   document.addEventListener("house:goal-hit", function (ev) {
     celebrateGoal(ev.detail && ev.detail.reward);
+    var meter = document.querySelector("[data-grow-meter]");
+    if (meter) {
+      meter.classList.add("is-goal-mega");
+      window.setTimeout(function () { meter.classList.remove("is-goal-mega"); }, 1600);
+      jarPoke(meter);
+    }
+  });
+  document.addEventListener("house:earn", function (ev) {
+    /* +$ flash owned by questPop; here only drive meter rise in real $ */
+    var meter = document.querySelector("[data-grow-meter]");
+    if (meter) {
+      meter.classList.remove("is-earning");
+      void meter.offsetWidth;
+      meter.classList.add("is-earning");
+      window.setTimeout(function () { meter.classList.remove("is-earning"); }, 700);
+    }
+  });
+  document.addEventListener("house:kid-rendered", function () {
+    wireGrowFx();
+    wireMustHold();
   });
 
   document.addEventListener("click", function (ev) {
@@ -340,17 +511,21 @@
   document.addEventListener("pointerdown", unlock);
   document.addEventListener("keydown", unlock);
 
-  function boot() {
+  function bootFx() {
     wireMute();
+    wireGrowFx();
+    wireMustHold();
     if (isMuted()) document.documentElement.setAttribute("data-sound", "off");
   }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
-  else boot();
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bootFx);
+  else bootFx();
 
   global.HouseSfx = {
     quest: sfxQuest, clear: sfxClear, goal: sfxGoal, tap: sfxTap,
     boomAt: boomAt, celebrateClear: celebrateClear, celebrateGoal: celebrateGoal,
-    floatPopup: floatPopup, screenShake: screenShake,
+    floatPopup: floatPopup, floatDollar: floatDollar, screenShake: screenShake,
+    jarPoke: jarPoke, pulseGoalLine: pulseGoalLine, streakSparks: streakSparks,
+    wireGrowFx: wireGrowFx, wireMustHold: wireMustHold,
     setMuted: setMuted, isMuted: isMuted, wireMute: wireMute,
     startAmbient: startAmbient, stopAmbient: stopAmbient
   };

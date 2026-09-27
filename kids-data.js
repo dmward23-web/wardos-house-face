@@ -324,6 +324,17 @@
         document.dispatchEvent(new CustomEvent("house:goal-hit", { detail: { kidId: bank.kidId, reward: bank.reward, bank: bank } }));
       } catch (e) {}
     }
+    /* Flash real $ on must tap — 1★ = $1 */
+    if (bank && done) {
+      try {
+        var bucks = questStarsFor(kidId, checkId, data);
+        if (bucks > 0) {
+          document.dispatchEvent(new CustomEvent("house:earn", {
+            detail: { kidId: kidId, dollars: bucks, checkId: checkId, bank: bank }
+          }));
+        }
+      } catch (eEarn) { /* */ }
+    }
     return bank;
   }
 
@@ -381,9 +392,9 @@
           : (q.hire ? "hire path · Dad books you · never fills jar" : "add-on · never fills jar");
       }
     } else if (cadence === "weekly") {
-      hint = done ? "weekly clear · banked" : "weekly must · tap once · ★ " + stars;
+      hint = done ? "weekly clear · +$" + stars + " banked" : "weekly must · tap · +$" + stars + " (1★=$1)";
     } else {
-      hint = done ? "cleared · banked today" : "daily must · tap today · ★ " + stars;
+      hint = done ? "cleared · +$" + stars + " today" : "daily must · tap · +$" + stars + " (1★=$1)";
     }
     var earn;
     if (optional) {
@@ -393,14 +404,15 @@
         earn = '<span class="star-earn addon-tag">' + (done ? "OPTIONAL ✓" : "OPTIONAL") + "</span>";
       }
     } else {
-      /* ★ only on musts — soft/addon never earn jar stars */
-      earn = '<span class="star-earn" data-stars="' + stars + '">' + (done ? "★ +" + stars : "★ " + stars) + "</span>";
+      /* 1★ = $1 · kids watch musts earn real money; theme chrome stays on FX */
+      earn = '<span class="star-earn" data-stars="' + stars + '">' + (done ? "+$" + stars : "$" + stars) + "</span>";
     }
     var optAttr = optional ? ' data-optional="1"' : "";
     var cadAttr = ' data-cadence="' + esc(cadence) + '"';
     var softClass = optional ? " addon soft" : "";
+    var starsAttr = optional ? "" : ' data-stars="' + stars + '"';
     return (
-      '<div class="quest ' + open + softClass + '" data-check="' + esc(q.id) + '" data-kid-quest="1"' + optAttr + cadAttr + ' role="button" tabindex="0">' +
+      '<div class="quest ' + open + softClass + '" data-check="' + esc(q.id) + '" data-kid-quest="1"' + optAttr + cadAttr + starsAttr + ' role="button" tabindex="0">' +
       '<span class="ring">' + ring + "</span>" +
       "<div><div class=\"what\">" + esc(q.what) + '</div><div class="hint">' + esc(hint) + "</div></div>" +
       earn +
@@ -709,13 +721,15 @@
       if (!meter._growWired) {
         meter._growWired = true;
         meter.addEventListener("click", function () {
-          meter.classList.remove("is-animating");
+          /* HouseSfx.wireGrowFx owns pointerdown poke — click = a11y fallback only */
+          if (window.HouseSfx && HouseSfx.jarPoke) return;
+          meter.classList.remove("is-animating", "is-poking");
           void meter.offsetWidth;
-          meter.classList.add("is-animating");
-          if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap();
-          setTimeout(function () { meter.classList.remove("is-animating"); }, 750);
+          meter.classList.add("is-animating", "is-poking");
+          setTimeout(function () { meter.classList.remove("is-animating", "is-poking"); }, 750);
         });
       }
+      if (window.HouseSfx && HouseSfx.wireGrowFx) HouseSfx.wireGrowFx();
     });
 
     var balPct = need > 0 ? Math.max(0, Math.min(100, (bal / need) * 100)) : 0;
