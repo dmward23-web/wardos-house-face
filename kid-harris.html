@@ -158,7 +158,8 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     box-shadow:inset 0 0 0 8px #2a4018,inset 0 0 0 14px rgba(200,230,120,.35)}
   .crosshair{position:absolute;top:50%;left:50%;width:28px;height:28px;margin:-14px 0 0 -14px;z-index:1;pointer-events:none;opacity:.25;
     background:linear-gradient(#fff,#fff) center/100% 2px no-repeat,linear-gradient(#fff,#fff) center/2px 100% no-repeat}
-  .panel>*{position:relative;z-index:2}
+  .panel > *:not(.crosshair){position:relative;z-index:2}
+  .crosshair{position:absolute!important;pointer-events:none;z-index:1}
   .hdr{background:linear-gradient(180deg,#d0e890,#8aba40);border:4px solid #1a3010;box-shadow:inset 0 3px 0 rgba(255,255,255,.55),0 7px 0 #0e2008;border-radius:4px}
   .back,.nav-week{background:linear-gradient(180deg,#c8f060,#6aaa28);color:#102010;border-color:#1a4010}
   .avatar{border-radius:4px;image-rendering:pixelated;background:linear-gradient(145deg,#90e050,#2a8018);font-size:36px}
@@ -175,9 +176,17 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .hot-banner::before{content:"";position:absolute;inset:0;background:url("theme-tiles/harris-blocks.png");background-size:40px 40px;opacity:.25;mix-blend-mode:overlay}
   .hot-accent{background:repeating-linear-gradient(180deg,#d0f050 0 10px,#50a020 10px 20px)}
   .hot-label,.hot-sub{color:#d0f090}.hot-title{color:#f8ffe8;text-shadow:0 3px 0 #0a2008}.hot-badge{color:#e8ffe0}
-  --sec-bg:linear-gradient(180deg,#f0f8d0,#c0d080);--sec-border:#1a3010;--sec-shadow:0 6px 0 #0e2008,0 12px 24px rgba(0,0,0,.3);
-  --sec-title:#102010;--card-bg:#e8f4b8;--card-border:#3a7020;--quest-bg:linear-gradient(145deg,#f4ffc8,#c8e870);
-  --quest-border:#2a8018;--bank-bg:#102010;--bank-border:#0a1808;
+  body.theme-harris{
+    --sec-bg:linear-gradient(180deg,#f0f8d0,#c0d080);--sec-border:#1a3010;--sec-shadow:0 6px 0 #0e2008,0 12px 24px rgba(0,0,0,.3);
+    --sec-title:#102010;--sec-meta:#2a5018;--sec-rule:rgba(26,48,16,.25);
+    --card-bg:#e8f4b8;--card-border:#3a7020;--card-hot-bg:#fff3a0;--card-hot-border:#e0a010;
+    --card-sport-bg:#c8f0ff;--card-sport-border:#1080c0;--card-act-bg:#dde4ff;--card-act-border:#3040a0;
+    --card-fun-bg:#d4ffb0;--card-fun-border:#308010;--when:#2a5018;
+    --quest-bg:linear-gradient(145deg,#f4ffc8,#c8e870);--quest-border:#2a8018;--quest-edge:#1a4010;
+    --ring-border:#2a8018;--ring-bg:rgba(180,230,80,.4);
+    --quest-done-bg:rgba(160,230,80,.55);--quest-done-border:#1a7a18;
+    --bank-bg:#102010;--bank-border:#0a1808;
+  }
   .bank-fill{background:repeating-linear-gradient(90deg,#70e030 0 10px,#ffe060 10px 20px)}
   .craft-row{display:flex;gap:10px;align-items:stretch;flex-shrink:0}
   .craft-grid{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);gap:4px;padding:8px;background:#1a2810;border:4px solid #0a1808;border-radius:4px;box-shadow:0 5px 0 #050805}
