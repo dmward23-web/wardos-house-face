@@ -6,7 +6,7 @@
   var DEFAULTS = {
     ainsley: [{ id: "seed-tour-jar", name: "Tour Jar", need: 20 }],
     hayes: [{ id: "seed-victory-stash", name: "Victory stash", need: 10 }],
-    harris: [{ id: "seed-gem-stash", name: "Gem stash", need: 8 }]
+    harris: [{ id: "seed-gem-stash", name: "Gem stash", need: 10 }]
   };
 
   function esc(s) {
@@ -42,6 +42,16 @@
         }
       });
       if (dirty) saveRoot(root);
+    } else if (kidId === "harris") {
+      /* AINSLEY$FIX gate · Gem stash seed was 8 → bankGoal/allowance 10 */
+      var dirtyH = false;
+      (root[kidId] || []).forEach(function (x) {
+        if (x && x.id === "seed-gem-stash" && Number(x.need) === 8) {
+          x.need = 10;
+          dirtyH = true;
+        }
+      });
+      if (dirtyH) saveRoot(root);
     } else if (kidId === "ainsley") {
       /* AINSLEY$FIX · Stick Season / concert-save → Tour Jar $20 */
       var dirtyA = false;
