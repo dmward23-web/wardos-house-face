@@ -270,9 +270,10 @@
     el.setAttribute("data-mode", st.mode || "Auto");
     el.setAttribute("href", el.getAttribute("href") || "sheet-google-home.html");
     if (hdr) {
-      /* Quiet header blend — temps + short LIVE/NEED, no CONNECT scream */
+      /* HUBBADGE1 · premium glass pill — big ambient, quiet set/mode, honest LIVE/NEED */
+      var thermoIco = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3.2v9.4a3.6 3.6 0 1 0 4 0V3.2a2 2 0 1 0-4 0z"/><path d="M12 14.8v2.4"/></svg>';
       el.innerHTML =
-        '<div class="sensi-hdr-ico" aria-hidden="true">🌡</div>'
+        '<div class="sensi-hdr-ico" aria-hidden="true">' + thermoIco + "</div>"
         + '<div class="sensi-hdr-text">'
         + '<div class="sensi-hdr-kicker">Sensi</div>'
         + '<div class="sensi-hdr-line">'
@@ -280,7 +281,7 @@
         + '<span class="sensi-hdr-set">set ' + st.setpoint + "°</span>"
         + '<span class="sensi-hdr-mode">' + mc.label + "</span>"
         + "</div>"
-        + '<div class="sensi-hdr-sub">' + status + "</div>"
+        + '<div class="sensi-hdr-sub"><i class="hdr-live-dot" aria-hidden="true"></i>' + status + "</div>"
         + "</div>";
       return;
     }
