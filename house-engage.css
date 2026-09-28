@@ -2082,6 +2082,26 @@ body.theme-harris .sec-bank.bank-card {
 .leaveby.is-hot {
   box-shadow: 0 8px 0 #05080c, 0 0 36px rgba(255,180,40,0.35) !important;
 }
+/* ==== NEXT UP / leaveby chrome · dark-hero rhythm (not Prism look redesign) ====
+   Boards where day badge is a direct sibling of .leaveby-body (month/week/today/us).
+   Hub sheet-index keeps badge inside .leaveby-head — intentionally not matched.
+   Tokens: ≥16px pad, clear label→main→detail gap, brighter detail contrast. */
+.leaveby:has(> .leaveby-badge) {
+  min-height: 96px;
+}
+.leaveby:has(> .leaveby-badge) > .leaveby-body {
+  padding: 16px 112px 16px 22px;
+  gap: 6px;
+}
+.leaveby:has(> .leaveby-badge) .leaveby-detail {
+  color: rgba(232, 238, 248, 0.96);
+  font-weight: 600;
+}
+.leaveby:has(> .leaveby-badge) .leaveby-detail strong {
+  color: #ffffff;
+  font-weight: 800;
+}
+
 .cam .cam-live.stub i {
   background: #8a909a !important;
   box-shadow: none !important;
