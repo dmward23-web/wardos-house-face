@@ -2658,6 +2658,18 @@
     letter-spacing: -0.01em !important;
   }
 
+
+  /* LIGHTS1 · Lights oval shares Nest oval language (+ amber need tint) */
+  .lights-hdr.is-need {
+    border-color: rgba(224,160,64,0.55) !important;
+  }
+  .hdr.hdr--spread .hdr-ovals { gap: 6px !important; }
+  .hdr.hdr--spread .lights-hdr,
+  .hdr.hdr--spread .sensi-hdr,
+  .hdr.hdr--spread .nest-hdr,
+  .hdr.hdr--spread .wx-card {
+    min-width: 0 !important;
+  }
 </style>
 <link rel="stylesheet" href="heat-v3.css?v=HEAT31" />
 </head>
@@ -2678,6 +2690,7 @@
  <div class="wx-card" id="house-wx" data-live="weather" aria-label="Weather · Overland Park"></div>
  <a class="sensi-hdr sensi-chip" id="index-sensi-chip" href="sheet-google-home.html" aria-label="Sensi thermostat">Sensi…</a>
  <a class="nest-hdr nest-chip" id="index-nest-chip" href="sheet-google-home.html" aria-label="Nest · Google Home">Nest…</a>
+ <a class="lights-hdr nest-hdr lights-chip" id="index-lights-chip" href="sheet-lights.html" aria-label="Lights control">Lights…</a>
  </div>
  <div class="hdr-date" aria-label="Today">
  <div class="hdr-date-kicker">Today</div>
@@ -2926,6 +2939,7 @@
 <script src="house-sfx.js?v=HUBSHIP1"></script>
 <script src="house-sensi.js?v=HUBSHIP1"></script>
 <script src="house-nest.js?v=HUBSHIP1"></script>
+<script src="house-lights.js?v=LIGHTS1"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
@@ -2942,7 +2956,9 @@
  }
  var S = window.HouseSensi;
  var N = window.HouseNest;
+ var L = window.HouseLights;
  var nestChip = document.getElementById("index-nest-chip");
+ var lightsChip = document.getElementById("index-lights-chip");
  function nestBit() {
   var g = N && N.gate ? N.gate() : null;
   if (!g) return "Nest…";
@@ -2984,9 +3000,12 @@
       ? ("Sensi " + st.ambient + "°")
       : (st && st.gate ? st.gate.label : "Sensi");
     var nb = nestBit();
-    subTile.textContent = sensiBit + " · Nest " + nb;
+    var lg = L && L.gate ? L.gate() : null;
+    var lb = lg ? (lg.live ? "LIVE" : lg.label) : "Lights";
+    subTile.textContent = sensiBit + " · Nest " + nb + " · Lights " + lb;
   }
   paintNestChip();
+  if (L && lightsChip) L.paintChip(lightsChip);
  }
  if (S) {
   if (chip) S.mountChip(chip);
@@ -2997,8 +3016,17 @@
   N.onChange(paintGhomeTile);
   N.startPolling();
  }
+ if (L) {
+  L.onChange(paintGhomeTile);
+  L.startPolling();
+ }
  if (nestChip) {
   nestChip.addEventListener("pointerdown", function () {
+   try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
+  }, { passive: true });
+ }
+ if (lightsChip) {
+  lightsChip.addEventListener("pointerdown", function () {
    try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
   }, { passive: true });
  }

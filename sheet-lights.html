@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon-20260926c.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="WardOS House" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="theme-color" content="#d8dadf" />
+<title>BOARD-OS · HOUSE · LIGHTS · CONTROL</title>
+<link rel="stylesheet" href="house-engage.css?v=LIGHTS1" />
+<style>
+  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
+  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
+  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-SemiBold.ttf") format("truetype");font-weight:600;font-style:normal}
+  @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Bold.ttf") format("truetype");font-weight:700;font-style:normal}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1080px;min-height:1920px;height:auto;overflow:auto;background:#d8dadf;color:#121418;
+    font-family:"Inter Display","Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+    -webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  .panel{width:1080px;min-height:1920px;height:auto;padding:16px 22px 12px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:visible;
+    background-color:#d8dadf;
+    background-image:linear-gradient(165deg,rgba(255,255,255,0.36),rgba(180,184,190,0.18)),url("camo-glass-tile-house.png");
+    background-size:auto,420px 420px;background-repeat:no-repeat,repeat}
+  .panel::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:linear-gradient(180deg,rgba(255,255,255,0.46),transparent 28%,transparent 72%,rgba(40,42,46,0.09));
+    mix-blend-mode:soft-light;opacity:0.82}
+  .panel::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+    box-shadow:inset 0 0 0 4px rgba(40,42,48,0.35),inset 0 0 0 8px rgba(255,255,255,0.35)}
+  .panel>*{position:relative;z-index:2}
+  .hdr{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:12px;flex-wrap:wrap;
+    background:rgba(255,255,255,0.78);border:3px solid #2a2e36;
+    box-shadow:inset 0 2px 0 rgba(255,255,255,0.9),0 6px 0 #1a1e24,0 12px 28px rgba(20,22,28,0.18)}
+  .hdr-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .brand img{height:44px;display:block}
+  .back,.nav-week{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:13px;font-weight:800;
+    padding:8px 14px;border-radius:8px;min-height:40px;color:#1a1e24;
+    background:#e8ebf0;border:2px solid #2a2e36;box-shadow:0 3px 0 #1a1e24}
+  .avatar{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:26px;font-weight:800;color:#fff;background:linear-gradient(145deg,#ffe080,#c87810);
+    border:3px solid #121418;box-shadow:0 0 0 3px #fff,0 6px 0 #1a1e24}
+  .eyebrow{font-size:11px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;color:#5a5e66;text-decoration:none}
+  .name{font-size:32px;font-weight:800;letter-spacing:-0.05em}
+  .name-accent{color:#c87810}
+  .tagline{font-size:14px;font-weight:600;color:#4a4e56;margin-top:2px}
+  .status-pill{font-size:13px;font-weight:800;padding:9px 14px;border-radius:8px;
+    background:linear-gradient(180deg,#fff,#d8dce2);border:2px solid #2a2e36;box-shadow:0 3px 0 #1a1e24}
+  .status-pill.on{background:linear-gradient(180deg,#d8f8d8,#80e090);border-color:#287838;color:#104820}
+  .status-pill.off{background:linear-gradient(180deg,#fff0d0,#f0c060);border-color:#8a6010;color:#4a2808}
+
+  .banner{display:flex;border-radius:12px;overflow:hidden;border:3px solid #121418;flex-shrink:0;
+    background:linear-gradient(105deg,#1a1408,#3a2810 40%,#784820 70%,#1a1408);color:#f4f6f8;
+    box-shadow:0 6px 0 #0a0c10,0 12px 28px rgba(0,0,0,0.3)}
+  .banner-accent{width:10px;background:linear-gradient(180deg,#ffe080,#c87810)}
+  .banner-body{padding:12px 18px;flex:1}
+  .banner-lab{font-size:10px;font-weight:800;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,220,140,0.8)}
+  .banner-title{font-size:24px;font-weight:800;letter-spacing:-0.03em;margin-top:2px}
+  .banner-sub{font-size:14px;font-weight:600;color:rgba(230,210,170,0.92);margin-top:2px}
+
+  .bulk{display:flex;gap:10px;flex-wrap:wrap;padding:14px;border-radius:14px;
+    background:rgba(255,255,255,0.9);border:3px solid #2a2e36;box-shadow:0 5px 0 #1a1e24}
+  .bulk-btn{appearance:none;cursor:pointer;flex:1;min-width:160px;min-height:64px;border-radius:12px;
+    font-size:18px;font-weight:800;border:3px solid #121418;
+    background:linear-gradient(180deg,#fff,#d8dce2);color:#1a1e24;box-shadow:0 5px 0 #1a1e24}
+  .bulk-btn.loud{background:linear-gradient(180deg,#ffe080,#e0a020);border-color:#8a6010;box-shadow:0 5px 0 #6a4010}
+  .bulk-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #1a1e24}
+
+  .pad-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .light-pad{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:14px;
+    background:rgba(255,255,255,0.92);border:3px solid #2a2e36;box-shadow:0 5px 0 #1a1e24}
+  .light-pad.is-on{border-color:#8a6010;background:linear-gradient(165deg,#fffaf0,#ffe8b0)}
+  .light-pad.is-pending{opacity:0.78;border-style:dashed}
+  .light-pad-top{display:flex;align-items:center;gap:12px}
+  .light-pad-ico{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:24px;background:linear-gradient(145deg,#ffe080,#c87810);border:2px solid #121418;color:#fff;flex-shrink:0}
+  .light-pad-name{font-size:20px;font-weight:800;letter-spacing:-0.02em}
+  .light-pad-where{font-size:12px;font-weight:700;color:#5a5e66;text-transform:uppercase;letter-spacing:0.08em}
+  .light-pad-state{margin-left:auto;font-size:14px;font-weight:900;letter-spacing:0.12em;
+    padding:6px 10px;border-radius:8px;background:#e8ebf0;border:2px solid #2a2e36}
+  .light-pad.is-on .light-pad-state{background:linear-gradient(180deg,#ffe080,#e0a020);border-color:#8a6010}
+  .light-pad-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .light-btn{appearance:none;cursor:pointer;padding:12px 16px;min-height:48px;border-radius:10px;font-size:14px;font-weight:800;
+    border:2px solid #2a2e36;background:linear-gradient(180deg,#f4f6f8,#d8dce2);color:#1a1e24;box-shadow:0 3px 0 #1a1e24}
+  .light-btn.loud{background:linear-gradient(180deg,#ffe080,#e0a020);border-color:#8a6010;box-shadow:0 3px 0 #6a4010}
+  .light-btn:disabled{opacity:0.55;cursor:default;pointer-events:none}
+  .light-btn:active:not(:disabled){transform:translateY(2px)}
+  .light-bright{flex:1;min-width:120px;accent-color:#c87810}
+  .light-pad-src{font-size:11px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:#8a909a}
+
+  .connect{padding:16px;border-radius:14px;border:3px solid #2a2e36;background:rgba(255,255,255,0.92);
+    box-shadow:0 5px 0 #1a1e24;display:flex;flex-direction:column;gap:10px}
+  .connect.ok{border-color:#287838;background:linear-gradient(165deg,#f0fff0,#d8f0d8)}
+  .connect-title{font-size:18px;font-weight:800;letter-spacing:-0.02em}
+  .connect-sub{font-size:13px;font-weight:650;color:#4a4e56;margin-top:2px}
+  .connect-actions{display:flex;flex-wrap:wrap;gap:8px}
+  .cbtn{appearance:none;cursor:pointer;padding:12px 16px;min-height:48px;border-radius:10px;font-size:14px;font-weight:800;
+    border:2px solid #2a2e36;background:linear-gradient(180deg,#f4f6f8,#d8dce2);color:#1a1e24;
+    box-shadow:0 3px 0 #1a1e24;text-decoration:none;display:inline-flex;align-items:center}
+  .cbtn.loud{background:linear-gradient(180deg,#ffe080,#e0a020);border-color:#8a6010;box-shadow:0 3px 0 #6a4010}
+
+  .note{padding:10px 14px;border-radius:10px;background:rgba(40,42,48,0.08);border:2px dashed rgba(40,42,48,0.3);
+    font-size:13px;font-weight:650;color:#3a3e46;flex-shrink:0}
+  .ftr{display:flex;justify-content:space-between;font-size:12px;color:#5a5e66;font-weight:600;align-items:center;gap:8px;flex-wrap:wrap}
+  .ftr-chip{padding:6px 10px;border-radius:8px;border:2px solid #2a2e36;background:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;color:inherit}
+</style>
+</head>
+<body>
+<div class="panel">
+ <header class="hdr">
+ <div class="hdr-left">
+ <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="44" /></div>
+ <a class="back" href="sheet-google-home.html" aria-label="Back to Google Home"><span class="chev">‹</span> Cams</a>
+ <a class="nav-week" href="sheet-index.html">Sheets</a>
+ <div class="identity" style="display:flex;align-items:center;gap:12px">
+ <div class="avatar">💡</div>
+ <div>
+ <a class="eyebrow" href="sheet-google-home.html">House · lights</a>
+ <h1 class="name"><span class="name-accent">Lights</span> · control</h1>
+ <div class="tagline">Hall · kitchen · porch · Kasa when tokened</div>
+ </div>
+ </div>
+ </div>
+ <div class="status-pill off" id="lights-status-pill">NEED TOKEN</div>
+ </header>
+
+ <section class="banner">
+ <div class="banner-accent"></div>
+ <div class="banner-body">
+ <div class="banner-lab">Lights · not Nest</div>
+ <div class="banner-title">Control tile · NEED TOKEN until Kasa · DEMO toggles</div>
+ <div class="banner-sub">Polls data/lights-live.json · no fake LIVE · OP wall dimmer folds in when Atlas confirms · Elo 3202L</div>
+ </div>
+ </section>
+
+ <section class="bulk" aria-label="All lights">
+ <button type="button" class="bulk-btn loud" id="lights-all-on">All on · DEMO</button>
+ <button type="button" class="bulk-btn" id="lights-all-off">All off · DEMO</button>
+ </section>
+
+ <section class="pad-grid" id="lights-pad-grid" aria-label="Per-light pads"></section>
+
+ <section class="connect" id="lights-connect" aria-label="Connect lights">
+ <div>
+ <div class="connect-title" id="lights-connect-title">CONNECT · need Kasa token</div>
+ <div class="connect-sub" id="lights-connect-sub">Atlas requests Kasa cloud / LAN path from Dan · store on box only · see LIGHTS-LIVE.md · no password in chat · OP dimmer pending Atlas Wi-Fi confirm</div>
+ </div>
+ <div class="connect-actions">
+ <a class="cbtn loud" href="sheet-google-home.html">Cams + climate hub</a>
+ <a class="cbtn" href="sheet-index.html">Sheets hub</a>
+ <a class="cbtn" href="LIGHTS-LIVE.md" target="_blank" rel="noopener">Auth docs · LIGHTS-LIVE</a>
+ <a class="cbtn" href="sheet-status.html">Status</a>
+ </div>
+ </section>
+
+ <div class="note" id="lights-note">Live control needs Kasa token/proxy on Atlas · Nest SDM is cams only · DEMO localStorage until then · never label DEMO as LIVE · Elo 3202L 1080×1920</div>
+
+ <footer class="ftr">
+ <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+ <span>House · Lights</span>
+ <a class="ftr-chip" href="sheet-google-home.html">Cams hub</a>
+ <a class="ftr-chip" href="sheet-sensi.html">Sensi</a>
+ <a class="ftr-chip" href="sheet-index.html">Sheets</a>
+ <a class="ftr-chip" href="sheet-status.html">Status</a>
+ </div>
+ <span id="lights-ftr-status">NEED TOKEN</span>
+ </footer>
+</div>
+<script src="house-clock.js?v=LIGHTS1"></script>
+<script src="house-zoom.js"></script>
+<script src="house-sfx.js"></script>
+<script src="house-lights.js?v=LIGHTS1"></script>
+<script>
+(function () {
+  var L = window.HouseLights;
+  if (!L) return;
+  function paint() {
+    var eff = L.effectiveLights();
+    var g = eff.gate;
+    var pill = document.getElementById("lights-status-pill");
+    pill.textContent = g.label;
+    pill.classList.toggle("on", !!g.live);
+    pill.classList.toggle("off", !g.live);
+    var box = document.getElementById("lights-connect");
+    box.classList.toggle("ok", !!g.live);
+    var title = document.getElementById("lights-connect-title");
+    var sub = document.getElementById("lights-connect-sub");
+    if (g.live) {
+      title.textContent = "LIVE · Kasa / cloud snapshot";
+      sub.textContent = "Reads from data/lights-live.json · writes DEMO until writeSupported · OP dimmer folds when Atlas confirms";
+    } else if (g.needToken || g.kind === "need_token") {
+      title.textContent = "CONNECT · need Kasa token";
+      sub.textContent = "Atlas must request Kasa cloud token or LAN path · ~/.config/wardos/ has nest+sensi only today · LIGHTS-LIVE.md · OP wall dimmer pending";
+    } else {
+      title.textContent = "Lights · " + g.label;
+      sub.textContent = (g.error || g.label) + " · DEMO fallback · never fake LIVE";
+    }
+    var ftr = document.getElementById("lights-ftr-status");
+    if (ftr) ftr.textContent = g.label + (eff.source === "demo" ? " · DEMO toggles" : "");
+    var note = document.getElementById("lights-note");
+    if (note && (g.needToken || g.kind === "need_token")) {
+      note.textContent = "BLOCKED on credential · need Kasa token/proxy on Atlas box · roster Hall/Kitchen/Porch provisional · OP wall dimmer reserved until Atlas confirms Wi-Fi · Elo 3202L";
+    }
+    L.paintPads(document);
+  }
+  L.wireAllButtons(document);
+  L.onChange(paint);
+  L.startPolling();
+  paint();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+{
+  "status": "need_token",
+  "fetchedAt": "2026-09-28T23:46:00.000Z",
+  "source": "kasa-pending",
+  "writeSupported": false,
+  "lights": [
+    {
+      "id": "hall",
+      "name": "Hall",
+      "where": "Hall",
+      "kind": "bulb",
+      "on": null,
+      "brightness": null,
+      "online": null
+    },
+    {
+      "id": "kitchen",
+      "name": "Kitchen",
+      "where": "Kitchen",
+      "kind": "bulb",
+      "on": null,
+      "brightness": null,
+      "online": null
+    },
+    {
+      "id": "porch",
+      "name": "Porch",
+      "where": "Porch",
+      "kind": "bulb",
+      "on": null,
+      "brightness": null,
+      "online": null
+    }
+  ],
+  "reserved": [
+    {
+      "id": "op-wall-dimmer",
+      "name": "OP wall dimmer",
+      "where": "Overland Park",
+      "kind": "dimmer",
+      "on": null,
+      "brightness": null,
+      "online": false,
+      "pending": true,
+      "note": "KS220/HS220 · fold in when Atlas confirms Wi-Fi online"
+    }
+  ],
+  "error": "Need Kasa cloud token or LAN control path on Atlas box (~/.config/wardos/ has nest + sensi only). OP wall dimmer reserved pending Atlas confirm."
+}
