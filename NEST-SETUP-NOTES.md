@@ -19,13 +19,13 @@ Public status only. No client secret, no refresh token, no auth code.
 | Client secret on box | Yes · `~/.config/wardos/nest-sdm.json` mode 600 (**never git**) |
 | Refresh token on box | **Yes** · `~/.config/wardos/nest-refresh.token` mode 600 (**never git**) |
 | `nest-fetch` | Live · lists **5** cams (Living Room, Front door doorbell, Garage, Kitchen, Backyard) |
-| Stills | **Pending** · all cams WEB_RTC-only (no RTSP / on-demand GenerateImage) |
+| Stills | Pending (no RTSP) · **WebRTC video LIVE** via nest-webrtc-proxy (NESTVID1) |
 
 ## Status
 
 **SDM is live on the box.** Refresh token + `nest-sdm.json` are present. `node scripts/nest-fetch.mjs` writes `data/nest-live.json` with `status: live` and real device names.
 
-House Face glass shows **LIVE · NO STILL** on pads (honest roster). Do **not** invent video or fake JPEG stills.
+House Face pads: tap → `nest-webrtc.html` WebRTC live (box proxy :8787). Proven: Front door + Garage. Do **not** invent JPEG stills.
 
 ### Why stills are pending
 

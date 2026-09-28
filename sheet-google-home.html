@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE · CAMS · GOOGLE HOME</title>
-<link rel="stylesheet" href="house-engage.css?v=FAIL3e" />
+<link rel="stylesheet" href="house-engage.css?v=NESTVID1" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
@@ -229,8 +229,8 @@
  <div class="banner-accent"></div>
  <div class="banner-body">
  <div class="banner-lab">Google Home · climate + cameras</div>
- <div class="banner-title">Climate LIVE · Nest LIVE · still pending</div>
- <div class="banner-sub">Sensi live · Nest SDM roster (5) · stills need event/WebRTC bridge · Elo 3202L</div>
+ <div class="banner-title">Climate LIVE · Nest · tap for video</div>
+ <div class="banner-sub">Sensi live · Nest SDM · tap pad → WebRTC via box proxy · Elo 3202L</div>
  </div>
  </section>
 
@@ -265,15 +265,15 @@
  <section class="cam-zone" aria-label="Nest and Google Home cameras">
  <div class="zone-hdr">
  <div class="zone-title">Cameras · Nest / Google Home</div>
- <div class="zone-meta">5 cams · LIVE · still pending</div>
+ <div class="zone-meta">5 cams · LIVE · tap for video</div>
  </div>
- <div class="cam-path">Nest SDM <strong>LIVE</strong> · 5 devices named from Device Access · <strong>stills pending</strong> (WEB_RTC-only · no RTSP/GenerateImage without event + auth proxy) · tokens stay off Pages · NEST-LIVE.md</div>
+ <div class="cam-path">Nest SDM <strong>LIVE</strong> · 5 cams · <strong>tap pad → WebRTC video</strong> (box <code>nest-webrtc-proxy</code> :8787) · tokens off Pages · NEST-LIVE.md</div>
  <div class="cam-grid">
  <article class="cam" aria-label="Living Room camera">
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🛋</span>
- <span class="cam-stub">Still pending · auth proxy</span>
+ <span class="cam-stub">TAP · WebRTC live</span>
  </div>
  <div class="cam-meta">
  <div class="cam-name">Living Room</div>
@@ -284,7 +284,7 @@
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🚪</span>
- <span class="cam-stub">Still pending · auth proxy</span>
+ <span class="cam-stub">TAP · WebRTC live</span>
  </div>
  <div class="cam-meta">
  <div class="cam-name">Front door doorbell</div>
@@ -295,7 +295,7 @@
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🏠</span>
- <span class="cam-stub">Still pending · auth proxy</span>
+ <span class="cam-stub">TAP · WebRTC live</span>
  </div>
  <div class="cam-meta">
  <div class="cam-name">Garage</div>
@@ -306,7 +306,7 @@
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🍳</span>
- <span class="cam-stub">Still pending · auth proxy</span>
+ <span class="cam-stub">TAP · WebRTC live</span>
  </div>
  <div class="cam-meta">
  <div class="cam-name">Kitchen</div>
@@ -317,7 +317,7 @@
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🌳</span>
- <span class="cam-stub">Still pending · auth proxy</span>
+ <span class="cam-stub">TAP · WebRTC live</span>
  </div>
  <div class="cam-meta">
  <div class="cam-name">Backyard</div>
@@ -375,7 +375,7 @@
  </div>
  </section>
 
- <div class="note" id="cam-next-step"><strong>Cams = LIVE · still pending.</strong> SDM roster on glass (5 devices). Refresh token on box. Stills need event-image → <code>data/nest-snaps/*.jpg</code> (auth Basic) or WebRTC/go2rtc bridge — not inventable on static Pages. See <code>NEST-LIVE.md</code>.</div>
+ <div class="note" id="cam-next-step"><strong>Cams = LIVE · tap for video.</strong> Run <code>node scripts/nest-webrtc-proxy.mjs</code> on Atlas box → open <code>http://127.0.0.1:8787/nest-webrtc.html</code> (or tap a pad). Elo LAN: <code>--lan</code> + <code>?proxy=http://&lt;box-ip&gt;:8787</code>. Tokens never on Pages. See <code>NEST-LIVE.md</code>.</div>
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -386,11 +386,11 @@
  <span id="sensi-home-ftr">Atlas · Sensi live gate</span>
  </footer>
 </div>
-<script src="house-clock.js?v=FAIL3e"></script>
+<script src="house-clock.js?v=NESTVID1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
-<script src="house-sensi.js?v=FAIL3e"></script>
-<script src="house-nest.js?v=FAIL3e"></script>
+<script src="house-sensi.js?v=NESTVID1"></script>
+<script src="house-nest.js?v=NESTVID1"></script>
 <script>
 (function () {
   document.querySelectorAll(".cam").forEach(function (el) {

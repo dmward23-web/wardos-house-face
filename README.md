@@ -71,6 +71,7 @@ Reference week plate: `/workspace/board-os-house-face.png`.
 - Auth + cron: see **SENSI-LIVE.md** — needs Dan’s one-time `refresh_token` (not password in chat)
 - LIVE pulse only when `status=live` and snapshot fresh · never fake LIVE · token never in git/glass
 - **Nest cams:** Device Access (SDM) **LIVE** — `scripts/nest-fetch.mjs` → `data/nest-live.json` · see **NEST-LIVE.md**
-  - Roster LIVE when `status=live` + fresh · stills only with Pages-safe `snapshotUrl` · else **LIVE · NO STILL** (no invent)
+  - Roster LIVE when `status=live` + fresh · **tap pad → WebRTC video** via box `nest-webrtc-proxy` (:8787)
   - Secrets on box only: `~/.config/wardos/nest-refresh.token` + `nest-sdm.json` (never git)
+  - Viewer: `nest-webrtc.html` · see **NEST-LIVE.md** · tip NESTVID1
 
