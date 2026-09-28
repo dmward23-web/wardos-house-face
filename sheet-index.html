@@ -200,11 +200,12 @@
     text-transform: uppercase; color: rgba(255,220,140,0.85);
   }
   .leaveby-main {
-    font-size: 34px; font-weight: 800; letter-spacing: -0.045em;
+    font-size: 36px; font-weight: 800; letter-spacing: -0.045em;
     color: #f8fafc; line-height: 1.1;
     text-shadow: 0 2px 0 rgba(0,0,0,0.55), 0 0 24px rgba(255,200,80,0.18);
   }
   .leaveby-main .time {
+    font-size: 44px; line-height: 1;
     color: #1a1000; font-weight: 900; padding: 2px 16px 3px; margin: 0 6px;
     border-radius: 10px;
     background: linear-gradient(180deg, #fff8e0 0%, #ffd246 55%, #f0a020 100%);
@@ -801,8 +802,9 @@
   .name { font-size: 34px; }
   .tagline { font-size: 14px; }
   .wx-card { min-width: 0; max-width: 100%; flex: 1 1 200px; }
-  .leaveby { min-height: 110px; }
-  .leaveby-main { font-size: 26px; }
+  .leaveby { min-height: 118px; }
+  .leaveby-main { font-size: 36px; }
+  .leaveby-main .time { font-size: 44px; }
   .hub-upper .leaveby { flex-wrap: nowrap; position: relative; }
   .hub-upper .leaveby-badge {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
@@ -866,7 +868,7 @@
     line-height: 1;
   }
   .hub-upper .sensi-chip-ico { font-size: 20px; line-height: 1; }
-  .hub-upper .sensi-chip-temp { font-size: 42px; font-weight: 900; letter-spacing: -0.05em; line-height: 0.92; }
+  .hub-upper .sensi-chip-temp { font-size: 33px; font-weight: 900; letter-spacing: -0.05em; line-height: 0.92; }
   .hub-upper .sensi-chip-meta {
     display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px;
     margin-left: 2px;
@@ -1530,6 +1532,10 @@
         0 16px 32px rgba(0,0,0,0.4);
     }
   }
+
+  /* PRISMP0 · leave-by ≥40–48 louder than Sensi · sensi temp ≤33 */
+  .leaveby-main .time { font-size: 44px !important; }
+  .hub-upper .sensi-chip-temp { font-size: 33px !important; }
 </style>
 </head>
 <body>
@@ -1777,14 +1783,6 @@
  <span class="tile-tap">Tap</span>
  </a>
 
- <a class="tile gallery" href="sheet-gallery.html">
- <div class="tile-icon" aria-hidden="true">▦</div>
- <div>
- <div class="tile-label">Gallery</div>
- <div class="tile-sub">Photos</div>
- </div>
- <span class="tile-tap">Tap</span>
- </a>
 
  </nav>
  </div>

@@ -58,17 +58,23 @@
   .banner-sub{font-size:14px;font-weight:600;color:rgba(200,206,216,0.9);margin-top:2px}
 
   /* PRIMARY · Nest / Google Home cam grid */
-  .cam-zone{flex:1 1 auto;min-height:860px;display:flex;flex-direction:column;gap:10px}
+  .cam-zone{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:8px}
   .zone-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 2px}
   .zone-title{font-size:14px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;color:#1a2848}
   .zone-meta{font-size:13px;font-weight:700;color:#4a5a78}
-  .cam-grid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:12px}
+  /* PRISMP0 · denser 3+2 · no empty 6th cell */
+  .cam-grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:1fr 1fr;gap:8px}
+  .cam-grid .cam:nth-child(1),
+  .cam-grid .cam:nth-child(2),
+  .cam-grid .cam:nth-child(3){grid-column:span 2}
+  .cam-grid .cam:nth-child(4),
+  .cam-grid .cam:nth-child(5){grid-column:span 3}
   .cam{position:relative;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;
     background:#0e141c;border:3px solid #121418;
     box-shadow:0 6px 0 #05080c,0 14px 28px rgba(0,0,0,0.28);min-height:0;cursor:pointer;
     -webkit-tap-highlight-color:transparent}
   .cam:active{transform:translateY(2px);box-shadow:0 3px 0 #05080c,0 8px 18px rgba(0,0,0,0.28)}
-  .cam-feed{flex:1;min-height:160px;position:relative;
+  .cam-feed{flex:1;min-height:128px;position:relative;
     background:
       radial-gradient(ellipse 60% 50% at 50% 45%, rgba(60,90,120,0.35), transparent 70%),
       linear-gradient(165deg,#1a2430 0%,#0e141c 55%,#121820 100%);
@@ -87,8 +93,8 @@
     font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;
     padding:5px 8px;border-radius:6px;background:rgba(0,0,0,0.65);color:#c8d0dc;border:1px solid rgba(255,255,255,0.18)}
   .cam-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;
-    padding:10px 12px;background:rgba(255,255,255,0.06);border-top:1px solid rgba(255,255,255,0.08)}
-  .cam-name{font-size:18px;font-weight:800;color:#f0f4f8;letter-spacing:-0.02em}
+    padding:8px 10px;background:rgba(255,255,255,0.06);border-top:1px solid rgba(255,255,255,0.08)}
+  .cam-name{font-size:16px;font-weight:800;color:#f0f4f8;letter-spacing:-0.02em}
   .cam-where{font-size:12px;font-weight:700;color:#90a0b8;text-transform:uppercase;letter-spacing:0.08em}
 
   /* SECONDARY · lights / garage / door strip */
@@ -121,10 +127,10 @@
     -webkit-tap-highlight-color:transparent}
   .climate-hero:active{transform:translateY(2px);box-shadow:0 4px 0 #05080c,0 10px 22px rgba(0,0,0,0.32)}
   .climate-accent{width:12px;flex-shrink:0;background:linear-gradient(180deg,#ffe080,#c87810 50%,#2868a0)}
-  .climate-body{flex:1;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;color:#f4f6f8}
+  .climate-body{flex:1;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#f4f6f8}
   .climate-left{display:flex;flex-direction:column;gap:4px;min-width:0}
   .climate-lab{font-size:11px;font-weight:800;letter-spacing:0.26em;text-transform:uppercase;color:rgba(255,220,140,0.85)}
-  .climate-title{font-size:28px;font-weight:900;letter-spacing:-0.04em;line-height:1.05}
+  .climate-title{font-size:22px;font-weight:900;letter-spacing:-0.04em;line-height:1.05}
   .climate-title em{font-style:normal;color:#ffe080}
   .climate-sub{font-size:14px;font-weight:650;color:rgba(220,210,190,0.9);margin-top:2px}
   .climate-temps{display:flex;align-items:center;gap:14px;flex-shrink:0}
@@ -151,10 +157,10 @@
   .ftr-chip{padding:6px 10px;border-radius:8px;border:2px solid #2a2e36;background:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;color:inherit}
 
   /* SENSI-FX hero · mode energy + live pulse */
-  .climate-hero{position:relative;min-height:210px}
+  .climate-hero{position:relative;min-height:148px}
   .climate-hero::after{content:"";position:absolute;inset:0;pointer-events:none;
     background:url("camo-glass-tile-house.png");background-size:280px 280px;opacity:0.14;mix-blend-mode:overlay}
-  .climate-amb .big{font-size:84px;text-shadow:0 4px 0 rgba(0,0,0,0.35)}
+  .climate-amb .big{font-size:56px;text-shadow:0 4px 0 rgba(0,0,0,0.35)}
   .climate-hero[data-mode="Heat"]{background:linear-gradient(115deg,#2a1206 0%,#8a3a08 42%,#c45a10 70%,#1a0c04 100%)}
   .climate-hero[data-mode="Cool"]{background:linear-gradient(115deg,#061018 0%,#123a68 46%,#2a88d0 78%,#061018 100%)}
   .climate-hero[data-mode="Auto"]{background:linear-gradient(115deg,#2a1408 0%,#6a3810 34%,#1a4068 68%,#071422 100%)}
@@ -204,6 +210,11 @@
     background:rgba(120,72,8,0.12);border:2px solid rgba(200,120,20,0.45);
     font-size:13px;font-weight:700;color:#3a2a10;line-height:1.45}
 
+
+  /* PRISMP0 · GHome density · climate compressed · cams denser · IDs untouched */
+  .cam-glyph{font-size:36px}
+  .cam-stub{font-size:10px;padding:4px 7px}
+  .cam-path{margin-top:2px;padding:8px 10px;font-size:12px}
 </style>
 </head>
 <body>
@@ -324,7 +335,7 @@
  <div class="cam-where">Yard</div>
  </div>
  </article>
- </div></div>
+ </div>
  </section>
 
  <section class="sec-zone" aria-label="Lights garage door secondary">
