@@ -1,16 +1,26 @@
-/* IOSCROLL2 · durable single-page scroller for kid boards (iOS Safari)
+/* IOSCROLL3 · sole html scroller (iOS dual html+body scrollport trap)
    Linked AFTER house-engage.css so it wins. Deploy must copy this file
-   from board-os/house-face or tips get wiped by house-face-deploy.sh. */
-html:not([data-export]),
-html:not([data-export]) body.theme-ainsley,
-html:not([data-export]) body.theme-hayes,
-html:not([data-export]) body.theme-harris {
+   from board-os/house-face or tips get wiped by house-face-deploy.sh.
+   ONLY html is the vertical scrollport — body must NOT be overflow-y
+   scroll/auto or iOS Safari traps the finger after you reach the bottom. */
+html:not([data-export]) {
   height: auto !important;
   max-height: none !important;
   overflow-x: auto !important;
   overflow-y: scroll !important; /* scroll not auto — iOS keeps a stable scroller */
   overscroll-behavior-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-x pan-y pinch-zoom !important;
+}
+html:not([data-export]) body.theme-ainsley,
+html:not([data-export]) body.theme-hayes,
+html:not([data-export]) body.theme-harris {
+  height: auto !important;
+  min-height: 100% !important;
+  max-height: none !important;
+  overflow: visible !important; /* NOT a scrollport — html alone scrolls */
+  overscroll-behavior-y: auto !important;
+  -webkit-overflow-scrolling: auto !important;
   touch-action: pan-x pan-y pinch-zoom !important;
 }
 html:not([data-export]) body.theme-ainsley .panel,
