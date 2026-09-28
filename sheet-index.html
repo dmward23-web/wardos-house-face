@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="description" content="Board-OS House face · family sheets home index · jazz glass · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
-<link rel="stylesheet" href="house-engage.css?v=FAIL3d" />
+<link rel="stylesheet" href="house-engage.css?v=FAIL3e" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -798,7 +798,7 @@
 
 
 
-  /* FAIL3d · Sensi card · upper-right dead zone beside leave-by (not header pill, not fat strip) */
+  /* FAIL3e · Sensi card · upper-right dead zone beside leave-by (not header pill, not fat strip) */
   .hub-upper {
     flex-shrink: 0; display: flex; align-items: stretch; gap: 12px;
     min-height: 0;
@@ -1095,7 +1095,7 @@
  <div class="tile-icon" aria-hidden="true">🏠</div>
  <div>
  <div class="tile-label">Google Home</div>
- <div class="tile-sub" id="ghome-tile-sub">Climate live · Nest STUB</div>
+ <div class="tile-sub" id="ghome-tile-sub">Climate live · Nest LIVE</div>
  </div>
  <span class="tile-tap">Tap</span>
  </a>
@@ -1136,12 +1136,13 @@
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=FAIL3d"></script>
-<script src="house-board-strip.js?v=FAIL3d"></script>
-<script src="house-weather.js?v=FAIL3d"></script>
-<script src="house-sfx.js?v=FAIL3d"></script>
-<script src="house-zoom.js?v=FAIL3d"></script>
-<script src="house-sensi.js?v=FAIL3d"></script>
+<script src="house-clock.js?v=FAIL3e"></script>
+<script src="house-board-strip.js?v=FAIL3e"></script>
+<script src="house-weather.js?v=FAIL3e"></script>
+<script src="house-sfx.js?v=FAIL3e"></script>
+<script src="house-zoom.js?v=FAIL3e"></script>
+<script src="house-sensi.js?v=FAIL3e"></script>
+<script src="house-nest.js?v=FAIL3e"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
@@ -1157,21 +1158,34 @@
   }, { passive: true });
  }
  var S = window.HouseSensi;
+ var N = window.HouseNest;
+ function nestBit() {
+  var g = N && N.gate ? N.gate() : null;
+  if (!g) return "Nest…";
+  if (g.live && g.hasSnaps) return "Nest LIVE";
+  if (g.live) return "Nest LIVE · no still";
+  if (g.needToken) return "Nest STUB";
+  return "Nest " + (g.label || "STUB");
+ }
+ function paintGhomeTile() {
+  var subTile = document.getElementById("ghome-tile-sub");
+  if (!subTile) return;
+  var st = S && S.effectiveState ? S.effectiveState() : null;
+  var sensiBit = st && st.gate && st.gate.live
+    ? ("Sensi " + st.ambient + "°")
+    : (st && st.gate ? st.gate.label : "Sensi");
+  subTile.textContent = sensiBit + " · " + nestBit();
+ }
  if (S) {
   if (chip) S.mountChip(chip);
-  function paintGhomeTile() {
-   var st = S.effectiveState();
-   var subTile = document.getElementById("ghome-tile-sub");
-   if (subTile) {
-    subTile.textContent = st.gate.live
-      ? ("Sensi " + st.ambient + "° · Nest STUB")
-      : (st.gate.label + " · Nest STUB");
-   }
-  }
   S.onChange(paintGhomeTile);
   if (!chip) S.startPolling();
-  paintGhomeTile();
  }
+ if (N) {
+  N.onChange(paintGhomeTile);
+  N.startPolling();
+ }
+ paintGhomeTile();
 })();
 </script>
 </body>

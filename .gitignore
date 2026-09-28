@@ -11,3 +11,8 @@ nest-sdm.json
 nest-refresh.token
 **/nest-refresh.token
 .nest-secrets/
+# Nest stills (auth-downloaded); keep folder via .gitkeep
+data/nest-snaps/*.jpg
+data/nest-snaps/*.jpeg
+data/nest-snaps/*.png
+data/nest-snaps/*.webp

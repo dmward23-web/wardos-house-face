@@ -1,6 +1,7 @@
 /* House Face · Nest / Google Home cams
    Poll data/nest-live.json (Atlas nest-fetch → Pages).
-   NEVER invent video. LIVE pulse only when status=live + fresh + ≥1 snapshotUrl.
+   NEVER invent video. Roster LIVE when status=live + fresh.
+   Still images only when snapshotUrl is a real Pages-servable path.
    See NEST-LIVE.md */
 (function (global) {
   "use strict";
@@ -26,48 +27,116 @@
     return Date.now() - t;
   }
 
+  function countSnaps(data) {
+    var cams = (data && data.cameras) || [];
+    var n = 0;
+    for (var i = 0; i < cams.length; i++) {
+      if (cams[i] && cams[i].snapshotUrl) n++;
+    }
+    return n;
+  }
+
   function hasFreshSnapshots(data) {
     if (!data || data.status !== "live") return false;
     if (ageMs(data) > LIVE_FRESH_MS) return false;
-    var cams = data.cameras || [];
-    for (var i = 0; i < cams.length; i++) {
-      if (cams[i] && cams[i].snapshotUrl) return true;
-    }
-    return false;
+    return countSnaps(data) > 0;
   }
 
-  /** Gate for UI. Never returns live:true without fresh snapshots. */
+  /**
+   * Gate for UI.
+   * live=true when SDM roster is fresh (status=live) — device names OK.
+   * hasSnaps=true only when ≥1 embeddable snapshotUrl (Pages-safe path).
+   * Never invent video.
+   */
   function gate(data) {
     if (!data) {
-      return { live: false, needToken: true, label: "STUB · NO JSON", reason: "missing nest-live.json" };
+      return {
+        live: false,
+        hasSnaps: false,
+        needToken: true,
+        label: "STUB · NO JSON",
+        reason: "missing nest-live.json",
+        deviceCount: 0,
+      };
     }
     if (data.status === "need_token") {
-      return { live: false, needToken: true, label: "STUB · NEED TOKEN", reason: data.error || "need SDM token" };
+      return {
+        live: false,
+        hasSnaps: false,
+        needToken: true,
+        label: "STUB · NEED TOKEN",
+        reason: data.error || "need SDM token",
+        deviceCount: 0,
+      };
     }
     if (data.status === "error") {
-      return { live: false, needToken: false, label: "STUB · ERROR", reason: data.error || "error" };
+      return {
+        live: false,
+        hasSnaps: false,
+        needToken: false,
+        label: "STUB · ERROR",
+        reason: data.error || "error",
+        deviceCount: 0,
+      };
     }
     if (data.status === "live") {
-      if (hasFreshSnapshots(data)) {
-        return { live: true, needToken: false, label: "LIVE", reason: null };
-      }
       var fresh = ageMs(data) <= LIVE_FRESH_MS;
-      if (fresh) {
+      var cams = data.cameras || [];
+      var real = 0;
+      for (var i = 0; i < cams.length; i++) {
+        if (cams[i] && !String(cams[i].id || "").startsWith("stub-")) real++;
+      }
+      var deviceCount = data.cameraCount != null ? data.cameraCount : real;
+      if (!fresh) {
         return {
           live: false,
+          hasSnaps: false,
           needToken: false,
-          label: "LINKED · NO SNAP",
-          reason: "SDM live but no embeddable snapshotUrl yet (see NEST-LIVE.md)",
+          label: "STUB · STALE",
+          reason: "nest-live.json stale",
+          deviceCount: deviceCount,
         };
       }
-      return { live: false, needToken: false, label: "STUB · STALE", reason: "nest-live.json stale" };
+      var snaps = countSnaps(data);
+      if (snaps > 0) {
+        return {
+          live: true,
+          hasSnaps: true,
+          needToken: false,
+          label: "LIVE",
+          reason: null,
+          deviceCount: deviceCount,
+        };
+      }
+      return {
+        live: true,
+        hasSnaps: false,
+        needToken: false,
+        label: "LIVE · NO STILL",
+        reason:
+          "SDM live · " +
+          deviceCount +
+          " cam(s) · stills pending (WEB_RTC-only · GenerateImage needs event + auth proxy)",
+        deviceCount: deviceCount,
+      };
     }
-    return { live: false, needToken: true, label: "STUB", reason: "unknown status" };
+    return {
+      live: false,
+      hasSnaps: false,
+      needToken: true,
+      label: "STUB",
+      reason: "unknown status",
+      deviceCount: 0,
+    };
   }
 
   function notify() {
     for (var i = 0; i < _listeners.length; i++) {
-      try { _listeners[i](); } catch (e) { /* */ }
+      try {
+        _listeners[i]();
+      } catch (e) {
+        /* */
+      }
     }
   }
 
@@ -106,11 +175,63 @@
 
   function glyphFor(cam) {
     var n = String((cam && (cam.where || cam.name)) || "").toLowerCase();
-    if (/entry|front|door/.test(n)) return "🚪";
+    if (/entry|front|door|doorbell/.test(n)) return "🚪";
     if (/drive/.test(n)) return "🚗";
     if (/yard|back|patio/.test(n)) return "🌳";
     if (/garage/.test(n)) return "🏠";
+    if (/kitchen/.test(n)) return "🍳";
+    if (/living|family|inside/.test(n)) return "🛋";
     return "📷";
+  }
+
+  function shortName(cam) {
+    var n = String((cam && cam.name) || "Nest cam").replace(/\s+camera$/i, "").trim();
+    return n || "Nest cam";
+  }
+
+  function ensurePads(grid, count) {
+    var articles = grid.querySelectorAll(".cam");
+    while (articles.length < count) {
+      var art = document.createElement("article");
+      art.className = "cam";
+      art.setAttribute("aria-label", "camera");
+      art.innerHTML =
+        '<div class="cam-feed">' +
+        '<span class="cam-live stub"><i></i>…</span>' +
+        '<span class="cam-glyph" aria-hidden="true">📷</span>' +
+        '<span class="cam-stub"></span>' +
+        "</div>" +
+        '<div class="cam-meta">' +
+        '<div class="cam-name">Cam</div>' +
+        '<div class="cam-where">Cam</div>' +
+        "</div>";
+      grid.appendChild(art);
+      art.addEventListener(
+        "pointerdown",
+        function () {
+          try {
+            if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap();
+          } catch (e) {}
+        },
+        { passive: true }
+      );
+      articles = grid.querySelectorAll(".cam");
+    }
+    while (articles.length > count && articles.length > 0) {
+      grid.removeChild(articles[articles.length - 1]);
+      articles = grid.querySelectorAll(".cam");
+    }
+    if (count <= 4) {
+      grid.style.gridTemplateColumns = "1fr 1fr";
+      grid.style.gridTemplateRows = "1fr 1fr";
+    } else if (count === 5) {
+      grid.style.gridTemplateColumns = "1fr 1fr 1fr";
+      grid.style.gridTemplateRows = "1fr 1fr";
+    } else {
+      grid.style.gridTemplateColumns = "repeat(auto-fit, minmax(220px, 1fr))";
+      grid.style.gridTemplateRows = "auto";
+    }
+    return grid.querySelectorAll(".cam");
   }
 
   function paintPads(root) {
@@ -119,38 +240,70 @@
     if (!grid) return;
     var data = cachedData();
     var g = gate(data);
-    var cams = (data && data.cameras && data.cameras.length) ? data.cameras : null;
-    var articles = grid.querySelectorAll(".cam");
+    var cams = data && data.cameras && data.cameras.length ? data.cameras : null;
+    var want = cams && g.live ? cams.length : cams && !g.needToken ? cams.length : 4;
+    if (want < 4) want = 4;
+    var articles = ensurePads(grid, want);
 
     var zoneMeta = root.querySelector(".cam-zone .zone-meta");
     if (zoneMeta) {
-      if (g.live) zoneMeta.textContent = "LIVE · snapshots";
-      else if (g.label.indexOf("LINKED") === 0) zoneMeta.textContent = "SDM linked · no snapshot URLs";
-      else if (g.needToken) zoneMeta.textContent = "4 pads · STUB · need SDM token";
-      else zoneMeta.textContent = g.label;
+      if (g.live && g.hasSnaps) {
+        zoneMeta.textContent = g.deviceCount + " cams · LIVE · stills";
+      } else if (g.live) {
+        zoneMeta.textContent = g.deviceCount + " cams · LIVE · still pending";
+      } else if (g.needToken) {
+        zoneMeta.textContent = "4 pads · STUB · need SDM token";
+      } else {
+        zoneMeta.textContent = g.label;
+      }
     }
 
     var path = root.querySelector(".cam-path");
     if (path) {
-      if (g.live) {
-        path.textContent = "Nest SDM live · fresh snapshots · see " + DOCS;
-      } else if (g.label.indexOf("LINKED") === 0) {
-        path.innerHTML = "SDM auth ok · device names live · <strong>no embeddable snapshot yet</strong> (GenerateImage needs eventId + auth header; bridge go2rtc/Scrypted HTTPS into <code>snapshotUrl</code>) · " + DOCS;
+      if (g.live && g.hasSnaps) {
+        path.textContent =
+          "Nest SDM live · Pages stills from data/nest-snaps · see " + DOCS;
+      } else if (g.live) {
+        path.innerHTML =
+          "Nest SDM <strong>LIVE</strong> · " +
+          g.deviceCount +
+          " devices named from Device Access · " +
+          "<strong>stills pending</strong> (cams are WEB_RTC-only — no RTSP/GenerateImage without event + auth proxy) · tokens stay off Pages · " +
+          DOCS;
+      } else if (g.needToken) {
+        path.innerHTML =
+          "WORKING path staged · no fake LIVE video · hand Atlas Nest refresh_token via secret-request → <code>~/.config/wardos/nest-refresh.token</code> + <code>nest-sdm.json</code> · see <code>" +
+          DOCS +
+          "</code>";
       } else {
-        path.innerHTML = "WORKING path staged · no fake LIVE video · hand Atlas Nest refresh_token via secret-request → <code>~/.config/wardos/nest-refresh.token</code> + <code>nest-sdm.json</code> · see <code>" + DOCS + "</code>";
+        path.textContent = g.label + (g.reason ? " · " + g.reason : "") + " · " + DOCS;
       }
     }
 
     var note = root.getElementById("cam-next-step");
     if (note) {
-      if (g.live) {
-        note.innerHTML = "<strong>Cams = LIVE.</strong> Snapshots from nest-live.json · polling ~60s.";
+      if (g.live && g.hasSnaps) {
+        note.innerHTML =
+          "<strong>Cams = LIVE + stills.</strong> Snapshots from nest-live.json → data/nest-snaps · polling ~60s.";
+      } else if (g.live) {
+        note.innerHTML =
+          "<strong>Cams = LIVE · still pending.</strong> SDM roster on glass (" +
+          g.deviceCount +
+          " devices). Stills need event-image download → <code>data/nest-snaps/*.jpg</code> (auth Basic) or a WebRTC/go2rtc bridge — not inventable on static Pages. Refresh token already on box.";
       } else if (g.needToken) {
-        note.innerHTML = "<strong>Cams = STUB (need token).</strong> Stage ready: <code>scripts/nest-fetch.mjs</code> + <code>" + DOCS + "</code>. Dan: enable Google Device Access (SDM) → hand Atlas refresh_token via <em>secret-request</em> (masked). Until then pads stay honest STUB — no invented video.";
-      } else if (g.label.indexOf("LINKED") === 0) {
-        note.innerHTML = "<strong>Cams = linked · no snap.</strong> SDM devices listed; snapshotUrl still null (Pages cannot use auth-gated GenerateImage URLs). Bridge HTTPS snapshots or wait for event images proxied by Atlas.";
+        note.innerHTML =
+          "<strong>Cams = STUB (need token).</strong> Stage ready: <code>scripts/nest-fetch.mjs</code> + <code>" +
+          DOCS +
+          "</code>. Dan: enable Google Device Access (SDM) → hand Atlas refresh_token via <em>secret-request</em> (masked). Until then pads stay honest STUB — no invented video.";
       } else {
-        note.innerHTML = "<strong>Cams = " + g.label + ".</strong> " + (g.reason || "") + " · see <code>" + DOCS + "</code>.";
+        note.innerHTML =
+          "<strong>Cams = " +
+          g.label +
+          ".</strong> " +
+          (g.reason || "") +
+          " · see <code>" +
+          DOCS +
+          "</code>.";
       }
     }
 
@@ -168,39 +321,49 @@
       var img = feed && feed.querySelector("img.cam-snap");
 
       if (cam) {
-        if (nameEl) nameEl.textContent = cam.name || "Nest cam";
-        if (whereEl) whereEl.textContent = cam.where || "Cam";
+        if (nameEl) nameEl.textContent = shortName(cam);
+        if (whereEl) {
+          var whereBit = cam.where || "Cam";
+          if (cam.online === true) whereBit += " · online";
+          else if (cam.online === false) whereBit += " · offline";
+          whereEl.textContent = whereBit;
+        }
         if (glyph) glyph.textContent = glyphFor(cam);
-        el.setAttribute("aria-label", (cam.name || "camera") + " camera");
+        el.setAttribute("aria-label", shortName(cam) + " camera");
       }
 
-      var showLive = g.live && cam && cam.snapshotUrl;
+      var showSnap = g.live && g.hasSnaps && cam && cam.snapshotUrl;
+      var realCam = cam && !String(cam.id || "").startsWith("stub-");
+
       if (liveEl) {
-        if (showLive) {
+        if (showSnap) {
           liveEl.className = "cam-live on";
           liveEl.innerHTML = "<i></i>LIVE";
-        } else if (g.label.indexOf("LINKED") === 0 && cam && !String(cam.id || "").startsWith("stub-")) {
-          liveEl.className = "cam-live stub";
-          liveEl.innerHTML = "<i></i>LINKED · NO SNAP";
-        } else {
+        } else if (g.live && realCam) {
+          liveEl.className = "cam-live on dim";
+          liveEl.innerHTML = "<i></i>LIVE · NO STILL";
+        } else if (g.needToken) {
           liveEl.className = "cam-live stub";
           liveEl.innerHTML = "<i></i>STUB · NO FEED";
+        } else {
+          liveEl.className = "cam-live stub";
+          liveEl.innerHTML = "<i></i>" + (g.label || "STUB");
         }
       }
 
       if (stubEl) {
-        if (showLive) stubEl.textContent = "SDM";
+        if (showSnap) stubEl.textContent = "SDM · still";
+        else if (g.live && realCam) stubEl.textContent = "Still pending · auth proxy";
         else if (g.needToken) stubEl.textContent = "Need SDM token";
-        else if (g.label.indexOf("LINKED") === 0) stubEl.textContent = "No snapshot URL";
         else stubEl.textContent = g.label;
       }
 
       if (feed) {
-        if (showLive) {
+        if (showSnap) {
           if (!img) {
             img = document.createElement("img");
             img.className = "cam-snap";
-            img.alt = (cam && cam.name) || "Nest snapshot";
+            img.alt = shortName(cam) || "Nest snapshot";
             img.decoding = "async";
             feed.insertBefore(img, feed.firstChild);
           }
@@ -216,18 +379,29 @@
     var bannerTitle = root.querySelector(".banner-title");
     var bannerSub = root.querySelector(".banner-sub");
     if (bannerTitle) {
-      if (g.live) bannerTitle.textContent = "Climate + Nest cams LIVE";
-      else if (g.label.indexOf("LINKED") === 0) bannerTitle.textContent = "Climate LIVE · Nest linked · no snap";
+      if (g.live && g.hasSnaps) bannerTitle.textContent = "Climate + Nest cams LIVE";
+      else if (g.live) bannerTitle.textContent = "Climate LIVE · Nest LIVE · still pending";
       else bannerTitle.textContent = "Climate LIVE glass · Nest cams STUB";
     }
     if (bannerSub) {
-      if (g.live) bannerSub.textContent = "Sensi + Nest snapshots · Elo 3202L";
-      else bannerSub.textContent = "Sensi polls live JSON · Nest needs SDM token or snapshot bridge · no fake video";
+      if (g.live && g.hasSnaps) {
+        bannerSub.textContent = "Sensi + Nest stills · Elo 3202L";
+      } else if (g.live) {
+        bannerSub.textContent =
+          "Sensi live · Nest SDM roster (" +
+          g.deviceCount +
+          ") · stills need event/WebRTC bridge · no fake video";
+      } else {
+        bannerSub.textContent =
+          "Sensi polls live JSON · Nest needs SDM token · no fake video";
+      }
     }
   }
 
   global.HouseNest = {
-    gate: function () { return gate(cachedData()); },
+    gate: function () {
+      return gate(cachedData());
+    },
     cachedData: cachedData,
     fetchLive: fetchLive,
     startPolling: startPolling,

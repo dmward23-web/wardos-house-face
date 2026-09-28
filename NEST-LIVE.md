@@ -1,8 +1,8 @@
 # Nest cams live · House Face (Device Access SDM)
 
-**Honest gate:** GitHub Pages is static. Nest / Google Home cams need **Google Device Access (SDM)** OAuth. Until Atlas has a refresh token + client secrets on the box, the UI stays **STUB · NEED TOKEN** — **never** labels invented video or blank pads as LIVE.
+**Honest gate:** GitHub Pages is static. Nest / Google Home cams use **Google Device Access (SDM)** OAuth.
 
-**Dan LAST-YES:** Device Access path approved. Token **not** on box yet — hand via secret-request (masked) later.
+**Status (2026-09-28):** Refresh token + `nest-sdm.json` **are on the box** (mode 600, never git). `nest-fetch` writes `status: live` with **5** real cams. Glass shows **LIVE · NO STILL** — roster honest, no invented video. Stills pending (WEB_RTC-only devices).
 
 ## Live data flow (stage)
 
@@ -25,9 +25,9 @@ sheet-google-home.html polls every ~60s
   else honest STUB / NEED TOKEN
 ```
 
-- **List devices:** camera / doorbell / display names + online when SDM returns them.
-- **Snapshots:** SDM `CameraEventImage.GenerateImage` needs a real `eventId` and returns a URL that requires `Authorization: Basic <token>` — **not** embeddable on static Pages. Until a local bridge (go2rtc / Scrypted) publishes HTTPS snapshot URLs into JSON, `snapshotUrl` stays **null**. Never invent video.
-- **RTSP / WebRTC:** short-lived; not wired on this stage.
+- **List devices:** camera / doorbell / display names + online when SDM returns them. **LIVE on glass.**
+- **Snapshots:** These house cams are **WEB_RTC-only** (no RTSP). `GenerateImage` / `GenerateRtspStream` are rejected. When a Pub/Sub `eventId` exists, nest-fetch can download Basic-auth image bytes into `data/nest-snaps/*.jpg` and set `snapshotUrl` to that relative path (Pages-safe; tokens off JSON). Until then `snapshotUrl` stays **null** — never invent video.
+- **RTSP / WebRTC:** RTSP unsupported on these devices; WebRTC stream grab is a future bridge (go2rtc / Scrypted).
 
 ## Credential Atlas must request from Dan
 
@@ -118,7 +118,7 @@ git push origin main
 | `status` | UI |
 |----------|----|
 | `need_token` | STUB · NEED TOKEN · no LIVE pulse |
-| `live` | LIVE pulse **only if** `fetchedAt` fresh **and** ≥1 camera has non-null `snapshotUrl` |
+| `live` | Roster **LIVE** when `fetchedAt` fresh · green still pulse only if ≥1 non-null `snapshotUrl` · else **LIVE · NO STILL** |
 | `error` | STUB · show error · never fake LIVE |
 
 ```json
@@ -145,9 +145,10 @@ git push origin main
 
 ## UI rules
 
-- No **LIVE** cam badge unless `status === "live"`, snapshot age &lt; 30 min, and at least one real `snapshotUrl`.
+- `status === "live"` + fresh → show **LIVE** roster (real device names). Do not invent video.
+- Green still + `<img>` only when a camera has a Pages-servable `snapshotUrl` (e.g. `data/nest-snaps/….jpg`).
+- Otherwise pad badge **LIVE · NO STILL** + “Still pending · auth proxy” — never STUB · NEED TOKEN while SDM is linked.
 - Names from SDM when live; stub pad names when `need_token`.
-- `snapshotUrl: null` → keep feed glyph + STUB / NO SNAP — do not draw fake video.
 - Alternate path: local go2rtc/Scrypted HTTPS snapshots written into `snapshotUrl` by a future bridge (same JSON contract).
 
 ## Related

@@ -70,7 +70,7 @@ Reference week plate: `/workspace/board-os-house-face.png`.
 - Live reads: `data/sensi-live.json` (Atlas `scripts/sensi-fetch.mjs`)
 - Auth + cron: see **SENSI-LIVE.md** — needs Dan’s one-time `refresh_token` (not password in chat)
 - LIVE pulse only when `status=live` and snapshot fresh · never fake LIVE · token never in git/glass
-- **Nest cams:** staged Device Access (SDM) — `scripts/nest-fetch.mjs` → `data/nest-live.json` · see **NEST-LIVE.md**
-  - LIVE pulse only when `status=live` + fresh non-null `snapshotUrl` · otherwise honest STUB / NEED TOKEN
-  - Secrets on box only: `~/.config/wardos/nest-refresh.token` + `nest-sdm.json` (never git) · Dan hands refresh_token via secret-request
+- **Nest cams:** Device Access (SDM) **LIVE** — `scripts/nest-fetch.mjs` → `data/nest-live.json` · see **NEST-LIVE.md**
+  - Roster LIVE when `status=live` + fresh · stills only with Pages-safe `snapshotUrl` · else **LIVE · NO STILL** (no invent)
+  - Secrets on box only: `~/.config/wardos/nest-refresh.token` + `nest-sdm.json` (never git)
 
