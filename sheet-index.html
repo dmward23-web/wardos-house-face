@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="description" content="Board-OS House face · family sheets home index · jazz glass · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
-<link rel="stylesheet" href="house-engage.css?v=BOARDSLAY1" />
+<link rel="stylesheet" href="house-engage.css?v=FAIL3b" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -792,6 +792,82 @@
   .tile.ghome .tile-tap { background: #0e2848; color: #c8e8ff; border-color: #2868a0; }
 
 
+
+  /* FAIL3b · main-board live Sensi climate strip */
+  .index-climate {
+    flex-shrink: 0; display: flex; align-items: stretch; gap: 0;
+    text-decoration: none; color: inherit; border-radius: 16px; overflow: hidden;
+    border: 4px solid #121418; min-height: 148px; position: relative;
+    background: linear-gradient(115deg, #2a1408 0%, #6a3810 34%, #1a4068 68%, #071422 100%);
+    box-shadow: 0 8px 0 #05080c, 0 16px 32px rgba(0,0,0,0.28), 0 0 36px rgba(255,140,40,0.22), 0 0 28px rgba(80,160,255,0.18);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .index-climate:active { transform: translateY(2px); box-shadow: 0 4px 0 #05080c, 0 10px 22px rgba(0,0,0,0.28); }
+  .index-climate::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: url("camo-glass-tile-house.png"); background-size: 280px 280px;
+    opacity: 0.12; mix-blend-mode: overlay;
+  }
+  .index-climate[data-mode="Heat"] { background: linear-gradient(115deg,#2a1206 0%,#8a3a08 42%,#c45a10 70%,#1a0c04 100%); }
+  .index-climate[data-mode="Cool"] { background: linear-gradient(115deg,#061018 0%,#123a68 46%,#2a88d0 78%,#061018 100%); }
+  .index-climate[data-mode="Auto"] { background: linear-gradient(115deg,#2a1408 0%,#6a3810 34%,#1a4068 68%,#071422 100%); }
+  .index-climate[data-mode="Off"] { background: linear-gradient(115deg,#121418,#2a2e36 55%,#121418); }
+  .index-climate.is-live .ix-pill {
+    background: rgba(40,120,56,0.9); color: #e8ffe8; border-color: rgba(128,232,144,0.55);
+    animation: ix-live 1.7s ease-out infinite;
+  }
+  .index-climate.is-need .ix-pill {
+    background: rgba(120,72,8,0.9); color: #ffe8b0; border-color: rgba(255,200,80,0.55);
+  }
+  @keyframes ix-live {
+    0% { box-shadow: 0 0 0 0 rgba(128,232,144,0.55); }
+    100% { box-shadow: 0 0 0 12px rgba(128,232,144,0); }
+  }
+  .ix-accent { width: 12px; flex-shrink: 0; background: linear-gradient(180deg,#ffe080,#c87810 50%,#2868a0); z-index: 1; }
+  .ix-body {
+    flex: 1; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; color: #f4f6f8; position: relative; z-index: 2; min-width: 0;
+  }
+  .ix-left { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .ix-lab { font-size: 11px; font-weight: 800; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(255,220,140,0.85); }
+  .ix-title { font-size: 26px; font-weight: 900; letter-spacing: -0.04em; line-height: 1.05; }
+  .ix-title em { font-style: normal; color: #ffe080; }
+  .ix-sub { font-size: 13px; font-weight: 650; color: rgba(220,210,190,0.9); margin-top: 2px; }
+  .ix-temps { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .ix-amb { text-align: center; }
+  .ix-amb .big { font-size: 64px; font-weight: 900; letter-spacing: -0.05em; line-height: 1; text-shadow: 0 3px 0 rgba(0,0,0,0.35); }
+  .ix-amb .big span { font-size: 22px; vertical-align: super; opacity: 0.85; }
+  .ix-amb .lab { font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(220,200,160,0.75); }
+  .ix-set {
+    padding: 10px 12px; border-radius: 12px; background: rgba(0,0,0,0.35);
+    border: 2px solid rgba(255,255,255,0.2); text-align: center; min-width: 96px;
+  }
+  .ix-set .val { font-size: 26px; font-weight: 900; letter-spacing: -0.03em; }
+  .ix-set .lab { font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(200,210,220,0.8); }
+  .ix-mode {
+    padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 800; letter-spacing: 0.12em;
+    background: rgba(255,224,128,0.95); color: #1a1000; border: 2px solid rgba(255,255,255,0.35);
+  }
+  .ix-humid {
+    padding: 6px 10px; border-radius: 8px; font-size: 13px; font-weight: 800;
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(160,210,255,0.35); color: #d8ecff; letter-spacing: 0.04em;
+  }
+  .ix-humid.is-empty { opacity: 0.4; }
+  .ix-cta { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+  .ix-pill {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 7px 12px; border-radius: 8px; background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.22); color: #c8d0dc;
+  }
+  .ix-open {
+    font-size: 13px; font-weight: 800; padding: 10px 14px; border-radius: 10px;
+    background: linear-gradient(180deg,#ffe080,#e0a020); color: #1a1000;
+    border: 2px solid #8a6010; box-shadow: 0 3px 0 #6a4010;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .index-climate.is-live .ix-pill { animation: none; }
+  }
+
   /* BOARDSLAY ghome · climate tile */
   .tile.ghome, .tile.google-home {
     background: linear-gradient(165deg, #2a1408 0%, #8a4810 38%, #2868a0 72%, #0e1828 100%) !important;
@@ -839,6 +915,33 @@
  </div>
  <div class="leaveby-badge" data-live="leaveby-badge">Sun</div>
  </section>
+
+ <a class="index-climate" id="sensi-hero" href="sheet-google-home.html" aria-label="Sensi thermostat · open cams + climate">
+ <div class="ix-accent" aria-hidden="true"></div>
+ <div class="ix-body">
+ <div class="ix-left">
+ <div class="ix-lab">Sensi · Emerson · 147th</div>
+ <div class="ix-title">Climate · <em>live</em></div>
+ <div class="ix-sub" id="sensi-hero-sub">Polling data/sensi-live.json · honest gate</div>
+ </div>
+ <div class="ix-temps">
+ <div class="ix-amb climate-amb">
+ <div class="lab">Indoor</div>
+ <div class="big" id="sensi-hero-amb">—<span>°</span></div>
+ </div>
+ <div class="ix-set">
+ <div class="lab">Set</div>
+ <div class="val" id="sensi-hero-set">—°</div>
+ </div>
+ <div class="ix-mode" id="sensi-hero-mode">—</div>
+ <div class="ix-humid" id="sensi-hero-humid">—% RH</div>
+ </div>
+ <div class="ix-cta">
+ <div class="ix-pill climate-pill" id="sensi-hero-pill">CONNECT · STUB</div>
+ <div class="ix-open">Cams + Sensi →</div>
+ </div>
+ </div>
+ </a>
 
  <div class="grid-wrap">
  <div class="grid-hdr">
@@ -1006,7 +1109,7 @@
  <div class="tile-icon" aria-hidden="true">🏠</div>
  <div>
  <div class="tile-label">Google Home</div>
- <div class="tile-sub">Sensi LIVE glass · Nest stubs</div>
+ <div class="tile-sub" id="ghome-tile-sub">Climate live · Nest STUB</div>
  </div>
  <span class="tile-tap">Tap</span>
  </a>
@@ -1047,11 +1150,12 @@
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=CT1"></script>
-<script src="house-board-strip.js?v=CT1"></script>
-<script src="house-weather.js?v=CT1"></script>
-<script src="house-sfx.js"></script>
-<script src="house-zoom.js"></script>
+<script src="house-clock.js?v=FAIL3b"></script>
+<script src="house-board-strip.js?v=FAIL3b"></script>
+<script src="house-weather.js?v=FAIL3b"></script>
+<script src="house-sfx.js?v=FAIL3b"></script>
+<script src="house-zoom.js?v=FAIL3b"></script>
+<script src="house-sensi.js?v=FAIL3b"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
@@ -1060,6 +1164,36 @@
  }, { passive: true });
  });
  try { if (window.HouseWeather) HouseWeather.mount("#house-wx"); } catch (e) {}
+ var hero = document.getElementById("sensi-hero");
+ if (hero) {
+  hero.addEventListener("pointerdown", function () {
+   try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
+  }, { passive: true });
+ }
+ var S = window.HouseSensi;
+ if (S) {
+  function paintIndex() {
+   S.paintHero({
+    hero: "sensi-hero",
+    amb: "sensi-hero-amb",
+    set: "sensi-hero-set",
+    mode: "sensi-hero-mode",
+    pill: "sensi-hero-pill",
+    sub: "sensi-hero-sub",
+    humid: "sensi-hero-humid"
+   });
+   var st = S.effectiveState();
+   var subTile = document.getElementById("ghome-tile-sub");
+   if (subTile) {
+    subTile.textContent = st.gate.live
+      ? ("Sensi " + st.ambient + "° · Nest STUB")
+      : (st.gate.label + " · Nest STUB");
+   }
+  }
+  S.onChange(paintIndex);
+  S.startPolling();
+  paintIndex();
+ }
 })();
 </script>
 </body>

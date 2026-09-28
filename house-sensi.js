@@ -259,8 +259,14 @@
     var st = effectiveState();
     var mc = modeColor(st.mode);
     var status = st.gate.label;
+    var humid = (st.humidity != null) ? (st.humidity + "% RH") : null;
     el.classList.add("sensi-chip");
+    el.classList.toggle("is-live", !!st.gate.live);
+    el.classList.toggle("sensi-live-pulse", !!st.gate.live);
+    el.classList.toggle("is-need", st.gate.kind === "need_token");
+    el.setAttribute("data-mode", st.mode || "Off");
     el.setAttribute("href", el.getAttribute("href") || "sheet-sensi.html");
+    el.setAttribute("aria-label", "Sensi · " + st.ambient + "° · set " + st.setpoint + "° · " + mc.label + (humid ? " · " + humid : ""));
     el.innerHTML =
       '<div class="sensi-chip-ico" aria-hidden="true">🌡</div>'
       + '<div class="sensi-chip-text">'
@@ -269,8 +275,9 @@
       + '<span class="sensi-chip-temp">' + st.ambient + "°</span>"
       + '<span class="sensi-chip-set">set ' + st.setpoint + "°</span>"
       + '<span class="sensi-chip-mode" style="--sensi-accent:' + mc.accent + '">' + mc.label + "</span>"
+      + (humid ? '<span class="sensi-chip-humid">' + humid + "</span>" : "")
       + "</div>"
-      + '<div class="sensi-chip-sub">' + status + " · fan " + st.fan + "</div>"
+      + '<div class="sensi-chip-sub"><span class="sensi-chip-pill' + (st.gate.live ? " on" : "") + '">' + status + "</span> · fan " + st.fan + "</div>"
       + "</div>";
   }
 
@@ -311,6 +318,16 @@
     if (sub) {
       var src = st.gate.live ? "LIVE" : (st.gate.kind === "need_token" ? "NEED TOKEN" : "DEMO");
       sub.textContent = src + " · " + st.mode + " · fan " + st.fan + " · not Nest";
+    }
+    var humidEl = document.getElementById(ids.humid || "sensi-hero-humid");
+    if (humidEl) {
+      if (st.humidity != null) {
+        humidEl.textContent = st.humidity + "% RH";
+        humidEl.classList.remove("is-empty");
+      } else {
+        humidEl.textContent = "—% RH";
+        humidEl.classList.add("is-empty");
+      }
     }
     var hero = document.getElementById(ids.hero || "sensi-hero");
     if (hero) {
