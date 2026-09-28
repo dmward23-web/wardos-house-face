@@ -1,4 +1,4 @@
-/* House Face · Overland Park / 147th weather · client-side, no key.
+/* House Face · HUBOVAL1 oval weather pill · Overland Park / 147th · client-side, no key.
    Primary: Open-Meteo. Fallback: wttr.in. Kids-safe · no $. */
 (function (global) {
   "use strict";
@@ -92,15 +92,20 @@
     if (!el || !data) return;
     var hi = (data.high != null && data.low != null)
       ? ("H " + data.high + "° · L " + data.low + "°")
-      : "";
+      : "LIVE";
+    var ico = data.icon || "🌤";
+    el.classList.add("wx-card", "wx-live", "is-live");
     el.innerHTML =
-      '<div class="wx-text">'
-      + '<div class="wx-kicker">' + (data.place || PLACE) + "</div>"
-      + '<div class="wx-line"><span class="wx-temp">' + data.temp + "°</span> "
-      + '<span class="wx-cond">' + data.condition + "</span></div>"
-      + (hi ? '<div class="wx-sub">' + hi + "</div>" : "")
+      '<div class="wx-hdr-ico" aria-hidden="true">' + ico + "</div>"
+      + '<div class="wx-hdr-text wx-text">'
+      + '<div class="wx-kicker">Weather</div>'
+      + '<div class="wx-line">'
+      + '<span class="wx-temp">' + data.temp + "°</span>"
+      + '<span class="wx-cond">' + data.condition + "</span>"
+      + '<span class="wx-mode">OUT</span>'
       + "</div>"
-      + '<div class="wx-icons" aria-hidden="true"><span class="wx-ico">' + (data.icon || "🌤") + "</span></div>";
+      + '<div class="wx-sub"><i class="hdr-live-dot" aria-hidden="true"></i>' + hi + "</div>"
+      + "</div>";
   }
 
   function mount(selector) {
@@ -108,12 +113,23 @@
     if (!el) return;
     el.setAttribute("aria-label", "Weather · " + PLACE);
     el.classList.add("wx-card", "wx-live");
-    el.innerHTML = '<div class="wx-text"><div class="wx-kicker">' + PLACE + '</div>'
-      + '<div class="wx-line">Weather · loading</div><div class="wx-sub">Overland Park</div></div>';
+    el.innerHTML =
+      '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
+      + '<div class="wx-hdr-text wx-text">'
+      + '<div class="wx-kicker">Weather</div>'
+      + '<div class="wx-line"><span class="wx-temp">…</span><span class="wx-cond">loading</span></div>'
+      + '<div class="wx-sub"><i class="hdr-live-dot" aria-hidden="true"></i>LIVE</div>'
+      + "</div>";
     load(function (err, data) {
       if (err || !data) {
-        el.innerHTML = '<div class="wx-text"><div class="wx-kicker">' + PLACE + '</div>'
-          + '<div class="wx-line">Weather · glance later</div><div class="wx-sub">tap refresh · free feed</div></div>';
+        el.classList.remove("is-live");
+        el.innerHTML =
+          '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
+          + '<div class="wx-hdr-text wx-text">'
+          + '<div class="wx-kicker">Weather</div>'
+          + '<div class="wx-line"><span class="wx-temp">—</span><span class="wx-cond">glance later</span></div>'
+          + '<div class="wx-sub">retry</div>'
+          + "</div>";
         return;
       }
       paint(el, data);
