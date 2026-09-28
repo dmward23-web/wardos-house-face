@@ -30,7 +30,7 @@
       "bankGoal": {
         "id": "gem-jar",
         "title": "Gem Jar · earn then save",
-        "blurb": "Clear musts to earn up to $10/week with Dad (1★=$1). Miss musts = short or no full payday. Gem Jar $8 = save what you earned — not free money.",
+        "blurb": "Honest full week of musts hits Gem Jar $8 AND full $10 payday (1★=$1). Miss musts = short or no full payday. Jar = save what you earned — not free money.",
         "need": 8,
         "reward": "Payday with Dad after honest musts",
         "dollarNeed": 8,
@@ -207,7 +207,7 @@
         {
           "when": "Anytime",
           "what": "🔥 Musts clear = gems in the jar",
-          "hint": "earn path · skip = less payday",
+          "hint": "full week → jar $8 + up to $10 payday",
           "tone": "fun"
         },
         {
@@ -235,10 +235,10 @@
       "bankGoal": {
         "id": "victory-jar",
         "title": "Victory Jar · earn then save",
-        "blurb": "Clear musts to earn up to $10/week with Dad (1★=$1). Miss musts = short or no full payday. Victory Jar $12 = save what you earned — not free money.",
-        "need": 12,
+        "blurb": "Honest full week of musts hits Victory Jar $10 AND full $10 payday (1★=$1). Miss musts = short or no full payday. Jar = save what you earned — not free money.",
+        "need": 10,
         "reward": "Payday with Dad after honest musts",
-        "dollarNeed": 12,
+        "dollarNeed": 10,
         "weeklyAllowance": 10,
         "starDollar": 1
       },
@@ -321,6 +321,12 @@
           "id": "hay-room",
           "what": "🧹 Room reset — weekly must",
           "stars": 2,
+          "cadence": "weekly"
+        },
+        {
+          "id": "hay-shoes",
+          "what": "👟 Shoes · closet / garage cubby / room — weekly must (never hallway)",
+          "stars": 1,
           "cadence": "weekly"
         },
         {
@@ -424,12 +430,12 @@
         {
           "when": "Every clear",
           "what": "💥 Must done = coin banked in the jar",
-          "hint": "earn path · skip = less payday",
+          "hint": "full week → jar $10 + $10 payday",
           "tone": "fun"
         },
         {
           "when": "Weekly",
-          "what": "🧹 Room + 🎒 garage cubby = bonus coins",
+          "what": "🧹 Room + 👟 shoes + 🎒 garage cubby",
           "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         }
@@ -452,7 +458,7 @@
       "bankGoal": {
         "id": "tour-jar",
         "title": "Tour Jar · earn then save",
-        "blurb": "Clear musts to earn up to $20/week with Dad (1★=$1). Miss musts = short or no full payday. Jar $20 = save what you earned — not free money. Babysit $15/hr = hire add-on, not jar.",
+        "blurb": "Honest full week of musts hits Tour Jar $20 AND full $20 payday (1★=$1). Miss musts = short or no full payday. Babysit $15/hr = hire add-on, not jar.",
         "need": 20,
         "reward": "Payday with Dad after honest musts",
         "dollarNeed": 20,
