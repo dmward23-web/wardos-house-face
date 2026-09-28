@@ -2301,3 +2301,379 @@ html:not([data-export]) body.theme-harris .sec-list {
   overscroll-behavior: auto !important;
 }
 
+
+
+/* ═══════════════════════════════════════════════════════════
+   GROW3 · Mon Sep 28 2026 · trophy glass v2 HEAT (Prism)
+   Port of victory-jar-mock-v2: louder bloom · forged GOAL ·
+   specular cylinder · deeper void · punchier $ · edge light.
+   Compact KIDSLAY footprint kept. Live $ / fills / data-* untouched.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Meter card — more edge light + dual bloom (wins KIDSLAY1 box-shadow) */
+body.theme-hayes .grow-meter,
+body.theme-harris .grow-meter,
+body.theme-ainsley .grow-meter {
+  border-color: rgba(220, 235, 250, 0.42) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 4px 0 rgba(0, 0, 0, 0.4),
+    0 0 28px rgba(94, 200, 224, 0.35) !important;
+}
+body.theme-hayes .grow-meter {
+  border-color: rgba(140, 228, 248, 0.7) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 4px 0 rgba(0, 0, 0, 0.4),
+    0 0 32px rgba(94, 200, 224, 0.55),
+    0 0 14px rgba(245, 197, 66, 0.28) !important;
+}
+body.theme-harris .grow-meter {
+  border-color: rgba(110, 240, 190, 0.65) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 4px 0 rgba(0, 0, 0, 0.4),
+    0 0 32px rgba(16, 185, 129, 0.5),
+    0 0 14px rgba(34, 211, 238, 0.28) !important;
+}
+body.theme-ainsley .grow-meter {
+  border-color: rgba(246, 160, 200, 0.6) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 4px 0 rgba(0, 0, 0, 0.4),
+    0 0 32px rgba(210, 90, 130, 0.48),
+    0 0 14px rgba(196, 120, 74, 0.28) !important;
+}
+
+/* Louder world bloom behind meter */
+body.theme-hayes .grow-meter::before,
+.grow-meter.grow-coins::before {
+  opacity: 0.42 !important;
+  filter: saturate(0.95) contrast(1.05) brightness(1.05);
+}
+body.theme-harris .grow-meter::before,
+.grow-meter.grow-gems::before {
+  opacity: 0.42 !important;
+  filter: saturate(0.95) contrast(1.05) brightness(1.05);
+}
+body.theme-ainsley .grow-meter::before,
+.grow-meter.grow-jar::before {
+  opacity: 0.44 !important;
+  filter: saturate(0.95) contrast(1.05) brightness(1.05);
+}
+body.theme-hayes .grow-meter::after {
+  background:
+    radial-gradient(ellipse 70% 55% at 18% 20%, rgba(94, 200, 224, 0.22), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 90% 90%, rgba(245, 197, 66, 0.14), transparent 55%),
+    linear-gradient(105deg, rgba(6, 10, 14, 0.82) 0%, rgba(6, 10, 14, 0.52) 42%, rgba(6, 10, 14, 0.78) 100%);
+}
+body.theme-harris .grow-meter::after {
+  background:
+    radial-gradient(ellipse 70% 55% at 18% 20%, rgba(16, 185, 129, 0.2), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 12% 90%, rgba(34, 211, 238, 0.14), transparent 55%),
+    linear-gradient(105deg, rgba(4, 10, 8, 0.82) 0%, rgba(4, 10, 8, 0.52) 42%, rgba(4, 10, 8, 0.78) 100%);
+}
+body.theme-ainsley .grow-meter::after {
+  background:
+    radial-gradient(ellipse 70% 55% at 18% 20%, rgba(210, 90, 130, 0.2), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 88% 90%, rgba(196, 120, 74, 0.14), transparent 55%),
+    linear-gradient(105deg, rgba(10, 6, 8, 0.82) 0%, rgba(10, 6, 8, 0.52) 42%, rgba(10, 6, 8, 0.78) 100%);
+}
+
+/* —— Trophy-glass cylinder (all three worlds) —— */
+body.theme-hayes .grow-stage,
+body.theme-harris .grow-stage,
+body.theme-ainsley .grow-stage,
+.grow-meter.grow-coins .grow-stage,
+.grow-meter.grow-gems .grow-stage,
+.grow-meter.grow-jar .grow-stage {
+  border-radius: 16px !important;
+  overflow: hidden;
+  isolation: isolate;
+  /* cylinder specular + deep void pool so empty still has volume */
+  background:
+    linear-gradient(90deg,
+      rgba(255, 255, 255, 0.34) 0%,
+      rgba(255, 255, 255, 0.12) 10%,
+      rgba(255, 255, 255, 0.03) 24%,
+      transparent 40%,
+      transparent 58%,
+      rgba(0, 0, 0, 0.35) 78%,
+      rgba(0, 0, 0, 0.7) 100%),
+    linear-gradient(180deg,
+      rgba(16, 26, 40, 0.95) 0%,
+      rgba(4, 8, 14, 0.98) 42%,
+      rgba(8, 28, 40, 0.92) 78%,
+      rgba(12, 40, 55, 0.95) 100%) !important;
+  border-width: 2.5px !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.22),
+    inset 10px 0 22px rgba(255, 255, 255, 0.12),
+    inset -12px 0 26px rgba(0, 0, 0, 0.7),
+    inset 0 18px 28px rgba(255, 255, 255, 0.08),
+    inset 0 -28px 36px rgba(0, 0, 0, 0.55) !important;
+}
+body.theme-hayes .grow-stage,
+.grow-meter.grow-coins .grow-stage {
+  border-color: rgba(140, 228, 248, 0.95) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.22),
+    0 0 22px rgba(94, 200, 224, 0.55),
+    0 0 10px rgba(245, 197, 66, 0.28),
+    inset 10px 0 22px rgba(255, 255, 255, 0.14),
+    inset -12px 0 26px rgba(0, 0, 0, 0.72),
+    inset 0 18px 28px rgba(255, 255, 255, 0.09),
+    inset 0 -28px 40px rgba(20, 70, 90, 0.45) !important;
+}
+body.theme-harris .grow-stage,
+.grow-meter.grow-gems .grow-stage {
+  border-color: rgba(110, 240, 190, 0.95) !important;
+  background:
+    linear-gradient(90deg,
+      rgba(255, 255, 255, 0.34) 0%,
+      rgba(255, 255, 255, 0.12) 10%,
+      rgba(255, 255, 255, 0.03) 24%,
+      transparent 40%,
+      transparent 58%,
+      rgba(0, 0, 0, 0.35) 78%,
+      rgba(0, 0, 0, 0.7) 100%),
+    linear-gradient(180deg,
+      rgba(12, 26, 20, 0.95) 0%,
+      rgba(2, 8, 6, 0.98) 42%,
+      rgba(6, 32, 24, 0.92) 78%,
+      rgba(10, 48, 36, 0.95) 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.22),
+    0 0 22px rgba(16, 185, 129, 0.52),
+    0 0 10px rgba(34, 211, 238, 0.28),
+    inset 10px 0 22px rgba(255, 255, 255, 0.14),
+    inset -12px 0 26px rgba(0, 0, 0, 0.72),
+    inset 0 18px 28px rgba(255, 255, 255, 0.09),
+    inset 0 -28px 40px rgba(12, 70, 50, 0.45) !important;
+}
+body.theme-ainsley .grow-stage,
+.grow-meter.grow-jar .grow-stage {
+  border-radius: 16px 16px 22px 22px / 14px 14px 28px 28px !important;
+  border-color: rgba(246, 160, 200, 0.9) !important;
+  background:
+    linear-gradient(90deg,
+      rgba(255, 255, 255, 0.34) 0%,
+      rgba(255, 255, 255, 0.12) 10%,
+      rgba(255, 255, 255, 0.03) 24%,
+      transparent 40%,
+      transparent 58%,
+      rgba(0, 0, 0, 0.35) 78%,
+      rgba(0, 0, 0, 0.7) 100%),
+    linear-gradient(180deg,
+      rgba(28, 14, 22, 0.95) 0%,
+      rgba(6, 2, 4, 0.98) 42%,
+      rgba(40, 14, 28, 0.92) 78%,
+      rgba(55, 18, 36, 0.95) 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 0 22px rgba(210, 90, 130, 0.5),
+    0 0 10px rgba(196, 120, 74, 0.28),
+    inset 10px 0 22px rgba(255, 255, 255, 0.14),
+    inset -12px 0 26px rgba(0, 0, 0, 0.72),
+    inset 0 18px 28px rgba(255, 255, 255, 0.09),
+    inset 0 -28px 40px rgba(70, 25, 45, 0.5) !important;
+}
+
+/* Metal cap — hayes + harris (ainsley already has ::before lid) */
+body.theme-hayes .grow-stage::before,
+.grow-meter.grow-coins .grow-stage::before,
+body.theme-harris .grow-stage::before,
+.grow-meter.grow-gems .grow-stage::before {
+  content: "";
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  top: 0;
+  height: 11px;
+  z-index: 6;
+  border-radius: 0 0 7px 7px;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.08) 40%, transparent 70%),
+    linear-gradient(145deg, #7a8ea4, #1c2a38 42%, #07090c);
+  border: 1px solid rgba(235, 245, 255, 0.55);
+  border-top: none;
+  box-shadow: 0 0 10px rgba(94, 200, 224, 0.45), 0 2px 0 rgba(0, 0, 0, 0.45);
+}
+body.theme-harris .grow-stage::before,
+.grow-meter.grow-gems .grow-stage::before {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.08) 40%, transparent 70%),
+    linear-gradient(145deg, #6a9a88, #142820 42%, #050806);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.45), 0 2px 0 rgba(0, 0, 0, 0.45);
+}
+/* Hotter ainsley metal lid */
+.grow-meter.grow-jar .grow-stage::before,
+body.theme-ainsley .grow-stage::before {
+  height: 11px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.06) 40%, transparent 70%),
+    linear-gradient(180deg, #e0b878, #c4784a 55%, #8a3a20) !important;
+  box-shadow: 0 0 12px rgba(196, 120, 74, 0.55), 0 2px 0 #3a2410 !important;
+  border: 1px solid rgba(255, 220, 180, 0.45);
+  border-top: none;
+}
+
+/* Left refraction caustic strip */
+body.theme-hayes .grow-stage::after,
+body.theme-harris .grow-stage::after,
+body.theme-ainsley .grow-stage::after,
+.grow-meter.grow-coins .grow-stage::after,
+.grow-meter.grow-gems .grow-stage::after,
+.grow-meter.grow-jar .grow-stage::after {
+  content: "";
+  position: absolute;
+  left: 10%;
+  width: 14%;
+  top: 14%;
+  bottom: 12%;
+  z-index: 4;
+  border-radius: 40px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.08) 35%, transparent 70%);
+  filter: blur(0.6px);
+  opacity: 0.85;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.12);
+}
+
+/* Forged GOAL rail + pill */
+body.theme-hayes .grow-goal-line,
+body.theme-harris .grow-goal-line,
+body.theme-ainsley .grow-goal-line {
+  border-top-width: 3.5px !important;
+  border-top-color: #ff4558 !important;
+  box-shadow:
+    0 0 18px rgba(255, 40, 60, 0.95),
+    0 0 6px rgba(255, 120, 130, 0.75),
+    0 1px 0 rgba(255, 210, 210, 0.5) !important;
+}
+body.theme-hayes .grow-goal-line span,
+body.theme-harris .grow-goal-line span,
+body.theme-ainsley .grow-goal-line span {
+  right: auto !important;
+  left: 50% !important;
+  top: -18px !important;
+  transform: translateX(-50%);
+  padding: 3px 9px 3px 8px;
+  border-radius: 999px;
+  font-size: 9px !important;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #ffe0e4 !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 40%),
+    linear-gradient(180deg, #6a1c28, #18060a);
+  border: 1px solid rgba(255, 140, 150, 0.95);
+  box-shadow:
+    0 0 14px rgba(255, 40, 60, 0.75),
+    0 1px 0 rgba(255, 210, 210, 0.4) inset;
+  text-shadow: none;
+  white-space: nowrap;
+}
+
+/* Punchier hero $ readout */
+body.theme-hayes .grow-total,
+body.theme-harris .grow-total,
+body.theme-ainsley .grow-total {
+  color: #ffffff;
+  text-shadow:
+    0 0 22px rgba(94, 200, 224, 0.75),
+    0 0 8px rgba(245, 197, 66, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.85) !important;
+}
+body.theme-harris .grow-total {
+  text-shadow:
+    0 0 22px rgba(16, 185, 129, 0.75),
+    0 0 8px rgba(34, 211, 238, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.85) !important;
+}
+body.theme-ainsley .grow-total {
+  text-shadow:
+    0 0 22px rgba(210, 90, 130, 0.75),
+    0 0 8px rgba(196, 120, 74, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.85) !important;
+}
+body.theme-hayes .grow-week-rising {
+  text-shadow: 0 0 12px rgba(112, 216, 255, 0.55);
+}
+body.theme-harris .grow-week-rising {
+  text-shadow: 0 0 12px rgba(144, 224, 80, 0.55);
+}
+body.theme-ainsley .grow-week-rising {
+  color: #f0a8c8 !important;
+  text-shadow: 0 0 12px rgba(232, 121, 168, 0.5);
+}
+body.theme-hayes .grow-jar-name,
+body.theme-harris .grow-jar-name,
+body.theme-ainsley .grow-jar-name {
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+/* Money chips — more edge light */
+body.theme-hayes .money-chip,
+body.theme-harris .money-chip,
+body.theme-ainsley .money-chip {
+  border-color: rgba(200, 220, 240, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 12px rgba(94, 200, 224, 0.18);
+}
+body.theme-harris .money-chip {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 12px rgba(16, 185, 129, 0.18);
+}
+body.theme-ainsley .money-chip {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 12px rgba(210, 90, 130, 0.18);
+}
+
+/* Fills keep liquid feel inside glass */
+body.theme-hayes .grow-fill-balance,
+.grow-meter.grow-coins .grow-fill-balance {
+  box-shadow: 0 0 18px rgba(64, 208, 208, 0.55), inset 0 2px 0 rgba(255, 255, 255, 0.4) !important;
+}
+body.theme-hayes .grow-fill-week,
+.grow-meter.grow-coins .grow-fill-week {
+  box-shadow: 0 0 16px rgba(80, 200, 255, 0.6), inset 0 2px 0 rgba(255, 255, 255, 0.4) !important;
+}
+body.theme-harris .grow-fill-balance,
+.grow-meter.grow-gems .grow-fill-balance {
+  box-shadow: 0 0 18px rgba(112, 224, 48, 0.55), inset 0 2px 0 rgba(255, 255, 255, 0.4) !important;
+}
+body.theme-harris .grow-fill-week,
+.grow-meter.grow-gems .grow-fill-week {
+  box-shadow: 0 0 16px rgba(80, 180, 255, 0.55), inset 0 2px 0 rgba(255, 255, 255, 0.4) !important;
+}
+body.theme-ainsley .grow-fill-balance,
+.grow-meter.grow-jar .grow-fill-balance {
+  box-shadow: 0 0 18px rgba(212, 168, 96, 0.55), inset 0 2px 0 rgba(255, 255, 255, 0.4) !important;
+}
+body.theme-ainsley .grow-fill-week,
+.grow-meter.grow-jar .grow-fill-week {
+  box-shadow: 0 0 16px rgba(232, 121, 168, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Bank card title edge — match mock header energy lightly */
+body.theme-hayes .sec-bank .bank-goal-title {
+  text-shadow: 0 0 18px rgba(94, 200, 224, 0.45);
+}
+body.theme-harris .sec-bank .bank-goal-title {
+  text-shadow: 0 0 18px rgba(16, 185, 129, 0.45);
+}
+body.theme-ainsley .sec-bank .bank-goal-title {
+  text-shadow: 0 0 18px rgba(210, 90, 130, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.theme-hayes .grow-meter::before,
+  body.theme-harris .grow-meter::before,
+  body.theme-ainsley .grow-meter::before {
+    opacity: 0.22 !important;
+  }
+}
