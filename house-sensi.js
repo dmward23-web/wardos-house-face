@@ -312,6 +312,13 @@
       var src = st.gate.live ? "LIVE" : (st.gate.kind === "need_token" ? "NEED TOKEN" : "DEMO");
       sub.textContent = src + " · " + st.mode + " · fan " + st.fan + " · not Nest";
     }
+    var hero = document.getElementById(ids.hero || "sensi-hero");
+    if (hero) {
+      hero.setAttribute("data-mode", st.mode || "Off");
+      hero.classList.toggle("is-live", !!st.gate.live);
+      hero.classList.toggle("sensi-live-pulse", !!st.gate.live);
+      hero.classList.toggle("is-need", st.gate.kind === "need_token");
+    }
   }
 
   function mountHero(ids) {

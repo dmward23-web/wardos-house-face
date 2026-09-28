@@ -149,6 +149,28 @@
     font-size:13px;font-weight:650;color:#3a3e46;flex-shrink:0}
   .ftr{display:flex;justify-content:space-between;font-size:12px;color:#5a5e66;font-weight:600;align-items:center;gap:8px;flex-wrap:wrap}
   .ftr-chip{padding:6px 10px;border-radius:8px;border:2px solid #2a2e36;background:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;color:inherit}
+
+  /* SENSI-FX hero · mode energy + live pulse */
+  .climate-hero{position:relative;min-height:210px}
+  .climate-hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:url("camo-glass-tile-house.png");background-size:280px 280px;opacity:0.14;mix-blend-mode:overlay}
+  .climate-amb .big{font-size:84px;text-shadow:0 4px 0 rgba(0,0,0,0.35)}
+  .climate-hero[data-mode="Heat"]{background:linear-gradient(115deg,#2a1206 0%,#8a3a08 42%,#c45a10 70%,#1a0c04 100%)}
+  .climate-hero[data-mode="Cool"]{background:linear-gradient(115deg,#061018 0%,#123a68 46%,#2a88d0 78%,#061018 100%)}
+  .climate-hero[data-mode="Auto"]{background:linear-gradient(115deg,#2a1408 0%,#6a3810 34%,#1a4068 68%,#071422 100%)}
+  .climate-hero[data-mode="Off"]{background:linear-gradient(115deg,#121418,#2a2e36 55%,#121418)}
+  .climate-hero.is-live .climate-pill{box-shadow:0 0 0 0 rgba(128,232,144,0.55);animation:hero-live 1.7s ease-out infinite}
+  .climate-hero.is-need .climate-pill{background:rgba(120,72,8,0.9);color:#ffe8b0;border-color:rgba(255,200,80,0.55)}
+  .climate-hero.is-live .climate-accent{animation:hero-accent 1.7s linear infinite}
+  @keyframes hero-live{
+    0%{box-shadow:0 0 0 0 rgba(128,232,144,0.55)}
+    100%{box-shadow:0 0 0 12px rgba(128,232,144,0)}
+  }
+  @keyframes hero-accent{50%{filter:brightness(1.35)}}
+  @media (prefers-reduced-motion: reduce){
+    .climate-hero.is-live .climate-pill,.climate-hero.is-live .climate-accent{animation:none}
+  }
+
 </style>
 </head>
 <body>
@@ -185,7 +207,7 @@
  <div class="climate-body">
  <div class="climate-left">
  <div class="climate-lab">Sensi · Emerson · 147th</div>
- <div class="climate-title">Climate · <em>on the wall</em></div>
+ <div class="climate-title">Climate · <em>WardOS</em></div>
  <div class="climate-sub" id="sensi-hero-sub">Waiting for live JSON · not Nest</div>
  </div>
  <div class="climate-temps">
@@ -321,7 +343,7 @@
 <script src="house-clock.js?v=CT1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
-<script src="house-sensi.js?v=SENSI2"></script>
+<script src="house-sensi.js?v=SENSI3"></script>
 <script>
 (function () {
   document.querySelectorAll(".cam").forEach(function (el) {
@@ -347,7 +369,6 @@
   S.startPolling();
   paint();
 })();
-</script>
 </script>
 </body>
 </html>
