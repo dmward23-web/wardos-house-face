@@ -117,7 +117,7 @@
     return (Date.now() - t) <= LIVE_FRESH_MS;
   }
 
-  /** Gate for UI labels. Never returns "LIVE" without fresh live JSON. */
+  /** Gate for UI labels. Never returns "LIVE" without fresh live JSON.\n   *  Honest STALE when snapshot aged out or fetch errored — never STALE·DEMO mock badge. */
   function liveStatus(data) {
     data = data || (_liveCache && _liveCache.data) || null;
     if (!data) return { kind: "stub", label: "CONNECT · STUB", live: false };
@@ -125,7 +125,14 @@
       return { kind: "need_token", label: "CONNECT · NEED TOKEN", live: false, error: data.error || null };
     }
     if (data.status === "error") {
-      return { kind: "error", label: "DEMO · FETCH ERR", live: false, error: data.error || null };
+      return {
+        kind: "stale",
+        label: "STALE",
+        live: false,
+        error: data.error || null,
+        thermostat: data.thermostat || null,
+        updatedAt: data.updatedAt || null
+      };
     }
     if (data.status === "live" && liveFresh(data)) {
       var th = data.thermostat;
@@ -140,7 +147,14 @@
       };
     }
     if (data.status === "live") {
-      return { kind: "stale", label: "STALE · DEMO", live: false, error: "snapshot older than 30m" };
+      return {
+        kind: "stale",
+        label: "STALE",
+        live: false,
+        error: "snapshot older than 30m",
+        thermostat: data.thermostat || null,
+        updatedAt: data.updatedAt || null
+      };
     }
     return { kind: "stub", label: "CONNECT · STUB", live: false };
   }
@@ -149,24 +163,32 @@
    * Effective display state: prefer fresh live reads; DEMO for writes / fallback.
    * ambient/mode/fan/setpoint from live when live; otherwise localStorage DEMO.
    */
+  function stateFromThermostat(th, demo, source, gate) {
+    return {
+      source: source,
+      ambient: typeof th.ambient === "number" ? th.ambient : demo.ambient,
+      setpoint: typeof th.setpoint === "number" ? th.setpoint : demo.setpoint,
+      mode: MODES.indexOf(th.mode) >= 0 ? th.mode : demo.mode,
+      fan: FANS.indexOf(th.fan) >= 0 ? th.fan : demo.fan,
+      hold: !!th.hold,
+      name: th.name || "Sensi",
+      humidity: typeof th.humidity === "number" ? th.humidity : null,
+      online: th.online !== false,
+      writeSupported: !!gate.writeSupported,
+      gate: gate
+    };
+  }
+
   function effectiveState() {
     var demo = loadState();
     var gate = liveStatus();
-    if (gate.live && gate.thermostat) {
-      var th = gate.thermostat;
-      return {
-        source: "live",
-        ambient: typeof th.ambient === "number" ? th.ambient : demo.ambient,
-        setpoint: typeof th.setpoint === "number" ? th.setpoint : demo.setpoint,
-        mode: MODES.indexOf(th.mode) >= 0 ? th.mode : demo.mode,
-        fan: FANS.indexOf(th.fan) >= 0 ? th.fan : demo.fan,
-        hold: !!th.hold,
-        name: th.name || "Sensi",
-        humidity: typeof th.humidity === "number" ? th.humidity : null,
-        online: th.online !== false,
-        writeSupported: !!gate.writeSupported,
-        gate: gate
-      };
+    if (gate.thermostat && typeof gate.thermostat.ambient === "number") {
+      return stateFromThermostat(
+        gate.thermostat,
+        demo,
+        gate.live ? "live" : "stale",
+        gate
+      );
     }
     return {
       source: "demo",
@@ -318,10 +340,10 @@
       pill.classList.toggle("on", st.gate.live);
     }
     if (ambLab) {
-      ambLab.textContent = st.gate.live ? "Indoor live" : "Indoor · not live";
+      ambLab.textContent = st.gate.live ? "Indoor live" : (st.gate.kind === "stale" ? "Indoor · STALE" : "Indoor · not live");
     }
     if (sub) {
-      var src = st.gate.live ? "LIVE" : (st.gate.kind === "need_token" ? "NEED TOKEN" : "DEMO");
+      var src = st.gate.live ? "LIVE" : (st.gate.kind === "need_token" ? "NEED TOKEN" : (st.gate.kind === "stale" ? "STALE" : "DEMO"));
       sub.textContent = src + " · " + st.mode + " · fan " + st.fan + " · not Nest";
     }
     var humidEl = document.getElementById(ids.humid || "sensi-hero-humid");
