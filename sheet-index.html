@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="description" content="Board-OS House face · family sheets home index · sharp-future hub · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
-<link rel="stylesheet" href="house-engage.css?v=FOUCFIX1" />
+<link rel="stylesheet" href="house-engage.css?v=HUBBLEND1" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -43,6 +43,18 @@
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+  }
+  /* HUBBLEND1 · wide Asus / desktop: center 1080 canvas, keep tablet 1080 intact */
+  @media (min-width: 1200px) {
+    html, body {
+      width: 100%; min-width: 1080px;
+      display: flex; justify-content: center; align-items: flex-start;
+      background: #c4c6cc;
+    }
+    .panel {
+      margin: 0 auto;
+      box-shadow: 0 0 0 1px rgba(40,42,48,0.18), 0 18px 48px rgba(20,22,28,0.22);
+    }
   }
   .panel {
     width: 1080px; min-height: 1920px; height: auto;
@@ -161,6 +173,82 @@
     font-size: 28px; background: rgba(255,255,255,0.7); border: 1px solid rgba(40,50,60,0.12);
   }
   .hdr-right { display: flex; flex-direction: row; align-items: center; gap: 12px; flex-shrink: 0; }
+
+
+  /* HUBBLEND1 · Sensi blended into header (quiet, beside weather) */
+  .sensi-hdr {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: #1a2030;
+    min-width: 148px; max-width: 200px;
+    padding: 8px 12px; border-radius: 14px;
+    background: linear-gradient(165deg, rgba(255,248,236,0.92), rgba(220,228,236,0.78));
+    border: 2px solid rgba(40,60,80,0.2);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 4px 0 rgba(40,50,60,0.1);
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sensi-hdr:active { transform: translateY(1px); }
+  .sensi-hdr.is-need {
+    border-color: rgba(180,100,20,0.45);
+    background: linear-gradient(165deg, rgba(255,236,200,0.95), rgba(236,220,200,0.85));
+  }
+  .sensi-hdr.is-live {
+    border-color: rgba(40,120,80,0.35);
+  }
+  .sensi-hdr-ico { font-size: 22px; line-height: 1; flex-shrink: 0; }
+  .sensi-hdr-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .sensi-hdr-kicker {
+    font-size: 10px; font-weight: 750; letter-spacing: 0.14em; text-transform: uppercase; color: #5a6878;
+  }
+  .sensi-hdr-line {
+    display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
+    font-size: 13px; font-weight: 700; color: #2a3440;
+  }
+  .sensi-hdr-temp { font-size: 24px; font-weight: 900; color: #0e1014; letter-spacing: -0.04em; line-height: 1; }
+  .sensi-hdr-set { font-size: 12px; font-weight: 700; color: #4a5868; }
+  .sensi-hdr-mode {
+    font-size: 10px; font-weight: 800; letter-spacing: 0.06em;
+    padding: 2px 6px; border-radius: 999px;
+    background: rgba(40,60,80,0.1); color: #284060;
+  }
+  .sensi-hdr-sub {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #4a6870; margin-top: 1px;
+  }
+  .sensi-hdr.is-live .sensi-hdr-sub { color: #287848; }
+  .sensi-hdr.is-need .sensi-hdr-sub { color: #8a5010; }
+
+  /* HUBBLEND1 · Nest/Google Home chip in former Sensi upper-right slot */
+  .hub-upper .nest-chip {
+    flex: 0 0 292px; width: 292px; max-width: 292px;
+    display: flex; flex-direction: column; justify-content: center; gap: 6px;
+    text-decoration: none; color: #f4f6f8;
+    padding: 12px 14px; border-radius: 14px;
+    border: 3px solid rgba(20,22,28,0.7);
+    background: linear-gradient(145deg, #0e1828 0%, #1a4068 42%, #2868a0 100%);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.28) inset, 0 8px 0 rgba(20,22,28,0.35), 0 0 22px rgba(64,160,255,0.18);
+    -webkit-tap-highlight-color: transparent;
+    position: relative; overflow: hidden;
+    min-height: 110px;
+  }
+  .hub-upper .nest-chip:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 4px 0 rgba(20,22,28,0.35); }
+  .hub-upper .nest-chip.is-live {
+    border-color: #40c878;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.28) inset, 0 8px 0 rgba(20,22,28,0.35), 0 0 22px rgba(64,200,120,0.28);
+  }
+  .hub-upper .nest-chip.is-need {
+    border-color: #e0a020;
+    background: linear-gradient(145deg, #2a1808 0%, #6a3810 42%, #1a4068 100%);
+  }
+  .hub-upper .nest-chip-kicker {
+    font-size: 11px; font-weight: 750; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(200,220,255,0.85);
+  }
+  .hub-upper .nest-chip-line {
+    display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+    font-size: 22px; font-weight: 900; letter-spacing: -0.03em; line-height: 1.05; color: #fff8e8;
+  }
+  .hub-upper .nest-chip-sub {
+    font-size: 13px; font-weight: 700; color: rgba(200,220,255,0.9);
+  }
 
   .leaveby {
     flex-shrink: 0; display: flex; align-items: stretch; border-radius: 14px; overflow: hidden;
@@ -811,7 +899,7 @@
     margin: 0; padding: 8px 12px; font-size: 11px;
   }
   .hub-upper .leaveby-body { padding-right: 88px; }
-  .hub-upper .sensi-chip { flex-basis: 300px; width: 300px; max-width: 300px; min-height: 110px; }
+  .hub-upper .nest-chip { flex-basis: 300px; width: 300px; max-width: 300px; min-height: 110px; }
   .tile { min-height: 148px; padding: 14px 14px 12px; }
   .tile-label { font-size: 22px; }
   .tile.hayes, .tile.ainsley, .tile.harris, .tile.dan { min-height: 148px; }
@@ -925,7 +1013,7 @@
   .leaveby { box-shadow: 0 8px 0 #05080c, 0 16px 32px rgba(0,0,0,0.28), 0 0 36px rgba(255,180,40,0.22) !important; }
 
   /* ═══════════════════════════════════════════════════════════
-     FOUCFIX1 · hub Nest subcopy no LIVE until gate
+     HUBBLEND1 · Sensi in hdr · Nest upper-right · LIVE when JSON live
      Hard geometry · thin luminous edges · deep blacks + camo frost
      Electric cyan / amber · hairline HUD · keep all sensi IDs/hooks
      ═══════════════════════════════════════════════════════════ */
@@ -1535,7 +1623,7 @@
 
   /* PRISMP0 · leave-by ≥40–48 louder than Sensi · sensi temp ≤33 */
   .leaveby-main .time { font-size: 44px !important; }
-  .hub-upper .sensi-chip-temp { font-size: 33px !important; }
+  .sensi-hdr-temp { font-size: 24px !important; }
 </style>
 </head>
 <body>
@@ -1556,6 +1644,7 @@
  </div>
  <div class="hdr-right">
  <div class="wx-card" id="house-wx" data-live="weather" aria-label="Weather · Overland Park"></div>
+ <a class="sensi-hdr sensi-chip" id="index-sensi-chip" href="sheet-google-home.html" aria-label="Sensi thermostat">Sensi…</a>
  <div class="hot-pill"><span class="spark">◎</span> SELECT · OPEN SHEET</div>
  </div>
  </header>
@@ -1571,7 +1660,7 @@
  </div>
  <div class="leaveby-badge" data-live="leaveby-badge">Sun</div>
  </section>
- <a class="sensi-chip" id="index-sensi-chip" href="sheet-google-home.html" aria-label="Sensi thermostat">Sensi…</a>
+ <a class="nest-chip" id="index-nest-chip" href="sheet-google-home.html" aria-label="Nest · Google Home">Nest…</a>
  </div>
 
 
@@ -1794,12 +1883,12 @@
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=FOUCFIX1"></script>
+<script src="house-clock.js?v=HUBBLEND1"></script>
 <script src="house-board-strip.js?v=CALFIX1"></script>
-<script src="house-weather.js?v=FOUCFIX1"></script>
-<script src="house-sfx.js?v=FOUCFIX1"></script>
-<script src="house-sensi.js?v=FOUCFIX1"></script>
-<script src="house-nest.js?v=FOUCFIX1"></script>
+<script src="house-weather.js?v=HUBBLEND1"></script>
+<script src="house-sfx.js?v=HUBBLEND1"></script>
+<script src="house-sensi.js?v=HUBBLEND1"></script>
+<script src="house-nest.js?v=HUBBLEND1"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
@@ -1816,13 +1905,26 @@
  }
  var S = window.HouseSensi;
  var N = window.HouseNest;
+ var nestChip = document.getElementById("index-nest-chip");
  function nestBit() {
   var g = N && N.gate ? N.gate() : null;
   if (!g) return "Nest…";
-  if (g.live && g.hasSnaps) return "Nest LIVE";
-  if (g.live) return "Nest LIVE · no still";
-  if (g.needToken) return "Nest STUB";
-  return "Nest " + (g.label || "STUB");
+  if (g.needToken) return "NEED TOKEN";
+  if (g.live && g.hasSnaps) return "LIVE";
+  if (g.live) return g.label || "LIVE";
+  return g.label || "STUB";
+ }
+ function paintNestChip() {
+  if (!nestChip) return;
+  var g = N && N.gate ? N.gate() : null;
+  var n = (g && g.deviceCount) || 0;
+  var label = nestBit();
+  nestChip.classList.toggle("is-live", !!(g && g.live));
+  nestChip.classList.toggle("is-need", !!(g && g.needToken));
+  nestChip.innerHTML =
+    '<div class="nest-chip-kicker">Nest · Google Home</div>'
+    + '<div class="nest-chip-line">' + (g && g.needToken ? "Connect cams" : (n ? (n + " cams") : "Cams")) + " · " + label + "</div>"
+    + '<div class="nest-chip-sub">' + (g && g.live ? "Tap → live pads · stills + WebRTC" : (g && g.needToken ? "SDM token on box · see NEST-LIVE.md" : "Tap → Google Home sheet")) + "</div>";
  }
  function paintGhomeTile() {
   var subTile = document.getElementById("ghome-tile-sub");
@@ -1831,7 +1933,9 @@
   var sensiBit = st && st.gate && st.gate.live
     ? ("Sensi " + st.ambient + "°")
     : (st && st.gate ? st.gate.label : "Sensi");
-  subTile.textContent = sensiBit + " · " + nestBit();
+  var nb = nestBit();
+  subTile.textContent = sensiBit + " · Nest " + nb;
+  paintNestChip();
  }
  if (S) {
   if (chip) S.mountChip(chip);
@@ -1841,6 +1945,11 @@
  if (N) {
   N.onChange(paintGhomeTile);
   N.startPolling();
+ }
+ if (nestChip) {
+  nestChip.addEventListener("pointerdown", function () {
+   try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
+  }, { passive: true });
  }
  paintGhomeTile();
 })();
