@@ -51,9 +51,9 @@
   .stage {
     width: 100%; height: 100%;
     min-height: 100dvh;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; align-items: flex-start; justify-content: center;
     padding:
-      env(safe-area-inset-top, 0px)
+      max(0px, env(safe-area-inset-top, 0px))
       env(safe-area-inset-right, 0px)
       env(safe-area-inset-bottom, 0px)
       env(safe-area-inset-left, 0px);
@@ -62,11 +62,11 @@
   .scaler {
     width: 1080px; height: 1920px;
     flex-shrink: 0;
-    transform-origin: center center;
+    transform-origin: top center;
   }
   .panel {
     width: 1080px; min-height: 1920px; height: auto;
-    padding: 22px 36px 14px;
+    padding: 12px 28px 14px;
     display: flex; flex-direction: column; gap: 10px;
     position: relative; overflow: visible;
     background-color: #d8dadf;
@@ -103,7 +103,7 @@
 
   .hdr {
     display: flex; align-items: flex-start; justify-content: space-between; gap: 32px;
-    flex-shrink: 0; padding: 18px 24px 20px; border-radius: 18px;
+    flex-shrink: 0; padding: 12px 18px 12px; border-radius: 16px;
     background: rgba(255,255,255,0.58);
     border: 1px solid rgba(255,255,255,0.85);
     box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 28px rgba(20,22,28,0.08), 0 2px 6px rgba(20,22,28,0.05);
@@ -255,7 +255,7 @@
     box-shadow: 0 4px 14px rgba(20,22,28,0.06);
     display: inline-flex; align-items: center; gap: 10px;
   }
-  .banner.custody-loud {
+  .banner.homebase-loud {
     font-size: 16px; font-weight: 850; color: #fff;
     padding: 14px 22px; border-radius: 16px;
     background: linear-gradient(90deg, #262830 0%, #343840 55%, #454952 100%);
@@ -263,14 +263,14 @@
     box-shadow: 0 8px 22px rgba(20,22,28,0.18);
     gap: 14px; flex-wrap: wrap;
   }
-  .banner.custody-loud .c-k {
+  .banner.homebase-loud .c-k {
     font-size: 11px; font-weight: 900; letter-spacing: 0.18em; text-transform: uppercase;
     color: #7dffd4; background: rgba(125,255,212,0.12); border: 1px solid rgba(125,255,212,0.35);
     padding: 6px 10px; border-radius: 999px;
   }
-  .banner.custody-loud .c-main { font-size: 17px; font-weight: 850; letter-spacing: -0.01em; }
-  .banner.custody-loud .c-main em { font-style: normal; color: #7dffd4; }
-  .banner.custody-loud .c-next { font-size: 14px; font-weight: 700; color: #c5d0de; }
+  .banner.homebase-loud .c-main { font-size: 17px; font-weight: 850; letter-spacing: -0.01em; }
+  .banner.homebase-loud .c-main em { font-style: normal; color: #7dffd4; }
+  .banner.homebase-loud .c-next { font-size: 14px; font-weight: 700; color: #c5d0de; }
 
   .who {
     display: inline-flex; gap: 6px; align-items: center; margin-left: auto;
@@ -756,9 +756,9 @@ function render() {
  <div class="week-range">${esc(f.week.range)}</div>
  </div>
  <div class="banner-row">
- <div class="banner custody-loud" aria-label="Custody">
- <span class="c-k">Custody</span>
- <span class="c-main">with <em>Dad</em> @ <em>147th</em> through <em>Fri Oct 2 3:00</em></span>
+ <div class="banner homebase-loud" aria-label="Home base">
+ <span class="c-k">Home base</span>
+ <span class="c-main">at <em>Dad's</em> @ <em>147th</em> through <em>Fri Oct 2 3:00</em></span>
  <span class="c-next">next · Sun 3:00 Ainsley vanity</span>
  </div>
  <div class="who" aria-label="Kids">
@@ -857,8 +857,8 @@ document.addEventListener("keydown", (e) => {
           if (s.label) FACTS.leaveBy.label = s.label;
           if (s.badge) FACTS.leaveBy.badge = s.badge;
         }
-        if (data && data.custody && data.custody.throughLabel && FACTS.week) {
-          FACTS.week.banner = data.custody.throughLabel;
+        if (data && data.homeWeek && data.homeWeek.throughLabel && FACTS.week) {
+          FACTS.week.banner = data.homeWeek.throughLabel;
         }
         cb();
       })
