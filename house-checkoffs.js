@@ -102,8 +102,8 @@
     taps.forEach(function (t) {
       if (t.classList.contains("done")) doneN += 1;
     });
-    var weekPay = parseInt(taps[0].getAttribute("data-stars") || "7", 10) || 7;
-    var need = taps.length || 7;
+    var weekPay = parseInt(taps[0].getAttribute("data-stars") || String(taps.length || 7), 10) || (taps.length || 7);
+    var need = taps.length || (window.WardKids && WardKids.DAD_WEEK_DAYS) || 7;
     var weekDone = doneN >= need;
     row.classList.toggle("done", weekDone);
     row.classList.toggle("open", !weekDone);

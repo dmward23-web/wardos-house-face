@@ -113,16 +113,23 @@
     return CHECK_PREFIX + kidId + ":" + iso;
   }
 
+  /** Fri–Thu inclusive = 7 Dad-week tap days (Fri Sat Sun Mon Tue Wed Thu). */
+  var DAD_WEEK_DAYS = 7;
+
   function weekDayIsos(anchorIso) {
     var start = weekStartIso(anchorIso || DAY_ISO);
     var parts = String(start).split("-");
     var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
     var out = [];
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < DAD_WEEK_DAYS; i++) {
       out.push(d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()));
       d.setDate(d.getDate() + 1);
     }
     return out;
+  }
+
+  function dadWeekLen() {
+    return weekDayIsos(DAY_ISO).length || DAD_WEEK_DAYS;
   }
 
   function dailyDoneCount(checkId, data) {
@@ -138,11 +145,11 @@
     return dailyDoneCount(checkId, data) >= weekDayIsos(DAY_ISO).length;
   }
 
-  /* Stars credited to jar for a must. Daily = stars×7 once week is 7/7 (not per-day pay). */
+  /* Stars credited to jar for a must. Daily = stars×DAD_WEEK_DAYS once Fri→Thu complete (not per-day pay). */
   function bankStarsFor(kidId, checkId, data) {
     var meta = questMeta(kidId, checkId, data);
     if (meta.optional) return 0;
-    if (meta.cadence === "daily") return (meta.stars || 1) * 7;
+    if (meta.cadence === "daily") return (meta.stars || 1) * dadWeekLen();
     return meta.stars || 1;
   }
 
@@ -164,7 +171,7 @@
     return root[kidId].days[iso];
   }
 
-  /** Daily musts: $ unlocks only when Fri→Thu Dad-week days all tapped. Credit stars×7 on week-start bucket. */
+  /** Daily musts: $ unlocks only when Fri→Thu Dad-week days all tapped. Credit stars×days on week-start bucket. */
   function syncDailyWeekBank(checkId, data) {
     var kidId = KID_FROM_CHECK[checkId];
     if (!kidId) return null;
@@ -208,7 +215,7 @@
     var parts = start.split("-");
     var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
     var sum = 0;
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < DAD_WEEK_DAYS; i++) {
       var iso = d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
       if (bag.days[iso] && bag.days[iso].stars) sum += bag.days[iso].stars;
       d.setDate(d.getDate() + 1);
@@ -370,7 +377,7 @@
       /* clear settled prior-week day buckets */
       var parts = ws.split("-");
       var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
-      for (var i = 0; i < 7; i++) {
+      for (var i = 0; i < DAD_WEEK_DAYS; i++) {
         var iso = d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
         if (bag.days[iso]) bag.days[iso] = { stars: 0, earned: {} };
         d.setDate(d.getDate() + 1);
@@ -534,7 +541,7 @@
     var optional = !!(q.optional || q.cadence === "addon");
     var cadence = q.cadence || (optional ? "addon" : "daily");
     var stars = optional ? 0 : (typeof q.stars === "number" ? q.stars : 1);
-    var weekPay = cadence === "daily" && !optional ? stars * 7 : stars;
+    var weekPay = cadence === "daily" && !optional ? stars * dadWeekLen() : stars;
     var dayCount = 0;
     var weekDone = false;
     if (cadence === "daily" && !optional) {
@@ -561,7 +568,7 @@
       var needN = weekDayIsos(DAY_ISO).length;
       hint = weekDone
         ? needN + "/" + needN + " Dad days · +$" + weekPay + " unlocked"
-        : dayCount + "/" + needN + " days · Dad week (Fri–Thu) unlocks $" + weekPay + " (1★×7)";
+        : dayCount + "/" + needN + " days · Dad week (Fri–Thu) unlocks $" + weekPay + " (1★×" + needN + ")";
     }
     var earn;
     if (optional) {
@@ -649,11 +656,33 @@
       var kidId = KID_FROM_CHECK[id];
       var meta = questMeta(kidId, id, data);
       el.setAttribute("data-cadence", meta.cadence);
-      el.setAttribute("data-stars", String(meta.optional ? 0 : (meta.cadence === "daily" ? meta.stars * 7 : meta.stars)));
-      if (meta.optional) el.setAttribute("data-optional", "1");
-      if (meta.cadence !== "daily" || meta.optional) return;
+      var nDays = dadWeekLen();
+      el.setAttribute("data-stars", String(meta.optional ? 0 : (meta.cadence === "daily" ? meta.stars * nDays : meta.stars)));
+      if (meta.optional) {
+        el.setAttribute("data-optional", "1");
+        var earnOpt = el.querySelector(".star-earn");
+        if (earnOpt && el.getAttribute("data-check") === "ain-babysit") {
+          earnOpt.classList.add("addon-tag");
+          earnOpt.textContent = "$15/hr";
+          earnOpt.setAttribute("data-stars", "0");
+        }
+        return;
+      }
+      if (meta.cadence === "weekly") {
+        var earnW = el.querySelector(".star-earn");
+        if (earnW) {
+          earnW.setAttribute("data-stars", String(meta.stars));
+          earnW.textContent = "$" + meta.stars;
+        }
+        var hintW = el.querySelector(".hint");
+        if (hintW && !hintW.getAttribute("data-hint-open")) {
+          hintW.setAttribute("data-hint-open", hintW.textContent);
+        }
+        return;
+      }
+      if (meta.cadence !== "daily") return;
 
-      var weekPay = meta.stars * 7;
+      var weekPay = meta.stars * nDays;
       var dayCount = dailyDoneCount(id, data);
       var weekDone = dayCount >= weekDayIsos(DAY_ISO).length;
       var whatEl = el.querySelector(".what");
@@ -763,7 +792,7 @@
     var start = weekStartIso(DAY_ISO);
     var parts = start.split("-");
     var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < DAD_WEEK_DAYS; i++) {
       var iso = d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
       if (pack.root[kidId] && pack.root[kidId].days) {
         pack.root[kidId].days[iso] = { stars: 0, earned: {} };
@@ -1248,6 +1277,8 @@
     checkKeyFor: checkKeyFor,
     weekStartIso: weekStartIso,
     weekDayIsos: weekDayIsos,
+    dadWeekLen: dadWeekLen,
+    DAD_WEEK_DAYS: DAD_WEEK_DAYS,
     dowIndexFromIso: dowIndexFromIso,
     chicagoHourNow: chicagoHourNow,
     weekStarsFor: weekStarsFor,
