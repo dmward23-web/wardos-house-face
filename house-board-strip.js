@@ -1,19 +1,29 @@
-/* House Face · live leave-by / Next Up strip (CALFIX1).
+/* House Face · live leave-by / Schedule strip (HUBNEXT2).
    Date labels ALWAYS from HouseClock (America/Chicago).
    Authority: data/cal-live.json (dmward23 → cal-from-events.mjs).
-   Next Up = first upcomingLeaves/events with start > clock.now (client-side).
+   Panel paints today's remaining + tomorrow peek (dense list, hub-scale type).
    Never paint a past boardStrip.time/place. Never silent day-lagged kids-week.
+   Glass law: never CUSTODY — WITH DAD / Dad week.
    CAL_FRESH_MS = 6 hours — past that, or asOfIso ≠ clock day → fail-closed CAL STALE. */
 (function (global) {
   "use strict";
 
-  /* Fresh window for cal-live.json (Atlas standing refresh should beat this). */
   var CAL_FRESH_MS = 6 * 60 * 60 * 1000;
+  var MAX_TODAY = 8;
+  var MAX_TOMORROW = 6;
 
   function esc(s) {
     return String(s == null ? "" : s)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;")
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  /** Kids-safe: never surface CUSTODY on glass. */
+  function kidsSafe(s) {
+    var t = String(s == null ? "" : s);
+    t = t.replace(/\bCUSTODY\b/gi, "WITH DAD");
+    t = t.replace(/\bcustody\b/gi, "Dad week");
+    return t;
   }
 
   function parseMs(iso) {
@@ -48,12 +58,12 @@
   }
 
   function shortPlace(summary) {
-    var s = String(summary || "").trim();
+    var s = kidsSafe(String(summary || "").trim());
     s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
     s = s.replace(/\(\s*Mom[^)]*\)/gi, "");
     s = s.replace(/\bMom\b[^·]*/gi, "");
     s = s.replace(/\s{2,}/g, " ").replace(/\s·\s*$/g, "").trim();
-    if (s.length > 56) s = s.slice(0, 53) + "…";
+    if (s.length > 64) s = s.slice(0, 61) + "…";
     return s;
   }
 
@@ -63,31 +73,125 @@
     return parseMs(ev.start || ev.startDateTime || ev.dateTime);
   }
 
-  /** First future event by start (> now). Client advances Next Up inside a fresh window. */
+  /** Chicago calendar day for timed events; date-only for all-day (Z midnight = that UTC date). */
+  function eventDayIso(ev) {
+    if (!ev) return "";
+    var start = ev.start || ev.startDateTime || ev.dateTime || "";
+    if (ev.allDay) {
+      var m = String(start).match(/^(\d{4}-\d{2}-\d{2})/);
+      return m ? m[1] : "";
+    }
+    try {
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Chicago",
+        year: "numeric", month: "2-digit", day: "2-digit"
+      }).format(new Date(eventStartMs(ev)));
+    } catch (e) {
+      var m2 = String(start).match(/^(\d{4}-\d{2}-\d{2})/);
+      return m2 ? m2[1] : "";
+    }
+  }
+
+  function addDaysIso(iso, days) {
+    var parts = String(iso || "").split("-");
+    if (parts.length !== 3) return "";
+    var d = new Date(Date.UTC(+parts[0], +parts[1] - 1, +parts[2]));
+    d.setUTCDate(d.getUTCDate() + days);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function dowShortFromIso(iso) {
+    try {
+      var parts = String(iso).split("-");
+      var d = new Date(Date.UTC(+parts[0], +parts[1] - 1, +parts[2], 12, 0, 0));
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Chicago", weekday: "short"
+      }).format(d);
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function listEvents(cal) {
+    return (cal && (cal.upcomingLeaves || cal.events)) || [];
+  }
+
+  /** First future event by start (> now). */
   function pickNextFuture(cal, nowMs) {
     nowMs = nowMs || Date.now();
-    var list = (cal && (cal.upcomingLeaves || cal.events)) || [];
+    var list = listEvents(cal);
     var future = [];
     for (var i = 0; i < list.length; i++) {
-      var ms = eventStartMs(list[i]);
-      if (ms > nowMs) future.push(list[i]);
+      var ev = list[i];
+      if (ev.allDay) continue; /* next hero prefers timed leave */
+      var ms = eventStartMs(ev);
+      if (ms > nowMs) future.push(ev);
     }
     future.sort(function (a, b) { return eventStartMs(a) - eventStartMs(b); });
+    if (!future.length) {
+      /* fall back: any future including all-day tomorrow */
+      for (var j = 0; j < list.length; j++) {
+        var ms2 = eventStartMs(list[j]);
+        if (ms2 > nowMs) future.push(list[j]);
+      }
+      future.sort(function (a, b) { return eventStartMs(a) - eventStartMs(b); });
+    }
     if (!future.length) return null;
-    /* Same-start tie-break: Busy preferred */
     var first = future[0];
     var firstMs = eventStartMs(first);
-    for (var j = 0; j < future.length; j++) {
-      if (eventStartMs(future[j]) !== firstMs) break;
-      if (future[j].busy) return future[j];
+    for (var k = 0; k < future.length; k++) {
+      if (eventStartMs(future[k]) !== firstMs) break;
+      if (future[k].busy) return future[k];
     }
     return first;
+  }
+
+  function remainingToday(cal, clock, nowMs) {
+    nowMs = nowMs || Date.now();
+    var today = clock.iso;
+    var out = [];
+    var list = listEvents(cal);
+    for (var i = 0; i < list.length; i++) {
+      var ev = list[i];
+      if (eventDayIso(ev) !== today) continue;
+      if (ev.allDay) {
+        /* all-day today: show while day is current */
+        out.push(ev);
+        continue;
+      }
+      if (eventStartMs(ev) > nowMs) out.push(ev);
+    }
+    out.sort(function (a, b) {
+      if (a.allDay && !b.allDay) return -1;
+      if (!a.allDay && b.allDay) return 1;
+      return eventStartMs(a) - eventStartMs(b);
+    });
+    return out.slice(0, MAX_TODAY);
+  }
+
+  function tomorrowPeek(cal, clock) {
+    var tmr = addDaysIso(clock.iso, 1);
+    var list = listEvents(cal);
+    var busy = [];
+    var allday = [];
+    var other = [];
+    for (var i = 0; i < list.length; i++) {
+      var ev = list[i];
+      if (eventDayIso(ev) !== tmr) continue;
+      if (ev.allDay) allday.push(ev);
+      else if (ev.busy) busy.push(ev);
+      else other.push(ev);
+    }
+    busy.sort(function (a, b) { return eventStartMs(a) - eventStartMs(b); });
+    other.sort(function (a, b) { return eventStartMs(a) - eventStartMs(b); });
+    var merged = allday.concat(busy).concat(other);
+    return { day: tmr, dow: dowShortFromIso(tmr), items: merged.slice(0, MAX_TOMORROW) };
   }
 
   function stripFromEvent(ev, clock) {
     if (!ev) {
       return {
-        label: "Next up · today",
+        label: "Schedule · today",
         time: "",
         place: "Clear · no future on glass",
         detailHtml: "Calendar window empty · America/Chicago",
@@ -95,15 +199,7 @@
       };
     }
     var startMs = eventStartMs(ev);
-    var startIsoDay = "";
-    try {
-      startIsoDay = new Intl.DateTimeFormat("en-CA", {
-        timeZone: "America/Chicago",
-        year: "numeric", month: "2-digit", day: "2-digit"
-      }).format(new Date(startMs));
-    } catch (e) {
-      startIsoDay = clock.iso;
-    }
+    var startIsoDay = eventDayIso(ev) || clock.iso;
     var isToday = startIsoDay === clock.iso;
     var dow = clock.dow;
     try {
@@ -111,12 +207,14 @@
         timeZone: "America/Chicago", weekday: "short"
       }).format(new Date(startMs));
     } catch (e2) { /* keep */ }
+    var place = shortPlace(ev.summary || ev.place || "");
+    var time = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
     return {
-      label: isToday ? "Next up · today" : ("Next up · " + dow),
-      time: clockTimeFromIso(ev.start) || "",
-      place: shortPlace(ev.summary || ev.place || ""),
-      detailHtml: "<strong>" + esc(clockTimeFromIso(ev.start) || "") + "</strong> " +
-        esc(shortPlace(ev.summary || "")) +
+      label: isToday ? "Schedule · today" : ("Schedule · " + dow),
+      time: time === "day" ? "" : time,
+      place: place,
+      detailHtml: "<strong>" + esc(time) + "</strong> " +
+        esc(place) +
         (ev.location ? (" · " + esc(String(ev.location).split(",")[0])) : ""),
       badge: isToday ? clock.dow : dow
     };
@@ -124,17 +222,18 @@
 
   function staleStrip(clock, reason) {
     return {
-      label: "Next up · today",
+      label: "Schedule · today",
       time: "",
       place: "CAL STALE",
       detailHtml: esc(reason || "cal-live missing"),
       badge: clock.dow,
       _stale: true,
-      _reason: reason || "cal-live missing"
+      _reason: reason || "cal-live missing",
+      today: [],
+      tomorrow: { day: "", dow: "", items: [] }
     };
   }
 
-  /** cal-live is authoritative only when live + fresh + same Chicago day. */
   function calIsFresh(cal, clock) {
     if (!cal) return { ok: false, reason: "cal-live missing" };
     if (cal.status === "error") {
@@ -160,15 +259,70 @@
 
   function pickStripFromCal(cal, clock) {
     var next = pickNextFuture(cal, Date.now());
-    if (next) return stripFromEvent(next, clock);
-    /* Live but empty future window — honest empty, not lagged vanity */
-    return {
-      label: "Next up · today",
-      time: "",
-      place: "Clear · no future on glass",
-      detailHtml: "No upcoming events in cal-live window",
-      badge: clock.dow
-    };
+    var strip = next
+      ? stripFromEvent(next, clock)
+      : {
+          label: "Schedule · today",
+          time: "",
+          place: "Clear · no future on glass",
+          detailHtml: "No upcoming events in cal-live window",
+          badge: clock.dow
+        };
+    strip.today = remainingToday(cal, clock, Date.now());
+    strip.tomorrow = tomorrowPeek(cal, clock);
+    return strip;
+  }
+
+  function rowHtml(ev, isNext) {
+    var title = shortPlace(ev.summary || ev.place || "");
+    var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "—");
+    var cls = "leaveby-row" + (isNext ? " is-next" : "") + (ev.allDay ? " is-allday" : "");
+    return '<li class="' + cls + '">' +
+      '<span class="leaveby-row-time">' + esc(timeLab) + "</span>" +
+      '<span class="leaveby-row-title">' + esc(title) + "</span>" +
+      "</li>";
+  }
+
+  function paintLists(strip) {
+    var todayEl = document.querySelector("[data-live='leaveby-today']");
+    var tmrEl = document.querySelector("[data-live='leaveby-tomorrow']");
+    var tmrLab = document.querySelector("[data-live='leaveby-tmr-label']");
+
+    var today = (strip && strip.today) || [];
+    var tmr = (strip && strip.tomorrow) || { items: [], dow: "" };
+
+    if (todayEl) {
+      if (strip && strip._stale) {
+        todayEl.innerHTML = '<li class="leaveby-empty">CAL STALE</li>';
+      } else if (!today.length) {
+        todayEl.innerHTML = '<li class="leaveby-empty">Clear · nothing left today</li>';
+      } else {
+        var html = "";
+        for (var i = 0; i < today.length; i++) {
+          html += rowHtml(today[i], i === 0 && !today[i].allDay);
+        }
+        todayEl.innerHTML = html;
+      }
+    }
+
+    if (tmrLab) {
+      tmrLab.textContent = tmr.dow
+        ? ("Tomorrow · " + tmr.dow)
+        : "Tomorrow";
+    }
+    if (tmrEl) {
+      if (strip && strip._stale) {
+        tmrEl.innerHTML = '<li class="leaveby-empty">—</li>';
+      } else if (!tmr.items || !tmr.items.length) {
+        tmrEl.innerHTML = '<li class="leaveby-empty">Clear on glass</li>';
+      } else {
+        var th = "";
+        for (var j = 0; j < tmr.items.length; j++) {
+          th += rowHtml(tmr.items[j], false);
+        }
+        tmrEl.innerHTML = th;
+      }
+    }
   }
 
   function applyStrip(strip, clock) {
@@ -199,15 +353,23 @@
     }
 
     if (main) {
-      var timeHtml = strip.time
-        ? ' <span class="time">' + esc(strip.time) + "</span> "
-        : " · ";
-      main.innerHTML = esc(clock.short) + " ·" + timeHtml + esc(strip.place || "House day");
+      if (strip._stale) {
+        main.innerHTML = esc(clock.short) + " · CAL STALE";
+      } else if (strip.time && strip.place) {
+        main.innerHTML = "Next" +
+          ' <span class="time">' + esc(strip.time) + "</span> " +
+          esc(strip.place);
+      } else if (strip.place) {
+        main.innerHTML = esc(strip.place);
+      } else {
+        main.innerHTML = esc(clock.short) + " · House day";
+      }
     }
     if (detail && strip.detailHtml) {
-      /* detailHtml may include trusted <strong> from our JSON / builder */
       detail.innerHTML = strip.detailHtml;
     }
+
+    paintLists(strip);
 
     if (warn) {
       if (strip._stale) {
@@ -260,11 +422,13 @@
     if (!global.HouseClock) return;
     var clock = HouseClock.now();
     applyStrip({
-      label: "Next up · today",
+      label: "Schedule · today",
       time: "",
       place: "Loading…",
       detailHtml: "America/Chicago · live clock",
-      badge: clock.dow
+      badge: clock.dow,
+      today: [],
+      tomorrow: { day: "", dow: "", items: [] }
     }, clock);
 
     loadCal(function (err, cal) {
@@ -273,11 +437,8 @@
         applyStrip(pickStripFromCal(cal, clock), clock);
         return;
       }
-      /* Fail-closed — do NOT paint day-lagged kids-week boardStrip as truth */
       var reason = gate.reason || (err && err.message) || "cal-live missing";
       applyStrip(staleStrip(clock, reason), clock);
-
-      /* Still warm kids-week in background for other tiles — never for Next Up hero */
       loadWeek(function () { /* no-op for strip */ });
     });
   }
@@ -288,10 +449,22 @@
     boot();
   }
 
+  /* Re-advance Next Up ~ every 60s so past items drop without full reload */
+  setInterval(function () {
+    if (!global.HouseClock) return;
+    loadCal(function (err, cal) {
+      var clock = HouseClock.now();
+      var gate = calIsFresh(cal, clock);
+      if (!err && gate.ok) applyStrip(pickStripFromCal(cal, clock), clock);
+    });
+  }, 60 * 1000);
+
   global.HouseBoardStrip = {
     boot: boot,
     pickNextFuture: pickNextFuture,
     pickStripFromCal: pickStripFromCal,
+    remainingToday: remainingToday,
+    tomorrowPeek: tomorrowPeek,
     calIsFresh: calIsFresh,
     staleStrip: staleStrip,
     stripFromEvent: stripFromEvent,
