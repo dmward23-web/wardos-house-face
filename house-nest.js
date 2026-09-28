@@ -49,11 +49,12 @@
    * Never invent video.
    */
   function gate(data) {
+    /* NEED TOKEN only when status===need_token. status=live ⇒ live (aging OK). */
     if (!data) {
       return {
         live: false,
         hasSnaps: false,
-        needToken: true,
+        needToken: false,
         label: "STUB · NO JSON",
         reason: "missing nest-live.json",
         deviceCount: 0,
@@ -64,7 +65,7 @@
         live: false,
         hasSnaps: false,
         needToken: true,
-        label: "STUB · NEED TOKEN",
+        label: "NEED TOKEN",
         reason: data.error || "need SDM token",
         deviceCount: 0,
       };
@@ -74,7 +75,7 @@
         live: false,
         hasSnaps: false,
         needToken: false,
-        label: "STUB · ERROR",
+        label: "ERROR",
         reason: data.error || "error",
         deviceCount: 0,
       };
@@ -87,18 +88,19 @@
         if (cams[i] && !String(cams[i].id || "").startsWith("stub-")) real++;
       }
       var deviceCount = data.cameraCount != null ? data.cameraCount : real;
+      var snaps = countSnaps(data);
+      var hasSnaps = snaps > 0;
       if (!fresh) {
         return {
-          live: false,
-          hasSnaps: false,
+          live: true,
+          hasSnaps: hasSnaps,
           needToken: false,
-          label: "STUB · STALE",
-          reason: "nest-live.json stale",
+          label: hasSnaps ? "LIVE · aging" : "LIVE · aging · no still",
+          reason: "nest-live.json aging (>30m)",
           deviceCount: deviceCount,
         };
       }
-      var snaps = countSnaps(data);
-      if (snaps > 0) {
+      if (hasSnaps) {
         return {
           live: true,
           hasSnaps: true,
@@ -123,7 +125,7 @@
     return {
       live: false,
       hasSnaps: false,
-      needToken: true,
+      needToken: false,
       label: "STUB",
       reason: "unknown status",
       deviceCount: 0,

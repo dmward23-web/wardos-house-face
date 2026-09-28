@@ -117,22 +117,26 @@
     return (Date.now() - t) <= LIVE_FRESH_MS;
   }
 
-  /** Gate for UI labels. Never returns "LIVE" without fresh live JSON. */
+  /** Gate for UI labels.
+   * LIVE when status==="live" + thermostat (even if aging).
+   * NEED TOKEN only when status==="need_token" (creds truly missing).
+   * Never invent LIVE from DEMO localStorage. */
   function liveStatus(data) {
     data = data || (_liveCache && _liveCache.data) || null;
-    if (!data) return { kind: "stub", label: "CONNECT · STUB", live: false };
+    if (!data) return { kind: "stub", label: "STUB", live: false };
     if (data.status === "need_token") {
-      return { kind: "need_token", label: "CONNECT · NEED TOKEN", live: false, error: data.error || null };
+      return { kind: "need_token", label: "NEED TOKEN", live: false, error: data.error || null };
     }
     if (data.status === "error") {
-      return { kind: "error", label: "DEMO · FETCH ERR", live: false, error: data.error || null };
+      return { kind: "error", label: "FETCH ERR", live: false, error: data.error || null };
     }
-    if (data.status === "live" && liveFresh(data)) {
+    if (data.status === "live" && data.thermostat) {
       var th = data.thermostat;
       var offline = th && th.online === false;
+      var aging = !liveFresh(data);
       return {
-        kind: offline ? "offline" : "live",
-        label: offline ? "LIVE · OFFLINE UNIT" : "LIVE",
+        kind: offline ? "offline" : (aging ? "aging" : "live"),
+        label: offline ? "LIVE · OFFLINE" : (aging ? "LIVE · aging" : "LIVE"),
         live: true,
         writeSupported: !!data.writeSupported,
         updatedAt: data.updatedAt,
@@ -140,9 +144,9 @@
       };
     }
     if (data.status === "live") {
-      return { kind: "stale", label: "STALE · DEMO", live: false, error: "snapshot older than 30m" };
+      return { kind: "stub", label: "LIVE · no unit", live: false, error: "live JSON missing thermostat" };
     }
-    return { kind: "stub", label: "CONNECT · STUB", live: false };
+    return { kind: "stub", label: "STUB", live: false };
   }
 
   /**
@@ -259,8 +263,27 @@
     var st = effectiveState();
     var mc = modeColor(st.mode);
     var status = st.gate.label;
+    var hdr = el.classList.contains("sensi-hdr");
     el.classList.add("sensi-chip");
-    el.setAttribute("href", el.getAttribute("href") || "sheet-sensi.html");
+    el.classList.toggle("is-live", !!st.gate.live);
+    el.classList.toggle("is-need", st.gate.kind === "need_token");
+    el.setAttribute("data-mode", st.mode || "Auto");
+    el.setAttribute("href", el.getAttribute("href") || "sheet-google-home.html");
+    if (hdr) {
+      /* Quiet header blend — temps + short LIVE/NEED, no CONNECT scream */
+      el.innerHTML =
+        '<div class="sensi-hdr-ico" aria-hidden="true">🌡</div>'
+        + '<div class="sensi-hdr-text">'
+        + '<div class="sensi-hdr-kicker">Sensi</div>'
+        + '<div class="sensi-hdr-line">'
+        + '<span class="sensi-hdr-temp">' + st.ambient + "°</span>"
+        + '<span class="sensi-hdr-set">set ' + st.setpoint + "°</span>"
+        + '<span class="sensi-hdr-mode">' + mc.label + "</span>"
+        + "</div>"
+        + '<div class="sensi-hdr-sub">' + status + "</div>"
+        + "</div>";
+      return;
+    }
     el.innerHTML =
       '<div class="sensi-chip-ico" aria-hidden="true">🌡</div>'
       + '<div class="sensi-chip-text">'
