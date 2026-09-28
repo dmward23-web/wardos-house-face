@@ -1,6 +1,6 @@
 /* House face · client-side checkoffs · localStorage · kids-safe
    Daily musts: house-checkoffs:{kid}:{YYYY-MM-DD} (America/Chicago via HouseClock) — resets each morning.
-   Weekly musts: house-checkoffs:{kid}:week:{SunISO}. Stars bank toward the WEEK jar. */
+   Weekly musts: house-checkoffs:{kid}:week:{FriISO}. Stars bank toward the Dad-week jar. */
 (function () {
   "use strict";
 
@@ -103,14 +103,15 @@
       if (t.classList.contains("done")) doneN += 1;
     });
     var weekPay = parseInt(taps[0].getAttribute("data-stars") || "7", 10) || 7;
-    var weekDone = doneN >= 7;
+    var need = taps.length || 7;
+    var weekDone = doneN >= need;
     row.classList.toggle("done", weekDone);
     row.classList.toggle("open", !weekDone);
     var hint = row.querySelector(".hint");
     if (hint) {
       hint.textContent = weekDone
-        ? "7/7 days · +$" + weekPay + " week unlocked"
-        : doneN + "/7 days · full week unlocks $" + weekPay;
+        ? need + "/" + need + " Dad days · +$" + weekPay + " unlocked"
+        : doneN + "/" + need + " days · Dad week (Fri–Thu) unlocks $" + weekPay;
     }
     var earn = row.querySelector(".star-earn");
     if (earn && !earn.classList.contains("addon-tag")) {
