@@ -963,7 +963,7 @@ html:not([data-export]) body {
   min-height: 100% !important;
   overflow-x: auto !important;
   overflow-y: auto !important;
-  overscroll-behavior-y: contain;
+  overscroll-behavior-y: auto; /* was contain · IOSCROLL2 */
   -webkit-overflow-scrolling: touch;
   touch-action: manipulation;
 }
@@ -1589,10 +1589,10 @@ html:not([data-export]) body.theme-harris .body .sec-schedule,
 html:not([data-export]) body.theme-ainsley .body .sec-more,
 html:not([data-export]) body.theme-hayes .body .sec-more,
 html:not([data-export]) body.theme-harris .body .sec-more {
-  overflow: auto !important;
+  overflow: visible !important; /* IOSCROLL2 */
   max-height: 100% !important;
   min-height: 0 !important;
-  overscroll-behavior: contain;
+  overscroll-behavior: auto; /* was contain · IOSCROLL2 */
   -webkit-overflow-scrolling: touch;
   gap: 8px !important;
   padding: 12px !important;
@@ -1607,14 +1607,14 @@ body.theme-harris .sec-schedule > .sec-list[data-mount-today-events],
 body.theme-harris .sec-schedule > .sec-list[data-mount-school] {
   flex: 1.35 1 0 !important;
   min-height: 88px !important;
-  overflow: auto !important;
+  overflow: visible !important; /* IOSCROLL2 */
 }
 body.theme-ainsley .sec-schedule > .sec-list[data-mount-sports],
 body.theme-hayes .sec-schedule > .sec-list[data-mount-sports],
 body.theme-harris .sec-schedule > .sec-list[data-mount-sports] {
   flex: 0.75 1 0 !important;
   min-height: 56px !important;
-  overflow: auto !important;
+  overflow: visible !important; /* IOSCROLL2 */
 }
 body.theme-ainsley .sec-schedule > .sec-list[data-mount-appointments],
 body.theme-ainsley .sec-more > .sec-list[data-mount-appointments],
@@ -1622,21 +1622,21 @@ body.theme-hayes .sec-more > .sec-list[data-mount-appointments],
 body.theme-harris .sec-more > .sec-list[data-mount-appointments] {
   flex: 0.4 1 0 !important;
   min-height: 44px !important;
-  overflow: auto !important;
+  overflow: visible !important; /* IOSCROLL2 */
 }
 body.theme-ainsley .sec-more > .sec-list[data-mount-fun],
 body.theme-hayes .sec-more > .sec-list[data-mount-fun],
 body.theme-harris .sec-more > .sec-list[data-mount-fun] {
   flex: 1.9 1 0 !important;
   min-height: 110px !important;
-  overflow: auto !important;
+  overflow: visible !important; /* IOSCROLL2 */
 }
 body.theme-ainsley .sec-more > .sec-list[data-mount-missions],
 body.theme-hayes .sec-more > .sec-list[data-mount-missions],
 body.theme-harris .sec-more > .sec-list[data-mount-missions] {
   flex: 0.7 1 0 !important;
   min-height: 48px !important;
-  overflow: auto !important;
+  overflow: visible !important; /* IOSCROLL2 */
 }
 /* Ainsley harbor strips stay compact */
 body.theme-ainsley .sec-schedule > .sec-list[data-mount-no-surprise],
@@ -1644,7 +1644,7 @@ body.theme-ainsley .sec-schedule > .sec-list[data-mount-rides],
 body.theme-ainsley .sec-schedule > .sec-list[data-mount-her-space] {
   flex: 0.55 1 0 !important;
   min-height: 40px !important;
-  overflow: auto !important;
+  overflow: visible !important; /* IOSCROLL2 */
 }
 
 /* Fun cards bigger · appt cards smaller (tap still ≥44) */
@@ -1798,8 +1798,8 @@ body.theme-harris .body .sec-schedule {
   grid-row: 2 !important;
   min-height: 0 !important;
   max-height: 100% !important;
-  overflow: auto !important;
-  overscroll-behavior: contain;
+  overflow: visible !important; /* IOSCROLL2 */
+  overscroll-behavior: auto; /* was contain · IOSCROLL2 */
   -webkit-overflow-scrolling: touch;
   gap: 10px !important;
   padding: 14px 16px !important;
@@ -1820,28 +1820,28 @@ body.theme-harris .sec-schedule > .sec-list[data-mount-today-events],
 body.theme-harris .sec-schedule > .sec-list[data-mount-school] {
   flex: 1.55 1 0 !important;
   min-height: 120px !important;
-  overflow: auto !important;
+  overflow: visible !important; /* IOSCROLL2 */
 }
 body.theme-ainsley .sec-schedule > .sec-list[data-mount-sports],
 body.theme-hayes .sec-schedule > .sec-list[data-mount-sports],
 body.theme-harris .sec-schedule > .sec-list[data-mount-sports] {
   flex: 1 1 0 !important;
   min-height: 88px !important;
-  overflow: auto !important;
+  overflow: visible !important; /* IOSCROLL2 */
 }
 body.theme-ainsley .sec-schedule > .sec-list[data-mount-appointments],
 body.theme-hayes .sec-schedule > .sec-list[data-mount-appointments],
 body.theme-harris .sec-schedule > .sec-list[data-mount-appointments] {
   flex: 0.45 1 0 !important;
   min-height: 48px !important;
-  overflow: auto !important;
+  overflow: visible !important; /* IOSCROLL2 */
 }
 body.theme-ainsley .sec-schedule > .sec-list[data-mount-no-surprise],
 body.theme-ainsley .sec-schedule > .sec-list[data-mount-rides],
 body.theme-ainsley .sec-schedule > .sec-list[data-mount-her-space] {
   flex: 0.7 1 0 !important;
   min-height: 56px !important;
-  overflow: auto !important;
+  overflow: visible !important; /* IOSCROLL2 */
 }
 
 /* Cards breathe */
@@ -2212,4 +2212,68 @@ body.theme-harris .day-tap.done {
 }
 @media (max-width: 420px) {
   .day-tap { width: 30px; height: 30px; min-width: 30px; font-size: 11px; }
+}
+
+/* ==== IOSCROLL2 · Mon Sep 28 2026 · single page scroller (iOS) FOREVER ====
+   Nested overflow:auto + overscroll-behavior:contain trapped finger in
+   schedule pane (scroll down OK, cannot return to top). Page is sole scroller.
+   Do NOT reintroduce overflow:auto on .sec-schedule / .sec-list kid boards.
+   house-face-deploy copies FROM board-os/house-face — keep THIS file fixed there. */
+html:not([data-export]) body.theme-ainsley,
+html:not([data-export]) body.theme-hayes,
+html:not([data-export]) body.theme-harris {
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  height: auto !important;
+  max-height: none !important;
+}
+html:not([data-export]) body.theme-ainsley .panel,
+html:not([data-export]) body.theme-hayes .panel,
+html:not([data-export]) body.theme-harris .panel {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 1920px !important;
+}
+html:not([data-export]) body.theme-ainsley .body,
+html:not([data-export]) body.theme-hayes .body,
+html:not([data-export]) body.theme-harris .body {
+  grid-template-rows: auto auto !important;
+  min-height: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  flex: 0 0 auto !important;
+}
+html:not([data-export]) body.theme-ainsley .body .sec-schedule,
+html:not([data-export]) body.theme-hayes .body .sec-schedule,
+html:not([data-export]) body.theme-harris .body .sec-schedule,
+html:not([data-export]) body.theme-ainsley .body .sec-more,
+html:not([data-export]) body.theme-hayes .body .sec-more,
+html:not([data-export]) body.theme-harris .body .sec-more,
+html:not([data-export]) body.theme-ainsley .body .sec-chores,
+html:not([data-export]) body.theme-hayes .body .sec-chores,
+html:not([data-export]) body.theme-harris .body .sec-chores {
+  overflow: visible !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  overscroll-behavior: auto !important;
+  -webkit-overflow-scrolling: auto !important;
+}
+html:not([data-export]) body.theme-ainsley .sec-schedule > .sec-list,
+html:not([data-export]) body.theme-hayes .sec-schedule > .sec-list,
+html:not([data-export]) body.theme-harris .sec-schedule > .sec-list,
+html:not([data-export]) body.theme-ainsley .sec-more > .sec-list,
+html:not([data-export]) body.theme-hayes .sec-more > .sec-list,
+html:not([data-export]) body.theme-harris .sec-more > .sec-list,
+html:not([data-export]) body.theme-ainsley .sec-list,
+html:not([data-export]) body.theme-hayes .sec-list,
+html:not([data-export]) body.theme-harris .sec-list {
+  overflow: visible !important;
+  max-height: none !important;
+  flex: 0 0 auto !important;
+  min-height: auto !important;
+  overscroll-behavior: auto !important;
 }
