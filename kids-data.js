@@ -1272,6 +1272,498 @@
   }
 
 
+  /* CONSUME1 · schedule consume layout (week strip · NEXT UP · HQ · routine · ahead) */
+  var CONSUME_DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  var CONSUME_META = {
+    hayes: { world: "Victory world", loadout: "Victory loadout", mark: "◎", hqTitle: "DROP ZONE HQ with Dad", hqIco: "🏠" },
+    harris: { world: "Gem world", loadout: "Gem loadout", mark: "◆", hqTitle: "YOUR BASE with Dad", hqIco: "🏡" },
+    ainsley: { world: "Tour world", loadout: "Tour loadout", mark: "◆", hqTitle: "Base with Dad", hqIco: "🏠" }
+  };
+
+  function kidsSafeGlass(s) {
+    var t = String(s == null ? "" : s);
+    t = t.replace(/\bCUSTODY\b/gi, "WITH DAD");
+    t = t.replace(/\bcustody\b/gi, "Dad week");
+    return t;
+  }
+
+  function addDaysIsoLocal(iso, days) {
+    var parts = String(iso || "").split("-");
+    if (parts.length !== 3) return "";
+    var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
+    d.setDate(d.getDate() + days);
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+  }
+
+  function mondayOfIso(iso) {
+    var parts = String(iso || DAY_ISO).split("-");
+    if (parts.length !== 3) return DAY_ISO;
+    var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
+    var toMon = (d.getDay() + 6) % 7;
+    d.setDate(d.getDate() - toMon);
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+  }
+
+  function consumeIsRoutine(item) {
+    var what = String((item && item.what) || "");
+    var when = String((item && item.when) || "");
+    var blob = what + " " + when;
+    if (/Hearing\s*\/?\s*Vision|field\s*trip|PE\b|collab|Homework Help|yearbook|Midwest Anxiety|swim|flag|baseball|game|practice/i.test(what)) {
+      if (!/SRE\s*(drop|pickup|drop-off)/i.test(what)) return false;
+    }
+    if (/SRE\s*(drop-?off|drop|pickup)/i.test(what)) return true;
+    if (/^(Boys\s+)?SRE\s+(drop|pickup)/i.test(what)) return true;
+    if (/\bdrop-?off\b/i.test(what) && /SRE|Boys/i.test(blob)) return true;
+    if (/\bpickup\b/i.test(what) && /SRE|Boys/i.test(blob)) return true;
+    return false;
+  }
+
+  function consumeIsHq(item) {
+    if (!item) return false;
+    if (item.kind === "note") return true;
+    var what = String(item.what || "");
+    return /DROP ZONE HQ|YOUR BASE|Base @|with Dad|Dad week|147th/i.test(what) && /All day|home|HQ|BASE|Dad/i.test((item.when || "") + " " + what);
+  }
+
+  function consumeParseWhen(when) {
+    var s = String(when || "").trim();
+    var out = { dow: "", dayNum: "", time: "", leave: false, raw: s };
+    var m = s.match(/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b(?:\s+(\d{1,2}))?/i);
+    if (m) {
+      out.dow = m[1].slice(0, 1).toUpperCase() + m[1].slice(1, 3).toLowerCase();
+      if (m[2]) out.dayNum = String(Number(m[2]));
+    }
+    var t = s.match(/(?:leave\s*)?(\d{1,2}:\d{2})\s*(am|pm)?/i);
+    if (t) {
+      out.time = t[1];
+      out.leave = /leave/i.test(s);
+      if (t[2]) out.time += t[2].toLowerCase();
+    }
+    return out;
+  }
+
+  function consumeIsoForParsed(parsed, weekIsos) {
+    if (!parsed) return "";
+    if (parsed.dayNum) {
+      for (var i = 0; i < weekIsos.length; i++) {
+        var dn = String(Number(weekIsos[i].split("-")[2]));
+        if (dn === parsed.dayNum) return weekIsos[i];
+      }
+    }
+    if (parsed.dow) {
+      for (var j = 0; j < weekIsos.length; j++) {
+        if (CONSUME_DOW[dowIndexFromIso(weekIsos[j])] === parsed.dow) return weekIsos[j];
+      }
+    }
+    return "";
+  }
+
+  function consumeCollectEvents(kid) {
+    var list = [];
+    function push(arr, bucket) {
+      (arr || []).forEach(function (it) {
+        if (!it || !it.what) return;
+        list.push({
+          when: it.when || "",
+          what: kidsSafeGlass(it.what),
+          hint: kidsSafeGlass(it.hint || ""),
+          tone: it.tone || "act",
+          kind: it.kind || bucket,
+          bucket: bucket
+        });
+      });
+    }
+    push(kid.today, "today");
+    push(kid.sports, "sports");
+    push(kid.school, "school");
+    push(kid.appointments, "appointments");
+    return list;
+  }
+
+  function consumeEventIcon(what) {
+    var w = String(what || "").toLowerCase();
+    if (/baseball|ball/.test(w)) return "⚾";
+    if (/flag/.test(w)) return "🏈";
+    if (/swim/.test(w)) return "🏊";
+    if (/hearing|vision|screening/.test(w)) return "👁️";
+    if (/field\s*trip|museum/.test(w)) return "🚌";
+    if (/\bpe\b|tennis/.test(w)) return "👟";
+    if (/collab|madi|randy/.test(w)) return "👥";
+    if (/anxiety|midwest|doctor|appt/.test(w)) return "🩺";
+    if (/homework|yearbook|school|lkms|sre/.test(w)) return "📚";
+    return "◆";
+  }
+
+  function consumeStripKidName(what, kid) {
+    var w = String(what || "");
+    if (!kid) return w;
+    var re = new RegExp("^" + kid.name + "\\s*[—\\-·]\\s*", "i");
+    w = w.replace(re, "");
+    re = new RegExp("^" + kid.name + "\\s+", "i");
+    /* keep sports titles like "Hayes baseball" */
+    if (/baseball|flag|swim/i.test(w)) return w;
+    return w.replace(re, "");
+  }
+
+  function consumeQueueForKid(data, kidId) {
+    var kid = data.kids[kidId];
+    var q = (data.boardStrip && data.boardStrip.queue) || [];
+    var name = (kid && kid.name) || kidId;
+    var out = [];
+    for (var i = 0; i < q.length; i++) {
+      var item = q[i];
+      var blob = ((item.summary || "") + " " + (item.place || "")).toLowerCase();
+      var mine = false;
+      if (kidId === "hayes") mine = /hayes/.test(blob) || (/boys|sre/.test(blob) && !/ainsley|harris flag|harris —/.test(blob));
+      else if (kidId === "harris") mine = /harris/.test(blob) || (/boys|sre/.test(blob) && !/ainsley|hayes baseball|hayes flag|hayes —|madi/.test(blob));
+      else if (kidId === "ainsley") mine = /ainsley/.test(blob);
+      /* shared boys SRE counts for both */
+      if ((kidId === "hayes" || kidId === "harris") && /hayes \+ harris|boys sre|sre (drop|pickup|hearing)/i.test(blob)) mine = true;
+      if (kidId === "hayes" && /madi|randy collab/i.test(blob)) mine = true;
+      if (!mine && kidId === "ainsley" && /midwest anxiety/i.test(blob)) mine = true;
+      if (!mine) continue;
+      out.push(item);
+    }
+    return out;
+  }
+
+  function consumePickNext(data, kidId, kid) {
+    var now = Date.now();
+    var queue = consumeQueueForKid(data, kidId);
+    for (var i = 0; i < queue.length; i++) {
+      var it = queue[i];
+      var end = Date.parse(it.endIso || "") || 0;
+      var start = Date.parse(it.startIso || "") || 0;
+      if (end && end < now) continue;
+      if (!end && start && start + 90 * 60 * 1000 < now) continue;
+      if (consumeIsRoutine({ what: it.place || it.summary || "" }) && queue.length > 1) {
+        /* Prefer unique over routine when another future unique exists */
+        var hasUniqueLater = false;
+        for (var j = i; j < queue.length; j++) {
+          var jt = queue[j];
+          var js = Date.parse(jt.startIso || "") || 0;
+          var je = Date.parse(jt.endIso || "") || 0;
+          if (je && je < now) continue;
+          if (!je && js && js + 90 * 60 * 1000 < now) continue;
+          if (!consumeIsRoutine({ what: jt.place || jt.summary || "" })) { hasUniqueLater = true; break; }
+        }
+        if (hasUniqueLater && start && start > now + 45 * 60 * 1000) continue;
+      }
+      return {
+        whenLabel: (it.badge ? String(it.badge).toUpperCase() : "") + (it.time ? (" · " + it.time) : ""),
+        time: it.time || "",
+        badge: it.badge || "",
+        title: kidsSafeGlass(it.place || shortConsumeTitle(it.summary) || "Next up"),
+        summary: kidsSafeGlass(it.summary || ""),
+        startIso: it.startIso || "",
+        endIso: it.endIso || "",
+        kind: it.kind || "",
+        source: "queue"
+      };
+    }
+    /* Fallback: kid hottest / first unique timed event */
+    var events = consumeCollectEvents(kid).filter(function (e) {
+      return !consumeIsHq(e) && !consumeIsRoutine(e);
+    });
+    if (events.length) {
+      var e0 = events[0];
+      var p = consumeParseWhen(e0.when);
+      return {
+        whenLabel: ((p.dow || "").toUpperCase() + (p.time ? (" · " + p.time) : "")).replace(/^\s·\s/, ""),
+        time: p.time || "",
+        badge: p.dow || "",
+        title: e0.what,
+        summary: e0.hint || "",
+        startIso: "",
+        endIso: "",
+        kind: e0.bucket,
+        source: "kid"
+      };
+    }
+    if (kid.hottest) {
+      return {
+        whenLabel: String(kid.hottest.when || ""),
+        time: "",
+        badge: "",
+        title: kidsSafeGlass(kid.hottest.what || "Next up"),
+        summary: kidsSafeGlass(kid.hottest.where || ""),
+        startIso: "",
+        endIso: "",
+        kind: "hot",
+        source: "hottest"
+      };
+    }
+    return null;
+  }
+
+  function shortConsumeTitle(summary) {
+    var s = String(summary || "");
+    s = s.replace(/\s·\s.*$/, "").trim();
+    return s;
+  }
+
+  function consumeCountdown(next) {
+    if (!next) return "";
+    var start = Date.parse(next.startIso || "") || 0;
+    if (!start) {
+      if (/today/i.test(next.source || "") || (next.badge && /mon|tue|wed|thu|fri|sat|sun/i.test(next.badge))) {
+        return "ON DECK";
+      }
+      return "NEXT";
+    }
+    var mins = Math.round((start - Date.now()) / 60000);
+    if (mins <= 5) return "LEAVE · NOW";
+    if (mins <= 45) return "LEAVE · " + mins + "m";
+    if (mins <= 120) return "LEAVE · " + Math.round(mins / 5) * 5 + "m";
+    try {
+      var p = {};
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Chicago",
+        weekday: "short", hour: "numeric", minute: "2-digit", hour12: true
+      }).formatToParts(new Date(start)).forEach(function (x) {
+        if (x.type !== "literal") p[x.type] = x.value;
+      });
+      return (p.weekday || "").toUpperCase().slice(0, 3) + " · " + (p.hour || "") + ":" + (p.minute || "");
+    } catch (e) {
+      return "UPCOMING";
+    }
+  }
+
+  function consumeThruChip(through) {
+    var t = String(through || "");
+    var m = t.match(/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i);
+    if (m) return "THRU " + m[1].toUpperCase().slice(0, 3);
+    return "DAD WEEK";
+  }
+
+  function renderConsumeSchedule(kidId, data) {
+    var root = document.querySelector(".sec-schedule.consume-sched");
+    if (!root || !data || !data.kids || !data.kids[kidId]) return;
+    var kid = data.kids[kidId];
+    var meta = CONSUME_META[kidId] || CONSUME_META.hayes;
+    var weekStart = mondayOfIso(DAY_ISO);
+    var weekIsos = [];
+    for (var i = 0; i < 7; i++) weekIsos.push(addDaysIsoLocal(weekStart, i));
+
+    var selected = root.getAttribute("data-consume-sel") || DAY_ISO;
+    if (weekIsos.indexOf(selected) < 0) selected = DAY_ISO;
+
+    var all = consumeCollectEvents(kid);
+    var unique = all.filter(function (e) { return !consumeIsRoutine(e) && !consumeIsHq(e); });
+
+    /* Dedupe by what+day */
+    var seen = {};
+    unique = unique.filter(function (e) {
+      var p = consumeParseWhen(e.when);
+      var iso = consumeIsoForParsed(p, weekIsos) || e.when + "|" + e.what;
+      var key = iso + "::" + String(e.what).toLowerCase().replace(/\s+/g, " ");
+      if (seen[key]) return false;
+      seen[key] = 1;
+      return true;
+    });
+
+    var byIso = {};
+    weekIsos.forEach(function (iso) { byIso[iso] = []; });
+    unique.forEach(function (e) {
+      var p = consumeParseWhen(e.when);
+      var iso = consumeIsoForParsed(p, weekIsos);
+      if (iso && byIso[iso]) byIso[iso].push({ e: e, p: p });
+      else if (!p.dayNum && !p.dow && e.bucket === "today") {
+        if (byIso[DAY_ISO]) byIso[DAY_ISO].push({ e: e, p: p });
+      }
+    });
+
+    /* Header */
+    var hdr = root.querySelector("[data-mount-consume-hdr]");
+    if (hdr) {
+      hdr.innerHTML =
+        '<div class="consume-mark">' + esc(meta.mark) + "</div>" +
+        '<div class="consume-hdr-text">' +
+        '<div class="consume-title">' + esc(kid.name) + " · Schedule</div>" +
+        '<div class="consume-sub">Loadout · ' + esc(meta.world) + "</div>" +
+        "</div>";
+    }
+
+    /* Week strip */
+    var weekEl = root.querySelector("[data-mount-consume-week]");
+    if (weekEl) {
+      var wh = "";
+      weekIsos.forEach(function (iso) {
+        var dow = CONSUME_DOW[dowIndexFromIso(iso)];
+        var dn = String(Number(iso.split("-")[2]));
+        var bits = byIso[iso] || [];
+        var sel = iso === selected ? " sel" : "";
+        var dots = "";
+        if (bits.length >= 2) dots = '<span class="consume-dot"></span><span class="consume-dot cyan"></span>';
+        else if (bits.length === 1) dots = '<span class="consume-dot cyan"></span>';
+        else dots = '<span class="consume-dot muted"></span>';
+        wh += '<button type="button" class="consume-day' + sel + '" data-consume-day="' + esc(iso) + '" aria-pressed="' + (iso === selected ? "true" : "false") + '">' +
+          '<span class="wd">' + dow + "</span>" +
+          '<span class="dn">' + dn + "</span>" +
+          '<div class="dots">' + dots + "</div></button>";
+      });
+      weekEl.innerHTML = wh;
+      if (!weekEl._consumeWired) {
+        weekEl._consumeWired = true;
+        weekEl.addEventListener("click", function (ev) {
+          var btn = ev.target.closest("[data-consume-day]");
+          if (!btn) return;
+          root.setAttribute("data-consume-sel", btn.getAttribute("data-consume-day"));
+          renderConsumeSchedule(kidId, data);
+        });
+      }
+    }
+
+    /* NEXT UP */
+    var next = consumePickNext(data, kidId, kid);
+    var nextMount = root.querySelector("[data-mount-consume-next]");
+    if (nextMount) {
+      if (!next) {
+        nextMount.className = "consume-hero empty";
+        nextMount.innerHTML = '<div class="consume-hero-inner"><div class="consume-hero-title">Nothing timed next</div><div class="consume-hero-meta">Quests + Dad week still on</div></div>';
+      } else {
+        var cd = consumeCountdown(next);
+        var title = consumeStripKidName(next.title, kid);
+        var ico = consumeEventIcon(title);
+        nextMount.className = "consume-hero";
+        nextMount.innerHTML =
+          '<div class="consume-hero-inner">' +
+          '<div class="consume-hero-top">' +
+          '<div class="consume-hero-when">' + esc(next.whenLabel || "NEXT") + "</div>" +
+          '<div class="consume-countdown"><span class="pulse"></span><span>' + esc(cd) + "</span></div>" +
+          "</div>" +
+          '<div class="consume-hero-title">' + esc(ico + " " + title) + "</div>" +
+          '<div class="consume-hero-meta">YOUR board · <b>' + esc(meta.loadout) + "</b></div>" +
+          "</div>";
+      }
+    }
+
+    /* Today label + HQ punch */
+    var selDow = CONSUME_DOW[dowIndexFromIso(selected)];
+    var selDn = String(Number(selected.split("-")[2]));
+    var todayLab = root.querySelector("[data-mount-consume-today-label]");
+    if (todayLab) {
+      var lab = selected === DAY_ISO ? ("Today · " + selDow + " " + selDn) : (selDow + " " + selDn);
+      todayLab.innerHTML = '<span class="tag">' + esc(lab) + '</span><span class="line"></span>';
+    }
+
+    var punch = root.querySelector("[data-mount-consume-punch]");
+    if (punch) {
+      var hw = data.homeWeek || {};
+      var through = kidsSafeGlass(hw.through || hw.throughLabel || "Dad week");
+      var place = hw.place ? (" @ " + hw.place) : "";
+      var sub = "Multi-day · " + through + (hw.with ? "" : "");
+      if (hw.with && hw.place) sub = "Multi-day · through " + through;
+      punch.innerHTML =
+        '<div class="consume-punch-card">' +
+        '<div class="consume-punch-ico">' + meta.hqIco + "</div>" +
+        '<div class="consume-punch-body">' +
+        '<div class="consume-punch-title">' + esc(meta.hqTitle) + "</div>" +
+        '<div class="consume-punch-sub">' + esc(kidsSafeGlass(sub)) + "</div>" +
+        "</div>" +
+        '<div class="consume-punch-chip">' + esc(consumeThruChip(through)) + "</div>" +
+        "</div>";
+    }
+
+    /* Routine rail */
+    var routine = root.querySelector("[data-mount-consume-routine]");
+    if (routine) {
+      var lb = data.leaveBys || {};
+      var drop = String(lb.SRE_drop || "leave 8:10 for 8:25");
+      var pick = String(lb.SRE_pickup || "leave 3:15 for 3:40");
+      var dropT = (drop.match(/(\d{1,2}:\d{2})/) || [])[1] || "8:10";
+      var pickT = (pick.match(/(\d{1,2}:\d{2})/) || [])[1] || "3:15";
+      if (kidId === "ainsley") {
+        var swimDays = unique.filter(function (e) { return /swim/i.test(e.what); });
+        if (swimDays.length >= 2) {
+          routine.hidden = false;
+          routine.innerHTML =
+            '<span class="consume-routine-ico">🔁</span>' +
+            '<div class="consume-routine-txt"><b>Swim</b> · leave 4:25 · Coach Ann</div>' +
+            '<span class="consume-routine-badge">Tue/Thu</span>';
+        } else if (swimDays.length === 1) {
+          routine.hidden = true;
+          routine.innerHTML = "";
+        } else {
+          routine.hidden = true;
+          routine.innerHTML = "";
+        }
+      } else {
+        var hasSre = all.some(consumeIsRoutine);
+        if (hasSre) {
+          routine.hidden = false;
+          routine.innerHTML =
+            '<span class="consume-routine-ico">🔁</span>' +
+            '<div class="consume-routine-txt"><b>SRE</b> · drop ' + esc(dropT) + " · pickup " + esc(pickT) + "</div>" +
+            '<span class="consume-routine-badge">Tue–Fri</span>';
+        } else {
+          routine.hidden = true;
+          routine.innerHTML = "";
+        }
+      }
+    }
+
+    /* Ahead · unique (not next, not routine, preferably after selected/today) */
+    var ahead = root.querySelector("[data-mount-consume-ahead]");
+    if (ahead) {
+      var nextKey = next ? String(next.title || "").toLowerCase().replace(/\s+/g, " ") : "";
+      var rows = [];
+      weekIsos.forEach(function (iso) {
+        if (iso < selected) return;
+        (byIso[iso] || []).forEach(function (pack) {
+          var e = pack.e;
+          var p = pack.p;
+          var titleKey = String(e.what || "").toLowerCase().replace(/\s+/g, " ");
+          if (nextKey && (titleKey.indexOf(nextKey.slice(0, 18)) >= 0 || nextKey.indexOf(titleKey.slice(0, 18)) >= 0)) {
+            if (iso === DAY_ISO || iso === selected) return; /* hide current next from ahead */
+          }
+          /* On selected=today, still show later unique same day only if not the next hero */
+          rows.push({ iso: iso, e: e, p: p });
+        });
+      });
+      /* If selected is today and next is today's event, drop first matching */
+      if (next && rows.length) {
+        var nk = nextKey.replace(/[^a-z0-9]+/g, "");
+        rows = rows.filter(function (r, idx) {
+          var tk = String(r.e.what || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+          if (idx === 0 && r.iso === DAY_ISO && nk && (tk.indexOf(nk.slice(0, 12)) >= 0 || nk.indexOf(tk.slice(0, 12)) >= 0)) return false;
+          return true;
+        });
+      }
+      if (!rows.length) {
+        ahead.innerHTML = '<div class="consume-ahead-empty">No unique events ahead · routines collapsed above</div>';
+      } else {
+        ahead.innerHTML = rows.slice(0, 8).map(function (r) {
+          var dow = CONSUME_DOW[dowIndexFromIso(r.iso)].toUpperCase();
+          var dn = String(Number(r.iso.split("-")[2]));
+          var what = consumeStripKidName(r.e.what, kid);
+          var dim = "";
+          var hint = r.e.hint || "";
+          if (hint && !/YOUR board/i.test(hint)) {
+            dim = ' <span class="dim">· ' + esc(hint) + "</span>";
+          } else {
+            var paren = what.match(/\(([^)]+)\)/);
+            if (paren) {
+              what = what.replace(/\s*\([^)]+\)\s*$/, "").trim();
+              dim = ' <span class="dim">· ' + esc(paren[1]) + "</span>";
+            } else if (/·/.test(what)) {
+              var parts = what.split("·");
+              what = parts[0].trim();
+              dim = ' <span class="dim">· ' + esc(parts.slice(1).join("·").trim()) + "</span>";
+            }
+          }
+          var time = r.p.time || "";
+          if (r.p.leave && time) time = time; /* already leave-aware in when */
+          return '<div class="consume-ahead-row">' +
+            '<span class="consume-ahead-day">' + esc(dow + " " + dn) + "</span>" +
+            '<div class="consume-ahead-what">' + esc(what) + dim + "</div>" +
+            '<span class="consume-ahead-time">' + esc(time || "—") + "</span>" +
+            "</div>";
+        }).join("");
+      }
+    }
+  }
+
   function renderKidPage(kidId, data) {
     var kid = data.kids[kidId];
     if (!kid) return;
@@ -1312,12 +1804,16 @@
       }).join("") || '<div class="hot-badge">…</div>';
     }
 
-    renderList(document.querySelector("[data-mount-today-events]"), kid.today, "easy day · your quests below");
     renderQuests(document.querySelector("[data-mount-quests]"), kid.quests, data, kidId);
-    renderList(document.querySelector("[data-mount-sports]"), kid.sports, kid.sportsEmpty || "no sports on your board right now");
-    renderList(document.querySelector("[data-mount-school]"), kid.school, "school bits show up when known");
+    if (document.querySelector(".sec-schedule.consume-sched")) {
+      renderConsumeSchedule(kidId, data);
+    } else {
+      renderList(document.querySelector("[data-mount-today-events]"), kid.today, "easy day · your quests below");
+      renderList(document.querySelector("[data-mount-sports]"), kid.sports, kid.sportsEmpty || "no sports on your board right now");
+      renderList(document.querySelector("[data-mount-school]"), kid.school, "school bits show up when known");
+      renderList(document.querySelector("[data-mount-appointments]"), kid.appointments, kid.appointmentsEmpty || "none on your board · quiet is good");
+    }
     renderList(document.querySelector("[data-mount-fun]"), kid.fun, "fun picks land here");
-    renderList(document.querySelector("[data-mount-appointments]"), kid.appointments, kid.appointmentsEmpty || "none on your board · quiet is good");
     renderList(document.querySelector("[data-mount-missions]"), kid.missions || kid.fun, "bonus missions land here");
 
     var streak = document.querySelector("[data-streak-label]");
@@ -1412,6 +1908,7 @@
     renderPersonalGoal: renderPersonalGoal,
     renderHarborStrips: renderHarborStrips,
     renderKidPage: renderKidPage,
+    renderConsumeSchedule: renderConsumeSchedule,
     nextPaydayInfo: nextPaydayInfo,
     resetJarCycle: resetJarCycle,
     settlePriorWeeksIntoBalance: settlePriorWeeksIntoBalance,
