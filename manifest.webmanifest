@@ -6,7 +6,7 @@
   "scope": "/wardos-house-face/",
   "id": "/wardos-house-face/sheet-index.html",
   "display": "standalone",
-  "orientation": "any",
+  "orientation": "portrait",
   "background_color": "#d8dadf",
   "theme_color": "#d8dadf",
   "icons": [

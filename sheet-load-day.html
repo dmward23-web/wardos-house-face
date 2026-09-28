@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=1920" />
+<meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -36,13 +36,13 @@
  }
  * { box-sizing: border-box; margin: 0; padding: 0; }
  html, body {
- width: 1920px; min-height: 1200px; height: auto; overflow: auto;
+ width: 1080px; min-height: 1920px; height: auto; overflow: auto;
  background: #d8dadf; color: #121418;
  font-family: "Inter Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
  -webkit-font-smoothing: antialiased;
  }
  .panel {
- width: 1920px; min-height: 1200px; height: auto;
+ width: 1080px; min-height: 1920px; height: auto;
  padding: 18px 28px 12px;
  display: flex; flex-direction: column; gap: 11px;
  position: relative; overflow: visible;
@@ -201,7 +201,7 @@
 
  .timeline {
  flex-shrink: 0;
- display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; /* portrait */
  }
  .beat {
  border-radius: 16px; padding: 14px 14px 12px;
@@ -264,7 +264,7 @@
 
  .lower {
  flex: 1; min-height: 0;
- display: grid; grid-template-columns: 1.35fr 1fr; gap: 12px;
+ display: grid; grid-template-columns: 1fr; gap: 12px; /* portrait stack */
  }
  .sec {
  background: rgba(255,255,255,0.58);

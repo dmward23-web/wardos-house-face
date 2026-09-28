@@ -705,7 +705,7 @@ body.theme-hayes .sec-bank.bank-card,
 body.theme-harris .sec-bank.bank-card {
   padding: 18px 20px !important;
   gap: 12px !important;
-  min-height: 320px;
+  min-height: 0; /* was 320 · LAYOUT32 compact grow */
 }
 body.theme-ainsley .sec-bank .bank-title,
 body.theme-hayes .sec-bank .bank-title,
@@ -879,10 +879,10 @@ body.theme-harris a.home-btn {
 }
 
 /* Allowance sheet · compact banks · no clip */
-.allow-shell .panel { height: auto !important; min-height: 1200px; overflow: visible !important; }
+.allow-shell .panel { height: auto !important; min-height: 1920px; overflow: visible !important; }
 .allow-shell .body {
   display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-columns: 1fr !important; /* portrait stack */
   gap: 14px !important;
   align-items: start !important;
 }
@@ -935,7 +935,7 @@ body.theme-harris a.home-btn {
 .allow-shell .hdr { flex-wrap: wrap; gap: 12px; }
 .allow-shell .hdr-left { flex-wrap: wrap; gap: 12px; }
 
-/* Kid boards · saves don't blow the 1200 panel */
+/* Kid boards · saves don't blow the 1920 panel */
 body.theme-ainsley .sec-bank .saves-panel,
 body.theme-hayes .sec-bank .saves-panel,
 body.theme-harris .sec-bank .saves-panel {
@@ -952,7 +952,7 @@ body.theme-ainsley .ledger-row { gap: 6px; }
 /* ═══════════════════════════════════════════════════════════
    Forever scroll unlock · 2026-09-27
    Tall content must scroll on tablet/phone.
-   Root cause was .panel { height:1200px; overflow:hidden }.
+   Root cause was .panel { height:1920px; overflow:hidden }.
    Progress-bar / [data-progress-fill] CSS does NOT kill scroll
    (track overflow:hidden is decorative only).
    Export crops (html[data-export]) stay locked.
@@ -969,7 +969,7 @@ html:not([data-export]) body {
 }
 html:not([data-export]) .panel {
   height: auto !important;
-  min-height: 1200px !important;
+  min-height: 1920px !important;
   overflow: visible !important;
   overflow-y: visible !important;
 }
@@ -1703,4 +1703,58 @@ body.theme-hayes .sec-chores .quest .ring,
 body.theme-harris .sec-chores .quest .ring {
   width: 42px !important;
   height: 42px !important;
+}
+
+
+/* ==== LAYOUT32 GRID OVERRIDE · Elo 3202L portrait · Prism handoff ==== */
+body.theme-ainsley .body,
+body.theme-hayes .body,
+body.theme-harris .body {
+  display: grid !important;
+  gap: 12px !important;
+  grid-template-columns: 1.4fr 1.6fr !important;
+  grid-template-rows:
+    minmax(168px, 0.20fr)
+    minmax(300px, 0.44fr)
+    minmax(240px, 0.36fr) !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+}
+body.theme-ainsley .body .sec-chores,
+body.theme-hayes .body .sec-chores,
+body.theme-harris .body .sec-chores {
+  grid-column: 1 !important;
+  grid-row: 1 / -1 !important;
+}
+body.theme-ainsley .body .sec-bank,
+body.theme-hayes .body .sec-bank,
+body.theme-harris .body .sec-bank {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  max-height: 200px !important;
+}
+body.theme-hayes .body .sec-schedule,
+body.theme-harris .body .sec-schedule {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  min-height: 0 !important;
+}
+body.theme-hayes .body .sec-more,
+body.theme-harris .body .sec-more {
+  grid-column: 2 !important;
+  grid-row: 3 !important;
+  min-height: 0 !important;
+}
+body.theme-ainsley .body .sec-schedule {
+  grid-column: 2 !important;
+  grid-row: 2 / 4 !important;
+  min-height: 0 !important;
+}
+body.theme-ainsley .body .sec-more {
+  display: none !important;
+}
+body.theme-ainsley .sec-chores .quest,
+body.theme-hayes .sec-chores .quest,
+body.theme-harris .sec-chores .quest {
+  min-height: 72px !important;
 }

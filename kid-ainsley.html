@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=1920" />
+<meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#12140f" />
 <title>BOARD-OS · AINSLEY · HER TRACKS</title>
-<link rel="stylesheet" href="house-engage.css?v=KIDSLAY1" />
+<link rel="stylesheet" href="house-engage.css?v=P32" />
 <style>
 
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400}
@@ -17,7 +17,7 @@
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Bold.ttf") format("truetype");font-weight:700}
 
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:1920px;min-height:1200px;height:auto;overflow:auto;
+html,body{width:1080px;min-height:1920px;height:auto;overflow:auto;
 font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
 -webkit-font-smoothing:antialiased}
 .sec {
@@ -106,29 +106,33 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     background:linear-gradient(180deg,#ffe080,#e0a020); color:#1a1000;
     border:2px solid #8a6010; box-shadow:0 3px 0 #6a4010;
   }
-/* Hierarchy: chores → reward jar → schedule+appt+school (awareness loud) → rest */
+
+  /* LAYOUT32 · Prism kids grid · Elo 3202L portrait 1080×1920
+     cols 1.4fr / 1.6fr · Ainsley: schedule eats mid+bot (no Fun) */
   .body {
-    flex:1; min-height:0; display:grid; gap:8px;
-    grid-template-columns: 1.35fr 1.75fr 0.7fr;
-    grid-template-rows: auto minmax(520px, 1fr);
+    flex:1; min-height:0; display:grid; gap:12px;
+    grid-template-columns: 1.4fr 1.6fr;
+    grid-template-rows:
+      minmax(168px, 0.20fr)
+      minmax(300px, 0.44fr)
+      minmax(240px, 0.36fr);
   }
   .body .sec-chores { grid-column: 1; grid-row: 1 / -1; }
   .body .sec-bank {
-    grid-column: 2 / -1; grid-row: 1;
-    overflow: visible; max-height: none;
+    grid-column: 2; grid-row: 1;
+    overflow: visible; max-height: 200px;
     padding: 10px 14px; gap: 6px;
   }
   .body .sec-schedule {
-    grid-column: 2; grid-row: 2;
+    grid-column: 2; grid-row: 2 / 4;
     min-height: 0; max-height: 100%;
     overflow: auto; overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
   }
   .body .sec-more {
-    grid-column: 3; grid-row: 2;
-    min-height: 0; max-height: 100%;
-    overflow: auto; overscroll-behavior: contain;
+    display: none; /* Fun empty · missions tucked; schedule spans mid+bot */
   }
+
   .sec-chores { gap:10px; padding:14px; }
   .sec-chores .sec-title { font-size:16px; letter-spacing:0.12em; }
   .sec-chores .quest {
@@ -306,7 +310,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   }
 
   body.theme-ainsley{background:#12140f;color:#d4d0c0}
-  .panel {width:1920px;min-height: 1200px; height: auto;padding:12px 20px 6px;display:flex;flex-direction:column;gap:8px;position:relative;overflow: visible;
+  .panel {width:1080px;min-height: 1920px; height: auto;padding:12px 20px 6px;display:flex;flex-direction:column;gap:8px;position:relative;overflow: visible;
     background-color:#12140f;
     background-image:
       radial-gradient(ellipse 65% 42% at 50% -6%,rgba(184,90,40,.14),transparent 55%),

@@ -50,7 +50,7 @@
       panel.style.transformOrigin = "top center";
       panel.style.transform = "scale(" + scale + ")";
       // reclaim layout gap when scaled down
-      var h = panel.offsetHeight || 1200;
+      var h = panel.offsetHeight || 1920;
       panel.style.marginBottom = Math.round(h * (scale - 1)) + "px";
       document.documentElement.style.setProperty("--house-zoom", String(scale));
     }

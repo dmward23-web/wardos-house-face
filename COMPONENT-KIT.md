@@ -7,7 +7,7 @@
 
 Companion: `../PRISM-HMI-HANDOFF.md` · `../HUB-LOCK.md` · `../DESIGN-SYSTEM.md`
 
-All primary plates: **1920×1200**. Phone export crop: **1170×731**.
+All primary plates: **1080×1920**. Phone export crop: **1170×731**.
 
 ---
 
@@ -15,7 +15,7 @@ All primary plates: **1920×1200**. Phone export crop: **1170×731**.
 
 | Token | Value / pattern |
 |-------|-----------------|
-| Canvas | `1920×1200`, `overflow: hidden` |
+| Canvas | `1080×1920`, `overflow: hidden` |
 | Base fill | `#d8dadf` |
 | Body text | `#121418` |
 | Type | `"Inter Display", "Inter", -apple-system, …` (local `fonts/`) |

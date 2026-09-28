@@ -9,7 +9,7 @@ cd board-os/house-face && python3 -m http.server 8765
 # → http://<host>:8765/sheet-index.html
 ```
 
-Or open any HTML via **Files → Open in Safari** / AirDrop the folder. Landscape **1920×1200** canvas.
+Or open any HTML via **Files → Open in Safari** / AirDrop the folder. Portrait **1080×1920** canvas · Elo 3202L.
 
 ## Page map
 
@@ -52,13 +52,13 @@ Relative paths only. Visual lock: soft glass, kids-first, zero homework vibe.
 
 | Plate | Size | Path |
 |-------|------|------|
-| Sheets index · tablet | 1920×1200 | `/workspace/board-os-house-index.png` |
+| Sheets index · tablet | 1080×1920 | `/workspace/board-os-house-index.png` |
 | Sheets index · phone | 1170×731 | `/workspace/board-os-house-index-phone.png` |
 | Gallery hero eight · phone | 1170×731 | `/workspace/board-os-house-gallery-phone.png` |
 | Gallery full · phone | 1170×2000 | `/workspace/board-os-house-gallery-full-phone.png` |
-| Desk · PIN gate · tablet | 1920×1200 | `/workspace/board-os-house-desk-gate.png` |
+| Desk · PIN gate · tablet | 1080×1920 | `/workspace/board-os-house-desk-gate.png` |
 | Desk · PIN gate · phone | 1170×731 | `/workspace/board-os-house-desk-gate-phone.png` |
-| Status stack · tablet | 1920×1200 | `/workspace/board-os-house-status.png` |
+| Status stack · tablet | 1080×1920 | `/workspace/board-os-house-status.png` |
 | Status stack · phone | 1170×731 | `/workspace/board-os-house-status-phone.png` |
 
 Reference week plate: `/workspace/board-os-house-face.png`.

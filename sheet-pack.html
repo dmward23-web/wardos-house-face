@@ -2,7 +2,7 @@
 <html lang="en" data-sound="on">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=1920" />
+<meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -35,13 +35,13 @@
  }
  * { box-sizing: border-box; margin: 0; padding: 0; }
  html, body {
- width: 1920px; min-height: 1200px; height: auto; overflow: auto;
+ width: 1080px; min-height: 1920px; height: auto; overflow: auto;
  background: #d8dadf; color: #121418;
  font-family: "Inter Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
  -webkit-font-smoothing: antialiased;
  }
  .panel {
- width: 1920px; min-height: 1200px; height: auto;
+ width: 1080px; min-height: 1920px; height: auto;
  padding: 18px 28px 12px;
  display: flex; flex-direction: column; gap: 12px;
  position: relative; overflow: visible;
@@ -222,7 +222,7 @@
  .ftr-meta { color: #8a8e96; }
 
 
- .body { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1.1fr; gap: 12px; }
+ .body { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr; /* portrait stack */ gap: 12px; }
  .tabs { display: flex; gap: 10px; flex-shrink: 0; }
  .tab {
  flex: 1; text-align: center; padding: 12px 14px; border-radius: 14px;
