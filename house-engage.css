@@ -2003,3 +2003,123 @@ body.theme-harris .sec-bank.bank-card {
     animation: none !important;
   }
 }
+
+
+/* —— BOARDSLAY1 · house-wide badass chrome · shared juice · Elo 1080×1920 —— */
+.panel.boardslay::before,
+.panel[data-boardslay]::before { opacity: 0.9; }
+.hdr {
+  position: relative;
+}
+.hdr::after {
+  content: "";
+  position: absolute; left: 12px; right: 12px; bottom: -2px; height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255,200,80,0.55), rgba(80,160,255,0.45), transparent);
+  pointer-events: none; opacity: 0.85;
+}
+.banner {
+  position: relative;
+  overflow: hidden;
+}
+.banner::after {
+  content: "";
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, transparent 0 40%, rgba(255,255,255,0.18) 50%, transparent 60%);
+  background-size: 220% 100%;
+  animation: board-shimmer 5.5s ease-in-out infinite;
+  opacity: 0.55;
+}
+@keyframes board-shimmer {
+  0%, 100% { background-position: 120% 0; }
+  50% { background-position: -20% 0; }
+}
+.hot-pill {
+  position: relative;
+  overflow: hidden;
+}
+.hot-pill::before {
+  content: "";
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: translateX(-120%);
+  animation: hot-sweep 3.8s ease-in-out infinite;
+}
+@keyframes hot-sweep {
+  0%, 60% { transform: translateX(-120%); }
+  80% { transform: translateX(120%); }
+  100% { transform: translateX(120%); }
+}
+.sec, .card, .zone, .cam, .ctrl, .sched, .connect, .set-row, .seg {
+  transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
+}
+.sec:active, .card:active, .cam:active, .ctrl:active {
+  transform: translateY(1px) scale(0.995);
+  filter: brightness(1.04);
+}
+.tile.is-bump, .kid-link.is-bump, .quest.is-bump, .seg-btn.is-bump, .set-btn.is-bump, .cbtn.is-bump {
+  animation: juice-ping 0.42s cubic-bezier(0.34, 1.6, 0.64, 1);
+}
+.leaveby {
+  position: relative;
+}
+.leaveby.is-hot {
+  box-shadow: 0 8px 0 #05080c, 0 0 36px rgba(255,180,40,0.35) !important;
+}
+.cam .cam-live.stub i {
+  background: #8a909a !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+.cam-feed {
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(255,255,255,0.08), transparent 70%),
+    linear-gradient(165deg, #1a1e24, #0c1016) !important;
+}
+.status-pill.on, .climate-pill.on, .sensi-status.is-live {
+  letter-spacing: 0.16em;
+}
+/* Index tile glow amp when boardslay */
+.tile-grid .tile {
+  transition: transform 0.14s cubic-bezier(0.34, 1.4, 0.64, 1), filter 0.14s ease, box-shadow 0.14s ease;
+}
+.tile-grid .tile:active {
+  transform: scale(0.96) !important;
+  filter: brightness(1.1) saturate(1.15);
+}
+.tile-grid .tile::after {
+  animation-duration: 4.8s !important;
+  opacity: 0.55 !important;
+}
+/* Dad command accents */
+body[data-theme="dan"] .banner,
+body[data-kid="dan"] .banner {
+  background: linear-gradient(105deg, #0e1014, #2a2e36 36%, #c87810 72%, #1a1408) !important;
+}
+body[data-theme="dan"] .banner-accent,
+body[data-kid="dan"] .banner-accent {
+  background: linear-gradient(180deg, #ffe080, #c87810) !important;
+}
+body[data-theme="dan"] .avatar,
+body[data-kid="dan"] .avatar {
+  background: linear-gradient(145deg, #ffe080, #c87810) !important;
+  color: #1a1000 !important;
+}
+body[data-theme="dan"] .name-accent,
+body[data-kid="dan"] .name-accent {
+  color: #c87810 !important;
+}
+/* Kid polish · keep unsquish · no fun/bonus restore */
+body.theme-ainsley .hdr,
+body.theme-hayes .hdr,
+body.theme-harris .hdr {
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 6px 0 #1a1e24, 0 14px 32px rgba(20,22,28,0.22), 0 0 28px rgba(255,200,80,0.12);
+}
+body.theme-ainsley .banner,
+body.theme-hayes .banner,
+body.theme-harris .banner {
+  box-shadow: 0 6px 0 #0a0c10, 0 14px 32px rgba(0,0,0,0.35), 0 0 28px rgba(255,255,255,0.08);
+}
+@media (prefers-reduced-motion: reduce) {
+  .banner::after, .hot-pill::before, .tile-grid .tile::after { animation: none !important; }
+}

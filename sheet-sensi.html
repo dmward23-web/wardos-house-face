@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE · SENSI · THERMOSTAT</title>
-<link rel="stylesheet" href="house-engage.css?v=P32" />
+<link rel="stylesheet" href="house-engage.css?v=BOARDSLAY1" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
@@ -169,15 +169,41 @@
   .panel[data-mode="Auto"] .banner{background:linear-gradient(105deg,#140c08,#3a2810 32%,#1a4068 68%,#061018)}
   .panel[data-mode="Off"] .banner{background:linear-gradient(105deg,#121418,#2a2e36 50%,#121418)}
   .seg-btn.on{transition:transform .12s ease, box-shadow .12s ease}
+
+  .dial-humid{z-index:1;display:inline-flex;align-items:center;gap:8px;margin-top:6px;
+    padding:8px 14px;border-radius:999px;font-size:18px;font-weight:900;letter-spacing:-0.02em;
+    background:rgba(0,0,0,0.42);border:2px solid rgba(255,255,255,0.22);color:#e8f4ff;
+    box-shadow:0 0 18px rgba(120,200,255,0.18)}
+  .dial-humid .humid-lab{font-size:11px;font-weight:800;letter-spacing:0.18em;opacity:0.75}
+  .dial-humid.is-empty{opacity:0.45;filter:grayscale(0.4)}
+  .set-row{position:relative;overflow:hidden;
+    background:linear-gradient(165deg,rgba(255,255,255,0.95),rgba(220,224,232,0.9));
+    border-width:4px}
+  .set-btn{width:100px;height:100px;border-radius:18px;font-size:48px;
+    background:linear-gradient(180deg,#fff,#c8ccd4);border-width:4px;
+    box-shadow:0 6px 0 #1a1e24,0 0 0 3px rgba(255,255,255,0.5)}
+  .set-val{font-size:72px;text-shadow:0 2px 0 rgba(255,255,255,0.8)}
+  .seg-btn{min-height:72px;font-size:20px;border-radius:14px;border-width:3px;
+    box-shadow:0 5px 0 #1a1e24, inset 0 1px 0 rgba(255,255,255,0.85)}
+  .seg-btn.on{transform:translateY(-2px);box-shadow:0 7px 0 #6a4010,0 0 22px rgba(255,180,40,0.45)!important}
+  .seg-btn.on.cool{box-shadow:0 7px 0 #0e2848,0 0 22px rgba(80,170,255,0.5)!important}
+  .seg-btn.on.auto{box-shadow:0 7px 0 #104820,0 0 22px rgba(80,220,120,0.45)!important}
+  .seg-btn.on.off{box-shadow:0 7px 0 #1a1e24,0 0 16px rgba(140,150,160,0.35)!important}
+  .seg-btn.is-bump{animation:juice-ping 0.4s cubic-bezier(0.34,1.6,0.64,1)}
+  .set-btn.is-bump{animation:juice-ping 0.4s cubic-bezier(0.34,1.6,0.64,1)}
+  .sensi-float{position:absolute;left:50%;top:18%;transform:translateX(-50%);z-index:20;pointer-events:none;
+    font-size:34px;font-weight:900;color:#ffe080;text-shadow:0 3px 0 #1a1000,0 0 16px #ffe080;
+    animation:vfx-float-up 0.85s cubic-bezier(0.22,1.2,0.36,1) forwards}
+  .status-pill.on{animation:sensi-badge-pulse 1.7s ease-in-out infinite}
   @media (prefers-reduced-motion: reduce){
-    .dial.is-live .ring-live,.dial.is-live .dial-badge,.dial.is-bump{animation:none}
+    .dial.is-live .ring-live,.dial.is-live .dial-badge,.dial.is-bump,.status-pill.on,.seg-btn.is-bump,.set-btn.is-bump,.sensi-float{animation:none}
     .ring-arc{transition:none}
   }
 
 </style>
 </head>
 <body>
-<div class="panel">
+<div class="panel" data-boardslay="1">
  <header class="hdr">
  <div class="hdr-left">
  <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="44" /></div>
@@ -199,7 +225,7 @@
  <div class="banner-accent"></div>
  <div class="banner-body">
  <div class="banner-lab">Sensi · not Nest</div>
- <div class="banner-title">Climate weapon · big ambient · mode energy</div>
+ <div class="banner-title">Climate weapon · live glass · mode punch</div>
  <div class="banner-sub">Polls data/sensi-live.json · no fake LIVE · Nest cams stay separate · Elo 3202L</div>
  </div>
  </section>
@@ -215,6 +241,7 @@
  <div class="dial-lab" id="sensi-dial-lab">Indoor · waiting</div>
  <div class="dial-ambient" id="sensi-ambient">—<span>°</span></div>
  <div class="dial-meta" id="sensi-dial-meta">mode · set · fan</div>
+ <div class="dial-humid" id="sensi-humid"><span class="humid-ico" aria-hidden="true">💧</span><span id="sensi-humid-val">—</span><span class="humid-lab">RH</span></div>
  <div class="dial-badge" id="sensi-dial-badge">CONNECT · STUB</div>
  </div>
  </section>
@@ -287,7 +314,7 @@
 <script src="house-clock.js?v=CT1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
-<script src="house-sensi.js?v=SENSI3"></script>
+<script src="house-sensi.js?v=SENSI3b"></script>
 <script>
 (function () {
   var S = window.HouseSensi;
@@ -376,11 +403,23 @@
     var panel = document.querySelector(".panel");
     if (panel) panel.setAttribute("data-mode", modeKey);
     var ring = document.getElementById("sensi-ring");
-    if (ring && typeof ambient === "number") {
+    var setN = liveOverride ? setpoint : state.setpoint;
+    if (ring && typeof setN === "number") {
       var C = 2 * Math.PI * 86;
-      var t = Math.max(0, Math.min(1, (ambient - 50) / 40));
+      var tt = Math.max(0, Math.min(1, (setN - 50) / 40));
       ring.style.strokeDasharray = C.toFixed(1);
-      ring.style.strokeDashoffset = (C * (1 - t)).toFixed(1);
+      ring.style.strokeDashoffset = (C * (1 - tt)).toFixed(1);
+    }
+    var hv = document.getElementById("sensi-humid-val");
+    var hh = document.getElementById("sensi-humid");
+    if (hv && hh) {
+      if (eff.humidity != null) {
+        hv.textContent = eff.humidity + "%";
+        hh.classList.remove("is-empty");
+      } else {
+        hv.textContent = "—";
+        hh.classList.add("is-empty");
+      }
     }
 
     var ftr = document.getElementById("sensi-ftr-status");
@@ -398,27 +437,42 @@
     paint();
   }
 
-  function bump() {
+  function bump(el) {
     var d = document.getElementById("sensi-dial");
-    if (!d) return;
-    d.classList.remove("is-bump");
-    void d.offsetWidth;
-    d.classList.add("is-bump");
+    if (d) { d.classList.remove("is-bump"); void d.offsetWidth; d.classList.add("is-bump"); }
+    if (el) { el.classList.remove("is-bump"); void el.offsetWidth; el.classList.add("is-bump"); }
+  }
+  function floatSet(delta) {
+    var row = document.querySelector(".set-row");
+    if (!row) return;
+    var f = document.createElement("div");
+    f.className = "sensi-float";
+    f.textContent = (delta > 0 ? "+" : "") + delta + "°";
+    row.appendChild(f);
+    setTimeout(function () { try { row.removeChild(f); } catch (e) {} }, 900);
+    try {
+      if (window.HouseSfx) {
+        if (HouseSfx.floatPopup) HouseSfx.floatPopup(row, (delta > 0 ? "+" : "") + delta + "°");
+        if (HouseSfx.boomAt) HouseSfx.boomAt(row, "tap");
+      }
+    } catch (e) {}
   }
   document.getElementById("sensi-minus").addEventListener("click", function () {
-    tap(); bump(); state.setpoint = S.clampSet(state.setpoint - 1); persist();
+    tap(); bump(this); floatSet(-1); state.setpoint = S.clampSet(state.setpoint - 1); persist();
   });
   document.getElementById("sensi-plus").addEventListener("click", function () {
-    tap(); bump(); state.setpoint = S.clampSet(state.setpoint + 1); persist();
+    tap(); bump(this); floatSet(1); state.setpoint = S.clampSet(state.setpoint + 1); persist();
   });
   document.querySelectorAll("#sensi-modes .seg-btn").forEach(function (b) {
     b.addEventListener("click", function () {
-      tap(); state.mode = b.getAttribute("data-mode"); persist();
+      tap(); bump(b);
+      try { if (window.HouseSfx && HouseSfx.screenShake) HouseSfx.screenShake(false); } catch (e) {}
+      state.mode = b.getAttribute("data-mode"); persist();
     });
   });
   document.querySelectorAll("#sensi-fans .seg-btn").forEach(function (b) {
     b.addEventListener("click", function () {
-      tap(); state.fan = b.getAttribute("data-fan"); persist();
+      tap(); bump(b); state.fan = b.getAttribute("data-fan"); persist();
     });
   });
 

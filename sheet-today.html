@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#d8dadf" />
 <meta name="description" content="WardOS House face · morning TODAY strip" />
 <title>BOARD-OS · HOUSE FACE · TODAY</title>
-<link rel="stylesheet" href="house-engage.css" />
+<link rel="stylesheet" href="house-engage.css?v=BOARDSLAY1" />
 <style>
  @font-face {
  font-family: "Inter Display";
@@ -502,6 +502,13 @@
  .where-card.custody-loud-card .sub { color: #c5d0de !important; }
  .where-card.custody-loud-card .sub strong { color: #7dffd4; }
 
+
+  /* BOARDSLAY1 · board punch */
+  .banner{position:relative;overflow:hidden}
+  .banner-title{letter-spacing:-0.035em;text-shadow:0 2px 0 rgba(0,0,0,0.28)}
+  .hdr{box-shadow:inset 0 2px 0 rgba(255,255,255,0.9),0 6px 0 #1a1e24,0 14px 30px rgba(20,22,28,0.2),0 0 22px rgba(255,200,80,0.1)!important}
+  .hot-pill{position:relative;overflow:hidden}
+  .sec,.card,.zone,.item-card,.chore,.quest{transition:transform .12s ease,filter .12s ease}
 </style>
 </head>
 <body>
@@ -665,6 +672,22 @@
 <script src="house-zoom.js"></script>
 <script>
 try { if (window.HouseWeather) HouseWeather.mount("#house-wx"); } catch (e) {}
+</script>
+<script src="house-sfx.js"></script>
+
+<script>
+(function(){
+  function wire(){
+    document.querySelectorAll("a,button,.tile,.quest,.chore,.card,.item,.cam,.ctrl-btn,.kid-link,[data-check]").forEach(function(el){
+      if (el.__bsfx) return; el.__bsfx = 1;
+      el.addEventListener("pointerdown", function(){
+        try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch(e){}
+      }, {passive:true});
+    });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wire);
+  else wire();
+})();
 </script>
 </body>
 </html>
