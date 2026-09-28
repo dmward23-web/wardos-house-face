@@ -2,7 +2,7 @@
 
 **Honest gate:** GitHub Pages is static. Nest / Google Home cams use **Google Device Access (SDM)** OAuth.
 
-**Status (2026-09-28 · NESTVID1):** Refresh token + `nest-sdm.json` on box (mode 600). **WebRTC live video works** via box proxy `scripts/nest-webrtc-proxy.mjs` → `nest-webrtc.html`. Proven tonight: **Front door** (384×512) + **Garage** (1920×1080) ICE connected + frames. Living Room / Kitchen returned SDM `FAILED_PRECONDITION` (not available). Tokens never on Pages.
+**Status (2026-09-28 · NESTSTILL1):** Refresh token + `nest-sdm.json` on box (mode 600). **WebRTC live** works on Atlas box proxy (`127.0.0.1:8787`) — proven Front door + Garage. **Pages/phone cannot reach box loopback** (that IP is the phone) → pads now show **real WebRTC stills** in `data/nest-snaps/` (Front / Garage / Backyard) via `scripts/nest-webrtc-still.mjs`. Viewer on Pages fails loud + still fallback (no silent black). Living / Kitchen: SDM unavailable. Tokens never on Pages.
 
 ## Live data flow (stage)
 
@@ -33,6 +33,21 @@ sheet-google-home.html polls every ~60s
   3. Browser builds Nest-legal SDP offer → proxy calls `GenerateWebRtcStream` → answer → ICE → `<video>`
   4. Elo / LAN: `node scripts/nest-webrtc-proxy.mjs --lan` then `?proxy=http://<box-ip>:8787&proxyToken=…`
   5. Secrets stay in `~/.config/wardos/` only — never git / never Pages
+
+  5. Secrets stay in `~/.config/wardos/` only — never git / never Pages
+
+### Pages stills (NESTSTILL1)
+
+Phone/Pages cannot talk to `127.0.0.1:8787` on the Atlas box. Capture frames on the box, commit jpgs:
+
+```bash
+# proxy + chrome CDP already running (or start them)
+node scripts/nest-webrtc-still.mjs --cams "Front,Garage,Backyard"
+git add data/nest-snaps/*.jpg data/nest-live.json
+git commit -m "NESTSTILL · refresh snaps" && git push
+```
+
+Pad thumbnails read `snapshotUrl` from `data/nest-live.json`. Live video remains box-local (`http://127.0.0.1:8787/nest-webrtc.html`) or LAN `?proxy=` when `--lan` is reachable.
 
 ## Credential Atlas must request from Dan
 

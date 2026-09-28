@@ -402,11 +402,31 @@
   }
 
 
+  function isPagesHost() {
+    try {
+      var h = location.hostname || "";
+      return /github\.io$/i.test(h) || /pages\.dev$/i.test(h);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function isLoopbackProxy(url) {
+    try {
+      var u = new URL(url, location.href);
+      return u.hostname === "127.0.0.1" || u.hostname === "localhost";
+    } catch (e) {
+      return /127\.0\.0\.1|localhost/.test(String(url || ""));
+    }
+  }
+
   function proxyBaseGuess() {
     try {
       var saved = localStorage.getItem("wardosNestProxy");
       if (saved) return saved.replace(/\/$/, "");
     } catch (e) {}
+    // On Pages/phone, do NOT default to 127.0.0.1 (that is the phone).
+    if (isPagesHost()) return "";
     return "http://127.0.0.1:8787";
   }
 
@@ -418,12 +438,13 @@
     try {
       token = localStorage.getItem("wardosNestProxyToken") || "";
     } catch (e) {}
-    var url =
-      "nest-webrtc.html?cam=" +
-      id +
-      "&proxy=" +
-      encodeURIComponent(proxy) +
-      (token ? "&proxyToken=" + encodeURIComponent(token) : "");
+    // Pages + loopback/missing proxy → viewer shows still fallback (not silent black).
+    // Only pass ?proxy= when we have a non-loopback URL (LAN) or we are on the box.
+    var url = "nest-webrtc.html?cam=" + id;
+    if (proxy && !(isPagesHost() && isLoopbackProxy(proxy))) {
+      url += "&proxy=" + encodeURIComponent(proxy);
+      if (token) url += "&proxyToken=" + encodeURIComponent(token);
+    }
     try {
       if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap();
     } catch (e) {}

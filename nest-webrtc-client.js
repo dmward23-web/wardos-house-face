@@ -20,6 +20,24 @@
     }
   }
 
+  function isPagesHost() {
+    try {
+      var h = location.hostname || "";
+      return /github\.io$/i.test(h) || /pages\.dev$/i.test(h);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function isLoopbackProxy(url) {
+    try {
+      var u = new URL(url, location.href);
+      return u.hostname === "127.0.0.1" || u.hostname === "localhost";
+    } catch (_) {
+      return /127\.0\.0\.1|localhost/.test(String(url || ""));
+    }
+  }
+
   function proxyBase() {
     var fromQs = qs("proxy");
     if (fromQs) {
@@ -32,11 +50,37 @@
       var saved = localStorage.getItem("wardosNestProxy");
       if (saved) return saved.replace(/\/$/, "");
     } catch (_) {}
-    // Same-origin when served by the proxy itself
-    if (/nest-webrtc/.test(location.pathname) || location.port === "8787") {
+    // Same-origin when served by the proxy itself (box / LAN)
+    if (location.port === "8787" || (location.protocol === "http:" && /nest-webrtc/.test(location.pathname) && !isPagesHost())) {
       return location.origin;
     }
+    // GitHub Pages / phone: 127.0.0.1 is THE PHONE, not Atlas — refuse silent black.
+    if (isPagesHost()) {
+      return "";
+    }
     return "http://127.0.0.1:8787";
+  }
+
+  function proxyUnreachableHint(base) {
+    if (!base) {
+      return (
+        "Live WebRTC needs the Atlas box proxy.\n\n" +
+        "This page is on GitHub Pages — http://127.0.0.1:8787 is YOUR phone, not the house box.\n\n" +
+        "What works tonight:\n" +
+        "• Google Home sheet pads show real Nest STILLS (data/nest-snaps)\n" +
+        "• Live video: on the Atlas box open http://127.0.0.1:8787/nest-webrtc.html\n" +
+        "• Elo / home LAN (if box reachable): run proxy with --lan, then\n" +
+        "  ?proxy=http://<box-lan-ip>:8787&proxyToken=…"
+      );
+    }
+    if (isPagesHost() && isLoopbackProxy(base)) {
+      return (
+        "Proxy is set to " + base + " but you are on Pages/phone.\n" +
+        "That address is this device, not Atlas. Clear localStorage wardosNestProxy\n" +
+        "or pass a reachable LAN ?proxy= URL. Pads stills remain on sheet-google-home.html."
+      );
+    }
+    return null;
   }
 
   function proxyToken() {
@@ -210,6 +254,12 @@
 
   async function fetchCameras() {
     var base = proxyBase();
+    var hint = proxyUnreachableHint(base);
+    if (!base || hint) {
+      var err = new Error(hint || "no nest proxy URL");
+      err.code = "NEST_PROXY_UNREACHABLE";
+      throw err;
+    }
     var r = await fetch(base + "/api/cameras", { headers: authHeaders(), cache: "no-store" });
     if (!r.ok) throw new Error("cameras HTTP " + r.status);
     return r.json();
@@ -335,6 +385,9 @@
   global.NestWebRtc = {
     proxyBase: proxyBase,
     proxyToken: proxyToken,
+    proxyUnreachableHint: proxyUnreachableHint,
+    isPagesHost: isPagesHost,
+    isLoopbackProxy: isLoopbackProxy,
     fetchCameras: fetchCameras,
     startStream: startStream,
     forceRecvonly: forceRecvonly,

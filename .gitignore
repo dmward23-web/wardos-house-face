@@ -11,8 +11,9 @@ nest-sdm.json
 nest-refresh.token
 **/nest-refresh.token
 .nest-secrets/
-# Nest stills (auth-downloaded); keep folder via .gitkeep
-data/nest-snaps/*.jpg
-data/nest-snaps/*.jpeg
-data/nest-snaps/*.png
-data/nest-snaps/*.webp
+# Nest stills: commit Pages-servable jpgs (no tokens in files). Keep .gitkeep.
+# Uncomment to ignore local-only scratch snaps:
+# data/nest-snaps/*.jpg
+# data/nest-snaps/*.jpeg
+# data/nest-snaps/*.png
+# data/nest-snaps/*.webp
