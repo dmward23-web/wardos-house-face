@@ -1,8 +1,8 @@
 {
   "status": "live",
-  "fetchedAt": "2026-09-28T02:20:48.977Z",
-  "updatedAt": "2026-09-28T02:20:48.977Z",
-  "source": "nest-sdm+webrtc-still",
+  "fetchedAt": "2026-09-28T18:29:33.357Z",
+  "updatedAt": "2026-09-28T18:29:33.357Z",
+  "source": "nest-sdm",
   "cameras": [
     {
       "id": "AVPHwEuWj4tCzdBjnBewJT9cxMmyuqJ44t2xEpZoHxHxy6X98PTT5LylTtkH09YotPY0laUf5oSLDS0FIHtzER2511VUJA",
@@ -23,9 +23,7 @@
       "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEuWj4tCzdBjnBewJT9cxMmyuqJ44t2xEpZoHxHxy6X98PTT5LylTtkH09YotPY0laUf5oSLDS0FIHtzER2511VUJA",
       "protocols": [
         "WEB_RTC"
-      ],
-      "snapCapturedAt": null,
-      "snapSize": null
+      ]
     },
     {
       "id": "AVPHwEszjDhfLzGUeifKqDy5RxbNgy-ak0LIcIeP_ne3v_vm8QWlxJrFgtF-bxW-yPgNqCGwjmYWuJUQZX-HK6paZASTlQ",
@@ -33,7 +31,7 @@
       "where": "Entry",
       "type": "DOORBELL",
       "online": null,
-      "snapshotUrl": "data/nest-snaps/front-door.jpg",
+      "snapshotUrl": null,
       "streamUrl": null,
       "traits": [
         "sdm.devices.traits.Info",
@@ -48,9 +46,7 @@
       "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEszjDhfLzGUeifKqDy5RxbNgy-ak0LIcIeP_ne3v_vm8QWlxJrFgtF-bxW-yPgNqCGwjmYWuJUQZX-HK6paZASTlQ",
       "protocols": [
         "WEB_RTC"
-      ],
-      "snapCapturedAt": "2026-09-28T02:19:53.734Z",
-      "snapSize": "384x512"
+      ]
     },
     {
       "id": "AVPHwEtJ7Bg8BNK_xeyUBSi4-8E7v9-b_1rH5UZSDNE7HNGH4uO44F8KpsbrYesj5DqMkGB_lRogpoYArP1Wo0aKF7-9Iw",
@@ -58,7 +54,7 @@
       "where": "Garage",
       "type": "CAMERA",
       "online": null,
-      "snapshotUrl": "data/nest-snaps/garage.jpg",
+      "snapshotUrl": null,
       "streamUrl": null,
       "traits": [
         "sdm.devices.traits.Info",
@@ -71,14 +67,12 @@
       "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEtJ7Bg8BNK_xeyUBSi4-8E7v9-b_1rH5UZSDNE7HNGH4uO44F8KpsbrYesj5DqMkGB_lRogpoYArP1Wo0aKF7-9Iw",
       "protocols": [
         "WEB_RTC"
-      ],
-      "snapCapturedAt": "2026-09-28T02:20:02.167Z",
-      "snapSize": "1920x1080"
+      ]
     },
     {
       "id": "AVPHwEtezQTp5yQU6h_0pWKlkCPORXdhYrCy96s1CVwjjT4NfAsP_hpfLy-kRlDF0ORI2c8AXwi9_Kq_yj_8rPZwyCH_6w",
       "name": "Kitchen camera",
-      "where": "Kitchen",
+      "where": "Cam",
       "type": "CAMERA",
       "online": null,
       "snapshotUrl": null,
@@ -94,9 +88,7 @@
       "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEtezQTp5yQU6h_0pWKlkCPORXdhYrCy96s1CVwjjT4NfAsP_hpfLy-kRlDF0ORI2c8AXwi9_Kq_yj_8rPZwyCH_6w",
       "protocols": [
         "WEB_RTC"
-      ],
-      "snapCapturedAt": null,
-      "snapSize": null
+      ]
     },
     {
       "id": "AVPHwEuvgj_bTQ6TzRNedMpdB-w5gs1bF2QHgvdTES9K5s9kshmS94FQCrNE_zPxr9PiWFmzVSCyRLj4f0G2RVo2biphPg",
@@ -104,7 +96,7 @@
       "where": "Yard",
       "type": "CAMERA",
       "online": null,
-      "snapshotUrl": "data/nest-snaps/backyard.jpg",
+      "snapshotUrl": null,
       "streamUrl": null,
       "traits": [
         "sdm.devices.traits.Info",
@@ -117,14 +109,12 @@
       "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEuvgj_bTQ6TzRNedMpdB-w5gs1bF2QHgvdTES9K5s9kshmS94FQCrNE_zPxr9PiWFmzVSCyRLj4f0G2RVo2biphPg",
       "protocols": [
         "WEB_RTC"
-      ],
-      "snapCapturedAt": "2026-09-28T02:20:10.039Z",
-      "snapSize": "640x360"
+      ]
     }
   ],
   "deviceCount": 5,
   "cameraCount": 5,
-  "stillsPending": false,
-  "stillNote": "WebRTC canvas stills via nest-webrtc-still.mjs · Pages-servable data/nest-snaps",
-  "error": "Living Room camera: timeout waiting for video frames; Kitchen camera: timeout waiting for video frames"
+  "stillsPending": true,
+  "stillNote": "WEB_RTC-only cams: GenerateImage/RTSP unsupported without event bridge. snapshotUrl null — never invent.",
+  "error": null
 }
