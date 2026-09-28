@@ -20,25 +20,28 @@
     return false;
   }
 
+  function todayIso() {
+    if (window.WardKids && window.WardKids.DAY_ISO) return window.WardKids.DAY_ISO;
+    if (window.HouseClock && HouseClock.iso) return HouseClock.iso();
+    try {
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Chicago",
+        year: "numeric", month: "2-digit", day: "2-digit"
+      }).format(new Date());
+    } catch (e) {
+      var d = new Date();
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    }
+  }
+
   function keyFor(el) {
     if (!usesShared(el)) return PAGE_KEY;
     var id = el.getAttribute("data-check") || "";
+    var dayIso = el.getAttribute("data-day-iso") || "";
     if (window.WardKids && typeof window.WardKids.checkKeyFor === "function") {
-      return window.WardKids.checkKeyFor(id, window.WardKids._data);
+      return window.WardKids.checkKeyFor(id, window.WardKids._data, dayIso || undefined);
     }
-    /* Fallback: kid+YYYY-MM-DD America/Chicago via HouseClock */
-    var iso = (window.HouseClock && HouseClock.iso) ? HouseClock.iso() : "";
-    if (!iso) {
-      try {
-        iso = new Intl.DateTimeFormat("en-CA", {
-          timeZone: "America/Chicago",
-          year: "numeric", month: "2-digit", day: "2-digit"
-        }).format(new Date());
-      } catch (e) {
-        var d = new Date();
-        iso = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-      }
-    }
+    var iso = dayIso || todayIso();
     var kid = (window.WardKids && window.WardKids.KID_FROM_CHECK && window.WardKids.KID_FROM_CHECK[id]) || "kid";
     var cadence = el.getAttribute("data-cadence") || "daily";
     if (cadence === "weekly" && window.WardKids && typeof window.WardKids.weekStartIso === "function") {
@@ -79,17 +82,56 @@
   }
 
   function checkNodes() {
-    return Array.prototype.slice.call(document.querySelectorAll("[data-check]"));
+    return Array.prototype.slice.call(document.querySelectorAll("[data-check]")).filter(function (el) {
+      /* Parent daily-week rows keep data-quest-id only; ignore stray wrappers */
+      if (el.classList.contains("daily-week") && el.querySelector(".day-tap")) return false;
+      return true;
+    });
+  }
+
+  function questRowFor(el) {
+    return el.closest(".quest, .chore") || el;
+  }
+
+  function refreshDailyRow(row) {
+    if (!row || !row.classList.contains("daily-week")) return;
+    var taps = row.querySelectorAll(".day-tap");
+    if (!taps.length) return;
+    var id = taps[0].getAttribute("data-check");
+    var doneN = 0;
+    taps.forEach(function (t) {
+      if (t.classList.contains("done")) doneN += 1;
+    });
+    var weekPay = parseInt(taps[0].getAttribute("data-stars") || "7", 10) || 7;
+    var weekDone = doneN >= 7;
+    row.classList.toggle("done", weekDone);
+    row.classList.toggle("open", !weekDone);
+    var hint = row.querySelector(".hint");
+    if (hint) {
+      hint.textContent = weekDone
+        ? "7/7 days · +$" + weekPay + " week unlocked"
+        : doneN + "/7 days · full week unlocks $" + weekPay;
+    }
+    var earn = row.querySelector(".star-earn");
+    if (earn && !earn.classList.contains("addon-tag")) {
+      earn.setAttribute("data-stars", String(weekPay));
+      earn.textContent = weekDone ? "+$" + weekPay : "$" + weekPay + " wk";
+    }
   }
 
   function applyDone(el, done, animate) {
-    var isChore = el.classList.contains("chore") || el.classList.contains("quest");
+    var isDayTap = el.classList.contains("day-tap");
+    var isChore = !isDayTap && (el.classList.contains("chore") || el.classList.contains("quest"));
     var isStar = el.classList.contains("tap-star");
 
     if (isStar) {
       el.classList.toggle("lit", done);
       el.classList.toggle("dim", !done);
       el.setAttribute("aria-pressed", done ? "true" : "false");
+    } else if (isDayTap) {
+      el.classList.toggle("done", done);
+      el.setAttribute("aria-pressed", done ? "true" : "false");
+      refreshDailyRow(questRowFor(el));
     } else {
       el.classList.toggle("done", done);
       if (isChore) {
@@ -104,9 +146,11 @@
             ? "done · nice!"
             : hint.getAttribute("data-hint-open") || "tap when done";
         }
-        if (earn) {
+        if (earn && !earn.classList.contains("addon-tag")) {
           var n = earn.getAttribute("data-stars") || "1";
-          earn.textContent = done ? "★ +" + n : "★ " + n;
+          var prefix = (earn.textContent || "").indexOf("$") >= 0 ? "$" : "★ ";
+          if (prefix === "$") earn.textContent = done ? "+$" + n : "$" + n;
+          else earn.textContent = done ? "★ +" + n : "★ " + n;
         }
       }
       var ring = ringEl(el);
@@ -208,11 +252,16 @@
   }
 
   function progressStats() {
-    /* Top progress bars = TODAY daily musts only (week jar uses bank fill) */
+    /* Top progress bars = TODAY daily must day-taps only (week jar uses bank fill) */
+    var today = todayIso();
     var nodes = checkNodes().filter(function (el) {
       if (el.getAttribute("data-optional") === "1" || el.classList.contains("addon")) return false;
       var cad = el.getAttribute("data-cadence") || "daily";
       if (cad === "weekly" || cad === "addon") return false;
+      if (el.classList.contains("day-tap")) {
+        return (el.getAttribute("data-day-iso") || today) === today;
+      }
+      /* legacy single daily row without day taps */
       return true;
     });
     var total = nodes.length;
@@ -361,11 +410,11 @@
     return stats;
   }
 
-  function refreshBankUI(checkId, done) {
+  function refreshBankUI(checkId, done, dayIso) {
     try {
       if (!window.WardKids) return;
       var data = window.WardKids._data;
-      var bank = window.WardKids.setCheck(checkId, done, data);
+      var bank = window.WardKids.setCheck(checkId, done, data, dayIso || undefined);
       if (bank) window.WardKids.renderBank(document, bank);
       var kidId = (window.WardKids.KID_FROM_CHECK || {})[checkId];
       if (kidId && data) {
@@ -381,19 +430,31 @@
       document.body.classList.add("rm-reduce");
     }
 
+    try {
+      if (window.WardKids && typeof window.WardKids.enhanceSharedChores === "function") {
+        window.WardKids.enhanceSharedChores(document, window.WardKids._data);
+      }
+    } catch (eEnh) { /* */ }
+
     var nodes = checkNodes();
     nodes.forEach(function (el) {
       var id = el.getAttribute("data-check");
       if (!id) return;
+      if (el.classList.contains("daily-week") && !el.classList.contains("day-tap")) return;
 
+      var dayIso = el.getAttribute("data-day-iso") || "";
       var key = keyFor(el);
       var state = loadKey(key);
       if (Object.prototype.hasOwnProperty.call(state, id)) {
         applyDone(el, !!state[id], false);
+      } else if (el.classList.contains("day-tap") && window.WardKids && typeof window.WardKids.getCheck === "function") {
+        applyDone(el, !!window.WardKids.getCheck(id, window.WardKids._data, dayIso), false);
       }
 
-      el.setAttribute("role", el.getAttribute("role") || "button");
-      el.setAttribute("tabindex", el.getAttribute("tabindex") || "0");
+      if (!el.classList.contains("day-tap")) {
+        el.setAttribute("role", el.getAttribute("role") || "button");
+        el.setAttribute("tabindex", el.getAttribute("tabindex") || "0");
+      }
 
       if (el.getAttribute("data-wired") === "1") return;
       el.setAttribute("data-wired", "1");
@@ -403,16 +464,22 @@
           ev.preventDefault();
           ev.stopPropagation();
         }
+        /* Daily week rows are shells — only .day-tap buttons count */
+        if (el.classList.contains("daily-week") && !el.classList.contains("day-tap")) return;
         var nowDone = el.classList.contains("tap-star")
           ? !el.classList.contains("lit")
           : !el.classList.contains("done");
         applyDone(el, nowDone, true);
         if (nowDone && !(window.HouseSfx && usesShared(el))) cheerDing();
-        var k = keyFor(el);
-        var st = loadKey(k);
-        st[id] = nowDone;
-        saveKey(k, st);
-        if (usesShared(el)) refreshBankUI(id, nowDone);
+        var iso = el.getAttribute("data-day-iso") || "";
+        if (usesShared(el) && window.WardKids && typeof window.WardKids.setCheck === "function") {
+          refreshBankUI(id, nowDone, iso || undefined);
+        } else {
+          var k = keyFor(el);
+          var st = loadKey(k);
+          st[id] = nowDone;
+          saveKey(k, st);
+        }
         evaluateClear(true);
       }
 
@@ -422,6 +489,8 @@
       });
     });
 
+    document.querySelectorAll(".quest.daily-week, .chore.daily-week").forEach(refreshDailyRow);
+
     evaluateClear(false);
   }
 
@@ -429,6 +498,14 @@
 
   function start() {
     document.addEventListener("house:kid-rendered", function () {
+      wireChecks();
+    });
+    document.addEventListener("house:kids-data-ready", function () {
+      try {
+        if (window.WardKids && window.WardKids.enhanceSharedChores) {
+          window.WardKids.enhanceSharedChores(document, window.WardKids._data);
+        }
+      } catch (e) { /* */ }
       wireChecks();
     });
     wireChecks();

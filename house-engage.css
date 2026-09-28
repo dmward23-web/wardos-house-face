@@ -2123,3 +2123,93 @@ body.theme-harris .banner {
 @media (prefers-reduced-motion: reduce) {
   .banner::after, .hot-pill::before, .tile-grid .tile::after { animation: none !important; }
 }
+
+
+/* ==== DAILY7 · per-day taps on daily musts (Sun–Sat) · week unlock pays ==== */
+.quest.daily-week,
+.chore.daily-week {
+  cursor: default;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px 12px;
+}
+.quest.daily-week:active,
+.chore.daily-week:active {
+  transform: none;
+}
+.quest.daily-week .quest-body,
+.chore.daily-week .txt {
+  flex: 1 1 160px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.quest-days {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 5px;
+  margin-top: 2px;
+}
+.day-tap {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 8px;
+  border: 3px solid rgba(40, 80, 40, 0.55);
+  background: rgba(255, 255, 255, 0.72);
+  color: #1a2018;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 2px 0 rgba(20, 22, 28, 0.2);
+  padding: 0;
+  line-height: 1;
+}
+.day-tap.is-today {
+  border-color: #d0a010;
+  box-shadow: 0 0 0 2px rgba(255, 200, 80, 0.55), 0 2px 0 rgba(20, 22, 28, 0.2);
+}
+.day-tap.done {
+  background: linear-gradient(180deg, #b8f060, #5cb820);
+  border-color: #1a7a18;
+  color: #0e3010;
+}
+.day-tap:active {
+  transform: translateY(2px) scale(0.94);
+}
+.day-tap.pop {
+  animation: star-pop 0.42s cubic-bezier(0.34, 1.7, 0.64, 1);
+}
+body.theme-ainsley .day-tap.is-today,
+body.theme-hayes .day-tap.is-today,
+body.theme-harris .day-tap.is-today {
+  border-color: #f0c040;
+}
+body.theme-ainsley .day-tap.done {
+  background: linear-gradient(180deg, #e8c878, #b88840);
+  border-color: #8a6020;
+  color: #2a1808;
+}
+body.theme-hayes .day-tap.done {
+  background: linear-gradient(180deg, #7dffc8, #2a9a78);
+  border-color: #0e6048;
+  color: #062820;
+}
+body.theme-harris .day-tap.done {
+  background: linear-gradient(180deg, #b8ff60, #4aa820);
+  border-color: #1a6a10;
+  color: #0e3010;
+}
+.quest.daily-week .star-earn,
+.chore.daily-week .star-earn {
+  align-self: center;
+}
+@media (max-width: 420px) {
+  .day-tap { width: 30px; height: 30px; min-width: 30px; font-size: 11px; }
+}

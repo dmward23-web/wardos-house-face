@@ -28,7 +28,7 @@
     "ain-dishwasher": "ainsley", "ain-empty": "ainsley", "ain-living": "ainsley",
     "ain-bath": "ainsley", "ain-laundry": "ainsley", "ain-cubby": "ainsley", "ain-babysit": "ainsley",
     "hay-bed": "hayes", "hay-backpack": "hayes", "hay-dishes": "hayes", "hay-empty": "hayes", "hay-trash": "hayes",
-    "hay-postgame": "hayes", "hay-shower": "hayes", "hay-room": "hayes", "hay-cubby": "hayes",
+    "hay-postgame": "hayes", "hay-shower": "hayes", "hay-room": "hayes", "hay-shoes": "hayes", "hay-cubby": "hayes",
     "har-bed": "harris", "har-backpack": "harris", "har-dishes": "harris", "har-empty": "harris", "har-trash": "harris",
     "har-postgame": "harris", "har-shower": "harris", "har-toys": "harris", "har-shoes": "harris", "har-cubby": "harris"
   };
@@ -62,20 +62,110 @@
 
   var WEEKLY_IDS = {
     "ain-bath": 1, "ain-laundry": 1, "ain-cubby": 1,
-    "hay-room": 1, "hay-cubby": 1,
+    "hay-room": 1, "hay-shoes": 1, "hay-cubby": 1,
     "har-toys": 1, "har-shoes": 1, "har-cubby": 1
   };
+  var DOW_SHORT = ["S", "M", "T", "W", "T", "F", "S"];
+  var DOW_LONG = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  function checkKeyFor(checkId, data) {
+  function checkKeyFor(checkId, data, dayIso) {
     var kidId = KID_FROM_CHECK[checkId];
     if (!kidId) return CHECK_KEY;
     var meta = questMeta(kidId, checkId, data || (global.WardKids && global.WardKids._data));
     var weekly = meta.cadence === "weekly" || !!WEEKLY_IDS[checkId];
+    var iso = dayIso || DAY_ISO;
     if (weekly) {
-      return CHECK_PREFIX + kidId + ":week:" + weekStartIso(DAY_ISO);
+      return CHECK_PREFIX + kidId + ":week:" + weekStartIso(iso);
     }
-    /* daily musts + soft/addon — reset each Chicago morning */
-    return CHECK_PREFIX + kidId + ":" + DAY_ISO;
+    /* daily musts + soft/addon — keyed per Chicago day (Sun–Sat taps) */
+    return CHECK_PREFIX + kidId + ":" + iso;
+  }
+
+  function weekDayIsos(anchorIso) {
+    var start = weekStartIso(anchorIso || DAY_ISO);
+    var parts = String(start).split("-");
+    var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
+    var out = [];
+    for (var i = 0; i < 7; i++) {
+      out.push(d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()));
+      d.setDate(d.getDate() + 1);
+    }
+    return out;
+  }
+
+  function dailyDoneCount(checkId, data) {
+    var n = 0;
+    var days = weekDayIsos(DAY_ISO);
+    for (var i = 0; i < days.length; i++) {
+      if (getCheckRaw(checkId, data, days[i])) n += 1;
+    }
+    return n;
+  }
+
+  function dailyWeekComplete(checkId, data) {
+    return dailyDoneCount(checkId, data) >= 7;
+  }
+
+  /* Stars credited to jar for a must. Daily = stars×7 once week is 7/7 (not per-day pay). */
+  function bankStarsFor(kidId, checkId, data) {
+    var meta = questMeta(kidId, checkId, data);
+    if (meta.optional) return 0;
+    if (meta.cadence === "daily") return (meta.stars || 1) * 7;
+    return meta.stars || 1;
+  }
+
+  function recomputeDayStars(kidId, dayBag, data) {
+    var sum = 0;
+    if (!dayBag || !dayBag.earned) return 0;
+    Object.keys(dayBag.earned).forEach(function (k) {
+      if (dayBag.earned[k]) sum += bankStarsFor(kidId, k, data);
+    });
+    dayBag.stars = sum;
+    return sum;
+  }
+
+  function ensureDayBag(root, kidId, iso) {
+    if (!root[kidId]) root[kidId] = { days: {}, lifetime: 0, balance: 0 };
+    if (!root[kidId].days) root[kidId].days = {};
+    if (!root[kidId].days[iso]) root[kidId].days[iso] = { stars: 0, earned: {} };
+    if (!root[kidId].days[iso].earned) root[kidId].days[iso].earned = {};
+    return root[kidId].days[iso];
+  }
+
+  /** Daily musts: $ unlocks only when Sun–Sat all tapped. Credit stars×7 on week-start bucket. */
+  function syncDailyWeekBank(checkId, data) {
+    var kidId = KID_FROM_CHECK[checkId];
+    if (!kidId) return null;
+    var meta = questMeta(kidId, checkId, data);
+    if (meta.optional || meta.cadence !== "daily") return null;
+    var root = loadBankRoot();
+    if (!root[kidId]) root[kidId] = { days: {}, lifetime: 0, balance: 0 };
+    var days = weekDayIsos(DAY_ISO);
+    var ws = days[0];
+    var complete = dailyWeekComplete(checkId, data);
+    var wsBag = ensureDayBag(root, kidId, ws);
+    var wasCredited = !!(wsBag.earned && wsBag.earned[checkId]);
+    var pay = bankStarsFor(kidId, checkId, data);
+    var i, iso, bag;
+    for (i = 0; i < days.length; i++) {
+      iso = days[i];
+      bag = ensureDayBag(root, kidId, iso);
+      if (iso === ws) {
+        if (complete) bag.earned[checkId] = true;
+        else delete bag.earned[checkId];
+      } else if (bag.earned && bag.earned[checkId]) {
+        /* scrub legacy per-day credits for daily musts */
+        delete bag.earned[checkId];
+      }
+      recomputeDayStars(kidId, bag, data);
+    }
+    if (complete && !wasCredited) {
+      root[kidId].lifetime = (root[kidId].lifetime || 0) + pay;
+    } else if (!complete && wasCredited) {
+      root[kidId].lifetime = Math.max(0, (root[kidId].lifetime || 0) - pay);
+    }
+    saveBankRoot(root);
+    return getBankView(kidId, data);
   }
 
   function weekStarsFor(kidId) {
@@ -178,24 +268,22 @@
   function applyCheckToBank(checkId, done, data) {
     var kidId = KID_FROM_CHECK[checkId];
     if (!kidId) return null;
+    var meta = questMeta(kidId, checkId, data);
+    /* Daily musts bank only via syncDailyWeekBank (full-week unlock) */
+    if (meta.cadence === "daily" && !meta.optional) {
+      return syncDailyWeekBank(checkId, data);
+    }
     var pack = kidDayBank(kidId);
-    var stars = questStarsFor(kidId, checkId, data);
+    var stars = bankStarsFor(kidId, checkId, data);
     var was = !!pack.day.earned[checkId];
     if (done && !was) {
       pack.day.earned[checkId] = true;
-      pack.day.stars += stars;
       pack.bag.lifetime = (pack.bag.lifetime || 0) + stars;
     } else if (!done && was) {
-      pack.day.earned[checkId] = false;
-      pack.day.stars = Math.max(0, pack.day.stars - stars);
+      delete pack.day.earned[checkId];
       pack.bag.lifetime = Math.max(0, (pack.bag.lifetime || 0) - stars);
     }
-    // recompute day stars from earned map for safety
-    var sum = 0;
-    Object.keys(pack.day.earned).forEach(function (k) {
-      if (pack.day.earned[k]) sum += questStarsFor(kidId, k, data);
-    });
-    pack.day.stars = sum;
+    recomputeDayStars(kidId, pack.day, data);
     saveBankRoot(pack.root);
     return getBankView(kidId, data);
   }
@@ -302,40 +390,79 @@
     };
   }
 
-  function setCheck(checkId, done, data) {
-    var key = checkKeyFor(checkId, data);
+  function getCheckRaw(checkId, data, dayIso) {
+    var key = checkKeyFor(checkId, data, dayIso);
+    var state = loadKeyState(key);
+    if (Object.prototype.hasOwnProperty.call(state, checkId)) return !!state[checkId];
+    /* one-shot migrate from legacy flat key into day/week key (today only) */
+    if (!dayIso || dayIso === DAY_ISO) {
+      var legacy = loadChecks();
+      if (Object.prototype.hasOwnProperty.call(legacy, checkId)) {
+        state[checkId] = !!legacy[checkId];
+        saveKeyState(key, state);
+        return !!state[checkId];
+      }
+    }
+    return false;
+  }
+
+  function getCheck(checkId, data, dayIso) {
+    return getCheckRaw(checkId, data, dayIso);
+  }
+
+  function setCheck(checkId, done, data, dayIso) {
+    var kidId = KID_FROM_CHECK[checkId];
+    var meta = kidId
+      ? questMeta(kidId, checkId, data || (global.WardKids && global.WardKids._data))
+      : { cadence: "daily", stars: 1, optional: false };
+    var before = kidId ? getBankView(kidId, data) : null;
+    var was = before ? before.reached : false;
+    var beforeWeekDone = (meta.cadence === "daily" && !meta.optional)
+      ? dailyWeekComplete(checkId, data)
+      : false;
+    var beforeEarned = false;
+    if (kidId && meta.cadence !== "daily") {
+      try {
+        var packPre = kidDayBank(kidId);
+        beforeEarned = !!(packPre.day.earned && packPre.day.earned[checkId]);
+      } catch (ePre) { beforeEarned = false; }
+    }
+
+    var key = checkKeyFor(checkId, data, dayIso);
     var state = loadKeyState(key);
     state[checkId] = !!done;
     saveKeyState(key, state);
-    /* keep legacy blob in sync for old readers */
+    /* keep legacy blob in sync for old readers (today / weekly only) */
     try {
-      var legacy = loadChecks();
-      if (!!done) legacy[checkId] = true;
-      else delete legacy[checkId];
-      saveChecks(legacy);
+      if (!dayIso || dayIso === DAY_ISO || meta.cadence === "weekly") {
+        var legacy = loadChecks();
+        if (!!done) legacy[checkId] = true;
+        else delete legacy[checkId];
+        saveChecks(legacy);
+      }
     } catch (eL) { /* */ }
-    var kidId = KID_FROM_CHECK[checkId];
-    var before = kidId ? getBankView(kidId, data) : null;
-    var was = before ? before.reached : false;
-    /* Detect NEW bank before apply — no invented / double $ flash */
+
+    var bank = null;
     var newlyBanked = false;
-    if (kidId && done) {
-      try {
-        var packPre = kidDayBank(kidId);
-        newlyBanked = !(packPre.day.earned && packPre.day.earned[checkId]);
-      } catch (ePre) { newlyBanked = true; }
+    if (meta.cadence === "daily" && !meta.optional) {
+      var afterWeekDone = dailyWeekComplete(checkId, data);
+      newlyBanked = afterWeekDone && !beforeWeekDone;
+      bank = syncDailyWeekBank(checkId, data);
+    } else {
+      newlyBanked = !!(kidId && done && !beforeEarned && !meta.optional);
+      bank = applyCheckToBank(checkId, !!done, data);
     }
-    var bank = applyCheckToBank(checkId, !!done, data);
+
     if (bank && bank.reached && !was) {
       try { localStorage.setItem("house-bank-goal:" + bank.kidId, "1"); } catch (e) {}
       try {
         document.dispatchEvent(new CustomEvent("house:goal-hit", { detail: { kidId: bank.kidId, reward: bank.reward, bank: bank } }));
       } catch (e) {}
     }
-    /* Flash real $ only when this tap newly banks — 1★ = $1 · hire/addon = 0 */
-    if (bank && done && newlyBanked) {
+    /* Flash $ only when week unlocks (daily) or weekly/addon newly banks — 1★=$1 */
+    if (bank && newlyBanked) {
       try {
-        var bucks = questStarsFor(kidId, checkId, data);
+        var bucks = bankStarsFor(kidId, checkId, data);
         if (bucks > 0) {
           document.dispatchEvent(new CustomEvent("house:earn", {
             detail: { kidId: kidId, dollars: bucks, checkId: checkId, bank: bank }
@@ -346,23 +473,12 @@
     return bank;
   }
 
-  function getCheck(checkId, data) {
-    var key = checkKeyFor(checkId, data);
-    var state = loadKeyState(key);
-    if (Object.prototype.hasOwnProperty.call(state, checkId)) return !!state[checkId];
-    /* one-shot migrate from legacy flat key into day/week key */
-    var legacy = loadChecks();
-    if (Object.prototype.hasOwnProperty.call(legacy, checkId)) {
-      state[checkId] = !!legacy[checkId];
-      saveKeyState(key, state);
-      return !!state[checkId];
-    }
-    return false;
-  }
-
   function syncBankFromChecks(data) {
     Object.keys(KID_FROM_CHECK).forEach(function (id) {
-      applyCheckToBank(id, getCheck(id, data), data);
+      var kidId = KID_FROM_CHECK[id];
+      var meta = questMeta(kidId, id, data);
+      if (meta.cadence === "daily" && !meta.optional) syncDailyWeekBank(id, data);
+      else applyCheckToBank(id, getCheck(id, data), data);
     });
   }
 
@@ -382,10 +498,18 @@
     return '<div class="card quiet">' + esc(msg) + "</div>";
   }
 
-  function questHTML(q, done, kidId) {
+  function questHTML(q, done, kidId, data) {
     var optional = !!(q.optional || q.cadence === "addon");
     var cadence = q.cadence || (optional ? "addon" : "daily");
     var stars = optional ? 0 : (typeof q.stars === "number" ? q.stars : 1);
+    var weekPay = cadence === "daily" && !optional ? stars * 7 : stars;
+    var dayCount = 0;
+    var weekDone = false;
+    if (cadence === "daily" && !optional) {
+      dayCount = dailyDoneCount(q.id, data);
+      weekDone = dayCount >= 7;
+      done = weekDone;
+    }
     var open = done ? "done" : "open";
     var ring = done ? "✓" : (optional ? "+" : "·");
     var hint;
@@ -402,7 +526,9 @@
     } else if (cadence === "weekly") {
       hint = done ? "weekly clear · +$" + stars + " banked" : "weekly must · tap · +$" + stars + " (1★=$1)";
     } else {
-      hint = done ? "cleared · +$" + stars + " today" : "daily must · tap · +$" + stars + " (1★=$1)";
+      hint = weekDone
+        ? "7/7 days · +$" + weekPay + " week unlocked"
+        : dayCount + "/7 days · full week unlocks $" + weekPay + " (1★×7)";
     }
     var earn;
     if (optional) {
@@ -411,20 +537,45 @@
       } else {
         earn = '<span class="star-earn addon-tag">' + (done ? "OPTIONAL ✓" : "OPTIONAL") + "</span>";
       }
+    } else if (cadence === "daily") {
+      earn = '<span class="star-earn" data-stars="' + weekPay + '">' + (weekDone ? "+$" + weekPay : "$" + weekPay + " wk") + "</span>";
     } else {
-      /* 1★ = $1 · kids watch musts earn real money; theme chrome stays on FX */
       earn = '<span class="star-earn" data-stars="' + stars + '">' + (done ? "+$" + stars : "$" + stars) + "</span>";
     }
     var optAttr = optional ? ' data-optional="1"' : "";
     var hireAttr = (optional && q.hire) ? ' data-hire="1"' : "";
     var cadAttr = ' data-cadence="' + esc(cadence) + '"';
     var softClass = optional ? " addon soft" : "";
-    /* FAIL3 · always emit data-stars (0 for hire/optional) so dollarsFor never invents +$1 */
-    var starsAttr = ' data-stars="' + stars + '"';
+    var dailyClass = (cadence === "daily" && !optional) ? " daily-week" : "";
+    var starsAttr = ' data-stars="' + (cadence === "daily" && !optional ? weekPay : stars) + '"';
+
+    if (cadence === "daily" && !optional) {
+      var days = weekDayIsos(DAY_ISO);
+      var taps = "";
+      for (var di = 0; di < days.length; di++) {
+        var iso = days[di];
+        var dayOn = getCheck(q.id, data, iso);
+        var isToday = iso === DAY_ISO;
+        var cls = "day-tap" + (dayOn ? " done" : "") + (isToday ? " is-today" : "");
+        taps += '<button type="button" class="' + cls + '" data-check="' + esc(q.id) + '" data-day-iso="' + esc(iso) +
+          '" data-kid-quest="1" data-cadence="daily"' + starsAttr +
+          ' aria-label="' + DOW_LONG[di] + " · " + esc(q.what) + '" aria-pressed="' + (dayOn ? "true" : "false") + '">' +
+          DOW_SHORT[di] + "</button>";
+      }
+      return (
+        '<div class="quest ' + open + softClass + dailyClass + '" data-quest-id="' + esc(q.id) + '" data-kid-quest="1"' +
+        optAttr + hireAttr + cadAttr + starsAttr + ">" +
+        '<div class="quest-body"><div class="what">' + esc(q.what) + '</div><div class="hint">' + esc(hint) +
+        '</div><div class="quest-days" role="group" aria-label="Days this week">' + taps + "</div></div>" +
+        earn +
+        "</div>"
+      );
+    }
+
     return (
       '<div class="quest ' + open + softClass + '" data-check="' + esc(q.id) + '" data-kid-quest="1"' + optAttr + hireAttr + cadAttr + starsAttr + ' role="button" tabindex="0">' +
       '<span class="ring">' + ring + "</span>" +
-      "<div><div class=\"what\">" + esc(q.what) + '</div><div class="hint">' + esc(hint) + "</div></div>" +
+      '<div><div class="what">' + esc(q.what) + '</div><div class="hint">' + esc(hint) + "</div></div>" +
       earn +
       "</div>"
     );
@@ -442,8 +593,89 @@
   function renderQuests(el, quests, data, kidId) {
     if (!el) return;
     el.innerHTML = (quests || []).map(function (q) {
-      return questHTML(q, getCheck(q.id, data), kidId);
+      var optional = !!(q.optional || q.cadence === "addon");
+      var cadence = q.cadence || (optional ? "addon" : "daily");
+      var done = cadence === "daily" && !optional
+        ? dailyWeekComplete(q.id, data)
+        : getCheck(q.id, data);
+      return questHTML(q, done, kidId, data);
     }).join("");
+  }
+
+  /** Upgrade static sheet-chores rows: daily musts get Sun–Sat taps. */
+  function enhanceSharedChores(root, data) {
+    root = root || document;
+    data = data || (global.WardKids && global.WardKids._data);
+    if (!data) return;
+    var nodes = root.querySelectorAll(".chore[data-check], .quest[data-check]");
+    Array.prototype.forEach.call(nodes, function (el) {
+      if (el.classList.contains("day-tap")) return;
+      if (el.querySelector(".quest-days")) return;
+      var id = el.getAttribute("data-check");
+      if (!id || !KID_FROM_CHECK[id]) return;
+      var kidId = KID_FROM_CHECK[id];
+      var meta = questMeta(kidId, id, data);
+      el.setAttribute("data-cadence", meta.cadence);
+      el.setAttribute("data-stars", String(meta.optional ? 0 : (meta.cadence === "daily" ? meta.stars * 7 : meta.stars)));
+      if (meta.optional) el.setAttribute("data-optional", "1");
+      if (meta.cadence !== "daily" || meta.optional) return;
+
+      var weekPay = meta.stars * 7;
+      var dayCount = dailyDoneCount(id, data);
+      var weekDone = dayCount >= 7;
+      var whatEl = el.querySelector(".what");
+      var what = whatEl ? whatEl.textContent : id;
+      var days = weekDayIsos(DAY_ISO);
+      var taps = document.createElement("div");
+      taps.className = "quest-days";
+      taps.setAttribute("role", "group");
+      taps.setAttribute("aria-label", "Days this week");
+      for (var di = 0; di < days.length; di++) {
+        var iso = days[di];
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "day-tap" + (getCheck(id, data, iso) ? " done" : "") + (iso === DAY_ISO ? " is-today" : "");
+        btn.setAttribute("data-check", id);
+        btn.setAttribute("data-day-iso", iso);
+        btn.setAttribute("data-kid-quest", "1");
+        btn.setAttribute("data-cadence", "daily");
+        btn.setAttribute("data-stars", String(weekPay));
+        btn.setAttribute("aria-label", DOW_LONG[di] + " · " + what);
+        btn.setAttribute("aria-pressed", getCheck(id, data, iso) ? "true" : "false");
+        btn.textContent = DOW_SHORT[di];
+        taps.appendChild(btn);
+      }
+      var txt = el.querySelector(".txt") || el;
+      var hint = el.querySelector(".hint");
+      if (hint) {
+        hint.setAttribute("data-hint-open", dayCount + "/7 days · full week unlocks $" + weekPay);
+        hint.textContent = weekDone
+          ? "7/7 days · +$" + weekPay + " week unlocked"
+          : dayCount + "/7 days · full week unlocks $" + weekPay;
+      }
+      var earn = el.querySelector(".star-earn");
+      if (earn) {
+        earn.setAttribute("data-stars", String(weekPay));
+        earn.textContent = weekDone ? "+$" + weekPay : "$" + weekPay + " wk";
+      }
+      var kids = el.children;
+      for (var ri = 0; ri < kids.length; ri++) {
+        if (kids[ri].classList && kids[ri].classList.contains("ring")) {
+          kids[ri].style.display = "none";
+          break;
+        }
+      }
+      el.classList.add("daily-week");
+      el.classList.toggle("done", weekDone);
+      el.classList.toggle("open", !weekDone);
+      el.removeAttribute("role");
+      el.removeAttribute("tabindex");
+      /* Move data-check off the row so only day-taps toggle */
+      el.setAttribute("data-quest-id", id);
+      el.removeAttribute("data-check");
+      if (txt && txt !== el) txt.appendChild(taps);
+      else el.appendChild(taps);
+    });
   }
 
 
@@ -981,7 +1213,14 @@
     KID_FROM_CHECK: KID_FROM_CHECK,
     checkKeyFor: checkKeyFor,
     weekStartIso: weekStartIso,
+    weekDayIsos: weekDayIsos,
     weekStarsFor: weekStarsFor,
+    dailyDoneCount: dailyDoneCount,
+    dailyWeekComplete: dailyWeekComplete,
+    bankStarsFor: bankStarsFor,
+    syncDailyWeekBank: syncDailyWeekBank,
+    enhanceSharedChores: enhanceSharedChores,
+    questMeta: questMeta,
     loadChecks: loadChecks,
     saveChecks: saveChecks,
     loadKeyState: loadKeyState,
