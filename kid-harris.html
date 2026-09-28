@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HARRIS · BLOCK WORLD</title>
-<link rel="stylesheet" href="house-engage.css?v=P32" />
+<link rel="stylesheet" href="house-engage.css?v=KIDSLAY2" />
 <style>
 
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400}
@@ -122,39 +122,31 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     border:3px solid #8a6010; box-shadow:0 4px 0 #6a4010;
   }
 
-  /* LAYOUT32 · Prism kids grid · Elo 3202L portrait 1080×1920
-     cols 1.4fr / 1.6fr · rows grow / mid / bot · chores full-height */
+  /* KIDSLAY2 · 2-row · drop fun/bonus · chores+grow primary · schedule air */
   .body {
-    flex:1; min-height:0; display:grid; gap:12px;
-    grid-template-columns: 1.4fr 1.6fr;
-    grid-template-rows:
-      minmax(168px, 0.20fr)
-      minmax(300px, 0.44fr)
-      minmax(240px, 0.36fr);
+    flex:1; min-height:0; display:grid; gap:16px;
+    grid-template-columns: 1.35fr 1.65fr;
+    grid-template-rows: auto 1fr;
   }
   .body .sec-chores { grid-column: 1; grid-row: 1 / -1; }
-  .body .sec-bank { grid-column: 2; grid-row: 1; overflow: visible; max-height: 200px; }
-  .body .sec-schedule { grid-column: 2; grid-row: 2; min-height:0; }
-  .body .sec-more { grid-column: 2; grid-row: 3; min-height:0; }
+  .body .sec-bank { grid-column: 2; grid-row: 1; overflow: visible; max-height: none; }
+  .body .sec-schedule { grid-column: 2; grid-row: 2; min-height:0; overflow:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+  .body .sec-more { display: none !important; }
 
-  .sec-more > .sec-hdr:first-child .sec-title { font-size:16px; letter-spacing:0.1em; }
-  /* Boys layout: School = Schedule size (up), Fun bigger, Appointments smaller */
   .sec-schedule > .sec-list[data-mount-today-events],
-  .sec-schedule > .sec-list[data-mount-school] { flex: 1.35 1 0; min-height: 88px; }
-  .sec-schedule > .sec-list[data-mount-sports] { flex: 0.75 1 0; min-height: 56px; }
-  .sec-more > .sec-list[data-mount-appointments] { flex: 0.4 1 0; min-height: 44px; }
-  .sec-more > .sec-list[data-mount-fun] { flex: 1.9 1 0; min-height: 110px; }
-  .sec-more > .sec-list[data-mount-missions] { flex: 0.7 1 0; min-height: 48px; }
-  .sec-chores { gap:10px; padding:14px; }
-  .sec-chores .sec-title { font-size:17px; letter-spacing:0.1em; }
+  .sec-schedule > .sec-list[data-mount-school] { flex: 1.5 1 0; min-height: 120px; }
+  .sec-schedule > .sec-list[data-mount-sports] { flex: 1 1 0; min-height: 80px; }
+  .sec-schedule > .sec-list[data-mount-appointments] { flex: 0.45 1 0; min-height: 48px; }
+  .sec-chores { gap:12px; padding:16px; }
+  .sec-chores .sec-title { font-size:18px; letter-spacing:0.1em; }
   .sec-chores .quest {
-    padding:14px 16px; min-height:72px;
+    padding:16px 18px; min-height:84px;
     border-width:5px;
   }
-  .sec-chores .quest .what { font-size:18px; }
-  .sec-chores .quest .ring { width:44px; height:44px; font-size:24px; }
-  .sec-chores .quest .star-earn { font-size:16px; padding:10px 14px; min-height:44px; }
-  .sec-chores .sec-list { gap:10px; }
+  .sec-chores .quest .what { font-size:19px; }
+  .sec-chores .quest .ring { width:48px; height:48px; font-size:26px; }
+  .sec-chores .quest .star-earn { font-size:17px; padding:12px 16px; min-height:48px; }
+  .sec-chores .sec-list { gap:12px; }
   .quest.addon {
     border-style: dashed; border-color: #6a7088;
     background: rgba(120,130,160,0.12);
@@ -294,7 +286,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     border:1px dashed rgba(255,255,255,0.28)}
 
 
-  /* KIDSLAY1 · compact jar · air for schedule/school/fun */
+  /* KIDSLAY2 · jar stays clear · schedule owns the rest */
   .body .sec-bank { max-height: none !important; overflow: visible !important; min-height: 0; }
   .sec-bank.bank-card { padding: 10px 14px !important; gap: 6px !important; }
   .sec-bank .bank-count { font-size: 34px !important; }
@@ -305,8 +297,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .sec-bank .bank-links a { font-size: 13px !important; padding: 8px 12px !important; min-height: 40px !important; }
   .sec-bank .jar-flow { display: none !important; }
   .sec-bank .money-chip { padding: 6px 10px !important; font-size: 15px !important; min-height: 36px !important; }
-  /* Right cols may scroll if still clipped */
-  .body .sec-schedule, .body .sec-more { overflow: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  .body .sec-schedule { overflow: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; gap:10px; padding:14px; }
 </style>
 </head>
 <body data-clear-label="LEVEL UP!!!" data-kid="harris" data-theme="harris" data-chores-shared="1" class="theme-harris">
@@ -411,27 +402,12 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <section class="sec sec-schedule" aria-label="Schedule">
  <div class="sec-hdr"><div class="sec-title">Schedule · smash list</div><div class="sec-meta">week</div></div>
  <div class="sec-list" data-mount-today-events></div>
- <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">School / base</div></div>
+ <div class="sec-hdr" style="margin-top:8px"><div class="sec-title">School / base</div></div>
  <div class="sec-list" data-mount-school></div>
- <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Sports</div></div>
+ <div class="sec-hdr" style="margin-top:8px"><div class="sec-title">Sports</div></div>
  <div class="sec-list" data-mount-sports></div>
- </section>
- <section class="sec sec-more" aria-label="Appointments then more">
- <div class="sec-hdr"><div class="sec-title">Appointments</div></div>
+ <div class="sec-hdr" style="margin-top:8px"><div class="sec-title">Appointments</div></div>
  <div class="sec-list" data-mount-appointments></div>
- <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">🎉 FUN stuff</div></div>
- <div class="sec-list" data-mount-fun></div>
- <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Bonus</div></div>
- <div class="sec-list" data-mount-missions></div>
- <div class="craft-row" style="margin-top:8px" aria-label="Crafting">
- <div class="craft-grid" id="craft-grid">
- <div class="craft-cell" data-craft="0"></div><div class="craft-cell" data-craft="1"></div><div class="craft-cell" data-craft="2"></div>
- <div class="craft-cell" data-craft="3"></div><div class="craft-cell" data-craft="4"></div><div class="craft-cell" data-craft="5"></div>
- <div class="craft-cell" data-craft="6"></div><div class="craft-cell" data-craft="7"></div><div class="craft-cell" data-craft="8"></div>
- </div>
- <div class="craft-arrow">➜</div>
- <div class="craft-out" title="Diamond Pick (optional)">⛏️</div>
- </div>
  </section>
  </div>
  <div class="hotbar">
@@ -469,11 +445,11 @@ document.addEventListener("house:cleared", function(){
 </script>
 
 <script src="house-clock.js?v=CT1"></script>
-<script src="kids-data.js?v=GROW2b"></script>
-<script src="house-saves.js?v=GROW2b"></script>
+<script src="kids-data.js?v=KIDSLAY2"></script>
+<script src="house-saves.js?v=KIDSLAY2"></script>
 <script src="house-zoom.js"></script>
-<script src="house-sfx.js?v=GROW2b"></script>
-<script src="house-checkoffs.js" defer></script>
+<script src="house-sfx.js?v=KIDSLAY2"></script>
+<script src="house-checkoffs.js?v=KIDSLAY2" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
  if (window.HouseSaves) HouseSaves.mount("harris");

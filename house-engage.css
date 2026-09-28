@@ -1758,3 +1758,164 @@ body.theme-hayes .sec-chores .quest,
 body.theme-harris .sec-chores .quest {
   min-height: 72px !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════
+   KIDSLAY2 · Sun Sep 27 2026 · drop fun/bonus · unsquish hard
+   2-row grid: bank auto + schedule 1fr. Chores fat. No more panel.
+   Wins over LAYOUT32 3-row crush + KIDSLAY1 fun share.
+   ═══════════════════════════════════════════════════════════ */
+
+body.theme-ainsley .body,
+body.theme-hayes .body,
+body.theme-harris .body {
+  display: grid !important;
+  gap: 16px !important;
+  grid-template-columns: 1.35fr 1.65fr !important;
+  grid-template-rows: auto 1fr !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+}
+body.theme-ainsley .body .sec-chores,
+body.theme-hayes .body .sec-chores,
+body.theme-harris .body .sec-chores {
+  grid-column: 1 !important;
+  grid-row: 1 / -1 !important;
+}
+body.theme-ainsley .body .sec-bank,
+body.theme-hayes .body .sec-bank,
+body.theme-harris .body .sec-bank {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+body.theme-ainsley .body .sec-schedule,
+body.theme-hayes .body .sec-schedule,
+body.theme-harris .body .sec-schedule {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overflow: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  gap: 10px !important;
+  padding: 14px 16px !important;
+}
+/* Fun / bonus / more panel gone — no husk */
+body.theme-ainsley .body .sec-more,
+body.theme-hayes .body .sec-more,
+body.theme-harris .body .sec-more {
+  display: none !important;
+}
+
+/* Schedule lists · school+today get real air; appts smaller; sports mid */
+body.theme-ainsley .sec-schedule > .sec-list[data-mount-today-events],
+body.theme-ainsley .sec-schedule > .sec-list[data-mount-school],
+body.theme-hayes .sec-schedule > .sec-list[data-mount-today-events],
+body.theme-hayes .sec-schedule > .sec-list[data-mount-school],
+body.theme-harris .sec-schedule > .sec-list[data-mount-today-events],
+body.theme-harris .sec-schedule > .sec-list[data-mount-school] {
+  flex: 1.55 1 0 !important;
+  min-height: 120px !important;
+  overflow: auto !important;
+}
+body.theme-ainsley .sec-schedule > .sec-list[data-mount-sports],
+body.theme-hayes .sec-schedule > .sec-list[data-mount-sports],
+body.theme-harris .sec-schedule > .sec-list[data-mount-sports] {
+  flex: 1 1 0 !important;
+  min-height: 88px !important;
+  overflow: auto !important;
+}
+body.theme-ainsley .sec-schedule > .sec-list[data-mount-appointments],
+body.theme-hayes .sec-schedule > .sec-list[data-mount-appointments],
+body.theme-harris .sec-schedule > .sec-list[data-mount-appointments] {
+  flex: 0.45 1 0 !important;
+  min-height: 48px !important;
+  overflow: auto !important;
+}
+body.theme-ainsley .sec-schedule > .sec-list[data-mount-no-surprise],
+body.theme-ainsley .sec-schedule > .sec-list[data-mount-rides],
+body.theme-ainsley .sec-schedule > .sec-list[data-mount-her-space] {
+  flex: 0.7 1 0 !important;
+  min-height: 56px !important;
+  overflow: auto !important;
+}
+
+/* Cards breathe */
+body.theme-ainsley .sec-schedule .sec-list[data-mount-school] .card,
+body.theme-hayes .sec-schedule .sec-list[data-mount-school] .card,
+body.theme-harris .sec-schedule .sec-list[data-mount-school] .card,
+body.theme-ainsley .sec-schedule .sec-list[data-mount-today-events] .card,
+body.theme-hayes .sec-schedule .sec-list[data-mount-today-events] .card,
+body.theme-harris .sec-schedule .sec-list[data-mount-today-events] .card,
+body.theme-ainsley .sec-schedule .sec-list[data-mount-sports] .card,
+body.theme-hayes .sec-schedule .sec-list[data-mount-sports] .card,
+body.theme-harris .sec-schedule .sec-list[data-mount-sports] .card {
+  min-height: 64px !important;
+  padding: 14px 16px !important;
+}
+body.theme-ainsley .sec-schedule .sec-list[data-mount-appointments] .card,
+body.theme-hayes .sec-schedule .sec-list[data-mount-appointments] .card,
+body.theme-harris .sec-schedule .sec-list[data-mount-appointments] .card {
+  min-height: 48px !important;
+  padding: 10px 12px !important;
+}
+
+/* Chores PRIMARY · taller taps */
+body.theme-ainsley .sec-chores,
+body.theme-hayes .sec-chores,
+body.theme-harris .sec-chores {
+  gap: 12px !important;
+  padding: 16px !important;
+}
+body.theme-ainsley .sec-chores .sec-list,
+body.theme-hayes .sec-chores .sec-list,
+body.theme-harris .sec-chores .sec-list {
+  gap: 12px !important;
+}
+body.theme-ainsley .sec-chores .quest,
+body.theme-hayes .sec-chores .quest,
+body.theme-harris .sec-chores .quest {
+  min-height: 84px !important;
+  padding: 16px 18px !important;
+}
+body.theme-ainsley .sec-chores .quest .what,
+body.theme-hayes .sec-chores .quest .what,
+body.theme-harris .sec-chores .quest .what {
+  font-size: 18px !important;
+}
+body.theme-ainsley .sec-chores .quest .star-earn,
+body.theme-hayes .sec-chores .quest .star-earn,
+body.theme-harris .sec-chores .quest .star-earn {
+  min-height: 44px !important;
+  padding: 11px 14px !important;
+  font-size: 15px !important;
+}
+body.theme-hayes .sec-chores .quest .ring,
+body.theme-harris .sec-chores .quest .ring {
+  width: 48px !important;
+  height: 48px !important;
+}
+
+/* GROW / jar · readable, not crushed · still compact vs chores */
+body.theme-ainsley .sec-bank.bank-card,
+body.theme-hayes .sec-bank.bank-card,
+body.theme-harris .sec-bank.bank-card {
+  padding: 12px 16px !important;
+  gap: 8px !important;
+}
+.grow-meter {
+  gap: 12px !important;
+  margin: 4px 0 !important;
+  padding: 10px 12px !important;
+}
+.grow-stage {
+  flex: 0 0 88px !important;
+  width: 88px !important;
+  height: 112px !important;
+}
+.grow-total { font-size: 28px !important; }
+.grow-line { font-size: 16px !important; }
