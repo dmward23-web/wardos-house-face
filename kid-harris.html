@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=1920" />
+<meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HARRIS · BLOCK WORLD</title>
-<link rel="stylesheet" href="house-engage.css?v=KIDSLAY1" />
+<link rel="stylesheet" href="house-engage.css?v=P32" />
 <style>
 
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400}
@@ -17,7 +17,7 @@
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Bold.ttf") format("truetype");font-weight:700}
 
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:1920px;min-height:1200px;height:auto;overflow:auto;
+html,body{width:1080px;min-height:1920px;height:auto;overflow:auto;
 font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
 -webkit-font-smoothing:antialiased}
 
@@ -121,16 +121,22 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     background:linear-gradient(180deg,#ffe080,#e0a020); color:#1a1000;
     border:3px solid #8a6010; box-shadow:0 4px 0 #6a4010;
   }
-/* Hierarchy: chores → reward jar → schedule → appointments → rest */
+
+  /* LAYOUT32 · Prism kids grid · Elo 3202L portrait 1080×1920
+     cols 1.4fr / 1.6fr · rows grow / mid / bot · chores full-height */
   .body {
-    flex:1; min-height:0; display:grid; gap:10px;
-    grid-template-columns: 1.7fr 1.1fr 0.95fr;
-    grid-template-rows: auto minmax(520px, 1fr);
+    flex:1; min-height:0; display:grid; gap:12px;
+    grid-template-columns: 1.4fr 1.6fr;
+    grid-template-rows:
+      minmax(168px, 0.20fr)
+      minmax(300px, 0.44fr)
+      minmax(240px, 0.36fr);
   }
   .body .sec-chores { grid-column: 1; grid-row: 1 / -1; }
-  .body .sec-bank { grid-column: 2 / -1; grid-row: 1;  overflow: visible; max-height: none; }
+  .body .sec-bank { grid-column: 2; grid-row: 1; overflow: visible; max-height: 200px; }
   .body .sec-schedule { grid-column: 2; grid-row: 2; min-height:0; }
-  .body .sec-more { grid-column: 3; grid-row: 2; min-height:0; }
+  .body .sec-more { grid-column: 2; grid-row: 3; min-height:0; }
+
   .sec-more > .sec-hdr:first-child .sec-title { font-size:16px; letter-spacing:0.1em; }
   /* Boys layout: School = Schedule size (up), Fun bigger, Appointments smaller */
   .sec-schedule > .sec-list[data-mount-today-events],
@@ -217,7 +223,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
 
 
   body.theme-harris{background:#4a7a30;color:#1a2014}
-  .panel {width:1920px;min-height: 1200px; height: auto;padding:12px 20px 6px;display:flex;flex-direction:column;gap:8px;position:relative;overflow: visible;
+  .panel {width:1080px;min-height: 1920px; height: auto;padding:12px 20px 6px;display:flex;flex-direction:column;gap:8px;position:relative;overflow: visible;
     background-color:#6aaa48;
     background-image:linear-gradient(180deg,rgba(110,180,240,0.5) 0%,rgba(110,180,240,0.12) 18%,transparent 38%),
       url("theme-tiles/harris-blocks.png"),url("camo-glass-tile-house.png");

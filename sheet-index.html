@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=1920" />
+<meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon-20260926c.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="description" content="Board-OS House face · family sheets home index · jazz glass · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
-<link rel="stylesheet" href="house-engage.css?v=BARS2X" />
+<link rel="stylesheet" href="house-engage.css?v=P32" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -37,7 +37,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
-    width: 1920px; min-height: 1200px; height: auto; overflow: auto;
+    width: 1080px; min-height: 1920px; height: auto; overflow: auto;
     background: #d8dadf; color: #121418;
     font-family: "Inter Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -45,7 +45,7 @@
     touch-action: manipulation;
   }
   .panel {
-    width: 1920px; min-height: 1200px; height: auto;
+    width: 1080px; min-height: 1920px; height: auto;
     padding: 18px 28px 12px;
     display: flex; flex-direction: column; gap: 12px;
     position: relative; overflow: visible;
@@ -246,8 +246,8 @@
   .tile-grid {
     flex: 1; min-height: 0;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(7, 1fr);
     gap: 12px;
   }
 
@@ -545,6 +545,21 @@
   .tile.us .tile-label { color: #fff4f0; }
   .tile.us .tile-sub { color: #ffd0c8; font-weight: 700; }
 
+
+  .tile.google-home {
+    background: linear-gradient(165deg, #e8f0ff 0%, #c8d8f8 45%, #a8b8e0 100%);
+    border-color: #284878;
+  }
+  .tile.google-home::before { background: linear-gradient(90deg, #70a0f0, #284878); height: 6px; }
+  .tile.google-home .tile-icon {
+    background: linear-gradient(145deg, #70a0f0, #284878); color: #fff;
+    border-color: transparent; font-size: 22px; font-weight: 800;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.85), 0 6px 16px rgba(40,72,120,0.28);
+  }
+  .tile.google-home .tile-label { color: #142848; }
+  .tile.google-home .tile-sub { color: #2a4068; font-weight: 700; }
+  .tile.google-home .tile-tap { background: #142848; color: #e8f0ff; border-color: #284878; }
+
   .tile.load {
     background: linear-gradient(165deg, #ffe070 0%, #e0a820 48%, #a85808 100%);
     border-color: #805010;
@@ -750,6 +765,32 @@
   }
   .tile.harris .tile-tap { background: #ffe060; color: #1a1000; border: 2px solid #8a5010; font-weight: 800; }
 
+  /* —— CANVAS LAW · Elo 3202L portrait 1080×1920 —— */
+  .hdr { flex-wrap: wrap; gap: 12px; padding: 12px 14px; }
+  .hdr-left { flex-wrap: wrap; gap: 12px; }
+  .name { font-size: 34px; }
+  .tagline { font-size: 14px; }
+  .wx-card { min-width: 0; max-width: 100%; flex: 1 1 200px; }
+  .leaveby { min-height: 110px; }
+  .leaveby-main { font-size: 28px; }
+  .leaveby-badge { position: static; transform: none; align-self: center; margin: 10px 16px 10px 0; }
+  .leaveby { flex-wrap: wrap; }
+  .tile { min-height: 148px; padding: 14px 14px 12px; }
+  .tile-label { font-size: 22px; }
+  .tile.hayes, .tile.ainsley, .tile.harris, .tile.dan { min-height: 148px; }
+  .tile.ghome {
+    background: linear-gradient(165deg, #e8f4ff 0%, #5a9ad0 42%, #1a4068 100%);
+    border-color: #0e2848;
+  }
+  .tile.ghome::before { background: linear-gradient(90deg, #90c8f0, #2868a0); }
+  .tile.ghome .tile-icon {
+    background: linear-gradient(145deg, #c0e0ff, #2868a0); color: #fff;
+    border-color: transparent; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 5px 0 #0e2848;
+  }
+  .tile.ghome .tile-label { color: #f0f8ff; }
+  .tile.ghome .tile-sub { color: #c8e0f8; font-weight: 700; }
+  .tile.ghome .tile-tap { background: #0e2848; color: #c8e8ff; border-color: #2868a0; }
+
 </style>
 </head>
 <body>
@@ -944,6 +985,16 @@
  <span class="tile-tap">Tap</span>
  </a>
 
+
+
+ <a class="tile google-home" href="sheet-google-home.html">
+ <div class="tile-icon" aria-hidden="true">🏠</div>
+ <div>
+ <div class="tile-label">Google Home</div>
+ <div class="tile-sub">Lights · garage · cams · door</div>
+ </div>
+ <span class="tile-tap">Tap</span>
+ </a>
 
  <a class="tile desk" href="sheet-desk-gate.html">
  <div class="tile-icon" aria-hidden="true">▣</div>

@@ -36,7 +36,7 @@
     font-weight: 700; font-style: normal;
   }
   /* WardOS House face — soft white/grey glass camo + Inter Display (updated 19 Sep 2026)
-     Design canvas 1920×1200; scales to tablet / browser viewport. */
+     Design canvas 1080×1920; scales to tablet / browser viewport. */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
     width: 100%; min-height: 100%; height: auto;
@@ -60,12 +60,12 @@
     background: #d8dadf;
   }
   .scaler {
-    width: 1920px; height: 1200px;
+    width: 1080px; height: 1920px;
     flex-shrink: 0;
     transform-origin: center center;
   }
   .panel {
-    width: 1920px; min-height: 1200px; height: auto;
+    width: 1080px; min-height: 1920px; height: auto;
     padding: 22px 36px 14px;
     display: flex; flex-direction: column; gap: 10px;
     position: relative; overflow: visible;
@@ -362,15 +362,16 @@
   }
 
   .week-grid {
-    flex: 1; display: grid; grid-template-columns: repeat(7, 1fr);
-    gap: 12px; min-height: 0;
+    flex: 1; display: grid;
+    grid-template-columns: 1fr; /* portrait · day bands */
+    gap: 10px; min-height: 0;
   }
 
   .day {
     background: rgba(255,255,255,0.58);
     border: 1px solid rgba(255,255,255,0.88);
-    border-radius: 20px; padding: 12px 10px 10px;
-    display: flex; flex-direction: column; gap: 8px; min-height: 0;
+    border-radius: 20px; padding: 12px 14px;
+    display: flex; flex-direction: row; align-items: stretch; gap: 8px; min-height: 168px;
     box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 12px 28px rgba(20,22,28,0.08), 0 3px 8px rgba(20,22,28,0.04);
     cursor: pointer;
     transition: transform 0.12s ease, box-shadow 0.12s ease;
@@ -386,7 +387,11 @@
       0 14px 36px rgba(20,22,28,0.14);
     margin-top: -4px; margin-bottom: 4px;
   }
-  .day-top { display: flex; align-items: center; justify-content: space-between; gap: 4px; flex-shrink: 0; }
+  .day-top {
+    display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;
+    gap: 4px; flex-shrink: 0; width: 72px; padding-right: 12px;
+    border-right: 1px solid rgba(40,42,48,0.12);
+  }
   .dow { font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #6a7080; }
   .day.load .dow { color: #2a2e36; }
   .dom {
@@ -406,7 +411,13 @@
   .day.today .dow { color: #1a4a7a; }
   .day.today .dom { color: #0e3058; }
 
-  .blocks { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+  .blocks {
+    flex: 1; display: flex; flex-direction: row; flex-wrap: wrap;
+    align-content: flex-start; gap: 8px; min-height: 0; padding-left: 10px;
+  }
+  .blk { flex: 1 1 220px; max-width: 100%; }
+  .hdr { flex-wrap: wrap; }
+  .name { font-size: 36px; }
 
   .blk {
     border-radius: 14px; padding: 12px 12px; font-size: 13.5px; font-weight: 650;
@@ -774,7 +785,7 @@ function fit() {
  const stage = document.querySelector(".stage");
  const w = stage.clientWidth;
  const h = stage.clientHeight;
- const s = Math.min(w / 1920, h / 1200);
+ const s = Math.min(w / 1080, h / 1920);
  scaler.style.transform = `scale(${s})`;
 }
 
