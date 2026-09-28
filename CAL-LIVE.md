@@ -24,6 +24,19 @@ House Face UI
 - **Next Up** always advances to the real next calendar event (client-side filter inside a fresh window).
 - **No Wright cron** (law). Atlas may attach standing refresh later.
 
+## CAL-REFRESH HARDEN (2026-09-28)
+
+Standing routine **must** use data-only ship:
+
+```bash
+./scripts/house-board-calendar-refresh.sh /workspace/cal-dmward23-week.json --deploy
+```
+
+Allowlist only: `data/cal-live.json` · `kids-week.json` · `data/kids-week.json` · `kids-data.js`.
+**Never** overwrite `kid-*.html` / `sheet-*.html` / `heat-v3.css` / `house-engage.css` / `sensi-live.json` / `nest-live.json`.
+**Never** call `house-face-deploy.sh` for calendar refresh (stomped HEAT/CONSUME on e77984f).
+Atlas body rewrite: `/workspace/plates/2026-09-28/hub-tile-heat-v3/CAL-REFRESH-HARDEN.md`.
+
 ## Run refresh (Atlas box / on-arrival)
 
 ```bash

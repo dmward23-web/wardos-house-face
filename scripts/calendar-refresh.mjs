@@ -739,27 +739,60 @@ function main() {
   console.log("calendar-refresh: OK", JSON.stringify(receipt, null, 2));
 
   if (args.deployNote && !args.dryRun) {
-    const deploy = "/workspace/board-os/scripts/house-face-deploy.sh";
-    if (!fs.existsSync(deploy)) die("deploy script missing: " + deploy);
-    // Ensure board-os mirror has latest strip + week before deploy copies board-os → repo
-    // Also copy refreshed files from ROOT into mirror (script already mirrored week)
-    for (const f of ["house-board-strip.js", "kids-week.json", "kids-data.js", "DATE-LAW.md"]) {
-      const src = path.join(ROOT, f);
-      const dst = path.join(args.mirrorDir, f);
-      if (fs.existsSync(src) && args.mirrorDir) fs.copyFileSync(src, dst);
-    }
-    if (fs.existsSync(path.join(ROOT, "data", "kids-week.json")) && args.mirrorDir) {
+    // HARDEN 2026-09-28: data-only push. NEVER house-face-deploy.sh (full
+    // board-os copy stomped HEAT/CONSUME HTML/CSS + sensi/nest on cal refresh).
+    const allow = [
+      "kids-week.json",
+      "data/kids-week.json",
+      "data/cal-live.json",
+      "kids-data.js",
+    ];
+    // Mirror DATA only into board-os (no HTML/CSS/sensi/nest)
+    if (args.mirrorDir && fs.existsSync(args.mirrorDir)) {
+      for (const f of ["kids-week.json", "kids-data.js"]) {
+        const s = path.join(ROOT, f);
+        const d = path.join(args.mirrorDir, f);
+        if (fs.existsSync(s)) fs.copyFileSync(s, d);
+      }
       fs.mkdirSync(path.join(args.mirrorDir, "data"), { recursive: true });
-      fs.copyFileSync(
-        path.join(ROOT, "data", "kids-week.json"),
-        path.join(args.mirrorDir, "data", "kids-week.json")
-      );
+      for (const f of ["kids-week.json", "cal-live.json"]) {
+        const s = path.join(ROOT, "data", f);
+        const d = path.join(args.mirrorDir, "data", f);
+        if (fs.existsSync(s)) fs.copyFileSync(s, d);
+      }
     }
     const note = args.deployNote.includes("calendar")
       ? args.deployNote
       : `calendar refresh ${next.asOfIso} CT · ${args.deployNote}`;
-    const r = spawnSync(deploy, [note], { stdio: "inherit" });
-    if (r.status !== 0) die("deploy failed exit " + r.status, r.status || 5);
+    const addArgs = ["add", "--", ...allow.filter((f) => fs.existsSync(path.join(ROOT, f)))];
+    let r = spawnSync("git", addArgs, { cwd: ROOT, stdio: "inherit" });
+    if (r.status !== 0) die("git add failed exit " + r.status, r.status || 5);
+    // Refuse anything outside allowlist
+    const staged = spawnSync("git", ["diff", "--cached", "--name-only"], {
+      cwd: ROOT,
+      encoding: "utf8",
+    });
+    const allowSet = new Set(allow);
+    const bad = (staged.stdout || "").split("\n").map((s) => s.trim()).filter((s) => s && !allowSet.has(s));
+    if (bad.length) {
+      spawnSync("git", ["reset", "HEAD", "--", "."], { cwd: ROOT });
+      die("refusing to stage non-data files in calendar --deploy: " + bad.join(", "), 7);
+    }
+    const dirty = spawnSync("git", ["diff", "--cached", "--quiet"], { cwd: ROOT });
+    if (dirty.status === 0) {
+      console.log("calendar-refresh: CLEAN · no data changes to push");
+      return;
+    }
+    const msg = `House Face · ${note} · data-only`;
+    r = spawnSync(
+      "git",
+      ["-c", "user.email=dmward23@gmail.com", "-c", "user.name=dmward23-web", "commit", "-m", msg],
+      { cwd: ROOT, stdio: "inherit" }
+    );
+    if (r.status !== 0) die("git commit failed exit " + r.status, r.status || 5);
+    r = spawnSync("git", ["push", "origin", "main"], { cwd: ROOT, stdio: "inherit" });
+    if (r.status !== 0) die("git push failed exit " + r.status, r.status || 5);
+    console.log("calendar-refresh: PUSHED data-only · protected HTML/CSS/sensi/nest untouched");
   }
 }
 
