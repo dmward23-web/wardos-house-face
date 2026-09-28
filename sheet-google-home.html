@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE · CAMS · GOOGLE HOME</title>
-<link rel="stylesheet" href="house-engage.css?v=NESTSTILL1" />
+<link rel="stylesheet" href="house-engage.css?v=KITFIX1" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
@@ -229,7 +229,7 @@
  <div class="banner-accent"></div>
  <div class="banner-body">
  <div class="banner-lab">Google Home · climate + cameras</div>
- <div class="banner-title">Climate LIVE · Nest · tap for video</div>
+ <div class="banner-title">Climate + Nest · checking gate</div>
  <div class="banner-sub">Sensi live · Nest SDM · tap pad → WebRTC via box proxy · Elo 3202L</div>
  </div>
  </section>
@@ -265,13 +265,13 @@
  <section class="cam-zone" aria-label="Nest and Google Home cameras">
  <div class="zone-hdr">
  <div class="zone-title">Cameras · Nest / Google Home</div>
- <div class="zone-meta">5 cams · LIVE · tap for video</div>
+ <div class="zone-meta">Cams · checking gate · tap for video</div>
  </div>
- <div class="cam-path">Nest SDM <strong>LIVE</strong> · 5 cams · <strong>tap pad → WebRTC video</strong> (box <code>nest-webrtc-proxy</code> :8787) · tokens off Pages · NEST-LIVE.md</div>
+ <div class="cam-path">Nest SDM · checking gate · <strong>tap pad → WebRTC video</strong> (box <code>nest-webrtc-proxy</code> :8787) · tokens off Pages · NEST-LIVE.md</div>
  <div class="cam-grid">
  <article class="cam" aria-label="Living Room camera">
  <div class="cam-feed">
- <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
+ <span class="cam-live stub"><i></i>…</span>
  <span class="cam-glyph" aria-hidden="true">🛋</span>
  <span class="cam-stub">TAP · WebRTC live</span>
  </div>
@@ -282,7 +282,7 @@
  </article>
  <article class="cam" aria-label="Front door doorbell">
  <div class="cam-feed">
- <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
+ <span class="cam-live stub"><i></i>…</span>
  <span class="cam-glyph" aria-hidden="true">🚪</span>
  <span class="cam-stub">TAP · WebRTC live</span>
  </div>
@@ -293,7 +293,7 @@
  </article>
  <article class="cam" aria-label="Garage camera">
  <div class="cam-feed">
- <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
+ <span class="cam-live stub"><i></i>…</span>
  <span class="cam-glyph" aria-hidden="true">🏠</span>
  <span class="cam-stub">TAP · WebRTC live</span>
  </div>
@@ -304,7 +304,7 @@
  </article>
  <article class="cam" aria-label="Kitchen camera">
  <div class="cam-feed">
- <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
+ <span class="cam-live stub"><i></i>…</span>
  <span class="cam-glyph" aria-hidden="true">🍳</span>
  <span class="cam-stub">TAP · WebRTC live</span>
  </div>
@@ -315,7 +315,7 @@
  </article>
  <article class="cam" aria-label="Backyard camera">
  <div class="cam-feed">
- <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
+ <span class="cam-live stub"><i></i>…</span>
  <span class="cam-glyph" aria-hidden="true">🌳</span>
  <span class="cam-stub">TAP · WebRTC live</span>
  </div>
@@ -375,7 +375,7 @@
  </div>
  </section>
 
- <div class="note" id="cam-next-step"><strong>Cams = LIVE · tap for video.</strong> Run <code>node scripts/nest-webrtc-proxy.mjs</code> on Atlas box → open <code>http://127.0.0.1:8787/nest-webrtc.html</code> (or tap a pad). Elo LAN: <code>--lan</code> + <code>?proxy=http://&lt;box-ip&gt;:8787</code>. Tokens never on Pages. See <code>NEST-LIVE.md</code>.</div>
+ <div class="note" id="cam-next-step"><strong>Cams = checking gate · tap for video.</strong> Run <code>node scripts/nest-webrtc-proxy.mjs</code> on Atlas box → open <code>http://127.0.0.1:8787/nest-webrtc.html</code> (or tap a pad). Elo LAN: <code>--lan</code> + <code>?proxy=http://&lt;box-ip&gt;:8787</code>. Tokens never on Pages. See <code>NEST-LIVE.md</code>.</div>
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -386,11 +386,10 @@
  <span id="sensi-home-ftr">Atlas · Sensi live gate</span>
  </footer>
 </div>
-<script src="house-clock.js?v=NESTVID1"></script>
-<script src="house-zoom.js"></script>
+<script src="house-clock.js?v=KITFIX1"></script>
 <script src="house-sfx.js"></script>
-<script src="house-sensi.js?v=NESTVID1"></script>
-<script src="house-nest.js?v=NESTSTILL1"></script>
+<script src="house-sensi.js?v=KITFIX1"></script>
+<script src="house-nest.js?v=KITFIX1"></script>
 <script>
 (function () {
   document.querySelectorAll(".cam").forEach(function (el) {
