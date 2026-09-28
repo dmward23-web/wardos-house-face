@@ -594,8 +594,8 @@ leaveBy: {
  },
  week: {
  title: "This week",
- range: "Sun Sep 27 – Fri Oct 2 · Dad week @ 147th",
- banner: "with Dad @ 147th through Fri Oct 2 3:00",
+ range: "Fri Sep 25 3:00p → Fri Oct 2 3:00 · Dad week @ 147th",
+ banner: "Dad week Fri→Fri · with Dad @ 147th through Fri Oct 2 3:00",
  who: [
  { id: "ain", label: "Ainsley" },
  { id: "hay", label: "Hayes" },
@@ -605,46 +605,74 @@ leaveBy: {
  {
  dow: "Sat", dom: "26", load: false,
  blocks: [
- { type: "flight", time: "7:55", text: "Leave · Harris flag · game 8:30 Heritage F10", chips: ["har"] },
- { type: "kids", time: "9:00", text: "Hayes Chat & Chew @ home · LOCKED", chips: ["hay"] },
- { type: "urban", time: "10:30–12:45", text: "Quiet errands" },
- { type: "flight", time: "~2:10", text: "Leave · Hayes flag · game 2:45 Indian Hills", chips: ["hay"] }
+ { type: "flight", time: "7:40", text: "Leave · Harris flag · game 8:30 Heritage F10", chips: ["har"] },
+ { type: "kids", time: "9:00", text: "Hayes Chat & Chew told · LOCKED", chips: ["hay"] },
+ { type: "flight", time: "1:45", text: "Leave · Hayes flag · game 2:45 Indian Hills", chips: ["hay"] }
  ]
  },
  {
  dow: "Sun", dom: "27", load: false,
  blocks: [
  { type: "kids", time: "9–2", text: "Garage sale / house shake @ 147th", chips: ["ain","hay","har"] },
- { type: "handoff", time: "3:00", text: "Ainsley vanity · Jessy", chips: ["ain"] },
+ { type: "kids", time: "3:00", text: "Ainsley vanity · Jessy", chips: ["ain"] },
  { type: "urban", time: "6:00", text: "Lawn feed" }
  ]
  },
  {
  dow: "Mon", dom: "28", load: true,
  blocks: [
- { type: "kids", time: "7:30", text: "Hayes snacks", chips: ["hay"] },
+ { type: "kids", time: "7:30", text: "Hayes snacks in bag", chips: ["hay"] },
  { type: "flight", time: "8:00", text: "House+Desk LIVE" },
- { type: "flight", time: "~8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
+ { type: "flight", time: "8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
  { type: "kids", time: "3:00", text: "Ainsley LKMS HW Help", chips: ["ain"] },
- { type: "kids", time: "3:15/3:40", text: "Boys pickup", chips: ["hay","har"] },
- { type: "flight", time: "~5:40", text: "Leave · Hayes BB 6:15 BV Rec F3", chips: ["hay"] }
+ { type: "kids", time: "3:15", text: "Leave · boys pickup 3:40", chips: ["hay","har"] },
+ { type: "flight", time: "5:40", text: "Leave · Hayes BB 6:15 BV Rec F3", chips: ["hay"] }
  ]
  },
- { dow: "Tue", dom: "29", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
- { dow: "Wed", dom: "30", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
- { dow: "Thu", dom: "1", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
+ {
+ dow: "Tue", dom: "29", load: false,
+ blocks: [
+ { type: "flight", time: "8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
+ { type: "kids", time: "8:50", text: "Hayes · Madi + Randy collab @ SRE", chips: ["hay"] },
+ { type: "kids", time: "3:15", text: "Leave · boys pickup 3:40", chips: ["hay","har"] },
+ { type: "flight", time: "4:25", text: "Leave · Ainsley swim 5:00 Genesis", chips: ["ain"] },
+ { type: "flight", time: "5:40", text: "Leave · Hayes flag 6:00 SRE fields", chips: ["hay"] }
+ ]
+ },
+ {
+ dow: "Wed", dom: "30", load: false,
+ blocks: [
+ { type: "flight", time: "8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
+ { type: "kids", time: "school", text: "Boys hearing/vision screen @ SRE", chips: ["hay","har"] },
+ { type: "flight", time: "12:40", text: "Leave · Ainsley Midwest Anxiety 1:00", chips: ["ain"] },
+ { type: "kids", time: "3:15", text: "Leave · boys pickup 3:40", chips: ["hay","har"] },
+ { type: "kids", time: "5:30", text: "Randy therapy @ 147th · Hayes + Harris (flag SKIP)", chips: ["hay","har"] }
+ ]
+ },
+ {
+ dow: "Thu", dom: "1", load: false,
+ blocks: [
+ { type: "kids", time: "AM", text: "Boys PE · tennis shoes", chips: ["hay","har"] },
+ { type: "flight", time: "8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
+ { type: "kids", time: "3:00", text: "Ainsley LKMS HW Help", chips: ["ain"] },
+ { type: "kids", time: "3:15", text: "Leave · boys pickup 3:40", chips: ["hay","har"] },
+ { type: "flight", time: "4:25", text: "Leave · Ainsley swim 5:00 Genesis", chips: ["ain"] },
+ { type: "flight", time: "~4:55", text: "Leave · Hayes BB game 5:30 Falcons vs Lions F24", chips: ["hay"] }
+ ]
+ },
  {
  dow: "Fri", dom: "2", load: false,
  blocks: [
- { type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"] },
- { type: "handoff", time: "3:00", text: "Through · kids with Dad ends", chips: ["ain","hay","har"] }
+ { type: "flight", time: "8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
+ { type: "kids", time: "school", text: "Hayes field trip · museum + Meadowbrook", chips: ["hay"] },
+ { type: "kids", time: "3:00", text: "Dad week ends · kids at Mom's", chips: ["ain","hay","har"] }
  ]
  }
  ]
  },
  nextTogether: {
  label: "Watch",
- items: ["Sun 27 · garage sale 9–2", "Mon 28 · House+Desk LIVE 8:00", "Fri Oct 2 3:00 · Dad week end"]
+ items: ["Tue 29 · swim + flag stack", "Wed 30 · Anxiety + Randy therapy", "Thu 1 · swim + BB game", "Fri Oct 2 3:00 · Dad week end"]
  },
  footer: {
  note: "House · week board",
