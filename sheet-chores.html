@@ -344,6 +344,24 @@
   a.chip, a.kid-chip { text-decoration: none; color: inherit; cursor: pointer; }
   a.ftr-chip { text-decoration: none; color: inherit; cursor: pointer; }
 
+  /* DAILY7 · per-day taps */
+  .chore.daily-week { flex-wrap: wrap; align-items: flex-start; cursor: default; }
+  .chore.daily-week:active { transform: none; }
+  .chore.daily-week > .ring { display: none !important; }
+  .chore .quest-days { display: flex; gap: 5px; margin-top: 6px; flex-wrap: nowrap; }
+  .chore .day-tap {
+    width: 32px; height: 32px; min-width: 32px; border-radius: 8px;
+    border: 3px solid rgba(40,80,40,0.5); background: rgba(255,255,255,0.85);
+    font-size: 11px; font-weight: 800; color: #1a2018;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; padding: 0; box-shadow: 0 2px 0 rgba(20,22,28,0.18);
+  }
+  .chore .day-tap.is-today { border-color: #d0a010; box-shadow: 0 0 0 2px rgba(255,200,80,0.5); }
+  .chore .day-tap.done { background: linear-gradient(180deg,#b8f060,#5cb820); border-color:#1a7a18; color:#0e3010; }
+  .chore.ainsley .day-tap.done { background: linear-gradient(180deg,#e8c878,#b88840); border-color:#8a6020; }
+  .chore.hayes .day-tap.done { background: linear-gradient(180deg,#7dffc8,#2a9a78); border-color:#0e6048; }
+  .chore.harris .day-tap.done { background: linear-gradient(180deg,#b8ff60,#4aa820); border-color:#1a6a10; }
+
   /* Interactive checkoffs · soft scale + ✓ fill */
   .chore, .item, .check, .tap-star {
     -webkit-tap-highlight-color: transparent;
@@ -709,11 +727,11 @@
  </footer>
 </div>
 <script src="house-clock.js?v=CT1"></script>
-<script src="kids-data.js?v=PUTAWAY1"></script>
+<script src="kids-data.js?v=DAILY7"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
-<script src="house-checkoffs.js" defer></script>
-<script>document.addEventListener("DOMContentLoaded",function(){if(window.WardKids){WardKids.loadJSON(function(e,d){if(d){WardKids._data=d;WardKids.syncBankFromChecks(d);}});}})</script>
+<script src="house-checkoffs.js?v=DAILY7" defer></script>
+<script>document.addEventListener("DOMContentLoaded",function(){if(window.WardKids){WardKids.loadJSON(function(e,d){if(d){WardKids._data=d;WardKids.syncBankFromChecks(d);if(WardKids.enhanceSharedChores)WardKids.enhanceSharedChores(document,d);try{document.dispatchEvent(new CustomEvent("house:kids-data-ready",{detail:{data:d}}));}catch(err){}if(window.HouseCheckoffs&&HouseCheckoffs.rewire)HouseCheckoffs.rewire();}});}})</script>
 
 
 <script>
