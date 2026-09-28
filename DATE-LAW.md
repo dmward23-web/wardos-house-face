@@ -36,3 +36,11 @@ Permanent glance card on `sheet-index.html` (+ week board `index.html`). Big tem
 
 **Report only (Atlas owns arming):** Not found as an armed Notion agent/routine from this box (search returned empty; Notion agent search requires Business plan).  
 **Recommendation:** Arm it **yes** for overnight/`kids-week.json` + `boardStrip` fact refresh — but it must **not** restamp HTML dates. Dates are client-live forever. If the routine currently rewrites `sheet-index.html` day strings, strip that step.
+
+## Calendar live (CALFIX1 · 2026-09-28)
+
+Silent day-lagged boardStrip (Sun vanity on Mon glass) is **forbidden**.
+Authority: `data/cal-live.json` via `scripts/cal-from-events.mjs` (see **CAL-LIVE.md**).
+`house-board-strip.js` fail-closes to **CAL STALE** when cal-live missing / aged >6h / `asOfIso` ≠ Chicago today — never paints lagged kids-week vanity as Next Up.
+Past events DROP by calendar clock. No Wright cron — Atlas owns standing refresh / on-arrival.
+

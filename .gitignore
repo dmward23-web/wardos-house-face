@@ -17,3 +17,7 @@ nest-refresh.token
 # data/nest-snaps/*.jpeg
 # data/nest-snaps/*.png
 # data/nest-snaps/*.webp
+
+# Calendar dumps — never publish raw dmward23 events to Pages
+data/calendar-*.json
+**/calendar-dmward23*.json
