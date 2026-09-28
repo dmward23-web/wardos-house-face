@@ -2150,33 +2150,27 @@
     border-radius: 999px !important;
   }
   .back {
-    border-radius: 3px !important;
-    background: rgba(8,10,14,0.72) !important;
-    border: 1px solid rgba(64,232,255,0.35) !important;
-    color: #c8e8f4 !important;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 0 12px rgba(64,232,255,0.08) !important;
+    border-radius: 999px !important;
+    background: rgba(255,255,255,0.55) !important;
+    border: 1px solid rgba(40,50,64,0.16) !important;
+    color: #2a3440 !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.85) !important;
   }
-  .back .chev { color: var(--f1-cyan, #40e8ff) !important; }
+  .back .chev { color: var(--ho-cyan) !important; }
   .eyebrow { color: var(--ho-cyan) !important; text-shadow: none !important; }
-  .name, .name-accent { color: #f2f6fa !important; text-shadow: 0 1px 0 rgba(0,0,0,0.6) !important; }
-  .tagline { color: rgba(200,220,232,0.78) !important; }
+  .name, .name-accent { color: #12161c !important; text-shadow: 0 1px 0 rgba(255,255,255,0.55) !important; }
+  .tagline { color: #4a5564 !important; }
   .avatar {
     border-radius: 50% !important;
     background: linear-gradient(145deg, #f0f4f8, #c8d0d8) !important;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 2px rgba(40,50,64,0.12) !important;
     color: #2a3440 !important;
   }
-  /* HDRFIX1 · kill HUBSHIP1 white chrome · dark mission glass wins */
   .hdr {
-    background: linear-gradient(180deg, rgba(28,32,38,0.94) 0%, rgba(12,14,18,0.96) 100%) !important;
-    border: 1px solid rgba(64,232,255,0.42) !important;
-    border-radius: 4px !important;
-    box-shadow:
-      0 0 0 1px rgba(0,0,0,0.55),
-      inset 0 1px 0 rgba(255,255,255,0.28),
-      inset 0 -1px 0 rgba(0,0,0,0.45),
-      0 0 28px rgba(64,232,255,0.08),
-      0 10px 0 rgba(5,7,10,0.55) !important;
+    background: linear-gradient(165deg, rgba(255,255,255,0.88), rgba(236,240,244,0.78)) !important;
+    border: 1.5px solid rgba(40,50,64,0.14) !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 6px 0 rgba(40,48,60,0.08) !important;
   }
 
 
@@ -2583,120 +2577,86 @@
 
 
 
-  /* HDRFIX1 · thin chrome + oval status row (mock v5) · keep The Ward's */
+  /* THEWARDS1 · hub header spread · brand left · ovals center · date right */
   .hdr.hdr--spread {
     display: flex !important;
-    flex-direction: column !important;
-    flex-wrap: nowrap !important;
-    align-items: stretch !important;
-    justify-content: flex-start !important;
-    gap: 10px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    padding: 10px 14px 12px !important;
-  }
-  .hdr.hdr--spread .hdr-chrome {
-    display: flex !important;
     flex-direction: row !important;
+    flex-wrap: nowrap !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 12px !important;
+    gap: 18px !important;
     width: 100% !important;
-    min-width: 0 !important;
+    box-sizing: border-box !important;
+    padding: 12px 18px !important;
   }
   .hdr.hdr--spread .hdr-brand {
-    flex: 1 1 auto !important;
+    flex: 1 1 0 !important;
     min-width: 0 !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     gap: 12px !important;
   }
-  .hdr.hdr--spread .hdr-brand .id-text { gap: 1px !important; min-width: 0 !important; }
+  .hdr.hdr--spread .hdr-brand .id-text { gap: 1px !important; }
   .hdr.hdr--spread .hdr-brand .name {
-    font-size: 28px !important;
+    font-size: 30px !important;
     letter-spacing: -0.04em !important;
     line-height: 1.05 !important;
     white-space: nowrap !important;
-    color: #f2f6fa !important;
-    text-shadow: 0 1px 0 rgba(0,0,0,0.6) !important;
-  }
-  .hdr.hdr--spread .hdr-brand .name-accent {
-    color: #f2f6fa !important;
   }
   .hdr.hdr--spread .hdr-brand .tagline {
-    font-size: 12px !important;
+    font-size: 13px !important;
     white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    color: rgba(200,220,232,0.78) !important;
   }
   .hdr.hdr--spread .hdr-brand .eyebrow {
     font-size: 9px !important;
     letter-spacing: 0.2em !important;
-    color: var(--f1-cyan) !important;
-  }
-  .hdr.hdr--spread .hdr-trail {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 10px !important;
-    flex: 0 0 auto !important;
   }
   .hdr.hdr--spread .hdr-week {
-    margin-left: 0 !important;
+    margin-left: 4px !important;
     padding: 8px 12px !important;
     min-height: 40px !important;
     flex-shrink: 0 !important;
-  }
-  .hdr.hdr--spread .hdr-date {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
-    justify-content: center !important;
-    gap: 1px !important;
-    text-align: right !important;
-    padding: 2px 2px !important;
-    flex: 0 0 auto !important;
-  }
-  .hdr.hdr--spread .hdr-date-kicker {
-    font-size: 9px !important;
-    font-weight: 750 !important;
-    letter-spacing: 0.2em !important;
-    text-transform: uppercase !important;
-    color: rgba(160,200,220,0.55) !important;
-  }
-  .hdr.hdr--spread .hdr-date-dow {
-    font-size: 18px !important;
-    font-weight: 850 !important;
-    letter-spacing: -0.03em !important;
-    color: #f2f6fa !important;
-    line-height: 1 !important;
-  }
-  .hdr.hdr--spread .hdr-date-long {
-    font-size: 12px !important;
-    font-weight: 650 !important;
-    color: rgba(200,220,232,0.72) !important;
-    letter-spacing: -0.01em !important;
-    white-space: nowrap !important;
   }
   .hdr.hdr--spread .hdr-ovals {
     flex: 0 0 auto !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     gap: 8px !important;
-    width: 100% !important;
   }
-  .hdr.hdr--spread .hdr-ovals > .wx-card,
-  .hdr.hdr--spread .hdr-ovals > .sensi-hdr,
-  .hdr.hdr--spread .hdr-ovals > .nest-hdr {
+  .hdr.hdr--spread .hdr-date {
     flex: 1 1 0 !important;
     min-width: 0 !important;
-    max-width: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    text-align: right !important;
+    padding: 4px 2px !important;
   }
-
+  .hdr.hdr--spread .hdr-date-kicker {
+    font-size: 9px !important;
+    font-weight: 750 !important;
+    letter-spacing: 0.2em !important;
+    text-transform: uppercase !important;
+    color: rgba(15,23,32,0.45) !important;
+  }
+  .hdr.hdr--spread .hdr-date-dow {
+    font-size: 22px !important;
+    font-weight: 850 !important;
+    letter-spacing: -0.03em !important;
+    color: #12161c !important;
+    line-height: 1 !important;
+  }
+  .hdr.hdr--spread .hdr-date-long {
+    font-size: 13px !important;
+    font-weight: 650 !important;
+    color: rgba(40,50,64,0.72) !important;
+    letter-spacing: -0.01em !important;
+  }
 
 </style>
 </head>
@@ -2704,7 +2664,6 @@
 <div class="panel">
  <div class="float-orbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
  <header class="hdr hdr--spread">
- <div class="hdr-chrome">
  <div class="hdr-brand">
  <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
  <div class="id-text">
@@ -2712,20 +2671,17 @@
  <h1 class="name"><span class="name-accent">The Ward's</span></h1>
  <div class="tagline">Mission hub · tap a sheet</div>
  </div>
- </div>
- <div class="hdr-trail">
  <a class="back hdr-week" href="index.html?v=WEEKFIX1" aria-label="Back to House week"><span class="chev">‹</span> Week</a>
- <div class="hdr-date" aria-label="Today">
- <div class="hdr-date-kicker">Today</div>
- <div class="hdr-date-dow" data-live="dow">Mon</div>
- <div class="hdr-date-long" data-live="date-long">Mon Sep 28</div>
- </div>
- </div>
  </div>
  <div class="hdr-ovals" aria-label="Live house status">
  <div class="wx-card" id="house-wx" data-live="weather" aria-label="Weather · Overland Park"></div>
  <a class="sensi-hdr sensi-chip" id="index-sensi-chip" href="sheet-google-home.html" aria-label="Sensi thermostat">Sensi…</a>
  <a class="nest-hdr nest-chip" id="index-nest-chip" href="sheet-google-home.html" aria-label="Nest · Google Home">Nest…</a>
+ </div>
+ <div class="hdr-date" aria-label="Today">
+ <div class="hdr-date-kicker">Today</div>
+ <div class="hdr-date-dow" data-live="dow">Mon</div>
+ <div class="hdr-date-long" data-live="date-long">Mon Sep 28</div>
  </div>
  </header>
 
@@ -2965,7 +2921,7 @@
 </div>
 <script src="house-clock.js?v=HUBSHIP1"></script>
 <script src="house-board-strip.js?v=HUBSHIP1"></script>
-<script src="house-weather.js?v=HDRFIX1"></script>
+<script src="house-weather.js?v=HUBSHIP1"></script>
 <script src="house-sfx.js?v=HUBSHIP1"></script>
 <script src="house-sensi.js?v=HUBSHIP1"></script>
 <script src="house-nest.js?v=HUBSHIP1"></script>
