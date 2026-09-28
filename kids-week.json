@@ -189,7 +189,7 @@
       "bankGoal": {
         "id": "gem-jar",
         "title": "Gem Jar · earn then save",
-        "blurb": "Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Gem Jar $10 AND full $10 payday (1★=$1). Miss musts = short or no full payday. Jar = save what you earned — not free money.",
+        "blurb": "Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Gem Jar $10 AND full $10 payday (1★=$1). ALL musts required — jar/allowance locked until every Must is done. Jar = save what you earned — not free money.",
         "need": 10,
         "reward": "Payday with Dad after honest musts",
         "dollarNeed": 10,
@@ -288,8 +288,8 @@
       "missions": [
         {
           "when": "Anytime",
-          "what": "🔥 Musts clear = gems in the jar",
-          "hint": "full week → jar $10 + $10 payday",
+          "what": "🔥 ALL musts clear = gems in the jar",
+          "hint": "ALL musts → jar $10 + $10 payday",
           "tone": "fun"
         },
         {
@@ -420,7 +420,7 @@
       "bankGoal": {
         "id": "victory-jar",
         "title": "Victory Jar · earn then save",
-        "blurb": "Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Victory Jar $10 AND full $10 payday (1★=$1). Miss musts = short or no full payday. Jar = save what you earned — not free money.",
+        "blurb": "Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Victory Jar $10 AND full $10 payday (1★=$1). ALL musts required — jar/allowance locked until every Must is done. Jar = save what you earned — not free money.",
         "need": 10,
         "reward": "Payday with Dad after honest musts",
         "dollarNeed": 10,
@@ -519,8 +519,8 @@
       "missions": [
         {
           "when": "Every clear",
-          "what": "💥 Must done = coin banked in the jar",
-          "hint": "full week → jar $10 + $10 payday",
+          "what": "💥 ALL musts clear = coins in the jar",
+          "hint": "ALL musts → jar $10 + $10 payday",
           "tone": "fun"
         },
         {
@@ -688,7 +688,7 @@
       "bankGoal": {
         "id": "tour-jar",
         "title": "Tour Jar · earn then save",
-        "blurb": "Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Tour Jar $20 AND full $20 payday (1★=$1). Miss musts = short or no full payday. Babysit $15/hr = hire add-on, not jar.",
+        "blurb": "Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Tour Jar $20 AND full $20 payday (1★=$1). ALL musts required — jar/allowance locked until every Must is done. Babysit $15/hr = hire add-on, not jar.",
         "need": 20,
         "reward": "Payday with Dad after honest musts",
         "dollarNeed": 20,
