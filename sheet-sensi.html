@@ -144,7 +144,7 @@
  <div>
  <a class="eyebrow" href="sheet-google-home.html">House · climate</a>
  <h1 class="name"><span class="name-accent">Sensi</span> · thermostat</h1>
- <div class="tagline">147th · Emerson Sensi · DEMO controls</div>
+ <div class="tagline">147th · Emerson Sensi · live JSON when tokened</div>
  </div>
  </div>
  </div>
@@ -155,23 +155,23 @@
  <div class="banner-accent"></div>
  <div class="banner-body">
  <div class="banner-lab">Sensi · not Nest</div>
- <div class="banner-title">Thermostat panel · local DEMO · connect Emerson account</div>
- <div class="banner-sub">Separate stack from Google Home cams · no fake live telemetry · Elo 3202L</div>
+ <div class="banner-title">Thermostat panel · live when tokened · DEMO writes</div>
+ <div class="banner-sub">Polls data/sensi-live.json · no fake LIVE · Nest cams stay separate · Elo 3202L</div>
  </div>
  </section>
 
  <div class="thermo">
- <section class="dial" aria-label="Current temperature stub">
- <div class="dial-lab">Indoor · stub ambient</div>
- <div class="dial-ambient" id="sensi-ambient">72<span>°</span></div>
- <div class="dial-meta" id="sensi-dial-meta">Heat · set 70° · fan Auto</div>
- <div class="dial-badge">STUB · not live API</div>
+ <section class="dial" aria-label="Current temperature">
+ <div class="dial-lab" id="sensi-dial-lab">Indoor · waiting</div>
+ <div class="dial-ambient" id="sensi-ambient">—<span>°</span></div>
+ <div class="dial-meta" id="sensi-dial-meta">mode · set · fan</div>
+ <div class="dial-badge" id="sensi-dial-badge">CONNECT · STUB</div>
  </section>
 
  <section class="set-row" aria-label="Setpoint">
  <button type="button" class="set-btn" id="sensi-minus" aria-label="Lower setpoint">−</button>
  <div class="set-mid">
- <div class="set-lab">Setpoint · DEMO</div>
+ <div class="set-lab" id="sensi-set-lab">Setpoint · DEMO local</div>
  <div class="set-val" id="sensi-setpoint">70<span>°</span></div>
  </div>
  <button type="button" class="set-btn" id="sensi-plus" aria-label="Raise setpoint">+</button>
@@ -206,8 +206,8 @@
  <section class="connect" id="sensi-connect" aria-label="Connect Sensi account">
  <div class="connect-top">
  <div>
- <div class="connect-title" id="sensi-connect-title">Connect Sensi account</div>
- <div class="connect-sub" id="sensi-connect-sub">Opens Emerson Sensi web / app · then tap “I linked it” — honest local flag, no API yet</div>
+ <div class="connect-title" id="sensi-connect-title">Connect · need refresh token</div>
+ <div class="connect-sub" id="sensi-connect-sub">Atlas asks Dan for Sensi refresh_token (manager.sensicomfort.com DevTools) · see SENSI-LIVE.md · no password in chat</div>
  </div>
  </div>
  <div class="connect-actions">
@@ -215,13 +215,14 @@
  <button type="button" class="cbtn" id="sensi-open-app">Try Sensi app</button>
  <button type="button" class="cbtn" id="sensi-open-ios">App Store</button>
  <button type="button" class="cbtn" id="sensi-open-android">Play Store</button>
- <button type="button" class="cbtn ok" id="sensi-confirm" hidden>I linked it · mark CONNECTED</button>
- <button type="button" class="cbtn" id="sensi-disconnect" hidden>Disconnect flag</button>
+ <button type="button" class="cbtn" id="sensi-open-docs">Auth docs · SENSI-LIVE</button>
+ <button type="button" class="cbtn ok" id="sensi-confirm" hidden>Local flag · DEMO only</button>
+ <button type="button" class="cbtn" id="sensi-disconnect" hidden>Clear local flag</button>
  </div>
  </section>
  </div>
 
- <div class="note">DEMO controls persist in localStorage · Nest/Google Home cams stay a separate stack · Atlas can wire real Sensi later · Elo 3202L 1080×1920</div>
+ <div class="note" id="sensi-note">Live reads via data/sensi-live.json when Atlas has refresh_token · setpoint/mode/fan buttons stay DEMO until write path · Nest cams separate · Elo 3202L 1080×1920</div>
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -229,44 +230,78 @@
  <a class="ftr-chip" href="sheet-google-home.html">Cams hub</a>
  <a class="ftr-chip" href="sheet-index.html">Sheets</a>
  </div>
- <span>STUB · no live API</span>
+ <span id="sensi-ftr-status">CONNECT · STUB</span>
  </footer>
 </div>
 <script src="house-clock.js?v=CT1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
-<script src="house-sensi.js?v=SENSI1"></script>
+<script src="house-sensi.js?v=SENSI2"></script>
 <script>
 (function () {
   var S = window.HouseSensi;
   if (!S) return;
   var state = S.loadState();
+  var liveOverride = false;
 
   function tap() {
     try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
   }
 
   function paint() {
-    var connected = S.isConnected();
-    var mc = S.modeColor(state.mode);
-    document.getElementById("sensi-ambient").innerHTML = state.ambient + "<span>°</span>";
+    var eff = S.effectiveState();
+    var gate = eff.gate;
+    liveOverride = !!gate.live;
+
+    var ambient = liveOverride ? eff.ambient : state.ambient;
+    var setpoint = liveOverride ? eff.setpoint : state.setpoint;
+    var mode = liveOverride ? eff.mode : state.mode;
+    var fan = liveOverride ? eff.fan : state.fan;
+    /* When live, keep DEMO state in sync for display continuity; writes still local-only */
+    if (liveOverride) {
+      state.ambient = ambient;
+      state.setpoint = setpoint;
+      state.mode = mode;
+      state.fan = fan;
+    }
+
+    var mc = S.modeColor(mode);
+    document.getElementById("sensi-ambient").innerHTML = ambient + "<span>°</span>";
     document.getElementById("sensi-setpoint").innerHTML = state.setpoint + "<span>°</span>";
     document.getElementById("sensi-dial-meta").textContent =
-      state.mode + " · set " + state.setpoint + "° · fan " + state.fan;
+      mode + " · set " + (liveOverride ? setpoint : state.setpoint) + "° · fan " + fan
+      + (eff.humidity != null ? " · " + eff.humidity + "% RH" : "");
+    document.getElementById("sensi-dial-lab").textContent =
+      liveOverride ? ("Indoor · live" + (eff.name ? " · " + eff.name : "")) : "Indoor · DEMO / not live";
+    document.getElementById("sensi-dial-badge").textContent = gate.label;
+    document.getElementById("sensi-set-lab").textContent =
+      gate.writeSupported ? "Setpoint · live write" : "Setpoint · DEMO local (not sent to Sensi)";
+
     var pill = document.getElementById("sensi-status-pill");
-    pill.textContent = connected ? "CONNECTED · DEMO" : "CONNECT · STUB";
-    pill.classList.toggle("on", connected);
-    pill.classList.toggle("off", !connected);
+    pill.textContent = gate.label;
+    pill.classList.toggle("on", gate.live);
+    pill.classList.toggle("off", !gate.live);
 
     var box = document.getElementById("sensi-connect");
-    box.classList.toggle("ok", connected);
-    document.getElementById("sensi-connect-title").textContent =
-      connected ? "Sensi marked CONNECTED" : "Connect Sensi account";
-    document.getElementById("sensi-connect-sub").textContent = connected
-      ? "Local flag only · open app/web anytime · Nest cams stay separate · no live temps yet"
-      : "Opens Emerson Sensi web / app · then tap “I linked it” — honest local flag, no API yet";
-    document.getElementById("sensi-confirm").hidden = connected;
-    document.getElementById("sensi-disconnect").hidden = !connected;
+    box.classList.toggle("ok", gate.live);
+    var title = document.getElementById("sensi-connect-title");
+    var sub = document.getElementById("sensi-connect-sub");
+    if (gate.live) {
+      title.textContent = "LIVE · Emerson cloud snapshot";
+      sub.textContent = "Reads from data/sensi-live.json · writes still DEMO until writeSupported · Nest cams separate";
+    } else if (gate.kind === "need_token") {
+      title.textContent = "CONNECT · need refresh token";
+      sub.textContent = "Atlas must request Sensi refresh_token from Dan (manager.sensicomfort.com DevTools) · no password in chat · SENSI-LIVE.md";
+    } else if (gate.kind === "error" || gate.kind === "stale") {
+      title.textContent = "Live fetch issue · DEMO fallback";
+      sub.textContent = (gate.error || gate.label) + " · open manager or re-run sensi-fetch on Atlas";
+    } else {
+      title.textContent = "Connect · need refresh token";
+      sub.textContent = "Atlas asks Dan for Sensi refresh_token · see SENSI-LIVE.md · local DEMO until then";
+    }
+    var connectedFlag = S.isConnected();
+    document.getElementById("sensi-confirm").hidden = connectedFlag || gate.live;
+    document.getElementById("sensi-disconnect").hidden = !connectedFlag;
 
     document.querySelectorAll("#sensi-modes .seg-btn").forEach(function (b) {
       var on = b.getAttribute("data-mode") === state.mode;
@@ -282,6 +317,13 @@
 
     document.querySelector(".dial").style.boxShadow =
       "0 8px 0 #05080c, 0 18px 36px rgba(0,0,0,0.35), 0 0 48px " + mc.accent + "44";
+
+    var ftr = document.getElementById("sensi-ftr-status");
+    if (ftr) ftr.textContent = gate.label;
+    var note = document.getElementById("sensi-note");
+    if (note && gate.kind === "need_token") {
+      note.textContent = "BLOCKED on credential · Atlas secret-request: Sensi refresh_token (not password) · capture at manager.sensicomfort.com · store ~/.config/wardos/sensi-refresh.token · run scripts/sensi-fetch.mjs · Elo 3202L";
+    }
   }
 
   function persist() {
@@ -318,6 +360,13 @@
   document.getElementById("sensi-open-android").addEventListener("click", function () {
     tap(); S.connectOpenAndroid();
   });
+  var docsBtn = document.getElementById("sensi-open-docs");
+  if (docsBtn) docsBtn.addEventListener("click", function () {
+    tap();
+    try { window.open("SENSI-LIVE.md", "_blank", "noopener,noreferrer"); } catch (e) {
+      location.href = "SENSI-LIVE.md";
+    }
+  });
   document.getElementById("sensi-confirm").addEventListener("click", function () {
     tap(); S.setConnected(true); paint();
   });
@@ -325,8 +374,11 @@
     tap(); S.setConnected(false); paint();
   });
 
+  S.onChange(function () { paint(); });
+  S.startPolling();
   paint();
 })();
+</script>
 </script>
 </body>
 </html>

@@ -175,7 +175,7 @@
  <div class="banner-body">
  <div class="banner-lab">Google Home · climate + cameras</div>
  <div class="banner-title">Sensi on top · Nest cam grid below</div>
- <div class="banner-sub">Climate hero · cam stubs · lights/garage · no fake live · Atlas owns</div>
+ <div class="banner-sub">Climate hero polls sensi-live.json · cam stubs · no fake LIVE · Atlas owns</div>
  </div>
  </section>
 
@@ -186,16 +186,16 @@
  <div class="climate-left">
  <div class="climate-lab">Sensi · Emerson · 147th</div>
  <div class="climate-title">Climate · <em>on the wall</em></div>
- <div class="climate-sub" id="sensi-hero-sub">DEMO setpoint · Heat · fan Auto · not Nest</div>
+ <div class="climate-sub" id="sensi-hero-sub">Waiting for live JSON · not Nest</div>
  </div>
  <div class="climate-temps">
  <div class="climate-amb">
- <div class="lab">Indoor stub</div>
- <div class="big" id="sensi-hero-amb">72<span>°</span></div>
+ <div class="lab">Indoor</div>
+ <div class="big" id="sensi-hero-amb">—<span>°</span></div>
  </div>
  <div class="climate-set">
  <div class="lab">Set</div>
- <div class="val" id="sensi-hero-set">70°</div>
+ <div class="val" id="sensi-hero-set">—°</div>
  </div>
  <div class="climate-mode" id="sensi-hero-mode">HEAT</div>
  </div>
@@ -307,7 +307,7 @@
  </div>
  </section>
 
- <div class="note">Sensi climate on top · Nest cams below (stubs) · lights · garage · door pads · separate stacks · Atlas owns · Elo 3202L 1080×1920</div>
+ <div class="note">Sensi climate on top (live JSON when tokened) · Nest cams stubs · lights/garage/door pads · no fake LIVE · Elo 3202L 1080×1920</div>
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -315,13 +315,13 @@
  <a class="ftr-chip" href="sheet-sensi.html">Sensi</a>
  <a class="ftr-chip" href="sheet-index.html">Sheets</a>
  </div>
- <span>Atlas · placeholders · no live API</span>
+ <span id="sensi-home-ftr">Atlas · Sensi live gate</span>
  </footer>
 </div>
 <script src="house-clock.js?v=CT1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
-<script src="house-sensi.js?v=SENSI1"></script>
+<script src="house-sensi.js?v=SENSI2"></script>
 <script>
 (function () {
   document.querySelectorAll(".cam").forEach(function (el) {
@@ -337,30 +337,17 @@
   }
   var S = window.HouseSensi;
   if (!S) return;
-  var st = S.loadState();
-  var connected = S.isConnected();
-  var mc = S.modeColor(st.mode);
-  var amb = document.getElementById("sensi-hero-amb");
-  var set = document.getElementById("sensi-hero-set");
-  var mode = document.getElementById("sensi-hero-mode");
-  var pill = document.getElementById("sensi-hero-pill");
-  var sub = document.getElementById("sensi-hero-sub");
-  if (amb) amb.innerHTML = st.ambient + "<span>°</span>";
-  if (set) set.textContent = st.setpoint + "°";
-  if (mode) {
-    mode.textContent = mc.label;
-    mode.style.background = mc.soft;
-    mode.style.color = "#121418";
-    mode.style.borderColor = mc.accent;
+  function paint() {
+    S.paintHero();
+    var gate = S.liveStatus();
+    var ftr = document.getElementById("sensi-home-ftr");
+    if (ftr) ftr.textContent = gate.live ? "Sensi LIVE · cams stub" : gate.label + " · cams stub";
   }
-  if (pill) {
-    pill.textContent = connected ? "CONNECTED · DEMO" : "CONNECT · STUB";
-    pill.classList.toggle("on", connected);
-  }
-  if (sub) {
-    sub.textContent = (connected ? "CONNECTED · DEMO" : "STUB") + " · " + st.mode + " · fan " + st.fan + " · not Nest";
-  }
+  S.onChange(paint);
+  S.startPolling();
+  paint();
 })();
+</script>
 </script>
 </body>
 </html>

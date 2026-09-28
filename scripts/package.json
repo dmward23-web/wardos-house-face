@@ -1,0 +1,16 @@
+{
+  "name": "wardos-house-face-scripts",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "sensi-fetch": "node sensi-fetch.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^8.22.0"
+  },
+  "private": true,
+  "type": "module"
+}

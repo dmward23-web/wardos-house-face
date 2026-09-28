@@ -1,0 +1,8 @@
+{
+  "status": "need_token",
+  "updatedAt": "2026-09-28T00:00:00.000Z",
+  "source": "sensi-cloud",
+  "writeSupported": false,
+  "thermostat": null,
+  "error": "SENSI_REFRESH_TOKEN missing — Atlas must request refresh_token from Dan (see SENSI-LIVE.md)"
+}
