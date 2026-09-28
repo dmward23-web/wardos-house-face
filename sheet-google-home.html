@@ -78,10 +78,11 @@
   .cam-glyph{font-size:48px;opacity:0.55;filter:grayscale(0.2);z-index:1}
   .cam-live{position:absolute;top:10px;left:10px;z-index:2;
     display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;
-    background:rgba(180,40,40,0.92);color:#fff;font-size:11px;font-weight:800;letter-spacing:0.14em}
-  .cam-live i{width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff;
-    animation:pulse 1.4s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+    background:rgba(40,48,60,0.88);color:#c8d0dc;font-size:11px;font-weight:800;letter-spacing:0.14em;
+    border:1px solid rgba(255,255,255,0.2)}
+  .cam-live.stub i{width:8px;height:8px;border-radius:50%;background:#8a909a;box-shadow:none;
+    animation:none}
+  /* NO fake LIVE — Atlas wires real streams later */
   .cam-stub{position:absolute;bottom:10px;right:10px;z-index:2;
     font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;
     padding:5px 8px;border-radius:6px;background:rgba(0,0,0,0.65);color:#c8d0dc;border:1px solid rgba(255,255,255,0.18)}
@@ -141,19 +142,19 @@
  <div class="banner-body">
  <div class="banner-lab">Google Home · cameras first</div>
  <div class="banner-title">Cam grid on glass · lights &amp; garage below</div>
- <div class="banner-sub">Placeholder tiles · wire Nest streams later · no Desk · no PIN · no $</div>
+ <div class="banner-sub">Placeholders only · no fake live state · Atlas owns · no Desk · no PIN · no $</div>
  </div>
  </section>
 
  <section class="cam-zone" aria-label="Nest and Google Home cameras">
  <div class="zone-hdr">
  <div class="zone-title">Cameras · Nest / Google Home</div>
- <div class="zone-meta">4 pads · stub live look</div>
+ <div class="zone-meta">4 pads · placeholders · no live</div>
  </div>
  <div class="cam-grid">
  <article class="cam" aria-label="Front door camera">
  <div class="cam-feed">
- <span class="cam-live"><i></i>LIVE</span>
+ <span class="cam-live stub"><i></i>STUB</span>
  <span class="cam-glyph" aria-hidden="true">🚪</span>
  <span class="cam-stub">Nest stub</span>
  </div>
@@ -164,7 +165,7 @@
  </article>
  <article class="cam" aria-label="Driveway camera">
  <div class="cam-feed">
- <span class="cam-live"><i></i>LIVE</span>
+ <span class="cam-live stub"><i></i>STUB</span>
  <span class="cam-glyph" aria-hidden="true">🚗</span>
  <span class="cam-stub">Nest stub</span>
  </div>
@@ -175,7 +176,7 @@
  </article>
  <article class="cam" aria-label="Backyard camera">
  <div class="cam-feed">
- <span class="cam-live"><i></i>LIVE</span>
+ <span class="cam-live stub"><i></i>STUB</span>
  <span class="cam-glyph" aria-hidden="true">🌳</span>
  <span class="cam-stub">Nest stub</span>
  </div>
@@ -186,7 +187,7 @@
  </article>
  <article class="cam" aria-label="Garage camera">
  <div class="cam-feed">
- <span class="cam-live"><i></i>LIVE</span>
+ <span class="cam-live stub"><i></i>STUB</span>
  <span class="cam-glyph" aria-hidden="true">🏠</span>
  <span class="cam-stub">Nest stub</span>
  </div>
@@ -200,7 +201,7 @@
 
  <section class="sec-zone" aria-label="Lights garage door secondary">
  <div class="zone-hdr">
- <div class="zone-title">Secondary · lights · garage · door</div>
+ <div class="zone-title">Secondary · lights · garage · door pads</div>
  <div class="zone-meta">placeholders</div>
  </div>
  <div class="ctrl-row">
@@ -234,8 +235,8 @@
  <div class="ctrl-top">
  <div class="ctrl-ico" aria-hidden="true">🔐</div>
  <div>
- <div class="ctrl-title">Door</div>
- <div class="ctrl-sub">Lock / unlock</div>
+ <div class="ctrl-title">Door pads</div>
+ <div class="ctrl-sub">Lock / unlock · codes</div>
  </div>
  </div>
  <div class="ctrl-actions">
@@ -246,14 +247,14 @@
  </div>
  </section>
 
- <div class="note">Cams primary on wall · Nest/Google Home streams wire later · controls stub only · Elo 3202L 1080×1920</div>
+ <div class="note">Cams primary on wall · placeholders only (no live) · lights · garage · door pads · Atlas owns · Elo 3202L 1080×1920</div>
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
  <span>House · Cams hub · Google Home</span>
  <a class="ftr-chip" href="sheet-index.html">Sheets</a>
  </div>
- <span>camo · WardOS · no live API yet</span>
+ <span>Atlas · placeholders · no live API</span>
  </footer>
 </div>
 <script src="house-clock.js?v=CT1"></script>
