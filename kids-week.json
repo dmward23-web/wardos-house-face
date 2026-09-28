@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Sep 28 2026",
   "asOfIso": "2026-09-28",
-  "refreshedAt": "2026-09-28T20:06:50.945Z",
+  "refreshedAt": "2026-09-28T20:20:37.172Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,26 +17,14 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "3:00",
-    "place": "LKMS Homework Help",
-    "detailHtml": "3:15 boys pickup · 5:40 Hayes baseball practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "time": "3:15",
+    "place": "Boys SRE pickup",
+    "detailHtml": "5:40 Hayes baseball practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Mon",
-    "startIso": "2026-09-28T20:00:00.000Z",
+    "startIso": "2026-09-28T20:15:00.000Z",
     "endIso": "2026-09-28T21:00:00.000Z",
-    "kind": "school",
+    "kind": "school_pickup",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "3:00",
-        "place": "LKMS Homework Help",
-        "detailHtml": "3:15 boys pickup · 5:40 Hayes baseball practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-09-28T20:00:00.000Z",
-        "endIso": "2026-09-28T21:00:00.000Z",
-        "kind": "school",
-        "whenLabel": "3:00",
-        "summary": "Ainsley — LKMS Homework Help · 3:00"
-      },
       {
         "label": "Next up · today",
         "time": "3:15",
@@ -168,6 +156,18 @@
         "kind": "appointment",
         "whenLabel": "Wed 12:40",
         "summary": "Ainsley — appointment · 1:00 (provider)"
+      },
+      {
+        "label": "Next up · Wed",
+        "time": "3:15",
+        "place": "Boys SRE pickup",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-09-30T20:15:00.000Z",
+        "endIso": "2026-09-30T21:00:00.000Z",
+        "kind": "school_pickup",
+        "whenLabel": "Wed 3:15",
+        "summary": "Hayes + Harris — SRE pickup · 3:40"
       }
     ]
   },
