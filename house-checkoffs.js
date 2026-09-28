@@ -107,16 +107,29 @@
     var weekDone = doneN >= need;
     row.classList.toggle("done", weekDone);
     row.classList.toggle("open", !weekDone);
+    var kidId = (window.WardKids && WardKids.KID_FROM_CHECK && id) ? WardKids.KID_FROM_CHECK[id] : null;
+    var gate = (kidId && window.WardKids && typeof WardKids.mustProgress === "function")
+      ? WardKids.mustProgress(kidId, WardKids._data)
+      : { done: 0, need: 0, complete: false };
+    var cap = 0;
+    try {
+      if (kidId && WardKids._data && WardKids._data.kids && WardKids._data.kids[kidId]) {
+        var bg = WardKids._data.kids[kidId].bankGoal || {};
+        cap = typeof WardKids.allowanceCap === "function" ? WardKids.allowanceCap(bg) : (bg.weeklyAllowance || bg.need || 0);
+      }
+    } catch (eCap) { cap = 0; }
     var hint = row.querySelector(".hint");
     if (hint) {
       hint.textContent = weekDone
-        ? need + "/" + need + " Dad days · +$" + weekPay + " unlocked"
-        : doneN + "/" + need + " days · Dad week (Fri–Thu) unlocks $" + weekPay;
+        ? (gate.complete
+          ? need + "/" + need + " Dad days · musts clear · jar $" + cap
+          : need + "/" + need + " Dad days · " + gate.done + "/" + gate.need + " musts · jar locked")
+        : doneN + "/" + need + " days · Dad week Fri→Fri · ALL musts unlock jar $" + cap;
     }
     var earn = row.querySelector(".star-earn");
     if (earn && !earn.classList.contains("addon-tag")) {
       earn.setAttribute("data-stars", String(weekPay));
-      earn.textContent = weekDone ? "+$" + weekPay : "$" + weekPay + " wk";
+      earn.textContent = weekDone ? (gate.complete ? "MUSTS ✓" : "days ✓") : "$" + weekPay + " wk";
     }
   }
 

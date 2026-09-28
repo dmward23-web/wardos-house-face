@@ -22,11 +22,20 @@ const GLOB = [
   "data/kids-week.json",
 ];
 
+/** Strip HTML/JS comments so anti-CUSTODY law notes in source don't false-fail glass lint. */
+function stripComments(text) {
+  return text
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/(^|[^:])\/\/.*$/gm, "$1");
+}
+
 let bad = [];
 for (const rel of GLOB) {
   const fp = path.join(ROOT, rel);
   if (!fs.existsSync(fp)) continue;
-  const lines = fs.readFileSync(fp, "utf8").split(/\n/);
+  const raw = fs.readFileSync(fp, "utf8");
+  const lines = stripComments(raw).split(/\n/);
   lines.forEach((line, i) => {
     if (BANNED.test(line)) bad.push(`${rel}:${i + 1}: ${line.trim().slice(0, 120)}`);
   });

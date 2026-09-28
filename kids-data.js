@@ -166,6 +166,7 @@
     var sum = 0;
     if (!dayBag || !dayBag.earned) return 0;
     Object.keys(dayBag.earned).forEach(function (k) {
+      if (k === MUST_GATE_FLAG) return;
       if (dayBag.earned[k]) sum += bankStarsFor(kidId, k, data);
     });
     dayBag.stars = sum;
@@ -180,40 +181,107 @@
     return root[kidId].days[iso];
   }
 
-  /** Daily musts: $ unlocks only when Sat→Fri taps all done. Credit stars×days on first tap day (Sat). */
-  function syncDailyWeekBank(checkId, data) {
-    var kidId = KID_FROM_CHECK[checkId];
+  /** MUSTGATE1 · non-optional quests that must ALL clear before jar/allowance unlocks. */
+  var MUST_GATE_FLAG = "__mustgate__";
+
+  function mustQuests(kidId, data) {
+    var kid = data && data.kids && data.kids[kidId];
+    if (!kid || !kid.quests) return [];
+    var out = [];
+    for (var i = 0; i < kid.quests.length; i++) {
+      var q = kid.quests[i];
+      if (q.optional || q.cadence === "addon") continue;
+      out.push(q);
+    }
+    return out;
+  }
+
+  function mustSetComplete(kidId, data) {
+    var qs = mustQuests(kidId, data);
+    if (!qs.length) return false;
+    for (var i = 0; i < qs.length; i++) {
+      var q = qs[i];
+      var cadence = q.cadence || "daily";
+      if (cadence === "daily") {
+        if (!dailyWeekComplete(q.id, data)) return false;
+      } else if (!getCheckRaw(q.id, data)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function mustProgress(kidId, data) {
+    var qs = mustQuests(kidId, data);
+    var done = 0;
+    for (var i = 0; i < qs.length; i++) {
+      var q = qs[i];
+      var cadence = q.cadence || "daily";
+      var ok = cadence === "daily" ? dailyWeekComplete(q.id, data) : getCheckRaw(q.id, data);
+      if (ok) done += 1;
+    }
+    return { done: done, need: qs.length, complete: qs.length > 0 && done >= qs.length };
+  }
+
+  function mustPayStars(kidId, data) {
+    var qs = mustQuests(kidId, data);
+    var pay = 0;
+    for (var i = 0; i < qs.length; i++) pay += bankStarsFor(kidId, qs[i].id, data);
+    return pay;
+  }
+
+  /**
+   * MUSTGATE1 · jar/allowance unlocks only when EVERY must is done for the Dad week
+   * (daily = all Sat→Fri taps; weekly = one tap). One chore done for the week does NOT credit $.
+   * Credits all must stars onto first Sat tap day when gate opens; scrubs when gate closes.
+   */
+  function syncMustGateBank(kidId, data) {
     if (!kidId) return null;
-    var meta = questMeta(kidId, checkId, data);
-    if (meta.optional || meta.cadence !== "daily") return null;
     var root = loadBankRoot();
     if (!root[kidId]) root[kidId] = { days: {}, lifetime: 0, balance: 0 };
     var days = weekDayIsos(DAY_ISO);
+    if (!days.length) return getBankView(kidId, data);
     var ws = days[0];
-    var complete = dailyWeekComplete(checkId, data);
+    var qs = mustQuests(kidId, data);
+    var complete = mustSetComplete(kidId, data);
     var wsBag = ensureDayBag(root, kidId, ws);
-    var wasCredited = !!(wsBag.earned && wsBag.earned[checkId]);
-    var pay = bankStarsFor(kidId, checkId, data);
-    var i, iso, bag;
-    for (i = 0; i < days.length; i++) {
-      iso = days[i];
-      bag = ensureDayBag(root, kidId, iso);
-      if (iso === ws) {
-        if (complete) bag.earned[checkId] = true;
-        else delete bag.earned[checkId];
-      } else if (bag.earned && bag.earned[checkId]) {
-        /* scrub legacy per-day credits for daily musts */
-        delete bag.earned[checkId];
+    var wasGate = !!(wsBag.earned && wsBag.earned[MUST_GATE_FLAG]);
+    var pay = mustPayStars(kidId, data);
+    var di, qi, bag, id;
+
+    for (di = 0; di < days.length; di++) {
+      bag = ensureDayBag(root, kidId, days[di]);
+      for (qi = 0; qi < qs.length; qi++) {
+        id = qs[qi].id;
+        if (bag.earned && bag.earned[id]) delete bag.earned[id];
       }
+      if (bag.earned && bag.earned[MUST_GATE_FLAG]) delete bag.earned[MUST_GATE_FLAG];
       recomputeDayStars(kidId, bag, data);
     }
-    if (complete && !wasCredited) {
+
+    if (complete) {
+      wsBag = ensureDayBag(root, kidId, ws);
+      for (qi = 0; qi < qs.length; qi++) {
+        wsBag.earned[qs[qi].id] = true;
+      }
+      wsBag.earned[MUST_GATE_FLAG] = true;
+      recomputeDayStars(kidId, wsBag, data);
+    }
+
+    if (complete && !wasGate) {
       root[kidId].lifetime = (root[kidId].lifetime || 0) + pay;
-    } else if (!complete && wasCredited) {
+    } else if (!complete && wasGate) {
       root[kidId].lifetime = Math.max(0, (root[kidId].lifetime || 0) - pay);
     }
     saveBankRoot(root);
     return getBankView(kidId, data);
+  }
+
+  /** Legacy name — re-syncs full Must gate for the kid owning this check. */
+  function syncDailyWeekBank(checkId, data) {
+    var kidId = KID_FROM_CHECK[checkId];
+    if (!kidId) return null;
+    return syncMustGateBank(kidId, data);
   }
 
   function weekStarsFor(kidId) {
@@ -231,7 +299,7 @@
   }
 
   /* Embedded fallback — same payload as kids-week.json (fetch preferred on Pages) */
-  var EMBEDDED = {"asOf":"Mon Sep 28 2026","asOfIso":"2026-09-28","refreshedAt":"2026-09-28T20:58:53.159Z","sourceCalendar":"dmward23@gmail.com","leaveBys":{"SRE_drop":"leave 8:10 for 8:25","SRE_pickup":"leave 3:15 for 3:40","note":"sports: event START = leave-by"},"homeWeek":{"with":"Dad","place":"147th","through":"Fri Oct 2 · 3:00","throughLabel":"with Dad @ 147th · Fri Sep 25 3:00 → Fri Oct 2 · 3:00","endIso":"2026-10-02T20:00:00.000Z"},"boardStrip":{"label":"Next up · today","time":"5:40","place":"Hayes baseball practice","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Mon","startIso":"2026-09-28T22:40:00.000Z","endIso":"2026-09-29T00:50:00.000Z","kind":"sport","queue":[{"label":"Next up · today","time":"5:40","place":"Hayes baseball practice","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Mon","startIso":"2026-09-28T22:40:00.000Z","endIso":"2026-09-29T00:50:00.000Z","kind":"sport","whenLabel":"5:40","summary":"Hayes baseball practice · 6:15 practice"},{"label":"Next up · Tue","time":"8:10","place":"Boys SRE drop","detailHtml":"3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Tue","startIso":"2026-09-29T13:10:00.000Z","endIso":"2026-09-29T13:40:00.000Z","kind":"school_drop","whenLabel":"Tue 8:10","summary":"Hayes + Harris — SRE drop-off · 8:25"},{"label":"Next up · Tue","time":"8:40","place":"Madi + Randy collab · in person","detailHtml":"3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Tue","startIso":"2026-09-29T13:40:00.000Z","endIso":"2026-09-29T15:10:00.000Z","kind":"school","whenLabel":"Tue 8:40","summary":"Hayes — Madi + Randy collab · in person · 8:50"},{"label":"Next up · Tue","time":"3:15","place":"Boys SRE pickup","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Tue","startIso":"2026-09-29T20:15:00.000Z","endIso":"2026-09-29T21:00:00.000Z","kind":"school_pickup","whenLabel":"Tue 3:15","summary":"Hayes + Harris — SRE pickup · 3:40"},{"label":"Next up · Tue","time":"4:25","place":"Ainsley swim — Coach Ann","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Tue","startIso":"2026-09-29T21:25:00.000Z","endIso":"2026-09-29T23:20:00.000Z","kind":"sport","whenLabel":"Tue 4:25","summary":"Ainsley swim — Coach Ann · 5:00 practice"},{"label":"Next up · Tue","time":"5:40","place":"Hayes flag practice","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Tue","startIso":"2026-09-29T22:40:00.000Z","endIso":"2026-09-30T00:35:00.000Z","kind":"sport","whenLabel":"Tue 5:40","summary":"Hayes flag practice · leave 5:40 · 6:00"},{"label":"Next up · Wed","time":"8:00","place":"SRE Hearing/Vision Screening","detailHtml":"9:00 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Wed","startIso":"2026-09-30T13:00:00.000Z","endIso":"2026-09-30T13:15:00.000Z","kind":"school","whenLabel":"Wed 8:00","summary":"Hayes + Harris — SRE Hearing/Vision Screening"},{"label":"Next up · Wed","time":"8:10","place":"Boys SRE drop","detailHtml":"9:00 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Wed","startIso":"2026-09-30T13:10:00.000Z","endIso":"2026-09-30T13:40:00.000Z","kind":"school_drop","whenLabel":"Wed 8:10","summary":"Hayes + Harris — SRE drop-off · 8:25"},{"label":"Next up · Wed","time":"9:00","place":"HD #2209 · return 5-drawer vanity","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Wed","startIso":"2026-09-30T14:00:00.000Z","endIso":"2026-09-30T15:30:00.000Z","kind":"leave","whenLabel":"Wed 9:00","summary":"Leave · HD #2209 · return 5-drawer vanity (Mom WK38853806)"},{"label":"Next up · Wed","time":"12:40","place":"Midwest Anxiety · 1:00 (Lindsay Bonebrake)","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Wed","startIso":"2026-09-30T17:40:00.000Z","endIso":"2026-09-30T19:20:00.000Z","kind":"appointment","whenLabel":"Wed 12:40","summary":"Ainsley — Midwest Anxiety · 1:00 (Lindsay Bonebrake)"},{"label":"Next up · Wed","time":"3:15","place":"Boys SRE pickup","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Wed","startIso":"2026-09-30T20:15:00.000Z","endIso":"2026-09-30T21:00:00.000Z","kind":"school_pickup","whenLabel":"Wed 3:15","summary":"Hayes + Harris — SRE pickup · 3:40"},{"label":"Next up · Wed","time":"4:55","place":"Harris flag practice","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Wed","startIso":"2026-09-30T21:55:00.000Z","endIso":"2026-09-30T23:50:00.000Z","kind":"sport","whenLabel":"Wed 4:55","summary":"Harris flag practice"}]},"kids":{"harris":{"id":"harris","name":"Harris","you":"you","theme":"block-world","themeLabel":"Block World","gradeVoice":"1st grade","avatar":"H","currency":{"unit":"gem","plural":"gems","symbol":"◆","label":"Gems"},"bankGoal":{"id":"gem-jar","title":"Gem Jar · earn then save","blurb":"Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Gem Jar $10 AND full $10 payday (1★=$1). Miss musts = short or no full payday. Jar = save what you earned — not free money.","need":10,"reward":"Payday with Dad after honest musts","dollarNeed":10,"weeklyAllowance":10,"starDollar":1},"quests":[{"id":"har-bed","what":"🛏️ Make bed — pre-game ritual (block rebuild)","stars":1,"cadence":"daily"},{"id":"har-backpack","what":"🎒 Pack backpack (loot ready) — daily must","stars":1,"cadence":"daily"},{"id":"har-dishes","what":"🍽️ Clean up after you · rinse · in dishwasher — daily must","stars":1,"cadence":"daily"},{"id":"har-empty","what":"🍽️ Empty dishwasher — daily must","stars":1,"cadence":"daily"},{"id":"har-trash","what":"🗑️ Trash out (clear the cave) — daily must","stars":1,"cadence":"daily"},{"id":"har-postgame","what":"⚡ Post-game · gear rinsed · bag set","stars":1,"cadence":"daily"},{"id":"har-shower","what":"🚿 Shower · brush · ready for bed","stars":1,"cadence":"daily"},{"id":"har-toys","what":"🧸 Toys reset — weekly must","stars":2,"cadence":"weekly"},{"id":"har-shoes","what":"👟 Shoes · closet / garage cubby / room — weekly must","stars":1,"cadence":"weekly"},{"id":"har-cubby","what":"🎒 Backpack + sports bag in garage cubby — weekly must","stars":1,"cadence":"weekly"}],"fun":[{"when":"Quest reward","what":"🧱 BLOCK BUILD TIME","hint":"gems → jar → payday · craft optional","tone":"fun"},{"when":"Outside","what":"🌳 Backyard boss fight (play)","hint":"ask Dad · run wild","tone":"fun"},{"when":"Tonight","what":"🍪 Snack chest raid","hint":"after quests · with Dad","tone":"fun"},{"when":"Base mission","what":"💎 Gem Jar · save with Dad","hint":"FUN · craft unlock optional","tone":"fun"}],"streakLabel":"🔥 3-day craft streak — keep smashing","missions":[{"when":"Anytime","what":"🔥 Musts clear = gems in the jar","hint":"full week → jar $10 + $10 payday","tone":"fun"},{"when":"Weekly","what":"🧸 Toys + 👟 shoes + 🎒 garage cubby","hint":"musts · ask Dad to inspect","tone":"fun"}],"appointmentsEmpty":"No doctor stuff on your board — lucky!!! More play time.","hottest":{"when":"MON · 3:15","what":"SRE PICKUP","where":"with Dad @ 147th · through Fri Oct 2 · 3:00","badges":["MON","3:15"]},"today":[{"kind":"event","when":"Mon · 3:15","what":"SRE pickup","hint":"","tone":"act"},{"kind":"note","when":"All day","what":"🏡 YOUR BASE with Dad","hint":"through Fri Oct 2 · 3:00","tone":"hot"}],"sports":[{"when":"Wed 30 · leave 4:55","what":"Harris flag practice","hint":"YOUR board","tone":"hot"},{"when":"Sat 3 · leave 1:00","what":"Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30","hint":"YOUR board","tone":"hot"}],"school":[{"when":"Mon 28 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Tue 29 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Tue 29 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Wed 30 · 8:00","what":"SRE Hearing/Vision Screening","tone":"act","hint":""},{"when":"Wed 30 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Wed 30 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Thu 1 · 7:00","what":"SRE PE (tennis shoes)","tone":"act","hint":""},{"when":"Thu 1 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Thu 1 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Fri 2 · 8:10","what":"SRE drop-off","tone":"act","hint":""}],"appointments":[]},"hayes":{"id":"hayes","name":"Hayes","you":"you","theme":"drop-zone","themeLabel":"Drop Zone","gradeVoice":"3rd grade","avatar":"H","currency":{"unit":"coin","plural":"coins","symbol":"◎","label":"Victory Coins"},"bankGoal":{"id":"victory-jar","title":"Victory Jar · earn then save","blurb":"Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Victory Jar $10 AND full $10 payday (1★=$1). Miss musts = short or no full payday. Jar = save what you earned — not free money.","need":10,"reward":"Payday with Dad after honest musts","dollarNeed":10,"weeklyAllowance":10,"starDollar":1},"quests":[{"id":"hay-bed","what":"🛏️ Make bed — pre-game ritual (daily must)","stars":1,"cadence":"daily"},{"id":"hay-backpack","what":"🎒 Backpack — loadout ready (daily must)","stars":1,"cadence":"daily"},{"id":"hay-dishes","what":"🍽️ Clean up after you · rinse · in dishwasher — daily must","stars":1,"cadence":"daily"},{"id":"hay-empty","what":"🍽️ Empty dishwasher — daily must","stars":1,"cadence":"daily"},{"id":"hay-trash","what":"🗑️ Trash out — zone clear (daily must)","stars":1,"cadence":"daily"},{"id":"hay-postgame","what":"⚡ Post-game · gear rinsed · bag set","stars":1,"cadence":"daily"},{"id":"hay-shower","what":"🚿 Shower · brush · ready for bed","stars":1,"cadence":"daily"},{"id":"hay-room","what":"🧹 Room reset — weekly must","stars":2,"cadence":"weekly"},{"id":"hay-shoes","what":"👟 Shoes · closet / garage cubby / room — weekly must (never hallway)","stars":1,"cadence":"weekly"},{"id":"hay-cubby","what":"🎒 Backpack + sports bag in garage cubby — weekly must","stars":1,"cadence":"weekly"}],"fun":[{"when":"After clears","what":"👑 Victory round — game pick with Dad","hint":"coins → jar → payday","tone":"fun"},{"when":"Outside","what":"⚡ Sports grind / run the yard","hint":"ask Dad","tone":"fun"},{"when":"Base mission","what":"☂️ Victory Jar · save with Dad","hint":"FUN · umbrella treat optional","tone":"fun"},{"when":"Squad","what":"🤝 Duo queue with Harris / crew","hint":"FUN","tone":"fun"}],"streakLabel":"🔥 6-day fire streak — don't break it","missions":[{"when":"Every clear","what":"💥 Must done = coin banked in the jar","hint":"full week → jar $10 + $10 payday","tone":"fun"},{"when":"Weekly","what":"🧹 Room + 👟 shoes + 🎒 garage cubby","hint":"musts · ask Dad to inspect","tone":"fun"}],"appointmentsEmpty":"No appointments. Clear skies. GO PLAY.","hottest":{"when":"MON · 3:15","what":"SRE PICKUP","where":"with Dad @ 147th · through Fri Oct 2 · 3:00","badges":["MON","3:15"]},"today":[{"kind":"event","when":"Mon · 3:15","what":"SRE pickup","hint":"","tone":"act"},{"kind":"event","when":"Mon · 5:40","what":"⚾ Hayes baseball practice","hint":"YOUR board","tone":"hot"},{"kind":"note","when":"All day","what":"🏡 DROP ZONE HQ with Dad","hint":"through Fri Oct 2 · 3:00","tone":"hot"}],"sports":[{"when":"Mon 28 · leave 5:40","what":"Hayes baseball practice","hint":"YOUR board","tone":"hot"},{"when":"Tue 29 · leave 5:40","what":"Hayes flag practice","hint":"YOUR board","tone":"hot"},{"when":"Thu 1 · leave 4:55","what":"Hayes baseball — Falcons vs Lions (home)","hint":"YOUR board","tone":"hot"},{"when":"Sun 4 · leave 8:30","what":"Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00","hint":"YOUR board","tone":"hot"},{"when":"Mon 5 · leave 5:30","what":"Hayes baseball — Falcons vs KC Tigers (away)","hint":"YOUR board","tone":"hot"}],"school":[{"when":"Mon 28 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Tue 29 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Tue 29 · 8:40","what":"Madi + Randy collab · in person","tone":"act","hint":""},{"when":"Tue 29 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Wed 30 · 8:00","what":"SRE Hearing/Vision Screening","tone":"act","hint":""},{"when":"Wed 30 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Wed 30 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Thu 1 · 7:00","what":"SRE PE (tennis shoes)","tone":"act","hint":""},{"when":"Thu 1 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Thu 1 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Fri 2 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Fri 2 · 9:00","what":"SRE field trip (museum + Meadowbrook)","tone":"act","hint":""}],"appointments":[]},"ainsley":{"id":"ainsley","name":"Ainsley","you":"you","theme":"quiet-folk","themeLabel":"Quiet Folk","gradeVoice":"8th grade","avatar":"A","currency":{"unit":"star","plural":"stars","symbol":"★","label":"Tour Stars"},"bankGoal":{"id":"tour-jar","title":"Tour Jar · earn then save","blurb":"Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Tour Jar $20 AND full $20 payday (1★=$1). Miss musts = short or no full payday. Babysit $15/hr = hire add-on, not jar.","need":20,"reward":"Payday with Dad after honest musts","dollarNeed":20,"starDollar":1,"weeklyAllowance":20},"quests":[{"id":"ain-bed","what":"Make bed — morning reset","stars":1,"cadence":"daily"},{"id":"ain-toys","what":"Room reset — clean pass","stars":1,"cadence":"daily"},{"id":"ain-dishwasher","what":"Clean up after you · rinse · in dishwasher","stars":1,"cadence":"daily"},{"id":"ain-empty","what":"Empty dishwasher","stars":1,"cadence":"daily"},{"id":"ain-living","what":"Shoes & coats · closet / cubby / room","stars":1,"cadence":"daily"},{"id":"ain-bath","what":"Bathroom wipe — weekly","stars":3,"cadence":"weekly"},{"id":"ain-laundry","what":"Laundry full cycle — her clothes","stars":5,"cadence":"weekly"},{"id":"ain-cubby","what":"🎒 Backpack + sports bag in garage cubby","stars":1,"cadence":"weekly"},{"id":"ain-babysit","what":"👶 Babysitting — optional hire (Dad books you)","stars":0,"cadence":"addon","optional":true,"hire":true,"hint":"not for jar · Dad handout","rateLabel":"$15/hr"}],"fun":[],"streakLabel":"◆ 4-day streak — hold the line","missions":[{"when":"Weekly","what":"Bath wipe + laundry + garage cubby = big star dump","hint":"musts · ask Dad to inspect","tone":"fun"},{"when":"Add-on","what":"Babysitting — optional · Dad books you","hint":"hire add-on · not for jar","tone":"fun"}],"goal":{"name":"Tour Jar","need":20,"placeholder":"Tour Jar · $20"},"bag":{"place":"Dad","label":"This week @ Dad · bag","hint":"147th through Fri Oct 2 · pack for Dad week"},"rides":[{"id":"scooter","what":"🛴 Scooter run","when":"your call","clear":true},{"id":"bv-rec","what":"🏟️ BV Rec","when":"when you're free","clear":true},{"id":"swim","what":"🏊 Ridgeview swim","when":"Tue/Thu · leave 4:25","clear":true,"hours":"leave 4:25 · 5:00"}],"appointmentsEmpty":"","sportsEmpty":"","hottest":{"when":"MON · 3:00","what":"LKMS HOMEWORK HELP","where":"with Dad @ 147th · through Fri Oct 2 · 3:00","badges":["MON","3:00"]},"today":[{"kind":"event","when":"Mon · 3:00","what":"LKMS Homework Help","hint":"","tone":"act"},{"kind":"note","when":"All day","what":"Base @ 147th with Dad","hint":"through Fri Oct 2 · 3:00","tone":"hot"}],"sports":[{"when":"Tue 29 · leave 4:25","what":"Ainsley swim — Coach Ann","hint":"YOUR board","tone":"hot"},{"when":"Thu 1 · leave 4:25","what":"Ainsley swim — Coach Ann","hint":"YOUR board","tone":"hot"}],"school":[{"when":"Mon 28 · 3:00","what":"LKMS Homework Help","tone":"act","hint":""},{"when":"Thu 1 · 3:00","what":"LKMS Homework Help","tone":"act","hint":""},{"when":"Fri 2 · 12:00","what":"LKMS yearbook baby photo due","tone":"act","hint":""},{"when":"Mon 5 · 3:00","what":"LKMS Homework Help","tone":"act","hint":""}],"appointments":[{"when":"Wed 30 · 12:40","what":"Midwest Anxiety · 1:00 (Lindsay Bonebrake)","hint":"with Dad","tone":"hot"},{"when":"Mon 5 · 1:40","what":"Midwest Anxiety · 2:00 (Lindsay Bonebrake)","hint":"with Dad","tone":"hot"}]},"dan":{"id":"dan","name":"Dad","theme":"house-dad","themeLabel":"Dad Box","avatar":"D","note":"Kids-safe Dad box · no money · no Desk · calendar facts from dmward23 / Atlas only","picks":[{"when":"Tonight","what":"Dinner vote with crew","hint":"House · kids-safe","tone":"fun"},{"when":"This week","what":"Sports stack · Mon ball · Tue flag/swim · Wed Harris flag · Thu game/swim","hint":"Dad drives","tone":"fun"}],"leaveBys":[{"when":"Weekday school","what":"SRE drop leave 8:10 for 8:25","tone":"act"},{"when":"Weekday pickup","what":"Leave 3:15 for 3:40 boys","tone":"act"},{"when":"Sports rule","what":"Event START = your leave-by","tone":"act"}],"hottest":{"when":"Mon Sep 28 2026 · kids with you @ 147th","what":"Dad week live","where":"through Fri Oct 2 · 3:00","badges":["Dad week","147th"]},"today":[{"when":"Mon · 3:00","what":"LKMS Homework Help","tone":"act"},{"when":"Mon · 3:15","what":"SRE pickup","tone":"act"},{"when":"Mon · 5:40","what":"Hayes baseball practice","tone":"hot"},{"when":"home week","what":"Kids with Dad @ 147th through Fri Oct 2 · 3:00","tone":"hot"}],"week":[{"when":"Mon 28 · 3:00","what":"LKMS Homework Help","tone":"act"},{"when":"Mon 28 · 3:15","what":"SRE pickup","tone":"act"},{"when":"Mon 28 · 5:40","what":"Hayes baseball practice","tone":"hot"},{"when":"Tue 29 · 8:10","what":"SRE drop-off","tone":"act"},{"when":"Tue 29 · 8:40","what":"Madi + Randy collab · in person","tone":"act"},{"when":"Tue 29 · 3:15","what":"SRE pickup","tone":"act"},{"when":"Tue 29 · 4:25","what":"Ainsley swim — Coach Ann","tone":"hot"},{"when":"Tue 29 · 5:40","what":"Hayes flag practice","tone":"hot"},{"when":"Wed 30 · 8:00","what":"SRE Hearing/Vision Screening","tone":"act"},{"when":"Wed 30 · 8:10","what":"SRE drop-off","tone":"act"},{"when":"Wed 30 · 9:00","what":"HD #2209 · return 5-drawer vanity","tone":"hot"},{"when":"Wed 30 · 12:40","what":"Midwest Anxiety · 1:00 (Lindsay Bonebrake)","tone":"act"},{"when":"Wed 30 · 3:15","what":"SRE pickup","tone":"act"},{"when":"Wed 30 · 4:55","what":"Harris flag practice","tone":"hot"},{"when":"Thu 1 · 7:00","what":"SRE PE (tennis shoes)","tone":"act"},{"when":"Thu 1 · 7:00","what":"SRE PE (tennis shoes)","tone":"act"},{"when":"Thu 1 · 8:10","what":"SRE drop-off","tone":"act"},{"when":"Thu 1 · 8:55","what":"KS DL replace · OP 119th · BOOKED 2777892","tone":"hot"},{"when":"Thu 1 · 3:00","what":"LKMS Homework Help","tone":"act"},{"when":"Thu 1 · 3:15","what":"SRE pickup","tone":"act"},{"when":"Thu 1 · 4:25","what":"Ainsley swim — Coach Ann","tone":"hot"},{"when":"Thu 1 · 4:55","what":"Hayes baseball — Falcons vs Lions (home)","tone":"hot"},{"when":"Fri 2 · 8:10","what":"SRE drop-off","tone":"act"},{"when":"Fri 2 · 9:00","what":"Dan DRIVE → Nashville","tone":"hot"}]}}};
+  var EMBEDDED = {"asOf":"Mon Sep 28 2026","asOfIso":"2026-09-28","refreshedAt":"2026-09-28T20:58:53.159Z","sourceCalendar":"dmward23@gmail.com","leaveBys":{"SRE_drop":"leave 8:10 for 8:25","SRE_pickup":"leave 3:15 for 3:40","note":"sports: event START = leave-by"},"homeWeek":{"with":"Dad","place":"147th","through":"Fri Oct 2 · 3:00","throughLabel":"with Dad @ 147th · Fri Sep 25 3:00 → Fri Oct 2 · 3:00","endIso":"2026-10-02T20:00:00.000Z"},"boardStrip":{"label":"Next up · today","time":"5:40","place":"Hayes baseball practice","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Mon","startIso":"2026-09-28T22:40:00.000Z","endIso":"2026-09-29T00:50:00.000Z","kind":"sport","queue":[{"label":"Next up · today","time":"5:40","place":"Hayes baseball practice","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Mon","startIso":"2026-09-28T22:40:00.000Z","endIso":"2026-09-29T00:50:00.000Z","kind":"sport","whenLabel":"5:40","summary":"Hayes baseball practice · 6:15 practice"},{"label":"Next up · Tue","time":"8:10","place":"Boys SRE drop","detailHtml":"3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Tue","startIso":"2026-09-29T13:10:00.000Z","endIso":"2026-09-29T13:40:00.000Z","kind":"school_drop","whenLabel":"Tue 8:10","summary":"Hayes + Harris — SRE drop-off · 8:25"},{"label":"Next up · Tue","time":"8:40","place":"Madi + Randy collab · in person","detailHtml":"3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Tue","startIso":"2026-09-29T13:40:00.000Z","endIso":"2026-09-29T15:10:00.000Z","kind":"school","whenLabel":"Tue 8:40","summary":"Hayes — Madi + Randy collab · in person · 8:50"},{"label":"Next up · Tue","time":"3:15","place":"Boys SRE pickup","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Tue","startIso":"2026-09-29T20:15:00.000Z","endIso":"2026-09-29T21:00:00.000Z","kind":"school_pickup","whenLabel":"Tue 3:15","summary":"Hayes + Harris — SRE pickup · 3:40"},{"label":"Next up · Tue","time":"4:25","place":"Ainsley swim — Coach Ann","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Tue","startIso":"2026-09-29T21:25:00.000Z","endIso":"2026-09-29T23:20:00.000Z","kind":"sport","whenLabel":"Tue 4:25","summary":"Ainsley swim — Coach Ann · 5:00 practice"},{"label":"Next up · Tue","time":"5:40","place":"Hayes flag practice","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Tue","startIso":"2026-09-29T22:40:00.000Z","endIso":"2026-09-30T00:35:00.000Z","kind":"sport","whenLabel":"Tue 5:40","summary":"Hayes flag practice · leave 5:40 · 6:00"},{"label":"Next up · Wed","time":"8:00","place":"SRE Hearing/Vision Screening","detailHtml":"9:00 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Wed","startIso":"2026-09-30T13:00:00.000Z","endIso":"2026-09-30T13:15:00.000Z","kind":"school","whenLabel":"Wed 8:00","summary":"Hayes + Harris — SRE Hearing/Vision Screening"},{"label":"Next up · Wed","time":"8:10","place":"Boys SRE drop","detailHtml":"9:00 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Wed","startIso":"2026-09-30T13:10:00.000Z","endIso":"2026-09-30T13:40:00.000Z","kind":"school_drop","whenLabel":"Wed 8:10","summary":"Hayes + Harris — SRE drop-off · 8:25"},{"label":"Next up · Wed","time":"9:00","place":"HD #2209 · return 5-drawer vanity","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Wed","startIso":"2026-09-30T14:00:00.000Z","endIso":"2026-09-30T15:30:00.000Z","kind":"leave","whenLabel":"Wed 9:00","summary":"Leave · HD #2209 · return 5-drawer vanity (Mom WK38853806)"},{"label":"Next up · Wed","time":"12:40","place":"Midwest Anxiety · 1:00 (Lindsay Bonebrake)","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Wed","startIso":"2026-09-30T17:40:00.000Z","endIso":"2026-09-30T19:20:00.000Z","kind":"appointment","whenLabel":"Wed 12:40","summary":"Ainsley — Midwest Anxiety · 1:00 (Lindsay Bonebrake)"},{"label":"Next up · Wed","time":"3:15","place":"Boys SRE pickup","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Wed","startIso":"2026-09-30T20:15:00.000Z","endIso":"2026-09-30T21:00:00.000Z","kind":"school_pickup","whenLabel":"Wed 3:15","summary":"Hayes + Harris — SRE pickup · 3:40"},{"label":"Next up · Wed","time":"4:55","place":"Harris flag practice","detailHtml":"kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00","badge":"Wed","startIso":"2026-09-30T21:55:00.000Z","endIso":"2026-09-30T23:50:00.000Z","kind":"sport","whenLabel":"Wed 4:55","summary":"Harris flag practice"}]},"kids":{"harris":{"id":"harris","name":"Harris","you":"you","theme":"block-world","themeLabel":"Block World","gradeVoice":"1st grade","avatar":"H","currency":{"unit":"gem","plural":"gems","symbol":"◆","label":"Gems"},"bankGoal":{"id":"gem-jar","title":"Gem Jar · earn then save","blurb":"Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Gem Jar $10 AND full $10 payday (1★=$1). ALL musts required — jar/allowance locked until every Must is done. Jar = save what you earned — not free money.","need":10,"reward":"Payday with Dad after honest musts","dollarNeed":10,"weeklyAllowance":10,"starDollar":1},"quests":[{"id":"har-bed","what":"🛏️ Make bed — pre-game ritual (block rebuild)","stars":1,"cadence":"daily"},{"id":"har-backpack","what":"🎒 Pack backpack (loot ready) — daily must","stars":1,"cadence":"daily"},{"id":"har-dishes","what":"🍽️ Clean up after you · rinse · in dishwasher — daily must","stars":1,"cadence":"daily"},{"id":"har-empty","what":"🍽️ Empty dishwasher — daily must","stars":1,"cadence":"daily"},{"id":"har-trash","what":"🗑️ Trash out (clear the cave) — daily must","stars":1,"cadence":"daily"},{"id":"har-postgame","what":"⚡ Post-game · gear rinsed · bag set","stars":1,"cadence":"daily"},{"id":"har-shower","what":"🚿 Shower · brush · ready for bed","stars":1,"cadence":"daily"},{"id":"har-toys","what":"🧸 Toys reset — weekly must","stars":2,"cadence":"weekly"},{"id":"har-shoes","what":"👟 Shoes · closet / garage cubby / room — weekly must","stars":1,"cadence":"weekly"},{"id":"har-cubby","what":"🎒 Backpack + sports bag in garage cubby — weekly must","stars":1,"cadence":"weekly"}],"fun":[{"when":"Quest reward","what":"🧱 BLOCK BUILD TIME","hint":"gems → jar → payday · craft optional","tone":"fun"},{"when":"Outside","what":"🌳 Backyard boss fight (play)","hint":"ask Dad · run wild","tone":"fun"},{"when":"Tonight","what":"🍪 Snack chest raid","hint":"after quests · with Dad","tone":"fun"},{"when":"Base mission","what":"💎 Gem Jar · save with Dad","hint":"FUN · craft unlock optional","tone":"fun"}],"streakLabel":"🔥 3-day craft streak — keep smashing","missions":[{"when":"Anytime","what":"🔥 ALL musts clear = gems in the jar","hint":"ALL musts → jar $10 + $10 payday","tone":"fun"},{"when":"Weekly","what":"🧸 Toys + 👟 shoes + 🎒 garage cubby","hint":"musts · ask Dad to inspect","tone":"fun"}],"appointmentsEmpty":"No doctor stuff on your board — lucky!!! More play time.","hottest":{"when":"MON · 3:15","what":"SRE PICKUP","where":"with Dad @ 147th · through Fri Oct 2 · 3:00","badges":["MON","3:15"]},"today":[{"kind":"event","when":"Mon · 3:15","what":"SRE pickup","hint":"","tone":"act"},{"kind":"note","when":"All day","what":"🏡 YOUR BASE with Dad","hint":"through Fri Oct 2 · 3:00","tone":"hot"}],"sports":[{"when":"Wed 30 · leave 4:55","what":"Harris flag practice","hint":"YOUR board","tone":"hot"},{"when":"Sat 3 · leave 1:00","what":"Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30","hint":"YOUR board","tone":"hot"}],"school":[{"when":"Mon 28 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Tue 29 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Tue 29 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Wed 30 · 8:00","what":"SRE Hearing/Vision Screening","tone":"act","hint":""},{"when":"Wed 30 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Wed 30 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Thu 1 · 7:00","what":"SRE PE (tennis shoes)","tone":"act","hint":""},{"when":"Thu 1 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Thu 1 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Fri 2 · 8:10","what":"SRE drop-off","tone":"act","hint":""}],"appointments":[]},"hayes":{"id":"hayes","name":"Hayes","you":"you","theme":"drop-zone","themeLabel":"Drop Zone","gradeVoice":"3rd grade","avatar":"H","currency":{"unit":"coin","plural":"coins","symbol":"◎","label":"Victory Coins"},"bankGoal":{"id":"victory-jar","title":"Victory Jar · earn then save","blurb":"Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Victory Jar $10 AND full $10 payday (1★=$1). ALL musts required — jar/allowance locked until every Must is done. Jar = save what you earned — not free money.","need":10,"reward":"Payday with Dad after honest musts","dollarNeed":10,"weeklyAllowance":10,"starDollar":1},"quests":[{"id":"hay-bed","what":"🛏️ Make bed — pre-game ritual (daily must)","stars":1,"cadence":"daily"},{"id":"hay-backpack","what":"🎒 Backpack — loadout ready (daily must)","stars":1,"cadence":"daily"},{"id":"hay-dishes","what":"🍽️ Clean up after you · rinse · in dishwasher — daily must","stars":1,"cadence":"daily"},{"id":"hay-empty","what":"🍽️ Empty dishwasher — daily must","stars":1,"cadence":"daily"},{"id":"hay-trash","what":"🗑️ Trash out — zone clear (daily must)","stars":1,"cadence":"daily"},{"id":"hay-postgame","what":"⚡ Post-game · gear rinsed · bag set","stars":1,"cadence":"daily"},{"id":"hay-shower","what":"🚿 Shower · brush · ready for bed","stars":1,"cadence":"daily"},{"id":"hay-room","what":"🧹 Room reset — weekly must","stars":2,"cadence":"weekly"},{"id":"hay-shoes","what":"👟 Shoes · closet / garage cubby / room — weekly must (never hallway)","stars":1,"cadence":"weekly"},{"id":"hay-cubby","what":"🎒 Backpack + sports bag in garage cubby — weekly must","stars":1,"cadence":"weekly"}],"fun":[{"when":"After clears","what":"👑 Victory round — game pick with Dad","hint":"coins → jar → payday","tone":"fun"},{"when":"Outside","what":"⚡ Sports grind / run the yard","hint":"ask Dad","tone":"fun"},{"when":"Base mission","what":"☂️ Victory Jar · save with Dad","hint":"FUN · umbrella treat optional","tone":"fun"},{"when":"Squad","what":"🤝 Duo queue with Harris / crew","hint":"FUN","tone":"fun"}],"streakLabel":"🔥 6-day fire streak — don't break it","missions":[{"when":"Every clear","what":"💥 ALL musts clear = coins in the jar","hint":"ALL musts → jar $10 + $10 payday","tone":"fun"},{"when":"Weekly","what":"🧹 Room + 👟 shoes + 🎒 garage cubby","hint":"musts · ask Dad to inspect","tone":"fun"}],"appointmentsEmpty":"No appointments. Clear skies. GO PLAY.","hottest":{"when":"MON · 3:15","what":"SRE PICKUP","where":"with Dad @ 147th · through Fri Oct 2 · 3:00","badges":["MON","3:15"]},"today":[{"kind":"event","when":"Mon · 3:15","what":"SRE pickup","hint":"","tone":"act"},{"kind":"event","when":"Mon · 5:40","what":"⚾ Hayes baseball practice","hint":"YOUR board","tone":"hot"},{"kind":"note","when":"All day","what":"🏡 DROP ZONE HQ with Dad","hint":"through Fri Oct 2 · 3:00","tone":"hot"}],"sports":[{"when":"Mon 28 · leave 5:40","what":"Hayes baseball practice","hint":"YOUR board","tone":"hot"},{"when":"Tue 29 · leave 5:40","what":"Hayes flag practice","hint":"YOUR board","tone":"hot"},{"when":"Thu 1 · leave 4:55","what":"Hayes baseball — Falcons vs Lions (home)","hint":"YOUR board","tone":"hot"},{"when":"Sun 4 · leave 8:30","what":"Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00","hint":"YOUR board","tone":"hot"},{"when":"Mon 5 · leave 5:30","what":"Hayes baseball — Falcons vs KC Tigers (away)","hint":"YOUR board","tone":"hot"}],"school":[{"when":"Mon 28 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Tue 29 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Tue 29 · 8:40","what":"Madi + Randy collab · in person","tone":"act","hint":""},{"when":"Tue 29 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Wed 30 · 8:00","what":"SRE Hearing/Vision Screening","tone":"act","hint":""},{"when":"Wed 30 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Wed 30 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Thu 1 · 7:00","what":"SRE PE (tennis shoes)","tone":"act","hint":""},{"when":"Thu 1 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Thu 1 · 3:15","what":"SRE pickup","tone":"act","hint":""},{"when":"Fri 2 · 8:10","what":"SRE drop-off","tone":"act","hint":""},{"when":"Fri 2 · 9:00","what":"SRE field trip (museum + Meadowbrook)","tone":"act","hint":""}],"appointments":[]},"ainsley":{"id":"ainsley","name":"Ainsley","you":"you","theme":"quiet-folk","themeLabel":"Quiet Folk","gradeVoice":"8th grade","avatar":"A","currency":{"unit":"star","plural":"stars","symbol":"★","label":"Tour Stars"},"bankGoal":{"id":"tour-jar","title":"Tour Jar · earn then save","blurb":"Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Tour Jar $20 AND full $20 payday (1★=$1). ALL musts required — jar/allowance locked until every Must is done. Babysit $15/hr = hire add-on, not jar.","need":20,"reward":"Payday with Dad after honest musts","dollarNeed":20,"starDollar":1,"weeklyAllowance":20},"quests":[{"id":"ain-bed","what":"Make bed — morning reset","stars":1,"cadence":"daily"},{"id":"ain-toys","what":"Room reset — clean pass","stars":1,"cadence":"daily"},{"id":"ain-dishwasher","what":"Clean up after you · rinse · in dishwasher","stars":1,"cadence":"daily"},{"id":"ain-empty","what":"Empty dishwasher","stars":1,"cadence":"daily"},{"id":"ain-living","what":"Shoes & coats · closet / cubby / room","stars":1,"cadence":"daily"},{"id":"ain-bath","what":"Bathroom wipe — weekly","stars":3,"cadence":"weekly"},{"id":"ain-laundry","what":"Laundry full cycle — her clothes","stars":5,"cadence":"weekly"},{"id":"ain-cubby","what":"🎒 Backpack + sports bag in garage cubby","stars":1,"cadence":"weekly"},{"id":"ain-babysit","what":"👶 Babysitting — optional hire (Dad books you)","stars":0,"cadence":"addon","optional":true,"hire":true,"hint":"not for jar · Dad handout","rateLabel":"$15/hr"}],"fun":[],"streakLabel":"◆ 4-day streak — hold the line","missions":[{"when":"Weekly","what":"Bath wipe + laundry + garage cubby = big star dump","hint":"musts · ask Dad to inspect","tone":"fun"},{"when":"Add-on","what":"Babysitting — optional · Dad books you","hint":"hire add-on · not for jar","tone":"fun"}],"goal":{"name":"Tour Jar","need":20,"placeholder":"Tour Jar · $20"},"bag":{"place":"Dad","label":"This week @ Dad · bag","hint":"147th through Fri Oct 2 · pack for Dad week"},"rides":[{"id":"scooter","what":"🛴 Scooter run","when":"your call","clear":true},{"id":"bv-rec","what":"🏟️ BV Rec","when":"when you're free","clear":true},{"id":"swim","what":"🏊 Ridgeview swim","when":"Tue/Thu · leave 4:25","clear":true,"hours":"leave 4:25 · 5:00"}],"appointmentsEmpty":"","sportsEmpty":"","hottest":{"when":"MON · 3:00","what":"LKMS HOMEWORK HELP","where":"with Dad @ 147th · through Fri Oct 2 · 3:00","badges":["MON","3:00"]},"today":[{"kind":"event","when":"Mon · 3:00","what":"LKMS Homework Help","hint":"","tone":"act"},{"kind":"note","when":"All day","what":"Base @ 147th with Dad","hint":"through Fri Oct 2 · 3:00","tone":"hot"}],"sports":[{"when":"Tue 29 · leave 4:25","what":"Ainsley swim — Coach Ann","hint":"YOUR board","tone":"hot"},{"when":"Thu 1 · leave 4:25","what":"Ainsley swim — Coach Ann","hint":"YOUR board","tone":"hot"}],"school":[{"when":"Mon 28 · 3:00","what":"LKMS Homework Help","tone":"act","hint":""},{"when":"Thu 1 · 3:00","what":"LKMS Homework Help","tone":"act","hint":""},{"when":"Fri 2 · 12:00","what":"LKMS yearbook baby photo due","tone":"act","hint":""},{"when":"Mon 5 · 3:00","what":"LKMS Homework Help","tone":"act","hint":""}],"appointments":[{"when":"Wed 30 · 12:40","what":"Midwest Anxiety · 1:00 (Lindsay Bonebrake)","hint":"with Dad","tone":"hot"},{"when":"Mon 5 · 1:40","what":"Midwest Anxiety · 2:00 (Lindsay Bonebrake)","hint":"with Dad","tone":"hot"}]},"dan":{"id":"dan","name":"Dad","theme":"house-dad","themeLabel":"Dad Box","avatar":"D","note":"Kids-safe Dad box · no money · no Desk · calendar facts from dmward23 / Atlas only","picks":[{"when":"Tonight","what":"Dinner vote with crew","hint":"House · kids-safe","tone":"fun"},{"when":"This week","what":"Sports stack · Mon ball · Tue flag/swim · Wed Harris flag · Thu game/swim","hint":"Dad drives","tone":"fun"}],"leaveBys":[{"when":"Weekday school","what":"SRE drop leave 8:10 for 8:25","tone":"act"},{"when":"Weekday pickup","what":"Leave 3:15 for 3:40 boys","tone":"act"},{"when":"Sports rule","what":"Event START = your leave-by","tone":"act"}],"hottest":{"when":"Mon Sep 28 2026 · kids with you @ 147th","what":"Dad week live","where":"through Fri Oct 2 · 3:00","badges":["Dad week","147th"]},"today":[{"when":"Mon · 3:00","what":"LKMS Homework Help","tone":"act"},{"when":"Mon · 3:15","what":"SRE pickup","tone":"act"},{"when":"Mon · 5:40","what":"Hayes baseball practice","tone":"hot"},{"when":"home week","what":"Kids with Dad @ 147th through Fri Oct 2 · 3:00","tone":"hot"}],"week":[{"when":"Mon 28 · 3:00","what":"LKMS Homework Help","tone":"act"},{"when":"Mon 28 · 3:15","what":"SRE pickup","tone":"act"},{"when":"Mon 28 · 5:40","what":"Hayes baseball practice","tone":"hot"},{"when":"Tue 29 · 8:10","what":"SRE drop-off","tone":"act"},{"when":"Tue 29 · 8:40","what":"Madi + Randy collab · in person","tone":"act"},{"when":"Tue 29 · 3:15","what":"SRE pickup","tone":"act"},{"when":"Tue 29 · 4:25","what":"Ainsley swim — Coach Ann","tone":"hot"},{"when":"Tue 29 · 5:40","what":"Hayes flag practice","tone":"hot"},{"when":"Wed 30 · 8:00","what":"SRE Hearing/Vision Screening","tone":"act"},{"when":"Wed 30 · 8:10","what":"SRE drop-off","tone":"act"},{"when":"Wed 30 · 9:00","what":"HD #2209 · return 5-drawer vanity","tone":"hot"},{"when":"Wed 30 · 12:40","what":"Midwest Anxiety · 1:00 (Lindsay Bonebrake)","tone":"act"},{"when":"Wed 30 · 3:15","what":"SRE pickup","tone":"act"},{"when":"Wed 30 · 4:55","what":"Harris flag practice","tone":"hot"},{"when":"Thu 1 · 7:00","what":"SRE PE (tennis shoes)","tone":"act"},{"when":"Thu 1 · 7:00","what":"SRE PE (tennis shoes)","tone":"act"},{"when":"Thu 1 · 8:10","what":"SRE drop-off","tone":"act"},{"when":"Thu 1 · 8:55","what":"KS DL replace · OP 119th · BOOKED 2777892","tone":"hot"},{"when":"Thu 1 · 3:00","what":"LKMS Homework Help","tone":"act"},{"when":"Thu 1 · 3:15","what":"SRE pickup","tone":"act"},{"when":"Thu 1 · 4:25","what":"Ainsley swim — Coach Ann","tone":"hot"},{"when":"Thu 1 · 4:55","what":"Hayes baseball — Falcons vs Lions (home)","tone":"hot"},{"when":"Fri 2 · 8:10","what":"SRE drop-off","tone":"act"},{"when":"Fri 2 · 9:00","what":"Dan DRIVE → Nashville","tone":"hot"}]}}};
 
   function esc(s) {
     return String(s == null ? "" : s)
@@ -315,31 +383,9 @@
     var kidId = KID_FROM_CHECK[checkId];
     if (!kidId) return null;
     var meta = questMeta(kidId, checkId, data);
-    /* Daily musts bank only via syncDailyWeekBank (full-week unlock) */
-    if (meta.cadence === "daily" && !meta.optional) {
-      return syncDailyWeekBank(checkId, data);
-    }
-    var root = loadBankRoot();
-    if (!root[kidId]) root[kidId] = { days: {}, lifetime: 0, balance: 0 };
-    /* Weekly (and non-daily) bank on first tap day so leave-Fri still lands in weekEarn */
-    var bankIso = DAY_ISO;
-    if (meta.cadence === "weekly") {
-      var taps = weekDayIsos(DAY_ISO);
-      bankIso = taps[0] || DAY_ISO;
-    }
-    var dayBag = ensureDayBag(root, kidId, bankIso);
-    var stars = bankStarsFor(kidId, checkId, data);
-    var was = !!(dayBag.earned && dayBag.earned[checkId]);
-    if (done && !was) {
-      dayBag.earned[checkId] = true;
-      root[kidId].lifetime = (root[kidId].lifetime || 0) + stars;
-    } else if (!done && was) {
-      delete dayBag.earned[checkId];
-      root[kidId].lifetime = Math.max(0, (root[kidId].lifetime || 0) - stars);
-    }
-    recomputeDayStars(kidId, dayBag, data);
-    saveBankRoot(root);
-    return getBankView(kidId, data);
+    /* MUSTGATE1 · optional/hire never fills jar; all musts route through full-set gate */
+    if (meta.optional) return getBankView(kidId, data);
+    return syncMustGateBank(kidId, data);
   }
 
   function allowanceCap(goal) {
@@ -355,6 +401,7 @@
   }
 
   function weekEarnDollars(kidId, data) {
+    if (!mustSetComplete(kidId, data)) return 0;
     var kid = (data && data.kids && data.kids[kidId]) || {};
     var goal = kid.bankGoal || {};
     var week = weekStarsFor(kidId);
@@ -420,6 +467,17 @@
     var pct = goal.need ? Math.round((toward / goal.need) * 100) : 0;
     /* Available $ toward jar / personal saves = carry + this week's earn */
     var available = balance + weekEarn;
+    var gate = mustProgress(kidId, data);
+    /* MUSTGATE1 · jar fill only when full Must set is clear (week stars already scrubbed if locked) */
+    var reached = !!gate.complete && weekEarn >= weeklyAllowance && weeklyAllowance > 0;
+    if (!gate.complete) {
+      week = 0;
+      weekEarn = 0;
+      toward = 0;
+      pct = 0;
+      available = balance;
+      reached = false;
+    }
     return {
       kidId: kidId,
       today: today,
@@ -433,7 +491,9 @@
       need: goal.need,
       toward: toward,
       pct: Math.min(100, pct),
-      reached: week >= goal.need,
+      reached: reached,
+      mustGate: gate,
+      mustComplete: !!gate.complete,
       goalTitle: goal.title,
       goalBlurb: goal.blurb,
       reward: goal.reward,
@@ -471,22 +531,7 @@
       : { cadence: "daily", stars: 1, optional: false };
     var before = kidId ? getBankView(kidId, data) : null;
     var was = before ? before.reached : false;
-    var beforeWeekDone = (meta.cadence === "daily" && !meta.optional)
-      ? dailyWeekComplete(checkId, data)
-      : false;
-    var beforeEarned = false;
-    if (kidId && meta.cadence !== "daily") {
-      try {
-        var rootPre = loadBankRoot();
-        var bankIsoPre = DAY_ISO;
-        if (meta.cadence === "weekly") {
-          var tapsPre = weekDayIsos(DAY_ISO);
-          bankIsoPre = tapsPre[0] || DAY_ISO;
-        }
-        var dayPre = rootPre[kidId] && rootPre[kidId].days && rootPre[kidId].days[bankIsoPre];
-        beforeEarned = !!(dayPre && dayPre.earned && dayPre.earned[checkId]);
-      } catch (ePre) { beforeEarned = false; }
-    }
+    var beforeGate = kidId ? mustSetComplete(kidId, data) : false;
 
     var key = checkKeyFor(checkId, data, dayIso);
     var state = loadKeyState(key);
@@ -504,13 +549,12 @@
 
     var bank = null;
     var newlyBanked = false;
-    if (meta.cadence === "daily" && !meta.optional) {
-      var afterWeekDone = dailyWeekComplete(checkId, data);
-      newlyBanked = afterWeekDone && !beforeWeekDone;
-      bank = syncDailyWeekBank(checkId, data);
-    } else {
-      newlyBanked = !!(kidId && done && !beforeEarned && !meta.optional);
-      bank = applyCheckToBank(checkId, !!done, data);
+    if (kidId && !meta.optional) {
+      bank = syncMustGateBank(kidId, data);
+      var afterGate = mustSetComplete(kidId, data);
+      newlyBanked = afterGate && !beforeGate;
+    } else if (kidId) {
+      bank = getBankView(kidId, data);
     }
 
     if (bank && bank.reached && !was) {
@@ -519,13 +563,13 @@
         document.dispatchEvent(new CustomEvent("house:goal-hit", { detail: { kidId: bank.kidId, reward: bank.reward, bank: bank } }));
       } catch (e) {}
     }
-    /* Flash $ only when week unlocks (daily) or weekly/addon newly banks — 1★=$1 */
+    /* Flash $ only when FULL Must set unlocks jar — existing allowance cap (1★=$1) */
     if (bank && newlyBanked) {
       try {
-        var bucks = bankStarsFor(kidId, checkId, data);
+        var bucks = weekEarnDollars(kidId, data);
         if (bucks > 0) {
           document.dispatchEvent(new CustomEvent("house:earn", {
-            detail: { kidId: kidId, dollars: bucks, checkId: checkId, bank: bank }
+            detail: { kidId: kidId, dollars: bucks, checkId: checkId, bank: bank, mustGate: true }
           }));
         }
       } catch (eEarn) { /* */ }
@@ -534,11 +578,12 @@
   }
 
   function syncBankFromChecks(data) {
+    var seen = {};
     Object.keys(KID_FROM_CHECK).forEach(function (id) {
       var kidId = KID_FROM_CHECK[id];
-      var meta = questMeta(kidId, id, data);
-      if (meta.cadence === "daily" && !meta.optional) syncDailyWeekBank(id, data);
-      else applyCheckToBank(id, getCheck(id, data), data);
+      if (!kidId || seen[kidId]) return;
+      seen[kidId] = 1;
+      syncMustGateBank(kidId, data);
     });
   }
 
@@ -584,12 +629,22 @@
           : (q.hire ? "hire path · Dad books you · never fills jar" : "add-on · never fills jar");
       }
     } else if (cadence === "weekly") {
-      hint = done ? "weekly clear · +$" + stars + " banked" : "weekly must · tap · +$" + stars + " (1★=$1)";
+      var gateW = kidId ? mustProgress(kidId, data) : { done: 0, need: 0, complete: false };
+      var capW = kidId ? allowanceCap(((data && data.kids && data.kids[kidId]) || {}).bankGoal) : 0;
+      hint = done
+        ? (gateW.complete
+          ? "weekly clear · musts done · jar $" + capW
+          : "weekly clear · " + gateW.done + "/" + gateW.need + " musts · jar locked")
+        : "weekly must · tap · jar unlocks when ALL musts done";
     } else {
       var needN = weekDayIsos(DAY_ISO).length;
+      var gateD = kidId ? mustProgress(kidId, data) : { done: 0, need: 0, complete: false };
+      var capD = kidId ? allowanceCap(((data && data.kids && data.kids[kidId]) || {}).bankGoal) : 0;
       hint = weekDone
-        ? needN + "/" + needN + " Dad days · +$" + weekPay + " unlocked"
-        : dayCount + "/" + needN + " days · Dad week Fri→Fri (taps Sat–Fri · leave Fri morning) unlocks $" + weekPay + " (1★×" + needN + ")";
+        ? (gateD.complete
+          ? needN + "/" + needN + " Dad days · musts clear · jar $" + capD
+          : needN + "/" + needN + " Dad days · " + gateD.done + "/" + gateD.need + " musts · jar locked")
+        : dayCount + "/" + needN + " days · Dad week Fri→Fri (taps Sat–Fri) · ALL musts unlock jar $" + capD;
     }
     var earn;
     if (optional) {
@@ -599,14 +654,16 @@
         earn = '<span class="star-earn addon-tag">' + (done ? "OPTIONAL ✓" : "OPTIONAL") + "</span>";
       }
     } else if (cadence === "daily") {
-      /* Ainsley: never paint "$7 wk" as if it were her jar/payday — chips are $1/d · ×7 toward Tour $20/$20 */
+      var gateEarn = kidId ? mustProgress(kidId, data) : { complete: false };
+      /* Chip shows chore week progress; $ only paints when FULL must set unlocks jar */
       if (kidId === "ainsley") {
-        earn = '<span class="star-earn" data-stars="' + weekPay + '">' + (weekDone ? "+$" + weekPay : "$1/d · ×" + dadWeekLen()) + "</span>";
+        earn = '<span class="star-earn" data-stars="' + weekPay + '">' + (weekDone ? (gateEarn.complete ? "MUSTS ✓" : "days ✓") : "$1/d · ×" + dadWeekLen()) + "</span>";
       } else {
-        earn = '<span class="star-earn" data-stars="' + weekPay + '">' + (weekDone ? "+$" + weekPay : "$" + weekPay + " wk") + "</span>";
+        earn = '<span class="star-earn" data-stars="' + weekPay + '">' + (weekDone ? (gateEarn.complete ? "MUSTS ✓" : "days ✓") : "$" + weekPay + " wk") + "</span>";
       }
     } else {
-      earn = '<span class="star-earn" data-stars="' + stars + '">' + (done ? "+$" + stars : "$" + stars) + "</span>";
+      var gateEarnW = kidId ? mustProgress(kidId, data) : { complete: false };
+      earn = '<span class="star-earn" data-stars="' + stars + '">' + (done ? (gateEarnW.complete ? "+$" + stars : "✓") : "$" + stars) + "</span>";
     }
     var optAttr = optional ? ' data-optional="1"' : "";
     var hireAttr = (optional && q.hire) ? ' data-hire="1"' : "";
@@ -737,15 +794,20 @@
       var hint = el.querySelector(".hint");
       if (hint) {
         var needN = weekDayIsos(DAY_ISO).length;
-        hint.setAttribute("data-hint-open", dayCount + "/" + needN + " days · Dad week Fri→Fri (taps Sat–Fri · leave Fri morning) unlocks $" + weekPay);
+        var gateE = mustProgress(kidId, data);
+        var capE = allowanceCap(((data.kids && data.kids[kidId]) || {}).bankGoal);
+        hint.setAttribute("data-hint-open", dayCount + "/" + needN + " days · Dad week Fri→Fri · ALL musts unlock jar $" + capE);
         hint.textContent = weekDone
-          ? needN + "/" + needN + " Dad days · +$" + weekPay + " unlocked"
-          : dayCount + "/" + needN + " days · Dad week Fri→Fri (taps Sat–Fri · leave Fri morning) unlocks $" + weekPay;
+          ? (gateE.complete
+            ? needN + "/" + needN + " Dad days · musts clear · jar $" + capE
+            : needN + "/" + needN + " Dad days · " + gateE.done + "/" + gateE.need + " musts · jar locked")
+          : dayCount + "/" + needN + " days · Dad week Fri→Fri · ALL musts unlock jar $" + capE;
       }
       var earn = el.querySelector(".star-earn");
       if (earn) {
+        var gateChip = mustProgress(kidId, data);
         earn.setAttribute("data-stars", String(weekPay));
-        earn.textContent = weekDone ? "+$" + weekPay : "$" + weekPay + " wk";
+        earn.textContent = weekDone ? (gateChip.complete ? "MUSTS ✓" : "days ✓") : "$" + weekPay + " wk";
       }
       var kids = el.children;
       for (var ri = 0; ri < kids.length; ri++) {
@@ -963,7 +1025,12 @@
     });
     root.querySelectorAll("[data-bank-meta]").forEach(function (el) {
       if (dollar) {
+        if (bank.mustComplete === false) {
+          var g = bank.mustGate || { done: 0, need: 0 };
+          el.textContent = "Musts " + g.done + "/" + g.need + " · jar locked · Balance $" + bal;
+        } else {
         el.textContent = "Balance $" + bal + " · This week $" + we + " · Jar $" + bank.toward + " / $" + bank.need;
+        }
       } else {
         el.textContent = "week " + bank.toward + " / " + bank.need + " ★";
       }
@@ -1324,6 +1391,11 @@
     dailyDoneCount: dailyDoneCount,
     dailyWeekComplete: dailyWeekComplete,
     bankStarsFor: bankStarsFor,
+    mustQuests: mustQuests,
+    mustSetComplete: mustSetComplete,
+    mustProgress: mustProgress,
+    mustPayStars: mustPayStars,
+    syncMustGateBank: syncMustGateBank,
     syncDailyWeekBank: syncDailyWeekBank,
     enhanceSharedChores: enhanceSharedChores,
     questMeta: questMeta,
