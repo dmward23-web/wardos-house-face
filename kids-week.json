@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Sep 28 2026",
   "asOfIso": "2026-09-28",
-  "refreshedAt": "2026-09-28T20:58:53.159Z",
+  "refreshedAt": "2026-09-28T21:15:11.902Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -301,22 +301,15 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "MON · 3:15",
-        "what": "SRE PICKUP",
+        "when": "TUE · 8:10",
+        "what": "SRE DROP-OFF",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "MON",
-          "3:15"
+          "TUE",
+          "8:10"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Mon · 3:15",
-          "what": "SRE pickup",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -340,12 +333,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Mon 28 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Tue 29 · 8:10",
           "what": "SRE drop-off",
@@ -532,22 +519,15 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "MON · 3:15",
-        "what": "SRE PICKUP",
+        "when": "MON · 5:40",
+        "what": "HAYES BASEBALL PRACTICE",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "MON",
-          "3:15"
+          "5:40"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Mon · 3:15",
-          "what": "SRE pickup",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Mon · 5:40",
@@ -596,12 +576,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Mon 28 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Tue 29 · 8:10",
           "what": "SRE drop-off",
@@ -805,22 +779,15 @@
       "appointmentsEmpty": "",
       "sportsEmpty": "",
       "hottest": {
-        "when": "MON · 3:00",
-        "what": "LKMS HOMEWORK HELP",
+        "when": "TUE · 4:25",
+        "what": "AINSLEY SWIM — COACH ANN",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "MON",
-          "3:00"
+          "TUE",
+          "4:25"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Mon · 3:00",
-          "what": "LKMS Homework Help",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -844,12 +811,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Mon 28 · 3:00",
-          "what": "LKMS Homework Help",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Thu 1 · 3:00",
           "what": "LKMS Homework Help",
@@ -933,16 +894,6 @@
       },
       "today": [
         {
-          "when": "Mon · 3:00",
-          "what": "LKMS Homework Help",
-          "tone": "act"
-        },
-        {
-          "when": "Mon · 3:15",
-          "what": "SRE pickup",
-          "tone": "act"
-        },
-        {
           "when": "Mon · 5:40",
           "what": "Hayes baseball practice",
           "tone": "hot"
@@ -954,16 +905,6 @@
         }
       ],
       "week": [
-        {
-          "when": "Mon 28 · 3:00",
-          "what": "LKMS Homework Help",
-          "tone": "act"
-        },
-        {
-          "when": "Mon 28 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act"
-        },
         {
           "when": "Mon 28 · 5:40",
           "what": "Hayes baseball practice",
@@ -1073,6 +1014,16 @@
           "when": "Fri 2 · 9:00",
           "what": "Dan DRIVE → Nashville",
           "tone": "hot"
+        },
+        {
+          "when": "Fri 2 · 9:00",
+          "what": "SRE field trip (museum + Meadowbrook)",
+          "tone": "act"
+        },
+        {
+          "when": "Fri 2 · 12:00",
+          "what": "LKMS yearbook baby photo due",
+          "tone": "act"
         }
       ]
     }
