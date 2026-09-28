@@ -259,26 +259,23 @@
     var st = effectiveState();
     var mc = modeColor(st.mode);
     var status = st.gate.label;
-    var humid = (st.humidity != null) ? (st.humidity + "% RH") : null;
+    var humid = (st.humidity != null) ? (st.humidity + "%") : null;
     el.classList.add("sensi-chip");
     el.classList.toggle("is-live", !!st.gate.live);
     el.classList.toggle("sensi-live-pulse", !!st.gate.live);
     el.classList.toggle("is-need", st.gate.kind === "need_token");
     el.setAttribute("data-mode", st.mode || "Off");
-    el.setAttribute("href", el.getAttribute("href") || "sheet-sensi.html");
-    el.setAttribute("aria-label", "Sensi · " + st.ambient + "° · set " + st.setpoint + "° · " + mc.label + (humid ? " · " + humid : ""));
+    if (!el.getAttribute("href")) el.setAttribute("href", "sheet-google-home.html");
+    el.setAttribute("aria-label", "Sensi · " + st.ambient + "° · set " + st.setpoint + "° · " + mc.label + (humid ? " · " + humid : "") + " · " + status);
     el.innerHTML =
-      '<div class="sensi-chip-ico" aria-hidden="true">🌡</div>'
-      + '<div class="sensi-chip-text">'
-      + '<div class="sensi-chip-kicker">Sensi · indoors</div>'
-      + '<div class="sensi-chip-line">'
+      '<span class="sensi-chip-ico" aria-hidden="true">🌡</span>'
       + '<span class="sensi-chip-temp">' + st.ambient + "°</span>"
+      + '<span class="sensi-chip-dot" aria-hidden="true">·</span>'
       + '<span class="sensi-chip-set">set ' + st.setpoint + "°</span>"
+      + '<span class="sensi-chip-dot" aria-hidden="true">·</span>'
       + '<span class="sensi-chip-mode" style="--sensi-accent:' + mc.accent + '">' + mc.label + "</span>"
-      + (humid ? '<span class="sensi-chip-humid">' + humid + "</span>" : "")
-      + "</div>"
-      + '<div class="sensi-chip-sub"><span class="sensi-chip-pill' + (st.gate.live ? " on" : "") + '">' + status + "</span> · fan " + st.fan + "</div>"
-      + "</div>";
+      + (humid ? '<span class="sensi-chip-dot" aria-hidden="true">·</span><span class="sensi-chip-humid">' + humid + "</span>" : "")
+      + '<span class="sensi-chip-pill' + (st.gate.live ? " on" : "") + '">' + status + "</span>";
   }
 
   function mountChip(selector) {
