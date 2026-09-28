@@ -38,17 +38,6 @@
     }
   }
 
-  /** True when this page is served by nest-webrtc-proxy (box, LAN, or CF tunnel). */
-  function isProxyOrigin() {
-    try {
-      if (String(location.port || "") === "8787") return true;
-      var h = location.hostname || "";
-      if (/trycloudflare\.com$/i.test(h)) return true;
-      if (!isPagesHost() && /nest-webrtc/i.test(location.pathname || "")) return true;
-    } catch (_) {}
-    return false;
-  }
-
   function proxyBase() {
     var fromQs = qs("proxy");
     if (fromQs) {
@@ -57,26 +46,14 @@
       } catch (_) {}
       return fromQs.replace(/\/$/, "");
     }
-    // Tunnel / box / LAN: same-origin ALWAYS wins over stale localStorage 127.0.0.1
-    if (isProxyOrigin()) {
-      try {
-        var bad = localStorage.getItem("wardosNestProxy") || "";
-        if (!bad || isLoopbackProxy(bad)) {
-          localStorage.setItem("wardosNestProxy", location.origin);
-        }
-      } catch (_) {}
-      return location.origin;
-    }
     try {
       var saved = localStorage.getItem("wardosNestProxy");
-      if (saved) {
-        if (isPagesHost() && isLoopbackProxy(saved)) {
-          try { localStorage.removeItem("wardosNestProxy"); } catch (_) {}
-        } else {
-          return saved.replace(/\/$/, "");
-        }
-      }
+      if (saved) return saved.replace(/\/$/, "");
     } catch (_) {}
+    // Same-origin when served by the proxy itself (box / LAN)
+    if (location.port === "8787" || (location.protocol === "http:" && /nest-webrtc/.test(location.pathname) && !isPagesHost())) {
+      return location.origin;
+    }
     // GitHub Pages / phone: 127.0.0.1 is THE PHONE, not Atlas — refuse silent black.
     if (isPagesHost()) {
       return "";

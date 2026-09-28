@@ -98,10 +98,10 @@
   }
 
   function modeColor(mode) {
-    if (mode === "Heat") return { accent: "#ff9a20", soft: "#fff0d0", label: "HEAT", glow: "rgba(255,140,40,0.55)", css: "heat" };
-    if (mode === "Cool") return { accent: "#3a9ae8", soft: "#d8ecff", label: "COOL", glow: "rgba(80,170,255,0.55)", css: "cool" };
-    if (mode === "Auto") return { accent: "#30c050", soft: "#d8f0d8", label: "AUTO", glow: "rgba(80,220,120,0.45)", css: "auto" };
-    return { accent: "#7a8090", soft: "#e8ebf0", label: "OFF", glow: "rgba(120,130,150,0.3)", css: "off" };
+    if (mode === "Heat") return { accent: "#c87810", soft: "#fff0d0", label: "HEAT" };
+    if (mode === "Cool") return { accent: "#2868a0", soft: "#d8ecff", label: "COOL" };
+    if (mode === "Auto") return { accent: "#287838", soft: "#d8f0d8", label: "AUTO" };
+    return { accent: "#5a5e66", soft: "#e8ebf0", label: "OFF" };
   }
 
   function parseUpdatedAt(iso) {
@@ -117,7 +117,7 @@
     return (Date.now() - t) <= LIVE_FRESH_MS;
   }
 
-  /** Gate for UI labels. Never returns "LIVE" without fresh live JSON.\n   *  Honest STALE when snapshot aged out or fetch errored — never STALE·DEMO mock badge. */
+  /** Gate for UI labels. Never returns "LIVE" without fresh live JSON. */
   function liveStatus(data) {
     data = data || (_liveCache && _liveCache.data) || null;
     if (!data) return { kind: "stub", label: "CONNECT · STUB", live: false };
@@ -125,14 +125,7 @@
       return { kind: "need_token", label: "CONNECT · NEED TOKEN", live: false, error: data.error || null };
     }
     if (data.status === "error") {
-      return {
-        kind: "stale",
-        label: "STALE",
-        live: false,
-        error: data.error || null,
-        thermostat: data.thermostat || null,
-        updatedAt: data.updatedAt || null
-      };
+      return { kind: "error", label: "DEMO · FETCH ERR", live: false, error: data.error || null };
     }
     if (data.status === "live" && liveFresh(data)) {
       var th = data.thermostat;
@@ -147,14 +140,7 @@
       };
     }
     if (data.status === "live") {
-      return {
-        kind: "stale",
-        label: "STALE",
-        live: false,
-        error: "snapshot older than 30m",
-        thermostat: data.thermostat || null,
-        updatedAt: data.updatedAt || null
-      };
+      return { kind: "stale", label: "STALE · DEMO", live: false, error: "snapshot older than 30m" };
     }
     return { kind: "stub", label: "CONNECT · STUB", live: false };
   }
@@ -163,32 +149,24 @@
    * Effective display state: prefer fresh live reads; DEMO for writes / fallback.
    * ambient/mode/fan/setpoint from live when live; otherwise localStorage DEMO.
    */
-  function stateFromThermostat(th, demo, source, gate) {
-    return {
-      source: source,
-      ambient: typeof th.ambient === "number" ? th.ambient : demo.ambient,
-      setpoint: typeof th.setpoint === "number" ? th.setpoint : demo.setpoint,
-      mode: MODES.indexOf(th.mode) >= 0 ? th.mode : demo.mode,
-      fan: FANS.indexOf(th.fan) >= 0 ? th.fan : demo.fan,
-      hold: !!th.hold,
-      name: th.name || "Sensi",
-      humidity: typeof th.humidity === "number" ? th.humidity : null,
-      online: th.online !== false,
-      writeSupported: !!gate.writeSupported,
-      gate: gate
-    };
-  }
-
   function effectiveState() {
     var demo = loadState();
     var gate = liveStatus();
-    if (gate.thermostat && typeof gate.thermostat.ambient === "number") {
-      return stateFromThermostat(
-        gate.thermostat,
-        demo,
-        gate.live ? "live" : "stale",
-        gate
-      );
+    if (gate.live && gate.thermostat) {
+      var th = gate.thermostat;
+      return {
+        source: "live",
+        ambient: typeof th.ambient === "number" ? th.ambient : demo.ambient,
+        setpoint: typeof th.setpoint === "number" ? th.setpoint : demo.setpoint,
+        mode: MODES.indexOf(th.mode) >= 0 ? th.mode : demo.mode,
+        fan: FANS.indexOf(th.fan) >= 0 ? th.fan : demo.fan,
+        hold: !!th.hold,
+        name: th.name || "Sensi",
+        humidity: typeof th.humidity === "number" ? th.humidity : null,
+        online: th.online !== false,
+        writeSupported: !!gate.writeSupported,
+        gate: gate
+      };
     }
     return {
       source: "demo",
@@ -281,31 +259,19 @@
     var st = effectiveState();
     var mc = modeColor(st.mode);
     var status = st.gate.label;
-    var humid = (st.humidity != null) ? (st.humidity + "%") : null;
     el.classList.add("sensi-chip");
-    el.classList.toggle("is-live", !!st.gate.live);
-    el.classList.toggle("sensi-live-pulse", !!st.gate.live);
-    el.classList.toggle("is-need", st.gate.kind === "need_token");
-    el.setAttribute("data-mode", st.mode || "Off");
-    if (!el.getAttribute("href")) el.setAttribute("href", "sheet-google-home.html");
-    el.setAttribute("aria-label", "Sensi · " + st.ambient + "° · set " + st.setpoint + "° · " + mc.label + (humid ? " · " + humid : "") + " · " + status);
-    var liveOn = !!st.gate.live;
-    var pillCls = "sensi-chip-pill" + (liveOn ? " on" : "");
-    var pillText = liveOn ? "LIVE" : status;
+    el.setAttribute("href", el.getAttribute("href") || "sheet-sensi.html");
     el.innerHTML =
-      '<span class="sensi-chip-kicker">'
-      + '<span class="sensi-chip-lab">Sensi · Emerson</span>'
-      + '<span class="' + pillCls + '">' + pillText + "</span>"
-      + "</span>"
-      + '<span class="sensi-chip-main">'
-      + '<span class="sensi-chip-ico" aria-hidden="true">🌡</span>'
+      '<div class="sensi-chip-ico" aria-hidden="true">🌡</div>'
+      + '<div class="sensi-chip-text">'
+      + '<div class="sensi-chip-kicker">Sensi · indoors</div>'
+      + '<div class="sensi-chip-line">'
       + '<span class="sensi-chip-temp">' + st.ambient + "°</span>"
-      + '<span class="sensi-chip-meta">'
       + '<span class="sensi-chip-set">set ' + st.setpoint + "°</span>"
-      + '<span class="sensi-chip-dot" aria-hidden="true">·</span>'
       + '<span class="sensi-chip-mode" style="--sensi-accent:' + mc.accent + '">' + mc.label + "</span>"
-      + (humid ? '<span class="sensi-chip-dot" aria-hidden="true">·</span><span class="sensi-chip-humid">' + humid + "</span>" : "")
-      + "</span></span>";
+      + "</div>"
+      + '<div class="sensi-chip-sub">' + status + " · fan " + st.fan + "</div>"
+      + "</div>";
   }
 
   function mountChip(selector) {
@@ -340,28 +306,11 @@
       pill.classList.toggle("on", st.gate.live);
     }
     if (ambLab) {
-      ambLab.textContent = st.gate.live ? "Indoor live" : (st.gate.kind === "stale" ? "Indoor · STALE" : "Indoor · not live");
+      ambLab.textContent = st.gate.live ? "Indoor live" : "Indoor · not live";
     }
     if (sub) {
-      var src = st.gate.live ? "LIVE" : (st.gate.kind === "need_token" ? "NEED TOKEN" : (st.gate.kind === "stale" ? "STALE" : "DEMO"));
+      var src = st.gate.live ? "LIVE" : (st.gate.kind === "need_token" ? "NEED TOKEN" : "DEMO");
       sub.textContent = src + " · " + st.mode + " · fan " + st.fan + " · not Nest";
-    }
-    var humidEl = document.getElementById(ids.humid || "sensi-hero-humid");
-    if (humidEl) {
-      if (st.humidity != null) {
-        humidEl.textContent = st.humidity + "% RH";
-        humidEl.classList.remove("is-empty");
-      } else {
-        humidEl.textContent = "—% RH";
-        humidEl.classList.add("is-empty");
-      }
-    }
-    var hero = document.getElementById(ids.hero || "sensi-hero");
-    if (hero) {
-      hero.setAttribute("data-mode", st.mode || "Off");
-      hero.classList.toggle("is-live", !!st.gate.live);
-      hero.classList.toggle("sensi-live-pulse", !!st.gate.live);
-      hero.classList.toggle("is-need", st.gate.kind === "need_token");
     }
   }
 

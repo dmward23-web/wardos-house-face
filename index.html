@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#d8dadf" />
 <meta name="description" content="WardOS House face · family week · no PIN" />
 <title>House · family week</title>
-<link rel="stylesheet" href="house-engage.css?v=FRIWEEK2" />
+<link rel="stylesheet" href="house-engage.css?v=BARS2X" />
 <link rel="icon" href="apple-touch-icon-20260926c.png" />
 <style>
   @font-face {
@@ -51,9 +51,9 @@
   .stage {
     width: 100%; height: 100%;
     min-height: 100dvh;
-    display: flex; align-items: flex-start; justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     padding:
-      max(0px, env(safe-area-inset-top, 0px))
+      env(safe-area-inset-top, 0px)
       env(safe-area-inset-right, 0px)
       env(safe-area-inset-bottom, 0px)
       env(safe-area-inset-left, 0px);
@@ -62,11 +62,11 @@
   .scaler {
     width: 1080px; height: 1920px;
     flex-shrink: 0;
-    transform-origin: top center;
+    transform-origin: center center;
   }
   .panel {
     width: 1080px; min-height: 1920px; height: auto;
-    padding: 12px 28px 14px;
+    padding: 22px 36px 14px;
     display: flex; flex-direction: column; gap: 10px;
     position: relative; overflow: visible;
     background-color: #d8dadf;
@@ -103,7 +103,7 @@
 
   .hdr {
     display: flex; align-items: flex-start; justify-content: space-between; gap: 32px;
-    flex-shrink: 0; padding: 12px 18px 12px; border-radius: 16px;
+    flex-shrink: 0; padding: 18px 24px 20px; border-radius: 18px;
     background: rgba(255,255,255,0.58);
     border: 1px solid rgba(255,255,255,0.85);
     box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 28px rgba(20,22,28,0.08), 0 2px 6px rgba(20,22,28,0.05);
@@ -255,7 +255,7 @@
     box-shadow: 0 4px 14px rgba(20,22,28,0.06);
     display: inline-flex; align-items: center; gap: 10px;
   }
-  .banner.homebase-loud {
+  .banner.custody-loud {
     font-size: 16px; font-weight: 850; color: #fff;
     padding: 14px 22px; border-radius: 16px;
     background: linear-gradient(90deg, #262830 0%, #343840 55%, #454952 100%);
@@ -263,14 +263,14 @@
     box-shadow: 0 8px 22px rgba(20,22,28,0.18);
     gap: 14px; flex-wrap: wrap;
   }
-  .banner.homebase-loud .c-k {
+  .banner.custody-loud .c-k {
     font-size: 11px; font-weight: 900; letter-spacing: 0.18em; text-transform: uppercase;
     color: #7dffd4; background: rgba(125,255,212,0.12); border: 1px solid rgba(125,255,212,0.35);
     padding: 6px 10px; border-radius: 999px;
   }
-  .banner.homebase-loud .c-main { font-size: 17px; font-weight: 850; letter-spacing: -0.01em; }
-  .banner.homebase-loud .c-main em { font-style: normal; color: #7dffd4; }
-  .banner.homebase-loud .c-next { font-size: 14px; font-weight: 700; color: #c5d0de; }
+  .banner.custody-loud .c-main { font-size: 17px; font-weight: 850; letter-spacing: -0.01em; }
+  .banner.custody-loud .c-main em { font-style: normal; color: #7dffd4; }
+  .banner.custody-loud .c-next { font-size: 14px; font-weight: 700; color: #c5d0de; }
 
   .who {
     display: inline-flex; gap: 6px; align-items: center; margin-left: auto;
@@ -535,13 +535,6 @@
     text-decoration: none;
   }
   a.sheets-pill .chev { font-size: 16px; font-weight: 700; color: #5a5e66; line-height: 1; }
-
-  /* BOARDSLAY1 · board punch */
-  .banner{position:relative;overflow:hidden}
-  .banner-title{letter-spacing:-0.035em;text-shadow:0 2px 0 rgba(0,0,0,0.28)}
-  .hdr{box-shadow:inset 0 2px 0 rgba(255,255,255,0.9),0 6px 0 #1a1e24,0 14px 30px rgba(20,22,28,0.2),0 0 22px rgba(255,200,80,0.1)!important}
-  .hot-pill{position:relative;overflow:hidden}
-  .sec,.card,.zone,.item-card,.chore,.quest{transition:transform .12s ease,filter .12s ease}
 </style>
 </head>
 <body>
@@ -555,8 +548,8 @@
 /* ─── Morning-refresh facts (swap values only; do not restyle) ───
  Known facts only · as-of LIVE America/Chicago · no money · no invent · Mon LIVE prep */
 const FACTS = {
- asOf: "Mon Sep 28 2026",
- asOfShort: "Mon Sep 28",
+ asOf: "Sun Sep 27 2026",
+ asOfShort: "Sun Sep 27",
  eyebrow: "WardOS · House · KS Hub",
  title: "House",
  titleSub: "family week",
@@ -569,13 +562,13 @@ const FACTS = {
  
  leaveCard: {
  style: "A",
- label: "Monday house card",
- dateLabel: "Mon Sep 28",
- leaveBy: "…",
+ label: "Sunday house card",
+ dateLabel: "Sun Sep 27",
+ leaveBy: "3:00",
  place: "147th",
  flight: "",
- route: "calendar live",
- status: "CAL · loading"
+ route: "Ainsley vanity",
+ status: "LIVE · garage sale 9–2 · vanity 3:00"
  },
  lockPacket: {
  style: "B",
@@ -585,19 +578,17 @@ const FACTS = {
  },
  schoolWeather: { school: "UNKNOWN", weather: "UNKNOWN" },
 leaveBy: {
- label: "Next up · today",
- date: "Mon Sep 28",
- time: "",
- place: "Loading…",
- detailHtml: "America/Chicago · live clock",
- badge: "Mon",
- stale: false,
- staleReason: ""
-},
+ label: "Next up · Sun",
+ date: "Sun Sep 27",
+ time: "3:00",
+ place: "Ainsley vanity · Jessy",
+ detailHtml: "Garage sale <strong>9–2</strong> @ 147th · then vanity · kids with Dad @ <strong>147th</strong> through Fri Oct 2 3:00",
+ badge: "Sun"
+ },
  week: {
  title: "This week",
- range: "Fri Sep 25 3:00p → Fri Oct 2 3:00 · Dad week @ 147th",
- banner: "Dad week Fri→Fri · with Dad @ 147th through Fri Oct 2 3:00",
+ range: "Sun Sep 27 – Fri Oct 2 · Dad week @ 147th",
+ banner: "with Dad @ 147th through Fri Oct 2 3:00",
  who: [
  { id: "ain", label: "Ainsley" },
  { id: "hay", label: "Hayes" },
@@ -607,75 +598,46 @@ leaveBy: {
  {
  dow: "Sat", dom: "26", load: false,
  blocks: [
- { type: "flight", time: "7:40", text: "Leave · Harris flag · game 8:30 Heritage F10", chips: ["har"] },
- { type: "kids", time: "9:00", text: "Hayes Chat & Chew told · LOCKED", chips: ["hay"] },
- { type: "flight", time: "1:45", text: "Leave · Hayes flag · game 2:45 Indian Hills", chips: ["hay"] }
+ { type: "flight", time: "7:55", text: "Leave · Harris flag · game 8:30 Heritage F10", chips: ["har"] },
+ { type: "kids", time: "9:00", text: "Hayes Chat & Chew @ home · LOCKED", chips: ["hay"] },
+ { type: "urban", time: "10:30–12:45", text: "Quiet errands" },
+ { type: "flight", time: "~2:10", text: "Leave · Hayes flag · game 2:45 Indian Hills", chips: ["hay"] }
  ]
  },
  {
  dow: "Sun", dom: "27", load: false,
  blocks: [
  { type: "kids", time: "9–2", text: "Garage sale / house shake @ 147th", chips: ["ain","hay","har"] },
- { type: "kids", time: "3:00", text: "Ainsley · LKMS Homework Help", chips: ["ain"] },
+ { type: "handoff", time: "3:00", text: "Ainsley vanity · Jessy", chips: ["ain"] },
  { type: "urban", time: "6:00", text: "Lawn feed" }
  ]
  },
  {
  dow: "Mon", dom: "28", load: true,
  blocks: [
- { type: "kids", time: "7:30", text: "Hayes snacks in bag", chips: ["hay"] },
+ { type: "kids", time: "7:30", text: "Hayes snacks", chips: ["hay"] },
  { type: "flight", time: "8:00", text: "House+Desk LIVE" },
- { type: "flight", time: "8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
+ { type: "flight", time: "~8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
  { type: "kids", time: "3:00", text: "Ainsley LKMS HW Help", chips: ["ain"] },
- { type: "kids", time: "3:15", text: "Leave · boys pickup 3:40", chips: ["hay","har"] },
- { type: "flight", time: "5:40", text: "Leave · Hayes BB 6:15 BV Rec F3", chips: ["hay"] }
+ { type: "kids", time: "3:15/3:40", text: "Boys pickup", chips: ["hay","har"] },
+ { type: "flight", time: "~5:40", text: "Leave · Hayes BB 6:15 BV Rec F3", chips: ["hay"] }
  ]
  },
- {
- dow: "Tue", dom: "29", load: false,
- blocks: [
- { type: "flight", time: "8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
- { type: "kids", time: "8:50", text: "Hayes · Madi + provider collab @ SRE", chips: ["hay"] },
- { type: "kids", time: "3:15", text: "Leave · boys pickup 3:40", chips: ["hay","har"] },
- { type: "flight", time: "4:25", text: "Leave · Ainsley swim 5:00 Genesis", chips: ["ain"] },
- { type: "flight", time: "5:40", text: "Leave · Hayes flag 6:00 SRE fields", chips: ["hay"] }
- ]
- },
- {
- dow: "Wed", dom: "30", load: false,
- blocks: [
- { type: "flight", time: "8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
- { type: "kids", time: "school", text: "Boys hearing/vision screen @ SRE", chips: ["hay","har"] },
- { type: "flight", time: "9:00", text: "Leave · HD #2209 vanity return", chips: [] },
- { type: "flight", time: "12:40", text: "Leave · Ainsley appointment 1:00", chips: ["ain"] },
- { type: "kids", time: "3:15", text: "Leave · boys pickup 3:40", chips: ["hay","har"] },
- { type: "flight", time: "~4:55", text: "Leave · Harris flag practice 4:55–6:50", chips: ["har"] }
- ]
- },
- {
- dow: "Thu", dom: "1", load: false,
- blocks: [
- { type: "kids", time: "AM", text: "Boys PE · tennis shoes", chips: ["hay","har"] },
- { type: "flight", time: "8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
- { type: "kids", time: "3:00", text: "Ainsley LKMS HW Help", chips: ["ain"] },
- { type: "kids", time: "3:15", text: "Leave · boys pickup 3:40", chips: ["hay","har"] },
- { type: "flight", time: "4:25", text: "Leave · Ainsley swim 5:00 Genesis", chips: ["ain"] },
- { type: "flight", time: "~4:55", text: "Leave · Hayes BB game 5:30 Falcons vs Lions F24", chips: ["hay"] }
- ]
- },
+ { dow: "Tue", dom: "29", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
+ { dow: "Wed", dom: "30", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
+ { dow: "Thu", dom: "1", load: false, blocks: [{ type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"], tapAdd: true }] },
  {
  dow: "Fri", dom: "2", load: false,
  blocks: [
- { type: "flight", time: "8:10", text: "Leave · SRE drop 8:25", chips: ["hay","har"] },
- { type: "kids", time: "school", text: "Hayes field trip · museum + Meadowbrook", chips: ["hay"] },
- { type: "flight", time: "9:00", text: "Dan DRIVE → Nashville · leave after SRE", chips: [] }
+ { type: "kids", text: "Dad week @ 147th", chips: ["ain","hay","har"] },
+ { type: "handoff", time: "3:00", text: "Through · kids with Dad ends", chips: ["ain","hay","har"] }
  ]
  }
  ]
  },
  nextTogether: {
  label: "Watch",
- items: ["Tue 29 · swim + flag stack", "Wed 30 · Anxiety + Harris flag", "Thu 1 · swim + BB game", "Fri Oct 2 · Nashville leave 9:00 · Dad week end"]
+ items: ["Sun 27 · garage sale 9–2", "Mon 28 · House+Desk LIVE 8:00", "Fri Oct 2 3:00 · Dad week end"]
  },
  footer: {
  note: "House · week board",
@@ -774,12 +736,11 @@ function render() {
  <section class="leaveby" aria-label="Next leave-by">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
- <div class="leaveby-label" data-live="leaveby-label">${esc(lb.label)}</div>
- <div class="leaveby-main" data-live="leaveby-main">${esc(lb.date)} · <span class="time">${esc(lb.time)}</span> ${esc(lb.place)}</div>
- <div class="leaveby-detail" data-live="leaveby-detail">${lb.detailHtml}</div>
- <div data-live="asof-warn" ${lb.stale ? "" : "hidden"} style="margin-top:6px;font-size:12px;font-weight:700;letter-spacing:0.04em;color:#ffb020;">${lb.staleReason ? esc(lb.staleReason) : ""}</div>
+ <div class="leaveby-label">${esc(lb.label)}</div>
+ <div class="leaveby-main">${esc(lb.date)} · <span class="time">${esc(lb.time)}</span>${esc(lb.place)}</div>
+ <div class="leaveby-detail">${lb.detailHtml}</div>
  </div>
- <div class="leaveby-badge" data-live="leaveby-badge">${esc(lb.badge)}</div>
+ <div class="leaveby-badge">${esc(lb.badge)}</div>
  </section>
 
  <section class="week-wrap">
@@ -788,10 +749,10 @@ function render() {
  <div class="week-range">${esc(f.week.range)}</div>
  </div>
  <div class="banner-row">
- <div class="banner homebase-loud" aria-label="Home base">
- <span class="c-k">Home base</span>
- <span class="c-main">at <em>Dad's</em> @ <em>147th</em> through <em>Fri Oct 2 3:00</em></span>
- <span class="c-next" data-live="banner-next">next · loading</span>
+ <div class="banner custody-loud" aria-label="Custody">
+ <span class="c-k">Custody</span>
+ <span class="c-main">with <em>Dad</em> @ <em>147th</em> through <em>Fri Oct 2 3:00</em></span>
+ <span class="c-next">next · Sun 3:00 Ainsley vanity</span>
  </div>
  <div class="who" aria-label="Kids">
  ${(f.week.who || []).map(w => {
@@ -846,8 +807,8 @@ document.addEventListener("keydown", (e) => {
 <script src="house-zoom.js"></script>
 <script>if (window.HouseZoom) HouseZoom.mount();</script>
 
-<script src="house-clock.js?v=CALFIX1"></script>
-<script src="house-weather.js?v=CALFIX1"></script>
+<script src="house-clock.js?v=CT1"></script>
+<script src="house-weather.js?v=CT1"></script>
 <script>
 (function () {
   function esc(s) {
@@ -878,87 +839,23 @@ document.addEventListener("keydown", (e) => {
     }
   }
   function loadStripIntoFacts(cb) {
-    var CAL_FRESH_MS = 6 * 60 * 60 * 1000;
-    function applyStale(reason) {
-      if (!FACTS.leaveBy) return;
-      FACTS.leaveBy.time = "";
-      FACTS.leaveBy.place = "CAL STALE";
-      FACTS.leaveBy.detailHtml = String(reason || "cal-live missing").replace(/</g, "&lt;");
-      FACTS.leaveBy.stale = true;
-      FACTS.leaveBy.staleReason = reason || "cal-live missing";
-      var bn = document.querySelector("[data-live='banner-next']");
-      /* banner updated on next render */
-    }
-    function applyStripObj(s, stale, reason) {
-      if (!s || !FACTS.leaveBy) return;
-      if (s.time != null) FACTS.leaveBy.time = s.time;
-      if (s.place) FACTS.leaveBy.place = s.place;
-      if (s.detailHtml) FACTS.leaveBy.detailHtml = s.detailHtml;
-      if (s.label) FACTS.leaveBy.label = s.label;
-      if (s.badge) FACTS.leaveBy.badge = s.badge;
-      FACTS.leaveBy.stale = !!stale;
-      FACTS.leaveBy.staleReason = reason || "";
-    }
-    function pickNext(cal) {
-      var list = (cal && (cal.upcomingLeaves || cal.events)) || [];
-      var now = Date.now();
-      var future = list.filter(function (e) {
-        var t = Date.parse(e.start || "");
-        return Number.isFinite(t) && t > now;
-      }).sort(function (a, b) { return Date.parse(a.start) - Date.parse(b.start); });
-      return future[0] || null;
-    }
-    function stripFromEv(ev, clock) {
-      if (!ev) {
-        return { label: "Next up · today", time: "", place: "Clear · no future on glass",
-          detailHtml: "No upcoming events in cal-live window", badge: clock.dow };
-      }
-      var p = {};
-      try {
-        new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", hour: "numeric", minute: "2-digit", hour12: true })
-          .formatToParts(new Date(ev.start)).forEach(function (x) { if (x.type !== "literal") p[x.type] = x.value; });
-      } catch (e) {}
-      var time = (p.hour || "") + ":" + (p.minute || "");
-      var place = String(ev.summary || "").replace(/^Leave\s*[·•\-–—]\s*/i, "");
-      return {
-        label: "Next up · today",
-        time: time,
-        place: place,
-        detailHtml: "<strong>" + time + "</strong> " + place,
-        badge: clock.dow
-      };
-    }
-    var clock = window.HouseClock ? HouseClock.now() : { iso: "", dow: "Mon" };
-    fetch("data/cal-live.json?v=" + Date.now(), { cache: "no-store" })
-      .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("cal-live missing")); })
-      .then(function (cal) {
-        var age = cal && cal.fetchedAt ? (Date.now() - Date.parse(cal.fetchedAt)) : Infinity;
-        if (!cal || cal.status !== "live" || age >= CAL_FRESH_MS || (cal.asOfIso && cal.asOfIso !== clock.iso)) {
-          var reason = !cal ? "cal-live missing"
-            : cal.status === "error" ? ("cal error: " + (cal.error || "unknown"))
-            : (cal.asOfIso && cal.asOfIso !== clock.iso) ? ("facts as-of " + cal.asOfIso + " · clock " + clock.iso)
-            : "cal-live aged out · >6h";
-          applyStale(reason);
-          cb();
-          return;
+    fetch("kids-week.json?v=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function (data) {
+        var s = data && data.boardStrip;
+        if (s && FACTS.leaveBy) {
+          if (s.time) FACTS.leaveBy.time = s.time;
+          if (s.place) FACTS.leaveBy.place = s.place;
+          if (s.detailHtml) FACTS.leaveBy.detailHtml = s.detailHtml;
+          if (s.label) FACTS.leaveBy.label = s.label;
+          if (s.badge) FACTS.leaveBy.badge = s.badge;
         }
-        var next = pickNext(cal);
-        applyStripObj(stripFromEv(next, clock), false, "");
-        /* homeWeek still from kids-week */
-        return fetch("kids-week.json?v=" + Date.now(), { cache: "no-store" })
-          .then(function (r) { return r.ok ? r.json() : null; })
-          .then(function (data) {
-            if (data && data.homeWeek && data.homeWeek.throughLabel && FACTS.week) {
-              FACTS.week.banner = data.homeWeek.throughLabel;
-            }
-            cb();
-          })
-          .catch(function () { cb(); });
-      })
-      .catch(function (e) {
-        applyStale((e && e.message) || "cal-live missing");
+        if (data && data.custody && data.custody.throughLabel && FACTS.week) {
+          FACTS.week.banner = data.custody.throughLabel;
+        }
         cb();
-      });
+      })
+      .catch(function () { cb(); });
   }
   applyClockToFacts();
   var _origRender = typeof render === "function" ? render : null;
@@ -972,21 +869,5 @@ document.addEventListener("keydown", (e) => {
 })();
 </script>
 
-<script src="house-sfx.js"></script>
-
-<script>
-(function(){
-  function wire(){
-    document.querySelectorAll("a,button,.tile,.quest,.chore,.card,.item,.cam,.ctrl-btn,.kid-link,[data-check]").forEach(function(el){
-      if (el.__bsfx) return; el.__bsfx = 1;
-      el.addEventListener("pointerdown", function(){
-        try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch(e){}
-      }, {passive:true});
-    });
-  }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wire);
-  else wire();
-})();
-</script>
 </body>
 </html>

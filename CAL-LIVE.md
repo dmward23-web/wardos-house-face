@@ -30,10 +30,6 @@ House Face UI
 cd /workspace/wardos-house-face   # or clone of wardos-house-face
 # 1) Dump dmward23 primary (MCP list_events → save JSON; strip connector preamble ok)
 # 2) Regenerate live slice + patch week glass
-# Preferred (standing routine / on calendar write):
-./scripts/house-board-calendar-refresh.sh /path/to/events-dump.json --deploy
-
-# Or stepwise:
 node scripts/cal-from-events.mjs \
   --events /path/to/events-dump.json \
   --out data/cal-live.json \

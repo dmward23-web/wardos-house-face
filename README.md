@@ -65,13 +65,8 @@ Reference week plate: `/workspace/board-os-house-face.png`.
 
 ## Sensi thermostat (live gate)
 
-- **Main board** (`sheet-index.html`): live climate strip (ambient · set · mode · humidity) → Google Home
 - Climate hero: `sheet-google-home.html` · full panel: `sheet-sensi.html`
 - Live reads: `data/sensi-live.json` (Atlas `scripts/sensi-fetch.mjs`)
 - Auth + cron: see **SENSI-LIVE.md** — needs Dan’s one-time `refresh_token` (not password in chat)
-- LIVE pulse only when `status=live` and snapshot fresh · never fake LIVE · token never in git/glass
-- **Nest cams:** Device Access (SDM) **LIVE** — `scripts/nest-fetch.mjs` → `data/nest-live.json` · see **NEST-LIVE.md**
-  - Roster LIVE when `status=live` + fresh · **tap pad → WebRTC video** via box `nest-webrtc-proxy` (:8787)
-  - Secrets on box only: `~/.config/wardos/nest-refresh.token` + `nest-sdm.json` (never git)
-  - Viewer: `nest-webrtc.html` · see **NEST-LIVE.md** · tip NESTVID1
+- Until tokened: UI shows **CONNECT · NEED TOKEN** / DEMO — never fake LIVE
 
