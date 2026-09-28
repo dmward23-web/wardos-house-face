@@ -2,8 +2,11 @@
 /**
  * WardOS House Face · Nest / Google Device Access (SDM) live snapshot
  *
- * STAGE ONLY until Dan hands refresh_token + nest-sdm.json.
+ * LIVE when refresh_token + nest-sdm.json exist on the box.
  * Never invent video or snapshot URLs. Missing creds → need_token JSON.
+ * WEB_RTC-only cams: no RTSP / on-demand GenerateImage. Optional stills:
+ *   download auth-gated event images into data/nest-snaps/*.jpg (gitignored)
+ *   and set snapshotUrl to a relative Pages path (tokens never in JSON).
  *
  * Secrets (never git):
  *   ~/.config/wardos/nest-refresh.token   (mode 600) — OAuth refresh_token
@@ -29,6 +32,7 @@ const SDM_BASE = "https://smartdevicemanagement.googleapis.com/v1";
 
 const DEFAULT_TOKEN = path.join(os.homedir(), ".config", "wardos", "nest-refresh.token");
 const DEFAULT_CONFIG = path.join(os.homedir(), ".config", "wardos", "nest-sdm.json");
+const SNAPS_DIR = path.join(ROOT, "data", "nest-snaps");
 
 /** Honest stub pads when no live devices yet — matches sheet-google-home.html */
 const STUB_PADS = [
@@ -224,6 +228,7 @@ async function listDevices(accessToken, projectId) {
 
 /**
  * Attempt GenerateImage only when an eventId is supplied via env (rare).
+ * WEB_RTC-only Nest cams often reject this command entirely (no RTSP).
  * Without eventId this is a no-op — we refuse to invent URLs.
  */
 async function tryGenerateImage(accessToken, deviceName, eventId) {
@@ -241,13 +246,40 @@ async function tryGenerateImage(accessToken, deviceName, eventId) {
       params: { eventId },
     }),
   });
-  if (!resp.ok) return null;
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    return { error: `GenerateImage HTTP ${resp.status}: ${text.slice(0, 160)}` };
+  }
   const json = await resp.json();
   const results = json.results || {};
-  if (!results.url) return null;
-  // URL needs Authorization: Basic <token> to download — not embeddable as <img>.
-  // Surface as snapshotUrl only if caller will proxy; for Pages we keep null unless bridged.
+  if (!results.url) return { error: "GenerateImage missing url" };
+  // URL needs Authorization: Basic <token> — not embeddable as bare <img> on Pages.
   return { url: results.url, token: results.token || null, needsAuthHeader: true };
+}
+
+/** Download auth-gated SDM image bytes → data/nest-snaps/<slug>.jpg (relative snapshotUrl). */
+async function downloadSnapToPages(img, slug) {
+  if (!img || !img.url || !img.token) return null;
+  fs.mkdirSync(SNAPS_DIR, { recursive: true });
+  const fileName = String(slug || "cam").replace(/[^a-zA-Z0-9_-]+/g, "-").toLowerCase() + ".jpg";
+  const abs = path.join(SNAPS_DIR, fileName);
+  const resp = await fetch(img.url + (img.url.includes("?") ? "&" : "?") + "width=640", {
+    headers: { Authorization: "Basic " + img.token },
+  });
+  if (!resp.ok) return null;
+  const buf = Buffer.from(await resp.arrayBuffer());
+  if (buf.length < 100) return null;
+  fs.writeFileSync(abs, buf);
+  return "data/nest-snaps/" + fileName;
+}
+
+function slugForCam(pad) {
+  const base = String(pad.name || pad.id || "cam")
+    .toLowerCase()
+    .replace(/\s+camera$/i, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return base || "cam";
 }
 
 function persistRotatedToken(tokenFile, newRefresh) {
@@ -305,18 +337,37 @@ async function main() {
     const eventId = process.env.NEST_EVENT_ID || "";
 
     const cameras = [];
+    let snapsSaved = 0;
+    let snapErrors = [];
     for (const d of camsRaw.length ? camsRaw : []) {
       const pad = normalizeDevice(d);
+      const live = (d.traits && d.traits["sdm.devices.traits.CameraLiveStream"]) || {};
+      pad.protocols = Array.isArray(live.supportedProtocols) ? live.supportedProtocols : [];
       if (eventId && d.name) {
         const img = await tryGenerateImage(tokens.accessToken, d.name, eventId);
-        // Do not put auth-gated SDM URLs into public JSON — Pages cannot send Basic header.
-        // Leave snapshotUrl null; document bridge path in NEST-LIVE.md.
-        if (img && img.url) {
-          pad.snapshotMeta = { hasEventImage: true, needsAuthHeader: true };
+        if (img && img.url && img.token) {
+          // Download with Basic auth → relative path Pages can serve (token never in JSON).
+          try {
+            const rel = await downloadSnapToPages(img, slugForCam(pad));
+            if (rel) {
+              pad.snapshotUrl = rel;
+              snapsSaved++;
+            } else {
+              snapErrors.push(pad.name + ": download empty");
+            }
+          } catch (e) {
+            snapErrors.push(pad.name + ": " + (e && e.message ? e.message : String(e)));
+          }
+        } else if (img && img.error) {
+          snapErrors.push(pad.name + ": " + img.error);
         }
       }
       cameras.push(pad);
     }
+
+    const webrtcOnly =
+      cameras.length > 0 &&
+      cameras.every((c) => Array.isArray(c.protocols) && c.protocols.includes("WEB_RTC") && !c.protocols.includes("RTSP"));
 
     // No camera devices linked — still "live" auth but honest empty pads (not invented video)
     const payload = {
@@ -327,11 +378,22 @@ async function main() {
       cameras: cameras.length ? cameras : stubCameras().map((c) => ({ ...c, note: "no CAMERA devices in SDM list" })),
       deviceCount: devices.length,
       cameraCount: camsRaw.length,
-      error: camsRaw.length ? null : "auth ok · no camera/doorbell devices in SDM enterprise list",
+      stillsPending: snapsSaved === 0,
+      stillNote: snapsSaved
+        ? null
+        : webrtcOnly
+          ? "WEB_RTC-only cams: GenerateImage/RTSP unsupported without event bridge. snapshotUrl null — never invent."
+          : "No embeddable stills yet (set NEST_EVENT_ID or bridge HTTPS into snapshotUrl).",
+      error: camsRaw.length
+        ? snapErrors.length
+          ? snapErrors.slice(0, 3).join("; ")
+          : null
+        : "auth ok · no camera/doorbell devices in SDM enterprise list",
     };
     writeJson(args.outPath, payload);
     console.log(
-      `live: devices=${devices.length} cameras=${camsRaw.length} → ${args.outPath} (snapshot URLs null unless bridged)`
+      `live: devices=${devices.length} cameras=${camsRaw.length} snaps=${snapsSaved} → ${args.outPath}` +
+        (webrtcOnly && !snapsSaved ? " (WEB_RTC-only · stills pending)" : "")
     );
   } catch (err) {
     const msg = err && err.message ? err.message : String(err);

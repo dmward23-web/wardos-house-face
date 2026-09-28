@@ -1,49 +1,120 @@
 {
-  "status": "need_token",
-  "fetchedAt": "2026-09-28T01:02:15.709Z",
-  "updatedAt": "2026-09-28T01:02:15.710Z",
+  "status": "live",
+  "fetchedAt": "2026-09-28T01:52:06.921Z",
+  "updatedAt": "2026-09-28T01:52:06.922Z",
   "source": "nest-sdm",
   "cameras": [
     {
-      "id": "stub-front",
-      "name": "Front door",
+      "id": "AVPHwEuWj4tCzdBjnBewJT9cxMmyuqJ44t2xEpZoHxHxy6X98PTT5LylTtkH09YotPY0laUf5oSLDS0FIHtzER2511VUJA",
+      "name": "Living Room camera",
+      "where": "Inside",
+      "type": "CAMERA",
+      "online": null,
+      "snapshotUrl": null,
+      "streamUrl": null,
+      "traits": [
+        "sdm.devices.traits.Info",
+        "sdm.devices.traits.CameraLiveStream",
+        "sdm.devices.traits.CameraImage",
+        "sdm.devices.traits.CameraPerson",
+        "sdm.devices.traits.CameraMotion",
+        "sdm.devices.traits.CameraEventImage"
+      ],
+      "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEuWj4tCzdBjnBewJT9cxMmyuqJ44t2xEpZoHxHxy6X98PTT5LylTtkH09YotPY0laUf5oSLDS0FIHtzER2511VUJA",
+      "protocols": [
+        "WEB_RTC"
+      ]
+    },
+    {
+      "id": "AVPHwEszjDhfLzGUeifKqDy5RxbNgy-ak0LIcIeP_ne3v_vm8QWlxJrFgtF-bxW-yPgNqCGwjmYWuJUQZX-HK6paZASTlQ",
+      "name": "Front door doorbell",
       "where": "Entry",
-      "type": "CAMERA",
+      "type": "DOORBELL",
       "online": null,
       "snapshotUrl": null,
       "streamUrl": null,
-      "traits": []
+      "traits": [
+        "sdm.devices.traits.Info",
+        "sdm.devices.traits.CameraLiveStream",
+        "sdm.devices.traits.CameraImage",
+        "sdm.devices.traits.CameraPerson",
+        "sdm.devices.traits.CameraMotion",
+        "sdm.devices.traits.CameraEventImage",
+        "sdm.devices.traits.DoorbellChime",
+        "sdm.devices.traits.CameraClipPreview"
+      ],
+      "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEszjDhfLzGUeifKqDy5RxbNgy-ak0LIcIeP_ne3v_vm8QWlxJrFgtF-bxW-yPgNqCGwjmYWuJUQZX-HK6paZASTlQ",
+      "protocols": [
+        "WEB_RTC"
+      ]
     },
     {
-      "id": "stub-drive",
-      "name": "Driveway",
-      "where": "Drive",
-      "type": "CAMERA",
-      "online": null,
-      "snapshotUrl": null,
-      "streamUrl": null,
-      "traits": []
-    },
-    {
-      "id": "stub-yard",
-      "name": "Backyard",
-      "where": "Yard",
-      "type": "CAMERA",
-      "online": null,
-      "snapshotUrl": null,
-      "streamUrl": null,
-      "traits": []
-    },
-    {
-      "id": "stub-garage",
-      "name": "Garage cam",
+      "id": "AVPHwEtJ7Bg8BNK_xeyUBSi4-8E7v9-b_1rH5UZSDNE7HNGH4uO44F8KpsbrYesj5DqMkGB_lRogpoYArP1Wo0aKF7-9Iw",
+      "name": "Garage camera",
       "where": "Garage",
       "type": "CAMERA",
       "online": null,
       "snapshotUrl": null,
       "streamUrl": null,
-      "traits": []
+      "traits": [
+        "sdm.devices.traits.Info",
+        "sdm.devices.traits.CameraLiveStream",
+        "sdm.devices.traits.CameraImage",
+        "sdm.devices.traits.CameraPerson",
+        "sdm.devices.traits.CameraMotion",
+        "sdm.devices.traits.CameraEventImage"
+      ],
+      "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEtJ7Bg8BNK_xeyUBSi4-8E7v9-b_1rH5UZSDNE7HNGH4uO44F8KpsbrYesj5DqMkGB_lRogpoYArP1Wo0aKF7-9Iw",
+      "protocols": [
+        "WEB_RTC"
+      ]
+    },
+    {
+      "id": "AVPHwEtezQTp5yQU6h_0pWKlkCPORXdhYrCy96s1CVwjjT4NfAsP_hpfLy-kRlDF0ORI2c8AXwi9_Kq_yj_8rPZwyCH_6w",
+      "name": "Kitchen camera",
+      "where": "Cam",
+      "type": "CAMERA",
+      "online": null,
+      "snapshotUrl": null,
+      "streamUrl": null,
+      "traits": [
+        "sdm.devices.traits.Info",
+        "sdm.devices.traits.CameraLiveStream",
+        "sdm.devices.traits.CameraImage",
+        "sdm.devices.traits.CameraPerson",
+        "sdm.devices.traits.CameraMotion",
+        "sdm.devices.traits.CameraEventImage"
+      ],
+      "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEtezQTp5yQU6h_0pWKlkCPORXdhYrCy96s1CVwjjT4NfAsP_hpfLy-kRlDF0ORI2c8AXwi9_Kq_yj_8rPZwyCH_6w",
+      "protocols": [
+        "WEB_RTC"
+      ]
+    },
+    {
+      "id": "AVPHwEuvgj_bTQ6TzRNedMpdB-w5gs1bF2QHgvdTES9K5s9kshmS94FQCrNE_zPxr9PiWFmzVSCyRLj4f0G2RVo2biphPg",
+      "name": "Backyard camera",
+      "where": "Yard",
+      "type": "CAMERA",
+      "online": null,
+      "snapshotUrl": null,
+      "streamUrl": null,
+      "traits": [
+        "sdm.devices.traits.Info",
+        "sdm.devices.traits.CameraLiveStream",
+        "sdm.devices.traits.CameraImage",
+        "sdm.devices.traits.CameraPerson",
+        "sdm.devices.traits.CameraMotion",
+        "sdm.devices.traits.CameraEventImage"
+      ],
+      "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEuvgj_bTQ6TzRNedMpdB-w5gs1bF2QHgvdTES9K5s9kshmS94FQCrNE_zPxr9PiWFmzVSCyRLj4f0G2RVo2biphPg",
+      "protocols": [
+        "WEB_RTC"
+      ]
     }
   ],
-  "error": "refresh_token missing (/home/box/.config/wardos/nest-refresh.token); config missing/unreadable (/home/box/.config/wardos/nest-sdm.json)"
+  "deviceCount": 5,
+  "cameraCount": 5,
+  "stillsPending": true,
+  "stillNote": "WEB_RTC-only cams: GenerateImage/RTSP unsupported without event bridge. snapshotUrl null — never invent.",
+  "error": null
 }
