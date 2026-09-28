@@ -1,0 +1,49 @@
+{
+  "status": "need_token",
+  "fetchedAt": "2026-09-28T01:02:15.709Z",
+  "updatedAt": "2026-09-28T01:02:15.710Z",
+  "source": "nest-sdm",
+  "cameras": [
+    {
+      "id": "stub-front",
+      "name": "Front door",
+      "where": "Entry",
+      "type": "CAMERA",
+      "online": null,
+      "snapshotUrl": null,
+      "streamUrl": null,
+      "traits": []
+    },
+    {
+      "id": "stub-drive",
+      "name": "Driveway",
+      "where": "Drive",
+      "type": "CAMERA",
+      "online": null,
+      "snapshotUrl": null,
+      "streamUrl": null,
+      "traits": []
+    },
+    {
+      "id": "stub-yard",
+      "name": "Backyard",
+      "where": "Yard",
+      "type": "CAMERA",
+      "online": null,
+      "snapshotUrl": null,
+      "streamUrl": null,
+      "traits": []
+    },
+    {
+      "id": "stub-garage",
+      "name": "Garage cam",
+      "where": "Garage",
+      "type": "CAMERA",
+      "online": null,
+      "snapshotUrl": null,
+      "streamUrl": null,
+      "traits": []
+    }
+  ],
+  "error": "refresh_token missing (/home/box/.config/wardos/nest-refresh.token); config missing/unreadable (/home/box/.config/wardos/nest-sdm.json)"
+}
