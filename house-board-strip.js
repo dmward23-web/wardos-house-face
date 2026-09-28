@@ -1,4 +1,4 @@
-/* House Face · live leave-by / Schedule strip (HUBNEXT2).
+/* House Face · live leave-by / Schedule strip (HUBGLASS1).
    Date labels ALWAYS from HouseClock (America/Chicago).
    Authority: data/cal-live.json (dmward23 → cal-from-events.mjs).
    Panel paints today's remaining + tomorrow peek (dense list, hub-scale type).
@@ -277,9 +277,10 @@
     var title = shortPlace(ev.summary || ev.place || "");
     var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "—");
     var cls = "leaveby-row" + (isNext ? " is-next" : "") + (ev.allDay ? " is-allday" : "");
+    var nextChip = isNext ? '<span class="leaveby-row-chip">NEXT</span>' : "";
     return '<li class="' + cls + '">' +
       '<span class="leaveby-row-time">' + esc(timeLab) + "</span>" +
-      '<span class="leaveby-row-title">' + esc(title) + "</span>" +
+      '<span class="leaveby-row-title">' + esc(title) + nextChip + "</span>" +
       "</li>";
   }
 
