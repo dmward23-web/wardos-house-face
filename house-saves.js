@@ -5,7 +5,7 @@
   var KEY = "house-saves:v1";
   var DEFAULTS = {
     ainsley: [{ id: "seed-stick-season", name: "Stick Season · concert save", need: 40 }],
-    hayes: [{ id: "seed-victory-stash", name: "Victory stash", need: 12 }],
+    hayes: [{ id: "seed-victory-stash", name: "Victory stash", need: 10 }],
     harris: [{ id: "seed-gem-stash", name: "Gem stash", need: 8 }]
   };
 
@@ -32,6 +32,16 @@
         return { id: x.id, name: x.name, need: x.need || 0, created: Date.now() };
       });
       saveRoot(root);
+    } else if (kidId === "hayes") {
+      /* FAIL3 · align legacy Victory stash seed (was 12) → bankGoal/allowance 10 */
+      var dirty = false;
+      (root[kidId] || []).forEach(function (x) {
+        if (x && x.id === "seed-victory-stash" && Number(x.need) === 12) {
+          x.need = 10;
+          dirty = true;
+        }
+      });
+      if (dirty) saveRoot(root);
     }
     return root[kidId].slice();
   }
