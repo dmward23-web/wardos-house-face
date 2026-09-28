@@ -127,13 +127,13 @@
  background: linear-gradient(180deg, #fff 0%, #d8dce2 40%, #8a909a 100%);
  }
  .leaveby-body {
- flex: 1; padding: 18px 112px 18px 22px;
- display: flex; flex-direction: column; gap: 8px;
+ flex: 1; padding: 12px 24px 12px 20px;
+ display: flex; flex-direction: column; gap: 1px;
  position: relative; z-index: 1;
  }
  .leaveby-label {
  font-size: 10px; font-weight: 700; letter-spacing: 0.32em;
- text-transform: uppercase; color: #e8eef6;
+ text-transform: uppercase; color: rgba(220,225,235,0.72);
  }
  .leaveby-main {
  font-size: 30px; font-weight: 700; letter-spacing: -0.04em;
@@ -146,10 +146,10 @@
  box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset, 0 3px 12px rgba(0,0,0,0.28), 0 0 12px rgba(255,255,255,0.18);
  }
  .leaveby-detail {
- font-size: 15px; font-weight: 600; color: #e8eef8;
+ font-size: 15px; font-weight: 500; color: rgba(200,206,216,0.88);
  letter-spacing: -0.015em;
  }
- .leaveby-detail strong { color: #ffffff; font-weight: 800; }
+ .leaveby-detail strong { color: #ffffff; font-weight: 700; }
  .leaveby-badge {
  position: absolute; right: 22px; top: 50%; transform: translateY(-50%); z-index: 2;
  font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
@@ -343,11 +343,11 @@
  <section class="leaveby" aria-label="Next leave-by">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
- <div class="leaveby-label" data-live="leaveby-label">Next up · today</div>
- <div class="leaveby-main" data-live="leaveby-main">Loading…</div>
- <div class="leaveby-detail" data-live="leaveby-detail">Kids with Dad @ <strong>147th</strong> through Fri Oct 2 3:00</div>
+ <div class="leaveby-label">Next up · today</div>
+ <div class="leaveby-main"><span class="time">3:00</span> Ainsley vanity · Jessy</div>
+ <div class="leaveby-detail">Garage sale <strong>9–2</strong> @ 147th · then vanity · kids with Dad @ <strong>147th</strong> through Fri Oct 2 3:00</div>
  </div>
- <div class="leaveby-badge" data-live="leaveby-badge">—</div>
+ <div class="leaveby-badge">Sun</div>
  </section>
 
  <section class="month-wrap">
@@ -356,7 +356,7 @@
  <div class="month-range">known facts only · empty = unknown</div>
  </div>
  <div class="banner-row">
- <div class="banner">Kids with Dad @ 147th through Fri Oct 2 3:00 · live week · Next Up from cal-live</div>
+ <div class="banner">Kids with Dad @ 147th through Fri Oct 2 3:00 · garage sale Sun 9–2 · Ainsley vanity 3:00</div>
  <div class="legend">
  <span class="leg ain"><i></i>Ainsley</span>
  <span class="leg hay"><i></i>Hayes</span>
@@ -465,15 +465,15 @@
  </div>
  </div>
  <!-- W5: 27–30 + Oct -->
- <div class="day" data-iso="2026-09-27">
- <div class="day-top"><span class="dom">27</span></div>
+ <div class="day today">
+ <div class="day-top"><span class="dom">27</span><span class="day-tag">today</span></div>
  <div class="blocks">
  <div class="blk shr">Garage sale 9–2 @ 147th</div>
  <div class="blk ain">Ainsley vanity 3:00 · Jessy</div>
  <div class="blk shr">Dad week @ 147th</div>
  </div>
  </div>
- <div class="day" data-iso="2026-09-28">
+ <div class="day">
  <div class="day-top"><span class="dom">28</span></div>
  <div class="blocks">
  <div class="blk shr">Drop 8:25 / pickup 3:40</div>
@@ -517,48 +517,6 @@
  </footer>
 </div>
 
-<script src="house-clock.js?v=NEXTUP1"></script>
-<script src="house-board-strip.js?v=NEXTUP1"></script>
 <script src="house-zoom.js"></script>
-<script>
-/* Month board · live Next Up + TODAY marker from HouseClock (America/Chicago).
-   Never paint lagged Jessy vanity into Next Up — house-board-strip advances past events. */
-(function () {
-  function markToday() {
-    if (!window.HouseClock) return;
-    var c = HouseClock.now();
-    var iso = c.iso;
-    var parts = String(iso || "").split("-");
-    var y = parts[0], m = parts[1], d = String(Number(parts[2] || 0));
-    var grid = document.querySelector(".month-grid");
-    if (!grid) return;
-    grid.querySelectorAll(".day").forEach(function (day) {
-      day.classList.remove("today");
-      var tag = day.querySelector(".day-tag");
-      if (tag && /today/i.test(tag.textContent || "")) tag.remove();
-      var hit = false;
-      if (day.getAttribute("data-iso") === iso) hit = true;
-      else if (!day.classList.contains("out") && y === "2026" && m === "09") {
-        var dom = day.querySelector(".dom");
-        if (dom && dom.textContent.trim() === d) hit = true;
-      }
-      if (!hit) return;
-      day.classList.add("today");
-      var top = day.querySelector(".day-top");
-      if (top && !top.querySelector(".day-tag")) {
-        var span = document.createElement("span");
-        span.className = "day-tag";
-        span.textContent = "today";
-        top.appendChild(span);
-      }
-    });
-  }
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", markToday);
-  } else {
-    markToday();
-  }
-})();
-</script>
 </body>
 </html>
