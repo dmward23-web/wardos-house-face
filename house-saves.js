@@ -4,7 +4,7 @@
 
   var KEY = "house-saves:v1";
   var DEFAULTS = {
-    ainsley: [{ id: "seed-stick-season", name: "Stick Season · concert save", need: 40 }],
+    ainsley: [{ id: "seed-tour-jar", name: "Tour Jar", need: 20 }],
     hayes: [{ id: "seed-victory-stash", name: "Victory stash", need: 10 }],
     harris: [{ id: "seed-gem-stash", name: "Gem stash", need: 8 }]
   };
@@ -42,6 +42,24 @@
         }
       });
       if (dirty) saveRoot(root);
+    } else if (kidId === "ainsley") {
+      /* AINSLEY$FIX · Stick Season / concert-save → Tour Jar $20 */
+      var dirtyA = false;
+      (root[kidId] || []).forEach(function (x) {
+        if (!x) return;
+        var nm = String(x.name || "");
+        if (x.id === "seed-stick-season" || /stick\s*season|concert\s*save/i.test(nm)) {
+          x.id = "seed-tour-jar";
+          x.name = "Tour Jar";
+          x.need = 20;
+          dirtyA = true;
+        } else if (x.id === "seed-tour-jar" && Number(x.need) !== 20) {
+          x.need = 20;
+          x.name = "Tour Jar";
+          dirtyA = true;
+        }
+      });
+      if (dirtyA) saveRoot(root);
     }
     return root[kidId].slice();
   }
