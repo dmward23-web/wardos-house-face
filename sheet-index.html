@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="description" content="Board-OS House face · family sheets home index · sharp-future hub · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
-<link rel="stylesheet" href="house-engage.css?v=HUBBLEND2" />
+<link rel="stylesheet" href="house-engage.css?v=HUBBADGE1" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -166,94 +166,170 @@
   .hdr-right { display: flex; flex-direction: row; align-items: center; gap: 10px; flex-shrink: 0; }
 
 
-  /* HUBBLEND2 · Sensi blended into header (quiet, beside weather) */
-  .sensi-hdr {
-    display: flex; align-items: center; gap: 10px;
-    text-decoration: none; color: #1a2030;
-    min-width: 148px; max-width: 200px;
-    padding: 8px 12px; border-radius: 14px;
-    background: linear-gradient(165deg, rgba(255,248,236,0.92), rgba(220,228,236,0.78));
-    border: 2px solid rgba(40,60,80,0.2);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 4px 0 rgba(40,50,60,0.1);
-    flex-shrink: 0;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .sensi-hdr:active { transform: translateY(1px); }
-  .sensi-hdr.is-need {
-    border-color: rgba(180,100,20,0.45);
-    background: linear-gradient(165deg, rgba(255,236,200,0.95), rgba(236,220,200,0.85));
-  }
-  .sensi-hdr.is-live {
-    border-color: rgba(40,120,80,0.35);
-  }
-  .sensi-hdr-ico { font-size: 22px; line-height: 1; flex-shrink: 0; }
-  .sensi-hdr-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-  .sensi-hdr-kicker {
-    font-size: 10px; font-weight: 750; letter-spacing: 0.14em; text-transform: uppercase; color: #5a6878;
-  }
-  .sensi-hdr-line {
-    display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
-    font-size: 13px; font-weight: 700; color: #2a3440;
-  }
-  .sensi-hdr-temp { font-size: 24px; font-weight: 900; color: #0e1014; letter-spacing: -0.04em; line-height: 1; }
-  .sensi-hdr-set { font-size: 12px; font-weight: 700; color: #4a5868; }
-  .sensi-hdr-mode {
-    font-size: 10px; font-weight: 800; letter-spacing: 0.06em;
-    padding: 2px 6px; border-radius: 999px;
-    background: rgba(40,60,80,0.1); color: #284060;
-  }
-  .sensi-hdr-sub {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #4a6870; margin-top: 1px;
-  }
-  .sensi-hdr.is-live .sensi-hdr-sub { color: #287848; }
-  .sensi-hdr.is-need .sensi-hdr-sub { color: #8a5010; }
-
-  /* HUBBLEND2 · Nest blended into header (compact pill, beside Sensi) */
+  /* HUBBADGE1 · paired premium glass pills · Tesla/SpaceX · Sensi + Nest */
+  .sensi-hdr,
   .nest-hdr {
+    position: relative;
     display: flex; align-items: center; gap: 10px;
-    text-decoration: none; color: #1a2030;
-    min-width: 140px; max-width: 188px;
-    padding: 8px 12px; border-radius: 14px;
-    background: linear-gradient(165deg, rgba(232,244,255,0.92), rgba(220,228,236,0.78));
-    border: 2px solid rgba(40,60,80,0.2);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 4px 0 rgba(40,50,60,0.1);
+    text-decoration: none; color: #e8eef4;
+    min-width: 156px; max-width: 214px;
+    min-height: 56px;
+    padding: 8px 16px 8px 10px;
+    border-radius: 999px;
+    background:
+      linear-gradient(165deg, rgba(28,32,40,0.94) 0%, rgba(10,12,16,0.96) 100%);
+    border: 1px solid rgba(64,232,255,0.34);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.18),
+      inset 0 -1px 0 rgba(0,0,0,0.45),
+      0 0 16px rgba(64,232,255,0.1),
+      0 5px 0 rgba(5,7,10,0.5);
     flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
+    overflow: visible;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   }
-  .nest-hdr:active { transform: translateY(1px); }
-  .nest-hdr.is-need {
-    border-color: rgba(180,100,20,0.45);
-    background: linear-gradient(165deg, rgba(255,236,200,0.95), rgba(236,220,200,0.85));
-  }
+  .sensi-hdr:active,
+  .nest-hdr:active { transform: translateY(1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 2px 0 rgba(5,7,10,0.55); }
+  .sensi-hdr.is-live,
   .nest-hdr.is-live {
-    border-color: rgba(40,120,80,0.35);
+    border-color: rgba(72,220,140,0.55);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.2),
+      inset 0 -1px 0 rgba(0,0,0,0.4),
+      0 0 0 1px rgba(72,220,140,0.18),
+      0 0 18px rgba(64,220,140,0.22),
+      0 5px 0 rgba(5,7,10,0.5);
   }
-  .nest-hdr-ico { font-size: 22px; line-height: 1; flex-shrink: 0; }
-  .nest-hdr-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .sensi-hdr.is-live::after,
+  .nest-hdr.is-live::after {
+    content: "";
+    position: absolute; inset: -3px;
+    border-radius: inherit;
+    pointer-events: none;
+    border: 1px solid rgba(96,232,160,0.35);
+    box-shadow: 0 0 0 0 rgba(96,232,160,0.35);
+    animation: hdr-live-ring 2.4s ease-out infinite;
+  }
+  .sensi-hdr.is-need,
+  .nest-hdr.is-need {
+    border-color: rgba(255,176,64,0.5);
+    background:
+      linear-gradient(165deg, rgba(42,32,16,0.95) 0%, rgba(14,12,8,0.96) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,220,160,0.14),
+      inset 0 -1px 0 rgba(0,0,0,0.45),
+      0 0 14px rgba(255,176,64,0.14),
+      0 5px 0 rgba(5,7,10,0.5);
+  }
+  .sensi-hdr.is-need::after,
+  .nest-hdr.is-need::after { display: none; }
+
+  .sensi-hdr-ico,
+  .nest-hdr-ico {
+    width: 36px; height: 36px; flex-shrink: 0;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background:
+      radial-gradient(circle at 35% 28%, rgba(255,255,255,0.16), transparent 55%),
+      linear-gradient(145deg, rgba(40,48,58,0.95), rgba(12,14,18,0.98));
+    border: 1px solid rgba(64,232,255,0.28);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 0 10px rgba(64,232,255,0.12);
+    color: #9ae8ff;
+  }
+  .sensi-hdr.is-live .sensi-hdr-ico,
+  .nest-hdr.is-live .nest-hdr-ico {
+    color: #8effc0;
+    border-color: rgba(96,232,160,0.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 0 12px rgba(72,220,140,0.28);
+  }
+  .sensi-hdr.is-need .sensi-hdr-ico,
+  .nest-hdr.is-need .nest-hdr-ico {
+    color: #ffc878;
+    border-color: rgba(255,176,64,0.42);
+    box-shadow: inset 0 1px 0 rgba(255,220,160,0.18), 0 0 10px rgba(255,176,64,0.18);
+  }
+  .sensi-hdr-ico svg,
+  .nest-hdr-ico svg { display: block; width: 18px; height: 18px; }
+
+  .sensi-hdr-text,
+  .nest-hdr-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+  .sensi-hdr-kicker,
   .nest-hdr-kicker {
-    font-size: 10px; font-weight: 750; letter-spacing: 0.14em; text-transform: uppercase; color: #5a6878;
+    font-size: 9px; font-weight: 750; letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(160,200,220,0.72); line-height: 1;
   }
+  .sensi-hdr-line,
   .nest-hdr-line {
     display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
-    font-size: 13px; font-weight: 700; color: #2a3440;
+    font-size: 12px; font-weight: 700; color: #a8bcc8; line-height: 1;
   }
-  .nest-hdr-main { font-size: 18px; font-weight: 900; color: #0e1014; letter-spacing: -0.03em; line-height: 1; }
+  .sensi-hdr-temp,
+  .nest-hdr-main {
+    font-size: 26px; font-weight: 900; color: #f2f7fb;
+    letter-spacing: -0.045em; line-height: 0.95;
+    text-shadow: 0 0 18px rgba(64,232,255,0.18);
+  }
+  .sensi-hdr-set {
+    font-size: 11px; font-weight: 650; color: rgba(168,188,200,0.78);
+    letter-spacing: 0.01em;
+  }
+  .sensi-hdr-mode,
   .nest-hdr-mode {
-    font-size: 10px; font-weight: 800; letter-spacing: 0.06em;
-    padding: 2px 6px; border-radius: 999px;
-    background: rgba(40,60,80,0.1); color: #284060;
+    font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 999px;
+    background: rgba(64,232,255,0.1);
+    border: 1px solid rgba(64,232,255,0.22);
+    color: #9ad8ec;
   }
   .nest-hdr.is-live .nest-hdr-mode {
-    background: rgba(40,120,80,0.18); color: #1a6040;
+    background: rgba(64,200,120,0.14);
+    border-color: rgba(96,232,160,0.35);
+    color: #9eecc0;
   }
+  .sensi-hdr.is-need .sensi-hdr-mode,
   .nest-hdr.is-need .nest-hdr-mode {
-    background: rgba(180,100,20,0.2); color: #8a5010;
+    background: rgba(255,176,64,0.12);
+    border-color: rgba(255,176,64,0.32);
+    color: #ffc878;
   }
+  .sensi-hdr-sub,
   .nest-hdr-sub {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #4a6870; margin-top: 1px;
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 750; letter-spacing: 0.08em;
+    text-transform: uppercase; color: rgba(160,188,200,0.7); margin-top: 1px; line-height: 1;
   }
-  .nest-hdr.is-live .nest-hdr-sub { color: #287848; }
-  .nest-hdr.is-need .nest-hdr-sub { color: #8a5010; }
+  .sensi-hdr.is-live .sensi-hdr-sub,
+  .nest-hdr.is-live .nest-hdr-sub { color: #6edc9a; }
+  .sensi-hdr.is-need .sensi-hdr-sub,
+  .nest-hdr.is-need .nest-hdr-sub { color: #e0a040; }
+  .hdr-live-dot {
+    width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+    background: #48e090;
+    box-shadow: 0 0 0 0 rgba(72,224,144,0.55);
+    animation: hdr-live-dot 2.2s ease-out infinite;
+  }
+  .sensi-hdr.is-need .hdr-live-dot,
+  .nest-hdr.is-need .hdr-live-dot {
+    background: #e0a040;
+    box-shadow: none;
+    animation: none;
+  }
+  @keyframes hdr-live-ring {
+    0%   { opacity: 0.7; box-shadow: 0 0 0 0 rgba(96,232,160,0.3); }
+    70%  { opacity: 0; box-shadow: 0 0 0 8px rgba(96,232,160,0); }
+    100% { opacity: 0; box-shadow: 0 0 0 0 rgba(96,232,160,0); }
+  }
+  @keyframes hdr-live-dot {
+    0%   { box-shadow: 0 0 0 0 rgba(72,224,144,0.55); }
+    70%  { box-shadow: 0 0 0 6px rgba(72,224,144,0); }
+    100% { box-shadow: 0 0 0 0 rgba(72,224,144,0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sensi-hdr.is-live::after,
+    .nest-hdr.is-live::after,
+    .hdr-live-dot { animation: none; }
+  }
 
   .leaveby {
     flex-shrink: 0; display: flex; align-items: stretch; border-radius: 14px; overflow: hidden;
@@ -1017,7 +1093,7 @@
   .leaveby { box-shadow: 0 8px 0 #05080c, 0 16px 32px rgba(0,0,0,0.28), 0 0 36px rgba(255,180,40,0.22) !important; }
 
   /* ═══════════════════════════════════════════════════════════
-     HUBBLEND2-SHIP · Sensi + Nest in hdr · SELECT killed · leave-by full · LIVE gate
+     HUBBADGE1-SHIP · sexy Sensi+Nest hdr pills · SELECT killed · leave-by full · LIVE gate
      Hard geometry · thin luminous edges · deep blacks + camo frost
      Electric cyan / amber · hairline HUD · keep all sensi IDs/hooks
      ═══════════════════════════════════════════════════════════ */
@@ -1615,7 +1691,7 @@
 
   /* PRISMP0 · leave-by ≥40–48 louder than Sensi · sensi temp ≤33 */
   .leaveby-main .time { font-size: 44px !important; }
-  .sensi-hdr-temp { font-size: 24px !important; }
+  .sensi-hdr-temp, .nest-hdr-main { font-size: 26px !important; }
 </style>
 </head>
 <body>
@@ -1874,12 +1950,12 @@
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=HUBBLEND2"></script>
+<script src="house-clock.js?v=HUBBADGE1"></script>
 <script src="house-board-strip.js?v=CALFIX1"></script>
-<script src="house-weather.js?v=HUBBLEND2"></script>
-<script src="house-sfx.js?v=HUBBLEND2"></script>
-<script src="house-sensi.js?v=HUBBLEND2"></script>
-<script src="house-nest.js?v=HUBBLEND2"></script>
+<script src="house-weather.js?v=HUBBADGE1"></script>
+<script src="house-sfx.js?v=HUBBADGE1"></script>
+<script src="house-sensi.js?v=HUBBADGE1"></script>
+<script src="house-nest.js?v=HUBBADGE1"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
@@ -1910,21 +1986,23 @@
   var g = N && N.gate ? N.gate() : null;
   var n = (g && g.deviceCount) || 0;
   var label = nestBit();
-  var main = g && g.needToken ? "Connect" : (n ? (n + " cams") : "Cams");
-  var sub = g && g.live
-    ? "Tap → live pads"
-    : (g && g.needToken ? "SDM token · NEST-LIVE" : "Tap → Google Home");
+  var big = n ? String(n) : (g && g.needToken ? "Cams" : "—");
+  var unit = n ? "cams" : "";
+  var quiet = g && g.needToken ? "SDM" : (g && g.hasSnaps ? "stills" : "pads");
   nestChip.classList.toggle("is-live", !!(g && g.live));
   nestChip.classList.toggle("is-need", !!(g && g.needToken));
+  var nestIco = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6.5" width="13" height="11" rx="2.2"/><path d="M15.5 10.2l5.2-2.6v9.8l-5.2-2.6z"/><circle cx="9" cy="12" r="2.1"/></svg>';
+  var statusBit = '<i class="hdr-live-dot" aria-hidden="true"></i>' + label;
   nestChip.innerHTML =
-    '<div class="nest-hdr-ico" aria-hidden="true">📹</div>'
+    '<div class="nest-hdr-ico" aria-hidden="true">' + nestIco + "</div>"
     + '<div class="nest-hdr-text">'
     + '<div class="nest-hdr-kicker">Nest</div>'
     + '<div class="nest-hdr-line">'
-    + '<span class="nest-hdr-main">' + main + "</span>"
-    + '<span class="nest-hdr-mode">' + label + "</span>"
+    + '<span class="nest-hdr-main">' + big + "</span>"
+    + '<span class="sensi-hdr-set">' + unit + "</span>"
+    + '<span class="nest-hdr-mode">' + quiet + "</span>"
     + "</div>"
-    + '<div class="nest-hdr-sub">' + sub + "</div>"
+    + '<div class="nest-hdr-sub">' + statusBit + "</div>"
     + "</div>";
  }
  function paintGhomeTile() {
