@@ -7,7 +7,8 @@
     "nest-fetch": "node nest-fetch.mjs",
     "nest-webrtc": "node nest-webrtc-proxy.mjs",
     "nest-webrtc-lan": "node nest-webrtc-proxy.mjs --lan",
-    "nest-still": "node nest-webrtc-still.mjs"
+    "nest-still": "node nest-webrtc-still.mjs",
+    "cal-from-events": "node cal-from-events.mjs"
   },
   "keywords": [],
   "author": "",
