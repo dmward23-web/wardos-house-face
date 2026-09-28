@@ -416,11 +416,13 @@
       earn = '<span class="star-earn" data-stars="' + stars + '">' + (done ? "+$" + stars : "$" + stars) + "</span>";
     }
     var optAttr = optional ? ' data-optional="1"' : "";
+    var hireAttr = (optional && q.hire) ? ' data-hire="1"' : "";
     var cadAttr = ' data-cadence="' + esc(cadence) + '"';
     var softClass = optional ? " addon soft" : "";
-    var starsAttr = optional ? "" : ' data-stars="' + stars + '"';
+    /* FAIL3 · always emit data-stars (0 for hire/optional) so dollarsFor never invents +$1 */
+    var starsAttr = ' data-stars="' + stars + '"';
     return (
-      '<div class="quest ' + open + softClass + '" data-check="' + esc(q.id) + '" data-kid-quest="1"' + optAttr + cadAttr + starsAttr + ' role="button" tabindex="0">' +
+      '<div class="quest ' + open + softClass + '" data-check="' + esc(q.id) + '" data-kid-quest="1"' + optAttr + hireAttr + cadAttr + starsAttr + ' role="button" tabindex="0">' +
       '<span class="ring">' + ring + "</span>" +
       "<div><div class=\"what\">" + esc(q.what) + '</div><div class="hint">' + esc(hint) + "</div></div>" +
       earn +
@@ -669,6 +671,7 @@
     root.querySelectorAll("[data-unlock-cta]").forEach(function (el) {
       el.hidden = !bank.reached;
       el.classList.toggle("is-loud", !!bank.reached);
+      el.textContent = "JAR FULL · saved $" + bank.need + " · show Dad";
     });
     var paid = getPaidStamp(bank.kidId);
     root.querySelectorAll("[data-paid-stamp]").forEach(function (el) {

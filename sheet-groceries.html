@@ -364,6 +364,30 @@
   }
   .tap-star.dim { color: rgba(100,110,120,0.28); }
 
+
+  /* FAIL3 · honest STUB empty — no EXAMPLE-as-content swamp */
+  .stub-empty {
+    border-radius: 14px; padding: 18px 16px;
+    background: rgba(255,255,255,0.5);
+    border: 2px dashed rgba(100,110,130,0.35);
+    display: flex; flex-direction: column; gap: 6px;
+    min-height: 72px;
+  }
+  .stub-empty .stub-kicker {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: #6a4a10;
+  }
+  .stub-empty .stub-msg {
+    font-size: 16px; font-weight: 750; letter-spacing: -0.02em; color: #2a2e36; line-height: 1.3;
+  }
+  .stub-empty .stub-hint {
+    font-size: 13px; font-weight: 600; color: #6a6e76;
+  }
+  .favs.stub-favs .fav-chips { flex-wrap: wrap; }
+  .fav.stub-chip {
+    background: rgba(255,255,255,0.55);
+    border: 1.5px dashed rgba(100,110,130,0.4);
+    color: #5a5e66; font-weight: 700;
+  }
   /* BOARDSLAY1 · board punch */
   .banner{position:relative;overflow:hidden}
   .banner-title{letter-spacing:-0.035em;text-shadow:0 2px 0 rgba(0,0,0,0.28)}
@@ -371,7 +395,7 @@
   .hot-pill{position:relative;overflow:hidden}
   .sec,.card,.zone,.item-card,.chore,.quest{transition:transform .12s ease,filter .12s ease}
 </style>
-<link rel="stylesheet" href="house-engage.css?v=BOARDSLAY1" />
+<link rel="stylesheet" href="house-engage.css?v=FAIL3" />
 </head>
 <body data-clear-label="CLEARED">
 <div class="panel">
@@ -383,136 +407,76 @@
  <div class="id-text">
  <a class="eyebrow" href="sheet-index.html">Family sheets · home</a>
  <h1 class="name"><span class="name-accent">Groceries</span> + Costco</h1>
- <div class="tagline">Favorites · check off · my treat pick that sticks</div>
+ <div class="tagline">STUB lists · fill before next run · treats when kids pick</div>
  </div>
  </div>
  </div>
  <div class="hdr-right">
- <div class="hot-pill"><span class="spark">★</span> Kid treats · no dollars here</div>
+ <div class="hot-pill"><span class="spark">★</span> STUB · real list pending</div>
  </div>
  </header>
 
- <section class="favs" aria-label="Favorites">
+ <section class="favs stub-favs" aria-label="Favorites">
  <div class="favs-label">Favorites</div>
  <div class="fav-chips">
- <div class="fav"><span class="heart">♥</span> Milk · EXAMPLE</div>
- <div class="fav"><span class="heart">♥</span> Bananas · EXAMPLE</div>
- <div class="fav"><span class="heart">♥</span> Eggs · EXAMPLE</div>
- <div class="fav"><span class="heart">♥</span> Bread · EXAMPLE</div>
- <div class="fav"><span class="heart">♥</span> Yogurt · EXAMPLE</div>
+ <div class="fav stub-chip"><span class="heart">♥</span> STUB · no favorites yet</div>
  <div class="fav add">+ add favorite</div>
  </div>
  </section>
 
  <div class="body">
- <!-- Home groceries -->
+ <!-- Home groceries · FAIL3 honest STUB (cleared fake rows) -->
  <section class="sec" aria-label="Home groceries">
  <div class="sec-hdr">
  <div class="sec-title">Home groceries</div>
- <div class="add-btn">+ add</div>
+ <div class="sec-meta">STUB</div>
  </div>
- <div class="item-list">
- <div data-check="home-milk" class="item done">
- <span class="ring">✓</span>
- <span class="what">Milk</span>
- <span class="tag">EXAMPLE</span>
+ <div class="stub-empty" role="status">
+ <div class="stub-kicker">STUB · empty list</div>
+ <div class="stub-msg">No home grocery list yet — Dad fills this before the next run.</div>
+ <div class="stub-hint">Not fake rows. Real items land here when set.</div>
  </div>
- <div data-check="home-bananas" class="item">
- <span class="ring"></span>
- <span class="what">Bananas</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="home-eggs" class="item">
- <span class="ring"></span>
- <span class="what">Eggs</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="home-bread" class="item">
- <span class="ring"></span>
- <span class="what">Sandwich bread</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="home-apples" class="item">
- <span class="ring"></span>
- <span class="what">Apples</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="home-pasta" class="item">
- <span class="ring"></span>
- <span class="what">Pasta</span>
- <span class="tag">DEMO</span>
- </div>
- </div>
- <div class="tap-hint"><span class="ring">✓</span> Tap to check off</div>
+ <div class="tap-hint"><span class="ring">+</span> Add real items when ready</div>
  </section>
 
- <!-- Costco -->
+ <!-- Costco · FAIL3 honest STUB -->
  <section class="sec" aria-label="Costco run">
  <div class="sec-hdr">
  <div class="sec-title">Costco run</div>
- <div class="sec-meta">bulk</div>
+ <div class="sec-meta">STUB · bulk</div>
  </div>
- <div class="item-list">
- <div data-check="costco-towels" class="item costco done">
- <span class="ring">✓</span>
- <span class="what">Paper towels</span>
- <span class="tag">EXAMPLE</span>
+ <div class="stub-empty" role="status">
+ <div class="stub-kicker">STUB · empty list</div>
+ <div class="stub-msg">No Costco checklist yet — empty until the next bulk run is planned.</div>
+ <div class="stub-hint">Not fake rows. Real Costco picks land here when set.</div>
  </div>
- <div data-check="costco-chicken" class="item costco">
- <span class="ring"></span>
- <span class="what">Rotisserie chicken</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="costco-berries" class="item costco">
- <span class="ring"></span>
- <span class="what">Frozen berries</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="costco-snacks" class="item costco">
- <span class="ring"></span>
- <span class="what">Snack packs</span>
- <span class="tag">DEMO</span>
- </div>
- <div data-check="costco-pods" class="item costco">
- <span class="ring"></span>
- <span class="what">Laundry pods</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="costco-sparkling" class="item costco">
- <span class="ring"></span>
- <span class="what">Sparkling water</span>
- <span class="tag">DEMO</span>
- </div>
- </div>
- <div class="tap-hint"><span class="ring">✓</span> Costco checklist</div>
+ <div class="tap-hint"><span class="ring">+</span> Costco list waits on Dad</div>
  </section>
 
- <!-- My treat picks -->
+ <!-- My treat picks · empty honest slots -->
  <section class="sec" aria-label="My treat picks">
  <div class="sec-hdr">
  <div class="sec-title">My treat</div>
- <div class="sec-meta">picks stick</div>
+ <div class="sec-meta">STUB · picks stick</div>
  </div>
  <div class="treats">
- <div class="treat ainsley picked">
+ <div class="treat ainsley empty">
  <a class="treat-kid" href="kid-ainsley.html"><span class="dot">A</span> Ainsley</a>
- <div class="treat-pick">🍓 Strawberries</div>
- <div class="treat-hint">EXAMPLE · my pick · sticks</div>
- <span class="stick">stuck</span>
+ <div class="treat-pick">No pick yet</div>
+ <div class="treat-hint">STUB · open for her pick</div>
  </div>
- <div class="treat hayes picked">
+ <div class="treat hayes empty">
  <a class="treat-kid" href="kid-hayes.html"><span class="dot">H</span> Hayes</a>
- <div class="treat-pick">🍪 Cookie dough bites</div>
- <div class="treat-hint">EXAMPLE · my pick · sticks</div>
- <span class="stick">stuck</span>
+ <div class="treat-pick">No pick yet</div>
+ <div class="treat-hint">STUB · open for his pick</div>
  </div>
  <div class="treat harris empty">
  <a class="treat-kid" href="kid-harris.html"><span class="dot">R</span> Harris</a>
- <div class="treat-pick">Tap to pick your treat</div>
- <div class="treat-hint">DEMO slot · open</div>
+ <div class="treat-pick">No pick yet</div>
+ <div class="treat-hint">STUB · open for his pick</div>
  </div>
  </div>
- <div class="tap-hint"><span class="ring">★</span> My-pick that sticks</div>
+ <div class="tap-hint"><span class="ring">★</span> Kids pick for real · sticks when set</div>
  </section>
  </div>
 
