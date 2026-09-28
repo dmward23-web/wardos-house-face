@@ -270,7 +270,7 @@
     el.setAttribute("data-mode", st.mode || "Auto");
     el.setAttribute("href", el.getAttribute("href") || "sheet-google-home.html");
     if (hdr) {
-      /* HUBBADGE1 · premium glass pill — big ambient, quiet set/mode, honest LIVE/NEED */
+      /* HUBOVAL1 · matched oval pill — big ambient, quiet set/mode, honest LIVE/NEED */
       var thermoIco = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3.2v9.4a3.6 3.6 0 1 0 4 0V3.2a2 2 0 1 0-4 0z"/><path d="M12 14.8v2.4"/></svg>';
       el.innerHTML =
         '<div class="sensi-hdr-ico" aria-hidden="true">' + thermoIco + "</div>"
