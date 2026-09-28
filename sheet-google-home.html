@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE · CAMS · GOOGLE HOME</title>
-<link rel="stylesheet" href="house-engage.css?v=FAIL3b" />
+<link rel="stylesheet" href="house-engage.css?v=NEST1" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
@@ -182,6 +182,19 @@
     .climate-hero.is-live .climate-pill,.climate-hero.is-live .climate-accent{animation:none}
   }
 
+
+  .cam-live.on{background:rgba(20,80,36,0.92);color:#e8ffe8;border-color:rgba(128,232,144,0.55)}
+  .cam-live.on i{width:8px;height:8px;border-radius:50%;background:#80e890;
+    box-shadow:0 0 0 0 rgba(128,232,144,0.7);animation:cam-live-pulse 1.6s ease-out infinite;display:inline-block}
+  .cam-feed img.cam-snap{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+  @keyframes cam-live-pulse{
+    0%{box-shadow:0 0 0 0 rgba(128,232,144,0.7)}
+    100%{box-shadow:0 0 0 10px rgba(128,232,144,0)}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .cam-live.on i{animation:none}
+  }
+
   .note strong{font-weight:850;color:#1a1e24}
   .note code{font-size:12px;background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:4px}
   .cam-path{margin-top:4px;padding:10px 12px;border-radius:10px;
@@ -213,7 +226,7 @@
  <div class="banner-accent"></div>
  <div class="banner-body">
  <div class="banner-lab">Google Home · climate + cameras</div>
- <div class="banner-title">Climate LIVE glass · Nest cams blocked</div>
+ <div class="banner-title">Climate LIVE glass · Nest cams STUB</div>
  <div class="banner-sub">Sensi polls live JSON · cams need Device Access (no fake video) · Elo 3202L</div>
  </div>
  </section>
@@ -249,9 +262,9 @@
  <section class="cam-zone" aria-label="Nest and Google Home cameras">
  <div class="zone-hdr">
  <div class="zone-title">Cameras · Nest / Google Home</div>
- <div class="zone-meta">4 pads · STUB · no stream URL on box</div>
+ <div class="zone-meta">4 pads · STUB · need SDM token</div>
  </div>
- <div class="cam-path">WORKING path blocked · no fake LIVE video · next: Device Access SDM refresh token <em>or</em> local go2rtc/Scrypted HTTPS snapshots → <code>data/nest-live.json</code></div>
+ <div class="cam-path">WORKING path staged · no fake LIVE video · hand Atlas Nest refresh_token via secret-request → <code>~/.config/wardos/nest-refresh.token</code> + <code>nest-sdm.json</code> · see <code>NEST-LIVE.md</code></div>
  <div class="cam-grid">
  <article class="cam" aria-label="Front door camera">
  <div class="cam-feed">
@@ -348,8 +361,7 @@
  </div>
  </section>
 
- <div class="note" id="cam-next-step"><strong>Cams = STUB (blocked).</strong> Box has no Google Device Access / SDM OAuth, no Nest stream or snapshot URLs, and Google Home Premium trial is slated to cancel — cannot embed live Nest video without inventing a feed.
- <br/><strong>Next step for Dan:</strong> enable <em>Google Device Access</em> (SDM) for this Google account → hand Atlas a Nest OAuth refresh token (box-only, never git/glass) <em>or</em> stand up a local go2rtc/Scrypted bridge that publishes HTTPS snapshot/HLS URLs Atlas can poll into <code>data/nest-live.json</code>. Until then pads stay honest STUB.</div>
+ <div class="note" id="cam-next-step"><strong>Cams = STUB (need token).</strong> Stage ready: <code>scripts/nest-fetch.mjs</code> + <code>NEST-LIVE.md</code>. Dan: enable <em>Google Device Access</em> (SDM) → hand Atlas refresh_token via <em>secret-request</em> (masked) into <code>~/.config/wardos/nest-refresh.token</code> + client secrets in <code>nest-sdm.json</code>. Until then pads stay honest STUB — no invented video.</div>
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -360,10 +372,11 @@
  <span id="sensi-home-ftr">Atlas · Sensi live gate</span>
  </footer>
 </div>
-<script src="house-clock.js?v=FAIL3b"></script>
+<script src="house-clock.js?v=NEST1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
-<script src="house-sensi.js?v=FAIL3b"></script>
+<script src="house-sensi.js?v=NEST1"></script>
+<script src="house-nest.js?v=NEST1"></script>
 <script>
 (function () {
   document.querySelectorAll(".cam").forEach(function (el) {
@@ -378,16 +391,20 @@
     }, { passive: true });
   }
   var S = window.HouseSensi;
-  if (!S) return;
+  var N = window.HouseNest;
   function paint() {
-    S.paintHero();
-    var st = S.effectiveState();
-    var gate = st.gate;
+    if (S) S.paintHero();
+    if (N) N.paintPads(document);
     var ftr = document.getElementById("sensi-home-ftr");
-    if (ftr) ftr.textContent = gate.live ? "Sensi LIVE · cams STUB (need SDM)" : gate.label + " · cams STUB";
+    if (!ftr) return;
+    var sensiLive = S && S.effectiveState && S.effectiveState().gate && S.effectiveState().gate.live;
+    var nestGate = N && N.gate ? N.gate() : { live: false, label: "STUB", needToken: true };
+    var sensiBit = sensiLive ? "Sensi LIVE" : (S && S.effectiveState ? S.effectiveState().gate.label : "Sensi");
+    var nestBit = nestGate.live ? "cams LIVE" : (nestGate.needToken ? "cams STUB (need SDM)" : "cams " + nestGate.label);
+    ftr.textContent = sensiBit + " · " + nestBit;
   }
-  S.onChange(paint);
-  S.startPolling();
+  if (S) { S.onChange(paint); S.startPolling(); }
+  if (N) { N.onChange(paint); N.startPolling(); }
   paint();
 })();
 </script>

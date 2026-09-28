@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "sensi-fetch": "node sensi-fetch.mjs"
+    "sensi-fetch": "node sensi-fetch.mjs",
+    "nest-fetch": "node nest-fetch.mjs"
   },
   "keywords": [],
   "author": "",
