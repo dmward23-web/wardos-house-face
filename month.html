@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE FACE · MONTH · WHITE GREY GLASS CAMO</title>
-<link rel="stylesheet" href="house-engage.css?v=CALFOUC2" />
+<link rel="stylesheet" href="house-engage.css" />
 <style>
  @font-face {
  font-family: "Inter Display";
@@ -320,13 +320,6 @@
  text-decoration: none; flex-shrink: 0;
  }
  a.eyebrow { text-decoration: none; color: inherit; cursor: pointer; }
-
-  /* BOARDSLAY1 · board punch */
-  .banner{position:relative;overflow:hidden}
-  .banner-title{letter-spacing:-0.035em;text-shadow:0 2px 0 rgba(0,0,0,0.28)}
-  .hdr{box-shadow:inset 0 2px 0 rgba(255,255,255,0.9),0 6px 0 #1a1e24,0 14px 30px rgba(20,22,28,0.2),0 0 22px rgba(255,200,80,0.1)!important}
-  .hot-pill{position:relative;overflow:hidden}
-  .sec,.card,.zone,.item-card,.chore,.quest{transition:transform .12s ease,filter .12s ease}
 </style>
 </head>
 <body>
@@ -350,12 +343,11 @@
  <section class="leaveby" aria-label="Next leave-by">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
- <div class="leaveby-label" data-live="leaveby-label">Next up · today</div>
- <div class="leaveby-main" data-live="leaveby-main">Mon Sep 28 · Loading…</div>
- <div class="leaveby-detail" data-live="leaveby-detail">America/Chicago · live clock</div>
- <div data-live="asof-warn" hidden style="margin-top:6px;font-size:12px;font-weight:700;letter-spacing:0.04em;color:#ffb020;"></div>
+ <div class="leaveby-label">Next up · today</div>
+ <div class="leaveby-main"><span class="time">3:00</span> Ainsley vanity · Jessy</div>
+ <div class="leaveby-detail">Garage sale <strong>9–2</strong> @ 147th · then vanity · kids with Dad @ <strong>147th</strong> through Fri Oct 2 3:00</div>
  </div>
- <div class="leaveby-badge" data-live="leaveby-badge">Mon</div>
+ <div class="leaveby-badge">Sun</div>
  </section>
 
  <section class="month-wrap">
@@ -364,7 +356,7 @@
  <div class="month-range">known facts only · empty = unknown</div>
  </div>
  <div class="banner-row">
- <div class="banner">Kids with Dad @ 147th through Fri Oct 2 3:00 · Next Up from calendar</div>
+ <div class="banner">Kids with Dad @ 147th through Fri Oct 2 3:00 · garage sale Sun 9–2 · Ainsley vanity 3:00</div>
  <div class="legend">
  <span class="leg ain"><i></i>Ainsley</span>
  <span class="leg hay"><i></i>Hayes</span>
@@ -473,18 +465,19 @@
  </div>
  </div>
  <!-- W5: 27–30 + Oct -->
- <div class="day">
- <div class="day-top"><span class="dom">27</span></div>
+ <div class="day today">
+ <div class="day-top"><span class="dom">27</span><span class="day-tag">today</span></div>
  <div class="blocks">
  <div class="blk shr">Garage sale 9–2 @ 147th</div>
+ <div class="blk ain">Ainsley vanity 3:00 · Jessy</div>
  <div class="blk shr">Dad week @ 147th</div>
  </div>
  </div>
- <div class="day today">
- <div class="day-top"><span class="dom">28</span><span class="day-tag">today</span></div>
+ <div class="day">
+ <div class="day-top"><span class="dom">28</span></div>
  <div class="blocks">
  <div class="blk shr">Drop 8:25 / pickup 3:40</div>
- <div class="blk ain">Ainsley · LKMS Homework Help 3:00</div>
+ <div class="blk ain">Ainsley HW 3:00</div>
  <div class="blk hay">Hayes baseball 6:15</div>
  </div>
  </div>
@@ -525,23 +518,5 @@
 </div>
 
 <script src="house-zoom.js"></script>
-<script src="house-sfx.js"></script>
-
-<script>
-(function(){
-  function wire(){
-    document.querySelectorAll("a,button,.tile,.quest,.chore,.card,.item,.cam,.ctrl-btn,.kid-link,[data-check]").forEach(function(el){
-      if (el.__bsfx) return; el.__bsfx = 1;
-      el.addEventListener("pointerdown", function(){
-        try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch(e){}
-      }, {passive:true});
-    });
-  }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wire);
-  else wire();
-})();
-</script>
-<script src="house-clock.js?v=CALFOUC2"></script>
-<script src="house-board-strip.js?v=CALFOUC2"></script>
 </body>
 </html>

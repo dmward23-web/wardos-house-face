@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE · SENSI · THERMOSTAT</title>
-<link rel="stylesheet" href="house-engage.css?v=KITFIX1" />
+<link rel="stylesheet" href="house-engage.css?v=P32" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
@@ -130,80 +130,10 @@
     font-size:13px;font-weight:650;color:#3a3e46;flex-shrink:0}
   .ftr{display:flex;justify-content:space-between;font-size:12px;color:#5a5e66;font-weight:600;align-items:center;gap:8px;flex-wrap:wrap}
   .ftr-chip{padding:6px 10px;border-radius:8px;border:2px solid #2a2e36;background:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;color:inherit}
-
-  /* SENSI-FX · dial weapon · heat/cool energy · live pulse only when live */
-  .dial{min-height:460px;padding:36px 24px 28px}
-  .dial-ring{position:absolute;width:420px;height:420px;left:50%;top:46%;transform:translate(-50%,-50%);z-index:0;overflow:visible}
-  .ring-track,.ring-arc,.ring-live{fill:none;stroke-linecap:round}
-  .ring-track{stroke:rgba(255,255,255,0.14);stroke-width:14}
-  .ring-arc{stroke:#ffe080;stroke-width:14;transform:rotate(-90deg);transform-origin:100px 100px;
-    filter:drop-shadow(0 0 8px rgba(255,180,60,0.65));transition:stroke-dashoffset .55s cubic-bezier(.2,.8,.2,1)}
-  .ring-live{stroke:rgba(255,255,255,0.0);stroke-width:3;transform:rotate(-90deg);transform-origin:100px 100px}
-  .dial-core{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
-  .dial-ambient{font-size:156px}
-  .dial[data-mode="Heat"]{background:radial-gradient(ellipse 70% 60% at 50% 42%,rgba(255,140,40,0.55),transparent 62%),linear-gradient(165deg,#2a1408,#4a2810 46%,#120c08)}
-  .dial[data-mode="Heat"] .ring-arc{stroke:#ffb020}
-  .dial[data-mode="Cool"]{background:radial-gradient(ellipse 70% 60% at 50% 42%,rgba(80,170,255,0.5),transparent 62%),linear-gradient(165deg,#071018,#123048 48%,#061018)}
-  .dial[data-mode="Cool"] .ring-arc{stroke:#7ec8ff}
-  .dial[data-mode="Auto"]{background:
-    linear-gradient(115deg,rgba(255,140,40,0.35),transparent 46%),
-    linear-gradient(295deg,rgba(80,170,255,0.38),transparent 48%),
-    linear-gradient(165deg,#141820,#1c2430 50%,#0c1016)}
-  .dial[data-mode="Auto"] .ring-arc{stroke:#b8f0c8}
-  .dial[data-mode="Off"]{background:linear-gradient(165deg,#1a1e24,#2a2e36 50%,#121418)}
-  .dial[data-mode="Off"] .ring-arc{stroke:#8a909a;filter:none}
-  .dial.is-live .ring-live{stroke:rgba(255,255,255,0.85);animation:sensi-live-pulse 1.7s ease-out infinite}
-  .dial.is-live .dial-badge{animation:sensi-badge-pulse 1.7s ease-in-out infinite}
-  .dial.is-bump{animation:sensi-bump .28s ease}
-  @keyframes sensi-live-pulse{
-    0%{opacity:.85;stroke-width:3}
-    100%{opacity:0;stroke-width:22}
-  }
-  @keyframes sensi-badge-pulse{
-    0%,100%{box-shadow:0 0 0 0 rgba(128,232,144,0.0)}
-    50%{box-shadow:0 0 0 6px rgba(128,232,144,0.28)}
-  }
-  @keyframes sensi-bump{50%{transform:scale(1.025)}}
-  .panel[data-mode="Heat"] .banner{background:linear-gradient(105deg,#1a0c04,#5a2808 42%,#c45a10 72%,#1a0c04)}
-  .panel[data-mode="Cool"] .banner{background:linear-gradient(105deg,#061018,#123a68 45%,#2a78c0 74%,#061018)}
-  .panel[data-mode="Auto"] .banner{background:linear-gradient(105deg,#140c08,#3a2810 32%,#1a4068 68%,#061018)}
-  .panel[data-mode="Off"] .banner{background:linear-gradient(105deg,#121418,#2a2e36 50%,#121418)}
-  .seg-btn.on{transition:transform .12s ease, box-shadow .12s ease}
-
-  .dial-humid{z-index:1;display:inline-flex;align-items:center;gap:8px;margin-top:6px;
-    padding:8px 14px;border-radius:999px;font-size:18px;font-weight:900;letter-spacing:-0.02em;
-    background:rgba(0,0,0,0.42);border:2px solid rgba(255,255,255,0.22);color:#e8f4ff;
-    box-shadow:0 0 18px rgba(120,200,255,0.18)}
-  .dial-humid .humid-lab{font-size:11px;font-weight:800;letter-spacing:0.18em;opacity:0.75}
-  .dial-humid.is-empty{opacity:0.45;filter:grayscale(0.4)}
-  .set-row{position:relative;overflow:hidden;
-    background:linear-gradient(165deg,rgba(255,255,255,0.95),rgba(220,224,232,0.9));
-    border-width:4px}
-  .set-btn{width:100px;height:100px;border-radius:18px;font-size:48px;
-    background:linear-gradient(180deg,#fff,#c8ccd4);border-width:4px;
-    box-shadow:0 6px 0 #1a1e24,0 0 0 3px rgba(255,255,255,0.5)}
-  .set-val{font-size:72px;text-shadow:0 2px 0 rgba(255,255,255,0.8)}
-  .seg-btn{min-height:72px;font-size:20px;border-radius:14px;border-width:3px;
-    box-shadow:0 5px 0 #1a1e24, inset 0 1px 0 rgba(255,255,255,0.85)}
-  .seg-btn.on{transform:translateY(-2px);box-shadow:0 7px 0 #6a4010,0 0 22px rgba(255,180,40,0.45)!important}
-  .seg-btn.on.cool{box-shadow:0 7px 0 #0e2848,0 0 22px rgba(80,170,255,0.5)!important}
-  .seg-btn.on.auto{box-shadow:0 7px 0 #104820,0 0 22px rgba(80,220,120,0.45)!important}
-  .seg-btn.on.off{box-shadow:0 7px 0 #1a1e24,0 0 16px rgba(140,150,160,0.35)!important}
-  .seg-btn.is-bump{animation:juice-ping 0.4s cubic-bezier(0.34,1.6,0.64,1)}
-  .set-btn.is-bump{animation:juice-ping 0.4s cubic-bezier(0.34,1.6,0.64,1)}
-  .sensi-float{position:absolute;left:50%;top:18%;transform:translateX(-50%);z-index:20;pointer-events:none;
-    font-size:34px;font-weight:900;color:#ffe080;text-shadow:0 3px 0 #1a1000,0 0 16px #ffe080;
-    animation:vfx-float-up 0.85s cubic-bezier(0.22,1.2,0.36,1) forwards}
-  .status-pill.on{animation:sensi-badge-pulse 1.7s ease-in-out infinite}
-  @media (prefers-reduced-motion: reduce){
-    .dial.is-live .ring-live,.dial.is-live .dial-badge,.dial.is-bump,.status-pill.on,.seg-btn.is-bump,.set-btn.is-bump,.sensi-float{animation:none}
-    .ring-arc{transition:none}
-  }
-
 </style>
 </head>
 <body>
-<div class="panel" data-boardslay="1">
+<div class="panel">
  <header class="hdr">
  <div class="hdr-left">
  <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="44" /></div>
@@ -214,7 +144,7 @@
  <div>
  <a class="eyebrow" href="sheet-google-home.html">House · climate</a>
  <h1 class="name"><span class="name-accent">Sensi</span> · thermostat</h1>
- <div class="tagline">147th · WardOS climate · camo glass · honest live</div>
+ <div class="tagline">147th · Emerson Sensi · live JSON when tokened</div>
  </div>
  </div>
  </div>
@@ -225,25 +155,17 @@
  <div class="banner-accent"></div>
  <div class="banner-body">
  <div class="banner-lab">Sensi · not Nest</div>
- <div class="banner-title">Climate weapon · live glass · mode punch</div>
+ <div class="banner-title">Thermostat panel · live when tokened · DEMO writes</div>
  <div class="banner-sub">Polls data/sensi-live.json · no fake LIVE · Nest cams stay separate · Elo 3202L</div>
  </div>
  </section>
 
  <div class="thermo">
- <section class="dial" id="sensi-dial" data-mode="Off" aria-label="Current temperature">
- <svg class="dial-ring" viewBox="0 0 200 200" aria-hidden="true">
- <circle class="ring-track" cx="100" cy="100" r="86"></circle>
- <circle class="ring-arc" id="sensi-ring" cx="100" cy="100" r="86"></circle>
- <circle class="ring-live" cx="100" cy="100" r="74"></circle>
- </svg>
- <div class="dial-core">
+ <section class="dial" aria-label="Current temperature">
  <div class="dial-lab" id="sensi-dial-lab">Indoor · waiting</div>
  <div class="dial-ambient" id="sensi-ambient">—<span>°</span></div>
  <div class="dial-meta" id="sensi-dial-meta">mode · set · fan</div>
- <div class="dial-humid" id="sensi-humid"><span class="humid-ico" aria-hidden="true">💧</span><span id="sensi-humid-val">—</span><span class="humid-lab">RH</span></div>
  <div class="dial-badge" id="sensi-dial-badge">CONNECT · STUB</div>
- </div>
  </section>
 
  <section class="set-row" aria-label="Setpoint">
@@ -312,8 +234,9 @@
  </footer>
 </div>
 <script src="house-clock.js?v=CT1"></script>
+<script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
-<script src="house-sensi.js?v=KITFIX1"></script>
+<script src="house-sensi.js?v=SENSI2"></script>
 <script>
 (function () {
   var S = window.HouseSensi;
@@ -392,42 +315,14 @@
       b.classList.toggle("on", b.getAttribute("data-fan") === state.fan);
     });
 
-    var dial = document.getElementById("sensi-dial");
-    var modeKey = mode || "Off";
-    if (dial) {
-      dial.setAttribute("data-mode", modeKey);
-      dial.classList.toggle("is-live", !!liveOverride);
-      dial.style.boxShadow = "0 8px 0 #05080c, 0 18px 36px rgba(0,0,0,0.35), 0 0 64px " + mc.accent + (liveOverride ? "88" : "33");
-    }
-    var panel = document.querySelector(".panel");
-    if (panel) panel.setAttribute("data-mode", modeKey);
-    var ring = document.getElementById("sensi-ring");
-    var setN = liveOverride ? setpoint : state.setpoint;
-    if (ring && typeof setN === "number") {
-      var C = 2 * Math.PI * 86;
-      var tt = Math.max(0, Math.min(1, (setN - 50) / 40));
-      ring.style.strokeDasharray = C.toFixed(1);
-      ring.style.strokeDashoffset = (C * (1 - tt)).toFixed(1);
-    }
-    var hv = document.getElementById("sensi-humid-val");
-    var hh = document.getElementById("sensi-humid");
-    if (hv && hh) {
-      if (eff.humidity != null) {
-        hv.textContent = eff.humidity + "%";
-        hh.classList.remove("is-empty");
-      } else {
-        hv.textContent = "—";
-        hh.classList.add("is-empty");
-      }
-    }
+    document.querySelector(".dial").style.boxShadow =
+      "0 8px 0 #05080c, 0 18px 36px rgba(0,0,0,0.35), 0 0 48px " + mc.accent + "44";
 
     var ftr = document.getElementById("sensi-ftr-status");
     if (ftr) ftr.textContent = gate.label;
     var note = document.getElementById("sensi-note");
-    if (note && gate.live) {
-      note.textContent = "LIVE from data/sensi-live.json · pulse means fresh cloud snapshot · setpoint/mode/fan taps are DEMO local until writeSupported · token stays off this glass · Elo 3202L";
-    } else if (note && gate.kind === "need_token") {
-      note.textContent = "CONNECT · NEED TOKEN · no fake LIVE · Atlas holds the refresh token off-glass · Elo 3202L 1080×1920";
+    if (note && gate.kind === "need_token") {
+      note.textContent = "BLOCKED on credential · Atlas secret-request: Sensi refresh_token (not password) · capture at manager.sensicomfort.com · store ~/.config/wardos/sensi-refresh.token · run scripts/sensi-fetch.mjs · Elo 3202L";
     }
   }
 
@@ -436,42 +331,20 @@
     paint();
   }
 
-  function bump(el) {
-    var d = document.getElementById("sensi-dial");
-    if (d) { d.classList.remove("is-bump"); void d.offsetWidth; d.classList.add("is-bump"); }
-    if (el) { el.classList.remove("is-bump"); void el.offsetWidth; el.classList.add("is-bump"); }
-  }
-  function floatSet(delta) {
-    var row = document.querySelector(".set-row");
-    if (!row) return;
-    var f = document.createElement("div");
-    f.className = "sensi-float";
-    f.textContent = (delta > 0 ? "+" : "") + delta + "°";
-    row.appendChild(f);
-    setTimeout(function () { try { row.removeChild(f); } catch (e) {} }, 900);
-    try {
-      if (window.HouseSfx) {
-        if (HouseSfx.floatPopup) HouseSfx.floatPopup(row, (delta > 0 ? "+" : "") + delta + "°");
-        if (HouseSfx.boomAt) HouseSfx.boomAt(row, "tap");
-      }
-    } catch (e) {}
-  }
   document.getElementById("sensi-minus").addEventListener("click", function () {
-    tap(); bump(this); floatSet(-1); state.setpoint = S.clampSet(state.setpoint - 1); persist();
+    tap(); state.setpoint = S.clampSet(state.setpoint - 1); persist();
   });
   document.getElementById("sensi-plus").addEventListener("click", function () {
-    tap(); bump(this); floatSet(1); state.setpoint = S.clampSet(state.setpoint + 1); persist();
+    tap(); state.setpoint = S.clampSet(state.setpoint + 1); persist();
   });
   document.querySelectorAll("#sensi-modes .seg-btn").forEach(function (b) {
     b.addEventListener("click", function () {
-      tap(); bump(b);
-      try { if (window.HouseSfx && HouseSfx.screenShake) HouseSfx.screenShake(false); } catch (e) {}
-      state.mode = b.getAttribute("data-mode"); persist();
+      tap(); state.mode = b.getAttribute("data-mode"); persist();
     });
   });
   document.querySelectorAll("#sensi-fans .seg-btn").forEach(function (b) {
     b.addEventListener("click", function () {
-      tap(); bump(b); state.fan = b.getAttribute("data-fan"); persist();
+      tap(); state.fan = b.getAttribute("data-fan"); persist();
     });
   });
 
@@ -505,6 +378,7 @@
   S.startPolling();
   paint();
 })();
+</script>
 </script>
 </body>
 </html>

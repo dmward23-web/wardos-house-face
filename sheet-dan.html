@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE · DAD BOX</title>
-<link rel="stylesheet" href="house-engage.css?v=CALFOUC2" />
+<link rel="stylesheet" href="house-engage.css" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
@@ -82,16 +82,6 @@
     font-size:13px;font-weight:650;color:#3a3e46;flex-shrink:0}
   .ftr{display:flex;justify-content:space-between;font-size:12px;color:#5a5e66;font-weight:600}
   .ftr-chip{padding:6px 10px;border-radius:8px;border:2px solid #2a2e36;background:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase}
-
-  /* BOARDSLAY dan · command seat */
-  .banner{min-height:110px}
-  .banner-title{font-size:28px;text-shadow:0 2px 0 rgba(0,0,0,0.35)}
-  .sec{box-shadow:0 6px 0 #1a1e24,0 12px 28px rgba(20,22,28,0.16),0 0 18px rgba(200,120,16,0.08)}
-  .kid-link{transition:transform .12s ease, filter .12s ease}
-  .kid-link:active{transform:translateY(2px) scale(.98);filter:brightness(1.08)}
-  .hot-pill{background:linear-gradient(180deg,#ffe080,#e0a020);border-color:#8a6010;color:#1a1000;
-    box-shadow:0 3px 0 #6a4010}
-  /* BOARDSLAY dan */
 </style>
 </head>
 <body data-kid="dan" data-theme="dan">
@@ -105,7 +95,7 @@
  <div class="avatar">D</div>
  <div>
  <a class="eyebrow" href="sheet-index.html">House · Dad box</a>
- <h1 class="name"><span class="name-accent">Dad</span> · command</h1>
+ <h1 class="name"><span class="name-accent">Dad</span>your week</h1>
  <div class="tagline">Leave-bys · kids with you · picks</div>
  </div>
  </div>
@@ -118,9 +108,9 @@
  <section class="banner">
  <div class="banner-accent"></div>
  <div class="banner-body">
- <div class="banner-lab">Dad command · live week</div>
+ <div class="banner-lab">Dad week live</div>
  <div class="banner-title">Kids with you @ 147th · through Fri Oct 2 · 3:00</div>
- <div class="banner-sub">Mon · LKMS Homework Help 3:00 · boys pickup 3:15 · Dad week through Fri Oct 2</div>
+ <div class="banner-sub">Sun · garage sale 9–2 @ 147th · Ainsley vanity 3:00 · Jessy</div>
  </div>
  </section>
 
@@ -159,19 +149,13 @@
  <span>camo substrate · WardOS mark · no money</span>
  </footer>
 </div>
-<script src="house-clock.js?v=CALFOUC2"></script>
-<script src="house-board-strip.js?v=CALFOUC2"></script>
-<script src="kids-data.js?v=CALFOUC2"></script>
+<script src="house-clock.js?v=CT1"></script>
+<script src="house-board-strip.js?v=CT1"></script>
+<script src="kids-data.js?v=PUTAWAY1"></script>
 <script src="house-zoom.js"></script>
-<script src="house-sfx.js"></script>
 <script>
  document.addEventListener("DOMContentLoaded", function () {
  if (window.WardKids) WardKids.boot("dan");
- document.querySelectorAll(".kid-link, .card, .back, .nav-week, .home-btn").forEach(function(el){
-   el.addEventListener("pointerdown", function(){
-     try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch(e){}
-   }, {passive:true});
- });
  });
 </script>
 

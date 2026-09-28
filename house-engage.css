@@ -422,10 +422,10 @@ body.bank-goal-hit .bank-card {
   box-sizing: border-box;
 }
 
-/* Ainsley Tour Jar — Prism exact */
+/* Ainsley Stick Season — Prism exact */
 .saves-host[data-kid="ainsley"] .saves-bar,
 body.theme-ainsley .saves-bar,
-body.theme-ainsley .saves-bar {
+body.theme-ainsley.stick-season .saves-bar {
   background: #1a2e24 !important;
   border-color: #8a7040 !important;
   color: #e8e4d4 !important;
@@ -440,7 +440,7 @@ body.theme-ainsley .saves-meter i {
 }
 .saves-host[data-kid="ainsley"] .saves-plus,
 body.theme-ainsley .saves-plus,
-body.theme-ainsley .saves-plus {
+body.theme-ainsley.stick-season .saves-plus {
   background: #c4783a !important;
   color: #14100a !important;
   border-color: #8a5020 !important;
@@ -679,13 +679,13 @@ body.theme-harris .sec-bank { max-height: none !important; }
   box-sizing: border-box;
 }
 body.theme-ainsley .house-zoom .hz-btn,
-body.theme-ainsley .house-zoom .hz-btn {
+body.theme-ainsley.stick-season .house-zoom .hz-btn {
   background: rgba(26,46,36,0.9);
   border-color: #8a7040;
   color: #e8e4d4;
 }
 body.theme-ainsley .house-zoom .hz-pct,
-body.theme-ainsley .house-zoom .hz-pct {
+body.theme-ainsley.stick-season .house-zoom .hz-pct {
   background: #1a2e24;
   border-color: #8a7040;
   color: #d4a05a;
@@ -859,7 +859,7 @@ a.home-btn .chev, .home-btn .chev {
   line-height: 1;
 }
 body.theme-ainsley a.home-btn,
-body.theme-ainsley a.home-btn {
+body.theme-ainsley.stick-season a.home-btn {
   background: linear-gradient(180deg, #e8d4b0, #c4783a) !important;
   border-color: #8a5020 !important;
   box-shadow: 0 3px 0 #3a2810 !important;

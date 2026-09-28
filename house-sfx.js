@@ -396,23 +396,17 @@
 
   /* 1★ = $1 · kids WATCH work earn real money. Themes keep particle chrome. */
   function dollarsFor(el) {
-    /* GROW2b/FAIL3 · hire/optional/addon never invent +$1 · missing data-stars ≠ $1 */
+    var n = 1;
     if (el) {
-      if (el.getAttribute("data-optional") === "1" || el.classList.contains("addon") ||
-          el.getAttribute("data-cadence") === "addon" || el.getAttribute("data-hire") === "1") {
-        return 0;
-      }
       var ds = el.getAttribute("data-stars");
       if (ds == null) {
         var earn = el.querySelector && el.querySelector("[data-stars]");
         if (earn) ds = earn.getAttribute("data-stars");
       }
-      if (ds == null) return 1; /* legacy musts without attr still 1★=$1 */
       var parsed = parseInt(ds, 10);
-      if (!isNaN(parsed) && parsed >= 0) return parsed;
-      return 0;
+      if (!isNaN(parsed) && parsed >= 0) n = parsed;
     }
-    return 1;
+    return n;
   }
   function currencyLabel(el) {
     var n = dollarsFor(el);

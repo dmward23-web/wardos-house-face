@@ -111,7 +111,7 @@
     if (hint) {
       hint.textContent = weekDone
         ? need + "/" + need + " Dad days · +$" + weekPay + " unlocked"
-        : doneN + "/" + need + " days · Dad week Fri→Fri (taps Sat–Fri · leave Fri morning) unlocks $" + weekPay;
+        : doneN + "/" + need + " days · Dad week (Fri–Thu) unlocks $" + weekPay;
     }
     var earn = row.querySelector(".star-earn");
     if (earn && !earn.classList.contains("addon-tag")) {

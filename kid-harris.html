@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HARRIS · BLOCK WORLD</title>
-<link rel="stylesheet" href="house-engage.css?v=FRIWEEK2" />
+<link rel="stylesheet" href="house-engage.css?v=FRIWEEK1" />
 <style>
 
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400}
@@ -304,27 +304,6 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .hdr{box-shadow:inset 0 2px 0 rgba(255,255,255,0.92),0 6px 0 #1a1e24,0 14px 32px rgba(20,22,28,0.22),0 0 24px rgba(255,200,80,0.14)!important}
   .sec-chores .quest{box-shadow:0 5px 0 rgba(20,22,28,0.35),0 0 14px rgba(255,200,80,0.08)}
   .grow-meter{box-shadow:0 6px 0 rgba(20,22,28,0.4),0 0 22px rgba(255,220,80,0.18)!important}
-
-  /* PRISMP0 · grow one hero · meter + total + one CTA · large jar · less stack */
-  .sec-bank.bank-card { padding: 14px 16px !important; gap: 10px !important; }
-  .sec-bank .bank-count { font-size: 72px !important; line-height: 0.95 !important; letter-spacing: -0.05em !important; }
-  .sec-bank .bank-goal-title { font-size: 22px !important; }
-  .sec-bank .bank-blurb,
-  .sec-bank .money-row,
-  .sec-bank .bank-meta,
-  .sec-bank .bank-track,
-  .sec-bank .jar-flow,
-  .sec-bank .ledger-row { display: none !important; }
-  .sec-bank .grow-week-rising,
-  .sec-bank .grow-line { display: none !important; }
-  .sec-bank .grow-total { font-size: 40px !important; font-weight: 900 !important; letter-spacing: -0.04em; line-height: 1; margin: 4px 0 2px; }
-  .sec-bank .grow-title { font-size: 12px !important; opacity: 0.9; }
-  .sec-bank .grow-jar-name { font-size: 15px !important; font-weight: 800; }
-  .sec-bank .bank-links { margin-top: 6px; gap: 8px; }
-  .sec-bank .bank-links a.primary-foil {
-    font-size: 16px !important; padding: 12px 18px !important; min-height: 48px !important;
-    font-weight: 850 !important;
-  }
 </style>
 </head>
 <body data-clear-label="LEVEL UP!!!" data-kid="harris" data-theme="harris" data-chores-shared="1" class="theme-harris">
@@ -372,7 +351,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <section class="sec sec-chores" aria-label="Chores and quests">
  <div class="sec-hdr"><div class="sec-title">⛏️ YOUR QUESTS · MUSTS</div><div class="sec-meta" data-streak-label>streak</div></div>
  <div class="sec-list" data-mount-quests></div>
- <div class="tap-hint">Tap each day Sat–Fri · leave Friday morning still counts · Dad week Fri 3:00p→Fri 3:00p unlocks that chore’s $ · ★ into the jar</div>
+ <div class="tap-hint">Tap each day Fri–Thu · Dad week unlocks that chore’s $ · ★ into the jar</div>
  <div class="bank-links" style="margin-top:4px">
  <a class="ghost" href="sheet-chores.html">Family chores</a>
  </div>
@@ -385,7 +364,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  </div>
  <div class="bank-count"><span data-bank-symbol>◆</span> <span data-bank-life>0</span></div>
  </div>
- <div class="bank-blurb" data-bank-goal-blurb>Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri) hit Gem Jar $10 AND full $10 payday (1★=$1). Miss musts = short or no full payday. Jar = save what you earned — not free money.</div>
+ <div class="bank-blurb" data-bank-goal-blurb>Honest Dad-week musts (Fri→Thu) hit Gem Jar $8 AND full $10 payday (1★=$1). Miss musts = short or no full payday. Jar = save what you earned — not free money.</div>
  <button type="button" class="grow-meter grow-gems" data-grow-meter aria-label="Grow · gems">
  <div class="grow-stage">
  <div class="grow-fill grow-fill-balance" data-grow-fill-balance></div>
@@ -411,7 +390,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  </div>
 
  <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
- <div class="bank-meta"><span data-bank-meta>$0 / $10 · 0/10 ★</span>today <span data-bank-today>0</span></div>
+ <div class="bank-meta"><span data-bank-meta>$0 / $8 · 0/8 ★</span>today <span data-bank-today>0</span></div>
  <div class="jar-flow" aria-label="stars to jar to payday">
  <span class="step">★ earn</span><span class="arr">→</span>
  <span class="step">🫙 jar</span><span class="arr">→</span>
@@ -420,7 +399,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  </div>
  <div class="bank-links">
  <a class="primary-foil" href="sheet-allowance.html">Gem Jar →</a>
- <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">JAR FULL · saved $10 · show Dad</a>
+ <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">JAR FULL · saved $8 · show Dad</a>
  <button type="button" class="got-it" data-got-it hidden>Got it · payday</button>
  <div class="paid-stamp" data-paid-stamp hidden>Paid · jar reset</div>
  </div>
@@ -472,8 +451,8 @@ document.addEventListener("house:cleared", function(){
 </script>
 
 <script src="house-clock.js?v=CT1"></script>
-<script src="kids-data.js?v=FRIWEEK2"></script>
-<script src="house-saves.js?v=HARRIS10B"></script>
+<script src="kids-data.js?v=JARCOR1"></script>
+<script src="house-saves.js?v=FAIL3"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=FAIL3"></script>
 <script src="house-checkoffs.js?v=JARCOR1" defer></script>

@@ -4,9 +4,9 @@
 
   var KEY = "house-saves:v1";
   var DEFAULTS = {
-    ainsley: [{ id: "seed-tour-jar", name: "Tour Jar", need: 20 }],
-    hayes: [{ id: "seed-victory-stash", name: "Victory stash", need: 10 }],
-    harris: [{ id: "seed-gem-stash", name: "Gem stash", need: 10 }]
+    ainsley: [{ id: "seed-stick-season", name: "Stick Season · concert save", need: 40 }],
+    hayes: [{ id: "seed-victory-stash", name: "Victory stash", need: 12 }],
+    harris: [{ id: "seed-gem-stash", name: "Gem stash", need: 8 }]
   };
 
   function esc(s) {
@@ -32,44 +32,6 @@
         return { id: x.id, name: x.name, need: x.need || 0, created: Date.now() };
       });
       saveRoot(root);
-    } else if (kidId === "hayes") {
-      /* FAIL3 · align legacy Victory stash seed (was 12) → bankGoal/allowance 10 */
-      var dirty = false;
-      (root[kidId] || []).forEach(function (x) {
-        if (x && x.id === "seed-victory-stash" && Number(x.need) === 12) {
-          x.need = 10;
-          dirty = true;
-        }
-      });
-      if (dirty) saveRoot(root);
-    } else if (kidId === "harris") {
-      /* AINSLEY$FIX gate · Gem stash seed was 8 → bankGoal/allowance 10 */
-      var dirtyH = false;
-      (root[kidId] || []).forEach(function (x) {
-        if (x && x.id === "seed-gem-stash" && Number(x.need) === 8) {
-          x.need = 10;
-          dirtyH = true;
-        }
-      });
-      if (dirtyH) saveRoot(root);
-    } else if (kidId === "ainsley") {
-      /* AINSLEY$FIX · Stick Season / concert-save → Tour Jar $20 */
-      var dirtyA = false;
-      (root[kidId] || []).forEach(function (x) {
-        if (!x) return;
-        var nm = String(x.name || "");
-        if (x.id === "seed-stick-season" || /stick\s*season|concert\s*save/i.test(nm)) {
-          x.id = "seed-tour-jar";
-          x.name = "Tour Jar";
-          x.need = 20;
-          dirtyA = true;
-        } else if (x.id === "seed-tour-jar" && Number(x.need) !== 20) {
-          x.need = 20;
-          x.name = "Tour Jar";
-          dirtyA = true;
-        }
-      });
-      if (dirtyA) saveRoot(root);
     }
     return root[kidId].slice();
   }
