@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Sep 28 2026",
   "asOfIso": "2026-09-28",
-  "refreshedAt": "2026-09-28T22:46:00.107Z",
+  "refreshedAt": "2026-09-28T23:02:52.264Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,27 +16,15 @@
     "endIso": "2026-10-02T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "5:40",
-    "place": "Hayes baseball practice",
-    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-    "badge": "Mon",
-    "startIso": "2026-09-28T22:40:00.000Z",
-    "endIso": "2026-09-29T00:50:00.000Z",
-    "kind": "sport",
+    "label": "Next up · Tue",
+    "time": "8:10",
+    "place": "Boys SRE drop",
+    "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "badge": "Tue",
+    "startIso": "2026-09-29T13:10:00.000Z",
+    "endIso": "2026-09-29T13:40:00.000Z",
+    "kind": "school_drop",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "5:40",
-        "place": "Hayes baseball practice",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-09-28T22:40:00.000Z",
-        "endIso": "2026-09-29T00:50:00.000Z",
-        "kind": "sport",
-        "whenLabel": "5:40",
-        "summary": "Hayes baseball practice · 6:15 practice"
-      },
       {
         "label": "Next up · Tue",
         "time": "8:10",
@@ -168,6 +156,18 @@
         "kind": "sport",
         "whenLabel": "Wed 4:55",
         "summary": "Harris flag practice"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "7:00",
+        "place": "SRE PE (tennis shoes)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-01T12:00:00.000Z",
+        "endIso": "2026-10-01T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Thu 7:00",
+        "summary": "Harris — SRE PE (tennis shoes)"
       }
     ]
   },
