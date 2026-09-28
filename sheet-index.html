@@ -9,11 +9,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="WardOS House" />
 <meta name="mobile-web-app-capable" content="yes" />
-<meta name="theme-color" content="#d8dadf" />
+<meta name="theme-color" content="#0e1014" />
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-<meta name="description" content="Board-OS House face · family sheets home index · jazz glass · family home" />
+<meta name="description" content="Board-OS House face · family sheets home index · sharp-future hub · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
-<link rel="stylesheet" href="house-engage.css?v=FAIL3f" />
+<link rel="stylesheet" href="house-engage.css?v=FUTURE1" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -921,6 +921,615 @@
     border-color: transparent !important; box-shadow: 0 0 0 3px rgba(255,255,255,0.55), 0 5px 0 #121418 !important;
   }
   .leaveby { box-shadow: 0 8px 0 #05080c, 0 16px 32px rgba(0,0,0,0.28), 0 0 36px rgba(255,180,40,0.22) !important; }
+
+  /* ═══════════════════════════════════════════════════════════
+     FUTURE1 · Tesla / SpaceX sharp-future hub chrome
+     Hard geometry · thin luminous edges · deep blacks + camo frost
+     Electric cyan / amber · hairline HUD · keep all sensi IDs/hooks
+     ═══════════════════════════════════════════════════════════ */
+  :root {
+    --f1-cyan: #40e8ff;
+    --f1-cyan-dim: rgba(64,232,255,0.55);
+    --f1-amber: #ffc040;
+    --f1-amber-hot: #ffe080;
+    --f1-void: #05070a;
+    --f1-ink: #0a0c10;
+    --f1-panel: #101418;
+    --f1-edge: rgba(64,232,255,0.42);
+    --f1-edge-amber: rgba(255,192,64,0.55);
+    --f1-hair: rgba(255,255,255,0.14);
+    --f1-hair-bright: rgba(255,255,255,0.28);
+  }
+
+  /* Panel · camo stays; darker frost veil for mission glass */
+  .panel {
+    background-color: #c8ccd2;
+    background-image:
+      linear-gradient(165deg, rgba(12,14,18,0.18) 0%, rgba(220,222,226,0.12) 42%, rgba(8,10,14,0.22) 100%),
+      url("camo-glass-tile-house.png");
+    background-size: auto, 420px 420px;
+    background-position: center, 0 0;
+    background-repeat: no-repeat, repeat;
+    gap: 10px;
+    padding: 14px 22px 10px;
+  }
+  .panel::before {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 22%, transparent 78%, rgba(0,0,0,0.18) 100%),
+      radial-gradient(ellipse 55% 40% at 12% 8%, rgba(64,232,255,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 35% at 92% 88%, rgba(255,192,64,0.07) 0%, transparent 55%);
+    mix-blend-mode: soft-light;
+    opacity: 0.9;
+  }
+  .panel::after {
+    background:
+      linear-gradient(118deg, transparent 0 36%, rgba(64,232,255,0.06) 36% 37%, transparent 37% 63%, rgba(255,192,64,0.05) 63% 64%, transparent 64%),
+      linear-gradient(0deg, rgba(255,255,255,0.03), rgba(255,255,255,0.03));
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.35),
+      inset 0 -1px 0 rgba(0,0,0,0.22),
+      inset 1px 0 0 rgba(255,255,255,0.12),
+      inset -1px 0 0 rgba(0,0,0,0.12);
+  }
+
+  /* Header · tighter mission-control */
+  .hdr {
+    border-radius: 4px;
+    padding: 10px 14px;
+    background:
+      linear-gradient(180deg, rgba(28,32,38,0.92) 0%, rgba(12,14,18,0.94) 100%);
+    border: 1px solid var(--f1-edge);
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.55),
+      inset 0 1px 0 var(--f1-hair-bright),
+      inset 0 -1px 0 rgba(0,0,0,0.45),
+      0 0 28px rgba(64,232,255,0.08),
+      0 10px 0 rgba(5,7,10,0.55);
+  }
+  .brand img { height: 42px; filter: drop-shadow(0 0 8px rgba(64,232,255,0.25)); }
+  .back {
+    border-radius: 3px;
+    background: rgba(8,10,14,0.72);
+    border: 1px solid rgba(64,232,255,0.35);
+    color: #c8e8f4;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 0 12px rgba(64,232,255,0.08);
+    font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .back .chev { color: var(--f1-cyan); }
+  .avatar {
+    border-radius: 4px;
+    width: 52px; height: 52px; font-size: 22px;
+    background: linear-gradient(145deg, #2a3038 0%, #0a0c10 100%);
+    box-shadow:
+      0 0 0 1px var(--f1-edge),
+      0 0 0 3px rgba(0,0,0,0.55),
+      0 0 18px rgba(64,232,255,0.2);
+  }
+  .eyebrow {
+    color: var(--f1-cyan);
+    letter-spacing: 0.28em;
+    font-size: 10px;
+    text-shadow: 0 0 12px rgba(64,232,255,0.35);
+  }
+  .name, .name-accent { color: #f2f6fa; text-shadow: 0 1px 0 rgba(0,0,0,0.6); }
+  .tagline { color: rgba(200,220,232,0.78); font-weight: 600; letter-spacing: 0.02em; }
+  .hot-pill {
+    border-radius: 3px;
+    background: linear-gradient(180deg, #ffe9a0 0%, #f0a020 100%);
+    border: 1px solid #ffc040;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.55),
+      0 3px 0 rgba(80,50,8,0.55),
+      0 0 18px rgba(255,180,40,0.35);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 12px;
+  }
+  .wx-card {
+    border-radius: 4px;
+    background: linear-gradient(165deg, rgba(16,20,26,0.92), rgba(8,10,14,0.9));
+    border: 1px solid rgba(64,232,255,0.38);
+    box-shadow:
+      inset 0 1px 0 var(--f1-hair),
+      0 0 16px rgba(64,232,255,0.1),
+      0 6px 0 rgba(5,7,10,0.5);
+  }
+  .wx-card .wx-kicker { color: var(--f1-cyan); letter-spacing: 0.16em; }
+  .wx-card .wx-line, .wx-card .wx-temp { color: #f0f6fa; }
+  .wx-card .wx-cond, .wx-card .wx-sub { color: #a8c0d0; }
+  .wx-card .wx-ico {
+    border-radius: 3px;
+    background: rgba(64,232,255,0.08);
+    border: 1px solid rgba(64,232,255,0.28);
+  }
+  .mock-tag {
+    border-radius: 3px;
+    background: rgba(8,10,14,0.55);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: #8a949e;
+  }
+
+  /* Leave-by · louder instrument panel */
+  .leaveby {
+    border-radius: 4px;
+    min-height: 112px;
+    background:
+      linear-gradient(105deg, #05070a 0%, #12161c 28%, #1a1410 52%, #0e1218 78%, #05070a 100%);
+    border: 1px solid var(--f1-edge-amber);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.18),
+      inset 0 0 0 1px rgba(64,232,255,0.08),
+      0 0 0 1px rgba(0,0,0,0.7),
+      0 0 40px rgba(255,180,40,0.28),
+      0 0 24px rgba(64,232,255,0.12),
+      0 10px 0 rgba(5,7,10,0.75),
+      0 16px 32px rgba(0,0,0,0.4) !important;
+    animation: leaveby-pulse 2.4s ease-in-out infinite;
+  }
+  .leaveby::before {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.16) 0%, transparent 36%, rgba(0,0,0,0.35) 100%),
+      repeating-linear-gradient(90deg, transparent 0 18px, rgba(64,232,255,0.05) 18px 19px),
+      radial-gradient(ellipse 40% 120% at 3% 50%, rgba(255,192,64,0.28) 0%, transparent 55%),
+      linear-gradient(118deg, transparent 0 30%, rgba(64,232,255,0.12) 30% 31%, transparent 31%);
+  }
+  .leaveby-accent {
+    width: 5px;
+    background: linear-gradient(180deg, #ffe080 0%, #ffc040 40%, #40e8ff 100%);
+    box-shadow: 0 0 16px rgba(255,192,64,0.7), 0 0 10px rgba(64,232,255,0.45);
+  }
+  .leaveby-label {
+    color: rgba(64,232,255,0.9);
+    letter-spacing: 0.36em;
+    text-shadow: 0 0 10px rgba(64,232,255,0.35);
+  }
+  .leaveby-main {
+    color: #f8fafc;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.7), 0 0 20px rgba(255,200,80,0.2);
+  }
+  .leaveby-main .time {
+    border-radius: 3px;
+    background: linear-gradient(180deg, #fff4c8 0%, #ffc040 55%, #e09010 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.65),
+      0 3px 0 rgba(80,50,8,0.55),
+      0 0 22px rgba(255,180,40,0.55);
+  }
+  .leaveby-detail { color: rgba(200,220,232,0.88); }
+  .leaveby-detail strong { color: var(--f1-amber-hot); }
+  .leaveby-badge {
+    border-radius: 3px;
+    background: linear-gradient(180deg, #ffe9a0, #f0a020);
+    border: 1px solid #ffe080;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.5),
+      0 3px 0 rgba(60,40,8,0.55),
+      0 0 16px rgba(255,180,40,0.4);
+    letter-spacing: 0.2em;
+  }
+  .hub-upper .leaveby-badge { border-radius: 3px; }
+
+  /* Sensi · spacecraft climate module (IDs / classes / data-mode preserved) */
+  .hub-upper .sensi-chip {
+    border-radius: 4px;
+    border: 1px solid var(--f1-edge);
+    background:
+      linear-gradient(155deg, #05080c 0%, #121820 38%, #0a1018 100%);
+    box-shadow:
+      inset 0 1px 0 var(--f1-hair-bright),
+      inset 0 0 0 1px rgba(64,232,255,0.08),
+      0 0 0 1px rgba(0,0,0,0.65),
+      0 8px 0 rgba(5,7,10,0.7),
+      0 0 22px rgba(64,232,255,0.16);
+    padding: 12px 12px 12px 14px;
+    position: relative;
+  }
+  .hub-upper .sensi-chip::before {
+    content: "";
+    position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px;
+    background: linear-gradient(180deg, var(--f1-cyan), var(--f1-amber));
+    box-shadow: 0 0 10px rgba(64,232,255,0.55);
+    border-radius: 0 1px 1px 0;
+  }
+  .hub-upper .sensi-chip:active {
+    transform: translateY(2px);
+    box-shadow:
+      inset 0 1px 0 var(--f1-hair),
+      0 4px 0 rgba(5,7,10,0.7),
+      0 0 14px rgba(64,232,255,0.12);
+  }
+  .hub-upper .sensi-chip[data-mode="Heat"] {
+    background: linear-gradient(155deg, #120806 0%, #3a1808 45%, #1a0c08 100%);
+    border-color: rgba(255,160,64,0.55);
+    box-shadow: inset 0 1px 0 rgba(255,200,120,0.2), 0 8px 0 rgba(5,7,10,0.7), 0 0 22px rgba(255,140,40,0.28);
+  }
+  .hub-upper .sensi-chip[data-mode="Cool"] {
+    background: linear-gradient(155deg, #040c14 0%, #0c2848 45%, #061018 100%);
+    border-color: rgba(64,200,255,0.55);
+    box-shadow: inset 0 1px 0 rgba(120,220,255,0.22), 0 8px 0 rgba(5,7,10,0.7), 0 0 22px rgba(40,180,255,0.28);
+  }
+  .hub-upper .sensi-chip[data-mode="Auto"] {
+    background: linear-gradient(155deg, #100806 0%, #2a1808 35%, #0c2038 100%);
+    border-color: rgba(64,232,255,0.4);
+  }
+  .hub-upper .sensi-chip[data-mode="Off"] {
+    background: linear-gradient(155deg, #080a0c, #161a20);
+    border-color: rgba(255,255,255,0.18);
+  }
+  .hub-upper .sensi-chip-lab {
+    color: rgba(64,232,255,0.88);
+    letter-spacing: 0.24em;
+    text-shadow: 0 0 8px rgba(64,232,255,0.3);
+  }
+  .hub-upper .sensi-chip-temp {
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 18px rgba(64,232,255,0.35);
+  }
+  .hub-upper .sensi-chip-mode {
+    border-radius: 2px;
+    border: 1px solid rgba(255,255,255,0.28);
+    letter-spacing: 0.1em;
+  }
+  .hub-upper .sensi-chip-pill {
+    border-radius: 2px;
+    letter-spacing: 0.14em;
+  }
+  .hub-upper .sensi-chip-pill.on {
+    background: rgba(16,96,48,0.95);
+    color: #b8ffd0;
+    border-color: rgba(64,232,160,0.55);
+    box-shadow: 0 0 10px rgba(64,232,160,0.35);
+  }
+  .hub-upper .sensi-chip.is-live {
+    box-shadow:
+      inset 0 1px 0 var(--f1-hair-bright),
+      0 8px 0 rgba(5,7,10,0.7),
+      0 0 26px rgba(64,232,160,0.32);
+  }
+
+  /* Grid chrome */
+  .grid-title {
+    color: #0e1218;
+    letter-spacing: 0.3em;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+  }
+  .grid-hint { color: #2a3038; }
+
+  /* Base tiles · hard geometry · thin luminous edge · deep + frost */
+  .tile {
+    border-radius: 4px;
+    border: 1px solid rgba(64,232,255,0.28);
+    background:
+      linear-gradient(165deg, rgba(24,28,34,0.92) 0%, rgba(10,12,16,0.96) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.16),
+      inset 0 -1px 0 rgba(0,0,0,0.45),
+      0 0 0 1px rgba(0,0,0,0.55),
+      0 8px 0 rgba(5,7,10,0.55),
+      0 14px 24px rgba(0,0,0,0.28),
+      0 0 18px rgba(64,232,255,0.06);
+    color: #e8eef4;
+  }
+  .tile::before {
+    height: 3px;
+    border-radius: 0;
+    background: linear-gradient(90deg, var(--f1-cyan), transparent 70%, var(--f1-amber));
+    box-shadow: 0 0 10px rgba(64,232,255,0.45);
+  }
+  .tile::after {
+    background: linear-gradient(115deg, transparent 0 44%, rgba(64,232,255,0.1) 50%, transparent 56%);
+    opacity: 0.55;
+  }
+  .tile-icon {
+    border-radius: 3px;
+    background: rgba(8,10,14,0.85);
+    border: 1px solid rgba(64,232,255,0.35);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.12),
+      0 0 12px rgba(64,232,255,0.12),
+      0 4px 0 rgba(0,0,0,0.45);
+    color: #e8f4ff;
+  }
+  .tile-label {
+    color: #f2f6fa;
+    letter-spacing: -0.03em;
+  }
+  .tile-sub { color: rgba(180,200,214,0.88); }
+  .tile-tap {
+    border-radius: 2px;
+    background: rgba(8,10,14,0.85);
+    border: 1px solid rgba(64,232,255,0.4);
+    color: var(--f1-cyan);
+    letter-spacing: 0.18em;
+    box-shadow: 0 0 10px rgba(64,232,255,0.15);
+  }
+
+  /* Personality tiles · sharper accent bars + luminous frames */
+  .tile.today {
+    background: linear-gradient(165deg, #2a1c08 0%, #c87810 48%, #5a3008 100%);
+    border-color: rgba(255,192,64,0.7);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 8px 0 rgba(40,24,4,0.7), 0 0 24px rgba(255,180,40,0.35);
+  }
+  .tile.today::before { background: linear-gradient(90deg, #ffe080, #40e8ff); height: 3px; }
+  .tile.today .tile-label { color: #fff4d0; }
+  .tile.today .tile-sub { color: #ffe0a0; }
+  .tile.today .tile-tap { background: #0a0804; color: #ffe080; border-color: #ffc040; }
+
+  .tile.week {
+    background: linear-gradient(165deg, #0a1428 0%, #2850a0 48%, #0a1838 100%);
+    border-color: rgba(100,180,255,0.55);
+  }
+  .tile.week::before { background: linear-gradient(90deg, #90c8ff, #40e8ff); height: 3px; }
+  .tile.week .tile-tap { background: #061018; color: #90d0ff; border-color: #4080c8; }
+
+  .tile.month {
+    background: linear-gradient(165deg, #140c28 0%, #5030a0 48%, #180c38 100%);
+    border-color: rgba(180,140,255,0.5);
+  }
+  .tile.month::before { background: linear-gradient(90deg, #c0a0ff, #40e8ff); height: 3px; }
+
+  .tile.chores {
+    background: linear-gradient(165deg, #061810 0%, #208040 48%, #0a2814 100%);
+    border-color: rgba(80,232,140,0.5);
+  }
+  .tile.chores::before { background: linear-gradient(90deg, #80f0a0, #40e8ff); height: 3px; }
+  .tile.chores .tile-tap { background: #041008; color: #b0ffc8; border-color: #40c868; }
+
+  .tile.groceries {
+    background: linear-gradient(165deg, #061818 0%, #188870 48%, #0a2820 100%);
+    border-color: rgba(64,232,200,0.5);
+  }
+  .tile.groceries::before { background: linear-gradient(90deg, #60f0d0, #40e8ff); height: 3px; }
+
+  .tile.pack {
+    background: linear-gradient(165deg, #1a1008 0%, #a06028 48%, #281808 100%);
+    border-color: rgba(255,180,100,0.5);
+  }
+  .tile.pack::before { background: linear-gradient(90deg, #f0b070, #ffc040); height: 3px; }
+
+  .tile.stars {
+    background: linear-gradient(165deg, #2a1c08 0%, #c88810 48%, #4a2808 100%);
+    border-color: rgba(255,200,64,0.65);
+  }
+  .tile.stars::before { background: linear-gradient(90deg, #ffe080, #40e8ff); height: 3px; }
+  .tile.stars .tile-label { color: #fff4d0; }
+  .tile.stars .tile-sub { color: #ffe0a0; }
+  .tile.stars .tile-tap { background: #0a0804; color: #ffe080; border-color: #ffc040; }
+
+  .tile.fun {
+    background: linear-gradient(165deg, #061820 0%, #2088a8 48%, #0a2030 100%);
+    border-color: rgba(64,220,255,0.5);
+  }
+  .tile.fun::before { background: linear-gradient(90deg, #70e8ff, #40e8ff); height: 3px; }
+
+  .tile.vote {
+    background: linear-gradient(165deg, #200c08 0%, #c05018 48%, #301008 100%);
+    border-color: rgba(255,140,80,0.55);
+  }
+  .tile.vote::before { background: linear-gradient(90deg, #ffb070, #ffc040); height: 3px; }
+
+  .tile.win {
+    background: linear-gradient(165deg, #081808 0%, #38a028 48%, #102810 100%);
+    border-color: rgba(120,232,80,0.5);
+  }
+  .tile.win::before { background: linear-gradient(90deg, #90f070, #40e8ff); height: 3px; }
+  .tile.win .tile-tap { background: #041004; color: #c8ffb0; border-color: #48c838; }
+
+  .tile.count {
+    background: linear-gradient(165deg, #100c28 0%, #4840b0 48%, #181040 100%);
+    border-color: rgba(160,140,255,0.5);
+  }
+  .tile.count::before { background: linear-gradient(90deg, #b0a0ff, #40e8ff); height: 3px; }
+
+  .tile.us {
+    background: linear-gradient(165deg, #200c10 0%, #b04040 48%, #280c14 100%);
+    border-color: rgba(255,140,140,0.5);
+  }
+  .tile.us::before { background: linear-gradient(90deg, #ffb0a0, #ffc040); height: 3px; }
+
+  .tile.load {
+    background: linear-gradient(165deg, #2a1c08 0%, #d09818 48%, #4a2808 100%);
+    border-color: rgba(255,200,64,0.65);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 8px 0 rgba(40,24,4,0.7), 0 0 22px rgba(255,180,40,0.3);
+  }
+  .tile.load::before { background: linear-gradient(90deg, #ffe080, #40e8ff); height: 3px; }
+  .tile.load .tile-label { color: #fff4d0; }
+  .tile.load .tile-sub { color: #ffe0a0; }
+
+  .tile.desk {
+    background: linear-gradient(165deg, #1a1e24 0%, #2a3038 40%, #05070a 100%);
+    border-color: rgba(200,210,220,0.35);
+  }
+  .tile.desk::before { background: linear-gradient(90deg, #a8b0b8, #40e8ff); height: 3px; }
+  .tile.desk .tile-tap { background: #05070a; color: #c8d0d8; border-color: #5a6068; }
+
+  .tile.status {
+    background: linear-gradient(165deg, #081428 0%, #2860b0 48%, #0a1838 100%);
+    border-color: rgba(100,180,255,0.5);
+  }
+  .tile.status::before { background: linear-gradient(90deg, #80b8ff, #40e8ff); height: 3px; }
+
+  .tile.gallery {
+    background: linear-gradient(165deg, #10141c 0%, #3a4860 48%, #121820 100%);
+    border-color: rgba(160,180,210,0.4);
+  }
+  .tile.gallery::before { background: linear-gradient(90deg, #a0b4d0, #40e8ff); height: 3px; }
+
+  .tile.ghome, .tile.google-home {
+    background: linear-gradient(165deg, #0a0806 0%, #6a3810 36%, #184878 72%, #05080c 100%) !important;
+    border-color: rgba(64,232,255,0.45) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.22),
+      0 8px 0 #05080c,
+      0 0 28px rgba(255,160,40,0.28),
+      0 0 22px rgba(64,200,255,0.22) !important;
+  }
+  .tile.ghome::before, .tile.google-home::before {
+    background: linear-gradient(90deg, #ffc040, #40e8ff) !important;
+    height: 3px !important;
+  }
+  .tile.ghome .tile-tap, .tile.google-home .tile-tap {
+    background: #05070a; color: #ffe080; border-color: #ffc040; border-radius: 2px;
+  }
+
+  /* Kid color languages · sharper chrome (Hayes cyan · Ainsley warm · Harris green · Dan gold) */
+  .tile.hayes, .tile.ainsley, .tile.harris, .tile.dan {
+    border-width: 1px !important;
+    border-radius: 4px;
+  }
+  .tile.hayes {
+    background: linear-gradient(165deg, #061420 0%, #0c2848 42%, #1a1858 100%) !important;
+    border-color: #40e8ff !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.16),
+      0 8px 0 rgba(5,7,10,0.65),
+      0 0 22px rgba(64,232,255,0.28) !important;
+  }
+  .tile.hayes::before { background: linear-gradient(90deg, #40e8ff, #7dffc8) !important; height: 3px !important; }
+  .tile.hayes .tile-label { color: #7dffc8 !important; }
+  .tile.hayes .tile-sub { color: #90d8f8 !important; }
+  .tile.hayes .tile-tap {
+    background: rgba(8,20,32,0.9); color: #40e8ff; border: 1px solid #40e8ff; border-radius: 2px;
+  }
+  .tile.hayes .tile-icon--portrait {
+    border-radius: 3px !important;
+    border-color: #40e8ff !important;
+    box-shadow: 0 0 0 1px rgba(64,232,255,0.35), 0 0 16px rgba(64,232,255,0.4) !important;
+  }
+
+  .tile.ainsley {
+    background:
+      radial-gradient(ellipse 80% 60% at 15% 20%, rgba(196,120,58,0.28), transparent 55%),
+      linear-gradient(165deg, #0e1612 0%, #12140f 55%, #1a1610 100%) !important;
+    border-color: #d4a05a !important;
+    box-shadow:
+      inset 0 1px 0 rgba(232,224,208,0.14),
+      0 8px 0 rgba(5,7,10,0.65),
+      0 0 20px rgba(212,160,90,0.28) !important;
+  }
+  .tile.ainsley::before { background: linear-gradient(90deg, #d4a05a, #ffc040, #40e8ff) !important; height: 3px !important; }
+  .tile.ainsley .tile-tap {
+    background: #0e1612; color: #e8e0d0; border: 1px solid #d4a05a; border-radius: 2px;
+  }
+  .tile.ainsley .vibe-mini {
+    border-radius: 2px;
+    background: rgba(196,120,58,0.2);
+    border: 1px solid rgba(212,160,90,0.55);
+  }
+  .tile.ainsley .tile-icon--portrait {
+    border-radius: 3px !important;
+    border-color: #d4a05a !important;
+  }
+
+  .tile.harris {
+    background: linear-gradient(165deg, #102008 0%, #3a7020 48%, #1a3010 100%) !important;
+    border-color: #90e050 !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.14),
+      0 8px 0 rgba(5,7,10,0.65),
+      0 0 18px rgba(144,224,80,0.25) !important;
+  }
+  .tile.harris::before { background: linear-gradient(90deg, #90e050, #40e8ff) !important; height: 3px !important; }
+  .tile.harris .tile-label { color: #e8ffe0 !important; }
+  .tile.harris .tile-sub { color: #c8f090 !important; }
+  .tile.harris .tile-icon {
+    border-radius: 2px !important;
+    box-shadow: 0 3px 0 #0a1804 !important;
+  }
+  .tile.harris .tile-tap {
+    background: #0a1406; color: #c8ff80; border: 1px solid #90e050; border-radius: 2px;
+  }
+  .tile.harris .tile-icon--portrait {
+    border-radius: 2px !important;
+    border-color: #90e050 !important;
+    box-shadow: 0 3px 0 #0a1804 !important;
+  }
+
+  .tile.dan {
+    background: linear-gradient(165deg, #1a1e24 0%, #0a0c10 55%, #05070a 100%) !important;
+    border-color: #ffc040 !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.14),
+      0 8px 0 rgba(5,7,10,0.75),
+      0 0 22px rgba(255,192,64,0.28) !important;
+  }
+  .tile.dan::before { background: linear-gradient(90deg, #ffe080, #40e8ff) !important; height: 3px !important; }
+  .tile.dan .tile-tap {
+    background: #ffc040; color: #0a0804; border: 1px solid #ffe080; border-radius: 2px; font-weight: 800;
+  }
+  .tile.dan .tile-icon--portrait {
+    border-radius: 3px !important;
+    border-color: #ffc040 !important;
+  }
+
+  .tile-icon.tile-icon--portrait {
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,0.35) !important;
+  }
+
+  .tile.primary-tile {
+    transform: scale(1.015);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.2),
+      0 0 0 1px rgba(64,232,255,0.45),
+      0 8px 0 rgba(5,7,10,0.55),
+      0 0 22px rgba(64,232,255,0.2) !important;
+  }
+  .tile.stars.primary-tile {
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.25),
+      0 0 0 1px rgba(255,192,64,0.55),
+      0 8px 0 rgba(40,24,4,0.65),
+      0 0 22px rgba(255,180,40,0.3) !important;
+  }
+
+  a.tile.ainsley::after {
+    box-shadow: 0 0 0 1px rgba(212,160,90,0.55), 0 0 22px rgba(212,160,90,0.3);
+  }
+  a.tile.hayes::after {
+    box-shadow: 0 0 0 1px rgba(64,232,255,0.55), 0 0 22px rgba(64,232,255,0.35);
+  }
+  a.tile.harris::after {
+    box-shadow: 0 0 0 1px rgba(144,224,80,0.5), 0 0 22px rgba(144,224,80,0.3);
+  }
+
+  /* Footer chips · hard HUD */
+  .ftr-chip {
+    border-radius: 2px;
+    background: linear-gradient(180deg, rgba(20,24,28,0.92), rgba(8,10,14,0.95));
+    border: 1px solid rgba(64,232,255,0.35);
+    color: #c8e8f4;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 0 rgba(0,0,0,0.35);
+  }
+  .ftr { color: #3a424a; }
+  .ftr-meta { color: #4a545c; }
+
+  /* Float orbs · cyan/amber instrument sparks */
+  .float-orbs i:nth-child(1) { background: #ffc040; box-shadow: 0 0 14px #ffc040; }
+  .float-orbs i:nth-child(2) { background: #40e8ff; box-shadow: 0 0 14px #40e8ff; }
+  .float-orbs i:nth-child(5) { background: #40e8ff; box-shadow: 0 0 12px #40e8ff; }
+  .float-orbs i:nth-child(6) { background: #ffe080; box-shadow: 0 0 12px #ffe080; }
+
+  @keyframes leaveby-pulse {
+    0%, 100% {
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.16),
+        0 0 0 1px rgba(0,0,0,0.7),
+        0 0 36px rgba(255,180,40,0.22),
+        0 0 18px rgba(64,232,255,0.1),
+        0 10px 0 rgba(5,7,10,0.75),
+        0 16px 32px rgba(0,0,0,0.4);
+    }
+    50% {
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.22),
+        0 0 0 1px rgba(0,0,0,0.7),
+        0 0 48px rgba(255,180,40,0.4),
+        0 0 28px rgba(64,232,255,0.18),
+        0 10px 0 rgba(5,7,10,0.75),
+        0 16px 32px rgba(0,0,0,0.4);
+    }
+  }
 </style>
 </head>
 <body>
@@ -933,15 +1542,15 @@
  <div class="identity">
  <div class="avatar" aria-hidden="true">⌂</div>
  <div class="id-text">
- <div class="eyebrow">HOUSE · WARD</div>
+ <div class="eyebrow">WARDOS · HOUSE FACE</div>
  <h1 class="name"><span class="name-accent">Family sheets</span></h1>
- <div class="tagline">Family home · tap a sheet</div>
+ <div class="tagline">Mission hub · tap a sheet</div>
  </div>
  </div>
  </div>
  <div class="hdr-right">
  <div class="wx-card" id="house-wx" data-live="weather" aria-label="Weather · Overland Park"></div>
- <div class="hot-pill"><span class="spark">◎</span> Tap a tile · open a sheet</div>
+ <div class="hot-pill"><span class="spark">◎</span> SELECT · OPEN SHEET</div>
  </div>
  </header>
 
@@ -961,7 +1570,7 @@
 
  <div class="grid-wrap">
  <div class="grid-hdr">
- <div class="grid-title">All sheets</div>
+ <div class="grid-title">Sheet roster</div>
  </div>
 
  <nav class="tile-grid" aria-label="Family sheet index">
@@ -994,7 +1603,7 @@
 
  <a class="tile hayes" href="kid-hayes.html">
  <div class="tile-icon tile-icon--portrait need-photo" data-person="hayes" aria-label="Hayes · NEED PHOTO">
- <img class="tile-portrait" src="assets/portraits/hayes.jpg?v=FAIL3f" alt="Hayes" width="56" height="56" loading="lazy"
+ <img class="tile-portrait" src="assets/portraits/hayes.jpg?v=FUTURE1" alt="Hayes" width="56" height="56" loading="lazy"
   onerror="this.closest('.tile-icon').classList.add('need-photo'); this.removeAttribute('src');"
   onload="this.closest('.tile-icon').classList.remove('need-photo');" />
  <span class="need-photo-label">NEED PHOTO</span>
@@ -1008,7 +1617,7 @@
 
  <a class="tile ainsley" href="kid-ainsley.html">
  <div class="tile-icon tile-icon--portrait need-photo" data-person="ainsley" aria-label="Ainsley · NEED PHOTO">
- <img class="tile-portrait" src="assets/portraits/ainsley.jpg?v=FAIL3f" alt="Ainsley" width="56" height="56" loading="lazy"
+ <img class="tile-portrait" src="assets/portraits/ainsley.jpg?v=FUTURE1" alt="Ainsley" width="56" height="56" loading="lazy"
   onerror="this.closest('.tile-icon').classList.add('need-photo'); this.removeAttribute('src');"
   onload="this.closest('.tile-icon').classList.remove('need-photo');" />
  <span class="need-photo-label">NEED PHOTO</span>
@@ -1023,7 +1632,7 @@
 
  <a class="tile harris" href="kid-harris.html">
  <div class="tile-icon tile-icon--portrait need-photo" data-person="harris" aria-label="Harris · NEED PHOTO">
- <img class="tile-portrait" src="assets/portraits/harris.jpg?v=FAIL3f" alt="Harris" width="56" height="56" loading="lazy"
+ <img class="tile-portrait" src="assets/portraits/harris.jpg?v=FUTURE1" alt="Harris" width="56" height="56" loading="lazy"
   onerror="this.closest('.tile-icon').classList.add('need-photo'); this.removeAttribute('src');"
   onload="this.closest('.tile-icon').classList.remove('need-photo');" />
  <span class="need-photo-label">NEED PHOTO</span>
@@ -1037,7 +1646,7 @@
 
  <a class="tile dan" href="sheet-dan.html">
  <div class="tile-icon tile-icon--portrait need-photo" data-person="dan" aria-label="Daniel Ward · NEED PHOTO">
- <img class="tile-portrait" src="assets/portraits/dan.jpg?v=FAIL3f" alt="Daniel Ward" width="56" height="56" loading="lazy"
+ <img class="tile-portrait" src="assets/portraits/dan.jpg?v=FUTURE1" alt="Daniel Ward" width="56" height="56" loading="lazy"
   onerror="this.closest('.tile-icon').classList.add('need-photo'); this.removeAttribute('src');"
   onload="this.closest('.tile-icon').classList.remove('need-photo');" />
  <span class="need-photo-label">NEED PHOTO</span>
@@ -1186,13 +1795,13 @@
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=FAIL3f"></script>
-<script src="house-board-strip.js?v=FAIL3f"></script>
-<script src="house-weather.js?v=FAIL3f"></script>
-<script src="house-sfx.js?v=FAIL3f"></script>
-<script src="house-zoom.js?v=FAIL3f"></script>
-<script src="house-sensi.js?v=FAIL3f"></script>
-<script src="house-nest.js?v=FAIL3f"></script>
+<script src="house-clock.js?v=FUTURE1"></script>
+<script src="house-board-strip.js?v=FUTURE1"></script>
+<script src="house-weather.js?v=FUTURE1"></script>
+<script src="house-sfx.js?v=FUTURE1"></script>
+<script src="house-zoom.js?v=FUTURE1"></script>
+<script src="house-sensi.js?v=FUTURE1"></script>
+<script src="house-nest.js?v=FUTURE1"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
