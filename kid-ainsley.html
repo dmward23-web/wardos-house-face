@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#12140f" />
 <title>BOARD-OS · AINSLEY · HER TRACKS</title>
-<link rel="stylesheet" href="house-engage.css?v=P32" />
+<link rel="stylesheet" href="house-engage.css?v=KIDSLAY2" />
 <style>
 
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400}
@@ -107,42 +107,36 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     border:2px solid #8a6010; box-shadow:0 3px 0 #6a4010;
   }
 
-  /* LAYOUT32 · Prism kids grid · Elo 3202L portrait 1080×1920
-     cols 1.4fr / 1.6fr · Ainsley: schedule eats mid+bot (no Fun) */
+  /* KIDSLAY2 · 2-row · no fun/bonus · chores+grow primary · schedule air */
   .body {
-    flex:1; min-height:0; display:grid; gap:12px;
-    grid-template-columns: 1.4fr 1.6fr;
-    grid-template-rows:
-      minmax(168px, 0.20fr)
-      minmax(300px, 0.44fr)
-      minmax(240px, 0.36fr);
+    flex:1; min-height:0; display:grid; gap:16px;
+    grid-template-columns: 1.35fr 1.65fr;
+    grid-template-rows: auto 1fr;
   }
   .body .sec-chores { grid-column: 1; grid-row: 1 / -1; }
   .body .sec-bank {
     grid-column: 2; grid-row: 1;
-    overflow: visible; max-height: 200px;
-    padding: 10px 14px; gap: 6px;
+    overflow: visible; max-height: none;
+    padding: 12px 16px; gap: 8px;
   }
   .body .sec-schedule {
-    grid-column: 2; grid-row: 2 / 4;
+    grid-column: 2; grid-row: 2;
     min-height: 0; max-height: 100%;
     overflow: auto; overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
   }
-  .body .sec-more {
-    display: none; /* Fun empty · missions tucked; schedule spans mid+bot */
-  }
+  .body .sec-more { display: none !important; }
 
-  .sec-chores { gap:10px; padding:14px; }
-  .sec-chores .sec-title { font-size:16px; letter-spacing:0.12em; }
+  .sec-chores { gap:12px; padding:16px; }
+  .sec-chores .sec-title { font-size:17px; letter-spacing:0.12em; }
   .sec-chores .quest {
-    padding:14px 16px; min-height:72px;
+    padding:16px 18px; min-height:80px;
     border-width:2px;
   }
-  .sec-chores .quest .what { font-size:17px; }
-  .sec-chores .quest .ring { width:38px; height:38px; font-size:15px; }
-  .sec-chores .quest .star-earn { font-size:15px; padding:9px 13px; min-height:40px; }
-  .sec-chores .sec-list { gap:10px; }
+  .sec-chores .quest .what { font-size:18px; }
+  .sec-chores .quest .ring { width:42px; height:42px; font-size:16px; }
+  .sec-chores .quest .star-earn { font-size:16px; padding:11px 14px; min-height:44px; }
+  .sec-chores .sec-list { gap:12px; }
   .quest.addon {
     border-style: dashed; border-color: #6a7088;
     background: rgba(120,130,160,0.12);
@@ -551,7 +545,6 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   body.theme-ainsley .sec-schedule > .sec-list[data-mount-school] { flex: 1.35 1 0; min-height: 88px; }
   body.theme-ainsley .sec-schedule > .sec-list[data-mount-sports] { flex: 0.75 1 0; min-height: 56px; }
   body.theme-ainsley .sec-schedule > .sec-list[data-mount-appointments] { flex: 0.4 1 0; min-height: 44px; }
-  body.theme-ainsley .sec-more > .sec-list[data-mount-missions] { flex: 1 1 0; min-height: 64px; }
   body.theme-ainsley .sec-schedule .harbor-strip { padding: 8px 10px; margin-bottom: 6px; }
   body.theme-ainsley .sec-schedule .bag-strip { padding: 8px 10px; margin: 2px 0 6px; }
   body.theme-ainsley .body { overflow: visible; }
@@ -702,10 +695,6 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="sec-hdr school-hdr" style="margin-top:6px"><div class="sec-title">School schedule</div><div class="sec-meta">week</div></div>
  <div class="sec-list" data-mount-school></div>
  </section>
- <section class="sec sec-more" aria-label="Bonus">
- <div class="sec-hdr"><div class="sec-title">Bonus</div></div>
- <div class="sec-list" data-mount-missions></div>
- </section>
  </div>
  <div class="setlist-foot">
  <div class="lab">TRACKS</div>
@@ -743,11 +732,11 @@ document.addEventListener("house:kid-rendered", function(){
 </script>
 
 <script src="house-clock.js?v=CT1"></script>
-<script src="kids-data.js?v=GROW2b"></script>
-<script src="house-saves.js?v=GROW2b"></script>
+<script src="kids-data.js?v=KIDSLAY2"></script>
+<script src="house-saves.js?v=KIDSLAY2"></script>
 <script src="house-zoom.js"></script>
-<script src="house-sfx.js?v=GROW2b"></script>
-<script src="house-checkoffs.js" defer></script>
+<script src="house-sfx.js?v=KIDSLAY2"></script>
+<script src="house-checkoffs.js?v=KIDSLAY2" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
  if (window.HouseSaves) HouseSaves.mount("ainsley");

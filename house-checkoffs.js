@@ -124,6 +124,7 @@
   }
 
   function soundEnabled() {
+    if (window.HouseSfx && typeof HouseSfx.isMuted === "function" && HouseSfx.isMuted()) return false;
     var root = document.documentElement;
     var flag = root.getAttribute("data-sound");
     if (flag === null || flag === "") flag = "on";
@@ -134,11 +135,31 @@
 
   var _audioCtx = null;
   function getCtx() {
+    /* Prefer shared HouseSfx context so one iOS unlock covers checkoffs too */
+    if (window.HouseSfx && typeof HouseSfx.ensureCtx === "function") {
+      var shared = HouseSfx.ensureCtx();
+      if (shared) {
+        if (shared.state === "suspended" && typeof HouseSfx.unlockAudio === "function") {
+          try { HouseSfx.unlockAudio(); } catch (e) {}
+        }
+        return shared;
+      }
+    }
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
     if (!_audioCtx) _audioCtx = new AC();
-    if (_audioCtx.state === "suspended") _audioCtx.resume();
+    if (_audioCtx.state === "suspended") {
+      try { _audioCtx.resume(); } catch (e2) {}
+    }
     return _audioCtx;
+  }
+  function masterOut(ctx) {
+    if (window.HouseSfx && typeof HouseSfx.masterGain === "function") {
+      var m = HouseSfx.masterGain();
+      if (m) return m;
+    }
+    if (window.__houseMasterGain) return window.__houseMasterGain;
+    return ctx.destination;
   }
 
   function tone(freq, dur, type, peak, when) {
@@ -151,11 +172,12 @@
       var gain = ctx.createGain();
       osc.type = type || "sine";
       osc.frequency.setValueAtTime(freq, t0);
+      var hot = (peak || 0.05) * 1.35;
       gain.gain.setValueAtTime(0.0001, t0);
-      gain.gain.exponentialRampToValueAtTime(peak || 0.05, t0 + 0.012);
+      gain.gain.exponentialRampToValueAtTime(Math.min(0.95, hot), t0 + 0.012);
       gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(masterOut(ctx));
       osc.start(t0);
       osc.stop(t0 + dur + 0.02);
     } catch (e) { /* silent */ }

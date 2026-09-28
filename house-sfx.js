@@ -1,7 +1,8 @@
-/* House face · LOUD kid SFX + VFX · original Web Audio · mute + reduced-motion safe */
+/* House face · LOUD kid SFX + VFX · original Web Audio · mute + iOS unlock */
 (function (global) {
   "use strict";
   var MUTE_KEY = "house-sfx:mute";
+  var VOL_KEY = "house-sfx:vol";
   var AMBIENT_KEY = "house-sfx:ambient";
 
   function reducedMotion() {
@@ -13,6 +14,35 @@
     var root = document.documentElement.getAttribute("data-sound");
     return root === "off" || root === "0" || root === "false";
   }
+  function getVolume() {
+    try {
+      var v = parseFloat(localStorage.getItem(VOL_KEY));
+      if (isFinite(v) && v >= 0 && v <= 1) return v;
+    } catch (e) {}
+    return 1;
+  }
+  function applyMasterGain() {
+    if (!_master || !_ctx) return;
+    var target = isMuted() ? 0.0001 : Math.max(0.0001, getVolume());
+    try {
+      var now = _ctx.currentTime;
+      _master.gain.cancelScheduledValues(now);
+      _master.gain.setValueAtTime(target, now);
+    } catch (e) {
+      try { _master.gain.value = target; } catch (e2) {}
+    }
+    document.querySelectorAll("[data-sfx-volume]").forEach(function (el) {
+      try {
+        if (el.type === "range" || el.tagName === "INPUT") el.value = String(Math.round(getVolume() * 100));
+      } catch (e3) {}
+    });
+  }
+  function setVolume(v) {
+    v = Math.max(0, Math.min(1, Number(v)));
+    if (!isFinite(v)) v = 1;
+    try { localStorage.setItem(VOL_KEY, String(v)); } catch (e) {}
+    applyMasterGain();
+  }
   function setMuted(on) {
     try { localStorage.setItem(MUTE_KEY, on ? "1" : "0"); } catch (e) {}
     document.documentElement.setAttribute("data-sound", on ? "off" : "on");
@@ -21,24 +51,103 @@
       btn.setAttribute("aria-pressed", on ? "true" : "false");
       btn.textContent = on ? "🔇 OFF" : "🔊 ON";
     });
-    if (on) stopAmbient(); else startAmbient();
+    applyMasterGain();
+    if (on) stopAmbient();
+    else {
+      unlockAudio().then(function () { startAmbient(); });
+    }
   }
 
   var _ctx = null;
-  function ctx() {
+  var _master = null;
+  var _unlocked = false;
+
+  function ensureCtx() {
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
-    if (!_ctx) _ctx = new AC();
-    if (_ctx.state === "suspended") _ctx.resume();
+    if (!_ctx) {
+      try {
+        _ctx = new AC();
+        _master = _ctx.createGain();
+        _master.gain.value = isMuted() ? 0.0001 : Math.max(0.0001, getVolume());
+        _master.connect(_ctx.destination);
+        global.__houseAudioCtx = _ctx;
+        global.__houseMasterGain = _master;
+      } catch (e) {
+        _ctx = null;
+        _master = null;
+        return null;
+      }
+    }
     return _ctx;
   }
+  function ctx() { return ensureCtx(); }
+  function masterOut() {
+    ensureCtx();
+    return _master || (_ctx && _ctx.destination) || null;
+  }
+
+  /* iOS Safari: AudioContext starts suspended; resume + silent buffer must
+     run inside a user gesture. Keep listening until state === running. */
+  function silentPing() {
+    var c = ensureCtx();
+    var out = masterOut();
+    if (!c || !out) return;
+    try {
+      var buf = c.createBuffer(1, 1, c.sampleRate || 44100);
+      var src = c.createBufferSource();
+      src.buffer = buf;
+      src.connect(out);
+      src.start(0);
+    } catch (e) {}
+  }
+  function unlockAudio() {
+    var c = ensureCtx();
+    if (!c) return Promise.resolve(false);
+    silentPing();
+    var p = (c.state === "suspended" && c.resume) ? c.resume() : Promise.resolve();
+    return Promise.resolve(p).then(function () {
+      silentPing();
+      _unlocked = !!(c && c.state === "running");
+      applyMasterGain();
+      return _unlocked;
+    }).catch(function () {
+      return false;
+    });
+  }
+  function onGestureUnlock() {
+    unlockAudio().then(function (ok) {
+      if (!ok) return;
+      if (!isMuted()) startAmbient();
+      document.removeEventListener("pointerdown", onGestureUnlock, true);
+      document.removeEventListener("touchstart", onGestureUnlock, true);
+      document.removeEventListener("touchend", onGestureUnlock, true);
+      document.removeEventListener("click", onGestureUnlock, true);
+      document.removeEventListener("keydown", onGestureUnlock, true);
+    });
+  }
+  document.addEventListener("pointerdown", onGestureUnlock, true);
+  document.addEventListener("touchstart", onGestureUnlock, true);
+  document.addEventListener("touchend", onGestureUnlock, true);
+  document.addEventListener("click", onGestureUnlock, true);
+  document.addEventListener("keydown", onGestureUnlock, true);
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && _ctx && _ctx.state === "suspended") unlockAudio();
+  });
+  window.addEventListener("pageshow", function () {
+    if (_ctx && _ctx.state === "suspended") unlockAudio();
+  });
+
   function envGain(peak, attack, dur, t0) {
-    var c = ctx(); if (!c) return null;
+    var c = ensureCtx(); if (!c) return null;
+    var out = masterOut(); if (!out) return null;
     var g = c.createGain();
+    /* iOS: slightly hotter peaks so wall-tablet media volume reads */
+    var hot = (peak || 0.06) * 1.35;
     g.gain.setValueAtTime(0.0001, t0);
-    g.gain.exponentialRampToValueAtTime(peak, t0 + attack);
+    g.gain.exponentialRampToValueAtTime(Math.min(0.95, hot), t0 + attack);
     g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-    g.connect(c.destination);
+    g.connect(out);
     return g;
   }
   function osc(freq, type, peak, attack, dur, t0, slideTo) {
@@ -157,12 +266,14 @@
   function startAmbient() {
     stopAmbient();
     if (isMuted() || reducedMotion()) return;
-    var c = ctx(); if (!c) return;
+    var c = ensureCtx(); if (!c) return;
+    if (c.state === "suspended") return; /* wait for unlock gesture */
+    var out = masterOut(); if (!out) return;
     var t = theme();
     try {
       var o = c.createOscillator();
       var g = c.createGain();
-      g.gain.value = 0.008;
+      g.gain.value = 0.012;
       o.type = "sine";
       if (t === "harris") o.frequency.value = 65;
       else if (t === "hayes") o.frequency.value = 90;
@@ -173,7 +284,7 @@
       lg.gain.value = 0.004;
       lfo.frequency.value = t === "ainsley" ? 0.15 : 0.08;
       lfo.connect(lg); lg.connect(g.gain);
-      o.connect(g); g.connect(c.destination);
+      o.connect(g); g.connect(out);
       o.start(); lfo.start();
       _ambNodes.push(o, lfo);
     } catch (e) {}
@@ -459,8 +570,25 @@
       btn.setAttribute("data-mute-wired", "1");
       btn.addEventListener("click", function (ev) {
         ev.preventDefault(); ev.stopPropagation();
-        setMuted(!isMuted());
-        if (!isMuted()) sfxTap();
+        var next = !isMuted();
+        /* unmute path must unlock inside this click (iOS gesture) */
+        unlockAudio().then(function () {
+          setMuted(next);
+          if (!next) sfxTap();
+        });
+      });
+    });
+    document.querySelectorAll("[data-sfx-volume]").forEach(function (el) {
+      if (el.getAttribute("data-vol-wired") === "1") return;
+      el.setAttribute("data-vol-wired", "1");
+      try { el.value = String(Math.round(getVolume() * 100)); } catch (e) {}
+      el.addEventListener("input", function () {
+        var n = parseFloat(el.value);
+        if (!isFinite(n)) return;
+        unlockAudio().then(function () {
+          setVolume(Math.max(0, Math.min(1, n / (el.max > 1 ? el.max : 100))));
+          if (!isMuted()) sfxTap();
+        });
       });
     });
   }
@@ -501,16 +629,6 @@
     }, 12);
   });
 
-  // first user gesture unlocks audio + ambient
-  function unlock() {
-    try { var c = ctx(); if (c && c.state === "suspended") c.resume(); } catch (e) {}
-    startAmbient();
-    document.removeEventListener("pointerdown", unlock);
-    document.removeEventListener("keydown", unlock);
-  }
-  document.addEventListener("pointerdown", unlock);
-  document.addEventListener("keydown", unlock);
-
   function bootFx() {
     wireMute();
     wireGrowFx();
@@ -527,6 +645,8 @@
     jarPoke: jarPoke, pulseGoalLine: pulseGoalLine, streakSparks: streakSparks,
     wireGrowFx: wireGrowFx, wireMustHold: wireMustHold,
     setMuted: setMuted, isMuted: isMuted, wireMute: wireMute,
+    setVolume: setVolume, getVolume: getVolume,
+    ensureCtx: ensureCtx, unlockAudio: unlockAudio, masterGain: function () { return _master; },
     startAmbient: startAmbient, stopAmbient: stopAmbient
   };
 })(window);
