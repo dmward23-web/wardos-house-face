@@ -267,15 +267,23 @@
     el.setAttribute("data-mode", st.mode || "Off");
     if (!el.getAttribute("href")) el.setAttribute("href", "sheet-google-home.html");
     el.setAttribute("aria-label", "Sensi · " + st.ambient + "° · set " + st.setpoint + "° · " + mc.label + (humid ? " · " + humid : "") + " · " + status);
+    var liveOn = !!st.gate.live;
+    var pillCls = "sensi-chip-pill" + (liveOn ? " on" : "");
+    var pillText = liveOn ? "LIVE" : status;
     el.innerHTML =
-      '<span class="sensi-chip-ico" aria-hidden="true">🌡</span>'
+      '<span class="sensi-chip-kicker">'
+      + '<span class="sensi-chip-lab">Sensi · Emerson</span>'
+      + '<span class="' + pillCls + '">' + pillText + "</span>"
+      + "</span>"
+      + '<span class="sensi-chip-main">'
+      + '<span class="sensi-chip-ico" aria-hidden="true">🌡</span>'
       + '<span class="sensi-chip-temp">' + st.ambient + "°</span>"
-      + '<span class="sensi-chip-dot" aria-hidden="true">·</span>'
+      + '<span class="sensi-chip-meta">'
       + '<span class="sensi-chip-set">set ' + st.setpoint + "°</span>"
       + '<span class="sensi-chip-dot" aria-hidden="true">·</span>'
       + '<span class="sensi-chip-mode" style="--sensi-accent:' + mc.accent + '">' + mc.label + "</span>"
       + (humid ? '<span class="sensi-chip-dot" aria-hidden="true">·</span><span class="sensi-chip-humid">' + humid + "</span>" : "")
-      + '<span class="sensi-chip-pill' + (st.gate.live ? " on" : "") + '">' + status + "</span>";
+      + "</span></span>";
   }
 
   function mountChip(selector) {

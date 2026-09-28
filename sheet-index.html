@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="description" content="Board-OS House face · family sheets home index · jazz glass · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
-<link rel="stylesheet" href="house-engage.css?v=FAIL3c" />
+<link rel="stylesheet" href="house-engage.css?v=FAIL3d" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -772,9 +772,14 @@
   .tagline { font-size: 14px; }
   .wx-card { min-width: 0; max-width: 100%; flex: 1 1 200px; }
   .leaveby { min-height: 110px; }
-  .leaveby-main { font-size: 28px; }
-  .leaveby-badge { position: static; transform: none; align-self: center; margin: 10px 16px 10px 0; }
-  .leaveby { flex-wrap: wrap; }
+  .leaveby-main { font-size: 26px; }
+  .hub-upper .leaveby { flex-wrap: nowrap; position: relative; }
+  .hub-upper .leaveby-badge {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    margin: 0; padding: 8px 12px; font-size: 11px;
+  }
+  .hub-upper .leaveby-body { padding-right: 88px; }
+  .hub-upper .sensi-chip { flex-basis: 300px; width: 300px; max-width: 300px; min-height: 110px; }
   .tile { min-height: 148px; padding: 14px 14px 12px; }
   .tile-label { font-size: 22px; }
   .tile.hayes, .tile.ainsley, .tile.harris, .tile.dan { min-height: 148px; }
@@ -793,51 +798,83 @@
 
 
 
-  /* FAIL3c · compact Sensi chip · upper-right header (not a climate strip) */
-  .hdr-right .sensi-chip {
-    display: inline-flex; align-items: center; gap: 7px;
-    flex-shrink: 0; text-decoration: none; color: #f4f6f8;
-    padding: 8px 12px 8px 10px; border-radius: 999px;
-    border: 2px solid rgba(20,22,28,0.55);
-    background: linear-gradient(145deg, #2a1808 0%, #6a3810 42%, #1a4068 100%);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.28) inset, 0 4px 0 rgba(20,22,28,0.28), 0 0 16px rgba(255,140,40,0.18);
-    font-size: 13px; font-weight: 800; letter-spacing: -0.01em;
-    line-height: 1; white-space: nowrap; max-width: 420px;
-    -webkit-tap-highlight-color: transparent;
-    position: relative;
+  /* FAIL3d · Sensi card · upper-right dead zone beside leave-by (not header pill, not fat strip) */
+  .hub-upper {
+    flex-shrink: 0; display: flex; align-items: stretch; gap: 12px;
+    min-height: 0;
   }
-  .hdr-right .sensi-chip:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(255,255,255,0.28) inset, 0 2px 0 rgba(20,22,28,0.28); }
-  .hdr-right .sensi-chip[data-mode="Heat"] { background: linear-gradient(145deg,#2a1206,#8a3a08 55%,#c45a10); }
-  .hdr-right .sensi-chip[data-mode="Cool"] { background: linear-gradient(145deg,#061018,#123a68 55%,#2a88d0); }
-  .hdr-right .sensi-chip[data-mode="Auto"] { background: linear-gradient(145deg,#2a1408,#6a3810 40%,#1a4068); }
-  .hdr-right .sensi-chip[data-mode="Off"] { background: linear-gradient(145deg,#121418,#2a2e36); }
-  .hdr-right .sensi-chip-ico { font-size: 15px; line-height: 1; }
-  .hdr-right .sensi-chip-temp { font-size: 18px; font-weight: 900; letter-spacing: -0.03em; }
-  .hdr-right .sensi-chip-set { font-size: 12px; font-weight: 750; opacity: 0.92; }
-  .hdr-right .sensi-chip-mode {
-    font-size: 11px; font-weight: 850; letter-spacing: 0.06em; text-transform: uppercase;
-    padding: 3px 7px; border-radius: 6px;
+  .hub-upper .leaveby { flex: 1 1 auto; min-width: 0; }
+  .hub-upper .sensi-chip {
+    flex: 0 0 292px; width: 292px; max-width: 292px;
+    display: flex; flex-direction: column; justify-content: center; gap: 8px;
+    text-decoration: none; color: #f4f6f8;
+    padding: 12px 14px 12px 14px; border-radius: 14px;
+    border: 3px solid rgba(20,22,28,0.7);
+    background: linear-gradient(145deg, #2a1808 0%, #6a3810 42%, #1a4068 100%);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.28) inset, 0 8px 0 rgba(20,22,28,0.35), 0 0 22px rgba(255,140,40,0.2);
+    -webkit-tap-highlight-color: transparent;
+    position: relative; overflow: hidden;
+    min-height: 110px;
+  }
+  .hub-upper .sensi-chip:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.28) inset, 0 4px 0 rgba(20,22,28,0.35), 0 0 16px rgba(255,140,40,0.16);
+  }
+  .hub-upper .sensi-chip[data-mode="Heat"] { background: linear-gradient(145deg,#2a1206,#8a3a08 55%,#c45a10); }
+  .hub-upper .sensi-chip[data-mode="Cool"] { background: linear-gradient(145deg,#061018,#123a68 55%,#2a88d0); }
+  .hub-upper .sensi-chip[data-mode="Auto"] { background: linear-gradient(145deg,#2a1408,#6a3810 40%,#1a4068); }
+  .hub-upper .sensi-chip[data-mode="Off"] { background: linear-gradient(145deg,#121418,#2a2e36); }
+  .hub-upper .sensi-chip-kicker {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .hub-upper .sensi-chip-lab {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(255,220,140,0.88);
+  }
+  .hub-upper .sensi-chip-main {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 8px;
+    line-height: 1;
+  }
+  .hub-upper .sensi-chip-ico { font-size: 20px; line-height: 1; }
+  .hub-upper .sensi-chip-temp { font-size: 42px; font-weight: 900; letter-spacing: -0.05em; line-height: 0.92; }
+  .hub-upper .sensi-chip-meta {
+    display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px;
+    margin-left: 2px;
+  }
+  .hub-upper .sensi-chip-set { font-size: 16px; font-weight: 750; opacity: 0.95; }
+  .hub-upper .sensi-chip-mode {
+    font-size: 13px; font-weight: 850; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 5px 9px; border-radius: 8px;
     background: var(--sensi-accent, #ffe080);
     color: #121418; border: 1px solid rgba(255,255,255,0.35);
   }
-  .hdr-right .sensi-chip-humid { font-size: 11px; font-weight: 750; color: #d8ecff; opacity: 0.9; }
-  .hdr-right .sensi-chip-dot { opacity: 0.45; font-weight: 700; }
-  .hdr-right .sensi-chip-pill {
-    font-size: 9px; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 3px 7px; border-radius: 999px; margin-left: 2px;
+  .hub-upper .sensi-chip-humid { font-size: 14px; font-weight: 750; color: #d8ecff; opacity: 0.92; }
+  .hub-upper .sensi-chip-dot { opacity: 0.45; font-weight: 700; font-size: 14px; }
+  .hub-upper .sensi-chip-pill {
+    font-size: 10px; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 8px; border-radius: 999px; flex-shrink: 0;
     background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.22); color: #c8d0dc;
   }
-  .hdr-right .sensi-chip-pill.on {
+  .hub-upper .sensi-chip-pill.on {
     background: rgba(40,120,56,0.92); color: #e8ffe8; border-color: rgba(128,232,144,0.55);
   }
-  .hdr-right .sensi-chip.is-need .sensi-chip-pill {
+  .hub-upper .sensi-chip.is-need .sensi-chip-pill {
     background: rgba(120,72,8,0.9); color: #ffe8b0; border-color: rgba(255,200,80,0.55);
   }
-  .hdr-right .sensi-chip.is-live {
-    box-shadow: 0 1px 0 rgba(255,255,255,0.28) inset, 0 4px 0 rgba(20,22,28,0.28), 0 0 18px rgba(80,220,120,0.28);
+  .hub-upper .sensi-chip.is-live {
+    box-shadow: 0 1px 0 rgba(255,255,255,0.28) inset, 0 8px 0 rgba(20,22,28,0.35), 0 0 24px rgba(80,220,120,0.3);
+  }
+  .hub-upper .sensi-chip.sensi-live-pulse::after {
+    content: ""; position: absolute; inset: -2px; border-radius: inherit; pointer-events: none;
+    box-shadow: 0 0 0 0 rgba(128,232,144,0.45);
+    animation: sensi-chip-live 1.8s ease-out infinite;
+  }
+  @keyframes sensi-chip-live {
+    0% { box-shadow: 0 0 0 0 rgba(128,232,144,0.45); }
+    100% { box-shadow: 0 0 0 14px rgba(128,232,144,0); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .hdr-right .sensi-chip.sensi-live-pulse::after { animation: none; }
+    .hub-upper .sensi-chip.sensi-live-pulse::after { animation: none; }
   }
 
   /* BOARDSLAY ghome · climate tile */
@@ -874,10 +911,11 @@
  </div>
  <div class="hdr-right">
  <div class="wx-card" id="house-wx" data-live="weather" aria-label="Weather · Overland Park"></div>
- <a class="sensi-chip" id="index-sensi-chip" href="sheet-google-home.html" aria-label="Sensi thermostat">Sensi…</a>
+ <div class="hot-pill"><span class="spark">◎</span> Tap a tile · open a sheet</div>
  </div>
  </header>
 
+ <div class="hub-upper">
  <section class="leaveby" aria-label="Next leave-by">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
@@ -887,6 +925,8 @@
  </div>
  <div class="leaveby-badge" data-live="leaveby-badge">Sun</div>
  </section>
+ <a class="sensi-chip" id="index-sensi-chip" href="sheet-google-home.html" aria-label="Sensi thermostat">Sensi…</a>
+ </div>
 
 
  <div class="grid-wrap">
@@ -1096,12 +1136,12 @@
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=FAIL3c"></script>
-<script src="house-board-strip.js?v=FAIL3c"></script>
-<script src="house-weather.js?v=FAIL3c"></script>
-<script src="house-sfx.js?v=FAIL3c"></script>
-<script src="house-zoom.js?v=FAIL3c"></script>
-<script src="house-sensi.js?v=FAIL3c"></script>
+<script src="house-clock.js?v=FAIL3d"></script>
+<script src="house-board-strip.js?v=FAIL3d"></script>
+<script src="house-weather.js?v=FAIL3d"></script>
+<script src="house-sfx.js?v=FAIL3d"></script>
+<script src="house-zoom.js?v=FAIL3d"></script>
+<script src="house-sensi.js?v=FAIL3d"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
