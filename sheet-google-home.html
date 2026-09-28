@@ -58,7 +58,7 @@
   .banner-sub{font-size:14px;font-weight:600;color:rgba(200,206,216,0.9);margin-top:2px}
 
   /* PRIMARY · Nest / Google Home cam grid */
-  .cam-zone{flex:1 1 auto;min-height:980px;display:flex;flex-direction:column;gap:10px}
+  .cam-zone{flex:1 1 auto;min-height:860px;display:flex;flex-direction:column;gap:10px}
   .zone-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 2px}
   .zone-title{font-size:14px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;color:#1a2848}
   .zone-meta{font-size:13px;font-weight:700;color:#4a5a78}
@@ -112,6 +112,39 @@
     border:2px solid #2a2e36;box-shadow:0 2px 0 #1a1e24}
   .ctrl-btn.loud{background:linear-gradient(180deg,#ffe080,#e0a020);border-color:#8a6010;box-shadow:0 2px 0 #6a4010}
 
+
+  /* CLIMATE HERO · Sensi on top of Google Home surface */
+  .climate-hero{flex-shrink:0;display:flex;align-items:stretch;gap:0;border-radius:16px;overflow:hidden;
+    text-decoration:none;color:inherit;border:4px solid #121418;min-height:168px;
+    background:linear-gradient(115deg,#1a1408 0%,#3a2810 28%,#784820 55%,#2a4060 78%,#0e1828 100%);
+    box-shadow:0 8px 0 #05080c,0 16px 32px rgba(0,0,0,0.32),0 0 40px rgba(255,160,40,0.18);
+    -webkit-tap-highlight-color:transparent}
+  .climate-hero:active{transform:translateY(2px);box-shadow:0 4px 0 #05080c,0 10px 22px rgba(0,0,0,0.32)}
+  .climate-accent{width:12px;flex-shrink:0;background:linear-gradient(180deg,#ffe080,#c87810 50%,#2868a0)}
+  .climate-body{flex:1;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;color:#f4f6f8}
+  .climate-left{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .climate-lab{font-size:11px;font-weight:800;letter-spacing:0.26em;text-transform:uppercase;color:rgba(255,220,140,0.85)}
+  .climate-title{font-size:28px;font-weight:900;letter-spacing:-0.04em;line-height:1.05}
+  .climate-title em{font-style:normal;color:#ffe080}
+  .climate-sub{font-size:14px;font-weight:650;color:rgba(220,210,190,0.9);margin-top:2px}
+  .climate-temps{display:flex;align-items:center;gap:14px;flex-shrink:0}
+  .climate-amb{text-align:center}
+  .climate-amb .big{font-size:56px;font-weight:900;letter-spacing:-0.05em;line-height:1}
+  .climate-amb .big span{font-size:24px;vertical-align:super;opacity:0.85}
+  .climate-amb .lab{font-size:11px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:rgba(220,200,160,0.75)}
+  .climate-set{padding:10px 14px;border-radius:12px;background:rgba(0,0,0,0.35);border:2px solid rgba(255,255,255,0.2);text-align:center;min-width:110px}
+  .climate-set .val{font-size:28px;font-weight:900;letter-spacing:-0.03em}
+  .climate-set .lab{font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:rgba(200,210,220,0.8)}
+  .climate-mode{padding:8px 12px;border-radius:8px;font-size:13px;font-weight:800;letter-spacing:0.12em;
+    background:rgba(255,224,128,0.95);color:#1a1000;border:2px solid rgba(255,255,255,0.35)}
+  .climate-cta{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+  .climate-pill{font-size:11px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;
+    padding:7px 12px;border-radius:8px;background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.22);color:#c8d0dc}
+  .climate-pill.on{background:rgba(40,120,56,0.85);color:#e8ffe8;border-color:rgba(128,232,144,0.5)}
+  .climate-open{font-size:13px;font-weight:800;padding:10px 14px;border-radius:10px;
+    background:linear-gradient(180deg,#ffe080,#e0a020);color:#1a1000;border:2px solid #8a6010;
+    box-shadow:0 3px 0 #6a4010}
+
   .note{padding:10px 14px;border-radius:10px;background:rgba(40,42,48,0.08);border:2px dashed rgba(40,42,48,0.3);
     font-size:13px;font-weight:650;color:#3a3e46;flex-shrink:0}
   .ftr{display:flex;justify-content:space-between;font-size:12px;color:#5a5e66;font-weight:600;align-items:center;gap:8px;flex-wrap:wrap}
@@ -134,17 +167,44 @@
  </div>
  </div>
  </div>
- <div class="hot-pill">PRIMARY · CAM GRID</div>
+ <div class="hot-pill">CLIMATE + CAMS</div>
  </header>
 
  <section class="banner">
  <div class="banner-accent"></div>
  <div class="banner-body">
- <div class="banner-lab">Google Home · cameras first</div>
- <div class="banner-title">Cam grid on glass · lights &amp; garage below</div>
- <div class="banner-sub">Placeholders only · no fake live state · Atlas owns · no Desk · no PIN · no $</div>
+ <div class="banner-lab">Google Home · climate + cameras</div>
+ <div class="banner-title">Sensi on top · Nest cam grid below</div>
+ <div class="banner-sub">Climate hero · cam stubs · lights/garage · no fake live · Atlas owns</div>
  </div>
  </section>
+
+
+ <a class="climate-hero" id="sensi-hero" href="sheet-sensi.html" aria-label="Sensi thermostat · open controls">
+ <div class="climate-accent" aria-hidden="true"></div>
+ <div class="climate-body">
+ <div class="climate-left">
+ <div class="climate-lab">Sensi · Emerson · 147th</div>
+ <div class="climate-title">Climate · <em>on the wall</em></div>
+ <div class="climate-sub" id="sensi-hero-sub">DEMO setpoint · Heat · fan Auto · not Nest</div>
+ </div>
+ <div class="climate-temps">
+ <div class="climate-amb">
+ <div class="lab">Indoor stub</div>
+ <div class="big" id="sensi-hero-amb">72<span>°</span></div>
+ </div>
+ <div class="climate-set">
+ <div class="lab">Set</div>
+ <div class="val" id="sensi-hero-set">70°</div>
+ </div>
+ <div class="climate-mode" id="sensi-hero-mode">HEAT</div>
+ </div>
+ <div class="climate-cta">
+ <div class="climate-pill" id="sensi-hero-pill">CONNECT · STUB</div>
+ <div class="climate-open">Open Sensi →</div>
+ </div>
+ </div>
+ </a>
 
  <section class="cam-zone" aria-label="Nest and Google Home cameras">
  <div class="zone-hdr">
@@ -247,11 +307,12 @@
  </div>
  </section>
 
- <div class="note">Cams primary on wall · placeholders only (no live) · lights · garage · door pads · Atlas owns · Elo 3202L 1080×1920</div>
+ <div class="note">Sensi climate on top · Nest cams below (stubs) · lights · garage · door pads · separate stacks · Atlas owns · Elo 3202L 1080×1920</div>
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
- <span>House · Cams hub · Google Home</span>
+ <span>House · Cams + Sensi</span>
+ <a class="ftr-chip" href="sheet-sensi.html">Sensi</a>
  <a class="ftr-chip" href="sheet-index.html">Sheets</a>
  </div>
  <span>Atlas · placeholders · no live API</span>
@@ -260,12 +321,46 @@
 <script src="house-clock.js?v=CT1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
+<script src="house-sensi.js?v=SENSI1"></script>
 <script>
-document.querySelectorAll(".cam").forEach(function (el) {
-  el.addEventListener("pointerdown", function () {
-    try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
-  }, { passive: true });
-});
+(function () {
+  document.querySelectorAll(".cam").forEach(function (el) {
+    el.addEventListener("pointerdown", function () {
+      try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
+    }, { passive: true });
+  });
+  var hero = document.getElementById("sensi-hero");
+  if (hero) {
+    hero.addEventListener("pointerdown", function () {
+      try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
+    }, { passive: true });
+  }
+  var S = window.HouseSensi;
+  if (!S) return;
+  var st = S.loadState();
+  var connected = S.isConnected();
+  var mc = S.modeColor(st.mode);
+  var amb = document.getElementById("sensi-hero-amb");
+  var set = document.getElementById("sensi-hero-set");
+  var mode = document.getElementById("sensi-hero-mode");
+  var pill = document.getElementById("sensi-hero-pill");
+  var sub = document.getElementById("sensi-hero-sub");
+  if (amb) amb.innerHTML = st.ambient + "<span>°</span>";
+  if (set) set.textContent = st.setpoint + "°";
+  if (mode) {
+    mode.textContent = mc.label;
+    mode.style.background = mc.soft;
+    mode.style.color = "#121418";
+    mode.style.borderColor = mc.accent;
+  }
+  if (pill) {
+    pill.textContent = connected ? "CONNECTED · DEMO" : "CONNECT · STUB";
+    pill.classList.toggle("on", connected);
+  }
+  if (sub) {
+    sub.textContent = (connected ? "CONNECTED · DEMO" : "STUB") + " · " + st.mode + " · fan " + st.fan + " · not Nest";
+  }
+})();
 </script>
 </body>
 </html>
