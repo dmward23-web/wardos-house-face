@@ -1,8 +1,22 @@
 {
-  "status": "need_token",
-  "updatedAt": "2026-09-28T00:00:00.000Z",
+  "status": "live",
+  "updatedAt": "2026-09-28T16:40:55.948Z",
   "source": "sensi-cloud",
   "writeSupported": false,
-  "thermostat": null,
-  "error": "SENSI_REFRESH_TOKEN missing — Atlas must request refresh_token from Dan (see SENSI-LIVE.md)"
+  "thermostat": {
+    "name": "Thermostat",
+    "icdId": "36-6f-92-ff-fe-12-9c-dc",
+    "online": true,
+    "ambient": 73,
+    "ambientRaw": 72.5,
+    "setpoint": 65,
+    "heatSetpoint": 65,
+    "coolSetpoint": 77,
+    "mode": "Auto",
+    "fan": "Auto",
+    "humidity": 60,
+    "hold": false,
+    "scale": "f"
+  },
+  "error": null
 }
