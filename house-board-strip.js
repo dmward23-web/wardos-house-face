@@ -190,6 +190,14 @@
     if (badge) badge.textContent = strip.badge || clock.dow;
     if (todaySub) todaySub.textContent = clock.short + " · " + clock.daypart;
 
+    var hotEv = document.querySelector("[data-live='hot-pill-event']");
+    if (hotEv) {
+      if (strip._stale) hotEv.textContent = "CAL STALE";
+      else if (strip.time && strip.place) hotEv.textContent = strip.time + " · " + strip.place;
+      else if (strip.place) hotEv.textContent = strip.place;
+      else hotEv.textContent = "Loading…";
+    }
+
     if (main) {
       var timeHtml = strip.time
         ? ' <span class="time">' + esc(strip.time) + "</span> "
