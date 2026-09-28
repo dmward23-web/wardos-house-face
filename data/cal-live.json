@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-28T20:20:37.563Z",
+  "fetchedAt": "2026-09-28T20:31:08.693Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-05",
+  "windowEnd": "2026-10-04",
   "asOfIso": "2026-09-28",
   "nextLeave": {
     "id": "g5e16vosvja467n0vstocltqtk",
@@ -400,51 +400,6 @@
       "start": "2026-10-04T08:30:00-05:00",
       "end": "2026-10-04T10:00:00-05:00",
       "location": "Indian Woods Middle School, 9700 Woodson Dr, Overland Park, KS 66207",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "hf423ics0i46n9goqo9gsur99s",
-      "summary": "Hayes + Harris — SRE Peace Week",
-      "start": "2026-10-05T00:00:00Z",
-      "end": "2026-10-09T00:00:00Z",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "jrhhe2nmio91r5u088ecjpbvl4_20261005T160000Z",
-      "summary": "Dan — cleaners",
-      "start": "2026-10-05T11:00:00-05:00",
-      "end": "2026-10-05T13:00:00-05:00",
-      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "7qmnbg7327q2kv9lm16etfdngg",
-      "summary": "Ainsley — appointment · 2:00 (provider)",
-      "start": "2026-10-05T13:40:00-05:00",
-      "end": "2026-10-05T15:20:00-05:00",
-      "location": "8675 College Blvd, Overland Park, KS 66210-1946",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "43chat4nm1cmv3tsqtd2p9cdjo_20261005T200000Z",
-      "summary": "Ainsley — LKMS Homework Help · 3:00",
-      "start": "2026-10-05T15:00:00-05:00",
-      "end": "2026-10-05T16:00:00-05:00",
-      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "f09ef0272gtar5bathk9f0m8sg",
-      "summary": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
-      "start": "2026-10-05T17:30:00-05:00",
-      "end": "2026-10-05T19:00:00-05:00",
-      "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
       "busy": false,
       "allDay": false
     }
