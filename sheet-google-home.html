@@ -112,6 +112,11 @@
     border:2px solid #2a2e36;box-shadow:0 2px 0 #1a1e24}
   .ctrl-btn.loud{background:linear-gradient(180deg,#ffe080,#e0a020);border-color:#8a6010;box-shadow:0 2px 0 #6a4010}
 
+  /* LIGHTS1 · Lights tile is live-linked (DEMO until Kasa) */
+  .ctrl.lights{cursor:pointer}
+  .ctrl.lights .ctrl-btn{pointer-events:auto;opacity:1;cursor:pointer}
+  a.ctrl.lights:active{transform:translateY(2px)}
+
 
   /* CLIMATE HERO · Sensi on top of Google Home surface */
   .climate-hero{flex-shrink:0;display:flex;align-items:stretch;gap:0;border-radius:16px;overflow:hidden;
@@ -327,25 +332,27 @@
  </div></div>
  </section>
 
- <section class="sec-zone" aria-label="Lights garage door secondary">
+ <section class="sec-zone" aria-label="Lights garage door secondary" id="lights">
  <div class="zone-hdr">
  <div class="zone-title">Secondary · lights · garage · door pads</div>
- <div class="zone-meta">placeholders</div>
+ <div class="zone-meta" id="lights-zone-meta">Lights tile · garage/door stubs</div>
  </div>
  <div class="ctrl-row">
- <div class="ctrl lights">
+ <a class="ctrl lights" id="lights-ctrl-tile" href="sheet-lights.html" style="text-decoration:none;color:inherit;-webkit-tap-highlight-color:transparent">
  <div class="ctrl-top">
  <div class="ctrl-ico" aria-hidden="true">💡</div>
  <div>
  <div class="ctrl-title">Lights</div>
- <div class="ctrl-sub">Hall · kitchen · porch</div>
+ <div class="ctrl-sub" id="lights-ctrl-sub">Hall · kitchen · porch</div>
  </div>
+ <div class="climate-pill" id="lights-ctrl-pill" style="margin-left:auto;font-size:10px">NEED TOKEN</div>
  </div>
  <div class="ctrl-actions">
- <button type="button" class="ctrl-btn loud" disabled>All on</button>
- <button type="button" class="ctrl-btn" disabled>Off</button>
+ <button type="button" class="ctrl-btn loud" id="lights-all-on">All on</button>
+ <button type="button" class="ctrl-btn" id="lights-all-off">Off</button>
+ <span class="ctrl-btn" style="pointer-events:none;opacity:0.85">Open →</span>
  </div>
- </div>
+ </a>
  <div class="ctrl garage">
  <div class="ctrl-top">
  <div class="ctrl-ico" aria-hidden="true">🚪</div>
@@ -379,8 +386,9 @@
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
- <span>House · Cams + Sensi</span>
+ <span>House · Cams + Sensi + Lights</span>
  <a class="ftr-chip" href="sheet-sensi.html">Sensi</a>
+ <a class="ftr-chip" href="sheet-lights.html">Lights</a>
  <a class="ftr-chip" href="sheet-index.html">Sheets</a>
  </div>
  <span id="sensi-home-ftr">Atlas · Sensi live gate</span>
@@ -391,6 +399,7 @@
 <script src="house-sfx.js"></script>
 <script src="house-sensi.js?v=NESTVID1"></script>
 <script src="house-nest.js?v=NESTSTILL1"></script>
+<script src="house-lights.js?v=LIGHTS1"></script>
 <script>
 (function () {
   document.querySelectorAll(".cam").forEach(function (el) {
@@ -406,21 +415,31 @@
   }
   var S = window.HouseSensi;
   var N = window.HouseNest;
+  var L = window.HouseLights;
   function paint() {
     if (S) S.paintHero();
     if (N) N.paintPads(document);
+    if (L) { L.paintPads(document); L.wireAllButtons(document); }
     var ftr = document.getElementById("sensi-home-ftr");
     if (!ftr) return;
     var sensiLive = S && S.effectiveState && S.effectiveState().gate && S.effectiveState().gate.live;
     var nestGate = N && N.gate ? N.gate() : { live: false, label: "STUB", needToken: true };
+    var lightsGate = L && L.gate ? L.gate() : { live: false, label: "STUB", needToken: true };
     var sensiBit = sensiLive ? "Sensi LIVE" : (S && S.effectiveState ? S.effectiveState().gate.label : "Sensi");
     var nestBit = nestGate.live
       ? (nestGate.hasSnaps ? "cams LIVE" : "cams LIVE · no still")
       : (nestGate.needToken ? "cams STUB (need SDM)" : "cams " + nestGate.label);
-    ftr.textContent = sensiBit + " · " + nestBit;
+    var lightsBit = lightsGate.live ? "Lights LIVE" : (lightsGate.needToken ? "Lights NEED TOKEN" : "Lights " + lightsGate.label);
+    ftr.textContent = sensiBit + " · " + nestBit + " · " + lightsBit;
   }
   if (S) { S.onChange(paint); S.startPolling(); }
   if (N) { N.onChange(paint); N.startPolling(); }
+  if (L) { L.onChange(paint); L.startPolling(); }
+  /* Stop All on/Off from navigating the parent <a> */
+  ["lights-all-on","lights-all-off"].forEach(function (id) {
+    var b = document.getElementById(id);
+    if (b) b.addEventListener("click", function (ev) { ev.preventDefault(); ev.stopPropagation(); });
+  });
   paint();
 })();
 </script>
