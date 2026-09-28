@@ -62,3 +62,11 @@ Relative paths only. Visual lock: soft glass, kids-first, zero homework vibe.
 | Status stack · phone | 1170×731 | `/workspace/board-os-house-status-phone.png` |
 
 Reference week plate: `/workspace/board-os-house-face.png`.
+
+## Sensi thermostat (live gate)
+
+- Climate hero: `sheet-google-home.html` · full panel: `sheet-sensi.html`
+- Live reads: `data/sensi-live.json` (Atlas `scripts/sensi-fetch.mjs`)
+- Auth + cron: see **SENSI-LIVE.md** — needs Dan’s one-time `refresh_token` (not password in chat)
+- Until tokened: UI shows **CONNECT · NEED TOKEN** / DEMO — never fake LIVE
+

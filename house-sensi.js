@@ -1,20 +1,28 @@
-/* House Face · Sensi thermostat local UI state.
-   DEMO/STUB controls only — no live Emerson API.
+/* House Face · Sensi thermostat
+   Live path: poll data/sensi-live.json (Atlas box fetcher → Pages).
+   DEMO/STUB localStorage when live missing/stale/need_token.
+   NEVER invent live temps. NEVER label DEMO as LIVE.
    Keys: house-sensi-connected, house-sensi-state */
 (function (global) {
   "use strict";
 
   var CONNECTED_KEY = "house-sensi-connected";
   var STATE_KEY = "house-sensi-state";
-  var WEB_LOGIN = "https://mythermostat.sensicomfort.com/";
+  var LIVE_URL = "data/sensi-live.json";
+  var LIVE_FRESH_MS = 30 * 60 * 1000;
+  var LIVE_POLL_MS = 60 * 1000;
+  var WEB_LOGIN = "https://manager.sensicomfort.com/";
   var WEB_PRODUCT = "https://sensi.copeland.com/en-us";
   var APP_IOS = "https://apps.apple.com/us/app/sensi/id792612452";
   var APP_ANDROID = "https://play.google.com/store/apps/details?id=com.asynchrony.emerson.sensi";
-  /* Undocumented deep link — try then fall back to web */
   var APP_SCHEME = "sensi://";
+  var DOCS = "SENSI-LIVE.md";
 
   var MODES = ["Heat", "Cool", "Auto", "Off"];
   var FANS = ["Auto", "On"];
+
+  var _liveCache = null; /* { at, data } */
+  var _listeners = [];
 
   function chicagoDayKey() {
     try {
@@ -58,7 +66,6 @@
       var o = JSON.parse(raw);
       if (!o || typeof o !== "object") return base;
       var day = chicagoDayKey();
-      /* Keep mode/fan/setpoint across days; refresh ambient stub per Chicago day if missing */
       return {
         day: day,
         ambient: (o.day === day && typeof o.ambient === "number") ? o.ambient : base.ambient,
@@ -97,6 +104,131 @@
     return { accent: "#5a5e66", soft: "#e8ebf0", label: "OFF" };
   }
 
+  function parseUpdatedAt(iso) {
+    if (!iso) return 0;
+    var t = Date.parse(iso);
+    return Number.isFinite(t) ? t : 0;
+  }
+
+  function liveFresh(data) {
+    if (!data || data.status !== "live" || !data.thermostat) return false;
+    var t = parseUpdatedAt(data.updatedAt);
+    if (!t) return false;
+    return (Date.now() - t) <= LIVE_FRESH_MS;
+  }
+
+  /** Gate for UI labels. Never returns "LIVE" without fresh live JSON. */
+  function liveStatus(data) {
+    data = data || (_liveCache && _liveCache.data) || null;
+    if (!data) return { kind: "stub", label: "CONNECT · STUB", live: false };
+    if (data.status === "need_token") {
+      return { kind: "need_token", label: "CONNECT · NEED TOKEN", live: false, error: data.error || null };
+    }
+    if (data.status === "error") {
+      return { kind: "error", label: "DEMO · FETCH ERR", live: false, error: data.error || null };
+    }
+    if (data.status === "live" && liveFresh(data)) {
+      var th = data.thermostat;
+      var offline = th && th.online === false;
+      return {
+        kind: offline ? "offline" : "live",
+        label: offline ? "LIVE · OFFLINE UNIT" : "LIVE",
+        live: true,
+        writeSupported: !!data.writeSupported,
+        updatedAt: data.updatedAt,
+        thermostat: th
+      };
+    }
+    if (data.status === "live") {
+      return { kind: "stale", label: "STALE · DEMO", live: false, error: "snapshot older than 30m" };
+    }
+    return { kind: "stub", label: "CONNECT · STUB", live: false };
+  }
+
+  /**
+   * Effective display state: prefer fresh live reads; DEMO for writes / fallback.
+   * ambient/mode/fan/setpoint from live when live; otherwise localStorage DEMO.
+   */
+  function effectiveState() {
+    var demo = loadState();
+    var gate = liveStatus();
+    if (gate.live && gate.thermostat) {
+      var th = gate.thermostat;
+      return {
+        source: "live",
+        ambient: typeof th.ambient === "number" ? th.ambient : demo.ambient,
+        setpoint: typeof th.setpoint === "number" ? th.setpoint : demo.setpoint,
+        mode: MODES.indexOf(th.mode) >= 0 ? th.mode : demo.mode,
+        fan: FANS.indexOf(th.fan) >= 0 ? th.fan : demo.fan,
+        hold: !!th.hold,
+        name: th.name || "Sensi",
+        humidity: typeof th.humidity === "number" ? th.humidity : null,
+        online: th.online !== false,
+        writeSupported: !!gate.writeSupported,
+        gate: gate
+      };
+    }
+    return {
+      source: "demo",
+      ambient: demo.ambient,
+      setpoint: demo.setpoint,
+      mode: demo.mode,
+      fan: demo.fan,
+      hold: !!demo.hold,
+      name: "Sensi",
+      humidity: null,
+      online: null,
+      writeSupported: false,
+      gate: gate
+    };
+  }
+
+  function notify() {
+    var st = effectiveState();
+    for (var i = 0; i < _listeners.length; i++) {
+      try { _listeners[i](st); } catch (e) { /* */ }
+    }
+  }
+
+  function onChange(fn) {
+    if (typeof fn === "function") _listeners.push(fn);
+  }
+
+  function applyLivePayload(data) {
+    _liveCache = { at: Date.now(), data: data };
+    notify();
+    return liveStatus(data);
+  }
+
+  function fetchLive(cb) {
+    var url = LIVE_URL + (LIVE_URL.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now();
+    fetch(url, { cache: "no-store" }).then(function (r) {
+      if (!r.ok) throw new Error("live json " + r.status);
+      return r.json();
+    }).then(function (j) {
+      var gate = applyLivePayload(j);
+      if (cb) cb(null, gate, j);
+    }).catch(function (err) {
+      /* Keep last cache if any; otherwise stay stub — do not invent */
+      if (!_liveCache) {
+        applyLivePayload({
+          status: "need_token",
+          updatedAt: null,
+          thermostat: null,
+          error: "data/sensi-live.json unavailable"
+        });
+      }
+      if (cb) cb(err || new Error("live fetch fail"), liveStatus(), null);
+    });
+  }
+
+  var _pollTimer = null;
+  function startPolling() {
+    fetchLive();
+    if (_pollTimer) return;
+    _pollTimer = setInterval(function () { fetchLive(); }, LIVE_POLL_MS);
+  }
+
   function openUrl(url) {
     try { window.open(url, "_blank", "noopener,noreferrer"); } catch (e) {
       try { location.href = url; } catch (e2) { /* */ }
@@ -108,7 +240,6 @@
   function connectOpenIos() { openUrl(APP_IOS); }
   function connectOpenAndroid() { openUrl(APP_ANDROID); }
   function connectTryApp() {
-    /* Attempt scheme; always also surface web as honest fallback */
     try {
       var iframe = document.createElement("iframe");
       iframe.style.display = "none";
@@ -123,13 +254,11 @@
     }
   }
 
-  /** Paint a compact glance chip (Home header). */
   function paintChip(el) {
     if (!el) return;
-    var st = loadState();
-    var connected = isConnected();
+    var st = effectiveState();
     var mc = modeColor(st.mode);
-    var status = connected ? "CONNECTED · DEMO" : "CONNECT · STUB";
+    var status = st.gate.label;
     el.classList.add("sensi-chip");
     el.setAttribute("href", el.getAttribute("href") || "sheet-sensi.html");
     el.innerHTML =
@@ -149,15 +278,57 @@
     var el = typeof selector === "string" ? document.querySelector(selector) : selector;
     if (!el) return;
     paintChip(el);
+    onChange(function () { paintChip(el); });
+    startPolling();
+  }
+
+  /** Paint climate hero on Google Home sheet. */
+  function paintHero(ids) {
+    ids = ids || {};
+    var st = effectiveState();
+    var mc = modeColor(st.mode);
+    var amb = document.getElementById(ids.amb || "sensi-hero-amb");
+    var set = document.getElementById(ids.set || "sensi-hero-set");
+    var mode = document.getElementById(ids.mode || "sensi-hero-mode");
+    var pill = document.getElementById(ids.pill || "sensi-hero-pill");
+    var sub = document.getElementById(ids.sub || "sensi-hero-sub");
+    var ambLab = document.querySelector(".climate-amb .lab");
+    if (amb) amb.innerHTML = st.ambient + "<span>°</span>";
+    if (set) set.textContent = st.setpoint + "°";
+    if (mode) {
+      mode.textContent = mc.label;
+      mode.style.background = mc.soft;
+      mode.style.color = "#121418";
+      mode.style.borderColor = mc.accent;
+    }
+    if (pill) {
+      pill.textContent = st.gate.label;
+      pill.classList.toggle("on", st.gate.live);
+    }
+    if (ambLab) {
+      ambLab.textContent = st.gate.live ? "Indoor live" : "Indoor · not live";
+    }
+    if (sub) {
+      var src = st.gate.live ? "LIVE" : (st.gate.kind === "need_token" ? "NEED TOKEN" : "DEMO");
+      sub.textContent = src + " · " + st.mode + " · fan " + st.fan + " · not Nest";
+    }
+  }
+
+  function mountHero(ids) {
+    paintHero(ids);
+    onChange(function () { paintHero(ids); });
+    startPolling();
   }
 
   global.HouseSensi = {
     CONNECTED_KEY: CONNECTED_KEY,
     STATE_KEY: STATE_KEY,
+    LIVE_URL: LIVE_URL,
     WEB_LOGIN: WEB_LOGIN,
     WEB_PRODUCT: WEB_PRODUCT,
     APP_IOS: APP_IOS,
     APP_ANDROID: APP_ANDROID,
+    DOCS: DOCS,
     MODES: MODES,
     FANS: FANS,
     isConnected: isConnected,
@@ -173,6 +344,13 @@
     connectOpenAndroid: connectOpenAndroid,
     connectTryApp: connectTryApp,
     paintChip: paintChip,
-    mountChip: mountChip
+    mountChip: mountChip,
+    paintHero: paintHero,
+    mountHero: mountHero,
+    fetchLive: fetchLive,
+    startPolling: startPolling,
+    liveStatus: liveStatus,
+    effectiveState: effectiveState,
+    onChange: onChange
   };
 })(typeof window !== "undefined" ? window : globalThis);

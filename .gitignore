@@ -1,0 +1,6 @@
+scripts/node_modules/
+scripts/package-lock.json
+data/sensi-live.json.tmp
+*.token
+.env
+.env.*
