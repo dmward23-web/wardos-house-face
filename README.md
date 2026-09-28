@@ -65,8 +65,10 @@ Reference week plate: `/workspace/board-os-house-face.png`.
 
 ## Sensi thermostat (live gate)
 
+- **Main board** (`sheet-index.html`): live climate strip (ambient · set · mode · humidity) → Google Home
 - Climate hero: `sheet-google-home.html` · full panel: `sheet-sensi.html`
 - Live reads: `data/sensi-live.json` (Atlas `scripts/sensi-fetch.mjs`)
 - Auth + cron: see **SENSI-LIVE.md** — needs Dan’s one-time `refresh_token` (not password in chat)
-- Until tokened: UI shows **CONNECT · NEED TOKEN** / DEMO — never fake LIVE
+- LIVE pulse only when `status=live` and snapshot fresh · never fake LIVE · token never in git/glass
+- **Nest cams:** STUB until Device Access (SDM) token or local go2rtc/Scrypted snapshot URLs — no fake video
 
