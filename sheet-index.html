@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="description" content="Board-OS House face · family sheets home index · jazz glass · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
-<link rel="stylesheet" href="house-engage.css?v=FAIL3e" />
+<link rel="stylesheet" href="house-engage.css?v=FAIL3f" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -765,6 +765,36 @@
   }
   .tile.harris .tile-tap { background: #ffe060; color: #1a1000; border: 2px solid #8a5010; font-weight: 800; }
 
+
+  /* —— Hub badge portraits · real photos when present; NEED PHOTO hooks otherwise —— */
+  .tile-icon.tile-icon--portrait {
+    width: 56px; height: 56px; border-radius: 14px;
+    padding: 0; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    background: #14161c !important;
+    border: 2px solid rgba(255,255,255,0.35) !important;
+  }
+  .tile-icon.tile-icon--portrait .tile-portrait {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .tile-icon.tile-icon--portrait .need-photo-label {
+    display: none;
+    position: absolute; inset: 0;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 4px;
+    font-size: 8px; font-weight: 900; letter-spacing: 0.04em;
+    line-height: 1.15; color: #ffe080;
+    background: linear-gradient(145deg, #2a2e34, #101218);
+    text-transform: uppercase;
+  }
+  .tile-icon.tile-icon--portrait.need-photo .need-photo-label { display: flex; }
+  .tile-icon.tile-icon--portrait.need-photo .tile-portrait { display: none; }
+  .tile.hayes .tile-icon--portrait { box-shadow: 0 0 0 3px rgba(112,224,255,0.45), 0 0 16px rgba(80,220,255,0.35) !important; border-color: #70e0ff !important; }
+  .tile.ainsley .tile-icon--portrait { box-shadow: 0 0 0 3px rgba(232,224,208,0.35), 0 6px 16px rgba(196,120,58,0.35) !important; border-color: #d4a05a !important; }
+  .tile.harris .tile-icon--portrait { border-radius: 6px !important; box-shadow: 0 4px 0 #0e2008 !important; border-color: #1a3010 !important; }
+  .tile.dan .tile-icon--portrait { border-color: #ffe080 !important; box-shadow: 0 0 0 3px rgba(0,0,0,0.35), 0 0 16px rgba(255,200,80,0.35) !important; }
+
   /* —— CANVAS LAW · Elo 3202L portrait 1080×1920 —— */
   .hdr { flex-wrap: wrap; gap: 12px; padding: 12px 14px; }
   .hdr-left { flex-wrap: wrap; gap: 12px; }
@@ -963,7 +993,12 @@
  </a>
 
  <a class="tile hayes" href="kid-hayes.html">
- <div class="tile-icon" aria-hidden="true">⚔️</div>
+ <div class="tile-icon tile-icon--portrait need-photo" data-person="hayes" aria-label="Hayes · NEED PHOTO">
+ <img class="tile-portrait" src="assets/portraits/hayes.jpg?v=FAIL3f" alt="Hayes" width="56" height="56" loading="lazy"
+  onerror="this.closest('.tile-icon').classList.add('need-photo'); this.removeAttribute('src');"
+  onload="this.closest('.tile-icon').classList.remove('need-photo');" />
+ <span class="need-photo-label">NEED PHOTO</span>
+ </div>
  <div>
  <div class="tile-label">⚔️ HAYES</div>
  <div class="tile-sub">Drop Zone · chores + Victory Jar</div>
@@ -972,7 +1007,12 @@
  </a>
 
  <a class="tile ainsley" href="kid-ainsley.html">
- <div class="tile-icon" aria-hidden="true">A</div>
+ <div class="tile-icon tile-icon--portrait need-photo" data-person="ainsley" aria-label="Ainsley · NEED PHOTO">
+ <img class="tile-portrait" src="assets/portraits/ainsley.jpg?v=FAIL3f" alt="Ainsley" width="56" height="56" loading="lazy"
+  onerror="this.closest('.tile-icon').classList.add('need-photo'); this.removeAttribute('src');"
+  onload="this.closest('.tile-icon').classList.remove('need-photo');" />
+ <span class="need-photo-label">NEED PHOTO</span>
+ </div>
  <div>
  <div class="tile-label">AINSLEY</div>
  <div class="tile-sub">Tour Jar · Payday with Dad</div>
@@ -982,7 +1022,12 @@
  </a>
 
  <a class="tile harris" href="kid-harris.html">
- <div class="tile-icon" aria-hidden="true">🧱</div>
+ <div class="tile-icon tile-icon--portrait need-photo" data-person="harris" aria-label="Harris · NEED PHOTO">
+ <img class="tile-portrait" src="assets/portraits/harris.jpg?v=FAIL3f" alt="Harris" width="56" height="56" loading="lazy"
+  onerror="this.closest('.tile-icon').classList.add('need-photo'); this.removeAttribute('src');"
+  onload="this.closest('.tile-icon').classList.remove('need-photo');" />
+ <span class="need-photo-label">NEED PHOTO</span>
+ </div>
  <div>
  <div class="tile-label">🧱 HARRIS</div>
  <div class="tile-sub">Blocks · chores + Gem Jar</div>
@@ -991,7 +1036,12 @@
  </a>
 
  <a class="tile dan" href="sheet-dan.html">
- <div class="tile-icon" aria-hidden="true">D</div>
+ <div class="tile-icon tile-icon--portrait need-photo" data-person="dan" aria-label="Daniel Ward · NEED PHOTO">
+ <img class="tile-portrait" src="assets/portraits/dan.jpg?v=FAIL3f" alt="Daniel Ward" width="56" height="56" loading="lazy"
+  onerror="this.closest('.tile-icon').classList.add('need-photo'); this.removeAttribute('src');"
+  onload="this.closest('.tile-icon').classList.remove('need-photo');" />
+ <span class="need-photo-label">NEED PHOTO</span>
+ </div>
  <div>
  <div class="tile-label">DAD SEAT</div>
  <div class="tile-sub">Command · leave-bys · week</div>
@@ -1136,13 +1186,13 @@
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=FAIL3e"></script>
-<script src="house-board-strip.js?v=FAIL3e"></script>
-<script src="house-weather.js?v=FAIL3e"></script>
-<script src="house-sfx.js?v=FAIL3e"></script>
-<script src="house-zoom.js?v=FAIL3e"></script>
-<script src="house-sensi.js?v=FAIL3e"></script>
-<script src="house-nest.js?v=FAIL3e"></script>
+<script src="house-clock.js?v=FAIL3f"></script>
+<script src="house-board-strip.js?v=FAIL3f"></script>
+<script src="house-weather.js?v=FAIL3f"></script>
+<script src="house-sfx.js?v=FAIL3f"></script>
+<script src="house-zoom.js?v=FAIL3f"></script>
+<script src="house-sensi.js?v=FAIL3f"></script>
+<script src="house-nest.js?v=FAIL3f"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
