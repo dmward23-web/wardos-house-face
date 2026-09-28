@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#12140f" />
 <title>BOARD-OS · AINSLEY · HER TRACKS</title>
-<link rel="stylesheet" href="house-engage.css?v=GROW3" />
+<link rel="stylesheet" href="house-engage.css?v=CONSUME1" />
 <link rel="stylesheet" href="kid-ioscroll.css?v=IOSCROLL3" />
 <style>
 
@@ -671,7 +671,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="saves-host" data-saves-panel data-kid="ainsley"></div>
  <div class="paid-stamp" data-paid-stamp hidden>Paid · jar reset</div>
  </section>
- <section class="sec sec-schedule" aria-label="Her week — schedule appointments school">
+ <section class="sec sec-schedule consume-sched" aria-label="Her week — schedule" data-consume-sel="">
  <div class="sec-hdr"><div class="sec-title">HER WEEK · no surprises</div><div class="sec-meta">scan fast</div></div>
  <div class="harbor-strip" aria-label="No surprises next 24h">
  <div class="hs-title">No surprises · next 24h</div>
@@ -681,26 +681,15 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <span class="bag-lab" data-bag-label>This week @ Dad · bag</span>
  <span class="bag-hint" data-bag-hint>147th · pack for Dad week</span>
  </div>
- <div class="leave-strip" aria-label="Leave-bys">
- <div class="leave-chip"><span class="t">DROP</span><span class="time">8:10</span><span class="arr">→</span><span class="dest">8:25</span></div>
- <div class="leave-chip"><span class="t">PICKUP</span><span class="time">3:15</span><span class="arr">→</span><span class="dest">3:40</span></div>
- </div>
- <div class="sec-hdr" style="margin-top:4px"><div class="sec-title">Today</div></div>
- <div class="sec-list" data-mount-today-events></div>
- <div class="harbor-strip rides" aria-label="Your rides">
- <div class="hs-title">Your rides · your call</div>
- <div class="sec-list" data-mount-rides></div>
- </div>
- <div class="harbor-strip her" aria-label="Your space">
- <div class="hs-title">Your space</div>
- <div class="sec-list" data-mount-her-space></div>
- </div>
- <div class="sec-hdr appt-hdr" style="margin-top:6px"><div class="sec-title">Appointments</div><div class="sec-meta">locked in</div></div>
- <div class="sec-list" data-mount-appointments></div>
- <div class="sec-hdr" style="margin-top:6px"><div class="sec-title">Sports</div></div>
- <div class="sec-list" data-mount-sports></div>
- <div class="sec-hdr school-hdr" style="margin-top:6px"><div class="sec-title">School schedule</div><div class="sec-meta">week</div></div>
- <div class="sec-list" data-mount-school></div>
+ <div class="consume-hdr" data-mount-consume-hdr></div>
+ <div class="consume-week" data-mount-consume-week></div>
+ <div class="consume-label"><span class="tag">Next up</span><span class="line"></span></div>
+ <div class="consume-hero" data-mount-consume-next></div>
+ <div class="consume-label sec" data-mount-consume-today-label><span class="tag">Today</span><span class="line"></span></div>
+ <div class="consume-punch" data-mount-consume-punch></div>
+ <div class="consume-routine" data-mount-consume-routine></div>
+ <div class="consume-label sec"><span class="tag">Ahead · unique</span><span class="line"></span></div>
+ <div class="consume-ahead" data-mount-consume-ahead></div>
  </section>
  </div>
  <div class="setlist-foot">
@@ -739,7 +728,7 @@ document.addEventListener("house:kid-rendered", function(){
 </script>
 
 <script src="house-clock.js?v=CT1"></script>
-<script src="kids-data.js?v=MUSTGATE1"></script>
+<script src="kids-data.js?v=CONSUME1"></script>
 <script src="house-saves.js?v=FAIL3"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=FAIL3"></script>
