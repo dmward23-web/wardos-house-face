@@ -37,6 +37,9 @@
     display:none;white-space:pre-wrap;overflow:auto;max-height:60%}
   .errbox.show{display:block}
   .hint{font-size:12px;color:#8090a8;margin-top:8px}
+  .stage.fail{background:#1a1010}
+  .still-fallback{display:none;max-width:96%;max-height:70%;object-fit:contain;border:2px solid #80e890;border-radius:10px;z-index:1}
+  .still-fallback.show{display:block}
 </style>
 </head>
 <body>
@@ -58,11 +61,12 @@
       <div class="status" id="status">Ready · tap a cam</div>
     </div>
     <video id="vid" playsinline muted autoplay></video>
+    <img id="still-fallback" class="still-fallback" alt="Nest still" />
     <div class="errbox" id="errbox"></div>
   </div>
   <div class="cams" id="cam-row" aria-label="Cameras"></div>
 </div>
-<script src="nest-webrtc-client.js?v=NESTVID1"></script>
+<script src="nest-webrtc-client.js?v=NESTSTILL1"></script>
 <script>
 (function () {
   var N = window.NestWebRtc;
@@ -96,8 +100,39 @@
 
   proxyMeta.textContent = "proxy " + N.proxyBase() + (N.proxyToken() ? " · authed" : " · localhost");
 
+  var stillEl = document.getElementById("still-fallback");
+  var stageEl = document.querySelector(".stage");
+
+  function showStillFallback(want) {
+    return fetch("data/nest-live.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data || !data.cameras) return null;
+        var hit = null;
+        if (want) {
+          hit = data.cameras.find(function (c) {
+            return c.id === want || (c.name && c.name.toLowerCase().indexOf(String(want).toLowerCase()) >= 0);
+          });
+        }
+        if (!hit) hit = data.cameras.find(function (c) { return c.snapshotUrl; });
+        if (hit && hit.snapshotUrl) {
+          stillEl.src = hit.snapshotUrl + (hit.snapshotUrl.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now();
+          stillEl.classList.add("show");
+          vid.style.display = "none";
+          if (stageEl) stageEl.classList.add("fail");
+          title.textContent = (hit.name || "Nest").replace(/\s+camera$/i, "") + " · STILL";
+          return hit;
+        }
+        return null;
+      })
+      .catch(function () { return null; });
+  }
+
   async function loadCams() {
     setStatus("loading cameras…");
+    var want = new URLSearchParams(location.search).get("cam") ||
+      new URLSearchParams(location.search).get("id") ||
+      new URLSearchParams(location.search).get("name");
     try {
       var data = await N.fetchCameras();
       cams = data.cameras || [];
@@ -115,9 +150,6 @@
       });
       setStatus(cams.length + " cams · tap to stream");
       setPill("dim", "READY");
-      var want = new URLSearchParams(location.search).get("cam") ||
-        new URLSearchParams(location.search).get("id") ||
-        new URLSearchParams(location.search).get("name");
       if (want) {
         var hit = cams.find(function (c) {
           return c.id === want || (c.name && c.name.toLowerCase().indexOf(want.toLowerCase()) >= 0);
@@ -126,14 +158,22 @@
         else if (cams[0]) startCam(cams[0].id);
       }
     } catch (e) {
+      if (stageEl) stageEl.classList.add("fail");
+      var msg = (e && e.message) ? e.message : String(e);
+      var base = N.proxyBase() || "(none — Pages/phone)";
       showErr(
-        "Cannot reach nest-webrtc-proxy at " + N.proxyBase() + "\n\n" +
-        (e && e.message ? e.message : String(e)) +
-        "\n\nFix: on the Atlas box run:\n  node scripts/nest-webrtc-proxy.mjs\n" +
-        "Then open http://127.0.0.1:8787/nest-webrtc.html\n" +
-        "Elo / LAN: node scripts/nest-webrtc-proxy.mjs --lan\n" +
-        "  then ?proxy=http://<box-lan-ip>:8787&proxyToken=…"
+        "Cannot reach nest-webrtc-proxy at " + base + "\n\n" + msg
       );
+      setStatus("proxy unreachable · loading still if any…");
+      showStillFallback(want).then(function (hit) {
+        if (hit) {
+          setPill("dim", "STILL · NO LIVE");
+          setStatus("Showing Nest still · live video needs box proxy");
+        } else {
+          setPill("err", "NO PROXY");
+          setStatus("No live video from Pages · open sheet-google-home for stills");
+        }
+      });
     }
   }
 
