@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#0e1014" />
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-<meta name="description" content="Board-OS House face · family sheets home index · sharp-future hub · family home" />
+<meta name="description" content="Board-OS House face · The Ward's mission hub · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
 <link rel="stylesheet" href="house-engage.css?v=HUBSHIP1" />
 <style>
@@ -2576,28 +2576,112 @@
   .tile-icon.need-photo::after { content: none !important; }
 
 
+
+  /* THEWARDS1 · hub header spread · brand left · ovals center · date right */
+  .hdr.hdr--spread {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 18px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 12px 18px !important;
+  }
+  .hdr.hdr--spread .hdr-brand {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+  .hdr.hdr--spread .hdr-brand .id-text { gap: 1px !important; }
+  .hdr.hdr--spread .hdr-brand .name {
+    font-size: 30px !important;
+    letter-spacing: -0.04em !important;
+    line-height: 1.05 !important;
+    white-space: nowrap !important;
+  }
+  .hdr.hdr--spread .hdr-brand .tagline {
+    font-size: 13px !important;
+    white-space: nowrap !important;
+  }
+  .hdr.hdr--spread .hdr-brand .eyebrow {
+    font-size: 9px !important;
+    letter-spacing: 0.2em !important;
+  }
+  .hdr.hdr--spread .hdr-week {
+    margin-left: 4px !important;
+    padding: 8px 12px !important;
+    min-height: 40px !important;
+    flex-shrink: 0 !important;
+  }
+  .hdr.hdr--spread .hdr-ovals {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+  .hdr.hdr--spread .hdr-date {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    text-align: right !important;
+    padding: 4px 2px !important;
+  }
+  .hdr.hdr--spread .hdr-date-kicker {
+    font-size: 9px !important;
+    font-weight: 750 !important;
+    letter-spacing: 0.2em !important;
+    text-transform: uppercase !important;
+    color: rgba(15,23,32,0.45) !important;
+  }
+  .hdr.hdr--spread .hdr-date-dow {
+    font-size: 22px !important;
+    font-weight: 850 !important;
+    letter-spacing: -0.03em !important;
+    color: #12161c !important;
+    line-height: 1 !important;
+  }
+  .hdr.hdr--spread .hdr-date-long {
+    font-size: 13px !important;
+    font-weight: 650 !important;
+    color: rgba(40,50,64,0.72) !important;
+    letter-spacing: -0.01em !important;
+  }
+
 </style>
 </head>
 <body>
 <div class="panel">
  <div class="float-orbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
- <header class="hdr">
- <div class="hdr-left">
+ <header class="hdr hdr--spread">
+ <div class="hdr-brand">
  <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
- <a class="back" href="index.html?v=WEEKFIX1" aria-label="Back to House week"><span class="chev">‹</span> Week</a>
- <div class="identity">
- <div class="avatar" aria-hidden="true">⌂</div>
  <div class="id-text">
  <div class="eyebrow">WARDOS · HOUSE FACE</div>
- <h1 class="name"><span class="name-accent">Family sheets</span></h1>
+ <h1 class="name"><span class="name-accent">The Ward's</span></h1>
  <div class="tagline">Mission hub · tap a sheet</div>
  </div>
+ <a class="back hdr-week" href="index.html?v=WEEKFIX1" aria-label="Back to House week"><span class="chev">‹</span> Week</a>
  </div>
- </div>
- <div class="hdr-right">
+ <div class="hdr-ovals" aria-label="Live house status">
  <div class="wx-card" id="house-wx" data-live="weather" aria-label="Weather · Overland Park"></div>
  <a class="sensi-hdr sensi-chip" id="index-sensi-chip" href="sheet-google-home.html" aria-label="Sensi thermostat">Sensi…</a>
  <a class="nest-hdr nest-chip" id="index-nest-chip" href="sheet-google-home.html" aria-label="Nest · Google Home">Nest…</a>
+ </div>
+ <div class="hdr-date" aria-label="Today">
+ <div class="hdr-date-kicker">Today</div>
+ <div class="hdr-date-dow" data-live="dow">Mon</div>
+ <div class="hdr-date-long" data-live="date-long">Mon Sep 28</div>
  </div>
  </header>
 
@@ -2632,7 +2716,7 @@
  <div class="grid-title">Sheet roster</div>
  </div>
 
- <nav class="tile-grid" aria-label="Family sheet index">
+ <nav class="tile-grid" aria-label="The Ward's sheet index">
  <a class="tile today" href="sheet-today.html">
  <div class="tile-top">
  <div class="tile-icon" aria-hidden="true">☀</div>
