@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Sep 28 2026",
   "asOfIso": "2026-09-28",
-  "refreshedAt": "2026-09-28T20:20:37.172Z",
+  "refreshedAt": "2026-09-28T20:31:08.356Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,31 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "3:15",
-    "place": "Boys SRE pickup",
-    "detailHtml": "5:40 Hayes baseball practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "time": "5:40",
+    "place": "Hayes baseball practice",
+    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Mon",
-    "startIso": "2026-09-28T20:15:00.000Z",
-    "endIso": "2026-09-28T21:00:00.000Z",
-    "kind": "school_pickup",
+    "startIso": "2026-09-28T22:40:00.000Z",
+    "endIso": "2026-09-29T00:50:00.000Z",
+    "kind": "sport",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "3:15",
-        "place": "Boys SRE pickup",
-        "detailHtml": "5:40 Hayes baseball practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-09-28T20:15:00.000Z",
-        "endIso": "2026-09-28T21:00:00.000Z",
-        "kind": "school_pickup",
-        "whenLabel": "3:15",
-        "summary": "Hayes + Harris — SRE pickup · 3:40"
-      },
       {
         "label": "Next up · today",
         "time": "5:40",
         "place": "Hayes baseball practice",
-        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Mon",
         "startIso": "2026-09-28T22:40:00.000Z",
         "endIso": "2026-09-29T00:50:00.000Z",
@@ -168,6 +156,18 @@
         "kind": "school_pickup",
         "whenLabel": "Wed 3:15",
         "summary": "Hayes + Harris — SRE pickup · 3:40"
+      },
+      {
+        "label": "Next up · Wed",
+        "time": "4:55",
+        "place": "Harris flag practice",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-09-30T21:55:00.000Z",
+        "endIso": "2026-09-30T23:50:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Wed 4:55",
+        "summary": "Harris flag practice"
       }
     ]
   },
@@ -587,12 +587,6 @@
           "what": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00",
           "hint": "YOUR board",
           "tone": "hot"
-        },
-        {
-          "when": "Mon 5 · leave 5:30",
-          "what": "Hayes baseball — Falcons vs KC Tigers (away)",
-          "hint": "YOUR board",
-          "tone": "hot"
         }
       ],
       "school": [
@@ -861,24 +855,12 @@
           "what": "LKMS yearbook baby photo due",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Mon 5 · 3:00",
-          "what": "LKMS Homework Help",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": [
         {
           "when": "Wed 30 · 12:40",
           "what": "Midwest Anxiety · 1:00 (Lindsay Bonebrake)",
-          "hint": "with Dad",
-          "tone": "hot"
-        },
-        {
-          "when": "Mon 5 · 1:40",
-          "what": "Midwest Anxiety · 2:00 (Lindsay Bonebrake)",
           "hint": "with Dad",
           "tone": "hot"
         }
