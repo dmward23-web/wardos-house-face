@@ -395,7 +395,7 @@
     settlePriorWeeksIntoBalance(kidId, data);
     var pack = kidDayBank(kidId);
     var kid = (data && data.kids && data.kids[kidId]) || {};
-    var goal = kid.bankGoal || { need: 8, title: "Goal", blurb: "", reward: "" };
+    var goal = kid.bankGoal || { need: 10, title: "Goal", blurb: "", reward: "" };
     var cur = kid.currency || { plural: "stars", symbol: "★", label: "Stars" };
     var today = pack.day.stars || 0;
     /* Week star tally → jar / weekly allowance goal (existing need $ amounts) */
