@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="description" content="Board-OS House face · family sheets home index · sharp-future hub · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
-<link rel="stylesheet" href="house-engage.css?v=HUBOVAL1" />
+<link rel="stylesheet" href="house-engage.css?v=HUBSHIP1" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -2173,6 +2173,409 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 6px 0 rgba(40,48,60,0.08) !important;
   }
 
+
+  /* ═══════════════════════════════════════════════════════════
+     HUBSHIP1 · mock v4 → live · Asus 32" 1080×1920 edge-to-edge
+     schedule≈2× tile (584:292) · 3×4 equal 344×292 @8px LOCKED
+     white camo kept · future dark glass (not beige) · denser tiles
+     header ovals left alone (HUBOVAL1 matched)
+     TWEAK: roster tile titles bigger than mock 16px → 19px
+     ═══════════════════════════════════════════════════════════ */
+
+  /* Layout lock */
+  .hub-upper {
+    flex: 0 0 584px !important;
+    height: 584px !important;
+    max-height: 584px !important;
+    min-height: 584px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    margin: 0 !important;
+  }
+  .leaveby,
+  .hub-upper .leaveby {
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    align-self: stretch !important;
+    margin: 0 !important;
+  }
+  .grid-wrap {
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    gap: 6px !important;
+    padding-top: 0 !important;
+  }
+  .grid-hdr { padding: 4px 2px 0 !important; min-height: 0 !important; }
+  .grid-title {
+    color: rgba(15,23,32,0.50) !important;
+    letter-spacing: 0.2em !important;
+    text-shadow: none !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+  }
+  .tile-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 344px) !important;
+    grid-template-rows: repeat(4, 292px) !important;
+    gap: 8px !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+
+  /* Schedule · dark mission glass (mock v4 heat) — kill beige */
+  .leaveby {
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    background:
+      linear-gradient(165deg, rgba(14,16,22,0.985) 0%, rgba(4,5,9,0.995) 55%, rgba(2,3,6,1) 100%) !important;
+    border: 1px solid rgba(110,212,234,0.42) !important;
+    box-shadow:
+      0 1.5px 0 rgba(255,255,255,0.12) inset,
+      0 -1px 0 rgba(0,0,0,0.5) inset,
+      0 18px 40px rgba(0,0,0,0.45),
+      0 0 40px rgba(94,200,224,0.12) !important;
+    animation: none !important;
+    backdrop-filter: blur(22px) saturate(1.2) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(1.2) !important;
+    color: #f8fafc !important;
+  }
+  .leaveby::before {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 40%, transparent 70%),
+      radial-gradient(ellipse 50% 80% at 8% 40%, rgba(255,200,80,0.14) 0%, transparent 55%) !important;
+    animation: none !important;
+  }
+  .leaveby-accent {
+    width: 4px !important;
+    background: linear-gradient(180deg, #ffe080 0%, #f0a020 45%, rgba(94,200,224,0.5) 100%) !important;
+    box-shadow: 0 0 18px rgba(255,200,80,0.45) !important;
+  }
+  .leaveby-body { padding: 14px 16px 12px !important; gap: 8px !important; color: #f8fafc !important; }
+  .leaveby-label {
+    color: #8ae0f2 !important;
+    letter-spacing: 0.2em !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    text-shadow: 0 0 12px rgba(110,212,234,0.35) !important;
+    text-transform: uppercase !important;
+  }
+  .leaveby-badge {
+    border-radius: 999px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    padding: 5px 12px !important;
+    background: linear-gradient(145deg, #ffe080, #f0a020) !important;
+    border: 1px solid rgba(255,230,160,0.65) !important;
+    color: #1a1000 !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 0 16px rgba(255,200,80,0.35) !important;
+    letter-spacing: 0.14em !important;
+  }
+  .leaveby-main {
+    color: #ffffff !important;
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.03em !important;
+    line-height: 1.2 !important;
+    text-shadow: 0 0 20px rgba(255,200,80,0.25) !important;
+  }
+  .leaveby-main .time {
+    font-size: 28px !important;
+    font-weight: 850 !important;
+    letter-spacing: -0.035em !important;
+    color: #0e1014 !important;
+    padding: 4px 14px 5px !important;
+    margin: 0 6px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(180deg, #ffe9a0 0%, #f0a028 100%) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.55),
+      0 0 24px rgba(255,200,80,0.55),
+      0 2px 0 rgba(0,0,0,0.35) !important;
+    animation: none !important;
+    display: inline-block !important;
+  }
+  .leaveby-detail { color: rgba(168,184,198,0.55) !important; font-size: 12px !important; }
+  .leaveby-detail strong { color: #ffd86a !important; }
+  .leaveby-sched { gap: 6px !important; }
+  .leaveby-sec { gap: 3px !important; }
+  .leaveby-sec-hdr {
+    color: rgba(138,224,242,0.7) !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.16em !important;
+    text-transform: uppercase !important;
+  }
+  .leaveby-list { gap: 3px !important; }
+  .leaveby-row {
+    background: rgba(255,255,255,0.055) !important;
+    border: 1px solid rgba(255,255,255,0.07) !important;
+    border-radius: 10px !important;
+    color: #ffffff !important;
+    padding: 7px 10px !important;
+  }
+  .leaveby-row.is-next {
+    background: rgba(255,200,80,0.14) !important;
+    border-color: rgba(255,216,106,0.45) !important;
+    box-shadow: 0 0 18px rgba(255,200,80,0.22) !important;
+  }
+  .leaveby-row-time {
+    font-size: 13px !important;
+    color: #8ae0f2 !important;
+    font-weight: 700 !important;
+  }
+  .leaveby-row.is-next .leaveby-row-time { font-size: 14px !important; color: #ffd86a !important; }
+  .leaveby-row-title { font-size: 13px !important; color: #ffffff !important; font-weight: 600 !important; }
+  .leaveby-row.is-next .leaveby-row-title { font-size: 14px !important; font-weight: 800 !important; color: #fff8e8 !important; }
+  .leaveby-row-chip {
+    background: rgba(255,200,80,0.34) !important;
+    color: #ffd86a !important;
+    border: 1px solid rgba(255,216,106,0.72) !important;
+    box-shadow: 0 0 12px rgba(255,200,80,0.4) !important;
+  }
+  .leaveby-empty { color: rgba(168,184,198,0.45) !important; }
+
+  /* Roster tiles · dark future glass · accent rails · denser */
+  .tile {
+    position: relative !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    padding: 12px 12px 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    background: linear-gradient(165deg, rgba(16,18,24,0.98) 0%, rgba(4,5,8,0.995) 100%) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border: 1px solid rgba(110,212,234,0.36) !important;
+    box-shadow:
+      0 1.5px 0 rgba(255,255,255,0.14) inset,
+      0 -1px 0 rgba(0,0,0,0.45) inset,
+      0 14px 32px rgba(0,0,0,0.50),
+      0 0 22px rgba(94,200,224,0.08) !important;
+    color: #f8fafc !important;
+    text-decoration: none !important;
+    gap: 0 !important;
+  }
+  .tile::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important; right: 0 !important; top: 0 !important;
+    width: auto !important; height: 48px !important;
+    bottom: auto !important;
+    border-radius: 0 !important;
+    background: linear-gradient(180deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.03) 55%, transparent 100%) !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+    opacity: 1 !important;
+    z-index: 0 !important;
+  }
+  .tile::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important; top: 8px !important; bottom: 8px !important;
+    width: 3px !important; height: auto !important;
+    border-radius: 2px !important;
+    background: var(--rail, #8ae0f2) !important;
+    box-shadow: 0 0 18px color-mix(in srgb, var(--rail, #8ae0f2) 95%, transparent),
+                0 0 6px color-mix(in srgb, var(--rail, #8ae0f2) 70%, transparent) !important;
+    opacity: 1 !important;
+    animation: none !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+  }
+  .tile > * { position: relative; z-index: 2; }
+
+  .tile.today { --rail: #8ae0f2; border-color: rgba(110,212,234,0.62) !important; box-shadow: 0 1.5px 0 rgba(255,255,255,0.14) inset, 0 14px 32px rgba(0,0,0,0.50), 0 0 36px rgba(94,200,224,0.28) !important; background: linear-gradient(165deg, rgba(16,18,24,0.98), rgba(4,5,8,0.995)) !important; }
+  .tile.week  { --rail: #9ec4e0; border-color: rgba(158,196,224,0.48) !important; box-shadow: 0 1.5px 0 rgba(255,255,255,0.14) inset, 0 14px 32px rgba(0,0,0,0.50), 0 0 26px rgba(122,154,184,0.16) !important; background: linear-gradient(165deg, rgba(16,18,24,0.98), rgba(4,5,8,0.995)) !important; }
+  .tile.month { --rail: #a8bdd2; border-color: rgba(168,189,210,0.44) !important; box-shadow: 0 1.5px 0 rgba(255,255,255,0.14) inset, 0 14px 32px rgba(0,0,0,0.50), 0 0 24px rgba(138,155,176,0.12) !important; background: linear-gradient(165deg, rgba(16,18,24,0.98), rgba(4,5,8,0.995)) !important; }
+  .tile.hayes { --rail: #5ec8e8; border-color: rgba(74,176,220,0.68) !important; box-shadow: 0 1.5px 0 rgba(255,255,255,0.14) inset, 0 14px 32px rgba(0,0,0,0.50), 0 0 36px rgba(58,159,196,0.32) !important; background: linear-gradient(165deg, rgba(16,18,24,0.98), rgba(4,5,8,0.995)) !important; }
+  .tile.ainsley { --rail: #f098d4; border-color: rgba(232,140,200,0.68) !important; box-shadow: 0 1.5px 0 rgba(255,255,255,0.14) inset, 0 14px 32px rgba(0,0,0,0.50), 0 0 36px rgba(212,120,184,0.32) !important; background: linear-gradient(165deg, rgba(16,18,24,0.98), rgba(4,5,8,0.995)) !important; }
+  .tile.harris { --rail: #7ed492; border-color: rgba(110,196,130,0.68) !important; box-shadow: 0 1.5px 0 rgba(255,255,255,0.14) inset, 0 14px 32px rgba(0,0,0,0.50), 0 0 36px rgba(90,170,110,0.32) !important; background: linear-gradient(165deg, rgba(16,18,24,0.98), rgba(4,5,8,0.995)) !important; }
+  .tile.dan { --rail: #ffd86a; border-color: rgba(255,216,106,0.72) !important; background: linear-gradient(165deg, rgba(28,28,32,0.99), rgba(6,7,10,1)) !important; box-shadow: 0 1.5px 0 rgba(255,255,255,0.14) inset, 0 14px 32px rgba(0,0,0,0.52), 0 0 36px rgba(255,200,80,0.28) !important; }
+  .tile.chores { --rail: #8ed09a; border-color: rgba(126,196,140,0.60) !important; box-shadow: 0 1.5px 0 rgba(255,255,255,0.14) inset, 0 14px 32px rgba(0,0,0,0.50), 0 0 30px rgba(109,176,122,0.22) !important; background: linear-gradient(165deg, rgba(16,18,24,0.98), rgba(4,5,8,0.995)) !important; }
+  .tile.groceries { --rail: #e0c07a; border-color: rgba(212,176,106,0.52) !important; box-shadow: 0 1.5px 0 rgba(255,255,255,0.14) inset, 0 14px 32px rgba(0,0,0,0.50), 0 0 24px rgba(196,160,90,0.16) !important; background: linear-gradient(165deg, rgba(16,18,24,0.98), rgba(4,5,8,0.995)) !important; }
+  .tile.stars { --rail: #f0c86a; border-color: rgba(236,184,90,0.55) !important; box-shadow: 0 1.5px 0 rgba(255,255,255,0.14) inset, 0 14px 32px rgba(0,0,0,0.50), 0 0 24px rgba(224,168,74,0.16) !important; background: linear-gradient(165deg, rgba(16,18,24,0.98), rgba(4,5,8,0.995)) !important; }
+  .tile.fun { --rail: #f0aab8; border-color: rgba(228,154,170,0.52) !important; box-shadow: 0 1.5px 0 rgba(255,255,255,0.14) inset, 0 14px 32px rgba(0,0,0,0.50), 0 0 24px rgba(212,138,154,0.16) !important; background: linear-gradient(165deg, rgba(16,18,24,0.98), rgba(4,5,8,0.995)) !important; }
+  .tile.win { --rail: #7ad0e4; border-color: rgba(106,192,212,0.52) !important; box-shadow: 0 1.5px 0 rgba(255,255,255,0.14) inset, 0 14px 32px rgba(0,0,0,0.50), 0 0 24px rgba(90,175,196,0.16) !important; background: linear-gradient(165deg, rgba(16,18,24,0.98), rgba(4,5,8,0.995)) !important; }
+
+  .tile-top {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 9px !important;
+    padding-left: 8px !important;
+    margin-bottom: 8px !important;
+    flex-shrink: 0 !important;
+  }
+  .tile-icon, .tile .av {
+    width: 36px !important; height: 36px !important;
+    border-radius: 10px !important;
+    display: grid !important; place-items: center !important;
+    font-weight: 800 !important; font-size: 15px !important;
+    letter-spacing: -0.02em !important;
+    flex-shrink: 0 !important;
+    border: 1px solid rgba(94,200,224,0.28) !important;
+    background: rgba(255,255,255,0.06) !important;
+    color: #e8eef4 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+  .tile.hayes .tile-icon, .tile.hayes .av { background: rgba(58,159,196,0.18) !important; color: #7dd3e8 !important; border-color: rgba(58,159,196,0.4) !important; }
+  .tile.ainsley .tile-icon, .tile.ainsley .av { background: rgba(212,120,184,0.18) !important; color: #e8a0d0 !important; border-color: rgba(212,120,184,0.4) !important; }
+  .tile.harris .tile-icon, .tile.harris .av { background: rgba(90,170,110,0.18) !important; color: #8ad49a !important; border-color: rgba(90,170,110,0.4) !important; }
+  .tile.dan .tile-icon, .tile.dan .av { background: rgba(240,193,75,0.16) !important; color: #f0c14b !important; border-color: rgba(240,193,75,0.4) !important; }
+
+  .tile-titles { min-width: 0; flex: 1; padding-top: 1px; }
+  /* HUBSHIP1 tweak: titles bigger than mock 16px for legibility */
+  .tile-label {
+    font-size: 19px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.15 !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .tile.hayes .tile-label,
+  .tile.ainsley .tile-label,
+  .tile.harris .tile-label,
+  .tile.dan .tile-label,
+  .tile.today .tile-label,
+  .tile.week .tile-label,
+  .tile.month .tile-label,
+  .tile.chores .tile-label,
+  .tile.groceries .tile-label,
+  .tile.stars .tile-label,
+  .tile.fun .tile-label,
+  .tile.win .tile-label {
+    font-size: 19px !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+  }
+  .tile.dan .tile-label { color: #ffd86a !important; }
+  .tile-sub {
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    color: rgba(168,184,198,0.48) !important;
+    margin-top: 2px !important;
+  }
+  .tile.dan .tile-sub { color: rgba(220,210,180,0.55) !important; }
+  .tile.hayes .tile-sub,
+  .tile.ainsley .tile-sub,
+  .tile.harris .tile-sub { color: rgba(168,184,198,0.48) !important; font-weight: 500 !important; }
+
+  .tile-micro {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    padding-left: 8px !important;
+    min-height: 0 !important;
+  }
+  .tile-mrow {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 5px 8px !important;
+    border-radius: 8px !important;
+    background: rgba(255,255,255,0.055) !important;
+    border: 1px solid rgba(255,255,255,0.065) !important;
+    font-size: 11.5px !important;
+    line-height: 1.2 !important;
+  }
+  .tile-mrow .mt {
+    font-family: "JetBrains Mono", ui-monospace, monospace !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #8ae0f2 !important;
+    min-width: 38px !important;
+  }
+  .tile.dan .tile-mrow .mt { color: #ffd86a !important; }
+  .tile-mrow .md { flex: 1 !important; font-weight: 600 !important; color: #ffffff !important; }
+  .tile-mchip {
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em !important;
+    padding: 2px 7px !important;
+    border-radius: 999px !important;
+    background: rgba(94,200,224,0.30) !important;
+    color: #a8eef8 !important;
+    white-space: nowrap !important;
+    border: 1px solid rgba(110,212,234,0.55) !important;
+    box-shadow: 0 0 12px rgba(94,200,224,0.35) !important;
+  }
+  .tile-mchip.amber {
+    background: rgba(255,200,80,0.34) !important;
+    color: #ffd86a !important;
+    border-color: rgba(255,216,106,0.72) !important;
+    box-shadow: 0 0 14px rgba(255,200,80,0.45) !important;
+  }
+  .tile-mchip.green {
+    background: rgba(90,170,110,0.20) !important;
+    color: #7dcc90 !important;
+    border-color: rgba(90,170,110,0.35) !important;
+    box-shadow: none !important;
+  }
+  .tile-mchip.rose {
+    background: rgba(212,138,154,0.20) !important;
+    color: #e0a0b0 !important;
+    border-color: rgba(212,138,154,0.35) !important;
+    box-shadow: none !important;
+  }
+
+  .tile-foot {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 6px 6px 0 8px !important;
+    margin-top: auto !important;
+    flex-shrink: 0 !important;
+  }
+  .tile-fact {
+    font-size: 10px !important;
+    font-weight: 500 !important;
+    color: rgba(168,184,198,0.38) !important;
+  }
+  .tile-tap, .tile-open {
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.14em !important;
+    padding: 5px 11px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(180deg, rgba(160,200,220,0.28) 0%, rgba(40,60,80,0.55) 45%, rgba(20,30,40,0.75) 100%) !important;
+    color: #a8eef8 !important;
+    border: 1px solid rgba(180,220,235,0.55) !important;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.35) inset,
+      0 -1px 0 rgba(0,0,0,0.45) inset,
+      0 0 12px rgba(94,200,224,0.28),
+      0 2px 6px rgba(0,0,0,0.35) !important;
+    text-shadow: 0 0 8px rgba(110,212,234,0.45) !important;
+    margin-top: 0 !important;
+    align-self: auto !important;
+  }
+  .tile.dan .tile-tap, .tile.dan .tile-open {
+    background: linear-gradient(180deg, rgba(255,220,140,0.32) 0%, rgba(120,80,20,0.50) 45%, rgba(40,28,8,0.75) 100%) !important;
+    color: #ffd86a !important;
+    border-color: rgba(255,230,160,0.65) !important;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.40) inset,
+      0 -1px 0 rgba(0,0,0,0.45) inset,
+      0 0 14px rgba(255,200,80,0.35),
+      0 2px 6px rgba(0,0,0,0.35) !important;
+  }
+
+  /* Hide NEED PHOTO chrome — letter avatars only */
+  .tile-icon .tile-portrait,
+  .tile-icon .need-photo-label { display: none !important; }
+  .tile-icon.need-photo::after { content: none !important; }
+
+
 </style>
 </head>
 <body>
@@ -2231,137 +2634,199 @@
 
  <nav class="tile-grid" aria-label="Family sheet index">
  <a class="tile today" href="sheet-today.html">
+ <div class="tile-top">
  <div class="tile-icon" aria-hidden="true">☀</div>
- <div>
+ <div class="tile-titles">
  <div class="tile-label">Today</div>
- <div class="tile-sub" data-live="today-sub">Sun Sep 27 · morning</div>
+ <div class="tile-sub" data-live="today-sub">Mon Sep 28 · afternoon</div>
  </div>
- <span class="tile-tap">Tap</span>
+ </div>
+ <div class="tile-micro">
+ <div class="tile-mrow"><span class="mt">5:40</span><span class="md">Hayes baseball</span><span class="tile-mchip amber">Next</span></div>
+ <div class="tile-mrow"><span class="mt">NOW</span><span class="md">2 blocks left today</span></div>
+ <div class="tile-mrow"><span class="mt">EVE</span><span class="md">Open after practice</span><span class="tile-mchip green">Clear</span></div>
+ </div>
+ <div class="tile-foot"><span class="tile-fact">Day board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
  <a class="tile week" href="index.html?v=WEEKFIX1">
- <div class="tile-icon" aria-hidden="true">📅</div>
- <div>
+ <div class="tile-top">
+ <div class="tile-icon" aria-hidden="true">▦</div>
+ <div class="tile-titles">
  <div class="tile-label">Week</div>
- <div class="tile-sub">Family week board</div>
+ <div class="tile-sub">Mon–Sun · leave-bys</div>
  </div>
- <span class="tile-tap">Tap</span>
+ </div>
+ <div class="tile-micro">
+ <div class="tile-mrow"><span class="mt">MON</span><span class="md">Baseball leave 5:40</span><span class="tile-mchip amber">Now</span></div>
+ <div class="tile-mrow"><span class="mt">TUE</span><span class="md">SRE · swim · flag 5:40</span><span class="tile-mchip">Dense</span></div>
+ <div class="tile-mrow"><span class="mt">WED</span><span class="md">School nights · chores</span></div>
+ <div class="tile-mrow"><span class="mt">THU+</span><span class="md">Practices · weekend load</span></div>
+ </div>
+ <div class="tile-foot"><span class="tile-fact">7-day strip</span><span class="tile-tap">OPEN</span></div>
  </a>
 
  <a class="tile month" href="month.html">
- <div class="tile-icon" aria-hidden="true">🗓</div>
- <div>
+ <div class="tile-top">
+ <div class="tile-icon" aria-hidden="true">▣</div>
+ <div class="tile-titles">
  <div class="tile-label">Month</div>
- <div class="tile-sub">Bigger calendar</div>
+ <div class="tile-sub">Sep → Oct horizon</div>
  </div>
- <span class="tile-tap">Tap</span>
+ </div>
+ <div class="tile-micro">
+ <div class="tile-mrow"><span class="mt">SEP</span><span class="md">Week 5 · wrap practices</span><span class="tile-mchip amber">Now</span></div>
+ <div class="tile-mrow"><span class="mt">OCT</span><span class="md">School nights · swim load</span><span class="tile-mchip">Peek</span></div>
+ <div class="tile-mrow"><span class="mt">KEY</span><span class="md">Screens · flag · travel</span></div>
+ <div class="tile-mrow"><span class="mt">HOLD</span><span class="md">Trips · weekend blocks</span></div>
+ </div>
+ <div class="tile-foot"><span class="tile-fact">Month board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
  <a class="tile hayes" href="kid-hayes.html">
- <div class="tile-icon tile-icon--portrait need-photo" data-person="hayes" aria-label="Hayes · NEED PHOTO">
- <img class="tile-portrait" src="assets/portraits/hayes.jpg?v=FUTURE1" alt="Hayes" width="56" height="56" loading="lazy"
-  onerror="this.closest('.tile-icon').classList.add('need-photo'); this.removeAttribute('src');"
-  onload="this.closest('.tile-icon').classList.remove('need-photo');" />
- <span class="need-photo-label">NEED PHOTO</span>
+ <div class="tile-top">
+ <div class="tile-icon av" aria-hidden="true">H</div>
+ <div class="tile-titles">
+ <div class="tile-label">Hayes</div>
+ <div class="tile-sub">Baseball · school · flag</div>
  </div>
- <div>
- <div class="tile-label">⚔️ HAYES</div>
- <div class="tile-sub">Drop Zone · chores + Victory Jar</div>
  </div>
- <span class="tile-tap">Tap</span>
+ <div class="tile-micro">
+ <div class="tile-mrow"><span class="mt">5:40</span><span class="md">Baseball practice</span><span class="tile-mchip amber">Today</span></div>
+ <div class="tile-mrow"><span class="mt">TUE</span><span class="md">SRE drop 8:10 · flag 5:40</span></div>
+ <div class="tile-mrow"><span class="mt">8:40</span><span class="md">Madi + Randy collab</span></div>
+ </div>
+ <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
  <a class="tile ainsley" href="kid-ainsley.html">
- <div class="tile-icon tile-icon--portrait need-photo" data-person="ainsley" aria-label="Ainsley · NEED PHOTO">
- <img class="tile-portrait" src="assets/portraits/ainsley.jpg?v=FUTURE1" alt="Ainsley" width="56" height="56" loading="lazy"
-  onerror="this.closest('.tile-icon').classList.add('need-photo'); this.removeAttribute('src');"
-  onload="this.closest('.tile-icon').classList.remove('need-photo');" />
- <span class="need-photo-label">NEED PHOTO</span>
+ <div class="tile-top">
+ <div class="tile-icon av" aria-hidden="true">A</div>
+ <div class="tile-titles">
+ <div class="tile-label">Ainsley</div>
+ <div class="tile-sub">Swim · LKMS · jars</div>
  </div>
- <div>
- <div class="tile-label">AINSLEY</div>
- <div class="tile-sub">Tour Jar · Payday with Dad</div>
- <span class="vibe-mini">Tour Jar · $20/$20</span>
  </div>
- <span class="tile-tap">Open</span>
+ <div class="tile-micro">
+ <div class="tile-mrow"><span class="mt">TUE</span><span class="md">LKMS hearing/vision</span><span class="tile-mchip rose">Day</span></div>
+ <div class="tile-mrow"><span class="mt">4:25</span><span class="md">Swim · Coach Ann</span></div>
+ <div class="tile-mrow"><span class="mt">JAR</span><span class="md">Tour jar · payday w/ Dad</span></div>
+ </div>
+ <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
  <a class="tile harris" href="kid-harris.html">
- <div class="tile-icon tile-icon--portrait need-photo" data-person="harris" aria-label="Harris · NEED PHOTO">
- <img class="tile-portrait" src="assets/portraits/harris.jpg?v=FUTURE1" alt="Harris" width="56" height="56" loading="lazy"
-  onerror="this.closest('.tile-icon').classList.add('need-photo'); this.removeAttribute('src');"
-  onload="this.closest('.tile-icon').classList.remove('need-photo');" />
- <span class="need-photo-label">NEED PHOTO</span>
+ <div class="tile-top">
+ <div class="tile-icon av" aria-hidden="true">R</div>
+ <div class="tile-titles">
+ <div class="tile-label">Harris</div>
+ <div class="tile-sub">SRE · chores · play</div>
  </div>
- <div>
- <div class="tile-label">🧱 HARRIS</div>
- <div class="tile-sub">Blocks · chores + Gem Jar</div>
  </div>
- <span class="tile-tap">Tap</span>
+ <div class="tile-micro">
+ <div class="tile-mrow"><span class="mt">TUE</span><span class="md">SRE drop 8:10 · pickup 3:15</span></div>
+ <div class="tile-mrow"><span class="mt">MUST</span><span class="md">Chores with Dad</span><span class="tile-mchip green">Due</span></div>
+ <div class="tile-mrow"><span class="mt">EVE</span><span class="md">Open after pickup</span></div>
+ </div>
+ <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
  <a class="tile dan" href="sheet-dan.html">
- <div class="tile-icon tile-icon--portrait need-photo" data-person="dan" aria-label="Daniel Ward · NEED PHOTO">
- <img class="tile-portrait" src="assets/portraits/dan.jpg?v=FUTURE1" alt="Daniel Ward" width="56" height="56" loading="lazy"
-  onerror="this.closest('.tile-icon').classList.add('need-photo'); this.removeAttribute('src');"
-  onload="this.closest('.tile-icon').classList.remove('need-photo');" />
- <span class="need-photo-label">NEED PHOTO</span>
- </div>
- <div>
- <div class="tile-label">DAD SEAT</div>
+ <div class="tile-top">
+ <div class="tile-icon av" aria-hidden="true">D</div>
+ <div class="tile-titles">
+ <div class="tile-label">Dad Seat</div>
  <div class="tile-sub">Command · leave-bys · week</div>
  </div>
- <span class="tile-tap">Open</span>
+ </div>
+ <div class="tile-micro">
+ <div class="tile-mrow"><span class="mt">NOW</span><span class="md">Leave-by · baseball 5:40</span><span class="tile-mchip amber">Active</span></div>
+ <div class="tile-mrow"><span class="mt">TUE</span><span class="md">SRE dual drop + pickup</span></div>
+ <div class="tile-mrow"><span class="mt">WK</span><span class="md">Week command board</span></div>
+ </div>
+ <div class="tile-foot"><span class="tile-fact">Mission seat</span><span class="tile-tap">OPEN</span></div>
  </a>
 
- <a class="tile chores primary-tile" href="sheet-chores.html">
+ <a class="tile chores" href="sheet-chores.html">
+ <div class="tile-top">
  <div class="tile-icon" aria-hidden="true">✓</div>
- <div>
+ <div class="tile-titles">
  <div class="tile-label">Chores · MUSTS</div>
  <div class="tile-sub">Musts · tap when done</div>
  </div>
- <span class="tile-tap">Tap</span>
+ </div>
+ <div class="tile-micro">
+ <div class="tile-mrow"><span class="mt">OPEN</span><span class="md">Musts on board</span><span class="tile-mchip amber">Due</span></div>
+ <div class="tile-mrow"><span class="mt">KIDS</span><span class="md">Hayes · Ainsley · Harris</span></div>
+ <div class="tile-mrow"><span class="mt">DONE</span><span class="md">Tap row to clear</span></div>
+ </div>
+ <div class="tile-foot"><span class="tile-fact">Must list</span><span class="tile-tap">OPEN</span></div>
  </a>
 
  <a class="tile groceries" href="sheet-groceries.html">
- <div class="tile-icon" aria-hidden="true">🛒</div>
- <div>
- <div class="tile-label">Groceries/Costco</div>
+ <div class="tile-top">
+ <div class="tile-icon" aria-hidden="true">▣</div>
+ <div class="tile-titles">
+ <div class="tile-label">Groceries / Costco</div>
  <div class="tile-sub">Family list</div>
  </div>
- <span class="tile-tap">Tap</span>
+ </div>
+ <div class="tile-micro">
+ <div class="tile-mrow"><span class="mt">LIST</span><span class="md">Family grocery list</span></div>
+ <div class="tile-mrow"><span class="mt">RUN</span><span class="md">Costco · this week</span><span class="tile-mchip amber">Plan</span></div>
+ <div class="tile-mrow"><span class="mt">ADD</span><span class="md">Tap to append</span></div>
+ </div>
+ <div class="tile-foot"><span class="tile-fact">Shared list</span><span class="tile-tap">OPEN</span></div>
  </a>
 
- <a class="tile stars primary-tile" href="sheet-allowance.html">
+ <a class="tile stars" href="sheet-allowance.html">
+ <div class="tile-top">
  <div class="tile-icon" aria-hidden="true">★</div>
- <div>
- <div class="tile-label">★ Reward jar</div>
+ <div class="tile-titles">
+ <div class="tile-label">Reward jar</div>
  <div class="tile-sub">Jars · payday with Dad</div>
  </div>
- <span class="tile-tap">Tap</span>
+ </div>
+ <div class="tile-micro">
+ <div class="tile-mrow"><span class="mt">JARS</span><span class="md">Kids jars on board</span></div>
+ <div class="tile-mrow"><span class="mt">PAY</span><span class="md">Payday with Dad</span><span class="tile-mchip amber">Soon</span></div>
+ <div class="tile-mrow"><span class="mt">RULE</span><span class="md">Earn · bank · spend</span></div>
+ </div>
+ <div class="tile-foot"><span class="tile-fact">No cash on House</span><span class="tile-tap">OPEN</span></div>
  </a>
 
-
  <a class="tile fun" href="sheet-weekend.html">
- <div class="tile-icon" aria-hidden="true">🎈</div>
- <div>
+ <div class="tile-top">
+ <div class="tile-icon" aria-hidden="true">◈</div>
+ <div class="tile-titles">
  <div class="tile-label">Weekend fun</div>
  <div class="tile-sub">Ideas · play</div>
  </div>
- <span class="tile-tap">Tap</span>
+ </div>
+ <div class="tile-micro">
+ <div class="tile-mrow"><span class="mt">SAT</span><span class="md">Pick · park or games</span></div>
+ <div class="tile-mrow"><span class="mt">SUN</span><span class="md">Family open block</span><span class="tile-mchip rose">Idea</span></div>
+ <div class="tile-mrow"><span class="mt">LIST</span><span class="md">Ideas board · vote</span></div>
+ </div>
+ <div class="tile-foot"><span class="tile-fact">Play sheet</span><span class="tile-tap">OPEN</span></div>
  </a>
 
-
  <a class="tile win" href="sheet-win.html">
+ <div class="tile-top">
  <div class="tile-icon" aria-hidden="true">✈</div>
- <div>
+ <div class="tile-titles">
  <div class="tile-label">Family trips</div>
  <div class="tile-sub">Vacations · travel</div>
  </div>
- <span class="tile-tap">Tap</span>
+ </div>
+ <div class="tile-micro">
+ <div class="tile-mrow"><span class="mt">NEXT</span><span class="md">Trip board · TBD</span></div>
+ <div class="tile-mrow"><span class="mt">PACK</span><span class="md">Lists · leave-bys</span></div>
+ <div class="tile-mrow"><span class="mt">MAP</span><span class="md">Ideas · destinations</span><span class="tile-mchip">Peek</span></div>
+ </div>
+ <div class="tile-foot"><span class="tile-fact">Travel sheet</span><span class="tile-tap">OPEN</span></div>
  </a>
-
- </nav>
+</nav>
  </div>
 
  <footer class="ftr">
@@ -2370,12 +2835,12 @@
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=HUBOVAL1"></script>
-<script src="house-board-strip.js?v=HUBOVAL1"></script>
-<script src="house-weather.js?v=HUBOVAL1"></script>
-<script src="house-sfx.js?v=HUBOVAL1"></script>
-<script src="house-sensi.js?v=HUBOVAL1"></script>
-<script src="house-nest.js?v=HUBOVAL1"></script>
+<script src="house-clock.js?v=HUBSHIP1"></script>
+<script src="house-board-strip.js?v=HUBSHIP1"></script>
+<script src="house-weather.js?v=HUBSHIP1"></script>
+<script src="house-sfx.js?v=HUBSHIP1"></script>
+<script src="house-sensi.js?v=HUBSHIP1"></script>
+<script src="house-nest.js?v=HUBSHIP1"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
