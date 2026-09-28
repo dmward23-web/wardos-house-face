@@ -98,10 +98,10 @@
   }
 
   function modeColor(mode) {
-    if (mode === "Heat") return { accent: "#c87810", soft: "#fff0d0", label: "HEAT" };
-    if (mode === "Cool") return { accent: "#2868a0", soft: "#d8ecff", label: "COOL" };
-    if (mode === "Auto") return { accent: "#287838", soft: "#d8f0d8", label: "AUTO" };
-    return { accent: "#5a5e66", soft: "#e8ebf0", label: "OFF" };
+    if (mode === "Heat") return { accent: "#ff9a20", soft: "#fff0d0", label: "HEAT", glow: "rgba(255,140,40,0.55)", css: "heat" };
+    if (mode === "Cool") return { accent: "#3a9ae8", soft: "#d8ecff", label: "COOL", glow: "rgba(80,170,255,0.55)", css: "cool" };
+    if (mode === "Auto") return { accent: "#30c050", soft: "#d8f0d8", label: "AUTO", glow: "rgba(80,220,120,0.45)", css: "auto" };
+    return { accent: "#7a8090", soft: "#e8ebf0", label: "OFF", glow: "rgba(120,130,150,0.3)", css: "off" };
   }
 
   function parseUpdatedAt(iso) {

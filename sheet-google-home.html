@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE · CAMS · GOOGLE HOME</title>
-<link rel="stylesheet" href="house-engage.css?v=P32" />
+<link rel="stylesheet" href="house-engage.css?v=BOARDSLAY1" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
@@ -167,6 +167,17 @@
     100%{box-shadow:0 0 0 12px rgba(128,232,144,0)}
   }
   @keyframes hero-accent{50%{filter:brightness(1.35)}}
+
+  .climate-humid{margin-top:6px;padding:6px 10px;border-radius:8px;font-size:13px;font-weight:800;
+    background:rgba(0,0,0,0.4);border:1px solid rgba(160,210,255,0.35);color:#d8ecff;letter-spacing:0.04em}
+  .climate-humid.is-empty{opacity:0.4}
+  .cam{position:relative;overflow:hidden}
+  .cam::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+    background:linear-gradient(160deg,rgba(255,255,255,0.08),transparent 40%,transparent 70%,rgba(0,0,0,0.25));
+    mix-blend-mode:soft-light}
+  .cam .cam-feed{border-width:3px}
+  .zone-title{letter-spacing:0.18em}
+  .banner-title{font-size:28px}
   @media (prefers-reduced-motion: reduce){
     .climate-hero.is-live .climate-pill,.climate-hero.is-live .climate-accent{animation:none}
   }
@@ -196,8 +207,8 @@
  <div class="banner-accent"></div>
  <div class="banner-body">
  <div class="banner-lab">Google Home · climate + cameras</div>
- <div class="banner-title">Sensi on top · Nest cam grid below</div>
- <div class="banner-sub">Climate hero polls sensi-live.json · cam stubs · no fake LIVE · Atlas owns</div>
+ <div class="banner-title">Climate LIVE glass · Nest cam stubs below</div>
+ <div class="banner-sub">LIVE pulse only when fresh · cam pads stay STUB · Elo 3202L</div>
  </div>
  </section>
 
@@ -220,6 +231,7 @@
  <div class="val" id="sensi-hero-set">—°</div>
  </div>
  <div class="climate-mode" id="sensi-hero-mode">HEAT</div>
+ <div class="climate-humid" id="sensi-hero-humid">—% RH</div>
  </div>
  <div class="climate-cta">
  <div class="climate-pill" id="sensi-hero-pill">CONNECT · STUB</div>
@@ -343,7 +355,7 @@
 <script src="house-clock.js?v=CT1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
-<script src="house-sensi.js?v=SENSI3"></script>
+<script src="house-sensi.js?v=SENSI3b"></script>
 <script>
 (function () {
   document.querySelectorAll(".cam").forEach(function (el) {
@@ -361,7 +373,13 @@
   if (!S) return;
   function paint() {
     S.paintHero();
-    var gate = S.liveStatus();
+    var st = S.effectiveState();
+    var h = document.getElementById("sensi-hero-humid");
+    if (h) {
+      if (st.humidity != null) { h.textContent = st.humidity + "% RH"; h.classList.remove("is-empty"); }
+      else { h.textContent = "—% RH"; h.classList.add("is-empty"); }
+    }
+    var gate = st.gate;
     var ftr = document.getElementById("sensi-home-ftr");
     if (ftr) ftr.textContent = gate.live ? "Sensi LIVE · cams stub" : gate.label + " · cams stub";
   }
