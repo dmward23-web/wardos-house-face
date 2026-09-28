@@ -22,22 +22,22 @@
         badge: strip.badge || clock.dow
       };
     }
-    /* Fallback: first non-custody dan.today row */
+    /* Fallback: first non-home-week dan.today row */
     var dan = data && data.kids && data.kids.dan;
     var rows = (dan && dan.today) || [];
     var row = null;
     for (var i = 0; i < rows.length; i++) {
-      if (/custody/i.test(rows[i].when || "")) continue;
+      if (/home week|Home base/i.test(rows[i].when || "")) continue;
       row = rows[i]; break;
     }
     if (!row) row = rows[0] || { when: clock.daypart, what: "House day @ 147th" };
-    var custody = (data && data.custody && data.custody.throughLabel)
+    var homeWeek = (data && data.homeWeek && data.homeWeek.throughLabel)
       || "kids with Dad @ 147th";
     return {
       label: "Next up · today",
       time: "",
       place: row.what || "",
-      detailHtml: esc(row.when || "") + " · " + esc(custody),
+      detailHtml: esc(row.when || "") + " · " + esc(homeWeek),
       badge: clock.dow
     };
   }
