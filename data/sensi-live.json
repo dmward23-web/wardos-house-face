@@ -1,6 +1,6 @@
 {
   "status": "live",
-  "updatedAt": "2026-09-28T13:29:58.821Z",
+  "updatedAt": "2026-09-28T13:59:44.640Z",
   "source": "sensi-cloud",
   "writeSupported": false,
   "thermostat": {
@@ -8,13 +8,13 @@
     "icdId": "36-6f-92-ff-fe-12-9c-dc",
     "online": true,
     "ambient": 72,
-    "ambientRaw": 72,
+    "ambientRaw": 71.5,
     "setpoint": 65,
     "heatSetpoint": 65,
     "coolSetpoint": 77,
     "mode": "Auto",
     "fan": "Auto",
-    "humidity": 62,
+    "humidity": 61,
     "hold": false,
     "scale": "f"
   },
