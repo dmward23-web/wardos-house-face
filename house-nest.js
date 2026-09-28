@@ -267,8 +267,7 @@
         path.innerHTML =
           "Nest SDM <strong>LIVE</strong> · " +
           g.deviceCount +
-          " devices named from Device Access · " +
-          "<strong>stills pending</strong> (cams are WEB_RTC-only — no RTSP/GenerateImage without event + auth proxy) · tokens stay off Pages · " +
+          " cams · <strong>tap pad → WebRTC video</strong> (box proxy :8787) · tokens off Pages · " +
           DOCS;
       } else if (g.needToken) {
         path.innerHTML =
@@ -287,9 +286,11 @@
           "<strong>Cams = LIVE + stills.</strong> Snapshots from nest-live.json → data/nest-snaps · polling ~60s.";
       } else if (g.live) {
         note.innerHTML =
-          "<strong>Cams = LIVE · still pending.</strong> SDM roster on glass (" +
+          "<strong>Cams = LIVE · tap pad for video.</strong> SDM roster (" +
           g.deviceCount +
-          " devices). Stills need event-image download → <code>data/nest-snaps/*.jpg</code> (auth Basic) or a WebRTC/go2rtc bridge — not inventable on static Pages. Refresh token already on box.";
+          "). Tap a pad → <code>nest-webrtc.html</code> via box proxy <code>scripts/nest-webrtc-proxy.mjs</code> (:8787). Tokens stay off Pages. See <code>" +
+          DOCS +
+          "</code>.";
       } else if (g.needToken) {
         note.innerHTML =
           "<strong>Cams = STUB (need token).</strong> Stage ready: <code>scripts/nest-fetch.mjs</code> + <code>" +
@@ -353,7 +354,7 @@
 
       if (stubEl) {
         if (showSnap) stubEl.textContent = "SDM · still";
-        else if (g.live && realCam) stubEl.textContent = "Still pending · auth proxy";
+        else if (g.live && realCam) stubEl.textContent = "TAP · WebRTC live";
         else if (g.needToken) stubEl.textContent = "Need SDM token";
         else stubEl.textContent = g.label;
       }
@@ -383,6 +384,8 @@
       else if (g.live) bannerTitle.textContent = "Climate LIVE · Nest LIVE · still pending";
       else bannerTitle.textContent = "Climate LIVE glass · Nest cams STUB";
     }
+    wirePadClicks(root);
+
     if (bannerSub) {
       if (g.live && g.hasSnaps) {
         bannerSub.textContent = "Sensi + Nest stills · Elo 3202L";
@@ -398,6 +401,60 @@
     }
   }
 
+
+  function proxyBaseGuess() {
+    try {
+      var saved = localStorage.getItem("wardosNestProxy");
+      if (saved) return saved.replace(/\/$/, "");
+    } catch (e) {}
+    return "http://127.0.0.1:8787";
+  }
+
+  /** Tap-to-open live WebRTC viewer (box/LAN proxy — tokens off Pages). */
+  function openViewer(cam) {
+    var id = cam && (cam.id || cam.name) ? encodeURIComponent(cam.id || cam.name) : "";
+    var proxy = proxyBaseGuess();
+    var token = "";
+    try {
+      token = localStorage.getItem("wardosNestProxyToken") || "";
+    } catch (e) {}
+    var url =
+      "nest-webrtc.html?cam=" +
+      id +
+      "&proxy=" +
+      encodeURIComponent(proxy) +
+      (token ? "&proxyToken=" + encodeURIComponent(token) : "");
+    try {
+      if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap();
+    } catch (e) {}
+    location.href = url;
+  }
+
+  function wirePadClicks(root) {
+    root = root || document;
+    var grid = root.querySelector(".cam-grid");
+    if (!grid || grid._nestWire) return;
+    grid._nestWire = true;
+    grid.addEventListener("click", function (ev) {
+      var art = ev.target && ev.target.closest ? ev.target.closest(".cam") : null;
+      if (!art) return;
+      var data = cachedData();
+      var g = gate(data);
+      if (!g.live) return;
+      var cams = (data && data.cameras) || [];
+      var articles = grid.querySelectorAll(".cam");
+      var idx = -1;
+      for (var i = 0; i < articles.length; i++) {
+        if (articles[i] === art) {
+          idx = i;
+          break;
+        }
+      }
+      var cam = idx >= 0 ? cams[idx] : null;
+      if (cam && !String(cam.id || "").startsWith("stub-")) openViewer(cam);
+    });
+  }
+
   global.HouseNest = {
     gate: function () {
       return gate(cachedData());
@@ -407,6 +464,9 @@
     startPolling: startPolling,
     onChange: onChange,
     paintPads: paintPads,
+    openViewer: openViewer,
+    wirePadClicks: wirePadClicks,
+    proxyBaseGuess: proxyBaseGuess,
     docs: DOCS,
   };
 })(typeof window !== "undefined" ? window : globalThis);

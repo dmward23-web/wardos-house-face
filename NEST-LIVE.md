@@ -2,7 +2,7 @@
 
 **Honest gate:** GitHub Pages is static. Nest / Google Home cams use **Google Device Access (SDM)** OAuth.
 
-**Status (2026-09-28):** Refresh token + `nest-sdm.json` **are on the box** (mode 600, never git). `nest-fetch` writes `status: live` with **5** real cams. Glass shows **LIVE · NO STILL** — roster honest, no invented video. Stills pending (WEB_RTC-only devices).
+**Status (2026-09-28 · NESTVID1):** Refresh token + `nest-sdm.json` on box (mode 600). **WebRTC live video works** via box proxy `scripts/nest-webrtc-proxy.mjs` → `nest-webrtc.html`. Proven tonight: **Front door** (384×512) + **Garage** (1920×1080) ICE connected + frames. Living Room / Kitchen returned SDM `FAILED_PRECONDITION` (not available). Tokens never on Pages.
 
 ## Live data flow (stage)
 
@@ -27,7 +27,12 @@ sheet-google-home.html polls every ~60s
 
 - **List devices:** camera / doorbell / display names + online when SDM returns them. **LIVE on glass.**
 - **Snapshots:** These house cams are **WEB_RTC-only** (no RTSP). `GenerateImage` / `GenerateRtspStream` are rejected. When a Pub/Sub `eventId` exists, nest-fetch can download Basic-auth image bytes into `data/nest-snaps/*.jpg` and set `snapshotUrl` to that relative path (Pages-safe; tokens off JSON). Until then `snapshotUrl` stays **null** — never invent video.
-- **RTSP / WebRTC:** RTSP unsupported on these devices; WebRTC stream grab is a future bridge (go2rtc / Scrypted).
+- **RTSP / WebRTC:** RTSP unsupported. **WebRTC LIVE path (NESTVID1):**
+  1. Box: `node scripts/nest-webrtc-proxy.mjs` → `http://127.0.0.1:8787`
+  2. Open `http://127.0.0.1:8787/nest-webrtc.html` (or tap a cam pad on Google Home sheet)
+  3. Browser builds Nest-legal SDP offer → proxy calls `GenerateWebRtcStream` → answer → ICE → `<video>`
+  4. Elo / LAN: `node scripts/nest-webrtc-proxy.mjs --lan` then `?proxy=http://<box-ip>:8787&proxyToken=…`
+  5. Secrets stay in `~/.config/wardos/` only — never git / never Pages
 
 ## Credential Atlas must request from Dan
 
@@ -155,3 +160,23 @@ git push origin main
 
 - Sensi climate (separate): **SENSI-LIVE.md** · `data/sensi-live.json`
 - Surface: `sheet-google-home.html`
+
+
+## WebRTC live video (NESTVID1)
+
+```bash
+# Atlas box — tokens already at ~/.config/wardos/
+cd /workspace/wardos-house-face
+node scripts/nest-webrtc-proxy.mjs          # 127.0.0.1:8787
+# Elo wall on LAN:
+# NEST_PROXY_TOKEN=secret node scripts/nest-webrtc-proxy.mjs --lan --port 8787
+```
+
+| URL | Role |
+|-----|------|
+| `http://127.0.0.1:8787/nest-webrtc.html` | Fullscreen viewer (tap cams) |
+| `http://127.0.0.1:8787/api/cameras` | Live roster |
+| `POST /api/webrtc` | `{ deviceId, offerSdp }` → `{ answerSdp, mediaSessionId }` |
+| Pages `nest-webrtc.html?proxy=…` | Same UI; points at box proxy |
+
+Pad tap on `sheet-google-home.html` opens the viewer. **No fake stills** — real WebRTC or honest error.

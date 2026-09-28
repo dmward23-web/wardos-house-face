@@ -4,7 +4,9 @@
   "description": "",
   "scripts": {
     "sensi-fetch": "node sensi-fetch.mjs",
-    "nest-fetch": "node nest-fetch.mjs"
+    "nest-fetch": "node nest-fetch.mjs",
+    "nest-webrtc": "node nest-webrtc-proxy.mjs",
+    "nest-webrtc-lan": "node nest-webrtc-proxy.mjs --lan"
   },
   "keywords": [],
   "author": "",
