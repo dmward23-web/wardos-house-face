@@ -1,8 +1,8 @@
 {
   "status": "live",
-  "fetchedAt": "2026-09-28T23:45:38.538Z",
-  "updatedAt": "2026-09-28T23:45:38.538Z",
-  "source": "nest-sdm",
+  "fetchedAt": "2026-09-28T19:09:41.060Z",
+  "updatedAt": "2026-09-28T19:09:41.060Z",
+  "source": "nest-sdm+webrtc-still",
   "cameras": [
     {
       "id": "AVPHwEuWj4tCzdBjnBewJT9cxMmyuqJ44t2xEpZoHxHxy6X98PTT5LylTtkH09YotPY0laUf5oSLDS0FIHtzER2511VUJA",
@@ -31,7 +31,7 @@
       "where": "Entry",
       "type": "DOORBELL",
       "online": null,
-      "snapshotUrl": null,
+      "snapshotUrl": "data/nest-snaps/front-door.jpg",
       "streamUrl": null,
       "traits": [
         "sdm.devices.traits.Info",
@@ -46,7 +46,9 @@
       "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEszjDhfLzGUeifKqDy5RxbNgy-ak0LIcIeP_ne3v_vm8QWlxJrFgtF-bxW-yPgNqCGwjmYWuJUQZX-HK6paZASTlQ",
       "protocols": [
         "WEB_RTC"
-      ]
+      ],
+      "snapCapturedAt": "2026-09-28T02:19:53.734Z",
+      "snapSize": "384x512"
     },
     {
       "id": "AVPHwEtJ7Bg8BNK_xeyUBSi4-8E7v9-b_1rH5UZSDNE7HNGH4uO44F8KpsbrYesj5DqMkGB_lRogpoYArP1Wo0aKF7-9Iw",
@@ -54,7 +56,7 @@
       "where": "Garage",
       "type": "CAMERA",
       "online": null,
-      "snapshotUrl": null,
+      "snapshotUrl": "data/nest-snaps/garage.jpg",
       "streamUrl": null,
       "traits": [
         "sdm.devices.traits.Info",
@@ -67,7 +69,9 @@
       "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEtJ7Bg8BNK_xeyUBSi4-8E7v9-b_1rH5UZSDNE7HNGH4uO44F8KpsbrYesj5DqMkGB_lRogpoYArP1Wo0aKF7-9Iw",
       "protocols": [
         "WEB_RTC"
-      ]
+      ],
+      "snapCapturedAt": "2026-09-28T02:20:02.167Z",
+      "snapSize": "1920x1080"
     },
     {
       "id": "AVPHwEtezQTp5yQU6h_0pWKlkCPORXdhYrCy96s1CVwjjT4NfAsP_hpfLy-kRlDF0ORI2c8AXwi9_Kq_yj_8rPZwyCH_6w",
@@ -96,7 +100,7 @@
       "where": "Yard",
       "type": "CAMERA",
       "online": null,
-      "snapshotUrl": null,
+      "snapshotUrl": "data/nest-snaps/backyard.jpg",
       "streamUrl": null,
       "traits": [
         "sdm.devices.traits.Info",
@@ -109,12 +113,14 @@
       "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEuvgj_bTQ6TzRNedMpdB-w5gs1bF2QHgvdTES9K5s9kshmS94FQCrNE_zPxr9PiWFmzVSCyRLj4f0G2RVo2biphPg",
       "protocols": [
         "WEB_RTC"
-      ]
+      ],
+      "snapCapturedAt": "2026-09-28T02:20:10.039Z",
+      "snapSize": "640x360"
     }
   ],
   "deviceCount": 5,
   "cameraCount": 5,
-  "stillsPending": true,
-  "stillNote": "WEB_RTC-only cams: GenerateImage/RTSP unsupported without event bridge. snapshotUrl null — never invent.",
+  "stillsPending": false,
+  "stillNote": "WebRTC canvas stills via nest-webrtc-still.mjs \u00b7 Pages-servable data/nest-snaps",
   "error": null
 }
