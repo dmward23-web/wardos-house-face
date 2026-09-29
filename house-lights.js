@@ -14,17 +14,11 @@
   var DOCS = "LIGHTS-LIVE.md";
 
   var STARTER = [
-    { id: "hall", name: "Hall", where: "Hall", kind: "bulb" },
-    { id: "kitchen", name: "Kitchen", where: "Kitchen", kind: "bulb" },
-    { id: "porch", name: "Porch", where: "Porch", kind: "bulb" }
+    { id: "dining-room", name: "Dining Room", where: "Dining Room", kind: "dimmer", on: true, brightness: 52 },
+    { id: "harris-room", name: "Harris's Room", where: "Harris's Room", kind: "dimmer", on: true, brightness: 100 },
+    { id: "kitchen", name: "Kitchen", where: "Kitchen", kind: "dimmer", on: true, brightness: 1 }
   ];
-  var RESERVED_OP = {
-    id: "op-wall-dimmer",
-    name: "OP wall dimmer",
-    where: "Overland Park",
-    kind: "dimmer",
-    pending: true
-  };
+
 
   var _liveCache = null;
   var _listeners = [];
@@ -45,7 +39,11 @@
   function loadDemo() {
     var base = {};
     for (var i = 0; i < STARTER.length; i++) {
-      base[STARTER[i].id] = { on: false, brightness: 100 };
+      var s = STARTER[i];
+      base[s.id] = {
+        on: typeof s.on === "boolean" ? s.on : false,
+        brightness: typeof s.brightness === "number" ? clampBright(s.brightness) : 100
+      };
     }
     try {
       var raw = localStorage.getItem(STATE_KEY);
@@ -175,8 +173,7 @@
 
   function reservedFromLive(data) {
     var r = (data && data.reserved) || [];
-    if (r.length) return r;
-    return [Object.assign({}, RESERVED_OP, { on: null, brightness: null, online: false })];
+    return r.length ? r : [];
   }
 
   /**
@@ -294,7 +291,7 @@
               on: null, brightness: null, online: null
             };
           }),
-          reserved: [Object.assign({}, RESERVED_OP, { on: null, brightness: null, online: false })],
+          reserved: [],
           error: "data/lights-live.json unavailable"
         });
       }
@@ -381,7 +378,7 @@
     var sub = doc.getElementById("lights-ctrl-sub");
     if (sub) {
       var names = eff.lights.map(function (L) { return L.name; }).join(" · ");
-      sub.textContent = names || "Hall · kitchen · porch";
+      sub.textContent = names || "Dining Room · Harris's Room · Kitchen";
     }
     var pill = doc.getElementById("lights-ctrl-pill");
     if (pill) {
@@ -442,7 +439,7 @@
           + '<button type="button" class="light-btn" disabled>On</button>'
           + '<button type="button" class="light-btn" disabled>Off</button>'
           + "</div>"
-          + '<div class="light-pad-src">OP Kasa · wait Atlas Wi-Fi confirm</div>'
+          + '<div class="light-pad-src">reserved · fold-in</div>'
           + "</article>";
       }
       grid.innerHTML = html;
@@ -505,6 +502,73 @@
     }
   }
 
+
+  /** Kid-board secondary shortcut: one named pad only (hub stays full roster). */
+  function paintKidPad(host, lightId, doc) {
+    doc = doc || document;
+    host = typeof host === "string" ? doc.querySelector(host) : host;
+    if (!host || !lightId) return;
+    var eff = effectiveLights();
+    var g = eff.gate;
+    var L = null;
+    for (var i = 0; i < eff.lights.length; i++) {
+      if (eff.lights[i].id === lightId) { L = eff.lights[i]; break; }
+    }
+    if (!L) {
+      host.innerHTML = '<div class="kid-light-miss">Light not in roster</div>';
+      return;
+    }
+    var onCls = L.on ? " is-on" : "";
+    var dim = (L.kind === "dimmer" || L.kind === "switch/dimmer");
+    var gateLab = g.label || (g.needToken ? "NEED TOKEN" : "DEMO");
+    host.innerHTML =
+      '<article class="light-pad kid-light-pad' + onCls + '" data-light-id="' + L.id + '">'
+      + '<div class="light-pad-top">'
+      + '<div class="light-pad-ico" aria-hidden="true">💡</div>'
+      + '<div><div class="light-pad-name">' + escapeHtml(L.name) + "</div>"
+      + '<div class="light-pad-where">My room · shortcut</div></div>'
+      + '<div class="light-pad-state">' + (L.on ? "ON" : "OFF") + "</div>"
+      + "</div>"
+      + '<div class="light-pad-actions">'
+      + '<button type="button" class="light-btn loud" data-act="on" data-id="' + L.id + '">On</button>'
+      + '<button type="button" class="light-btn" data-act="off" data-id="' + L.id + '">Off</button>'
+      + (dim
+        ? '<input class="light-bright" type="range" min="1" max="100" value="' + clampBright(L.brightness || 100) + '" data-id="' + L.id + '" aria-label="Brightness" />'
+        : "")
+      + "</div>"
+      + '<div class="light-pad-src">' + (eff.source === "live" ? "LIVE" : "DEMO") + " · " + escapeHtml(gateLab) + " · full house → Lights</div>"
+      + "</article>";
+    host.onclick = function (ev) {
+      var el = ev.target;
+      if (!el || !el.getAttribute) return;
+      var act = el.getAttribute("data-act");
+      var id = el.getAttribute("data-id");
+      if (!act || !id) return;
+      try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
+      if (act === "on") setLight(id, { on: true });
+      if (act === "off") setLight(id, { on: false });
+      paintKidPad(host, lightId, doc);
+    };
+    host.onchange = function (ev) {
+      var el = ev.target;
+      if (!el || !el.classList || !el.classList.contains("light-bright")) return;
+      var id = el.getAttribute("data-id");
+      if (!id) return;
+      setLight(id, { on: true, brightness: clampBright(el.value) });
+      paintKidPad(host, lightId, doc);
+    };
+  }
+
+  function mountKidLight(selector, lightId) {
+    var doc = document;
+    var host = typeof selector === "string" ? doc.querySelector(selector) : selector;
+    if (!host || !lightId) return;
+    function repaint() { paintKidPad(host, lightId, doc); }
+    onChange(repaint);
+    startPolling();
+    repaint();
+  }
+
   global.HouseLights = {
     STATE_KEY: STATE_KEY,
     LIVE_URL: LIVE_URL,
@@ -523,6 +587,8 @@
     mountChip: mountChip,
     paintPads: paintPads,
     wireAllButtons: wireAllButtons,
+    paintKidPad: paintKidPad,
+    mountKidLight: mountKidLight,
     clampBright: clampBright
   };
 })(typeof window !== "undefined" ? window : globalThis);

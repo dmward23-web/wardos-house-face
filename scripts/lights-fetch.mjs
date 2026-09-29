@@ -44,23 +44,9 @@ function readToken(opts) {
 }
 
 const STARTER = [
-  { id: "hall", name: "Hall", where: "Hall", kind: "bulb", on: null, brightness: null, online: null },
-  { id: "kitchen", name: "Kitchen", where: "Kitchen", kind: "bulb", on: null, brightness: null, online: null },
-  { id: "porch", name: "Porch", where: "Porch", kind: "bulb", on: null, brightness: null, online: null },
-];
-
-const RESERVED = [
-  {
-    id: "op-wall-dimmer",
-    name: "OP wall dimmer",
-    where: "Overland Park",
-    kind: "dimmer",
-    on: null,
-    brightness: null,
-    online: false,
-    pending: true,
-    note: "KS220/HS220 · fold in when Atlas confirms Wi-Fi online",
-  },
+  { id: "dining-room", name: "Dining Room", where: "Dining Room", kind: "dimmer", on: true, brightness: 52, online: true },
+  { id: "harris-room", name: "Harris's Room", where: "Harris's Room", kind: "dimmer", on: true, brightness: 100, online: true },
+  { id: "kitchen", name: "Kitchen", where: "Kitchen", kind: "dimmer", on: true, brightness: 1, online: true },
 ];
 
 function main() {
@@ -75,21 +61,20 @@ function main() {
       source: "kasa-pending",
       writeSupported: false,
       lights: STARTER,
-      reserved: RESERVED,
+      reserved: [],
       error:
-        "Need Kasa cloud token or LAN control path on Atlas box (~/.config/wardos/ has nest + sensi only). OP wall dimmer reserved pending Atlas confirm.",
+        "NEED TOKEN · no Kasa cloud yet. Screenshot roster DEMO seeds only (Dining/Harris/Kitchen) — do not paint LIVE. OP Kasa online; LIVE cloud still need_token.",
     };
   } else {
-    /* Token present but live Kasa client not wired yet — stay honest. */
     payload = {
       status: "need_token",
       fetchedAt,
       source: "kasa-pending",
       writeSupported: false,
       lights: STARTER,
-      reserved: RESERVED,
+      reserved: [],
       error:
-        "Kasa token file present but lights cloud/LAN client not wired yet — do not invent LIVE. Fold OP dimmer when Atlas confirms online.",
+        "Kasa token file present but lights cloud/LAN client not wired yet — do not invent LIVE.",
     };
   }
   fs.mkdirSync(path.dirname(opts.outPath), { recursive: true });

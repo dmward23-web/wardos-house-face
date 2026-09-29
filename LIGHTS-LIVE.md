@@ -15,8 +15,9 @@ data/lights-live.json  (committed / pushed)
      ↓
 House Face UI polls JSON every ~60s
   sheet-index.html Lights oval
-  sheet-google-home.html Lights tile
-  sheet-lights.html pads
+  sheet-google-home.html Lights tile (PRIMARY · full roster)
+  sheet-lights.html pads (PRIMARY · full roster)
+  kid-harris.html Harris's Room only (secondary shortcut)
 ```
 
 - **Read:** per-light `on`, `brightness` (dimmers), `online`.
@@ -42,18 +43,19 @@ Or env: `export KASA_TOKEN='…'` on the Atlas cron user.
 
 **Today on box:** `~/.config/wardos/` has Nest + Sensi only — **no Kasa token yet**.
 
-## Starter roster (provisional IDs)
+## Roster (LIGHTS2 · from Ward home screenshot)
 
-Pad names from Google Home secondary strip — kebab ids until live fetch renames:
+Named dimmers/switches — kebab ids. Screenshot on/brightness seed DEMO defaults only; gate stays **NEED TOKEN** (never paint LIVE from snapshot alone).
 
-| id | name | where | kind |
-|----|------|-------|------|
-| `hall` | Hall | Hall | bulb |
-| `kitchen` | Kitchen | Kitchen | bulb |
-| `porch` | Porch | Porch | bulb |
-| `op-wall-dimmer` | OP wall dimmer | Overland Park | dimmer · **pending** |
+| id | name | where | kind | DEMO seed |
+|----|------|-------|------|-----------|
+| `dining-room` | Dining Room | Dining Room | dimmer | on · 52 |
+| `harris-room` | Harris's Room | Harris's Room | dimmer | on · 100 |
+| `kitchen` | Kitchen | Kitchen | dimmer | on · 1 |
 
-**OP Kasa KS220/HS220** (`op-wall-dimmer`): reserved fold-in slot · `online:false` · `pending:true` · **not live until Atlas confirms that dimmer is online on Wi-Fi**. Do not invent pairing.
+**OP Kasa online** (Dan via Atlas). LIVE cloud still `need_token`. No separate pending stub — these three are the primary controllable pads.
+
+**Hub vs kid boards:** `sheet-lights` / Google Home Lights tile = PRIMARY full roster (Dining / Harris / Kitchen · sits with Sensi/Nest). Each kid board gets that kid's named switch only as a secondary shortcut (`kid-harris` → `harris-room` via `HouseLights.mountKidLight`). Same pattern later for Ainsley/Hayes when those lights exist.
 
 ## Run fetch (Atlas box — when tokened)
 
@@ -85,16 +87,16 @@ Secrets **never** on Pages / git.
 ```json
 {
   "status": "need_token",
-  "fetchedAt": "2026-09-28T00:00:00.000Z",
+  "fetchedAt": "2026-09-29T00:01:00.000Z",
   "source": "kasa-pending",
   "writeSupported": false,
   "lights": [
-    { "id": "hall", "name": "Hall", "where": "Hall", "kind": "bulb", "on": null, "brightness": null, "online": null }
+    { "id": "dining-room", "name": "Dining Room", "where": "Dining Room", "kind": "dimmer", "on": true, "brightness": 52, "online": true },
+    { "id": "harris-room", "name": "Harris's Room", "where": "Harris's Room", "kind": "dimmer", "on": true, "brightness": 100, "online": true },
+    { "id": "kitchen", "name": "Kitchen", "where": "Kitchen", "kind": "dimmer", "on": true, "brightness": 1, "online": true }
   ],
-  "reserved": [
-    { "id": "op-wall-dimmer", "name": "OP wall dimmer", "where": "Overland Park", "kind": "dimmer", "on": null, "brightness": null, "online": false, "pending": true }
-  ],
-  "error": "Need Kasa cloud token or LAN control path on Atlas box"
+  "reserved": [],
+  "error": "NEED TOKEN · screenshot DEMO seeds only · do not paint LIVE"
 }
 ```
 
@@ -103,7 +105,7 @@ Secrets **never** on Pages / git.
 - No **LIVE** label unless `status === "live"` and snapshot is fresh.
 - Missing token → clear **NEED TOKEN**.
 - DEMO writes remain labeled DEMO until `writeSupported` is true.
-- OP wall dimmer stays pending / offline until Atlas confirms Wi-Fi online — then fold into `lights[]`.
+- Screenshot on/brightness may seed DEMO pad defaults; gate label stays NEED TOKEN.
 
 ## Related
 
