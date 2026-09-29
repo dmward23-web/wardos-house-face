@@ -390,9 +390,123 @@
   letter-spacing: 0.08em;
 }
 
+/* LIGHTDIM1 · LIVE HS220 dimmers get premium fill · stubs stay dark (no track) */
+#hub-lights-panel.hub-lights--cams .hub-sw--dim,
+#hub-lights-panel.hub-lights--cmd .hub-sw--dim,
+#hub-lights-panel.hub-lights--hot .hub-sw--dim {
+  min-height: 34px !important;
+  max-height: 42px !important;
+  height: auto !important;
+  padding: 4px 8px !important;
+}
+
 #hub-lights-panel.hub-lights--cams .hub-sw-dim,
 #hub-lights-panel.hub-lights--cmd .hub-sw-dim,
 #hub-lights-panel.hub-lights--hot .hub-sw-dim {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  align-items: center !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+  max-width: 148px;
+  margin: 0 2px 0 4px;
+}
+
+#hub-lights-panel .hub-sw-dim.is-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+#hub-lights-panel .hub-sw-track {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 56px;
+  height: 18px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(12, 14, 18, 0.92), rgba(28, 32, 40, 0.88));
+  border: 1.5px solid rgba(0, 0, 0, 0.75);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.55),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  overflow: hidden;
+}
+
+#hub-lights-panel .hub-sw-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, #a85808 0%, #f0a818 48%, #ffe894 100%);
+  box-shadow:
+    0 0 12px rgba(255, 180, 30, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+  transition: width 0.06s linear;
+}
+
+#hub-lights-panel .hub-sw.is-off .hub-sw-fill {
+  opacity: 0.28;
+  filter: saturate(0.55);
+}
+
+#hub-lights-panel .hub-sw-thumb {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #fffaf0, #e8e0d0);
+  border: 1px solid rgba(20, 22, 28, 0.5);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+  transition: left 0.06s linear;
+  z-index: 1;
+}
+
+#hub-lights-panel .hub-sw.is-off .hub-sw-thumb {
+  background: linear-gradient(180deg, #8a9098, #4a5058);
+  opacity: 0.7;
+}
+
+#hub-lights-panel .hub-sw-pct {
+  flex: 0 0 34px;
+  text-align: right;
+  font-size: 10px !important;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  color: #ffe8a8;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+#hub-lights-panel .hub-sw.is-off .hub-sw-pct {
+  color: rgba(160, 168, 180, 0.75);
+}
+
+/* LIVE dimmer text column stays narrow so fill has room */
+#hub-lights-panel.hub-lights--hot .hub-sw--dim .hub-sw-text,
+#hub-lights-panel.hub-lights--cmd .hub-sw--dim .hub-sw-text,
+#hub-lights-panel.hub-lights--cams .hub-sw--dim .hub-sw-text {
+  flex: 0 0 auto;
+  max-width: 72px;
+}
+
+/* Stubs: never show dim track / fake % */
+#hub-lights-panel .hub-sw.is-stub .hub-sw-dim,
+#hub-lights-panel .hub-sw.hub-sw--stub .hub-sw-dim,
+#hub-lights-panel .hub-sw.is-stub .hub-sw-track,
+#hub-lights-panel .hub-sw.hub-sw--stub .hub-sw-track {
   display: none !important;
 }
 
@@ -680,4 +794,19 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   LIGHTDIM1 · LIVE brightness fill on Dining/Harris/Kitchen
+   HS220 dimmers · stubs stay NEED CONNECT (no fake %)
+   ═══════════════════════════════════════════════════════════ */
+
+
+/* LEAVESCRUB2 · hide schedule list chrome entirely · hero only */
+.hub-upper.hub-upper--hot .leaveby-sched,
+.leaveby.leaveby--hot .leaveby-sched,
+.hub-upper.hub-upper--cmd .leaveby-sched,
+.leaveby.leaveby--cmd .leaveby-sched {
+  display: none !important;
 }
