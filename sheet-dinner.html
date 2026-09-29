@@ -257,6 +257,14 @@
  .day-row .pick { flex: 1; font-size: 16px; font-weight: 700; letter-spacing: -0.02em; color: #121418; }
  .day-row .pick.win-pick { color: #8a6010; }
  .day-row .tag { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #8a8e96; }
+ /* VITA1 · today row is loud (amber), past nights are muted */
+ .day-row.is-today {
+ background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(255,236,180,0.6));
+ border: 2px solid rgba(210,160,40,0.6);
+ box-shadow: 0 0 0 3px rgba(255,220,100,0.25);
+ }
+ .day-row.is-today .dow, .day-row.is-today .tag { color: #8a6010; }
+ .day-row.is-past { opacity: 0.55; }
  .suggest {
  margin-top: auto; border-radius: 14px; padding: 14px 16px;
  border: 2px dashed rgba(90,94,102,0.35);
@@ -313,7 +321,7 @@
  <div class="cheer-accent"></div>
  <div class="cheer-body">
  <div class="cheer-main">
- <div class="cheer-label">Tonight </div>
+ <div class="cheer-label">Tonight</div>
  <div class="cheer-title"><span data-live="date-short">—</span> · <span class="hl" data-dinner-tonight>no pick yet</span></div>
  <div class="cheer-sub"><strong>Fuel</strong> · sleep → water → protein when you eat · no grocery dollars</div>
  </div>
@@ -341,18 +349,18 @@
  <div class="sec-meta">Sat 26 → Fri Oct 2</div>
  </div>
  <div class="list">
- <div class="day-row"><span class="dow">Sat</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row"><span class="dow">Sun</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row"><span class="dow">Mon</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row"><span class="dow">Tue</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row"><span class="dow">Wed</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row"><span class="dow">Thu</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row"><span class="dow">Fri</span><span class="pick">Handoff day · keep light</span><span class="tag">Oct 2</span></div>
+ <div class="day-row" data-date="2026-09-26"><span class="dow">Sat</span><span class="pick">—</span><span class="tag">open</span></div>
+ <div class="day-row" data-date="2026-09-27"><span class="dow">Sun</span><span class="pick">—</span><span class="tag">open</span></div>
+ <div class="day-row" data-date="2026-09-28"><span class="dow">Mon</span><span class="pick">—</span><span class="tag">open</span></div>
+ <div class="day-row" data-date="2026-09-29"><span class="dow">Tue</span><span class="pick">—</span><span class="tag">open</span></div>
+ <div class="day-row" data-date="2026-09-30"><span class="dow">Wed</span><span class="pick">—</span><span class="tag">open</span></div>
+ <div class="day-row" data-date="2026-10-01"><span class="dow">Thu</span><span class="pick">—</span><span class="tag">open</span></div>
+ <div class="day-row" data-date="2026-10-02"><span class="dow">Fri</span><span class="pick">Handoff day · keep light</span><span class="tag">Oct 2</span></div>
  </div>
  <div class="suggest">
- <div class="lbl">+ Suggest</div>
- <div class="big">Tap to add a meal idea</div>
- <div class="hint">Kids suggest · grown-ups lock the night</div>
+ <div class="lbl">Suggest</div>
+ <div class="big">Meal idea? Tell Dad</div>
+ <div class="hint">Kids suggest · Dad locks the night</div>
  </div>
  </section>
  <section class="sec" aria-label="Each kid votes">
@@ -392,15 +400,19 @@
 (function () {
   function markToday() {
     if (!window.HouseClock) return;
-    var dow = HouseClock.now().dow;
+    var now = HouseClock.now(), dow = now.dow, todayIso = now.iso;
     document.querySelectorAll(".day-row").forEach(function (row) {
       var d = row.querySelector(".dow"), pick = row.querySelector(".pick"), tag = row.querySelector(".tag");
       if (!d || !pick || !tag) return;
       if (!tag.hasAttribute("data-orig")) tag.setAttribute("data-orig", tag.textContent);
       if (!pick.hasAttribute("data-orig")) pick.setAttribute("data-orig", pick.textContent);
-      var isToday = d.textContent.trim() === dow;
+      /* VITA1 · match on CT ISO date (data-date) so next week's Tue never lights; dow is the fallback */
+      var rowIso = row.getAttribute("data-date");
+      var isToday = rowIso ? rowIso === todayIso : d.textContent.trim() === dow;
+      var isPast = !!(rowIso && todayIso && rowIso < todayIso);
       row.classList.toggle("is-today", isToday);
-      tag.textContent = isToday ? "today" : tag.getAttribute("data-orig");
+      row.classList.toggle("is-past", isPast && !isToday);
+      tag.textContent = isToday ? "today" : (isPast ? "past" : tag.getAttribute("data-orig"));
       var orig = pick.getAttribute("data-orig");
       pick.textContent = (isToday && orig.trim() === "—") ? "no pick yet" : orig;
     });
