@@ -1,7 +1,7 @@
 # KIDENGAGE1 · kid flip cards · who’s up · claim · streak · SFX
 
 **When:** 2026-09-28 ~20:45 CT  
-**Tip:** `72cf272`  
+**Tip:** `ab97c17`  
 **Page:** https://dmward23-web.github.io/wardos-house-face/sheet-index.html
 
 ## Shipped
