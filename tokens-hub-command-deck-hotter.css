@@ -1,0 +1,606 @@
+/* ============================================================
+   WARDOS · hub-command-deck-hotter LOOK tokens · CMDDECK2 / LIGHTS8-DENSE9
+   Plate only — Atlas paste after Dan last-yes.
+   Scoped under .hub-upper / .leaveby / #hub-lights-panel / .hub-cam-deck.
+   Forces 9 denser horizontal rows in ~350×420 command badge.
+   LIVE = Dining · Harris · Kitchen. STUB = Dad · Ainsley · Hayes · Living · Family · Basement.
+   No live HTML edit from this file.
+   ============================================================ */
+
+:root {
+  --cmd-void: #010205;
+  --cmd-ink: #f6f9fd;
+  --cmd-amber: #ffc040;
+  --cmd-amber-hi: #ffe8a0;
+  --cmd-amber-on: #f0a818;
+  --cmd-cyan: #5ec8e0;
+  --cmd-cyan-hi: #8ae0f4;
+  --cmd-mute: rgba(170, 195, 220, 0.48);
+  --cmd-glass:
+    linear-gradient(165deg, rgba(8,10,16,0.98) 0%, rgba(18,14,6,0.94) 48%, rgba(4,6,12,0.98) 100%);
+  --cmd-border: rgba(255, 190, 64, 0.55);
+  --cmd-border-hot: rgba(255, 210, 90, 0.78);
+  --cmd-bloom-amber: rgba(255, 170, 30, 0.42);
+  --cmd-bloom-cyan: rgba(94, 200, 224, 0.28);
+  --hub-command-h: 420px;
+  --hub-lights-w: 350px;
+  --hub-sw-row-h: 34px;
+  --hub-tap-min: 30px;
+  --hub-bulk-min: 36px;
+  --hub-rocker-w: 58px;
+  --hub-knob: 22px;
+}
+
+/* —— Command row lock (taller for 9 denser slots) —— */
+.hub-upper.hub-upper--cams,
+.hub-upper.hub-upper--cmd,
+.hub-upper.hub-upper--hot {
+  flex: 0 0 var(--hub-command-h) !important;
+  height: var(--hub-command-h) !important;
+  min-height: var(--hub-command-h) !important;
+  max-height: var(--hub-command-h) !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CAM DECK · sharper bezels + cyan edge light
+   ═══════════════════════════════════════════════════════════ */
+.hub-cam-deck .hub-cam,
+#hub-cam-deck .hub-cam {
+  border: 2px solid rgba(140, 230, 250, 0.58) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.2) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.6) inset,
+    0 12px 32px rgba(0, 0, 0, 0.5),
+    0 0 28px var(--cmd-bloom-cyan),
+    0 0 2px rgba(180, 240, 255, 0.45) !important;
+  border-radius: 14px !important;
+}
+
+.hub-cam-deck .hub-cam-foot,
+#hub-cam-deck .hub-cam-foot {
+  border-top: 1px solid rgba(140, 230, 250, 0.28) !important;
+  background: linear-gradient(180deg, rgba(4,6,10,0.96), rgba(1,2,4,0.99)) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LEAVEBY-DARK-HOT · deeper void · hotter amber numeral
+   ═══════════════════════════════════════════════════════════ */
+.hub-upper.hub-upper--cams .leaveby,
+.hub-upper.hub-upper--cmd .leaveby,
+.hub-upper.hub-upper--hot .leaveby,
+.leaveby.leaveby--cmd,
+.leaveby.leaveby--hot {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  color: var(--cmd-ink) !important;
+  background: var(--cmd-glass) !important;
+  border: 2px solid var(--cmd-border) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 230, 160, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 12px 0 rgba(8, 10, 14, 0.4),
+    0 0 42px var(--cmd-bloom-amber),
+    0 0 2px rgba(255, 200, 80, 0.35) !important;
+  padding: 12px 14px 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  position: relative;
+  overflow: hidden;
+  animation: none !important;
+}
+
+.hub-upper.hub-upper--cams .leaveby::before,
+.hub-upper.hub-upper--cmd .leaveby::before,
+.hub-upper.hub-upper--hot .leaveby::before,
+.leaveby.leaveby--cmd::before,
+.leaveby.leaveby--hot::before {
+  content: "";
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 72% 50% at 10% -10%, rgba(255, 190, 50, 0.28), transparent 58%),
+    radial-gradient(ellipse 44% 40% at 98% 102%, rgba(94, 200, 224, 0.16), transparent 55%);
+  opacity: 1 !important;
+  animation: none !important;
+}
+
+.hub-upper.hub-upper--cams .leaveby > *,
+.hub-upper.hub-upper--cmd .leaveby > *,
+.hub-upper.hub-upper--hot .leaveby > *,
+.leaveby.leaveby--cmd > *,
+.leaveby.leaveby--hot > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hub-upper.hub-upper--cams .leaveby-label,
+.hub-upper.hub-upper--cmd .leaveby-label,
+.hub-upper.hub-upper--hot .leaveby-label,
+.leaveby.leaveby--cmd .leaveby-label,
+.leaveby.leaveby--hot .leaveby-label {
+  color: var(--cmd-amber-hi) !important;
+  font-size: 12px !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 0 12px rgba(255, 180, 40, 0.35);
+}
+
+.hub-upper.hub-upper--cams .leaveby-badge,
+.hub-upper.hub-upper--cmd .leaveby-badge,
+.hub-upper.hub-upper--hot .leaveby-badge,
+.leaveby.leaveby--cmd .leaveby-badge,
+.leaveby.leaveby--hot .leaveby-badge {
+  background: linear-gradient(180deg, #fff0a8, #f0a818) !important;
+  color: #140c02 !important;
+  border: 1px solid #9a6810 !important;
+  box-shadow: 0 2px 0 #6a4010, inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 0 14px rgba(255, 180, 40, 0.35) !important;
+}
+
+/* PASS-BY #1 — bigger hotter next-time numeral */
+.hub-upper.hub-upper--cams .leaveby-main .time,
+.hub-upper.hub-upper--cmd .leaveby-main .time,
+.hub-upper.hub-upper--hot .leaveby-main .time,
+.leaveby.leaveby--cmd .leaveby-time,
+.leaveby.leaveby--cmd .leaveby-main .time,
+.leaveby.leaveby--hot .leaveby-time,
+.leaveby.leaveby--hot .leaveby-main .time {
+  font-size: clamp(72px, 10vw, 108px) !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.08em !important;
+  line-height: 0.86 !important;
+  color: var(--cmd-amber-hi) !important;
+  text-shadow:
+    0 0 48px rgba(255, 180, 30, 0.72),
+    0 0 18px rgba(255, 200, 60, 0.45),
+    0 2px 0 rgba(0, 0, 0, 0.65) !important;
+}
+
+.hub-upper.hub-upper--cams .leaveby-detail,
+.hub-upper.hub-upper--cmd .leaveby-detail,
+.hub-upper.hub-upper--hot .leaveby-detail,
+.leaveby.leaveby--cmd .leaveby-what,
+.leaveby.leaveby--cmd .leaveby-detail,
+.leaveby.leaveby--hot .leaveby-what,
+.leaveby.leaveby--hot .leaveby-detail {
+  color: rgba(235, 225, 195, 0.88) !important;
+}
+.hub-upper.hub-upper--cams .leaveby-detail strong,
+.hub-upper.hub-upper--cmd .leaveby-detail strong,
+.hub-upper.hub-upper--hot .leaveby-detail strong,
+.leaveby.leaveby--cmd .leaveby-what span,
+.leaveby.leaveby--hot .leaveby-what span {
+  color: var(--cmd-amber) !important;
+}
+
+.hub-upper.hub-upper--cams .leaveby-sec-hdr,
+.hub-upper.hub-upper--cmd .leaveby-sec-hdr,
+.hub-upper.hub-upper--hot .leaveby-sec-hdr,
+.leaveby.leaveby--cmd .leaveby-sec-hdr,
+.leaveby.leaveby--hot .leaveby-sec-hdr {
+  color: rgba(255, 210, 130, 0.78) !important;
+}
+
+.hub-upper.hub-upper--cams .leaveby-row,
+.hub-upper.hub-upper--cmd .leaveby-row,
+.hub-upper.hub-upper--hot .leaveby-row,
+.leaveby.leaveby--cmd .leaveby-row,
+.leaveby.leaveby--hot .leaveby-row {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  color: var(--cmd-ink) !important;
+}
+
+.hub-upper.hub-upper--cams .leaveby-row.is-next,
+.hub-upper.hub-upper--cmd .leaveby-row.is-next,
+.hub-upper.hub-upper--hot .leaveby-row.is-next,
+.leaveby.leaveby--cmd .leaveby-row.is-next,
+.leaveby.leaveby--hot .leaveby-row.is-next {
+  background: linear-gradient(145deg, rgba(255, 200, 70, 0.3), rgba(180, 90, 10, 0.22)) !important;
+  border-color: rgba(255, 200, 80, 0.65) !important;
+  box-shadow: 0 0 20px rgba(255, 170, 30, 0.28) !important;
+}
+
+.hub-upper.hub-upper--cams .leaveby-row-time,
+.hub-upper.hub-upper--cmd .leaveby-row-time,
+.hub-upper.hub-upper--hot .leaveby-row-time,
+.leaveby.leaveby--cmd .leaveby-row-time,
+.leaveby.leaveby--hot .leaveby-row-time {
+  color: rgba(255, 210, 130, 0.92) !important;
+}
+.hub-upper.hub-upper--cams .leaveby-row.is-next .leaveby-row-time,
+.hub-upper.hub-upper--cmd .leaveby-row.is-next .leaveby-row-time,
+.hub-upper.hub-upper--hot .leaveby-row.is-next .leaveby-row-time,
+.leaveby.leaveby--cmd .leaveby-row.is-next .leaveby-row-time,
+.leaveby.leaveby--hot .leaveby-row.is-next .leaveby-row-time {
+  color: var(--cmd-amber-hi) !important;
+}
+
+.hub-upper.hub-upper--cams .leaveby-row-title,
+.hub-upper.hub-upper--cmd .leaveby-row-title,
+.hub-upper.hub-upper--hot .leaveby-row-title,
+.leaveby.leaveby--cmd .leaveby-row-title,
+.leaveby.leaveby--hot .leaveby-row-title {
+  color: #f4f0e8 !important;
+}
+.hub-upper.hub-upper--cams .leaveby-row.is-next .leaveby-row-title,
+.hub-upper.hub-upper--cmd .leaveby-row.is-next .leaveby-row-title,
+.hub-upper.hub-upper--hot .leaveby-row.is-next .leaveby-row-title,
+.leaveby.leaveby--cmd .leaveby-row.is-next .leaveby-row-title,
+.leaveby.leaveby--hot .leaveby-row.is-next .leaveby-row-title {
+  color: #fff8e0 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LIGHTS8-DENSE9 · 9 horizontal pill rows · LIVE + STUB
+   ═══════════════════════════════════════════════════════════ */
+#hub-lights-panel.hub-lights--cams,
+#hub-lights-panel.hub-lights--cmd,
+#hub-lights-panel.hub-lights--hot,
+.hub-lights.hub-lights--cams,
+.hub-lights.hub-lights--cmd,
+.hub-lights.hub-lights--hot {
+  flex: 0 0 var(--hub-lights-w) !important;
+  width: var(--hub-lights-w) !important;
+  max-width: var(--hub-lights-w) !important;
+  min-width: 300px;
+  height: 100% !important;
+  max-height: 100% !important;
+  align-self: stretch !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  padding: 8px 10px 8px !important;
+  border-radius: 16px !important;
+  color: #f4f0e8;
+  background: var(--cmd-glass) !important;
+  border: 2px solid var(--cmd-border-hot) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 230, 160, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 12px 0 rgba(8, 10, 14, 0.4),
+    0 0 48px var(--cmd-bloom-amber),
+    0 0 2px rgba(255, 210, 90, 0.4) !important;
+  overflow: hidden !important;
+  position: relative;
+}
+
+#hub-lights-panel.hub-lights--cams::before,
+#hub-lights-panel.hub-lights--cmd::before,
+#hub-lights-panel.hub-lights--hot::before,
+.hub-lights.hub-lights--cams::before,
+.hub-lights.hub-lights--cmd::before,
+.hub-lights.hub-lights--hot::before {
+  content: "";
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 85% 48% at 50% -12%, rgba(255, 190, 50, 0.22), transparent 58%),
+    radial-gradient(ellipse 40% 30% at 100% 100%, rgba(94, 200, 224, 0.1), transparent 55%);
+}
+
+#hub-lights-panel.hub-lights--cams > *,
+#hub-lights-panel.hub-lights--cmd > *,
+#hub-lights-panel.hub-lights--hot > *,
+.hub-lights.hub-lights--cams > *,
+.hub-lights.hub-lights--cmd > *,
+.hub-lights.hub-lights--hot > * {
+  position: relative;
+  z-index: 1;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-lights-head,
+#hub-lights-panel.hub-lights--cmd .hub-lights-head,
+#hub-lights-panel.hub-lights--hot .hub-lights-head {
+  flex: 0 0 auto;
+  min-height: 22px;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-lights-title,
+#hub-lights-panel.hub-lights--cmd .hub-lights-title,
+#hub-lights-panel.hub-lights--hot .hub-lights-title {
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  color: #fff0b8;
+  text-shadow: 0 0 12px rgba(255, 180, 40, 0.4);
+}
+
+#hub-lights-panel.hub-lights--cams .hub-lights-sub,
+#hub-lights-panel.hub-lights--cmd .hub-lights-sub,
+#hub-lights-panel.hub-lights--hot .hub-lights-sub {
+  display: none !important;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-lights-bulk,
+#hub-lights-panel.hub-lights--cmd .hub-lights-bulk,
+#hub-lights-panel.hub-lights--hot .hub-lights-bulk {
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-lights-bulk-btn,
+#hub-lights-panel.hub-lights--cmd .hub-lights-bulk-btn,
+#hub-lights-panel.hub-lights--hot .hub-lights-bulk-btn {
+  min-height: var(--hub-bulk-min) !important;
+  height: var(--hub-bulk-min);
+  padding: 4px 8px !important;
+  border-radius: 9px !important;
+  font-size: 11px !important;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-lights-grid,
+#hub-lights-panel.hub-lights--cmd .hub-lights-grid,
+#hub-lights-panel.hub-lights--hot .hub-lights-grid {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  overflow: hidden !important;
+}
+
+/* Dense horizontal switch row · ~32–36px */
+#hub-lights-panel.hub-lights--cams .hub-sw,
+#hub-lights-panel.hub-lights--cmd .hub-sw,
+#hub-lights-panel.hub-lights--hot .hub-sw {
+  flex: 1 1 0 !important;
+  min-height: 30px !important;
+  max-height: 36px !important;
+  height: var(--hub-sw-row-h);
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  padding: 3px 8px !important;
+  border-radius: 10px !important;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-sw-main,
+#hub-lights-panel.hub-lights--cmd .hub-sw-main,
+#hub-lights-panel.hub-lights--hot .hub-sw-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-sw-name,
+#hub-lights-panel.hub-lights--cmd .hub-sw-name,
+#hub-lights-panel.hub-lights--hot .hub-sw-name {
+  font-size: 13px !important;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-sw-meta,
+#hub-lights-panel.hub-lights--cmd .hub-sw-meta,
+#hub-lights-panel.hub-lights--hot .hub-sw-meta {
+  font-size: 9px !important;
+  margin-top: 0 !important;
+  letter-spacing: 0.08em;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-sw-dim,
+#hub-lights-panel.hub-lights--cmd .hub-sw-dim,
+#hub-lights-panel.hub-lights--hot .hub-sw-dim {
+  display: none !important;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-lights-more,
+#hub-lights-panel.hub-lights--cmd .hub-lights-more,
+#hub-lights-panel.hub-lights--hot .hub-lights-more {
+  display: none !important;
+}
+
+/* —— LIVE amber ON DNA —— */
+#hub-lights-panel .hub-sw.is-on:not(.is-stub),
+#hub-lights-panel .hub-sw.hub-sw--live.is-on {
+  background: linear-gradient(145deg, rgba(255, 200, 70, 0.28), rgba(180, 90, 10, 0.22)) !important;
+  border: 1.5px solid rgba(255, 200, 80, 0.7) !important;
+  box-shadow: 0 0 16px rgba(255, 170, 30, 0.28), inset 0 1px 0 rgba(255, 230, 160, 0.28) !important;
+}
+
+#hub-lights-panel .hub-sw.is-off:not(.is-stub),
+#hub-lights-panel .hub-sw.hub-sw--live.is-off {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: none !important;
+}
+
+/* —— STUB · muted dashed ghost · never LIVE —— */
+#hub-lights-panel .hub-sw.is-stub,
+#hub-lights-panel .hub-sw.hub-sw--stub {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1.5px dashed rgba(140, 160, 180, 0.28) !important;
+  box-shadow: none !important;
+  opacity: 0.72 !important;
+}
+
+#hub-lights-panel .hub-sw.is-stub .hub-sw-name,
+#hub-lights-panel .hub-sw.hub-sw--stub .hub-sw-name {
+  color: rgba(160, 175, 190, 0.72) !important;
+  font-weight: 750 !important;
+}
+
+#hub-lights-panel .hub-sw.is-stub .hub-sw-meta,
+#hub-lights-panel .hub-sw.hub-sw--stub .hub-sw-meta {
+  color: rgba(140, 155, 170, 0.55) !important;
+}
+
+#hub-lights-panel .hub-sw-stub-pill {
+  flex: 0 0 auto;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(80, 90, 105, 0.35);
+  border: 1px solid rgba(140, 155, 170, 0.35);
+  color: rgba(180, 190, 205, 0.75);
+}
+
+/* —— Horizontal pill rocker (LIVE denser) —— */
+#hub-lights-panel.hub-lights--cams .hub-sw-rocker,
+#hub-lights-panel.hub-lights--cmd .hub-sw-rocker,
+#hub-lights-panel.hub-lights--hot .hub-sw-rocker {
+  appearance: none;
+  cursor: pointer;
+  position: relative;
+  flex: 0 0 var(--hub-rocker-w) !important;
+  width: var(--hub-rocker-w) !important;
+  min-width: var(--hub-rocker-w) !important;
+  max-width: var(--hub-rocker-w) !important;
+  height: var(--hub-tap-min) !important;
+  min-height: var(--hub-tap-min) !important;
+  max-height: var(--hub-tap-min) !important;
+  padding: 3px !important;
+  border-radius: 999px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0 !important;
+  border: 2px solid #050608 !important;
+  box-shadow:
+    0 2px 0 #020304,
+    inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  overflow: hidden;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-sw-rocker.is-on,
+#hub-lights-panel.hub-lights--cmd .hub-sw-rocker.is-on,
+#hub-lights-panel.hub-lights--hot .hub-sw-rocker.is-on {
+  background: linear-gradient(90deg, #a85808 0%, #f0a818 42%, #ffe894 100%) !important;
+  color: #140c02;
+  justify-content: flex-end !important;
+  box-shadow:
+    0 2px 0 #6a4010,
+    0 0 18px rgba(255, 180, 30, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-sw-rocker.is-off,
+#hub-lights-panel.hub-lights--cmd .hub-sw-rocker.is-off,
+#hub-lights-panel.hub-lights--hot .hub-sw-rocker.is-off {
+  background: linear-gradient(90deg, #0c0e12 0%, #22262e 55%, #3a404c 100%) !important;
+  color: #b8bcc4;
+  justify-content: flex-start !important;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-sw-rocker:active,
+#hub-lights-panel.hub-lights--cmd .hub-sw-rocker:active,
+#hub-lights-panel.hub-lights--hot .hub-sw-rocker:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #020304 !important;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-sw-rocker-on,
+#hub-lights-panel.hub-lights--cams .hub-sw-rocker-off,
+#hub-lights-panel.hub-lights--cmd .hub-sw-rocker-on,
+#hub-lights-panel.hub-lights--cmd .hub-sw-rocker-off,
+#hub-lights-panel.hub-lights--hot .hub-sw-rocker-on,
+#hub-lights-panel.hub-lights--hot .hub-sw-rocker-off {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin: -1px !important;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-sw-rocker-knob,
+#hub-lights-panel.hub-lights--cmd .hub-sw-rocker-knob,
+#hub-lights-panel.hub-lights--hot .hub-sw-rocker-knob {
+  flex: 0 0 var(--hub-knob) !important;
+  width: var(--hub-knob) !important;
+  height: var(--hub-knob) !important;
+  min-width: var(--hub-knob) !important;
+  border-radius: 50% !important;
+  pointer-events: none;
+  background: linear-gradient(180deg, #fffaf0, #e8e0d0) !important;
+  border: 1px solid rgba(20, 22, 28, 0.45) !important;
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-sw-rocker.is-off .hub-sw-rocker-knob,
+#hub-lights-panel.hub-lights--cmd .hub-sw-rocker.is-off .hub-sw-rocker-knob,
+#hub-lights-panel.hub-lights--hot .hub-sw-rocker.is-off .hub-sw-rocker-knob {
+  background: linear-gradient(180deg, #8a9098, #4a5058) !important;
+}
+
+/* Stub rocker · ghost OFF · not interactive DNA */
+#hub-lights-panel .hub-sw.is-stub .hub-sw-rocker,
+#hub-lights-panel .hub-sw.hub-sw--stub .hub-sw-rocker,
+#hub-lights-panel .hub-sw-rocker.is-stub {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: linear-gradient(90deg, #0a0c10 0%, #1a1e24 55%, #2a3038 100%) !important;
+  box-shadow: 0 1px 0 #020304, inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  border-color: #0a0c10 !important;
+  justify-content: flex-start !important;
+}
+
+#hub-lights-panel .hub-sw.is-stub .hub-sw-rocker-knob,
+#hub-lights-panel .hub-sw.hub-sw--stub .hub-sw-rocker-knob,
+#hub-lights-panel .hub-sw-rocker.is-stub .hub-sw-rocker-knob {
+  background: linear-gradient(180deg, #6a7078, #3a4048) !important;
+}
+
+#hub-lights-panel.hub-lights--cams .hub-sw-rocker.is-disabled,
+#hub-lights-panel.hub-lights--cams .hub-sw-rocker:disabled,
+#hub-lights-panel.hub-lights--cmd .hub-sw-rocker.is-disabled,
+#hub-lights-panel.hub-lights--cmd .hub-sw-rocker:disabled,
+#hub-lights-panel.hub-lights--hot .hub-sw-rocker.is-disabled,
+#hub-lights-panel.hub-lights--hot .hub-sw-rocker:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Atlas note: short labels Dining/Harris/Kitchen + Dad/Ainsley/Hayes/Living/Family/Basement
+   via paintHubPanel name map. Stub rows must never receive LIVE / DEMO-LIVE class or pill. */
+
+/* ═══════════════════════════════════════════════════════════
+   HUBCMD1 land · leaveby DOM fit + NEED CONNECT stub chrome
+   ═══════════════════════════════════════════════════════════ */
+.hub-upper.hub-upper--hot .leaveby-accent,
+.leaveby.leaveby--hot .leaveby-accent {
+  display: none !important;
+}
+.hub-upper.hub-upper--hot .leaveby-body,
+.leaveby.leaveby--hot .leaveby-body {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  gap: 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+.hub-upper.hub-upper--hot .leaveby-sched,
+.leaveby.leaveby--hot .leaveby-sched {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+#hub-lights-panel .hub-sw.is-need-connect,
+#hub-lights-panel .hub-sw.is-stub {
+  pointer-events: none;
+}
