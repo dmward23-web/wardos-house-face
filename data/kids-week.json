@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-29T15:11:43.783Z",
+  "refreshedAt": "2026-09-29T15:39:30.168Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -520,22 +520,15 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "TUE · 8:40",
-        "what": "MADI + PROVIDER COLLAB · IN PERSON",
+        "when": "TUE · 3:15",
+        "what": "SRE PICKUP",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "TUE",
-          "8:40"
+          "3:15"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Tue · 8:40",
-          "what": "Madi + provider collab · in person",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Tue · 3:15",
@@ -592,12 +585,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Tue 29 · 8:40",
-          "what": "Madi + provider collab · in person",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Tue 29 · 3:15",
           "what": "SRE pickup",
@@ -838,6 +825,12 @@
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Tue 6 · leave 5:00",
+          "what": "Ainsley swim — Coach Ann",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -972,11 +965,6 @@
       ],
       "week": [
         {
-          "when": "Tue 29 · 8:40",
-          "what": "Madi + provider collab · in person",
-          "tone": "act"
-        },
-        {
           "when": "Tue 29 · 3:15",
           "what": "SRE pickup",
           "tone": "act"
@@ -1089,6 +1077,11 @@
         {
           "when": "Sat 3 · 1:00",
           "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
+          "tone": "hot"
+        },
+        {
+          "when": "Sun 4 · 8:30",
+          "what": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00",
           "tone": "hot"
         }
       ]
