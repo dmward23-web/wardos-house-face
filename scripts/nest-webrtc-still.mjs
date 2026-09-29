@@ -12,8 +12,17 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import os from "node:os";
 import { fileURLToPath } from "node:url";
 import WebSocket from "ws";
+
+// KEYROT1: fall back to the box-only key file so rotation needs no env change.
+function proxyTokenFromFile() {
+  try {
+    return fs.readFileSync(path.join(os.homedir(), ".config", "wardos", "nest-proxy.token"), "utf8").trim();
+  } catch { return ""; }
+}
+
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -157,7 +166,7 @@ async function captureJpeg(send, outPath) {
 
 async function listCams() {
   const headers = {};
-  const tok = process.env.NEST_PROXY_TOKEN || "";
+  const tok = (process.env.NEST_PROXY_TOKEN || proxyTokenFromFile());
   if (tok) headers["X-Nest-Proxy-Token"] = tok;
   const data = await fetch(PROXY + "/api/cameras", { headers }).then((r) => r.json());
   if (!Array.isArray(data.cameras)) {
@@ -234,7 +243,7 @@ async function main() {
 
   for (const cam of want) {
     const name = cam.name || "cam";
-    const tok = process.env.NEST_PROXY_TOKEN || "";
+    const tok = (process.env.NEST_PROXY_TOKEN || proxyTokenFromFile());
     let url = PROXY + "/nest-webrtc.html?cam=" + encodeURIComponent(cam.id);
     if (tok) url += "&proxyToken=" + encodeURIComponent(tok);
     process.stdout.write("capture " + name + " … ");
