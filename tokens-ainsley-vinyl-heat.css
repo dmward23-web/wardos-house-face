@@ -589,3 +589,42 @@ body.theme-ainsley .day-records img {
   border-radius: 14px !important;
   box-shadow: 0 0 18px rgba(245,180,70,.18) !important;
 }
+
+/* HUBCLK1 · jump rail overrides SVG-only chrome */
+body.theme-ainsley .session-rail.jump-rail,
+body.theme-ainsley .day-records.jump-rail {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 10px 12px !important;
+}
+body.theme-ainsley .session-rail img,
+body.theme-ainsley .day-records img {
+  display: none !important;
+}
+body.theme-ainsley .jump-rail a.row {
+  flex: 1 !important;
+  min-height: 52px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  border-radius: 999px !important;
+  font-family: "JetBrains Mono", ui-monospace, monospace !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+}
+body.theme-ainsley .jump-rail a.row.live {
+  background: linear-gradient(90deg, #a85808, #f0a818, #ffe894) !important;
+  color: #140c02 !important;
+  border: 1.5px solid #9a6810 !important;
+}
+body.theme-ainsley .jump-rail a.row.stub {
+  background: #080706 !important;
+  color: rgba(180,176,160,0.85) !important;
+  border: 1.5px dashed rgba(160,156,140,0.4) !important;
+}
+

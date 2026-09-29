@@ -8,10 +8,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HARRIS · HARRIS</title>
-<link rel="stylesheet" href="house-engage.css?v=TEXTBACK1" />
+<link rel="stylesheet" href="house-engage.css?v=HUBCLK1" />
 <link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=LIVEGREEN1" />
 <link rel="stylesheet" href="tokens-ctrlpanel.css?v=TEXTBACK1" />
-<link rel="stylesheet" href="tokens-harris-blockworld-heat.css?v=HARRIS-TEXT1" />
+<link rel="stylesheet" href="tokens-harris-blockworld-heat.css?v=HUBCLK1" />
 <link rel="stylesheet" href="kid-ioscroll.css?v=HUBSCROLL2" />
 <style>
 
@@ -368,7 +368,33 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     box-shadow: 0 0 18px rgba(245,180,70,.18);
   }
 </style>
-<link rel="stylesheet" href="heat-v3.css?v=DAYTAP1" />
+<style id="hubclk1-jump">
+body.theme-harris .session-rail.jump-rail {
+  display: flex !important; flex-direction: row; align-items: center; gap: 10px;
+  flex-shrink: 0; margin: 0 0 8px; padding: 10px 12px;
+  background: rgba(10,9,8,0.96); border: 1.5px solid rgba(245,196,70,0.22);
+  border-radius: 16px; box-shadow: 0 0 18px rgba(245,180,70,.18);
+}
+body.theme-harris .session-rail img { display: none !important; }
+body.theme-harris .jump-rail a.row {
+  flex: 1; min-height: 52px; display: flex; align-items: center; justify-content: center;
+  padding: 10px 12px; border-radius: 999px; text-decoration: none; cursor: pointer;
+  font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 15px; font-weight: 800;
+  letter-spacing: 0.06em;
+}
+body.theme-harris .jump-rail a.row.live {
+  background: linear-gradient(90deg, #a85808, #f0a818, #ffe894); color: #140c02 !important;
+  border: 1.5px solid #9a6810;
+}
+body.theme-harris .jump-rail a.row.stub {
+  background: #080706; color: rgba(180,176,160,0.85) !important;
+  border: 1.5px dashed rgba(160,156,140,0.4);
+}
+body.theme-harris .hotbar { cursor: pointer; }
+body.theme-harris .hotbar-slot { pointer-events: none; }
+body.theme-harris #sec-musts, body.theme-harris #sec-jar, body.theme-harris #sec-days { scroll-margin-top: 12px; }
+</style>
+<link rel="stylesheet" href="heat-v3.css?v=HUBCLK1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
 </head>
 <body data-clear-label="LEVEL UP!!!" data-kid="harris" data-theme="harris" data-chores-shared="1" class="theme-harris cmd-kid-rail">
@@ -637,9 +663,11 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  </div>
  </div>
  </header>
-  <div class="session-rail" aria-label="Musts Jar Days">
- <img src="theme-tiles/harris-session-rail-pills.svg?v=HARRIS-TEXT1" alt="Musts · Jar · Days" width="720" height="88" />
- </div>
+  <nav class="session-rail jump-rail" aria-label="Jump · Musts Jar Days">
+ <a class="row live jump-pill" href="#sec-musts">Musts</a>
+ <a class="row stub jump-pill" href="#sec-jar">Jar</a>
+ <a class="row stub jump-pill" href="#sec-days">Days</a>
+ </nav>
 <div class="xp-row" aria-label="Progress">
  <div class="xp-label">TODAY</div>
  <div class="xp-track"><div class="xp-fill" data-progress-fill></div></div>
@@ -659,11 +687,11 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="sec-hdr"><div class="sec-title">Light</div></div>
  <div id="kid-harris-light" class="kid-light-host" data-light-id="harris-room"></div>
  </section>
- <section class="sec sec-chores" aria-label="Musts">
+ <section class="sec sec-chores" id="sec-musts" aria-label="Musts">
  <div class="sec-hdr"><div class="sec-title">Musts</div></div>
  <div class="sec-list" data-mount-quests></div>
  </section>
- <section class="sec sec-bank bank-card" aria-label="Gem Jar">
+ <section class="sec sec-bank bank-card" id="sec-jar" aria-label="Gem Jar">
  <div class="bank-top">
  <div>
  <div class="bank-title">Gem Jar</div>
@@ -699,7 +727,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  </div>
  <div class="saves-host" data-saves-panel data-kid="harris"></div>
  </section>
- <section class="sec sec-schedule consume-sched" aria-label="Week" data-consume-sel="">
+ <section class="sec sec-schedule consume-sched" id="sec-days" aria-label="Week" data-consume-sel="">
  <div class="sec-hdr"><div class="sec-title">Week</div></div>
  <div class="consume-hdr" data-mount-consume-hdr></div>
  <div class="consume-week" data-mount-consume-week></div>
@@ -712,7 +740,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="consume-ahead" data-mount-consume-ahead></div>
  </section>
  </div>
- <div class="hotbar">
+ <a class="hotbar" href="#sec-musts" aria-label="Jump to Musts" style="text-decoration:none;color:inherit">
  <div class="hotbar-label">HOTBAR</div>
  <div class="hotbar-slot sel" data-hot="0"><div class="gem" style="background:#70e030"></div><span class="n">1</span></div>
  <div class="hotbar-slot" data-hot="1"><div class="gem" style="background:#8a6238"></div><span class="n">2</span></div>
@@ -724,7 +752,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="hotbar-slot" data-hot="7"><div class="gem" style="background:#f0f0f0"></div><span class="n">8</span></div>
  <div class="hotbar-slot" data-hot="8"><div class="gem" style="background:#3a3a3a"></div><span class="n">9</span></div>
  <div class="hotbar-note">daily musts → week gems → jar</div>
- </div>
+ </a>
  <footer class="ftr">
  <div class="ftr-left" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
  <span>YOUR board · smash mode</span>

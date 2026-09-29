@@ -8,10 +8,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>HAYES</title>
-<link rel="stylesheet" href="house-engage.css?v=TEXTBACK1" />
+<link rel="stylesheet" href="house-engage.css?v=HUBCLK1" />
 <link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=LIVEGREEN1" />
 <link rel="stylesheet" href="tokens-ctrlpanel.css?v=TEXTBACK1" />
-<link rel="stylesheet" href="tokens-hayes-dropzone-heat.css?v=HAYES-TEXT1" />
+<link rel="stylesheet" href="tokens-hayes-dropzone-heat.css?v=HUBCLK1" />
 <link rel="stylesheet" href="kid-ioscroll.css?v=HUBSCROLL2" />
 <style>
 
@@ -344,15 +344,31 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   body.theme-hayes .panel { position: relative; }
   body.theme-hayes .panel > *:not(.storm-float):not(.hud-tick) { position: relative; z-index: 2; }
   body.theme-hayes .storm-float { position: absolute !important; pointer-events: none; z-index: 1; }
-  body.theme-hayes .session-rail {
-    flex-shrink: 0; margin: 0 0 8px; padding: 0; border: 0; background: transparent;
+  body.theme-hayes .session-rail.jump-rail {
+    display: flex !important; flex-direction: row; align-items: center; gap: 10px;
+    flex-shrink: 0; margin: 0 0 8px; padding: 10px 12px;
+    background: rgba(10,9,8,0.96); border: 1.5px solid rgba(245,196,70,0.22);
+    border-radius: 16px; box-shadow: 0 0 18px rgba(245,180,70,.18);
   }
-  body.theme-hayes .session-rail img {
-    display: block; width: 100%; height: auto; border-radius: 14px;
-    box-shadow: 0 0 18px rgba(245,180,70,.18);
+  body.theme-hayes .session-rail img { display: none !important; }
+  body.theme-hayes .jump-rail a.row {
+    flex: 1; min-height: 52px; display: flex; align-items: center; justify-content: center;
+    padding: 10px 12px; border-radius: 999px; text-decoration: none; cursor: pointer;
+    font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 15px; font-weight: 800;
+    letter-spacing: 0.06em;
   }
+  body.theme-hayes .jump-rail a.row.live {
+    background: linear-gradient(90deg, #a85808, #f0a818, #ffe894); color: #140c02 !important;
+    border: 1.5px solid #9a6810;
+  }
+  body.theme-hayes .jump-rail a.row.stub {
+    background: #080706; color: rgba(180,176,160,0.85) !important;
+    border: 1.5px dashed rgba(160,156,140,0.4);
+  }
+  body.theme-hayes .loadout { display: none !important; }
+  body.theme-hayes #sec-musts, body.theme-hayes #sec-jar, body.theme-hayes #sec-days { scroll-margin-top: 12px; }
 </style>
-<link rel="stylesheet" href="heat-v3.css?v=DAYTAP1" />
+<link rel="stylesheet" href="heat-v3.css?v=HUBCLK1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
 </head>
 <body data-clear-label="VICTORY ROYALE" data-kid="hayes" data-theme="hayes" data-chores-shared="1" class="theme-hayes cmd-kid-rail">
@@ -621,9 +637,11 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  </div>
  </div>
  </header>
-  <div class="session-rail" aria-label="Musts Jar Days">
- <img src="theme-tiles/hayes-session-rail-pills.svg?v=HAYES-TEXT1" alt="Musts · Jar · Days" width="720" height="88" />
- </div>
+  <nav class="session-rail jump-rail" aria-label="Jump · Musts Jar Days">
+ <a class="row live jump-pill" href="#sec-musts">Musts</a>
+ <a class="row stub jump-pill" href="#sec-jar">Jar</a>
+ <a class="row stub jump-pill" href="#sec-days">Days</a>
+ </nav>
 <div class="bars">
  <div class="bar-card"><div class="bar-top"><span aria-hidden="true">❤️</span><span data-progress-val>0%</span></div><div class="bar-track"><div class="bar-fill-hp" data-progress-fill></div></div></div>
  <div class="bar-card"><div class="bar-top"><span aria-hidden="true">🛡️</span><span data-left-count>·</span></div><div class="bar-track"><div class="bar-fill-sh" data-progress-fill></div></div></div>
@@ -639,11 +657,11 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  </div>
  </section>
  <div class="body">
- <section class="sec sec-chores" aria-label="Musts">
+ <section class="sec sec-chores" id="sec-musts" aria-label="Musts">
  <div class="sec-hdr"><div class="sec-title">Musts</div></div>
  <div class="sec-list" data-mount-quests></div>
  </section>
- <section class="sec sec-bank bank-card" aria-label="Victory Jar">
+ <section class="sec sec-bank bank-card" id="sec-jar" aria-label="Victory Jar">
  <div class="bank-top">
  <div>
  <div class="bank-title">Victory Jar</div>
@@ -679,7 +697,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  </div>
  <div class="saves-host" data-saves-panel data-kid="hayes"></div>
  </section>
- <section class="sec sec-schedule consume-sched" aria-label="Week" data-consume-sel="">
+ <section class="sec sec-schedule consume-sched" id="sec-days" aria-label="Week" data-consume-sel="">
  <div class="sec-hdr"><div class="sec-title">Week</div></div>
  <div class="consume-hdr" data-mount-consume-hdr></div>
  <div class="consume-week" data-mount-consume-week></div>
@@ -692,10 +710,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="consume-ahead" data-mount-consume-ahead></div>
  </section>
  </div>
- <div class="loadout" aria-hidden="true">
- <div class="loadout-slot on">🎯</div><div class="loadout-slot">🛡️</div><div class="loadout-slot">⚡</div><div class="loadout-slot">🏃</div><div class="loadout-slot">🎒</div>
- <div class="loadout-note">clear all = VICTORY ROYALE moment</div>
- </div>
+ <div class="loadout" aria-hidden="true" hidden></div>
  <footer class="ftr">
  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
  <span>YOUR match · Drop Zone</span>

@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE FACE · WEEKEND FUN</title>
-<link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
+<link rel="stylesheet" href="house-engage.css?v=HUBCLK1" />
 <link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=LIVEGREEN1" />
 <link rel="stylesheet" href="tokens-ctrlpanel.css?v=HUBSCROLL2" />
 <style>
@@ -295,8 +295,15 @@
  a.chip, a.kid-chip { text-decoration: none; color: inherit; cursor: pointer; }
  a.ftr-chip { text-decoration: none; color: inherit; cursor: pointer; }
 </style>
-<link rel="stylesheet" href="heat-v3.css?v=DAYTAP1" />
+<link rel="stylesheet" href="heat-v3.css?v=HUBCLK1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
+<style id="hubclk1-weekend">
+.hdr.hdr--clockfirst{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important;padding:10px 16px!important;min-height:96px!important;background:linear-gradient(165deg,rgba(8,10,16,.98),rgba(18,14,6,.94),rgba(4,6,12,.98))!important;border:2px solid rgba(245,196,70,.55)!important;border-radius:16px!important;box-shadow:inset 0 1px 0 rgba(255,230,160,.18),0 0 36px rgba(255,170,30,.35)!important}
+.hdr.hdr--clockfirst .brand,.hdr.hdr--clockfirst .eyebrow,.hdr.hdr--clockfirst .tagline{display:none!important}
+.hdr.hdr--clockfirst .live-clock{font-size:clamp(48px,6vw,72px)!important;font-weight:900!important;letter-spacing:-.06em!important;color:#ffe894!important;line-height:.9!important;text-shadow:0 0 44px rgba(255,180,30,.75),0 2px 0 #000!important;font-variant-numeric:tabular-nums}
+.hdr.hdr--clockfirst .live-clock-lab{display:none!important}
+.hdr.hdr--clockfirst .name-accent{color:#ffe894!important;-webkit-text-fill-color:#ffe894!important}
+</style>
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -547,15 +554,16 @@
  <div style="font-size:14px;opacity:0.85;margin-top:4px;">Garage sale 9–2 @ 147th · Ainsley vanity 3:00 · kids with Dad through Fri Oct 2 3:00</div>
  </div>
 
- <header class="hdr">
+ <header class="hdr hdr--clockfirst">
+ <div class="live-clock-host" aria-label="America/Chicago time">
+ <div class="live-clock" data-live-clock>—:— —</div>
+ </div>
  <div class="hdr-left">
  <div class="nav-row"><a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a><a class="nav-week" href="index.html">Week</a></div>
  <div class="identity">
  <div class="avatar g2-mark" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-diamond"/></svg></div>
  <div class="id-text">
- <a class="eyebrow" href="sheet-index.html">The Ward's · home</a>
  <h1 class="name"><span class="name-accent">Weekend fun</span></h1>
- <div class="tagline">Pick one · not a fight · three options max</div>
  </div>
  </div>
  </div>
@@ -644,5 +652,6 @@
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
 <script src="house-zoom.js"></script>
 <script>(function(){document.querySelectorAll(".empty-slot,.opt").forEach(function(el){el.addEventListener("pointerdown",function(){try{if(window.HouseSfx&&HouseSfx.tap)HouseSfx.tap()}catch(e){}},{passive:true})});})();</script>
+<script src="house-clock.js?v=HUBCLK1"></script>
 </body>
 </html>

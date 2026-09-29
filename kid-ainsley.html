@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#12140f" />
 <title>BOARD-OS · AINSLEY</title>
-<link rel="stylesheet" href="house-engage.css?v=TEXTBACK1" />
+<link rel="stylesheet" href="house-engage.css?v=HUBCLK1" />
 <link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=LIVEGREEN1" />
 <link rel="stylesheet" href="tokens-ctrlpanel.css?v=TEXTBACK1" />
 <link rel="stylesheet" href="kid-ioscroll.css?v=HUBSCROLL2" />
@@ -751,22 +751,41 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
 
 
 
-  /* TEXTBACK1-PLATES · day-record / session rail */
+  /* HUBCLK1 · jump rail · real click targets · no dead SVG */
   body.theme-ainsley .session-rail,
-  body.theme-ainsley .day-records {
-    flex-shrink: 0; margin: 0 0 8px; padding: 0; border: 0; background: transparent;
+  body.theme-ainsley .day-records,
+  body.theme-ainsley .jump-rail {
+    display: flex !important; flex-direction: row; align-items: center; gap: 10px;
+    flex-shrink: 0; margin: 0 0 8px; padding: 10px 12px;
+    background: rgba(10,9,8,0.96); border: 1.5px solid rgba(245,196,70,0.22);
+    border-radius: 16px; box-shadow: 0 0 18px rgba(245,180,70,.18);
   }
   body.theme-ainsley .session-rail img,
-  body.theme-ainsley .day-records img {
-    display: block; width: 100%; height: auto; border-radius: 14px;
-    box-shadow: 0 0 18px rgba(245,180,70,.18);
+  body.theme-ainsley .day-records img { display: none !important; }
+  body.theme-ainsley .jump-rail .jump-pill,
+  body.theme-ainsley .jump-rail a.row {
+    flex: 1; min-height: 52px; display: flex; align-items: center; justify-content: center;
+    padding: 10px 12px; border-radius: 999px; text-decoration: none; cursor: pointer;
+    font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 15px; font-weight: 800;
+    letter-spacing: 0.06em; -webkit-tap-highlight-color: transparent;
   }
+  body.theme-ainsley .jump-rail a.row.live {
+    background: linear-gradient(90deg, #a85808, #f0a818, #ffe894); color: #140c02 !important;
+    border: 1.5px solid #9a6810; box-shadow: 0 0 14px rgba(245,180,70,0.4);
+  }
+  body.theme-ainsley .jump-rail a.row.stub {
+    background: #080706; color: rgba(180,176,160,0.85) !important;
+    border: 1.5px dashed rgba(160,156,140,0.4);
+  }
+  body.theme-ainsley #sec-musts,
+  body.theme-ainsley #sec-jar,
+  body.theme-ainsley #sec-days { scroll-margin-top: 12px; }
 /* HEAT3 · tagline/day-record killed in markup + tokens */
 body.theme-ainsley .setlist-foot { display: none !important; }
 
 </style>
-<link rel="stylesheet" href="heat-v3.css?v=TEXTBACK1" />
-<link rel="stylesheet" href="tokens-ainsley-vinyl-heat.css?v=AVINYL4" />
+<link rel="stylesheet" href="heat-v3.css?v=HUBCLK1" />
+<link rel="stylesheet" href="tokens-ainsley-vinyl-heat.css?v=HUBCLK1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
 </head>
 <body data-clear-label="ALL CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley stick-season">
@@ -1037,9 +1056,11 @@ body.theme-ainsley .setlist-foot { display: none !important; }
  </div>
  </div>
  </header>
- <div class="session-rail day-records" aria-label="Musts Jar Days">
- <img src="theme-tiles/day-record-pills.svg?v=AVINYL4" alt="Musts · Jar · Days" width="720" height="88" />
- </div>
+ <nav class="session-rail day-records jump-rail" aria-label="Jump · Musts Jar Days">
+ <a class="row live jump-pill" href="#sec-musts">Musts</a>
+ <a class="row stub jump-pill" href="#sec-jar">Jar</a>
+ <a class="row stub jump-pill" href="#sec-days">Days</a>
+ </nav>
 <div class="xp-stage" aria-label="Today progress">
  <div class="xp-stage-lab">TODAY</div>
  <div class="xp-stage-track"><div class="xp-stage-fill" data-progress-fill></div></div>
@@ -1055,11 +1076,11 @@ body.theme-ainsley .setlist-foot { display: none !important; }
  </div>
  </section>
  <div class="body">
- <section class="sec sec-chores" aria-label="Musts">
+ <section class="sec sec-chores" id="sec-musts" aria-label="Musts">
  <div class="sec-hdr"><div class="sec-title">Musts</div></div>
  <div class="sec-list" data-mount-quests></div>
  </section>
- <section class="sec sec-bank bank-card tour-jar" aria-label="Tour Jar">
+ <section class="sec sec-bank bank-card tour-jar" id="sec-jar" aria-label="Tour Jar">
  <div class="bank-top">
  <div>
  <div class="bank-title">Tour Jar</div>
@@ -1093,7 +1114,7 @@ body.theme-ainsley .setlist-foot { display: none !important; }
  <div class="saves-host" data-saves-panel data-kid="ainsley"></div>
  <div class="paid-stamp" data-paid-stamp hidden>Paid</div>
  </section>
- <section class="sec sec-schedule consume-sched" aria-label="Week" data-consume-sel="">
+ <section class="sec sec-schedule consume-sched" id="sec-days" aria-label="Week" data-consume-sel="">
  <div class="sec-hdr"><div class="sec-title">Week</div></div>
  <div class="harbor-strip" aria-label="Next 24h">
  <div class="sec-list" data-mount-no-surprise></div>
