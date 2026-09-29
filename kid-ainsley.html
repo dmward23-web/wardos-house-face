@@ -7,11 +7,10 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#12140f" />
-<title>BOARD-OS · AINSLEY · HER TRACKS</title>
-<link rel="stylesheet" href="house-engage.css?v=HEAT2" />
-<link rel="stylesheet" href="tokens-ainsley-vinyl-heat.css?v=HEAT2" />
+<title>BOARD-OS · AINSLEY</title>
+<link rel="stylesheet" href="house-engage.css?v=AVINYL2" />
 <link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=LIVEGREEN1" />
-<link rel="stylesheet" href="tokens-ctrlpanel.css?v=HEAT2" />
+<link rel="stylesheet" href="tokens-ctrlpanel.css?v=AVINYL2" />
 <link rel="stylesheet" href="kid-ioscroll.css?v=HUBSCROLL2" />
 <style>
 
@@ -415,11 +414,6 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .ftr{color:#a8a490}.ftr-chip{background:rgba(26,28,22,.92);border-color:#5a6a50;color:#d4a860;border-radius:6px}
   .mute-btn{border-radius:6px;background:rgba(26,28,22,.95);color:#d4d0c0;border-color:#5a6a50;border:2px solid #5a6a50;padding:8px 12px;font-weight:800;cursor:pointer}
   body.theme-ainsley .hcb-label{color:#e8e4d4;text-shadow:0 0 20px rgba(184,90,40,.35),0 4px 0 #0e100c}
-  body[data-era-mood="midnight"] .panel{filter:saturate(.7) brightness(.86)}
-  body[data-era-mood="fog"] .panel{filter:saturate(.45) brightness(1.05) contrast(.95)}
-  body[data-era-mood="gold"] .panel{filter:none}
-  body[data-era-mood="lilac"] .panel{filter:hue-rotate(8deg) saturate(.85) brightness(.95)}
-  body[data-era-mood="blush"] .panel{filter:saturate(.55) brightness(1.06) contrast(1.02)}
   body.theme-ainsley .body{flex:0 0 auto;min-height:0;overflow: visible}
   body.theme-ainsley .sec-more .card{padding:10px 12px;min-height:48px}
   body.theme-ainsley .sec-more .card .what{font-size:14px}
@@ -530,7 +524,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     position: relative;
   }
   body.theme-ainsley .sec-schedule::after {
-    content: "↕ scroll her setlist";
+    content: "↕ scroll";
     position: sticky; bottom: 0; display: block;
     font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
     text-align: center; color: #d4a860;
@@ -564,7 +558,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
 
   /* ═══════════════════════════════════════════════════
      VINYLHEAT1 · Ainsley whole-page graphic heat
-     records · grooves · amber control-panel DNA
+     void + honey amber · night-stage vinyl
      ═══════════════════════════════════════════════════ */
   body.theme-ainsley .hdr.hdr--vinyl {
     padding: 10px 14px !important;
@@ -586,11 +580,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     text-shadow: 0 0 22px rgba(184,90,40,.45), 0 3px 0 #0e100c !important;
     letter-spacing: -0.04em;
   }
-  body.theme-ainsley .hdr.hdr--vinyl .tagline {
-    color: #c87840 !important;
-    font-weight: 750 !important;
-    letter-spacing: 0.02em;
-  }
+  body.theme-ainsley .hdr.hdr--vinyl .tagline { display: none !important; }
   body.theme-ainsley .live-clock-host {
     display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
     padding: 6px 12px; border-radius: 10px;
@@ -614,7 +604,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     justify-content: flex-end; gap: 8px;
   }
 
-  /* Whole-page heat · vinyl float louder + second groove orb */
+  /* Whole-page heat · vinyl float louder + second orb */
   body.theme-ainsley .vinyl-float {
     width: 200px; height: 200px; opacity: .38 !important;
     filter: drop-shadow(0 0 18px rgba(184,90,40,.35));
@@ -634,7 +624,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
       radial-gradient(ellipse 50% 40% at 50% 0%, rgba(212,168,96,.22), transparent 70%) !important;
   }
 
-  /* XP = SIDE A pressing bar */
+  /* XP = today bar */
   body.theme-ainsley .xp-stage {
     border: 2px solid rgba(200,120,64,.5) !important;
     background: rgba(14,16,12,.92) !important;
@@ -645,7 +635,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     color: #d4a860 !important; letter-spacing: 0.16em !important;
   }
 
-  /* Must rows · groove rail */
+  /* Must rows */
   body.theme-ainsley .sec-chores {
     background:
       linear-gradient(145deg, rgba(184,90,40,.08), transparent 40%),
@@ -760,36 +750,15 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   }
 
 
-/* HEAT1 · keep her vinyl tagline · Tour Jar = dark-glass twin · day-record rail */
-body.theme-ainsley .hdr.hdr--vinyl .tagline {
-  display: block !important;
-  color: #d4a860 !important;
-  font-weight: 750 !important;
-}
-body.theme-ainsley .sec-bank.bank-card,
-body.theme-ainsley .sec-bank.tour-jar {
-  background: rgba(12, 11, 9, 0.88) !important;
-  border: 2px solid rgba(245, 196, 70, 0.35) !important;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.55), 0 0 28px rgba(245,180,70,0.18), 0 6px 0 #0a0908 !important;
-  border-radius: 14px !important;
-}
-body.theme-ainsley .day-record-rail {
-  margin: 4px 0 8px;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(245,196,70,0.22);
-  box-shadow: 0 0 18px rgba(245,180,70,0.15);
-  background: #0a0908;
-}
-body.theme-ainsley .day-record-rail img {
-  display: block; width: 100%; height: auto;
-}
+/* HEAT3 · tagline/day-record killed in markup + tokens */
+body.theme-ainsley .setlist-foot { display: none !important; }
 
 </style>
-<link rel="stylesheet" href="heat-v3.css?v=HEAT2" />
+<link rel="stylesheet" href="heat-v3.css?v=AVINYL2" />
+<link rel="stylesheet" href="tokens-ainsley-vinyl-heat.css?v=AVINYL2" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
 </head>
-<body data-clear-label="SIDE A CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley stick-season">
+<body data-clear-label="ALL CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley stick-season">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
   <defs>
     <!-- Shared paints · HEAT v3 cyan+gold -->
@@ -846,26 +815,26 @@ body.theme-ainsley .day-record-rail img {
 
     <!-- Week · 7-cell strip grid -->
     <symbol id="g2-week" viewBox="0 0 32 32">
-      <rect x="3.5" y="8" width="25" height="16" rx="3" fill="none" stroke="url(#g2-cyan)" stroke-width="1.7"/>
-      <line x1="7.5" y1="8" x2="7.5" y2="24" stroke="url(#g2-cyan)" stroke-width="1.2" opacity="0.7"/>
-      <line x1="11.5" y1="8" x2="11.5" y2="24" stroke="url(#g2-cyan)" stroke-width="1.2" opacity="0.7"/>
+      <rect x="3.5" y="8" width="25" height="16" rx="3" fill="none" stroke="url(#g2-gold)" stroke-width="1.7"/>
+      <line x1="7.5" y1="8" x2="7.5" y2="24" stroke="url(#g2-gold)" stroke-width="1.2" opacity="0.7"/>
+      <line x1="11.5" y1="8" x2="11.5" y2="24" stroke="url(#g2-gold)" stroke-width="1.2" opacity="0.7"/>
       <line x1="15.5" y1="8" x2="15.5" y2="24" stroke="url(#g2-gold)" stroke-width="1.6"/>
-      <line x1="19.5" y1="8" x2="19.5" y2="24" stroke="url(#g2-cyan)" stroke-width="1.2" opacity="0.7"/>
-      <line x1="23.5" y1="8" x2="23.5" y2="24" stroke="url(#g2-cyan)" stroke-width="1.2" opacity="0.7"/>
+      <line x1="19.5" y1="8" x2="19.5" y2="24" stroke="url(#g2-gold)" stroke-width="1.2" opacity="0.7"/>
+      <line x1="23.5" y1="8" x2="23.5" y2="24" stroke="url(#g2-gold)" stroke-width="1.2" opacity="0.7"/>
       <rect x="13.6" y="10.2" width="3.8" height="11.6" rx="1" fill="url(#g2-gold)" opacity="0.85" filter="url(#g2-bloom-gold)"/>
     </symbol>
 
     <!-- Month · calendar block -->
     <symbol id="g2-month" viewBox="0 0 32 32">
       <rect x="5" y="7" width="22" height="19" rx="3.2" fill="none" stroke="url(#g2-gold)" stroke-width="1.75"/>
-      <line x1="5" y1="12.5" x2="27" y2="12.5" stroke="url(#g2-cyan)" stroke-width="1.5"/>
+      <line x1="5" y1="12.5" x2="27" y2="12.5" stroke="url(#g2-gold)" stroke-width="1.5"/>
       <line x1="11" y1="5.5" x2="11" y2="9.5" stroke="url(#g2-gold)" stroke-width="1.8" stroke-linecap="round"/>
       <line x1="21" y1="5.5" x2="21" y2="9.5" stroke="url(#g2-gold)" stroke-width="1.8" stroke-linecap="round"/>
-      <circle cx="11" cy="17.5" r="1.35" fill="url(#g2-cyan)"/>
+      <circle cx="11" cy="17.5" r="1.35" fill="url(#g2-gold)"/>
       <circle cx="16" cy="17.5" r="1.35" fill="url(#g2-gold)"/>
-      <circle cx="21" cy="17.5" r="1.35" fill="url(#g2-cyan)"/>
-      <circle cx="11" cy="22.2" r="1.35" fill="url(#g2-cyan)"/>
-      <circle cx="16" cy="22.2" r="1.35" fill="url(#g2-cyan)"/>
+      <circle cx="21" cy="17.5" r="1.35" fill="url(#g2-gold)"/>
+      <circle cx="11" cy="22.2" r="1.35" fill="url(#g2-gold)"/>
+      <circle cx="16" cy="22.2" r="1.35" fill="url(#g2-gold)"/>
     </symbol>
 
     <!-- Chores · forged check -->
@@ -877,9 +846,9 @@ body.theme-ainsley .day-record-rail img {
     <!-- Groceries · crate/grid basket -->
     <symbol id="g2-groceries" viewBox="0 0 32 32">
       <rect x="5" y="10" width="22" height="15" rx="2.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.75"/>
-      <path d="M9 10 V7.5 Q9 5.5 11 5.5 H21 Q23 5.5 23 7.5 V10" fill="none" stroke="url(#g2-cyan)" stroke-width="1.6"/>
-      <line x1="12.5" y1="10" x2="12.5" y2="25" stroke="url(#g2-cyan)" stroke-width="1.2" opacity="0.65"/>
-      <line x1="19.5" y1="10" x2="19.5" y2="25" stroke="url(#g2-cyan)" stroke-width="1.2" opacity="0.65"/>
+      <path d="M9 10 V7.5 Q9 5.5 11 5.5 H21 Q23 5.5 23 7.5 V10" fill="none" stroke="url(#g2-gold)" stroke-width="1.6"/>
+      <line x1="12.5" y1="10" x2="12.5" y2="25" stroke="url(#g2-gold)" stroke-width="1.2" opacity="0.65"/>
+      <line x1="19.5" y1="10" x2="19.5" y2="25" stroke="url(#g2-gold)" stroke-width="1.2" opacity="0.65"/>
       <line x1="5" y1="16.5" x2="27" y2="16.5" stroke="url(#g2-gold)" stroke-width="1.2" opacity="0.55"/>
     </symbol>
 
@@ -897,27 +866,27 @@ body.theme-ainsley .day-record-rail img {
     <!-- Weekend Fun · forged diamond -->
     <symbol id="g2-diamond" viewBox="0 0 32 32">
       <path d="M16 3.8 L28.2 16 L16 28.2 L3.8 16 Z" fill="none" stroke="url(#g2-gold)" stroke-width="1.8" stroke-linejoin="round" filter="url(#g2-bloom-gold)"/>
-      <path d="M16 9.2 L22.8 16 L16 22.8 L9.2 16 Z" fill="none" stroke="url(#g2-cyan)" stroke-width="1.45"/>
+      <path d="M16 9.2 L22.8 16 L16 22.8 L9.2 16 Z" fill="none" stroke="url(#g2-gold)" stroke-width="1.45"/>
       <circle cx="16" cy="16" r="1.8" fill="url(#g2-gold)"/>
     </symbol>
 
     <!-- Family trips · plane -->
     <symbol id="g2-plane" viewBox="0 0 32 32">
-      <path d="M4.5 17.2 L14.2 14.6 L27.5 7.8 L22.8 18.5 L19.5 26.2 L16.8 18.8 L10.5 20.6 Z" fill="none" stroke="url(#g2-cyan)" stroke-width="1.7" stroke-linejoin="round" filter="url(#g2-bloom-cyan)"/>
+      <path d="M4.5 17.2 L14.2 14.6 L27.5 7.8 L22.8 18.5 L19.5 26.2 L16.8 18.8 L10.5 20.6 Z" fill="none" stroke="url(#g2-gold)" stroke-width="1.7" stroke-linejoin="round" filter="url(#g2-bloom-gold)"/>
       <path d="M14.2 14.6 L19.8 12.2" stroke="url(#g2-gold)" stroke-width="1.5" stroke-linecap="round"/>
       <circle cx="27.5" cy="7.8" r="1.4" fill="url(#g2-gold)"/>
     </symbol>
 
     <!-- ==== PERSONA MONOGRAMS ==== -->
     <symbol id="g2-hayes" viewBox="0 0 32 32">
-      <circle cx="16" cy="16" r="12.2" fill="none" stroke="url(#g2-cyan)" stroke-width="1.85" filter="url(#g2-bloom-cyan)"/>
-      <circle cx="16" cy="16" r="9.4" fill="none" stroke="url(#g2-cyan)" stroke-width="1.1" opacity="0.45"/>
-      <text x="16" y="21.2" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="900" fill="url(#g2-cyan)">H</text>
+      <circle cx="16" cy="16" r="12.2" fill="none" stroke="url(#g2-gold)" stroke-width="1.85" filter="url(#g2-bloom-gold)"/>
+      <circle cx="16" cy="16" r="9.4" fill="none" stroke="url(#g2-gold)" stroke-width="1.1" opacity="0.45"/>
+      <text x="16" y="21.2" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="900" fill="url(#g2-gold)">H</text>
     </symbol>
     <symbol id="g2-ainsley" viewBox="0 0 32 32">
-      <circle cx="16" cy="16" r="12.2" fill="none" stroke="url(#g2-pink)" stroke-width="1.85" filter="url(#g2-bloom-gold)"/>
-      <circle cx="16" cy="16" r="9.4" fill="none" stroke="url(#g2-pink)" stroke-width="1.1" opacity="0.45"/>
-      <text x="16" y="21.2" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="900" fill="url(#g2-pink)">A</text>
+      <circle cx="16" cy="16" r="12.2" fill="none" stroke="url(#g2-gold)" stroke-width="1.85" filter="url(#g2-bloom-gold)"/>
+      <circle cx="16" cy="16" r="9.4" fill="none" stroke="url(#g2-gold)" stroke-width="1.1" opacity="0.45"/>
+      <text x="16" y="21.2" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="900" fill="url(#g2-gold)">A</text>
     </symbol>
     <symbol id="g2-harris" viewBox="0 0 32 32">
       <circle cx="16" cy="16" r="12.2" fill="none" stroke="url(#g2-green)" stroke-width="1.85"/>
@@ -936,31 +905,31 @@ body.theme-ainsley .day-record-rail img {
     </symbol>
     <symbol id="g2-pack" viewBox="0 0 32 32">
       <rect x="7" y="9" width="18" height="16" rx="2.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.7"/>
-      <path d="M12 9 V7.2 Q12 5.5 16 5.5 Q20 5.5 20 7.2 V9" fill="none" stroke="url(#g2-cyan)" stroke-width="1.5"/>
-      <line x1="11" y1="15" x2="21" y2="15" stroke="url(#g2-cyan)" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M12 9 V7.2 Q12 5.5 16 5.5 Q20 5.5 20 7.2 V9" fill="none" stroke="url(#g2-gold)" stroke-width="1.5"/>
+      <line x1="11" y1="15" x2="21" y2="15" stroke="url(#g2-gold)" stroke-width="1.4" stroke-linecap="round"/>
       <line x1="11" y1="19.5" x2="18" y2="19.5" stroke="url(#g2-gold)" stroke-width="1.4" stroke-linecap="round"/>
     </symbol>
     <symbol id="g2-home" viewBox="0 0 32 32">
       <path d="M5.5 15 L16 6.2 L26.5 15" fill="none" stroke="url(#g2-gold)" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M9 14.5 V25.2 H23 V14.5" fill="none" stroke="url(#g2-cyan)" stroke-width="1.7" stroke-linejoin="round"/>
+      <path d="M9 14.5 V25.2 H23 V14.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.7" stroke-linejoin="round"/>
       <rect x="13.5" y="18.5" width="5" height="6.7" rx="0.8" fill="none" stroke="url(#g2-gold)" stroke-width="1.4"/>
     </symbol>
     <symbol id="g2-routine" viewBox="0 0 32 32">
-      <path d="M8.5 11.5 A9 9 0 1 1 8.8 20.5" fill="none" stroke="url(#g2-cyan)" stroke-width="1.85" stroke-linecap="round"/>
+      <path d="M8.5 11.5 A9 9 0 1 1 8.8 20.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.85" stroke-linecap="round"/>
       <path d="M8.5 7.2 L8.5 12.2 L13.2 12.2" fill="none" stroke="url(#g2-gold)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
     </symbol>
     <symbol id="g2-leave" viewBox="0 0 32 32">
       <circle cx="16" cy="16" r="11" fill="none" stroke="url(#g2-gold)" stroke-width="1.75"/>
-      <path d="M16 9.5 V16.5 L21 19.2" fill="none" stroke="url(#g2-cyan)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M16 9.5 V16.5 L21 19.2" fill="none" stroke="url(#g2-gold)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
       <circle cx="16" cy="16" r="1.5" fill="url(#g2-gold)"/>
     </symbol>
     <symbol id="g2-target" viewBox="0 0 32 32">
-      <circle cx="16" cy="16" r="11" fill="none" stroke="url(#g2-cyan)" stroke-width="1.6"/>
+      <circle cx="16" cy="16" r="11" fill="none" stroke="url(#g2-gold)" stroke-width="1.6"/>
       <circle cx="16" cy="16" r="6.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.5"/>
       <circle cx="16" cy="16" r="2.2" fill="url(#g2-gold)"/>
     </symbol>
     <symbol id="g2-weather" viewBox="0 0 32 32">
-      <circle cx="16" cy="16" r="4.6" fill="none" stroke="url(#g2-cyan)" stroke-width="1.7"/>
+      <circle cx="16" cy="16" r="4.6" fill="none" stroke="url(#g2-gold)" stroke-width="1.7"/>
       <g stroke="url(#g2-gold)" stroke-width="1.6" stroke-linecap="round">
         <line x1="16" y1="5" x2="16" y2="8"/>
         <line x1="16" y1="24" x2="16" y2="27"/>
@@ -977,15 +946,15 @@ body.theme-ainsley .day-record-rail img {
       <path d="M10 16.2 L14.2 20.4 L22.5 11.5" fill="none" stroke="url(#g2-gold)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     </symbol>
     <symbol id="g2-next" viewBox="0 0 32 32">
-      <circle cx="16" cy="16" r="11.2" fill="none" stroke="url(#g2-cyan)" stroke-width="1.7" filter="url(#g2-bloom-cyan)"/>
+      <circle cx="16" cy="16" r="11.2" fill="none" stroke="url(#g2-gold)" stroke-width="1.7" filter="url(#g2-bloom-gold)"/>
       <path d="M13 10.5 L20.5 16 L13 21.5" fill="none" stroke="url(#g2-gold)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
     </symbol>
 
     <!-- ==== CONSUME event glyphs ==== -->
     <symbol id="g2-baseball" viewBox="0 0 32 32">
       <circle cx="16" cy="16" r="11" fill="none" stroke="url(#g2-gold)" stroke-width="1.75"/>
-      <path d="M9 8.5 Q14 12 14 16 Q14 20 9 23.5" fill="none" stroke="url(#g2-cyan)" stroke-width="1.45"/>
-      <path d="M23 8.5 Q18 12 18 16 Q18 20 23 23.5" fill="none" stroke="url(#g2-cyan)" stroke-width="1.45"/>
+      <path d="M9 8.5 Q14 12 14 16 Q14 20 9 23.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.45"/>
+      <path d="M23 8.5 Q18 12 18 16 Q18 20 23 23.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.45"/>
       <g stroke="url(#g2-gold)" stroke-width="1.2" stroke-linecap="round" opacity="0.85">
         <line x1="11.2" y1="11" x2="12.5" y2="12"/>
         <line x1="11.2" y1="14" x2="12.6" y2="14.5"/>
@@ -998,33 +967,33 @@ body.theme-ainsley .day-record-rail img {
       </g>
     </symbol>
     <symbol id="g2-swim" viewBox="0 0 32 32">
-      <path d="M5 14.5 Q8.5 11.5 12 14.5 Q15.5 17.5 19 14.5 Q22.5 11.5 27 14.5" fill="none" stroke="url(#g2-cyan)" stroke-width="1.85" stroke-linecap="round"/>
+      <path d="M5 14.5 Q8.5 11.5 12 14.5 Q15.5 17.5 19 14.5 Q22.5 11.5 27 14.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.85" stroke-linecap="round"/>
       <path d="M5 20.5 Q8.5 17.5 12 20.5 Q15.5 23.5 19 20.5 Q22.5 17.5 27 20.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.7" stroke-linecap="round"/>
-      <circle cx="16" cy="9" r="2.4" fill="none" stroke="url(#g2-cyan)" stroke-width="1.5"/>
+      <circle cx="16" cy="9" r="2.4" fill="none" stroke="url(#g2-gold)" stroke-width="1.5"/>
     </symbol>
     <symbol id="g2-flag" viewBox="0 0 32 32">
       <line x1="8" y1="5.5" x2="8" y2="27" stroke="url(#g2-gold)" stroke-width="1.9" stroke-linecap="round"/>
       <path d="M8.8 6.2 H23.5 L20.2 11.5 L23.5 16.8 H8.8 Z" fill="none" stroke="url(#g2-green)" stroke-width="1.7" stroke-linejoin="round"/>
-      <line x1="12.5" y1="9.5" x2="18.5" y2="9.5" stroke="url(#g2-cyan)" stroke-width="1.3" stroke-linecap="round"/>
+      <line x1="12.5" y1="9.5" x2="18.5" y2="9.5" stroke="url(#g2-gold)" stroke-width="1.3" stroke-linecap="round"/>
       <line x1="12.5" y1="13.2" x2="17.2" y2="13.2" stroke="url(#g2-gold)" stroke-width="1.3" stroke-linecap="round"/>
     </symbol>
 
     <!-- Grow accents · Victory / Tour / Gem -->
     <symbol id="g2-victory" viewBox="0 0 32 32">
-      <path d="M8 8.5 L12.5 23.5 H19.5 L24 8.5" fill="none" stroke="url(#g2-cyan)" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M8 8.5 L12.5 23.5 H19.5 L24 8.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M11.5 8.5 H20.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.6" stroke-linecap="round"/>
       <circle cx="16" cy="26.2" r="1.6" fill="url(#g2-gold)"/>
     </symbol>
     <symbol id="g2-tour" viewBox="0 0 32 32">
-      <path d="M7 20.5 Q10 12 16 8.5 Q22 12 25 20.5" fill="none" stroke="url(#g2-pink)" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M7 20.5 Q10 12 16 8.5 Q22 12 25 20.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.8" stroke-linecap="round"/>
       <path d="M9.5 20.5 H22.5" stroke="url(#g2-gold)" stroke-width="1.6" stroke-linecap="round"/>
-      <circle cx="16" cy="12.5" r="2" fill="url(#g2-pink)"/>
-      <path d="M12 24.5 L16 22 L20 24.5" fill="none" stroke="url(#g2-cyan)" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="16" cy="12.5" r="2" fill="url(#g2-gold)"/>
+      <path d="M12 24.5 L16 22 L20 24.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.4" stroke-linecap="round"/>
     </symbol>
     <symbol id="g2-gem" viewBox="0 0 32 32">
       <path d="M10 8.5 H22 L27 14 L16 26.5 L5 14 Z" fill="none" stroke="url(#g2-green)" stroke-width="1.75" stroke-linejoin="round"/>
       <path d="M10 8.5 L16 14 L22 8.5" fill="none" stroke="url(#g2-gold)" stroke-width="1.4"/>
-      <path d="M5 14 H27" stroke="url(#g2-cyan)" stroke-width="1.3"/>
+      <path d="M5 14 H27" stroke="url(#g2-gold)" stroke-width="1.3"/>
       <path d="M16 14 V26.5" stroke="url(#g2-gold)" stroke-width="1.3"/>
     </symbol>
   </defs>
@@ -1037,14 +1006,13 @@ body.theme-ainsley .day-record-rail img {
  <div class="vinyl-float" aria-hidden="true"></div>
  <div class="stage-grid" aria-hidden="true"></div>
  <div class="stage-ticks" aria-hidden="true"></div>
- <header class="hdr hdr--vinyl">
+ <header class="hdr hdr--vinyl hdr--heat3">
  <div class="hdr-left">
  <div class="nav-row"><a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a><a class="nav-week" href="index.html">Week</a></div>
  <div class="identity">
  <div class="avatar g2-av ains" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-ainsley"/></svg></div>
  <div>
  <h1 class="name"><span class="name-accent">AINSLEY</span></h1>
- <div class="tagline">Her vinyl week · press the musts · Tour Jar</div>
  </div>
  </div>
  </div>
@@ -1053,34 +1021,23 @@ body.theme-ainsley .day-record-rail img {
  <div class="live-clock-lab">CT</div>
  <div class="live-clock" data-live-clock>—:— —</div>
  </div>
- <div class="hot-pill" data-hot-pill>ON THE BOARD · SUN · vanity 3:00</div>
+ <div class="hot-pill" data-hot-pill>ON THE BOARD</div>
  <div style="display:flex;gap:8px;align-items:center">
  <button type="button" class="mute-btn" data-mute-toggle>🔊 ON</button>
  </div>
  </div>
  </header>
- <div class="eras" aria-label="Pick your mood">
- <span class="eras-lab">MOOD</span>
- <button type="button" class="era midnight" data-era="midnight">Pine Night</button>
- <button type="button" class="era fog" data-era="fog">Mist</button>
- <button type="button" class="era gold on" data-era="gold">Honey Amber</button>
- <button type="button" class="era lilac" data-era="lilac">Dusk</button>
- <button type="button" class="era blush" data-era="blush">Birch</button>
- </div>
-  <div class="day-record-rail" aria-label="Day records">
- <img src="theme-tiles/day-record-pills.svg" alt="Day records · LIVE sessions" width="980" height="220" />
- </div>
 <div class="xp-stage">
- <div class="xp-stage-lab">SIDE A · TODAY</div>
+ <div class="xp-stage-lab">TODAY</div>
  <div class="xp-stage-track"><div class="xp-stage-fill" data-progress-fill></div></div>
- <div data-progress-meta="{done}/{total} pressed today" style="font-size:13px;font-weight:800;color:#a8a490">0/6</div>
+ <div data-progress-meta="{done}/{total} done today" style="font-size:13px;font-weight:800;color:#a8a490">0/6</div>
  <div class="left-chip" data-left-count>··</div>
  </div>
  <section class="hot-banner" aria-label="What’s on the board">
  <div class="hot-accent"></div>
  <div class="hot-body">
  <div class="hot-main">
- <div class="hot-label">ON THE BOARD · SUNDAY</div>
+ <div class="hot-label">ON THE BOARD</div>
  <div class="hot-title" data-hot-title>SUN · vanity 3:00 · Jessy</div>
  <div class="hot-sub" data-hot-sub><strong>Vanity 3:00</strong>with Dad @ 147th</div>
  </div>
@@ -1088,23 +1045,22 @@ body.theme-ainsley .day-record-rail img {
  </div>
  </section>
  <div class="body">
- <section class="sec sec-chores" aria-label="Her setlist and musts">
- <div class="sec-hdr"><div class="sec-title">HER SETLIST · MUSTS</div><div class="sec-meta" data-streak-label>streak</div></div>
+ <section class="sec sec-chores" aria-label="Musts">
+ <div class="sec-hdr"><div class="sec-title">Musts</div><div class="sec-meta" data-streak-label>streak</div></div>
  <div class="sec-list" data-mount-quests></div>
- <div class="tap-hint">Tap each groove Sat–Fri · day = vinyl · spin off to undo</div>
  <div class="bank-links" style="margin-top:4px">
  <a class="ghost" href="sheet-chores.html">Family chores</a>
  </div>
  </section>
- <section class="sec sec-bank bank-card tour-jar" aria-label="Tour Jar · pressed week">
+ <section class="sec sec-bank bank-card tour-jar" aria-label="Tour Jar">
  <div class="bank-top">
  <div>
- <div class="bank-title">★ TOUR JAR · PRESSED</div>
+ <div class="bank-title">Tour Jar</div>
  <div class="bank-goal-title" data-bank-goal-title>Tour Jar</div>
  </div>
  <div class="bank-count"><span data-bank-symbol>★</span> <span data-bank-life>0</span></div>
  </div>
- <div class="bank-blurb" data-bank-goal-blurb>Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri) hit Tour Jar $20 AND full $20 payday (1★=$1). ALL musts required — jar locked until every Must is done. Babysit $15/hr = hire add-on, not jar.</div>
+ <div class="bank-blurb" data-bank-goal-blurb>Dad-week musts unlock Tour Jar $20 + $20 payday. All musts required. Babysit $15/hr separate.</div>
  <button type="button" class="grow-meter grow-jar" data-grow-meter aria-label="Grow · jar">
  <div class="grow-stage">
  <div class="grow-fill grow-fill-balance" data-grow-fill-balance></div>
@@ -1114,18 +1070,18 @@ body.theme-ainsley .day-record-rail img {
  <div class="grow-pct" data-grow-pct>0%</div>
  </div>
  <div class="grow-readout">
- <div class="grow-title" data-grow-title>GROW · pressed jar</div>
+ <div class="grow-title" data-grow-title>GROW</div>
  <div class="grow-jar-name" data-grow-jar-name>Tour Jar</div>
  <div class="grow-total"><span data-grow-total>0</span> / <span data-grow-save-need>0</span></div>
  <div class="grow-week-rising" data-grow-week-rising>week +$0 rising ↑</div>
  <div class="grow-line"><span class="lab">Balance</span><span class="val" data-grow-balance>$0</span></div>
- <div class="grow-line"><span class="lab">This press</span><span class="val" data-grow-week>$0</span></div>
+ <div class="grow-line"><span class="lab">This week</span><span class="val" data-grow-week>$0</span></div>
  <div class="grow-line"><span class="lab">Save for</span><span class="val" data-grow-save-line>Cue a save</span></div>
  </div>
  </button>
  <div class="money-row" aria-label="Balance carry and this week earn">
  <div class="money-chip"><span class="lab">Balance</span> $<span data-bank-balance>0</span></div>
- <div class="money-chip"><span class="lab">This press</span> $<span data-bank-week-earn>0</span></div>
+ <div class="money-chip"><span class="lab">This week</span> $<span data-bank-week-earn>0</span></div>
  <div class="money-chip save-chip"><span class="lab">Save for</span> <span data-grow-save-name>…</span> · $<span data-grow-save-toward>0</span>/$<span data-grow-save-need>0</span></div>
  </div>
 
@@ -1138,18 +1094,18 @@ body.theme-ainsley .day-record-rail img {
  <span class="ledger-chip goal-chip is-empty" data-goal-chip>Cue a goal with Dad</span>
  </div>
  <div class="bank-links">
- <a class="primary-foil" href="sheet-allowance.html">Tour Jar · open →</a>
- <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">JAR FULL · saved $20 · show Dad</a>
+ <a class="primary-foil" href="sheet-allowance.html">Jar →</a>
+ <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">Jar full · $20 · show Dad</a>
  <button type="button" class="got-it" data-got-it hidden>Got it · payday</button>
  </div>
- <div class="goal-unlock" data-goal-unlock hidden>JAR FULL · saved $20 · show Dad</div>
+ <div class="goal-unlock" data-goal-unlock hidden>Jar full · $20 · show Dad</div>
  <div class="saves-host" data-saves-panel data-kid="ainsley"></div>
  <div class="paid-stamp" data-paid-stamp hidden>Paid · jar reset</div>
  </section>
  <section class="sec sec-schedule consume-sched" aria-label="Her week — schedule" data-consume-sel="">
- <div class="sec-hdr"><div class="sec-title">HER WEEK · no surprises</div><div class="sec-meta">spin the week</div></div>
+ <div class="sec-hdr"><div class="sec-title">Week</div><div class="sec-meta"></div></div>
  <div class="harbor-strip" aria-label="No surprises next 24h">
- <div class="hs-title">No surprises · next 24h</div>
+ <div class="hs-title">Next 24h</div>
  <div class="sec-list" data-mount-no-surprise></div>
  </div>
  <div class="bag-strip" data-bag-strip aria-label="Two-house bag">
@@ -1167,48 +1123,30 @@ body.theme-ainsley .day-record-rail img {
  <div class="consume-ahead" data-mount-consume-ahead></div>
  </section>
  </div>
- <div class="setlist-foot">
- <div class="lab">SIDE A</div>
- <div class="track-num on" data-track="1">1</div>
- <div class="track-num" data-track="2">2</div>
- <div class="track-num" data-track="3">3</div>
- <div class="track-num" data-track="4">4</div>
- <div class="track-num" data-track="5">5</div>
- <div class="track-num" data-track="6">6</div>
- <div class="track-num" data-track="7">7</div>
- <div class="note">her call · clear grooves = honey glow</div>
- </div>
+
  <footer class="ftr">
  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
- <span>Quiet folk · vinyl · her board</span>
- <span class="ftr-chip">AINSLEY · HER VINYL</span>
+ <span>Ainsley</span>
+ <span class="ftr-chip">AINSLEY</span>
  <a class="ftr-chip" href="sheet-allowance.html">Tour Jar</a>
  </div>
- <span>vinyl road-trip energy · sound ON</span>
+ <span></span>
  </footer>
 </div>
 <script>
-document.querySelectorAll("[data-era]").forEach(function(btn){
- btn.addEventListener("click", function(){
- document.querySelectorAll("[data-era]").forEach(function(b){ b.classList.remove("on"); });
- btn.classList.add("on");
- document.body.setAttribute("data-era-mood", btn.getAttribute("data-era"));
- if (window.HouseSfx) HouseSfx.tap();
- });
-});
 document.addEventListener("house:kid-rendered", function(){
  var done = document.querySelectorAll(".quest.done").length;
  document.querySelectorAll("[data-track]").forEach(function(t,i){ t.classList.toggle("on", i < done); });
 });
 </script>
 
-<script src="house-clock.js?v=HEAT2"></script>
-<script src="kids-data.js?v=HEAT2"></script>
+<script src="house-clock.js?v=AVINYL2"></script>
+<script src="kids-data.js?v=AVINYL2"></script>
 <script src="house-saves.js?v=FAIL3"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
 <script src="house-kid-engage.js?v=HUBSCROLL2"></script>
-<script src="house-checkoffs.js?v=HEAT2" defer></script>
+<script src="house-checkoffs.js?v=AVINYL2" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
  if (window.HouseSaves) HouseSaves.mount("ainsley");

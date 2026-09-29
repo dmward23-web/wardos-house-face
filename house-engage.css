@@ -3172,11 +3172,12 @@ body.theme-hayes .consume-title {
   letter-spacing: 0.04em;
 }
 body.theme-ainsley .consume-title {
-  background: linear-gradient(180deg, #ffffff 8%, #f8c0e8 50%, #e8a0d0 100%) !important;
+  /* HEAT3 · void+amber — no pink */
+  background: linear-gradient(180deg, #ffffff 8%, #ffe08a 50%, #f5c542 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   color: transparent !important;
-  filter: drop-shadow(0 0 22px rgba(232,160,208,0.8));
+  filter: drop-shadow(0 0 22px rgba(245,197,66,0.7));
 }
 body.theme-harris .consume-title {
   background: linear-gradient(180deg, #ffffff 8%, #b8f0c4 50%, #8ee8a0 100%) !important;

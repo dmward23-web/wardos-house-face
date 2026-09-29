@@ -636,20 +636,20 @@
       "id": "ainsley",
       "name": "Ainsley",
       "you": "you",
-      "theme": "quiet-folk",
-      "themeLabel": "Quiet Folk",
+      "theme": "vinyl-night",
+      "themeLabel": "Ainsley",
       "gradeVoice": "8th grade",
       "avatar": "A",
       "currency": {
         "unit": "star",
         "plural": "stars",
         "symbol": "★",
-        "label": "Tour Stars"
+        "label": "Stars"
       },
       "bankGoal": {
         "id": "tour-jar",
-        "title": "Tour Jar · earn then save",
-        "blurb": "Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Tour Jar $20 AND full $20 payday (1★=$1). ALL musts required — jar/allowance locked until every Must is done. Babysit $15/hr = hire add-on, not jar.",
+        "title": "Tour Jar",
+        "blurb": "Dad-week musts unlock Tour Jar $20 + $20 payday. All musts required. Babysit $15/hr separate.",
         "need": 20,
         "reward": "Payday with Dad after honest musts",
         "dollarNeed": 20,

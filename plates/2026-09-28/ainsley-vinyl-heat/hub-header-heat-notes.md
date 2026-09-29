@@ -1,4 +1,4 @@
-# Hub header heat-pass · one screen · AVINYL1 / HUBHDR
+# Hub header heat-pass · one screen · AVINYL2 / HUBHDR
 
 **Target:** `sheet-index.html` header only (LOOK notes — Atlas ships).  
 **Law:** pass-by glance · control-panel void · no brand fight with command deck.

@@ -1,8 +1,10 @@
-/* AINSLEY VINYL HEAT · Prism LOOK drop-in · CMDDECK2 DNA · 2026-09-28
-   Paste on kid-ainsley.html (or link). Atlas ships. Prism does not push Pages. */
+/* AINSLEY VINYL HEAT · AVINYL2 · void+amber · ONE night-stage · 2026-09-28
+   Paste on kid-ainsley.html (or link ?v=AVINYL2). Atlas ships. Prism does not push Pages.
+   Palette lock: void + amber ONLY. No pink / blush / lilac / magenta / rose / cyan. */
 
 :root {
   --av-void: #0a0908;
+  --av-void-deep: #010205;
   --av-glass: rgba(12, 11, 9, 0.82);
   --av-amber: #f5c446;
   --av-amber-hi: #ffe894;
@@ -24,91 +26,84 @@
   background-image: url("theme-tiles/ainsley-vinyl.png") !important;
 }
 
-/* Mood → rocker pills (CMDDECK2 lights DNA) */
-.eras {
-  gap: 6px !important;
-  padding: 6px 10px !important;
-  background: var(--av-glass) !important;
-  border: 1px solid rgba(245, 196, 70, 0.18) !important;
-  border-radius: 12px !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04),
-              0 0 0 1px rgba(0, 0, 0, 0.45) !important;
-}
-.eras-lab {
-  color: var(--av-amber) !important;
-  letter-spacing: 0.18em !important;
-  text-shadow: 0 0 10px rgba(245, 196, 70, 0.35) !important;
-}
-.era {
-  min-height: 34px !important;
-  padding: 6px 12px !important;
-  border-radius: 999px !important;
-  border: 1px dashed rgba(160, 156, 140, 0.35) !important;
-  background: rgba(18, 16, 12, 0.75) !important;
-  color: var(--av-ghost) !important;
-  box-shadow: none !important;
-}
-.era.on {
-  border-style: solid !important;
-  border-color: var(--av-amber-mid) !important;
-  background: linear-gradient(180deg, var(--av-amber-mid), var(--av-amber-lo)) !important;
-  color: #14100a !important;
-  box-shadow: 0 0 14px rgba(245, 180, 70, 0.45),
-              inset 0 1px 0 rgba(255, 240, 200, 0.35) !important;
+/* KILL mood / era picker — one locked night-stage forever */
+.eras,
+.era,
+.eras-lab,
+[data-eras],
+.mood-row,
+.theme-picker {
+  display: none !important;
 }
 
-/* Day-record / session rail — denser instrument pills */
+/* Day-record rail — quiet instrument pills, no banner chrome */
+.day-records .banner,
+.day-records > .lab,
+.session-rail > .lab,
+.vinyl-days > .lab,
+.day-rail > .lab {
+  display: none !important;
+}
 .day-records,
 .session-rail,
-.vinyl-days {
+.vinyl-days,
+.day-rail {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 10px 12px;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
   background: var(--av-glass);
   border-radius: 14px;
-  border: 1px solid rgba(245, 196, 70, 0.16);
+  border: 1px solid rgba(245, 196, 70, 0.14);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 .day-records .row,
 .session-rail .row,
-.vinyl-days .row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 34px;
-  padding: 0 12px;
+.vinyl-days .row,
+.day-rail .pill {
+  flex: 1;
+  min-height: 40px;
+  padding: 8px 12px;
   border-radius: 999px;
   background: rgba(8, 7, 6, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.06);
   color: var(--av-ink);
   font-weight: 700;
   letter-spacing: 0.04em;
-  font-size: 13px;
+  font-size: 12px;
 }
 .day-records .row.live,
-.session-rail .row.live {
+.session-rail .row.live,
+.day-rail .pill.live {
   border-color: rgba(245, 196, 70, 0.55);
-  box-shadow: 0 0 12px rgba(245, 180, 70, 0.22);
-}
-.day-records .row.live .chip,
-.session-rail .row.live .chip {
-  background: linear-gradient(180deg, var(--av-amber-mid), var(--av-amber-lo));
-  color: #14100a;
-  border-radius: 999px;
-  padding: 3px 10px;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
+  background: linear-gradient(90deg, var(--av-amber-lo), var(--av-amber-mid), var(--av-amber-hi));
+  color: #140c02;
+  box-shadow: 0 0 12px rgba(245, 180, 70, 0.28);
 }
 .day-records .row.stub,
-.session-rail .row.stub {
+.session-rail .row.stub,
+.day-rail .pill.off {
   border-style: dashed;
-  opacity: 0.55;
+  opacity: 0.45;
   color: var(--av-ghost);
 }
 
-/* Tour jar twin — dark glass + amber fill bloom */
+/* Hide merch / duplicate label chrome if Atlas pastes on live */
+.eyebrow,
+.chip.eras-stage,
+.chip.eras,
+[data-label="eras-stage"],
+.tour-jar .stars,
+.tour-jar .pressed-lab,
+.xp-stage .side-a-lab,
+.flow-tabs,
+.tour-flow,
+.musts-press-jar {
+  display: none !important;
+}
+
+/* Tour jar twin — dark glass + amber fill · quiet */
 .tour-jar,
 .xp-stage,
 .grow-tour {
@@ -125,6 +120,7 @@
 }
 
 /* Kid header — logo-free control strip */
-.hdr .brand img { display: none !important; }
+.hdr .brand,
+.hdr .brand img,
 .hdr .tagline { display: none !important; }
 .hdr .eyebrow { color: var(--av-amber) !important; }
