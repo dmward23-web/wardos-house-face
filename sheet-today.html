@@ -384,6 +384,15 @@
  }
  .kid-hint { font-size: 13px; font-weight: 600; color: #5a5e66; margin-top: 2px; }
 
+ /* QARELAY1 · today day list (painted by house-board-strip from cal-live) */
+ .today-day-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+ .today-day-list:empty { display: none; }
+ .today-day-list .leaveby-row { display: flex; gap: 12px; align-items: baseline; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,0.6); }
+ .today-day-list .leaveby-row.is-next { background: rgba(245,196,70,0.28); }
+ .today-day-list .leaveby-row-time { font-weight: 850; min-width: 56px; font-variant-numeric: tabular-nums; }
+ .today-day-list .leaveby-row-title { font-weight: 700; }
+ .today-day-list .leaveby-empty { font-weight: 700; color: #5a5e66; padding: 6px 10px; }
+
  .kids-col {
  display: flex; flex-direction: column; gap: 10px; min-height: 0;
  }
@@ -774,11 +783,11 @@
  <div class="gm-body">
  <div class="gm-main">
  <div class="gm-label">Today · known facts</div>
- <div class="gm-title"><span class="hl" data-live="date-short">Sun Sep 27</span> · what’s on</div>
- <div class="gm-sub">Kids with <strong>Dad @ 147th</strong> through Fri Oct 2 3:00 · garage sale 9–2 · Ainsley vanity 3:00</div>
+ <div class="gm-title"><span class="hl" data-live="date-short"></span> · what’s on</div>
+ <div class="gm-sub" data-today-bind="homeweek" hidden></div>
  </div>
  <div class="gm-badges">
- <div class="gm-badge" data-live="dow">Sun</div>
+ <div class="gm-badge" data-live="dow"></div>
  <div class="gm-badge days">Dad week · → Fri Oct 2</div>
  </div>
  </div>
@@ -793,9 +802,9 @@
  <div class="leaveby-body">
  <div class="leaveby-label" data-live="leaveby-label">NEXT UP · leave by</div>
  <div class="leaveby-main" data-live="leaveby-main">NEXT UP</div>
- <div class="leaveby-detail" data-live="leaveby-detail">Garage sale <strong>9–2</strong> · vanity <strong>3:00</strong> · Dad @ 147th</div>
+ <div class="leaveby-detail" data-live="leaveby-detail"></div>
  </div>
- <div class="leaveby-badge" data-live="leaveby-badge">Sun</div>
+ <div class="leaveby-badge" data-live="leaveby-badge"></div>
 </a>
 
 
@@ -810,7 +819,7 @@
  <div class="where-card kids dad-week-loud-card">
  <div class="lbl">WITH DAD</div>
  <div class="big">With Dad · @ 147th</div>
- <div class="sub">Through <strong>Fri Oct 2 · 3:00</strong> · garage sale <strong>9–2</strong> · vanity <strong>3:00</strong></div>
+ <div class="sub" data-today-bind="through" hidden></div>
  <div class="chip-row">
  <a class="kchip ain" href="kid-ainsley.html"><span class="d">A</span>Ainsley</a>
  <a class="kchip hay" href="kid-hayes.html"><span class="d">H</span>Hayes</a>
@@ -824,15 +833,23 @@
  </a>
  </section>
 
+ <section class="sec today-day" aria-label="Today on the calendar">
+ <div class="sec-hdr">
+ <div class="sec-title">Today</div>
+ <div class="sec-meta">calendar</div>
+ </div>
+ <ul class="today-day-list" data-live="leaveby-today"></ul>
+ </section>
+
  <section class="sec kids-col" aria-label="Each kid today" style="background:transparent;border:none;box-shadow:none;padding:0;">
  <a class="kid-card harris" href="kid-harris.html">
  <div class="kid-top">
  <div class="kid-name"><span class="dot">H</span> Harris</div>
  <span class="kid-tap">Board</span>
  </div>
- <div class="kid-when">Morning · 9–2</div>
+ <div class="kid-when" data-today-kid-when="harris" hidden></div>
  <div>
- <div class="kid-what">House shake / garage-sale crew @ 147th</div>
+ <div class="kid-what" data-today-kid-what="harris" hidden></div>
  <div class="kid-hint">Musts · Jar · Days on board</div>
  </div>
  </a>
@@ -841,9 +858,9 @@
  <div class="kid-name"><span class="dot">H</span> Hayes</div>
  <span class="kid-tap">Board</span>
  </div>
- <div class="kid-when">Morning · 9–2</div>
+ <div class="kid-when" data-today-kid-when="hayes" hidden></div>
  <div>
- <div class="kid-what">House shake / garage-sale loadout @ 147th</div>
+ <div class="kid-what" data-today-kid-what="hayes" hidden></div>
  <div class="kid-hint">Musts · Jar · Days on board</div>
  </div>
  </a>
@@ -852,9 +869,9 @@
  <div class="kid-name"><span class="dot">A</span> Ainsley</div>
  <span class="kid-tap">Board</span>
  </div>
- <div class="kid-when">3:00 LOCKED</div>
+ <div class="kid-when" data-today-kid-when="ainsley" hidden></div>
  <div>
- <div class="kid-what">Vanity install · Jessy</div>
+ <div class="kid-what" data-today-kid-what="ainsley" hidden></div>
  <div class="kid-hint">Musts · Jar · Days on board</div>
  </div>
  </a>
@@ -892,7 +909,7 @@
  <div class="qtile-icon" aria-hidden="true">LD</div>
  <div>
  <div class="qtile-label">Load day</div>
- <div class="qtile-sub">Mon 28 · House+Desk LIVE</div>
+ <div class="qtile-sub">Load-day sheet</div>
  </div>
  <span class="qtile-tap">Tap</span>
  </a>
@@ -902,13 +919,14 @@
 
  <footer class="ftr">
  <div class="ftr-left">
- <span class="ftr-chip">TODAY · TODAYGLANCE1</span>
+ <span class="ftr-chip">TODAY · QARELAY1</span>
  </div>
  </footer>
 </div>
 
 <script src="house-clock.js?v=TODAYGLANCE1"></script>
 <script src="house-board-strip.js?v=SCHEDDAY2"></script>
+<script src="house-today-bind.js?v=QARELAY1"></script>
 <script src="house-weather.js?v=CT1"></script>
 <script src="house-sensi.js?v=TODAYGLANCE1"></script>
 <script src="house-zoom.js"></script>

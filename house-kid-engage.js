@@ -196,6 +196,15 @@
     return false;
   }
 
+  /* QARELAY1 · RIDES law on kid NEXT UP: Dad logistics (kind leave/ride, "Pick up …" / "Drop …")
+     are Dad-seat items, never a kid's next thing. */
+  function isDadLogistics(item) {
+    if (!item) return false;
+    if (item.kind === "leave" || item.kind === "ride") return true;
+    var raw = String(item.summary || item.place || item.what || item.title || "").trim();
+    return /^(Pick\s*-?\s*up|Drop)\b/i.test(raw);
+  }
+
   function shortTitle(summary) {
     var s = kidsSafe(String(summary || "").trim());
     s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
@@ -298,6 +307,7 @@
 
     function consider(item) {
       if (!item) return;
+      if (isDadLogistics(item)) return;
       if (isPrepItem(item) !== wantPrep) return;
       var start = Date.parse(item.startIso || item.start || "") || 0;
       var end = Date.parse(item.endIso || item.end || "") || 0;
