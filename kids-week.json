@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Sep 28 2026",
   "asOfIso": "2026-09-28",
-  "refreshedAt": "2026-09-29T02:32:01.382Z",
+  "refreshedAt": "2026-09-29T02:42:10.651Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -554,12 +554,6 @@
           "what": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00",
           "hint": "YOUR board",
           "tone": "hot"
-        },
-        {
-          "when": "Mon 5 · leave 5:30",
-          "what": "Hayes baseball — Falcons vs KC Tigers (away)",
-          "hint": "YOUR board",
-          "tone": "hot"
         }
       ],
       "school": [
@@ -815,24 +809,12 @@
           "what": "LKMS yearbook baby photo due",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Mon 5 · 3:00",
-          "what": "LKMS Homework Help",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": [
         {
           "when": "Wed 30 · 12:40",
           "what": "appointment · 1:00 (provider)",
-          "hint": "with Dad",
-          "tone": "hot"
-        },
-        {
-          "when": "Mon 5 · 1:40",
-          "what": "appointment · 2:00 (provider)",
           "hint": "with Dad",
           "tone": "hot"
         }
