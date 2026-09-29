@@ -5,7 +5,7 @@
   var LAT = 38.884;
   var LON = -94.671;
   var PLACE = "Overland Park · 147th";
-  var CACHE_KEY = "house-wx:v1";
+  var CACHE_KEY = "house-wx:v2";
   var CACHE_MS = 20 * 60 * 1000;
 
   var WMO = {
@@ -31,12 +31,42 @@
     try { localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), data: data })); } catch (e) { /* */ }
   }
 
+
+  /* RAINLINE1 · will it rain in the next 24h, and when (Open-Meteo hourly, CT) */
+  function hourLabel(iso) {
+    var h = Number(String(iso).slice(11, 13));
+    var ap = h < 12 ? "a" : "p";
+    var hh = h % 12 === 0 ? 12 : h % 12;
+    return hh + ap;
+  }
+  function rainOutlook(hourly, nowIso) {
+    if (!hourly || !hourly.time) return null;
+    var t = hourly.time, pp = hourly.precipitation_probability || [], pr = hourly.precipitation || [];
+    var nowKey = String(nowIso || "").slice(0, 13);
+    var i0 = 0;
+    for (var k = 0; k < t.length; k++) { if (String(t[k]).slice(0, 13) >= nowKey) { i0 = k; break; } }
+    var iEnd = Math.min(t.length, i0 + 24);
+    function wet(i) { return (pp[i] || 0) >= 40 || (pr[i] || 0) >= 0.02; }
+    function damp(i) { return (pp[i] || 0) >= 30 || (pr[i] || 0) > 0; }
+    var s = -1;
+    for (var i = i0; i < iEnd; i++) { if (wet(i)) { s = i; break; } }
+    if (s < 0) return { text: "No rain next 24 hrs", wet: false };
+    var e = s, maxP = pp[s] || 0;
+    while (e + 1 < t.length && damp(e + 1)) { e++; if ((pp[e] || 0) > maxP) maxP = pp[e]; }
+    var dayNow = String(t[i0]).slice(0, 10);
+    var tmrw = String(t[s]).slice(0, 10) !== dayNow ? "Tmrw " : "";
+    var endIso = t[e + 1] || t[e];
+    var when = (s === i0 ? "now" : tmrw + hourLabel(t[s])) + "–" + hourLabel(endIso);
+    return { text: "Rain " + when + " · " + Math.round(maxP) + "%", wet: true };
+  }
+
   function fromOpenMeteo() {
     var url = "https://api.open-meteo.com/v1/forecast"
       + "?latitude=" + LAT + "&longitude=" + LON
       + "&current=temperature_2m,weather_code"
       + "&daily=temperature_2m_max,temperature_2m_min"
-      + "&temperature_unit=fahrenheit&timezone=America%2FChicago&forecast_days=1";
+      + "&hourly=precipitation_probability,precipitation"
+      + "&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FChicago&forecast_days=2";
     return fetch(url, { cache: "no-store" }).then(function (r) {
       if (!r.ok) throw new Error("om " + r.status);
       return r.json();
@@ -49,6 +79,7 @@
         icon: pair[1],
         high: Math.round(j.daily.temperature_2m_max[0]),
         low: Math.round(j.daily.temperature_2m_min[0]),
+        rain: rainOutlook(j.hourly, j.current && j.current.time),
         place: PLACE,
         source: "open-meteo"
       };
@@ -105,7 +136,9 @@
       + '<span class="wx-mode">OUT</span>'
       + "</div>"
       + '<div class="wx-sub"><i class="hdr-live-dot" aria-hidden="true"></i>' + hi + "</div>"
+      + (data.rain ? '<div class="wx-rain' + (data.rain.wet ? ' is-wet' : '') + '">' + (data.rain.wet ? "☂ " : "") + data.rain.text + "</div>" : "")
       + "</div>";
+    el.classList.toggle("has-rain", !!(data.rain && data.rain.wet));
   }
 
   function mount(selector) {
@@ -134,6 +167,12 @@
       }
       paint(el, data);
     });
+    /* RAINLINE1 · wall stays open all day: repaint every 20 min */
+    if (!el.__wxTimer) {
+      el.__wxTimer = setInterval(function () {
+        load(function (err, data) { if (!err && data) paint(el, data); });
+      }, CACHE_MS);
+    }
   }
 
   global.HouseWeather = { load: load, paint: paint, mount: mount, PLACE: PLACE };
