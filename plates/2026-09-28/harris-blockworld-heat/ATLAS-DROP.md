@@ -1,9 +1,12 @@
-# ATLAS DROP · Harris Block World heat · PASS-FIRE Mon 28 Sep ~10:00p CT
+# ATLAS DROP · Harris Block World heat · HARRIS-TEXT1 · Mon 28 Sep ~10:23p CT
 
-**Drop now (live ship yours):**
-1. Copy `harris-blocks-amber.png` → `theme-tiles/harris-blocks.png` (hotbar companion optional: `harris-hotbar-amber.png`)
-2. Paste `tokens-harris-blockworld-heat.css` after kid-harris heat block (or link `?v=HBWORLD1`)
-3. Optional: mount `session-rail-pills.svg` faces (CRAFT / MINE LIVE · GEM / BUILD honest STUB)
+**Dan stack (hard):** void+amber · **icon heat + essential words** · denser fill · kids-first · homage-clean. No Minecraft IP. Kill CRAFT/MINE/GEM/BUILD. TEXTLESS swung too far — restore musts/jar/days/chores/next.
 
-**Still baking:** full 1080×1920 mock · chore-rail live wiring
-**Locks:** No Minecraft IP marks. No inventing $ amounts. Prism LOOK only — Atlas ships Pages.
+**Paste order (live ship yours):**
+1. Copy `harris-blocks-amber.png` → `theme-tiles/harris-blocks.png`
+2. Paste `tokens-harris-blockworld-heat.css` (`?v=HARRIS-TEXT1`) — kills merch; shows essential words
+3. **TEXTBACK1 chrome** — TIME · ovals · next+time · meters · jar. Labels: next · musts · chores · jar · days. Session rail: Musts/Jar/Days
+4. Day rail: `session-rail-pills.svg`
+5. **Density** — enlarge blocks float, thicken meters/jar
+
+**Do not:** invent money · Minecraft/Mojang marks · lime grass candy · pink · Prism edits live Pages · restore merch corn

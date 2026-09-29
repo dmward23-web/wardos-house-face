@@ -1,8 +1,8 @@
-# Hub header heat-pass · one screen · AVINYL3 / HUBHDR
+# Hub header heat-pass · one screen · AVINYL4 / TEXTBACK1 / HUBHDR
 
 **Target:** `sheet-index.html` header only (LOOK notes — Atlas ships).  
-**Law:** pass-by glance · control-panel void · icon-first · no brand fight with command deck.  
-**Vibe:** fresh / untouched chrome — spare, not merch.
+**Law:** pass-by glance · control-panel void · **clock-first** · essential words elsewhere on boards (not in header).  
+**Vibe:** fresh / untouched chrome — spare, not merch. See house `textback1/LOOK-LAW.md`.
 
 ---
 
@@ -29,7 +29,7 @@
 ## Layout sketch (one bar ~110px)
 
 ```
-[  10:11  ]················[ ☀ 68° ][ ⌠ 72° ]
+[  10:23  ]················[ ☀ 68° ][ ⌠ 72° ]
    ↑ TIME only                  icon instruments
 ```
 

@@ -1,9 +1,12 @@
-# ATLAS DROP · Hayes Drop Zone heat · PASS-FIRE Mon 28 Sep ~10:00p CT
+# ATLAS DROP · Hayes Drop Zone heat · HAYES-TEXT1 · Mon 28 Sep ~10:23p CT
 
-**Drop now (live ship yours):**
-1. Copy `hayes-storm-amber.png` → `theme-tiles/hayes-storm.png` (keep lattice companion optional: `hayes-lattice-amber.png` → `hayes-lattice.png`)
-2. Paste `tokens-hayes-dropzone-heat.css` after kid-hayes heat block (or link `?v=HDZONE1`)
-3. Optional: mount `session-rail-pills.svg` faces (LOADOUT / DROP LIVE · VICTORY / SQUAD honest STUB)
+**Dan stack (hard):** void+amber · **icon heat + essential words** · denser fill · kids-first · homage-clean. No Fortnite IP. Kill LOADOUT/DROP/VICTORY/SQUAD. TEXTLESS swung too far — restore musts/jar/days/chores/next.
 
-**Still baking:** full 1080×1920 mock · chore-rail live wiring
-**Locks:** No Fortnite IP marks. No inventing $ amounts. Prism LOOK only — Atlas ships Pages.
+**Paste order (live ship yours):**
+1. Copy `hayes-storm-amber.png` → `theme-tiles/hayes-storm.png`
+2. Paste `tokens-hayes-dropzone-heat.css` (`?v=HAYES-TEXT1`) — kills merch; shows essential words
+3. **TEXTBACK1 chrome** — TIME · ovals · next+time · meters · jar. Labels: next · musts · chores · jar · days. Session rail: Musts/Jar/Days
+4. Day rail: `session-rail-pills.svg`
+5. **Density** — enlarge storm float, thicken meters/jar
+
+**Do not:** invent money · Fortnite/Epic marks · purple storm candy · pink · Prism edits live Pages · restore merch corn

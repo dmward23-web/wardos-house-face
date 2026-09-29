@@ -1,7 +1,7 @@
-/* AINSLEY VINYL HEAT · AVINYL3 · void+amber · icon-first · denser · 2026-09-28
-   Paste on kid-ainsley.html (or link ?v=AVINYL3). Atlas ships. Prism does not push Pages.
+/* AINSLEY VINYL HEAT · AVINYL4 / TEXTBACK1 · void+amber · icon heat + essential words · 2026-09-28
+   Paste on kid-ainsley.html (or link ?v=AVINYL4). Atlas ships. Prism does not push Pages.
    Palette lock: void + amber ONLY. No pink / blush / lilac / magenta / rose / cyan.
-   Icon-first: hide leftover word labels; instruments speak in glyphs + meters. */
+   TEXTBACK1: keep icon heat; restore chores/musts/jar/days/next plain words. Kill merch-speak. */
 
 :root {
   --av-void: #0a0908;
@@ -37,51 +37,81 @@
   display: none !important;
 }
 
-/* Hide leftover word labels — icon-first / AVINYL3 strip */
+/* KILL merch-speak + eyebrow spam + weather words — NOT essential labels */
 .eyebrow,
 .chip.eras-stage,
 .chip.eras,
 [data-label="eras-stage"],
-.tour-jar .stars,
 .tour-jar .pressed-lab,
-.tour-jar .lab,
 .tour-jar .quiet,
 .tour-jar .count,
 .xp-stage .side-a-lab,
-.xp-stage .lab,
 .flow-tabs,
 .tour-flow,
 .musts-press-jar,
 .next .quiet,
-.next .lab,
-.next .main,
 .next .sub,
-.next-up .lab,
-.next-up .title,
 .next-up .sub,
 .prog .meta,
 .progress .meta,
-.progress .lab,
 .wx-card .k,
 .wx-card .lab,
+.wx-card .desc,
+.wx-card .condition,
 .sensi-hdr .k,
 .sensi-hdr .lab,
+.sensi-hdr .mode,
+.sensi-hdr .auto-lab,
 .hdr .clock-lab,
 .hdr .tz-lab,
-[data-label="next"],
+.hdr .brand,
+.hdr .brand img,
+.hdr .tagline,
 [data-label="saved"],
-[data-label="weather-words"] {
+[data-label="weather-words"],
+[data-label="setlist"],
+[data-label="track-a"],
+[data-label="side-a"],
+[data-label="encore"],
+[data-label="press"] {
   display: none !important;
 }
 
-/* Day-record rail — quiet instrument pills, no banner chrome */
-.day-records .banner,
+/* TEXTBACK1 · SHOW essential plain words */
+.wlab,
+.lab--essential,
+[data-label="next"],
+[data-label="musts"],
+[data-label="chores"],
+[data-label="jar"],
+[data-label="days"],
+.next .lab,
+.next .main,
+.next-up .lab,
+.next-up .title,
+.tour-jar .lab,
+.tour-jar .stars,
+.xp-stage .lab,
+.musts .lab,
+.chores .lab,
+.days .lab,
 .day-records > .lab,
 .session-rail > .lab,
 .vinyl-days > .lab,
 .day-rail > .lab {
-  display: none !important;
+  display: block !important;
+  color: var(--av-amber-hi) !important;
+  font-family: "JetBrains Mono", ui-monospace, monospace !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: lowercase !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
+
+/* Day-record / session rail — plain Musts/Jar/Days or Mon–Sun (not mute) */
+.day-records .banner { display: none !important; }
 .day-records,
 .session-rail,
 .vinyl-days,
@@ -106,8 +136,12 @@
   border-radius: 999px;
   background: rgba(8, 7, 6, 0.72);
   border: 1.5px solid rgba(255, 255, 255, 0.06);
-  color: transparent; /* icon-first: kill glyph text if any */
-  font-size: 0;
+  color: var(--av-ink) !important; /* TEXTBACK1: readable */
+  font-family: "JetBrains Mono", ui-monospace, monospace !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  text-align: center;
 }
 .day-records .row.live,
 .session-rail .row.live,
@@ -115,15 +149,17 @@
   border-color: rgba(245, 196, 70, 0.55);
   background: linear-gradient(90deg, var(--av-amber-lo), var(--av-amber-mid), var(--av-amber-hi));
   box-shadow: 0 0 14px rgba(245, 180, 70, 0.32);
+  color: #140c02 !important;
 }
 .day-records .row.stub,
 .session-rail .row.stub,
 .day-rail .pill.off {
   border-style: dashed;
-  opacity: 0.5;
+  opacity: 0.75;
+  color: rgba(180, 176, 160, 0.65) !important;
 }
 
-/* Tour jar twin — dark glass + amber fill · denser · no numeral spam */
+/* Tour jar twin — dark glass + amber fill · denser · show "jar" lab */
 .tour-jar,
 .xp-stage,
 .grow-tour {
@@ -142,7 +178,7 @@
   min-height: 56px !important;
 }
 
-/* Progress meter — segments / bar only */
+/* Progress meter — segments / bar; hide fraction spam meta only */
 .prog .meta,
 .progress-meta,
 .xp-meta { display: none !important; }
@@ -152,18 +188,10 @@
   border-radius: 8px !important;
 }
 
-/* Kid / hub header — logo-free · icon instruments */
-.hdr .brand,
-.hdr .brand img,
-.hdr .tagline { display: none !important; }
+/* Kid / hub header — logo-free · clock-first */
 .hdr .eyebrow { color: var(--av-amber) !important; }
 
-/* Weather / Sensi — hide word labels; keep oval chrome */
-.wx-card .desc,
-.wx-card .condition,
-.sensi-hdr .mode,
-.sensi-hdr .auto-lab { display: none !important; }
-
+/* ── Atlas live-surface (TEXTBACK1 tip keep) · denser + essential labels ── */
 /* ═══════════════════════════════════════════════════
    TEXTBACK1 / HEAT4 surface · void+amber denser fill
    Labels restored below · corn stays dead
@@ -224,7 +252,6 @@ body.theme-ainsley .consume-title,
 body.theme-ainsley .ftr,
 body.theme-ainsley .ftr-chip,
 body.theme-ainsley .eras,
-body.theme-ainsley .day-record-rail,
 body.theme-ainsley .setlist-foot {
   display: none !important;
 }
@@ -541,3 +568,24 @@ body.theme-ainsley .consume-hero .hint {
   display: none !important;
 }
 body.theme-ainsley[data-era-mood] .panel { filter: none !important; }
+
+
+/* TEXTBACK1-PLATES · remount Musts/Jar/Days day rail */
+body.theme-ainsley .session-rail,
+body.theme-ainsley .day-records {
+  display: block !important;
+  flex-shrink: 0 !important;
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+body.theme-ainsley .session-rail img,
+body.theme-ainsley .day-records img {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 14px !important;
+  box-shadow: 0 0 18px rgba(245,180,70,.18) !important;
+}

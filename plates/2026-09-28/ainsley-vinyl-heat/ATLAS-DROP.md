@@ -1,14 +1,14 @@
-# ATLAS DROP · Ainsley vinyl heat · AVINYL3 · Mon 28 Sep ~10:11p CT
+# ATLAS DROP · Ainsley vinyl heat · AVINYL4 / TEXTBACK1 · Mon 28 Sep ~10:23p CT
 
-**Dan stack (hard):** void+amber only · one night-stage · icon-first · almost NO text · denser fill · fresh/untouched chrome · no merch-speak · vinyl speaks. Vibe = clean new board (not Madonna IP).
+**Dan stack (hard):** void+amber · one night-stage · **icon heat + essential words** · denser fill · **innocent-but-guilty** · no merch-speak · vinyl speaks. No Madonna IP. TEXTLESS swung too far — restore musts/jar/days/chores/next.
 
 **Paste order (live ship yours):**
-1. Copy `ainsley-vinyl-amber.png` → `theme-tiles/ainsley-vinyl.png` (or point `.vinyl-float` at amber)
-2. Paste `tokens-ainsley-vinyl-heat.css` after kid-ainsley heat (`?v=AVINYL3`) — hides `.eras`, kills leftover labels, icon-first instruments
-3. **Kill mood row** — delete `.eras` / `.era` markup. One locked look forever
-4. **Strip to icon chrome** — hide NEXT/SAVED/CT/weather-words/“2/6”/jar zero. Keep: TIME digits, sun+thermo ovals (tiny ° OK), next glyph+time card, segment meter, unlabeled pills, star+fill jar
-5. Day rail: drop OR ≤3 unlabeled pills (`day-record-pills.svg`)
-6. Hub header heat-pass per `hub-header-heat-notes.md` (logo-free · clock · icon-only Weather/Sensi)
+1. Copy `ainsley-vinyl-amber.png` → `theme-tiles/ainsley-vinyl.png`
+2. Paste `tokens-ainsley-vinyl-heat.css` after kid-ainsley heat (`?v=AVINYL4`) — kills eras/merch/pink; **shows** essential words
+3. **Kill mood row** — delete `.eras` / `.era`. One locked look forever
+4. **TEXTBACK1 chrome** — keep TIME digits, sun+thermo ovals, next glyph+time, segment meter, star+fill jar. **Add plain labels:** next · musts · chores · jar · days. Short kid lines OK. Session rail: Musts/Jar/Days (or Mon–Sun)
+5. Day rail: `day-record-pills.svg` (Musts/Jar/Days) — not unlabeled mute dots
+6. Hub header: clock-first per `hub-header-heat-notes.md` + house `textback1/LOOK-LAW.md`
 7. **Density** — enlarge vinyl float, thicken meters/jar; do not leave sparse void
 
-**Do not:** invent money · Swift IP · Madonna marks/lyrics · pink/blush/lilac · multi-theme picker · Prism edits live Pages
+**Do not:** invent money · Swift IP · Madonna marks/lyrics · pink/blush · multi-theme picker · Prism edits live Pages · restore merch-speak (Setlist/Track A/Encore/Press…)

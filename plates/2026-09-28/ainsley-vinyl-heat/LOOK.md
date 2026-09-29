@@ -1,4 +1,4 @@
-# LOOK · Ainsley Vinyl Heat · AVINYL3
+# LOOK · Ainsley Vinyl Heat · AVINYL4 / TEXTBACK1
 
 **Plate:** `ainsley-vinyl-heat` · 2026-09-28 · Prism LOOK only  
 **Canvas:** Elo / Asus portrait **1080×1920** · wall, no scroll  
@@ -10,34 +10,32 @@
 ## One language forever
 
 **Locked:** one vinyl night-stage look. Void black + honey amber only.  
-**Killed:** mood / era / theme picker. No multi-mood product. Ever.  
-**Vibe:** *Like a Virgin* = **fresh / clean / untouched** — crisp void+amber that feels brand-new. Not a restyle of corny merch boards. Spare chrome. Pure vinyl. Zero leftover cat-merch DNA. **Vibe only — no Madonna IP.**
+**Killed:** mood / era / theme picker. No multi-mood product. Ever. Merch-speak (Setlist, Track A, Side A, Encore, Press, Eras, Tour Jar…). Pink / blush / lilac. Duplicate eyebrow spam.  
+**Vibe:** *Like a Virgin* = **innocent-but-guilty** — pure/clean glass chrome on the surface, soft amber heat bloom simmering **under**. Denser icon stack + **essential readable words**. **Vibe only — no Madonna IP.**
 
-Pass-by glance: **vinyl + next glyph/time + jar meter.** A kid reads it with **zero words**.
+Pass-by glance: **vinyl · next (time) · musts · jar · days · chores.**
 
 ---
 
-## Icon-first / anti-text (AVINYL3 strip)
+## TEXTBACK1 law (corrects TEXTLESS swing)
 
-1. **Almost no words** — graphic-intuitive. Prefer silence over labels.
-2. **Kill:** NEXT · SAVED · CT spelled out · weather words (“clear”, “auto”) · “2/6” numeral text · big jar “0” · any merch-speak (Setlist, Track A, Side A, Encore, Press, Eras, Tour Jar…).
-3. **Header** — huge TIME digits (kids need time). Weather / Sensi = **icon-only** amber ovals (sun / thermo glyphs + tiny ° numerals OK). No “68° clear” strings.
-4. **Next-up** — one graphic card: glyph + time digits only. Atlas binds live prose; plate shows chrome pattern only.
-5. **Progress** — amber **segment bar** only (filled / empty). No “2/6” text.
-6. **Pills** — ≤3 unlabeled instrument dots. No “DAY RECORD” banner.
-7. **Jar** — star/glyph + amber fill meter only. No SAVED / big zero spam.
-8. **Palette** — void `#0a0908` / `#010205` + amber `#f5c446` / `#ffe894` / `#b85a28` only. **Kill every pink / blush / lilac / magenta / rose / cyan.**
-9. **Density** — fill the portrait. Bigger vinyl · bigger next card · thicker meters · taller jar · icon rails use width. Compress empty gaps. No sparse desert.
+1. **Keep icon heat** — glyphs, meters, amber bloom, denser fill, clock-first header.
+2. **Restore ESSENTIAL plain words** — `chores` · `musts` · `jar` · `days` · `next` (or time digits) · short kid-context lines OK (`bed · dishes`, `piano · after school`).
+3. **Still kill** — merch-speak · mood/era pickers · pink · duplicate eyebrow spam · weather condition strings · “CT” spelled out · big jar zero spam.
+4. **Header** — huge TIME digits. Weather / Sensi = icon ovals + tiny °. No logo fight.
+5. **Session rail** — short plain words (`Musts` / `Jar` / `Days` or Mon–Sun). Not LOADOUT/DROP/etc.
+6. **Palette** — void `#0a0908` / `#010205` + amber `#f5c446` / `#ffe894` / `#b85a28` only.
+7. **Density** — bigger vinyl + under-vinyl heat pad · right rail packed. Not mute boards.
 
 ---
 
 ## Atlas drop-in moves
 
-1. **Vinyl** — `ainsley-vinyl-amber.png` → `theme-tiles/ainsley-vinyl.png`. Louder float (opacity ~0.4, amber drop-shadow).
-2. **Kill moods** — remove `.eras` / `.era` markup (or hide via tokens). One locked night-stage forever.
-3. **Strip chrome** — hide leftover labels via `tokens-ainsley-vinyl-heat.css` (`?v=AVINYL3`). Icon-first instruments.
-4. **Hub header** — see `hub-header-heat-notes.md` (clock + icon-only Weather/Sensi).
-5. **What NOT** — no Taylor/Swift IP · no Madonna marks/lyrics · no purple disc · no pink/blush · no inventing money · no live Pages edit from this plate.
+1. **Vinyl** — `ainsley-vinyl-amber.png` → `theme-tiles/ainsley-vinyl.png`.
+2. **Kill moods** — remove `.eras` / `.era` markup. One locked night-stage forever.
+3. **Tokens** — paste `tokens-ainsley-vinyl-heat.css` (`?v=AVINYL4`). Kill merch / eras / pink; **show** essential `.wlab` / musts / jar / days / chores / next.
+4. **Hub header** — clock-first per `hub-header-heat-notes.md` + house `LOOK-LAW.md`.
+5. **What NOT** — no Taylor/Swift IP · no Madonna marks/lyrics · no purple disc · no pink · no inventing money · no live Pages edit from this plate.
 
 ---
 

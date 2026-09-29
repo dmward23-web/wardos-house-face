@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>AINSLEY · Vinyl Heat · AVINYL4 / TEXTBACK1 · 1080×1920</title>
+<title>HAYES · Drop Zone Heat · HAYES-TEXT1 · 1080×1920</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet"/>
 <style>
-/* AVINYL4 / TEXTBACK1 · innocent-but-guilty · essential words + icon heat */
+/* HAYES-TEXT1 · Drop Zone · essential words + icon heat · no Fortnite IP */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
   width: 1080px; height: 1920px; overflow: hidden;
@@ -17,7 +17,7 @@ html, body {
   background:
     radial-gradient(ellipse 92% 54% at 38% 42%, rgba(255,148,20,0.26), transparent 55%),
     radial-gradient(ellipse 100% 44% at 50% -3%, rgba(255,176,40,0.22), transparent 58%),
-    radial-gradient(ellipse 46% 32% at 100% 100%, rgba(184,90,40,0.2), transparent 52%),
+    radial-gradient(ellipse 46% 32% at 100% 100%, rgba(94,200,224,0.08), transparent 52%),
     linear-gradient(180deg, #0a0908 0%, #010205 44%, #0c0804 100%);
 }
 .frame {
@@ -75,7 +75,7 @@ html, body {
   grid-template-columns: 1.55fr 1fr;
   gap: 6px;
 }
-.vinyl-bay {
+.hero-bay {
   border-radius: 18px;
   position: relative;
   background:
@@ -92,14 +92,14 @@ html, body {
   overflow: hidden;
   gap: 10px;
 }
-.vinyl-bay::before {
+.hero-bay::before {
   content: ""; position: absolute; left: 4%; right: 4%; top: 2%; height: 62%;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255,150,25,0.5) 0%, rgba(184,70,14,0.16) 42%, transparent 68%);
   filter: blur(18px);
   z-index: 0; pointer-events: none;
 }
-.vinyl-bay img {
+.hero-bay img {
   position: relative; z-index: 1;
   width: 100%; aspect-ratio: 1; height: auto;
   flex: 0 0 auto; object-fit: contain; display: block;
@@ -108,13 +108,13 @@ html, body {
     drop-shadow(0 18px 32px rgba(0,0,0,0.6))
     drop-shadow(0 30px 52px rgba(255,110,10,0.26));
 }
-.vinyl-bay .under {
+.hero-bay .under {
   position: relative; z-index: 1;
   flex: 1 1 auto; min-height: 0;
   display: flex; flex-direction: column; justify-content: stretch; gap: 8px;
   padding: 4px 2px 0;
 }
-.vinyl-bay .heatbar {
+.hero-bay .heatbar {
   flex: 1 1 auto; min-height: 40px;
   border-radius: 14px;
   background:
@@ -127,29 +127,29 @@ html, body {
     0 0 32px rgba(255,140,18,0.24);
   display: flex; align-items: center; justify-content: center;
 }
-.vinyl-bay .heatbar .wlab { font-size: 14px; opacity: 0.95; }
-.vinyl-bay .udots {
+.hero-bay .heatbar .wlab { font-size: 14px; opacity: 0.95; }
+.hero-bay .udots {
   flex: 0 0 56px;
   display: flex; gap: 8px; align-items: stretch;
 }
-.vinyl-bay .udot {
+.hero-bay .udot {
   flex: 1; border-radius: 12px;
   background: linear-gradient(145deg, rgba(255,200,70,0.16), rgba(30,22,8,0.9));
   border: 1.5px solid rgba(255,190,64,0.4);
   box-shadow: inset 0 1px 0 rgba(255,230,160,0.16), 0 8px 16px rgba(255,120,10,0.16);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
 }
-.vinyl-bay .udot i {
+.hero-bay .udot i {
   width: 10px; height: 10px; border-radius: 50%; display: block;
   background: radial-gradient(circle at 40% 35%, #ffe894, #a85808);
   box-shadow: 0 0 12px rgba(255,170,30,0.55);
 }
-.vinyl-bay .udot.off {
+.hero-bay .udot.off {
   opacity: 0.55;
   border-style: dashed;
   border-color: rgba(160,156,140,0.3);
 }
-.vinyl-bay .udot.off i {
+.hero-bay .udot.off i {
   background: rgba(180,176,160,0.35);
   box-shadow: none;
 }
@@ -423,13 +423,13 @@ html, body {
     </header>
 
     <div class="main">
-      <div class="vinyl-bay">
-        <img src="ainsley-vinyl-amber.png" alt=""/>
+      <div class="hero-bay">
+        <img src="hayes-storm-amber.png" alt=""/>
         <div class="under">
           <div class="heatbar"><span class="wlab">chores</span></div>
           <div class="udots">
             <div class="udot"><i></i><span class="w">bed</span></div>
-            <div class="udot"><i></i><span class="w">dishes</span></div>
+            <div class="udot"><i></i><span class="w">trash</span></div>
             <div class="udot off"><i></i><span class="w">shoes</span></div>
           </div>
         </div>
@@ -439,12 +439,11 @@ html, body {
           <div class="wlab">next</div>
           <div class="g">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <circle cx="12" cy="12" r="9" stroke="#ffe894" stroke-width="1.8"/>
-              <path d="M12 7v5.2l3.2 2" stroke="#ffe894" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M13 2L4 13.5h6.5L11 22l9-12.5h-6.5L13 2z" fill="#ffe894"/>
             </svg>
           </div>
           <div class="t">3:00</div>
-          <div class="kid">piano · after school</div>
+          <div class="kid">practice · backyard</div>
         </div>
         <div class="twins">
           <div class="twin" aria-label="musts">
@@ -459,14 +458,12 @@ html, body {
           <div class="twin" aria-label="chores">
             <div class="g">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle cx="12" cy="12" r="3.2" fill="#ffe894"/>
-                <circle cx="12" cy="12" r="7" stroke="#ffe894" stroke-width="1.6" opacity="0.85"/>
-                <circle cx="12" cy="12" r="10.2" stroke="#f0a818" stroke-width="1.4" opacity="0.45"/>
+                <path d="M13 2L4 13.5h6.5L11 22l9-12.5h-6.5L13 2z" fill="#ffe894"/>
               </svg>
             </div>
             <div class="col">
               <div class="wlab">chores</div>
-              <div class="kid">bed · dishes</div>
+              <div class="kid">bed · trash</div>
             </div>
           </div>
           <div class="twin" aria-label="days">
@@ -516,7 +513,7 @@ html, body {
       <div class="meter"><div class="fill"></div></div>
     </section>
 
-    <div class="foot">LOOK · AVINYL4 / TEXTBACK1 · NO LIVE PAGES · INNOCENT-BUT-GUILTY · TEXTBACK1</div>
+    <div class="foot">LOOK · HAYES-TEXT1 · NO LIVE PAGES · HOMAGE-CLEAN · TEXTBACK1</div>
   </div>
 </div>
 </body>
