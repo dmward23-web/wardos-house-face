@@ -147,7 +147,21 @@
   box-shadow: 0 0 14px rgba(60,220,140,0.35);
 }
 
-/* HUBFMT1 · still snapshot (hub deck — not WebRTC LIVE) */
+/* CAMLIVE2 · WebRTC video on hub tiles */
+.hub-cam-media-wrap {
+  position: relative;
+}
+.hub-cam-media-wrap video.hub-cam-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+  z-index: 1;
+}
+
+/* HUBFMT1 · still snapshot (hub deck — LIVE only when video plays) */
 .hub-cam-still .hub-cam-pill,
 .hub-cam-pill.is-still {
   background: linear-gradient(180deg, rgba(40,120,160,0.45), rgba(10,40,60,0.55));

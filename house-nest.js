@@ -1,6 +1,7 @@
 /* House Face · Nest / Google Home cams
    Poll data/nest-live.json (Atlas nest-fetch → Pages).
    NEVER invent video. Roster LIVE when status=live + fresh.
+   CAMLIVE2: hub deck WebRTC <video> · LIVE pill ONLY when frames play (never on JPEG).
    Still images only when snapshotUrl is a real Pages-servable path.
    NESTVID1: when localStorage empty, auto-use nestProxy + nestProxyToken
    from nest-live.json (public CF URL). No ?proxy= seed required.
@@ -578,10 +579,10 @@
   }
 
   /**
-   * Honest ONE status for a hub still tile (HUBFMT1 / CAMLABEL1).
-   * Hub deck paints JPEG stills only — never WebRTC <video> — so fresh snap = STILL
-   * (not LIVE). LIVE is reserved for actual video/WebRTC (viewer page), never both.
-   * STALE / NEED TOKEN / STUB / NEED PROXY otherwise. Never invent video. Never silent black.
+   * Honest ONE status for a hub tile (HUBFMT1 / CAMLIVE2).
+   * Default while still-only = STILL / STALE / NEED TOKEN / STUB / NEED PROXY.
+   * LIVE is applied later ONLY when NestWebRtc <video> is actually playing
+   * (see markHubCamLive). Never fake LIVE on a JPEG. Never silent black.
    */
   function hubCamHonesty(slot, cam, g, data) {
     if (g && g.needToken) {
@@ -631,11 +632,26 @@
       var el = tiles[i] || null;
       if (!el) continue;
       var cam = findCamForHub(slot, cams);
+      /* CAMLIVE2 · never clobber a proven LIVE playing tile with STILL on poll */
+      if (el._hubLivePlaying && el.classList.contains("hub-cam-live")) {
+        if (cam && !String(cam.id || "").startsWith("stub-")) {
+          el.setAttribute("data-cam-id", cam.id);
+          el.setAttribute("href", viewerHref(cam));
+          el.setAttribute("aria-label", slot.label + " camera · LIVE");
+        }
+        continue;
+      }
       var h = hubCamHonesty(slot, cam, g, data);
       el.classList.remove("hub-cam-live", "hub-cam-still", "hub-cam-stale", "hub-cam-stub");
       el.classList.add(h.cls);
-      el.setAttribute("href", "sheet-google-home.html");
       el.setAttribute("aria-label", slot.label + " camera · " + h.pill);
+      if (cam && !String(cam.id || "").startsWith("stub-")) {
+        el.setAttribute("data-cam-id", cam.id);
+        el.setAttribute("href", viewerHref(cam));
+      } else {
+        el.removeAttribute("data-cam-id");
+        el.setAttribute("href", "sheet-google-home.html");
+      }
 
       var pill = el.querySelector(".hub-cam-pill");
       if (pill) {
@@ -656,6 +672,7 @@
       var mediaWrap = el.querySelector(".hub-cam-media-wrap");
       var img = el.querySelector("img.hub-cam-media");
       var voidEl = el.querySelector(".hub-cam-stub-void");
+      var vid = el.querySelector("video.hub-cam-video");
       /* Prefer real still path; fall back to known NESTSTILL1 slot file so wall never goes black */
       var snapUrl = h.snapUrl || slot.snap || null;
       var showStill = !!snapUrl;
@@ -668,9 +685,10 @@
           mediaWrap.insertBefore(img, mediaWrap.firstChild);
         }
         if (img) {
-          var bust = snapUrl + (snapUrl.indexOf("?") >= 0 ? "&" : "?") + "v=CAMDECK1";
+          var bust = snapUrl + (snapUrl.indexOf("?") >= 0 ? "&" : "?") + "v=CAMLIVE2";
           if (img.getAttribute("src") !== bust) img.setAttribute("src", bust);
-          img.style.display = "block";
+          /* Keep still visible until LIVE video proves frames */
+          if (!el._hubLivePlaying) img.style.display = "block";
           img.onerror = (function (wrap, image) {
             return function () {
               image.style.display = "none";
@@ -681,12 +699,12 @@
                 wrap.insertBefore(v, wrap.firstChild);
               }
               var p = wrap && wrap.parentNode && wrap.parentNode.querySelector(".hub-cam-pill");
-              if (p) {
+              if (p && !wrap.parentNode._hubLivePlaying) {
                 p.textContent = "NEED PROXY";
                 p.classList.remove("is-live", "is-still", "is-stale", "is-stub");
                 p.classList.add("is-need");
               }
-              if (wrap && wrap.parentNode) {
+              if (wrap && wrap.parentNode && !wrap.parentNode._hubLivePlaying) {
                 wrap.parentNode.classList.remove("hub-cam-live", "hub-cam-still", "hub-cam-stale");
                 wrap.parentNode.classList.add("hub-cam-stub");
               }
@@ -695,16 +713,244 @@
         }
         if (voidEl) voidEl.style.display = "none";
       } else {
-        if (img) img.style.display = "none";
+        if (img && !el._hubLivePlaying) img.style.display = "none";
         if (!voidEl && mediaWrap) {
           voidEl = doc.createElement("div");
           voidEl.className = "hub-cam-media hub-cam-stub-void";
           voidEl.setAttribute("aria-hidden", "true");
           mediaWrap.insertBefore(voidEl, mediaWrap.firstChild);
         }
-        if (voidEl) voidEl.style.display = "block";
+        if (voidEl && !el._hubLivePlaying) voidEl.style.display = "block";
+      }
+      /* Ensure video element exists for CAMLIVE2 (hidden until playing) */
+      if (mediaWrap && !vid) {
+        vid = doc.createElement("video");
+        vid.className = "hub-cam-media hub-cam-video";
+        vid.setAttribute("playsinline", "");
+        vid.setAttribute("muted", "");
+        vid.muted = true;
+        vid.autoplay = true;
+        vid.playsInline = true;
+        vid.setAttribute("aria-label", slot.label + " live");
+        vid.style.display = "none";
+        mediaWrap.insertBefore(vid, mediaWrap.firstChild);
       }
     }
+    /* Kick WebRTC after still paint — LIVE only when frames play */
+    startHubLiveStreams(doc);
+  }
+
+  function viewerHref(cam) {
+    ingestProxyFromLive(cachedData());
+    var id = cam && (cam.id || cam.name) ? encodeURIComponent(cam.id || cam.name) : "";
+    var url = "nest-webrtc.html?cam=" + id + "&v=CAMLIVE2";
+    var proxy = proxyBaseGuess();
+    var token = proxyTokenGuess();
+    if (proxy && !(isPagesHost() && isLoopbackProxy(proxy))) {
+      url += "&proxy=" + encodeURIComponent(proxy);
+      if (token) url += "&proxyToken=" + encodeURIComponent(token);
+    }
+    return url;
+  }
+
+  /* CAMLIVE2 · sessions keyed by cam id — never restart a healthy stream on poll */
+  var _hubLiveSessions = Object.create(null);
+  var _hubLiveStarting = false;
+  var _hubLiveKickTimer = null;
+
+  function markHubCamLive(el, slotLabel) {
+    if (!el) return;
+    el._hubLivePlaying = true;
+    el.classList.remove("hub-cam-still", "hub-cam-stale", "hub-cam-stub");
+    el.classList.add("hub-cam-live");
+    el.setAttribute("aria-label", (slotLabel || "Cam") + " camera · LIVE");
+    var pill = el.querySelector(".hub-cam-pill");
+    if (pill) {
+      pill.textContent = "LIVE";
+      pill.classList.remove("is-still", "is-stale", "is-stub", "is-need");
+      pill.classList.add("is-live");
+    }
+    var kind = el.querySelector(".hub-cam-kind");
+    if (kind) {
+      kind.textContent = "LIVE";
+      kind.setAttribute("hidden", "");
+      kind.setAttribute("aria-hidden", "true");
+    }
+    var img = el.querySelector("img.hub-cam-media");
+    if (img) img.style.display = "none";
+    var voidEl = el.querySelector(".hub-cam-stub-void");
+    if (voidEl) voidEl.style.display = "none";
+    var vid = el.querySelector("video.hub-cam-video");
+    if (vid) vid.style.display = "block";
+  }
+
+  function markHubCamNotLive(el, reason) {
+    if (!el) return;
+    el._hubLivePlaying = false;
+    var vid = el.querySelector("video.hub-cam-video");
+    if (vid) {
+      try { vid.srcObject = null; } catch (_) {}
+      vid.style.display = "none";
+    }
+    /* Revert to still honesty — never leave a fake LIVE label */
+    if (el.classList.contains("hub-cam-live")) {
+      el.classList.remove("hub-cam-live");
+      var data = cachedData();
+      var g = gate(data);
+      var cams = (data && data.cameras) || [];
+      var deck = el.closest ? el.closest("#hub-cam-deck") : null;
+      var tiles = deck ? deck.querySelectorAll(".hub-cam") : [];
+      var idx = -1;
+      for (var i = 0; i < tiles.length; i++) {
+        if (tiles[i] === el) { idx = i; break; }
+      }
+      var slot = idx >= 0 ? HUB_CAMS[idx] : null;
+      if (slot) {
+        var cam = findCamForHub(slot, cams);
+        var h = hubCamHonesty(slot, cam, g, data);
+        el.classList.remove("hub-cam-still", "hub-cam-stale", "hub-cam-stub");
+        el.classList.add(h.cls);
+        el.setAttribute("aria-label", slot.label + " camera · " + h.pill);
+        var pill = el.querySelector(".hub-cam-pill");
+        if (pill) {
+          pill.textContent = h.pill;
+          pill.classList.remove("is-live", "is-still", "is-stale", "is-stub", "is-need");
+          pill.classList.add(h.pillCls);
+        }
+        var img = el.querySelector("img.hub-cam-media");
+        if (img && h.snapUrl) img.style.display = "block";
+      }
+    }
+    if (reason && typeof console !== "undefined" && console.info) {
+      try { console.info("[CAMLIVE2] hub not LIVE:", reason); } catch (_) {}
+    }
+  }
+
+  function waitVideoPlaying(videoEl, timeoutMs) {
+    return new Promise(function (resolve) {
+      if (!videoEl) return resolve(false);
+      var done = false;
+      var t = setTimeout(function () {
+        if (!done) {
+          done = true;
+          resolve(!!(videoEl.videoWidth > 0 && !videoEl.paused));
+        }
+      }, timeoutMs || 20000);
+      function check() {
+        if (done) return;
+        if (videoEl.videoWidth > 0 && videoEl.readyState >= 2) {
+          done = true;
+          clearTimeout(t);
+          resolve(true);
+        }
+      }
+      videoEl.addEventListener("playing", check);
+      videoEl.addEventListener("loadeddata", check);
+      videoEl.addEventListener("resize", check);
+      /* already playing? */
+      check();
+    });
+  }
+
+  function startHubLiveStreams(doc) {
+    doc = doc || document;
+    if (typeof global.NestWebRtc === "undefined" || !global.NestWebRtc.startStream) {
+      return; /* client not loaded — stay STILL honestly */
+    }
+    if (_hubLiveKickTimer) clearTimeout(_hubLiveKickTimer);
+    _hubLiveKickTimer = setTimeout(function () {
+      _hubLiveKickTimer = null;
+      runHubLiveStreams(doc);
+    }, 120);
+  }
+
+  function runHubLiveStreams(doc) {
+    if (_hubLiveStarting) return;
+    var deck = doc.getElementById("hub-cam-deck");
+    if (!deck) return;
+    var data = cachedData();
+    var g = gate(data);
+    if (!g || !g.live) return;
+    ingestProxyFromLive(data);
+    var proxy = proxyBaseGuess();
+    if (!proxy || (isPagesHost() && isLoopbackProxy(proxy))) {
+      /* NEED PROXY — leave STILL/NEED PROXY from honesty; never fake LIVE */
+      return;
+    }
+    var NWR = global.NestWebRtc;
+    var cams = (data && data.cameras) || [];
+    var tiles = deck.querySelectorAll(".hub-cam");
+    _hubLiveStarting = true;
+
+    function startOne(i) {
+      if (i >= HUB_CAMS.length) {
+        _hubLiveStarting = false;
+        return;
+      }
+      var slot = HUB_CAMS[i];
+      var el = tiles[i] || null;
+      var cam = findCamForHub(slot, cams);
+      if (!el || !cam || String(cam.id || "").startsWith("stub-")) {
+        return startOne(i + 1);
+      }
+      var deviceId = cam.id;
+      var existing = _hubLiveSessions[deviceId];
+      if (existing && existing.ok && el._hubLivePlaying) {
+        return startOne(i + 1);
+      }
+      if (existing && existing.stop) {
+        try { existing.stop(); } catch (_) {}
+        delete _hubLiveSessions[deviceId];
+      }
+      var mediaWrap = el.querySelector(".hub-cam-media-wrap");
+      var vid = el.querySelector("video.hub-cam-video");
+      if (!vid && mediaWrap) {
+        vid = doc.createElement("video");
+        vid.className = "hub-cam-media hub-cam-video";
+        vid.setAttribute("playsinline", "");
+        vid.setAttribute("muted", "");
+        vid.muted = true;
+        vid.autoplay = true;
+        vid.playsInline = true;
+        vid.style.display = "none";
+        mediaWrap.insertBefore(vid, mediaWrap.firstChild);
+      }
+      if (!vid) return startOne(i + 1);
+
+      NWR.startStream(deviceId, vid, function (/* status */) {})
+        .then(function (session) {
+          _hubLiveSessions[deviceId] = session;
+          return waitVideoPlaying(vid, 22000).then(function (ok) {
+            session.ok = !!ok;
+            if (ok) {
+              markHubCamLive(el, slot.label);
+              /* Drop to STILL if ICE dies later */
+              try {
+                if (session.pc) {
+                  session.pc.addEventListener("connectionstatechange", function () {
+                    var st = session.pc.connectionState;
+                    if (st === "failed" || st === "closed" || st === "disconnected") {
+                      markHubCamNotLive(el, "ICE " + st);
+                      try { session.stop(); } catch (_) {}
+                      delete _hubLiveSessions[deviceId];
+                    }
+                  });
+                }
+              } catch (_) {}
+            } else {
+              try { session.stop(); } catch (_) {}
+              delete _hubLiveSessions[deviceId];
+              markHubCamNotLive(el, "no frames " + slot.label);
+            }
+            startOne(i + 1);
+          });
+        })
+        .catch(function (err) {
+          markHubCamNotLive(el, (err && err.message) || "stream fail");
+          startOne(i + 1);
+        });
+    }
+    startOne(0);
   }
 
   function mountHubCamDeck(selector) {
@@ -731,6 +977,7 @@
     paintPads: paintPads,
     paintHubCamDeck: paintHubCamDeck,
     mountHubCamDeck: mountHubCamDeck,
+    startHubLiveStreams: startHubLiveStreams,
     openViewer: openViewer,
     wirePadClicks: wirePadClicks,
     proxyBaseGuess: proxyBaseGuess,

@@ -2,7 +2,7 @@
 
 **Honest gate:** GitHub Pages is static. Nest / Google Home cams use **Google Device Access (SDM)** OAuth.
 
-**Status (2026-09-28 · NESTVID1):** Refresh token + `nest-sdm.json` on box (mode 600). **WebRTC live** via Atlas `nest-webrtc-proxy` (`127.0.0.1:8787`) + public CF tunnel. **NESTVID1 bake:** `nest-fetch` writes public `nestProxy` + `nestProxyToken` into `data/nest-live.json` (from `~/.config/wardos/nest-webrtc-proxy.url` + `nest-proxy.token`) — Pages hard-refresh plays video without `?proxy=` seed (LIGHTS6 pattern). Hub tiles stay stills; cams board taps open live. If proxy/tunnel down → honest **NEED PROXY** + still fallback (no silent black). SDM OAuth never on Pages.
+**Status (2026-09-28 · CAMLIVE2):** Refresh token + `nest-sdm.json` on box (mode 600). **WebRTC live** via Atlas `nest-webrtc-proxy` (`127.0.0.1:8787`) + public CF tunnel. **NESTVID1 bake:** `nest-fetch` writes public `nestProxy` + `nestProxyToken` into `data/nest-live.json` (LIGHTS6 pattern) — Pages hard-refresh just works. **CAMLIVE2:** hub deck Front/Garage/Backyard run inline WebRTC `<video>` via `NestWebRtc.startStream`; pill = **LIVE** only when frames play (videoWidth + playing) — **never** LIVE on a JPEG (STILL/STALE/NEED PROXY until then). If proxy/tunnel down → reopen CF + re-bake nestProxy + still fallback (no silent black). SDM OAuth never on Pages.
 
 ## Live data flow (stage)
 
