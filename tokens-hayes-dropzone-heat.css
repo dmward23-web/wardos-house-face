@@ -211,7 +211,7 @@ body.theme-hayes .panel::after {
   box-shadow: 0 0 12px rgba(245, 180, 70, 0.35) !important;
 }
 
-/* TEXTLESS1 / HEAT4 · Atlas · kill corn · icon-first void+amber */
+/* TEXTBACK1 · restore Musts/Jar/days/time · corn stays dead */
 body.theme-hayes .eyebrow,
 body.theme-hayes .tagline,
 body.theme-hayes .brand,
@@ -224,24 +224,81 @@ body.theme-hayes .session-rail,
 body.theme-hayes .loadout-lab,
 body.theme-hayes .storm-lab,
 body.theme-hayes .elim-tag,
-body.theme-hayes .sec-hdr,
-body.theme-hayes .bank-title,
-body.theme-hayes .bank-goal-title,
 body.theme-hayes .bank-blurb,
-body.theme-hayes .bank-meta,
 body.theme-hayes .jar-flow,
 body.theme-hayes .grow-title,
-body.theme-hayes .grow-jar-name,
 body.theme-hayes .grow-week-rising,
 body.theme-hayes .grow-line .lab,
-body.theme-hayes .money-chip .lab,
 body.theme-hayes .money-chip.save-chip,
 body.theme-hayes .tap-hint,
-body.theme-hayes .consume-label,
-body.theme-hayes .consume-hdr,
-body.theme-hayes .live-clock-lab {
+body.theme-hayes .consume-hdr {
   display: none !important;
 }
+body.theme-hayes .sec-hdr,
+body.theme-hayes .sec-title,
+body.theme-hayes .bank-title,
+body.theme-hayes .grow-jar-name,
+body.theme-hayes .live-clock-lab,
+body.theme-hayes .money-chip .lab,
+body.theme-hayes .consume-label,
+body.theme-hayes .bank-meta,
+body.theme-hayes .day-tap {
+  display: revert !important;
+}
+body.theme-hayes .sec-title {
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #ffe894 !important;
+}
+body.theme-hayes .bank-title,
+body.theme-hayes .grow-jar-name {
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: #ffe894 !important;
+}
+body.theme-hayes .live-clock-lab {
+  display: block !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  color: #f5c446 !important;
+}
+body.theme-hayes .consume-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 6px 0 2px !important;
+}
+body.theme-hayes .consume-label .tag {
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: #f5c446 !important;
+}
+body.theme-hayes .money-chip .lab {
+  display: inline !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: rgba(245,196,70,0.75) !important;
+  margin-right: 4px !important;
+}
+body.theme-hayes .bank-meta {
+  display: flex !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #d4a860 !important;
+}
+
 body.theme-hayes .loadout {
   justify-content: center;
   gap: 8px !important;

@@ -225,7 +225,7 @@ body.theme-harris .panel::after {
 /* Hotbar note quiet ghost */
 .hotbar-note { color: var(--bw-ghost) !important; }
 
-/* TEXTLESS1 / HEAT4 · Atlas · kill corn · icon-first void+amber */
+/* TEXTBACK1 · restore Musts/Jar/days/time · corn stays dead */
 body.theme-harris .eyebrow,
 body.theme-harris .tagline,
 body.theme-harris .brand,
@@ -236,29 +236,86 @@ body.theme-harris .hot-sub,
 body.theme-harris .hot-badges,
 body.theme-harris .session-rail,
 body.theme-harris .hotbar-label,
-body.theme-harris .xp-label,
-body.theme-harris .xp-meta,
-body.theme-harris .sec-hdr,
-body.theme-harris .sec-title,
-body.theme-harris .sec-meta,
-body.theme-harris .bank-title,
-body.theme-harris .bank-goal-title,
+body.theme-harris .hotbar-note,
 body.theme-harris .bank-blurb,
-body.theme-harris .bank-meta,
 body.theme-harris .jar-flow,
 body.theme-harris .grow-title,
-body.theme-harris .grow-jar-name,
 body.theme-harris .grow-week-rising,
 body.theme-harris .grow-line .lab,
-body.theme-harris .money-chip .lab,
 body.theme-harris .money-chip.save-chip,
 body.theme-harris .tap-hint,
-body.theme-harris .consume-label,
-body.theme-harris .consume-hdr,
-body.theme-harris .live-clock-lab,
-body.theme-harris .hotbar-note {
+body.theme-harris .consume-hdr {
   display: none !important;
 }
+body.theme-harris .sec-hdr,
+body.theme-harris .sec-title,
+body.theme-harris .bank-title,
+body.theme-harris .grow-jar-name,
+body.theme-harris .xp-label,
+body.theme-harris .live-clock-lab,
+body.theme-harris .money-chip .lab,
+body.theme-harris .consume-label,
+body.theme-harris .bank-meta,
+body.theme-harris .day-tap {
+  display: revert !important;
+}
+body.theme-harris .sec-meta,
+body.theme-harris .xp-meta { display: none !important; }
+body.theme-harris .sec-title {
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #ffe894 !important;
+}
+body.theme-harris .bank-title,
+body.theme-harris .grow-jar-name {
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: #ffe894 !important;
+}
+body.theme-harris .xp-label,
+body.theme-harris .live-clock-lab {
+  display: block !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  color: #f5c446 !important;
+}
+body.theme-harris .consume-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 6px 0 2px !important;
+}
+body.theme-harris .consume-label .tag {
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: #f5c446 !important;
+}
+body.theme-harris .money-chip .lab {
+  display: inline !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: rgba(245,196,70,0.75) !important;
+  margin-right: 4px !important;
+}
+body.theme-harris .bank-meta {
+  display: flex !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #d4a860 !important;
+}
+
 body.theme-harris .hot-title {
   font-size: 20px !important;
   font-weight: 900 !important;

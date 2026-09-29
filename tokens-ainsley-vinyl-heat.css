@@ -165,8 +165,8 @@
 .sensi-hdr .auto-lab { display: none !important; }
 
 /* ═══════════════════════════════════════════════════
-   TEXTLESS1 / HEAT4 · Atlas live ship on AVINYL3
-   Innocent surface · amber heat under · denser fill
+   TEXTBACK1 / HEAT4 surface · void+amber denser fill
+   Labels restored below · corn stays dead
    Protect: no sensi/nest data edits
    ═══════════════════════════════════════════════════ */
 body.theme-ainsley {
@@ -193,7 +193,13 @@ body.theme-ainsley .panel.cmd-kid {
     0 0 48px rgba(255,170,30,0.28) !important;
 }
 
-/* Kill ALL leftover corn / meta / helper on live board */
+/* ═══════════════════════════════════════════════════
+   TEXTBACK1 · Atlas · restore necessary labels only
+   Musts · Jar · day letters · TODAY · CT · section tags
+   Keep corn/setlist/pink dead · short chore names OK
+   Protect: no sensi/nest data edits
+   ═══════════════════════════════════════════════════ */
+/* Corn stays dead */
 body.theme-ainsley .eyebrow,
 body.theme-ainsley .tagline,
 body.theme-ainsley .brand,
@@ -202,36 +208,95 @@ body.theme-ainsley .hot-pill,
 body.theme-ainsley .hot-label,
 body.theme-ainsley .hot-sub,
 body.theme-ainsley .hot-badges,
-body.theme-ainsley .xp-stage-lab,
-body.theme-ainsley .sec-hdr,
-body.theme-ainsley .sec-title,
-body.theme-ainsley .sec-meta,
-body.theme-ainsley .bank-title,
-body.theme-ainsley .bank-goal-title,
 body.theme-ainsley .bank-blurb,
-body.theme-ainsley .bank-meta,
 body.theme-ainsley .ledger-row,
 body.theme-ainsley .jar-flow,
 body.theme-ainsley .grow-title,
-body.theme-ainsley .grow-jar-name,
 body.theme-ainsley .grow-week-rising,
 body.theme-ainsley .grow-line,
 body.theme-ainsley .grow-goal-line span,
-body.theme-ainsley .money-chip .lab,
 body.theme-ainsley .money-chip.save-chip,
 body.theme-ainsley .tap-hint,
 body.theme-ainsley .bag-strip,
 body.theme-ainsley .hs-title,
-body.theme-ainsley .consume-label,
 body.theme-ainsley .consume-hdr,
 body.theme-ainsley .consume-title,
 body.theme-ainsley .ftr,
 body.theme-ainsley .ftr-chip,
-body.theme-ainsley .live-clock-lab,
 body.theme-ainsley .eras,
 body.theme-ainsley .day-record-rail,
 body.theme-ainsley .setlist-foot {
   display: none !important;
+}
+
+/* Essential UI words — readable, short */
+body.theme-ainsley .sec-hdr,
+body.theme-ainsley .sec-title,
+body.theme-ainsley .bank-title,
+body.theme-ainsley .grow-jar-name,
+body.theme-ainsley .xp-stage-lab,
+body.theme-ainsley .live-clock-lab,
+body.theme-ainsley .money-chip .lab,
+body.theme-ainsley .consume-label,
+body.theme-ainsley .bank-meta,
+body.theme-ainsley .day-tap,
+body.theme-ainsley .quest-days {
+  display: revert !important;
+}
+body.theme-ainsley .sec-meta { display: none !important; }
+body.theme-ainsley .sec-title {
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: #ffe894 !important;
+}
+body.theme-ainsley .bank-title,
+body.theme-ainsley .grow-jar-name {
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #ffe894 !important;
+}
+body.theme-ainsley .xp-stage-lab,
+body.theme-ainsley .live-clock-lab {
+  display: block !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  color: #f5c446 !important;
+}
+body.theme-ainsley .consume-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 6px 0 2px !important;
+}
+body.theme-ainsley .consume-label .tag {
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: #f5c446 !important;
+}
+body.theme-ainsley .money-chip .lab {
+  display: inline !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: rgba(245,196,70,0.75) !important;
+  margin-right: 4px !important;
+}
+body.theme-ainsley .bank-meta {
+  display: flex !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #d4a860 !important;
 }
 
 body.theme-ainsley .mute-btn {

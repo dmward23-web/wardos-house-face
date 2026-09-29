@@ -363,10 +363,9 @@
 /* Atlas: paste AFTER tokens-hub-command-deck-hotter.css. Lights 9-slot already live — do not regress. */
 
 /* ═══════════════════════════════════════════════════════════
-   HEAT4 / HUBHDR · AVINYL3 hub header · clock-first · icon-only
-   Kill CT lab · weather/sensi word strings · Nest/Lights already dead
+   TEXTBACK1 / HUBHDR · clock-first · CT + DOW readable
+   Weather/Sensi stay icon+° (protect sensi) · Nest/Lights dead words
    ═══════════════════════════════════════════════════════════ */
-.hdr.hdr--spread .hdr-date-kicker,
 .hdr.hdr--spread .wx-card .wx-kicker,
 .hdr.hdr--spread .wx-card .wx-cond,
 .hdr.hdr--spread .wx-card .wx-mode,
@@ -382,6 +381,15 @@
 .hdr.hdr--spread .hdr-brand .tagline,
 .hdr.hdr--spread .tagline {
   display: none !important;
+}
+.hdr.hdr--spread .hdr-date-kicker {
+  display: block !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+  color: #f5c446 !important;
+  opacity: 0.9 !important;
 }
 
 /* Huge live CT clock — digits own the bar */
