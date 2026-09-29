@@ -1183,8 +1183,11 @@
     var onCls = L.on ? " is-on" : "";
     var dim = (L.kind === "dimmer" || L.kind === "switch/dimmer");
     var gateLab = hubHonesty(g);
+    var rockerCls = L.on ? " is-on" : " is-off";
+    var armedPad = canWrite();
+    var rockerDis = armedPad ? "" : " is-disabled";
     host.innerHTML =
-      '<article class="light-pad kid-light-pad' + onCls + '" data-light-id="' + L.id + '">'
+      '<article class="light-pad cmd-panel kid-light-pad' + onCls + '" data-light-id="' + L.id + '">'
       + '<div class="light-pad-top">'
       + '<div class="light-pad-ico" aria-hidden="true">💡</div>'
       + '<div><div class="light-pad-name">' + escapeHtml(L.name) + "</div>"
@@ -1192,23 +1195,31 @@
       + '<div class="light-pad-state">' + (L.on ? "ON" : "OFF") + "</div>"
       + "</div>"
       + '<div class="light-pad-actions">'
-      + '<button type="button" class="light-btn loud" data-act="on" data-id="' + L.id + '">On</button>'
-      + '<button type="button" class="light-btn" data-act="off" data-id="' + L.id + '">Off</button>'
+      + '<button type="button" class="cmd-rocker' + rockerCls + rockerDis + '" data-act="toggle" data-id="' + L.id + '"'
+      + (armedPad ? "" : " disabled")
+      + ' aria-label="' + escapeHtml(L.name) + ' ' + (L.on ? "on" : "off") + '">'
+      + '<span class="cmd-rocker-knob" aria-hidden="true"></span></button>'
       + (dim
-        ? '<input class="light-bright" type="range" min="1" max="100" value="' + clampBright(L.brightness || 100) + '" data-id="' + L.id + '" aria-label="Brightness" />'
+        ? '<input class="light-bright" type="range" min="1" max="100" value="' + clampBright(L.brightness || 100) + '" data-id="' + L.id + '" aria-label="Brightness"' + (armedPad ? "" : " disabled") + ' />'
         : "")
       + "</div>"
       + '<div class="light-pad-src">' + hubSrcLabel(eff, g) + " · " + escapeHtml(gateLab) + " · full house → Lights</div>"
       + "</article>";
     host.onclick = function (ev) {
       var el = ev.target;
-      if (!el || !el.getAttribute) return;
+      if (!el) return;
+      if (el.classList && el.classList.contains("cmd-rocker-knob") && el.parentElement) el = el.parentElement;
+      if (!el.getAttribute) return;
       var act = el.getAttribute("data-act");
       var id = el.getAttribute("data-id");
       if (!act || !id) return;
       try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
       if (act === "on") setLight(id, { on: true });
-      if (act === "off") setLight(id, { on: false });
+      else if (act === "off") setLight(id, { on: false });
+      else if (act === "toggle") {
+        var wasOn = el.classList && el.classList.contains("is-on");
+        setLight(id, { on: !wasOn });
+      }
       paintKidPad(host, lightId, doc);
     };
     host.onchange = function (ev) {

@@ -12,8 +12,8 @@
 <meta name="theme-color" content="#d8dadf" />
 <meta name="description" content="Board-OS House face · status / stack plate for Dan · shipped inventory · open gaps · promotion-ready · no money" />
 <title>BOARD-OS · HOUSE FACE · STATUS · STACK</title>
-<link rel="stylesheet" href="house-engage.css" />
-<link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=HUBTOK1" />
+<link rel="stylesheet" href="house-engage.css?v=HUBKIT1" />
+<link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=HUBKIT1" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -310,6 +310,15 @@
     background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(230,232,236,0.7));
   }
   .ftr-meta { color: #8a8e96; }
+
+  /* HUBKIT1 */
+  html,body{overflow-x:hidden}
+  .banner.cmd-panel{display:flex;flex-direction:column;gap:6px;padding:14px 16px}
+  .banner-main{font-size:22px;font-weight:850;color:var(--cmd-ink)}
+  .banner-detail{font-size:13px;color:var(--cmd-mute)}
+  .sec.cmd-panel{padding:12px 14px}
+  .sec-title{color:var(--cmd-amber-hi)}
+  .sec-meta{color:var(--cmd-mute)}
 </style>
 </head>
 <body>
@@ -330,18 +339,17 @@
  </div>
  </div>
  <div class="hdr-right">
- <div class="hot-pill"><span class="spark">◎</span> Promotion-ready inventory</div>
+ <div class="hot-pill cmd-pill cmd-pill--live"><span class="spark">◎</span> Promotion-ready inventory</div>
  </div>
  </header>
 
- <section class="banner" aria-label="Stack summary">
- <div class="banner-accent"></div>
- <div class="banner-body">
- <div class="banner-label">House face stack</div>
- <div class="banner-main">Soft glass · <span class="pill">18</span> index tiles · no money</div>
- <div class="banner-detail">Prism audition · <strong>visual lock held</strong>wires still open gaps</div>
+ <section class="banner cmd-panel cmd-panel--hot" aria-label="Stack summary">
+ <div class="cmd-hdr">
+ <div class="cmd-title">House face stack</div>
+ <div class="cmd-meta">For Dan</div>
  </div>
- <div class="banner-badge">For Dan</div>
+ <div class="banner-main">Soft glass · 18 index tiles · no money</div>
+ <div class="banner-detail">Prism audition · <strong>visual lock held</strong> · wires still open gaps</div>
  </section>
 
  <div class="stats" aria-label="Quick counts">
@@ -368,7 +376,7 @@
  </div>
 
  <div class="body">
- <section class="sec" aria-label="Pages built">
+ <section class="sec cmd-panel" aria-label="Pages built">
  <div class="sec-hdr">
  <div class="sec-title">Pages built</div>
  <div class="sec-meta">house-face/ · shipped</div>
@@ -391,7 +399,7 @@
  </div>
  </section>
 
- <section class="sec" aria-label="Template lock">
+ <section class="sec cmd-panel" aria-label="Template lock">
  <div class="sec-hdr">
  <div class="sec-title">Template lock</div>
  <div class="sec-meta">do not drift</div>
@@ -403,7 +411,7 @@
  <div class="t">Soft white/grey glass</div>
  <div class="d">#d8dadf · camo-glass-tile · frosted cards</div>
  </div>
- <span class="tag locked">Locked</span>
+ <span class="tag locked cmd-pill cmd-pill--live">Locked</span>
  </div>
  <div class="lock-row">
  <div class="ico" aria-hidden="true">Aa</div>
@@ -411,7 +419,7 @@
  <div class="t">Inter Display</div>
  <div class="d">Local fonts/ · charcoal leave-by band</div>
  </div>
- <span class="tag locked">Locked</span>
+ <span class="tag locked cmd-pill cmd-pill--live">Locked</span>
  </div>
  <div class="lock-row">
  <div class="ico" aria-hidden="true">👧</div>
@@ -419,7 +427,7 @@
  <div class="t">Kid color system</div>
  <div class="d">Ainsley purple · Hayes green · Harris blue</div>
  </div>
- <span class="tag locked">Locked</span>
+ <span class="tag locked cmd-pill cmd-pill--live">Locked</span>
  </div>
  <div class="lock-row">
  <div class="ico" aria-hidden="true">🚫</div>
@@ -427,7 +435,7 @@
  <div class="t">Never on House</div>
  <div class="d">Money · Harbor drafts · Vita mind · Ledger</div>
  </div>
- <span class="tag locked">Locked</span>
+ <span class="tag locked cmd-pill cmd-pill--live">Locked</span>
  </div>
  <div class="lock-row">
  <div class="ico" aria-hidden="true">📐</div>
@@ -435,12 +443,12 @@
  <div class="t">Canvas + phone crop</div>
  <div class="d">1080×1920 · phone 1170×731</div>
  </div>
- <span class="tag locked">Locked</span>
+ <span class="tag locked cmd-pill cmd-pill--live">Locked</span>
  </div>
  </div>
  </section>
 
- <section class="sec" aria-label="Open gaps and promo">
+ <section class="sec cmd-panel" aria-label="Open gaps and promo">
  <div class="sec-hdr">
  <div class="sec-title">Open gaps</div>
  <div class="sec-meta">not wired yet</div>
@@ -452,7 +460,7 @@
  <div class="t">Live weather</div>
  <div class="d">UNKNOWN · no live source · omit invent</div>
  </div>
- <span class="tag open">UNKNOWN</span>
+ <span class="tag open cmd-pill cmd-pill--need">UNKNOWN</span>
  </div>
  <div class="gap-row">
  <div class="ico" aria-hidden="true">🗓</div>
@@ -460,7 +468,7 @@
  <div class="t">Calendar wire</div>
  <div class="d">dmward23 live pull not connected</div>
  </div>
- <span class="tag open">UNKNOWN</span>
+ <span class="tag open cmd-pill cmd-pill--need">UNKNOWN</span>
  </div>
  <div class="gap-row">
  <div class="ico" aria-hidden="true">🏫</div>
@@ -468,7 +476,7 @@
  <div class="t">School feeds</div>
  <div class="d">School · UNKNOWN · ParentSquare not wired</div>
  </div>
- <span class="tag open">UNKNOWN</span>
+ <span class="tag open cmd-pill cmd-pill--need">UNKNOWN</span>
  </div>
  <div class="gap-row">
  <div class="ico" aria-hidden="true">💡</div>
@@ -476,7 +484,7 @@
  <div class="t">Lights live control</div>
  <div class="d">LIVE · Kasa cloud + write proxy · roster Dining/Harris/Kitchen · writeProxy baked · kid-harris room shortcut · no Harbor/money</div>
  </div>
- <span class="tag closed">LIVE</span>
+ <span class="tag closed cmd-pill cmd-pill--live">LIVE</span>
  </div>
  </div>
  <div class="sec-hdr" style="margin-top:4px">
@@ -490,7 +498,7 @@
  <div class="t">Visual system proven</div>
  <div class="d">COMPONENT-KIT · HUB-LOCK · handoff</div>
  </div>
- <span class="tag ready">Ready</span>
+ <span class="tag ready cmd-pill cmd-pill--live">Ready</span>
  </div>
  <div class="promo-row">
  <div class="ico" aria-hidden="true">🖼</div>
@@ -498,7 +506,7 @@
  <div class="t">PNG plates shipped</div>
  <div class="d">Tablet + phone crops on /workspace</div>
  </div>
- <span class="tag ready">Ready</span>
+ <span class="tag ready cmd-pill cmd-pill--live">Ready</span>
  </div>
  <div class="promo-row">
  <div class="ico" aria-hidden="true">🔐</div>
@@ -506,7 +514,7 @@
  <div class="t">Desk gate</div>
  <div class="d">House open / Desk gate · stars only</div>
  </div>
- <span class="tag ready">Ready</span>
+ <span class="tag ready cmd-pill cmd-pill--live">Ready</span>
  </div>
  </div>
  </section>

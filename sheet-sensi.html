@@ -11,8 +11,8 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE · SENSI · THERMOSTAT</title>
-<link rel="stylesheet" href="house-engage.css?v=P32" />
-<link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=HUBTOK1" />
+<link rel="stylesheet" href="house-engage.css?v=HUBKIT1" />
+<link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=HUBKIT1" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
@@ -131,6 +131,24 @@
     font-size:13px;font-weight:650;color:#3a3e46;flex-shrink:0}
   .ftr{display:flex;justify-content:space-between;font-size:12px;color:#5a5e66;font-weight:600;align-items:center;gap:8px;flex-wrap:wrap}
   .ftr-chip{padding:6px 10px;border-radius:8px;border:2px solid #2a2e36;background:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;color:inherit}
+
+  /* HUBKIT1 */
+  html,body{overflow-x:hidden}
+  .panel{--cmd-tap-min:44px;--cmd-bulk-min:48px;--cmd-rocker-w:72px;--cmd-knob:32px}
+  .banner.cmd-panel{padding:14px 16px;gap:6px}
+  .banner .banner-title{font-size:22px;font-weight:850;color:var(--cmd-ink);margin-top:2px}
+  .banner .banner-sub{font-size:13px;color:var(--cmd-mute);margin-top:2px}
+  .dial.cmd-panel{align-items:center;padding:28px 24px 22px;gap:6px}
+  .dial-ambient{color:var(--cmd-amber-hi);text-shadow:0 0 48px rgba(255,180,30,0.72),0 2px 0 rgba(0,0,0,0.65)}
+  .set-row.cmd-panel,.seg.cmd-panel,.sched.cmd-panel,.connect.cmd-panel{padding:14px}
+  .set-btn{background:linear-gradient(180deg,#3a3e48,#1e222a);color:#f4f0e8;border:2px solid rgba(255,255,255,0.14)}
+  .set-val{color:var(--cmd-amber-hi)}
+  .seg-btn{background:linear-gradient(180deg,#3a3e48,#1e222a);color:#f4f0e8;border:2px solid rgba(255,255,255,0.14);min-height:56px}
+  .seg-btn.on{background:linear-gradient(180deg,#ffe080,#c87810);border-color:#8a6010;color:#1a1208}
+  .cbtn{background:linear-gradient(180deg,#3a3e48,#1e222a);color:#f4f0e8;border:2px solid rgba(255,255,255,0.14);min-height:48px}
+  .cbtn.loud{background:linear-gradient(180deg,#ffe080,#c87810);color:#1a1208;border-color:#8a6010}
+  .note{background:rgba(8,10,16,0.55);border:1px dashed rgba(255,190,64,0.35);color:var(--cmd-mute)}
+
 </style>
 </head>
 <body>
@@ -149,36 +167,36 @@
  </div>
  </div>
  </div>
- <div class="status-pill off" id="sensi-status-pill">CONNECT · STUB</div>
+ <div class="cmd-pill cmd-pill--need" id="sensi-status-pill">NEED TOKEN</div>
  </header>
 
- <section class="banner">
- <div class="banner-accent"></div>
- <div class="banner-body">
- <div class="banner-lab">Sensi · not Nest</div>
- <div class="banner-title">Thermostat panel · live when tokened · DEMO writes</div>
- <div class="banner-sub">Polls data/sensi-live.json · no fake LIVE · Nest cams stay separate · Elo 3202L</div>
+ <section class="banner cmd-panel cmd-panel--hot" aria-label="Sensi mission">
+ <div class="cmd-hdr">
+ <div class="cmd-title">Sensi · not Nest</div>
+ <div class="cmd-meta">Elo · Emerson</div>
  </div>
+ <div class="banner-title">Thermostat panel · live when tokened · local writes until write path</div>
+ <div class="banner-sub">Polls data/sensi-live.json · no fake LIVE · Nest cams stay separate · Elo 3202L</div>
  </section>
 
  <div class="thermo">
- <section class="dial" aria-label="Current temperature">
+ <section class="dial cmd-panel cmd-panel--hot" aria-label="Current temperature">
  <div class="dial-lab" id="sensi-dial-lab">Indoor · waiting</div>
  <div class="dial-ambient" id="sensi-ambient">—<span>°</span></div>
  <div class="dial-meta" id="sensi-dial-meta">mode · set · fan</div>
- <div class="dial-badge" id="sensi-dial-badge">CONNECT · STUB</div>
+ <div class="dial-badge cmd-pill cmd-pill--need" id="sensi-dial-badge">NEED TOKEN</div>
  </section>
 
- <section class="set-row" aria-label="Setpoint">
+ <section class="set-row cmd-panel" aria-label="Setpoint">
  <button type="button" class="set-btn" id="sensi-minus" aria-label="Lower setpoint">−</button>
  <div class="set-mid">
- <div class="set-lab" id="sensi-set-lab">Setpoint · DEMO local</div>
+ <div class="set-lab" id="sensi-set-lab">Setpoint · LOCAL (not sent)</div>
  <div class="set-val" id="sensi-setpoint">70<span>°</span></div>
  </div>
  <button type="button" class="set-btn" id="sensi-plus" aria-label="Raise setpoint">+</button>
  </section>
 
- <section class="seg" aria-label="Mode">
+ <section class="seg cmd-panel" aria-label="Mode">
  <div class="seg-title">Mode</div>
  <div class="seg-row modes" id="sensi-modes">
  <button type="button" class="seg-btn" data-mode="Heat">Heat</button>
@@ -188,7 +206,7 @@
  </div>
  </section>
 
- <section class="seg" aria-label="Fan">
+ <section class="seg cmd-panel" aria-label="Fan">
  <div class="seg-title">Fan</div>
  <div class="seg-row fans" id="sensi-fans">
  <button type="button" class="seg-btn" data-fan="Auto">Auto</button>
@@ -196,15 +214,15 @@
  </div>
  </section>
 
- <section class="sched" aria-label="Schedule peek stub">
+ <section class="sched cmd-panel" aria-label="Schedule peek stub">
  <div class="sched-title">Schedule peek · stub rows</div>
- <div class="sched-row"><span class="sched-when">Weekday · 6:30a</span><span class="sched-what">Wake · 70°</span><span class="sched-stub">STUB</span></div>
- <div class="sched-row"><span class="sched-when">Weekday · 8:00a</span><span class="sched-what">Away · 66°</span><span class="sched-stub">STUB</span></div>
- <div class="sched-row"><span class="sched-when">Weekday · 5:00p</span><span class="sched-what">Home · 70°</span><span class="sched-stub">STUB</span></div>
- <div class="sched-row"><span class="sched-when">Night · 10:00p</span><span class="sched-what">Sleep · 68°</span><span class="sched-stub">STUB</span></div>
+ <div class="sched-row"><span class="sched-when">Weekday · 6:30a</span><span class="sched-what">Wake · 70°</span><span class="cmd-pill cmd-pill--stub">STUB</span></div>
+ <div class="sched-row"><span class="sched-when">Weekday · 8:00a</span><span class="sched-what">Away · 66°</span><span class="cmd-pill cmd-pill--stub">STUB</span></div>
+ <div class="sched-row"><span class="sched-when">Weekday · 5:00p</span><span class="sched-what">Home · 70°</span><span class="cmd-pill cmd-pill--stub">STUB</span></div>
+ <div class="sched-row"><span class="sched-when">Night · 10:00p</span><span class="sched-what">Sleep · 68°</span><span class="cmd-pill cmd-pill--stub">STUB</span></div>
  </section>
 
- <section class="connect" id="sensi-connect" aria-label="Connect Sensi account">
+ <section class="connect cmd-panel" id="sensi-connect" aria-label="Connect Sensi account">
  <div class="connect-top">
  <div>
  <div class="connect-title" id="sensi-connect-title">Connect · need refresh token</div>
@@ -217,13 +235,13 @@
  <button type="button" class="cbtn" id="sensi-open-ios">App Store</button>
  <button type="button" class="cbtn" id="sensi-open-android">Play Store</button>
  <button type="button" class="cbtn" id="sensi-open-docs">Auth docs · SENSI-LIVE</button>
- <button type="button" class="cbtn ok" id="sensi-confirm" hidden>Local flag · DEMO only</button>
+ <button type="button" class="cbtn ok" id="sensi-confirm" hidden>Local flag · not live</button>
  <button type="button" class="cbtn" id="sensi-disconnect" hidden>Clear local flag</button>
  </div>
  </section>
  </div>
 
- <div class="note" id="sensi-note">Live reads via data/sensi-live.json when Atlas has refresh_token · setpoint/mode/fan buttons stay DEMO until write path · Nest cams separate · Elo 3202L 1080×1920</div>
+ <div class="note" id="sensi-note">Live reads via data/sensi-live.json when Atlas has refresh_token · setpoint/mode/fan stay LOCAL until writeSupported · Nest cams separate · Elo 3202L 1080×1920</div>
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -231,13 +249,13 @@
  <a class="ftr-chip" href="sheet-google-home.html">Cams hub</a>
  <a class="ftr-chip" href="sheet-index.html">Sheets</a>
  </div>
- <span id="sensi-ftr-status">CONNECT · STUB</span>
+ <span id="sensi-ftr-status">NEED TOKEN</span>
  </footer>
 </div>
 <script src="house-clock.js?v=CT1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
-<script src="house-sensi.js?v=SENSI2"></script>
+<script src="house-sensi.js?v=HUBKIT1"></script>
 <script>
 (function () {
   var S = window.HouseSensi;
@@ -273,15 +291,19 @@
       mode + " · set " + (liveOverride ? setpoint : state.setpoint) + "° · fan " + fan
       + (eff.humidity != null ? " · " + eff.humidity + "% RH" : "");
     document.getElementById("sensi-dial-lab").textContent =
-      liveOverride ? ("Indoor · live" + (eff.name ? " · " + eff.name : "")) : "Indoor · DEMO / not live";
+      liveOverride ? ("Indoor · live" + (eff.name ? " · " + eff.name : "")) : "Indoor · LOCAL / not live";
     document.getElementById("sensi-dial-badge").textContent = gate.label;
     document.getElementById("sensi-set-lab").textContent =
-      gate.writeSupported ? "Setpoint · live write" : "Setpoint · DEMO local (not sent to Sensi)";
+      gate.writeSupported ? "Setpoint · live write" : "Setpoint · LOCAL (not sent to Sensi)";
 
     var pill = document.getElementById("sensi-status-pill");
     pill.textContent = gate.label;
-    pill.classList.toggle("on", gate.live);
-    pill.classList.toggle("off", !gate.live);
+    pill.classList.remove("cmd-pill--live","cmd-pill--off","cmd-pill--need","cmd-pill--stub","on","off");
+    pill.classList.add("cmd-pill");
+    if (gate.live) pill.classList.add("cmd-pill--live");
+    else if (gate.kind === "need_token") pill.classList.add("cmd-pill--need");
+    else if (gate.kind === "stub") pill.classList.add("cmd-pill--stub");
+    else pill.classList.add("cmd-pill--off");
 
     var box = document.getElementById("sensi-connect");
     box.classList.toggle("ok", gate.live);
@@ -289,16 +311,16 @@
     var sub = document.getElementById("sensi-connect-sub");
     if (gate.live) {
       title.textContent = "LIVE · Emerson cloud snapshot";
-      sub.textContent = "Reads from data/sensi-live.json · writes still DEMO until writeSupported · Nest cams separate";
+      sub.textContent = "Reads from data/sensi-live.json · writes LOCAL until writeSupported · Nest cams separate";
     } else if (gate.kind === "need_token") {
       title.textContent = "CONNECT · need refresh token";
       sub.textContent = "Atlas must request Sensi refresh_token from Dan (manager.sensicomfort.com DevTools) · no password in chat · SENSI-LIVE.md";
     } else if (gate.kind === "error" || gate.kind === "stale") {
-      title.textContent = "Live fetch issue · DEMO fallback";
+      title.textContent = "Live fetch issue · LOCAL fallback";
       sub.textContent = (gate.error || gate.label) + " · open manager or re-run sensi-fetch on Atlas";
     } else {
       title.textContent = "Connect · need refresh token";
-      sub.textContent = "Atlas asks Dan for Sensi refresh_token · see SENSI-LIVE.md · local DEMO until then";
+      sub.textContent = "Atlas asks Dan for Sensi refresh_token · see SENSI-LIVE.md · LOCAL until then";
     }
     var connectedFlag = S.isConnected();
     document.getElementById("sensi-confirm").hidden = connectedFlag || gate.live;
@@ -379,7 +401,6 @@
   S.startPolling();
   paint();
 })();
-</script>
 </script>
 </body>
 </html>

@@ -328,12 +328,17 @@
     if (pill) {
       pill.textContent = st.gate.label;
       pill.classList.toggle("on", st.gate.live);
+      pill.classList.add("cmd-pill");
+      pill.classList.toggle("cmd-pill--live", !!st.gate.live);
+      pill.classList.toggle("cmd-pill--need", st.gate.kind === "need_token");
+      pill.classList.toggle("cmd-pill--off", !st.gate.live && st.gate.kind !== "need_token");
+      pill.classList.toggle("cmd-pill--stub", st.gate.kind === "stub");
     }
     if (ambLab) {
       ambLab.textContent = st.gate.live ? "Indoor live" : "Indoor · not live";
     }
     if (sub) {
-      var src = st.gate.live ? "LIVE" : (st.gate.kind === "need_token" ? "NEED TOKEN" : "DEMO");
+      var src = st.gate.live ? "LIVE" : (st.gate.kind === "need_token" ? "NEED TOKEN" : (st.gate.kind === "error" || st.gate.kind === "stale" ? "OFF" : "LOCAL"));
       sub.textContent = src + " · " + st.mode + " · fan " + st.fan + " · not Nest";
     }
   }

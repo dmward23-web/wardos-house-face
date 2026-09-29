@@ -1,9 +1,9 @@
 /* ============================================================
-   WARDOS · tokens-hub-command-deck-shared.css · tip HUBTOK1
+   WARDOS · tokens-hub-command-deck-shared.css · tip HUBKIT1
    Shared command-deck CONTROL PANEL / HUBCMD DNA.
    Source: hub-command-deck-hotter (CMDDECK2) palette — one amber/cyan.
    Load before hub-scoped hotter overlay on sheet-index.
-   Kit sheets: link only — atoms available; full restyle = HUBKIT1.
+   Kit sheets (HUBKIT1): link + apply atoms on lights/Sensi/Nest/Status chrome.
 
    ATOMS (stable class names — see HUBTOK.md):
      .cmd-panel                         void mission-glass panel shell
