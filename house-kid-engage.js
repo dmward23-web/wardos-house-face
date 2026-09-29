@@ -1,5 +1,5 @@
-/* House Face · HUBSCROLL1 · kid flip · who’s up = active leave window only · shared boys · scroll
-   LIVE only · WardKids · HUBTOK1 atoms. Bind-once guards · tap-to-cycle · OPEN nav.
+/* House Face · HUBSCROLL2 · kid flip · who’s up leave-window · hide scroll chrome · tap/OPEN → board
+   LIVE only · WardKids · HUBTOK1 atoms. Bind-once · swipe flips · tap/OPEN navigates · claims safe.
    No leaveby/cam/nest/sensi JSON. */
 (function (global) {
   "use strict";
@@ -489,7 +489,7 @@
       else if (kidObj(kidId) && kidObj(kidId).themeLabel) sub.textContent = kidObj(kidId).themeLabel;
     }
     root.setAttribute("data-face", face);
-    root.setAttribute("aria-label", (ACCENT[kidId].name) + " · " + (FACE_LABEL[face] || face) + " · tap or swipe for more");
+    root.setAttribute("aria-label", (ACCENT[kidId].name) + " · " + (FACE_LABEL[face] || face) + " · tap OPEN · swipe to flip");
   }
 
   function setFace(root, face, playSound) {
@@ -510,10 +510,36 @@
     setFace(root, next, true);
   }
 
+  var __kfNavLock = 0;
+  function openKidBoard(root, ev) {
+    var kidId = root && root.getAttribute("data-kid-flip");
+    var go = root && root.querySelector(".kid-flip-go");
+    var href = (go && go.getAttribute("href")) || (kidId && HREF[kidId]) || "";
+    if (!href || href === "#") return false;
+    var now = Date.now();
+    if (now - __kfNavLock < 600) {
+      if (ev) {
+        try { ev.preventDefault(); } catch (eL) { /* */ }
+        try { ev.stopPropagation(); } catch (eL2) { /* */ }
+      }
+      return true;
+    }
+    __kfNavLock = now;
+    if (ev) {
+      try { ev.preventDefault(); } catch (e0) { /* */ }
+      try { ev.stopPropagation(); } catch (e1) { /* */ }
+    }
+    sfxTap();
+    try { global.location.assign(href); } catch (e) {
+      try { global.location.href = href; } catch (e2) { /* */ }
+    }
+    return true;
+  }
+
   function bindSwipe(root) {
     if (root.getAttribute("data-kf-swipe") === "1") return;
     root.setAttribute("data-kf-swipe", "1");
-    var sx = 0, sy = 0, armed = false, moved = false;
+    var sx = 0, sy = 0, armed = false, moved = false, scrolled = false;
     root.addEventListener("pointerdown", function (ev) {
       if (ev.target && ev.target.closest && (
         ev.target.closest(".kf-claim") ||
@@ -523,38 +549,41 @@
       )) return;
       armed = true;
       moved = false;
+      scrolled = false;
       sx = ev.clientX;
       sy = ev.clientY;
-      try { root.setPointerCapture(ev.pointerId); } catch (e) { /* */ }
+      /* Do not setPointerCapture — it steals pan-y scroll on kf-stage and kills OPEN clicks on wall */
     });
     root.addEventListener("pointermove", function (ev) {
       if (!armed) return;
       var dx = ev.clientX - sx;
       var dy = ev.clientY - sy;
       if (Math.abs(dx) > 18 && Math.abs(dx) > Math.abs(dy) * 1.2) moved = true;
-      if (Math.abs(dy) > 24 && Math.abs(dy) > Math.abs(dx)) moved = true; /* vertical scroll — not a tap */
+      if (Math.abs(dy) > 24 && Math.abs(dy) > Math.abs(dx)) {
+        moved = true;
+        scrolled = true; /* vertical scroll on stage — not a tap-open */
+      }
     });
     function end(ev) {
       if (!armed) return;
       armed = false;
       var dx = (ev.clientX || 0) - sx;
       var dy = (ev.clientY || 0) - sy;
-      try { root.releasePointerCapture(ev.pointerId); } catch (e) { /* */ }
-      if (moved && Math.abs(dx) >= 36 && Math.abs(dx) > Math.abs(dy)) {
+      /* Horizontal swipe flips faces — keep claims/dots/OPEN alone */
+      if (moved && !scrolled && Math.abs(dx) >= 36 && Math.abs(dx) > Math.abs(dy)) {
         ev.preventDefault();
         cycleFace(root, dx < 0 ? 1 : -1);
         return;
       }
-      /* Tap (no meaningful drag) cycles face — Elo/wall can't swipe reliably */
-      if (!moved && Math.abs(dx) < 12 && Math.abs(dy) < 12) {
+      /* Tap (no meaningful drag) → open kid board (Ainsley/Hayes/Harris) */
+      if (!moved && !scrolled && Math.abs(dx) < 12 && Math.abs(dy) < 12) {
         var t = ev.target;
         if (t && t.closest && (
           t.closest(".kf-claim") ||
           t.closest(".kid-flip-go") ||
           t.closest("[data-face-dot]")
         )) return;
-        ev.preventDefault();
-        cycleFace(root, 1);
+        openKidBoard(root, ev);
       }
     }
     root.addEventListener("pointerup", end);
@@ -614,18 +643,21 @@
     if (root.getAttribute("data-kf-open") === "1") return;
     root.setAttribute("data-kf-open", "1");
     var go = root.querySelector(".kid-flip-go");
-    if (!go) return;
+    if (!go) {
+      /* Allow retry after paint injects OPEN */
+      root.removeAttribute("data-kf-open");
+      return;
+    }
+    function goNav(ev) {
+      openKidBoard(root, ev);
+    }
     go.addEventListener("pointerdown", function () { sfxTap(); }, { passive: true });
-    go.addEventListener("click", function (ev) {
-      var href = go.getAttribute("href");
-      if (!href) return;
-      /* Force navigation — wall WebViews sometimes swallow bare <a> after tile replace */
-      ev.preventDefault();
-      ev.stopPropagation();
-      try { global.location.assign(href); } catch (e) {
-        try { global.location.href = href; } catch (e2) { /* */ }
-      }
+    /* pointerup + click — wall WebViews sometimes drop one or the other after tile replace */
+    go.addEventListener("pointerup", function (ev) {
+      if (ev.button != null && ev.button !== 0) return;
+      goNav(ev);
     });
+    go.addEventListener("click", goNav);
   }
 
   function enhanceTile(anchor) {
@@ -678,7 +710,7 @@
       if (ev.key === "ArrowLeft") { ev.preventDefault(); cycleFace(wrap, -1); }
       if (ev.key === "Enter" || ev.key === " ") {
         ev.preventDefault();
-        cycleFace(wrap, 1);
+        openKidBoard(wrap, ev);
       }
     });
     return wrap;
@@ -909,6 +941,15 @@
     if (go && go.getAttribute("data-sfx") !== "1") {
       go.setAttribute("data-sfx", "1");
       go.addEventListener("pointerdown", function () { sfxTap(); }, { passive: true });
+      go.addEventListener("click", function (ev) {
+        var href = go.getAttribute("href");
+        if (!href || href === "#" || go.hidden) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        try { global.location.assign(href); } catch (e) {
+          try { global.location.href = href; } catch (e2) { /* */ }
+        }
+      });
     }
   }
 

@@ -77,3 +77,34 @@ html:not([data-export]) body.theme-hayes .panel[style],
 html:not([data-export]) body.theme-harris .panel[style] {
   overflow: visible !important;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   HUBSCROLL2 · ENTIRE House Face — hide scrollbar chrome
+   html/body + every overflow container. Scroll (touch/wheel) stays.
+   ═══════════════════════════════════════════════════════════ */
+html, body {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+}
+*, *::before, *::after {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+*::-webkit-scrollbar,
+*::-webkit-scrollbar-button,
+*::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+  border: 0 !important;
+}

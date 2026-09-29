@@ -1,8 +1,8 @@
 /* ============================================================
-   WARDOS · tokens-ctrlpanel.css · tip HUBSCROLL1 (CTRLPANEL1 base)
+   WARDOS · tokens-ctrlpanel.css · tip HUBSCROLL2 (CTRLPANEL1 base)
    CONTROL PANEL shortlist on HUBTOK1 shared atoms ONLY (--cmd-*).
    No second palette. Never DEMO. Stub/Need never LIVE.
-   Includes HDRFIX1 header hierarchy + HUBSCROLL1 tile scroll (no glue).
+   Includes HDRFIX1 header hierarchy + HUBSCROLL1 tile scroll + HUBSCROLL2 hide chrome / kid OPEN.
    ============================================================ */
 
 .leaveby-preview-tag { display: none !important; }
@@ -279,7 +279,9 @@ body[data-kid] .cmd-kid .card {
   background: linear-gradient(180deg, #5ec8e8, #7ed492, #ffe080) !important;
 }
 
-/* Shells: clip x for radius, scroll y when content overflows */
+/* Shells: clip x for radius, scroll y when content overflows.
+   Kid flip + sheet roster tiles: overflow hidden on the shell (OPEN/foot stay hittable).
+   Inner kf-stage / leaveby-layouts / lights-grid are the real scrollports. */
 .cmd-panel,
 .leaveby.leaveby--cmd,
 .leaveby.leaveby--hot,
@@ -287,14 +289,19 @@ body[data-kid] .cmd-kid .card {
 .hub-lights.hub-lights--hot,
 #hub-lights-panel.hub-lights--cmd,
 #hub-lights-panel.hub-lights--hot,
-.who-up,
-.tile-grid.tile-grid--cams .tile,
-.tile.kid-flip {
+.who-up {
   overflow-x: hidden !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior: contain;
   touch-action: pan-y !important;
+  max-height: none;
+  min-height: 0;
+}
+.tile-grid.tile-grid--cams .tile,
+.tile.kid-flip {
+  overflow: hidden !important; /* radius chrome — do not scroll the whole tile */
+  touch-action: manipulation !important; /* taps reach OPEN / href */
   max-height: none;
   min-height: 0;
 }
@@ -353,6 +360,22 @@ body[data-kid] .cmd-kid .card {
   display: flex !important;
   flex-direction: column !important;
 }
+.tile.kid-flip .tile-foot {
+  flex: 0 0 auto !important;
+  position: relative !important;
+  z-index: 5 !important;
+  pointer-events: auto !important;
+}
+.tile.kid-flip .kid-flip-go,
+.tile.kid-flip .tile-tap.kid-flip-go {
+  position: relative !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 6 !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  cursor: pointer !important;
+}
 .tile.kid-flip .kf-stage {
   flex: 1 1 auto !important;
   min-height: 0 !important;
@@ -393,7 +416,11 @@ body[data-kid] .cmd-kid .card {
 .hub-lights .hub-sw-rocker,
 .hub-lights .hub-lights-bulk-btn,
 .tile .tile-tap,
-.who-up-go {
+.tile a.tile,
+.tile.kid-flip .kid-flip-go,
+.who-up-go,
+.kf-claim,
+.kf-dots {
   touch-action: manipulation !important;
 }
 
@@ -453,3 +480,35 @@ body[data-kid] .cmd-kid .card {
   box-shadow: none !important;
   outline: none !important;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   HUBSCROLL2 · ENTIRE House Face — hide scrollbar chrome
+   html/body + every overflow container. Scroll (touch/wheel) stays.
+   ═══════════════════════════════════════════════════════════ */
+html, body {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+}
+*, *::before, *::after {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+*::-webkit-scrollbar,
+*::-webkit-scrollbar-button,
+*::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+

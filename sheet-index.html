@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="description" content="Board-OS House face · The Ward's mission hub · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
-<link rel="stylesheet" href="house-engage.css?v=CAMDECK1" />
+<link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -43,7 +43,14 @@
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
   }
+  html::-webkit-scrollbar, body::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    width: 0 !important; height: 0 !important; display: none !important;
+  }
+  * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
   /* HUBOVAL1 · Asus 32" wall PORTRAIT · 1080×1920 canvas · no landscape letterbox */
   @media (min-width: 1200px) {
     html, body {
@@ -3055,7 +3062,7 @@
 <link rel="stylesheet" href="tokens-hub-cams.css?v=CAMLIVE2" />
 <link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=CTRLPANEL1" />
 <link rel="stylesheet" href="tokens-hub-command-deck-hotter.css?v=CTRLPANEL1" />
-<link rel="stylesheet" href="tokens-ctrlpanel.css?v=HUBSCROLL1" />
+<link rel="stylesheet" href="tokens-ctrlpanel.css?v=HUBSCROLL2" />
 
 <style id="sched-look2">
 /* SCHEDLOOK2 · hero shrunk · layout body ≥140px · chips tap · LEAVESCRUB2 chrome stays dead */
@@ -3256,7 +3263,7 @@
 
 .tile.kid-flip {
   cursor: grab;
-  touch-action: pan-y;
+  touch-action: manipulation; /* HUBSCROLL2 · taps reach OPEN; stage keeps pan-y */
   user-select: none;
   -webkit-user-select: none;
   display: flex;
@@ -4166,7 +4173,7 @@
 <script src="house-weather.js?v=CAMDECK1"></script>
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
 <script src="kids-data.js?v=HUBSCROLL1"></script>
-<script src="house-kid-engage.js?v=HUBSCROLL1"></script>
+<script src="house-kid-engage.js?v=HUBSCROLL2"></script>
 <script src="house-sensi.js?v=CAMDECK1"></script>
 <script src="nest-webrtc-client.js?v=CAMLIVE2"></script>
 <script src="house-nest.js?v=CAMLIVE2"></script>
