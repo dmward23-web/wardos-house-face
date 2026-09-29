@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#d8dadf" />
 <meta name="description" content="WardOS House face · morning TODAY strip" />
 <title>BOARD-OS · HOUSE FACE · TODAY</title>
-<link rel="stylesheet" href="house-engage.css?v=HUBCLK1" />
+<link rel="stylesheet" href="house-engage.css?v=FAMCLK1" />
 <style>
  @font-face {
  font-family: "Inter Display";
@@ -503,15 +503,9 @@
  .where-card.dad-week-loud-card .sub strong { color: #7dffd4; }
 
 </style>
-<link rel="stylesheet" href="heat-v3.css?v=HUBCLK1" />
+<link rel="stylesheet" href="heat-v3.css?v=FAMCLK1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
-<style id="hubclk1-today">
-.hdr.hdr--clockfirst{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important;padding:10px 16px!important;min-height:96px!important;background:linear-gradient(165deg,rgba(8,10,16,.98),rgba(18,14,6,.94),rgba(4,6,12,.98))!important;border:2px solid rgba(245,196,70,.55)!important;border-radius:16px!important;box-shadow:inset 0 1px 0 rgba(255,230,160,.18),0 0 36px rgba(255,170,30,.35)!important}
-.hdr.hdr--clockfirst .brand,.hdr.hdr--clockfirst .eyebrow,.hdr.hdr--clockfirst .tagline{display:none!important}
-.hdr.hdr--clockfirst .live-clock{font-size:clamp(48px,6vw,72px)!important;font-weight:900!important;letter-spacing:-.06em!important;color:#ffe894!important;line-height:.9!important;text-shadow:0 0 44px rgba(255,180,30,.75),0 2px 0 #000!important;font-variant-numeric:tabular-nums}
-.hdr.hdr--clockfirst .live-clock-lab{display:none!important}
-.hdr.hdr--clockfirst .name-accent{color:#ffe894!important;-webkit-text-fill-color:#ffe894!important}
-</style>
+<link rel="stylesheet" href="tokens-family-clock-first-heat.css?v=FAMCLK1" />
 <style id="heat1-hide-brand">.brand img,.brand{display:none!important}.eyebrow{display:none!important}</style>
 </head>
 <body>
@@ -758,32 +752,29 @@
 
 <div class="panel">
  <header class="hdr hdr--clockfirst">
+ <div class="hdr-left-col">
  <div class="live-clock-host" aria-label="America/Chicago time">
- <div class="live-clock" data-live-clock>—:— —</div>
+ <div class="live-clock" data-live-clock>—:—</div>
  </div>
- <div class="hdr-left">
- <div class="nav-row">
- <a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
+ <div class="hdr-micros">
+ <a class="home-btn" href="sheet-index.html" aria-label="Home — House board">Home</a>
  <a class="nav-week" href="index.html">Week</a>
- </div>
- <div class="identity">
- <div class="avatar g2-mark" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-today"/></svg></div>
- <div class="id-text">
- <h1 class="name"><span class="name-accent">Today</span></h1>
+ <a class="nav-us" href="sheet-us.html">Us</a>
  </div>
  </div>
- </div>
- <div class="hdr-right">
- <div class="hot-pill"><span class="spark g2-spark"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-star"/></svg></span> <span data-live="date-short">Sun Sep 27</span> · vanity 3:00</div>
+ <div class="hdr-spacer" aria-hidden="true"></div>
+ <div class="hdr-ovals">
+ <a class="oval wx" href="#house-wx" aria-label="Weather"><span class="oval-ico">☀</span><span class="oval-deg">—°</span></a>
+ <a class="oval sensi" href="sheet-sensi.html" aria-label="Sensi"><span class="oval-ico">⌠</span><span class="oval-deg">—°</span></a>
  </div>
  </header>
 
- <section class="gm" aria-label="Good morning">
+ <section class="gm" aria-label="Today strip">
  <div class="gm-accent"></div>
  <div class="gm-body">
  <div class="gm-main">
- <div class="gm-label">Good morning · Ward house</div>
- <div class="gm-title">Hey crew · <span class="hl" data-live="date-short">Sun Sep 27</span> what’s on</div>
+ <div class="gm-label">Today · known facts</div>
+ <div class="gm-title"><span class="hl" data-live="date-short">Sun Sep 27</span> · what’s on</div>
  <div class="gm-sub">Kids with <strong>Dad @ 147th</strong> through Fri Oct 2 3:00 · garage sale 9–2 · Ainsley vanity 3:00</div>
  </div>
  <div class="gm-badges">
@@ -797,15 +788,15 @@
  <div class="unknown-chips" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;">
  <span style="font-size:13px;font-weight:850;letter-spacing:0.06em;color:#1a4a6a;background:#e8f4ff;border:1.5px solid #7eb6e0;padding:8px 12px;border-radius:10px;">WITH DAD · with Dad @ 147th through Fri Oct 2 3:00</span>
  </div>
-<section class="leaveby" aria-label="Leave-by countdown">
+<a class="leaveby" href="sheet-countdowns.html" aria-label="Leave-by countdown">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
- <div class="leaveby-label" data-live="leaveby-label">Next up · today</div>
+ <div class="leaveby-label" data-live="leaveby-label">Leave by · next</div>
  <div class="leaveby-main" data-live="leaveby-main">Sun Sep 27 · loading</div>
  <div class="leaveby-detail" data-live="leaveby-detail">Garage sale <strong>9–2</strong> · vanity <strong>3:00</strong> · Dad @ 147th</div>
  </div>
  <div class="leaveby-badge" data-live="leaveby-badge">Sun</div>
- </section>
+</a>
 
 
  <section class="wx-card" id="house-wx" data-live="weather" aria-label="Weather · Overland Park"></section>
@@ -826,11 +817,11 @@
  <a class="kchip har" href="kid-harris.html"><span class="d">H</span>Harris</a>
  </div>
  </div>
- <div class="where-card dad">
+ <a class="where-card dad" href="sheet-dan.html">
  <div class="lbl">Dad</div>
  <div class="big">Home · 147th</div>
- <div class="sub">Kids with Dad · watch <strong>Sun</strong> garage sale · <strong>Mon</strong> House+Desk LIVE</div>
- </div>
+ <div class="sub">Ops box → sheet-dan · kids with Dad</div>
+ </a>
  </section>
 
  <section class="sec kids-col" aria-label="Each kid today" style="background:transparent;border:none;box-shadow:none;padding:0;">
@@ -842,7 +833,7 @@
  <div class="kid-when">Morning · 9–2</div>
  <div>
  <div class="kid-what">House shake / garage-sale crew @ 147th</div>
- <div class="kid-hint">Help Dad · then free play</div>
+ <div class="kid-hint">Musts · Jar · Days on board</div>
  </div>
  </a>
  <a class="kid-card hayes" href="kid-hayes.html">
@@ -853,7 +844,7 @@
  <div class="kid-when">Morning · 9–2</div>
  <div>
  <div class="kid-what">House shake / garage-sale loadout @ 147th</div>
- <div class="kid-hint">Help the crew · then free time</div>
+ <div class="kid-hint">Musts · Jar · Days on board</div>
  </div>
  </a>
  <a class="kid-card ainsley" href="kid-ainsley.html">
@@ -864,10 +855,16 @@
  <div class="kid-when">3:00 LOCKED</div>
  <div>
  <div class="kid-what">Vanity install · Jessy</div>
- <div class="kid-hint">Garage sale morning · then your board</div>
+ <div class="kid-hint">Musts · Jar · Days on board</div>
  </div>
  </a>
  </section>
+
+ <nav class="family-rail tap-rail" aria-label="Musts Jar Days">
+ <a href="sheet-chores.html">Musts</a>
+ <a href="sheet-allowance.html">Jar</a>
+ <a href="month.html">Days</a>
+ </nav>
 
  <section class="sec" aria-label="Quick taps">
  <div class="sec-hdr">
@@ -905,12 +902,12 @@
 
  <footer class="ftr">
  <div class="ftr-left">
- <span class="ftr-chip">TODAY · MORNING STRIP</span>
+ <span class="ftr-chip">TODAY · FAMCLK1</span>
  </div>
  </footer>
 </div>
 
-<script src="house-clock.js?v=HUBCLK1"></script>
+<script src="house-clock.js?v=FAMCLK1"></script>
 <script src="house-board-strip.js?v=CT1"></script>
 <script src="house-weather.js?v=CT1"></script>
 <script src="house-zoom.js"></script>

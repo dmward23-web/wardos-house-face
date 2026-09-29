@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE FACE · MONTH · CHAT PREVIEW</title>
-<link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
+<link rel="stylesheet" href="house-engage.css?v=FAMCLK1" />
 <style>
  @font-face {
  font-family: "Inter Display";
@@ -304,23 +304,29 @@
  }
  .ftr-meta { color: #8a8e96; line-height: 1.35; }
 </style>
+<link rel="stylesheet" href="tokens-family-clock-first-heat.css?v=FAMCLK1" />
 </head>
 <body>
 <div class="panel">
- <header class="hdr">
- <div class="hdr-top">
- <div>
- <a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
- <div class="eyebrow" style="margin-top:8px">House · Ward</div>
- <h1 class="title">House <span class="sep">·</span> <span class="sub">family month</span></h1>
+  <header class="hdr hdr--clockfirst">
+ <div class="hdr-left-col">
+ <div class="live-clock-host" aria-label="America/Chicago time">
+ <div class="live-clock" data-live-clock>—:—</div>
+ </div>
+ <div class="hdr-micros">
+ <a class="home-btn" href="sheet-index.html" aria-label="Home — House board">Home</a>
+ <a class="nav-week" href="index.html">Week</a>
+ <a class="nav-us" href="sheet-us.html">Us</a>
  </div>
  </div>
- <div class="meta">Nashville week (at Erin’s) · through Fri Sep 25 AM</div>
- <div class="meta">TN week with Erin · Kids with mom through Fri Sep 25 3:00 CT</div>
- <div class="meta wx">Weather</div>
+ <div class="hdr-spacer" aria-hidden="true"></div>
+ <div class="hdr-ovals">
+ <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather"><span class="oval-ico">☀</span><span class="oval-deg">—°</span></a>
+ <a class="oval sensi" href="sheet-sensi.html" aria-label="Sensi"><span class="oval-ico">⌠</span><span class="oval-deg">—°</span></a>
+ </div>
  </header>
 
- <section class="leaveby" aria-label="Next leave-by">
+ <a class="leaveby" href="sheet-countdowns.html" aria-label="Next leave-by">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
  <div class="leaveby-top">
@@ -330,7 +336,7 @@
  <div class="leaveby-main">Fri Sep 25 · <span class="time">6:50a</span><br/>Harbor Cove</div>
  <div class="leaveby-detail"><strong>WN557</strong> BNA→MCI · ~9:45a · Hayes birthday</div>
  </div>
- </section>
+ </a>
 
  <section class="month-wrap">
  <div class="month-hdr">
@@ -489,6 +495,7 @@
  </footer>
 </div>
 
+<script src="house-clock.js?v=FAMCLK1"></script>
 <script src="house-zoom.js"></script>
 </body>
 </html>

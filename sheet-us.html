@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#d8dadf" />
 <meta name="description" content="Board-OS House face · Us · together · shared calendar + logistics · Harbor-safe" />
 <title>BOARD-OS · HOUSE FACE · US · TOGETHER</title>
-<link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
+<link rel="stylesheet" href="house-engage.css?v=FAMCLK1" />
 <style>
  @font-face {
  font-family: "Inter Display";
@@ -302,27 +302,29 @@
  }
  a.eyebrow { text-decoration: none; color: inherit; cursor: pointer; }
 </style>
+<link rel="stylesheet" href="tokens-family-clock-first-heat.css?v=FAMCLK1" />
 </head>
 <body>
 <div class="panel">
- <header class="hdr">
- <div class="hdr-left">
- <div class="nav-row"><a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a><a class="nav-week" href="index.html">Week</a></div>
- <div class="identity">
- <div class="avatar" aria-hidden="true">◎</div>
- <div class="id-text">
- <a class="eyebrow" href="sheet-index.html">Partner sheet · Harbor-safe · shared only</a>
- <h1 class="name"><span class="name-accent">Us · together</span></h1>
- <div class="tagline">Shared week · calendar dates · household logistics</div>
+  <header class="hdr hdr--clockfirst">
+ <div class="hdr-left-col">
+ <div class="live-clock-host" aria-label="America/Chicago time">
+ <div class="live-clock" data-live-clock>—:—</div>
+ </div>
+ <div class="hdr-micros">
+ <a class="home-btn" href="sheet-index.html" aria-label="Home — House board">Home</a>
+ <a class="nav-week" href="index.html">Week</a>
+ <a class="nav-us" href="sheet-us.html" aria-current="page">Us</a>
  </div>
  </div>
- </div>
- <div class="hdr-right">
- <div class="hot-pill"><span class="spark">◎</span> Leave Fri 6:50a · Harbor Cove</div>
+ <div class="hdr-spacer" aria-hidden="true"></div>
+ <div class="hdr-ovals">
+ <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather"><span class="oval-ico">☀</span><span class="oval-deg">—°</span></a>
+ <a class="oval sensi" href="sheet-sensi.html" aria-label="Sensi"><span class="oval-ico">⌠</span><span class="oval-deg">—°</span></a>
  </div>
  </header>
 
- <section class="leaveby" aria-label="Next leave-by">
+ <a class="leaveby" href="sheet-countdowns.html" aria-label="Next leave-by">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
  <div class="leaveby-label">Next leave-by · shared</div>
@@ -330,7 +332,7 @@
  <div class="leaveby-detail">Nashville week ends · <strong>WN557</strong> BNA→MCI · lands ~9:45a</div>
  </div>
  <div class="leaveby-badge">Known</div>
- </section>
+ </a>
 
  <div class="body">
  <div class="col">
@@ -352,30 +354,30 @@
  <div class="sec-meta">See-all safe titles</div>
  </div>
  <div class="cal-list">
- <div class="cal-row hot">
+ <a class="cal-row hot" href="sheet-countdowns.html">
  <div class="cal-when">Fri Sep 25<span class="sm">leave + handoff</span></div>
  <div class="cal-what">
  Leave Harbor Cove · 6:50a
  <span class="hint">WN557 return · kids handoff 3:00 · Hayes birthday</span>
  </div>
  <span class="cal-tag">Today’s plan</span>
- </div>
- <div class="cal-row">
+ </a>
+ <a class="cal-row" href="month.html">
  <div class="cal-when">Oct 9–14<span class="sm">six days</span></div>
  <div class="cal-what">
  Erin + Kids · KC
  <span class="hint">Shared week in Kansas City · calendar-together</span>
  </div>
  <span class="cal-tag known">Known</span>
- </div>
- <div class="cal-row">
+ </a>
+ <a class="cal-row" href="month.html">
  <div class="cal-when">Oct 18<span class="sm">Saturday</span></div>
  <div class="cal-what">
  Live on the Green
  <span class="hint">Family outing · shared calendar date</span>
  </div>
  <span class="cal-tag known">Known</span>
- </div>
+ </a>
  </div>
  </section>
  </div>
@@ -418,11 +420,12 @@
 
  <footer class="ftr">
  <div class="ftr-left">
- <span class="ftr-chip">US · TOGETHER · HARBOR-SAFE</span>
+ <span class="ftr-chip">US · FAMCLK1</span>
  </div>
  </footer>
 </div>
 
+<script src="house-clock.js?v=FAMCLK1"></script>
 <script src="house-zoom.js"></script>
 </body>
 </html>

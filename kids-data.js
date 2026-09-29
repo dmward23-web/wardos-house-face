@@ -591,11 +591,13 @@
     var tone = item.tone || "act";
     var cls = "card " + tone;
     if (item.compact) cls += " compact";
-    var html = '<div class="' + cls + '">';
+    var tag = item.href ? "a" : "div";
+    var hrefAttr = item.href ? ' href="' + esc(item.href) + '"' : "";
+    var html = "<" + tag + ' class="' + cls + '"' + hrefAttr + ">";
     if (item.when) html += '<div class="when">' + esc(item.when) + "</div>";
     if (item.what) html += '<div class="what">' + esc(item.what) + "</div>";
     if (item.hint) html += '<div class="hint">' + esc(item.hint) + "</div>";
-    html += "</div>";
+    html += "</" + tag + ">";
     return html;
   }
 
@@ -1865,13 +1867,41 @@
     } catch (e) { /* */ }
   }
 
+  function withHref(items, href) {
+    return (items || []).map(function (it) {
+      var o = {};
+      for (var k in it) if (Object.prototype.hasOwnProperty.call(it, k)) o[k] = it[k];
+      if (!o.href) o.href = href;
+      return o;
+    });
+  }
+
+  function pickHref(item) {
+    var blob = ((item && item.what) || "") + " " + ((item && item.when) || "") + " " + ((item && item.hint) || "");
+    blob = blob.toLowerCase();
+    if (/harris/.test(blob)) return "kid-harris.html";
+    if (/hayes/.test(blob)) return "kid-hayes.html";
+    if (/ainsley/.test(blob)) return "kid-ainsley.html";
+    if (/jar|allowance|gem|coin|payday/.test(blob)) return "sheet-allowance.html";
+    if (/chore|must/.test(blob)) return "sheet-chores.html";
+    if (/pack/.test(blob)) return "sheet-pack.html";
+    return "sheet-today.html";
+  }
+
   function renderDanPage(data) {
     var dan = data.kids.dan;
     if (!dan) return;
-    renderList(document.querySelector("[data-mount-dan-today]"), dan.today, "quiet day");
-    renderList(document.querySelector("[data-mount-dan-week]"), dan.week, "week fills from Atlas");
-    renderList(document.querySelector("[data-mount-dan-leave]"), dan.leaveBys, "leave-bys when known");
-    renderList(document.querySelector("[data-mount-dan-picks]"), dan.picks, "picks later");
+    /* DADCLK1 · every ops card lands somewhere (LOOK tap map) */
+    renderList(document.querySelector("[data-mount-dan-today]"), withHref(dan.today, "sheet-today.html"), "quiet day");
+    renderList(document.querySelector("[data-mount-dan-week]"), withHref(dan.week, "month.html"), "week fills from Atlas");
+    renderList(document.querySelector("[data-mount-dan-leave]"), withHref(dan.leaveBys, "sheet-countdowns.html"), "leave-bys when known");
+    var picks = (dan.picks || []).map(function (it) {
+      var o = {};
+      for (var k in it) if (Object.prototype.hasOwnProperty.call(it, k)) o[k] = it[k];
+      if (!o.href) o.href = pickHref(o);
+      return o;
+    });
+    renderList(document.querySelector("[data-mount-dan-picks]"), picks, "picks later");
   }
 
   function boot(kidId) {
