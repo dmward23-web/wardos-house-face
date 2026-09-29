@@ -390,12 +390,16 @@
     }
     var url = base + "/api/lights/set";
     _writeInFlight++;
+    var ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    var timer = setTimeout(function () { try { if (ctrl) ctrl.abort(); } catch (e) {} }, 15000);
     return fetch(url, {
       method: "POST",
       cache: "no-store",
       headers: proxyHeaders(),
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      signal: ctrl ? ctrl.signal : undefined
     }).then(function (r) {
+      clearTimeout(timer);
       return r.json().then(function (j) {
         if (!r.ok || !j || !j.ok) {
           var err = new Error((j && j.error) || ("write HTTP " + r.status));
@@ -496,7 +500,37 @@
     return g;
   }
 
+  /* LIGHTSFAST1: when the write proxy is reachable + keyed, read live state from
+   * its warm Kasa session (seconds old) instead of the Pages JSON (minutes old),
+   * so polls never snap a just-tapped switch back. Falls back to Pages JSON. */
   function fetchLive(cb) {
+    var base = proxyBase();
+    if (base && proxyToken() && _proxyReachable && !(isPagesHost() && isLoopbackProxy(base))) {
+      var ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+      var timer = setTimeout(function () { try { if (ctrl) ctrl.abort(); } catch (e) {} }, 4000);
+      fetch(base + "/api/lights?t=" + Date.now(), {
+        cache: "no-store",
+        headers: proxyHeaders(),
+        signal: ctrl ? ctrl.signal : undefined
+      }).then(function (r) {
+        clearTimeout(timer);
+        if (!r.ok) throw new Error("proxy lights " + r.status);
+        return r.json();
+      }).then(function (j) {
+        if (!j || j.status !== "live" || !Array.isArray(j.lights) || !j.lights.length) throw new Error("proxy not live");
+        if (_writeInFlight > 0) { if (cb) cb(null, gate(), j); return; }
+        var g = applyLivePayload(j);
+        if (cb) cb(null, g, j);
+      }).catch(function () {
+        clearTimeout(timer);
+        fetchLivePages(cb);
+      });
+      return;
+    }
+    fetchLivePages(cb);
+  }
+
+  function fetchLivePages(cb) {
     var url = LIVE_URL + (LIVE_URL.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now();
     fetch(url, { cache: "no-store" }).then(function (r) {
       if (!r.ok) throw new Error("live json " + r.status);

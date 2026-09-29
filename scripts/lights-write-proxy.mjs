@@ -32,6 +32,7 @@ const DEFAULT_PYTHON =
   process.env.KASA_VENV_PYTHON ||
   "/workspace/plates/2026-09-28/kasa-live/.venv/bin/python";
 const DEFAULT_WRITE = path.join(ROOT, "scripts", "kasa-write.py");
+const DEFAULT_DAEMON = path.join(ROOT, "scripts", "kasa-daemon.py");
 const LIVE_JSON = path.join(ROOT, "data", "lights-live.json");
 
 const ROSTER_IDS = new Set(["dining-room", "harris-room", "kitchen"]);
@@ -169,6 +170,119 @@ function runWrite(argsList, args) {
   });
 }
 
+/* LIGHTSFAST1 · warm Kasa session: one long-lived python child keeps the
+ * TP-Link cloud login + device handles, so a tap is one passthrough (~0.5 s).
+ * Falls back to one-shot kasa-write.py if the daemon is down. */
+const warm = {
+  child: null,
+  ready: false,
+  nextRid: 1,
+  pending: new Map(),
+  lights: null,
+  at: null,
+  buf: "",
+  restarts: 0,
+};
+
+function startDaemon(args) {
+  if (!fs.existsSync(DEFAULT_DAEMON)) return;
+  const child = spawn(args.python, [DEFAULT_DAEMON], {
+    env: process.env,
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+  warm.child = child;
+  warm.ready = false;
+  warm.buf = "";
+  child.stdout.on("data", (d) => {
+    warm.buf += d.toString("utf8");
+    let i;
+    while ((i = warm.buf.indexOf("\n")) >= 0) {
+      const line = warm.buf.slice(0, i);
+      warm.buf = warm.buf.slice(i + 1);
+      let msg;
+      try {
+        msg = JSON.parse(line);
+      } catch {
+        continue;
+      }
+      if (Array.isArray(msg.lights)) {
+        warm.lights = msg.lights;
+        warm.at = new Date().toISOString();
+      }
+      if (msg.event === "ready") {
+        warm.ready = !!msg.ok;
+        console.log(`[lights-write-proxy] warm kasa ${msg.ok ? "ready" : "failed"}`);
+      }
+      if (msg.rid != null && warm.pending.has(msg.rid)) {
+        const p = warm.pending.get(msg.rid);
+        warm.pending.delete(msg.rid);
+        clearTimeout(p.timer);
+        p.resolve(msg);
+      }
+    }
+  });
+  child.stderr.on("data", () => {});
+  child.on("close", (code) => {
+    console.warn(`[lights-write-proxy] warm kasa exited ${code}; restarting`);
+    warm.child = null;
+    warm.ready = false;
+    for (const [, p] of warm.pending) {
+      clearTimeout(p.timer);
+      p.resolve({ ok: false, error: "daemon exited" });
+    }
+    warm.pending.clear();
+    const delay = Math.min(60000, 2000 * 2 ** Math.min(warm.restarts++, 5));
+    setTimeout(() => startDaemon(args), delay);
+  });
+  child.on("spawn", () => {
+    setTimeout(() => {
+      if (warm.child === child) warm.restarts = 0;
+    }, 120000);
+  });
+}
+
+function daemonCall(msg, timeoutMs = 12000) {
+  return new Promise((resolve) => {
+    if (!warm.child || !warm.ready) return resolve(null);
+    const rid = warm.nextRid++;
+    const timer = setTimeout(() => {
+      warm.pending.delete(rid);
+      resolve({ ok: false, error: "warm kasa timeout" });
+    }, timeoutMs);
+    warm.pending.set(rid, { resolve, timer });
+    warm.child.stdin.write(JSON.stringify({ rid, ...msg }) + "\n");
+  });
+}
+
+function liveWithWarm() {
+  let live = null;
+  try {
+    live = JSON.parse(fs.readFileSync(LIVE_JSON, "utf8"));
+  } catch {
+    live = null;
+  }
+  if (!warm.lights) return live;
+  return {
+    ...(live || {}),
+    status: "live",
+    writeSupported: true,
+    source: "lights-write-proxy-warm",
+    fetchedAt: warm.at || new Date().toISOString(),
+    lights: warm.lights,
+    error: null,
+  };
+}
+
+let refreshTimer = null;
+function scheduleSnapshotRefresh() {
+  // Debounced, non-blocking: keep data/lights-live.json honest for Pages pollers.
+  if (refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(() => {
+    refreshTimer = null;
+    refreshLiveSnapshot().catch(() => {});
+  }, 20000);
+}
+
 function refreshLiveSnapshot() {
   return new Promise((resolve) => {
     const fetchScript = path.join(ROOT, "scripts", "lights-fetch.mjs");
@@ -257,6 +371,7 @@ async function main() {
           lan: args.lan,
           authRequired: Boolean(args.authToken),
           writeSupported: true,
+          warm: warm.ready,
           kasaCreds: hasKasaCreds(),
           ts: new Date().toISOString(),
         });
@@ -269,19 +384,15 @@ async function main() {
       }
 
       if (pathname === "/api/lights" && req.method === "GET") {
-        let live = null;
-        try {
-          live = JSON.parse(fs.readFileSync(LIVE_JSON, "utf8"));
-        } catch {
-          live = null;
-        }
+        const live = liveWithWarm();
         return json(res, 200, {
+          ...(live || {}),
           status: live?.status || "unknown",
           writeSupported: true,
-          source: "lights-write-proxy",
+          source: live?.source || "lights-write-proxy",
           lights: live?.lights || [],
           fetchedAt: live?.fetchedAt || null,
-          proxy: { write: true },
+          proxy: { write: true, warm: warm.ready },
         });
       }
 
@@ -322,6 +433,31 @@ async function main() {
           }
         }
 
+        const t0 = Date.now();
+        let msg;
+        if (allOn || allOff) msg = { op: "all", on: !!allOn };
+        else {
+          msg = { op: "set", id };
+          if (typeof body.on === "boolean") msg.on = body.on;
+          if (typeof body.brightness === "number") msg.brightness = Math.round(body.brightness);
+        }
+        const fast = await daemonCall(msg);
+        if (fast && fast.ok) {
+          scheduleSnapshotRefresh();
+          console.log(`[lights-write-proxy] warm ${JSON.stringify(msg)} ${Date.now() - t0}ms`);
+          return json(res, 200, {
+            ok: true,
+            warm: true,
+            ms: Date.now() - t0,
+            write: { ok: true, lights: fast.lights },
+            live: liveWithWarm(),
+          });
+        }
+        if (fast && !fast.ok && /unknown id|need on/.test(fast.error || "")) {
+          return json(res, 400, { ok: false, error: fast.error });
+        }
+
+        // Fallback: one-shot cold write (full login) if warm session is down.
         const result = await runWrite(argv, args);
         if (!result.ok) {
           return json(res, 502, {
@@ -330,14 +466,14 @@ async function main() {
             detail: result.parsed || null,
           });
         }
-
-        // Best-effort refresh snapshot for Pages pollers (non-fatal)
-        const snap = await refreshLiveSnapshot();
+        scheduleSnapshotRefresh();
+        console.log(`[lights-write-proxy] cold ${argv.join(" ")} ${Date.now() - t0}ms`);
         return json(res, 200, {
           ok: true,
+          warm: false,
+          ms: Date.now() - t0,
           write: result.parsed,
-          live: snap.live || null,
-          refreshed: !!snap.ok,
+          live: liveWithWarm(),
         });
       }
 
@@ -348,6 +484,14 @@ async function main() {
       return json(res, 500, { error: msg });
     }
   });
+
+  startDaemon(args);
+  process.on("exit", () => {
+    try {
+      if (warm.child) warm.child.kill();
+    } catch {}
+  });
+  for (const sig of ["SIGTERM", "SIGINT"]) process.on(sig, () => process.exit(0));
 
   server.listen(args.port, args.host, () => {
     const shown = args.host === "0.0.0.0" ? "0.0.0.0 (all interfaces)" : args.host;
