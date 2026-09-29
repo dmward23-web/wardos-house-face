@@ -1102,6 +1102,99 @@
     });
   }, 60 * 1000);
 
+  /* SCHEDDAY2 · Dad page (sheet-dan): Day layout for Today + This week */
+  var DAN_CSS = [
+    ".lb-day.dan-stack .lb-day-cols{grid-template-columns:1fr}",
+    ".lb-day.dan-stack .lb-day-col.is-past{display:none}",
+    ".lb-wk{display:flex;flex-direction:column;gap:8px}",
+    ".lb-wk-day{background:rgba(255,255,255,.04);border:1px solid rgba(255,224,128,.14);border-radius:12px;padding:6px 8px}",
+    ".lb-wk-day.is-tmr{border-color:rgba(255,224,128,.4)}",
+    ".lb-wk-hd{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#ffe080;margin:0 0 3px}",
+    ".lb-wk-row{display:grid;grid-template-columns:52px 1fr;gap:6px;align-items:baseline;padding:3px 0;border-top:1px solid rgba(255,255,255,.07)}",
+    ".lb-wk-row:first-of-type{border-top:0}",
+    ".lb-wk-t{font-size:15px;font-weight:900;letter-spacing:-.03em;color:#f2eee6;white-space:nowrap}",
+    ".lb-wk-what{font-size:12px;font-weight:700;color:#e8e2d6;line-height:1.2}",
+    ".lb-wk-what .lb-day-tags{display:inline-flex;margin:0 0 0 4px;vertical-align:middle}"
+  ].join("\n");
+  function ensureDanCss() {
+    ensureDayCss();
+    if (document.getElementById("sched-day2")) return;
+    var st = document.createElement("style");
+    st.id = "sched-day2";
+    st.textContent = DAN_CSS;
+    document.head.appendChild(st);
+  }
+  var DOW3 = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  function dayLabel(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+    if (!m) return iso || "";
+    var d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], 12));
+    return DOW3[d.getUTCDay()] + " " + (+m[3]);
+  }
+  function layoutWeekDays(cal, clock) {
+    ensureDanCss();
+    var list = listEvents(cal);
+    var by = {}, days = [];
+    for (var i = 0; i < list.length; i++) {
+      var ev = list[i];
+      var d = eventDayIso(ev);
+      if (!d || d <= clock.iso) continue;
+      if (!ev.allDay && isPrep(ev)) continue;
+      if (!by[d]) { by[d] = []; days.push(d); }
+      by[d].push(ev);
+    }
+    days.sort();
+    days = days.slice(0, 6);
+    if (!days.length) return '<div class="lb-wk"><div class="lb-day-none">Week is clear</div></div>';
+    var html = '<div class="lb-wk" aria-label="This week by day">';
+    for (var k = 0; k < days.length; k++) {
+      var evs = by[days[k]].slice().sort(function (a, b) {
+        if (a.allDay !== b.allDay) return a.allDay ? -1 : 1;
+        return eventStartMs(a) - eventStartMs(b);
+      });
+      html += '<div class="lb-wk-day' + (k === 0 ? " is-tmr" : "") + '"><div class="lb-wk-hd">' +
+        esc((k === 0 ? "Tomorrow · " : "") + dayLabel(days[k])) + "</div>";
+      for (var j = 0; j < evs.length; j++) {
+        var e = evs[j], who = whoNames(e), tags = "";
+        for (var w = 0; w < who.length; w++) {
+          tags += '<span class="lb-day-tag" data-who="' + esc(who[w]) + '">' + esc(who[w]) + "</span>";
+        }
+        html += '<div class="lb-wk-row"><span class="lb-wk-t">' + esc(e.allDay ? "All day" : shortTime(e.start)) +
+          '</span><span class="lb-wk-what">' + esc(dayTitle(e)) + '<span class="lb-day-tags">' + tags + "</span></span></div>";
+      }
+      html += "</div>";
+    }
+    return html + "</div>";
+  }
+  function paintDan() {
+    var tEl = document.querySelector("[data-mount-dan-today]");
+    var wEl = document.querySelector("[data-mount-dan-week]");
+    if ((!tEl && !wEl) || !global.HouseClock) return;
+    loadCal(function (err, cal) {
+      var clock = HouseClock.now();
+      var gate = calIsFresh(cal, clock);
+      if (err || !gate.ok) return; /* leave kids-data fallback cards */
+      var strip = pickStripFromCal(cal, clock);
+      if (tEl) {
+        var h = layoutDay(strip).replace('class="lb-layout lb-day"', 'class="lb-layout lb-day dan-stack"');
+        h = h.replace(/<div class="lb-day-tmr">[\s\S]*<\/div><\/div>$/, "</div>");
+        ensureDanCss();
+        tEl.innerHTML = h;
+        tEl.setAttribute("data-sched", "day2");
+      }
+      if (wEl) {
+        wEl.innerHTML = layoutWeekDays(cal, clock);
+        wEl.setAttribute("data-sched", "day2");
+      }
+    });
+  }
+  if (typeof document !== "undefined" && document.addEventListener) {
+    document.addEventListener("house:kids-data-ready", function () { setTimeout(paintDan, 0); });
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", paintDan);
+    else paintDan();
+    setInterval(paintDan, 60 * 1000);
+  }
+
   global.HouseBoardStrip = {
     boot: boot,
     pickNextFuture: pickNextFuture,
@@ -1116,6 +1209,8 @@
     setLayout: setLayout,
     cycleLayout: cycleLayout,
     LAYOUTS: LAYOUTS,
+    layoutWeekDays: layoutWeekDays,
+    paintDan: paintDan,
     CAL_FRESH_MS: CAL_FRESH_MS
   };
 })(typeof window !== "undefined" ? window : globalThis);
