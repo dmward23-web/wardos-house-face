@@ -1,4 +1,4 @@
-/* House Face · CTRLPANEL2 · kid flip · who’s up denser · daily quest · claim · streak · SFX
+/* House Face · HUBBREATHE1 · kid flip · who’s up breathes · hub quest off · claim · streak · SFX
    LIVE only · WardKids · HUBTOK1 atoms. Bind-once guards · tap-to-cycle · OPEN nav.
    No leaveby/cam/nest/sensi JSON. */
 (function (global) {
@@ -672,31 +672,21 @@
     return KIDS[0];
   }
 
+  /** Main hub face (sheet-index roster) — quest belongs on kid boards only. */
+  function isMainHubFace() {
+    return !!document.querySelector(".tile-grid--cams, .tile-grid[aria-label*=\"sheet index\"]");
+  }
+
   function ensureQuestHost() {
     var existing = document.querySelector("[data-hub-quest]");
+    /* HUBQUESTOFF · never paint / keep daily quest on main hub board */
+    if (isMainHubFace() || (document.body && !document.body.getAttribute("data-kid") && document.querySelector("[data-who-up]"))) {
+      if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+      return null;
+    }
     if (existing) return existing;
-    var who = document.querySelector("[data-who-up]");
-    var grid = document.querySelector(".tile-grid, .grid-wrap");
-    if (!who && !grid) return null;
-    var sec = document.createElement("section");
-    sec.className = "hub-quest";
-    sec.setAttribute("data-hub-quest", "1");
-    sec.setAttribute("aria-label", "Daily quest");
-    sec.innerHTML =
-      '<div class="hub-quest-accent" aria-hidden="true"></div>' +
-      '<div class="hub-quest-body">' +
-      '<div class="hub-quest-kicker">Daily quest</div>' +
-      '<div class="hub-quest-main">' +
-      '<span class="hub-quest-title" data-hq-title>…</span>' +
-      '<span class="hub-quest-musts" data-hq-musts></span>' +
-      '<span class="hub-quest-streak" data-hq-streak></span>' +
-      "</div>" +
-      '<div class="hub-quest-claims" data-hq-claims></div>' +
-      "</div>" +
-      '<a class="hub-quest-go" data-hq-go href="#">OPEN</a>';
-    if (who && who.parentNode) who.parentNode.insertBefore(sec, who.nextSibling);
-    else if (grid && grid.parentNode) grid.parentNode.insertBefore(sec, grid);
-    return sec;
+    /* Kid boards already own musts/quests — do not inject a hub-quest strip elsewhere. */
+    return null;
   }
 
   function paintDailyQuest() {
