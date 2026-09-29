@@ -388,48 +388,54 @@ body.theme-harris .xp-row {
 }
 
 
-/* HUBCLK1 · real jump rail (Musts/Jar/Days) — no dead SVG chrome */
+/* GLYPH-RAIL2 · amber session-rail SVGs on glass · kill Musts/Jar/Days text */
 body.theme-harris .session-rail.jump-rail {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 10px !important;
+  position: relative !important;
+  display: block !important;
   flex-shrink: 0 !important;
   margin: 0 0 8px !important;
-  padding: 10px 12px !important;
-  background: rgba(10,9,8,0.96) !important;
-  border: 1.5px solid rgba(245,196,70,0.22) !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
   border-radius: 16px !important;
-  box-shadow: 0 0 18px rgba(245,180,70,.18) !important;
+  box-shadow: none !important;
+  min-height: 56px !important;
 }
 body.theme-harris .session-rail img {
-  display: none !important;
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 14px !important;
+  box-shadow: 0 0 18px rgba(245,180,70,.18) !important;
+  pointer-events: none !important;
 }
 body.theme-harris .jump-rail a.row {
-  flex: 1 !important;
+  position: absolute !important;
+  top: 16% !important;
+  bottom: 16% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
   min-height: 52px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 10px 12px !important;
+  background: transparent !important;
+  border: 0 !important;
   border-radius: 999px !important;
   text-decoration: none !important;
   cursor: pointer !important;
-  font-family: "JetBrains Mono", ui-monospace, monospace !important;
-  font-size: 15px !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.06em !important;
+  font-size: 0 !important;
+  color: transparent !important;
+  overflow: hidden !important;
+  z-index: 2 !important;
 }
-body.theme-harris .jump-rail a.row.live {
-  background: linear-gradient(90deg, #a85808, #f0a818, #ffe894) !important;
-  color: #140c02 !important;
-  border: 1.5px solid #9a6810 !important;
-}
+body.theme-harris .jump-rail a.row.live,
 body.theme-harris .jump-rail a.row.stub {
-  background: #080706 !important;
-  color: rgba(180,176,160,0.85) !important;
-  border: 1.5px dashed rgba(160,156,140,0.4) !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: transparent !important;
 }
+body.theme-harris .jump-rail a.row:nth-of-type(1) { left: 2.78% !important; width: 30% !important; }
+body.theme-harris .jump-rail a.row:nth-of-type(2) { left: 35% !important; width: 30% !important; }
+body.theme-harris .jump-rail a.row:nth-of-type(3) { left: 67.22% !important; width: 30% !important; }
 
 /* HUBCLK1 · hotbar is a real jump to Musts (no dead-end slots) */
 body.theme-harris a.hotbar {
