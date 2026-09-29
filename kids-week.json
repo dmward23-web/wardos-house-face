@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-29T22:30:53.498Z",
+  "refreshedAt": "2026-09-29T22:35:00.535Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,27 +16,15 @@
     "endIso": "2026-10-02T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "6:55",
-    "place": "Get Hayes from Maria's · time TBD",
+    "label": "Next up · Wed",
+    "time": "7:30",
+    "place": "LKMS yearbook picture retakes",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-    "badge": "Tue",
-    "startIso": "2026-09-29T23:55:00.000Z",
-    "endIso": "2026-09-30T00:45:00.000Z",
-    "kind": "other",
+    "badge": "Wed",
+    "startIso": "2026-09-30T12:30:00.000Z",
+    "endIso": "2026-09-30T12:45:00.000Z",
+    "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "6:55",
-        "place": "Get Hayes from Maria's · time TBD",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-09-29T23:55:00.000Z",
-        "endIso": "2026-09-30T00:45:00.000Z",
-        "kind": "other",
-        "whenLabel": "6:55",
-        "summary": "Get Hayes from Maria's · time TBD"
-      },
       {
         "label": "Next up · Wed",
         "time": "7:30",
@@ -168,6 +156,18 @@
         "kind": "leave",
         "whenLabel": "Thu 8:55",
         "summary": "Leave · KS DL replace · OP 119th · BOOKED 2777892 · 9:15"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "3:00",
+        "place": "LKMS Homework Help",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-01T20:00:00.000Z",
+        "endIso": "2026-10-01T21:00:00.000Z",
+        "kind": "school",
+        "whenLabel": "Thu 3:00",
+        "summary": "Ainsley — LKMS Homework Help · 3:00"
       }
     ]
   },
@@ -507,22 +507,15 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "TUE · 6:55",
-        "what": "GET HAYES FROM MARIA'S · TIME TBD",
+        "when": "WED · 8:00",
+        "what": "SRE HEARING/VISION SCREENING",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "TUE",
-          "6:55"
+          "WED",
+          "8:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Tue · 6:55",
-          "what": "Get Hayes from Maria's · time TBD",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "note",
           "when": "All day",

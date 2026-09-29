@@ -278,6 +278,8 @@ function buildBoardItems(events, now) {
     if (ev.status === "cancelled" || ev.status === "canceled") continue;
     /* CANCELGONE1 · title marked canceled = gone from board */
     if (/^\s*[\[(]?\s*(cancel+ed|cxl)\b/i.test(String(ev.summary || ""))) continue;
+    /* SOFTGONE1 · TBD / DONE / BACKUP / "cancel if" = no card, no countdown */
+    if (ev.status === "tentative" || /(^\s*[\[(]?\s*(cancel+ed|cxl|done|backup|tentative)\b)|\btbd\b|\bcancel if\b/i.test(String(ev.summary || ""))) continue;
     const start = parseEventTime(ev, "start");
     const end = parseEventTime(ev, "end") || start;
     if (!start || !end) continue;

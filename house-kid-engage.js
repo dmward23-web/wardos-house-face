@@ -986,7 +986,10 @@
         return r.json();
       }).then(function (cal) {
         if (cal && Array.isArray(cal.upcomingLeaves)) {
-          global.__wardosCalLeaves = cal.upcomingLeaves;
+          /* SOFTGONE1 · no Who's up / leave for TBD, canceled, done, backup */
+          global.__wardosCalLeaves = cal.upcomingLeaves.filter(function (e) {
+            return !(e && /(^\s*[\[(]?\s*(cancel+ed|cxl|done|backup|tentative)\b)|\btbd\b|\bcancel if\b/i.test(String(e.summary || "")));
+          });
         }
         if (cb) cb(cal);
       }).catch(function () { next(); });

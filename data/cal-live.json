@@ -1,39 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-29T22:30:53.781Z",
+  "fetchedAt": "2026-09-29T22:35:00.814Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-06",
   "asOfIso": "2026-09-29",
   "nextLeave": {
-    "id": "9svtqhd8cujpm1n70pevblo01k",
-    "summary": "Get Hayes from Maria's · time TBD",
-    "start": "2026-09-29T18:55:00-05:00",
-    "end": "2026-09-29T19:45:00-05:00",
-    "location": "Maria's, 14538 Grant Lane, Overland Park, KS",
+    "id": "iv9gs783mgggf0mico2hhurct4",
+    "summary": "Ainsley — LKMS yearbook picture retakes",
+    "start": "2026-09-30T07:30:00-05:00",
+    "end": "2026-09-30T07:45:00-05:00",
+    "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
     "busy": false,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "9svtqhd8cujpm1n70pevblo01k",
-      "summary": "Get Hayes from Maria's · time TBD",
-      "start": "2026-09-29T18:55:00-05:00",
-      "end": "2026-09-29T19:45:00-05:00",
-      "location": "Maria's, 14538 Grant Lane, Overland Park, KS",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "f1k7ld8mkl7lgoc94epf870i0k",
-      "summary": "DONE · LawnStarter mowing cancelled",
-      "start": "2026-09-29T19:00:00-05:00",
-      "end": "2026-09-29T19:15:00-05:00",
-      "location": "6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "iv9gs783mgggf0mico2hhurct4",
       "summary": "Ainsley — LKMS yearbook picture retakes",
@@ -287,15 +269,6 @@
       "allDay": false
     },
     {
-      "id": "fr1gg3k816ddfcve0ethts2l7k",
-      "summary": "BACKUP fly · Dan #AWNB5V MCI→BNA 12:05 · cancel if driving",
-      "start": "2026-10-02T10:05:00-05:00",
-      "end": "2026-10-02T14:40:00-05:00",
-      "location": "Kansas City International Airport (MCI) → Nashville International Airport (BNA)",
-      "busy": false,
-      "allDay": false
-    },
-    {
       "id": "g98fr3pkfngl28fab505jbo4u8",
       "summary": "Harris — SRE Tailgate Party (reading incentive)",
       "start": "2026-10-02T11:30:00-05:00",
@@ -414,11 +387,11 @@
     }
   ],
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "6:55",
-    "place": "Get Hayes from Maria's · time TBD",
-    "detailHtml": "<strong>6:55</strong> Get Hayes from Maria's · time TBD · next Leave · Wed <strong>9:00</strong> HD #2209 · vanity return ONLY",
-    "badge": "Tue"
+    "label": "Next up · Wed",
+    "time": "7:30",
+    "place": "Ainsley — LKMS yearbook picture retakes",
+    "detailHtml": "<strong>7:30</strong> Ainsley — LKMS yearbook picture retakes · next Leave · Wed <strong>9:00</strong> HD #2209 · vanity return ONLY",
+    "badge": "Wed"
   },
   "error": null
 }

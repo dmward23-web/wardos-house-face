@@ -153,6 +153,13 @@ function isBusy(e) {
 /* CANCELGONE1 · Google status OR a title marked canceled (how Atlas marks a
  * rained-out practice) → never on the board, Who's up, or a leave countdown. */
 const CANCEL_TITLE = /^\s*[\[(]?\s*(cancel+ed|canceled|cancelled|cxl)\b/i;
+/* SOFTGONE1 · placeholders never own the big card, Who's up, or a countdown:
+ * CANCELED / DONE / BACKUP / tentative titles, "time TBD",
+ * "cancel if…". Retitle with a real time and it comes right back. */
+const SOFT_TITLE = /(^\s*[\[(]?\s*(cancel+ed|cxl|done|backup|tentative)\b)|\btbd\b|\bcancel if\b/i;
+function isSoft(e) {
+  return !!(e && (e.status === "tentative" || SOFT_TITLE.test(String(e.summary || ""))));
+}
 function isCancelled(e) {
   return !!(e && (e.status === "cancelled" || e.status === "canceled" || CANCEL_TITLE.test(String(e.summary || ""))));
 }
@@ -531,6 +538,7 @@ function main() {
   const upcoming = slimAll
     .filter((e) => e.startMs > now.getTime())
     .filter((e) => !/^GET\s*·/i.test(e.summary || "") && !/^Atlas:/i.test(e.summary || ""))
+    .filter((e) => !isSoft(e))
     .sort((a, b) => a.startMs - b.startMs);
 
   /* nextLeave field = Next Up hero = first future event (Busy preferred only as tie-break same start) */

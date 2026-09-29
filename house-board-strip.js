@@ -155,8 +155,11 @@
     }
   }
 
+  /* SOFTGONE1 · placeholders never get the big card or a countdown */
+  var SOFT_TITLE = /(^\s*[\[(]?\s*(cancel+ed|cxl|done|backup|tentative)\b)|\btbd\b|\bcancel if\b/i;
   function listEvents(cal) {
-    return (cal && (cal.upcomingLeaves || cal.events)) || [];
+    var l = (cal && (cal.upcomingLeaves || cal.events)) || [];
+    return l.filter(function (e) { return !(e && SOFT_TITLE.test(String(e.summary || e.title || ""))); });
   }
 
   /** First future event by start (> now). */
