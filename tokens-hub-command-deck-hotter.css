@@ -604,3 +604,80 @@
 #hub-lights-panel .hub-sw.is-stub {
   pointer-events: none;
 }
+
+
+/* ═══════════════════════════════════════════════════════════
+   HUBCMD2 · OVALTRIM1 · leaveby pass-by scrub
+   Huge time + destination only · kill label/badge/sec chrome
+   Nest/Lights header ovals removed in sheet-index (cam+pills)
+   ═══════════════════════════════════════════════════════════ */
+.hub-upper.hub-upper--hot .leaveby-head,
+.leaveby.leaveby--hot .leaveby-head,
+.hub-upper.hub-upper--hot .leaveby-label,
+.leaveby.leaveby--hot .leaveby-label,
+.hub-upper.hub-upper--hot .leaveby-badge,
+.leaveby.leaveby--hot .leaveby-badge,
+.hub-upper.hub-upper--hot .leaveby-detail,
+.leaveby.leaveby--hot .leaveby-detail,
+.hub-upper.hub-upper--hot .leaveby-sec-hdr,
+.leaveby.leaveby--hot .leaveby-sec-hdr,
+.hub-upper.hub-upper--hot .leaveby-row-chip,
+.leaveby.leaveby--hot .leaveby-row-chip,
+.hub-upper.hub-upper--cmd .leaveby-head,
+.hub-upper.hub-upper--cmd .leaveby-label,
+.hub-upper.hub-upper--cmd .leaveby-badge,
+.hub-upper.hub-upper--cmd .leaveby-detail,
+.hub-upper.hub-upper--cmd .leaveby-sec-hdr,
+.hub-upper.hub-upper--cmd .leaveby-row-chip {
+  display: none !important;
+}
+
+.hub-upper.hub-upper--hot .leaveby-main,
+.leaveby.leaveby--hot .leaveby-main,
+.hub-upper.hub-upper--cmd .leaveby-main {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+  font-size: 0 !important; /* kill leftover text nodes */
+  line-height: 1 !important;
+  color: transparent !important;
+  text-shadow: none !important;
+}
+
+.hub-upper.hub-upper--hot .leaveby-main .time,
+.leaveby.leaveby--hot .leaveby-main .time,
+.hub-upper.hub-upper--cmd .leaveby-main .time {
+  display: block !important;
+  font-size: clamp(72px, 10vw, 108px) !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.08em !important;
+  line-height: 0.86 !important;
+  color: var(--cmd-amber-hi) !important;
+  text-shadow:
+    0 0 48px rgba(255, 180, 30, 0.72),
+    0 0 18px rgba(255, 200, 60, 0.45),
+    0 2px 0 rgba(0, 0, 0, 0.65) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.hub-upper.hub-upper--hot .leaveby-dest,
+.leaveby.leaveby--hot .leaveby-dest,
+.hub-upper.hub-upper--cmd .leaveby-dest {
+  display: block !important;
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.15 !important;
+  color: #f2eee6 !important;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45) !important;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

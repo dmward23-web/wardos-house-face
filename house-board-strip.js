@@ -277,10 +277,9 @@
     var title = shortPlace(ev.summary || ev.place || "");
     var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "—");
     var cls = "leaveby-row" + (isNext ? " is-next" : "") + (ev.allDay ? " is-allday" : "");
-    var nextChip = isNext ? '<span class="leaveby-row-chip">NEXT</span>' : "";
     return '<li class="' + cls + '">' +
       '<span class="leaveby-row-time">' + esc(timeLab) + "</span>" +
-      '<span class="leaveby-row-title">' + esc(title) + nextChip + "</span>" +
+      '<span class="leaveby-row-title">' + esc(title) + "</span>" +
       "</li>";
   }
 
@@ -341,8 +340,8 @@
     longNodes.forEach(function (n) { n.textContent = clock.long; });
     dowNodes.forEach(function (n) { n.textContent = clock.dow; });
 
-    if (label && strip.label) label.textContent = strip.label;
-    if (badge) badge.textContent = strip.badge || clock.dow;
+    if (label) label.textContent = "";
+    if (badge) badge.textContent = "";
     if (todaySub) todaySub.textContent = clock.short + " · " + clock.daypart;
 
     var hotEv = document.querySelector("[data-live='hot-pill-event']");
@@ -354,16 +353,17 @@
     }
 
     if (main) {
+      /* HUBCMD2 · pass-by hero = huge time + destination only · no Next/label chrome */
       if (strip._stale) {
-        main.innerHTML = esc(clock.short) + " · CAL STALE";
+        main.innerHTML = '<span class="leaveby-dest">CAL STALE</span>';
       } else if (strip.time && strip.place) {
-        main.innerHTML = "Next" +
-          ' <span class="time">' + esc(strip.time) + "</span> " +
-          esc(strip.place);
+        main.innerHTML =
+          '<span class="time">' + esc(strip.time) + "</span>" +
+          '<span class="leaveby-dest">' + esc(strip.place) + "</span>";
       } else if (strip.place) {
-        main.innerHTML = esc(strip.place);
+        main.innerHTML = '<span class="leaveby-dest">' + esc(strip.place) + "</span>";
       } else {
-        main.innerHTML = esc(clock.short) + " · House day";
+        main.innerHTML = '<span class="leaveby-dest">House day</span>';
       }
     }
     if (detail && strip.detailHtml) {

@@ -3017,7 +3017,7 @@
 <link rel="stylesheet" href="heat-v3.css?v=CAMDECK1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
 <link rel="stylesheet" href="tokens-hub-cams.css?v=CAMDECK1" />
-<link rel="stylesheet" href="tokens-hub-command-deck-hotter.css?v=HUBCMD1" />
+<link rel="stylesheet" href="tokens-hub-command-deck-hotter.css?v=HUBCMD2" />
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -3276,8 +3276,6 @@
  <div class="hdr-ovals" aria-label="Live house status">
  <div class="wx-card" id="house-wx" data-live="weather" aria-label="Weather · Overland Park"></div>
  <a class="sensi-hdr sensi-chip" id="index-sensi-chip" href="sheet-google-home.html" aria-label="Sensi thermostat">Sensi…</a>
- <a class="nest-hdr nest-chip" id="index-nest-chip" href="sheet-google-home.html" aria-label="Nest · Google Home">Nest…</a>
- <a class="lights-hdr nest-hdr lights-chip" id="index-lights-chip" href="sheet-lights.html" aria-label="Lights control">Lights…</a>
  </div>
  <div class="hdr-date" aria-label="Today">
  <div class="hdr-date-kicker">Today</div>
@@ -3567,12 +3565,12 @@
  </footer>
 </div>
 <script src="house-clock.js?v=CAMDECK1"></script>
-<script src="house-board-strip.js?v=CAMDECK1"></script>
+<script src="house-board-strip.js?v=HUBCMD2"></script>
 <script src="house-weather.js?v=CAMDECK1"></script>
 <script src="house-sfx.js?v=CAMDECK1"></script>
 <script src="house-sensi.js?v=CAMDECK1"></script>
 <script src="house-nest.js?v=CAMDECK1"></script>
-<script src="house-lights.js?v=HUBCMD1"></script>
+<script src="house-lights.js?v=HUBCMD2"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
@@ -3590,83 +3588,26 @@
  var S = window.HouseSensi;
  var N = window.HouseNest;
  var L = window.HouseLights;
- var nestChip = document.getElementById("index-nest-chip");
- var lightsChip = document.getElementById("index-lights-chip");
- function nestBit() {
-  var g = N && N.gate ? N.gate() : null;
-  if (!g) return "Nest…";
-  if (g.needToken) return "NEED TOKEN";
-  if (g.live && g.hasSnaps) return "LIVE";
-  if (g.live) return g.label || "LIVE";
-  return g.label || "STUB";
- }
- function paintNestChip() {
-  if (!nestChip) return;
-  var g = N && N.gate ? N.gate() : null;
-  var n = (g && g.deviceCount) || 0;
-  var label = nestBit();
-  var big = n ? String(n) : (g && g.needToken ? "Cams" : "—");
-  var unit = n ? "cams" : "";
-  var quiet = g && g.needToken ? "SDM" : (g && g.hasSnaps ? "stills" : "pads");
-  nestChip.classList.toggle("is-live", !!(g && g.live));
-  nestChip.classList.toggle("is-need", !!(g && g.needToken));
-  var nestIco = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6.5" width="13" height="11" rx="2.2"/><path d="M15.5 10.2l5.2-2.6v9.8l-5.2-2.6z"/><circle cx="9" cy="12" r="2.1"/></svg>';
-  var statusBit = '<i class="hdr-live-dot" aria-hidden="true"></i>' + label;
-  nestChip.innerHTML =
-    '<div class="nest-hdr-ico" aria-hidden="true">' + nestIco + "</div>"
-    + '<div class="nest-hdr-text">'
-    + '<div class="nest-hdr-kicker">Nest</div>'
-    + '<div class="nest-hdr-line">'
-    + '<span class="nest-hdr-main">' + big + "</span>"
-    + '<span class="sensi-hdr-set">' + unit + "</span>"
-    + '<span class="nest-hdr-mode">' + quiet + "</span>"
-    + "</div>"
-    + '<div class="nest-hdr-sub">' + statusBit + "</div>"
-    + "</div>";
- }
- function paintGhomeTile() {
-  /* HUBOVAL1 · matched ovals + white house camo · portrait wall fill · no ghome tile */
-  var subTile = document.getElementById("ghome-tile-sub");
-  if (subTile) {
-    var st = S && S.effectiveState ? S.effectiveState() : null;
-    var sensiBit = st && st.gate && st.gate.live
-      ? ("Sensi " + st.ambient + "°")
-      : (st && st.gate ? st.gate.label : "Sensi");
-    var nb = nestBit();
-    var lg = L && L.gate ? L.gate() : null;
-    var lb = lg ? (lg.live ? "LIVE" : lg.label) : "Lights";
-    subTile.textContent = sensiBit + " · Nest " + nb + " · Lights " + lb;
-  }
-  paintNestChip();
-  if (L && lightsChip) L.paintChip(lightsChip);
+ /* HUBCMD2 / OVALTRIM1 · Nest + Lights header ovals removed (cam deck + light pills carry them) */
+ function paintHubLive() {
   if (L && L.paintHubPanel) L.paintHubPanel(document);
  }
  if (S) {
   if (chip) S.mountChip(chip);
-  S.onChange(paintGhomeTile);
+  S.onChange(paintHubLive);
   if (!chip) S.startPolling();
  }
  if (N) {
-  N.onChange(paintGhomeTile);
+  N.onChange(paintHubLive);
   if (N.mountHubCamDeck) N.mountHubCamDeck("#hub-cam-deck");
   else N.startPolling();
  }
  if (L) {
-  L.onChange(paintGhomeTile);
+  L.onChange(paintHubLive);
   if (L.mountHubPanel) L.mountHubPanel("#hub-lights-panel");
   else L.startPolling();
  }
- if (nestChip) {
-  nestChip.addEventListener("pointerdown", function () {
-   try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
-  }, { passive: true });
- }
- if (lightsChip) {
-  lightsChip.addEventListener("pointerdown", function () {
-   try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
-  }, { passive: true });
- }
- paintGhomeTile();
+ paintHubLive();
 })();
 </script>
 <script>
