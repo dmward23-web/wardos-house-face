@@ -1,4 +1,7 @@
-/* House Face · HUBSCROLL2 · kid flip · who’s up leave-window · hide scroll chrome · tap/OPEN → board
+/* House Face · WHOSUP2 · kid flip · who’s up leave-window · hide scroll chrome · tap/OPEN → board
+   WHOSUP2: prep/reminder items (pack · snacks · get/buy …) never own Who's up / Next leave —
+   they bridge to the next REAL leave they feed; Who's up names every kid on that leave
+   (Boys / SRE drop·pickup with no kid named → Hayes + Harris). Never invents events.
    LIVE only · WardKids · HUBTOK1 atoms. Bind-once · swipe flips · tap/OPEN navigates · claims safe.
    No leaveby/cam/nest/sensi JSON. */
 (function (global) {
@@ -168,11 +171,29 @@
     if (/\bHayes\b/i.test(s)) out.push("hayes");
     if (/\bHarris\b/i.test(s)) out.push("harris");
     /* Boys / shared SRE-style titles → both boys when neither named alone */
-    if (/\bBoys\b/i.test(s) || /\bboth\s+boys\b/i.test(s)) {
+    var boys = /\bBoys\b/i.test(s) || /\bboth\s+boys\b/i.test(s);
+    /* SRE (Sunset Ridge Elementary) drop / pickup with no kid named = the boys' school run */
+    if (!out.length && /\bSRE\b|Sunset\s+Ridge/i.test(s) && /\bdrop\b|drop-?off|pick\s*-?up/i.test(s)) boys = true;
+    if (boys) {
       if (out.indexOf("hayes") < 0) out.push("hayes");
       if (out.indexOf("harris") < 0) out.push("harris");
     }
     return out;
+  }
+
+  /* WHOSUP2 · prep / reminder items (pack snacks, get/buy X, reminders) are not leaves.
+     Strip leading "Hayes — " / "Hayes + Harris · " then test the action verb. */
+  var PREP_VERB_RE = /^(pack|packing|prep|get|buy|grab|bring|order|remind|reminder|charge|sign|print|refill|restock|label|lay\s+out)\b/i;
+  function isPrepItem(item) {
+    if (!item) return false;
+    if (item.kind === "prep" || item.kind === "reminder") return true;
+    var raw = String(item.summary || item.place || item.what || item.title || "").trim();
+    if (!raw || /^Leave\b/i.test(raw)) return false;
+    var act = raw.replace(/^(?:(?:Ainsley|Hayes|Harris|Boys|Kids|Dan|Dad)\s*(?:\+|&|,|and)?\s*)+[—–\-:·]\s*/i, "");
+    if (PREP_VERB_RE.test(act)) return true;
+    if (/^reminder\b|\breminder\s*[·:]/i.test(raw)) return true;
+    if (/\bsnacks?\b/i.test(act) && !/\b(drop|pick\s*-?up|practice|game|swim|class)\b/i.test(act)) return true;
+    return false;
   }
 
   function shortTitle(summary) {
@@ -268,7 +289,8 @@
   }
 
   /** Next leave/event for a kid from embedded boardStrip.queue or kid hottest. */
-  function nextLeaveFor(kidId) {
+  function nextLeaveFor(kidId, opts) {
+    var wantPrep = !!(opts && opts.prepOnly);
     var d = data();
     var name = ACCENT[kidId] && ACCENT[kidId].name;
     var now = Date.now();
@@ -276,6 +298,7 @@
 
     function consider(item) {
       if (!item) return;
+      if (isPrepItem(item) !== wantPrep) return;
       var start = Date.parse(item.startIso || item.start || "") || 0;
       var end = Date.parse(item.endIso || item.end || "") || 0;
       if (end && end < now) return;
@@ -290,7 +313,9 @@
         time: cleanWallTime(item.time, item.startIso || item.start),
         badge: item.badge || "",
         title: shortTitle(item.place || item.summary || item.what || item.title || "Next up"),
-        summary: shortTitle(item.summary || item.hint || "")
+        summary: shortTitle(item.summary || item.hint || ""),
+        who: whoInSummary((item.summary || "") + " " + (item.place || "")),
+        prep: wantPrep
       };
     }
 
@@ -322,7 +347,7 @@
       }
     } catch (e) { /* */ }
 
-    if (!best) {
+    if (!best && !wantPrep) {
       var kid = kidObj(kidId);
       if (kid && kid.hottest) {
         return {
@@ -339,20 +364,43 @@
     return best;
   }
 
+  /* WHOSUP2 · a prep item that is live now (e.g. 7:30 "Hayes — pack snacks") lights the
+     REAL leave it feeds (8:10 boys SRE drop) when that leave starts within PREP_BRIDGE_MS. */
+  var PREP_BRIDGE_MS = 2 * 60 * 60 * 1000;
+  function prepBridges(kidId, leave) {
+    if (!leave || !leave.start) return false;
+    var prep = nextLeaveFor(kidId, { prepOnly: true });
+    if (!prep || !prep.start || !inLeaveWindow(prep)) return false;
+    return prep.start <= leave.start && (leave.start - prep.start) <= PREP_BRIDGE_MS;
+  }
+
   function soonestWhoUp() {
     /* Only light when someone is IN an active leave window — quiet otherwise.
-       Shared events (Hayes + Harris SRE) name ALL kids on that leave. */
+       Prep/reminder items never win; shared events (Hayes + Harris SRE) name ALL kids on that leave. */
     var best = null;
     for (var i = 0; i < KIDS.length; i++) {
       var id = KIDS[i];
       var leave = nextLeaveFor(id);
-      if (!leave || !inLeaveWindow(leave)) continue;
+      if (!leave) continue;
+      if (!inLeaveWindow(leave) && !prepBridges(id, leave)) continue;
       var score = leave.start || Number.MAX_SAFE_INTEGER;
       if (!best || score < best.score) {
         best = { kidId: id, kidIds: [id], leave: leave, score: score };
       } else if (score === best.score && sameLeave(best.leave, leave)) {
         if (best.kidIds.indexOf(id) < 0) best.kidIds.push(id);
       }
+    }
+    if (best) {
+      /* Everyone the chosen leave names (title parse) + anyone whose own next leave is it */
+      var named = (best.leave && best.leave.who) || [];
+      var ids = [];
+      for (var k = 0; k < KIDS.length; k++) {
+        var kid = KIDS[k];
+        if (best.kidIds.indexOf(kid) >= 0 || named.indexOf(kid) >= 0) ids.push(kid);
+        else if (sameLeave(best.leave, nextLeaveFor(kid))) ids.push(kid);
+      }
+      best.kidIds = ids;
+      best.kidId = ids[0] || best.kidId;
     }
     return best;
   }
@@ -1035,6 +1083,7 @@
     streakDays: streakDays,
     nextLeaveFor: nextLeaveFor,
     soonestWhoUp: soonestWhoUp,
+    isPrepItem: isPrepItem,
     inLeaveWindow: inLeaveWindow,
     paintDailyQuest: paintDailyQuest,
     FACES: FACES
