@@ -975,16 +975,30 @@
     root.querySelectorAll("[data-bank-allowance]").forEach(function (el) {
       el.textContent = String(bank.weeklyAllowance != null ? bank.weeklyAllowance : bank.need);
     });
-    root.querySelectorAll("[data-bank-meta]").forEach(function (el) {
+    function bankMetaText() {
       if (dollar) {
         if (bank.mustComplete === false) {
           var g = bank.mustGate || { done: 0, need: 0 };
-          el.textContent = "Musts " + g.done + "/" + g.need + " · jar locked · Balance $" + bal;
-        } else {
-        el.textContent = "Balance $" + bal + " · This week $" + we + " · Jar $" + bank.toward + " / $" + bank.need;
+          return "Musts " + g.done + "/" + g.need + " · jar locked · Balance $" + bal;
         }
-      } else {
-        el.textContent = "week " + bank.toward + " / " + bank.need + " ★";
+        return "Balance $" + bal + " · This week $" + we + " · Jar $" + bank.toward + " / $" + bank.need;
+      }
+      return "week " + bank.toward + " / " + bank.need + " ★";
+    }
+    var metaTxt = bankMetaText();
+    root.querySelectorAll("[data-bank-meta]").forEach(function (el) {
+      el.textContent = metaTxt;
+    });
+    /* BINDFIX1 · also paint .bank-meta hosts that lack a child span */
+    root.querySelectorAll(".bank-meta").forEach(function (el) {
+      var span = el.querySelector("[data-bank-meta]");
+      if (span) return;
+      /* keep Today sibling; only replace leading text node / empty host */
+      var first = el.firstChild;
+      if (first && first.nodeType === 3) {
+        first.textContent = metaTxt + " ";
+      } else if (!el.querySelector(".bank-meta-today")) {
+        el.textContent = metaTxt;
       }
     });
     var left = Math.max(0, bank.need - bank.toward);
@@ -1113,7 +1127,8 @@
       }
     });
     root.querySelectorAll("[data-grow-total]").forEach(function (el) {
-      el.textContent = "$" + toward;
+      /* HTML already prints $ before the span inside .grow-total */
+      el.textContent = (el.closest && el.closest(".grow-total")) ? String(toward) : ("$" + toward);
     });
     root.querySelectorAll("[data-grow-week-rising]").forEach(function (el) {
       el.textContent = "week +$" + we + " rising ↑";
