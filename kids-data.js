@@ -478,6 +478,10 @@
       available = balance;
       reached = false;
     }
+    /* BINDFIX2 · never jar-full / JAR FULL CTA at $0 */
+    if (!(weekEarn > 0 || toward > 0 || (balance > 0 && gate.complete))) {
+      reached = false;
+    }
     return {
       kidId: kidId,
       today: today,
@@ -1022,9 +1026,20 @@
       if (bank.goalBlurb) el.textContent = bank.goalBlurb;
     });
     root.querySelectorAll("[data-unlock-cta]").forEach(function (el) {
-      el.hidden = !bank.reached;
-      el.classList.toggle("is-loud", !!bank.reached);
-      el.textContent = "JAR FULL · saved $" + bank.need + " · show Dad";
+      var full = !!bank.reached && (Number(bank.toward) > 0 || Number(bank.weekEarn) > 0 || Number(bank.available) > 0);
+      /* musts incomplete OR zero toward → never jar-full chrome */
+      if (!bank.mustComplete || !(Number(bank.toward) > 0 || Number(bank.weekEarn) >= Number(bank.weeklyAllowance || bank.need || 0))) {
+        full = false;
+      }
+      full = full && !!bank.reached;
+      el.hidden = !full;
+      if (full) {
+        el.textContent = "JAR FULL · saved $" + bank.need + " · show Dad";
+        el.classList.add("is-loud");
+      } else {
+        el.textContent = ""; /* never show saved $N at $0 */
+        el.classList.remove("is-loud");
+      }
     });
     var paid = getPaidStamp(bank.kidId);
     root.querySelectorAll("[data-paid-stamp]").forEach(function (el) {
@@ -1032,7 +1047,12 @@
       else { el.hidden = true; }
     });
     root.querySelectorAll("[data-got-it]").forEach(function (el) {
-      el.hidden = !bank.reached;
+      var full = !!bank.reached && (Number(bank.toward) > 0 || Number(bank.weekEarn) > 0 || Number(bank.available) > 0);
+      if (!bank.mustComplete || !(Number(bank.toward) > 0 || Number(bank.weekEarn) >= Number(bank.weeklyAllowance || bank.need || 0))) {
+        full = false;
+      }
+      full = full && !!bank.reached;
+      el.hidden = !full;
     });
     document.body.classList.toggle("bank-goal-hit", !!bank.reached);
     try {
@@ -1098,9 +1118,10 @@
 
     var balPct = need > 0 ? Math.max(0, Math.min(100, (bal / need) * 100)) : 0;
     var weekPct = need > 0 ? Math.max(0, Math.min(100 - balPct, (we / need) * 100)) : 0;
+    var jarHit = !!(gv.active && gv.met && bank.mustComplete !== false && (toward > 0));
     root.querySelectorAll("[data-grow-fill]").forEach(function (el) {
       el.style.height = pct + "%";
-      el.classList.toggle("is-full", !!(gv.active && gv.met));
+      el.classList.toggle("is-full", jarHit);
     });
     root.querySelectorAll("[data-grow-fill-balance]").forEach(function (el) {
       el.style.height = balPct + "%";
@@ -1150,9 +1171,8 @@
     });
     root.querySelectorAll("[data-grow-save-need]").forEach(function (el) {
       var n = gv.active ? need : 0;
-      /* money-chip already prints $ before this span — keep bare digits there */
-      if (el.closest && el.closest(".grow-total")) el.textContent = "$" + n;
-      else el.textContent = String(n);
+      /* HTML already prints $ before both spans inside .grow-total — bare digits only */
+      el.textContent = String(n);
     });
     root.querySelectorAll("[data-grow-save-line]").forEach(function (el) {
       if (!gv.active) el.textContent = gv.placeholder || "Add a save";
@@ -1875,6 +1895,8 @@
     } else {
       var unlock2 = document.querySelector("[data-goal-unlock]");
       if (unlock2) unlock2.hidden = true;
+      try { localStorage.removeItem("house-bank-goal:" + kidId); } catch (eClr) {}
+      document.body.classList.remove("bank-goal-hit");
     }
 
     try {
