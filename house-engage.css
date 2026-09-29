@@ -370,7 +370,8 @@ body.bank-goal-hit .bank-card {
   }
 }
 
-.goal-unlock[hidden], [data-goal-unlock][hidden] { display: none !important; }
+.goal-unlock[hidden], [data-goal-unlock][hidden],
+a.unlock-cta[hidden], [data-unlock-cta][hidden] { display: none !important; }
 
 /* —— Kid saves · Prism collapsed 36px bar · overlays · ★ only —— */
 .saves-host, [data-saves-panel].saves-host {
