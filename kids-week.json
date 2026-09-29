@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-29T12:40:28.652Z",
+  "refreshedAt": "2026-09-29T12:50:08.848Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -533,22 +533,15 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "TUE · 7:30",
-        "what": "PACK LATE-LUNCH SNACKS (HEADACHES · MADI OK)",
+        "when": "TUE · 8:10",
+        "what": "SRE DROP-OFF",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "TUE",
-          "7:30"
+          "8:10"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Tue · 7:30",
-          "what": "pack late-lunch snacks (headaches · Madi OK)",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Tue · 8:10",
@@ -612,12 +605,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Tue 29 · 7:30",
-          "what": "pack late-lunch snacks (headaches · Madi OK)",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Tue 29 · 8:10",
           "what": "SRE drop-off",
@@ -857,6 +844,12 @@
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Tue 6 · leave 5:00",
+          "what": "Ainsley swim — Coach Ann",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -986,11 +979,6 @@
       ],
       "week": [
         {
-          "when": "Tue 29 · 7:30",
-          "what": "pack late-lunch snacks (headaches · Madi OK)",
-          "tone": "act"
-        },
-        {
           "when": "Tue 29 · 8:10",
           "what": "SRE drop-off",
           "tone": "act"
@@ -1104,6 +1092,11 @@
           "when": "Fri 2 · 12:00",
           "what": "LKMS yearbook baby photo due",
           "tone": "act"
+        },
+        {
+          "when": "Sat 3 · 1:00",
+          "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
+          "tone": "hot"
         }
       ]
     }
