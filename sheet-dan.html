@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
-<title>BOARD-OS · HOUSE · DAD BOX</title>
+<title>Dad · House board</title>
 <link rel="stylesheet" href="house-engage.css?v=DADGLANCE1" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
@@ -91,6 +91,11 @@
 <link rel="stylesheet" href="tokens-dad-fix1-heat.css?v=DADGLANCE1" />
 <style>
 /* DADSEAT1 · Dad seat page — kid-card look, gold */
+/* DADNAME1 · page says whose it is */
+.ds-title{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;margin:4px 2px 0;font-size:56px;font-weight:900;letter-spacing:.04em;line-height:1}
+.ds-title .name-accent{color:#ffd76a!important;opacity:1!important;text-shadow:0 0 18px rgba(255,190,60,.7)}
+.ds-title .ds-sub{font-size:18px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,224,128,.7)}
+@media (max-width:600px){.ds-title{font-size:42px;gap:10px}.ds-title .ds-sub{font-size:14px}}
 .ds{display:flex;flex-direction:column;gap:16px;padding:6px 0 10px}
 .ds-next{background:linear-gradient(155deg,rgba(40,36,28,.92),rgba(20,18,16,.94));border:1.5px solid rgba(255,200,80,.55);border-radius:26px;padding:26px 30px;box-shadow:0 0 0 1px rgba(0,0,0,.4) inset,0 0 36px rgba(255,180,40,.18)}
 .ds-kick{font-size:20px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,224,128,.78)}
@@ -393,6 +398,7 @@
  </header>
 
  <main class="ds" data-dad-seat>
+ <h1 class="ds-title name"><span class="name-accent">DAD</span><span class="ds-sub">Your page · leave-bys · rides · week</span></h1>
  <section class="ds-next" data-ds-next><div class="ds-kick">Up next</div><div class="ds-big"><span class="ds-time">Dad week</span></div><div class="ds-what">Reading your calendar</div></section>
  <div class="ds-line" data-ds-line></div>
  <div class="kids-row" aria-label="Jump to kid boards">
