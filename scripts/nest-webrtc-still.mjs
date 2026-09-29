@@ -156,8 +156,14 @@ async function captureJpeg(send, outPath) {
 }
 
 async function listCams() {
-  const data = await fetch(PROXY + "/api/cameras").then((r) => r.json());
-  return data.cameras || [];
+  const headers = {};
+  const tok = process.env.NEST_PROXY_TOKEN || "";
+  if (tok) headers["X-Nest-Proxy-Token"] = tok;
+  const data = await fetch(PROXY + "/api/cameras", { headers }).then((r) => r.json());
+  if (!Array.isArray(data.cameras)) {
+    throw new Error("cameras fetch failed: " + JSON.stringify(data).slice(0, 200));
+  }
+  return data.cameras;
 }
 
 function writeLive(cameras, meta) {
@@ -224,7 +230,9 @@ async function main() {
 
   for (const cam of want) {
     const name = cam.name || "cam";
-    const url = PROXY + "/nest-webrtc.html?cam=" + encodeURIComponent(cam.id);
+    const tok = process.env.NEST_PROXY_TOKEN || "";
+    let url = PROXY + "/nest-webrtc.html?cam=" + encodeURIComponent(cam.id);
+    if (tok) url += "&proxyToken=" + encodeURIComponent(tok);
     process.stdout.write("capture " + name + " … ");
     try {
       await navigate(send, url);
