@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Sep 28 2026",
   "asOfIso": "2026-09-28",
-  "refreshedAt": "2026-09-29T02:18:43.008Z",
+  "refreshedAt": "2026-09-29T02:32:01.382Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,19 +17,31 @@
   },
   "boardStrip": {
     "label": "Next up · Tue",
-    "time": "8:10",
-    "place": "Boys SRE drop",
-    "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "time": "7:30",
+    "place": "pack late-lunch snacks (headaches · Madi OK)",
+    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Tue",
-    "startIso": "2026-09-29T13:10:00.000Z",
-    "endIso": "2026-09-29T13:40:00.000Z",
-    "kind": "school_drop",
+    "startIso": "2026-09-29T12:30:00.000Z",
+    "endIso": "2026-09-29T12:45:00.000Z",
+    "kind": "school",
     "queue": [
+      {
+        "label": "Next up · Tue",
+        "time": "7:30",
+        "place": "pack late-lunch snacks (headaches · Madi OK)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-09-29T12:30:00.000Z",
+        "endIso": "2026-09-29T12:45:00.000Z",
+        "kind": "school",
+        "whenLabel": "Tue 7:30",
+        "summary": "Hayes — pack late-lunch snacks (headaches · Madi OK)"
+      },
       {
         "label": "Next up · Tue",
         "time": "8:10",
         "place": "Boys SRE drop",
-        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T13:10:00.000Z",
         "endIso": "2026-09-29T13:40:00.000Z",
@@ -41,7 +53,7 @@
         "label": "Next up · Tue",
         "time": "8:40",
         "place": "Madi + provider collab · in person",
-        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T13:40:00.000Z",
         "endIso": "2026-09-29T15:10:00.000Z",
@@ -112,14 +124,14 @@
       {
         "label": "Next up · Wed",
         "time": "9:00",
-        "place": "HD #2209 · return 5-drawer vanity",
+        "place": "HD #2209 · vanity return ONLY",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
         "startIso": "2026-09-30T14:00:00.000Z",
         "endIso": "2026-09-30T15:30:00.000Z",
         "kind": "leave",
         "whenLabel": "Wed 9:00",
-        "summary": "Leave · HD #2209 · return 5-drawer vanity (Mom WK38853806)"
+        "summary": "Leave · HD #2209 · vanity return ONLY"
       },
       {
         "label": "Next up · Wed",
@@ -156,18 +168,6 @@
         "kind": "sport",
         "whenLabel": "Wed 4:55",
         "summary": "Harris flag practice"
-      },
-      {
-        "label": "Next up · Thu",
-        "time": "7:00",
-        "place": "SRE PE (tennis shoes)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T12:00:00.000Z",
-        "endIso": "2026-10-01T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Thu 7:00",
-        "summary": "Harris — SRE PE (tennis shoes)"
       }
     ]
   },
@@ -519,12 +519,12 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "TUE · 8:10",
-        "what": "SRE DROP-OFF",
+        "when": "TUE · 7:30",
+        "what": "PACK LATE-LUNCH SNACKS (HEADACHES · MADI OK)",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "TUE",
-          "8:10"
+          "7:30"
         ]
       },
       "today": [
@@ -563,6 +563,12 @@
         }
       ],
       "school": [
+        {
+          "when": "Tue 29 · 7:30",
+          "what": "pack late-lunch snacks (headaches · Madi OK)",
+          "tone": "act",
+          "hint": ""
+        },
         {
           "when": "Tue 29 · 8:10",
           "what": "SRE drop-off",
@@ -888,6 +894,11 @@
       ],
       "week": [
         {
+          "when": "Tue 29 · 7:30",
+          "what": "pack late-lunch snacks (headaches · Madi OK)",
+          "tone": "act"
+        },
+        {
           "when": "Tue 29 · 8:10",
           "what": "SRE drop-off",
           "tone": "act"
@@ -924,7 +935,7 @@
         },
         {
           "when": "Wed 30 · 9:00",
-          "what": "HD #2209 · return 5-drawer vanity",
+          "what": "HD #2209 · vanity return ONLY",
           "tone": "hot"
         },
         {
@@ -1001,11 +1012,6 @@
           "when": "Fri 2 · 12:00",
           "what": "LKMS yearbook baby photo due",
           "tone": "act"
-        },
-        {
-          "when": "Sat 3 · 1:00",
-          "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
-          "tone": "hot"
         }
       ]
     }
