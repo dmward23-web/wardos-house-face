@@ -1,47 +1,66 @@
 # Lights live control · House Face
 
-**Honest gate:** GitHub Pages is static. TP-Link Kasa / Google Home lights need a cloud token or LAN control path on the Atlas box. Until that token exists under `~/.config/wardos/`, the UI stays **NEED TOKEN** and DEMO localStorage — **never** labels invented on/off as LIVE.
+**Honest gate:** GitHub Pages is static. TP-Link **Kasa IoT** dimmers need cloud (or LAN) credentials on the Atlas box. With `kasa.user`+`kasa.password` on Atlas, `lights-fetch.mjs` runs the cloud probe and ships `status:live`. Without creds the UI stays **NEED TOKEN** + DEMO — **never** labels invented on/off as LIVE.
 
-Nest SDM on the box is **cameras only** (no lights). Lights are Kasa / Google Home — separate from Nest.
+Nest SDM on the box is **cameras only** (no lights). Lights are Kasa — separate from Nest.
+
+## Important: tplinkcloud.com ≠ Kasa switches
+
+| Login | What you get |
+|-------|----------------|
+| **https://tplinkcloud.com** | Legacy **camera** admin only — **no** switches / dimmers |
+| **Kasa / TP-Link account** (app email+password) | IoT cloud for plugs / switches / dimmers (KS220 etc.) |
+
+Do **not** chase a token from the camera portal for Dining / Harris / Kitchen.
+
+## Auth path (confirmed 2026-09-28)
+
+**Preferred for Atlas (not necessarily on home Wi-Fi): cloud**
+
+1. Dan places Kasa **account email + password** on Atlas only (files below).
+2. Probe uses [`tplink-cloud-api`](https://pypi.org/project/tplink-cloud-api/) → V2 cloud login → `get_devices()` → map alias → `get_sys_info()` for `relay_state` + `brightness`.
+3. Optional LAN: [`python-kasa`](https://pypi.org/project/python-kasa/) `Discover` / `Device.connect` with the same email+password (`Credentials`) for newer KLAP/AES devices. Env names for the CLI: `KASA_USERNAME` / `KASA_PASSWORD`.
+
+There is **no** separate long-lived “kasa.token” from tplinkcloud.com for IoT. Session tokens come from email+password login inside the library (or optional refresh-token cache later).
+
+**Brightness:** Yes for KS220 / HS220-style dimmers — read `brightness` from sysinfo; write via python-kasa `Light` / `IotDimmer.set_brightness` (LAN) or cloud passthrough `smartlife.iot.dimmer` / `set_brightness`. Probe is **read-only**; `writeSupported` stays false until a safe proxy exists.
 
 ## Live data flow (path C — same shape as Sensi)
 
 ```
-Dan (once) → Kasa cloud token / local control path
+Dan (once) → ~/.config/wardos/kasa.user + kasa.password  (mode 600)
      ↓
-Atlas box: scripts/lights-fetch.mjs  (stub until creds)
-     ↓
-data/lights-live.json  (committed / pushed)
+Atlas box: scripts/lights-fetch.mjs → kasa-live/.venv python + scripts/kasa-probe.py
+     ↓  (tplink-cloud-api V2 login → get_devices + sysinfo)
+data/lights-live.json  status=live (Dining / Harris / Kitchen)
      ↓
 House Face UI polls JSON every ~60s
-  sheet-index.html Lights oval
-  sheet-google-home.html Lights tile (PRIMARY · full roster)
-  sheet-lights.html pads (PRIMARY · full roster)
-  kid-harris.html Harris's Room only (secondary shortcut)
 ```
+
+**LIVE (shipped LIGHTS3):** cloud path works with `kasa.user`/`kasa.password` (or `KASA_USER`/`KASA_PASSWORD`). `tplinkcloud.com` remains cameras-only — not used for switches. `writeSupported` stays false (read-only snapshot).
 
 - **Read:** per-light `on`, `brightness` (dimmers), `online`.
 - **Write:** DEMO localStorage only until `writeSupported: true` and a safe proxy exists. Never invent LIVE.
 
 ## Credential Atlas must request from Dan
 
-**Do NOT ask Dan to paste Kasa / Google password into chat.**
+**Do NOT ask Dan to paste the Kasa password into chat.**
 
-**Ask for:** a Kasa cloud / tplink-cloud token (or agreed LAN discovery path) stored **only on the Atlas box**.
-
-### Where Atlas stores it (when ready)
+**Ask Dan to create these files on the Atlas box** (or have Atlas create empty files and Dan fill them via a secure channel / desktop):
 
 ```bash
 mkdir -p ~/.config/wardos
 chmod 700 ~/.config/wardos
-# token file mode 600 — never commit
-nano ~/.config/wardos/kasa.token   # name TBD when Atlas confirms path
-chmod 600 ~/.config/wardos/kasa.token
+# Kasa / TP-Link account email (same as Kasa app — NOT the camera-portal-only confusion)
+nano ~/.config/wardos/kasa.user
+# account password
+nano ~/.config/wardos/kasa.password
+chmod 600 ~/.config/wardos/kasa.user ~/.config/wardos/kasa.password
 ```
 
-Or env: `export KASA_TOKEN='…'` on the Atlas cron user.
+Or env on the Atlas cron user: `KASA_USER` + `KASA_PASSWORD` (also accepts `KASA_USERNAME`).
 
-**Today on box:** `~/.config/wardos/` has Nest + Sensi only — **no Kasa token yet**.
+**Today on box (2026-09-28 CT):** `kasa.user` + `kasa.password` present (mode 600). LIVE cloud path works via those creds + `scripts/kasa-probe.py`. Nest + Sensi unchanged.
 
 ## Roster (LIGHTS2 · from Ward home screenshot)
 
@@ -53,24 +72,33 @@ Named dimmers/switches — kebab ids. Screenshot on/brightness seed DEMO default
 | `harris-room` | Harris's Room | Harris's Room | dimmer | on · 100 |
 | `kitchen` | Kitchen | Kitchen | dimmer | on · 1 |
 
-**OP Kasa online** (Dan via Atlas). LIVE cloud still `need_token`. No separate pending stub — these three are the primary controllable pads.
+Aliases must match the **Kasa app** device names (probe normalizes case / punctuation).
 
-**Hub vs kid boards:** `sheet-lights` / Google Home Lights tile = PRIMARY full roster (Dining / Harris / Kitchen · sits with Sensi/Nest). Each kid board gets that kid's named switch only as a secondary shortcut (`kid-harris` → `harris-room` via `HouseLights.mountKidLight`). Same pattern later for Ainsley/Hayes when those lights exist.
+**Hub vs kid boards:** `sheet-lights` / Google Home Lights tile = PRIMARY full roster. Kid boards: that kid's named switch only (`kid-harris` → `harris-room`).
 
-## Run fetch (Atlas box — when tokened)
+## Probe / fetch (Atlas box)
+
+```bash
+# venv (PEP 668 — do not pip --user on this distro)
+python3 -m venv /workspace/plates/2026-09-28/kasa-live/.venv
+/workspace/plates/2026-09-28/kasa-live/.venv/bin/pip install -r /workspace/plates/2026-09-28/kasa-live/requirements.txt
+
+# cloud probe (stdout JSON — no secrets)
+/workspace/plates/2026-09-28/kasa-live/.venv/bin/python \
+  /workspace/wardos-house-face/scripts/kasa-probe.py
+# or: .../probe_kasa.py --lan   # only if Atlas is on home LAN
+```
+
+Without creds → exit 2 + `status: need_creds`. **Do not** commit/push `status: live` until a probe succeeds.
+
+Fetch (LIVE when creds present):
 
 ```bash
 cd /workspace/wardos-house-face
-node scripts/lights-fetch.mjs --token-file ~/.config/wardos/kasa.token
-# → writes data/lights-live.json  status:live|need_token|error
-```
-
-Without creds the stub writes `need_token` (honest). Commit + push JSON only when status changes meaningfully:
-
-```bash
-git add data/lights-live.json
-git commit -m "LIGHTS-live · snapshot $(date -u +%Y%m%d-%H%M)"
-git push origin main
+node scripts/lights-fetch.mjs
+# → data/lights-live.json  status:live  (Dining/Harris/Kitchen from cloud)
+# missing creds → status:need_token + DEMO starter (honest)
+# probe failure → status:error (keeps last lights if any; never invents LIVE)
 ```
 
 Secrets **never** on Pages / git.
@@ -79,7 +107,7 @@ Secrets **never** on Pages / git.
 
 | `status` | UI |
 |----------|----|
-| `need_token` | NEED TOKEN · DEMO local toggles |
+| `need_token` / `need_creds` | NEED TOKEN · DEMO local toggles |
 | `stage` | same as need_token · roster declared, no live reads |
 | `live` | LIVE · on/brightness/online from fetch (if fresh) |
 | `error` / stale | DEMO fallback · show error · never fake LIVE |
@@ -111,3 +139,4 @@ Secrets **never** on Pages / git.
 
 - Sensi climate: `SENSI-LIVE.md` / `house-sensi.js`
 - Nest cams: `NEST-LIVE.md` / `house-nest.js` (cameras only — no lights)
+- Plate notes: `/workspace/plates/2026-09-28/kasa-live/README.md`

@@ -1,8 +1,9 @@
 {
-  "status": "need_token",
-  "fetchedAt": "2026-09-29T00:01:00.000Z",
-  "source": "kasa-pending",
+  "status": "live",
+  "fetchedAt": "2026-09-29T00:20:51.836Z",
+  "source": "tplink-cloud-api",
   "writeSupported": false,
+  "brightnessControlSupported": true,
   "lights": [
     {
       "id": "dining-room",
@@ -32,6 +33,32 @@
       "online": true
     }
   ],
-  "reserved": [],
-  "error": "NEED TOKEN \u00b7 no Kasa cloud yet. Screenshot roster as-of 2026-09-28 ~18:58 CDT (Dining Room / Harris's Room / Kitchen \u2014 DEMO seed values only; do not paint LIVE). OP Kasa online; LIVE cloud still need_token."
+  "reserved": [
+    {
+      "alias": "QmFzZW1lbnQ=",
+      "model": "deco X20(US)",
+      "list_online": false,
+      "mapped": null
+    },
+    {
+      "alias": "Archer AX4400",
+      "model": "Archer AX4400(US)",
+      "list_online": false,
+      "mapped": null
+    },
+    {
+      "alias": "RGVjb19EMzU4",
+      "model": "deco X20(US)",
+      "list_online": false,
+      "mapped": null
+    },
+    {
+      "alias": "RGVjb19DQzZD",
+      "model": "deco X20(US)",
+      "list_online": false,
+      "mapped": null
+    }
+  ],
+  "error": null,
+  "note": "Brightness READ from get_sysinfo.brightness (HS220/KS220). WRITE: python-kasa Light/IotDimmer.set_brightness (LAN) or cloud passthrough smartlife.iot.dimmer.set_brightness — not wired in probe."
 }
