@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#d8dadf" />
 <meta name="description" content="WardOS House face · morning TODAY strip" />
 <title>BOARD-OS · HOUSE FACE · TODAY</title>
-<link rel="stylesheet" href="house-engage.css?v=FAMCLK1" />
+<link rel="stylesheet" href="house-engage.css?v=TODAYGLANCE1" />
 <style>
  @font-face {
  font-family: "Inter Display";
@@ -503,9 +503,9 @@
  .where-card.dad-week-loud-card .sub strong { color: #7dffd4; }
 
 </style>
-<link rel="stylesheet" href="heat-v3.css?v=FAMCLK1" />
+<link rel="stylesheet" href="heat-v3.css?v=TODAYGLANCE1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
-<link rel="stylesheet" href="tokens-family-clock-first-heat.css?v=FAMCLK1" />
+<link rel="stylesheet" href="tokens-family-clock-first-heat.css?v=TODAYGLANCE1" />
 <style id="heat1-hide-brand">.brand img,.brand{display:none!important}.eyebrow{display:none!important}</style>
 </head>
 <body>
@@ -764,8 +764,8 @@
  </div>
  <div class="hdr-spacer" aria-hidden="true"></div>
  <div class="hdr-ovals">
- <a class="oval wx" href="#house-wx" aria-label="Weather"><span class="oval-ico">☀</span><span class="oval-deg">—°</span></a>
- <a class="oval sensi" href="sheet-sensi.html" aria-label="Sensi"><span class="oval-ico">⌠</span><span class="oval-deg">—°</span></a>
+ <a class="oval wx" href="#house-wx" aria-label="Weather" data-wired="0" hidden><span class="oval-ico">☀</span><span class="oval-deg"></span></a>
+ <a class="oval sensi" href="sheet-sensi.html" aria-label="Sensi" data-wired="0" hidden><span class="oval-ico">⌠</span><span class="oval-deg"></span></a>
  </div>
  </header>
 
@@ -786,13 +786,13 @@
 
  
  <div class="unknown-chips" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;">
- <span style="font-size:13px;font-weight:850;letter-spacing:0.06em;color:#1a4a6a;background:#e8f4ff;border:1.5px solid #7eb6e0;padding:8px 12px;border-radius:10px;">WITH DAD · with Dad @ 147th through Fri Oct 2 3:00</span>
+ <span style="font-size:13px;font-weight:850;letter-spacing:0.06em;color:#ffe894;background:rgba(18,14,8,0.72);border:1.5px solid rgba(245,196,70,0.55);padding:8px 12px;border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,232,148,0.12);">WITH DAD · with Dad @ 147th through Fri Oct 2 3:00</span>
  </div>
 <a class="leaveby" href="sheet-countdowns.html" aria-label="Leave-by countdown">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
- <div class="leaveby-label" data-live="leaveby-label">Leave by · next</div>
- <div class="leaveby-main" data-live="leaveby-main">Sun Sep 27 · loading</div>
+ <div class="leaveby-label" data-live="leaveby-label">NEXT UP · leave by</div>
+ <div class="leaveby-main" data-live="leaveby-main">NEXT UP</div>
  <div class="leaveby-detail" data-live="leaveby-detail">Garage sale <strong>9–2</strong> · vanity <strong>3:00</strong> · Dad @ 147th</div>
  </div>
  <div class="leaveby-badge" data-live="leaveby-badge">Sun</div>
@@ -902,17 +902,77 @@
 
  <footer class="ftr">
  <div class="ftr-left">
- <span class="ftr-chip">TODAY · FAMCLK1</span>
+ <span class="ftr-chip">TODAY · TODAYGLANCE1</span>
  </div>
  </footer>
 </div>
 
-<script src="house-clock.js?v=FAMCLK1"></script>
+<script src="house-clock.js?v=TODAYGLANCE1"></script>
 <script src="house-board-strip.js?v=CT1"></script>
 <script src="house-weather.js?v=CT1"></script>
+<script src="house-sensi.js?v=TODAYGLANCE1"></script>
 <script src="house-zoom.js"></script>
 <script>
 try { if (window.HouseWeather) HouseWeather.mount("#house-wx"); } catch (e) {}
+</script>
+<script>
+(function () {
+  function wireOval(sel, degText, label) {
+    var oval = document.querySelector(sel);
+    if (!oval) return;
+    var deg = oval.querySelector(".oval-deg");
+    if (!deg) return;
+    if (degText == null) {
+      oval.setAttribute("data-wired", "0");
+      oval.setAttribute("hidden", "");
+      oval.classList.add("unwired");
+      deg.textContent = "";
+      return;
+    }
+    deg.textContent = degText;
+    oval.setAttribute("data-wired", "1");
+    oval.removeAttribute("hidden");
+    oval.classList.remove("unwired");
+    if (label) oval.setAttribute("aria-label", label);
+  }
+  /* TODAYGLANCE1 · live Wx/Sensi ° only · never ship dash-degree */
+  function paintTodayOvals() {
+    wireOval(".hdr .oval.wx", null);
+    wireOval(".hdr .oval.sensi", null);
+    if (window.HouseWeather) {
+      HouseWeather.load(function (err, data) {
+        if (data && data.temp != null && isFinite(Number(data.temp))) {
+          wireOval(".hdr .oval.wx", Math.round(data.temp) + "°", "Weather " + Math.round(data.temp) + " degrees");
+        } else {
+          wireOval(".hdr .oval.wx", null);
+        }
+      });
+    }
+    if (window.HouseSensi) {
+      HouseSensi.fetchLive(function (err, gate) {
+        var st = HouseSensi.effectiveState();
+        if (gate && gate.live && st && typeof st.ambient === "number") {
+          wireOval(".hdr .oval.sensi", st.ambient + "°", "Sensi " + st.ambient + " degrees");
+        } else {
+          wireOval(".hdr .oval.sensi", null);
+        }
+      });
+      HouseSensi.startPolling();
+      HouseSensi.onChange(function (st) {
+        if (st && st.gate && st.gate.live && typeof st.ambient === "number") {
+          wireOval(".hdr .oval.sensi", st.ambient + "°", "Sensi " + st.ambient + " degrees");
+        } else {
+          wireOval(".hdr .oval.sensi", null);
+        }
+      });
+    }
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", paintTodayOvals);
+  } else {
+    paintTodayOvals();
+  }
+})();
 </script>
 </body>
 </html>

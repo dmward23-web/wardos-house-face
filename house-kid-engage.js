@@ -732,7 +732,7 @@
       '<div class="who-up-main" data-who-main>…</div>' +
       '<div class="who-up-meta" data-who-meta></div>' +
       '</div>' +
-      '<a class="who-up-go" data-who-go href="#">OPEN</a>';
+      '<a class="who-up-go" data-who-go href="sheet-today.html">OPEN</a>';
     grid.parentNode.insertBefore(sec, grid);
     return sec;
   }
@@ -838,7 +838,7 @@
       host.classList.add("is-quiet");
       if (main) main.innerHTML = '<span class="who-up-name">Quiet</span><span class="who-up-what">No leave window</span>';
       if (meta) meta.textContent = "LIVE cal";
-      if (go) { go.setAttribute("href", "#"); go.hidden = true; }
+      if (go) { go.setAttribute("href", "sheet-today.html"); go.hidden = true; }
       return;
     }
     var kidIds = (pick.kidIds && pick.kidIds.length) ? pick.kidIds.slice() : [pick.kidId];

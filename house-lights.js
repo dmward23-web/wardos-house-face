@@ -807,7 +807,7 @@
     return g.label || "OFFLINE";
   }
 
-  /** Hub command-deck roster · 3 LIVE (LIGHTS6 write) + 6 NEED CONNECT stubs (honest · never DEMO). */
+  /** Hub command-deck roster · 3 LIVE (LIGHTS6 write) + 6 OFF · wait stubs (honest · never DEMO). */
   var HUB_DECK = [
     { id: "dining-room", short: "Dining", name: "Dining Room", live: true },
     { id: "harris-room", short: "Harris", name: "Harris's Room", live: true },
@@ -840,7 +840,7 @@
     return n || L.id;
   }
 
-  /** Hub-only deck: LIVE Kasa rows + honest NEED CONNECT stubs (not in write path). */
+  /** Hub-only deck: LIVE Kasa rows + honest OFF · wait stubs (not in write path). */
   function hubDeckLights() {
     var eff = effectiveLights();
     var byId = {};
@@ -914,7 +914,7 @@
     var sub = doc.getElementById("hub-lights-sub");
     if (sub) {
       sub.textContent = canWrite()
-        ? "3 LIVE · 6 NEED CONNECT"
+        ? "3 LIVE · 6 OFF · wait"
         : (g.live && g.writeSupported
           ? "PROXY OFF · write proxy unreachable (check tunnel)"
           : (g.live
@@ -935,9 +935,9 @@
           + '<div class="hub-sw-main">'
           + '<div class="hub-sw-text">'
           + '<div class="hub-sw-name">' + escapeHtml(hubName) + "</div>"
-          + '<div class="hub-sw-meta">NEED CONNECT</div>'
+          + '<div class="hub-sw-meta">OFF · wait</div>'
           + "</div>"
-          + '<span class="hub-sw-stub-pill" title="Not connected yet">STUB</span>'
+          + '<span class="hub-sw-stub-pill" title="Not connected yet">OFF · wait</span>'
           + "</div>"
           + "</article>";
         continue;
