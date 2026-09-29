@@ -81,11 +81,10 @@ function attachNestProxy(payload) {
   const token = resolveNestProxyToken();
   payload.nestProxy = nestProxy;
   payload.nestProxyPath = "scripts/nest-webrtc-proxy.mjs → SDM GenerateWebRtcStream";
-  if (token && !isLoopbackProxyUrl(nestProxy)) {
-    payload.nestProxyToken = token;
-  } else {
-    delete payload.nestProxyToken;
-  }
+  // KEYROT1 (9/29): proxy token is NEVER published to public Pages. Wall devices
+  // are seeded once via ?proxyToken= (stored in localStorage by house-nest.js).
+  void token;
+  delete payload.nestProxyToken;
   return payload;
 }
 

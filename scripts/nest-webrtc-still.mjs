@@ -202,7 +202,7 @@ function writeLive(cameras, meta) {
   };
   // NESTVID1: keep baked public nestProxy across still refreshes (do not drop).
   if (prev.nestProxy) payload.nestProxy = prev.nestProxy;
-  if (prev.nestProxyToken) payload.nestProxyToken = prev.nestProxyToken;
+  // KEYROT1: never carry nestProxyToken into public JSON.
   if (prev.nestProxyPath) payload.nestProxyPath = prev.nestProxyPath;
   fs.mkdirSync(path.dirname(LIVE), { recursive: true });
   const tmp = LIVE + ".tmp";
