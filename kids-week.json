@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-29T13:09:56.535Z",
+  "refreshedAt": "2026-09-29T13:25:54.447Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,31 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "8:10",
-    "place": "Boys SRE drop",
-    "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "time": "8:40",
+    "place": "Madi + provider collab · in person",
+    "detailHtml": "3:15 boys pickup · 4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Tue",
-    "startIso": "2026-09-29T13:10:00.000Z",
-    "endIso": "2026-09-29T13:40:00.000Z",
-    "kind": "school_drop",
+    "startIso": "2026-09-29T13:40:00.000Z",
+    "endIso": "2026-09-29T15:10:00.000Z",
+    "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "8:10",
-        "place": "Boys SRE drop",
-        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-09-29T13:10:00.000Z",
-        "endIso": "2026-09-29T13:40:00.000Z",
-        "kind": "school_drop",
-        "whenLabel": "8:10",
-        "summary": "Hayes + Harris — SRE drop-off · 8:25"
-      },
       {
         "label": "Next up · today",
         "time": "8:40",
         "place": "Madi + provider collab · in person",
-        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "3:15 boys pickup · 4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T13:40:00.000Z",
         "endIso": "2026-09-29T15:10:00.000Z",
@@ -53,7 +41,7 @@
         "label": "Next up · today",
         "time": "3:15",
         "place": "Boys SRE pickup",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T20:15:00.000Z",
         "endIso": "2026-09-29T21:00:00.000Z",
@@ -65,7 +53,7 @@
         "label": "Next up · today",
         "time": "4:25",
         "place": "Ainsley swim — Coach Ann",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T21:25:00.000Z",
         "endIso": "2026-09-29T23:20:00.000Z",
@@ -77,7 +65,7 @@
         "label": "Next up · today",
         "time": "5:40",
         "place": "Hayes flag practice",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T22:40:00.000Z",
         "endIso": "2026-09-30T00:35:00.000Z",
@@ -168,6 +156,18 @@
         "kind": "sport",
         "whenLabel": "Wed 4:55",
         "summary": "Harris flag practice"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "7:00",
+        "place": "SRE PE (tennis shoes)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-01T12:00:00.000Z",
+        "endIso": "2026-10-01T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Thu 7:00",
+        "summary": "Harris — SRE PE (tennis shoes)"
       }
     ]
   },
@@ -841,6 +841,12 @@
         },
         {
           "when": "Thu 1 · leave 4:25",
+          "what": "Ainsley swim — Coach Ann",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Tue 6 · leave 5:00",
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
