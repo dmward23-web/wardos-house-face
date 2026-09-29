@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-29T12:15:12.582Z",
+  "refreshedAt": "2026-09-29T12:40:28.652Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,31 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "7:30",
-    "place": "pack late-lunch snacks (headaches · Madi OK)",
-    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "time": "8:10",
+    "place": "Boys SRE drop",
+    "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Tue",
-    "startIso": "2026-09-29T12:30:00.000Z",
-    "endIso": "2026-09-29T12:45:00.000Z",
-    "kind": "school",
+    "startIso": "2026-09-29T13:10:00.000Z",
+    "endIso": "2026-09-29T13:40:00.000Z",
+    "kind": "school_drop",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "7:30",
-        "place": "pack late-lunch snacks (headaches · Madi OK)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-09-29T12:30:00.000Z",
-        "endIso": "2026-09-29T12:45:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:30",
-        "summary": "Hayes — pack late-lunch snacks (headaches · Madi OK)"
-      },
       {
         "label": "Next up · today",
         "time": "8:10",
         "place": "Boys SRE drop",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T13:10:00.000Z",
         "endIso": "2026-09-29T13:40:00.000Z",
@@ -53,7 +41,7 @@
         "label": "Next up · today",
         "time": "8:40",
         "place": "Madi + provider collab · in person",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T13:40:00.000Z",
         "endIso": "2026-09-29T15:10:00.000Z",
@@ -168,6 +156,18 @@
         "kind": "school_pickup",
         "whenLabel": "Wed 3:15",
         "summary": "Hayes + Harris — SRE pickup · 3:40"
+      },
+      {
+        "label": "Next up · Wed",
+        "time": "4:55",
+        "place": "Harris flag practice",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-09-30T21:55:00.000Z",
+        "endIso": "2026-09-30T23:50:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Wed 4:55",
+        "summary": "Harris flag practice"
       }
     ]
   },
