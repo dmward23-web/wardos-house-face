@@ -30,7 +30,7 @@ This file is the format law for every bot that paints, copies, or ships WardOS o
 4. **Type from the hallway.** Leave-by time is the biggest type on the plate. Tile names readable at a walk-by. No body paragraphs. No fine print as the point.
 5. **Camo + WardOS mark.** Soft white/grey glass camo. Inter Display. Frost shells from the kit.
 6. **Tap opens the sheet** on the same glass (week, month, kid, chores, dinner, pack, Google Home). Every sheet keeps **‹ Sheets** back to this home.
-7. **Google Home hub** (`sheet-google-home.html`) — lights · garage · cams · door pads. Placeholders only. **Atlas owns.** No fake live state.
+7. **Google Home hub** (`sheet-google-home.html`) — Sensi · Nest cams · lights LIVE; garage/door pads honest NEED CONNECT (never DEMO). **Wright kit surface** · Atlas owns live feeds/tokens. No fake live state.
 
 ---
 

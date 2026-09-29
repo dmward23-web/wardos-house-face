@@ -281,6 +281,8 @@
  .sec-title {
  font-size: 11px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: #4a4e56;
  }
+ a.sec-title { cursor: pointer; }
+ a.sec-title:active { opacity: 0.85; }
  .sec-meta { font-size: 12px; font-weight: 550; color: #6a6e76; }
 
  .pack-strip {
@@ -370,7 +372,7 @@
   html,body{overflow-x:hidden}
   .hot-pill.cmd-pill{font-size:11px;min-height:28px;padding:6px 12px}
 </style>
-<link rel="stylesheet" href="tokens-sheet-clock-first-heat.css?v=SHEETCLK1" />
+<link rel="stylesheet" href="tokens-sheet-clock-first-heat.css?v=KITDEAD1" />
 </head>
 <body>
 <div class="panel">
@@ -450,10 +452,10 @@
  <div class="lower">
  <section class="sec" aria-label="Pack checklist strip">
  <div class="sec-hdr">
- <div class="sec-title">Pack checklist · strip</div>
- <div class="sec-meta">tap when packed</div>
+ <a class="sec-title" href="sheet-pack.html?v=KITDEAD1" style="text-decoration:none;color:inherit">Pack checklist · open Pack →</a>
+ <div class="sec-meta">glance only · checkoffs on Pack sheet</div>
  </div>
- <div class="pack-strip">
+ <div class="pack-strip" aria-hidden="true">
  <div class="pack-item done">
  <div class="box">✓</div>
  <div class="lbl">Backpacks</div>
@@ -465,27 +467,27 @@
  <div class="who">Ainsley</div>
  </div>
  <div class="pack-item">
- <div class="box"></div>
+ <div class="box" aria-hidden="true">·</div>
  <div class="lbl">Flag gear</div>
  <div class="who">Hayes</div>
  </div>
  <div class="pack-item">
- <div class="box"></div>
+ <div class="box" aria-hidden="true">·</div>
  <div class="lbl">Flag stuff</div>
  <div class="who">Harris</div>
  </div>
  <div class="pack-item">
- <div class="box"></div>
+ <div class="box" aria-hidden="true">·</div>
  <div class="lbl">Snacks bag</div>
  <div class="who">Hayes 7:30</div>
  </div>
  <div class="pack-item">
- <div class="box"></div>
+ <div class="box" aria-hidden="true">·</div>
  <div class="lbl">BB gear</div>
  <div class="who">Hayes 6:15</div>
  </div>
  <div class="pack-item">
- <div class="box"></div>
+ <div class="box" aria-hidden="true">·</div>
  <div class="lbl">Meds pouch</div>
  <div class="who">night before</div>
  </div>
@@ -526,7 +528,7 @@
  </footer>
 </div>
 
-<script src="house-clock.js?v=SHEETCLK1"></script>
+<script src="house-clock.js?v=KITDEAD1"></script>
 <script src="house-zoom.js"></script>
 </body>
 </html>
