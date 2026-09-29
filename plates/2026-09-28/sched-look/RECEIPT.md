@@ -1,7 +1,7 @@
 # SCHEDLOOK2 · leave-by layout switcher fixed
 
 **When:** 2026-09-28 ~20:30 CT  
-**Tip:** (filled at commit)  
+**Tip:** `97e2fb8`  
 **Page:** https://dmward23-web.github.io/wardos-house-face/sheet-index.html
 
 ## Root cause
