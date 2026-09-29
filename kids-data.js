@@ -1272,12 +1272,17 @@
   }
 
 
+
+  /* GRAPHICS2 · forged SVG marks (sprite must be inlined on kid boards) */
+  function g2Ico(sym) {
+    return '<svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#' + sym + '"/></svg>';
+  }
   /* CONSUME1 · schedule consume layout (week strip · NEXT UP · HQ · routine · ahead) */
   var CONSUME_DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   var CONSUME_META = {
-    hayes: { world: "Victory world", loadout: "Victory loadout", mark: "◎", hqTitle: "DROP ZONE HQ with Dad", hqIco: "🏠" },
-    harris: { world: "Gem world", loadout: "Gem loadout", mark: "◆", hqTitle: "YOUR BASE with Dad", hqIco: "🏡" },
-    ainsley: { world: "Tour world", loadout: "Tour loadout", mark: "◆", hqTitle: "Base with Dad", hqIco: "🏠" }
+    hayes: { world: "Victory world", loadout: "Victory loadout", markSym: "g2-hayes", hqTitle: "DROP ZONE HQ with Dad", hqSym: "g2-home" },
+    harris: { world: "Gem world", loadout: "Gem loadout", markSym: "g2-harris", hqTitle: "YOUR BASE with Dad", hqSym: "g2-home" },
+    ainsley: { world: "Tour world", loadout: "Tour loadout", markSym: "g2-ainsley", hqTitle: "Base with Dad", hqSym: "g2-home" }
   };
 
   function kidsSafeGlass(s) {
@@ -1382,16 +1387,16 @@
 
   function consumeEventIcon(what) {
     var w = String(what || "").toLowerCase();
-    if (/baseball|ball/.test(w)) return "⚾";
-    if (/flag/.test(w)) return "🏈";
-    if (/swim/.test(w)) return "🏊";
-    if (/hearing|vision|screening/.test(w)) return "👁️";
-    if (/field\s*trip|museum/.test(w)) return "🚌";
-    if (/\bpe\b|tennis/.test(w)) return "👟";
-    if (/collab|madi|provider/.test(w)) return "👥";
-    if (/anxiety|midwest|doctor|appt/.test(w)) return "🩺";
-    if (/homework|yearbook|school|lkms|sre/.test(w)) return "📚";
-    return "◆";
+    if (/baseball|ball/.test(w)) return { html: '<span class="g2-lead">' + g2Ico("g2-baseball") + "</span>", text: "" };
+    if (/flag/.test(w)) return { html: '<span class="g2-lead">' + g2Ico("g2-flag") + "</span>", text: "" };
+    if (/swim/.test(w)) return { html: '<span class="g2-lead">' + g2Ico("g2-swim") + "</span>", text: "" };
+    if (/hearing|vision|screening/.test(w)) return { html: "", text: "👁️" };
+    if (/field\s*trip|museum/.test(w)) return { html: "", text: "🚌" };
+    if (/\bpe\b|tennis/.test(w)) return { html: "", text: "👟" };
+    if (/collab|madi|provider/.test(w)) return { html: "", text: "👥" };
+    if (/anxiety|midwest|doctor|appt/.test(w)) return { html: "", text: "🩺" };
+    if (/homework|yearbook|school|lkms|sre/.test(w)) return { html: "", text: "📚" };
+    return { html: '<span class="g2-lead">' + g2Ico("g2-next") + "</span>", text: "" };
   }
 
   function consumeStripKidName(what, kid) {
@@ -1577,7 +1582,7 @@
     var hdr = root.querySelector("[data-mount-consume-hdr]");
     if (hdr) {
       hdr.innerHTML =
-        '<div class="consume-mark">' + esc(meta.mark) + "</div>" +
+        '<div class="consume-mark g2-mark">' + g2Ico(meta.markSym || "g2-next") + "</div>" +
         '<div class="consume-hdr-text">' +
         '<div class="consume-title">' + esc(kid.name) + " · Schedule</div>" +
         '<div class="consume-sub">Loadout · ' + esc(meta.world) + "</div>" +
@@ -1632,7 +1637,7 @@
           '<div class="consume-hero-when">' + esc(next.whenLabel || "NEXT") + "</div>" +
           '<div class="consume-countdown"><span class="pulse"></span><span>' + esc(cd) + "</span></div>" +
           "</div>" +
-          '<div class="consume-hero-title">' + esc(ico + " " + title) + "</div>" +
+          '<div class="consume-hero-title">' + (ico.html || "") + esc(((ico.text ? ico.text + " " : "") + title)) + "</div>" +
           '<div class="consume-hero-meta">YOUR board · <b>' + esc(meta.loadout) + "</b></div>" +
           "</div>";
       }
@@ -1656,7 +1661,7 @@
       if (hw.with && hw.place) sub = "Multi-day · through " + through;
       punch.innerHTML =
         '<div class="consume-punch-card">' +
-        '<div class="consume-punch-ico">' + meta.hqIco + "</div>" +
+        '<div class="consume-punch-ico g2-mark">' + g2Ico(meta.hqSym || "g2-home") + "</div>" +
         '<div class="consume-punch-body">' +
         '<div class="consume-punch-title">' + esc(meta.hqTitle) + "</div>" +
         '<div class="consume-punch-sub">' + esc(kidsSafeGlass(sub)) + "</div>" +
@@ -1678,7 +1683,7 @@
         if (swimDays.length >= 2) {
           routine.hidden = false;
           routine.innerHTML =
-            '<span class="consume-routine-ico">🔁</span>' +
+            '<span class="consume-routine-ico g2-inline">' + g2Ico("g2-routine") + "</span>" +
             '<div class="consume-routine-txt"><b>Swim</b> · leave 4:25 · Coach Ann</div>' +
             '<span class="consume-routine-badge">Tue/Thu</span>';
         } else if (swimDays.length === 1) {
@@ -1693,7 +1698,7 @@
         if (hasSre) {
           routine.hidden = false;
           routine.innerHTML =
-            '<span class="consume-routine-ico">🔁</span>' +
+            '<span class="consume-routine-ico g2-inline">' + g2Ico("g2-routine") + "</span>" +
             '<div class="consume-routine-txt"><b>SRE</b> · drop ' + esc(dropT) + " · pickup " + esc(pickT) + "</div>" +
             '<span class="consume-routine-badge">Tue–Fri</span>';
         } else {
