@@ -3172,3 +3172,33 @@ body.theme-harris .consume-title {
 .consume-label .nline {
   background: linear-gradient(90deg, rgba(245,197,66,0.55), transparent) !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════
+   KIDENGAGE1 · streak / XP glass on kid boards
+   ═══════════════════════════════════════════════════════════ */
+.xp-glass {
+  display: flex; flex-direction: column; gap: 4px;
+  margin-top: 6px; width: 100%;
+  padding: 8px 10px; border-radius: 12px;
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,200,80,0.28);
+}
+.xp-glass-lab {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,220,140,0.8);
+}
+.xp-glass-bar {
+  height: 12px; border-radius: 999px;
+  background: rgba(0,0,0,0.45);
+  overflow: hidden; border: 1px solid rgba(255,255,255,0.12);
+}
+.xp-glass-bar i {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, #ffe080, #40e8ff);
+}
+.xp-glass-meta { font-size: 12px; font-weight: 700; color: rgba(230,240,250,0.85); }
+.sec-chores .sec-hdr { flex-wrap: wrap; }
+.sec-chores .sec-meta[data-streak-label].streak-sparks {
+  font-size: 13px;
+}

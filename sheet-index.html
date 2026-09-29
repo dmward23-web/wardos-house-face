@@ -3110,6 +3110,267 @@
   color: #ffe080 !important;
 }
 </style>
+
+<style id="kid-engage1">
+/* KIDENGAGE1 · flip cards · who's up · claim · streak glass · cams untouched */
+.who-up {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  margin: 0 0 10px;
+  padding: 0;
+  min-height: 72px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 200, 80, 0.45);
+  background:
+    linear-gradient(165deg, rgba(28, 22, 12, 0.96), rgba(8, 8, 10, 0.98));
+  box-shadow:
+    0 1.5px 0 rgba(255,255,255,0.12) inset,
+    0 12px 28px rgba(0,0,0,0.45),
+    0 0 28px rgba(255,180,40,0.18);
+  overflow: hidden;
+  position: relative;
+}
+.who-up-accent {
+  flex: 0 0 6px;
+  background: linear-gradient(180deg, #ffe080, #ff9a40, #40e8ff);
+}
+.who-up[data-kid="ainsley"] { border-color: rgba(240,152,212,0.55); box-shadow: 0 1.5px 0 rgba(255,255,255,0.12) inset, 0 12px 28px rgba(0,0,0,0.45), 0 0 28px rgba(240,152,212,0.22); }
+.who-up[data-kid="ainsley"] .who-up-accent { background: linear-gradient(180deg, #f098d4, #ffe080); }
+.who-up[data-kid="hayes"] { border-color: rgba(94,200,232,0.55); box-shadow: 0 1.5px 0 rgba(255,255,255,0.12) inset, 0 12px 28px rgba(0,0,0,0.45), 0 0 28px rgba(94,200,232,0.22); }
+.who-up[data-kid="hayes"] .who-up-accent { background: linear-gradient(180deg, #5ec8e8, #7dffc8); }
+.who-up[data-kid="harris"] { border-color: rgba(126,212,146,0.55); box-shadow: 0 1.5px 0 rgba(255,255,255,0.12) inset, 0 12px 28px rgba(0,0,0,0.45), 0 0 28px rgba(126,212,146,0.22); }
+.who-up[data-kid="harris"] .who-up-accent { background: linear-gradient(180deg, #7ed492, #ffe080); }
+.who-up-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 10px 4px 10px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  justify-content: center;
+}
+.who-up-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #ffe080;
+}
+.who-up-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+  min-width: 0;
+}
+.who-up-name {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: #f4f7fb;
+  line-height: 1;
+}
+.who-up-time {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  color: #ffe080;
+  text-shadow: 0 0 18px rgba(255,180,40,0.45);
+  line-height: 1;
+}
+.who-up-what {
+  flex: 1 1 160px;
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(220,230,240,0.88);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.who-up-meta {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,220,140,0.75);
+  letter-spacing: 0.04em;
+}
+.who-up-go {
+  flex: 0 0 auto;
+  align-self: center;
+  margin-right: 12px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  background: rgba(255,220,80,0.18);
+  border: 2px solid rgba(255,220,80,0.55);
+  color: #ffe080;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  white-space: nowrap;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.who-up-go:active { transform: scale(0.97); }
+
+.tile.kid-flip {
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-decoration: none;
+}
+.tile.kid-flip.kf-bump { animation: kf-bump 0.28s ease-out; }
+@keyframes kf-bump {
+  0% { transform: scale(0.985); }
+  60% { transform: scale(1.015); }
+  100% { transform: scale(1); }
+}
+.tile.kid-flip .tile-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+.tile.kid-flip .kf-dots {
+  margin-left: auto;
+  display: flex;
+  gap: 5px;
+  padding: 4px;
+}
+.tile.kid-flip .kf-dots i {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,0.22);
+  display: block;
+}
+.tile.kid-flip .kf-dots i.is-on {
+  background: var(--rail, #ffe080);
+  box-shadow: 0 0 8px var(--rail, #ffe080);
+}
+.tile.kid-flip .kf-stage {
+  flex: 1 1 auto;
+  min-height: 96px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.kf-face { display: flex; flex-direction: column; gap: 4px; min-height: 96px; }
+.kf-kicker {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(200,210,220,0.55);
+  display: flex; align-items: center; gap: 8px;
+}
+.kf-loud {
+  font-size: 22px; font-weight: 900; letter-spacing: -0.04em;
+  color: #f2f6fa; line-height: 1.05;
+}
+.kf-title {
+  font-size: 14px; font-weight: 700; color: rgba(210,220,230,0.88);
+  line-height: 1.2;
+}
+.kf-meta { font-size: 12px; font-weight: 650; color: rgba(180,190,200,0.7); }
+.kf-rows { display: flex; flex-direction: column; gap: 3px; margin-top: 2px; }
+.kf-row { display: flex; gap: 8px; align-items: baseline; font-size: 12px; }
+.kf-mt { font-weight: 800; color: rgba(255,220,120,0.8); min-width: 36px; }
+.kf-md { color: rgba(200,210,220,0.8); font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kf-chip {
+  display: inline-flex; align-items: center;
+  padding: 3px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 800;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #e8f0f8;
+}
+.kf-chip--hot {
+  align-self: flex-start;
+  margin-top: 4px;
+  background: rgba(255,180,40,0.18);
+  border-color: rgba(255,200,80,0.45);
+  color: #ffe080;
+}
+.kf-xp {
+  height: 10px; border-radius: 999px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.12);
+  overflow: hidden; margin: 4px 0;
+}
+.kf-xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rail, #ffe080), #40e8ff);
+  box-shadow: 0 0 12px rgba(255,200,80,0.35);
+}
+.kf-streak { align-self: flex-start; margin-top: 4px; font-size: 12px !important; padding: 4px 8px !important; }
+.kf-claim-list { display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
+.kf-claim {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; text-align: left;
+  padding: 8px 10px; min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.35);
+  color: #e8eef4;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.kf-claim:active { transform: scale(0.98); }
+.kf-claim.is-done {
+  background: rgba(80,200,120,0.18);
+  border-color: rgba(120,220,150,0.45);
+  color: #c8f0d0;
+}
+.kf-claim-ring {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 2px solid rgba(255,255,255,0.28);
+  font-size: 12px; font-weight: 900; flex: 0 0 auto;
+}
+.kf-claim.is-done .kf-claim-ring {
+  background: #40c868; border-color: #80f0a0; color: #041008;
+}
+.kf-claim-what { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kf-empty { font-size: 12px; color: rgba(180,190,200,0.65); padding: 8px 0; }
+.tile.kid-flip .kid-flip-go {
+  text-decoration: none;
+}
+.tile.kid-flip .tile-micro { display: none !important; }
+.tile.ainsley.kid-flip { --rail: #f098d4; }
+.tile.hayes.kid-flip { --rail: #5ec8e8; }
+.tile.harris.kid-flip { --rail: #7ed492; }
+
+/* Board XP glass */
+.xp-glass {
+  display: flex; flex-direction: column; gap: 4px;
+  margin-top: 6px; width: 100%;
+  padding: 8px 10px; border-radius: 12px;
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,200,80,0.28);
+}
+.xp-glass-lab {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,220,140,0.8);
+}
+.xp-glass-bar {
+  height: 12px; border-radius: 999px;
+  background: rgba(0,0,0,0.45);
+  overflow: hidden; border: 1px solid rgba(255,255,255,0.12);
+}
+.xp-glass-bar i {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, #ffe080, #40e8ff);
+}
+.xp-glass-meta { font-size: 12px; font-weight: 700; color: rgba(230,240,250,0.85); }
+.sec-chores .sec-hdr { flex-wrap: wrap; }
+@media (prefers-reduced-motion: reduce) {
+  .tile.kid-flip.kf-bump { animation: none; }
+}
+</style>
+
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -3460,6 +3721,17 @@
  </div>
 
 
+
+ <section class="who-up" data-who-up="1" aria-label="Who's up next">
+ <div class="who-up-accent" aria-hidden="true"></div>
+ <div class="who-up-body">
+ <div class="who-up-kicker">Who's up</div>
+ <div class="who-up-main" data-who-main><span class="who-up-name">…</span></div>
+ <div class="who-up-meta" data-who-meta>LIVE</div>
+ </div>
+ <a class="who-up-go" data-who-go href="#">OPEN</a>
+ </section>
+
  <div class="grid-wrap">
  <div class="grid-hdr grid-hdr--cams">
  <div class="grid-title">Sheet roster</div>
@@ -3516,7 +3788,7 @@
  <div class="tile-foot"><span class="tile-fact">Month board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
- <a class="tile ainsley" href="kid-ainsley.html">
+ <a class="tile ainsley" href="kid-ainsley.html" data-kid-seed="ainsley">
  <div class="tile-top">
  <div class="tile-icon av g2-av ains" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-ainsley"/></svg></div>
  <div class="tile-titles">
@@ -3532,7 +3804,7 @@
  <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
- <a class="tile hayes" href="kid-hayes.html">
+ <a class="tile hayes" href="kid-hayes.html" data-kid-seed="hayes">
  <div class="tile-top">
  <div class="tile-icon av g2-av hayes" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-hayes"/></svg></div>
  <div class="tile-titles">
@@ -3548,7 +3820,7 @@
  <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
- <a class="tile harris" href="kid-harris.html">
+ <a class="tile harris" href="kid-harris.html" data-kid-seed="harris">
  <div class="tile-top">
  <div class="tile-icon av g2-av harr" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-harris"/></svg></div>
  <div class="tile-titles">
@@ -3671,7 +3943,9 @@
 <script src="house-clock.js?v=CAMDECK1"></script>
 <script src="house-board-strip.js?v=SCHEDLOOK2"></script>
 <script src="house-weather.js?v=CAMDECK1"></script>
-<script src="house-sfx.js?v=CAMDECK1"></script>
+<script src="house-sfx.js?v=KIDENGAGE1"></script>
+<script src="kids-data.js?v=KIDENGAGE1"></script>
+<script src="house-kid-engage.js?v=KIDENGAGE1"></script>
 <script src="house-sensi.js?v=CAMDECK1"></script>
 <script src="house-nest.js?v=NESTVID1"></script>
 <script src="house-lights.js?v=LIGHTDIM1"></script>
