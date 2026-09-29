@@ -1,6 +1,6 @@
 {
   "status": "live",
-  "fetchedAt": "2026-09-29T02:59:46.997Z",
+  "fetchedAt": "2026-09-29T03:14:52.171Z",
   "source": "tplink-cloud-api",
   "writeSupported": true,
   "brightnessControlSupported": true,
@@ -10,7 +10,7 @@
       "name": "Dining Room",
       "where": "Dining Room",
       "kind": "dimmer",
-      "on": true,
+      "on": false,
       "brightness": 34,
       "online": true
     },
@@ -28,7 +28,7 @@
       "name": "Kitchen",
       "where": "Kitchen",
       "kind": "dimmer",
-      "on": true,
+      "on": false,
       "brightness": 49,
       "online": true
     }
