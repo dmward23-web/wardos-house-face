@@ -12,7 +12,7 @@
  *   · as-of stamp present
  *   · Guild once = statement amount (never $4k double / never double-count)
  *   · plate $ bound to stamp (fixture lockedAt / asOfLabel)
- *   · cliff 2028/2029 PARK — do not "fix" in CI
+ *   · cliff SoT decree May 2028 (Dan exact-yes) — CI holds available/eoy; does not invent cliff $
  *
  * If no fixture AND no in-repo cash.json: SKIP with explicit Ledger message
  * (legacy path). Tonight fixture is required so CI asserts the contract.
@@ -91,10 +91,13 @@ function assertFixture(cash, bad) {
     bad.push("plate $ not bound to stamp (need lockedAt or asOfLabel with available)");
   }
 
-  // cliff PARK — detect mentions but do not fail/fix
-  const blob = JSON.stringify(cash);
-  if (/2028|2029/.test(blob)) {
-    console.log("GATE2 NOTE — cliff 2028/2029 mentioned in fixture · PARK (no CI fix)");
+  // cliff decree May 2028 — note from fixture meta; never invent cliff $ in CI
+  const meta = cash._meta || {};
+  const cliff = meta.cliff || meta.cliffNote || "";
+  if (cliff || /2028|2029/.test(JSON.stringify(cash))) {
+    console.log(
+      "GATE2 NOTE — cliff SoT decree May 2028 (Ledger) · CI holds available/eoy only · no invent cliff $"
+    );
   }
 }
 
@@ -180,8 +183,7 @@ function main() {
   assertFixture(cash, bad);
   scanHouseFaceMoney(bad);
 
-  // cliff PARK banner always
-  console.log("GATE2 — cliff 2028/2029 PARK · not fixed in CI");
+  console.log("GATE2 — cliff decree May 2028 · available/eoy asserted · cliff $ not invented");
 
   if (bad.length) {
     console.error("GATE2 FAIL — numbers contract:");
