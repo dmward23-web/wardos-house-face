@@ -75,3 +75,13 @@ html body .hdr.hdr--spread .wx-card .wx-rain.is-wet {
   opacity: 1 !important;
   text-shadow: 0 0 12px rgba(120, 200, 255, 0.45) !important;
 }
+
+/* LEDRING1 · thin LED lap around the whole board, 1 lap / minute */
+.led-ring {
+  position: fixed; inset: 0; width: 100vw; height: 100vh;
+  pointer-events: none; z-index: 9999; overflow: visible;
+}
+.led-ring path { fill: none; stroke-linecap: round; }
+.led-ring .led-tail { stroke: rgba(255, 176, 40, 0.28); stroke-width: 3; filter: blur(2px); }
+.led-ring .led-mid  { stroke: rgba(255, 196, 70, 0.7);  stroke-width: 2.5; filter: drop-shadow(0 0 4px rgba(255, 170, 30, 0.8)); }
+.led-ring .led-head { stroke: #fff2c4; stroke-width: 3; filter: drop-shadow(0 0 6px rgba(255, 200, 80, 1)) drop-shadow(0 0 12px rgba(255, 160, 20, 0.8)); }
