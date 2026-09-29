@@ -3026,10 +3026,10 @@
 <link rel="stylesheet" href="heat-v3.css?v=CAMDECK1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
 <link rel="stylesheet" href="tokens-hub-cams.css?v=CAMDECK1" />
-<link rel="stylesheet" href="tokens-hub-command-deck-hotter.css?v=LIGHTDIM1" />
+<link rel="stylesheet" href="tokens-hub-command-deck-hotter.css?v=SCHEDLOOK1" />
 
-<style id="leave-scrub2">
-/* LEAVESCRUB2 · pass-by leave-by = huge time + destination ONLY */
+<style id="sched-look1">
+/* SCHEDLOOK1 · huge time+dest hero · live layout switcher under it */
 .leaveby .leaveby-head,
 .leaveby .leaveby-label,
 .leaveby .leaveby-badge,
@@ -3037,10 +3037,10 @@
 .leaveby .leaveby-sec-hdr,
 .leaveby .leaveby-sched,
 .leaveby .leaveby-row-chip { display: none !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; border: 0 !important; }
-.leaveby .leaveby-main { font-size: 0 !important; color: transparent !important; }
+.leaveby .leaveby-main { font-size: 0 !important; color: transparent !important; flex: 0 0 auto !important; }
 .leaveby .leaveby-main .time {
   display: block !important;
-  font-size: clamp(72px, 10vw, 108px) !important;
+  font-size: clamp(64px, 9vw, 100px) !important;
   font-weight: 900 !important;
   letter-spacing: -0.08em !important;
   line-height: 0.86 !important;
@@ -3049,7 +3049,7 @@
 }
 .leaveby .leaveby-main .leaveby-dest {
   display: block !important;
-  font-size: 22px !important;
+  font-size: 20px !important;
   font-weight: 800 !important;
   color: #f2eee6 !important;
   letter-spacing: -0.02em !important;
@@ -3059,6 +3059,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.leaveby .leaveby-switch,
+.leaveby .leaveby-layouts { display: block !important; height: auto !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; border: 0 !important; }
 </style>
 </head>
 <body>
@@ -3360,7 +3362,7 @@
  </div>
 
  <div class="hub-upper hub-upper--cams hub-upper--cmd hub-upper--hot">
- <section class="leaveby leaveby--cmd leaveby--hot" aria-label="Schedule · today and tomorrow">
+ <section class="leaveby leaveby--cmd leaveby--hot" data-layout="list" aria-label="Schedule · today and tomorrow">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
  <div class="leaveby-head" hidden aria-hidden="true">
@@ -3368,6 +3370,17 @@
  <div class="leaveby-badge" data-live="leaveby-badge"></div>
  </div>
  <div class="leaveby-main" data-live="leaveby-main"><span class="leaveby-dest">…</span></div>
+ <div class="leaveby-switch" data-live="leaveby-switch">
+ <span class="leaveby-preview-tag">LAYOUT PREVIEW</span>
+ <div class="leaveby-chips" role="tablist" aria-label="Schedule layout">
+ <button type="button" class="leaveby-chip" role="tab" data-layout="rail" aria-selected="false">Rail</button>
+ <button type="button" class="leaveby-chip" role="tab" data-layout="who" aria-selected="false">Who</button>
+ <button type="button" class="leaveby-chip" role="tab" data-layout="peek" aria-selected="false">Peek</button>
+ <button type="button" class="leaveby-chip" role="tab" data-layout="radar" aria-selected="false">Radar</button>
+ <button type="button" class="leaveby-chip is-on" role="tab" data-layout="list" aria-selected="true">List</button>
+ </div>
+ </div>
+ <div class="leaveby-layouts" data-live="leaveby-layouts" data-layout="list"></div>
  <div class="leaveby-sched" data-live="leaveby-sched" hidden aria-hidden="true">
  <div class="leaveby-sec leaveby-sec--today">
  <div class="leaveby-sec-hdr" hidden>Remaining today</div>
@@ -3607,7 +3620,7 @@
  </footer>
 </div>
 <script src="house-clock.js?v=CAMDECK1"></script>
-<script src="house-board-strip.js?v=LEAVESCRUB2"></script>
+<script src="house-board-strip.js?v=SCHEDLOOK1"></script>
 <script src="house-weather.js?v=CAMDECK1"></script>
 <script src="house-sfx.js?v=CAMDECK1"></script>
 <script src="house-sensi.js?v=CAMDECK1"></script>

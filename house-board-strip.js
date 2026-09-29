@@ -257,6 +257,21 @@
     return { ok: true, reason: null };
   }
 
+  function futureLeaves(cal, nowMs, limit) {
+    nowMs = nowMs || Date.now();
+    limit = limit || 10;
+    var list = listEvents(cal);
+    var future = [];
+    for (var i = 0; i < list.length; i++) {
+      var ev = list[i];
+      if (ev.allDay) continue;
+      var ms = eventStartMs(ev);
+      if (ms > nowMs) future.push(ev);
+    }
+    future.sort(function (a, b) { return eventStartMs(a) - eventStartMs(b); });
+    return future.slice(0, limit);
+  }
+
   function pickStripFromCal(cal, clock) {
     var next = pickNextFuture(cal, Date.now());
     var strip = next
@@ -270,7 +285,113 @@
         };
     strip.today = remainingToday(cal, clock, Date.now());
     strip.tomorrow = tomorrowPeek(cal, clock);
+    strip.future = futureLeaves(cal, Date.now(), 10);
     return strip;
+  }
+
+  var LAYOUT_KEY = "wardos.leaveby.layout";
+  var LAYOUTS = ["rail", "who", "peek", "radar", "list"];
+  var LAYOUT_LABELS = {
+    rail: "Rail",
+    who: "Who",
+    peek: "Peek",
+    radar: "Radar",
+    list: "List"
+  };
+  var _lastStrip = null;
+  var _lastClock = null;
+  var _layoutBound = false;
+
+  function getLayout() {
+    try {
+      var v = localStorage.getItem(LAYOUT_KEY) || "list";
+      if (LAYOUTS.indexOf(v) >= 0) return v;
+    } catch (e) { /* private mode */ }
+    return "list";
+  }
+
+  function setLayout(id) {
+    if (LAYOUTS.indexOf(id) < 0) id = "list";
+    try { localStorage.setItem(LAYOUT_KEY, id); } catch (e2) { /* ignore */ }
+    var root = document.querySelector(".leaveby");
+    if (root) root.setAttribute("data-layout", id);
+    var canvas = document.querySelector("[data-live='leaveby-layouts']");
+    if (canvas) canvas.setAttribute("data-layout", id);
+    document.querySelectorAll("[data-live='leaveby-switch'] [data-layout]").forEach(function (btn) {
+      var on = btn.getAttribute("data-layout") === id;
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+      btn.classList.toggle("is-on", on);
+    });
+    if (_lastStrip && _lastClock) paintLayouts(_lastStrip, _lastClock, id);
+  }
+
+  function bindLayoutSwitcher() {
+    if (_layoutBound) return;
+    var bar = document.querySelector("[data-live='leaveby-switch']");
+    if (!bar) return;
+    _layoutBound = true;
+    bar.addEventListener("click", function (ev) {
+      var btn = ev.target && ev.target.closest ? ev.target.closest("[data-layout]") : null;
+      if (!btn || !bar.contains(btn)) return;
+      var id = btn.getAttribute("data-layout");
+      if (!id) return;
+      try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e3) { /* ok */ }
+      setLayout(id);
+    });
+    setLayout(getLayout());
+  }
+
+  function whoNames(ev) {
+    var s = String((ev && (ev.summary || ev.place)) || "");
+    var out = [];
+    if (/\bAinsley\b/i.test(s)) out.push("Ainsley");
+    if (/\bHayes\b/i.test(s)) out.push("Hayes");
+    if (/\bHarris\b/i.test(s)) out.push("Harris");
+    if (/\b(?:Dan|Dad|Hank)\b/i.test(s)) out.push("Dan");
+    if (!out.length) out.push("Dan");
+    return out;
+  }
+
+  function upcomingFlat(strip, limit) {
+    limit = limit || 8;
+    var out = [];
+    var today = (strip && strip.today) || [];
+    var tmr = (strip && strip.tomorrow && strip.tomorrow.items) || [];
+    var future = (strip && strip.future) || [];
+    var i;
+    for (i = 0; i < today.length; i++) out.push({ ev: today[i], when: "today" });
+    for (i = 0; i < tmr.length; i++) out.push({ ev: tmr[i], when: "tmr" });
+    /* Evening / empty today+tmr window: still paint real next leaves from cal-live */
+    if (!out.length && future.length) {
+      for (i = 0; i < future.length; i++) out.push({ ev: future[i], when: "soon" });
+    } else if (today.length < 2 && future.length) {
+      /* thin today: append near-term future not already listed */
+      var seen = {};
+      for (i = 0; i < out.length; i++) {
+        seen[(out[i].ev.start || "") + "|" + (out[i].ev.summary || "")] = 1;
+      }
+      for (i = 0; i < future.length && out.length < limit; i++) {
+        var key = (future[i].start || "") + "|" + (future[i].summary || "");
+        if (seen[key]) continue;
+        out.push({ ev: future[i], when: "soon" });
+      }
+    }
+    return out.slice(0, limit);
+  }
+
+  function minsUntil(ev) {
+    if (!ev || ev.allDay) return null;
+    var ms = eventStartMs(ev) - Date.now();
+    if (!Number.isFinite(ms)) return null;
+    return Math.max(0, Math.round(ms / 60000));
+  }
+
+  function fmtMins(m) {
+    if (m == null) return "—";
+    if (m < 60) return m + "m";
+    var h = Math.floor(m / 60);
+    var r = m % 60;
+    return r ? (h + "h " + r + "m") : (h + "h");
   }
 
   function rowHtml(ev, isNext) {
@@ -325,6 +446,197 @@
     }
   }
 
+  function layoutRail(strip) {
+    var items = upcomingFlat(strip, 7);
+    if (strip && strip._stale) {
+      return '<div class="lb-layout lb-rail"><div class="lb-empty">CAL STALE</div></div>';
+    }
+    if (!items.length) {
+      return '<div class="lb-layout lb-rail"><div class="lb-empty">Clear on glass</div></div>';
+    }
+    var html = '<div class="lb-layout lb-rail" aria-label="Timeline rail"><div class="lb-rail-spine">';
+    for (var i = 0; i < items.length; i++) {
+      var ev = items[i].ev;
+      var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "—");
+      var title = shortPlace(ev.summary || ev.place || "");
+      var cls = "lb-rail-item" + (i === 0 ? " is-next" : "") +
+        (items[i].when === "tmr" ? " is-tmr" : "");
+      html += '<div class="' + cls + '">' +
+        '<span class="lb-rail-dot" aria-hidden="true"></span>' +
+        '<span class="lb-rail-time">' + esc(timeLab) + "</span>" +
+        '<span class="lb-rail-pill">' + esc(title) + "</span>" +
+        "</div>";
+    }
+    html += "</div></div>";
+    return html;
+  }
+
+  function layoutWho(strip) {
+    var order = ["Hayes", "Ainsley", "Harris", "Dan"];
+    var buckets = { Hayes: [], Ainsley: [], Harris: [], Dan: [] };
+    var items = upcomingFlat(strip, 12);
+    if (strip && strip._stale) {
+      return '<div class="lb-layout lb-who"><div class="lb-empty">CAL STALE</div></div>';
+    }
+    for (var i = 0; i < items.length; i++) {
+      var names = whoNames(items[i].ev);
+      for (var n = 0; n < names.length; n++) {
+        if (buckets[names[n]] && buckets[names[n]].length < 3) {
+          buckets[names[n]].push(items[i]);
+        }
+      }
+    }
+    var html = '<div class="lb-layout lb-who" aria-label="Who is next">';
+    var any = false;
+    for (var o = 0; o < order.length; o++) {
+      var person = order[o];
+      var list = buckets[person];
+      if (!list.length) continue;
+      any = true;
+      html += '<div class="lb-who-group" data-who="' + esc(person) + '">' +
+        '<div class="lb-who-name">' + esc(person) + "</div>" +
+        '<div class="lb-who-rows">';
+      for (var j = 0; j < list.length; j++) {
+        var ev2 = list[j].ev;
+        var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "—");
+        var title2 = shortPlace(ev2.summary || ev2.place || "");
+        html += '<div class="lb-who-row' + (j === 0 ? " is-next" : "") + '">' +
+          '<span class="lb-who-time">' + esc(t2) + "</span>" +
+          '<span class="lb-who-title">' + esc(title2) + "</span>" +
+          "</div>";
+      }
+      html += "</div></div>";
+    }
+    if (!any) html += '<div class="lb-empty">Clear on glass</div>';
+    html += "</div>";
+    return html;
+  }
+
+  function layoutPeek(strip) {
+    var items = upcomingFlat(strip, 3);
+    if (strip && strip._stale) {
+      return '<div class="lb-layout lb-peek"><div class="lb-empty">CAL STALE</div></div>';
+    }
+    if (!items.length) {
+      return '<div class="lb-layout lb-peek"><div class="lb-empty">Clear on glass</div></div>';
+    }
+    var first = items[0].ev;
+    var t0 = first.allDay ? "day" : (clockTimeFromIso(first.start) || "—");
+    var html = '<div class="lb-layout lb-peek" aria-label="Next plus peek">' +
+      '<div class="lb-peek-hero">' +
+      '<span class="lb-peek-kicker">Next</span>' +
+      '<span class="lb-peek-time">' + esc(t0) + "</span>" +
+      '<span class="lb-peek-title">' + esc(shortPlace(first.summary || first.place || "")) + "</span>" +
+      "</div>";
+    if (items.length > 1) {
+      html += '<div class="lb-peek-quiet">';
+      for (var i = 1; i < items.length; i++) {
+        var ev = items[i].ev;
+        var t = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "—");
+        html += '<div class="lb-peek-row">' +
+          '<span class="lb-peek-row-time">' + esc(t) + "</span>" +
+          '<span class="lb-peek-row-title">' + esc(shortPlace(ev.summary || ev.place || "")) + "</span>" +
+          "</div>";
+      }
+      html += "</div>";
+    }
+    html += "</div>";
+    return html;
+  }
+
+  function layoutRadar(strip) {
+    if (strip && strip._stale) {
+      return '<div class="lb-layout lb-radar"><div class="lb-empty">CAL STALE</div></div>';
+    }
+    var items = upcomingFlat(strip, 1);
+    if (!items.length) {
+      return '<div class="lb-layout lb-radar"><div class="lb-empty">Clear on glass</div></div>';
+    }
+    var ev = items[0].ev;
+    var mins = minsUntil(ev);
+    var title = shortPlace(ev.summary || ev.place || "");
+    var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "—");
+    var windowM = 180;
+    var pct = mins == null ? 0 : Math.max(0, Math.min(1, 1 - (mins / windowM)));
+    var r = 42;
+    var c = 2 * Math.PI * r;
+    var dash = (pct * c).toFixed(1);
+    var gap = (c - pct * c).toFixed(1);
+    var html = '<div class="lb-layout lb-radar" aria-label="Countdown radar">' +
+      '<div class="lb-radar-ring" aria-hidden="true">' +
+      '<svg viewBox="0 0 100 100" width="96" height="96">' +
+      '<circle class="lb-radar-track" cx="50" cy="50" r="' + r + '" fill="none" stroke-width="8"/>' +
+      '<circle class="lb-radar-prog" cx="50" cy="50" r="' + r + '" fill="none" stroke-width="8" ' +
+      'stroke-dasharray="' + dash + " " + gap + '" transform="rotate(-90 50 50)"/>' +
+      '<text class="lb-radar-mins" x="50" y="54" text-anchor="middle">' + esc(fmtMins(mins)) + "</text>" +
+      "</svg></div>" +
+      '<div class="lb-radar-line">' +
+      '<span class="lb-radar-time">' + esc(timeLab) + "</span>" +
+      '<span class="lb-radar-title">' + esc(title) + "</span>" +
+      "</div></div>";
+    return html;
+  }
+
+  function layoutList(strip) {
+    /* REFINE CURRENT · tighter remaining + tomorrow peek */
+    var today = (strip && strip.today) || [];
+    var tmr = (strip && strip.tomorrow) || { items: [], dow: "" };
+    if (strip && strip._stale) {
+      return '<div class="lb-layout lb-list"><div class="lb-empty">CAL STALE</div></div>';
+    }
+    var html = '<div class="lb-layout lb-list" aria-label="Schedule list">';
+    html += '<div class="lb-list-sec"><div class="lb-list-hdr">Remaining</div><ul class="lb-list-ul">';
+    if (!today.length) {
+      html += '<li class="lb-empty">Clear · nothing left today</li>';
+    } else {
+      for (var i = 0; i < today.length; i++) {
+        var ev = today[i];
+        var t = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "—");
+        html += '<li class="lb-list-row' + (i === 0 && !ev.allDay ? " is-next" : "") + '">' +
+          '<span class="lb-list-time">' + esc(t) + "</span>" +
+          '<span class="lb-list-title">' + esc(shortPlace(ev.summary || ev.place || "")) + "</span>" +
+          "</li>";
+      }
+    }
+    html += "</ul></div>";
+    html += '<div class="lb-list-sec lb-list-sec--tmr"><div class="lb-list-hdr">' +
+      esc(tmr.dow ? ("Tmr · " + tmr.dow) : "Tomorrow") +
+      '</div><ul class="lb-list-ul">';
+    if (!tmr.items || !tmr.items.length) {
+      html += '<li class="lb-empty">Clear on glass</li>';
+    } else {
+      var maxT = Math.min(tmr.items.length, 4);
+      for (var j = 0; j < maxT; j++) {
+        var ev2 = tmr.items[j];
+        var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "—");
+        html += '<li class="lb-list-row">' +
+          '<span class="lb-list-time">' + esc(t2) + "</span>" +
+          '<span class="lb-list-title">' + esc(shortPlace(ev2.summary || ev2.place || "")) + "</span>" +
+          "</li>";
+      }
+    }
+    html += "</ul></div></div>";
+    return html;
+  }
+
+  function paintLayouts(strip, clock, mode) {
+    var el = document.querySelector("[data-live='leaveby-layouts']");
+    if (!el) {
+      paintLists(strip);
+      return;
+    }
+    mode = mode || getLayout();
+    var html;
+    if (mode === "rail") html = layoutRail(strip);
+    else if (mode === "who") html = layoutWho(strip);
+    else if (mode === "peek") html = layoutPeek(strip);
+    else if (mode === "radar") html = layoutRadar(strip);
+    else html = layoutList(strip);
+    el.innerHTML = html;
+    el.setAttribute("data-layout", mode);
+    paintLists(strip); /* keep legacy nodes in sync if present */
+  }
+
   function applyStrip(strip, clock) {
     var main = document.querySelector("[data-live='leaveby-main']");
     var detail = document.querySelector("[data-live='leaveby-detail']");
@@ -370,7 +682,10 @@
       detail.innerHTML = strip.detailHtml;
     }
 
-    paintLists(strip);
+    _lastStrip = strip;
+    _lastClock = clock;
+    bindLayoutSwitcher();
+    paintLayouts(strip, clock, getLayout());
 
     if (warn) {
       if (strip._stale) {
@@ -470,6 +785,9 @@
     staleStrip: staleStrip,
     stripFromEvent: stripFromEvent,
     applyStrip: applyStrip,
+    getLayout: getLayout,
+    setLayout: setLayout,
+    LAYOUTS: LAYOUTS,
     CAL_FRESH_MS: CAL_FRESH_MS
   };
 })(typeof window !== "undefined" ? window : globalThis);
