@@ -179,9 +179,13 @@
     return s;
   }
 
+  /** Clean CT wall time · "8:10 AM" (HUBFMT1). */
   function clockFromIso(iso) {
     if (!iso) return "";
     try {
+      if (global.HouseClock && HouseClock.timeLabel) {
+        return HouseClock.timeLabel(new Date(iso));
+      }
       var p = {};
       new Intl.DateTimeFormat("en-US", {
         timeZone: "America/Chicago",
@@ -191,10 +195,24 @@
       }).formatToParts(new Date(iso)).forEach(function (x) {
         if (x.type !== "literal") p[x.type] = x.value;
       });
-      return (p.hour || "") + ":" + (p.minute || "");
+      var ap = p.dayPeriod ? (" " + p.dayPeriod) : "";
+      return (p.hour || "") + ":" + (p.minute || "") + ap;
     } catch (e) {
       return "";
     }
+  }
+
+  /** Prefer ISO→CT; if bare "8:10" only, keep it (no invent AM/PM without ISO). */
+  function cleanWallTime(time, iso) {
+    var fromIso = clockFromIso(iso);
+    if (fromIso) return fromIso;
+    var s = String(time || "").trim();
+    if (!s) return "";
+    /* Already has AM/PM */
+    if (/[ap]\.?m\.?/i.test(s)) return s.replace(/\s+/g, " ");
+    /* Reject ISO / 24h junk on glass */
+    if (/T\d{2}:|\d{4}-\d{2}-\d{2}/.test(s)) return clockFromIso(s) || "";
+    return s;
   }
 
   function minsUntilIso(iso) {
@@ -230,7 +248,7 @@
       best = {
         start: start || 0,
         startIso: item.startIso || item.start || "",
-        time: item.time || clockFromIso(item.startIso || item.start) || "",
+        time: cleanWallTime(item.time, item.startIso || item.start),
         badge: item.badge || "",
         title: shortTitle(item.place || item.summary || item.what || item.title || "Next up"),
         summary: shortTitle(item.summary || item.hint || "")
@@ -259,7 +277,7 @@
             endIso: ev.end,
             summary: ev.summary,
             place: ev.summary,
-            time: clockFromIso(ev.start)
+            time: cleanWallTime("", ev.start)
           });
         }
       }

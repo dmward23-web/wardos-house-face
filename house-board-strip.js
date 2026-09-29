@@ -39,9 +39,13 @@
     return Date.now() - t;
   }
 
+  /** Clean CT wall time · "8:10 AM" (HUBFMT1 · never bare H:MM / never 24h ISO). */
   function clockTimeFromIso(iso) {
     if (!iso) return "";
     try {
+      if (global.HouseClock && HouseClock.timeLabel) {
+        return HouseClock.timeLabel(new Date(iso));
+      }
       var p = {};
       new Intl.DateTimeFormat("en-US", {
         timeZone: "America/Chicago",
@@ -51,7 +55,8 @@
       }).formatToParts(new Date(iso)).forEach(function (x) {
         if (x.type !== "literal") p[x.type] = x.value;
       });
-      return (p.hour || "") + ":" + (p.minute || "");
+      var ap = p.dayPeriod ? (" " + p.dayPeriod) : "";
+      return (p.hour || "") + ":" + (p.minute || "") + ap;
     } catch (e) {
       return "";
     }
@@ -725,7 +730,12 @@
     var warn = document.querySelector("[data-live='asof-warn']");
 
     dateNodes.forEach(function (n) { n.textContent = clock.short; });
-    longNodes.forEach(function (n) { n.textContent = clock.long; });
+    /* HUBFMT1 · date-long under big DOW = "Sep 28, 2026" (no weekday echo) */
+    longNodes.forEach(function (n) {
+      n.textContent = clock.dateLine || (global.HouseClock && HouseClock.dateLine
+        ? HouseClock.dateLine()
+        : clock.long);
+    });
     dowNodes.forEach(function (n) { n.textContent = clock.dow; });
 
     if (label) label.textContent = "";

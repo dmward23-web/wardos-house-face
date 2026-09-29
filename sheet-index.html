@@ -2626,6 +2626,7 @@
     justify-content: center !important;
     gap: 8px !important;
   }
+  /* HUBFMT1 · pass-by glance date — huge DOW + high-contrast long */
   .hdr.hdr--spread .hdr-date {
     flex: 1 1 0 !important;
     min-width: 0 !important;
@@ -2633,29 +2634,31 @@
     flex-direction: column !important;
     align-items: flex-end !important;
     justify-content: center !important;
-    gap: 2px !important;
+    gap: 4px !important;
     text-align: right !important;
-    padding: 4px 2px !important;
+    padding: 6px 4px !important;
   }
   .hdr.hdr--spread .hdr-date-kicker {
-    font-size: 9px !important;
-    font-weight: 750 !important;
-    letter-spacing: 0.2em !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.22em !important;
     text-transform: uppercase !important;
-    color: rgba(15,23,32,0.45) !important;
+    color: rgba(10,14,22,0.55) !important;
   }
   .hdr.hdr--spread .hdr-date-dow {
-    font-size: 22px !important;
-    font-weight: 850 !important;
-    letter-spacing: -0.03em !important;
-    color: #12161c !important;
-    line-height: 1 !important;
+    font-size: 44px !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.04em !important;
+    color: #0a0c10 !important;
+    line-height: 0.92 !important;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.55);
   }
   .hdr.hdr--spread .hdr-date-long {
-    font-size: 13px !important;
-    font-weight: 650 !important;
-    color: rgba(40,50,64,0.72) !important;
-    letter-spacing: -0.01em !important;
+    font-size: 20px !important;
+    font-weight: 750 !important;
+    color: #1a2230 !important;
+    letter-spacing: -0.015em !important;
+    line-height: 1.1 !important;
   }
 
 
@@ -2895,12 +2898,16 @@
     background: linear-gradient(180deg, rgba(8,10,14,0.92), rgba(4,5,8,0.98));
     border-top: 1px solid rgba(140,220,240,0.18);
   }
+  /* HUBFMT1 · one cam status only (corner pill). Foot kind stays hidden. */
   .hub-cam-foot .hub-cam-kind {
-    font-size: 10px;
-    font-weight: 700;
-    color: rgba(140,220,240,0.55);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    display: none !important;
+  }
+  .hub-cam-still .hub-cam-pill,
+  .hub-cam-pill.is-still {
+    background: linear-gradient(180deg, rgba(40,120,160,0.45), rgba(10,40,60,0.55));
+    border-color: rgba(120,210,240,0.65);
+    color: #c8f0ff;
+    box-shadow: 0 0 14px rgba(80,180,220,0.3);
   }
 
   /* Geometry locks (override HUBSHIP1 584 / 292) */
@@ -3008,7 +3015,7 @@
   }
   .hdr.hdr--spread .hdr-ovals { gap: 6px !important; }
 
-  /* KIDSWAP1 · force-kill Nest/Lights header ovals (Weather+Sensi only) */
+  /* KIDSWAP1 + HUBFMT1 · force-kill Nest/Lights header ovals (Weather+Sensi only) */
   .hdr-ovals .nest-hdr,
   .hdr-ovals .lights-hdr,
   .hdr-ovals a.nest-chip,
@@ -3638,34 +3645,34 @@
  </header>
 
  <div class="hub-cam-deck" id="hub-cam-deck" aria-label="Nest cameras · stills">
- <a class="hub-cam hub-cam-stub" href="sheet-google-home.html" aria-label="Front door camera">
+ <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Front door camera · STILL">
  <div class="hub-cam-media-wrap">
  <img class="hub-cam-media" src="data/nest-snaps/front-door.jpg?v=CAMDECK1" alt="Front door still"/>
- <span class="hub-cam-pill hub-cam-pill--corner is-stub">…</span>
+ <span class="hub-cam-pill hub-cam-pill--corner is-still">STILL</span>
  </div>
  <div class="hub-cam-foot">
  <span class="hub-cam-label">Front door</span>
- <span class="hub-cam-kind">STILL</span>
+ <span class="hub-cam-kind" hidden aria-hidden="true">STILL</span>
  </div>
  </a>
- <a class="hub-cam hub-cam-stub" href="sheet-google-home.html" aria-label="Garage camera">
+ <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Garage camera · STILL">
  <div class="hub-cam-media-wrap">
  <img class="hub-cam-media" src="data/nest-snaps/garage.jpg?v=CAMDECK1" alt="Garage still"/>
- <span class="hub-cam-pill hub-cam-pill--corner is-stub">…</span>
+ <span class="hub-cam-pill hub-cam-pill--corner is-still">STILL</span>
  </div>
  <div class="hub-cam-foot">
  <span class="hub-cam-label">Garage</span>
- <span class="hub-cam-kind">STILL</span>
+ <span class="hub-cam-kind" hidden aria-hidden="true">STILL</span>
  </div>
  </a>
- <a class="hub-cam hub-cam-stub" href="sheet-google-home.html" aria-label="Backyard camera">
+ <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Backyard camera · STILL">
  <div class="hub-cam-media-wrap">
  <img class="hub-cam-media" src="data/nest-snaps/backyard.jpg?v=CAMDECK1" alt="Backyard still"/>
- <span class="hub-cam-pill hub-cam-pill--corner is-stub">…</span>
+ <span class="hub-cam-pill hub-cam-pill--corner is-still">STILL</span>
  </div>
  <div class="hub-cam-foot">
  <span class="hub-cam-label">Backyard</span>
- <span class="hub-cam-kind">STILL</span>
+ <span class="hub-cam-kind" hidden aria-hidden="true">STILL</span>
  </div>
  </a>
  </div>
@@ -3940,14 +3947,14 @@
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=CAMDECK1"></script>
-<script src="house-board-strip.js?v=SCHEDLOOK2"></script>
+<script src="house-clock.js?v=HUBFMT1"></script>
+<script src="house-board-strip.js?v=HUBFMT1"></script>
 <script src="house-weather.js?v=CAMDECK1"></script>
 <script src="house-sfx.js?v=KIDENGAGE1"></script>
 <script src="kids-data.js?v=KIDENGAGE1"></script>
-<script src="house-kid-engage.js?v=KIDENGAGE1"></script>
+<script src="house-kid-engage.js?v=HUBFMT1"></script>
 <script src="house-sensi.js?v=CAMDECK1"></script>
-<script src="house-nest.js?v=NESTVID1"></script>
+<script src="house-nest.js?v=HUBFMT1"></script>
 <script src="house-lights.js?v=LIGHTDIM1"></script>
 <script>
 (function () {

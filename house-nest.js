@@ -578,10 +578,10 @@
   }
 
   /**
-   * Honest pill for a hub still tile.
-   * LIVE = nest status live + snap file present + snapCapturedAt (or nest fetchedAt) fresh.
-   * STALE = snap present but aging. NEED TOKEN / STUB / NEED PROXY otherwise.
-   * Never invent video. Never silent black.
+   * Honest ONE status for a hub still tile (HUBFMT1 / CAMLABEL1).
+   * Hub deck paints JPEG stills only — never WebRTC <video> — so fresh snap = STILL
+   * (not LIVE). LIVE is reserved for actual video/WebRTC (viewer page), never both.
+   * STALE / NEED TOKEN / STUB / NEED PROXY otherwise. Never invent video. Never silent black.
    */
   function hubCamHonesty(slot, cam, g, data) {
     if (g && g.needToken) {
@@ -607,11 +607,12 @@
         snapUrl: snapUrl
       };
     }
+    /* Still snapshot on hub = STILL only (one status · never LIVE+STILL). */
     return {
-      pill: "LIVE",
-      cls: "hub-cam-live",
-      pillCls: "is-live",
-      kind: "live",
+      pill: "STILL",
+      cls: "hub-cam-still",
+      pillCls: "is-still",
+      kind: "still",
       snapUrl: snapUrl
     };
   }
@@ -631,7 +632,7 @@
       if (!el) continue;
       var cam = findCamForHub(slot, cams);
       var h = hubCamHonesty(slot, cam, g, data);
-      el.classList.remove("hub-cam-live", "hub-cam-stale", "hub-cam-stub");
+      el.classList.remove("hub-cam-live", "hub-cam-still", "hub-cam-stale", "hub-cam-stub");
       el.classList.add(h.cls);
       el.setAttribute("href", "sheet-google-home.html");
       el.setAttribute("aria-label", slot.label + " camera · " + h.pill);
@@ -639,11 +640,18 @@
       var pill = el.querySelector(".hub-cam-pill");
       if (pill) {
         pill.textContent = h.pill;
-        pill.classList.remove("is-live", "is-stale", "is-stub", "is-need");
+        pill.classList.remove("is-live", "is-still", "is-stale", "is-stub", "is-need");
         pill.classList.add(h.pillCls);
       }
       var label = el.querySelector(".hub-cam-label");
       if (label) label.textContent = slot.label;
+      /* HUBFMT1 · one status only — pill owns it; hide foot kind duplicate */
+      var kind = el.querySelector(".hub-cam-kind");
+      if (kind) {
+        kind.textContent = h.pill;
+        kind.setAttribute("hidden", "");
+        kind.setAttribute("aria-hidden", "true");
+      }
 
       var mediaWrap = el.querySelector(".hub-cam-media-wrap");
       var img = el.querySelector("img.hub-cam-media");
@@ -675,11 +683,11 @@
               var p = wrap && wrap.parentNode && wrap.parentNode.querySelector(".hub-cam-pill");
               if (p) {
                 p.textContent = "NEED PROXY";
-                p.classList.remove("is-live", "is-stale", "is-stub");
+                p.classList.remove("is-live", "is-still", "is-stale", "is-stub");
                 p.classList.add("is-need");
               }
               if (wrap && wrap.parentNode) {
-                wrap.parentNode.classList.remove("hub-cam-live", "hub-cam-stale");
+                wrap.parentNode.classList.remove("hub-cam-live", "hub-cam-still", "hub-cam-stale");
                 wrap.parentNode.classList.add("hub-cam-stub");
               }
             };

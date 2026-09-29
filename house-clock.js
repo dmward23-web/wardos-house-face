@@ -84,12 +84,28 @@
     return "evening";
   }
 
+  /** Clean CT wall time · "8:10 AM" (never 24h / never bare ISO). */
+  function timeLabel(date) {
+    var p = parts(date);
+    if (!p.hour || !p.minute) return "";
+    var ap = p.dayPeriod ? (" " + p.dayPeriod) : "";
+    return p.hour + ":" + p.minute + ap;
+  }
+
+  /** Date under big DOW · "Sep 28, 2026" (no weekday repeat). */
+  function dateLine(date) {
+    var p = parts(date);
+    return p.month + " " + p.day + ", " + p.year;
+  }
+
   function stamp(date) {
     return {
       tz: TZ,
       iso: iso(date),
       short: shortLabel(date),
       long: longLabel(date),
+      dateLine: dateLine(date),
+      time: timeLabel(date),
       dow: dow(date),
       daypart: daypart(date),
       year: parts(date).year
@@ -102,6 +118,8 @@
     iso: iso,
     shortLabel: shortLabel,
     longLabel: longLabel,
+    dateLine: dateLine,
+    timeLabel: timeLabel,
     dow: dow,
     daypart: daypart,
     stamp: stamp,

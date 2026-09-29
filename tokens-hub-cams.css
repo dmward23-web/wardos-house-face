@@ -147,6 +147,19 @@
   box-shadow: 0 0 14px rgba(60,220,140,0.35);
 }
 
+/* HUBFMT1 · still snapshot (hub deck — not WebRTC LIVE) */
+.hub-cam-still .hub-cam-pill,
+.hub-cam-pill.is-still {
+  background: linear-gradient(180deg, rgba(40,120,160,0.45), rgba(10,40,60,0.55));
+  border-color: rgba(120,210,240,0.65);
+  color: #c8f0ff;
+  box-shadow: 0 0 14px rgba(80,180,220,0.3);
+}
+
+.hub-cam-foot .hub-cam-kind {
+  display: none !important;
+}
+
 .hub-cam-stale .hub-cam-pill,
 .hub-cam-pill.is-stale {
   background: linear-gradient(180deg, rgba(180,120,20,0.4), rgba(80,50,10,0.55));
