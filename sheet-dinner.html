@@ -314,7 +314,7 @@
  <div class="cheer-body">
  <div class="cheer-main">
  <div class="cheer-label">Tonight </div>
- <div class="cheer-title">Mon Sep 28 · <span class="hl">no pick yet</span></div>
+ <div class="cheer-title"><span data-live="date-short">—</span> · <span class="hl" data-dinner-tonight>no pick yet</span></div>
  <div class="cheer-sub"><strong>Fuel</strong> · sleep → water → protein when you eat · no grocery dollars</div>
  </div>
  <div class="cheer-badges"><div class="cheer-badge">OPEN</div></div>
@@ -343,7 +343,7 @@
  <div class="list">
  <div class="day-row"><span class="dow">Sat</span><span class="pick">—</span><span class="tag">open</span></div>
  <div class="day-row"><span class="dow">Sun</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row"><span class="dow">Mon</span><span class="pick">no pick yet</span><span class="tag">today</span></div>
+ <div class="day-row"><span class="dow">Mon</span><span class="pick">—</span><span class="tag">open</span></div>
  <div class="day-row"><span class="dow">Tue</span><span class="pick">—</span><span class="tag">open</span></div>
  <div class="day-row"><span class="dow">Wed</span><span class="pick">—</span><span class="tag">open</span></div>
  <div class="day-row"><span class="dow">Thu</span><span class="pick">—</span><span class="tag">open</span></div>
@@ -386,6 +386,29 @@
 </div>
 
 <script src="house-clock.js?v=SHEETCLK2"></script>
+<script>
+/* DINNERLIVE1 · header date from HouseClock (data-live="date-short"); "today" row follows the CT clock.
+   Never invents a meal: an empty night on today reads "no pick yet". */
+(function () {
+  function markToday() {
+    if (!window.HouseClock) return;
+    var dow = HouseClock.now().dow;
+    document.querySelectorAll(".day-row").forEach(function (row) {
+      var d = row.querySelector(".dow"), pick = row.querySelector(".pick"), tag = row.querySelector(".tag");
+      if (!d || !pick || !tag) return;
+      if (!tag.hasAttribute("data-orig")) tag.setAttribute("data-orig", tag.textContent);
+      if (!pick.hasAttribute("data-orig")) pick.setAttribute("data-orig", pick.textContent);
+      var isToday = d.textContent.trim() === dow;
+      row.classList.toggle("is-today", isToday);
+      tag.textContent = isToday ? "today" : tag.getAttribute("data-orig");
+      var orig = pick.getAttribute("data-orig");
+      pick.textContent = (isToday && orig.trim() === "—") ? "no pick yet" : orig;
+    });
+  }
+  markToday();
+  setInterval(markToday, 60000);
+})();
+</script>
 <script src="house-zoom.js"></script>
 </body>
 </html>

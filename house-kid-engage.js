@@ -1,4 +1,4 @@
-/* House Face · WHOSUP2 · kid flip · who’s up leave-window · hide scroll chrome · tap/OPEN → board
+/* House Face · WHOSUP3 · kid flip · who’s up leave-window · hide scroll chrome · tap/OPEN → board
    WHOSUP2: prep/reminder items (pack · snacks · get/buy …) never own Who's up / Next leave —
    they bridge to the next REAL leave they feed; Who's up names every kid on that leave
    (Boys / SRE drop·pickup with no kid named → Hayes + Harris). Never invents events.
@@ -377,16 +377,28 @@
   function soonestWhoUp() {
     /* Only light when someone is IN an active leave window — quiet otherwise.
        Prep/reminder items never win; shared events (Hayes + Harris SRE) name ALL kids on that leave. */
+    /* WHOSUP3 · UPCOMING beats UNDERWAY: once a leave's time has passed (swim 4:25 in progress)
+       and a later leave's window is open (flag 5:40), the upcoming one owns Who's up.
+       Upcoming → soonest first. All underway → most recent departure first. */
     var best = null;
+    var now = Date.now();
+    function rank(leave) {
+      var st = leave.start || 0;
+      if (!st) return [2, 0];
+      return st > now ? [0, st] : [1, -st];
+    }
+    function better(ra, rb) {
+      return ra[0] !== rb[0] ? ra[0] < rb[0] : ra[1] < rb[1];
+    }
     for (var i = 0; i < KIDS.length; i++) {
       var id = KIDS[i];
       var leave = nextLeaveFor(id);
       if (!leave) continue;
       if (!inLeaveWindow(leave) && !prepBridges(id, leave)) continue;
-      var score = leave.start || Number.MAX_SAFE_INTEGER;
-      if (!best || score < best.score) {
-        best = { kidId: id, kidIds: [id], leave: leave, score: score };
-      } else if (score === best.score && sameLeave(best.leave, leave)) {
+      var r = rank(leave);
+      if (!best || better(r, best.rank)) {
+        best = { kidId: id, kidIds: [id], leave: leave, rank: r, score: leave.start || Number.MAX_SAFE_INTEGER };
+      } else if (sameLeave(best.leave, leave)) {
         if (best.kidIds.indexOf(id) < 0) best.kidIds.push(id);
       }
     }
