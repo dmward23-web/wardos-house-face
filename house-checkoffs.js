@@ -97,40 +97,19 @@
     if (!row || !row.classList.contains("daily-week")) return;
     var taps = row.querySelectorAll(".day-tap");
     if (!taps.length) return;
-    var id = taps[0].getAttribute("data-check");
     var doneN = 0;
     taps.forEach(function (t) {
       if (t.classList.contains("done")) doneN += 1;
     });
-    var weekPay = parseInt(taps[0].getAttribute("data-stars") || String(taps.length || 7), 10) || (taps.length || 7);
     var need = taps.length || (window.WardKids && WardKids.DAD_WEEK_DAYS) || 7;
     var weekDone = doneN >= need;
     row.classList.toggle("done", weekDone);
     row.classList.toggle("open", !weekDone);
-    var kidId = (window.WardKids && WardKids.KID_FROM_CHECK && id) ? WardKids.KID_FROM_CHECK[id] : null;
-    var gate = (kidId && window.WardKids && typeof WardKids.mustProgress === "function")
-      ? WardKids.mustProgress(kidId, WardKids._data)
-      : { done: 0, need: 0, complete: false };
-    var cap = 0;
-    try {
-      if (kidId && WardKids._data && WardKids._data.kids && WardKids._data.kids[kidId]) {
-        var bg = WardKids._data.kids[kidId].bankGoal || {};
-        cap = typeof WardKids.allowanceCap === "function" ? WardKids.allowanceCap(bg) : (bg.weeklyAllowance || bg.need || 0);
-      }
-    } catch (eCap) { cap = 0; }
+    /* KIDCHORES1 · no per-row Fri→Fri / jar / $ wk spam — board-level note only */
     var hint = row.querySelector(".hint");
-    if (hint) {
-      hint.textContent = weekDone
-        ? (gate.complete
-          ? need + "/" + need + " Dad days · musts clear · jar $" + cap
-          : need + "/" + need + " Dad days · " + gate.done + "/" + gate.need + " musts · jar locked")
-        : doneN + "/" + need + " days · Dad week Fri→Fri · ALL musts unlock jar $" + cap;
-    }
+    if (hint) hint.remove();
     var earn = row.querySelector(".star-earn");
-    if (earn && !earn.classList.contains("addon-tag")) {
-      earn.setAttribute("data-stars", String(weekPay));
-      earn.textContent = weekDone ? (gate.complete ? "MUSTS ✓" : "days ✓") : "$" + weekPay + " wk";
-    }
+    if (earn && !earn.classList.contains("addon-tag")) earn.remove();
   }
 
   function applyDone(el, done, animate) {

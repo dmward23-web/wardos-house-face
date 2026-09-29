@@ -1165,7 +1165,7 @@
     return panel;
   }
 
-  /** Kid-board secondary shortcut: one named pad only (hub stays full roster). */
+  /** Kid-board room pad only (hub = full roster). One LIVE badge max · no shortcut fluff. */
   function paintKidPad(host, lightId, doc) {
     doc = doc || document;
     host = typeof host === "string" ? doc.querySelector(host) : host;
@@ -1182,17 +1182,21 @@
     }
     var onCls = L.on ? " is-on" : "";
     var dim = (L.kind === "dimmer" || L.kind === "switch/dimmer");
-    var gateLab = hubHonesty(g);
     var rockerCls = L.on ? " is-on" : " is-off";
     var armedPad = canWrite();
     var rockerDis = armedPad ? "" : " is-disabled";
+    /* One honesty pill only — green LIVE when live, else NEED/OFF. Never double LIVE. */
+    var pillCls = "light-pad-state cmd-pill";
+    var pillTxt = "OFFLINE";
+    if (g.live) { pillCls += " cmd-pill--live"; pillTxt = "LIVE"; }
+    else if (g.needToken || g.kind === "need_token") { pillCls += " cmd-pill--need"; pillTxt = "NEED TOKEN"; }
+    else { pillCls += " cmd-pill--off"; pillTxt = hubHonesty(g) || "OFF"; }
     host.innerHTML =
       '<article class="light-pad cmd-panel kid-light-pad' + onCls + '" data-light-id="' + L.id + '">'
       + '<div class="light-pad-top">'
       + '<div class="light-pad-ico" aria-hidden="true">💡</div>'
-      + '<div><div class="light-pad-name">' + escapeHtml(L.name) + "</div>"
-      + '<div class="light-pad-where">My room · shortcut</div></div>'
-      + '<div class="light-pad-state">' + (L.on ? "ON" : "OFF") + "</div>"
+      + '<div class="light-pad-name">' + escapeHtml(L.name) + "</div>"
+      + '<div class="' + pillCls + '">' + escapeHtml(pillTxt) + "</div>"
       + "</div>"
       + '<div class="light-pad-actions">'
       + '<button type="button" class="cmd-rocker' + rockerCls + rockerDis + '" data-act="toggle" data-id="' + L.id + '"'
@@ -1203,7 +1207,6 @@
         ? '<input class="light-bright" type="range" min="1" max="100" value="' + clampBright(L.brightness || 100) + '" data-id="' + L.id + '" aria-label="Brightness"' + (armedPad ? "" : " disabled") + ' />'
         : "")
       + "</div>"
-      + '<div class="light-pad-src">' + hubSrcLabel(eff, g) + " · " + escapeHtml(gateLab) + " · full house → Lights</div>"
       + "</article>";
     host.onclick = function (ev) {
       var el = ev.target;

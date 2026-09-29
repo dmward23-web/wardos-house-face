@@ -138,10 +138,11 @@
 
 .cmd-pill--live,
 .cmd-pill.is-live {
-  background: linear-gradient(180deg, rgba(255, 220, 120, 0.35), rgba(200, 140, 30, 0.35));
-  border-color: rgba(255, 200, 80, 0.65);
-  color: #ffe9a0;
-  box-shadow: 0 0 10px rgba(255, 180, 40, 0.25);
+  /* Match cams / Sensi LIVE green house-wide (not amber) */
+  background: linear-gradient(180deg, rgba(40, 180, 120, 0.45), rgba(10, 80, 50, 0.55));
+  border-color: rgba(80, 255, 180, 0.65);
+  color: #b8ffe0;
+  box-shadow: 0 0 14px rgba(60, 220, 140, 0.35);
 }
 
 .cmd-pill--off,

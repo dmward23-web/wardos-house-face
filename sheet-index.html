@@ -2744,8 +2744,10 @@
     background: rgba(40,42,48,0.7); border: 1px solid rgba(255,200,120,0.3); color: #d8d0c0;
   }
   .hub-lights-pill.on {
-    background: linear-gradient(180deg, rgba(255,220,120,0.35), rgba(200,140,30,0.35));
-    border-color: rgba(255,200,80,0.65); color: #ffe9a0;
+    /* Match cams / Sensi LIVE green (not amber) */
+    background: linear-gradient(180deg, rgba(40,180,120,0.45), rgba(10,80,50,0.55));
+    border-color: rgba(80,255,180,0.65); color: #b8ffe0;
+    box-shadow: 0 0 14px rgba(60,220,140,0.35);
   }
   .hub-lights-pill.off {
     background: rgba(60,40,10,0.55); border-color: rgba(224,160,64,0.4); color: #f0c878;
@@ -3060,7 +3062,7 @@
 <link rel="stylesheet" href="heat-v3.css?v=CAMDECK1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
 <link rel="stylesheet" href="tokens-hub-cams.css?v=CAMLIVE2" />
-<link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=CTRLPANEL1" />
+<link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=LIVEGREEN1" />
 <link rel="stylesheet" href="tokens-hub-command-deck-hotter.css?v=CTRLPANEL1" />
 <link rel="stylesheet" href="tokens-ctrlpanel.css?v=HUBSCROLL2" />
 
@@ -4172,12 +4174,12 @@
 <script src="house-board-strip.js?v=HUBSCROLL1"></script>
 <script src="house-weather.js?v=CAMDECK1"></script>
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
-<script src="kids-data.js?v=HUBSCROLL1"></script>
+<script src="kids-data.js?v=KIDCHORES1"></script>
 <script src="house-kid-engage.js?v=HUBSCROLL2"></script>
 <script src="house-sensi.js?v=CAMDECK1"></script>
 <script src="nest-webrtc-client.js?v=CAMLIVE2"></script>
 <script src="house-nest.js?v=CAMLIVE2"></script>
-<script src="house-lights.js?v=LIGHTDIM1"></script>
+<script src="house-lights.js?v=KIDLITE1"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {

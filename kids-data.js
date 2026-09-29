@@ -617,53 +617,21 @@
     }
     var open = done ? "done" : "open";
     var ring = done ? "✓" : (optional ? "+" : "·");
-    var hint;
+    /* KIDCHORES1 · musts = title + day checks only. Jar/payout lives once at board level. */
+    var hint = "";
+    var earn = "";
     if (optional) {
       if (q.hire && kidId === "ainsley") {
         hint = done
           ? "hire logged · $15/hr Dad handout"
           : "hire path · $15/hr · Dad books you · never fills jar";
+        earn = '<span class="star-earn addon-tag">' + (done ? "$15/hr ✓" : "$15/hr") + "</span>";
       } else {
         hint = done
           ? (q.hire ? "hire logged · booked" : "logged")
           : (q.hire ? "hire path · Dad books you · never fills jar" : "add-on · never fills jar");
-      }
-    } else if (cadence === "weekly") {
-      var gateW = kidId ? mustProgress(kidId, data) : { done: 0, need: 0, complete: false };
-      var capW = kidId ? allowanceCap(((data && data.kids && data.kids[kidId]) || {}).bankGoal) : 0;
-      hint = done
-        ? (gateW.complete
-          ? "weekly clear · musts done · jar $" + capW
-          : "weekly clear · " + gateW.done + "/" + gateW.need + " musts · jar locked")
-        : "weekly must · tap · jar unlocks when ALL musts done";
-    } else {
-      var needN = weekDayIsos(DAY_ISO).length;
-      var gateD = kidId ? mustProgress(kidId, data) : { done: 0, need: 0, complete: false };
-      var capD = kidId ? allowanceCap(((data && data.kids && data.kids[kidId]) || {}).bankGoal) : 0;
-      hint = weekDone
-        ? (gateD.complete
-          ? needN + "/" + needN + " Dad days · musts clear · jar $" + capD
-          : needN + "/" + needN + " Dad days · " + gateD.done + "/" + gateD.need + " musts · jar locked")
-        : dayCount + "/" + needN + " days · Dad week Fri→Fri (taps Sat–Fri) · ALL musts unlock jar $" + capD;
-    }
-    var earn;
-    if (optional) {
-      if (q.hire && kidId === "ainsley") {
-        earn = '<span class="star-earn addon-tag">' + (done ? "$15/hr ✓" : "$15/hr") + "</span>";
-      } else {
         earn = '<span class="star-earn addon-tag">' + (done ? "OPTIONAL ✓" : "OPTIONAL") + "</span>";
       }
-    } else if (cadence === "daily") {
-      var gateEarn = kidId ? mustProgress(kidId, data) : { complete: false };
-      /* Chip shows chore week progress; $ only paints when FULL must set unlocks jar */
-      if (kidId === "ainsley") {
-        earn = '<span class="star-earn" data-stars="' + weekPay + '">' + (weekDone ? (gateEarn.complete ? "MUSTS ✓" : "days ✓") : "$1/d · ×" + dadWeekLen()) + "</span>";
-      } else {
-        earn = '<span class="star-earn" data-stars="' + weekPay + '">' + (weekDone ? (gateEarn.complete ? "MUSTS ✓" : "days ✓") : "$" + weekPay + " wk") + "</span>";
-      }
-    } else {
-      var gateEarnW = kidId ? mustProgress(kidId, data) : { complete: false };
-      earn = '<span class="star-earn" data-stars="' + stars + '">' + (done ? (gateEarnW.complete ? "+$" + stars : "✓") : "$" + stars) + "</span>";
     }
     var optAttr = optional ? ' data-optional="1"' : "";
     var hireAttr = (optional && q.hire) ? ' data-hire="1"' : "";
@@ -688,17 +656,17 @@
       return (
         '<div class="quest ' + open + softClass + dailyClass + '" data-quest-id="' + esc(q.id) + '" data-kid-quest="1"' +
         optAttr + hireAttr + cadAttr + starsAttr + ">" +
-        '<div class="quest-body"><div class="what">' + esc(q.what) + '</div><div class="hint">' + esc(hint) +
-        '</div><div class="quest-days" role="group" aria-label="Days this week">' + taps + "</div></div>" +
-        earn +
+        '<div class="quest-body"><div class="what">' + esc(q.what) + "</div>" +
+        '<div class="quest-days" role="group" aria-label="Days this week">' + taps + "</div></div>" +
         "</div>"
       );
     }
 
+    var hintBlock = hint ? '<div class="hint">' + esc(hint) + "</div>" : "";
     return (
       '<div class="quest ' + open + softClass + '" data-check="' + esc(q.id) + '" data-kid-quest="1"' + optAttr + hireAttr + cadAttr + starsAttr + ' role="button" tabindex="0">' +
       '<span class="ring">' + ring + "</span>" +
-      '<div><div class="what">' + esc(q.what) + '</div><div class="hint">' + esc(hint) + "</div></div>" +
+      '<div><div class="what">' + esc(q.what) + "</div>" + hintBlock + "</div>" +
       earn +
       "</div>"
     );
@@ -752,15 +720,11 @@
         return;
       }
       if (meta.cadence === "weekly") {
+        /* KIDCHORES1 · no per-row $ / jar hint on musts */
         var earnW = el.querySelector(".star-earn");
-        if (earnW) {
-          earnW.setAttribute("data-stars", String(meta.stars));
-          earnW.textContent = "$" + meta.stars;
-        }
+        if (earnW && !earnW.classList.contains("addon-tag")) earnW.remove();
         var hintW = el.querySelector(".hint");
-        if (hintW && !hintW.getAttribute("data-hint-open")) {
-          hintW.setAttribute("data-hint-open", hintW.textContent);
-        }
+        if (hintW) hintW.remove();
         return;
       }
       if (meta.cadence !== "daily") return;
@@ -792,23 +756,9 @@
       }
       var txt = el.querySelector(".txt") || el;
       var hint = el.querySelector(".hint");
-      if (hint) {
-        var needN = weekDayIsos(DAY_ISO).length;
-        var gateE = mustProgress(kidId, data);
-        var capE = allowanceCap(((data.kids && data.kids[kidId]) || {}).bankGoal);
-        hint.setAttribute("data-hint-open", dayCount + "/" + needN + " days · Dad week Fri→Fri · ALL musts unlock jar $" + capE);
-        hint.textContent = weekDone
-          ? (gateE.complete
-            ? needN + "/" + needN + " Dad days · musts clear · jar $" + capE
-            : needN + "/" + needN + " Dad days · " + gateE.done + "/" + gateE.need + " musts · jar locked")
-          : dayCount + "/" + needN + " days · Dad week Fri→Fri · ALL musts unlock jar $" + capE;
-      }
+      if (hint) hint.remove();
       var earn = el.querySelector(".star-earn");
-      if (earn) {
-        var gateChip = mustProgress(kidId, data);
-        earn.setAttribute("data-stars", String(weekPay));
-        earn.textContent = weekDone ? (gateChip.complete ? "MUSTS ✓" : "days ✓") : "$" + weekPay + " wk";
-      }
+      if (earn && !earn.classList.contains("addon-tag")) earn.remove();
       var kids = el.children;
       for (var ri = 0; ri < kids.length; ri++) {
         if (kids[ri].classList && kids[ri].classList.contains("ring")) {

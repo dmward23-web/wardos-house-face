@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HARRIS · BLOCK WORLD</title>
 <link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
-<link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=CTRLPANEL1" />
+<link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=LIVEGREEN1" />
 <link rel="stylesheet" href="tokens-ctrlpanel.css?v=HUBSCROLL2" />
 <link rel="stylesheet" href="kid-ioscroll.css?v=HUBSCROLL2" />
 <style>
@@ -175,46 +175,30 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .ftr { flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:12px; font-weight:700; padding-top:2px; }
   .ftr-chip { font-size:11px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; padding:7px 12px; border-radius:8px; text-decoration:none; color:inherit; background:rgba(255,255,255,0.75); border:3px solid rgba(0,0,0,0.3); }
 
-  /* LIGHTS6 · Harris room shortcut (secondary; hub = full roster) */
+  /* LIGHTS6 · Harris room pad · one LIVE badge · no white chrome / shortcut fluff */
   .sec-light { gap:10px; padding:14px; }
   .sec-light .light-pad {
-    display:flex; flex-direction:column; gap:10px; padding:14px 16px; border-radius:12px;
-    background:rgba(255,255,255,0.92); border:3px solid #2a4820; box-shadow:0 5px 0 #0e2008;
+    display:flex; flex-direction:column; gap:10px; padding:14px 16px; border-radius:8px;
+    background:var(--quest-bg, linear-gradient(145deg,#f4ffc8,#c8e870));
+    border:3px solid var(--quest-border, #2a8018);
+    box-shadow:0 5px 0 var(--quest-edge, #1a4010);
   }
   .sec-light .light-pad.is-on {
-    border-color:#8a6010; background:linear-gradient(165deg,#fffaf0,#ffe8b0);
+    border-color:var(--quest-done-border, #1a7a18);
+    background:var(--quest-done-bg, rgba(160,230,80,0.55));
   }
   .sec-light .light-pad-top { display:flex; align-items:center; gap:12px; }
   .sec-light .light-pad-ico {
-    width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center;
-    font-size:22px; background:linear-gradient(145deg,#ffe080,#c87810); border:2px solid #121418; flex-shrink:0;
+    width:44px; height:44px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    font-size:22px; background:linear-gradient(145deg,#90e050,#2a8018); border:2px solid #0a1808; flex-shrink:0;
   }
-  .sec-light .light-pad-name { font-size:18px; font-weight:800; letter-spacing:-0.02em; color:#102010; }
-  .sec-light .light-pad-where { font-size:11px; font-weight:700; color:#3a5030; text-transform:uppercase; letter-spacing:0.08em; }
-  .sec-light .light-pad-state {
-    margin-left:auto; font-size:13px; font-weight:900; letter-spacing:0.12em;
-    padding:6px 10px; border-radius:8px; background:#e8ebf0; border:2px solid #2a2e36; color:#1a1e24;
-  }
-  .sec-light .light-pad.is-on .light-pad-state {
-    background:linear-gradient(180deg,#ffe080,#e0a020); border-color:#8a6010;
-  }
+  .sec-light .light-pad-name { font-size:18px; font-weight:800; letter-spacing:-0.02em; color:#102010; flex:1; min-width:0; }
+  .sec-light .light-pad-where { display:none !important; }
+  .sec-light .light-pad-state.cmd-pill { margin-left:auto; }
   .sec-light .light-pad-actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-  .sec-light .light-btn {
-    appearance:none; cursor:pointer; padding:10px 14px; min-height:44px; border-radius:10px;
-    font-size:14px; font-weight:800; border:2px solid #2a2e36;
-    background:linear-gradient(180deg,#f4f6f8,#d8dce2); color:#1a1e24; box-shadow:0 3px 0 #1a1e24;
-  }
-  .sec-light .light-btn.loud {
-    background:linear-gradient(180deg,#ffe080,#e0a020); border-color:#8a6010; box-shadow:0 3px 0 #6a4010;
-  }
-  .sec-light .light-btn:active { transform:translateY(2px); }
-  .sec-light .light-bright { flex:1; min-width:120px; accent-color:#c87810; }
-  .sec-light .light-pad-src { font-size:11px; font-weight:700; color:#4a6038; }
-  .sec-light .kid-light-link {
-    display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:800;
-    padding:8px 12px; border-radius:8px; text-decoration:none; color:#102010;
-    background:rgba(255,255,255,0.75); border:2px solid #2a4820;
-  }
+  .sec-light .light-bright { flex:1; min-width:120px; accent-color:#2a8018; }
+  .sec-light .light-pad-src { display:none !important; }
+  .sec-light .kid-light-link { display:none !important; }
   .hdr { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0; padding:10px 14px; }
   .hdr-left { display:flex; align-items:center; gap:10px; min-width:0; }
   .brand img { display:block; height:40px; width:auto; }
@@ -635,17 +619,14 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  </div>
  </section>
  <div class="body">
- <section class="sec sec-light" aria-label="My room light">
- <div class="sec-hdr"><div class="sec-title">💡 MY ROOM LIGHT</div><div class="sec-meta">shortcut · LIVE</div></div>
+  <section class="sec sec-light" aria-label="Room light">
+ <div class="sec-hdr"><div class="sec-title">💡 LIGHT</div></div>
  <div id="kid-harris-light" class="kid-light-host" data-light-id="harris-room"></div>
- <div class="bank-links" style="margin-top:4px">
- <a class="kid-light-link" href="sheet-lights.html">Full house Lights →</a>
- </div>
  </section>
  <section class="sec sec-chores" aria-label="Chores and quests">
  <div class="sec-hdr"><div class="sec-title">⛏️ YOUR QUESTS · MUSTS</div><div class="sec-meta" data-streak-label>streak</div></div>
  <div class="sec-list" data-mount-quests></div>
- <div class="tap-hint">Tap each day Sat–Fri · ALL musts unlock jar $10 · ★ into the jar</div>
+ <div class="tap-hint">Tap each day Sat–Fri · title + day checks</div>
  <div class="bank-links" style="margin-top:4px">
  <a class="ghost" href="sheet-chores.html">Family chores</a>
  </div>
@@ -746,13 +727,13 @@ document.addEventListener("house:cleared", function(){
 </script>
 
 <script src="house-clock.js?v=CT1"></script>
-<script src="house-lights.js?v=LIGHTDIM1"></script>
-<script src="kids-data.js?v=CTRLPANEL2"></script>
+<script src="house-lights.js?v=KIDLITE1"></script>
+<script src="kids-data.js?v=KIDCHORES1"></script>
 <script src="house-saves.js?v=FAIL3"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
 <script src="house-kid-engage.js?v=HUBSCROLL2"></script>
-<script src="house-checkoffs.js?v=MUSTGATE1" defer></script>
+<script src="house-checkoffs.js?v=KIDCHORES1" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
  if (window.HouseSaves) HouseSaves.mount("harris");
