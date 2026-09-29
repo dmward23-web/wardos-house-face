@@ -130,8 +130,17 @@
       el.textContent = s.dow;
     });
     root.querySelectorAll("[data-live='date-long']").forEach(function (el) {
-      if (!el.closest || !el.closest(".hdr-date, .live-clock-host, header")) return;
-      el.textContent = s.dateLine || s.long;
+      if (!el.closest || !el.closest(".hdr-date, .live-clock-host, header, footer, .ftr, .sec-hdr, .sec-meta")) return;
+      el.textContent = s.long || s.dateLine;
+    });
+    /* DADFIX1 · always refresh date-short (Dad Today meta was stuck on Sun Sep 27) */
+    root.querySelectorAll("[data-live='date-short']").forEach(function (el) {
+      el.textContent = s.short || s.long;
+    });
+    /* Also paint date-long outside hdr (footer stamps) */
+    root.querySelectorAll("[data-live='date-long']").forEach(function (el) {
+      if (el.closest && el.closest(".hdr-date, .live-clock-host, header")) return; /* already painted */
+      el.textContent = s.long || s.dateLine || el.textContent;
     });
     return s;
   }

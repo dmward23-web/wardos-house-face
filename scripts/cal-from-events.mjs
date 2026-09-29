@@ -275,13 +275,16 @@ function writeJson(outPath, payload) {
   fs.renameSync(tmp, outPath);
 }
 
-function danTodayFromUpcoming(upcoming, todayIso) {
+function danTodayFromDayEvents(dayEvents, todayIso, homeWeekThrough) {
+  /* Dad Today leave stack = FULL calendar day (past + future). Night refresh must not void the column. */
   const dayNum = Number(todayIso.slice(8));
   const dow = chicagoParts().weekday; /* Chicago today */
   const rows = [];
-  for (const ev of upcoming) {
-    if (!ev.start || ev.start.slice(0, 10) !== todayIso) continue;
-    if (ev.allDay && /Kids with Dan/i.test(ev.summary)) continue;
+  const seen = new Set();
+  const list = (dayEvents || []).slice().sort((a, b) => (a.startMs || 0) - (b.startMs || 0));
+  for (const ev of list) {
+    if (!ev.start || String(ev.start).slice(0, 10) !== todayIso) continue;
+    if (ev.allDay && /Kids with Dan/i.test(ev.summary || "")) continue;
     const sum = ev.summary || "";
     /* Dad glass: skip pure Atlas/GET desk stubs — keep leave / school / sports / kid / house tasks */
     if (/^Atlas:/i.test(sum)) continue;
@@ -293,14 +296,21 @@ function danTodayFromUpcoming(upcoming, todayIso) {
       end && !ev.allDay
         ? `${dow} ${dayNum} · ${p.hour}:${p.minute}–${chicagoParts(end).hour}:${chicagoParts(end).minute}`
         : `${dow} ${dayNum} · ${p.hour}:${p.minute}`;
+    let what = shortPlace(sum);
+    /* Collapse identical when+what (e.g. Harris+Hayes PE → one card) */
+    const key = `${when}|${what}`.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
     let tone = "act";
     if (/^Leave/i.test(sum)) tone = "hot";
-    else if (/baseball|flag|swim|practice|game/i.test(sum)) tone = "sport";
-    rows.push({ when, what: shortPlace(sum), tone });
+    else if (/baseball|flag|swim|practice|game/i.test(sum)) tone = "hot";
+    else if (/Large Item|HOA|DRIVE/i.test(sum)) tone = "hot";
+    rows.push({ when, what, tone });
   }
+  const through = homeWeekThrough || "Fri Oct 2 · 3:00";
   rows.push({
     when: "home week",
-    what: "Kids with Dad @ 147th through Fri Oct 2 3:00",
+    what: `Kids with Dad @ 147th through ${through}`,
     tone: "hot",
   });
   return rows;
@@ -340,7 +350,7 @@ function dropPastFromToday(rows, nowMs) {
   });
 }
 
-function patchKidsWeek(weekPath, cal, upcoming) {
+function patchKidsWeek(weekPath, cal, upcoming, slimAll) {
   const raw = fs.readFileSync(weekPath, "utf8");
   const week = JSON.parse(raw);
   const todayIso = cal.asOfIso;
@@ -362,9 +372,20 @@ function patchKidsWeek(weekPath, cal, upcoming) {
     (e) => e.id === "4n0c5k6h39q3rvqrbavhlo1kv4" || /Leave\s*·\s*HD\s*#?\s*2209/i.test(e.summary || "")
   );
 
-  /* Refresh dan.today from calendar (Mon) — drop Sun vanity forever */
-  week.kids.dan.today = danTodayFromUpcoming(upcoming, todayIso);
+  /* Refresh dan.today from FULL today window (not future-only) — night must not void the stack */
+  const daySrc = Array.isArray(slimAll) && slimAll.length ? slimAll : upcoming;
+  week.kids.dan.today = danTodayFromDayEvents(daySrc, todayIso, week.homeWeek && week.homeWeek.through);
   week.kids.dan.today = dropPastFromToday(week.kids.dan.today, nowMs);
+  /* Dedupe week display twins (Harris+Hayes PE → one SRE PE card) */
+  if (Array.isArray(week.kids.dan.week)) {
+    const seenW = new Set();
+    week.kids.dan.week = week.kids.dan.week.filter((r) => {
+      const k = `${String(r.when || "").toLowerCase()}|${String(r.what || "").toLowerCase()}`;
+      if (seenW.has(k)) return false;
+      seenW.add(k);
+      return true;
+    });
+  }
 
   week.kids.dan.week = ensureHdInWeek(week.kids.dan.week, hd);
 
@@ -549,7 +570,7 @@ function main() {
   );
 
   if (args.patchWeek) {
-    const week = patchKidsWeek(args.patchWeek, cal, upcoming);
+    const week = patchKidsWeek(args.patchWeek, cal, upcoming, slimAll);
     const ok = syncEmbedded(week);
     console.log(
       `patched kids-week asOfIso=${week.asOfIso} · EMBEDDED ${ok ? "synced" : "SKIPPED"} · HD in week=${JSON.stringify(week.kids.dan.week).includes("HD #2209")}`

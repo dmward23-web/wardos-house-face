@@ -407,10 +407,14 @@
   margin-top: 2px !important;
 }
 
-/* Soften DOW/date under clock — clock wins pass-by */
+/* DADFIX1 · DOW light ink on dark glass · keep 44px (Alfred P0) */
 .hdr.hdr--spread .hdr-date-dow {
-  font-size: 22px !important;
-  opacity: 0.72 !important;
+  font-size: 44px !important;
+  font-weight: 900 !important;
+  color: #ffe894 !important;
+  -webkit-text-fill-color: #ffe894 !important;
+  opacity: 1 !important;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.75), 0 0 18px rgba(255,220,120,0.28) !important;
 }
 .hdr.hdr--spread .hdr-date-long {
   font-size: 13px !important;

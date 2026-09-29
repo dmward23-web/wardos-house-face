@@ -532,19 +532,25 @@ function hottestFor(kidId, items, now, homeWeek) {
 }
 
 function buildDanToday(items, now, homeWeek) {
+  /* Full calendar day on Dad Today — do NOT drop past same-day (night void bug). */
   const todayIso = partsInTZ(now).iso;
   const rows = [];
+  const seen = new Set();
   for (const it of items) {
-    if (!stillRelevant(it, now)) continue;
     if (partsInTZ(it.start).iso !== todayIso) continue;
     if (it.kind === "custody") continue;
     if (isAdminNoise(it.raw)) continue;
     // Dad box: leaves, school logistics, sports, appointments, notable dad
     if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school", "dad"].includes(it.kind)) continue;
+    const when = `${partsInTZ(now).weekday.slice(0, 3)} · ${fmtTime(it.start)}`;
+    const what = kidsSafeWhat(it.raw, it.kind);
+    const key = `${when}|${what}`.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
     rows.push({
-      when: `${partsInTZ(now).weekday.slice(0, 3)} · ${fmtTime(it.start)}`,
-      what: kidsSafeWhat(it.raw, it.kind),
-      tone: it.kind === "leave" || it.kind === "sport" || it.kind === "appointment" ? "hot" : "act",
+      when,
+      what,
+      tone: it.kind === "leave" || it.kind === "sport" || it.kind === "appointment" || it.kind === "dad" ? "hot" : "act",
     });
   }
   rows.push({
@@ -552,19 +558,24 @@ function buildDanToday(items, now, homeWeek) {
     what: `Kids with Dad @ 147th through ${homeWeek.through}`,
     tone: "hot",
   });
-  return rows.slice(0, 8);
+  return rows.slice(0, 10);
 }
 
 function buildDanWeek(items, now, homeWeek) {
   const rows = [];
+  const seen = new Set();
   for (const it of items) {
     if (!stillRelevant(it, now)) continue;
     if (isAdminNoise(it.raw)) continue;
     if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school"].includes(it.kind)) continue;
-    // skip pure repeats of custody
+    const when = `${fmtDayLabel(it.start)} · ${fmtTime(it.start)}`;
+    const what = kidsSafeWhat(it.raw, it.kind);
+    const key = `${when}|${what}`.toLowerCase();
+    if (seen.has(key)) continue; /* Harris+Hayes PE → one card */
+    seen.add(key);
     rows.push({
-      when: `${fmtDayLabel(it.start)} · ${fmtTime(it.start)}`,
-      what: kidsSafeWhat(it.raw, it.kind),
+      when,
+      what,
       tone: it.kind === "leave" || it.kind === "sport" ? "hot" : it.kind === "appointment" ? "act" : "act",
     });
   }

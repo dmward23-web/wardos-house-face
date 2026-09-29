@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE · DAD BOX</title>
-<link rel="stylesheet" href="house-engage.css?v=DADCLK1" />
+<link rel="stylesheet" href="house-engage.css?v=DADFIX1" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
@@ -80,12 +80,15 @@
   .kid-link.ainsley .dot{background:#8a40a8}
   .note{padding:10px 14px;border-radius:10px;background:rgba(40,42,48,0.08);border:2px dashed rgba(40,42,48,0.3);
     font-size:13px;font-weight:650;color:#3a3e46;flex-shrink:0}
+  /* DADFIX1 · zoom chrome is junk under clock-first — kill */
+  .house-zoom,[data-house-zoom-ctl]{display:none!important}
   .ftr{display:flex;justify-content:space-between;font-size:12px;color:#5a5e66;font-weight:600}
   .ftr-chip{padding:6px 10px;border-radius:8px;border:2px solid #2a2e36;background:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase}
 </style>
-<link rel="stylesheet" href="heat-v3.css?v=DADCLK1" />
+<link rel="stylesheet" href="heat-v3.css?v=DADFIX1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
-<link rel="stylesheet" href="tokens-dad-clock-first-heat.css?v=DADCLK1" />
+<link rel="stylesheet" href="tokens-dad-clock-first-heat.css?v=DADFIX1" />
+<link rel="stylesheet" href="tokens-dad-fix1-heat.css?v=DADFIX1" />
 </head>
 <body data-kid="dan" data-theme="dan">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -342,8 +345,8 @@
  </div>
  <div class="hdr-spacer" aria-hidden="true"></div>
  <div class="hdr-ovals">
- <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather"><span class="oval-ico">☀</span><span class="oval-deg">—°</span></a>
- <a class="oval sensi" href="sheet-sensi.html" aria-label="Sensi"><span class="oval-ico">⌠</span><span class="oval-deg">—°</span></a>
+ <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather" data-wired="0" hidden><span class="oval-ico">☀</span><span class="oval-deg"></span></a>
+ <a class="oval sensi" href="sheet-sensi.html" aria-label="Sensi" data-wired="0" hidden><span class="oval-ico">⌠</span><span class="oval-deg"></span></a>
  </div>
  </header>
 
@@ -352,19 +355,19 @@
  <div class="banner-body">
  <div class="banner-lab">Leave by · next</div>
  <div class="banner-title">Kids with you @ 147th · through Fri Oct 2 · 3:00</div>
- <div class="banner-sub">Garage sale 9–2 @ 147th · Ainsley vanity 3:00 · Jessy</div>
+ <div class="banner-sub" data-dan-banner-sub>Next · Tue 7:30 pack late-lunch snacks · HD vanity return Wed 9:00</div>
  </div>
  </a>
 
  <div class="kids-row" aria-label="Jump to kid boards">
- <a class="kid-link harris" href="kid-harris.html"><span class="dot g2-av harr"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-harris"/></svg></span> Harris · Block World</a>
- <a class="kid-link hayes" href="kid-hayes.html"><span class="dot g2-av hayes"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-hayes"/></svg></span> Hayes · Drop Zone</a>
- <a class="kid-link ainsley" href="kid-ainsley.html"><span class="dot g2-av ains"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-ainsley"/></svg></span> Ainsley · Eras Stage</a>
+ <a class="kid-link harris" href="kid-harris.html"><span class="dot g2-av harr"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-harris"/></svg></span> Harris</a>
+ <a class="kid-link hayes" href="kid-hayes.html"><span class="dot g2-av hayes"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-hayes"/></svg></span> Hayes</a>
+ <a class="kid-link ainsley" href="kid-ainsley.html"><span class="dot g2-av ains"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-ainsley"/></svg></span> Ainsley</a>
  </div>
 
  <div class="body">
  <section class="sec">
- <div class="sec-hdr"><div class="sec-title">Today · your leave stack</div><div class="sec-meta" data-live="date-short">Sun Sep 27</div></div>
+ <div class="sec-hdr"><div class="sec-title">Today · your leave stack</div><div class="sec-meta" data-live="date-short">Mon Sep 28</div></div>
  <div class="sec-list" data-mount-dan-today></div>
  </section>
  <section class="sec">
@@ -385,20 +388,100 @@
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center">
- <span>House face · Dad box · <span data-live="date-long">Sun Sep 27 2026</span></span>
- <span class="ftr-chip">DAN · DADCLK1</span>
+ <span>House face · Dad box · <span data-live="date-long">Mon Sep 28 2026</span></span>
+ <span class="ftr-chip">DAN · DADFIX1</span>
  </div>
  <span>kids-safe · no Desk cash · every tap → dest</span>
  </footer>
 </div>
-<script src="house-clock.js?v=DADCLK1"></script>
+<script src="house-clock.js?v=DADFIX1"></script>
 <script src="house-board-strip.js?v=CT1"></script>
-<script src="kids-data.js?v=DADCLK1"></script>
-<script src="house-zoom.js"></script>
+<script src="kids-data.js?v=DADFIX1"></script>
+<script src="house-weather.js?v=DADFIX1"></script>
+<script src="house-sensi.js?v=DADFIX1"></script>
 <script>
- document.addEventListener("DOMContentLoaded", function () {
- if (window.WardKids) WardKids.boot("dan");
- });
+(function () {
+  function wireOval(sel, degText, label) {
+    var oval = document.querySelector(sel);
+    if (!oval) return;
+    var deg = oval.querySelector(".oval-deg");
+    if (!deg) return;
+    if (degText == null) {
+      oval.setAttribute("data-wired", "0");
+      oval.setAttribute("hidden", "");
+      oval.classList.add("unwired");
+      deg.textContent = "";
+      return;
+    }
+    deg.textContent = degText;
+    oval.setAttribute("data-wired", "1");
+    oval.removeAttribute("hidden");
+    oval.classList.remove("unwired");
+    if (label) oval.setAttribute("aria-label", label);
+  }
+  /* Live Wx/Sensi ° — real live only; omit oval if not (never dash-degree) */
+  function paintDanOvals() {
+    wireOval(".hdr .oval.wx", null);
+    wireOval(".hdr .oval.sensi", null);
+    if (window.HouseWeather) {
+      HouseWeather.load(function (err, data) {
+        if (data && data.temp != null && isFinite(Number(data.temp))) {
+          wireOval(".hdr .oval.wx", Math.round(data.temp) + "°", "Weather " + Math.round(data.temp) + " degrees");
+        } else {
+          wireOval(".hdr .oval.wx", null);
+        }
+      });
+    }
+    if (window.HouseSensi) {
+      HouseSensi.fetchLive(function (err, gate) {
+        var st = HouseSensi.effectiveState();
+        if (gate && gate.live && st && typeof st.ambient === "number") {
+          wireOval(".hdr .oval.sensi", st.ambient + "°", "Sensi " + st.ambient + " degrees");
+        } else {
+          wireOval(".hdr .oval.sensi", null);
+        }
+      });
+      HouseSensi.startPolling();
+      HouseSensi.onChange(function (st) {
+        if (st && st.gate && st.gate.live && typeof st.ambient === "number") {
+          wireOval(".hdr .oval.sensi", st.ambient + "°", "Sensi " + st.ambient + " degrees");
+        }
+      });
+    }
+  }
+  function paintBanner(data) {
+    var sub = document.querySelector("[data-dan-banner-sub]");
+    var title = document.querySelector(".banner-title");
+    if (!data) return;
+    var hw = data.homeWeek || {};
+    if (title && hw.through) {
+      title.textContent = "Kids with you @ 147th · through " + hw.through;
+    }
+    var strip = data.boardStrip || {};
+    if (sub && strip.time && strip.place) {
+      var lab = strip.label || "Next";
+      sub.textContent = lab + " · " + strip.time + " " + strip.place;
+    }
+  }
+  function paintDanDates() {
+    if (!window.HouseClock) return;
+    var s = HouseClock.now();
+    document.querySelectorAll("[data-live='date-short']").forEach(function (el) {
+      el.textContent = s.short || s.long || el.textContent;
+    });
+    document.querySelectorAll("[data-live='date-long']").forEach(function (el) {
+      el.textContent = s.long || el.textContent;
+    });
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    paintDanDates();
+    paintDanOvals();
+    if (window.WardKids) WardKids.boot("dan");
+  });
+  document.addEventListener("house:kids-data-ready", function (ev) {
+    try { paintBanner(ev.detail && ev.detail.data); } catch (e) { /* */ }
+  });
+})();
 </script>
 
 </body>
