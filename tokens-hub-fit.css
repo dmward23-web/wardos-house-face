@@ -1,0 +1,71 @@
+/* HUBFIT1 · wall 1080×1920 exact fit + phone (iPhone Pro Max 440×956) layout.
+   Loaded LAST. Wall rules: tiles share the grid's rows instead of a 228px floor
+   (the floor made each row ride over the one above and pushed the page to 1935px). */
+
+/* ——— Wall (anything wider than a phone) ——— */
+@media (min-width: 601px) {
+  html body .panel { height: 1920px !important; max-height: 1920px !important; overflow: hidden !important; }
+  html body .grid-wrap { flex: 1 1 0 !important; min-height: 0 !important; overflow: hidden !important; }
+  html body .tile-grid.tile-grid--cams {
+    height: 100% !important; min-height: 0 !important;
+    grid-template-rows: repeat(4, minmax(0, 1fr)) !important;
+    grid-auto-rows: minmax(0, 1fr) !important;
+  }
+  html body .tile-grid.tile-grid--cams > .tile {
+    min-height: 0 !important; height: auto !important; max-height: 100% !important;
+  }
+  /* Leave-by day columns: tighter stops so a 3-stop afternoon fits without scrolling */
+  html body .leaveby .lb-day-stop { padding-top: 2px !important; padding-bottom: 2px !important; margin-bottom: 2px !important; gap: 0 !important; }
+  html body .leaveby .lb-day-what { line-height: 1.12 !important; }
+  html body .panel.panel .leaveby .lb-day-t { font-size: 18px !important; line-height: 1.05 !important; }
+  html body .panel.panel .leaveby .lb-day-part { margin-bottom: 2px !important; }
+  html body .panel.panel .leaveby .lb-day-stop { padding-top: 2px !important; padding-bottom: 2px !important; }
+}
+
+/* ——— Phone ——— */
+@media (max-width: 600px) {
+  html, body { width: 100% !important; min-width: 0 !important; overflow-x: hidden !important; }
+  html body .panel {
+    width: 100% !important; min-width: 0 !important; height: auto !important; max-height: none !important;
+    min-height: 100vh; overflow: visible !important;
+    padding: max(10px, env(safe-area-inset-top)) 10px max(16px, env(safe-area-inset-bottom)) !important;
+    gap: 10px !important;
+  }
+  /* Header: name centered on top; clock/date left + weather/thermostat right underneath */
+  html body .panel.panel.panel header.hdr {
+    display: grid !important; grid-template-columns: auto 1fr !important; grid-template-areas: "brand brand" "date ovals" !important;
+    align-items: center !important; height: auto !important; min-height: 0 !important; gap: 6px 10px !important; padding: 10px 12px !important;
+  }
+  html body .panel.panel.panel header.hdr > .hdr-brand { grid-area: brand !important; position: static !important; transform: none !important; text-align: center !important; justify-self: center !important; width: auto !important; }
+  html body .panel.panel.panel header.hdr > .hdr-date { grid-area: date !important; position: static !important; min-width: 0 !important; }
+  html body .panel.panel.panel header.hdr > .hdr-ovals, html body .panel.panel.panel header.hdr > .hdr-right { grid-area: ovals !important; position: static !important; justify-self: end !important; min-width: 0 !important; max-width: 100% !important; gap: 6px !important; flex-wrap: nowrap !important; }
+  html body .panel.panel.panel header.hdr .hdr-ovals > * { min-width: 0 !important; flex: 0 1 auto !important; }
+  html body .panel.panel.panel header.hdr > .hdr-ovals { zoom: 0.76; }
+  html body .panel.panel.panel header.hdr .hdr-brand, html body .panel.panel.panel header.hdr .hdr-brand * { font-size: 30px !important; line-height: 1.05 !important; }
+  html body .panel.panel.panel header.hdr .hdr-date-time { font-size: 26px !important; }
+  /* Cams: 3 across, 16:9 */
+  html body .panel.panel.panel #hub-cam-deck.hub-cam-deck { flex: none !important; min-height: 0 !important; max-height: none !important; grid-template-rows: auto !important; grid-auto-rows: auto !important; align-items: start !important; height: auto !important; grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; }
+  html body .panel.panel.panel .hub-cam-deck .hub-cam { height: auto !important; }
+  html body .panel.panel.panel .hub-cam-deck .hub-cam-media-wrap { flex: none !important; height: auto !important; min-height: 0 !important; max-height: none !important; aspect-ratio: 4 / 3 !important; overflow: hidden !important; }
+  html body .panel.panel.panel .hub-cam-deck .hub-cam { flex: none !important; height: auto !important; min-height: 0 !important; max-height: none !important; align-self: start !important; }
+  html body .panel.panel.panel .hub-cam-deck .hub-cam-media-wrap img, html body .panel.panel.panel .hub-cam-deck .hub-cam-media-wrap video { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+  html body .panel.panel.panel .leaveby .lb-day-what { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; -webkit-line-clamp: unset !important; display: block !important; }
+  html body .panel.panel.panel .hub-cam-deck .hub-cam-foot { height: auto !important; min-height: 24px; font-size: 10px !important; }
+  /* Command card + lights stack full width */
+  html body .panel.panel.panel .hub-upper.hub-upper--cams.hub-upper--cmd.hub-upper--hot, html body .panel.panel.panel .hub-upper { flex: none !important; flex-direction: column !important; height: auto !important; min-height: 0 !important; max-height: none !important; gap: 10px !important; }
+  html body .panel.panel.panel .hub-upper.hub-upper--cams > section.leaveby, html body .panel.panel.panel .hub-upper.hub-upper--cams > section#hub-lights-panel, html body .panel.panel.panel .hub-upper > section { min-width: 0 !important; width: 100% !important; max-width: none !important; height: auto !important; flex: none !important; }
+  html body .panel.panel.panel .leaveby, html body .panel.panel.panel .leaveby .leaveby-layouts, html body .panel.panel.panel .leaveby .lb-layout, html body .panel.panel.panel .leaveby .lb-day-cols { flex: none !important; max-height: none !important; min-height: 0 !important; height: auto !important; overflow: visible !important; overflow-y: visible !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-lights-grid { height: auto !important; max-height: none !important; overflow: visible !important; }
+  html body .panel.panel.panel .who-up { flex: none !important; height: auto !important; min-height: 0 !important; max-height: none !important; }
+  html body .panel.panel.panel #hub-lights-panel { flex: none !important; min-height: 0 !important; max-height: none !important; }
+  /* Tiles: 2 across, natural height */
+  html body .panel.panel.panel .grid-wrap { flex: none !important; height: auto !important; overflow: visible !important; }
+  html body .panel.panel.panel .tile-grid.tile-grid--cams {
+    height: auto !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: none !important; grid-auto-rows: auto !important; gap: 8px !important;
+  }
+  html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile { min-height: 150px !important; height: auto !important; max-height: none !important; }
+  html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.kid-flip { grid-column: 1 / -1; min-height: 170px !important; }
+  /* LED ring stays; thinner on phone */
+  html body .panel.panel.panel svg.led-ring path { stroke-width: 2px !important; }
+}

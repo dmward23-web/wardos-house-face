@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=1080" />
+<meta name="viewport" id="hf-viewport" content="width=1080" />
+<script>/* HUBFIT1 · phones get their own layout; the wall keeps 1080 */(function(){try{var w=Math.min(screen.width,screen.height);if(w&&w<=600){document.getElementById("hf-viewport").setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon-20260926c.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -3757,6 +3758,8 @@
 .hdr.hdr--spread.hdr--heat .eyebrow,
 .hdr.hdr--spread.hdr--heat .tagline { display: none !important; }
 </style>
+<!-- HUBFIT2 · must load after every inline <style> so wall-fit + phone rules win -->
+<link rel="stylesheet" href="tokens-hub-fit.css?v=HUBFIT2" />
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -4381,6 +4384,16 @@
   function fitPortrait() {
     var panel = document.querySelector(".panel");
     if (!panel) return;
+    /* HUBFIT1 · phones use their own responsive layout (tokens-hub-fit.css) — never shrink the wall canvas */
+    try {
+      if (Math.min(screen.width, screen.height) <= 600) {
+        panel.style.transform = ""; panel.style.transformOrigin = "";
+        panel.style.marginLeft = "0"; panel.style.marginTop = "0";
+        document.documentElement.setAttribute("data-hub-fit", "phone");
+        document.documentElement.style.setProperty("--hub-fit-scale", "1");
+        return;
+      }
+    } catch (e) {}
     var vw = window.innerWidth || document.documentElement.clientWidth || 1080;
     var vh = window.innerHeight || document.documentElement.clientHeight || 1920;
     var sx = vw / 1080;
