@@ -132,11 +132,10 @@ function attachWriteProxy(payload) {
   payload.writePath = "scripts/lights-write-proxy.mjs → kasa-write.py (cloud)";
   // LIGHTS6: publish token only when proxy is a public URL (Pages cannot use loopback).
   // Kasa email/password NEVER go here.
-  if (token && !isLoopbackProxyUrl(writeProxy)) {
-    payload.writeProxyToken = token;
-  } else {
-    delete payload.writeProxyToken;
-  }
+  // KEYROT2 (9/29): proxy key is NEVER published to public Pages. Wall devices are
+  // seeded once via ?lightsProxyToken= (stored in localStorage by house-lights.js).
+  void token;
+  delete payload.writeProxyToken;
   return payload;
 }
 
