@@ -1170,6 +1170,7 @@
     return html + "</div>";
   }
   function paintDan() {
+    if (document.querySelector("[data-dad-seat]")) return; /* DADSEAT1 page paints itself */
     var tEl = document.querySelector("[data-mount-dan-today]");
     var wEl = document.querySelector("[data-mount-dan-week]");
     if ((!tEl && !wEl) || !global.HouseClock) return;
@@ -1214,6 +1215,9 @@
     LAYOUTS: LAYOUTS,
     layoutWeekDays: layoutWeekDays,
     paintDan: paintDan,
-    CAL_FRESH_MS: CAL_FRESH_MS
+    CAL_FRESH_MS: CAL_FRESH_MS,
+    /* DADSEAT1 · read-only helpers for the Dad seat page */
+    _h: { loadCal: loadCal, listEvents: listEvents, eventStartMs: eventStartMs, eventDayIso: eventDayIso,
+      whoNames: whoNames, dayTitle: dayTitle, shortTime: shortTime, isPrep: isPrep, addDaysIso: addDaysIso }
   };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -89,6 +89,48 @@
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
 <link rel="stylesheet" href="tokens-dad-clock-first-heat.css?v=DADGLANCE1" />
 <link rel="stylesheet" href="tokens-dad-fix1-heat.css?v=DADGLANCE1" />
+<style>
+/* DADSEAT1 · Dad seat page — kid-card look, gold */
+.ds{display:flex;flex-direction:column;gap:16px;padding:6px 0 10px}
+.ds-next{background:linear-gradient(155deg,rgba(40,36,28,.92),rgba(20,18,16,.94));border:1.5px solid rgba(255,200,80,.55);border-radius:26px;padding:26px 30px;box-shadow:0 0 0 1px rgba(0,0,0,.4) inset,0 0 36px rgba(255,180,40,.18)}
+.ds-kick{font-size:20px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,224,128,.78)}
+.ds-big{display:flex;align-items:baseline;gap:22px;flex-wrap:wrap;margin-top:6px}
+.ds-time{font-size:96px;font-weight:900;letter-spacing:-.04em;line-height:1;color:#ffe080;text-shadow:0 0 24px rgba(255,180,30,.45)}
+.ds-cd{font-size:30px;font-weight:800;color:#0e0a02;background:#ffd35a;border-radius:999px;padding:6px 18px}
+.ds-what{font-size:40px;font-weight:800;color:#f4f0e4;line-height:1.15;margin-top:10px}
+.ds-tags{display:flex;gap:8px;margin-top:12px}
+.ds-tag{font-size:18px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 12px;border-radius:10px;background:rgba(255,224,128,.18);color:#ffe9a8}
+.ds-tag[data-who=Ainsley]{background:rgba(236,72,153,.3);color:#ffd1e8}.ds-tag[data-who=Hayes]{background:rgba(56,152,255,.3);color:#cfe6ff}.ds-tag[data-who=Harris]{background:rgba(52,199,120,.3);color:#c9f5dc}
+.ds-line{font-size:24px;font-weight:700;color:rgba(232,220,180,.85);padding:0 8px;margin-top:-4px}
+.ds .kids-row{margin:0}
+.ds-sec{background:rgba(14,13,11,.86);border:1px solid rgba(255,200,80,.28);border-radius:22px;padding:18px 20px}
+.ds-hd{font-size:20px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#ffe080;margin-bottom:10px}
+.ds-hd span{font-size:15px;letter-spacing:.06em;color:rgba(232,220,180,.55);margin-left:10px;text-transform:none}
+.ds-stop{display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:14px;padding:12px 4px;border-top:1px solid rgba(255,255,255,.07)}
+.ds-stop:first-child{border-top:0}
+.ds-st{font-size:30px;font-weight:900;color:#f2eee6;letter-spacing:-.03em}
+.ds-st em{display:block;font-style:normal;font-size:15px;font-weight:800;letter-spacing:.12em;color:rgba(255,224,128,.7);text-transform:uppercase}
+.ds-sw{font-size:26px;font-weight:700;color:#e8e2d6;line-height:1.2}
+.ds-sd,.ds-rd{display:flex;gap:5px}
+.ds-dot{width:14px;height:14px;border-radius:50%;background:#ffd35a;box-shadow:0 0 8px rgba(255,200,80,.5)}
+.ds-dot[data-who=Ainsley]{background:#f098d4;box-shadow:0 0 8px rgba(240,152,212,.6)}.ds-dot[data-who=Hayes]{background:#5ec8e8;box-shadow:0 0 8px rgba(94,200,232,.6)}.ds-dot[data-who=Harris]{background:#7ed492;box-shadow:0 0 8px rgba(126,212,146,.6)}
+.ds-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ds-day{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,224,128,.18);border-radius:18px;padding:14px 16px;cursor:pointer;min-width:0}
+.ds-day.is-first{grid-column:1/-1;border-color:rgba(255,224,128,.5);box-shadow:0 0 18px rgba(255,180,30,.14)}
+.ds-day.is-open{grid-column:1/-1;background:rgba(255,224,128,.06)}
+.ds-dh{display:flex;align-items:baseline;gap:10px;margin-bottom:2px}
+.ds-dn{font-size:22px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#ffe080}
+.ds-dd{font-size:22px;font-weight:800;color:#f2eee6}
+.ds-dc{margin-left:auto;font-size:16px;font-weight:800;color:rgba(232,220,180,.6)}
+.ds-row{display:grid;grid-template-columns:86px 1fr auto;gap:10px;align-items:center}
+.ds-row.is-aware{opacity:.55}
+.ds-rt{font-size:19px;font-weight:800;color:rgba(255,224,128,.9)}
+.ds-rw{font-size:19px;font-weight:700;color:#e8e2d6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ds-day.is-open .ds-rw{white-space:normal}
+.ds-more{font-size:16px;font-weight:800;color:rgba(232,220,180,.6);letter-spacing:.04em}
+.ds-none{font-size:19px;color:#8d877c}
+.ds-foot{font-size:17px;font-weight:700;color:rgba(232,220,180,.7);padding:6px 10px;border-top:1px solid rgba(255,200,80,.2)}
+</style>
 </head>
 <body data-kid="dan" data-theme="dan">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -350,61 +392,24 @@
  </div>
  </header>
 
- <a class="banner" href="sheet-countdowns.html" aria-label="Next leave · Dad week">
- <div class="banner-accent"></div>
- <div class="banner-body">
- <div class="banner-lab">NEXT UP · leave by</div>
- <div class="banner-title">Kids with you @ 147th · through Fri Oct 2 · 3:00</div>
- <div class="banner-sub" data-dan-banner-sub>Next · Tue 7:30 pack late-lunch snacks · HD vanity return Wed 9:00</div>
- </div>
- </a>
-
+ <main class="ds" data-dad-seat>
+ <section class="ds-next" data-ds-next><div class="ds-kick">Up next</div><div class="ds-big"><span class="ds-time">Dad week</span></div><div class="ds-what">Reading your calendar</div></section>
+ <div class="ds-line" data-ds-line></div>
  <div class="kids-row" aria-label="Jump to kid boards">
  <a class="kid-link harris" href="kid-harris.html"><span class="dot g2-av harr"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-harris"/></svg></span> Harris</a>
  <a class="kid-link hayes" href="kid-hayes.html"><span class="dot g2-av hayes"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-hayes"/></svg></span> Hayes</a>
  <a class="kid-link ainsley" href="kid-ainsley.html"><span class="dot g2-av ains"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-ainsley"/></svg></span> Ainsley</a>
  </div>
-
- <div class="body">
- <section class="sec">
- <div class="sec-hdr"><div class="sec-title">Today · your leave stack</div><div class="sec-meta" data-live="date-short">Mon Sep 28</div></div>
- <div class="sec-list" data-mount-dan-today>
- <a class="card hot" href="sheet-today.html"><div class="when">Dad week</div><div class="what">Kids with you @ 147th</div><div class="hint">through Fri Oct 2 · 3:00</div></a>
- <a class="card" href="sheet-countdowns.html"><div class="when">Leave stack</div><div class="what">Next leave-bys</div><div class="hint">→ countdowns</div></a>
- <a class="card" href="sheet-chores.html"><div class="when">Musts</div><div class="what">Kids clear · chores board</div><div class="hint">→ sheet-chores</div></a>
- <a class="card" href="sheet-pack.html"><div class="when">Pack</div><div class="what">Dad week pack</div><div class="hint">→ sheet-pack</div></a>
- </div>
+ <section class="ds-sec">
+ <div class="ds-hd" data-ds-tl-hd>Next 24 hours</div>
+ <div class="ds-tl" data-ds-tl></div>
  </section>
- <section class="sec">
- <div class="sec-hdr"><div class="sec-title">This week · kids with Dad</div><div class="sec-meta">known</div></div>
- <div class="sec-list" data-mount-dan-week>
- <a class="card hot" href="month.html"><div class="when">Through Fri Oct 2 · 3:00</div><div class="what">Dad week @ 147th</div><div class="hint">Handoff Fri</div></a>
- <a class="card" href="sheet-today.html"><div class="when">Tue–Thu</div><div class="what">School mornings</div><div class="hint">Leave stack builds</div></a>
- <a class="card" href="sheet-chores.html"><div class="when">Daily</div><div class="what">Chores board</div><div class="hint">→ sheet-chores</div></a>
- <a class="card" href="sheet-dinner.html"><div class="when">Eve</div><div class="what">Dinner window</div><div class="hint">→ sheet-dinner</div></a>
- </div>
+ <section class="ds-sec">
+ <div class="ds-hd">This week <span>tap a day for everything</span></div>
+ <div class="ds-grid" data-ds-week></div>
  </section>
- <section class="sec">
- <div class="sec-hdr"><div class="sec-title">Leave-bys</div><div class="sec-meta">standing</div></div>
- <div class="sec-list" data-mount-dan-leave>
- <a class="card" href="sheet-countdowns.html"><div class="when">School</div><div class="what">Drop · mornings</div><div class="hint">Known only</div></a>
- <a class="card" href="sheet-countdowns.html"><div class="when">Activities</div><div class="what">Sports · swim · vanity</div><div class="hint">Empty = unknown</div></a>
- <a class="card" href="sheet-pack.html"><div class="when">Pack</div><div class="what">Dad week pack list</div><div class="hint">→ sheet-pack</div></a>
- <a class="card" href="sheet-weekend.html"><div class="when">Weekend</div><div class="what">Weekend board</div><div class="hint">→ sheet-weekend</div></a>
- </div>
- </section>
- <section class="sec">
- <div class="sec-hdr"><div class="sec-title">Your picks</div><div class="sec-meta">kids-safe</div></div>
- <div class="sec-list" data-mount-dan-picks>
- <a class="card" href="kid-harris.html"><div class="when">Harris</div><div class="what">Block World board</div><div class="hint">Musts · Jar · Days</div></a>
- <a class="card" href="kid-hayes.html"><div class="when">Hayes</div><div class="what">Drop Zone board</div><div class="hint">Musts · Jar · Days</div></a>
- <a class="card" href="kid-ainsley.html"><div class="when">Ainsley</div><div class="what">Vinyl board</div><div class="hint">Musts · Jar · Days</div></a>
- <a class="card" href="sheet-allowance.html"><div class="when">Jar</div><div class="what">Allowance / jar</div><div class="hint">Live tally only</div></a>
- </div>
- </section>
- </div>
-
- <div class="note">Kids-safe Dad box · no Desk cash · no Ledger · no Harbor drafts · calendar facts from House / Atlas only · empty = unknown</div>
+ <div class="ds-foot" data-ds-foot></div>
+ </main>
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center">
@@ -415,7 +420,7 @@
  </footer>
 </div>
 <script src="house-clock.js?v=DADGLANCE1"></script>
-<script src="house-board-strip.js?v=SOFTGONE1"></script>
+<script src="house-board-strip.js?v=DADSEAT1"></script>
 <script src="kids-data.js?v=NOSURP2"></script>
 <script src="house-weather.js?v=RAINNOW1"></script>
 <script src="house-sensi.js?v=DADGLANCE1"></script>
@@ -504,6 +509,7 @@
 })();
 </script>
 
-<script src="house-fresh.js?v=FRESH1"></script>
+<script src="dad-seat.js?v=DADSEAT1"></script>
+<script src="house-fresh.js?v=DADSEAT1"></script>
 </body>
 </html>
