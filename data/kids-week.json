@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-29T22:02:45.326Z",
+  "refreshedAt": "2026-09-29T22:19:24.886Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -18,8 +18,8 @@
   "boardStrip": {
     "label": "Next up · today",
     "time": "6:00",
-    "place": "Hayes flag practice · 6:00 · Maria drives",
-    "detailHtml": "6:55 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "place": "CANCELED (rain) · Hayes flag practice",
+    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Tue",
     "startIso": "2026-09-29T23:00:00.000Z",
     "endIso": "2026-09-30T00:15:00.000Z",
@@ -28,26 +28,26 @@
       {
         "label": "Next up · today",
         "time": "6:00",
-        "place": "Hayes flag practice · 6:00 · Maria drives",
-        "detailHtml": "6:55 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "place": "CANCELED (rain) · Hayes flag practice",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T23:00:00.000Z",
         "endIso": "2026-09-30T00:15:00.000Z",
         "kind": "sport",
         "whenLabel": "6:00",
-        "summary": "Hayes flag practice · 6:00 · Maria drives"
+        "summary": "CANCELED (rain) · Hayes flag practice"
       },
       {
         "label": "Next up · today",
         "time": "6:55",
-        "place": "Pick up Hayes + Theo from flag",
-        "detailHtml": "6:00 Hayes flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "place": "Get Hayes from Maria's · time TBD",
+        "detailHtml": "6:00 CANCELED (rain) · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T23:55:00.000Z",
         "endIso": "2026-09-30T00:45:00.000Z",
-        "kind": "leave",
+        "kind": "other",
         "whenLabel": "6:55",
-        "summary": "Pick up Hayes + Theo from flag · leave 6:55 · 7:15"
+        "summary": "Get Hayes from Maria's · time TBD"
       },
       {
         "label": "Next up · Wed",
@@ -508,7 +508,7 @@
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
         "when": "TUE · 6:00",
-        "what": "HAYES FLAG PRACTICE · 6:00 · MARIA DRIVES",
+        "what": "CANCELED (RAIN) · HAYES FLAG PRACTICE",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "TUE",
@@ -519,9 +519,16 @@
         {
           "kind": "event",
           "when": "Tue · 6:00",
-          "what": "Hayes flag practice · 6:00 · Maria drives",
+          "what": "CANCELED (rain) · Hayes flag practice",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "kind": "event",
+          "when": "Tue · 6:55",
+          "what": "Get Hayes from Maria's · time TBD",
+          "hint": "",
+          "tone": "act"
         },
         {
           "kind": "note",
@@ -534,7 +541,7 @@
       "sports": [
         {
           "when": "Tue 29 · leave 6:00",
-          "what": "Hayes flag practice · 6:00 · Maria drives",
+          "what": "CANCELED (rain) · Hayes flag practice",
           "hint": "YOUR board",
           "tone": "hot"
         },
@@ -779,12 +786,6 @@
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
-        },
-        {
-          "when": "Tue 6 · leave 5:00",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
         }
       ],
       "school": [
@@ -908,12 +909,7 @@
         },
         {
           "when": "Tue · 6:00",
-          "what": "Hayes flag practice · 6:00 · Maria drives",
-          "tone": "hot"
-        },
-        {
-          "when": "Tue · 6:55",
-          "what": "Pick up Hayes + Theo from flag",
+          "what": "CANCELED (rain) · Hayes flag practice",
           "tone": "hot"
         },
         {
@@ -930,12 +926,7 @@
         },
         {
           "when": "Tue 29 · 6:00",
-          "what": "Hayes flag practice · 6:00 · Maria drives",
-          "tone": "hot"
-        },
-        {
-          "when": "Tue 29 · 6:55",
-          "what": "Pick up Hayes + Theo from flag",
+          "what": "CANCELED (rain) · Hayes flag practice",
           "tone": "hot"
         },
         {
@@ -1041,6 +1032,11 @@
         {
           "when": "Mon 5 · 1:40",
           "what": "appointment",
+          "tone": "act"
+        },
+        {
+          "when": "Mon 5 · 3:00",
+          "what": "LKMS Homework Help",
           "tone": "act"
         }
       ]
