@@ -1285,6 +1285,38 @@
     ainsley: { world: "Tour world", loadout: "Tour loadout", markSym: "g2-ainsley", hqTitle: "Base with Dad", hqSym: "g2-home" }
   };
 
+  /* HUBSCROLL1 · daily SPECIAL — sourced only, never invented.
+     Hayes: Ms. Allen ParentSquare / cal PE note (“Specials: Mon Art, Tue Spanish, Wed Music, Thu PE, Fri Art”).
+     Harris: Kysa cal PE notes only (Thu PE · tennis shoes) — no weekly rotation in source. */
+  var SRE_SPECIALS = {
+    hayes: {
+      source: "Ms. Allen · ParentSquare / cal PE note",
+      Mon: "Art",
+      Tue: "Spanish",
+      Wed: "Music",
+      Thu: "PE · tennis shoes",
+      Fri: "Art"
+    },
+    harris: {
+      source: "Kysa · cal PE notes",
+      Thu: "PE · tennis shoes"
+    }
+  };
+
+  function specialForIso(kidId, iso) {
+    var map = SRE_SPECIALS[kidId];
+    if (!map || !iso) return null;
+    var dow = CONSUME_DOW[dowIndexFromIso(iso)];
+    if (!dow || !map[dow]) return null;
+    return {
+      when: dow + " · Special",
+      what: "Special · " + map[dow],
+      hint: map.source || "",
+      tone: "act",
+      kind: "special"
+    };
+  }
+
   function kidsSafeGlass(s) {
     var t = String(s == null ? "" : s);
     t = t.replace(/\bCUSTODY\b/gi, "WITH DAD");
@@ -1382,6 +1414,27 @@
     push(kid.sports, "sports");
     push(kid.school, "school");
     push(kid.appointments, "appointments");
+    /* Daily SPECIAL into school strip · sourced rotation only */
+    var kidId = kid && kid.id;
+    if (kidId && SRE_SPECIALS[kidId]) {
+      var weekStart = mondayOfIso(DAY_ISO);
+      for (var si = 0; si < 7; si++) {
+        var iso = addDaysIsoLocal(weekStart, si);
+        var sp = specialForIso(kidId, iso);
+        if (!sp) continue;
+        /* Stamp day num so consumeParseWhen buckets correctly */
+        var dow = CONSUME_DOW[dowIndexFromIso(iso)];
+        var dn = String(Number(String(iso).split("-")[2]));
+        list.push({
+          when: dow + " " + dn + " · Special",
+          what: kidsSafeGlass(sp.what),
+          hint: kidsSafeGlass(sp.hint || ""),
+          tone: "act",
+          kind: "special",
+          bucket: "school"
+        });
+      }
+    }
     return list;
   }
 
@@ -1392,6 +1445,7 @@
     if (/swim/.test(w)) return { html: '<span class="g2-lead">' + g2Ico("g2-swim") + "</span>", text: "" };
     if (/hearing|vision|screening/.test(w)) return { html: "", text: "👁️" };
     if (/field\s*trip|museum/.test(w)) return { html: "", text: "🚌" };
+    if (/special|\bart\b|spanish|music/.test(w)) return { html: "", text: "🎨" };
     if (/\bpe\b|tennis/.test(w)) return { html: "", text: "👟" };
     if (/collab|madi|provider/.test(w)) return { html: "", text: "👥" };
     if (/anxiety|midwest|doctor|appt/.test(w)) return { html: "", text: "🩺" };
@@ -1815,7 +1869,14 @@
     } else {
       renderList(document.querySelector("[data-mount-today-events]"), kid.today, "easy day · your quests below");
       renderList(document.querySelector("[data-mount-sports]"), kid.sports, kid.sportsEmpty || "no sports on your board right now");
-      renderList(document.querySelector("[data-mount-school]"), kid.school, "school bits show up when known");
+      (function () {
+        var schoolRows = (kid.school || []).slice();
+        var sp = specialForIso(kidId, DAY_ISO);
+        if (sp) {
+          schoolRows = [{ when: "Today · Special", what: sp.what, hint: sp.hint, tone: "act" }].concat(schoolRows);
+        }
+        renderList(document.querySelector("[data-mount-school]"), schoolRows, "school bits show up when known");
+      })();
       renderList(document.querySelector("[data-mount-appointments]"), kid.appointments, kid.appointmentsEmpty || "none on your board · quiet is good");
     }
     renderList(document.querySelector("[data-mount-fun]"), kid.fun, "fun picks land here");

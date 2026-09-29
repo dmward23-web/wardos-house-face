@@ -1,4 +1,4 @@
-/* House Face · HUBBREATHE1 · kid flip · who’s up breathes · hub quest off · claim · streak · SFX
+/* House Face · HUBSCROLL1 · kid flip · who’s up = active leave window only · shared boys · scroll
    LIVE only · WardKids · HUBTOK1 atoms. Bind-once guards · tap-to-cycle · OPEN nav.
    No leaveby/cam/nest/sensi JSON. */
 (function (global) {
@@ -167,6 +167,11 @@
     if (/\bAinsley\b/i.test(s)) out.push("ainsley");
     if (/\bHayes\b/i.test(s)) out.push("hayes");
     if (/\bHarris\b/i.test(s)) out.push("harris");
+    /* Boys / shared SRE-style titles → both boys when neither named alone */
+    if (/\bBoys\b/i.test(s) || /\bboth\s+boys\b/i.test(s)) {
+      if (out.indexOf("hayes") < 0) out.push("hayes");
+      if (out.indexOf("harris") < 0) out.push("harris");
+    }
     return out;
   }
 
@@ -229,6 +234,39 @@
     return "UPCOMING";
   }
 
+  /** Active leave window: within 45m before start through event end. Not tomorrow's next. */
+  var LEAVE_PRE_MS = 45 * 60 * 1000;
+
+  function inLeaveWindow(leave) {
+    if (!leave || leave.source === "hottest") return false;
+    var start = leave.start || Date.parse(leave.startIso || "") || 0;
+    if (!start) return false;
+    var end = Date.parse(leave.endIso || "") || 0;
+    if (!end) end = start + 90 * 60 * 1000;
+    var now = Date.now();
+    return now >= (start - LEAVE_PRE_MS) && now <= end;
+  }
+
+  function sameLeave(a, b) {
+    if (!a || !b) return false;
+    if (a.startIso && b.startIso && a.startIso === b.startIso) return true;
+    if (a.start && b.start && a.start === b.start && a.title === b.title) return true;
+    return false;
+  }
+
+  function formatWhoNames(kidIds) {
+    var names = [];
+    (kidIds || []).forEach(function (id) {
+      if (ACCENT[id] && ACCENT[id].name) names.push(ACCENT[id].name);
+    });
+    if (names.length === 2 && names.indexOf("Hayes") >= 0 && names.indexOf("Harris") >= 0) {
+      return "Hayes + Harris";
+    }
+    if (names.length <= 1) return names[0] || "";
+    if (names.length === 2) return names[0] + " + " + names[1];
+    return names.slice(0, -1).join(", ") + " + " + names[names.length - 1];
+  }
+
   /** Next leave/event for a kid from embedded boardStrip.queue or kid hottest. */
   function nextLeaveFor(kidId) {
     var d = data();
@@ -248,6 +286,7 @@
       best = {
         start: start || 0,
         startIso: item.startIso || item.start || "",
+        endIso: item.endIso || item.end || "",
         time: cleanWallTime(item.time, item.startIso || item.start),
         badge: item.badge || "",
         title: shortTitle(item.place || item.summary || item.what || item.title || "Next up"),
@@ -301,14 +340,18 @@
   }
 
   function soonestWhoUp() {
+    /* Only light when someone is IN an active leave window — quiet otherwise.
+       Shared events (Hayes + Harris SRE) name ALL kids on that leave. */
     var best = null;
     for (var i = 0; i < KIDS.length; i++) {
       var id = KIDS[i];
       var leave = nextLeaveFor(id);
-      if (!leave) continue;
+      if (!leave || !inLeaveWindow(leave)) continue;
       var score = leave.start || Number.MAX_SAFE_INTEGER;
       if (!best || score < best.score) {
-        best = { kidId: id, leave: leave, score: score };
+        best = { kidId: id, kidIds: [id], leave: leave, score: score };
+      } else if (score === best.score && sameLeave(best.leave, leave)) {
+        if (best.kidIds.indexOf(id) < 0) best.kidIds.push(id);
       }
     }
     return best;
@@ -759,18 +802,24 @@
     var go = host.querySelector("[data-who-go]");
     if (!pick) {
       host.setAttribute("data-kid", "");
-      if (main) main.innerHTML = '<span class="who-up-name">Clear</span><span class="who-up-what">No kid leave queued</span>';
+      host.removeAttribute("data-kids");
+      host.classList.add("is-quiet");
+      if (main) main.innerHTML = '<span class="who-up-name">Quiet</span><span class="who-up-what">No leave window</span>';
       if (meta) meta.textContent = "LIVE cal";
       if (go) { go.setAttribute("href", "#"); go.hidden = true; }
       return;
     }
-    var id = pick.kidId;
+    var kidIds = (pick.kidIds && pick.kidIds.length) ? pick.kidIds.slice() : [pick.kidId];
+    var id = kidIds[0];
     var leave = pick.leave;
     var mins = minsUntilIso(leave.startIso);
-    host.setAttribute("data-kid", id);
+    var label = formatWhoNames(kidIds);
+    host.classList.remove("is-quiet");
+    host.setAttribute("data-kid", kidIds.length === 1 ? id : kidIds.join(" "));
+    host.setAttribute("data-kids", kidIds.join(","));
     if (main) {
       main.innerHTML =
-        '<span class="who-up-name">' + esc(ACCENT[id].name) + "</span>" +
+        '<span class="who-up-name">' + esc(label) + "</span>" +
         '<span class="who-up-time">' + esc(leave.time || leave.badge || "") + "</span>" +
         '<span class="who-up-what">' + esc(leave.title) + "</span>";
     }
@@ -778,7 +827,13 @@
     if (go) {
       go.hidden = false;
       go.setAttribute("href", HREF[id]);
-      go.textContent = "OPEN · " + ACCENT[id].name.toUpperCase();
+      if (kidIds.length === 2 && kidIds.indexOf("hayes") >= 0 && kidIds.indexOf("harris") >= 0) {
+        go.textContent = "OPEN · BOYS";
+      } else if (kidIds.length > 1) {
+        go.textContent = "OPEN";
+      } else {
+        go.textContent = "OPEN · " + ACCENT[id].name.toUpperCase();
+      }
     }
   }
 
@@ -939,6 +994,7 @@
     streakDays: streakDays,
     nextLeaveFor: nextLeaveFor,
     soonestWhoUp: soonestWhoUp,
+    inLeaveWindow: inLeaveWindow,
     paintDailyQuest: paintDailyQuest,
     FACES: FACES
   };

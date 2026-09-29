@@ -1,4 +1,4 @@
-/* House Face · live leave-by / Schedule strip (HUBGLASS1).
+/* House Face · live leave-by / Schedule strip (HUBSCROLL1 · kid-first schedule).
    Date labels ALWAYS from HouseClock (America/Chicago).
    Authority: data/cal-live.json (dmward23 → cal-from-events.mjs).
    Panel paints today's remaining + tomorrow peek (dense list, hub-scale type).
@@ -9,8 +9,46 @@
   "use strict";
 
   var CAL_FRESH_MS = 6 * 60 * 60 * 1000;
-  var MAX_TODAY = 8;
-  var MAX_TOMORROW = 6;
+  var MAX_TODAY = 12;
+  var MAX_TOMORROW = 12;
+
+  /** Kid / school / sports glass — never drop these for errands. */
+  function isKidActivity(ev) {
+    var s = String((ev && (ev.summary || ev.place || "")) || "");
+    if (/\b(Ainsley|Hayes|Harris|Boys)\b/i.test(s)) return true;
+    if (/\b(swim|flag|baseball|SRE|LKMS|practice|game|PE|special|hearing|vision|field\s*trip|homework|collab|screening)\b/i.test(s)) return true;
+    return false;
+  }
+
+  function isNoiseEvent(ev) {
+    var s = String((ev && (ev.summary || ev.place || "")) || "");
+    if (isKidActivity(ev)) return false;
+    if (/^Free\b/i.test(s)) return true;
+    if (/\b(Amazon|Hank|HD #\d+|lever return|vanity|scooter)\b/i.test(s)) return true;
+    if (/^Dan\b/i.test(s) && !/\b(Hayes|Harris|Ainsley|Boys)\b/i.test(s)) return true;
+    if (/^Leave\s*·/i.test(s) && !/\b(Hayes|Harris|Ainsley|Boys|SRE|swim|flag|baseball)\b/i.test(s)) return true;
+    return false;
+  }
+
+  function sortByStart(a, b) {
+    return eventStartMs(a) - eventStartMs(b);
+  }
+
+  /** Prefer kid activities; never slice them off for noise. */
+  function preferKidItems(items, softCap) {
+    softCap = softCap || MAX_TOMORROW;
+    var list = (items || []).slice();
+    var kid = [];
+    var rest = [];
+    for (var i = 0; i < list.length; i++) {
+      if (isKidActivity(list[i]) && !isNoiseEvent(list[i])) kid.push(list[i]);
+      else rest.push(list[i]);
+    }
+    var out = kid.concat(rest);
+    var floor = kid.length;
+    var cap = Math.max(softCap, floor);
+    return out.slice(0, Math.min(out.length, cap));
+  }
 
   function esc(s) {
     return String(s == null ? "" : s)
@@ -167,30 +205,47 @@
       if (eventStartMs(ev) > nowMs) out.push(ev);
     }
     out.sort(function (a, b) {
+      var ka = isKidActivity(a) ? 0 : (isNoiseEvent(a) ? 2 : 1);
+      var kb = isKidActivity(b) ? 0 : (isNoiseEvent(b) ? 2 : 1);
+      if (ka !== kb) return ka - kb;
       if (a.allDay && !b.allDay) return -1;
       if (!a.allDay && b.allDay) return 1;
       return eventStartMs(a) - eventStartMs(b);
     });
-    return out.slice(0, MAX_TODAY);
+    return preferKidItems(out, MAX_TODAY);
   }
 
   function tomorrowPeek(cal, clock) {
     var tmr = addDaysIso(clock.iso, 1);
     var list = listEvents(cal);
+    var kid = [];
     var busy = [];
     var allday = [];
     var other = [];
+    var noise = [];
     for (var i = 0; i < list.length; i++) {
       var ev = list[i];
       if (eventDayIso(ev) !== tmr) continue;
-      if (ev.allDay) allday.push(ev);
-      else if (ev.busy) busy.push(ev);
-      else other.push(ev);
+      if (ev.allDay) {
+        if (isKidActivity(ev)) kid.push(ev);
+        else allday.push(ev);
+      } else if (isNoiseEvent(ev)) {
+        noise.push(ev);
+      } else if (isKidActivity(ev)) {
+        kid.push(ev);
+      } else if (ev.busy) {
+        busy.push(ev);
+      } else {
+        other.push(ev);
+      }
     }
-    busy.sort(function (a, b) { return eventStartMs(a) - eventStartMs(b); });
-    other.sort(function (a, b) { return eventStartMs(a) - eventStartMs(b); });
-    var merged = allday.concat(busy).concat(other);
-    return { day: tmr, dow: dowShortFromIso(tmr), items: merged.slice(0, MAX_TOMORROW) };
+    kid.sort(sortByStart);
+    busy.sort(sortByStart);
+    other.sort(sortByStart);
+    noise.sort(sortByStart);
+    /* Kid/school/sports first · errands last · never drop kid rows for noise */
+    var merged = kid.concat(allday).concat(busy).concat(other).concat(noise);
+    return { day: tmr, dow: dowShortFromIso(tmr), items: preferKidItems(merged, MAX_TOMORROW) };
   }
 
   function stripFromEvent(ev, clock) {
@@ -428,13 +483,17 @@
     if (/\bAinsley\b/i.test(s)) out.push("Ainsley");
     if (/\bHayes\b/i.test(s)) out.push("Hayes");
     if (/\bHarris\b/i.test(s)) out.push("Harris");
+    if (/\bBoys\b/i.test(s) || /\bboth\s+boys\b/i.test(s)) {
+      if (out.indexOf("Hayes") < 0) out.push("Hayes");
+      if (out.indexOf("Harris") < 0) out.push("Harris");
+    }
     if (/\b(?:Dan|Dad|Hank)\b/i.test(s)) out.push("Dan");
     if (!out.length) out.push("Dan");
     return out;
   }
 
   function upcomingFlat(strip, limit) {
-    limit = limit || 8;
+    limit = limit || 12;
     var out = [];
     var today = (strip && strip.today) || [];
     var tmr = (strip && strip.tomorrow && strip.tomorrow.items) || [];
@@ -457,7 +516,19 @@
         out.push({ ev: future[i], when: "soon" });
       }
     }
-    return out.slice(0, limit);
+    var evs = out.map(function (x) { return x.ev; });
+    var preferred = preferKidItems(evs, limit);
+    var preferSet = {};
+    for (var p = 0; p < preferred.length; p++) {
+      preferSet[(preferred[p].start || "") + "|" + (preferred[p].summary || "")] = 1;
+    }
+    var filtered = [];
+    for (var f = 0; f < out.length; f++) {
+      var fk = (out[f].ev.start || "") + "|" + (out[f].ev.summary || "");
+      if (preferSet[fk]) filtered.push(out[f]);
+    }
+    /* keep original order among preferred */
+    return filtered.slice(0, Math.max(limit, preferred.length));
   }
 
   function minsUntil(ev) {
@@ -686,9 +757,10 @@
     if (!tmr.items || !tmr.items.length) {
       html += '<li class="lb-empty">Clear on glass</li>';
     } else {
-      var maxT = Math.min(tmr.items.length, 4);
-      for (var j = 0; j < maxT; j++) {
-        var ev2 = tmr.items[j];
+      /* Show every kid/school/sports row · soft-cap only after those */
+      var showTmr = preferKidItems(tmr.items, Math.max(8, tmr.items.length));
+      for (var j = 0; j < showTmr.length; j++) {
+        var ev2 = showTmr[j];
         var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "—");
         html += '<li class="lb-list-row">' +
           '<span class="lb-list-time">' + esc(t2) + "</span>" +

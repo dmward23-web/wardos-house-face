@@ -1,8 +1,8 @@
 /* ============================================================
-   WARDOS · tokens-ctrlpanel.css · tip HUBBREATHE1 (CTRLPANEL1 base)
+   WARDOS · tokens-ctrlpanel.css · tip HUBSCROLL1 (CTRLPANEL1 base)
    CONTROL PANEL shortlist on HUBTOK1 shared atoms ONLY (--cmd-*).
    No second palette. Never DEMO. Stub/Need never LIVE.
-   Includes HDRFIX1 header hierarchy (Atlas · this tip).
+   Includes HDRFIX1 header hierarchy + HUBSCROLL1 tile scroll (no glue).
    ============================================================ */
 
 .leaveby-preview-tag { display: none !important; }
@@ -252,4 +252,204 @@ body[data-kid] .cmd-kid .card {
 }
 .weekend-cmd .idea-jar-live i {
   width: 8px; height: 8px; border-radius: 50%; background: #80e890; box-shadow: 0 0 10px rgba(128,232,144,0.7);
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   HUBSCROLL1 · main board tiles scroll · no glue top/bottom
+   Shared --cmd-* only. Leave-by keeps pan-y + JS horizontal swipe.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Who's up · quiet when nobody in leave window */
+.who-up.is-quiet,
+.who-up[data-kid=""] {
+  opacity: 0.72 !important;
+  border-color: rgba(255, 200, 80, 0.28) !important;
+  box-shadow: inset 0 1px 0 rgba(255,230,160,0.12), 0 8px 0 rgba(8,10,14,0.28) !important;
+}
+.who-up.is-quiet .who-up-name { color: var(--cmd-mute) !important; }
+.who-up.is-quiet .who-up-what { color: rgba(170,195,220,0.55) !important; }
+.who-up.is-quiet .who-up-go,
+.who-up[data-kid=""] .who-up-go { display: none !important; }
+.who-up[data-kids*="hayes"][data-kids*="harris"] {
+  border-color: rgba(94, 200, 232, 0.45) !important;
+  box-shadow: inset 0 1px 0 rgba(255,230,160,0.18), 0 10px 0 rgba(8,10,14,0.35), 0 0 28px rgba(94,200,232,0.22), 0 0 22px rgba(126,212,146,0.18) !important;
+}
+.who-up[data-kids*="hayes"][data-kids*="harris"] .who-up-accent {
+  background: linear-gradient(180deg, #5ec8e8, #7ed492, #ffe080) !important;
+}
+
+/* Shells: clip x for radius, scroll y when content overflows */
+.cmd-panel,
+.leaveby.leaveby--cmd,
+.leaveby.leaveby--hot,
+.hub-lights.hub-lights--cmd,
+.hub-lights.hub-lights--hot,
+#hub-lights-panel.hub-lights--cmd,
+#hub-lights-panel.hub-lights--hot,
+.who-up,
+.tile-grid.tile-grid--cams .tile,
+.tile.kid-flip {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain;
+  touch-action: pan-y !important;
+  max-height: none;
+  min-height: 0;
+}
+
+/* Leave-by: outer may stay bounded; body flex + layouts is the scrollport.
+   touch-action pan-y lets JS keep horizontal layout swipe. */
+.leaveby.leaveby--cmd,
+.leaveby.leaveby--hot {
+  overflow: hidden !important; /* radius chrome — layouts scrolls inside */
+}
+.leaveby.leaveby--cmd .leaveby-body,
+.leaveby.leaveby--hot .leaveby-body,
+.hub-upper .leaveby .leaveby-body {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  touch-action: pan-y !important;
+}
+.leaveby .leaveby-layouts,
+.leaveby.leaveby--cmd .leaveby-layouts,
+.leaveby.leaveby--hot .leaveby-layouts,
+.hub-upper .leaveby .leaveby-layouts {
+  flex: 1 1 140px !important;
+  min-height: 140px !important;
+  max-height: none !important;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain;
+  touch-action: pan-y !important;
+  pointer-events: auto !important;
+}
+
+/* Lights deck: grid scrolls — do not lock/hide overflow on switch list */
+#hub-lights-panel .hub-lights-grid,
+.hub-lights .hub-lights-grid,
+#hub-lights-panel.hub-lights--cmd .hub-lights-grid,
+#hub-lights-panel.hub-lights--hot .hub-lights-grid,
+.hub-lights.hub-lights--cmd .hub-lights-grid,
+.hub-lights.hub-lights--hot .hub-lights-grid {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain;
+  touch-action: pan-y !important;
+}
+
+/* Kid flip stage + sheet roster cards */
+.tile.kid-flip {
+  display: flex !important;
+  flex-direction: column !important;
+}
+.tile.kid-flip .kf-stage {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain;
+  touch-action: pan-y !important;
+}
+.tile-grid.tile-grid--cams .tile .tile-micro,
+.tile-grid.tile-grid--cams .tile .kf-stage {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/* Who's up strip can grow; scroll if stacked names overflow */
+.who-up {
+  max-height: none !important;
+}
+.who-up-body {
+  overflow: visible !important;
+}
+
+/* Cams: media crop may clip; never block vertical page/tile pan */
+.hub-cam-deck .hub-cam,
+#hub-cam-deck .hub-cam {
+  touch-action: manipulation !important;
+}
+.hub-cam-media-wrap {
+  overflow: hidden; /* intentional still crop */
+}
+
+/* Chips/rockers keep tap; do not inherit pan-y traps onto buttons */
+.leaveby .leaveby-chip,
+.hub-lights .hub-sw-rocker,
+.hub-lights .hub-lights-bulk-btn,
+.tile .tile-tap,
+.who-up-go {
+  touch-action: manipulation !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   HUBSCROLL1 · kill white pill/outline on huge leave-by time
+   Old amber-pill inset border was clipping through digits.
+   ═══════════════════════════════════════════════════════════ */
+.leaveby .leaveby-main .time,
+.leaveby.leaveby--cmd .leaveby-main .time,
+.leaveby.leaveby--hot .leaveby-main .time,
+.hub-upper .leaveby-main .time,
+.lb-peek-time,
+.lb-peek-hero .lb-peek-time,
+.lb-radar-time,
+.lb-radar-mins {
+  background: none !important;
+  background-image: none !important;
+  border: 0 !important;
+  outline: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  filter: none !important;
+}
+.leaveby .leaveby-main .time::before,
+.leaveby .leaveby-main .time::after,
+.lb-peek-time::before,
+.lb-peek-time::after {
+  content: none !important;
+  display: none !important;
+}
+.leaveby .leaveby-main .time::selection,
+.lb-peek-time::selection {
+  background: transparent !important;
+  color: inherit !important;
+}
+/* Keep glow inside the tile — don't hard-clip digits mid-glyph */
+.leaveby.leaveby--cmd .leaveby-main,
+.leaveby.leaveby--hot .leaveby-main,
+.hub-upper .leaveby .leaveby-main {
+  overflow: visible !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.lb-peek-hero {
+  border-color: rgba(255, 200, 80, 0.22) !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
