@@ -1,7 +1,7 @@
 # HDRFIX1 · hub header hierarchy · high-contrast date
 
 **When:** 2026-09-28 ~21:00 CT  
-**Tip:** `TIPSHA` · HDRFIX1  
+**Tip:** `3cb39da` · HDRFIX1  
 **Base:** HUBTOK1 (`f98caa8`) shared tokens untouched  
 **Page:** https://dmward23-web.github.io/wardos-house-face/sheet-index.html
 
