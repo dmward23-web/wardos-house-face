@@ -812,6 +812,10 @@
         : clock.long);
     });
     dowNodes.forEach(function (n) { n.textContent = clock.dow; });
+    var timeNodes = document.querySelectorAll("[data-live='time'], [data-live-clock], [data-live='clock-time']");
+    timeNodes.forEach(function (n) {
+      n.textContent = clock.time || (global.HouseClock && HouseClock.timeLabel ? HouseClock.timeLabel() : "");
+    });
 
     if (label) label.textContent = "";
     if (badge) badge.textContent = "";

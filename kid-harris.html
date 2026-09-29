@@ -8,9 +8,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HARRIS · BLOCK WORLD</title>
-<link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
+<link rel="stylesheet" href="house-engage.css?v=HEAT1" />
 <link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=LIVEGREEN1" />
-<link rel="stylesheet" href="tokens-ctrlpanel.css?v=HUBSCROLL2" />
+<link rel="stylesheet" href="tokens-ctrlpanel.css?v=HEAT1" />
 <link rel="stylesheet" href="kid-ioscroll.css?v=HUBSCROLL2" />
 <style>
 
@@ -332,6 +332,29 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .hdr{box-shadow:inset 0 2px 0 rgba(255,255,255,0.92),0 6px 0 #1a1e24,0 14px 32px rgba(20,22,28,0.22),0 0 24px rgba(255,200,80,0.14)!important}
   .sec-chores .quest{box-shadow:0 5px 0 rgba(20,22,28,0.35),0 0 14px rgba(255,200,80,0.08)}
   .grow-meter{box-shadow:0 6px 0 rgba(20,22,28,0.4),0 0 22px rgba(255,220,80,0.18)!important}
+
+  /* HEAT1 · harris header · no WardOS mark · CT clock · own fire */
+  body.theme-harris .hdr .brand { display: none !important; }
+  body.theme-harris .hdr.hdr--heat {
+    padding: 10px 14px !important; gap: 10px !important; border-radius: 12px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 6px 0 rgba(0,0,0,.45), 0 0 24px rgba(255,200,80,.18) !important;
+  }
+  body.theme-harris .live-clock-host {
+    display:flex; flex-direction:column; align-items:flex-end; gap:1px;
+    padding:6px 12px; border-radius:10px; min-width:108px;
+    background:rgba(0,0,0,.55); border:1px solid rgba(255,220,100,.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 14px rgba(255,200,80,.2);
+  }
+  body.theme-harris .live-clock-lab {
+    font-size:10px; font-weight:800; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,220,140,.75);
+  }
+  body.theme-harris .live-clock {
+    font-size:26px; font-weight:900; letter-spacing:-.04em; font-variant-numeric:tabular-nums;
+    line-height:1; color:#ffe894; text-shadow:0 0 16px rgba(255,200,80,.5);
+  }
+  body.theme-harris .hdr.hdr--heat .hdr-right {
+    flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:8px;
+  }
 </style>
 <link rel="stylesheet" href="heat-v3.css?v=DAYTAP1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
@@ -581,20 +604,23 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
 
 <div class="panel cmd-kid">
  <div class="crosshair" aria-hidden="true"></div>
- <header class="hdr">
+ <header class="hdr hdr--heat">
  <div class="hdr-left">
- <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="40" /></div>
  <div class="nav-row"><a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a><a class="nav-week" href="index.html">Week</a></div>
  <div class="identity">
  <div class="avatar g2-av harr" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-harris"/></svg></div>
  <div>
  <a class="eyebrow" href="sheet-index.html">BLOCK WORLD · SMASH MODE</a>
  <h1 class="name">HEY <span class="name-accent">HARRIS</span>!!!</h1>
- <div class="tagline">Do the musts · earn your week</div>
+ <div class="tagline">Gem week · smash musts · jar loot</div>
  </div>
  </div>
  </div>
  <div class="hdr-right">
+ <div class="live-clock-host" aria-label="America/Chicago time">
+ <div class="live-clock-lab">CT</div>
+ <div class="live-clock" data-live-clock>—:— —</div>
+ </div>
  <div class="hot-pill" data-hot-pill>⚡ YOUR FLAG · Leave 7:55</div>
  <div style="display:flex;gap:8px;align-items:center">
  <button type="button" class="mute-btn" data-mute-toggle>🔊 ON</button>
@@ -665,7 +691,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  </div>
 
  <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
- <div class="bank-meta"><span data-bank-meta>$0 / $8 · 0/8 ★</span>today <span data-bank-today>0</span></div>
+ <div class="bank-meta"><span data-bank-meta>$0 / $8 · 0/8 ★</span><span class="bank-meta-sep" aria-hidden="true">·</span><span class="bank-meta-today">Today <span data-bank-today>0</span></span></div>
  <div class="jar-flow" aria-label="stars to jar to payday">
  <span class="step">★ earn</span><span class="arr">→</span>
  <span class="step">🫙 jar</span><span class="arr">→</span>
@@ -726,14 +752,14 @@ document.addEventListener("house:cleared", function(){
 });
 </script>
 
-<script src="house-clock.js?v=CT1"></script>
+<script src="house-clock.js?v=HEAT1"></script>
 <script src="house-lights.js?v=KIDLITE1"></script>
-<script src="kids-data.js?v=KIDCHORES1"></script>
+<script src="kids-data.js?v=HEAT1"></script>
 <script src="house-saves.js?v=FAIL3"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
 <script src="house-kid-engage.js?v=HUBSCROLL2"></script>
-<script src="house-checkoffs.js?v=KIDCHORES1" defer></script>
+<script src="house-checkoffs.js?v=HEAT1" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
  if (window.HouseSaves) HouseSaves.mount("harris");

@@ -8,9 +8,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#12140f" />
 <title>BOARD-OS · AINSLEY · HER TRACKS</title>
-<link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
+<link rel="stylesheet" href="house-engage.css?v=HEAT1" />
+<link rel="stylesheet" href="tokens-ainsley-vinyl-heat.css?v=HEAT1" />
 <link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=LIVEGREEN1" />
-<link rel="stylesheet" href="tokens-ctrlpanel.css?v=HUBSCROLL2" />
+<link rel="stylesheet" href="tokens-ctrlpanel.css?v=HEAT1" />
 <link rel="stylesheet" href="kid-ioscroll.css?v=HUBSCROLL2" />
 <style>
 
@@ -529,7 +530,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     position: relative;
   }
   body.theme-ainsley .sec-schedule::after {
-    content: "↕ scroll her week";
+    content: "↕ scroll her setlist";
     position: sticky; bottom: 0; display: block;
     font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
     text-align: center; color: #d4a860;
@@ -560,11 +561,235 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .hdr{box-shadow:inset 0 2px 0 rgba(255,255,255,0.92),0 6px 0 #1a1e24,0 14px 32px rgba(20,22,28,0.22),0 0 24px rgba(255,200,80,0.14)!important}
   .sec-chores .quest{box-shadow:0 5px 0 rgba(20,22,28,0.35),0 0 14px rgba(255,200,80,0.08)}
   .grow-meter{box-shadow:0 6px 0 rgba(20,22,28,0.4),0 0 22px rgba(255,220,80,0.18)!important}
+
+  /* ═══════════════════════════════════════════════════
+     VINYLHEAT1 · Ainsley whole-page graphic heat
+     records · grooves · amber control-panel DNA
+     ═══════════════════════════════════════════════════ */
+  body.theme-ainsley .hdr.hdr--vinyl {
+    padding: 10px 14px !important;
+    gap: 12px !important;
+    border-radius: 12px !important;
+    background:
+      linear-gradient(145deg, rgba(184,90,40,.16), transparent 42%),
+      linear-gradient(165deg, rgba(26,28,22,.96), rgba(14,16,12,.98)) !important;
+    border: 2px solid rgba(200,120,64,.55) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,230,160,.14),
+      0 6px 0 #0e100c,
+      0 0 28px rgba(184,90,40,.22) !important;
+  }
+  body.theme-ainsley .hdr.hdr--vinyl .brand { display: none !important; }
+  body.theme-ainsley .hdr.hdr--vinyl .eyebrow { display: none !important; }
+  body.theme-ainsley .hdr.hdr--vinyl .name-accent {
+    color: #e8d090 !important;
+    text-shadow: 0 0 22px rgba(184,90,40,.45), 0 3px 0 #0e100c !important;
+    letter-spacing: -0.04em;
+  }
+  body.theme-ainsley .hdr.hdr--vinyl .tagline {
+    color: #c87840 !important;
+    font-weight: 750 !important;
+    letter-spacing: 0.02em;
+  }
+  body.theme-ainsley .live-clock-host {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
+    padding: 6px 12px; border-radius: 10px;
+    background: rgba(0,0,0,.55);
+    border: 1px solid rgba(212,168,96,.45);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 16px rgba(184,90,40,.2);
+    min-width: 108px;
+  }
+  body.theme-ainsley .live-clock-lab {
+    font-size: 10px; font-weight: 800; letter-spacing: 0.22em;
+    text-transform: uppercase; color: rgba(212,168,96,.75);
+  }
+  body.theme-ainsley .live-clock {
+    font-size: 26px; font-weight: 900; letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums; line-height: 1;
+    color: #e8d090;
+    text-shadow: 0 0 18px rgba(184,90,40,.5);
+  }
+  body.theme-ainsley .hdr.hdr--vinyl .hdr-right {
+    flex-direction: row; flex-wrap: wrap; align-items: center;
+    justify-content: flex-end; gap: 8px;
+  }
+
+  /* Whole-page heat · vinyl float louder + second groove orb */
+  body.theme-ainsley .vinyl-float {
+    width: 200px; height: 200px; opacity: .38 !important;
+    filter: drop-shadow(0 0 18px rgba(184,90,40,.35));
+    animation: vinyl-spin 22s linear infinite;
+  }
+  body.theme-ainsley .panel::after {
+    content: "";
+    position: absolute; left: 28px; bottom: 120px; width: 110px; height: 110px;
+    z-index: 1; pointer-events: none;
+    background: url("theme-tiles/ainsley-vinyl.png") center/contain no-repeat;
+    opacity: .18; animation: vinyl-spin 36s linear infinite reverse;
+    filter: drop-shadow(0 0 10px rgba(212,168,96,.25));
+  }
+  body.theme-ainsley .spotlight {
+    opacity: .55 !important;
+    background:
+      radial-gradient(ellipse 50% 40% at 50% 0%, rgba(212,168,96,.22), transparent 70%) !important;
+  }
+
+  /* XP = SIDE A pressing bar */
+  body.theme-ainsley .xp-stage {
+    border: 2px solid rgba(200,120,64,.5) !important;
+    background: rgba(14,16,12,.92) !important;
+    box-shadow: inset 0 1px 0 rgba(255,230,160,.1), 0 0 18px rgba(184,90,40,.18) !important;
+    border-radius: 10px !important;
+  }
+  body.theme-ainsley .xp-stage-lab {
+    color: #d4a860 !important; letter-spacing: 0.16em !important;
+  }
+
+  /* Must rows · groove rail */
+  body.theme-ainsley .sec-chores {
+    background:
+      linear-gradient(145deg, rgba(184,90,40,.08), transparent 40%),
+      rgba(18,20,15,.92) !important;
+    border-color: #5a6a50 !important;
+    box-shadow: 0 0 20px rgba(184,90,40,.12), 0 5px 0 #0e100c !important;
+  }
+  body.theme-ainsley .sec-chores .sec-title {
+    color: #d4a860 !important;
+  }
+  body.theme-ainsley .sec-chores .quest {
+    border-color: rgba(200,120,64,.35) !important;
+    background: rgba(14,16,12,.88) !important;
+  }
+  body.theme-ainsley .sec-chores .quest.done {
+    box-shadow: 0 0 16px rgba(212,168,96,.28), 0 5px 0 rgba(20,22,28,.35) !important;
+  }
+
+  /* Jar · pressed foil · no smash / no truncate pills */
+  body.theme-ainsley .sec-bank .bank-meta {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 8px !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-transform: none !important;
+    line-height: 1.35 !important;
+  }
+  body.theme-ainsley .sec-bank .bank-meta [data-bank-meta] {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  body.theme-ainsley .sec-bank .bank-meta-sep {
+    opacity: 0.55; color: #c87840; font-weight: 800;
+  }
+  body.theme-ainsley .sec-bank .bank-meta-today {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px; border-radius: 999px;
+    background: rgba(184,90,40,.18);
+    border: 1px solid rgba(212,168,96,.45);
+    color: #e8d090; font-weight: 800; font-size: 12px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  body.theme-ainsley .sec-bank .money-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    overflow: visible !important;
+  }
+  body.theme-ainsley .sec-bank .money-chip {
+    flex: 0 0 auto !important;
+    min-width: max-content !important;
+    max-width: none !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    padding: 8px 12px !important;
+    font-size: 16px !important;
+    border-color: rgba(212,168,96,.45) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 0 14px rgba(184,90,40,.22) !important;
+  }
+  body.theme-ainsley .sec-bank .money-chip .lab {
+    font-size: 11px !important;
+    letter-spacing: 0.12em !important;
+    color: #d4a860 !important;
+    flex-shrink: 0 !important;
+  }
+  body.theme-ainsley .sec-bank .ledger-row {
+    overflow: visible !important;
+  }
+  body.theme-ainsley .sec-bank .ledger-chip {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    max-width: none !important;
+    padding: 8px 12px !important;
+    min-height: 36px !important;
+    font-size: 12px !important;
+  }
+  body.theme-ainsley .sec-bank .grow-line .val {
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+  }
+
+  /* Stars sprinkle accents */
+  body.theme-ainsley .setlist-foot {
+    background:
+      url("theme-tiles/ainsley-stars.png") right 12px center / 48px no-repeat,
+      rgba(14,16,12,.94) !important;
+    border-color: #c87840 !important;
+    box-shadow: 0 0 16px rgba(184,90,40,.2) !important;
+  }
+  body.theme-ainsley .ftr-chip {
+    box-shadow: 0 0 10px rgba(184,90,40,.2);
+  }
+
+  /* Empty / quiet cards · vinyl microcopy frame */
+  body.theme-ainsley .card.quiet,
+  body.theme-ainsley .quiet {
+    border-style: dashed !important;
+    border-color: rgba(200,120,64,.4) !important;
+    color: #a8a490 !important;
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    body.theme-ainsley .vinyl-float,
+    body.theme-ainsley .panel::after { animation: none !important; }
+  }
+
+
+/* HEAT1 · keep her vinyl tagline · Tour Jar = dark-glass twin · day-record rail */
+body.theme-ainsley .hdr.hdr--vinyl .tagline {
+  display: block !important;
+  color: #d4a860 !important;
+  font-weight: 750 !important;
+}
+body.theme-ainsley .sec-bank.bank-card,
+body.theme-ainsley .sec-bank.tour-jar {
+  background: rgba(12, 11, 9, 0.88) !important;
+  border: 2px solid rgba(245, 196, 70, 0.35) !important;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.55), 0 0 28px rgba(245,180,70,0.18), 0 6px 0 #0a0908 !important;
+  border-radius: 14px !important;
+}
+body.theme-ainsley .day-record-rail {
+  margin: 4px 0 8px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(245,196,70,0.22);
+  box-shadow: 0 0 18px rgba(245,180,70,0.15);
+  background: #0a0908;
+}
+body.theme-ainsley .day-record-rail img {
+  display: block; width: 100%; height: auto;
+}
+
 </style>
-<link rel="stylesheet" href="heat-v3.css?v=DAYTAP1" />
+<link rel="stylesheet" href="heat-v3.css?v=HEAT1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
 </head>
-<body data-clear-label="TRACKS CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley stick-season">
+<body data-clear-label="SIDE A CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley stick-season">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
   <defs>
     <!-- Shared paints · HEAT v3 cyan+gold -->
@@ -812,20 +1037,22 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="vinyl-float" aria-hidden="true"></div>
  <div class="stage-grid" aria-hidden="true"></div>
  <div class="stage-ticks" aria-hidden="true"></div>
- <header class="hdr">
+ <header class="hdr hdr--vinyl">
  <div class="hdr-left">
- <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="40" /></div>
  <div class="nav-row"><a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a><a class="nav-week" href="index.html">Week</a></div>
  <div class="identity">
  <div class="avatar g2-av ains" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-ainsley"/></svg></div>
  <div>
- <a class="eyebrow" href="sheet-index.html">HER TRACKS · HER WEEK</a>
  <h1 class="name"><span class="name-accent">AINSLEY</span></h1>
- <div class="tagline">Do the musts · earn your week</div>
+ <div class="tagline">Her vinyl week · press the musts · Tour Jar</div>
  </div>
  </div>
  </div>
  <div class="hdr-right">
+ <div class="live-clock-host" aria-label="America/Chicago time">
+ <div class="live-clock-lab">CT</div>
+ <div class="live-clock" data-live-clock>—:— —</div>
+ </div>
  <div class="hot-pill" data-hot-pill>ON THE BOARD · SUN · vanity 3:00</div>
  <div style="display:flex;gap:8px;align-items:center">
  <button type="button" class="mute-btn" data-mute-toggle>🔊 ON</button>
@@ -840,10 +1067,13 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <button type="button" class="era lilac" data-era="lilac">Dusk</button>
  <button type="button" class="era blush" data-era="blush">Birch</button>
  </div>
- <div class="xp-stage">
- <div class="xp-stage-lab">TODAY</div>
+  <div class="day-record-rail" aria-label="Day records">
+ <img src="theme-tiles/day-record-pills.svg" alt="Day records · LIVE sessions" width="980" height="220" />
+ </div>
+<div class="xp-stage">
+ <div class="xp-stage-lab">SIDE A · TODAY</div>
  <div class="xp-stage-track"><div class="xp-stage-fill" data-progress-fill></div></div>
- <div data-progress-meta="{done}/{total} today" style="font-size:13px;font-weight:800;color:#a8a490">0/6</div>
+ <div data-progress-meta="{done}/{total} pressed today" style="font-size:13px;font-weight:800;color:#a8a490">0/6</div>
  <div class="left-chip" data-left-count>··</div>
  </div>
  <section class="hot-banner" aria-label="What’s on the board">
@@ -858,18 +1088,18 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  </div>
  </section>
  <div class="body">
- <section class="sec sec-chores" aria-label="Her tracks and musts">
- <div class="sec-hdr"><div class="sec-title">HER TRACKS · MUSTS</div><div class="sec-meta" data-streak-label>streak</div></div>
+ <section class="sec sec-chores" aria-label="Her setlist and musts">
+ <div class="sec-hdr"><div class="sec-title">HER SETLIST · MUSTS</div><div class="sec-meta" data-streak-label>streak</div></div>
  <div class="sec-list" data-mount-quests></div>
- <div class="tap-hint">Tap each day Sat–Fri · title + day checks</div>
+ <div class="tap-hint">Tap each groove Sat–Fri · day = vinyl · spin off to undo</div>
  <div class="bank-links" style="margin-top:4px">
  <a class="ghost" href="sheet-chores.html">Family chores</a>
  </div>
  </section>
- <section class="sec sec-bank bank-card" aria-label="Tour Jar reward">
+ <section class="sec sec-bank bank-card tour-jar" aria-label="Tour Jar · pressed week">
  <div class="bank-top">
  <div>
- <div class="bank-title">★ TOUR JAR · WEEK</div>
+ <div class="bank-title">★ TOUR JAR · PRESSED</div>
  <div class="bank-goal-title" data-bank-goal-title>Tour Jar</div>
  </div>
  <div class="bank-count"><span data-bank-symbol>★</span> <span data-bank-life>0</span></div>
@@ -884,31 +1114,31 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="grow-pct" data-grow-pct>0%</div>
  </div>
  <div class="grow-readout">
- <div class="grow-title" data-grow-title>GROW · jar</div>
+ <div class="grow-title" data-grow-title>GROW · pressed jar</div>
  <div class="grow-jar-name" data-grow-jar-name>Tour Jar</div>
  <div class="grow-total"><span data-grow-total>0</span> / <span data-grow-save-need>0</span></div>
  <div class="grow-week-rising" data-grow-week-rising>week +$0 rising ↑</div>
  <div class="grow-line"><span class="lab">Balance</span><span class="val" data-grow-balance>$0</span></div>
- <div class="grow-line"><span class="lab">This week</span><span class="val" data-grow-week>$0</span></div>
- <div class="grow-line"><span class="lab">Save for</span><span class="val" data-grow-save-line>Add a save</span></div>
+ <div class="grow-line"><span class="lab">This press</span><span class="val" data-grow-week>$0</span></div>
+ <div class="grow-line"><span class="lab">Save for</span><span class="val" data-grow-save-line>Cue a save</span></div>
  </div>
  </button>
  <div class="money-row" aria-label="Balance carry and this week earn">
  <div class="money-chip"><span class="lab">Balance</span> $<span data-bank-balance>0</span></div>
- <div class="money-chip"><span class="lab">This week</span> $<span data-bank-week-earn>0</span></div>
+ <div class="money-chip"><span class="lab">This press</span> $<span data-bank-week-earn>0</span></div>
  <div class="money-chip save-chip"><span class="lab">Save for</span> <span data-grow-save-name>…</span> · $<span data-grow-save-toward>0</span>/$<span data-grow-save-need>0</span></div>
  </div>
 
  <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
- <div class="bank-meta"><span data-bank-meta>$0 / $20 · 0/20 ★</span>today <span data-bank-today>0</span></div>
+ <div class="bank-meta"><span data-bank-meta>$0 / $20 · 0/20 ★</span><span class="bank-meta-sep" aria-hidden="true">·</span><span class="bank-meta-today">Today <span data-bank-today>0</span></span></div>
  <div class="ledger-row" aria-label="Ledger glass">
  <span class="ledger-chip unlock-left" data-bank-left>$20 left · 20 ★ to unlock</span>
  <span class="ledger-chip payday" data-payday-chip title="Next Payday = next Friday 6:00p CT">Next payday · …</span>
- <span class="ledger-chip" data-payday-copy>Payday with Dad after honest musts</span>
- <span class="ledger-chip goal-chip is-empty" data-goal-chip>Set a goal with Dad</span>
+ <span class="ledger-chip" data-payday-copy>Friday drop · payday after honest musts</span>
+ <span class="ledger-chip goal-chip is-empty" data-goal-chip>Cue a goal with Dad</span>
  </div>
  <div class="bank-links">
- <a class="primary-foil" href="sheet-allowance.html">Tour Jar →</a>
+ <a class="primary-foil" href="sheet-allowance.html">Tour Jar · open →</a>
  <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">JAR FULL · saved $20 · show Dad</a>
  <button type="button" class="got-it" data-got-it hidden>Got it · payday</button>
  </div>
@@ -917,7 +1147,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="paid-stamp" data-paid-stamp hidden>Paid · jar reset</div>
  </section>
  <section class="sec sec-schedule consume-sched" aria-label="Her week — schedule" data-consume-sel="">
- <div class="sec-hdr"><div class="sec-title">HER WEEK · no surprises</div><div class="sec-meta">scan fast</div></div>
+ <div class="sec-hdr"><div class="sec-title">HER WEEK · no surprises</div><div class="sec-meta">spin the week</div></div>
  <div class="harbor-strip" aria-label="No surprises next 24h">
  <div class="hs-title">No surprises · next 24h</div>
  <div class="sec-list" data-mount-no-surprise></div>
@@ -938,7 +1168,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  </section>
  </div>
  <div class="setlist-foot">
- <div class="lab">TRACKS</div>
+ <div class="lab">SIDE A</div>
  <div class="track-num on" data-track="1">1</div>
  <div class="track-num" data-track="2">2</div>
  <div class="track-num" data-track="3">3</div>
@@ -946,15 +1176,15 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="track-num" data-track="5">5</div>
  <div class="track-num" data-track="6">6</div>
  <div class="track-num" data-track="7">7</div>
- <div class="note">her call · clear tracks = honey glow</div>
+ <div class="note">her call · clear grooves = honey glow</div>
  </div>
  <footer class="ftr">
  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
- <span>Quiet folk · her board</span>
- <span class="ftr-chip">AINSLEY · HER TRACKS</span>
+ <span>Quiet folk · vinyl · her board</span>
+ <span class="ftr-chip">AINSLEY · HER VINYL</span>
  <a class="ftr-chip" href="sheet-allowance.html">Tour Jar</a>
  </div>
- <span>autumn road-trip energy · sound ON</span>
+ <span>vinyl road-trip energy · sound ON</span>
  </footer>
 </div>
 <script>
@@ -972,13 +1202,13 @@ document.addEventListener("house:kid-rendered", function(){
 });
 </script>
 
-<script src="house-clock.js?v=CT1"></script>
-<script src="kids-data.js?v=KIDCHORES1"></script>
+<script src="house-clock.js?v=HEAT1"></script>
+<script src="kids-data.js?v=HEAT1"></script>
 <script src="house-saves.js?v=FAIL3"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
 <script src="house-kid-engage.js?v=HUBSCROLL2"></script>
-<script src="house-checkoffs.js?v=KIDCHORES1" defer></script>
+<script src="house-checkoffs.js?v=HEAT1" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
  if (window.HouseSaves) HouseSaves.mount("ainsley");

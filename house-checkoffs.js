@@ -122,8 +122,16 @@
       el.classList.toggle("dim", !done);
       el.setAttribute("aria-pressed", done ? "true" : "false");
     } else if (isDayTap) {
+      var wasDone = el.classList.contains("done");
       el.classList.toggle("done", done);
       el.setAttribute("aria-pressed", done ? "true" : "false");
+      /* VINYLHEAT1 · Ainsley records spin when toggled OFF */
+      if (animate && wasDone && !done && !reducedMotion()) {
+        el.classList.remove("spin-off");
+        void el.offsetWidth;
+        el.classList.add("spin-off");
+        window.setTimeout(function () { el.classList.remove("spin-off"); }, 720);
+      }
       refreshDailyRow(questRowFor(el));
     } else {
       el.classList.toggle("done", done);

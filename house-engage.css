@@ -3234,3 +3234,171 @@ body.theme-harris .consume-title {
 .sec-chores .sec-meta[data-streak-label].streak-sparks {
   font-size: 13px;
 }
+
+
+/* ============================================================
+   VINYLHEAT1 · jar meta no-smash (all kids) + Ainsley vinyl day-taps
+   Boys keep square day-taps; Ainsley = little records that spin OFF
+   ============================================================ */
+.bank-meta {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  white-space: normal !important;
+  overflow: visible !important;
+}
+.bank-meta-sep {
+  opacity: 0.55;
+  font-weight: 800;
+}
+.bank-meta-today {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,200,80,0.35);
+}
+body.theme-ainsley .bank-meta-today {
+  background: rgba(184,90,40,0.2);
+  border-color: rgba(212,168,96,0.5);
+  color: #e8d090;
+}
+body.theme-ainsley .sec-bank .money-chip,
+body.theme-ainsley .sec-bank .ledger-chip {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  max-width: none !important;
+}
+
+/* Ainsley day-taps = little vinyl RECORDS */
+body.theme-ainsley .day-tap {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 50% !important;
+  position: relative;
+  color: #e8d090 !important;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  border: 2px solid rgba(212,168,96,0.55) !important;
+  background:
+    radial-gradient(circle at 50% 50%,
+      #d4a860 0 14%,
+      #1a1410 15% 22%,
+      #0e100c 23% 100%) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    inset 0 0 0 5px rgba(0,0,0,0.35),
+    inset 0 0 0 6px rgba(212,168,96,0.18),
+    inset 0 0 0 9px rgba(0,0,0,0.25),
+    0 2px 0 rgba(14,16,12,0.85),
+    0 0 10px rgba(184,90,40,0.25) !important;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.85);
+  overflow: hidden;
+}
+body.theme-ainsley .day-tap::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    repeating-radial-gradient(circle at 50% 50%,
+      transparent 0 2px,
+      rgba(212,168,96,0.07) 2px 3px);
+  opacity: 0.9;
+}
+body.theme-ainsley .day-tap.is-today {
+  border-color: #f0c040 !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.1),
+    inset 0 0 0 5px rgba(0,0,0,0.35),
+    0 0 0 2px rgba(255,200,80,0.55),
+    0 0 14px rgba(255,200,80,0.4) !important;
+}
+body.theme-ainsley .day-tap.done {
+  color: #14100a !important;
+  border-color: #c87840 !important;
+  background:
+    radial-gradient(circle at 50% 50%,
+      #fff6d0 0 14%,
+      #d4a860 15% 28%,
+      #b85a28 29% 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.45),
+    0 0 14px rgba(212,168,96,0.55),
+    0 2px 0 #3a2410 !important;
+  text-shadow: none;
+}
+body.theme-ainsley .day-tap.spin-off {
+  animation: vinyl-day-spin-off 0.7s cubic-bezier(0.22, 0.8, 0.25, 1) forwards;
+}
+@keyframes vinyl-day-spin-off {
+  0%   { transform: rotate(0deg) scale(1); }
+  55%  { transform: rotate(320deg) scale(0.92); filter: brightness(1.15); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.theme-ainsley .day-tap.spin-off { animation: none !important; }
+}
+@media (max-width: 420px) {
+  body.theme-ainsley .day-tap { width: 32px; height: 32px; min-width: 32px; font-size: 9px; }
+}
+
+
+/* ============================================================
+   HEAT1 · Hayes victory chips + Harris gem blocks (NOT vinyl)
+   ============================================================ */
+body.theme-hayes .day-tap {
+  border-radius: 8px !important;
+  border: 2px solid rgba(64,232,255,0.55) !important;
+  background: linear-gradient(180deg, rgba(20,40,80,0.95), rgba(8,16,40,0.98)) !important;
+  color: #b8f4ff !important;
+  box-shadow: 0 0 12px rgba(64,232,255,0.28), inset 0 1px 0 rgba(255,255,255,0.12) !important;
+}
+body.theme-hayes .day-tap.done {
+  background: linear-gradient(180deg, #7dffc8, #2a9a78) !important;
+  border-color: #0e6048 !important;
+  color: #062820 !important;
+  box-shadow: 0 0 16px rgba(64,255,200,0.45) !important;
+}
+body.theme-hayes .day-tap.is-today {
+  box-shadow: 0 0 0 2px rgba(255,200,80,0.55), 0 0 14px rgba(64,232,255,0.4) !important;
+}
+body.theme-harris .day-tap {
+  border-radius: 6px !important;
+  border: 3px solid rgba(140,230,60,0.55) !important;
+  background:
+    linear-gradient(135deg, rgba(40,90,30,0.95) 25%, transparent 25%) -4px 0 / 12px 12px,
+    linear-gradient(180deg, #2a6020, #143810) !important;
+  color: #e8ffe0 !important;
+  box-shadow: 0 3px 0 #0a2008, 0 0 10px rgba(140,230,60,0.25) !important;
+}
+body.theme-harris .day-tap.done {
+  background: linear-gradient(180deg, #b8ff60, #4aa820) !important;
+  border-color: #1a6a10 !important;
+  color: #0e3010 !important;
+  box-shadow: 0 0 16px rgba(144,255,80,0.5), 0 3px 0 #1a4010 !important;
+}
+body.theme-harris .day-tap.is-today {
+  box-shadow: 0 0 0 2px rgba(255,220,80,0.6), 0 3px 0 #0a2008 !important;
+}
+
+/* Shared bank-meta today pill heat */
+body.theme-hayes .bank-meta-today {
+  border-color: rgba(64,232,255,0.45); color: #b8f4ff; background: rgba(20,60,100,0.45);
+}
+body.theme-harris .bank-meta-today {
+  border-color: rgba(140,230,60,0.5); color: #e8ffe0; background: rgba(40,90,30,0.45);
+}

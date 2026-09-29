@@ -997,7 +997,9 @@
       el.setAttribute("title", info.rule);
     });
     root.querySelectorAll("[data-payday-copy]").forEach(function (el) {
-      el.textContent = "Payday with Dad after honest musts";
+      el.textContent = (bank.kidId === "ainsley")
+        ? "Friday drop · payday after honest musts"
+        : "Payday with Dad after honest musts";
     });
     root.querySelectorAll("[data-bank-goal-blurb]").forEach(function (el) {
       // already set above from goalBlurb — ensure cash blurbs stick
@@ -1178,7 +1180,7 @@
       var items = buildNoSurprise(kid, data);
       ns.innerHTML = items.length
         ? items.map(cardHTML).join("")
-        : quietHTML("quiet board · check musts");
+        : quietHTML(kidId === "ainsley" ? "side quiet · drop the needle on musts" : "quiet board · check musts");
     }
     var rides = document.querySelector("[data-mount-rides]");
     if (rides) {
@@ -1217,7 +1219,7 @@
           space.push({ when: "Room", what: done ? "Room reset · clear" : "Room reset · still open", hint: "your space · your pace", tone: done ? "fun" : "act" });
         }
       });
-      her.innerHTML = space.length ? space.map(cardHTML).join("") : quietHTML("your space · quiet");
+      her.innerHTML = space.length ? space.map(cardHTML).join("") : quietHTML(kidId === "ainsley" ? "her space · needle up" : "your space · quiet");
     }
   }
 
@@ -1232,7 +1234,7 @@
   var CONSUME_META = {
     hayes: { world: "Victory world", loadout: "Victory loadout", markSym: "g2-hayes", hqTitle: "DROP ZONE HQ with Dad", hqSym: "g2-home" },
     harris: { world: "Gem world", loadout: "Gem loadout", markSym: "g2-harris", hqTitle: "YOUR BASE with Dad", hqSym: "g2-home" },
-    ainsley: { world: "Tour world", loadout: "Tour loadout", markSym: "g2-ainsley", hqTitle: "Base with Dad", hqSym: "g2-home" }
+    ainsley: { world: "Vinyl world", loadout: "Her setlist", markSym: "g2-ainsley", hqTitle: "Home base · with Dad", hqSym: "g2-home" }
   };
 
   /* HUBSCROLL1 · daily SPECIAL — sourced only, never invented.

@@ -112,6 +112,41 @@
     };
   }
 
+  var _liveTimer = null;
+
+  /** Paint every [data-live-clock] / [data-live="time"] with CT wall time. */
+  function paintLive(root) {
+    root = root || (typeof document !== "undefined" ? document : null);
+    if (!root || !root.querySelectorAll) return stamp(new Date());
+    var s = stamp(new Date());
+    root.querySelectorAll("[data-live-clock], [data-live='time'], [data-live='clock-time']").forEach(function (el) {
+      el.textContent = s.time || "—";
+      if (el.tagName === "TIME") el.setAttribute("datetime", s.iso + "T" + (s.time || "").replace(" ", ""));
+      el.setAttribute("title", "America/Chicago · " + s.long + " · " + (s.time || ""));
+    });
+    /* Keep hub DOW / date-long honest across midnight without a reload */
+    root.querySelectorAll("[data-live='dow']").forEach(function (el) {
+      if (!el.closest || !el.closest(".hdr-date, .live-clock-host, header")) return;
+      el.textContent = s.dow;
+    });
+    root.querySelectorAll("[data-live='date-long']").forEach(function (el) {
+      if (!el.closest || !el.closest(".hdr-date, .live-clock-host, header")) return;
+      el.textContent = s.dateLine || s.long;
+    });
+    return s;
+  }
+
+  function startLive(ms) {
+    if (typeof document === "undefined") return;
+    paintLive(document);
+    if (_liveTimer) return;
+    _liveTimer = setInterval(function () { paintLive(document); }, ms || 1000);
+  }
+
+  function stopLive() {
+    if (_liveTimer) { clearInterval(_liveTimer); _liveTimer = null; }
+  }
+
   global.HouseClock = {
     TZ: TZ,
     parts: parts,
@@ -123,6 +158,22 @@
     dow: dow,
     daypart: daypart,
     stamp: stamp,
-    now: function () { return stamp(new Date()); }
+    now: function () { return stamp(new Date()); },
+    paintLive: paintLive,
+    startLive: startLive,
+    stopLive: stopLive
   };
+
+  if (typeof document !== "undefined") {
+    function bootLive() {
+      if (document.querySelector("[data-live-clock], [data-live='time'], [data-live='clock-time']")) {
+        startLive(1000);
+      }
+    }
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bootLive);
+    } else {
+      bootLive();
+    }
+  }
 })(typeof window !== "undefined" ? window : globalThis);

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>AINSLEY · Vinyl Heat LOOK · 1080×1920</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #030508; font-family: Inter, system-ui, sans-serif; color: #f2ead4; }
+.stage {
+  position: relative; width: 1080px; height: 1920px;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 8%, rgba(255,170,40,0.22), transparent 58%),
+    radial-gradient(ellipse 50% 40% at 92% 88%, rgba(94,200,224,0.12), transparent 55%),
+    linear-gradient(180deg, #0a0908 0%, #030508 45%, #0c0804 100%);
+}
+.pad { position: relative; z-index: 1; height: 100%; padding: 28px 22px 18px; display: flex; flex-direction: column; }
+.panel {
+  flex: 1; display: flex; flex-direction: column; gap: 12px; border-radius: 28px; overflow: hidden; position: relative;
+  padding: 20px 22px 16px;
+  background: linear-gradient(165deg, rgba(8,10,16,0.98) 0%, rgba(18,14,6,0.94) 48%, rgba(4,6,12,0.98) 100%);
+  border: 2px solid rgba(255,190,64,0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255,230,160,0.22),
+    inset 0 -1px 0 rgba(0,0,0,0.55),
+    0 12px 0 rgba(8,10,14,0.4),
+    0 0 48px rgba(255,170,30,0.35),
+    0 40px 100px rgba(0,0,0,0.7);
+}
+.panel::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 72% 40% at 12% -5%, rgba(255,190,50,0.2), transparent 55%),
+    radial-gradient(ellipse 40% 30% at 98% 100%, rgba(94,200,224,0.1), transparent 50%);
+}
+.panel > * { position: relative; z-index: 2; }
+
+/* header — clock in, no brand */
+.hdr {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 10px 14px; border-radius: 16px;
+  background: rgba(1,2,5,0.88);
+  border: 1.5px solid rgba(255,190,64,0.4);
+  box-shadow: inset 0 1px 0 rgba(255,230,160,0.12), 0 0 24px rgba(255,170,30,0.18);
+}
+.clock-block { display: flex; align-items: baseline; gap: 10px; }
+.clock-lab {
+  font-family: "JetBrains Mono", monospace; font-size: 14px; font-weight: 800;
+  letter-spacing: 0.2em; color: #ffe8a0; text-shadow: 0 0 12px rgba(255,180,40,0.45);
+}
+.clock {
+  font-size: 56px; font-weight: 900; letter-spacing: -0.06em; line-height: 0.9;
+  color: #ffe8a0;
+  text-shadow: 0 0 40px rgba(255,180,30,0.7), 0 0 14px rgba(255,200,60,0.4), 0 2px 0 rgba(0,0,0,0.65);
+}
+.ovals { display: flex; gap: 10px; }
+.oval {
+  display: flex; align-items: center; gap: 8px; min-width: 148px; padding: 10px 14px;
+  border-radius: 999px;
+  background: linear-gradient(145deg, rgba(255,200,70,0.22), rgba(180,90,10,0.18));
+  border: 1.5px solid rgba(255,200,80,0.65);
+  box-shadow: 0 0 16px rgba(255,170,30,0.28), inset 0 1px 0 rgba(255,230,160,0.25);
+}
+.oval .k { font-family: "JetBrains Mono", monospace; font-size: 9px; font-weight: 800; letter-spacing: 0.14em; color: #ffe894; }
+.oval .v { font-size: 15px; font-weight: 850; color: #fff8e0; }
+.oval .dot { width: 8px; height: 8px; border-radius: 50%; background: #f0a818; box-shadow: 0 0 10px rgba(255,180,40,0.8); }
+
+.identity { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+.name {
+  font-size: 42px; font-weight: 900; letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #fff 8%, #ffe08a 50%, #f5c542 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 22px rgba(245,197,66,0.7));
+}
+.chip {
+  font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 800; letter-spacing: 0.12em;
+  padding: 8px 12px; border-radius: 999px; background: #0a0c10; color: #ffe08a;
+  border: 1px solid rgba(255,210,90,0.85); box-shadow: 0 0 18px rgba(245,197,66,0.45);
+}
+
+/* vinyl stage */
+.stage-row {
+  display: flex; gap: 16px; align-items: stretch; margin-top: 4px;
+}
+.vinyl-wrap {
+  flex: 0 0 340px; display: grid; place-items: center;
+  border-radius: 18px; padding: 18px;
+  background: rgba(0,0,0,0.45);
+  border: 1.5px solid rgba(255,190,64,0.35);
+  box-shadow: inset 0 0 40px rgba(255,170,30,0.08), 0 0 28px rgba(255,170,30,0.15);
+}
+.vinyl-wrap img { width: 300px; height: 300px; display: block; filter: drop-shadow(0 0 18px rgba(245,180,70,0.35)); }
+.side-stack { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.hot {
+  border-radius: 16px; padding: 14px 16px;
+  background: linear-gradient(125deg, rgba(55,45,12,0.98), rgba(10,12,16,0.99) 55%);
+  border: 1.5px solid rgba(255,210,90,0.85);
+  box-shadow: 0 0 40px rgba(245,197,66,0.4), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.hot .lab { font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 800; letter-spacing: 0.16em; color: #ffe08a; }
+.hot .main { margin-top: 4px; font-size: 22px; font-weight: 850; color: #fff; }
+.hot .sub { margin-top: 4px; font-size: 13px; font-weight: 600; color: rgba(200,215,230,0.62); }
+
+/* mood rockers */
+.eras {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 8px 12px; border-radius: 12px;
+  background: rgba(12,11,9,0.82);
+  border: 1px solid rgba(245,196,70,0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.eras-lab {
+  font-size: 11px; font-weight: 850; letter-spacing: 0.18em; text-transform: uppercase;
+  color: #f5c446; margin-right: 4px; text-shadow: 0 0 10px rgba(245,196,70,0.35);
+}
+.era {
+  min-height: 34px; padding: 6px 14px; border-radius: 999px;
+  border: 1px dashed rgba(160,156,140,0.35);
+  background: rgba(18,16,12,0.75); color: rgba(180,176,160,0.55);
+  font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.era.on {
+  border-style: solid; border-color: #d4a860;
+  background: linear-gradient(180deg, #d4a860, #b85a28); color: #14100a;
+  box-shadow: 0 0 14px rgba(245,180,70,0.45), inset 0 1px 0 rgba(255,240,200,0.35);
+}
+
+/* day-record rail */
+.day-rail {
+  display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 14px;
+  background: rgba(12,11,9,0.82);
+  border: 1px solid rgba(245,196,70,0.16);
+  overflow: hidden;
+}
+.day-rail .lab {
+  font-family: "JetBrains Mono", monospace; font-size: 10px; font-weight: 850;
+  letter-spacing: 0.16em; color: #ffe8a0; flex-shrink: 0; margin-right: 4px;
+}
+.pill {
+  display: flex; flex-direction: column; justify-content: center; gap: 2px;
+  min-width: 0; flex: 1; padding: 8px 12px; border-radius: 12px; min-height: 52px;
+}
+.pill.live {
+  background: linear-gradient(90deg, #a85808 0%, #f0a818 42%, #ffe894 100%);
+  border: 1px solid #9a6810;
+  box-shadow: 0 0 14px rgba(255,180,30,0.4), inset 0 1px 0 rgba(255,255,255,0.35);
+  color: #140c02;
+}
+.pill.off {
+  background: linear-gradient(90deg, #0c0e12 0%, #22262e 55%, #3a404c 100%);
+  border: 1px solid rgba(255,255,255,0.1); color: #b8bcc4;
+}
+.pill .st { font-family: "JetBrains Mono", monospace; font-size: 8px; font-weight: 800; letter-spacing: 0.14em; }
+.pill .nm { font-size: 14px; font-weight: 900; letter-spacing: 0.02em; }
+
+/* SIDE A bar */
+.xp {
+  display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px;
+  background: rgba(1,2,5,0.9); border: 2px solid rgba(255,190,64,0.45);
+}
+.xp .lab { font-size: 12px; font-weight: 850; letter-spacing: 0.16em; color: #f0a818; text-transform: uppercase; }
+.xp .track { flex: 1; height: 22px; border-radius: 6px; background: #0a0c10; border: 1.5px solid rgba(255,190,64,0.35); overflow: hidden; }
+.xp .fill { height: 100%; width: 42%; background: linear-gradient(90deg, #a85808, #f0a818, #ffe894); box-shadow: 0 0 14px rgba(255,180,40,0.5); }
+.xp .meta { font-size: 13px; font-weight: 800; color: rgba(200,190,160,0.7); }
+
+/* Tour jar strip */
+.tour {
+  margin-top: auto;
+  border-radius: 16px; padding: 16px 18px;
+  background: linear-gradient(145deg, rgba(255,200,70,0.12), transparent 42%),
+              linear-gradient(165deg, rgba(8,10,16,0.98), rgba(18,14,6,0.94));
+  border: 2px solid rgba(255,190,64,0.65);
+  box-shadow: inset 0 1px 0 rgba(255,230,160,0.22), 0 0 36px rgba(255,170,30,0.28), 0 8px 0 rgba(8,10,14,0.35);
+}
+.tour-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.tour .t { font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 800; letter-spacing: 0.16em; color: #ffe8a0; }
+.tour .g { font-size: 26px; font-weight: 900; color: #fff8e0; margin-top: 2px; }
+.tour .count { font-size: 56px; font-weight: 900; color: #ffe894; line-height: 0.9; text-shadow: 0 0 24px rgba(255,180,40,0.5); }
+.tour .track {
+  margin-top: 12px; height: 48px; border-radius: 10px;
+  background: #010205; border: 2px solid rgba(255,190,64,0.55);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.65), 0 0 18px rgba(255,170,30,0.25);
+  overflow: hidden; position: relative;
+}
+.tour .fill {
+  height: 100%; width: 35%;
+  background: linear-gradient(90deg, #a85808, #f0a818, #ffe894);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.4), 0 0 20px rgba(255,180,40,0.55);
+}
+.tour .flow {
+  margin-top: 10px; display: flex; gap: 0; border-radius: 8px; overflow: hidden;
+  border: 1px solid rgba(255,190,64,0.35);
+}
+.tour .step {
+  flex: 1; padding: 8px 6px; text-align: center; font-size: 11px; font-weight: 800;
+  background: rgba(0,0,0,0.35); color: rgba(200,190,160,0.75); border-right: 1px solid rgba(255,190,64,0.2);
+}
+.tour .step:last-child { border-right: none; }
+.tour .step.on { background: linear-gradient(180deg, #d4a860, #b85a28); color: #14100a; }
+
+.footnote {
+  text-align: center; font-size: 10px; font-weight: 650; color: rgba(180,176,160,0.4);
+  letter-spacing: 0.08em; padding-top: 4px;
+}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="pad">
+    <div class="panel">
+      <header class="hdr">
+        <div class="clock-block">
+          <div class="clock-lab">CT</div>
+          <div class="clock">9:54 PM</div>
+        </div>
+        <div class="ovals">
+          <div class="oval"><span class="dot"></span><div><div class="k">WEATHER</div><div class="v">68° clear</div></div></div>
+          <div class="oval"><span class="dot"></span><div><div class="k">SENSI</div><div class="v">72° · auto</div></div></div>
+        </div>
+      </header>
+
+      <div class="identity">
+        <div class="name">AINSLEY</div>
+        <div class="chip">ERAS STAGE · LIVE</div>
+      </div>
+
+      <div class="stage-row">
+        <div class="vinyl-wrap">
+          <img src="ainsley-vinyl-amber.png" alt="amber vinyl"/>
+        </div>
+        <div class="side-stack">
+          <div class="hot">
+            <div class="lab">ON THE BOARD · SUNDAY</div>
+            <div class="main">SUN · vanity 3:00 · Jessy</div>
+            <div class="sub"><strong>Vanity 3:00</strong> with Dad @ 147th</div>
+          </div>
+          <div class="eras" aria-label="Mood rockers">
+            <span class="eras-lab">MOOD</span>
+            <span class="era">Midnight</span>
+            <span class="era">Fog</span>
+            <span class="era on">Honey Amber</span>
+            <span class="era">Dusk</span>
+            <span class="era">Birch</span>
+          </div>
+          <div class="xp">
+            <div class="lab">SIDE A · TODAY</div>
+            <div class="track"><div class="fill"></div></div>
+            <div class="meta">2/6</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="day-rail" aria-label="Day record">
+        <div class="lab">DAY RECORD</div>
+        <div class="pill live"><span class="st">LIVE</span><span class="nm">SESSION</span></div>
+        <div class="pill live"><span class="st">LIVE</span><span class="nm">SIDE A</span></div>
+        <div class="pill live"><span class="st">LIVE</span><span class="nm">SETLIST</span></div>
+        <div class="pill off"><span class="st">OFF</span><span class="nm">ENCORE</span></div>
+        <div class="pill off"><span class="st">OFF</span><span class="nm">PRESS</span></div>
+      </div>
+
+      <section class="tour" aria-label="Tour Jar">
+        <div class="tour-top">
+          <div>
+            <div class="t">★ TOUR JAR · PRESSED</div>
+            <div class="g">Tour Jar</div>
+          </div>
+          <div class="count">★ 0</div>
+        </div>
+        <div class="track"><div class="fill"></div></div>
+        <div class="flow">
+          <div class="step on">MUSTS</div>
+          <div class="step">PRESS</div>
+          <div class="step">JAR</div>
+          <div class="step">PAYDAY</div>
+        </div>
+      </section>
+
+      <div class="footnote">LOOK PLATE · AVINYL1 · NO LIVE PAGES EDIT · HOMAGE-CLEAN</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

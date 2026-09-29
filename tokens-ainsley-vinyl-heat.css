@@ -1,0 +1,130 @@
+/* AINSLEY VINYL HEAT · Prism LOOK drop-in · CMDDECK2 DNA · 2026-09-28
+   Paste on kid-ainsley.html (or link). Atlas ships. Prism does not push Pages. */
+
+:root {
+  --av-void: #0a0908;
+  --av-glass: rgba(12, 11, 9, 0.82);
+  --av-amber: #f5c446;
+  --av-amber-hi: #ffe894;
+  --av-amber-lo: #b85a28;
+  --av-amber-mid: #d4a860;
+  --av-ghost: rgba(180, 176, 160, 0.35);
+  --av-ink: #f2ead4;
+}
+
+/* Vinyl instrument — hotter float */
+.vinyl-float {
+  width: 188px !important;
+  height: 188px !important;
+  right: 28px !important;
+  top: 96px !important;
+  opacity: 0.4 !important;
+  filter: drop-shadow(0 0 18px rgba(245, 180, 70, 0.35))
+          drop-shadow(0 8px 24px rgba(0, 0, 0, 0.55)) !important;
+  background-image: url("theme-tiles/ainsley-vinyl.png") !important;
+}
+
+/* Mood → rocker pills (CMDDECK2 lights DNA) */
+.eras {
+  gap: 6px !important;
+  padding: 6px 10px !important;
+  background: var(--av-glass) !important;
+  border: 1px solid rgba(245, 196, 70, 0.18) !important;
+  border-radius: 12px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04),
+              0 0 0 1px rgba(0, 0, 0, 0.45) !important;
+}
+.eras-lab {
+  color: var(--av-amber) !important;
+  letter-spacing: 0.18em !important;
+  text-shadow: 0 0 10px rgba(245, 196, 70, 0.35) !important;
+}
+.era {
+  min-height: 34px !important;
+  padding: 6px 12px !important;
+  border-radius: 999px !important;
+  border: 1px dashed rgba(160, 156, 140, 0.35) !important;
+  background: rgba(18, 16, 12, 0.75) !important;
+  color: var(--av-ghost) !important;
+  box-shadow: none !important;
+}
+.era.on {
+  border-style: solid !important;
+  border-color: var(--av-amber-mid) !important;
+  background: linear-gradient(180deg, var(--av-amber-mid), var(--av-amber-lo)) !important;
+  color: #14100a !important;
+  box-shadow: 0 0 14px rgba(245, 180, 70, 0.45),
+              inset 0 1px 0 rgba(255, 240, 200, 0.35) !important;
+}
+
+/* Day-record / session rail — denser instrument pills */
+.day-records,
+.session-rail,
+.vinyl-days {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--av-glass);
+  border-radius: 14px;
+  border: 1px solid rgba(245, 196, 70, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+.day-records .row,
+.session-rail .row,
+.vinyl-days .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(8, 7, 6, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--av-ink);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-size: 13px;
+}
+.day-records .row.live,
+.session-rail .row.live {
+  border-color: rgba(245, 196, 70, 0.55);
+  box-shadow: 0 0 12px rgba(245, 180, 70, 0.22);
+}
+.day-records .row.live .chip,
+.session-rail .row.live .chip {
+  background: linear-gradient(180deg, var(--av-amber-mid), var(--av-amber-lo));
+  color: #14100a;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+.day-records .row.stub,
+.session-rail .row.stub {
+  border-style: dashed;
+  opacity: 0.55;
+  color: var(--av-ghost);
+}
+
+/* Tour jar twin — dark glass + amber fill bloom */
+.tour-jar,
+.xp-stage,
+.grow-tour {
+  background: var(--av-glass) !important;
+  border: 1px solid rgba(245, 196, 70, 0.22) !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5),
+              0 0 24px rgba(245, 180, 70, 0.12) !important;
+  border-radius: 16px !important;
+}
+.tour-jar .fill,
+.xp-stage-fill {
+  background: linear-gradient(180deg, var(--av-amber-hi), var(--av-amber-lo)) !important;
+  box-shadow: 0 0 18px rgba(245, 180, 70, 0.4) !important;
+}
+
+/* Kid header — logo-free control strip */
+.hdr .brand img { display: none !important; }
+.hdr .tagline { display: none !important; }
+.hdr .eyebrow { color: var(--av-amber) !important; }
