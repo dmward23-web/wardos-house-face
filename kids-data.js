@@ -1071,8 +1071,9 @@
 
 
   function growGoalView(kidId, data, bank) {
+    /* JARMATH1 · the jar always shows the jar's real target (bankGoal), never a
+     * personal save — those live on the Saves line only. */
     var gv = personalGoalView(kidId, data, bank);
-    if (gv && gv.active && gv.need > 0) return gv;
     var kid = data && data.kids && data.kids[kidId];
     var bg = (kid && kid.bankGoal) || {};
     var need = typeof bg.dollarNeed === "number" ? bg.dollarNeed : (typeof bg.need === "number" ? bg.need : 0);

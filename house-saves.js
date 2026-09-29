@@ -3,11 +3,9 @@
   "use strict";
 
   var KEY = "house-saves:v1";
-  var DEFAULTS = {
-    ainsley: [{ id: "seed-stick-season", name: "Stick Season · concert save", need: 40 }],
-    hayes: [{ id: "seed-victory-stash", name: "Victory stash", need: 12 }],
-    harris: [{ id: "seed-gem-stash", name: "Gem stash", need: 8 }]
-  };
+  /* JARMATH1 · no seeded sample saves ("Gem stash $8" etc.). Nothing DEMO:
+   * a save shows only when the kid writes one in. Old seed rows are dropped. */
+  var DEFAULTS = { ainsley: [], hayes: [], harris: [] };
 
   function esc(s) {
     return String(s == null ? "" : s)
@@ -27,6 +25,10 @@
 
   function list(kidId) {
     var root = loadRoot();
+    if (root[kidId] && root[kidId].some(function (x) { return x && /^seed-/.test(String(x.id || "")); })) {
+      root[kidId] = root[kidId].filter(function (x) { return x && !/^seed-/.test(String(x.id || "")); });
+      saveRoot(root);
+    }
     if (!root[kidId]) {
       root[kidId] = (DEFAULTS[kidId] || []).map(function (x) {
         return { id: x.id, name: x.name, need: x.need || 0, created: Date.now() };
