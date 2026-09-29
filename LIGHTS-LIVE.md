@@ -111,7 +111,8 @@ Secrets **never** on Pages / git.
 | `need_token` / `need_creds` | NEED TOKEN · controls dark |
 | `stage` | same as need_token · roster declared, no live reads |
 | `live` | LIVE · on/brightness/online from fetch (if fresh) · writeProxy baked |
-| `error` / stale | show error · controls dark · never invent LIVE |
+| `error` | show error · controls dark · never invent LIVE |
+| `live` (aged) | still **LIVE** for writes while proxy up · cron keeps JSON ≤15m · never STALE-disable taps |
 
 ```json
 {
@@ -168,7 +169,45 @@ LIGHTS_PROXY_TOKEN=$(cat ~/.config/wardos/lights-proxy.token) \
 
 Rotate the proxy token + tunnel if leaked. Revoking Kasa password is separate and stays box-only.
 
+## Recurring refresh (FOREVER · STALE killer)
+
+**Problem this kills:** Wall showed **STALE** and disabled writes when `lights-live.json` aged past 30m (no standing Kasa fetch).
+
+**Durable fix (2026-09-28 CT):**
+
+1. **Box cron every 15 min** → `scripts/lights-refresh.sh`
+   - Kasa cloud probe → `data/lights-live.json` (`status:live`)
+   - Re-bakes `writeProxy` + `writeProxyToken` from `~/.config/wardos/`
+   - Restarts `lights-write-proxy` (:8788) if dead
+   - Reopens CF quick tunnel to :8788 if health fails; persists new URL
+   - Commits **only** `data/lights-live.json` + pushes `origin/main` (never sensi/nest)
+2. **Wall gate:** `house-lights.js` no longer flips `live:false` / disables taps solely because JSON aged. Soft age window is 24h; writes stay on while `status===live` + proxy healthy.
+
+```cron
+# Preferred when crontab exists:
+*/15 * * * * /workspace/wardos-house-face/scripts/lights-refresh.sh
+```
+
+**This Atlas box (2026-09-28):** `cron`/`crontab` package **not available**. Standing path is the forever loop:
+
+```bash
+# one-shot start (idempotent — PID file ~/.cache/wardos/lights-refresh-loop.pid)
+nohup /workspace/wardos-house-face/scripts/lights-refresh-loop.sh   >>~/.cache/wardos/lights-refresh-loop.log 2>&1 &
+# interval default 900s (15m); override: LIGHTS_REFRESH_INTERVAL_SEC=1200
+```
+
+Logs: `~/.cache/wardos/lights-refresh.log` · `lights-refresh-loop.log`
+
+**Parent / routine note:** No MCP routine tool. On box rebuild: (1) start `lights-write-proxy` + CF tunnel to :8788, (2) start `lights-refresh-loop.sh`, (3) or install crontab with the line above if cron becomes available. Parent standing routine can shell `./scripts/lights-refresh.sh` every 15–20m as an alternative.
+
+Manual one-shot (same as cron body core):
+```bash
+cd /workspace/wardos-house-face && ./scripts/lights-refresh.sh
+# or: node scripts/lights-fetch.mjs && git add data/lights-live.json && git commit -m "LIGHTS-live · refresh" && git push
+```
+
 ## UI rules
+
 
 - **LIVE** only when `status === "live"` and snapshot is fresh.
 - Missing Kasa creds → **NEED TOKEN** · controls dark (**No DEMO**).

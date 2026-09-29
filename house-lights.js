@@ -12,7 +12,9 @@
 
   var STATE_KEY = "house-lights-state"; /* legacy — unused for write */
   var LIVE_URL = "data/lights-live.json";
-  var LIVE_FRESH_MS = 30 * 60 * 1000;
+  /* FOREVER: age must never disable wall writes. Cron refreshes ~15m.
+     Soft display window kept long only as last-resort honesty if cron dies. */
+  var LIVE_FRESH_MS = 24 * 60 * 60 * 1000;
   var LIVE_POLL_MS = 60 * 1000;
   var DOCS = "LIGHTS-LIVE.md";
   var PROXY_LS_KEY = "wardos-lights-proxy";
@@ -141,7 +143,11 @@
 
   function canWrite() {
     var g = gate();
-    return !!(g.live && g.writeSupported && _proxyReachable && proxyBase());
+    var data = g.data;
+    /* Forever: status=live + writeSupported + proxy — JSON age must NOT kill taps. */
+    var statusLive = !!(data && data.status === "live");
+    var ws = !!(g.writeSupported || (data && data.writeSupported));
+    return !!(statusLive && ws && _proxyReachable && proxyBase());
   }
 
   function probeProxy(cb) {
@@ -231,29 +237,25 @@
         ageMs: age
       };
     }
-    if (st === "live" && age <= LIVE_FRESH_MS) {
+    if (st === "live") {
       var ws = !!data.writeSupported;
       var label = "LIVE";
       if (ws && _proxyReachable === false) label = "LIVE · PROXY OFF";
       else if (ws && _proxyReachable === null) label = "LIVE";
       else if (!ws) label = "LIVE · READ ONLY";
+      /* FOREVER FIX: never STALE-disable writes when JSON ages.
+         Soft label only if snapshot older than LIVE_FRESH_MS (24h) AND proxy down. */
+      if (age > LIVE_FRESH_MS && ws && _proxyReachable === false) {
+        label = "STALE · PROXY OFF";
+      } else if (age > LIVE_FRESH_MS && !ws) {
+        label = "STALE · READ ONLY";
+      }
       return {
         kind: "live",
         live: true,
         needToken: false,
         label: label,
         writeSupported: ws,
-        data: data,
-        ageMs: age
-      };
-    }
-    if (st === "live" && age > LIVE_FRESH_MS) {
-      return {
-        kind: "stale",
-        live: false,
-        needToken: false,
-        label: "STALE",
-        writeSupported: !!data.writeSupported,
         data: data,
         ageMs: age
       };
