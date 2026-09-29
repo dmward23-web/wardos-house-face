@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-29T22:48:29.476Z",
+  "refreshedAt": "2026-09-29T22:57:35.199Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -763,12 +763,6 @@
         },
         {
           "when": "Thu 1 · leave 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "when": "Tue 6 · leave 5:00",
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
