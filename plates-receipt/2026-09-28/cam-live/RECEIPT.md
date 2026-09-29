@@ -24,7 +24,7 @@ Proof JSON + screenshot: `plates/2026-09-28/cam-live/proof.json` · `hub-cam-dec
 
 ## Protected
 
--  **not modified by CAMLIVE2** (left at concurrent SENSIFRESH · md5 )
+- `data/sensi-live.json` not modified by CAMLIVE2 (left at concurrent SENSIFRESH · md5 `f94ad66f17893dafb644fca4c82c37ca`)
 - SDM OAuth / `nest-sdm.json` / refresh token stay box-only (never git)
 
 ## Cache bust
