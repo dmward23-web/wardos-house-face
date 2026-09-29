@@ -1,4 +1,4 @@
-/* KEYPASTE1 · WardOS hub: paste the setup link right on the screen.
+/* KEYPASTE2 · WardOS hub: paste the setup link right on the screen.
  * iOS home-screen icons keep their own storage (separate from Safari), so a
  * setup link opened in Safari never reaches the icon. Tapping a camera that
  * says NEED KEY opens this box; paste the link (or the keys) once and both the
@@ -67,7 +67,10 @@
       }
       msg.style.color = "#9be39b";
       msg.textContent = "Saved. Reloading…";
-      setTimeout(function () { location.replace(location.pathname); }, 400);
+      var q = location.search.replace(/^\?/, "").split("&").filter(function (kv) {
+        return kv && !/^(lightsProxyToken|nestProxyToken|proxyToken)=/.test(kv);
+      }).join("&");
+      setTimeout(function () { location.replace(location.pathname + (q ? "?" + q : "")); }, 400);
     });
     setTimeout(function () { try { input.focus(); } catch (e) {} }, 50);
   }
@@ -85,6 +88,16 @@
     e.stopPropagation();
     openBox();
   }, true);
+
+  /* KEYPASTE2: a screen with no camera key opens the box by itself (once per load). */
+  function hasKey() {
+    try {
+      return !!localStorage.getItem(NEST_LS) || /(nestProxyToken|proxyToken)=/.test(location.search);
+    } catch (_) { return true; }
+  }
+  function autoOpen() { if (!hasKey()) setTimeout(openBox, 1200); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", autoOpen);
+  else autoOpen();
 
   window.WardHubKeyEntry = { open: openBox, parse: parseKeys };
 })();
