@@ -821,6 +821,17 @@
         if (img && h.snapUrl) img.style.display = "block";
       }
     }
+    /* CAMKEY1: proxy says this screen has no/old camera key — say so, not STALE. */
+    if (reason && /unauthorized|\b401\b/i.test(String(reason))) {
+      var kp = el.querySelector(".hub-cam-pill");
+      if (kp) {
+        kp.textContent = "NEED KEY";
+        kp.classList.remove("is-live", "is-still", "is-stale", "is-stub");
+        kp.classList.add("is-need");
+      }
+      var lbl = el.getAttribute("aria-label") || "";
+      el.setAttribute("aria-label", lbl.replace(/·.*$/, "· NEED KEY"));
+    }
     if (reason && typeof console !== "undefined" && console.info) {
       try { console.info("[CAMLIVE2] hub not LIVE:", reason); } catch (_) {}
     }
