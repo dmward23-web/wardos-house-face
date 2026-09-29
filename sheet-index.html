@@ -3007,6 +3007,15 @@
     border-color: rgba(224,160,64,0.55) !important;
   }
   .hdr.hdr--spread .hdr-ovals { gap: 6px !important; }
+
+  /* KIDSWAP1 · force-kill Nest/Lights header ovals (Weather+Sensi only) */
+  .hdr-ovals .nest-hdr,
+  .hdr-ovals .lights-hdr,
+  .hdr-ovals a.nest-chip,
+  .hdr-ovals a.lights-chip,
+  .hdr .nest-hdr,
+  .hdr .lights-hdr { display: none !important; }
+
   .hdr.hdr--spread .lights-hdr,
   .hdr.hdr--spread .sensi-hdr,
   .hdr.hdr--spread .nest-hdr,
@@ -3412,22 +3421,6 @@
  <div class="tile-foot"><span class="tile-fact">Month board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
- <a class="tile hayes" href="kid-hayes.html">
- <div class="tile-top">
- <div class="tile-icon av g2-av hayes" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-hayes"/></svg></div>
- <div class="tile-titles">
- <div class="tile-label">Hayes</div>
- <div class="tile-sub">Baseball · school · flag</div>
- </div>
- </div>
- <div class="tile-micro">
- <div class="tile-mrow"><span class="mt">5:40</span><span class="md">Baseball practice</span><span class="tile-mchip amber">Today</span></div>
- <div class="tile-mrow"><span class="mt">TUE</span><span class="md">SRE drop 8:10 · flag 5:40</span></div>
- <div class="tile-mrow"><span class="mt">8:40</span><span class="md">Madi + provider collab</span></div>
- </div>
- <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
- </a>
-
  <a class="tile ainsley" href="kid-ainsley.html">
  <div class="tile-top">
  <div class="tile-icon av g2-av ains" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-ainsley"/></svg></div>
@@ -3440,6 +3433,22 @@
  <div class="tile-mrow"><span class="mt">TUE</span><span class="md">LKMS hearing/vision</span><span class="tile-mchip rose">Day</span></div>
  <div class="tile-mrow"><span class="mt">4:25</span><span class="md">Swim · Coach Ann</span></div>
  <div class="tile-mrow"><span class="mt">JAR</span><span class="md">Tour jar · payday w/ Dad</span></div>
+ </div>
+ <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
+ </a>
+
+ <a class="tile hayes" href="kid-hayes.html">
+ <div class="tile-top">
+ <div class="tile-icon av g2-av hayes" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-hayes"/></svg></div>
+ <div class="tile-titles">
+ <div class="tile-label">Hayes</div>
+ <div class="tile-sub">Baseball · school · flag</div>
+ </div>
+ </div>
+ <div class="tile-micro">
+ <div class="tile-mrow"><span class="mt">5:40</span><span class="md">Baseball practice</span><span class="tile-mchip amber">Today</span></div>
+ <div class="tile-mrow"><span class="mt">TUE</span><span class="md">SRE drop 8:10 · flag 5:40</span></div>
+ <div class="tile-mrow"><span class="mt">8:40</span><span class="md">Madi + provider collab</span></div>
  </div>
  <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
@@ -3570,7 +3579,7 @@
 <script src="house-sfx.js?v=CAMDECK1"></script>
 <script src="house-sensi.js?v=CAMDECK1"></script>
 <script src="house-nest.js?v=NESTVID1"></script>
-<script src="house-lights.js?v=HUBCMD2"></script>
+<script src="house-lights.js?v=KIDSWAP1"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
@@ -3588,7 +3597,7 @@
  var S = window.HouseSensi;
  var N = window.HouseNest;
  var L = window.HouseLights;
- /* HUBCMD2 / OVALTRIM1 · Nest + Lights header ovals removed (cam deck + light pills carry them) */
+ /* KIDSWAP1 · Ainsley before Hayes tiles · Nest/Lights header ovals stay removed */
  function paintHubLive() {
   if (L && L.paintHubPanel) L.paintHubPanel(document);
  }
