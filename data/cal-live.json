@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-29T22:45:14.708Z",
+  "fetchedAt": "2026-09-29T22:48:29.755Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-06",
@@ -54,7 +54,7 @@
     },
     {
       "id": "2rn2cegcuk32c0skjn9bgdignk",
-      "summary": "Ainsley — appointment · 1:00",
+      "summary": "Ainsley — Lindsay appt · 1:00",
       "start": "2026-09-30T12:40:00-05:00",
       "end": "2026-09-30T14:20:00-05:00",
       "location": "8675 College Blvd, Overland Park, KS 66210-1946",
@@ -342,7 +342,7 @@
     },
     {
       "id": "7qmnbg7327q2kv9lm16etfdngg",
-      "summary": "Ainsley — appointment · 2:00",
+      "summary": "Ainsley — Lindsay appt · 2:00",
       "start": "2026-10-05T13:40:00-05:00",
       "end": "2026-10-05T15:20:00-05:00",
       "location": "8675 College Blvd, Overland Park, KS 66210-1946",

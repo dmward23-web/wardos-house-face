@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-29T22:45:14.412Z",
+  "refreshedAt": "2026-09-29T22:48:29.476Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -76,14 +76,14 @@
       {
         "label": "Next up · Wed",
         "time": "12:40",
-        "place": "appointment",
+        "place": "Lindsay appt",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
         "startIso": "2026-09-30T17:40:00.000Z",
         "endIso": "2026-09-30T19:20:00.000Z",
         "kind": "appointment",
         "whenLabel": "Wed 12:40",
-        "summary": "Ainsley — appointment · 1:00"
+        "summary": "Ainsley — Lindsay appt · 1:00"
       },
       {
         "label": "Next up · Wed",
@@ -727,7 +727,7 @@
           "hours": "leave 4:25 · 5:00"
         }
       ],
-      "appointmentsEmpty": "",
+      "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
         "when": "TUE · 4:25",
@@ -803,13 +803,13 @@
       "appointments": [
         {
           "when": "Wed 30 · 12:40",
-          "what": "appointment",
+          "what": "Lindsay appt",
           "hint": "with Dad",
           "tone": "hot"
         },
         {
           "when": "Mon 5 · 1:40",
-          "what": "appointment",
+          "what": "Lindsay appt",
           "hint": "with Dad",
           "tone": "hot"
         }
@@ -927,7 +927,7 @@
         },
         {
           "when": "Wed 30 · 12:40",
-          "what": "appointment",
+          "what": "Lindsay appt",
           "tone": "act"
         },
         {
@@ -1007,7 +1007,7 @@
         },
         {
           "when": "Mon 5 · 1:40",
-          "what": "appointment",
+          "what": "Lindsay appt",
           "tone": "act"
         },
         {
