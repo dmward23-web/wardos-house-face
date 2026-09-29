@@ -1,17 +1,21 @@
-/* House Face · Lights control (Kasa / Google Home)
-   Live path: poll data/lights-live.json (Atlas fetcher → Pages).
-   DEMO localStorage toggles when need_token / not live.
-   NEVER invent LIVE. NEVER label DEMO as LIVE.
+/* House Face · Lights control (Kasa LIVE only)
+   Read: poll data/lights-live.json (Atlas fetcher → Pages).
+   Write: POST Atlas lights-write-proxy (creds on box only).
+   HARD LAW: nothing ever DEMO. No fake taps. If proxy/token missing →
+   controls disabled + honest NEED TOKEN / PROXY OFF / OFFLINE.
    See LIGHTS-LIVE.md
-   Keys: house-lights-state */
+   Keys: wardos-lights-proxy · wardos-lights-proxy-token */
 (function (global) {
   "use strict";
 
-  var STATE_KEY = "house-lights-state";
+  var STATE_KEY = "house-lights-state"; /* legacy — unused for write */
   var LIVE_URL = "data/lights-live.json";
   var LIVE_FRESH_MS = 30 * 60 * 1000;
   var LIVE_POLL_MS = 60 * 1000;
   var DOCS = "LIGHTS-LIVE.md";
+  var PROXY_LS_KEY = "wardos-lights-proxy";
+  var PROXY_TOKEN_LS_KEY = "wardos-lights-proxy-token";
+  var DEFAULT_PROXY = "http://127.0.0.1:8788";
 
   var STARTER = [
     { id: "dining-room", name: "Dining Room", where: "Dining Room", kind: "dimmer", on: true, brightness: 52 },
@@ -22,6 +26,10 @@
 
   var _liveCache = null;
   var _listeners = [];
+  var _optimistic = {}; /* id -> {on,brightness,pending} — LIVE only, rolled back on fail */
+  var _proxyReachable = null; /* null unknown · true/false after probe */
+  var _proxyProbeAt = 0;
+  var _writeInFlight = 0;
 
   function parseUpdatedAt(iso) {
     if (!iso) return 0;
@@ -36,38 +44,128 @@
     return Date.now() - t;
   }
 
-  function loadDemo() {
-    var base = {};
-    for (var i = 0; i < STARTER.length; i++) {
-      var s = STARTER[i];
-      base[s.id] = {
-        on: typeof s.on === "boolean" ? s.on : false,
-        brightness: typeof s.brightness === "number" ? clampBright(s.brightness) : 100
-      };
-    }
+  function qs(name) {
     try {
-      var raw = localStorage.getItem(STATE_KEY);
-      if (!raw) return base;
-      var o = JSON.parse(raw);
-      if (!o || typeof o !== "object") return base;
-      for (var id in o) {
-        if (!Object.prototype.hasOwnProperty.call(o, id)) continue;
-        if (!base[id]) base[id] = { on: false, brightness: 100 };
-        if (typeof o[id].on === "boolean") base[id].on = o[id].on;
-        if (typeof o[id].brightness === "number") {
-          base[id].brightness = clampBright(o[id].brightness);
-        }
-      }
-      return base;
+      var u = new URL(location.href);
+      return u.searchParams.get(name);
     } catch (e) {
-      return base;
+      return null;
     }
   }
 
-  function saveDemo(map) {
+  function isPagesHost() {
     try {
-      localStorage.setItem(STATE_KEY, JSON.stringify(map || loadDemo()));
+      return /\.github\.io$/i.test(location.hostname || "");
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function isLoopbackProxy(url) {
+    return /^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/i.test(String(url || ""));
+  }
+
+  /** Seed proxy URL/token from ?lightsProxy= / ?proxy= (once) into localStorage. */
+  function ingestProxyFromQuery() {
+    try {
+      var p = qs("lightsProxy") || qs("proxy");
+      var t = qs("lightsProxyToken") || qs("proxyToken");
+      if (p) localStorage.setItem(PROXY_LS_KEY, String(p).replace(/\/$/, ""));
+      if (t) localStorage.setItem(PROXY_TOKEN_LS_KEY, String(t));
     } catch (e) { /* */ }
+  }
+
+  function proxyBase() {
+    ingestProxyFromQuery();
+    var fromQs = qs("lightsProxy") || qs("proxy");
+    if (fromQs) return String(fromQs).replace(/\/$/, "");
+    try {
+      var ls = localStorage.getItem(PROXY_LS_KEY);
+      if (ls) return String(ls).replace(/\/$/, "");
+      // Nest private-link once-seed (wardos may share box tunnel host)
+      var nest = localStorage.getItem("wardos-nest-proxy") || localStorage.getItem("nestProxy");
+      if (nest) return String(nest).replace(/\/$/, "");
+    } catch (e) { /* */ }
+    var data = (_liveCache && _liveCache.data) || null;
+    if (data && data.writeProxy) return String(data.writeProxy).replace(/\/$/, "");
+    // Pages cannot reach Atlas loopback — leave empty so UI stays PROXY OFF (honest).
+    if (isPagesHost()) return "";
+    return DEFAULT_PROXY;
+  }
+
+  function proxyToken() {
+    var t = qs("lightsProxyToken") || qs("proxyToken");
+    if (t) return t;
+    try {
+      var ls = localStorage.getItem(PROXY_TOKEN_LS_KEY);
+      if (ls) return ls;
+    } catch (e) { /* */ }
+    var data = (_liveCache && _liveCache.data) || null;
+    if (data && data.writeProxyToken) return String(data.writeProxyToken);
+    return "";
+  }
+
+  function proxyHeaders() {
+    var h = { "Content-Type": "application/json", Accept: "application/json" };
+    var t = proxyToken();
+    if (t) {
+      h["X-Lights-Proxy-Token"] = t;
+      h["Authorization"] = "Bearer " + t;
+    }
+    return h;
+  }
+
+  function canWrite() {
+    var g = gate();
+    return !!(g.live && g.writeSupported && _proxyReachable && proxyBase());
+  }
+
+  function probeProxy(cb) {
+    var base = proxyBase();
+    if (!base) {
+      _proxyReachable = false;
+      _proxyProbeAt = Date.now();
+      if (cb) cb(false);
+      notify();
+      return;
+    }
+    // Skip loopback probe on Pages (that IP is the phone/Elo, not Atlas).
+    if (isPagesHost() && isLoopbackProxy(base)) {
+      _proxyReachable = false;
+      _proxyProbeAt = Date.now();
+      if (cb) cb(false);
+      notify();
+      return;
+    }
+    var url = base + "/health?t=" + Date.now();
+    var ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    var timer = setTimeout(function () { try { if (ctrl) ctrl.abort(); } catch (e) {} }, 4000);
+    fetch(url, {
+      cache: "no-store",
+      signal: ctrl ? ctrl.signal : undefined,
+      headers: proxyHeaders()
+    }).then(function (r) {
+      return r.json().then(function (j) {
+        return { ok: r.ok, j: j };
+      }).catch(function () { return { ok: r.ok, j: null }; });
+    }).then(function (res) {
+      clearTimeout(timer);
+      var j = res.j || {};
+      _proxyReachable = !!(res.ok && j.ok && (
+        j.writeSupported === true ||
+        j.lightsWrite === true ||
+        j.service === "lights-write-proxy"
+      ));
+      _proxyProbeAt = Date.now();
+      if (cb) cb(_proxyReachable);
+      notify();
+    }).catch(function () {
+      clearTimeout(timer);
+      _proxyReachable = false;
+      _proxyProbeAt = Date.now();
+      if (cb) cb(false);
+      notify();
+    });
   }
 
   function clampBright(n) {
@@ -81,70 +179,69 @@
    * Gate for UI labels.
    * LIVE only when status==="live" + fresh-ish roster.
    * NEED TOKEN when status need_token|stage.
-   * Never invent LIVE from DEMO localStorage.
+   * Never invent LIVE. No DEMO overlays.
    */
   function gate(data) {
     data = data || (_liveCache && _liveCache.data) || null;
+    var age = ageMs(data);
+    var st = data && data.status;
     if (!data) {
       return {
-        kind: "stub",
-        label: "STUB",
-        live: false,
-        needToken: false,
-        writeSupported: false,
-        error: "missing lights-live.json",
-        lightCount: 0
-      };
-    }
-    if (data.status === "need_token" || data.status === "stage") {
-      var n = ((data.lights && data.lights.length) || STARTER.length);
-      return {
-        kind: "need_token",
-        label: "NEED TOKEN",
+        kind: "offline",
         live: false,
         needToken: true,
+        label: "OFFLINE",
         writeSupported: false,
-        error: data.error || "need Kasa token",
-        lightCount: n,
-        data: data
+        data: null,
+        ageMs: Infinity
       };
     }
-    if (data.status === "error") {
+    if (st === "need_token" || st === "need_creds" || st === "stage") {
       return {
-        kind: "error",
-        label: "FETCH ERR",
+        kind: "need_token",
         live: false,
-        needToken: false,
+        needToken: true,
+        label: "NEED TOKEN",
         writeSupported: false,
-        error: data.error || "error",
-        lightCount: 0,
-        data: data
+        data: data,
+        ageMs: age
       };
     }
-    if (data.status === "live") {
-      var lights = data.lights || [];
-      var aging = ageMs(data) > LIVE_FRESH_MS;
+    if (st === "live" && age <= LIVE_FRESH_MS) {
+      var ws = !!data.writeSupported;
+      var label = "LIVE";
+      if (ws && _proxyReachable === false) label = "LIVE · PROXY OFF";
+      else if (ws && _proxyReachable === null) label = "LIVE";
+      else if (!ws) label = "LIVE · READ ONLY";
       return {
-        kind: aging ? "aging" : "live",
-        label: aging ? "LIVE · aging" : "LIVE",
+        kind: "live",
         live: true,
         needToken: false,
+        label: label,
+        writeSupported: ws,
+        data: data,
+        ageMs: age
+      };
+    }
+    if (st === "live" && age > LIVE_FRESH_MS) {
+      return {
+        kind: "stale",
+        live: false,
+        needToken: false,
+        label: "STALE",
         writeSupported: !!data.writeSupported,
-        error: null,
-        lightCount: lights.length,
-        updatedAt: data.fetchedAt || data.updatedAt,
-        data: data
+        data: data,
+        ageMs: age
       };
     }
     return {
-      kind: "stub",
-      label: "STUB",
+      kind: "error",
       live: false,
       needToken: false,
+      label: (st === "error" ? "ERROR" : "OFFLINE"),
       writeSupported: false,
-      error: "unknown status",
-      lightCount: 0,
-      data: data
+      data: data,
+      ageMs: age
     };
   }
 
@@ -176,86 +273,171 @@
     return r.length ? r : [];
   }
 
+  /* Legacy localStorage readers kept as no-ops for API compat — NEVER used as truth. */
+  function loadDemo() { return {}; }
+  function saveDemo(map) { /* killed · HARD LAW no DEMO */ }
+
   /**
-   * Effective per-light state for UI.
-   * Live reads when gate.live; otherwise DEMO localStorage.
+   * Effective per-light state for UI — LIVE reads only.
+   * Optimistic overlay while a write is in flight; never DEMO localStorage.
    */
   function effectiveLights() {
     var g = gate();
-    var demo = loadDemo();
     var data = g.data || (_liveCache && _liveCache.data) || null;
     var roster = rosterFromLive(data);
     var reserved = reservedFromLive(data);
     var items = [];
-    /* LIVE + writeSupported → pure live reads.
-       LIVE + !writeSupported → DEMO overlay (seeded from live on fetch; taps visible until next poll).
-       else → pure DEMO. */
-    var usePureLive = !!(g.live && g.writeSupported);
+    var liveOk = !!g.live;
     for (var i = 0; i < roster.length; i++) {
       var L = roster[i];
       var id = L.id;
-      var d = demo[id] || { on: false, brightness: 100 };
-      if (usePureLive) {
-        items.push({
-          id: id,
-          name: L.name || id,
-          where: L.where || "",
-          kind: L.kind || "bulb",
-          on: typeof L.on === "boolean" ? L.on : !!d.on,
-          brightness: typeof L.brightness === "number" ? L.brightness : d.brightness,
-          online: L.online !== false,
-          source: "live",
-          pending: !!L.pending
-        });
-      } else {
-        items.push({
-          id: id,
-          name: L.name || id,
-          where: L.where || "",
-          kind: L.kind || "bulb",
-          on: !!d.on,
-          brightness: clampBright(d.brightness),
-          online: g.live ? (L.online !== false) : null,
-          source: g.live ? "live-demo" : "demo",
-          pending: false
-        });
-      }
+      var opt = _optimistic[id];
+      var on = null;
+      var brightness = null;
+      if (opt && typeof opt.on === "boolean") on = opt.on;
+      else if (typeof L.on === "boolean") on = L.on;
+      if (opt && typeof opt.brightness === "number") brightness = opt.brightness;
+      else if (typeof L.brightness === "number") brightness = L.brightness;
+      items.push({
+        id: id,
+        name: L.name || id,
+        where: L.where || "",
+        kind: L.kind || "bulb",
+        on: on,
+        brightness: brightness != null ? clampBright(brightness) : null,
+        online: liveOk ? (L.online !== false) : null,
+        source: liveOk ? "live" : "offline",
+        pending: !!(opt && opt.pending),
+        disabled: !canWrite()
+      });
     }
     return {
       gate: g,
       lights: items,
       reserved: reserved,
       writeSupported: !!(g.writeSupported),
-      source: usePureLive ? "live" : (g.live ? "live-demo" : "demo")
+      proxyReachable: _proxyReachable,
+      canWrite: canWrite(),
+      source: liveOk ? "live" : (g.needToken ? "need_token" : "offline")
     };
+  }
+
+  function applyOptimistic(id, patch) {
+    var cur = _optimistic[id] || {};
+    var next = {
+      on: typeof patch.on === "boolean" ? patch.on : cur.on,
+      brightness: typeof patch.brightness === "number" ? clampBright(patch.brightness) : cur.brightness,
+      pending: true,
+      prev: cur.prev || null
+    };
+    if (!cur.prev) {
+      var eff = effectiveLights();
+      for (var i = 0; i < eff.lights.length; i++) {
+        if (eff.lights[i].id === id) {
+          next.prev = { on: eff.lights[i].on, brightness: eff.lights[i].brightness };
+          break;
+        }
+      }
+    }
+    _optimistic[id] = next;
+  }
+
+  function clearOptimistic(id) {
+    if (id) delete _optimistic[id];
+    else _optimistic = {};
+  }
+
+  function rollbackOptimistic(id) {
+    var o = _optimistic[id];
+    if (o && o.prev) {
+      _optimistic[id] = { on: o.prev.on, brightness: o.prev.brightness, pending: false, prev: null };
+      setTimeout(function () { clearOptimistic(id); notify(); }, 50);
+    } else {
+      clearOptimistic(id);
+    }
+  }
+
+  function postWrite(body) {
+    var base = proxyBase();
+    if (!base) {
+      return Promise.reject(new Error("PROXY OFF · no lights write proxy URL"));
+    }
+    var url = base + "/api/lights/set";
+    _writeInFlight++;
+    return fetch(url, {
+      method: "POST",
+      cache: "no-store",
+      headers: proxyHeaders(),
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      return r.json().then(function (j) {
+        if (!r.ok || !j || !j.ok) {
+          var err = new Error((j && j.error) || ("write HTTP " + r.status));
+          err.payload = j;
+          throw err;
+        }
+        return j;
+      });
+    }).finally(function () {
+      _writeInFlight = Math.max(0, _writeInFlight - 1);
+    });
+  }
+
+  function mergeWriteIntoCache(writePayload) {
+    if (!writePayload || !writePayload.live) return;
+    applyLivePayload(writePayload.live);
   }
 
   function setLight(id, patch) {
     var g = gate();
-    if (g.live && g.writeSupported) {
-      /* live write path not wired — fall through to demo flag only if ever enabled */
+    if (!(g.live && g.writeSupported)) {
+      notify();
+      return null;
     }
-    var demo = loadDemo();
-    if (!demo[id]) demo[id] = { on: false, brightness: 100 };
-    if (patch && typeof patch.on === "boolean") demo[id].on = patch.on;
-    if (patch && typeof patch.brightness === "number") {
-      demo[id].brightness = clampBright(patch.brightness);
+    if (!canWrite()) {
+      probeProxy();
+      notify();
+      return null;
     }
-    saveDemo(demo);
+    applyOptimistic(id, patch || {});
     notify();
-    return demo[id];
+    var body = { id: id };
+    if (patch && typeof patch.on === "boolean") body.on = patch.on;
+    if (patch && typeof patch.brightness === "number") body.brightness = clampBright(patch.brightness);
+    postWrite(body).then(function (j) {
+      clearOptimistic(id);
+      if (j.live) mergeWriteIntoCache(j);
+      else fetchLive();
+      notify();
+    }).catch(function (err) {
+      rollbackOptimistic(id);
+      notify();
+      try { console.warn("[HouseLights] write fail", err && err.message); } catch (e) {}
+    });
+    return _optimistic[id] || null;
   }
 
   function setAll(on) {
-    var eff = effectiveLights();
-    var demo = loadDemo();
-    for (var i = 0; i < eff.lights.length; i++) {
-      var id = eff.lights[i].id;
-      if (!demo[id]) demo[id] = { on: false, brightness: 100 };
-      demo[id].on = !!on;
+    var g = gate();
+    if (!(g.live && g.writeSupported) || !canWrite()) {
+      probeProxy();
+      notify();
+      return;
     }
-    saveDemo(demo);
+    var eff = effectiveLights();
+    for (var i = 0; i < eff.lights.length; i++) {
+      applyOptimistic(eff.lights[i].id, { on: !!on });
+    }
     notify();
+    postWrite(on ? { allOn: true } : { allOff: true }).then(function (j) {
+      clearOptimistic();
+      if (j.live) mergeWriteIntoCache(j);
+      else fetchLive();
+      notify();
+    }).catch(function () {
+      for (var i = 0; i < eff.lights.length; i++) rollbackOptimistic(eff.lights[i].id);
+      notify();
+    });
   }
 
   function notify() {
@@ -271,22 +453,17 @@
   function applyLivePayload(data) {
     _liveCache = { at: Date.now(), data: data };
     var g = gate(data);
-    /* Seed DEMO from LIVE snapshot when writes are not yet proxied —
-       so hub switches match reality on poll, and taps stay visible between polls. */
-    if (g.live && !g.writeSupported) {
-      var demo = loadDemo();
-      var list = (data && data.lights) || [];
-      for (var i = 0; i < list.length; i++) {
-        var L = list[i];
-        if (!L || !L.id) continue;
-        demo[L.id] = {
-          on: typeof L.on === "boolean" ? L.on : !!(demo[L.id] && demo[L.id].on),
-          brightness: typeof L.brightness === "number"
-            ? clampBright(L.brightness)
-            : clampBright((demo[L.id] && demo[L.id].brightness) || 100)
-        };
+    /* Clear optimistic once live snapshot catches up (no DEMO seed — HARD LAW). */
+    if (g.live && data && Array.isArray(data.lights)) {
+      for (var i = 0; i < data.lights.length; i++) {
+        var L = data.lights[i];
+        if (!L || !L.id || !_optimistic[L.id]) continue;
+        var o = _optimistic[L.id];
+        if (o.pending) continue;
+        var matchOn = (typeof o.on !== "boolean") || o.on === L.on;
+        var matchBr = (typeof o.brightness !== "number") || o.brightness === L.brightness;
+        if (matchOn && matchBr) clearOptimistic(L.id);
       }
-      saveDemo(demo);
     }
     notify();
     return g;
@@ -323,9 +500,14 @@
 
   var _pollTimer = null;
   function startPolling() {
-    fetchLive();
+    ingestProxyFromQuery();
+    fetchLive(function () { probeProxy(); });
+    probeProxy();
     if (_pollTimer) return;
-    _pollTimer = setInterval(function () { fetchLive(); }, LIVE_POLL_MS);
+    _pollTimer = setInterval(function () {
+      fetchLive();
+      if (!_proxyProbeAt || Date.now() - _proxyProbeAt > 30000) probeProxy();
+    }, LIVE_POLL_MS);
   }
 
   function countOn(items) {
@@ -391,11 +573,13 @@
     var g = eff.gate;
     var meta = doc.getElementById("lights-zone-meta") || doc.querySelector(".sec-zone .zone-meta");
     if (meta && meta.closest && meta.closest(".sec-zone")) {
-      meta.textContent = g.live
-        ? ("Lights LIVE · " + eff.lights.length + " pads")
-        : (g.needToken
-          ? ("Lights · NEED TOKEN · " + eff.lights.length + " pads · DEMO")
-          : ("Lights · " + g.label + " · garage/door stubs"));
+      meta.textContent = canWrite()
+        ? ("Lights LIVE · " + eff.lights.length + " pads · write armed")
+        : (g.live
+          ? ("Lights LIVE · " + eff.lights.length + " pads · " + (g.writeSupported ? "PROXY OFF" : "READ ONLY"))
+          : (g.needToken
+            ? ("Lights · NEED TOKEN · controls dark")
+            : ("Lights · " + g.label + " · controls dark")));
     }
     var sub = doc.getElementById("lights-ctrl-sub");
     if (sub) {
@@ -409,17 +593,18 @@
     }
     var allOn = doc.getElementById("lights-all-on");
     var allOff = doc.getElementById("lights-all-off");
+    var armed = canWrite();
     if (allOn) {
-      allOn.disabled = false;
-      allOn.style.pointerEvents = "auto";
-      allOn.style.opacity = "1";
-      allOn.style.cursor = "pointer";
+      allOn.disabled = !armed;
+      allOn.style.pointerEvents = armed ? "auto" : "none";
+      allOn.style.opacity = armed ? "1" : "0.45";
+      allOn.style.cursor = armed ? "pointer" : "not-allowed";
     }
     if (allOff) {
-      allOff.disabled = false;
-      allOff.style.pointerEvents = "auto";
-      allOff.style.opacity = "1";
-      allOff.style.cursor = "pointer";
+      allOff.disabled = !armed;
+      allOff.style.pointerEvents = armed ? "auto" : "none";
+      allOff.style.opacity = armed ? "1" : "0.45";
+      allOff.style.cursor = armed ? "pointer" : "not-allowed";
     }
     var grid = doc.getElementById("lights-pad-grid");
     if (grid) {
@@ -530,18 +715,22 @@
 
   function hubSrcLabel(eff, g) {
     g = g || (eff && eff.gate) || gate();
-    if (g.live && g.writeSupported) return "LIVE";
-    if (g.live) return "LIVE · DEMO write";
-    if (g.needToken) return "NEED TOKEN · DEMO";
-    return (g.label || "DEMO") + (eff && eff.source === "demo" ? " · DEMO" : "");
+    if (canWrite()) return "LIVE";
+    if (g.live && g.writeSupported && _proxyReachable === false) return "LIVE · PROXY OFF";
+    if (g.live && g.writeSupported) return "LIVE · PROXY…";
+    if (g.live) return "LIVE · READ ONLY";
+    if (g.needToken) return "NEED TOKEN";
+    return g.label || "OFFLINE";
   }
 
   function hubHonesty(g) {
     g = g || gate();
+    if (canWrite()) return "LIVE";
+    if (g.live && g.writeSupported && _proxyReachable === false) return "PROXY OFF";
     if (g.live && g.writeSupported) return "LIVE";
-    if (g.live) return "LIVE";
-    if (g.needToken) return "NEED TOKEN · DEMO";
-    return (g.label || "STUB") + " · DEMO";
+    if (g.live) return "READ ONLY";
+    if (g.needToken) return "NEED TOKEN";
+    return g.label || "OFFLINE";
   }
 
   /** Hub primary control · rocker switches on sheet-index (Dining / Harris / Kitchen). */
@@ -553,7 +742,9 @@
     var g = eff.gate;
     panel.classList.toggle("is-live", !!g.live);
     panel.classList.toggle("is-need", !!(g.needToken || g.kind === "need_token"));
-    panel.classList.toggle("is-demo-write", !!(g.live && !g.writeSupported));
+    panel.classList.toggle("is-demo-write", false);
+    panel.classList.toggle("is-proxy-off", !!(g.live && g.writeSupported && !canWrite()));
+    panel.classList.toggle("is-disabled", !canWrite());
 
     var pill = doc.getElementById("hub-lights-pill");
     if (pill) {
@@ -563,13 +754,13 @@
     }
     var sub = doc.getElementById("hub-lights-sub");
     if (sub) {
-      sub.textContent = g.live
-        ? (g.writeSupported
-          ? "Kasa live · wall switches"
-          : "LIVE read · taps DEMO until write proxy")
-        : (g.needToken
-          ? "NEED TOKEN · DEMO toggles"
-          : ((g.label || "STUB") + " · DEMO"));
+      sub.textContent = canWrite()
+        ? "Kasa live · wall switches"
+        : (g.live && g.writeSupported
+          ? "PROXY OFF · open once with ?lightsProxy=… to enable taps"
+          : (g.live
+            ? "LIVE read · write not armed"
+            : (g.needToken ? "NEED TOKEN · controls dark" : ((g.label || "OFFLINE") + " · controls dark"))));
     }
 
     var grid = doc.getElementById("hub-lights-grid");
@@ -589,9 +780,9 @@
         + (dim ? (" · " + bright + "%") : "")
         + "</div>"
         + "</div>"
-        + '<button type="button" class="hub-sw-rocker' + onCls + '" data-act="toggle" data-id="'
+        + '<button type="button" class="hub-sw-rocker' + onCls + (canWrite() ? "" : " is-disabled") + '" data-act="toggle" data-id="'
         + L.id + '" aria-pressed="' + (L.on ? "true" : "false") + '" aria-label="'
-        + escapeHtml(L.name) + ' power">'
+        + escapeHtml(L.name) + ' power"' + (canWrite() ? "" : " disabled") + '>'
         + '<span class="hub-sw-rocker-on">ON</span>'
         + '<span class="hub-sw-rocker-knob" aria-hidden="true"></span>'
         + '<span class="hub-sw-rocker-off">OFF</span>'
@@ -600,7 +791,8 @@
         + (dim
           ? ('<div class="hub-sw-dim">'
             + '<input class="hub-sw-bright light-bright" type="range" min="1" max="100" value="'
-            + bright + '" data-id="' + L.id + '" aria-label="' + escapeHtml(L.name) + ' brightness" />'
+            + bright + '" data-id="' + L.id + '" aria-label="' + escapeHtml(L.name) + ' brightness"'
+            + (canWrite() ? "" : " disabled") + ' />'
             + '<span class="hub-sw-pct" data-pct-for="' + L.id + '">' + bright + "%</span>"
             + "</div>")
           : "")
@@ -625,6 +817,7 @@
       var act = btn.getAttribute("data-act");
       var id = btn.getAttribute("data-id");
       if (!act || !id) return;
+      if (!canWrite()) { probeProxy(); return; }
       ev.preventDefault();
       try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
       if (act === "toggle") {
@@ -657,6 +850,7 @@
       if (!t || !t.classList || !t.classList.contains("hub-sw-bright")) return;
       var id = t.getAttribute("data-id");
       if (!id) return;
+      if (!canWrite()) { probeProxy(); return; }
       try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
       setLight(id, { on: true, brightness: clampBright(t.value) });
       paintHubPanel(panel.ownerDocument || document);
@@ -694,7 +888,7 @@
     }
     var onCls = L.on ? " is-on" : "";
     var dim = (L.kind === "dimmer" || L.kind === "switch/dimmer");
-    var gateLab = g.label || (g.needToken ? "NEED TOKEN" : "DEMO");
+    var gateLab = hubHonesty(g);
     host.innerHTML =
       '<article class="light-pad kid-light-pad' + onCls + '" data-light-id="' + L.id + '">'
       + '<div class="light-pad-top">'
@@ -754,6 +948,9 @@
     saveDemo: saveDemo,
     setLight: setLight,
     setAll: setAll,
+    canWrite: canWrite,
+    probeProxy: probeProxy,
+    proxyBase: proxyBase,
     fetchLive: fetchLive,
     startPolling: startPolling,
     onChange: onChange,

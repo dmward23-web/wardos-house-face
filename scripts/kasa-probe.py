@@ -307,8 +307,7 @@ async def probe_cloud(username: str, password: str) -> dict:
         ),
         "note": (
             "Brightness READ from get_sysinfo.brightness (HS220/KS220). "
-            "WRITE: python-kasa Light/IotDimmer.set_brightness (LAN) or cloud "
-            "passthrough smartlife.iot.dimmer.set_brightness — not wired in probe."
+            "WRITE via scripts/kasa-write.py + lights-write-proxy.mjs (cloud passthrough)."
         ),
     }
     return payload

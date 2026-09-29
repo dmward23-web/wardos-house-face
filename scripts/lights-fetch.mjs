@@ -5,12 +5,12 @@
  * Creds: ~/.config/wardos/kasa.user + kasa.password (or env KASA_USER /
  * KASA_PASSWORD / KASA_USERNAME). Not the old kasa.token path.
  *
- * If missing → status need_token + DEMO starter (honest — never invent LIVE).
+ * If missing → status need_token · roster ids only · controls dark (never DEMO).
  * If present → spawn plates kasa-live venv python + scripts/kasa-probe.py,
  * capture stdout JSON, write --out / data/lights-live.json.
  * On probe failure → status error (keep last lights if any).
  *
- * writeSupported stays false until a safe write proxy exists.
+ * writeSupported true when status=live (writes via lights-write-proxy on box).
  *
  * Usage:
  *   node scripts/lights-fetch.mjs
@@ -114,10 +114,19 @@ function needTokenPayload(fetchedAt) {
     fetchedAt,
     source: "kasa-pending",
     writeSupported: false,
-    lights: STARTER,
+    writeProxy: null,
+    lights: STARTER.map((s) => ({
+      id: s.id,
+      name: s.name,
+      where: s.where,
+      kind: s.kind,
+      on: null,
+      brightness: null,
+      online: null,
+    })),
     reserved: [],
     error:
-      "NEED TOKEN · no ~/.config/wardos/kasa.user+kasa.password (or KASA_USER/KASA_PASSWORD) yet. tplinkcloud.com is cameras-only; Kasa IoT needs app account creds. DEMO seeds only — do not paint LIVE.",
+      "NEED TOKEN · no ~/.config/wardos/kasa.user+kasa.password (or KASA_USER/KASA_PASSWORD) yet. tplinkcloud.com is cameras-only; Kasa IoT needs app account creds. Controls stay dark — never DEMO.",
   };
 }
 
@@ -222,8 +231,13 @@ function main() {
       run.parsed &&
       (run.parsed.status === "live" || run.parsed.status === "need_creds")
     ) {
-      // Pass through probe JSON; force writeSupported false
-      payload = { ...run.parsed, writeSupported: false };
+      // Pass through probe JSON; arm write when LIVE (proxy holds creds)
+      payload = {
+        ...run.parsed,
+        writeSupported: run.parsed.status === "live",
+        writeProxy: process.env.LIGHTS_WRITE_PROXY || "http://127.0.0.1:8788",
+        writePath: "scripts/lights-write-proxy.mjs → kasa-write.py (cloud)",
+      };
       if (payload.status === "need_creds") {
         // Treat as need_token for UI consistency if probe says need_creds
         // despite our local hasCreds() — rare race / empty files
@@ -272,8 +286,9 @@ function main() {
     }
   }
 
-  // Absolute invariant
-  if (payload.writeSupported !== false) payload.writeSupported = false;
+  // Absolute invariant: never claim write without live status
+  if (payload.status !== "live") payload.writeSupported = false;
+  if (payload.status === "live") payload.writeSupported = true;
   if (
     payload.status === "live" &&
     (!payload.lights || !Array.isArray(payload.lights) || !payload.lights.length)
