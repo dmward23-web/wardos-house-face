@@ -1,7 +1,7 @@
 # CTRLPANEL1 · full control-panel shortlist
 
 **When:** 2026-09-28 ~21:02 CT  
-**Tip:** `TIPSHA` · CTRLPANEL1  
+**Tip:** `e81de7b27e7c8359c82b525af3d9b7fe3646b098` · CTRLPANEL1  
 **Base:** HDRFIX1 `df92987` + HUBTOK1 shared atoms (no second palette)  
 **Page:** https://dmward23-web.github.io/wardos-house-face/sheet-index.html
 
