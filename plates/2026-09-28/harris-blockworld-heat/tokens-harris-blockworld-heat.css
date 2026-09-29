@@ -1,0 +1,226 @@
+/* HARRIS BLOCK WORLD HEAT · Prism LOOK drop-in · CMDDECK2 DNA · 2026-09-28
+   Paste on kid-harris.html (or link). Atlas ships. Prism does not push Pages.
+   Homage-clean Block World — NO official Minecraft marks/logos. */
+
+:root {
+  --bw-void: #0a0908;
+  --bw-glass: rgba(12, 11, 9, 0.82);
+  --bw-amber: #f5c446;
+  --bw-amber-hi: #ffe894;
+  --bw-amber-lo: #b85a28;
+  --bw-amber-mid: #d4a860;
+  --bw-ghost: rgba(180, 176, 160, 0.35);
+  --bw-ink: #f2ead4;
+  --bw-moss: #3a5230; /* muted forge moss — not lime candy */
+  --bw-gem: #34d399;  /* gem jar twin accent */
+}
+
+/* Blocks / hotbar hero float — hotter instrument */
+.blocks-float,
+.hotbar-float,
+.panel .blocks-float {
+  width: 188px !important;
+  height: 188px !important;
+  right: 28px !important;
+  top: 96px !important;
+  opacity: 0.42 !important;
+  filter: drop-shadow(0 0 18px rgba(245, 180, 70, 0.38))
+          drop-shadow(0 8px 24px rgba(0, 0, 0, 0.55)) !important;
+  background-image: url("theme-tiles/harris-blocks.png") !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  image-rendering: pixelated;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+/* Kill bright grass candy stage — dark forge void + house camo */
+body.theme-harris .panel {
+  background-color: var(--bw-void) !important;
+  background-image:
+    radial-gradient(ellipse 55% 48% at 50% 40%, rgba(245, 180, 70, 0.12), transparent 65%),
+    linear-gradient(180deg, rgba(20, 28, 16, 0.55) 0%, transparent 28%),
+    url("theme-tiles/harris-blocks.png"),
+    url("camo-glass-tile-house.png") !important;
+  background-size: auto, auto, 80px 80px, 420px 420px !important;
+  background-repeat: no-repeat, no-repeat, repeat, repeat !important;
+  color: var(--bw-ink) !important;
+}
+body.theme-harris .panel::before {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 7px, rgba(245, 196, 70, 0.03) 7px 8px),
+    repeating-linear-gradient(90deg, transparent 0 7px, rgba(245, 196, 70, 0.03) 7px 8px) !important;
+}
+body.theme-harris .panel::after {
+  box-shadow:
+    inset 0 0 0 3px rgba(245, 196, 70, 0.32),
+    inset 0 0 0 10px rgba(10, 9, 8, 0.85),
+    inset 0 0 80px rgba(52, 211, 153, 0.06) !important;
+}
+
+/* Mood / status → rocker pills (CMDDECK2 lights DNA) */
+.eras,
+.status-rail,
+.hotbar {
+  gap: 6px !important;
+  padding: 6px 10px !important;
+  background: var(--bw-glass) !important;
+  border: 1px solid rgba(245, 196, 70, 0.18) !important;
+  border-radius: 12px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04),
+              0 0 0 1px rgba(0, 0, 0, 0.45) !important;
+}
+.eras-lab,
+.status-rail .lab,
+.hotbar-label {
+  color: var(--bw-amber) !important;
+  letter-spacing: 0.18em !important;
+  text-shadow: 0 0 10px rgba(245, 196, 70, 0.35) !important;
+}
+.era,
+.status-rail .chip,
+.hotbar-slot {
+  min-height: 34px !important;
+  border-radius: 8px !important; /* blockier than vinyl pills — still rocker DNA */
+  border: 1px dashed rgba(160, 156, 140, 0.35) !important;
+  background: rgba(18, 16, 12, 0.75) !important;
+  color: var(--bw-ghost) !important;
+  box-shadow: none !important;
+}
+.era.on,
+.status-rail .chip.on,
+.status-rail .chip.live,
+.hotbar-slot.sel,
+.hotbar-slot.lit {
+  border-style: solid !important;
+  border-color: var(--bw-amber-mid) !important;
+  background: linear-gradient(180deg, var(--bw-amber-mid), var(--bw-amber-lo)) !important;
+  color: #14100a !important;
+  box-shadow: 0 0 14px rgba(245, 180, 70, 0.45),
+              inset 0 1px 0 rgba(255, 240, 200, 0.35),
+              0 0 0 2px rgba(200, 160, 40, 0.35) !important;
+}
+
+/* Day-record / session rail — denser CRAFT · MINE · GEM pills */
+.day-records,
+.session-rail,
+.block-days,
+.chore-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--bw-glass);
+  border-radius: 14px;
+  border: 1px solid rgba(245, 196, 70, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+.day-records .row,
+.session-rail .row,
+.block-days .row,
+.chore-rail .row,
+.sec-chores .quest {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(8, 7, 6, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--bw-ink);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-size: 13px;
+}
+.day-records .row.live,
+.session-rail .row.live,
+.chore-rail .row.live {
+  border-color: rgba(245, 196, 70, 0.55);
+  box-shadow: 0 0 12px rgba(245, 180, 70, 0.22);
+}
+.day-records .row.live .chip,
+.session-rail .row.live .chip,
+.chore-rail .row.live .chip {
+  background: linear-gradient(180deg, var(--bw-amber-mid), var(--bw-amber-lo));
+  color: #14100a;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+.day-records .row.stub,
+.session-rail .row.stub,
+.chore-rail .row.stub {
+  border-style: dashed;
+  opacity: 0.55;
+  color: var(--bw-ghost);
+}
+
+/* XP row → amber instrument track */
+.xp-row {
+  background: var(--bw-glass) !important;
+  border: 1px solid rgba(245, 196, 70, 0.28) !important;
+  border-radius: 12px !important;
+}
+.xp-label { color: var(--bw-amber) !important; }
+.xp-track {
+  background: #080706 !important;
+  border-color: rgba(245, 196, 70, 0.4) !important;
+}
+.xp-fill {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--bw-amber-lo) 0 12px,
+    var(--bw-amber-mid) 12px 14px,
+    var(--bw-amber-hi) 14px 26px,
+    var(--bw-amber-mid) 26px 28px
+  ) !important;
+  box-shadow: 0 0 18px rgba(245, 180, 70, 0.5) !important;
+  filter: none !important;
+}
+
+/* Gem jar twin — dark glass + amber/gem fill bloom (amounts untouched) */
+.grow-meter,
+.grow-gems,
+.bank-card,
+.xp-stage,
+.gem-jar {
+  background: var(--bw-glass) !important;
+  border: 1px solid rgba(245, 196, 70, 0.22) !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5),
+              0 0 24px rgba(245, 180, 70, 0.12) !important;
+  border-radius: 16px !important;
+}
+.grow-meter .fill,
+.bank-fill,
+.xp-stage-fill {
+  box-shadow: 0 0 18px rgba(245, 180, 70, 0.4) !important;
+}
+
+/* Kid header — logo-free control strip */
+.hdr .brand,
+.hdr .brand img { display: none !important; }
+.hdr .tagline { display: none !important; }
+.hdr .eyebrow { color: var(--bw-amber) !important; }
+.hdr.hdr--heat {
+  background: var(--bw-glass) !important;
+  border: 1px solid rgba(245, 196, 70, 0.28) !important;
+  border-radius: 12px !important;
+  color: var(--bw-ink) !important;
+}
+.hdr .name,
+.hdr .name-accent { color: var(--bw-ink) !important; text-shadow: 0 0 12px rgba(245, 180, 70, 0.25) !important; }
+
+/* Hot-pill — amber rocker DNA */
+.hot-pill {
+  background: linear-gradient(180deg, var(--bw-amber-mid), var(--bw-amber-lo)) !important;
+  color: #14100a !important;
+  border-color: var(--bw-amber-lo) !important;
+  box-shadow: 0 0 12px rgba(245, 180, 70, 0.35) !important;
+}
+
+/* Hotbar note quiet ghost */
+.hotbar-note { color: var(--bw-ghost) !important; }

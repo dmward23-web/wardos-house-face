@@ -1,0 +1,212 @@
+/* HAYES DROP ZONE HEAT · Prism LOOK drop-in · CMDDECK2 DNA · 2026-09-28
+   Paste on kid-hayes.html (or link). Atlas ships. Prism does not push Pages.
+   Homage-clean Drop Zone — NO official Fortnite marks/logos. */
+
+:root {
+  --hz-void: #0a0908;
+  --hz-glass: rgba(12, 11, 9, 0.82);
+  --hz-amber: #f5c446;
+  --hz-amber-hi: #ffe894;
+  --hz-amber-lo: #b85a28;
+  --hz-amber-mid: #d4a860;
+  --hz-ghost: rgba(180, 176, 160, 0.35);
+  --hz-ink: #f2ead4;
+  --hz-cyan: #5ec8e0; /* competitive edge — twin victory jar, not candy purple */
+}
+
+/* Storm / lattice hero float — hotter instrument */
+.storm-float,
+.drop-float,
+.panel .storm-float {
+  width: 188px !important;
+  height: 188px !important;
+  right: 28px !important;
+  top: 96px !important;
+  opacity: 0.42 !important;
+  filter: drop-shadow(0 0 18px rgba(245, 180, 70, 0.38))
+          drop-shadow(0 8px 24px rgba(0, 0, 0, 0.55)) !important;
+  background-image: url("theme-tiles/hayes-storm.png") !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+/* Kill purple/pastel storm wash — amber control-panel bloom on panel stage */
+body.theme-hayes .panel {
+  background-color: var(--hz-void) !important;
+  background-image:
+    radial-gradient(ellipse 55% 50% at 50% 45%, rgba(245, 180, 70, 0.14), transparent 68%),
+    radial-gradient(circle at 50% 50%, transparent 28%, rgba(94, 200, 224, 0.08) 42%, rgba(10, 9, 8, 0.92) 72%),
+    url("theme-tiles/hayes-storm.png"),
+    url("theme-tiles/hayes-lattice.png"),
+    url("camo-glass-tile-house.png") !important;
+  background-size: auto, auto, 480px 480px, 64px 64px, 420px 420px !important;
+}
+body.theme-hayes .panel::before {
+  background: radial-gradient(circle at 50% 50%, transparent 30%, rgba(245, 196, 70, 0.10) 48%, transparent 54%) !important;
+}
+body.theme-hayes .panel::after {
+  box-shadow:
+    inset 0 0 0 3px rgba(245, 196, 70, 0.35),
+    inset 0 0 0 10px rgba(10, 9, 8, 0.85),
+    inset 0 0 80px rgba(245, 180, 70, 0.08) !important;
+}
+
+/* Mood / status → rocker pills (CMDDECK2 lights DNA) */
+.eras,
+.status-rail,
+.loadout {
+  gap: 6px !important;
+  padding: 6px 10px !important;
+  background: var(--hz-glass) !important;
+  border: 1px solid rgba(245, 196, 70, 0.18) !important;
+  border-radius: 12px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04),
+              0 0 0 1px rgba(0, 0, 0, 0.45) !important;
+}
+.eras-lab,
+.status-rail .lab,
+.loadout-lab {
+  color: var(--hz-amber) !important;
+  letter-spacing: 0.18em !important;
+  text-shadow: 0 0 10px rgba(245, 196, 70, 0.35) !important;
+}
+.era,
+.status-rail .chip,
+.loadout-slot {
+  min-height: 34px !important;
+  padding: 6px 12px !important;
+  border-radius: 999px !important;
+  border: 1px dashed rgba(160, 156, 140, 0.35) !important;
+  background: rgba(18, 16, 12, 0.75) !important;
+  color: var(--hz-ghost) !important;
+  box-shadow: none !important;
+}
+.era.on,
+.status-rail .chip.on,
+.status-rail .chip.live,
+.loadout-slot.on {
+  border-style: solid !important;
+  border-color: var(--hz-amber-mid) !important;
+  background: linear-gradient(180deg, var(--hz-amber-mid), var(--hz-amber-lo)) !important;
+  color: #14100a !important;
+  box-shadow: 0 0 14px rgba(245, 180, 70, 0.45),
+              inset 0 1px 0 rgba(255, 240, 200, 0.35) !important;
+}
+
+/* Day-record / session rail — denser LOADOUT · DROP · VICTORY pills */
+.day-records,
+.session-rail,
+.drop-days,
+.chore-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--hz-glass);
+  border-radius: 14px;
+  border: 1px solid rgba(245, 196, 70, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+.day-records .row,
+.session-rail .row,
+.drop-days .row,
+.chore-rail .row,
+.sec-chores .quest {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(8, 7, 6, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--hz-ink);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-size: 13px;
+}
+.day-records .row.live,
+.session-rail .row.live,
+.chore-rail .row.live {
+  border-color: rgba(245, 196, 70, 0.55);
+  box-shadow: 0 0 12px rgba(245, 180, 70, 0.22);
+}
+.day-records .row.live .chip,
+.session-rail .row.live .chip,
+.chore-rail .row.live .chip {
+  background: linear-gradient(180deg, var(--hz-amber-mid), var(--hz-amber-lo));
+  color: #14100a;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+.day-records .row.stub,
+.session-rail .row.stub,
+.chore-rail .row.stub {
+  border-style: dashed;
+  opacity: 0.55;
+  color: var(--hz-ghost);
+}
+
+/* Storm meter → amber LIVE instrument (kill purple candy) */
+.storm-meter {
+  background: var(--hz-glass) !important;
+  border: 1px solid rgba(245, 196, 70, 0.28) !important;
+  border-radius: 12px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+.storm-lab { color: var(--hz-amber) !important; }
+.storm-track {
+  background: #080706 !important;
+  border-color: rgba(245, 196, 70, 0.4) !important;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.55), 0 0 14px rgba(245, 180, 70, 0.2) !important;
+}
+.storm-fill {
+  background: linear-gradient(90deg, var(--hz-amber-lo), var(--hz-amber-mid), var(--hz-amber-hi)) !important;
+  box-shadow: 0 0 18px rgba(245, 180, 70, 0.55), inset 0 2px 0 rgba(255, 255, 255, 0.35) !important;
+  filter: none !important;
+}
+
+/* Victory jar twin — dark glass + amber fill bloom (amounts untouched) */
+.grow-meter,
+.grow-coins,
+.bank-card,
+.xp-stage,
+.victory-jar {
+  background: var(--hz-glass) !important;
+  border: 1px solid rgba(245, 196, 70, 0.22) !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5),
+              0 0 24px rgba(245, 180, 70, 0.12) !important;
+  border-radius: 16px !important;
+}
+.grow-meter .fill,
+.bank-fill,
+.xp-stage-fill,
+.storm-fill[data-bank-fill] {
+  /* fill color only — never invent $ copy */
+  box-shadow: 0 0 18px rgba(245, 180, 70, 0.4) !important;
+}
+
+/* Kid header — logo-free control strip */
+.hdr .brand,
+.hdr .brand img { display: none !important; }
+.hdr .tagline { display: none !important; }
+.hdr .eyebrow { color: var(--hz-amber) !important; }
+.hdr.hdr--heat {
+  background: var(--hz-glass) !important;
+  border: 1px solid rgba(245, 196, 70, 0.28) !important;
+  border-radius: 12px !important;
+}
+
+/* Hot-pill / MATCH LIVE — amber rocker DNA */
+.hot-pill {
+  background: linear-gradient(180deg, var(--hz-amber-mid), var(--hz-amber-lo)) !important;
+  color: #14100a !important;
+  border-color: var(--hz-amber-lo) !important;
+  box-shadow: 0 0 12px rgba(245, 180, 70, 0.35) !important;
+}
