@@ -1,39 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-29T21:17:17.079Z",
+  "fetchedAt": "2026-09-29T21:34:35.993Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-06",
+  "windowEnd": "2026-10-05",
   "asOfIso": "2026-09-29",
   "nextLeave": {
-    "id": "4iuge4862k2uhd3t5irr7jjmc8_20260929T212500Z",
-    "summary": "Ainsley swim — Coach Ann · 5:00 practice",
-    "start": "2026-09-29T16:25:00-05:00",
-    "end": "2026-09-29T18:20:00-05:00",
-    "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
-    "busy": true,
+    "id": "sj1i5etod2tvov186q7mltlb78",
+    "summary": "Hayes flag practice · 6:00 · Maria drives",
+    "start": "2026-09-29T18:00:00-05:00",
+    "end": "2026-09-29T19:15:00-05:00",
+    "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+    "busy": false,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "4iuge4862k2uhd3t5irr7jjmc8_20260929T212500Z",
-      "summary": "Ainsley swim — Coach Ann · 5:00 practice",
-      "start": "2026-09-29T16:25:00-05:00",
-      "end": "2026-09-29T18:20:00-05:00",
-      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "jbcnd5pom8l2o01acsbgja3s4k",
-      "summary": "Drop Hayes at Maria's · ~4:30 (on way to swim)",
-      "start": "2026-09-29T16:30:00-05:00",
-      "end": "2026-09-29T16:35:00-05:00",
-      "location": "14538 Grant Lane, Overland Park, KS",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "sj1i5etod2tvov186q7mltlb78",
       "summary": "Hayes flag practice · 6:00 · Maria drives",
@@ -411,31 +393,13 @@
       "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
       "busy": false,
       "allDay": false
-    },
-    {
-      "id": "nipks59d70cl19j22e6edbvjug_20261006",
-      "summary": "Hayes Johnson birthday",
-      "start": "2026-10-06T00:00:00Z",
-      "end": "2026-10-07T00:00:00Z",
-      "location": "",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "4iuge4862k2uhd3t5irr7jjmc8_20261006T212500Z",
-      "summary": "Ainsley swim — Coach Ann · 5:00 practice",
-      "start": "2026-10-06T17:00:00-05:00",
-      "end": "2026-10-06T18:00:00-05:00",
-      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
-      "busy": false,
-      "allDay": false
     }
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "4:25",
-    "place": "Ainsley swim — Coach Ann · 5:00 practice",
-    "detailHtml": "<strong>4:25</strong> Ainsley swim — Coach Ann · 5:00 practice · next Leave · Wed <strong>9:00</strong> HD #2209 · vanity return ONLY",
+    "time": "6:00",
+    "place": "Hayes flag practice · 6:00 · Maria drives",
+    "detailHtml": "<strong>6:00</strong> Hayes flag practice · 6:00 · Maria drives · next Leave · Wed <strong>9:00</strong> HD #2209 · vanity return ONLY",
     "badge": "Tue"
   },
   "error": null
