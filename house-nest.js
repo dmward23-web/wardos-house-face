@@ -873,7 +873,8 @@
       }, timeoutMs || 20000);
       function check() {
         if (done) return;
-        if (videoEl.videoWidth > 0 && videoEl.readyState >= 2) {
+        /* CAMIOS2: a paused first frame is not live */
+        if (videoEl.videoWidth > 0 && videoEl.readyState >= 2 && !videoEl.paused) {
           done = true;
           clearTimeout(t);
           resolve(true);
@@ -882,6 +883,7 @@
       videoEl.addEventListener("playing", check);
       videoEl.addEventListener("loadeddata", check);
       videoEl.addEventListener("resize", check);
+      videoEl.addEventListener("timeupdate", check);
       /* already playing? */
       check();
     });
@@ -897,6 +899,62 @@
       _hubLiveKickTimer = null;
       runHubLiveStreams(doc);
     }, 120);
+  }
+
+  /* CAMIOS2 · start the cams that can stream first (front-door battery bell
+   * last), back off a cam Google says can't stream, and if the iPhone won't
+   * autoplay, show "TAP FOR LIVE" and start every hub video on the first tap. */
+  var HUB_ORDER = [1, 2, 0];
+  var _hubCamBackoff = {};
+  var _hubTapArmed = false;
+  function hubVideoHasTrack(vid) {
+    try {
+      var so = vid && vid.srcObject;
+      var vt = so && so.getVideoTracks ? so.getVideoTracks() : [];
+      return !!(vt.length && vt[0].readyState === "live");
+    } catch (_) { return false; }
+  }
+  function armHubTapToPlay(doc, el, slot) {
+    var pill = el.querySelector(".hub-cam-pill");
+    if (pill) pill.textContent = "TAP FOR LIVE";
+    el._hubNeedsTap = true;
+    var vid = el.querySelector("video.hub-cam-video");
+    if (vid && !vid._hubTapHook) {
+      vid._hubTapHook = true;
+      vid.addEventListener("playing", function () {
+        if (el._hubNeedsTap && vid.videoWidth > 0) {
+          el._hubNeedsTap = false;
+          markHubCamLive(el, slot.label);
+        }
+      });
+    }
+    if (_hubTapArmed) return;
+    _hubTapArmed = true;
+    function onFirstTap(ev) {
+      var deck = doc.getElementById("hub-cam-deck");
+      var waiting = deck ? deck.querySelectorAll(".hub-cam") : [];
+      var any = false;
+      for (var k = 0; k < waiting.length; k++) {
+        if (!waiting[k]._hubNeedsTap) continue;
+        any = true;
+        var v = waiting[k].querySelector("video.hub-cam-video");
+        if (v) {
+          v.muted = true;
+          try { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (_) {}
+        }
+      }
+      if (!any) return;
+      /* this tap only starts video; the next tap opens the camera */
+      if (ev && deck && deck.contains(ev.target)) {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+      _hubTapArmed = false;
+      doc.removeEventListener("click", onFirstTap, true);
+      doc.removeEventListener("touchend", onFirstTap, true);
+    }
+    doc.addEventListener("click", onFirstTap, true);
+    doc.addEventListener("touchend", onFirstTap, true);
   }
 
   function runHubLiveStreams(doc) {
@@ -917,22 +975,26 @@
     var tiles = deck.querySelectorAll(".hub-cam");
     _hubLiveStarting = true;
 
-    function startOne(i) {
-      if (i >= HUB_CAMS.length) {
+    function startOne(n) {
+      if (n >= HUB_ORDER.length) {
         _hubLiveStarting = false;
         return;
       }
+      var i = HUB_ORDER[n];
+      var next = function () { startOne(n + 1); };
       var slot = HUB_CAMS[i];
       var el = tiles[i] || null;
-      var cam = findCamForHub(slot, cams);
+      var cam = slot ? findCamForHub(slot, cams) : null;
       if (!el || !cam || String(cam.id || "").startsWith("stub-")) {
-        return startOne(i + 1);
+        return next();
       }
       var deviceId = cam.id;
+      if (_hubCamBackoff[deviceId] && Date.now() < _hubCamBackoff[deviceId]) return next();
       var existing = _hubLiveSessions[deviceId];
       if (existing && existing.ok && el._hubLivePlaying) {
-        return startOne(i + 1);
+        return next();
       }
+      if (existing && el._hubNeedsTap) return next(); /* waiting on a tap */
       if (existing && existing.stop) {
         try { existing.stop(); } catch (_) {}
         delete _hubLiveSessions[deviceId];
@@ -950,15 +1012,27 @@
         vid.style.display = "none";
         mediaWrap.insertBefore(vid, mediaWrap.firstChild);
       }
-      if (!vid) return startOne(i + 1);
+      if (!vid) return next();
       armHubVid(vid);
 
       NWR.startStream(deviceId, vid, function (/* status */) {})
         .then(function (session) {
           _hubLiveSessions[deviceId] = session;
-          try { var pp = vid.play(); if (pp && pp.catch) pp.catch(function () {}); } catch (_) {}
-          return waitVideoPlaying(vid, 22000).then(function (ok) {
+          try {
+            var pp = vid.play();
+            if (pp && pp.catch) pp.catch(function (e) {
+              /* phone refused autoplay: ask for the tap right away */
+              if (e && e.name === "NotAllowedError") armHubTapToPlay(doc, el, slot);
+            });
+          } catch (_) {}
+          return waitVideoPlaying(vid, el._hubNeedsTap ? 4000 : 12000).then(function (ok) {
             session.ok = !!ok;
+            if (!ok && hubVideoHasTrack(vid)) {
+              /* video is arriving but the phone won't autoplay it */
+              session.ok = true;
+              armHubTapToPlay(doc, el, slot);
+              return next();
+            }
             if (ok) {
               markHubCamLive(el, slot.label);
               /* Drop to STILL if ICE dies later */
@@ -979,12 +1053,14 @@
               delete _hubLiveSessions[deviceId];
               markHubCamNotLive(el, "no frames " + slot.label);
             }
-            startOne(i + 1);
+            next();
           });
         })
         .catch(function (err) {
-          markHubCamNotLive(el, (err && err.message) || "stream fail");
-          startOne(i + 1);
+          var msg = (err && err.message) || "stream fail";
+          if (/not available for streaming/i.test(msg)) _hubCamBackoff[deviceId] = Date.now() + 30 * 60 * 1000;
+          markHubCamNotLive(el, msg);
+          next();
         });
     }
     startOne(0);
