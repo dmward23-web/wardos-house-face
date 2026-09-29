@@ -11,6 +11,9 @@
  * On probe failure → status error (keep last lights if any).
  *
  * writeSupported true when status=live (writes via lights-write-proxy on box).
+ * LIGHTS6: bake public writeProxy (+ writeProxyToken) from
+ * ~/.config/wardos/lights-write-proxy.url + lights-proxy.token so Pages
+ * hard-refresh works — no ?lightsProxy= seed. Never put kasa.* in JSON.
  *
  * Usage:
  *   node scripts/lights-fetch.mjs
@@ -90,6 +93,51 @@ function hasCreds() {
   const pass =
     (process.env.KASA_PASSWORD || "").trim() || readCredFile("kasa.password");
   return Boolean(user && pass);
+}
+
+/**
+ * Public write proxy for Pages/Elo (LIGHTS6).
+ * Prefer LIGHTS_WRITE_PROXY env, else ~/.config/wardos/lights-write-proxy.url,
+ * else loopback (box-only). Never invent a tunnel URL.
+ */
+function resolveWriteProxy() {
+  const fromEnv = (process.env.LIGHTS_WRITE_PROXY || "").trim().replace(/\/$/, "");
+  if (fromEnv) return fromEnv;
+  const fromFile = readCredFile("lights-write-proxy.url").replace(/\/$/, "");
+  if (fromFile) return fromFile;
+  return "http://127.0.0.1:8788";
+}
+
+/**
+ * Proxy auth token (NOT Kasa password). LIGHTS6 UX: baked into lights-live.json
+ * so Pages hard-refresh works without ?lightsProxy= seed. Readable on Pages by design.
+ */
+function resolveWriteProxyToken() {
+  return (
+    (process.env.LIGHTS_PROXY_TOKEN || "").trim() ||
+    readCredFile("lights-proxy.token") ||
+    ""
+  );
+}
+
+function isLoopbackProxyUrl(url) {
+  return /^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/i.test(String(url || ""));
+}
+
+/** Attach writeProxy (+ token when public) onto a live payload. */
+function attachWriteProxy(payload) {
+  const writeProxy = resolveWriteProxy();
+  const token = resolveWriteProxyToken();
+  payload.writeProxy = writeProxy;
+  payload.writePath = "scripts/lights-write-proxy.mjs → kasa-write.py (cloud)";
+  // LIGHTS6: publish token only when proxy is a public URL (Pages cannot use loopback).
+  // Kasa email/password NEVER go here.
+  if (token && !isLoopbackProxyUrl(writeProxy)) {
+    payload.writeProxyToken = token;
+  } else {
+    delete payload.writeProxyToken;
+  }
+  return payload;
 }
 
 function writeJson(outPath, payload) {
@@ -235,9 +283,8 @@ function main() {
       payload = {
         ...run.parsed,
         writeSupported: run.parsed.status === "live",
-        writeProxy: process.env.LIGHTS_WRITE_PROXY || "http://127.0.0.1:8788",
-        writePath: "scripts/lights-write-proxy.mjs → kasa-write.py (cloud)",
-      };
+      }
+      if (run.parsed.status === "live") attachWriteProxy(payload);
       if (payload.status === "need_creds") {
         // Treat as need_token for UI consistency if probe says need_creds
         // despite our local hasCreds() — rare race / empty files
@@ -287,8 +334,15 @@ function main() {
   }
 
   // Absolute invariant: never claim write without live status
-  if (payload.status !== "live") payload.writeSupported = false;
-  if (payload.status === "live") payload.writeSupported = true;
+  if (payload.status !== "live") {
+    payload.writeSupported = false;
+    if (payload.writeProxy === undefined) payload.writeProxy = null;
+    delete payload.writeProxyToken;
+  }
+  if (payload.status === "live") {
+    payload.writeSupported = true;
+    attachWriteProxy(payload);
+  }
   if (
     payload.status === "live" &&
     (!payload.lights || !Array.isArray(payload.lights) || !payload.lights.length)
