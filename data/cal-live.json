@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-29T22:19:25.187Z",
+  "fetchedAt": "2026-09-29T22:27:20.245Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-05",
   "asOfIso": "2026-09-29",
   "nextLeave": {
-    "id": "sj1i5etod2tvov186q7mltlb78",
-    "summary": "CANCELED (rain) · Hayes flag practice",
-    "start": "2026-09-29T18:00:00-05:00",
-    "end": "2026-09-29T19:15:00-05:00",
-    "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+    "id": "9svtqhd8cujpm1n70pevblo01k",
+    "summary": "Get Hayes from Maria's · time TBD",
+    "start": "2026-09-29T18:55:00-05:00",
+    "end": "2026-09-29T19:45:00-05:00",
+    "location": "Maria's, 14538 Grant Lane, Overland Park, KS",
     "busy": false,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "sj1i5etod2tvov186q7mltlb78",
-      "summary": "CANCELED (rain) · Hayes flag practice",
-      "start": "2026-09-29T18:00:00-05:00",
-      "end": "2026-09-29T19:15:00-05:00",
-      "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "9svtqhd8cujpm1n70pevblo01k",
       "summary": "Get Hayes from Maria's · time TBD",
@@ -406,9 +397,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "6:00",
-    "place": "CANCELED (rain) · Hayes flag practice",
-    "detailHtml": "<strong>6:00</strong> CANCELED (rain) · Hayes flag practice · next Leave · Wed <strong>9:00</strong> HD #2209 · vanity return ONLY",
+    "time": "6:55",
+    "place": "Get Hayes from Maria's · time TBD",
+    "detailHtml": "<strong>6:55</strong> Get Hayes from Maria's · time TBD · next Leave · Wed <strong>9:00</strong> HD #2209 · vanity return ONLY",
     "badge": "Tue"
   },
   "error": null

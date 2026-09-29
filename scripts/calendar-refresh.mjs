@@ -275,7 +275,9 @@ function kidsSafeWhat(summary, kind) {
 function buildBoardItems(events, now) {
   const items = [];
   for (const ev of events) {
-    if (ev.status === "cancelled") continue;
+    if (ev.status === "cancelled" || ev.status === "canceled") continue;
+    /* CANCELGONE1 · title marked canceled = gone from board */
+    if (/^\s*[\[(]?\s*(cancel+ed|cxl)\b/i.test(String(ev.summary || ""))) continue;
     const start = parseEventTime(ev, "start");
     const end = parseEventTime(ev, "end") || start;
     if (!start || !end) continue;

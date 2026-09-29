@@ -150,8 +150,11 @@ function isBusy(e) {
   return true;
 }
 
+/* CANCELGONE1 · Google status OR a title marked canceled (how Atlas marks a
+ * rained-out practice) → never on the board, Who's up, or a leave countdown. */
+const CANCEL_TITLE = /^\s*[\[(]?\s*(cancel+ed|canceled|cancelled|cxl)\b/i;
 function isCancelled(e) {
-  return e && (e.status === "cancelled" || e.status === "canceled");
+  return !!(e && (e.status === "cancelled" || e.status === "canceled" || CANCEL_TITLE.test(String(e.summary || ""))));
 }
 
 function startIsoLocal(e) {
