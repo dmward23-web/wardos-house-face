@@ -1,0 +1,40 @@
+{
+  "_meta": {
+    "note": "Ledger owns SoT. Wright does not invent $. Source of truth live file is /workspace/board-os/data/cash.json (NOT in house-face git). Refresh this fixture when Ledger restamps.",
+    "copiedFrom": "board-os/data/cash.json",
+    "copiedAtCT": "2026-09-28 ~11:02p CT",
+    "cliffPark": "2028/2029 PARK \u2014 do not fix in CI"
+  },
+  "schema": "board-os.cash.packet.v1",
+  "mode": "LIVE",
+  "lockedAt": "2026-09-28T21:19:00-05:00",
+  "as_of": "2026-09-28",
+  "asOfLabel": "Mon 28 Sep ~9:19p CT \u00b7 nightly harvest Finance confirm \u00b7 LIVE Wells Everyday \u20266854",
+  "available": 19961.9,
+  "availableDisplay": "$19,961.90",
+  "discGate": {
+    "threshold": 15000,
+    "state": "OPEN",
+    "posture": "ASK_BEFORE_BUYS"
+  },
+  "eoy": {
+    "floor": 20000,
+    "short": 38.1,
+    "gapDisplay": "SHORT $38.10",
+    "killLine": "SHORT",
+    "killLedgerClause": "OFF",
+    "state": "SHORT"
+  },
+  "guild": {
+    "monthlyPayment": 3589.57,
+    "additionalPrincipal": 0.0,
+    "totalAutopay": 3589.57,
+    "extra": "PAUSED",
+    "asOf": "2026-09-23T15:30:00-05:00",
+    "note": "statement-only \u00b7 never double-count \u00b7 updated successfully emailed dmward23"
+  },
+  "freeze": {
+    "posture": "GATE OPEN \u00b7 ask-before-buys \u00b7 EOY SHORT $38.10 \u00b7 not FREEZE under $15k",
+    "guildExtra": "PAUSED"
+  }
+}
