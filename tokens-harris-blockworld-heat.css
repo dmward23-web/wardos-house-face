@@ -224,3 +224,73 @@ body.theme-harris .panel::after {
 
 /* Hotbar note quiet ghost */
 .hotbar-note { color: var(--bw-ghost) !important; }
+
+/* TEXTLESS1 / HEAT4 · Atlas · kill corn · icon-first void+amber */
+body.theme-harris .eyebrow,
+body.theme-harris .tagline,
+body.theme-harris .brand,
+body.theme-harris .avatar,
+body.theme-harris .hot-pill,
+body.theme-harris .hot-label,
+body.theme-harris .hot-sub,
+body.theme-harris .hot-badges,
+body.theme-harris .session-rail,
+body.theme-harris .hotbar-label,
+body.theme-harris .xp-label,
+body.theme-harris .xp-meta,
+body.theme-harris .sec-hdr,
+body.theme-harris .sec-title,
+body.theme-harris .sec-meta,
+body.theme-harris .bank-title,
+body.theme-harris .bank-goal-title,
+body.theme-harris .bank-blurb,
+body.theme-harris .bank-meta,
+body.theme-harris .jar-flow,
+body.theme-harris .grow-title,
+body.theme-harris .grow-jar-name,
+body.theme-harris .grow-week-rising,
+body.theme-harris .grow-line .lab,
+body.theme-harris .money-chip .lab,
+body.theme-harris .money-chip.save-chip,
+body.theme-harris .tap-hint,
+body.theme-harris .consume-label,
+body.theme-harris .consume-hdr,
+body.theme-harris .live-clock-lab,
+body.theme-harris .hotbar-note {
+  display: none !important;
+}
+body.theme-harris .hot-title {
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  color: #ffe894 !important;
+}
+body.theme-harris .live-clock {
+  font-size: clamp(36px, 5vw, 52px) !important;
+  font-weight: 900 !important;
+  color: #ffe8a0 !important;
+  text-shadow: 0 0 32px rgba(255,180,30,0.7) !important;
+}
+body.theme-harris .sec-chores .quest .what {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+}
+body.theme-harris .sec-chores .quest .hint,
+body.theme-harris .sec-chores .quest .sub { display: none !important; }
+body.theme-harris .money-chip {
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  color: #ffe894 !important;
+}
+body.theme-harris .blocks-float,
+body.theme-harris .hotbar-float {
+  width: 240px !important;
+  height: 240px !important;
+  opacity: 0.48 !important;
+  filter: drop-shadow(0 0 28px rgba(245,180,70,0.45)) !important;
+}
+body.theme-harris .panel { gap: 8px !important; }
+body.theme-harris .body { gap: 10px !important; }
+body.theme-harris .xp-row {
+  padding: 10px 12px !important;
+  min-height: 48px !important;
+}

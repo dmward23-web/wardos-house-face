@@ -210,3 +210,71 @@ body.theme-hayes .panel::after {
   border-color: var(--hz-amber-lo) !important;
   box-shadow: 0 0 12px rgba(245, 180, 70, 0.35) !important;
 }
+
+/* TEXTLESS1 / HEAT4 · Atlas · kill corn · icon-first void+amber */
+body.theme-hayes .eyebrow,
+body.theme-hayes .tagline,
+body.theme-hayes .brand,
+body.theme-hayes .avatar,
+body.theme-hayes .hot-pill,
+body.theme-hayes .hot-label,
+body.theme-hayes .hot-sub,
+body.theme-hayes .hot-badges,
+body.theme-hayes .session-rail,
+body.theme-hayes .loadout-lab,
+body.theme-hayes .storm-lab,
+body.theme-hayes .elim-tag,
+body.theme-hayes .sec-hdr,
+body.theme-hayes .bank-title,
+body.theme-hayes .bank-goal-title,
+body.theme-hayes .bank-blurb,
+body.theme-hayes .bank-meta,
+body.theme-hayes .jar-flow,
+body.theme-hayes .grow-title,
+body.theme-hayes .grow-jar-name,
+body.theme-hayes .grow-week-rising,
+body.theme-hayes .grow-line .lab,
+body.theme-hayes .money-chip .lab,
+body.theme-hayes .money-chip.save-chip,
+body.theme-hayes .tap-hint,
+body.theme-hayes .consume-label,
+body.theme-hayes .consume-hdr,
+body.theme-hayes .live-clock-lab {
+  display: none !important;
+}
+body.theme-hayes .loadout {
+  justify-content: center;
+  gap: 8px !important;
+  padding: 8px !important;
+}
+body.theme-hayes .hot-title {
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  color: #ffe894 !important;
+}
+body.theme-hayes .live-clock {
+  font-size: clamp(36px, 5vw, 52px) !important;
+  font-weight: 900 !important;
+  color: #ffe8a0 !important;
+  text-shadow: 0 0 32px rgba(255,180,30,0.7) !important;
+}
+body.theme-hayes .sec-chores .quest .what {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+}
+body.theme-hayes .sec-chores .quest .hint,
+body.theme-hayes .sec-chores .quest .sub { display: none !important; }
+body.theme-hayes .money-chip {
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  color: #ffe894 !important;
+}
+body.theme-hayes .storm-float,
+body.theme-hayes .drop-float {
+  width: 240px !important;
+  height: 240px !important;
+  opacity: 0.48 !important;
+  filter: drop-shadow(0 0 28px rgba(245,180,70,0.45)) !important;
+}
+body.theme-hayes .panel { gap: 8px !important; }
+body.theme-hayes .body { gap: 10px !important; }

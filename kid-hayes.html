@@ -7,11 +7,11 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
-<title>BOARD-OS · HAYES · DROP ZONE</title>
-<link rel="stylesheet" href="house-engage.css?v=HEAT2" />
+<title>HAYES</title>
+<link rel="stylesheet" href="house-engage.css?v=HEAT4" />
 <link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=LIVEGREEN1" />
-<link rel="stylesheet" href="tokens-ctrlpanel.css?v=HEAT2" />
-<link rel="stylesheet" href="tokens-hayes-dropzone-heat.css?v=HEAT2" />
+<link rel="stylesheet" href="tokens-ctrlpanel.css?v=HEAT4" />
+<link rel="stylesheet" href="tokens-hayes-dropzone-heat.css?v=HEAT4" />
 <link rel="stylesheet" href="kid-ioscroll.css?v=HUBSCROLL2" />
 <style>
 
@@ -603,65 +603,50 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="storm-float" aria-hidden="true"></div>
  <header class="hdr hdr--heat">
  <div class="hdr-left">
- <div class="nav-row"><a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a><a class="nav-week" href="index.html">Week</a></div>
+ <div class="nav-row"><a class="home-btn" href="sheet-index.html" aria-label="Home"><span class="chev">←</span></a><a class="nav-week" href="index.html" aria-label="Week">W</a></div>
  <div class="identity">
  <div class="avatar g2-av hayes" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-hayes"/></svg></div>
  <div>
- <a class="eyebrow" href="sheet-index.html">DROP ZONE · MATCH LIVE</a>
- <h1 class="name">LET'S GO <span class="name-accent">HAYES</span>!!!</h1>
- <div class="tagline">Victory week · clear musts · jar fire</div>
+ <h1 class="name"><span class="name-accent">HAYES</span></h1>
  </div>
  </div>
  </div>
  <div class="hdr-right">
  <div class="live-clock-host" aria-label="America/Chicago time">
- <div class="live-clock-lab">CT</div>
  <div class="live-clock" data-live-clock>—:— —</div>
  </div>
- <div class="hot-pill" data-hot-pill>🎯 SAT DROP · Chat &amp; Chew + FLAG</div>
  <div style="display:flex;gap:8px;align-items:center">
- <button type="button" class="mute-btn" data-mute-toggle>🔊 ON</button>
+ <button type="button" class="mute-btn" data-mute-toggle aria-label="Sound">🔊</button>
  </div>
  </div>
  </header>
- <div class="session-rail" aria-label="Drop Zone session rail">
- <img src="theme-tiles/hayes-session-rail-pills.svg" alt="LOADOUT DROP LIVE · VICTORY SQUAD STUB" width="980" height="220" />
- </div>
  <div class="bars">
- <div class="bar-card"><div class="bar-top"><span>❤️ TODAY</span><span data-progress-val>0%</span></div><div class="bar-track"><div class="bar-fill-hp" data-progress-fill></div></div></div>
- <div class="bar-card"><div class="bar-top"><span>🛡️ SHIELD</span><span data-progress-meta="{pct}%">{pct}</span></div><div class="bar-track"><div class="bar-fill-sh" data-progress-fill></div></div></div>
- <div class="bar-card"><div class="bar-top"><span>⚔️ CHALLENGES</span><span data-left-count>open</span></div><div class="bar-track"><div class="bar-fill-ch" data-progress-fill></div></div></div>
+ <div class="bar-card"><div class="bar-top"><span aria-hidden="true">❤️</span><span data-progress-val>0%</span></div><div class="bar-track"><div class="bar-fill-hp" data-progress-fill></div></div></div>
+ <div class="bar-card"><div class="bar-top"><span aria-hidden="true">🛡️</span><span data-left-count>·</span></div><div class="bar-track"><div class="bar-fill-sh" data-progress-fill></div></div></div>
+ <div class="bar-card"><div class="bar-top"><span aria-hidden="true">⚔️</span><span data-progress-meta="{done}/{total}">{done}/{total}</span></div><div class="bar-track"><div class="bar-fill-ch" data-progress-fill></div></div></div>
  </div>
- <div class="storm-meter"><div class="storm-lab">STORM</div><div class="storm-track"><div class="storm-fill" data-bank-fill></div></div><span class="elim-tag">WEEK ★ → JAR</span></div>
- <section class="hot-banner">
+ <div class="storm-meter"><div class="storm-track"><div class="storm-fill" data-bank-fill></div></div></div>
+ <section class="hot-banner" aria-label="Next">
  <div class="hot-accent"></div>
  <div class="hot-body">
  <div class="hot-main">
- <div class="hot-label">DROP ALERT · GO LEGENDARY</div>
- <div class="hot-title" data-hot-title>SAT DROP · Chat &amp; Chew 9:00 · FLAG 2:45</div>
- <div class="hot-sub" data-hot-sub><strong>YOUR BIG SATURDAY LOADOUT</strong>clutch up</div>
+ <div class="hot-title" data-hot-title></div>
  </div>
- <div class="hot-badges"><div class="hot-badge">LOCKED IN</div><div class="hot-badge">FLAG DROP</div></div>
  </div>
  </section>
  <div class="body">
- <section class="sec sec-chores" aria-label="Chores and quests">
- <div class="sec-hdr"><div class="sec-title">⚔️ YOUR CHALLENGES · MUSTS</div><div class="sec-meta" data-streak-label>streak</div></div>
+ <section class="sec sec-chores" aria-label="Musts">
  <div class="sec-list" data-mount-quests></div>
- <div class="tap-hint">Tap each day Sat–Fri · title + day checks</div>
- <div class="bank-links" style="margin-top:4px">
- <a class="ghost" href="sheet-chores.html">Family chores</a>
- </div>
  </section>
  <section class="sec sec-bank bank-card" aria-label="Reward collection">
  <div class="bank-top">
  <div>
- <div class="bank-title">◎ VICTORY JAR · WEEK</div>
- <div class="bank-goal-title" data-bank-goal-title>Victory Jar</div>
+ <div class="bank-title">◎</div>
+ 
  </div>
  <div class="bank-count"><span data-bank-symbol>◎</span> <span data-bank-life>0</span></div>
  </div>
- <div class="bank-blurb" data-bank-goal-blurb>Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri) hit Victory Jar $10 AND full $10 payday (1★=$1). ALL musts required — jar locked until every Must is done. Jar = save what you earned — not free money.</div>
+ <div class="bank-blurb" data-bank-goal-blurb hidden></div>
  <button type="button" class="grow-meter grow-coins" data-grow-meter aria-label="Grow · victory coins">
  <div class="grow-stage">
  <div class="grow-fill grow-fill-balance" data-grow-fill-balance></div>
@@ -671,32 +656,24 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="grow-pct" data-grow-pct>0%</div>
  </div>
  <div class="grow-readout">
- <div class="grow-title" data-grow-title>GROW · victory coins</div>
- <div class="grow-jar-name" data-grow-jar-name>Victory Jar</div>
+ 
+ 
  <div class="grow-total"><span data-grow-total>0</span> / <span data-grow-save-need>0</span></div>
- <div class="grow-week-rising" data-grow-week-rising>week +$0 rising ↑</div>
- <div class="grow-line"><span class="lab">Balance</span><span class="val" data-grow-balance>$0</span></div>
- <div class="grow-line"><span class="lab">This week</span><span class="val" data-grow-week>$0</span></div>
- <div class="grow-line"><span class="lab">Save for</span><span class="val" data-grow-save-line>Add a save</span></div>
+ 
+ <div class="grow-line"><span class="val" data-grow-balance>$0</span></div>
+ <div class="grow-line"><span class="val" data-grow-week>$0</span></div>
  </div>
  </button>
  <div class="money-row" aria-label="Balance carry and this week earn">
- <div class="money-chip"><span class="lab">Balance</span> $<span data-bank-balance>0</span></div>
- <div class="money-chip"><span class="lab">This week</span> $<span data-bank-week-earn>0</span></div>
- <div class="money-chip save-chip"><span class="lab">Save for</span> <span data-grow-save-name>…</span> · $<span data-grow-save-toward>0</span>/$<span data-grow-save-need>0</span></div>
+ <div class="money-chip">$<span data-bank-balance>0</span></div>
+ <div class="money-chip">+$<span data-bank-week-earn>0</span></div>
  </div>
 
  <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
  <div class="bank-meta"><span data-bank-meta>$0 / $10 · 0/10 ★</span><span class="bank-meta-sep" aria-hidden="true">·</span><span class="bank-meta-today">Today <span data-bank-today>0</span></span></div>
- <div class="jar-flow" aria-label="stars to jar to payday">
- <span class="step">★ earn</span><span class="arr">→</span>
- <span class="step">🫙 jar</span><span class="arr">→</span>
- <span class="step dad">Dad checks · payday</span>
- <span class="treat-secondary" aria-hidden="true" title="optional treat">☂️ optional</span>
- </div>
  <div class="bank-links">
- <a class="primary-foil" href="sheet-allowance.html">Victory Jar →</a>
- <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">JAR FULL · saved $10 · show Dad</a>
+ <a class="primary-foil" href="sheet-allowance.html" aria-label="Jar">→</a>
+ <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">$ · Dad</a>
  <button type="button" class="got-it" data-got-it hidden>Got it · payday</button>
  <div class="paid-stamp" data-paid-stamp hidden>Paid · jar reset</div>
  </div>
@@ -705,38 +682,34 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <section class="sec sec-schedule consume-sched" aria-label="Schedule" data-consume-sel="">
  <div class="consume-hdr" data-mount-consume-hdr></div>
  <div class="consume-week" data-mount-consume-week></div>
- <div class="consume-label"><span class="tag">Next up</span><span class="line"></span></div>
- <div class="consume-hero" data-mount-consume-next></div>
- <div class="consume-label sec" data-mount-consume-today-label><span class="tag">Today</span><span class="line"></span></div>
- <div class="consume-punch" data-mount-consume-punch></div>
+  <div class="consume-hero" data-mount-consume-next></div>
+  <div class="consume-punch" data-mount-consume-punch></div>
  <div class="consume-routine" data-mount-consume-routine></div>
- <div class="consume-label sec"><span class="tag">Ahead · unique</span><span class="line"></span></div>
- <div class="consume-ahead" data-mount-consume-ahead></div>
+  <div class="consume-ahead" data-mount-consume-ahead></div>
  </section>
  </div>
- <div class="loadout">
- <div class="loadout-lab">LOADOUT</div>
+ <div class="loadout" aria-hidden="true">
  <div class="loadout-slot on">🎯</div><div class="loadout-slot">🛡️</div><div class="loadout-slot">⚡</div><div class="loadout-slot">🏃</div><div class="loadout-slot">🎒</div>
  <div class="loadout-note">clear all = VICTORY ROYALE moment</div>
  </div>
  <footer class="ftr">
  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
  <span>YOUR match · Drop Zone</span>
- <span class="ftr-chip">HAYES · DROP ZONE</span>
- <a class="ftr-chip" href="sheet-chores.html">Family chores</a>
- <a class="ftr-chip" href="sheet-allowance.html">★ Reward jar</a>
+ 
+ 
+ <a class="ftr-chip" href="sheet-allowance.html" aria-label="Jar">◎</a>
  </div>
  <span>original storm homage · sound ON</span>
  </footer>
 </div>
 
-<script src="house-clock.js?v=HEAT2"></script>
-<script src="kids-data.js?v=HEAT2"></script>
+<script src="house-clock.js?v=HEAT4"></script>
+<script src="kids-data.js?v=HEAT4"></script>
 <script src="house-saves.js?v=FAIL3"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
 <script src="house-kid-engage.js?v=HUBSCROLL2"></script>
-<script src="house-checkoffs.js?v=HEAT2" defer></script>
+<script src="house-checkoffs.js?v=HEAT4" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
  if (window.HouseSaves) HouseSaves.mount("hayes");

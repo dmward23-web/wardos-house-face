@@ -361,3 +361,105 @@
 }
 
 /* Atlas: paste AFTER tokens-hub-command-deck-hotter.css. Lights 9-slot already live — do not regress. */
+
+/* ═══════════════════════════════════════════════════════════
+   HEAT4 / HUBHDR · AVINYL3 hub header · clock-first · icon-only
+   Kill CT lab · weather/sensi word strings · Nest/Lights already dead
+   ═══════════════════════════════════════════════════════════ */
+.hdr.hdr--spread .hdr-date-kicker,
+.hdr.hdr--spread .wx-card .wx-kicker,
+.hdr.hdr--spread .wx-card .wx-cond,
+.hdr.hdr--spread .wx-card .wx-mode,
+.hdr.hdr--spread .wx-card .wx-sub,
+.hdr.hdr--spread .sensi-hdr-kicker,
+.hdr.hdr--spread .sensi-hdr-mode,
+.hdr.hdr--spread .sensi-hdr-set,
+.hdr.hdr--spread .sensi-hdr-sub,
+.hdr.hdr--spread .sensi-chip-kicker,
+.hdr.hdr--spread .sensi-chip-mode,
+.hdr.hdr--spread .sensi-chip-set,
+.hdr.hdr--spread .sensi-chip-sub,
+.hdr.hdr--spread .hdr-brand .tagline,
+.hdr.hdr--spread .tagline {
+  display: none !important;
+}
+
+/* Huge live CT clock — digits own the bar */
+.hdr.hdr--spread .hdr-date-time {
+  font-size: clamp(42px, 5.2vw, 58px) !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.06em !important;
+  line-height: 0.92 !important;
+  color: #ffe8a0 !important;
+  -webkit-text-fill-color: #ffe8a0 !important;
+  text-shadow:
+    0 0 48px rgba(255, 180, 30, 0.78),
+    0 0 16px rgba(255, 200, 60, 0.55),
+    0 2px 0 rgba(0, 0, 0, 0.75) !important;
+  margin-top: 2px !important;
+}
+
+/* Soften DOW/date under clock — clock wins pass-by */
+.hdr.hdr--spread .hdr-date-dow {
+  font-size: 22px !important;
+  opacity: 0.72 !important;
+}
+.hdr.hdr--spread .hdr-date-long {
+  font-size: 13px !important;
+  opacity: 0.62 !important;
+}
+
+/* Weather / Sensi · amber instrument ovals · icon + ° only */
+.hdr.hdr--spread .wx-card,
+.hdr.hdr--spread .sensi-hdr,
+.hdr.hdr--spread .sensi-chip {
+  min-width: 112px !important;
+  max-width: 148px !important;
+  min-height: 64px !important;
+  height: 64px !important;
+  padding: 8px 14px 8px 10px !important;
+  gap: 8px !important;
+  border-radius: 999px !important;
+  border: 2px solid rgba(255, 190, 64, 0.62) !important;
+  background:
+    linear-gradient(165deg, rgba(8, 10, 16, 0.98), rgba(18, 14, 6, 0.94)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 230, 160, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 0 22px rgba(255, 170, 30, 0.32),
+    0 6px 0 rgba(5, 7, 10, 0.45) !important;
+}
+.hdr.hdr--spread .wx-card .wx-hdr-ico,
+.hdr.hdr--spread .sensi-hdr-ico,
+.hdr.hdr--spread .sensi-chip .sensi-chip-ico {
+  width: 36px !important;
+  height: 36px !important;
+  border: 1.5px solid rgba(255, 200, 80, 0.42) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 12px rgba(255, 180, 40, 0.28) !important;
+  color: #ffe894 !important;
+}
+.hdr.hdr--spread .wx-card .wx-temp,
+.hdr.hdr--spread .sensi-hdr-temp,
+.hdr.hdr--spread .sensi-chip-temp {
+  font-size: 26px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.05em !important;
+  color: #ffe8a0 !important;
+  -webkit-text-fill-color: #ffe8a0 !important;
+  text-shadow: 0 0 14px rgba(255, 200, 80, 0.4) !important;
+}
+.hdr.hdr--spread .wx-card .wx-line,
+.hdr.hdr--spread .sensi-hdr-line,
+.hdr.hdr--spread .sensi-chip-line {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0 !important;
+}
+.hdr.hdr--spread .wx-card .wx-text,
+.hdr.hdr--spread .wx-card .wx-hdr-text,
+.hdr.hdr--spread .sensi-hdr-text,
+.hdr.hdr--spread .sensi-chip-text {
+  gap: 0 !important;
+  justify-content: center !important;
+}

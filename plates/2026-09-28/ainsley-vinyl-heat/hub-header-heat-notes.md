@@ -1,7 +1,8 @@
-# Hub header heat-pass · one screen · AVINYL2 / HUBHDR
+# Hub header heat-pass · one screen · AVINYL3 / HUBHDR
 
 **Target:** `sheet-index.html` header only (LOOK notes — Atlas ships).  
-**Law:** pass-by glance · control-panel void · no brand fight with command deck.
+**Law:** pass-by glance · control-panel void · icon-first · no brand fight with command deck.  
+**Vibe:** fresh / untouched chrome — spare, not merch.
 
 ---
 
@@ -12,33 +13,35 @@
 | WardOS / house **logo** / wordmark | Brand fights clock + ovals; not instrument |
 | Tagline / subtitle under brand | Noise; pass-by never reads it |
 | Nest + Lights header ovals | Already on cam deck + lights panel (HUBCMD2) |
-| Soft light header chrome | Breaks dark-glass twin with leave-by / lights |
+| Soft light header chrome | Breaks dark-glass twin |
+| Weather/Sensi **word labels** + condition strings (“clear”, “auto”) | Icon-first — sun/thermo glyphs + tiny ° only |
+| “CT” spelled out | TIME digits are enough for kids |
 
 ## Keep / amplify
 
 | Keep | How |
 |------|-----|
-| **Huge live CT clock** | Hero of the bar — clamp large, amber-hi glow, JetBrains/Inter heavy |
-| Dark void glass bar | `--cmd-glass` / void `#010205`–`#0a0908` · amber border bloom twin |
-| **Weather** oval | Amber instrument capsule only — LIVE ring when fresh |
-| **Sensi** oval | Same amber instrument oval DNA — twin to Weather |
+| **Huge live CT clock** | Hero of the bar — digits only, amber-hi glow |
+| Dark void glass bar | void `#010205`–`#0a0908` · amber border bloom |
+| **Weather** oval | Amber instrument · **sun glyph** + tiny ° numeral |
+| **Sensi** oval | Amber instrument · **thermo glyph** + tiny ° numeral |
 
 ## Layout sketch (one bar ~110px)
 
 ```
-[  CT  9:54 PM  ]············[ Weather oval ][ Sensi oval ]
-     ↑ LOUDEST                     amber instruments only
+[  10:11  ]················[ ☀ 68° ][ ⌠ 72° ]
+   ↑ TIME only                  icon instruments
 ```
 
-No WardOS wordmark. No logo tile. No “House Face” tagline. Clock owns left/center; ovals huddle right as denser pills (not cards).
+No WardOS wordmark. No logo. No “clear”/“auto”. Clock owns left; ovals huddle right.
 
 ## Atlas paste cues
 
-- Hide `.brand`, `.brand img`, `.tagline` (or remove markup).
-- Upsize `[data-live-clock]` / `.live-clock` to leave-by-adjacent numeral heat.
-- Restyle `.wx-card` / `.sensi-hdr` as amber oval instruments (CMDDECK2 border + bloom).
-- Bar background = void glass; 2px amber border optional bloom — match lights badge, not light mode gray.
+- Hide `.brand`, `.brand img`, `.tagline`, `.clock-lab` / “CT”.
+- Upsize live clock to leave-by-adjacent numeral heat.
+- Restyle `.wx-card` / `.sensi-hdr` as amber oval instruments; hide `.k` / `.desc` / `.mode` word chrome.
+- Bar = void glass; 2px amber border bloom.
 
 ## Integrity
 
-No `sensi-live.json` / `nest-live.json` edits. No DEMO. LOOK plate only until Dan last-yes.
+No `sensi-live.json` / `nest-live.json` edits. No DEMO. LOOK plate only until Dan last-yes. No Madonna / Swift IP.
