@@ -758,6 +758,21 @@
   var _hubLiveStarting = false;
   var _hubLiveKickTimer = null;
 
+  /* CAMIOS1 · iPhone Safari will not start a muted autoplay <video> that is
+   * display:none, so hub tiles never went LIVE on the phone. Keep the video
+   * rendered (invisible, under the still) while it connects. */
+  function armHubVid(vid) {
+    if (!vid) return;
+    vid.style.display = "block";
+    vid.style.position = "absolute";
+    vid.style.inset = "0";
+    vid.style.opacity = "0";
+    vid.style.pointerEvents = "none";
+    vid.muted = true;
+    vid.playsInline = true;
+    vid.autoplay = true;
+  }
+
   function markHubCamLive(el, slotLabel) {
     if (!el) return;
     el._hubLivePlaying = true;
@@ -781,7 +796,12 @@
     var voidEl = el.querySelector(".hub-cam-stub-void");
     if (voidEl) voidEl.style.display = "none";
     var vid = el.querySelector("video.hub-cam-video");
-    if (vid) vid.style.display = "block";
+    if (vid) {
+      vid.style.display = "block";
+      vid.style.opacity = "1";
+      vid.style.position = "";
+      vid.style.inset = "";
+    }
   }
 
   function markHubCamNotLive(el, reason) {
@@ -927,10 +947,12 @@
         mediaWrap.insertBefore(vid, mediaWrap.firstChild);
       }
       if (!vid) return startOne(i + 1);
+      armHubVid(vid);
 
       NWR.startStream(deviceId, vid, function (/* status */) {})
         .then(function (session) {
           _hubLiveSessions[deviceId] = session;
+          try { var pp = vid.play(); if (pp && pp.catch) pp.catch(function () {}); } catch (_) {}
           return waitVideoPlaying(vid, 22000).then(function (ok) {
             session.ok = !!ok;
             if (ok) {
@@ -976,6 +998,19 @@
     });
     startPolling();
   }
+
+  /* CAMIOS1 · re-kick hub streams when the screen comes back (back button,
+   * app switch, bfcache) and every 90 s for any tile that dropped. Healthy
+   * sessions are skipped inside runHubLiveStreams. */
+  try {
+    global.addEventListener("pageshow", function () { startHubLiveStreams(document); });
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible") startHubLiveStreams(document);
+    });
+    setInterval(function () {
+      if (document.visibilityState === "visible") startHubLiveStreams(document);
+    }, 90000);
+  } catch (_) {}
 
   global.HouseNest = {
     gate: function () {
