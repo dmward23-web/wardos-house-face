@@ -2659,6 +2659,209 @@
   }
 
 
+
+
+  /* ═══════════════════════════════════════════════════════════
+     LIGHTS4 · hub rocker panel · right column beside leave-by
+     dark mission-glass · amber ON / muted OFF · ≥44px targets
+     HUBOVAL portrait scale untouched (ovals stay in header)
+     ═══════════════════════════════════════════════════════════ */
+  .hub-upper {
+    flex-direction: row !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  .hub-upper .leaveby {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    width: auto !important;
+  }
+  #hub-lights-panel,
+  .hub-lights {
+    flex: 0 0 348px !important;
+    width: 348px !important;
+    max-width: 348px !important;
+    min-width: 300px;
+    height: 100% !important;
+    max-height: 100% !important;
+    align-self: stretch !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px;
+    padding: 12px 12px 10px;
+    border-radius: 16px;
+    color: #f2eee6;
+    background:
+      linear-gradient(165deg, rgba(14,16,22,0.94) 0%, rgba(28,22,12,0.90) 55%, rgba(18,20,28,0.92) 100%);
+    border: 2px solid rgba(255,180,64,0.38);
+    box-shadow:
+      inset 0 1px 0 rgba(255,220,140,0.18),
+      inset 0 -1px 0 rgba(0,0,0,0.35),
+      0 10px 0 rgba(20,22,28,0.28),
+      0 0 28px rgba(255,160,40,0.12);
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #hub-lights-panel::before {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,180,60,0.14), transparent 60%);
+    opacity: 0.9;
+  }
+  #hub-lights-panel > * { position: relative; z-index: 1; }
+  #hub-lights-panel.is-live {
+    border-color: rgba(255,200,80,0.55);
+    box-shadow:
+      inset 0 1px 0 rgba(255,220,140,0.22),
+      0 10px 0 rgba(20,22,28,0.28),
+      0 0 36px rgba(255,180,40,0.22);
+  }
+  #hub-lights-panel.is-need {
+    border-color: rgba(224,160,64,0.45);
+  }
+  .hub-lights-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .hub-lights-title {
+    font-size: 15px; font-weight: 850; letter-spacing: 0.18em; text-transform: uppercase;
+    color: #ffe8a8;
+  }
+  .hub-lights-pill {
+    font-size: 10px; font-weight: 850; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 6px 10px; border-radius: 999px; min-height: 28px;
+    display: inline-flex; align-items: center;
+    background: rgba(40,42,48,0.7); border: 1px solid rgba(255,200,120,0.3); color: #d8d0c0;
+  }
+  .hub-lights-pill.on {
+    background: linear-gradient(180deg, rgba(255,220,120,0.35), rgba(200,140,30,0.35));
+    border-color: rgba(255,200,80,0.65); color: #ffe9a0;
+  }
+  .hub-lights-pill.off {
+    background: rgba(60,40,10,0.55); border-color: rgba(224,160,64,0.4); color: #f0c878;
+  }
+  .hub-lights-sub {
+    font-size: 11px; font-weight: 650; color: rgba(230,210,170,0.78); letter-spacing: 0.02em;
+    margin-top: -4px;
+  }
+  .hub-lights-bulk {
+    display: flex; gap: 8px;
+  }
+  .hub-lights-bulk-btn {
+    appearance: none; cursor: pointer; flex: 1;
+    min-height: 48px; padding: 10px 8px; border-radius: 12px;
+    font-size: 13px; font-weight: 850; letter-spacing: 0.06em; text-transform: uppercase;
+    color: #f4f0e8;
+    background: linear-gradient(180deg, #3a3e48, #1e222a);
+    border: 2px solid rgba(255,255,255,0.14);
+    box-shadow: 0 3px 0 #0a0c10, inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+  .hub-lights-bulk-btn.loud {
+    background: linear-gradient(180deg, #ffe080, #c87810);
+    color: #1a1208; border-color: #8a6010;
+    box-shadow: 0 3px 0 #6a4010, inset 0 1px 0 rgba(255,255,255,0.35);
+  }
+  .hub-lights-bulk-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #0a0c10;
+  }
+  #hub-lights-grid,
+  .hub-lights-grid {
+    flex: 1 1 auto; min-height: 0;
+    display: flex; flex-direction: column; gap: 8px;
+    overflow: hidden;
+  }
+  .hub-sw {
+    flex: 1 1 0;
+    min-height: 96px;
+    display: flex; flex-direction: column; justify-content: center; gap: 8px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.04);
+    border: 2px solid rgba(255,255,255,0.10);
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .hub-sw.is-on {
+    background: linear-gradient(145deg, rgba(255,200,80,0.18), rgba(180,100,20,0.16));
+    border-color: rgba(255,190,70,0.55);
+    box-shadow: 0 0 18px rgba(255,170,40,0.18), inset 0 1px 0 rgba(255,230,160,0.2);
+  }
+  .hub-sw.is-off {
+    background: rgba(0,0,0,0.22);
+    border-color: rgba(255,255,255,0.08);
+    opacity: 0.92;
+  }
+  .hub-sw-main {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .hub-sw-text { min-width: 0; flex: 1 1 auto; }
+  .hub-sw-name {
+    font-size: 17px; font-weight: 850; letter-spacing: -0.02em; color: #f8f4ec;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .hub-sw.is-off .hub-sw-name { color: #a8aeb8; }
+  .hub-sw-meta {
+    font-size: 12px; font-weight: 750; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(255,220,140,0.85); margin-top: 2px;
+  }
+  .hub-sw.is-off .hub-sw-meta { color: rgba(160,168,180,0.75); }
+  .hub-sw-rocker {
+    appearance: none; cursor: pointer;
+    flex: 0 0 64px; width: 64px; min-width: 64px; min-height: 88px; height: 88px;
+    padding: 6px 4px; border-radius: 14px;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    border: 2px solid #0a0c10;
+    box-shadow: 0 4px 0 #050608, inset 0 1px 0 rgba(255,255,255,0.2);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .hub-sw-rocker.is-on {
+    background: linear-gradient(180deg, #ffe894 0%, #e0a020 45%, #a06010 100%);
+    color: #1a1004;
+  }
+  .hub-sw-rocker.is-off {
+    background: linear-gradient(180deg, #4a5060 0%, #2a2e38 45%, #14161c 100%);
+    color: #c8ccd4;
+  }
+  .hub-sw-rocker:active { transform: translateY(2px); box-shadow: 0 2px 0 #050608; }
+  .hub-sw-rocker-on,
+  .hub-sw-rocker-off {
+    font-size: 11px; font-weight: 900; letter-spacing: 0.14em; line-height: 1;
+    pointer-events: none;
+  }
+  .hub-sw-rocker.is-on .hub-sw-rocker-off { opacity: 0.35; }
+  .hub-sw-rocker.is-off .hub-sw-rocker-on { opacity: 0.35; }
+  .hub-sw-rocker-knob {
+    width: 44px; height: 22px; border-radius: 8px; pointer-events: none;
+    background: linear-gradient(180deg, #fff6d0, #d8d0c0);
+    border: 1px solid rgba(20,22,28,0.35);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  .hub-sw-rocker.is-off .hub-sw-rocker-knob {
+    background: linear-gradient(180deg, #8a909a, #4a5058);
+  }
+  .hub-sw-dim {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .hub-sw-bright {
+    flex: 1 1 auto; min-width: 0; height: 28px; min-height: 44px;
+    accent-color: #e0a020; cursor: pointer;
+  }
+  .hub-sw-pct {
+    flex: 0 0 44px; text-align: right;
+    font-size: 13px; font-weight: 850; color: #ffe8a8; letter-spacing: 0.02em;
+  }
+  .hub-sw.is-off .hub-sw-pct { color: #8a909a; }
+  .hub-lights-more {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 40px; padding: 8px 10px; border-radius: 10px;
+    font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    text-decoration: none; color: rgba(255,220,140,0.85);
+    border: 1px dashed rgba(255,200,100,0.35);
+    background: rgba(255,255,255,0.03);
+  }
+  .hub-lights-more:active { opacity: 0.85; }
+
   /* LIGHTS2 · Lights oval shares Nest oval language (+ amber need tint) */
   .lights-hdr.is-need {
     border-color: rgba(224,160,64,0.55) !important;
@@ -2964,6 +3167,19 @@
  <div data-live="asof-warn" hidden style="margin-top:4px;font-size:11px;font-weight:700;letter-spacing:0.04em;color:#b06010;"></div>
  </div>
  </section>
+ <section class="hub-lights" id="hub-lights-panel" aria-label="Lights · house switches">
+ <div class="hub-lights-head">
+ <div class="hub-lights-title">Lights</div>
+ <div class="hub-lights-pill off" id="hub-lights-pill">…</div>
+ </div>
+ <div class="hub-lights-sub" id="hub-lights-sub">Dining · Harris · Kitchen</div>
+ <div class="hub-lights-bulk" aria-label="All lights">
+ <button type="button" class="hub-lights-bulk-btn loud" id="lights-all-on">All On</button>
+ <button type="button" class="hub-lights-bulk-btn" id="lights-all-off">All Off</button>
+ </div>
+ <div class="hub-lights-grid" id="hub-lights-grid" aria-label="Per-room switches"></div>
+ <a class="hub-lights-more" href="sheet-lights.html">Full lights board →</a>
+ </section>
  </div>
 
 
@@ -3181,7 +3397,7 @@
 <script src="house-sfx.js?v=HUBSHIP1"></script>
 <script src="house-sensi.js?v=HUBSHIP1"></script>
 <script src="house-nest.js?v=HUBSHIP1"></script>
-<script src="house-lights.js?v=LIGHTS2"></script>
+<script src="house-lights.js?v=LIGHTS4"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
@@ -3248,6 +3464,7 @@
   }
   paintNestChip();
   if (L && lightsChip) L.paintChip(lightsChip);
+  if (L && L.paintHubPanel) L.paintHubPanel(document);
  }
  if (S) {
   if (chip) S.mountChip(chip);
@@ -3260,7 +3477,8 @@
  }
  if (L) {
   L.onChange(paintGhomeTile);
-  L.startPolling();
+  if (L.mountHubPanel) L.mountHubPanel("#hub-lights-panel");
+  else L.startPolling();
  }
  if (nestChip) {
   nestChip.addEventListener("pointerdown", function () {

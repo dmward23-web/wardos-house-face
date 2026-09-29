@@ -187,11 +187,15 @@
     var roster = rosterFromLive(data);
     var reserved = reservedFromLive(data);
     var items = [];
+    /* LIVE + writeSupported → pure live reads.
+       LIVE + !writeSupported → DEMO overlay (seeded from live on fetch; taps visible until next poll).
+       else → pure DEMO. */
+    var usePureLive = !!(g.live && g.writeSupported);
     for (var i = 0; i < roster.length; i++) {
       var L = roster[i];
       var id = L.id;
       var d = demo[id] || { on: false, brightness: 100 };
-      if (g.live) {
+      if (usePureLive) {
         items.push({
           id: id,
           name: L.name || id,
@@ -211,8 +215,8 @@
           kind: L.kind || "bulb",
           on: !!d.on,
           brightness: clampBright(d.brightness),
-          online: null,
-          source: "demo",
+          online: g.live ? (L.online !== false) : null,
+          source: g.live ? "live-demo" : "demo",
           pending: false
         });
       }
@@ -222,7 +226,7 @@
       lights: items,
       reserved: reserved,
       writeSupported: !!(g.writeSupported),
-      source: g.live ? "live" : "demo"
+      source: usePureLive ? "live" : (g.live ? "live-demo" : "demo")
     };
   }
 
@@ -266,8 +270,26 @@
 
   function applyLivePayload(data) {
     _liveCache = { at: Date.now(), data: data };
+    var g = gate(data);
+    /* Seed DEMO from LIVE snapshot when writes are not yet proxied —
+       so hub switches match reality on poll, and taps stay visible between polls. */
+    if (g.live && !g.writeSupported) {
+      var demo = loadDemo();
+      var list = (data && data.lights) || [];
+      for (var i = 0; i < list.length; i++) {
+        var L = list[i];
+        if (!L || !L.id) continue;
+        demo[L.id] = {
+          on: typeof L.on === "boolean" ? L.on : !!(demo[L.id] && demo[L.id].on),
+          brightness: typeof L.brightness === "number"
+            ? clampBright(L.brightness)
+            : clampBright((demo[L.id] && demo[L.id].brightness) || 100)
+        };
+      }
+      saveDemo(demo);
+    }
     notify();
-    return gate(data);
+    return g;
   }
 
   function fetchLive(cb) {
@@ -421,7 +443,7 @@
             ? '<input class="light-bright" type="range" min="1" max="100" value="' + clampBright(L.brightness || 100) + '" data-id="' + L.id + '" aria-label="Brightness" />'
             : "")
           + "</div>"
-          + '<div class="light-pad-src">' + (eff.source === "live" ? "LIVE" : "DEMO") + "</div>"
+          + '<div class="light-pad-src">' + hubSrcLabel(eff, g) + "</div>"
           + "</article>";
       }
       /* reserved OP slot */
@@ -469,7 +491,8 @@
       try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
       if (act === "on") setLight(id, { on: true });
       if (act === "off") setLight(id, { on: false });
-      paintPads(grid.ownerDocument || document);
+      var d0 = grid.ownerDocument || document;
+      paintPads(d0); paintHubPanel(d0);
     };
     grid.onchange = function (ev) {
       var t = ev.target;
@@ -477,7 +500,8 @@
       var id = t.getAttribute("data-id");
       if (!id) return;
       setLight(id, { on: true, brightness: clampBright(t.value) });
-      paintPads(grid.ownerDocument || document);
+      var d1 = grid.ownerDocument || document;
+      paintPads(d1); paintHubPanel(d1);
     };
   }
 
@@ -491,17 +515,167 @@
     if (onB && !onB._lightsWired) {
       onB._lightsWired = true;
       onB.addEventListener("click", function () {
-        tap(); setAll(true); paintPads(doc); paintChip(doc.getElementById("index-lights-chip"));
+        tap(); setAll(true); paintPads(doc); paintHubPanel(doc); paintChip(doc.getElementById("index-lights-chip"));
       });
     }
     if (offB && !offB._lightsWired) {
       offB._lightsWired = true;
       offB.addEventListener("click", function () {
-        tap(); setAll(false); paintPads(doc); paintChip(doc.getElementById("index-lights-chip"));
+        tap(); setAll(false); paintPads(doc); paintHubPanel(doc); paintChip(doc.getElementById("index-lights-chip"));
       });
     }
   }
 
+
+
+  function hubSrcLabel(eff, g) {
+    g = g || (eff && eff.gate) || gate();
+    if (g.live && g.writeSupported) return "LIVE";
+    if (g.live) return "LIVE · DEMO write";
+    if (g.needToken) return "NEED TOKEN · DEMO";
+    return (g.label || "DEMO") + (eff && eff.source === "demo" ? " · DEMO" : "");
+  }
+
+  function hubHonesty(g) {
+    g = g || gate();
+    if (g.live && g.writeSupported) return "LIVE";
+    if (g.live) return "LIVE";
+    if (g.needToken) return "NEED TOKEN · DEMO";
+    return (g.label || "STUB") + " · DEMO";
+  }
+
+  /** Hub primary control · rocker switches on sheet-index (Dining / Harris / Kitchen). */
+  function paintHubPanel(doc) {
+    doc = doc || document;
+    var panel = doc.getElementById("hub-lights-panel");
+    if (!panel) return;
+    var eff = effectiveLights();
+    var g = eff.gate;
+    panel.classList.toggle("is-live", !!g.live);
+    panel.classList.toggle("is-need", !!(g.needToken || g.kind === "need_token"));
+    panel.classList.toggle("is-demo-write", !!(g.live && !g.writeSupported));
+
+    var pill = doc.getElementById("hub-lights-pill");
+    if (pill) {
+      pill.textContent = hubHonesty(g);
+      pill.classList.toggle("on", !!g.live);
+      pill.classList.toggle("off", !g.live);
+    }
+    var sub = doc.getElementById("hub-lights-sub");
+    if (sub) {
+      sub.textContent = g.live
+        ? (g.writeSupported
+          ? "Kasa live · wall switches"
+          : "LIVE read · taps DEMO until write proxy")
+        : (g.needToken
+          ? "NEED TOKEN · DEMO toggles"
+          : ((g.label || "STUB") + " · DEMO"));
+    }
+
+    var grid = doc.getElementById("hub-lights-grid");
+    if (!grid) return;
+    var html = "";
+    for (var i = 0; i < eff.lights.length; i++) {
+      var L = eff.lights[i];
+      var onCls = L.on ? " is-on" : " is-off";
+      var dim = (L.kind === "dimmer" || L.kind === "switch/dimmer");
+      var bright = clampBright(L.brightness || (L.on ? 100 : 0));
+      html +=
+        '<article class="hub-sw' + onCls + '" data-light-id="' + L.id + '">'
+        + '<div class="hub-sw-main">'
+        + '<div class="hub-sw-text">'
+        + '<div class="hub-sw-name">' + escapeHtml(L.name) + "</div>"
+        + '<div class="hub-sw-meta">' + (L.on ? "ON" : "OFF")
+        + (dim ? (" · " + bright + "%") : "")
+        + "</div>"
+        + "</div>"
+        + '<button type="button" class="hub-sw-rocker' + onCls + '" data-act="toggle" data-id="'
+        + L.id + '" aria-pressed="' + (L.on ? "true" : "false") + '" aria-label="'
+        + escapeHtml(L.name) + ' power">'
+        + '<span class="hub-sw-rocker-on">ON</span>'
+        + '<span class="hub-sw-rocker-knob" aria-hidden="true"></span>'
+        + '<span class="hub-sw-rocker-off">OFF</span>'
+        + "</button>"
+        + "</div>"
+        + (dim
+          ? ('<div class="hub-sw-dim">'
+            + '<input class="hub-sw-bright light-bright" type="range" min="1" max="100" value="'
+            + bright + '" data-id="' + L.id + '" aria-label="' + escapeHtml(L.name) + ' brightness" />'
+            + '<span class="hub-sw-pct" data-pct-for="' + L.id + '">' + bright + "%</span>"
+            + "</div>")
+          : "")
+        + "</article>";
+    }
+    grid.innerHTML = html;
+    bindHubHandlers(panel);
+  }
+
+  function bindHubHandlers(panel) {
+    if (!panel) return;
+    panel.setAttribute("data-hub-lights-bound", "1");
+    panel.onclick = function (ev) {
+      var t = ev.target;
+      if (!t) return;
+      var btn = t.closest ? t.closest("[data-act]") : null;
+      if (!btn) {
+        while (t && t !== panel && !(t.getAttribute && t.getAttribute("data-act"))) t = t.parentNode;
+        btn = (t && t.getAttribute && t.getAttribute("data-act")) ? t : null;
+      }
+      if (!btn) return;
+      var act = btn.getAttribute("data-act");
+      var id = btn.getAttribute("data-id");
+      if (!act || !id) return;
+      ev.preventDefault();
+      try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
+      if (act === "toggle") {
+        var eff = effectiveLights();
+        var cur = false;
+        for (var i = 0; i < eff.lights.length; i++) {
+          if (eff.lights[i].id === id) { cur = !!eff.lights[i].on; break; }
+        }
+        setLight(id, { on: !cur });
+      } else if (act === "on") {
+        setLight(id, { on: true });
+      } else if (act === "off") {
+        setLight(id, { on: false });
+      }
+      paintHubPanel(panel.ownerDocument || document);
+      paintPads(panel.ownerDocument || document);
+      paintChip((panel.ownerDocument || document).getElementById("index-lights-chip"));
+    };
+    panel.oninput = function (ev) {
+      var t = ev.target;
+      if (!t || !t.classList || !t.classList.contains("hub-sw-bright")) return;
+      var id = t.getAttribute("data-id");
+      if (!id) return;
+      var v = clampBright(t.value);
+      var pct = panel.querySelector('[data-pct-for="' + id + '"]');
+      if (pct) pct.textContent = v + "%";
+    };
+    panel.onchange = function (ev) {
+      var t = ev.target;
+      if (!t || !t.classList || !t.classList.contains("hub-sw-bright")) return;
+      var id = t.getAttribute("data-id");
+      if (!id) return;
+      try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
+      setLight(id, { on: true, brightness: clampBright(t.value) });
+      paintHubPanel(panel.ownerDocument || document);
+      paintPads(panel.ownerDocument || document);
+      paintChip((panel.ownerDocument || document).getElementById("index-lights-chip"));
+    };
+  }
+
+  function mountHubPanel(selector) {
+    var doc = document;
+    var panel = typeof selector === "string" ? doc.querySelector(selector) : selector;
+    if (!panel) panel = doc.getElementById("hub-lights-panel");
+    if (!panel) return null;
+    wireAllButtons(doc);
+    onChange(function () { paintHubPanel(doc); });
+    startPolling();
+    paintHubPanel(doc);
+    return panel;
+  }
 
   /** Kid-board secondary shortcut: one named pad only (hub stays full roster). */
   function paintKidPad(host, lightId, doc) {
@@ -536,7 +710,7 @@
         ? '<input class="light-bright" type="range" min="1" max="100" value="' + clampBright(L.brightness || 100) + '" data-id="' + L.id + '" aria-label="Brightness" />'
         : "")
       + "</div>"
-      + '<div class="light-pad-src">' + (eff.source === "live" ? "LIVE" : "DEMO") + " · " + escapeHtml(gateLab) + " · full house → Lights</div>"
+      + '<div class="light-pad-src">' + hubSrcLabel(eff, g) + " · " + escapeHtml(gateLab) + " · full house → Lights</div>"
       + "</article>";
     host.onclick = function (ev) {
       var el = ev.target;
@@ -587,8 +761,11 @@
     mountChip: mountChip,
     paintPads: paintPads,
     wireAllButtons: wireAllButtons,
+    paintHubPanel: paintHubPanel,
+    mountHubPanel: mountHubPanel,
     paintKidPad: paintKidPad,
     mountKidLight: mountKidLight,
-    clampBright: clampBright
+    clampBright: clampBright,
+    hubHonesty: hubHonesty
   };
 })(typeof window !== "undefined" ? window : globalThis);

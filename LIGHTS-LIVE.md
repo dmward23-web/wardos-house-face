@@ -74,7 +74,7 @@ Named dimmers/switches — kebab ids. Screenshot on/brightness seed DEMO default
 
 Aliases must match the **Kasa app** device names (probe normalizes case / punctuation).
 
-**Hub vs kid boards:** `sheet-lights` / Google Home Lights tile = PRIMARY full roster. Kid boards: that kid's named switch only (`kid-harris` → `harris-room`).
+**Hub vs kid boards:** `sheet-index` hub rocker panel (`#hub-lights-panel`) = PRIMARY wall control (Dining / Harris / Kitchen). `sheet-lights.html` = full-page board. Kid boards: that kid's named switch only (`kid-harris` → `harris-room`). LIGHTS4.
 
 ## Probe / fetch (Atlas box)
 
