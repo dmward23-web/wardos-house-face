@@ -1,7 +1,7 @@
 # CAMLIVE2 · hub cam LIVE WebRTC (Front / Garage / Backyard)
 
 **When:** 2026-09-28 ~20:50 CT  
-**Tip:** `TIPSHA` · CAMLIVE2  
+**Tip:** `f389f43` · CAMLIVE2  
 **Page:** https://dmward23-web.github.io/wardos-house-face/sheet-index.html
 
 ## Shipped
