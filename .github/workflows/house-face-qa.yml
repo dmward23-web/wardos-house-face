@@ -1,0 +1,36 @@
+# House Face · QA gates (push main + pull_request)
+# GATE 1 — placeholder lint · GATE 2 — Ledger numbers contract
+# Job C dead-end/asset · PARK tonight (optional)
+# Red = tip not LIVE
+name: house-face-qa
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gate1-placeholder-lint:
+    name: "GATE 1 · placeholder lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run GATE 1
+        run: node scripts/qa/gate1-placeholder-lint.mjs
+
+  gate2-numbers-contract:
+    name: "GATE 2 · numbers contract"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run GATE 2
+        run: node scripts/qa/gate2-numbers-contract.mjs
