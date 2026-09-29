@@ -757,33 +757,102 @@
     return g.label || "OFFLINE";
   }
 
-  /** Hub primary control · rocker switches on sheet-index (Dining / Harris / Kitchen). */
+  /** Hub command-deck roster · 3 LIVE (LIGHTS6 write) + 6 NEED CONNECT stubs (honest · never DEMO). */
+  var HUB_DECK = [
+    { id: "dining-room", short: "Dining", name: "Dining Room", live: true },
+    { id: "harris-room", short: "Harris", name: "Harris's Room", live: true },
+    { id: "kitchen", short: "Kitchen", name: "Kitchen", live: true },
+    { id: "dads-room", short: "Dad", name: "Dad's Room", live: false },
+    { id: "ainsley-room", short: "Ainsley", name: "Ainsley's Room", live: false },
+    { id: "hayes-room", short: "Hayes", name: "Hayes' Room", live: false },
+    { id: "living-room", short: "Living", name: "Living Room", live: false },
+    { id: "family-room", short: "Family", name: "Family Room", live: false },
+    { id: "basement", short: "Basement", name: "Basement", live: false }
+  ];
+
   var HUB_SHORT_NAMES = {
     "dining-room": "Dining",
     "harris-room": "Harris",
-    "kitchen": "Kitchen"
+    "kitchen": "Kitchen",
+    "dads-room": "Dad",
+    "ainsley-room": "Ainsley",
+    "hayes-room": "Hayes",
+    "living-room": "Living",
+    "family-room": "Family",
+    "basement": "Basement"
   };
 
   function shortHubName(L) {
     if (!L) return "";
     if (HUB_SHORT_NAMES[L.id]) return HUB_SHORT_NAMES[L.id];
     var n = String(L.name || L.id || "");
-    // Strip possessive / Room suffix for wall glance
     n = n.replace(/\u2019s Room$/i, "").replace(/'s Room$/i, "").replace(/ Room$/i, "");
     return n || L.id;
+  }
+
+  /** Hub-only deck: LIVE Kasa rows + honest NEED CONNECT stubs (not in write path). */
+  function hubDeckLights() {
+    var eff = effectiveLights();
+    var byId = {};
+    for (var i = 0; i < eff.lights.length; i++) byId[eff.lights[i].id] = eff.lights[i];
+    var out = [];
+    for (var j = 0; j < HUB_DECK.length; j++) {
+      var slot = HUB_DECK[j];
+      if (slot.live && byId[slot.id]) {
+        var L = byId[slot.id];
+        out.push({
+          id: L.id,
+          name: L.name || slot.name,
+          short: slot.short,
+          kind: L.kind || "dimmer",
+          on: L.on,
+          brightness: L.brightness,
+          live: true,
+          needConnect: false,
+          disabled: !canWrite()
+        });
+      } else if (slot.live) {
+        out.push({
+          id: slot.id,
+          name: slot.name,
+          short: slot.short,
+          kind: "dimmer",
+          on: null,
+          brightness: null,
+          live: true,
+          needConnect: false,
+          disabled: true,
+          offline: true
+        });
+      } else {
+        out.push({
+          id: slot.id,
+          name: slot.name,
+          short: slot.short,
+          kind: "stub",
+          on: null,
+          brightness: null,
+          live: false,
+          needConnect: true,
+          disabled: true
+        });
+      }
+    }
+    return { gate: eff.gate, lights: out, canWrite: canWrite() };
   }
 
   function paintHubPanel(doc) {
     doc = doc || document;
     var panel = doc.getElementById("hub-lights-panel");
     if (!panel) return;
-    var eff = effectiveLights();
-    var g = eff.gate;
+    var deck = hubDeckLights();
+    var g = deck.gate;
     panel.classList.toggle("is-live", !!g.live);
     panel.classList.toggle("is-need", !!(g.needToken || g.kind === "need_token"));
     panel.classList.toggle("is-demo-write", false);
     panel.classList.toggle("is-proxy-off", !!(g.live && g.writeSupported && !canWrite()));
     panel.classList.toggle("is-disabled", !canWrite());
+    panel.classList.add("hub-lights--deck9");
 
     var pill = doc.getElementById("hub-lights-pill");
     if (pill) {
@@ -794,7 +863,7 @@
     var sub = doc.getElementById("hub-lights-sub");
     if (sub) {
       sub.textContent = canWrite()
-        ? "Kasa live · wall switches"
+        ? "3 LIVE · 6 NEED CONNECT"
         : (g.live && g.writeSupported
           ? "PROXY OFF · write proxy unreachable (check tunnel)"
           : (g.live
@@ -804,31 +873,45 @@
 
     var grid = doc.getElementById("hub-lights-grid");
     if (!grid) return;
+    grid.classList.add("hub-lights-grid--deck9");
     var html = "";
-    for (var i = 0; i < eff.lights.length; i++) {
-      var L = eff.lights[i];
+    for (var i = 0; i < deck.lights.length; i++) {
+      var L = deck.lights[i];
+      var hubName = L.short || shortHubName(L);
+      if (L.needConnect) {
+        html +=
+          '<article class="hub-sw is-stub is-need-connect is-off hub-sw--stub" data-light-id="' + L.id + '" data-need-connect="1">'
+          + '<div class="hub-sw-main">'
+          + '<div class="hub-sw-text">'
+          + '<div class="hub-sw-name">' + escapeHtml(hubName) + "</div>"
+          + '<div class="hub-sw-meta">NEED CONNECT</div>'
+          + "</div>"
+          + '<span class="hub-sw-stub-pill" title="Not connected yet">STUB</span>'
+          + "</div>"
+          + "</article>";
+        continue;
+      }
       var onCls = L.on ? " is-on" : " is-off";
+      if (L.on == null) onCls = " is-off is-unknown";
       var dim = (L.kind === "dimmer" || L.kind === "switch/dimmer");
-      var bright = clampBright(L.brightness || (L.on ? 100 : 0));
-      var hubName = shortHubName(L);
+      var bright = L.brightness != null ? clampBright(L.brightness) : (L.on ? 100 : 0);
+      var meta = L.on == null ? "…" : ((L.on ? "ON" : "OFF") + (dim ? (" · " + bright + "%") : ""));
+      var writable = canWrite() && !L.disabled;
       html +=
-        '<article class="hub-sw' + onCls + '" data-light-id="' + L.id + '">'
+        '<article class="hub-sw hub-sw--live' + onCls + '" data-light-id="' + L.id + '">'
         + '<div class="hub-sw-main">'
         + '<div class="hub-sw-text">'
         + '<div class="hub-sw-name">' + escapeHtml(hubName) + "</div>"
-        + '<div class="hub-sw-meta">' + (L.on ? "ON" : "OFF")
-        + (dim ? (" · " + bright + "%") : "")
+        + '<div class="hub-sw-meta">' + meta + "</div>"
         + "</div>"
-        + "</div>"
-        + '<button type="button" class="hub-sw-rocker' + onCls + (canWrite() ? "" : " is-disabled") + '" data-act="toggle" data-id="'
+        + '<button type="button" class="hub-sw-rocker' + onCls + (writable ? "" : " is-disabled") + '" data-act="toggle" data-id="'
         + L.id + '" aria-pressed="' + (L.on ? "true" : "false") + '" aria-label="'
-        + escapeHtml(L.name) + ' power"' + (canWrite() ? "" : " disabled") + '>'
+        + escapeHtml(L.name) + ' power"' + (writable ? "" : " disabled") + '>'
         + '<span class="hub-sw-rocker-on">ON</span>'
         + '<span class="hub-sw-rocker-knob" aria-hidden="true"></span>'
         + '<span class="hub-sw-rocker-off">OFF</span>'
         + "</button>"
         + "</div>"
-        /* HUBCMD1 / LIGHTS7-COMPACT: no brightness range on hub — pct in meta only */
         + "</article>";
     }
     grid.innerHTML = html;
@@ -850,6 +933,8 @@
       var act = btn.getAttribute("data-act");
       var id = btn.getAttribute("data-id");
       if (!act || !id) return;
+      if (btn.classList && (btn.classList.contains("is-stub") || btn.getAttribute("data-need-connect"))) return;
+      if (btn.closest && btn.closest("[data-need-connect]")) return;
       if (!canWrite()) { probeProxy(); return; }
       ev.preventDefault();
       try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
