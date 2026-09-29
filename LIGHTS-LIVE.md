@@ -74,7 +74,7 @@ Named dimmers/switches — kebab ids. On/brightness come from live cloud probe o
 
 Aliases must match the **Kasa app** device names (probe normalizes case / punctuation).
 
-**Hub vs kid boards:** `sheet-index` hub rocker panel (`#hub-lights-panel`) = PRIMARY wall control (Dining / Harris / Kitchen). `sheet-lights.html` = full-page board. Kid boards: that kid's named switch only (`kid-harris` → `harris-room`). LIGHTS6.
+**Hub vs kid boards:** `sheet-index` hub rocker panel (`#hub-lights-panel`) = PRIMARY wall control (Dining / Harris / Kitchen) — HUBCMD1 / LIGHTS7-COMPACT horizontal pills inside ~350×380 command deck (dark glass twin of leave-by). `sheet-lights.html` = full-page board (brightness). Kid boards: that kid's named switch only (`kid-harris` → `harris-room`).
 
 ## Probe / fetch (Atlas box)
 

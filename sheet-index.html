@@ -3017,6 +3017,7 @@
 <link rel="stylesheet" href="heat-v3.css?v=CAMDECK1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
 <link rel="stylesheet" href="tokens-hub-cams.css?v=CAMDECK1" />
+<link rel="stylesheet" href="tokens-hub-command-deck.css?v=HUBCMD1" />
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -3318,8 +3319,8 @@
  </a>
  </div>
 
- <div class="hub-upper hub-upper--cams">
- <section class="leaveby" aria-label="Schedule · today and tomorrow">
+ <div class="hub-upper hub-upper--cams hub-upper--cmd">
+ <section class="leaveby leaveby--cmd" aria-label="Schedule · today and tomorrow">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
  <div class="leaveby-head">
@@ -3341,7 +3342,7 @@
  <div data-live="asof-warn" hidden style="margin-top:4px;font-size:11px;font-weight:700;letter-spacing:0.04em;color:#b06010;"></div>
  </div>
  </section>
- <section class="hub-lights hub-lights--cams" id="hub-lights-panel" aria-label="Lights · house switches">
+ <section class="hub-lights hub-lights--cams hub-lights--cmd" id="hub-lights-panel" aria-label="Lights · house switches">
  <div class="hub-lights-head">
  <div class="hub-lights-title">Lights</div>
  <div class="hub-lights-pill off" id="hub-lights-pill">…</div>
@@ -3571,7 +3572,7 @@
 <script src="house-sfx.js?v=CAMDECK1"></script>
 <script src="house-sensi.js?v=CAMDECK1"></script>
 <script src="house-nest.js?v=CAMDECK1"></script>
-<script src="house-lights.js?v=LIGHTS6"></script>
+<script src="house-lights.js?v=HUBCMD1"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
