@@ -91,7 +91,11 @@
       var wp = data.writeProxy ? String(data.writeProxy).replace(/\/$/, "") : "";
       var tok = data.writeProxyToken ? String(data.writeProxyToken) : "";
       if (!wp || (isPagesHost() && isLoopbackProxy(wp))) return;
-      if (!localStorage.getItem(PROXY_LS_KEY)) localStorage.setItem(PROXY_LS_KEY, wp);
+      // PROXYFOLLOW1: the tunnel address can change when Atlas's computer
+      // restarts; always follow the newest public address from live JSON.
+      if (/^https:\/\//i.test(wp) || !localStorage.getItem(PROXY_LS_KEY)) {
+        if (localStorage.getItem(PROXY_LS_KEY) !== wp) localStorage.setItem(PROXY_LS_KEY, wp);
+      }
       if (tok && !localStorage.getItem(PROXY_TOKEN_LS_KEY)) {
         localStorage.setItem(PROXY_TOKEN_LS_KEY, tok);
       }

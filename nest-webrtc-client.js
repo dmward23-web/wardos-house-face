@@ -86,6 +86,12 @@
       } catch (_) {}
       return fromQs.replace(/\/$/, "");
     }
+    // PROXYFOLLOW1: newest public address from nest-live.json beats a saved one
+    // (the tunnel address changes when Atlas's computer restarts).
+    if (_liveProxy && _liveProxy.nestProxy && /^https:\/\//i.test(_liveProxy.nestProxy)) {
+      try { localStorage.setItem(PROXY_LS_KEY, _liveProxy.nestProxy); } catch (_) {}
+      return _liveProxy.nestProxy;
+    }
     try {
       var saved = localStorage.getItem(PROXY_LS_KEY);
       if (saved) {
