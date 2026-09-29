@@ -1,6 +1,6 @@
 # Lights live control · House Face
 
-**Honest gate:** GitHub Pages is static. TP-Link **Kasa IoT** dimmers need cloud (or LAN) credentials on the Atlas box. With `kasa.user`+`kasa.password` on Atlas, `lights-fetch.mjs` runs the cloud probe and ships `status:live`. Without creds the UI stays **NEED TOKEN** · controls dark — **never** labels invented on/off as LIVE (never DEMO).
+**Honest gate:** GitHub Pages is static. TP-Link **Kasa IoT** dimmers need cloud (or LAN) credentials on the Atlas box. With `kasa.user`+`kasa.password` on Atlas, `lights-fetch.mjs` runs the cloud probe and ships `status:live` **with public `writeProxy` + `writeProxyToken` baked in** (from `lights-write-proxy.url` + `lights-proxy.token`). Without creds the UI stays **NEED TOKEN** · controls dark — **never** invent LIVE. **No DEMO. Hard law.**
 
 Nest SDM on the box is **cameras only** (no lights). Lights are Kasa — separate from Nest.
 
@@ -62,19 +62,19 @@ Or env on the Atlas cron user: `KASA_USER` + `KASA_PASSWORD` (also accepts `KASA
 
 **Today on box (2026-09-28 CT):** `kasa.user` + `kasa.password` present (mode 600). LIVE cloud path works via those creds + `scripts/kasa-probe.py`. Nest + Sensi unchanged.
 
-## Roster (LIGHTS2 · from Ward home screenshot)
+## Roster (LIGHTS6 · Ward home Kasa)
 
-Named dimmers/switches — kebab ids. Screenshot on/brightness seed DEMO defaults only; gate stays **NEED TOKEN** (never paint LIVE from snapshot alone).
+Named dimmers/switches — kebab ids. On/brightness come from live cloud probe only (never invented).
 
-| id | name | where | kind | DEMO seed |
-|----|------|-------|------|-----------|
-| `dining-room` | Dining Room | Dining Room | dimmer | on · 52 |
-| `harris-room` | Harris's Room | Harris's Room | dimmer | on · 100 |
-| `kitchen` | Kitchen | Kitchen | dimmer | on · 1 |
+| id | name | where | kind |
+|----|------|-------|------|
+| `dining-room` | Dining Room | Dining Room | dimmer |
+| `harris-room` | Harris's Room | Harris's Room | dimmer |
+| `kitchen` | Kitchen | Kitchen | dimmer |
 
 Aliases must match the **Kasa app** device names (probe normalizes case / punctuation).
 
-**Hub vs kid boards:** `sheet-index` hub rocker panel (`#hub-lights-panel`) = PRIMARY wall control (Dining / Harris / Kitchen). `sheet-lights.html` = full-page board. Kid boards: that kid's named switch only (`kid-harris` → `harris-room`). LIGHTS4.
+**Hub vs kid boards:** `sheet-index` hub rocker panel (`#hub-lights-panel`) = PRIMARY wall control (Dining / Harris / Kitchen). `sheet-lights.html` = full-page board. Kid boards: that kid's named switch only (`kid-harris` → `harris-room`). LIGHTS6.
 
 ## Probe / fetch (Atlas box)
 
@@ -97,8 +97,9 @@ Fetch (LIVE when creds present):
 cd /workspace/wardos-house-face
 node scripts/lights-fetch.mjs
 # → data/lights-live.json  status:live  (Dining/Harris/Kitchen from cloud)
-# missing creds → status:need_token + DEMO starter (honest)
+# missing creds → status:need_token · controls dark (honest · never DEMO)
 # probe failure → status:error (keeps last lights if any; never invents LIVE)
+# LIGHTS6 auto-bake: writeProxy from lights-write-proxy.url + writeProxyToken from lights-proxy.token
 ```
 
 Secrets **never** on Pages / git.
@@ -107,10 +108,10 @@ Secrets **never** on Pages / git.
 
 | `status` | UI |
 |----------|----|
-| `need_token` / `need_creds` | NEED TOKEN · DEMO local toggles |
+| `need_token` / `need_creds` | NEED TOKEN · controls dark |
 | `stage` | same as need_token · roster declared, no live reads |
-| `live` | LIVE · on/brightness/online from fetch (if fresh) |
-| `error` / stale | DEMO fallback · show error · never fake LIVE |
+| `live` | LIVE · on/brightness/online from fetch (if fresh) · writeProxy baked |
+| `error` / stale | show error · controls dark · never invent LIVE |
 
 ```json
 {
@@ -126,7 +127,7 @@ Secrets **never** on Pages / git.
     { "id": "kitchen", "name": "Kitchen", "where": "Kitchen", "kind": "dimmer", "on": true, "brightness": 1, "online": true }
   ],
   "reserved": [],
-  "error": "NEED TOKEN · controls dark — never DEMO"
+  "error": "NEED TOKEN · controls dark — No DEMO"
 }
 ```
 
@@ -170,7 +171,7 @@ Rotate the proxy token + tunnel if leaked. Revoking Kasa password is separate an
 ## UI rules
 
 - **LIVE** only when `status === "live"` and snapshot is fresh.
-- Missing Kasa creds → **NEED TOKEN** · controls dark (never DEMO).
+- Missing Kasa creds → **NEED TOKEN** · controls dark (**No DEMO**).
 - Live + writeSupported but proxy down → **PROXY OFF** · controls dark (tunnel/proxy unhealthy — not a missing seed link).
 - Live + proxy up → pill **LIVE** · taps are real Kasa writes (optimistic UI + rollback on fail).
 

@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE · LIGHTS · CONTROL</title>
-<link rel="stylesheet" href="house-engage.css?v=LIGHTS5" />
+<link rel="stylesheet" href="house-engage.css?v=LIGHTS6" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
@@ -130,22 +130,22 @@
  <div class="banner-accent"></div>
  <div class="banner-body">
  <div class="banner-lab">Lights · not Nest</div>
- <div class="banner-title">Control tile · NEED TOKEN until Kasa · DEMO toggles</div>
- <div class="banner-sub">Polls data/lights-live.json · no fake LIVE · OP Kasa online · need_token · Elo 3202L</div>
+ <div class="banner-title">Control tile · LIVE Kasa · write via baked proxy</div>
+ <div class="banner-sub">Polls data/lights-live.json · writeProxy baked · no seed link · Elo 3202L</div>
  </div>
  </section>
 
  <section class="bulk" aria-label="All lights">
- <button type="button" class="bulk-btn loud" id="lights-all-on">All on · DEMO</button>
- <button type="button" class="bulk-btn" id="lights-all-off">All off · DEMO</button>
+ <button type="button" class="bulk-btn loud" id="lights-all-on">All on</button>
+ <button type="button" class="bulk-btn" id="lights-all-off">All off</button>
  </section>
 
  <section class="pad-grid" id="lights-pad-grid" aria-label="Per-light pads"></section>
 
  <section class="connect" id="lights-connect" aria-label="Connect lights">
  <div>
- <div class="connect-title" id="lights-connect-title">CONNECT · need Kasa token</div>
- <div class="connect-sub" id="lights-connect-sub">Atlas requests Kasa cloud / LAN path from Dan · store on box only · see LIGHTS-LIVE.md · no password in chat · OP online · cloud need_token</div>
+ <div class="connect-title" id="lights-connect-title">LIVE · Kasa cloud + write proxy</div>
+ <div class="connect-sub" id="lights-connect-sub">Reads + writes via data/lights-live.json · writeProxy + token baked · Kasa password box-only · see LIGHTS-LIVE.md</div>
  </div>
  <div class="connect-actions">
  <a class="cbtn loud" href="sheet-google-home.html">Cams + climate hub</a>
@@ -155,7 +155,7 @@
  </div>
  </section>
 
- <div class="note" id="lights-note">Live control needs Kasa token/proxy on Atlas · Nest SDM is cams only · DEMO localStorage until then · never label DEMO as LIVE · Elo 3202L 1080×1920</div>
+ <div class="note" id="lights-note">LIVE · Kasa cloud + public write proxy · Nest SDM is cams only · controls dark only if PROXY OFF / offline · Elo 3202L 1080×1920</div>
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -168,7 +168,7 @@
  <span id="lights-ftr-status">NEED TOKEN</span>
  </footer>
 </div>
-<script src="house-clock.js?v=LIGHTS5"></script>
+<script src="house-clock.js?v=LIGHTS6"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
 <script src="house-lights.js?v=LIGHTS6"></script>
@@ -188,20 +188,24 @@
     var title = document.getElementById("lights-connect-title");
     var sub = document.getElementById("lights-connect-sub");
     if (g.live) {
-      title.textContent = "LIVE · Kasa / cloud snapshot";
-      sub.textContent = "Reads from data/lights-live.json · writes DEMO until writeSupported · OP online · cloud need_token";
+      title.textContent = "LIVE · Kasa cloud + write proxy";
+      sub.textContent = "Reads + writes from data/lights-live.json · writeProxy baked · no seed link · Elo 3202L";
     } else if (g.needToken || g.kind === "need_token") {
-      title.textContent = "CONNECT · need Kasa token";
-      sub.textContent = "Atlas must request Kasa cloud token or LAN path · ~/.config/wardos/ has nest+sensi only today · LIGHTS-LIVE.md · OP online · cloud need_token";
+      title.textContent = "CONNECT · need Kasa on Atlas";
+      sub.textContent = "Kasa creds missing on Atlas box · controls dark · LIGHTS-LIVE.md · never invent LIVE";
     } else {
       title.textContent = "Lights · " + g.label;
-      sub.textContent = (g.error || g.label) + " · DEMO fallback · never fake LIVE";
+      sub.textContent = (g.error || g.label) + " · controls dark · never invent LIVE";
     }
     var ftr = document.getElementById("lights-ftr-status");
-    if (ftr) ftr.textContent = g.label + (eff.source === "demo" ? " · DEMO toggles" : "");
+    if (ftr) ftr.textContent = g.label;
     var note = document.getElementById("lights-note");
     if (note && (g.needToken || g.kind === "need_token")) {
-      note.textContent = "BLOCKED on credential · need Kasa token/proxy on Atlas box · roster Dining/Harris/Kitchen from screenshot (DEMO seeds) · OP online · LIVE cloud need_token · Elo 3202L";
+      note.textContent = "BLOCKED · Kasa creds/proxy on Atlas box · controls dark until LIVE · Elo 3202L";
+    } else if (note && !g.live) {
+      note.textContent = "Controls dark · PROXY OFF / offline · bake writeProxy via lights-fetch · Elo 3202L";
+    } else if (note && g.live) {
+      note.textContent = "LIVE · Kasa cloud + public write proxy · Nest SDM is cams only · Elo 3202L 1080×1920";
     }
     L.paintPads(document);
   }
