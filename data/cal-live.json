@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-29T13:46:06.766Z",
+  "fetchedAt": "2026-09-29T14:15:12.073Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-06",
@@ -328,6 +328,15 @@
       "start": "2026-10-02T10:05:00-05:00",
       "end": "2026-10-02T14:40:00-05:00",
       "location": "Kansas City International Airport (MCI) → Nashville International Airport (BNA)",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "g98fr3pkfngl28fab505jbo4u8",
+      "summary": "Harris — SRE Tailgate Party (reading incentive)",
+      "start": "2026-10-02T11:30:00-05:00",
+      "end": "2026-10-02T12:30:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
       "busy": false,
       "allDay": false
     },
