@@ -2,7 +2,10 @@
    Poll data/nest-live.json (Atlas nest-fetch → Pages).
    NEVER invent video. Roster LIVE when status=live + fresh.
    Still images only when snapshotUrl is a real Pages-servable path.
-   See NEST-LIVE.md */
+   NESTVID1: when localStorage empty, auto-use nestProxy + nestProxyToken
+   from nest-live.json (public CF URL). No ?proxy= seed required.
+   See NEST-LIVE.md
+   Keys: wardosNestProxy · wardosNestProxyToken */
 (function (global) {
   "use strict";
 
@@ -10,6 +13,9 @@
   var LIVE_FRESH_MS = 30 * 60 * 1000;
   var LIVE_POLL_MS = 60 * 1000;
   var DOCS = "NEST-LIVE.md";
+  var PROXY_LS_KEY = "wardosNestProxy";
+  var PROXY_TOKEN_LS_KEY = "wardosNestProxyToken";
+  var DEFAULT_PROXY = "http://127.0.0.1:8787";
 
   var _liveCache = null;
   var _listeners = [];
@@ -237,6 +243,7 @@
   }
 
   function paintPads(root) {
+    ingestProxyFromLive(cachedData());
     root = root || document;
     var grid = root.querySelector(".cam-grid");
     if (!grid) return;
@@ -269,7 +276,7 @@
         path.innerHTML =
           "Nest SDM <strong>LIVE</strong> · " +
           g.deviceCount +
-          " cams · <strong>tap pad → WebRTC video</strong> (box proxy :8787) · tokens off Pages · " +
+          " cams · <strong>tap pad → WebRTC video</strong> (nestProxy from live JSON) · SDM tokens off Pages · " +
           DOCS;
       } else if (g.needToken) {
         path.innerHTML =
@@ -404,6 +411,14 @@
   }
 
 
+  function qs(name) {
+    try {
+      return new URL(location.href).searchParams.get(name);
+    } catch (e) {
+      return null;
+    }
+  }
+
   function isPagesHost() {
     try {
       var h = location.hostname || "";
@@ -422,27 +437,75 @@
     }
   }
 
-  function proxyBaseGuess() {
+  /** Optional override: seed proxy URL/token from ?proxy= into localStorage. */
+  function ingestProxyFromQuery() {
     try {
-      var saved = localStorage.getItem("wardosNestProxy");
-      if (saved) return saved.replace(/\/$/, "");
-    } catch (e) {}
-    // On Pages/phone, do NOT default to 127.0.0.1 (that is the phone).
-    if (isPagesHost()) return "";
-    return "http://127.0.0.1:8787";
+      var p = qs("proxy") || qs("nestProxy");
+      var t = qs("proxyToken") || qs("nestProxyToken") || qs("token");
+      if (p) localStorage.setItem(PROXY_LS_KEY, String(p).replace(/\/$/, ""));
+      if (t) localStorage.setItem(PROXY_TOKEN_LS_KEY, String(t));
+    } catch (e) { /* */ }
   }
 
-  /** Tap-to-open live WebRTC viewer (box/LAN proxy — tokens off Pages). */
+  /**
+   * NESTVID1: after live JSON loads, if LS empty and JSON has a public nestProxy
+   * (+ token), persist once. Never persist loopback on Pages.
+   */
+  function ingestProxyFromLive(data) {
+    if (!data) return;
+    try {
+      var wp = data.nestProxy ? String(data.nestProxy).replace(/\/$/, "") : "";
+      var tok = data.nestProxyToken ? String(data.nestProxyToken) : "";
+      if (!wp || (isPagesHost() && isLoopbackProxy(wp))) return;
+      if (!localStorage.getItem(PROXY_LS_KEY)) localStorage.setItem(PROXY_LS_KEY, wp);
+      if (tok && !localStorage.getItem(PROXY_TOKEN_LS_KEY)) {
+        localStorage.setItem(PROXY_TOKEN_LS_KEY, tok);
+      }
+    } catch (e) { /* */ }
+  }
+
+  function proxyBaseGuess() {
+    ingestProxyFromQuery();
+    var fromQs = qs("proxy") || qs("nestProxy");
+    if (fromQs) return String(fromQs).replace(/\/$/, "");
+    try {
+      var saved = localStorage.getItem(PROXY_LS_KEY);
+      if (saved) {
+        var lsUrl = String(saved).replace(/\/$/, "");
+        if (!(isPagesHost() && isLoopbackProxy(lsUrl))) return lsUrl;
+      }
+    } catch (e) {}
+    var data = cachedData();
+    if (data && data.nestProxy) {
+      var wp = String(data.nestProxy).replace(/\/$/, "");
+      if (!(isPagesHost() && isLoopbackProxy(wp))) return wp;
+    }
+    // On Pages/phone, do NOT default to 127.0.0.1 (that is the phone).
+    if (isPagesHost()) return "";
+    return DEFAULT_PROXY;
+  }
+
+  function proxyTokenGuess() {
+    ingestProxyFromQuery();
+    var fromQs = qs("proxyToken") || qs("nestProxyToken") || qs("token");
+    if (fromQs) return String(fromQs);
+    try {
+      var ls = localStorage.getItem(PROXY_TOKEN_LS_KEY);
+      if (ls) return String(ls);
+    } catch (e) {}
+    var data = cachedData();
+    if (data && data.nestProxyToken) return String(data.nestProxyToken);
+    return "";
+  }
+
+  /** Tap-to-open live WebRTC viewer. NESTVID1: nestProxy from live JSON when LS empty. */
   function openViewer(cam) {
     var id = cam && (cam.id || cam.name) ? encodeURIComponent(cam.id || cam.name) : "";
+    ingestProxyFromLive(cachedData());
     var proxy = proxyBaseGuess();
-    var token = "";
-    try {
-      token = localStorage.getItem("wardosNestProxyToken") || "";
-    } catch (e) {}
-    // Pages + loopback/missing proxy → viewer shows still fallback (not silent black).
-    // Only pass ?proxy= when we have a non-loopback URL (LAN) or we are on the box.
-    var url = "nest-webrtc.html?cam=" + id;
+    var token = proxyTokenGuess();
+    // Pages + loopback/missing proxy → NEED PROXY + still (not silent black).
+    var url = "nest-webrtc.html?cam=" + id + "&v=NESTVID1";
     if (proxy && !(isPagesHost() && isLoopbackProxy(proxy))) {
       url += "&proxy=" + encodeURIComponent(proxy);
       if (token) url += "&proxyToken=" + encodeURIComponent(token);
@@ -554,6 +617,7 @@
   }
 
   function paintHubCamDeck(doc) {
+    ingestProxyFromLive(cachedData());
     doc = doc || document;
     var deck = doc.getElementById("hub-cam-deck");
     if (!deck) return;
@@ -662,6 +726,8 @@
     openViewer: openViewer,
     wirePadClicks: wirePadClicks,
     proxyBaseGuess: proxyBaseGuess,
+    proxyTokenGuess: proxyTokenGuess,
+    ingestProxyFromLive: ingestProxyFromLive,
     docs: DOCS,
   };
 })(typeof window !== "undefined" ? window : globalThis);

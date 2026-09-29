@@ -1,7 +1,9 @@
 /* House Face · Nest WebRTC client
    Builds Nest-legal SDP offer (audio/video/application · recvonly · trailing NL),
-   POSTs to box-local nest-webrtc-proxy, sets answer, plays <video>.
-   Tokens never touch this file — proxy holds secrets. */
+   POSTs to nest-webrtc-proxy, sets answer, plays <video>.
+   NESTVID1: when QS/LS empty, load nestProxy + nestProxyToken from data/nest-live.json
+   (public CF URL baked by nest-fetch — LIGHTS6 pattern). SDM secrets stay on box.
+   Proxy auth token may be on Pages by design; Nest OAuth never is. */
 (function (global) {
   "use strict";
 
@@ -11,6 +13,12 @@
     ],
     iceCandidatePoolSize: 10,
   };
+
+  var LIVE_URL = "data/nest-live.json";
+  var PROXY_LS_KEY = "wardosNestProxy";
+  var PROXY_TOKEN_LS_KEY = "wardosNestProxyToken";
+  var _liveProxy = null; /* { nestProxy, nestProxyToken } from nest-live.json */
+  var _liveProxyPromise = null;
 
   function qs(name) {
     try {
@@ -38,18 +46,57 @@
     }
   }
 
+  function ingestLiveProxy(data) {
+    if (!data) return;
+    try {
+      var wp = data.nestProxy ? String(data.nestProxy).replace(/\/$/, "") : "";
+      var tok = data.nestProxyToken ? String(data.nestProxyToken) : "";
+      if (!wp || (isPagesHost() && isLoopbackProxy(wp))) return;
+      _liveProxy = { nestProxy: wp, nestProxyToken: tok || "" };
+      if (!localStorage.getItem(PROXY_LS_KEY)) localStorage.setItem(PROXY_LS_KEY, wp);
+      if (tok && !localStorage.getItem(PROXY_TOKEN_LS_KEY)) {
+        localStorage.setItem(PROXY_TOKEN_LS_KEY, tok);
+      }
+    } catch (_) {}
+  }
+
+  /** NESTVID1: pull baked nestProxy from nest-live.json once (Pages hard-refresh). */
+  function ensureProxyFromLive() {
+    if (_liveProxy && _liveProxy.nestProxy) return Promise.resolve(_liveProxy);
+    if (_liveProxyPromise) return _liveProxyPromise;
+    _liveProxyPromise = fetch(LIVE_URL + "?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        ingestLiveProxy(data);
+        return _liveProxy;
+      })
+      .catch(function () { return _liveProxy; })
+      .then(function (v) {
+        _liveProxyPromise = null;
+        return v;
+      });
+    return _liveProxyPromise;
+  }
+
   function proxyBase() {
-    var fromQs = qs("proxy");
+    var fromQs = qs("proxy") || qs("nestProxy");
     if (fromQs) {
       try {
-        localStorage.setItem("wardosNestProxy", fromQs);
+        localStorage.setItem(PROXY_LS_KEY, fromQs.replace(/\/$/, ""));
       } catch (_) {}
       return fromQs.replace(/\/$/, "");
     }
     try {
-      var saved = localStorage.getItem("wardosNestProxy");
-      if (saved) return saved.replace(/\/$/, "");
+      var saved = localStorage.getItem(PROXY_LS_KEY);
+      if (saved) {
+        var lsUrl = saved.replace(/\/$/, "");
+        if (!(isPagesHost() && isLoopbackProxy(lsUrl))) return lsUrl;
+      }
     } catch (_) {}
+    if (_liveProxy && _liveProxy.nestProxy) {
+      var wp = _liveProxy.nestProxy;
+      if (!(isPagesHost() && isLoopbackProxy(wp))) return wp;
+    }
     // Same-origin when served by the proxy itself (box / LAN)
     if (location.port === "8787" || (location.protocol === "http:" && /nest-webrtc/.test(location.pathname) && !isPagesHost())) {
       return location.origin;
@@ -64,38 +111,37 @@
   function proxyUnreachableHint(base) {
     if (!base) {
       return (
-        "Live WebRTC needs the Atlas box proxy.\n\n" +
+        "NEED PROXY · Live WebRTC needs the Atlas nest-webrtc-proxy.\n\n" +
         "This page is on GitHub Pages — http://127.0.0.1:8787 is YOUR phone, not the house box.\n\n" +
-        "What works tonight:\n" +
-        "• Google Home sheet pads show real Nest STILLS (data/nest-snaps)\n" +
-        "• Live video: on the Atlas box open http://127.0.0.1:8787/nest-webrtc.html\n" +
-        "• Elo / home LAN (if box reachable): run proxy with --lan, then\n" +
-        "  ?proxy=http://<box-lan-ip>:8787&proxyToken=…"
+        "Normal open: data/nest-live.json should bake nestProxy (public CF URL).\n" +
+        "If missing: Atlas run nest-fetch after nest-webrtc-proxy.url is set.\n" +
+        "Pads stills remain on sheet-google-home.html — never silent black."
       );
     }
     if (isPagesHost() && isLoopbackProxy(base)) {
       return (
-        "Proxy is set to " + base + " but you are on Pages/phone.\n" +
+        "NEED PROXY · Proxy is set to " + base + " but you are on Pages/phone.\n" +
         "That address is this device, not Atlas. Clear localStorage wardosNestProxy\n" +
-        "or pass a reachable LAN ?proxy= URL. Pads stills remain on sheet-google-home.html."
+        "or wait for nestProxy in nest-live.json. Pads stills remain on sheet-google-home.html."
       );
     }
     return null;
   }
 
   function proxyToken() {
-    var t = qs("proxyToken") || qs("token");
+    var t = qs("proxyToken") || qs("nestProxyToken") || qs("token");
     if (t) {
       try {
-        localStorage.setItem("wardosNestProxyToken", t);
+        localStorage.setItem(PROXY_TOKEN_LS_KEY, t);
       } catch (_) {}
       return t;
     }
     try {
-      return localStorage.getItem("wardosNestProxyToken") || "";
-    } catch (_) {
-      return "";
-    }
+      var ls = localStorage.getItem(PROXY_TOKEN_LS_KEY);
+      if (ls) return ls;
+    } catch (_) {}
+    if (_liveProxy && _liveProxy.nestProxyToken) return _liveProxy.nestProxyToken;
+    return "";
   }
 
   function authHeaders() {
@@ -253,6 +299,7 @@
   }
 
   async function fetchCameras() {
+    await ensureProxyFromLive();
     var base = proxyBase();
     var hint = proxyUnreachableHint(base);
     if (!base || hint) {
@@ -317,6 +364,7 @@
     function status(s) {
       if (typeof onStatus === "function") onStatus(s);
     }
+    await ensureProxyFromLive();
     status("building offer…");
     var built = await buildOffer();
     var pc = built.pc;
@@ -386,6 +434,8 @@
     proxyBase: proxyBase,
     proxyToken: proxyToken,
     proxyUnreachableHint: proxyUnreachableHint,
+    ensureProxyFromLive: ensureProxyFromLive,
+    ingestLiveProxy: ingestLiveProxy,
     isPagesHost: isPagesHost,
     isLoopbackProxy: isLoopbackProxy,
     fetchCameras: fetchCameras,

@@ -200,6 +200,10 @@ function writeLive(cameras, meta) {
         : "No stills captured",
     error: meta.errors.length ? meta.errors.slice(0, 5).join("; ") : null,
   };
+  // NESTVID1: keep baked public nestProxy across still refreshes (do not drop).
+  if (prev.nestProxy) payload.nestProxy = prev.nestProxy;
+  if (prev.nestProxyToken) payload.nestProxyToken = prev.nestProxyToken;
+  if (prev.nestProxyPath) payload.nestProxyPath = prev.nestProxyPath;
   fs.mkdirSync(path.dirname(LIVE), { recursive: true });
   const tmp = LIVE + ".tmp";
   fs.writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n");

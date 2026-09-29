@@ -2,7 +2,7 @@
 
 **Honest gate:** GitHub Pages is static. Nest / Google Home cams use **Google Device Access (SDM)** OAuth.
 
-**Status (2026-09-28 · NESTSTILL1):** Refresh token + `nest-sdm.json` on box (mode 600). **WebRTC live** works on Atlas box proxy (`127.0.0.1:8787`) — proven Front door + Garage. **Pages/phone cannot reach box loopback** (that IP is the phone) → pads now show **real WebRTC stills** in `data/nest-snaps/` (Front / Garage / Backyard) via `scripts/nest-webrtc-still.mjs`. Viewer on Pages fails loud + still fallback (no silent black). Living / Kitchen: SDM unavailable. Tokens never on Pages.
+**Status (2026-09-28 · NESTVID1):** Refresh token + `nest-sdm.json` on box (mode 600). **WebRTC live** via Atlas `nest-webrtc-proxy` (`127.0.0.1:8787`) + public CF tunnel. **NESTVID1 bake:** `nest-fetch` writes public `nestProxy` + `nestProxyToken` into `data/nest-live.json` (from `~/.config/wardos/nest-webrtc-proxy.url` + `nest-proxy.token`) — Pages hard-refresh plays video without `?proxy=` seed (LIGHTS6 pattern). Hub tiles stay stills; cams board taps open live. If proxy/tunnel down → honest **NEED PROXY** + still fallback (no silent black). SDM OAuth never on Pages.
 
 ## Live data flow (stage)
 
@@ -176,6 +176,36 @@ git push origin main
 - Sensi climate (separate): **SENSI-LIVE.md** · `data/sensi-live.json`
 - Surface: `sheet-google-home.html`
 
+
+
+### NESTVID1 bake (public nestProxy)
+
+Same shape as LIGHTS6 `writeProxy`:
+
+```bash
+# Persist public tunnel (not git)
+echo 'https://….trycloudflare.com' > ~/.config/wardos/nest-webrtc-proxy.url
+chmod 600 ~/.config/wardos/nest-webrtc-proxy.url
+# token already at ~/.config/wardos/nest-proxy.token
+
+node scripts/nest-fetch.mjs
+# → data/nest-live.json includes nestProxy + nestProxyToken (when non-loopback)
+```
+
+| Field | Role |
+|-------|------|
+| `nestProxy` | Public HTTPS CF URL (or loopback on box-only) |
+| `nestProxyToken` | Proxy auth only — baked when proxy is public · **not** SDM OAuth |
+| UI | `house-nest.js` / `nest-webrtc-client.js` auto-use when localStorage empty |
+
+**Never public:** `nest-refresh.token`, `nest-sdm.json` client secret.
+
+Keep proxy + tunnel running:
+
+```bash
+node scripts/nest-webrtc-proxy.mjs --host 127.0.0.1 --port 8787
+# + cloudflared tunnel --url http://127.0.0.1:8787
+```
 
 ## WebRTC live video (NESTVID1)
 

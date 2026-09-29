@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE · CAMS · GOOGLE HOME</title>
-<link rel="stylesheet" href="house-engage.css?v=NESTSTILL1" />
+<link rel="stylesheet" href="house-engage.css?v=NESTVID1" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
@@ -272,7 +272,7 @@
  <div class="zone-title">Cameras · Nest / Google Home</div>
  <div class="zone-meta">5 cams · LIVE · tap for video</div>
  </div>
- <div class="cam-path">Nest SDM <strong>LIVE</strong> · 5 cams · <strong>tap pad → WebRTC video</strong> (box <code>nest-webrtc-proxy</code> :8787) · tokens off Pages · NEST-LIVE.md</div>
+ <div class="cam-path">Nest SDM <strong>LIVE</strong> · 5 cams · <strong>tap pad → WebRTC video</strong> (<code>nestProxy</code> baked in live JSON) · SDM tokens off Pages · NEST-LIVE.md</div>
  <div class="cam-grid">
  <article class="cam" aria-label="Living Room camera">
  <div class="cam-feed">
@@ -382,7 +382,7 @@
  </div>
  </section>
 
- <div class="note" id="cam-next-step"><strong>Cams = LIVE · tap for video.</strong> Run <code>node scripts/nest-webrtc-proxy.mjs</code> on Atlas box → open <code>http://127.0.0.1:8787/nest-webrtc.html</code> (or tap a pad). Elo LAN: <code>--lan</code> + <code>?proxy=http://&lt;box-ip&gt;:8787</code>. Tokens never on Pages. See <code>NEST-LIVE.md</code>.</div>
+ <div class="note" id="cam-next-step"><strong>Cams = LIVE · tap for video.</strong> Normal open uses baked <code>nestProxy</code> from <code>data/nest-live.json</code> (NESTVID1 · no ?proxy= seed). Atlas keeps <code>nest-webrtc-proxy</code> + CF tunnel up. If proxy down → honest <strong>NEED PROXY</strong> + stills — never silent black. SDM tokens never on Pages. See <code>NEST-LIVE.md</code>.</div>
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -398,7 +398,7 @@
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
 <script src="house-sensi.js?v=NESTVID1"></script>
-<script src="house-nest.js?v=NESTSTILL1"></script>
+<script src="house-nest.js?v=NESTVID1"></script>
 <script src="house-lights.js?v=HUBCMD1"></script>
 <script>
 (function () {

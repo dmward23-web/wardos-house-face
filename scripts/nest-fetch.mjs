@@ -12,6 +12,10 @@
  *   ~/.config/wardos/nest-refresh.token   (mode 600) — OAuth refresh_token
  *   ~/.config/wardos/nest-sdm.json        (mode 600) — { projectId, clientId, clientSecret }
  *
+ * NESTVID1 (LIGHTS6 pattern): bake public nestProxy (+ nestProxyToken) from
+ *   ~/.config/wardos/nest-webrtc-proxy.url + nest-proxy.token into nest-live.json
+ *   so Pages hard-refresh plays video without ?proxy= seed. SDM secrets stay box-only.
+ *
  * Usage:
  *   node scripts/nest-fetch.mjs
  *   node scripts/nest-fetch.mjs --token-file ~/.config/wardos/nest-refresh.token \
@@ -33,6 +37,121 @@ const SDM_BASE = "https://smartdevicemanagement.googleapis.com/v1";
 const DEFAULT_TOKEN = path.join(os.homedir(), ".config", "wardos", "nest-refresh.token");
 const DEFAULT_CONFIG = path.join(os.homedir(), ".config", "wardos", "nest-sdm.json");
 const SNAPS_DIR = path.join(ROOT, "data", "nest-snaps");
+const CRED_DIR = path.join(os.homedir(), ".config", "wardos");
+
+function readCredFile(name) {
+  const fp = path.join(CRED_DIR, name);
+  if (!fs.existsSync(fp)) return "";
+  try {
+    return fs.readFileSync(fp, "utf8").trim();
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Public nest WebRTC proxy for Pages/Elo (NESTVID1 · same shape as LIGHTS6 writeProxy).
+ * Prefer NEST_WEBRTC_PROXY env, else ~/.config/wardos/nest-webrtc-proxy.url,
+ * else loopback (box-only). Never invent a tunnel URL.
+ */
+function resolveNestProxy() {
+  const fromEnv = (process.env.NEST_WEBRTC_PROXY || process.env.NEST_PROXY || "").trim().replace(/\/$/, "");
+  if (fromEnv) return fromEnv;
+  const fromFile = readCredFile("nest-webrtc-proxy.url").replace(/\/$/, "");
+  if (fromFile) return fromFile;
+  return "http://127.0.0.1:8787";
+}
+
+/** Proxy auth token (NOT SDM OAuth). Baked when proxy is public so Pages works without seed. */
+function resolveNestProxyToken() {
+  return (
+    (process.env.NEST_PROXY_TOKEN || "").trim() ||
+    readCredFile("nest-proxy.token") ||
+    ""
+  );
+}
+
+function isLoopbackProxyUrl(url) {
+  return /^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/i.test(String(url || ""));
+}
+
+/** Attach nestProxy (+ token when public) onto a live payload. */
+function attachNestProxy(payload) {
+  const nestProxy = resolveNestProxy();
+  const token = resolveNestProxyToken();
+  payload.nestProxy = nestProxy;
+  payload.nestProxyPath = "scripts/nest-webrtc-proxy.mjs → SDM GenerateWebRtcStream";
+  if (token && !isLoopbackProxyUrl(nestProxy)) {
+    payload.nestProxyToken = token;
+  } else {
+    delete payload.nestProxyToken;
+  }
+  return payload;
+}
+
+/**
+ * Re-attach Pages-servable stills already on disk (NESTSTILL) so a plain
+ * nest-fetch does not wipe snapshotUrl after NESTFRESH. Never invent stills.
+ */
+function attachExistingStills(cameras, outPath) {
+  let prev = {};
+  try {
+    if (fs.existsSync(outPath)) prev = JSON.parse(fs.readFileSync(outPath, "utf8"));
+  } catch {
+    prev = {};
+  }
+  const prevById = new Map((prev.cameras || []).map((c) => [c.id, c]));
+  let attached = 0;
+  for (const pad of cameras) {
+    if (pad.snapshotUrl) continue;
+    const old = prevById.get(pad.id) || {};
+    if (old.snapshotUrl) {
+      const abs = path.join(ROOT, old.snapshotUrl);
+      if (fs.existsSync(abs) && fs.statSync(abs).size > 800) {
+        pad.snapshotUrl = old.snapshotUrl;
+        if (old.snapCapturedAt) pad.snapCapturedAt = old.snapCapturedAt;
+        if (old.snapSize) pad.snapSize = old.snapSize;
+        attached++;
+        continue;
+      }
+    }
+    // Try disk by slug variants (still.mjs strips doorbell; fetch slug may keep it)
+    const base = slugForCam(pad);
+    const candidates = [
+      base + ".jpg",
+      base.replace(/-doorbell$/, "") + ".jpg",
+      base.replace(/-door$/, "-door.jpg"),
+      "front-door.jpg",
+      "garage.jpg",
+      "backyard.jpg",
+    ];
+    const seen = new Set();
+    for (const name of candidates) {
+      if (!name || seen.has(name)) continue;
+      seen.add(name);
+      const rel = "data/nest-snaps/" + name;
+      const abs = path.join(ROOT, rel);
+      if (!fs.existsSync(abs) || fs.statSync(abs).size <= 800) continue;
+      // Only attach if name matches this cam (avoid cross-wiring)
+      const n = String(pad.name || "").toLowerCase();
+      const stem = name.replace(/\.jpg$/, "");
+      const ok =
+        (stem === "front-door" && /front/.test(n)) ||
+        (stem === "garage" && /garage/.test(n)) ||
+        (stem === "backyard" && /back|yard/.test(n)) ||
+        stem === base ||
+        stem === base.replace(/-doorbell$/, "");
+      if (!ok) continue;
+      pad.snapshotUrl = rel;
+      const st = fs.statSync(abs);
+      if (!pad.snapCapturedAt) pad.snapCapturedAt = new Date(st.mtimeMs).toISOString();
+      if (!pad.snapSize) pad.snapSize = null;
+      attached++;
+      break;
+    }
+  }
+  return attached;
+}
 
 /** Honest stub pads when no live devices yet — matches sheet-google-home.html */
 const STUB_PADS = [
@@ -390,9 +509,23 @@ async function main() {
           : null
         : "auth ok · no camera/doorbell devices in SDM enterprise list",
     };
+    // NESTSTILL: keep disk stills if this fetch did not capture new ones
+    const reattached = attachExistingStills(payload.cameras, args.outPath);
+    if (reattached > 0) {
+      snapsSaved += reattached;
+      payload.stillsPending = snapsSaved === 0;
+      if (snapsSaved > 0) {
+        payload.stillNote = "WEB_RTC stills on disk (nest-snaps) · reattached by nest-fetch";
+        payload.source = "nest-sdm+webrtc-still";
+      }
+    }
+    // NESTVID1: bake public nestProxy so Pages video just works (no ?proxy= seed)
+    attachNestProxy(payload);
     writeJson(args.outPath, payload);
     console.log(
-      `live: devices=${devices.length} cameras=${camsRaw.length} snaps=${snapsSaved} → ${args.outPath}` +
+      `live: devices=${devices.length} cameras=${camsRaw.length} snaps=${snapsSaved}` +
+        (payload.nestProxy ? ` nestProxy=${payload.nestProxy}` : "") +
+        ` → ${args.outPath}` +
         (webrtcOnly && !snapsSaved ? " (WEB_RTC-only · stills pending)" : "")
     );
   } catch (err) {
