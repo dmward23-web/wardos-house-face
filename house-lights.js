@@ -758,6 +758,21 @@
   }
 
   /** Hub primary control · rocker switches on sheet-index (Dining / Harris / Kitchen). */
+  var HUB_SHORT_NAMES = {
+    "dining-room": "Dining",
+    "harris-room": "Harris",
+    "kitchen": "Kitchen"
+  };
+
+  function shortHubName(L) {
+    if (!L) return "";
+    if (HUB_SHORT_NAMES[L.id]) return HUB_SHORT_NAMES[L.id];
+    var n = String(L.name || L.id || "");
+    // Strip possessive / Room suffix for wall glance
+    n = n.replace(/\u2019s Room$/i, "").replace(/'s Room$/i, "").replace(/ Room$/i, "");
+    return n || L.id;
+  }
+
   function paintHubPanel(doc) {
     doc = doc || document;
     var panel = doc.getElementById("hub-lights-panel");
@@ -795,11 +810,12 @@
       var onCls = L.on ? " is-on" : " is-off";
       var dim = (L.kind === "dimmer" || L.kind === "switch/dimmer");
       var bright = clampBright(L.brightness || (L.on ? 100 : 0));
+      var hubName = shortHubName(L);
       html +=
         '<article class="hub-sw' + onCls + '" data-light-id="' + L.id + '">'
         + '<div class="hub-sw-main">'
         + '<div class="hub-sw-text">'
-        + '<div class="hub-sw-name">' + escapeHtml(L.name) + "</div>"
+        + '<div class="hub-sw-name">' + escapeHtml(hubName) + "</div>"
         + '<div class="hub-sw-meta">' + (L.on ? "ON" : "OFF")
         + (dim ? (" · " + bright + "%") : "")
         + "</div>"
@@ -812,14 +828,7 @@
         + '<span class="hub-sw-rocker-off">OFF</span>'
         + "</button>"
         + "</div>"
-        + (dim
-          ? ('<div class="hub-sw-dim">'
-            + '<input class="hub-sw-bright light-bright" type="range" min="1" max="100" value="'
-            + bright + '" data-id="' + L.id + '" aria-label="' + escapeHtml(L.name) + ' brightness"'
-            + (canWrite() ? "" : " disabled") + ' />'
-            + '<span class="hub-sw-pct" data-pct-for="' + L.id + '">' + bright + "%</span>"
-            + "</div>")
-          : "")
+        /* HUBCMD1 / LIGHTS7-COMPACT: no brightness range on hub — pct in meta only */
         + "</article>";
     }
     grid.innerHTML = html;
