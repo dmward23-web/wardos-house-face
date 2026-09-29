@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-29T16:52:46.128Z",
+  "refreshedAt": "2026-09-29T16:59:43.740Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -19,7 +19,7 @@
     "label": "Next up · today",
     "time": "3:15",
     "place": "Boys SRE pickup",
-    "detailHtml": "4:25 Ainsley swim — Coach Ann · 4:30 Drop Hayes at Maria's · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "detailHtml": "4:25 Ainsley swim — Coach Ann · 4:30 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Tue",
     "startIso": "2026-09-29T20:15:00.000Z",
     "endIso": "2026-09-29T21:00:00.000Z",
@@ -29,7 +29,7 @@
         "label": "Next up · today",
         "time": "3:15",
         "place": "Boys SRE pickup",
-        "detailHtml": "4:25 Ainsley swim — Coach Ann · 4:30 Drop Hayes at Maria's · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "4:25 Ainsley swim — Coach Ann · 4:30 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T20:15:00.000Z",
         "endIso": "2026-09-29T21:00:00.000Z",
@@ -41,7 +41,7 @@
         "label": "Next up · today",
         "time": "4:25",
         "place": "Ainsley swim — Coach Ann",
-        "detailHtml": "3:15 boys pickup · 4:30 Drop Hayes at Maria's · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "3:15 boys pickup · 4:30 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T21:25:00.000Z",
         "endIso": "2026-09-29T23:20:00.000Z",
@@ -57,9 +57,21 @@
         "badge": "Tue",
         "startIso": "2026-09-29T21:30:00.000Z",
         "endIso": "2026-09-29T21:35:00.000Z",
-        "kind": "sport",
+        "kind": "leave",
         "whenLabel": "4:30",
         "summary": "Drop Hayes at Maria's · ~4:30 (on way to swim)"
+      },
+      {
+        "label": "Next up · today",
+        "time": "6:00",
+        "place": "Hayes flag practice · 6:00 · Maria drives",
+        "detailHtml": "3:15 boys pickup · 4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-09-29T23:00:00.000Z",
+        "endIso": "2026-09-30T00:15:00.000Z",
+        "kind": "sport",
+        "whenLabel": "6:00",
+        "summary": "Hayes flag practice · 6:00 · Maria drives"
       },
       {
         "label": "Next up · today",
@@ -69,7 +81,7 @@
         "badge": "Tue",
         "startIso": "2026-09-29T23:55:00.000Z",
         "endIso": "2026-09-30T00:45:00.000Z",
-        "kind": "sport",
+        "kind": "leave",
         "whenLabel": "6:55",
         "summary": "Pick up Hayes + Theo from flag · leave 6:55 · 7:15"
       },
@@ -156,18 +168,6 @@
         "kind": "sport",
         "whenLabel": "Wed 4:55",
         "summary": "Harris flag practice"
-      },
-      {
-        "label": "Next up · Thu",
-        "time": "7:00",
-        "place": "SRE PE (tennis shoes)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T12:00:00.000Z",
-        "endIso": "2026-10-01T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Thu 7:00",
-        "summary": "Harris — SRE PE (tennis shoes)"
       }
     ]
   },
@@ -538,15 +538,8 @@
         },
         {
           "kind": "event",
-          "when": "Tue · 4:30",
-          "what": "Drop Hayes at Maria's · ~4:30 (on way to swim)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "kind": "event",
-          "when": "Tue · 6:55",
-          "what": "Pick up Hayes + Theo from flag",
+          "when": "Tue · 6:00",
+          "what": "Hayes flag practice · 6:00 · Maria drives",
           "hint": "YOUR board",
           "tone": "hot"
         },
@@ -560,8 +553,8 @@
       ],
       "sports": [
         {
-          "when": "Tue 29 · leave 6:55",
-          "what": "Pick up Hayes + Theo from flag",
+          "when": "Tue 29 · leave 6:00",
+          "what": "Hayes flag practice · 6:00 · Maria drives",
           "hint": "YOUR board",
           "tone": "hot"
         },
@@ -793,13 +786,6 @@
           "tone": "hot"
         },
         {
-          "kind": "event",
-          "when": "Tue · 4:30",
-          "what": "Drop Hayes at Maria's · ~4:30 (on way to swim)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
           "kind": "note",
           "when": "All day",
           "what": "Base @ 147th with Dad",
@@ -811,12 +797,6 @@
         {
           "when": "Tue 29 · leave 4:25",
           "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "when": "Tue 29 · leave 4:30",
-          "what": "Drop Hayes at Maria's · ~4:30 (on way to swim)",
           "hint": "YOUR board",
           "tone": "hot"
         },
@@ -953,6 +933,11 @@
           "tone": "hot"
         },
         {
+          "when": "Tue · 6:00",
+          "what": "Hayes flag practice · 6:00 · Maria drives",
+          "tone": "hot"
+        },
+        {
           "when": "Tue · 6:55",
           "what": "Pick up Hayes + Theo from flag",
           "tone": "hot"
@@ -977,6 +962,11 @@
         {
           "when": "Tue 29 · 4:30",
           "what": "Drop Hayes at Maria's · ~4:30 (on way to swim)",
+          "tone": "hot"
+        },
+        {
+          "when": "Tue 29 · 6:00",
+          "what": "Hayes flag practice · 6:00 · Maria drives",
           "tone": "hot"
         },
         {
@@ -1077,11 +1067,6 @@
         {
           "when": "Sat 3 · 1:00",
           "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
-          "tone": "hot"
-        },
-        {
-          "when": "Sun 4 · 8:30",
-          "what": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00",
           "tone": "hot"
         }
       ]
