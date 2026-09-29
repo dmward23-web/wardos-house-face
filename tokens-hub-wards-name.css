@@ -81,6 +81,8 @@ html body .hdr.hdr--spread .wx-card .wx-rain.is-wet {
   position: fixed; inset: 0; width: 100vw; height: 100vh;
   pointer-events: none; z-index: 9999; overflow: visible;
 }
+/* LEDPHONE1 · phones: pin to the physical screen box (not 100vh / layout height) */
+.led-ring.led-ring--phone { top: 0; left: 0; right: 0; bottom: 0; width: auto; height: auto; }
 .led-ring path { fill: none; stroke-linecap: round; }
 .led-ring .led-tail { stroke: rgba(255, 176, 40, 0.28); stroke-width: 3; filter: blur(2px); }
 .led-ring .led-mid  { stroke: rgba(255, 196, 70, 0.7);  stroke-width: 2.5; filter: drop-shadow(0 0 4px rgba(255, 170, 30, 0.8)); }

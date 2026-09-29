@@ -3071,7 +3071,7 @@
 <link rel="stylesheet" href="tokens-hub-midnight1.css?v=MIDNIGHT1" />
 <link rel="stylesheet" href="tokens-hub-midnight2.css?v=MIDNIGHT2" />
 <link rel="stylesheet" href="tokens-ctrlpanel.css?v=HUBSCROLL2" />
-<link rel="stylesheet" href="tokens-hub-wards-name.css?v=LEDRING1" />
+<link rel="stylesheet" href="tokens-hub-wards-name.css?v=LEDPHONE1" />
 
 <style id="sched-look2">
 /* SCHEDLOOK2 · hero shrunk · layout body ≥140px · chips tap · LEAVESCRUB2 chrome stays dead */
@@ -4173,6 +4173,18 @@
  <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
+ <a class="tile dan kid-flip dad-seat" href="sheet-dan.html" data-kid-seed="dad" data-face="day">
+ <div class="tile-top">
+ <div class="tile-icon av g2-av dad" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-dad"/></svg></div>
+ <div class="tile-titles">
+ <div class="tile-label">Dad</div>
+ <div class="tile-sub" data-dad-sub>Leave-bys · rides · week</div>
+ </div>
+ </div>
+ <div class="kf-stage" data-dad-stage><div class="kf-face kf-day"><div class="kf-kicker">Next leave</div><div class="kf-loud">Dad week</div><div class="kf-title">Leave-bys · rides</div></div></div>
+ <div class="tile-foot"><span class="tile-fact">Dad board</span></div>
+ </a>
+
  <a class="tile today" href="sheet-today.html">
  <div class="tile-top">
  <div class="tile-icon g2-mark" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-today"/></svg></div>
@@ -4221,22 +4233,6 @@
  <div class="tile-mrow"><span class="mt">HOLD</span><span class="md">Trips · weekend blocks</span></div>
  </div>
  <div class="tile-foot"><span class="tile-fact">Month board</span><span class="tile-tap">OPEN</span></div>
- </a>
-
- <a class="tile dan" href="sheet-dan.html">
- <div class="tile-top">
- <div class="tile-icon av g2-av dad" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-dad"/></svg></div>
- <div class="tile-titles">
- <div class="tile-label">Dad Seat</div>
- <div class="tile-sub">Command · leave-bys · week</div>
- </div>
- </div>
- <div class="tile-micro">
- <div class="tile-mrow"><span class="mt">6:55</span><span class="md">Leave-by · Hayes + Theo pickup</span><span class="tile-mchip amber">Tonight</span></div>
- <div class="tile-mrow"><span class="mt">TUE</span><span class="md">SRE dual drop + pickup</span></div>
- <div class="tile-mrow"><span class="mt">WK</span><span class="md">Week command board</span></div>
- </div>
- <div class="tile-foot"><span class="tile-fact">Mission seat</span><span class="tile-tap">OPEN</span></div>
  </a>
 
  <a class="tile chores" href="sheet-chores.html">
@@ -4333,13 +4329,13 @@
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
 <script src="kids-data.js?v=NOSURP2"></script>
 <script src="house-kid-engage.js?v=SOFTGONE1"></script>
-<script src="house-hub-tiles-bind.js?v=QARELAY1"></script>
+<script src="house-hub-tiles-bind.js?v=SEATS1"></script>
 <script src="house-sensi.js?v=CAMDECK1"></script>
 <script src="nest-webrtc-client.js?v=PROXYFOLLOW2"></script>
 <script src="house-nest.js?v=CAMIOS2"></script>
 <script src="hub-key-entry.js?v=KEYPASTE2"></script>
 <script src="house-lights.js?v=PROXYFOLLOW1"></script>
-<script src="hub-led-ring.js?v=LEDRING1"></script>
+<script src="hub-led-ring.js?v=LEDPHONE1"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
@@ -4419,6 +4415,25 @@
 })();
 
 </script>
-<script src="house-fresh.js?v=NAMES1"></script>
+<script src="house-fresh.js?v=NOOPEN1"></script>
+<style>
+/* NOOPEN1 · no OPEN buttons anywhere — the whole card is the tap target */
+.tile .tile-tap, .tile .kid-flip-go, .who-up-go { display: none !important; }
+[data-who-up] { cursor: pointer; }
+/* SEATS1 · Dad seat wears the kid card, last in the lineup */
+.tile.dan.dad-seat .kf-loud { color: #ffe080; }
+.tile.dan.dad-seat .kf-kicker { color: rgba(255,224,128,0.75); }
+.tile.dan.dad-seat .tile-top { border-color: rgba(255,200,80,0.5); }
+</style>
+<script>
+/* NOOPEN1 · Who's up strip: tap anywhere to open */
+document.addEventListener("click", function (ev) {
+  var host = ev.target && ev.target.closest && ev.target.closest("[data-who-up]");
+  if (!host) return;
+  var go = host.querySelector("[data-who-go]");
+  var href = go && !go.hidden && go.getAttribute("href");
+  if (href) { ev.preventDefault(); location.href = href; }
+});
+</script>
 </body>
 </html>

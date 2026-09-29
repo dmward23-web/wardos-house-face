@@ -115,12 +115,32 @@
     }).join("");
     setMicro(micro(".tile.week"), wh);
 
-    /* Dad Seat · next leave-bys (every queue item is a Dad leave-by: event START = leave-by) */
-    var dh = queue.slice(0, 2).map(function (it, i) {
-      return row(mtFor(it), "Leave-by · " + titleOf(it), i === 0 ? "Next" : "", i === 0 ? "amber" : "");
-    }).join("");
-    dh += row("WK", "Week command board", "", "");
-    setMicro(micro(".tile.dan"), dh);
+    /* SEATS1 · Dad card = kid card face: big next leave-by + next two after it */
+    var stage = document.querySelector(".tile.dan [data-dad-stage]");
+    if (stage) {
+      var first = queue[0];
+      var dd = '<div class="kf-face kf-day"><div class="kf-kicker">Next leave</div>';
+      if (!first) {
+        dd += '<div class="kf-loud">Clear</div><div class="kf-title">Nothing queued</div>';
+      } else {
+        var dow = isToday(first) ? "TODAY" : String(first.badge || "").toUpperCase();
+        dd += '<div class="kf-loud">' + esc((dow ? dow + " · " : "") + (first.time || "")) + "</div>";
+        dd += '<div class="kf-title">' + esc(titleOf(first)) + "</div>";
+        var rest = queue.slice(1, 3);
+        if (rest.length) {
+          dd += '<div class="kf-rows">' + rest.map(function (it) {
+            return '<div class="kf-row"><span class="kf-mt">' + esc(mtFor(it)) + '</span><span class="kf-md">' + esc(titleOf(it)) + "</span></div>";
+          }).join("") + "</div>";
+        }
+      }
+      stage.innerHTML = dd + "</div>";
+    } else {
+      var dh = queue.slice(0, 2).map(function (it, i) {
+        return row(mtFor(it), "Leave-by · " + titleOf(it), i === 0 ? "Next" : "", i === 0 ? "amber" : "");
+      }).join("");
+      dh += row("WK", "Week command board", "", "");
+      setMicro(micro(".tile.dan"), dh);
+    }
   }
 
   function load() {
