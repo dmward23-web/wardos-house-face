@@ -165,6 +165,12 @@ function classify(ev) {
   if (/^Leave\s*·/i.test(summary) || /^Leave\b/i.test(summary)) {
     return { kind: "leave", summary, busy: !isFree(ev) };
   }
+  /* RIDES LAW (Dan 9/29): Dad's own pickups/drop-offs ("Pick up Hayes + Theo…",
+     "Drop Hayes at Maria's…") are Dad logistics, never a kid's activity. Treat as
+     leave → Dad strip / dan box only; kid glass shows the kid's own practice event. */
+  if (/^(Pick\s*up|Drop)\b/i.test(summary) && !/SRE (drop|pickup)/i.test(summary)) {
+    return { kind: "leave", summary, busy: !isFree(ev), ride: true };
+  }
   if (/SRE drop-off|SRE drop\b/i.test(summary)) return { kind: "school_drop", summary };
   if (/SRE pickup/i.test(summary)) return { kind: "school_pickup", summary };
   if (/Homework Help/i.test(summary)) return { kind: "school", summary, kid: "ainsley" };
