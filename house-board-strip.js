@@ -310,9 +310,7 @@
     return "list";
   }
 
-  function setLayout(id) {
-    if (LAYOUTS.indexOf(id) < 0) id = "list";
-    try { localStorage.setItem(LAYOUT_KEY, id); } catch (e2) { /* ignore */ }
+  function syncChipUI(id) {
     var root = document.querySelector(".leaveby");
     if (root) root.setAttribute("data-layout", id);
     var canvas = document.querySelector("[data-live='leaveby-layouts']");
@@ -322,7 +320,68 @@
       btn.setAttribute("aria-selected", on ? "true" : "false");
       btn.classList.toggle("is-on", on);
     });
+    var modeEl = document.querySelector("[data-live='leaveby-mode']");
+    if (modeEl) modeEl.textContent = LAYOUT_LABELS[id] || id;
+  }
+
+  function setLayout(id) {
+    if (LAYOUTS.indexOf(id) < 0) id = "list";
+    try { localStorage.setItem(LAYOUT_KEY, id); } catch (e2) { /* ignore */ }
+    syncChipUI(id);
     if (_lastStrip && _lastClock) paintLayouts(_lastStrip, _lastClock, id);
+  }
+
+  function cycleLayout(dir) {
+    var cur = getLayout();
+    var i = LAYOUTS.indexOf(cur);
+    if (i < 0) i = LAYOUTS.indexOf("list");
+    if (i < 0) i = 0;
+    var next = LAYOUTS[(i + dir + LAYOUTS.length) % LAYOUTS.length];
+    setLayout(next);
+  }
+
+  function bindSwipeCycle(root) {
+    if (!root || root.getAttribute("data-swipe-bound") === "1") return;
+    root.setAttribute("data-swipe-bound", "1");
+    var startX = 0;
+    var startY = 0;
+    var startT = 0;
+    var tracking = false;
+    var pid = null;
+
+    function onDown(ev) {
+      /* chips handle their own picks · don't steal */
+      if (ev.target && ev.target.closest && ev.target.closest(".leaveby-chip")) return;
+      if (ev.pointerType === "mouse" && ev.button !== 0) return;
+      tracking = true;
+      pid = ev.pointerId;
+      startX = ev.clientX;
+      startY = ev.clientY;
+      startT = Date.now();
+      try { root.setPointerCapture && root.setPointerCapture(ev.pointerId); } catch (eCap) { /* ok */ }
+    }
+    function onUp(ev) {
+      if (!tracking) return;
+      if (pid != null && ev.pointerId !== pid) return;
+      tracking = false;
+      var dx = ev.clientX - startX;
+      var dy = ev.clientY - startY;
+      var dt = Date.now() - startT;
+      pid = null;
+      if (dt > 900) return;
+      if (Math.abs(dx) < 48) return;
+      if (Math.abs(dx) < Math.abs(dy) * 1.15) return; /* vertical scroll wins */
+      try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e3) { /* ok */ }
+      /* swipe left → next · swipe right → prev */
+      cycleLayout(dx < 0 ? 1 : -1);
+    }
+    function onCancel() {
+      tracking = false;
+      pid = null;
+    }
+    root.addEventListener("pointerdown", onDown);
+    root.addEventListener("pointerup", onUp);
+    root.addEventListener("pointercancel", onCancel);
   }
 
   function bindLayoutSwitcher() {
@@ -330,14 +389,28 @@
     var bar = document.querySelector("[data-live='leaveby-switch']");
     if (!bar) return;
     _layoutBound = true;
-    bar.addEventListener("click", function (ev) {
+    var lastPickAt = 0;
+    function onPick(ev) {
       var btn = ev.target && ev.target.closest ? ev.target.closest("[data-layout]") : null;
       if (!btn || !bar.contains(btn)) return;
       var id = btn.getAttribute("data-layout");
       if (!id) return;
+      var now = Date.now();
+      if (now - lastPickAt < 350) return; /* pointerdown+click debounce */
+      lastPickAt = now;
+      try { if (ev.cancelable) ev.preventDefault(); } catch (ePrev) { /* ok */ }
       try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e3) { /* ok */ }
       setLayout(id);
-    });
+    }
+    /* pointerdown first on Elo/touch · click as fallback */
+    bar.addEventListener("pointerdown", onPick);
+    bar.addEventListener("click", onPick);
+
+    /* one swipe surface only · nested binds would triple-cycle on bubble */
+    var leaveby = document.querySelector(".leaveby.leaveby--hot, .leaveby.leaveby--cmd, .leaveby");
+    var canvas = document.querySelector("[data-live='leaveby-layouts']");
+    bindSwipeCycle(leaveby || canvas);
+
     setLayout(getLayout());
   }
 
@@ -632,8 +705,11 @@
     else if (mode === "peek") html = layoutPeek(strip);
     else if (mode === "radar") html = layoutRadar(strip);
     else html = layoutList(strip);
-    el.innerHTML = html;
+    var banner = '<div class="lb-mode-banner" aria-live="polite">Layout · <strong>' +
+      esc(LAYOUT_LABELS[mode] || mode) + "</strong></div>";
+    el.innerHTML = banner + html;
     el.setAttribute("data-layout", mode);
+    syncChipUI(mode);
     paintLists(strip); /* keep legacy nodes in sync if present */
   }
 
@@ -787,6 +863,7 @@
     applyStrip: applyStrip,
     getLayout: getLayout,
     setLayout: setLayout,
+    cycleLayout: cycleLayout,
     LAYOUTS: LAYOUTS,
     CAL_FRESH_MS: CAL_FRESH_MS
   };

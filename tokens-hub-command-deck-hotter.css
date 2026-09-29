@@ -821,24 +821,34 @@
 .hub-upper.hub-upper--hot .leaveby-switch,
 .leaveby.leaveby--hot .leaveby-switch,
 .hub-upper.hub-upper--cmd .leaveby-switch,
-.leaveby.leaveby--cmd .leaveby-switch,
+.leaveby.leaveby--cmd .leaveby-switch {
+  display: block !important;
+  flex: 0 0 auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  margin-top: 4px !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
 .hub-upper.hub-upper--hot .leaveby-layouts,
 .leaveby.leaveby--hot .leaveby-layouts,
 .hub-upper.hub-upper--cmd .leaveby-layouts,
 .leaveby.leaveby--cmd .leaveby-layouts {
   display: block !important;
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  overflow: hidden !important;
-}
-
-.hub-upper.hub-upper--hot .leaveby-switch,
-.leaveby.leaveby--hot .leaveby-switch,
-.hub-upper.hub-upper--cmd .leaveby-switch,
-.leaveby.leaveby--cmd .leaveby-switch {
-  flex: 0 0 auto !important;
-  overflow: visible !important;
-  margin-top: 6px !important;
+  flex: 1 1 140px !important;
+  flex-grow: 1 !important;
+  flex-shrink: 1 !important;
+  flex-basis: 140px !important;
+  min-height: 140px !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 3 !important;
 }
 
 .leaveby-preview-tag {
@@ -1177,4 +1187,78 @@
 .hub-upper.hub-upper--cmd .leaveby-sched,
 .leaveby.leaveby--cmd .leaveby-sched {
   display: none !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   SCHEDLOOK2 · give layout body real height · chips receive taps
+   Hero shrinks so Rail/Who/Peek/Radar/List paint inside 420px deck
+   LEAVESCRUB2 still hides .leaveby-sched chrome only
+   ═══════════════════════════════════════════════════════════ */
+.hub-upper.hub-upper--hot .leaveby:has(.leaveby-switch) .leaveby-main .time,
+.leaveby.leaveby--hot:has(.leaveby-switch) .leaveby-main .time,
+.hub-upper.hub-upper--cmd .leaveby:has(.leaveby-switch) .leaveby-main .time,
+.leaveby.leaveby--cmd:has(.leaveby-switch) .leaveby-main .time {
+  font-size: clamp(42px, 5.5vw, 64px) !important;
+  line-height: 0.9 !important;
+}
+.hub-upper.hub-upper--hot .leaveby:has(.leaveby-switch) .leaveby-dest,
+.leaveby.leaveby--hot:has(.leaveby-switch) .leaveby-dest,
+.hub-upper.hub-upper--cmd .leaveby:has(.leaveby-switch) .leaveby-dest,
+.leaveby.leaveby--cmd:has(.leaveby-switch) .leaveby-dest {
+  font-size: 16px !important;
+}
+
+.leaveby-chips {
+  pointer-events: auto !important;
+}
+.leaveby-chip {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 6;
+}
+.leaveby-mode-label {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffe080;
+  vertical-align: middle;
+}
+.leaveby-layouts .lb-mode-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 224, 128, 0.9);
+}
+.leaveby-layouts .lb-mode-banner strong {
+  color: #ffe080;
+  letter-spacing: 0.14em;
+}
+
+/* SCHEDLOOK2 swipe · horizontal gesture on leaveby · vertical scroll still ok */
+.leaveby.leaveby--hot,
+.leaveby.leaveby--cmd,
+.leaveby .leaveby-body,
+.leaveby .leaveby-layouts {
+  touch-action: pan-y !important;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.leaveby .leaveby-chip {
+  touch-action: manipulation !important;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.leaveby-chip {
+  min-height: 28px !important;
+  min-width: 44px !important;
+  padding: 7px 11px !important;
 }
