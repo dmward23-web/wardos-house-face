@@ -417,6 +417,7 @@
 <link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
 <link rel="stylesheet" href="heat-v3.css?v=DAYTAP1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
+<link rel="stylesheet" href="tokens-sheet-clock-first-heat.css?v=SHEETCLK1" />
 </head>
 <body data-clear-label="ALL CLEAR" data-chores-shared="1" data-theme="house">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -661,22 +662,19 @@
 
 
 <div class="panel">
- <header class="hdr">
- <div class="hdr-left">
- <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="48" /></div>
- <div class="nav-row"><a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a><a class="nav-week" href="index.html">Week</a></div>
- <div class="identity">
- <div class="avatar g2-mark" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-chores"/></svg></div>
- <div class="id-text">
- <a class="eyebrow" href="sheet-index.html">House · chores</a>
- <h1 class="name"><span class="name-accent">Chores</span></h1>
- <div class="tagline">Do the musts · earn your week · miss work = short payday</div>
+ <header class="hdr hdr--clockfirst">
+ <div class="hdr-left-col">
+ <div class="live-clock-host" aria-label="America/Chicago time">
+ <div class="live-clock" data-live-clock>—:—</div>
+ </div>
+ <div class="hdr-micros">
+ <a class="home-btn" href="sheet-index.html" aria-label="Home — House board">Home</a>
+ <a class="nav-week" href="index.html">Week</a>
  </div>
  </div>
- </div>
- <div class="hdr-right">
- <div class="hot-pill"><span class="spark g2-spark"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-star"/></svg></span> Musts → jar → payday</div>
- <button type="button" class="mute-btn" data-mute-toggle style="margin-bottom:6px">🔊 Sound</button>
+ <div class="hdr-spacer" aria-hidden="true"></div>
+ <div class="hdr-right-tools">
+ <button type="button" class="mute-btn" data-mute-toggle>🔊 Sound</button>
  </div>
  </header>
 
@@ -969,7 +967,7 @@
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=CT1"></script>
+<script src="house-clock.js?v=SHEETCLK1"></script>
 <script>document.addEventListener("DOMContentLoaded",function(){if(window.HouseClock){document.querySelectorAll("[data-live='date-short']").forEach(function(n){n.textContent=HouseClock.shortLabel();});}});</script>
 <script src="kids-data.js?v=GRAPHICS2"></script>
 <script src="house-zoom.js"></script>

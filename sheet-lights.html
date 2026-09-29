@@ -87,24 +87,24 @@
   .ftr{display:flex;justify-content:space-between;font-size:12px;color:#5a5e66;font-weight:600;align-items:center;gap:8px;flex-wrap:wrap}
   .ftr-chip{padding:8px 12px;min-height:44px;display:inline-flex;align-items:center;border-radius:8px;border:2px solid #2a2e36;background:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;color:inherit}
 </style>
+<link rel="stylesheet" href="tokens-sheet-clock-first-heat.css?v=SHEETCLK1" />
 </head>
 <body>
 <div class="panel lights-cmd">
- <header class="hdr">
- <div class="hdr-left">
- <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="44" /></div>
- <a class="back" href="sheet-google-home.html" aria-label="Back to Google Home"><span class="chev">‹</span> Cams</a>
+ <header class="hdr hdr--clockfirst">
+ <div class="hdr-left-col">
+ <div class="live-clock-host" aria-label="America/Chicago time">
+ <div class="live-clock" data-live-clock>—:—</div>
+ </div>
+ <div class="hdr-micros">
+ <a class="home-btn" href="sheet-google-home.html" aria-label="Back to cams">Cams</a>
  <a class="nav-week" href="sheet-index.html">Sheets</a>
- <div class="identity" style="display:flex;align-items:center;gap:12px">
- <div class="avatar">💡</div>
- <div>
- <a class="eyebrow" href="sheet-google-home.html">House · lights</a>
- <h1 class="name"><span class="name-accent">Lights</span> · control</h1>
- <div class="tagline">Dining · Harris · Kitchen · Kasa when tokened</div>
  </div>
  </div>
- </div>
+ <div class="hdr-spacer" aria-hidden="true"></div>
+ <div class="hdr-right-tools">
  <div class="cmd-pill cmd-pill--need" id="lights-status-pill">NEED TOKEN</div>
+ </div>
  </header>
 
  <section class="banner cmd-panel cmd-panel--hot" aria-label="Lights mission">
@@ -150,7 +150,7 @@
  <span id="lights-ftr-status">NEED TOKEN</span>
  </footer>
 </div>
-<script src="house-clock.js?v=HUBKIT1"></script>
+<script src="house-clock.js?v=SHEETCLK1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
 <script src="house-lights.js?v=KIDLITE1"></script>

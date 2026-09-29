@@ -392,26 +392,23 @@
   .banner-main{font-size:22px;font-weight:850;color:var(--cmd-ink)}
   .banner-detail{font-size:13px;color:var(--cmd-mute)}
 </style>
+<link rel="stylesheet" href="tokens-sheet-clock-first-heat.css?v=SHEETCLK1" />
 </head>
 <body>
 <div class="panel">
- <header class="hdr">
- <div class="hdr-left">
- <div class="nav-row">
- <a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
+ <header class="hdr hdr--clockfirst">
+ <div class="hdr-left-col">
+ <div class="live-clock-host" aria-label="America/Chicago time">
+ <div class="live-clock" data-live-clock>—:—</div>
+ </div>
+ <div class="hdr-micros">
+ <a class="home-btn" href="sheet-index.html" aria-label="Home — House board">Home</a>
  <a class="nav-week" href="index.html">Week</a>
  </div>
- <div class="identity">
- <div class="avatar" aria-hidden="true">▣</div>
- <div class="id-text">
- <a class="eyebrow" href="sheet-index.html">HOUSE</a>
- <h1 class="name"><span class="name-accent">Desk gate</span></h1>
- <div class="tagline">Same glass · two layers · kids never see money</div>
  </div>
- </div>
- </div>
- <div class="hdr-right">
- <div class="hot-pill cmd-pill cmd-pill--live"><span class="spark">◎</span> House → Desk gate</div>
+ <div class="hdr-spacer" aria-hidden="true"></div>
+ <div class="hdr-right-tools">
+ <div class="hot-pill cmd-pill cmd-pill--live">DESK GATE</div>
  </div>
  </header>
 
@@ -541,6 +538,7 @@
  </footer>
 </div>
 
+<script src="house-clock.js?v=SHEETCLK1"></script>
 <script src="house-zoom.js"></script>
 </body>
 </html>

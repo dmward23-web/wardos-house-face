@@ -150,24 +150,24 @@
   .note{background:rgba(8,10,16,0.55);border:1px dashed rgba(255,190,64,0.35);color:var(--cmd-mute)}
 
 </style>
+<link rel="stylesheet" href="tokens-sheet-clock-first-heat.css?v=SHEETCLK1" />
 </head>
 <body>
 <div class="panel">
- <header class="hdr">
- <div class="hdr-left">
- <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="44" /></div>
- <a class="back" href="sheet-google-home.html" aria-label="Back to Google Home cams"><span class="chev">‹</span> Cams</a>
+ <header class="hdr hdr--clockfirst">
+ <div class="hdr-left-col">
+ <div class="live-clock-host" aria-label="America/Chicago time">
+ <div class="live-clock" data-live-clock>—:—</div>
+ </div>
+ <div class="hdr-micros">
+ <a class="home-btn" href="sheet-google-home.html" aria-label="Back to cams">Cams</a>
  <a class="nav-week" href="sheet-index.html">Sheets</a>
- <div class="identity" style="display:flex;align-items:center;gap:12px">
- <div class="avatar">🌡</div>
- <div>
- <a class="eyebrow" href="sheet-google-home.html">House · climate</a>
- <h1 class="name"><span class="name-accent">Sensi</span> · thermostat</h1>
- <div class="tagline">147th · Emerson Sensi · live JSON when tokened</div>
  </div>
  </div>
- </div>
+ <div class="hdr-spacer" aria-hidden="true"></div>
+ <div class="hdr-right-tools">
  <div class="cmd-pill cmd-pill--need" id="sensi-status-pill">NEED TOKEN</div>
+ </div>
  </header>
 
  <section class="banner cmd-panel cmd-panel--hot" aria-label="Sensi mission">
@@ -252,7 +252,7 @@
  <span id="sensi-ftr-status">NEED TOKEN</span>
  </footer>
 </div>
-<script src="house-clock.js?v=CT1"></script>
+<script src="house-clock.js?v=SHEETCLK1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
 <script src="house-sensi.js?v=HUBKIT1"></script>
