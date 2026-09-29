@@ -1,85 +1,302 @@
 #!/usr/bin/env node
 /**
- * WardOS House Face · Lights live snapshot (stub)
+ * WardOS House Face · Lights live snapshot
  *
- * Until a Kasa cloud token / LAN path exists on the Atlas box, this writes
- * data/lights-live.json with status:need_token. Never invents on/off LIVE.
+ * Creds: ~/.config/wardos/kasa.user + kasa.password (or env KASA_USER /
+ * KASA_PASSWORD / KASA_USERNAME). Not the old kasa.token path.
+ *
+ * If missing → status need_token + DEMO starter (honest — never invent LIVE).
+ * If present → spawn plates kasa-live venv python + scripts/kasa-probe.py,
+ * capture stdout JSON, write --out / data/lights-live.json.
+ * On probe failure → status error (keep last lights if any).
+ *
+ * writeSupported stays false until a safe write proxy exists.
  *
  * Usage:
  *   node scripts/lights-fetch.mjs
- *   node scripts/lights-fetch.mjs --token-file ~/.config/wardos/kasa.token
  *   node scripts/lights-fetch.mjs --out data/lights-live.json
  *
  * See ../LIGHTS-LIVE.md
  */
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 
+const DEFAULT_PYTHON =
+  "/workspace/plates/2026-09-28/kasa-live/.venv/bin/python";
+const DEFAULT_PROBE = path.join(ROOT, "scripts", "kasa-probe.py");
+
+const STARTER = [
+  {
+    id: "dining-room",
+    name: "Dining Room",
+    where: "Dining Room",
+    kind: "dimmer",
+    on: true,
+    brightness: 52,
+    online: true,
+  },
+  {
+    id: "harris-room",
+    name: "Harris's Room",
+    where: "Harris's Room",
+    kind: "dimmer",
+    on: true,
+    brightness: 100,
+    online: true,
+  },
+  {
+    id: "kitchen",
+    name: "Kitchen",
+    where: "Kitchen",
+    kind: "dimmer",
+    on: true,
+    brightness: 1,
+    online: true,
+  },
+];
+
 function parseArgs(argv) {
   const out = {
-    tokenFile: null,
     outPath: path.join(ROOT, "data", "lights-live.json"),
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
-    if (a === "--token-file") out.tokenFile = argv[++i];
-    else if (a === "--out") out.outPath = path.resolve(argv[++i]);
+    if (a === "--out") out.outPath = path.resolve(argv[++i]);
   }
   return out;
 }
 
-function readToken(opts) {
-  if (process.env.KASA_TOKEN) return process.env.KASA_TOKEN.trim();
-  if (opts.tokenFile && fs.existsSync(opts.tokenFile)) {
-    return fs.readFileSync(opts.tokenFile, "utf8").trim();
-  }
+function readCredFile(name) {
   const home = process.env.HOME || "";
-  const def = path.join(home, ".config", "wardos", "kasa.token");
-  if (fs.existsSync(def)) return fs.readFileSync(def, "utf8").trim();
-  return "";
+  const p = path.join(home, ".config", "wardos", name);
+  if (!fs.existsSync(p)) return "";
+  try {
+    return fs.readFileSync(p, "utf8").trim();
+  } catch {
+    return "";
+  }
 }
 
-const STARTER = [
-  { id: "dining-room", name: "Dining Room", where: "Dining Room", kind: "dimmer", on: true, brightness: 52, online: true },
-  { id: "harris-room", name: "Harris's Room", where: "Harris's Room", kind: "dimmer", on: true, brightness: 100, online: true },
-  { id: "kitchen", name: "Kitchen", where: "Kitchen", kind: "dimmer", on: true, brightness: 1, online: true },
-];
+/** Detect Kasa account email+password (not legacy kasa.token). */
+function hasCreds() {
+  const user =
+    (process.env.KASA_USER || process.env.KASA_USERNAME || "").trim() ||
+    readCredFile("kasa.user");
+  const pass =
+    (process.env.KASA_PASSWORD || "").trim() || readCredFile("kasa.password");
+  return Boolean(user && pass);
+}
+
+function writeJson(outPath, payload) {
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  const tmp = outPath + ".tmp";
+  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n");
+  fs.renameSync(tmp, outPath);
+}
+
+function readPrevious(outPath) {
+  try {
+    if (!fs.existsSync(outPath)) return null;
+    return JSON.parse(fs.readFileSync(outPath, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function needTokenPayload(fetchedAt) {
+  return {
+    status: "need_token",
+    fetchedAt,
+    source: "kasa-pending",
+    writeSupported: false,
+    lights: STARTER,
+    reserved: [],
+    error:
+      "NEED TOKEN · no ~/.config/wardos/kasa.user+kasa.password (or KASA_USER/KASA_PASSWORD) yet. tplinkcloud.com is cameras-only; Kasa IoT needs app account creds. DEMO seeds only — do not paint LIVE.",
+  };
+}
+
+function runProbe() {
+  const py = process.env.KASA_VENV_PYTHON || DEFAULT_PYTHON;
+  const probe =
+    process.env.KASA_PROBE_SCRIPT ||
+    (fs.existsSync(DEFAULT_PROBE)
+      ? DEFAULT_PROBE
+      : "/workspace/plates/2026-09-28/kasa-live/probe_kasa.py");
+
+  if (!fs.existsSync(py)) {
+    return {
+      ok: false,
+      error: `kasa venv python missing: ${py}`,
+      code: 127,
+      stderr: "",
+      stdout: "",
+    };
+  }
+  if (!fs.existsSync(probe)) {
+    return {
+      ok: false,
+      error: `kasa-probe.py missing: ${probe}`,
+      code: 127,
+      stderr: "",
+      stdout: "",
+    };
+  }
+
+  const result = spawnSync(py, [probe], {
+    encoding: "utf8",
+    env: process.env,
+    maxBuffer: 4 * 1024 * 1024,
+    timeout: 120000,
+  });
+
+  const stdout = (result.stdout || "").trim();
+  const stderr = (result.stderr || "").trim();
+  const code = result.status;
+
+  if (result.error) {
+    return {
+      ok: false,
+      error: `probe spawn failed: ${result.error.message}`,
+      code: code ?? 1,
+      stderr,
+      stdout,
+    };
+  }
+
+  let parsed = null;
+  if (stdout) {
+    try {
+      // probe may print warnings on stderr; stdout should be pure JSON
+      const start = stdout.indexOf("{");
+      const end = stdout.lastIndexOf("}");
+      if (start >= 0 && end > start) {
+        parsed = JSON.parse(stdout.slice(start, end + 1));
+      }
+    } catch (e) {
+      return {
+        ok: false,
+        error: `probe JSON parse failed: ${e.message}`,
+        code: code ?? 1,
+        stderr,
+        stdout: stdout.slice(0, 500),
+      };
+    }
+  }
+
+  if (code !== 0 || !parsed) {
+    const msg =
+      (parsed && parsed.error) ||
+      stderr ||
+      (stdout ? stdout.slice(0, 300) : "") ||
+      `probe exit ${code}`;
+    return {
+      ok: false,
+      error: String(msg),
+      code: code ?? 1,
+      stderr,
+      stdout,
+      parsed,
+    };
+  }
+
+  return { ok: true, parsed, code, stderr };
+}
 
 function main() {
   const opts = parseArgs(process.argv);
-  const token = readToken(opts);
   const fetchedAt = new Date().toISOString();
   let payload;
-  if (!token) {
-    payload = {
-      status: "need_token",
-      fetchedAt,
-      source: "kasa-pending",
-      writeSupported: false,
-      lights: STARTER,
-      reserved: [],
-      error:
-        "NEED TOKEN · no Kasa cloud yet. Screenshot roster DEMO seeds only (Dining/Harris/Kitchen) — do not paint LIVE. OP Kasa online; LIVE cloud still need_token.",
-    };
+
+  if (!hasCreds()) {
+    payload = needTokenPayload(fetchedAt);
   } else {
-    payload = {
-      status: "need_token",
-      fetchedAt,
-      source: "kasa-pending",
-      writeSupported: false,
-      lights: STARTER,
-      reserved: [],
-      error:
-        "Kasa token file present but lights cloud/LAN client not wired yet — do not invent LIVE.",
-    };
+    const run = runProbe();
+    if (
+      run.ok &&
+      run.parsed &&
+      (run.parsed.status === "live" || run.parsed.status === "need_creds")
+    ) {
+      // Pass through probe JSON; force writeSupported false
+      payload = { ...run.parsed, writeSupported: false };
+      if (payload.status === "need_creds") {
+        // Treat as need_token for UI consistency if probe says need_creds
+        // despite our local hasCreds() — rare race / empty files
+        payload = {
+          ...payload,
+          status: "need_token",
+          lights: payload.lights?.length ? payload.lights : STARTER,
+          writeSupported: false,
+        };
+      }
+    } else if (run.ok && run.parsed && run.parsed.status === "error") {
+      const prev = readPrevious(opts.outPath);
+      payload = {
+        ...run.parsed,
+        writeSupported: false,
+        lights:
+          Array.isArray(run.parsed.lights) && run.parsed.lights.length
+            ? run.parsed.lights
+            : prev?.lights?.length
+              ? prev.lights
+              : STARTER,
+        reserved: run.parsed.reserved ?? prev?.reserved ?? [],
+      };
+    } else {
+      // Probe failed — status error, keep last lights if any
+      const prev = readPrevious(opts.outPath);
+      const keepLights =
+        prev?.lights?.length && Array.isArray(prev.lights)
+          ? prev.lights
+          : STARTER;
+      const keepReserved = Array.isArray(prev?.reserved) ? prev.reserved : [];
+      payload = {
+        status: "error",
+        fetchedAt,
+        source: "tplink-cloud-api",
+        writeSupported: false,
+        lights: keepLights,
+        reserved: keepReserved,
+        error: run.error || "kasa probe failed",
+      };
+      // If probe returned a partial parsed object with status live but we
+      // somehow failed validation — never invent LIVE from failure path.
+      if (payload.status === "live") {
+        payload.status = "error";
+      }
+    }
   }
-  fs.mkdirSync(path.dirname(opts.outPath), { recursive: true });
-  fs.writeFileSync(opts.outPath, JSON.stringify(payload, null, 2) + "\n");
+
+  // Absolute invariant
+  if (payload.writeSupported !== false) payload.writeSupported = false;
+  if (
+    payload.status === "live" &&
+    (!payload.lights || !Array.isArray(payload.lights) || !payload.lights.length)
+  ) {
+    payload.status = "error";
+    payload.error =
+      (payload.error || "") + " · refused LIVE with empty lights roster";
+  }
+
+  writeJson(opts.outPath, payload);
   console.log("Wrote", opts.outPath, "status=" + payload.status);
+  if (payload.status === "live" && Array.isArray(payload.lights)) {
+    for (const L of payload.lights) {
+      const br =
+        L.brightness != null ? ` brightness=${L.brightness}` : "";
+      console.log(
+        `  ${L.id}: ${L.on ? "on" : "off"}${br} online=${L.online}`
+      );
+    }
+  }
+  if (payload.status === "error" || payload.status === "need_token") {
+    process.exitCode = payload.status === "error" ? 1 : 0;
+  }
 }
 
 main();
