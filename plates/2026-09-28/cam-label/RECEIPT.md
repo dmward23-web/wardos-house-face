@@ -1,7 +1,7 @@
 # HUBFMT1 · cam labels · CT times · header date
 
 **When:** 2026-09-28 ~20:50 CT  
-**Tip:** HUBFMT1 (cam-label / TIMEFMT / header)  
+**Tip:** `1f4237d` · HUBFMT1 (cam-label / TIMEFMT / header)  
 **Page:** https://dmward23-web.github.io/wardos-house-face/sheet-index.html
 
 ## Shipped
