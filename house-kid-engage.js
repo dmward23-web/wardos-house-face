@@ -1,5 +1,6 @@
-/* House Face · CTRLPANEL1 · kid flip · who’s up denser · daily quest · claim · streak · SFX
-   LIVE only · WardKids · HUBTOK1 atoms. No leaveby/cam/nest/sensi JSON. */
+/* House Face · CTRLPANEL2 · kid flip · who’s up denser · daily quest · claim · streak · SFX
+   LIVE only · WardKids · HUBTOK1 atoms. Bind-once guards · tap-to-cycle · OPEN nav.
+   No leaveby/cam/nest/sensi JSON. */
 (function (global) {
   "use strict";
 
@@ -445,7 +446,7 @@
       else if (kidObj(kidId) && kidObj(kidId).themeLabel) sub.textContent = kidObj(kidId).themeLabel;
     }
     root.setAttribute("data-face", face);
-    root.setAttribute("aria-label", (ACCENT[kidId].name) + " · " + (FACE_LABEL[face] || face) + " · swipe for more");
+    root.setAttribute("aria-label", (ACCENT[kidId].name) + " · " + (FACE_LABEL[face] || face) + " · tap or swipe for more");
   }
 
   function setFace(root, face, playSound) {
@@ -474,7 +475,8 @@
       if (ev.target && ev.target.closest && (
         ev.target.closest(".kf-claim") ||
         ev.target.closest(".kid-flip-go") ||
-        ev.target.closest("[data-face-dot]")
+        ev.target.closest("[data-face-dot]") ||
+        ev.target.closest(".hub-quest-claim")
       )) return;
       armed = true;
       moved = false;
@@ -487,6 +489,7 @@
       var dx = ev.clientX - sx;
       var dy = ev.clientY - sy;
       if (Math.abs(dx) > 18 && Math.abs(dx) > Math.abs(dy) * 1.2) moved = true;
+      if (Math.abs(dy) > 24 && Math.abs(dy) > Math.abs(dx)) moved = true; /* vertical scroll — not a tap */
     });
     function end(ev) {
       if (!armed) return;
@@ -497,6 +500,18 @@
       if (moved && Math.abs(dx) >= 36 && Math.abs(dx) > Math.abs(dy)) {
         ev.preventDefault();
         cycleFace(root, dx < 0 ? 1 : -1);
+        return;
+      }
+      /* Tap (no meaningful drag) cycles face — Elo/wall can't swipe reliably */
+      if (!moved && Math.abs(dx) < 12 && Math.abs(dy) < 12) {
+        var t = ev.target;
+        if (t && t.closest && (
+          t.closest(".kf-claim") ||
+          t.closest(".kid-flip-go") ||
+          t.closest("[data-face-dot]")
+        )) return;
+        ev.preventDefault();
+        cycleFace(root, 1);
       }
     }
     root.addEventListener("pointerup", end);
@@ -504,6 +519,8 @@
   }
 
   function bindClaims(root) {
+    if (root.getAttribute("data-kf-claims") === "1") return;
+    root.setAttribute("data-kf-claims", "1");
     root.addEventListener("click", function (ev) {
       var btn = ev.target && ev.target.closest && ev.target.closest(".kf-claim");
       if (!btn || !root.contains(btn)) return;
@@ -532,17 +549,39 @@
       }
       paintTile(root);
       paintWhoUp();
+      paintDailyQuest();
       paintBoardStreak(kidId);
+      try { document.dispatchEvent(new CustomEvent("house:earn", { detail: { id: id, done: next } })); } catch (e2) { /* */ }
     });
   }
 
   function bindDots(root) {
+    if (root.getAttribute("data-kf-dotbind") === "1") return;
+    root.setAttribute("data-kf-dotbind", "1");
     root.addEventListener("click", function (ev) {
       var dot = ev.target && ev.target.closest && ev.target.closest("[data-face-dot]");
       if (!dot || !root.contains(dot)) return;
       ev.preventDefault();
       ev.stopPropagation();
       setFace(root, dot.getAttribute("data-face-dot"), true);
+    });
+  }
+
+  function bindOpen(root) {
+    if (root.getAttribute("data-kf-open") === "1") return;
+    root.setAttribute("data-kf-open", "1");
+    var go = root.querySelector(".kid-flip-go");
+    if (!go) return;
+    go.addEventListener("pointerdown", function () { sfxTap(); }, { passive: true });
+    go.addEventListener("click", function (ev) {
+      var href = go.getAttribute("href");
+      if (!href) return;
+      /* Force navigation — wall WebViews sometimes swallow bare <a> after tile replace */
+      ev.preventDefault();
+      ev.stopPropagation();
+      try { global.location.assign(href); } catch (e) {
+        try { global.location.href = href; } catch (e2) { /* */ }
+      }
     });
   }
 
@@ -590,14 +629,15 @@
     bindSwipe(wrap);
     bindClaims(wrap);
     bindDots(wrap);
+    bindOpen(wrap);
     wrap.addEventListener("keydown", function (ev) {
       if (ev.key === "ArrowRight") { ev.preventDefault(); cycleFace(wrap, 1); }
       if (ev.key === "ArrowLeft") { ev.preventDefault(); cycleFace(wrap, -1); }
+      if (ev.key === "Enter" || ev.key === " ") {
+        ev.preventDefault();
+        cycleFace(wrap, 1);
+      }
     });
-    var go = wrap.querySelector(".kid-flip-go");
-    if (go) {
-      go.addEventListener("pointerdown", function () { sfxTap(); }, { passive: true });
-    }
     return wrap;
   }
 
@@ -810,10 +850,12 @@
   function enhanceHub() {
     if (!document.querySelector(".tile.ainsley, .tile.hayes, .tile.harris, [data-kid-flip]")) return;
     document.querySelectorAll("a.tile.ainsley, a.tile.hayes, a.tile.harris").forEach(enhanceTile);
+    /* Bind-once guards inside bind* — safe to call; paint every time */
     document.querySelectorAll("[data-kid-flip]").forEach(function (el) {
       bindSwipe(el);
       bindClaims(el);
       bindDots(el);
+      bindOpen(el);
       paintTile(el);
     });
     paintWhoUp();
@@ -839,6 +881,9 @@
   }
 
   function onDataReady() {
+    /* Paint shells now so who’s-up / quest never sit on … waiting on cal */
+    enhanceHub();
+    enhanceBoard();
     prefetchCalLeaves(function () {
       enhanceHub();
       enhanceBoard();
