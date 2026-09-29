@@ -13,6 +13,7 @@
 <meta name="description" content="Board-OS House face · phone plate contact sheet · all major House PNG phone renders" />
 <title>BOARD-OS · HOUSE FACE · PHONE GALLERY</title>
 <link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
+<link rel="stylesheet" href="tokens-sheets-clock-first-heat.css?v=SHEETCLK2" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -213,21 +214,17 @@
 </head>
 <body>
 <div class="panel">
- <header class="hdr">
- <div class="hdr-left">
- <a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a>
- <div class="identity">
- <div class="avatar" aria-hidden="true">▦</div>
- <div class="id-text">
- <div class="eyebrow">HOUSE · PHONE PLATES · CONTACT SHEET</div>
- <h1 class="name"><span class="name-accent">Gallery</span></h1>
- <div class="tagline">All major House phone renders · scroll for Dan</div>
+ <header class="hdr hdr--clockfirst">
+ <div class="hdr-left-col">
+ <div class="live-clock-host" aria-label="America/Chicago time">
+ <div class="board-clock live-clock" data-live="time" data-live-clock>—:—</div>
+ </div>
+ <div class="hdr-micros">
+ <a class="home-btn" href="sheet-index.html" aria-label="Home — House board">Home</a>
  </div>
  </div>
- </div>
- <div class="hdr-right">
- <div class="hot-pill">19 plates · 1170×731 each</div>
- </div>
+ <div class="hdr-spacer" aria-hidden="true"></div>
+ <div class="sheet-chip" data-sheet-chip>Gallery</div>
  </header>
 
  <div class="grid-wrap">
@@ -334,6 +331,7 @@
  </footer>
 </div>
 
+<script src="house-clock.js?v=SHEETCLK2"></script>
 <script src="house-zoom.js"></script>
 </body>
 </html>

@@ -107,6 +107,7 @@
 </style>
 <link rel="stylesheet" href="heat-v3.css?v=DAYTAP1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
+<link rel="stylesheet" href="tokens-sheets-clock-first-heat.css?v=SHEETCLK2" />
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -351,22 +352,18 @@
 
 
 <div class="panel">
- <header class="hdr">
-  <div class="hdr-left">
-   <div class="nav-row">
-    <a class="back" href="sheet-index.html?v=HUBNEXT2"><span class="chev">‹</span> Sheets</a>
-    <a class="nav-week" href="index.html?v=WEEKFIX1">Week</a>
-   </div>
-   <div class="identity">
-    <div class="avatar g2-mark" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-plane"/></svg></div>
-    <div>
-     <a class="eyebrow" href="sheet-index.html?v=HUBNEXT2">The Ward's · home</a>
-     <h1 class="name">Family trips</h1>
-     <div class="tagline">Vacations · drives · flights · wall glance</div>
-    </div>
-   </div>
-  </div>
-  <div class="hot-pill">From dmward23 · kids-safe</div>
+ <header class="hdr hdr--clockfirst">
+ <div class="hdr-left-col">
+ <div class="live-clock-host" aria-label="America/Chicago time">
+ <div class="board-clock live-clock" data-live="time" data-live-clock>—:—</div>
+ </div>
+ <div class="hdr-micros">
+ <a class="home-btn" href="sheet-index.html" aria-label="Home — House board">Sheets</a>
+ <a class="nav-week" href="index.html">Week</a>
+ </div>
+ </div>
+ <div class="hdr-spacer" aria-hidden="true"></div>
+ <div class="sheet-chip" data-sheet-chip>Trips</div>
  </header>
 
  <section class="hero" aria-label="Next trip">
@@ -443,6 +440,7 @@
   <span style="margin-left:10px">Kids-safe · WITH DAD / Dad week on glass</span>
  </footer>
 </div>
+<script src="house-clock.js?v=SHEETCLK2"></script>
 <script src="house-zoom.js?v=HUBNEXT2"></script>
 </body>
 </html>

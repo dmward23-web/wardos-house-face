@@ -13,6 +13,7 @@
 <meta name="description" content="Board-OS House face · hero eight phone contact sheet · no money" />
 <title>BOARD-OS · HOUSE · GALLERY HERO EIGHT</title>
 <link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
+<link rel="stylesheet" href="tokens-sheets-clock-first-heat.css?v=SHEETCLK2" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -99,6 +100,7 @@
     grid-template-rows: repeat(2, 1fr);
     gap: 8px;
   }
+  a.card { text-decoration: none; color: inherit; cursor: pointer; }
   .card {
     display: flex; flex-direction: column; gap: 4px;
     padding: 6px;
@@ -139,56 +141,62 @@
 </head>
 <body>
 <div class="panel">
- <header class="hdr">
- <div class="hdr-left">
- <div class="avatar" aria-hidden="true">▦</div>
- <div>
- <div class="eyebrow">HOUSE · HERO EIGHT · PHONE</div>
- <h1 class="name">Gallery · page 1</h1>
+ <header class="hdr hdr--clockfirst">
+ <div class="hdr-left-col">
+ <div class="live-clock-host" aria-label="America/Chicago time">
+ <div class="board-clock live-clock" data-live="time" data-live-clock>—:—</div>
+ </div>
+ <div class="hdr-micros">
+ <a class="home-btn" href="sheet-index.html" aria-label="Home — House board">Home</a>
+ <a class="nav-week" href="sheet-gallery.html">Full gallery</a>
  </div>
  </div>
+ <div class="hdr-spacer" aria-hidden="true"></div>
+ <div class="sheet-chip" data-sheet-chip>Gallery</div>
  </header>
 
  <nav class="shot-grid" aria-label="Hero eight phone plates">
- <div class="card">
+ <a class="card" href="sheet-index.html">
  <div class="thumb-wrap"><img src="phone-shots/board-os-house-index-phone.png" alt="Index" /></div>
  <div class="card-label">Index</div>
- </div>
- <div class="card">
+ </a>
+ <a class="card" href="sheet-today.html">
  <div class="thumb-wrap"><img src="phone-shots/board-os-house-today-phone.png" alt="Today" /></div>
  <div class="card-label">Today</div>
- </div>
- <div class="card">
+ </a>
+ <a class="card" href="index.html">
  <div class="thumb-wrap"><img src="phone-shots/board-os-house-face-week-phone.png" alt="Week" /></div>
  <div class="card-label">Week</div>
- </div>
- <div class="card">
+ </a>
+ <a class="card" href="month.html">
  <div class="thumb-wrap"><img src="phone-shots/board-os-house-face-month-phone.png" alt="Month" /></div>
  <div class="card-label">Month</div>
- </div>
- <div class="card">
+ </a>
+ <a class="card" href="kid-hayes.html">
  <div class="thumb-wrap"><img src="phone-shots/board-os-house-face-hayes-phone.png" alt="Hayes" /></div>
  <div class="card-label">Hayes</div>
- </div>
- <div class="card">
+ </a>
+ <a class="card" href="sheet-chores.html">
  <div class="thumb-wrap"><img src="phone-shots/board-os-house-chores-phone.png" alt="Chores" /></div>
  <div class="card-label">Chores</div>
- </div>
- <div class="card">
+ </a>
+ <a class="card" href="sheet-load-day.html">
  <div class="thumb-wrap"><img src="phone-shots/board-os-house-load-day-phone.png" alt="Load day" /></div>
  <div class="card-label">Load day</div>
- </div>
- <div class="card">
+ </a>
+ <a class="card" href="sheet-status.html">
  <div class="thumb-wrap"><img src="phone-shots/board-os-house-status-phone.png" alt="Status" /></div>
  <div class="card-label">Status</div>
- </div>
+ </a>
  </nav>
 
  <footer class="ftr">
- 
+ <a class="ftr-chip" href="sheet-gallery.html">Full gallery</a>
+ <span class="ftr-chip">Kids-safe · phone plates</span>
  </footer>
 </div>
 
+<script src="house-clock.js?v=SHEETCLK2"></script>
 <script src="house-zoom.js"></script>
 </body>
 </html>

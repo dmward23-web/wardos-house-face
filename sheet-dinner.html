@@ -12,6 +12,7 @@
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE FACE · DINNER VOTE</title>
 <link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
+<link rel="stylesheet" href="tokens-sheets-clock-first-heat.css?v=SHEETCLK2" />
 <style>
 
  @font-face {
@@ -294,21 +295,18 @@
 </head>
 <body>
 <div class="panel">
- <header class="hdr">
- <div class="hdr-left">
- <div class="nav-row"><a class="home-btn" href="sheet-index.html" aria-label="Home — House board"><span class="chev">←</span> Home</a><a class="nav-week" href="index.html">Week</a></div>
- <div class="identity">
- <div class="avatar" aria-hidden="true" style="background:linear-gradient(145deg,#ffb060,#e87830,#c85820);box-shadow:0 0 0 4px rgba(255,255,255,0.92),0 0 0 7px rgba(232,120,48,0.35),0 10px 28px rgba(200,88,32,0.3);">🌮</div>
- <div class="id-text">
- <a class="eyebrow" href="sheet-index.html">The Ward's · home</a>
- <h1 class="name"><span class="name-accent">Dinner vote</span></h1>
- <div class="tagline">This week’s picks · kids vote · winner cooks loud</div>
+ <header class="hdr hdr--clockfirst">
+ <div class="hdr-left-col">
+ <div class="live-clock-host" aria-label="America/Chicago time">
+ <div class="board-clock live-clock" data-live="time" data-live-clock>—:—</div>
+ </div>
+ <div class="hdr-micros">
+ <a class="home-btn" href="sheet-index.html" aria-label="Home — House board">Home</a>
+ <a class="nav-week" href="index.html">Week</a>
  </div>
  </div>
- </div>
- <div class="hdr-right">
- <div class="hot-pill"><span class="spark">★</span> Winning · Taco night</div>
- </div>
+ <div class="hdr-spacer" aria-hidden="true"></div>
+ <div class="sheet-chip" data-sheet-chip>Dinner</div>
  </header>
 
  <section class="cheer" aria-label="Cheer banner">
@@ -402,6 +400,7 @@
  </footer>
 </div>
 
+<script src="house-clock.js?v=SHEETCLK2"></script>
 <script src="house-zoom.js"></script>
 </body>
 </html>
