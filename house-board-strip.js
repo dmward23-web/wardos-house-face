@@ -376,8 +376,11 @@
       if (dt > 900) return;
       if (Math.abs(dx) < 48) return;
       if (Math.abs(dx) < Math.abs(dy) * 1.15) return; /* vertical scroll wins */
-      try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e3) { /* ok */ }
-      /* swipe left → next · swipe right → prev */
+      try {
+        if (global.HouseSfx && HouseSfx.unlockAudio) HouseSfx.unlockAudio();
+        if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap();
+      } catch (e3) { /* ok */ }
+      /* swipe · CTRLPANEL1 SFX */
       cycleLayout(dx < 0 ? 1 : -1);
     }
     function onCancel() {

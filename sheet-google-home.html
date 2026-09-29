@@ -11,8 +11,10 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE · CAMS · GOOGLE HOME</title>
-<link rel="stylesheet" href="house-engage.css?v=NESTVID1" />
-<link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=HUBTOK1" />
+<link rel="stylesheet" href="house-engage.css?v=CTRLPANEL1" />
+<link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=CTRLPANEL1" />
+<link rel="stylesheet" href="tokens-hub-cams.css?v=CAMLIVE2" />
+<link rel="stylesheet" href="tokens-ctrlpanel.css?v=CTRLPANEL1" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
@@ -210,10 +212,31 @@
     background:rgba(120,72,8,0.12);border:2px solid rgba(200,120,20,0.45);
     font-size:13px;font-weight:700;color:#3a2a10;line-height:1.45}
 
+
+  /* HUBKIT1 · command-panel kit chrome on camo */
+  html,body{overflow-x:hidden}
+  .panel{--cmd-tap-min:44px;--cmd-bulk-min:48px;--cmd-rocker-w:72px;--cmd-knob:32px}
+  .banner.cmd-panel{padding:14px 16px;gap:6px}
+  .banner .banner-title{font-size:24px;font-weight:850;color:var(--cmd-ink);margin-top:2px}
+  .banner .banner-sub{font-size:13px;color:var(--cmd-mute);margin-top:2px}
+  .hot-pill.cmd-pill{font-size:11px;min-height:28px;padding:6px 12px}
+  .cam.cmd-bezel{border-radius:14px}
+  .climate-hero{border-color:var(--cmd-border);box-shadow:0 8px 0 #05080c,0 16px 32px rgba(0,0,0,0.32),0 0 40px var(--cmd-bloom-amber)}
+  .climate-pill.cmd-pill{letter-spacing:0.12em}
+  .ctrl.cmd-panel{min-height:120px;padding:12px 14px}
+  .ctrl-btn.cmd-chip,.ctrl-actions .cmd-chip{flex:0 1 auto;min-width:72px;min-height:44px;height:auto;font-size:12px}
+  .ctrl-title{color:var(--cmd-ink)}
+  .ctrl-sub{color:var(--cmd-mute)}
+  .zone-title{color:var(--cmd-amber-hi);text-shadow:0 0 10px rgba(255,180,40,0.25)}
+  .zone-meta{color:var(--cmd-mute)}
+  .cam-path{background:rgba(8,10,16,0.55);border:1px solid rgba(255,190,64,0.4);color:var(--cmd-ink)}
+  .note{background:rgba(8,10,16,0.55);border:1px dashed rgba(255,190,64,0.35);color:var(--cmd-mute)}
+  .note strong{color:var(--cmd-amber-hi)}
+
 </style>
 </head>
 <body>
-<div class="panel">
+<div class="panel cams-cmd">
  <header class="hdr">
  <div class="hdr-left">
  <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="44" /></div>
@@ -228,16 +251,16 @@
  </div>
  </div>
  </div>
- <div class="hot-pill">CLIMATE + CAMS</div>
+ <div class="hot-pill cmd-pill cmd-pill--live">CLIMATE + CAMS</div>
  </header>
 
- <section class="banner">
- <div class="banner-accent"></div>
- <div class="banner-body">
- <div class="banner-lab">Google Home · climate + cameras</div>
+ <section class="banner cmd-panel cmd-panel--hot" aria-label="Cams mission">
+ <div class="cmd-hdr">
+ <div class="cmd-title">Google Home · climate + cameras</div>
+ <div class="cmd-meta">Elo · Nest SDM</div>
+ </div>
  <div class="banner-title">Climate LIVE · Nest · tap for video</div>
  <div class="banner-sub">Sensi live · Nest SDM · tap pad → WebRTC via box proxy · Elo 3202L</div>
- </div>
  </section>
 
 
@@ -262,7 +285,7 @@
  <div class="climate-humid" id="sensi-hero-humid">—% RH</div>
  </div>
  <div class="climate-cta">
- <div class="climate-pill" id="sensi-hero-pill">CONNECT · STUB</div>
+ <div class="climate-pill cmd-pill cmd-pill--need" id="sensi-hero-pill">NEED TOKEN</div>
  <div class="climate-open">Open Sensi →</div>
  </div>
  </div>
@@ -275,7 +298,7 @@
  </div>
  <div class="cam-path">Nest SDM <strong>LIVE</strong> · 5 cams · <strong>tap pad → WebRTC video</strong> (<code>nestProxy</code> baked in live JSON) · SDM tokens off Pages · NEST-LIVE.md</div>
  <div class="cam-grid">
- <article class="cam" aria-label="Living Room camera">
+ <article class="cam cmd-bezel" aria-label="Living Room camera">
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🛋</span>
@@ -286,7 +309,7 @@
  <div class="cam-where">Inside</div>
  </div>
  </article>
- <article class="cam" aria-label="Front door doorbell">
+ <article class="cam cmd-bezel" aria-label="Front door doorbell">
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🚪</span>
@@ -297,7 +320,7 @@
  <div class="cam-where">Entry</div>
  </div>
  </article>
- <article class="cam" aria-label="Garage camera">
+ <article class="cam cmd-bezel" aria-label="Garage camera">
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🏠</span>
@@ -308,7 +331,7 @@
  <div class="cam-where">Garage</div>
  </div>
  </article>
- <article class="cam" aria-label="Kitchen camera">
+ <article class="cam cmd-bezel" aria-label="Kitchen camera">
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🍳</span>
@@ -319,7 +342,7 @@
  <div class="cam-where">Cam</div>
  </div>
  </article>
- <article class="cam" aria-label="Backyard camera">
+ <article class="cam cmd-bezel" aria-label="Backyard camera">
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🌳</span>
@@ -339,45 +362,47 @@
  <div class="zone-meta" id="lights-zone-meta">Lights tile · garage/door stubs</div>
  </div>
  <div class="ctrl-row">
- <a class="ctrl lights" id="lights-ctrl-tile" href="sheet-lights.html" style="text-decoration:none;color:inherit;-webkit-tap-highlight-color:transparent">
+ <a class="ctrl lights cmd-panel" id="lights-ctrl-tile" href="sheet-lights.html" style="text-decoration:none;color:inherit;-webkit-tap-highlight-color:transparent">
  <div class="ctrl-top">
  <div class="ctrl-ico" aria-hidden="true">💡</div>
  <div>
  <div class="ctrl-title">Lights</div>
  <div class="ctrl-sub" id="lights-ctrl-sub">Dining · Harris · Kitchen</div>
  </div>
- <div class="climate-pill" id="lights-ctrl-pill" style="margin-left:auto;font-size:10px">NEED TOKEN</div>
+ <div class="climate-pill cmd-pill cmd-pill--need" id="lights-ctrl-pill" style="margin-left:auto;font-size:10px">NEED TOKEN</div>
  </div>
  <div class="ctrl-actions">
- <button type="button" class="ctrl-btn loud" id="lights-all-on">All on</button>
- <button type="button" class="ctrl-btn" id="lights-all-off">Off</button>
+ <button type="button" class="cmd-chip cmd-chip--loud" id="lights-all-on">All on</button>
+ <button type="button" class="cmd-chip" id="lights-all-off">Off</button>
  <span class="ctrl-btn" style="pointer-events:none;opacity:0.85">Open →</span>
  </div>
  </a>
- <div class="ctrl garage">
+ <div class="ctrl garage cmd-panel is-need-connect" data-need-connect="1">
  <div class="ctrl-top">
  <div class="ctrl-ico" aria-hidden="true">🚪</div>
  <div>
  <div class="ctrl-title">Garage</div>
  <div class="ctrl-sub">Door open / close</div>
  </div>
+ <span class="need-connect-pill cmd-pill cmd-pill--need">NEED CONNECT</span>
  </div>
  <div class="ctrl-actions">
- <button type="button" class="ctrl-btn loud" disabled>Toggle</button>
- <button type="button" class="ctrl-btn" disabled>Status</button>
+ <button type="button" class="cmd-rocker is-stub is-off" disabled aria-label="Garage · need connect"><span class="cmd-rocker-knob"></span></button>
+ <span class="ctrl-sub">Never DEMO</span>
  </div>
  </div>
- <div class="ctrl door">
+ <div class="ctrl door cmd-panel is-need-connect" data-need-connect="1">
  <div class="ctrl-top">
  <div class="ctrl-ico" aria-hidden="true">🔐</div>
  <div>
  <div class="ctrl-title">Door pads</div>
  <div class="ctrl-sub">Lock / unlock · codes</div>
  </div>
+ <span class="need-connect-pill cmd-pill cmd-pill--need">NEED CONNECT</span>
  </div>
  <div class="ctrl-actions">
- <button type="button" class="ctrl-btn loud" disabled>Lock</button>
- <button type="button" class="ctrl-btn" disabled>Status</button>
+ <button type="button" class="cmd-rocker is-stub is-off" disabled aria-label="Door pads · need connect"><span class="cmd-rocker-knob"></span></button>
+ <span class="ctrl-sub">Never DEMO</span>
  </div>
  </div>
  </div>
@@ -395,12 +420,13 @@
  <span id="sensi-home-ftr">Atlas · Sensi live gate</span>
  </footer>
 </div>
-<script src="house-clock.js?v=NESTVID1"></script>
+<script src="house-clock.js?v=CTRLPANEL1"></script>
 <script src="house-zoom.js"></script>
-<script src="house-sfx.js"></script>
-<script src="house-sensi.js?v=NESTVID1"></script>
-<script src="house-nest.js?v=NESTVID1"></script>
-<script src="house-lights.js?v=LIGHTDIM1"></script>
+<script src="house-sfx.js?v=CTRLPANEL1"></script>
+<script src="house-sensi.js?v=CAMLIVE2"></script>
+<script src="nest-webrtc-client.js?v=CAMLIVE2"></script>
+<script src="house-nest.js?v=CAMLIVE2"></script>
+<script src="house-lights.js?v=CTRLPANEL1"></script>
 <script>
 (function () {
   document.querySelectorAll(".cam").forEach(function (el) {

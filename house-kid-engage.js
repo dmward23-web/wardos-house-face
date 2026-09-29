@@ -1,6 +1,5 @@
-/* House Face · KIDENGAGE1 · kid tile flip cards · who’s up · claim · streak glass · SFX
-   LIVE only · localStorage checks via WardKids · cal from kids-data / cal-live.
-   Does NOT touch leaveby swipe, cam deck, nest/sensi/lights JSON. */
+/* House Face · CTRLPANEL1 · kid flip · who’s up denser · daily quest · claim · streak · SFX
+   LIVE only · WardKids · HUBTOK1 atoms. No leaveby/cam/nest/sensi JSON. */
 (function (global) {
   "use strict";
 
@@ -623,6 +622,104 @@
     return sec;
   }
 
+  function pickQuestKid() {
+    var who = soonestWhoUp();
+    if (who && who.kidId) return who.kidId;
+    for (var i = 0; i < KIDS.length; i++) {
+      var tp = todayMustProgress(KIDS[i]);
+      if (tp.need && tp.done < tp.need) return KIDS[i];
+    }
+    return KIDS[0];
+  }
+
+  function ensureQuestHost() {
+    var existing = document.querySelector("[data-hub-quest]");
+    if (existing) return existing;
+    var who = document.querySelector("[data-who-up]");
+    var grid = document.querySelector(".tile-grid, .grid-wrap");
+    if (!who && !grid) return null;
+    var sec = document.createElement("section");
+    sec.className = "hub-quest";
+    sec.setAttribute("data-hub-quest", "1");
+    sec.setAttribute("aria-label", "Daily quest");
+    sec.innerHTML =
+      '<div class="hub-quest-accent" aria-hidden="true"></div>' +
+      '<div class="hub-quest-body">' +
+      '<div class="hub-quest-kicker">Daily quest</div>' +
+      '<div class="hub-quest-main">' +
+      '<span class="hub-quest-title" data-hq-title>…</span>' +
+      '<span class="hub-quest-musts" data-hq-musts></span>' +
+      '<span class="hub-quest-streak" data-hq-streak></span>' +
+      "</div>" +
+      '<div class="hub-quest-claims" data-hq-claims></div>' +
+      "</div>" +
+      '<a class="hub-quest-go" data-hq-go href="#">OPEN</a>';
+    if (who && who.parentNode) who.parentNode.insertBefore(sec, who.nextSibling);
+    else if (grid && grid.parentNode) grid.parentNode.insertBefore(sec, grid);
+    return sec;
+  }
+
+  function paintDailyQuest() {
+    var host = ensureQuestHost();
+    if (!host) return;
+    var kidId = pickQuestKid();
+    var accent = ACCENT[kidId] || ACCENT.hayes;
+    var tp = todayMustProgress(kidId);
+    var streak = streakDays(kidId);
+    var qs = mustQuests(kidId).filter(function (q) {
+      return (q.cadence || "daily") === "daily";
+    }).slice(0, 4);
+    host.setAttribute("data-kid", kidId);
+    host.classList.toggle("is-empty", !tp.need);
+    var title = host.querySelector("[data-hq-title]");
+    var musts = host.querySelector("[data-hq-musts]");
+    var streakEl = host.querySelector("[data-hq-streak]");
+    var claims = host.querySelector("[data-hq-claims]");
+    var go = host.querySelector("[data-hq-go]");
+    if (title) title.textContent = accent.name + " · musts";
+    if (musts) musts.textContent = tp.need ? (tp.done + "/" + tp.need) : "—";
+    if (streakEl) streakEl.textContent = streak > 0 ? ("🔥 " + streak + "-day streak") : "🔥 Start streak";
+    if (go) {
+      go.setAttribute("href", HREF[kidId]);
+      go.textContent = "CLAIM · " + accent.name.toUpperCase();
+      if (go.getAttribute("data-sfx") !== "1") {
+        go.setAttribute("data-sfx", "1");
+        go.addEventListener("pointerdown", function () { sfxTap(); }, { passive: true });
+      }
+    }
+    if (claims) {
+      if (!qs.length) {
+        claims.innerHTML = '<span class="hub-quest-streak">No daily musts queued</span>';
+      } else {
+        var html = "";
+        qs.forEach(function (q) {
+          var done = getCheck(q.id);
+          html +=
+            '<button type="button" class="hub-quest-claim' + (done ? " is-done" : "") + '" data-hq-claim="' + esc(q.id) + '">' +
+            '<span class="kf-claim-ring">' + (done ? "✓" : "○") + "</span>" +
+            "<span>" + esc(kidsSafe(q.title || q.what || q.id)) + "</span></button>";
+        });
+        claims.innerHTML = html;
+        if (claims.getAttribute("data-bound") !== "1") {
+          claims.setAttribute("data-bound", "1");
+          claims.addEventListener("click", function (ev) {
+            var btn = ev.target && ev.target.closest ? ev.target.closest("[data-hq-claim]") : null;
+            if (!btn) return;
+            var id = btn.getAttribute("data-hq-claim");
+            if (!id) return;
+            var next = !getCheck(id);
+            setCheck(id, next);
+            sfxQuest(btn);
+            try { if (next && global.HouseSfx && HouseSfx.questPop) HouseSfx.questPop(btn); } catch (e) {}
+            paintDailyQuest();
+            refreshAll();
+            try { document.dispatchEvent(new CustomEvent("house:earn", { detail: { id: id, done: next } })); } catch (e2) {}
+          });
+        }
+      }
+    }
+  }
+
   function paintWhoUp() {
     var host = ensureWhoUpHost();
     if (!host) return;
@@ -720,6 +817,7 @@
       paintTile(el);
     });
     paintWhoUp();
+    paintDailyQuest();
     var go = document.querySelector("[data-who-go]");
     if (go && go.getAttribute("data-sfx") !== "1") {
       go.setAttribute("data-sfx", "1");
@@ -736,6 +834,7 @@
   function refreshAll() {
     document.querySelectorAll("[data-kid-flip]").forEach(paintTile);
     paintWhoUp();
+    paintDailyQuest();
     enhanceBoard();
   }
 
@@ -791,6 +890,7 @@
     /* Re-paint who’s up on the minute so leave countdown stays honest */
     setInterval(function () {
       paintWhoUp();
+      paintDailyQuest();
       document.querySelectorAll('[data-kid-flip][data-face="leave"], [data-kid-flip][data-face="stars"]').forEach(paintTile);
       enhanceBoard();
     }, 60 * 1000);
@@ -804,6 +904,7 @@
     streakDays: streakDays,
     nextLeaveFor: nextLeaveFor,
     soonestWhoUp: soonestWhoUp,
+    paintDailyQuest: paintDailyQuest,
     FACES: FACES
   };
 })(window);

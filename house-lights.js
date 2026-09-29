@@ -591,6 +591,37 @@
     startPolling();
   }
 
+
+  var DOOR_GARAGE_STUBS = [
+    { id: "garage-door", name: "Garage", where: "Door open / close" },
+    { id: "door-pads", name: "Door pads", where: "Lock / unlock · codes" }
+  ];
+
+  function paintNeedConnectStubs(doc) {
+    doc = doc || document;
+    var grid = doc.getElementById("lights-stub-grid");
+    if (!grid) return;
+    var html = "";
+    for (var i = 0; i < DOOR_GARAGE_STUBS.length; i++) {
+      var R = DOOR_GARAGE_STUBS[i];
+      html +=
+        '<article class="light-pad is-pending is-need-connect is-off" data-light-id="' + R.id + '" data-need-connect="1">'
+        + '<div class="light-pad-top">'
+        + '<div class="light-pad-ico" aria-hidden="true">🔌</div>'
+        + '<div><div class="light-pad-name">' + escapeHtml(R.name) + "</div>"
+        + '<div class="light-pad-where">' + escapeHtml(R.where) + "</div></div>"
+        + '<div class="light-pad-state cmd-pill cmd-pill--need">NEED CONNECT</div>'
+        + "</div>"
+        + '<div class="light-pad-actions">'
+        + '<button type="button" class="cmd-rocker is-stub is-off" disabled aria-label="' + escapeHtml(R.name) + ' · need connect">'
+        + '<span class="cmd-rocker-knob"></span></button>'
+        + "</div>"
+        + '<div class="light-pad-src">NEED CONNECT · never DEMO</div>'
+        + "</article>";
+    }
+    grid.innerHTML = html;
+  }
+
   /** Paint Google Home secondary Lights tile + optional pad row. */
   function paintPads(doc) {
     doc = doc || document;
@@ -615,6 +646,10 @@
     if (pill) {
       pill.textContent = g.label;
       pill.classList.toggle("on", !!g.live);
+      pill.classList.add("cmd-pill");
+      pill.classList.toggle("cmd-pill--live", !!g.live);
+      pill.classList.toggle("cmd-pill--need", !!(g.needToken || g.kind === "need_token"));
+      pill.classList.toggle("cmd-pill--off", !g.live && !(g.needToken || g.kind === "need_token"));
     }
     var allOn = doc.getElementById("lights-all-on");
     var allOff = doc.getElementById("lights-all-off");
@@ -638,8 +673,11 @@
         var L = eff.lights[i];
         var onCls = L.on ? " is-on" : "";
         var dim = L.kind === "dimmer";
+        var rockerCls = L.on ? " is-on" : " is-off";
+        var armedPad = canWrite();
+        var rockerDis = armedPad ? "" : " is-disabled";
         html +=
-          '<article class="light-pad' + onCls + '" data-light-id="' + L.id + '">'
+          '<article class="light-pad cmd-panel' + onCls + '" data-light-id="' + L.id + '">'
           + '<div class="light-pad-top">'
           + '<div class="light-pad-ico" aria-hidden="true">💡</div>'
           + '<div><div class="light-pad-name">' + escapeHtml(L.name) + "</div>"
@@ -647,10 +685,12 @@
           + '<div class="light-pad-state">' + (L.on ? "ON" : "OFF") + "</div>"
           + "</div>"
           + '<div class="light-pad-actions">'
-          + '<button type="button" class="light-btn loud" data-act="on" data-id="' + L.id + '">On</button>'
-          + '<button type="button" class="light-btn" data-act="off" data-id="' + L.id + '">Off</button>'
+          + '<button type="button" class="cmd-rocker' + rockerCls + rockerDis + '" data-act="toggle" data-id="' + L.id + '"'
+          + (armedPad ? "" : " disabled")
+          + ' aria-label="' + escapeHtml(L.name) + ' ' + (L.on ? "on" : "off") + '">'
+          + '<span class="cmd-rocker-knob" aria-hidden="true"></span></button>'
           + (dim
-            ? '<input class="light-bright" type="range" min="1" max="100" value="' + clampBright(L.brightness || 100) + '" data-id="' + L.id + '" aria-label="Brightness" />'
+            ? '<input class="light-bright" type="range" min="1" max="100" value="' + clampBright(L.brightness || 100) + '" data-id="' + L.id + '" aria-label="Brightness"' + (armedPad ? "" : " disabled") + ' />'
             : "")
           + "</div>"
           + '<div class="light-pad-src">' + hubSrcLabel(eff, g) + "</div>"
@@ -660,23 +700,24 @@
       for (var r = 0; r < eff.reserved.length; r++) {
         var R = eff.reserved[r];
         html +=
-          '<article class="light-pad is-pending" data-light-id="' + R.id + '">'
+          '<article class="light-pad cmd-panel is-pending" data-light-id="' + R.id + '">'
           + '<div class="light-pad-top">'
           + '<div class="light-pad-ico" aria-hidden="true">⏳</div>'
           + '<div><div class="light-pad-name">' + escapeHtml(R.name || R.id) + "</div>"
           + '<div class="light-pad-where">' + escapeHtml(R.where || "pending") + " · fold-in</div></div>"
-          + '<div class="light-pad-state">PENDING</div>'
+          + '<div class="light-pad-state cmd-pill cmd-pill--need">NEED CONNECT</div>'
           + "</div>"
           + '<div class="light-pad-actions">'
-          + '<button type="button" class="light-btn" disabled>On</button>'
-          + '<button type="button" class="light-btn" disabled>Off</button>'
+          + '<button type="button" class="cmd-rocker is-stub is-off" disabled aria-label="need connect">'
+          + '<span class="cmd-rocker-knob" aria-hidden="true"></span></button>'
           + "</div>"
-          + '<div class="light-pad-src">reserved · fold-in</div>'
+          + '<div class="light-pad-src">NEED CONNECT · never DEMO</div>'
           + "</article>";
       }
       grid.innerHTML = html;
       bindPadHandlers(grid);
     }
+    paintNeedConnectStubs(doc);
   }
 
   function escapeHtml(s) {
@@ -694,13 +735,19 @@
     grid.setAttribute("data-lights-bound", "1");
     grid.onclick = function (ev) {
       var t = ev.target;
-      if (!t || !t.getAttribute) return;
+      if (!t) return;
+      if (t.classList && t.classList.contains("cmd-rocker-knob") && t.parentElement) t = t.parentElement;
+      if (!t.getAttribute) return;
       var act = t.getAttribute("data-act");
       var id = t.getAttribute("data-id");
       if (!act || !id) return;
       try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
       if (act === "on") setLight(id, { on: true });
-      if (act === "off") setLight(id, { on: false });
+      else if (act === "off") setLight(id, { on: false });
+      else if (act === "toggle") {
+        var wasOn = t.classList && t.classList.contains("is-on");
+        setLight(id, { on: !wasOn });
+      }
       var d0 = grid.ownerDocument || document;
       paintPads(d0); paintHubPanel(d0);
     };
@@ -1204,6 +1251,7 @@
     paintChip: paintChip,
     mountChip: mountChip,
     paintPads: paintPads,
+    paintNeedConnectStubs: paintNeedConnectStubs,
     wireAllButtons: wireAllButtons,
     paintHubPanel: paintHubPanel,
     mountHubPanel: mountHubPanel,

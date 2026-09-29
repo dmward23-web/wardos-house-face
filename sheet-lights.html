@@ -11,18 +11,20 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE · LIGHTS · CONTROL</title>
-<link rel="stylesheet" href="house-engage.css?v=LIGHTS6" />
-<link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=HUBTOK1" />
+<link rel="stylesheet" href="house-engage.css?v=CTRLPANEL1" />
+<link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=CTRLPANEL1" />
+<link rel="stylesheet" href="tokens-ctrlpanel.css?v=CTRLPANEL1" />
 <style>
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Medium.ttf") format("truetype");font-weight:500;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-SemiBold.ttf") format("truetype");font-weight:600;font-style:normal}
   @font-face{font-family:"Inter Display";src:url("fonts/InterDisplay-Bold.ttf") format("truetype");font-weight:700;font-style:normal}
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{width:1080px;min-height:1920px;height:auto;overflow:auto;background:#d8dadf;color:#121418;
+  html,body{width:1080px;min-height:1920px;height:auto;overflow-x:hidden;overflow-y:auto;background:#d8dadf;color:#121418;
     font-family:"Inter Display","Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased;
     -webkit-tap-highlight-color:transparent;touch-action:manipulation}
   .panel{width:1080px;min-height:1920px;height:auto;padding:16px 22px 12px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:visible;
+    --cmd-tap-min:44px;--cmd-bulk-min:48px;--cmd-rocker-w:72px;--cmd-knob:32px;
     background-color:#d8dadf;
     background-image:linear-gradient(165deg,rgba(255,255,255,0.36),rgba(180,184,190,0.18)),url("camo-glass-tile-house.png");
     background-size:auto,420px 420px;background-repeat:no-repeat,repeat}
@@ -38,7 +40,7 @@
   .hdr-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .brand img{height:44px;display:block}
   .back,.nav-week{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:13px;font-weight:800;
-    padding:8px 14px;border-radius:8px;min-height:40px;color:#1a1e24;
+    padding:8px 14px;border-radius:8px;min-height:44px;color:#1a1e24;
     background:#e8ebf0;border:2px solid #2a2e36;box-shadow:0 3px 0 #1a1e24}
   .avatar{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;
     font-size:26px;font-weight:800;color:#fff;background:linear-gradient(145deg,#ffe080,#c87810);
@@ -47,69 +49,47 @@
   .name{font-size:32px;font-weight:800;letter-spacing:-0.05em}
   .name-accent{color:#c87810}
   .tagline{font-size:14px;font-weight:600;color:#4a4e56;margin-top:2px}
-  .status-pill{font-size:13px;font-weight:800;padding:9px 14px;border-radius:8px;
-    background:linear-gradient(180deg,#fff,#d8dce2);border:2px solid #2a2e36;box-shadow:0 3px 0 #1a1e24}
-  .status-pill.on{background:linear-gradient(180deg,#d8f8d8,#80e090);border-color:#287838;color:#104820}
-  .status-pill.off{background:linear-gradient(180deg,#fff0d0,#f0c060);border-color:#8a6010;color:#4a2808}
-
-  .banner{display:flex;border-radius:12px;overflow:hidden;border:3px solid #121418;flex-shrink:0;
-    background:linear-gradient(105deg,#1a1408,#3a2810 40%,#784820 70%,#1a1408);color:#f4f6f8;
-    box-shadow:0 6px 0 #0a0c10,0 12px 28px rgba(0,0,0,0.3)}
-  .banner-accent{width:10px;background:linear-gradient(180deg,#ffe080,#c87810)}
-  .banner-body{padding:12px 18px;flex:1}
-  .banner-lab{font-size:10px;font-weight:800;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,220,140,0.8)}
-  .banner-title{font-size:24px;font-weight:800;letter-spacing:-0.03em;margin-top:2px}
-  .banner-sub{font-size:14px;font-weight:600;color:rgba(230,210,170,0.92);margin-top:2px}
-
-  .bulk{display:flex;gap:10px;flex-wrap:wrap;padding:14px;border-radius:14px;
-    background:rgba(255,255,255,0.9);border:3px solid #2a2e36;box-shadow:0 5px 0 #1a1e24}
-  .bulk-btn{appearance:none;cursor:pointer;flex:1;min-width:160px;min-height:64px;border-radius:12px;
-    font-size:18px;font-weight:800;border:3px solid #121418;
-    background:linear-gradient(180deg,#fff,#d8dce2);color:#1a1e24;box-shadow:0 5px 0 #1a1e24}
-  .bulk-btn.loud{background:linear-gradient(180deg,#ffe080,#e0a020);border-color:#8a6010;box-shadow:0 5px 0 #6a4010}
-  .bulk-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #1a1e24}
-
+  #lights-status-pill.cmd-pill{font-size:11px;min-height:28px;padding:6px 12px}
+  .banner.cmd-panel{padding:14px 16px;gap:6px}
+  .banner .cmd-title{font-size:15px}
+  .banner .banner-title{font-size:22px;font-weight:850;letter-spacing:-0.02em;color:var(--cmd-ink);margin-top:2px}
+  .banner .banner-sub{font-size:13px;font-weight:600;color:var(--cmd-mute);margin-top:2px}
+  .bulk.cmd-panel{flex-direction:row;flex-wrap:wrap;align-items:stretch;padding:12px;gap:10px}
+  .bulk .cmd-chip{flex:1;min-width:160px;min-height:48px;height:auto;font-size:16px}
   .pad-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .light-pad{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:14px;
-    background:rgba(255,255,255,0.92);border:3px solid #2a2e36;box-shadow:0 5px 0 #1a1e24}
-  .light-pad.is-on{border-color:#8a6010;background:linear-gradient(165deg,#fffaf0,#ffe8b0)}
-  .light-pad.is-pending{opacity:0.78;border-style:dashed}
+  .light-pad.cmd-panel{gap:10px;padding:14px}
+  .light-pad.is-on{border-color:var(--cmd-border-hot)}
+  .light-pad.is-pending{opacity:0.72;border-style:dashed}
   .light-pad-top{display:flex;align-items:center;gap:12px}
   .light-pad-ico{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;
     font-size:24px;background:linear-gradient(145deg,#ffe080,#c87810);border:2px solid #121418;color:#fff;flex-shrink:0}
-  .light-pad-name{font-size:20px;font-weight:800;letter-spacing:-0.02em}
-  .light-pad-where{font-size:12px;font-weight:700;color:#5a5e66;text-transform:uppercase;letter-spacing:0.08em}
-  .light-pad-state{margin-left:auto;font-size:14px;font-weight:900;letter-spacing:0.12em;
-    padding:6px 10px;border-radius:8px;background:#e8ebf0;border:2px solid #2a2e36}
-  .light-pad.is-on .light-pad-state{background:linear-gradient(180deg,#ffe080,#e0a020);border-color:#8a6010}
-  .light-pad-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-  .light-btn{appearance:none;cursor:pointer;padding:12px 16px;min-height:48px;border-radius:10px;font-size:14px;font-weight:800;
-    border:2px solid #2a2e36;background:linear-gradient(180deg,#f4f6f8,#d8dce2);color:#1a1e24;box-shadow:0 3px 0 #1a1e24}
-  .light-btn.loud{background:linear-gradient(180deg,#ffe080,#e0a020);border-color:#8a6010;box-shadow:0 3px 0 #6a4010}
-  .light-btn:disabled{opacity:0.55;cursor:default;pointer-events:none}
-  .light-btn:active:not(:disabled){transform:translateY(2px)}
-  .light-bright{flex:1;min-width:120px;accent-color:#c87810}
-  .light-pad-src{font-size:11px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:#8a909a}
-
-  .connect{padding:16px;border-radius:14px;border:3px solid #2a2e36;background:rgba(255,255,255,0.92);
-    box-shadow:0 5px 0 #1a1e24;display:flex;flex-direction:column;gap:10px}
-  .connect.ok{border-color:#287838;background:linear-gradient(165deg,#f0fff0,#d8f0d8)}
-  .connect-title{font-size:18px;font-weight:800;letter-spacing:-0.02em}
-  .connect-sub{font-size:13px;font-weight:650;color:#4a4e56;margin-top:2px}
+  .light-pad-name{font-size:18px;font-weight:800;letter-spacing:-0.02em;color:var(--cmd-ink)}
+  .light-pad-where{font-size:11px;font-weight:700;color:var(--cmd-mute);text-transform:uppercase;letter-spacing:0.08em}
+  .light-pad-state{margin-left:auto;font-size:12px;font-weight:900;letter-spacing:0.12em;
+    padding:6px 10px;border-radius:999px;background:rgba(40,42,48,0.7);border:1px solid rgba(255,200,120,0.3);color:#d8d0c0}
+  .light-pad.is-on .light-pad-state{background:linear-gradient(180deg,rgba(255,220,120,0.35),rgba(200,140,30,0.35));
+    border-color:rgba(255,200,80,0.65);color:#ffe9a0}
+  .light-pad-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .light-bright{flex:1;min-width:120px;accent-color:var(--cmd-amber-on);min-height:44px}
+  .light-pad-src{font-size:10px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--cmd-mute)}
+  .connect.cmd-panel{gap:10px;padding:14px}
+  .connect.ok{border-color:var(--cmd-border-hot)}
+  .connect-title{font-size:16px;font-weight:800;letter-spacing:-0.02em;color:var(--cmd-ink)}
+  .connect-sub{font-size:13px;font-weight:650;color:var(--cmd-mute);margin-top:2px}
   .connect-actions{display:flex;flex-wrap:wrap;gap:8px}
   .cbtn{appearance:none;cursor:pointer;padding:12px 16px;min-height:48px;border-radius:10px;font-size:14px;font-weight:800;
-    border:2px solid #2a2e36;background:linear-gradient(180deg,#f4f6f8,#d8dce2);color:#1a1e24;
-    box-shadow:0 3px 0 #1a1e24;text-decoration:none;display:inline-flex;align-items:center}
-  .cbtn.loud{background:linear-gradient(180deg,#ffe080,#e0a020);border-color:#8a6010;box-shadow:0 3px 0 #6a4010}
-
-  .note{padding:10px 14px;border-radius:10px;background:rgba(40,42,48,0.08);border:2px dashed rgba(40,42,48,0.3);
-    font-size:13px;font-weight:650;color:#3a3e46;flex-shrink:0}
+    border:2px solid rgba(255,255,255,0.14);background:linear-gradient(180deg,#3a3e48,#1e222a);color:#f4f0e8;
+    box-shadow:0 2px 0 #0a0c10,inset 0 1px 0 rgba(255,255,255,0.12);text-decoration:none;display:inline-flex;align-items:center}
+  .cbtn.loud{background:linear-gradient(180deg,#ffe080,#c87810);color:#1a1208;border-color:#8a6010;
+    box-shadow:0 2px 0 #6a4010,inset 0 1px 0 rgba(255,255,255,0.35)}
+  .note{padding:10px 14px;border-radius:10px;background:rgba(8,10,16,0.55);border:1px dashed rgba(255,190,64,0.35);
+    font-size:13px;font-weight:650;color:var(--cmd-mute);flex-shrink:0}
   .ftr{display:flex;justify-content:space-between;font-size:12px;color:#5a5e66;font-weight:600;align-items:center;gap:8px;flex-wrap:wrap}
-  .ftr-chip{padding:6px 10px;border-radius:8px;border:2px solid #2a2e36;background:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;color:inherit}
+  .ftr-chip{padding:8px 12px;min-height:44px;display:inline-flex;align-items:center;border-radius:8px;border:2px solid #2a2e36;background:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;color:inherit}
 </style>
 </head>
 <body>
-<div class="panel">
+<div class="panel lights-cmd">
  <header class="hdr">
  <div class="hdr-left">
  <div class="brand"><img src="wardos-mark-header.png" alt="WardOS" height="44" /></div>
@@ -124,26 +104,27 @@
  </div>
  </div>
  </div>
- <div class="status-pill off" id="lights-status-pill">NEED TOKEN</div>
+ <div class="cmd-pill cmd-pill--need" id="lights-status-pill">NEED TOKEN</div>
  </header>
 
- <section class="banner">
- <div class="banner-accent"></div>
- <div class="banner-body">
- <div class="banner-lab">Lights · not Nest</div>
+ <section class="banner cmd-panel cmd-panel--hot" aria-label="Lights mission">
+ <div class="cmd-hdr">
+ <div class="cmd-title">Lights · not Nest</div>
+ <div class="cmd-meta">Elo · Kasa</div>
+ </div>
  <div class="banner-title">Control tile · LIVE Kasa · write via baked proxy</div>
  <div class="banner-sub">Polls data/lights-live.json · writeProxy baked · no seed link · Elo 3202L</div>
- </div>
  </section>
 
- <section class="bulk" aria-label="All lights">
- <button type="button" class="bulk-btn loud" id="lights-all-on">All on</button>
- <button type="button" class="bulk-btn" id="lights-all-off">All off</button>
+ <section class="bulk cmd-panel" aria-label="All lights">
+ <button type="button" class="cmd-chip cmd-chip--loud" id="lights-all-on">All on</button>
+ <button type="button" class="cmd-chip" id="lights-all-off">All off</button>
  </section>
 
  <section class="pad-grid" id="lights-pad-grid" aria-label="Per-light pads"></section>
+ <section class="pad-grid" id="lights-stub-grid" aria-label="Need connect stubs"></section>
 
- <section class="connect" id="lights-connect" aria-label="Connect lights">
+ <section class="connect cmd-panel" id="lights-connect" aria-label="Connect lights">
  <div>
  <div class="connect-title" id="lights-connect-title">LIVE · Kasa cloud + write proxy</div>
  <div class="connect-sub" id="lights-connect-sub">Reads + writes via data/lights-live.json · writeProxy + token baked · Kasa password box-only · see LIGHTS-LIVE.md</div>
@@ -169,10 +150,10 @@
  <span id="lights-ftr-status">NEED TOKEN</span>
  </footer>
 </div>
-<script src="house-clock.js?v=LIGHTS6"></script>
+<script src="house-clock.js?v=HUBKIT1"></script>
 <script src="house-zoom.js"></script>
-<script src="house-sfx.js"></script>
-<script src="house-lights.js?v=LIGHTDIM1"></script>
+<script src="house-sfx.js?v=CTRLPANEL1"></script>
+<script src="house-lights.js?v=CTRLPANEL1"></script>
 <script>
 (function () {
   var L = window.HouseLights;
@@ -182,8 +163,11 @@
     var g = eff.gate;
     var pill = document.getElementById("lights-status-pill");
     pill.textContent = g.label;
-    pill.classList.toggle("on", !!g.live);
-    pill.classList.toggle("off", !g.live);
+    pill.classList.remove("cmd-pill--live", "cmd-pill--off", "cmd-pill--need", "cmd-pill--stub", "on", "off");
+    pill.classList.add("cmd-pill");
+    if (g.live) pill.classList.add("cmd-pill--live");
+    else if (g.needToken || g.kind === "need_token") pill.classList.add("cmd-pill--need");
+    else pill.classList.add("cmd-pill--off");
     var box = document.getElementById("lights-connect");
     box.classList.toggle("ok", !!g.live);
     var title = document.getElementById("lights-connect-title");
