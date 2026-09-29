@@ -349,9 +349,10 @@
     return strip;
   }
 
-  var LAYOUT_KEY = "wardos.leaveby.layout";
-  var LAYOUTS = ["rail", "who", "peek", "radar", "list"];
+  var LAYOUT_KEY = "wardos.leaveby.layout.v2"; /* SCHEDDAY1 · fresh key so Day is default */
+  var LAYOUTS = ["day", "rail", "who", "peek", "radar", "list"];
   var LAYOUT_LABELS = {
+    day: "Day",
     rail: "Rail",
     who: "Who",
     peek: "Peek",
@@ -364,10 +365,10 @@
 
   function getLayout() {
     try {
-      var v = localStorage.getItem(LAYOUT_KEY) || "list";
+      var v = localStorage.getItem(LAYOUT_KEY) || "day";
       if (LAYOUTS.indexOf(v) >= 0) return v;
     } catch (e) { /* private mode */ }
-    return "list";
+    return "day";
   }
 
   function syncChipUI(id) {
@@ -385,7 +386,7 @@
   }
 
   function setLayout(id) {
-    if (LAYOUTS.indexOf(id) < 0) id = "list";
+    if (LAYOUTS.indexOf(id) < 0) id = "day";
     try { localStorage.setItem(LAYOUT_KEY, id); } catch (e2) { /* ignore */ }
     syncChipUI(id);
     if (_lastStrip && _lastClock) paintLayouts(_lastStrip, _lastClock, id);
@@ -772,6 +773,166 @@
     return html;
   }
 
+  /* SCHEDDAY1 · glance layout: Morning / Afternoon / Evening columns,
+     big time per stop, kid color tags, prep folded into the next leave */
+  var DAY_CSS = [
+    ".lb-day{display:flex;flex-direction:column;gap:8px}",
+    ".lb-day-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}",
+    ".lb-day-col{background:rgba(255,255,255,.04);border:1px solid rgba(255,224,128,.14);border-radius:12px;padding:6px 7px;min-width:0}",
+    ".lb-day-col.is-past{opacity:.35}",
+    ".lb-day-col.is-now{border-color:rgba(255,224,128,.55);box-shadow:0 0 18px rgba(255,180,30,.18)}",
+    ".lb-day-part{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#ffe080;margin:0 0 4px}",
+    ".lb-day-stop{display:flex;flex-direction:column;padding:4px 0 5px;border-top:1px solid rgba(255,255,255,.07)}",
+    ".lb-day-stop:first-of-type{border-top:0}",
+    ".lb-day-t{font-size:20px;font-weight:900;letter-spacing:-.04em;line-height:1;color:#f2eee6}",
+    ".lb-day-stop.is-next .lb-day-t{color:#ffe080;text-shadow:0 0 16px rgba(255,180,30,.5)}",
+    ".lb-day-what{font-size:12px;font-weight:700;color:#e8e2d6;line-height:1.2;margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}",
+    ".lb-day-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}",
+    ".lb-day-tag{font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:1px 5px;border-radius:6px;background:rgba(255,255,255,.1);color:#f2eee6}",
+    ".lb-day-tag[data-who=Ainsley]{background:rgba(236,72,153,.28);color:#ffd1e8}",
+    ".lb-day-tag[data-who=Hayes]{background:rgba(56,152,255,.28);color:#cfe6ff}",
+    ".lb-day-tag[data-who=Harris]{background:rgba(52,199,120,.28);color:#c9f5dc}",
+    ".lb-day-tag[data-who=Dan]{background:rgba(255,224,128,.18);color:#ffe9a8}",
+    ".lb-day-prep{font-size:10px;color:#bdb6a8;margin-top:2px}",
+    ".lb-day-none{font-size:11px;color:#8d877c;padding:4px 0}",
+    ".lb-day-tmr{display:flex;flex-wrap:wrap;align-items:center;gap:5px;font-size:11px;color:#d8d2c6}",
+    ".lb-day-tmr b{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#ffe080;margin-right:2px}",
+    ".lb-day-tchip{background:rgba(255,255,255,.06);border-radius:8px;padding:2px 7px;white-space:nowrap}",
+    ".lb-day-tchip strong{color:#f2eee6;margin-right:4px}"
+  ].join("\n");
+
+  function ensureDayCss() {
+    if (document.getElementById("sched-day1")) return;
+    var st = document.createElement("style");
+    st.id = "sched-day1";
+    st.textContent = DAY_CSS;
+    document.head.appendChild(st);
+  }
+
+  var PREP_RE = /^\s*(?:[A-Za-z+ ]+[—-]\s*)?(?:pack|snacks?|get|buy|bring|remind)\b/i;
+  function isPrep(ev) {
+    var s = String((ev && ev.summary) || "");
+    return PREP_RE.test(s.replace(/^(?:Hayes|Harris|Ainsley|Boys|Dan)(?:\s*\+\s*\w+)?\s*[—-]\s*/i, ""));
+  }
+
+  function ctHour(iso) {
+    var t = clockTimeFromIso(iso) || "";
+    var m = /^(\d{1,2}):(\d{2})\s*([AP])M/i.exec(t);
+    if (!m) return null;
+    var h = parseInt(m[1], 10) % 12;
+    if (/p/i.test(m[3])) h += 12;
+    return h + parseInt(m[2], 10) / 60;
+  }
+
+  function nowCtHour() {
+    return ctHour(new Date().toISOString());
+  }
+
+  function dayTitle(ev) {
+    var s = shortPlace(ev.summary || ev.place || "");
+    /* drop leading kid names — the tags carry who */
+    var out = s.replace(/^(?:(?:Hayes|Harris|Ainsley|Boys|Dan)\s*(?:\+\s*)?)+\s*[—-]\s*/i, "") || s;
+    /* time is already big on the left · drop echoed "leave 5:40 · 6:00" / "· 8:25" tails and Free/HOLD chrome */
+    out = out.replace(/\s*·\s*leave\s+\d{1,2}:\d{2}.*$/i, "")
+      .replace(/^Free\s*[·—-]\s*/i, "")
+      .replace(/\s*·\s*HOLD\b.*$/i, "");
+    return out || s;
+  }
+
+  function shortTime(iso) {
+    var t = clockTimeFromIso(iso) || "—";
+    return t.replace(/\s*([AP])M$/i, function (_, ap) { return ap.toLowerCase(); });
+  }
+
+  function stopHtml(ev, isNext, prepList) {
+    var who = whoNames(ev);
+    var tags = "";
+    for (var i = 0; i < who.length; i++) {
+      tags += '<span class="lb-day-tag" data-who="' + esc(who[i]) + '">' + esc(who[i]) + "</span>";
+    }
+    var prep = "";
+    if (prepList && prepList.length) {
+      prep = '<div class="lb-day-prep">Before: ' + esc(prepList.map(dayTitle).join(" · ")) + "</div>";
+    }
+    return '<div class="lb-day-stop' + (isNext ? " is-next" : "") + '">' +
+      '<span class="lb-day-t">' + esc(ev.allDay ? "All day" : shortTime(ev.start)) + "</span>" +
+      '<span class="lb-day-what">' + esc(dayTitle(ev)) + "</span>" +
+      '<div class="lb-day-tags">' + tags + "</div>" + prep + "</div>";
+  }
+
+  function layoutDay(strip) {
+    ensureDayCss();
+    if (strip && strip._stale) {
+      return '<div class="lb-layout lb-day"><div class="lb-empty">CAL STALE</div></div>';
+    }
+    var today = ((strip && strip.today) || []).slice();
+    var parts = [
+      { key: "am", label: "Morning", from: 0, to: 12, items: [] },
+      { key: "pm", label: "Afternoon", from: 12, to: 17, items: [] },
+      { key: "eve", label: "Evening", from: 17, to: 24, items: [] }
+    ];
+    /* fold prep rows into the next real stop */
+    var pending = [];
+    var stops = [];
+    for (var i = 0; i < today.length; i++) {
+      var ev = today[i];
+      if (!ev.allDay && isPrep(ev)) { pending.push(ev); continue; }
+      stops.push({ ev: ev, prep: pending });
+      pending = [];
+    }
+    if (pending.length) {
+      for (var k = 0; k < pending.length; k++) stops.push({ ev: pending[k], prep: [] });
+    }
+    var nextSet = false;
+    for (var j = 0; j < stops.length; j++) {
+      var h = stops[j].ev.allDay ? 0 : ctHour(stops[j].ev.start);
+      if (h == null) h = 0;
+      for (var p = 0; p < parts.length; p++) {
+        if (h >= parts[p].from && h < parts[p].to) { parts[p].items.push(stops[j]); break; }
+      }
+    }
+    for (var ps = 0; ps < parts.length; ps++) {
+      parts[ps].items.sort(function (a, b) {
+        if (a.ev.allDay !== b.ev.allDay) return a.ev.allDay ? -1 : 1;
+        return eventStartMs(a.ev) - eventStartMs(b.ev);
+      });
+    }
+    var nowH = nowCtHour();
+    var html = '<div class="lb-layout lb-day" aria-label="Today at a glance"><div class="lb-day-cols">';
+    for (var q = 0; q < parts.length; q++) {
+      var part = parts[q];
+      var cls = "lb-day-col";
+      if (nowH != null && nowH >= part.to && !part.items.length) cls += " is-past";
+      if (nowH != null && nowH >= part.from && nowH < part.to) cls += " is-now";
+      html += '<div class="' + cls + '"><div class="lb-day-part">' + part.label + "</div>";
+      if (!part.items.length) {
+        html += '<div class="lb-day-none">' + (nowH != null && nowH >= part.to ? "Done" : "Open") + "</div>";
+      }
+      for (var r = 0; r < part.items.length; r++) {
+        var isNext = !nextSet && !part.items[r].ev.allDay;
+        if (isNext) nextSet = true;
+        html += stopHtml(part.items[r].ev, isNext, part.items[r].prep);
+      }
+      html += "</div>";
+    }
+    html += "</div>";
+    var tmr = (strip && strip.tomorrow) || { items: [], dow: "" };
+    html += '<div class="lb-day-tmr"><b>' + esc(tmr.dow ? ("Tmr " + tmr.dow) : "Tomorrow") + "</b>";
+    var tItems = (tmr.items || []).filter(function (e) { return e.allDay || !isPrep(e); });
+    if (!tItems.length) {
+      html += '<span class="lb-day-tchip">Clear</span>';
+    } else {
+      var showT = preferKidItems(tItems, 6);
+      for (var t = 0; t < showT.length; t++) {
+        var e2 = showT[t];
+        html += '<span class="lb-day-tchip"><strong>' + esc(e2.allDay ? "Day" : shortTime(e2.start)) + "</strong>" +
+          esc(dayTitle(e2)) + "</span>";
+      }
+    }
+    html += "</div></div>";
+    return html;
+  }
+
   function paintLayouts(strip, clock, mode) {
     var el = document.querySelector("[data-live='leaveby-layouts']");
     if (!el) {
@@ -780,7 +941,8 @@
     }
     mode = mode || getLayout();
     var html;
-    if (mode === "rail") html = layoutRail(strip);
+    if (mode === "day") html = layoutDay(strip);
+    else if (mode === "rail") html = layoutRail(strip);
     else if (mode === "who") html = layoutWho(strip);
     else if (mode === "peek") html = layoutPeek(strip);
     else if (mode === "radar") html = layoutRadar(strip);

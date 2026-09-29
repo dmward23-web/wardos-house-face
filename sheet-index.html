@@ -4054,7 +4054,7 @@
  </div>
 
  <div class="hub-upper hub-upper--cams hub-upper--cmd hub-upper--hot">
- <section class="leaveby leaveby--cmd leaveby--hot" data-layout="list" aria-label="Schedule · today and tomorrow">
+ <section class="leaveby leaveby--cmd leaveby--hot" data-layout="day" aria-label="Schedule · today and tomorrow">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
  <div class="leaveby-head" hidden aria-hidden="true">
@@ -4063,16 +4063,17 @@
  </div>
  <div class="leaveby-main" data-live="leaveby-main"><span class="leaveby-dest">NEXT UP</span></div>
  <div class="leaveby-switch" data-live="leaveby-switch">
-  <span class="leaveby-mode-label" data-live="leaveby-mode">List</span>
+  <span class="leaveby-mode-label" data-live="leaveby-mode">Day</span>
  <div class="leaveby-chips" role="tablist" aria-label="Schedule layout">
+ <button type="button" class="leaveby-chip is-on" role="tab" data-layout="day" aria-selected="true">Day</button>
  <button type="button" class="leaveby-chip" role="tab" data-layout="rail" aria-selected="false">Rail</button>
  <button type="button" class="leaveby-chip" role="tab" data-layout="who" aria-selected="false">Who</button>
  <button type="button" class="leaveby-chip" role="tab" data-layout="peek" aria-selected="false">Peek</button>
  <button type="button" class="leaveby-chip" role="tab" data-layout="radar" aria-selected="false">Radar</button>
- <button type="button" class="leaveby-chip is-on" role="tab" data-layout="list" aria-selected="true">List</button>
+ <button type="button" class="leaveby-chip" role="tab" data-layout="list" aria-selected="false">List</button>
  </div>
  </div>
- <div class="leaveby-layouts" data-live="leaveby-layouts" data-layout="list"></div>
+ <div class="leaveby-layouts" data-live="leaveby-layouts" data-layout="day"></div>
  <div class="leaveby-sched" data-live="leaveby-sched" hidden aria-hidden="true">
  <div class="leaveby-sec leaveby-sec--today">
  <div class="leaveby-sec-hdr" hidden>Remaining today</div>
@@ -4323,7 +4324,7 @@
  </footer>
 </div>
 <script src="house-clock.js?v=INDEXCLK1"></script>
-<script src="house-board-strip.js?v=HUBSCROLL1"></script>
+<script src="house-board-strip.js?v=SCHEDDAY1"></script>
 <script src="house-weather.js?v=CAMDECK1"></script>
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
 <script src="kids-data.js?v=KIDCHORES1"></script>
