@@ -478,6 +478,176 @@
     });
   }
 
+
+  /* ── CAMDECK1 · hub still tiles (Front / Garage / Backyard only) ── */
+  var HUB_CAMS = [
+    {
+      key: "front",
+      label: "Front door",
+      snap: "data/nest-snaps/front-door.jpg",
+      match: /front|door|doorbell/i
+    },
+    {
+      key: "garage",
+      label: "Garage",
+      snap: "data/nest-snaps/garage.jpg",
+      match: /garage/i
+    },
+    {
+      key: "backyard",
+      label: "Backyard",
+      snap: "data/nest-snaps/backyard.jpg",
+      match: /backyard|yard|patio/i
+    }
+  ];
+
+  var SNAP_FRESH_MS = 30 * 60 * 1000;
+
+  function findCamForHub(slot, cams) {
+    cams = cams || [];
+    for (var i = 0; i < cams.length; i++) {
+      var c = cams[i];
+      if (!c) continue;
+      var blob = String((c.name || "") + " " + (c.where || ""));
+      if (slot.match.test(blob)) return c;
+    }
+    return null;
+  }
+
+  /**
+   * Honest pill for a hub still tile.
+   * LIVE = nest status live + snap file present + snapCapturedAt (or nest fetchedAt) fresh.
+   * STALE = snap present but aging. NEED TOKEN / STUB / NEED PROXY otherwise.
+   * Never invent video. Never silent black.
+   */
+  function hubCamHonesty(slot, cam, g, data) {
+    if (g && g.needToken) {
+      return { pill: "NEED TOKEN", cls: "hub-cam-stub", pillCls: "is-need", kind: "need" };
+    }
+    if (!g || !g.live) {
+      return { pill: g && g.label ? g.label : "STUB", cls: "hub-cam-stub", pillCls: "is-stub", kind: "stub" };
+    }
+    var snapUrl = (cam && cam.snapshotUrl) || (slot && slot.snap) || null;
+    if (!snapUrl) {
+      return { pill: "NEED PROXY", cls: "hub-cam-stub", pillCls: "is-need", kind: "need" };
+    }
+    var captured = 0;
+    if (cam && cam.snapCapturedAt) captured = parseUpdatedAt(cam.snapCapturedAt);
+    if (!captured && data) captured = parseUpdatedAt(data.fetchedAt || data.updatedAt);
+    var age = captured ? Date.now() - captured : Infinity;
+    if (!Number.isFinite(age) || age > SNAP_FRESH_MS) {
+      return {
+        pill: "STALE",
+        cls: "hub-cam-stale",
+        pillCls: "is-stale",
+        kind: "stale",
+        snapUrl: snapUrl
+      };
+    }
+    return {
+      pill: "LIVE",
+      cls: "hub-cam-live",
+      pillCls: "is-live",
+      kind: "live",
+      snapUrl: snapUrl
+    };
+  }
+
+  function paintHubCamDeck(doc) {
+    doc = doc || document;
+    var deck = doc.getElementById("hub-cam-deck");
+    if (!deck) return;
+    var data = cachedData();
+    var g = gate(data);
+    var cams = (data && data.cameras) || [];
+    var tiles = deck.querySelectorAll(".hub-cam");
+    for (var i = 0; i < HUB_CAMS.length; i++) {
+      var slot = HUB_CAMS[i];
+      var el = tiles[i] || null;
+      if (!el) continue;
+      var cam = findCamForHub(slot, cams);
+      var h = hubCamHonesty(slot, cam, g, data);
+      el.classList.remove("hub-cam-live", "hub-cam-stale", "hub-cam-stub");
+      el.classList.add(h.cls);
+      el.setAttribute("href", "sheet-google-home.html");
+      el.setAttribute("aria-label", slot.label + " camera · " + h.pill);
+
+      var pill = el.querySelector(".hub-cam-pill");
+      if (pill) {
+        pill.textContent = h.pill;
+        pill.classList.remove("is-live", "is-stale", "is-stub", "is-need");
+        pill.classList.add(h.pillCls);
+      }
+      var label = el.querySelector(".hub-cam-label");
+      if (label) label.textContent = slot.label;
+
+      var mediaWrap = el.querySelector(".hub-cam-media-wrap");
+      var img = el.querySelector("img.hub-cam-media");
+      var voidEl = el.querySelector(".hub-cam-stub-void");
+      /* Prefer real still path; fall back to known NESTSTILL1 slot file so wall never goes black */
+      var snapUrl = h.snapUrl || slot.snap || null;
+      var showStill = !!snapUrl;
+
+      if (showStill) {
+        if (!img && mediaWrap) {
+          img = doc.createElement("img");
+          img.className = "hub-cam-media";
+          img.alt = slot.label + " still";
+          mediaWrap.insertBefore(img, mediaWrap.firstChild);
+        }
+        if (img) {
+          var bust = snapUrl + (snapUrl.indexOf("?") >= 0 ? "&" : "?") + "v=CAMDECK1";
+          if (img.getAttribute("src") !== bust) img.setAttribute("src", bust);
+          img.style.display = "block";
+          img.onerror = (function (wrap, image) {
+            return function () {
+              image.style.display = "none";
+              if (wrap && !wrap.querySelector(".hub-cam-stub-void")) {
+                var v = doc.createElement("div");
+                v.className = "hub-cam-media hub-cam-stub-void";
+                v.setAttribute("aria-hidden", "true");
+                wrap.insertBefore(v, wrap.firstChild);
+              }
+              var p = wrap && wrap.parentNode && wrap.parentNode.querySelector(".hub-cam-pill");
+              if (p) {
+                p.textContent = "NEED PROXY";
+                p.classList.remove("is-live", "is-stale", "is-stub");
+                p.classList.add("is-need");
+              }
+              if (wrap && wrap.parentNode) {
+                wrap.parentNode.classList.remove("hub-cam-live", "hub-cam-stale");
+                wrap.parentNode.classList.add("hub-cam-stub");
+              }
+            };
+          })(mediaWrap, img);
+        }
+        if (voidEl) voidEl.style.display = "none";
+      } else {
+        if (img) img.style.display = "none";
+        if (!voidEl && mediaWrap) {
+          voidEl = doc.createElement("div");
+          voidEl.className = "hub-cam-media hub-cam-stub-void";
+          voidEl.setAttribute("aria-hidden", "true");
+          mediaWrap.insertBefore(voidEl, mediaWrap.firstChild);
+        }
+        if (voidEl) voidEl.style.display = "block";
+      }
+    }
+  }
+
+  function mountHubCamDeck(selector) {
+    var el =
+      typeof selector === "string"
+        ? document.querySelector(selector)
+        : selector || document.getElementById("hub-cam-deck");
+    if (!el) return;
+    paintHubCamDeck(el.ownerDocument || document);
+    onChange(function () {
+      paintHubCamDeck(el.ownerDocument || document);
+    });
+    startPolling();
+  }
+
   global.HouseNest = {
     gate: function () {
       return gate(cachedData());
@@ -487,6 +657,8 @@
     startPolling: startPolling,
     onChange: onChange,
     paintPads: paintPads,
+    paintHubCamDeck: paintHubCamDeck,
+    mountHubCamDeck: mountHubCamDeck,
     openViewer: openViewer,
     wirePadClicks: wirePadClicks,
     proxyBaseGuess: proxyBaseGuess,

@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="description" content="Board-OS House face · The Ward's mission hub · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
-<link rel="stylesheet" href="house-engage.css?v=HEAT31" />
+<link rel="stylesheet" href="house-engage.css?v=CAMDECK1" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -2862,6 +2862,146 @@
   }
   .hub-lights-more:active { opacity: 0.85; }
 
+
+  /* ═══════════════════════════════════════════════════════════
+     CAMDECK1 · Nest stills above command · compress roster
+     leave-by light-amber hybrid · lights dark glass · Elo 1080×1920
+     ═══════════════════════════════════════════════════════════ */
+  .hub-cam-media-wrap {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    background: #0a0c12;
+  }
+  .hub-cam-media-wrap .hub-cam-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .hub-cam-stub-void {
+    width: 100%;
+    height: 100%;
+    min-height: 120px;
+  }
+  .hub-cam-foot {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    background: linear-gradient(180deg, rgba(8,10,14,0.92), rgba(4,5,8,0.98));
+    border-top: 1px solid rgba(140,220,240,0.18);
+  }
+  .hub-cam-foot .hub-cam-kind {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(140,220,240,0.55);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Geometry locks (override HUBSHIP1 584 / 292) */
+  .panel {
+    gap: 10px !important;
+    padding: 16px 18px 12px !important;
+  }
+  #hub-cam-deck.hub-cam-deck {
+    flex: 0 0 var(--hub-cam-deck-h, 320px) !important;
+    height: var(--hub-cam-deck-h, 320px) !important;
+    min-height: var(--hub-cam-deck-h, 320px) !important;
+    max-height: var(--hub-cam-deck-h, 320px) !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: var(--hub-cam-gap, 10px) !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  .hub-upper.hub-upper--cams {
+    flex: 0 0 var(--hub-command-h, 380px) !important;
+    height: var(--hub-command-h, 380px) !important;
+    min-height: var(--hub-command-h, 380px) !important;
+    max-height: var(--hub-command-h, 380px) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  .hub-upper.hub-upper--cams .leaveby {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: none !important;
+    /* hybrid: light amber pops on dark cam/lights stage */
+    background:
+      linear-gradient(165deg, rgba(255,252,240,0.97) 0%, rgba(255,228,160,0.90) 45%, rgba(245,200,100,0.88) 100%) !important;
+    border: 2.5px solid rgba(180,100,20,0.55) !important;
+    color: #1a1208 !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.95),
+      0 10px 0 rgba(80,50,10,0.18),
+      0 18px 36px rgba(40,20,0,0.28),
+      0 0 48px rgba(255,180,40,0.32) !important;
+  }
+  .hub-upper.hub-upper--cams .leaveby-label { color: #8a5010 !important; }
+  .hub-upper.hub-upper--cams .leaveby-main,
+  .hub-upper.hub-upper--cams .leaveby-row-title { color: #1a1208 !important; }
+  .hub-upper.hub-upper--cams .leaveby-sec-hdr { color: #8a5010 !important; }
+  .hub-upper.hub-upper--cams .leaveby-row { background: rgba(255,255,255,0.35) !important; }
+  .hub-upper.hub-upper--cams .leaveby-row.is-next { background: rgba(255,220,120,0.5) !important; }
+  .hub-upper.hub-upper--cams .leaveby-row-time { color: #8a4010 !important; }
+  .hub-upper.hub-upper--cams .leaveby-body { padding: 10px 12px 8px 10px !important; gap: 6px !important; }
+
+  #hub-lights-panel.hub-lights--cams,
+  .hub-lights.hub-lights--cams {
+    flex: 0 0 var(--hub-lights-w-lock, 350px) !important;
+    width: var(--hub-lights-w-lock, 350px) !important;
+    max-width: var(--hub-lights-w-lock, 350px) !important;
+  }
+  .hub-lights--cams .hub-sw-rocker.is-disabled,
+  .hub-lights--cams .hub-sw-rocker:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .grid-wrap { flex: 1 1 auto !important; min-height: 0 !important; gap: 6px !important; }
+  .grid-hdr.grid-hdr--cams {
+    padding: 0 2px !important;
+    min-height: 0 !important;
+    height: 18px !important;
+    overflow: hidden !important;
+  }
+  .grid-hdr.grid-hdr--cams .grid-title {
+    font-size: 10px !important;
+    letter-spacing: 0.16em !important;
+    opacity: 0.55 !important;
+  }
+  .tile-grid.tile-grid--cams {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-rows: repeat(4, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    justify-content: stretch !important;
+  }
+  .tile-grid.tile-grid--cams .tile {
+    min-height: var(--hub-tile-min-h, 228px) !important;
+    height: auto !important;
+    padding: 8px 10px 8px !important;
+  }
+  .tile-grid.tile-grid--cams .tile-micro .tile-mrow:nth-child(n+3) {
+    display: none !important;
+  }
+  .tile-grid.tile-grid--cams .tile-label { font-size: 17px !important; }
+  .tile-grid.tile-grid--cams .tile-sub { font-size: 11px !important; }
+  .ftr { display: none !important; } /* reclaim bottom pad for Elo no-scroll */
+
   /* LIGHTS2 · Lights oval shares Nest oval language (+ amber need tint) */
   .lights-hdr.is-need {
     border-color: rgba(224,160,64,0.55) !important;
@@ -2874,8 +3014,9 @@
     min-width: 0 !important;
   }
 </style>
-<link rel="stylesheet" href="heat-v3.css?v=DAYTAP1" />
+<link rel="stylesheet" href="heat-v3.css?v=CAMDECK1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
+<link rel="stylesheet" href="tokens-hub-cams.css?v=CAMDECK1" />
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -3144,7 +3285,40 @@
  </div>
  </header>
 
- <div class="hub-upper">
+ <div class="hub-cam-deck" id="hub-cam-deck" aria-label="Nest cameras · stills">
+ <a class="hub-cam hub-cam-stub" href="sheet-google-home.html" aria-label="Front door camera">
+ <div class="hub-cam-media-wrap">
+ <img class="hub-cam-media" src="data/nest-snaps/front-door.jpg?v=CAMDECK1" alt="Front door still"/>
+ <span class="hub-cam-pill hub-cam-pill--corner is-stub">…</span>
+ </div>
+ <div class="hub-cam-foot">
+ <span class="hub-cam-label">Front door</span>
+ <span class="hub-cam-kind">STILL</span>
+ </div>
+ </a>
+ <a class="hub-cam hub-cam-stub" href="sheet-google-home.html" aria-label="Garage camera">
+ <div class="hub-cam-media-wrap">
+ <img class="hub-cam-media" src="data/nest-snaps/garage.jpg?v=CAMDECK1" alt="Garage still"/>
+ <span class="hub-cam-pill hub-cam-pill--corner is-stub">…</span>
+ </div>
+ <div class="hub-cam-foot">
+ <span class="hub-cam-label">Garage</span>
+ <span class="hub-cam-kind">STILL</span>
+ </div>
+ </a>
+ <a class="hub-cam hub-cam-stub" href="sheet-google-home.html" aria-label="Backyard camera">
+ <div class="hub-cam-media-wrap">
+ <img class="hub-cam-media" src="data/nest-snaps/backyard.jpg?v=CAMDECK1" alt="Backyard still"/>
+ <span class="hub-cam-pill hub-cam-pill--corner is-stub">…</span>
+ </div>
+ <div class="hub-cam-foot">
+ <span class="hub-cam-label">Backyard</span>
+ <span class="hub-cam-kind">STILL</span>
+ </div>
+ </a>
+ </div>
+
+ <div class="hub-upper hub-upper--cams">
  <section class="leaveby" aria-label="Schedule · today and tomorrow">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
@@ -3167,7 +3341,7 @@
  <div data-live="asof-warn" hidden style="margin-top:4px;font-size:11px;font-weight:700;letter-spacing:0.04em;color:#b06010;"></div>
  </div>
  </section>
- <section class="hub-lights" id="hub-lights-panel" aria-label="Lights · house switches">
+ <section class="hub-lights hub-lights--cams" id="hub-lights-panel" aria-label="Lights · house switches">
  <div class="hub-lights-head">
  <div class="hub-lights-title">Lights</div>
  <div class="hub-lights-pill off" id="hub-lights-pill">…</div>
@@ -3184,11 +3358,11 @@
 
 
  <div class="grid-wrap">
- <div class="grid-hdr">
+ <div class="grid-hdr grid-hdr--cams">
  <div class="grid-title">Sheet roster</div>
  </div>
 
- <nav class="tile-grid" aria-label="The Ward's sheet index">
+ <nav class="tile-grid tile-grid--cams" aria-label="The Ward's sheet index">
  <a class="tile today" href="sheet-today.html">
  <div class="tile-top">
  <div class="tile-icon g2-mark" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-today"/></svg></div>
@@ -3391,13 +3565,13 @@
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=HUBSHIP1"></script>
-<script src="house-board-strip.js?v=HUBSHIP1"></script>
-<script src="house-weather.js?v=HUBSHIP1"></script>
-<script src="house-sfx.js?v=HUBSHIP1"></script>
-<script src="house-sensi.js?v=HUBSHIP1"></script>
-<script src="house-nest.js?v=HUBSHIP1"></script>
-<script src="house-lights.js?v=LIGHTS4"></script>
+<script src="house-clock.js?v=CAMDECK1"></script>
+<script src="house-board-strip.js?v=CAMDECK1"></script>
+<script src="house-weather.js?v=CAMDECK1"></script>
+<script src="house-sfx.js?v=CAMDECK1"></script>
+<script src="house-sensi.js?v=CAMDECK1"></script>
+<script src="house-nest.js?v=CAMDECK1"></script>
+<script src="house-lights.js?v=LIGHTS5"></script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
@@ -3473,7 +3647,8 @@
  }
  if (N) {
   N.onChange(paintGhomeTile);
-  N.startPolling();
+  if (N.mountHubCamDeck) N.mountHubCamDeck("#hub-cam-deck");
+  else N.startPolling();
  }
  if (L) {
   L.onChange(paintGhomeTile);
