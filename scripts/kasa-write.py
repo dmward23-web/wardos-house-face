@@ -25,6 +25,22 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+
+def _stable_term_id() -> str:
+    """TPLINKQUIET1: reuse one terminal UUID so TP-Link stops mailing 'New Login' alerts."""
+    import uuid
+    p = Path(os.environ.get("HOME", "")) / ".config" / "wardos" / "kasa.term_id"
+    try:
+        v = p.read_text().strip()
+        if v:
+            return v
+    except OSError:
+        pass
+    v = str(uuid.uuid4())
+    p.write_text(v + "\n")
+    os.chmod(p, 0o600)
+    return v
+
 ROSTER = [
     {
         "id": "dining-room",
@@ -226,7 +242,7 @@ async def run(args) -> dict:
     username, password = creds
     from tplinkcloud import TPLinkDeviceManager
 
-    manager = TPLinkDeviceManager(username, password)
+    manager = TPLinkDeviceManager(username, password, term_id=_stable_term_id())
 
     targets: list[tuple[str, bool | None, int | None]] = []
     if args.all_on:

@@ -30,6 +30,22 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+
+def _stable_term_id() -> str:
+    """TPLINKQUIET1: reuse one terminal UUID so TP-Link stops mailing 'New Login' alerts."""
+    import uuid
+    p = Path(os.environ.get("HOME", "")) / ".config" / "wardos" / "kasa.term_id"
+    try:
+        v = p.read_text().strip()
+        if v:
+            return v
+    except OSError:
+        pass
+    v = str(uuid.uuid4())
+    p.write_text(v + "\n")
+    os.chmod(p, 0o600)
+    return v
+
 ROSTER = [
     {
         "id": "dining-room",
@@ -196,7 +212,8 @@ async def probe_cloud(username: str, password: str) -> dict:
 
     try:
         manager = TPLinkDeviceManager(
-            username, password, prefetch=False, include_tapo=False
+            username, password, prefetch=False, include_tapo=False,
+            term_id=_stable_term_id(),
         )
     except TPLinkMFARequiredError as e:
         return {
