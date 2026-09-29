@@ -5,8 +5,8 @@
   var LAT = 38.884;
   var LON = -94.671;
   var PLACE = "Overland Park · 147th";
-  var CACHE_KEY = "house-wx:v2";
-  var CACHE_MS = 20 * 60 * 1000;
+  var CACHE_KEY = "house-wx:v3";
+  var CACHE_MS = 10 * 60 * 1000;
 
   var WMO = {
     0: ["Clear", "☀"], 1: ["Mostly clear", "☀"], 2: ["Partly cloudy", "⛅"],
@@ -81,6 +81,7 @@
         low: Math.round(j.daily.temperature_2m_min[0]),
         rain: rainOutlook(j.hourly, j.current && j.current.time),
         place: PLACE,
+        code: code,
         source: "open-meteo"
       };
     });
@@ -105,10 +106,43 @@
     });
   }
 
+  /* RAINNOW1 · the forecast model misses a storm that's already here. Check the
+   * real weather station (NWS, Johnson County Executive airport, a few miles
+   * from 147th) and trust it for "is it raining right now". */
+  var OBS_URL = "https://api.weather.gov/stations/KOJC/observations/latest";
+  function fromObs() {
+    return fetch(OBS_URL, { cache: "no-store", headers: { Accept: "application/geo+json" } }).then(function (r) {
+      if (!r.ok) throw new Error("obs " + r.status);
+      return r.json();
+    }).then(function (j) {
+      var p = j && j.properties;
+      if (!p || !p.timestamp) return null;
+      if (Date.now() - Date.parse(p.timestamp) > 100 * 60 * 1000) return null;
+      var txt = String(p.textDescription || "");
+      var c = p.temperature && p.temperature.value;
+      return { text: txt, tempF: c == null ? null : Math.round(c * 9 / 5 + 32) };
+    }).catch(function () { return null; });
+  }
+  function rainyText(t) { return /rain|shower|thunder|storm|drizzle/i.test(t || ""); }
+  function mergeObs(d, obs, omCode) {
+    var nowWet = (obs && rainyText(obs.text)) || (omCode >= 51 && omCode < 70) || omCode >= 80;
+    if (obs && obs.text) {
+      d.condition = obs.text.replace(/^Light /, "Light ").slice(0, 22);
+      if (rainyText(obs.text)) d.icon = /thunder|storm/i.test(obs.text) ? "⛈" : "🌧";
+    }
+    if (obs && obs.tempF != null) d.temp = obs.tempF;
+    if (nowWet) {
+      var later = d.rain && d.rain.wet && / now/.test(d.rain.text) ? d.rain.text.replace(/^Rain now/, "Raining now") : "Raining now";
+      d.rain = { text: later, wet: true };
+    }
+    return d;
+  }
+
   function load(cb) {
     var cached = readCache();
     if (cached) { cb(null, cached); return; }
-    fromOpenMeteo().then(function (d) {
+    Promise.all([fromOpenMeteo(), fromObs()]).then(function (res) {
+      var d = mergeObs(res[0], res[1], res[0].code);
       writeCache(d); cb(null, d);
     }).catch(function () {
       return fromWttr().then(function (d) {
