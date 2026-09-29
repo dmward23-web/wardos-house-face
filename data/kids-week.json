@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-29T20:16:10.883Z",
+  "refreshedAt": "2026-09-29T20:35:16.226Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,31 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "3:15",
-    "place": "Boys SRE pickup",
-    "detailHtml": "4:25 Ainsley swim — Coach Ann · 4:30 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "time": "4:25",
+    "place": "Ainsley swim — Coach Ann",
+    "detailHtml": "4:30 leave · 6:00 Hayes flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Tue",
-    "startIso": "2026-09-29T20:15:00.000Z",
-    "endIso": "2026-09-29T21:00:00.000Z",
-    "kind": "school_pickup",
+    "startIso": "2026-09-29T21:25:00.000Z",
+    "endIso": "2026-09-29T23:20:00.000Z",
+    "kind": "sport",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "3:15",
-        "place": "Boys SRE pickup",
-        "detailHtml": "4:25 Ainsley swim — Coach Ann · 4:30 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-09-29T20:15:00.000Z",
-        "endIso": "2026-09-29T21:00:00.000Z",
-        "kind": "school_pickup",
-        "whenLabel": "3:15",
-        "summary": "Hayes + Harris — SRE pickup · 3:40"
-      },
       {
         "label": "Next up · today",
         "time": "4:25",
         "place": "Ainsley swim — Coach Ann",
-        "detailHtml": "3:15 boys pickup · 4:30 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "4:30 leave · 6:00 Hayes flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T21:25:00.000Z",
         "endIso": "2026-09-29T23:20:00.000Z",
@@ -53,7 +41,7 @@
         "label": "Next up · today",
         "time": "4:30",
         "place": "Drop Hayes at Maria's · ~4:30 (on way to swim)",
-        "detailHtml": "3:15 boys pickup · 4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "4:25 Ainsley swim — Coach Ann · 6:00 Hayes flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T21:30:00.000Z",
         "endIso": "2026-09-29T21:35:00.000Z",
@@ -65,7 +53,7 @@
         "label": "Next up · today",
         "time": "6:00",
         "place": "Hayes flag practice · 6:00 · Maria drives",
-        "detailHtml": "3:15 boys pickup · 4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "4:25 Ainsley swim — Coach Ann · 4:30 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T23:00:00.000Z",
         "endIso": "2026-09-30T00:15:00.000Z",
@@ -77,7 +65,7 @@
         "label": "Next up · today",
         "time": "6:55",
         "place": "Pick up Hayes + Theo from flag",
-        "detailHtml": "3:15 boys pickup · 4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "4:25 Ainsley swim — Coach Ann · 4:30 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Tue",
         "startIso": "2026-09-29T23:55:00.000Z",
         "endIso": "2026-09-30T00:45:00.000Z",
@@ -168,6 +156,18 @@
         "kind": "sport",
         "whenLabel": "Wed 4:55",
         "summary": "Harris flag practice"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "7:00",
+        "place": "SRE PE (tennis shoes)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-01T12:00:00.000Z",
+        "endIso": "2026-10-01T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Thu 7:00",
+        "summary": "Harris — SRE PE (tennis shoes)"
       }
     ]
   },
