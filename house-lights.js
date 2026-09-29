@@ -32,6 +32,7 @@
   var _proxyReachable = null; /* null unknown · true/false after probe */
   var _proxyProbeAt = 0;
   var _writeInFlight = 0;
+  var _dimDrag = null; /* {id, bright, writing} · preserve fill mid-drag */
 
   function parseUpdatedAt(iso) {
     if (!iso) return 0;
@@ -845,6 +846,7 @@
     doc = doc || document;
     var panel = doc.getElementById("hub-lights-panel");
     if (!panel) return;
+    if (_dimDrag) return; /* don't wipe mid-drag fill */
     var deck = hubDeckLights();
     var g = deck.gate;
     panel.classList.toggle("is-live", !!g.live);
@@ -895,16 +897,38 @@
       if (L.on == null) onCls = " is-off is-unknown";
       var dim = (L.kind === "dimmer" || L.kind === "switch/dimmer");
       var bright = L.brightness != null ? clampBright(L.brightness) : (L.on ? 100 : 0);
-      var meta = L.on == null ? "…" : ((L.on ? "ON" : "OFF") + (dim ? (" · " + bright + "%") : ""));
+      /* Mid-drag: keep the fill the user is holding, not a stale poll. */
+      if (_dimDrag && _dimDrag.id === L.id && typeof _dimDrag.bright === "number") {
+        bright = clampBright(_dimDrag.bright);
+      }
+      var meta = L.on == null ? "…" : (L.on ? "ON" : "OFF");
       var writable = canWrite() && !L.disabled;
+      var dimCls = dim ? " hub-sw--dim" : " hub-sw--toggle";
       html +=
-        '<article class="hub-sw hub-sw--live' + onCls + '" data-light-id="' + L.id + '">'
+        '<article class="hub-sw hub-sw--live' + dimCls + onCls + '" data-light-id="' + L.id + '">'
         + '<div class="hub-sw-main">'
         + '<div class="hub-sw-text">'
         + '<div class="hub-sw-name">' + escapeHtml(hubName) + "</div>"
         + '<div class="hub-sw-meta">' + meta + "</div>"
-        + "</div>"
-        + '<button type="button" class="hub-sw-rocker' + onCls + (writable ? "" : " is-disabled") + '" data-act="toggle" data-id="'
+        + "</div>";
+      if (dim) {
+        /* Premium fill · tap rocker = on/off · drag track = brightness. Stubs never get this. */
+        var fillPct = L.on ? bright : 0;
+        var showPct = (L.on == null) ? "—" : (bright + "%");
+        html +=
+          '<div class="hub-sw-dim' + (writable ? "" : " is-disabled") + '" data-id="' + L.id + '">'
+          + '<div class="hub-sw-track" role="slider" tabindex="' + (writable ? "0" : "-1") + '"'
+          + ' aria-valuemin="1" aria-valuemax="100" aria-valuenow="' + bright + '"'
+          + ' aria-label="' + escapeHtml(L.name) + ' brightness"'
+          + ' data-id="' + L.id + '"' + (writable ? "" : " aria-disabled=\"true\"") + '>'
+          + '<div class="hub-sw-fill" style="width:' + fillPct + '%" aria-hidden="true"></div>'
+          + '<div class="hub-sw-thumb" style="left:' + fillPct + '%" aria-hidden="true"></div>'
+          + "</div>"
+          + '<span class="hub-sw-pct" data-pct-for="' + L.id + '">' + showPct + "</span>"
+          + "</div>";
+      }
+      html +=
+        '<button type="button" class="hub-sw-rocker' + onCls + (writable ? "" : " is-disabled") + '" data-act="toggle" data-id="'
         + L.id + '" aria-pressed="' + (L.on ? "true" : "false") + '" aria-label="'
         + escapeHtml(L.name) + ' power"' + (writable ? "" : " disabled") + '>'
         + '<span class="hub-sw-rocker-on">ON</span>'
@@ -918,12 +942,53 @@
     bindHubHandlers(panel);
   }
 
+  function brightFromPointer(track, clientX) {
+    if (!track) return 50;
+    var rect = track.getBoundingClientRect();
+    var w = rect.width || 1;
+    var x = clientX - rect.left;
+    var pct = Math.round((x / w) * 100);
+    return clampBright(Math.max(1, pct)); /* HS220 native 1–100 */
+  }
+
+  function paintDimVisual(panel, id, bright, on) {
+    if (!panel || !id) return;
+    bright = clampBright(bright);
+    var fillPct = on === false ? 0 : bright;
+    var track = panel.querySelector('.hub-sw-track[data-id="' + id + '"]');
+    if (track) {
+      track.setAttribute("aria-valuenow", String(bright));
+      var fill = track.querySelector(".hub-sw-fill");
+      var thumb = track.querySelector(".hub-sw-thumb");
+      if (fill) fill.style.width = fillPct + "%";
+      if (thumb) thumb.style.left = fillPct + "%";
+    }
+    var pct = panel.querySelector('[data-pct-for="' + id + '"]');
+    if (pct) pct.textContent = bright + "%";
+    var art = panel.querySelector('.hub-sw[data-light-id="' + id + '"]');
+    if (art && on !== undefined && on !== null) {
+      art.classList.toggle("is-on", !!on);
+      art.classList.toggle("is-off", !on);
+    }
+  }
+
+  function commitDim(id, bright, panel) {
+    bright = clampBright(Math.max(1, bright));
+    _dimDrag = null;
+    setLight(id, { on: true, brightness: bright });
+    paintHubPanel(panel.ownerDocument || document);
+    paintPads(panel.ownerDocument || document);
+    paintChip((panel.ownerDocument || document).getElementById("index-lights-chip"));
+  }
+
   function bindHubHandlers(panel) {
     if (!panel) return;
     panel.setAttribute("data-hub-lights-bound", "1");
     panel.onclick = function (ev) {
       var t = ev.target;
       if (!t) return;
+      /* Ignore clicks that originated on the dim track (pointer handlers own those). */
+      if (t.closest && t.closest(".hub-sw-track, .hub-sw-dim")) return;
       var btn = t.closest ? t.closest("[data-act]") : null;
       if (!btn) {
         while (t && t !== panel && !(t.getAttribute && t.getAttribute("data-act"))) t = t.parentNode;
@@ -954,6 +1019,70 @@
       paintPads(panel.ownerDocument || document);
       paintChip((panel.ownerDocument || document).getElementById("index-lights-chip"));
     };
+
+    /* LIGHTDIM1 · premium fill drag (pointer) · write on release · optimistic mid-drag */
+    panel.onpointerdown = function (ev) {
+      var t = ev.target;
+      if (!t || !t.closest) return;
+      var track = t.closest(".hub-sw-track");
+      if (!track || track.getAttribute("aria-disabled") === "true") return;
+      var id = track.getAttribute("data-id");
+      if (!id) return;
+      if (!canWrite()) { probeProxy(); return; }
+      ev.preventDefault();
+      ev.stopPropagation();
+      try { track.setPointerCapture(ev.pointerId); } catch (e) {}
+      var bright = brightFromPointer(track, ev.clientX);
+      _dimDrag = { id: id, bright: bright, pointerId: ev.pointerId };
+      paintDimVisual(panel, id, bright, true);
+      applyOptimistic(id, { on: true, brightness: bright });
+    };
+    panel.onpointermove = function (ev) {
+      if (!_dimDrag || _dimDrag.pointerId !== ev.pointerId) return;
+      var track = panel.querySelector('.hub-sw-track[data-id="' + _dimDrag.id + '"]');
+      if (!track) return;
+      ev.preventDefault();
+      var bright = brightFromPointer(track, ev.clientX);
+      _dimDrag.bright = bright;
+      paintDimVisual(panel, _dimDrag.id, bright, true);
+      applyOptimistic(_dimDrag.id, { on: true, brightness: bright });
+    };
+    function endDimPointer(ev) {
+      if (!_dimDrag || (ev && _dimDrag.pointerId !== ev.pointerId)) return;
+      var id = _dimDrag.id;
+      var bright = _dimDrag.bright;
+      try { if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
+      commitDim(id, bright, panel);
+    }
+    panel.onpointerup = endDimPointer;
+    panel.onpointercancel = function (ev) {
+      if (!_dimDrag || _dimDrag.pointerId !== ev.pointerId) return;
+      var id = _dimDrag.id;
+      _dimDrag = null;
+      rollbackOptimistic(id);
+      paintHubPanel(panel.ownerDocument || document);
+    };
+
+    /* Keyboard on focused track · arrows nudge 5% */
+    panel.onkeydown = function (ev) {
+      var t = ev.target;
+      if (!t || !t.classList || !t.classList.contains("hub-sw-track")) return;
+      var id = t.getAttribute("data-id");
+      if (!id || !canWrite()) return;
+      var cur = Number(t.getAttribute("aria-valuenow") || 50);
+      var next = cur;
+      if (ev.key === "ArrowRight" || ev.key === "ArrowUp") next = cur + 5;
+      else if (ev.key === "ArrowLeft" || ev.key === "ArrowDown") next = cur - 5;
+      else if (ev.key === "Home") next = 1;
+      else if (ev.key === "End") next = 100;
+      else return;
+      ev.preventDefault();
+      next = clampBright(Math.max(1, next));
+      paintDimVisual(panel, id, next, true);
+      commitDim(id, next, panel);
+    };
+
+    /* Legacy range fallback (sheet-lights / older markup) */
     panel.oninput = function (ev) {
       var t = ev.target;
       if (!t || !t.classList || !t.classList.contains("hub-sw-bright")) return;

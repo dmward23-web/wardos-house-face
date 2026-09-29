@@ -62,7 +62,7 @@ Or env on the Atlas cron user: `KASA_USER` + `KASA_PASSWORD` (also accepts `KASA
 
 **Today on box (2026-09-28 CT):** `kasa.user` + `kasa.password` present (mode 600). LIVE cloud path works via those creds + `scripts/kasa-probe.py`. Nest + Sensi unchanged.
 
-## Roster (LIGHTS6 · Ward home Kasa)
+## Roster (LIGHTDIM1 · Ward home Kasa HS220)
 
 Named dimmers/switches — kebab ids. On/brightness come from live cloud probe only (never invented).
 
@@ -74,7 +74,7 @@ Named dimmers/switches — kebab ids. On/brightness come from live cloud probe o
 
 Aliases must match the **Kasa app** device names (probe normalizes case / punctuation).
 
-**Hub vs kid boards:** `sheet-index` hub rocker panel (`#hub-lights-panel`) = PRIMARY wall control (Dining / Harris / Kitchen) — HUBCMD1 / CMDDECK2 · 9 denser slots (3 LIVE Kasa + 6 NEED CONNECT stubs) in ~350×420 hotter command deck. `sheet-lights.html` = full-page board (brightness). Kid boards: that kid's named switch only (`kid-harris` → `harris-room`).
+**Hub vs kid boards:** `sheet-index` hub panel (`#hub-lights-panel`) = PRIMARY wall control — LIGHTDIM1 / HUBCMD2 · 9 denser slots (3 LIVE HS220 dimmers with premium fill + rocker · 6 NEED CONNECT stubs, dark, no fake %). Tap rocker = on/off · drag fill = brightness 1–100. `sheet-lights.html` = full-page board. Kid boards: that kid's named switch only (`kid-harris` → `harris-room`).
 
 ## Probe / fetch (Atlas box)
 
@@ -131,7 +131,7 @@ Secrets **never** on Pages / git.
 }
 ```
 
-## Write path (LIGHTS6 · wall taps → Kasa · no seed link)
+## Write path (LIGHTDIM1 / LIGHTS6 · wall taps → Kasa · no seed link)
 
 ```
 Elo / phone / box UI  (hard-refresh OK — no ?lightsProxy= required)
