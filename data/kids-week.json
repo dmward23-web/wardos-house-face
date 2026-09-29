@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-29T23:19:43.524Z",
+  "refreshedAt": "2026-09-29T23:32:18.449Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -730,22 +730,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "TUE · 4:25",
-        "what": "AINSLEY SWIM — COACH ANN",
+        "when": "WED · 7:30",
+        "what": "LKMS YEARBOOK PICTURE RETAKES",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "TUE",
-          "4:25"
+          "WED",
+          "7:30"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Tue · 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -755,12 +748,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Tue 29 · leave 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Thu 1 · leave 4:25",
           "what": "Ainsley swim — Coach Ann",
@@ -901,11 +888,6 @@
       ],
       "week": [
         {
-          "when": "Tue 29 · 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "tone": "hot"
-        },
-        {
           "when": "Wed 30 · 7:30",
           "what": "LKMS yearbook picture retakes",
           "tone": "act"
@@ -1018,6 +1000,11 @@
         {
           "when": "Mon 5 · 5:30",
           "what": "Hayes baseball — Falcons vs KC Tigers (away)",
+          "tone": "hot"
+        },
+        {
+          "when": "Tue 6 · 5:00",
+          "what": "Ainsley swim — Coach Ann",
           "tone": "hot"
         }
       ]
