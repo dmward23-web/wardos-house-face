@@ -108,13 +108,18 @@ python3 - "$EVENTS" "$SCRUBBED" <<'PRIV'
 import json, re, sys
 src, dst = sys.argv[1], sys.argv[2]
 d = json.load(open(src))
-RULES = [
-  (re.compile(r"appointment", re.I), "appointment"),
-  (re.compile(r"\s*\(?\s*Lindsay\s+provider\s*\)?", re.I), ""),
-  (re.compile(r"\bLindsay\b", re.I), "appointment"),
-  (re.compile(r"\bRandy\b", re.I), "provider"),
-  (re.compile(r"\b(therapy|therapist|counsel(ing|or))\b", re.I), "appointment"),
-]
+# Scrub terms live OFF the public repo: ~/.config/wardos/privacy-scrub.tsv
+# (one "regex<TAB>replacement" per line). Missing file = HARD FAIL (fail closed).
+import os
+fp = os.path.expanduser("~/.config/wardos/privacy-scrub.tsv")
+if not os.path.exists(fp):
+  print("HARD FAIL: privacy-scrub.tsv missing — refusing to publish unscrubbed calendar", file=sys.stderr); sys.exit(9)
+RULES = []
+for line in open(fp):
+  line = line.rstrip("\n")
+  if not line or line.startswith("#"): continue
+  rx, _, rep = line.partition("\t")
+  RULES.append((re.compile(rx, re.I), rep))
 def walk(o):
   if isinstance(o, dict):
     for k, v in o.items():
