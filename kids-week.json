@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-29T18:04:26.305Z",
+  "refreshedAt": "2026-09-29T18:06:53.120Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -136,14 +136,14 @@
       {
         "label": "Next up · Wed",
         "time": "12:40",
-        "place": "appointment · 1:00 (provider)",
+        "place": "appointment",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
         "startIso": "2026-09-30T17:40:00.000Z",
         "endIso": "2026-09-30T19:20:00.000Z",
         "kind": "appointment",
         "whenLabel": "Wed 12:40",
-        "summary": "Ainsley — appointment · 1:00 (provider)"
+        "summary": "Ainsley — appointment · 1:00"
       },
       {
         "label": "Next up · Wed",
@@ -836,13 +836,13 @@
       "appointments": [
         {
           "when": "Wed 30 · 12:40",
-          "what": "appointment · 1:00 (provider)",
+          "what": "appointment",
           "hint": "with Dad",
           "tone": "hot"
         },
         {
           "when": "Mon 5 · 1:40",
-          "what": "appointment · 2:00 (provider)",
+          "what": "appointment",
           "hint": "with Dad",
           "tone": "hot"
         }
@@ -990,7 +990,7 @@
         },
         {
           "when": "Wed 30 · 12:40",
-          "what": "appointment · 1:00 (provider)",
+          "what": "appointment",
           "tone": "act"
         },
         {

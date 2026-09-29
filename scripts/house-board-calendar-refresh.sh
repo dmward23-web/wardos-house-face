@@ -101,6 +101,34 @@ if [[ -f "$EVENTS" ]]; then
   cp -f "$EVENTS" "$ROOT/data/calendar-dmward23-dump.json" 2>/dev/null || true
 fi
 
+# 0) PRIVACY1: public Pages never carries therapy/provider names (kid privacy).
+#    Scrub summaries in a temp copy; the private dump above stays raw (gitignored).
+SCRUBBED=$(mktemp /tmp/cal-scrubbed-XXXX.json)
+python3 - "$EVENTS" "$SCRUBBED" <<'PRIV'
+import json, re, sys
+src, dst = sys.argv[1], sys.argv[2]
+d = json.load(open(src))
+RULES = [
+  (re.compile(r"appointment", re.I), "appointment"),
+  (re.compile(r"\s*\(?\s*Lindsay\s+provider\s*\)?", re.I), ""),
+  (re.compile(r"\bLindsay\b", re.I), "appointment"),
+  (re.compile(r"\bRandy\b", re.I), "provider"),
+  (re.compile(r"\b(therapy|therapist|counsel(ing|or))\b", re.I), "appointment"),
+]
+def walk(o):
+  if isinstance(o, dict):
+    for k, v in o.items():
+      if k in ("summary", "title", "description") and isinstance(v, str):
+        for rx, rep in RULES: v = rx.sub(rep, v)
+        o[k] = re.sub(r"\s{2,}", " ", v).strip()
+      else: walk(v)
+  elif isinstance(o, list):
+    for x in o: walk(x)
+walk(d)
+json.dump(d, open(dst, "w"))
+PRIV
+EVENTS="$SCRUBBED"
+
 # 1) Full kids-week schedule rewrite (sports/school/appointments/boardStrip queue)
 node "$ROOT/scripts/calendar-refresh.mjs" --events "$EVENTS" --week "$ROOT/kids-week.json" --no-mirror
 

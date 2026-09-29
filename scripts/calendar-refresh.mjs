@@ -187,7 +187,7 @@ function classify(ev) {
   if (/flag/i.test(summary) && /hayes/i.test(summary)) {
     return { kind: "sport", sport: "flag", summary, kid: "hayes" };
   }
-  if (/appointment|Lindsay/i.test(summary)) {
+  if (/appointment|Lindsay|^Ainsley\b.*\bappointment\b/i.test(summary)) {
     return { kind: "appointment", summary, kid: "ainsley" };
   }
   if (/vanity|Jessy/i.test(summary) && /ainsley/i.test(summary)) {
