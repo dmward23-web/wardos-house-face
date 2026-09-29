@@ -1,6 +1,6 @@
 # Lights live control · House Face
 
-**Honest gate:** GitHub Pages is static. TP-Link **Kasa IoT** dimmers need cloud (or LAN) credentials on the Atlas box. With `kasa.user`+`kasa.password` on Atlas, `lights-fetch.mjs` runs the cloud probe and ships `status:live`. Without creds the UI stays **NEED TOKEN** + DEMO — **never** labels invented on/off as LIVE.
+**Honest gate:** GitHub Pages is static. TP-Link **Kasa IoT** dimmers need cloud (or LAN) credentials on the Atlas box. With `kasa.user`+`kasa.password` on Atlas, `lights-fetch.mjs` runs the cloud probe and ships `status:live`. Without creds the UI stays **NEED TOKEN** · controls dark — **never** labels invented on/off as LIVE (never DEMO).
 
 Nest SDM on the box is **cameras only** (no lights). Lights are Kasa — separate from Nest.
 
@@ -37,7 +37,7 @@ data/lights-live.json  status=live (Dining / Harris / Kitchen)
 House Face UI polls JSON every ~60s
 ```
 
-**LIVE (LIGHTS5):** cloud **read + write**. `writeSupported: true` when snapshot is live. Wall taps POST the Atlas `lights-write-proxy` (never the Kasa password).
+**LIVE (LIGHTS6):** cloud **read + write**. `writeSupported: true` when snapshot is live. Wall taps POST the public write proxy URL from live JSON (never the Kasa password).
 
 - **Read:** per-light `on`, `brightness` (dimmers), `online` via `lights-fetch.mjs` → `data/lights-live.json`.
 - **Write:** `POST /api/lights/set` on box proxy → `kasa-write.py` → Kasa cloud. **No DEMO overlays.** If proxy unreachable → controls dark (`PROXY OFF` / `NEED TOKEN` / `OFFLINE`).
@@ -117,7 +117,9 @@ Secrets **never** on Pages / git.
   "status": "need_token",
   "fetchedAt": "2026-09-29T00:01:00.000Z",
   "source": "kasa-pending",
-  "writeSupported": true,  // LIGHTS5 when status=live
+  "writeSupported": true,  // when status=live
+  "writeProxy": "https://….trycloudflare.com",
+  "writeProxyToken": "lights-…",  // LIGHTS6 UX · proxy auth only · NOT kasa password
   "lights": [
     { "id": "dining-room", "name": "Dining Room", "where": "Dining Room", "kind": "dimmer", "on": true, "brightness": 52, "online": true },
     { "id": "harris-room", "name": "Harris's Room", "where": "Harris's Room", "kind": "dimmer", "on": true, "brightness": 100, "online": true },
@@ -128,31 +130,48 @@ Secrets **never** on Pages / git.
 }
 ```
 
-## Write path (LIGHTS5 · wall taps → Kasa)
+## Write path (LIGHTS6 · wall taps → Kasa · no seed link)
 
 ```
-Elo / phone / box UI
+Elo / phone / box UI  (hard-refresh OK — no ?lightsProxy= required)
+  → poll data/lights-live.json  (writeProxy + writeProxyToken baked in)
   → POST {writeProxy}/api/lights/set   (Header: X-Lights-Proxy-Token)
-       default writeProxy: http://127.0.0.1:8788
-       Pages: seed once with ?lightsProxy=URL&lightsProxyToken=… (localStorage)
+       writeProxy = public CF HTTPS URL (from ~/.config/wardos/lights-write-proxy.url)
+       fallback loopback http://127.0.0.1:8788 on Atlas only
   → scripts/lights-write-proxy.mjs  (Atlas box · holds kasa.* secrets)
   → scripts/kasa-write.py           (tplink-cloud-api passthrough)
   → Kasa cloud → HS220 Dining / Harris / Kitchen
-  → lights-fetch.mjs refreshes data/lights-live.json
+  → lights-fetch.mjs refreshes data/lights-live.json (keeps public writeProxy)
 ```
+
+**LIGHTS6 board wiring:** `house-lights.js` reads `writeProxy` / `writeProxyToken` from the live JSON when localStorage is empty. Optional `?lightsProxy=` still works as an override. Loopback URLs are ignored on GitHub Pages.
 
 Keep proxy running on Atlas:
 ```bash
+# Persist public tunnel URL so every lights-fetch refresh re-bakes it into live JSON
+echo 'https://<your-cf-quick-tunnel>.trycloudflare.com' > ~/.config/wardos/lights-write-proxy.url
+chmod 600 ~/.config/wardos/lights-write-proxy.url
+
 LIGHTS_PROXY_TOKEN=$(cat ~/.config/wardos/lights-proxy.token) \
   node scripts/lights-write-proxy.mjs --host 127.0.0.1 --port 8788
+# CF quick tunnel → :8788 (same pattern as Nest :8787)
 ```
-Token file: `~/.config/wardos/lights-proxy.token` (mode 600). Optional CF quick tunnel to :8788 for Pages/Elo (same pattern as Nest :8787) — do not commit tunnel URL or token.
+
+### Security tradeoff (Dan chose UX)
+
+| Secret | Where | Public? |
+|--------|-------|---------|
+| Kasa email + password | `~/.config/wardos/kasa.user` + `kasa.password` (mode 600) | **Never** — not in git, not in live JSON |
+| Proxy auth token | `~/.config/wardos/lights-proxy.token` **and** `writeProxyToken` in `data/lights-live.json` | **Yes on Pages** (LIGHTS6) — anyone who can read the board JSON can POST writes while the tunnel is up |
+| Tunnel URL | `lights-write-proxy.url` + `writeProxy` in live JSON | Yes on Pages |
+
+Rotate the proxy token + tunnel if leaked. Revoking Kasa password is separate and stays box-only.
 
 ## UI rules
 
 - **LIVE** only when `status === "live"` and snapshot is fresh.
 - Missing Kasa creds → **NEED TOKEN** · controls dark (never DEMO).
-- Live + writeSupported but proxy down → **PROXY OFF** · controls dark.
+- Live + writeSupported but proxy down → **PROXY OFF** · controls dark (tunnel/proxy unhealthy — not a missing seed link).
 - Live + proxy up → pill **LIVE** · taps are real Kasa writes (optimistic UI + rollback on fail).
 
 ## Related

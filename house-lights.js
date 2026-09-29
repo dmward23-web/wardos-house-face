@@ -1,6 +1,8 @@
 /* House Face · Lights control (Kasa LIVE only)
    Read: poll data/lights-live.json (Atlas fetcher → Pages).
    Write: POST Atlas lights-write-proxy (creds on box only).
+   LIGHTS6: when localStorage empty, auto-use writeProxy + writeProxyToken
+   from lights-live.json (public CF URL). No ?lightsProxy= seed required.
    HARD LAW: nothing ever DEMO. No fake taps. If proxy/token missing →
    controls disabled + honest NEED TOKEN / PROXY OFF / OFFLINE.
    See LIGHTS-LIVE.md
@@ -65,7 +67,7 @@
     return /^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/i.test(String(url || ""));
   }
 
-  /** Seed proxy URL/token from ?lightsProxy= / ?proxy= (once) into localStorage. */
+  /** Optional override: seed proxy URL/token from ?lightsProxy= into localStorage. */
   function ingestProxyFromQuery() {
     try {
       var p = qs("lightsProxy") || qs("proxy");
@@ -75,20 +77,41 @@
     } catch (e) { /* */ }
   }
 
+  /**
+   * LIGHTS6: after live JSON loads, if LS empty and JSON has a public writeProxy
+   * (+ token), persist once so later polls keep working even if JSON briefly
+   * drops the fields. Never persist loopback on Pages.
+   */
+  function ingestProxyFromLive(data) {
+    if (!data) return;
+    try {
+      var wp = data.writeProxy ? String(data.writeProxy).replace(/\/$/, "") : "";
+      var tok = data.writeProxyToken ? String(data.writeProxyToken) : "";
+      if (!wp || (isPagesHost() && isLoopbackProxy(wp))) return;
+      if (!localStorage.getItem(PROXY_LS_KEY)) localStorage.setItem(PROXY_LS_KEY, wp);
+      if (tok && !localStorage.getItem(PROXY_TOKEN_LS_KEY)) {
+        localStorage.setItem(PROXY_TOKEN_LS_KEY, tok);
+      }
+    } catch (e) { /* */ }
+  }
+
   function proxyBase() {
     ingestProxyFromQuery();
     var fromQs = qs("lightsProxy") || qs("proxy");
     if (fromQs) return String(fromQs).replace(/\/$/, "");
     try {
       var ls = localStorage.getItem(PROXY_LS_KEY);
-      if (ls) return String(ls).replace(/\/$/, "");
-      // Nest private-link once-seed (wardos may share box tunnel host)
-      var nest = localStorage.getItem("wardos-nest-proxy") || localStorage.getItem("nestProxy");
-      if (nest) return String(nest).replace(/\/$/, "");
+      if (ls) {
+        var lsUrl = String(ls).replace(/\/$/, "");
+        if (!(isPagesHost() && isLoopbackProxy(lsUrl))) return lsUrl;
+      }
     } catch (e) { /* */ }
     var data = (_liveCache && _liveCache.data) || null;
-    if (data && data.writeProxy) return String(data.writeProxy).replace(/\/$/, "");
-    // Pages cannot reach Atlas loopback — leave empty so UI stays PROXY OFF (honest).
+    if (data && data.writeProxy) {
+      var wp = String(data.writeProxy).replace(/\/$/, "");
+      // Pages cannot reach Atlas loopback — skip localhost hints in live JSON.
+      if (!(isPagesHost() && isLoopbackProxy(wp))) return wp;
+    }
     if (isPagesHost()) return "";
     return DEFAULT_PROXY;
   }
@@ -452,6 +475,7 @@
 
   function applyLivePayload(data) {
     _liveCache = { at: Date.now(), data: data };
+    ingestProxyFromLive(data);
     var g = gate(data);
     /* Clear optimistic once live snapshot catches up (no DEMO seed — HARD LAW). */
     if (g.live && data && Array.isArray(data.lights)) {
@@ -757,7 +781,7 @@
       sub.textContent = canWrite()
         ? "Kasa live · wall switches"
         : (g.live && g.writeSupported
-          ? "PROXY OFF · open once with ?lightsProxy=… to enable taps"
+          ? "PROXY OFF · write proxy unreachable (check tunnel)"
           : (g.live
             ? "LIVE read · write not armed"
             : (g.needToken ? "NEED TOKEN · controls dark" : ((g.label || "OFFLINE") + " · controls dark"))));
