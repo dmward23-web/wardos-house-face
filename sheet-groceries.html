@@ -225,6 +225,14 @@
   }
   .item.costco .ring { border-color: rgba(70,110,170,0.5); }
 
+  .list-empty {
+    font-size: 15px; font-weight: 650; color: #8a9098; letter-spacing: -0.01em;
+    padding: 18px 14px; border-radius: 14px; text-align: center;
+    background: rgba(255,255,255,0.4); border: 2px dashed rgba(100,110,130,0.22);
+  }
+  .favs-empty {
+    font-size: 13px; font-weight: 600; color: #8a9098; padding: 4px 2px 2px;
+  }
   .treats { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; }
   .treat {
     border-radius: 14px; padding: 14px 14px;
@@ -367,7 +375,7 @@
 <link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
 <link rel="stylesheet" href="heat-v3.css?v=DAYTAP1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
-<link rel="stylesheet" href="tokens-sheets-clock-first-heat.css?v=SHEETCLK2" />
+<link rel="stylesheet" href="tokens-sheets-clock-first-heat.css?v=SHEETCLK3" />
 </head>
 <body data-clear-label="CLEARED">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -629,13 +637,9 @@
  <section class="favs" aria-label="Favorites">
  <div class="favs-label">Favorites</div>
  <div class="fav-chips">
- <div class="fav"><span class="heart">♥</span> Milk · EXAMPLE</div>
- <div class="fav"><span class="heart">♥</span> Bananas · EXAMPLE</div>
- <div class="fav"><span class="heart">♥</span> Eggs · EXAMPLE</div>
- <div class="fav"><span class="heart">♥</span> Bread · EXAMPLE</div>
- <div class="fav"><span class="heart">♥</span> Yogurt · EXAMPLE</div>
  <div class="fav add">+ add favorite</div>
  </div>
+ <div class="favs-empty">No favorites yet</div>
  </section>
 
  <div class="body">
@@ -646,36 +650,7 @@
  <div class="add-btn">+ add</div>
  </div>
  <div class="item-list">
- <div data-check="home-milk" class="item done">
- <span class="ring">✓</span>
- <span class="what">Milk</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="home-bananas" class="item">
- <span class="ring"></span>
- <span class="what">Bananas</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="home-eggs" class="item">
- <span class="ring"></span>
- <span class="what">Eggs</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="home-bread" class="item">
- <span class="ring"></span>
- <span class="what">Sandwich bread</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="home-apples" class="item">
- <span class="ring"></span>
- <span class="what">Apples</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="home-pasta" class="item">
- <span class="ring"></span>
- <span class="what">Pasta</span>
- <span class="tag">DEMO</span>
- </div>
+ <div class="list-empty">List empty · tap + add</div>
  </div>
  <div class="tap-hint"><span class="ring">✓</span> Tap to check off</div>
  </section>
@@ -687,36 +662,7 @@
  <div class="sec-meta">bulk</div>
  </div>
  <div class="item-list">
- <div data-check="costco-towels" class="item costco done">
- <span class="ring">✓</span>
- <span class="what">Paper towels</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="costco-chicken" class="item costco">
- <span class="ring"></span>
- <span class="what">Rotisserie chicken</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="costco-berries" class="item costco">
- <span class="ring"></span>
- <span class="what">Frozen berries</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="costco-snacks" class="item costco">
- <span class="ring"></span>
- <span class="what">Snack packs</span>
- <span class="tag">DEMO</span>
- </div>
- <div data-check="costco-pods" class="item costco">
- <span class="ring"></span>
- <span class="what">Laundry pods</span>
- <span class="tag">EXAMPLE</span>
- </div>
- <div data-check="costco-sparkling" class="item costco">
- <span class="ring"></span>
- <span class="what">Sparkling water</span>
- <span class="tag">DEMO</span>
- </div>
+ <div class="list-empty">List empty · Costco run open</div>
  </div>
  <div class="tap-hint"><span class="ring">✓</span> Costco checklist</div>
  </section>
@@ -728,22 +674,20 @@
  <div class="sec-meta">picks stick</div>
  </div>
  <div class="treats">
- <div class="treat ainsley picked">
+ <div class="treat ainsley empty">
  <a class="treat-kid" href="kid-ainsley.html"><span class="dot">A</span> Ainsley</a>
- <div class="treat-pick">🍓 Strawberries</div>
- <div class="treat-hint">EXAMPLE · my pick · sticks</div>
- <span class="stick">stuck</span>
+ <div class="treat-pick">Tap to pick your treat</div>
+ <div class="treat-hint">Open slot · my pick sticks</div>
  </div>
- <div class="treat hayes picked">
+ <div class="treat hayes empty">
  <a class="treat-kid" href="kid-hayes.html"><span class="dot">H</span> Hayes</a>
- <div class="treat-pick">🍪 Cookie dough bites</div>
- <div class="treat-hint">EXAMPLE · my pick · sticks</div>
- <span class="stick">stuck</span>
+ <div class="treat-pick">Tap to pick your treat</div>
+ <div class="treat-hint">Open slot · my pick sticks</div>
  </div>
  <div class="treat harris empty">
  <a class="treat-kid" href="kid-harris.html"><span class="dot">R</span> Harris</a>
  <div class="treat-pick">Tap to pick your treat</div>
- <div class="treat-hint">DEMO slot · open</div>
+ <div class="treat-hint">Open slot · my pick sticks</div>
  </div>
  </div>
  <div class="tap-hint"><span class="ring">★</span> My-pick that sticks</div>
@@ -758,7 +702,7 @@
 </div>
 <script src="house-checkoffs.js" defer></script>
 
-<script src="house-clock.js?v=SHEETCLK2"></script>
+<script src="house-clock.js?v=SHEETCLK3"></script>
 <script src="house-zoom.js"></script>
 </body>
 </html>
