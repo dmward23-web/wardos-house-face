@@ -23,7 +23,7 @@ Do **not** chase a token from the camera portal for Dining / Harris / Kitchen.
 
 There is **no** separate long-lived “kasa.token” from tplinkcloud.com for IoT. Session tokens come from email+password login inside the library (or optional refresh-token cache later).
 
-**Brightness:** Yes for KS220 / HS220-style dimmers — read `brightness` from sysinfo; write via python-kasa `Light` / `IotDimmer.set_brightness` (LAN) or cloud passthrough `smartlife.iot.dimmer` / `set_brightness`. Probe is **read-only**; `writeSupported` stays false until a safe proxy exists.
+**Brightness:** Yes for KS220 / HS220-style dimmers — read `brightness` from sysinfo; write via cloud passthrough `smartlife.iot.dimmer.set_brightness` (`scripts/kasa-write.py`). Probe remains read-only; **write** goes through `scripts/lights-write-proxy.mjs` (creds on box only).
 
 ## Live data flow (path C — same shape as Sensi)
 
@@ -37,10 +37,10 @@ data/lights-live.json  status=live (Dining / Harris / Kitchen)
 House Face UI polls JSON every ~60s
 ```
 
-**LIVE (shipped LIGHTS3):** cloud path works with `kasa.user`/`kasa.password` (or `KASA_USER`/`KASA_PASSWORD`). `tplinkcloud.com` remains cameras-only — not used for switches. `writeSupported` stays false (read-only snapshot).
+**LIVE (LIGHTS5):** cloud **read + write**. `writeSupported: true` when snapshot is live. Wall taps POST the Atlas `lights-write-proxy` (never the Kasa password).
 
-- **Read:** per-light `on`, `brightness` (dimmers), `online`.
-- **Write:** DEMO localStorage only until `writeSupported: true` and a safe proxy exists. Never invent LIVE.
+- **Read:** per-light `on`, `brightness` (dimmers), `online` via `lights-fetch.mjs` → `data/lights-live.json`.
+- **Write:** `POST /api/lights/set` on box proxy → `kasa-write.py` → Kasa cloud. **No DEMO overlays.** If proxy unreachable → controls dark (`PROXY OFF` / `NEED TOKEN` / `OFFLINE`).
 
 ## Credential Atlas must request from Dan
 
@@ -117,23 +117,43 @@ Secrets **never** on Pages / git.
   "status": "need_token",
   "fetchedAt": "2026-09-29T00:01:00.000Z",
   "source": "kasa-pending",
-  "writeSupported": false,
+  "writeSupported": true,  // LIGHTS5 when status=live
   "lights": [
     { "id": "dining-room", "name": "Dining Room", "where": "Dining Room", "kind": "dimmer", "on": true, "brightness": 52, "online": true },
     { "id": "harris-room", "name": "Harris's Room", "where": "Harris's Room", "kind": "dimmer", "on": true, "brightness": 100, "online": true },
     { "id": "kitchen", "name": "Kitchen", "where": "Kitchen", "kind": "dimmer", "on": true, "brightness": 1, "online": true }
   ],
   "reserved": [],
-  "error": "NEED TOKEN · screenshot DEMO seeds only · do not paint LIVE"
+  "error": "NEED TOKEN · controls dark — never DEMO"
 }
 ```
 
+## Write path (LIGHTS5 · wall taps → Kasa)
+
+```
+Elo / phone / box UI
+  → POST {writeProxy}/api/lights/set   (Header: X-Lights-Proxy-Token)
+       default writeProxy: http://127.0.0.1:8788
+       Pages: seed once with ?lightsProxy=URL&lightsProxyToken=… (localStorage)
+  → scripts/lights-write-proxy.mjs  (Atlas box · holds kasa.* secrets)
+  → scripts/kasa-write.py           (tplink-cloud-api passthrough)
+  → Kasa cloud → HS220 Dining / Harris / Kitchen
+  → lights-fetch.mjs refreshes data/lights-live.json
+```
+
+Keep proxy running on Atlas:
+```bash
+LIGHTS_PROXY_TOKEN=$(cat ~/.config/wardos/lights-proxy.token) \
+  node scripts/lights-write-proxy.mjs --host 127.0.0.1 --port 8788
+```
+Token file: `~/.config/wardos/lights-proxy.token` (mode 600). Optional CF quick tunnel to :8788 for Pages/Elo (same pattern as Nest :8787) — do not commit tunnel URL or token.
+
 ## UI rules
 
-- No **LIVE** label unless `status === "live"` and snapshot is fresh.
-- Missing token → clear **NEED TOKEN**.
-- DEMO writes remain labeled DEMO until `writeSupported` is true.
-- Screenshot on/brightness may seed DEMO pad defaults; gate label stays NEED TOKEN.
+- **LIVE** only when `status === "live"` and snapshot is fresh.
+- Missing Kasa creds → **NEED TOKEN** · controls dark (never DEMO).
+- Live + writeSupported but proxy down → **PROXY OFF** · controls dark.
+- Live + proxy up → pill **LIVE** · taps are real Kasa writes (optimistic UI + rollback on fail).
 
 ## Related
 
