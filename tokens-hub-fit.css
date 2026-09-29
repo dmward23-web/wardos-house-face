@@ -24,10 +24,11 @@
 
 /* ——— Phone ——— */
 @media (max-width: 600px) {
-  html, body { width: 100% !important; min-width: 0 !important; overflow-x: hidden !important; }
+  html, body { width: 100% !important; min-width: 0 !important; }
+  html body .panel { overflow-x: clip !important; }
   html body .panel {
     width: 100% !important; min-width: 0 !important; height: auto !important; max-height: none !important;
-    min-height: 100vh; overflow: visible !important;
+    min-height: 100vh; overflow-y: visible !important;
     padding: max(10px, env(safe-area-inset-top)) 10px max(16px, env(safe-area-inset-bottom)) !important;
     gap: 10px !important;
   }
@@ -67,5 +68,6 @@
   html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile { min-height: 150px !important; height: auto !important; max-height: none !important; }
   html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.kid-flip { grid-column: 1 / -1; min-height: 170px !important; }
   /* LED ring stays; thinner on phone */
-  html body .panel.panel.panel svg.led-ring path { stroke-width: 2px !important; }
+  /* LED ring: body-level fixed overlay, pinned to the visible phone screen, drawn above everything */
+  html body svg.led-ring { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100dvh !important; z-index: 2147483000 !important; display: block !important; visibility: visible !important; opacity: 1 !important; }
 }
