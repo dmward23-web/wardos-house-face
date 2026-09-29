@@ -1,49 +1,37 @@
 {
   "status": "need_token",
-  "fetchedAt": "2026-09-28T23:46:00.000Z",
+  "fetchedAt": "2026-09-29T00:01:00.000Z",
   "source": "kasa-pending",
   "writeSupported": false,
   "lights": [
     {
-      "id": "hall",
-      "name": "Hall",
-      "where": "Hall",
-      "kind": "bulb",
-      "on": null,
-      "brightness": null,
-      "online": null
+      "id": "dining-room",
+      "name": "Dining Room",
+      "where": "Dining Room",
+      "kind": "dimmer",
+      "on": true,
+      "brightness": 52,
+      "online": true
+    },
+    {
+      "id": "harris-room",
+      "name": "Harris's Room",
+      "where": "Harris's Room",
+      "kind": "dimmer",
+      "on": true,
+      "brightness": 100,
+      "online": true
     },
     {
       "id": "kitchen",
       "name": "Kitchen",
       "where": "Kitchen",
-      "kind": "bulb",
-      "on": null,
-      "brightness": null,
-      "online": null
-    },
-    {
-      "id": "porch",
-      "name": "Porch",
-      "where": "Porch",
-      "kind": "bulb",
-      "on": null,
-      "brightness": null,
-      "online": null
-    }
-  ],
-  "reserved": [
-    {
-      "id": "op-wall-dimmer",
-      "name": "OP wall dimmer",
-      "where": "Overland Park",
       "kind": "dimmer",
-      "on": null,
-      "brightness": null,
-      "online": false,
-      "pending": true,
-      "note": "KS220/HS220 · fold in when Atlas confirms Wi-Fi online"
+      "on": true,
+      "brightness": 1,
+      "online": true
     }
   ],
-  "error": "Need Kasa cloud token or LAN control path on Atlas box (~/.config/wardos/ has nest + sensi only). OP wall dimmer reserved pending Atlas confirm."
+  "reserved": [],
+  "error": "NEED TOKEN \u00b7 no Kasa cloud yet. Screenshot roster as-of 2026-09-28 ~18:58 CDT (Dining Room / Harris's Room / Kitchen \u2014 DEMO seed values only; do not paint LIVE). OP Kasa online; LIVE cloud still need_token."
 }
