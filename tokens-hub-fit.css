@@ -72,20 +72,9 @@
   html body svg.led-ring { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100dvh !important; z-index: 2147483000 !important; display: block !important; visibility: visible !important; opacity: 1 !important; }
 }
 
-/* HDRPHONE1 · phone header: name on top; clock left + thermostat right; weather full width (rain line never clipped) */
+/* RAINSHORT1 · phone keeps the 2-row header; rain line uses the short form so it fits */
+.wx-rain .wx-rain-short { display: none; }
 @media (max-width: 600px) {
-  html body .panel.panel.panel header.hdr {
-    grid-template-columns: 1fr auto !important;
-    grid-template-areas: "brand brand" "date sensi" "wx wx" !important;
-  }
-  html body .panel.panel.panel header.hdr > .hdr-ovals { display: contents !important; zoom: 1 !important; }
-  html body .panel.panel.panel header.hdr .hdr-ovals > .wx-card {
-    grid-area: wx !important; width: 100% !important; max-width: none !important; min-width: 0 !important;
-    min-height: 54px !important; justify-self: stretch !important; box-sizing: border-box !important;
-  }
-  html body .panel.panel.panel header.hdr .hdr-ovals > .wx-card .wx-rain { white-space: normal !important; font-size: 14px !important; }
-  html body .panel.panel.panel header.hdr .hdr-ovals > .sensi-hdr {
-    grid-area: sensi !important; justify-self: end !important; align-self: stretch !important; max-width: none !important;
-  }
-  html body .panel.panel.panel header.hdr > .hdr-date { justify-self: stretch !important; }
+  html body .hdr .wx-rain .wx-rain-full { display: none !important; }
+  html body .hdr .wx-rain .wx-rain-short { display: inline !important; }
 }

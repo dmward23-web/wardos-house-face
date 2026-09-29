@@ -170,9 +170,19 @@
       + '<span class="wx-mode">OUT</span>'
       + "</div>"
       + '<div class="wx-sub"><i class="hdr-live-dot" aria-hidden="true"></i>' + hi + "</div>"
-      + (data.rain ? '<div class="wx-rain' + (data.rain.wet ? ' is-wet' : '') + '">' + (data.rain.wet ? "☂ " : "") + data.rain.text + "</div>" : "")
+      + (data.rain ? '<div class="wx-rain' + (data.rain.wet ? ' is-wet' : '') + '">' + (data.rain.wet ? "☂ " : "") + '<span class="wx-rain-full">' + data.rain.text + '</span><span class="wx-rain-short" style="display:none">' + shortRain(data.rain.text) + "</span></div>" : "")
       + "</div>";
     el.classList.toggle("has-rain", !!(data.rain && data.rain.wet));
+  }
+
+  /* RAINSHORT1 · phone-size rain line: "Raining now–2a · 51%" -> "Rain till 2a" */
+  function shortRain(t) {
+    t = String(t || "");
+    if (/^No rain/i.test(t)) return "No rain 24h";
+    t = t.replace(/\s*·\s*\d+%$/, "");
+    var m = t.match(/^Rain(?:ing)? now[–-](.+)$/i);
+    if (m) return "Rain till " + m[1];
+    return t;
   }
 
   function mount(selector) {
