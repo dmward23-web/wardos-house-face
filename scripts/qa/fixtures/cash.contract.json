@@ -1,15 +1,19 @@
 {
   "_meta": {
-    "note": "Ledger owns SoT. Wright does not invent $. Source of truth live file is /workspace/board-os/data/cash.json (NOT in house-face git). Refresh this fixture when Ledger restamps.",
+    "note": "Ledger owns SoT. Wright does not invent $. Source of truth live file is /workspace/board-os/data/cash.json (NOT in house-face git). Refresh this fixture when Ledger restamps. Cliff SoT now decree May 2028 (Dan exact-yes 28 Sep ~11:05p).",
     "copiedFrom": "board-os/data/cash.json",
-    "copiedAtCT": "2026-09-28 ~11:02p CT",
-    "cliffPark": "2028/2029 PARK \u2014 do not fix in CI"
+    "copiedAtCT": "2026-09-28 ~11:05p CT",
+    "cliffPark": "cliff SoT decree May 2028 (Dan exact-yes 28 Sep ~11:05p) — CI holds available/eoy",
+    "cliff": "May 2028",
+    "cliffFirstPay": "2025-10-01",
+    "cliffMonths": 32,
+    "cliffNote": "¶32 first pay 2025-10-01 · 32 months · ends May 2028 · 2028 Jan–May full CS+maint $4,998 · Jun–Dec CS ASSUMED $2,600"
   },
   "schema": "board-os.cash.packet.v1",
   "mode": "LIVE",
   "lockedAt": "2026-09-28T21:19:00-05:00",
   "as_of": "2026-09-28",
-  "asOfLabel": "Mon 28 Sep ~9:19p CT \u00b7 nightly harvest Finance confirm \u00b7 LIVE Wells Everyday \u20266854",
+  "asOfLabel": "Mon 28 Sep ~9:19p CT · nightly harvest Finance confirm · LIVE Wells Everyday …6854",
   "available": 19961.9,
   "availableDisplay": "$19,961.90",
   "discGate": {
@@ -31,10 +35,10 @@
     "totalAutopay": 3589.57,
     "extra": "PAUSED",
     "asOf": "2026-09-23T15:30:00-05:00",
-    "note": "statement-only \u00b7 never double-count \u00b7 updated successfully emailed dmward23"
+    "note": "statement-only · never double-count · updated successfully emailed dmward23"
   },
   "freeze": {
-    "posture": "GATE OPEN \u00b7 ask-before-buys \u00b7 EOY SHORT $38.10 \u00b7 not FREEZE under $15k",
+    "posture": "GATE OPEN · ask-before-buys · EOY SHORT $38.10 · not FREEZE under $15k",
     "guildExtra": "PAUSED"
   }
 }
