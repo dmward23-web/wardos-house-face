@@ -1,21 +1,39 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T03:07:40.560Z",
+  "fetchedAt": "2026-09-30T03:37:45.092Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-06",
+  "windowEnd": "2026-10-05",
   "asOfIso": "2026-09-29",
   "nextLeave": {
-    "id": "iv9gs783mgggf0mico2hhurct4",
-    "summary": "Ainsley — LKMS yearbook picture retakes",
-    "start": "2026-09-30T07:30:00-05:00",
-    "end": "2026-09-30T07:45:00-05:00",
-    "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
+    "id": "h5h4hvg15fbb07du8pi6ld7l6c",
+    "summary": "Hayes — SRE specials: PE + Library (tennis shoes)",
+    "start": "2026-09-30T07:00:00-05:00",
+    "end": "2026-09-30T07:15:00-05:00",
+    "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
     "busy": false,
     "allDay": false
   },
   "upcomingLeaves": [
+    {
+      "id": "h5h4hvg15fbb07du8pi6ld7l6c",
+      "summary": "Hayes — SRE specials: PE + Library (tennis shoes)",
+      "start": "2026-09-30T07:00:00-05:00",
+      "end": "2026-09-30T07:15:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "tccch6r1l8bmsc1bhj3vuch8kg",
+      "summary": "Harris — SRE specials: Art",
+      "start": "2026-09-30T07:00:00-05:00",
+      "end": "2026-09-30T07:15:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
     {
       "id": "iv9gs783mgggf0mico2hhurct4",
       "summary": "Ainsley — LKMS yearbook picture retakes",
@@ -80,21 +98,21 @@
       "allDay": false
     },
     {
+      "id": "vluod9ndrvhcr20ovpera726dc_20260930T215500Z",
+      "summary": "Harris flag practice",
+      "start": "2026-09-30T16:55:00-05:00",
+      "end": "2026-09-30T18:50:00-05:00",
+      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
+      "busy": false,
+      "allDay": false
+    },
+    {
       "id": "torv7e3cq59fdi1vuiod9vq824",
       "summary": "BVW Homecoming Carnival",
       "start": "2026-09-30T17:00:00-05:00",
       "end": "2026-09-30T19:00:00-05:00",
       "location": "Blue Valley West",
       "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "p8plnu9u6lr16m2qi9p64keue8",
-      "summary": "Hayes + Harris — provider in-home · 5:30",
-      "start": "2026-09-30T17:30:00-05:00",
-      "end": "2026-09-30T18:30:00-05:00",
-      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": true,
       "allDay": false
     },
     {
@@ -108,7 +126,7 @@
     },
     {
       "id": "hv5k8kthnlieaqu6juv0g2hbrg",
-      "summary": "Harris — SRE PE (tennis shoes)",
+      "summary": "Harris — SRE specials: Spanish + Library checkout",
       "start": "2026-10-01T07:00:00-05:00",
       "end": "2026-10-01T07:15:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
@@ -117,7 +135,7 @@
     },
     {
       "id": "taurkhbv4smljpq3vjbb1tvfh8",
-      "summary": "Hayes — SRE PE (tennis shoes)",
+      "summary": "Hayes — SRE specials: Art",
       "start": "2026-10-01T07:00:00-05:00",
       "end": "2026-10-01T07:15:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
@@ -240,6 +258,15 @@
       "location": "Johnson County Museum, 8788 Metcalf Ave, Overland Park, KS 66212",
       "busy": false,
       "allDay": true
+    },
+    {
+      "id": "vhkqeollllpnjjrujf2rh7jcvc",
+      "summary": "Harris — SRE specials: Music",
+      "start": "2026-10-02T07:00:00-05:00",
+      "end": "2026-10-02T07:15:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
     },
     {
       "id": "1ni8dem5hrho45a0csgj81r3i4_20261002T131000Z",
@@ -375,31 +402,13 @@
       "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
       "busy": false,
       "allDay": false
-    },
-    {
-      "id": "nipks59d70cl19j22e6edbvjug_20261006",
-      "summary": "Hayes Johnson birthday",
-      "start": "2026-10-06T00:00:00Z",
-      "end": "2026-10-07T00:00:00Z",
-      "location": "",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "4iuge4862k2uhd3t5irr7jjmc8_20261006T212500Z",
-      "summary": "Ainsley swim — Coach Ann · 5:00 practice",
-      "start": "2026-10-06T17:00:00-05:00",
-      "end": "2026-10-06T18:00:00-05:00",
-      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
-      "busy": false,
-      "allDay": false
     }
   ],
   "boardStrip": {
     "label": "Next up · Wed",
-    "time": "7:30",
-    "place": "Ainsley — LKMS yearbook picture retakes",
-    "detailHtml": "<strong>7:30</strong> Ainsley — LKMS yearbook picture retakes · next Leave · Wed <strong>9:00</strong> HD #2209 · vanity return ONLY",
+    "time": "7:00",
+    "place": "Hayes — SRE specials: PE + Library (tennis shoes)",
+    "detailHtml": "<strong>7:00</strong> Hayes — SRE specials: PE + Library (tennis shoes) · next Leave · Wed <strong>9:00</strong> HD #2209 · vanity return ONLY",
     "badge": "Wed"
   },
   "error": null
