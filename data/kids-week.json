@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T11:42:44.681Z",
+  "refreshedAt": "2026-09-30T11:49:37.528Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -135,15 +135,15 @@
       },
       {
         "label": "Next up · today",
-        "time": "5:30",
-        "place": "provider in-home",
+        "time": "4:55",
+        "place": "Harris flag practice",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
-        "startIso": "2026-09-30T22:30:00.000Z",
-        "endIso": "2026-09-30T23:30:00.000Z",
-        "kind": "other",
-        "whenLabel": "5:30",
-        "summary": "Hayes + Harris — provider in-home · 5:30"
+        "startIso": "2026-09-30T21:55:00.000Z",
+        "endIso": "2026-09-30T23:50:00.000Z",
+        "kind": "sport",
+        "whenLabel": "4:55",
+        "summary": "Harris flag practice"
       },
       {
         "label": "Next up · Thu",
@@ -340,10 +340,10 @@
         },
         {
           "kind": "event",
-          "when": "Wed · 5:30",
-          "what": "provider in-home",
-          "hint": "",
-          "tone": "act"
+          "when": "Wed · 4:55",
+          "what": "🏁 Harris flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
         },
         {
           "kind": "note",
@@ -355,8 +355,26 @@
       ],
       "sports": [
         {
+          "when": "Wed 30 · leave 4:55",
+          "what": "Harris flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
           "when": "Sat 3 · leave 1:00",
           "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Wed 7 · leave 5:30",
+          "what": "Harris flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Sat 10 · leave 7:40",
+          "what": "Harris flag — vs SH Proehl (home)",
           "hint": "YOUR board",
           "tone": "hot"
         }
@@ -431,6 +449,18 @@
         {
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 7 · 7:00",
+          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
           "tone": "act",
           "hint": ""
         }
@@ -604,13 +634,6 @@
           "tone": "act"
         },
         {
-          "kind": "event",
-          "when": "Wed · 5:30",
-          "what": "provider in-home",
-          "hint": "",
-          "tone": "act"
-        },
-        {
           "kind": "note",
           "when": "All day",
           "what": "🏡 DROP ZONE HQ with Dad",
@@ -634,6 +657,18 @@
         {
           "when": "Mon 5 · leave 5:30",
           "what": "Hayes baseball — Falcons vs KC Tigers (away)",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Thu 8 · leave 6:00",
+          "what": "Hayes flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Sat 10 · leave 11:25",
+          "what": "Hayes flag — SRE Falcons vs Funk",
           "hint": "YOUR board",
           "tone": "hot"
         }
@@ -682,6 +717,12 @@
           "hint": ""
         },
         {
+          "when": "Fri 2 · 7:00",
+          "what": "SRE specials: No Specials",
+          "tone": "act",
+          "hint": ""
+        },
+        {
           "when": "Fri 2 · 8:10",
           "what": "SRE drop-off",
           "tone": "act",
@@ -702,6 +743,18 @@
         {
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 7 · 7:00",
+          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
           "tone": "act",
           "hint": ""
         }
@@ -885,6 +938,12 @@
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Thu 8 · leave 5:00",
+          "what": "Ainsley swim — Coach Ann",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -908,6 +967,12 @@
         },
         {
           "when": "Mon 5 · 3:00",
+          "what": "LKMS Homework Help",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 3:00",
           "what": "LKMS Homework Help",
           "tone": "act",
           "hint": ""
@@ -1022,8 +1087,8 @@
           "tone": "act"
         },
         {
-          "when": "home week",
-          "what": "Kids with Dad @ 147th through Fri Oct 2 · 3:00",
+          "when": "Wed · 4:55",
+          "what": "Harris flag practice",
           "tone": "hot"
         }
       ],
@@ -1074,6 +1139,11 @@
           "tone": "act"
         },
         {
+          "when": "Wed 30 · 4:55",
+          "what": "Harris flag practice",
+          "tone": "hot"
+        },
+        {
           "when": "Thu 1 · 7:00",
           "what": "SRE specials: Spanish + Library checkout",
           "tone": "act"
@@ -1115,6 +1185,11 @@
         },
         {
           "when": "Fri 2 · 7:00",
+          "what": "SRE specials: No Specials",
+          "tone": "act"
+        },
+        {
+          "when": "Fri 2 · 7:00",
           "what": "SRE specials: Music",
           "tone": "act"
         },
@@ -1137,16 +1212,6 @@
           "when": "Fri 2 · 11:30",
           "what": "SRE Tailgate Party (reading incentive)",
           "tone": "act"
-        },
-        {
-          "when": "Fri 2 · 12:00",
-          "what": "LKMS yearbook baby photo due",
-          "tone": "act"
-        },
-        {
-          "when": "Sat 3 · 1:00",
-          "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
-          "tone": "hot"
         }
       ]
     }
