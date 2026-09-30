@@ -265,6 +265,9 @@
   }
   function startAmbient() {
     stopAmbient();
+    /* HUM1 · ambient drone OFF by default (constant low hum in headphones).
+       Opt back in only with localStorage "house-sfx:ambient" = "1". */
+    try { if (localStorage.getItem(AMBIENT_KEY) !== "1") return; } catch (e) { return; }
     if (isMuted() || reducedMotion()) return;
     var c = ensureCtx(); if (!c) return;
     if (c.state === "suspended") return; /* wait for unlock gesture */
