@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-30T03:37:44.811Z",
+  "refreshedAt": "2026-09-30T03:42:01.819Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -123,6 +123,18 @@
       },
       {
         "label": "Next up · Wed",
+        "time": "4:00",
+        "place": "SRE — conference sign-ups go live",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-09-30T21:00:00.000Z",
+        "endIso": "2026-09-30T21:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Wed 4:00",
+        "summary": "SRE — conference sign-ups go live · 4:00"
+      },
+      {
+        "label": "Next up · Wed",
         "time": "4:55",
         "place": "Harris flag practice",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
@@ -156,18 +168,6 @@
         "kind": "school",
         "whenLabel": "Thu 7:00",
         "summary": "Hayes — SRE specials: Art"
-      },
-      {
-        "label": "Next up · Thu",
-        "time": "8:10",
-        "place": "Boys SRE drop",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T13:10:00.000Z",
-        "endIso": "2026-10-01T13:40:00.000Z",
-        "kind": "school_drop",
-        "whenLabel": "Thu 8:10",
-        "summary": "Hayes + Harris — SRE drop-off · 8:25"
       }
     ]
   },
@@ -384,6 +384,18 @@
         {
           "when": "Fri 2 · 8:10",
           "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 2 · 11:30",
+          "what": "SRE Tailgate Party (reading incentive)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 5 · 7:00",
+          "what": "SRE spirit day: Hat Day (Peace Week)",
           "tone": "act",
           "hint": ""
         }
@@ -608,6 +620,12 @@
         {
           "when": "Fri 2 · 9:00",
           "what": "SRE field trip (museum + Meadowbrook)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 5 · 7:00",
+          "what": "SRE spirit day: Hat Day (Peace Week)",
           "tone": "act",
           "hint": ""
         }
@@ -940,6 +958,11 @@
           "tone": "act"
         },
         {
+          "when": "Wed 30 · 4:00",
+          "what": "SRE — conference sign-ups go live",
+          "tone": "act"
+        },
+        {
           "when": "Wed 30 · 4:55",
           "what": "Harris flag practice",
           "tone": "hot"
@@ -1005,19 +1028,14 @@
           "tone": "act"
         },
         {
-          "when": "Fri 2 · 12:00",
-          "what": "LKMS yearbook baby photo due",
+          "when": "Fri 2 · 11:30",
+          "what": "SRE Tailgate Party (reading incentive)",
           "tone": "act"
         },
         {
-          "when": "Sat 3 · 1:00",
-          "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
-          "tone": "hot"
-        },
-        {
-          "when": "Sun 4 · 8:30",
-          "what": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00",
-          "tone": "hot"
+          "when": "Fri 2 · 12:00",
+          "what": "LKMS yearbook baby photo due",
+          "tone": "act"
         }
       ]
     }
