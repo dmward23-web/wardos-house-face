@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T18:54:42.004Z",
+  "refreshedAt": "2026-09-30T19:00:34.248Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -822,13 +822,6 @@
           "tone": "hot"
         },
         {
-          "kind": "event",
-          "when": "Wed · 1:00",
-          "what": "HD #2209 · vanity return ONLY (during Ainsley's session)",
-          "hint": "",
-          "tone": "hot"
-        },
-        {
           "kind": "note",
           "when": "All day",
           "what": "Base @ 147th with Dad",
@@ -876,13 +869,6 @@
           "what": "Lindsay appt",
           "hint": "with Dad",
           "tone": "hot"
-        },
-        {
-          "when": "Wed 30 · 1:00",
-          "what": "HD #2209 · vanity return ONLY (during Ainsley's session)",
-          "hint": "with Dad",
-          "tone": "hot",
-          "herSpace": true
         },
         {
           "when": "Mon 5 · 1:40",
@@ -998,11 +984,6 @@
           "tone": "act"
         },
         {
-          "when": "Wed 30 · 1:00",
-          "what": "HD #2209 · vanity return ONLY (during Ainsley's session)",
-          "tone": "act"
-        },
-        {
           "when": "Wed 30 · 3:15",
           "what": "SRE pickup",
           "tone": "act"
@@ -1110,6 +1091,11 @@
         {
           "when": "Mon 5 · 12:00",
           "what": "SRE Peace Week",
+          "tone": "act"
+        },
+        {
+          "when": "Mon 5 · 1:40",
+          "what": "Lindsay appt",
           "tone": "act"
         }
       ]
