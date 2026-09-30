@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T22:59:53.212Z",
+  "refreshedAt": "2026-09-30T23:13:43.737Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -344,6 +344,12 @@
           "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Wed 7 · leave 4:45",
+          "what": "Harris flag practice · 5:30–6:30",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -398,6 +404,12 @@
         {
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 7 · 7:00",
+          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
         }
@@ -637,6 +649,12 @@
           "what": "SRE spirit day: Tropical Day (Peace Week)",
           "tone": "act",
           "hint": ""
+        },
+        {
+          "when": "Wed 7 · 7:00",
+          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
+          "tone": "act",
+          "hint": ""
         }
       ],
       "appointments": []
@@ -775,22 +793,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "WED · 5:30",
-        "what": "DROP AT BVW FOOTBALL GAME (GAME 6:00)",
+        "when": "WED · 7:15",
+        "what": "PICK UP AT BVW FOOTBALL GAME",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "WED",
-          "5:30"
+          "7:15"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Wed · 5:30",
-          "what": "drop at BVW football game (game 6:00)",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Wed · 7:15",
