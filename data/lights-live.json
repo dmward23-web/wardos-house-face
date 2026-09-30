@@ -1,6 +1,6 @@
 {
   "status": "live",
-  "fetchedAt": "2026-09-30T12:54:56.147Z",
+  "fetchedAt": "2026-09-30T13:10:01.730Z",
   "source": "tplink-cloud-api",
   "writeSupported": true,
   "brightnessControlSupported": true,
@@ -19,8 +19,8 @@
       "name": "Harris's Room",
       "where": "Harris's Room",
       "kind": "dimmer",
-      "on": false,
-      "brightness": 64,
+      "on": true,
+      "brightness": 85,
       "online": true
     },
     {
