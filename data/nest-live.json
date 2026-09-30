@@ -1,7 +1,7 @@
 {
   "status": "live",
-  "fetchedAt": "2026-09-30T11:38:55.719Z",
-  "updatedAt": "2026-09-30T11:38:55.719Z",
+  "fetchedAt": "2026-09-30T11:43:05.263Z",
+  "updatedAt": "2026-09-30T11:43:05.264Z",
   "source": "nest-sdm+webrtc-still",
   "cameras": [
     {
@@ -123,6 +123,6 @@
   "stillsPending": false,
   "stillNote": "WEB_RTC stills on disk (nest-snaps) · reattached by nest-fetch",
   "error": null,
-  "nestProxy": "https://cornwall-hosted-doll-costume.trycloudflare.com",
+  "nestProxy": "https://fabrics-upcoming-curve-abc.trycloudflare.com",
   "nestProxyPath": "scripts/nest-webrtc-proxy.mjs → SDM GenerateWebRtcStream"
 }
