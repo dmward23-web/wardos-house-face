@@ -245,10 +245,39 @@ function fmtDowShort(date) {
 
 function loadEvents(filePath) {
   const raw = JSON.parse(fs.readFileSync(filePath, "utf8"));
-  if (Array.isArray(raw)) return raw;
-  if (Array.isArray(raw.events)) return raw.events;
-  if (raw.result && Array.isArray(raw.result.events)) return raw.result.events;
+  if (Array.isArray(raw)) return dedupeEvents(raw);
+  if (Array.isArray(raw.events)) return dedupeEvents(raw.events);
+  if (raw.result && Array.isArray(raw.result.events)) return dedupeEvents(raw.result.events);
   die("events file has no events[]: " + filePath);
+}
+
+/* DEDUPE1 · same start + same who + same title (ignoring "(...)" notes, punctuation, case)
+ * = one card. Keep the longest title (most detail). Stops double-booked calendar
+ * writes (e.g. two "Hayes — SRE specials: PE + Library" at 7:00) from showing twice. */
+function dedupeKey(ev) {
+  const st = (ev.start && (ev.start.dateTime || ev.start.date)) || ev.start || "";
+  const t = new Date(st);
+  const when = isNaN(t) ? String(st) : t.toISOString();
+  const base = String(ev.summary || ev.title || "")
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[^a-z0-9+]+/g, " ")
+    .trim();
+  return when + "|" + base;
+}
+function dedupeEvents(list) {
+  const keep = new Map();
+  const out = [];
+  for (const ev of list) {
+    if (!ev || ev.status === "cancelled" || ev.status === "canceled") { out.push(ev); continue; }
+    const k = dedupeKey(ev);
+    if (!keep.has(k)) { keep.set(k, out.length); out.push(ev); continue; }
+    const i = keep.get(k);
+    const a = String(out[i].summary || ""), b = String(ev.summary || "");
+    if (b.length > a.length) out[i] = ev;
+    console.error("[dedupe] dropped duplicate: " + (b.length > a.length ? a : b));
+  }
+  return out;
 }
 
 function stripDollars(s) {
