@@ -3766,14 +3766,28 @@
 </style>
 <!-- HUBFIT2 · must load after every inline <style> so wall-fit + phone rules win -->
 <link rel="stylesheet" href="tokens-hub-fit.css?v=LIGHTSDIM1" />
-<style id="atlas1-chip">/* ATLAS1 · one-tap Atlas chat, top-right of the hub header */
+<style id="atlas1-chip">/* ATLAS2 · one-tap Atlas chat, top-right glass pill */
 .hdr{position:relative;}
-.hdr > .atlas-chip{position:absolute;top:12px;right:14px;z-index:5;display:inline-flex;align-items:center;justify-content:center;
-min-height:34px;padding:0 14px;border-radius:999px;font-weight:700;font-size:14px;letter-spacing:.03em;color:#ffd257;text-decoration:none;
-background:linear-gradient(180deg,rgba(40,34,20,.92),rgba(20,18,12,.92));border:1.5px solid rgba(255,210,87,.7);
-box-shadow:0 0 12px rgba(255,190,60,.22),inset 0 1px 0 rgba(255,255,255,.12);}
-.hdr > .atlas-chip::after{content:"";position:absolute;inset:-6px;}
-.hdr > .atlas-chip:active{transform:scale(.97);}
+.hdr > .atlas-chip{position:absolute;top:10px;right:10px;z-index:5;display:inline-flex;align-items:center;gap:6px;
+padding:3px 9px 3px 3px;border-radius:999px;text-decoration:none;
+background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.02)),linear-gradient(180deg,rgba(34,28,14,.94),rgba(12,10,6,.94));
+border:1.5px solid rgba(255,210,87,.62);
+box-shadow:0 0 18px rgba(255,180,40,.28),0 6px 16px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,246,208,.22);
+-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transition:transform .12s ease,box-shadow .2s ease;}
+.hdr > .atlas-chip::after{content:"";position:absolute;inset:-8px;}
+.hdr > .atlas-chip:active{transform:scale(.96);box-shadow:0 0 26px rgba(255,190,60,.5),0 4px 10px rgba(0,0,0,.5);}
+.atlas-chip .atlas-orb{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
+font:800 12px/1 system-ui,-apple-system,sans-serif;color:#1a1204;
+background:radial-gradient(circle at 32% 28%,#fff6d0 0,#ffe08a 38%,#f5c542 70%,#b8860b 100%);
+box-shadow:0 0 12px rgba(255,200,70,.65),inset 0 -2px 4px rgba(120,70,0,.35);}
+.atlas-chip .atlas-txt{display:flex;flex-direction:column;line-height:1;}
+.atlas-chip .atlas-kick{font:700 7.5px/1 system-ui,-apple-system,sans-serif;letter-spacing:.18em;color:rgba(138,224,242,.9);margin-bottom:2px;}
+.atlas-chip .atlas-name{font:800 13px/1 system-ui,-apple-system,sans-serif;letter-spacing:.01em;
+background:linear-gradient(180deg,#fff6d0,#ffe08a 45%,#f5c542);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.atlas-chip .atlas-live{width:6px;height:6px;border-radius:50%;background:#6ee7a0;box-shadow:0 0 8px #6ee7a0;margin-left:2px;
+animation:atlasPulse 2.4s ease-in-out infinite;}
+@keyframes atlasPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+@media (prefers-reduced-motion:reduce){.atlas-chip .atlas-live{animation:none}}
 </style>
 </head>
 <body>
@@ -4027,7 +4041,7 @@ box-shadow:0 0 12px rgba(255,190,60,.22),inset 0 1px 0 rgba(255,255,255,.12);}
  <div class="hdr-date-dow" data-live="dow">Mon</div>
  <div class="hdr-date-long" data-live="date-long">Sep 28, 2026</div>
  </div>
- <a class="atlas-chip" href="grokbot://app/v1/agent?id=f68c51ee-274a-4b78-a822-a1302fcffb05" aria-label="Open Atlas in Grok Bot">Atlas</a>
+ <a class="atlas-chip" href="grokbot://app/v1/agent?id=f68c51ee-274a-4b78-a822-a1302fcffb05" aria-label="Open Atlas in Grok Bot"><span class="atlas-orb" aria-hidden="true">A</span><span class="atlas-txt"><span class="atlas-kick">ASK</span><span class="atlas-name">Atlas</span></span><span class="atlas-live" aria-hidden="true"></span></a>
  <div class="hdr-brand">
  <div class="id-text">
  <h1 class="name"><span class="name-accent">The Ward's</span></h1>
