@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T11:07:16.732Z",
+  "refreshedAt": "2026-09-30T11:08:31.260Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -36,18 +36,6 @@
         "kind": "school",
         "whenLabel": "7:00",
         "summary": "Hayes — SRE specials: PE + Library (tennis shoes, library book)"
-      },
-      {
-        "label": "Next up · today",
-        "time": "7:00",
-        "place": "SRE specials: PE + Library (tennis shoes)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-09-30T12:00:00.000Z",
-        "endIso": "2026-09-30T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:00",
-        "summary": "Hayes — SRE specials: PE + Library (tennis shoes)"
       },
       {
         "label": "Next up · today",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Thu 7:00",
         "summary": "Harris — SRE specials: Spanish + Library checkout"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "7:00",
+        "place": "SRE specials: Art",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-01T12:00:00.000Z",
+        "endIso": "2026-10-01T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Thu 7:00",
+        "summary": "Hayes — SRE specials: Art"
       }
     ]
   },
@@ -584,13 +584,6 @@
         },
         {
           "kind": "event",
-          "when": "Wed · 7:00",
-          "what": "SRE specials: PE + Library (tennis shoes)",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
           "when": "Wed · 8:00",
           "what": "SRE Hearing/Vision Screening",
           "hint": "",
@@ -616,6 +609,13 @@
           "what": "provider in-home",
           "hint": "",
           "tone": "act"
+        },
+        {
+          "kind": "note",
+          "when": "All day",
+          "what": "🏡 DROP ZONE HQ with Dad",
+          "hint": "through Fri Oct 2 · 3:00",
+          "tone": "hot"
         }
       ],
       "sports": [
@@ -642,12 +642,6 @@
         {
           "when": "Wed 30 · 7:00",
           "what": "SRE specials: PE + Library (tennis shoes, library book)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 30 · 7:00",
-          "what": "SRE specials: PE + Library (tennis shoes)",
           "tone": "act",
           "hint": ""
         },
@@ -989,11 +983,6 @@
         },
         {
           "when": "Wed · 7:00",
-          "what": "SRE specials: PE + Library (tennis shoes)",
-          "tone": "act"
-        },
-        {
-          "when": "Wed · 7:00",
           "what": "SRE specials: Art",
           "tone": "act"
         },
@@ -1031,17 +1020,17 @@
           "when": "Wed · 4:00",
           "what": "SRE — conference sign-ups go live",
           "tone": "act"
+        },
+        {
+          "when": "home week",
+          "what": "Kids with Dad @ 147th through Fri Oct 2 · 3:00",
+          "tone": "hot"
         }
       ],
       "week": [
         {
           "when": "Wed 30 · 7:00",
           "what": "SRE specials: PE + Library (tennis shoes, library book)",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 30 · 7:00",
-          "what": "SRE specials: PE + Library (tennis shoes)",
           "tone": "act"
         },
         {
@@ -1153,6 +1142,11 @@
           "when": "Fri 2 · 12:00",
           "what": "LKMS yearbook baby photo due",
           "tone": "act"
+        },
+        {
+          "when": "Sat 3 · 1:00",
+          "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
+          "tone": "hot"
         }
       ]
     }
