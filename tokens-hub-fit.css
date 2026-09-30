@@ -78,3 +78,55 @@
   html body .hdr .wx-rain .wx-rain-full { display: none !important; }
   html body .hdr .wx-rain .wx-rain-short { display: inline !important; }
 }
+
+/* LIGHTSUP1 · phone: lights sit right under the cameras, then the schedule and the rest */
+@media (max-width: 600px) {
+  html body .panel.panel.panel .hub-upper > .hub-lights { order: -1 !important; }
+}
+
+/* LIGHTSLIM1 · hub lights = slim strip: one glowing pill per real room (tap = on/off), All off.
+   Not-connected stubs, sub line and dim sliders stay on the full lights page. */
+html body .panel.panel.panel #hub-lights-panel .hub-sw.is-stub,
+html body .panel.panel.panel #hub-lights-panel .hub-sw--stub { display: none !important; }
+@media (max-width: 600px) {
+  html body .panel.panel.panel #hub-lights-panel {
+    display: grid !important; grid-template-columns: 1fr auto !important; grid-template-areas: "head bulk" "grid grid" !important;
+    align-items: center !important; gap: 8px 10px !important; padding: 10px 12px !important;
+    height: auto !important; min-height: 0 !important; max-height: none !important; flex: none !important;
+  }
+  html body .panel.panel.panel #hub-lights-panel .hub-lights-head { grid-area: head !important; display: flex !important; align-items: center !important; gap: 8px !important; margin: 0 !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-lights-title { font-size: 14px !important; letter-spacing: .16em !important; text-transform: uppercase !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-lights-pill { font-size: 11px !important; padding: 2px 8px !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-lights-sub,
+  html body .panel.panel.panel #hub-lights-panel .hub-lights-more,
+  html body .panel.panel.panel #hub-lights-panel #lights-all-on { display: none !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-lights-bulk { grid-area: bulk !important; display: flex !important; margin: 0 !important; }
+  html body .panel.panel.panel #hub-lights-panel #lights-all-off { height: 30px !important; min-height: 0 !important; padding: 0 12px !important; font-size: 13px !important; border-radius: 999px !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-lights-grid {
+    grid-area: grid !important; display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important;
+    height: auto !important; max-height: none !important; overflow: visible !important;
+  }
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live {
+    position: relative !important; height: 48px !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important;
+    border-radius: 999px !important; display: flex !important; align-items: center !important; justify-content: center !important;
+    border: 1.5px solid rgba(255,200,80,.28) !important; background: rgba(255,255,255,.04) !important; box-shadow: none !important;
+    transition: background .2s, box-shadow .2s, border-color .2s !important;
+  }
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live.is-on {
+    background: linear-gradient(180deg, rgba(255,215,106,.95), rgba(232,169,58,.9)) !important;
+    border-color: #ffd76a !important; box-shadow: 0 0 18px rgba(255,190,60,.55) !important;
+  }
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live .hub-sw-main { display: contents !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live .hub-sw-text { pointer-events: none !important; text-align: center !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live .hub-sw-name { font-size: 16px !important; font-weight: 800 !important; color: #fff3d6 !important; -webkit-text-fill-color: #fff3d6 !important; white-space: nowrap !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live.is-on .hub-sw-name { color: #1a1206 !important; -webkit-text-fill-color: #1a1206 !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live .hub-sw-meta,
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live .hub-sw-dim { display: none !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live .hub-sw-rocker {
+    position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; margin: 0 !important;
+    opacity: 0 !important; border-radius: 999px !important; cursor: pointer !important; z-index: 2 !important;
+  }
+}
+
+/* TILEFILL1 · Today tile gone → 11 tiles; last tile fills the empty slot instead of leaving a hole. */
+html body nav.tile-grid > .tile:last-child { grid-column: span 2 !important; }
