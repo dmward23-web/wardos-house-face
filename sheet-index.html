@@ -3766,6 +3766,15 @@
 </style>
 <!-- HUBFIT2 · must load after every inline <style> so wall-fit + phone rules win -->
 <link rel="stylesheet" href="tokens-hub-fit.css?v=LIGHTSDIM1" />
+<style id="atlas1-chip">/* ATLAS1 · one-tap Atlas chat, top-right of the hub header */
+.hdr{position:relative;}
+.hdr > .atlas-chip{position:absolute;top:12px;right:14px;z-index:5;display:inline-flex;align-items:center;justify-content:center;
+min-height:34px;padding:0 14px;border-radius:999px;font-weight:700;font-size:14px;letter-spacing:.03em;color:#ffd257;text-decoration:none;
+background:linear-gradient(180deg,rgba(40,34,20,.92),rgba(20,18,12,.92));border:1.5px solid rgba(255,210,87,.7);
+box-shadow:0 0 12px rgba(255,190,60,.22),inset 0 1px 0 rgba(255,255,255,.12);}
+.hdr > .atlas-chip::after{content:"";position:absolute;inset:-6px;}
+.hdr > .atlas-chip:active{transform:scale(.97);}
+</style>
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -4018,6 +4027,7 @@
  <div class="hdr-date-dow" data-live="dow">Mon</div>
  <div class="hdr-date-long" data-live="date-long">Sep 28, 2026</div>
  </div>
+ <a class="atlas-chip" href="grokbot://app/v1/agent?id=f68c51ee-274a-4b78-a822-a1302fcffb05" aria-label="Open Atlas in Grok Bot">Atlas</a>
  <div class="hdr-brand">
  <div class="id-text">
  <h1 class="name"><span class="name-accent">The Ward's</span></h1>
