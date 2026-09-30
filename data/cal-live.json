@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T02:06:46.655Z",
+  "fetchedAt": "2026-09-30T02:10:44.014Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-06",
+  "windowEnd": "2026-10-05",
   "asOfIso": "2026-09-29",
   "nextLeave": {
     "id": "iv9gs783mgggf0mico2hhurct4",
@@ -364,24 +364,6 @@
       "start": "2026-10-05T17:30:00-05:00",
       "end": "2026-10-05T19:00:00-05:00",
       "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "nipks59d70cl19j22e6edbvjug_20261006",
-      "summary": "Hayes Johnson birthday",
-      "start": "2026-10-06T00:00:00Z",
-      "end": "2026-10-07T00:00:00Z",
-      "location": "",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "4iuge4862k2uhd3t5irr7jjmc8_20261006T212500Z",
-      "summary": "Ainsley swim — Coach Ann · 5:00 practice",
-      "start": "2026-10-06T17:00:00-05:00",
-      "end": "2026-10-06T18:00:00-05:00",
-      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
       "busy": false,
       "allDay": false
     }
