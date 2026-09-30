@@ -678,32 +678,40 @@
           "cadence": "daily"
         },
         {
-          "id": "ain-toys",
-          "what": "Room reset — clean pass",
+          "id": "ain-backpack",
+          "what": "🎒 Backpack packed — tomorrow ready",
           "stars": 1,
-          "cadence": "daily"
+          "cadence": "daily",
+          "since": "2026-09-30"
         },
         {
           "id": "ain-dishwasher",
-          "what": "Clean up after you · rinse · in dishwasher",
-          "stars": 1,
-          "cadence": "daily"
-        },
-        {
-          "id": "ain-empty",
-          "what": "Empty dishwasher",
+          "what": "Dishes — rinse + in the washer (empty it if it is clean)",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "ain-living",
-          "what": "Shoes & coats · closet / cubby / room",
+          "what": "Shoes & coat — closet / cubby / room — never the hallway",
           "stars": 1,
           "cadence": "daily"
         },
         {
+          "id": "ain-toys",
+          "what": "Room close — floor clear · hamper · surfaces",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "ain-shower",
+          "what": "Ready for bed — shower · brush",
+          "stars": 1,
+          "cadence": "daily",
+          "since": "2026-09-30"
+        },
+        {
           "id": "ain-bath",
-          "what": "Bathroom wipe — weekly",
+          "what": "Bathroom wipe — her bathroom",
           "stars": 3,
           "cadence": "weekly"
         },
@@ -715,7 +723,7 @@
         },
         {
           "id": "ain-cubby",
-          "what": "🎒 Backpack + sports bag in garage cubby",
+          "what": "🎒 Backpack + sports bag in the garage cubby",
           "stars": 1,
           "cadence": "weekly"
         },
@@ -734,9 +742,9 @@
       "streakLabel": "◆ 4-day streak — hold the line",
       "missions": [
         {
-          "when": "Weekly",
+          "when": "Weekly · house day",
           "what": "Bath wipe + laundry + garage cubby = big star dump",
-          "hint": "musts · ask Dad to inspect",
+          "hint": "Sat after breakfast unless you have a standing day · ask Dad to inspect",
           "tone": "fun"
         },
         {
