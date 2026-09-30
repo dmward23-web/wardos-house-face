@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-30T03:00:46.204Z",
+  "refreshedAt": "2026-09-30T03:07:40.276Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -99,15 +99,15 @@
       },
       {
         "label": "Next up · Wed",
-        "time": "4:55",
-        "place": "Harris flag practice",
+        "time": "5:30",
+        "place": "provider in-home",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
-        "startIso": "2026-09-30T21:55:00.000Z",
-        "endIso": "2026-09-30T23:50:00.000Z",
-        "kind": "sport",
-        "whenLabel": "Wed 4:55",
-        "summary": "Harris flag practice"
+        "startIso": "2026-09-30T22:30:00.000Z",
+        "endIso": "2026-09-30T23:30:00.000Z",
+        "kind": "other",
+        "whenLabel": "Wed 5:30",
+        "summary": "Hayes + Harris — provider in-home · 5:30"
       },
       {
         "label": "Next up · Thu",
@@ -319,12 +319,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Wed 30 · leave 4:55",
-          "what": "Harris flag practice",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Sat 3 · leave 1:00",
           "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
@@ -753,6 +747,12 @@
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Tue 6 · leave 5:00",
+          "what": "Ainsley swim — Coach Ann",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -912,11 +912,6 @@
           "tone": "act"
         },
         {
-          "when": "Wed 30 · 4:55",
-          "what": "Harris flag practice",
-          "tone": "hot"
-        },
-        {
           "when": "Thu 1 · 7:00",
           "what": "SRE PE (tennis shoes)",
           "tone": "act"
@@ -994,6 +989,11 @@
         {
           "when": "Mon 5 · 5:30",
           "what": "Hayes baseball — Falcons vs KC Tigers (away)",
+          "tone": "hot"
+        },
+        {
+          "when": "Tue 6 · 5:00",
+          "what": "Ainsley swim — Coach Ann",
           "tone": "hot"
         },
         {
