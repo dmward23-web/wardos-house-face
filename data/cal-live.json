@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T21:55:25.235Z",
+  "fetchedAt": "2026-09-30T22:02:06.819Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-07",
   "asOfIso": "2026-09-30",
   "nextLeave": {
-    "id": "vluod9ndrvhcr20ovpera726dc_20260930T214500Z",
-    "summary": "Harris flag practice · 5:30–6:30",
-    "start": "2026-09-30T17:00:00-05:00",
-    "end": "2026-09-30T18:30:00-05:00",
-    "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
+    "id": "6fqdqdicrf1aglh2kk48cnod38",
+    "summary": "Ainsley — drop at BVW football game (game 6:00)",
+    "start": "2026-09-30T17:30:00-05:00",
+    "end": "2026-09-30T18:00:00-05:00",
+    "location": "Blue Valley West High School, 16200 Antioch Rd, Overland Park, KS 66085",
     "busy": true,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "vluod9ndrvhcr20ovpera726dc_20260930T214500Z",
-      "summary": "Harris flag practice · 5:30–6:30",
-      "start": "2026-09-30T17:00:00-05:00",
-      "end": "2026-09-30T18:30:00-05:00",
-      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "6fqdqdicrf1aglh2kk48cnod38",
       "summary": "Ainsley — drop at BVW football game (game 6:00)",
@@ -388,9 +379,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "5:00",
-    "place": "Harris flag practice · 5:30–6:30",
-    "detailHtml": "<strong>5:00</strong> Harris flag practice · 5:30–6:30",
+    "time": "5:30",
+    "place": "Ainsley — drop at BVW football game (game 6:00)",
+    "detailHtml": "<strong>5:30</strong> Ainsley — drop at BVW football game (game 6:00)",
     "badge": "Wed"
   },
   "error": null
