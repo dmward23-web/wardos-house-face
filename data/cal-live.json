@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T21:42:40.548Z",
+  "fetchedAt": "2026-09-30T21:55:25.235Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-06",
+  "windowEnd": "2026-10-07",
   "asOfIso": "2026-09-30",
   "nextLeave": {
     "id": "vluod9ndrvhcr20ovpera726dc_20260930T214500Z",
@@ -365,6 +365,24 @@
       "end": "2026-10-06T18:00:00-05:00",
       "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
       "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "uj7dl4l1smsa286932ro47ae1k",
+      "summary": "Hayes + Harris — SRE spirit day: Workout Day / team jersey (Peace Week)",
+      "start": "2026-10-07T07:00:00-05:00",
+      "end": "2026-10-07T07:15:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "vluod9ndrvhcr20ovpera726dc_20261007T214500Z",
+      "summary": "Harris flag practice · 5:30–6:30",
+      "start": "2026-10-07T16:45:00-05:00",
+      "end": "2026-10-07T18:30:00-05:00",
+      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
+      "busy": true,
       "allDay": false
     }
   ],
