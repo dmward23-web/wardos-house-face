@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T02:21:05.570Z",
+  "fetchedAt": "2026-09-30T02:21:56.508Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-06",
@@ -149,6 +149,15 @@
       "end": "2026-10-01T11:20:00-05:00",
       "location": "Dr. David P. Ramirez, MD, 8631 W 150th St #101, Overland Park, KS 66223",
       "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "tcss94gr3r35me8b24socvu318",
+      "summary": "Free · Hank — scooter pickup + brake return",
+      "start": "2026-10-01T11:45:00-05:00",
+      "end": "2026-10-01T13:15:00-05:00",
+      "location": "Electro Scoot Repair, 12506 W 70th St, Shawnee, KS 66216",
+      "busy": false,
       "allDay": false
     },
     {
