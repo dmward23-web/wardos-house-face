@@ -791,9 +791,10 @@
   color: #f2eee6 !important;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45) !important;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere; /* NEXTWRAP1 · Dan 9/29: show the whole next-up line */
 }
 
 
