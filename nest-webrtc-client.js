@@ -314,6 +314,7 @@
       err.code = "NEST_PROXY_UNREACHABLE";
       throw err;
     }
+    if (!proxyToken()) { var ek = new Error("NEED KEY"); ek.code = "NEED_KEY"; throw ek; } /* CAMKEY1 · no keyless calls */
     var r = await fetch(base + "/api/cameras", { headers: authHeaders(), cache: "no-store" });
     if (!r.ok) throw new Error("cameras HTTP " + r.status);
     return r.json();
@@ -321,6 +322,7 @@
 
   async function exchangeOffer(deviceId, offerSdp) {
     var base = proxyBase();
+    if (!proxyToken()) { var ek = new Error("NEED KEY"); ek.code = "NEED_KEY"; throw ek; } /* CAMKEY1 · no keyless calls */
     var r = await fetch(base + "/api/webrtc", {
       method: "POST",
       headers: authHeaders(),
