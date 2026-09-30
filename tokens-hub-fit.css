@@ -130,3 +130,35 @@ html body .panel.panel.panel #hub-lights-panel .hub-sw--stub { display: none !im
 
 /* TILEFILL1 · Today tile gone → 11 tiles; last tile fills the empty slot instead of leaving a hole. */
 html body nav.tile-grid > .tile:last-child { grid-column: span 2 !important; }
+
+/* LIGHTSQUIET1 · Dan: slim strip too loud. One thin quiet row: tiny label, small chips, gold dot when on, no fill/glow. */
+@media (max-width: 600px) {
+  html body .panel.panel.panel #hub-lights-panel {
+    grid-template-columns: auto 1fr auto !important; grid-template-areas: "head grid bulk" !important;
+    gap: 8px !important; padding: 6px 10px !important; border-width: 1px !important;
+    border-color: rgba(255,255,255,.10) !important; background: rgba(255,255,255,.03) !important; box-shadow: none !important;
+  }
+  html body .panel.panel.panel #hub-lights-panel::before, html body .panel.panel.panel #hub-lights-panel::after { display: none !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-lights-pill { display: none !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-lights-title { font-size: 11px !important; color: rgba(255,243,214,.55) !important; -webkit-text-fill-color: rgba(255,243,214,.55) !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-lights-grid { gap: 6px !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live,
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live.is-on {
+    height: 30px !important; background: transparent !important; box-shadow: none !important;
+    border: 1px solid rgba(255,255,255,.14) !important;
+  }
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live.is-on { border-color: rgba(255,215,106,.45) !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live .hub-sw-name,
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live.is-on .hub-sw-name {
+    font-size: 13px !important; font-weight: 600 !important; color: rgba(255,243,214,.6) !important; -webkit-text-fill-color: rgba(255,243,214,.6) !important;
+  }
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live.is-on .hub-sw-name { color: #ffd76a !important; -webkit-text-fill-color: #ffd76a !important; }
+  html body .panel.panel.panel #hub-lights-panel .hub-sw--live.is-on .hub-sw-name::before {
+    content: "" !important; display: inline-block !important; width: 6px !important; height: 6px !important; border-radius: 50% !important;
+    background: #ffd76a !important; margin-right: 5px !important; vertical-align: middle !important;
+  }
+  html body .panel.panel.panel #hub-lights-panel #lights-all-off {
+    height: 30px !important; padding: 0 8px !important; font-size: 12px !important; background: transparent !important;
+    border: 1px solid rgba(255,255,255,.14) !important; box-shadow: none !important; color: rgba(255,243,214,.6) !important; -webkit-text-fill-color: rgba(255,243,214,.6) !important;
+  }
+}
