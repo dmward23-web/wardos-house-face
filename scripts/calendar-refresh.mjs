@@ -174,7 +174,7 @@ function classify(ev) {
   if (/SRE drop-off|SRE drop\b/i.test(summary)) return { kind: "school_drop", summary };
   if (/SRE pickup/i.test(summary)) return { kind: "school_pickup", summary };
   if (/Homework Help/i.test(summary)) return { kind: "school", summary, kid: "ainsley" };
-  if (/hearing\/vision|Hearing\/Vision|PE \(tennis|field trip|yearbook/i.test(summary)) {
+  if (/hearing\/vision|Hearing\/Vision|PE \(tennis|SRE specials?|field trip|yearbook/i.test(summary)) { /* SPECIALS1: boys specials always on kid boards + hub */
     return { kind: "school", summary };
   }
   if (/swim|Swim|Coach Ann/i.test(summary)) return { kind: "sport", sport: "swim", summary, kid: "ainsley" };
