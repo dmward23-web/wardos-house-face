@@ -100,13 +100,14 @@
     }
   }
 
-  function shortPlace(summary) {
+  function shortPlace(summary, cap) {
     var s = kidsSafe(String(summary || "").trim());
     s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
     s = s.replace(/\(\s*Mom[^)]*\)/gi, "");
     s = s.replace(/\bMom\b[^·]*/gi, "");
     s = s.replace(/\s{2,}/g, " ").replace(/\s·\s*$/g, "").trim();
-    if (s.length > 64) s = s.slice(0, 61) + "…";
+    cap = cap || 64;
+    if (s.length > cap) s = s.slice(0, cap - 3) + "…";
     return s;
   }
 
@@ -270,7 +271,7 @@
         timeZone: "America/Chicago", weekday: "short"
       }).format(new Date(startMs));
     } catch (e2) { /* keep */ }
-    var place = shortPlace(ev.summary || ev.place || "");
+    var place = shortPlace(ev.summary || ev.place || "", ev._merged ? 120 : 64);
     var time = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
     return {
       label: isToday ? "Schedule · today" : ("Schedule · " + dow),
@@ -335,8 +336,30 @@
     return future.slice(0, limit);
   }
 
+  /* BOTHKIDS1 · same-start events share the hero (both boys always shown) */
+  function mergeSameStart(cal, next) {
+    if (!next || next.allDay) return next;
+    var ms = eventStartMs(next);
+    var same = listEvents(cal).filter(function (e) { return !e.allDay && eventStartMs(e) === ms; });
+    if (same.length < 2) return next;
+    var rx = /^\s*([A-Z][a-z]+)\s*[—–-]\s*([^:]+):\s*(.+)$/;
+    var parts = same.map(function (e) { return String(e.summary || "").match(rx); });
+    var summary;
+    if (parts.every(function (m) { return m && m[2].trim() === parts[0][2].trim(); })) {
+      summary = parts.map(function (m) { return m[1]; }).join(" + ") + " — " + parts[0][2].trim() + ": " +
+        parts.map(function (m) { return m[1] + " " + m[3].trim(); }).join(" · ");
+    } else {
+      summary = same.map(function (e) { return String(e.summary || ""); }).join(" · ");
+    }
+    var out = {};
+    for (var k in next) out[k] = next[k];
+    out.summary = summary;
+    out._merged = same.length;
+    return out;
+  }
+
   function pickStripFromCal(cal, clock) {
-    var next = pickNextFuture(cal, Date.now());
+    var next = mergeSameStart(cal, pickNextFuture(cal, Date.now()));
     var strip = next
       ? stripFromEvent(next, clock)
       : {
