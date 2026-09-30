@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T19:12:56.153Z",
+  "refreshedAt": "2026-09-30T19:20:42.230Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -344,6 +344,12 @@
           "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Wed 7 · leave 5:30",
+          "what": "Harris flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -404,6 +410,12 @@
         {
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 7 · 7:00",
+          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
         }
@@ -649,6 +661,12 @@
           "what": "SRE spirit day: Tropical Day (Peace Week)",
           "tone": "act",
           "hint": ""
+        },
+        {
+          "when": "Wed 7 · 7:00",
+          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
+          "tone": "act",
+          "hint": ""
         }
       ],
       "appointments": []
@@ -787,22 +805,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "WED · 12:15",
-        "what": "LINDSAY APPT",
+        "when": "THU · 3:00",
+        "what": "LKMS HOMEWORK HELP",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "WED",
-          "12:15"
+          "THU",
+          "3:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Wed · 12:15",
-          "what": "Lindsay appt",
-          "hint": "",
-          "tone": "hot"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -846,12 +857,6 @@
         }
       ],
       "appointments": [
-        {
-          "when": "Wed 30 · 12:15",
-          "what": "Lindsay appt",
-          "hint": "with Dad",
-          "tone": "hot"
-        },
         {
           "when": "Mon 5 · 1:40",
           "what": "Lindsay appt",
@@ -960,11 +965,6 @@
         }
       ],
       "week": [
-        {
-          "when": "Wed 30 · 12:15",
-          "what": "Lindsay appt",
-          "tone": "act"
-        },
         {
           "when": "Wed 30 · 3:15",
           "what": "SRE pickup",
@@ -1078,6 +1078,11 @@
         {
           "when": "Mon 5 · 1:40",
           "what": "Lindsay appt",
+          "tone": "act"
+        },
+        {
+          "when": "Mon 5 · 3:00",
+          "what": "LKMS Homework Help",
           "tone": "act"
         }
       ]
