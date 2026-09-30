@@ -121,8 +121,10 @@ function parseEventTime(ev, which) {
     return Number.isNaN(d.getTime()) ? null : d;
   }
   if (block.date) {
-    // All-day: treat as midnight CT of that civil date
-    const d = new Date(block.date + "T12:00:00-05:00");
+    // All-day: treat as noon CT of that civil date.
+    // MCP dumps sometimes emit "2026-10-09T00:00:00Z" in date — take YYYY-MM-DD only.
+    const civil = String(block.date).slice(0, 10);
+    const d = new Date(civil + "T12:00:00-05:00");
     return Number.isNaN(d.getTime()) ? null : d;
   }
   // compact dump shape
