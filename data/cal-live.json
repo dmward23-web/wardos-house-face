@@ -1,39 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T11:59:21.078Z",
+  "fetchedAt": "2026-09-30T12:12:20.455Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-07",
   "asOfIso": "2026-09-30",
   "nextLeave": {
-    "id": "5fdjtu0pf3dub1rim305qtrnrk",
-    "summary": "Hayes — SRE specials: PE + Library (tennis shoes, library book)",
-    "start": "2026-09-30T07:00:00-05:00",
-    "end": "2026-09-30T07:15:00-05:00",
-    "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+    "id": "iv9gs783mgggf0mico2hhurct4",
+    "summary": "Ainsley — LKMS yearbook picture retakes",
+    "start": "2026-09-30T07:30:00-05:00",
+    "end": "2026-09-30T07:45:00-05:00",
+    "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
     "busy": false,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "5fdjtu0pf3dub1rim305qtrnrk",
-      "summary": "Hayes — SRE specials: PE + Library (tennis shoes, library book)",
-      "start": "2026-09-30T07:00:00-05:00",
-      "end": "2026-09-30T07:15:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "tccch6r1l8bmsc1bhj3vuch8kg",
-      "summary": "Harris — SRE specials: Art",
-      "start": "2026-09-30T07:00:00-05:00",
-      "end": "2026-09-30T07:15:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "iv9gs783mgggf0mico2hhurct4",
       "summary": "Ainsley — LKMS yearbook picture retakes",
@@ -469,9 +451,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "7:00",
-    "place": "Hayes — SRE specials: PE + Library (tennis shoes, lib…",
-    "detailHtml": "<strong>7:00</strong> Hayes — SRE specials: PE + Library (tennis shoes, lib… · next Leave · Wed <strong>9:00</strong> HD #2209 · vanity return ONLY",
+    "time": "7:30",
+    "place": "Ainsley — LKMS yearbook picture retakes",
+    "detailHtml": "<strong>7:30</strong> Ainsley — LKMS yearbook picture retakes · next Leave · Wed <strong>9:00</strong> HD #2209 · vanity return ONLY",
     "badge": "Wed"
   },
   "error": null

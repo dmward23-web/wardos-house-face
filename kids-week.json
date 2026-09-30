@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T11:59:20.710Z",
+  "refreshedAt": "2026-09-30T12:12:20.113Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,38 +17,14 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "7:00",
-    "place": "SRE specials: PE + Library (tennis shoes, library book)",
+    "time": "7:30",
+    "place": "LKMS yearbook picture retakes",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Wed",
-    "startIso": "2026-09-30T12:00:00.000Z",
-    "endIso": "2026-09-30T12:15:00.000Z",
+    "startIso": "2026-09-30T12:30:00.000Z",
+    "endIso": "2026-09-30T12:45:00.000Z",
     "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "7:00",
-        "place": "SRE specials: PE + Library (tennis shoes, library book)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-09-30T12:00:00.000Z",
-        "endIso": "2026-09-30T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:00",
-        "summary": "Hayes — SRE specials: PE + Library (tennis shoes, library book)"
-      },
-      {
-        "label": "Next up · today",
-        "time": "7:00",
-        "place": "SRE specials: Art",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-09-30T12:00:00.000Z",
-        "endIso": "2026-09-30T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:00",
-        "summary": "Harris — SRE specials: Art"
-      },
       {
         "label": "Next up · today",
         "time": "7:30",
@@ -168,6 +144,30 @@
         "kind": "school",
         "whenLabel": "Thu 7:00",
         "summary": "Hayes — SRE specials: Art"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "8:10",
+        "place": "Boys SRE drop",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-01T13:10:00.000Z",
+        "endIso": "2026-10-01T13:40:00.000Z",
+        "kind": "school_drop",
+        "whenLabel": "Thu 8:10",
+        "summary": "Hayes + Harris — SRE drop-off · 8:25"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "8:55",
+        "place": "KS DL replace · OP 119th · BOOKED 2777892",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-01T13:55:00.000Z",
+        "endIso": "2026-10-01T15:00:00.000Z",
+        "kind": "leave",
+        "whenLabel": "Thu 8:55",
+        "summary": "Leave · KS DL replace · OP 119th · BOOKED 2777892 · 9:15"
       }
     ]
   },
