@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T14:31:40.780Z",
+  "refreshedAt": "2026-09-30T14:44:18.791Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -344,6 +344,12 @@
           "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Wed 7 · leave 5:30",
+          "what": "Harris flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -404,6 +410,12 @@
         {
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 7 · 7:00",
+          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
         }
@@ -647,6 +659,12 @@
         {
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 7 · 7:00",
+          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
         }
