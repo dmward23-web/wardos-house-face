@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T23:45:42.696Z",
+  "fetchedAt": "2026-09-30T23:57:17.416Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-08",
+  "windowEnd": "2026-10-06",
   "asOfIso": "2026-09-30",
   "nextLeave": {
     "id": "ovkott1hhl53e1rfc15rvu9og8",
@@ -382,96 +382,6 @@
       "start": "2026-10-06T17:00:00-05:00",
       "end": "2026-10-06T18:00:00-05:00",
       "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "8aimbl11odujl3cl1r73pokqvs",
-      "summary": "Harris — SRE specials: Art",
-      "start": "2026-10-07T07:00:00-05:00",
-      "end": "2026-10-07T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "ipl03ih1jh4k1plriiu6sa6sms",
-      "summary": "Hayes — SRE specials: PE + Library (tennis shoes, library book)",
-      "start": "2026-10-07T07:00:00-05:00",
-      "end": "2026-10-07T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "uj7dl4l1smsa286932ro47ae1k",
-      "summary": "Hayes + Harris — SRE spirit day: Workout Day / team jersey (Peace Week)",
-      "start": "2026-10-07T07:00:00-05:00",
-      "end": "2026-10-07T07:15:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "vluod9ndrvhcr20ovpera726dc_20261007T214500Z",
-      "summary": "Harris flag practice · 5:30–6:30",
-      "start": "2026-10-07T16:45:00-05:00",
-      "end": "2026-10-07T18:30:00-05:00",
-      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "6gc1db0v6m642r4t0uhhpagft0",
-      "summary": "Hayes + Harris — SRE spirit day: Crazy Socks Day (Peace Week)",
-      "start": "2026-10-08T07:00:00-05:00",
-      "end": "2026-10-08T07:15:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "jsv3ukvj82chj7v8tmk4mv4atk",
-      "summary": "Harris — SRE specials: Spanish + Library checkout",
-      "start": "2026-10-08T07:00:00-05:00",
-      "end": "2026-10-08T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "t1sse9vtre7av9lvi2kctig9b8",
-      "summary": "Hayes — SRE specials: Art",
-      "start": "2026-10-08T07:00:00-05:00",
-      "end": "2026-10-08T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "43chat4nm1cmv3tsqtd2p9cdjo_20261008T200000Z",
-      "summary": "Ainsley — LKMS Homework Help · 3:00",
-      "start": "2026-10-08T15:00:00-05:00",
-      "end": "2026-10-08T16:00:00-05:00",
-      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "4iuge4862k2uhd3t5irr7jjmc8_20261008T212500Z",
-      "summary": "Ainsley swim — Coach Ann · 5:00 practice",
-      "start": "2026-10-08T17:00:00-05:00",
-      "end": "2026-10-08T18:00:00-05:00",
-      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "gdlheaj2udj8ilargoqmor6m0s",
-      "summary": "Hayes flag practice · 6:00",
-      "start": "2026-10-08T18:00:00-05:00",
-      "end": "2026-10-08T19:15:00-05:00",
-      "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
       "busy": false,
       "allDay": false
     }
