@@ -535,16 +535,29 @@ function main() {
 
   /* Upcoming = start > now (Next Up advances by clock). Drop past forever.
      House glass: drop Desk GET · / Atlas: stubs from Next Up (still in raw dump). */
+  /* PINSPEC1 2026-09-30 (Dan): today's SRE specials stay on the main board's
+     today list (published as all-day so they sort to the top) until drop-off
+     is done at 8:40 CT; the 10-min refresh drops them after that. */
+  const ctMin = (() => {
+    const b = {};
+    for (const p of new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", hour: "numeric", minute: "2-digit", hourCycle: "h23" }).formatToParts(now)) b[p.type] = p.value;
+    return Number(b.hour) * 60 + Number(b.minute);
+  })();
+  const isPinnedSpecial = (e) =>
+    /SRE specials?/i.test(e.summary || "") && !/No Specials/i.test(e.summary || "") &&
+    String(e.start || "").slice(0, 10) === todayIso && ctMin < 8 * 60 + 40 && e.startMs <= now.getTime();
   const upcoming = slimAll
-    .filter((e) => e.startMs > now.getTime())
+    .filter((e) => e.startMs > now.getTime() || isPinnedSpecial(e))
+    .map((e) => (isPinnedSpecial(e) ? { ...e, allDay: true, start: todayIso, end: todayIso, pinnedUntil: "8:40" } : e))
     .filter((e) => !/^GET\s*·/i.test(e.summary || "") && !/^Atlas:/i.test(e.summary || ""))
     .filter((e) => !isSoft(e))
     .sort((a, b) => a.startMs - b.startMs);
 
   /* nextLeave field = Next Up hero = first future event (Busy preferred only as tie-break same start) */
-  let next = upcoming[0] || null;
-  if (upcoming.length >= 2 && upcoming[0].startMs === upcoming[1].startMs) {
-    const busy = upcoming.find((e) => e.busy && e.startMs === upcoming[0].startMs);
+  const heroPool = upcoming.filter((e) => !e.pinnedUntil);
+  let next = heroPool[0] || null;
+  if (heroPool.length >= 2 && heroPool[0].startMs === heroPool[1].startMs) {
+    const busy = heroPool.find((e) => e.busy && e.startMs === heroPool[0].startMs);
     if (busy) next = busy;
   }
 

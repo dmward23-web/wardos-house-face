@@ -336,7 +336,22 @@ function buildBoardItems(events, now) {
   return items;
 }
 
+/* PINSPEC1 2026-09-30 (Dan): today's SRE specials stay pinned at the top of
+   Next Up until morning drop-off is done (8:40 CT), even after their 7:00 stub ends. */
+function ctMinutes(date) {
+  const f = new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "numeric", minute: "2-digit", hourCycle: "h23" });
+  const b = {};
+  for (const p of f.formatToParts(date)) b[p.type] = p.value;
+  return Number(b.hour) * 60 + Number(b.minute);
+}
+function pinnedSpecials(item, now) {
+  if (!/SRE specials?/i.test(item.raw || "")) return false;
+  if (partsInTZ(item.start).iso !== partsInTZ(now).iso) return false;
+  return ctMinutes(now) < 8 * 60 + 40;
+}
+
 function stillRelevant(item, now) {
+  if (pinnedSpecials(item, now)) return true;
   // Drop when ended (5 min grace so "just ended" clears quickly)
   return item.end.getTime() + 5 * 60 * 1000 > now.getTime();
 }
@@ -360,9 +375,11 @@ function pickStripQueue(items, now, homeWeek) {
   const upcoming = items
     .filter((it) => stillRelevant(it, now) && it.kind !== "custody")
     .filter((it) => it.kind !== "dad") // Dad chores stay on dan.today/week, not Next Up strip
-    .filter((it) => it.start.getTime() + leadMs >= now.getTime()) // future / just-started only
+    .filter((it) => pinnedSpecials(it, now) || it.start.getTime() + leadMs >= now.getTime()) // future / just-started only (PINSPEC1 keeps today's specials)
     .slice()
     .sort((a, b) => {
+      const pa = pinnedSpecials(a, now) ? 0 : 1, pb = pinnedSpecials(b, now) ? 0 : 1;
+      if (pa !== pb) return pa - pb;
       const dt = a.start - b.start;
       if (dt !== 0) return dt;
       return stripPriority(a) - stripPriority(b);
