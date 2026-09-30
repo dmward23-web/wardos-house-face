@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0e141c" />
 <title>WardOS · Nest live</title>
@@ -74,7 +75,7 @@
   <div class="cams" id="cam-row" aria-label="Cameras" hidden></div>
 </div>
 <script src="nest-webrtc-client.js?v=PROXYFOLLOW2"></script>
-<script src="hub-key-entry.js?v=KEYPASTE2"></script>
+<script src="hub-key-entry.js?v=AUDIT1"></script>
 <script>
 (function () {
   var N = window.NestWebRtc;
@@ -142,6 +143,15 @@
     try {
       if (N.ensureProxyFromLive) await N.ensureProxyFromLive();
       proxyMeta.textContent = "proxy " + (N.proxyBase() || "NEED PROXY") + (N.proxyToken() ? " · authed" : "");
+      /* AUDIT1 · no key on this screen → don't call the proxy; say NEED KEY and show the still */
+      if (!N.proxyToken()) {
+        if (stageEl) stageEl.classList.add("fail");
+        setStatus("NEED KEY · live video needs the key on this screen");
+        showStillFallback(want).then(function (hit) {
+          setPill(hit ? "dim" : "err", hit ? "STILL · NEED KEY" : "NEED KEY");
+        });
+        return;
+      }
       var data = await N.fetchCameras();
       cams = data.cameras || [];
       row.innerHTML = "";

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -941,9 +942,9 @@
 </div>
 
 <script src="house-clock.js?v=TODAYGLANCE1"></script>
-<script src="house-board-strip.js?v=SOFTGONE1"></script>
+<script src="house-board-strip.js?v=AUDIT1"></script>
 <script src="house-today-bind.js?v=QARELAY1"></script>
-<script src="house-weather.js?v=RAINNOW1"></script>
+<script src="house-weather.js?v=AUDIT1"></script>
 <script src="house-sensi.js?v=TODAYGLANCE1"></script>
 <script src="house-zoom.js"></script>
 <script>
@@ -964,6 +965,8 @@ try { if (window.HouseWeather) HouseWeather.mount("#house-wx"); } catch (e) {}
       return;
     }
     deg.textContent = degText;
+    var ico = oval.querySelector(".oval-ico");
+    if (ico && arguments[3]) ico.textContent = arguments[3]; /* AUDIT1 · icon from the same wx state */
     oval.setAttribute("data-wired", "1");
     oval.removeAttribute("hidden");
     oval.classList.remove("unwired");
@@ -976,7 +979,7 @@ try { if (window.HouseWeather) HouseWeather.mount("#house-wx"); } catch (e) {}
     if (window.HouseWeather) {
       HouseWeather.load(function (err, data) {
         if (data && data.temp != null && isFinite(Number(data.temp))) {
-          wireOval(".hdr .oval.wx", Math.round(data.temp) + "°", "Weather " + Math.round(data.temp) + " degrees");
+          wireOval(".hdr .oval.wx", Math.round(data.temp) + "°", "Weather " + Math.round(data.temp) + " degrees", data.icon);
         } else {
           wireOval(".hdr .oval.wx", null);
         }

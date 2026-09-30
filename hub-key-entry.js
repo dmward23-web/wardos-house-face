@@ -95,7 +95,12 @@
       return !!localStorage.getItem(NEST_LS) || /(nestProxyToken|proxyToken)=/.test(location.search);
     } catch (_) { return true; }
   }
-  function autoOpen() { if (!hasKey()) setTimeout(openBox, 1200); }
+  /* AUDIT1 · wall/kiosk screens never get a board-covering modal on load; the cam NEED KEY pill
+     is the quiet cue there (tap it to add the key). Phones keep the one-time auto-open. */
+  function isPhone() {
+    try { var w = Math.min(screen.width, screen.height); return !!(w && w <= 600); } catch (_) { return false; }
+  }
+  function autoOpen() { if (!hasKey() && isPhone()) setTimeout(openBox, 1200); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", autoOpen);
   else autoOpen();
 

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -127,10 +128,10 @@
 .ds-dn{font-size:22px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#ffe080}
 .ds-dd{font-size:22px;font-weight:800;color:#f2eee6}
 .ds-dc{margin-left:auto;font-size:16px;font-weight:800;color:rgba(232,220,180,.6)}
-.ds-row{display:grid;grid-template-columns:86px 1fr auto;gap:10px;align-items:center}
+.ds-row{display:grid;grid-template-columns:86px minmax(0,1fr) auto;gap:10px;align-items:center}
 .ds-row.is-aware{opacity:.55}
 .ds-rt{font-size:19px;font-weight:800;color:rgba(255,224,128,.9)}
-.ds-rw{font-size:19px;font-weight:700;color:#e8e2d6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ds-rw{font-size:19px;font-weight:700;color:#e8e2d6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .ds-day.is-open .ds-rw{white-space:normal}
 .ds-more{font-size:16px;font-weight:800;color:rgba(232,220,180,.6);letter-spacing:.04em}
 .ds-none{font-size:19px;color:#8d877c}
@@ -426,9 +427,9 @@
  </footer>
 </div>
 <script src="house-clock.js?v=DADGLANCE1"></script>
-<script src="house-board-strip.js?v=DADSEAT1"></script>
-<script src="kids-data.js?v=NOSURP2"></script>
-<script src="house-weather.js?v=RAINNOW1"></script>
+<script src="house-board-strip.js?v=AUDIT1"></script>
+<script src="kids-data.js?v=AUDIT1"></script>
+<script src="house-weather.js?v=AUDIT1"></script>
 <script src="house-sensi.js?v=DADGLANCE1"></script>
 <script>
 (function () {
@@ -445,6 +446,8 @@
       return;
     }
     deg.textContent = degText;
+    var ico = oval.querySelector(".oval-ico");
+    if (ico && arguments[3]) ico.textContent = arguments[3]; /* AUDIT1 · icon from the same wx state */
     oval.setAttribute("data-wired", "1");
     oval.removeAttribute("hidden");
     oval.classList.remove("unwired");
@@ -457,7 +460,7 @@
     if (window.HouseWeather) {
       HouseWeather.load(function (err, data) {
         if (data && data.temp != null && isFinite(Number(data.temp))) {
-          wireOval(".hdr .oval.wx", Math.round(data.temp) + "°", "Weather " + Math.round(data.temp) + " degrees");
+          wireOval(".hdr .oval.wx", Math.round(data.temp) + "°", "Weather " + Math.round(data.temp) + " degrees", data.icon);
         } else {
           wireOval(".hdr .oval.wx", null);
         }
@@ -515,7 +518,7 @@
 })();
 </script>
 
-<script src="dad-seat.js?v=DADSEAT1"></script>
+<script src="dad-seat.js?v=AUDIT1"></script>
 <script src="house-fresh.js?v=DADSEAT1"></script>
 </body>
 </html>

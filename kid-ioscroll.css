@@ -18,7 +18,8 @@ html:not([data-export]) body.theme-harris {
   height: auto !important;
   min-height: 100% !important;
   max-height: none !important;
-  overflow: visible !important; /* NOT a scrollport — html alone scrolls */
+  overflow-x: clip !important; /* AUDIT1 · no sideways pan from floats (clip ≠ scrollport) */
+  overflow-y: visible !important; /* NOT a scrollport — html alone scrolls */
   overscroll-behavior-y: auto !important;
   -webkit-overflow-scrolling: auto !important;
   touch-action: pan-x pan-y pinch-zoom !important;

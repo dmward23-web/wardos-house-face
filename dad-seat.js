@@ -43,6 +43,24 @@
     return t.replace(/([ap])$/i, function (_, ap) { return " " + ap.toUpperCase() + "M"; });
   }
 
+  /* AUDIT1 · same start + same title for different kids → one row ("Hayes + Harris — SRE PE") */
+  function mergeSame(list) {
+    var out = [], by = {};
+    list.forEach(function (e) {
+      var key = (e.allDay ? "d" + H.eventDayIso(e) : H.eventStartMs(e)) + "|" + H.dayTitle(e).toLowerCase();
+      var hit = by[key];
+      if (!hit) { by[key] = e; out.push(e); return; }
+      var names = H.whoNames(hit).concat(H.whoNames(e)).filter(function (n, i, a) { return n !== "Dan" && a.indexOf(n) === i; });
+      if (!names.length) return;
+      var merged = {};
+      for (var k in hit) if (Object.prototype.hasOwnProperty.call(hit, k)) merged[k] = hit[k];
+      merged.summary = names.join(" + ") + " — " + H.dayTitle(hit);
+      out[out.indexOf(hit)] = merged;
+      by[key] = merged;
+    });
+    return out;
+  }
+
   var _cal = null, _kw = null, _open = {};
   function paint() {
     var root = document.querySelector("[data-dad-seat]");
@@ -53,6 +71,7 @@
       return e.allDay ? H.eventDayIso(e) >= todayIso : en > now;
     });
     all.sort(function (a, b) { return H.eventStartMs(a) - H.eventStartMs(b); });
+    all = mergeSame(all);
     var timed = all.filter(function (e) { return !e.allDay && !AWARE.test(e.summary || "") && !H.isPrep(e); });
 
     /* Up next */

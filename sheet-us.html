@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -304,7 +305,7 @@
 </style>
 <link rel="stylesheet" href="tokens-family-clock-first-heat.css?v=FAMCLK1" />
 </head>
-<body>
+<body data-glass="ovals us-leave">
 <div class="panel">
   <header class="hdr hdr--clockfirst">
  <div class="hdr-left-col">
@@ -319,49 +320,29 @@
  </div>
  <div class="hdr-spacer" aria-hidden="true"></div>
  <div class="hdr-ovals">
- <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather"><span class="oval-ico">☀</span><span class="oval-deg">—°</span></a>
- <a class="oval sensi" href="sheet-sensi.html" aria-label="Sensi"><span class="oval-ico">⌠</span><span class="oval-deg">—°</span></a>
+ <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather" data-wired="0" hidden style="display:none"><span class="oval-ico">🌤</span><span class="oval-deg"></span></a>
+ <a class="oval sensi" href="sheet-google-home.html" aria-label="Thermostat" data-wired="0" hidden style="display:none"><span class="oval-ico">⌠</span><span class="oval-deg"></span></a>
  </div>
  </header>
 
- <a class="leaveby" href="sheet-countdowns.html" aria-label="Next leave-by">
+ <a class="leaveby" href="sheet-countdowns.html" aria-label="Next leave-by" data-glass-us-leave>
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
  <div class="leaveby-label">Next leave-by · shared</div>
- <div class="leaveby-main">Fri Sep 25 · <span class="time">6:50a</span>Harbor Cove</div>
- <div class="leaveby-detail">Nashville week ends · <strong>WN557</strong> BNA→MCI · lands ~9:45a</div>
+ <div class="leaveby-main"></div>
+ <div class="leaveby-detail" hidden style="display:none"></div>
  </div>
- <div class="leaveby-badge">Known</div>
+ <div class="leaveby-badge" hidden style="display:none"></div>
  </a>
 
  <div class="body">
  <div class="col">
- <section class="sec" aria-label="This shared week">
- <div class="sec-hdr">
- <div class="sec-title">Shared week location</div>
- <div class="sec-meta">known · through Fri AM</div>
- </div>
- <div class="now-card">
- <div class="lbl">Where we are</div>
- <div class="big">Nashville week · Erin’s Harbor Cove</div>
- <div class="sub">Through <strong>Fri Sep 25 AM</strong>then return KC · kids handoff 3:00 → Dan week</div>
- </div>
- </section>
-
  <section class="sec grow" aria-label="Calendar together">
  <div class="sec-hdr">
  <div class="sec-title">Calendar · together</div>
  <div class="sec-meta">See-all safe titles</div>
  </div>
  <div class="cal-list">
- <a class="cal-row hot" href="sheet-countdowns.html">
- <div class="cal-when">Fri Sep 25<span class="sm">leave + handoff</span></div>
- <div class="cal-what">
- Leave Harbor Cove · 6:50a
- <span class="hint">WN557 return · kids handoff 3:00 · Hayes birthday</span>
- </div>
- <span class="cal-tag">Today’s plan</span>
- </a>
  <a class="cal-row" href="month.html">
  <div class="cal-when">Oct 9–14<span class="sm">six days</span></div>
  <div class="cal-what">
@@ -390,21 +371,6 @@
  </div>
  <div class="log-grid">
  <div class="log-card">
- <div class="ico" aria-hidden="true">🏠</div>
- <div class="t">Harbor Cove stay</div>
- <div class="d">Nashville week through Fri Sep 25 morning · leave-by locked</div>
- </div>
- <div class="log-card">
- <div class="ico" aria-hidden="true">✈</div>
- <div class="t">WN557 · BNA→MCI</div>
- <div class="d">Depart morning · lands ~9:45a · then KC day</div>
- </div>
- <div class="log-card">
- <div class="ico" aria-hidden="true">🔄</div>
- <div class="t">Kids handoff 3:00</div>
- <div class="d">Mom’s week ends · Dan week starts Fri Sep 25</div>
- </div>
- <div class="log-card">
  <div class="ico" aria-hidden="true">📅</div>
  <div class="t">See-all calendar</div>
  <div class="d">Shared titles only · location · times · who has kids</div>
@@ -426,6 +392,10 @@
 </div>
 
 <script src="house-clock.js?v=FAMCLK1"></script>
+<script src="house-board-strip.js?v=AUDIT1"></script>
+<script src="house-weather.js?v=AUDIT1"></script>
+<script src="house-sensi.js?v=SENSIAUTO1"></script>
+<script src="house-glass-bind.js?v=AUDIT1"></script>
 <script src="house-zoom.js"></script>
 </body>
 </html>

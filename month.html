@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -325,7 +326,7 @@
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
 <link rel="stylesheet" href="tokens-family-clock-first-heat.css?v=FAMCLK1" />
 </head>
-<body>
+<body data-glass="ovals month-today">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
   <defs>
     <!-- Shared paints · HEAT v3 cyan+gold -->
@@ -581,19 +582,19 @@
  </div>
  <div class="hdr-spacer" aria-hidden="true"></div>
  <div class="hdr-ovals">
- <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather"><span class="oval-ico">☀</span><span class="oval-deg">—°</span></a>
- <a class="oval sensi" href="sheet-sensi.html" aria-label="Sensi"><span class="oval-ico">⌠</span><span class="oval-deg">—°</span></a>
+ <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather" data-wired="0" hidden style="display:none"><span class="oval-ico">🌤</span><span class="oval-deg"></span></a>
+ <a class="oval sensi" href="sheet-google-home.html" aria-label="Thermostat" data-wired="0" hidden style="display:none"><span class="oval-ico">⌠</span><span class="oval-deg"></span></a>
  </div>
  </header>
 
  <a class="leaveby" href="sheet-countdowns.html" aria-label="Next leave-by">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
- <div class="leaveby-label">Leave by · next</div>
- <div class="leaveby-main"><span class="time">3:00</span> Ainsley vanity · Jessy</div>
- <div class="leaveby-detail">Garage sale <strong>9–2</strong> @ 147th · then vanity · kids with Dad @ <strong>147th</strong> through Fri Oct 2 3:00</div>
+ <div class="leaveby-label" data-live="leaveby-label"></div>
+ <div class="leaveby-main" data-live="leaveby-main"></div>
+ <div class="leaveby-detail" data-live="leaveby-detail"></div>
  </div>
- <div class="leaveby-badge">Sun</div>
+ <div class="leaveby-badge" data-live="leaveby-badge"></div>
  </a>
 
  <section class="month-wrap">
@@ -602,7 +603,7 @@
  <div class="month-range">known facts only · empty = unknown</div>
  </div>
  <div class="banner-row">
- <div class="banner">Kids with Dad @ 147th through Fri Oct 2 3:00 · garage sale Sun 9–2 · Ainsley vanity 3:00</div>
+ <div class="banner">Kids with Dad @ 147th through Fri Oct 2 3:00</div>
  <div class="legend">
  <span class="leg ain"><i></i>Ainsley</span>
  <span class="leg hay"><i></i>Hayes</span>
@@ -613,7 +614,7 @@
  <div class="dow-row">
  <div class="dow-h">Sun</div><div class="dow-h">Mon</div><div class="dow-h">Tue</div><div class="dow-h">Wed</div><div class="dow-h">Thu</div><div class="dow-h">Fri</div><div class="dow-h">Sat</div>
  </div>
- <div class="month-grid">
+ <div class="month-grid" data-year="2026" data-month="9">
  <!-- W1 -->
  <div class="day out"><div class="day-top"><span class="dom">30</span></div></div>
  <div class="day out"><div class="day-top"><span class="dom">31</span></div></div>
@@ -711,8 +712,8 @@
  </div>
  </a>
  <!-- W5: 27–30 + Oct -->
- <a class="day today" href="sheet-today.html">
- <div class="day-top"><span class="dom">27</span><span class="day-tag">today</span></div>
+ <a class="day" href="sheet-today.html">
+ <div class="day-top"><span class="dom">27</span></div>
  <div class="blocks">
  <div class="blk shr">Garage sale 9–2 @ 147th</div>
  <div class="blk ain">Ainsley vanity 3:00 · Jessy</div>
@@ -763,7 +764,13 @@
  </footer>
 </div>
 
+<style id="audit1-hero">/* AUDIT1 · live time chip sits in its own line box (never over the label) */
+.leaveby-main .time{display:inline-block;margin:4px 10px 4px 0 !important;}</style>
 <script src="house-clock.js?v=FAMCLK1"></script>
+<script src="house-board-strip.js?v=AUDIT1"></script>
+<script src="house-weather.js?v=AUDIT1"></script>
+<script src="house-sensi.js?v=SENSIAUTO1"></script>
+<script src="house-glass-bind.js?v=AUDIT1"></script>
 <script src="house-zoom.js"></script>
 </body>
 </html>

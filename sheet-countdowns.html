@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -297,7 +298,7 @@
  a.ftr-chip { text-decoration: none; color: inherit; cursor: pointer; }
 </style>
 </head>
-<body>
+<body data-glass="countdown">
 <div class="panel">
  <header class="hdr hdr--clockfirst">
  <div class="hdr-left-col">
@@ -313,34 +314,34 @@
  <div class="sheet-chip" data-sheet-chip>Countdowns</div>
  </header>
 
- <section class="cheer" aria-label="Cheer banner">
+ <section class="cheer" aria-label="Cheer banner" data-glass-bday-cheer hidden style="display:none">
  <div class="cheer-accent"></div>
  <div class="cheer-body">
  <div class="cheer-main">
- <div class="cheer-label">Known streak</div>
- <div class="cheer-title">Hayes birthday · <span class="hl">Fri Sep 25</span></div>
- <div class="cheer-sub"><strong>Known</strong> · as-of Sat Sep 19 · reading streak</div>
+ <div class="cheer-label">Countdown</div>
+ <div class="cheer-title">Hayes birthday · <span class="hl"></span></div>
+ <div class="cheer-sub"></div>
  </div>
  <div class="cheer-badges"><div class="cheer-badge">BDAY</div><div class="cheer-badge">STREAK</div></div>
  </div>
  </section>
 
  <div class="body">
- <section class="sec" aria-label="Hayes birthday countdown">
+ <section class="sec" aria-label="Hayes birthday countdown" data-glass-bday hidden style="display:none">
  <div class="sec-hdr">
  <div class="sec-title">Birthday countdown</div>
- <div class="sec-meta">known · Fri Sep 25</div>
+ <div class="sec-meta"></div>
  </div>
  <div class="bday">
  <div class="lbl">Counting down</div>
  <div class="who"><span>Hayes</span> birthday</div>
- <div class="when">Friday · Sep 25 2026</div>
+ <div class="when"></div>
  <div class="count-row">
- <div class="count-box"><div class="n">6</div><div class="u">days</div></div>
+ <div class="count-box"><div class="n"></div><div class="u"></div></div>
  <div class="count-box"><div class="n">🎉</div><div class="u">party vibes</div></div>
- <div class="count-box"><div class="n">Fri</div><div class="u">Sep 25</div></div>
+ <div class="count-box"><div class="n"></div><div class="u"></div></div>
  </div>
- <div class="note">Same day as handoff · keep it joyful · known fact</div>
+ <div class="note"></div>
  </div>
  </section>
  <section class="sec" aria-label="Reading streak">
@@ -362,7 +363,7 @@
  <div class="flame" style="height:30%"><span class="day">S</span></div>
  </div>
  <div class="streak-num">
- <div class="n">—</div>
+ <div class="n">0</div>
  <div class="u">day streak</div>
  </div>
  <div class="safe">Kids-safe plate · no grades · no money · Freckle Juice from month board</div>
@@ -378,6 +379,8 @@
 </div>
 
 <script src="house-clock.js?v=SHEETCLK3"></script>
+<script src="house-board-strip.js?v=AUDIT1"></script>
+<script src="house-glass-bind.js?v=AUDIT1"></script>
 <script src="house-zoom.js"></script>
 </body>
 </html>

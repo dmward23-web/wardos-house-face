@@ -432,6 +432,22 @@
     return i < 0 ? 0 : i;
   }
 
+  /* AUDIT1 · kicker says TODAY only when the hottest item is today; TOMORROW / NEXT otherwise */
+  function ctDowShort(ms) {
+    try {
+      return new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", weekday: "short" })
+        .format(new Date(ms)).toUpperCase().slice(0, 3);
+    } catch (e) { return ""; }
+  }
+  function dayKicker(hot) {
+    var d = String((hot && hot.badges && hot.badges[0]) || (hot && hot.when) || "").split("·")[0].trim().toUpperCase().slice(0, 3);
+    if (!/^(SUN|MON|TUE|WED|THU|FRI|SAT)$/.test(d)) return "Today";
+    var now = Date.now();
+    if (d === ctDowShort(now)) return "Today";
+    if (d === ctDowShort(now + 864e5)) return "Tomorrow";
+    return "Next";
+  }
+
   function paintFace(kidId, face) {
     var kid = kidObj(kidId) || { name: ACCENT[kidId].name };
     var accent = ACCENT[kidId];
@@ -441,7 +457,7 @@
       var hot = kid.hottest || {};
       var todayBits = (kid.today || []).slice(0, 2);
       html += '<div class="kf-face kf-day">';
-      html += '<div class="kf-kicker">Today</div>';
+      html += '<div class="kf-kicker">' + esc(dayKicker(hot)) + "</div>";
       html += '<div class="kf-loud">' + esc(hot.when || "Dad week") + "</div>";
       html += '<div class="kf-title">' + esc(shortTitle(hot.what || "On deck")) + "</div>";
       if (todayBits.length) {
@@ -895,9 +911,32 @@
     }
   }
 
+  /* AUDIT1 · whole Who's Up card taps through to Today (its OPEN link is hidden) */
+  function bindWhoUpTap(host) {
+    if (!host || host.getAttribute("data-tap-bound") === "1") return;
+    host.setAttribute("data-tap-bound", "1");
+    host.setAttribute("role", "link");
+    host.setAttribute("tabindex", "0");
+    host.style.cursor = "pointer";
+    function go() {
+      var a = host.querySelector("[data-who-go]");
+      var href = (a && a.getAttribute("href")) || "sheet-today.html";
+      try { sfxTap(); } catch (e) { /* ok */ }
+      global.location.href = href;
+    }
+    host.addEventListener("click", function (ev) {
+      if (ev.target && ev.target.closest && ev.target.closest("a[href]")) return;
+      go();
+    });
+    host.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); }
+    });
+  }
+
   function paintWhoUp() {
     var host = ensureWhoUpHost();
     if (!host) return;
+    bindWhoUpTap(host);
     var pick = soonestWhoUp();
     var main = host.querySelector("[data-who-main]");
     var meta = host.querySelector("[data-who-meta]");

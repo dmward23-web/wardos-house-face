@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon-20260926c.png" />
@@ -112,8 +113,8 @@
  <div class="cmd-title">Lights · not Nest</div>
  <div class="cmd-meta">Elo · Kasa</div>
  </div>
- <div class="banner-title">Control tile · LIVE Kasa · write via baked proxy</div>
- <div class="banner-sub">Polls data/lights-live.json · writeProxy baked · no seed link · Elo 3202L</div>
+ <div class="banner-title">Kasa lights · tap to switch</div>
+ <div class="banner-sub">Kasa lights on this screen</div>
  </section>
 
  <section class="bulk cmd-panel" aria-label="All lights">
@@ -126,18 +127,17 @@
 
  <section class="connect cmd-panel" id="lights-connect" aria-label="Connect lights">
  <div>
- <div class="connect-title" id="lights-connect-title">LIVE · Kasa cloud + write proxy</div>
- <div class="connect-sub" id="lights-connect-sub">Reads + writes via data/lights-live.json · writeProxy + token baked · Kasa password box-only · see LIGHTS-LIVE.md</div>
+ <div class="connect-title" id="lights-connect-title">Lights</div>
+ <div class="connect-sub" id="lights-connect-sub"></div>
  </div>
  <div class="connect-actions">
  <a class="cbtn loud" href="sheet-google-home.html">Cams + climate hub</a>
  <a class="cbtn" href="sheet-index.html">Sheets hub</a>
- <a class="cbtn" href="LIGHTS-LIVE.md" target="_blank" rel="noopener">Auth docs · LIGHTS-LIVE</a>
  <a class="cbtn" href="sheet-status.html">Status</a>
  </div>
  </section>
 
- <div class="note" id="lights-note">LIVE · Kasa cloud + public write proxy · Nest SDM is cams only · controls dark only if PROXY OFF / offline · Elo 3202L 1080×1920</div>
+ <div class="note" id="lights-note"></div>
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -153,7 +153,7 @@
 <script src="house-clock.js?v=SHEETCLK1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
-<script src="house-lights.js?v=PROXYFOLLOW1"></script>
+<script src="house-lights.js?v=AUDIT1"></script>
 <script>
 (function () {
   var L = window.HouseLights;
@@ -173,24 +173,24 @@
     var title = document.getElementById("lights-connect-title");
     var sub = document.getElementById("lights-connect-sub");
     if (g.live) {
-      title.textContent = "LIVE · Kasa cloud + write proxy";
-      sub.textContent = "Reads + writes from data/lights-live.json · writeProxy baked · no seed link · Elo 3202L";
+      title.textContent = "Lights · LIVE";
+      sub.textContent = "Kasa lights on this screen";
     } else if (g.needToken || g.kind === "need_token") {
       title.textContent = "CONNECT · need Kasa on Atlas";
-      sub.textContent = "Kasa creds missing on Atlas box · controls dark · LIGHTS-LIVE.md · never invent LIVE";
+      sub.textContent = "Not connected yet · controls dark";
     } else {
       title.textContent = "Lights · " + g.label;
-      sub.textContent = (g.error || g.label) + " · controls dark · never invent LIVE";
+      sub.textContent = g.label + " · controls dark";
     }
     var ftr = document.getElementById("lights-ftr-status");
     if (ftr) ftr.textContent = g.label;
     var note = document.getElementById("lights-note");
     if (note && (g.needToken || g.kind === "need_token")) {
-      note.textContent = "BLOCKED · Kasa creds/proxy on Atlas box · controls dark until LIVE · Elo 3202L";
+      note.textContent = "Not connected yet · controls dark";
     } else if (note && !g.live) {
-      note.textContent = "Controls dark · PROXY OFF / offline · bake writeProxy via lights-fetch · Elo 3202L";
+      note.textContent = "Controls dark · lights offline";
     } else if (note && g.live) {
-      note.textContent = "LIVE · Kasa cloud + public write proxy · Nest SDM is cams only · Elo 3202L 1080×1920";
+      note.textContent = "";
     }
     L.paintPads(document);
   }

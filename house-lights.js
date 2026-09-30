@@ -145,7 +145,12 @@
     return h;
   }
 
+  /* AUDIT1 · no key saved on this screen → no lights requests at all (no probe, no write) */
+  function hasKey() { return !!proxyToken(); }
+  function noKey(g) { g = g || gate(); return !!(g.live && g.writeSupported && !hasKey()); }
+
   function canWrite() {
+    if (!hasKey()) return false;
     var g = gate();
     var data = g.data;
     /* Forever: status=live + writeSupported + proxy — JSON age must NOT kill taps. */
@@ -156,7 +161,7 @@
 
   function probeProxy(cb) {
     var base = proxyBase();
-    if (!base) {
+    if (!base || !hasKey()) {
       _proxyReachable = false;
       _proxyProbeAt = Date.now();
       if (cb) cb(false);
@@ -244,12 +249,13 @@
     if (st === "live") {
       var ws = !!data.writeSupported;
       var label = "LIVE";
-      if (ws && _proxyReachable === false) label = "LIVE · PROXY OFF";
+      if (ws && !hasKey()) label = "LIVE · NEED KEY";
+      else if (ws && _proxyReachable === false) label = "LIVE · PROXY OFF";
       else if (ws && _proxyReachable === null) label = "LIVE";
       else if (!ws) label = "LIVE · READ ONLY";
       /* FOREVER FIX: never STALE-disable writes when JSON ages.
          Soft label only if snapshot older than LIVE_FRESH_MS (24h) AND proxy down. */
-      if (age > LIVE_FRESH_MS && ws && _proxyReachable === false) {
+      if (age > LIVE_FRESH_MS && ws && hasKey() && _proxyReachable === false) {
         label = "STALE · PROXY OFF";
       } else if (age > LIVE_FRESH_MS && !ws) {
         label = "STALE · READ ONLY";
@@ -423,6 +429,7 @@
   }
 
   function setLight(id, patch) {
+    if (!hasKey()) { notify(); return null; }
     var g = gate();
     if (!(g.live && g.writeSupported)) {
       notify();
@@ -452,6 +459,7 @@
   }
 
   function setAll(on) {
+    if (!hasKey()) { notify(); return; }
     var g = gate();
     if (!(g.live && g.writeSupported) || !canWrite()) {
       probeProxy();
@@ -656,7 +664,7 @@
         + '<button type="button" class="cmd-rocker is-stub is-off" disabled aria-label="' + escapeHtml(R.name) + ' · need connect">'
         + '<span class="cmd-rocker-knob"></span></button>'
         + "</div>"
-        + '<div class="light-pad-src">NEED CONNECT · never DEMO</div>'
+        + '<div class="light-pad-src">Not connected yet</div>'
         + "</article>";
     }
     grid.innerHTML = html;
@@ -672,7 +680,7 @@
       meta.textContent = canWrite()
         ? ("Lights LIVE · " + eff.lights.length + " pads · write armed")
         : (g.live
-          ? ("Lights LIVE · " + eff.lights.length + " pads · " + (g.writeSupported ? "PROXY OFF" : "READ ONLY"))
+          ? ("Lights LIVE · " + eff.lights.length + " pads · " + (noKey(g) ? "NEED KEY" : g.writeSupported ? "PROXY OFF" : "READ ONLY"))
           : (g.needToken
             ? ("Lights · NEED TOKEN · controls dark")
             : ("Lights · " + g.label + " · controls dark")));
@@ -744,14 +752,14 @@
           + '<div class="light-pad-top">'
           + '<div class="light-pad-ico" aria-hidden="true">⏳</div>'
           + '<div><div class="light-pad-name">' + escapeHtml(R.name || R.id) + "</div>"
-          + '<div class="light-pad-where">' + escapeHtml(R.where || "pending") + " · fold-in</div></div>"
+          + '<div class="light-pad-where">' + escapeHtml(R.where || "Not connected yet") + "</div></div>"
           + '<div class="light-pad-state cmd-pill cmd-pill--need">NEED CONNECT</div>'
           + "</div>"
           + '<div class="light-pad-actions">'
           + '<button type="button" class="cmd-rocker is-stub is-off" disabled aria-label="need connect">'
           + '<span class="cmd-rocker-knob" aria-hidden="true"></span></button>'
           + "</div>"
-          + '<div class="light-pad-src">NEED CONNECT · never DEMO</div>'
+          + '<div class="light-pad-src">Not connected yet</div>'
           + "</article>";
       }
       grid.innerHTML = html;
@@ -828,6 +836,7 @@
   function hubSrcLabel(eff, g) {
     g = g || (eff && eff.gate) || gate();
     if (canWrite()) return "LIVE";
+    if (noKey(g)) return "NEED KEY";
     if (g.live && g.writeSupported && _proxyReachable === false) return "LIVE · PROXY OFF";
     if (g.live && g.writeSupported) return "LIVE · PROXY…";
     if (g.live) return "LIVE · READ ONLY";
@@ -838,6 +847,7 @@
   function hubHonesty(g) {
     g = g || gate();
     if (canWrite()) return "LIVE";
+    if (noKey(g)) return "NEED KEY";
     if (g.live && g.writeSupported && _proxyReachable === false) return "PROXY OFF";
     if (g.live && g.writeSupported) return "LIVE";
     if (g.live) return "READ ONLY";
@@ -953,7 +963,9 @@
     if (sub) {
       sub.textContent = canWrite()
         ? "3 LIVE · 6 OFF · wait"
-        : (g.live && g.writeSupported
+        : (noKey(g)
+          ? "NEED KEY · controls dark"
+          : g.live && g.writeSupported
           ? "PROXY OFF · write proxy unreachable (check tunnel)"
           : (g.live
             ? "LIVE read · write not armed"

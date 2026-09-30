@@ -3083,6 +3083,11 @@
 .leaveby .leaveby-sched,
 .leaveby .leaveby-row-chip { display: none !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; border: 0 !important; }
 .leaveby .leaveby-main { font-size: 0 !important; color: transparent !important; flex: 0 0 auto !important; }
+.leaveby .leaveby-main .leaveby-when {
+  display: block !important; font-size: 15px !important; font-weight: 900 !important;
+  letter-spacing: 0.2em !important; text-transform: uppercase !important;
+  color: #ffe080 !important; opacity: 0.85; margin: 0 0 6px !important; line-height: 1.1 !important;
+}
 .leaveby .leaveby-main .time {
   display: block !important;
   font-size: clamp(42px, 5.5vw, 64px) !important;
@@ -4310,17 +4315,17 @@
  </footer>
 </div>
 <script src="house-clock.js?v=INDEXCLK1"></script>
-<script src="house-board-strip.js?v=SOFTGONE1"></script>
-<script src="house-weather.js?v=RAINSHORT1"></script>
+<script src="house-board-strip.js?v=AUDIT1"></script>
+<script src="house-weather.js?v=AUDIT1"></script>
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
-<script src="kids-data.js?v=NOSURP2"></script>
-<script src="house-kid-engage.js?v=SOFTGONE1"></script>
+<script src="kids-data.js?v=AUDIT1"></script>
+<script src="house-kid-engage.js?v=AUDIT1"></script>
 <script src="house-hub-tiles-bind.js?v=SEATS1"></script>
 <script src="house-sensi.js?v=SENSIAUTO1"></script>
 <script src="nest-webrtc-client.js?v=PROXYFOLLOW2"></script>
 <script src="house-nest.js?v=CAMIOS2"></script>
-<script src="hub-key-entry.js?v=KEYPASTE2"></script>
-<script src="house-lights.js?v=PROXYFOLLOW1"></script>
+<script src="hub-key-entry.js?v=AUDIT1"></script>
+<script src="house-lights.js?v=AUDIT1"></script>
 <script src="house-sensi-ctl.js?v=SENSIAUTO1"></script>
 <script src="hub-led-ring.js?v=LEDPHONE1"></script>
 <script>
@@ -4372,7 +4377,7 @@
     try {
       if (Math.min(screen.width, screen.height) <= 600) {
         panel.style.transform = ""; panel.style.transformOrigin = "";
-        panel.style.marginLeft = "0"; panel.style.marginTop = "0";
+        panel.style.marginLeft = "0"; panel.style.marginTop = "0"; panel.style.removeProperty("margin-bottom"); document.body.style.removeProperty("height");
         document.documentElement.setAttribute("data-hub-fit", "phone");
         document.documentElement.style.setProperty("--hub-fit-scale", "1");
         return;
@@ -4391,8 +4396,13 @@
     /* center horizontally if leftover width (should be ~0 on true portrait wall) */
     var ox = Math.max(0, (vw - 1080 * s) / 2);
     var oy = Math.max(0, (vh - 1920 * s) / 2);
-    panel.style.marginLeft = ox ? (ox + "px") : "0";
-    panel.style.marginTop = oy ? (oy + "px") : "0";
+    /* AUDIT1 · !important so the kit's .panel margin rules can't pin the canvas left on landscape;
+       reclaim the unscaled height so a scaled canvas doesn't scroll */
+    panel.style.setProperty("margin-left", ox ? (ox + "px") : "0", "important");
+    panel.style.setProperty("margin-top", oy ? (oy + "px") : "0", "important");
+    panel.style.setProperty("margin-bottom", s < 1 ? (Math.round(-panel.offsetHeight * (1 - s)) + "px") : "0", "important");
+    if (s < 1) document.body.style.setProperty("height", Math.ceil(1920 * s + 2 * oy) + "px", "important");
+    else document.body.style.removeProperty("height");
     document.documentElement.setAttribute("data-hub-fit", portrait ? "portrait-contain" : "landscape-contain");
     document.documentElement.style.setProperty("--hub-fit-scale", String(s));
   }

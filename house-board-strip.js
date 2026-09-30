@@ -275,6 +275,8 @@
     var time = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
     return {
       label: isToday ? "Schedule · today" : ("Schedule · " + dow),
+      _dayIso: startIsoDay,
+      _dow: dow,
       time: time === "day" ? "" : time,
       place: place,
       detailHtml: "<strong>" + esc(time) + "</strong> " +
@@ -1005,8 +1007,11 @@
       n.textContent = clock.time || (global.HouseClock && HouseClock.timeLabel ? HouseClock.timeLabel() : "");
     });
 
-    if (label) label.textContent = "";
-    if (badge) badge.textContent = "";
+    /* AUDIT1 · hero names its day when the next item is not today ("Next up · Wed" / "Wed") */
+    var notToday = !strip._stale && strip._dayIso && clock && strip._dayIso !== clock.iso;
+    var isTodayEv = !strip._stale && strip._dayIso && clock && strip._dayIso === clock.iso;
+    if (label) label.textContent = notToday ? ("Next up · " + strip._dow) : (isTodayEv ? "Next up · Today" : "");
+    if (badge) badge.textContent = notToday ? strip._dow : (isTodayEv ? "Today" : "");
     if (todaySub) todaySub.textContent = clock.short + " · " + clock.daypart;
 
     var hotEv = document.querySelector("[data-live='hot-pill-event']");
@@ -1014,15 +1019,18 @@
       if (strip._stale) hotEv.textContent = "CAL STALE";
       else if (strip.time && strip.place) hotEv.textContent = strip.time + " · " + strip.place;
       else if (strip.place) hotEv.textContent = strip.place;
-      else hotEv.textContent = "Loading…";
+      else hotEv.textContent = "";
     }
 
-    if (main) {
+    if (main && !strip._boot) {
       /* HUBCMD2 · pass-by hero = huge time + destination only · no Next/label chrome */
       if (strip._stale) {
         main.innerHTML = '<span class="leaveby-dest">CAL STALE</span>';
       } else if (strip.time && strip.place) {
+        /* AUDIT1 · label row hidden on this page (hub) → carry the day as a small kicker in the hero */
+        var labHidden = !label || label.offsetParent === null;
         main.innerHTML =
+          (notToday && labHidden ? '<span class="leaveby-when">Next up · ' + esc(strip._dow) + "</span>" : "") +
           '<span class="time">' + esc(strip.time) + "</span>" +
           '<span class="leaveby-dest">' + esc(strip.place) + "</span>";
       } else if (strip.place) {
@@ -1093,7 +1101,8 @@
     applyStrip({
       label: "Schedule · today",
       time: "",
-      place: "Loading…",
+      place: "",
+      _boot: true,
       detailHtml: "America/Chicago · live clock",
       badge: clock.dow,
       today: [],

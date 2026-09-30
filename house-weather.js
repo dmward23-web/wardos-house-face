@@ -5,7 +5,7 @@
   var LAT = 38.884;
   var LON = -94.671;
   var PLACE = "Overland Park · 147th";
-  var CACHE_KEY = "house-wx:v3";
+  var CACHE_KEY = "house-wx:v4";
   var CACHE_MS = 10 * 60 * 1000;
 
   var WMO = {
@@ -63,7 +63,7 @@
   function fromOpenMeteo() {
     var url = "https://api.open-meteo.com/v1/forecast"
       + "?latitude=" + LAT + "&longitude=" + LON
-      + "&current=temperature_2m,weather_code"
+      + "&current=temperature_2m,weather_code,is_day"
       + "&daily=temperature_2m_max,temperature_2m_min"
       + "&hourly=precipitation_probability,precipitation"
       + "&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FChicago&forecast_days=2";
@@ -73,10 +73,13 @@
     }).then(function (j) {
       var code = (j.current && j.current.weather_code) || 0;
       var pair = WMO[code] || ["Outside", "🌤"];
+      /* AUDIT1 · no sun icon after dark */
+      var night = j.current && j.current.is_day === 0;
+      var icon = night && (pair[1] === "☀" || pair[1] === "⛅") ? (pair[1] === "☀" ? "🌙" : "☁") : pair[1];
       return {
         temp: Math.round(j.current.temperature_2m),
         condition: pair[0],
-        icon: pair[1],
+        icon: icon,
         high: Math.round(j.daily.temperature_2m_max[0]),
         low: Math.round(j.daily.temperature_2m_min[0]),
         rain: rainOutlook(j.hourly, j.current && j.current.time),
@@ -194,7 +197,7 @@
       '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
       + '<div class="wx-hdr-text wx-text">'
       + '<div class="wx-kicker">Weather</div>'
-      + '<div class="wx-line"><span class="wx-temp">…</span><span class="wx-cond">loading</span></div>'
+      + '<div class="wx-line"><span class="wx-temp"></span><span class="wx-cond"></span></div>'
       + '<div class="wx-sub"><i class="hdr-live-dot" aria-hidden="true"></i>LIVE</div>'
       + "</div>";
     load(function (err, data) {
