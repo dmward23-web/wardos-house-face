@@ -1,11 +1,11 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T04:54:13.429Z",
+  "fetchedAt": "2026-09-30T05:02:26.161Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-05",
-  "asOfIso": "2026-09-29",
+  "asOfIso": "2026-09-30",
   "nextLeave": {
     "id": "h5h4hvg15fbb07du8pi6ld7l6c",
     "summary": "Hayes — SRE specials: PE + Library (tennis shoes)",
@@ -414,7 +414,7 @@
     }
   ],
   "boardStrip": {
-    "label": "Next up · Wed",
+    "label": "Next up · today",
     "time": "7:00",
     "place": "Hayes — SRE specials: PE + Library (tennis shoes)",
     "detailHtml": "<strong>7:00</strong> Hayes — SRE specials: PE + Library (tennis shoes) · next Leave · Wed <strong>9:00</strong> HD #2209 · vanity return ONLY",
