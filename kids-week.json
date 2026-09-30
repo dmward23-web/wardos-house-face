@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T19:31:11.824Z",
+  "refreshedAt": "2026-09-30T19:47:20.934Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -56,7 +56,7 @@
         "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
         "startIso": "2026-09-30T21:05:00.000Z",
-        "endIso": "2026-09-30T21:55:00.000Z",
+        "endIso": "2026-09-30T22:00:00.000Z",
         "kind": "other",
         "whenLabel": "4:05",
         "summary": "Target with all 3 kids — Ainsley bday gift for her friend"
@@ -75,26 +75,26 @@
       },
       {
         "label": "Next up · today",
-        "time": "4:55",
-        "place": "drop at BVW football game",
-        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-09-30T21:55:00.000Z",
-        "endIso": "2026-09-30T22:15:00.000Z",
-        "kind": "other",
-        "whenLabel": "4:55",
-        "summary": "Ainsley — drop at BVW football game · 5:05"
-      },
-      {
-        "label": "Next up · today",
         "time": "5:35",
-        "place": "Scheels with Hayes (Harris at flag)",
+        "place": "drop at BVW football game · 5:50 (game 6:00)",
         "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
         "startIso": "2026-09-30T22:35:00.000Z",
+        "endIso": "2026-09-30T22:55:00.000Z",
+        "kind": "other",
+        "whenLabel": "5:35",
+        "summary": "Ainsley — drop at BVW football game · 5:50 (game 6:00)"
+      },
+      {
+        "label": "Next up · today",
+        "time": "5:55",
+        "place": "Scheels with Hayes (Harris at flag)",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-09-30T22:55:00.000Z",
         "endIso": "2026-09-30T23:35:00.000Z",
         "kind": "sport",
-        "whenLabel": "5:35",
+        "whenLabel": "5:55",
         "summary": "Scheels with Hayes (Harris at flag)"
       },
       {
@@ -326,7 +326,7 @@
         },
         {
           "kind": "event",
-          "when": "Wed · 5:35",
+          "when": "Wed · 5:55",
           "what": "🏁 Scheels with Hayes (Harris at flag)",
           "hint": "YOUR board",
           "tone": "hot"
@@ -347,7 +347,7 @@
           "tone": "hot"
         },
         {
-          "when": "Wed 30 · leave 5:35",
+          "when": "Wed 30 · leave 5:55",
           "what": "Scheels with Hayes (Harris at flag)",
           "hint": "YOUR board",
           "tone": "hot"
@@ -582,7 +582,7 @@
         },
         {
           "kind": "event",
-          "when": "Wed · 5:35",
+          "when": "Wed · 5:55",
           "what": "Scheels with Hayes (Harris at flag)",
           "hint": "YOUR board",
           "tone": "hot"
@@ -843,8 +843,8 @@
         },
         {
           "kind": "event",
-          "when": "Wed · 4:55",
-          "what": "drop at BVW football game",
+          "when": "Wed · 5:35",
+          "what": "drop at BVW football game · 5:50 (game 6:00)",
           "hint": "",
           "tone": "act"
         },
@@ -1022,7 +1022,7 @@
           "tone": "hot"
         },
         {
-          "when": "Wed 30 · 5:35",
+          "when": "Wed 30 · 5:55",
           "what": "Scheels with Hayes (Harris at flag)",
           "tone": "hot"
         },
