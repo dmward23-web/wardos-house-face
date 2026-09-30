@@ -1094,6 +1094,7 @@ body.theme-ainsley .setlist-foot { display: none !important; }
  <section class="sec sec-chores" id="sec-musts" aria-label="Musts">
  <div class="sec-hdr"><div class="sec-title">Musts</div></div>
  <div class="sec-list" data-mount-quests></div>
+ <div class="csq" data-consequences aria-label="Rules and park"></div>
  </section>
  <section class="sec sec-bank bank-card tour-jar" id="sec-jar" aria-label="Tour Jar">
  <div class="bank-top">
@@ -1162,6 +1163,7 @@ document.addEventListener("house:kid-rendered", function(){
 <script src="house-sfx.js?v=CTRLPANEL1"></script>
 <script src="house-kid-engage.js?v=AUDIT1"></script>
 <script src="house-checkoffs.js?v=TEXTBACK1" defer></script>
+<script src="house-consequences.js?v=CONSEQ1" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
  if (window.HouseSaves) HouseSaves.mount("ainsley");
