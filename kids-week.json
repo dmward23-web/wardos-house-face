@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-30T00:04:11.908Z",
+  "refreshedAt": "2026-09-30T00:10:16.638Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -753,6 +753,12 @@
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Tue 6 · leave 5:00",
+          "what": "Ainsley swim — Coach Ann",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -997,8 +1003,8 @@
           "tone": "hot"
         },
         {
-          "when": "through Fri Oct 2 · 3:00",
-          "what": "Kids with Dad @ 147th",
+          "when": "Tue 6 · 5:00",
+          "what": "Ainsley swim — Coach Ann",
           "tone": "hot"
         }
       ]
