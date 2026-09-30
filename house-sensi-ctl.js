@@ -141,7 +141,7 @@
     var el = document.getElementById("index-sensi-chip");
     if (!el || !st) return;
     var t = el.querySelector(".sensi-hdr-temp"); if (t) t.textContent = st.ambient + "°";
-    var s = el.querySelector(".sensi-hdr-set"); if (s) s.textContent = "set " + st.setpoint + "°";
+    var s = el.querySelector(".sensi-hdr-set"); if (s) s.textContent = "set " + (/^auto$/i.test(st.mode) && st.heatSetpoint != null && st.coolSetpoint != null ? st.heatSetpoint + "–" + st.coolSetpoint : st.setpoint) + "°"; /* SENSIAUTO1 */
     el.setAttribute("data-mode", st.mode.charAt(0).toUpperCase() + st.mode.slice(1));
   }
 

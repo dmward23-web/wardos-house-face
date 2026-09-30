@@ -162,6 +162,8 @@
         source: "live",
         ambient: typeof th.ambient === "number" ? th.ambient : demo.ambient,
         setpoint: typeof th.setpoint === "number" ? th.setpoint : demo.setpoint,
+        heatSetpoint: typeof th.heatSetpoint === "number" ? th.heatSetpoint : null,
+        coolSetpoint: typeof th.coolSetpoint === "number" ? th.coolSetpoint : null,
         mode: MODES.indexOf(th.mode) >= 0 ? th.mode : demo.mode,
         fan: FANS.indexOf(th.fan) >= 0 ? th.fan : demo.fan,
         hold: !!th.hold,
@@ -258,6 +260,14 @@
     }
   }
 
+  /* SENSIAUTO1 · Auto runs a range (heat–cool), not one number. Not live → no invented temp. */
+  function setLabel(st) {
+    if (st.source !== "live") return "";
+    if (st.mode === "Auto" && st.heatSetpoint != null && st.coolSetpoint != null) return st.heatSetpoint + "–" + st.coolSetpoint + "°";
+    return st.setpoint + "°";
+  }
+  function ambLabel(st) { return st.source === "live" ? st.ambient : "—"; }
+
   function paintChip(el) {
     if (!el) return;
     var st = effectiveState();
@@ -277,8 +287,8 @@
         + '<div class="sensi-hdr-text">'
         + '<div class="sensi-hdr-kicker">Sensi</div>'
         + '<div class="sensi-hdr-line">'
-        + '<span class="sensi-hdr-temp">' + st.ambient + "°</span>"
-        + '<span class="sensi-hdr-set">set ' + st.setpoint + "°</span>"
+        + '<span class="sensi-hdr-temp">' + ambLabel(st) + "°</span>"
+        + (setLabel(st) ? '<span class="sensi-hdr-set">set ' + setLabel(st) + "</span>" : "")
         + '<span class="sensi-hdr-mode">' + mc.label + "</span>"
         + "</div>"
         + '<div class="sensi-hdr-sub"><i class="hdr-live-dot" aria-hidden="true"></i>' + status + "</div>"
@@ -290,8 +300,8 @@
       + '<div class="sensi-chip-text">'
       + '<div class="sensi-chip-kicker">Sensi · indoors</div>'
       + '<div class="sensi-chip-line">'
-      + '<span class="sensi-chip-temp">' + st.ambient + "°</span>"
-      + '<span class="sensi-chip-set">set ' + st.setpoint + "°</span>"
+      + '<span class="sensi-chip-temp">' + ambLabel(st) + "°</span>"
+      + (setLabel(st) ? '<span class="sensi-chip-set">set ' + setLabel(st) + "</span>" : "")
       + '<span class="sensi-chip-mode" style="--sensi-accent:' + mc.accent + '">' + mc.label + "</span>"
       + "</div>"
       + '<div class="sensi-chip-sub">' + status + " · fan " + st.fan + "</div>"
@@ -317,8 +327,8 @@
     var pill = document.getElementById(ids.pill || "sensi-hero-pill");
     var sub = document.getElementById(ids.sub || "sensi-hero-sub");
     var ambLab = document.querySelector(".climate-amb .lab");
-    if (amb) amb.innerHTML = st.ambient + "<span>°</span>";
-    if (set) set.textContent = st.setpoint + "°";
+    if (amb) amb.innerHTML = ambLabel(st) + "<span>°</span>";
+    if (set) set.textContent = setLabel(st) || "—";
     if (mode) {
       mode.textContent = mc.label;
       mode.style.background = mc.soft;
