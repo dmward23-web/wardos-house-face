@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T19:20:42.230Z",
+  "refreshedAt": "2026-09-30T19:31:11.824Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -19,7 +19,7 @@
     "label": "Next up · today",
     "time": "3:15",
     "place": "Boys SRE pickup",
-    "detailHtml": "4:55 Harris flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Wed",
     "startIso": "2026-09-30T20:15:00.000Z",
     "endIso": "2026-09-30T21:00:00.000Z",
@@ -29,7 +29,7 @@
         "label": "Next up · today",
         "time": "3:15",
         "place": "Boys SRE pickup",
-        "detailHtml": "4:55 Harris flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
         "startIso": "2026-09-30T20:15:00.000Z",
         "endIso": "2026-09-30T21:00:00.000Z",
@@ -41,13 +41,25 @@
         "label": "Next up · today",
         "time": "4:00",
         "place": "SRE — conference sign-ups go live",
-        "detailHtml": "3:15 boys pickup · 4:55 Harris flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
         "startIso": "2026-09-30T21:00:00.000Z",
         "endIso": "2026-09-30T21:15:00.000Z",
         "kind": "school",
         "whenLabel": "4:00",
         "summary": "SRE — conference sign-ups go live · 4:00"
+      },
+      {
+        "label": "Next up · today",
+        "time": "4:05",
+        "place": "Target with all 3 kids — Ainsley bday gift for her fr…",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-09-30T21:05:00.000Z",
+        "endIso": "2026-09-30T21:55:00.000Z",
+        "kind": "other",
+        "whenLabel": "4:05",
+        "summary": "Target with all 3 kids — Ainsley bday gift for her friend"
       },
       {
         "label": "Next up · today",
@@ -60,6 +72,42 @@
         "kind": "sport",
         "whenLabel": "4:55",
         "summary": "Harris flag practice · leave 4:55 · practice 5:30"
+      },
+      {
+        "label": "Next up · today",
+        "time": "4:55",
+        "place": "drop at BVW football game",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-09-30T21:55:00.000Z",
+        "endIso": "2026-09-30T22:15:00.000Z",
+        "kind": "other",
+        "whenLabel": "4:55",
+        "summary": "Ainsley — drop at BVW football game · 5:05"
+      },
+      {
+        "label": "Next up · today",
+        "time": "5:35",
+        "place": "Scheels with Hayes (Harris at flag)",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-09-30T22:35:00.000Z",
+        "endIso": "2026-09-30T23:35:00.000Z",
+        "kind": "sport",
+        "whenLabel": "5:35",
+        "summary": "Scheels with Hayes (Harris at flag)"
+      },
+      {
+        "label": "Next up · today",
+        "time": "7:15",
+        "place": "pick up at BVW football game",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-10-01T00:15:00.000Z",
+        "endIso": "2026-10-01T00:45:00.000Z",
+        "kind": "other",
+        "whenLabel": "7:15",
+        "summary": "Ainsley — pick up at BVW football game · 7:30"
       },
       {
         "label": "Next up · Thu",
@@ -120,54 +168,6 @@
         "kind": "school_pickup",
         "whenLabel": "Thu 3:15",
         "summary": "Hayes + Harris — SRE pickup · 3:40"
-      },
-      {
-        "label": "Next up · Thu",
-        "time": "4:25",
-        "place": "Ainsley swim — Coach Ann",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T21:25:00.000Z",
-        "endIso": "2026-10-01T23:20:00.000Z",
-        "kind": "sport",
-        "whenLabel": "Thu 4:25",
-        "summary": "Ainsley swim — Coach Ann · 5:00 practice"
-      },
-      {
-        "label": "Next up · Thu",
-        "time": "4:55",
-        "place": "Hayes baseball — Falcons vs Lions (home)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T21:55:00.000Z",
-        "endIso": "2026-10-02T00:20:00.000Z",
-        "kind": "sport",
-        "whenLabel": "Thu 4:55",
-        "summary": "Hayes baseball — Falcons vs Lions (home) · 5:30 game"
-      },
-      {
-        "label": "Next up · Fri",
-        "time": "7:00",
-        "place": "SRE specials: No Specials",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Fri",
-        "startIso": "2026-10-02T12:00:00.000Z",
-        "endIso": "2026-10-02T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Fri 7:00",
-        "summary": "Hayes — SRE specials: No Specials"
-      },
-      {
-        "label": "Next up · Fri",
-        "time": "7:00",
-        "place": "SRE specials: Music",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Fri",
-        "startIso": "2026-10-02T12:00:00.000Z",
-        "endIso": "2026-10-02T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Fri 7:00",
-        "summary": "Harris — SRE specials: Music"
       }
     ]
   },
@@ -325,6 +325,13 @@
           "tone": "hot"
         },
         {
+          "kind": "event",
+          "when": "Wed · 5:35",
+          "what": "🏁 Scheels with Hayes (Harris at flag)",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
           "kind": "note",
           "when": "All day",
           "what": "🏡 YOUR BASE with Dad",
@@ -336,6 +343,12 @@
         {
           "when": "Wed 30 · leave 4:55",
           "what": "Harris flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Wed 30 · leave 5:35",
+          "what": "Scheels with Hayes (Harris at flag)",
           "hint": "YOUR board",
           "tone": "hot"
         },
@@ -566,6 +579,13 @@
           "what": "SRE pickup",
           "hint": "",
           "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Wed · 5:35",
+          "what": "Scheels with Hayes (Harris at flag)",
+          "hint": "YOUR board",
+          "tone": "hot"
         },
         {
           "kind": "note",
@@ -805,15 +825,36 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "THU · 3:00",
-        "what": "LKMS HOMEWORK HELP",
+        "when": "WED · 4:05",
+        "what": "TARGET WITH ALL 3 KIDS — AINSLEY BDAY GIFT FOR H",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "THU",
-          "3:00"
+          "WED",
+          "4:05"
         ]
       },
       "today": [
+        {
+          "kind": "event",
+          "when": "Wed · 4:05",
+          "what": "Target with all 3 kids — Ainsley bday gift for her friend",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Wed · 4:55",
+          "what": "drop at BVW football game",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Wed · 7:15",
+          "what": "pick up at BVW football game",
+          "hint": "",
+          "tone": "act"
+        },
         {
           "kind": "note",
           "when": "All day",
@@ -981,6 +1022,11 @@
           "tone": "hot"
         },
         {
+          "when": "Wed 30 · 5:35",
+          "what": "Scheels with Hayes (Harris at flag)",
+          "tone": "hot"
+        },
+        {
           "when": "Thu 1 · 7:00",
           "what": "SRE specials: Spanish + Library checkout",
           "tone": "act"
@@ -1078,11 +1124,6 @@
         {
           "when": "Mon 5 · 1:40",
           "what": "Lindsay appt",
-          "tone": "act"
-        },
-        {
-          "when": "Mon 5 · 3:00",
-          "what": "LKMS Homework Help",
           "tone": "act"
         }
       ]

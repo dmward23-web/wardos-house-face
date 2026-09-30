@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T19:20:42.591Z",
+  "fetchedAt": "2026-09-30T19:31:12.258Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-07",
@@ -35,6 +35,24 @@
       "allDay": false
     },
     {
+      "id": "qi8f6st94545omi83f4iccu598",
+      "summary": "Target with all 3 kids — Ainsley bday gift for her friend",
+      "start": "2026-09-30T16:05:00-05:00",
+      "end": "2026-09-30T16:55:00-05:00",
+      "location": "Target Overland Park South, 8101 W 151st St, Overland Park, KS 66223",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "6fqdqdicrf1aglh2kk48cnod38",
+      "summary": "Ainsley — drop at BVW football game · 5:05",
+      "start": "2026-09-30T16:55:00-05:00",
+      "end": "2026-09-30T17:15:00-05:00",
+      "location": "Blue Valley West High School, 16200 Antioch Rd, Overland Park, KS 66085",
+      "busy": true,
+      "allDay": false
+    },
+    {
       "id": "vluod9ndrvhcr20ovpera726dc_20260930T215500Z",
       "summary": "Harris flag practice · leave 4:55 · practice 5:30",
       "start": "2026-09-30T16:55:00-05:00",
@@ -53,12 +71,30 @@
       "allDay": false
     },
     {
+      "id": "khfr1al7bb2bvhurt5ht9gopp8",
+      "summary": "Scheels with Hayes (Harris at flag)",
+      "start": "2026-09-30T17:35:00-05:00",
+      "end": "2026-09-30T18:35:00-05:00",
+      "location": "Scheels, 6503 W 135th St, Overland Park, KS 66223",
+      "busy": true,
+      "allDay": false
+    },
+    {
       "id": "p6uaep2aendkqogub5un20d6ak",
       "summary": "HOA Board Meeting (awareness)",
       "start": "2026-09-30T19:00:00-05:00",
       "end": "2026-09-30T20:00:00-05:00",
       "location": "Regency By The Lake, Overland Park, KS",
       "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "ovkott1hhl53e1rfc15rvu9og8",
+      "summary": "Ainsley — pick up at BVW football game · 7:30",
+      "start": "2026-09-30T19:15:00-05:00",
+      "end": "2026-09-30T19:45:00-05:00",
+      "location": "Blue Valley West High School, 16200 Antioch Rd, Overland Park, KS 66085",
+      "busy": true,
       "allDay": false
     },
     {
