@@ -150,10 +150,14 @@ function isAdminNoise(summary) {
 
 function kidMentions(summary) {
   const s = summary.toLowerCase();
+  /* SCHOOL2: "Ward Kids [AHH No School]" → A = Ainsley, HH = Hayes + Harris */
+  const ns = /Ward Kids \[([AH]+) No School\]/i.exec(summary);
+  const nsA = ns ? /A/i.test(ns[1]) : false;
+  const nsH = ns ? /H/i.test(ns[1]) : false;
   return {
-    ainsley: /\bainsley\b/.test(s),
-    hayes: /\bhayes\b/.test(s),
-    harris: /\bharris\b/.test(s),
+    ainsley: /\bainsley\b/.test(s) || nsA,
+    hayes: /\bhayes\b/.test(s) || nsH,
+    harris: /\bharris\b/.test(s) || nsH,
     boys: /\bboyes\b|\bharris\b.*\bhayes\b|\bhayes\b.*\bharris\b|\bboyes\b|SRE drop|SRE pickup|Hayes \+ Harris/i.test(summary),
   };
 }
@@ -174,7 +178,7 @@ function classify(ev) {
   if (/SRE drop-off|SRE drop\b/i.test(summary)) return { kind: "school_drop", summary };
   if (/SRE pickup/i.test(summary)) return { kind: "school_pickup", summary };
   if (/Homework Help/i.test(summary)) return { kind: "school", summary, kid: "ainsley" };
-  if (/hearing\/vision|Hearing\/Vision|PE \(tennis|SRE specials?|field trip|yearbook/i.test(summary)) { /* SPECIALS1: boys specials always on kid boards + hub */
+  if (/hearing\/vision|Hearing\/Vision|PE \(tennis|SRE specials?|SRE spirit|Peace Week|field trip|yearbook|picture (retake|makeup)|LKMS (choir|fall conferences|Cougar Night|Bingo)|Ward Kids \[[AH]+ No School\]|no school \(elem|conference sign-ups|Tailgate|Halloween Bash/i.test(summary)) { /* SPECIALS1+SCHOOL2: all kids school info on kid boards + hub */
     return { kind: "school", summary };
   }
   if (/swim|Swim|Coach Ann/i.test(summary)) return { kind: "sport", sport: "swim", summary, kid: "ainsley" };
