@@ -23,6 +23,7 @@ import os from "node:os";
 import http from "node:http";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import * as sensi from "./sensi-control.mjs"; /* SENSICTL1 */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -373,6 +374,7 @@ async function main() {
           writeSupported: true,
           warm: warm.ready,
           kasaCreds: hasKasaCreds(),
+          sensi: true,
           ts: new Date().toISOString(),
         });
       }
@@ -381,6 +383,28 @@ async function main() {
         return json(res, 401, {
           error: "unauthorized · need X-Lights-Proxy-Token / ?proxyToken=",
         });
+      }
+
+      /* SENSICTL1 · live Sensi thermostat read + control (same key + tunnel as lights) */
+      if (pathname === "/api/sensi" && req.method === "GET") {
+        try {
+          return json(res, 200, { ok: true, service: "sensi", thermostat: await sensi.readState(), ts: new Date().toISOString() });
+        } catch (e) {
+          return json(res, 502, { ok: false, error: String(e.message || e) });
+        }
+      }
+      if (pathname === "/api/sensi/set" && req.method === "POST") {
+        const body = await readBody(req);
+        try {
+          let t;
+          if (body.kind === "mode") t = await sensi.setMode(body.mode);
+          else if (body.kind === "temp") t = await sensi.setTemp(body.mode, body.temp);
+          else return json(res, 400, { ok: false, error: "kind must be temp or mode" });
+          console.log(`[sensi] ${new Date().toISOString()} ${body.kind} ${body.mode || ""} ${body.temp || ""} -> heat ${t.heatSetpoint} cool ${t.coolSetpoint} mode ${t.mode}`);
+          return json(res, 200, { ok: true, thermostat: t, ts: new Date().toISOString() });
+        } catch (e) {
+          return json(res, 502, { ok: false, error: String(e.message || e) });
+        }
       }
 
       if (pathname === "/api/lights" && req.method === "GET") {
