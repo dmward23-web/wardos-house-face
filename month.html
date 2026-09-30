@@ -321,6 +321,30 @@
  text-decoration: none; flex-shrink: 0;
  }
  a.eyebrow { text-decoration: none; color: inherit; cursor: pointer; }
+
+ /* MONTHS1 · every month, JS-rendered from data/cal-months.json */
+ .mnav { display: inline-flex; align-items: center; gap: 10px; }
+ .month-title { font-size: 20px !important; letter-spacing: 0.12em !important; color: #1a1c20 !important; min-width: 250px; text-align: center; }
+ .mbtn {
+ font: inherit; font-size: 26px; font-weight: 700; color: #3a3e46; line-height: 1;
+ width: 52px; height: 52px; border-radius: 999px; cursor: pointer;
+ background: rgba(255,255,255,0.72); border: 1px solid rgba(40,42,48,0.14);
+ box-shadow: 0 2px 8px rgba(20,22,28,0.06);
+ }
+ .mbtn:disabled { opacity: 0.35; cursor: default; }
+ .mpills { display: flex; flex-wrap: wrap; gap: 8px; flex-shrink: 0; }
+ .mpill {
+ font: inherit; font-size: 13px; font-weight: 650; color: #3a3e46; cursor: pointer;
+ padding: 8px 14px; border-radius: 999px; min-height: 40px;
+ background: rgba(255,255,255,0.55); border: 1px solid rgba(40,42,48,0.12);
+ }
+ .mpill.on { background: #2a2c32; color: #fff; border-color: #2a2c32; }
+ .month-grid { min-height: 1000px; }
+ .mom.dan { color: #1a4038; }
+ .day-empty { font-size: 9px; color: #a0a4ac; font-weight: 500; }
+ .month-grid .day .dom { color: #eef0f4 !important; font-size: 17px; }
+ .month-grid .day.out .dom { color: #6a6e76 !important; font-size: 12px; }
+ .month-grid .day.today .dom { color: #ffd257 !important; }
 </style>
 <link rel="stylesheet" href="heat-v3.css?v=DAYTAP1" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
@@ -599,11 +623,16 @@
 
  <section class="month-wrap">
  <div class="month-hdr">
- <div class="month-title">September 2026</div>
- <div class="month-range">known facts only · empty = unknown</div>
+ <div class="mnav">
+ <button class="mbtn" type="button" data-mnav="-1" aria-label="Previous month">‹</button>
+ <div class="month-title" data-month-title>—</div>
+ <button class="mbtn" type="button" data-mnav="1" aria-label="Next month">›</button>
  </div>
+ <div class="month-range" data-month-range>known facts only · empty = unknown</div>
+ </div>
+ <div class="mpills" data-month-pills></div>
  <div class="banner-row">
- <div class="banner">Kids with Dad @ 147th through Fri Oct 2 3:00</div>
+ <div class="banner" data-month-banner>Loading calendar…</div>
  <div class="legend">
  <span class="leg ain"><i></i>Ainsley</span>
  <span class="leg hay"><i></i>Hayes</span>
@@ -614,148 +643,8 @@
  <div class="dow-row">
  <div class="dow-h">Sun</div><div class="dow-h">Mon</div><div class="dow-h">Tue</div><div class="dow-h">Wed</div><div class="dow-h">Thu</div><div class="dow-h">Fri</div><div class="dow-h">Sat</div>
  </div>
- <div class="month-grid" data-year="2026" data-month="9">
- <!-- W1 -->
- <div class="day out"><div class="day-top"><span class="dom">30</span></div></div>
- <div class="day out"><div class="day-top"><span class="dom">31</span></div></div>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">1</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">2</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">3</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">4</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">5</span></div></a>
- <!-- W2 -->
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">6</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">7</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">8</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">9</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">10</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">11</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">12</span></div></a>
- <!-- W3: 13–19 -->
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">13</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">14</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">15</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">16</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">17</span></div></a>
- <a class="day" href="sheet-today.html"><div class="day-top"><span class="dom">18</span></div></a>
- <a class="day" href="sheet-today.html">
- <div class="day-top"><span class="dom">19</span></div>
- <div class="mom">Kids · mom’s week</div>
- <div class="blocks">
- <div class="blk har">Harris flag ~11:00</div>
- <div class="blk hay">Hayes flag ~5:15</div>
- </div>
- </a>
- <!-- W4: 20–26 -->
- <a class="day" href="sheet-today.html">
- <div class="day-top"><span class="dom">20</span></div>
- <div class="mom">Kids · mom’s week</div>
- <div class="blocks">
- <div class="blk hay">Hayes · Freckle Juice</div>
- </div>
- </a>
- <a class="day" href="sheet-today.html">
- <div class="day-top"><span class="dom">21</span></div>
- <div class="mom">Kids · mom’s week</div>
- <div class="blocks">
- <div class="blk ain">Ainsley appointment 2:00</div>
- <div class="blk ain">LKMS HW Help 3:00</div>
- <div class="blk hay">Hayes baseball 6:15</div>
- </div>
- </a>
- <a class="day" href="sheet-today.html">
- <div class="day-top"><span class="dom">22</span></div>
- <div class="mom">Kids · mom’s week</div>
- <div class="blocks">
- <div class="blk har">Harris appointment 4:00</div>
- <div class="blk ain">Ainsley swim 5:00</div>
- <div class="blk hay">Hayes flag 6:30</div>
- </div>
- </a>
- <a class="day" href="sheet-today.html">
- <div class="day-top"><span class="dom">23</span></div>
- <div class="mom">Kids · mom’s week</div>
- <div class="blocks">
- <div class="blk hay">Hayes BV Rec BB · by</div>
- <div class="blk har">Harris flag 5:30</div>
- </div>
- </a>
- <a class="day" href="sheet-today.html">
- <div class="day-top"><span class="dom">24</span></div>
- <div class="mom">Kids · mom’s week</div>
- <div class="blocks">
- <div class="blk aware">Large Item Pickup</div>
- <div class="blk shr">SRE Fun Run + trip</div>
- <div class="blk ain">Ainsley HW 3:00</div>
- <div class="blk ain">Ainsley swim 5:00</div>
- <div class="blk hay">Hayes flag ~6:30</div>
- <div class="blk hay">Baseball vs LES 7:15</div>
- </div>
- </a>
- <a class="day load" href="sheet-today.html">
- <div class="day-top"><span class="dom">25</span><span class="day-tag">load</span></div>
- <div class="blocks">
- <div class="blk flight">6:50a · WN557 return</div>
- <div class="blk hay">Hayes birthday</div>
- <div class="blk aware">SRE no school</div>
- <div class="blk shr">Wrap presents ~11</div>
- <div class="blk hand">Boys pickup 3:00</div>
- <div class="blk shr">Kids with Dan starts</div>
- <div class="blk hay">UA Glow 4–6p OP</div>
- </div>
- </a>
- <a class="day" href="sheet-today.html">
- <div class="day-top"><span class="dom">26</span></div>
- <div class="blocks">
- <div class="blk har">Harris flag ~8:30</div>
- <div class="blk hay">Hayes flag vs Scott ~2:45</div>
- </div>
- </a>
- <!-- W5: 27–30 + Oct -->
- <a class="day" href="sheet-today.html">
- <div class="day-top"><span class="dom">27</span></div>
- <div class="blocks">
- <div class="blk shr">Garage sale 9–2 @ 147th</div>
- <div class="blk ain">Ainsley vanity 3:00 · Jessy</div>
- <div class="blk shr">Dad week @ 147th</div>
- </div>
- </a>
- <a class="day" href="sheet-today.html">
- <div class="day-top"><span class="dom">28</span></div>
- <div class="blocks">
- <div class="blk shr">Drop 8:25 / pickup 3:40</div>
- <div class="blk ain">Ainsley HW 3:00</div>
- <div class="blk hay">Hayes baseball 6:15</div>
- </div>
- </a>
- <a class="day" href="sheet-today.html">
- <div class="day-top"><span class="dom">29</span></div>
- <div class="blocks">
- <div class="blk shr">Drop / pickup</div>
- <div class="blk ain">Ainsley swim 5:00</div>
- <div class="blk hay">Hayes flag 6:30</div>
- </div>
- </a>
- <a class="day" href="sheet-today.html">
- <div class="day-top"><span class="dom">30</span></div>
- <div class="blocks">
- <div class="blk shr">SRE hearing/vision</div>
- <div class="blk shr">BVW Carnival ~5:00</div>
- <div class="blk har">Harris appointment 5:30</div>
- <div class="blk har">Harris flag SKIP</div>
- </div>
- </a>
- <div class="day out"><div class="day-top"><span class="dom">1</span></div><div class="blocks"><div class="blk next-chip">Oct · next</div></div></div>
- <div class="day out"><div class="day-top"><span class="dom">2</span></div><div class="blocks"><div class="blk next-chip">Oct · next</div></div></div>
- <div class="day out"><div class="day-top"><span class="dom">3</span></div><div class="blocks"><div class="blk next-chip">Oct · next</div></div></div>
- </div>
+ <div class="month-grid" data-year="2026" data-month="9"></div>
  </section>
-
- <div class="us-row">
- <span class="us-label">Next together</span>
- <span class="us-item">Oct 9–14 · Erin+Kids KC</span>
- <span class="us-item">Oct 18 · Live on the Green</span>
- </div>
 
  <footer class="ftr">
  <div class="ftr-left">
@@ -766,6 +655,92 @@
 
 <style id="audit1-hero">/* AUDIT1 · live time chip sits in its own line box (never over the label) */
 .leaveby-main .time{display:inline-block;margin:4px 10px 4px 0 !important;}</style>
+<script>
+/* MONTHS1 · month view for any month (‹ › + pills), data from data/cal-months.json */
+(function () {
+  var MN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var MS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var grid = document.querySelector(".month-grid");
+  var DATA = null, cur = null;
+  function ctToday() {
+    var p = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+    return { y: +p.slice(0, 4), m: +p.slice(5, 7), d: +p.slice(8, 10), iso: p };
+  }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function key(y, m, d) { return y + "-" + pad(m) + "-" + pad(d); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function months() {
+    var out = [], t = ctToday();
+    var s = DATA && DATA.rangeStart ? DATA.rangeStart : key(t.y, t.m, 1);
+    var e = DATA && DATA.rangeEnd ? DATA.rangeEnd : key(t.y, t.m, 1);
+    var y = +s.slice(0, 4), m = +s.slice(5, 7), ey = +e.slice(0, 4), em = +e.slice(5, 7);
+    if (DATA && DATA.days) { /* skip lead months with no real items */
+      while ((y < ey || (y === ey && m < em)) && !Object.keys(DATA.days).some(function (k) { return k.slice(0, 7) === y + "-" + pad(m) && DATA.days[k].items.length > 1; })) { m++; if (m > 12) { m = 1; y++; } }
+    }
+    while (y < ey || (y === ey && m <= em)) { out.push({ y: y, m: m }); m++; if (m > 12) { m = 1; y++; } }
+    return out;
+  }
+  function spans(y, m) {
+    var dim = new Date(y, m, 0).getDate(), out = [], run = null;
+    for (var d = 1; d <= dim; d++) {
+      var day = DATA && DATA.days[key(y, m, d)];
+      if (day && day.withDan) { if (!run) run = [d, d]; else run[1] = d; }
+      else if (run) { out.push(run); run = null; }
+    }
+    if (run) out.push(run);
+    return out.map(function (r) { return MS[m - 1] + " " + r[0] + (r[1] > r[0] ? "–" + r[1] : ""); });
+  }
+  function render(y, m) {
+    cur = { y: y, m: m };
+    var t = ctToday();
+    grid.setAttribute("data-year", y); grid.setAttribute("data-month", m);
+    document.querySelector("[data-month-title]").textContent = MN[m - 1] + " " + y;
+    var first = new Date(y, m - 1, 1).getDay(), dim = new Date(y, m, 0).getDate();
+    var weeks = Math.ceil((first + dim) / 7);
+    grid.style.gridTemplateRows = "repeat(" + weeks + ", 1fr)";
+    var html = "", start = new Date(y, m - 1, 1 - first);
+    for (var i = 0; i < weeks * 7; i++) {
+      var dd = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      var dy = dd.getFullYear(), dm = dd.getMonth() + 1, dn = dd.getDate();
+      if (dm !== m) { html += '<div class="day out"><div class="day-top"><span class="dom">' + dn + "</span></div></div>"; continue; }
+      var k = key(dy, dm, dn), day = DATA && DATA.days[k], isToday = k === t.iso;
+      html += '<a class="day' + (isToday ? " today" : "") + '" href="sheet-today.html"><div class="day-top"><span class="dom">' + dn + "</span>" + (isToday ? '<span class="day-tag">today</span>' : "") + "</div>";
+      if (day && day.withDan) html += '<div class="mom dan">Kids with Dan</div>';
+      html += '<div class="blocks">';
+      (day ? day.items : []).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '" title="' + esc(it.l) + '">' + esc(it.l) + "</div>"; });
+      html += "</div></a>";
+    }
+    grid.innerHTML = html;
+    var sp = spans(y, m);
+    document.querySelector("[data-month-banner]").textContent = sp.length ? "Kids with Dan · " + sp.join(" · ") : "No Kids-with-Dan days on the calendar this month";
+    var list = months(), idx = list.findIndex(function (x) { return x.y === y && x.m === m; });
+    document.querySelector('[data-mnav="-1"]').disabled = idx <= 0;
+    document.querySelector('[data-mnav="1"]').disabled = idx < 0 || idx >= list.length - 1;
+    document.querySelector("[data-month-pills]").innerHTML = list.map(function (x) {
+      return '<button type="button" class="mpill' + (x.y === y && x.m === m ? " on" : "") + '" data-ym="' + x.y + "-" + x.m + '">' + MS[x.m - 1] + (x.y !== t.y ? " " + x.y : "") + "</button>";
+    }).join("");
+    var r = document.querySelector("[data-month-range]");
+    r.textContent = DATA ? "calendar through " + MS[+DATA.rangeEnd.slice(5, 7) - 1] + " " + +DATA.rangeEnd.slice(8, 10) + " · empty = unknown" : "calendar unavailable · empty = unknown";
+    if (location.hash !== "#" + y + "-" + pad(m)) history.replaceState(null, "", "#" + y + "-" + pad(m));
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-mnav]");
+    if (b && cur) { var list = months(), i = list.findIndex(function (x) { return x.y === cur.y && x.m === cur.m; }) + +b.getAttribute("data-mnav"); if (list[i]) render(list[i].y, list[i].m); return; }
+    var p = e.target.closest("[data-ym]");
+    if (p) { var v = p.getAttribute("data-ym").split("-"); render(+v[0], +v[1]); }
+  });
+  function initial() {
+    var h = /^#(\d{4})-(\d{2})$/.exec(location.hash), t = ctToday();
+    return h ? { y: +h[1], m: +h[2] } : { y: t.y, m: t.m };
+  }
+  var s0 = initial(); render(s0.y, s0.m);
+  fetch("data/cal-months.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    if (d && d.days) DATA = d;
+    render(cur.y, cur.m);
+  }).catch(function () { render(cur.y, cur.m); });
+  setInterval(function () { if (cur) render(cur.y, cur.m); }, 10 * 60 * 1000);
+})();
+</script>
 <script src="house-clock.js?v=FAMCLK1"></script>
 <script src="house-board-strip.js?v=AUDIT1"></script>
 <script src="house-weather.js?v=AUDIT1"></script>
