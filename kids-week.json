@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T23:23:15.963Z",
+  "refreshedAt": "2026-09-30T23:37:18.222Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,26 +17,14 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "6:30",
-    "place": "Scheels with Hayes + Harris",
+    "time": "7:15",
+    "place": "pick up at BVW football game",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Wed",
-    "startIso": "2026-09-30T23:30:00.000Z",
-    "endIso": "2026-10-01T00:15:00.000Z",
+    "startIso": "2026-10-01T00:15:00.000Z",
+    "endIso": "2026-10-01T00:45:00.000Z",
     "kind": "other",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "6:30",
-        "place": "Scheels with Hayes + Harris",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-09-30T23:30:00.000Z",
-        "endIso": "2026-10-01T00:15:00.000Z",
-        "kind": "other",
-        "whenLabel": "6:30",
-        "summary": "Scheels with Hayes + Harris"
-      },
       {
         "label": "Next up · today",
         "time": "7:15",
@@ -132,6 +120,18 @@
         "kind": "sport",
         "whenLabel": "Thu 4:55",
         "summary": "Hayes baseball — Falcons vs Lions (home) · 5:30 game"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "7:15",
+        "place": "Scheels with Hayes + Harris",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-02T00:15:00.000Z",
+        "endIso": "2026-10-02T01:00:00.000Z",
+        "kind": "other",
+        "whenLabel": "Thu 7:15",
+        "summary": "Scheels with Hayes + Harris"
       },
       {
         "label": "Next up · Fri",
@@ -301,29 +301,15 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "WED · 5:00",
-        "what": "HARRIS FLAG PRACTICE · 5:30–6:30",
+        "when": "THU · 7:00",
+        "what": "SRE SPECIALS: SPANISH + LIBRARY CHECKOUT",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "WED",
-          "5:00"
+          "THU",
+          "7:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Wed · 5:00",
-          "what": "🏁 Harris flag practice · 5:30–6:30",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "kind": "event",
-          "when": "Wed · 6:30",
-          "what": "Scheels with Hayes + Harris",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -334,20 +320,8 @@
       ],
       "sports": [
         {
-          "when": "Wed 30 · leave 5:00",
-          "what": "Harris flag practice · 5:30–6:30",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
           "when": "Sat 3 · leave 1:00",
           "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "when": "Wed 7 · leave 4:45",
-          "what": "Harris flag practice · 5:30–6:30",
           "hint": "YOUR board",
           "tone": "hot"
         }
@@ -404,12 +378,6 @@
         {
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 7 · 7:00",
-          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
         }
@@ -545,22 +513,15 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "WED · 6:30",
-        "what": "SCHEELS WITH HAYES + HARRIS",
+        "when": "THU · 7:00",
+        "what": "SRE SPECIALS: ART",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "WED",
-          "6:30"
+          "THU",
+          "7:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Wed · 6:30",
-          "what": "Scheels with Hayes + Harris",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -647,12 +608,6 @@
         {
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 7 · 7:00",
-          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
         }
@@ -961,11 +916,6 @@
       ],
       "week": [
         {
-          "when": "Wed 30 · 5:00",
-          "what": "Harris flag practice · 5:30–6:30",
-          "tone": "hot"
-        },
-        {
           "when": "Thu 1 · 7:00",
           "what": "SRE specials: Spanish + Library checkout",
           "tone": "act"
@@ -1079,6 +1029,11 @@
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
           "tone": "act"
+        },
+        {
+          "when": "Tue 6 · 5:00",
+          "what": "Ainsley swim — Coach Ann",
+          "tone": "hot"
         }
       ]
     }
