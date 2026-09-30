@@ -2,7 +2,7 @@
   "_meta": {
     "note": "Ledger owns SoT. Wright does not invent $. Source of truth live file is /workspace/board-os/data/cash.json (NOT in house-face git). Refresh this fixture when Ledger restamps. Cliff SoT now decree May 2028 (Dan exact-yes 28 Sep ~11:05p).",
     "copiedFrom": "board-os/data/cash.json",
-    "copiedAtCT": "2026-09-28 ~11:05p CT",
+    "copiedAtCT": "2026-09-29 ~10:35p CT (restamp to SoT as-of Tue 29 Sep ~9:15p CT · same dollars · Ledger item 25)",
     "cliffPark": "cliff SoT decree May 2028 (Dan exact-yes 28 Sep ~11:05p) — CI holds available/eoy",
     "cliff": "May 2028",
     "cliffFirstPay": "2025-10-01",
@@ -11,9 +11,9 @@
   },
   "schema": "board-os.cash.packet.v1",
   "mode": "LIVE",
-  "lockedAt": "2026-09-28T21:19:00-05:00",
-  "as_of": "2026-09-28",
-  "asOfLabel": "Mon 28 Sep ~9:19p CT · nightly harvest Finance confirm · LIVE Wells Everyday …6854",
+  "lockedAt": "2026-09-29T21:15:00-05:00",
+  "as_of": "2026-09-29",
+  "asOfLabel": "Tue 29 Sep ~9:15p CT · nightly harvest Finance confirm · LIVE Wells Everyday …6854",
   "available": 19961.9,
   "availableDisplay": "$19,961.90",
   "discGate": {
