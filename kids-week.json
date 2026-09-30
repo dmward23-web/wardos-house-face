@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T20:30:03.553Z",
+  "refreshedAt": "2026-09-30T20:42:51.162Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -39,14 +39,14 @@
       },
       {
         "label": "Next up · today",
-        "time": "4:10",
+        "time": "4:15",
         "place": "Target with all 3 kids — Ainsley bday gift for her fr…",
         "detailHtml": "5:00 Harris flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
-        "startIso": "2026-09-30T21:10:00.000Z",
+        "startIso": "2026-09-30T21:15:00.000Z",
         "endIso": "2026-09-30T22:00:00.000Z",
         "kind": "other",
-        "whenLabel": "4:10",
+        "whenLabel": "4:15",
         "summary": "Target with all 3 kids — Ainsley bday gift for her friend"
       },
       {
@@ -80,21 +80,21 @@
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
         "startIso": "2026-09-30T23:30:00.000Z",
-        "endIso": "2026-10-01T00:00:00.000Z",
+        "endIso": "2026-10-01T00:15:00.000Z",
         "kind": "other",
         "whenLabel": "6:30",
         "summary": "Scheels with Hayes + Harris"
       },
       {
         "label": "Next up · today",
-        "time": "7:00",
+        "time": "7:15",
         "place": "pick up at BVW football game",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
-        "startIso": "2026-10-01T00:00:00.000Z",
+        "startIso": "2026-10-01T00:15:00.000Z",
         "endIso": "2026-10-01T00:45:00.000Z",
         "kind": "other",
-        "whenLabel": "7:00",
+        "whenLabel": "7:15",
         "summary": "Ainsley — pick up at BVW football game · 7:30"
       },
       {
@@ -819,18 +819,18 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "WED · 4:10",
+        "when": "WED · 4:15",
         "what": "TARGET WITH ALL 3 KIDS — AINSLEY BDAY GIFT FOR H",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "WED",
-          "4:10"
+          "4:15"
         ]
       },
       "today": [
         {
           "kind": "event",
-          "when": "Wed · 4:10",
+          "when": "Wed · 4:15",
           "what": "Target with all 3 kids — Ainsley bday gift for her friend",
           "hint": "",
           "tone": "act"
@@ -844,7 +844,7 @@
         },
         {
           "kind": "event",
-          "when": "Wed · 7:00",
+          "when": "Wed · 7:15",
           "what": "pick up at BVW football game",
           "hint": "",
           "tone": "act"
