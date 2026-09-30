@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T22:39:33.243Z",
+  "refreshedAt": "2026-09-30T22:54:58.645Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,26 +17,14 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "5:30",
-    "place": "drop at BVW football game (game 6:00)",
+    "time": "6:30",
+    "place": "Scheels with Hayes + Harris",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Wed",
-    "startIso": "2026-09-30T22:30:00.000Z",
-    "endIso": "2026-09-30T23:00:00.000Z",
+    "startIso": "2026-09-30T23:30:00.000Z",
+    "endIso": "2026-10-01T00:15:00.000Z",
     "kind": "other",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "5:30",
-        "place": "drop at BVW football game (game 6:00)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-09-30T22:30:00.000Z",
-        "endIso": "2026-09-30T23:00:00.000Z",
-        "kind": "other",
-        "whenLabel": "5:30",
-        "summary": "Ainsley — drop at BVW football game (game 6:00)"
-      },
       {
         "label": "Next up · today",
         "time": "6:30",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Fri 7:00",
         "summary": "Harris — SRE specials: Music"
+      },
+      {
+        "label": "Next up · Fri",
+        "time": "8:10",
+        "place": "Boys SRE drop",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-02T13:10:00.000Z",
+        "endIso": "2026-10-02T13:40:00.000Z",
+        "kind": "school_drop",
+        "whenLabel": "Fri 8:10",
+        "summary": "Hayes + Harris — SRE drop-off · 8:25"
       }
     ]
   },
