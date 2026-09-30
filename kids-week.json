@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Sep 29 2026",
   "asOfIso": "2026-09-29",
-  "refreshedAt": "2026-09-30T04:54:13.139Z",
+  "refreshedAt": "2026-09-30T03:50:10.249Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -199,25 +199,37 @@
       "quests": [
         {
           "id": "har-bed",
-          "what": "🛏️ Make bed — pre-game ritual",
+          "what": "🛏️ Make bed — pre-game ritual (block rebuild)",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "har-backpack",
-          "what": "🎒 Backpack packed — tomorrow ready",
+          "what": "🎒 Pack backpack (loot ready) — daily must",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "har-dishes",
-          "what": "🍽️ Dishes — rinse + in the washer (empty it if it is clean)",
+          "what": "🍽️ Clean up after you · rinse · in dishwasher — daily must",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "har-empty",
+          "what": "🍽️ Empty dishwasher — daily must",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "har-trash",
-          "what": "🗑️ Trash — your zone clear",
+          "what": "🗑️ Trash out (clear the cave) — daily must",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "har-postgame",
+          "what": "⚡ Post-game · gear rinsed · bag set",
           "stars": 1,
           "cadence": "daily"
         },
@@ -228,39 +240,20 @@
           "cadence": "daily"
         },
         {
-          "id": "har-postgame",
-          "what": "⚡ Practice / game days only: gear rinsed · bag set",
-          "stars": 1,
-          "cadence": "daily"
-        },
-        {
-          "id": "har-outside",
-          "what": "⚾ Outside reset — balls, bats, bikes, scooters, chairs back to their spot. Nothing left in the yard or on the patio.",
-          "stars": 1,
-          "cadence": "daily",
-          "since": "2026-09-30"
-        },
-        {
           "id": "har-toys",
-          "what": "🧹 Room reset — floor clear · hamper · surfaces",
+          "what": "🧸 Toys reset — weekly must",
           "stars": 2,
           "cadence": "weekly"
         },
         {
           "id": "har-shoes",
-          "what": "👟 Shoes in closet / cubby / room — never the hallway",
+          "what": "👟 Shoes · closet / garage cubby / room — weekly must",
           "stars": 1,
           "cadence": "weekly"
         },
         {
           "id": "har-cubby",
-          "what": "🎒 Backpack + sports bag in the garage cubby",
-          "stars": 1,
-          "cadence": "weekly"
-        },
-        {
-          "id": "har-yard",
-          "what": "🧺 Yard sweep — walk the patio, trampoline area, and driveway. Pick up the leftovers the daily close missed.",
+          "what": "🎒 Backpack + sports bag in garage cubby — weekly must",
           "stars": 1,
           "cadence": "weekly"
         }
@@ -300,8 +293,8 @@
           "tone": "fun"
         },
         {
-          "when": "Weekly · Sat after breakfast",
-          "what": "🧹 Room + 👟 shoes + 🎒 garage cubby + 🧺 yard sweep",
+          "when": "Weekly",
+          "what": "🧸 Toys + 👟 shoes + 🎒 garage cubby",
           "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         }
@@ -436,25 +429,37 @@
       "quests": [
         {
           "id": "hay-bed",
-          "what": "🛏️ Make bed — pre-game ritual",
+          "what": "🛏️ Make bed — pre-game ritual (daily must)",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "hay-backpack",
-          "what": "🎒 Backpack packed — tomorrow ready",
+          "what": "🎒 Backpack — loadout ready (daily must)",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "hay-dishes",
-          "what": "🍽️ Dishes — rinse + in the washer (empty it if it is clean)",
+          "what": "🍽️ Clean up after you · rinse · in dishwasher — daily must",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "hay-empty",
+          "what": "🍽️ Empty dishwasher — daily must",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "hay-trash",
-          "what": "🗑️ Trash — your zone clear",
+          "what": "🗑️ Trash out — zone clear (daily must)",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "hay-postgame",
+          "what": "⚡ Post-game · gear rinsed · bag set",
           "stars": 1,
           "cadence": "daily"
         },
@@ -465,39 +470,20 @@
           "cadence": "daily"
         },
         {
-          "id": "hay-postgame",
-          "what": "⚡ Practice / game days only: gear rinsed · bag set",
-          "stars": 1,
-          "cadence": "daily"
-        },
-        {
-          "id": "hay-outside",
-          "what": "⚾ Outside reset — balls, bats, bikes, scooters, chairs back to their spot. Nothing left in the yard or on the patio.",
-          "stars": 1,
-          "cadence": "daily",
-          "since": "2026-09-30"
-        },
-        {
           "id": "hay-room",
-          "what": "🧹 Room reset — floor clear · hamper · surfaces",
+          "what": "🧹 Room reset — weekly must",
           "stars": 2,
           "cadence": "weekly"
         },
         {
           "id": "hay-shoes",
-          "what": "👟 Shoes in closet / cubby / room — never the hallway",
+          "what": "👟 Shoes · closet / garage cubby / room — weekly must (never hallway)",
           "stars": 1,
           "cadence": "weekly"
         },
         {
           "id": "hay-cubby",
-          "what": "🎒 Backpack + sports bag in the garage cubby",
-          "stars": 1,
-          "cadence": "weekly"
-        },
-        {
-          "id": "hay-yard",
-          "what": "🧺 Yard sweep — walk the patio, trampoline area, and driveway. Pick up the leftovers the daily close missed.",
+          "what": "🎒 Backpack + sports bag in garage cubby — weekly must",
           "stars": 1,
           "cadence": "weekly"
         }
@@ -537,8 +523,8 @@
           "tone": "fun"
         },
         {
-          "when": "Weekly · Sat after breakfast",
-          "what": "🧹 Room + 👟 shoes + 🎒 garage cubby + 🧺 yard sweep",
+          "when": "Weekly",
+          "what": "🧹 Room + 👟 shoes + 🎒 garage cubby",
           "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         }
@@ -678,40 +664,32 @@
           "cadence": "daily"
         },
         {
-          "id": "ain-backpack",
-          "what": "🎒 Backpack packed — tomorrow ready",
+          "id": "ain-toys",
+          "what": "Room reset — clean pass",
           "stars": 1,
-          "cadence": "daily",
-          "since": "2026-09-30"
+          "cadence": "daily"
         },
         {
           "id": "ain-dishwasher",
-          "what": "Dishes — rinse + in the washer (empty it if it is clean)",
+          "what": "Clean up after you · rinse · in dishwasher",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "ain-empty",
+          "what": "Empty dishwasher",
           "stars": 1,
           "cadence": "daily"
         },
         {
           "id": "ain-living",
-          "what": "Shoes & coat — closet / cubby / room — never the hallway",
+          "what": "Shoes & coats · closet / cubby / room",
           "stars": 1,
           "cadence": "daily"
-        },
-        {
-          "id": "ain-toys",
-          "what": "Room close — floor clear · hamper · surfaces",
-          "stars": 1,
-          "cadence": "daily"
-        },
-        {
-          "id": "ain-shower",
-          "what": "Ready for bed — shower · brush",
-          "stars": 1,
-          "cadence": "daily",
-          "since": "2026-09-30"
         },
         {
           "id": "ain-bath",
-          "what": "Bathroom wipe — her bathroom",
+          "what": "Bathroom wipe — weekly",
           "stars": 3,
           "cadence": "weekly"
         },
@@ -723,7 +701,7 @@
         },
         {
           "id": "ain-cubby",
-          "what": "🎒 Backpack + sports bag in the garage cubby",
+          "what": "🎒 Backpack + sports bag in garage cubby",
           "stars": 1,
           "cadence": "weekly"
         },
@@ -742,9 +720,9 @@
       "streakLabel": "◆ 4-day streak — hold the line",
       "missions": [
         {
-          "when": "Weekly · house day",
+          "when": "Weekly",
           "what": "Bath wipe + laundry + garage cubby = big star dump",
-          "hint": "Sat after breakfast unless you have a standing day · ask Dad to inspect",
+          "hint": "musts · ask Dad to inspect",
           "tone": "fun"
         },
         {
