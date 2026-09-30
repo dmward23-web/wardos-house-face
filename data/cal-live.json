@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T14:54:12.893Z",
+  "fetchedAt": "2026-09-30T15:08:44.671Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-07",
@@ -103,15 +103,6 @@
       "start": "2026-10-01T08:10:00-05:00",
       "end": "2026-10-01T08:40:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "fp6v1cl6aptt431jhu6cfkjrng",
-      "summary": "Leave · KS DL replace · OP 119th · BOOKED 2777892 · 9:15",
-      "start": "2026-10-01T08:55:00-05:00",
-      "end": "2026-10-01T10:00:00-05:00",
-      "location": "Johnson County Driver License Office, 7600 W 119th Street, Suite D, Overland Park, KS 66210",
       "busy": true,
       "allDay": false
     },
@@ -426,7 +417,7 @@
     "label": "Next up · today",
     "time": "12:15",
     "place": "Ainsley — Lindsay appt · 1:00",
-    "detailHtml": "<strong>12:15</strong> Ainsley — Lindsay appt · 1:00 · next Leave · Thu <strong>8:55</strong> KS DL replace · OP 119th · BOOKED 2777892 · 9:15",
+    "detailHtml": "<strong>12:15</strong> Ainsley — Lindsay appt · 1:00",
     "badge": "Wed"
   },
   "error": null

@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T14:54:12.473Z",
+  "refreshedAt": "2026-09-30T15:08:44.274Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -123,18 +123,6 @@
       },
       {
         "label": "Next up · Thu",
-        "time": "8:55",
-        "place": "KS DL replace · OP 119th · BOOKED 2777892",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T13:55:00.000Z",
-        "endIso": "2026-10-01T15:00:00.000Z",
-        "kind": "leave",
-        "whenLabel": "Thu 8:55",
-        "summary": "Leave · KS DL replace · OP 119th · BOOKED 2777892 · 9:15"
-      },
-      {
-        "label": "Next up · Thu",
         "time": "3:00",
         "place": "LKMS Homework Help",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
@@ -168,6 +156,18 @@
         "kind": "sport",
         "whenLabel": "Thu 4:25",
         "summary": "Ainsley swim — Coach Ann · 5:00 practice"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "4:55",
+        "place": "Hayes baseball — Falcons vs Lions (home)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-01T21:55:00.000Z",
+        "endIso": "2026-10-02T00:20:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Thu 4:55",
+        "summary": "Hayes baseball — Falcons vs Lions (home) · 5:30 game"
       }
     ]
   },
@@ -1033,11 +1033,6 @@
           "tone": "act"
         },
         {
-          "when": "Thu 1 · 8:55",
-          "what": "KS DL replace · OP 119th · BOOKED 2777892",
-          "tone": "hot"
-        },
-        {
           "when": "Thu 1 · 3:00",
           "what": "LKMS Homework Help",
           "tone": "act"
@@ -1110,6 +1105,11 @@
         {
           "when": "Mon 5 · 7:00",
           "what": "SRE spirit day: Hat Day (Peace Week)",
+          "tone": "act"
+        },
+        {
+          "when": "Mon 5 · 12:00",
+          "what": "SRE Peace Week",
           "tone": "act"
         }
       ]
