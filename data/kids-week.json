@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T12:31:34.341Z",
+  "refreshedAt": "2026-09-30T12:48:37.439Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -48,18 +48,6 @@
         "kind": "school",
         "whenLabel": "7:00",
         "summary": "Harris — SRE specials: Art"
-      },
-      {
-        "label": "Next up · today",
-        "time": "7:30",
-        "place": "LKMS yearbook picture retakes",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-09-30T12:30:00.000Z",
-        "endIso": "2026-09-30T12:45:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:30",
-        "summary": "Ainsley — LKMS yearbook picture retakes"
       },
       {
         "label": "Next up · today",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Thu 7:00",
         "summary": "Hayes — SRE specials: Art"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "8:10",
+        "place": "Boys SRE drop",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-01T13:10:00.000Z",
+        "endIso": "2026-10-01T13:40:00.000Z",
+        "kind": "school_drop",
+        "whenLabel": "Thu 8:10",
+        "summary": "Hayes + Harris — SRE drop-off · 8:25"
       }
     ]
   },
