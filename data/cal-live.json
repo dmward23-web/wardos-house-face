@@ -1,17 +1,17 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T13:06:02.063Z",
+  "fetchedAt": "2026-09-30T13:18:28.660Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-06",
+  "windowEnd": "2026-10-07",
   "asOfIso": "2026-09-30",
   "nextLeave": {
-    "id": "1ni8dem5hrho45a0csgj81r3i4_20260930T131000Z",
-    "summary": "Hayes + Harris — SRE drop-off · 8:25",
-    "start": "2026-09-30T08:10:00-05:00",
-    "end": "2026-09-30T08:40:00-05:00",
-    "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+    "id": "2rn2cegcuk32c0skjn9bgdignk",
+    "summary": "Ainsley — Lindsay appt · 1:00",
+    "start": "2026-09-30T12:15:00-05:00",
+    "end": "2026-09-30T14:15:00-05:00",
+    "location": "8675 College Blvd, Overland Park, KS 66210-1946",
     "busy": true,
     "allDay": false
   },
@@ -37,29 +37,20 @@
       "pinnedUntil": "8:40"
     },
     {
-      "id": "1ni8dem5hrho45a0csgj81r3i4_20260930T131000Z",
-      "summary": "Hayes + Harris — SRE drop-off · 8:25",
-      "start": "2026-09-30T08:10:00-05:00",
-      "end": "2026-09-30T08:40:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "4n0c5k6h39q3rvqrbavhlo1kv4",
-      "summary": "Leave · HD #2209 · vanity return ONLY",
-      "start": "2026-09-30T09:00:00-05:00",
-      "end": "2026-09-30T10:30:00-05:00",
-      "location": "The Home Depot #2209, 12200 W 135th St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
-    {
       "id": "2rn2cegcuk32c0skjn9bgdignk",
       "summary": "Ainsley — Lindsay appt · 1:00",
       "start": "2026-09-30T12:15:00-05:00",
       "end": "2026-09-30T14:15:00-05:00",
       "location": "8675 College Blvd, Overland Park, KS 66210-1946",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "4n0c5k6h39q3rvqrbavhlo1kv4",
+      "summary": "HD #2209 · vanity return ONLY (during Ainsley's session)",
+      "start": "2026-09-30T13:00:00-05:00",
+      "end": "2026-09-30T13:55:00-05:00",
+      "location": "The Home Depot #2209, 12200 W 135th St, Overland Park, KS 66221",
       "busy": true,
       "allDay": false
     },
@@ -431,13 +422,31 @@
       "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
       "busy": false,
       "allDay": false
+    },
+    {
+      "id": "uj7dl4l1smsa286932ro47ae1k",
+      "summary": "Hayes + Harris — SRE spirit day: Workout Day / team jersey (Peace Week)",
+      "start": "2026-10-07T07:00:00-05:00",
+      "end": "2026-10-07T07:15:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "vluod9ndrvhcr20ovpera726dc_20261007T215500Z",
+      "summary": "Harris flag practice · 5:30 practice",
+      "start": "2026-10-07T17:30:00-05:00",
+      "end": "2026-10-07T18:30:00-05:00",
+      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
+      "busy": false,
+      "allDay": false
     }
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "8:10",
-    "place": "Hayes + Harris — SRE drop-off · 8:25",
-    "detailHtml": "<strong>8:10</strong> Hayes + Harris — SRE drop-off · 8:25 · next Leave · Wed <strong>9:00</strong> HD #2209 · vanity return ONLY",
+    "time": "12:15",
+    "place": "Ainsley — Lindsay appt · 1:00",
+    "detailHtml": "<strong>12:15</strong> Ainsley — Lindsay appt · 1:00 · next Leave · Thu <strong>8:55</strong> KS DL replace · OP 119th · BOOKED 2777892 · 9:15",
     "badge": "Wed"
   },
   "error": null
