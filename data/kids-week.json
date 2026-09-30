@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T12:48:37.439Z",
+  "refreshedAt": "2026-09-30T12:52:35.060Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -883,22 +883,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "WED · 7:30",
-        "what": "LKMS YEARBOOK PICTURE RETAKES",
+        "when": "WED · 12:15",
+        "what": "LINDSAY APPT",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "WED",
-          "7:30"
+          "12:15"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Wed · 7:30",
-          "what": "LKMS yearbook picture retakes",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Wed · 12:15",
@@ -929,12 +922,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Wed 30 · 7:30",
-          "what": "LKMS yearbook picture retakes",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Thu 1 · 3:00",
           "what": "LKMS Homework Help",
@@ -1080,11 +1067,6 @@
           "tone": "act"
         },
         {
-          "when": "Wed 30 · 7:30",
-          "what": "LKMS yearbook picture retakes",
-          "tone": "act"
-        },
-        {
           "when": "Wed 30 · 8:00",
           "what": "SRE Hearing/Vision Screening",
           "tone": "act"
@@ -1187,6 +1169,11 @@
         {
           "when": "Fri 2 · 11:30",
           "what": "SRE Tailgate Party (reading incentive)",
+          "tone": "act"
+        },
+        {
+          "when": "Fri 2 · 12:00",
+          "what": "SRE field trip museum+park (chaperone slots)",
           "tone": "act"
         }
       ]
