@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T21:13:12.190Z",
+  "fetchedAt": "2026-09-30T21:28:22.087Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-07",
+  "windowEnd": "2026-10-06",
   "asOfIso": "2026-09-30",
   "nextLeave": {
-    "id": "qi8f6st94545omi83f4iccu598",
-    "summary": "Target with all 3 kids — Ainsley bday gift for her friend",
-    "start": "2026-09-30T16:15:00-05:00",
-    "end": "2026-09-30T17:00:00-05:00",
-    "location": "Target Overland Park South, 8101 W 151st St, Overland Park, KS 66223",
+    "id": "vluod9ndrvhcr20ovpera726dc_20260930T214500Z",
+    "summary": "Harris flag practice · 5:30–6:30",
+    "start": "2026-09-30T17:00:00-05:00",
+    "end": "2026-09-30T18:30:00-05:00",
+    "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
     "busy": true,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "qi8f6st94545omi83f4iccu598",
-      "summary": "Target with all 3 kids — Ainsley bday gift for her friend",
-      "start": "2026-09-30T16:15:00-05:00",
-      "end": "2026-09-30T17:00:00-05:00",
-      "location": "Target Overland Park South, 8101 W 151st St, Overland Park, KS 66223",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "torv7e3cq59fdi1vuiod9vq824",
       "summary": "BVW Homecoming Carnival",
@@ -384,31 +375,13 @@
       "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
       "busy": false,
       "allDay": false
-    },
-    {
-      "id": "uj7dl4l1smsa286932ro47ae1k",
-      "summary": "Hayes + Harris — SRE spirit day: Workout Day / team jersey (Peace Week)",
-      "start": "2026-10-07T07:00:00-05:00",
-      "end": "2026-10-07T07:15:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "vluod9ndrvhcr20ovpera726dc_20261007T214500Z",
-      "summary": "Harris flag practice · 5:30–6:30",
-      "start": "2026-10-07T16:45:00-05:00",
-      "end": "2026-10-07T18:30:00-05:00",
-      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
-      "busy": true,
-      "allDay": false
     }
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "4:15",
-    "place": "Target with all 3 kids — Ainsley bday gift for her fr…",
-    "detailHtml": "<strong>4:15</strong> Target with all 3 kids — Ainsley bday gift for her fr…",
+    "time": "5:00",
+    "place": "Harris flag practice · 5:30–6:30",
+    "detailHtml": "<strong>5:00</strong> Harris flag practice · 5:30–6:30",
     "badge": "Wed"
   },
   "error": null

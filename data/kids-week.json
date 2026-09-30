@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T21:13:11.824Z",
+  "refreshedAt": "2026-09-30T21:28:21.704Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,26 +17,14 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "4:15",
-    "place": "Target with all 3 kids — Ainsley bday gift for her fr…",
-    "detailHtml": "5:00 Harris flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "time": "5:00",
+    "place": "Harris flag practice · 5:30–6:30",
+    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Wed",
-    "startIso": "2026-09-30T21:15:00.000Z",
-    "endIso": "2026-09-30T22:00:00.000Z",
-    "kind": "other",
+    "startIso": "2026-09-30T22:00:00.000Z",
+    "endIso": "2026-09-30T23:30:00.000Z",
+    "kind": "sport",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "4:15",
-        "place": "Target with all 3 kids — Ainsley bday gift for her fr…",
-        "detailHtml": "5:00 Harris flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-09-30T21:15:00.000Z",
-        "endIso": "2026-09-30T22:00:00.000Z",
-        "kind": "other",
-        "whenLabel": "4:15",
-        "summary": "Target with all 3 kids — Ainsley bday gift for her friend"
-      },
       {
         "label": "Next up · today",
         "time": "5:00",
@@ -168,6 +156,18 @@
         "kind": "sport",
         "whenLabel": "Thu 4:55",
         "summary": "Hayes baseball — Falcons vs Lions (home) · 5:30 game"
+      },
+      {
+        "label": "Next up · Fri",
+        "time": "7:00",
+        "place": "SRE specials: No Specials",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-02T12:00:00.000Z",
+        "endIso": "2026-10-02T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Fri 7:00",
+        "summary": "Hayes — SRE specials: No Specials"
       }
     ]
   },
@@ -344,12 +344,6 @@
           "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
           "hint": "YOUR board",
           "tone": "hot"
-        },
-        {
-          "when": "Wed 7 · leave 4:45",
-          "what": "Harris flag practice · 5:30–6:30",
-          "hint": "YOUR board",
-          "tone": "hot"
         }
       ],
       "school": [
@@ -404,12 +398,6 @@
         {
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 7 · 7:00",
-          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
         }
@@ -647,12 +635,6 @@
         {
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 7 · 7:00",
-          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
         }
@@ -975,11 +957,6 @@
       ],
       "week": [
         {
-          "when": "Wed 30 · 4:00",
-          "what": "SRE — conference sign-ups go live",
-          "tone": "act"
-        },
-        {
           "when": "Wed 30 · 5:00",
           "what": "Harris flag practice · 5:30–6:30",
           "tone": "hot"
@@ -1093,6 +1070,11 @@
           "when": "Mon 5 · 5:30",
           "what": "Hayes baseball — Falcons vs KC Tigers (away)",
           "tone": "hot"
+        },
+        {
+          "when": "Tue 6 · 7:00",
+          "what": "SRE spirit day: Tropical Day (Peace Week)",
+          "tone": "act"
         }
       ]
     }
