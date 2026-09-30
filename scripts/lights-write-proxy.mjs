@@ -103,6 +103,19 @@ function readBody(req) {
   });
 }
 
+/* TAPSYNC1 · shared kid taps store (box only, never git) */
+const TAPS_FILE = path.join(os.homedir(), ".config", "wardos", "kid-taps.json");
+const TAP_KEY_RE = /^house-checkoffs:(hayes|harris|ainsley):(week:)?\d{4}-\d{2}-\d{2}$/;
+const TAP_ID_RE = /^(hay|har|ain)-[a-z0-9-]{2,24}$/;
+function loadTaps() {
+  try { return JSON.parse(fs.readFileSync(TAPS_FILE, "utf8")) || {}; } catch { return {}; }
+}
+function saveTaps(taps) {
+  const tmp = TAPS_FILE + ".tmp";
+  fs.writeFileSync(tmp, JSON.stringify(taps), { mode: 0o600 });
+  fs.renameSync(tmp, TAPS_FILE);
+}
+
 function checkAuth(req, args) {
   // Always require token when set (even on localhost) so tunnel cannot be open.
   if (!args.authToken) {
@@ -383,6 +396,27 @@ async function main() {
         return json(res, 401, {
           error: "unauthorized · need X-Lights-Proxy-Token / ?proxyToken=",
         });
+      }
+
+      /* TAPSYNC1 · kids chore taps shared across every device (same key + tunnel) */
+      if (pathname === "/api/taps" && (req.method === "GET" || req.method === "POST")) {
+        const taps = loadTaps();
+        if (req.method === "POST") {
+          const body = await readBody(req);
+          const changes = Array.isArray(body.changes) ? body.changes.slice(0, 2000) : [];
+          let applied = 0;
+          for (const c of changes) {
+            if (!c || !TAP_KEY_RE.test(String(c.key)) || !TAP_ID_RE.test(String(c.id)) || typeof c.v !== "boolean") continue;
+            const t = Number(c.t) || 0;
+            const k = (taps[c.key] = taps[c.key] || {});
+            const cur = k[c.id];
+            if (!cur || t > cur.t) { k[c.id] = { v: c.v, t }; applied++; }
+            else if (t === cur.t && c.v && !cur.v) { k[c.id] = { v: true, t }; applied++; }
+          }
+          if (applied) saveTaps(taps);
+          return json(res, 200, { ok: true, applied, taps, ts: new Date().toISOString() });
+        }
+        return json(res, 200, { ok: true, taps, ts: new Date().toISOString() });
       }
 
       /* SENSICTL1 · live Sensi thermostat read + control (same key + tunnel as lights) */
