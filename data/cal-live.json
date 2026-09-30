@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T17:14:41.026Z",
+  "fetchedAt": "2026-09-30T17:28:46.744Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-07",
   "asOfIso": "2026-09-30",
   "nextLeave": {
-    "id": "2rn2cegcuk32c0skjn9bgdignk",
-    "summary": "Ainsley — Lindsay appt · 1:00",
-    "start": "2026-09-30T12:15:00-05:00",
-    "end": "2026-09-30T14:15:00-05:00",
-    "location": "8675 College Blvd, Overland Park, KS 66210-1946",
+    "id": "4n0c5k6h39q3rvqrbavhlo1kv4",
+    "summary": "HD #2209 · vanity return ONLY (during Ainsley's session)",
+    "start": "2026-09-30T13:00:00-05:00",
+    "end": "2026-09-30T13:55:00-05:00",
+    "location": "The Home Depot #2209, 12200 W 135th St, Overland Park, KS 66221",
     "busy": true,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "2rn2cegcuk32c0skjn9bgdignk",
-      "summary": "Ainsley — Lindsay appt · 1:00",
-      "start": "2026-09-30T12:15:00-05:00",
-      "end": "2026-09-30T14:15:00-05:00",
-      "location": "8675 College Blvd, Overland Park, KS 66210-1946",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "4n0c5k6h39q3rvqrbavhlo1kv4",
       "summary": "HD #2209 · vanity return ONLY (during Ainsley's session)",
@@ -415,9 +406,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "12:15",
-    "place": "Ainsley — Lindsay appt · 1:00",
-    "detailHtml": "<strong>12:15</strong> Ainsley — Lindsay appt · 1:00",
+    "time": "1:00",
+    "place": "HD #2209 · vanity return ONLY (during Ainsley's session)",
+    "detailHtml": "<strong>1:00</strong> HD #2209 · vanity return ONLY (during Ainsley's session)",
     "badge": "Wed"
   },
   "error": null
