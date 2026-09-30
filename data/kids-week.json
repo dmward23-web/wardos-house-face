@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-09-30T18:08:26.557Z",
+  "refreshedAt": "2026-09-30T18:10:15.492Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,31 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "1:00",
-    "place": "HD #2209 · vanity return ONLY (during Ainsley's session)",
-    "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "time": "3:15",
+    "place": "Boys SRE pickup",
+    "detailHtml": "4:55 Harris flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Wed",
-    "startIso": "2026-09-30T18:00:00.000Z",
-    "endIso": "2026-09-30T18:55:00.000Z",
-    "kind": "appointment",
+    "startIso": "2026-09-30T20:15:00.000Z",
+    "endIso": "2026-09-30T21:00:00.000Z",
+    "kind": "school_pickup",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "1:00",
-        "place": "HD #2209 · vanity return ONLY (during Ainsley's session)",
-        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-09-30T18:00:00.000Z",
-        "endIso": "2026-09-30T18:55:00.000Z",
-        "kind": "appointment",
-        "whenLabel": "1:00",
-        "summary": "HD #2209 · vanity return ONLY (during Ainsley's session)"
-      },
       {
         "label": "Next up · today",
         "time": "3:15",
         "place": "Boys SRE pickup",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "4:55 Harris flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
         "startIso": "2026-09-30T20:15:00.000Z",
         "endIso": "2026-09-30T21:00:00.000Z",
@@ -53,7 +41,7 @@
         "label": "Next up · today",
         "time": "4:00",
         "place": "SRE — conference sign-ups go live",
-        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "3:15 boys pickup · 4:55 Harris flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Wed",
         "startIso": "2026-09-30T21:00:00.000Z",
         "endIso": "2026-09-30T21:15:00.000Z",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Fri 7:00",
         "summary": "Hayes — SRE specials: No Specials"
+      },
+      {
+        "label": "Next up · Fri",
+        "time": "7:00",
+        "place": "SRE specials: Music",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-02T12:00:00.000Z",
+        "endIso": "2026-10-02T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Fri 7:00",
+        "summary": "Harris — SRE specials: Music"
       }
     ]
   },
@@ -344,6 +344,12 @@
           "what": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Wed 7 · leave 5:30",
+          "what": "Harris flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -404,6 +410,12 @@
         {
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 7 · 7:00",
+          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
         }
@@ -647,6 +659,12 @@
         {
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 7 · 7:00",
+          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
         }
