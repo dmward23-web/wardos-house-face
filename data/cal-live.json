@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-09-30T12:23:20.220Z",
+  "fetchedAt": "2026-09-30T12:24:12.072Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-06",
@@ -16,6 +16,26 @@
     "allDay": false
   },
   "upcomingLeaves": [
+    {
+      "id": "5fdjtu0pf3dub1rim305qtrnrk",
+      "summary": "Hayes — SRE specials: PE + Library (tennis shoes, library book)",
+      "start": "2026-09-30",
+      "end": "2026-09-30",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": true,
+      "pinnedUntil": "8:40"
+    },
+    {
+      "id": "tccch6r1l8bmsc1bhj3vuch8kg",
+      "summary": "Harris — SRE specials: Art",
+      "start": "2026-09-30",
+      "end": "2026-09-30",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": true,
+      "pinnedUntil": "8:40"
+    },
     {
       "id": "iv9gs783mgggf0mico2hhurct4",
       "summary": "Ainsley — LKMS yearbook picture retakes",
