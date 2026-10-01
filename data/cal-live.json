@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-01T00:02:28.262Z",
+  "fetchedAt": "2026-10-01T00:17:44.279Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-06",
+  "windowEnd": "2026-10-07",
   "asOfIso": "2026-09-30",
   "nextLeave": {
-    "id": "ovkott1hhl53e1rfc15rvu9og8",
-    "summary": "Ainsley — pick up at BVW football game · 7:30",
-    "start": "2026-09-30T19:15:00-05:00",
-    "end": "2026-09-30T19:45:00-05:00",
-    "location": "Blue Valley West High School, 16200 Antioch Rd, Overland Park, KS 66085",
-    "busy": true,
+    "id": "hv5k8kthnlieaqu6juv0g2hbrg",
+    "summary": "Harris — SRE specials: Spanish + Library checkout",
+    "start": "2026-10-01T07:00:00-05:00",
+    "end": "2026-10-01T07:15:00-05:00",
+    "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+    "busy": false,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "ovkott1hhl53e1rfc15rvu9og8",
-      "summary": "Ainsley — pick up at BVW football game · 7:30",
-      "start": "2026-09-30T19:15:00-05:00",
-      "end": "2026-09-30T19:45:00-05:00",
-      "location": "Blue Valley West High School, 16200 Antioch Rd, Overland Park, KS 66085",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "hv5k8kthnlieaqu6juv0g2hbrg",
       "summary": "Harris — SRE specials: Spanish + Library checkout",
@@ -384,14 +375,50 @@
       "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
       "busy": false,
       "allDay": false
+    },
+    {
+      "id": "8aimbl11odujl3cl1r73pokqvs",
+      "summary": "Harris — SRE specials: Art",
+      "start": "2026-10-07T07:00:00-05:00",
+      "end": "2026-10-07T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "ipl03ih1jh4k1plriiu6sa6sms",
+      "summary": "Hayes — SRE specials: PE + Library (tennis shoes, library book)",
+      "start": "2026-10-07T07:00:00-05:00",
+      "end": "2026-10-07T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "uj7dl4l1smsa286932ro47ae1k",
+      "summary": "Hayes + Harris — SRE spirit day: Workout Day / team jersey (Peace Week)",
+      "start": "2026-10-07T07:00:00-05:00",
+      "end": "2026-10-07T07:15:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "vluod9ndrvhcr20ovpera726dc_20261007T214500Z",
+      "summary": "Harris flag practice · 5:30–6:30",
+      "start": "2026-10-07T16:45:00-05:00",
+      "end": "2026-10-07T18:30:00-05:00",
+      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
+      "busy": true,
+      "allDay": false
     }
   ],
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "7:15",
-    "place": "Ainsley — pick up at BVW football game · 7:30",
-    "detailHtml": "<strong>7:15</strong> Ainsley — pick up at BVW football game · 7:30",
-    "badge": "Wed"
+    "label": "Next up · Thu",
+    "time": "7:00",
+    "place": "Harris — SRE specials: Spanish + Library checkout",
+    "detailHtml": "<strong>7:00</strong> Harris — SRE specials: Spanish + Library checkout",
+    "badge": "Thu"
   },
   "error": null
 }
