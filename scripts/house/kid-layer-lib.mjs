@@ -1,12 +1,18 @@
-/* ATLASLANE4 · scripts/house/kid-layer-lib.mjs · Kid layer v3 rules (pure, no DOM, no server). NOT WIRED.
+/* ATLASLANE4+5 · scripts/house/kid-layer-lib.mjs · Kid layer v3 rules (pure, no DOM, no server). NOT WIRED.
    Reuses the existing chore tap shapes:
      daily musts  -> key "house-checkoffs:<kid>:<YYYY-MM-DD>"      value {<checkId>: true|false}
      weekly musts -> key "house-checkoffs:<kid>:week:<FriISO>"     value {<checkId>: true|false}
    (house-checkoffs.js / kids-data.js checkKeyFor). The hub store (lights-write-proxy /api/taps, TAPSYNC1)
    holds the same keys as {<checkId>: {v, t}}. Both shapes are accepted.
    Chore week = kids-data.js weekStartIso: Fri 3:00 PM -> next Fri 3:00 PM, tap days Sat..Fri (7).
-   Week closed = MUSTGATE1 (kids-data.js mustSetComplete): every daily must tapped on all 7 tap days AND every
-   weekly must tapped in that week's key. Optional / add-on quests never count.
+   Week closed:
+     Hayes, Ainsley = MUSTGATE1 (kids-data.js mustSetComplete): every daily must tapped on all 7 tap days AND every
+       weekly must tapped in that week's key. Optional / add-on quests never count.
+     Harris = one fixed mission per day (config harrisMissionByDow, by day of week, never changes after taps).
+       His day mark closes when that one mission is tapped; his week closes when every HOME tap day's mark is closed
+       (home = a 'Kids with Dan' span covers noon; days outside the calendar window count as home, so never easier).
+   Unlocks carry over: once lit, lit until spent (through the kids-away week into the next home week). A newer close
+   of the same kind replaces an unspent one (no stacking). Spends are keyed to the week that earned the unlock.
    Public output never carries money, kid-reward, or rank words, never a name next to a miss, no stats. */
 import { KIDS, ctParts, ctDate, ctWallMs, addDays, ctIso, kidsIn, kidsHomeAt, kidsHomeSpans, asCalendar,
   publicText, sentence, scanObject, PICKUP_EXCLUDE_RE, bannedHits } from "./lib.mjs";
@@ -23,6 +29,16 @@ export function choreWeek(t, handoff = { hh: 15, mm: 0 }) {
   if (sinceFri === 0 && p.minutes < handoff.hh * 60 + handoff.mm) fri = addDays(fri, -7);
   const tapDays = Array.from({ length: 7 }, (_, i) => addDays(fri, i + 1));
   return { id: fri, startsAt: ctWallMs(fri, handoff.hh, handoff.mm), endsAt: ctWallMs(addDays(fri, 7), handoff.hh, handoff.mm), tapDays };
+}
+
+export function weekById(fri, handoff = { hh: 15, mm: 0 }) {
+  return { id: fri, startsAt: ctWallMs(fri, handoff.hh, handoff.mm), endsAt: ctWallMs(addDays(fri, 7), handoff.hh, handoff.mm),
+    tapDays: Array.from({ length: 7 }, (_, i) => addDays(fri, i + 1)) };
+}
+/** Week id a tap DAY belongs to: Sat..Thu -> previous Fri; Fri -> the Fri a week earlier (leave morning). */
+export function weekIdOfTapDay(iso) {
+  const sinceFri = (DOW.indexOf(dowOf(iso)) - 5 + 7) % 7;
+  return addDays(iso, -(sinceFri === 0 ? 7 : sinceFri));
 }
 
 /** Normalize either tap shape into {key: Set(doneIds)}. */
@@ -60,20 +76,27 @@ export function weekClosed(musts, taps, kid, week) {
     : tappedWeek(taps, kid, m.id, week.id)));
 }
 
-/** Harris: one mission at a time = first open must today (daily in order, then open weekly). */
-export function harrisMission(musts, taps, week, today, config) {
-  const order = (config && config.harrisMissionOrder) || musts.map((m) => m.id);
-  const byId = Object.fromEntries(musts.map((m) => [m.id, m]));
-  for (const id of order) {
-    const m = byId[id]; if (!m) continue;
-    const done = m.cadence === "daily" ? tapped(taps, "harris", id, today) : tappedWeek(taps, "harris", id, week.id);
-    if (!done) {
-      const word = (config && config.missionWords && config.missionWords[id]) || null;
-      if (!word) continue; /* no approved wall word -> never invent copy */
-      return { id, word, copy: `Harris. ${word}.` };
-    }
-  }
-  return null;
+/** Harris: the fixed mission for a date (by day of week). null if the config has no approved word for it. */
+export function harrisMissionFor(iso, config) {
+  const id = config && config.harrisMissionByDow && config.harrisMissionByDow[dowOf(iso)];
+  const word = id && config.missionWords && config.missionWords[id];
+  return id && word ? { id, word, copy: `Harris. ${word}.` } : null;
+}
+export function harrisDayClosed(taps, iso, config) {
+  const m = harrisMissionFor(iso, config);
+  return !!m && tapped(taps, "harris", m.id, iso);
+}
+/** home(iso): a 'Kids with Dan' span covers noon; outside the calendar window (or no span data) = home (conservative). */
+export function homeDayFn(cal, spans) {
+  const w = cal.window;
+  return (iso) => {
+    if (!cal.hasKidsHome || !w || iso < w.from || iso > w.to) return true;
+    return kidsHomeAt(spans, ctWallMs(iso, 12, 0));
+  };
+}
+export function harrisWeekClosed(taps, week, isHome, config) {
+  const days = week.tapDays.filter(isHome);
+  return days.length > 0 && days.every((d) => harrisDayClosed(taps, d, config));
 }
 
 /** Hayes: Mon–Sun row for the calendar week holding today. mark = closed | empty | ahead | off. No counts. */
@@ -119,21 +142,33 @@ export function hayesCountdown(events, t, config) {
   return null;
 }
 
-/** Spends: [{unlock, weekId, usedAt, choice?}] (per-device wall tap today; shape only). */
-export function spentThisWeek(uses, unlockId, week) {
-  return ((uses && uses.uses) || []).some((u) => u && u.unlock === unlockId && u.weekId === week.id);
+/** Spends: [{unlock, weekId (the week that EARNED it), usedAt, choice?}] (per-device wall tap today). */
+export function spent(uses, unlockId, weekId) {
+  return ((uses && uses.uses) || []).some((u) => u && u.unlock === unlockId && u.weekId === weekId);
+}
+/** Every chore week the tap data touches, up to the current one. */
+export function candidateWeeks(taps, current) {
+  const ids = new Set([current.id]);
+  for (const key of Object.keys(taps)) {
+    const m = /:(week:)?(\d{4}-\d{2}-\d{2})$/.exec(key);
+    if (!m) continue;
+    ids.add(m[1] ? m[2] : weekIdOfTapDay(m[2]));
+  }
+  return [...ids].filter((id) => id <= current.id).sort();
 }
 
 export function computeKidLayer({ calendar, kidsWeek, taps, uses, config, now }) {
   const t = now == null ? Date.now() : now;
   const cal = asCalendar(calendar);
   const spans = kidsHomeSpans(cal.events);
+  const isHome = homeDayFn(cal, spans);
   const tp = normalizeTaps(taps);
   const week = choreWeek(t);
   const today = ctDate(t);
   const home = cal.hasKidsHome ? kidsHomeAt(spans, t) : true;
   const musts = Object.fromEntries(KIDS.map((k) => [k.id, mustsFor(kidsWeek, k.id)]));
-  const closed = Object.fromEntries(KIDS.map((k) => [k.id, weekClosed(musts[k.id], tp, k.id, week)]));
+  const closedIn = (kid, w) => (kid === "harris" ? harrisWeekClosed(tp, w, isHome, config) : weekClosed(musts[kid], tp, kid, w));
+  const closed = Object.fromEntries(KIDS.map((k) => [k.id, closedIn(k.id, week)]));
   const weekOut = { id: week.id, startsAt: ctIso(week.startsAt), endsAt: ctIso(week.endsAt) };
   const base = { asOfIso: today, generatedAt: ctIso(t), week: weekOut };
 
@@ -144,32 +179,36 @@ export function computeKidLayer({ calendar, kidsWeek, taps, uses, config, now })
     ainsley: { name: "Ainsley", week: { closed: closed.ainsley } },
   };
   if (home) {
-    const mission = harrisMission(musts.harris, tp, week, today, config);
+    const tapDay = week.tapDays.includes(today); /* arrival Friday after 3:00 PM is not a tap day */
+    const mission = tapDay ? harrisMissionFor(today, config) : null;
     seats.harris.mission = mission;
-    seats.harris.today = { closed: dayClosed(musts.harris, tp, "harris", today) };
-    seats.harris.copy = mission ? mission.copy : (seats.harris.today.closed ? "Harris. Done today." : null);
+    seats.harris.today = { closed: !!mission && harrisDayClosed(tp, today, config) };
+    seats.harris.copy = mission ? mission.copy : null;
     seats.hayes.row = hayesRow(musts.hayes, tp, spans, today, t);
     seats.hayes.countdown = hayesCountdown(cal.events, t, config);
   }
   for (const k of KIDS) if (closed[k.id]) {
     seats[k.id].copy = k.id === "harris" ? "Harris. Week closed." : k.id === "hayes" ? "Hayes. Week closed. You pick." : "Ainsley. Week closed.";
   }
-  const allClosed = KIDS.every((k) => closed[k.id]);
-  const kidSeats = { ...base, quiet: !home, seats, usTogether: { lit: allClosed } };
+  const kidSeats = { ...base, quiet: !home, seats, usTogether: { lit: KIDS.every((k) => closed[k.id]) } };
 
-  /* unlocks.json: only LIT unlocks are listed. Dark or spent = absent (never a name next to a miss). */
+  /* unlocks.json: latest close of each kind, lit until spent. Only LIT unlocks are listed (dark/spent = absent). */
   const U = (config && config.unlocks) || {};
+  const weeks = candidateWeeks(tp, week).map((id) => (id === week.id ? week : weekById(id)));
+  const latest = {};
+  for (const w of weeks) {
+    const c = Object.fromEntries(KIDS.map((k) => [k.id, closedIn(k.id, w)]));
+    for (const k of KIDS) if (c[k.id]) latest[k.id] = w.id;
+    if (KIDS.every((k) => c[k.id])) latest.house = w.id;
+  }
   const lit = [];
-  const open = t < week.endsAt;
-  for (const k of KIDS) {
-    const u = U[k.id];
-    if (!u || !closed[k.id] || !open || spentThisWeek(uses, u.id, week)) continue;
-    lit.push({ id: u.id, seat: NAME[k.id], control: u.control, tile: u.tile, ...(u.choices ? { choices: u.choices } : {}), uses: 1, copy: u.copy });
+  for (const kind of ["harris", "hayes", "ainsley", "house"]) {
+    const u = U[kind], earned = latest[kind];
+    if (!u || !u.id || !earned || spent(uses, u.id, earned)) continue;
+    lit.push({ id: u.id, seat: kind === "house" ? "House" : NAME[kind], control: u.control, tile: u.tile,
+      ...(u.choices ? { choices: u.choices } : {}), uses: 1, earnedWeek: earned, copy: u.copy });
   }
-  if (allClosed && U.house && open && !spentThisWeek(uses, U.house.id, week)) {
-    lit.push({ id: U.house.id, seat: "House", control: U.house.control, tile: U.house.tile, uses: 1, copy: U.house.copy });
-  }
-  const unlocks = { ...base, resetsAt: weekOut.endsAt, lit };
+  const unlocks = { ...base, lit };
 
   for (const [n, o] of [["kid-seats", kidSeats], ["unlocks", unlocks]]) {
     const hits = scanObject(o).concat(missNameHits(o));
@@ -180,11 +219,11 @@ export function computeKidLayer({ calendar, kidsWeek, taps, uses, config, now })
 
 /** A wall tap spends a lit unlock: returns the new uses state (caller persists). Not lit -> unchanged. */
 export function consumeUnlock(usesState, unlockId, layer, t, choice) {
-  const state = { uses: [...(((usesState && usesState.uses) || []))] };
+  const state = { ...(usesState && usesState.note ? { note: usesState.note } : {}), uses: [...(((usesState && usesState.uses) || []))] };
   const u = layer.unlocks.lit.find((x) => x.id === unlockId);
   if (!u) return state;
   if (u.choices && !u.choices.includes(choice)) return state;
-  state.uses.push({ unlock: unlockId, weekId: layer.unlocks.week.id, usedAt: ctIso(t), ...(choice ? { choice } : {}) });
+  state.uses.push({ unlock: unlockId, weekId: u.earnedWeek, usedAt: ctIso(t), ...(choice ? { choice } : {}) });
   return state;
 }
 

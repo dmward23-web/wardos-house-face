@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-/* ATLASLANE4 · scripts/kid-layer.mjs · Kid layer v3 data (no UI) · NOT WIRED (no cron, no deploy).
+/* ATLASLANE4+5 · scripts/kid-layer.mjs · Kid layer v3 data (no UI) · NOT WIRED (no cron, no deploy).
    Writes data/kid-seats.json + data/unlocks.json from MUSTS taps + kids-week.json + calendar (read-only).
    Taps: --taps <file> (hub store {key:{id:{v,t}}} or a localStorage export {key:{id:bool}}).
          Default: the hub store ~/.config/wardos/kid-taps.json if present (taps are per-device unless the hub has them).
-   Spends: --uses data/unlock-uses.json (absent by default) = {uses:[{unlock, weekId, usedAt, choice?}]}.
+   Spends: --uses <file>, default data/unlock-uses.json = {note, uses:[{unlock, weekId (earned week), usedAt, choice?}]}.
+           Per-device until a shared write path is approved. Unlocks carry over until spent (no weekly reset, no stacking).
    Usage: node scripts/kid-layer.mjs [--data-dir data] [--events …] [--taps …] [--uses …] [--now ISO] [--stdout] */
 import path from "node:path";
 import os from "node:os";

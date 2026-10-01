@@ -1,12 +1,11 @@
 {
   "asOfIso": "2026-10-01",
-  "generatedAt": "2026-10-01T18:09:00-05:00",
+  "generatedAt": "2026-10-01T18:14:00-05:00",
   "week": {
     "id": "2026-09-25",
     "startsAt": "2026-09-25T15:00:00-05:00",
     "endsAt": "2026-10-02T15:00:00-05:00"
   },
-  "resetsAt": "2026-10-02T15:00:00-05:00",
   "lit": [],
   "source": "MUSTS taps (kid-taps.json, updated 2026-09-30T06:04:00-05:00) + kids-week.json quests + Calendar (data/cal-live.json fetched 2026-10-01T18:02:00-05:00 + cal-dmward23-week.json fetched 2026-10-01T18:02:00-05:00, read-only)"
 }

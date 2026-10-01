@@ -105,15 +105,15 @@ Clears at the end of the CT day. `kid` must be one of the three names; `text` ma
 
 **Taps (reused shapes, nothing new):** daily musts `house-checkoffs:<kid>:<YYYY-MM-DD>` → `{<checkId>: true}`, weekly musts `house-checkoffs:<kid>:week:<FriISO>` (house-checkoffs.js / kids-data.js `checkKeyFor`). The hub store (TAPSYNC1 `/api/taps`, `~/.config/wardos/kid-taps.json`) holds the same keys as `{<checkId>: {v, t}}`. Both are read. Default input is the hub store. Taps that never reached the hub (per-device) are invisible here.
 
-**Chore week:** kids-data.js `weekStartIso`, Fri 3:00 PM → next Fri 3:00 PM, tap days Sat..Fri. **Week closed** = MUSTGATE1: every daily must tapped on all 7 tap days + every weekly must tapped. Optional add-ons never count.
+**Chore week:** kids-data.js `weekStartIso`, Fri 3:00 PM → next Fri 3:00 PM, tap days Sat..Fri. **Week closed:** Hayes and Ainsley = MUSTGATE1: every daily must tapped on all 7 tap days + every weekly must tapped. Optional add-ons never count. Harris = every home tap day's mission closed (home = a `Kids with Dan` span covers noon; a day outside the calendar window counts as home, so it is never easier; a week with no home days never closes). His weekly musts and other daily musts don't gate his week.
 
 **kid-seats.json** `{asOfIso, generatedAt, week, quiet, seats, usTogether: {lit}, source}`
-- Harris: `mission {id, word, copy}` = the first open must today (daily in order, then open weeklies), copy `Harris. Dishes.`. Words come only from `missionWords` in the config; a must with no approved word is skipped. `today.closed` when every daily must is tapped today. `Harris. Done today.` after that.
+- Harris: one mission today. `mission {id, word, copy}` is fixed by day of week (`harrisMissionByDow` in the config: Sat Bed, Sun Trash, Mon Dishes, Tue Dishwasher, Wed Gear, Thu Shower, Fri Backpack, his 7 daily musts) and never changes after taps. Copy `Harris. Shower.`. Words come only from `missionWords`. `today.closed` when that one mission is tapped today (daily key); other taps don't close it. Arrival Friday after 3:00 PM is not a tap day: `mission: null`.
 - Hayes: `row` Mon–Sun, `mark` = `closed` | `empty` (past day, kids home, not closed) | `ahead` (today or later) | `off` (kids away). No names on marks, no counts. `countdown` = his next real game in the calendar (`Flag · vs Ridley · 3 days`), else `null`.
 - Ainsley: `week.closed` only.
 - `quiet: true` while kids are away: no mission, row, or countdown.
 
-**unlocks.json** `{asOfIso, generatedAt, week, resetsAt, lit[], source}`. Only lit unlocks are listed; dark or spent = absent.
+**unlocks.json** `{asOfIso, generatedAt, week, lit[], source}`; each lit entry `{id, seat, control, tile, choices?, uses: 1, earnedWeek, copy}`. Only lit unlocks are listed; dark or spent = absent.
 | closed | unlock id | control | copy |
 |---|---|---|---|
 | Harris | `harris-dinner-vote` | Vita's dinner vote | `Harris. Week closed. Dinner vote.` |
@@ -121,6 +121,8 @@ Clears at the end of the CT day. `kid` must be one of the three names; `text` ma
 | Ainsley | `ainsley-gallery-or-weekend` | gallery photo OR weekend pick (`choices`) | `Ainsley. Week closed. Gallery or weekend, your call.` |
 | all three | `house-weekend-pick` (seat `House`) | Weekend fun, house pick | `Us together. Weekend fun, house pick.` |
 
-One use each per chore week. Spending = `consumeUnlock(uses, id, layer, now, choice?)` appends `{unlock, weekId, usedAt, choice?}` to `data/unlock-uses.json` (absent by default; per-device tap today, same as check-ins). It resets at the week's Fri 3:00 PM end.
+**Carry-over:** once lit, an unlock stays lit until spent, through the kids-away week and into the next home week. No weekly reset. It clears only when used, or when a newer close of the same kind replaces it (no stacking: always one, `earnedWeek` = the latest closed week of that kind). `house-weekend-pick` = the latest week where all three closed in the same week; kids spending their own unlocks doesn't touch it.
+
+**Spends:** `consumeUnlock(uses, id, layer, now, choice?)` appends `{unlock, weekId, usedAt, choice?}`, `weekId` = the unlock's `earnedWeek`. A spend clears only that earned week's unlock; a later close lights it again. Store: `data/unlock-uses.json`, committed as the empty shape `{"note": "Per-device until a shared write path is approved. …", "uses": []}`. **Per-device until a shared write path is approved** (the hub `/api/taps` only accepts `house-checkoffs` keys), so a spend on one wall is not seen by another device or by this script unless that device's file is passed with `--uses`.
 
 **Never in these files:** money symbols, kid-reward / account / sibling-order / parent words, `!`, stats (done/need/streak/score), a kid name in any miss / dark / empty object, or a list of who kept Us together dark (`usTogether` is `{lit}` only). `computeKidLayer` refuses to write if `scanObject` or `missNameHits` finds anything.
