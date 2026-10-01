@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 1 2026",
   "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-01T13:16:29.847Z",
+  "refreshedAt": "2026-10-01T13:31:14.981Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -48,18 +48,6 @@
         "kind": "school",
         "whenLabel": "7:00",
         "summary": "Hayes — SRE specials: Art"
-      },
-      {
-        "label": "Next up · today",
-        "time": "8:10",
-        "place": "Boys SRE drop",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T13:10:00.000Z",
-        "endIso": "2026-10-01T13:40:00.000Z",
-        "kind": "school_drop",
-        "whenLabel": "8:10",
-        "summary": "Hayes + Harris — SRE drop-off · 8:25"
       },
       {
         "label": "Next up · today",
@@ -168,6 +156,18 @@
         "kind": "school_drop",
         "whenLabel": "Fri 8:10",
         "summary": "Hayes + Harris — SRE drop-off · 8:25"
+      },
+      {
+        "label": "Next up · Fri",
+        "time": "9:00",
+        "place": "Dan DRIVE → Nashville",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-02T14:00:00.000Z",
+        "endIso": "2026-10-02T22:30:00.000Z",
+        "kind": "leave",
+        "whenLabel": "Fri 9:00",
+        "summary": "Dan DRIVE → Nashville · leave 9:00 after SRE · arrive ~5:30"
       }
     ]
   },
@@ -438,6 +438,18 @@
           "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE specials: Spanish + Library checkout",
+          "tone": "act",
+          "hint": ""
         }
       ],
       "appointments": []
@@ -647,6 +659,12 @@
           "what": "Hayes baseball — Falcons vs KC Tigers (away)",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Thu 8 · leave 6:00",
+          "what": "Hayes flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -731,6 +749,18 @@
         {
           "when": "Wed 7 · 7:00",
           "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE specials: Art",
           "tone": "act",
           "hint": ""
         }
@@ -914,6 +944,12 @@
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Thu 8 · leave 5:00",
+          "what": "Ainsley swim — Coach Ann",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -931,6 +967,12 @@
         },
         {
           "when": "Mon 5 · 3:00",
+          "what": "LKMS Homework Help",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 3:00",
           "what": "LKMS Homework Help",
           "tone": "act",
           "hint": ""
