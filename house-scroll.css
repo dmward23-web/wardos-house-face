@@ -1,0 +1,37 @@
+/* ═══════════════════════════════════════════════════════════
+   SCROLL5 · House Face · EVERY board scrolls (Dan 10/1)
+   Wall 1080×1920 touch + TV 1920×1080: page height always > viewport,
+   touch + wheel move it down and back, no direction stuck.
+   Linked LAST in <head> on every board so it wins.
+   1. html is the ONE vertical scroller (never hidden / fixed height).
+   2. body is NOT a scrollport (iOS dual html+body trap) and never fixed-height;
+      it is always at least viewport + 240px, so even a board whose tiles fit
+      the 1920 canvas (or a 731px plate) still has a runway to scroll.
+   3. No tile traps the page: overscroll-behavior:contain on a tile that has
+      overflow:auto but nothing to scroll ate every wheel/swipe (Lights pads,
+      hub tiles). Inner scrollports still scroll; at their edge the page takes over.
+   :not(#hf-scroll-off) = ID-weight so this beats every board's own html/body
+   rules (incl. data-export plates like Month-chat / Gallery hero).
+   Boards keep their own panel heights (hub 1920 fit stays; tiles inside scroll).
+   ═══════════════════════════════════════════════════════════ */
+html:not(#hf-scroll-off) {
+  height: auto !important;
+  max-height: none !important;
+  overflow-y: scroll !important;
+  overscroll-behavior-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+html:not(#hf-scroll-off) > body {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 2160px !important;              /* fallback: 1920 + 240 */
+  min-height: calc(100vh + 240px) !important;
+  overflow-x: visible !important;             /* fallback where clip unsupported */
+  overflow-x: clip !important;                /* clip ≠ scrollport */
+  overflow-y: visible !important;
+  overscroll-behavior: auto !important;
+  -webkit-overflow-scrolling: auto !important;
+}
+html:not(#hf-scroll-off) > body * {
+  overscroll-behavior: auto !important;
+}
