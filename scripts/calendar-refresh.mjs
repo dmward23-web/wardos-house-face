@@ -23,6 +23,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { displayDeep } from "./house/display-rename.mjs"; /* ATLASLANE6 display-only renames, never the calendar */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -661,6 +662,7 @@ function rebuildEmbed(kidsDataPath, weekObj) {
 }
 
 function writeWeekTree(weekPath, weekObj, kidsDataPath, dryRun) {
+  weekObj = displayDeep(weekObj); /* "Mom & Dad" -> "Nonna and Papa" etc. (config/display-rename.json) */
   const dataTwin = path.join(path.dirname(weekPath), "data", "kids-week.json");
   const text = JSON.stringify(weekObj, null, 2) + "\n";
   if (dryRun) {
@@ -677,6 +679,7 @@ function writeWeekTree(weekPath, weekObj, kidsDataPath, dryRun) {
 }
 
 function mirrorToBoardOs(mirrorDir, weekObj, dryRun) {
+  weekObj = displayDeep(weekObj);
   if (!mirrorDir || !fs.existsSync(mirrorDir)) {
     console.log("calendar-refresh: mirror skip (no dir)", mirrorDir);
     return;

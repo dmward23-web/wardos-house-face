@@ -8,20 +8,20 @@
   "asOfIso": "2026-10-01",
   "nextLeave": {
     "id": "tah8oji0ahni4old2cd1a6jb5k",
-    "summary": "Pick up Hayes at Casey's (Riley's mom)",
+    "summary": "Pick up Hayes at Casey's",
     "start": "2026-10-01T18:20:00-05:00",
     "end": "2026-10-01T18:55:00-05:00",
-    "location": "Casey's (Riley's mom), 9504 W 148th St, Overland Park, KS 66221",
+    "location": "Casey's, 9504 W 148th St, Overland Park, KS 66221",
     "busy": true,
     "allDay": false
   },
   "upcomingLeaves": [
     {
       "id": "tah8oji0ahni4old2cd1a6jb5k",
-      "summary": "Pick up Hayes at Casey's (Riley's mom)",
+      "summary": "Pick up Hayes at Casey's",
       "start": "2026-10-01T18:20:00-05:00",
       "end": "2026-10-01T18:55:00-05:00",
-      "location": "Casey's (Riley's mom), 9504 W 148th St, Overland Park, KS 66221",
+      "location": "Casey's, 9504 W 148th St, Overland Park, KS 66221",
       "busy": true,
       "allDay": false
     },

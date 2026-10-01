@@ -11,8 +11,9 @@
    - Public text never names anyone's parent: "(Riley's …)"-style parentheticals are dropped and any row still
      hitting the banned list is not published. Kids-away reason = "Kids away · back Fri 3:00". Text is rebuilt
      from the event title, never the description. Sentence case, no "!".
-   - gear only if the event text names it; leaveBy only if the text says "leave H:MM" or the event start
-     is earlier than the stated time (repo convention: kids-week leaveBys.note "event START = leave-by").
+   - gear only if the event text names it; leaveBy = lib.leaveByMs (ATLASLANE6): title "leave H:MM" > the event's
+     own description leave line ("Leave-by 4:25pm", time only, never the text) > event start earlier than the stated
+     time (kids-week leaveBys.note "event START = leave-by"); none when the event says "not a leave".
 
    Inputs: same loader as house-mode (repo data/cal-live.json + data/kids-week.json when present; box dump
    /workspace/cal-dmward23-week.json as fallback + supplement). warnings[] when now+7d is outside the calendar window.
@@ -25,22 +26,23 @@ import { parseArgs, loadInputs, DEFAULTS as HM_DEFAULTS } from "./house-mode.mjs
 import {
   asCalendar, calendarWarnings, kidsHomeSpans, kidsHomeAt, schoolDayInfo, ctDate, ctParts, ctWallMs, parseHM,
   fmtTime, ctIso, readJson, writeJson, scanObject, bannedHits, PICKUP_EXCLUDE_RE, PARENT_IDS, publicText, kidsAwayReason, sentence, kidsIn,
+  leaveByMs,
 } from "./house/lib.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DEFAULTS = { ...HM_DEFAULTS, out: path.join(ROOT, "data/pickup-chain.json") };
 
-const RIDE_RE = /\b(pick(?:s|ing)?\s*(?:\w+\s+)?up|pickup|drop(?:s|ping)?(?:\s*-?\s*off)?|ride|carpool)\b/i;
-const ACTIVITY_RE = /\b(swim|practice|game|baseball|softball|flag|soccer|football|basketball|volleyball|lesson|homework help|tutor\w*|rehearsal|choir|scouts|camp)\b/i;
+export const RIDE_RE = /\b(pick(?:s|ing)?\s*(?:\w+\s+)?up|pickup|drop(?:s|ping)?(?:\s*-?\s*off)?|ride|carpool)\b/i;
+export const ACTIVITY_RE = /\b(swim|practice|game|baseball|softball|flag|soccer|football|basketball|volleyball|lesson|homework help|tutor\w*|rehearsal|choir|scouts|camp)\b/i;
 /* School-day info (specials, spirit days, field trips, in-school parties) is the Pack/Today tile, not a ride. */
-const SCHOOL_INFO_RE = /\b(SRE specials?|spirit day|Peace Week|field trip|Tailgate|yearbook|picture|baby pic|send .* to|pack\b|snacks?)\b/i;
-const GEAR = [
+export const SCHOOL_INFO_RE = /\b(SRE specials?|spirit day|Peace Week|field trip|Tailgate|yearbook|picture|baby pic|send .* to|pack\b|snacks?)\b/i;
+export const GEAR = [
   "cleats", "glove", "mitt", "bat", "helmet", "jersey", "uniform", "goggles", "swim bag", "swimsuit", "towel",
   "cap", "tennis shoes", "shin guards", "mouthguard", "flag belt", "water bottle", "library book", "backpack",
   "instrument", "ball", "racket", "pads",
 ];
 
-function statedTime(text, startMs) {
+export function statedTime(text, startMs) {
   /* "· 3:40", "5:00 practice", "game 5:30", "for 8:25", "@ 3:40" — pick the H:MM closest to the event start (am/pm). */
   const re = /(?:^|[\s·@(])(?:(?:for|at|game|arrive)\s+)?(\d{1,2}):(\d{2})\b(?!\s*[–-]\s*\d)/gi;
   const day = ctDate(startMs);
@@ -56,20 +58,13 @@ function statedTime(text, startMs) {
   }
   return best ? best.ms : null;
 }
-function leaveText(text, startMs) {
-  const m = /\bleave\s+(\d{1,2}):(\d{2})\b/i.exec(text);
-  if (!m) return null;
-  const day = ctDate(startMs), h = Number(m[1]) % 12, mm = Number(m[2]);
-  const cands = [ctWallMs(day, h, mm), ctWallMs(day, h + 12, mm)];
-  return cands.sort((a, b) => Math.abs(a - startMs) - Math.abs(b - startMs))[0];
-}
-function placeOf(location) {
+export function placeOf(location) {
   const first = publicText(String(location || "").split(",")[0]);
   if (!first) return null;
   if (/^Home$/i.test(first) || /^\d+ W 147th/i.test(first)) return "Home";
   return first;
 }
-function gearIn(text) {
+export function gearIn(text) {
   const s = String(text || "").toLowerCase();
   return GEAR.filter((g) => new RegExp(`\\b${g}s?\\b`, "i").test(s));
 }
@@ -82,7 +77,7 @@ function cleanWhat(seg) {
   s = s.trim();
   return sentence(publicText(s));
 }
-function byOf(seg) {
+export function byOf(seg) {
   if (/^\s*(Pick\s*up|Drop)\b/i.test(seg)) return "Dad"; /* imperative on Dad's own calendar = Dad's ride (RIDES LAW) */
   const m = /^\s*(.+?)\s+picks?\s+(?:\w+\s+)?up\b/i.exec(seg);
   if (!m) return null;
@@ -129,8 +124,7 @@ export function computePickupChain({ calendar, kidsWeek, config, now, sourceLabe
     /* "Dan picks up Harris — SRE pickup · 3:40 | Casey (Riley's mom) picks up Hayes; …" -> one row per segment */
     const segs = e.summary.split(/\s+\|\s+/).map((s) => s.split(/;\s*/)[0]).filter((s) => kidsIn(s).length);
     const timeMs = statedTime(e.summary, e.startMs) || e.startMs;
-    const explicitLeave = leaveText(e.summary, e.startMs);
-    const leaveMs = explicitLeave || (e.startMs < timeMs ? e.startMs : null);
+    const leaveMs = leaveByMs(e, timeMs); /* shared leave-by: title "leave H:MM" > description leave line > start before stated time */
     const gear = gearIn(`${e.summary} ${e.description}`);
     for (const seg of segs) {
       const kids = kidsIn(seg);
