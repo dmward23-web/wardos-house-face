@@ -1,7 +1,7 @@
 {
   "status": "live",
-  "fetchedAt": "2026-10-01T01:01:38.909Z",
-  "updatedAt": "2026-10-01T01:01:38.910Z",
+  "fetchedAt": "2026-10-01T01:25:23.704Z",
+  "updatedAt": "2026-10-01T01:25:23.705Z",
   "source": "nest-sdm+webrtc-still",
   "cameras": [
     {
