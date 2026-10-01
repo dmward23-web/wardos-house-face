@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-10-01T02:11:40.298Z",
+  "refreshedAt": "2026-10-01T02:23:54.837Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -48,6 +48,18 @@
         "kind": "school",
         "whenLabel": "Thu 7:00",
         "summary": "Hayes — SRE specials: Art"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "7:30",
+        "place": "pack late-lunch snacks (headaches · Madi OK)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-01T12:30:00.000Z",
+        "endIso": "2026-10-01T12:45:00.000Z",
+        "kind": "school",
+        "whenLabel": "Thu 7:30",
+        "summary": "Hayes — pack late-lunch snacks (headaches · Madi OK)"
       },
       {
         "label": "Next up · Thu",
@@ -156,18 +168,6 @@
         "kind": "school",
         "whenLabel": "Fri 7:00",
         "summary": "Harris — SRE specials: Music"
-      },
-      {
-        "label": "Next up · Fri",
-        "time": "8:10",
-        "place": "Boys SRE drop",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Fri",
-        "startIso": "2026-10-02T13:10:00.000Z",
-        "endIso": "2026-10-02T13:40:00.000Z",
-        "kind": "school_drop",
-        "whenLabel": "Fri 8:10",
-        "summary": "Hayes + Harris — SRE drop-off · 8:25"
       }
     ]
   },
@@ -594,6 +594,12 @@
           "hint": ""
         },
         {
+          "when": "Thu 1 · 7:30",
+          "what": "pack late-lunch snacks (headaches · Madi OK)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
           "when": "Thu 1 · 8:10",
           "what": "SRE drop-off",
           "tone": "act",
@@ -979,6 +985,11 @@
           "tone": "act"
         },
         {
+          "when": "Thu 1 · 7:30",
+          "what": "pack late-lunch snacks (headaches · Madi OK)",
+          "tone": "act"
+        },
+        {
           "when": "Thu 1 · 8:10",
           "what": "SRE drop-off",
           "tone": "act"
@@ -1081,11 +1092,6 @@
         {
           "when": "Mon 5 · 1:40",
           "what": "Lindsay appt",
-          "tone": "act"
-        },
-        {
-          "when": "Mon 5 · 3:00",
-          "what": "LKMS Homework Help",
           "tone": "act"
         }
       ]

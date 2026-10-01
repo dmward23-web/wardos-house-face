@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-01T02:11:40.732Z",
+  "fetchedAt": "2026-10-01T02:23:55.305Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-07",
@@ -31,6 +31,15 @@
       "start": "2026-10-01T07:00:00-05:00",
       "end": "2026-10-01T07:15:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "3usi8cv7h2sikgv5n96lat5kt4",
+      "summary": "Hayes — pack late-lunch snacks (headaches · Madi OK)",
+      "start": "2026-10-01T07:30:00-05:00",
+      "end": "2026-10-01T07:45:00-05:00",
+      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
       "busy": false,
       "allDay": false
     },
@@ -167,6 +176,15 @@
       "end": "2026-10-01T20:00:00-05:00",
       "location": "Scheels, 6503 W 135th St, Overland Park, KS 66223",
       "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "6rg63v1kn8df1a9mmdq7gtut4c",
+      "summary": "REMIND · donation receipts → Ledger (Erin list + Goodwill)",
+      "start": "2026-10-01T22:20:00-05:00",
+      "end": "2026-10-01T22:30:00-05:00",
+      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
+      "busy": false,
       "allDay": false
     },
     {
