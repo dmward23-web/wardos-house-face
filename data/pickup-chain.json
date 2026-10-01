@@ -1,0 +1,46 @@
+{
+  "asOfIso": "2026-10-01",
+  "generatedAt": "2026-10-01T17:48:00-05:00",
+  "date": "2026-10-01",
+  "schoolDay": true,
+  "cutoff": "2026-10-01T19:00:00-05:00",
+  "source": "calendar dmward23@gmail.com (data/cal-live.json fetched 2026-10-01T17:44:00-05:00 + cal-dmward23-week.json fetched 2026-10-01T17:44:00-05:00, read-only) + kids-week.json (refreshed 2026-10-01T17:44:00-05:00)",
+  "warnings": [],
+  "rows": [
+    {
+      "who": [
+        "Ainsley"
+      ],
+      "by": null,
+      "what": "Swim — Coach Ann · 5:00 practice",
+      "where": "Genesis Health Clubs Olathe Ridgeview",
+      "time": "5:00 PM",
+      "timeIso": "2026-10-01T17:00:00-05:00",
+      "leaveBy": "4:25 PM",
+      "leaveByIso": "2026-10-01T16:25:00-05:00",
+      "gear": [],
+      "status": "now",
+      "kind": "activity",
+      "startIso": "2026-10-01T16:25:00-05:00",
+      "endIso": "2026-10-01T18:20:00-05:00"
+    },
+    {
+      "who": [
+        "Hayes"
+      ],
+      "by": "Dad",
+      "what": "Pick up Hayes at Casey's (Riley's mom)",
+      "where": "Casey's (Riley's mom)",
+      "time": "6:20 PM",
+      "timeIso": "2026-10-01T18:20:00-05:00",
+      "leaveBy": null,
+      "leaveByIso": null,
+      "gear": [],
+      "status": "next",
+      "kind": "ride",
+      "startIso": "2026-10-01T18:20:00-05:00",
+      "endIso": "2026-10-01T18:55:00-05:00"
+    }
+  ],
+  "reason": "2 kid rides left today"
+}
