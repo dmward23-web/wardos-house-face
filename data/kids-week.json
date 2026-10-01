@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 1 2026",
   "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-01T23:30:49.249Z",
+  "refreshedAt": "2026-10-01T23:43:45.958Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -98,18 +98,6 @@
         "summary": "Hayes — SRE field trip museum+park (chaperone slots)"
       },
       {
-        "label": "Next up · Fri",
-        "time": "12:00",
-        "place": "LKMS baby pic due · 3pm",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Fri",
-        "startIso": "2026-10-02T17:00:00.000Z",
-        "endIso": "2026-10-02T17:15:00.000Z",
-        "kind": "other",
-        "whenLabel": "Fri 12:00",
-        "summary": "Ainsley — LKMS baby pic due · 3pm"
-      },
-      {
         "label": "Next up · Sat",
         "time": "8:30",
         "place": "Dan DRIVE → Nashville",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Mon 7:00",
         "summary": "Harris — SRE specials: Music"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "7:00",
+        "place": "SRE specials: Spanish",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-05T12:00:00.000Z",
+        "endIso": "2026-10-05T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Mon 7:00",
+        "summary": "Hayes — SRE specials: Spanish"
       }
     ]
   },
@@ -402,6 +402,12 @@
         {
           "when": "Thu 8 · 7:00",
           "what": "SRE specials: Spanish + Library checkout",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 9 · 12:00",
+          "what": "Ward Kids [AHH No School]",
           "tone": "act",
           "hint": ""
         }
@@ -652,6 +658,12 @@
           "what": "SRE specials: Art",
           "tone": "act",
           "hint": ""
+        },
+        {
+          "when": "Fri 9 · 12:00",
+          "what": "Ward Kids [AHH No School]",
+          "tone": "act",
+          "hint": ""
         }
       ],
       "appointments": []
@@ -790,12 +802,12 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "FRI · 12:00",
-        "what": "LKMS BABY PIC DUE · 3PM",
+        "when": "MON · 1:40",
+        "what": "LINDSAY APPT",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "FRI",
-          "12:00"
+          "MON",
+          "1:40"
         ]
       },
       "today": [
@@ -831,6 +843,12 @@
         {
           "when": "Thu 8 · 3:00",
           "what": "LKMS Homework Help",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 9 · 12:00",
+          "what": "Ward Kids [AHH No School]",
           "tone": "act",
           "hint": ""
         }
