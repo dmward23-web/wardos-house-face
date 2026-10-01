@@ -62,6 +62,7 @@ These are real, already wired, and reachable from the wall through the existing 
 | School day | UNKNOWN (none found) |
 | After school | UNKNOWN (none found) |
 | Weekend | UNKNOWN (none found) |
+| Day off (`day-off`, Atlas) | UNKNOWN (none found) |
 | Kids away (`kids-away`; renamed from the brief's old label, ruling Oct 1) | UNKNOWN (none found) |
 | Nashville week (away-care: pet, lawn, alarms) | UNKNOWN (none found). No alarm device on the box either. Travel week is READ from `data/house-mode.json` (Atlas), never inferred from the calendar |
 | Guest | UNKNOWN (none found) |

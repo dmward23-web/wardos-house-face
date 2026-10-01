@@ -13,7 +13,8 @@ Brief: `/workspace/plates/2026-10-01/redesign/BRIEF.md` (Atlas owns). Plate: Pri
 | `OPEN-LOOPS.md` | max 3 house-object loops, empty = hidden |
 | `LISTENING-PIP.md` | PARKED (ruling Oct 1); removed from the build |
 | `KIOSK-27.md` | 27" landscape 2560x1440 ruling, vertical scroll, fit/zoom, portrait fallback |
-| `../../wall.html` | the wall page (body.wall-kiosk) |
+| `ATLAS-DATA-LANE.md` | Atlas's data lane (merged @ 4b288a4; Atlas's file, not edited here) |
+| `../../wall.html` | the wall page (body.wall-kiosk); reads Atlas's house-mode / pickup-chain / who-home / pack-flags / temps |
 | `../../tokens-wall-kiosk27.css` | wall.html stylesheet only, derived from the plate CSS |
 | `../../house-wall-status.js` | pure rules (UMD) |
 | `../../house-wall-actions.js` | wall glue: scenes + Travel, every side effect injected |

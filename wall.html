@@ -4,7 +4,8 @@
 <meta name="robots" content="noindex">
 <title>WardOS · House wall</title>
 <!-- WALLKIT3 · wall.html · branch wall-redesign-1 · built to Prism's 27" plate (2560x1440, landscape, vertical scroll OK).
-     Not deployed. Every tile is hidden when it has no live source (no placeholders, no sample data).
+     Not deployed. Reads Atlas's data lane (house-mode, pickup-chain, who-home, pack-flags, temps; read only).
+     Every tile is hidden when it has no live source (no placeholders, no sample data).
      Writes: Dan's Kasa scenes via HouseLights.setLight; thermostat Travel / Back home via /api/sensi/travel.
      No key saved on this screen -> zero write/proxy requests. No camera feed. Docs: docs/wall-redesign/WALL-BUILD.md -->
 <link rel="stylesheet" href="tokens-wall-kiosk27.css">
@@ -30,6 +31,14 @@
       <div class="sub" id="w-next-sub"></div>
     </a>
 
+    <div class="mod chain" id="w-chain" aria-label="Pickup chain" hidden>
+      <div class="ch-lbl"><span class="kick">Pickup<br>chain</span><span class="dies" id="w-chain-dies"></span></div>
+      <div class="chain-cells" id="w-chain-cells"></div>
+    </div>
+    <div class="mod who" id="w-who" aria-label="Who's home" hidden>
+      <svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17 L18 7 L30 17"/><path d="M10 15.5 V29 H26 V15.5"/><rect x="15" y="20" width="6" height="9" rx="1"/></g></svg><span class="kick">Who&#39;s home</span><span id="w-who-row" style="display:contents"></span>
+    </div>
+
     <div class="acts" aria-label="Actuators">
       <div class="mod act" id="w-house">
         <div class="ah"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17 L18 7 L30 17"/><path d="M10 15.5 V29 H26 V15.5"/><rect x="15" y="20" width="6" height="9" rx="1"/></g></svg><span class="kick">House</span><span class="gate">LIGHTS</span></div>
@@ -45,6 +54,11 @@
           <button class="tap" id="w-travel"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6 Q15 3 18 3 Q21 3 21 6 V20 Q25 22 25 26 Q25 32 18 32 Q11 32 11 26 Q11 22 15 20 Z"/><path d="M18 12 V25"/></g></svg><span class="tx"><span id="w-travel-l"></span><small id="w-travel-s"></small></span></button>
         </div>
         <div class="note" id="w-travel-note"></div>
+      </div>
+      <div class="mod act" id="w-pack" hidden>
+        <div class="ah"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 V32"/><path d="M10 6 H27 L23 12 L27 18 H10"/></g></svg><span class="kick">Pack</span><span class="gate">TODAY</span></div>
+        <div class="flags" id="w-pack-flags"></div>
+        <div class="note">ride or gear flags · clear at midnight</div>
       </div>
     </div>
 
@@ -104,7 +118,7 @@
   var S = window.HouseWallStatus, A = window.HouseWallActions, L = window.HouseLights;
   var TZ = "America/Chicago";
   var TOKEN_LS = "wardos-lights-proxy-token"; /* same key as house-lights.js + house-sensi-ctl.js */
-  var MODES = [["school-day", "School day"], ["after-school", "After school"], ["weekend", "Weekend"], ["kids-away", "Kids away"],
+  var MODES = [["school-day", "School day"], ["after-school", "After school"], ["weekend", "Weekend"], ["day-off", "Day off"], ["kids-away", "Kids away"],
     ["nashville-week", "Nashville week"], ["guest", "Guest"], ["quiet", "Quiet"]];
   var ICON = { thermo: `<svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6 Q15 3 18 3 Q21 3 21 6 V20 Q25 22 25 26 Q25 32 18 32 Q11 32 11 26 Q11 22 15 20 Z"/><path d="M18 12 V25"/></g></svg>`, cams: `<svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="20" height="15" rx="3"/><path d="M24 16 L32 12 V25 L24 21"/></g></svg>`, laundry: `<svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="4" width="22" height="28" rx="3"/><path d="M7 10 H29"/><circle cx="18" cy="21" r="6.5"/><circle cx="12" cy="7" r="0.8" fill="currentColor"/></g></svg>` };
   var feeds = {};
@@ -191,6 +205,34 @@
     var mode = S.readHouseMode(feeds.houseMode, { now: now });
     $("w-mode").hidden = !mode;
     if (mode) $("w-mode-v").textContent = mode.label;
+
+    var ch = S.pickupChain(feeds.pickup, { now: now });
+    $("w-chain").hidden = !ch;
+    if (ch) {
+      var cut = feeds.pickup && feeds.pickup.cutoff ? ct(feeds.pickup.cutoff) : null;
+      $("w-chain-dies").innerHTML = "school days" + (cut ? "<br>ends " + esc(cut) : "");
+      $("w-chain-cells").innerHTML = ch.rows.slice(0, 4).map(function (r, i) {
+        var kids = r.who.map(function (w) { return '<span class="k-' + w.toLowerCase() + ' kname">' + esc(w) + "</span>"; }).join(" + ");
+        var who = r.by ? "<b>" + esc(r.by) + "</b> <i>\u2192</i> " + kids : kids;
+        var t = r.time || (r.startMs ? ct(new Date(r.startMs).toISOString()) : "");
+        return (i ? '<div class="c-arrow">\u203a</div>' : "") + '<div class="c-cell is-' + r.status + '">'
+          + '<div class="c-top"><span class="c-time">' + esc(String(t).replace(/ (AM|PM)$/, "")) + '</span><span class="c-tag">' + esc(r.status) + (r.leaveBy ? " \u00b7 leave " + esc(r.leaveBy) : "") + "</span></div>"
+          + '<div class="c-who">' + who + "</div>"
+          + '<div class="c-where">' + esc(r.what) + (r.where && r.what.indexOf(r.where) < 0 ? " \u00b7 " + esc(r.where) : "") + "</div>"
+          + (r.gear.length ? '<div class="c-gear">gear \u00b7 ' + esc(r.gear.join(", ")) + "</div>" : "")
+          + "</div>";
+      }).join("");
+    }
+    var wh = S.whoHome(feeds.whoHome, { now: now, mode: mode });
+    $("w-who").hidden = !wh;
+    if (wh) $("w-who-row").innerHTML = wh.kids.map(function (k) {
+      return '<span class="pill k-' + k.name.toLowerCase() + (k.inAt ? " is-in" : "") + '"><span class="dot">' + esc(k.name[0]) + "</span><b>" + esc(k.name) + "</b><span>" + (k.inAt ? "in \u00b7 " + esc(ct(k.inAt)) : "not in yet") + "</span></span>";
+    }).join("");
+    var pf = S.packFlags(feeds.pack, { now: now });
+    $("w-pack").hidden = !pf;
+    if (pf) $("w-pack-flags").innerHTML = pf.flags.map(function (f) {
+      return '<div class="flag k-' + f.kid.toLowerCase() + '"><b>' + esc(f.kid) + "</b>" + esc(f.text) + "</div>";
+    }).join("");
     /* thermostat light reads the LIVE reading: the hub's (key saved) or the polled sensi-live.json */
     var ast = act.state();
     var sensiFeed = act.hasKey() && ast.liveAt ? { status: "live", updatedAt: ast.liveAt, thermostat: ast.th } : feeds.sensi;
@@ -202,9 +244,10 @@
     $("w-lights-row").innerHTML = strip.map(lightHtml).join("");
     var loops = S.openLoops ? S.openLoops([], { now: now }) : [];
     $("w-loops").hidden = !(loops && loops.length);
-    var src = [["cal-live", feeds.cal], ["sensi-live", feeds.sensi], ["nest-live", feeds.nest], ["lights-live", feeds.lights]]
+    var src = [["cal-live", feeds.cal], ["sensi-live", feeds.sensi], ["nest-live", feeds.nest], ["lights-live", feeds.lights],
+      ["house-mode", feeds.houseMode], ["pickup-chain", feeds.pickup]]
       .filter(function (x) { return x[1]; })
-      .map(function (x) { var t = ct(x[1].fetchedAt || x[1].updatedAt); return x[0] + ".json " + (t || "UNKNOWN"); });
+      .map(function (x) { var t = ct(x[1].fetchedAt || x[1].updatedAt || x[1].generatedAt); return x[0] + ".json " + (t || "UNKNOWN"); });
     $("w-src").innerHTML = "<b>Data</b> " + esc(src.join(" · ") || "no feeds") + " · CT";
     $("w-modes").innerHTML = "Modes · " + MODES.map(function (m) { return mode && mode.key === m[0] ? "<b>" + esc(m[1]) + "</b>" : esc(m[1]); }).join(" · ");
     paintTravel();
@@ -216,9 +259,10 @@
       .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
   }
   function load() {
-    Promise.all(["cal-live.json", "sensi-live.json", "nest-live.json", "lights-live.json", "house-mode.json", "house-mode-temps.json"].map(get))
+    Promise.all(["cal-live.json", "sensi-live.json", "nest-live.json", "lights-live.json", "house-mode.json", "house-mode-temps.json",
+      "pickup-chain.json", "who-home.json", "pack-flags.json"].map(get))
       .then(function (r) {
-        feeds = { cal: r[0], sensi: r[1], nest: r[2], lights: r[3], houseMode: r[4], temps: r[5] };
+        feeds = { cal: r[0], sensi: r[1], nest: r[2], lights: r[3], houseMode: r[4], temps: r[5], pickup: r[6], whoHome: r[7], pack: r[8] };
         if (!act.state().liveAt && feeds.sensi && feeds.sensi.thermostat) act.state().th = feeds.sensi.thermostat;
         paint();
         if (act.hasKey()) act.refresh().then(paint); /* live reading + saved-capture flag from the hub (key only) */

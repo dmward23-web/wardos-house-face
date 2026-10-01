@@ -7,16 +7,21 @@ Rule: a tile is drawn only when it has a live source. No placeholders. No plate 
 | Plate area | wall.html | Source |
 |---|---|---|
 | Header (tap → `sheet-index.html`) | WardOS mark, live CT clock + date, stale dot (`stale · thermostat, cams` / `feeds fresh`), Main board | browser clock; `staleFeeds()` over present feeds |
-| House mode chip | built, **hidden** (no `data/house-mode.json` yet) | `readHouseMode()` |
+| House mode chip | **shown**: the file's label (`After school` at render); `kids-away` always reads **Kids away**; Nashville week only from the file | `data/house-mode.json` (Atlas, merged @ 4b288a4): `mode` key + `label`, `asOfIso` = today, now inside `since..until` |
+| Pickup chain | **shown**: up to 4 cells, `now` / `next` / `later` re-derived from the clock, ended rows dropped; `Dad → Hayes` when `by` is set; leave-by in the tag; gear line only when the file lists gear; "ends 7:00 PM" from `cutoff` | `data/pickup-chain.json`: `asOfIso` + `date` = today, `generatedAt` ≤ 6 h, before `cutoff`, Ward kids only |
 | NEXT UP | time + the calendar's own words + `ends h:mm` (place only when not already in the words; long text wraps to 2 lines, never cut) | `data/cal-live.json` `nextLeave`, live + ≤ 6 h + `asOfIso` = today, timed, not over |
 | House actuator | **I'm home** / **Leaving** (Dan's Kasa scenes) | `HouseLights.setLight`; no key → `NEED KEY`, 0 requests |
 | Thermostat actuator (**deviation: not on the plate**) | **Travel / Back home**, arm-then-confirm | THERMO-TRAVEL.md |
-| Status lights | thermostat (`73°` · plain, or `Travel · 55–85`), `Laundry NEED TOKEN` | `statusStrip()` |
+| Status lights | thermostat `73° · after school` (mode label from house-mode.json, no flag while `house-mode-temps.json` targets are null) or `Travel · 55–85`; `Laundry NEED TOKEN` | `statusStrip()` + `bandsFromTemps()` (mirror of Atlas's) |
 | Rail | all 22 badges, the plate's names, groups and icons, repo-relative links | static |
 | Footer | real as-of stamps (CT) of each loaded feed; modes list with **Kids away** | feed `fetchedAt` / `updatedAt` |
 
 ## Hidden (no source or gated)
-Pickup chain, Who's home (Atlas files absent), Check in, Chore done, Reward jar (Alfred PASS pending), Dinner vote (no picks), Pack flag (`pack-flags.json` absent), Ask pip (**PARKED**), Open loops (no source → empty → hidden), cams light (`online:null`), doors (no source), Load day (no live source), dragon (never), pond (no source), house-mode chip.
+- **Who's home**: wired (`whoHome()`), hidden. `data/who-home.json` is Atlas's all-null seed and nothing writes it (check-ins are per-device; no writer built). Shows only once a kid has a real check-in for the current house day (3 AM CT reset); hidden in Kids away.
+- **Pack**: wired (`packFlags()`), hidden. `data/pack-flags.json` has no flags. Shows today's flags only (date = today, before `clearsAt`, created today, one of the three kids, ≤ 60 chars). Read-only: no flag button (no writer).
+- **Check in**: not built. Stays per-device only; **no new key added to the hub `/api/taps` allowlist** (`TAP_KEY_RE` untouched, Dan's last-yes list).
+- Chore done, Reward jar (Alfred PASS pending), Dinner vote (no picks), Ask pip (**PARKED**), Open loops (no source), cams light (`online:null`), doors (no source), Load day (no live source), dragon (never), pond (no source).
+Merged render (Atlas data): `wall-build-2560-merged.png` (~5:56 PM CT). `wall-build-2560-merged-sensi-fresh-mock.png` is the same page with only the Sensi timestamp mocked fresh, to show the `73° · after school` line.
 Thermostat light is also hidden whenever `sensi-live.json` is > 30 min old (it was at render time: 5:10 PM CT feed, render ~5:48 PM CT) unless the hub's live reading is available with a key.
 
 ## Deviations from the plate
@@ -24,3 +29,6 @@ Thermostat light is also hidden whenever `sensi-live.json` is > 30 min old (it w
 
 ## Checks
 scrollWidth = clientWidth at 2560x1440 / 1920x1080 / 1080x1920 (no sideways scroll). No-key run: **0 non-local requests** after forced taps on Leaving and Travel x2. GATE1 (`--file wall.html` too), GATE2, kids-safe voice: PASS.
+
+## Known cross-lane mismatch (left as authored)
+Atlas's `scripts/house/tests/wall-state.test.mjs` test 26 expects the thermostat text `73°, After school` (Wright's old bcd53ea stub). The owner ruling is `73° · after school`, which is what ships, so that one test fails (25/26). Its second half (Atlas's `{mode:{id,label}, bands}` call shape flags when a target is set) passes against this build. Fix belongs in Atlas's test line 49; not edited here.

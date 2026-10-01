@@ -12,8 +12,9 @@ Freshness windows reuse the constants that already ship:
 | Nest cams | `data/nest-live.json` | `fetchedAt` / `updatedAt` | 30 min (`house-nest.js:14`) |
 | Sensi | `data/sensi-live.json` | `updatedAt` | 30 min (`house-sensi.js:12`) |
 | Kasa lights | `data/lights-live.json` | `fetchedAt` | 24 h (`house-lights.js:17`) |
-| House mode | `data/house-mode.json` (Atlas, branch `wall-redesign-atlas`, **not on origin yet**) | `asOfIso` (ASSUMED) | must equal today CT |
-| Mode temps | `data/house-mode-temps.json` (Atlas; temps `null` today) | n/a | n/a |
+| House mode | `data/house-mode.json` (Atlas, merged @ 4b288a4) `{mode, label, since, until, asOfIso, generatedAt}` | `asOfIso`, `since`, `until` | asOfIso = today CT and now inside since..until |
+| Mode temps | `data/house-mode-temps.json` `{toleranceF, modes:{<key>:{label, heatSetpoint, coolSetpoint}}}` (all `null`) | n/a | n/a (no band while null) |
+| Pickup chain | `data/pickup-chain.json` | `generatedAt`, `asOfIso`, `date`, `cutoff` | ≤ 6 h (cal window), today, before cutoff |
 | Laundry | proposed `/api/laundry` (LAUNDRY.md) | `fetchedAt` | 30 min state / 5 min timer (**ASSUMED kit defaults**) |
 
 Wright reads these. Wright never writes them.
@@ -56,7 +57,7 @@ Quiet rendering: HUBCMD void + amber atoms (`--cmd-*`). OK = muted ink with a sm
 
 | | |
 |---|---|
-| Gate | Travel week is **READ** from `data/house-mode.json` (key `nashville-week`, ASSUMED until Atlas's schema lands). **Never inferred** from the calendar or the Oct 2–12 trip. File missing / stale → hidden |
+| Gate | Travel week is **READ** from `data/house-mode.json` (key `nashville-week`, Atlas's real schema). **Never inferred** from the calendar or the Oct 2–12 trip. File missing / stale → hidden |
 | Dragon | **No line, ever, until it exists** (ruling). The rule has no dragon output |
 | Pond | **Hidden until a real data source exists.** Once one exists: `{filterOk, asOf, freshMs}` → `Pond filter OK` / `Pond filter not OK`. With no `freshMs` from the source → hidden |
 | Kid-safe | "dragon" / "pond" are on Alfred's kid-chore ban list; Alfred rules before the pond line goes live |

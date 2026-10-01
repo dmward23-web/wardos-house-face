@@ -28,8 +28,10 @@
   };
   var HUB = "sheet-google-home.html";
   var LOAD = "sheet-load-day.html";
-  /* house-mode.json is Atlas's (branch wall-redesign-atlas, not yet on origin): key names ASSUMED until it lands. */
-  var MODE_KEYS = ["school-day", "after-school", "weekend", "kids-away", "nashville-week", "guest", "quiet"];
+  /* house-mode.json keys = Atlas's real schema (docs/wall-redesign/ATLAS-DATA-LANE.md, merged @ 4b288a4). */
+  var MODE_KEYS = ["school-day", "after-school", "weekend", "day-off", "kids-away", "nashville-week", "guest", "quiet"];
+  var MODE_LABEL_FORCE = { "kids-away": "Kids away" }; /* ruling: never "Custody-out" / "Mom week" on the wall */
+  var KID_NAMES = ["Ainsley", "Hayes", "Harris"];
   var TRAVEL_KEYS = ["nashville-week"];
 
   function nowMs(now) { return now == null ? Date.now() : (now instanceof Date ? now.getTime() : Number(now)); }
@@ -78,16 +80,21 @@
     return { id: "cams", ok: true, text: "Cams OK", href: HUB };
   }
 
-  /* House mode · READ ONLY from data/house-mode.json (Atlas). Missing, unknown key, or stale -> null.
-     ASSUMED shape until Atlas's branch lands: {asOfIso, mode:{key,label}} or {asOfIso, key, label}. */
+  /* House mode · READ ONLY from data/house-mode.json (Atlas):
+     {mode:"<key>", label, since, until, asOfIso, generatedAt, source, reason, warnings}.
+     Hidden (null) when missing, unknown key, no label, asOfIso != today CT, or now is outside since..until.
+     Travel / Nashville week only ever comes from this file (never inferred). */
   function readHouseMode(json, opts) {
     opts = opts || {};
-    if (!json || typeof json !== "object") return null;
-    var m = json.mode && typeof json.mode === "object" ? json.mode : json;
-    var key = m && m.key, label = m && m.label;
-    if (MODE_KEYS.indexOf(key) < 0 || !label) return null;
-    if (json.asOfIso !== ctIso(nowMs(opts.now))) return null;
-    return { key: key, label: String(label) };
+    if (!json || typeof json !== "object" || typeof json.mode !== "string") return null;
+    var key = json.mode, now = nowMs(opts.now);
+    if (MODE_KEYS.indexOf(key) < 0 || !json.label) return null;
+    if (json.asOfIso !== ctIso(now)) return null;
+    var until = parse(json.until), since = parse(json.since);
+    if (until && now >= until) return null;
+    if (since && now < since - 5 * 60 * 1000) return null;
+    var label = MODE_LABEL_FORCE[key] || String(json.label);
+    return { key: key, id: key, label: label, since: json.since || null, until: json.until || null };
   }
   function isTravelWeek(mode) { return !!(mode && TRAVEL_KEYS.indexOf(mode.key) >= 0); }
 
@@ -100,6 +107,20 @@
     return !!th && String(th.mode || "").toLowerCase() === TRAVEL_SET.mode
       && th.heatSetpoint === TRAVEL_SET.heatSetpoint && th.coolSetpoint === TRAVEL_SET.coolSetpoint;
   }
+  /* data/house-mode-temps.json -> bands (mirror of Atlas bandsFromTemps in scripts/house/wall-state.mjs).
+     Only non-null targets make a band; all null (today, "awaiting Dan") = {} = never flags. */
+  function bandsFromTemps(temps) {
+    var out = {}, modes = (temps && temps.modes) || {};
+    var tol = temps && typeof temps.toleranceF === "number" ? temps.toleranceF : 0;
+    MODE_KEYS.forEach(function (k) {
+      var m = modes[k]; if (!m) return;
+      var band = {};
+      if (typeof m.heatSetpoint === "number") band.heatSetpoint = [m.heatSetpoint - tol, m.heatSetpoint + tol];
+      if (typeof m.coolSetpoint === "number") band.coolSetpoint = [m.coolSetpoint - tol, m.coolSetpoint + tol];
+      if (Object.keys(band).length) out[k] = band;
+    });
+    return out;
+  }
   function numRange(r) { return Array.isArray(r) && r.length === 2 && typeof r[0] === "number" && typeof r[1] === "number"; }
   function thermoLight(sensi, opts) {
     opts = opts || {};
@@ -111,7 +132,9 @@
     if (typeof th.ambient !== "number") return null;
     var mode = opts.mode && opts.mode.label ? opts.mode : null;
     var text = th.ambient + "\u00b0" + (mode ? " \u00b7 " + mode.label.toLowerCase() : "");
-    var band = mode && opts.temps ? opts.temps[mode.key] : null;
+    var mkey = mode ? (mode.key || mode.id) : null;
+    var bands = opts.bands || (opts.temps ? bandsFromTemps(opts.temps) : null);
+    var band = mkey && bands ? bands[mkey] : null;
     if (band) {
       var bad = (numRange(band.heatSetpoint) && !(th.heatSetpoint >= band.heatSetpoint[0] && th.heatSetpoint <= band.heatSetpoint[1]))
         || (numRange(band.coolSetpoint) && !(th.coolSetpoint >= band.coolSetpoint[0] && th.coolSetpoint <= band.coolSetpoint[1]));
@@ -273,6 +296,73 @@
     return out;
   }
 
+  /* Pickup strip · data/pickup-chain.json (Atlas). Hidden when missing, not today's, generatedAt older than the
+     calendar window (6 h, same as cal-live), at/after cutoff, or no rows left. Status is re-derived from the clock:
+     the row in progress = now, the first upcoming = next, the rest = later. Ended rows are dropped. */
+  function pickupChain(json, opts) {
+    opts = opts || {};
+    var now = nowMs(opts.now), today = ctIso(now);
+    if (!json || json.asOfIso !== today || json.date !== today || json.schoolDay === false) return null;
+    if (!fresh(json.generatedAt, FRESH.cal, now)) return null;
+    var cut = parse(json.cutoff);
+    if (cut && now >= cut) return null;
+    var rows = (Array.isArray(json.rows) ? json.rows : []).filter(function (r) {
+      if (!r || !r.what || !Array.isArray(r.who) || !r.who.length) return false;
+      if (!r.who.every(function (w) { return KID_NAMES.indexOf(w) >= 0; })) return false;
+      var end = parse(r.endIso) || parse(r.timeIso) || parse(r.startIso);
+      return end > now;
+    }).map(function (r) {
+      return { who: r.who.slice(), by: r.by || null, what: String(r.what), where: r.where || null, time: r.time || null,
+        leaveBy: r.leaveBy || null, gear: Array.isArray(r.gear) ? r.gear.slice() : [], kind: r.kind || null,
+        startMs: parse(r.startIso) || parse(r.timeIso), endMs: parse(r.endIso) };
+    });
+    if (!rows.length) return null;
+    rows.sort(function (a, b) { return a.startMs - b.startMs; });
+    var nextSet = false;
+    rows.forEach(function (r) {
+      if (r.startMs && r.startMs <= now && (!r.endMs || now < r.endMs)) r.status = "now";
+      else if (!nextSet) { r.status = "next"; nextSet = true; }
+      else r.status = "later";
+    });
+    return { rows: rows, generatedAt: json.generatedAt };
+  }
+
+  /* Who's home · data/who-home.json (Atlas shape; check-ins are per-device, no writer exists yet).
+     House day = CT date of (now - 3h). Shown only when at least one kid has a real check-in from this house day;
+     an all-null seed would just be three placeholders, so it stays hidden. Kids away -> hidden. */
+  function houseDay(now) { return ctIso(nowMs(now) - 3 * 60 * 60 * 1000); }
+  function whoHome(json, opts) {
+    opts = opts || {};
+    var now = nowMs(opts.now);
+    if (opts.mode && opts.mode.key === "kids-away") return null;
+    if (!json || json.date !== houseDay(now) || !Array.isArray(json.kids)) return null;
+    var day = houseDay(now), any = false;
+    var kids = KID_NAMES.map(function (name) {
+      var k = json.kids.filter(function (x) { return x && (x.name === name || String(x.id || "") === name.toLowerCase()); })[0];
+      var at = k && k.checkedInAt ? parse(k.checkedInAt) : 0;
+      var ok = !!at && at <= now + 5 * 60 * 1000 && houseDay(at) === day;
+      if (ok) any = true;
+      return { name: name, inAt: ok ? new Date(at).toISOString() : null };
+    });
+    return any ? { kids: kids } : null;
+  }
+
+  /* Pack flags · data/pack-flags.json (Atlas). Today-relevant only: date == today CT, before clearsAt, each flag
+     created today CT, kid is one of the three, text 1-60 chars (Atlas's addPackFlag already wall-safe-scans). */
+  function packFlags(json, opts) {
+    opts = opts || {};
+    var now = nowMs(opts.now), today = ctIso(now);
+    if (!json || json.date !== today || !Array.isArray(json.flags)) return null;
+    var clr = parse(json.clearsAt);
+    if (clr && now >= clr) return null;
+    var flags = json.flags.filter(function (f) {
+      var at = f && parse(f.createdAt);
+      return at && ctIso(at) === today && at <= now + 5 * 60 * 1000 && KID_NAMES.indexOf(f.kid) >= 0
+        && typeof f.text === "string" && f.text.trim().length > 0 && f.text.length <= 60;
+    }).map(function (f) { return { kid: f.kid, text: f.text.trim() }; });
+    return flags.length ? { flags: flags } : null;
+  }
+
   /* Scenes (Dan, Oct 1). Kasa only, through the EXISTING lights write path (HouseLights.setLight).
      Neither touches the Sensi. Kasa All on / All off stays as is and is not relabeled. Mode chips recall nothing. */
   var SCENES = {
@@ -370,6 +460,7 @@
     SCENES: SCENES, scenePlan: scenePlan, sceneButtons: sceneButtons,
     ARM_MS: ARM_MS, armTap: armTap, isArmed: isArmed, isTravelThermo: isTravelThermo, travelButton: travelButton,
     statusStrip: statusStrip, nextUp: nextUp, staleFeeds: staleFeeds,
+    bandsFromTemps: bandsFromTemps, pickupChain: pickupChain, whoHome: whoHome, houseDay: houseDay, packFlags: packFlags, KID_NAMES: KID_NAMES,
     isHouseLoop: isHouseLoop, openLoops: openLoops, lightLoops: lightLoops,
     _ctIso: ctIso
   };

@@ -31,29 +31,42 @@ t("stale nest -> hidden", () => assert.equal(S.camsLight(nest(true, { fetchedAt:
 t("nest not live -> hidden", () => assert.equal(S.camsLight(nest(true, { status: "need_token" }), { now: NOW }), null));
 t("doors never shown (no doors option)", () => assert.equal(S.camsLight(nest(true), { now: NOW, roster: ROSTER, doors: { ok: true } }).text, "Cams OK"));
 
-// house mode (READ from data/house-mode.json; never inferred)
-const HM = (key, label, asOfIso = "2026-10-01") => ({ asOfIso, mode: { key, label } });
-t("house mode read", () => assert.deepEqual(S.readHouseMode(HM("school-day", "School day"), { now: NOW }), { key: "school-day", label: "School day" }));
-t("flat shape also read", () => assert.equal(S.readHouseMode({ asOfIso: "2026-10-01", key: "kids-away", label: "Kids away" }, { now: NOW }).key, "kids-away"));
+// house mode · Atlas's real schema {mode:"<key>", label, since, until, asOfIso, ...} (ATLAS-DATA-LANE.md)
+const HM = (key, label, asOfIso = "2026-10-01", extra = {}) => ({ mode: key, label, since: "2026-10-01T15:40:00-05:00", until: "2026-10-01T20:00:00-05:00", asOfIso, generatedAt: "2026-10-01T17:00:00-05:00", ...extra });
+t("house mode read (real schema)", () => assert.deepEqual(
+  (({ key, label }) => ({ key, label }))(S.readHouseMode(HM("after-school", "After school"), { now: NOW })), { key: "after-school", label: "After school" }));
+t("all 8 Atlas keys known, incl. day-off", () => assert.deepEqual(S.MODE_KEYS, ["school-day", "after-school", "weekend", "day-off", "kids-away", "nashville-week", "guest", "quiet"]));
+t("kids-away label is always 'Kids away'", () => assert.equal(S.readHouseMode(HM("kids-away", "Mom week"), { now: NOW }).label, "Kids away"));
+t("old guessed object shape no longer read", () => assert.equal(S.readHouseMode({ asOfIso: "2026-10-01", mode: { key: "weekend", label: "Weekend" } }, { now: NOW }), null));
 t("missing house-mode.json -> null", () => assert.equal(S.readHouseMode(null, { now: NOW }), null));
-t("stale house-mode.json -> null", () => assert.equal(S.readHouseMode(HM("school-day", "School day", "2026-09-30"), { now: NOW }), null));
+t("other-day asOfIso -> null", () => assert.equal(S.readHouseMode(HM("school-day", "School day", "2026-09-30"), { now: NOW }), null));
+t("past until -> null", () => assert.equal(S.readHouseMode(HM("after-school", "After school"), { now: Date.parse("2026-10-01T20:00:00-05:00") }), null));
 t("unknown / old key (custody-out) -> null", () => assert.equal(S.readHouseMode(HM("custody-out", "x"), { now: NOW }), null));
-t("kids-away is a known key", () => assert.ok(S.MODE_KEYS.includes("kids-away")));
+t("travel week only from the file", () => {
+  assert.equal(S.isTravelWeek(S.readHouseMode(HM("nashville-week", "Nashville week"), { now: NOW })), true);
+  assert.equal(S.isTravelWeek(S.readHouseMode(null, { now: NOW })), false);
+});
 
 // 2 · thermostat (plain reading; no flag while temps null)
 const sensi = (th = {}, extra = {}) => ({ status: "live", updatedAt: iso(4 * MIN), error: null,
   thermostat: { online: true, ambient: 73, mode: "Auto", heatSetpoint: 65, coolSetpoint: 73, setpoint: 65, ...th }, ...extra });
 const SCHOOL = { key: "school-day", label: "School day" };
+const TEMPS = (school) => ({ note: "awaiting Dan", toleranceF: null, modes: { "school-day": { label: "School day", heatSetpoint: null, coolSetpoint: null, ...school } } });
 t("plain reading '73° · school day'", () => assert.deepEqual(S.thermoLight(sensi(), { now: NOW, mode: SCHOOL }), { id: "thermo", ok: true, text: "73\u00b0 \u00b7 school day", href: "sheet-google-home.html" }));
 t("no house mode -> ambient only", () => assert.equal(S.thermoLight(sensi(), { now: NOW }).text, "73\u00b0"));
 t("temps null -> never flagged", () => {
-  const r = S.thermoLight(sensi(), { now: NOW, mode: SCHOOL, temps: { "school-day": { heatSetpoint: null, coolSetpoint: null } } });
+  const r = S.thermoLight(sensi(), { now: NOW, mode: SCHOOL, temps: TEMPS() });
   assert.equal(r.ok, true); assert.equal(r.text, "73\u00b0 \u00b7 school day");
 });
 t("real band numbers + mismatch -> quiet flag", () => {
-  const r = S.thermoLight(sensi(), { now: NOW, mode: SCHOOL, temps: { "school-day": { heatSetpoint: [68, 72], coolSetpoint: null } } });
+  const r = S.thermoLight(sensi(), { now: NOW, mode: SCHOOL, temps: { toleranceF: 2, modes: { "school-day": { heatSetpoint: 70, coolSetpoint: null } } } });
   assert.equal(r.ok, false); assert.equal(r.text, "73\u00b0 \u00b7 school day \u00b7 check set 65\u201373\u00b0");
 });
+t("Atlas call shape {mode:{id,label}, bands} also works", () => {
+  const r = S.thermoLight(sensi(), { now: NOW, mode: { id: "after-school", label: "After school" }, bands: { "after-school": { heatSetpoint: [70, 70] } } });
+  assert.equal(r.ok, false);
+});
+t("bandsFromTemps mirrors Atlas: all null -> {}", () => assert.deepEqual(S.bandsFromTemps(TEMPS()), {}));
 t("offline -> Thermostat offline", () => assert.equal(S.thermoLight(sensi({ online: false }), { now: NOW }).text, "Thermostat offline"));
 t("stale sensi -> hidden", () => assert.equal(S.thermoLight(sensi({}, { updatedAt: iso(31 * MIN) }), { now: NOW }), null));
 
@@ -155,6 +168,46 @@ t("next up: other day as-of -> hidden", () => assert.equal(S.nextUp({ ...CAL, as
 t("next up: over -> hidden", () => assert.equal(S.nextUp(CAL, { now: Date.parse("2026-10-01T19:00:00-05:00") }), null));
 t("next up: all-day -> hidden", () => assert.equal(S.nextUp({ ...CAL, nextLeave: { ...CAL.nextLeave, allDay: true } }, { now: NOW }), null));
 t("stale dot lists only present stale feeds", () => assert.deepEqual(S.staleFeeds({ cal: CAL, sensi: { status: "live", updatedAt: new Date(NOW - 3600000).toISOString() } }, { now: NOW }), ["thermostat"]));
+
+// Atlas data lane readers (pickup chain, who's home, pack flags)
+const PC = (rows, extra = {}) => ({ asOfIso: "2026-10-01", generatedAt: "2026-10-01T17:00:00-05:00", date: "2026-10-01", schoolDay: true,
+  cutoff: "2026-10-01T19:00:00-05:00", warnings: [], rows, ...extra });
+const ROW = (who, what, s0, e0, extra = {}) => ({ who, by: null, what, where: null, time: null, leaveBy: null, gear: [], status: "next", kind: "ride", startIso: s0, endIso: e0, ...extra });
+const P1 = ROW(["Ainsley"], "Swim practice", "2026-10-01T16:25:00-05:00", "2026-10-01T18:20:00-05:00");
+const P2 = ROW(["Hayes"], "Pick up Hayes", "2026-10-01T18:20:00-05:00", "2026-10-01T18:55:00-05:00", { by: "Dad" });
+const P0 = ROW(["Harris"], "SRE pickup", "2026-10-01T15:40:00-05:00", "2026-10-01T15:50:00-05:00");
+t("pickup: status re-derived from the clock (now/next), ended rows dropped", () =>
+  assert.deepEqual(S.pickupChain(PC([P0, P2, P1]), { now: NOW }).rows.map((r) => [r.what, r.status]), [["Swim practice", "now"], ["Pick up Hayes", "next"]]));
+t("pickup: at/after cutoff -> hidden", () => assert.equal(S.pickupChain(PC([P2]), { now: Date.parse("2026-10-01T19:00:00-05:00") }), null));
+t("pickup: other day -> hidden", () => assert.equal(S.pickupChain(PC([P2], { asOfIso: "2026-09-30", date: "2026-09-30" }), { now: NOW }), null));
+t("pickup: generated > 6h ago -> hidden", () => assert.equal(S.pickupChain(PC([P2], { generatedAt: "2026-10-01T10:00:00-05:00" }), { now: NOW }), null));
+t("pickup: no rows left -> hidden", () => assert.equal(S.pickupChain(PC([P0]), { now: NOW }), null));
+t("pickup: non-Ward kid row dropped", () => assert.equal(S.pickupChain(PC([ROW(["Riley"], "x", P2.startIso, P2.endIso)]), { now: NOW }), null));
+const WH = (atH) => ({ date: "2026-10-01", resetsAt: "2026-10-02T03:00:00-05:00", kids: [
+  { id: "hayes", name: "Hayes", checkedInAt: atH }, { id: "ainsley", name: "Ainsley", checkedInAt: null }, { id: "harris", name: "Harris", checkedInAt: null }] });
+t("who's home: all-null seed -> hidden (no placeholders)", () => assert.equal(S.whoHome(WH(null), { now: NOW }), null));
+t("who's home: a real check-in today -> shown", () => assert.deepEqual(S.whoHome(WH("2026-10-01T16:00:00-05:00"), { now: NOW }).kids.map((k) => [k.name, !!k.inAt]), [["Ainsley", false], ["Hayes", true], ["Harris", false]]));
+t("who's home: yesterday's check-in -> hidden", () => assert.equal(S.whoHome({ ...WH("2026-09-30T16:00:00-05:00"), date: "2026-10-01" }, { now: NOW }), null));
+t("who's home: kids away -> hidden", () => assert.equal(S.whoHome(WH("2026-10-01T16:00:00-05:00"), { now: NOW, mode: { key: "kids-away" } }), null));
+t("house day resets at 3 AM CT", () => assert.equal(S.houseDay(Date.parse("2026-10-02T02:59:00-05:00")), "2026-10-01"));
+const PF = (flags, date = "2026-10-01") => ({ date, clearsAt: "2026-10-02T00:00:00-05:00", flags });
+t("pack: empty -> hidden", () => assert.equal(S.packFlags(PF([]), { now: NOW }), null));
+t("pack: today's flag shown", () => assert.deepEqual(S.packFlags(PF([{ kid: "Hayes", text: "cleats", createdAt: "2026-10-01T07:10:00-05:00" }]), { now: NOW }).flags, [{ kid: "Hayes", text: "cleats" }]));
+t("pack: yesterday's flag / unknown kid / over 60 chars dropped", () => assert.equal(S.packFlags(PF([
+  { kid: "Hayes", text: "cleats", createdAt: "2026-09-30T07:10:00-05:00" }, { kid: "Riley", text: "x", createdAt: "2026-10-01T07:10:00-05:00" },
+  { kid: "Hayes", text: "x".repeat(61), createdAt: "2026-10-01T07:10:00-05:00" }]), { now: NOW }), null));
+t("pack: other-day file -> hidden", () => assert.equal(S.packFlags(PF([{ kid: "Hayes", text: "cleats", createdAt: "2026-10-01T07:10:00-05:00" }], "2026-09-30"), { now: NOW }), null));
+
+// real merged Atlas files parse with the wall rules (as of their own generation time)
+import fs from "node:fs";
+const J = (f) => JSON.parse(fs.readFileSync(new URL("../../data/" + f, import.meta.url)));
+const AT = Date.parse("2026-10-01T17:50:00-05:00");
+t("real house-mode.json -> After school chip", () => assert.equal(S.readHouseMode(J("house-mode.json"), { now: AT }).label, "After school"));
+t("real temps all null -> thermo plain '73° · after school'", () => assert.equal(S.thermoLight(sensi({}, { updatedAt: new Date(AT - MIN).toISOString() }),
+  { now: AT, mode: S.readHouseMode(J("house-mode.json"), { now: AT }), temps: J("house-mode-temps.json") }).text, "73° · after school"));
+t("real pickup-chain.json -> 2 rows", () => assert.equal(S.pickupChain(J("pickup-chain.json"), { now: AT }).rows.length, 2));
+t("real who-home.json seed -> hidden", () => assert.equal(S.whoHome(J("who-home.json"), { now: AT }), null));
+t("real pack-flags.json empty -> hidden", () => assert.equal(S.packFlags(J("pack-flags.json"), { now: AT }), null));
 
 // 5 · open loops
 const loop = (o) => ({ kind: "house-object", severity: "task", asOf: iso(MIN), freshMs: H, ...o });
