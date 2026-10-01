@@ -4,11 +4,11 @@
   "date": "2026-10-02",
   "schoolDay": true,
   "cutoff": "2026-10-02T19:00:00-05:00",
-  "source": "calendar dmward23@gmail.com (data/cal-live.json fetched 2026-10-01T17:44:00-05:00 + cal-dmward23-week.json fetched 2026-10-01T17:44:00-05:00, read-only) + kids-week.json (refreshed 2026-10-01T17:44:00-05:00)",
+  "source": "Calendar (data/cal-live.json fetched 2026-10-01T17:55:00-05:00 + cal-dmward23-week.json fetched 2026-10-01T17:55:00-05:00, read-only) + kids-week.json (refreshed 2026-10-01T17:55:00-05:00)",
   "warnings": [
-    "calendar window 2026-09-25..2026-10-08 does not reach now+7d (2026-10-09)",
-    "data/cal-live.json older than 6h",
-    "cal-dmward23-week.json older than 6h"
+    "Calendar window 2026-09-25..2026-10-08 does not reach now+7d (2026-10-09)",
+    "Calendar feed data/cal-live.json older than 6h",
+    "Calendar feed cal-dmward23-week.json older than 6h"
   ],
   "rows": [
     {

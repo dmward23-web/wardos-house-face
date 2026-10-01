@@ -197,14 +197,14 @@ export function calendarWarnings(cal, t) {
   const out = [];
   const w = windowMs(cal);
   const horizon = t + 7 * 24 * 3600000;
-  if (!cal.events.length || !w) out.push("no calendar events loaded");
+  if (!cal.events.length || !w) out.push("No calendar events loaded");
   else if (t < w.fromMs || horizon >= w.toMs) {
-    out.push(`calendar window ${cal.window.from}..${cal.window.to} does not reach now+7d (${ctDate(horizon)})`);
+    out.push(`Calendar window ${cal.window.from}..${cal.window.to} does not reach now+7d (${ctDate(horizon)})`);
   }
   for (const s of cal.sources) {
-    if (s.fetchedMs != null && isFinite(s.fetchedMs) && t - s.fetchedMs > 6 * 3600000) out.push(`${s.name} older than 6h`);
+    if (s.fetchedMs != null && isFinite(s.fetchedMs) && t - s.fetchedMs > 6 * 3600000) out.push(`Calendar feed ${s.name} older than 6h`);
   }
-  if (!cal.hasKidsHome) out.push("no 'Kids with Dan' events in calendar data; Kids away not evaluated");
+  if (!cal.hasKidsHome) out.push("No 'Kids with Dan' events in calendar data; kids away not evaluated");
   return out;
 }
 /** CLI loader. Repo data first (data/cal-live.json, data/kids-week.json), box dump as fallback + supplement:
@@ -229,9 +229,8 @@ export function loadInputs({ dataDir, calLive, events, kidsWeek, override } = {}
   const kw = kwPath && fs.existsSync(kwPath) ? readJson(kwPath, null) : null;
   const ovPath = override || (dataDir ? path.join(dataDir, "house-mode-override.json") : null);
   const ov = ovPath && fs.existsSync(ovPath) ? readJson(ovPath, null) : null;
-  const cal = (kw && kw.sourceCalendar) || "?";
   const parts = calendar.sources.map((s) => `${s.name}${s.fetchedMs ? ` fetched ${ctIso(s.fetchedMs)}` : ""}`);
-  const label = `calendar ${cal} (${parts.join(" + ")}, read-only)` +
+  const label = `Calendar (${parts.join(" + ")}, read-only)` +
     (kw ? ` + kids-week.json${kw.refreshedAt ? ` (refreshed ${ctIso(Date.parse(kw.refreshedAt))})` : ""}` : "") +
     (ov ? " + house-mode-override.json" : "");
   return { calendar, kidsWeek: kw, override: ov, sourceLabel: label };
@@ -314,25 +313,38 @@ export function nashvilleAt(events, config, t) {
 /** Banned on wall output (Dan/brief). Scan is case-insensitive and word-bounded. */
 export const BANNED_PATTERNS = [
   { id: "custody", re: /\bcustody\b/i },
-  { id: "dollar", re: /\$\s?\d|\b\d+(?:\.\d{2})?\s?(?:dollars|bucks)\b|\bUSD\b/i },
+  { id: "$", re: /\$|\b\d+(?:\.\d{2})?\s?(?:dollars|bucks)\b|\bUSD\b/i },
+  { id: "jar", re: /\bjars?\b/i },
+  { id: "payout", re: /\bpay-?outs?\b|\bpayday\b/i },
   { id: "Erin", re: /\berin\b/i },
   { id: "legal", re: /\blegal\b/i },
   { id: "therapy", re: /\btherap(?:y|ist|ies)\b/i },
   { id: "Wells", re: /\bwells\b/i },
   { id: "balance", re: /\bbalances?\b/i },
   { id: "autopay", re: /\bauto-?pay\b/i },
+  { id: "their mom", re: /\btheir\s+moms?\b/i },
+  { id: "mom", re: /\bmoms?\b|\bmommy\b/i },
 ];
+/* Parent-mention ids: scrubbed by publicText() rather than dropping the whole event. */
+export const PARENT_IDS = ["mom", "their mom"];
+/* Public wall JSON style: no exclamation marks. */
+export const STYLE_PATTERNS = [{ id: "exclamation", re: /!/ }];
 /** Extra source-side excludes for the pickup chain (never even considered): work, health, money, legal, admin. */
-export const PICKUP_EXCLUDE_RE = /\b(custody|erin|legal|lawyer|attorney|court|mediat\w*|8332|therap\w*|counsel\w*|LPC|anxiety|psych\w*|doctor|dr\.?\s|clinic|appt|appointment|wells|balance|autopay|bill|payment|budget|ledger|harbor|cursor|wardos|atlas|work|invoice|tax)\b|\$\s?\d|^\s*(GET|REMIND|Atlas)\b\s*[·:]/i;
+export const PICKUP_EXCLUDE_RE = /\b(custody|erin|legal|lawyer|attorney|court|mediat\w*|8332|therap\w*|counsel\w*|LPC|anxiety|psych\w*|doctor|dr\.?\s|clinic|appt|appointment|wells|balances?|autopay|bill|payment|budget|ledger|harbor|cursor|wardos|atlas|work|invoice|tax|jars?|pay-?outs?|payday|allowance|reward)\b|\$|^\s*(GET|REMIND|Atlas)\b\s*[·:]/i;
 export function bannedHits(text) {
   const s = String(text == null ? "" : text);
   return BANNED_PATTERNS.filter((p) => p.re.test(s)).map((p) => p.id);
 }
-/** Recursively scan every string value (and key) in an object. */
+/** Public-data hits: banned words + style (no "!"). */
+export function publicHits(text) {
+  const s = String(text == null ? "" : text);
+  return bannedHits(s).concat(STYLE_PATTERNS.filter((p) => p.re.test(s)).map((p) => p.id));
+}
+/** Recursively scan every string value (and key) in an object for public-data hits. */
 export function scanObject(obj, path = "$") {
   const hits = [];
   const walk = (v, p) => {
-    if (typeof v === "string") { const h = bannedHits(v); if (h.length) hits.push({ path: p, hits: h, text: v }); }
+    if (typeof v === "string") { const h = publicHits(v); if (h.length) hits.push({ path: p, hits: h, text: v }); }
     else if (Array.isArray(v)) v.forEach((x, i) => walk(x, `${p}[${i}]`));
     else if (v && typeof v === "object") for (const k of Object.keys(v)) {
       const hk = bannedHits(k); if (hk.length) hits.push({ path: `${p}.${k}`, hits: hk, text: k });
@@ -342,13 +354,29 @@ export function scanObject(obj, path = "$") {
   walk(obj, path);
   return hits;
 }
-/** Wall voice: the kids' mother is "their mom". Leaves other people's moms ("Riley's mom") alone. */
-export function theirMom(text) {
-  return String(text || "").replace(/\b(?:the\s+)?(?:kids['’]\s+)?mom(['’]s)?\b/gi, (m, poss, idx, all) => {
-    const before = all.slice(Math.max(0, idx - 12), idx);
-    if (/(?:their|\w['’]s)\s+$/i.test(before)) return m; /* "their mom", "Riley's mom" stay */
-    return "their mom" + (poss || "");
-  });
+/** Public text: drop any parenthetical naming someone's parent ("Casey's (Riley's …)" -> "Casey's"),
+    drop "!", tidy spaces. Anything still banned after this is dropped by the caller, never published. */
+export function publicText(text) {
+  return String(text || "")
+    .replace(/\s*\([^)]*\b(?:moms?|mommy|mother|dad)\b[^)]*\)/gi, "")
+    .replace(/!+/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+/** "Kids away · back Fri 3:00" (weekday + time within 6 days, else with the date). */
+export function kidsAwayReason(spans, t) {
+  const next = spans.filter((s) => s.startMs > t).sort((a, b) => a.startMs - b.startMs)[0];
+  if (!next) return "Kids away";
+  const p = ctParts(next.startMs);
+  const hm = `${p.hh % 12 === 0 ? 12 : p.hh % 12}:${String(p.mm).padStart(2, "0")}`;
+  const day = next.startMs - t < 6 * 24 * 3600000 ? p.wd : `${p.wd} ${MON[p.m - 1]} ${p.d}`;
+  return `Kids away · back ${day} ${hm}`;
+}
+/** Sentence case: first letter upper-case. */
+export function sentence(s) {
+  const str = String(s || "");
+  const i = str.search(/[A-Za-z]/);
+  return i < 0 ? str : str.slice(0, i) + str.charAt(i).toUpperCase() + str.slice(i + 1);
 }
 
 /* ---------- kid mentions ---------- */

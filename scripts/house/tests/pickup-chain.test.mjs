@@ -20,6 +20,12 @@ test("school-day morning: kid rides only, in time order, with who/where/time/lea
   assert.equal(harris.leaveBy, "3:15 PM");
   const hayesCasey = out.rows.find((r) => r.by && r.by.startsWith("Casey"));
   assert.deepEqual(hayesCasey.who, ["Hayes"]);
+  assert.equal(hayesCasey.by, "Casey");
+  assert.equal(hayesCasey.what, "Casey picks up Hayes");
+  const casey = out.rows.find((r) => /at Casey's/.test(r.what));
+  assert.equal(casey.what, "Pick up Hayes at Casey's");
+  assert.equal(casey.where, "Casey's");
+  assert.doesNotMatch(JSON.stringify(out), /\bmoms?\b/i);
   assert.equal(hayesCasey.leaveBy, null); /* Dad's leave-by never pinned on someone else's pickup */
   const times = out.rows.map((r) => Date.parse(r.timeIso));
   assert.deepEqual(times, [...times].sort((a, b) => a - b));
@@ -37,7 +43,7 @@ test("gear comes from the event text; cancelled events are dropped", () => {
 test("never work, therapy, money, Erin, legal, admin, Dan-only, or another family's kid", () => {
   const out = run("2026-10-01T07:00:00-05:00");
   const blob = JSON.stringify(out);
-  for (const bad of [/therapy/i, /anxiety/i, /erin/i, /legal/i, /\$\s?\d/, /wells/i, /autopay/i, /balance/i, /cursor/i, /work call/i, /GET ·/, /Johnson/i, /gift/i]) {
+  for (const bad of [/therapy/i, /anxiety/i, /erin/i, /legal/i, /\$/, /\bjars?\b/i, /payout/i, /wells/i, /autopay/i, /balance/i, /cursor/i, /work call/i, /GET ·/, /Johnson/i, /gift/i, /\bmom\b/i, /!/]) {
     assert.doesNotMatch(blob, bad);
   }
 });
@@ -66,5 +72,5 @@ test("empty on non-school days and while the kids are with their mom", () => {
   assert.deepEqual(run("2026-10-09T07:00:00-05:00").rows, []);       /* Fri, AHH no school */
   const away = run("2026-10-05T07:00:00-05:00");                      /* Mon, their mom's week */
   assert.deepEqual(away.rows, []);
-  assert.equal(away.reason, "Kids are with their mom");
+  assert.equal(away.reason, "Kids away · back Fri 3:00");
 });

@@ -18,6 +18,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   MODES, MANUAL_ONLY, kidsHomeSpans, kidsHomeAt, schoolDayInfo, dismissalFor, asCalendar, windowMs, calendarWarnings,
   nashvilleAt, ctDate, ctWallMs, addDays, parseHM, fmtWhen, fmtTime, ctIso, readJson, writeJson, scanObject, loadInputs as loadAll,
+  kidsAwayReason,
 } from "./house/lib.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -48,17 +49,14 @@ export function modeAt(ctx, t) {
   const { events, spans, kidsWeek, config, override } = ctx;
   const spansKnown = ctx.spansKnown !== false;
   const ov = activeOverride(override, t);
-  if (ov) return { mode: ov.mode, reason: `Set by hand until ${fmtWhen(ov.untilMs)}` };
+  if (ov) return { mode: ov.mode, reason: `Set by hand · until ${fmtWhen(ov.untilMs)}` };
 
   /* Kids home beats Nashville week: once a 'Kids with Dan' span covers now, travel week is over. */
   const kidsHome = spansKnown && kidsHomeAt(spans, t);
   if (!kidsHome) {
     const trip = nashvilleAt(events, config, t);
-    if (trip) return { mode: "nashville-week", reason: `Dan's Nashville travel week (all-day calendar event, through ${fmtWhen(trip.endMs - 60000).replace(/, .*$/, "")})` };
-    if (spansKnown) {
-      const next = spans.filter((s) => s.startMs > t).sort((a, b) => a.startMs - b.startMs)[0];
-      return { mode: "kids-away", reason: "Kids are with their mom" + (next ? `; back with Dad ${fmtWhen(next.startMs)}` : "") };
-    }
+    if (trip) return { mode: "nashville-week", reason: `Nashville week · through ${fmtWhen(trip.endMs - 60000).replace(/, .*$/, "")}` };
+    if (spansKnown) return { mode: "kids-away", reason: kidsAwayReason(spans, t) };
   }
 
   const today = ctDate(t);
@@ -70,17 +68,17 @@ export function modeAt(ctx, t) {
   if (!info.school) {
     const wkend = info.weekday === "Sat" || info.weekday === "Sun";
     const mode = wkend ? "weekend" : "day-off";
-    const why = wkend ? "Weekend" : "No school on the calendar";
-    return { mode, reason: evening ? `${why} tomorrow (after ${fmtTime(bedMs)} bedtime)` : why };
+    const why = wkend ? "Weekend" : "Day off · no school";
+    return { mode, reason: evening ? (wkend ? "Weekend tomorrow" : "Day off tomorrow · no school") : why };
   }
   if (!evening) {
     const dis = dismissalFor(events, kidsWeek, today, config);
     if (t >= dis.ms) {
-      return { mode: "after-school", reason: `School day; after dismissal ${fmtTime(dis.ms)} (${dis.source}) until ${fmtTime(bedMs)} bedtime` + (info.earlyRelease ? "; early release day (time not on calendar)" : "") };
+      return { mode: "after-school", reason: `After school · until ${fmtTime(bedMs)}` + (info.earlyRelease ? " · early release, time not on calendar" : "") };
     }
-    return { mode: "school-day", reason: `School day; dismissal ${fmtTime(dis.ms)} (${dis.source})` + (info.earlyRelease ? "; early release day (time not on calendar)" : "") };
+    return { mode: "school-day", reason: `School day · dismissal ${fmtTime(dis.ms)}` + (info.earlyRelease ? " · early release, time not on calendar" : "") };
   }
-  return { mode: "school-day", reason: `School night: tomorrow is a school day (after ${fmtTime(bedMs)} bedtime)` };
+  return { mode: "school-day", reason: "School night · school tomorrow" };
 }
 
 /** Find the edge of the current mode by stepping, then refine to the minute. Bounded by calendar coverage. */
@@ -121,11 +119,11 @@ export function computeHouseMode({ calendar, kidsWeek, config, override, now, so
     untilMs = edgeOf(ctx, t, cur.mode, +1, cov);
   }
 
-  if (kidsWeek && kidsWeek.asOfIso && kidsWeek.asOfIso !== ctDate(t)) warnings.push("kids-week.json asOfIso is not today");
+  if (kidsWeek && kidsWeek.asOfIso && kidsWeek.asOfIso !== ctDate(t)) warnings.push("Kids-week data is not from today");
   /* Cross-check: kids-week homeWeek.endIso should be the end of the active Kids with Dan span when kids are home. */
   if (kidsWeek && kidsWeek.homeWeek && kidsWeek.homeWeek.endIso && kidsHomeAt(spans, t)) {
     const active = spans.find((s) => s.startMs <= t && t < s.endMs);
-    if (active && Date.parse(kidsWeek.homeWeek.endIso) !== active.endMs) warnings.push("kids-week homeWeek.endIso disagrees with calendar");
+    if (active && Date.parse(kidsWeek.homeWeek.endIso) !== active.endMs) warnings.push("Kids-week homeWeek.endIso disagrees with calendar");
   }
 
   const out = {
@@ -135,7 +133,7 @@ export function computeHouseMode({ calendar, kidsWeek, config, override, now, so
     until: ctIso(untilMs),
     asOfIso: ctDate(t),
     generatedAt: ctIso(t),
-    source: sourceLabel || "calendar (Kids with Dan + all-day travel + no-school events) + data/kids-week.json + config/house-mode.config.json",
+    source: sourceLabel || "Calendar (read-only) + kids-week.json + config/house-mode.config.json",
     reason: cur.reason,
     warnings,
   };

@@ -21,15 +21,17 @@ test("pack flags: kid + text + createdAt, cleared at end of CT day, banned text 
   assert.equal(p.flags.length, 1);
   assert.deepEqual(Object.keys(p.flags[0]), ["kid", "text", "createdAt"]);
   p = addPackFlag(p, "Hayes", "bring $20", at("2026-10-01T07:11:00-05:00"));
+  p = addPackFlag(p, "Hayes", "reward jar", at("2026-10-01T07:11:00-05:00"));
+  p = addPackFlag(p, "Hayes", "ask their mom", at("2026-10-01T07:11:00-05:00"));
   p = addPackFlag(p, "Theo", "cleats", at("2026-10-01T07:11:00-05:00"));
   assert.equal(p.flags.length, 1);
   assert.equal(packFlagsFor(p, at("2026-10-01T23:59:00-05:00")).flags.length, 1);
   assert.equal(packFlagsFor(p, at("2026-10-02T00:00:00-05:00")).flags.length, 0);
 });
 
-test("temps: all null 'awaiting Dan' -> no bands -> thermostat light can't flag", () => {
+test("temps: all null 'Awaiting Dan' -> no bands -> thermostat light can't flag", () => {
   const temps = readJson(path.join(ROOT, "data/house-mode-temps.json"));
-  assert.equal(temps.note, "awaiting Dan");
+  assert.equal(temps.note, "Awaiting Dan");
   assert.equal(Object.keys(temps.modes).length, 8);
   assert.equal(temps.modes["day-off"].label, "Day off");
   assert.ok(Object.values(temps.modes).every((m) => m.heatSetpoint === null && m.coolSetpoint === null));
@@ -46,7 +48,7 @@ test("thermostat light integration with Wright's stub: no flag while temps are n
   const mode = { id: "after-school", label: "After school" };
   const light = W.thermoLight(sensi, { mode, bands: bandsFromTemps(temps), now });
   assert.equal(light.ok, true);
-  assert.equal(light.text, "73°, After school");
+  assert.equal(light.text, "73° · after school");
   const flagged = W.thermoLight(sensi, { mode, bands: bandsFromTemps({ modes: { "after-school": { heatSetpoint: 70 } } }), now });
   assert.equal(flagged.ok, false);
 });

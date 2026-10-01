@@ -37,6 +37,9 @@ export function calendar(extra = []) {
       timed("Dan — Hayes Johnson gift $150 pickup", "2026-10-01T12:00:00-05:00", "2026-10-01T12:15:00-05:00", { location: "Home, 6719 W 147th Terrace" }),
       timed("GET · Pick up Harris form for school", "2026-10-01T12:30:00-05:00", "2026-10-01T12:45:00-05:00", { location: "Home, 6719 W 147th Terrace" }),
       timed("Hayes pickup — Wells autopay balance run", "2026-10-01T13:00:00-05:00", "2026-10-01T13:15:00-05:00", { location: "Bank, 3 St" }),
+      timed("Hayes reward jar payout pickup", "2026-10-01T14:10:00-05:00", "2026-10-01T14:20:00-05:00", { location: "Home, 6719 W 147th Terrace" }),
+      timed("Harris pickup from their mom's house", "2026-10-01T14:15:00-05:00", "2026-10-01T14:25:00-05:00", { location: "Their mom's, 1 St" }),
+      timed("Ainsley ride to swim!", "2026-10-01T14:30:00-05:00", "2026-10-01T14:45:00-05:00", { location: "Pool, 1 St" }),
       timed("Cursor work call — Harris carpool sync", "2026-10-01T14:00:00-05:00", "2026-10-01T14:30:00-05:00", { location: "Zoom" }),
       /* kids-away day: rides on Dan's calendar during their mom's week are not Dad's chain */
       timed("Hayes + Harris — SRE drop-off · 8:25", "2026-10-05T08:10:00-05:00", "2026-10-05T08:40:00-05:00", { location: "Sunset Ridge Elementary, 14901 England St" }),

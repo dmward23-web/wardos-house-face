@@ -8,7 +8,9 @@
    - Kid/family logistics only. Never work, therapy/health, money, Erin, legal, admin (GET/REMIND/Atlas) items.
    - Only rows while the kids are with Dad (calendar "Kids with Dan" span); their mom's rides aren't Dad's chain.
    - Cancelled events dropped. Rows whose event already ended are dropped.
-   - The kids' mother is "their mom". Text is rebuilt from the event, never the description.
+   - Public text never names anyone's parent: "(Riley's …)"-style parentheticals are dropped and any row still
+     hitting the banned list is not published. Kids-away reason = "Kids away · back Fri 3:00". Text is rebuilt
+     from the event title, never the description. Sentence case, no "!".
    - gear only if the event text names it; leaveBy only if the text says "leave H:MM" or the event start
      is earlier than the stated time (repo convention: kids-week leaveBys.note "event START = leave-by").
 
@@ -22,7 +24,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs, loadInputs, DEFAULTS as HM_DEFAULTS } from "./house-mode.mjs";
 import {
   asCalendar, calendarWarnings, kidsHomeSpans, kidsHomeAt, schoolDayInfo, ctDate, ctParts, ctWallMs, parseHM,
-  fmtTime, ctIso, readJson, writeJson, scanObject, bannedHits, PICKUP_EXCLUDE_RE, theirMom, kidsIn,
+  fmtTime, ctIso, readJson, writeJson, scanObject, bannedHits, PICKUP_EXCLUDE_RE, PARENT_IDS, publicText, kidsAwayReason, sentence, kidsIn,
 } from "./house/lib.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -62,7 +64,7 @@ function leaveText(text, startMs) {
   return cands.sort((a, b) => Math.abs(a - startMs) - Math.abs(b - startMs))[0];
 }
 function placeOf(location) {
-  const first = String(location || "").split(",")[0].trim();
+  const first = publicText(String(location || "").split(",")[0]);
   if (!first) return null;
   if (/^Home$/i.test(first) || /^\d+ W 147th/i.test(first)) return "Home";
   return first;
@@ -78,7 +80,7 @@ function cleanWhat(seg) {
   s = s.replace(/^\s*(?:Hayes|Harris|Ainsley)\s+(?=[a-z])/, "");                          /* "Ainsley swim — …" */
   s = s.replace(/\s*·\s*\d{1,2}:\d{2}\s*$/, "");                                    /* trailing "· 3:40" */
   s = s.trim();
-  return theirMom(s.charAt(0).toUpperCase() + s.slice(1));
+  return sentence(publicText(s));
 }
 function byOf(seg) {
   if (/^\s*(Pick\s*up|Drop)\b/i.test(seg)) return "Dad"; /* imperative on Dad's own calendar = Dad's ride (RIDES LAW) */
@@ -87,7 +89,7 @@ function byOf(seg) {
   const who = m[1].trim();
   if (/^(Dan|Dad)$/i.test(who)) return "Dad";
   if (kidsIn(who).length) return null;
-  return theirMom(who);
+  return sentence(publicText(who));
 }
 
 export function computePickupChain({ calendar, kidsWeek, config, now, sourceLabel }) {
@@ -114,7 +116,8 @@ export function computePickupChain({ calendar, kidsWeek, config, now, sourceLabe
     if (e.allDay || e.cancelled || e.startDate !== today) continue;
     if (e.endMs <= t) continue;
     const full = `${e.summary} ${e.location}`;
-    if (PICKUP_EXCLUDE_RE.test(e.summary) || PICKUP_EXCLUDE_RE.test(e.location) || bannedHits(full).length) continue;
+    /* content bans drop the event; a parent-mention alone is scrubbed (publicText), then re-scanned per row */
+    if (PICKUP_EXCLUDE_RE.test(e.summary) || PICKUP_EXCLUDE_RE.test(e.location) || bannedHits(full).some((h) => !PARENT_IDS.includes(h))) continue;
     if (/^\s*Dan\s*[—–-]/i.test(e.summary)) continue;                /* Dan's own items */
     if (!kidsIn(e.summary).length) continue;                         /* kid logistics only */
     const isRide = RIDE_RE.test(e.summary);
@@ -155,7 +158,7 @@ export function computePickupChain({ calendar, kidsWeek, config, now, sourceLabe
   }
   rows.sort((a, b) => Date.parse(a.timeIso) - Date.parse(b.timeIso));
   const reason = rows.length ? `${rows.length} kid ride${rows.length === 1 ? "" : "s"} left today`
-    : (!homeAt(t) ? "Kids are with their mom" : "No kid rides left today");
+    : (!homeAt(t) ? kidsAwayReason(spans, t) : "No kid rides left today");
   const out = { ...base, rows, reason };
   const hits = scanObject(out);
   if (hits.length) throw new Error("pickup-chain output failed wall-safe scan: " + JSON.stringify(hits));

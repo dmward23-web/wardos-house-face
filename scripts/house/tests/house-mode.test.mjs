@@ -82,12 +82,12 @@ test("sources: cal-live wins on the same event; 'Kids with Dan' comes from the b
   const liveOnly = buildCalendar([{ name: "data/cal-live.json", data: calLive, window: { from: "2026-09-25", to: "2026-10-08" } }]);
   const lo = computeHouseMode({ calendar: liveOnly, kidsWeek: KIDS_WEEK, config: CONFIG, now: at("2026-10-01T17:45:00-05:00") });
   assert.notEqual(lo.mode, "kids-away");
-  assert.ok(lo.warnings.some((w) => /Kids away not evaluated/.test(w)));
+  assert.ok(lo.warnings.some((w) => /kids away not evaluated/.test(w)));
   /* window: explicit cal-live window ends Oct 8 (inclusive) */
   const ok = computeHouseMode({ calendar: liveOnly, kidsWeek: KIDS_WEEK, config: CONFIG, now: at("2026-10-01T17:45:00-05:00") });
   assert.ok(!ok.warnings.some((w) => /now\+7d/.test(w)), "Oct 1 + 7d = Oct 8 is inside");
   const late = computeHouseMode({ calendar: liveOnly, kidsWeek: KIDS_WEEK, config: CONFIG, now: at("2026-10-02T00:30:00-05:00") });
-  assert.ok(late.warnings.some((w) => /calendar window 2026-09-25\.\.2026-10-08 does not reach now\+7d \(2026-10-09\)/.test(w)));
+  assert.ok(late.warnings.some((w) => /Calendar window 2026-09-25\.\.2026-10-08 does not reach now\+7d \(2026-10-09\)/.test(w)));
   /* inferred window for a dump with no explicit bounds */
   const far = computeHouseMode({ calendar: calendar(), kidsWeek: KIDS_WEEK, config: CONFIG, now: at("2026-10-20T12:00:00-05:00") });
   assert.ok(far.warnings.some((w) => /does not reach now\+7d/.test(w)));
@@ -117,13 +117,18 @@ test("dismissal falls back to 3:00 PM when the data has none", () => {
   assert.equal(m(c, "2026-10-29T15:00:00-05:00"), "after-school");
 });
 
-test("kids away = outside every 'Kids with Dan' span; reason says 'their mom'", () => {
+test("kids away = outside every 'Kids with Dan' span; reason is 'Kids away · back <day> <time>'", () => {
   const c = ctx();
   assert.equal(m(c, "2026-10-02T14:59:00-05:00"), "school-day");
   assert.equal(m(c, "2026-10-02T15:00:00-05:00"), "kids-away");
   const r = modeAt(c, at("2026-10-06T10:00:00-05:00"));
   assert.equal(r.mode, "kids-away");
-  assert.match(r.reason, /their mom/);
+  assert.equal(r.reason, "Kids away · back Fri 3:00");
+  assert.doesNotMatch(r.reason, /\bmom\b/i);
+  const far = modeAt(c, at("2026-10-02T15:30:00-05:00"));            /* return 6+ days out -> with date */
+  assert.equal(far.reason, "Kids away · back Fri Oct 9 3:00");
+  const none = modeAt(ctx(calendar()), at("2026-11-02T10:00:00-06:00")); /* no next span in data */
+  assert.equal(none.reason, "Kids away");
 });
 
 test("Oct 2–12 2026 Nashville trip never triggers Nashville week (config exclusion)", () => {

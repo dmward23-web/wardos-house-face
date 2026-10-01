@@ -1,5 +1,5 @@
 {
-  "note": "awaiting Dan",
+  "note": "Awaiting Dan",
   "units": "F",
   "toleranceF": null,
   "rule": "Targets per house mode. All null = no band = the thermostat-vs-mode light never flags. A light flags only for a mode whose target is set.",
