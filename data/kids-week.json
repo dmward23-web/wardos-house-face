@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 1 2026",
   "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-01T21:34:46.260Z",
+  "refreshedAt": "2026-10-01T21:46:00.648Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,31 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "4:25",
-    "place": "Ainsley swim — Coach Ann",
-    "detailHtml": "6:20 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "time": "6:20",
+    "place": "Pick up Hayes at Casey's (Riley's mom)",
+    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Thu",
-    "startIso": "2026-10-01T21:25:00.000Z",
-    "endIso": "2026-10-01T23:20:00.000Z",
-    "kind": "sport",
+    "startIso": "2026-10-01T23:20:00.000Z",
+    "endIso": "2026-10-01T23:55:00.000Z",
+    "kind": "leave",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "4:25",
-        "place": "Ainsley swim — Coach Ann",
-        "detailHtml": "6:20 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T21:25:00.000Z",
-        "endIso": "2026-10-01T23:20:00.000Z",
-        "kind": "sport",
-        "whenLabel": "4:25",
-        "summary": "Ainsley swim — Coach Ann · 5:00 practice"
-      },
       {
         "label": "Next up · today",
         "time": "6:20",
         "place": "Pick up Hayes at Casey's (Riley's mom)",
-        "detailHtml": "4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-01T23:20:00.000Z",
         "endIso": "2026-10-01T23:55:00.000Z",
@@ -168,6 +156,18 @@
         "kind": "other",
         "whenLabel": "Sat 5:00",
         "summary": "Hayes birthday — J. Alexander's · 5:30 · leave 5:00"
+      },
+      {
+        "label": "Next up · Sun",
+        "time": "8:30",
+        "place": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · ga…",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Sun",
+        "startIso": "2026-10-04T13:30:00.000Z",
+        "endIso": "2026-10-04T15:00:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Sun 8:30",
+        "summary": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00"
       }
     ]
   },
