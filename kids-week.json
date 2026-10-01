@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 1 2026",
   "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-01T23:21:04.188Z",
+  "refreshedAt": "2026-10-01T23:30:49.249Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,27 +16,15 @@
     "endIso": "2026-10-02T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "6:20",
-    "place": "Pick up Hayes at Casey's (Riley's mom)",
+    "label": "Next up · Fri",
+    "time": "7:00",
+    "place": "SRE specials: No Specials",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-    "badge": "Thu",
-    "startIso": "2026-10-01T23:20:00.000Z",
-    "endIso": "2026-10-01T23:55:00.000Z",
-    "kind": "leave",
+    "badge": "Fri",
+    "startIso": "2026-10-02T12:00:00.000Z",
+    "endIso": "2026-10-02T12:15:00.000Z",
+    "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "6:20",
-        "place": "Pick up Hayes at Casey's (Riley's mom)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T23:20:00.000Z",
-        "endIso": "2026-10-01T23:55:00.000Z",
-        "kind": "leave",
-        "whenLabel": "6:20",
-        "summary": "Pick up Hayes at Casey's (Riley's mom)"
-      },
       {
         "label": "Next up · Fri",
         "time": "7:00",
@@ -168,6 +156,18 @@
         "kind": "sport",
         "whenLabel": "Sun 8:30",
         "summary": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "7:00",
+        "place": "SRE specials: Music",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-05T12:00:00.000Z",
+        "endIso": "2026-10-05T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Mon 7:00",
+        "summary": "Harris — SRE specials: Music"
       }
     ]
   },
@@ -790,22 +790,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "THU · 4:25",
-        "what": "AINSLEY SWIM — COACH ANN",
+        "when": "FRI · 12:00",
+        "what": "LKMS BABY PIC DUE · 3PM",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "THU",
-          "4:25"
+          "FRI",
+          "12:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Thu · 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -815,12 +808,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Thu 1 · leave 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Tue 6 · leave 5:00",
           "what": "Ainsley swim — Coach Ann",
@@ -958,11 +945,6 @@
       ],
       "week": [
         {
-          "when": "Thu 1 · 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "tone": "hot"
-        },
-        {
           "when": "Thu 1 · 6:20",
           "what": "Pick up Hayes at Casey's (Riley's mom)",
           "tone": "hot"
@@ -1075,6 +1057,11 @@
         {
           "when": "Wed 7 · 7:00",
           "what": "SRE specials: PE + Library (tennis shoes, library book)",
+          "tone": "act"
+        },
+        {
+          "when": "Wed 7 · 7:00",
+          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act"
         }
       ]
