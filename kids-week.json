@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 1 2026",
   "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-01T13:31:14.981Z",
+  "refreshedAt": "2026-10-01T13:41:12.196Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,43 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "7:00",
-    "place": "SRE specials: Spanish + Library checkout",
-    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "time": "3:00",
+    "place": "LKMS Homework Help",
+    "detailHtml": "3:15 boys pickup · 4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Thu",
-    "startIso": "2026-10-01T12:00:00.000Z",
-    "endIso": "2026-10-01T12:15:00.000Z",
+    "startIso": "2026-10-01T20:00:00.000Z",
+    "endIso": "2026-10-01T21:00:00.000Z",
     "kind": "school",
     "queue": [
       {
         "label": "Next up · today",
-        "time": "7:00",
-        "place": "SRE specials: Spanish + Library checkout",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T12:00:00.000Z",
-        "endIso": "2026-10-01T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:00",
-        "summary": "Harris — SRE specials: Spanish + Library checkout"
-      },
-      {
-        "label": "Next up · today",
-        "time": "7:00",
-        "place": "SRE specials: Art",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T12:00:00.000Z",
-        "endIso": "2026-10-01T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:00",
-        "summary": "Hayes — SRE specials: Art"
-      },
-      {
-        "label": "Next up · today",
         "time": "3:00",
         "place": "LKMS Homework Help",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "3:15 boys pickup · 4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-01T20:00:00.000Z",
         "endIso": "2026-10-01T21:00:00.000Z",
@@ -65,7 +41,7 @@
         "label": "Next up · today",
         "time": "3:15",
         "place": "Boys SRE pickup",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-01T20:15:00.000Z",
         "endIso": "2026-10-01T21:00:00.000Z",
@@ -77,7 +53,7 @@
         "label": "Next up · today",
         "time": "4:25",
         "place": "Ainsley swim — Coach Ann",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-01T21:25:00.000Z",
         "endIso": "2026-10-01T23:20:00.000Z",
@@ -89,7 +65,7 @@
         "label": "Next up · today",
         "time": "4:55",
         "place": "Hayes baseball — Falcons vs Lions (home)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-01T21:55:00.000Z",
         "endIso": "2026-10-02T00:20:00.000Z",
@@ -101,7 +77,7 @@
         "label": "Next up · today",
         "time": "4:55",
         "place": "Cover — Hayes baseball 5:30 · Casey",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-01T21:55:00.000Z",
         "endIso": "2026-10-02T00:20:00.000Z",
@@ -113,7 +89,7 @@
         "label": "Next up · today",
         "time": "7:15",
         "place": "Scheels with Hayes + Harris",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-02T00:15:00.000Z",
         "endIso": "2026-10-02T01:00:00.000Z",
@@ -168,6 +144,30 @@
         "kind": "leave",
         "whenLabel": "Fri 9:00",
         "summary": "Dan DRIVE → Nashville · leave 9:00 after SRE · arrive ~5:30"
+      },
+      {
+        "label": "Next up · Fri",
+        "time": "9:00",
+        "place": "SRE field trip (museum + Meadowbrook)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-02T14:00:00.000Z",
+        "endIso": "2026-10-02T19:00:00.000Z",
+        "kind": "school",
+        "whenLabel": "Fri 9:00",
+        "summary": "Hayes — SRE field trip (museum + Meadowbrook)"
+      },
+      {
+        "label": "Next up · Fri",
+        "time": "11:30",
+        "place": "SRE Tailgate Party (reading incentive)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-02T16:30:00.000Z",
+        "endIso": "2026-10-02T17:30:00.000Z",
+        "kind": "school",
+        "whenLabel": "Fri 11:30",
+        "summary": "Harris — SRE Tailgate Party (reading incentive)"
       }
     ]
   },
@@ -301,22 +301,15 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "THU · 7:00",
-        "what": "SRE SPECIALS: SPANISH + LIBRARY CHECKOUT",
+        "when": "THU · 8:10",
+        "what": "SRE DROP-OFF",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "THU",
-          "7:00"
+          "8:10"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Thu · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Thu · 8:10",
@@ -361,12 +354,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Thu 1 · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Thu 1 · 8:10",
           "what": "SRE drop-off",
@@ -583,22 +570,15 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "THU · 7:00",
-        "what": "SRE SPECIALS: ART",
+        "when": "THU · 8:10",
+        "what": "SRE DROP-OFF",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "THU",
-          "7:00"
+          "8:10"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Thu · 7:00",
-          "what": "SRE specials: Art",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Thu · 8:10",
@@ -633,6 +613,13 @@
           "what": "⚾ Cover — Hayes baseball 5:30 · Casey",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "kind": "event",
+          "when": "Thu · 7:15",
+          "what": "Scheels with Hayes + Harris",
+          "hint": "",
+          "tone": "act"
         }
       ],
       "sports": [
@@ -668,12 +655,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Thu 1 · 7:00",
-          "what": "SRE specials: Art",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Thu 1 · 8:10",
           "what": "SRE drop-off",
@@ -1088,16 +1069,6 @@
       ],
       "week": [
         {
-          "when": "Thu 1 · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 1 · 7:00",
-          "what": "SRE specials: Art",
-          "tone": "act"
-        },
-        {
           "when": "Thu 1 · 8:10",
           "what": "SRE drop-off",
           "tone": "act"
@@ -1205,6 +1176,16 @@
         {
           "when": "Mon 5 · 3:00",
           "what": "LKMS Homework Help",
+          "tone": "act"
+        },
+        {
+          "when": "Mon 5 · 5:30",
+          "what": "Hayes baseball — Falcons vs KC Tigers (away)",
+          "tone": "hot"
+        },
+        {
+          "when": "Tue 6 · 7:00",
+          "what": "SRE spirit day: Tropical Day (Peace Week)",
           "tone": "act"
         }
       ]

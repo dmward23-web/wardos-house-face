@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-01T13:31:15.394Z",
+  "fetchedAt": "2026-10-01T13:41:12.603Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-08",
@@ -16,26 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "hv5k8kthnlieaqu6juv0g2hbrg",
-      "summary": "Harris — SRE specials: Spanish + Library checkout",
-      "start": "2026-10-01",
-      "end": "2026-10-01",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true,
-      "pinnedUntil": "8:40"
-    },
-    {
-      "id": "taurkhbv4smljpq3vjbb1tvfh8",
-      "summary": "Hayes — SRE specials: Art",
-      "start": "2026-10-01",
-      "end": "2026-10-01",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true,
-      "pinnedUntil": "8:40"
-    },
     {
       "id": "i8fc6622krmqu3crieoub95v48",
       "summary": "Cursor setup with Atlas · 9:00",
