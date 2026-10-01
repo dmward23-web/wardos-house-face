@@ -1,0 +1,197 @@
+/* ============================================================
+   WARDOS · tokens-wall-kiosk27.css · tip WALLKIT1 (branch wall-redesign-1)
+   27" LANDSCAPE wall kiosk scaffold. NOT LINKED by any live page.
+   Double opt-in: landscape media query AND body.wall-kiosk class.
+   Phones (440x956 portrait) and every live sheet are untouched.
+   HUBCMD DNA only: --cmd-* atoms from tokens-hub-command-deck-shared.css
+   (fallbacks inline). No second palette. Nothing loud. No cam feed.
+   Plan: docs/wall-redesign/KIOSK-27.md · final placement waits on Prism plate.
+   ============================================================ */
+
+@media (orientation: landscape) and (min-width: 1600px) and (min-aspect-ratio: 3/2) {
+
+  body.wall-kiosk {
+    /* type scale · 1920 basis, clamps up to 2560 */
+    --wk-fs-hero:   clamp(96px, 5.833vw, 150px);  /* 112 @1920 · NEXT UP time */
+    --wk-fs-glance: clamp(60px, 3.75vw, 96px);    /*  72 @1920 · chip / next up / who-home */
+    --wk-fs-tile:   clamp(34px, 2.083vw, 54px);   /*  40 @1920 · tile names */
+    --wk-fs-line:   clamp(26px, 1.5625vw, 40px);  /*  30 @1920 · status / loops / sublines */
+    --wk-fs-min:    clamp(20px, 1.146vw, 30px);   /*  22 @1920 · floor */
+    --wk-tap: 96px;
+    --wk-gap: 24px;
+    --wk-gap-lg: 32px;
+    --wk-radius: 20px;
+
+    --wk-void:    var(--cmd-void, #010205);
+    --wk-ink:     var(--cmd-ink, #f6f9fd);
+    --wk-mute:    var(--cmd-mute, rgba(170, 195, 220, 0.48));
+    --wk-amber:   var(--cmd-amber, #ffc040);
+    --wk-amber-hi:var(--cmd-amber-hi, #ffe8a0);
+    --wk-amber-on:var(--cmd-amber-on, #f0a818);
+    --wk-border:  var(--cmd-border, rgba(255, 190, 64, 0.55));
+    --wk-glass:   var(--cmd-glass, linear-gradient(165deg, rgba(8,10,16,0.98) 0%, rgba(18,14,6,0.94) 48%, rgba(4,6,12,0.98) 100%));
+
+    margin: 0;
+    max-width: 100vw;
+    overflow-x: hidden;
+    overflow-y: auto;            /* every board scrolls (Dan, Oct 1) · vertical only */
+    overscroll-behavior: contain;
+    background-color: var(--wk-void);
+    color: var(--wk-ink);
+    font-size: var(--wk-fs-line);
+    -webkit-text-size-adjust: 100%;
+  }
+  html:has(body.wall-kiosk) { overflow-x: hidden; max-width: 100vw; }
+
+  body.wall-kiosk *,
+  body.wall-kiosk *::before,
+  body.wall-kiosk *::after { box-sizing: border-box; }
+
+  /* ---------- grid: three bands + status strip ---------- */
+  body.wall-kiosk .wk-wall {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      "top top top top top top top top top top top top"
+      "mid mid mid mid mid mid mid mid mid mid mid mid"
+      "act act act act act act act act act act act act"
+      "status status status status status status status status status status status status";
+    gap: var(--wk-gap);
+    padding: var(--wk-gap-lg);
+    min-height: 100vh;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  body.wall-kiosk .wk-wall > * { min-width: 0; overflow-wrap: anywhere; }
+
+  body.wall-kiosk .wk-band-top {
+    grid-area: top;
+    position: sticky; top: 0; z-index: 2;   /* glance never scrolls away */
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: var(--wk-gap-lg);
+    min-height: 18vh;
+    padding: var(--wk-gap) var(--wk-gap-lg);
+    border-radius: var(--wk-radius);
+    border: 1px solid var(--wk-border);
+    background: var(--wk-glass);
+  }
+  body.wall-kiosk .wk-band-mid { grid-area: mid; }
+  body.wall-kiosk .wk-band-act {
+    grid-area: act;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--wk-gap);
+    min-height: 30vh;
+    align-content: end;          /* kid height · lower half */
+  }
+  body.wall-kiosk .wk-status { grid-area: status; }
+
+  /* ---------- top band atoms ---------- */
+  body.wall-kiosk .wk-mode-chip {
+    overflow-wrap: normal;
+    font-size: var(--wk-fs-glance);
+    font-weight: 850;
+    line-height: 1;
+    padding: 0.18em 0.5em;
+    border-radius: 999px;
+    border: 2px solid var(--wk-border);
+    color: var(--wk-amber-hi);
+    white-space: nowrap;
+  }
+  body.wall-kiosk .wk-next { display: flex; align-items: baseline; gap: 0.4em; min-width: 0; }
+  body.wall-kiosk .wk-next-time {
+    font-size: var(--wk-fs-hero);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    color: var(--wk-amber-hi);
+    white-space: nowrap;
+    overflow-wrap: normal;
+    flex: 0 0 auto;
+  }
+  body.wall-kiosk .wk-next-what {
+    font-size: var(--wk-fs-glance);
+    font-weight: 750;
+    line-height: 1.05;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+  body.wall-kiosk .wk-who-home { font-size: var(--wk-fs-tile); font-weight: 750; color: var(--wk-ink); white-space: nowrap; }
+  body.wall-kiosk .wk-stale-dot {
+    width: 0.5em; height: 0.5em; border-radius: 50%;
+    font-size: var(--wk-fs-line);
+    background: var(--wk-amber-on);
+  }
+  body.wall-kiosk .wk-stale-dot[hidden] { display: none; }
+
+  /* ---------- actuators: big targets, not menus ---------- */
+  body.wall-kiosk .wk-act {
+    min-height: var(--wk-tap);
+    min-width: var(--wk-tap);
+    padding: 0.4em 0.8em;
+    font: inherit;
+    font-size: var(--wk-fs-tile);
+    font-weight: 800;
+    color: var(--wk-ink);
+    background: var(--wk-glass);
+    border: 2px solid var(--wk-border);
+    border-radius: var(--wk-radius);
+    touch-action: manipulation;
+  }
+  body.wall-kiosk .wk-act:disabled,
+  body.wall-kiosk .wk-act[aria-disabled="true"] { opacity: 0.45; }
+
+  /* ---------- status lights + open loops: quiet lines ---------- */
+  body.wall-kiosk .wk-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wk-gap) var(--wk-gap-lg);
+    align-items: center;
+    font-size: var(--wk-fs-line);
+    color: var(--wk-mute);
+  }
+  body.wall-kiosk .wk-status:empty { display: none; }
+  body.wall-kiosk .wk-light { display: inline-flex; align-items: center; gap: 0.4em; min-height: 64px; color: var(--wk-mute); text-decoration: none; }
+  body.wall-kiosk .wk-light::before {
+    content: ""; width: 0.42em; height: 0.42em; border-radius: 50%;
+    background: var(--wk-amber); opacity: 0.55; flex: 0 0 auto;
+  }
+  body.wall-kiosk .wk-light[data-ok="false"] { color: var(--wk-amber-hi); font-weight: 750; }
+  body.wall-kiosk .wk-light[data-ok="false"]::before { opacity: 1; }
+  body.wall-kiosk .wk-light[hidden],
+  body.wall-kiosk .wk-loops[hidden] { display: none; }
+  body.wall-kiosk .wk-loops { display: flex; flex-wrap: wrap; gap: var(--wk-gap); list-style: none; margin: 0; padding: 0; }
+  body.wall-kiosk .wk-loops:empty { display: none; }
+  body.wall-kiosk .wk-loop { font-size: var(--wk-fs-line); color: var(--wk-mute); }
+  body.wall-kiosk .wk-loop b { color: var(--wk-amber-hi); font-weight: 750; }
+
+  /* ---------- listening pip (one-shot "Hey Atlas") ---------- */
+  body.wall-kiosk .wk-pip {
+    position: fixed; right: var(--wk-gap-lg); top: var(--wk-gap-lg); z-index: 3;
+    display: inline-flex; align-items: center; gap: 0.4em;
+    font-size: var(--wk-fs-min);
+    color: var(--wk-amber-hi);
+    pointer-events: none;        /* never covers or blocks a tile */
+  }
+  body.wall-kiosk .wk-pip[hidden],
+  body.wall-kiosk .wk-pip[data-state="idle"] { display: none; }
+  body.wall-kiosk .wk-pip::before {
+    content: ""; width: 0.9em; height: 0.9em; border-radius: 50%;
+    border: 3px solid var(--wk-amber);
+  }
+  body.wall-kiosk .wk-pip[data-state="listening"]::before { animation: wk-pip-breathe 1.8s ease-in-out infinite; }
+  body.wall-kiosk .wk-pip[data-state="thinking"] { opacity: 0.7; }
+  body.wall-kiosk .wk-pip[data-state="done"] { opacity: 0.85; }
+  @keyframes wk-pip-breathe { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+}
+
+@media (orientation: landscape) and (min-width: 1600px) and (min-aspect-ratio: 3/2) and (prefers-reduced-motion: reduce) {
+  body.wall-kiosk .wk-pip::before { animation: none !important; }
+}
