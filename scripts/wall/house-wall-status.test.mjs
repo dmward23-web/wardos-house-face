@@ -36,7 +36,7 @@ const HM = (key, label, asOfIso = "2026-10-01", extra = {}) => ({ mode: key, lab
 t("house mode read (real schema)", () => assert.deepEqual(
   (({ key, label }) => ({ key, label }))(S.readHouseMode(HM("after-school", "After school"), { now: NOW })), { key: "after-school", label: "After school" }));
 t("all 8 Atlas keys known, incl. day-off", () => assert.deepEqual(S.MODE_KEYS, ["school-day", "after-school", "weekend", "day-off", "kids-away", "nashville-week", "guest", "quiet"]));
-t("kids-away label is always 'Kids away'", () => assert.equal(S.readHouseMode(HM("kids-away", "Mom week"), { now: NOW }).label, "Kids away"));
+t("kids-away label is always 'Kids away'", () => assert.equal(S.readHouseMode(HM("kids-away", "Custody-out"), { now: NOW }).label, "Kids away"));
 t("old guessed object shape no longer read", () => assert.equal(S.readHouseMode({ asOfIso: "2026-10-01", mode: { key: "weekend", label: "Weekend" } }, { now: NOW }), null));
 t("missing house-mode.json -> null", () => assert.equal(S.readHouseMode(null, { now: NOW }), null));
 t("other-day asOfIso -> null", () => assert.equal(S.readHouseMode(HM("school-day", "School day", "2026-09-30"), { now: NOW }), null));

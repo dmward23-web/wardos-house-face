@@ -1010,9 +1010,9 @@
       if (dollar) {
         if (bank.mustComplete === false) {
           var g = bank.mustGate || { done: 0, need: 0 };
-          return "Musts " + g.done + "/" + g.need + " · jar locked · Balance $" + bal;
+          return "Musts " + g.done + "/" + g.need + " · jar locked"; /* ALFREDP0-5: no balance on a kid surface */
         }
-        return "Balance $" + bal + " · This week $" + we + " · Jar $" + bank.toward + " / $" + bank.need;
+        return "This week $" + we + " · Jar $" + bank.toward + " / $" + bank.need; /* ALFREDP0-5: balance dropped */
       }
       return "week " + bank.toward + " / " + bank.need + " ★";
     }
@@ -1034,8 +1034,8 @@
     });
     var left = Math.max(0, bank.need - bank.toward);
     root.querySelectorAll("[data-bank-left]").forEach(function (el) {
-      if (bank.reached) el.textContent = "Jar full · $" + bank.need + " · Balance $" + bal;
-      else if (dollar) el.textContent = "$" + left + " left on jar · Balance $" + bal;
+      if (bank.reached) el.textContent = "Jar full · $" + bank.need;
+      else if (dollar) el.textContent = "$" + left + " left on jar";
       else el.textContent = left + " ★ to unlock";
     });
     root.querySelectorAll("[data-payday-chip]").forEach(function (el) {

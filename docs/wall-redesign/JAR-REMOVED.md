@@ -15,7 +15,8 @@ Ruling: no jar, balance, $x/$goal, payout or per-chore $ on the hallway panel. N
 Reward jar (`sheet-allowance.html`), Chores MUSTS (`sheet-chores.html`), Ainsley / Hayes / Harris (`kid-*.html`). People is now Dad Seat and Us together. The kid layer lives on the wall face instead (KIDLAYER3.md). `build_wall.py` filters these out, and `wall-guards.test.mjs` fails if any comes back.
 
 ## Still reachable (gaps, not my files or not in scope)
-- Hub: the "Show me the Money · Jars" tile, plus links to sheet-allowance and the kid pages.
+- Hub: the "Show me the Money · Jars" tile is **removed** (ALFREDP0-5, ~6:25 PM CT). The hub still links to the kid pages, which show jar `$` amounts ("$0 / $20", "+$").
+- "Balance $…" is stripped from kids-data.js and sheet-allowance (branch). **Ainsley's babysit `$15/hr` stays** (Dan: the one allowed exception, allowlisted in wall-guards).
 - Second hop: sheet-today links to allowance, chores and the kid pages.
 - "jar" wording on sheet-today, sheet-weekend and the hub.
 - Prism's `TILE-INVENTORY.md` still lists the Reward jar (Prism's file; not edited).

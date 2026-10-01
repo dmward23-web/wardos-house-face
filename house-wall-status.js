@@ -30,7 +30,7 @@
   var LOAD = "sheet-load-day.html";
   /* house-mode.json keys = Atlas's real schema (docs/wall-redesign/ATLAS-DATA-LANE.md, merged @ 4b288a4). */
   var MODE_KEYS = ["school-day", "after-school", "weekend", "day-off", "kids-away", "nashville-week", "guest", "quiet"];
-  var MODE_LABEL_FORCE = { "kids-away": "Kids away" }; /* ruling: never "Custody-out" / "Mom week" on the wall */
+  var MODE_LABEL_FORCE = { "kids-away": "Kids away" }; /* ruling: never "Custody-out" or a parent-week label on the wall; the file label is not shown for this key */
   var KID_NAMES = ["Ainsley", "Hayes", "Harris"];
   var TRAVEL_KEYS = ["nashville-week"];
 

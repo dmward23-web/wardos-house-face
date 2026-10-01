@@ -85,4 +85,50 @@ await t("v2 finish: no motion, hall flash config ships empty, pip parked", () =>
   assert.deepEqual(JSON.parse(read("config/wall-kid.config.json")).hallFlashLightIds, []);
   assert.match(wall, /id="w-pip"[^>]*data-state="off" hidden/);
 });
+await t("ALFREDP0-5: hub has no Show me the Money / Jars tile; kid surfaces show no Balance", () => {
+  assert.doesNotMatch(hub.replace(/<!--[\s\S]*?-->/g, ""), /Show me the Money|Kids jars on board|class="tile stars"/);
+  const kd = read("kids-data.js").replace(/var EMBEDDED = .*\n/, "");
+  assert.doesNotMatch(kd, /"Balance \$"|Balance \$" \+/);
+  assert.doesNotMatch(read("sheet-allowance.html"), /"Balance \$"\+/);
+});
+await t("$ allowlist: the ONLY rate tag allowed is Ainsley's babysit $15/hr (Dan, 6:27 PM CT)", () => {
+  const files = ["kids-data.js", "sheet-chores.html", "sheet-allowance.html", "kid-ainsley.html", "kid-hayes.html", "kid-harris.html", "sheet-index.html", "wall.html"];
+  let hits = 0;
+  for (const f of files) {
+    read(f).split("\n").forEach((line, i) => {
+      if (/var EMBEDDED = /.test(line)) return; // calendar/data snapshot, not render code
+      const rates = line.match(/\$\d+(?:\.\d+)?\s*\/\s*hr/g) || [];
+      rates.forEach((r) => {
+        assert.equal(r, "$15/hr", `${f}:${i + 1} unexpected rate ${r}`);
+        assert.match(line, /hire|babysit|addon-tag|earnOpt|ain-babysit/i, `${f}:${i + 1} $15/hr outside the babysit tag`);
+        hits++;
+      });
+    });
+  }
+  assert.ok(hits >= 3, "the babysit tag is kept (not stripped)");
+  assert.doesNotMatch(copy(wall), /\$/, "wall face itself shows no $ at all");
+});
+await t("timer + grocery never touch the Kasa lights or the flash", () => {
+  const code = wall.replace(/<!--[\s\S]*?-->/g, "");
+  const tb = code.slice(code.indexOf("FIVE UPGRADES #2"), code.indexOf("FIVE UPGRADES #3"));
+  assert.ok(tb.length > 200); assert.doesNotMatch(tb, /setLight|flash\.flash|HouseLights/);
+  const gb = code.slice(code.indexOf("FIVE UPGRADES #4"), code.indexOf('document.addEventListener("click", function (e) {\n    var t = e.target.closest ? e.target.closest("[data-sp]'));
+  assert.ok(gb.length > 200); assert.doesNotMatch(gb, /setLight|flash\.flash|href=|location\./);
+});
+await t("grocery tile hosts Ledger's house-grocery-list.js as-is; tile hidden by default; no link out", () => {
+  assert.match(wall, /<script src="house-grocery-list\.js"><\/script>/);
+  assert.match(wall, /id="w-groc"[^>]*hidden/);
+  const tile = wall.slice(wall.indexOf('id="w-groc"'), wall.indexOf("<!-- Ask pip"));
+  assert.doesNotMatch(tile, /<a |href=/);
+});
+await t("doors lamp + doorbell line: hidden, no reader, never a feed or still", () => {
+  assert.match(wall, /id="w-doors"[^>]*hidden><\/div>/); assert.match(wall, /id="w-bell"[^>]*hidden><\/div>/);
+  assert.doesNotMatch(wall.replace(/<!--[\s\S]*?-->/g, ""), /doors?-live\.json|doorbell[^"\n]*\.json|ring-live/);
+});
+await t("no hardcoded Mom in wall code or copy (data labels render as given)", () => {
+  const mine = ["wall.html", "house-wall-kid.js", "house-wall-panel.js", "house-wall-lists.js", "house-wall-actions.js", "tokens-wall-v2.css", "config/wall-kid.config.json"];
+  for (const f of mine) assert.doesNotMatch(read(f), /\bmom\b/i, f);
+  // house-wall-status.js keeps "mom" only inside PEOPLE_RE, the open-loops BLOCK filter (it hides such loops; it never prints the word)
+  read("house-wall-status.js").split("\n").forEach((l, i) => { if (/\bmom\b/i.test(l)) assert.match(l, /PEOPLE_RE = /, `house-wall-status.js:${i + 1}`); });
+});
 console.log(`wall-guards: ${n} tests PASS`);

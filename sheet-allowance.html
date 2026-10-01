@@ -865,7 +865,7 @@ document.addEventListener("DOMContentLoaded", function () {
  }
  var lab = document.querySelector('.bank.'+id+' .star-label');
  if (lab) {
- lab.textContent = "Balance $"+v.balance+" · Week $"+v.weekEarn+" · Jar $"+v.toward+"/$"+v.need;
+ lab.textContent = "Week $"+v.weekEarn+" · Jar $"+v.toward+"/$"+v.need; /* ALFREDP0-5: balance dropped */
  }
  });
  });

@@ -26,12 +26,53 @@
   </a>
 
   <div class="main">
-    <a class="mod next" id="w-next" href="sheet-today.html" data-band="top" data-glance="next-up" data-owner="Atlas" data-tile="next-up" data-tile-id="next-up" aria-label="Next up" hidden>
+    <div class="mod ctl" id="w-ctl" data-band="top" data-owner="Wright" data-tile="house-controls" data-tile-id="house-controls" aria-label="House controls">
+      <div class="cg cg-temp" id="w-thermo-act" data-owner="Wright" data-tile="temperature" data-tile-id="temperature">
+        <div class="cg-h"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6 Q15 3 18 3 Q21 3 21 6 V20 Q25 22 25 26 Q25 32 18 32 Q11 32 11 26 Q11 22 15 20 Z"/><path d="M18 12 V25"/></g></svg><span class="kick">Temperature</span><span class="cg-in" id="w-temp-in"></span></div>
+        <div class="sp-rows" id="w-sp-rows"></div>
+        <div class="note" id="w-sp-note"></div>
+        <button class="tap sm" id="w-travel"><span class="tx"><span id="w-travel-l"></span><small id="w-travel-s"></small></span></button>
+        <div class="note" id="w-travel-note"></div>
+      </div>
+      <div class="cg cg-lights" id="w-lts" data-owner="Wright" data-tile="kasa-lights" data-tile-id="kasa-lights">
+        <div class="cg-h"><span class="kick">Lights</span></div>
+        <div class="lt-row" id="w-lts-row"></div>
+      </div>
+      <div class="cg cg-house" id="w-house" data-owner="Wright" data-tile="scenes" data-tile-id="scenes">
+        <div class="cg-h"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17 L18 7 L30 17"/><path d="M10 15.5 V29 H26 V15.5"/><rect x="15" y="20" width="6" height="9" rx="1"/></g></svg><span class="kick">House</span></div>
+        <div class="stack">
+          <button class="tap sm" id="w-scene-home" data-scene="home"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17 L18 7 L30 17"/><path d="M10 15.5 V29 H26 V15.5"/><rect x="15" y="20" width="6" height="9" rx="1"/></g></svg><span class="tx"><span>I’m home</span><small></small></span></button>
+          <button class="tap sm" id="w-scene-leave" data-scene="leave"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="6" width="13" height="24" rx="1.5"/><path d="M17 18 H31"/><path d="M26 13 L31 18 L26 23"/></g></svg><span class="tx"><span>Leaving</span><small></small></span></button>
+        </div>
+        <div class="note" id="w-scene-note"></div>
+      </div>
+      <!-- Doors: a lamp only ("Doors ok" or the one that isn't). No door source exists on the box -> hidden, no reader. -->
+      <div class="cg cg-doors" id="w-doors" data-owner="Wright" data-tile="doors" data-tile-id="doors" hidden></div>
+      <!-- Doorbell: one text line (last ring time), never a feed or still. No ring source (Nest doorbell has no ring events in nest-live.json; no Ring) -> hidden, no reader. -->
+      <div class="cg cg-bell" id="w-bell" data-owner="Wright" data-tile="doorbell" data-tile-id="doorbell" hidden></div>
+    </div>
+
+    <div class="nextbar" id="w-nextbar" data-band="top">
+      <a class="mod next" id="w-next" href="sheet-today.html" data-band="top" data-glance="next-up" data-owner="Atlas" data-tile="next-up" data-tile-id="next-up" aria-label="Next up" hidden>
       <div class="lbl"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="13"/><path d="M15 11 L23 18 L15 25"/></g></svg><span class="kick">Next up</span></div>
       <div class="t" id="w-next-t"></div>
       <div class="w" id="w-next-w"></div>
       <div class="sub" id="w-next-sub"></div>
     </a>
+      <div class="mod leave" id="w-leave" data-owner="Atlas" data-tile="leave-by" data-tile-id="leave-by" hidden></div>
+      <div class="mod timer" id="w-timer" data-owner="Wright" data-tile="house-timer" data-tile-id="house-timer">
+        <div class="t-show" id="w-timer-show" hidden></div>
+        <div class="t-chips" id="w-timer-labels" role="group" aria-label="Timer label">
+          <button class="chip" data-timer-label="Oven">Oven</button><button class="chip" data-timer-label="Laundry">Laundry</button><button class="chip" data-timer-label="Bath">Bath</button>
+        </div>
+        <div class="t-chips" id="w-timer-mins" role="group" aria-label="Timer minutes">
+          <button class="chip" data-timer-min="5">5</button><button class="chip" data-timer-min="10">10</button><button class="chip" data-timer-min="15">15</button><button class="chip" data-timer-min="20">20</button><button class="chip" data-timer-min="30">30</button><button class="chip" data-timer-min="60">60</button><button class="chip" id="w-timer-clear" data-timer-clear hidden>Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mod school" id="w-school" data-owner="Atlas" data-tile="school-night" data-tile-id="school-night" hidden><span class="kick">School night</span><span id="w-school-row" style="display:contents"></span></div>
+
 
     <div class="mod chain" id="w-chain" data-owner="Atlas" data-tile="pickup-chain" data-tile-id="pickup-chain" aria-label="Pickup chain">
       <div class="ch-lbl"><span class="kick">Pickup<br>chain</span><span class="dies" id="w-chain-dies"></span></div>
@@ -41,6 +82,8 @@
     <div class="mod who" id="w-who" data-glance="who-home" data-owner="Atlas" data-tile="who-home" data-tile-id="who-home" aria-label="Who's home" hidden>
       <svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17 L18 7 L30 17"/><path d="M10 15.5 V29 H26 V15.5"/><rect x="15" y="20" width="6" height="9" rx="1"/></g></svg><span class="kick">Who&#39;s home</span><span id="w-who-row" style="display:contents"></span>
     </div>
+
+    <div class="mod ltaps" id="w-ltaps" data-owner="Atlas" data-tile="logistics-taps" data-tile-id="logistics-taps" hidden><span class="kick">Taps</span><span id="w-ltaps-row" style="display:contents"></span><span class="note">This screen only · nothing is sent</span></div>
 
     <div class="kids" id="w-kids" aria-label="Kids" hidden>
       <div class="mod kid" id="w-kid-ainsley" data-owner="Atlas" data-tile="kid-ainsley" data-tile-id="kid-ainsley" data-kid="ainsley">
@@ -68,25 +111,18 @@
     </div>
 
     <div class="acts" aria-label="Actuators">
-      <div class="mod act" id="w-house" data-owner="Wright" data-tile="scenes" data-tile-id="scenes">
-        <div class="ah"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17 L18 7 L30 17"/><path d="M10 15.5 V29 H26 V15.5"/><rect x="15" y="20" width="6" height="9" rx="1"/></g></svg><span class="kick">House</span><span class="gate">Lights</span></div>
-        <div class="stack">
-          <button class="tap" id="w-scene-home" data-scene="home"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17 L18 7 L30 17"/><path d="M10 15.5 V29 H26 V15.5"/><rect x="15" y="20" width="6" height="9" rx="1"/></g></svg><span class="tx"><span>I’m home</span><small></small></span></button>
-          <button class="tap" id="w-scene-leave" data-scene="leave"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="6" width="13" height="24" rx="1.5"/><path d="M17 18 H31"/><path d="M26 13 L31 18 L26 23"/></g></svg><span class="tx"><span>Leaving</span><small></small></span></button>
-        </div>
-        <div class="note" id="w-scene-note"></div>
-      </div>
-      <div class="mod act" id="w-thermo-act" data-owner="Wright" data-tile="thermo-travel" data-tile-id="thermo-travel" hidden>
-        <div class="ah"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6 Q15 3 18 3 Q21 3 21 6 V20 Q25 22 25 26 Q25 32 18 32 Q11 32 11 26 Q11 22 15 20 Z"/><path d="M18 12 V25"/></g></svg><span class="kick">Thermostat</span><span class="gate">Sensi</span></div>
-        <div class="stack">
-          <button class="tap" id="w-travel"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6 Q15 3 18 3 Q21 3 21 6 V20 Q25 22 25 26 Q25 32 18 32 Q11 32 11 26 Q11 22 15 20 Z"/><path d="M18 12 V25"/></g></svg><span class="tx"><span id="w-travel-l"></span><small id="w-travel-s"></small></span></button>
-        </div>
-        <div class="note" id="w-travel-note"></div>
-      </div>
       <div class="mod act" id="w-pack" data-owner="Atlas" data-tile="pack-flag" data-tile-id="pack-flag" hidden>
         <div class="ah"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 V32"/><path d="M10 6 H27 L23 12 L27 18 H10"/></g></svg><span class="kick">Pack</span><span class="gate">Today</span></div>
         <div class="flags" id="w-pack-flags"></div>
         <div class="note">Ride or gear flags. Clear at midnight.</div>
+      </div>
+      <div class="mod act groc" id="w-groc" data-owner="Ledger" data-tile="grocery" data-tile-id="grocery" hidden>
+        <div class="ah"><span class="kick">Groceries</span><span class="g-filter" role="group" aria-label="Store">
+          <button class="chip" data-groc-filter="all">All</button><button class="chip" data-groc-filter="costco">Costco</button></span></div>
+        <div class="g-list" id="w-groc-list"></div>
+        <div class="g-chips" id="w-groc-chips" aria-label="Add"></div>
+        <div class="g-picks" id="w-groc-picks" aria-label="Pick list" hidden></div>
+        <div class="g-foot"><button class="chip" id="w-groc-more" data-groc-more>More</button><button class="chip" id="w-groc-clear" data-groc-clear hidden>Clear checked</button></div>
       </div>
       <!-- Ask pip: PARKED (ruling Oct 1). Single state change only (off -> listening -> off), no loop; never shown while parked. -->
       <div class="mod act pip" id="w-pip" data-owner="Wright" data-tile="ask-pip" data-tile-id="ask-pip" data-state="off" hidden></div>
@@ -143,6 +179,9 @@
 <script src="house-wall-status.js"></script>
 <script src="house-wall-actions.js"></script>
 <script src="house-wall-kid.js"></script>
+<script src="house-wall-panel.js"></script>
+<script src="house-wall-lists.js"></script>
+<script src="house-grocery-list.js"></script>
 <script>
 (function () {
   "use strict";
@@ -178,6 +217,9 @@
     $("w-clock").innerHTML = esc(t[0]) + "<small>" + esc(t[1] || "") + "</small>";
     $("w-date").textContent = d.toLocaleDateString("en-US", { timeZone: TZ, weekday: "short", month: "short", day: "numeric" }).replace(",", "");
   }
+
+  var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) { /* */ } } };
 
   /* actions */
   var act = A.create({
@@ -216,11 +258,124 @@
   }
   $("w-travel").addEventListener("click", function () { act.tap().then(paintTravel); });
 
+  /* FIVE UPGRADES #1 · top-band controls (house-wall-panel.js) */
+  var P = window.HouseWallPanel, LS = window.HouseWallLists;
+  var sp = P.createSetpoint({
+    fetch: function (u, o) { return window.fetch(u, o); }, getToken: token, getBase: base,
+    getReading: function () { var st = act.state(); return st.liveAt ? st.th : null; }, /* the hub's live reading only (key) */
+    onReading: function (th, ts) { var st = act.state(); st.th = th; st.liveAt = ts || new Date().toISOString(); },
+    onChange: function () { paintTemp(); }
+  });
+  function paintTemp() {
+    var v = sp.view(), st = act.state();
+    var sf = feeds.sensi, sAge = sf ? Date.now() - (Date.parse(sf.updatedAt || sf.fetchedAt || "") || 0) : Infinity;
+    var amb = v.ambient != null ? v.ambient : (sf && sf.thermostat && sAge <= S.FRESH.sensi && typeof sf.thermostat.ambient === "number" ? sf.thermostat.ambient : null);
+    $("w-temp-in").textContent = amb != null ? amb + "\u00b0 inside" : "";
+    $("w-sp-rows").innerHTML = v.rows.map(function (r) {
+      return '<div class="sp-row' + (r.pending ? " is-pending" : "") + '"><button class="tap step" data-sp="' + r.side + '" data-d="-1" aria-label="' + r.label + ' down"' + (v.busy ? " disabled" : "") + '>\u2212</button>'
+        + '<span class="sp-v"><small>' + esc(r.label) + "</small>" + (r.value == null ? "" : esc(r.value) + "\u00b0") + "</span>"
+        + '<button class="tap step" data-sp="' + r.side + '" data-d="1" aria-label="' + r.label + ' up"' + (v.busy ? " disabled" : "") + ">+</button></div>";
+    }).join("");
+    $("w-sp-note").textContent = v.busy ? "sending" : (v.msg || (v.rows.length ? "" : v.reason));
+  }
+  function paintLightToggles() {
+    var eff = L && L.effectiveLights ? L.effectiveLights() : null;
+    var t = P.lightToggles(eff, !!token());
+    $("w-lts").hidden = !t.length;
+    $("w-lts-row").innerHTML = t.map(function (x) {
+      return '<button class="tap sm lt-t' + (x.on ? " is-on" : "") + '" data-light="' + esc(x.id) + '"' + (x.disabled ? " disabled" : "") + '><span class="tx"><span>' + esc(x.name) + "</span><small>" + esc(x.sub) + "</small></span></button>";
+    }).join("");
+  }
+  if (L && L.onChange) L.onChange(function () { paintLightToggles(); });
+
+  /* FIVE UPGRADES #2 · NEXT UP house timer (one object, per device, ends on the board only; never the Kasa lights) */
+  var timerLabel = null, timerEndShown = false;
+  function paintTimer() {
+    var v = P.timerView(store, Date.now());
+    var show = $("w-timer-show");
+    document.querySelectorAll("[data-timer-label]").forEach(function (b) { b.classList.toggle("is-on", b.getAttribute("data-timer-label") === timerLabel); });
+    $("w-timer-clear").hidden = !v;
+    if (!v) { show.hidden = true; $("w-timer").classList.remove("is-ended"); return; }
+    show.hidden = false; show.textContent = v.text;
+    if (v.ended && !timerEndShown) {
+      timerEndShown = true;
+      $("w-timer").classList.add("is-ended"); /* 2 s on-screen flash: one state change, no animation */
+      setTimeout(function () { P.clearTimer(store); timerEndShown = false; timerLabel = null; paintTimer(); }, 2000);
+    }
+  }
+  setInterval(paintTimer, 1000);
+
+  /* FIVE UPGRADES #3 · Atlas's four taps + school-night strip (hidden until ATLASLANE6 files exist) */
+  function paintTaps() {
+    var now = Date.now(), lt = LS.logisticsTaps(feeds.logistics, now);
+    $("w-ltaps").hidden = !lt;
+    if (!lt) return;
+    var last = LS.lastTaps(store, now);
+    $("w-ltaps-row").innerHTML = lt.taps.map(function (t) {
+      if (t.id === "running-late") return '<span class="lt-grp"><b>' + esc(t.label) + "</b>" + t.minutes.map(function (m) {
+        return '<button class="chip" data-ltap="running-late" data-min="' + m + '">' + m + " min</button>"; }).join("") + "</span>";
+      if (t.id === "check-in") return '<span class="lt-grp"><b>' + esc(t.label) + "</b>" + t.kids.map(function (k) {
+        var r = last["check-in:" + k]; return '<button class="chip' + (r ? " is-on" : "") + '" data-ltap="check-in" data-kid="' + esc(k) + '">' + esc(k) + "</button>"; }).join("") + "</span>";
+      var r = last[t.id];
+      return '<button class="tap sm' + (r ? " is-on" : "") + '" data-ltap="' + esc(t.id) + '"><span class="tx"><span>' + esc(t.label) + "</span><small>" + (r ? esc(ct(r.at) || "") : "") + "</small></span></button>";
+    }).join("");
+    var rl = last["running-late"];
+    if (rl) $("w-ltaps-row").insertAdjacentHTML("beforeend", '<span class="note">Running late \u00b7 ' + esc(rl.minutes) + " min \u00b7 " + esc(ct(rl.at) || "") + "</span>");
+  }
+  function paintSchool() {
+    var sn = LS.schoolNight(feeds.schoolNight, Date.now());
+    $("w-school").hidden = !sn;
+    $("w-school-row").innerHTML = sn ? sn.lines.map(function (l) { return '<span class="sn"><small>' + esc(l.k) + "</small>" + esc(l.v) + "</span>"; }).join("") : "";
+    var lv = LS.leaveLine(feeds.nextUp, Date.now());
+    $("w-leave").hidden = !lv;
+    $("w-leave").textContent = lv ? lv.copy : "";
+  }
+
+  /* FIVE UPGRADES #4 · grocery tile: Ledger's house-grocery-list.js (window.HouseGroceryList) hosted as-is */
+  var G = window.HouseGroceryList, groc = null, grocSeed = null, grocFilter = "all", grocMore = false;
+  var gStore = { getItem: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, setItem: function (k, v) { try { localStorage.setItem(k, v); } catch (e) { /* */ } }, removeItem: function (k) { try { localStorage.removeItem(k); } catch (e) { /* */ } } };
+  function paintGroc() {
+    if (!G || !feeds.grocery) { $("w-groc").hidden = true; groc = null; return; } /* file absent -> hidden */
+    if (!groc || grocSeed !== feeds.grocery) { groc = G.create({ seed: feeds.grocery, storage: gStore }); grocSeed = feeds.grocery; }
+    $("w-groc").hidden = false;
+    document.querySelectorAll("[data-groc-filter]").forEach(function (b) { b.classList.toggle("is-on", b.getAttribute("data-groc-filter") === grocFilter); });
+    var items = groc.filter(grocFilter);
+    $("w-groc-list").innerHTML = items.map(function (x) {
+      return '<button class="g-item' + (x.checked ? " is-checked" : "") + '" data-groc-toggle="' + esc(x.id) + '"><span class="mark" aria-hidden="true"></span>' + esc(x.name) + "</button>";
+    }).join("");
+    $("w-groc-list").hidden = !items.length; /* empty list: chips + pick list only, no placeholder */
+    $("w-groc-chips").innerHTML = groc.quickAdd().filter(function (c) { return grocFilter !== "costco" || c.store === "costco"; }).map(function (c) {
+      return '<button class="chip' + (c.onList ? " is-on" : "") + '" data-groc-add="' + esc(c.id) + '"' + (c.onList ? " disabled" : "") + ">+ " + esc(c.name) + "</button>";
+    }).join("");
+    $("w-groc-picks").hidden = !grocMore;
+    $("w-groc-picks").innerHTML = grocMore ? groc.pickList().map(function (c) {
+      return '<button class="chip' + (c.onList ? " is-on" : "") + '" data-groc-add="' + esc(c.id) + '"' + (c.onList ? " disabled" : "") + ">+ " + esc(c.name) + "</button>";
+    }).join("") : "";
+    $("w-groc-more").textContent = grocMore ? "Less" : "More";
+    $("w-groc-clear").hidden = !groc.list().some(function (x) { return x.checked; });
+  }
+
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest ? e.target.closest("[data-sp],[data-light],[data-timer-label],[data-timer-min],[data-timer-clear],[data-ltap],[data-groc-filter],[data-groc-add],[data-groc-toggle],[data-groc-more],[data-groc-clear]") : null;
+    if (!t || t.disabled) return;
+    if (t.hasAttribute("data-sp")) { sp.bump(t.getAttribute("data-sp"), Number(t.getAttribute("data-d"))); return; }
+    if (t.hasAttribute("data-light")) { P.toggleLight(L, L.effectiveLights(), t.getAttribute("data-light"), !!token()); paintLightToggles(); return; }
+    if (t.hasAttribute("data-timer-label")) { var l = t.getAttribute("data-timer-label"); timerLabel = timerLabel === l ? null : l; paintTimer(); return; }
+    if (t.hasAttribute("data-timer-min")) { P.setTimer(store, Number(t.getAttribute("data-timer-min")), timerLabel, Date.now()); timerEndShown = false; paintTimer(); return; }
+    if (t.hasAttribute("data-timer-clear")) { P.clearTimer(store); timerLabel = null; paintTimer(); return; }
+    if (t.hasAttribute("data-ltap")) { LS.logTap(store, t.getAttribute("data-ltap"), { kid: t.getAttribute("data-kid"), minutes: t.hasAttribute("data-min") ? Number(t.getAttribute("data-min")) : undefined }, Date.now()); paintTaps(); return; }
+    if (!groc) return;
+    if (t.hasAttribute("data-groc-filter")) grocFilter = t.getAttribute("data-groc-filter") === "costco" ? "costco" : "all";
+    else if (t.hasAttribute("data-groc-add")) groc.add(t.getAttribute("data-groc-add"));
+    else if (t.hasAttribute("data-groc-toggle")) groc.toggle(t.getAttribute("data-groc-toggle"));
+    else if (t.hasAttribute("data-groc-more")) grocMore = !grocMore;
+    else if (t.hasAttribute("data-groc-clear")) groc.clearChecked();
+    paintGroc();
+  });
+
 
   /* KID LAYER v3 (house-wall-kid.js). Per-device store; never house-checkoffs / house-bank / any jar. */
   var K = window.HouseWallKid;
-  var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
-    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) { /* */ } } };
   var kidCfg = {};
   var flash = K.createFlash({ config: kidCfg, lights: L, hasKey: function () { return !!token(); } });
   function loadKidCfg() {
@@ -362,6 +517,7 @@
     $("w-loops-empty").hidden = !!(loops && loops.length);
     $("w-loops-empty").textContent = S.openLoops ? "None" : "Not available right now";
     paintKids(mode);
+    paintTemp(); paintLightToggles(); paintTimer(); paintTaps(); paintSchool(); paintGroc();
     var src = [["cal-live", feeds.cal], ["sensi-live", feeds.sensi], ["nest-live", feeds.nest], ["lights-live", feeds.lights],
       ["house-mode", feeds.houseMode], ["pickup-chain", feeds.pickup], ["kid-seats", feeds.kidSeats], ["unlocks", feeds.unlocks]]
       .filter(function (x) { return x[1]; })
@@ -378,9 +534,9 @@
   }
   function load() {
     Promise.all(["cal-live.json", "sensi-live.json", "nest-live.json", "lights-live.json", "house-mode.json", "house-mode-temps.json",
-      "pickup-chain.json", "who-home.json", "pack-flags.json", "unlocks.json", "kid-seats.json"].map(get))
+      "pickup-chain.json", "who-home.json", "pack-flags.json", "unlocks.json", "kid-seats.json", "next-up.json", "logistics-taps.json", "school-night.json", "grocery-list.json"].map(get))
       .then(function (r) {
-        feeds = { cal: r[0], sensi: r[1], nest: r[2], lights: r[3], houseMode: r[4], temps: r[5], pickup: r[6], whoHome: r[7], pack: r[8], unlocks: r[9], kidSeats: r[10] };
+        feeds = { cal: r[0], sensi: r[1], nest: r[2], lights: r[3], houseMode: r[4], temps: r[5], pickup: r[6], whoHome: r[7], pack: r[8], unlocks: r[9], kidSeats: r[10], nextUp: r[11], logistics: r[12], schoolNight: r[13], grocery: r[14] };
         if (!act.state().liveAt && feeds.sensi && feeds.sensi.thermostat) act.state().th = feeds.sensi.thermostat;
         paint();
         if (act.hasKey()) act.refresh().then(paint); /* live reading + saved-capture flag from the hub (key only) */

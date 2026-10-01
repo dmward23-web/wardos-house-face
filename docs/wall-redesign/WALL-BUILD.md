@@ -46,3 +46,6 @@ Atlas's `scripts/house/tests/wall-state.test.mjs` test 26 expects the thermostat
 | Hub (`sheet-index.html`) | wall.html, with pickup chain + open loops on its face | 1 (`House panel · pickup · loops · gallery`) |
 | Hub | Gallery / Needs photo (wall rail badges) | 2 (hub → wall → badge). Before this the hub had no gallery link at all. |
 | wall.html | any rail board / Main board | 1 |
+
+## Update Oct 1 ~6:35 PM CT · FIVE UPGRADES
+See FIVE-UPGRADES.md. Old House and Thermostat actuator tiles moved into the top-band control panel. NEXT UP strip adds Atlas's leave-by line (hidden until next-up.json) and the house timer. Grocery tile = Ledger's module. Render: `wall-build-2560-v3.png`.
