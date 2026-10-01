@@ -30,6 +30,11 @@ html:not([data-export]) body.theme-harris .panel {
   height: auto !important;
   max-height: none !important;
   min-height: 1920px !important;
+  /* SCROLL4 (10/1) · panel was pinned to exactly the 1920 canvas, so a board
+     whose tiles fit (Ainsley ≈1720px) had scrollHeight == clientHeight on the
+     1080×1920 wall → zero scroll, swipe/wheel did nothing (Harris had 14px).
+     Always leave a 240px runway past the viewport so every kid board scrolls. */
+  min-height: max(1920px, calc(100vh + 240px)) !important;
   overflow: visible !important;
 }
 html:not([data-export]) body.theme-ainsley .body,
