@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 1 2026",
   "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-01T20:16:03.408Z",
+  "refreshedAt": "2026-10-01T20:28:33.995Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,31 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "3:15",
-    "place": "Boys SRE pickup",
-    "detailHtml": "4:25 Ainsley swim — Coach Ann · 6:35 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+    "time": "4:25",
+    "place": "Ainsley swim — Coach Ann",
+    "detailHtml": "6:20 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Thu",
-    "startIso": "2026-10-01T20:15:00.000Z",
-    "endIso": "2026-10-01T21:00:00.000Z",
-    "kind": "school_pickup",
+    "startIso": "2026-10-01T21:25:00.000Z",
+    "endIso": "2026-10-01T23:20:00.000Z",
+    "kind": "sport",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "3:15",
-        "place": "Boys SRE pickup",
-        "detailHtml": "4:25 Ainsley swim — Coach Ann · 6:35 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T20:15:00.000Z",
-        "endIso": "2026-10-01T21:00:00.000Z",
-        "kind": "school_pickup",
-        "whenLabel": "3:15",
-        "summary": "Dan picks up Harris — SRE pickup · 3:40 | Casey (Riley's mom) picks up Hayes; Hayes hangs at Casey's"
-      },
       {
         "label": "Next up · today",
         "time": "4:25",
         "place": "Ainsley swim — Coach Ann",
-        "detailHtml": "3:15 boys pickup · 6:35 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "6:20 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-01T21:25:00.000Z",
         "endIso": "2026-10-01T23:20:00.000Z",
@@ -51,14 +39,14 @@
       },
       {
         "label": "Next up · today",
-        "time": "6:35",
+        "time": "6:20",
         "place": "Pick up Hayes at Casey's (Riley's mom)",
-        "detailHtml": "3:15 boys pickup · 4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "detailHtml": "4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Thu",
-        "startIso": "2026-10-01T23:35:00.000Z",
-        "endIso": "2026-10-01T23:50:00.000Z",
+        "startIso": "2026-10-01T23:20:00.000Z",
+        "endIso": "2026-10-01T23:55:00.000Z",
         "kind": "leave",
-        "whenLabel": "6:35",
+        "whenLabel": "6:20",
         "summary": "Pick up Hayes at Casey's (Riley's mom)"
       },
       {
@@ -168,6 +156,18 @@
         "kind": "sport",
         "whenLabel": "Sat 1:00",
         "summary": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30"
+      },
+      {
+        "label": "Next up · Sat",
+        "time": "5:00",
+        "place": "Hayes birthday — J. Alexander's · 5:30",
+        "detailHtml": "8:30 leave · 1:00 Harris flag — vs BV Gardner (home) · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-03T22:00:00.000Z",
+        "endIso": "2026-10-04T00:30:00.000Z",
+        "kind": "other",
+        "whenLabel": "Sat 5:00",
+        "summary": "Hayes birthday — J. Alexander's · 5:30 · leave 5:00"
       }
     ]
   },
@@ -990,7 +990,7 @@
           "tone": "hot"
         },
         {
-          "when": "Thu · 6:35",
+          "when": "Thu · 6:20",
           "what": "Pick up Hayes at Casey's (Riley's mom)",
           "tone": "hot"
         }
@@ -1012,7 +1012,7 @@
           "tone": "hot"
         },
         {
-          "when": "Thu 1 · 6:35",
+          "when": "Thu 1 · 6:20",
           "what": "Pick up Hayes at Casey's (Riley's mom)",
           "tone": "hot"
         },

@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-01T20:16:03.822Z",
+  "fetchedAt": "2026-10-01T20:28:34.400Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-08",
@@ -28,9 +28,9 @@
     {
       "id": "tah8oji0ahni4old2cd1a6jb5k",
       "summary": "Pick up Hayes at Casey's (Riley's mom)",
-      "start": "2026-10-01T18:35:00-05:00",
-      "end": "2026-10-01T18:50:00-05:00",
-      "location": "Casey's house (Riley's mom) — street address unknown",
+      "start": "2026-10-01T18:20:00-05:00",
+      "end": "2026-10-01T18:55:00-05:00",
+      "location": "Casey's (Riley's mom), 9504 W 148th St, Overland Park, KS 66221",
       "busy": true,
       "allDay": false
     },
