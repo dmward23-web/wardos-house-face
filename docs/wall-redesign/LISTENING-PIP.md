@@ -1,31 +1,18 @@
-# LISTENING PIP · "Hey Atlas" one-shot · Wright wall keyword kit (plan only, nothing wired)
+# LISTENING PIP · "Hey Atlas" one-shot · **PARKED**
 
-Law (`grok-share-badge-ownership.txt:129-150`, `board-os/kits/mode-a/06b MODULE HITL wall box handoff.md:2,34`, Atlas profile VOICE LAW):
-"Hey Atlas" turns the ears on for **one utterance**, then off. Not "Atlas" by itself. On-device wake on the Beelink. Nothing leaves the column until the phrase hits. Then **one transcript → WardOS Voice Pipe** → mute. Atlas routes. No Voice bot, no rolling mic, no new personality, no hallway people-text. Wright owns the wall keyword kit + Shortcut / VOICE.md.
+**Status: PARKED** (redesign owner ruling, Thu Oct 1 2026). It's out of the build: no pip CSS in `tokens-wall-kiosk27.css`, no pip rule in `house-wall-status.js`.
+It comes back only when **both** are true: (1) a real event path exists from the wall's wake listener to the page, and (2) Dan gives his last-yes. Kid-safe voice also needs Alfred QAQC PASS before anything listening is called live.
 
-## States
+## What's known (kept for when it unparks)
 
-| State | Shows | Enters on | Leaves on |
-|---|---|---|---|
-| `idle` | **nothing** (pip `hidden`, no reserved space) | boot; `done` timeout; any error | wake phrase heard |
-| `listening` | small amber ring + the word `Listening` | on-device wake fires | end of the utterance (VAD) or a hard cap |
-| `thinking` | same pip, dim amber, `Sent` | transcript posted to Voice Pipe | Voice Pipe ack, or timeout |
-| `done` | `Got it` for a beat, then fade | ack | fade → `idle` |
+Law (`grok-share-badge-ownership.txt:129-150`, `board-os/kits/mode-a/06b MODULE HITL wall box handoff.md:2,34`): "Hey Atlas" = ears on for **one utterance**, then off. On-device wake on the Beelink → one transcript → WardOS Voice Pipe → mute. Atlas routes. No Voice bot, no rolling mic, no new personality, no hallway people-text.
 
-Rules: one pip, top band corner, never covers a tile, no sound, no modal, no LED ring change (`06b` "Never" list), `prefers-reduced-motion` = no pulse. **No transcript text on the glass** (no hallway people-text). Errors go silently back to `idle`. No error copy on the wall.
-Timings (utterance cap, thinking timeout, done beat): **UNKNOWN.** Dan or Atlas sets them; Wright won't invent them.
+| Piece | Status |
+|---|---|
+| WardOS Voice Pipe | Exists as a Grok automation (task `8321bf3c`), webhook input (`grok-share-badge-ownership.txt:77,97-119`) |
+| Voice Pipe webhook URL | UNKNOWN (`HITL-WALL-HANDOFF.cursor.md:22`) |
+| On-device wake | Not built (wall hardware HOLD) |
+| Repo speech code | None (`SHIP-ARTIFACT-GATE.cursor.md:47`) |
+| Event into the page | **None. This is what's blocking it.** |
 
-## Wiring found
-
-| Piece | Status | Evidence |
-|---|---|---|
-| WardOS Voice Pipe | **EXISTS** as a Grok automation (task `8321bf3c`), webhook input | `grok-share-badge-ownership.txt:77,97-119` |
-| Voice Pipe webhook URL | **UNKNOWN** (not on the box) | `HITL-WALL-HANDOFF.cursor.md:22` |
-| On-device wake on the Beelink | **NOT BUILT.** Wall hardware is on HOLD (`WALL-STATION.md` Plumb section) | `06b` module; `SHIP-ARTIFACT-GATE.cursor.md:47` ("off-repo ... UNKNOWN") |
-| Repo speech code | **NONE.** No `SpeechRecognition` / `speechSynthesis` in house-face | `SHIP-ARTIFACT-GATE.cursor.md:47` |
-| Event into the wall page | **NONE.** Proposal only: the wake helper on the Beelink fires a page event `wardos:pip` with `{state}` (kiosk-local, no network), or the existing house hub serves a read-only `GET /api/pip`. **Either one is a new interface, so it needs Atlas/Dan's yes. Not built** |
-| Hub reachability from the Beelink | UNKNOWN | `HITL-WALL-HANDOFF.cursor.md:24` |
-
-## Ship gate
-
-Kid-safe voice → Alfred QAQC PASS before anything spoken or listening is called live (brief + `05-5 Ship artifact gate`). The pip's CSS skeleton lives in `tokens-wall-kiosk27.css` (`.wk-pip[data-state]`), and no page uses it.
+Proposed states when unparked: `idle` (hidden) → `listening` → `thinking` → `done` → `idle`. No transcript text, no sound, no modal. Timings UNKNOWN.

@@ -1,8 +1,14 @@
-/* WALLKIT1 · house-wall-status.js · branch wall-redesign-1 · NOT WIRED.
-   No live page loads this file. Pure rules for the 27" wall status lights + open loops.
+/* WALLKIT1/3 · house-wall-status.js · branch wall-redesign-1 · loaded only by wall.html (branch, not deployed).
+   Pure rules for the 27" wall: next up, status lights, scenes, thermostat Travel, open loops.
    No DOM, no fetch, no timers, no writes. Every light returns null (= hidden) or {id, ok, text, href}.
-   Stale or missing data -> null. Never a placeholder. Never invents a scene, device, band, or cadence.
-   Plan: docs/wall-redesign/STATUS-LIGHTS.md + OPEN-LOOPS.md. Tests: scripts/wall/house-wall-status.test.mjs */
+   Stale or missing data -> null. Never a placeholder. Never invents a scene, device, band, cadence, or time.
+   Rulings Oct 1 (redesign owner): cams only (no doors) and hidden until a real per-camera check exists;
+   dragon has no line; pond hidden until a real source; travel week READ from data/house-mode.json only
+   (never inferred from the calendar); thermostat is a plain reading, no flag while temps are null;
+   Load day hidden until a live source with an as-of; listening pip PARKED; Home/Leaving = Dan's Kasa scenes
+   (no key -> NEED KEY, zero requests); thermostat Travel 55-85 / Back home (arm then confirm);
+   laundry = NEED TOKEN until an LG ThinQ PAT exists.
+   Plan: docs/wall-redesign/*.md. Tests: scripts/wall/house-wall-status.test.mjs */
 (function (root, factory) {
   var api = factory();
   if (typeof module === "object" && module.exports) module.exports = api;
@@ -16,11 +22,15 @@
     nest: 30 * 60 * 1000,        /* house-nest.js LIVE_FRESH_MS */
     sensi: 30 * 60 * 1000,       /* house-sensi.js LIVE_FRESH_MS */
     lights: 24 * 60 * 60 * 1000, /* house-lights.js LIVE_FRESH_MS */
-    cal: 6 * 60 * 60 * 1000      /* house-board-strip.js CAL_FRESH_MS */
+    cal: 6 * 60 * 60 * 1000,     /* house-board-strip.js CAL_FRESH_MS */
+    laundry: 30 * 60 * 1000,     /* ASSUMED kit default (mirrors Sensi/Nest polled feeds) · no laundry feed exists yet */
+    laundryTimer: 5 * 60 * 1000  /* ASSUMED: a remaining time older than this is not printed (never extrapolated) */
   };
   var HUB = "sheet-google-home.html";
   var LOAD = "sheet-load-day.html";
-  var TRAVEL_MODE = "Nashville week";
+  /* house-mode.json is Atlas's (branch wall-redesign-atlas, not yet on origin): key names ASSUMED until it lands. */
+  var MODE_KEYS = ["school-day", "after-school", "weekend", "kids-away", "nashville-week", "guest", "quiet"];
+  var TRAVEL_KEYS = ["nashville-week"];
 
   function nowMs(now) { return now == null ? Date.now() : (now instanceof Date ? now.getTime() : Number(now)); }
   function parse(iso) { if (!iso) return 0; var t = Date.parse(iso); return isFinite(t) ? t : 0; }
@@ -44,12 +54,13 @@
     return names[0] + " +" + (names.length - 1);
   }
 
-  /* 1 · Doors / cams. Label says "Cams" until a real door source exists. */
+  /* 1 · Cams only (doors not shown). Hidden until a real per-camera check exists:
+     every roster cam must carry online === true/false from a real check (SDM Connectivity or a proxy probe).
+     Today all cams report online:null, so this returns null. */
   function camsLight(nest, opts) {
     opts = opts || {};
-    var now = opts.now;
     if (!nest || nest.status !== "live" || nest.error) return null;
-    if (!fresh(nest.fetchedAt || nest.updatedAt, FRESH.nest, now)) return null;
+    if (!fresh(nest.fetchedAt || nest.updatedAt, FRESH.nest, opts.now)) return null;
     var cams = Array.isArray(nest.cameras) ? nest.cameras : [];
     if (!cams.length) return null;
     var byName = {};
@@ -58,36 +69,53 @@
     var bad = [], unknown = false;
     roster.forEach(function (n) {
       var c = byName[n];
-      if (!c || c.online === false) bad.push(shortCam(n));
+      if (!c) bad.push(shortCam(n));
+      else if (c.online === false) bad.push(shortCam(n));
       else if (c.online !== true) unknown = true;
     });
-    var doors = opts.doors; /* {ok:boolean, bad:[names], asOf, freshMs} or undefined (no source today) */
-    var doorsOk = null;
-    if (doors && fresh(doors.asOf, doors.freshMs, now)) {
-      if (Array.isArray(doors.bad) && doors.bad.length) bad = doors.bad.concat(bad);
-      else if (doors.ok === true) doorsOk = true;
-    }
+    if (unknown) return null; /* no real per-camera check -> hidden (never "OK" on null) */
     if (bad.length) return { id: "cams", ok: false, text: nameList(bad) + " offline", href: HUB };
-    if (unknown) return null; /* can't claim OK on online:null */
-    return { id: "cams", ok: true, text: doorsOk ? "Doors + cams OK" : "Cams OK", href: HUB };
+    return { id: "cams", ok: true, text: "Cams OK", href: HUB };
   }
 
-  /* 2 · Thermostat vs house mode. bands come from Dan; none ship. */
-  function inRange(v, r) { return !Array.isArray(r) || (typeof v === "number" && v >= r[0] && v <= r[1]); }
+  /* House mode · READ ONLY from data/house-mode.json (Atlas). Missing, unknown key, or stale -> null.
+     ASSUMED shape until Atlas's branch lands: {asOfIso, mode:{key,label}} or {asOfIso, key, label}. */
+  function readHouseMode(json, opts) {
+    opts = opts || {};
+    if (!json || typeof json !== "object") return null;
+    var m = json.mode && typeof json.mode === "object" ? json.mode : json;
+    var key = m && m.key, label = m && m.label;
+    if (MODE_KEYS.indexOf(key) < 0 || !label) return null;
+    if (json.asOfIso !== ctIso(nowMs(opts.now))) return null;
+    return { key: key, label: String(label) };
+  }
+  function isTravelWeek(mode) { return !!(mode && TRAVEL_KEYS.indexOf(mode.key) >= 0); }
+
+  /* 2 · Thermostat · plain reading "73° · school day". mode = readHouseMode(...) result.
+     temps = data/house-mode-temps.json (Atlas; values null today). A flag only appears when that mode's
+     band has real numbers: {heatSetpoint:[lo,hi]|null, coolSetpoint:[lo,hi]|null}. Null -> never flagged. */
+  /* Travel = the LIVE reading is Auto heat 55 / cool 85 (not a local flag). */
+  var TRAVEL_SET = { mode: "auto", heatSetpoint: 55, coolSetpoint: 85 };
+  function isTravelThermo(th) {
+    return !!th && String(th.mode || "").toLowerCase() === TRAVEL_SET.mode
+      && th.heatSetpoint === TRAVEL_SET.heatSetpoint && th.coolSetpoint === TRAVEL_SET.coolSetpoint;
+  }
+  function numRange(r) { return Array.isArray(r) && r.length === 2 && typeof r[0] === "number" && typeof r[1] === "number"; }
   function thermoLight(sensi, opts) {
     opts = opts || {};
     if (!sensi || sensi.status !== "live" || sensi.error || !sensi.thermostat) return null;
     if (!fresh(sensi.updatedAt, FRESH.sensi, opts.now)) return null;
     var th = sensi.thermostat;
     if (th.online === false) return { id: "thermo", ok: false, text: "Thermostat offline", href: HUB };
+    if (isTravelThermo(th)) return { id: "thermo", ok: true, travel: true, text: "Travel \u00b7 55\u201385", href: HUB };
     if (typeof th.ambient !== "number") return null;
     var mode = opts.mode && opts.mode.label ? opts.mode : null;
-    var text = th.ambient + "\u00b0" + (mode ? ", " + mode.label : "");
-    var band = mode && opts.bands ? opts.bands[mode.id || mode.label] : null;
+    var text = th.ambient + "\u00b0" + (mode ? " \u00b7 " + mode.label.toLowerCase() : "");
+    var band = mode && opts.temps ? opts.temps[mode.key] : null;
     if (band) {
-      var hvacOk = !Array.isArray(band.mode) || band.mode.indexOf(th.mode) >= 0;
-      var spOk = inRange(th.heatSetpoint, band.heatSetpoint) && inRange(th.coolSetpoint, band.coolSetpoint);
-      if (!hvacOk || !spOk) {
+      var bad = (numRange(band.heatSetpoint) && !(th.heatSetpoint >= band.heatSetpoint[0] && th.heatSetpoint <= band.heatSetpoint[1]))
+        || (numRange(band.coolSetpoint) && !(th.coolSetpoint >= band.coolSetpoint[0] && th.coolSetpoint <= band.coolSetpoint[1]));
+      if (bad) {
         var set = (th.heatSetpoint != null && th.coolSetpoint != null && /^auto$/i.test(th.mode))
           ? th.heatSetpoint + "\u2013" + th.coolSetpoint : String(th.setpoint != null ? th.setpoint : "");
         return { id: "thermo", ok: false, text: text + " \u00b7 check set " + set + "\u00b0", href: HUB };
@@ -108,31 +136,186 @@
     return null;
   }
 
-  /* 4 · Dragon + pond, travel-week mode only. care = {dragon:{fed:boolean, asOf}, pond:{filterOk:boolean, asOf}}.
-     fresh = {dragon: ms, pond: ms} must be given by Dan/Atlas; cadence is UNKNOWN so absent window -> hidden. */
+  /* 4 · Travel-week care. Dragon: NO line (ruling: hidden until it exists). Pond: hidden until a real source.
+     Gate = isTravelWeek(readHouseMode(house-mode.json)) only. pond = {filterOk:boolean, asOf, freshMs} from a
+     real source (none exists); freshMs must come with the source (cadence UNKNOWN) or the line stays hidden. */
   function travelLights(mode, care, opts) {
     opts = opts || {};
     var out = [];
-    if (!mode || mode.label !== TRAVEL_MODE || !care) return out;
-    var fw = opts.fresh || {};
-    var dg = care.dragon, pd = care.pond;
-    if (dg && typeof dg.fed === "boolean" && fresh(dg.asOf, fw.dragon, opts.now)) {
-      out.push({ id: "dragon", ok: dg.fed, text: dg.fed ? "Dragon fed" : "Dragon not fed", href: null });
-    }
-    if (pd && typeof pd.filterOk === "boolean" && fresh(pd.asOf, fw.pond, opts.now)) {
+    if (!isTravelWeek(mode) || !care) return out;
+    var pd = care.pond;
+    if (pd && typeof pd.filterOk === "boolean" && fresh(pd.asOf, pd.freshMs, opts.now)) {
       out.push({ id: "pond", ok: pd.filterOk, text: pd.filterOk ? "Pond filter OK" : "Pond filter not OK", href: null });
     }
     return out;
   }
 
+  /* 5 · Laundry (LG ThinQ Connect). Field names inside unit.state are LG's real device-state schema
+     (runState.currentState, timer.remainHour/remainMinute, remoteControlEnable.remoteControlEnabled,
+     operation.washerOperationMode / dryerOperationMode). The wrapper {status, fetchedAt, washer:{state}, dryer:{state}}
+     is a PROPOSED proxy shape (no feed exists). null / no token -> "NEED TOKEN". Stale -> hidden. */
+  var ACTIVE = ["RUNNING", "DETECTING", "SOAKING", "PREWASH", "RINSING", "SPINNING", "DRYING", "COOLING", "STEAM",
+    "STEAM_SOFTENING", "REFRESHING", "ADD_DRAIN", "RINSE_HOLD", "SMART_GRID_RUN", "CHANGE_CONDITION", "DISPLAY_LOADSIZE", "DETERGENT_AMOUNT"];
+  var DONE = ["END", "COMPLETE", "WRINKLE_CARE", "RUNNING_END"];
+  var IDLE = ["POWER_OFF", "INITIAL", "SLEEP", "STANDBY"];
+  function unitState(unit) {
+    if (!unit || !unit.state) return null;
+    var st = unit.state;
+    if (Array.isArray(st)) { /* location-list form: prefer MAIN */
+      var main = st.filter(function (x) { return x && x.location && x.location.locationName === "MAIN"; })[0];
+      st = main || st[0];
+    }
+    return st && typeof st === "object" ? st : null;
+  }
+  function runState(unit) {
+    var st = unitState(unit);
+    var v = st && st.runState && st.runState.currentState;
+    return v ? String(v).toUpperCase() : null;
+  }
+  function remainText(st) {
+    var t = st && st.timer;
+    if (!t || typeof t.remainHour !== "number" || typeof t.remainMinute !== "number") return null;
+    if (t.remainHour < 0 || t.remainMinute < 0 || t.remainMinute > 59) return null;
+    return t.remainHour + ":" + (t.remainMinute < 10 ? "0" : "") + t.remainMinute;
+  }
+  function unitText(name, unit, timerFresh) {
+    var rs = runState(unit);
+    if (!rs || IDLE.indexOf(rs) >= 0) return null;
+    if (DONE.indexOf(rs) >= 0) return { text: name + " DONE", ok: true };
+    if (rs === "PAUSE" || rs === "PAUSED") return { text: name + " paused", ok: true };
+    if (rs === "RESERVED") return { text: name + " delay start", ok: true };
+    if (rs === "ERROR" || rs === "POWER_FAIL") return { text: name + " error", ok: false };
+    if (ACTIVE.indexOf(rs) >= 0) {
+      var tt = timerFresh ? remainText(unitState(unit)) : null;
+      return { text: name + " " + (tt || "running"), ok: true }; /* never a made-up time */
+    }
+    return { text: name + " " + rs.toLowerCase().replace(/_/g, " "), ok: true }; /* honest raw state */
+  }
+  function laundryLight(laundry, opts) {
+    opts = opts || {};
+    if (!laundry || laundry.status === "need_token" || laundry.hasToken === false) {
+      return { id: "laundry", ok: false, need: true, text: "NEED TOKEN", href: HUB + "#laundry" };
+    }
+    if (laundry.status !== "live" || laundry.error) return null;
+    if (!fresh(laundry.fetchedAt, FRESH.laundry, opts.now)) return null;
+    var timerFresh = fresh(laundry.fetchedAt, FRESH.laundryTimer, opts.now);
+    var parts = [unitText("Washer", laundry.washer, timerFresh), unitText("Dryer", laundry.dryer, timerFresh)].filter(Boolean);
+    if (!parts.length) return null; /* both off / idle -> nothing to say */
+    return {
+      id: "laundry",
+      ok: parts.every(function (p) { return p.ok; }),
+      text: parts.map(function (p) { return p.text; }).join(" \u00b7 "),
+      href: HUB + "#laundry"
+    };
+  }
+  /* Controls for one unit ("washer" | "dryer"). No token -> every control disabled, sends:false (zero requests).
+     Start ONLY when the appliance reports remoteControlEnable.remoteControlEnabled === true (Remote Start armed).
+     Pause/Off also need the remote-control flag (ASSUMED; LG enforcement per model UNKNOWN). */
+  function laundryControls(laundry, unitKey, opts) {
+    opts = opts || {};
+    var off = { start: false, pause: false, off: false, sends: false };
+    if (!laundry || laundry.status !== "live" || laundry.hasToken === false || laundry.error) return Object.assign(off, { reason: "NEED TOKEN" });
+    if (!fresh(laundry.fetchedAt, FRESH.laundry, opts.now)) return Object.assign(off, { reason: "STALE" });
+    var unit = laundry[unitKey], st = unitState(unit), rs = runState(unit);
+    if (!st || !rs) return Object.assign(off, { reason: "NO UNIT" });
+    var armed = !!(st.remoteControlEnable && st.remoteControlEnable.remoteControlEnabled === true);
+    var active = ACTIVE.indexOf(rs) >= 0;
+    var c = { start: armed && !active, pause: armed && active, off: armed && rs !== "POWER_OFF" };
+    c.sends = c.start || c.pause || c.off;
+    c.reason = armed ? null : "REMOTE START OFF";
+    return c;
+  }
+
+  /* feeds: {nest, sensi, loadDay, care, laundry, houseMode (raw house-mode.json), temps (house-mode-temps.json)} */
   function statusStrip(feeds, opts) {
     feeds = feeds || {}; opts = opts || {};
+    var mode = readHouseMode(feeds.houseMode, { now: opts.now });
     var lights = [
-      camsLight(feeds.nest, { now: opts.now, roster: opts.roster, doors: feeds.doors }),
-      thermoLight(feeds.sensi, { now: opts.now, mode: opts.mode, bands: opts.bands }),
+      camsLight(feeds.nest, { now: opts.now, roster: opts.roster }),
+      thermoLight(feeds.sensi, { now: opts.now, mode: mode, temps: feeds.temps }),
       loadDayLight(feeds.loadDay, { now: opts.now })
-    ].concat(travelLights(opts.mode, feeds.care, { now: opts.now, fresh: opts.careFresh }));
+    ].concat(travelLights(mode, feeds.care, { now: opts.now }));
+    if ("laundry" in feeds) lights.push(laundryLight(feeds.laundry, { now: opts.now }));
     return lights.filter(Boolean);
+  }
+
+  /* NEXT UP from cal-live.json nextLeave. Hidden when the feed is not live, older than 6h, not today's,
+     or the event is all-day / already over / not today. Text is the calendar's own words (never rewritten). */
+  function clockParts(ms) {
+    var p = new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "numeric", minute: "2-digit" }).format(new Date(ms)).split(" ");
+    return { t: p[0], ap: p[1] || "" };
+  }
+  function nextUp(cal, opts) {
+    opts = opts || {};
+    var now = nowMs(opts.now);
+    if (!cal || cal.status !== "live" || cal.error) return null;
+    if (!fresh(cal.fetchedAt || cal.updatedAt, FRESH.cal, now)) return null;
+    if (cal.asOfIso !== ctIso(now)) return null;
+    var e = cal.nextLeave;
+    if (!e || e.allDay || !e.summary) return null;
+    var s = parse(e.start), en = parse(e.end);
+    if (!s || ctIso(s) !== ctIso(now)) return null;
+    if ((en || s) <= now) return null;
+    var where = e.location ? String(e.location).split(",")[0].trim() : "";
+    if (where && String(e.summary).toLowerCase().indexOf(where.toLowerCase()) >= 0) where = ""; /* already in the words */
+    return { time: clockParts(s).t, ampm: clockParts(s).ap, what: String(e.summary), where: where || null,
+      ends: en ? clockParts(en).t + " " + clockParts(en).ap : null, startIso: e.start };
+  }
+  /* Header stale dot: which PRESENT feeds are past their window (missing files are hidden tiles, not stale). */
+  function staleFeeds(feeds, opts) {
+    feeds = feeds || {}; opts = opts || {};
+    var out = [];
+    [["cal", "calendar"], ["sensi", "thermostat"], ["nest", "cams"], ["lights", "lights"]].forEach(function (k) {
+      var f = feeds[k[0]];
+      if (!f) return;
+      if (f.status !== "live" || !fresh(f.fetchedAt || f.updatedAt, FRESH[k[0]], opts.now)) out.push(k[1]);
+    });
+    return out;
+  }
+
+  /* Scenes (Dan, Oct 1). Kasa only, through the EXISTING lights write path (HouseLights.setLight).
+     Neither touches the Sensi. Kasa All on / All off stays as is and is not relabeled. Mode chips recall nothing. */
+  var SCENES = {
+    home: { id: "home", label: "I\u2019m home", writes: [{ id: "kitchen", on: true }, { id: "dining-room", on: true }] },
+    leave: { id: "leave", label: "Leaving", writes: [{ id: "dining-room", on: false }, { id: "harris-room", on: false }, { id: "kitchen", on: false }] }
+  };
+  function scenePlan(id) {
+    var sc = SCENES[id];
+    return sc ? sc.writes.map(function (w) { return { id: w.id, on: w.on }; }) : [];
+  }
+  /* hasKey = a lights key is saved on this screen. No key -> quiet NEED KEY, zero requests. */
+  function sceneButtons(opts) {
+    opts = opts || {};
+    return ["home", "leave"].map(function (id) {
+      var sc = SCENES[id];
+      return { id: id, label: sc.label, sub: opts.hasKey ? null : "NEED KEY", disabled: !opts.hasKey, sends: !!opts.hasKey };
+    });
+  }
+
+  /* Arm-then-confirm (no menu). First tap arms; a second tap within ARM_MS confirms; otherwise it disarms. */
+  var ARM_MS = 5000;
+  function armTap(arm, now) {
+    var t = nowMs(now);
+    if (arm && arm.armedAt != null && t - arm.armedAt >= 0 && t - arm.armedAt < ARM_MS) return { arm: null, fire: true };
+    return { arm: { armedAt: t }, fire: false };
+  }
+  function isArmed(arm, now) {
+    var t = nowMs(now);
+    return !!(arm && arm.armedAt != null && t - arm.armedAt >= 0 && t - arm.armedAt < ARM_MS);
+  }
+  /* Thermostat Travel button. th = live reading; saved = proxy says a prior setting is captured (true/false/null). */
+  function travelButton(th, opts) {
+    opts = opts || {};
+    var travel = isTravelThermo(th);
+    var armed = isArmed(opts.arm, opts.now);
+    var b = { action: travel ? "back" : "travel", label: travel ? "Back home" : "Travel", sub: null, armed: false, disabled: false, sends: false };
+    if (!opts.hasKey) { b.sub = "NEED KEY"; b.disabled = true; return b; }
+    if (!th || th.online === false) { b.disabled = true; return b; }
+    if (travel && opts.saved !== true) { b.sub = "no saved setting"; b.disabled = true; return b; }
+    b.armed = armed;
+    b.sends = armed; /* only a confirm (second tap) sends */
+    if (armed) b.label = travel ? "Tap again \u00b7 Back home" : "Tap again \u00b7 Travel 55\u201385";
+    return b;
   }
 
   /* ---------- open loops: max 3, house objects only ---------- */
@@ -180,9 +363,13 @@
   }
 
   return {
-    FRESH: FRESH, TRAVEL_MODE: TRAVEL_MODE,
-    camsLight: camsLight, thermoLight: thermoLight, loadDayLight: loadDayLight,
-    travelLights: travelLights, statusStrip: statusStrip,
+    FRESH: FRESH, MODE_KEYS: MODE_KEYS, TRAVEL_KEYS: TRAVEL_KEYS,
+    camsLight: camsLight, readHouseMode: readHouseMode, isTravelWeek: isTravelWeek,
+    thermoLight: thermoLight, loadDayLight: loadDayLight, travelLights: travelLights,
+    laundryLight: laundryLight, laundryControls: laundryControls,
+    SCENES: SCENES, scenePlan: scenePlan, sceneButtons: sceneButtons,
+    ARM_MS: ARM_MS, armTap: armTap, isArmed: isArmed, isTravelThermo: isTravelThermo, travelButton: travelButton,
+    statusStrip: statusStrip, nextUp: nextUp, staleFeeds: staleFeeds,
     isHouseLoop: isHouseLoop, openLoops: openLoops, lightLoops: lightLoops,
     _ctIso: ctIso
   };

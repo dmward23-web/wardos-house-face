@@ -24,6 +24,7 @@ import http from "node:http";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import * as sensi from "./sensi-control.mjs"; /* SENSICTL1 */
+import * as sensiTravel from "./sensi-travel.mjs"; /* TRAVEL1 · wall Travel / Back home */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -438,6 +439,27 @@ async function main() {
           return json(res, 200, { ok: true, thermostat: t, ts: new Date().toISOString() });
         } catch (e) {
           return json(res, 502, { ok: false, error: String(e.message || e) });
+        }
+      }
+
+      /* TRAVEL1 · wall thermostat Travel / Back home (Dan Oct 1). Prior setting saved box-side only
+         (~/.config/wardos/sensi-travel-restore.json, mode 600) BEFORE any write; never in Pages JSON. */
+      if (pathname === "/api/sensi/travel" && (req.method === "GET" || req.method === "POST")) {
+        const store = sensiTravel.fileStore();
+        try {
+          if (req.method === "GET") {
+            const st = await sensiTravel.travelStatus({ sensi, store });
+            return json(res, 200, { ok: true, ...st, ts: new Date().toISOString() });
+          }
+          const body = await readBody(req);
+          let out;
+          if (body.action === "travel") out = await sensiTravel.goTravel({ sensi, store });
+          else if (body.action === "back") out = await sensiTravel.goBack({ sensi, store });
+          else return json(res, 400, { ok: false, error: "action must be travel or back" });
+          console.log(`[sensi-travel] ${new Date().toISOString()} ${body.action} -> ${JSON.stringify(out.thermostat ? { mode: out.thermostat.mode, heat: out.thermostat.heatSetpoint, cool: out.thermostat.coolSetpoint } : out)}`);
+          return json(res, 200, { ...out, saved: !!store.load(), ts: new Date().toISOString() });
+        } catch (e) {
+          return json(res, e.status || 502, { ok: false, error: String(e.message || e), saved: !!store.load() });
         }
       }
 

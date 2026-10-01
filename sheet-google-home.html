@@ -107,6 +107,10 @@
   .ctrl.lights .ctrl-ico{background:linear-gradient(145deg,#ffe080,#c87810)}
   .ctrl.garage .ctrl-ico{background:linear-gradient(145deg,#90b0f0,#304878)}
   .ctrl.door .ctrl-ico{background:linear-gradient(145deg,#f0b070,#784028)}
+  /* LAUNDRY1 · LG washer + dryer · NEED TOKEN until a ThinQ PAT exists · controls send nothing */
+  .ctrl.laundry .ctrl-ico{background:linear-gradient(145deg,#a8d8e8,#2a6a88)}
+  .ctrl-row.laundry-row{grid-template-columns:1fr 1fr}
+  .ctrl.laundry .cmd-chip:disabled{opacity:0.45;cursor:not-allowed;pointer-events:none}
   .ctrl-title{font-size:16px;font-weight:800;letter-spacing:-0.02em}
   .ctrl-sub{font-size:12px;font-weight:650;color:#5a5e66}
   .ctrl-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
@@ -404,6 +408,45 @@
  <div class="ctrl-actions">
  <button type="button" class="cmd-rocker is-stub is-off" disabled aria-label="Door pads · need connect"><span class="cmd-rocker-knob"></span></button>
  <span class="ctrl-sub">Not connected yet</span>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <section class="sec-zone" aria-label="Laundry washer dryer" id="laundry">
+ <div class="zone-hdr">
+ <div class="zone-title">Laundry · washer · dryer</div>
+ <div class="zone-meta">NEED TOKEN · controls off</div>
+ </div>
+ <div class="ctrl-row laundry-row">
+ <div class="ctrl laundry cmd-panel is-need-connect" data-need-connect="1" data-laundry-unit="washer">
+ <div class="ctrl-top">
+ <div class="ctrl-ico" aria-hidden="true">🫧</div>
+ <div>
+ <div class="ctrl-title">Washer</div>
+ <div class="ctrl-sub">LG ThinQ</div>
+ </div>
+ <span class="need-connect-pill cmd-pill cmd-pill--need">NEED TOKEN</span>
+ </div>
+ <div class="ctrl-actions">
+ <button type="button" class="cmd-chip" disabled aria-disabled="true" data-laundry-op="start" aria-label="Washer start · needs Remote Start on the machine">Start</button>
+ <button type="button" class="cmd-chip" disabled aria-disabled="true" data-laundry-op="pause" aria-label="Washer pause">Pause</button>
+ <button type="button" class="cmd-chip" disabled aria-disabled="true" data-laundry-op="off" aria-label="Washer off">Off</button>
+ </div>
+ </div>
+ <div class="ctrl laundry cmd-panel is-need-connect" data-need-connect="1" data-laundry-unit="dryer">
+ <div class="ctrl-top">
+ <div class="ctrl-ico" aria-hidden="true">🌀</div>
+ <div>
+ <div class="ctrl-title">Dryer</div>
+ <div class="ctrl-sub">LG ThinQ</div>
+ </div>
+ <span class="need-connect-pill cmd-pill cmd-pill--need">NEED TOKEN</span>
+ </div>
+ <div class="ctrl-actions">
+ <button type="button" class="cmd-chip" disabled aria-disabled="true" data-laundry-op="start" aria-label="Dryer start · needs Remote Start on the machine">Start</button>
+ <button type="button" class="cmd-chip" disabled aria-disabled="true" data-laundry-op="pause" aria-label="Dryer pause">Pause</button>
+ <button type="button" class="cmd-chip" disabled aria-disabled="true" data-laundry-op="off" aria-label="Dryer off">Off</button>
  </div>
  </div>
  </div>

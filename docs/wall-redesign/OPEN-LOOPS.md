@@ -52,3 +52,7 @@ One line per loop, `--cmd-mute` object + `--cmd-amber-hi` state, no icons that s
 ## Needs
 
 - A house-object feed (maintenance + door/garage state). Owner UNKNOWN. Wright can build the reader once a source exists. Not invented.
+
+
+## In wall.html (Oct 1)
+No loop source is wired yet, so `openLoops([])` is empty and the row is **hidden** (owner ruling: hidden when empty). Plate samples (Tree trim / Garage sale / Cleaners) are not copied.

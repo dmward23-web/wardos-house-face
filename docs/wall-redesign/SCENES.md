@@ -5,9 +5,15 @@ Law: the wall recalls EXISTING scenes only. It never invents a scene, routine, o
 
 ## Bottom line
 
+> **Update Thu Oct 1 ~5:40 PM CT · Dan defined the two wall scenes (Kasa only):**
+> **Leaving** = all Kasa OFF (Dining Room, Harris's Room, Kitchen). **I'm home** = Kitchen + Dining Room ON.
+> Neither touches the Sensi. Both go through the EXISTING Kasa client (`HouseLights.setLight(id,{on})`, `house-lights.js`).
+> No key saved on the screen → quiet `NEED KEY`, zero requests. Mode chips recall nothing (no mode scenes). Kasa All on / All off is untouched.
+> The inventory below (no Google Home scenes exist anywhere on the box) still stands; these two are Dan's wall-side definitions, not Google Home scenes.
+
 **No Google Home scene, routine, or automation was found in any source on the box.**
 That includes **Home** and **Leave**, and every mode-like name (Away, Night, Bedtime, Movie, Vacation, Good night, Good morning, I'm home, Leaving).
-So today the wall can recall **zero** scenes. `I'm home / Leaving` and "mode recalls the scene" are **BLOCKED** until Dan names the scenes that really exist in the Google Home app and a recall path exists (see Gaps).
+So the wall recalls **zero Google Home** scenes. "Mode recalls the scene" stays **off** (ruling: mode chips recall nothing). `I'm home / Leaving` are now Dan's Kasa definitions (top of page).
 
 ## Scenes found
 
@@ -56,17 +62,25 @@ These are real, already wired, and reachable from the wall through the existing 
 | School day | UNKNOWN (none found) |
 | After school | UNKNOWN (none found) |
 | Weekend | UNKNOWN (none found) |
-| Custody-out | UNKNOWN (none found). Note: the word "custody" is banned on kid/house glass (`scripts/lint-kids-safe-voice.mjs`), so Atlas needs a kid-safe chip label |
-| Nashville week (away-care: pet, lawn, alarms) | UNKNOWN (none found). No alarm device on the box either |
+| Kids away (`kids-away`; renamed from the brief's old label, ruling Oct 1) | UNKNOWN (none found) |
+| Nashville week (away-care: pet, lawn, alarms) | UNKNOWN (none found). No alarm device on the box either. Travel week is READ from `data/house-mode.json` (Atlas), never inferred from the calendar |
 | Guest | UNKNOWN (none found) |
 | Quiet | UNKNOWN (none found) |
 
-## What it takes to make I'm home / Leaving real (needs Dan; not built)
+## Wall buttons (built in wall.html, branch only)
 
-1. **Dan names what exists.** In the Google Home app, Automations tab: the exact names of any Home / Leave (or Away / Night...) household automations, and what each one controls. Wright can't read that list. No API or connector exposes it.
-2. **Pick a recall path** (each needs Dan's yes; none built):
-   - a. **Phone/tablet relay.** A Home APIs app (Android/iOS) can only run automations it created. It would have to re-create Dan's Home/Leave as API automations with a manual starter. That's a copy of an existing scene, so Dan has to say yes to it. It also needs a Google Home Developer Console project and an Android/iOS device that stays on.
-   - b. **Assistant voice.** Household automations can be started by the starter Dan set (often a "Hey Google, I'm home" phrase). The wall has no Google Assistant speaker path today.
-   - c. **Existing hub only.** If Dan says the Home/Leave scenes are only Kasa lights + Sensi, the wall could call the existing `/api/lights/set` + `/api/sensi/set` with Dan's stated values. That's a wall-side scene, so it's an **invented scene unless Dan defines it word for word.**
-3. "Nest status flips on the status strip": SDM has no Home/Away state. The Nest devices on the box are 5 cameras only. **No Nest presence or Home/Away data source exists.**
-4. Google Home Premium is set to be cancelled (~Oct 16, DAN-NEEDS #5). If any existing automation uses a Premium-only starter (Google's help page names "familiar faces"), it may stop working after cancel. Which ones do: UNKNOWN.
+| Button | Writes (exact, in order) | Path | No key |
+|---|---|---|---|
+| **I'm home** | `kitchen` on · `dining-room` on (no brightness change) | `HouseLights.setLight` → `POST /api/lights/set` (existing) | `NEED KEY`, disabled, 0 requests |
+| **Leaving** | `dining-room` off · `harris-room` off · `kitchen` off | same | same |
+
+Rules: `scenePlan()` / `sceneButtons()` in `house-wall-status.js`; glue `house-wall-actions.js` (`scene()` also refuses when `HouseLights.canWrite()` is false: quiet `lights offline`, nothing sent). Tests: `scripts/wall/house-wall-status.test.mjs`, `scripts/wall/thermo-travel.test.mjs`.
+The thermostat has its own **Travel / Back home** button (THERMO-TRAVEL.md). It is not part of either scene.
+Mode chips recall nothing. Kasa **All on / All off** is not relabeled; it stays a lights control on the Google Home board.
+
+## Historical: what it would take to recall real Google Home routines (not built)
+
+1. **Dan names what exists.** In the Google Home app, Automations tab. No API or connector exposes that list.
+2. Recall paths: (a) a Home APIs phone/tablet relay (can only run automations it created), (b) Assistant voice, (c) the existing hub (what Dan chose for Home/Leaving).
+3. SDM has no Home/Away state; the Nest devices on the box are 5 cameras only.
+4. Google Home Premium is set to be cancelled (~Oct 16, DAN-NEEDS #5). Which automations use Premium-only starters: UNKNOWN.
