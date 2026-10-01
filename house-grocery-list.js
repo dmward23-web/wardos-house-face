@@ -1,7 +1,7 @@
 /* LEDGER · house-grocery-list.js · branch wall-redesign-ledger · not deployed, not wired.
    FIVE UPGRADES #2 (Dan, Oct 1): the grocery tile IS the list. Add, check and clear on the tile.
    Costco is a filter on the same list, not a second tile. Nothing links out. No dollars.
-   Seed: data/grocery-list.json (Ledger writes). Wall state: PER DEVICE in localStorage "wardos.grocery.v1".
+   Seed: data/grocery-list.json (Ledger writes; items start EMPTY, chips/pick list resolve via catalog). Wall state: PER DEVICE in localStorage "wardos.grocery.v1".
    Shared cross-screen store "house.grocery.shared.v1" is LAST-YES: documented only, NOT built here.
    No fetch except load(), no timers, no network writes. Contract: docs/grocery-list-CONTRACT.md */
 (function (root, factory) {
@@ -62,12 +62,17 @@
       if (catalog.some(function (c) { return c.id === entry.id || normalize(c.name) === normalize(entry.name); })) return;
       catalog.push({ id: entry.id, name: entry.name, store: cleanStore(entry.store) || "any" });
     }
+    function validEntry(c) { return c && typeof c.id === "string" && /^g-[a-z0-9-]+$/.test(c.id) && typeof c.name === "string" && normalize(c.name) && cleanStore(c.store) !== null; }
+    /* seed.catalog = {id, name, store} for every real item the chips and pick list may add (list starts empty). */
+    (Array.isArray(seed.catalog) ? seed.catalog : []).filter(validEntry).forEach(catAdd);
     (Array.isArray(seed.items) ? seed.items : []).filter(validItem).forEach(catAdd);
     function resolveRef(ref) {
       if (ref && typeof ref === "object") ref = ref.id || ref.name;
       var s = String(ref == null ? "" : ref).trim();
       var hit = catalog.filter(function (c) { return c.id === s || normalize(c.name) === normalize(s); })[0];
-      return hit || (s && !isUnsafe(s) ? { id: slug(s), name: s, store: "any" } : null);
+      if (hit) return hit;
+      if (/^g-[a-z0-9-]+$/.test(s)) return null; /* an id that is not in the catalog never becomes an item named "g-…" */
+      return s && !isUnsafe(s) ? { id: slug(s), name: s, store: "any" } : null;
     }
     var quick = (Array.isArray(seed.quickAdd) ? seed.quickAdd : []).map(resolveRef).filter(Boolean);
     quick.forEach(catAdd);
@@ -104,7 +109,7 @@
     function add(nameOrId, storeArg) {
       var ref = resolveRef(nameOrId);
       if (!ref) return null;
-      var existing = byId(String(nameOrId).trim()) ||
+      var existing = byId(String(nameOrId).trim()) || byId(ref.id) ||
         items.filter(function (x) { return normalize(x.name) === normalize(ref.name); })[0];
       if (existing) {
         if (existing.checked) { existing.checked = false; write(); }
