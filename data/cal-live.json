@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-01T01:19:27.844Z",
+  "fetchedAt": "2026-10-01T01:30:56.502Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-06",
+  "windowEnd": "2026-10-07",
   "asOfIso": "2026-09-30",
   "nextLeave": {
     "id": "hv5k8kthnlieaqu6juv0g2hbrg",
@@ -314,6 +314,15 @@
       "allDay": false
     },
     {
+      "id": "lup0n0rfbp6cupsruab9tufglk",
+      "summary": "Harris — send TP tubes to Lind (1–2)",
+      "start": "2026-10-05T07:15:00-05:00",
+      "end": "2026-10-05T07:30:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
       "id": "jrhhe2nmio91r5u088ecjpbvl4_20261005T160000Z",
       "summary": "Dan — cleaners",
       "start": "2026-10-05T11:00:00-05:00",
@@ -392,6 +401,42 @@
       "end": "2026-10-06T18:00:00-05:00",
       "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
       "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "8aimbl11odujl3cl1r73pokqvs",
+      "summary": "Harris — SRE specials: Art",
+      "start": "2026-10-07T07:00:00-05:00",
+      "end": "2026-10-07T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "ipl03ih1jh4k1plriiu6sa6sms",
+      "summary": "Hayes — SRE specials: PE + Library (tennis shoes, library book)",
+      "start": "2026-10-07T07:00:00-05:00",
+      "end": "2026-10-07T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "uj7dl4l1smsa286932ro47ae1k",
+      "summary": "Hayes + Harris — SRE spirit day: Workout Day / team jersey (Peace Week)",
+      "start": "2026-10-07T07:00:00-05:00",
+      "end": "2026-10-07T07:15:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "vluod9ndrvhcr20ovpera726dc_20261007T214500Z",
+      "summary": "Harris flag practice · 5:30–6:30",
+      "start": "2026-10-07T16:45:00-05:00",
+      "end": "2026-10-07T18:30:00-05:00",
+      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
+      "busy": true,
       "allDay": false
     }
   ],
