@@ -98,3 +98,29 @@ Clears at the end of the CT day. `kid` must be one of the three names; `text` ma
 
 `docs/wall-redesign/atlas-samples/`: house-mode + pickup-chain for Thu Oct 1 7:30 AM, Fri Oct 2 7:30 AM (school-day morning), and Mon Oct 5 7:30 AM (inside the excluded trip dates: Kids away, not Nashville week). Simulated future runs carry the expected `calendar dump older than 6h` / `kids-week.json asOfIso is not today` warnings.
 `data/house-mode.json` and `data/pickup-chain.json` on this branch are a real-data run pinned to `--now 2026-10-01T17:48:00-05:00` (Wright's wall tests read this snapshot at 5:50 PM CT).
+
+## Kid layer v3 (data + rules only, no UI)
+
+`node scripts/kid-layer.mjs [--data-dir data] [--taps <file>] [--uses data/unlock-uses.json] [--now ISO]` writes `data/kid-seats.json` + `data/unlocks.json`. Rules: `scripts/house/kid-layer-lib.mjs`. Copy + unlock map: `config/kid-layer.config.json`. Tests: `scripts/house/tests/kid-layer.test.mjs`.
+
+**Taps (reused shapes, nothing new):** daily musts `house-checkoffs:<kid>:<YYYY-MM-DD>` → `{<checkId>: true}`, weekly musts `house-checkoffs:<kid>:week:<FriISO>` (house-checkoffs.js / kids-data.js `checkKeyFor`). The hub store (TAPSYNC1 `/api/taps`, `~/.config/wardos/kid-taps.json`) holds the same keys as `{<checkId>: {v, t}}`. Both are read. Default input is the hub store. Taps that never reached the hub (per-device) are invisible here.
+
+**Chore week:** kids-data.js `weekStartIso`, Fri 3:00 PM → next Fri 3:00 PM, tap days Sat..Fri. **Week closed** = MUSTGATE1: every daily must tapped on all 7 tap days + every weekly must tapped. Optional add-ons never count.
+
+**kid-seats.json** `{asOfIso, generatedAt, week, quiet, seats, usTogether: {lit}, source}`
+- Harris: `mission {id, word, copy}` = the first open must today (daily in order, then open weeklies), copy `Harris. Dishes.`. Words come only from `missionWords` in the config; a must with no approved word is skipped. `today.closed` when every daily must is tapped today. `Harris. Done today.` after that.
+- Hayes: `row` Mon–Sun, `mark` = `closed` | `empty` (past day, kids home, not closed) | `ahead` (today or later) | `off` (kids away). No names on marks, no counts. `countdown` = his next real game in the calendar (`Flag · vs Ridley · 3 days`), else `null`.
+- Ainsley: `week.closed` only.
+- `quiet: true` while kids are away: no mission, row, or countdown.
+
+**unlocks.json** `{asOfIso, generatedAt, week, resetsAt, lit[], source}`. Only lit unlocks are listed; dark or spent = absent.
+| closed | unlock id | control | copy |
+|---|---|---|---|
+| Harris | `harris-dinner-vote` | Vita's dinner vote | `Harris. Week closed. Dinner vote.` |
+| Hayes | `hayes-weekend-pick` | Weekend fun pick | `Hayes. Week closed. You pick.` |
+| Ainsley | `ainsley-gallery-or-weekend` | gallery photo OR weekend pick (`choices`) | `Ainsley. Week closed. Gallery or weekend, your call.` |
+| all three | `house-weekend-pick` (seat `House`) | Weekend fun, house pick | `Us together. Weekend fun, house pick.` |
+
+One use each per chore week. Spending = `consumeUnlock(uses, id, layer, now, choice?)` appends `{unlock, weekId, usedAt, choice?}` to `data/unlock-uses.json` (absent by default; per-device tap today, same as check-ins). It resets at the week's Fri 3:00 PM end.
+
+**Never in these files:** money symbols, kid-reward / account / sibling-order / parent words, `!`, stats (done/need/streak/score), a kid name in any miss / dark / empty object, or a list of who kept Us together dark (`usTogether` is `{lit}` only). `computeKidLayer` refuses to write if `scanObject` or `missNameHits` finds anything.

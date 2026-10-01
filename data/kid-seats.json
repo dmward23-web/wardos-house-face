@@ -1,0 +1,94 @@
+{
+  "asOfIso": "2026-10-01",
+  "generatedAt": "2026-10-01T18:09:00-05:00",
+  "week": {
+    "id": "2026-09-25",
+    "startsAt": "2026-09-25T15:00:00-05:00",
+    "endsAt": "2026-10-02T15:00:00-05:00"
+  },
+  "quiet": false,
+  "seats": {
+    "harris": {
+      "name": "Harris",
+      "week": {
+        "closed": false
+      },
+      "mission": {
+        "id": "har-bed",
+        "word": "Bed",
+        "copy": "Harris. Bed."
+      },
+      "today": {
+        "closed": false
+      },
+      "copy": "Harris. Bed."
+    },
+    "hayes": {
+      "name": "Hayes",
+      "week": {
+        "closed": false
+      },
+      "row": [
+        {
+          "dow": "Mon",
+          "date": "2026-09-28",
+          "mark": "closed",
+          "today": false
+        },
+        {
+          "dow": "Tue",
+          "date": "2026-09-29",
+          "mark": "closed",
+          "today": false
+        },
+        {
+          "dow": "Wed",
+          "date": "2026-09-30",
+          "mark": "empty",
+          "today": false
+        },
+        {
+          "dow": "Thu",
+          "date": "2026-10-01",
+          "mark": "ahead",
+          "today": true
+        },
+        {
+          "dow": "Fri",
+          "date": "2026-10-02",
+          "mark": "ahead",
+          "today": false
+        },
+        {
+          "dow": "Sat",
+          "date": "2026-10-03",
+          "mark": "off",
+          "today": false
+        },
+        {
+          "dow": "Sun",
+          "date": "2026-10-04",
+          "mark": "off",
+          "today": false
+        }
+      ],
+      "countdown": {
+        "what": "Flag · vs Ridley",
+        "startIso": "2026-10-04T09:00:00-05:00",
+        "day": "Sun",
+        "inDays": 3,
+        "copy": "Flag · vs Ridley · 3 days"
+      }
+    },
+    "ainsley": {
+      "name": "Ainsley",
+      "week": {
+        "closed": false
+      }
+    }
+  },
+  "usTogether": {
+    "lit": false
+  },
+  "source": "MUSTS taps (kid-taps.json, updated 2026-09-30T06:04:00-05:00) + kids-week.json quests + Calendar (data/cal-live.json fetched 2026-10-01T18:02:00-05:00 + cal-dmward23-week.json fetched 2026-10-01T18:02:00-05:00, read-only)"
+}

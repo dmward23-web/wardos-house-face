@@ -1,0 +1,17 @@
+{
+  "_about": "Kid layer v3 (Atlas). Read by scripts/kid-layer.mjs. Branch wall-redesign-atlas, not wired. Copy words are wall text: short, operational, sentence case.",
+  "choreWeek": { "startDow": "Fri", "handoff": "15:00", "tapDays": 7 },
+  "missionWords": {
+    "har-bed": "Bed", "har-backpack": "Backpack", "har-dishes": "Dishes", "har-empty": "Dishwasher",
+    "har-trash": "Trash", "har-postgame": "Gear", "har-shower": "Shower", "har-toys": "Toys",
+    "har-shoes": "Shoes", "har-cubby": "Cubby"
+  },
+  "harrisMissionOrder": null,
+  "hayesCountdown": { "match": "\\b(baseball|flag|soccer|basketball)\\b", "gameOnly": true, "maxDays": 14 },
+  "unlocks": {
+    "harris": { "id": "harris-dinner-vote", "control": "dinner-vote", "tile": "Dinner vote", "copy": "Harris. Week closed. Dinner vote." },
+    "hayes": { "id": "hayes-weekend-pick", "control": "weekend-pick", "tile": "Weekend fun", "copy": "Hayes. Week closed. You pick." },
+    "ainsley": { "id": "ainsley-gallery-or-weekend", "control": "gallery-or-weekend", "tile": "Gallery or Weekend fun", "choices": ["gallery-photo", "weekend-pick"], "copy": "Ainsley. Week closed. Gallery or weekend, your call." },
+    "house": { "id": "house-weekend-pick", "control": "weekend-pick", "tile": "Weekend fun", "copy": "Us together. Weekend fun, house pick." }
+  }
+}

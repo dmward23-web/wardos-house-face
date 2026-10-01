@@ -322,6 +322,7 @@ export const BANNED_PATTERNS = [
   { id: "Wells", re: /\bwells\b/i },
   { id: "balance", re: /\bbalances?\b/i },
   { id: "autopay", re: /\bauto-?pay\b/i },
+  { id: "rank", re: /\brank(?:s|ing|ings|ed)?\b|\bleader-?board\b/i },
   { id: "their mom", re: /\btheir\s+moms?\b/i },
   { id: "mom", re: /\bmoms?\b|\bmommy\b/i },
 ];
