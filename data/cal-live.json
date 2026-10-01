@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-01T23:18:34.296Z",
+  "fetchedAt": "2026-10-01T23:21:04.582Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-08",
   "asOfIso": "2026-10-01",
   "nextLeave": {
-    "id": "tah8oji0ahni4old2cd1a6jb5k",
-    "summary": "Pick up Hayes at Casey's (Riley's mom)",
-    "start": "2026-10-01T18:20:00-05:00",
-    "end": "2026-10-01T18:55:00-05:00",
-    "location": "Casey's (Riley's mom), 9504 W 148th St, Overland Park, KS 66221",
-    "busy": true,
-    "allDay": false
+    "id": "21pjdlio8sqj8pkn601k6u3n90",
+    "summary": "Dan — HOA Fall Garage Sale",
+    "start": "2026-10-02T00:00:00Z",
+    "end": "2026-10-04T00:00:00Z",
+    "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
+    "busy": false,
+    "allDay": true
   },
   "upcomingLeaves": [
-    {
-      "id": "tah8oji0ahni4old2cd1a6jb5k",
-      "summary": "Pick up Hayes at Casey's (Riley's mom)",
-      "start": "2026-10-01T18:20:00-05:00",
-      "end": "2026-10-01T18:55:00-05:00",
-      "location": "Casey's (Riley's mom), 9504 W 148th St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "21pjdlio8sqj8pkn601k6u3n90",
       "summary": "Dan — HOA Fall Garage Sale",
@@ -406,9 +397,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "6:20",
-    "place": "Pick up Hayes at Casey's (Riley's",
-    "detailHtml": "<strong>6:20</strong> Pick up Hayes at Casey's (Riley's",
+    "time": "7:00",
+    "place": "Dan — HOA Fall Garage Sale",
+    "detailHtml": "<strong>7:00</strong> Dan — HOA Fall Garage Sale",
     "badge": "Thu"
   },
   "error": null
