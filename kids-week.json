@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Sep 30 2026",
   "asOfIso": "2026-09-30",
-  "refreshedAt": "2026-10-01T00:17:43.563Z",
+  "refreshedAt": "2026-10-01T00:27:23.828Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,27 +16,15 @@
     "endIso": "2026-10-02T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "7:15",
-    "place": "pick up at BVW football game",
+    "label": "Next up · Thu",
+    "time": "7:00",
+    "place": "SRE specials: Spanish + Library checkout",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-    "badge": "Wed",
-    "startIso": "2026-10-01T00:15:00.000Z",
-    "endIso": "2026-10-01T00:45:00.000Z",
-    "kind": "other",
+    "badge": "Thu",
+    "startIso": "2026-10-01T12:00:00.000Z",
+    "endIso": "2026-10-01T12:15:00.000Z",
+    "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "7:15",
-        "place": "pick up at BVW football game",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-10-01T00:15:00.000Z",
-        "endIso": "2026-10-01T00:45:00.000Z",
-        "kind": "other",
-        "whenLabel": "7:15",
-        "summary": "Ainsley — pick up at BVW football game · 7:30"
-      },
       {
         "label": "Next up · Thu",
         "time": "7:00",
@@ -168,6 +156,18 @@
         "kind": "school_drop",
         "whenLabel": "Fri 8:10",
         "summary": "Hayes + Harris — SRE drop-off · 8:25"
+      },
+      {
+        "label": "Next up · Fri",
+        "time": "9:00",
+        "place": "Dan DRIVE → Nashville",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-02T14:00:00.000Z",
+        "endIso": "2026-10-02T22:30:00.000Z",
+        "kind": "leave",
+        "whenLabel": "Fri 9:00",
+        "summary": "Dan DRIVE → Nashville · leave 9:00 after SRE · arrive ~5:30"
       }
     ]
   },
