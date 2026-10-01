@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 1 2026",
   "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-01T12:48:25.456Z",
+  "refreshedAt": "2026-10-01T12:51:22.700Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -438,6 +438,18 @@
           "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE specials: Spanish + Library checkout",
+          "tone": "act",
+          "hint": ""
         }
       ],
       "appointments": []
@@ -589,13 +601,6 @@
         },
         {
           "kind": "event",
-          "when": "Thu · 7:30",
-          "what": "pack late-lunch snacks (headaches · Madi OK)",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
           "when": "Thu · 8:10",
           "what": "SRE drop-off",
           "hint": "",
@@ -619,6 +624,13 @@
           "kind": "event",
           "when": "Thu · 4:55",
           "what": "⚾ Hayes baseball — Falcons vs Lions (home)",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "kind": "event",
+          "when": "Thu · 4:55",
+          "what": "⚾ Cover — Hayes baseball 5:30 · Casey",
           "hint": "YOUR board",
           "tone": "hot"
         }
@@ -647,18 +659,18 @@
           "what": "Hayes baseball — Falcons vs KC Tigers (away)",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Thu 8 · leave 6:00",
+          "what": "Hayes flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
         {
           "when": "Thu 1 · 7:00",
           "what": "SRE specials: Art",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 1 · 7:30",
-          "what": "pack late-lunch snacks (headaches · Madi OK)",
           "tone": "act",
           "hint": ""
         },
@@ -737,6 +749,18 @@
         {
           "when": "Wed 7 · 7:00",
           "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE specials: Art",
           "tone": "act",
           "hint": ""
         }
@@ -920,6 +944,12 @@
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Thu 8 · leave 5:00",
+          "what": "Ainsley swim — Coach Ann",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -937,6 +967,12 @@
         },
         {
           "when": "Mon 5 · 3:00",
+          "what": "LKMS Homework Help",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 3:00",
           "what": "LKMS Homework Help",
           "tone": "act",
           "hint": ""
@@ -1062,11 +1098,6 @@
           "tone": "act"
         },
         {
-          "when": "Thu 1 · 7:30",
-          "what": "pack late-lunch snacks (headaches · Madi OK)",
-          "tone": "act"
-        },
-        {
           "when": "Thu 1 · 8:10",
           "what": "SRE drop-off",
           "tone": "act"
@@ -1169,6 +1200,11 @@
         {
           "when": "Mon 5 · 1:40",
           "what": "Lindsay appt",
+          "tone": "act"
+        },
+        {
+          "when": "Mon 5 · 3:00",
+          "what": "LKMS Homework Help",
           "tone": "act"
         }
       ]
