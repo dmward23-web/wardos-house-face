@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 1 2026",
   "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-01T18:00:55.252Z",
+  "refreshedAt": "2026-10-01T18:10:48.609Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -47,7 +47,7 @@
         "endIso": "2026-10-01T21:00:00.000Z",
         "kind": "school_pickup",
         "whenLabel": "3:15",
-        "summary": "Hayes + Harris — SRE pickup · 3:40"
+        "summary": "Dan picks up Harris — SRE pickup · 3:40 | Casey (Riley's mom) picks up Hayes; Hayes hangs at Casey's"
       },
       {
         "label": "Next up · today",
@@ -63,39 +63,15 @@
       },
       {
         "label": "Next up · today",
-        "time": "4:55",
-        "place": "Hayes baseball — Falcons vs Lions (home)",
+        "time": "6:35",
+        "place": "Pick up Hayes at Casey's (Riley's mom)",
         "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Thu",
-        "startIso": "2026-10-01T21:55:00.000Z",
-        "endIso": "2026-10-02T00:20:00.000Z",
-        "kind": "sport",
-        "whenLabel": "4:55",
-        "summary": "Hayes baseball — Falcons vs Lions (home) · 5:30 game"
-      },
-      {
-        "label": "Next up · today",
-        "time": "4:55",
-        "place": "Cover — Hayes baseball 5:30 · Casey",
-        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T21:55:00.000Z",
-        "endIso": "2026-10-02T00:20:00.000Z",
-        "kind": "sport",
-        "whenLabel": "4:55",
-        "summary": "Cover — Hayes baseball 5:30 · Casey"
-      },
-      {
-        "label": "Next up · today",
-        "time": "7:15",
-        "place": "Scheels with Hayes + Harris",
-        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-02T00:15:00.000Z",
-        "endIso": "2026-10-02T01:00:00.000Z",
-        "kind": "other",
-        "whenLabel": "7:15",
-        "summary": "Scheels with Hayes + Harris"
+        "startIso": "2026-10-01T23:35:00.000Z",
+        "endIso": "2026-10-01T23:50:00.000Z",
+        "kind": "leave",
+        "whenLabel": "6:35",
+        "summary": "Pick up Hayes at Casey's (Riley's mom)"
       },
       {
         "label": "Next up · Fri",
@@ -168,6 +144,30 @@
         "kind": "school",
         "whenLabel": "Fri 12:00",
         "summary": "Hayes — SRE field trip museum+park (chaperone slots)"
+      },
+      {
+        "label": "Next up · Fri",
+        "time": "12:00",
+        "place": "LKMS baby pic due · 3pm",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-02T17:00:00.000Z",
+        "endIso": "2026-10-02T17:15:00.000Z",
+        "kind": "other",
+        "whenLabel": "Fri 12:00",
+        "summary": "Ainsley — LKMS baby pic due · 3pm"
+      },
+      {
+        "label": "Next up · Sat",
+        "time": "8:30",
+        "place": "Dan DRIVE → Nashville",
+        "detailHtml": "1:00 Harris flag — vs BV Gardner (home) · kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-03T13:30:00.000Z",
+        "endIso": "2026-10-03T22:00:00.000Z",
+        "kind": "leave",
+        "whenLabel": "Sat 8:30",
+        "summary": "Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. Alexander's"
       }
     ]
   },
@@ -302,7 +302,7 @@
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
         "when": "THU · 3:15",
-        "what": "SRE PICKUP",
+        "what": "DAN PICKS UP HARRIS — SRE PICKUP · 3:40 | CASEY ",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "THU",
@@ -313,14 +313,7 @@
         {
           "kind": "event",
           "when": "Thu · 3:15",
-          "what": "SRE pickup",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Thu · 7:15",
-          "what": "Scheels with Hayes + Harris",
+          "what": "Dan picks up Harris — SRE pickup · 3:40 | Casey (Riley's mom) picks up Hayes; Hayes hangs at Casey's",
           "hint": "",
           "tone": "act"
         },
@@ -349,7 +342,7 @@
       "school": [
         {
           "when": "Thu 1 · 3:15",
-          "what": "SRE pickup",
+          "what": "Dan picks up Harris — SRE pickup · 3:40 | Casey (Riley's mom) picks up Hayes; Hayes hangs at Casey's",
           "tone": "act",
           "hint": ""
         },
@@ -410,6 +403,18 @@
         {
           "when": "Wed 7 · 7:00",
           "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE specials: Spanish + Library checkout",
           "tone": "act",
           "hint": ""
         }
@@ -546,7 +551,7 @@
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
         "when": "THU · 3:15",
-        "what": "SRE PICKUP",
+        "what": "DAN PICKS UP HARRIS — SRE PICKUP · 3:40 | CASEY ",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "THU",
@@ -557,28 +562,7 @@
         {
           "kind": "event",
           "when": "Thu · 3:15",
-          "what": "SRE pickup",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Thu · 4:55",
-          "what": "⚾ Hayes baseball — Falcons vs Lions (home)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "kind": "event",
-          "when": "Thu · 4:55",
-          "what": "⚾ Cover — Hayes baseball 5:30 · Casey",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "kind": "event",
-          "when": "Thu · 7:15",
-          "what": "Scheels with Hayes + Harris",
+          "what": "Dan picks up Harris — SRE pickup · 3:40 | Casey (Riley's mom) picks up Hayes; Hayes hangs at Casey's",
           "hint": "",
           "tone": "act"
         },
@@ -592,18 +576,6 @@
       ],
       "sports": [
         {
-          "when": "Thu 1 · leave 4:55",
-          "what": "Hayes baseball — Falcons vs Lions (home)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "when": "Thu 1 · leave 4:55",
-          "what": "Cover — Hayes baseball 5:30 · Casey",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
           "when": "Sun 4 · leave 8:30",
           "what": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00",
           "hint": "YOUR board",
@@ -614,12 +586,18 @@
           "what": "Hayes baseball — Falcons vs KC Tigers (away)",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Thu 8 · leave 6:00",
+          "what": "Hayes flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
         {
           "when": "Thu 1 · 3:15",
-          "what": "SRE pickup",
+          "what": "Dan picks up Harris — SRE pickup · 3:40 | Casey (Riley's mom) picks up Hayes; Hayes hangs at Casey's",
           "tone": "act",
           "hint": ""
         },
@@ -686,6 +664,18 @@
         {
           "when": "Wed 7 · 7:00",
           "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE specials: Art",
           "tone": "act",
           "hint": ""
         }
@@ -869,6 +859,12 @@
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Thu 8 · leave 5:00",
+          "what": "Ainsley swim — Coach Ann",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -880,6 +876,12 @@
         },
         {
           "when": "Mon 5 · 3:00",
+          "what": "LKMS Homework Help",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 8 · 3:00",
           "what": "LKMS Homework Help",
           "tone": "act",
           "hint": ""
@@ -979,7 +981,7 @@
         },
         {
           "when": "Thu · 3:15",
-          "what": "SRE pickup",
+          "what": "Dan picks up Harris — SRE pickup · 3:40 | Casey (Riley's mom) picks up Hayes; Hayes hangs at Casey's",
           "tone": "act"
         },
         {
@@ -988,8 +990,8 @@
           "tone": "hot"
         },
         {
-          "when": "Thu · 4:55",
-          "what": "Hayes baseball — Falcons vs Lions (home)",
+          "when": "Thu · 6:35",
+          "what": "Pick up Hayes at Casey's (Riley's mom)",
           "tone": "hot"
         }
       ],
@@ -1001,7 +1003,7 @@
         },
         {
           "when": "Thu 1 · 3:15",
-          "what": "SRE pickup",
+          "what": "Dan picks up Harris — SRE pickup · 3:40 | Casey (Riley's mom) picks up Hayes; Hayes hangs at Casey's",
           "tone": "act"
         },
         {
@@ -1010,13 +1012,8 @@
           "tone": "hot"
         },
         {
-          "when": "Thu 1 · 4:55",
-          "what": "Hayes baseball — Falcons vs Lions (home)",
-          "tone": "hot"
-        },
-        {
-          "when": "Thu 1 · 4:55",
-          "what": "Cover — Hayes baseball 5:30 · Casey",
+          "when": "Thu 1 · 6:35",
+          "what": "Pick up Hayes at Casey's (Riley's mom)",
           "tone": "hot"
         },
         {
@@ -1113,6 +1110,11 @@
           "when": "Tue 6 · 7:00",
           "what": "SRE specials: Music",
           "tone": "act"
+        },
+        {
+          "when": "Tue 6 · 5:00",
+          "what": "Ainsley swim — Coach Ann",
+          "tone": "hot"
         }
       ]
     }
