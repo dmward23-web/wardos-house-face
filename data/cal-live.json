@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-01T16:41:12.462Z",
+  "fetchedAt": "2026-10-01T16:58:09.870Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-08",
   "asOfIso": "2026-10-01",
   "nextLeave": {
-    "id": "tcss94gr3r35me8b24socvu318",
-    "summary": "Free · Hank — scooter pickup + brake return",
-    "start": "2026-10-01T11:45:00-05:00",
-    "end": "2026-10-01T13:15:00-05:00",
-    "location": "Electro Scoot Repair, 12506 W 70th St, Shawnee, KS 66216",
+    "id": "otlllm3ojuh6953ke3ct7uv7s8",
+    "summary": "Dan — Hayes Johnson gift $150",
+    "start": "2026-10-01T12:00:00-05:00",
+    "end": "2026-10-01T12:15:00-05:00",
+    "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
     "busy": false,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "tcss94gr3r35me8b24socvu318",
-      "summary": "Free · Hank — scooter pickup + brake return",
-      "start": "2026-10-01T11:45:00-05:00",
-      "end": "2026-10-01T13:15:00-05:00",
-      "location": "Electro Scoot Repair, 12506 W 70th St, Shawnee, KS 66216",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "otlllm3ojuh6953ke3ct7uv7s8",
       "summary": "Dan — Hayes Johnson gift $150",
@@ -487,9 +478,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "11:45",
-    "place": "Free · Hank — scooter pickup + brake return",
-    "detailHtml": "<strong>11:45</strong> Free · Hank — scooter pickup + brake return",
+    "time": "12:00",
+    "place": "Dan — Hayes Johnson gift $150",
+    "detailHtml": "<strong>12:00</strong> Dan — Hayes Johnson gift $150",
     "badge": "Thu"
   },
   "error": null
