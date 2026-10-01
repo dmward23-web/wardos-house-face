@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 1 2026",
   "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-01T11:46:19.389Z",
+  "refreshedAt": "2026-10-01T11:55:20.603Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -124,14 +124,14 @@
       {
         "label": "Next up · today",
         "time": "4:55",
-        "place": "Cover — Hayes baseball 5:30",
+        "place": "Cover — Hayes baseball 5:30 · Casey",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-01T21:55:00.000Z",
         "endIso": "2026-10-02T00:20:00.000Z",
         "kind": "sport",
         "whenLabel": "4:55",
-        "summary": "Cover — Hayes baseball 5:30"
+        "summary": "Cover — Hayes baseball 5:30 · Casey"
       },
       {
         "label": "Next up · today",
@@ -632,7 +632,7 @@
         },
         {
           "when": "Thu 1 · leave 4:55",
-          "what": "Cover — Hayes baseball 5:30",
+          "what": "Cover — Hayes baseball 5:30 · Casey",
           "hint": "YOUR board",
           "tone": "hot"
         },
@@ -1093,7 +1093,7 @@
         },
         {
           "when": "Thu 1 · 4:55",
-          "what": "Cover — Hayes baseball 5:30",
+          "what": "Cover — Hayes baseball 5:30 · Casey",
           "tone": "hot"
         },
         {
