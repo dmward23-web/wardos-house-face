@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-01T14:49:15.068Z",
+  "fetchedAt": "2026-10-01T14:53:12.739Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-08",
@@ -98,15 +98,6 @@
       "allDay": true
     },
     {
-      "id": "3a7puubvbq8hgsr0m7h46t9hi0_20261002",
-      "summary": "Dan Nashville [DRIVE · fly backup #AWNB5V]",
-      "start": "2026-10-02T00:00:00Z",
-      "end": "2026-10-10T00:00:00Z",
-      "location": "14 Harbor Cove Dr, Old Hickory, TN",
-      "busy": false,
-      "allDay": true
-    },
-    {
       "id": "cn7vvqun5npbi78hn0ece62ufg",
       "summary": "Hayes — SRE field trip museum+park (chaperone slots)",
       "start": "2026-10-02T00:00:00Z",
@@ -161,24 +152,6 @@
       "allDay": false
     },
     {
-      "id": "806kf6gnibpjh3vq78g4mnfiqc",
-      "summary": "Dan — load car · haul + bags (after SRE)",
-      "start": "2026-10-02T08:40:00-05:00",
-      "end": "2026-10-02T09:00:00-05:00",
-      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "4ug63o0oqfeld1ll1h7ff1eerc",
-      "summary": "Dan DRIVE → Nashville · leave 9:00 after SRE · arrive ~5:30",
-      "start": "2026-10-02T09:00:00-05:00",
-      "end": "2026-10-02T17:30:00-05:00",
-      "location": "6719 W 147th Terrace, Overland Park, KS 66223 → 14 Harbor Cove Dr, Old Hickory, TN",
-      "busy": true,
-      "allDay": false
-    },
-    {
       "id": "7pot7bg5qqs5lt9lucfgq51c18",
       "summary": "Hayes — SRE field trip (museum + Meadowbrook)",
       "start": "2026-10-02T09:00:00-05:00",
@@ -212,6 +185,33 @@
       "end": "2026-10-02T12:15:00-05:00",
       "location": "6719 W 147th Terrace, Overland Park, KS 66223",
       "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "3a7puubvbq8hgsr0m7h46t9hi0_20261002",
+      "summary": "Dan Nashville [DRIVE Sat Oct 3]",
+      "start": "2026-10-03T00:00:00Z",
+      "end": "2026-10-10T00:00:00Z",
+      "location": "14 Harbor Cove Dr, Old Hickory, TN",
+      "busy": false,
+      "allDay": true
+    },
+    {
+      "id": "806kf6gnibpjh3vq78g4mnfiqc",
+      "summary": "Dan — load car · haul + bags (before drive)",
+      "start": "2026-10-03T08:00:00-05:00",
+      "end": "2026-10-03T08:30:00-05:00",
+      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "4ug63o0oqfeld1ll1h7ff1eerc",
+      "summary": "Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. Alexander's",
+      "start": "2026-10-03T08:30:00-05:00",
+      "end": "2026-10-03T17:00:00-05:00",
+      "location": "6719 W 147th Terrace, Overland Park, KS 66223 → J. Alexander's, 73 White Bridge Rd #130, Nashville, TN 37205",
+      "busy": true,
       "allDay": false
     },
     {

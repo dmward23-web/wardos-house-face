@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 1 2026",
   "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-01T14:49:14.651Z",
+  "refreshedAt": "2026-10-01T14:53:12.303Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -136,18 +136,6 @@
       {
         "label": "Next up · Fri",
         "time": "9:00",
-        "place": "Dan DRIVE → Nashville",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Fri",
-        "startIso": "2026-10-02T14:00:00.000Z",
-        "endIso": "2026-10-02T22:30:00.000Z",
-        "kind": "leave",
-        "whenLabel": "Fri 9:00",
-        "summary": "Dan DRIVE → Nashville · leave 9:00 after SRE · arrive ~5:30"
-      },
-      {
-        "label": "Next up · Fri",
-        "time": "9:00",
         "place": "SRE field trip (museum + Meadowbrook)",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
         "badge": "Fri",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Fri 11:30",
         "summary": "Harris — SRE Tailgate Party (reading incentive)"
+      },
+      {
+        "label": "Next up · Fri",
+        "time": "12:00",
+        "place": "SRE field trip museum+park (chaperone slots)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-02T17:00:00.000Z",
+        "endIso": "2026-10-02T17:00:00.000Z",
+        "kind": "school",
+        "whenLabel": "Fri 12:00",
+        "summary": "Hayes — SRE field trip museum+park (chaperone slots)"
       }
     ]
   },
@@ -1091,11 +1091,6 @@
         },
         {
           "when": "Fri 2 · 9:00",
-          "what": "Dan DRIVE → Nashville",
-          "tone": "hot"
-        },
-        {
-          "when": "Fri 2 · 9:00",
           "what": "SRE field trip (museum + Meadowbrook)",
           "tone": "act"
         },
@@ -1113,6 +1108,11 @@
           "when": "Fri 2 · 12:00",
           "what": "LKMS yearbook baby photo due",
           "tone": "act"
+        },
+        {
+          "when": "Sat 3 · 8:30",
+          "what": "Dan DRIVE → Nashville",
+          "tone": "hot"
         },
         {
           "when": "Sat 3 · 1:00",
