@@ -211,7 +211,7 @@ export function computeKidLayer({ calendar, kidsWeek, taps, uses, config, now })
   const unlocks = { ...base, lit };
 
   for (const [n, o] of [["kid-seats", kidSeats], ["unlocks", unlocks]]) {
-    const hits = scanObject(o).concat(missNameHits(o));
+    const hits = scanObject(o).concat(missNameHits(o), scoreHits(o));
     if (hits.length) throw new Error(`${n} failed kid-layer scan: ${JSON.stringify(hits)}`);
   }
   return { kidSeats, unlocks };
@@ -229,6 +229,20 @@ export function consumeUnlock(usesState, unlockId, layer, t, choice) {
 
 /** Any object in a miss / dark / empty state must not carry a kid name. Also no miss words anywhere. */
 const MISS_WORD_RE = /\b(miss(?:ed|es|ing)?|fail(?:ed|s|ing)?|broke|broken|behind|late|incomplete|not done|x)\b/i;
+/** Alfred KL-05: no score on a kid seat (XP, points, n/m counts, streaks, stars, coins, gems, per-chore amounts). */
+export const SCORE_RE = /\bXP\b|\bpoints?\b|\bpts\b|\b\d+\s*\/\s*\d+\b|\bstreaks?\b|\bstars?\b|\bscores?\b|\bcoins?\b|\bgems?\b|\$/i;
+export function scoreHits(obj) {
+  const hits = [];
+  const walk = (v, p) => {
+    if (typeof v === "string") { if (SCORE_RE.test(v)) hits.push({ path: p, text: v }); }
+    else if (typeof v === "number" && /seats\.ainsley/.test(p)) hits.push({ path: p, text: String(v) });
+    else if (Array.isArray(v)) v.forEach((x, i) => walk(x, `${p}[${i}]`));
+    else if (v && typeof v === "object") for (const k of Object.keys(v)) { if (SCORE_RE.test(k)) hits.push({ path: `${p}.${k}`, text: k }); walk(v[k], `${p}.${k}`); }
+  };
+  walk(obj, "$");
+  return hits;
+}
+
 export function missNameHits(obj) {
   const hits = [];
   const names = KIDS.map((k) => k.name);

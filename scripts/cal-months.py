@@ -22,6 +22,33 @@ for line in open(fp):
     if not line or line.startswith("#"): continue
     rx, _, rep = line.partition("\t")
     RULES.append((re.compile(rx, re.I), rep))
+# ATLASLANE6 · display-only renames (DAN RULING t2812u), same rules as scripts/house/display-rename.mjs.
+# The source calendar is never edited. "Mom & Dad" -> "Nonna and Papa", "Mom birthday" -> "Nonna birthday".
+_RC = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config", "display-rename.json")))
+RENAMES = [(re.compile(r["pattern"], re.I), r["replace"]) for r in _RC["renames"]]
+PAREN = re.compile(_RC["parentScrub"]["parenthetical"], re.I)
+POSS = re.compile(_RC["parentScrub"]["possessive"])
+RESIDUAL = re.compile(_RC["parentScrub"]["residual"], re.I)
+MONEY_PAREN = re.compile(_RC["moneyScrub"]["parenthetical"])
+MONEY_TOKEN = re.compile(_RC["moneyScrub"]["token"])
+MONEY_ALLOW = _RC["moneyScrub"]["allow"]
+
+def nomoney(s):
+    """Calendar labels carry no money on the board ("($30)" dropped); MONEY_ALLOW strings stay."""
+    if s.strip() in MONEY_ALLOW: return s
+    for i, a in enumerate(MONEY_ALLOW): s = s.replace(a, f"\0{i}\0")
+    s = MONEY_TOKEN.sub("", MONEY_PAREN.sub("", s))
+    for i, a in enumerate(MONEY_ALLOW): s = s.replace(f"\0{i}\0", a)
+    return s
+
+def display(s):
+    """Renamed + parent-scrubbed label, or None (not published) if a parent word survives."""
+    s = nomoney(s)
+    for rx, rep in RENAMES: s = rx.sub(rep, s)
+    s = POSS.sub(lambda m: m.group(1) + m.group(2), PAREN.sub("", s))
+    s = re.sub(r"\s+([·,;:])", r" \1", re.sub(r"\s{2,}", " ", s)).strip()
+    return None if (not s or RESIDUAL.search(s)) else s
+
 BLOCK = re.compile(r"midwest anxiety|bonebrake|\brandy\b|therap|counsel", re.I)
 
 def scrub(s):
@@ -75,7 +102,8 @@ for i, (summ, s, e, allday) in ev.items():
         while d < d1: withdan[d.isoformat()] = 1; d += dt.timedelta(days=1)
         continue
     if summ.startswith("Dan") and not DAN_KEEP.search(summ): continue
-    label = scrub(summ)
+    label = display(scrub(summ))
+    if label is None: continue  # still names a parent after the display pass: not published
     if BLOCK.search(label): sys.exit(f"HARD FAIL: private term survived scrub in: {label!r}")
     c = kid(label)
     if FLIGHT.search(label) and not allday: c = "flight"

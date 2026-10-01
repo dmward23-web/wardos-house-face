@@ -126,3 +126,39 @@ Clears at the end of the CT day. `kid` must be one of the three names; `text` ma
 **Spends:** `consumeUnlock(uses, id, layer, now, choice?)` appends `{unlock, weekId, usedAt, choice?}`, `weekId` = the unlock's `earnedWeek`. A spend clears only that earned week's unlock; a later close lights it again. Store: `data/unlock-uses.json`, committed as the empty shape `{"note": "Per-device until a shared write path is approved. …", "uses": []}`. **Per-device until a shared write path is approved** (the hub `/api/taps` only accepts `house-checkoffs` keys), so a spend on one wall is not seen by another device or by this script unless that device's file is passed with `--uses`.
 
 **Never in these files:** money symbols, kid-reward / account / sibling-order / parent words, `!`, stats (done/need/streak/score), a kid name in any miss / dark / empty object, or a list of who kept Us together dark (`usTogether` is `{lit}` only). `computeKidLayer` refuses to write if `scanObject` or `missNameHits` finds anything.
+
+## ATLASLANE6: NEXT UP, logistics taps, school-night strip, display renames (data + rules only, no UI)
+
+None of this is wired: no cron, no deploy, no network. Each CLI takes `--data-dir`, `--events`, `--now ISO`, `--stdout`.
+
+### Shared leave-by (`lib.leaveByMs`)
+Used by pickup-chain, next-up and school-night, in this order: (1) title says `leave H:MM`; (2) the event's own leave line in the description (`Leave-by 4:25pm`, `Leave home 4:45`; anything after `Was:` is history and ignored; only the time is read, the text is never published); (3) the event starts earlier than the stated time (kids-week `leaveBys.note`, "event START = leave-by"). No leave when the calendar says `not a leave` or `Leave-by: none`. A leave is Dad's only: a ride someone else drives never gets one. Change vs ATLASLANE5: pickup-chain now also reads (2), so the 6:20 Hayes pickup row has `leaveBy 6:20 PM`.
+
+### NEXT UP: `data/next-up.json` (`node scripts/next-up.mjs`)
+`{asOfIso, generatedAt, next, timer: null, source, warnings, reason?}`
+- `next = {label, copy, leaveAt, leaveIso, startIso, day}` or `null`. `copy` is exactly `Leave 5:10.` (h:mm, no am/pm, trailing period). `day` = `Today` or the weekday (tomorrow). Window: now through the end of tomorrow; first leave not yet passed.
+- Picks kid/family events only (a kid named, ride or activity), kids home at the start, a real place (not Home, phone, Zoom, TBD). Never: GET / BUY / REMIND / Atlas stubs, desk blocks, calls, work, health, money, Dan-only items, school-info rows (specials, spirit days, field trips).
+- `label` is rebuilt from kid names + one fixed word (`Hayes pickup`, `Hayes + Harris drop-off`, `Ainsley swim`). No event text, place, or person.
+- **Timer slot (Wright owns the state, on the board):** exactly one. This script always writes `timer: null`. Shape `{label, endsAt}`: `label` 1–12 letters/spaces (`Oven`), `endsAt` ISO with offset. Render `Oven 12:00.` = m:ss remaining, rounded up, clamps at `Oven 0:00.` (the timer ends on the board). Reference: `timerCopy()` in `scripts/next-up.mjs`. Anything invalid renders nothing.
+- Today (Thu Oct 1, 6:30 PM CT run): `Hayes + Harris drop-off · Leave 8:10. (Fri)`.
+
+### Logistics taps: `data/logistics-taps.json` (`node scripts/logistics-taps.mjs`)
+Contract: `docs/wall-redesign/LOGISTICS-TAPS.md`. Four taps (I'm home, Leaving, kid check-in, Running late + chips 5/10/15/20/30), no keyboard, local board state only, nothing sends to a person. Per-device; the shared hub key is documented and OFF (last-yes).
+
+### School-night strip: `data/school-night.json` (`node scripts/school-night.mjs [--pack-flags data/pack-flags.json]`)
+- Visible `15:00`–`19:00` CT (`visibleFrom`, `visibleUntil`, plus today's `visibleFromIso` / `visibleUntilIso` so the wall hides at 7:00 even on a stale file). Outside that, or not a school night, the file holds only `{asOfIso, generatedAt, visibleFrom, visibleUntil, visibleFromIso, visibleUntilIso, schoolNight, visible: false}`. No placeholder.
+- School night = tonight's house mode is not Day off / Kids away / Nashville week, kids home now and at 7:30 AM tomorrow, and tomorrow is a school day (Sun–Thu unless no school tomorrow; another family's no-school days don't count).
+- `pickup[]` from pickup-chain (today, remaining rides that are pickups): `{who, label, time, leaveBy, by, copy}`, e.g. `Harris pickup 3:40. Leave 3:15.`; someone else's pickup names the driver and has no leave (`Hayes pickup 3:40 · Casey.`).
+- `gear[]` `{who, items, copy}`: tonight's remaining activities and tomorrow's events (sport bag from the activity, gear the title names, `send X to`), plus today's Pack flags. `Ainsley · swim bag.`
+- `form` (omitted unless real): the first kid-named calendar item with form / slip / waiver / due, today after now or tomorrow; GET/BUY stubs never count. `Ainsley · LKMS baby pic due Fri 3:00.`
+- `weather: null`, `weatherSource: "source needed"`. Last-yes: there is no field-weather data on the box. The board's own pill (`house-weather.js`) calls Open-Meteo client-side (no key, home coordinates, current + 24h rain); using it for the field means a new fetch path in this lane or Wright reading `HouseWeather` at the field time. Not done; render nothing.
+
+### Display renames (DAN RULING t2812u #2): board only, never the calendar
+- Rules: `config/display-rename.json` (one file for JS and Python). Two renames: the grandparents' calendar title becomes `Nonna and Papa` (also the slash form in the same visit's events; evidence quoted in the config), and their birthday title becomes `Nonna birthday` unless the title names another person's parent. Every other name is unchanged.
+- Parent-word scrub (standing rule, not a rename): a parenthetical naming a parent is dropped, `Riley's <parent word>` becomes `Riley's`, anything still naming a parent is not published (item dropped).
+- Applied at build time, so it carries over when main's refresh routine runs after a merge: `scripts/calendar-refresh.mjs` (kids-week.json, kids-data.js EMBEDDED, board-os mirror), `scripts/cal-from-events.mjs` (cal-live.json, kids-week patch, EMBEDDED), `scripts/cal-months.py` (cal-months.json; also drops dollar amounts from calendar labels), and `lib.publicText` (pickup-chain, next-up, school-night). For already-built files: `node scripts/display-rename.mjs [--check] [--money] <files…>`.
+- Test: no parent word anywhere in public wall data (`atlaslane6.test.mjs`).
+
+### Zero dollars, no score (DAN RULING t2812u #1, Alfred KL-05)
+- The one allowed dollar string is Ainsley's babysitting rate tag (`moneyScrub.allow` in `config/display-rename.json`); it is never stripped. Every Atlas-lane file has zero dollar strings (`moneyHits`, test).
+- Ainsley's seat in `kid-seats.json` is `{name, week: {closed}}` (+ `copy` when closed). No XP, points, counts, streaks, stars. `computeKidLayer` refuses to write if `scoreHits` finds any.

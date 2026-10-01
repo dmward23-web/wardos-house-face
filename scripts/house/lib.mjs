@@ -4,6 +4,7 @@
    renames, or annotates a calendar event. No network. */
 import fs from "node:fs";
 import path from "node:path";
+import { renameText } from "./display-rename.mjs";
 
 export const TZ = "America/Chicago";
 
@@ -62,6 +63,11 @@ export function fmtTime(ms) {
   const p = ctParts(ms);
   const h12 = p.hh % 12 === 0 ? 12 : p.hh % 12;
   return `${h12}:${String(p.mm).padStart(2, "0")} ${p.hh < 12 ? "AM" : "PM"}`;
+}
+/** Wall clock copy, no am/pm: "5:10". */
+export function fmtHM(ms) {
+  const p = ctParts(ms);
+  return `${p.hh % 12 === 0 ? 12 : p.hh % 12}:${String(p.mm).padStart(2, "0")}`;
 }
 const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 export function fmtWhen(ms) {
@@ -355,10 +361,10 @@ export function scanObject(obj, path = "$") {
   walk(obj, path);
   return hits;
 }
-/** Public text: drop any parenthetical naming someone's parent ("Casey's (Riley's …)" -> "Casey's"),
+/** Public text: display renames first ("Mom & Dad" -> "Nonna and Papa", DAN RULING), then drop any parenthetical naming someone's parent ("Casey's (Riley's …)" -> "Casey's"),
     drop "!", tidy spaces. Anything still banned after this is dropped by the caller, never published. */
 export function publicText(text) {
-  return String(text || "")
+  return renameText(String(text || "")) /* ATLASLANE6 display-only renames (config/display-rename.json) */
     .replace(/\s*\([^)]*\b(?:moms?|mommy|mother|dad)\b[^)]*\)/gi, "")
     .replace(/!+/g, "")
     .replace(/\s{2,}/g, " ")
@@ -378,6 +384,36 @@ export function sentence(s) {
   const str = String(s || "");
   const i = str.search(/[A-Za-z]/);
   return i < 0 ? str : str.slice(0, i) + str.charAt(i).toUpperCase() + str.slice(i + 1);
+}
+
+/* ---------- leave-by (ATLASLANE6: shared by pickup-chain, next-up, school-night) ---------- */
+/** Calendar says it's not Dad's leave ("Awareness only — not a leave from 147th", "Leave-by: none"). */
+export const NOT_A_LEAVE_RE = /\bnot a leave\b|\bleave-?by\s*:\s*none\b/i;
+function nearestOf(day, h, mm, ap, anchorMs) {
+  const hh = h % 12;
+  const cands = ap ? [ctWallMs(day, /p/i.test(ap) ? hh + 12 : hh, mm)] : [ctWallMs(day, hh, mm), ctWallMs(day, hh + 12, mm)];
+  return cands.sort((a, b) => Math.abs(a - anchorMs) - Math.abs(b - anchorMs))[0];
+}
+/** Leave-by for an event, in order:
+    1. the title says "leave H:MM"                         ("Dan DRIVE … · leave 8:30")
+    2. the event's own leave reminder line in the description ("Leave-by 4:25pm", "Leave home 4:45";
+       text after "Was:" is history and ignored). Only the time is used; description text is never published.
+    3. the event START is earlier than the stated time    ("SRE drop-off · 8:25" starting 8:10, kids-week
+       leaveBys.note "event START = leave-by")
+    null when the calendar says it isn't a leave, or none of these hold. */
+export function leaveByMs(e, timeMs) {
+  const day = ctDate(e.startMs);
+  const anchor = timeMs == null ? e.startMs : timeMs;
+  if (NOT_A_LEAVE_RE.test(e.summary) || NOT_A_LEAVE_RE.test(e.description)) return null;
+  const t = /\bleave\s+(\d{1,2}):(\d{2})\s*([ap])?\.?m?\b/i.exec(e.summary);
+  if (t) return nearestOf(day, Number(t[1]), Number(t[2]), t[3], e.startMs);
+  const desc = String(e.description || "").split(/\bWas:/i)[0];
+  const d = /\bleave(?:-by|\s+by|\s+home)\s*:?\s*(\d{1,2}):(\d{2})\s*([ap])?\.?m?\b/i.exec(desc);
+  if (d) {
+    const ms = nearestOf(day, Number(d[1]), Number(d[2]), d[3], anchor);
+    if (ms <= anchor && anchor - ms <= 3 * 3600000) return ms;
+  }
+  return e.startMs < anchor ? e.startMs : null;
 }
 
 /* ---------- kid mentions ---------- */
