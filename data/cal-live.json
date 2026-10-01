@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-01T15:01:50.219Z",
+  "fetchedAt": "2026-10-01T15:14:12.136Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-08",
+  "windowEnd": "2026-10-07",
   "asOfIso": "2026-10-01",
   "nextLeave": {
     "id": "tcss94gr3r35me8b24socvu318",
@@ -32,6 +32,15 @@
       "end": "2026-10-01T12:15:00-05:00",
       "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
       "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "1q9j57d92s05qn7j6ruc3mofo8",
+      "summary": "CVS pickup — photo print 5x7",
+      "start": "2026-10-01T13:30:00-05:00",
+      "end": "2026-10-01T13:45:00-05:00",
+      "location": "CVS #8586, 7100 W 151st St, Overland Park, KS 66223",
+      "busy": true,
       "allDay": false
     },
     {
@@ -211,6 +220,24 @@
       "start": "2026-10-03T08:30:00-05:00",
       "end": "2026-10-03T17:00:00-05:00",
       "location": "6719 W 147th Terrace, Overland Park, KS 66223 → J. Alexander's, 73 White Bridge Rd #130, Nashville, TN 37205",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "jo4lmvp34i6iq4m3dg8vd3i0k4",
+      "summary": "Harris — Lindsay appt · 10:00",
+      "start": "2026-10-03T10:00:00-05:00",
+      "end": "2026-10-03T11:00:00-05:00",
+      "location": "",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "tbh8n97tj1mirjorkl17en6904",
+      "summary": "Hayes — Lindsay appt · 10:00",
+      "start": "2026-10-03T10:00:00-05:00",
+      "end": "2026-10-03T11:00:00-05:00",
+      "location": "Midwest Anxiety · location blank in reminder · (913) 498-8200",
       "busy": true,
       "allDay": false
     },
@@ -401,60 +428,6 @@
       "end": "2026-10-07T18:30:00-05:00",
       "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
       "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "6gc1db0v6m642r4t0uhhpagft0",
-      "summary": "Hayes + Harris — SRE spirit day: Crazy Socks Day (Peace Week)",
-      "start": "2026-10-08T07:00:00-05:00",
-      "end": "2026-10-08T07:15:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "jsv3ukvj82chj7v8tmk4mv4atk",
-      "summary": "Harris — SRE specials: Spanish + Library checkout",
-      "start": "2026-10-08T07:00:00-05:00",
-      "end": "2026-10-08T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "t1sse9vtre7av9lvi2kctig9b8",
-      "summary": "Hayes — SRE specials: Art",
-      "start": "2026-10-08T07:00:00-05:00",
-      "end": "2026-10-08T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "43chat4nm1cmv3tsqtd2p9cdjo_20261008T200000Z",
-      "summary": "Ainsley — LKMS Homework Help · 3:00",
-      "start": "2026-10-08T15:00:00-05:00",
-      "end": "2026-10-08T16:00:00-05:00",
-      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "4iuge4862k2uhd3t5irr7jjmc8_20261008T212500Z",
-      "summary": "Ainsley swim — Coach Ann · 5:00 practice",
-      "start": "2026-10-08T17:00:00-05:00",
-      "end": "2026-10-08T18:00:00-05:00",
-      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "gdlheaj2udj8ilargoqmor6m0s",
-      "summary": "Hayes flag practice · 6:00",
-      "start": "2026-10-08T18:00:00-05:00",
-      "end": "2026-10-08T19:15:00-05:00",
-      "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
       "allDay": false
     }
   ],
