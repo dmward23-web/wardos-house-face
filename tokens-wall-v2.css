@@ -1,0 +1,119 @@
+/* FINISH v2 · tokens-wall-v2.css · branch wall-redesign-1 · Wright · loaded after tokens-wall-kiosk27.css, wall.html only.
+   Architectural panel: hairline 1px rules, small radius, no glows / shadows. One sans (InterV), sentence case, tight tracking.
+   Heavy weight only on the mode chip + NEXT UP. Tabular figures for status. Near-monochrome; green / amber / red are the
+   only signal colors (red = not OK, amber = stale or needs attention). Kid colors off (name + a small mark).
+   No motion: animation + transition none everywhere, so a mode change is a hard cut. Taps >= 112px. */
+body.wall-kiosk.wall-v2 {
+  --ink: #e9e7e2; --mute: rgba(233,231,226,0.58); --mute2: rgba(233,231,226,0.38);
+  --hair: rgba(233,231,226,0.16); --hair-hi: rgba(233,231,226,0.34);
+  --go: #5fbf8a; --warn: #d9a441; --bad: #d0574b;
+  --surface: #101112; --void: #0b0c0d;
+  --amber: var(--ink); --amber-hi: var(--ink); --amber-lo: var(--mute); --ok: var(--go);
+  --k-ainsley: var(--ink); --k-hayes: var(--ink); --k-harris: var(--ink);
+  --edge: var(--hair); --edge-hot: var(--hair-hi); --glass: var(--surface);
+  font-family: "InterV", system-ui, sans-serif; letter-spacing: -0.01em; background: var(--void); color: var(--ink);
+}
+body.wall-kiosk.wall-v2 *, body.wall-kiosk.wall-v2 *::before, body.wall-kiosk.wall-v2 *::after {
+  animation: none !important; transition: none !important; text-shadow: none !important; }
+html:has(body.wall-kiosk.wall-v2) { background: #0b0c0d; }
+
+/* panel: restrained camo (dimmed under a flat wash), no frame glow */
+.wall-v2 .panel { background-color: var(--void);
+  background-image: linear-gradient(rgba(11,12,13,0.93), rgba(11,12,13,0.93)), url("camo-tile.png");
+  background-size: auto, 520px 520px; background-repeat: no-repeat, repeat; }
+.wall-v2 .panel::after { box-shadow: none; border: 1px solid var(--hair); }
+.wall-v2 .mod { background: var(--surface); border: 1px solid var(--hair); border-radius: 6px; box-shadow: none; }
+.wall-v2 .ico { color: var(--mute); }
+.wall-v2 .kick { font-size: 22px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--mute); }
+
+/* header */
+.wall-v2 .hdr .mark { opacity: 0.7; filter: grayscale(1); }
+.wall-v2 .hdr .clock { font-weight: 500; letter-spacing: -0.03em; }
+.wall-v2 .hdr .clock small { font-weight: 500; color: var(--mute); }
+.wall-v2 .hdr .date { font-weight: 500; }
+.wall-v2 .mode { border-radius: 6px; border: 1px solid var(--hair-hi); background: transparent; box-shadow: none; padding: 12px 32px 12px 22px; }
+.wall-v2 .mode i { background: var(--ink); box-shadow: none; width: 14px; height: 14px; border-radius: 2px; }
+.wall-v2 .mode .mk { font-size: 18px; font-weight: 600; letter-spacing: 0; color: var(--mute); }
+.wall-v2 .mode .mv { font-weight: 800; color: var(--ink); letter-spacing: -0.03em; }
+.wall-v2 .stale { font-weight: 500; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.wall-v2 .stale i { width: 14px; height: 14px; border: 1px solid var(--hair-hi); }
+.wall-v2 .stale.on { color: var(--warn); }
+.wall-v2 .stale.on i { background: var(--warn); border-color: var(--warn); box-shadow: none; }
+.wall-v2 .home-hint { border-radius: 6px; border: 1px solid var(--hair); font-weight: 500; }
+
+/* NEXT UP: the other heavy line */
+.wall-v2 .next .t { font-weight: 800; font-variant-numeric: tabular-nums; }
+.wall-v2 .next .w { font-weight: 800; }
+.wall-v2 .next .sub, .wall-v2 .next .sub b { font-weight: 500; color: var(--mute); }
+
+/* controls: hairline-ruled, labeled, >= 112px */
+.wall-v2 .tap { min-height: 112px; border: 1px solid var(--hair-hi); border-radius: 6px; background: transparent; box-shadow: none; font-weight: 600; }
+.wall-v2 .tap:active { background: rgba(233,231,226,0.08); transform: none; }
+.wall-v2 .tap[disabled] { opacity: 0.4; }
+.wall-v2 .tap.is-armed { border-color: var(--warn); background: transparent; box-shadow: none; }
+.wall-v2 .tap .tx small { font-weight: 500; color: var(--mute); font-variant-numeric: tabular-nums; }
+.wall-v2 .act .ah .gate { border: 1px solid var(--hair); border-radius: 4px; background: transparent; color: var(--mute); font-weight: 500; letter-spacing: 0; }
+.wall-v2 .act .note { font-weight: 500; color: var(--mute); }
+
+/* status lights: green OK · amber stale / attention · red not OK · off = needs a token */
+.wall-v2 .lt { font-variant-numeric: tabular-nums; font-weight: 500; border-color: var(--hair); box-shadow: none; }
+.wall-v2 .lt .led { box-shadow: none !important; width: 14px; height: 14px; border-radius: 50%; }
+.wall-v2 .led.ok { background: var(--go); }
+.wall-v2 .led.warn { background: var(--warn); }
+.wall-v2 .led.bad { background: var(--bad); }
+.wall-v2 .led.off { background: transparent; border: 1px solid var(--hair-hi); }
+
+/* pickup chain + loops honest empty line */
+.wall-v2 .empty-line { align-self: center; font-size: 26px; font-weight: 500; color: var(--mute); padding: 0 8px; }
+.wall-v2 .c-cell, .wall-v2 .c-cell.is-now, .wall-v2 .c-cell.is-next { border: 1px solid var(--hair); border-radius: 6px; box-shadow: none; background: transparent; }
+.wall-v2 .c-cell.is-next { border-color: var(--hair-hi); }
+.wall-v2 .c-time { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink) !important; }
+.wall-v2 .c-tag { color: var(--mute) !important; font-weight: 500; letter-spacing: 0; text-transform: none; }
+.wall-v2 .kname { color: var(--ink); }
+.wall-v2 .who .pill { border: 1px solid var(--hair); border-radius: 6px; background: transparent; box-shadow: none; }
+.wall-v2 .who .pill .dot { background: transparent; border: 1px solid var(--hair-hi); color: var(--ink); box-shadow: none; }
+.wall-v2 .who .pill.is-in .dot { background: var(--go); border-color: var(--go); color: #0b0c0d; }
+.wall-v2 .flag { border: 1px solid var(--hair); border-radius: 6px; background: transparent; box-shadow: none; }
+
+/* KID LAYER v3: the name is the check-in; chore done fills a small mark. No kid colors. */
+.wall-v2 .kids { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+.wall-v2 .kid { display: grid; grid-template-columns: minmax(0,1.3fr) minmax(0,1fr); gap: 12px; padding: 14px; align-items: stretch; }
+.wall-v2 .kid .kid-name .tx > span { font-size: 52px; font-weight: 700; letter-spacing: -0.02em; }
+.wall-v2 .kid .kid-name.is-in { border-color: var(--go); }
+.wall-v2 .kid .kid-name.is-in .tx small { color: var(--go); }
+.wall-v2 .kid .tap { display: flex; align-items: center; gap: 16px; padding: 14px 20px; font-size: 32px; }
+.wall-v2 .kid .mark { width: 30px; height: 30px; flex: none; border: 1px solid var(--hair-hi); border-radius: 4px; }
+.wall-v2 .kid .kid-done.is-done .mark { background: var(--ink); border-color: var(--ink); }
+.wall-v2 .kid-unlock { grid-column: 1 / 3; display: flex; gap: 12px; }
+.wall-v2 .kid-unlock .tap, .wall-v2 .us-row .tap { flex: 1; font-size: 28px; }
+.wall-v2 .tap.unlock { border-color: var(--go); }
+.wall-v2 .tap.unlock.is-used, .wall-v2 .tap.unlock[disabled] { border-color: var(--hair); opacity: 0.32; }
+.wall-v2 .us-row { display: flex; align-items: center; gap: 24px; padding: 14px 24px; }
+.wall-v2 .us-row .us-msg { font-size: 30px; color: var(--ink); font-weight: 600; }
+.wall-v2 .badge.is-lit { border-color: var(--go); }
+
+/* rail + footer */
+.wall-v2 .badge { border: 1px solid var(--hair); border-radius: 6px; background: transparent; box-shadow: none; font-weight: 500; letter-spacing: 0; }
+.wall-v2 .rail-h { font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--mute); }
+.wall-v2 .rail-top, .wall-v2 .rail-foot, .wall-v2 .ftr { font-weight: 500; letter-spacing: 0; text-transform: none; }
+.wall-v2 .ftr b, .wall-v2 .ftr .modes b { color: var(--ink); font-weight: 600; }
+body.wall-kiosk.wall-v2.is-stacked .kids { grid-template-columns: minmax(0,1fr); }
+/* sentence case on secondary labels (plate CSS uppercased them) */
+.wall-v2 .who .pill span, .wall-v2 .who .pill b, .wall-v2 .tap .tx small, .wall-v2 .c-tag, .wall-v2 .lt .lv small,
+.wall-v2 .chain .ch-lbl .dies, .wall-v2 .rail-top span, .wall-v2 .ftr { text-transform: none; letter-spacing: 0; }
+.wall-v2 .act .ah .kick, .wall-v2 .who .kick, .wall-v2 .chain .ch-lbl .kick, .wall-v2 .lights .kick, .wall-v2 .loops .kick { letter-spacing: 0; text-transform: none; color: var(--mute); }
+/* seats (Atlas kid-seats.json): Hayes week row, Ainsley week-closed mark, Harris mission word. A miss is an empty mark, never red. */
+.wall-v2 .kid .kid-done .tx > span { font-size: 40px; font-weight: 700; }
+.wall-v2 .kid-seat { grid-column: 1 / 3; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.wall-v2 .wk-row { display: flex; gap: 8px; }
+.wall-v2 .wk { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 18px; color: var(--mute); font-variant-numeric: tabular-nums; min-width: 44px; }
+.wall-v2 .wk i { width: 26px; height: 26px; border: 1px solid var(--hair-hi); border-radius: 4px; }
+.wall-v2 .wk.m-closed i { background: var(--ink); border-color: var(--ink); }
+.wall-v2 .wk.m-ahead i { border-style: dashed; }
+.wall-v2 .wk.m-off i { opacity: 0.35; }
+.wall-v2 .wk.is-today { color: var(--ink); }
+.wall-v2 .wk-next { font-size: 24px; color: var(--mute); font-variant-numeric: tabular-nums; }
+.wall-v2 .wk-closed { display: flex; align-items: center; gap: 10px; font-size: 22px; color: var(--mute); }
+.wall-v2 .wk-closed i { width: 14px; height: 14px; background: var(--ink); border-radius: 2px; }
+.wall-v2 .kid-unlock { flex-wrap: wrap; }
+.wall-v2 .ul-copy { flex-basis: 100%; font-size: 24px; color: var(--ink); }

@@ -9,6 +9,7 @@ Law: the wall recalls EXISTING scenes only. It never invents a scene, routine, o
 > **Leaving** = all Kasa OFF (Dining Room, Harris's Room, Kitchen). **I'm home** = Kitchen + Dining Room ON.
 > Neither touches the Sensi. Both go through the EXISTING Kasa client (`HouseLights.setLight(id,{on})`, `house-lights.js`).
 > No key saved on the screen → quiet `NEED KEY`, zero requests. Mode chips recall nothing (no mode scenes). Kasa All on / All off is untouched.
+> **KID LAYER v3 (~6:15 PM CT):** the chore-done hall flash is **not a scene**. It is a 2-second invert-and-restore of lights listed in `config/wall-kid.config.json` through the same `HouseLights.setLight`. The list ships **EMPTY** (no hall-visible light confirmed; Harris's Room never). See KIDLAYER3.md.
 > The inventory below (no Google Home scenes exist anywhere on the box) still stands; these two are Dan's wall-side definitions, not Google Home scenes.
 
 **No Google Home scene, routine, or automation was found in any source on the box.**

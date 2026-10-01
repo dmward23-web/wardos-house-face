@@ -19,7 +19,7 @@ Freshness windows reuse the constants that already ship:
 
 Wright reads these. Wright never writes them.
 
-Quiet rendering: HUBCMD void + amber atoms (`--cmd-*`). OK = muted ink with a small amber dot. Not-OK = `--cmd-amber-hi` text, no red, no blink, no sound, no modal. Each line taps through to its sheet (no dead ends).
+Quiet rendering: HUBCMD void + amber atoms (`--cmd-*`). On the hub: OK = muted ink with a small amber dot; not-OK = `--cmd-amber-hi` text. **On wall.html (FINISH v2):** LED green `#5fbf8a` = OK, **red `#d0574b` = not OK** (offline, error, pond not OK), **amber `#d9a441` only for stale or needs attention** (thermostat `check set`), off/outlined = NEED TOKEN (laundry). No blink, no sound, no modal. Each line taps through to its sheet (no dead ends).
 
 ---
 

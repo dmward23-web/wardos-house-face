@@ -4054,37 +4054,13 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  </div>
  </header>
 
- <div class="hub-cam-deck" id="hub-cam-deck" aria-label="Nest cameras · live when stream plays">
- <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Front door camera · STILL">
- <div class="hub-cam-media-wrap">
- <img class="hub-cam-media" src="data/nest-snaps/front-door.jpg?v=CAMLIVE2" alt="Front door still"/>
- <span class="hub-cam-pill hub-cam-pill--corner is-still">STILL</span>
- </div>
- <div class="hub-cam-foot">
- <span class="hub-cam-label">Front door</span>
- <span class="hub-cam-kind" hidden aria-hidden="true">STILL</span>
- </div>
- </a>
- <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Garage camera · STILL">
- <div class="hub-cam-media-wrap">
- <img class="hub-cam-media" src="data/nest-snaps/garage.jpg?v=CAMLIVE2" alt="Garage still"/>
- <span class="hub-cam-pill hub-cam-pill--corner is-still">STILL</span>
- </div>
- <div class="hub-cam-foot">
- <span class="hub-cam-label">Garage</span>
- <span class="hub-cam-kind" hidden aria-hidden="true">STILL</span>
- </div>
- </a>
- <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Backyard camera · STILL">
- <div class="hub-cam-media-wrap">
- <img class="hub-cam-media" src="data/nest-snaps/backyard.jpg?v=CAMLIVE2" alt="Backyard still"/>
- <span class="hub-cam-pill hub-cam-pill--corner is-still">STILL</span>
- </div>
- <div class="hub-cam-foot">
- <span class="hub-cam-label">Backyard</span>
- <span class="hub-cam-kind" hidden aria-hidden="true">STILL</span>
- </div>
- </a>
+ <!-- CAMOFF1 · wall-redesign-1 (Alfred P0 CAM-01): no camera feed, still, or WebRTC mount on the hub.
+      Cams = one quiet light, hidden until a real per-camera check exists (house-wall-status.js camsLight).
+      Cameras stay on sheet-google-home.html. Key entry (lights + cam keys) keeps a quiet trigger here. -->
+ <div class="hub-cams-row" id="hub-cams-row" data-owner="Wright" data-tile="cams-light" data-tile-id="cams-light">
+ <a class="hub-cams-light" id="hub-cams-light" href="sheet-google-home.html" hidden><span class="hub-cams-led" aria-hidden="true"></span><span class="hub-cams-text"></span></a>
+ <a class="hub-wall-link" href="wall.html" data-owner="Wright" data-tile="wall-panel" data-tile-id="wall-panel">House panel · pickup · loops · gallery</a>
+ <button type="button" class="hub-key-btn" id="hub-key-btn" data-hub-key-entry hidden>Add screen key</button>
  </div>
 
  <div class="hub-upper hub-upper--cams hub-upper--cmd hub-upper--hot">
@@ -4333,12 +4309,41 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 <script src="house-kid-engage.js?v=AUDIT1"></script>
 <script src="house-hub-tiles-bind.js?v=SEATS1"></script>
 <script src="house-sensi.js?v=SENSIAUTO1"></script>
-<script src="nest-webrtc-client.js?v=PROXYFOLLOW2"></script>
-<script src="house-nest.js?v=CAMIOS2"></script>
 <script src="hub-key-entry.js?v=AUDIT1"></script>
 <script src="house-lights.js?v=AUDIT1"></script>
 <script src="house-sensi-ctl.js?v=SENSIAUTO1"></script>
 <script src="hub-led-ring.js?v=LEDPHONE1"></script>
+<script src="house-wall-status.js?v=CAMOFF1"></script>
+<style>
+/* CAMOFF1 · one quiet row where the cam deck was */
+.hub-cams-row { display: flex; align-items: center; gap: 14px; padding: 6px 4px; min-height: 52px; }
+.hub-cams-light, .hub-wall-link, .hub-key-btn { display: inline-flex; align-items: center; gap: 10px; font-family: inherit; font-size: 20px; font-weight: 600; line-height: 1.2; color: rgba(240,236,226,0.82);
+  border: 1px solid rgba(240,236,226,0.22); border-radius: 6px; padding: 10px 16px; background: rgba(5,7,10,0.55); text-decoration: none; }
+.hub-cams-light[hidden], .hub-key-btn[hidden] { display: none; }
+.hub-cams-led { width: 14px; height: 14px; border-radius: 50%; background: #5fbf8a; }
+.hub-cams-light.is-bad .hub-cams-led { background: #d0574b; }
+.hub-key-btn { cursor: pointer; }
+</style>
+<script>
+/* CAMOFF1 · cams light (hidden until every cam has a real online true/false) + quiet key entry */
+(function () {
+  var W = window.HouseWallStatus;
+  var el = document.getElementById("hub-cams-light");
+  function paint(j) {
+    var l = W && j ? W.camsLight(j, {}) : null;
+    if (!el) return;
+    el.hidden = !l;
+    if (l) { el.classList.toggle("is-bad", !l.ok); el.querySelector(".hub-cams-text").textContent = l.text; }
+  }
+  function load() {
+    fetch("data/nest-live.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; })
+      .then(paint).catch(function () { paint(null); });
+  }
+  load(); setInterval(load, 60000);
+  var kb = document.getElementById("hub-key-btn");
+  try { if (kb) kb.hidden = !!localStorage.getItem("wardos-lights-proxy-token"); } catch (e) {}
+})();
+</script>
 <script>
 (function () {
  document.querySelectorAll("a.tile").forEach(function (a) {
@@ -4354,7 +4359,6 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
   }, { passive: true });
  }
  var S = window.HouseSensi;
- var N = window.HouseNest;
  var L = window.HouseLights;
  /* KIDSWAP1 · Ainsley before Hayes tiles · Nest/Lights header ovals stay removed */
  function paintHubLive() {
@@ -4364,11 +4368,6 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
   if (chip) S.mountChip(chip);
   S.onChange(paintHubLive);
   if (!chip) S.startPolling();
- }
- if (N) {
-  N.onChange(paintHubLive);
-  if (N.mountHubCamDeck) N.mountHubCamDeck("#hub-cam-deck");
-  else N.startPolling();
  }
  if (L) {
   L.onChange(paintHubLive);

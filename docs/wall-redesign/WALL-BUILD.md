@@ -13,22 +13,36 @@ Rule: a tile is drawn only when it has a live source. No placeholders. No plate 
 | House actuator | **I'm home** / **Leaving** (Dan's Kasa scenes) | `HouseLights.setLight`; no key → `NEED KEY`, 0 requests |
 | Thermostat actuator (**deviation: not on the plate**) | **Travel / Back home**, arm-then-confirm | THERMO-TRAVEL.md |
 | Status lights | thermostat `73° · after school` (mode label from house-mode.json, no flag while `house-mode-temps.json` targets are null) or `Travel · 55–85`; `Laundry NEED TOKEN` | `statusStrip()` + `bandsFromTemps()` (mirror of Atlas's) |
-| Rail | all 22 badges, the plate's names, groups and icons, repo-relative links | static |
+| Rail | **17 badges** (JAR REMOVED: Reward jar, Chores MUSTS and the 3 kid pages dropped), the plate's names, groups and icons, repo-relative links, `data-owner` per badge | static |
 | Footer | real as-of stamps (CT) of each loaded feed; modes list with **Kids away** | feed `fetchedAt` / `updatedAt` |
 
 ## Hidden (no source or gated)
 - **Who's home**: wired (`whoHome()`), hidden. `data/who-home.json` is Atlas's all-null seed and nothing writes it (check-ins are per-device; no writer built). Shows only once a kid has a real check-in for the current house day (3 AM CT reset); hidden in Kids away.
 - **Pack**: wired (`packFlags()`), hidden. `data/pack-flags.json` has no flags. Shows today's flags only (date = today, before `clearsAt`, created today, one of the three kids, ≤ 60 chars). Read-only: no flag button (no writer).
-- **Check in**: not built. Stays per-device only; **no new key added to the hub `/api/taps` allowlist** (`TAP_KEY_RE` untouched, Dan's last-yes list).
-- Chore done, Reward jar (Alfred PASS pending), Dinner vote (no picks), Ask pip (**PARKED**), Open loops (no source), cams light (`online:null`), doors (no source), Load day (no live source), dragon (never), pond (no source).
+- **Check in**: built as the kid name button (KIDLAYER3.md). Per-device only; **no new key added to the hub `/api/taps` allowlist** (`TAP_KEY_RE` untouched, Dan's last-yes list).
+- Reward jar (removed: JAR-REMOVED.md), Dinner vote (only as a one-use unlock), Ask pip (**PARKED**), Open loops (no source), cams light (`online:null`), doors (no source), Load day (no live source), dragon (never), pond (no source).
 Merged render (Atlas data): `wall-build-2560-merged.png` (~5:56 PM CT). `wall-build-2560-merged-sensi-fresh-mock.png` is the same page with only the Sensi timestamp mocked fresh, to show the `73° · after school` line.
 Thermostat light is also hidden whenever `sensi-live.json` is > 30 min old (it was at render time: 5:10 PM CT feed, render ~5:48 PM CT) unless the hub's live reading is available with a key.
 
 ## Deviations from the plate
-1. Thermostat Travel button added (Dan asked). 2. Actuator band is two 560-px tiles that fill the free height (the plate's 7 columns are mostly hidden). 3. NEXT UP time carries a small AM/PM; text is the calendar's, not the plate's split "who · where". 4. `Laundry` light (owner ruling). 5. Footer lists only feeds wall.html reads. 6. Rail foot reads "Branch build · not live until Alfred PASS + Dan last-yes".
+1. Thermostat Travel button added (Dan asked). 2. Actuator band is two 560-px tiles that fill the free height (the plate's 7 columns are mostly hidden). 3. NEXT UP time carries a small AM/PM; text is the calendar's, not the plate's split "who · where". 4. `Laundry` light (owner ruling). 5. Footer lists only feeds wall.html reads. 6. Rail foot reads "Branch build. Not live." (no bot name). 7. FINISH v2 restyle (FINISH-V2.md). 8. Kid band + Us together row (KIDLAYER3.md).
 
 ## Checks
 scrollWidth = clientWidth at 2560x1440 / 1920x1080 / 1080x1920 (no sideways scroll). No-key run: **0 non-local requests** after forced taps on Leaving and Travel x2. GATE1 (`--file wall.html` too), GATE2, kids-safe voice: PASS.
 
 ## Known cross-lane mismatch (left as authored)
 Atlas's `scripts/house/tests/wall-state.test.mjs` test 26 expects the thermostat text `73°, After school` (Wright's old bcd53ea stub). The owner ruling is `73° · after school`, which is what ships, so that one test fails (25/26). Its second half (Atlas's `{mode:{id,label}, bands}` call shape flags when a target is set) passes against this build. Fix belongs in Atlas's test line 49; not edited here.
+
+## Update Oct 1 ~6:15 PM CT · FINISH v2 + KID LAYER v3 (on Atlas 3bde4a5, then FF to Atlas 1163be5)
+- New render: `wall-build-2560-v2.png` (+ `-unlock-MOCK`, `wall-build-1080x1920-v2.png`, `hub-1080x1920-v2.png`).
+- **Who's home** now shows once a kid taps their name on this screen. That's a per-device check-in merged with `data/who-home.json`.
+- **Pickup chain** and **Open loops** show a one-line honest empty state instead of hiding.
+- Check-in and Chore done are built (KIDLAYER3.md). Reward jar and Chores badges are removed (JAR-REMOVED.md). Cams on the hub are removed (CAMOFF1.md).
+- Atlas's wall-state test is fixed upstream in 3bde4a5 (28/28). The "Known cross-lane mismatch" below is closed.
+
+## 2-tap paths
+| From | To | Taps |
+|---|---|---|
+| Hub (`sheet-index.html`) | wall.html, with pickup chain + open loops on its face | 1 (`House panel · pickup · loops · gallery`) |
+| Hub | Gallery / Needs photo (wall rail badges) | 2 (hub → wall → badge). Before this the hub had no gallery link at all. |
+| wall.html | any rail board / Main board | 1 |

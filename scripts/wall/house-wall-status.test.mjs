@@ -114,18 +114,22 @@ t("location-list state picks MAIN", () => assert.equal(S.laundryLight(L({ state:
   { location: { locationName: "MINI" }, runState: { currentState: "END" } },
   { location: { locationName: "MAIN" }, runState: { currentState: "RUNNING" }, timer: { remainHour: 0, remainMinute: 7 } }] }), { now: NOW }).text, "Washer 0:07"));
 t("unknown run state shown raw, not guessed", () => assert.equal(S.laundryLight(L(unit("FOTA")), { now: NOW }).text, "Washer fota"));
-t("controls: no token -> all disabled, sends nothing", () => assert.deepEqual(S.laundryControls(null, "washer", { now: NOW }), { start: false, pause: false, off: false, sends: false, reason: "NEED TOKEN" }));
+t("controls: no token -> all disabled, sends nothing", () => assert.deepEqual(S.laundryControls(null, "washer", { now: NOW }), { start: false, off: false, sends: false, reason: "NEED TOKEN" }));
 t("controls: Remote Start not armed -> Start disabled", () => {
   const c = S.laundryControls(L(unit("INITIAL", null, false)), "washer", { now: NOW });
   assert.equal(c.start, false); assert.equal(c.sends, false);
 });
 t("controls: armed + idle -> Start only (+Off)", () => {
   const c = S.laundryControls(L(unit("INITIAL", null, true)), "washer", { now: NOW });
-  assert.deepEqual([c.start, c.pause, c.off], [true, false, true]);
+  assert.deepEqual([c.start, c.off], [true, true]);
 });
-t("controls: armed + running -> Pause/Off, not Start", () => {
+t("controls: armed + running -> Off only, not Start", () => {
   const c = S.laundryControls(L(unit("RUNNING", null, true)), "washer", { now: NOW });
-  assert.deepEqual([c.start, c.pause, c.off], [false, true, true]);
+  assert.deepEqual([c.start, c.off], [false, true]);
+});
+t("controls: no Pause control exists (LG has no pause op; never mapped to STOP)", () => {
+  const c = S.laundryControls(L(unit("RUNNING", null, true)), "washer", { now: NOW });
+  assert.equal("pause" in c, false);
 });
 t("controls: stale -> all disabled", () => assert.equal(S.laundryControls(L(unit("INITIAL", null, true), null, { fetchedAt: iso(31 * MIN) }), "washer", { now: NOW }).sends, false));
 

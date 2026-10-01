@@ -141,7 +141,7 @@
       if (bad) {
         var set = (th.heatSetpoint != null && th.coolSetpoint != null && /^auto$/i.test(th.mode))
           ? th.heatSetpoint + "\u2013" + th.coolSetpoint : String(th.setpoint != null ? th.setpoint : "");
-        return { id: "thermo", ok: false, text: text + " \u00b7 check set " + set + "\u00b0", href: HUB };
+        return { id: "thermo", ok: false, attention: true, text: text + " \u00b7 check set " + set + "\u00b0", href: HUB };
       }
     }
     return { id: "thermo", ok: true, text: text, href: HUB };
@@ -233,18 +233,20 @@
   }
   /* Controls for one unit ("washer" | "dryer"). No token -> every control disabled, sends:false (zero requests).
      Start ONLY when the appliance reports remoteControlEnable.remoteControlEnabled === true (Remote Start armed).
-     Pause/Off also need the remote-control flag (ASSUMED; LG enforcement per model UNKNOWN). */
+     No Pause: ThinQ Connect's writable washer/dryerOperationMode enum has no pause value (START, STOP, POWER_OFF,
+     POWER_ON / WAKE_UP per model profile), so Pause is hidden, never mapped to STOP (ruling Oct 1). See LAUNDRY.md.
+     Off (POWER_OFF) also needs the remote-control flag (ASSUMED; LG enforcement per model UNKNOWN). */
   function laundryControls(laundry, unitKey, opts) {
     opts = opts || {};
-    var off = { start: false, pause: false, off: false, sends: false };
+    var off = { start: false, off: false, sends: false };
     if (!laundry || laundry.status !== "live" || laundry.hasToken === false || laundry.error) return Object.assign(off, { reason: "NEED TOKEN" });
     if (!fresh(laundry.fetchedAt, FRESH.laundry, opts.now)) return Object.assign(off, { reason: "STALE" });
     var unit = laundry[unitKey], st = unitState(unit), rs = runState(unit);
     if (!st || !rs) return Object.assign(off, { reason: "NO UNIT" });
     var armed = !!(st.remoteControlEnable && st.remoteControlEnable.remoteControlEnabled === true);
     var active = ACTIVE.indexOf(rs) >= 0;
-    var c = { start: armed && !active, pause: armed && active, off: armed && rs !== "POWER_OFF" };
-    c.sends = c.start || c.pause || c.off;
+    var c = { start: armed && !active, off: armed && rs !== "POWER_OFF" };
+    c.sends = c.start || c.off;
     c.reason = armed ? null : "REMOTE START OFF";
     return c;
   }
