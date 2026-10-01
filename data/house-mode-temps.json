@@ -19,6 +19,11 @@
       "heatSetpoint": null,
       "coolSetpoint": null
     },
+    "day-off": {
+      "label": "Day off",
+      "heatSetpoint": null,
+      "coolSetpoint": null
+    },
     "kids-away": {
       "label": "Kids away",
       "heatSetpoint": null,

@@ -9,7 +9,7 @@ export const KIDS_WEEK = { asOfIso: "2026-10-01", leaveBys: { SRE_pickup: "leave
 export const at = (s) => Date.parse(s);
 
 const timed = (summary, start, end, extra = {}) => ({ summary, start: { dateTime: start }, end: { dateTime: end }, ...extra });
-const allDay = (summary, from, to) => ({ summary, start: { date: `${from}T00:00:00Z` }, end: { date: `${to}T00:00:00Z` } });
+export const allDay = (summary, from, to) => ({ summary, start: { date: `${from}T00:00:00Z` }, end: { date: `${to}T00:00:00Z` } });
 
 export function calendar(extra = []) {
   return {

@@ -30,7 +30,8 @@ test("pack flags: kid + text + createdAt, cleared at end of CT day, banned text 
 test("temps: all null 'awaiting Dan' -> no bands -> thermostat light can't flag", () => {
   const temps = readJson(path.join(ROOT, "data/house-mode-temps.json"));
   assert.equal(temps.note, "awaiting Dan");
-  assert.equal(Object.keys(temps.modes).length, 7);
+  assert.equal(Object.keys(temps.modes).length, 8);
+  assert.equal(temps.modes["day-off"].label, "Day off");
   assert.ok(Object.values(temps.modes).every((m) => m.heatSetpoint === null && m.coolSetpoint === null));
   assert.deepEqual(bandsFromTemps(temps), {});
   const set = { modes: { ...temps.modes, "school-day": { heatSetpoint: 68, coolSetpoint: null } } };

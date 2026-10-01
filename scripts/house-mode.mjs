@@ -2,28 +2,32 @@
 /* ATLASLANE1 · scripts/house-mode.mjs · branch wall-redesign-atlas · NOT WIRED (no cron, no deploy).
    Writes data/house-mode.json: {mode, label, since, until, asOfIso, generatedAt, source, reason, warnings}.
 
-   Precedence: override (Guest/Quiet, manual) > Nashville week > Kids away > Weekend > After school > School day.
-   Inputs (read-only): calendar JSON dump on the box, data/kids-week.json, config/house-mode.config.json,
-   optional data/house-mode-override.json (absent by default).
+   Precedence: override (Guest/Quiet, manual) > Kids home (a 'Kids with Dan' span covers now: Nashville week
+   ends, e.g. handoff Fridays) > Nashville week > Kids away > Day off / Weekend > After school > School day.
+   Inputs (read-only): repo data/cal-live.json + data/kids-week.json when present; box dump
+   /workspace/cal-dmward23-week.json as fallback + supplement (cal-live never carries 'Kids with Dan');
+   config/house-mode.config.json; optional data/house-mode-override.json (absent by default).
+   Warns (never guesses) when now+7d is outside the calendar window.
 
    Usage:
-     node scripts/house-mode.mjs [--events /workspace/cal-dmward23-week.json] [--kids-week data/kids-week.json]
-                                 [--config config/house-mode.config.json] [--override data/house-mode-override.json]
-                                 [--now 2026-10-02T07:30:00-05:00] [--out data/house-mode.json] [--stdout] */
+     node scripts/house-mode.mjs [--data-dir data] [--cal-live data/cal-live.json] [--events /workspace/cal-dmward23-week.json]
+                                 [--kids-week data/kids-week.json] [--config config/house-mode.config.json]
+                                 [--override data/house-mode-override.json] [--now ISO] [--out data/house-mode.json] [--stdout] */
 import path from "node:path";
-import fs from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
-  MODES, MANUAL_ONLY, normalizeEvents, coverage, kidsHomeSpans, kidsHomeAt, schoolDayInfo, dismissalFor,
-  nashvilleAt, ctDate, ctWallMs, addDays, parseHM, fmtWhen, fmtTime, ctIso, readJson, writeJson, scanObject,
+  MODES, MANUAL_ONLY, kidsHomeSpans, kidsHomeAt, schoolDayInfo, dismissalFor, asCalendar, windowMs, calendarWarnings,
+  nashvilleAt, ctDate, ctWallMs, addDays, parseHM, fmtWhen, fmtTime, ctIso, readJson, writeJson, scanObject, loadInputs as loadAll,
 } from "./house/lib.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const DEFAULTS = {
+  dataDir: path.join(ROOT, "data"),
+  calLive: null,      /* default <dataDir>/cal-live.json */
   events: "/workspace/cal-dmward23-week.json",
-  kidsWeek: path.join(ROOT, "data/kids-week.json"),
+  kidsWeek: null,     /* default <dataDir>/kids-week.json */
   config: path.join(ROOT, "config/house-mode.config.json"),
-  override: path.join(ROOT, "data/house-mode-override.json"),
+  override: null,     /* default <dataDir>/house-mode-override.json */
   out: path.join(ROOT, "data/house-mode.json"),
 };
 
@@ -39,18 +43,22 @@ export function activeOverride(override, t) {
   return { mode, sinceMs: isFinite(since) ? since : null, untilMs: until };
 }
 
-/** Pure: mode key + reason at instant t. ctx = {events (normalized), spans, kidsWeek, config, override}. */
+/** Pure: mode key + reason at instant t. ctx = {events (normalized), spans, spansKnown, kidsWeek, config, override}. */
 export function modeAt(ctx, t) {
   const { events, spans, kidsWeek, config, override } = ctx;
+  const spansKnown = ctx.spansKnown !== false;
   const ov = activeOverride(override, t);
   if (ov) return { mode: ov.mode, reason: `Set by hand until ${fmtWhen(ov.untilMs)}` };
 
-  const trip = nashvilleAt(events, config, t);
-  if (trip) return { mode: "nashville-week", reason: `Dan's Nashville travel week (all-day calendar event, through ${fmtWhen(trip.endMs - 60000).replace(/, .*$/, "")})` };
-
-  if (!kidsHomeAt(spans, t)) {
-    const next = spans.filter((s) => s.startMs > t).sort((a, b) => a.startMs - b.startMs)[0];
-    return { mode: "kids-away", reason: "Kids are with their mom" + (next ? `; back with Dad ${fmtWhen(next.startMs)}` : "") };
+  /* Kids home beats Nashville week: once a 'Kids with Dan' span covers now, travel week is over. */
+  const kidsHome = spansKnown && kidsHomeAt(spans, t);
+  if (!kidsHome) {
+    const trip = nashvilleAt(events, config, t);
+    if (trip) return { mode: "nashville-week", reason: `Dan's Nashville travel week (all-day calendar event, through ${fmtWhen(trip.endMs - 60000).replace(/, .*$/, "")})` };
+    if (spansKnown) {
+      const next = spans.filter((s) => s.startMs > t).sort((a, b) => a.startMs - b.startMs)[0];
+      return { mode: "kids-away", reason: "Kids are with their mom" + (next ? `; back with Dad ${fmtWhen(next.startMs)}` : "") };
+    }
   }
 
   const today = ctDate(t);
@@ -60,8 +68,10 @@ export function modeAt(ctx, t) {
   const day = evening ? addDays(today, 1) : today; /* after bedtime the house is on tomorrow's footing */
   const info = schoolDayInfo(events, day);
   if (!info.school) {
-    const why = info.weekday === "Sat" || info.weekday === "Sun" ? "Weekend" : "No school on the calendar";
-    return { mode: "weekend", reason: evening ? `${why} tomorrow (after ${fmtTime(bedMs)} bedtime)` : why };
+    const wkend = info.weekday === "Sat" || info.weekday === "Sun";
+    const mode = wkend ? "weekend" : "day-off";
+    const why = wkend ? "Weekend" : "No school on the calendar";
+    return { mode, reason: evening ? `${why} tomorrow (after ${fmtTime(bedMs)} bedtime)` : why };
   }
   if (!evening) {
     const dis = dismissalFor(events, kidsWeek, today, config);
@@ -77,7 +87,8 @@ export function modeAt(ctx, t) {
 function edgeOf(ctx, t, key, dir, cov) {
   const STEP = 15 * 60000, MAX = 21 * 24 * 60 * 60000;
   const lo = cov ? cov.fromMs : t - MAX, hi = cov ? cov.toMs : t + MAX;
-  let a = t, b = t + dir * STEP, n = 0;
+  const t0 = Math.floor(t / 60000) * 60000; /* minute-aligned so the bisection always converges */
+  let a = t0, b = t0 + dir * STEP, n = 0;
   while (n++ < MAX / STEP) {
     if (b < lo || b > hi) return null; /* no change inside the data we have */
     if (modeAt(ctx, b).mode !== key) break;
@@ -85,36 +96,31 @@ function edgeOf(ctx, t, key, dir, cov) {
   }
   if (n >= MAX / STEP) return null;
   /* a = same mode, b = different; binary search to the minute */
-  while (Math.abs(b - a) > 60000) {
+  for (let guard = 0; Math.abs(b - a) > 60000 && guard < 64; guard++) {
     const mid = Math.floor((a + b) / 2 / 60000) * 60000;
     if (modeAt(ctx, mid).mode === key) a = mid; else b = mid;
   }
   return dir > 0 ? b : a; /* until = first minute of next mode; since = first minute of this mode */
 }
 
-export function computeHouseMode({ calendar, kidsWeek, config, override, now, sourceLabel, calendarFetchedMs }) {
+export function computeHouseMode({ calendar, kidsWeek, config, override, now, sourceLabel }) {
   const t = now == null ? Date.now() : now;
-  const events = normalizeEvents(calendar);
+  const cal = asCalendar(calendar);
+  const events = cal.events;
   const spans = kidsHomeSpans(events);
-  const ctx = { events, spans, kidsWeek, config, override };
+  const ctx = { events, spans, spansKnown: cal.hasKidsHome, kidsWeek, config, override };
   const cur = modeAt(ctx, t);
-  const cov = coverage(events);
-  const warnings = [];
+  const cov = windowMs(cal);
+  const warnings = calendarWarnings(cal, t);
 
   let sinceMs, untilMs;
   const ov = activeOverride(override, t);
   if (ov) { sinceMs = ov.sinceMs; untilMs = ov.untilMs; }
   else {
-    const s = edgeOf(ctx, t, cur.mode, -1, cov);
-    sinceMs = s == null ? null : s;
+    sinceMs = edgeOf(ctx, t, cur.mode, -1, cov);
     untilMs = edgeOf(ctx, t, cur.mode, +1, cov);
   }
 
-  if (!events.length) warnings.push("no calendar events loaded");
-  else if (cov && (t < cov.fromMs || t >= cov.toMs)) warnings.push("now is outside the calendar dump's date range");
-  /* freshness = when the dump was fetched (file mtime); calendar.updated is only the calendar's last edit */
-  const calFetched = isFinite(calendarFetchedMs) ? calendarFetchedMs : (calendar && calendar.updated ? Date.parse(calendar.updated) : NaN);
-  if (isFinite(calFetched) && t - calFetched > 6 * 3600000) warnings.push("calendar dump older than 6h");
   if (kidsWeek && kidsWeek.asOfIso && kidsWeek.asOfIso !== ctDate(t)) warnings.push("kids-week.json asOfIso is not today");
   /* Cross-check: kids-week homeWeek.endIso should be the end of the active Kids with Dan span when kids are home. */
   if (kidsWeek && kidsWeek.homeWeek && kidsWeek.homeWeek.endIso && kidsHomeAt(spans, t)) {
@@ -138,11 +144,13 @@ export function computeHouseMode({ calendar, kidsWeek, config, override, now, so
   return out;
 }
 
-function parseArgs(argv) {
-  const a = { ...DEFAULTS, now: null, stdout: false };
+export function parseArgs(argv, defaults = DEFAULTS) {
+  const a = { ...defaults, now: null, stdout: false };
   for (let i = 2; i < argv.length; i++) {
     const k = argv[i], v = argv[i + 1];
-    if (k === "--events") { a.events = path.resolve(v); i++; }
+    if (k === "--data-dir") { a.dataDir = path.resolve(v); i++; }
+    else if (k === "--cal-live") { a.calLive = path.resolve(v); i++; }
+    else if (k === "--events") { a.events = path.resolve(v); i++; }
     else if (k === "--kids-week") { a.kidsWeek = path.resolve(v); i++; }
     else if (k === "--config") { a.config = path.resolve(v); i++; }
     else if (k === "--override") { a.override = path.resolve(v); i++; }
@@ -154,16 +162,7 @@ function parseArgs(argv) {
 }
 
 export function loadInputs(a) {
-  const calendar = readJson(a.events);
-  const kidsWeek = readJson(a.kidsWeek, null);
-  const config = readJson(a.config);
-  const override = fs.existsSync(a.override) ? readJson(a.override, null) : null;
-  const cal = (kidsWeek && kidsWeek.sourceCalendar) || (calendar && calendar.summary) || "?";
-  const calendarFetchedMs = fs.statSync(a.events).mtimeMs;
-  const upd = `, fetched ${ctIso(calendarFetchedMs)}`;
-  const who = `calendar ${cal} (${path.basename(a.events)}${upd}, read-only)`;
-  const kw = kidsWeek && kidsWeek.refreshedAt ? ` + kids-week.json (refreshed ${ctIso(Date.parse(kidsWeek.refreshedAt))})` : "";
-  return { calendar, kidsWeek, config, override, calendarFetchedMs, sourceLabel: `${who}${kw}${override ? " + house-mode-override.json" : ""}` };
+  return { ...loadAll(a), config: readJson(a.config) };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
@@ -171,5 +170,5 @@ if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.ar
   const inp = loadInputs(a);
   const out = computeHouseMode({ ...inp, now: a.now == null || isNaN(a.now) ? Date.now() : a.now });
   if (a.stdout) process.stdout.write(JSON.stringify(out, null, 2) + "\n");
-  else { writeJson(a.out, out); console.log(`house-mode: ${out.label} (${out.mode}) since ${out.since} until ${out.until} -> ${path.relative(process.cwd(), a.out)}`); }
+  else { writeJson(a.out, out); console.log(`house-mode: ${out.label} (${out.mode}) since ${out.since} until ${out.until}${out.warnings.length ? " · WARN " + out.warnings.join("; ") : ""} -> ${path.relative(process.cwd(), a.out)}`); }
 }

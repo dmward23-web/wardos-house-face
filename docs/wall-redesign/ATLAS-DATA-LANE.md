@@ -18,11 +18,12 @@ Read-only on calendars: the scripts read a calendar JSON dump already on the box
 ## Run
 
 ```
-node scripts/house-mode.mjs   --events /workspace/cal-dmward23-week.json --kids-week data/kids-week.json [--now ISO] [--stdout]
-node scripts/pickup-chain.mjs --events /workspace/cal-dmward23-week.json --kids-week data/kids-week.json [--now ISO] [--stdout]
+node scripts/house-mode.mjs   [--data-dir data] [--cal-live …] [--events /workspace/cal-dmward23-week.json] [--kids-week …] [--now ISO] [--stdout]
+node scripts/pickup-chain.mjs [--data-dir data] [--cal-live …] [--events /workspace/cal-dmward23-week.json] [--kids-week …] [--now ISO] [--stdout]
 ```
 
-Defaults: `--events /workspace/cal-dmward23-week.json` (the dump the calendar routine refreshes), `--kids-week data/kids-week.json`, output into `data/`.
+Inputs, in order: the repo's `data/cal-live.json` (if present and `status: "live"`) and `data/kids-week.json`; then the box dump `/workspace/cal-dmward23-week.json` as fallback. cal-live wins when both have the same event id. The dump also fills what cal-live never publishes: `Kids with Dan` spans and events that already started. With no `Kids with Dan` data at all, Kids away is **not evaluated** and a warning says so (never guessed).
+Calendar window = cal-live `windowStart..windowEnd` (inclusive), else the dump's first..last event date. If now+7d falls outside it, `warnings[]` says `calendar window A..B does not reach now+7d (date)` in both outputs. Output goes to this repo's `data/`.
 
 ## House mode
 
@@ -31,13 +32,14 @@ Defaults: `--events /workspace/cal-dmward23-week.json` (the dump the calendar ro
 | key | label | when |
 |---|---|---|
 | `guest` / `quiet` | Guest / Quiet | manual only: `data/house-mode-override.json` = `{"mode":"guest","since":ISO?,"until":ISO,"note":"…"}`. `until` is required; expired or missing `until` = ignored. Any other mode in the file = ignored |
-| `nashville-week` | Nashville week | an all-day event matching `^Dan( + Kids)? Nashville` covers now, **and** today (CT) is not inside a `nashvilleWeek.excludeDateRanges` entry. Oct 2–12 2026 is excluded per Dan |
+| `nashville-week` | Nashville week | an all-day event matching `^Dan( + Kids)? Nashville` covers now, today (CT) is not inside a `nashvilleWeek.excludeDateRanges` entry (Oct 2–12 2026 is excluded per Dan), **and the kids aren't home**. Once a `Kids with Dan` span covers now (handoff Fridays), Nashville week ends |
 | `kids-away` | Kids away | no `Kids with Dan` calendar span covers now (the kids are with their mom). Kid tiles go quiet; Dad Seat stays |
-| `weekend` | Weekend | Sat/Sun, or a weekday where every Ward kid has a no-school all-day event (`Ward Kids [AHH No School]`, `Hayes + Harris — no school …`). After 8 PM the house is on tomorrow's footing, so Fri 8 PM+ = Weekend |
+| `weekend` | Weekend | Sat/Sun. After 8 PM the house is on tomorrow's footing, so Fri 8 PM+ = Weekend |
+| `day-off` | Day off | a weekday where every Ward kid has a no-school all-day event (`Ward Kids [AHH No School]`, `Ward Kids — no school …`, `Hayes + Harris — no school …`) and the kids are home. Night before after 8 PM = Day off |
 | `after-school` | After school | school day, from dismissal to 8:00 PM bedtime |
 | `school-day` | School day | school day before dismissal; also the evening after 8 PM before a school day ("school night") |
 
-Precedence: override > Nashville week > Kids away > Weekend > After school > School day.
+Precedence: override > Kids home (ends Nashville week) > Nashville week > Kids away > Day off / Weekend > After school > School day.
 
 **How kids-away is detected:** the calendar's recurring all-week event `Kids with Dan` (Fri 3:00 PM → Fri 3:00 PM, plus one-offs like `Kids with Dan — Christmas morning`). Its `start.dateTime` / `end.dateTime` make the home spans; outside every span = kids away. `data/kids-week.json` → `homeWeek.endIso` is only a cross-check (warning if it disagrees). It can't be the primary signal: `homeWeek.with` is always `"Dad"` and `homeWeek` has no start time, so it can't say when the kids are with their mom.
 
@@ -47,7 +49,7 @@ Precedence: override > Nashville week > Kids away > Weekend > After school > Sch
 
 ## Pickup chain
 
-`data/pickup-chain.json` = `{asOfIso, generatedAt, date, schoolDay, cutoff, source, rows[], reason}`.
+`data/pickup-chain.json` = `{asOfIso, generatedAt, date, schoolDay, cutoff, source, warnings[], rows[], reason}`.
 Row = `{who[], by, what, where, time, timeIso, leaveBy, leaveByIso, gear[], status (now|next), kind (ride|activity), startIso, endIso}`.
 
 - Today (CT) only, school days only, and **empty at/after 7:00 PM CT**.
@@ -89,7 +91,7 @@ Clears at the end of the CT day. `kid` must be one of the three names; `text` ma
 
 ## Thermostat vs mode
 
-`data/house-mode-temps.json` has a `heatSetpoint` / `coolSetpoint` per mode, all `null` ("awaiting Dan"). `bandsFromTemps()` turns only non-null targets into Wright's `thermoLight` bands (`bands[mode.id]`), so with all-null targets the light shows `73°, After school` and never flags. Pass `{id: houseMode.mode, label: houseMode.label}` as Wright's `mode`.
+`data/house-mode-temps.json` has a `heatSetpoint` / `coolSetpoint` per mode (8 modes incl. `day-off`), all `null` ("awaiting Dan"). `bandsFromTemps()` turns only non-null targets into Wright's `thermoLight` bands (`bands[mode.id]`), so with all-null targets the light shows `73°, After school` and never flags. Pass `{id: houseMode.mode, label: houseMode.label}` as Wright's `mode`.
 
 ## Samples (real box data, `--now` simulated)
 

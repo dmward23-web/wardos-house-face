@@ -39,7 +39,7 @@ test("house-mode + pickup-chain output is clean every 30 min, Sep 25 – Oct 31 
 });
 
 test("real box calendar, if present: clean every 15 min over its window", { skip: !fs.existsSync(DEFAULTS.events) }, () => {
-  const inp = loadInputs({ ...DEFAULTS, kidsWeek: "/workspace/wardos-house-face/data/kids-week.json", override: "/nonexistent" });
+  const inp = loadInputs({ ...DEFAULTS, dataDir: "/workspace/wardos-house-face/data", override: "/nonexistent" });
   for (let d = "2026-09-28"; d <= "2026-10-08"; d = addDays(d, 1)) {
     for (let q = 0; q < 96; q++) {
       const now = ctWallMs(d, Math.floor(q / 4), (q % 4) * 15);

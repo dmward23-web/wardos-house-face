@@ -12,22 +12,21 @@
    - gear only if the event text names it; leaveBy only if the text says "leave H:MM" or the event start
      is earlier than the stated time (repo convention: kids-week leaveBys.note "event START = leave-by").
 
-   Usage: node scripts/pickup-chain.mjs [--events …] [--kids-week …] [--config …] [--now ISO] [--out data/pickup-chain.json] [--stdout] */
+   Inputs: same loader as house-mode (repo data/cal-live.json + data/kids-week.json when present; box dump
+   /workspace/cal-dmward23-week.json as fallback + supplement). warnings[] when now+7d is outside the calendar window.
+
+   Usage: node scripts/pickup-chain.mjs [--data-dir data] [--cal-live …] [--events …] [--kids-week …] [--config …]
+                                        [--now ISO] [--out data/pickup-chain.json] [--stdout] */
 import path from "node:path";
-import fs from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { parseArgs, loadInputs, DEFAULTS as HM_DEFAULTS } from "./house-mode.mjs";
 import {
-  normalizeEvents, kidsHomeSpans, kidsHomeAt, schoolDayInfo, ctDate, ctParts, ctWallMs, parseHM,
+  asCalendar, calendarWarnings, kidsHomeSpans, kidsHomeAt, schoolDayInfo, ctDate, ctParts, ctWallMs, parseHM,
   fmtTime, ctIso, readJson, writeJson, scanObject, bannedHits, PICKUP_EXCLUDE_RE, theirMom, kidsIn,
 } from "./house/lib.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const DEFAULTS = {
-  events: "/workspace/cal-dmward23-week.json",
-  kidsWeek: path.join(ROOT, "data/kids-week.json"),
-  config: path.join(ROOT, "config/house-mode.config.json"),
-  out: path.join(ROOT, "data/pickup-chain.json"),
-};
+const DEFAULTS = { ...HM_DEFAULTS, out: path.join(ROOT, "data/pickup-chain.json") };
 
 const RIDE_RE = /\b(pick(?:s|ing)?\s*(?:\w+\s+)?up|pickup|drop(?:s|ping)?(?:\s*-?\s*off)?|ride|carpool)\b/i;
 const ACTIVITY_RE = /\b(swim|practice|game|baseball|softball|flag|soccer|football|basketball|volleyball|lesson|homework help|tutor\w*|rehearsal|choir|scouts|camp)\b/i;
@@ -93,15 +92,19 @@ function byOf(seg) {
 
 export function computePickupChain({ calendar, kidsWeek, config, now, sourceLabel }) {
   const t = now == null ? Date.now() : now;
-  const events = normalizeEvents(calendar);
+  const cal = asCalendar(calendar);
+  const events = cal.events;
   const spans = kidsHomeSpans(events);
+  const spansKnown = cal.hasKidsHome;
+  const homeAt = (ms) => !spansKnown || kidsHomeAt(spans, ms); /* unknown: keep rows, warning says so */
+  const warnings = calendarWarnings(cal, t);
   const today = ctDate(t);
   const cut = parseHM((config && config.pickupCutoff) || "19:00") || { hh: 19, mm: 0 };
   const cutoffMs = ctWallMs(today, cut.hh, cut.mm);
   const info = schoolDayInfo(events, today);
   const base = {
     asOfIso: today, generatedAt: ctIso(t), date: today, schoolDay: info.school,
-    cutoff: ctIso(cutoffMs), source: sourceLabel || "calendar (read-only)", rows: [],
+    cutoff: ctIso(cutoffMs), source: sourceLabel || "calendar (read-only)", warnings, rows: [],
   };
   if (t >= cutoffMs) return { ...base, reason: `Pickup chain ends at ${fmtTime(cutoffMs)}` };
   if (!info.school) return { ...base, reason: "Not a school day" };
@@ -118,7 +121,7 @@ export function computePickupChain({ calendar, kidsWeek, config, now, sourceLabe
     const isActivity = !isRide && ACTIVITY_RE.test(e.summary) && placeOf(e.location) !== "Home";
     if (!isRide && !isActivity) continue;
     if (!isRide && SCHOOL_INFO_RE.test(e.summary)) continue;
-    if (!kidsHomeAt(spans, e.startMs)) continue;                     /* kids with their mom then */
+    if (!homeAt(e.startMs)) continue;                     /* kids with their mom then */
 
     /* "Dan picks up Harris — SRE pickup · 3:40 | Casey (Riley's mom) picks up Hayes; …" -> one row per segment */
     const segs = e.summary.split(/\s+\|\s+/).map((s) => s.split(/;\s*/)[0]).filter((s) => kidsIn(s).length);
@@ -152,38 +155,17 @@ export function computePickupChain({ calendar, kidsWeek, config, now, sourceLabe
   }
   rows.sort((a, b) => Date.parse(a.timeIso) - Date.parse(b.timeIso));
   const reason = rows.length ? `${rows.length} kid ride${rows.length === 1 ? "" : "s"} left today`
-    : (!kidsHomeAt(spans, t) ? "Kids are with their mom" : "No kid rides left today");
+    : (!homeAt(t) ? "Kids are with their mom" : "No kid rides left today");
   const out = { ...base, rows, reason };
   const hits = scanObject(out);
   if (hits.length) throw new Error("pickup-chain output failed wall-safe scan: " + JSON.stringify(hits));
   return out;
 }
 
-function parseArgs(argv) {
-  const a = { ...DEFAULTS, now: null, stdout: false };
-  for (let i = 2; i < argv.length; i++) {
-    const k = argv[i], v = argv[i + 1];
-    if (k === "--events") { a.events = path.resolve(v); i++; }
-    else if (k === "--kids-week") { a.kidsWeek = path.resolve(v); i++; }
-    else if (k === "--config") { a.config = path.resolve(v); i++; }
-    else if (k === "--out") { a.out = path.resolve(v); i++; }
-    else if (k === "--now") { a.now = Date.parse(v); i++; }
-    else if (k === "--stdout") a.stdout = true;
-  }
-  return a;
-}
-
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-  const a = parseArgs(process.argv);
-  const calendar = readJson(a.events);
-  const kidsWeek = readJson(a.kidsWeek, null);
-  const config = readJson(a.config);
-  const cal = (kidsWeek && kidsWeek.sourceCalendar) || (calendar && calendar.summary) || "?";
-  const upd = `, fetched ${ctIso(fs.statSync(a.events).mtimeMs)}`;
-  const out = computePickupChain({
-    calendar, kidsWeek, config, now: a.now == null || isNaN(a.now) ? Date.now() : a.now,
-    sourceLabel: `calendar ${cal} (${path.basename(a.events)}${upd}, read-only)`,
-  });
+  const a = parseArgs(process.argv, DEFAULTS);
+  const inp = loadInputs(a);
+  const out = computePickupChain({ ...inp, now: a.now == null || isNaN(a.now) ? Date.now() : a.now });
   if (a.stdout) process.stdout.write(JSON.stringify(out, null, 2) + "\n");
-  else { writeJson(a.out, out); console.log(`pickup-chain: ${out.rows.length} row(s) · ${out.reason} -> ${path.relative(process.cwd(), a.out)}`); }
+  else { writeJson(a.out, out); console.log(`pickup-chain: ${out.rows.length} row(s) · ${out.reason}${out.warnings.length ? " · WARN " + out.warnings.join("; ") : ""} -> ${path.relative(process.cwd(), a.out)}`); }
 }

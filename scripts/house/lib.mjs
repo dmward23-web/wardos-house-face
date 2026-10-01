@@ -3,6 +3,7 @@
    Read-only on calendars: reads a calendar JSON dump already on the box. Never writes, edits,
    renames, or annotates a calendar event. No network. */
 import fs from "node:fs";
+import path from "node:path";
 
 export const TZ = "America/Chicago";
 
@@ -10,6 +11,7 @@ export const MODES = {
   "school-day": "School day",
   "after-school": "After school",
   "weekend": "Weekend",
+  "day-off": "Day off",
   "kids-away": "Kids away",
   "nashville-week": "Nashville week",
   "guest": "Guest",
@@ -148,6 +150,91 @@ export function coverage(events) {
   let lo = Infinity, hi = -Infinity;
   for (const e of events) { lo = Math.min(lo, e.startMs); hi = Math.max(hi, e.startMs); }
   return { fromMs: ctWallMs(ctDate(lo), 0, 0), toMs: ctWallMs(addDays(ctDate(hi), 1), 0, 0) };
+}
+
+/** Merge calendar sources (priority order; earlier wins on the same event id) into one read-only view.
+    source = {name, data, window?: {from, to} (CT dates, inclusive), fetchedMs?}. Window defaults to the
+    first..last event start date in that source (same rule as cal-from-events.mjs windowBounds). */
+export function buildCalendar(sources) {
+  const seen = new Set();
+  const events = [];
+  const windows = [];
+  const used = [];
+  for (const src of sources || []) {
+    if (!src || !src.data) continue;
+    const evs = normalizeEvents(src.data);
+    used.push({ name: src.name || "calendar", fetchedMs: src.fetchedMs == null ? null : src.fetchedMs, count: evs.length });
+    for (const e of evs) {
+      const key = e.id || `${e.summary.toLowerCase()}|${e.startMs}`;
+      const alt = `${e.summary.toLowerCase()}|${e.startMs}`;
+      if (seen.has(key) || seen.has(alt)) continue;
+      seen.add(key); seen.add(alt);
+      events.push(e);
+    }
+    let w = src.window && src.window.from && src.window.to ? { from: src.window.from, to: src.window.to } : null;
+    if (!w && evs.length) {
+      const c = coverage(evs);
+      w = { from: ctDate(c.fromMs), to: addDays(ctDate(c.toMs), -1) };
+    }
+    if (w) windows.push(w);
+  }
+  events.sort((a, b) => a.startMs - b.startMs);
+  const window = windows.length
+    ? { from: windows.map((w) => w.from).sort()[0], to: windows.map((w) => w.to).sort().slice(-1)[0] }
+    : null;
+  return { __built: true, events, window, sources: used, hasKidsHome: events.some((e) => !e.cancelled && KIDS_HOME_RE.test(e.summary)) };
+}
+export function asCalendar(calendar) {
+  if (calendar && calendar.__built) return calendar;
+  return buildCalendar([{ name: "calendar", data: calendar }]);
+}
+export function windowMs(cal) {
+  if (!cal.window) return null;
+  return { fromMs: ctWallMs(cal.window.from, 0, 0), toMs: ctWallMs(addDays(cal.window.to, 1), 0, 0) };
+}
+/** Shared input warnings: window must reach now+7d; feeds must be fresh; kids-home must be knowable. Never guesses. */
+export function calendarWarnings(cal, t) {
+  const out = [];
+  const w = windowMs(cal);
+  const horizon = t + 7 * 24 * 3600000;
+  if (!cal.events.length || !w) out.push("no calendar events loaded");
+  else if (t < w.fromMs || horizon >= w.toMs) {
+    out.push(`calendar window ${cal.window.from}..${cal.window.to} does not reach now+7d (${ctDate(horizon)})`);
+  }
+  for (const s of cal.sources) {
+    if (s.fetchedMs != null && isFinite(s.fetchedMs) && t - s.fetchedMs > 6 * 3600000) out.push(`${s.name} older than 6h`);
+  }
+  if (!cal.hasKidsHome) out.push("no 'Kids with Dan' events in calendar data; Kids away not evaluated");
+  return out;
+}
+/** CLI loader. Repo data first (data/cal-live.json, data/kids-week.json), box dump as fallback + supplement:
+    cal-live never publishes 'Kids with Dan' or events that already started, so the dump (when present) fills those. */
+export const BOX_DUMP = "/workspace/cal-dmward23-week.json";
+export function loadInputs({ dataDir, calLive, events, kidsWeek, override } = {}) {
+  const sources = [];
+  const cl = calLive || (dataDir ? path.join(dataDir, "cal-live.json") : null);
+  if (cl && fs.existsSync(cl)) {
+    const d = readJson(cl, null);
+    if (d && d.status === "live" && Array.isArray(d.upcomingLeaves)) {
+      sources.push({ name: "data/cal-live.json", data: d, window: d.windowStart && d.windowEnd ? { from: d.windowStart, to: d.windowEnd } : null, fetchedMs: d.fetchedAt ? Date.parse(d.fetchedAt) : null });
+    }
+  }
+  const dump = events || BOX_DUMP;
+  if (dump && fs.existsSync(dump)) {
+    sources.push({ name: path.basename(dump), data: readJson(dump), fetchedMs: fs.statSync(dump).mtimeMs });
+  }
+  if (!sources.length) throw new Error(`no calendar data: neither ${cl} nor ${dump} found`);
+  const calendar = buildCalendar(sources);
+  const kwPath = kidsWeek || (dataDir ? path.join(dataDir, "kids-week.json") : null);
+  const kw = kwPath && fs.existsSync(kwPath) ? readJson(kwPath, null) : null;
+  const ovPath = override || (dataDir ? path.join(dataDir, "house-mode-override.json") : null);
+  const ov = ovPath && fs.existsSync(ovPath) ? readJson(ovPath, null) : null;
+  const cal = (kw && kw.sourceCalendar) || "?";
+  const parts = calendar.sources.map((s) => `${s.name}${s.fetchedMs ? ` fetched ${ctIso(s.fetchedMs)}` : ""}`);
+  const label = `calendar ${cal} (${parts.join(" + ")}, read-only)` +
+    (kw ? ` + kids-week.json${kw.refreshedAt ? ` (refreshed ${ctIso(Date.parse(kw.refreshedAt))})` : ""}` : "") +
+    (ov ? " + house-mode-override.json" : "");
+  return { calendar, kidsWeek: kw, override: ov, sourceLabel: label };
 }
 
 /* ---------- kids home / away ---------- */
