@@ -1,17 +1,17 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-01T11:55:21.007Z",
+  "fetchedAt": "2026-10-01T12:04:50.120Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-07",
+  "windowEnd": "2026-10-08",
   "asOfIso": "2026-10-01",
   "nextLeave": {
-    "id": "hv5k8kthnlieaqu6juv0g2hbrg",
-    "summary": "Harris — SRE specials: Spanish + Library checkout",
-    "start": "2026-10-01T07:00:00-05:00",
-    "end": "2026-10-01T07:15:00-05:00",
-    "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+    "id": "3usi8cv7h2sikgv5n96lat5kt4",
+    "summary": "Hayes — pack late-lunch snacks (headaches · Madi OK)",
+    "start": "2026-10-01T07:30:00-05:00",
+    "end": "2026-10-01T07:45:00-05:00",
+    "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
     "busy": false,
     "allDay": false
   },
@@ -19,20 +19,22 @@
     {
       "id": "hv5k8kthnlieaqu6juv0g2hbrg",
       "summary": "Harris — SRE specials: Spanish + Library checkout",
-      "start": "2026-10-01T07:00:00-05:00",
-      "end": "2026-10-01T07:15:00-05:00",
+      "start": "2026-10-01",
+      "end": "2026-10-01",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
       "busy": false,
-      "allDay": false
+      "allDay": true,
+      "pinnedUntil": "8:40"
     },
     {
       "id": "taurkhbv4smljpq3vjbb1tvfh8",
       "summary": "Hayes — SRE specials: Art",
-      "start": "2026-10-01T07:00:00-05:00",
-      "end": "2026-10-01T07:15:00-05:00",
+      "start": "2026-10-01",
+      "end": "2026-10-01",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
       "busy": false,
-      "allDay": false
+      "allDay": true,
+      "pinnedUntil": "8:40"
     },
     {
       "id": "3usi8cv7h2sikgv5n96lat5kt4",
@@ -456,13 +458,67 @@
       "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
       "busy": true,
       "allDay": false
+    },
+    {
+      "id": "6gc1db0v6m642r4t0uhhpagft0",
+      "summary": "Hayes + Harris — SRE spirit day: Crazy Socks Day (Peace Week)",
+      "start": "2026-10-08T07:00:00-05:00",
+      "end": "2026-10-08T07:15:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "jsv3ukvj82chj7v8tmk4mv4atk",
+      "summary": "Harris — SRE specials: Spanish + Library checkout",
+      "start": "2026-10-08T07:00:00-05:00",
+      "end": "2026-10-08T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "t1sse9vtre7av9lvi2kctig9b8",
+      "summary": "Hayes — SRE specials: Art",
+      "start": "2026-10-08T07:00:00-05:00",
+      "end": "2026-10-08T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "43chat4nm1cmv3tsqtd2p9cdjo_20261008T200000Z",
+      "summary": "Ainsley — LKMS Homework Help · 3:00",
+      "start": "2026-10-08T15:00:00-05:00",
+      "end": "2026-10-08T16:00:00-05:00",
+      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "4iuge4862k2uhd3t5irr7jjmc8_20261008T212500Z",
+      "summary": "Ainsley swim — Coach Ann · 5:00 practice",
+      "start": "2026-10-08T17:00:00-05:00",
+      "end": "2026-10-08T18:00:00-05:00",
+      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "gdlheaj2udj8ilargoqmor6m0s",
+      "summary": "Hayes flag practice · 6:00",
+      "start": "2026-10-08T18:00:00-05:00",
+      "end": "2026-10-08T19:15:00-05:00",
+      "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
     }
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "7:00",
-    "place": "Harris — SRE specials: Spanish + Library checkout",
-    "detailHtml": "<strong>7:00</strong> Harris — SRE specials: Spanish + Library checkout",
+    "time": "7:30",
+    "place": "Hayes — pack late-lunch snacks (headaches · Madi OK)",
+    "detailHtml": "<strong>7:30</strong> Hayes — pack late-lunch snacks (headaches · Madi OK)",
     "badge": "Thu"
   },
   "error": null
