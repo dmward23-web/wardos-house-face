@@ -1,5 +1,6 @@
 // PANEL1 · node scripts/wall/panel.test.mjs · FIVE UPGRADES: setpoint (no key = no request, debounce = one request per settled side),
-// Kasa toggles, house timer (per device, persists, ends on the board), Atlas LANE6 readers hidden when absent.
+// Kasa toggles, house timer (Atlas timer slot shape), Atlas ATLASLANE6 readers on the REAL contracts (next-up, logistics-taps,
+// school-night), display renames from config/display-rename.json, field weather from the existing Open-Meteo forecast.
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
@@ -65,50 +66,139 @@ await t("Kasa toggles: existing roster only; no key -> disabled and toggle sends
   assert.equal(P.toggleLight(L, eff, "kitchen", true).sent, 0, "unknown state is not guessed");
   assert.deepEqual(P.lightToggles(eff, true).map((x) => x.id), ["dining-room", "harris-room", "kitchen"]);
 });
-await t("timer: fixed chips only; label chip; reads 'Oven 12:00'", () => {
+await t("timer: fixed chips only; label chip; Atlas slot {label, endsAt ISO+offset}; reads 'Oven 12:00.'", () => {
   const s = mem();
   assert.equal(P.setTimer(s, 7, "Oven", NOW), null);
-  P.setTimer(s, 15, "Oven", NOW);
-  assert.equal(P.timerView(s, NOW + 3 * 60000).text, "Oven 12:00");
-  P.setTimer(s, 5, "Pizza", NOW); assert.equal(P.timerView(s, NOW).text, "Timer 5:00", "unknown label -> plain Timer");
+  const j = P.setTimer(s, 15, "Oven", NOW);
+  assert.deepEqual(Object.keys(j), ["label", "endsAt"]);
+  assert.equal(j.endsAt, "2026-10-01T16:45:00-05:00");
+  assert.equal(P.timerView(s, NOW + 3 * 60000).text, "Oven 12:00.");
+  assert.equal(P.timerView(s, NOW + 3 * 60000 + 500).text, "Oven 12:00.", "11:59.5 left -> m:ss rounded up");
+  P.setTimer(s, 5, "Pizza", NOW); assert.equal(P.timerView(s, NOW).text, "Timer 5:00.", "unknown label -> plain Timer");
+  s.set(P.TIMER_KEY, JSON.stringify({ label: "Oven!", endsAt: "2026-10-01T16:45:00-05:00" })); assert.equal(P.timerView(s, NOW), null, "invalid label renders nothing");
+  s.set(P.TIMER_KEY, JSON.stringify({ label: "Oven", endsAt: 1790000000000 })); assert.equal(P.timerView(s, NOW), null, "endsAt must be an ISO string");
 });
 await t("timer: one object (a new set replaces), persists across reload (same store)", () => {
   const s = mem(); P.setTimer(s, 10, "Bath", NOW); P.setTimer(s, 20, "Laundry", NOW);
-  assert.equal(P.timerView(s, NOW).text, "Laundry 20:00");
+  assert.equal(P.timerView(s, NOW).text, "Laundry 20:00.");
   const reloaded = { get: s.get, set: s.set };
-  assert.equal(P.timerView(reloaded, NOW + 60000).text, "Laundry 19:00");
+  assert.equal(P.timerView(reloaded, NOW + 60000).text, "Laundry 19:00.");
   assert.deepEqual(Object.keys(s.m), [P.TIMER_KEY]);
 });
 await t("timer: ends on the board then clears; module never touches lights or network", () => {
   const s = mem(); P.setTimer(s, 5, "Oven", NOW);
-  const v = P.timerView(s, NOW + 5 * 60000); assert.equal(v.ended, true); assert.equal(v.text, "Oven 0:00");
+  const v = P.timerView(s, NOW + 5 * 60000); assert.equal(v.ended, true); assert.equal(v.text, "Oven 0:00.", "clamps at 0:00.");
   P.clearTimer(s); assert.equal(P.timerView(s, NOW), null);
   const src = require("node:fs").readFileSync(new URL("../../house-wall-panel.js", import.meta.url), "utf8");
   const timerSrc = src.slice(src.indexOf("/* House timer */"));
   assert.doesNotMatch(timerSrc, /setLight|fetch|flash/);
 });
-await t("Atlas LANE6 readers: absent -> null (tiles hidden)", () => {
-  assert.equal(LS.leaveLine(null, NOW), null); assert.equal(LS.logisticsTaps(null, NOW), null); assert.equal(LS.schoolNight(null, NOW), null);
+const fs = require("node:fs");
+const J = (f) => JSON.parse(fs.readFileSync(new URL("../../" + f, import.meta.url), "utf8"));
+const R = LS.compileRenames(J("config/display-rename.json"));
+const AT = Date.parse("2026-10-01T18:40:00-05:00"); /* the files' own run window (generated 6:34-6:35 PM CT) */
+await t("ATLASLANE6 readers: absent -> null (tiles hidden)", () => {
+  assert.equal(LS.leaveLine(null, NOW), null); assert.equal(LS.logisticsControls(null, NOW), null); assert.equal(LS.schoolNight(null, NOW), null);
+  assert.equal(LS.fieldGame(null, NOW), null); assert.equal(LS.fieldWeather(null, null), null);
 });
-const G = { asOfIso: "2026-10-01", generatedAt: "2026-10-01T15:00:00-05:00" };
-await t("leave-by line: today + fresh + future only, the file's words", () => {
-  assert.deepEqual(LS.leaveLine({ ...G, leaveBy: { copy: "Leave 5:10.", atIso: "2026-10-01T17:10:00-05:00" } }, NOW), { copy: "Leave 5:10.", atMs: Date.parse("2026-10-01T17:10:00-05:00") });
-  assert.equal(LS.leaveLine({ ...G, leaveBy: { copy: "Leave 4:10.", atIso: "2026-10-01T16:10:00-05:00" } }, NOW), null);
-  assert.equal(LS.leaveLine({ ...G, asOfIso: "2026-09-30", leaveBy: { copy: "Leave 5:10.", atIso: "2026-10-01T17:10:00-05:00" } }, NOW), null);
+await t("next-up.json (ATLAS-DATA-LANE.md NEXT UP): real file -> 'Hayes + Harris drop-off · Leave 8:10. (Fri)'", () => {
+  const j = J("data/next-up.json");
+  assert.deepEqual(Object.keys(j.next).sort(), ["copy", "day", "label", "leaveAt", "leaveIso", "startIso"]);
+  assert.equal(LS.leaveLine(j, AT, R).text, "Hayes + Harris drop-off \u00b7 Leave 8:10. (Fri)");
+  const today = { ...j, next: { ...j.next, day: "Today", leaveIso: "2026-10-01T18:55:00-05:00", copy: "Leave 6:55." } };
+  assert.equal(LS.leaveLine(today, AT, R).text, "Hayes + Harris drop-off \u00b7 Leave 6:55.", "Today adds no day tag");
+  assert.equal(LS.leaveLine({ ...j, next: null }, AT, R), null, "next null -> hidden");
+  assert.equal(LS.leaveLine({ ...j, next: { ...j.next, copy: "Leave at 8:10 AM!" } }, AT, R), null, "copy must be exactly 'Leave h:mm.'");
+  assert.equal(LS.leaveLine(j, Date.parse("2026-10-02T08:11:00-05:00"), R), null, "passed / next day -> hidden");
+  assert.equal(LS.leaveLine({ ...j, generatedAt: "2026-10-01T09:00:00-05:00" }, AT, R), null, "stale -> hidden");
 });
-await t("four taps: known ids only; running late needs minute chips; tap log is per device, nothing sent", () => {
-  const j = { ...G, taps: [{ id: "im-home", label: "I'm home" }, { id: "leaving", label: "Leaving" }, { id: "check-in", label: "Check in" }, { id: "running-late", label: "Running late", minutes: [5, 10, 15] }, { id: "text-mom", label: "x" }] };
-  const v = LS.logisticsTaps(j, NOW);
-  assert.deepEqual(v.taps.map((x) => x.id), ["im-home", "leaving", "check-in", "running-late"]);
-  assert.equal(LS.logisticsTaps({ ...G, taps: [{ id: "running-late", label: "Running late" }] }, NOW), null);
-  const s = mem(); LS.logTap(s, "running-late", { minutes: 10 }, NOW);
-  assert.equal(LS.lastTaps(s, NOW)["running-late"].minutes, 10);
-  assert.deepEqual(Object.keys(s.m), ["wardos-wall-logistics:2026-10-01"]);
+await t("logistics-taps.json (LOGISTICS-TAPS.md): the file's four controls, labels and chips; sendsToPeople must be false", () => {
+  const j = J("data/logistics-taps.json");
+  const c = LS.logisticsControls(j, AT);
+  assert.deepEqual(c.map((x) => [x.id, x.label]), [["im-home", "I'm home"], ["leaving", "Leaving"], ["check-in", "Check in"], ["running-late", "Running late"]]);
+  assert.deepEqual(c[2].kids, ["Harris", "Hayes", "Ainsley"]); assert.deepEqual(c[3].chips, [5, 10, 15, 20, 30]);
+  assert.deepEqual(c[0].lights.on, ["kitchen", "dining-room"]); assert.deepEqual(c[1].lights.off, ["dining-room", "harris-room", "kitchen"]);
+  assert.equal(LS.logisticsControls({ ...j, sendsToPeople: true }, AT), null);
+  assert.equal(LS.logisticsControls(j, Date.parse("2026-10-02T03:01:00-05:00")), null, "past resetsAt (3:00 AM house day) -> hidden");
+  assert.equal(LS.logisticsControls({ ...j, controls: [{ id: "text-someone", label: "x" }] }, AT), null, "unknown controls are not drawn");
 });
-await t("school night: only 3:00-6:59 PM CT", () => {
-  const j = { ...G, schoolNight: true, pickup: "3:40 SRE", gear: ["cleats"], formDue: "Field trip form", fieldWeather: "62° dry" };
-  assert.equal(LS.schoolNight(j, NOW).lines.length, 4);
-  assert.equal(LS.schoolNight(j, Date.parse("2026-10-01T14:59:00-05:00")), null);
-  assert.equal(LS.schoolNight(j, Date.parse("2026-10-01T19:00:00-05:00")), null);
+await t("logistics taps: status copy per contract, latest tap wins, 3:00 AM reset, invalid input ignored, sends always []", () => {
+  const c = LS.logisticsControls(J("data/logistics-taps.json"), AT), s = mem();
+  const at = (hm) => Date.parse("2026-10-01T" + hm + ":00-05:00");
+  assert.equal(LS.applyTap(s, c, { control: "im-home" }, at("18:05")).logistics.status.line, "Home 6:05.");
+  assert.equal(LS.applyTap(s, c, { control: "check-in", kid: "Ainsley" }, at("18:52")).logistics.status.line, "Ainsley home 6:52.");
+  const late = LS.applyTap(s, c, { control: "running-late", minutes: 15 }, at("18:55"));
+  assert.equal(late.logistics.status.line, "Running 15 min late."); assert.deepEqual(late.effects, { lights: null, checkIn: null, sends: [] });
+  const lv = LS.applyTap(s, c, { control: "leaving" }, at("20:05"));
+  assert.equal(lv.logistics.status.line, "Leaving 8:05."); assert.deepEqual(lv.effects.lights.off, ["dining-room", "harris-room", "kitchen"]); assert.deepEqual(lv.effects.sends, []);
+  const ci = LS.applyTap(s, c, { control: "check-in", kid: "Hayes" }, at("20:06")); assert.equal(ci.effects.checkIn, "hayes");
+  const before = s.m[LS.STATE_KEY];
+  for (const bad of [{ control: "running-late", minutes: 7 }, { control: "check-in", kid: "Riley" }, { control: "text" }, null])
+    assert.deepEqual(LS.applyTap(s, c, bad, at("20:10")).effects, { lights: null, checkIn: null, sends: [] });
+  assert.equal(s.m[LS.STATE_KEY], before, "invalid taps change nothing");
+  assert.deepEqual(Object.keys(s.m), [LS.STATE_KEY], "one local key, nothing else written");
+  assert.equal(LS.logisticsFor(LS.readState(s), Date.parse("2026-10-02T02:59:00-05:00")).taps.length, 5, "same house day until 3:00 AM");
+  assert.equal(LS.logisticsFor(LS.readState(s), Date.parse("2026-10-02T03:00:00-05:00")).status, null, "3:00 AM CT reset");
+  const src = fs.readFileSync(new URL("../../house-wall-lists.js", import.meta.url), "utf8");
+  assert.doesNotMatch(src.replace(/\/\*[\s\S]*?\*\//g, ""), /fetch\(|XMLHttpRequest|sendBeacon|WebSocket/, "the lists module has no network code");
+});
+await t("school-night.json: real file, visibleFromIso..visibleUntilIso only, Atlas's copy lines", () => {
+  const j = J("data/school-night.json");
+  assert.deepEqual(LS.schoolNight(j, AT, R).lines, [{ k: "Pickup", v: "Hayes pickup. Leave 6:20." }, { k: "Form", v: "Ainsley \u00b7 LKMS baby pic due Fri 3:00." }]);
+  assert.equal(LS.schoolNight(j, Date.parse("2026-10-01T14:59:00-05:00"), R), null);
+  assert.equal(LS.schoolNight(j, Date.parse("2026-10-01T19:00:00-05:00"), R), null, "hides at 7:00 even on the same file");
+  const off = { asOfIso: j.asOfIso, generatedAt: j.generatedAt, visibleFrom: "15:00", visibleUntil: "19:00", visibleFromIso: j.visibleFromIso, visibleUntilIso: j.visibleUntilIso, schoolNight: false, visible: false };
+  assert.equal(LS.schoolNight(off, AT, R), null, "not a school night -> no strip, no placeholder");
+  assert.equal(LS.schoolNight({ ...j, pickup: [], gear: [], form: undefined }, AT, R), null, "nothing to say -> hidden");
+  assert.deepEqual(LS.schoolNight({ ...j, gear: [{ who: ["Ainsley"], items: ["swim bag"], copy: "Ainsley \u00b7 swim bag." }] }, AT, R).lines[1], { k: "Gear", v: "Ainsley \u00b7 swim bag." });
+});
+await t("display renames come from config/display-rename.json (no names in the wall code); other text unchanged", () => {
+  const P1 = R.renames.length; assert.ok(P1 >= 2);
+  const cfg = J("config/display-rename.json");
+  const src = cfg.renames[0].evidence.match(/'([^']+)'/)[1]; /* the source title quoted in the config's own evidence */
+  assert.equal(LS.displayText(src, R), "Nonna and Papa in KC");
+  assert.equal(LS.displayText("Pick up Hayes at Casey's", R), "Pick up Hayes at Casey's", "calendar text as the data gives it");
+  assert.equal(LS.displayText("Erin + Hayes lunch", R), "Erin + Hayes lunch", "Erin stays Erin");
+  assert.equal(LS.displayText("x", null), "x", "no config -> unchanged (files are scrubbed at build time)");
+  for (const f of ["house-wall-lists.js", "wall.html"]) assert.doesNotMatch(fs.readFileSync(new URL("../../" + f, import.meta.url), "utf8"), /\bmom\b|\bmoms\b|Nonna|Papa/i, f + " has no hardcoded parent names");
+});
+const WX = { source: "open-meteo", hourlyTemp: { time: ["2026-10-05T16:00", "2026-10-05T17:00", "2026-10-05T18:00"], temp: [66.2, 64.4, 61.6] } };
+const CAL = { upcomingLeaves: [
+  { id: "a", summary: "Hayes baseball \u2014 Falcons vs KC Tigers (away) \u00b7 5:30 game", start: "2026-10-05T17:30:00-05:00", allDay: false },
+  { id: "b", summary: "Ainsley swim \u2014 Coach Ann \u00b7 5:00 practice", start: "2026-10-05T17:00:00-05:00", allDay: false },
+  { id: "c", summary: "Harris flag \u2014 vs BV Gardner (home) \u00b7 arrive 1:00 \u00b7 game 1:30", start: "2026-10-06T13:00:00-05:00", allDay: false } ] };
+const MON4 = Date.parse("2026-10-05T16:00:00-05:00");
+await t("field weather: tonight's game time ('5:30 game') + the forecast hour it starts in -> '64\u00b0 at 5:30'", () => {
+  const g = LS.fieldGame(CAL, MON4, R);
+  assert.equal(g.at, "5:30"); assert.equal(g.gameMs, Date.parse("2026-10-05T17:30:00-05:00"));
+  assert.deepEqual(LS.fieldWeather(g, WX), { text: "64\u00b0 at 5:30", temp: 64, hour: "2026-10-05T17:00", source: "open-meteo hourly temperature_2m" });
+  const g2 = LS.fieldGame({ upcomingLeaves: [CAL.upcomingLeaves[2]] }, Date.parse("2026-10-06T09:00:00-05:00"), R);
+  assert.equal(g2.at, "1:30", "'game 1:30' in the title beats the 1:00 arrive start");
+});
+await t("field weather: no game -> no weather; practice is not a game; passed game -> none; real cal today has none", () => {
+  assert.equal(LS.fieldGame({ upcomingLeaves: [CAL.upcomingLeaves[1]] }, MON4, R), null);
+  assert.equal(LS.fieldWeather(LS.fieldGame({ upcomingLeaves: [] }, MON4, R), WX), null);
+  assert.equal(LS.fieldGame(CAL, Date.parse("2026-10-05T17:31:00-05:00"), R), null, "game already started");
+  assert.equal(LS.fieldGame(J("data/cal-live.json"), AT, R), null, "Thu Oct 1: no game tonight -> no weather");
+});
+await t("field weather: no forecast for that hour -> none (never invented); fallback source without hourly temps -> none", () => {
+  const g = LS.fieldGame(CAL, MON4, R);
+  assert.equal(LS.fieldWeather(g, { ...WX, hourlyTemp: { time: ["2026-10-05T16:00"], temp: [66] } }), null, "hour missing");
+  assert.equal(LS.fieldWeather(g, { ...WX, hourlyTemp: { time: WX.hourlyTemp.time, temp: [66, null, 61] } }), null, "null value");
+  assert.equal(LS.fieldWeather(g, { source: "wttr", temp: 60 }), null, "wttr fallback has no hourly temp here");
+  assert.equal(LS.fieldWeather(g, { source: "open-meteo", temp: 60, hourlyTemp: null }), null, "current temp is never used as the field temp");
+});
+await t("field weather reuses the existing Open-Meteo pill call: same URL + hourly temperature_2m, no new fetch/key in the wall", () => {
+  const wxSrc = fs.readFileSync(new URL("../../house-weather.js", import.meta.url), "utf8");
+  assert.equal((wxSrc.match(/api\.open-meteo\.com/g) || []).length, 1, "one Open-Meteo call, the pill's own");
+  assert.match(wxSrc, /&hourly=precipitation_probability,precipitation,temperature_2m/);
+  assert.match(wxSrc, /hourlyTemp: j\.hourly/);
+  const wall = fs.readFileSync(new URL("../../wall.html", import.meta.url), "utf8");
+  assert.match(wall, /<script src="house-weather\.js"><\/script>/);
+  assert.doesNotMatch(wall, /open-meteo\.com|weather\.gov|wttr\.in|apikey|api_key/i, "the wall itself has no weather URL or key");
+  const block = wall.slice(wall.indexOf("function needWx("), wall.indexOf("function paintSchool("));
+  assert.match(block, /W\.load\(/); assert.doesNotMatch(block, /fetch\(/);
+  const ps = wall.slice(wall.indexOf("function paintSchool("), wall.indexOf("FIVE UPGRADES #4"));
+  assert.match(ps, /var game = sn \? LS\.fieldGame/); assert.match(ps, /if \(game\) \{ needWx\(\)/, "weather is asked only when there is a game");
 });
 console.log(`panel: ${n} tests PASS`);

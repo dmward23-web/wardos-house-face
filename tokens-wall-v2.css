@@ -145,8 +145,8 @@ body.wall-kiosk.wall-v2.is-stacked .kids { grid-template-columns: minmax(0,1fr);
 .wall-v2 .cg-house .stack .tap { flex: 1; font-size: 30px; }
 /* NEXT UP strip: Atlas's NEXT UP + leave-by line, Wright's one house timer */
 .wall-v2 .nextbar { display: flex; gap: 14px; align-items: stretch; }
-.wall-v2 .nextbar .next { flex: 1 1 auto; min-width: 0; }
-.wall-v2 .leave { display: flex; align-items: center; padding: 0 28px; font-size: 44px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.wall-v2 .nextbar .next { flex: 1 1 auto; min-width: 820px; }
+.wall-v2 .leave { display: flex; align-items: center; padding: 0 28px; font-size: 34px; line-height: 1.15; font-weight: 800; font-variant-numeric: tabular-nums; flex: 0 1 520px; min-width: 0; }
 .wall-v2 .timer { flex: 0 0 640px; display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 12px 16px; }
 .wall-v2 .t-show { font-size: 52px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
 .wall-v2 .t-chips { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -160,6 +160,7 @@ body.wall-kiosk.wall-v2.is-stacked .kids { grid-template-columns: minmax(0,1fr);
 .wall-v2 .ltaps .lt-grp { display: flex; align-items: center; gap: 8px; }
 .wall-v2 .ltaps .lt-grp b { font-size: 24px; font-weight: 600; margin-right: 4px; }
 .wall-v2 .ltaps .tap.is-on { border-color: var(--go); }
+.wall-v2 .ltaps .lt-status { font-size: 24px; font-weight: 600; }
 /* grocery (Ledger's list, hosted here) */
 .wall-v2 .groc { width: 760px; }
 .wall-v2 .groc .g-filter { margin-left: auto; display: flex; gap: 8px; }
@@ -171,4 +172,6 @@ body.wall-kiosk.wall-v2.is-stacked .kids { grid-template-columns: minmax(0,1fr);
 .wall-v2 .g-chips, .wall-v2 .g-picks, .wall-v2 .g-foot { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .wall-v2 .g-chips .chip, .wall-v2 .g-picks .chip { font-size: 22px; padding: 0 16px; }
 body.wall-kiosk.wall-v2.is-stacked .ctl, body.wall-kiosk.wall-v2.is-stacked .nextbar { flex-wrap: wrap; }
+body.wall-kiosk.wall-v2.is-stacked .nextbar .next { min-width: 0; flex-basis: 100%; }
+body.wall-kiosk.wall-v2.is-stacked .ctl .cg-house { flex: 1 1 100%; border-left: 0; border-top: 1px solid var(--hair); } /* portrait: House scenes get their own row (was clipped) */
 body.wall-kiosk.wall-v2.is-stacked .timer, body.wall-kiosk.wall-v2.is-stacked .groc { flex-basis: 100%; width: auto; }

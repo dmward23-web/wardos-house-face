@@ -1071,9 +1071,9 @@ body.theme-ainsley .setlist-foot { display: none !important; }
  </div>
  </div>
  </header>
- <nav class="session-rail day-records jump-rail" aria-label="Jump · Musts Jar Days">
+ <nav class="session-rail day-records jump-rail" aria-label="Jump · Musts Goal Days">
  <a class="row live jump-pill" href="#sec-musts">Musts</a>
- <a class="row stub jump-pill" href="#sec-jar">Jar</a>
+ <a class="row stub jump-pill" href="#sec-jar">Goal</a>
  <a class="row stub jump-pill" href="#sec-days">Days</a>
  </nav>
 <div class="xp-stage" aria-label="Today progress">
@@ -1095,14 +1095,14 @@ body.theme-ainsley .setlist-foot { display: none !important; }
  <div class="sec-hdr"><div class="sec-title">Musts</div></div>
  <div class="sec-list" data-mount-quests></div>
  </section>
- <section class="sec sec-bank bank-card tour-jar" id="sec-jar" aria-label="Tour Jar">
+ <section class="sec sec-bank bank-card tour-jar" id="sec-jar" aria-label="Tour goal">
  <div class="bank-top">
  <div>
- <div class="bank-title">Tour Jar</div>
+ <div class="bank-title">Tour goal</div>
  </div>
  <div class="bank-count"><span data-bank-symbol>★</span> <span data-bank-life>0</span></div>
  </div>
- <button type="button" class="grow-meter grow-jar" data-grow-meter aria-label="Tour Jar">
+ <button type="button" class="grow-meter grow-jar" data-grow-meter aria-label="Tour goal">
  <div class="grow-stage">
  <div class="grow-fill grow-fill-balance" data-grow-fill-balance></div>
  <div class="grow-fill grow-fill-week" data-grow-fill-week></div>
@@ -1111,19 +1111,16 @@ body.theme-ainsley .setlist-foot { display: none !important; }
  <div class="grow-pct" data-grow-pct></div>
  </div>
  <div class="grow-readout">
- <div class="grow-jar-name" data-grow-jar-name>Tour Jar</div>
- <div class="grow-total">$<span data-grow-total>0</span> / $<span data-grow-save-need>0</span></div>
+ <div class="grow-jar-name" data-grow-jar-name>Tour goal</div>
+ <div class="grow-total"><span data-grow-total>0</span> / <span data-grow-save-need>0</span> ★</div>
  </div>
  </button>
- <div class="money-row" aria-label="Money">
- <div class="money-chip"><span class="lab">Bal</span> $<span data-bank-balance>0</span></div>
- <div class="money-chip"><span class="lab">Week</span> +$<span data-bank-week-earn>0</span></div>
- </div>
+ <!-- KIDPATH1: balance + week money chips removed (no $ on kid paths) -->
  <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
  <div class="bank-meta"><span data-bank-meta></span><span class="bank-meta-sep" aria-hidden="true">·</span><span class="bank-meta-today">Today <span data-bank-today>0</span></span></div>
  <div class="bank-links">
- <a class="primary-foil" href="sheet-allowance.html">Jar →</a>
- <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">Jar full · show Dad</a>
+ <a class="primary-foil" href="sheet-allowance.html">Goal →</a>
+ <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">Goal met · show Dad</a>
  <button type="button" class="got-it" data-got-it hidden>Paid</button>
  </div>
  <div class="saves-host" data-saves-panel data-kid="ainsley"></div>
@@ -1179,7 +1176,7 @@ document.addEventListener("DOMContentLoaded", function(){
  var after = bal + weekEarn;
  var def = String(weekEarn);
  var paidStr = window.prompt(
- "Dad paid how many $?\nThis week earn $" + weekEarn + " → balance becomes $" + after + " − paid.\n0 = keep all as carry into next week.",
+ "Dad paid how much?\nThis week earn " + weekEarn + " → carry becomes " + after + " − paid.\n0 = keep all as carry into next week.",
  def
  );
  if (paidStr == null) return;

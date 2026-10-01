@@ -131,4 +131,58 @@ await t("no hardcoded Mom in wall code or copy (data labels render as given)", (
   // house-wall-status.js keeps "mom" only inside PEOPLE_RE, the open-loops BLOCK filter (it hides such loops; it never prints the word)
   read("house-wall-status.js").split("\n").forEach((l, i) => { if (/\bmom\b/i.test(l)) assert.match(l, /PEOPLE_RE = /, `house-wall-status.js:${i + 1}`); });
 });
+const KP = await import("./kid-path-copy.mjs");
+await t("KIDPATH1 scanner catches every banned form (fixtures) and lets only the one $15/hr tag through", () => {
+  const bad = { "a.js": 'el.textContent = ("XP " + tp.done + "/" + tp.need);', "b.html": '<div class="money-chip"><span class="lab">Bal</span> $<span>0</span></div>',
+    "c.html": '<a class="tile stars" href="sheet-allowance.html"><div class="tile-label">Show me the Money</div></a>', "d.html": '<div class="tab"><span>Mom week</span></div>',
+    "e.html": '<span class="star-earn" data-stars="7">$7 wk</span>', "f.json": '{"title": "Tour Jar", "id": "tour-jar"}', "g.html": '<div class="trip-detail">kids with Mom that week</div>',
+    "h.js": 'var s = "Paid $" + paid;', "i.html": '<section aria-label="How jars work"></section>' };
+  const rules = { "a.js": "XP", "b.html": "Bal", "c.html": "Show me the Money", "d.html": "Mom", "e.html": "$", "f.json": "jar", "g.html": "Mom", "h.js": "$", "i.html": "jar" };
+  for (const [f, src] of Object.entries(bad)) assert.ok(KP.hits(f, src).some((h) => h.rule === rules[f]), f + " should fail on " + rules[f]);
+  const ok = { "a.html": '<span class="star-earn addon-tag" data-stars="0">$15/hr</span>', "b.json": '{"id": "tour-jar", "rateLabel": "$15/hr"}',
+    "c.js": 'meter.classList.remove("grow-jar"); root.querySelectorAll("[data-grow-jar-name]"); var $x = 1; /* jar comment */' };
+  for (const [f, src] of Object.entries(ok)) assert.deepEqual(KP.hits(f, src), [], f + " is clean (tag / code tokens / comments)");
+});
+await t("KIDPATH1: kid-path files show no $ except the one $15/hr tag, and no jar / XP / Bal / Show me the Money / Mom wording", () => {
+  assert.deepEqual(KP.KID_PATH_FILES, ["house-kid-engage.js", "sheet-index.html", "kid-ainsley.html", "kids-data.js", "kids-week.json", "sheet-chores.html", "sheet-allowance.html", "sheet-pack.html", "sheet-win.html"]);
+  const all = KP.KID_PATH_FILES.flatMap((f) => KP.hits(f, read(f)));
+  assert.deepEqual(all, [], all.map((h) => `${h.file}:${h.line} [${h.rule}] ${h.text}`).join("\n"));
+});
+await t("KIDPATH1: Ainsley's $15/hr babysit tag is KEPT (kids-week rateLabel, chores addon tag, allowance feed row, kids-data tag)", () => {
+  const kw = JSON.parse(read("kids-week.json"));
+  const tags = kw.kids.ainsley.quests.filter((q) => q.rateLabel); assert.equal(tags.length, 1); assert.equal(tags[0].rateLabel, "$15/hr"); assert.equal(tags[0].hire, true);
+  assert.match(read("sheet-chores.html"), /data-check="ain-babysit"[\s\S]{0,300}<span class="star-earn addon-tag" data-stars="0">\$15\/hr<\/span>/);
+  assert.match(read("sheet-allowance.html"), /<span class="plus">\$15\/hr<\/span> Babysitting hire/);
+  assert.match(read("kids-data.js"), /earnOpt\.textContent = "\$15\/hr";/);
+  for (const f of ["kids-week.json", "sheet-chores.html", "sheet-allowance.html"]) {
+    const dollars = KP.visibleCopy(f, read(f)).filter((v) => v.text.includes("$")).map((v) => v.text);
+    assert.ok(dollars.length === 1 && dollars[0].includes("$15/hr"), f + " has exactly one $ string, the tag: " + JSON.stringify(dollars));
+  }
+});
+await t("KIDPATH1: display text only; rate logic + star counts untouched (data-stars, goal need, ids, weeklyAllowance code)", () => {
+  const ch = read("sheet-chores.html");
+  for (const m of ch.matchAll(/<span class="star-earn" data-stars="(\d+)">(\d+)\u2605( wk)?<\/span>/g)) assert.equal(m[1], m[2], "per-chore star text = the row's own data-stars");
+  const kw = JSON.parse(read("kids-week.json"));
+  assert.deepEqual([kw.kids.harris.bankGoal.id, kw.kids.hayes.bankGoal.id, kw.kids.ainsley.bankGoal.id], ["gem-jar", "victory-jar", "tour-jar"], "ids are keys, not copy");
+  assert.equal(kw.kids.ainsley.goal.need, 20);
+  const kd = read("kids-data.js");
+  assert.match(kd, /function resetJarCycle/); assert.match(kd, /weeklyAllowance/);
+  const emb = JSON.parse(kd.match(/var EMBEDDED = (.*);\n/)[1]);
+  assert.deepEqual(emb.kids.ainsley.goal, kw.kids.ainsley.goal, "EMBEDDED fallback mirrors kids-week.json");
+});
+await t("KIDPATH1: Pack tabs read Kids home / Kids away; Win says Kids away; Win's Fri Oct 2 Nashville item untouched", () => {
+  const pk = copy(read("sheet-pack.html")), win = read("sheet-win.html");
+  assert.match(pk, /Kids home/); assert.match(pk, /Kids away/); assert.doesNotMatch(pk, /\bMom\b/i);
+  assert.match(win, /return Oct 23 \u00b7 Kids away that week/);
+  assert.match(win, /<div class="trip-when">Fri Oct 2<br\/>\u2192 Thu Oct 9<\/div>\s*<div>\s*<div class="trip-title">Dan \u00b7 Nashville DRIVE<\/div>\s*<div class="trip-detail">Primary drive OP \u2192 Harbor Cove \u00b7 leave 9:00 after boys drop \u00b7 fly is backup only<\/div>/);
+  assert.match(win, /<div class="hero-title">Fri Oct 2 \u00b7 Dan DRIVE \u2192 Nashville<\/div>/);
+});
+await t("WEEKLINK1: Week and Dad Seat open different pages; Week = existing hub (WEEKGONE1), Dad Seat = sheet-dan.html", () => {
+  const href = (id) => (wall.match(new RegExp('data-tile-id="' + id + '"[^>]*href="([^"]+)"')) || [])[1];
+  const wk = href("rail-week"), dad = href("rail-dad-seat");
+  assert.ok(wk && dad); assert.notEqual(wk, dad);
+  assert.equal(dad, "sheet-dan.html"); assert.equal(wk, "sheet-index.html");
+  assert.ok(fs.existsSync(new URL(wk, root)), "Week target exists (not invented)");
+  assert.match(read("index.html"), /WEEKGONE1[^>]*old Week links go to the House hub/);
+});
 console.log(`wall-guards: ${n} tests PASS`);

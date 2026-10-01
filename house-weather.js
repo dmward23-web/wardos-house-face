@@ -65,7 +65,7 @@
       + "?latitude=" + LAT + "&longitude=" + LON
       + "&current=temperature_2m,weather_code,is_day"
       + "&daily=temperature_2m_max,temperature_2m_min"
-      + "&hourly=precipitation_probability,precipitation"
+      + "&hourly=precipitation_probability,precipitation,temperature_2m" /* FIELDWX1: same call, + hourly temp for the wall's field weather */
       + "&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FChicago&forecast_days=2";
     return fetch(url, { cache: "no-store" }).then(function (r) {
       if (!r.ok) throw new Error("om " + r.status);
@@ -83,6 +83,8 @@
         high: Math.round(j.daily.temperature_2m_max[0]),
         low: Math.round(j.daily.temperature_2m_min[0]),
         rain: rainOutlook(j.hourly, j.current && j.current.time),
+        /* FIELDWX1 · hourly °F from this same response (CT local hour keys, home coordinates); null when absent */
+        hourlyTemp: j.hourly && Array.isArray(j.hourly.time) && Array.isArray(j.hourly.temperature_2m) ? { time: j.hourly.time.slice(), temp: j.hourly.temperature_2m.slice() } : null,
         place: PLACE,
         code: code,
         source: "open-meteo"

@@ -482,7 +482,7 @@
       var pct = bank ? bank.pct : 0;
       var locked = bank && !bank.mustComplete;
       html += '<div class="kf-face kf-stars">';
-      html += '<div class="kf-kicker">Stars · jar</div>';
+      html += '<div class="kf-kicker">Stars</div>';
       html += '<div class="kf-loud">' + esc(sym) + " " + esc(String(week)) +
         (need ? (" / " + esc(String(need))) : "") + "</div>";
       html += '<div class="kf-xp" aria-label="Must progress">';
@@ -490,8 +490,8 @@
       html += "</div>";
       html += '<div class="kf-meta">' +
         (locked
-          ? ("Musts " + gate.done + "/" + gate.need + " · jar locked")
-          : ("Jar open · " + (bank && bank.weekEarn != null ? ("$" + bank.weekEarn) : "LIVE"))) +
+          ? ("Musts " + gate.done + "/" + gate.need)
+          : "Musts clear") + /* KIDPATH1: no jar, no $ */
         "</div>";
       html += '<div class="kf-streak streak-sparks" data-streak>' +
         (streak > 0 ? ("🔥 " + streak + "-day streak") : "🔥 Streak · tap musts") +
@@ -567,7 +567,7 @@
     if (streakEl) {
       streakEl.textContent = streak > 0
         ? ("🔥 " + streak + "d · " + tp.done + "/" + tp.need)
-        : ("XP " + tp.done + "/" + tp.need);
+        : ("Musts " + tp.done + "/" + tp.need); /* KIDPATH1: no XP */
     }
     if (sub) {
       var leave = nextLeaveFor(kidId);
@@ -781,7 +781,7 @@
       "</div>" +
       '<div class="kf-stage" data-kf-stage></div>' +
       '<div class="tile-foot">' +
-      '<span class="tile-fact kf-streak-chip" data-kf-streak>XP</span>' +
+      '<span class="tile-fact kf-streak-chip" data-kf-streak>Musts</span>' +
       '<a class="tile-tap kid-flip-go" href="' + esc(href) + '">OPEN</a>' +
       "</div>";
 
@@ -1007,10 +1007,10 @@
     if (glass) {
       var pct = tp.need ? Math.round((tp.done / tp.need) * 100) : 0;
       glass.innerHTML =
-        '<div class="xp-glass-lab">XP · musts</div>' +
+        '<div class="xp-glass-lab">Musts today</div>' +
         '<div class="xp-glass-bar"><i style="width:' + pct + '%"></i></div>' +
         '<div class="xp-glass-meta">' + tp.done + "/" + tp.need +
-        (gate.complete ? " · jar unlocked" : " · jar locked") + "</div>";
+        "</div>"; /* KIDPATH1: no jar wording */
     }
   }
 

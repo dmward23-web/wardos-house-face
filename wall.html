@@ -136,7 +136,7 @@
     <div class="rail-top"><span class="kick">One tap</span><span>every board</span></div>
     <div class="rail-grp"><div class="rail-h">Days</div><div class="rail-grid">
 <a data-owner="Atlas" data-tile="rail-today" data-tile-id="rail-today" class="badge " href="sheet-today.html" data-sheet="sheet-today.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="6"/><path d="M18 4 V8 M18 28 V32 M4 18 H8 M28 18 H32 M8 8 L11 11 M25 25 L28 28 M28 8 L25 11 M11 25 L8 28"/></g></svg><span>Today</span></a>
-<a data-owner="Atlas" data-tile="rail-week" data-tile-id="rail-week" class="badge " href="sheet-dan.html" data-sheet="sheet-dan.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="28" height="18" rx="3"/><path d="M8 9 V27 M12 9 V27 M16 9 V27 M20 9 V27 M24 9 V27 M28 9 V27"/></g></svg><span>Week</span></a>
+<a data-owner="Atlas" data-tile="rail-week" data-tile-id="rail-week" class="badge " href="sheet-index.html" data-sheet="sheet-index.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="28" height="18" rx="3"/><path d="M8 9 V27 M12 9 V27 M16 9 V27 M20 9 V27 M24 9 V27 M28 9 V27"/></g></svg><span>Week</span></a>
 <a data-owner="Atlas" data-tile="rail-month" data-tile-id="rail-month" class="badge " href="month.html" data-sheet="month.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="7" width="26" height="23" rx="3.5"/><path d="M5 13.5 H31 M12 4.5 V9.5 M24 4.5 V9.5"/></g></svg><span>Month</span></a>
 <a data-owner="Atlas" data-tile="rail-countdowns" data-tile-id="rail-countdowns" class="badge " href="sheet-countdowns.html" data-sheet="sheet-countdowns.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="19" r="12"/><path d="M18 11 V19 L23 22"/><path d="M14 4 H22"/></g></svg><span>Countdowns</span></a>
 </div></div>
@@ -181,6 +181,7 @@
 <script src="house-wall-kid.js"></script>
 <script src="house-wall-panel.js"></script>
 <script src="house-wall-lists.js"></script>
+<script src="house-weather.js"></script>
 <script src="house-grocery-list.js"></script>
 <script>
 (function () {
@@ -305,30 +306,52 @@
   }
   setInterval(paintTimer, 1000);
 
-  /* FIVE UPGRADES #3 · Atlas's four taps + school-night strip (hidden until ATLASLANE6 files exist) */
+  /* FIVE UPGRADES #3 · Atlas's four taps + school-night strip + leave-by (shapes: LOGISTICS-TAPS.md, ATLAS-DATA-LANE.md) */
+  var renames = null; /* config/display-rename.json compiled; board-only renames, calendar text otherwise as the data gives it */
+  function D(s) { return LS.displayText(s, renames); }
+  var ltControls = null;
   function paintTaps() {
-    var now = Date.now(), lt = LS.logisticsTaps(feeds.logistics, now);
-    $("w-ltaps").hidden = !lt;
-    if (!lt) return;
-    var last = LS.lastTaps(store, now);
-    $("w-ltaps-row").innerHTML = lt.taps.map(function (t) {
-      if (t.id === "running-late") return '<span class="lt-grp"><b>' + esc(t.label) + "</b>" + t.minutes.map(function (m) {
-        return '<button class="chip" data-ltap="running-late" data-min="' + m + '">' + m + " min</button>"; }).join("") + "</span>";
-      if (t.id === "check-in") return '<span class="lt-grp"><b>' + esc(t.label) + "</b>" + t.kids.map(function (k) {
-        var r = last["check-in:" + k]; return '<button class="chip' + (r ? " is-on" : "") + '" data-ltap="check-in" data-kid="' + esc(k) + '">' + esc(k) + "</button>"; }).join("") + "</span>";
-      var r = last[t.id];
-      return '<button class="tap sm' + (r ? " is-on" : "") + '" data-ltap="' + esc(t.id) + '"><span class="tx"><span>' + esc(t.label) + "</span><small>" + (r ? esc(ct(r.at) || "") : "") + "</small></span></button>";
-    }).join("");
-    var rl = last["running-late"];
-    if (rl) $("w-ltaps-row").insertAdjacentHTML("beforeend", '<span class="note">Running late \u00b7 ' + esc(rl.minutes) + " min \u00b7 " + esc(ct(rl.at) || "") + "</span>");
+    var now = Date.now();
+    ltControls = LS.logisticsControls(feeds.logistics, now);
+    $("w-ltaps").hidden = !ltControls;
+    if (!ltControls) { $("w-ltaps-row").innerHTML = ""; return; }
+    var st = LS.logisticsFor(LS.readState(store), now);
+    var lastOf = function (c, kid) { return st.taps.filter(function (x) { return x.control === c && (!kid || x.kid === kid); }).pop(); };
+    $("w-ltaps-row").innerHTML = ltControls.map(function (c) {
+      if (c.id === "running-late") return '<span class="lt-grp"><b>' + esc(c.label) + "</b>" + c.chips.map(function (m) {
+        var r = lastOf("running-late"); return '<button class="chip' + (r && r.minutes === m ? " is-on" : "") + '" data-ltap="running-late" data-min="' + m + '">' + m + "</button>"; }).join("") + "</span>";
+      if (c.id === "check-in") return '<span class="lt-grp"><b>' + esc(c.label) + "</b>" + c.kids.map(function (k) {
+        return '<button class="chip' + (lastOf("check-in", k) ? " is-on" : "") + '" data-ltap="check-in" data-kid="' + esc(k) + '">' + esc(k) + "</button>"; }).join("") + "</span>";
+      var r = lastOf(c.id);
+      return '<button class="tap sm' + (r ? " is-on" : "") + '" data-ltap="' + esc(c.id) + '"><span class="tx"><span>' + esc(c.label) + "</span><small>" + (r ? esc(LS.fmtHM(Date.parse(r.at))) : "") + "</small></span></button>";
+    }).join("") + (st.status ? '<span class="lt-status">' + esc(st.status.line) + "</span>" : "");
+  }
+  /* one tap: local status line (+ who-home on check-in); lights only through the existing scene client, only with the key. Never sends. */
+  function ltap(control, kid, minutes) {
+    var now = Date.now(), r = LS.applyTap(store, ltControls, { control: control, kid: kid, minutes: minutes }, now);
+    if (r.effects.checkIn) K.checkIn(store, r.effects.checkIn, now);
+    if (r.effects.lights && act.hasKey()) { var sr = act.scene(control === "im-home" ? "home" : "leave"); paintScenes(sr.sent ? (control === "im-home" ? "Kitchen + Dining on" : "All Kasa off") : sr.reason); }
+    return r;
+  }
+  var wx = null, wxAsked = 0, WX_MS = 10 * 60 * 1000;
+  /* field weather = the forecast the existing Open-Meteo pill loads (house-weather.js, same call + cache house-wx:v4).
+     Asked only when the strip is up AND tonight has a game: no game -> no weather request, no weather line. */
+  function needWx() {
+    var W = window.HouseWeather;
+    if (!W || !W.load || Date.now() - wxAsked < WX_MS) return;
+    wxAsked = Date.now();
+    W.load(function (err, d) { wx = err ? null : d; paintSchool(); });
   }
   function paintSchool() {
-    var sn = LS.schoolNight(feeds.schoolNight, Date.now());
+    var now = Date.now(), sn = LS.schoolNight(feeds.schoolNight, now, renames);
+    var lines = sn ? sn.lines.slice() : [];
+    var game = sn ? LS.fieldGame(feeds.cal, now, renames) : null;
+    if (game) { needWx(); var fw = LS.fieldWeather(game, wx); if (fw) lines.push({ k: "Field", v: fw.text }); }
     $("w-school").hidden = !sn;
-    $("w-school-row").innerHTML = sn ? sn.lines.map(function (l) { return '<span class="sn"><small>' + esc(l.k) + "</small>" + esc(l.v) + "</span>"; }).join("") : "";
-    var lv = LS.leaveLine(feeds.nextUp, Date.now());
+    $("w-school-row").innerHTML = lines.map(function (l) { return '<span class="sn"><small>' + esc(l.k) + "</small>" + esc(l.v) + "</span>"; }).join("");
+    var lv = LS.leaveLine(feeds.nextUp, now, renames);
     $("w-leave").hidden = !lv;
-    $("w-leave").textContent = lv ? lv.copy : "";
+    $("w-leave").textContent = lv ? lv.text : "";
   }
 
   /* FIVE UPGRADES #4 · grocery tile: Ledger's house-grocery-list.js (window.HouseGroceryList) hosted as-is */
@@ -363,7 +386,7 @@
     if (t.hasAttribute("data-timer-label")) { var l = t.getAttribute("data-timer-label"); timerLabel = timerLabel === l ? null : l; paintTimer(); return; }
     if (t.hasAttribute("data-timer-min")) { P.setTimer(store, Number(t.getAttribute("data-timer-min")), timerLabel, Date.now()); timerEndShown = false; paintTimer(); return; }
     if (t.hasAttribute("data-timer-clear")) { P.clearTimer(store); timerLabel = null; paintTimer(); return; }
-    if (t.hasAttribute("data-ltap")) { LS.logTap(store, t.getAttribute("data-ltap"), { kid: t.getAttribute("data-kid"), minutes: t.hasAttribute("data-min") ? Number(t.getAttribute("data-min")) : undefined }, Date.now()); paintTaps(); return; }
+    if (t.hasAttribute("data-ltap")) { ltap(t.getAttribute("data-ltap"), t.getAttribute("data-kid") || undefined, t.hasAttribute("data-min") ? Number(t.getAttribute("data-min")) : undefined); paint(); return; }
     if (!groc) return;
     if (t.hasAttribute("data-groc-filter")) grocFilter = t.getAttribute("data-groc-filter") === "costco" ? "costco" : "all";
     else if (t.hasAttribute("data-groc-add")) groc.add(t.getAttribute("data-groc-add"));
@@ -409,7 +432,7 @@
       var ex = tile.querySelector("[data-kid-seat]"), html = "";
       if (st && st.row) html = '<div class="wk-row" aria-label="This week">' + st.row.map(function (r) {
         return '<span class="wk m-' + esc(r.mark) + (r.today ? " is-today" : "") + '"><i></i>' + esc(r.dow) + "</span>"; }).join("") + "</div>"
-        + (st.countdown ? '<div class="wk-next">' + esc(st.countdown) + "</div>" : "");
+        + (st.countdown && D(st.countdown) ? '<div class="wk-next">' + esc(D(st.countdown)) + "</div>" : "");
       if (st && st.weekClosed) html = '<div class="wk-closed"><i></i>Week closed</div>';
       ex.innerHTML = html; ex.hidden = !html;
       var box = tile.querySelector("[data-kid-unlock]");
@@ -433,7 +456,7 @@
     var t = e.target.closest ? e.target.closest("[data-kid-checkin],[data-kid-done],[data-unlock]") : null;
     if (!t) return;
     var now = Date.now();
-    if (t.hasAttribute("data-kid-checkin")) K.checkIn(store, t.getAttribute("data-kid-checkin"), now);
+    if (t.hasAttribute("data-kid-checkin")) { var kid = t.getAttribute("data-kid-checkin"); K.checkIn(store, kid, now); if (ltControls) LS.applyTap(store, ltControls, { control: "check-in", kid: kid.charAt(0).toUpperCase() + kid.slice(1) }, now); }
     else if (t.hasAttribute("data-kid-done")) {
       var r = K.choreDone(store, t.getAttribute("data-kid-done"), now);
       if (r.first) { var f = flash.flash(); document.body.setAttribute("data-flash", f.sent ? "sent" : f.reason); }
@@ -456,6 +479,7 @@
   function paint() {
     var now = Date.now();
     var n = S.nextUp(feeds.cal, { now: now });
+    if (n) { var nw = D(n.what); n = nw ? Object.assign({}, n, { what: nw, where: n.where ? D(n.where) : n.where }) : null; }
     $("w-next").hidden = !n;
     if (n) {
       $("w-next-t").innerHTML = esc(n.time) + "<small>" + esc(n.ampm) + "</small>";
@@ -483,12 +507,13 @@
       $("w-chain-dies").innerHTML = "school days" + (cut ? "<br>ends " + esc(cut) : "");
       $("w-chain-cells").innerHTML = ch.rows.slice(0, 4).map(function (r, i) {
         var kids = r.who.map(function (w) { return '<span class="k-' + w.toLowerCase() + ' kname">' + esc(w) + "</span>"; }).join(" + ");
-        var who = r.by ? "<b>" + esc(r.by) + "</b> <i>\u2192</i> " + kids : kids;
+        var by = r.by ? D(r.by) : null;
+        var who = by ? "<b>" + esc(by) + "</b> <i>\u2192</i> " + kids : kids;
         var t = r.time || (r.startMs ? ct(new Date(r.startMs).toISOString()) : "");
         return (i ? '<div class="c-arrow">\u203a</div>' : "") + '<div class="c-cell is-' + r.status + '">'
           + '<div class="c-top"><span class="c-time">' + esc(String(t).replace(/ (AM|PM)$/, "")) + '</span><span class="c-tag">' + esc(r.status) + (r.leaveBy ? " \u00b7 leave " + esc(r.leaveBy) : "") + "</span></div>"
           + '<div class="c-who">' + who + "</div>"
-          + '<div class="c-where">' + esc(r.what) + (r.where && r.what.indexOf(r.where) < 0 ? " \u00b7 " + esc(r.where) : "") + "</div>"
+          + '<div class="c-where">' + esc(D(r.what) || "") + (r.where && D(r.where) && r.what.indexOf(r.where) < 0 ? " \u00b7 " + esc(D(r.where)) : "") + "</div>"
           + (r.gear.length ? '<div class="c-gear">gear \u00b7 ' + esc(r.gear.join(", ")) + "</div>" : "")
           + "</div>";
       }).join("");
@@ -500,8 +525,8 @@
     }).join("");
     var pf = S.packFlags(feeds.pack, { now: now });
     $("w-pack").hidden = !pf;
-    if (pf) $("w-pack-flags").innerHTML = pf.flags.map(function (f) {
-      return '<div class="flag k-' + f.kid.toLowerCase() + '"><b>' + esc(f.kid) + "</b>" + esc(f.text) + "</div>";
+    if (pf) $("w-pack-flags").innerHTML = pf.flags.filter(function (f) { return D(f.text); }).map(function (f) {
+      return '<div class="flag k-' + f.kid.toLowerCase() + '"><b>' + esc(f.kid) + "</b>" + esc(D(f.text)) + "</div>";
     }).join("");
     /* thermostat light reads the LIVE reading: the hub's (key saved) or the polled sensi-live.json */
     var ast = act.state();
@@ -535,6 +560,10 @@
   function load() {
     Promise.all(["cal-live.json", "sensi-live.json", "nest-live.json", "lights-live.json", "house-mode.json", "house-mode-temps.json",
       "pickup-chain.json", "who-home.json", "pack-flags.json", "unlocks.json", "kid-seats.json", "next-up.json", "logistics-taps.json", "school-night.json", "grocery-list.json"].map(get))
+      .then(function (r) {
+        return fetch("config/display-rename.json?t=" + Date.now(), { cache: "no-store" }).then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; })
+          .then(function (cfg) { renames = LS.compileRenames(cfg); return r; });
+      })
       .then(function (r) {
         feeds = { cal: r[0], sensi: r[1], nest: r[2], lights: r[3], houseMode: r[4], temps: r[5], pickup: r[6], whoHome: r[7], pack: r[8], unlocks: r[9], kidSeats: r[10], nextUp: r[11], logistics: r[12], schoolNight: r[13], grocery: r[14] };
         if (!act.state().liveAt && feeds.sensi && feeds.sensi.thermostat) act.state().th = feeds.sensi.thermostat;

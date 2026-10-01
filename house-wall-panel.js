@@ -116,28 +116,41 @@
   var TIMER_MINUTES = [5, 10, 15, 20, 30, 60];
   var TIMER_LABELS = ["Oven", "Laundry", "Bath"];
   function nowMs(n) { return n == null ? Date.now() : Number(n); }
+  /* Atlas's NEXT UP timer slot (ATLAS-DATA-LANE.md, ATLASLANE6): exactly one, shape {label, endsAt}; label 1-12 letters/spaces,
+     endsAt ISO with offset; copy "Oven 12:00." = m:ss left rounded up, clamps at "Oven 0:00." (reference: timerCopy() in scripts/next-up.mjs). */
+  var LABEL_RE = /^[A-Za-z][A-Za-z ]{0,11}$/;
+  function isoCt(ms) {
+    var d = new Date(ms), p = {};
+    new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" })
+      .formatToParts(d).forEach(function (x) { p[x.type] = x.value; });
+    var wall = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second), off = Math.round((wall - Math.floor(ms / 1000) * 1000) / 60000);
+    var sign = off < 0 ? "-" : "+", a = Math.abs(off), hh = Math.floor(a / 60), mm = a % 60;
+    return p.year + "-" + p.month + "-" + p.day + "T" + p.hour + ":" + p.minute + ":" + p.second + sign + (hh < 10 ? "0" : "") + hh + ":" + (mm < 10 ? "0" : "") + mm;
+  }
   function readTimer(store) {
     var j = null; try { j = JSON.parse(store.get(TIMER_KEY) || "null"); } catch (e) { j = null; }
-    if (!j || typeof j.endsAt !== "number" || TIMER_LABELS.concat(["Timer"]).indexOf(j.label) < 0) return null;
-    return j;
+    if (!j || typeof j !== "object" || typeof j.label !== "string" || !LABEL_RE.test(j.label.trim())) return null;
+    var end = Date.parse(j.endsAt || "");
+    if (typeof j.endsAt !== "string" || !isFinite(end)) return null;
+    return { label: j.label.trim(), endsAt: j.endsAt, endsMs: end };
   }
   function setTimer(store, minutes, label, now) {
     if (TIMER_MINUTES.indexOf(minutes) < 0) return null;
     var l = TIMER_LABELS.indexOf(label) >= 0 ? label : "Timer", t = nowMs(now);
-    var j = { label: l, minutes: minutes, setAt: t, endsAt: t + minutes * 60000 };
+    var j = { label: l, endsAt: isoCt(t + minutes * 60000) };
     store.set(TIMER_KEY, JSON.stringify(j)); return j;
   }
   function clearTimer(store) { store.set(TIMER_KEY, ""); }
   function mmss(ms) { var s = Math.max(0, Math.ceil(ms / 1000)), m = Math.floor(s / 60); return m + ":" + (s % 60 < 10 ? "0" : "") + (s % 60); }
-  /* -> null (none) | {running, label, text:"Oven 12:00"} | {ended:true, label, text:"Oven 0:00"} (caller shows the end on screen for 2 s, then clearTimer) */
+  /* -> null (none / invalid) | {running, label, text:"Oven 12:00."} | {ended:true, label, text:"Oven 0:00."} (caller shows the end for 2 s, then clearTimer) */
   function timerView(store, now) {
     var j = readTimer(store); if (!j) return null;
-    var left = j.endsAt - nowMs(now);
-    if (left <= 0) return { ended: true, label: j.label, text: j.label + " 0:00", overdueMs: -left };
-    return { running: true, label: j.label, text: j.label + " " + mmss(left), leftMs: left };
+    var left = j.endsMs - nowMs(now);
+    if (left <= 0) return { ended: true, label: j.label, text: j.label + " 0:00.", overdueMs: -left };
+    return { running: true, label: j.label, text: j.label + " " + mmss(left) + ".", leftMs: left };
   }
 
   return { MIN_F: MIN_F, MAX_F: MAX_F, DEADBAND: DEADBAND, DEBOUNCE_MS: DEBOUNCE_MS, isTravel: isTravel, createSetpoint: createSetpoint,
     lightToggles: lightToggles, toggleLight: toggleLight,
-    TIMER_KEY: TIMER_KEY, TIMER_MINUTES: TIMER_MINUTES, TIMER_LABELS: TIMER_LABELS, readTimer: readTimer, setTimer: setTimer, clearTimer: clearTimer, timerView: timerView, mmss: mmss };
+    TIMER_KEY: TIMER_KEY, TIMER_MINUTES: TIMER_MINUTES, TIMER_LABELS: TIMER_LABELS, readTimer: readTimer, setTimer: setTimer, clearTimer: clearTimer, timerView: timerView, mmss: mmss, isoCt: isoCt };
 });
