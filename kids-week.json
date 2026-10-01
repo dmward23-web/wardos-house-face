@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 1 2026",
   "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-01T23:43:45.958Z",
+  "refreshedAt": "2026-10-01T23:46:06.530Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -404,12 +404,6 @@
           "what": "SRE specials: Spanish + Library checkout",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Fri 9 · 12:00",
-          "what": "Ward Kids [AHH No School]",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": []
@@ -658,12 +652,6 @@
           "what": "SRE specials: Art",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Fri 9 · 12:00",
-          "what": "Ward Kids [AHH No School]",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": []
@@ -843,12 +831,6 @@
         {
           "when": "Thu 8 · 3:00",
           "what": "LKMS Homework Help",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 9 · 12:00",
-          "what": "Ward Kids [AHH No School]",
           "tone": "act",
           "hint": ""
         }
