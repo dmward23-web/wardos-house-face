@@ -153,3 +153,19 @@ html[data-landscape] .panel:not(#ls-off) .hdr--clockfirst > .hdr-ovals { flex-wr
 /* SPACE-01 overlaps · sheet-today: each kid card keeps at least its own words' height (an equal split cut
    Hayes's long day under Ainsley's card); the spare still goes evenly */
 html[data-landscape] .panel:not(#ls-off) .kids-col > * { flex: 1 0 auto !important; min-height: min-content !important; }
+/* SPREAD4 · "mids": centred words, but each part keeps the card's full width (a row's end dot stays at the edge) */
+html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-spread="mids"] { display: flex !important; flex-direction: column !important; align-items: stretch !important; justify-content: space-evenly !important; }
+/* SPACE-01 · dinner: the three kid votes sit side by side in landscape, each centred (name chip over its pick),
+   and the pick line reads at chip size, so the votes card has no empty right half */
+html[data-landscape] .panel:not(#ls-off) .list:has(> .kv) { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr)) !important; gap: 10px !important; align-content: stretch; }
+html[data-landscape] .panel:not(#ls-off) .list > .kv { margin: 0 !important; min-width: 0; align-items: stretch !important; justify-content: space-evenly !important; text-align: center; }
+html[data-landscape] .panel:not(#ls-off) .list > .kv > .chip { justify-content: center !important; }
+html[data-landscape] .panel:not(#ls-off) .list > .kv > .picked { font-size: 1.6em !important; }
+/* SPACE-01 · dinner: night by night runs two nights across in landscape (an odd last night, today, spans) */
+html[data-landscape] .panel:not(#ls-off) .list:has(> .day-row) { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px 10px !important; align-content: stretch; }
+html[data-landscape] .panel:not(#ls-off) .list > .day-row { margin: 0 !important; min-width: 0; }
+html[data-landscape] .panel:not(#ls-off) .list > .day-row:last-child:nth-child(odd) { grid-column: 1 / -1; }
+/* SPACE-01 overlaps · a clock-first header's name block never shrinks under its words; the header wraps its
+   right-hand pill to a second row instead (weekend 2560: "Our Ideas" ran under the LIVE jar pill) */
+html[data-landscape] .panel:not(#ls-off) .hdr--clockfirst:has(.identity > .id-text) { flex-wrap: wrap !important; row-gap: 10px !important; align-content: space-evenly !important; }
+html[data-landscape] .panel:not(#ls-off) .hdr--clockfirst .identity, html[data-landscape] .panel:not(#ls-off) .hdr--clockfirst .identity > .id-text { flex-shrink: 0 !important; min-width: max-content; }

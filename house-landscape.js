@@ -331,7 +331,7 @@
       var r = api.rect, cands = hits(panel, r).filter(function (e) { return !done.has(e) && !pictureCard(e); }).slice(0, 2), moved = false;
       for (var ci = 0; ci < cands.length && !moved; ci++) {
         var e = cands[ci], z0 = e.style.zoom, zat = e.getAttribute("data-ls-zoomed"), sp0 = e.getAttribute("data-ls-spread");
-        var steps = sp0 === "row" ? [] : sp0 === "mid" ? ["row"] : sp0 === "even" ? ["mid", "row"] : ["even", "mid", "row"];
+        var ORDER = ["even", "mid", "mids", "row"], steps = ORDER.slice(ORDER.indexOf(sp0) + 1);
         for (var si = 0; si < steps.length && !moved; si++) {
           e.setAttribute("data-ls-spread", steps[si]); denseOne(e);
           var d = cardOk(e) && layoutOk(panel) ? deadFrac() : 1, e0 = r.w * r.h / 64, e1 = d < 1 ? emptyIn(r) : e0;
