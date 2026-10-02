@@ -720,11 +720,14 @@
   });
 
   /* status lights */
+  var PAGE_ANCHOR = { "sheet-google-home.html": "sensi-hero", "sheet-load-day.html": "loadday-board", "sheet-status.html": "status-feeds", "sheet-index.html": "hub-home", "sheet-today.html": "today-now" };
   function lightHtml(l) {
     /* QUIET1 (Dan hates loud): stale = a quiet static dim amber dot; breathing red is only a real active alert */
     var led = l.need ? "off" : (l.ok ? "ok" : (l.stale ? "stale" : (l.attention ? "warn" : "bad")));
     var label = l.id === "laundry" ? "Laundry<small>" + esc(l.text) + "</small>" : esc(l.text);
-    return '<a class="lt" href="' + esc(l.href || "sheet-google-home.html") + '"><i class="led ' + led + '"></i><span class="lv">' + label + "</span></a>"; /* ION1: no icons */
+    var href = l.href || "sheet-google-home.html", page = href.split("#")[0];
+    if (href.indexOf("#") < 0) href += "#" + (PAGE_ANCHOR[page] || "");  /* PRESSMAP1: every press lands on an anchor */
+    return '<a class="lt" href="' + esc(href) + '"><i class="led ' + led + '"></i><span class="lv">' + label + "</span></a>"; /* ION1: no icons */
   }
 
   /* house day + CT helpers for the face (3 AM reset like who-home) */

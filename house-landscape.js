@@ -68,7 +68,14 @@
   g.HouseLandscape = api;
   if (isLandscape()) document.documentElement.setAttribute("data-landscape", "");
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", apply); else apply();
-  g.addEventListener("load", apply);
+  /* PRESSMAP1: a press from the wall lands on page#anchor; the landscape reflow moves it, so bring it back into view once */
+  var landed = false;
+  function land() {
+    if (landed || !location.hash || location.hash.length < 2) return;
+    var t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (!t) return;
+    landed = true; try { t.scrollIntoView({ block: "start" }); } catch (e) { t.scrollIntoView(); }
+  }
+  g.addEventListener("load", function () { apply(); setTimeout(land, 60); setTimeout(function () { landed = false; land(); }, 900); });
   g.addEventListener("resize", apply, { passive: true });
   g.addEventListener("orientationchange", function () { setTimeout(apply, 60); });
 })(window);

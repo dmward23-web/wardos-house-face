@@ -200,3 +200,9 @@ html body.wall-kiosk.is-short[data-plate][data-master="ion"] .seats-law > .seat.
 /* QUIET1 · stale = a quiet, static, dim amber dot (no glow, no breathe). Breathe stays on .led.bad = a real active alert only */
 html body.wall-kiosk[data-plate][data-master="ion"] .led.stale { background: rgba(var(--amber-rgb), 0.42); box-shadow: none; border: 0; }
 html body.wall-kiosk[data-plate][data-master="ion"] .led.stale::after { content: none; display: none; }
+/* JARFILL1 · jar tile: jars left, the two rule lines right (no empty band above "Not synced") */
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar:not([hidden]) { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto 1fr 1fr; column-gap: 28px; row-gap: 4px; align-items: center; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar > .ah { grid-column: 1 / -1; grid-row: 1; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar > .jar-mid { grid-column: 1; grid-row: 2 / 4; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar > .jar-rule { grid-column: 2; grid-row: 2; align-self: end; margin: 0; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar > .jar-rule2 { grid-row: 3; align-self: start; }

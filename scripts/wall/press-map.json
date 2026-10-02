@@ -1,0 +1,291 @@
+{
+ "about": "PRESSMAP1 · every tappable thing on wall.html and where a press goes. kind=go: it navigates to dest (page#anchor; '*' = its own href/data-go, which must be one of allowDest). kind=inplace: it answers on the wall (feedback within 1s), the URL never changes. A visible tappable that matches no entry fails scripts/wall/press-map.py. Doc: docs/PRESS-MAP.md",
+ "allowDest": [
+  "sheet-index.html#hub-home",
+  "sheet-today.html#today-now",
+  "sheet-today.html#today-day",
+  "month.html#month-board",
+  "month.html#d-*",
+  "sheet-countdowns.html#countdowns-board",
+  "sheet-dan.html#ds-next",
+  "sheet-us.html#us-board",
+  "sheet-pack.html#pack-board",
+  "sheet-weekend.html#weekend-board",
+  "sheet-win.html#win-board",
+  "sheet-groceries.html#groc-list",
+  "sheet-dinner.html#dinner-board",
+  "sheet-gallery.html#gallery-board",
+  "sheet-gallery-hero.html#hero-board",
+  "sheet-load-day.html#loadday-board",
+  "sheet-google-home.html#sensi-hero",
+  "sheet-google-home.html#cam-next-step",
+  "sheet-google-home.html#laundry",
+  "sheet-status.html#status-feeds",
+  "sheet-lights.html#lights-pad-grid",
+  "kid-hayes.html#kid-board",
+  "kid-harris.html#kid-board",
+  "kid-ainsley.html#kid-board"
+ ],
+ "entries": [
+  {
+   "id": "header-home",
+   "selector": "a.hdr",
+   "kind": "go",
+   "dest": "sheet-index.html#hub-home",
+   "what": "Header bar = Main board"
+  },
+  {
+   "id": "clock",
+   "selector": "#w-clock",
+   "kind": "go",
+   "dest": "sheet-today.html#today-now"
+  },
+  {
+   "id": "date",
+   "selector": "#w-date",
+   "kind": "go",
+   "dest": "month.html#d-*",
+   "what": "today's cell on Month"
+  },
+  {
+   "id": "house-mode",
+   "selector": "#w-mode",
+   "kind": "go",
+   "dest": "sheet-today.html#today-now"
+  },
+  {
+   "id": "stale-dot",
+   "selector": "#w-stale",
+   "kind": "go",
+   "dest": "sheet-status.html#status-feeds"
+  },
+  {
+   "id": "next-up",
+   "selector": "#w-next",
+   "kind": "go",
+   "dest": "sheet-today.html#today-now"
+  },
+  {
+   "id": "timer-label",
+   "selector": "[data-timer-label]",
+   "kind": "inplace",
+   "what": "picks the timer label"
+  },
+  {
+   "id": "timer-min",
+   "selector": "[data-timer-min]",
+   "kind": "inplace",
+   "what": "starts the house timer (local)"
+  },
+  {
+   "id": "timer-stop",
+   "selector": "#w-timer-stop, [data-timer-stop]",
+   "kind": "inplace"
+  },
+  {
+   "id": "temp-head",
+   "selector": ".ah[data-go^='sheet-google-home.html']",
+   "kind": "go",
+   "dest": "sheet-google-home.html#sensi-hero"
+  },
+  {
+   "id": "temp-read",
+   "selector": "#w-temp-v",
+   "kind": "go",
+   "dest": "sheet-google-home.html#sensi-hero"
+  },
+  {
+   "id": "temp-step",
+   "selector": "[data-temp]",
+   "kind": "inplace",
+   "what": "says Needs Dan's OK (setpoint writes off)"
+  },
+  {
+   "id": "travel",
+   "selector": "#w-travel",
+   "kind": "inplace",
+   "what": "without the hub key: says Needs the hub key; with it: Travel / Back home"
+  },
+  {
+   "id": "lights-head",
+   "selector": ".ah[data-go^='sheet-lights.html']",
+   "kind": "go",
+   "dest": "sheet-lights.html#lights-pad-grid"
+  },
+  {
+   "id": "light-chip",
+   "selector": "[data-light]",
+   "kind": "inplace",
+   "what": "without the hub key: Needs the hub key"
+  },
+  {
+   "id": "doorbell",
+   "selector": "#w-bell",
+   "kind": "go",
+   "dest": "sheet-google-home.html#cam-next-step"
+  },
+  {
+   "id": "doors",
+   "selector": "#w-doors",
+   "kind": "go",
+   "dest": "sheet-google-home.html#sensi-hero"
+  },
+  {
+   "id": "scene",
+   "selector": "[data-scene]",
+   "kind": "inplace",
+   "what": "I'm home / Leaving (lights only with the hub key)"
+  },
+  {
+   "id": "checkin-hint",
+   "selector": "#w-ltap-checkin",
+   "kind": "inplace",
+   "what": "lights up the seat names"
+  },
+  {
+   "id": "running-late",
+   "selector": "[data-ltap='running-late']",
+   "kind": "inplace"
+  },
+  {
+   "id": "who-pill",
+   "selector": "[data-kid-checkin]",
+   "kind": "inplace",
+   "what": "kid check-in (who's home pill and seat name)"
+  },
+  {
+   "id": "status-kick",
+   "selector": "#w-lights .kick[data-go], .lights .kick[data-go]",
+   "kind": "go",
+   "dest": "sheet-status.html#status-feeds"
+  },
+  {
+   "id": "status-light",
+   "selector": "#w-lights a.lt",
+   "kind": "go",
+   "dest": "*"
+  },
+  {
+   "id": "school-night",
+   "selector": "#w-school[data-go], [data-tile-id='school-night'][data-go], [data-go='sheet-today.html#today-day']",
+   "kind": "go",
+   "dest": "sheet-today.html#today-day"
+  },
+  {
+   "id": "pickup",
+   "selector": "[data-tile-id='pickup-chain'][data-go], #w-pickup [data-go]",
+   "kind": "go",
+   "dest": "sheet-today.html#today-day"
+  },
+  {
+   "id": "must",
+   "selector": "[data-law-must]",
+   "kind": "inplace",
+   "what": "the kid's MUSTS tap (local, honest)"
+  },
+  {
+   "id": "close",
+   "selector": "[data-law-close]",
+   "kind": "inplace"
+  },
+  {
+   "id": "week-row",
+   "selector": "[data-week-row]",
+   "kind": "go",
+   "dest": "*",
+   "what": "the kid's board"
+  },
+  {
+   "id": "countdown-frame",
+   "selector": "[data-countdown]",
+   "kind": "go",
+   "dest": "month.html#d-*"
+  },
+  {
+   "id": "trusted",
+   "selector": "[data-kid-trusted]",
+   "kind": "go",
+   "dest": "kid-ainsley.html#kid-board"
+  },
+  {
+   "id": "hire",
+   "selector": "[data-hire]",
+   "kind": "go",
+   "dest": "kid-ainsley.html#kid-board"
+  },
+  {
+   "id": "nice-one",
+   "selector": "[data-nice-dim], [data-nice-one]",
+   "kind": "inplace",
+   "what": "says Ask a parent (parent-only)"
+  },
+  {
+   "id": "pack",
+   "selector": "[data-law-pack]",
+   "kind": "inplace"
+  },
+  {
+   "id": "us-together",
+   "selector": "#w-us-x",
+   "kind": "go",
+   "dest": "sheet-us.html#us-board"
+  },
+  {
+   "id": "week-win",
+   "selector": "[data-tile-id='week-win'][data-go], #w-wwin",
+   "kind": "go",
+   "dest": "sheet-win.html#win-board"
+  },
+  {
+   "id": "choice-head",
+   "selector": ".claim-h[data-go], .cj-row[data-go]",
+   "kind": "go",
+   "dest": "sheet-dan.html#ds-next",
+   "what": "CHOICE closed / Dad Seat exception"
+  },
+  {
+   "id": "choice-claim",
+   "selector": "[data-law-claim], [data-law-choice-done]",
+   "kind": "inplace"
+  },
+  {
+   "id": "groc-kick",
+   "selector": "#w-groc .kick[data-go]",
+   "kind": "go",
+   "dest": "sheet-groceries.html#groc-list"
+  },
+  {
+   "id": "groc-filter",
+   "selector": "[data-groc-filter]",
+   "kind": "inplace"
+  },
+  {
+   "id": "groc-add",
+   "selector": "[data-groc-add]",
+   "kind": "inplace"
+  },
+  {
+   "id": "groc-more",
+   "selector": "[data-groc-more]",
+   "kind": "inplace"
+  },
+  {
+   "id": "jar",
+   "selector": "#w-jar",
+   "kind": "inplace",
+   "what": "the jar tile is its own explainer (no jar page exists): lights the rule lines"
+  },
+  {
+   "id": "rail-badge",
+   "selector": ".rail a.badge",
+   "kind": "go",
+   "dest": "*"
+  },
+  {
+   "id": "source-chip",
+   "selector": "#w-src [data-go], #w-src span[data-go]",
+   "kind": "go",
+   "dest": "sheet-status.html#status-feeds"
+  }
+ ]
+}
