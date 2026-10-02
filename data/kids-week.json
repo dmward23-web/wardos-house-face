@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 1 2026",
   "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-02T02:24:26.764Z",
+  "refreshedAt": "2026-10-02T02:30:22.329Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -48,6 +48,18 @@
         "kind": "school",
         "whenLabel": "Fri 7:00",
         "summary": "Harris — SRE specials: Music"
+      },
+      {
+        "label": "Next up · Fri",
+        "time": "7:30",
+        "place": "Free · Hayes — pack late-lunch snacks (headaches · Ma…",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-02T12:30:00.000Z",
+        "endIso": "2026-10-02T12:45:00.000Z",
+        "kind": "school",
+        "whenLabel": "Fri 7:30",
+        "summary": "Free · Hayes — pack late-lunch snacks (headaches · Madi OK)"
       },
       {
         "label": "Next up · Fri",
@@ -156,18 +168,6 @@
         "kind": "school",
         "whenLabel": "Mon 7:00",
         "summary": "Harris — SRE specials: Music"
-      },
-      {
-        "label": "Next up · Mon",
-        "time": "7:00",
-        "place": "SRE specials: Spanish",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-05T12:00:00.000Z",
-        "endIso": "2026-10-05T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Mon 7:00",
-        "summary": "Hayes — SRE specials: Spanish"
       }
     ]
   },
@@ -392,18 +392,6 @@
           "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Thu 8 · 7:00",
-          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 8 · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": []
@@ -566,18 +554,18 @@
           "what": "Hayes baseball — Falcons vs KC Tigers (away)",
           "hint": "YOUR board",
           "tone": "hot"
-        },
-        {
-          "when": "Thu 8 · leave 6:00",
-          "what": "Hayes flag practice",
-          "hint": "YOUR board",
-          "tone": "hot"
         }
       ],
       "school": [
         {
           "when": "Fri 2 · 7:00",
           "what": "SRE specials: No Specials",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 2 · 7:30",
+          "what": "Free · Hayes — pack late-lunch snacks (headaches · Madi OK)",
           "tone": "act",
           "hint": ""
         },
@@ -638,18 +626,6 @@
         {
           "when": "Wed 7 · 7:00",
           "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 8 · 7:00",
-          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 8 · 7:00",
-          "what": "SRE specials: Art",
           "tone": "act",
           "hint": ""
         }
@@ -813,23 +789,11 @@
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
-        },
-        {
-          "when": "Thu 8 · leave 5:00",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
         }
       ],
       "school": [
         {
           "when": "Mon 5 · 3:00",
-          "what": "LKMS Homework Help",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 8 · 3:00",
           "what": "LKMS Homework Help",
           "tone": "act",
           "hint": ""
@@ -903,11 +867,6 @@
           "tone": "act"
         },
         {
-          "when": "Thu · 7:30",
-          "what": "pack late-lunch snacks (headaches · Madi OK)",
-          "tone": "act"
-        },
-        {
           "when": "Thu · 8:10",
           "what": "SRE drop-off",
           "tone": "act"
@@ -941,6 +900,11 @@
           "when": "Thu · 6:20",
           "what": "Pick up Hayes at Casey's (Riley's mom)",
           "tone": "hot"
+        },
+        {
+          "when": "home week",
+          "what": "Kids with Dad @ 147th through Fri Oct 2 · 3:00",
+          "tone": "hot"
         }
       ],
       "week": [
@@ -952,6 +916,11 @@
         {
           "when": "Fri 2 · 7:00",
           "what": "SRE specials: Music",
+          "tone": "act"
+        },
+        {
+          "when": "Fri 2 · 7:30",
+          "what": "Free · Hayes — pack late-lunch snacks (headaches · Madi OK)",
           "tone": "act"
         },
         {
@@ -1058,11 +1027,6 @@
           "when": "Wed 7 · 7:00",
           "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act"
-        },
-        {
-          "when": "Wed 7 · 4:45",
-          "what": "Harris flag practice · 5:30–6:30",
-          "tone": "hot"
         }
       ]
     }
