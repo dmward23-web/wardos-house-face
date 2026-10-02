@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-02T17:11:52.506Z",
+  "fetchedAt": "2026-10-02T17:27:31.769Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-09",
   "asOfIso": "2026-10-02",
   "nextLeave": {
-    "id": "cmsip35h8v7m7b1c1ea0kenuo4",
-    "summary": "Kids — pack sports + clothes for mom",
-    "start": "2026-10-02T12:15:00-05:00",
-    "end": "2026-10-02T12:45:00-05:00",
+    "id": "mvd4lqf7f1k1f1a0gn8e7cgq9s",
+    "summary": "Dan — garage-sale haul · shake whole house",
+    "start": "2026-10-02T13:00:00-05:00",
+    "end": "2026-10-02T15:00:00-05:00",
     "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
     "busy": true,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "cmsip35h8v7m7b1c1ea0kenuo4",
-      "summary": "Kids — pack sports + clothes for mom",
-      "start": "2026-10-02T12:15:00-05:00",
-      "end": "2026-10-02T12:45:00-05:00",
-      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "mvd4lqf7f1k1f1a0gn8e7cgq9s",
       "summary": "Dan — garage-sale haul · shake whole house",
@@ -379,9 +370,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "12:15",
-    "place": "Kids — pack sports + clothes for",
-    "detailHtml": "<strong>12:15</strong> Kids — pack sports + clothes for",
+    "time": "1:00",
+    "place": "Dan — garage-sale haul · shake whole house",
+    "detailHtml": "<strong>1:00</strong> Dan — garage-sale haul · shake whole house",
     "badge": "Fri"
   },
   "error": null
