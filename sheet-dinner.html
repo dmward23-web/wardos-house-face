@@ -334,7 +334,7 @@
  <section class="sec" aria-label="This week picks">
  <div class="sec-hdr">
  <div class="sec-title">This week’s picks</div>
- <div class="sec-meta">Kids week · through Fri Oct 2</div>
+ <div class="sec-meta" data-dinner-week-end>Sat → Fri</div>
  </div>
  <div class="list">
  <div class="meal">
@@ -347,16 +347,16 @@
  <section class="sec" aria-label="Night by night">
  <div class="sec-hdr">
  <div class="sec-title">Night by night</div>
- <div class="sec-meta">Sat 26 → Fri Oct 2</div>
+ <div class="sec-meta" data-dinner-week-range>Sat → Fri</div>
  </div>
- <div class="list">
- <div class="day-row" data-date="2026-09-26"><span class="dow">Sat</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row" data-date="2026-09-27"><span class="dow">Sun</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row" data-date="2026-09-28"><span class="dow">Mon</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row" data-date="2026-09-29"><span class="dow">Tue</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row" data-date="2026-09-30"><span class="dow">Wed</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row" data-date="2026-10-01"><span class="dow">Thu</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row" data-date="2026-10-02"><span class="dow">Fri</span><span class="pick">Handoff day · keep light</span><span class="tag">Oct 2</span></div>
+ <div class="list" data-dinner-week>
+ <div class="day-row"><span class="dow">Sat</span><span class="pick">—</span><span class="tag">open</span></div>
+ <div class="day-row"><span class="dow">Sun</span><span class="pick">—</span><span class="tag">open</span></div>
+ <div class="day-row"><span class="dow">Mon</span><span class="pick">—</span><span class="tag">open</span></div>
+ <div class="day-row"><span class="dow">Tue</span><span class="pick">—</span><span class="tag">open</span></div>
+ <div class="day-row"><span class="dow">Wed</span><span class="pick">—</span><span class="tag">open</span></div>
+ <div class="day-row"><span class="dow">Thu</span><span class="pick">—</span><span class="tag">open</span></div>
+ <div class="day-row"><span class="dow">Fri</span><span class="pick">—</span><span class="tag">open</span></div>
  </div>
  <div class="suggest">
  <div class="lbl">Suggest</div>
@@ -396,30 +396,71 @@
 
 <script src="house-clock.js?v=SHEETCLK2"></script>
 <script>
-/* DINNERLIVE1 · header date from HouseClock (data-live="date-short"); "today" row follows the CT clock.
-   Never invents a meal: an empty night on today reads "no pick yet". */
+/* DINNERLIVE1 · header date from HouseClock (data-live="date-short").
+   VITAWEEK1 · the Sat→Fri week is built here from today's America/Chicago date,
+   so the strip rolls itself every Saturday (no hardcoded dates in the HTML).
+   Every night starts honest-open: no meal is ever invented; today reads "no pick yet",
+   earlier nights this week are muted "past". No-JS fallback = generic Sat–Fri rows, open. */
 (function () {
-  function markToday() {
-    if (!window.HouseClock) return;
-    var now = HouseClock.now(), dow = now.dow, todayIso = now.iso;
-    document.querySelectorAll(".day-row").forEach(function (row) {
-      var d = row.querySelector(".dow"), pick = row.querySelector(".pick"), tag = row.querySelector(".tag");
-      if (!d || !pick || !tag) return;
-      if (!tag.hasAttribute("data-orig")) tag.setAttribute("data-orig", tag.textContent);
-      if (!pick.hasAttribute("data-orig")) pick.setAttribute("data-orig", pick.textContent);
-      /* VITA1 · match on CT ISO date (data-date) so next week's Tue never lights; dow is the fallback */
-      var rowIso = row.getAttribute("data-date");
-      var isToday = rowIso ? rowIso === todayIso : d.textContent.trim() === dow;
-      var isPast = !!(rowIso && todayIso && rowIso < todayIso);
-      row.classList.toggle("is-today", isToday);
-      row.classList.toggle("is-past", isPast && !isToday);
-      tag.textContent = isToday ? "today" : (isPast ? "past" : tag.getAttribute("data-orig"));
-      var orig = pick.getAttribute("data-orig");
-      pick.textContent = (isToday && orig.trim() === "—") ? "no pick yet" : orig;
-    });
+  var TZ = "America/Chicago";
+  var DOWS = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
+  var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var lastIso = null;
+
+  /* Today in CT as {y, m, d, iso} via Intl (en-CA → YYYY-MM-DD). */
+  function ctToday() {
+    var iso;
+    try {
+      iso = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+    } catch (e) {
+      var n = new Date();
+      iso = n.getFullYear() + "-" + String(n.getMonth() + 1).padStart(2, "0") + "-" + String(n.getDate()).padStart(2, "0");
+    }
+    var b = iso.split("-");
+    return { y: +b[0], m: +b[1], d: +b[2], iso: iso };
   }
-  markToday();
-  setInterval(markToday, 60000);
+
+  /* Calendar-date math on UTC midnights (DST-proof: CT date already resolved). */
+  function utcDay(y, m, d) { return new Date(Date.UTC(y, m - 1, d)); }
+  function isoOf(dt) {
+    return dt.getUTCFullYear() + "-" + String(dt.getUTCMonth() + 1).padStart(2, "0") + "-" + String(dt.getUTCDate()).padStart(2, "0");
+  }
+  function label(dt) { return MON[dt.getUTCMonth()] + " " + dt.getUTCDate(); }
+
+  function buildWeek() {
+    var list = document.querySelector("[data-dinner-week]");
+    if (!list) return;
+    var t = ctToday();
+    if (t.iso === lastIso) return;
+    lastIso = t.iso;
+    var today = utcDay(t.y, t.m, t.d);
+    var sinceSat = (today.getUTCDay() + 1) % 7; /* Sat=0 … Fri=6 */
+    var sat = new Date(today.getTime() - sinceSat * 86400000);
+    var fri = new Date(sat.getTime() + 6 * 86400000);
+
+    var html = "";
+    for (var i = 0; i < 7; i++) {
+      var dt = new Date(sat.getTime() + i * 86400000);
+      var iso = isoOf(dt);
+      var isToday = iso === t.iso, isPast = iso < t.iso;
+      var cls = "day-row" + (isToday ? " is-today" : "") + (isPast ? " is-past" : "");
+      var pick = isToday ? "no pick yet" : "—";
+      var state = isToday ? "today" : (isPast ? "past" : "open");
+      html += '<div class="' + cls + '" data-date="' + iso + '"' + (isToday ? ' aria-current="date"' : "") + ">" +
+        '<span class="dow">' + DOWS[i] + "</span>" +
+        '<span class="pick">' + pick + "</span>" +
+        '<span class="tag">' + label(dt) + " · " + state + "</span></div>";
+    }
+    list.innerHTML = html;
+
+    var range = document.querySelector("[data-dinner-week-range]");
+    if (range) range.textContent = "Sat " + label(sat) + " → Fri " + label(fri);
+    var end = document.querySelector("[data-dinner-week-end]");
+    if (end) end.textContent = "This week · through Fri " + label(fri);
+  }
+
+  buildWeek();
+  setInterval(buildWeek, 60000); /* rolls at CT midnight without a reload */
 })();
 </script>
 <script src="house-zoom.js"></script>
