@@ -1,7 +1,10 @@
 """GATE RULE 10/2: REAL data at the CURRENT clock (PRESS_CLOCK pins it; PRESS_FX fixtures are extra runs that never count).
 Usage: python3 scripts/wall/alfred/press.py <worktree> <outdir>
 PRESS-01 (Alfred, independent): enumerate every visible tappable / tappable-looking thing on wall.html and press each one.
-Read-only: GET only, local host only (external requests aborted), fresh browser context per press."""
+Read-only: GET only, local host only (external requests aborted), fresh browser context per press.
+PREVIEW-USE (CLIP1 10/2, defaults off): PRESS_ALLOW=<regex> also lets GETs to matching outside URLs through (the preview's
+live data); PRESS_LOUD=1 also fails a press that puts anything loud on the face (an error / failed / refused / try again /
+offline / read-only line, a role=alert box) and records the writes the preview guard refused (window.__previewBlocked)."""
 import json, re, sys, csv, socket, subprocess, time
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -74,6 +77,17 @@ def expected(c):
     return "inplace:visible feedback on the wall"
 import os
 import datetime
+ALLOW = re.compile(os.environ["PRESS_ALLOW"]) if os.environ.get("PRESS_ALLOW") else None
+LOUD_ON = os.environ.get("PRESS_LOUD") == "1"
+LOUD = r"""() => { const RX = /\b(error|errors|failed|failure|couldn.?t|could not|can.?t (save|reach|connect|load)|not saved|refused|denied|try again|offline|unauthori[sz]ed|forbidden|read.only|need key|need token|undefined|NaN)\b|\bnull\b/i;
+  const vis = e => { const r = e.getBoundingClientRect(); if (r.width < 2 || r.height < 2 || r.bottom <= 0 || r.top >= innerHeight) return false;
+    for (let a = e; a; a = a.parentElement) { const c = getComputedStyle(a); if (c.display === 'none' || c.visibility === 'hidden' || +c.opacity < 0.05 || a.hidden) return false; } return true; };
+  const out = [];
+  for (const e of document.querySelectorAll('body *')) { if (e.closest('script,style,template,noscript,svg,#pv-chip')) continue;
+    const own = [...e.childNodes].filter(n => n.nodeType === 3).map(n => n.nodeValue).join(' ').replace(/\s+/g, ' ').trim();
+    const alert = /^(alert|alertdialog)$/.test(e.getAttribute('role') || '');
+    if ((alert && (e.innerText || '').trim()) || (own && RX.test(own))) { if (vis(e)) out.push((alert ? 'alert: ' : '') + (alert ? e.innerText : own).replace(/\s+/g, ' ').trim().slice(0, 70)); } }
+  return { loud: [...new Set(out)], blocked: (window.__previewBlocked || []).length }; }"""
 CLOCK = os.environ.get("PRESS_CLOCK") or datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-5))).replace(microsecond=0).isoformat()
 print("clock", CLOCK, "real data" if not os.environ.get("PRESS_FX") else "FIXTURE (does not count)", flush=True); FXMAP = json.loads(os.environ.get("PRESS_FX") or "{}")
 rows = []
@@ -83,7 +97,7 @@ with sync_playwright() as p:
         ctx = b.new_context(viewport={"width": W, "height": H})
         def route(r):
             u = r.request.url
-            if r.request.method not in ("GET", "HEAD") or not u.startswith(BASE): return r.abort()
+            if r.request.method not in ("GET", "HEAD") or not (u.startswith(BASE) or (ALLOW and ALLOW.search(u))): return r.abort()
             path = u[len(BASE):].split("?")[0]
             if path in FXMAP: return r.fulfill(status=200, content_type="application/json", body=(WT / "scripts/wall/fixtures" / (FXMAP[path] + ".FIXTURE.json")).read_text())
             return r.continue_()
@@ -101,7 +115,7 @@ with sync_playwright() as p:
             pg.goto(WALL, wait_until="load"); pg.wait_for_timeout(1500)
             now = pg.evaluate(ENUM); m = [x for x in now if x["sel"] == c["sel"]]
             if not m: rows.append(dict(vp=f"{W}x{H}", element=c["text"] or c["aria"] or c["tag"], selector=c["sel"], kind=c["kind"] + (f" ({c['why']})" if c["why"] else ""), expected=expected(c), actual="element not present on reload", verdict="FAIL")); ctx.close(); continue
-            x = m[0]; before = pg.evaluate(SNAP); resp = {"status": None}
+            x = m[0]; before = pg.evaluate(SNAP); resp = {"status": None}; loud0 = pg.evaluate(LOUD) if LOUD_ON else None
             pg.on("response", lambda r: resp.update(status=r.status) if r.request.is_navigation_request() and r.frame == pg.main_frame else None)
             try: pg.mouse.click(x["x"], x["y"])
             except Exception as e: errs.append("click: " + str(e)[:100])
@@ -133,6 +147,13 @@ with sync_playwright() as p:
                     if exp.startswith("go:") and "board or" not in exp: verdict = f"FAIL wrong destination (expected {exp[3:].split(' ')[0]}, got in-place)"
                 else:
                     actual = "no visible change (no URL change, no DOM/toast change)"; verdict = "FAIL no-op"
+            if LOUD_ON:
+                try: l1 = target.evaluate(LOUD)
+                except Exception as e: l1 = {"loud": ["(could not read: " + str(e)[:60] + ")"], "blocked": 0}
+                l2 = pg.evaluate(LOUD) if target is not pg else l1
+                fresh = [t for t in l1["loud"] if target is not pg or url.split("#")[0] != WALL or t not in loud0["loud"]]
+                actual += f" | refused writes {l2['blocked']}" + (f" | LOUD {fresh[:2]}" if fresh else " | quiet")
+                if fresh: verdict = (verdict + "; " if verdict != "PASS" else "") + "FAIL loud: " + fresh[0]
             if errs: verdict = (verdict + "; " if verdict != "PASS" else "") + "FAIL JS error: " + errs[0]
             rows.append(dict(vp=f"{W}x{H}", element=c["text"] or c["aria"] or c["tag"], selector=c["sel"], kind=c["kind"] + (f" ({c['why']})" if c["why"] else ""), expected=exp, actual=actual, verdict=verdict))
             ctx.close()

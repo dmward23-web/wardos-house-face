@@ -12,7 +12,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
 <title>BOARD-OS · HOUSE FACE · MONTH · WHITE GREY GLASS CAMO</title>
-<link rel="stylesheet" href="house-engage.css?v=OVERLAP1" />
+<link rel="stylesheet" href="house-engage.css?v=CLIP1" />
 <style>
  @font-face {
  font-family: "Inter Display";
@@ -233,7 +233,7 @@
  .blk {
  border-radius: 5px; padding: 2px 5px; font-size: 9.5px; font-weight: 600;
  line-height: 1.18; border: 1px solid transparent; letter-spacing: -0.01em;
- white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+ white-space: normal; overflow: visible; overflow-wrap: break-word; /* CLIP1: an item wraps; never an ellipsis */
  }
  .blk.ain {
  background: linear-gradient(145deg, rgba(180,120,200,0.22), rgba(150,100,180,0.1));
@@ -823,7 +823,7 @@ html[data-landscape] .panel[data-ls-grid]:not(#ls-off) > .leaveby .leaveby-body 
     Array.prototype.forEach.call(grid.querySelectorAll(".blocks"), function (b) {
       var m = b.querySelector(".blk-more"); if (m) b.removeChild(m);
       var ks = b.querySelectorAll(".blk"); Array.prototype.forEach.call(ks, function (k) { k.style.removeProperty("display"); });
-      if (!on || b.scrollHeight <= b.clientHeight + 1) return;
+      if (b.scrollHeight <= b.clientHeight + 1) return; /* CLIP1: whole items only, the rest is "+N more" (any layout) */
       var more = document.createElement("div"); more.className = "blk blk-more"; b.appendChild(more);
       for (var shown = ks.length - 1; shown >= 0; shown--) {
         ks[shown].style.display = "none"; more.textContent = "+" + (ks.length - shown) + " more";
@@ -861,7 +861,7 @@ html[data-landscape] .panel[data-ls-grid]:not(#ls-off) > .leaveby .leaveby-body 
 <script src="house-sensi.js?v=SENSIAUTO1"></script>
 <script src="house-glass-bind.js?v=AUDIT1"></script>
 <script src="house-zoom.js"></script>
-<script src="house-hdr-home.js?v=GLANCEFIT1"></script>
+<script src="house-hdr-home.js?v=CLIP1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>
 <script src="house-noagent.js"></script>
 </body>

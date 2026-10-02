@@ -265,7 +265,50 @@
     panel.style.width = (w / z) + "px"; panel.style.height = (h / z) + "px"; panel.style.minHeight = (h / z) + "px";
     if (typeof layout === "function") layout();
   }
-  window.addEventListener("resize", fit); fit();
+  /* CLIP1 (Dan: no text clipped mid-word, no ellipsis on the face): the glance steps its type down until it fits its
+     box, and the Add chips show whole chips only (a chip that would be cut by the row's height is left out). */
+  function clipFit() {
+    var g = $("w-glance");
+    if (g && !g.hidden) {
+      var big = g.querySelector(".g-big"), ga = $("w-glance-a"), gc = $("w-glance-c"), gs = $("w-glance-b"), i;
+      for (i = 0; i < 40 && big && big.scrollWidth > big.clientWidth + 1; i++) {
+        ga.style.fontSize = (parseFloat(getComputedStyle(ga).fontSize) * 0.96) + "px";
+        gc.style.fontSize = (parseFloat(getComputedStyle(gc).fontSize) * 0.96) + "px";
+      }
+      gs.style.fontSize = "";
+      for (i = 0; i < 30 && gs.scrollWidth > gs.clientWidth + 1; i++) gs.style.fontSize = (parseFloat(getComputedStyle(gs).fontSize) * 0.95) + "px";
+    }
+    /* footer: one line; when it is too long, the per-feed times drop out from the end, then the date, then the
+       Behind note names the count instead of every feed (still a press to Status) */
+    var ft = document.querySelector("footer.ftr"), src = $("w-src"), st = $("w-stale-t");
+    if (ft && src && ft.offsetParent) {
+      var items = Array.prototype.slice.call(src.children);
+      items.forEach(function (k) { k.style.display = ""; });
+      if (st && st.getAttribute("data-full") != null) st.textContent = st.getAttribute("data-full");
+      for (var q = items.length - 1; q >= 1 && ft.scrollWidth > ft.clientWidth + 1; q--) items[q].style.display = "none";
+      if (st && !st.hidden && ft.scrollWidth > ft.clientWidth + 1) {
+        st.setAttribute("data-full", st.textContent);
+        var nf = (st.textContent.replace(/^Behind \u00b7 /, "").match(/[^,]+/g) || []).length;
+        st.textContent = "Behind \u00b7 " + nf + " feed" + (nf === 1 ? "" : "s");
+      }
+    }
+    var ch = $("w-groc-chips");
+    if (ch && ch.offsetParent) {
+      var kids = Array.prototype.slice.call(ch.children);
+      kids.forEach(function (k) { k.style.display = ""; });
+      for (var pass = 0; pass < 2; pass++) {
+        var box = ch.getBoundingClientRect();
+        kids.forEach(function (k) {
+          if (k.style.display === "none") return;
+          var r = k.getBoundingClientRect();
+          if (r.bottom > box.bottom + 0.5 || r.right > box.right + 0.5) k.style.display = "none";
+        });
+      }
+    }
+  }
+  window.addEventListener("resize", function () { fit(); clipFit(); }); fit();
+  if (window.ResizeObserver) { var cfT = 0, cfRO = new ResizeObserver(function () { clearTimeout(cfT); cfT = setTimeout(clipFit, 30); });
+    ["w-groc-chips", "w-glance"].forEach(function (id) { var e = $(id); if (e) cfRO.observe(e); }); var ftE = document.querySelector("footer.ftr"); if (ftE) cfRO.observe(ftE); }
 
   /* FILL1 (b): the seats row is one grid row (equal height). When the seats' content leaves room, step the seat type
      scale up the Ion steps (1 -> 1.125 -> 1.25) while everything still fits; never below 1, never past 1.25. */
@@ -541,6 +584,7 @@
     $("w-groc-chips").innerHTML = groc.quickAdd().filter(function (c) { return grocFilter !== "costco" || c.store === "costco"; }).map(function (c) {
       return '<button class="chip' + (c.onList ? " is-on" : "") + '" data-groc-add="' + esc(c.id) + '"' + (c.onList ? " disabled" : "") + ">+ " + esc(c.name) + "</button>";
     }).join("");
+    clipFit();
     $("w-groc-picks").hidden = !grocMore;
     $("w-groc-picks").innerHTML = grocMore ? groc.pickList().map(function (c) {
       return '<button class="chip' + (c.onList ? " is-on" : "") + '" data-groc-add="' + esc(c.id) + '"' + (c.onList ? " disabled" : "") + ">+ " + esc(c.name) + "</button>";
@@ -894,6 +938,7 @@
     $("w-stale").classList.toggle("on", old2h.length > 0);
     $("w-stale-t").hidden = !stale.length;
     $("w-stale-t").textContent = stale.length ? "Behind \u00b7 " + stale.join(", ") : "";
+    $("w-stale-t").removeAttribute("data-full");
     var strip = S.statusStrip({ nest: feeds.nest, sensi: sensiFeed, houseMode: feeds.houseMode, temps: feeds.temps, laundry: null }, { now: now })
       .filter(function (l) { return !l.need; }); /* NEED TOKEN items (laundry) stay off the face; their notice lives on sheet-status */
     $("w-lights-row").innerHTML = strip.map(lightHtml).join("");
@@ -922,6 +967,7 @@
       .filter(function (x) { return x[1]; })
       .map(function (x) { var t = ct(x[1].fetchedAt || x[1].updatedAt || x[1].generatedAt || x[1].refreshedAt); return '<span data-go="sheet-status.html#status-feeds">' + esc(x[0] + " " + (t || "UNKNOWN")) + "</span>"; });
     $("w-src").innerHTML = '<span data-go="sheet-status.html#status-feeds"><b>Data</b></span>' + src.join("") + '<span data-go="sheet-status.html#status-feeds">CT ' + esc(new Date(now).toLocaleDateString("en-US", { timeZone: TZ, weekday: "short", month: "short", day: "numeric" }).replace(",", "")) + "</span>";
+    clipFit();
     $("w-modes").innerHTML = "Modes \u00b7 " + MODES.map(function (m) { return mode && mode.key === m[0] ? "<b>" + esc(m[1]) + "</b>" : esc(m[1]); }).join(" \u00b7 ");
     paintTravel();
     paintScenes();
@@ -978,6 +1024,7 @@
         gb.style.fontSize = ""; ge.style.fontSize = "";
       }
     }
+    clipFit();
   }
   function railSpans() { /* SPACE-01: the odd last badge of a group spans both columns (no rail holes) */
     document.querySelectorAll(".rail .rail-grid").forEach(function (g) {
