@@ -107,3 +107,25 @@ html[data-landscape] .panel:not(#ls-off) #gallery-board .card-meta { padding: 0 
 html[data-landscape] .panel:not(#ls-off) .quick:has(> .qtile) { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 html[data-landscape] .panel:not(#ls-off) .quick > .qtile { margin: 0 !important; min-width: 0; }
 html[data-landscape] .panel:not(#ls-off) .quick > .qtile:last-child:nth-child(odd) { grid-column: 1 / -1; }
+/* SPREAD1 (SPACE-01 per board, 10/2) · house-landscape.js spreadOut(): a card whose words sit in one corner of a
+   wide box centres them ("mid"), then lays its parts side by side across its width, wrapping ("row") */
+html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-spread]:not([data-ls-spread="even"]) { text-align: center !important; }
+html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-spread="even"] { display: flex !important; flex-direction: column !important; justify-content: space-evenly !important; }
+html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-spread="mid"] { display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: space-evenly !important; }
+html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-spread="row"] { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; align-items: center !important; align-content: space-evenly !important; justify-content: space-evenly !important; column-gap: 1.1em !important; row-gap: 0.4em !important; }
+html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-spread="row"] > * { flex: 0 1 auto !important; min-width: 0 !important; max-width: 100% !important; margin-top: 0 !important; margin-bottom: 0 !important; }
+/* SPACE-01 · google-home: the Sensi hero's three groups wrap into rows in landscape (title row, then the temps and
+   the open tap spread across) instead of crushing the title to one word per line under the 84px reading */
+html[data-landscape] .panel:not(#ls-off) #sensi-hero { display: flex !important; }
+html[data-landscape] .panel:not(#ls-off) #sensi-hero > .climate-body { flex-wrap: wrap !important; align-content: space-evenly !important; justify-content: space-evenly !important; row-gap: 0.8em; }
+html[data-landscape] .panel:not(#ls-off) #sensi-hero .climate-left { flex: 1 1 100% !important; text-align: center; align-items: center; }
+html[data-landscape] .panel:not(#ls-off) #sensi-hero .climate-temps { flex: 1 1 auto; justify-content: space-evenly; flex-wrap: wrap; }
+html[data-landscape] .panel:not(#ls-off) #sensi-hero .climate-cta { flex: 0 1 auto; align-items: center; }
+/* SPACE-01 · google-home: the camera grid fits the real camera count: a short last row shares the full width
+   (5 cams = 3 + 2 wide; 4 = 2 + 2 under a 3-track grid stays 3 + 1 wide) */
+html[data-landscape] .panel:not(#ls-off) .cam-zone > .cam-grid:has(> .cam:nth-child(3)) { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
+html[data-landscape] .panel:not(#ls-off) .cam-zone > .cam-grid:has(> .cam:nth-child(3)) > .cam { grid-column: span 2 !important; }
+html[data-landscape] .panel:not(#ls-off) .cam-zone > .cam-grid > .cam:nth-child(3n+1):nth-last-child(2),
+html[data-landscape] .panel:not(#ls-off) .cam-zone > .cam-grid > .cam:nth-child(3n+2):last-child { grid-column: span 3 !important; }
+html[data-landscape] .panel:not(#ls-off) .cam-zone > .cam-grid > .cam:nth-child(3n+1):last-child:not(:first-child) { grid-column: 1 / -1 !important; }
+html[data-landscape] .panel:not(#ls-off) #sensi-hero .climate-amb .big { padding-top: 0.14em; }

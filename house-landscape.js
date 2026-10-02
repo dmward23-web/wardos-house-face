@@ -45,6 +45,7 @@
   function colsFor(panel, w, z, n) {
     var cols = clamp(Math.floor((w / z) / COLW), 1, Math.max(1, n));
     var force = parseInt(panel.getAttribute("data-ls-cols") || "", 10); if (force > 0) cols = Math.min(cols, force);
+    if (COLS_OVR > 0) cols = clamp(COLS_OVR, 1, Math.max(1, n));
     return cols;
   }
   function setCols(panel, root, cols) { root.style.setProperty("--ls-cols", String(cols)); root.setAttribute("data-ls-cols", String(cols)); }
@@ -61,7 +62,7 @@
       e.style.removeProperty("grid-row"); e.style.removeProperty("grid-column"); e.removeAttribute(PLACED);
     });
     Array.prototype.forEach.call(panel.querySelectorAll("[data-ls-zoomed]"), function (e) { e.style.zoom = ""; e.removeAttribute("data-ls-zoomed"); });
-    Array.prototype.forEach.call(panel.querySelectorAll("[data-ls-fill],[data-ls-grow],[data-ls-end],[data-ls-foot]"), function (e) { ["data-ls-fill", "data-ls-grow", "data-ls-end", "data-ls-foot"].forEach(function (a) { e.removeAttribute(a); }); });
+    Array.prototype.forEach.call(panel.querySelectorAll("[data-ls-fill],[data-ls-grow],[data-ls-end],[data-ls-foot],[data-ls-spread]"), function (e) { ["data-ls-fill", "data-ls-grow", "data-ls-end", "data-ls-foot", "data-ls-spread"].forEach(function (a) { e.removeAttribute(a); }); });
   }
   /* a card that got taller shares the height out inside: its own boxes (chips, rows, tiles) grow with their
      content centred, plain text keeps its size, and what is left goes evenly between the rows. A card that
@@ -241,7 +242,106 @@
     var avail = h / z - pad - bot - 0.5; /* (each column's last card takes its own gap: it has no margin under it) */
     return { z: z, cols: cols, all: all, hs: hs, ft: ft, fh: fh, segs: segs, total: total, avail: avail, fits: total <= avail + 1 };
   }
+  /* FITBEST1 (SPACE-01 per board, 10/2): the same empty-patch measure the gate uses (words, media and controls,
+     12px halo, largest empty rectangle in the window). The board tries its column counts and keeps the layout
+     whose largest empty patch is smallest; real content only, nothing is added. */
+  var COLS_OVR = 0;
+  function deadFrac() {
+    var W = g.innerWidth, H = g.innerHeight, C = 8, D = 12, cols = Math.ceil(W / C), rows = Math.ceil(H / C), gr = new Uint8Array(cols * rows);
+    function vis(e) { for (var a = e; a && a !== document.documentElement; a = a.parentElement) { var c = g.getComputedStyle(a); if (c.display === "none" || c.visibility === "hidden" || +c.opacity < 0.05 || a.hidden) return false; } return true; }
+    function mark(r) {
+      if (r.width <= 0 || r.height <= 0 || r.bottom < 0 || r.top > H) return;
+      var x0 = Math.max(0, Math.floor((r.left - D) / C)), x1 = Math.min(cols - 1, Math.floor((r.right + D) / C)), y0 = Math.max(0, Math.floor((r.top - D) / C)), y1 = Math.min(rows - 1, Math.floor((r.bottom + D) / C));
+      for (var y = y0; y <= y1; y++) for (var x = x0; x <= x1; x++) gr[y * cols + x] = 1;
+    }
+    var tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n, seen = new Map();
+    while ((n = tw.nextNode())) {
+      if (!n.nodeValue.trim() || !n.parentElement) continue;
+      var pe = n.parentElement, ok = seen.get(pe); if (ok === undefined) { ok = vis(pe); seen.set(pe, ok); } if (!ok) continue;
+      var rg = document.createRange(); rg.selectNodeContents(n); var rs = rg.getClientRects(); for (var i = 0; i < rs.length; i++) mark(rs[i]);
+    }
+    Array.prototype.forEach.call(document.querySelectorAll("img,svg,canvas,video,button,input,select,textarea,progress,meter,.led,[role=img],[role=progressbar]"), function (e) { if (vis(e)) mark(e.getBoundingClientRect()); });
+    var hgt = new Array(cols).fill(0), best = 0, bx = 0, by = 0, bw = 0, bh = 0;
+    for (var y = 0; y < rows; y++) {
+      for (var x = 0; x < cols; x++) hgt[x] = gr[y * cols + x] ? 0 : hgt[x] + 1;
+      var st = [];
+      for (var x2 = 0; x2 <= cols; x2++) {
+        var hh = x2 < cols ? hgt[x2] : 0, sx = x2;
+        while (st.length && st[st.length - 1][1] >= hh) { var t = st.pop(); sx = t[0]; var a = t[1] * (x2 - sx); if (a > best) { best = a; bx = sx; by = y - t[1] + 1; bw = x2 - sx; bh = t[1]; } }
+        st.push([sx, hh]);
+      }
+    }
+    api.rect = { x: bx * C, y: by * C, w: bw * C, h: bh * C }; api.grid = gr; api.gcols = cols;
+    return best * C * C / (W * H);
+  }
+  /* a candidate layout only counts when no placed card spills past its own box or over a neighbour */
+  function layoutOk(panel) {
+    var els = Array.prototype.filter.call(panel.querySelectorAll("[" + PLACED + "]"), function (e) { return e.offsetParent || g.getComputedStyle(e).display !== "none"; });
+    var rs = els.map(function (e) { return e.getBoundingClientRect(); });
+    for (var i = 0; i < els.length; i++) {
+      var e = els[i];
+      if (rs[i].width < 1) continue;
+      if (e.scrollWidth > e.clientWidth + 2) return false;
+      for (var j = i + 1; j < els.length; j++) {
+        var a = rs[i], b = rs[j];
+        if (b.width < 1) continue;
+        if (Math.min(a.right, b.right) - Math.max(a.left, b.left) > 2 && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 2) return false;
+      }
+    }
+    return document.documentElement.scrollWidth <= g.innerWidth + 2;
+  }
   function pack(panel, root, w, h, z0) {
+    COLS_OVR = 0; packWith(panel, root, w, h, z0);
+    api.dead0 = deadFrac(); api.dead = api.dead0; api.moves = [];
+    if (api.dead0 > 0.018 && !panel.hasAttribute("data-ls-fixcols")) spreadOut(panel);
+  }
+  /* SPREAD1 (SPACE-01 per board, 10/2): where the largest empty patch sits inside a card (short words in a wide
+     box), that card first centres its words, then lays its parts side by side across its width (wrapping), and
+     takes the largest type scale that still fits. A move is kept only when the patch shrinks and every word and
+     control still sits inside its card. Real content only: nothing is added. */
+  function hits(panel, r) {
+    return Array.prototype.filter.call(panel.querySelectorAll("[" + PLACED + "]"), function (e) { return !e.matches(LEAD) || e.matches(".hot-banner"); }).map(function (e) {
+      var b = e.getBoundingClientRect(), ix = Math.min(b.right, r.x + r.w) - Math.max(b.left, r.x), iy = Math.min(b.bottom, r.y + r.h) - Math.max(b.top, r.y);
+      return [e, ix > 0 && iy > 0 ? ix * iy : 0];
+    }).filter(function (t) { return t[1] > 0; }).sort(function (a, b) { return b[1] - a[1]; }).map(function (t) { return t[0]; });
+  }
+  function denseOne(e) {
+    e.style.zoom = ""; e.removeAttribute("data-ls-zoomed");
+    if (e.clientHeight < 40 || e.clientWidth < 80) return;
+    for (var q = DENSE_MAX; q > 1.05; q = q / 1.06) {
+      e.style.zoom = String(q);
+      if (e.scrollHeight <= e.clientHeight + 1 && e.scrollWidth <= e.clientWidth + 1 && fitsIn(e) && innerOk(e)) { e.setAttribute("data-ls-zoomed", String(Math.round(q * 100) / 100)); return; }
+      e.style.zoom = "";
+    }
+  }
+  function emptyIn(r) { /* empty cells of the last measure inside rect r */
+    var C = 8, n = 0, x0 = Math.floor(r.x / C), y0 = Math.floor(r.y / C), x1 = x0 + Math.round(r.w / C), y1 = y0 + Math.round(r.h / C);
+    for (var y = y0; y < y1; y++) for (var x = x0; x < x1; x++) if (!api.grid[y * api.gcols + x]) n++;
+    return n;
+  }
+  function cardOk(e) { return e.scrollHeight <= e.clientHeight + 1 && e.scrollWidth <= e.clientWidth + 1 && fitsIn(e) && innerOk(e); }
+  function spreadOut(panel) {
+    var done = new Set();
+    for (var it = 0; it < 24 && api.dead > 0.018; it++) {
+      var r = api.rect, cands = hits(panel, r).filter(function (e) { return !done.has(e); }).slice(0, 2), moved = false;
+      for (var ci = 0; ci < cands.length && !moved; ci++) {
+        var e = cands[ci], z0 = e.style.zoom, zat = e.getAttribute("data-ls-zoomed"), sp0 = e.getAttribute("data-ls-spread");
+        var steps = sp0 === "row" ? [] : sp0 === "mid" ? ["row"] : sp0 === "even" ? ["mid", "row"] : ["even", "mid", "row"];
+        for (var si = 0; si < steps.length && !moved; si++) {
+          e.setAttribute("data-ls-spread", steps[si]); denseOne(e);
+          var d = cardOk(e) && layoutOk(panel) ? deadFrac() : 1, e0 = r.w * r.h / 64, e1 = d < 1 ? emptyIn(r) : e0;
+          if (d < api.dead - 0.0005 || (d <= api.dead + 0.0002 && e1 < e0 * 0.85)) { api.moves.push([e.id || e.className.toString().split(" ")[0] || e.tagName, steps[si], Math.round(api.dead * 1000) / 10, Math.round(d * 1000) / 10]); api.dead = d; moved = true; }
+        }
+        if (!moved) {
+          if (sp0) e.setAttribute("data-ls-spread", sp0); else e.removeAttribute("data-ls-spread");
+          e.style.zoom = z0; if (zat) e.setAttribute("data-ls-zoomed", zat); else e.removeAttribute("data-ls-zoomed");
+          done.add(e); deadFrac();
+        }
+      }
+      if (!moved) { if (!cands.length) break; }
+    }
+  }
+  function packWith(panel, root, w, h, z0) {
     var best = null, zmax = Math.min(ZFIT, z0 * FITMAX);
     for (var z = zmax; z > z0 + 0.001; z = z / 1.06) { var t = trial(panel, root, w, h, z); if (t.fits) { best = t; break; } }
     if (!best) best = trial(panel, root, w, h, z0);
@@ -310,6 +410,9 @@
       if (d.scrollHeight > d.clientHeight + 2 || d.scrollWidth > d.clientWidth + 2) {
         var cs = getComputedStyle(d);
         if (cs.display === "inline" || cs.display === "contents") continue;
+        /* a plain box (no fill, no border, overflow visible) that a line's superscript pokes out of by a few px
+           shows nothing cut or spilled: the card's own fitsIn still holds every word inside the card */
+        if (!boxy(cs) && cs.overflowX === "visible" && cs.overflowY === "visible" && d.scrollHeight <= d.clientHeight * 1.15 + 2 && d.scrollWidth <= d.clientWidth * 1.15 + 2) continue;
         return false;
       }
     }
@@ -328,6 +431,9 @@
       var kids = sections(e); if (kids.length < 2) return;
       var tag = e.tagName; if (tag === "MAIN" || e.classList.contains("body") || e.hasAttribute("data-ls-wrapper")) e.setAttribute("data-ls-flat", "");
     });
+    /* SPREAD1 · a board marks a long section [data-ls-wrapper] (and its list [data-ls-wrapper]) so its cards are dealt
+       one by one into the columns (no column held up by one tall section) */
+    Array.prototype.forEach.call(panel.querySelectorAll("[data-ls-wrapper]"), function (e) { if (sections(e).length >= 2) e.setAttribute("data-ls-flat", ""); });
     /* LANDFILL2 · a bare list wrapper (no card of its own) holding 3+ cards lets its cards be dealt one by one */
     if (document.documentElement.hasAttribute("data-ls-pack")) for (var pass = 0; pass < 2; pass++) flow(panel).forEach(function (e) {
       if (e.matches(LEAD) || e.matches("footer, .ftr") || e.hasAttribute("data-ls-keep") || e.hasAttribute("data-ls-wide")) return;
@@ -342,11 +448,13 @@
     var out = [];
     sections(panel).forEach(function (e) {
       if (e.matches(LEAD)) return;
-      if (e.hasAttribute("data-ls-flat")) sections(e).forEach(function (k) { if (k.hasAttribute("data-ls-flat")) sections(k).forEach(function (k2) { out.push(k2); }); else out.push(k); }); else out.push(e);
+      (function walk(x, d) { if (x.hasAttribute("data-ls-flat") && d < 4) sections(x).forEach(function (k) { walk(k, d + 1); }); else out.push(x); })(e, 0);
     });
     return out;
   }
   var api = { apply: apply, active: function () { return document.documentElement.hasAttribute("data-landscape"); }, isLandscape: isLandscape };
+  api.why = function (e, q) { var z0 = e.style.zoom; e.style.zoom = String(q); var r = [e.scrollHeight <= e.clientHeight + 1, e.scrollWidth <= e.clientWidth + 1, fitsIn(e), innerOk(e)]; e.style.zoom = z0; return r; };
+  api.fitsIn = function (e) { return fitsIn(e); }; api.innerOk = function (e) { return innerOk(e); };
   g.HouseLandscape = api;
   if (isLandscape()) document.documentElement.setAttribute("data-landscape", "");
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", apply); else apply();
