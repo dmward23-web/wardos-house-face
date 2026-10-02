@@ -56,7 +56,7 @@ See FIVE-UPGRADES.md. Old House and Thermostat actuator tiles moved into the top
 - Taps write the existing `house-checkoffs:<kid>:<day>` keys. wall.html now loads `house-tapsync.js` (sync only with a saved key) and `house-sfx.js` (Harris's soft tick only).
 - Ledger's jar tile (JAR1–JAR3, 23 tests) shows only `wallDisplay()`. Nice one adds time or picks, never cash (NICE-ONE.md).
 
-## Update Oct 1 ~9:15 PM CT · ION (ION1, Prism's FINAL kit `plates/2026-10-01/redesign/ion-handoff/`)
+## Update Oct 1 ~9:00 PM CT · ION (ION1, Prism's FINAL kit `plates/2026-10-01/redesign/ion-handoff/`)
 Source of truth: `ion-handoff/HANDOFF.md`, `house-face-wall-redesign-27-ion.html` + its 2560/1920 PNGs, `MOTION-SPEC.md`, `CONTRAST-ion.md`. The loose files in `redesign/` are not used.
 
 **Files (all in the repo, wall-only):** `wall-ion/tokens-wall-kiosk27-v2.css`, `wall-ion/tokens-v3-2100-A.css`, `wall-ion/finish-v3-2100.css`, `wall-ion/ion-master.css` (Prism's bytes; only `url("assets/...")` rewritten to `../fonts/…` and `../camo-tile.png`), `wall-ion/wall-v3-layout.css` (the master's inline `<style>`, verbatim, moved to a file), `wall-ion/ion-wright.css` (Wright bridge, loads last). Fonts in `fonts/`: Oxanium-VF, Michroma-Regular, SpaceGrotesk-VF, JetBrainsMono-VF, InterVariable + each `*-OFL.txt` (Inter-OFL.txt added). Ground `camo-tile.png` and `wardos-mark-header.png` are the kit's bytes (md5-identical, already in the repo root). Nothing loads from the network.
@@ -77,4 +77,4 @@ Source of truth: `ion-handoff/HANDOFF.md`, `house-face-wall-redesign-27-ion.html
 
 **Deviations from the master (all data or rule driven):** Week → `sheet-index.html`, Dad Seat → `sheet-dan.html` (master has both on sheet-dan). No Mode setter tile and no Dinner vote tile (no setter / no source). Doors + Doorbell lamps hidden (no source). Pickup chain stays a separate strip (master folds it into School night). CHOICE is one Atlas job with a per-seat claim row (master draws four sample jobs). Harris has no `wk-row` (Atlas only sends Hayes's row). Captain / Week win / Mystery / Pack / Us-together unlock show only when Atlas's data has them. Ainsley's `$15/hr` hire line is not on the wall (no wall data wiring). Babysitting/unlock seat-foot buttons are not drawn (no source); Nice one is there only when the hub has a PIN.
 
-**Renders:** `plates/2026-10-01/redesign/wright/wall-build-2560-v6-ion.png`, `wall-build-1920-v6-ion.png`, `wall-ion-compare-2560.png` (master left, build right) and `wall-ion-compare-1920.png`.
+**Renders (real data, box clock 8:57 PM CT, no mocks):** `plates/2026-10-01/redesign/wright/wall-build-2560-v6-ion.png`, `wall-build-1920-v6-ion.png`, `wall-ion-compare-2560.png` / `wall-ion-compare-1920.png` (master left, build right). The states fixture shot (CHOICE claimed by Hayes, siblings locked; Harris 1/4 fill; travel-week Pack) comes from `check-ion.py` with a test-only kid-seats fixture served by the route, never written to data/.
