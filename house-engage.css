@@ -3404,3 +3404,12 @@ body.theme-hayes .bank-meta-today {
 body.theme-harris .bank-meta-today {
   border-color: rgba(140,230,60,0.5); color: #e8ffe0; background: rgba(40,90,30,0.45);
 }
+
+/* OVERLAP1: kid boards keep the CT tag clear of the clock glyphs and the
+   percent clear of the GOAL pill (pill rides the top rail, percent sits low). */
+body.theme-hayes .live-clock-host > .live-clock-lab + .live-clock,
+body.theme-harris .live-clock-host > .live-clock-lab + .live-clock,
+body.theme-ainsley .live-clock-host > .live-clock-lab + .live-clock { padding-top: .16em; }
+body.theme-hayes .grow-pct,
+body.theme-harris .grow-pct,
+body.theme-ainsley .grow-pct { top: auto !important; bottom: 6px !important; }

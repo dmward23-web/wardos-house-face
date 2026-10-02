@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="description" content="Board-OS House face · The Ward's mission hub · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
-<link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
+<link rel="stylesheet" href="house-engage.css?v=OVERLAP1" />
 <style>
   @font-face {
     font-family: "Inter Display";
@@ -3788,6 +3788,14 @@ background:linear-gradient(180deg,#fff6d0,#ffe08a 45%,#f5c542);-webkit-backgroun
 animation:atlasPulse 2.4s ease-in-out infinite;}
 @keyframes atlasPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
 @media (prefers-reduced-motion:reduce){.atlas-chip .atlas-live{animation:none}}
+/* OVERLAP1: the Ask chip keeps its own lane; the header ovals stop short of it. */
+.hdr:has(> .atlas-chip) > .hdr-ovals{margin-right:100px;}
+/* OVERLAP1: Morning / Afternoon / Evening labels fit their column, no touching. */
+.leaveby .lb-day-cols .lb-day-part{letter-spacing:0 !important;font-size:9px !important;white-space:nowrap;overflow:hidden;text-overflow:clip;}
+html body .leaveby .lb-day-cols{grid-template-columns:repeat(3,minmax(0,1fr)) !important;}
+html body .leaveby .lb-day-cols > .lb-day-col{min-width:0 !important;max-width:100% !important;box-sizing:border-box;padding-left:6px !important;padding-right:6px !important;}
+/* OVERLAP1: the jar strip keeps air between its label, names, sync note and rule. */
+.tile[data-house-jar]{column-gap:16px !important;}
 </style>
 <link rel="stylesheet" href="house-scroll.css?v=SCROLLEND2" />
 <link rel="stylesheet" href="house-landscape.css?v=SPREAD5" />
