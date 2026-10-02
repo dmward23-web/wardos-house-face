@@ -169,3 +169,5 @@ html[data-landscape] .panel:not(#ls-off) .list > .day-row:last-child:nth-child(o
    right-hand pill to a second row instead (weekend 2560: "Our Ideas" ran under the LIVE jar pill) */
 html[data-landscape] .panel:not(#ls-off) .hdr--clockfirst:has(.identity > .id-text) { flex-wrap: wrap !important; row-gap: 10px !important; align-content: space-evenly !important; }
 html[data-landscape] .panel:not(#ls-off) .hdr--clockfirst .identity, html[data-landscape] .panel:not(#ls-off) .hdr--clockfirst .identity > .id-text { flex-shrink: 0 !important; min-width: max-content; }
+/* SPLIT1 · a kid header's name block never shrinks under the clock (a narrow column wraps or scales instead) */
+html[data-landscape][data-ls-pack] body[data-kid] .panel:not(#ls-off) .hdr > .hdr-left { flex-shrink: 0 !important; }

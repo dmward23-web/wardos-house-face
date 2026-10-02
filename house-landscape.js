@@ -54,7 +54,7 @@
      column, in reading order), the type scale grows (up to FITMAX x the base) while everything still fits one screen,
      and each column's cards share out what is left of the window height so no column ends in a black band.
      A board longer than the window keeps the base scale and scrolls; its columns are evened to the tallest one. */
-  var ROW = 2, GAP = 12, FITMAX = 1.7, ZFIT = 2.6;
+  var ROW = 2, GAP = 12, FITMAX = 2.4, ZFIT = 2.6;
   var PLACED = "data-ls-placed";
   function unpack(panel, keepWide) {
     if (!keepWide) Array.prototype.forEach.call(panel.querySelectorAll("[data-ls-autowide]"), function (e) { e.removeAttribute("data-ls-autowide"); });
@@ -173,6 +173,8 @@
       else sg.list.forEach(function (i) { place(all[i], "auto", "1 / span " + (T / sg.k)); });
     });
     var hs = all.map(function (e) { return hpx(e, z); });
+    /* FITW1: a card wider than its column at this scale (a header that will not wrap) means this scale does not fit */
+    measure.wide = all.some(function (e) { return e.scrollWidth > e.clientWidth + 2; });
     root.removeAttribute("data-ls-measure");
     return hs;
   }
@@ -189,7 +191,24 @@
     if (pend.length) { if (groups.length) Array.prototype.push.apply(groups[groups.length - 1], pend); else groups.push(pend); }
     var n = groups.length, k = Math.min(sg.k, n); sg.k = k;
     var hh = groups.map(function (gr) { return gr.reduce(function (a, i) { return a + hs[i] + GAP; }, 0); }), asg = null;
-    if (Math.pow(k, n - 1) <= 6561) {
+    /* ORDER1 (Dan 10/2): a board marked [data-ls-order] keeps strict reading order: each column takes the next run
+       of cards (column-major), so a week stays in calendar order and a list stays in its own order. The cut points
+       are the ones whose tallest column is shortest. */
+    if (n && (document.body.hasAttribute("data-ls-order") || sg.list.some(function (i) { return all[i].closest("[data-ls-order]"); }))) {
+      var bestO = Infinity, sprO = Infinity, cuts = [];
+      (function run(j, c, at, mx, mn) {
+        if (c === k - 1) {
+          var rest = 0; for (var q = j; q < n; q++) rest += hh[q];
+          if (j >= n) return;
+          var M = Math.max(mx, rest), N = Math.min(mn, rest);
+          if (M < bestO - 0.5 || (Math.abs(M - bestO) <= 0.5 && M - N < sprO)) { bestO = M; sprO = M - N; asg = at.slice(); for (q = j; q < n; q++) asg[q] = c; }
+          return;
+        }
+        var acc = 0;
+        for (var e2 = j; e2 < n - (k - 1 - c); e2++) { acc += hh[e2]; at[e2] = c; if (Math.max(mx, acc) >= bestO + 0.5) break; run(e2 + 1, c + 1, at, Math.max(mx, acc), Math.min(mn, acc)); }
+      })(0, 0, new Array(n), 0, Infinity);
+    }
+    if (!asg && Math.pow(k, n - 1) <= 6561) {
       var best = Infinity, spread = Infinity, cur = new Array(n), tot = new Array(k);
       for (var code = 0, lim = Math.pow(k, n - 1); code < lim; code++) {
         var x = code; cur[0] = 0;
@@ -240,7 +259,7 @@
     });
     var bot = 0; fh.forEach(function (v) { bot += Math.ceil((v + 4) / ROW) * ROW; });
     var avail = h / z - pad - bot - 0.5; /* (each column's last card takes its own gap: it has no margin under it) */
-    return { z: z, cols: cols, all: all, hs: hs, ft: ft, fh: fh, segs: segs, total: total, avail: avail, fits: total <= avail + 1 };
+    return { z: z, cols: cols, all: all, hs: hs, ft: ft, fh: fh, segs: segs, total: total, avail: avail, fits: total <= avail + 1 && !measure.wide, wide: measure.wide };
   }
   /* FITBEST1 (SPACE-01 per board, 10/2): the same empty-patch measure the gate uses (words, media and controls,
      12px halo, largest empty rectangle in the window). The board tries its column counts and keeps the layout
@@ -276,23 +295,67 @@
   }
   /* a candidate layout only counts when no placed card spills past its own box or over a neighbour */
   function layoutOk(panel) {
+    api.why0 = "";
     var els = Array.prototype.filter.call(panel.querySelectorAll("[" + PLACED + "]"), function (e) { return e.offsetParent || g.getComputedStyle(e).display !== "none"; });
     var rs = els.map(function (e) { return e.getBoundingClientRect(); });
     for (var i = 0; i < els.length; i++) {
       var e = els[i];
       if (rs[i].width < 1) continue;
-      if (e.scrollWidth > e.clientWidth + 2) return false;
+      if (e.scrollWidth > e.clientWidth + 2) { api.why0 = "wide:" + (e.id || String(e.className).split(" ")[0]) + ":" + e.scrollWidth + "/" + e.clientWidth; return false; }
       for (var j = i + 1; j < els.length; j++) {
         var a = rs[i], b = rs[j];
         if (b.width < 1) continue;
-        if (Math.min(a.right, b.right) - Math.max(a.left, b.left) > 2 && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 2) return false;
+        if (Math.min(a.right, b.right) - Math.max(a.left, b.left) > 2 && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 2) { api.why0 = "overlap:" + (e.id || String(e.className).split(" ")[0]) + "x" + (els[j].id || String(els[j].className).split(" ")[0]); return false; }
       }
     }
     return document.documentElement.scrollWidth <= g.innerWidth + 2;
   }
+  /* SPLIT1 (SPACE-01 systemic, 10/2). Cause found on the 17 failing boards: the patch sits INSIDE a few big
+     sections (a whole list in one box): with 4-6 big boxes over 2-3 columns the columns cannot come out even, the
+     one scale is set by the tallest column, and the short columns' boxes are stretched with nothing in them (or
+     their short rows leave a stripe). So a big section with 2+ parts is split into its own cards (its title rides
+     with the first one), the cards are dealt in strict reading order (each column takes the next run, column-major),
+     and the board is packed again. Kept only when the empty patch shrinks and no card spills or overlaps. */
+  function splitCands(panel) {
+    var H = g.innerHeight, out = [];
+    function ok(e, f) {
+      if (e.matches(LEAD) || e.matches("footer, .ftr") || e.hasAttribute("data-ls-keep") || e.hasAttribute("data-ls-wide") || e.hasAttribute("data-ls-nosplit") || pictureCard(e)) return false;
+      if (e.matches("a, button, [role=button], [role=link], [data-go], [onclick]")) return false; /* a press target stays one card */
+      var ks = sections(e); if (ks.length < 2) return false;
+      if (e.getBoundingClientRect().height < H * f) return false;
+      var r0 = ks[0].getBoundingClientRect();
+      return !ks.some(function (k) { var r = k.getBoundingClientRect(); return r.width > 0 && r.left > r0.right - 2; }); /* parts side by side: a grid card */
+    }
+    flow(panel).forEach(function (e) {
+      if (!ok(e, 0.35)) return; out.push(e);
+      sections(e).forEach(function (k) { if (ok(k, 0.3)) out.push(k); });
+    });
+    return out;
+  }
   function pack(panel, root, w, h, z0) {
+    if (panel.hasAttribute("data-ls-order-auto")) { panel.removeAttribute("data-ls-order"); panel.removeAttribute("data-ls-order-auto"); }
+    Array.prototype.forEach.call(panel.querySelectorAll("[data-ls-split]"), function (e) { e.removeAttribute("data-ls-split"); e.removeAttribute("data-ls-flat"); });
     COLS_OVR = 0; packWith(panel, root, w, h, z0);
-    api.dead0 = deadFrac(); api.dead = api.dead0; api.moves = [];
+    api.dead0 = deadFrac(); api.split = []; api.tries = [];
+    if (api.dead0 > 0.018 && !panel.hasAttribute("data-ls-fixcols") && !panel.hasAttribute("data-ls-nosplit")) {
+      var c0 = api.last.cols, S = splitCands(panel), mine = !panel.hasAttribute("data-ls-order");
+      var setSplit = function (on) {
+        S.forEach(function (e) { if (on) { e.setAttribute("data-ls-flat", ""); e.setAttribute("data-ls-split", ""); } else { e.removeAttribute("data-ls-split"); e.removeAttribute("data-ls-flat"); } });
+        if (mine) { if (on) { panel.setAttribute("data-ls-order", ""); panel.setAttribute("data-ls-order-auto", ""); } else { panel.removeAttribute("data-ls-order"); panel.removeAttribute("data-ls-order-auto"); } }
+      };
+      /* FITBEST2: the split and the column count are tried together; the layout with the smallest empty patch wins */
+      var best = { d: api.dead0, sp: false, c: 0 };
+      [[false, c0 + 1], [true, 0], [true, c0 + 1]].forEach(function (cf) {
+        if (cf[0] && !S.length) return;
+        setSplit(cf[0]); COLS_OVR = cf[1]; packWith(panel, root, w, h, z0);
+        var lo = layoutOk(panel), d = lo && api.last.fits ? deadFrac() : 1;
+        api.tries.push([cf[0] ? "split" : "whole", api.last.cols, Math.round(d * 1000) / 10, lo ? "ok" : api.why0, api.last.fits]);
+        if (d < best.d - 0.002) best = { d: d, sp: cf[0], c: cf[1] };
+      });
+      setSplit(best.sp); COLS_OVR = best.c; packWith(panel, root, w, h, z0); api.dead0 = deadFrac();
+      if (best.sp) api.split = S.map(function (e) { return e.id || String(e.className).split(" ")[0] || e.tagName; });
+    }
+    api.dead = api.dead0; api.moves = [];
     if (api.dead0 > 0.018 && !panel.hasAttribute("data-ls-fixcols")) spreadOut(panel);
   }
   /* SPREAD1 (SPACE-01 per board, 10/2): where the largest empty patch sits inside a card (short words in a wide
