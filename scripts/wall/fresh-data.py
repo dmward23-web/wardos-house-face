@@ -1,58 +1,97 @@
 #!/usr/bin/env python3
-"""FRESHDATA1 · pull the LIVE published feeds into a gate snapshot before any real-data gate or render.
+"""FRESHDATA1 · real data at the current clock for a gate snapshot (never a git checkout).
 
-Usage: fresh-data.py <snapshot-root> [--base URL]
+Usage: fresh-data.py <snapshot-root>        env FRESH_EVENTS (default /workspace/cal-dmward23-week.json)
 
-The branch's committed data/*.json is a morning snapshot; calendar boards then read "CAL STALE" and old
-titles. Real data at the current clock = the same live feeds the preview reads (main's published data/,
-refreshed by Atlas's 10-minute data-only commits). Each data/<name>.json the snapshot ships is replaced by
-the live copy (GET only, valid JSON only); a feed the live site lacks keeps the snapshot copy and is named.
-Then the 8 branch wall feeds (house-mode, next-up, kid-seats, unlocks, pickup-chain, school-night, who-home,
-logistics-taps; main does not publish them) are regenerated IN THE SNAPSHOT by its own
-scripts/house-feeds-refresh.sh from the fresh calendar pull Atlas's routine writes (--events, default
-/workspace/cal-dmward23-week.json; it must be under 2 h old). Read only on the house: no writes anywhere but the snapshot. Refuses a git checkout (never touches a
-worktree's committed data). Writes <root>/data/.fresh.json (base, fetchedAt, per-file result).
+The branch's committed data is a morning snapshot (calendar boards then read "CAL STALE" and old titles).
+Before any real-data gate or render this rebuilds the snapshot's calendar data the way the 10-minute routine
+does (scripts/house-board-calendar-refresh.sh, steps 0-3, minus its board-os mirror and git):
+  0. privacy-scrub the fresh calendar pull with ~/.config/wardos/privacy-scrub.tsv (missing file = fail closed)
+  1. scripts/calendar-refresh.mjs --no-mirror      -> kids-week.json, data/kids-week.json, kids-data.js EMBEDDED
+  2. scripts/cal-from-events.mjs                   -> data/cal-live.json
+  3. scripts/house-feeds-refresh.sh                -> the 8 wall feeds (house-mode, next-up, kid-seats, ...)
+  4. scripts/cal-months.py on the same pull        -> the pull's days replaced in data/cal-months.json
+Device feeds (nest, sensi, lights) come from main's live published data/ (GET only).
+If the pull is missing, over 2 h old or cannot be scrubbed: cal-live comes from main's live data instead,
+the branch copies of the rest are kept, and the result says PARTIAL. Writes <root>/data/.fresh.json.
+Read only on the house: writes nowhere but the snapshot; no network but GETs of the published data.
 """
-import json, os, sys, subprocess, time, datetime as dt, urllib.request
+import json, os, re, sys, subprocess, time, tempfile, datetime as dt, urllib.request
 
-args = [a for a in sys.argv[1:] if not a.startswith("--")]
 BASE = "https://dmward23-web.github.io/wardos-house-face/data/"
-if "--base" in sys.argv: BASE = sys.argv[sys.argv.index("--base") + 1].rstrip("/") + "/"; args = [a for a in args if a != BASE.rstrip("/")]
-if not args: sys.exit(__doc__)
-root = os.path.abspath(args[0]); data = os.path.join(root, "data")
+DEVICE = ["nest-live.json", "sensi-live.json", "lights-live.json"]
+if len(sys.argv) < 2: sys.exit(__doc__)
+root = os.path.abspath(sys.argv[1]); data = os.path.join(root, "data")
 if os.path.exists(os.path.join(root, ".git")): sys.exit(f"FRESH DATA REFUSED: {root} is a git checkout; run on a snapshot copy")
 if not os.path.isdir(data): sys.exit(f"FRESH DATA FAIL: no data/ in {root}")
 now = dt.datetime.now(dt.timezone(dt.timedelta(hours=-5))).replace(microsecond=0).isoformat()
-res, ok, kept = {}, 0, []
-for name in sorted(os.listdir(data)):
-    if not name.endswith(".json") or name.startswith("."): continue
-    try:
-        req = urllib.request.Request(BASE + name + "?t=" + str(int(dt.datetime.now().timestamp())), headers={"Cache-Control": "no-cache"})
-        with urllib.request.urlopen(req, timeout=20) as r: body = r.read()
-        obj = json.loads(body)
-        with open(os.path.join(data, name), "wb") as f: f.write(body)
-        stamp = next((obj.get(k) for k in ("fetchedAt", "refreshedAt", "generatedAt", "updatedAt", "asOfIso") if isinstance(obj, dict) and obj.get(k)), None)
-        res[name] = {"live": True, "stamp": stamp}; ok += 1
-    except Exception as e:
-        res[name] = {"live": False, "why": str(e)[:120]}; kept.append(name)
-# root copies the kid boards may read
-for name in ("kids-week.json",):
-    if os.path.exists(os.path.join(root, name)) and res.get(name, {}).get("live"):
-        with open(os.path.join(data, name), "rb") as s, open(os.path.join(root, name), "wb") as d: d.write(s.read())
 EV = os.environ.get("FRESH_EVENTS", "/workspace/cal-dmward23-week.json")
-feeds = {"events": EV}
+rep = {"fetchedAt": now, "base": BASE, "events": EV, "steps": {}}
+
+def get_live(name):
+    req = urllib.request.Request(BASE + name + "?t=" + str(int(time.time())), headers={"Cache-Control": "no-cache"})
+    with urllib.request.urlopen(req, timeout=20) as r: body = r.read()
+    json.loads(body)
+    with open(os.path.join(data, name), "wb") as f: f.write(body)
+
+for name in DEVICE:
+    try: get_live(name); rep["steps"][name] = "live"
+    except Exception as e: rep["steps"][name] = "kept branch copy: " + str(e)[:80]
+
+def run(cmd):
+    r = subprocess.run(cmd, cwd=root, capture_output=True, text=True, timeout=300)
+    if r.returncode: raise RuntimeError(" ".join(os.path.basename(c) for c in cmd[:2]) + " failed: " + (r.stderr or r.stdout).strip()[-200:])
+    return r
+
+cal_ok = False
 try:
-    age = (time.time() - os.path.getmtime(EV)) / 60
-    feeds["ageMin"] = round(age)
-    if age > 120: raise RuntimeError(f"calendar pull {EV} is {round(age)} min old (> 2 h)")
-    r = subprocess.run(["bash", os.path.join(root, "scripts/house-feeds-refresh.sh"), "--events", EV], cwd=root, capture_output=True, text=True, timeout=300)
-    feeds["ok"] = r.returncode == 0; feeds["out"] = (r.stdout + r.stderr).strip().splitlines()[-1:] if (r.stdout or r.stderr) else []
+    if not os.path.exists(EV): raise RuntimeError(f"no calendar pull at {EV}")
+    age = (time.time() - os.path.getmtime(EV)) / 60; rep["pullAgeMin"] = round(age)
+    if age > 120: raise RuntimeError(f"calendar pull is {round(age)} min old (> 2 h)")
+    fp = os.path.expanduser("~/.config/wardos/privacy-scrub.tsv")
+    if not os.path.exists(fp): raise RuntimeError("privacy-scrub.tsv missing: fail closed")
+    rules = []
+    for line in open(fp):
+        line = line.rstrip("\n")
+        if not line or line.startswith("#"): continue
+        rx, _, r_ = line.partition("\t"); rules.append((re.compile(rx, re.I), r_))
+    def walk(o):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k in ("summary", "title", "description") and isinstance(v, str):
+                    for rx, r_ in rules: v = rx.sub(r_, v)
+                    o[k] = re.sub(r"\s{2,}", " ", v).strip()
+                else: walk(v)
+        elif isinstance(o, list):
+            for x in o: walk(x)
+    dump = json.load(open(EV)); walk(dump)
+    tmpd = tempfile.mkdtemp(prefix="fresh-"); S = os.path.join(tmpd, "events.json"); json.dump(dump, open(S, "w"))
+    try:
+        run(["node", "scripts/calendar-refresh.mjs", "--events", S, "--week", os.path.join(root, "kids-week.json"), "--no-mirror"]); rep["steps"]["kids-week"] = "regenerated"
+        run(["node", "scripts/cal-from-events.mjs", "--events", S, "--out", os.path.join(data, "cal-live.json")]); rep["steps"]["cal-live.json"] = "regenerated"
+        cal_ok = True
+        run(["bash", "scripts/house-feeds-refresh.sh", "--events", S]); rep["steps"]["wall-feeds"] = "regenerated"
+        cm = os.path.join(tmpd, "cal-months.json")
+        run(["python3", "scripts/cal-months.py", cm, S])
+        fresh = json.load(open(cm)); cur_p = os.path.join(data, "cal-months.json")
+        cur = json.load(open(cur_p)) if os.path.exists(cur_p) else {"days": {}}
+        lo, hi = fresh.get("rangeStart"), fresh.get("rangeEnd")
+        for k in list(cur.get("days", {})):
+            if lo and hi and lo <= k <= hi: del cur["days"][k]
+        cur.setdefault("days", {}).update(fresh.get("days", {})); cur["days"] = dict(sorted(cur["days"].items()))
+        cur["generatedAt"] = fresh.get("generatedAt"); cur["freshDays"] = [lo, hi]
+        json.dump(cur, open(cur_p, "w"), ensure_ascii=False, separators=(",", ":")); rep["steps"]["cal-months.json"] = f"days {lo}..{hi} regenerated"
+    finally:
+        for f in os.listdir(tmpd): os.remove(os.path.join(tmpd, f))
+        os.rmdir(tmpd)
 except Exception as e:
-    feeds["ok"] = False; feeds["why"] = str(e)[:200]
-json.dump({"base": BASE, "fetchedAt": now, "files": res, "feeds": feeds}, open(os.path.join(data, ".fresh.json"), "w"), indent=1)
-cal = res.get("cal-live.json", {})
-REGEN = {"house-mode.json", "next-up.json", "kid-seats.json", "unlocks.json", "pickup-chain.json", "school-night.json", "who-home.json", "logistics-taps.json"}
-if feeds.get("ok"): kept = [k for k in kept if k not in REGEN]
-good = bool(cal.get("live")) and feeds.get("ok")
-print(f"FRESH DATA {'PASS' if good else 'FAIL'} · {now} · {ok} live feed(s) from {BASE}" + (f" · branch copy kept (not published by main): {', '.join(kept)}" if kept else "") + f" · cal-live {cal.get('stamp')} · wall feeds " + ("regenerated from " + EV + f" ({feeds.get('ageMin')} min old)" if feeds.get("ok") else "FAILED: " + str(feeds.get("why") or feeds.get("out"))))
-sys.exit(0 if good else 1)
+    rep["calendarPath"] = "not run: " + str(e)[:200]
+    if not cal_ok:
+        try: get_live("cal-live.json"); rep["steps"]["cal-live.json"] = "main live copy"; cal_ok = "live"
+        except Exception as e2: rep["steps"]["cal-live.json"] = "STALE branch copy: " + str(e2)[:80]
+json.dump(rep, open(os.path.join(data, ".fresh.json"), "w"), indent=1)
+full = cal_ok is True and "calendarPath" not in rep
+cl = json.load(open(os.path.join(data, "cal-live.json")))
+print(f"FRESH DATA {'PASS' if full else ('PARTIAL' if cal_ok else 'FAIL')} · {now} · pull {EV} ({rep.get('pullAgeMin')} min old) · cal-live fetchedAt {cl.get('fetchedAt')} · "
+      + " · ".join(f"{k}: {v}" for k, v in rep["steps"].items()) + (f" · {rep['calendarPath']}" if "calendarPath" in rep else ""))
+sys.exit(0 if cal_ok else 1)
