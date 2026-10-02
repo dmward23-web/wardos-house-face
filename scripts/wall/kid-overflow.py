@@ -2,6 +2,7 @@
 # kid-hayes / kid-harris / kid-ainsley reaches past the viewport, pseudo-elements included (the board's own
 # overflow-x clip on body is lifted for the measurement so a hidden overflow can't hide). Test clock Thu Oct 1 9:30 PM CT.
 # Usage: python3 scripts/wall/kid-overflow.py   (exit 1 on any overflow)
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import datasnap  # DAYWIN1
 import sys, os, subprocess, time, random, datetime, json
 from playwright.sync_api import sync_playwright
 WT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../..")); PORT = random.randint(20000, 40000)
@@ -21,7 +22,11 @@ try:
                 ctx = b.new_context(viewport={"width": vw, "height": vh}, is_mobile=mob, has_touch=mob, screen={"width": vw, "height": vh}); pg = ctx.new_page(); errs = []
                 pg.on("pageerror", lambda e: errs.append(str(e)[:100]))
                 pg.clock.install(time=datetime.datetime.fromisoformat("2026-10-01T21:30:00-05:00"))
-                pg.route("**/*", lambda r: r.continue_() if r.request.url.startswith(L) else r.abort())
+                def route(r, _q=None):
+                    pb = datasnap.body(r.request.url, "2026-10-01T21:30:00-05:00")
+                    if pb is not None and r.request.url.startswith(L): return r.fulfill(status=200, content_type="application/json", body=pb)
+                    return r.continue_() if r.request.url.startswith(L) else r.abort()
+                pg.route("**/*", route)
                 pg.goto(L + f"kid-{kid}.html"); pg.clock.run_for(2500); pg.wait_for_timeout(1200)
                 m = pg.evaluate(MEASURE)
                 lim = max(vw, m["panelCW"]) if vw < 600 else vw  # phone: the board's own width=1080 viewport meta is the layout width

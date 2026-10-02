@@ -6,6 +6,7 @@
 #   inplace -> the wall answers within 1s (DOM feedback), the URL does not change.
 # No request leaves the box (any non-local request = FAIL; no key is saved, so nothing writes).
 # Test clock (Playwright clock.install), real branch data. Usage: python3 scripts/wall/press-map.py [WxH ...] [--time ISO] [--out file.json]
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import datasnap  # DAYWIN1
 import sys, os, json, re, subprocess, time, random, datetime, fnmatch
 from playwright.sync_api import sync_playwright
 WT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../.."))
@@ -38,6 +39,8 @@ def page(b, vw, vh, nonlocal_):
     ctx = b.new_context(viewport={"width": vw, "height": vh}); pg = ctx.new_page(); errs = []
     pg.clock.install(time=datetime.datetime.fromisoformat(iso)); pg.on("pageerror", lambda e: errs.append(str(e)[:120]))
     def route(r):
+        pb = datasnap.body(r.request.url, iso)
+        if pb is not None and r.request.url.startswith(L): return r.fulfill(status=200, content_type="application/json", body=pb)
         if r.request.url.startswith(L): return r.continue_()
         # the wall itself may not reach off the box at all; a destination board's public GET (weather) is aborted, not a failure
         if r.request.method != "GET" or "/wall.html" in (pg.url or ""): nonlocal_.append(r.request.method + " " + r.request.url)

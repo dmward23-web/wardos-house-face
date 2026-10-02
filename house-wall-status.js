@@ -87,9 +87,23 @@
   function readHouseMode(json, opts) {
     opts = opts || {};
     if (!json || typeof json !== "object" || typeof json.mode !== "string") return null;
-    var key = json.mode, now = nowMs(opts.now);
-    if (MODE_KEYS.indexOf(key) < 0 || !json.label) return null;
+    var now = nowMs(opts.now);
     if (json.asOfIso !== ctIso(now)) return null;
+    var gen = parse(json.generatedAt);
+    if (gen && gen > now + 5 * 60 * 1000) return null; /* a file from later than this clock is not this window's data */
+    /* DAYWIN1 · Atlas writes the house day's windows (timeline); the wall shows the one covering its own clock */
+    if (Array.isArray(json.timeline) && json.timeline.length) {
+      var win = null;
+      for (var i = 0; i < json.timeline.length; i++) {
+        var w = json.timeline[i]; if (!w || typeof w.mode !== "string") continue;
+        var ws = parse(w.since), wu = parse(w.until);
+        if ((!ws || now >= ws - 5 * 60 * 1000) && (!wu || now < wu)) { win = w; break; }
+      }
+      if (!win) return null;
+      json = { mode: win.mode, label: win.label, since: win.since, until: win.until, asOfIso: json.asOfIso };
+    }
+    var key = json.mode;
+    if (MODE_KEYS.indexOf(key) < 0 || !json.label) return null;
     var until = parse(json.until), since = parse(json.since);
     if (until && now >= until) return null;
     if (since && now < since - 5 * 60 * 1000) return null;

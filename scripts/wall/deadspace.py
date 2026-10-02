@@ -9,6 +9,7 @@
 # States (wall): real data at a test clock (Playwright clock.install; data/ is never written) plus FIXTURE states
 # routed in from scripts/wall/fixtures/*.FIXTURE.json. Heatmaps: red = failing hole/gap, amber = empty cells.
 # Usage: python3 scripts/wall/deadspace.py [--wall] [--boards] [--vp WxH ...] [--out DIR]
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import datasnap  # DAYWIN1
 import sys, os, json, subprocess, time, random, datetime
 from playwright.sync_api import sync_playwright
 from PIL import Image, ImageDraw
@@ -26,11 +27,13 @@ def fx(name): return json.load(open(os.path.join(FX, name)))
 # (label, clock, {data path: fixture file}, localStorage seed)
 def must_done_seed(day):
     return {f"house-checkoffs:{k}:{day}": json.dumps({"must-bed": True, "must-hamper": True, "must-dish": True, "must-floor": True}) for k in ("harris", "hayes", "ainsley")}
+TODAY = json.load(open(os.path.join(WT, "data/kid-seats.json"))).get("asOfIso") or datetime.date.today().isoformat()
 STATES = [
-    ("FIXTURE-0645", "2026-10-01T06:45:00-05:00", {"data/kid-seats.json": "kid-seats.gen0645.FIXTURE.json", "data/next-up.json": "next-up.gen0645.FIXTURE.json", "data/house-mode.json": "house-mode.gen0645.FIXTURE.json"}, {}),
-    ("FIXTURE-1530", "2026-10-01T15:30:00-05:00", {"data/kid-seats.json": "kid-seats.gen1530.FIXTURE.json", "data/next-up.json": "next-up.gen1530.FIXTURE.json", "data/house-mode.json": "house-mode.gen1530.FIXTURE.json"}, {}),
-    ("real-2000", "2026-10-01T20:00:00-05:00", {}, {}),
-    ("real-2130", "2026-10-01T21:30:00-05:00", {}, {}),
+    # DAYWIN1 · today's REAL morning / afternoon windows: data/ as generated this morning, no fixtures
+    ("real-0645", TODAY + "T06:45:00-05:00", {}, {}),
+    ("real-1530", TODAY + "T15:30:00-05:00", {}, {}),
+    ("oct01-2000", "2026-10-01T20:00:00-05:00", {}, {}),  # Thu Oct 1 real data (pinned, scripts/wall/datasnap.py)
+    ("oct01-2130", "2026-10-01T21:30:00-05:00", {}, {}),
     ("FIXTURE-travel-week", "2026-10-01T20:00:00-05:00", {"data/kid-seats.json": "kid-seats.travel-week.FIXTURE.json"}, {}),
     ("FIXTURE-no-pickups", "2026-10-01T15:30:00-05:00", {"data/pickup-chain.json": "pickup-chain.empty.FIXTURE.json", "data/kid-seats.json": "kid-seats.gen1530.FIXTURE.json", "data/next-up.json": "next-up.gen1530.FIXTURE.json", "data/house-mode.json": "house-mode.gen1530.FIXTURE.json"}, {}),
     ("FIXTURE-all-musts-done", "2026-10-01T20:00:00-05:00", {}, must_done_seed("2026-10-01")),
@@ -146,6 +149,8 @@ def run(b, page, vw, vh, iso, routes, seed, label, wall):
         u = r.request.url
         for k, f in routes.items():
             if u.split("?")[0].endswith("/" + k): return r.fulfill(status=200, content_type="application/json", body=json.dumps(fx(f)))
+        pb = datasnap.body(u, iso)
+        if pb is not None and u.startswith(L): return r.fulfill(status=200, content_type="application/json", body=pb)
         return r.continue_() if u.startswith(L) else r.abort()
     pg.route("**/*", route)
     pg.goto(L + page); pg.clock.run_for(3000); pg.wait_for_timeout(1300); pg.clock.run_for(1000); pg.wait_for_timeout(300)
@@ -166,7 +171,7 @@ try:
                 for label, iso, routes, seed in STATES: run(b, "wall.html", vw, vh, iso, routes, seed, label, True)
         if do_boards:
             for vw, vh in VPS:
-                for page in BOARDS: run(b, page, vw, vh, "2026-10-01T21:30:00-05:00", {}, {}, "real-2130", False)
+                for page in BOARDS: run(b, page, vw, vh, "2026-10-01T21:30:00-05:00", {}, {}, "oct01-2130", False)
         b.close()
 finally:
     srv.terminate()

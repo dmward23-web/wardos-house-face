@@ -41,7 +41,7 @@ await t("fake fetch: both scenes with a key -> 0 /api/sensi calls, only setLight
   assert.ok(lit.length > 0);
 });
 await t("CHORELAW2: wall taps write ONLY house-checkoffs:<kid>:<day|week:Sunday> law ids; never jar / bank / money keys", () => {
-  const s = K.memStore(), j = JSON.parse(read("data/kid-seats.json")), NOW = Date.parse("2026-10-01T20:30:00-05:00");
+  const s = K.memStore(), j = JSON.parse(read("scripts/wall/fixtures/oct01-data/kid-seats.json")), NOW = Date.parse("2026-10-01T20:30:00-05:00");
   K.KIDS.forEach((k) => { K.tapMust(s, j, k.id, "must-bed", NOW); K.tapClose(s, j, k.id, NOW); K.checkIn(s, k.id, NOW); });
   const keys = Object.keys(s.dump());
   assert.ok(keys.length > 0);
@@ -73,7 +73,7 @@ await t("CHORELAW2: no old quest chart on the wall or the hub kid tiles (one cho
   assert.ok(idx.indexOf('src="house-wall-kid.js') > 0 && idx.indexOf('src="house-wall-kid.js') < idx.indexOf('src="house-kid-engage.js'));
   assert.ok(fs.existsSync(new URL("data/kids-week.json", root)), "quest data is NOT deleted (Atlas retires it at merge)");
   /* the law module decides what the Chores face lists */
-  const j = JSON.parse(read("data/kid-seats.json")), m = K.musts(j, K.memStore(), "hayes", Date.parse("2026-10-01T20:30:00-05:00"));
+  const j = JSON.parse(read("scripts/wall/fixtures/oct01-data/kid-seats.json")), m = K.musts(j, K.memStore(), "hayes", Date.parse("2026-10-01T20:30:00-05:00"));
   assert.deepEqual(m.items.map((x) => x.id), j.seats.hayes.musts.map((x) => x.id).slice(0, 4));
 });
 await t("CHORELAW2: dinner-vote and gallery unlock controls gone; no leaderboard / ranking on the wall", () => {

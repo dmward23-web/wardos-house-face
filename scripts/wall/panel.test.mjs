@@ -102,7 +102,7 @@ await t("ATLASLANE6 readers: absent -> null (tiles hidden)", () => {
   assert.equal(LS.fieldGame(null, NOW), null); assert.equal(LS.fieldWeather(null, null), null);
 });
 await t("next-up.json (ATLAS-DATA-LANE.md NEXT UP): real file -> 'Hayes + Harris drop-off · Leave 8:10. (Fri)'", () => {
-  const j = J("data/next-up.json");
+  const j = J("scripts/wall/fixtures/oct01-data/next-up.json");
   assert.deepEqual(Object.keys(j.next).sort(), ["copy", "day", "label", "leaveAt", "leaveIso", "startIso"]);
   assert.equal(LS.leaveLine(j, AT, R).text, "Hayes + Harris drop-off \u00b7 Leave 8:10. (Fri)");
   const today = { ...j, next: { ...j.next, day: "Today", leaveIso: "2026-10-01T18:55:00-05:00", copy: "Leave 6:55." } };
@@ -113,7 +113,7 @@ await t("next-up.json (ATLAS-DATA-LANE.md NEXT UP): real file -> 'Hayes + Harris
   assert.equal(LS.leaveLine({ ...j, generatedAt: "2026-10-01T09:00:00-05:00" }, AT, R), null, "stale -> hidden");
 });
 await t("logistics-taps.json (LOGISTICS-TAPS.md): the file's four controls, labels and chips; sendsToPeople must be false", () => {
-  const j = J("data/logistics-taps.json");
+  const j = J("scripts/wall/fixtures/oct01-data/logistics-taps.json");
   const c = LS.logisticsControls(j, AT);
   assert.deepEqual(c.map((x) => [x.id, x.label]), [["im-home", "I'm home"], ["leaving", "Leaving"], ["check-in", "Check in"], ["running-late", "Running late"]]);
   assert.deepEqual(c[2].kids, ["Harris", "Hayes", "Ainsley"]); assert.deepEqual(c[3].chips, [5, 10, 15, 20, 30]);
@@ -123,7 +123,7 @@ await t("logistics-taps.json (LOGISTICS-TAPS.md): the file's four controls, labe
   assert.equal(LS.logisticsControls({ ...j, controls: [{ id: "text-someone", label: "x" }] }, AT), null, "unknown controls are not drawn");
 });
 await t("logistics taps: status copy per contract, latest tap wins, 3:00 AM reset, invalid input ignored, sends always []", () => {
-  const c = LS.logisticsControls(J("data/logistics-taps.json"), AT), s = mem();
+  const c = LS.logisticsControls(J("scripts/wall/fixtures/oct01-data/logistics-taps.json"), AT), s = mem();
   const at = (hm) => Date.parse("2026-10-01T" + hm + ":00-05:00");
   assert.equal(LS.applyTap(s, c, { control: "im-home" }, at("18:05")).logistics.status.line, "Home 6:05.");
   assert.equal(LS.applyTap(s, c, { control: "check-in", kid: "Ainsley" }, at("18:52")).logistics.status.line, "Ainsley home 6:52.");
@@ -143,7 +143,7 @@ await t("logistics taps: status copy per contract, latest tap wins, 3:00 AM rese
   assert.doesNotMatch(src.replace(/\/\*[\s\S]*?\*\//g, ""), /fetch\(|XMLHttpRequest|sendBeacon|WebSocket/, "the lists module has no network code");
 });
 await t("school-night.json: real file, visibleFromIso..visibleUntilIso only, Atlas's copy lines", () => {
-  const j = J("data/school-night.json");
+  const j = J("scripts/wall/fixtures/oct01-data/school-night.json");
   assert.deepEqual(LS.schoolNight(j, AT, R).lines, [{ k: "Pickup", v: "Hayes pickup. Leave 6:20." }, { k: "Form", v: "Ainsley \u00b7 LKMS baby pic due Fri 3:00." }]);
   assert.equal(LS.schoolNight(j, Date.parse("2026-10-01T14:59:00-05:00"), R), null);
   assert.equal(LS.schoolNight(j, Date.parse("2026-10-01T19:00:00-05:00"), R), null, "hides at 7:00 even on the same file");

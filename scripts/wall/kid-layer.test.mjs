@@ -69,7 +69,7 @@ const LIT = {
 const UL = (kinds, extra = {}, week = "2026-09-27") => ({ asOfIso: "2026-10-01", generatedAt: "2026-10-01T17:00:00-05:00",
   week: { id: week }, lit: kinds.map((k) => ({ ...LIT[k], earnedWeek: week })), source: "test", ...extra });
 t("Atlas's committed data/unlocks.json parses (lit [] today -> nothing shown)", () => {
-  const j = JSON.parse(fs.readFileSync(new URL("../../data/unlocks.json", import.meta.url)));
+  const j = JSON.parse(fs.readFileSync(new URL("../../scripts/wall/fixtures/oct01-data/unlocks.json", import.meta.url)));
   assert.ok(Array.isArray(j.lit));
   const u = K.unlocks(j, K.memStore(), Date.parse(j.generatedAt) + 60000);
   assert.ok(u.every((x) => j.lit.some((l) => l.id === x.id)));
@@ -94,7 +94,7 @@ t("Weekend fun spends once; a newer earnedWeek lights it again (no stacking)", (
 });
 
 // chore law · Atlas's data/kid-seats.json (ATLASLANE8)
-const SEATS = JSON.parse(fs.readFileSync(new URL("../../data/kid-seats.json", import.meta.url)));
+const SEATS = JSON.parse(fs.readFileSync(new URL("../../scripts/wall/fixtures/oct01-data/kid-seats.json", import.meta.url)));
 const at = (hhmm) => Date.parse(`2026-10-01T${hhmm}:00-05:00`);
 const law = (patch = {}) => { const j = structuredClone(SEATS); j.generatedAt = "2026-10-01T03:05:00-05:00"; return Object.assign(j, typeof patch === "function" ? patch(j) || {} : patch); };
 const openChoice = (j) => { j.choice = { ...j.choice, claimedBy: null, claimedAt: null, locked: false, done: false, open: true, exception: false }; };

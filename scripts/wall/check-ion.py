@@ -6,9 +6,10 @@ import os; WT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__f
 srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORT), "--bind", "127.0.0.1"], cwd=WT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 time.sleep(0.8); L = f"http://127.0.0.1:{PORT}/"
 T = datetime.datetime.fromisoformat(sys.argv[1] if len(sys.argv) > 1 else "2026-10-01T20:30:00-05:00")
-seats = json.load(open(WT + "/data/kid-seats.json"))
+sys.path.insert(0, os.path.join(WT, "scripts/wall")); import datasnap  # DAYWIN1: Oct 1 clocks read the Oct 1 data set
+seats = json.load(open(datasnap.path("kid-seats.json", T.isoformat())))
 FIX = copy.deepcopy(seats)  # states fixture: CHOICE open (no claim yet) + travel-week Pack; test-only, never written to data/
-FIX["choice"].update({"open": True, "exception": False, "lockAt": "2026-10-01T23:00:00-05:00", "claimedBy": None})
+FIX["choice"].update({"open": True, "exception": False, "lockAt": T.strftime("%Y-%m-%dT23:00:00-05:00"), "claimedBy": None})
 FIX["pack"] = {"travelWeek": True, "dark": False, "items": [{"id": "pack-dragon", "word": "Dragon care"}, {"id": "pack-bag", "word": "Bag"}, {"id": "pack-charger", "word": "Charger"}]}
 GEOM = """() => {
   const z = parseFloat(document.getElementById('wall-panel').style.zoom) || 1, vis = e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'; };
@@ -37,6 +38,8 @@ def page(b, vw, vh, fixture=False, reduced=None):
     def route(r):
         u = r.request.url
         if fixture and "/data/kid-seats.json" in u: return r.fulfill(status=200, content_type="application/json", body=json.dumps(FIX))
+        pb = datasnap.body(u, T.isoformat())
+        if pb is not None and u.startswith(L): return r.fulfill(status=200, content_type="application/json", body=pb)
         if u.startswith(L): return r.continue_()
         reqs.append(u); return r.abort()
     pg.route("**/*", route)

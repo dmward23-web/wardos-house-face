@@ -204,7 +204,9 @@ t("pack: other-day file -> hidden", () => assert.equal(S.packFlags(PF([{ kid: "H
 
 // real merged Atlas files parse with the wall rules (as of their own generation time)
 import fs from "node:fs";
-const J = (f) => JSON.parse(fs.readFileSync(new URL("../../data/" + f, import.meta.url)));
+/* DAYWIN1: the day's generated files change every morning; these pins read the Oct 1 snapshot (scripts/wall/fixtures/oct01) */
+const SNAP = new URL("./fixtures/oct01-data/", import.meta.url);
+const J = (f) => JSON.parse(fs.readFileSync(fs.existsSync(new URL(f, SNAP)) ? new URL(f, SNAP) : new URL("../../data/" + f, import.meta.url)));
 const AT = Date.parse("2026-10-01T17:50:00-05:00");
 t("real house-mode.json -> After school chip", () => assert.equal(S.readHouseMode(J("house-mode.json"), { now: AT }).label, "After school"));
 t("real temps all null -> thermo plain '73° · after school'", () => assert.equal(S.thermoLight(sensi({}, { updatedAt: new Date(AT - MIN).toISOString() }),

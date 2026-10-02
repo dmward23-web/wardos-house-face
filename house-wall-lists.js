@@ -62,9 +62,20 @@
   /* ---- NEXT UP leave-by: data/next-up.json {asOfIso, generatedAt, next:{label, copy, leaveAt, leaveIso, startIso, day}|null, timer} ---- */
   var LEAVE_COPY = /^Leave \d{1,2}:\d{2}\.$/;
   function leaveLine(j, now, rules) {
-    if (!today(j, now) || !fresh(j, now, H6) || !j.next || typeof j.next !== "object") return null;
-    var n = j.next, copy = str(n.copy, 16), label = displayText(str(n.label, 40), rules), at = parse(n.leaveIso);
-    if (!copy || !LEAVE_COPY.test(copy) || !label || !at || at <= nowMs(now)) return null;
+    if (!today(j, now)) return null;
+    var n = null, t = nowMs(now);
+    if (Array.isArray(j.upcoming)) {
+      /* DAYWIN1 · Atlas lists every leave still ahead (one morning run carries the day): the first one whose leave
+         has not passed on this clock. Same day + not from later than this clock; nothing ahead = nothing. */
+      if (!fresh(j, now, 24 * 3600 * 1000)) return null;
+      for (var i = 0; i < j.upcoming.length; i++) { var u = j.upcoming[i]; if (u && typeof u === "object" && parse(u.leaveIso) > t) { n = u; break; } }
+    } else {
+      if (!fresh(j, now, H6) || !j.next || typeof j.next !== "object") return null;
+      n = j.next;
+    }
+    if (!n) return null;
+    var copy = str(n.copy, 16), label = displayText(str(n.label, 40), rules), at = parse(n.leaveIso);
+    if (!copy || !LEAVE_COPY.test(copy) || !label || !at || at <= t) return null;
     var day = str(n.day, 9);
     return { label: label, copy: copy, day: day, atMs: at, text: label + " \u00b7 " + copy + (day && day !== "Today" ? " (" + day + ")" : "") };
   }

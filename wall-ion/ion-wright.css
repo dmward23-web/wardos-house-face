@@ -226,3 +226,9 @@ html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .taps[data-
 /* MUSTEQ2 · equal weight holds on the stacked (portrait) wall too: same row-driven --must-h */
 html body.wall-kiosk.is-stacked[data-plate][data-master="ion"] .seats-law[data-must-h] > .seat.kid > .kid-law > .musts { grid-auto-rows: var(--must-h); grid-template-rows: none; }
 html body.wall-kiosk.is-stacked[data-plate][data-master="ion"] .seats-law[data-must-h] .seat .must { min-height: 0; height: var(--must-h); }
+/* DAYWIN1 · the real school-morning wall has a pickup-chain row; on short landscape walls (<= 800px tall) it runs as
+   one line so the three seats keep their MUSTS (1280x650 / 1366x768 / 1536x730 overflowed by 3-35px) */
+html body.wall-kiosk.is-low[data-plate][data-master="ion"]:not(.is-stacked) #w-chain { height: auto; min-height: 0; padding-top: 6px; padding-bottom: 6px; align-items: center; }
+html body.wall-kiosk.is-low[data-plate][data-master="ion"]:not(.is-stacked) #w-chain .c-cell { display: flex; flex-direction: row; justify-content: flex-start; align-items: baseline; gap: 16px; flex-wrap: nowrap; min-width: 0; padding-top: 6px; padding-bottom: 6px; }
+html body.wall-kiosk.is-low[data-plate][data-master="ion"]:not(.is-stacked) #w-chain .c-cell > * { margin: 0; white-space: nowrap; }
+html body.wall-kiosk.is-low[data-plate][data-master="ion"]:not(.is-stacked) #w-chain .c-where { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
