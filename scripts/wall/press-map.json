@@ -295,6 +295,39 @@
    "selector": "#w-src [data-go], #w-src span[data-go]",
    "kind": "go",
    "dest": "sheet-status.html#status-feeds"
+  },
+  {
+   "id": "title-hints",
+   "selector": "[data-inplace$=\"-hint\"]",
+   "kind": "inplace",
+   "what": "tile titles Timer / Running late / Who's home / Choice light their own chips in place (PRESS-01)"
+  },
+  {
+   "id": "choice-closed",
+   "selector": "[data-inplace=\"choice-closed\"]",
+   "kind": "inplace",
+   "what": "a closed CHOICE slot says why in place; never routes to the Dad Seat"
+  },
+  {
+   "id": "rail-top",
+   "selector": ".rail-top[data-go]",
+   "kind": "go",
+   "dest": "sheet-index.html#hub-home",
+   "what": "Boards title = the main board"
+  },
+  {
+   "id": "stale-words",
+   "selector": "#w-stale-t",
+   "kind": "go",
+   "dest": "sheet-status.html#status-feeds",
+   "what": "Behind words in the footer = the feeds board"
+  },
+  {
+   "id": "open-loop",
+   "selector": "#w-loops .loop[data-go]",
+   "kind": "go",
+   "dest": "sheet-today.html#today-now",
+   "what": "an open loop (today's calendar REMIND/GET) = today's board"
   }
  ]
 }
