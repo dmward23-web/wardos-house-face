@@ -117,6 +117,9 @@ with sync_playwright() as p:
             pg.on("pageerror", lambda e: errs.append(str(e)[:160])); ctx.on("page", lambda np: pops.append(np))
             pg.goto(WALL, wait_until="load"); pg.wait_for_timeout(1500)
             now = pg.evaluate(ENUM); m = [x for x in now if x["sel"] == c["sel"]]
+            for _ in range(10):  # live data can land after 1.5 s on a cold fetch: wait (up to 5 s more) for the face to paint, as a person would
+                if m: break
+                pg.wait_for_timeout(500); now = pg.evaluate(ENUM); m = [x for x in now if x["sel"] == c["sel"]]
             if not m: rows.append(dict(vp=f"{W}x{H}", element=c["text"] or c["aria"] or c["tag"], selector=c["sel"], kind=c["kind"] + (f" ({c['why']})" if c["why"] else ""), expected=expected(c), actual="element not present on reload", verdict="FAIL")); ctx.close(); continue
             x = m[0]; before = pg.evaluate(SNAP); resp = {"status": None}; loud0 = pg.evaluate(LOUD) if LOUD_ON else None
             pg.on("response", lambda r: resp.update(status=r.status) if r.request.is_navigation_request() and r.frame == pg.main_frame else None)
