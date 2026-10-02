@@ -967,6 +967,17 @@
       $("w-glance").classList.add("is-tight");
       $("w-glance-c").textContent = ""; $("w-glance-b").textContent = (b ? b + " \u00b7 " : "") + c;
     }
+    /* a short glance on a wide window grows (up to 1.4x) so the header has no dead band either side */
+    var gb = $("w-glance-a"), ge = $("w-glance-c");
+    gb.style.fontSize = ""; ge.style.fontSize = "";
+    if (a && big && !document.body.classList.contains("is-stacked")) {
+      var b0 = parseFloat(getComputedStyle(gb).fontSize) || 80, e0 = parseFloat(getComputedStyle(ge).fontSize) || 48;
+      for (var k = 1.4; k > 1.01; k -= 0.05) {
+        gb.style.fontSize = (b0 * k) + "px"; ge.style.fontSize = (e0 * k) + "px";
+        if (big.scrollWidth <= big.clientWidth + 1 && $("w-glance").scrollHeight <= $("w-glance").clientHeight + 1) break;
+        gb.style.fontSize = ""; ge.style.fontSize = "";
+      }
+    }
   }
   function railSpans() { /* SPACE-01: the odd last badge of a group spans both columns (no rail holes) */
     document.querySelectorAll(".rail .rail-grid").forEach(function (g) {
