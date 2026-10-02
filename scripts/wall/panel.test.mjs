@@ -152,13 +152,17 @@ await t("school-night.json: real file, visibleFromIso..visibleUntilIso only, Atl
   assert.equal(LS.schoolNight({ ...j, pickup: [], gear: [], form: undefined }, AT, R), null, "nothing to say -> hidden");
   assert.deepEqual(LS.schoolNight({ ...j, gear: [{ who: ["Ainsley"], items: ["swim bag"], copy: "Ainsley \u00b7 swim bag." }] }, AT, R).lines[1], { k: "Gear", v: "Ainsley \u00b7 swim bag." });
 });
-await t("display renames come from config/display-rename.json (no names in the wall code); other text unchanged", () => {
-  const P1 = R.renames.length; assert.ok(P1 >= 2);
+await t("display renames: published config has display strings only, no patterns (ATLASLANE9); wall compiles none; other text unchanged", () => {
   const cfg = J("config/display-rename.json");
-  const src = cfg.renames[0].evidence.match(/'([^']+)'/)[1]; /* the source title quoted in the config's own evidence */
-  assert.equal(LS.displayText(src, R), "Nonna and Papa in KC");
+  assert.deepEqual(cfg.renames.map((r) => r.replace), ["Nonna and Papa", "Nonna birthday"], "only the display strings ship");
+  assert.ok(cfg.renames.every((r) => !("pattern" in r) && !("evidence" in r)), "raw-title patterns live in Atlas's private box file");
+  assert.equal(R.renames.length, 0, "pattern-less renames are skipped (data is renamed at build time)");
+  assert.equal(LS.displayText("Nonna and Papa in KC", R), "Nonna and Papa in KC", "built text passes through");
   assert.equal(LS.displayText("Pick up Hayes at Casey's", R), "Pick up Hayes at Casey's", "calendar text as the data gives it");
   assert.equal(LS.displayText("Erin + Hayes lunch", R), "Erin + Hayes lunch", "Erin stays Erin");
+  assert.equal(LS.displayText("Harris — provider in-home @ mom’s · 4:00", R), null, "parent scrub still drops a parent word");
+  const RP = LS.compileRenames({ ...cfg, renames: [{ id: "t", pattern: "\\bZia\\b", replace: "Nonna" }, { id: "u", replace: "Papa" }] });
+  assert.equal(LS.displayText("Zia visit", RP), "Nonna visit", "a rule with a pattern still applies; the one without is skipped");
   assert.equal(LS.displayText("x", null), "x", "no config -> unchanged (files are scrubbed at build time)");
   for (const f of ["house-wall-lists.js", "wall.html"]) assert.doesNotMatch(fs.readFileSync(new URL("../../" + f, import.meta.url), "utf8"), /\bmom\b|\bmoms\b|Nonna|Papa/i, f + " has no hardcoded parent names");
 });

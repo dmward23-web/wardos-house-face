@@ -664,7 +664,7 @@ function rebuildEmbed(kidsDataPath, weekObj) {
 }
 
 function writeWeekTree(weekPath, weekObj, kidsDataPath, dryRun) {
-  weekObj = kidCopyDeep(displayDeep(weekObj)); /* renames (config/display-rename.json) + board-safe kid copy (kid-copy.mjs) */
+  weekObj = kidCopyDeep(displayDeep(weekObj)); /* renames (config/display-rename.json + private box patterns) + board-safe kid copy + chore law pass (kid-copy.mjs, ATLASLANE9) */
   const dataTwin = path.join(path.dirname(weekPath), "data", "kids-week.json");
   const text = JSON.stringify(weekObj, null, 2) + "\n";
   if (dryRun) {

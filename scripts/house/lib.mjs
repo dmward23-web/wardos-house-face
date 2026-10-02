@@ -361,7 +361,7 @@ export function scanObject(obj, path = "$") {
   walk(obj, path);
   return hits;
 }
-/** Public text: display renames first ("Mom & Dad" -> "Nonna and Papa", DAN RULING), then drop any parenthetical naming someone's parent ("Casey's (Riley's …)" -> "Casey's"),
+/** Public text: display renames first (Nonna and Papa, DAN RULING; patterns in the private box file), then drop any parenthetical naming someone's parent ("Casey's (Riley's …)" -> "Casey's"),
     drop "!", tidy spaces. Anything still banned after this is dropped by the caller, never published. */
 export function publicText(text) {
   return renameText(String(text || "")) /* ATLASLANE6 display-only renames (config/display-rename.json) */

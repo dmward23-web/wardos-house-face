@@ -1,21 +1,36 @@
-/* ATLASLANE6 · scripts/house/display-rename.mjs · display-only renames for public board data. NOT WIRED.
-   DAN RULING (t2812u): "Mom & Dad" -> "Nonna and Papa", "Mom birthday" -> "Nonna birthday" (unless the title names
-   someone else's mom). Erin stays Erin. The source calendar is never edited: this runs at build time only.
-   Rules live in config/display-rename.json (scripts/cal-months.py reads the same file).
+/* ATLASLANE6 + ATLASLANE9 · scripts/house/display-rename.mjs · display-only renames for public board data.
+   DAN RULING (t2812u): Dan's parents show as "Nonna and Papa", his mother's birthday as "Nonna birthday" (not when the title
+   names someone else's mom). Erin stays Erin. The source calendar is never edited: this runs at build time only.
+   ATLASLANE9 (Alfred QA): the raw-title patterns are NOT in the repo (the repo root is the published Pages site). They live in
+   a private box file (~/.config/wardos/display-rename.private.json, mode 600, or $WARDOS_DISPLAY_RENAME_PRIVATE).
+   config/display-rename.json keeps only ids + display strings + the generic parent / money scrubs.
+   Missing private file = no renames; the parent scrub then drops those items (fail closed, never the raw title).
    displayText(s) -> renamed + parent-scrubbed string, or null when a parent word survives (caller drops it).
    displayDeep(obj) -> deep copy; array entries whose strings can't be cleaned are dropped, other such strings -> "". */
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 export const RENAME_CONFIG = path.join(ROOT, "config/display-rename.json");
+const expand = (p) => (p && p.startsWith("~/") ? path.join(os.homedir(), p.slice(2)) : p);
+/** Where the private patterns live: env override, else the public config's privateRules.path. */
+export function privateRulesPath(c = JSON.parse(fs.readFileSync(RENAME_CONFIG, "utf8"))) {
+  const pr = c.privateRules || {};
+  return expand(process.env[pr.env || "WARDOS_DISPLAY_RENAME_PRIVATE"] || pr.path || "");
+}
 let CACHE = null;
-export function loadRenames(fp = RENAME_CONFIG) {
-  if (CACHE && CACHE.fp === fp) return CACHE.rules;
+export function loadRenames(fp = RENAME_CONFIG, privateFp) {
   const c = JSON.parse(fs.readFileSync(fp, "utf8"));
+  const pfp = privateFp === undefined ? privateRulesPath(c) : privateFp;
+  if (CACHE && CACHE.fp === fp && CACHE.pfp === pfp) return CACHE.rules;
+  const priv = pfp && fs.existsSync(pfp) ? JSON.parse(fs.readFileSync(pfp, "utf8")) : null;
+  const pattern = Object.fromEntries(((priv && priv.renames) || []).map((r) => [r.id, r.pattern]));
   const rules = {
-    renames: c.renames.map((r) => ({ id: r.id, re: new RegExp(r.pattern, "gi"), replace: r.replace })),
+    privateLoaded: !!priv,
+    /* display text comes only from the public file; a private id with no public entry is ignored */
+    renames: c.renames.filter((r) => pattern[r.id]).map((r) => ({ id: r.id, re: new RegExp(pattern[r.id], "gi"), replace: r.replace })),
     paren: new RegExp(c.parentScrub.parenthetical, "gi"),
     poss: new RegExp(c.parentScrub.possessive, "g"),
     residual: new RegExp(c.parentScrub.residual, "i"),
@@ -23,7 +38,7 @@ export function loadRenames(fp = RENAME_CONFIG) {
     moneyToken: new RegExp(c.moneyScrub.token, "g"),
     moneyAllow: c.moneyScrub.allow,
   };
-  CACHE = { fp, rules };
+  CACHE = { fp, pfp, rules };
   return rules;
 }
 /** Money scrub for calendar labels (cal-months): drops "($30)" and bare amounts; the allow-list string stays. */

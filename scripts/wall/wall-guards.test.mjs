@@ -169,8 +169,9 @@ await t("KIDPATH1: display text only; rate logic + star counts untouched (data-s
   const ch = read("sheet-chores.html");
   for (const m of ch.matchAll(/<span class="star-earn" data-stars="(\d+)">(\d+)\u2605( wk)?<\/span>/g)) assert.equal(m[1], m[2], "per-chore star text = the row's own data-stars");
   const kw = JSON.parse(read("kids-week.json"));
-  assert.deepEqual([kw.kids.harris.bankGoal.id, kw.kids.hayes.bankGoal.id, kw.kids.ainsley.bankGoal.id], ["gem-jar", "victory-jar", "tour-jar"], "ids are keys, not copy");
-  assert.equal(kw.kids.ainsley.goal.need, 20);
+  assert.deepEqual([kw.kids.harris.bankGoal.id, kw.kids.hayes.bankGoal.id], ["gem-jar", "victory-jar"], "ids are keys, not copy");
+  /* ATLASLANE9 chore law (Alfred QA): Ainsley gets no stars, ever -> no bankGoal / goal / currency on her kid section */
+  assert.equal(kw.kids.ainsley.bankGoal, undefined); assert.equal(kw.kids.ainsley.goal, undefined); assert.equal(kw.kids.ainsley.currency, undefined);
   const kd = read("kids-data.js");
   assert.match(kd, /function resetJarCycle/); assert.match(kd, /weeklyAllowance/);
   const emb = JSON.parse(kd.match(/var EMBEDDED = (.*);\n/)[1]);

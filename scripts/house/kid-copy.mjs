@@ -8,7 +8,15 @@
    Not copy, left alone: id / *Id / key / href / cls values (e.g. bankGoal.id "gem-jar" keys saved state) and numbers.
    WALLKIT9 (Wright, on Dan's ask Oct 1 7:52 PM CT, merged into wall-redesign-1): streak / flame copy is fixed here too, at the
    source: "🔥 6-day fire streak" -> "Week 6", no 🔥. Ainsley has a seat, not a score (KL-05): her streak/day count is dropped,
-   not relabeled (streakLabel -> "", "N-day streak" removed from her strings; a calendar "Week 5" stays, it's a fact). */
+   not relabeled (streakLabel -> "", "N-day streak" removed from her strings; a calendar "Week 5" stays, it's a fact).
+   ATLASLANE9 (Alfred QA, Oct 1 9:18 PM CT): the chore law runs here too, last, on every kids-week write (kidLawWeek):
+     quests = exactly the 4 binary MUSTS from config/kid-layer.config.json (mustsFor: Dragon fed swaps Hayes's 4th only
+     while the dragon is home) + the optional / add-on quests kept as they are. The old 5/7/7 daily chart and the weekly
+     musts are gone. Ainsley has no stars, ever: no currency / bankGoal / goal, no stars keys, no star wording. */
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { mustsFor } from "./kid-layer-lib.mjs";
 
 export const ALLOWED_TAG = "$15/hr";
 const GOAL_WORD = { harris: "Gems", hayes: "Victory Coins", ainsley: "Tour goal" };
@@ -97,7 +105,64 @@ export function kidCopyDeep(week) {
   };
   const out = walk(week, null, "");
   if (week && week.kids) for (const kidId of Object.keys(week.kids)) out.kids[kidId] = walk(week.kids[kidId], kidId, "");
+  return kidLawWeek(out);
+}
+
+/* ---------- ATLASLANE9 chore law on kids-week ---------- */
+export const LAW_CONFIG = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../config/kid-layer.config.json");
+let _law = null;
+export function lawConfig() { return _law || (_law = JSON.parse(fs.readFileSync(LAW_CONFIG, "utf8"))); }
+export const LAW_KIDS = ["harris", "hayes", "ainsley"];
+const STAR_WORD = /\bstars?\b|★/i;
+const isExtra = (q) => q && (q.optional === true || q.cadence === "addon");
+const dropStars = (v) => {
+  if (Array.isArray(v)) return v.map(dropStars);
+  if (v && typeof v === "object") { const o = {}; for (const k of Object.keys(v)) if (k !== "stars") o[k] = dropStars(v[k]); return o; }
+  return v;
+};
+/** The law on one kids-week object (new object; idempotent). */
+export function kidLawWeek(week, config = lawConfig()) {
+  if (!week || !week.kids) return week;
+  const out = { ...week, kids: { ...week.kids } };
+  for (const kidId of LAW_KIDS) {
+    const k0 = week.kids[kidId];
+    if (!k0 || typeof k0 !== "object") continue;
+    const k = { ...k0 };
+    const boy = kidId !== "ainsley";
+    const musts = mustsFor(kidId, config).map((m) => (boy ? { id: m.id, what: m.word, cadence: "daily", must: true, stars: 1 } : { id: m.id, what: m.word, cadence: "daily", must: true }));
+    k.quests = musts.concat((Array.isArray(k0.quests) ? k0.quests : []).filter(isExtra));
+    if (Array.isArray(k.missions)) k.missions = k.missions.filter((m) => !(m && /^weekly$/i.test(String(m.when || "").trim())));
+    if (!boy) {
+      delete k.currency; delete k.bankGoal; delete k.goal;
+      const starry = (x) => STAR_WORD.test(JSON.stringify(x));
+      if (Array.isArray(k.missions)) k.missions = k.missions.filter((m) => !starry(m));
+      if (Array.isArray(k.fun)) k.fun = k.fun.filter((m) => !starry(m));
+      out.kids[kidId] = dropStars(k);
+    } else out.kids[kidId] = k;
+  }
   return out;
+}
+/** Law breaches on a kids-week object ([] = clean). */
+export function kidLawHits(week, config = lawConfig()) {
+  const hits = [];
+  if (!week || !week.kids) return ["no kids"];
+  for (const kidId of LAW_KIDS) {
+    const k = week.kids[kidId];
+    if (!k) { hits.push(`${kidId}: missing`); continue; }
+    const want = mustsFor(kidId, config).map((m) => m.word);
+    const musts = (k.quests || []).filter((q) => !isExtra(q));
+    const got = musts.map((q) => q.what);
+    if (JSON.stringify(got) !== JSON.stringify(want)) hits.push(`${kidId}: musts ${JSON.stringify(got)} != ${JSON.stringify(want)}`);
+    if (musts.some((q) => q.cadence !== "daily" || q.must !== true)) hits.push(`${kidId}: a must is not binary daily`);
+    if ((k.missions || []).some((m) => /^weekly$/i.test(String(m.when || "").trim()))) hits.push(`${kidId}: weekly mission`);
+    if (kidId === "ainsley") {
+      for (const f of ["currency", "bankGoal", "goal"]) if (f in k) hits.push(`ainsley: ${f}`);
+      const s = JSON.stringify(k);
+      if (/"stars"\s*:/.test(s)) hits.push("ainsley: stars key");
+      if (STAR_WORD.test(s)) hits.push("ainsley: star wording");
+    }
+  }
+  return hits;
 }
 /** Visible strings (not ids) still carrying $, jar, payday, payout or balance; the exact allowed tag is ignored. */
 export function kidMoneyHits(obj) {
