@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "asOfIso": "2026-10-01T20:10:00-05:00",
+  "owner": "Ledger",
+  "law": "CHORE LAW, locked by Dan Thu Oct 1 2026 8:01 PM CT (plates/2026-10-01/redesign/CHORE-LAW-2026-10-01.md)",
+  "note": "Jar pays time and picks, never cash. Append-only entries, union by id. Totals are derived and never sent to the wall. Shared write OFF until Dan's last-yes. Not live until Alfred QAQC PASS. Contract: docs/house-jar-CONTRACT.md",
+  "ruleText": "The jar pays time and picks. Never cash. Close a job that isn't yours, or take a sibling's claimed choice, and your jar pays nothing that day.",
+  "jars": [
+    { "id": "family", "name": "Family jar", "kind": "family" },
+    { "id": "harris", "name": "Harris", "kind": "personal" },
+    { "id": "hayes", "name": "Hayes", "kind": "personal" },
+    { "id": "ainsley", "name": "Ainsley", "kind": "personal" }
+  ],
+  "units": [
+    { "id": "min", "label": "minutes", "means": "time: minutes of a privilege a parent hands out" },
+    { "id": "pick", "label": "picks", "means": "a count of choices, like picking Sunday dinner or the movie" }
+  ],
+  "niceOneChips": [
+    { "id": "min-10", "unit": "min", "qty": 10, "label": "+10 min" },
+    { "id": "min-15", "unit": "min", "qty": 15, "label": "+15 min" },
+    { "id": "pick-1", "unit": "pick", "qty": 1, "label": "+1 pick" }
+  ],
+  "niceOneReasons": [
+    { "id": "kind-sibling", "label": "Kind to a sibling" },
+    { "id": "helped-unasked", "label": "Helped without asking" },
+    { "id": "great-attitude", "label": "Great attitude" },
+    { "id": "extra-effort", "label": "Extra effort" },
+    { "id": "good-listener", "label": "Good listener" }
+  ],
+  "creditReasons": [
+    { "id": "close-done", "label": "Close done" }
+  ],
+  "redeemReasons": [
+    { "id": "time-used", "label": "Time used" },
+    { "id": "picked-dinner", "label": "Picked Sunday dinner" },
+    { "id": "picked-movie", "label": "Picked the movie" }
+  ],
+  "zeroDayReasons": [
+    { "id": "stolen-close", "label": "Closed a job that isn't theirs" },
+    { "id": "took-claimed-choice", "label": "Took a sibling's claimed choice" }
+  ],
+  "limits": { "maxMinPerEntry": 120, "maxPickPerEntry": 3 },
+  "undoWindowMin": 10,
+  "entries": []
+}
