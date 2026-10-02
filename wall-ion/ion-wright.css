@@ -171,3 +171,12 @@ html body.wall-kiosk.is-stacked[data-plate][data-master="ion"] .seats-law .seat.
 html body.wall-kiosk.is-stacked[data-plate][data-master="ion"] .seats-law .musts { grid-template-columns: minmax(0,1fr); }
 html body.wall-kiosk.is-stacked[data-plate][data-master="ion"] .acts-v3 { flex-wrap: wrap; }
 html body.wall-kiosk.is-stacked[data-plate][data-master="ion"] .acts-v3 > .act { flex: 1 1 100%; height: auto; min-height: 180px; }
+
+/* ---------- ION POLISH (Prism, Oct 1 10:03 PM CT, on d2b5177): last gaps to the Ion master. CSS only, no binding changes. ---------- */
+/* PL1 · rail: FILL1 shares spare height per GROUP, so a 1-row group (People, Photos) got 144px badges and Do got 80px. Grow each group by its badge rows so every badge is one height */
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .rail .rail-grp:has(.badge:nth-of-type(3)) { flex-grow: 2; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .rail .rail-grp:has(.badge:nth-of-type(5)) { flex-grow: 3; }
+/* PL2 · row 1: Next up hero (112px) sat 12px short of the two-row timer (124px); both take the row height */
+html body.wall-kiosk[data-plate][data-master="ion"] .row1 > .next { height: auto; align-self: stretch; min-height: 112px; }
+/* PL3 · who's home: with the inline status lights hidden, ".lights.is-inline + .hint" still matched the hidden sibling, so "Resets 3 AM" hugged the last pill; the master pins it right */
+html body.wall-kiosk[data-plate][data-master="ion"] .who > .lights[hidden] + .hint { margin-left: auto; }
