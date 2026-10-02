@@ -1,0 +1,63 @@
+/* LANDFILL1 · landscape fill for every House Face board (see house-landscape.js). Linked LAST in <head>.
+   Only applies under html[data-landscape] (set by house-landscape.js on landscape windows); portrait boards
+   (the 1080x1920 wall, phones) keep their own layout. :not(#ls-off) = ID weight, beats the boards' own rules. */
+html[data-landscape]:not(#ls-off), html[data-landscape]:not(#ls-off) > body {
+  width: 100% !important; min-width: 0 !important; max-width: none !important;
+}
+html[data-landscape]:not(#ls-off) > body { margin: 0 !important; padding: 0 !important; overflow-x: clip !important; }
+html[data-landscape] .panel:not(#ls-off) {
+  width: var(--ls-w, 100%) !important; max-width: none !important; min-width: 0 !important;
+  height: auto !important; max-height: none !important; min-height: var(--ls-h, 100vh) !important;
+  margin: 0 !important; transform: none !important; box-sizing: border-box !important;
+  display: block !important;
+  column-count: var(--ls-cols, 2); column-gap: 18px; column-fill: balance;
+}
+html[data-landscape] .panel:not(#ls-off) > * {
+  break-inside: avoid; -webkit-column-break-inside: avoid;
+  margin-bottom: 12px !important; max-width: 100% !important; box-sizing: border-box;
+}
+html[data-landscape] .panel:not(#ls-off) > :is(header, .hdr, [data-ls-lead], [data-ls-span]) { column-span: all; -webkit-column-span: all; }
+/* a section that is itself a long list gets its own columns (full width, never a phone column) */
+html[data-landscape] .panel:not(#ls-off) [data-ls-list] { column-width: 420px; column-gap: 18px; }
+html[data-landscape] .panel:not(#ls-off) [data-ls-list] > * { break-inside: avoid; }
+html[data-landscape] .panel:not(#ls-off) [data-ls-flat] { display: contents !important; }
+html[data-landscape] .panel:not(#ls-off) [data-ls-flat] > * { break-inside: avoid; margin-bottom: 12px !important; max-width: 100% !important; width: auto !important; box-sizing: border-box; }
+html[data-landscape] .panel:not(#ls-off) > :not(header):not(.hdr):not([data-ls-flat]) { width: auto !important; }
+/* long lists continue into the next column; their rows never split */
+html[data-landscape] .panel:not(#ls-off) [data-ls-long] { break-inside: auto !important; -webkit-column-break-inside: auto !important; box-decoration-break: clone; -webkit-box-decoration-break: clone; height: auto !important; max-height: none !important; }
+html[data-landscape] .panel:not(#ls-off) [data-ls-long] * { max-height: none; }
+html[data-landscape] .panel:not(#ls-off) [data-ls-long] > *, html[data-landscape] .panel:not(#ls-off) [data-ls-long] > * > * { break-inside: avoid; }
+html[data-landscape] .panel:not(#ls-off) > :is(footer, .ftr) { column-span: all; -webkit-column-span: all; }
+/* row mode (short boards): one row, equal columns, each section runs the full height of the window */
+html[data-landscape][data-ls-row] .panel:not(#ls-off) {
+  display: grid !important; columns: auto !important; column-count: auto !important;
+  grid-template-columns: repeat(var(--ls-cols, 2), minmax(0, 1fr)); grid-auto-rows: auto; align-content: stretch; align-items: stretch;
+  gap: 14px 18px; grid-template-rows: auto 1fr auto;
+}
+html[data-landscape][data-ls-row] .panel:not(#ls-off) > :is(header, .hdr, [data-ls-lead], [data-ls-span], footer, .ftr) { grid-column: 1 / -1; }
+html[data-landscape][data-ls-row] .panel:not(#ls-off) > *, html[data-landscape][data-ls-row] .panel:not(#ls-off) [data-ls-flat] > * { margin-bottom: 0 !important; min-height: 0; }
+html[data-landscape][data-ls-row] .panel:not(#ls-off) > :is(footer, .ftr) { grid-row: auto; }
+
+/* HUB (sheet-index #hub-home): header across; left column = wall link / key, Next up + lights, who's up;
+   right = the board tiles in as many columns as fit. Cameras (when live) run across under the header. */
+html[data-landscape] #hub-home.panel:not(#ls-off) {
+  display: grid !important; columns: auto !important; column-count: auto !important;
+  grid-template-columns: minmax(560px, 0.8fr) minmax(0, 1.2fr); grid-template-rows: auto auto 1fr auto;
+  gap: 14px 18px; align-content: stretch;
+}
+html[data-landscape] #hub-home.panel:not(#ls-off) > * { margin: 0 !important; }
+html[data-landscape] #hub-home.panel:not(#ls-off) > header { grid-column: 1 / -1; grid-row: 1; }
+html[data-landscape] #hub-home.panel:not(#ls-off) > .hub-cams-row { grid-column: 1; grid-row: 2; }
+html[data-landscape] #hub-home.panel:not(#ls-off) > .hub-upper { grid-column: 1; grid-row: 3; flex: none !important; height: auto !important; max-height: none !important; min-height: 340px !important; align-self: stretch; }
+html[data-landscape] #hub-home.panel:not(#ls-off) > .hub-upper > .leaveby { flex: 1 1 auto !important; min-width: 0; }
+html[data-landscape] #hub-home.panel:not(#ls-off) > .who-up { grid-column: 1; grid-row: 4; align-self: end; }
+html[data-landscape] #hub-home.panel:not(#ls-off) > .grid-wrap { grid-column: 2; grid-row: 2 / -1; min-height: 0; height: auto !important; }
+html[data-landscape] #hub-home.panel:not(#ls-off) > .grid-wrap { display: flex !important; flex-direction: column; }
+html[data-landscape] #hub-home.panel:not(#ls-off) .tile-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; grid-template-rows: none !important; grid-auto-rows: minmax(168px, 1fr) !important; flex: 1 1 auto !important; }
+html[data-landscape] #hub-home.panel:not(#ls-off) .tile-grid > .tile { min-height: 168px !important; grid-column: auto !important; grid-row: auto !important; }
+html[data-landscape] #hub-home.panel:not(#ls-off) > .hub-upper > * { height: auto !important; max-height: none !important; align-self: stretch !important; }
+/* Ledger's jar tile (wallDisplay only) sits under the tiles: a quiet card, its words spaced */
+html[data-landscape] #hub-home.panel:not(#ls-off) .grid-wrap > [data-house-jar]:not([hidden]) { display: grid !important; grid-template-columns: auto auto minmax(0, 1fr); align-items: center; gap: 6px 22px; flex: none !important; margin-top: 10px; padding: 12px 18px; min-height: 0 !important; height: auto !important; font-size: 15px; }
+html[data-landscape] #hub-home.panel:not(#ls-off) [data-house-jar] .jar-mid, html[data-landscape] #hub-home.panel:not(#ls-off) [data-house-jar] .jars { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+html[data-landscape] #hub-home.panel:not(#ls-off) [data-house-jar] .jar-rule { grid-column: 3; margin: 0; white-space: normal; }
+html[data-landscape] #hub-home.panel:not(#ls-off) [data-house-jar] .jar-rule2 { grid-row: 2; }
