@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ATLASLANE6 · scripts/next-up.mjs · NEXT UP leave-by (upgrade 3) · NOT WIRED (no cron, no deploy).
-   Writes data/next-up.json: {asOfIso, generatedAt, next, timer: null, source, warnings, reason?}.
+   Writes data/next-up.json: {asOfIso, generatedAt, next, upcoming[], timer: null, source, warnings, reason?}.
    next = {label, copy, leaveAt, leaveIso, startIso, day} | null. copy is exactly "Leave 5:10." (h:mm, no am/pm).
    Pick: the next kid/family event (calendar, read-only) with a real place and a leave time, leave not passed,
    through the end of tomorrow. Leave time = lib.leaveByMs, the same rule pickup-chain uses (title "leave H:MM" >
@@ -88,17 +88,22 @@ export function computeNextUp({ calendar, now, sourceLabel }) {
   const through = ctWallMs(addDays(today, 2), 0, 0); /* end of tomorrow */
   const spans = kidsHomeSpans(cal.events);
   const floorMin = Math.floor(t / 60000) * 60000;
-  const c = leaveCandidates(cal, t, { through }).find((x) => x.leaveMs >= floorMin) || null;
-  const next = c ? {
-    label: c.label,
-    copy: `Leave ${fmtHM(c.leaveMs)}.`,
-    leaveAt: fmtHM(c.leaveMs),
-    leaveIso: ctIso(c.leaveMs),
-    startIso: ctIso(c.startMs),
-    day: ctDate(c.leaveMs) === today ? "Today" : ctParts(c.leaveMs).wd,
-  } : null;
+  const shape = (x) => ({
+    label: x.label,
+    copy: `Leave ${fmtHM(x.leaveMs)}.`,
+    leaveAt: fmtHM(x.leaveMs),
+    leaveIso: ctIso(x.leaveMs),
+    startIso: ctIso(x.startMs),
+    day: ctDate(x.leaveMs) === today ? "Today" : ctParts(x.leaveMs).wd,
+  });
+  const ahead = leaveCandidates(cal, t, { through }).filter((x) => x.leaveMs >= floorMin);
+  const c = ahead[0] || null;
+  const next = c ? shape(c) : null;
+  /* DAYWIN1 · every leave still ahead through the end of tomorrow (same rules as next), so one morning run
+     carries the wall through the day: the wall shows the first one whose leave has not passed on its own clock. */
+  const upcoming = ahead.slice(0, 12).map(shape);
   const out = {
-    asOfIso: today, generatedAt: ctIso(t), next, timer: null,
+    asOfIso: today, generatedAt: ctIso(t), next, upcoming, timer: null,
     source: sourceLabel || "calendar (read-only)", warnings: calendarWarnings(cal, t),
   };
   if (!next && cal.hasKidsHome && !kidsHomeAt(spans, t)) out.reason = kidsAwayReason(spans, t);

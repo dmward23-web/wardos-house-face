@@ -127,6 +127,20 @@ export function computeHouseMode({ calendar, kidsWeek, config, override, now, so
     if (active && Date.parse(kidsWeek.homeWeek.endIso) !== active.endMs) warnings.push("Kids-week homeWeek.endIso disagrees with calendar");
   }
 
+  /* DAYWIN1 · the house day's mode windows, from now through 3:00 AM tomorrow (the house day reset), so one
+     morning run carries the wall through the day: the wall shows the window that covers its own clock and never
+     an evening file's "current" mode in the morning. Same rules as the top-level mode (modeAt + edgeOf). */
+  const timeline = [];
+  const dayEnd = ctWallMs(addDays(ctDate(t), 1), 3, 0);
+  for (let i = 0, at = t; i < 8 && at < dayEnd; i++) {
+    const m = i === 0 ? cur : modeAt(ctx, at);
+    const ovAt = activeOverride(override, at);
+    const u = i === 0 ? untilMs : (ovAt ? ovAt.untilMs : edgeOf(ctx, at, m.mode, +1, cov));
+    timeline.push({ mode: m.mode, label: MODES[m.mode], since: i === 0 ? ctIso(sinceMs) : ctIso(at), until: u == null ? null : ctIso(u), reason: m.reason });
+    if (u == null || u <= at) break;
+    at = u;
+  }
+
   const out = {
     mode: cur.mode,
     label: MODES[cur.mode],
@@ -136,6 +150,7 @@ export function computeHouseMode({ calendar, kidsWeek, config, override, now, so
     generatedAt: ctIso(t),
     source: sourceLabel || "Calendar (read-only) + kids-week.json + config/house-mode.config.json",
     reason: cur.reason,
+    timeline,
     warnings,
   };
   const hits = scanObject(out);

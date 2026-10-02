@@ -1,6 +1,6 @@
 {
-  "asOfIso": "2026-10-01",
-  "generatedAt": "2026-10-01T20:05:00-05:00",
+  "asOfIso": "2026-10-02",
+  "generatedAt": "2026-10-02T05:47:00-05:00",
   "law": "House Face chore law · locked Oct 1 2026",
   "week": {
     "id": "2026-09-27",
@@ -106,14 +106,14 @@
         {
           "dow": "Thu",
           "date": "2026-10-01",
-          "mark": "ahead",
-          "today": true
+          "mark": "empty",
+          "today": false
         },
         {
           "dow": "Fri",
           "date": "2026-10-02",
           "mark": "ahead",
-          "today": false
+          "today": true
         },
         {
           "dow": "Sat",
@@ -132,8 +132,8 @@
         "what": "Flag · vs Ridley",
         "startIso": "2026-10-04T09:00:00-05:00",
         "day": "Sun",
-        "inDays": 3,
-        "copy": "Flag · vs Ridley · 3 days"
+        "inDays": 2,
+        "copy": "Flag · vs Ridley · 2 days"
       },
       "copy": "Hayes."
     },
@@ -176,41 +176,31 @@
     }
   },
   "choice": {
-    "date": "2026-10-01",
+    "date": "2026-10-02",
     "job": {
-      "id": "island",
-      "word": "Wipe the island"
+      "id": "trash",
+      "word": "Trash to the can"
     },
-    "lockAt": "2026-10-01T17:00:00-05:00",
+    "lockAt": "2026-10-02T17:00:00-05:00",
     "claimedBy": null,
     "claimedAt": null,
     "locked": false,
     "done": false,
-    "open": false,
-    "exception": true,
-    "copy": "Wipe the island · Dad Seat."
+    "open": true,
+    "exception": false,
+    "copy": "Trash to the can. First tap owns it."
   },
   "close": {
-    "date": "2026-10-01",
-    "opensAt": "2026-10-01T19:30:00-05:00",
-    "closesAt": "2026-10-01T21:30:00-05:00",
-    "open": true,
-    "captain": "Harris",
-    "kids": {
-      "harris": {
-        "closed": false
-      },
-      "hayes": {
-        "closed": false
-      },
-      "ainsley": {
-        "closed": false
-      }
-    },
-    "copy": "Close at the wall. Captain tonight: Harris."
+    "date": "2026-10-02",
+    "opensAt": "2026-10-02T19:30:00-05:00",
+    "closesAt": "2026-10-02T21:30:00-05:00",
+    "open": false,
+    "captain": null,
+    "kids": {},
+    "copy": "Close at the wall."
   },
   "dadSeat": {
-    "mode": "day",
+    "mode": "overnight",
     "loopDay": "2026-10-01",
     "loops": [
       {
@@ -218,6 +208,111 @@
         "kid": null,
         "what": "Wipe the island",
         "copy": "Wipe the island · no claim."
+      },
+      {
+        "kind": "must",
+        "kid": "harris",
+        "name": "Harris",
+        "what": "Bed made",
+        "copy": "Harris · Bed made."
+      },
+      {
+        "kind": "must",
+        "kid": "harris",
+        "name": "Harris",
+        "what": "Hamper in",
+        "copy": "Harris · Hamper in."
+      },
+      {
+        "kind": "must",
+        "kid": "harris",
+        "name": "Harris",
+        "what": "Dish to the sink",
+        "copy": "Harris · Dish to the sink."
+      },
+      {
+        "kind": "must",
+        "kid": "harris",
+        "name": "Harris",
+        "what": "Own floor clear",
+        "copy": "Harris · Own floor clear."
+      },
+      {
+        "kind": "close",
+        "kid": "harris",
+        "name": "Harris",
+        "what": "Close",
+        "copy": "Harris · Close."
+      },
+      {
+        "kind": "must",
+        "kid": "hayes",
+        "name": "Hayes",
+        "what": "Bed made",
+        "copy": "Hayes · Bed made."
+      },
+      {
+        "kind": "must",
+        "kid": "hayes",
+        "name": "Hayes",
+        "what": "Hamper in",
+        "copy": "Hayes · Hamper in."
+      },
+      {
+        "kind": "must",
+        "kid": "hayes",
+        "name": "Hayes",
+        "what": "Dish to the sink",
+        "copy": "Hayes · Dish to the sink."
+      },
+      {
+        "kind": "must",
+        "kid": "hayes",
+        "name": "Hayes",
+        "what": "Own floor clear",
+        "copy": "Hayes · Own floor clear."
+      },
+      {
+        "kind": "close",
+        "kid": "hayes",
+        "name": "Hayes",
+        "what": "Close",
+        "copy": "Hayes · Close."
+      },
+      {
+        "kind": "must",
+        "kid": "ainsley",
+        "name": "Ainsley",
+        "what": "Bed made",
+        "copy": "Ainsley · Bed made."
+      },
+      {
+        "kind": "must",
+        "kid": "ainsley",
+        "name": "Ainsley",
+        "what": "Hamper in",
+        "copy": "Ainsley · Hamper in."
+      },
+      {
+        "kind": "must",
+        "kid": "ainsley",
+        "name": "Ainsley",
+        "what": "Dish to the sink",
+        "copy": "Ainsley · Dish to the sink."
+      },
+      {
+        "kind": "must",
+        "kid": "ainsley",
+        "name": "Ainsley",
+        "what": "Own floor clear",
+        "copy": "Ainsley · Own floor clear."
+      },
+      {
+        "kind": "close",
+        "kid": "ainsley",
+        "name": "Ainsley",
+        "what": "Close",
+        "copy": "Ainsley · Close."
       }
     ],
     "caughtIt": null,
@@ -227,7 +322,22 @@
   "pack": {
     "travelWeek": false,
     "dark": true,
-    "items": []
+    "perKid": true,
+    "items": [],
+    "kids": {
+      "harris": {
+        "dark": true,
+        "items": []
+      },
+      "hayes": {
+        "dark": true,
+        "items": []
+      },
+      "ainsley": {
+        "dark": true,
+        "items": []
+      }
+    }
   },
   "weekWin": null,
   "usTogether": {
@@ -236,5 +346,5 @@
     "unlockAt": 10,
     "lit": false
   },
-  "source": "chore-law taps (kid-taps.json, updated 2026-09-30T06:04:00-05:00) + config/kid-layer.config.json + Calendar (data/cal-live.json fetched 2026-10-01T17:11:00-05:00 + cal-dmward23-week.json fetched 2026-10-01T20:18:00-05:00, read-only)"
+  "source": "chore-law taps (kid-taps.json, updated 2026-10-01T21:26:00-05:00) + config/kid-layer.config.json + Calendar (data/cal-live.json fetched 2026-10-02T05:42:00-05:00 + cal-dmward23-week.json fetched 2026-10-02T05:42:00-05:00, read-only)"
 }

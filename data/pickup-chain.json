@@ -1,46 +1,30 @@
 {
-  "asOfIso": "2026-10-01",
-  "generatedAt": "2026-10-01T17:48:00-05:00",
-  "date": "2026-10-01",
+  "asOfIso": "2026-10-02",
+  "generatedAt": "2026-10-02T05:47:00-05:00",
+  "date": "2026-10-02",
   "schoolDay": true,
-  "cutoff": "2026-10-01T19:00:00-05:00",
-  "source": "Calendar (data/cal-live.json fetched 2026-10-01T18:30:00-05:00 + cal-dmward23-week.json fetched 2026-10-01T18:30:00-05:00, read-only) + kids-week.json (refreshed 2026-10-01T18:30:00-05:00)",
+  "cutoff": "2026-10-02T19:00:00-05:00",
+  "source": "Calendar (data/cal-live.json fetched 2026-10-02T05:42:00-05:00 + cal-dmward23-week.json fetched 2026-10-02T05:42:00-05:00, read-only) + kids-week.json (refreshed 2026-10-02T05:42:00-05:00)",
   "warnings": [],
   "rows": [
     {
       "who": [
-        "Ainsley"
+        "Hayes",
+        "Harris"
       ],
       "by": null,
-      "what": "Swim — Coach Ann · 5:00 practice",
-      "where": "Genesis Health Clubs Olathe Ridgeview",
-      "time": "5:00 PM",
-      "timeIso": "2026-10-01T17:00:00-05:00",
-      "leaveBy": "4:25 PM",
-      "leaveByIso": "2026-10-01T16:25:00-05:00",
-      "gear": [],
-      "status": "now",
-      "kind": "activity",
-      "startIso": "2026-10-01T16:25:00-05:00",
-      "endIso": "2026-10-01T18:20:00-05:00"
-    },
-    {
-      "who": [
-        "Hayes"
-      ],
-      "by": "Dad",
-      "what": "Pick up Hayes at Casey's",
-      "where": "Casey's",
-      "time": "6:20 PM",
-      "timeIso": "2026-10-01T18:20:00-05:00",
-      "leaveBy": "6:20 PM",
-      "leaveByIso": "2026-10-01T18:20:00-05:00",
+      "what": "SRE drop-off",
+      "where": "Sunset Ridge Elementary",
+      "time": "8:25 AM",
+      "timeIso": "2026-10-02T08:25:00-05:00",
+      "leaveBy": "8:10 AM",
+      "leaveByIso": "2026-10-02T08:10:00-05:00",
       "gear": [],
       "status": "next",
       "kind": "ride",
-      "startIso": "2026-10-01T18:20:00-05:00",
-      "endIso": "2026-10-01T18:55:00-05:00"
+      "startIso": "2026-10-02T08:10:00-05:00",
+      "endIso": "2026-10-02T08:40:00-05:00"
     }
   ],
-  "reason": "2 kid rides left today"
+  "reason": "1 kid ride left today"
 }
