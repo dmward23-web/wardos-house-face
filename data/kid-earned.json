@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "asOfIso": "2026-10-01T20:05:00-05:00",
+  "owner": "Ledger",
+  "note": "Kid weekly earned book. Append-only entries, integer cents, union by id. Totals are DERIVED, never stored. Shared write OFF until Dan's last-yes on the hub key. Contract: docs/kid-earned-CONTRACT.md",
+  "week": {
+    "rule": "fri-1500",
+    "tz": "America/Chicago",
+    "startDow": 5,
+    "startTime": "15:00",
+    "keyIs": "date (YYYY-MM-DD) of the Friday the week starts",
+    "source": "existing Dad-week convention: kids-data.js:53-77 (homeWeek Fri 3:00p to Fri 3:00p), house-checkoffs.js:3 (week:{FriISO}), kids-week.json bankGoal blurb"
+  },
+  "weekKey": "2026-09-25",
+  "kids": [
+    { "id": "harris", "name": "Harris", "earnedCapCents": 1000 },
+    { "id": "hayes", "name": "Hayes", "earnedCapCents": 1000 },
+    { "id": "ainsley", "name": "Ainsley", "earnedCapCents": 2000 }
+  ],
+  "bonusAmounts": [
+    { "cents": 100, "label": "$1" },
+    { "cents": 200, "label": "$2" },
+    { "cents": 500, "label": "$5" }
+  ],
+  "bonusReasons": [
+    { "id": "kind-sibling", "label": "Kind to a sibling" },
+    { "id": "helped-unasked", "label": "Helped without asking" },
+    { "id": "great-attitude", "label": "Great attitude" },
+    { "id": "extra-effort", "label": "Extra effort" },
+    { "id": "good-listener", "label": "Good listener" }
+  ],
+  "undoWindowMin": 10,
+  "entries": []
+}
