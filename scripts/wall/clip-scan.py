@@ -9,6 +9,10 @@ visible element with words where:
   CUT     a painted word rect that runs past an ancestor with overflow hidden / clip (any side), or past a
           scrolling ancestor sideways
   EDGE    a painted word rect that runs off the window's left / right edge (the page is wider than the screen)
+  SEP     a ' · ' separator that starts or ends a line (break at whole phrases instead)
+  TRUNC   words cut short with a literal ellipsis ('arrive 1:00 · ga…')
+  PHONE   (kid boards on the phone viewport) the page lays out wider than the phone and is zoomed out
+Kid boards also run on Dan's phone: 440x956 CSS (iPhone 17 Pro Max, 3x, touch); --kidvps adds more (390x844 extra).
 Skipped: hidden / transparent elements, SVG defs, templates, screen-reader-only boxes (clip box 2px or less),
 words fully outside the viewport (page scroll is not clipping).
 --minfont N also renders as a browser with a minimum font size of N px does (Dan's live preview showed the small
@@ -24,6 +28,7 @@ def opt(k, d=None):
 WT = Path(args[0] if args else Path(__file__).resolve().parents[2]).resolve()
 VPS = [tuple(map(int, v.split("x"))) for v in opt("--vps", "2560x1440,1920x1080,1536x730,1366x768,1280x650").split(",")]
 MINFONT = float(opt("--minfont", "0") or 0)
+KIDVPS = [tuple(map(int, v.split("x"))) for v in ("440x956" + ("," + opt("--kidvps") if opt("--kidvps") else "")).split(",")]  # Dan's phone, portrait
 MINJS = r"""(m) => { const zm = e => { let z = 1; for (let a = e; a; a = a.parentElement) z *= parseFloat(getComputedStyle(a).zoom) || 1; return z; };
  const L = []; for (const e of document.querySelectorAll('body *')) { const f = parseFloat(getComputedStyle(e).fontSize), z = zm(e); if (f && f * z < m) L.push([e, m / z]); }
  for (const [e, f] of L) e.style.setProperty('font-size', f.toFixed(2) + 'px', 'important'); return L.length; }"""
@@ -72,6 +77,21 @@ JS = r"""() => {
      }
    }
  }
+ /* SEP (Dan 10/2: 'Kids back Fri Oct 9 ·' / '3:00 PM'): a ' · ' separator never starts or ends a line.
+    TRUNC: words cut short with a literal ellipsis ('arrive 1:00 · ga…') are clipped words too. */
+ const blk = e => { let b = e; while (b && b !== document.body) { const d = getComputedStyle(b).display; if (d !== 'inline' && d !== 'contents') return b; b = b.parentElement; } return b; };
+ const blocks = new Set(); const tw2 = document.createTreeWalker(document.body, 4); let m2;
+ while ((m2 = tw2.nextNode())) { const v = m2.nodeValue, p = m2.parentElement; if (!p || p.closest('svg,defs,symbol,template,script,style,noscript,select,option') || !vis(p) || srOnly(p)) continue;
+   const tv = v.trim(); if (/(\u2026|\.\.\.)$/.test(tv) && tv.length > 3) { rg.selectNodeContents(m2); const q0 = rg.getClientRects()[0]; if (q0 && inView(q0)) add('TRUNC', p, 'words cut with an ellipsis'); }
+   if (v.indexOf('\u00b7') >= 0) blocks.add(blk(p)); }
+ const r2 = document.createRange();
+ for (const b of blocks) { if (!b) continue; const G = []; const w2 = document.createTreeWalker(b, 4); let t2;
+   while ((t2 = w2.nextNode())) { const pe = t2.parentElement; if (!pe || blk(pe) !== b || !vis(pe)) continue; const v = t2.nodeValue;
+     for (let i = 0; i < v.length; i++) { if (/\s/.test(v[i])) continue; r2.setStart(t2, i); r2.setEnd(t2, i + 1); const q = r2.getClientRects()[0]; if (!q || q.width < 0.5 || q.height < 0.5) continue; G.push({ q, c: v[i], pe }); } }
+   for (let i = 0; i < G.length; i++) { if (G[i].c !== '\u00b7') continue; const q = G[i].q, mid = (q.top + q.bottom) / 2, prev = G[i - 1], next = G[i + 1];
+     if (!prev && !next) continue; if (!inView(q)) continue;
+     const same = g => g && mid > g.q.top && mid < g.q.bottom, starts = !same(prev), ends = !same(next);
+     if (starts || ends) add('SEP', G[i].pe, 'a line ' + (starts ? 'starts' : 'ends') + ' with \u00b7'); } }
  return out;
 }"""
 def job(a):
@@ -79,7 +99,8 @@ def job(a):
     from playwright.sync_api import sync_playwright
     base = f"http://127.0.0.1:{port}/"
     with sync_playwright() as p:
-        b = p.chromium.launch(); ctx = b.new_context(viewport={"width": W, "height": H}, reduced_motion="reduce")
+        phone = W < 600
+        b = p.chromium.launch(); ctx = b.new_context(viewport={"width": W, "height": H}, reduced_motion="reduce", **({"device_scale_factor": 3, "is_mobile": True, "has_touch": True, "screen": {"width": W, "height": H}} if phone else {}))
         ctx.route("**/*", lambda r: r.continue_() if r.request.url.startswith(base) and r.request.method in ("GET", "HEAD") else r.abort())
         pg = ctx.new_page()
         try:
@@ -91,6 +112,9 @@ def job(a):
                 try: pg.clock.run_for(800)
                 except Exception: pass
             o = pg.evaluate(JS)
+            if phone:
+                lw = pg.evaluate("() => [innerWidth, document.documentElement.scrollWidth]")
+                if lw[0] > W + 1 or lw[1] > W + 1: o = ["PHONE lays out " + str(max(lw)) + "px wide on a " + str(W) + "px phone (zoomed out / sideways scroll)"] + o
         except Exception as e: o = ["ERROR " + str(e)[:120]]
         b.close(); return (page, f"{W}x{H}", o)
 if __name__ == "__main__":
@@ -109,9 +133,10 @@ if __name__ == "__main__":
                 hrefs = pg.evaluate("() => [...document.querySelectorAll('a[href],[data-go]')].map(a => a.getAttribute('href') || a.getAttribute('data-go'))"); b.close()
             boards = sorted({h.split("#")[0].split("?")[0] for h in hrefs if h and re.match(r"^[\w./-]+\.html", h)} - {"wall.html"})
             pages = list(dict.fromkeys(["wall.html"] + boards + ["kid-harris.html", "kid-hayes.html", "kid-ainsley.html"]))
-        if len(pages) < 10: print(f"CLIP SCAN FAIL · page discovery found only {len(pages)} page(s): {pages}"); sys.exit(2)
+        if not opt("--pages") and len(pages) < 10: print(f"CLIP SCAN FAIL · page discovery found only {len(pages)} page(s): {pages}"); sys.exit(2)
         print(f"pages ({len(pages)}): {' '.join(pages)}", flush=True)
-        with Pool(5) as pool: res = pool.map(job, [(pg_, vp, port) for pg_ in pages for vp in VPS], chunksize=3)
+        jobs = [(pg_, vp, port) for pg_ in pages for vp in VPS] + [(pg_, vp, port) for pg_ in pages if pg_.startswith("kid-") for vp in KIDVPS]
+        with Pool(5) as pool: res = pool.map(job, jobs, chunksize=3)
     finally: srv.terminate()
     bad = 0; total = 0
     for page, vp, o in res:

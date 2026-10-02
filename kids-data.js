@@ -264,6 +264,35 @@
     return { done: done, need: qs.length, complete: qs.length > 0 && done >= qs.length };
   }
 
+  /* JARHERO1 (Atlas 6:12 PM): the kid-page jar fill = this Dad week's closed MUSTS boxes / all MUSTS boxes for the week,
+     read from the same per-day must taps the MUSTS tile paints (daily must = one box per tap day; weekly must = one box).
+     No stars, no goal, no money. total 0 / unknown -> level null (the jar draws its quiet empty state). */
+  function mustWeekFill(kidId, data) {
+    data = data || (global.WardKids && global.WardKids._data);
+    var qs = data ? mustQuests(kidId, data) : [];
+    var days = weekDayIsos(DAY_ISO).length, closed = 0, total = 0;
+    for (var i = 0; i < qs.length; i++) {
+      var q = qs[i], id = qid(kidId, q.id);
+      if ((q.cadence || "daily") === "daily") { total += days; closed += Math.min(days, dailyDoneCount(id, data) || 0); }
+      else { total += 1; if (getCheckRaw(id, data)) closed += 1; }
+    }
+    return { closed: closed, total: total, level: total > 0 ? Math.max(0, Math.min(1, closed / total)) : null };
+  }
+
+  /* JARHERO1 nudge input: how many of today's MUSTS boxes are still open (today must be one of this Dad week's tap days). */
+  function mustTodayOpen(kidId, data) {
+    data = data || (global.WardKids && global.WardKids._data);
+    var qs = data ? mustQuests(kidId, data) : [];
+    if (weekDayIsos(DAY_ISO).indexOf(DAY_ISO) < 0) return { open: 0, total: 0 };
+    var open = 0, total = 0;
+    for (var i = 0; i < qs.length; i++) {
+      if ((qs[i].cadence || "daily") !== "daily") continue;
+      total += 1;
+      if (!getCheckRaw(qid(kidId, qs[i].id), data, DAY_ISO)) open += 1;
+    }
+    return { open: open, total: total };
+  }
+
   function mustPayStars(kidId, data) {
     var qs = mustQuests(kidId, data);
     var pay = 0;
@@ -970,12 +999,56 @@
     return { active: true, placeholder: placeholder, name: name, need: need, toward: toward, met: toward >= need, unit: NO_STARS[kidId] ? "" : "★" };
   }
 
+  /* KIDPAGES1 · where the kid is NOW, from the wall's own house mode (data/house-mode.json timeline, real calendar
+     spans). A kids-away week shows the away face ("Away week" + "Back with Dad <day> · <time>"); a Dad stay that has
+     ended (or not started) is never shown. No house mode on hand: the Dad week shows only while its end is still ahead
+     and within one week. Other parents are never named on a kid board (public-data standing rule). */
+  var HOUSE_MODE = null;
+  function loadHouseMode(cb) {
+    var done = false;
+    function fin() { if (!done) { done = true; cb(); } }
+    if (typeof fetch !== "function") { fin(); return; }
+    var t = setTimeout(fin, 2500);
+    fetch("data/house-mode.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { if (d && typeof d === "object") HOUSE_MODE = d; clearTimeout(t); fin(); })
+      .catch(function () { clearTimeout(t); fin(); });
+  }
+  function modeAt(hm, t) {
+    if (!hm) return null;
+    var segs = Array.isArray(hm.timeline) && hm.timeline.length ? hm.timeline : [hm];
+    for (var i = 0; i < segs.length; i++) {
+      var a = Date.parse(segs[i].since || ""), b = Date.parse(segs[i].until || "");
+      if (a && b && a <= t && t < b) return segs[i];
+    }
+    return null;
+  }
+  function backLabel(iso) {
+    var ms = Date.parse(iso || ""); if (!ms) return "";
+    try {
+      var p = {};
+      new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", hour12: true })
+        .formatToParts(new Date(ms)).forEach(function (x) { if (x.type !== "literal") p[x.type] = x.value; });
+      return p.weekday + " " + p.month + " " + p.day + " \u00b7 " + p.hour + ":" + p.minute + " " + String(p.dayPeriod || "").toUpperCase();
+    } catch (e) { return ""; }
+  }
+  function stayNow(data, t) {
+    t = t || Date.now();
+    var seg = modeAt(HOUSE_MODE, t);
+    if (seg && seg.mode === "kids-away") return { kind: "away", until: seg.until, back: backLabel(seg.until) };
+    var hw = data && data.homeWeek, end = hw ? Date.parse(hw.endIso || "") : 0;
+    if (!hw || !end || end <= t) return null;
+    if (end - t > 7 * 864e5 + 36e5) return null; /* a Dad week that ends more than a week out has not started yet */
+    return { kind: "dad", hw: hw };
+  }
+
   function buildNoSurprise(kid, data) {
     var bits = [];
-    var cust = data && data.homeWeek;
+    var st = stayNow(data), cust = st && st.kind === "dad" ? st.hw : null;
+    if (st && st.kind === "away") bits.push({ kind: "house", when: "Now", what: "Away week", hint: st.back ? "Back with Dad " + st.back : "", tone: "hot" });
     if (cust) bits.push({ kind: "house", when: "Now", what: "With " + (cust.with || "Dad") + (cust.place ? " @ " + cust.place : ""), hint: cust.throughLabel || cust.through || "", tone: "hot" });
     if (kid && kid.hottest) bits.push({ kind: "next", when: kid.hottest.when || "Next", what: kid.hottest.what || "Next up", hint: kid.hottest.where || "", tone: "hot" });
-    (kid && kid.today || []).slice(0, 2).forEach(function (t) {
+    (kid && kid.today || []).filter(function (t) { return cust || !consumeIsHq(t); }).slice(0, 2).forEach(function (t) {
       bits.push({ kind: "today", when: t.when || "Today", what: t.what || "", hint: t.hint || "next 24h", tone: t.tone || "act" });
     });
     (kid && kid.appointments || []).forEach(function (a) {
@@ -1006,7 +1079,7 @@
     return bits.filter(function (b) {
       if (!b.what) return false;
       if (b.kind !== "house" && pastToday(b.when)) return false;
-      var k = String(b.what).toLowerCase().replace(/\s+/g, " ").trim() + "|" + String(b.when || "").toLowerCase().replace(/\s+/g, " ").trim();
+      var k = String(b.what).toLowerCase().replace(/\s+/g, " ").trim() + "|" + ((String(b.when || "").match(/\d{1,2}:\d{2}/) || [String(b.when || "").toLowerCase().replace(/\s+/g, " ").trim()])[0]);
       if (seen[k]) return false;
       seen[k] = 1;
       return true;
@@ -1045,6 +1118,8 @@
     root.querySelectorAll("[data-bank-fill]").forEach(function (el) {
       el.style.width = bank.pct + "%";
       el.classList.toggle("is-full", bank.reached);
+      var sm = el.closest(".storm-meter"); /* KIDPAGES1: an unlabelled meter at 0 is an empty input-looking bar: it leaves */
+      if (sm) { if (!bank.pct) sm.setAttribute("data-meter0", ""); else sm.removeAttribute("data-meter0"); }
     });
     root.querySelectorAll("[data-bank-goal-title]").forEach(function (el) {
       el.textContent = bank.goalTitle;
@@ -1621,7 +1696,7 @@
         whenLabel: (it.badge ? String(it.badge).toUpperCase() : "") + (it.time ? (" · " + it.time) : ""),
         time: it.time || "",
         badge: it.badge || "",
-        title: kidsSafeGlass(it.place || shortConsumeTitle(it.summary) || "Next up"),
+        title: kidsSafeGlass(wholeTitle(it) || "Next up"),
         summary: kidsSafeGlass(it.summary || ""),
         startIso: it.startIso || "",
         endIso: it.endIso || "",
@@ -1662,6 +1737,20 @@
       };
     }
     return null;
+  }
+
+  /* KIDPAGES1 · CLIP rule: a title is never cut mid-word with an ellipsis ('arrive 1:00 · ga…'). A place the feed
+     capped with "…" is rebuilt from the full summary at whole " · " phrases (up to 56 characters, first phrase whole). */
+  function wholePhrases(text, max) {
+    var parts = String(text || "").replace(/\s*(\u2026|\.\.\.)\s*$/, "").split(/\s+\u00b7\s+/), out = parts[0] || "";
+    for (var i = 1; i < parts.length; i++) { if ((out + " \u00b7 " + parts[i]).length > max) break; out += " \u00b7 " + parts[i]; }
+    return out;
+  }
+  function wholeTitle(it) {
+    var p = String(it.place || "");
+    if (p && !/(\u2026|\.\.\.)\s*$/.test(p)) return p;
+    var full = String(it.summary || "").replace(/^Free\s*\u00b7\s*/i, "").replace(/\s+\u2014\s+/, " \u00b7 ");
+    return wholePhrases(full || p, 56) || shortConsumeTitle(it.summary);
   }
 
   function shortConsumeTitle(summary) {
@@ -1816,7 +1905,21 @@
     }
 
     var punch = root.querySelector("[data-mount-consume-punch]");
-    if (punch) {
+    var stay = stayNow(data);
+    if (punch && stay && stay.kind === "away") {
+      punch.hidden = false;
+      punch.innerHTML =
+        '<div class="consume-punch-card is-away">' +
+        '<div class="consume-punch-ico g2-mark">' + g2Ico(meta.hqSym || "g2-home") + "</div>" +
+        '<div class="consume-punch-body">' +
+        '<div class="consume-punch-title">Away week</div>' +
+        '<div class="consume-punch-sub">' + (stay.back ? '<span class="ph">Back with Dad</span> ' + stay.back.split(" \u00b7 ").map(function (x) { return '<span class="ph">' + esc(x) + "</span>"; }).join(" \u00b7 ") : "Back with Dad soon") + "</div>" +
+        "</div>" +
+        (stay.back ? '<div class="consume-punch-chip">' + esc("BACK " + stay.back.slice(0, 3).toUpperCase()) + "</div>" : "") +
+        "</div>";
+    } else if (punch && !stay) { punch.hidden = true; punch.innerHTML = ""; }
+    else if (punch) {
+      punch.hidden = false;
       var hw = data.homeWeek || {};
       var through = kidsSafeGlass(hw.through || hw.throughLabel || "Dad week");
       var place = hw.place ? (" @ " + hw.place) : "";
@@ -1847,7 +1950,7 @@
           routine.hidden = false;
           routine.innerHTML =
             '<span class="consume-routine-ico g2-inline">' + g2Ico("g2-routine") + "</span>" +
-            '<div class="consume-routine-txt"><b>Swim</b> · leave 4:25 · Coach Ann</div>' +
+            '<div class="consume-routine-txt"><span class="ph"><b>Swim</b></span> · <span class="ph">leave 4:25</span> · <span class="ph">Coach Ann</span></div>' +
             '<span class="consume-routine-badge">Tue/Thu</span>';
         } else if (swimDays.length === 1) {
           routine.hidden = true;
@@ -1862,7 +1965,7 @@
           routine.hidden = false;
           routine.innerHTML =
             '<span class="consume-routine-ico g2-inline">' + g2Ico("g2-routine") + "</span>" +
-            '<div class="consume-routine-txt"><b>SRE</b> · drop ' + esc(dropT) + " · pickup " + esc(pickT) + "</div>" +
+            '<div class="consume-routine-txt"><span class="ph"><b>SRE</b></span> · <span class="ph">drop ' + esc(dropT) + '</span> · <span class="ph">pickup ' + esc(pickT) + "</span></div>" +
             '<span class="consume-routine-badge">Tue–Fri</span>';
         } else {
           routine.hidden = true;
@@ -2124,7 +2227,7 @@
   }
 
   function boot(kidId) {
-    loadJSON(function (err, data) {
+    loadHouseMode(function () { loadJSON(function (err, data) {
       if (err || !data) {
         console.warn("[kids-data]", err);
         return;
@@ -2135,7 +2238,7 @@
       try {
         document.dispatchEvent(new CustomEvent("house:kids-data-ready", { detail: { kidId: kidId, data: data } }));
       } catch (e) { /* */ }
-    });
+    }); });
   }
 
   global.WardKids = {
@@ -2180,7 +2283,8 @@
     renderHarborStrips: renderHarborStrips,
     renderKidPage: renderKidPage,
     renderConsumeSchedule: renderConsumeSchedule,
-    consumeQueueForKid: consumeQueueForKid, /* HAYESJ1 test hook: which queue items are this kid's NEXT UP */
+    consumeQueueForKid: consumeQueueForKid,
+    stayNow: stayNow, mustWeekFill: mustWeekFill, mustTodayOpen: mustTodayOpen, _setHouseMode: function (d) { HOUSE_MODE = d; }, /* HAYESJ1 test hook: which queue items are this kid's NEXT UP */
     nextPaydayInfo: nextPaydayInfo,
     resetJarCycle: resetJarCycle,
     settlePriorWeeksIntoBalance: settlePriorWeeksIntoBalance,

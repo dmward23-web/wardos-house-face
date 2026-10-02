@@ -231,8 +231,10 @@ await t("KIDPATH2: Hayes + Harris boards match Ainsley (no money chips, star-cou
   for (const f of ["kid-hayes.html", "kid-harris.html", "kid-ainsley.html"]) assert.doesNotMatch(read(f), /data-bank-balance|data-bank-week-earn/, f + " has no Bal / Week $ chips");
   for (const f of ["kid-hayes.html", "kid-harris.html"]) { /* CHORELAW1: Ainsley's star goal section is gone (no stars) */
     const h = read(f);
-    assert.match(h, /<div class="grow-total"><span data-grow-total>0<\/span> \/ <span data-grow-save-need>0<\/span> \u2605<\/div>/);
-    assert.match(h, /id="sec-jar"/, "anchor id kept"); assert.match(h, /data-grow-jar-name/); assert.match(h, /WardKids\.resetJarCycle\(/);
+    /* JARHERO1 (Atlas 6:12 PM CT): the star-goal readout (0 / 10 \u2605), symbol count and bank bar are gone; the hero jar fills
+       from this week's closed MUSTS only (house-kid-jar.js, guarded in scripts/house/tests/jarhero1.test.mjs) */
+    assert.doesNotMatch(h, /data-grow-total|data-grow-save-need|data-bank-life/);
+    assert.match(h, /id="sec-jar"/, "anchor id kept"); assert.match(h, /data-kid-jar="(hayes|harris)"/); assert.match(h, /WardKids\.resetJarCycle\(/);
   }
   const ks = KP.KID_PATH_FILES.flatMap((f) => KP.visibleCopy(f, read(f))).map((v) => v.text).join("\n");
   assert.doesNotMatch(ks, /streak|\u{1F525}/iu); assert.match(read("house-kid-engage.js"), /"Week " \+ streak/);

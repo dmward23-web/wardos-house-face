@@ -5,7 +5,9 @@ reaches, plus the kid boards) on the REAL data at the CURRENT clock at the five 
   SIDEWAYS  the page scrolls sideways
 Only what is actually painted counts: words clipped by an overflow:hidden box (an ellipsis line) are measured
 as clipped; SVG defs, templates and hidden / transparent elements are skipped.
-Usage: python3 scripts/wall/overlap-scan.py [worktree] [--pages a.html,b.html] [--vps 1920x1080,...]"""
+Usage: python3 scripts/wall/overlap-scan.py [worktree] [--pages a.html,b.html] [--vps 1920x1080,...] [--kidvps 390x844]
+KIDPAGES1: kid-*.html pages also run at the phone portrait 440x956 (iPhone 17 Pro Max, mobile, 3x, touch);
+--kidvps adds more phone sizes (e.g. 390x844) to the kid pages only."""
 import sys, re, json, socket, subprocess, time, datetime
 from pathlib import Path
 from multiprocessing import Pool
@@ -14,6 +16,7 @@ def opt(k, d=None):
     return sys.argv[sys.argv.index(k) + 1] if k in sys.argv else d
 WT = Path(args[0] if args else Path(__file__).resolve().parents[2]).resolve()
 VPS = [tuple(map(int, v.split("x"))) for v in opt("--vps", "1280x650,1366x768,1536x730,1920x1080,2560x1440").split(",")]
+KIDVPS = [tuple(map(int, v.split("x"))) for v in ("440x956," + opt("--kidvps", "")).strip(",").split(",") if v]
 CLOCK = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-5))).replace(microsecond=0).isoformat()
 JS = r"""() => {
  const H = innerHeight, W = innerWidth, bx = [];
@@ -38,7 +41,9 @@ def job(a):
     from playwright.sync_api import sync_playwright
     base = f"http://127.0.0.1:{port}/"
     with sync_playwright() as p:
-        b = p.chromium.launch(); ctx = b.new_context(viewport={"width": W, "height": H}, reduced_motion="reduce")
+        mob = W < 600
+        b = p.chromium.launch(); ctx = b.new_context(viewport={"width": W, "height": H}, reduced_motion="reduce",
+                                                     **({"device_scale_factor": 3, "is_mobile": True, "has_touch": True, "screen": {"width": W, "height": H}} if mob else {}))
         ctx.route("**/*", lambda r: r.continue_() if r.request.url.startswith(base) and r.request.method in ("GET", "HEAD") else r.abort())
         pg = ctx.new_page()
         try:
@@ -60,7 +65,7 @@ if __name__ == "__main__":
                 hrefs = pg.evaluate("() => [...document.querySelectorAll('a[href],[data-go]')].map(a => a.getAttribute('href') || a.getAttribute('data-go'))"); b.close()
             boards = sorted({h.split("#")[0].split("?")[0] for h in hrefs if h and re.match(r"^[\w./-]+\.html", h)} - {"wall.html"})
             pages = list(dict.fromkeys(["wall.html"] + boards + ["kid-harris.html", "kid-hayes.html", "kid-ainsley.html"]))
-        with Pool(5) as pool: res = pool.map(job, [(pg_, vp, port) for pg_ in pages for vp in VPS], chunksize=3)
+        with Pool(5) as pool: res = pool.map(job, [(pg_, vp, port) for pg_ in pages for vp in (VPS + KIDVPS if re.match(r"kid-[a-z]+\.html$", pg_) else VPS)], chunksize=3)
     finally: srv.terminate()
     bad = 0
     for page, vp, o in res:

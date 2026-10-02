@@ -155,6 +155,14 @@ function isAdminNoise(summary) {
   return /^(GET\s*·|Atlas:)/i.test(summary);
 }
 
+/* KIDPAGES1: keep whole " · " phrases while they fit max chars (the first phrase always whole); no ellipsis */
+export function capPhrases(text, max) {
+  const parts = String(text || "").split(/\s+·\s+/);
+  let out = parts[0];
+  for (let i = 1; i < parts.length; i++) { if ((out + " · " + parts[i]).length > max) break; out += " · " + parts[i]; }
+  return out;
+}
+
 export function kidMentions(summary) {
   summary = KidMatch.strip(summary); /* HAYESJ1: "Hayes Johnson's birthday dinner" is not our Hayes */
   const s = summary.toLowerCase();
@@ -399,8 +407,8 @@ function pickStripQueue(items, now, homeWeek) {
     else if (it.kind === "school_drop") place = "Boys SRE drop";
     else if (it.kind === "sport") place = kidsSafeWhat(it.raw, "sport");
     else place = kidsSafeWhat(it.raw, it.kind);
-    // Cap length for strip
-    if (place.length > 56) place = place.slice(0, 53) + "…";
+    // Cap length for strip at whole phrases (KIDPAGES1 / CLIP rule: never cut words, never an ellipsis)
+    place = capPhrases(place, 56);
     const dayPart = partsInTZ(it.start);
     const sameDay = dayPart.iso === partsInTZ(now).iso;
     const whenLabel = sameDay

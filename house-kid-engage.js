@@ -1045,7 +1045,7 @@
       var pct = tp.need ? Math.round((tp.done / tp.need) * 100) : 0;
       glass.innerHTML =
         '<div class="xp-glass-lab">Musts today</div>' +
-        '<div class="xp-glass-bar"><i style="width:' + pct + '%"></i></div>' +
+        (pct ? '<div class="xp-glass-bar"><i style="width:' + pct + '%"></i></div>' : "") + /* KIDPAGES1 METER0: no empty track at 0 */
         '<div class="xp-glass-meta">' + tp.done + "/" + tp.need +
         "</div>"; /* KIDPATH1: no jar wording */
     }
