@@ -54,7 +54,7 @@ try:
         # reduced motion: zero running animations
         ctx, pg, errs, reqs = page(b, 2560, 1440, reduced="reduce"); pg.evaluate(LED); pg.wait_for_timeout(200); a = pg.evaluate(ANIM); ctx.close()
         print("reduced-motion running animations:", a, "PASS" if not a else "FAIL"); ok = ok and not a
-        # states fixture: CHOICE claim -> owner mark, siblings locked, no un-claim; Pack travel week -> dark on bag; Harris fill same minute
+        # states fixture: CHOICE claim -> owner mark, siblings locked, never released; Pack travel week -> Ainsley's Bag darkens only hers (per kid); Harris fill same minute
         ctx, pg, errs, reqs = page(b, 2560, 1440, fixture=True)
         s0 = pg.evaluate("() => ({ claim: !document.getElementById('w-claim').hidden, cj: [...document.querySelectorAll('#w-claim .cj')].map(e => e.innerText.trim() + '|' + e.getAttribute('data-locked')), pack: document.querySelectorAll('[data-law-pack]').length })")
         pg.click('[data-law-claim="hayes"]'); pg.clock.run_for(300)
@@ -63,12 +63,12 @@ try:
         pg.click('[data-law-must="harris"][data-law-id="must-bed"]'); pg.clock.run_for(100)
         f1 = pg.evaluate("() => [document.querySelector('[data-law-fill] i').style.width, document.querySelector('[data-law-must=\"harris\"][data-law-id=\"must-bed\"]').getAttribute('data-state')]")
         pg.click('[data-law-pack="ainsley"][data-law-id="pack-bag"]'); pg.clock.run_for(300)
-        s2 = pg.evaluate("() => ({ packLeft: document.querySelectorAll('[data-law-pack]').length, mystery: document.querySelectorAll('[data-law-mystery]').length, photo: document.querySelectorAll('[data-disputed-photo], .pframe').length })")
+        s2 = pg.evaluate("() => ({ packLeft: document.querySelectorAll('[data-law-pack]').length, perKid: ['harris','hayes','ainsley'].map(k => document.querySelectorAll('[data-law-pack=\"' + k + '\"]').length), mystery: document.querySelectorAll('[data-law-mystery]').length, photo: document.querySelectorAll('[data-disputed-photo], .pframe').length })")
         g = pg.evaluate(GEOM)
         print("fixture before:", json.dumps(s0)); print("fixture after Hayes claim:", json.dumps(s1)); print("Harris fill:", f0, "->", f1); print("after pack-bag:", json.dumps(s2))
         print("fixture geometry:", json.dumps({k: g[k] for k in ("clipped", "outside", "small", "preview")}), "errors:", errs[:3])
         st = (s0["claim"] and len(s0["cj"]) == 3 and s0["pack"] == 9 and any("locked=false|by=hayes" in x for x in s1["cj"]) and sum("locked=true" in x and "disabled=true" in x for x in s1["cj"]) == 2
-              and f1[1] == "done" and f1[0] == "25%" and s2["packLeft"] == 0 and s2["mystery"] == 0 and s2["photo"] == 0 and not g["clipped"] and not g["outside"] and not g["small"] and not errs)
+              and f1[1] == "done" and f1[0] == "25%" and s2["perKid"] == [3, 3, 0] and s2["mystery"] == 0 and s2["photo"] == 0 and not g["clipped"] and not g["outside"] and not g["small"] and not errs)
         print("states:", "PASS" if st else "FAIL"); ok = ok and st
         pg.screenshot(path=os.environ.get("ION_FIXTURE_PNG", "/tmp/ion-fixture-states.png")); ctx.close(); b.close()
 finally:

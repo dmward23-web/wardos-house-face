@@ -2,7 +2,7 @@
    House Face chore law (Dan, locked Thu Oct 1 2026 8:01 PM CT · plates/2026-10-01/redesign/CHORE-LAW-2026-10-01.md).
    ONE chore copy: every id, word and window comes from Atlas's data/kid-seats.json (ATLASLANE8); nothing here invents copy.
    Controls: 4 MUSTS taps (binary, capped at 4) · CHOICE claim (first tap owns it, siblings locked out, no un-claim) ·
-   CLOSE (only inside Atlas's window, each kid on their own tile) · Pack (3 items on travel weeks, dark once the bag is tapped) ·
+   CLOSE (only inside Atlas's window, each kid on their own tile) · Pack (3 items on travel weeks, dark per kid at that kid's own Bag) ·
    Mystery close (hidden until that kid's 4 MUSTS are closed; time and picks only, never money).
    Taps are written to the EXISTING hub keys house-checkoffs:<kid>:<YYYY-MM-DD> (house day, resets 3:00 AM CT) and
    house-checkoffs:<kid>:week:<Sunday> (Pack), value true; house-tapsync.js carries them to the hub when a key is saved.
@@ -143,7 +143,7 @@
   /* ---------- Chore law · data/kid-seats.json (Atlas ATLASLANE8) ----------
      {asOfIso, generatedAt, week:{id}, quiet, seats:{<kid>:{name, musts:[{id,word,closed}], today, streak?, captainTonight?,
      trustedWith?, line?, mystery?}}, choice:{date, job:{id,word}, lockAt, claimedBy, locked, done, open, exception},
-     close:{date, opensAt, closesAt, open, captain, kids:{<kid>:{closed}}}, pack:{travelWeek, dark, items:[{id,word,done}]}}.
+     close:{date, opensAt, closesAt, open, captain, kids:{<kid>:{closed}}}, pack:{travelWeek, dark, items:[{id,word}], kids:{<kid>:{dark, items:[{id,word,done}]}}}}.
      Not today's / older than 24 h / quiet (kids away) -> null: no chore controls at all (never inferred). */
   var ORDER = ["harris", "hayes", "ainsley"]; /* Atlas's fixed order; never sorted by how anyone did */
   var NAME = { harris: "Harris", hayes: "Hayes", ainsley: "Ainsley" };
@@ -239,13 +239,16 @@
     return { ok: true, first: writeTap(store, dayKey(kid, today(now)), IDS.close) };
   }
 
-  /* Pack: travel weeks only, three items (Atlas's words), dark once the bag is tapped by anyone (Atlas: any kid). */
+  /* Pack: travel weeks only, three items (Atlas's words). Dark PER KID (Atlas ruling Oct 1, 9 PM CT): only this kid's own
+     Bag tap (here, or in Atlas's kids[kid]) darkens this kid's Pack; a sibling's tap never does. Top-level pack.dark = not a travel week. */
   function pack(j, store, kid, now) {
-    var L = law(j, now), p = L && L.pack, wk = L && L.week && L.week.id;
-    if (!p || p.travelWeek !== true || p.dark === true || !Array.isArray(p.items) || !/^\d{4}-\d{2}-\d{2}$/.test(wk || "")) return { dark: true, items: [] };
-    function tapped(id) { return ORDER.some(function (k) { return tapOn(readTaps(store, weekKey(k, wk))[id]); }); }
-    var items = p.items.filter(function (x) { return x && PACK_IDS.indexOf(x.id) >= 0 && typeof x.word === "string" && x.word; })
-      .slice(0, PACK_CAP).map(function (x) { return { id: x.id, word: x.word, done: x.done === true || tapped(x.id) }; });
+    var L = law(j, now), p = L && L.pack, wk = L && L.week && L.week.id, pk = p && p.kids && typeof p.kids === "object" ? p.kids[kid] : null;
+    if (!p || !NAME[kid] || p.travelWeek !== true || !/^\d{4}-\d{2}-\d{2}$/.test(wk || "")) return { dark: true, items: [] };
+    if (pk ? pk.dark === true : p.dark === true) return { dark: true, items: [] };
+    var src = pk && Array.isArray(pk.items) && pk.items.length ? pk.items : p.items, mine = readTaps(store, weekKey(kid, wk));
+    if (!Array.isArray(src)) return { dark: true, items: [] };
+    var items = src.filter(function (x) { return x && PACK_IDS.indexOf(x.id) >= 0 && typeof x.word === "string" && x.word; })
+      .slice(0, PACK_CAP).map(function (x) { return { id: x.id, word: x.word, done: (!!pk && x.done === true) || tapOn(mine[x.id]) }; });
     var dark = !items.length || items.some(function (x) { return x.id === PACK_DONE && x.done; });
     return { dark: dark, items: dark ? [] : items, weekId: wk };
   }

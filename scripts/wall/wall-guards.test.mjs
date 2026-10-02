@@ -299,4 +299,30 @@ await t("CHORELAW1: Ainsley has NO stars and NO counts on her tile/seat/page; sl
   assert.match(wall, /if \(kid === "ainsley"\) return \(r\.trusted\.length/); assert.match(wall, /if \(kid === "harris"\) html \+= '<div class="law-fill"/);
   for (const f of ["sheet-allowance.html", "sheet-chores.html"]) assert.ok(read(f).includes("Ainsley"), f + " (Ainsley star rows there are a listed gap)");
 });
+await t("TAPSYNC badge: no hub key saved -> no badge, no /api/taps call; key saved but hub unreachable -> plain-text badge (no link)", async () => {
+  const vm = await import("node:vm");
+  const src = read("house-tapsync.js");
+  async function boot(store, hub) {
+    const mem = Object.assign({}, store), kids = [], calls = [], attrs = {};
+    const ls = { getItem: (k) => (k in mem ? mem[k] : null), setItem: (k, v) => { mem[k] = String(v); }, removeItem: (k) => { delete mem[k]; }, get length() { return Object.keys(mem).length; }, key: (i) => Object.keys(mem)[i] };
+    const el = (tag) => ({ tagName: tag.toUpperCase(), style: {}, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, remove() { kids.splice(kids.indexOf(this), 1); } });
+    const document = { readyState: "complete", visibilityState: "visible", documentElement: { setAttribute: (k, v) => { attrs[k] = v; } },
+      body: { appendChild: (e) => kids.push(e) }, getElementById: (id) => kids.find((e) => e.id === id) || null, createElement: el, addEventListener() {} };
+    const fetch = (u) => { calls.push(String(u)); if (/lights-live\.json/.test(u)) return Promise.resolve({ ok: true, json: () => Promise.resolve(hub ? { writeProxy: hub } : {}) }); return Promise.reject(new Error("offline")); };
+    const ctx = { window: { localStorage: ls }, localStorage: ls, document, fetch, location: { search: "", reload() {} }, sessionStorage: ls, setInterval: () => 0, setTimeout: () => 0, clearTimeout() {}, Date, JSON, Object, Error, Promise, RegExp, String, Number, Array, Math };
+    ctx.window.window = ctx.window; vm.createContext(ctx); vm.runInContext(src, ctx);
+    for (let i = 0; i < 10; i++) await new Promise((r) => setImmediate(r));
+    return { kids, calls, attrs };
+  }
+  const none = await boot({ "house-checkoffs:hayes:2026-10-01": JSON.stringify({ "must-bed": true }) }, "https://hub.example");
+  assert.deepEqual(none.kids.filter((e) => e.id === "tapsync-badge"), [], "no key -> no badge");
+  assert.equal(none.attrs["data-tapsync"], "nokey");
+  assert.ok(!none.calls.some((u) => /\/api\/taps/.test(u)), "no key -> no hub call");
+  const keyed = await boot({ "wardos-lights-proxy-token": "abcdefgh1234" }, "https://hub.example");
+  const b = keyed.kids.find((e) => e.id === "tapsync-badge");
+  assert.ok(b && b.textContent === "taps: this device only", "key saved + hub down -> badge shows");
+  assert.equal(b.tagName, "DIV"); assert.match(b.style.cssText, /pointer-events:none/); assert.ok(!("href" in b) && !b.attrs.href, "plain text, not a link");
+  assert.equal(keyed.attrs["data-tapsync"], "local");
+  assert.doesNotMatch(src, /createElement\("a"\)|\.href\s*=/, "badge is never a link");
+});
 console.log(`wall-guards: ${n} tests PASS`);

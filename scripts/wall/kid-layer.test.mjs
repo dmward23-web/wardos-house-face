@@ -197,7 +197,7 @@ t("Mystery close: hidden until that kid's MUSTS are 4/4, never shown off-day", (
   assert.deepEqual(K.mystery(atlasHidden, s, "hayes", at("16:00")), { hidden: true }); // Atlas still hides it -> stays hidden
   assert.doesNotMatch(JSON.stringify(SEATS.seats), /\$/);
 });
-t("Pack: travel weeks only, 3-item cap, dark once the bag is tapped", () => {
+t("Pack: travel weeks only, 3-item cap, dark once THIS kid's bag is tapped", () => {
   const s = K.memStore();
   assert.deepEqual(K.pack(SEATS, s, "harris", at("20:30")), { dark: true, items: [] }); // committed: not a travel week
   const j = law((x) => { x.pack = { travelWeek: true, dark: false, items: [{ id: "pack-dragon", word: "Dragon care", done: false }, { id: "pack-bag", word: "Bag", done: false },
@@ -207,9 +207,37 @@ t("Pack: travel weeks only, 3-item cap, dark once the bag is tapped", () => {
   assert.equal(K.tapPack(s, j, "hayes", "pack-snacks", at("16:00")).ok, false);
   assert.equal(K.tapPack(s, j, "hayes", "pack-dragon", at("16:00")).pack.dark, false);
   assert.equal(K.tapPack(s, j, "hayes", "pack-bag", at("16:01")).pack.dark, true);
-  assert.deepEqual([K.pack(j, s, "harris", at("16:02")).dark, K.pack(j, s, "harris", at("16:02")).items], [true, []]); // bag at the door -> dark on every seat
-  assert.equal(K.tapPack(s, j, "harris", "pack-charger", at("16:03")).ok, false);
+  assert.equal(K.tapPack(s, j, "hayes", "pack-charger", at("16:02")).ok, false, "his own Pack is dark");
   assert.deepEqual(JSON.parse(s.get("house-checkoffs:hayes:week:2026-09-27")), { "pack-dragon": true, "pack-bag": true });
+});
+t("Pack PER KID (Atlas ruling): Hayes taps Bag -> Hayes's Pack dark, Harris's and Ainsley's stay lit (local taps and Atlas kids[kid])", () => {
+  const items = [{ id: "pack-dragon", word: "Dragon care" }, { id: "pack-bag", word: "Bag" }, { id: "pack-charger", word: "Charger" }];
+  const s = K.memStore(), j = law((x) => { x.pack = { travelWeek: true, dark: false, items }; });
+  assert.equal(K.tapPack(s, j, "hayes", "pack-bag", at("16:01")).pack.dark, true);
+  assert.equal(K.pack(j, s, "hayes", at("16:02")).dark, true);
+  for (const k of ["harris", "ainsley"]) {
+    const q = K.pack(j, s, k, at("16:02"));
+    assert.deepEqual([q.dark, q.items.map((x) => x.id + ":" + x.done)], [false, ["pack-dragon:false", "pack-bag:false", "pack-charger:false"]], k + " stays lit, nothing marked");
+  }
+  assert.equal(K.tapPack(s, j, "harris", "pack-charger", at("16:03")).ok, true, "Harris can still pack");
+  assert.equal(K.pack(j, s, "ainsley", at("16:03")).items.find((x) => x.id === "pack-charger").done, false, "Harris's charger is his only");
+  // Atlas's per-kid shape (kid-seats.json after the hub sync): kids.hayes dark, siblings lit
+  const a = law((x) => { x.pack = { travelWeek: true, dark: false, perKid: true, items, kids: {
+    hayes: { dark: true, items: [] }, harris: { dark: false, items: items.map((i) => ({ ...i, done: false })) }, ainsley: { dark: false, items: items.map((i) => ({ ...i, done: i.id === "pack-dragon" })) } } }; });
+  const e = K.memStore();
+  assert.equal(K.pack(a, e, "hayes", at("16:05")).dark, true);
+  assert.equal(K.pack(a, e, "harris", at("16:05")).dark, false);
+  assert.deepEqual(K.pack(a, e, "ainsley", at("16:05")).items.map((x) => x.done), [true, false, false]);
+  // old shared shape never darkens a sibling from a sibling's local tap
+  assert.ok(!/ORDER\.some\(function \(k\) \{ return tapOn\(readTaps\(store, weekKey/.test(fs.readFileSync(new URL("../../house-wall-kid.js", import.meta.url), "utf8")), "no any-kid Pack read");
+});
+t("CLOSE is the routine (Atlas confirmed): the button says only 'Close', no countdown / seconds / timer text for it", () => {
+  const wall = fs.readFileSync(new URL("../../wall.html", import.meta.url), "utf8"), kid = fs.readFileSync(new URL("../../house-wall-kid.js", import.meta.url), "utf8");
+  const lawHtml = wall.slice(wall.indexOf("function lawHtml("), wall.indexOf("function seatHtml("));
+  assert.match(lawHtml, /mustBtn\("data-law-close", kid, "", "Close", cl\.closed, "close"\)/);
+  const closeFns = kid.slice(kid.indexOf("function close("), kid.indexOf("/* Pack:"));
+  for (const src of [lawHtml.slice(lawHtml.indexOf("K.close(")), closeFns]) assert.doesNotMatch(src.slice(0, 900), /\b90\b|second|secs|countdown|timer|setInterval|setTimeout/i);
+  assert.doesNotMatch(wall + kid, /90 seconds|90s\b|\b\d+ ?sec(onds)? left/i);
 });
 t("rewards by age: Harris run pauses (never reset copy), Hayes run + captain, Ainsley trusted-with only (no counts)", () => {
   const j = law((x) => { x.seats.harris.streak = { days: 3, paused: true }; x.seats.hayes.streak = { days: 1 }; x.seats.hayes.captainTonight = true; });

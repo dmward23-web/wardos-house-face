@@ -395,14 +395,19 @@ export function computeKidLayer({ calendar, taps, uses, config, now }) {
       noCheck: nc.map((m) => `Ainsley · ${m.word}`) };
 
     /* Pack: travel week = an all-day trip with the kids on the calendar overlaps this law week (config tripPattern), or Dan
-       lists the week id. A plain handoff Friday is not travel (that would light every home week). Dark once the bag is at the door. */
+       lists the week id. A plain handoff Friday is not travel (that would light every home week).
+       Dark PER KID (Atlas ruling Oct 1, 9 PM CT): only that kid's own Bag tap darkens that kid's Pack, never a sibling's. */
     const p = config.pack;
     const trip = new RegExp(p.tripPattern || "^Dan\\s*\\+\\s*Kids\\b", "i");
     const onTrip = cal.events.some((e) => e.allDay && !e.cancelled && trip.test(e.summary || "") && e.startMs < wk.endsAt && e.endMs > wk.startsAt);
     const travelWeek = onTrip || (p.travelWeeks || []).includes(wk.id);
-    const done = (id) => ORDER.some((k) => weekTapOf(tp, k, wk.id, id) !== undefined);
-    const dark = !travelWeek || done(p.doneWhen);
-    pack = { travelWeek, dark, items: dark ? [] : p.items.map((x) => ({ id: x.id, word: x.word, done: done(x.id) })) };
+    const doneBy = (k, id) => weekTapOf(tp, k, wk.id, id) !== undefined;
+    const kids = Object.fromEntries(ORDER.map((k) => {
+      const kd = !travelWeek || doneBy(k, p.doneWhen);
+      return [k, { dark: kd, items: kd ? [] : p.items.map((x) => ({ id: x.id, word: x.word, done: doneBy(k, x.id) })) }];
+    }));
+    /* top-level dark = "not a travel week" only (shared); each kid's own state is in kids[kid] */
+    pack = { travelWeek, dark: !travelWeek, perKid: true, items: travelWeek ? p.items.map((x) => ({ id: x.id, word: x.word })) : [], kids };
 
   }
   if (dowOf(today) === "Sun") weekWin = weekWinFor(tp, lawWeek(addDays(today, -7)), isHome, config, t); /* the Sunday tile, home or not */

@@ -235,18 +235,23 @@ test("Repair: a missed MUST can close before Saturday fun; never after, never in
   assert.equal(normalizeTaps(sat) && dayClosed(normalizeTaps(allMusts(sat, "harris", "2026-10-03", "08:00", "must-bed")), "harris", "2026-10-03", CONFIG), false, "a Saturday miss has no repair window");
 });
 
-test("Pack: travel week only, three items (dragon care, bag, charger), dark when the bag is at the door", () => {
-  assert.deepEqual(run({}, "2026-10-01T20:05:00-05:00").kidSeats.pack, { travelWeek: false, dark: true, items: [] }, "a handoff Friday is not travel");
+test("Pack: travel week only, three items (dragon care, bag, charger), dark PER KID when that kid's bag is at the door", () => {
+  const off = run({}, "2026-10-01T20:05:00-05:00").kidSeats.pack;
+  assert.deepEqual([off.travelWeek, off.dark, off.items], [false, true, []], "a handoff Friday is not travel");
+  assert.deepEqual(Object.values(off.kids).map((k) => k.dark), [true, true, true]);
   const trip = calendar([{ summary: "Dan + Kids Nashville", start: { date: "2026-10-02T00:00:00Z" }, end: { date: "2026-10-05T00:00:00Z" } }]);
   let p = run({}, "2026-10-01T20:05:00-05:00", { cal: trip }).kidSeats.pack;
-  assert.equal(p.travelWeek, true);
+  assert.equal(p.travelWeek, true); assert.equal(p.dark, false); assert.equal(p.perKid, true);
   assert.deepEqual(p.items.map((x) => x.word), ["Dragon care", "Bag", "Charger"], "three items only");
   const t = { "house-checkoffs:hayes:week:2026-09-27": { "pack-charger": { v: true, t: at("2026-10-01T19:00:00-05:00") } } };
   p = run(t, "2026-10-01T20:05:00-05:00", { cal: trip }).kidSeats.pack;
-  assert.deepEqual(p.items.map((x) => x.done), [false, false, true]);
-  t["house-checkoffs:ainsley:week:2026-09-27"] = { "pack-bag": true };
+  assert.deepEqual(p.kids.hayes.items.map((x) => x.done), [false, false, true]);
+  assert.deepEqual(p.kids.harris.items.map((x) => x.done), [false, false, false], "Hayes's tap is his only");
+  t["house-checkoffs:hayes:week:2026-09-27"]["pack-bag"] = true;
   p = run(t, "2026-10-01T20:05:00-05:00", { cal: trip }).kidSeats.pack;
-  assert.deepEqual([p.dark, p.items], [true, []], "dark once the bag is at the door");
+  assert.deepEqual([p.kids.hayes.dark, p.kids.hayes.items], [true, []], "Hayes's bag at the door: Hayes's Pack dark");
+  assert.deepEqual([p.kids.harris.dark, p.kids.ainsley.dark, p.dark], [false, false, false], "siblings stay lit");
+  assert.equal(p.kids.ainsley.items.length, 3);
   const c = cfg(); c.pack.travelWeeks = ["2026-10-11"];
   assert.equal(run({}, "2026-10-12T19:00:00-05:00").kidSeats.pack.travelWeek, false);
   assert.equal(run({}, "2026-10-12T19:00:00-05:00", { config: c }).kidSeats.pack.travelWeek, true, "Dan can list a week");

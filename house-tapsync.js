@@ -28,7 +28,8 @@
   }
   function call(method, body) {
     return proxy().then(function (base) {
-      if (!base || !token()) throw new Error("nokey");
+      if (!token()) throw new Error("nokey"); /* no hub key saved: badge hidden */
+      if (!base) throw new Error("noproxy"); /* key saved, no hub address: still per device -> badge shows */
       return fetch(base + "/api/taps", {
         method: method, cache: "no-store",
         headers: { "Content-Type": "application/json", "X-Lights-Proxy-Token": token() },
@@ -86,18 +87,21 @@
     return changed;
   }
 
-  function setBadge(ok) {
-    document.documentElement.setAttribute("data-tapsync", ok ? "on" : "local");
+  /* Badge: no hub key saved -> no badge at all (nothing is trying to sync). A key IS saved but the hub can't be reached ->
+     "taps: this device only" as plain text (a div, no link, no tap target). */
+  function setBadge(ok, noKey) {
+    document.documentElement.setAttribute("data-tapsync", ok ? "on" : noKey ? "nokey" : "local");
     var b = document.getElementById("tapsync-badge");
-    if (ok) { if (b) b.remove(); return; }
+    if (ok || noKey) { if (b) b.remove(); return; }
     if (!document.body) return;
     if (!b) {
-      b = document.createElement("div"); b.id = "tapsync-badge";
+      b = document.createElement("div"); b.id = "tapsync-badge"; b.setAttribute("role", "status");
       b.style.cssText = "position:fixed;left:8px;bottom:8px;z-index:99;padding:4px 10px;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font:600 11px/1.4 system-ui;opacity:.7;pointer-events:none";
       b.textContent = "taps: this device only";
       document.body.appendChild(b);
     }
   }
+  function fail(e) { setBadge(false, !!(e && e.message === "nokey")); }
 
   function afterPull(res) {
     setBadge(true);
@@ -114,10 +118,10 @@
     if (!q.length) return pull();
     return call("POST", { changes: q }).then(function (res) {
       rawSet(SEEDED, "1"); jset(QUEUE, []); afterPull(res);
-    }).catch(function () { setBadge(false); });
+    }).catch(fail);
   }
   function pull() {
-    return call("GET").then(afterPull).catch(function () { setBadge(false); });
+    return call("GET").then(afterPull).catch(fail);
   }
 
   function tick() { if (document.visibilityState !== "hidden") push(); }
