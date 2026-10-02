@@ -14,7 +14,7 @@
 |---|---|
 | `data/house-jar.json` | Seed, written only by Ledger. It holds the jars, `ruleText`, units, chips, reasons, limits, the undo window and `entries: []`. |
 | `house-jar.js` | UMD module, `window.HouseJar` (Node: `require`). No dependencies, no timers. The only network calls are `load()` and the flag-gated `pushShared()`. |
-| `scripts/wall/house-jar.test.mjs` | `node --test scripts/wall/house-jar.test.mjs` (14 tests). |
+| `scripts/wall/house-jar.test.mjs` | `node --test scripts/wall/house-jar.test.mjs` (23 tests). |
 
 None of these files contains a currency glyph. A test enforces that.
 
@@ -43,7 +43,7 @@ None of these files contains a currency glyph. A test enforces that.
 - Applying an id that is already in the book is a no-op. **Sync and merge are a union by id**, so a resync can never pay twice.
 - **Nothing is ever deleted.** Undo and disputes append a `reversal`.
 
-## Derived totals and the reset / zero rule (Atlas: please confirm)
+## Derived totals and the reset / zero rule (confirmed by Atlas, 8:08 PM CT)
 For each jar and unit:
 ```
 available = max(0, sum(qty of live adds whose dayKey is NOT zeroed for that jar) - sum(qty of live redeems))
@@ -53,7 +53,7 @@ available = max(0, sum(qty of live adds whose dayKey is NOT zeroed for that jar)
 - **zero-day `{kid, dayKey}`:**
   - That kid's personal-jar **adds dated that dayKey count 0**, for both minutes and picks. That day's adds are voided.
   - Earlier and later days, other kids, and the family jar are untouched.
-  - **Redeems made that day still count**: time already spent stays spent. The floor keeps the total at or above 0.
+  - **Redeems made that day still count** (Atlas ruling 1, 8:08 PM CT): time already spent stays spent. The zero-day voids only that day's adds. The floor keeps the total at or above 0.
   - The result does not depend on the order in which entries arrive, because it is computed from the set and not replayed in sequence.
   - A zero-day can only be recorded on a personal jar.
   - The reasons are fixed: "Closed a job that isn't theirs" and "Took a sibling's claimed choice".
@@ -66,7 +66,9 @@ available = max(0, sum(qty of live adds whose dayKey is NOT zeroed for that jar)
 |---|---|---|
 | `load({fetch?, storage?, now?, parentGate?, url?})` / `create({seed, storage, now, parentGate, fetch, hubBase})` | | the book |
 | `book.niceOne({jar, chip, reason, pinOk})` | parent | `{ok, entry}`, or an error: `parent-gate`, `bad-jar`, `not-a-chip`, `not-a-reason`. It adds time or picks from a fixed chip with a fixed reason. Never cash. |
-| `book.credit({jar, unit, qty, sourceId, reason, at?})` | none (Atlas automation, not a wall button) | `{ok, entry\|noop}`. The reason must be in `creditReasons` ("Close done"). **No earning rate is seeded.** How much a close pays is for Atlas and Dan to set. |
+| `book.credit({jar, unit, qty, sourceId, reason, at?, dayKey?})` | none (Atlas automation, not a wall button) | `{ok, entry\|noop}`. The reason must be in `creditReasons`. `dayKey` overrides the day (a repair is credited to the missed day). Atlas normally calls `applyCloseEvent` rather than this. |
+| `book.applyCloseEvent(event)` | none (Atlas) | `{ok, added:[ids], rulesStatus}`. It turns one Atlas close event into idempotent `credit()` entries using `earningRules`, and adds the week-five pick when it is due. See "Earning rules". |
+| `HouseJar.eventToCredits(event, rules?)` / `HouseJar.monWeekKey(dayKey)` | | Pure helpers: the event becomes credit args, and a dayKey becomes the Monday of its Mon to Sun CT week. |
 | `book.zeroDay({kid, reason, dayKey? \| at?})` | none (Atlas claim-board detection) | `{ok, entry\|noop}` |
 | `book.redeem({jar, unit, qty, reason, pinOk})` | parent | `{ok, entry}`, or `not-enough`, `not-a-reason`, `parent-gate`. Reasons: "Time used", "Picked Sunday dinner", "Picked the movie". |
 | `book.reverse(refId, {pinOk})` | parent | Appends `r-<refId>`. For a Nice one, this only works within **10 minutes** of the original. For a zero-day (disputed close), a credit or a redeem, it works any time. |
@@ -87,7 +89,25 @@ available = max(0, sum(qty of live adds whose dayKey is NOT zeroed for that jar)
 - `niceOneReasons`: Kind to a sibling, Helped without asking, Great attitude, Extra effort, Good listener.
 - `redeemReasons`: Time used, Picked Sunday dinner, Picked the movie.
 - `zeroDayReasons`: Closed a job that isn't theirs, Took a sibling's claimed choice.
-- `creditReasons`: Close done.
+- `creditReasons`: Close done, All four musts closed, Choice job done, Five full closes this week, Us together, Mystery close.
+
+## Earning rules (`data/house-jar.json` `earningRules`): status `pending-dan-last-yes`
+These are Atlas's defaults (8:08 PM CT). **They need Dan's last-yes before live**, on top of Alfred's QAQC PASS. `book.rulesStatus()` and every `applyCloseEvent` result carry `"pending-dan-last-yes"`.
+
+The week for these rules runs **Mon to Sun, America/Chicago**. `weekKey` is that Monday's date (`monWeekKey`). It is pure calendar math, so DST can't shift it.
+
+| Rule | Event (Atlas) | Credit | Deterministic id |
+|---|---|---|---|
+| All four MUSTS closed at CLOSE | `{kind:"close", kid, dayKey, mustsClosed: 4 or true}` | +15 min to that kid. Partial earns **nothing** (binary). | `c-<kid>-musts-<dayKey>` |
+| Repair before Saturday fun | `{kind:"repair", kid, missedDayKey, dayKey}` | +15 min, credited to the **missed** day. Only allowed in the same Mon to Sun week and on or before that Saturday. It doesn't carry into next week. | `c-<kid>-musts-<missedDayKey>`, the same id as a normal close for that day, so it can't double |
+| Claimed CHOICE job done | `{kind:"choice", kid, dayKey}` | +10 min to that kid | `c-<kid>-choice-<dayKey>` |
+| Five full closes in one week | none; the book derives it after any close or repair | +1 pick to that kid, once per kid per week. It is dated the fifth close's day. Repairs count, and so do closes on a zeroed day (the close happened; only the adds are voided). | `c-<kid>-week5-<weekKey>` |
+| Us together, ten or more of twelve closes | `{kind:"us-together", dayKey, closes, of?: 12}` | +1 pick to the **family** jar, once per week, on top of the Weekend fun unlock | `c-family-us-<weekKey>` |
+| Mystery close | `{kind:"mystery", kid, dayKey}` | +1 pick to that kid, once per kid per week | `c-<kid>-mystery-<weekKey>` |
+
+- **Idempotent:** re-applying the same event, on the same screen or another one, in any order, adds nothing. A test runs every event twice, in forward and reverse order, on two devices, then merges them.
+- **Zero-day:** voids that kid's credits dated that dayKey. That covers the musts, the choice, and a week-five pick dated that day. Other days stay.
+- "Saturday fun" has no clock time in the law. Ledger accepts a repair dated through Saturday of that week, and Atlas gates the actual fun cut-off when it sends the event.
 - There is no free text and no free quantity. An off-chip Nice one that arrives by sync is refused.
 
 ## Parent gate
@@ -125,5 +145,6 @@ These are read-only findings. Line numbers are identical on `main` and on Wright
 - **Clock skew.** `at` and `dayKey` come from the device clock. A wrong clock can put a zero-day or credit on the wrong day, or misjudge the 10-minute undo window. The hub should stamp its own receive time and refuse large skews.
 - **Parent gate.** `pinOk` is a caller boolean. The real gate is Wright's hub-verified PIN. Until the hub key is on, a forged local entry can't be rejected server-side, but it stays "Not synced".
 - **zeroDay and credit are ungated** because they are Atlas automation. A buggy claim-board detection could zero a kid's day wrongly. A parent `reverse` is the remedy, and Prism's disputed-close photo is the evidence.
-- **Earning rate is not set.** No close-to-minutes or close-to-picks rate is seeded. Atlas and Dan must set it.
-- **Redeems on a zero-day still count** (spent stays spent). Atlas should confirm this reading of "zeros that personal jar for the day".
+- **Earning rates are pending.** They are Atlas defaults with status `pending-dan-last-yes`, not live until Dan says yes.
+- **Two week conventions.** The jar's rules use a Mon to Sun CT week. The older chore code uses a Fri 3:00 PM Dad-week. Atlas sends the event dayKeys, so the two only meet at the week-five and once-per-week ids.
+- **Week-five dating.** The pick is dated the fifth close's day. If two screens see different sets of closes before syncing, the id is still the same, so there is never a second pick. The first copy written wins its dayKey.

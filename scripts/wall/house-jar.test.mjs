@@ -230,3 +230,119 @@ test("persists across days and weeks (no weekly wipe); no stored bank", () => {
   const src = readFileSync(join(repo, "house-jar.js"), "utf8");
   assert.ok(!/house-bank|balance\s*[+-]?=/.test(src));
 });
+
+// ---------- Atlas rulings 8:08 PM CT ----------
+const W = ["2026-09-28", "2026-09-29", "2026-09-30", "2026-10-01", "2026-10-02", "2026-10-03", "2026-10-04"]; // Mon..Sun
+const close = (kid, dayKey, mustsClosed = 4) => ({ kind: "close", kid, dayKey, mustsClosed });
+
+test("ruling 1: a zero-day voids only that day's adds; redeems that day STILL count", () => {
+  const t = clock("2026-09-30T20:00:00-05:00");
+  const b = J.create({ seed: seed(), storage: mem(), now: t });
+  b.applyCloseEvent(close("hayes", "2026-09-30"));                       // +15 Wed
+  t.set("2026-10-01T19:00:00-05:00");
+  b.applyCloseEvent(close("hayes", "2026-10-01"));                       // +15 Thu
+  assert.ok(b.redeem({ jar: "hayes", unit: "min", qty: 10, reason: "time-used", ...P }).ok); // spent Thu
+  b.zeroDay({ kid: "hayes", reason: "stolen-close", dayKey: "2026-10-01" });
+  assert.equal(bal(b, "hayes").min, 5, "Wed 15 kept, Thu 15 voided, Thu redeem of 10 still counts");
+  assert.equal(seed().earningRules.zeroDay, "a zero-day voids only that kid's adds dated that dayKey; redeems that day still count");
+});
+
+test("earning rules are seeded and marked pending-dan-last-yes", () => {
+  const r = seed().earningRules;
+  assert.equal(r.status, "pending-dan-last-yes");
+  const by = Object.fromEntries(r.rules.map(x => [x.id, x]));
+  assert.deepEqual([by.musts.unit, by.musts.qty, by.musts.to], ["min", 15, "kid"]);
+  assert.deepEqual([by.repair.unit, by.repair.qty], ["min", 15]);
+  assert.deepEqual([by.choice.unit, by.choice.qty], ["min", 10]);
+  assert.deepEqual([by.week5.unit, by.week5.qty, by.week5.threshold], ["pick", 1, 5]);
+  assert.deepEqual([by.us.to, by.us.unit, by.us.qty, by.us.threshold, by.us.of], ["family", "pick", 1, 10, 12]);
+  assert.deepEqual([by.mystery.unit, by.mystery.qty], ["pick", 1]);
+  assert.equal(book().rulesStatus(), "pending-dan-last-yes");
+});
+
+test("musts are binary: all four = +15 min; partial = nothing", () => {
+  const b = book();
+  for (const n of [0, 1, 2, 3, false, null, "4"]) assert.deepEqual(b.applyCloseEvent(close("harris", "2026-10-01", n)).added, [], String(n));
+  assert.equal(bal(b, "harris").min, 0);
+  assert.deepEqual(b.applyCloseEvent(close("harris", "2026-10-01", 4)).added, ["c-harris-musts-2026-10-01"]);
+  assert.equal(bal(b, "harris").min, 15);
+  assert.deepEqual(b.applyCloseEvent({ kind: "choice", kid: "harris", dayKey: "2026-10-01" }).added, ["c-harris-choice-2026-10-01"]);
+  assert.equal(bal(b, "harris").min, 25);
+  assert.deepEqual(J.monWeekKey("2026-10-04"), "2026-09-28");
+  assert.deepEqual(J.monWeekKey("2026-10-05"), "2026-10-05");
+});
+
+test("repair: credits the missed day with the same id as a normal close, so it can't double; Saturday cut-off", () => {
+  const b = book();
+  assert.deepEqual(b.applyCloseEvent({ kind: "repair", kid: "ainsley", missedDayKey: "2026-09-29", dayKey: "2026-10-01" }).added, ["c-ainsley-musts-2026-09-29"]);
+  const e = b.entries().find(x => x.id === "c-ainsley-musts-2026-09-29");
+  assert.equal(e.dayKey, "2026-09-29", "credited to the missed day");
+  assert.deepEqual(b.applyCloseEvent(close("ainsley", "2026-09-29")).added, [], "normal close for that day = same id = no-op");
+  assert.deepEqual(b.applyCloseEvent({ kind: "repair", kid: "ainsley", missedDayKey: "2026-09-29", dayKey: "2026-10-02" }).added, []);
+  assert.equal(bal(b, "ainsley").min, 15);
+  const c = book();
+  assert.deepEqual(c.applyCloseEvent({ kind: "repair", kid: "ainsley", missedDayKey: "2026-09-30", dayKey: "2026-10-03" }).added.length, 1, "Saturday is still before fun");
+  assert.deepEqual(c.applyCloseEvent({ kind: "repair", kid: "ainsley", missedDayKey: "2026-09-30", dayKey: "2026-10-04" }).added, [], "Sunday is past Saturday fun");
+  assert.deepEqual(c.applyCloseEvent({ kind: "repair", kid: "ainsley", missedDayKey: "2026-10-02", dayKey: "2026-10-05" }).added, [], "doesn't carry into next week");
+});
+
+test("week five: +1 pick once per kid per Mon to Sun week (repairs count), deterministic id", () => {
+  const b = book();
+  for (const d of W.slice(0, 4)) b.applyCloseEvent(close("hayes", d));
+  assert.equal(bal(b, "hayes").pick, 0, "four closes, no pick");
+  b.applyCloseEvent({ kind: "repair", kid: "hayes", missedDayKey: W[4], dayKey: W[5] });
+  assert.ok(b.entries().some(e => e.id === "c-hayes-week5-2026-09-28"), "fifth (a repair) earns the pick");
+  b.applyCloseEvent(close("hayes", W[5]));
+  b.applyCloseEvent(close("hayes", W[6]));
+  assert.equal(bal(b, "hayes").pick, 1, "seven closes still one pick");
+  assert.equal(b.entries().filter(e => e.id.startsWith("c-hayes-week5-")).length, 1);
+  assert.equal(bal(b, "hayes").min, 7 * 15);
+  b.applyCloseEvent(close("hayes", "2026-10-05"));
+  assert.equal(b.entries().filter(e => e.id.startsWith("c-hayes-week5-")).length, 1, "new week needs its own five");
+  assert.equal(bal(b, "harris").pick, 0, "sibling untouched");
+});
+
+test("Us together: >= ten of twelve gives +1 pick to the FAMILY jar, once per week", () => {
+  const b = book();
+  assert.deepEqual(b.applyCloseEvent({ kind: "us-together", dayKey: "2026-10-04", closes: 9, of: 12 }).added, []);
+  assert.deepEqual(b.applyCloseEvent({ kind: "us-together", dayKey: "2026-10-03", closes: 10, of: 12 }).added, ["c-family-us-2026-09-28"]);
+  assert.deepEqual(b.applyCloseEvent({ kind: "us-together", dayKey: "2026-10-04", closes: 12, of: 12 }).added, [], "once per week");
+  assert.equal(bal(b, "family").pick, 1);
+  for (const k of ["harris", "hayes", "ainsley"]) assert.equal(bal(b, k).pick, 0);
+  assert.deepEqual(b.applyCloseEvent({ kind: "us-together", dayKey: "2026-10-10", closes: 11 }).added, ["c-family-us-2026-10-05"]);
+});
+
+test("Mystery close: +1 pick to that kid, once per week", () => {
+  const b = book();
+  assert.deepEqual(b.applyCloseEvent({ kind: "mystery", kid: "harris", dayKey: "2026-09-29" }).added, ["c-harris-mystery-2026-09-28"]);
+  assert.deepEqual(b.applyCloseEvent({ kind: "mystery", kid: "harris", dayKey: "2026-10-02" }).added, [], "once per week");
+  assert.deepEqual(b.applyCloseEvent({ kind: "mystery", kid: "hayes", dayKey: "2026-10-02" }).added, ["c-hayes-mystery-2026-09-28"]);
+  assert.equal(bal(b, "harris").pick, 1);
+});
+
+test("re-applied events (same screen, other screen, any order) never double", () => {
+  const evs = [close("ainsley", W[0]), { kind: "choice", kid: "ainsley", dayKey: W[0] }, close("ainsley", W[1]), close("ainsley", W[2]),
+    close("ainsley", W[3]), close("ainsley", W[4]), { kind: "mystery", kid: "ainsley", dayKey: W[4] }, { kind: "us-together", dayKey: W[5], closes: 10 }];
+  const A = book(), B = book();
+  evs.forEach(e => A.applyCloseEvent(e));
+  evs.forEach(e => A.applyCloseEvent(e));
+  [...evs].reverse().forEach(e => B.applyCloseEvent(e));
+  [...evs].reverse().forEach(e => B.applyCloseEvent(e));
+  A.merge(B.entries()); B.merge(A.entries());
+  for (const x of [A, B]) {
+    assert.deepEqual([bal(x, "ainsley").min, bal(x, "ainsley").pick, bal(x, "family").pick], [5 * 15 + 10, 2, 1]);
+  }
+  assert.deepEqual(A.entries().map(e => e.id).sort(), B.entries().map(e => e.id).sort());
+});
+
+test("zero-day voids that day's credits (musts, choice, the week-five pick dated that day); other days stay", () => {
+  const b = book();
+  for (const d of W.slice(0, 5)) b.applyCloseEvent(close("harris", d));
+  b.applyCloseEvent({ kind: "choice", kid: "harris", dayKey: W[4] });
+  assert.deepEqual([bal(b, "harris").min, bal(b, "harris").pick], [5 * 15 + 10, 1]);
+  b.zeroDay({ kid: "harris", reason: "took-claimed-choice", dayKey: W[4] });
+  assert.deepEqual([bal(b, "harris").min, bal(b, "harris").pick], [4 * 15, 0], "Fri musts, Fri choice and the Fri-dated pick voided");
+  b.zeroDay({ kid: "harris", reason: "stolen-close", dayKey: W[0] });
+  assert.equal(bal(b, "harris").min, 3 * 15);
+  assert.equal(bal(b, "family").pick, 0);
+});
