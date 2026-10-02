@@ -1,14 +1,14 @@
 {
   "status": "live",
-  "updatedAt": "2026-10-02T13:36:53.764Z",
+  "updatedAt": "2026-10-02T13:47:12.941Z",
   "source": "sensi-cloud",
   "writeSupported": false,
   "thermostat": {
     "name": "Thermostat",
     "icdId": "36-6f-92-ff-fe-12-9c-dc",
     "online": true,
-    "ambient": 70,
-    "ambientRaw": 70,
+    "ambient": 71,
+    "ambientRaw": 70.5,
     "setpoint": 65,
     "heatSetpoint": 65,
     "coolSetpoint": 77,
