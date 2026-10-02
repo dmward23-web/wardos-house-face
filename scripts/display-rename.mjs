@@ -7,17 +7,14 @@
 import fs from "node:fs";
 import { displayDeepReport, momHits } from "./house/display-rename.mjs";
 import { kidCopyDeep, kidMoneyHits } from "./house/kid-copy.mjs";
-if (process.argv.includes("--help") || process.argv.includes("-h")) { /* ATLASLANE7 --help is print-only, never writes */
-  process.stdout.write("Usage: node scripts/display-rename.mjs [--check] [--money] [--kid-copy] <files…>\n--help prints this and writes nothing.\n");
-  process.exit(0);
-}
-
-const args = process.argv.slice(2);
-const check = args.includes("--check");
-const money = args.includes("--money"); /* calendar-label files only (cal-months.json) */
-const kidCopy = args.includes("--kid-copy"); /* kids-week files: no $ / jar / payday / balance copy (ATLASLANE7) */
+import { cliArgs } from "./house/cli-args.mjs";
+const USAGE = "Usage: node scripts/display-rename.mjs [--check] [--money] [--kid-copy] <files…>\n--help prints this and writes nothing. Unknown flags exit 2, nothing written.";
+const r = cliArgs(process.argv, { name: "display-rename", usage: USAGE, bools: ["--check", "--money", "--kid-copy"], positional: true }); /* --help print-only */
+const check = r.bools.has("--check");
+const money = r.bools.has("--money"); /* calendar-label files only (cal-months.json) */
+const kidCopy = r.bools.has("--kid-copy"); /* kids-week files: no money copy, only the babysitting rate tag (ATLASLANE7) */
 let bad = 0;
-for (const fp of args.filter((a) => !a.startsWith("--"))) {
+for (const fp of r.positional) {
   if (!fs.existsSync(fp)) { console.log(`${fp}: absent, skip`); continue; }
   const src = fs.readFileSync(fp, "utf8");
   let obj, wrap = null;

@@ -128,17 +128,11 @@ export function computeSchoolNight({ calendar, kidsWeek, config, packFlags, now,
   return out;
 }
 
-const USAGE = "Usage: node scripts/school-night.mjs [--data-dir data] [--events …] [--pack-flags data/pack-flags.json] [--now ISO] [--out data/school-night.json] [--stdout] [--help]\n--help prints this and writes nothing.";
+const USAGE = "Usage: node scripts/school-night.mjs [--data-dir data] [--events …] [--pack-flags data/pack-flags.json] [--now ISO] [--out data/school-night.json] [--stdout] [--help]\n--help prints this and writes nothing. Unknown flags exit 2, nothing written.";
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-  if (process.argv.includes("--help") || process.argv.includes("-h")) { /* ATLASLANE7 --help is print-only, never writes */
-    process.stdout.write(USAGE + "\n");
-    process.exit(0);
-  }
-  const argv = process.argv.slice();
-  let pf = null;
-  const i = argv.indexOf("--pack-flags");
-  if (i > 0) { pf = path.resolve(argv[i + 1]); argv.splice(i, 2); }
-  const a = parseArgs(argv, { ...HM_DEFAULTS, out: path.join(ROOT, "data/school-night.json") });
+  const a = parseArgs(process.argv, { ...HM_DEFAULTS, out: path.join(ROOT, "data/school-night.json"), packFlags: null },
+    { name: "school-night", usage: USAGE, extra: { "--pack-flags": "packFlags" } }); /* --help print-only; unknown flags exit 2 */
+  const pf = a.packFlags;
   const inp = loadInputs(a);
   const pfPath = pf || path.join(ROOT, "data/pack-flags.json");
   const packFlags = fs.existsSync(pfPath) ? readJson(pfPath, null) : null;

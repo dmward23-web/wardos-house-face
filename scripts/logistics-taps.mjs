@@ -8,21 +8,16 @@ import { fileURLToPath } from "node:url";
 import { readJson, writeJson, scanObject } from "./house/lib.mjs";
 import { logisticsFile } from "./house/logistics-lib.mjs";
 import { momHits } from "./house/display-rename.mjs";
-const USAGE = "Usage: node scripts/logistics-taps.mjs [--state <local export>] [--now ISO] [--out data/logistics-taps.json] [--stdout] [--help]\n--help prints this and writes nothing.";
-if (process.argv.includes("--help") || process.argv.includes("-h")) { /* ATLASLANE7 --help is print-only, never writes */
-  process.stdout.write(USAGE + "\n");
-  process.exit(0);
-}
+import { cliArgs } from "./house/cli-args.mjs";
+const USAGE = "Usage: node scripts/logistics-taps.mjs [--state <local export>] [--now ISO] [--out data/logistics-taps.json] [--stdout] [--help]\n--help prints this and writes nothing. Unknown flags exit 2, nothing written.";
+const r = cliArgs(process.argv, { name: "logistics-taps", usage: USAGE, values: ["--state", "--now", "--out"], bools: ["--stdout"] }); /* --help print-only; unknown flags exit 2 */
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const a = { state: null, now: null, out: path.join(ROOT, "data/logistics-taps.json"), stdout: false };
-for (let i = 2; i < process.argv.length; i++) {
-  const k = process.argv[i], v = process.argv[i + 1];
-  if (k === "--state") { a.state = path.resolve(v); i++; }
-  else if (k === "--now") { a.now = Date.parse(v); i++; }
-  else if (k === "--out") { a.out = path.resolve(v); i++; }
-  else if (k === "--stdout") a.stdout = true;
-}
+if (r.values["--state"]) a.state = path.resolve(r.values["--state"]);
+if (r.values["--now"]) a.now = Date.parse(r.values["--now"]);
+if (r.values["--out"]) a.out = path.resolve(r.values["--out"]);
+a.stdout = r.bools.has("--stdout");
 const t = a.now == null || isNaN(a.now) ? Date.now() : a.now;
 const state = a.state && fs.existsSync(a.state) ? readJson(a.state, null) : null;
 const out = logisticsFile(state, t);
