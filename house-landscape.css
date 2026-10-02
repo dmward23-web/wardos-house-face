@@ -94,3 +94,8 @@ html[data-landscape] .panel:not(#ls-off) > [hidden], html[data-landscape] .panel
 html[data-landscape] .panel:not(#ls-off) > .jump-rail { display: none !important; }
 /* KIDFIT2 / LANDFILL2 · Ainsley's next-event banner is dealt into the columns like any card (pack mode) */
 html[data-landscape][data-ls-pack] body.theme-ainsley .panel:not(#ls-off) > .hot-banner[data-ls-span] { column-span: none; }
+/* SPACE-01 (10/2) · groceries: the three treat slots sit side by side in landscape (no empty right half) */
+html[data-landscape] .panel:not(#ls-off) .treats { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+html[data-landscape] .panel:not(#ls-off) .treats > .treat { margin: 0 !important; min-width: 0; }
+/* SPACE-01 · gallery: the header chip already says Gallery, so the lone "Photos" title row folds away in landscape */
+html[data-landscape] .panel:not(#ls-off) #gallery-board > .grid-hdr { display: none !important; }

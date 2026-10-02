@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   SCROLL5 · House Face · EVERY board scrolls (Dan 10/1)
+   SCROLLEND2 (was SCROLL5) · House Face · EVERY board scrolls (Dan 10/1); no runway, sticky header
    Wall 1080×1920 touch + TV 1920×1080: page height always > viewport,
    touch + wheel move it down and back, no direction stuck.
    Linked LAST in <head> on every board so it wins.
@@ -33,4 +33,11 @@ html:not(#hf-scroll-off) > body {
 }
 html:not(#hf-scroll-off) > body * {
   overscroll-behavior: auto !important;
+}
+/* PRESS-01 (Atlas 10/2): the header (the Home button, house-hdr-home.js) stays on screen while a board
+   scrolls or lands on an anchor, so Home is always one tap away. */
+html:not(#hf-scroll-off) header.hdr-home-tap {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 60 !important;
 }

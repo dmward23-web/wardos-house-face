@@ -5,7 +5,10 @@
  * are plain text, so tapping them goes home too.
  * Also strips any leftover header link to sheet-index.html (old Home button).
  * Works with touch: header gets touch-action:manipulation (no 300ms delay,
- * page pan still allowed) and we listen to plain click, which taps fire. */
+ * page pan still allowed) and we listen to plain click, which taps fire.
+ * HDRGLANCE1 (SPACE-01, 10/2): the empty header middle (.hdr-spacer) carries a one-line glance:
+ * the next leave countdown (Atlas's data/next-up.json, today only) or today's handoff (the
+ * house-mode timeline's kids-away span later today). Plain text: a tap still goes Home. */
 (function () {
   "use strict";
   var HOME = "sheet-index.html";
@@ -71,7 +74,71 @@
     });
   }
 
+  /* ---- HDRGLANCE1 ---- */
+  var TZ = "America/Chicago";
+  function ctDay(ms) { try { return new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(ms)); } catch (e) { return ""; } }
+  function ctTime(iso) { try { return new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "numeric", minute: "2-digit" }).format(new Date(iso)); } catch (e) { return ""; } }
+  function clean(t) {
+    t = String(t == null ? "" : t);
+    try { if (window.HouseNoAgent && window.HouseNoAgent.clean) t = window.HouseNoAgent.clean(t); } catch (e) {}
+    return /null|undefined|NEED (KEY|TOKEN)|\bmom\b|\bjar\b|\$|streak/i.test(t) ? "" : t.replace(/\s*\u2014\s*/g, " · ");
+  }
+  function getJson(name) {
+    return fetch("data/" + name + "?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+  }
+  var glanceFeeds = { nextUp: null, houseMode: null };
+  function glanceText(now) {
+    var a = "", b = "";
+    var nu = glanceFeeds.nextUp, nx = nu && nu.next, lt = nx && Date.parse(nx.leaveIso || "");
+    if (isFinite(lt) && lt > now && ctDay(lt) === ctDay(now)) {
+      var m = Math.round((lt - now) / 60000), hh = Math.floor(m / 60), mm = m % 60;
+      a = "Leave in " + (hh ? hh + "h " : "") + mm + "m";
+      b = clean(nx.label);
+    }
+    var hm = glanceFeeds.houseMode, tl = hm && Array.isArray(hm.timeline) ? hm.timeline : [];
+    var hv = tl.filter(function (x) { var t0 = Date.parse(x && x.since || ""); return x && x.mode === "kids-away" && isFinite(t0) && t0 > now && ctDay(t0) === ctDay(now); })[0];
+    var ho = hv ? "Handoff " + ctTime(hv.since) : "";
+    if (!a && ho) return ho + " · today";
+    if (!a) return "";
+    return a + (b ? " · " + b : "") + (ho ? " · " + ho : "");
+  }
+  function paintGlance() {
+    var sp = document.querySelector("header .hdr-spacer");
+    if (!sp) return;
+    var t = glanceText(Date.now());
+    sp.setAttribute("data-glance", "header-glance");
+    /* longest line that fits the room: full line, then the countdown alone; else nothing (never a clipped word) */
+    var tries = t ? [t, t.split(" · ")[0]] : [];
+    sp.classList.add("hdr-glance"); t = "";
+    for (var i = 0; i < tries.length; i++) {
+      sp.textContent = tries[i];
+      if (sp.clientWidth >= 120 && sp.scrollWidth <= sp.clientWidth + 1) { t = tries[i]; break; }
+    }
+    sp.classList.toggle("hdr-glance", !!t);
+    sp.textContent = t;
+    if (t) sp.removeAttribute("aria-hidden"); else sp.setAttribute("aria-hidden", "true");
+  }
+  function loadGlance() {
+    if (!document.querySelector("header .hdr-spacer") || !window.fetch) return;
+    Promise.all([getJson("next-up.json"), getJson("house-mode.json")]).then(function (r) {
+      glanceFeeds.nextUp = r[0]; glanceFeeds.houseMode = r[1]; paintGlance();
+    });
+  }
+  function injectGlanceStyle() {
+    if (document.getElementById("hdr-glance-css")) return;
+    var s = document.createElement("style");
+    s.id = "hdr-glance-css";
+    s.textContent =
+      "header .hdr-spacer.hdr-glance{flex:1 1 auto;min-width:0;align-self:center;text-align:center;" +
+      "font-weight:800;font-size:clamp(18px,1.9vw,44px);line-height:1.15;color:rgba(255,236,190,0.92);" +
+      "white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 18px;letter-spacing:0.01em}";
+    (document.head || document.documentElement).appendChild(s);
+  }
+
   injectStyle();
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wire);
-  else wire();
+  injectGlanceStyle();
+  function boot() { wire(); loadGlance(); setInterval(paintGlance, 30000); setInterval(loadGlance, 600000); window.addEventListener("resize", function () { setTimeout(paintGlance, 250); }); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
 })();

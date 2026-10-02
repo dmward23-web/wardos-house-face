@@ -287,7 +287,33 @@
       }
       fill(e, 0);
     });
+    /* DENSE1 (SPACE-01, Atlas 10/2): every card then takes the largest type scale whose words still fit its own box,
+       so a card's words reach across its room instead of leaving a dead band beside them */
+    best.all.forEach(function (e) {
+      if (e.hasAttribute("data-ls-zoomed") || (e.matches(LEAD) && !e.matches(".hot-banner")) || e.hasAttribute("data-ls-nodense")) return;
+      if (e.clientHeight < 40 || e.clientWidth < 80) return;
+      for (var q = DENSE_MAX; q > 1.05; q = q / 1.06) {
+        e.style.zoom = String(q);
+        if (e.scrollHeight <= e.clientHeight + 1 && e.scrollWidth <= e.clientWidth + 1 && fitsIn(e) && innerOk(e)) { e.setAttribute("data-ls-zoomed", String(Math.round(q * 100) / 100)); return; }
+        e.style.zoom = "";
+      }
+    });
     root.style.setProperty("--ls-rows", String(r));
+  }
+  var DENSE_MAX = 2.2;
+  /* no inner box (a slot card, a chip) may spill its words past its own edge at the new scale */
+  function innerOk(e) {
+    var all = e.querySelectorAll("*");
+    for (var i = 0; i < all.length && i < 600; i++) {
+      var d = all[i];
+      if (!d.clientHeight || !d.clientWidth) continue;
+      if (d.scrollHeight > d.clientHeight + 2 || d.scrollWidth > d.clientWidth + 2) {
+        var cs = getComputedStyle(d);
+        if (cs.display === "inline" || cs.display === "contents") continue;
+        return false;
+      }
+    }
+    return true;
   }
   var LEAD = "header, .hdr, [data-ls-lead], [data-ls-span]";
   /* one wrapper holding most of the board (main.ds, div.body) is flattened (display: contents) so its sections
