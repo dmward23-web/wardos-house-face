@@ -298,6 +298,22 @@
       return Array.prototype.every.call(seats, function (e) { return e.scrollHeight <= e.clientHeight + 1; }) &&
         Array.prototype.every.call(row.querySelectorAll(".must span, .kid-name span, .tw, .frame .fk"), function (t) { return t.scrollWidth <= t.clientWidth + 1; });
     };
+    /* SEATFIT1 (real data, short windows): a seat that still overflows at scale 1 first lifts its Nice one into the
+       name row (no foot row), then lets the week strip go; never a clipped seat, never a tap under 48. */
+    Array.prototype.forEach.call(seats, function (seat) {
+      var f = seat.querySelector(".seat-h > .seat-foot");
+      if (f) { f.classList.remove("in-head"); seat.appendChild(f); }
+    });
+    row.classList.remove("seat-tight-1", "seat-tight-2");
+    row.style.setProperty("--seat-scale", "1");
+    if (!document.body.classList.contains("is-stacked") && !fits()) {
+      row.classList.add("seat-tight-1");
+      Array.prototype.forEach.call(seats, function (seat) {
+        var f = seat.querySelector(":scope > .seat-foot"), hd = seat.querySelector(".seat-h"), hc = hd && hd.querySelector(".here-chip");
+        if (f && hd && f.children.length) { f.classList.add("in-head"); hd.insertBefore(f, hc || null); }
+      });
+      if (!fits()) row.classList.add("seat-tight-2");
+    }
     var best = 0;
     for (var i = 0; i < SEAT_STEPS.length; i++) { row.style.setProperty("--seat-scale", String(SEAT_STEPS[i])); if (fits()) best = i; else break; }
     row.style.setProperty("--seat-scale", String(SEAT_STEPS[best]));
