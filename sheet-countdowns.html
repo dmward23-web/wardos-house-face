@@ -299,7 +299,13 @@
 </style>
 <link rel="stylesheet" href="house-scroll.css?v=SCROLLEND2" />
 <link rel="stylesheet" href="house-landscape.css?v=SPLIT1" />
-<script src="house-landscape.js?v=SPLIT2"></script>
+<style id="meter0">/* METER0 (Dan 10/2): a week of bars with no day lit is drawn at its compact size, one line of day letters,
+   not stretched into tall empty bars; the "0 days this week" line carries the count. */
+.flame-row:not(:has(.flame.on)) { height: auto; margin: 6px 0 10px; align-items: center; }
+.flame-row:not(:has(.flame.on)) .flame { height: auto !important; padding: 5px 0; border-radius: 8px; opacity: 0.4; }
+.flame-row:not(:has(.flame.on)) .flame .day { position: static; display: block; color: #fff; }
+</style>
+<script src="house-landscape.js?v=FOOTCOL1"></script>
 <script src="house-nodash.js?v=NODASH1"></script>
 </head>
 <body data-glass="countdown">
