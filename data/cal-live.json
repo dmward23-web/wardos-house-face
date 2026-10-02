@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-02T16:26:21.625Z",
+  "fetchedAt": "2026-10-02T16:30:48.483Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-09",
   "asOfIso": "2026-10-02",
   "nextLeave": {
-    "id": "g98fr3pkfngl28fab505jbo4u8",
-    "summary": "Harris — SRE Tailgate Party (reading incentive)",
-    "start": "2026-10-02T11:30:00-05:00",
-    "end": "2026-10-02T12:30:00-05:00",
-    "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+    "id": "jcd7fqkarnk4ic1760sqa33klc",
+    "summary": "Dan — get tree-trim bids (2–3 written)",
+    "start": "2026-10-02T12:00:00-05:00",
+    "end": "2026-10-02T12:15:00-05:00",
+    "location": "6719 W 147th Terrace, Overland Park, KS 66223",
     "busy": false,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "g98fr3pkfngl28fab505jbo4u8",
-      "summary": "Harris — SRE Tailgate Party (reading incentive)",
-      "start": "2026-10-02T11:30:00-05:00",
-      "end": "2026-10-02T12:30:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "jcd7fqkarnk4ic1760sqa33klc",
       "summary": "Dan — get tree-trim bids (2–3 written)",
@@ -397,9 +388,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "11:30",
-    "place": "Harris — SRE Tailgate Party (reading incentive)",
-    "detailHtml": "<strong>11:30</strong> Harris — SRE Tailgate Party (reading incentive)",
+    "time": "12:00",
+    "place": "Dan — get tree-trim bids (2–3 written)",
+    "detailHtml": "<strong>12:00</strong> Dan — get tree-trim bids (2–3 written)",
     "badge": "Fri"
   },
   "error": null
