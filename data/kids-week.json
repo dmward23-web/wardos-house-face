@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 2 2026",
   "asOfIso": "2026-10-02",
-  "refreshedAt": "2026-10-02T12:34:31.876Z",
+  "refreshedAt": "2026-10-02T12:46:45.215Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -48,18 +48,6 @@
         "kind": "school",
         "whenLabel": "7:00",
         "summary": "Harris — SRE specials: Music"
-      },
-      {
-        "label": "Next up · today",
-        "time": "7:30",
-        "place": "Free · Hayes — pack late-lunch snacks (headaches · Ma…",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Fri",
-        "startIso": "2026-10-02T12:30:00.000Z",
-        "endIso": "2026-10-02T12:45:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:30",
-        "summary": "Free · Hayes — pack late-lunch snacks (headaches · Madi OK)"
       },
       {
         "label": "Next up · today",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Mon 7:00",
         "summary": "Harris — SRE specials: Music"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "7:00",
+        "place": "SRE specials: Spanish",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-05T12:00:00.000Z",
+        "endIso": "2026-10-05T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Mon 7:00",
+        "summary": "Hayes — SRE specials: Spanish"
       }
     ]
   },
@@ -423,12 +423,6 @@
         {
           "when": "Thu 8 · 7:00",
           "what": "SRE specials: Spanish + Library checkout",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 9 · 12:00",
-          "what": "Ward Kids [AHH No School]",
           "tone": "act",
           "hint": ""
         }
@@ -720,12 +714,6 @@
           "what": "SRE specials: Art",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Fri 9 · 12:00",
-          "what": "Ward Kids [AHH No School]",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": []
@@ -905,12 +893,6 @@
         {
           "when": "Thu 8 · 3:00",
           "what": "LKMS Homework Help",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 9 · 12:00",
-          "what": "Ward Kids [AHH No School]",
           "tone": "act",
           "hint": ""
         }
