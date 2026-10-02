@@ -34,6 +34,8 @@ test("seed: family + three personal jars, rule text, units, chips, reasons, entr
   assert.equal(s.niceOneReasons.length, 5);
   assert.equal(s.ruleText, "A stolen close zeros that personal jar for the day.", "law exact sentence (CL-08)");
   assert.ok(!/\d/.test(s.ruleText), "rule text carries no numbers");
+  assert.equal(s.ruleLine2, "The jar pays time and picks. Never cash.", "second line under the law sentence");
+  assert.ok(!/\d/.test(s.ruleLine2));
 });
 
 test("zero currency glyph in any jar file; no cash words in seed copy", () => {
@@ -167,8 +169,9 @@ test("wall display API exports NO numbers and no currency glyph (balances not li
   b.niceOne({ jar: "hayes", chip: "min-15", reason: "Extra effort", ...P });
   b.credit({ jar: "family", unit: "pick", qty: 2, sourceId: "us-2026-10-01", reason: "close-done" });
   const d = b.wallDisplay();
-  assert.deepEqual(Object.keys(d).sort(), ["jars", "ruleText", "syncLabel", "synced"]);
+  assert.deepEqual(Object.keys(d).sort(), ["jars", "ruleLine2", "ruleText", "syncLabel", "synced"]);
   assert.equal(d.ruleText, seed().ruleText);
+  assert.equal(d.ruleLine2, seed().ruleLine2);
   const walk = v => {
     if (typeof v === "number") assert.fail("number on the wall: " + v);
     if (typeof v === "string") { assert.ok(!/\d/.test(v), "digit in wall string: " + v); assert.ok(!v.includes(CUR)); }

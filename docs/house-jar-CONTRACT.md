@@ -72,13 +72,14 @@ available = max(0, sum(qty of live adds whose dayKey is NOT zeroed for that jar)
 | `book.zeroDay({kid, reason, dayKey? \| at?})` | none (Atlas claim-board detection) | `{ok, entry\|noop}` |
 | `book.redeem({jar, unit, qty, reason, pinOk})` | parent | `{ok, entry}`, or `not-enough`, `not-a-reason`, `parent-gate`. Reasons: "Time used", "Picked Sunday dinner", "Picked the movie". |
 | `book.reverse(refId, {pinOk})` | parent | Appends `r-<refId>`. For a Nice one, this only works within **10 minutes** of the original. For a zero-day (disputed close), a credit or a redeem, it works any time. |
-| `book.wallDisplay()` | | **The only thing the tile renders:** `{ruleText, jars:[{jar, name}], synced, syncLabel}` |
+| `book.wallDisplay()` | | **The only thing the tile renders:** `{ruleText, ruleLine2, jars:[{jar, name}], synced, syncLabel}` |
 | `book.parentView({pinOk})` | parent | `{ok, jars:[{jar, name, min, pick}]}`. This is for the internal or parent redeem screen only, **never the wall**. |
 | `book.apply(e)` / `book.merge(es)` / `book.entries()` / `book.pending()` / `book.chips()` / `book.reasons()` / `book.syncState()` / `book.pushShared()` | | |
 | `HouseJar.dayKeyFor(ms)`, `HouseJar.ctIso(ms)` | | |
 
 ## Wall display contract
 - The tile prints `ruleText` verbatim: "A stolen close zeros that personal jar for the day." This is the chore law's exact sentence (Alfred CL-08). It means that kid's personal-jar ADDS for that CT day are voided. The standing balance from earlier days is never touched, and redeems that day still count.
+- Directly under it the tile prints `ruleLine2` verbatim: "The jar pays time and picks. Never cash."
 - The wall shows NO per-jar totals anywhere. There is no PIN totals view on the wall; `parentView` stays a module-internal audit helper with no wall consumer.
 - It shows the jar names.
 - It shows `syncLabel` while `synced === false`.

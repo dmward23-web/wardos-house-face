@@ -138,6 +138,7 @@
     var lim = seed.limits || {};
     var maxQty = { min: Number.isInteger(lim.maxMinPerEntry) ? lim.maxMinPerEntry : 120, pick: Number.isInteger(lim.maxPickPerEntry) ? lim.maxPickPerEntry : 3 };
     var ruleText = typeof seed.ruleText === "string" ? seed.ruleText : "";
+    var ruleLine2 = typeof seed.ruleLine2 === "string" ? seed.ruleLine2 : "";
     var jars = list(seed.jars).filter(function (j) { return j && JARS.indexOf(j.id) >= 0; });
     if (!jars.length) jars = JARS.map(function (id) { return { id: id, name: id === "family" ? "Family jar" : id[0].toUpperCase() + id.slice(1), kind: id === "family" ? "family" : "personal" }; });
     var jarIds = jars.map(function (j) { return j.id; });
@@ -303,10 +304,10 @@
       var synced = SHARED_WRITE_ENABLED && pendingIds.length === 0;
       return { sharedWriteEnabled: SHARED_WRITE_ENABLED, sharedKey: SHARED_KEY, pendingKey: PENDING_KEY, pendingCount: pendingIds.length, synced: synced, label: synced ? "Synced" : "Not synced" };
     }
-    /* wallDisplay() -> the ONLY thing the tile renders: rule text, jar names, sync state. No numbers, no balances, no fill. */
+    /* wallDisplay() -> the ONLY thing the tile renders: rule text (law sentence) + ruleLine2 under it, jar names, sync state. No numbers, no balances, no fill. */
     function wallDisplay() {
       var s = syncState();
-      return { ruleText: ruleText, jars: jars.map(function (j) { return { jar: j.id, name: j.name }; }), synced: s.synced, syncLabel: s.label };
+      return { ruleText: ruleText, ruleLine2: ruleLine2, jars: jars.map(function (j) { return { jar: j.id, name: j.name }; }), synced: s.synced, syncLabel: s.label };
     }
     /* parentView({pinOk}) -> internal/parent redeem screen only (numbers live here, never on the wall). */
     function parentView(g) {
