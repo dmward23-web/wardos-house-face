@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 2 2026",
   "asOfIso": "2026-10-02",
-  "refreshedAt": "2026-10-02T22:34:17.715Z",
+  "refreshedAt": "2026-10-02T22:38:51.107Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -60,18 +60,6 @@
         "kind": "sport",
         "whenLabel": "Sat 1:00",
         "summary": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30"
-      },
-      {
-        "label": "Next up · Sat",
-        "time": "5:00",
-        "place": "Hayes birthday — J. Alexander's · 5:30",
-        "detailHtml": "8:30 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Sat",
-        "startIso": "2026-10-03T22:00:00.000Z",
-        "endIso": "2026-10-04T00:30:00.000Z",
-        "kind": "other",
-        "whenLabel": "Sat 5:00",
-        "summary": "Hayes birthday — J. Alexander's · 5:30 · leave 5:00"
       },
       {
         "label": "Next up · Sun",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Mon 3:00",
         "summary": "Ainsley — LKMS Homework Help · 3:00"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "5:30",
+        "place": "Hayes baseball — Falcons vs KC Tigers (away)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-05T22:30:00.000Z",
+        "endIso": "2026-10-06T00:00:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Mon 5:30",
+        "summary": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game"
       }
     ]
   },
