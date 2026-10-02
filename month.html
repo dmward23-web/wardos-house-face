@@ -344,6 +344,9 @@
  .day-empty { font-size: 9px; color: #a0a4ac; font-weight: 500; }
  .month-grid .day .dom { color: #eef0f4 !important; font-size: 17px; }
  .month-grid .day.out .dom { color: #6a6e76 !important; font-size: 12px; }
+ /* SPILL1: outside-month days are dimmed; an empty one shrinks to its date chip. */
+ .month-grid .day.out.has-items .blocks, .month-grid .day.out.has-items .mom { opacity: .5; }
+ .month-grid .day.out.empty { align-self: start; background: transparent; border-color: transparent; padding: 2px 6px; }
  .month-grid .day.today .dom { color: #ffd257 !important; }
 </style>
 <link rel="stylesheet" href="heat-v3.css?v=DAYTAP1" />
@@ -700,12 +703,29 @@
     document.querySelector("[data-month-title]").textContent = MN[m - 1] + " " + y;
     var first = new Date(y, m - 1, 1).getDay(), dim = new Date(y, m, 0).getDate();
     var weeks = Math.ceil((first + dim) / 7);
-    grid.style.gridTemplateRows = "repeat(" + weeks + ", 1fr)";
-    var html = "", start = new Date(y, m - 1, 1 - first);
+    var html = "", start = new Date(y, m - 1, 1 - first), rows = 0;
+    /* SPILL1 (Dan 10/2): spill-over days outside the month show their REAL calendar items, dimmed.
+       An empty spill day shrinks to its date; a spill row with nothing at all is dropped. Nothing invented. */
+    function dayAt(i) { var dd = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i); return { y: dd.getFullYear(), m: dd.getMonth() + 1, d: dd.getDate() }; }
+    function itemsOf(o) { var dd = DATA && DATA.days[key(o.y, o.m, o.d)]; return dd && dd.items ? dd.items : []; }
     for (var i = 0; i < weeks * 7; i++) {
-      var dd = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-      var dy = dd.getFullYear(), dm = dd.getMonth() + 1, dn = dd.getDate();
-      if (dm !== m) { html += '<div class="day out"><div class="day-top"><span class="dom">' + dn + "</span></div></div>"; continue; }
+      if (i % 7 === 0) {
+        var bare = true;
+        for (var j = i; j < i + 7; j++) { var oj = dayAt(j); if (oj.m === m || itemsOf(oj).length) { bare = false; break; } }
+        if (bare) { i += 6; continue; }
+        rows++;
+      }
+      var o = dayAt(i), dy = o.y, dm = o.m, dn = o.d;
+      if (dm !== m) {
+        var oi = itemsOf(o), od = DATA && DATA.days[key(dy, dm, dn)];
+        if (!oi.length) { html += '<div class="day out empty"><div class="day-top"><span class="dom">' + MS[dm - 1] + " " + dn + "</span></div></div>"; continue; }
+        html += '<div class="day out has-items" id="d-' + key(dy, dm, dn) + '"><div class="day-top"><span class="dom">' + MS[dm - 1] + " " + dn + "</span></div>";
+        if (od && od.withDan) html += '<div class="mom dan">Kids with Dan</div>';
+        html += '<div class="blocks">';
+        oi.forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '" title="' + esc(it.l) + '">' + esc(it.l) + "</div>"; });
+        html += "</div></div>";
+        continue;
+      }
       var k = key(dy, dm, dn), day = DATA && DATA.days[k], isToday = k === t.iso;
       html += '<a class="day' + (isToday ? " today" : "") + '" id="d-' + k + '" href="sheet-today.html"><div class="day-top"><span class="dom">' + dn + "</span>" + (isToday ? '<span class="day-tag">today</span>' : "") + "</div>";
       if (day && day.withDan) html += '<div class="mom dan">Kids with Dan</div>';
@@ -713,6 +733,7 @@
       (day ? day.items : []).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '" title="' + esc(it.l) + '">' + esc(it.l) + "</div>"; });
       html += "</div></a>";
     }
+    grid.style.gridTemplateRows = "repeat(" + rows + ", 1fr)";
     grid.innerHTML = html;
     var sp = spans(y, m);
     document.querySelector("[data-month-banner]").textContent = sp.length ? "Kids with Dan · " + sp.join(" · ") : "No Kids-with-Dan days on the calendar this month";
