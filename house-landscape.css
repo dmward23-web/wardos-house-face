@@ -50,7 +50,7 @@ html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-foot] { margin-t
 html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-foot] { display: flex !important; flex-wrap: wrap !important; justify-content: space-evenly !important; align-items: center !important; gap: 6px 18px !important; text-align: center; }
 html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-fill] { display: flex !important; flex-direction: column !important; justify-content: space-evenly !important; }
 html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-fill] > * { flex-shrink: 0; }
-html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-fill] > [data-ls-grow] { flex: 1 1 auto !important; max-height: none !important; }
+html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-fill] > [data-ls-grow] { flex: 1 0 auto !important; max-height: none !important; min-height: min-content !important; }
 html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-grow="block"] { display: flex !important; flex-direction: column !important; justify-content: center !important; }
 html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-grow="col"] { justify-content: center !important; }
 html[data-landscape][data-ls-pack] .panel:not(#ls-off) [data-ls-grow="row"] { align-items: center !important; }
@@ -143,3 +143,13 @@ html[data-landscape] .panel.weekend-cmd:not(#ls-off) .side > .sec > .sec-hdr { g
 html[data-landscape] .panel.weekend-cmd:not(#ls-off) .side > .sec > .vote-card { margin: 0 !important; min-width: 0; text-align: center; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; }
 html[data-landscape] .panel.weekend-cmd:not(#ls-off) .options > .opt:last-child:nth-child(odd):not(:first-child) { flex-direction: row !important; }
 html[data-landscape] .panel.weekend-cmd:not(#ls-off) .options > .opt > .emoji { zoom: 0.72; flex-shrink: 0; }
+/* SPACE-01 overlaps (10/2) · a leave-by's big time is its own line box in landscape, so the date before it and
+   the title after it never draw under it (sheet-us, sheet-today: the 104px time sat in a 28px line) */
+html[data-landscape] .panel:not(#ls-off) .leaveby-main .time { display: inline-block !important; line-height: 1 !important; margin: 0.06em 0.18em 0.06em 0 !important; vertical-align: middle; }
+/* SPACE-01 overlaps · a clock-first header whose weather / Sensi ovals do not fit beside the clock wraps them to
+   a second row inside the card (the 71° oval poked out of the clock card on sheet-us / sheet-today) */
+html[data-landscape] .panel:not(#ls-off) .hdr--clockfirst:has(> .hdr-ovals) { flex-wrap: wrap !important; row-gap: 10px !important; align-content: space-evenly !important; }
+html[data-landscape] .panel:not(#ls-off) .hdr--clockfirst > .hdr-ovals { flex-wrap: wrap !important; justify-content: space-evenly; margin-left: auto; max-width: 100%; min-width: 0; }
+/* SPACE-01 overlaps · sheet-today: each kid card keeps at least its own words' height (an equal split cut
+   Hayes's long day under Ainsley's card); the spare still goes evenly */
+html[data-landscape] .panel:not(#ls-off) .kids-col > * { flex: 1 0 auto !important; min-height: min-content !important; }
