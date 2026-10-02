@@ -99,12 +99,42 @@ try:
                 if nl: r["ok"] = False; r["why"] = (r["why"] + "; " if r["why"] else "") + "non-local request " + nl[0][:80]
                 if errs: r["ok"] = False; r["why"] = (r["why"] + "; " if r["why"] else "") + "page error " + errs[0]
                 ok = ok and r["ok"]; results.append(r); ctx.close()
+            # PRESS3 (Atlas 10/2) rules on top of the map: each kid's name opens THAT kid's board; check-in is an
+            # explicit I'm here chip inside the seat; the jar explainer shows rules only (no $, no numbers)
+            nl = []; ctx, pg, errs = page(b, vw, vh, nl)
+            rule = pg.evaluate("""() => {
+              const why = [];
+              for (const k of ['harris', 'hayes', 'ainsley']) {
+                const seat = document.getElementById('w-kid-' + k); if (!seat || seat.closest('[hidden]')) continue;
+                const n = seat.querySelector('[data-kid-board]');
+                if (!n || n.getAttribute('data-go') !== 'kid-' + k + '.html#kid-board') why.push(k + ' name does not open kid-' + k + '.html#kid-board');
+                if (n && n.hasAttribute('data-kid-checkin')) why.push(k + ' name still checks in');
+                const c = seat.querySelector('[data-kid-checkin]');
+                if (!c || !/I.m here/.test(c.textContent)) why.push(k + " seat has no I'm here chip");
+              }
+              const j = document.getElementById('w-jar');
+              if (j && j.getAttribute('data-go') !== 'sheet-index.html#jar-rules') why.push('jar does not open the jar explainer');
+              return why;
+            }""")
+            ctx.close()
+            ctx = b.new_context(viewport={"width": vw, "height": vh}); pg = ctx.new_page(); pg.clock.install(time=datetime.datetime.fromisoformat(iso))
+            pg.route("**/*", lambda r: r.fulfill(status=200, content_type="application/json", body=datasnap.body(r.request.url, iso)) if (r.request.url.startswith(L) and datasnap.body(r.request.url, iso) is not None) else (r.continue_() if r.request.url.startswith(L) else r.abort()))
+            pg.goto(L + "sheet-index.html#jar-rules"); pg.clock.run_for(2500); pg.wait_for_timeout(700)
+            jx = pg.evaluate("""() => { const s = document.getElementById('jar-rules'); if (!s) return { why: 'no #jar-rules' };
+              const r = s.getBoundingClientRect(), t = s.innerText || '';
+              return { why: (r.width < 50 || r.height < 50 || r.top >= innerHeight) ? 'jar explainer not in view' : (!/How the jar works/.test(t) ? 'jar explainer has no rules' : ((/[$\u00a2\u00a3\u20ac]|[0-9]/.test(t)) ? 'jar explainer shows money or numbers: ' + t.slice(0, 80) : '')),
+                home: !!s.querySelector('a[href*="wall.html"], a[href*="sheet-index.html"]') }; }""")
+            ctx.close()
+            if jx.get("why"): rule.append(jx["why"])
+            if not jx.get("home"): rule.append("jar explainer has no way back")
+            r = {"vp": f"{vw}x{vh}", "entry": "PRESS3-rules", "kind": "rule", "text": "names / I'm here / jar", "ok": not rule, "why": "; ".join(rule)}
+            ok = ok and r["ok"]; results.append(r)
         b.close()
 finally:
     srv.terminate()
 for vp in sorted(set(r["vp"] for r in results)):
     rs = [r for r in results if r["vp"] == vp]; bad = [r for r in rs if not r["ok"]]
-    print(f"{vp}: {len(rs)} presses ({sum(1 for r in rs if r.get('kind') == 'go')} go, {sum(1 for r in rs if r.get('kind') == 'inplace')} in place), {len(bad)} FAIL")
+    print(f"{vp}: {sum(1 for r in rs if r.get('kind') != 'rule')} presses ({sum(1 for r in rs if r.get('kind') == 'go')} go, {sum(1 for r in rs if r.get('kind') == 'inplace')} in place) + {sum(1 for r in rs if r.get('kind') == 'rule')} rule check, {len(bad)} FAIL")
     for r in bad: print("   FAIL", r.get("entry", "-"), "|", r["text"], "|", r["why"])
 if out: json.dump({"time": iso, "results": results}, open(out, "w"), indent=1)
 print("PRESS MAP", "PASS" if ok else "FAIL"); sys.exit(0 if ok else 1)

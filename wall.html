@@ -85,7 +85,7 @@
       <div class="mod taps" id="w-ltaps" data-owner="Atlas" data-tile="logistics-taps" data-tile-id="logistics-taps" aria-label="Four taps">
         <button class="tap big" id="w-scene-home" data-scene="home" data-ltap="im-home"><i class="mk"></i><span class="tx" id="w-scene-home-l">I'm home<small></small></span></button>
         <button class="tap big" id="w-scene-leave" data-scene="leave" data-ltap="leaving"><i class="mk"></i><span class="tx" id="w-scene-leave-l">Leaving<small></small></span></button>
-        <div class="tapgrp" id="w-ltap-checkin" role="button" tabindex="0" data-inplace="check-in-hint"><span class="kick">Check in</span><b>Tap your name</b><small id="w-ltap-checkin-s">On your seat, below</small></div>
+        <div class="tapgrp" id="w-ltap-checkin" role="button" tabindex="0" data-inplace="check-in-hint"><span class="kick">Check in</span><b>Tap I'm here</b><small id="w-ltap-checkin-s">On your seat, below</small></div>
         <div class="tapgrp late" id="w-ltap-late"><span class="kick">Running late &middot; minutes</span><div class="chips" id="w-ltap-late-row"></div></div>
       </div>
       <div class="mod who" id="w-who" data-glance="who-home" data-owner="Atlas" data-tile="who-home" data-tile-id="who-home" aria-label="Who's home" hidden><span class="kick">Who&#39;s home</span><span id="w-who-row" style="display:contents"></span><span class="hint">Resets 3 AM</span></div>
@@ -103,21 +103,21 @@
     <!-- CHORE LAW seats (KIDLAYER3.md): Harris · Hayes · Ainsley, Atlas's fixed order, equal weight, no ranking. Every word comes from data. -->
     <div class="mod seats seats-law kids" id="w-kids" data-owner="Atlas" data-tile="kids" data-tile-id="kids" data-band="kids" data-law="CHORE-LAW-2026-10-01" aria-label="Kids" hidden>
       <section class="seat kid" id="w-kid-harris" data-owner-split="Atlas · Wright" data-owner="Atlas" data-tile="kid-harris" data-tile-id="kid-harris" data-kid="harris" aria-label="Harris seat">
-        <div class="seat-h"><button class="kid-name" data-kid-checkin="harris" aria-label="Harris check in"><span>Harris</span><small>Tap name to check in</small></button></div>
+        <div class="seat-h"><button type="button" class="kid-name" data-go="kid-harris.html#kid-board" data-kid-board="harris" aria-label="Harris board"><span>Harris</span></button><button type="button" class="here-chip" data-kid-checkin="harris" data-inplace="check-in" aria-label="Harris: I'm here"><b>I'm here</b><small></small></button></div>
         <div class="kid-frame" data-kid-frame="harris" hidden></div>
         <div class="kid-law" data-kid-law="harris" hidden></div>
         <div class="kid-seat" data-kid-seat="harris" hidden></div>
         <div class="seat-foot" data-nice-one-host="harris"><button type="button" class="nice1 is-dim" data-nice-dim data-inplace="nice-one" aria-label="Nice one, parent only (no PIN set)"><span>Nice one</span><small>Parent only</small></button></div>
       </section>
       <section class="seat kid seat-ball" id="w-kid-hayes" data-owner-split="Atlas · Wright" data-owner="Atlas" data-tile="kid-hayes" data-tile-id="kid-hayes" data-kid="hayes" aria-label="Hayes seat">
-        <div class="seat-h"><button class="kid-name" data-kid-checkin="hayes" aria-label="Hayes check in"><span>Hayes</span><small>Tap name to check in</small></button><div class="captain" data-captain-slot="hayes" data-owner="Atlas" data-tile="kid-hayes-captain" data-tile-id="kid-hayes-captain" hidden><i class="cap-mk"></i><span>Captain<small>of the night</small></span></div></div>
+        <div class="seat-h"><button type="button" class="kid-name" data-go="kid-hayes.html#kid-board" data-kid-board="hayes" aria-label="Hayes board"><span>Hayes</span></button><button type="button" class="here-chip" data-kid-checkin="hayes" data-inplace="check-in" aria-label="Hayes: I'm here"><b>I'm here</b><small></small></button><div class="captain" data-captain-slot="hayes" data-owner="Atlas" data-tile="kid-hayes-captain" data-tile-id="kid-hayes-captain" hidden><i class="cap-mk"></i><span>Captain<small>of the night</small></span></div></div>
         <div class="kid-frame" data-kid-frame="hayes" hidden></div>
         <div class="kid-law" data-kid-law="hayes" hidden></div>
         <div class="kid-seat" data-kid-seat="hayes" hidden></div>
         <div class="seat-foot" data-nice-one-host="hayes"><button type="button" class="nice1 is-dim" data-nice-dim data-inplace="nice-one" aria-label="Nice one, parent only (no PIN set)"><span>Nice one</span><small>Parent only</small></button></div>
       </section>
       <section class="seat kid seat-quiet" id="w-kid-ainsley" data-owner-split="Atlas · Wright" data-owner="Atlas" data-tile="kid-ainsley" data-tile-id="kid-ainsley" data-kid="ainsley" aria-label="Ainsley seat">
-        <div class="seat-h"><button class="kid-name" data-kid-checkin="ainsley" aria-label="Ainsley check in"><span>Ainsley</span><small>Tap name to check in</small></button></div>
+        <div class="seat-h"><button type="button" class="kid-name" data-go="kid-ainsley.html#kid-board" data-kid-board="ainsley" aria-label="Ainsley board"><span>Ainsley</span></button><button type="button" class="here-chip" data-kid-checkin="ainsley" data-inplace="check-in" aria-label="Ainsley: I'm here"><b>I'm here</b><small></small></button></div>
         <div class="kid-frame" data-kid-frame="ainsley" hidden></div>
         <div class="kid-law" data-kid-law="ainsley" hidden></div>
         <div class="kid-seat" data-kid-seat="ainsley" hidden></div>
@@ -158,7 +158,7 @@
         <div class="stack" id="w-pack-none"><span class="tap is-empty" aria-disabled="true"><i class="mk"></i><span class="tx">No flags<small>Clears midnight</small></span></span></div>
       </section>
       <!-- JARTILE1: Ledger's jar tile = HouseJar.wallDisplay() only (rule, names, sync). No numbers, no fill, no money. -->
-      <section class="act jar" id="w-jar" data-owner="Ledger" data-tile="house-jar" data-tile-id="house-jar" data-balances="none" aria-label="Jar" data-inplace="jar-rule" data-house-jar hidden></section>
+      <section class="act jar" id="w-jar" data-owner="Ledger" data-tile="house-jar" data-tile-id="house-jar" data-balances="none" aria-label="Jar: how it works" data-go="sheet-index.html#jar-rules" data-house-jar hidden></section>
       <!-- Ask pip: PARKED (ruling Oct 1). Display only: off, no listen, no tap. Wording waits on Atlas (no name on the face). -->
       <section class="act ask" id="w-pip" data-owner="Wright" data-tile="ask-pip" data-tile-id="ask-pip" data-state="off" aria-label="Ask" hidden>
         <div class="ah"><span class="kick">Ask</span><span class="gate">Off</span></div>
@@ -188,6 +188,7 @@
 
 
 </div></div>
+<!-- PRESS3 (Atlas 10/2): a row with no data source (load day: no feed; dinner vote: no options source) collapses fully, no placeholder -->
 <div class="rail-grp"><div class="rail-h">Do</div><div class="rail-grid">
 
 <a data-owner="Atlas" data-tile="rail-pack" data-tile-id="rail-pack" class="badge " href="sheet-pack.html#pack-board" data-sheet="sheet-pack.html"><span>Pack</span></a>
@@ -195,14 +196,14 @@
 <a data-owner="Atlas" data-tile="rail-week-win" data-tile-id="rail-week-win" class="badge " href="sheet-win.html#win-board" data-sheet="sheet-win.html"><span>Week win</span></a>
 <a data-owner="Ledger" data-tile="rail-groceries-costco" data-tile-id="rail-groceries-costco" class="badge " href="sheet-groceries.html#groc-list" data-sheet="sheet-groceries.html"><span>Groceries · Costco</span></a>
 
-<a data-owner="Vita" data-tile="rail-dinner-vote" data-tile-id="rail-dinner-vote" class="badge " href="sheet-dinner.html#dinner-board" data-sheet="sheet-dinner.html"><span>Dinner vote</span></a>
+<a data-owner="Vita" data-tile="rail-dinner-vote" data-tile-id="rail-dinner-vote" data-no-source class="badge " hidden href="sheet-dinner.html#dinner-board" data-sheet="sheet-dinner.html"><span>Dinner vote</span></a>
 </div></div>
 <div class="rail-grp"><div class="rail-h">Photos</div><div class="rail-grid">
 <a data-owner="Prism" data-tile="rail-gallery" data-tile-id="rail-gallery" class="badge " href="sheet-gallery.html#gallery-board" data-sheet="sheet-gallery.html"><span>Gallery</span></a>
 <a data-owner="Prism" data-tile="rail-needs-photo" data-tile-id="rail-needs-photo" class="badge " href="sheet-gallery-hero.html#hero-board" data-sheet="sheet-gallery-hero.html"><span>Needs photo</span></a>
 </div></div>
 <div class="rail-grp"><div class="rail-h">House</div><div class="rail-grid">
-<a data-owner="Wright" data-tile="rail-load-day" data-tile-id="rail-load-day" class="badge " href="sheet-load-day.html#loadday-board" data-sheet="sheet-load-day.html"><span>Load day</span></a>
+<a data-owner="Wright" data-tile="rail-load-day" data-tile-id="rail-load-day" data-no-source class="badge " hidden href="sheet-load-day.html#loadday-board" data-sheet="sheet-load-day.html"><span>Load day</span></a>
 <a data-owner="Wright" data-tile="rail-home-sensi-nest" data-tile-id="rail-home-sensi-nest" class="badge " href="sheet-google-home.html#sensi-hero" data-sheet="sheet-google-home.html"><span>Home · Sensi · Nest</span></a>
 <a data-owner="Wright" data-tile="rail-status" data-tile-id="rail-status" class="badge " href="sheet-status.html#status-feeds" data-sheet="sheet-status.html"><span>Status</span></a>
 </div></div>
@@ -215,6 +216,7 @@
   </footer>
 </div>
 
+<script src="house-noagent.js"></script>
 <script src="house-lights.js"></script>
 <script src="house-tapsync.js"></script>
 <script src="house-sfx.js"></script>
@@ -674,7 +676,7 @@
       var inAt = w && w.checkedInAt;
       var nb = tile.querySelector("[data-kid-checkin]");
       nb.classList.toggle("is-in", !!inAt);
-      nb.querySelector("small").textContent = inAt ? "In \u00b7 " + (ct(inAt) || "") : "Tap name to check in";
+      nb.querySelector("small").textContent = inAt ? "In \u00b7 " + (ct(inAt) || "") : ""; /* PRESS3: the I'm here chip in the seat; the name opens the kid's board */
       var fr = tile.querySelector("[data-kid-frame]"), fh = frameHtml(k.id, now); fr.innerHTML = fh; fr.hidden = !fh;
       var box = tile.querySelector("[data-kid-law]"), lh = lawHtml(k.id, now);
       box.innerHTML = lh; box.hidden = !lh;
@@ -922,10 +924,9 @@
   document.addEventListener("click", function (e) {
     var n = e.target.closest ? e.target.closest("[data-nice-dim]") : null;
     if (n) { var sm = n.querySelector("small"); sm.textContent = "Ask a parent"; n.classList.add("is-said"); setTimeout(function () { sm.textContent = "Parent only"; n.classList.remove("is-said"); }, 3000); return; }
-    var jt = e.target.closest ? e.target.closest("[data-house-jar]") : null;
-    if (jt) { jt.classList.add("is-said"); setTimeout(function () { jt.classList.remove("is-said"); }, 3000); return; }
+    /* JARX1: a jar tap opens the jar explainer (sheet-index.html#jar-rules) through [data-go] above */
     var h = e.target.closest ? e.target.closest("#w-ltap-checkin") : null;
-    if (h) { document.querySelectorAll(".seat .kid-name").forEach(function (b) { b.classList.add("is-hint"); }); $("w-ltap-checkin-s").textContent = "Names are on the seats below"; setTimeout(function () { document.querySelectorAll(".kid-name.is-hint").forEach(function (b) { b.classList.remove("is-hint"); }); paintTaps(); }, 3000); }
+    if (h) { document.querySelectorAll(".seat .here-chip").forEach(function (b) { b.classList.add("is-hint"); }); $("w-ltap-checkin-s").textContent = "I'm here is on each seat"; setTimeout(function () { document.querySelectorAll(".here-chip.is-hint").forEach(function (b) { b.classList.remove("is-hint"); }); paintTaps(); }, 3000); }
   });
   if (L && L.startPolling) L.startPolling(); /* existing lights client: no key -> no proxy requests (AUDIT1) */
   tick(); setInterval(tick, 15000);

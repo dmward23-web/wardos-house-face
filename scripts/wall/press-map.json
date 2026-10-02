@@ -2,6 +2,7 @@
  "about": "PRESSMAP1 · every tappable thing on wall.html and where a press goes. kind=go: it navigates to dest (page#anchor; '*' = its own href/data-go, which must be one of allowDest). kind=inplace: it answers on the wall (feedback within 1s), the URL never changes. A visible tappable that matches no entry fails scripts/wall/press-map.py. Doc: docs/PRESS-MAP.md",
  "allowDest": [
   "sheet-index.html#hub-home",
+  "sheet-index.html#jar-rules",
   "sheet-today.html#today-now",
   "sheet-today.html#today-day",
   "month.html#month-board",
@@ -140,7 +141,7 @@
    "id": "checkin-hint",
    "selector": "#w-ltap-checkin",
    "kind": "inplace",
-   "what": "lights up the seat names"
+   "what": "lights up the I'm here chips on the seats"
   },
   {
    "id": "running-late",
@@ -148,10 +149,17 @@
    "kind": "inplace"
   },
   {
+   "id": "kid-name",
+   "selector": "[data-kid-board]",
+   "kind": "go",
+   "dest": "kid-*.html#kid-board",
+   "what": "the kid's name opens the kid's board"
+  },
+  {
    "id": "who-pill",
    "selector": "[data-kid-checkin]",
    "kind": "inplace",
-   "what": "kid check-in (who's home pill and seat name)"
+   "what": "kid check-in: the I'm here chip in each seat and the who's home pill (same wiring)"
   },
   {
    "id": "status-kick",
@@ -272,8 +280,9 @@
   {
    "id": "jar",
    "selector": "#w-jar",
-   "kind": "inplace",
-   "what": "the jar tile is its own explainer (no jar page exists): lights the rule lines"
+   "kind": "go",
+   "dest": "sheet-index.html#jar-rules",
+   "what": "the jar explainer on the Main board: the rules, no balances, no totals"
   },
   {
    "id": "rail-badge",

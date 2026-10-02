@@ -2109,7 +2109,7 @@
     if (!dan) return;
     /* DADFIX1 · denser Today (next/musts/leave) · dedupe PE twins · every card → dest */
     renderList(document.querySelector("[data-mount-dan-today]"), densifyDanToday(data), "quiet day");
-    renderList(document.querySelector("[data-mount-dan-week]"), withHref(dedupeDanRows(dan.week), "month.html"), "week fills from Atlas");
+    renderList(document.querySelector("[data-mount-dan-week]"), withHref(dedupeDanRows(dan.week), "month.html"), "week fills from the calendar");
     renderList(document.querySelector("[data-mount-dan-leave]"), withHref(dan.leaveBys, "sheet-countdowns.html"), "leave-bys when known");
     var picks = (dan.picks || []).map(function (it) {
       var o = {};

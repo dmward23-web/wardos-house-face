@@ -4035,6 +4035,20 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 </svg>
 
 
+<section id="jar-rules" class="jar-rules" aria-label="How it works">
+  <div class="jar-rules-card">
+    <a class="jar-rules-home" href="wall.html">&larr; Main board</a>
+    <div id="jar-rules-body"></div>
+  </div>
+</section>
+<style>/* JARX1 · jar explainer: only on #jar-rules, rules + jar names, no balances */
+.jar-rules{display:none}
+.jar-rules:target{display:flex;position:fixed;inset:0;z-index:9000;background:rgba(6,10,18,.94);align-items:center;justify-content:center;padding:4vh 4vw}
+.jar-rules-card{max-width:900px;width:100%;color:#e8edf5;font:500 clamp(18px,2.2vw,30px)/1.4 system-ui,sans-serif}
+.jar-rules-home{display:inline-block;margin-bottom:1em;padding:.4em .9em;border-radius:999px;background:#1d2a3d;color:#e8edf5;text-decoration:none;font-weight:700}
+#hub-lights-pill.is-quiet,#hub-lights-panel .is-quiet{opacity:.35;min-width:2.2em;min-height:1em}
+</style>
+<script src="house-jar-explainer.js?v=JARX1"></script>
 <div id="hub-home" class="panel" data-ls-grid>
  <div class="float-orbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
  <header class="hdr hdr--spread hdr--premium hdr--heat">
@@ -4301,6 +4315,8 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 <script src="house-sensi.js?v=SENSIAUTO1"></script>
 <script src="hub-key-entry.js?v=AUDIT1"></script>
 <script src="house-lights.js?v=AUDIT1"></script>
+<script src="house-hub-lights-quiet.js?v=HUBQUIET1"></script>
+<script src="house-noagent.js"></script>
 <script src="house-jar.js?v=JAR1"></script>
 <script src="house-jar-wall.js?v=NICEONE1"></script>
 <script>document.addEventListener("DOMContentLoaded", function () { if (window.HouseJarWall) window.HouseJarWall.boot(); /* JARTILE1 + NICEONE1: Nice one hidden until the hub has a PIN */ });</script>

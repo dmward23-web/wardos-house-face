@@ -174,8 +174,8 @@ html body.wall-kiosk.is-stacked[data-plate][data-master="ion"] .acts-v3 > .act {
 
 /* ---------- ION POLISH (Prism, Oct 1 10:03 PM CT, on d2b5177): last gaps to the Ion master. CSS only, no binding changes. ---------- */
 /* PL1 · rail: FILL1 shares spare height per GROUP, so a 1-row group (People, Photos) got 144px badges and Do got 80px. Grow each group by its badge rows so every badge is one height */
-html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .rail .rail-grp:has(.badge:nth-of-type(3)) { flex-grow: 2; }
-html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .rail .rail-grp:has(.badge:nth-of-type(5)) { flex-grow: 3; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .rail .rail-grp:has(.badge:not([hidden]) ~ .badge:not([hidden]) ~ .badge:not([hidden])) { flex-grow: 2; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .rail .rail-grp:has(.badge:not([hidden]) ~ .badge:not([hidden]) ~ .badge:not([hidden]) ~ .badge:not([hidden]) ~ .badge:not([hidden])) { flex-grow: 3; }
 /* PL2 · row 1: Next up hero (112px) sat 12px short of the two-row timer (124px); both take the row height */
 html body.wall-kiosk[data-plate][data-master="ion"] .row1 > .next { height: auto; align-self: stretch; min-height: 112px; }
 /* PL3 · who's home: with the inline status lights hidden, ".lights.is-inline + .hint" still matched the hidden sibling, so "Resets 3 AM" hugged the last pill; the master pins it right */
@@ -232,3 +232,14 @@ html body.wall-kiosk.is-low[data-plate][data-master="ion"]:not(.is-stacked) #w-c
 html body.wall-kiosk.is-low[data-plate][data-master="ion"]:not(.is-stacked) #w-chain .c-cell { display: flex; flex-direction: row; justify-content: flex-start; align-items: baseline; gap: 16px; flex-wrap: nowrap; min-width: 0; padding-top: 6px; padding-bottom: 6px; }
 html body.wall-kiosk.is-low[data-plate][data-master="ion"]:not(.is-stacked) #w-chain .c-cell > * { margin: 0; white-space: nowrap; }
 html body.wall-kiosk.is-low[data-plate][data-master="ion"]:not(.is-stacked) #w-chain .c-where { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+
+/* ---------- PRESS3 (Atlas 10/2): the kid's name opens the kid's board; check-in is an explicit I'm here chip in the seat ---------- */
+html body.wall-kiosk[data-plate][data-master="ion"] .seats-law .seat-h { display: flex; align-items: center; gap: 10px; }
+html body.wall-kiosk[data-plate][data-master="ion"] .seats-law .seat-h .kid-name { flex: 1 1 auto; min-width: 0; background: none; border-left: 0; border-right: 0; border-top: 0; color: inherit; font: inherit; text-align: left; }
+html body.wall-kiosk[data-plate][data-master="ion"] .seats-law .here-chip { flex: none; min-height: 48px; padding: 4px 14px; border-radius: 24px; border: 1.5px solid rgba(var(--acc-rgb), 0.55); background: rgba(var(--acc-rgb), 0.08); color: var(--ink); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font: inherit; line-height: 1.05; }
+html body.wall-kiosk[data-plate][data-master="ion"] .seats-law .here-chip b { font-size: calc(17px * var(--seat-scale)); font-weight: 600; white-space: nowrap; }
+html body.wall-kiosk[data-plate][data-master="ion"] .seats-law .here-chip small { font-size: 12px; color: var(--mute2); white-space: nowrap; }
+html body.wall-kiosk[data-plate][data-master="ion"] .seats-law .here-chip small:empty { display: none; }
+html body.wall-kiosk[data-plate][data-master="ion"] .seats-law .here-chip.is-in { border-color: var(--ok); background: rgba(var(--ok-rgb), 0.16); }
+html body.wall-kiosk[data-plate][data-master="ion"] .here-chip.is-hint { box-shadow: 0 0 0 2px var(--acc); }
+html body.wall-kiosk[data-plate][data-master="ion"] .rail .badge[hidden] { display: none !important; } /* PRESS3: a no-source badge collapses */
