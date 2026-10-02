@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 2 2026",
   "asOfIso": "2026-10-02",
-  "refreshedAt": "2026-10-02T17:33:38.650Z",
+  "refreshedAt": "2026-10-02T17:46:39.941Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -301,22 +301,15 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "FRI · 11:30",
-        "what": "SRE TAILGATE PARTY (READING INCENTIVE)",
+        "when": "SAT · 10:00",
+        "what": "SATURDAY MORNING DONUTS",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "FRI",
-          "11:30"
+          "SAT",
+          "10:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Fri · 11:30",
-          "what": "SRE Tailgate Party (reading incentive)",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -340,12 +333,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Fri 2 · 11:30",
-          "what": "SRE Tailgate Party (reading incentive)",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Mon 5 · 7:00",
           "what": "SRE specials: Music",
@@ -397,12 +384,6 @@
         {
           "when": "Thu 8 · 7:00",
           "what": "SRE specials: Spanish + Library checkout",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 9 · 12:00",
-          "what": "Ward Kids [AHH No School]",
           "tone": "act",
           "hint": ""
         }
@@ -642,12 +623,6 @@
           "what": "SRE specials: Art",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Fri 9 · 12:00",
-          "what": "Ward Kids [AHH No School]",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": []
@@ -829,12 +804,6 @@
           "what": "LKMS Homework Help",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Fri 9 · 12:00",
-          "what": "Ward Kids [AHH No School]",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": [
@@ -952,11 +921,6 @@
           "tone": "act"
         },
         {
-          "when": "Fri 2 · 11:30",
-          "what": "SRE Tailgate Party (reading incentive)",
-          "tone": "act"
-        },
-        {
           "when": "Sat 3 · 8:30",
           "what": "Dan DRIVE → Nashville",
           "tone": "hot"
@@ -1065,6 +1029,11 @@
           "when": "Thu 8 · 3:00",
           "what": "LKMS Homework Help",
           "tone": "act"
+        },
+        {
+          "when": "Thu 8 · 5:00",
+          "what": "Ainsley swim — Coach Ann",
+          "tone": "hot"
         }
       ]
     }
