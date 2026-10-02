@@ -149,13 +149,13 @@ await t("client gate + Ledger's HouseJar: Nice one writes only after hub verify 
   const storage = memStore();
   const gate = W.createGate({ fetch: fakeFetch, base: () => "http://hub", token: () => "k", now, storage });
   const book = HouseJar.create({ seed: SEED, storage, now, parentGate: gate.parentGate });
-  assert.equal(book.niceOne({ jar: "hayes", chip: "min-10", reason: "great-attitude", pinOk: true }).error, "parent-gate", "pinOk alone is not enough: gate hook is closed");
-  assert.equal((await gate.act("nice-one", U(8), (ok) => book.niceOne({ jar: "hayes", chip: "min-10", reason: "great-attitude", pinOk: ok }))).error, "grant-expired", "no verify yet");
+  assert.equal(book.niceOne({ jar: "hayes", chip: "min-10", reason: "positive-attitude", pinOk: true }).error, "parent-gate", "pinOk alone is not enough: gate hook is closed");
+  assert.equal((await gate.act("nice-one", U(8), (ok) => book.niceOne({ jar: "hayes", chip: "min-10", reason: "positive-attitude", pinOk: ok }))).error, "grant-expired", "no verify yet");
   assert.equal((await gate.status()).pinSet, true);
   assert.equal((await gate.verify("0000")).error, "wrong-pin");
   assert.equal((await gate.verify("4821")).ok, true);
   const v = await gate.view((ok) => book.parentView({ pinOk: ok })); assert.equal(v.ok, true); assert.deepEqual(v.jars.map((j) => j.min), [0, 0, 0, 0]);
-  const r = await gate.act("nice-one", U(8), (ok) => book.niceOne({ jar: "hayes", chip: "min-10", reason: "great-attitude", pinOk: ok }));
+  const r = await gate.act("nice-one", U(8), (ok) => book.niceOne({ jar: "hayes", chip: "min-10", reason: "positive-attitude", pinOk: ok }));
   assert.equal(r.ok, true); assert.equal(r.entry.qty, 10); assert.equal(r.entry.unit, "min");
   assert.equal(gate.parentGate(), false, "hook closed again");
   const again = await gate.act("nice-one", U(8), () => { throw new Error("must not run"); }); assert.equal(again.duplicate, true);
