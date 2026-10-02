@@ -99,3 +99,7 @@ html[data-landscape] .panel:not(#ls-off) .treats { display: grid !important; gri
 html[data-landscape] .panel:not(#ls-off) .treats > .treat { margin: 0 !important; min-width: 0; }
 /* SPACE-01 · gallery: the header chip already says Gallery, so the lone "Photos" title row folds away in landscape */
 html[data-landscape] .panel:not(#ls-off) #gallery-board > .grid-hdr { display: none !important; }
+/* SPACE-01 · gallery: photo cards sit tight in landscape (no empty band between card rows) */
+html[data-landscape] .panel:not(#ls-off) #gallery-board .shot-grid { gap: 4px !important; row-gap: 4px !important; }
+html[data-landscape] .panel:not(#ls-off) #gallery-board .card { padding: 4px 4px 2px !important; gap: 2px !important; }
+html[data-landscape] .panel:not(#ls-off) #gallery-board .card-meta { padding: 0 2px !important; }

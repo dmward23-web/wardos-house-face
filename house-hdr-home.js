@@ -117,6 +117,16 @@
     }
     sp.classList.toggle("hdr-glance", !!t);
     sp.textContent = t;
+    /* the line grows to fill its room (no dead header band either side), capped by the header's own height */
+    sp.style.fontSize = "";
+    if (t && sp.clientWidth > 0) {
+      var base = parseFloat(getComputedStyle(sp).fontSize) || 24, hd = sp.closest("header") || sp.parentElement;
+      var ck = hd && hd.querySelector("[data-live-clock], .live-clock, .board-clock"), ckf = ck ? parseFloat(getComputedStyle(ck).fontSize) || 0 : 0;
+      var cap = Math.max(base, Math.min(ckf ? ckf * 0.85 : base * 1.6, base * 3)), f = cap;
+      var rg = document.createRange(); rg.selectNodeContents(sp);
+      for (; f > base; f -= 2) { sp.style.fontSize = f + "px"; if (rg.getBoundingClientRect().width <= sp.getBoundingClientRect().width * 0.97) break; }
+      if (f <= base) sp.style.fontSize = "";
+    }
     if (t) sp.removeAttribute("aria-hidden"); else sp.setAttribute("aria-hidden", "true");
   }
   function loadGlance() {
