@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-02T17:27:31.769Z",
+  "fetchedAt": "2026-10-02T17:33:39.070Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-09",
@@ -50,6 +50,15 @@
       "end": "2026-10-03T17:00:00-05:00",
       "location": "6719 W 147th Terrace, Overland Park, KS 66223 → J. Alexander's, 73 White Bridge Rd #130, Nashville, TN 37205",
       "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "gfm3p4jh5agr5vdp6ra79ohbag",
+      "summary": "Hayes + Harris — Saturday Morning Donuts · 10:00",
+      "start": "2026-10-03T10:00:00-05:00",
+      "end": "2026-10-03T11:00:00-05:00",
+      "location": "Cardboard Corner Cafe, 9240 Metcalf Ave, Overland Park, KS 66212",
+      "busy": false,
       "allDay": false
     },
     {
