@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 2 2026",
   "asOfIso": "2026-10-02",
-  "refreshedAt": "2026-10-02T16:30:48.115Z",
+  "refreshedAt": "2026-10-02T16:46:53.396Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,26 +17,14 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "11:30",
-    "place": "SRE Tailgate Party (reading incentive)",
+    "time": "12:00",
+    "place": "SRE field trip museum+park (chaperone slots)",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
     "badge": "Fri",
-    "startIso": "2026-10-02T16:30:00.000Z",
-    "endIso": "2026-10-02T17:30:00.000Z",
+    "startIso": "2026-10-02T17:00:00.000Z",
+    "endIso": "2026-10-02T17:00:00.000Z",
     "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "11:30",
-        "place": "SRE Tailgate Party (reading incentive)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Fri",
-        "startIso": "2026-10-02T16:30:00.000Z",
-        "endIso": "2026-10-02T17:30:00.000Z",
-        "kind": "school",
-        "whenLabel": "11:30",
-        "summary": "Harris — SRE Tailgate Party (reading incentive)"
-      },
       {
         "label": "Next up · today",
         "time": "12:00",
@@ -168,6 +156,18 @@
         "kind": "appointment",
         "whenLabel": "Mon 1:40",
         "summary": "Ainsley — Lindsay appt · 2:00"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "3:00",
+        "place": "LKMS Homework Help",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-05T20:00:00.000Z",
+        "endIso": "2026-10-05T21:00:00.000Z",
+        "kind": "school",
+        "whenLabel": "Mon 3:00",
+        "summary": "Ainsley — LKMS Homework Help · 3:00"
       }
     ]
   },
