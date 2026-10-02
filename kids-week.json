@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 2 2026",
   "asOfIso": "2026-10-02",
-  "refreshedAt": "2026-10-02T13:41:00.771Z",
+  "refreshedAt": "2026-10-02T13:46:04.302Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -301,22 +301,15 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "FRI · 8:10",
-        "what": "SRE DROP-OFF",
+        "when": "FRI · 11:30",
+        "what": "SRE TAILGATE PARTY (READING INCENTIVE)",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "FRI",
-          "8:10"
+          "11:30"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Fri · 8:10",
-          "what": "SRE drop-off",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Fri · 11:30",
@@ -347,12 +340,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Fri 2 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Fri 2 · 11:30",
           "what": "SRE Tailgate Party (reading incentive)",
@@ -551,22 +538,15 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "FRI · 8:10",
-        "what": "SRE DROP-OFF",
+        "when": "FRI · 9:00",
+        "what": "SRE FIELD TRIP (MUSEUM + MEADOWBROOK)",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
           "FRI",
-          "8:10"
+          "9:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Fri · 8:10",
-          "what": "SRE drop-off",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Fri · 9:00",
@@ -610,12 +590,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Fri 2 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Fri 2 · 9:00",
           "what": "SRE field trip (museum + Meadowbrook)",
@@ -986,11 +960,6 @@
       ],
       "week": [
         {
-          "when": "Fri 2 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act"
-        },
-        {
           "when": "Fri 2 · 9:00",
           "what": "SRE field trip (museum + Meadowbrook)",
           "tone": "act"
@@ -1103,6 +1072,11 @@
         {
           "when": "Thu 8 · 7:00",
           "what": "SRE specials: Spanish + Library checkout",
+          "tone": "act"
+        },
+        {
+          "when": "Thu 8 · 7:00",
+          "what": "SRE specials: Art",
           "tone": "act"
         }
       ]

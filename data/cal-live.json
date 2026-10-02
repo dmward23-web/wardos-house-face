@@ -1,39 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-02T13:41:01.184Z",
+  "fetchedAt": "2026-10-02T13:46:04.692Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-09",
   "asOfIso": "2026-10-02",
   "nextLeave": {
-    "id": "fl3v6o6eh5q37r6kds72n7gv8o",
-    "summary": "Free · UPS — return Amazon brake lever",
-    "start": "2026-10-02T08:45:00-05:00",
-    "end": "2026-10-02T09:00:00-05:00",
-    "location": "The UPS Store, 151st & Metcalf, Overland Park, KS",
+    "id": "7pot7bg5qqs5lt9lucfgq51c18",
+    "summary": "Hayes — SRE field trip (museum + Meadowbrook)",
+    "start": "2026-10-02T09:00:00-05:00",
+    "end": "2026-10-02T14:00:00-05:00",
+    "location": "Johnson County History Museum, 8788 Metcalf Ave, Overland Park, KS 66212 → Meadowbrook Park, 9101 Nall Ave, Prairie Village, KS 66207",
     "busy": false,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "fl3v6o6eh5q37r6kds72n7gv8o",
-      "summary": "Free · UPS — return Amazon brake lever",
-      "start": "2026-10-02T08:45:00-05:00",
-      "end": "2026-10-02T09:00:00-05:00",
-      "location": "The UPS Store, 151st & Metcalf, Overland Park, KS",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "jtonajhib1i5qbm51koiueb5dc",
-      "summary": "Free · CVS pickup — photo print 5x7",
-      "start": "2026-10-02T08:45:00-05:00",
-      "end": "2026-10-02T09:00:00-05:00",
-      "location": "CVS #8586, 7100 W 151st St, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "7pot7bg5qqs5lt9lucfgq51c18",
       "summary": "Hayes — SRE field trip (museum + Meadowbrook)",
@@ -424,9 +406,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "8:45",
-    "place": "Free · UPS — return Amazon brake lever",
-    "detailHtml": "<strong>8:45</strong> Free · UPS — return Amazon brake lever",
+    "time": "9:00",
+    "place": "Hayes — SRE field trip (museum + Meadowbrook)",
+    "detailHtml": "<strong>9:00</strong> Hayes — SRE field trip (museum + Meadowbrook)",
     "badge": "Fri"
   },
   "error": null
