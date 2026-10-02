@@ -51,6 +51,8 @@
   .name-accent{color:#c87810}
   .tagline{font-size:14px;font-weight:600;color:#4a4e56;margin-top:2px}
   #lights-status-pill.cmd-pill{font-size:11px;min-height:28px;padding:6px 12px}
+  /* LIGHTSQUIET1 (Dan 10/2, Atlas's hub ruling): a NEED KEY / NEED TOKEN state draws DIMMED WITH NO TEXT */
+  #lights-status-pill.is-quiet,#lights-ftr-status.is-quiet,.light-pad-src.is-quiet,.light-pad-state.is-quiet{opacity:.35;min-width:2.2em;min-height:1em;display:inline-block}
   .banner.cmd-panel{padding:14px 16px;gap:6px}
   .banner .cmd-title{font-size:15px}
   .banner .banner-title{font-size:22px;font-weight:850;letter-spacing:-0.02em;color:var(--cmd-ink);margin-top:2px}
@@ -92,6 +94,7 @@
 <link rel="stylesheet" href="house-scroll.css?v=SCROLLEND2" />
 <link rel="stylesheet" href="house-landscape.css?v=SPREAD5" />
 <script src="house-landscape.js?v=SPREAD5"></script>
+<script src="house-nodash.js?v=NODASH1"></script>
 </head>
 <body>
 <div class="panel lights-cmd">
@@ -106,7 +109,7 @@
  </div>
  <div class="hdr-spacer" aria-hidden="true"></div>
  <div class="hdr-right-tools">
- <div class="cmd-pill cmd-pill--need" id="lights-status-pill">NEED TOKEN</div>
+ <div class="cmd-pill cmd-pill--need is-quiet" id="lights-status-pill" aria-label="Lights controls off on this screen"></div>
  </div>
  </header>
 
@@ -149,7 +152,7 @@
  <a class="ftr-chip" href="sheet-index.html">Sheets</a>
  <a class="ftr-chip" href="sheet-status.html">Status</a>
  </div>
- <span id="lights-ftr-status">NEED TOKEN</span>
+ <span id="lights-ftr-status" class="is-quiet"></span>
  </footer>
 </div>
 <script src="house-clock.js?v=SHEETCLK1"></script>
@@ -160,6 +163,12 @@
 (function () {
   var L = window.HouseLights;
   if (!L) return;
+  var NEED = /NEED\s*(KEY|TOKEN)/i;
+  function quiet(el) {
+    if (!el) return;
+    if (NEED.test(el.textContent || "")) { el.textContent = ""; el.classList.add("is-quiet"); el.setAttribute("aria-label", "Lights controls off on this screen"); }
+    else if (el.textContent.trim()) { el.classList.remove("is-quiet"); el.removeAttribute("aria-label"); }
+  }
   function paint() {
     var eff = L.effectiveLights();
     var g = eff.gate;
@@ -186,6 +195,7 @@
     }
     var ftr = document.getElementById("lights-ftr-status");
     if (ftr) ftr.textContent = g.label;
+    quiet(pill); quiet(ftr); quiet(title); if (sub && NEED.test(sub.textContent || "")) sub.textContent = "Controls dark on this screen";
     var note = document.getElementById("lights-note");
     if (note && (g.needToken || g.kind === "need_token")) {
       note.textContent = "Not connected yet · controls dark";
@@ -195,6 +205,7 @@
       note.textContent = "";
     }
     L.paintPads(document);
+    Array.prototype.forEach.call(document.querySelectorAll(".light-pad-src, .light-pad-state"), quiet);
   }
   L.wireAllButtons(document);
   L.onChange(paint);
