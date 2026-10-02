@@ -117,6 +117,8 @@ Commits on `wall-redesign-1`: `d2b5177` FIDELITY1+FILL1 Â· `fa858ad` LANDFILL1 Â
   boards still fail the board rule (open work, below).
 - **Preview** (`scripts/preview/publish-preview.mjs`, dry run only): read-only copy in `/workspace/preview-out`, guard
   first in every page, noindex + robots.txt, SHA chip, turn-sideways hint on a portrait phone only. Not published.
+  Its dead-space gate (10/2) is `scripts/wall/alfred/space.py` on the wall at the CURRENT clock on real data (5
+  viewports); the pinned 06:45 / 15:30 fixture replay (`deadspace.py --wall`) still runs but only reports, never blocks.
 
 ### Open / for Dan
 - Morning states only test on FIXTURES: `kid-seats`, `next-up` and `house-mode` are generated in the evening, so at

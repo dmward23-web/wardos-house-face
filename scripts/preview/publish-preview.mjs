@@ -11,7 +11,9 @@
  *
  * Gates (a failed gate = the build is marked NOT PUBLISHABLE, exit 1):
  *   scripts/wall/press-map.py 1920x1080   every press lands somewhere real
- *   scripts/wall/deadspace.py --wall      no dead space on the wall
+ *   scripts/wall/alfred/space.py          no dead space on the wall: REAL data at the CURRENT clock, 5 viewports
+ *                                         (SPACE-01 10/2; fixtures never block)
+ *   extra, never blocks: scripts/wall/deadspace.py --wall  (the pinned 06:45 / 15:30 fixture replays, reported only)
  *   scripts/preview/check-preview.py     the built copy: no writes, keys ignored, noindex, chip, hint
  *   preview checks below                  guard first in every page, noindex, robots.txt,
  *                                         no keys in the copy, no house writer scripts left live */
@@ -34,6 +36,7 @@ if (OUT === ROOT || ROOT.startsWith(OUT + path.sep)) { console.error("refusing t
 const git = (...a) => execFileSync("git", a, { cwd: ROOT, encoding: "utf8" }).trim();
 const sha = git("rev-parse", "--short", REF);
 const fails = [];
+const SPACE_OUT = path.join(OUT, "..", "preview-gates-space-now");
 
 // 1. fresh copy of the tracked tree at REF (untracked/private files never ship)
 fs.rmSync(OUT, { recursive: true, force: true });
@@ -104,15 +107,33 @@ if (fs.existsSync(path.join(OUT, "data/display-rename.private.json"))) fails.pus
 const gates = [
   ["press map 1920", "python3", ["scripts/wall/press-map.py", "1920x1080", "--out", path.join(OUT, "..", "preview-gates-press.json")]],
   ["preview guard", "python3", ["scripts/preview/check-preview.py", OUT]],
-  ["dead space wall", "python3", ["scripts/wall/deadspace.py", "--wall", "--vp", "1920x1080", "--out", path.join(OUT, "..", "preview-gates-deadspace")]],
+  ["dead space wall (real data, now)", "python3", ["scripts/wall/alfred/space.py", ROOT, SPACE_OUT], { SPACE_PAGES: "wall.html" }, spaceVerdict],
+];
+/* SPACE-01 (10/2): the dead-space gate reads the wall at the CURRENT clock on the real data/ (no pinned 06:45 / 15:30
+   replay); space.py reports, this decides: any real-now render with a fail or an error blocks */
+function spaceVerdict() {
+  let rows = [];
+  try { rows = JSON.parse(fs.readFileSync(path.join(SPACE_OUT, "space.json"), "utf8")); } catch (e) { return { ok: false, lines: ["no space.json: " + e.message] }; }
+  const real = rows.filter((r) => !String(r.state).endsWith("-FIXTURE"));
+  const bad = real.filter((r) => (r.fails && r.fails.length) || r.error);
+  return { ok: real.length > 0 && !bad.length, lines: bad.map((r) => `FAIL ${r.page} ${r.state} ${r.vp}: ${r.error || r.fails.join("; ")}`), note: `${real.length - bad.length}/${real.length} real-now renders pass` };
+}
+const extras = [ /* reported, never block the build */
+  ["dead space wall, pinned fixtures (extra)", "python3", ["scripts/wall/deadspace.py", "--wall", "--vp", "1920x1080", "--out", path.join(OUT, "..", "preview-gates-deadspace")]],
 ];
 const gateResults = [];
-for (const [name, cmd, a] of gates) {
+for (const [name, cmd, a, env, verdict] of gates) {
+  if (SKIP) { gateResults.push([name, "SKIPPED"]); continue; }
+  const r = spawnSync(cmd, a, { cwd: ROOT, encoding: "utf8", timeout: 1500000, env: { ...process.env, ...(env || {}) } });
+  const v = verdict ? verdict(r) : { ok: r.status === 0, lines: (r.stdout || "").split("\n").filter((l) => /FAIL/.test(l)) };
+  const ok = r.status === 0 && v.ok;
+  gateResults.push([name, (ok ? "PASS" : "FAIL") + (v.note ? ` (${v.note})` : "")]);
+  if (!ok) fails.push(`gate ${name} failed:\n${v.lines.slice(0, 12).join("\n")}`);
+}
+for (const [name, cmd, a] of extras) {
   if (SKIP) { gateResults.push([name, "SKIPPED"]); continue; }
   const r = spawnSync(cmd, a, { cwd: ROOT, encoding: "utf8", timeout: 1500000 });
-  const ok = r.status === 0;
-  gateResults.push([name, ok ? "PASS" : "FAIL"]);
-  if (!ok) fails.push(`gate ${name} failed:\n${(r.stdout || "").split("\n").filter((l) => /FAIL/.test(l)).slice(0, 12).join("\n")}`);
+  gateResults.push([name, (r.status === 0 ? "pass" : "fail") + " · extra, does not block"]);
 }
 
 console.log(`preview build ${sha} -> ${OUT}  (${pages.length} pages, live data ${LIVE})`);
