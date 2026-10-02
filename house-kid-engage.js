@@ -116,6 +116,8 @@
     });
   }
 
+  /* CHORELAW3: must-* ids are shared by the three kids; a kid-scoped call qualifies them ("hayes:must-bed") */
+  function Q(kidId, id) { var w = WK(); return (w && typeof w.qid === "function") ? w.qid(kidId, id) : id; }
   function getCheck(id, iso) {
     var w = WK();
     if (!w || typeof w.getCheck !== "function") return false;
@@ -151,7 +153,7 @@
 
     function dayHit(iso) {
       for (var i = 0; i < qs.length; i++) {
-        if (!getCheck(qs[i].id, iso)) return false;
+        if (!getCheck(Q(kidId, qs[i].id), iso)) return false;
       }
       return true;
     }
@@ -179,8 +181,8 @@
     var done = 0;
     var need = qs.length + weekly.length;
     var iso = dayIso();
-    qs.forEach(function (q) { if (getCheck(q.id, iso)) done += 1; });
-    weekly.forEach(function (q) { if (getCheck(q.id)) done += 1; });
+    qs.forEach(function (q) { if (getCheck(Q(kidId, q.id), iso)) done += 1; });
+    weekly.forEach(function (q) { if (getCheck(Q(kidId, q.id))) done += 1; });
     return { done: done, need: need, complete: need > 0 && done >= need };
   }
 
@@ -712,6 +714,7 @@
       var kidId = btn.getAttribute("data-kid") || root.getAttribute("data-kid-flip");
       if (!id) return;
       var iso = cadence === "daily" ? dayIso() : undefined;
+      id = Q(kidId, id);
       var was = getCheck(id, iso);
       var next = !was;
       setCheck(id, next, iso);
@@ -912,9 +915,9 @@
       } else {
         var html = "";
         qs.forEach(function (q) {
-          var done = getCheck(q.id);
+          var done = getCheck(Q(kidId, q.id));
           html +=
-            '<button type="button" class="hub-quest-claim' + (done ? " is-done" : "") + '" data-hq-claim="' + esc(q.id) + '">' +
+            '<button type="button" class="hub-quest-claim' + (done ? " is-done" : "") + '" data-hq-claim="' + esc(Q(kidId, q.id)) + '">' +
             '<span class="kf-claim-ring">' + (done ? "✓" : "○") + "</span>" +
             "<span>" + esc(kidsSafe(q.title || q.what || q.id)) + "</span></button>";
         });

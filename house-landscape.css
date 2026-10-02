@@ -61,3 +61,9 @@ html[data-landscape] #hub-home.panel:not(#ls-off) .grid-wrap > [data-house-jar]:
 html[data-landscape] #hub-home.panel:not(#ls-off) [data-house-jar] .jar-mid, html[data-landscape] #hub-home.panel:not(#ls-off) [data-house-jar] .jars { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
 html[data-landscape] #hub-home.panel:not(#ls-off) [data-house-jar] .jar-rule { grid-column: 3; margin: 0; white-space: normal; }
 html[data-landscape] #hub-home.panel:not(#ls-off) [data-house-jar] .jar-rule2 { grid-row: 2; }
+
+/* KIDFIT1 (every orientation, not just landscape) · the kid boards' decorative layers (Hayes's .panel::before storm
+   ring, Ainsley's .vinyl-float and .panel::after) reached 10 to 21px past the 1080 board and pushed the page
+   sideways. They are clipped at the board edge; clip is not a scroll container, so the page still scrolls down. */
+html:not(#ls-off) body[data-kid] .panel { overflow-x: clip !important; }
+html:not(#ls-off) body[data-kid] { overflow-x: clip !important; }

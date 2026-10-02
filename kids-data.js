@@ -33,6 +33,41 @@
     "har-postgame": "harris", "har-shower": "harris", "har-toys": "harris", "har-shoes": "harris", "har-cubby": "harris"
   };
 
+  /* CHORELAW3 · the chore law's ids: every kid has the same 4 binary MUSTS (must-bed / must-hamper / must-dish /
+     must-floor; Hayes's 4th swaps to must-dragon only while the dragon is home). The same id belongs to three kids,
+     so a tap id is qualified "kid:must-x" (rendered as data-check) and stored plain, per kid per day, under
+     house-checkoffs:<kid>:<YYYY-MM-DD> (the wall reads the same key). The old per-kid ids (har-bed, hay-dishes, ...)
+     are retired: the ones that match a must map onto it (saved checkoffs carry over), the rest render nowhere. */
+  var MUST_IDS = { "must-bed": 1, "must-hamper": 1, "must-dish": 1, "must-floor": 1, "must-dragon": 1 };
+  var NO_STARS = { ainsley: true }; /* CHORELAW1: Ainsley has no stars, counts or currency */
+  var LEGACY_TO_MUST = {
+    "ain-bed": "must-bed", "hay-bed": "must-bed", "har-bed": "must-bed",
+    "ain-laundry": "must-hamper",
+    "ain-dishwasher": "must-dish", "hay-dishes": "must-dish", "har-dishes": "must-dish",
+    "ain-living": "must-floor", "ain-toys": "must-floor", "hay-room": "must-floor", "har-toys": "must-floor"
+  };
+  function qid(kidId, id) {
+    id = String(id == null ? "" : id);
+    if (!kidId || id.indexOf(":") >= 0 || !MUST_IDS[id]) return id;
+    return kidId + ":" + id;
+  }
+  function pageKid() {
+    try { var b = document.body; var k = b && (b.getAttribute("data-kid") || ""); return KIDS_ALL[k] ? k : null; } catch (e) { return null; }
+  }
+  var KIDS_ALL = { harris: 1, hayes: 1, ainsley: 1 };
+  /** -> { kid, id (plain, stored), legacy (old id or null), retired } ; kid null = unknown (never written) */
+  function resolveCheck(checkId) {
+    var raw = String(checkId == null ? "" : checkId), kid = null, id = raw;
+    var c = raw.indexOf(":");
+    if (c > 0 && KIDS_ALL[raw.slice(0, c)]) { kid = raw.slice(0, c); id = raw.slice(c + 1); }
+    if (KID_FROM_CHECK[id]) {
+      var mapped = LEGACY_TO_MUST[id] || null;
+      return { kid: kid || KID_FROM_CHECK[id], id: mapped || id, legacy: id, retired: !mapped && id !== "ain-babysit" };
+    }
+    if (!kid && MUST_IDS[id]) kid = pageKid();
+    return { kid: kid, id: id, legacy: null, retired: false };
+  }
+
   function pad2(n) { return String(n).padStart(2, "0"); }
 
   /** Chicago hour 0–23 (for Fri 3:00p homeWeek handoff). */
@@ -86,17 +121,19 @@
 
   function questMeta(kidId, checkId, data) {
     var kid = data && data.kids && data.kids[kidId];
-    if (!kid || !kid.quests) return { cadence: "daily", stars: 1, optional: false };
+    var base = NO_STARS[kidId] ? 0 : 1; /* CHORELAW3: no stars:1 default for Ainsley */
+    var plain = resolveCheck(checkId).id;
+    if (!kid || !kid.quests) return { cadence: "daily", stars: base, optional: false };
     for (var i = 0; i < kid.quests.length; i++) {
-      if (kid.quests[i].id === checkId) {
+      if (kid.quests[i].id === plain) {
         var q = kid.quests[i];
         var optional = !!(q.optional || q.cadence === "addon");
         var cadence = q.cadence || (optional ? "addon" : "daily");
-        var stars = optional ? 0 : (typeof q.stars === "number" ? q.stars : 1);
+        var stars = (optional || NO_STARS[kidId]) ? 0 : (typeof q.stars === "number" ? q.stars : 1);
         return { cadence: cadence, stars: stars, optional: optional };
       }
     }
-    return { cadence: "daily", stars: 1, optional: false };
+    return { cadence: "daily", stars: base, optional: false };
   }
 
   var WEEKLY_IDS = {
@@ -108,10 +145,11 @@
   var DOW_LONG = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   function checkKeyFor(checkId, data, dayIso) {
-    var kidId = KID_FROM_CHECK[checkId];
+    var r = resolveCheck(checkId), kidId = r.kid;
     if (!kidId) return CHECK_KEY;
     var meta = questMeta(kidId, checkId, data || (global.WardKids && global.WardKids._data));
-    var weekly = meta.cadence === "weekly" || !!WEEKLY_IDS[checkId];
+    var weekly = meta.cadence === "weekly" || !!WEEKLY_IDS[r.legacy || r.id];
+    if (MUST_IDS[r.id]) weekly = false; /* the law's MUSTS are daily, binary */
     var iso = dayIso || DAY_ISO;
     if (weekly) {
       return CHECK_PREFIX + kidId + ":week:" + weekStartIso(iso);
@@ -203,8 +241,8 @@
       var q = qs[i];
       var cadence = q.cadence || "daily";
       if (cadence === "daily") {
-        if (!dailyWeekComplete(q.id, data)) return false;
-      } else if (!getCheckRaw(q.id, data)) {
+        if (!dailyWeekComplete(qid(kidId, q.id), data)) return false;
+      } else if (!getCheckRaw(qid(kidId, q.id), data)) {
         return false;
       }
     }
@@ -217,7 +255,7 @@
     for (var i = 0; i < qs.length; i++) {
       var q = qs[i];
       var cadence = q.cadence || "daily";
-      var ok = cadence === "daily" ? dailyWeekComplete(q.id, data) : getCheckRaw(q.id, data);
+      var ok = cadence === "daily" ? dailyWeekComplete(qid(kidId, q.id), data) : getCheckRaw(qid(kidId, q.id), data);
       if (ok) done += 1;
     }
     return { done: done, need: qs.length, complete: qs.length > 0 && done >= qs.length };
@@ -279,7 +317,7 @@
 
   /** Legacy name — re-syncs full Must gate for the kid owning this check. */
   function syncDailyWeekBank(checkId, data) {
-    var kidId = KID_FROM_CHECK[checkId];
+    var kidId = resolveCheck(checkId).kid;
     if (!kidId) return null;
     return syncMustGateBank(kidId, data);
   }
@@ -389,7 +427,7 @@
   }
 
   function applyCheckToBank(checkId, done, data) {
-    var kidId = KID_FROM_CHECK[checkId];
+    var kidId = resolveCheck(checkId).kid;
     if (!kidId) return null;
     var meta = questMeta(kidId, checkId, data);
     /* MUSTGATE1 · optional/hire never fills jar; all musts route through full-set gate */
@@ -463,7 +501,7 @@
     var pack = kidDayBank(kidId);
     var kid = (data && data.kids && data.kids[kidId]) || {};
     var goal = kid.bankGoal || { need: 10, title: "Goal", blurb: "", reward: "" };
-    var cur = kid.currency || { plural: "stars", symbol: "★", label: "Stars" };
+    var cur = kid.currency || (NO_STARS[kidId] ? { plural: "", symbol: "", label: "" } : { plural: "stars", symbol: "★", label: "Stars" }); /* CHORELAW3: no ★ fallback for Ainsley */
     var today = pack.day.stars || 0;
     /* Week star tally → jar / weekly allowance goal (existing need $ amounts) */
     var week = weekStarsFor(kidId);
@@ -518,11 +556,22 @@
   }
 
   function getCheckRaw(checkId, data, dayIso) {
+    var r = resolveCheck(checkId);
+    if (r.retired) return false; /* retired id: nothing renders it, nothing counts it */
+    if (!r.kid && MUST_IDS[r.id]) return false; /* a must with no kid is never read from a shared key */
     var key = checkKeyFor(checkId, data, dayIso);
-    var state = loadKeyState(key);
-    if (Object.prototype.hasOwnProperty.call(state, checkId)) return !!state[checkId];
+    var state = loadKeyState(key), has = Object.prototype.hasOwnProperty;
+    if (has.call(state, r.id)) return !!state[r.id];
+    /* CHORELAW3 carry-over: a checkoff saved under the old id (har-bed) on this kid/day counts for its must */
+    for (var old in LEGACY_TO_MUST) {
+      if (LEGACY_TO_MUST[old] === r.id && KID_FROM_CHECK[old] === r.kid && has.call(state, old)) {
+        state[r.id] = !!state[old]; delete state[old]; saveKeyState(key, state); return !!state[r.id];
+      }
+    }
+    if (r.kid && key !== CHECK_KEY) checkId = r.legacy || r.id;
+    if (has.call(state, checkId)) return !!state[checkId];
     /* one-shot migrate from legacy flat key into day/week key (today only) */
-    if (!dayIso || dayIso === DAY_ISO) {
+    if (!MUST_IDS[r.id] && (!dayIso || dayIso === DAY_ISO)) {
       var legacy = loadChecks();
       if (Object.prototype.hasOwnProperty.call(legacy, checkId)) {
         state[checkId] = !!legacy[checkId];
@@ -538,21 +587,24 @@
   }
 
   function setCheck(checkId, done, data, dayIso) {
-    var kidId = KID_FROM_CHECK[checkId];
+    var rc = resolveCheck(checkId), kidId = rc.kid;
+    if (rc.retired || (!kidId && MUST_IDS[rc.id])) return null; /* CHORELAW3: no write for a retired / kid-less id */
     var meta = kidId
       ? questMeta(kidId, checkId, data || (global.WardKids && global.WardKids._data))
-      : { cadence: "daily", stars: 1, optional: false };
+      : { cadence: "daily", stars: 0, optional: false };
     var before = kidId ? getBankView(kidId, data) : null;
     var was = before ? before.reached : false;
     var beforeGate = kidId ? mustSetComplete(kidId, data) : false;
 
     var key = checkKeyFor(checkId, data, dayIso);
     var state = loadKeyState(key);
-    state[checkId] = !!done;
+    if (rc.legacy && rc.legacy !== rc.id) delete state[rc.legacy];
+    state[rc.id] = !!done;
     saveKeyState(key, state);
+    checkId = rc.id;
     /* keep legacy blob in sync for old readers (today / weekly only) */
     try {
-      if (!dayIso || dayIso === DAY_ISO || meta.cadence === "weekly") {
+      if (!MUST_IDS[checkId] && (!dayIso || dayIso === DAY_ISO || meta.cadence === "weekly")) { /* a must id is never written to the shared flat key */
         var legacy = loadChecks();
         if (!!done) legacy[checkId] = true;
         else delete legacy[checkId];
@@ -621,12 +673,13 @@
   function questHTML(q, done, kidId, data) {
     var optional = !!(q.optional || q.cadence === "addon");
     var cadence = q.cadence || (optional ? "addon" : "daily");
-    var stars = optional ? 0 : (typeof q.stars === "number" ? q.stars : 1);
+    var stars = (optional || NO_STARS[kidId]) ? 0 : (typeof q.stars === "number" ? q.stars : 1); /* CHORELAW3: no stars on Ainsley's board */
     var weekPay = cadence === "daily" && !optional ? stars * dadWeekLen() : stars;
+    var cid = qid(kidId, q.id); /* kid-qualified tap id (must-* ids are shared by all three kids) */
     var dayCount = 0;
     var weekDone = false;
     if (cadence === "daily" && !optional) {
-      dayCount = dailyDoneCount(q.id, data);
+      dayCount = dailyDoneCount(cid, data);
       weekDone = dayCount >= weekDayIsos(DAY_ISO).length;
       done = weekDone;
     }
@@ -653,17 +706,17 @@
     var cadAttr = ' data-cadence="' + esc(cadence) + '"';
     var softClass = optional ? " addon soft" : "";
     var dailyClass = (cadence === "daily" && !optional) ? " daily-week" : "";
-    var starsAttr = ' data-stars="' + (cadence === "daily" && !optional ? weekPay : stars) + '"';
+    var starsAttr = NO_STARS[kidId] ? "" : ' data-stars="' + (cadence === "daily" && !optional ? weekPay : stars) + '"';
 
     if (cadence === "daily" && !optional) {
       var days = weekDayIsos(DAY_ISO);
       var taps = "";
       for (var di = 0; di < days.length; di++) {
         var iso = days[di];
-        var dayOn = getCheck(q.id, data, iso);
+        var dayOn = getCheck(cid, data, iso);
         var isToday = iso === DAY_ISO;
         var cls = "day-tap" + (dayOn ? " done" : "") + (isToday ? " is-today" : "");
-        taps += '<button type="button" class="' + cls + '" data-check="' + esc(q.id) + '" data-day-iso="' + esc(iso) +
+        taps += '<button type="button" class="' + cls + '" data-check="' + esc(cid) + '" data-day-iso="' + esc(iso) +
           '" data-kid-quest="1" data-cadence="daily"' + starsAttr +
           ' aria-label="' + DOW_LONG[dowIndexFromIso(iso)] + " · " + esc(q.what) + '" aria-pressed="' + (dayOn ? "true" : "false") + '">' +
           DOW_SHORT[dowIndexFromIso(iso)] + "</button>";
@@ -679,7 +732,7 @@
 
     var hintBlock = hint ? '<div class="hint">' + esc(hint) + "</div>" : "";
     return (
-      '<div class="quest ' + open + softClass + '" data-check="' + esc(q.id) + '" data-kid-quest="1"' + optAttr + hireAttr + cadAttr + starsAttr + ' role="button" tabindex="0">' +
+      '<div class="quest ' + open + softClass + '" data-check="' + esc(cid) + '" data-kid-quest="1"' + optAttr + hireAttr + cadAttr + starsAttr + ' role="button" tabindex="0">' +
       '<span class="ring">' + ring + "</span>" +
       '<div><div class="what">' + esc(q.what) + "</div>" + hintBlock + "</div>" +
       earn +
@@ -702,8 +755,8 @@
       var optional = !!(q.optional || q.cadence === "addon");
       var cadence = q.cadence || (optional ? "addon" : "daily");
       var done = cadence === "daily" && !optional
-        ? dailyWeekComplete(q.id, data)
-        : getCheck(q.id, data);
+        ? dailyWeekComplete(qid(kidId, q.id), data)
+        : getCheck(qid(kidId, q.id), data);
       return questHTML(q, done, kidId, data);
     }).join("");
   }
@@ -717,13 +770,20 @@
     Array.prototype.forEach.call(nodes, function (el) {
       if (el.classList.contains("day-tap")) return;
       if (el.querySelector(".quest-days")) return;
-      var id = el.getAttribute("data-check");
-      if (!id || !KID_FROM_CHECK[id]) return;
-      var kidId = KID_FROM_CHECK[id];
+      var id0 = el.getAttribute("data-check");
+      if (!id0) return;
+      var rc = resolveCheck(id0);
+      if (!rc.kid) return;
+      /* CHORELAW3: a retired old chore row (backpack, trash, shoes, ...) is hidden, never a dead tap;
+         an old row that matches a must is re-pointed at the kid's must (same storage as the wall) */
+      if (rc.retired) { el.hidden = true; el.setAttribute("data-chore-retired", ""); return; }
+      var kidId = rc.kid, id = qid(kidId, rc.id);
+      if (id !== id0) el.setAttribute("data-check", id);
       var meta = questMeta(kidId, id, data);
       el.setAttribute("data-cadence", meta.cadence);
       var nDays = dadWeekLen();
-      el.setAttribute("data-stars", String(meta.optional ? 0 : (meta.cadence === "daily" ? meta.stars * nDays : meta.stars)));
+      if (NO_STARS[kidId]) el.removeAttribute("data-stars");
+      else el.setAttribute("data-stars", String(meta.optional ? 0 : (meta.cadence === "daily" ? meta.stars * nDays : meta.stars)));
       if (meta.optional) {
         el.setAttribute("data-optional", "1");
         var earnOpt = el.querySelector(".star-earn");
@@ -763,7 +823,7 @@
         btn.setAttribute("data-day-iso", iso);
         btn.setAttribute("data-kid-quest", "1");
         btn.setAttribute("data-cadence", "daily");
-        btn.setAttribute("data-stars", String(weekPay));
+        if (!NO_STARS[kidId]) btn.setAttribute("data-stars", String(weekPay));
         btn.setAttribute("aria-label", DOW_LONG[dowIndexFromIso(iso)] + " · " + what);
         btn.setAttribute("aria-pressed", getCheck(id, data, iso) ? "true" : "false");
         btn.textContent = DOW_SHORT[dowIndexFromIso(iso)];
@@ -904,7 +964,7 @@
       }
     }
     var toward = Math.min(money, need);
-    return { active: true, placeholder: placeholder, name: name, need: need, toward: toward, met: toward >= need, unit: "★" };
+    return { active: true, placeholder: placeholder, name: name, need: need, toward: toward, met: toward >= need, unit: NO_STARS[kidId] ? "" : "★" };
   }
 
   function buildNoSurprise(kid, data) {
@@ -952,6 +1012,12 @@
 
   function renderBank(root, bank) {
     if (!root || !bank) return;
+    if (NO_STARS[bank.kidId]) { /* CHORELAW3: Ainsley's board has no star chips, counts or goal text */
+      root.querySelectorAll("[data-bank-today], [data-bank-life], [data-bank-week], [data-bank-meta], [data-bank-left], [data-bank-sym], [data-bank-unit], [data-bank-need], [data-bank-toward]").forEach(function (el) { el.textContent = ""; });
+      root.querySelectorAll(".bank-meta, [data-grow-meter]").forEach(function (el) { el.hidden = true; });
+      root.querySelectorAll("[data-payday-copy]").forEach(function (el) { el.textContent = "Friday drop · pick with Dad after honest musts"; });
+      return;
+    }
     var sym = bank.currency.symbol || "★";
     var plural = bank.currency.plural || "stars";
     root.querySelectorAll("[data-bank-today]").forEach(function (el) {
@@ -1103,20 +1169,21 @@
       else money = (Number(bank.balance) || 0) + (Number(bank.weekEarn) || 0);
     }
     if (need <= 0) {
-      return { active: false, placeholder: (gv && gv.placeholder) || "Add a save", name: "", need: 0, toward: 0, met: false, unit: "★" };
+      return { active: false, placeholder: (gv && gv.placeholder) || "Add a save", name: "", need: 0, toward: 0, met: false, unit: NO_STARS[kidId] ? "" : "★" };
     }
     var toward = Math.min(money, need);
-    return { active: true, placeholder: "", name: name, need: need, toward: toward, met: toward >= need, unit: "★", fallback: true };
+    return { active: true, placeholder: "", name: name, need: need, toward: toward, met: toward >= need, unit: NO_STARS[kidId] ? "" : "★", fallback: true };
   }
 
   var GROW_THEME = {
     harris: { cls: "grow-gems", token: "◆", label: "GROW · gems" },
     hayes: { cls: "grow-coins", token: "◎", label: "GROW · victory coins" },
-    ainsley: { cls: "grow-jar", token: "★", label: "GROW · stars" }
+    ainsley: { cls: "grow-jar", token: "", label: "" } /* CHORELAW3: no star token on Ainsley's board */
   };
 
   function renderGrow(root, kidId, data, bank) {
     if (!root || !bank) return;
+    if (NO_STARS[kidId]) { root.querySelectorAll("[data-grow-meter]").forEach(function (m) { m.hidden = true; }); return; } /* CHORELAW3 */
     var theme = GROW_THEME[kidId] || GROW_THEME.harris;
     var gv = growGoalView(kidId, data || (global.WardKids && global.WardKids._data), bank);
     var bal = bank.balance != null ? Number(bank.balance) || 0 : 0;
@@ -1281,7 +1348,7 @@
       // room reset quest as light status if present
       (kid.quests || []).forEach(function (q) {
         if (q.id === "ain-toys" || /room reset/i.test(q.what || "")) {
-          var done = getCheck(q.id);
+          var done = getCheck(qid(kidId, q.id));
           space.push({ when: "Room", what: done ? "Room reset · clear" : "Room reset · still open", hint: "your space · your pace", tone: done ? "fun" : "act" });
         }
       });
@@ -2073,6 +2140,10 @@
     CHECK_KEY: CHECK_KEY,
     BANK_KEY: BANK_KEY,
     KID_FROM_CHECK: KID_FROM_CHECK,
+    LEGACY_TO_MUST: LEGACY_TO_MUST,
+    MUST_IDS: MUST_IDS,
+    resolveCheck: resolveCheck,
+    qid: qid,
     checkKeyFor: checkKeyFor,
     weekStartIso: weekStartIso,
     weekDayIsos: weekDayIsos,
