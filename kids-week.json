@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 2 2026",
   "asOfIso": "2026-10-02",
-  "refreshedAt": "2026-10-02T13:14:52.646Z",
+  "refreshedAt": "2026-10-02T13:30:09.442Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -48,18 +48,6 @@
         "kind": "school",
         "whenLabel": "7:00",
         "summary": "Harris — SRE specials: Music"
-      },
-      {
-        "label": "Next up · today",
-        "time": "8:10",
-        "place": "Boys SRE drop",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Fri",
-        "startIso": "2026-10-02T13:10:00.000Z",
-        "endIso": "2026-10-02T13:40:00.000Z",
-        "kind": "school_drop",
-        "whenLabel": "8:10",
-        "summary": "Hayes + Harris — SRE drop-off · 8:25"
       },
       {
         "label": "Next up · today",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Mon 7:00",
         "summary": "Hayes — SRE specials: Spanish"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "7:00",
+        "place": "SRE spirit day: Hat Day (Peace Week)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-05T12:00:00.000Z",
+        "endIso": "2026-10-05T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Mon 7:00",
+        "summary": "Hayes + Harris — SRE spirit day: Hat Day (Peace Week)"
       }
     ]
   },
