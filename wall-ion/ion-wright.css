@@ -303,3 +303,9 @@ html body.wall-kiosk[data-plate][data-master="ion"] .seats.seat-tight-2 .kid-sea
 html body.wall-kiosk[data-plate][data-master="ion"] .seats.seat-tight-2 .kid-seat:has(> .trusted) { display: flex; flex-direction: row; align-items: stretch; gap: 8px; }
 html body.wall-kiosk[data-plate][data-master="ion"] .seats.seat-tight-2 .kid-seat > .trusted { flex: 1 1 auto; min-width: 0; }
 html body.wall-kiosk[data-plate][data-master="ion"] .seats.seat-tight-2 .kid-seat > .hire { flex: 0 1 auto; min-width: 0; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .row1:not(:has(> .next:not([hidden]))) > .timer { flex: 1 1 auto; display: flex; flex-direction: row; align-items: center; gap: 18px; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .row1:not(:has(> .next:not([hidden]))) > .timer > .ah, html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .row1:not(:has(> .next:not([hidden]))) > .timer > .trow { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 10px; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .row1:not(:has(> .next:not([hidden]))) > .timer .t-chips { flex: 1 1 auto; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .row1:not(:has(> .next:not([hidden]))) > .timer .t-chips > .chip { flex: 1 1 0; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .hdr .glance:has(#w-glance-c:empty) { align-items: center; text-align: center; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .hdr .glance:has(#w-glance-c:empty) .g-big { justify-content: center; }
