@@ -305,6 +305,11 @@
       return [e, ix > 0 && iy > 0 ? ix * iy : 0];
     }).filter(function (t) { return t[1] > 0; }).sort(function (a, b) { return b[1] - a[1]; }).map(function (t) { return t[0]; });
   }
+  /* a card that is mostly one picture (a plate, a photo) keeps its picture-over-label shape */
+  function pictureCard(e) {
+    var b = e.getBoundingClientRect(), a = b.width * b.height;
+    return Array.prototype.some.call(e.querySelectorAll("img, video, canvas"), function (m) { var r = m.getBoundingClientRect(); return a > 0 && r.width * r.height > 0.4 * a; });
+  }
   function denseOne(e) {
     e.style.zoom = ""; e.removeAttribute("data-ls-zoomed");
     if (e.clientHeight < 40 || e.clientWidth < 80) return;
@@ -323,7 +328,7 @@
   function spreadOut(panel) {
     var done = new Set();
     for (var it = 0; it < 24 && api.dead > 0.018; it++) {
-      var r = api.rect, cands = hits(panel, r).filter(function (e) { return !done.has(e); }).slice(0, 2), moved = false;
+      var r = api.rect, cands = hits(panel, r).filter(function (e) { return !done.has(e) && !pictureCard(e); }).slice(0, 2), moved = false;
       for (var ci = 0; ci < cands.length && !moved; ci++) {
         var e = cands[ci], z0 = e.style.zoom, zat = e.getAttribute("data-ls-zoomed"), sp0 = e.getAttribute("data-ls-spread");
         var steps = sp0 === "row" ? [] : sp0 === "mid" ? ["row"] : sp0 === "even" ? ["mid", "row"] : ["even", "mid", "row"];
@@ -390,7 +395,7 @@
     /* DENSE1 (SPACE-01, Atlas 10/2): every card then takes the largest type scale whose words still fit its own box,
        so a card's words reach across its room instead of leaving a dead band beside them */
     best.all.forEach(function (e) {
-      if (e.hasAttribute("data-ls-zoomed") || (e.matches(LEAD) && !e.matches(".hot-banner")) || e.hasAttribute("data-ls-nodense")) return;
+      if (e.hasAttribute("data-ls-zoomed") || (e.matches(LEAD) && !e.matches(".hot-banner")) || e.hasAttribute("data-ls-nodense") || pictureCard(e)) return;
       if (e.clientHeight < 40 || e.clientWidth < 80) return;
       for (var q = DENSE_MAX; q > 1.05; q = q / 1.06) {
         e.style.zoom = String(q);
@@ -453,6 +458,7 @@
     return out;
   }
   var api = { apply: apply, active: function () { return document.documentElement.hasAttribute("data-landscape"); }, isLandscape: isLandscape };
+  api.pictureCard = function (e) { return pictureCard(e); };
   api.why = function (e, q) { var z0 = e.style.zoom; e.style.zoom = String(q); var r = [e.scrollHeight <= e.clientHeight + 1, e.scrollWidth <= e.clientWidth + 1, fitsIn(e), innerOk(e)]; e.style.zoom = z0; return r; };
   api.fitsIn = function (e) { return fitsIn(e); }; api.innerOk = function (e) { return innerOk(e); };
   g.HouseLandscape = api;

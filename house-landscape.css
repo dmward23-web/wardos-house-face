@@ -129,3 +129,7 @@ html[data-landscape] .panel:not(#ls-off) .cam-zone > .cam-grid > .cam:nth-child(
 html[data-landscape] .panel:not(#ls-off) .cam-zone > .cam-grid > .cam:nth-child(3n+2):last-child { grid-column: span 3 !important; }
 html[data-landscape] .panel:not(#ls-off) .cam-zone > .cam-grid > .cam:nth-child(3n+1):last-child:not(:first-child) { grid-column: 1 / -1 !important; }
 html[data-landscape] .panel:not(#ls-off) #sensi-hero .climate-amb .big { padding-top: 0.14em; }
+/* SPACE-01 · gallery-hero: the plate cards sit tight in landscape (picture to the card edge), so no empty band
+   runs down the gutters between the columns of plates */
+html[data-landscape] .panel:not(#ls-off)#hero-board a.card { padding: 1px 1px 0 !important; gap: 1px !important; }
+html[data-landscape] .panel:not(#ls-off)#hero-board a.card .card-label { padding: 0 3px !important; font-size: 18px !important; }
