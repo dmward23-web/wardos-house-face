@@ -284,11 +284,11 @@
           "tone": "fun"
         }
       ],
-      "streakLabel": "🔥 3-day craft streak — keep smashing",
+      "streakLabel": "Week 3 · craft — keep smashing",
       "missions": [
         {
           "when": "Anytime",
-          "what": "🔥 ALL musts clear = gems",
+          "what": "ALL musts clear = gems",
           "hint": "ALL musts clear",
           "tone": "fun"
         },
@@ -520,7 +520,7 @@
           "tone": "fun"
         }
       ],
-      "streakLabel": "🔥 6-day fire streak — don't break it",
+      "streakLabel": "Week 6 — don't break it",
       "missions": [
         {
           "when": "Every clear",
@@ -741,7 +741,7 @@
         }
       ],
       "fun": [],
-      "streakLabel": "◆ 4-day streak — hold the line",
+      "streakLabel": "Week 4 — hold the line",
       "missions": [
         {
           "when": "Weekly",

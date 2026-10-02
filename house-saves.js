@@ -174,7 +174,7 @@
     } else {
       rows = items.map(function (it) {
         var meta = it.need > 0
-          ? ("$" + Math.min(toward, it.need) + "/$" + it.need)
+          ? (Math.min(toward, it.need) + "/" + it.need + " ★") /* KIDPATH2: no $ on kid paths */
           : "★ later";
         return (
           '<div class="saves-list-row" data-save-id="' + esc(it.id) + '">' +
@@ -232,7 +232,7 @@
       label = "Saves · tap + to add";
     } else if (item.need > 0) {
       var banked = Math.min(toward, item.need);
-      label = "Saves · " + shortName(item.name, 20) + "  $" + banked + "/$" + item.need;
+      label = "Saves · " + shortName(item.name, 20) + "  " + banked + "/" + item.need + " ★";
       pct = Math.max(0, Math.min(100, Math.round((banked / item.need) * 100)));
     } else {
       label = "Saves · " + shortName(item.name, 24) + "  ★";
@@ -291,10 +291,10 @@
           el.textContent = "Add a save";
           el.classList.add("is-empty");
         } else if (gv.met) {
-          el.textContent = "Goal met · " + gv.name + " ($" + gv.need + ")";
+          el.textContent = "Goal met · " + gv.name;
           el.classList.add("is-met", "is-active");
         } else {
-          el.textContent = gv.name + " · $" + (gv.toward || 0) + "/$" + gv.need;
+          el.textContent = gv.name + " · " + (gv.toward || 0) + "/" + gv.need + " ★";
           el.classList.add("is-active");
         }
       });

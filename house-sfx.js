@@ -413,13 +413,13 @@
   }
   function currencyLabel(el) {
     var n = dollarsFor(el);
-    if (n <= 0) return "hire · not jar";
+    if (n <= 0) return "hire";
     var t = theme();
-    var cash = "+$" + n;
+    var cash = "+" + n; /* KIDPATH2: star count, no $ */
     if (t === "harris") return cash + " ◆";
     if (t === "hayes") return cash + " ◎";
     if (t === "ainsley") return cash + " ★";
-    return cash;
+    return cash + " ★";
   }
 
   function floatDollar(el, dollars) {
@@ -428,7 +428,7 @@
     var r = el && el.getBoundingClientRect ? el.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 0, height: 0 };
     var pop = document.createElement("div");
     pop.className = "vfx-float vfx-dollar vfx-" + theme();
-    pop.textContent = "+$" + (dollars == null ? 1 : dollars);
+    pop.textContent = "+" + (dollars == null ? 1 : dollars) + " ★"; /* KIDPATH2: no $ */
     pop.style.left = (r.left + r.width / 2) + "px";
     pop.style.top = (r.top + 8) + "px";
     layer.appendChild(pop);

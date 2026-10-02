@@ -149,9 +149,7 @@
         }
         if (earn && !earn.classList.contains("addon-tag")) {
           var n = earn.getAttribute("data-stars") || "1";
-          var prefix = (earn.textContent || "").indexOf("$") >= 0 ? "$" : "★ ";
-          if (prefix === "$") earn.textContent = done ? "+$" + n : "$" + n;
-          else earn.textContent = done ? "★ +" + n : "★ " + n;
+          earn.textContent = done ? "★ +" + n : "★ " + n; /* KIDPATH2: stars only, never $ */
         }
       }
       var ring = ringEl(el);

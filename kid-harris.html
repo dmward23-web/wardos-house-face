@@ -684,7 +684,7 @@ body.theme-harris #sec-musts, body.theme-harris #sec-jar, body.theme-harris #sec
   <nav class="session-rail jump-rail" aria-label="Jump">
  <img src="theme-tiles/harris-session-rail-pills.svg?v=GLYPH-RAIL2" alt="" width="720" height="88" decoding="async" />
  <a class="row live jump-pill" href="#sec-musts" aria-label="Musts"></a>
- <a class="row stub jump-pill" href="#sec-jar" aria-label="Jar"></a>
+ <a class="row stub jump-pill" href="#sec-jar" aria-label="Goal"></a>
  <a class="row stub jump-pill" href="#sec-days" aria-label="Days"></a>
  </nav>
 <div class="xp-row" aria-label="Progress">
@@ -710,10 +710,10 @@ body.theme-harris #sec-musts, body.theme-harris #sec-jar, body.theme-harris #sec
  <div class="sec-hdr"><div class="sec-title">Musts</div></div>
  <div class="sec-list" data-mount-quests></div>
  </section>
- <section class="sec sec-bank bank-card" id="sec-jar" aria-label="Gem Jar">
+ <section class="sec sec-bank bank-card" id="sec-jar" aria-label="Gems">
  <div class="bank-top">
  <div>
- <div class="bank-title">Gem Jar</div>
+ <div class="bank-title">Gems</div>
  </div>
  <div class="bank-count"><span data-bank-symbol>◆</span> <span data-bank-life>0</span></div>
  </div>
@@ -727,20 +727,17 @@ body.theme-harris #sec-musts, body.theme-harris #sec-jar, body.theme-harris #sec
  <div class="grow-pct" data-grow-pct>0%</div>
  </div>
  <div class="grow-readout">
- <div class="grow-jar-name" data-grow-jar-name>Gem Jar</div>
- <div class="grow-total">$<span data-grow-total>0</span> / $<span data-grow-save-need>0</span></div>
+ <div class="grow-jar-name" data-grow-jar-name>Gems</div>
+ <div class="grow-total"><span data-grow-total>0</span> / <span data-grow-save-need>0</span> ★</div>
  </div>
  </button>
- <div class="money-row" aria-label="Money">
- <div class="money-chip"><span class="lab">Bal</span> $<span data-bank-balance>0</span></div>
- <div class="money-chip"><span class="lab">Week</span> +$<span data-bank-week-earn>0</span></div>
- </div>
+ <!-- KIDPATH2: balance + week money chips removed (no $ on kid paths) -->
 
  <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
  <div class="bank-meta"><span data-bank-meta></span><span class="bank-meta-sep" aria-hidden="true">·</span><span class="bank-meta-today">Today <span data-bank-today>0</span></span></div>
  <div class="bank-links">
- <a class="primary-foil" href="sheet-allowance.html">Jar →</a>
- <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">Jar full · show Dad</a>
+ <a class="primary-foil" href="sheet-allowance.html">Goal →</a>
+ <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">Goal met · show Dad</a>
  <button type="button" class="got-it" data-got-it hidden>Paid</button>
  <div class="paid-stamp" data-paid-stamp hidden>Paid</div>
  </div>
@@ -770,14 +767,14 @@ body.theme-harris #sec-musts, body.theme-harris #sec-jar, body.theme-harris #sec
  <div class="hotbar-slot" data-hot="6"><div class="gem" style="background:#a064dc"></div><span class="n">7</span></div>
  <div class="hotbar-slot" data-hot="7"><div class="gem" style="background:#f0f0f0"></div><span class="n">8</span></div>
  <div class="hotbar-slot" data-hot="8"><div class="gem" style="background:#3a3a3a"></div><span class="n">9</span></div>
- <div class="hotbar-note">daily musts → week gems → jar</div>
+ <div class="hotbar-note">daily musts → week gems → goal</div>
  </a>
  <footer class="ftr">
  <div class="ftr-left" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
  <span>YOUR board · smash mode</span>
  
  
- <a class="ftr-chip" href="sheet-allowance.html">Jar</a>
+ <a class="ftr-chip" href="sheet-allowance.html">Stars</a>
  </div>
  </footer>
 </div>
@@ -819,7 +816,7 @@ document.addEventListener("DOMContentLoaded", function(){
  var after = bal + weekEarn;
  var def = String(weekEarn);
  var paidStr = window.prompt(
- "Dad paid how many $?\nThis week earn $" + weekEarn + " → balance becomes $" + after + " − paid.\n0 = keep all as carry into next week.",
+ "Dad paid how much?\nThis week earn " + weekEarn + " → carry becomes " + after + " − paid.\n0 = keep all as carry into next week.",
  def
  );
  if (paidStr == null) return;

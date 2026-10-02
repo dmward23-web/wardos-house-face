@@ -1,13 +1,14 @@
 // KIDPATH1 · scripts/wall/kid-path-copy.mjs · branch wall-redesign-1 (Wright).
 // Pulls the words a kid can SEE out of a kid-path file and lists the banned ones (Alfred KL-05 / Dan rulings Oct 1):
-// no $ except Ainsley's one babysit tag "$15/hr", no jar, no XP, no Bal, no "Show me the Money", no Mom wording.
+// no $ except Ainsley's one babysit tag "$15/hr", no jar, no XP, no Bal, no "Show me the Money", no Mom wording, no streak / 🔥 (KIDPATH2: plain 'Week' wording).
 // Visible copy = HTML text + aria-label/title/placeholder/alt, plus JS string literals (tags stripped) and JSON string values.
 // Code tokens (class names, selectors, storage keys, ids) are not copy and are skipped.
 // CLI: node scripts/wall/kid-path-copy.mjs [files...]  -> prints hits, exit 1 if any.
 import fs from "node:fs";
 
-export const KID_PATH_FILES = ["house-kid-engage.js", "sheet-index.html", "kid-ainsley.html", "kids-data.js", "kids-week.json",
-  "sheet-chores.html", "sheet-allowance.html", "sheet-pack.html", "sheet-win.html"];
+export const KID_PATH_FILES = ["house-kid-engage.js", "sheet-index.html", "kid-ainsley.html", "kid-hayes.html", "kid-harris.html", "kids-data.js", "kids-week.json",
+  "sheet-chores.html", "sheet-allowance.html", "sheet-pack.html", "sheet-win.html", "sheet-countdowns.html", "sheet-today.html",
+  "house-saves.js", "house-sfx.js", "house-checkoffs.js"];
 export const ALLOWED_TAG = "$15/hr";
 export const BANNED = [
   ["$", (s) => s.split(ALLOWED_TAG).join("").includes("$")],
@@ -16,15 +17,18 @@ export const BANNED = [
   ["Bal", (s) => /\bBal\b/.test(s)],
   ["Show me the Money", (s) => /show me the money/i.test(s)],
   ["Mom", (s) => /\bmoms?\b|\bmommy\b|\bmom['’]s\b/i.test(s)],
+  ["streak", (s) => /streak/i.test(s)],
+  ["\u{1F525}", (s) => /\u{1F525}/u.test(s)],
 ];
 const ent = (s) => s.replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&#39;|&apos;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#36;/g, "$");
 /** string looks like code, not copy: no whitespace, no $, and (has - _ [ ] # . : / = or is all lowercase/digits) */
 export function codeToken(s) {
   const x = s.trim();
   if (!x) return true;
-  if (/\s/.test(x)) return false;
   if (x.includes("$")) return false; /* a $ string is always copy: "$5/hr" must not hide as a token */
-  return /[-_[\]#.:/=]/.test(x) || /^[a-z0-9]+$/.test(x);
+  if (x.split(/\s*,\s*/).every((part) => part.split(/\s+/).every((w) => /^[.#[][\w\-[\]="'.#:]*$/.test(w)))) return true; /* CSS selector list */
+  if (/\s/.test(x)) return false;
+  return /[-_[\]#.:/=]/.test(x) || /^[a-z0-9]+$/.test(x) || /^[a-z]+(?:[A-Z][a-z0-9]*)+$/.test(x); /* camelCase = a key/identifier (streakLabel) */
 }
 /** JS string literals (and template text) in source order, comments skipped. Heuristic regex-literal skip. */
 export function jsStrings(src) {

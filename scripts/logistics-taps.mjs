@@ -8,8 +8,11 @@ import { fileURLToPath } from "node:url";
 import { readJson, writeJson, scanObject } from "./house/lib.mjs";
 import { logisticsFile } from "./house/logistics-lib.mjs";
 import { momHits } from "./house/display-rename.mjs";
+import { cliGuard } from "./house/cli-guard.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const USAGE = "Usage: node scripts/logistics-taps.mjs [--state <local export {taps:[…]}>] [--now ISO] [--out data/logistics-taps.json] [--stdout] [--help|-h]\n  Writes data/logistics-taps.json (or --out) unless --stdout. --help prints this and writes nothing.";
+cliGuard(process.argv, { usage: USAGE, flags: { "--state": true, "--now": true, "--out": true, "--stdout": false } }); /* CLIGUARD1: before any read/write */
 const a = { state: null, now: null, out: path.join(ROOT, "data/logistics-taps.json"), stdout: false };
 for (let i = 2; i < process.argv.length; i++) {
   const k = process.argv[i], v = process.argv[i + 1];

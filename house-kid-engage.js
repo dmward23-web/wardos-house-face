@@ -494,7 +494,7 @@
           : "Musts clear") + /* KIDPATH1: no jar, no $ */
         "</div>";
       html += '<div class="kf-streak streak-sparks" data-streak>' +
-        (streak > 0 ? ("🔥 " + streak + "-day streak") : "🔥 Streak · tap musts") +
+        (streak > 0 ? ("Week " + streak) : "Week · tap musts") + /* KIDPATH2: plain Week wording */
         "</div>";
       html += "</div>";
       return html;
@@ -566,7 +566,7 @@
     var tp = todayMustProgress(kidId);
     if (streakEl) {
       streakEl.textContent = streak > 0
-        ? ("🔥 " + streak + "d · " + tp.done + "/" + tp.need)
+        ? ("Week " + streak + " · " + tp.done + "/" + tp.need)
         : ("Musts " + tp.done + "/" + tp.need); /* KIDPATH1: no XP */
     }
     if (sub) {
@@ -869,7 +869,7 @@
     var go = host.querySelector("[data-hq-go]");
     if (title) title.textContent = accent.name + " · musts";
     if (musts) musts.textContent = tp.need ? (tp.done + "/" + tp.need) : "—";
-    if (streakEl) streakEl.textContent = streak > 0 ? ("🔥 " + streak + "-day streak") : "🔥 Start streak";
+    if (streakEl) streakEl.textContent = streak > 0 ? ("Week " + streak) : "Week · tap musts"; /* KIDPATH2 */
     if (go) {
       go.setAttribute("href", HREF[kidId]);
       go.textContent = "CLAIM · " + accent.name.toUpperCase();
@@ -991,8 +991,8 @@
       label.classList.add("streak-sparks");
       label.setAttribute("data-streak", "1");
       label.textContent = streak > 0
-        ? ("🔥 " + streak + "-day streak · today " + tp.done + "/" + tp.need)
-        : ("🔥 Start streak · today " + tp.done + "/" + tp.need);
+        ? ("Week " + streak + " · today " + tp.done + "/" + tp.need)
+        : ("Week · today " + tp.done + "/" + tp.need); /* KIDPATH2 */
     }
     var glass = document.querySelector("[data-xp-glass]");
     if (!glass) {
