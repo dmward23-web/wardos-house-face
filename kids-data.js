@@ -1,6 +1,9 @@
 /* House face · kids shared data + bank · kids-safe · localStorage only */
 (function (global) {
   "use strict";
+  /* HAYESJ1: kid names in titles go through the one shared matcher (house-kid-match.js): Hayes Johnson is not our Hayes */
+  var KM = global.HouseKidMatch || (typeof require === "function" ? require("./house-kid-match.js") : null);
+  function notOurs(s) { return KM ? KM.strip(s) : String(s == null ? "" : s); }
 
   var DAY_ISO = (function () {
     try {
@@ -1574,11 +1577,11 @@
     var out = [];
     for (var i = 0; i < q.length; i++) {
       var item = q[i];
-      var blob = ((item.summary || "") + " " + (item.place || "")).toLowerCase();
+      var blob = notOurs((item.summary || "") + " " + (item.place || "")).toLowerCase();
       var mine = false;
-      if (kidId === "hayes") mine = /hayes/.test(blob) || (/boys|sre/.test(blob) && !/ainsley|harris flag|harris —/.test(blob));
-      else if (kidId === "harris") mine = /harris/.test(blob) || (/boys|sre/.test(blob) && !/ainsley|hayes baseball|hayes flag|hayes —|madi/.test(blob));
-      else if (kidId === "ainsley") mine = /ainsley/.test(blob);
+      if (kidId === "hayes") mine = /\bhayes\b/.test(blob) || (/boys|sre/.test(blob) && !/ainsley|harris flag|harris —/.test(blob));
+      else if (kidId === "harris") mine = /\bharris\b/.test(blob) || (/boys|sre/.test(blob) && !/ainsley|hayes baseball|hayes flag|hayes —|madi/.test(blob));
+      else if (kidId === "ainsley") mine = /\bainsley\b/.test(blob);
       /* shared boys SRE counts for both */
       if ((kidId === "hayes" || kidId === "harris") && /hayes \+ harris|boys sre|sre (drop|pickup|hearing)/i.test(blob)) mine = true;
       if (kidId === "hayes" && /madi|provider collab/i.test(blob)) mine = true;
@@ -2177,6 +2180,7 @@
     renderHarborStrips: renderHarborStrips,
     renderKidPage: renderKidPage,
     renderConsumeSchedule: renderConsumeSchedule,
+    consumeQueueForKid: consumeQueueForKid, /* HAYESJ1 test hook: which queue items are this kid's NEXT UP */
     nextPaydayInfo: nextPaydayInfo,
     resetJarCycle: resetJarCycle,
     settlePriorWeeksIntoBalance: settlePriorWeeksIntoBalance,

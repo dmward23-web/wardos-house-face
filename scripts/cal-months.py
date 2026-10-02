@@ -81,9 +81,14 @@ FLIGHT = re.compile(r"✈|\bWN\d|#[A-Z0-9]{6}|DRIVE\b", re.I)
 LOW = re.compile(r"specials|drop-off|pickup|spirit day", re.I)
 HAS_TIME = re.compile(r"\b\d{1,2}:\d{2}")
 
+# HAYESJ1: the one kid-name matcher lives in house-kid-match.js; its KIDNAMES block is plain JSON
+_KM = json.loads(re.search(r"/\*KIDNAMES\*/(.*?)/\*END\*/", open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "house-kid-match.js"), encoding="utf-8").read(), re.S).group(1))
+_NOT_OURS = re.compile(r"\b(?:" + "|".join(_KM["notOurs"]) + r")(?![A-Za-z])", re.I)
+_SHORT = {"ainsley": "ain", "hayes": "hay", "harris": "har"}
+
 def kid(summ):
-    s = re.sub(r"Hayes Johnson|Johnson Kids", "", summ)
-    names = [k for k, rx in (("ain", r"\bAinsley\b"), ("hay", r"\bHayes\b"), ("har", r"\bHarris\b")) if re.search(rx, s)]
+    s = _NOT_OURS.sub(" ", summ)
+    names = [_SHORT[k["id"]] for k in sorted(_KM["kids"], key=lambda k: ["ainsley", "hayes", "harris"].index(k["id"])) if re.search(r"\b" + k["name"] + r"\b", s, re.I)]
     if len(names) > 1 or re.match(r"^(Kids|Ward Kids)\b", s): return "shr"
     return names[0] if names else None
 

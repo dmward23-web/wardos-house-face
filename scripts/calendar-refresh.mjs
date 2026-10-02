@@ -26,6 +26,8 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { displayDeep } from "./house/display-rename.mjs"; /* ATLASLANE6 display-only renames, never the calendar */
 import { kidCopyDeep } from "./house/kid-copy.mjs"; /* ATLASLANE7 no $ / jar / payday / balance copy (Ainsley's rate tag stays) */
+import { createRequire as kmRequire } from "node:module";
+const KidMatch = kmRequire(import.meta.url)("../house-kid-match.js"); /* HAYESJ1 shared kid matcher */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -153,7 +155,8 @@ function isAdminNoise(summary) {
   return /^(GET\s*·|Atlas:)/i.test(summary);
 }
 
-function kidMentions(summary) {
+export function kidMentions(summary) {
+  summary = KidMatch.strip(summary); /* HAYESJ1: "Hayes Johnson's birthday dinner" is not our Hayes */
   const s = summary.toLowerCase();
   /* SCHOOL2: "Ward Kids [AHH No School]" → A = Ainsley, HH = Hayes + Harris */
   const ns = /Ward Kids \[([AH]+) No School\]/i.exec(summary);
@@ -167,9 +170,10 @@ function kidMentions(summary) {
   };
 }
 
-function classify(ev) {
+export function classify(ev) {
   const summary = summaryOf(ev);
   if (!summary || isAdminNoise(summary)) return null;
+  const kids = kidMentions(summary); /* HAYESJ1: kid tags only from the shared matcher (never Hayes Johnson) */
   if (/^Kids with Dan/i.test(summary)) return { kind: "custody", summary };
   if (/^Leave\s*·/i.test(summary) || /^Leave\b/i.test(summary)) {
     return { kind: "leave", summary, busy: !isFree(ev) };
@@ -187,19 +191,19 @@ function classify(ev) {
     return { kind: "school", summary };
   }
   if (/swim|Swim|Coach Ann/i.test(summary)) return { kind: "sport", sport: "swim", summary, kid: "ainsley" };
-  if (/baseball|BASEBALL|Falcons/i.test(summary) && /hayes/i.test(summary)) {
+  if (/baseball|BASEBALL|Falcons/i.test(summary) && kids.hayes) {
     return { kind: "sport", sport: "baseball", summary, kid: "hayes" };
   }
-  if (/flag/i.test(summary) && /harris/i.test(summary)) {
+  if (/flag/i.test(summary) && kids.harris) {
     return { kind: "sport", sport: "flag", summary, kid: "harris" };
   }
-  if (/flag/i.test(summary) && /hayes/i.test(summary)) {
+  if (/flag/i.test(summary) && kids.hayes) {
     return { kind: "sport", sport: "flag", summary, kid: "hayes" };
   }
-  if (/^Ainsley\b.*\b(appointment|appt)\b/i.test(summary)) {
+  if (kids.ainsley && /^Ainsley\b.*\b(appointment|appt)\b/i.test(summary)) {
     return { kind: "appointment", summary, kid: "ainsley" };
   }
-  if (/vanity|Jessy/i.test(summary) && /ainsley/i.test(summary)) {
+  if (/vanity|Jessy/i.test(summary) && kids.ainsley) {
     return { kind: "appointment", summary, kid: "ainsley", herSpace: true };
   }
   if (/DRIVE\s*→\s*Nashville|Dan DRIVE/i.test(summary)) {
@@ -211,14 +215,13 @@ function classify(ev) {
       return { kind: "dad", summary, busy: !isFree(ev) };
     }
   }
-  if (/pack late-lunch|snacks/i.test(summary) && /hayes/i.test(summary)) {
+  if (/pack late-lunch|snacks/i.test(summary) && kids.hayes) {
     return { kind: "school", summary, kid: "hayes" };
   }
   if (/Madi|provider collab/i.test(summary)) {
     return { kind: "school", summary, kid: "hayes" };
   }
   // Fallback: kid-named timed events land on boards
-  const kids = kidMentions(summary);
   if (kids.ainsley || kids.hayes || kids.harris) {
     return { kind: "other", summary, kids };
   }
@@ -874,4 +877,5 @@ function main() {
   }
 }
 
-main();
+/* HAYESJ1: importable for tests (kidMentions); runs only as a script */
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

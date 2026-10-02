@@ -5,6 +5,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { renameText } from "./display-rename.mjs";
+import { createRequire } from "node:module";
+/* HAYESJ1: the one kid-name matcher (house-kid-match.js, shared with the boards and cal-months.py) */
+export const KidMatch = createRequire(import.meta.url)("../../house-kid-match.js");
 
 export const TZ = "America/Chicago";
 
@@ -418,14 +421,8 @@ export function leaveByMs(e, timeMs) {
 
 /* ---------- kid mentions ---------- */
 export function kidsIn(text) {
-  const s = String(text || "").replace(/\bHayes Johnson\b/gi, " ").replace(/\bJohnson Kids\b/gi, " ");
-  const found = [];
-  for (const k of KIDS) {
-    const m = new RegExp(`\\b${k.name}\\b`, "i").exec(s);
-    if (m) found.push({ id: k.id, name: k.name, at: m.index });
-  }
-  if (!found.length && /\bboys\b/i.test(s)) {
-    found.push({ id: "hayes", name: "Hayes", at: 0 }, { id: "harris", name: "Harris", at: 1 });
-  }
-  return found.sort((a, b) => a.at - b.at).map(({ id, name }) => ({ id, name }));
+  const s = KidMatch.strip(text); /* HAYESJ1: Hayes Johnson, Johnson Kids are not ours */
+  const found = KidMatch.kidsIn(s);
+  if (!found.length && /\bboys\b/i.test(s)) return [{ id: "hayes", name: "Hayes" }, { id: "harris", name: "Harris" }];
+  return found;
 }
