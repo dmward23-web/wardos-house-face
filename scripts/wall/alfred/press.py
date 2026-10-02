@@ -3,8 +3,9 @@ Usage: python3 scripts/wall/alfred/press.py <worktree> <outdir>
 PRESS-01 (Alfred, independent): enumerate every visible tappable / tappable-looking thing on wall.html and press each one.
 Read-only: GET only, local host only (external requests aborted), fresh browser context per press.
 PREVIEW-USE (CLIP1 10/2, defaults off): PRESS_ALLOW=<regex> also lets GETs to matching outside URLs through (the preview's
-live data); PRESS_LOUD=1 also fails a press that puts anything loud on the face (an error / failed / refused / try again /
-offline / read-only line, a role=alert box) and records the writes the preview guard refused (window.__previewBlocked)."""
+live data); PRESS_LOUD=1 also fails a press that puts anything loud on the face (an error / failed / refused / denied /
+try again / could not line, undefined / NaN / null, a role=alert box), records the writes the preview guard refused
+(window.__previewBlocked), and notes (never fails) the quiet setup states a keyless preview shows (NEED KEY, read only, offline)."""
 import json, re, sys, csv, socket, subprocess, time
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -79,15 +80,17 @@ import os
 import datetime
 ALLOW = re.compile(os.environ["PRESS_ALLOW"]) if os.environ.get("PRESS_ALLOW") else None
 LOUD_ON = os.environ.get("PRESS_LOUD") == "1"
-LOUD = r"""() => { const RX = /\b(error|errors|failed|failure|couldn.?t|could not|can.?t (save|reach|connect|load)|not saved|refused|denied|try again|offline|unauthori[sz]ed|forbidden|read.only|need key|need token|undefined|NaN)\b|\bnull\b/i;
+LOUD = r"""() => { const RX = /\b(error|errors|failed|failure|couldn.?t|could not|can.?t (save|reach|connect|load)|not saved|refused|denied|try again|unauthori[sz]ed|forbidden|undefined|NaN)\b|\bnull\b/i;
+  const NOTE = /\b(need key|need token|read.only|offline)\b/i;
   const vis = e => { const r = e.getBoundingClientRect(); if (r.width < 2 || r.height < 2 || r.bottom <= 0 || r.top >= innerHeight) return false;
     for (let a = e; a; a = a.parentElement) { const c = getComputedStyle(a); if (c.display === 'none' || c.visibility === 'hidden' || +c.opacity < 0.05 || a.hidden) return false; } return true; };
-  const out = [];
+  const out = [], notes = [];
   for (const e of document.querySelectorAll('body *')) { if (e.closest('script,style,template,noscript,svg,#pv-chip')) continue;
     const own = [...e.childNodes].filter(n => n.nodeType === 3).map(n => n.nodeValue).join(' ').replace(/\s+/g, ' ').trim();
     const alert = /^(alert|alertdialog)$/.test(e.getAttribute('role') || '');
-    if ((alert && (e.innerText || '').trim()) || (own && RX.test(own))) { if (vis(e)) out.push((alert ? 'alert: ' : '') + (alert ? e.innerText : own).replace(/\s+/g, ' ').trim().slice(0, 70)); } }
-  return { loud: [...new Set(out)], blocked: (window.__previewBlocked || []).length }; }"""
+    if ((alert && (e.innerText || '').trim()) || (own && RX.test(own))) { if (vis(e)) out.push((alert ? 'alert: ' : '') + (alert ? e.innerText : own).replace(/\s+/g, ' ').trim().slice(0, 70)); }
+    else if (own && NOTE.test(own) && vis(e)) notes.push(own.replace(/\s+/g, ' ').trim().slice(0, 70)); }
+  return { loud: [...new Set(out)], notes: [...new Set(notes)], blocked: (window.__previewBlocked || []).length }; }"""
 CLOCK = os.environ.get("PRESS_CLOCK") or datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-5))).replace(microsecond=0).isoformat()
 print("clock", CLOCK, "real data" if not os.environ.get("PRESS_FX") else "FIXTURE (does not count)", flush=True); FXMAP = json.loads(os.environ.get("PRESS_FX") or "{}")
 rows = []
@@ -152,7 +155,8 @@ with sync_playwright() as p:
                 except Exception as e: l1 = {"loud": ["(could not read: " + str(e)[:60] + ")"], "blocked": 0}
                 l2 = pg.evaluate(LOUD) if target is not pg else l1
                 fresh = [t for t in l1["loud"] if target is not pg or url.split("#")[0] != WALL or t not in loud0["loud"]]
-                actual += f" | refused writes {l2['blocked']}" + (f" | LOUD {fresh[:2]}" if fresh else " | quiet")
+                nts = [t for t in l1.get("notes", []) if target is not pg or url.split("#")[0] != WALL or t not in loud0.get("notes", [])]
+                actual += f" | refused writes {l2['blocked']}" + (f" | LOUD {fresh[:2]}" if fresh else " | quiet") + (f" | note {nts[:2]}" if nts else "")
                 if fresh: verdict = (verdict + "; " if verdict != "PASS" else "") + "FAIL loud: " + fresh[0]
             if errs: verdict = (verdict + "; " if verdict != "PASS" else "") + "FAIL JS error: " + errs[0]
             rows.append(dict(vp=f"{W}x{H}", element=c["text"] or c["aria"] or c["tag"], selector=c["sel"], kind=c["kind"] + (f" ({c['why']})" if c["why"] else ""), expected=exp, actual=actual, verdict=verdict))

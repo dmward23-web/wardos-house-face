@@ -244,4 +244,43 @@ t("roster device with a kid's name survives", () => {
 });
 t("typed (non-roster) name of a kid dropped", () => assert.deepEqual(S.openLoops([loop({ object: "Hayes room fan", text: "Hayes room fan broken" })], { now: NOW }), []));
 
+
+// KIDSAWAY1 · Dan's next days while the kids are away (cal-live items only)
+{
+  const AWNOW = Date.parse("2026-10-02T15:50:00-05:00");
+  const ev = (start, summary, extra = {}) => ({ id: summary, summary, start, end: start, busy: false, allDay: false, ...extra });
+  const cal = { upcomingLeaves: [
+    ev("2026-10-02T13:00:00-05:00", "Dan \u2014 garage-sale haul"),
+    ev("2026-10-03T00:00:00-05:00", "Dan Nashville [DRIVE Sat Oct 3]", { allDay: true }),
+    ev("2026-10-03T08:00:00-05:00", "Dan \u2014 load car \u00b7 haul + bags"),
+    ev("2026-10-03T13:00:00-05:00", "Harris flag \u2014 vs BV Gardner (home)"),
+    ev("2026-10-02T16:30:00-05:00", "Free \u00b7 Hayes \u2014 pack snacks"),
+    ev("2026-10-05T11:00:00-05:00", "Dan \u2014 cleaners \u2192 Atlas"),
+    ev("2026-10-05T11:15:00-05:00", "donation receipts \u2192 Ledger"), // routed to the money helper: money, dropped
+    ev("2026-10-05T11:15:00-05:00", "donation receipts \u2192 Ledger"),
+    ev("2026-10-05T11:30:00-05:00", "Phone consult: Joe Wilner, LPC"),
+    ev("2026-10-05T12:00:00-05:00", "Dan \u2014 get tree-trim bids"),
+    ev("2026-10-05T13:00:00-05:00", "Pay the $40 water bill"),
+    ev("2026-10-09T00:00:00-05:00", "Erin KC [drive w/ Dan Fri \u00b7 #A6GW5X Mon]", { allDay: true }),
+    ev("2026-10-09T14:40:00-05:00", "Kids \u2014 pickup at Kristin's \u00b7 3:00"),
+    ev("2026-10-10T09:00:00-05:00", "Dan \u2014 after the window"),
+  ] };
+  const clean = (t) => t.replace(/\s*\u2192\s*(Ledger|Atlas)\b/g, "");
+  const r = S.awayDays(cal, { now: AWNOW, until: "2026-10-09T15:00:00-05:00", clean });
+  t("away days: real items only, kid / money / private / past items dropped, window ends on the kids-back day", () => {
+    assert.deepEqual(r.map((d) => d.label), ["Sat Oct 3", "Mon Oct 5", "Fri Oct 9"]);
+    assert.deepEqual(r[0].items.map((i) => i.time + " " + i.text), ["All day Nashville \u00b7 DRIVE Sat Oct 3", "8:00 AM load car \u00b7 haul + bags"]);
+    assert.deepEqual(r[1].items.map((i) => i.text), ["cleaners"]);
+    assert.deepEqual(r[2].items.map((i) => i.text), ["Erin KC \u00b7 drive w/ Dan Fri \u00b7 Mon"]);
+  });
+  t("away days: keepKids keeps kid items (kids-home glance fallback)", () => {
+    const k = S.awayDays(cal, { now: AWNOW, keepKids: true, clean });
+    assert.ok(k[0].label === "Fri Oct 2" && k[0].items[0].text === "Hayes \u00b7 pack snacks");
+  });
+  t("away days: no feed or nothing left -> []", () => {
+    assert.deepEqual(S.awayDays(null, { now: AWNOW }), []);
+    assert.deepEqual(S.awayDays({ upcomingLeaves: [cal.upcomingLeaves[0]] }, { now: AWNOW }), []);
+  });
+}
+
 console.log(`house-wall-status: ${n} tests PASS`);
