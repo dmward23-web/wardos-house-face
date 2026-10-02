@@ -202,4 +202,37 @@ await t("WEEKLINK1: Week and Dad Seat open different pages; Week = existing hub 
   assert.ok(fs.existsSync(new URL(wk, root)), "Week target exists (not invented)");
   assert.match(read("index.html"), /WEEKGONE1[^>]*old Week links go to the House hub/);
 });
+await t("WALLKIT9: Hayes reward line is exactly Atlas's 'Goal with Dad after honest musts' (no Payday) in every copy + our fallback", () => {
+  const R = "Goal with Dad after honest musts";
+  const emb = JSON.parse(/var EMBEDDED = (\{[\s\S]*?\});/.exec(read("kids-data.js"))[1]);
+  for (const [name, w] of [["kids-week.json", JSON.parse(read("kids-week.json"))], ["data/kids-week.json", JSON.parse(read("data/kids-week.json"))], ["kids-data.js EMBEDDED", emb]]) {
+    assert.equal(w.kids.hayes.bankGoal.reward, R, name);
+    assert.doesNotMatch(String(w.kids.hayes.bankGoal.reward), /payday/i, name);
+  }
+  const kd = read("kids-data.js").replace(/var EMBEDDED = \{[\s\S]*?\};/, "");
+  assert.ok(kd.includes(`: "${R}";`), "data-payday-copy fallback (non-Ainsley) reads Atlas's string");
+  assert.ok(!kd.includes("Payday with Dad after honest musts"), "old Payday reward line gone");
+});
+await t("WALLKIT9: Ainsley has a seat, not a score: no streak/day count in her kids-week copy, engage seat or sheets (dropped, not relabeled)", async () => {
+  const { kidCopyText, kidCopyDeep } = await import(new URL("scripts/house/kid-copy.mjs", root).href);
+  const vals = (v, out = []) => { if (typeof v === "string") out.push(v); else if (Array.isArray(v)) v.forEach((x) => vals(x, out)); else if (v && typeof v === "object") Object.values(v).forEach((x) => vals(x, out)); return out; };
+  const COUNT = /\b\d+-day\b|streak|\u{1F525}|\bWeek \d+\b/iu;
+  const emb = JSON.parse(/var EMBEDDED = (\{[\s\S]*?\});/.exec(read("kids-data.js"))[1]);
+  for (const [name, w] of [["kids-week.json", JSON.parse(read("kids-week.json"))], ["data/kids-week.json", JSON.parse(read("data/kids-week.json"))], ["kids-data.js EMBEDDED", emb]]) {
+    assert.equal(w.kids.ainsley.streakLabel, "", `${name}: Ainsley streakLabel dropped`);
+    assert.deepEqual(vals(w.kids.ainsley).filter((x) => COUNT.test(x)), [], `${name}: no count on Ainsley's copy`);
+    for (const k of ["hayes", "harris"]) assert.match(w.kids[k].streakLabel, /^Week \d+\b/, `${name}: ${k} keeps plain Week wording`);
+  }
+  /* at the source (Atlas's generator pass), so a refresh can't bring it back */
+  assert.equal(kidCopyText("◆ 4-day streak — hold the line", "ainsley"), "hold the line");
+  assert.equal(kidCopyText("🔥 6-day fire streak — don't break it", "hayes"), "Week 6 — don't break it");
+  assert.equal(kidCopyDeep({ kids: { ainsley: { streakLabel: "◆ 9-day streak" } } }).kids.ainsley.streakLabel, "");
+  const eng = read("house-kid-engage.js");
+  assert.match(eng, /var SEAT_ONLY = \{ ainsley: true \};/);
+  const lines = eng.split("\n");
+  lines.forEach((l, i) => { if (/"Week " \+ streak/.test(l)) assert.ok(lines.slice(Math.max(0, i - 6), i + 1).some((x) => /SEAT_ONLY\[kidId\]/.test(x)), `engage:${i + 1} streak count not guarded for a seat`); });
+  const chores = read("sheet-chores.html"), col = chores.slice(chores.indexOf('aria-label="Ainsley chores"'), chores.indexOf('class="chore-list"', chores.indexOf('aria-label="Ainsley chores"')));
+  assert.doesNotMatch(col, /class="streak"|\d+-day/, "sheet-chores Ainsley header has no day-count chip");
+  assert.doesNotMatch(read("kid-ainsley.html"), /\b\d+-day\b|Week \d+\b/, "kid-ainsley.html shows no day count");
+});
 console.log(`wall-guards: ${n} tests PASS`);

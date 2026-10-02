@@ -73,6 +73,9 @@ GROCERY-CONTRACT.md → Ledger's `docs/grocery-list-CONTRACT.md`.
   - `wall-guards` fails on any `$` other than `$15/hr`, and on jar, XP, Bal, "Show me the Money" or Mom wording.
   - Per-chore `$N` now shows the row's own star count (`N★`, equal to `data-stars`).
   - The allowance rate logic, star counts, goal `need` and ids are untouched (display text only).
+- **WALLKIT8/9**: kid-hayes.html + kid-harris.html get the same treatment, and the scanner also bans streak / 🔥 (16 files). Atlas's ATLASLANE7 (`scripts/house/kid-copy.mjs`) now owns kids-week kid copy at the source; the streak/🔥 → "Week N" wording lives there too, so a calendar refresh can't bring it back.
+  - Hayes/Harris reward line = Atlas's "Goal with Dad after honest musts" (kids-week + the kids-data.js fallback).
+  - Ainsley has a seat, not a score (KL-05): her streakLabel is "" at the source, `house-kid-engage.js` `SEAT_ONLY` drops every streak/day count on her seat, and the sheet-chores "★ 4-day" chip in her column is gone. Counts are removed, not relabeled.
 - No hardcoded parent names in wall code. Renames come from the config.
 - Earlier P0s are kept: no cam video or still, `data-owner` + tile ids on every tile.
 

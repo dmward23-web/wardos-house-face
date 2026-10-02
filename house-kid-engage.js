@@ -8,6 +8,8 @@
   "use strict";
 
   var KIDS = ["ainsley", "hayes", "harris"];
+  /* WALLKIT9 · KL-05: Ainsley has a seat, not a score. No streak/day count anywhere on her seat (dropped, not relabeled). */
+  var SEAT_ONLY = { ainsley: true };
   var FACES = ["day", "stars", "chores", "leave"];
   var FACE_LABEL = { day: "Day", stars: "Stars", chores: "Chores", leave: "Leave" };
   var HREF = {
@@ -493,9 +495,9 @@
           ? ("Musts " + gate.done + "/" + gate.need)
           : "Musts clear") + /* KIDPATH1: no jar, no $ */
         "</div>";
-      html += '<div class="kf-streak streak-sparks" data-streak>' +
+      if (!SEAT_ONLY[kidId]) html += '<div class="kf-streak streak-sparks" data-streak>' +
         (streak > 0 ? ("Week " + streak) : "Week · tap musts") + /* KIDPATH2: plain Week wording */
-        "</div>";
+        "</div>"; /* WALLKIT9: none on a seat */
       html += "</div>";
       return html;
     }
@@ -565,7 +567,7 @@
     var streak = streakDays(kidId);
     var tp = todayMustProgress(kidId);
     if (streakEl) {
-      streakEl.textContent = streak > 0
+      streakEl.textContent = streak > 0 && !SEAT_ONLY[kidId] /* WALLKIT9: no day count on a seat */
         ? ("Week " + streak + " · " + tp.done + "/" + tp.need)
         : ("Musts " + tp.done + "/" + tp.need); /* KIDPATH1: no XP */
     }
@@ -869,7 +871,10 @@
     var go = host.querySelector("[data-hq-go]");
     if (title) title.textContent = accent.name + " · musts";
     if (musts) musts.textContent = tp.need ? (tp.done + "/" + tp.need) : "—";
-    if (streakEl) streakEl.textContent = streak > 0 ? ("Week " + streak) : "Week · tap musts"; /* KIDPATH2 */
+    if (streakEl) {
+      streakEl.hidden = !!SEAT_ONLY[kidId]; /* WALLKIT9: a seat shows no streak line */
+      streakEl.textContent = SEAT_ONLY[kidId] ? "" : (streak > 0 ? ("Week " + streak) : "Week · tap musts"); /* KIDPATH2 */
+    }
     if (go) {
       go.setAttribute("href", HREF[kidId]);
       go.textContent = "CLAIM · " + accent.name.toUpperCase();
@@ -987,7 +992,8 @@
     var tp = todayMustProgress(kidId);
     var gate = mustProgress(kidId);
     var label = document.querySelector("[data-streak-label]");
-    if (label) {
+    if (label && SEAT_ONLY[kidId]) label.textContent = "Today " + tp.done + "/" + tp.need; /* WALLKIT9: no streak count on a seat */
+    else if (label) {
       label.classList.add("streak-sparks");
       label.setAttribute("data-streak", "1");
       label.textContent = streak > 0

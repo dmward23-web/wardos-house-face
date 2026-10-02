@@ -5,7 +5,10 @@
      no $, jar, payday or balance text. Jar -> the kid's own goal word (Gems / Victory Coins / Tour goal), $N chore
      amounts -> N★ ("$7 wk" -> "7★ wk"). Only Ainsley's babysitting rateLabel "$15/hr" stays (DAN RULING t2812u #1).
    Wording matches Wright's KIDPATH1 scrub (24cb71f) exactly for every current string (EXACT below); RULES cover new ones.
-   Not copy, left alone: id / *Id / key / href / cls values (e.g. bankGoal.id "gem-jar" keys saved state) and numbers. */
+   Not copy, left alone: id / *Id / key / href / cls values (e.g. bankGoal.id "gem-jar" keys saved state) and numbers.
+   WALLKIT9 (Wright, on Dan's ask Oct 1 7:52 PM CT, merged into wall-redesign-1): streak / flame copy is fixed here too, at the
+   source: "🔥 6-day fire streak" -> "Week 6", no 🔥. Ainsley has a seat, not a score (KL-05): her streak/day count is dropped,
+   not relabeled (streakLabel -> "", "N-day streak" removed from her strings; a calendar "Week 5" stays, it's a fact). */
 
 export const ALLOWED_TAG = "$15/hr";
 const GOAL_WORD = { harris: "Gems", hayes: "Victory Coins", ainsley: "Tour goal" };
@@ -22,13 +25,30 @@ export const EXACT = new Map([
   ["coins → jar → payday", "coins · earn then save"],
   ["💎 Gem Jar · save with Dad", "💎 Gems · save with Dad"],
   ["☂️ Victory Jar · save with Dad", "☂️ Victory Coins · save with Dad"],
-  ["🔥 ALL musts clear = gems in the jar", "🔥 ALL musts clear = gems"],
+  ["🔥 ALL musts clear = gems in the jar", "ALL musts clear = gems"],
+  ["🔥 ALL musts clear = gems", "ALL musts clear = gems"],
+  ["🔥 3-day craft streak — keep smashing", "Week 3 · craft — keep smashing"],
+  ["🔥 6-day fire streak — don't break it", "Week 6 — don't break it"],
   ["💥 ALL musts clear = coins in the jar", "💥 ALL musts clear = coins"],
   ["ALL musts → jar $10 + $10 payday", "ALL musts clear"],
   ["not for jar · Dad handout", "Dad handout"],
   ["hire add-on · not for jar", "hire add-on"],
   ["Payday with Dad after honest musts", "Goal with Dad after honest musts"],
 ]);
+const STREAK_RE = /streak|\u{1F525}|\b\d+-day\b/iu;
+/** WALLKIT9 streak rules (after money rules). Ainsley: the count goes, nothing replaces it. */
+export function streakRulesFor(kidId) {
+  if (kidId === "ainsley") return [
+    [/[◆\u{1F525}]?\s*\b\d+-day(?:\s+[a-z]+)?\s+streaks?\b\s*(?:—|-|·)?\s*/giu, ""],
+    [/\bstreaks?\b/gi, ""],
+    [/\s*\u{1F525}\s*/gu, " "],
+  ];
+  return [
+    [/\b(\d+)-day(?:\s+[a-z]+)?\s+streaks?\b/gi, "Week $1"],
+    [/\bStreaks?\b/g, "Week"], [/\bstreaks?\b/gi, "week"],
+    [/\s*\u{1F525}\s*/gu, " "],
+  ];
+}
 /** Generic rules for strings not in EXACT (new copy someone adds later). Order matters. */
 export function rulesFor(kidId) {
   const goal = GOAL_WORD[kidId] || "Goal";
@@ -54,17 +74,23 @@ function tidy(s) {
 /** One visible string -> board-safe. The allowed tag survives anywhere it appears. */
 export function kidCopyText(s, kidId) {
   if (typeof s !== "string") return s;
-  if (EXACT.has(s)) return EXACT.get(s);
-  if (!/\$|\bjars?\b|\bpay-?days?\b|\bpay-?outs?\b|\bbalances?\b/i.test(s)) return s;
+  if (EXACT.has(s) && !(kidId === "ainsley" && STREAK_RE.test(s))) return EXACT.get(s);
+  const money = /\$|\bjars?\b|\bpay-?days?\b|\bpay-?outs?\b|\bbalances?\b/i.test(s), streak = STREAK_RE.test(s);
+  if (!money && !streak) return s;
+  const rules = (money ? rulesFor(kidId) : []).concat(streak ? streakRulesFor(kidId) : []);
   const parts = s.split(ALLOWED_TAG);
-  const out = parts.map((p) => { let x = p; for (const [re, rep] of rulesFor(kidId)) x = x.replace(re, rep); return x; }).join(ALLOWED_TAG);
+  const out = parts.map((p) => { let x = p; for (const [re, rep] of rules) x = x.replace(re, rep); return x; }).join(ALLOWED_TAG);
   return tidy(out);
 }
 const CODE_KEY = (k) => k === "id" || /Id$|^key$|href$|^cls$/.test(k);
 /** Deep pass over a kids-week object (all kids + dan + boardStrip). Returns a new object. */
 export function kidCopyDeep(week) {
   const walk = (v, kidId, k) => {
-    if (typeof v === "string") return CODE_KEY(k) ? v : kidCopyText(v, kidId);
+    if (typeof v === "string") {
+      if (CODE_KEY(k)) return v;
+      if (k === "streakLabel" && kidId === "ainsley") return ""; /* WALLKIT9 KL-05: a seat, not a score */
+      return kidCopyText(v, kidId);
+    }
     if (Array.isArray(v)) return v.map((x) => walk(x, kidId, k));
     if (v && typeof v === "object") { const o = {}; for (const kk of Object.keys(v)) o[kk] = walk(v[kk], kidId, kk); return o; }
     return v;
