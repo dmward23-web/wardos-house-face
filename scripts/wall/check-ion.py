@@ -32,13 +32,13 @@ GEOM = """() => {
 }"""
 LED = "() => { const i = document.createElement('i'); i.className = 'led bad'; i.setAttribute('data-check-only', ''); const h = document.getElementById('w-lights-row'); const host = (h && h.offsetParent) ? h : document.getElementById('wall-panel'); if (host !== h) i.style.cssText = 'position:absolute;left:4px;top:4px;width:16px;height:16px;border-radius:50%'; host.appendChild(i); }"  # check-only alert LED so loop 4 has a host
 ANIM = "() => document.getAnimations().filter(a => a.playState === 'running').map(a => a.animationName || a.constructor.name)"
-def page(b, vw, vh, fixture=False, reduced=None):
+def page(b, vw, vh, fixture=False, reduced=None, at=None):
     ctx = b.new_context(viewport={"width": vw, "height": vh}, reduced_motion=reduced or "no-preference"); pg = ctx.new_page(); errs = []; reqs = []
-    pg.clock.install(time=T); pg.on("pageerror", lambda e: errs.append(str(e)))
+    TT = at or T; pg.clock.install(time=TT); pg.on("pageerror", lambda e: errs.append(str(e)))
     def route(r):
         u = r.request.url
         if fixture and "/data/kid-seats.json" in u: return r.fulfill(status=200, content_type="application/json", body=json.dumps(FIX))
-        pb = datasnap.body(u, T.isoformat())
+        pb = datasnap.body(u, TT.isoformat())
         if pb is not None and u.startswith(L): return r.fulfill(status=200, content_type="application/json", body=pb)
         if u.startswith(L): return r.continue_()
         reqs.append(u); return r.abort()
@@ -62,8 +62,27 @@ try:
         # reduced motion: zero running animations
         ctx, pg, errs, reqs = page(b, 2560, 1440, reduced="reduce"); pg.evaluate(LED); pg.wait_for_timeout(200); a = pg.evaluate(ANIM); ctx.close()
         print("reduced-motion running animations:", a, "PASS" if not a else "FAIL"); ok = ok and not a
+        # KIDSAWAY1: a kids-away clock has no seats. The face check runs at NOW (no seats, no claim, no check-in tile, the
+        # away band shows real days or collapses); the seat scenario below then runs at the last kids-home window of
+        # today's house-mode timeline (real data, that window's midpoint, capped 30 min before it ends).
+        ctx, pg, errs, reqs = page(b, 2560, 1440)
+        aw = pg.evaluate("() => ({ away: document.body.classList.contains('is-away'), seats: !!(document.getElementById('w-kids') && !document.getElementById('w-kids').hidden), claim: [...document.querySelectorAll('#w-claim .cj')].filter(e => e.offsetParent).length, checkin: !!(document.getElementById('w-ltap-checkin') && document.getElementById('w-ltap-checkin').offsetParent), band: !!(document.getElementById('w-away') && !document.getElementById('w-away').hidden), items: document.querySelectorAll('#w-away .aw-i').length, back: (document.getElementById('w-away-back') || {}).textContent || '' })")
+        ctx.close(); AT = None
+        if aw["away"]:
+            awok = not aw["seats"] and not aw["claim"] and not aw["checkin"] and (aw["band"] == (aw["items"] > 0)) and not errs
+            print("kids-away face (now):", json.dumps(aw), "PASS" if awok else "FAIL"); ok = ok and awok
+            hm = json.load(open(datasnap.path("house-mode.json", T.isoformat())))
+            homes = [w for w in (hm.get("timeline") or []) if w.get("mode") != "kids-away" and w.get("since") and w.get("until") and datetime.datetime.fromisoformat(w["since"]) < T]
+            if homes:
+                w = homes[-1]; s0_, u0_ = datetime.datetime.fromisoformat(w["since"]), datetime.datetime.fromisoformat(w["until"])
+                AT = max(s0_ + (u0_ - s0_) / 2, u0_ - datetime.timedelta(minutes=30)) if (u0_ - s0_) > datetime.timedelta(hours=1) else s0_ + (u0_ - s0_) / 2
+                print("seat scenario clock (last kids-home window today):", AT.isoformat(), w.get("mode"))
+            else: print("seat scenario: n/a, no kids-home window today")
         # states fixture: CHOICE claim -> owner mark, siblings locked, never released; Pack travel week -> Ainsley's Bag darkens only hers (per kid); Harris fill same minute
-        ctx, pg, errs, reqs = page(b, 2560, 1440, fixture=True)
+        if aw["away"] and AT is None: b.close(); print("ION CHECK", "PASS" if ok else "FAIL"); raise SystemExit(0 if ok else 1)
+        if AT is not None:
+            FIX["choice"]["lockAt"] = AT.strftime("%Y-%m-%dT23:00:00-05:00")
+        ctx, pg, errs, reqs = page(b, 2560, 1440, fixture=True, at=AT)
         s0 = pg.evaluate("() => ({ claim: !document.getElementById('w-claim').hidden, cj: [...document.querySelectorAll('#w-claim .cj')].map(e => e.innerText.trim() + '|' + e.getAttribute('data-locked')), pack: document.querySelectorAll('[data-law-pack]').length })")
         pg.click('[data-law-claim="hayes"]'); pg.clock.run_for(300)
         s1 = pg.evaluate("() => ({ cj: [...document.querySelectorAll('#w-claim .cj')].map(e => e.innerText.replace(/\\s+/g,' ').trim() + '|locked=' + e.getAttribute('data-locked') + '|by=' + e.getAttribute('data-claimed-by') + '|disabled=' + e.disabled), small: document.querySelector('#w-claim .claim-h small').textContent })")
