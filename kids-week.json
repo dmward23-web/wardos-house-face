@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 2 2026",
   "asOfIso": "2026-10-02",
-  "refreshedAt": "2026-10-02T11:39:06.423Z",
+  "refreshedAt": "2026-10-02T11:46:00.405Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -87,6 +87,18 @@
       },
       {
         "label": "Next up · today",
+        "time": "11:00",
+        "place": "Free · Ainsley — baby pic email by 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-02T16:00:00.000Z",
+        "endIso": "2026-10-02T16:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "11:00",
+        "summary": "Free · Ainsley — baby pic email by 3:00"
+      },
+      {
+        "label": "Next up · today",
         "time": "11:30",
         "place": "SRE Tailgate Party (reading incentive)",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
@@ -156,18 +168,6 @@
         "kind": "sport",
         "whenLabel": "Sun 8:30",
         "summary": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00"
-      },
-      {
-        "label": "Next up · Mon",
-        "time": "7:00",
-        "place": "SRE specials: Music",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-05T12:00:00.000Z",
-        "endIso": "2026-10-05T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Mon 7:00",
-        "summary": "Harris — SRE specials: Music"
       }
     ]
   },
@@ -423,6 +423,12 @@
         {
           "when": "Thu 8 · 7:00",
           "what": "SRE specials: Spanish + Library checkout",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 9 · 12:00",
+          "what": "Ward Kids [AHH No School]",
           "tone": "act",
           "hint": ""
         }
@@ -714,6 +720,12 @@
           "what": "SRE specials: Art",
           "tone": "act",
           "hint": ""
+        },
+        {
+          "when": "Fri 9 · 12:00",
+          "what": "Ward Kids [AHH No School]",
+          "tone": "act",
+          "hint": ""
         }
       ],
       "appointments": []
@@ -852,15 +864,22 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "MON · 1:40",
-        "what": "LINDSAY APPT",
+        "when": "FRI · 11:00",
+        "what": "FREE · AINSLEY — BABY PIC EMAIL BY 3:00",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "MON",
-          "1:40"
+          "FRI",
+          "11:00"
         ]
       },
       "today": [
+        {
+          "kind": "event",
+          "when": "Fri · 11:00",
+          "what": "Free · Ainsley — baby pic email by 3:00",
+          "hint": "",
+          "tone": "act"
+        },
         {
           "kind": "note",
           "when": "All day",
@@ -885,6 +904,12 @@
       ],
       "school": [
         {
+          "when": "Fri 2 · 11:00",
+          "what": "Free · Ainsley — baby pic email by 3:00",
+          "tone": "act",
+          "hint": ""
+        },
+        {
           "when": "Mon 5 · 3:00",
           "what": "LKMS Homework Help",
           "tone": "act",
@@ -893,6 +918,12 @@
         {
           "when": "Thu 8 · 3:00",
           "what": "LKMS Homework Help",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 9 · 12:00",
+          "what": "Ward Kids [AHH No School]",
           "tone": "act",
           "hint": ""
         }
@@ -980,6 +1011,11 @@
           "tone": "act"
         },
         {
+          "when": "Fri · 11:00",
+          "what": "Free · Ainsley — baby pic email by 3:00",
+          "tone": "act"
+        },
+        {
           "when": "Fri · 11:30",
           "what": "SRE Tailgate Party (reading incentive)",
           "tone": "act"
@@ -997,11 +1033,6 @@
         {
           "when": "Fri · 12:00",
           "what": "get tree-trim bids (2–3 written)",
-          "tone": "hot"
-        },
-        {
-          "when": "Fri · 1:00",
-          "what": "garage-sale haul · shake whole house",
           "tone": "hot"
         }
       ],
@@ -1029,6 +1060,11 @@
         {
           "when": "Fri 2 · 9:00",
           "what": "SRE field trip (museum + Meadowbrook)",
+          "tone": "act"
+        },
+        {
+          "when": "Fri 2 · 11:00",
+          "what": "Free · Ainsley — baby pic email by 3:00",
           "tone": "act"
         },
         {
@@ -1119,11 +1155,6 @@
         {
           "when": "Wed 7 · 7:00",
           "what": "SRE specials: PE + Library (tennis shoes, library book)",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 7 · 7:00",
-          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act"
         }
       ]
