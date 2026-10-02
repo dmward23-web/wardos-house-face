@@ -56,6 +56,77 @@
   }
   function list(x) { return Array.isArray(x) ? x : []; }
 
+  /* ---------- earning rules (Atlas 8:08 PM CT default, PENDING Dan last-yes) ---------- */
+  /* Mon to Sun CT week; key = that Monday's date. Pure calendar math on the dayKey, so DST can't move it. */
+  function monWeekKey(dayKey) {
+    if (!full(DAY_RE, dayKey)) return null;
+    var y = +dayKey.slice(0, 4), m = +dayKey.slice(5, 7), d = +dayKey.slice(8, 10);
+    var dt = new Date(Date.UTC(y, m - 1, d)), back = (dt.getUTCDay() + 6) % 7;
+    var k = new Date(Date.UTC(y, m - 1, d - back));
+    return k.getUTCFullYear() + "-" + pad(k.getUTCMonth() + 1) + "-" + pad(k.getUTCDate());
+  }
+  function addDays(dayKey, n) {
+    var k = new Date(Date.UTC(+dayKey.slice(0, 4), +dayKey.slice(5, 7) - 1, +dayKey.slice(8, 10) + n));
+    return k.getUTCFullYear() + "-" + pad(k.getUTCMonth() + 1) + "-" + pad(k.getUTCDate());
+  }
+  var DEFAULT_RULES = {
+    musts: { unit: "min", qty: 15, reason: "musts-closed" }, repair: { unit: "min", qty: 15, reason: "musts-closed" },
+    choice: { unit: "min", qty: 10, reason: "choice-done" }, week5: { unit: "pick", qty: 1, reason: "week-five", threshold: 5 },
+    us: { unit: "pick", qty: 1, reason: "us-together", threshold: 10, of: 12 }, mystery: { unit: "pick", qty: 1, reason: "mystery-close" }
+  };
+  function rulesFrom(seed) {
+    var out = {}, given = {};
+    list(seed && seed.earningRules && seed.earningRules.rules).forEach(function (r) { if (r && r.id) given[r.id] = r; });
+    Object.keys(DEFAULT_RULES).forEach(function (id) { out[id] = Object.assign({}, DEFAULT_RULES[id], given[id] || {}); });
+    out.status = (seed && seed.earningRules && seed.earningRules.status) || "pending-dan-last-yes";
+    return out;
+  }
+  /* eventToCredits(event, rules) -> credit() args (pure; ids deterministic). Atlas's event kinds:
+       {kind:"close",   kid, dayKey, mustsClosed}            all four (or true) -> +15 min, partial -> nothing
+       {kind:"repair",  kid, missedDayKey, dayKey}           before Saturday fun, same week -> the missed day's +15, same id
+       {kind:"choice",  kid, dayKey}                         -> +10 min
+       {kind:"us-together", dayKey, closes, of?}             >= ten of twelve -> +1 pick to the family jar, once per week
+       {kind:"mystery", kid, dayKey}                         -> +1 pick, once per kid per week
+     The week-five pick is not an event: the book derives it from the musts credits (see applyCloseEvent). */
+  function eventToCredits(ev, rules) {
+    rules = rules || rulesFrom(null);
+    ev = ev || {};
+    var kidOk = KIDS.indexOf(ev.kid) >= 0, day = ev.dayKey;
+    if (!full(DAY_RE, day || "")) return [];
+    var r;
+    if (ev.kind === "close") {
+      var all4 = ev.mustsClosed === true || ev.mustsClosed === 4;
+      if (!kidOk || !all4) return [];
+      r = rules.musts;
+      return [{ jar: ev.kid, unit: r.unit, qty: r.qty, reason: r.reason, sourceId: "musts-" + day, dayKey: day }];
+    }
+    if (ev.kind === "repair") {
+      var missed = ev.missedDayKey;
+      if (!kidOk || !full(DAY_RE, missed || "")) return [];
+      var wk = monWeekKey(missed);
+      if (monWeekKey(day) !== wk || day < missed || day > addDays(wk, 5)) return [];   /* same week, on or before Saturday */
+      r = rules.repair;
+      return [{ jar: ev.kid, unit: r.unit, qty: r.qty, reason: r.reason, sourceId: "musts-" + missed, dayKey: missed }];
+    }
+    if (ev.kind === "choice") {
+      if (!kidOk) return [];
+      r = rules.choice;
+      return [{ jar: ev.kid, unit: r.unit, qty: r.qty, reason: r.reason, sourceId: "choice-" + day, dayKey: day }];
+    }
+    if (ev.kind === "us-together") {
+      r = rules.us;
+      if (!Number.isInteger(ev.closes) || ev.closes < r.threshold) return [];
+      if (ev.of != null && ev.of !== r.of) return [];
+      return [{ jar: "family", unit: r.unit, qty: r.qty, reason: r.reason, sourceId: "us-" + monWeekKey(day), dayKey: day }];
+    }
+    if (ev.kind === "mystery") {
+      if (!kidOk) return [];
+      r = rules.mystery;
+      return [{ jar: ev.kid, unit: r.unit, qty: r.qty, reason: r.reason, sourceId: "mystery-" + monWeekKey(day), dayKey: day }];
+    }
+    return [];
+  }
+
   /* create({ seed, storage, now, parentGate, fetch, hubBase }) -> jar book */
   function create(opts) {
     opts = opts || {};
@@ -119,7 +190,7 @@
 
     /* ---------- derived balance (order-independent) ----------
        available(jar, unit) = max(0, sum(adds on days NOT zeroed for that jar) - sum(redeems)).
-       zero-day {kid, dayKey}: that personal jar's adds dated that dayKey count 0. Redeems still count (spent stays spent).
+       zero-day {kid, dayKey}: that personal jar's adds dated that dayKey count 0. Redeems that day STILL COUNT (Atlas 8:08 PM).
        Other days, other kids and the family jar are untouched. Reversed entries count as if never made. */
     function available(jar, unit) {
       var L = live().filter(function (e) { return e.jar === jar; });
@@ -150,8 +221,8 @@
       var e = { id: "n-" + a.jar + "-" + s.t + "-" + rand4(), jar: a.jar, type: "add", unit: chip.unit, qty: chip.qty, reason: why.label, at: s.at, dayKey: s.dayKey };
       return record(e) ? { ok: true, entry: copy(e) } : fail("duplicate");
     }
-    /* credit({jar, unit, qty, sourceId, reason, at?}) -> Atlas's close credit (not a wall button). Deterministic id per
-       source, so two screens recording the same close make one entry. Rate/schedule is Atlas + Dan's call (none seeded). */
+    /* credit({jar, unit, qty, sourceId, reason, at?, dayKey?}) -> Atlas's close credit (not a wall button). Deterministic id
+       per source, so two screens recording the same close make one entry. Rates come from seed.earningRules via applyCloseEvent. */
     function credit(a) {
       a = a || {};
       if (jarIds.indexOf(a.jar) < 0) return fail("bad-jar");
@@ -161,7 +232,8 @@
       var why = findReason(R.credit, a.reason);
       if (!why) return fail("not-a-reason");
       var at = full(ISO_RE, a.at || "") ? a.at : ctIso(now());
-      var e = { id: "c-" + a.jar + "-" + src, jar: a.jar, type: "add", unit: a.unit, qty: a.qty, reason: why.label, at: at, dayKey: dayKeyFor(Date.parse(at)) };
+      var dk = full(DAY_RE, a.dayKey || "") ? a.dayKey : dayKeyFor(Date.parse(at));   /* repair credits the missed day */
+      var e = { id: "c-" + a.jar + "-" + src, jar: a.jar, type: "add", unit: a.unit, qty: a.qty, reason: why.label, at: at, dayKey: dk };
       if (byId[e.id]) return { ok: true, entry: null, noop: true };
       return record(e) ? { ok: true, entry: copy(e) } : fail("invalid");
     }
@@ -204,6 +276,29 @@
       return record(e) ? { ok: true, entry: copy(e) } : fail("invalid");
     }
 
+    var rules = rulesFrom(seed);
+    /* week-five: count this kid's full closes (live c-<kid>-musts-<dayKey> credits, repairs included) in a Mon to Sun week.
+       A zero-day voids that day's adds but the close still happened, so it still counts toward five (Atlas ruling 1:
+       zero-day touches adds only). The pick is dated the fifth close's day, so a zero-day on that day voids it. */
+    function week5Credit(kid, wk) {
+      var r = rules.week5, pre = "c-" + kid + "-musts-";
+      var days = live().filter(function (e) { return e.jar === kid && e.type === "add" && e.id.indexOf(pre) === 0 && monWeekKey(e.dayKey) === wk; })
+        .map(function (e) { return e.dayKey; }).sort();
+      if (days.length < r.threshold) return null;
+      return { jar: kid, unit: r.unit, qty: r.qty, reason: r.reason, sourceId: "week5-" + wk, dayKey: days[r.threshold - 1] };
+    }
+    /* applyCloseEvent(event) -> {ok, added:[ids]}. Idempotent: re-applying the same event adds nothing. */
+    function applyCloseEvent(ev) {
+      var added = [];
+      eventToCredits(ev, rules).forEach(function (c) { var res = credit(c); if (res.entry) added.push(res.entry.id); });
+      if (ev && KIDS.indexOf(ev.kid) >= 0 && (ev.kind === "close" || ev.kind === "repair")) {
+        var dk = ev.kind === "repair" ? ev.missedDayKey : ev.dayKey;
+        var w5 = full(DAY_RE, dk || "") ? week5Credit(ev.kid, monWeekKey(dk)) : null;
+        if (w5) { var res = credit(w5); if (res.entry) added.push(res.entry.id); }
+      }
+      return { ok: true, added: added, rulesStatus: rules.status };
+    }
+
     function syncState() {
       var synced = SHARED_WRITE_ENABLED && pendingIds.length === 0;
       return { sharedWriteEnabled: SHARED_WRITE_ENABLED, sharedKey: SHARED_KEY, pendingKey: PENDING_KEY, pendingCount: pendingIds.length, synced: synced, label: synced ? "Synced" : "Not synced" };
@@ -238,7 +333,7 @@
 
     writePending();
     return {
-      apply: apply, merge: merge, niceOne: niceOne, credit: credit, zeroDay: zeroDay, redeem: redeem, reverse: reverse,
+      apply: apply, merge: merge, applyCloseEvent: applyCloseEvent, rulesStatus: function () { return rules.status; }, niceOne: niceOne, credit: credit, zeroDay: zeroDay, redeem: redeem, reverse: reverse,
       wallDisplay: wallDisplay, parentView: parentView, syncState: syncState, pushShared: pushShared,
       entries: function () { return all().map(copy); },
       pending: function () { return pendingIds.map(function (id) { return copy(byId[id]); }); },
@@ -257,6 +352,6 @@
     });
   }
 
-  return { create: create, load: load, dayKeyFor: dayKeyFor, ctIso: ctIso,
+  return { create: create, load: load, dayKeyFor: dayKeyFor, ctIso: ctIso, monWeekKey: monWeekKey, eventToCredits: eventToCredits,
     SHARED_WRITE_ENABLED: SHARED_WRITE_ENABLED, SHARED_KEY: SHARED_KEY, PENDING_KEY: PENDING_KEY, SEED_URL: SEED_URL };
 });
