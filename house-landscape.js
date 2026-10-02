@@ -321,6 +321,7 @@
     function ok(e, f) {
       if (e.matches(LEAD) || e.matches("footer, .ftr") || e.hasAttribute("data-ls-keep") || e.hasAttribute("data-ls-wide") || e.hasAttribute("data-ls-nosplit") || pictureCard(e)) return false;
       if (e.matches("a, button, [role=button], [role=link], [data-go], [onclick]")) return false; /* a press target stays one card */
+      if (e.id && location.hash === "#" + e.id) return false; /* the card a wall press lands on keeps its own box */
       var ks = sections(e); if (ks.length < 2) return false;
       if (e.getBoundingClientRect().height < H * f) return false;
       var r0 = ks[0].getBoundingClientRect();
