@@ -1,7 +1,7 @@
 {
-  "asOf": "Thu Oct 1 2026",
-  "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-02T03:06:24.510Z",
+  "asOf": "Fri Oct 2 2026",
+  "asOfIso": "2026-10-02",
+  "refreshedAt": "2026-10-02T10:18:13.057Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,7 +16,7 @@
     "endIso": "2026-10-02T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · Fri",
+    "label": "Next up · today",
     "time": "7:00",
     "place": "SRE specials: No Specials",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
@@ -26,7 +26,7 @@
     "kind": "school",
     "queue": [
       {
-        "label": "Next up · Fri",
+        "label": "Next up · today",
         "time": "7:00",
         "place": "SRE specials: No Specials",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
@@ -34,11 +34,11 @@
         "startIso": "2026-10-02T12:00:00.000Z",
         "endIso": "2026-10-02T12:15:00.000Z",
         "kind": "school",
-        "whenLabel": "Fri 7:00",
+        "whenLabel": "7:00",
         "summary": "Hayes — SRE specials: No Specials"
       },
       {
-        "label": "Next up · Fri",
+        "label": "Next up · today",
         "time": "7:00",
         "place": "SRE specials: Music",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
@@ -46,11 +46,11 @@
         "startIso": "2026-10-02T12:00:00.000Z",
         "endIso": "2026-10-02T12:15:00.000Z",
         "kind": "school",
-        "whenLabel": "Fri 7:00",
+        "whenLabel": "7:00",
         "summary": "Harris — SRE specials: Music"
       },
       {
-        "label": "Next up · Fri",
+        "label": "Next up · today",
         "time": "7:30",
         "place": "Free · Hayes — pack late-lunch snacks (headaches · Ma…",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
@@ -58,11 +58,11 @@
         "startIso": "2026-10-02T12:30:00.000Z",
         "endIso": "2026-10-02T12:45:00.000Z",
         "kind": "school",
-        "whenLabel": "Fri 7:30",
+        "whenLabel": "7:30",
         "summary": "Free · Hayes — pack late-lunch snacks (headaches · Madi OK)"
       },
       {
-        "label": "Next up · Fri",
+        "label": "Next up · today",
         "time": "8:10",
         "place": "Boys SRE drop",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
@@ -70,11 +70,11 @@
         "startIso": "2026-10-02T13:10:00.000Z",
         "endIso": "2026-10-02T13:40:00.000Z",
         "kind": "school_drop",
-        "whenLabel": "Fri 8:10",
+        "whenLabel": "8:10",
         "summary": "Hayes + Harris — SRE drop-off · 8:25"
       },
       {
-        "label": "Next up · Fri",
+        "label": "Next up · today",
         "time": "9:00",
         "place": "SRE field trip (museum + Meadowbrook)",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
@@ -82,11 +82,11 @@
         "startIso": "2026-10-02T14:00:00.000Z",
         "endIso": "2026-10-02T19:00:00.000Z",
         "kind": "school",
-        "whenLabel": "Fri 9:00",
+        "whenLabel": "9:00",
         "summary": "Hayes — SRE field trip (museum + Meadowbrook)"
       },
       {
-        "label": "Next up · Fri",
+        "label": "Next up · today",
         "time": "11:30",
         "place": "SRE Tailgate Party (reading incentive)",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
@@ -94,11 +94,11 @@
         "startIso": "2026-10-02T16:30:00.000Z",
         "endIso": "2026-10-02T17:30:00.000Z",
         "kind": "school",
-        "whenLabel": "Fri 11:30",
+        "whenLabel": "11:30",
         "summary": "Harris — SRE Tailgate Party (reading incentive)"
       },
       {
-        "label": "Next up · Fri",
+        "label": "Next up · today",
         "time": "12:00",
         "place": "SRE field trip museum+park (chaperone slots)",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
@@ -106,7 +106,7 @@
         "startIso": "2026-10-02T17:00:00.000Z",
         "endIso": "2026-10-02T17:00:00.000Z",
         "kind": "school",
-        "whenLabel": "Fri 12:00",
+        "whenLabel": "12:00",
         "summary": "Hayes — SRE field trip museum+park (chaperone slots)"
       },
       {
@@ -310,6 +310,27 @@
         ]
       },
       "today": [
+        {
+          "kind": "event",
+          "when": "Fri · 7:00",
+          "what": "SRE specials: Music",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Fri · 8:10",
+          "what": "SRE drop-off",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Fri · 11:30",
+          "what": "SRE Tailgate Party (reading incentive)",
+          "hint": "",
+          "tone": "act"
+        },
         {
           "kind": "note",
           "when": "All day",
@@ -546,6 +567,41 @@
         ]
       },
       "today": [
+        {
+          "kind": "event",
+          "when": "Fri · 7:00",
+          "what": "SRE specials: No Specials",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Fri · 7:30",
+          "what": "Free · Hayes — pack late-lunch snacks (headaches · Madi OK)",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Fri · 8:10",
+          "what": "SRE drop-off",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Fri · 9:00",
+          "what": "SRE field trip (museum + Meadowbrook)",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Fri · 12:00",
+          "what": "SRE field trip museum+park (chaperone slots)",
+          "hint": "",
+          "tone": "act"
+        },
         {
           "kind": "note",
           "when": "All day",
@@ -889,7 +945,7 @@
         }
       ],
       "hottest": {
-        "when": "Thu Oct 1 2026 · kids with you @ 147th",
+        "when": "Fri Oct 2 2026 · kids with you @ 147th",
         "what": "Dad week live",
         "where": "through Fri Oct 2 · 3:00",
         "badges": [
@@ -899,53 +955,53 @@
       },
       "today": [
         {
-          "when": "Thu · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
+          "when": "Fri · 7:00",
+          "what": "SRE specials: No Specials",
           "tone": "act"
         },
         {
-          "when": "Thu · 7:00",
-          "what": "SRE specials: Art",
+          "when": "Fri · 7:00",
+          "what": "SRE specials: Music",
           "tone": "act"
         },
         {
-          "when": "Thu · 8:10",
+          "when": "Fri · 7:30",
+          "what": "Free · Hayes — pack late-lunch snacks (headaches · Madi OK)",
+          "tone": "act"
+        },
+        {
+          "when": "Fri · 8:10",
           "what": "SRE drop-off",
           "tone": "act"
         },
         {
-          "when": "Thu · 9:40",
-          "what": "Dr Ramirez",
-          "tone": "hot"
-        },
-        {
-          "when": "Thu · 12:00",
-          "what": "Hayes Johnson gift",
-          "tone": "hot"
-        },
-        {
-          "when": "Thu · 3:00",
-          "what": "LKMS Homework Help",
+          "when": "Fri · 9:00",
+          "what": "SRE field trip (museum + Meadowbrook)",
           "tone": "act"
         },
         {
-          "when": "Thu · 3:15",
-          "what": "Dan picks up Harris — SRE pickup · 3:40 | Casey (Riley's mom) picks up Hayes; Hayes hangs at Casey's",
+          "when": "Fri · 11:30",
+          "what": "SRE Tailgate Party (reading incentive)",
           "tone": "act"
         },
         {
-          "when": "Thu · 4:25",
-          "what": "Ainsley swim — Coach Ann",
+          "when": "Fri · 12:00",
+          "what": "HOA Fall Garage Sale",
           "tone": "hot"
         },
         {
-          "when": "Thu · 6:20",
-          "what": "Pick up Hayes at Casey's (Riley's mom)",
+          "when": "Fri · 12:00",
+          "what": "SRE field trip museum+park (chaperone slots)",
+          "tone": "act"
+        },
+        {
+          "when": "Fri · 12:00",
+          "what": "get tree-trim bids (2–3 written)",
           "tone": "hot"
         },
         {
-          "when": "home week",
-          "what": "Kids with Dad @ 147th through Fri Oct 2 · 3:00",
+          "when": "Fri · 1:00",
+          "what": "garage-sale haul · shake whole house",
           "tone": "hot"
         }
       ],
