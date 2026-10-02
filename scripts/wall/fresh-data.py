@@ -75,7 +75,10 @@ try:
         run(["python3", "scripts/cal-months.py", cm, S])
         fresh = json.load(open(cm)); cur_p = os.path.join(data, "cal-months.json")
         cur = json.load(open(cur_p)) if os.path.exists(cur_p) else {"days": {}}
-        lo, hi = fresh.get("rangeStart"), fresh.get("rangeEnd")
+        # the pull is "today CT -> +7 d": only those days are whole in it (earlier days and later ones are partial)
+        today = dt.datetime.now(dt.timezone(dt.timedelta(hours=-5))).date()
+        lo, hi = today.isoformat(), min(fresh.get("rangeEnd") or today.isoformat(), (today + dt.timedelta(days=7)).isoformat())
+        fresh["days"] = {k: v for k, v in fresh.get("days", {}).items() if lo <= k <= hi}
         for k in list(cur.get("days", {})):
             if lo and hi and lo <= k <= hi: del cur["days"][k]
         cur.setdefault("days", {}).update(fresh.get("days", {})); cur["days"] = dict(sorted(cur["days"].items()))
