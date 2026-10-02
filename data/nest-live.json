@@ -1,7 +1,7 @@
 {
   "status": "live",
-  "fetchedAt": "2026-10-02T01:38:29.578Z",
-  "updatedAt": "2026-10-02T01:38:29.578Z",
+  "fetchedAt": "2026-10-02T01:45:02.779Z",
+  "updatedAt": "2026-10-02T01:45:02.779Z",
   "source": "nest-sdm+webrtc-still",
   "cameras": [
     {
@@ -23,9 +23,7 @@
       "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEuWj4tCzdBjnBewJT9cxMmyuqJ44t2xEpZoHxHxy6X98PTT5LylTtkH09YotPY0laUf5oSLDS0FIHtzER2511VUJA",
       "protocols": [
         "WEB_RTC"
-      ],
-      "snapCapturedAt": null,
-      "snapSize": null
+      ]
     },
     {
       "id": "AVPHwEszjDhfLzGUeifKqDy5RxbNgy-ak0LIcIeP_ne3v_vm8QWlxJrFgtF-bxW-yPgNqCGwjmYWuJUQZX-HK6paZASTlQ",
@@ -78,7 +76,7 @@
     {
       "id": "AVPHwEtezQTp5yQU6h_0pWKlkCPORXdhYrCy96s1CVwjjT4NfAsP_hpfLy-kRlDF0ORI2c8AXwi9_Kq_yj_8rPZwyCH_6w",
       "name": "Kitchen camera",
-      "where": "Kitchen",
+      "where": "Cam",
       "type": "CAMERA",
       "online": null,
       "snapshotUrl": null,
@@ -94,9 +92,7 @@
       "rawName": "enterprises/86afe4a8-6612-4bf0-b69e-679d8910ec27/devices/AVPHwEtezQTp5yQU6h_0pWKlkCPORXdhYrCy96s1CVwjjT4NfAsP_hpfLy-kRlDF0ORI2c8AXwi9_Kq_yj_8rPZwyCH_6w",
       "protocols": [
         "WEB_RTC"
-      ],
-      "snapCapturedAt": null,
-      "snapSize": null
+      ]
     },
     {
       "id": "AVPHwEuvgj_bTQ6TzRNedMpdB-w5gs1bF2QHgvdTES9K5s9kshmS94FQCrNE_zPxr9PiWFmzVSCyRLj4f0G2RVo2biphPg",
@@ -125,7 +121,7 @@
   "deviceCount": 5,
   "cameraCount": 5,
   "stillsPending": false,
-  "stillNote": "WebRTC canvas stills via nest-webrtc-still.mjs · Pages-servable data/nest-snaps",
+  "stillNote": "WEB_RTC stills on disk (nest-snaps) · reattached by nest-fetch",
   "error": null,
   "nestProxy": "https://fabrics-upcoming-curve-abc.trycloudflare.com",
   "nestProxyPath": "scripts/nest-webrtc-proxy.mjs → SDM GenerateWebRtcStream"
