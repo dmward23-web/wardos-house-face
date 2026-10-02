@@ -20,7 +20,6 @@ import {
   writeJson, scanObject, bannedHits, PICKUP_EXCLUDE_RE, PARENT_IDS, kidsIn, leaveByMs,
 } from "./house/lib.mjs";
 import { momHits } from "./house/display-rename.mjs";
-import { cliGuard, HOUSE_MODE_FLAGS } from "./house/cli-guard.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DEFAULTS = { ...HM_DEFAULTS, out: path.join(ROOT, "data/next-up.json") };
@@ -120,10 +119,12 @@ export function timerCopy(timer, now) {
   return `${label} ${Math.floor(rem / 60)}:${String(rem % 60).padStart(2, "0")}.`;
 }
 
-export const USAGE = "Usage: node scripts/next-up.mjs [--data-dir data] [--events …] [--cal-live …] [--kids-week …] [--config …] [--override …] [--now ISO] [--out data/next-up.json] [--stdout] [--help|-h]\n  Writes data/next-up.json (or --out) unless --stdout. --help prints this and writes nothing.";
-
+const USAGE = "Usage: node scripts/next-up.mjs [--data-dir data] [--events …] [--now ISO] [--out data/next-up.json] [--stdout] [--help]\n--help prints this and writes nothing.";
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-  cliGuard(process.argv, { usage: USAGE, flags: HOUSE_MODE_FLAGS }); /* CLIGUARD1: before any read/write */
+  if (process.argv.includes("--help") || process.argv.includes("-h")) { /* ATLASLANE7 --help is print-only, never writes */
+    process.stdout.write(USAGE + "\n");
+    process.exit(0);
+  }
   const a = parseArgs(process.argv, DEFAULTS);
   const inp = loadInputs(a);
   const out = computeNextUp({ ...inp, now: a.now == null || isNaN(a.now) ? Date.now() : a.now });

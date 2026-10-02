@@ -23,7 +23,6 @@ import {
 } from "./house/lib.mjs";
 import { packFlagsFor } from "./house/wall-state.mjs";
 import { momHits } from "./house/display-rename.mjs";
-import { cliGuard, HOUSE_MODE_FLAGS } from "./house/cli-guard.mjs";
 import { NEXTUP_EXCLUDE_RE } from "./next-up.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -129,10 +128,12 @@ export function computeSchoolNight({ calendar, kidsWeek, config, packFlags, now,
   return out;
 }
 
-export const USAGE = "Usage: node scripts/school-night.mjs [--data-dir data] [--events …] [--cal-live …] [--kids-week …] [--config …] [--override …] [--pack-flags data/pack-flags.json] [--now ISO] [--out data/school-night.json] [--stdout] [--help|-h]\n  Writes data/school-night.json (or --out) unless --stdout. --help prints this and writes nothing.";
-
+const USAGE = "Usage: node scripts/school-night.mjs [--data-dir data] [--events …] [--pack-flags data/pack-flags.json] [--now ISO] [--out data/school-night.json] [--stdout] [--help]\n--help prints this and writes nothing.";
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-  cliGuard(process.argv, { usage: USAGE, flags: { ...HOUSE_MODE_FLAGS, "--pack-flags": true } }); /* CLIGUARD1: before any read/write */
+  if (process.argv.includes("--help") || process.argv.includes("-h")) { /* ATLASLANE7 --help is print-only, never writes */
+    process.stdout.write(USAGE + "\n");
+    process.exit(0);
+  }
   const argv = process.argv.slice();
   let pf = null;
   const i = argv.indexOf("--pack-flags");
