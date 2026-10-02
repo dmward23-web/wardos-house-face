@@ -133,3 +133,13 @@ html[data-landscape] .panel:not(#ls-off) #sensi-hero .climate-amb .big { padding
    runs down the gutters between the columns of plates */
 html[data-landscape] .panel:not(#ls-off)#hero-board a.card { padding: 1px 1px 0 !important; gap: 1px !important; }
 html[data-landscape] .panel:not(#ls-off)#hero-board a.card .card-label { padding: 0 3px !important; font-size: 18px !important; }
+/* SPACE-01 · weekend: the three idea slots and the three kid chips each sit side by side in landscape (one row
+   across the card, words centred), so neither card is a narrow stack with an empty right half */
+html[data-landscape] .panel.weekend-cmd:not(#ls-off) .options { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 12px !important; align-content: stretch; flex: 1 1 auto; }
+html[data-landscape] .panel.weekend-cmd:not(#ls-off) .options > .opt:last-child:nth-child(odd):not(:first-child) { grid-column: 1 / -1; }
+html[data-landscape] .panel.weekend-cmd:not(#ls-off) .options > .opt { flex-direction: column !important; align-items: center !important; justify-content: space-evenly !important; text-align: center !important; margin: 0 !important; min-width: 0; }
+html[data-landscape] .panel.weekend-cmd:not(#ls-off) .side > .sec { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-content: space-evenly; }
+html[data-landscape] .panel.weekend-cmd:not(#ls-off) .side > .sec > .sec-hdr { grid-column: 1 / -1; }
+html[data-landscape] .panel.weekend-cmd:not(#ls-off) .side > .sec > .vote-card { margin: 0 !important; min-width: 0; text-align: center; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; }
+html[data-landscape] .panel.weekend-cmd:not(#ls-off) .options > .opt:last-child:nth-child(odd):not(:first-child) { flex-direction: row !important; }
+html[data-landscape] .panel.weekend-cmd:not(#ls-off) .options > .opt > .emoji { zoom: 0.72; flex-shrink: 0; }

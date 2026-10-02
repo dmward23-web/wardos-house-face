@@ -386,7 +386,7 @@
       if (f > 1.12 && !(e.matches(LEAD) && !e.matches(".hot-banner"))) {
         for (var q = Math.min(2.4, f); q > 1.04; q = q / 1.07) {
           e.style.zoom = String(q);
-          if (e.scrollHeight <= e.clientHeight + 1 && e.scrollWidth <= e.clientWidth + 1 && fitsIn(e)) { e.setAttribute("data-ls-zoomed", String(Math.round(q * 100) / 100)); break; }
+          if (e.scrollHeight <= e.clientHeight + 1 && e.scrollWidth <= e.clientWidth + 1 && fitsIn(e) && innerOk(e)) { e.setAttribute("data-ls-zoomed", String(Math.round(q * 100) / 100)); break; }
           e.style.zoom = "";
         }
       }
@@ -473,6 +473,8 @@
   }
   g.addEventListener("load", function () { apply(); setTimeout(land, 60); setTimeout(function () { landed = false; land(); }, 900); });
   g.addEventListener("resize", apply, { passive: true });
+  /* SPREAD2 · the type fit measures words: when a web font lands after load, measure again (no word left cut) */
+  try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (isLandscape()) { apply(); sig = sign(); } }); } catch (e) {}
   /* LANDFILL2 · boards fill in their data after first paint (musts, lists, photos): deal the cards again when
      the board's content changes. Only text / child changes are watched, never the attributes apply() sets. */
   var tm = 0, busy = false;
