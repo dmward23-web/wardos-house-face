@@ -43,7 +43,7 @@ test("zero currency glyph in any jar file; no cash words in seed copy", () => {
 
 test("idempotent: same id twice is a no-op; same close credited from two screens = one entry", () => {
   const b = book();
-  const n = b.niceOne({ jar: "hayes", chip: "min-10", reason: "Great attitude", ...P }).entry;
+  const n = b.niceOne({ jar: "hayes", chip: "min-10", reason: "Positive attitude", ...P }).entry;
   assert.equal(b.apply(n), false);
   assert.equal(b.merge([n, { ...n }]), 0);
   assert.ok(b.credit({ jar: "hayes", unit: "pick", qty: 1, sourceId: "close-2026-10-01", reason: "close-done" }).entry);
@@ -122,12 +122,12 @@ test("redeem: parent-only, can't go below 0, floor holds even if a zero-day land
 test("chips: off-chip values and reasons rejected (no free amount, no free text)", () => {
   const b = book();
   for (const chip of ["min-20", "+20 min", 10, "10", "pick-2", null, "min-10 "]) {
-    assert.equal(b.niceOne({ jar: "hayes", chip, reason: "Great attitude", ...P }).error, "not-a-chip", String(chip));
+    assert.equal(b.niceOne({ jar: "hayes", chip, reason: "Positive attitude", ...P }).error, "not-a-chip", String(chip));
   }
   for (const reason of ["Nice", "", null, "great attitude"]) {
     assert.equal(b.niceOne({ jar: "hayes", chip: "min-10", reason, ...P }).error, "not-a-reason", String(reason));
   }
-  const forged = { id: "n-hayes-1790000000000-abcd", jar: "hayes", type: "add", unit: "min", qty: 45, reason: "Great attitude", at: NOW, dayKey: "2026-10-01" };
+  const forged = { id: "n-hayes-1790000000000-abcd", jar: "hayes", type: "add", unit: "min", qty: 45, reason: "Positive attitude", at: NOW, dayKey: "2026-10-01" };
   assert.equal(b.apply(forged), false, "off-chip Nice one from a sync is refused");
   assert.equal(b.apply({ ...forged, qty: 10.5 }), false, "non-integer qty refused");
   assert.equal(b.apply({ ...forged, unit: "usd", qty: 10 }), false, "no cash unit");
@@ -138,13 +138,13 @@ test("chips: off-chip values and reasons rejected (no free amount, no free text)
 test("parent gate required for Nice one, redeem, reversal and the parent view", () => {
   const b = book();
   for (const pinOk of [undefined, false, "true", 1, "1234"]) {
-    assert.equal(b.niceOne({ jar: "hayes", chip: "min-10", reason: "Great attitude", pinOk }).error, "parent-gate");
+    assert.equal(b.niceOne({ jar: "hayes", chip: "min-10", reason: "Positive attitude", pinOk }).error, "parent-gate");
     assert.equal(b.parentView({ pinOk }).error, "parent-gate");
   }
   const hooked = book({ parentGate: () => false });
-  assert.equal(hooked.niceOne({ jar: "hayes", chip: "min-10", reason: "Great attitude", ...P }).error, "parent-gate");
+  assert.equal(hooked.niceOne({ jar: "hayes", chip: "min-10", reason: "Positive attitude", ...P }).error, "parent-gate");
   const ok = book({ parentGate: ctx => ctx.action === "nice-one" });
-  assert.ok(ok.niceOne({ jar: "hayes", chip: "min-10", reason: "Great attitude", ...P }).ok);
+  assert.ok(ok.niceOne({ jar: "hayes", chip: "min-10", reason: "Positive attitude", ...P }).ok);
 });
 
 test("Nice one undo = reversal within 10 minutes; nothing deleted", () => {

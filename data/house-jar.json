@@ -62,7 +62,7 @@
   "niceOneReasons": [
     { "id": "kind-sibling", "label": "Kind to a sibling" },
     { "id": "helped-unasked", "label": "Helped without asking" },
-    { "id": "great-attitude", "label": "Great attitude" },
+    { "id": "positive-attitude", "label": "Positive attitude" },
     { "id": "extra-effort", "label": "Extra effort" },
     { "id": "good-listener", "label": "Good listener" }
   ],

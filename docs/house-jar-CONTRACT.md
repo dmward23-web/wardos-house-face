@@ -27,7 +27,7 @@ None of these files contains a currency glyph. A test enforces that.
 ```json
 { "id": "n-hayes-1790000000000-k3x9", "jar": "family|harris|hayes|ainsley",
   "type": "add|redeem|zero-day|reversal", "unit": "min|pick", "qty": 10,
-  "reason": "Great attitude", "at": "2026-10-01T20:00:00-05:00", "dayKey": "2026-10-01", "refId": "<reversals only>" }
+  "reason": "Positive attitude", "at": "2026-10-01T20:00:00-05:00", "dayKey": "2026-10-01", "refId": "<reversals only>" }
 ```
 - `qty` is a whole number.
   - A Nice one add must equal a chip.
@@ -86,7 +86,7 @@ available = max(0, sum(qty of live adds whose dayKey is NOT zeroed for that jar)
 
 ## Chips and reasons (fixed, from the seed)
 - `niceOneChips`: **+10 min** (`min-10`), **+15 min** (`min-15`), **+1 pick** (`pick-1`).
-- `niceOneReasons`: Kind to a sibling, Helped without asking, Great attitude, Extra effort, Good listener.
+- `niceOneReasons`: Kind to a sibling, Helped without asking, Positive attitude, Extra effort, Good listener.
 - `redeemReasons`: Time used, Picked Sunday dinner, Picked the movie.
 - `zeroDayReasons`: Closed a job that isn't theirs, Took a sibling's claimed choice.
 - `creditReasons`: Close done, All four musts closed, Choice job done, Five full closes this week, Us together, Mystery close.
