@@ -23,9 +23,13 @@ for line in open(fp):
     rx, _, rep = line.partition("\t")
     RULES.append((re.compile(rx, re.I), rep))
 # ATLASLANE6 · display-only renames (DAN RULING t2812u), same rules as scripts/house/display-rename.mjs.
-# The source calendar is never edited. "Mom & Dad" -> "Nonna and Papa", "Mom birthday" -> "Nonna birthday".
+# The source calendar is never edited. ATLASLANE9: raw-title patterns live in a private box file (never in the published
+# repo); the public config holds only ids + display strings. Missing private file = no renames (parent scrub drops them).
 _RC = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config", "display-rename.json")))
-RENAMES = [(re.compile(r["pattern"], re.I), r["replace"]) for r in _RC["renames"]]
+_PR = _RC.get("privateRules") or {}
+_PFP = os.path.expanduser(os.environ.get(_PR.get("env") or "WARDOS_DISPLAY_RENAME_PRIVATE") or _PR.get("path") or "")
+_PAT = {r["id"]: r["pattern"] for r in (json.load(open(_PFP)).get("renames") or [])} if _PFP and os.path.exists(_PFP) else {}
+RENAMES = [(re.compile(_PAT[r["id"]], re.I), r["replace"]) for r in _RC["renames"] if r["id"] in _PAT]
 PAREN = re.compile(_RC["parentScrub"]["parenthetical"], re.I)
 POSS = re.compile(_RC["parentScrub"]["possessive"])
 RESIDUAL = re.compile(_RC["parentScrub"]["residual"], re.I)

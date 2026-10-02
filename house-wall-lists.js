@@ -35,7 +35,10 @@
     try {
       if (!cfg || !Array.isArray(cfg.renames) || !cfg.parentScrub) return null;
       return {
-        renames: cfg.renames.map(function (r) { return { re: new RegExp(r.pattern, "gi"), replace: String(r.replace) }; }),
+        /* ATLASLANE9: the published config carries no patterns (they live in Atlas's private box file and the data is renamed
+           at build time). A rename without a pattern is skipped; new RegExp(undefined) would match between every letter. */
+        renames: cfg.renames.filter(function (r) { return r && typeof r.pattern === "string" && r.pattern; })
+          .map(function (r) { return { re: new RegExp(r.pattern, "gi"), replace: String(r.replace) }; }),
         paren: new RegExp(cfg.parentScrub.parenthetical, "gi"),
         poss: new RegExp(cfg.parentScrub.possessive, "g"),
         residual: new RegExp(cfg.parentScrub.residual, "i")

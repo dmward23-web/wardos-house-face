@@ -2,13 +2,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { computeNextUp, timerCopy } from "../../next-up.mjs";
 import { computeSchoolNight } from "../../school-night.mjs";
 import { computePickupChain } from "../../pickup-chain.mjs";
 import { CONTROLS, LATE_CHIPS, SHARED, applyTap, logisticsFor, toHubEntries, fromHubEntries, logisticsFile } from "../logistics-lib.mjs";
-import { displayText, displayDeepReport, momHits, moneyHits, moneyText } from "../display-rename.mjs";
+import { displayText, displayDeepReport, momHits, moneyHits, moneyText, loadRenames, RENAME_CONFIG } from "../display-rename.mjs";
 import { scoreHits } from "../kid-layer-lib.mjs";
 import { scanObject, readJson, publicText } from "../lib.mjs";
 import { calendar, allDay, KIDS_WEEK, CONFIG, at, ROOT } from "./fixture.mjs";
@@ -206,23 +207,39 @@ test("school-night: pickup from pickup-chain, gear from real events + Pack, real
 });
 
 /* ---------------- display renames (DAN RULING t2812u #2) ---------------- */
-test("display rename: Mom & Dad -> Nonna and Papa, Mom birthday -> Nonna birthday, Erin stays Erin", () => {
-  assert.equal(displayText("Mom & Dad in KC"), "Nonna and Papa in KC");
-  assert.equal(displayText("Erin + Mom/Dad — MCI curb · WN2480 9:10"), "Erin + Nonna and Papa — MCI curb · WN2480 9:10");
-  assert.equal(displayText("Mom birthday"), "Nonna birthday");
-  assert.equal(displayText("Erin drop Hayes"), "Erin drop Hayes");
-  assert.equal(displayText("Riley's Mom birthday"), null, "someone else's mom: never renamed to Nonna, not published");
-  assert.equal(displayText("Pick up Hayes at Casey's (Riley's mom)"), "Pick up Hayes at Casey's");
-  assert.equal(displayText("Harris — provider in-home @ mom’s · 4:00"), null);
-  assert.equal(publicText("Mom & Dad in KC"), "Nonna and Papa in KC", "public text path uses the rename");
-  const rep = displayDeepReport({ days: { a: { items: [{ l: "Mom birthday" }, { l: "x @ mom’s" }] } } });
+/* ATLASLANE9: the real raw-title patterns are private (box file, outside the published repo), so this test uses synthetic
+   private rules (Zia / Zio) through the same env override the builders read. The real examples are checked in atlaslane9. */
+test("display rename: private patterns + public display strings (synthetic), parent scrub, cal-months.py parity", () => {
+  const T = fs.mkdtempSync(path.join(os.tmpdir(), "atlas6-rename-"));
+  const pfp = path.join(T, "private.json");
+  fs.writeFileSync(pfp, JSON.stringify({ renames: [
+    { id: "nonna-papa", pattern: "\\bZia\\s*(?:&|and|\\+|/)\\s*Zio\\b" },
+    { id: "nonna-birthday", pattern: "(?<!'s )\\bZia birthday\\b" },
+  ] }));
+  const rules = loadRenames(RENAME_CONFIG, pfp);
+  assert.equal(rules.privateLoaded, true);
+  assert.equal(displayText("Zia & Zio in KC", rules), "Nonna and Papa in KC");
+  assert.equal(displayText("Erin + Zia/Zio · MCI curb · WN2480 9:10", rules), "Erin + Nonna and Papa · MCI curb · WN2480 9:10");
+  assert.equal(displayText("Zia birthday", rules), "Nonna birthday");
+  assert.equal(displayText("Riley's Zia birthday", rules), "Riley's Zia birthday", "someone else's: never renamed to Nonna");
+  assert.equal(displayText("Erin drop Hayes", rules), "Erin drop Hayes");
+  assert.equal(displayText("Pick up Hayes at Casey's (Riley's mom)", rules), "Pick up Hayes at Casey's");
+  assert.equal(displayText("Harris — provider in-home @ mom’s · 4:00", rules), null);
+  const none = loadRenames(RENAME_CONFIG, path.join(T, "absent.json"));
+  assert.equal(displayText("Zia & Zio in KC", none), "Zia & Zio in KC", "no private file: no renames");
+  const rep = displayDeepReport({ days: { a: { items: [{ l: "Zia birthday" }, { l: "x @ mom’s" }] } } }, rules);
   assert.deepEqual(rep.value, { days: { a: { items: [{ l: "Nonna birthday" }] } } });
-  /* cal-months.py uses the same config: parity */
+  const old = process.env.WARDOS_DISPLAY_RENAME_PRIVATE;
+  process.env.WARDOS_DISPLAY_RENAME_PRIVATE = pfp;
+  try { assert.equal(publicText("Zia & Zio in KC"), "Nonna and Papa in KC", "public text path uses the rename"); }
+  finally { if (old === undefined) delete process.env.WARDOS_DISPLAY_RENAME_PRIVATE; else process.env.WARDOS_DISPLAY_RENAME_PRIVATE = old; }
+  /* cal-months.py reads the same public config + private file: parity */
   const py = `import json,os,re\nsrc=open(${JSON.stringify(path.join(ROOT, "scripts/cal-months.py"))}).read()\nns={'json':json,'os':os,'re':re,'__file__':${JSON.stringify(path.join(ROOT, "scripts/cal-months.py"))}}\nexec(src[src.index('# ATLASLANE6'):src.index('BLOCK = re.compile(')],ns)\nprint(json.dumps([ns['display'](s) for s in json.loads(input())]))`;
-  const cases = ["Mom & Dad in KC", "Erin + Mom/Dad — MCI curb", "Mom birthday", "Harris — provider in-home @ mom’s · 4:00", "LKMS yearbook order ($30) · 12:00", "Babysit $15/hr"];
-  const r = spawnSync("python3", ["-c", py], { input: JSON.stringify(cases) + "\n", encoding: "utf8" });
+  const cases = ["Zia & Zio in KC", "Erin + Zia/Zio · MCI curb", "Zia birthday", "Harris — provider in-home @ mom’s · 4:00", "LKMS yearbook order ($30) · 12:00", "Babysit $15/hr"];
+  const r = spawnSync("python3", ["-c", py], { input: JSON.stringify(cases) + "\n", encoding: "utf8", env: { ...process.env, WARDOS_DISPLAY_RENAME_PRIVATE: pfp } });
   assert.equal(r.status, 0, r.stderr);
-  assert.deepEqual(JSON.parse(r.stdout), ["Nonna and Papa in KC", "Erin + Nonna and Papa — MCI curb", "Nonna birthday", null, "LKMS yearbook order · 12:00", "Babysit $15/hr"]);
+  assert.deepEqual(JSON.parse(r.stdout), ["Nonna and Papa in KC", "Erin + Nonna and Papa · MCI curb", "Nonna birthday", null, "LKMS yearbook order · 12:00", "Babysit $15/hr"]);
+  fs.rmSync(T, { recursive: true, force: true });
   /* every builder that writes public calendar data runs the pass */
   for (const f of ["scripts/calendar-refresh.mjs", "scripts/cal-from-events.mjs"]) assert.match(fs.readFileSync(path.join(ROOT, f), "utf8"), /displayDeep\(/, f);
   assert.match(fs.readFileSync(path.join(ROOT, "scripts/cal-months.py"), "utf8"), /label = display\(scrub\(summ\)\)/);

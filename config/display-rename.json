@@ -1,17 +1,17 @@
 {
-  "_about": "Display-only renames for public board data (DAN RULING t2812u, Thu Oct 1 6:26 PM CT). The source Google Calendar is never edited. Applied at build time by scripts/house/display-rename.mjs (kids-week.json, kids-data.js EMBEDDED, cal-live.json, next-up, pickup-chain, school-night) and scripts/cal-months.py (cal-months.json). Erin stays Erin.",
+  "_about": "Display-only renames for public board data (DAN RULING t2812u, Thu Oct 1 6:26 PM CT). The source Google Calendar is never edited. Only ids and display strings live here (this folder is published). The raw-title patterns live in a private box file outside the repo (privateRules); a missing private file means no renames and the parent scrub below drops those items. Applied at build time by scripts/house/display-rename.mjs and scripts/cal-months.py.",
+  "privateRules": {
+    "path": "~/.config/wardos/display-rename.private.json",
+    "env": "WARDOS_DISPLAY_RENAME_PRIVATE"
+  },
   "renames": [
     {
       "id": "nonna-papa",
-      "pattern": "\\bMom\\s*(?:&|and|\\+|/)\\s*Dad\\b",
-      "replace": "Nonna and Papa",
-      "evidence": "Source event 'Mom & Dad in KC' (Sep 11-14): 'Mom & Dad arriving with Dan on BNA->MCI ... continuing to Cleveland' = Dan's parents. 'Erin + Mom/Dad' events are the same visit."
+      "replace": "Nonna and Papa"
     },
     {
       "id": "nonna-birthday",
-      "pattern": "(?<!['’]s )\\bMom(?:['’]s)? birthday\\b",
-      "replace": "Nonna birthday",
-      "evidence": "Source event 'Mom birthday' (Dec 24). Not applied when the title names someone else's mom (\"Riley's Mom birthday\")."
+      "replace": "Nonna birthday"
     }
   ],
   "parentScrub": {
