@@ -33,6 +33,15 @@ ALLOW_WRITE=(
   data/cal-live.json
   kids-data.js
   data/calendar-dmward23-dump.json
+  # LIVEDATA1 · the 8 wall feeds ride the same 10-minute data-only commit (scripts/house-feeds-refresh.sh)
+  data/house-mode.json
+  data/next-up.json
+  data/kid-seats.json
+  data/unlocks.json
+  data/pickup-chain.json
+  data/school-night.json
+  data/who-home.json
+  data/logistics-taps.json
 )
 
 # Protected — NEVER overwrite / stage / restore from board-os snapshots.
@@ -142,6 +151,11 @@ node "$ROOT/scripts/cal-from-events.mjs" \
   --events "$EVENTS" \
   --out "$ROOT/data/cal-live.json"
 
+# 3) LIVEDATA1 · the 8 wall feeds at the current clock from the same scrubbed dump (no network, no git).
+#    The 3:00 AM CT house-day reset runs the same entrypoint (config/house-feeds.schedule.json);
+#    standalone: scripts/house-feeds-refresh.sh --events <dump>.
+"$ROOT/scripts/house-feeds-refresh.sh" --events "$EVENTS"
+
 # Mirror DATA ONLY into board-os when present (never HTML/CSS)
 if [[ -d /workspace/board-os/house-face ]]; then
   BOS=/workspace/board-os/house-face
@@ -150,6 +164,9 @@ if [[ -d /workspace/board-os/house-face ]]; then
   cp -f "$ROOT/data/kids-week.json" "$BOS/data/kids-week.json"
   cp -f "$ROOT/data/cal-live.json" "$BOS/data/cal-live.json"
   cp -f "$ROOT/kids-data.js" "$BOS/kids-data.js"
+  for f in house-mode next-up kid-seats unlocks pickup-chain school-night who-home logistics-taps; do
+    cp -f "$ROOT/data/$f.json" "$BOS/data/$f.json"
+  done
   # Explicitly do NOT copy kid-*.html sheet-*.html heat-v3.css house-engage.css
   # Explicitly do NOT copy sensi-live.json nest-live.json
 fi
