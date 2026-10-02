@@ -4277,6 +4277,8 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <div class="tile-foot"><span class="tile-fact">Travel sheet</span><span class="tile-tap">OPEN</span></div>
  </a>
 </nav>
+ <!-- JARTILE1: Ledger's jar tile = HouseJar.wallDisplay() only (rule, names, sync). No numbers, no fill, no money. Hidden without seed/module. -->
+ <div class="tile" data-house-jar data-owner="Ledger" data-tile-id="house-jar" hidden></div>
  </div>
 
  <footer class="ftr">
@@ -4296,6 +4298,9 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 <script src="house-sensi.js?v=SENSIAUTO1"></script>
 <script src="hub-key-entry.js?v=AUDIT1"></script>
 <script src="house-lights.js?v=AUDIT1"></script>
+<script src="house-jar.js?v=JAR1"></script>
+<script src="house-jar-wall.js?v=NICEONE1"></script>
+<script>document.addEventListener("DOMContentLoaded", function () { if (window.HouseJarWall) window.HouseJarWall.boot(); /* JARTILE1 + NICEONE1: Nice one hidden until the hub has a PIN */ });</script>
 <script src="house-sensi-ctl.js?v=SENSIAUTO1"></script>
 <script src="hub-led-ring.js?v=LEDPHONE1"></script>
 <script src="house-wall-status.js?v=CAMOFF1"></script>

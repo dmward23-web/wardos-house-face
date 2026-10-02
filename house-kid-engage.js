@@ -8,8 +8,11 @@
   "use strict";
 
   var KIDS = ["ainsley", "hayes", "harris"];
-  /* WALLKIT9 · KL-05: Ainsley has a seat, not a score. No streak/day count anywhere on her seat (dropped, not relabeled). */
+  /* WALLKIT9 · KL-05: Ainsley has a seat, not a score. No streak/day count anywhere on her seat (dropped, not relabeled).
+     CHORELAW1 (Dan 8:01 PM CT): Ainsley has NO stars and NO counts. Her tile is trusted-with: no Stars face, no Musts n/n,
+     no Today n/n, no progress glass. Atlas's rare, specific trusted-with line goes in [data-kf-trusted] (slot only: no copy here). */
   var SEAT_ONLY = { ainsley: true };
+  function facesFor(kidId) { return SEAT_ONLY[kidId] ? FACES.filter(function (f) { return f !== "stars"; }) : FACES; }
   var FACES = ["day", "stars", "chores", "leave"];
   var FACE_LABEL = { day: "Day", stars: "Stars", chores: "Chores", leave: "Leave" };
   var HREF = {
@@ -429,8 +432,8 @@
     return best;
   }
 
-  function faceIndex(face) {
-    var i = FACES.indexOf(face);
+  function faceIndex(face, kidId) {
+    var i = facesFor(kidId).indexOf(face);
     return i < 0 ? 0 : i;
   }
 
@@ -455,6 +458,7 @@
     var accent = ACCENT[kidId];
     var html = "";
 
+    if (face === "stars" && SEAT_ONLY[kidId]) face = "day"; /* CHORELAW1: no stars on a seat */
     if (face === "day") {
       var hot = kid.hottest || {};
       var todayBits = (kid.today || []).slice(0, 2);
@@ -507,8 +511,8 @@
       var iso = dayIso();
       var tp = todayMustProgress(kidId);
       html += '<div class="kf-face kf-chores">';
-      html += '<div class="kf-kicker">Chores · claim <span class="kf-chip">' +
-        tp.done + "/" + tp.need + "</span></div>";
+      html += '<div class="kf-kicker">Chores · claim' + (SEAT_ONLY[kidId] ? "" : ' <span class="kf-chip">' +
+        tp.done + "/" + tp.need + "</span>") + "</div>"; /* CHORELAW1: no count on a seat */
       html += '<div class="kf-claim-list" role="list">';
       var shown = 0;
       for (var i = 0; i < qs.length && shown < 5; i++) {
@@ -553,23 +557,24 @@
     var kidId = root.getAttribute("data-kid-flip");
     if (KIDS.indexOf(kidId) < 0) return;
     var face = root.getAttribute("data-face") || "day";
-    if (FACES.indexOf(face) < 0) face = "day";
+    if (facesFor(kidId).indexOf(face) < 0) face = "day";
     var stage = root.querySelector("[data-kf-stage]");
     var dots = root.querySelector("[data-kf-dots]");
     var streakEl = root.querySelector("[data-kf-streak]");
     var sub = root.querySelector("[data-kf-sub]");
     if (stage) stage.innerHTML = paintFace(kidId, face);
     if (dots) {
-      dots.innerHTML = FACES.map(function (f) {
+      dots.innerHTML = facesFor(kidId).map(function (f) {
         return '<i class="' + (f === face ? "is-on" : "") + '" data-face-dot="' + f + '"></i>';
       }).join("");
     }
     var streak = streakDays(kidId);
     var tp = todayMustProgress(kidId);
     if (streakEl) {
-      streakEl.textContent = streak > 0 && !SEAT_ONLY[kidId] /* WALLKIT9: no day count on a seat */
+      streakEl.hidden = !!SEAT_ONLY[kidId]; /* CHORELAW1: no Musts n/n on a seat */
+      streakEl.textContent = SEAT_ONLY[kidId] ? "" : (streak > 0
         ? ("Week " + streak + " · " + tp.done + "/" + tp.need)
-        : ("Musts " + tp.done + "/" + tp.need); /* KIDPATH1: no XP */
+        : ("Musts " + tp.done + "/" + tp.need)); /* KIDPATH1: no XP */
     }
     if (sub) {
       var leave = nextLeaveFor(kidId);
@@ -581,7 +586,7 @@
   }
 
   function setFace(root, face, playSound) {
-    if (FACES.indexOf(face) < 0) return;
+    if (facesFor(root.getAttribute("data-kid-flip")).indexOf(face) < 0) return;
     var prev = root.getAttribute("data-face");
     root.setAttribute("data-face", face);
     paintTile(root);
@@ -593,8 +598,9 @@
 
   function cycleFace(root, dir) {
     var face = root.getAttribute("data-face") || "day";
-    var i = faceIndex(face);
-    var next = FACES[(i + dir + FACES.length) % FACES.length];
+    var fs = facesFor(root.getAttribute("data-kid-flip"));
+    var i = faceIndex(face, root.getAttribute("data-kid-flip"));
+    var next = fs[(i + dir + fs.length) % fs.length];
     setFace(root, next, true);
   }
 
@@ -783,7 +789,9 @@
       "</div>" +
       '<div class="kf-stage" data-kf-stage></div>' +
       '<div class="tile-foot">' +
-      '<span class="tile-fact kf-streak-chip" data-kf-streak>Musts</span>' +
+      (SEAT_ONLY[kidId]
+        ? '<span class="tile-fact" data-kf-trusted hidden></span>' /* CHORELAW1 slot: Atlas's trusted-with line (data next round) */
+        : '<span class="tile-fact kf-streak-chip" data-kf-streak>Musts</span>') +
       '<a class="tile-tap kid-flip-go" href="' + esc(href) + '">OPEN</a>' +
       "</div>";
 
@@ -870,7 +878,7 @@
     var claims = host.querySelector("[data-hq-claims]");
     var go = host.querySelector("[data-hq-go]");
     if (title) title.textContent = accent.name + " · musts";
-    if (musts) musts.textContent = tp.need ? (tp.done + "/" + tp.need) : "—";
+    if (musts) { musts.hidden = !!SEAT_ONLY[kidId]; musts.textContent = SEAT_ONLY[kidId] ? "" : (tp.need ? (tp.done + "/" + tp.need) : "—"); } /* CHORELAW1 */
     if (streakEl) {
       streakEl.hidden = !!SEAT_ONLY[kidId]; /* WALLKIT9: a seat shows no streak line */
       streakEl.textContent = SEAT_ONLY[kidId] ? "" : (streak > 0 ? ("Week " + streak) : "Week · tap musts"); /* KIDPATH2 */
@@ -992,7 +1000,7 @@
     var tp = todayMustProgress(kidId);
     var gate = mustProgress(kidId);
     var label = document.querySelector("[data-streak-label]");
-    if (label && SEAT_ONLY[kidId]) label.textContent = "Today " + tp.done + "/" + tp.need; /* WALLKIT9: no streak count on a seat */
+    if (label && SEAT_ONLY[kidId]) { label.textContent = ""; label.hidden = true; } /* CHORELAW1: no streak, no Today n/n on a seat */
     else if (label) {
       label.classList.add("streak-sparks");
       label.setAttribute("data-streak", "1");
@@ -1001,6 +1009,7 @@
         : ("Week · today " + tp.done + "/" + tp.need); /* KIDPATH2 */
     }
     var glass = document.querySelector("[data-xp-glass]");
+    if (SEAT_ONLY[kidId]) { if (glass && glass.parentNode) glass.parentNode.removeChild(glass); return; } /* CHORELAW1: no Musts today n/n */
     if (!glass) {
       var hdr = document.querySelector(".sec-chores .sec-hdr");
       if (hdr) {

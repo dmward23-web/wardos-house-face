@@ -21,3 +21,11 @@ nest-refresh.token
 # Calendar dumps — never publish raw dmward23 events to Pages
 data/calendar-*.json
 **/calendar-dmward23*.json
+# NICEONE1 · hub parent PIN (salted scrypt hash), its lock and grant ledger live in ~/.config/wardos ONLY — never commit
+parent-pin.json
+**/parent-pin.json
+parent-pin*.json
+**/parent-pin*.json
+parent-pin-lock.json
+nice-one-taps.json
+**/nice-one-taps.json

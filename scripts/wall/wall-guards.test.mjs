@@ -150,7 +150,7 @@ await t("KIDPATH1: kid-path files show no $ except the one $15/hr tag, and no ja
   assert.deepEqual(KP.KID_PATH_FILES, ["house-kid-engage.js", "sheet-index.html", "kid-ainsley.html", "kid-hayes.html", "kid-harris.html", "kids-data.js", "kids-week.json",
     "sheet-chores.html", "sheet-allowance.html", "sheet-pack.html", "sheet-win.html", "sheet-countdowns.html", "sheet-today.html",
     "house-saves.js", "house-sfx.js", "house-checkoffs.js"]);
-  assert.deepEqual(KP.BANNED.map((b) => b[0]), ["$", "jar", "XP", "Bal", "Show me the Money", "Mom", "streak", "\u{1F525}"]);
+  assert.deepEqual(KP.BANNED.map((b) => b[0]), ["$", "jar", "XP", "Bal", "Show me the Money", "Mom", "streak", "payday", "\u{1F525}"]);
   const all = KP.KID_PATH_FILES.flatMap((f) => KP.hits(f, read(f)));
   assert.deepEqual(all, [], all.map((h) => `${h.file}:${h.line} [${h.rule}] ${h.text}`).join("\n"));
 });
@@ -184,9 +184,9 @@ await t("KIDPATH1: Pack tabs read Kids home / Kids away; Win says Kids away; Win
   assert.match(win, /<div class="hero-title">Fri Oct 2 \u00b7 Dan DRIVE \u2192 Nashville<\/div>/);
 });
 await t("KIDPATH2: Hayes + Harris boards match Ainsley (no money chips, star-count readout, Goal wording); ids + goal math untouched", () => {
-  for (const f of ["kid-hayes.html", "kid-harris.html", "kid-ainsley.html"]) {
+  for (const f of ["kid-hayes.html", "kid-harris.html", "kid-ainsley.html"]) assert.doesNotMatch(read(f), /data-bank-balance|data-bank-week-earn/, f + " has no Bal / Week $ chips");
+  for (const f of ["kid-hayes.html", "kid-harris.html"]) { /* CHORELAW1: Ainsley's star goal section is gone (no stars) */
     const h = read(f);
-    assert.doesNotMatch(h, /data-bank-balance|data-bank-week-earn/, f + " has no Bal / Week $ chips");
     assert.match(h, /<div class="grow-total"><span data-grow-total>0<\/span> \/ <span data-grow-save-need>0<\/span> \u2605<\/div>/);
     assert.match(h, /id="sec-jar"/, "anchor id kept"); assert.match(h, /data-grow-jar-name/); assert.match(h, /WardKids\.resetJarCycle\(/);
   }
@@ -234,5 +234,33 @@ await t("WALLKIT9: Ainsley has a seat, not a score: no streak/day count in her k
   const chores = read("sheet-chores.html"), col = chores.slice(chores.indexOf('aria-label="Ainsley chores"'), chores.indexOf('class="chore-list"', chores.indexOf('aria-label="Ainsley chores"')));
   assert.doesNotMatch(col, /class="streak"|\d+-day/, "sheet-chores Ainsley header has no day-count chip");
   assert.doesNotMatch(read("kid-ainsley.html"), /\b\d+-day\b|Week \d+\b/, "kid-ainsley.html shows no day count");
+});
+await t("CHORELAW1: no payday wording anywhere on the kid path (scanner bans it); the only $ is still Ainsley's $15/hr", () => {
+  const fx = (s) => KP.BANNED.filter(([, f]) => f(s)).map(([k]) => k);
+  assert.deepEqual(fx("Next payday · Fri"), ["payday"]); assert.deepEqual(fx("Pay-day with Dad"), ["payday"]); assert.deepEqual(fx("Next goal day · Fri"), []);
+  for (const f of KP.KID_PATH_FILES) assert.deepEqual(KP.hits(f, read(f)), [], f);
+  const kd = read("kids-data.js").replace(/var EMBEDDED = \{[\s\S]*?\};/, "");
+  for (const old of ["Next payday", "Fri payday", "payday after honest musts", "Goal met · Payday with Dad", "Next Payday ="]) assert.ok(!kd.includes(old), old);
+  assert.ok(kd.includes('"Next goal day · "') && kd.includes('"Goal met · show Dad"') && kd.includes('"Friday drop · pick with Dad after honest musts"'));
+  const al = read("sheet-allowance.html"); assert.ok(al.includes("Dad checks · pick") && al.includes("goal day turns week ★ into carry (carry survives)."));
+  assert.doesNotMatch(al, /payday/i);
+  assert.doesNotMatch(read("wall.html").replace(/<script[\s\S]*?<\/script>/g, ""), /data-money/, "no weekly $ total element (superseded by the chore law)");
+  for (const f of KP.JAR_FILES) assert.deepEqual(KP.jarHits(f, read(f)), [], f + ": jar copy has no $, payday, balance");
+});
+await t("CHORELAW1: Ainsley has NO stars and NO counts on her tile/seat/page; slots left for Atlas's trusted-with line", () => {
+  const eng = read("house-kid-engage.js");
+  assert.match(eng, /function facesFor\(kidId\) \{ return SEAT_ONLY\[kidId\] \? FACES\.filter\(function \(f\) \{ return f !== "stars"; \}\) : FACES; \}/);
+  assert.match(eng, /if \(face === "stars" && SEAT_ONLY\[kidId\]\) face = "day";/);
+  assert.match(eng, /streakEl\.hidden = !!SEAT_ONLY\[kidId\]; \/\* CHORELAW1/);
+  assert.match(eng, /if \(label && SEAT_ONLY\[kidId\]\) \{ label\.textContent = ""; label\.hidden = true; \}/);
+  assert.match(eng, /if \(SEAT_ONLY\[kidId\]\) \{ if \(glass && glass\.parentNode\) glass\.parentNode\.removeChild\(glass\); return; \}/);
+  assert.match(eng, /musts\.hidden = !!SEAT_ONLY\[kidId\]/); assert.match(eng, /data-kf-trusted hidden/);
+  assert.doesNotMatch(eng, /"Today " \+ tp\.done/, "no 'Today n/n' on her seat");
+  const sfx = read("house-sfx.js"); assert.match(sfx, /if \(t === "ainsley"\) return ""; \/\* CHORELAW1/); assert.match(sfx, /theme\(\) === "ainsley"\) return; \/\* CHORELAW1/);
+  const ka = read("kid-ainsley.html").replace(/<style[\s\S]*?<\/style>/g, "").replace(/<!--[\s\S]*?-->/g, "");
+  assert.doesNotMatch(ka, /\u2605|data-progress-meta|data-left-count|id="sec-jar"|data-grow-total|data-bank-life|data-got-it|href="#sec-jar"/, "no stars, counts or star goal on Ainsley's page");
+  assert.match(ka, /data-trusted-line="ainsley"[^>]*hidden><\/section>/, "empty slot, no invented copy");
+  const wall = read("wall.html"); assert.match(wall, /data-kid-trusted="ainsley" hidden><\/div>/);
+  for (const f of ["sheet-allowance.html", "sheet-chores.html"]) assert.ok(read(f).includes("Ainsley"), f + " (Ainsley star rows there are a listed gap)");
 });
 console.log(`wall-guards: ${n} tests PASS`);

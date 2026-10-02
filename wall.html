@@ -91,20 +91,27 @@
         <button class="tap kid-done" data-kid-done="ainsley" aria-label="Ainsley chore done"><span class="mark" aria-hidden="true"></span><span class="tx"><span>Chore done</span><small>Today</small></span></button>
         <div class="kid-seat" data-kid-seat="ainsley" hidden></div>
         <div class="kid-unlock" data-kid-unlock="ainsley" hidden></div>
+        <div class="kid-seat" data-kid-trusted="ainsley" hidden></div><!-- CHORELAW1 slot: Atlas's trusted-with line (data next round); no stars, no counts -->
+        <div data-nice-one-host="ainsley"></div><!-- NICEONE1: parent hold control lands here only when the hub has a PIN -->
       </div>
       <div class="mod kid" id="w-kid-hayes" data-owner="Atlas" data-tile="kid-hayes" data-tile-id="kid-hayes" data-kid="hayes">
         <button class="tap kid-name" data-kid-checkin="hayes" aria-label="Hayes check in"><span class="tx"><span>Hayes</span><small>Tap when home</small></span></button>
         <button class="tap kid-done" data-kid-done="hayes" aria-label="Hayes chore done"><span class="mark" aria-hidden="true"></span><span class="tx"><span>Chore done</span><small>Today</small></span></button>
         <div class="kid-seat" data-kid-seat="hayes" hidden></div>
         <div class="kid-unlock" data-kid-unlock="hayes" hidden></div>
+        <div data-nice-one-host="hayes"></div><!-- NICEONE1: parent hold control lands here only when the hub has a PIN -->
       </div>
       <div class="mod kid" id="w-kid-harris" data-owner="Atlas" data-tile="kid-harris" data-tile-id="kid-harris" data-kid="harris">
         <button class="tap kid-name" data-kid-checkin="harris" aria-label="Harris check in"><span class="tx"><span>Harris</span><small>Tap when home</small></span></button>
         <button class="tap kid-done" data-kid-done="harris" aria-label="Harris chore done"><span class="mark" aria-hidden="true"></span><span class="tx"><span>Chore done</span><small>Today</small></span></button>
         <div class="kid-seat" data-kid-seat="harris" hidden></div>
         <div class="kid-unlock" data-kid-unlock="harris" hidden></div>
+        <div data-nice-one-host="harris"></div><!-- NICEONE1: parent hold control lands here only when the hub has a PIN -->
       </div>
     </div>
+    <!-- JARTILE1: Ledger's jar tile = HouseJar.wallDisplay() only (rule, names, sync). No numbers, no fill, no money. -->
+    <div class="mod" id="w-jar" data-owner="Ledger" data-tile="house-jar" data-tile-id="house-jar" data-house-jar hidden></div>
+    <div class="mod" id="w-nice-pad" data-owner="Wright" data-tile="nice-one-pad" data-tile-id="nice-one-pad" data-nice-pad-host hidden></div>
     <div class="mod us-row" id="w-us" data-owner="Atlas" data-tile="us-together" data-tile-id="us-together" hidden>
       <span class="us-msg" id="w-us-msg"></span>
       <button class="tap unlock" id="w-us-btn" data-unlock="" data-choice=""><span class="tx"><span>Weekend fun</span><small></small></span></button>
@@ -183,6 +190,8 @@
 <script src="house-wall-lists.js"></script>
 <script src="house-weather.js"></script>
 <script src="house-grocery-list.js"></script>
+<script src="house-jar.js"></script>
+<script src="house-jar-wall.js"></script>
 <script>
 (function () {
   "use strict";
@@ -574,6 +583,7 @@
   if (L && L.startPolling) L.startPolling(); /* existing lights client: no key -> no proxy requests (AUDIT1) */
   tick(); setInterval(tick, 15000);
   loadKidCfg().then(load); setInterval(load, 60000);
+  if (window.HouseJarWall) window.HouseJarWall.boot(); /* JARTILE1 jar tile (Ledger wallDisplay only) + NICEONE1 parent gate (hidden until the hub has a PIN) */
 })();
 </script>
 </body>

@@ -25,6 +25,7 @@ import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import * as sensi from "./sensi-control.mjs"; /* SENSICTL1 */
 import * as sensiTravel from "./sensi-travel.mjs"; /* TRAVEL1 · wall Travel / Back home */
+import { createNiceOne } from "./house/nice-one.mjs"; /* NICEONE1 · parent PIN verify + one-use grant for the jar Nice one (time/picks, never cash) */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -363,6 +364,7 @@ async function main() {
     process.exit(2);
   }
 
+  const niceOne = createNiceOne(); /* NICEONE1 · ~/.config/wardos/parent-pin.json (600) · verify only; Ledger's house-jar.js writes client-side */
   const server = http.createServer(async (req, res) => {
     const u = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
     const pathname = u.pathname;
@@ -397,6 +399,17 @@ async function main() {
         return json(res, 401, {
           error: "unauthorized · need X-Lights-Proxy-Token / ?proxyToken=",
         });
+      }
+
+      /* NICEONE1 · parent "Nice one": PIN verified HERE on the hub (never in the browser), then one time/pick grant.
+         Behind the same checkAuth gate as Sensi/Kasa above. Not configured until a PIN is set (scripts/parent-pin.mjs set). No book write here. */
+      if (pathname === "/api/nice-one" || pathname.startsWith("/api/nice-one/")) {
+        const body = req.method === "POST" ? await readBody(req) : {};
+        const r = await niceOne.handle(pathname, req.method, body);
+        if (r) {
+          if (pathname !== "/api/nice-one/status") console.log(`[nice-one] ${new Date().toISOString()} ${pathname} -> ${r.status} ${r.body.error || "ok"}`); /* never logs the PIN */
+          return json(res, r.status, r.body);
+        }
       }
 
       /* TAPSYNC1 · kids chore taps shared across every device (same key + tunnel) */

@@ -18,6 +18,7 @@ export const BANNED = [
   ["Show me the Money", (s) => /show me the money/i.test(s)],
   ["Mom", (s) => /\bmoms?\b|\bmommy\b|\bmom['’]s\b/i.test(s)],
   ["streak", (s) => /streak/i.test(s)],
+  ["payday", (s) => /\bpay-?days?\b/i.test(s)], /* CHORELAW1: jar pays time and picks, never cash */
   ["\u{1F525}", (s) => /\u{1F525}/u.test(s)],
 ];
 const ent = (s) => s.replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&#39;|&apos;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#36;/g, "$");
@@ -92,11 +93,29 @@ export function hits(file, src) {
   for (const v of visibleCopy(file, src)) for (const [name, f] of BANNED) if (f(v.text)) res.push({ file, line: v.line, rule: name, text: v.text.slice(0, 160) });
   return res;
 }
+/* JARTILE1 + NICEONE1 (CHORE LAW, Dan 8:01 PM CT): Ledger's jar and the parent Nice one are allowed to say "jar" (it is
+   Ledger's tile now), but their copy carries NO $ at all (not even the rate tag), no payday, no balance and no cash amount.
+   The tile itself (wallDisplay) is also checked at render time in nice-one.test.mjs: no digits, no fill. */
+export const JAR_FILES = ["house-jar.js", "house-jar-wall.js", "data/house-jar.json"];
+export const JAR_BANNED = [
+  ["$", (s) => s.includes("$")],
+  ["payday", (s) => /\bpay-?days?\b/i.test(s)],
+  ["balance", (s) => /\bbalances?\b|\bBal\b/i.test(s)],
+  ["cash amount", (s) => /\b\d+\s*(?:dollars?|bucks|cents?)\b/i.test(s)],
+  ["XP", (s) => /\bXP\b/.test(s)],
+  ["Mom", (s) => /\bmoms?|\bmommy|\bmom['’]s\b/i.test(s)],
+];
+export function jarHits(file, src) {
+  const res = [];
+  for (const v of visibleCopy(file, src)) for (const [name, f] of JAR_BANNED) if (f(v.text)) res.push({ file, line: v.line, rule: name, text: v.text.slice(0, 160) });
+  return res;
+}
 if (import.meta.url === `file://${process.argv[1]}`) {
   const root = new URL("../../", import.meta.url);
   const files = process.argv.slice(2).length ? process.argv.slice(2) : KID_PATH_FILES;
   let all = [];
   for (const f of files) all = all.concat(hits(f, fs.readFileSync(new URL(f, root), "utf8")));
+  if (!process.argv.slice(2).length) for (const f of JAR_FILES) all = all.concat(jarHits(f, fs.readFileSync(new URL(f, root), "utf8")));
   all.forEach((h) => console.log(`${h.file}:${h.line} [${h.rule}] ${h.text}`));
   console.log(all.length + " hits");
   process.exit(all.length ? 1 : 0);

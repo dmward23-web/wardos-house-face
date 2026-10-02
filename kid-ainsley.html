@@ -1071,17 +1071,11 @@ body.theme-ainsley .setlist-foot { display: none !important; }
  </div>
  </div>
  </header>
- <nav class="session-rail day-records jump-rail" aria-label="Jump · Musts Goal Days">
+ <nav class="session-rail day-records jump-rail" aria-label="Jump · Musts Days">
  <a class="row live jump-pill" href="#sec-musts">Musts</a>
- <a class="row stub jump-pill" href="#sec-jar">Goal</a>
  <a class="row stub jump-pill" href="#sec-days">Days</a>
  </nav>
-<div class="xp-stage" aria-label="Today progress">
- <div class="xp-stage-lab">TODAY</div>
- <div class="xp-stage-track"><div class="xp-stage-fill" data-progress-fill></div></div>
- <div data-progress-meta="{done}/{total}" style="font-size:13px;font-weight:800;color:#a8a490">0/6</div>
- <div class="left-chip" data-left-count>··</div>
- </div>
+<!-- CHORELAW1 (Dan 8:01 PM CT): Ainsley has NO stars and NO counts. The TODAY n/n strip and left-count chip are gone. -->
  <section class="hot-banner" aria-label="Next">
  <div class="hot-accent"></div>
  <div class="hot-body">
@@ -1095,37 +1089,8 @@ body.theme-ainsley .setlist-foot { display: none !important; }
  <div class="sec-hdr"><div class="sec-title">Musts</div></div>
  <div class="sec-list" data-mount-quests></div>
  </section>
- <section class="sec sec-bank bank-card tour-jar" id="sec-jar" aria-label="Tour goal">
- <div class="bank-top">
- <div>
- <div class="bank-title">Tour goal</div>
- </div>
- <div class="bank-count"><span data-bank-symbol>★</span> <span data-bank-life>0</span></div>
- </div>
- <button type="button" class="grow-meter grow-jar" data-grow-meter aria-label="Tour goal">
- <div class="grow-stage">
- <div class="grow-fill grow-fill-balance" data-grow-fill-balance></div>
- <div class="grow-fill grow-fill-week" data-grow-fill-week></div>
- <div class="grow-goal-line" data-grow-goal-line aria-hidden="true"></div>
- <div class="grow-icons" data-grow-icons aria-hidden="true"></div>
- <div class="grow-pct" data-grow-pct></div>
- </div>
- <div class="grow-readout">
- <div class="grow-jar-name" data-grow-jar-name>Tour goal</div>
- <div class="grow-total"><span data-grow-total>0</span> / <span data-grow-save-need>0</span> ★</div>
- </div>
- </button>
- <!-- KIDPATH1: balance + week money chips removed (no $ on kid paths) -->
- <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
- <div class="bank-meta"><span data-bank-meta></span><span class="bank-meta-sep" aria-hidden="true">·</span><span class="bank-meta-today">Today <span data-bank-today>0</span></span></div>
- <div class="bank-links">
- <a class="primary-foil" href="sheet-allowance.html">Goal →</a>
- <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">Goal met · show Dad</a>
- <button type="button" class="got-it" data-got-it hidden>Paid</button>
- </div>
- <div class="saves-host" data-saves-panel data-kid="ainsley"></div>
- <div class="paid-stamp" data-paid-stamp hidden>Paid</div>
- </section>
+ <!-- CHORELAW1: no star goal / jar section on Ainsley's page (she has NO stars; the jar is Ledger's tile on the wall/hub, never listed here). -->
+ <section class="sec" data-trusted-line="ainsley" aria-label="Trusted with" hidden></section><!-- slot: Atlas's rare, specific trusted-with line (data next round). No copy here. -->
  <section class="sec sec-schedule consume-sched" id="sec-days" aria-label="Week" data-consume-sel="">
  <div class="sec-hdr"><div class="sec-title">Week</div></div>
  <div class="harbor-strip" aria-label="Next 24h">
@@ -1166,30 +1131,7 @@ document.addEventListener("DOMContentLoaded", function(){
  if (window.WardKids) WardKids.boot("ainsley");
  if (window.HouseSfx) HouseSfx.wireMute();
 
- var got = document.querySelector("[data-got-it]");
- if (got && window.WardKids) {
- got.addEventListener("click", function () {
- var data = WardKids._data;
- var bank = data ? WardKids.getBankView("ainsley", data) : null;
- var weekEarn = bank ? bank.weekEarn : 0;
- var bal = bank ? bank.balance : 0;
- var after = bal + weekEarn;
- var def = String(weekEarn);
- var paidStr = window.prompt(
- "Dad paid how much?\nThis week earn " + weekEarn + " → carry becomes " + after + " − paid.\n0 = keep all as carry into next week.",
- def
- );
- if (paidStr == null) return;
- WardKids.resetJarCycle("ainsley", paidStr, data);
- if (data) {
- WardKids.syncBankFromChecks(data);
- var bank2 = WardKids.getBankView("ainsley", data);
- WardKids.renderBank(document, bank2);
- WardKids.renderPersonalGoal(document, "ainsley", data, bank2);
- }
- if (window.HouseSfx) HouseSfx.tap();
- });
- }
+ /* CHORELAW1: the Paid / carry prompt is gone with the star goal section (Ainsley has no stars). */
 });
 </script>
 

@@ -418,12 +418,12 @@
     var cash = "+" + n; /* KIDPATH2: star count, no $ */
     if (t === "harris") return cash + " ◆";
     if (t === "hayes") return cash + " ◎";
-    if (t === "ainsley") return cash + " ★";
+    if (t === "ainsley") return ""; /* CHORELAW1: Ainsley has no stars */
     return cash + " ★";
   }
 
   function floatDollar(el, dollars) {
-    if (reducedMotion()) return;
+    if (reducedMotion() || theme() === "ainsley") return; /* CHORELAW1: no star float for Ainsley */
     var layer = ensureLayer();
     var r = el && el.getBoundingClientRect ? el.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 0, height: 0 };
     var pop = document.createElement("div");
@@ -439,7 +439,8 @@
     var n = dollarsFor(el);
     sfxQuest();
     boomAt(el);
-    if (n > 0) floatDollar(el, n);
+    if (theme() === "ainsley") { /* CHORELAW1: sound + burst only, no star count */ }
+    else if (n > 0) floatDollar(el, n);
     else floatPopup(el, currencyLabel(el));
     // light hotbar / era / loadout react
     document.querySelectorAll(".hotbar-slot, .loadout-slot, .track-dot, .era").forEach(function (s, i) {

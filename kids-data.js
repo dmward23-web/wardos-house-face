@@ -795,7 +795,7 @@
   }
 
 
-  /** Next payday = next Friday 6:00p America/Chicago (box TZ). Ledger default. */
+  /** Next goal day = next Friday 6:00p America/Chicago (box TZ). Ledger default (CHORELAW1: no payday wording). */
   function nextPaydayInfo(now) {
     now = now || new Date();
     var day = now.getDay();
@@ -803,10 +803,11 @@
     var daysUntilFri = (5 - day + 7) % 7;
     if (daysUntilFri === 0 && hours >= 18) daysUntilFri = 7;
     var label;
-    if (daysUntilFri === 0) label = "Tonight · Fri payday";
-    else if (daysUntilFri === 1) label = "Tomorrow · Fri payday";
-    else label = daysUntilFri + " days · Fri payday";
-    return { days: daysUntilFri, label: label, when: "Fri evening CT", rule: "Next Payday = next Friday 6:00p CT" };
+    /* CHORELAW1: no payday wording (the jar pays time and picks, never cash) */
+    if (daysUntilFri === 0) label = "Tonight · Fri goal day";
+    else if (daysUntilFri === 1) label = "Tomorrow · Fri goal day";
+    else label = daysUntilFri + " days · Fri goal day";
+    return { days: daysUntilFri, label: label, when: "Fri evening CT", rule: "Next goal day = next Friday 6:00p CT" };
   }
 
   function getPaidStamp(kidId) {
@@ -1040,12 +1041,12 @@
     });
     root.querySelectorAll("[data-payday-chip]").forEach(function (el) {
       var info = nextPaydayInfo();
-      el.textContent = "Next payday · " + info.label;
+      el.textContent = "Next goal day · " + info.label.replace(/ · Fri goal day$/, " · Fri"); /* CHORELAW1 */
       el.setAttribute("title", info.rule);
     });
     root.querySelectorAll("[data-payday-copy]").forEach(function (el) {
       el.textContent = (bank.kidId === "ainsley")
-        ? "Friday drop · payday after honest musts"
+        ? "Friday drop · pick with Dad after honest musts" /* CHORELAW1: no payday */
         : "Goal with Dad after honest musts"; /* WALLKIT9: Atlas's reward string (kid-copy.mjs), no Payday */
     });
     root.querySelectorAll("[data-bank-goal-blurb]").forEach(function (el) {
@@ -1950,7 +1951,7 @@
       var unlock = document.querySelector("[data-goal-unlock]");
       if (unlock) {
         unlock.hidden = false;
-        unlock.textContent = "Goal met · Payday with Dad";
+        unlock.textContent = "Goal met · show Dad"; /* CHORELAW1: no payday */
       }
       if (!prevReached) {
         try {
