@@ -1,12 +1,12 @@
 /* NICEONE1 + JARTILE1 · house-jar-wall.js · window.HouseJarWall (Node: require) · Wright, Oct 1 2026.
    CHORE LAW (Dan 8:01 PM CT): the jar is Ledger's tile; it pays time and picks, never cash; balances are never listed.
-   1. Jar tile (wall.html + hub): renders ONLY HouseJar book.wallDisplay() = {ruleText, jars:[{jar,name}], synced, syncLabel}:
-      the printed rule, the jar names, and the sync label. No numbers, no fill, no money. Hidden if the seed or module is missing.
+   1. Jar tile (wall.html + hub): renders ONLY HouseJar book.wallDisplay() = {ruleText, ruleLine2, jars:[{jar,name}], synced, syncLabel}:
+      the law sentence, ruleLine2 directly under it (both verbatim), the jar names, and the sync label. No numbers, no fill, no money. Hidden if the seed or module is missing.
    2. Nice one (wall + hub seat cards ONLY, never kid-*.html): press-and-hold 1.5 s (a short tap does nothing) -> on-screen
       4-digit PIN pad (buttons only, no input element, no keyboard) -> PIN verified ON THE HUB (/api/nice-one/verify, same hub
       key as Sensi/Kasa) -> chips from Ledger's seed (+10 min / +15 min / +1 pick) + reasons -> the hub spends the one grant
       for a uuid tapId (/api/nice-one/consume) -> only then book.niceOne({..., pinOk:true}) with the parentGate hook armed for
-      that single call. Parent jar totals (parentView) show only inside this gated panel. Hidden while no PIN is set.
+      that single call. JAR-VIEW-01 (Alfred): no totals view on the wall at all; parentView is never called from here. Hidden while no PIN is set.
    Functional markup only, existing classes (Dan is picking the 2100 look): no CSS in here. */
 (function (root, factory) {
   var api = factory(root);
@@ -26,7 +26,7 @@
     if (!d || typeof d.ruleText !== "string" || !d.ruleText.trim() || !Array.isArray(d.jars) || !d.jars.length) return null;
     var jars = d.jars.map(function (j) { return { id: String((j && j.jar) || "").trim(), name: String((j && j.name) || "").trim() }; }).filter(function (j) { return j.name; });
     if (!jars.length) return null;
-    return { rule: d.ruleText.trim(), names: jars.map(function (j) { return j.name; }), ids: jars.map(function (j) { return j.id; }),
+    return { rule: d.ruleText.trim(), rule2: typeof d.ruleLine2 === "string" ? d.ruleLine2.trim() : "", names: jars.map(function (j) { return j.name; }), ids: jars.map(function (j) { return j.id; }),
       sync: d.synced === true ? "" : String(d.syncLabel || "Not synced") };
   }
   /* ION1: Prism's Ion jar markup (.jars / .jarg outline glyph / .jar-sync / .jar-rule). Outline glyphs only: no fill, no numbers. */
@@ -36,7 +36,8 @@
         var id = (m.ids && m.ids[i]) || "";
         return '<span class="jarg"' + (id ? ' data-jar="' + esc(id) + '"' : "") + '><i class="jar-glyph" aria-hidden="true"></i><em>' + esc(n) + "</em></span>"; }).join("") + "</div>" +
       (m.sync ? '<span class="jar-sync" data-jar-sync>' + esc(m.sync) + "</span>" : "") + "</div>" +
-      '<p class="jar-rule" data-jar-rule>' + esc(m.rule) + "</p>";
+      '<p class="jar-rule" data-jar-rule>' + esc(m.rule) + "</p>" +
+      (m.rule2 ? '<p class="jar-rule jar-rule2" data-jar-rule2>' + esc(m.rule2) + "</p>" : "");
   }
   function paintJarTile(el, display) {
     if (!el) return false;
@@ -124,12 +125,6 @@
           if (out && out.ok) saveTap(tapId, out.entry && out.entry.id);
           return out || { ok: false, error: "book-error" };
         });
-      },
-      view: function (fn) {
-        if (!grant || now() >= grant.exp) return Promise.resolve({ ok: false, error: "grant-expired" });
-        return call("/api/nice-one/check", "POST", { grantToken: grant.token }).then(function (r) {
-          return r.status === 200 && r.body.ok ? runArmed(fn) : { ok: false, error: r.body.error || "hub-error" };
-        });
       }
     };
   }
@@ -152,7 +147,7 @@
       '<button type="button" class="chip" data-pad-back>Back</button></div></div>' +
       '<div data-pad-step="grant" hidden><div data-grant-chips></div><div data-grant-reasons></div>' +
       '<button type="button" class="tap" data-grant-give disabled><span class="tx"><span>Give</span><small>One per PIN</small></span></button>' +
-      '<button type="button" class="chip" data-grant-view>Jar totals</button><div data-grant-totals hidden></div></div>' +
+      "</div>" +
       '<span class="note" data-pad-msg aria-live="polite"></span>' +
       '<button type="button" class="chip" data-pad-cancel>Cancel</button></div>';
   }
@@ -181,7 +176,7 @@
     function close() {
       if (closeT != null) T.clearTimeout(closeT); closeT = null;
       pad.clear(); gate.drop(); state = { kid: null, chip: null, reason: null, tapId: null, busy: false };
-      P("[data-grant-totals]").hidden = true; P("[data-grant-totals]").innerHTML = ""; msg(""); padHost.hidden = true;
+      msg(""); padHost.hidden = true;
     }
     function open(kid) {
       close(); state.kid = kid;
@@ -211,14 +206,6 @@
       if (t.hasAttribute("data-pad-back")) { pad.back(); paintDots(); return; }
       if (t.hasAttribute("data-grant-chip")) { state.chip = t.getAttribute("data-grant-chip"); return paintGrant(); }
       if (t.hasAttribute("data-grant-reason")) { state.reason = t.getAttribute("data-grant-reason"); return paintGrant(); }
-      if (t.hasAttribute("data-grant-view")) {
-        gate.view(function (ok) { return book.parentView({ pinOk: ok }); }).then(function (v) {
-          var box = P("[data-grant-totals]");
-          if (!v || !v.ok) { msg(v && v.error === "grant-used" ? "PIN again to look" : "PIN again"); return; }
-          box.innerHTML = v.jars.map(function (j) { return "<div>" + esc(j.name) + " \u00b7 " + esc(j.min) + " min \u00b7 " + esc(j.pick) + " picks</div>"; }).join(""); box.hidden = false;
-        });
-        return;
-      }
       if (t.hasAttribute("data-grant-give")) {
         if (!(state.chip && state.reason)) return;
         state.tapId = state.tapId || uuid(); state.busy = true; paintGrant(); msg("Adding\u2026");

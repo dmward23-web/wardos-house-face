@@ -154,7 +154,7 @@ await t("client gate + Ledger's HouseJar: Nice one writes only after hub verify 
   assert.equal((await gate.status()).pinSet, true);
   assert.equal((await gate.verify("0000")).error, "wrong-pin");
   assert.equal((await gate.verify("4821")).ok, true);
-  const v = await gate.view((ok) => book.parentView({ pinOk: ok })); assert.equal(v.ok, true); assert.deepEqual(v.jars.map((j) => j.min), [0, 0, 0, 0]);
+  assert.equal(gate.view, undefined, "JAR-VIEW-01: the wall gate has no totals view");
   const r = await gate.act("nice-one", U(8), (ok) => book.niceOne({ jar: "hayes", chip: "min-10", reason: "positive-attitude", pinOk: ok }));
   assert.equal(r.ok, true); assert.equal(r.entry.qty, 10); assert.equal(r.entry.unit, "min");
   assert.equal(gate.parentGate(), false, "hook closed again");
@@ -178,6 +178,32 @@ await t("jar tile = wallDisplay only: rule + names + 'Not synced'; no digits, no
   assert.equal(W.paintJarTile(tile, HouseJar.create({ seed: null, storage: memStore() }).wallDisplay()), false); assert.equal(tile.hidden, true);
   assert.equal(W.paintJarTile(tile, null), false); assert.equal(tile.hidden, true);
   assert.match(read("wall.html"), /data-house-jar hidden/); assert.match(read("sheet-index.html"), /data-house-jar data-owner="Ledger" data-tile-id="house-jar" hidden/);
+});
+await t("JAR-VIEW-01 + JAR5 guard: no wall-loaded script calls HouseJar.parentView(); tile = wallDisplay() fields only, ruleText then ruleLine2 verbatim", () => {
+  const strip = (c) => c.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1").replace(/<!--[\s\S]*?-->/g, "");
+  const wallSrc = read("wall.html");
+  const loaded = [...wallSrc.matchAll(/<script src="([^"?]+)/g)].map((m) => m[1]);
+  assert.ok(loaded.includes("house-jar.js") && loaded.includes("house-jar-wall.js"));
+  const own = fs.readdirSync(ROOT).filter((f) => /^house-wall-.*\.js$/.test(f));
+  for (const f of ["wall.html", ...own, ...loaded.filter((f) => f !== "house-jar.js")]) {
+    assert.doesNotMatch(strip(read(f)), /parentView\s*\(|\.parentView\b|\[\s*["']parentView["']\s*\]/, f + " calls parentView");
+    assert.doesNotMatch(strip(read(f)), /data-grant-view|data-grant-totals|Jar totals/, f + " has a totals view");
+  }
+  assert.match(read("house-jar.js"), /function parentView\(g\)/, "parentView stays in Ledger's module");
+  const book = HouseJar.create({ seed: SEED, storage: memStore() }), d = book.wallDisplay();
+  assert.deepEqual(Object.keys(d).sort(), ["jars", "ruleLine2", "ruleText", "syncLabel", "synced"]);
+  assert.equal(d.ruleText, "A stolen close zeros that personal jar for the day.");
+  assert.equal(d.ruleLine2, "The jar pays time and picks. Never cash.");
+  const html = W.jarTileHtml(W.jarTileModel(d));
+  const i1 = html.indexOf('data-jar-rule>' + d.ruleText + "</p>"), i2 = html.indexOf('data-jar-rule2>' + d.ruleLine2 + "</p>");
+  assert.ok(i1 > 0 && i2 > i1, "ruleText then ruleLine2, verbatim, adjacent");
+  assert.equal(html.slice(i1).indexOf("</p>") + 4 + i1, html.indexOf("<p", i1 + 1), "ruleLine2 directly under ruleText");
+  const text = html.replace(/<[^>]+>/g, " ");
+  assert.doesNotMatch(text, /\d|balance|total|min\b|picks? ·/i, "no digits, totals or balances");
+  for (const lit of [d.ruleText, d.ruleLine2]) assert.ok(!read("house-jar-wall.js").includes(lit) && !wallSrc.includes(lit), "never hardcoded: " + lit);
+  /* only wallDisplay() fields reach the tile: a display with an extra numeric field prints nothing extra */
+  const html2 = W.jarTileHtml(W.jarTileModel(Object.assign({}, d, { totals: [{ jar: "hayes", min: 40 }], balance: 12 })));
+  assert.equal(html2, html);
 });
 await t("kid pages never render Nice one or the jar tile; wall + hub seats have hosts", () => {
   assert.equal(W.allowedPage("/kid-ainsley.html", null), false); assert.equal(W.allowedPage("/x/kid-hayes.html", null), false);
