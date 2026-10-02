@@ -40,18 +40,53 @@ await t("fake fetch: both scenes with a key -> 0 /api/sensi calls, only setLight
   assert.equal(calls.length, 0);
   assert.ok(lit.length > 0);
 });
-await t("chore done + check-in never write jar / bank / MUSTS-book keys", () => {
-  const s = K.memStore(), NOW = Date.parse("2026-10-01T17:30:00-05:00");
-  K.KIDS.forEach((k) => { K.choreDone(s, k.id, NOW); K.choreDone(s, k.id, NOW + 1000); K.checkIn(s, k.id, NOW); });
+await t("CHORELAW2: wall taps write ONLY house-checkoffs:<kid>:<day|week:Sunday> law ids; never jar / bank / money keys", () => {
+  const s = K.memStore(), j = JSON.parse(read("data/kid-seats.json")), NOW = Date.parse("2026-10-01T20:30:00-05:00");
+  K.KIDS.forEach((k) => { K.tapMust(s, j, k.id, "must-bed", NOW); K.tapClose(s, j, k.id, NOW); K.checkIn(s, k.id, NOW); });
   const keys = Object.keys(s.dump());
   assert.ok(keys.length > 0);
-  keys.forEach((k) => assert.match(k, /^wardos-wall-(mark|whohome)/));
-  keys.forEach((k) => assert.doesNotMatch(k, /jar|bank|checkoff|allowance|money/i));
+  keys.forEach((k) => assert.match(k, /^(wardos-wall-whohome|house-checkoffs:(harris|hayes|ainsley):(week:)?\d{4}-\d{2}-\d{2})$/));
+  keys.forEach((k) => assert.doesNotMatch(k, /jar|bank|allowance|money/i));
 });
-await t("wall.html source never touches house-checkoffs / house-bank / jar keys", () => {
+await t("wall.html source never touches house-bank / jar book keys; taps ride house-tapsync.js", () => {
   const code = wall.replace(/<!--[\s\S]*?-->/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
-  assert.doesNotMatch(code, /house-checkoffs|house-bank|HouseBank|HouseChores/);
-  assert.doesNotMatch(read("house-wall-kid.js").replace(/\/\*[\s\S]*?\*\//g, ""), /house-checkoffs|house-bank/);
+  assert.doesNotMatch(code, /house-bank|HouseBank|HouseChores|wardos\.jar\.|house\.jar\.shared/);
+  assert.doesNotMatch(read("house-wall-kid.js").replace(/\/\*[\s\S]*?\*\//g, ""), /house-bank|jar/i);
+  assert.match(wall, /<script src="house-tapsync\.js"><\/script>/);
+});
+await t("CHORELAW2: no old quest chart on the wall or the hub kid tiles (one chore copy from kid-seats.json)", () => {
+  const code = wall.replace(/<!--[\s\S]*?-->/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
+  assert.doesNotMatch(code, /kids-week|kids-data\.js|WardKids|data-kid-quest|data-kid-done|Chore done|mustQuests|data-claim=/);
+  assert.match(code, /"kid-seats\.json"/);
+  const eng = read("house-kid-engage.js");
+  const chores = eng.slice(eng.indexOf('if (face === "chores") {'), eng.indexOf("/* leave */"));
+  assert.ok(chores.length > 100);
+  assert.doesNotMatch(chores, /mustQuests|kid\.quests|getCheck|data-claim=|todayMustProgress/, "Chores face is the law, not the quest chart");
+  assert.match(chores, /data-law-must/); assert.match(chores, /w\.choice\(LAW/);
+  const tile = eng.slice(eng.indexOf("function paintTile(root)"), eng.indexOf("function setFace("));
+  assert.doesNotMatch(tile, /todayMustProgress|streakDays/, "tile count + run read the law");
+  const idx = read("sheet-index.html");
+  assert.ok(idx.indexOf('src="house-wall-kid.js') > 0 && idx.indexOf('src="house-wall-kid.js') < idx.indexOf('src="house-kid-engage.js'));
+  assert.ok(fs.existsSync(new URL("data/kids-week.json", root)), "quest data is NOT deleted (Atlas retires it at merge)");
+  /* the law module decides what the Chores face lists */
+  const j = JSON.parse(read("data/kid-seats.json")), m = K.musts(j, K.memStore(), "hayes", Date.parse("2026-10-01T20:30:00-05:00"));
+  assert.deepEqual(m.items.map((x) => x.id), j.seats.hayes.musts.map((x) => x.id).slice(0, 4));
+});
+await t("CHORELAW2: dinner-vote and gallery unlock controls gone; no leaderboard / ranking on the wall", () => {
+  assert.deepEqual(Object.keys(K.CONTROL), ["weekend-pick"]);
+  const code = wall.replace(/<!--[\s\S]*?-->/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
+  const kids = code.slice(code.indexOf('<div class="kids"'), code.indexOf('id="w-jar"')) + read("house-wall-kid.js").replace(/\/\*[\s\S]*?\*\//g, "");
+  assert.doesNotMatch(kids, /sheet-dinner\.html|sheet-gallery-hero\.html|data-kid-unlock|leaderboard|\.sort\(/i, "kid seats: no dinner-vote / gallery unlock, no ranking (Vita's dinner rail badge is not a kid control)");
+  assert.doesNotMatch(code.slice(code.indexOf("function paintKids")), /\.sort\(/);
+  const order = [...wall.matchAll(/id="w-kid-([a-z]+)"/g)].map((x) => x[1]);
+  assert.deepEqual(order, ["ainsley", "hayes", "harris"], "fixed seat order in markup, never re-ordered by results");
+});
+await t("CHORELAW2: Harris's sound is the existing soft house-sfx tap only, on his seat only; no new audio code on the wall", () => {
+  const code = wall.replace(/<!--[\s\S]*?-->/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
+  assert.match(code, /if \(r\.ok && r\.first && mk === "harris"\) harrisTick\(\);/);
+  assert.match(code, /window\.HouseSfx\.tap\(\)/);
+  assert.doesNotMatch(code, /AudioContext|createOscillator|HouseSfx\.(quest|clear|goal|celebrate|startAmbient)/);
+  assert.match(read("house-sfx.js"), /function sfxTap\(\) \{\s*if \(isMuted\(\)\) return;\s*osc\(720, "square", 0\.03, 0\.002, 0\.04, null\);/, "tap = one 40 ms tick at low gain");
 });
 await t("wall.html has no badge or link to sheet-allowance, sheet-chores or kid-*.html", () => {
   assert.doesNotMatch(wall, /href="(sheet-allowance|sheet-chores|kid-[a-z]+)\.html"/);
@@ -260,7 +295,8 @@ await t("CHORELAW1: Ainsley has NO stars and NO counts on her tile/seat/page; sl
   const ka = read("kid-ainsley.html").replace(/<style[\s\S]*?<\/style>/g, "").replace(/<!--[\s\S]*?-->/g, "");
   assert.doesNotMatch(ka, /\u2605|data-progress-meta|data-left-count|id="sec-jar"|data-grow-total|data-bank-life|data-got-it|href="#sec-jar"/, "no stars, counts or star goal on Ainsley's page");
   assert.match(ka, /data-trusted-line="ainsley"[^>]*hidden><\/section>/, "empty slot, no invented copy");
-  const wall = read("wall.html"); assert.match(wall, /data-kid-trusted="ainsley" hidden><\/div>/);
+  const wall = read("wall.html"); assert.match(wall, /data-kid-trusted="ainsley">/, "trusted-with renders from Atlas's trustedWith only");
+  assert.match(wall, /if \(kid === "ainsley"\) return \(r\.trusted\.length/); assert.match(wall, /if \(kid === "harris"\) html \+= '<div class="law-fill"/);
   for (const f of ["sheet-allowance.html", "sheet-chores.html"]) assert.ok(read(f).includes("Ainsley"), f + " (Ainsley star rows there are a listed gap)");
 });
 console.log(`wall-guards: ${n} tests PASS`);

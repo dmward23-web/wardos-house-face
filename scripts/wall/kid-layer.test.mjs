@@ -1,4 +1,5 @@
-// KIDLAYER3 · node scripts/wall/kid-layer.test.mjs · flash (no key = no request, restore, debounce) + one-use unlocks
+// KIDLAYER3 + CHORELAW2 · node scripts/wall/kid-layer.test.mjs · flash (no key = no request, restore, debounce), check-in,
+// the one-use Weekend fun unlock, and the chore law controls (MUSTS / CHOICE / CLOSE / Pack / Mystery) on Atlas's kid-seats.json
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { createRequire } from "node:module";
@@ -50,31 +51,22 @@ t("unknown prior state -> that light is skipped (never guessed)", () => {
   assert.equal(log.length, 0);
 });
 
-// marks + check-in (never the MUSTS book or the bank)
-t("chore done fills today's wall mark once; repeat tap is not 'first' (no second flash)", () => {
-  const s = K.memStore();
-  assert.deepEqual(K.choreDone(s, "harris", NOW), { marked: true, first: true });
-  assert.deepEqual(K.choreDone(s, "harris", NOW + 1000), { marked: true, first: false });
-  assert.equal(K.isMarked(s, "harris", NOW), true);
-});
-t("chore done never writes house-checkoffs / house-bank / jar keys", () => {
-  const s = K.memStore(); K.choreDone(s, "hayes", NOW); K.checkIn(s, "hayes", NOW);
-  for (const k of Object.keys(s.dump())) assert.ok(!/house-checkoffs|house-bank|jar|allowance/i.test(k), k);
-});
-t("mark resets with the CT day", () => assert.equal(K.isMarked((() => { const s = K.memStore(); K.choreDone(s, "ainsley", NOW); return s; })(), "ainsley", NOW + 24 * 3600000), false));
+// check-in (per device, Atlas's who-home shape)
 t("check-in uses Atlas's who-home shape, per device", () => {
   const s = K.memStore(); const j = K.checkIn(s, "ainsley", NOW);
   assert.equal(j.date, "2026-10-01"); assert.ok(j.kids.find((k) => k.id === "ainsley").checkedInAt);
 });
+t("the old wall-only 'Chore done' mark is gone (one chore copy)", () => {
+  assert.equal(K.choreDone, undefined); assert.equal(K.isMarked, undefined); assert.equal(K.seats, undefined);
+});
 
 // one-use unlocks · Atlas's data/unlocks.json shape (ATLASLANE4/5)
 const LIT = {
-  harris: { id: "harris-dinner-vote", seat: "Harris", control: "dinner-vote", tile: "Dinner vote", uses: 1, copy: "Harris. Week closed. Dinner vote." },
-  hayes: { id: "hayes-weekend-pick", seat: "Hayes", control: "weekend-pick", tile: "Weekend fun", uses: 1, copy: "Hayes. Week closed. You pick." },
-  ainsley: { id: "ainsley-gallery-or-weekend", seat: "Ainsley", control: "gallery-or-weekend", tile: "Gallery or Weekend fun", choices: ["gallery-photo", "weekend-pick"], uses: 1, copy: "Ainsley. Week closed. Gallery or weekend, your call." },
-  house: { id: "house-weekend-pick", seat: "House", control: "weekend-pick", tile: "Weekend fun", uses: 1, copy: "Us together. Weekend fun, house pick." }
+  house: { id: "house-weekend-pick", seat: "House", control: "weekend-pick", tile: "Weekend fun", uses: 1, copy: "Us together. Weekend fun." },
+  harrisOld: { id: "harris-dinner-vote", seat: "Harris", control: "dinner-vote", tile: "Dinner vote", uses: 1, copy: "old" },
+  ainsleyOld: { id: "ainsley-gallery-or-weekend", seat: "Ainsley", control: "gallery-or-weekend", tile: "Gallery", choices: ["gallery-photo"], uses: 1, copy: "old" }
 };
-const UL = (kinds, extra = {}, week = "2026-09-25") => ({ asOfIso: "2026-10-01", generatedAt: "2026-10-01T17:00:00-05:00",
+const UL = (kinds, extra = {}, week = "2026-09-27") => ({ asOfIso: "2026-10-01", generatedAt: "2026-10-01T17:00:00-05:00",
   week: { id: week }, lit: kinds.map((k) => ({ ...LIT[k], earnedWeek: week })), source: "test", ...extra });
 t("Atlas's committed data/unlocks.json parses (lit [] today -> nothing shown)", () => {
   const j = JSON.parse(fs.readFileSync(new URL("../../data/unlocks.json", import.meta.url)));
@@ -85,51 +77,154 @@ t("Atlas's committed data/unlocks.json parses (lit [] today -> nothing shown)", 
 });
 t("no file -> no unlocks (never inferred)", () => assert.deepEqual(K.unlocks(null, K.memStore(), NOW), []));
 t("stale / other-day file -> no unlocks", () => {
-  assert.deepEqual(K.unlocks(UL(["harris"], { asOfIso: "2026-09-30" }), K.memStore(), NOW), []);
-  assert.deepEqual(K.unlocks(UL(["harris"], { generatedAt: "2026-09-29T17:00:00-05:00" }), K.memStore(), NOW), []);
+  assert.deepEqual(K.unlocks(UL(["house"], { asOfIso: "2026-09-30" }), K.memStore(), NOW), []);
+  assert.deepEqual(K.unlocks(UL(["house"], { generatedAt: "2026-09-29T17:00:00-05:00" }), K.memStore(), NOW), []);
   assert.deepEqual(K.unlocks(UL([], { lit: undefined }), K.memStore(), NOW), []);
 });
-t("Harris -> dinner vote; Hayes -> Weekend fun; Ainsley -> gallery photo OR weekend; House -> Weekend fun", () => {
-  const u = K.unlocks(UL(["harris", "hayes", "ainsley", "house"]), K.memStore(), NOW);
-  assert.deepEqual(u.map((x) => [x.id, x.kid, x.choices.map((c) => c.href)]), [
-    ["harris-dinner-vote", "harris", ["sheet-dinner.html"]], ["hayes-weekend-pick", "hayes", ["sheet-weekend.html"]],
-    ["ainsley-gallery-or-weekend", "ainsley", ["sheet-gallery-hero.html", "sheet-weekend.html"]], ["house-weekend-pick", "house", ["sheet-weekend.html"]]]);
-  assert.equal(u[0].copy, "Harris. Week closed. Dinner vote.");
+t("chore law: dinner-vote and gallery controls are gone from the control map; only Weekend fun", () => {
+  assert.deepEqual(Object.keys(K.CONTROL), ["weekend-pick"]);
+  assert.deepEqual(K.unlocks(UL(["harrisOld", "ainsleyOld", "house"]), K.memStore(), NOW).map((x) => [x.id, x.kid]), [["house-weekend-pick", "house"]]);
 });
-t("Us together shows only when Atlas lists house-weekend-pick (wall never derives it)", () =>
-  assert.equal(K.unlocks(UL(["harris", "hayes", "ainsley"]), K.memStore(), NOW).some((x) => x.kid === "house"), false));
-t("unknown seat / control -> not drawn", () => {
-  const j = UL([]); j.lit = [{ ...LIT.hayes, earnedWeek: "2026-09-25", control: "laser-tag" }, { ...LIT.harris, earnedWeek: "2026-09-25", seat: "Erin" }];
-  assert.deepEqual(K.unlocks(j, K.memStore(), NOW), []);
-});
-t("one use, then dark; spend recorded in Atlas's unlock-uses shape", () => {
-  const s = K.memStore(), j = UL(["ainsley"]);
-  assert.equal(K.useUnlock(j, s, "ainsley-gallery-or-weekend", "nope", NOW), null); // a two-choice unlock needs a real choice
-  assert.equal(K.useUnlock(j, s, "ainsley-gallery-or-weekend", "gallery-photo", NOW), "sheet-gallery-hero.html");
-  assert.equal(K.unlocks(j, s, NOW)[0].used, true);
-  assert.equal(K.useUnlock(j, s, "ainsley-gallery-or-weekend", "weekend-pick", NOW), null); // not even the other choice
-  const uses = JSON.parse(s.get(K.USES_KEY));
-  assert.deepEqual(uses.uses, [{ unlock: "ainsley-gallery-or-weekend", weekId: "2026-09-25", usedAt: new Date(NOW).toISOString(), choice: "gallery-photo" }]);
-  assert.match(uses.note, /Per-device/);
-});
-t("single-control unlock spends once; a newer earnedWeek lights it again (no stacking)", () => {
+t("Weekend fun spends once; a newer earnedWeek lights it again (no stacking)", () => {
   const s = K.memStore();
-  assert.equal(K.useUnlock(UL(["hayes"]), s, "hayes-weekend-pick", null, NOW), "sheet-weekend.html");
-  assert.equal(K.useUnlock(UL(["hayes"]), s, "hayes-weekend-pick", null, NOW), null);
-  assert.equal(K.unlocks(UL(["hayes"], {}, "2026-10-09"), s, NOW)[0].used, false);
+  assert.equal(K.useUnlock(UL(["house"]), s, "house-weekend-pick", null, NOW), "sheet-weekend.html");
+  assert.equal(K.useUnlock(UL(["house"]), s, "house-weekend-pick", null, NOW), null);
+  assert.equal(K.unlocks(UL(["house"], {}, "2026-10-04"), s, NOW)[0].used, false);
+  assert.match(JSON.parse(s.get(K.USES_KEY)).note, /Per-device/);
 });
 
-// seats · Atlas's data/kid-seats.json
-t("seats read Atlas's committed kid-seats.json (Harris mission word, Hayes 7-day row, Ainsley week mark)", () => {
-  const j = JSON.parse(fs.readFileSync(new URL("../../data/kid-seats.json", import.meta.url)));
-  const s = K.seats(j, Date.parse(j.generatedAt) + 60000);
-  assert.ok(s.harris && typeof s.harris.word === "string");
-  assert.equal(s.hayes.row.length, 7);
-  assert.equal(typeof s.ainsley.weekClosed, "boolean");
+// chore law · Atlas's data/kid-seats.json (ATLASLANE8)
+const SEATS = JSON.parse(fs.readFileSync(new URL("../../data/kid-seats.json", import.meta.url)));
+const at = (hhmm) => Date.parse(`2026-10-01T${hhmm}:00-05:00`);
+const law = (patch = {}) => { const j = structuredClone(SEATS); j.generatedAt = "2026-10-01T03:05:00-05:00"; return Object.assign(j, typeof patch === "function" ? patch(j) || {} : patch); };
+const openChoice = (j) => { j.choice = { ...j.choice, claimedBy: null, claimedAt: null, locked: false, done: false, open: true, exception: false }; };
+const DAY = "house-checkoffs:%k:2026-10-01";
+const keyFor = (k) => DAY.replace("%k", k);
+
+t("committed kid-seats.json: 4 MUSTS per kid, ids must-*, words from Atlas", () => {
+  for (const k of K.ORDER) {
+    const m = K.musts(SEATS, K.memStore(), k, at("20:30"));
+    assert.equal(m.items.length, 4);
+    assert.ok(m.items.every((x) => /^must-[a-z]+$/.test(x.id)));
+    assert.deepEqual(m.items.map((x) => x.word), SEATS.seats[k].musts.map((x) => x.word));
+  }
 });
-t("seats: not today's / quiet -> null", () => {
-  const j = JSON.parse(fs.readFileSync(new URL("../../data/kid-seats.json", import.meta.url)));
-  assert.equal(K.seats({ ...j, asOfIso: "2026-09-30" }, Date.parse(j.generatedAt)), null);
-  assert.equal(K.seats({ ...j, quiet: true }, Date.parse(j.generatedAt)), null);
+t("not today's / stale / quiet (kids away) -> no chore controls at all", () => {
+  assert.equal(K.musts({ ...SEATS, asOfIso: "2026-09-30" }, K.memStore(), "hayes", at("20:30")), null);
+  assert.equal(K.musts({ ...SEATS, quiet: true }, K.memStore(), "hayes", at("20:30")), null);
+  assert.equal(K.musts(null, K.memStore(), "hayes", at("20:30")), null);
+});
+t("MUSTS binary and capped at 4: a 5th must in the data is not drawn; a second tap changes nothing", () => {
+  const j = law((x) => { x.seats.hayes.musts = x.seats.hayes.musts.concat([{ id: "must-extra", word: "Extra", closed: false }]); });
+  const s = K.memStore();
+  assert.equal(K.musts(j, s, "hayes", at("16:00")).items.length, 4);
+  assert.equal(K.tapMust(s, j, "hayes", "must-extra", at("16:00")).ok, false);
+  const r1 = K.tapMust(s, j, "hayes", "must-bed", at("16:00")), r2 = K.tapMust(s, j, "hayes", "must-bed", at("16:01"));
+  assert.equal(r1.first, true); assert.equal(r2.first, false);
+  assert.deepEqual(JSON.parse(s.get(keyFor("hayes"))), { "must-bed": true });
+});
+t("Dragon fed replaces Hayes's 4th only when Atlas's data swaps it in", () => {
+  const j = law((x) => { x.seats.hayes.musts[3] = { id: "must-dragon", word: "Dragon fed", closed: false }; });
+  assert.deepEqual(K.musts(j, K.memStore(), "hayes", at("16:00")).items.map((x) => x.id), ["must-bed", "must-hamper", "must-dish", "must-dragon"]);
+  assert.deepEqual(K.musts(j, K.memStore(), "harris", at("16:00")).items.map((x) => x.id).slice(3), ["must-floor"]);
+});
+t("Harris: the tap fills the tile in the same paint (state returned with the write)", () => {
+  const s = K.memStore(), j = law();
+  const r = K.tapMust(s, j, "harris", "must-dish", at("16:00"));
+  assert.equal(r.musts.done, 1); assert.equal(K.musts(j, s, "harris", at("16:00")).items.find((x) => x.id === "must-dish").closed, true);
+  ["must-bed", "must-hamper"].forEach((id) => K.tapMust(s, j, "harris", id, at("16:00")));
+  assert.equal(K.tapMust(s, j, "harris", "must-floor", at("16:00")).allNow, true);
+});
+t("checkoff keys: house-checkoffs:<kid>:<house day> with law ids only (must-*, close, choice-claim, choice-done, pack-*)", () => {
+  const s = K.memStore();
+  const j = law((x) => { openChoice(x); x.pack = { travelWeek: true, dark: false, items: [{ id: "pack-dragon", word: "Dragon care", done: false }, { id: "pack-bag", word: "Bag", done: false }, { id: "pack-charger", word: "Charger", done: false }] }; });
+  K.tapMust(s, j, "harris", "must-bed", at("16:00"));
+  K.claimChoice(s, j, "harris", at("16:00")); K.choiceDone(s, j, "harris", at("16:05"));
+  K.tapClose(s, j, "hayes", at("20:00"));
+  K.tapPack(s, j, "ainsley", "pack-charger", at("16:00"));
+  const d = s.dump();
+  assert.deepEqual(Object.keys(d).sort(), ["house-checkoffs:ainsley:week:2026-09-27", "house-checkoffs:harris:2026-10-01", "house-checkoffs:hayes:2026-10-01"]);
+  assert.deepEqual(JSON.parse(d["house-checkoffs:harris:2026-10-01"]), { "must-bed": true, "choice-claim": true, "choice-done": true });
+  assert.deepEqual(JSON.parse(d["house-checkoffs:hayes:2026-10-01"]), { close: true });
+  assert.deepEqual(JSON.parse(d["house-checkoffs:ainsley:week:2026-09-27"]), { "pack-charger": true });
+  for (const k of Object.keys(d)) assert.match(k, /^house-checkoffs:(harris|hayes|ainsley):(week:)?\d{4}-\d{2}-\d{2}$/); // house-tapsync.js KEY_RE
+  for (const v of Object.values(d)) for (const id of Object.keys(JSON.parse(v))) assert.match(id, /^(must-[a-z]+|close|choice-claim|choice-done|pack-(dragon|bag|charger))$/);
+  assert.equal(K.dayKey("hayes", K.houseDay(Date.parse("2026-10-02T02:30:00-05:00"))), "house-checkoffs:hayes:2026-10-01"); // resets 3:00 AM CT
+});
+t("CHOICE: first tap owns it, siblings are locked out, and no un-claim exists", () => {
+  const s = K.memStore(), j = law(openChoice);
+  assert.equal(K.choice(j, s, "hayes", at("07:30")).open, true);
+  assert.deepEqual(K.claimChoice(s, j, "hayes", at("07:30")), { ok: true, owner: "hayes" });
+  assert.deepEqual(K.claimChoice(s, j, "harris", at("07:31")), { ok: false, owner: "hayes" });
+  assert.deepEqual(K.claimChoice(s, j, "ainsley", at("07:32")), { ok: false, owner: "hayes" });
+  assert.equal(s.get(keyFor("harris")), null); assert.equal(s.get(keyFor("ainsley")), null);
+  const h = K.choice(j, s, "harris", at("07:33"));
+  assert.equal(h.lockedOut, true); assert.equal(h.open, false);
+  assert.deepEqual(K.claimChoice(s, j, "hayes", at("07:40")), { ok: true, owner: "hayes" }); // owner re-tap: still owns it
+  assert.equal(K.choice(j, s, "hayes", at("07:41")).mine, true);
+  assert.equal(K.choiceDone(s, j, "harris", at("08:00")).ok, false); // a sibling can't finish it either
+  assert.equal(Object.keys(K).some((n) => /un-?claim|release|drop/i.test(n)), false);
+  assert.doesNotMatch(fs.readFileSync(new URL("../../wall.html", import.meta.url), "utf8"), /unclaim|un-claim|data-law-release/i);
+});
+t("CHOICE: Atlas's claimedBy (another device) wins; unclaimed at 5 PM / exception -> no claim button", () => {
+  const s = K.memStore(), j = law((x) => { openChoice(x); x.choice.claimedBy = "Ainsley"; x.choice.locked = true; });
+  assert.deepEqual(K.claimChoice(s, j, "harris", at("07:30")), { ok: false, owner: "ainsley" });
+  const late = law(openChoice);
+  assert.equal(K.choice(late, s, "harris", at("17:00")).open, false);
+  assert.equal(K.claimChoice(s, late, "harris", at("17:01")).ok, false);
+  assert.equal(K.choice(SEATS, s, "harris", at("20:30")).exception, true); // committed file: unclaimed, Dad Seat exception
+});
+t("CLOSE: only inside Atlas's window, only for kids in close.kids, writes only that kid's key", () => {
+  const s = K.memStore(), j = law();
+  assert.equal(K.close(j, s, "harris", at("19:29")), null);
+  assert.equal(K.tapClose(s, j, "harris", at("19:29")).ok, false);
+  assert.equal(K.tapClose(s, j, "harris", at("21:31")).ok, false);
+  assert.equal(K.tapClose(s, j, "harris", at("19:30")).ok, true);
+  assert.deepEqual(Object.keys(s.dump()), [keyFor("harris")]);
+  assert.equal(K.close(j, s, "harris", at("20:00")).closed, true);
+  assert.equal(K.close(j, s, "hayes", at("20:00")).closed, false);
+  const away = law((x) => { delete x.close.kids.ainsley; });
+  assert.equal(K.close(away, s, "ainsley", at("20:00")), null);
+});
+t("Mystery close: hidden until that kid's MUSTS are 4/4, never shown off-day", () => {
+  const s = K.memStore(), j = law((x) => { x.seats.hayes.mystery = { hidden: false, copy: "Mystery close: +1 pick." }; });
+  assert.equal(K.mystery(law(), s, "hayes", at("16:00")), null); // not a mystery day
+  ["must-bed", "must-hamper", "must-dish"].forEach((id) => K.tapMust(s, j, "hayes", id, at("16:00")));
+  assert.deepEqual(K.mystery(j, s, "hayes", at("16:00")), { hidden: true }); // 3/4
+  K.tapMust(s, j, "hayes", "must-floor", at("16:00"));
+  assert.deepEqual(K.mystery(j, s, "hayes", at("16:00")), { hidden: false, copy: "Mystery close: +1 pick." });
+  const atlasHidden = law((x) => { x.seats.hayes.mystery = { hidden: true }; });
+  assert.deepEqual(K.mystery(atlasHidden, s, "hayes", at("16:00")), { hidden: true }); // Atlas still hides it -> stays hidden
+  assert.doesNotMatch(JSON.stringify(SEATS.seats), /\$/);
+});
+t("Pack: travel weeks only, 3-item cap, dark once the bag is tapped", () => {
+  const s = K.memStore();
+  assert.deepEqual(K.pack(SEATS, s, "harris", at("20:30")), { dark: true, items: [] }); // committed: not a travel week
+  const j = law((x) => { x.pack = { travelWeek: true, dark: false, items: [{ id: "pack-dragon", word: "Dragon care", done: false }, { id: "pack-bag", word: "Bag", done: false },
+    { id: "pack-charger", word: "Charger", done: false }, { id: "pack-snacks", word: "Snacks", done: false }] }; });
+  const p = K.pack(j, s, "hayes", at("16:00"));
+  assert.equal(p.dark, false); assert.deepEqual(p.items.map((x) => x.id), ["pack-dragon", "pack-bag", "pack-charger"]);
+  assert.equal(K.tapPack(s, j, "hayes", "pack-snacks", at("16:00")).ok, false);
+  assert.equal(K.tapPack(s, j, "hayes", "pack-dragon", at("16:00")).pack.dark, false);
+  assert.equal(K.tapPack(s, j, "hayes", "pack-bag", at("16:01")).pack.dark, true);
+  assert.deepEqual([K.pack(j, s, "harris", at("16:02")).dark, K.pack(j, s, "harris", at("16:02")).items], [true, []]); // bag at the door -> dark on every seat
+  assert.equal(K.tapPack(s, j, "harris", "pack-charger", at("16:03")).ok, false);
+  assert.deepEqual(JSON.parse(s.get("house-checkoffs:hayes:week:2026-09-27")), { "pack-dragon": true, "pack-bag": true });
+});
+t("rewards by age: Harris run pauses (never reset copy), Hayes run + captain, Ainsley trusted-with only (no counts)", () => {
+  const j = law((x) => { x.seats.harris.streak = { days: 3, paused: true }; x.seats.hayes.streak = { days: 1 }; x.seats.hayes.captainTonight = true; });
+  assert.deepEqual(K.reward(j, "harris", at("16:00")), { kid: "harris", days: 3, paused: true });
+  assert.deepEqual(K.reward(j, "hayes", at("16:00")), { kid: "hayes", days: 1, captain: true });
+  assert.equal(K.runText(1), "1 day."); assert.equal(K.runText(0), "");
+  const a = K.reward(SEATS, "ainsley", at("20:30"));
+  assert.deepEqual(Object.keys(a).sort(), ["kid", "line", "trusted"]);
+  assert.deepEqual(a.trusted, SEATS.seats.ainsley.trustedWith);
+  assert.equal(K.musts(SEATS, K.memStore(), "ainsley", at("20:30")).seatOnly, true);
+});
+t("no taps ever touch the bank, a jar or money keys", () => {
+  const s = K.memStore(), j = law(openChoice);
+  K.ORDER.forEach((k) => { K.tapMust(s, j, k, "must-bed", at("20:00")); K.tapClose(s, j, k, at("20:00")); K.checkIn(s, k, at("20:00")); });
+  K.claimChoice(s, j, "hayes", at("16:00"));
+  for (const k of Object.keys(s.dump())) assert.doesNotMatch(k, /house-bank|jar|allowance|money/i);
 });
 console.log(`kid-layer: ${n} tests PASS`);

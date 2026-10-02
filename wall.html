@@ -88,24 +88,20 @@
     <div class="kids" id="w-kids" aria-label="Kids" hidden>
       <div class="mod kid" id="w-kid-ainsley" data-owner="Atlas" data-tile="kid-ainsley" data-tile-id="kid-ainsley" data-kid="ainsley">
         <button class="tap kid-name" data-kid-checkin="ainsley" aria-label="Ainsley check in"><span class="tx"><span>Ainsley</span><small>Tap when home</small></span></button>
-        <button class="tap kid-done" data-kid-done="ainsley" aria-label="Ainsley chore done"><span class="mark" aria-hidden="true"></span><span class="tx"><span>Chore done</span><small>Today</small></span></button>
+        <div class="kid-law" data-kid-law="ainsley" hidden></div><!-- CHORELAW2: MUSTS / CHOICE / CLOSE / Pack / Mystery from data/kid-seats.json -->
         <div class="kid-seat" data-kid-seat="ainsley" hidden></div>
-        <div class="kid-unlock" data-kid-unlock="ainsley" hidden></div>
-        <div class="kid-seat" data-kid-trusted="ainsley" hidden></div><!-- CHORELAW1 slot: Atlas's trusted-with line (data next round); no stars, no counts -->
         <div data-nice-one-host="ainsley"></div><!-- NICEONE1: parent hold control lands here only when the hub has a PIN -->
       </div>
       <div class="mod kid" id="w-kid-hayes" data-owner="Atlas" data-tile="kid-hayes" data-tile-id="kid-hayes" data-kid="hayes">
         <button class="tap kid-name" data-kid-checkin="hayes" aria-label="Hayes check in"><span class="tx"><span>Hayes</span><small>Tap when home</small></span></button>
-        <button class="tap kid-done" data-kid-done="hayes" aria-label="Hayes chore done"><span class="mark" aria-hidden="true"></span><span class="tx"><span>Chore done</span><small>Today</small></span></button>
+        <div class="kid-law" data-kid-law="hayes" hidden></div><!-- CHORELAW2: MUSTS / CHOICE / CLOSE / Pack / Mystery from data/kid-seats.json -->
         <div class="kid-seat" data-kid-seat="hayes" hidden></div>
-        <div class="kid-unlock" data-kid-unlock="hayes" hidden></div>
         <div data-nice-one-host="hayes"></div><!-- NICEONE1: parent hold control lands here only when the hub has a PIN -->
       </div>
       <div class="mod kid" id="w-kid-harris" data-owner="Atlas" data-tile="kid-harris" data-tile-id="kid-harris" data-kid="harris">
         <button class="tap kid-name" data-kid-checkin="harris" aria-label="Harris check in"><span class="tx"><span>Harris</span><small>Tap when home</small></span></button>
-        <button class="tap kid-done" data-kid-done="harris" aria-label="Harris chore done"><span class="mark" aria-hidden="true"></span><span class="tx"><span>Chore done</span><small>Today</small></span></button>
+        <div class="kid-law" data-kid-law="harris" hidden></div><!-- CHORELAW2: MUSTS / CHOICE / CLOSE / Pack / Mystery from data/kid-seats.json -->
         <div class="kid-seat" data-kid-seat="harris" hidden></div>
-        <div class="kid-unlock" data-kid-unlock="harris" hidden></div>
         <div data-nice-one-host="harris"></div><!-- NICEONE1: parent hold control lands here only when the hub has a PIN -->
       </div>
     </div>
@@ -183,6 +179,8 @@
 </div>
 
 <script src="house-lights.js"></script>
+<script src="house-tapsync.js"></script>
+<script src="house-sfx.js"></script>
 <script src="house-wall-status.js"></script>
 <script src="house-wall-actions.js"></script>
 <script src="house-wall-kid.js"></script>
@@ -406,7 +404,9 @@
   });
 
 
-  /* KID LAYER v3 (house-wall-kid.js). Per-device store; never house-checkoffs / house-bank / any jar. */
+  /* CHORE LAW (house-wall-kid.js, CHORELAW2). Ids, words and windows come from Atlas's data/kid-seats.json only.
+     Taps go to the existing house-checkoffs:<kid>:<day> keys (house-tapsync.js carries them to the hub when a key is saved).
+     Never house-bank, never any jar, never money. Fixed seat order, no leaderboard. */
   var K = window.HouseWallKid;
   var kidCfg = {};
   var flash = K.createFlash({ config: kidCfg, lights: L, hasKey: function () { return !!token(); } });
@@ -418,12 +418,52 @@
         flash = K.createFlash({ config: kidCfg, lights: L, hasKey: function () { return !!token(); } });
       });
   }
+  /* Harris: the tile fills in the same paint as the tap, plus the EXISTING soft tap tick from house-sfx.js
+     (HouseSfx.tap: one 40 ms tick at ~0.04 gain, honours the house mute; ambient stays off). No other seat makes a sound. */
+  function harrisTick() { try { if (window.HouseSfx && typeof window.HouseSfx.tap === "function") window.HouseSfx.tap(); } catch (e) { /* silent is fine */ } }
+  function lawTap(attr, kid, id, word, on, small) {
+    return '<button class="tap law' + (on ? " is-done" : "") + '" ' + attr + '="' + esc(kid) + '"' + (id ? ' data-law-id="' + esc(id) + '"' : "") +
+      ' aria-pressed="' + (on ? "true" : "false") + '"><span class="mark" aria-hidden="true"></span><span class="tx"><span>' + esc(word) + "</span>" +
+      (small ? "<small>" + esc(small) + "</small>" : "") + "</span></button>";
+  }
+  function lawHtml(kid, now) {
+    var j = feeds.kidSeats, m = K.musts(j, store, kid, now);
+    if (!m) return "";
+    var html = '<div class="law-musts" data-law-musts="' + esc(kid) + '">' + m.items.map(function (x) { return lawTap("data-law-must", kid, x.id, x.word, x.closed); }).join("") + "</div>";
+    if (kid === "harris") html += '<div class="law-fill" data-law-fill="' + m.done + '" aria-hidden="true"><i style="width:' + (m.done * 25) + '%"></i></div>';
+    var c = K.choice(j, store, kid, now);
+    if (c && c.open) html += lawTap("data-law-claim", kid, "", c.job.word, false, "First tap owns it."); /* Atlas's open-choice wording */
+    else if (c && c.mine) html += lawTap("data-law-choice-done", kid, "", c.job.word, c.done, c.done ? "Marked today" : "Today");
+    var cl = K.close(j, store, kid, now);
+    if (cl) html += lawTap("data-law-close", kid, "", "Close", cl.closed);
+    var p = K.pack(j, store, kid, now);
+    if (!p.dark) html += '<div class="law-pack" data-law-pack-row="' + esc(kid) + '"><span class="kick">Pack</span>' +
+      p.items.map(function (x) { return lawTap("data-law-pack", kid, x.id, x.word, x.done); }).join("") + "</div>";
+    var my = K.mystery(j, store, kid, now);
+    if (my && !my.hidden) html += '<div class="law-mystery" data-law-mystery="' + esc(kid) + '">' + esc(my.copy) + "</div>";
+    return html;
+  }
+  function seatHtml(kid, now) {
+    var r = K.reward(feeds.kidSeats, kid, now);
+    if (!r) return "";
+    if (kid === "ainsley") return (r.trusted.length ? '<div class="trusted" data-kid-trusted="ainsley">' + r.trusted.map(function (x) { return "<span>" + esc(x) + "</span>"; }).join("") + "</div>" : "")
+      + (r.line ? '<div class="wk-next">' + esc(r.line) + "</div>" : ""); /* no stars, no counts, no fill */
+    var html = "", run = K.runText(r.days);
+    if (run) html += '<div class="wk-next" data-run="' + esc(kid) + '"' + (r.paused ? ' data-paused="1"' : "") + ">" + esc(run) + "</div>";
+    if (kid === "hayes") {
+      if (r.captain) html += '<div class="wk-next" data-captain="hayes">Captain tonight.</div>';
+      var s = (K.law(feeds.kidSeats, now) || {}).seats, y = s && s.hayes;
+      if (y && Array.isArray(y.row) && y.row.length === 7) html += '<div class="wk-row" aria-label="This week">' + y.row.map(function (d) {
+        return '<span class="wk m-' + esc(d.mark) + (d.today ? " is-today" : "") + '"><i></i>' + esc(d.dow) + "</span>"; }).join("") + "</div>";
+      if (y && y.countdown && typeof y.countdown.copy === "string" && D(y.countdown.copy)) html += '<div class="wk-next">' + esc(D(y.countdown.copy)) + "</div>";
+    }
+    return html;
+  }
   function paintKids(mode) {
     var now = Date.now();
     var away = mode && mode.key === "kids-away";
     $("w-kids").hidden = !!away;
     var who = K.readWho(store, now);
-    var seat = K.seats(feeds.kidSeats, now) || {};
     var ul = K.unlocks(feeds.unlocks, store, now);
     K.KIDS.forEach(function (k) {
       var tile = $("w-kid-" + k.id);
@@ -432,24 +472,10 @@
       var nb = tile.querySelector("[data-kid-checkin]");
       nb.classList.toggle("is-in", !!inAt);
       nb.querySelector("small").textContent = inAt ? "In \u00b7 " + (ct(inAt) || "") : "Tap when home";
-      var st = seat[k.id] || null;
-      var done = K.isMarked(store, k.id, now) || !!(st && st.closedToday);
-      var db = tile.querySelector("[data-kid-done]");
-      db.classList.toggle("is-done", done);
-      db.querySelector(".tx > span").textContent = st && st.word ? st.word : "Chore done"; /* Harris: Atlas's one mission today */
-      db.querySelector("small").textContent = done ? "Marked today" : "Today";
-      var ex = tile.querySelector("[data-kid-seat]"), html = "";
-      if (st && st.row) html = '<div class="wk-row" aria-label="This week">' + st.row.map(function (r) {
-        return '<span class="wk m-' + esc(r.mark) + (r.today ? " is-today" : "") + '"><i></i>' + esc(r.dow) + "</span>"; }).join("") + "</div>"
-        + (st.countdown && D(st.countdown) ? '<div class="wk-next">' + esc(D(st.countdown)) + "</div>" : "");
-      if (st && st.weekClosed) html = '<div class="wk-closed"><i></i>Week closed</div>';
-      ex.innerHTML = html; ex.hidden = !html;
-      var box = tile.querySelector("[data-kid-unlock]");
-      var u = ul.filter(function (x) { return x.kid === k.id; })[0];
-      box.hidden = !u;
-      box.innerHTML = u ? '<div class="ul-copy">' + esc(u.copy) + "</div>" + u.choices.map(function (c) {
-        return '<button class="tap unlock' + (u.used ? " is-used" : "") + '" data-unlock="' + esc(u.id) + '" data-choice="' + esc(c.key) + '"' + (u.used ? " disabled" : "") + '><span class="tx"><span>' + esc(c.label) + "</span><small>" + (u.used ? "Used" : "One use") + "</small></span></button>";
-      }).join("") : "";
+      var box = tile.querySelector("[data-kid-law]"), lh = lawHtml(k.id, now);
+      box.innerHTML = lh; box.hidden = !lh;
+      var ex = tile.querySelector("[data-kid-seat]"), sh = seatHtml(k.id, now);
+      ex.innerHTML = sh; ex.hidden = !sh;
     });
     var us = ul.filter(function (x) { return x.kid === "house"; })[0];
     $("w-us").hidden = !us || !!away;
@@ -461,15 +487,23 @@
     var rb = document.querySelector('[data-tile-id="rail-us-together"]');
     if (rb) rb.classList.toggle("is-lit", !!(us && !us.used));
   }
+  var LAW_SEL = "[data-kid-checkin],[data-law-must],[data-law-claim],[data-law-choice-done],[data-law-close],[data-law-pack],[data-unlock]";
   document.addEventListener("click", function (e) {
-    var t = e.target.closest ? e.target.closest("[data-kid-checkin],[data-kid-done],[data-unlock]") : null;
+    var t = e.target.closest ? e.target.closest(LAW_SEL) : null;
     if (!t) return;
-    var now = Date.now();
-    if (t.hasAttribute("data-kid-checkin")) { var kid = t.getAttribute("data-kid-checkin"); K.checkIn(store, kid, now); if (ltControls) LS.applyTap(store, ltControls, { control: "check-in", kid: kid.charAt(0).toUpperCase() + kid.slice(1) }, now); }
-    else if (t.hasAttribute("data-kid-done")) {
-      var r = K.choreDone(store, t.getAttribute("data-kid-done"), now);
-      if (r.first) { var f = flash.flash(); document.body.setAttribute("data-flash", f.sent ? "sent" : f.reason); }
-    } else if (t.hasAttribute("data-unlock")) {
+    var now = Date.now(), j = feeds.kidSeats;
+    function kidOf(a) { return t.getAttribute(a); }
+    if (t.hasAttribute("data-kid-checkin")) { var kid = kidOf("data-kid-checkin"); K.checkIn(store, kid, now); if (ltControls) LS.applyTap(store, ltControls, { control: "check-in", kid: kid.charAt(0).toUpperCase() + kid.slice(1) }, now); }
+    else if (t.hasAttribute("data-law-must")) {
+      var mk = kidOf("data-law-must"), r = K.tapMust(store, j, mk, t.getAttribute("data-law-id"), now);
+      if (r.ok && r.first && mk === "harris") harrisTick();
+      if (r.ok && r.allNow) { var f = flash.flash(); document.body.setAttribute("data-flash", f.sent ? "sent" : f.reason); }
+    }
+    else if (t.hasAttribute("data-law-claim")) K.claimChoice(store, j, kidOf("data-law-claim"), now);
+    else if (t.hasAttribute("data-law-choice-done")) K.choiceDone(store, j, kidOf("data-law-choice-done"), now);
+    else if (t.hasAttribute("data-law-close")) K.tapClose(store, j, kidOf("data-law-close"), now);
+    else if (t.hasAttribute("data-law-pack")) K.tapPack(store, j, kidOf("data-law-pack"), t.getAttribute("data-law-id"), now);
+    else if (t.hasAttribute("data-unlock")) {
       var href = K.useUnlock(feeds.unlocks, store, t.getAttribute("data-unlock"), t.getAttribute("data-choice"), now);
       paint();
       if (href) location.href = href;

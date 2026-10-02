@@ -1,57 +1,34 @@
-# KID LAYER v3 · wall.html (Wright, Thu Oct 1 2026 ~6:15 PM CT, branch `wall-redesign-1`)
+# KID LAYER · chore law on wall.html + the hub kid tiles (Wright, branch `wall-redesign-1`)
 
-Brief: `BRIEF.md` "KID LAYER v3". Code: `house-wall-kid.js` (UMD `HouseWallKid`), `config/wall-kid.config.json`, wall.html kid band. Tests: `node scripts/wall/kid-layer.test.mjs` (20), `node scripts/wall/wall-guards.test.mjs` (11).
+**The law:** `plates/2026-10-01/redesign/CHORE-LAW-2026-10-01.md`, locked by Dan Thu Oct 1 2026 8:01 PM CT. It replaces every older wall chore-chart rule (the "Chore done" mark, the one Harris mission by weekday, the per-kid week-closed unlocks). This file is the only Wright copy of how the wall follows it.
+**Data:** Atlas's `data/kid-seats.json` (ATLASLANE8 @ 0b1f4f0, `docs/wall-redesign/ATLAS-DATA-LANE.md` "Chore law"). Every id, word and window on the kid tiles comes from that file. The wall writes no copy of its own for chores.
+**Code:** `house-wall-kid.js` (UMD `HouseWallKid`, pure rules) · `wall.html` kid band · `house-kid-engage.js` (hub kid tiles, Chores face) · `config/wall-kid.config.json` (hall flash only).
+**Tests:** `node scripts/wall/kid-layer.test.mjs` (26) · `node scripts/wall/wall-guards.test.mjs` (30).
 
-## Kid tiles (the name is the button)
-- One tile per kid (Ainsley · Hayes · Harris), in the actuator band. Hidden in **Kids away**. No kid colors (name + small mark only).
-- **Name button = check-in.** Writes Atlas's who-home shape `{date, kids:[{id,name,checkedInAt}]}` to localStorage `wardos-wall-whohome` (per device; house day resets 3:00 AM CT). Merged with `data/who-home.json` for the Who's home row. **No writer to the file, no new `/api/taps` key** (`TAP_KEY_RE` untouched).
-- **Chore done** fills today's mark: localStorage `wardos-wall-mark:<kid>:<CT date>`. Wall-only. **Never writes `house-checkoffs:*` or `house-bank:*`** (that book banks stars toward the jar). So wall marks are **not synced** to the MUSTS book (gap).
-- The first mark of the day calls the hall flash once; repeat taps don't.
+## When the tiles show anything
+Only when `kid-seats.json` has `asOfIso` = today (CT), `generatedAt` ≤ 24 h old, and `quiet !== true`. If any of those fails, the tile shows the kid's name (check-in) and nothing else. Nothing is ever inferred. The kid band is hidden in **Kids away**. Seat order is fixed (Ainsley · Hayes · Harris in the markup) and never sorted by results. **No leaderboard.**
 
-## Hall flash
-- Uses the **existing** Kasa client only: `HouseLights.setLight(id,{on})` → existing lights proxy. No new scene, no per-kid pattern, no color.
-- Pattern (shared): capture each listed light's prior on/off from `HouseLights.effectiveLights()`, invert it, and after **2000 ms** set each back to its captured prior. A light with an unknown prior (`on:null`) is skipped, never guessed.
-- **Debounce:** no new flash while one runs, or within `flashCooldownMs` (15 s) of the last restore. Taps during that time return `debounced` and send nothing.
-- **No key → zero requests, no flash** (`NEED KEY`). Lights client can't write → `lights offline`, nothing sent.
-- `harris-room` is **never** flashed, even if listed (`NEVER_FLASH`).
-- **Lights used: NONE. `hallFlashLightIds: []`. No hall light confirmed.** Evidence:
-  - `WALL-STATION.md:16`: the panel is on the "Hallway column … Not the kitchen. Not a tabletop." It doesn't say which room lights can be seen from there.
-  - `data/lights-live.json` roster `where` values are just the room names: "Dining Room", "Harris's Room", "Kitchen". Nothing says any of them is in view of the hall.
-  - `SCENES.md` / the lights notes: no hall light, and no Google Home or Kasa scene exists. The brief (line 92) asks for "a 2-second, already-owned light flash in the hall"; no such owned flash or scene exists, so nothing is recalled.
-  - To turn the flash on: Dan confirms which of `dining-room` / `kitchen` can be seen from the hall, and its id is added to `config/wall-kid.config.json`. No code change needed.
+## Controls (each kid on their own tile)
+| Control | Rule on the wall | Key written (`true`) |
+|---|---|---|
+| **MUSTS** | Atlas's four `seats.<kid>.musts[]` (Bed made / Hamper in / Dish to the sink / Own floor clear). Binary: a tap closes it and a second tap changes nothing. Capped at 4: a fifth entry is never drawn. **Dragon fed** replaces Hayes's fourth only when Atlas's data swaps it in (`musts.dragon.inHouse`, off now). | `house-checkoffs:<kid>:<day>` → `must-bed` / `must-hamper` / `must-dish` / `must-floor` / `must-dragon` |
+| **CHOICE** | One shared job (`choice.job.word`). While nobody owns it and it's before `choice.lockAt` (5:00 PM), each tile shows the job with "First tap owns it." (Atlas's wording). The first tap owns it, and every sibling's claim button disappears. A sibling's tap writes nothing. **There is no un-claim.** Atlas's `claimedBy` (a claim from another device) wins. The owner then sees the job as a done tap. Unclaimed at 5:00 PM = Atlas's Dad Seat exception, so no kid tile shows it. | `choice-claim`, then `choice-done` (owner only) |
+| **CLOSE** | Shown only inside Atlas's window (`close.opensAt`–`close.closesAt`, 7:30–9:30 PM) and only for kids in `close.kids` (home tonight). Each tap writes only that kid's key. The law's "90 seconds at the wall" is the routine, not a timer. | `close` |
+| **Pack** | Only when `pack.travelWeek` is true and `pack.dark` is false. At most 3 items, using Atlas's words and ids (`pack-dragon` / `pack-bag` / `pack-charger`); any other id is not drawn. It goes **dark on every seat** once `pack-bag` is tapped (Atlas: any kid). | `house-checkoffs:<kid>:week:<Sunday>` → `pack-*` |
+| **Mystery close** | Only when Atlas puts `seats.<kid>.mystery` on that kid's seat (one Mon–Thu day a week). It stays hidden until that kid's 4 MUSTS are closed, both on this screen and in Atlas's data (`hidden:false` + `copy`). It is time and picks, never money. | none (a reveal only) |
 
-## Seats (Atlas `data/kid-seats.json`, ATLASLANE4/5 @ 1163be5, read only)
-Valid only when `asOfIso` = today (CT), `generatedAt` ≤ 24 h, and `quiet !== true`. Otherwise the tile is just the name and Chore done.
-- **Harris:** Atlas's one mission for today (`mission.word`, e.g. "Shower") becomes his Chore done button label, in large type. The mark fills from Atlas's `today.closed` or from this screen's mark.
-- **Hayes:** his week row (Mon–Sun). `closed` = filled; `empty` = an empty mark (never red, no name); `ahead` = dashed; `off` = dim. Atlas's `countdown.copy` sits beside it (e.g. "Flag · vs Ridley · 3 days").
-- **Ainsley:** a small "Week closed" mark, only when `week.closed === true`. Nothing else, and no score.
+Keys are the **existing** hub keys (`house-tapsync.js` `KEY_RE`), with the house day that resets at 3:00 AM CT. `wall.html` now loads `house-tapsync.js`, so the taps go to the hub when a key is saved on the screen. With no key it shows "taps: this device only" and sends nothing. `TAP_KEY_RE` / the hub allowlist is unchanged. The wall never writes `house-bank:*`, any jar key, or anything with money in it.
 
-## One-use unlocks (Atlas owns the data: `data/unlocks.json`)
-Read only from Atlas's **`data/unlocks.json`** (on this branch since FF to 1163be5; `lit: []` today, so nothing shows). If the file is missing, not today's (`asOfIso`), more than 24 h old (`generatedAt`) or has no `lit[]`, every unlock is hidden. The wall never infers a close (not from MUSTS, the bank, the calendar or `kids-week.json`). Us together shows only when Atlas lists `house-weekend-pick`.
+## Age changes the reward, not the standard
+- **Harris:** the tile fill (`data-law-fill`, a quarter per MUST) updates in the same paint as the tap, so it fills in the same minute. A tap that closes a MUST also plays the **existing** soft tick from `house-sfx.js` (`HouseSfx.tap`: one 40 ms tick at about 0.04 gain, honours the house mute, ambient stays off). No other seat makes a sound. His run comes from Atlas's `streak.days` in Atlas's wording ("3 days."). A miss **pauses** the run (`paused`); there is no reset or miss copy.
+- **Hayes:** his run (`streak.days`, same wording), plus "Captain tonight." when `captainTonight` is true. His Mon–Sun row and Atlas's `countdown.copy` stay.
+- **Ainsley:** no stars, no counts, no fill, no sound. Her seat shows only Atlas's `trustedWith[]` and her rare `line` when Atlas sets one.
 
-Schema the wall reads (Atlas's):
-```json
-{
-  "asOfIso": "2026-10-01",
-  "generatedAt": "2026-10-01T18:14:00-05:00",
-  "week": { "id": "2026-09-25", "startsAt": "2026-09-25T15:00:00-05:00", "endsAt": "2026-10-02T15:00:00-05:00" },
-  "lit": [
-    { "id": "ainsley-gallery-or-weekend", "seat": "Ainsley", "control": "gallery-or-weekend", "tile": "Gallery or Weekend fun",
-      "choices": ["gallery-photo", "weekend-pick"], "uses": 1, "earnedWeek": "2026-09-25",
-      "copy": "Ainsley. Week closed. Gallery or weekend, your call." }
-  ],
-  "source": "…"
-}
-```
-Fields the wall needs: `id`, `seat` ∈ Harris | Hayes | Ainsley | House, `control` or `choices[]` ∈ dinner-vote | weekend-pick | gallery-photo (anything else is not drawn), `earnedWeek`, and `copy` (shown as written).
+## Hub kid tiles (one chore copy)
+On `sheet-index.html`, the kid flip tile's **Chores** face lists the same 4 law MUSTS, plus the CHOICE claim/done, from `kid-seats.json` via `HouseWallKid`. It writes the same keys. The tile's Musts count and run come from the law too. The old `kids-week.json` quest chart is no longer drawn on the wall or on those tiles. **The quest data is not deleted** (Atlas retires it at merge). The kid boards (`kid-*.html`) still show their own quest lists (gap).
 
-| Atlas id | Seat | Control | Opens |
-|---|---|---|---|
-| `harris-dinner-vote` | Harris | Dinner vote | `sheet-dinner.html` (Vita) |
-| `hayes-weekend-pick` | Hayes | Weekend fun | `sheet-weekend.html` |
-| `ainsley-gallery-or-weekend` | Ainsley | Gallery photo **or** Weekend pick (one use between them) | `sheet-gallery-hero.html` / `sheet-weekend.html` |
-| `house-weekend-pick` | House (Us together row; the rail badge lights) | Weekend fun | `sheet-weekend.html` |
-
-- **One use each.** A spend appends Atlas's unlock-uses record `{unlock, weekId: earnedWeek, usedAt, choice?}` to localStorage `wardos-wall-unlock-uses`, using the shape `{note, uses[]}` of `data/unlock-uses.json`. The control then goes dark (disabled, "Used"). A newer `earnedWeek` lights it again (Atlas: no stacking).
-- **Per device** for now. A spend on this screen is not seen by Atlas's script or by any other device until a shared write path is approved.
-- **No jar control anywhere.**
+## Kept from the earlier kid layer
+- **Name button = check-in.** Writes Atlas's who-home shape to localStorage `wardos-wall-whohome` (per device, 3:00 AM reset) and merges it with `data/who-home.json`.
+- **Hall flash:** the existing Kasa client only (`HouseLights.setLight`). It inverts each listed light for 2000 ms and then restores its captured prior state. A light with an unknown prior is skipped. Debounced for 15 s. No key → zero requests. `harris-room` is never flashed. It fires once, when a kid's fourth MUST closes. **`hallFlashLightIds: []`: no hall light has been confirmed**, so nothing flashes until Dan names one in `config/wall-kid.config.json`.
+- **Weekend fun:** the only unlock control left (`CONTROL = {weekend-pick}`), from Atlas's `data/unlocks.json` `house-weekend-pick` (Us together, 10 of 12 closes). One use per earned week, per device (`wardos-wall-unlock-uses`). The old per-kid dinner-vote and gallery unlocks are gone.
+- **Jar:** Ledger's tile (`HouseJar.wallDisplay()`: rule, names, sync). It shows no numbers. See NICE-ONE.md.

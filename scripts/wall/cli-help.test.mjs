@@ -1,6 +1,7 @@
 // CLIGUARD1 → WALLKIT9 · node scripts/wall/cli-help.test.mjs · --help / -h print usage and exit 0 and write nothing, now
-// against Atlas's own ATLASLANE7 --help (our cli-guard.mjs is gone; his CLIs win). His CLIs do NOT reject unknown flags
-// (an unknown flag runs the build and writes data/*.json), so that case is not exercised here: known gap, Atlas's lane. Every data/*.json (and config/*.json) is copied to a temp dir first; contents + mtime are
+// against Atlas's own --help (our cli-guard.mjs is gone; his CLIs win). ATLASLANE8 adds scripts/house/cli-args.mjs: an unknown flag,
+// a valueless value flag or a stray argument now exits 2 before any write, so that case is exercised again here
+// (display-rename.mjs takes file names as arguments, so it gets no stray-argument case). Every data/*.json (and config/*.json) is copied to a temp dir first; contents + mtime are
 // compared after each run, and anything a run changed is restored from the copy before the test fails.
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -37,6 +38,9 @@ try {
   }
   for (const cli of ALSO_HELP) for (const h of ["--help", "-h"]) t(`${path.basename(cli)} ${h}: usage, exit 0, no file written`, () => {
     const r = run(cli, h, "kids-week.json"); assert.equal(r.status, 0, r.stderr); assert.match(r.stdout, /^Usage: node scripts\//); assert.match(r.stdout, /writes nothing/);
+  });
+  for (const cli of CLIS.concat(ALSO_HELP)) for (const bad of [["--bogus"], ["--now"]].concat(/display-rename/.test(cli) ? [] : [["stray-arg"]])) t(`${path.basename(cli)} ${bad.join(" ")}: exit 2, usage on stderr, no file written`, () => {
+    const r = run(cli, ...bad); assert.equal(r.status, 2, r.stdout + r.stderr); assert.match(r.stderr, /Usage: node scripts\//);
   });
   t("our cli-guard.mjs is gone and no CLI imports it (Atlas's --help is the one)", () => {
     assert.equal(fs.existsSync(path.join(ROOT, "scripts/house/cli-guard.mjs")), false);

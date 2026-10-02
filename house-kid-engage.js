@@ -15,6 +15,21 @@
   function facesFor(kidId) { return SEAT_ONLY[kidId] ? FACES.filter(function (f) { return f !== "stars"; }) : FACES; }
   var FACES = ["day", "stars", "chores", "leave"];
   var FACE_LABEL = { day: "Day", stars: "Stars", chores: "Chores", leave: "Leave" };
+  /* CHORELAW2 · ONE chore copy on the kid tiles: the Chores face, the Musts count and the run read Atlas's chore law
+     (data/kid-seats.json via HouseWallKid), not the old kids-week.json quest chart. Quest data stays (Atlas retires it). */
+  var LAW = null;
+  var lawStore = { get: function (k) { try { return global.localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { global.localStorage.setItem(k, v); } catch (e) { /* */ } } };
+  function HW() { return global.HouseWallKid || null; }
+  function loadLaw(cb) {
+    if (typeof fetch !== "function") { if (cb) cb(); return; }
+    fetch("data/kid-seats.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+      .then(function (j) { LAW = j; if (cb) cb(); });
+  }
+  function lawMusts(kidId) { var w = HW(); return w && LAW ? w.musts(LAW, lawStore, kidId, Date.now()) : null; }
+  function lawCount(kidId) { var m = lawMusts(kidId); return m ? { done: m.done, need: m.items.length } : { done: 0, need: 0 }; }
+  function lawRun(kidId) { var w = HW(), r = w && LAW ? w.reward(LAW, kidId, Date.now()) : null; return r && r.days ? w.runText(r.days) : ""; }
   var HREF = {
     ainsley: "kid-ainsley.html",
     hayes: "kid-hayes.html",
@@ -495,41 +510,32 @@
       html += '<div class="kf-xp-fill" style="width:' + Math.max(0, Math.min(100, pct)) + '%"></div>';
       html += "</div>";
       html += '<div class="kf-meta">' +
-        (locked
-          ? ("Musts " + gate.done + "/" + gate.need)
-          : "Musts clear") + /* KIDPATH1: no jar, no $ */
-        "</div>";
-      if (!SEAT_ONLY[kidId]) html += '<div class="kf-streak streak-sparks" data-streak>' +
-        (streak > 0 ? ("Week " + streak) : "Week · tap musts") + /* KIDPATH2: plain Week wording */
-        "</div>"; /* WALLKIT9: none on a seat */
+        (function () { var lc = lawCount(kidId); return lc.need ? (lc.done < lc.need ? ("Musts " + lc.done + "/" + lc.need) : "Musts clear") : ""; })() +
+        "</div>"; /* CHORELAW2: Musts from the chore law (4), not the old quest gate */
+      var run = lawRun(kidId);
+      if (!SEAT_ONLY[kidId] && run) html += '<div class="kf-streak" data-run>' + esc(run) + "</div>"; /* Atlas's run wording; none on a seat */
       html += "</div>";
       return html;
     }
 
     if (face === "chores") {
-      var qs = mustQuests(kidId);
-      var iso = dayIso();
-      var tp = todayMustProgress(kidId);
+      /* CHORELAW2: the chore law's 4 MUSTS + the CHOICE claim from data/kid-seats.json. No quest chart here. */
+      var w = HW(), lm = lawMusts(kidId), now = Date.now();
       html += '<div class="kf-face kf-chores">';
-      html += '<div class="kf-kicker">Chores · claim' + (SEAT_ONLY[kidId] ? "" : ' <span class="kf-chip">' +
-        tp.done + "/" + tp.need + "</span>") + "</div>"; /* CHORELAW1: no count on a seat */
+      html += '<div class="kf-kicker">Chores' + (SEAT_ONLY[kidId] || !lm ? "" : ' <span class="kf-chip">' +
+        lm.done + "/" + lm.items.length + "</span>") + "</div>"; /* no count on a seat */
       html += '<div class="kf-claim-list" role="list">';
-      var shown = 0;
-      for (var i = 0; i < qs.length && shown < 5; i++) {
-        var q = qs[i];
-        var cadence = q.cadence || "daily";
-        var done = cadence === "daily" ? getCheck(q.id, iso) : getCheck(q.id);
-        var label = String(q.what || "").replace(/^[^A-Za-z0-9]+/, "").trim();
-        if (label.length > 28) label = label.slice(0, 26) + "…";
-        html += '<button type="button" class="kf-claim' + (done ? " is-done" : "") +
-          '" data-claim="' + esc(q.id) + '" data-cadence="' + esc(cadence) +
-          '" data-kid="' + esc(kidId) + '" aria-pressed="' + (done ? "true" : "false") + '">' +
-          '<span class="kf-claim-ring">' + (done ? "✓" : "·") + "</span>" +
-          '<span class="kf-claim-what">' + esc(label || q.what) + "</span>" +
-          "</button>";
-        shown += 1;
+      function lawBtn(attr, id, word, on) {
+        return '<button type="button" class="kf-claim' + (on ? " is-done" : "") + '" ' + attr + '="' + esc(kidId) + '"' + (id ? ' data-law-id="' + esc(id) + '"' : "") +
+          ' data-kid="' + esc(kidId) + '" aria-pressed="' + (on ? "true" : "false") + '"><span class="kf-claim-ring">' + (on ? "✓" : "·") + "</span>" +
+          '<span class="kf-claim-what">' + esc(word) + "</span></button>";
       }
-      if (!shown) html += '<div class="kf-empty">No musts on board</div>';
+      if (lm && lm.items.length) {
+        lm.items.forEach(function (m) { html += lawBtn("data-law-must", m.id, m.word, m.closed); });
+        var c = w.choice(LAW, lawStore, kidId, now);
+        if (c && c.open) html += lawBtn("data-law-claim", "", c.job.word, false);
+        else if (c && c.mine) html += lawBtn("data-law-choice-done", "", c.job.word, c.done);
+      } else html += '<div class="kf-empty">No musts on board</div>';
       html += "</div></div>";
       return html;
     }
@@ -568,13 +574,10 @@
         return '<i class="' + (f === face ? "is-on" : "") + '" data-face-dot="' + f + '"></i>';
       }).join("");
     }
-    var streak = streakDays(kidId);
-    var tp = todayMustProgress(kidId);
     if (streakEl) {
       streakEl.hidden = !!SEAT_ONLY[kidId]; /* CHORELAW1: no Musts n/n on a seat */
-      streakEl.textContent = SEAT_ONLY[kidId] ? "" : (streak > 0
-        ? ("Week " + streak + " · " + tp.done + "/" + tp.need)
-        : ("Musts " + tp.done + "/" + tp.need)); /* KIDPATH1: no XP */
+      var lc = lawCount(kidId), lr = lawRun(kidId); /* CHORELAW2: the law's 4 MUSTS + Atlas's run, not the quest chart */
+      streakEl.textContent = SEAT_ONLY[kidId] || !lc.need ? "" : ((lr ? lr + " · " : "") + "Musts " + lc.done + "/" + lc.need);
     }
     if (sub) {
       var leave = nextLeaveFor(kidId);
@@ -692,6 +695,18 @@
       if (!btn || !root.contains(btn)) return;
       ev.preventDefault();
       ev.stopPropagation();
+      var lawAttr = ["data-law-must", "data-law-claim", "data-law-choice-done"].filter(function (a) { return btn.hasAttribute(a); })[0];
+      if (lawAttr) { /* CHORELAW2: same keys as the wall (house-checkoffs:<kid>:<day>, law ids) */
+        var hw = HW(), lk = btn.getAttribute(lawAttr), tnow = Date.now(), res = null;
+        if (hw && LAW) {
+          if (lawAttr === "data-law-must") res = hw.tapMust(lawStore, LAW, lk, btn.getAttribute("data-law-id"), tnow);
+          else if (lawAttr === "data-law-claim") res = hw.claimChoice(lawStore, LAW, lk, tnow);
+          else res = hw.choiceDone(lawStore, LAW, lk, tnow);
+        }
+        if (res && res.ok) sfxQuest(btn); else sfxTap();
+        paintTile(root);
+        return;
+      }
       var id = btn.getAttribute("data-claim");
       var cadence = btn.getAttribute("data-cadence") || "daily";
       var kidId = btn.getAttribute("data-kid") || root.getAttribute("data-kid-flip");
@@ -1105,6 +1120,7 @@
 
   function boot() {
     enhanceBoard();
+    loadLaw(function () { document.querySelectorAll("[data-kid-flip]").forEach(paintTile); }); /* CHORELAW2 */
     var w = WK();
     if (w && w._data) {
       onDataReady();
