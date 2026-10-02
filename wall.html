@@ -254,6 +254,7 @@
     var w = document.documentElement.clientWidth || window.innerWidth, h = window.innerHeight;
     var landscape = w >= h * 1.3, panel = document.getElementById("wall-panel");
     document.body.classList.toggle("is-stacked", !landscape);
+    document.body.classList.toggle("is-short", landscape && h < 720); /* short laptop window (1280x650): compact rows, same type floor */
     var lt0 = $("w-lights"); if (!landscape && lt0 && lt0.classList.contains("is-inline")) { $("w-lights-home").parentNode.insertBefore(lt0, $("w-lights-home")); lt0.classList.remove("is-inline"); } /* FILL1: portrait keeps its own Status strip */
     if (!landscape) { var zs = w / 1280; panel.style.zoom = String(zs); panel.style.width = "1280px"; panel.style.height = ""; panel.style.minHeight = ""; return; }
     var z = Math.min(w / 2560, h / 1440);
@@ -298,6 +299,17 @@
     for (var i = 0; i < SEAT_STEPS.length; i++) { row.style.setProperty("--seat-scale", String(SEAT_STEPS[i])); if (fits()) best = i; else break; }
     row.style.setProperty("--seat-scale", String(SEAT_STEPS[best]));
     row.setAttribute("data-seat-step", String(best));
+    /* CHORE LAW equal weight: every seat's MUSTS buttons share ONE height, the smallest any seat can give at this
+       size (driven from the row, never per seat). The seat with more room spreads its blocks instead. */
+    row.style.removeProperty("--must-h"); row.removeAttribute("data-must-h");
+    var zr = parseFloat(document.getElementById("wall-panel").style.zoom) || 1, hs = [];
+    Array.prototype.forEach.call(seats, function (seat) {
+      var box = seat.querySelector(".kid-law > .musts"), m = box && box.querySelector(".must"); if (!m || !m.offsetParent) return;
+      var cs = getComputedStyle(box), rows = cs.gridTemplateRows.split(" ").filter(Boolean).length || 1, gap = parseFloat(cs.rowGap) || 0;
+      var over = Math.max(0, seat.scrollHeight - seat.clientHeight); /* a seat that overflows gives that back from its musts */
+      hs.push((box.getBoundingClientRect().height / zr - over - gap * (rows - 1)) / rows);
+    });
+    if (hs.length > 1) { var mh = Math.max(48, Math.floor(Math.min.apply(null, hs))); /* never under the 48 design px tap floor */ row.style.setProperty("--must-h", mh + "px"); row.setAttribute("data-must-h", String(mh)); }
   }
   function tick() {
     var d = new Date();
@@ -709,7 +721,8 @@
 
   /* status lights */
   function lightHtml(l) {
-    var led = l.need ? "off" : (l.ok ? "ok" : (l.stale || l.attention ? "warn" : "bad"));
+    /* QUIET1 (Dan hates loud): stale = a quiet static dim amber dot; breathing red is only a real active alert */
+    var led = l.need ? "off" : (l.ok ? "ok" : (l.stale ? "stale" : (l.attention ? "warn" : "bad")));
     var label = l.id === "laundry" ? "Laundry<small>" + esc(l.text) + "</small>" : esc(l.text);
     return '<a class="lt" href="' + esc(l.href || "sheet-google-home.html") + '"><i class="led ' + led + '"></i><span class="lv">' + label + "</span></a>"; /* ION1: no icons */
   }
@@ -772,7 +785,7 @@
     if (!bell) return false;
     var old = !isFinite(at) || Date.now() - at > S.FRESH.nest;
     var nm = String(bell.name || "Doorbell").replace(/\s*doorbell$/i, "") || "Doorbell";
-    $("w-bell-led").className = "led " + (old ? "bad" : "ok");
+    $("w-bell-led").className = "led " + (old ? "stale" : "ok"); /* QUIET1: an old still is stale (quiet dim amber), never the red breathing alert */
     $("w-bell-s").textContent = nm + (isFinite(at) ? " \u00b7 still " + new Date(at).toLocaleDateString("en-US", { timeZone: TZ, month: "short", day: "numeric" }) : " \u00b7 no still yet");
     return true;
   }

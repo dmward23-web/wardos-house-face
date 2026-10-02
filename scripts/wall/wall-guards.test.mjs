@@ -343,4 +343,18 @@ await t("FILL1: no clock override on the wall (test clocks are Playwright only);
   assert.match(code, /var TYPE_FLOOR = 10,/);
   assert.doesNotMatch(read("wall-ion/ion-wright.css"), /max-width:\s*(4|5|6|7|8|9)\d\dpx/, "no phone/center column cap");
 });
+await t("QUIET1: a stale reading (old doorbell still, stale feed light) never gets red or the breathing lamp", () => {
+  const code = wall.replace(/<!--[\s\S]*?-->/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
+  assert.match(code, /\$\("w-bell-led"\)\.className = "led " \+ \(old \? "stale" : "ok"\);/);
+  assert.match(code, /\(l\.stale \? "stale" : \(l\.attention \? "warn" : "bad"\)\)/, "stale wins over bad in the status lights");
+  assert.doesNotMatch(code, /old \? "bad"|stale[^;\n]*\? "bad"/);
+  const css = fs.readdirSync(new URL("wall-ion/", root)).filter((f) => f.endsWith(".css")).map((f) => read("wall-ion/" + f)).join("\n");
+  const staleRules = css.split("\n").filter((l) => /\.led\.stale/.test(l));
+  assert.ok(staleRules.length >= 2, "stale has its own rules");
+  for (const r of staleRules) { assert.doesNotMatch(r, /alert|animation|breathe|box-shadow: 0 0/, r.slice(0, 90)); }
+  assert.match(css, /\.led\.stale::after \{ content: none; display: none; \}/, "no ::after halo (the breathe lives on ::after)");
+  const rules = css.replace(/\/\*[\s\S]*?\*\//g, "").split("}").filter((r) => /animation[^;]*x21-breathe/.test(r));
+  assert.ok(rules.length >= 1);
+  for (const r of rules) assert.match(r.split("{")[0], /\.led\.bad::after\s*$/, "breathe only on .led.bad: " + r.slice(0, 80));
+});
 console.log(`wall-guards: ${n} tests PASS`);

@@ -23,10 +23,13 @@ GEOM = """() => {
   return { zoom: z, docOverflowX: document.documentElement.scrollWidth > document.documentElement.clientWidth, docOverflowY: document.documentElement.scrollHeight > document.documentElement.clientHeight,
     tiles: tiles.length, tileIds: document.querySelectorAll('[data-tile-id]').length, noId, missingOwner, clipped, outside, targets: targets.length, small,
     preview: document.querySelectorAll('[data-state-preview], .spv, .sp-tag').length,
+    bellLed: (document.getElementById('w-bell-led') || {}).className || '', redLeds: [...document.querySelectorAll('.led.bad')].filter(vis).length,
+    breathing: document.getAnimations().filter(a => a.playState === 'running' && a.animationName === 'x21-breathe').length,
+    mustH: [...document.querySelectorAll('.seats-law > .seat.kid')].map(s => s.querySelector('.kid-law > .musts .must')).filter(m => m && m.offsetParent).map(m => Math.round(m.getBoundingClientRect().height / z * 10) / 10),
     css: [...document.styleSheets].map(s => (s.href || 'inline').replace(location.origin + '/', '')),
     fonts: [...document.fonts].filter(f => f.status === 'loaded').map(f => f.family).filter((v, i, a) => a.indexOf(v) === i) };
 }"""
-LED = "() => { const i = document.createElement('i'); i.className = 'led bad'; i.setAttribute('data-check-only', ''); (document.getElementById('w-lights-row') || document.body).appendChild(i); }"  # check-only alert LED so loop 4 has a host
+LED = "() => { const i = document.createElement('i'); i.className = 'led bad'; i.setAttribute('data-check-only', ''); const h = document.getElementById('w-lights-row'); const host = (h && h.offsetParent) ? h : document.getElementById('wall-panel'); if (host !== h) i.style.cssText = 'position:absolute;left:4px;top:4px;width:16px;height:16px;border-radius:50%'; host.appendChild(i); }"  # check-only alert LED so loop 4 has a host
 ANIM = "() => document.getAnimations().filter(a => a.playState === 'running').map(a => a.animationName || a.constructor.name)"
 def page(b, vw, vh, fixture=False, reduced=None):
     ctx = b.new_context(viewport={"width": vw, "height": vh}, reduced_motion=reduced or "no-preference"); pg = ctx.new_page(); errs = []; reqs = []
@@ -46,7 +49,9 @@ try:
         for vw, vh in [(2560, 1440), (1920, 1080), (1536, 730), (1366, 768), (1280, 650), (1080, 1920)]:  # FILL1: laptop windows too
             ctx, pg, errs, reqs = page(b, vw, vh)
             g = pg.evaluate(GEOM); pg.evaluate(LED); pg.wait_for_timeout(200); anims = sorted(set(pg.evaluate(ANIM)))
-            bad = (anims != ["x21-breathe", "x21-drift", "x21-scan", "x21-sweep"] or g["docOverflowX"] or (vw > vh and g["docOverflowY"]) or g["noId"] or g["missingOwner"] or g["clipped"] or (vw > vh and g["outside"]) or g["small"] or g["preview"] or errs or reqs)
+            bad = (anims != ["x21-breathe", "x21-drift", "x21-scan", "x21-sweep"] or g["docOverflowX"] or (vw > vh and g["docOverflowY"]) or g["noId"] or g["missingOwner"] or g["clipped"] or (vw > vh and g["outside"]) or g["small"] or g["preview"] or errs or reqs
+                   or g["breathing"] or g["redLeds"] or "bad" in g["bellLed"]  # QUIET1: real data today has no active alert -> no red, no breathe
+                   or (vw > vh and len(g["mustH"]) > 1 and max(g["mustH"]) - min(g["mustH"]) > 1))  # MUSTEQ1: one MUSTS height across seats
             ok = ok and not bad
             print(f"{vw}x{vh}", "FAIL" if bad else "PASS", json.dumps({k: g[k] for k in g if k not in ("css", "fonts")}), "anims:", sorted(anims), "errors:", errs[:3], "non-local:", reqs[:3])
             if vw == 2560: print("  css order:", g["css"]); print("  fonts loaded:", g["fonts"])
