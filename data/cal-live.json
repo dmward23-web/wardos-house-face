@@ -1,39 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-01T23:51:57.713Z",
+  "fetchedAt": "2026-10-02T00:03:58.556Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-08",
+  "windowEnd": "2026-10-07",
   "asOfIso": "2026-10-01",
   "nextLeave": {
-    "id": "21pjdlio8sqj8pkn601k6u3n90",
-    "summary": "Dan — HOA Fall Garage Sale",
-    "start": "2026-10-02T00:00:00Z",
-    "end": "2026-10-04T00:00:00Z",
+    "id": "6rg63v1kn8df1a9mmdq7gtut4c",
+    "summary": "REMIND · donation receipts → Ledger (Erin list + Goodwill)",
+    "start": "2026-10-01T22:20:00-05:00",
+    "end": "2026-10-01T22:30:00-05:00",
     "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
     "busy": false,
-    "allDay": true
+    "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "21pjdlio8sqj8pkn601k6u3n90",
-      "summary": "Dan — HOA Fall Garage Sale",
-      "start": "2026-10-02T00:00:00Z",
-      "end": "2026-10-04T00:00:00Z",
-      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "cn7vvqun5npbi78hn0ece62ufg",
-      "summary": "Hayes — SRE field trip museum+park (chaperone slots)",
-      "start": "2026-10-02T00:00:00Z",
-      "end": "2026-10-02T00:00:00Z",
-      "location": "Johnson County Museum, 8788 Metcalf Ave, Overland Park, KS 66212",
-      "busy": false,
-      "allDay": true
-    },
     {
       "id": "6rg63v1kn8df1a9mmdq7gtut4c",
       "summary": "REMIND · donation receipts → Ledger (Erin list + Goodwill)",
@@ -330,67 +312,13 @@
       "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
       "busy": true,
       "allDay": false
-    },
-    {
-      "id": "6gc1db0v6m642r4t0uhhpagft0",
-      "summary": "Hayes + Harris — SRE spirit day: Crazy Socks Day (Peace Week)",
-      "start": "2026-10-08T07:00:00-05:00",
-      "end": "2026-10-08T07:15:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "jsv3ukvj82chj7v8tmk4mv4atk",
-      "summary": "Harris — SRE specials: Spanish + Library checkout",
-      "start": "2026-10-08T07:00:00-05:00",
-      "end": "2026-10-08T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "t1sse9vtre7av9lvi2kctig9b8",
-      "summary": "Hayes — SRE specials: Art",
-      "start": "2026-10-08T07:00:00-05:00",
-      "end": "2026-10-08T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "43chat4nm1cmv3tsqtd2p9cdjo_20261008T200000Z",
-      "summary": "Ainsley — LKMS Homework Help · 3:00",
-      "start": "2026-10-08T15:00:00-05:00",
-      "end": "2026-10-08T16:00:00-05:00",
-      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "4iuge4862k2uhd3t5irr7jjmc8_20261008T212500Z",
-      "summary": "Ainsley swim — Coach Ann · 5:00 practice",
-      "start": "2026-10-08T17:00:00-05:00",
-      "end": "2026-10-08T18:00:00-05:00",
-      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "gdlheaj2udj8ilargoqmor6m0s",
-      "summary": "Hayes flag practice · 6:00",
-      "start": "2026-10-08T18:00:00-05:00",
-      "end": "2026-10-08T19:15:00-05:00",
-      "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
     }
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "7:00",
-    "place": "Dan — HOA Fall Garage Sale",
-    "detailHtml": "<strong>7:00</strong> Dan — HOA Fall Garage Sale",
+    "time": "10:20",
+    "place": "REMIND · donation receipts → Ledger (Erin list + Good…",
+    "detailHtml": "<strong>10:20</strong> REMIND · donation receipts → Ledger (Erin list + Good…",
     "badge": "Thu"
   },
   "error": null
