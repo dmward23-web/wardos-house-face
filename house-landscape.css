@@ -37,6 +37,12 @@ html[data-landscape][data-ls-row] .panel:not(#ls-off) {
 html[data-landscape][data-ls-row] .panel:not(#ls-off) > :is(header, .hdr, [data-ls-lead], [data-ls-span], footer, .ftr) { grid-column: 1 / -1; }
 html[data-landscape][data-ls-row] .panel:not(#ls-off) > *, html[data-landscape][data-ls-row] .panel:not(#ls-off) [data-ls-flat] > * { margin-bottom: 0 !important; min-height: 0; }
 html[data-landscape][data-ls-row] .panel:not(#ls-off) > :is(footer, .ftr) { grid-row: auto; }
+/* KIDFIT2 · a theme's own portrait placement (Ainsley: chores grid-row 1/-1, schedule row 2 col 2) must not
+   survive into the landscape row, or the header lands under the sections */
+html[data-landscape][data-ls-row] .panel:not(#ls-off) > :not(header):not(.hdr):not([data-ls-lead]):not([data-ls-span]):not(footer):not(.ftr),
+html[data-landscape][data-ls-row] .panel:not(#ls-off) [data-ls-flat] > *,
+html[data-landscape][data-ls-row] .panel:not(#ls-off) > .body > * { grid-row: auto !important; grid-column: auto !important; }
+html[data-landscape][data-ls-row] .panel:not(#ls-off) > :is(header, .hdr) { grid-row: 1 !important; }
 
 /* HUB (sheet-index #hub-home): header across; left column = wall link / key, Next up + lights, who's up;
    right = the board tiles in as many columns as fit. Cameras (when live) run across under the header. */
@@ -67,3 +73,11 @@ html[data-landscape] #hub-home.panel:not(#ls-off) [data-house-jar] .jar-rule2 { 
    sideways. They are clipped at the board edge; clip is not a scroll container, so the page still scrolls down. */
 html:not(#ls-off) body[data-kid] .panel { overflow-x: clip !important; }
 html:not(#ls-off) body[data-kid] { overflow-x: clip !important; }
+/* KIDFIT2 · in landscape a [hidden] section stays hidden even when a theme sets its display (Ainsley's empty
+   "Trusted with" slot drew an empty card), and the portrait jump rail (Musts / Days scroll tabs) has nothing to
+   scroll to: every section is already on screen */
+html[data-landscape] .panel:not(#ls-off) > [hidden], html[data-landscape] .panel:not(#ls-off) [data-ls-flat] > [hidden] { display: none !important; }
+html[data-landscape] .panel:not(#ls-off) > .jump-rail { display: none !important; }
+/* KIDFIT2 · Ainsley's next-event banner rides in the header's empty middle in landscape (not a column of its own) */
+html[data-landscape][data-ls-row] body.theme-ainsley .panel:not(#ls-off) > .hot-banner[data-ls-span] { grid-row: 1 !important; grid-column: 2 / 3 !important; justify-self: start; align-self: center; z-index: 2; width: auto !important; min-width: 300px; margin: 0 !important; }
+html[data-landscape]:not([data-ls-row]) body.theme-ainsley .panel:not(#ls-off) > .hot-banner[data-ls-span] { column-span: none; }

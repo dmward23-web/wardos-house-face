@@ -200,9 +200,29 @@ html body.wall-kiosk.is-short[data-plate][data-master="ion"] .seats-law > .seat.
 /* QUIET1 · stale = a quiet, static, dim amber dot (no glow, no breathe). Breathe stays on .led.bad = a real active alert only */
 html body.wall-kiosk[data-plate][data-master="ion"] .led.stale { background: rgba(var(--amber-rgb), 0.42); box-shadow: none; border: 0; }
 html body.wall-kiosk[data-plate][data-master="ion"] .led.stale::after { content: none; display: none; }
-/* JARFILL1 · jar tile: jars left, the two rule lines right (no empty band above "Not synced") */
-html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar:not([hidden]) { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto 1fr 1fr; column-gap: 28px; row-gap: 4px; align-items: center; }
-html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar > .ah { grid-column: 1 / -1; grid-row: 1; }
-html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar > .jar-mid { grid-column: 1; grid-row: 2 / 4; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
-html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar > .jar-rule { grid-column: 2; grid-row: 2; align-self: end; margin: 0; }
-html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar > .jar-rule2 { grid-row: 3; align-self: start; }
+/* JARFILL1 · jar tile: jars left, the two rule lines right, centered on the whole tile height (no empty band
+   above them beside the head) */
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar:not([hidden]) { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr auto auto 1fr; column-gap: 28px; row-gap: 6px; align-items: center; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar > .ah { grid-column: 1; grid-row: 1; align-self: start; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar > .jar-mid { grid-column: 1; grid-row: 2 / 5; align-self: start; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar > .jar-rule { grid-column: 2; grid-row: 2; margin: 0; font-size: 20px; line-height: 1.3; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-jar > .jar-rule2 { grid-row: 3; }
+/* DEADSPACE1 · us-together meter: only on the full-width row (CHOICE hidden) */
+html body.wall-kiosk[data-plate][data-master="ion"] .us-x .ux-meter { display: none; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-kids.no-claim .us-x .ux-meter { display: flex; grid-column: 4; align-self: center; gap: 8px; min-width: 0; height: 28px; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-kids.no-claim .us-x { grid-template-columns: auto auto auto minmax(0, 1fr); }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-kids.no-claim .us-x .ux-meter i { flex: 1 1 0; min-width: 6px; border-radius: 4px; border: 1px solid rgba(var(--acc-rgb), 0.35); background: rgba(var(--acc-rgb), 0.06); }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-kids.no-claim .us-x .ux-meter i.on { background: rgba(var(--acc-rgb), 0.55); }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-kids.no-claim .us-x .ux-meter i.at { box-shadow: 4px 0 0 -1px rgba(var(--acc-rgb), 0.9); }
+/* DEADSPACE1 · NEXT UP scales with its own width: same 100/48px at the 1430px master tile, larger on the
+   wide short walls (1536x730, 1280x650) where the tile runs 1700-1900px and the line left a dead band */
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .next.nx3 { container-type: inline-size; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .next.nx3 .t { font-size: clamp(100px, 7cqw, 112px); }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .next.nx3 .w { font-size: clamp(48px, 3.8cqw, 72px); }
+/* DEADSPACE1 · four-tap band re-splits when Check in / Running late are hidden (morning, no next pickup) */
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .taps[data-groups=""] { grid-template-columns: 1fr 1fr; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .taps[data-groups="c"] { grid-template-columns: 1fr 1fr 1.1fr; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .taps[data-groups="l"] { grid-template-columns: 1fr 1fr 1.35fr; }
+/* MUSTEQ2 · equal weight holds on the stacked (portrait) wall too: same row-driven --must-h */
+html body.wall-kiosk.is-stacked[data-plate][data-master="ion"] .seats-law[data-must-h] > .seat.kid > .kid-law > .musts { grid-auto-rows: var(--must-h); grid-template-rows: none; }
+html body.wall-kiosk.is-stacked[data-plate][data-master="ion"] .seats-law[data-must-h] .seat .must { min-height: 0; height: var(--must-h); }

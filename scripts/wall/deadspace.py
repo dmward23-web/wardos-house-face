@@ -3,7 +3,7 @@
 # input, LED) or an inner box with its own background/border covers it. Two failures:
 #   tile-hole  - inside one tile (wall: [data-tile-id] / .mod / .act / .ctl / .seat / .claim / .badge), the largest
 #                empty rectangle is more than 2% of the viewport (boards: any card, 3%);
-#   gap        - a vertical run between two tiles (or a tile and the viewport edge, side bars included) longer than
+#   gap        - a vertical run (in an empty band 48px+ wide, so a tile gutter is not one) between two tiles (or a tile and the viewport edge, side bars included) longer than
 #                24px with nothing in it (boards: area outside every card > 2% of the viewport as one rectangle).
 # Plus overflow: no horizontal scroll anywhere; the wall never scrolls vertically in landscape.
 # States (wall): real data at a test clock (Playwright clock.install; data/ is never written) plus FIXTURE states
@@ -27,14 +27,14 @@ def fx(name): return json.load(open(os.path.join(FX, name)))
 def must_done_seed(day):
     return {f"house-checkoffs:{k}:{day}": json.dumps({"must-bed": True, "must-hamper": True, "must-dish": True, "must-floor": True}) for k in ("harris", "hayes", "ainsley")}
 STATES = [
-    ("FIXTURE-0645", "2026-10-01T06:45:00-05:00", {"data/kid-seats.json": "kid-seats.gen0645.FIXTURE.json"}, {}),
-    ("FIXTURE-1530", "2026-10-01T15:30:00-05:00", {"data/kid-seats.json": "kid-seats.gen1530.FIXTURE.json"}, {}),
+    ("FIXTURE-0645", "2026-10-01T06:45:00-05:00", {"data/kid-seats.json": "kid-seats.gen0645.FIXTURE.json", "data/next-up.json": "next-up.gen0645.FIXTURE.json", "data/house-mode.json": "house-mode.gen0645.FIXTURE.json"}, {}),
+    ("FIXTURE-1530", "2026-10-01T15:30:00-05:00", {"data/kid-seats.json": "kid-seats.gen1530.FIXTURE.json", "data/next-up.json": "next-up.gen1530.FIXTURE.json", "data/house-mode.json": "house-mode.gen1530.FIXTURE.json"}, {}),
     ("real-2000", "2026-10-01T20:00:00-05:00", {}, {}),
     ("real-2130", "2026-10-01T21:30:00-05:00", {}, {}),
     ("FIXTURE-travel-week", "2026-10-01T20:00:00-05:00", {"data/kid-seats.json": "kid-seats.travel-week.FIXTURE.json"}, {}),
-    ("FIXTURE-no-pickups", "2026-10-01T15:30:00-05:00", {"data/pickup-chain.json": "pickup-chain.empty.FIXTURE.json", "data/kid-seats.json": "kid-seats.gen1530.FIXTURE.json"}, {}),
+    ("FIXTURE-no-pickups", "2026-10-01T15:30:00-05:00", {"data/pickup-chain.json": "pickup-chain.empty.FIXTURE.json", "data/kid-seats.json": "kid-seats.gen1530.FIXTURE.json", "data/next-up.json": "next-up.gen1530.FIXTURE.json", "data/house-mode.json": "house-mode.gen1530.FIXTURE.json"}, {}),
     ("FIXTURE-all-musts-done", "2026-10-01T20:00:00-05:00", {}, must_done_seed("2026-10-01")),
-    ("FIXTURE-choice-claimed", "2026-10-01T16:00:00-05:00", {"data/kid-seats.json": "kid-seats.choice-claimed.FIXTURE.json"}, {}),
+    ("FIXTURE-choice-claimed", "2026-10-01T20:00:00-05:00", {"data/kid-seats.json": "kid-seats.choice-claimed.FIXTURE.json"}, {}),
     ("FIXTURE-choice-hidden", "2026-10-01T20:00:00-05:00", {"data/kid-seats.json": "kid-seats.choice-hidden.FIXTURE.json"}, {}),
     ("FIXTURE-doorbell-absent", "2026-10-01T20:00:00-05:00", {"data/nest-live.json": "nest-live.no-doorbell.FIXTURE.json"}, {}),
 ]
@@ -93,11 +93,22 @@ def analyse(res, wall):
         if a * C * C > lim * area: fails.append(f"tile-hole {bx['id']} {w*C}x{h*C}px = {a*C*C/area:.1%}"); rects.append((x, y, w, h))
     out = [[inside[y][x] is None and empty(x, y) for x in range(cols)] for y in range(rows)]
     if wall:
+        # a gutter between side-by-side tiles is one or two cells wide; a dead band is wider. Only cells in an
+        # empty horizontal run of 3+ cells (48px) count toward a vertical gap.
+        band = [[False] * cols for _ in range(rows)]
+        for y in range(rows):
+            x = 0
+            while x < cols:
+                if not out[y][x]: x += 1; continue
+                x0 = x
+                while x < cols and out[y][x]: x += 1
+                if x - x0 >= 3:
+                    for k in range(x0, x): band[y][k] = True
         for x in range(cols):  # vertical gaps between tiles (columns that cross a tile)
             if all(inside[y][x] is None for y in range(rows)): continue
             run = 0
             for y in range(rows + 1):
-                if y < rows and out[y][x]: run += 1; continue
+                if y < rows and band[y][x]: run += 1; continue
                 if run * C > 24: fails.append(f"gap x {x*C}px y {(y-run)*C}-{y*C}px"); rects.append((x, y - run, 1, run))
                 run = 0
         for y in range(rows):  # side bars: an empty run from the left / right edge wider than 24px

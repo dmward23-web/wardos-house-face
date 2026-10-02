@@ -467,6 +467,7 @@
     $("w-ltap-checkin").hidden = !chk;
     $("w-ltap-checkin-s").textContent = st.status ? st.status.line : "On your seat, below";
     $("w-ltap-late").hidden = !late;
+    $("w-ltaps").setAttribute("data-groups", (chk ? "c" : "") + (late ? "l" : "")); /* DEADSPACE1: the band re-splits when a group is hidden */
     $("w-ltap-late-row").innerHTML = late ? late.chips.map(function (m) {
       var r = lastOf("running-late"); return '<button class="chip' + (r && r.minutes === m ? " is-on" : "") + '" data-ltap="running-late" data-min="' + m + '">' + m + "</button>"; }).join("") : "";
   }
@@ -647,10 +648,18 @@
   function sharedHtml(now) {
     var L0 = K.law(feeds.kidSeats, now), u = L0 && L0.usTogether, w = L0 && L0.weekWin;
     var us = u && isFinite(u.closes) && isFinite(u.available) && isFinite(u.unlockAt) ? '<span class="kick">Us together</span><b class="ux"><span class="ux-n">' + esc(u.closes) + '</span><span class="ux-d"> / ' + esc(u.available) +
-      "</span></b><small>Closes this week \u00b7 " + esc(u.unlockAt) + " or more unlocks Weekend fun</small>" : "";
+      "</span></b><small>Closes this week \u00b7 " + esc(u.unlockAt) + " or more unlocks Weekend fun</small>" + usMeter(u) : "";
     var ww = w && typeof w.copy === "string" ? '<span class="kick">Week win \u00b7 Sunday</span>' + (w.houseHeld ? '<span class="ww-name">House held</span>' :
       '<span class="ww-name">' + esc(w.name || "") + '</span><span class="ww-why">' + esc(w.reason || "") + "</span>") : "";
     return { us: us, ww: ww };
+  }
+  /* DEADSPACE1 · when CHOICE is hidden the count runs the full row: a quiet meter of the week's closes
+     (filled = closed, the tick = where Weekend fun unlocks). Display only; shown by CSS on the wide row. */
+  function usMeter(u) {
+    var n = Math.max(0, Math.min(40, Math.round(+u.available))), c = Math.max(0, Math.round(+u.closes)), at = Math.round(+u.unlockAt), h = "";
+    if (!n) return "";
+    for (var i = 1; i <= n; i++) h += '<i class="' + (i <= c ? "on" : "") + (i === at ? " at" : "") + '"></i>';
+    return '<span class="ux-meter" aria-hidden="true">' + h + "</span>";
   }
   function paintKids(mode) {
     var now = Date.now();

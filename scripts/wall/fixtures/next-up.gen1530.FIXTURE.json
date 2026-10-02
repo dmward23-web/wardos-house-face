@@ -1,0 +1,16 @@
+{
+ "asOfIso": "2026-10-01",
+ "generatedAt": "2026-10-01T15:15:00-05:00",
+ "next": {
+  "label": "Hayes + Harris drop-off",
+  "copy": "Leave 8:10.",
+  "leaveAt": "8:10",
+  "leaveIso": "2026-10-02T08:10:00-05:00",
+  "startIso": "2026-10-02T08:10:00-05:00",
+  "day": "Fri"
+ },
+ "timer": null,
+ "source": "Calendar (data/cal-live.json fetched 2026-10-01T18:30:00-05:00 + cal-dmward23-week.json fetched 2026-10-01T18:30:00-05:00, read-only) + kids-week.json (refreshed 2026-10-01T18:30:00-05:00)",
+ "warnings": [],
+ "_fixture": "FIXTURE \u00b7 committed next-up, generatedAt before the 3:30 PM clock"
+}

@@ -51,7 +51,7 @@ try:
             g = pg.evaluate(GEOM); pg.evaluate(LED); pg.wait_for_timeout(200); anims = sorted(set(pg.evaluate(ANIM)))
             bad = (anims != ["x21-breathe", "x21-drift", "x21-scan", "x21-sweep"] or g["docOverflowX"] or (vw > vh and g["docOverflowY"]) or g["noId"] or g["missingOwner"] or g["clipped"] or (vw > vh and g["outside"]) or g["small"] or g["preview"] or errs or reqs
                    or g["breathing"] or g["redLeds"] or "bad" in g["bellLed"]  # QUIET1: real data today has no active alert -> no red, no breathe
-                   or (vw > vh and len(g["mustH"]) > 1 and max(g["mustH"]) - min(g["mustH"]) > 1))  # MUSTEQ1: one MUSTS height across seats
+                   or (len(g["mustH"]) > 1 and max(g["mustH"]) - min(g["mustH"]) > 1))  # MUSTEQ1/2: one MUSTS height across seats, every size
             ok = ok and not bad
             print(f"{vw}x{vh}", "FAIL" if bad else "PASS", json.dumps({k: g[k] for k in g if k not in ("css", "fonts")}), "anims:", sorted(anims), "errors:", errs[:3], "non-local:", reqs[:3])
             if vw == 2560: print("  css order:", g["css"]); print("  fonts loaded:", g["fonts"])
