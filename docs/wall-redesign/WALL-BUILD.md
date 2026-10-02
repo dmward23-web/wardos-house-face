@@ -83,3 +83,45 @@ Source of truth: `ion-handoff/HANDOFF.md`, `house-face-wall-redesign-27-ion.html
 - **Pack is dark per kid.** Only that kid's own Bag tap darkens that kid's Pack; siblings stay lit. `house-wall-kid.js` `pack()` reads only this kid's `house-checkoffs:<kid>:week:<Sunday>` taps (no any-kid read) and Atlas's per-kid `pack.kids.<kid>`. The shared state in Atlas's generator (`scripts/house/kid-layer-lib.mjs`, which used `ORDER.some(...)` for every seat) now writes `pack.kids.<kid>.{dark,items}`, and top-level `pack.dark` means only "not a travel week". Atlas's Pack test was updated in place (still 62). `data/kid-seats.json` is not hand-edited; the next Atlas run writes the new shape, and the wall reads both shapes.
 - **CLOSE is the routine with no countdown (confirmed).** No code change was needed: the button says only "Close", inside Atlas's 7:30–9:30 PM window. A guard checks there is no countdown or seconds text for it.
 - **"taps: this device only" badge.** With no hub key saved, no badge (`data-tapsync="nokey"`, no `/api/taps` call). With a key saved and the hub unreachable (or no hub address), the badge shows as plain text in a `div` with no link and no tap target. This lives in `house-tapsync.js`, so the hub gets the same behaviour.
+
+## Update Oct 1 ~11:10 PM CT · polish, rulings, press map, dead space, preview (Wright)
+
+Commits on `wall-redesign-1`: `d2b5177` FIDELITY1+FILL1 · `fa858ad` LANDFILL1 · `4ef6473` merge Atlas `629dee9` ·
+`bc93504` CHORELAW3+KIDFIT1 · `19a10d3` ION POLISH (Prism's patch, applied clean, credited to Prism) ·
+`1e87835` MUSTEQ1+QUIET1+SHORT1 · `01467ac` PRESSMAP1 · `bd56d6b` PREVIEW1 · `22fda7d` DEADSPACE1+KIDFIT2+MUSTEQ2.
+
+- **FILL1 / LANDFILL1**: the wall fills the window at every landscape size (zoom from the 2560 design; 1280x650 = 0.451).
+  Boards get `house-landscape.js/.css` on landscape windows (>= 960 wide, >= 1.25x wider than tall, not a phone):
+  zoom clamp(0.8, w/1600, 1.6), CSS columns, wrapper flattening, row mode for short boards, hub grid. A press that
+  lands on `page#anchor` re-lands on the anchor after the reflow.
+- **ION POLISH (Prism)**: rail badges one height per row (101px at 2560), Next up shares the timer's 124px row,
+  "Resets 3 AM" pinned right when the status lights are hidden.
+- **MUSTEQ1/2 (Dan's ruling a)**: one MUSTS button height across the three seats, set from the row in `layout()`
+  (`--must-h` = the smallest any seat can give, overflow-aware, never under 48 design px), landscape and stacked.
+  check-ion fails if the seats differ by more than 1px at any size.
+- **QUIET1 (ruling b)**: a stale reading (doorbell "still Sep 28", a stale status light) is a quiet static dim amber
+  dot plus its text: `.led.stale`, no glow, no breathe. Breathe lives only on `.led.bad::after` (a real active
+  alert). Tests: wall-guards (breathe only on `.led.bad`) and check-ion (real data: `bellLed` = `led stale`,
+  red LEDs 0, breathing 0).
+- **SHORT1 (ruling c)**: `body.is-short` (landscape, height < 720) compacts the CHOICE claim row to one line, Nice one
+  inline, tighter trusted-with / hire rows and 4px seat gaps. 1280x650 passes with no seat overflow and the 10 CSS px
+  type floor kept (smallest measured text 10 CSS px).
+- **CHORELAW3 / KIDFIT1-2**: must ids qualified per kid (`kid:must-x`), stored per kid per day; Ainsley has no stars.
+  Kid boards: no horizontal overflow at 1080x1920 / 440x956; in landscape a theme's portrait grid placement is
+  reset, `[hidden]` sections stay hidden, the jump rail is off, Ainsley's next banner rides in her header.
+- **Press map** (`docs/PRESS-MAP.md`, `scripts/wall/press-map.{json,py}`): every visible tappable mapped and pressed;
+  1920 + 2560: 103 presses, 0 FAIL.
+- **Dead space** (`scripts/wall/deadspace.py`, heatmaps in `plates/2026-10-01/redesign/wright/deadspace/`): 16px cells;
+  wall tile hole > 2% of the viewport, vertical dead band > 24px, side bars, overflow and wall scroll fail. Wall:
+  50/50 clean (1280x650, 1366x768, 1536x730, 1920x1080, 2560x1440 x 10 states). Boards: see the summary JSON; most
+  boards still fail the board rule (open work, below).
+- **Preview** (`scripts/preview/publish-preview.mjs`, dry run only): read-only copy in `/workspace/preview-out`, guard
+  first in every page, noindex + robots.txt, SHA chip, turn-sideways hint on a portrait phone only. Not published.
+
+### Open / for Dan
+- Morning states only test on FIXTURES: `kid-seats`, `next-up` and `house-mode` are generated in the evening, so at
+  6:45 AM or 3:30 PM the real files read as "from the future" and the seats / NEXT UP / mode hide. Real data cadence gap.
+- SCROLL5 (Dan 10/1) forces a 240px scroll runway on every board; that fights "no dead space" on boards.
+- The hub's lights pill can still say NEED KEY (`house-lights.js`, main's shared lib, not changed here).
+- No jar explainer page; the kid name is a check-in, not a link; no door sensor; no load-day source; Pack flag has no writer.
+- Rail is 16 badges vs the master's 21; "Hey Atlas" naming vs Ask parked.
