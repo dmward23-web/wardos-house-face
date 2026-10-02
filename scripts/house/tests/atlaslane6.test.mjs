@@ -260,13 +260,16 @@ test("zero $ in Atlas lane data; '$15/hr' is the only allowed dollar string", ()
   assert.equal(displayDeepReport(kw).value.kids.ainsley.quests.find((q) => q.id === "ain-babysit").rateLabel, "$15/hr");
 });
 
-test("Alfred KL-05: Ainsley's seat is a small mark only: no XP, points, or count", () => {
+test("Alfred KL-05 under the chore law (ATLASLANE8): Ainsley gets no stars and no counts, trusted-with only", () => {
   const ks = load("data/kid-seats.json");
   const a = ks.seats.ainsley;
-  assert.ok(Object.keys(a).every((k) => ["name", "week", "copy"].includes(k)), JSON.stringify(Object.keys(a)));
+  assert.ok(Object.keys(a).every((k) => ["name", "week", "musts", "today", "trustedWith", "line", "mystery", "copy"].includes(k)), JSON.stringify(Object.keys(a)));
   assert.deepEqual(Object.keys(a.week), ["closed"]);
   assert.deepEqual(scoreHits(ks), []);
   assert.ok(scoreHits({ seats: { ainsley: { chip: "XP 0/8" } } }).length);
   assert.ok(scoreHits({ seats: { ainsley: { done: 3 } } }).length);
-  assert.ok(scoreHits({ copy: "10 points" }).length);
+  assert.ok(scoreHits({ seats: { ainsley: { copy: "10 points" } } }).length);
+  assert.ok(scoreHits({ copy: "$10" }).length, "no dollar sign anywhere");
+  /* the law gives the brothers a run of days (Harris pauses, Hayes restarts): a number there is allowed */
+  assert.deepEqual(scoreHits({ seats: { hayes: { streak: { days: 3 } } } }), []);
 });

@@ -119,13 +119,9 @@ export function timerCopy(timer, now) {
   return `${label} ${Math.floor(rem / 60)}:${String(rem % 60).padStart(2, "0")}.`;
 }
 
-const USAGE = "Usage: node scripts/next-up.mjs [--data-dir data] [--events …] [--now ISO] [--out data/next-up.json] [--stdout] [--help]\n--help prints this and writes nothing.";
+const USAGE = "Usage: node scripts/next-up.mjs [--data-dir data] [--events …] [--now ISO] [--out data/next-up.json] [--stdout] [--help]\n--help prints this and writes nothing. Unknown flags exit 2, nothing written.";
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-  if (process.argv.includes("--help") || process.argv.includes("-h")) { /* ATLASLANE7 --help is print-only, never writes */
-    process.stdout.write(USAGE + "\n");
-    process.exit(0);
-  }
-  const a = parseArgs(process.argv, DEFAULTS);
+  const a = parseArgs(process.argv, DEFAULTS, { name: "next-up", usage: USAGE }); /* --help print-only; unknown flags exit 2 */
   const inp = loadInputs(a);
   const out = computeNextUp({ ...inp, now: a.now == null || isNaN(a.now) ? Date.now() : a.now });
   if (a.stdout) process.stdout.write(JSON.stringify(out, null, 2) + "\n");

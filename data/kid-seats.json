@@ -1,10 +1,11 @@
 {
   "asOfIso": "2026-10-01",
-  "generatedAt": "2026-10-01T18:34:00-05:00",
+  "generatedAt": "2026-10-01T20:05:00-05:00",
+  "law": "House Face chore law · locked Oct 1 2026",
   "week": {
-    "id": "2026-09-25",
-    "startsAt": "2026-09-25T15:00:00-05:00",
-    "endsAt": "2026-10-02T15:00:00-05:00"
+    "id": "2026-09-27",
+    "startsAt": "2026-09-27T00:00:00-05:00",
+    "endsAt": "2026-10-04T00:00:00-05:00"
   },
   "quiet": false,
   "seats": {
@@ -13,32 +14,87 @@
       "week": {
         "closed": false
       },
+      "musts": [
+        {
+          "id": "must-bed",
+          "word": "Bed made",
+          "closed": false
+        },
+        {
+          "id": "must-hamper",
+          "word": "Hamper in",
+          "closed": false
+        },
+        {
+          "id": "must-dish",
+          "word": "Dish to the sink",
+          "closed": false
+        },
+        {
+          "id": "must-floor",
+          "word": "Own floor clear",
+          "closed": false
+        }
+      ],
       "mission": {
-        "id": "har-shower",
-        "word": "Shower",
-        "copy": "Harris. Shower."
+        "id": "must-bed",
+        "word": "Bed made",
+        "copy": "Harris. Bed made."
       },
       "today": {
         "closed": false
       },
-      "copy": "Harris. Shower."
+      "streak": {
+        "days": 0,
+        "paused": false
+      },
+      "copy": "Harris. Bed made."
     },
     "hayes": {
       "name": "Hayes",
       "week": {
         "closed": false
       },
+      "musts": [
+        {
+          "id": "must-bed",
+          "word": "Bed made",
+          "closed": false
+        },
+        {
+          "id": "must-hamper",
+          "word": "Hamper in",
+          "closed": false
+        },
+        {
+          "id": "must-dish",
+          "word": "Dish to the sink",
+          "closed": false
+        },
+        {
+          "id": "must-floor",
+          "word": "Own floor clear",
+          "closed": false
+        }
+      ],
+      "today": {
+        "closed": false
+      },
+      "streak": {
+        "days": 0
+      },
+      "captainTonight": false,
       "row": [
         {
           "dow": "Mon",
           "date": "2026-09-28",
-          "mark": "closed",
+          "mark": "empty",
           "today": false
         },
         {
           "dow": "Tue",
           "date": "2026-09-29",
-          "mark": "closed",
+          "mark": "empty",
           "today": false
         },
         {
@@ -78,17 +134,107 @@
         "day": "Sun",
         "inDays": 3,
         "copy": "Flag · vs Ridley · 3 days"
-      }
+      },
+      "copy": "Hayes."
     },
     "ainsley": {
       "name": "Ainsley",
       "week": {
         "closed": false
-      }
+      },
+      "musts": [
+        {
+          "id": "must-bed",
+          "word": "Bed made",
+          "closed": false
+        },
+        {
+          "id": "must-hamper",
+          "word": "Hamper in",
+          "closed": false
+        },
+        {
+          "id": "must-dish",
+          "word": "Dish to the sink",
+          "closed": false
+        },
+        {
+          "id": "must-floor",
+          "word": "Own floor clear",
+          "closed": false
+        }
+      ],
+      "today": {
+        "closed": false
+      },
+      "trustedWith": [
+        "Phone upstairs",
+        "Later lights-out",
+        "Picks Sunday dinner"
+      ],
+      "line": null
     }
   },
+  "choice": {
+    "date": "2026-10-01",
+    "job": {
+      "id": "island",
+      "word": "Wipe the island"
+    },
+    "lockAt": "2026-10-01T17:00:00-05:00",
+    "claimedBy": null,
+    "claimedAt": null,
+    "locked": false,
+    "done": false,
+    "open": false,
+    "exception": true,
+    "copy": "Wipe the island · Dad Seat."
+  },
+  "close": {
+    "date": "2026-10-01",
+    "opensAt": "2026-10-01T19:30:00-05:00",
+    "closesAt": "2026-10-01T21:30:00-05:00",
+    "open": true,
+    "captain": "Harris",
+    "kids": {
+      "harris": {
+        "closed": false
+      },
+      "hayes": {
+        "closed": false
+      },
+      "ainsley": {
+        "closed": false
+      }
+    },
+    "copy": "Close at the wall. Captain tonight: Harris."
+  },
+  "dadSeat": {
+    "mode": "day",
+    "loopDay": "2026-10-01",
+    "loops": [
+      {
+        "kind": "choice",
+        "kid": null,
+        "what": "Wipe the island",
+        "copy": "Wipe the island · no claim."
+      }
+    ],
+    "caughtIt": null,
+    "weekStrip": [],
+    "noCheck": []
+  },
+  "pack": {
+    "travelWeek": false,
+    "dark": true,
+    "items": []
+  },
+  "weekWin": null,
   "usTogether": {
+    "closes": 0,
+    "available": 12,
+    "unlockAt": 10,
     "lit": false
   },
-  "source": "MUSTS taps (kid-taps.json, updated 2026-09-30T06:04:00-05:00) + kids-week.json quests + Calendar (data/cal-live.json fetched 2026-10-01T18:30:00-05:00 + cal-dmward23-week.json fetched 2026-10-01T18:30:00-05:00, read-only)"
+  "source": "chore-law taps (kid-taps.json, updated 2026-09-30T06:04:00-05:00) + config/kid-layer.config.json + Calendar (data/cal-live.json fetched 2026-10-01T17:11:00-05:00 + cal-dmward23-week.json fetched 2026-10-01T20:18:00-05:00, read-only)"
 }

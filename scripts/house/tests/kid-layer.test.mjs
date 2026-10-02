@@ -1,284 +1,294 @@
+/* ATLASLANE8 · House Face chore law (Dan, locked Oct 1 2026 8:01 PM CT) · Atlas data side. One test block per rule.
+   Replaces the kid layer v3 tests (one Harris mission by weekday, MUSTGATE1, per-kid week unlocks): those rules are gone. */
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { choreWeek, normalizeTaps, weekClosed, mustsFor, computeKidLayer, consumeUnlock, missNameHits, harrisMissionFor, weekIdOfTapDay } from "../kid-layer-lib.mjs";
-import { scanObject, bannedHits, readJson, addDays } from "../lib.mjs";
+import { computeKidLayer, mustsFor, dayClosed, normalizeTaps, claimChoice, closeTile, choiceJobFor, consumeUnlock, lawWeek,
+  scoreHits, consequenceHits, missNameHits, repairDeadline, ORDER } from "../kid-layer-lib.mjs";
+import { scanObject, readJson, addDays, ctWallMs } from "../lib.mjs";
+import { kidMoneyHits } from "../kid-copy.mjs";
 import { calendar, at, ROOT } from "./fixture.mjs";
 
 const CONFIG = readJson(path.join(ROOT, "config/kid-layer.config.json"));
-/* Real quest ids/cadences (kids-week.json), incl. an optional add-on that must never count. */
-const q = (id, cadence = "daily", extra = {}) => ({ id, what: id, stars: 1, cadence, ...extra });
-const KW = { kids: {
-  harris: { quests: [q("har-bed"), q("har-backpack"), q("har-dishes"), q("har-toys", "weekly")] },
-  hayes: { quests: [q("hay-bed"), q("hay-dishes"), q("hay-room", "weekly")] },
-  ainsley: { quests: [q("ain-bed"), q("ain-laundry", "weekly"), q("ain-babysit", "addon", { optional: true })] },
-} };
-const WEEK = "2026-09-25";
-const TAP_DAYS = Array.from({ length: 7 }, (_, i) => addDays(WEEK, i + 1)); /* Sat Sep 26 .. Fri Oct 2 */
-
-/** Local (localStorage) tap shape: {key: {id: true}}. Harris: that day's one fixed mission. */
-function closeWeek(taps, kid, { skipDay = null, skipWeekly = false, week = WEEK } = {}) {
-  const days = Array.from({ length: 7 }, (_, i) => addDays(week, i + 1));
-  if (kid === "harris") {
-    for (const d of days) if (d !== skipDay) { const k = `house-checkoffs:harris:${d}`; (taps[k] = taps[k] || {})[harrisMissionFor(d, CONFIG).id] = true; }
-    return taps;
-  }
-  for (const m of mustsFor(KW, kid)) {
-    if (m.cadence === "daily") for (const d of days) {
-      if (d === skipDay) continue;
-      const k = `house-checkoffs:${kid}:${d}`; (taps[k] = taps[k] || {})[m.id] = true;
-    } else if (!skipWeekly) { const k = `house-checkoffs:${kid}:week:${week}`; (taps[k] = taps[k] || {})[m.id] = true; }
-  }
+const cfg = (patch = {}) => ({ ...structuredClone(CONFIG), ...patch });
+const MUSTS = ["must-bed", "must-hamper", "must-dish", "must-floor"];
+/* hub shape {v, t}; hh:mm CT on `iso` unless whenIso given */
+function tap(taps, kid, iso, id, hm = "07:30", whenIso = iso) {
+  const [h, m] = hm.split(":").map(Number);
+  const k = `house-checkoffs:${kid}:${iso}`;
+  (taps[k] = taps[k] || {})[id] = { v: true, t: ctWallMs(whenIso, h, m) };
   return taps;
 }
-const FRI_AM = at("2026-10-02T07:45:00-05:00");
-const run = (taps, uses = { uses: [] }, now = FRI_AM, cal = calendar()) => computeKidLayer({ calendar: cal, kidsWeek: KW, taps, uses, config: CONFIG, now });
-const ids = (layer) => layer.unlocks.lit.map((u) => u.id).sort();
+const allMusts = (taps, kid, iso, hm = "07:30", skip = null) => { for (const id of MUSTS) if (id !== skip) tap(taps, kid, iso, id, hm); return taps; };
+const close = (taps, kid, iso, hm = "20:00") => tap(taps, kid, iso, "close", hm);
+const run = (taps, now, { config = CONFIG, uses = { uses: [] }, cal = calendar() } = {}) => computeKidLayer({ calendar: cal, taps, uses, config, now: at(now) });
+const scansClean = (o) => { for (const x of [o.kidSeats, o.unlocks]) assert.deepEqual(scanObject(x).concat(missNameHits(x), scoreHits(x), consequenceHits(x)), []); };
+const NIGHTS = ["2026-09-28", "2026-09-29", "2026-09-30", "2026-10-01"]; /* Mon..Thu, kids home (fixture Kids with Dan Sep 25 3 PM - Oct 2 3 PM) */
 
-test("chore week = Fri 3:00 PM -> Fri 3:00 PM, tap days Sat..Fri (kids-data.js weekStartIso)", () => {
-  const w = choreWeek(at("2026-10-01T18:00:00-05:00"));
-  assert.equal(w.id, WEEK);
-  assert.deepEqual(w.tapDays, TAP_DAYS);
-  assert.equal(choreWeek(at("2026-10-02T14:59:00-05:00")).id, WEEK);
-  assert.equal(choreWeek(at("2026-10-02T15:00:00-05:00")).id, "2026-10-02");
+test("law week = Sunday to Sunday; repair edge = Saturday 12:00 AM of that week", () => {
+  const w = lawWeek("2026-10-01");
+  assert.equal(w.id, "2026-09-27");
+  assert.deepEqual([w.days[0], w.days[6]], ["2026-09-27", "2026-10-03"]);
+  assert.equal(repairDeadline("2026-09-29", CONFIG), ctWallMs("2026-10-03", 0, 0));
+  const o = run({}, "2026-10-01T20:05:00-05:00");
+  assert.equal(o.kidSeats.week.id, "2026-09-27");
+  assert.match(o.kidSeats.law, /locked Oct 1 2026/);
 });
 
-test("week close: every daily must on all 7 tap days + every weekly must; add-ons never count", () => {
-  const w = choreWeek(FRI_AM);
-  const m = mustsFor(KW, "ainsley");
-  assert.ok(!m.some((x) => x.id === "ain-babysit"));
-  assert.equal(weekClosed(m, normalizeTaps(closeWeek({}, "ainsley")), "ainsley", w), true);
-  assert.equal(weekClosed(m, normalizeTaps(closeWeek({}, "ainsley", { skipDay: "2026-09-30" })), "ainsley", w), false);
-  assert.equal(weekClosed(m, normalizeTaps(closeWeek({}, "ainsley", { skipWeekly: true })), "ainsley", w), false);
-  /* leave-Friday morning tap is required; an arrival-Friday (Sep 25) tap doesn't substitute */
-  const t = closeWeek({}, "hayes", { skipDay: "2026-10-02" });
-  t["house-checkoffs:hayes:2026-09-25"] = { "hay-bed": true, "hay-dishes": true };
-  assert.equal(weekClosed(mustsFor(KW, "hayes"), normalizeTaps(t), "hayes", w), false);
-  /* hub store shape {id: {v, t}} reads the same; v:false is not a tap */
-  const hub = {};
-  for (const [k, v] of Object.entries(closeWeek({}, "hayes"))) hub[k] = Object.fromEntries(Object.entries(v).map(([id]) => [id, { v: true, t: 1 }]));
-  assert.equal(weekClosed(mustsFor(KW, "hayes"), normalizeTaps(hub), "hayes", w), true);
-  hub[`house-checkoffs:hayes:${TAP_DAYS[3]}`]["hay-bed"] = { v: false, t: 2 };
-  assert.equal(weekClosed(mustsFor(KW, "hayes"), normalizeTaps(hub), "hayes", w), false);
+test("MUSTS: four per kid, binary (three of four is open), Dragon fed replaces Hayes's fourth only while the dragon is in the house", () => {
+  for (const k of ORDER) assert.deepEqual(mustsFor(k, CONFIG).map((m) => m.word), ["Bed made", "Hamper in", "Dish to the sink", "Own floor clear"], k);
+  assert.equal(CONFIG.musts.dragon.inHouse, false, "the dragon is not in the house now");
+  const inHouse = cfg(); inHouse.musts.dragon.inHouse = true;
+  assert.deepEqual(mustsFor("hayes", inHouse).map((m) => m.word), ["Bed made", "Hamper in", "Dish to the sink", "Dragon fed"]);
+  assert.deepEqual(mustsFor("harris", inHouse).map((m) => m.word).length, 4, "only Hayes swaps");
+  const t = allMusts({}, "hayes", "2026-10-01", "07:30", "must-floor");
+  assert.equal(dayClosed(normalizeTaps(t), "hayes", "2026-10-01", CONFIG), false, "no partial credit");
+  tap(t, "hayes", "2026-10-01", "must-floor");
+  assert.equal(dayClosed(normalizeTaps(t), "hayes", "2026-10-01", CONFIG), true);
+  assert.equal(dayClosed(normalizeTaps(t), "hayes", "2026-10-01", inHouse), false, "dragon in: floor no longer counts, dragon fed does");
+  const o = run(t, "2026-10-01T20:05:00-05:00");
+  assert.equal(o.kidSeats.seats.hayes.musts.length, 4);
+  assert.ok(o.kidSeats.seats.hayes.musts.every((m) => m.closed === true));
+  assert.equal(o.kidSeats.seats.hayes.today.closed, true);
+  assert.ok(o.kidSeats.seats.harris.musts.every((m) => typeof m.closed === "boolean" && Object.keys(m).join() === "id,word,closed"));
+  scansClean(o);
 });
 
-test("one use: a closed week lights one control; spending it turns it dark; second spend is a no-op", () => {
-  const taps = closeWeek({}, "harris");
-  let layer = run(taps);
-  assert.deepEqual(ids(layer), ["harris-dinner-vote"]);
-  assert.equal(layer.unlocks.lit[0].copy, "Harris. Week closed. Dinner vote.");
-  let uses = consumeUnlock({ uses: [] }, "harris-dinner-vote", layer, FRI_AM);
-  assert.equal(uses.uses.length, 1);
-  layer = run(taps, uses);
-  assert.deepEqual(ids(layer), []);
-  assert.equal(consumeUnlock(uses, "harris-dinner-vote", layer, FRI_AM).uses.length, 1, "already spent");
-  assert.equal(consumeUnlock({ uses: [] }, "hayes-weekend-pick", run({}), FRI_AM).uses.length, 0, "not lit, can't spend");
+test("CHOICE: one shared job a day; first tap owns it and locks it; a sibling can't take it; unclaimed at 5 PM = Dad Seat exception", () => {
+  const jobs = Array.from({ length: 4 }, (_, i) => choiceJobFor(addDays("2026-09-27", i), CONFIG).word);
+  assert.deepEqual(jobs.slice().sort(), ["Fold one basket", "Reset the couch", "Trash to the can", "Wipe the island"], "rotates through all four");
+  const d = "2026-10-01";
+  let s = claimChoice({}, "hayes", d, ctWallMs(d, 7, 40), CONFIG);
+  assert.deepEqual([s.ok, s.owner], [true, "hayes"]);
+  const s2 = claimChoice(s.taps, "harris", d, ctWallMs(d, 7, 41), CONFIG);
+  assert.deepEqual([s2.ok, s2.owner], [false, "hayes"], "sibling can't take a claimed job");
+  assert.deepEqual(s2.taps, s.taps, "nothing written for the sibling");
+  /* two devices: the earlier tap wins even if it synced later */
+  const raw = tap(tap({}, "ainsley", d, "choice-claim", "07:50"), "harris", d, "choice-claim", "07:45");
+  let o = run(raw, "2026-10-01T12:00:00-05:00");
+  assert.equal(o.kidSeats.choice.claimedBy, "Harris");
+  assert.equal(o.kidSeats.choice.locked, true);
+  assert.equal(o.kidSeats.choice.copy, `${choiceJobFor(d, CONFIG).word} · Harris.`);
+  /* unclaimed: open before 5 PM, exception at 5 PM, claims closed after */
+  o = run({}, "2026-10-01T16:59:00-05:00");
+  assert.deepEqual([o.kidSeats.choice.open, o.kidSeats.choice.exception], [true, false]);
+  assert.deepEqual(o.kidSeats.dadSeat.loops, []);
+  o = run({}, "2026-10-01T17:00:00-05:00");
+  assert.deepEqual([o.kidSeats.choice.open, o.kidSeats.choice.exception], [false, true]);
+  assert.deepEqual(o.kidSeats.dadSeat.loops.map((l) => l.kind), ["choice"]);
+  assert.equal(o.kidSeats.dadSeat.loops[0].kid, null, "an exception names no kid");
+  assert.equal(claimChoice({}, "hayes", d, ctWallMs(d, 17, 5), CONFIG).ok, false, "no claim after 5 PM");
+  assert.equal(run(tap({}, "hayes", d, "choice-claim", "17:10"), "2026-10-01T18:00:00-05:00").kidSeats.choice.exception, true, "late claim tap ignored");
+  scansClean(o);
 });
 
-test("Ainsley spends one: gallery photo OR weekend pick, never both", () => {
-  const taps = closeWeek({}, "ainsley");
-  const layer = run(taps);
-  const u = layer.unlocks.lit.find((x) => x.id === "ainsley-gallery-or-weekend");
-  assert.deepEqual(u.choices, ["gallery-photo", "weekend-pick"]);
-  assert.equal(consumeUnlock({ uses: [] }, u.id, layer, FRI_AM, "bad").uses.length, 0);
-  const uses = consumeUnlock({ uses: [] }, u.id, layer, FRI_AM, "gallery-photo");
-  assert.equal(uses.uses[0].choice, "gallery-photo");
-  assert.deepEqual(ids(run(taps, uses)), []);
+test("CLOSE: bedtime window, each kid closes only their own tile; overnight Dad Seat = open loops only + one Caught-it line shown once", () => {
+  const d = "2026-10-01";
+  assert.equal(closeTile({}, "hayes", d, ctWallMs(d, 18, 0), CONFIG).ok, false, "before the window");
+  const c = closeTile({}, "hayes", d, ctWallMs(d, 20, 10), CONFIG);
+  assert.equal(c.ok, true);
+  assert.deepEqual(Object.keys(c.taps), ["house-checkoffs:hayes:2026-10-01"], "writes only that kid's tile");
+  assert.equal(closeTile({}, "hayes", d, ctWallMs(d, 23, 0), CONFIG).ok, false, "after the window");
+  /* Thu: Harris + Ainsley all MUSTS + close; Hayes MUSTS minus hamper, no close; Hayes claimed + did the island */
+  const t = {};
+  allMusts(t, "harris", d, "07:20"); close(t, "harris", d);
+  allMusts(t, "ainsley", d, "07:30"); close(t, "ainsley", d);
+  allMusts(t, "hayes", d, "07:30", "must-hamper");
+  tap(t, "hayes", d, "choice-claim", "07:35"); tap(t, "hayes", d, "choice-done", "16:00");
+  const late = close({}, "hayes", d, "22:30");
+  assert.equal(run({ ...t, ...late }, "2026-10-01T22:45:00-05:00").kidSeats.close.kids.hayes.closed, false, "a close after the window doesn't count");
+  const night = run(t, "2026-10-01T23:00:00-05:00");
+  const ds = night.kidSeats.dadSeat;
+  assert.equal(ds.mode, "overnight");
+  assert.deepEqual(ds.loops.map((l) => l.copy), ["Hayes · Hamper in.", "Hayes · Close."], "open loops only, nothing closed listed");
+  assert.equal(ds.caughtIt.line, "Hayes wiped the island.", "one line about the actual thing");
+  assert.equal(run(t, "2026-10-02T01:00:00-05:00").kidSeats.dadSeat.loopDay, d, "after midnight still Thursday's loops");
+  /* morning: shown overnight only; next afternoon it has moved to the week strip */
+  const fri = run(t, "2026-10-02T13:00:00-05:00");
+  assert.equal(fri.kidSeats.quiet, false);
+  assert.equal(fri.kidSeats.dadSeat.caughtIt, null);
+  assert.deepEqual(fri.kidSeats.dadSeat.weekStrip.map((x) => x.line), ["Hayes wiped the island."]);
+  /* morning with nothing open = no lecture */
+  const t2 = {}; for (const k of ORDER) { allMusts(t2, k, d); close(t2, k, d); }
+  const m = run(t2, "2026-10-02T07:00:00-05:00").kidSeats.dadSeat;
+  assert.equal(m.mode, "morning");
+  assert.deepEqual(m.loops.filter((l) => l.kind !== "choice"), []);
+  scansClean(night);
 });
 
-test("carry-over: once lit, an unlock stays lit until spent, through the kids-away week into the next home week", () => {
-  const taps = closeWeek({}, "hayes");
-  for (const now of ["2026-10-02T14:59:00-05:00", "2026-10-02T15:00:00-05:00", "2026-10-05T18:00:00-05:00", "2026-10-12T18:00:00-05:00"]) {
-    const layer = run(taps, { uses: [] }, at(now));
-    assert.deepEqual(ids(layer), ["hayes-weekend-pick"], now);
-    assert.equal(layer.unlocks.lit[0].earnedWeek, WEEK, now);
-    assert.equal(layer.unlocks.resetsAt, undefined, "no reset");
+test("Harris: a miss pauses his run, it never resets it", () => {
+  const t = {};
+  for (const d of ["2026-09-28", "2026-09-29"]) allMusts(t, "harris", d);
+  /* Wed Sep 30 missed */
+  let s = run(t, "2026-10-01T07:00:00-05:00").kidSeats.seats.harris;
+  assert.deepEqual(s.streak, { days: 2, paused: true });
+  allMusts(t, "harris", "2026-10-01", "07:10");
+  s = run(t, "2026-10-01T07:15:00-05:00").kidSeats.seats.harris;
+  assert.deepEqual(s.streak, { days: 3, paused: false }, "the miss didn't zero it");
+  assert.equal(s.mission, null);
+  assert.equal(s.copy, "Harris. All four done.");
+  const open = run({}, "2026-10-01T07:15:00-05:00").kidSeats.seats.harris;
+  assert.equal(open.mission.word, "Bed made", "his tile shows the next open MUST");
+  assert.equal(open.copy, "Harris. Bed made.");
+});
+
+test("Hayes: run of closed days (a miss restarts it quietly) plus captain of the night, rotating", () => {
+  const t = {};
+  for (const d of ["2026-09-28", "2026-09-30", "2026-10-01"]) allMusts(t, "hayes", d);
+  const s = run(t, "2026-10-01T19:40:00-05:00").kidSeats.seats.hayes;
+  assert.deepEqual(s.streak, { days: 2 });
+  assert.ok(!/miss|lost|reset/i.test(s.copy), s.copy);
+  const caps = NIGHTS.slice(0, 3).map((d) => run({}, `${d}T19:40:00-05:00`).kidSeats.close.captain);
+  assert.deepEqual(caps.slice().sort(), ["Ainsley", "Harris", "Hayes"], "rotates through the kids home");
+  const hayesNight = NIGHTS.find((d) => run({}, `${d}T19:40:00-05:00`).kidSeats.close.captain === "Hayes");
+  const h = run(t, `${hayesNight}T19:40:00-05:00`).kidSeats.seats.hayes;
+  assert.equal(h.captainTonight, true);
+  assert.match(h.copy, /Captain tonight\.$/);
+});
+
+test("Ainsley: no stars, no counts; trusted-with only; no check after five days running; her line is specific and rare", () => {
+  const o = run({}, "2026-10-01T20:05:00-05:00");
+  const a = o.kidSeats.seats.ainsley;
+  assert.deepEqual(a.trustedWith, ["Phone upstairs", "Later lights-out", "Picks Sunday dinner"]);
+  assert.equal(a.streak, undefined);
+  assert.deepEqual(scoreHits(o.kidSeats), []);
+  assert.ok(!/\d|★|stars?|streak/i.test(JSON.stringify(a)), "no number anywhere on her seat");
+  assert.ok(scoreHits({ seats: { ainsley: { copy: "Week 3" } } }).length);
+  assert.ok(scoreHits({ seats: { ainsley: { done: 3 } } }).length);
+  assert.ok(scoreHits({ seats: { ainsley: { streak: { days: 1 } } } }).length);
+  /* hamper closed Sun..Thu = five home days running -> no check on hamper, and one line the day it crosses */
+  const t = {};
+  for (const d of ["2026-09-27", ...NIGHTS]) tap(t, "ainsley", d, "must-hamper");
+  const thu = run(t, "2026-10-01T20:05:00-05:00").kidSeats;
+  assert.ok(thu.seats.ainsley.trustedWith.includes("No check · Hamper in"));
+  assert.deepEqual(thu.dadSeat.noCheck, ["Ainsley · Hamper in"]);
+  assert.equal(thu.seats.ainsley.line, "Ainsley. Hamper in is yours now. No check.");
+  const wed = run(t, "2026-09-30T20:05:00-05:00").kidSeats.seats.ainsley;
+  assert.equal(wed.line, null, "four days: no line, no no-check");
+  assert.ok(!wed.trustedWith.some((x) => /No check/.test(x)));
+  tap(t, "ainsley", "2026-10-02", "must-hamper");
+  assert.equal(run(t, "2026-10-02T08:00:00-05:00").kidSeats.seats.ainsley.line, null, "rare: not again the next day");
+  assert.ok(consequenceHits({ line: "Ainsley. Great job." }).length, "never generic praise");
+  scansClean(run(t, "2026-10-01T20:05:00-05:00"));
+});
+
+test("Week win: Sunday tile, one name + one reason, rotating by week; quiet week = house held; absent other days", () => {
+  assert.equal(run({}, "2026-10-01T20:05:00-05:00").kidSeats.weekWin, null);
+  const quiet = run({}, "2026-10-04T10:00:00-05:00").kidSeats.weekWin;
+  assert.deepEqual([quiet.houseHeld, quiet.name, quiet.copy], [true, null, "Week win: house held."]);
+  const t = {};
+  tap(t, "hayes", "2026-09-29", "choice-claim", "07:30"); tap(t, "hayes", "2026-09-29", "choice-done", "16:00");
+  const w = run(t, "2026-10-04T10:00:00-05:00").kidSeats.weekWin;
+  assert.equal(w.weekId, "2026-09-27");
+  assert.equal(w.name, "Hayes");
+  assert.equal(w.copy, `Week win: Hayes. ${choiceJobFor("2026-09-29", CONFIG).did.replace(/^./, (c) => c.toUpperCase())}.`);
+  /* rotation: the next weeks are other names, whatever anyone did (not a ranking) */
+  const names = ["2026-10-04", "2026-10-11", "2026-10-18"].map((sun) => {
+    const c = cfg(); const wk = lawWeek(addDays(sun, -7));
+    return c.weekWin.rotation[(Math.round((ctWallMs(wk.id, 12) - ctWallMs(c.rotationEpoch, 12)) / 86400000 / 7) % 3 + 3) % 3];
+  });
+  assert.equal(new Set(names).size, 3);
+  const t2 = {}; for (const d of ["2026-10-10", "2026-10-11"]) allMusts(t2, "harris", d); /* week of Oct 4: Harris home only Sat Oct 10 */
+  const w2 = run(t2, "2026-10-11T10:00:00-05:00").kidSeats.weekWin;
+  assert.equal(w2.name, "Harris");
+  assert.equal(w2.reason, "All MUSTS, every day home.");
+});
+
+test("Us together: 12 closes available (Mon-Thu, three kids); 10 or more lights Weekend fun, carried until spent", () => {
+  const t = {};
+  let n = 0;
+  for (const d of NIGHTS) for (const k of ORDER) { if (n++ >= 9) break; allMusts(t, k, d); close(t, k, d); }
+  let o = run(t, "2026-10-01T21:00:00-05:00");
+  assert.deepEqual(o.kidSeats.usTogether, { closes: 9, available: 12, unlockAt: 10, lit: false });
+  assert.deepEqual(o.unlocks.lit, []);
+  /* a close without that day's MUSTS isn't a close */
+  close(t, "ainsley", "2026-10-01");
+  assert.equal(run(t, "2026-10-01T21:00:00-05:00").kidSeats.usTogether.closes, 9);
+  allMusts(t, "ainsley", "2026-10-01");
+  o = run(t, "2026-10-01T21:00:00-05:00");
+  assert.deepEqual(o.kidSeats.usTogether, { closes: 10, available: 12, unlockAt: 10, lit: true });
+  assert.deepEqual(o.unlocks.lit.map((u) => [u.id, u.seat, u.control, u.tile, u.earnedWeek, u.copy]),
+    [["house-weekend-pick", "House", "weekend-pick", "Weekend fun", "2026-09-27", "Us together. Weekend fun."]]);
+  assert.equal(o.kidSeats.usTogether.closes <= 12, true);
+  /* carries through the kids-away week, one use, then dark */
+  const away = run(t, "2026-10-07T12:00:00-05:00");
+  assert.equal(away.unlocks.lit.length, 1);
+  const uses = consumeUnlock({ uses: [] }, "house-weekend-pick", away, at("2026-10-10T10:00:00-05:00"));
+  assert.deepEqual(run(t, "2026-10-10T11:00:00-05:00", { uses }).unlocks.lit, []);
+  assert.deepEqual(Object.keys(o.kidSeats.usTogether), ["closes", "available", "unlockAt", "lit"], "no list of who");
+});
+
+test("Repair: a missed MUST can close before Saturday fun; never after, never into next week", () => {
+  const t = {};
+  allMusts(t, "harris", "2026-09-29", "07:30", "must-dish");
+  assert.equal(dayClosed(normalizeTaps(t), "harris", "2026-09-29", CONFIG), false);
+  const fixed = structuredClone(t); tap(fixed, "harris", "2026-09-29", "must-dish", "16:00", "2026-10-01"); /* Thu, for Tuesday */
+  assert.equal(dayClosed(normalizeTaps(fixed), "harris", "2026-09-29", CONFIG), true);
+  const o = run(fixed, "2026-10-01T23:00:00-05:00");
+  assert.equal(o.kidSeats.dadSeat.caughtIt.line, "Harris went back and took the dish to the sink.");
+  const tooLate = structuredClone(t); tap(tooLate, "harris", "2026-09-29", "must-dish", "09:00", "2026-10-03"); /* Saturday */
+  assert.equal(dayClosed(normalizeTaps(tooLate), "harris", "2026-09-29", CONFIG), false, "after Saturday fun");
+  const nextWeek = structuredClone(t); tap(nextWeek, "harris", "2026-09-29", "must-dish", "18:00", "2026-10-05");
+  assert.equal(dayClosed(normalizeTaps(nextWeek), "harris", "2026-09-29", CONFIG), false, "does not carry into next week");
+  const sat = tap({}, "harris", "2026-10-03", "must-bed", "09:00", "2026-10-04");
+  assert.equal(normalizeTaps(sat) && dayClosed(normalizeTaps(allMusts(sat, "harris", "2026-10-03", "08:00", "must-bed")), "harris", "2026-10-03", CONFIG), false, "a Saturday miss has no repair window");
+});
+
+test("Pack: travel week only, three items (dragon care, bag, charger), dark when the bag is at the door", () => {
+  assert.deepEqual(run({}, "2026-10-01T20:05:00-05:00").kidSeats.pack, { travelWeek: false, dark: true, items: [] }, "a handoff Friday is not travel");
+  const trip = calendar([{ summary: "Dan + Kids Nashville", start: { date: "2026-10-02T00:00:00Z" }, end: { date: "2026-10-05T00:00:00Z" } }]);
+  let p = run({}, "2026-10-01T20:05:00-05:00", { cal: trip }).kidSeats.pack;
+  assert.equal(p.travelWeek, true);
+  assert.deepEqual(p.items.map((x) => x.word), ["Dragon care", "Bag", "Charger"], "three items only");
+  const t = { "house-checkoffs:hayes:week:2026-09-27": { "pack-charger": { v: true, t: at("2026-10-01T19:00:00-05:00") } } };
+  p = run(t, "2026-10-01T20:05:00-05:00", { cal: trip }).kidSeats.pack;
+  assert.deepEqual(p.items.map((x) => x.done), [false, false, true]);
+  t["house-checkoffs:ainsley:week:2026-09-27"] = { "pack-bag": true };
+  p = run(t, "2026-10-01T20:05:00-05:00", { cal: trip }).kidSeats.pack;
+  assert.deepEqual([p.dark, p.items], [true, []], "dark once the bag is at the door");
+  const c = cfg(); c.pack.travelWeeks = ["2026-10-11"];
+  assert.equal(run({}, "2026-10-12T19:00:00-05:00").kidSeats.pack.travelWeek, false);
+  assert.equal(run({}, "2026-10-12T19:00:00-05:00", { config: c }).kidSeats.pack.travelWeek, true, "Dan can list a week");
+});
+
+test("Mystery close: once a week, hidden until that kid's MUSTS are closed, never money", () => {
+  const days = lawWeek("2026-10-01").days.filter((d) => run({}, `${d}T12:00:00-05:00`).kidSeats.seats.harris.mystery);
+  assert.equal(days.length, 1, "one day a week");
+  const d = days[0];
+  const t = allMusts({}, "hayes", d);
+  const s = run(t, `${d}T18:00:00-05:00`).kidSeats.seats;
+  assert.deepEqual(s.harris.mystery, { hidden: true });
+  assert.equal(s.hayes.mystery.hidden, false);
+  assert.ok(CONFIG.mystery.pool.includes(s.hayes.mystery.copy));
+  for (const x of CONFIG.mystery.pool) assert.deepEqual(kidMoneyHits({ x }).concat(scanObject({ x })), [], x);
+});
+
+test("No leaderboard, no consequence text on a miss: fixed kid order, no rank / who-kept-it-dark, no penalty words", () => {
+  const good = {}, bad = {};
+  for (const d of NIGHTS) { allMusts(good, "ainsley", d); close(good, "ainsley", d); allMusts(bad, "harris", d); close(bad, "harris", d); }
+  for (const [t, now] of [[good, "2026-10-01T23:00:00-05:00"], [bad, "2026-10-01T23:00:00-05:00"], [{}, "2026-10-02T07:00:00-05:00"], [good, "2026-10-04T10:00:00-05:00"]]) {
+    const o = run(t, now);
+    assert.deepEqual(Object.keys(o.kidSeats.seats), ["harris", "hayes", "ainsley"], "order never follows performance");
+    scansClean(o);
+    assert.ok(!/\b(rank|leader|winner|most|best|ahead of|lose|lost|grounded|penalt\w*|consequence|owe|missed)\b/i.test(JSON.stringify(o.kidSeats.dadSeat) + JSON.stringify(o.kidSeats.seats).replace(/"mark": ?"ahead"/g, "")));
   }
-  /* kids-away week: seat marks go quiet, unlock still lit */
-  const away = run(taps, { uses: [] }, at("2026-10-05T18:00:00-05:00"));
-  assert.equal(away.kidSeats.quiet, true);
-  assert.equal(away.kidSeats.seats.hayes.week.closed, false, "new week's mark is not closed; the unlock is what carries");
-  /* spent in the next home week -> dark; stays dark */
-  const MON = at("2026-10-12T18:00:00-05:00");
-  const uses = consumeUnlock({ uses: [] }, "hayes-weekend-pick", run(taps, { uses: [] }, MON), MON);
-  assert.deepEqual(uses.uses[0], { unlock: "hayes-weekend-pick", weekId: WEEK, usedAt: "2026-10-12T18:00:00-05:00" });
-  assert.deepEqual(ids(run(taps, uses, MON)), []);
-  assert.deepEqual(ids(run(taps, uses, at("2026-10-20T18:00:00-05:00"))), []);
-  /* a spend for some other week never clears this one */
-  assert.deepEqual(ids(run(taps, { uses: [{ unlock: "hayes-weekend-pick", weekId: "2026-09-18", usedAt: "x" }] }, MON)), ["hayes-weekend-pick"]);
+  assert.ok(consequenceHits({ copy: "Hayes lost his weekend" }).length);
+  assert.ok(consequenceHits({ copy: "No screens tonight" }).length);
+  assert.ok(scanObject({ copy: "Leaderboard" }).length);
 });
 
-test("no stacking: a newer close of the same kind replaces an unspent one; spent then closed again = lit again", () => {
-  const NEXT = "2026-10-09";
-  const taps = closeWeek(closeWeek({}, "hayes"), "hayes", { week: NEXT });
-  const T = at("2026-10-17T10:00:00-05:00");
-  let layer = run(taps, { uses: [] }, T);
-  assert.equal(layer.unlocks.lit.length, 1, "two closed weeks, one unlock");
-  assert.equal(layer.unlocks.lit[0].earnedWeek, NEXT);
-  assert.equal(layer.unlocks.lit[0].uses, 1);
-  /* spending the replaced week's unlock doesn't touch the newer one */
-  assert.deepEqual(ids(run(taps, { uses: [{ unlock: "hayes-weekend-pick", weekId: WEEK, usedAt: "x" }] }, T)), ["hayes-weekend-pick"]);
-  /* spent week A, then closes week B -> lit again (for B) */
-  const usedA = consumeUnlock({ uses: [] }, "hayes-weekend-pick", run(closeWeek({}, "hayes"), { uses: [] }, at("2026-10-03T10:00:00-05:00")), at("2026-10-03T10:00:00-05:00"));
-  assert.equal(usedA.uses[0].weekId, WEEK);
-  layer = run(taps, usedA, T);
-  assert.deepEqual(ids(layer), ["hayes-weekend-pick"]);
-  assert.equal(layer.unlocks.lit[0].earnedWeek, NEXT);
-  /* spending B -> dark; A never re-lights */
-  layer = run(taps, consumeUnlock(usedA, "hayes-weekend-pick", layer, T), T);
-  assert.deepEqual(ids(layer), []);
-});
-
-test("week ids: a daily tap's date maps to its chore week (Fri belongs to the week before)", () => {
-  assert.equal(weekIdOfTapDay("2026-09-26"), WEEK);
-  assert.equal(weekIdOfTapDay("2026-10-01"), WEEK);
-  assert.equal(weekIdOfTapDay("2026-10-02"), WEEK);
-  assert.equal(weekIdOfTapDay("2026-10-03"), "2026-10-02");
-});
-
-test("Us together: house weekend pick only when all three weeks close; independent of kids' own unlocks", () => {
-  let taps = closeWeek(closeWeek({}, "harris"), "hayes");
-  let layer = run(taps);
-  assert.equal(layer.kidSeats.usTogether.lit, false);
-  assert.ok(!ids(layer).includes("house-weekend-pick"));
-  taps = closeWeek(taps, "ainsley");
-  layer = run(taps);
-  assert.equal(layer.kidSeats.usTogether.lit, true);
-  assert.deepEqual(ids(layer), ["ainsley-gallery-or-weekend", "harris-dinner-vote", "hayes-weekend-pick", "house-weekend-pick"]);
-  const house = layer.unlocks.lit.find((u) => u.id === "house-weekend-pick");
-  assert.equal(house.seat, "House");
-  assert.equal(house.copy, "Us together. Weekend fun, house pick.");
-  const uses = consumeUnlock({ uses: [] }, "house-weekend-pick", layer, FRI_AM);
-  assert.deepEqual(ids(run(taps, uses)), ["ainsley-gallery-or-weekend", "harris-dinner-vote", "hayes-weekend-pick"]);
-  /* carries over; kids spending their own unlocks doesn't touch it */
-  const MON = at("2026-10-12T18:00:00-05:00");
-  let own = { uses: [] };
-  for (const id of ["harris-dinner-vote", "hayes-weekend-pick"]) own = consumeUnlock(own, id, run(taps, own, MON), MON);
-  own = consumeUnlock(own, "ainsley-gallery-or-weekend", run(taps, own, MON), MON, "weekend-pick");
-  assert.deepEqual(ids(run(taps, own, MON)), ["house-weekend-pick"]);
-  /* all three must close in the SAME week: Harris + Hayes week A, Ainsley week B -> no house pick */
-  const split = closeWeek(closeWeek(closeWeek({}, "harris"), "hayes"), "ainsley", { week: "2026-10-09" });
-  assert.ok(!ids(run(split, { uses: [] }, at("2026-10-17T10:00:00-05:00"))).includes("house-weekend-pick"));
-});
-
-test("Harris: one fixed mission per day of week; it never changes after taps; it alone closes his day", () => {
-  const THU = at("2026-10-01T18:00:00-05:00");
-  const before = run({}, { uses: [] }, THU).kidSeats.seats.harris;
-  assert.deepEqual(before.mission, { id: "har-shower", word: "Shower", copy: "Harris. Shower." });
-  assert.equal(before.today.closed, false);
-  /* other musts tapped: mission unchanged, day still open */
-  const other = { "house-checkoffs:harris:2026-10-01": { "har-bed": true, "har-backpack": true, "har-dishes": true } };
-  const mid = run(other, { uses: [] }, THU).kidSeats.seats.harris;
-  assert.deepEqual(mid.mission, before.mission);
-  assert.equal(mid.today.closed, false);
-  /* the mission tapped: mark closes, mission still the same */
-  const done = run({ "house-checkoffs:harris:2026-10-01": { "har-shower": true } }, { uses: [] }, THU).kidSeats.seats.harris;
-  assert.deepEqual(done.mission, before.mission);
-  assert.equal(done.today.closed, true);
-  /* rotation covers every day with an approved word; Fri after 3:00 PM (arrival) has no mission */
-  const byDow = TAP_DAYS.map((d) => harrisMissionFor(d, CONFIG).id);
-  assert.deepEqual(byDow, ["har-bed", "har-trash", "har-dishes", "har-empty", "har-postgame", "har-shower", "har-backpack"]);
-  assert.equal(new Set(byDow).size, 7);
-  assert.equal(run({}, { uses: [] }, at("2026-10-02T07:45:00-05:00")).kidSeats.seats.harris.copy, "Harris. Backpack.");
-  assert.equal(run({}, { uses: [] }, at("2026-10-09T16:00:00-05:00")).kidSeats.seats.harris.mission, null);
-});
-
-test("Harris week closes when every home day's mission is closed; weekly musts not needed; Hayes/Ainsley keep full musts", () => {
-  /* all 7 home days' missions, no weekly, no other musts */
-  let layer = run(closeWeek({}, "harris"));
-  assert.equal(layer.kidSeats.seats.harris.week.closed, true);
-  assert.equal(layer.kidSeats.seats.harris.copy, "Harris. Week closed.");
-  assert.deepEqual(ids(layer), ["harris-dinner-vote"]);
-  /* one home day's mission missing -> open; tapping every OTHER must that day doesn't substitute */
-  const miss = closeWeek({}, "harris", { skipDay: "2026-09-29" });
-  miss["house-checkoffs:harris:2026-09-29"] = { "har-bed": true, "har-backpack": true, "har-dishes": true };
-  assert.equal(run(miss).kidSeats.seats.harris.week.closed, false);
-  /* partial-home week (mid-week handoff Wed Oct 7 3:00 PM): only Thu Oct 8 + Fri Oct 9 are home days */
-  const cal = calendar([{ summary: "Kids with Dan", start: { dateTime: "2026-10-07T15:00:00-05:00" }, end: { dateTime: "2026-10-09T15:00:00-05:00" } }]);
-  const FRI = at("2026-10-09T14:00:00-05:00");
-  const two = { "house-checkoffs:harris:2026-10-08": { "har-shower": true }, "house-checkoffs:harris:2026-10-09": { "har-backpack": true } };
-  layer = run(two, { uses: [] }, FRI, cal);
-  assert.equal(layer.kidSeats.seats.harris.week.closed, true);
-  assert.equal(layer.unlocks.lit.find((u) => u.id === "harris-dinner-vote").earnedWeek, "2026-10-02");
-  assert.equal(run({ "house-checkoffs:harris:2026-10-08": { "har-shower": true } }, { uses: [] }, FRI, cal).kidSeats.seats.harris.week.closed, false);
-  /* a week with no home days never closes */
-  assert.equal(run({}, { uses: [] }, FRI).kidSeats.seats.harris.week.closed, false);
-  /* Hayes on the same partial week still needs the full musts (7 days + weekly) */
-  const hay = { "house-checkoffs:hayes:2026-10-08": { "hay-bed": true, "hay-dishes": true }, "house-checkoffs:hayes:2026-10-09": { "hay-bed": true, "hay-dishes": true }, "house-checkoffs:hayes:week:2026-10-02": { "hay-room": true } };
-  assert.equal(run(hay, { uses: [] }, FRI, cal).kidSeats.seats.hayes.week.closed, false);
-  /* Ainsley without her weekly must stays open */
-  assert.equal(run(closeWeek({}, "ainsley", { skipWeekly: true })).kidSeats.seats.ainsley.week.closed, false);
-});
-
-test("unlock spends file: empty shape, documented per-device; spending keeps the note", () => {
-  const u = readJson(path.join(ROOT, "data/unlock-uses.json"));
-  assert.deepEqual(u.uses, []);
-  assert.match(u.note, /^Per-device until a shared write path is approved/);
-  assert.deepEqual(Object.keys(u).sort(), ["note", "uses"]);
-  const layer = run(closeWeek({}, "hayes"));
-  const next = consumeUnlock(u, "hayes-weekend-pick", layer, FRI_AM);
-  assert.equal(next.note, u.note);
-  assert.equal(next.uses.length, 1);
-  assert.equal(u.uses.length, 0, "input not mutated");
-});
-
-test("no names in miss states, no miss words, no callout of who broke Us together", () => {
-  const scenarios = [{}, closeWeek({}, "hayes"), closeWeek(closeWeek({}, "hayes"), "ainsley"), closeWeek({}, "harris", { skipDay: "2026-09-29" })];
-  for (const taps of scenarios) for (const now of [FRI_AM, at("2026-10-01T18:00:00-05:00"), at("2026-10-05T18:00:00-05:00")]) {
-    const { kidSeats, unlocks } = run(taps, { uses: [] }, now);
-    assert.deepEqual(missNameHits(kidSeats), []);
-    assert.deepEqual(missNameHits(unlocks), []);
-    assert.equal(JSON.stringify(kidSeats.usTogether), JSON.stringify({ lit: kidSeats.usTogether.lit }), "Us together never lists kids");
+test("Jar is Ledger's tile: no jar, $, kid dollars or old chart rules in Atlas's chore files; committed outputs match the law", () => {
+  for (const rel of ["config/kid-layer.config.json", "data/kid-seats.json", "data/unlocks.json", "data/unlock-uses.json"]) {
+    const src = fs.readFileSync(path.join(ROOT, rel), "utf8");
+    assert.ok(!/\$|\bjars?\b|\bpay-?day\b|\bbalances?\b|allowance|cash|\bnice one\b/i.test(src), rel);
+    assert.deepEqual(scanObject(JSON.parse(src)), [], rel);
+    assert.ok(!/harrisMissionByDow|missionWords|harris-dinner-vote|hayes-weekend-pick|ainsley-gallery-or-weekend|MUSTGATE|house-checkoffs:[a-z]+:week:\d{4}-\d{2}-\d{2}"?\s*:\s*\{\s*"(har|hay|ain)-/.test(src), `${rel}: old chart rule`);
   }
-  /* only Hayes closed: only Hayes appears in unlocks */
-  const u = JSON.stringify(run(closeWeek({}, "hayes")).unlocks);
-  assert.match(u, /Hayes/);
-  assert.doesNotMatch(u, /Harris|Ainsley/);
-  /* the checker itself catches violations */
-  assert.ok(missNameHits({ a: { name: "Harris", closed: false } }).length);
-  assert.ok(missNameHits({ copy: "Hayes missed Tuesday" }).length);
-  assert.ok(missNameHits({ row: [{ mark: "empty", who: "Ainsley" }] }).length);
-});
-
-test("Harris: one mission, operational copy; Hayes: Mon–Sun marks + real game countdown, no stats", () => {
-  const taps = { "house-checkoffs:harris:2026-10-01": { "har-bed": true, "har-backpack": true } };
-  const { kidSeats } = run(taps, { uses: [] }, at("2026-10-01T18:00:00-05:00"));
-  assert.equal(kidSeats.seats.harris.copy, "Harris. Shower.");
-  const row = kidSeats.seats.hayes.row;
-  assert.deepEqual(row.map((r) => r.dow), ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
-  assert.deepEqual(row.map((r) => r.mark), ["empty", "empty", "empty", "ahead", "ahead", "off", "off"]);
-  assert.equal(kidSeats.seats.hayes.countdown, null, "tonight's game already started; nothing else in the fixture");
-  const noon = run(taps, { uses: [] }, at("2026-10-01T12:00:00-05:00")).kidSeats.seats.hayes.countdown;
-  assert.equal(noon.copy, "Baseball · vs Lions · Today");
-  assert.equal(noon.startIso, "2026-10-01T17:30:00-05:00");
-  const blob = JSON.stringify(kidSeats);
-  assert.doesNotMatch(blob, /"(done|need|pct|percent|stars?|streak|count|score|points|total)"\s*:/i);
-  assert.deepEqual(Object.keys(kidSeats.seats.ainsley), ["name", "week"], "Ainsley: week mark only");
-  /* kids away: seats go quiet */
-  const away = run({}, { uses: [] }, at("2026-10-05T18:00:00-05:00")).kidSeats;
-  assert.equal(away.quiet, true);
-  assert.equal(away.seats.harris.mission, undefined);
-});
-
-test("banned in kid-layer output: $, jar, balance, payout, rank, mom, '!'", () => {
-  for (const [id, s] of [["$", "$10"], ["jar", "Gem jar"], ["balance", "balance"], ["payout", "payout"], ["rank", "ranked first"], ["rank", "leaderboard"], ["mom", "mom"]]) {
-    assert.ok(bannedHits(s).includes(id), s);
-  }
-  const all = closeWeek(closeWeek(closeWeek({}, "harris"), "hayes"), "ainsley");
-  for (const taps of [{}, all]) {
-    const { kidSeats, unlocks } = run(taps);
-    assert.deepEqual(scanObject(kidSeats), []);
-    assert.deepEqual(scanObject(unlocks), []);
-  }
-});
-
-test("committed data/kid-seats.json + data/unlocks.json + config are clean", () => {
-  for (const rel of ["data/kid-seats.json", "data/unlocks.json", "data/unlock-uses.json", "config/kid-layer.config.json"]) {
-    const fp = path.join(ROOT, rel);
-    if (!fs.existsSync(fp)) continue;
-    const o = readJson(fp);
-    assert.deepEqual(scanObject(o), [], rel);
-    assert.deepEqual(missNameHits(o), [], rel);
-  }
+  const ks = readJson(path.join(ROOT, "data/kid-seats.json")), ul = readJson(path.join(ROOT, "data/unlocks.json"));
+  assert.equal(ks.week.id, lawWeek(ks.asOfIso).id);
+  for (const k of ORDER) assert.equal(ks.seats[k].musts.length, 4);
+  assert.ok(ul.lit.every((u) => u.id === "house-weekend-pick"));
+  const lib = fs.readFileSync(path.join(ROOT, "scripts/house/kid-layer-lib.mjs"), "utf8");
+  assert.ok(!/harrisMissionFor|MUSTGATE1 \(|weekClosed\(musts/.test(lib), "old rules are gone from the lib, not stacked");
 });

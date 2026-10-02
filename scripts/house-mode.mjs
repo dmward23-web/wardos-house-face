@@ -14,6 +14,7 @@
                                  [--kids-week data/kids-week.json] [--config config/house-mode.config.json]
                                  [--override data/house-mode-override.json] [--now ISO] [--out data/house-mode.json] [--stdout] */
 import path from "node:path";
+import { cliArgs } from "./house/cli-args.mjs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   MODES, MANUAL_ONLY, kidsHomeSpans, kidsHomeAt, schoolDayInfo, dismissalFor, asCalendar, windowMs, calendarWarnings,
@@ -142,20 +143,16 @@ export function computeHouseMode({ calendar, kidsWeek, config, override, now, so
   return out;
 }
 
-export function parseArgs(argv, defaults = DEFAULTS) {
-  const a = { ...defaults, now: null, stdout: false };
-  for (let i = 2; i < argv.length; i++) {
-    const k = argv[i], v = argv[i + 1];
-    if (k === "--data-dir") { a.dataDir = path.resolve(v); i++; }
-    else if (k === "--cal-live") { a.calLive = path.resolve(v); i++; }
-    else if (k === "--events") { a.events = path.resolve(v); i++; }
-    else if (k === "--kids-week") { a.kidsWeek = path.resolve(v); i++; }
-    else if (k === "--config") { a.config = path.resolve(v); i++; }
-    else if (k === "--override") { a.override = path.resolve(v); i++; }
-    else if (k === "--out") { a.out = path.resolve(v); i++; }
-    else if (k === "--now") { a.now = Date.parse(v); i++; }
-    else if (k === "--stdout") a.stdout = true;
-  }
+const HOUSE_FLAGS = { "--data-dir": "dataDir", "--cal-live": "calLive", "--events": "events", "--kids-week": "kidsWeek",
+  "--config": "config", "--override": "override", "--out": "out" };
+/** ATLASLANE8: strict. Unknown / valueless flags exit 2 before anything is read or written (scripts/house/cli-args.mjs).
+    extra = more value flags {flag: key} (school-night --pack-flags). */
+export function parseArgs(argv, defaults = DEFAULTS, { name = "house-mode", usage = USAGE, extra = {} } = {}) {
+  const flags = { ...HOUSE_FLAGS, ...extra };
+  const r = cliArgs(argv, { name, usage, values: Object.keys(flags).concat("--now"), bools: ["--stdout"] });
+  const a = { ...defaults, now: null, stdout: r.bools.has("--stdout") };
+  for (const [f, k] of Object.entries(flags)) if (f in r.values) a[k] = path.resolve(r.values[f]);
+  if ("--now" in r.values) a.now = Date.parse(r.values["--now"]);
   return a;
 }
 
@@ -163,13 +160,9 @@ export function loadInputs(a) {
   return { ...loadAll(a), config: readJson(a.config) };
 }
 
-const USAGE = "Usage: node scripts/house-mode.mjs [--data-dir data] [--cal-live …] [--events …] [--kids-week …] [--config …] [--override …] [--now ISO] [--out data/house-mode.json] [--stdout] [--help]\n--help prints this and writes nothing.";
+var USAGE = "Usage: node scripts/house-mode.mjs [--data-dir data] [--cal-live …] [--events …] [--kids-week …] [--config …] [--override …] [--now ISO] [--out data/house-mode.json] [--stdout] [--help]\n--help prints this and writes nothing. Unknown flags exit 2, nothing written.";
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-  if (process.argv.includes("--help") || process.argv.includes("-h")) { /* ATLASLANE7 --help is print-only, never writes */
-    process.stdout.write(USAGE + "\n");
-    process.exit(0);
-  }
-  const a = parseArgs(process.argv);
+  const a = parseArgs(process.argv); /* --help print-only; unknown flags exit 2 */
   const inp = loadInputs(a);
   const out = computeHouseMode({ ...inp, now: a.now == null || isNaN(a.now) ? Date.now() : a.now });
   if (a.stdout) process.stdout.write(JSON.stringify(out, null, 2) + "\n");
