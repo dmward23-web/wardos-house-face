@@ -1,11 +1,12 @@
 # KIDFIT1 · kid boards never push sideways: at 1080x1920 (wall portrait) and 440x956 (Dan's phone) nothing on
 # kid-hayes / kid-harris / kid-ainsley reaches past the viewport, pseudo-elements included (the board's own
 # overflow-x clip on body is lifted for the measurement so a hidden overflow can't hide). Test clock Thu Oct 1 9:30 PM CT.
-# Usage: python3 scripts/wall/kid-overflow.py   (exit 1 on any overflow)
+# Usage: python3 scripts/wall/kid-overflow.py [isoTime]   (exit 1 on any overflow; default = NOW CT on real data, the gate rule 10/2)
 import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import datasnap  # DAYWIN1
 import sys, os, subprocess, time, random, datetime, json
 from playwright.sync_api import sync_playwright
 WT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../..")); PORT = random.randint(20000, 40000)
+CLK = sys.argv[1] if len(sys.argv) > 1 else datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-5))).replace(microsecond=0).isoformat()
 srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORT), "--bind", "127.0.0.1"], cwd=WT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 time.sleep(0.8); L = f"http://127.0.0.1:{PORT}/"
 MEASURE = """() => { for (const e of [document.documentElement, document.body]) e.style.setProperty('overflow-x', 'visible', 'important');
@@ -21,9 +22,9 @@ try:
                 mob = vw <= 500
                 ctx = b.new_context(viewport={"width": vw, "height": vh}, is_mobile=mob, has_touch=mob, screen={"width": vw, "height": vh}); pg = ctx.new_page(); errs = []
                 pg.on("pageerror", lambda e: errs.append(str(e)[:100]))
-                pg.clock.install(time=datetime.datetime.fromisoformat("2026-10-01T21:30:00-05:00"))
+                pg.clock.install(time=datetime.datetime.fromisoformat(CLK))
                 def route(r, _q=None):
-                    pb = datasnap.body(r.request.url, "2026-10-01T21:30:00-05:00")
+                    pb = datasnap.body(r.request.url, CLK)
                     if pb is not None and r.request.url.startswith(L): return r.fulfill(status=200, content_type="application/json", body=pb)
                     return r.continue_() if r.request.url.startswith(L) else r.abort()
                 pg.route("**/*", route)

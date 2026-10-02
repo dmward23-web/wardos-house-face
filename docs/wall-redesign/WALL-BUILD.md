@@ -125,3 +125,19 @@ Commits on `wall-redesign-1`: `d2b5177` FIDELITY1+FILL1 Â· `fa858ad` LANDFILL1 Â
 - The hub's lights pill can still say NEED KEY (`house-lights.js`, main's shared lib, not changed here).
 - No jar explainer page; the kid name is a check-in, not a link; no door sensor; no load-day source; Pack flag has no writer.
 - Rail is 16 badges vs the master's 21; "Hey Atlas" naming vs Ask parked.
+
+## 10/2 scope change (Atlas): gates run on REAL data at the CURRENT clock
+- **Runners** (copies of Alfred's method, `scripts/wall/alfred/`): `space.py <tree> <out>` (real-now only; fixtures only with
+  `SPACE_FIXTURES=1`, never in the summary), `press.py <tree> <out>` (clock = now; `PRESS_CLOCK` pins), `livedata.py <tree> <out>`
+  (1920 + 2560 renders). `check-ion.py` and `kid-overflow.py` default to now CT too; an Oct 1 clock replays the pinned snapshot.
+- **LIVEDATA**: `scripts/house-feeds-refresh.sh` writes the 8 feeds (house-mode, next-up, kid-seats, pickup-chain, school-night,
+  who-home, unlocks, logistics-taps) from the same scrubbed calendar dump; `house-board-calendar-refresh.sh` runs it every
+  10 min and commits them with cal-live (data-only allowlist). `config/house-feeds.schedule.json` asks for a 03:00 CT regen:
+  the routine owner still has to add that run (nothing here installs a timer). Stale dot: any feed over 2h, dim amber, still.
+- **Wall**: header glance (next leave countdown, else today's handoff from the house-mode timeline); odd last rail badge spans;
+  I'm home / Leaving draw dim with the reason; tile titles either light their chips in place or route to their board;
+  CHOICE claims in place; `data-owner` + locked `data-tile` on 16 rail badges + 3 seats; open loops = today's calendar
+  REMIND / GET items through the agent, money and people filters (none pass -> the row collapses).
+- **Boards**: sticky header (Home one tap); SCROLL5 runway gone (`?v=SCROLLEND2`); header-middle glance (`house-hdr-home.js`
+  HDRGLANCE1, only when it fits whole); DENSE1 card scale (largest scale whose words fit, no inner spill); groceries treat
+  slots side by side; gallery "Photos" row folds in landscape. Most boards still miss Alfred's 2% empty-rect rule (see report).

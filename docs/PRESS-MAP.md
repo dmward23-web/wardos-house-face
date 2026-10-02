@@ -72,3 +72,11 @@ Last run (Thu Oct 1, 10:40 PM CT): 1920x1080 and 2560x1440, 103 presses each (47
 | `jar` | inplace | feedback on the wall | the jar tile is its own explainer (no jar page exists): lights the rule lines |
 | `rail-badge` | go | `*` |  |
 | `source-chip` | go | `sheet-status.html#status-feeds` |  |
+
+## 10/2 (Atlas scope change)
+- Board header (any board): tap = Main board (sheet-index). Header is sticky, so Home stays one tap away. The middle glance is plain text.
+- Wall header: tap = Main board; date = month.html#month-board (NAV-07); clock = sheet-today.
+- Open loops (wall): each loop -> sheet-today.html#today-now (its source is today's calendar).
+- Tile titles: Timer / Running late / Choice / Who's home light their own chips in place; Add -> sheet-groceries.html#groc-list;
+  Boards -> sheet-index.html#hub-home; Behind -> sheet-status.html#status-feeds; Lights -> sheet-lights.html#lights-board.
+- I'm home / Leaving with no taps feed: dim, "Off · today's taps not in yet", a tap only flashes the reason.

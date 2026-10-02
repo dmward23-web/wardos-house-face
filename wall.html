@@ -944,6 +944,13 @@
     }
     $("w-glance").hidden = !a;
     $("w-glance-a").textContent = a; $("w-glance-b").textContent = b; $("w-glance-c").textContent = c;
+    /* never a clipped countdown: when both don't fit on the big line, the handoff rides on the label line */
+    var big = $("w-glance").querySelector(".g-big");
+    $("w-glance").classList.remove("is-tight");
+    if (c && big && big.scrollWidth > big.clientWidth + 1) {
+      $("w-glance").classList.add("is-tight");
+      $("w-glance-c").textContent = ""; $("w-glance-b").textContent = (b ? b + " \u00b7 " : "") + c;
+    }
   }
   function railSpans() { /* SPACE-01: the odd last badge of a group spans both columns (no rail holes) */
     document.querySelectorAll(".rail .rail-grid").forEach(function (g) {

@@ -1,11 +1,11 @@
 # ION1 browser check for wall.html (Prism's Ion kit). Real data unless a scenario says "fixture".
-# Usage: python3 check_ion.py [isoTime]   (default Thu Oct 1 8:30 PM CT; kid-seats.json generatedAt is 8:05 PM)
+# Usage: python3 check_ion.py [isoTime]   (default NOW CT on real data; pass an Oct 1 clock to replay the pinned snapshot)
 import sys, json, subprocess, time, datetime, random, copy
 from playwright.sync_api import sync_playwright
 import os; WT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../..")) if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../wall.html")) else "/workspace/wt-wall-redesign-1"; PORT = random.randint(20000, 40000)
 srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORT), "--bind", "127.0.0.1"], cwd=WT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 time.sleep(0.8); L = f"http://127.0.0.1:{PORT}/"
-T = datetime.datetime.fromisoformat(sys.argv[1] if len(sys.argv) > 1 else "2026-10-01T20:30:00-05:00")
+T = datetime.datetime.fromisoformat(sys.argv[1]) if len(sys.argv) > 1 else datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-5))).replace(microsecond=0)  # gate rule 10/2: NOW CT on real data
 sys.path.insert(0, os.path.join(WT, "scripts/wall")); import datasnap  # DAYWIN1: Oct 1 clocks read the Oct 1 data set
 seats = json.load(open(datasnap.path("kid-seats.json", T.isoformat())))
 FIX = copy.deepcopy(seats)  # states fixture: CHOICE open (no claim yet) + travel-week Pack; test-only, never written to data/
