@@ -110,16 +110,21 @@
     sp.setAttribute("data-glance", "header-glance");
     /* longest line that fits the room: full line, then the countdown alone; else nothing (never a clipped word) */
     var tries = t ? [t, t.split(" · ")[0]] : [];
-    sp.classList.add("hdr-glance"); t = "";
-    for (var i = 0; i < tries.length; i++) {
+    sp.classList.add("hdr-glance"); t = ""; sp.style.fontSize = "";
+    /* GLANCEFIT1: a line too long at the header's type tries smaller type (down to 18px) before a shorter line */
+    var small = 0, f0 = parseFloat(getComputedStyle(sp).fontSize) || 24;
+    for (var i = 0; i < tries.length && !t; i++) {
       sp.textContent = tries[i];
-      if (sp.clientWidth >= 120 && sp.scrollWidth <= sp.clientWidth + 1) { t = tries[i]; break; }
+      for (var fs = f0; fs >= 18; fs -= 2) {
+        sp.style.fontSize = fs < f0 ? fs + "px" : "";
+        if (sp.clientWidth >= 120 && sp.scrollWidth <= sp.clientWidth + 1) { t = tries[i]; small = fs < f0 ? fs : 0; break; }
+      }
     }
     sp.classList.toggle("hdr-glance", !!t);
     sp.textContent = t;
     /* the line grows to fill its room (no dead header band either side), capped by the header's own height */
-    sp.style.fontSize = "";
-    if (t && sp.clientWidth > 0) {
+    sp.style.fontSize = small ? small + "px" : "";
+    if (t && !small && sp.clientWidth > 0) {
       var base = parseFloat(getComputedStyle(sp).fontSize) || 24, hd = sp.closest("header") || sp.parentElement;
       var ck = hd && hd.querySelector("[data-live-clock], .live-clock, .board-clock"), ckf = ck ? parseFloat(getComputedStyle(ck).fontSize) || 0 : 0;
       var cap = Math.max(base, Math.min(ckf ? ckf * 0.85 : base * 1.6, base * 3)), f = cap;
@@ -148,7 +153,7 @@
 
   injectStyle();
   injectGlanceStyle();
-  function boot() { wire(); loadGlance(); setInterval(paintGlance, 30000); setInterval(loadGlance, 600000); window.addEventListener("resize", function () { setTimeout(paintGlance, 250); }); }
+  function boot() { wire(); loadGlance(); window.addEventListener("load", function () { setTimeout(paintGlance, 80); }); try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { setTimeout(paintGlance, 80); }); } catch (e) {} setInterval(paintGlance, 30000); setInterval(loadGlance, 600000); window.addEventListener("resize", function () { setTimeout(paintGlance, 250); }); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
 })();
