@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 2 2026",
   "asOfIso": "2026-10-02",
-  "refreshedAt": "2026-10-02T23:43:42.941Z",
+  "refreshedAt": "2026-10-02T23:48:50.711Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -799,6 +799,12 @@
           "hint": ""
         },
         {
+          "when": "Wed 7 · 3:00",
+          "what": "LKMS choir combined rehearsal",
+          "tone": "act",
+          "hint": ""
+        },
+        {
           "when": "Thu 8 · 3:00",
           "what": "LKMS Homework Help",
           "tone": "act",
@@ -1006,6 +1012,11 @@
           "tone": "act"
         },
         {
+          "when": "Wed 7 · 3:00",
+          "what": "LKMS choir combined rehearsal",
+          "tone": "act"
+        },
+        {
           "when": "Wed 7 · 4:45",
           "what": "Harris flag practice · 5:30–6:30",
           "tone": "hot"
@@ -1033,11 +1044,6 @@
         {
           "when": "Thu 8 · 5:00",
           "what": "Ainsley swim — Coach Ann",
-          "tone": "hot"
-        },
-        {
-          "when": "Thu 8 · 6:00",
-          "what": "Hayes flag practice",
           "tone": "hot"
         }
       ]
