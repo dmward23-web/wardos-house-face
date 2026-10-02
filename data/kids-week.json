@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 2 2026",
   "asOfIso": "2026-10-02",
-  "refreshedAt": "2026-10-02T19:03:37.611Z",
+  "refreshedAt": "2026-10-02T19:17:53.244Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -525,22 +525,15 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "FRI · 9:00",
-        "what": "SRE FIELD TRIP (MUSEUM + MEADOWBROOK)",
+        "when": "SAT · 10:00",
+        "what": "SATURDAY MORNING DONUTS",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "FRI",
-          "9:00"
+          "SAT",
+          "10:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Fri · 9:00",
-          "what": "SRE field trip (museum + Meadowbrook)",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -570,12 +563,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Fri 2 · 9:00",
-          "what": "SRE field trip (museum + Meadowbrook)",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Mon 5 · 7:00",
           "what": "SRE specials: Spanish",
@@ -934,11 +921,6 @@
       ],
       "week": [
         {
-          "when": "Fri 2 · 9:00",
-          "what": "SRE field trip (museum + Meadowbrook)",
-          "tone": "act"
-        },
-        {
           "when": "Sat 3 · 8:30",
           "what": "Dan DRIVE → Nashville",
           "tone": "hot"
@@ -1051,6 +1033,11 @@
         {
           "when": "Thu 8 · 5:00",
           "what": "Ainsley swim — Coach Ann",
+          "tone": "hot"
+        },
+        {
+          "when": "Thu 8 · 6:00",
+          "what": "Hayes flag practice",
           "tone": "hot"
         }
       ]
