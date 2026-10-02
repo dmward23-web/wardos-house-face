@@ -78,7 +78,8 @@ available = max(0, sum(qty of live adds whose dayKey is NOT zeroed for that jar)
 | `HouseJar.dayKeyFor(ms)`, `HouseJar.ctIso(ms)` | | |
 
 ## Wall display contract
-- The tile prints `ruleText` verbatim: "The jar pays time and picks. Never cash. Close a job that isn't yours, or take a sibling's claimed choice, and your jar pays nothing that day."
+- The tile prints `ruleText` verbatim: "A stolen close zeros that personal jar for the day." This is the chore law's exact sentence (Alfred CL-08). It means that kid's personal-jar ADDS for that CT day are voided. The standing balance from earlier days is never touched, and redeems that day still count.
+- The wall shows NO per-jar totals anywhere. There is no PIN totals view on the wall; `parentView` stays a module-internal audit helper with no wall consumer.
 - It shows the jar names.
 - It shows `syncLabel` while `synced === false`.
 - **The wall API exports no numbers.** There are no balances, counts or fill state (empty, some, full). The law says balances are not listed, so the tile has nothing to compare between kids.

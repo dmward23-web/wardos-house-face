@@ -32,7 +32,7 @@ test("seed: family + three personal jars, rule text, units, chips, reasons, entr
   assert.deepEqual(s.entries, []);
   assert.deepEqual(s.niceOneChips.map(c => c.label), ["+10 min", "+15 min", "+1 pick"]);
   assert.equal(s.niceOneReasons.length, 5);
-  assert.ok(/never cash/i.test(s.ruleText));
+  assert.equal(s.ruleText, "A stolen close zeros that personal jar for the day.", "law exact sentence (CL-08)");
   assert.ok(!/\d/.test(s.ruleText), "rule text carries no numbers");
 });
 

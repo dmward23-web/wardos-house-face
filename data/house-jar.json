@@ -4,7 +4,7 @@
   "owner": "Ledger",
   "law": "CHORE LAW, locked by Dan Thu Oct 1 2026 8:01 PM CT (plates/2026-10-01/redesign/CHORE-LAW-2026-10-01.md)",
   "note": "Jar pays time and picks, never cash. Append-only entries, union by id. Totals are derived and never sent to the wall. Shared write OFF until Dan's last-yes. Not live until Alfred QAQC PASS. Contract: docs/house-jar-CONTRACT.md",
-  "ruleText": "The jar pays time and picks. Never cash. Close a job that isn't yours, or take a sibling's claimed choice, and your jar pays nothing that day.",
+  "ruleText": "A stolen close zeros that personal jar for the day.",
   "jars": [
     {
       "id": "family",
