@@ -7,12 +7,19 @@
      Not deployed. Reads Atlas's data lane (house-mode, pickup-chain, who-home, pack-flags, temps; read only).
      Every tile is hidden when it has no live source (no placeholders, no sample data).
      Writes: Dan's Kasa scenes + the kid-layer hall flash via HouseLights.setLight; thermostat Travel / Back home via /api/sensi/travel.
-     FINISH v2 (tokens-wall-v2.css) + KID LAYER v3 (house-wall-kid.js). No jar, no $, no bot names.
+     FINISH: Prism's Ion kit (ION1, below) + CHORE LAW (house-wall-kid.js). Jar = Ledger's wallDisplay() only. No $, no bot names.
      No key saved on this screen -> zero write/proxy requests. No camera feed. Docs: docs/wall-redesign/WALL-BUILD.md -->
-<link rel="stylesheet" href="tokens-wall-kiosk27.css">
-<link rel="stylesheet" href="tokens-wall-v2.css">
+<!-- ION1 · Prism's FINAL Ion kit (plates/2026-10-01/redesign/ion-handoff, HANDOFF.md), wall-scoped (body.wall-kiosk), in Prism's load order:
+     base kiosk tokens -> the master's v3 layout block (its inline <style>, moved to a file) -> Ion tokens -> 2100 finish -> Ion master layer.
+     ion-wright.css (last) only fits Wright's live controls to those classes; no new colours, no new motion. Fonts + camo are local files. -->
+<link rel="stylesheet" href="wall-ion/tokens-wall-kiosk27-v2.css">
+<link rel="stylesheet" href="wall-ion/wall-v3-layout.css">
+<link rel="stylesheet" href="wall-ion/tokens-v3-2100-A.css">
+<link rel="stylesheet" href="wall-ion/finish-v3-2100.css">
+<link rel="stylesheet" href="wall-ion/ion-master.css">
+<link rel="stylesheet" href="wall-ion/ion-wright.css">
 </head>
-<body class="wall-kiosk wall-v2">
+<body class="wall-kiosk" data-plate="v3" data-master="ion">
 <div class="panel" id="wall-panel">
 
   <a class="hdr mod" href="sheet-index.html" data-band="top" data-owner="Wright" data-tile="header" data-tile-id="header" aria-label="Tap header to return to the main board">
@@ -22,152 +29,158 @@
     <div class="sp"></div>
     <div class="mode" id="w-mode" data-glance="mode" data-owner="Atlas" data-tile="house-mode" data-tile-id="house-mode" aria-label="House mode" hidden><i></i><div><span class="mk">House mode</span><span class="mv" id="w-mode-v"></span></div></div>
     <div class="stale" id="w-stale" data-glance="stale-dot" data-owner="Wright" data-tile="stale-dot" data-tile-id="stale-dot"><i></i><span id="w-stale-t"></span></div>
-    <div class="home-hint"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17 L18 7 L30 17"/><path d="M10 15.5 V29 H26 V15.5"/><rect x="15" y="20" width="6" height="9" rx="1"/></g></svg>Main board</div>
+    <div class="home-hint" data-owner="Wright" data-tile="main-board" data-tile-id="main-board">Main board</div>
   </a>
 
   <div class="main">
-    <div class="mod ctl" id="w-ctl" data-band="top" data-owner="Wright" data-tile="house-controls" data-tile-id="house-controls" aria-label="House controls">
-      <div class="cg cg-temp" id="w-thermo-act" data-owner="Wright" data-tile="temperature" data-tile-id="temperature">
-        <div class="cg-h"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6 Q15 3 18 3 Q21 3 21 6 V20 Q25 22 25 26 Q25 32 18 32 Q11 32 11 26 Q11 22 15 20 Z"/><path d="M18 12 V25"/></g></svg><span class="kick">Temperature</span><span class="cg-in" id="w-temp-in"></span></div>
-        <div class="sp-rows" id="w-sp-rows"></div>
-        <div class="note" id="w-sp-note"></div>
-        <button class="tap sm" id="w-travel"><span class="tx"><span id="w-travel-l"></span><small id="w-travel-s"></small></span></button>
-        <div class="note" id="w-travel-note"></div>
-      </div>
-      <div class="cg cg-lights" id="w-lts" data-owner="Wright" data-tile="kasa-lights" data-tile-id="kasa-lights">
-        <div class="cg-h"><span class="kick">Lights</span></div>
-        <div class="lt-row" id="w-lts-row"></div>
-      </div>
-      <div class="cg cg-house" id="w-house" data-owner="Wright" data-tile="scenes" data-tile-id="scenes">
-        <div class="cg-h"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17 L18 7 L30 17"/><path d="M10 15.5 V29 H26 V15.5"/><rect x="15" y="20" width="6" height="9" rx="1"/></g></svg><span class="kick">House</span></div>
-        <div class="stack">
-          <button class="tap sm" id="w-scene-home" data-scene="home"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17 L18 7 L30 17"/><path d="M10 15.5 V29 H26 V15.5"/><rect x="15" y="20" width="6" height="9" rx="1"/></g></svg><span class="tx"><span>I’m home</span><small></small></span></button>
-          <button class="tap sm" id="w-scene-leave" data-scene="leave"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="6" width="13" height="24" rx="1.5"/><path d="M17 18 H31"/><path d="M26 13 L31 18 L26 23"/></g></svg><span class="tx"><span>Leaving</span><small></small></span></button>
-        </div>
-        <div class="note" id="w-scene-note"></div>
-      </div>
-      <!-- Doors: a lamp only ("Doors ok" or the one that isn't). No door source exists on the box -> hidden, no reader. -->
-      <div class="cg cg-doors" id="w-doors" data-owner="Wright" data-tile="doors" data-tile-id="doors" hidden></div>
-      <!-- Doorbell: one text line (last ring time), never a feed or still. No ring source (Nest doorbell has no ring events in nest-live.json; no Ring) -> hidden, no reader. -->
-      <div class="cg cg-bell" id="w-bell" data-owner="Wright" data-tile="doorbell" data-tile-id="doorbell" hidden></div>
-    </div>
-
-    <div class="nextbar" id="w-nextbar" data-band="top">
-      <a class="mod next" id="w-next" href="sheet-today.html" data-band="top" data-glance="next-up" data-owner="Atlas" data-tile="next-up" data-tile-id="next-up" aria-label="Next up" hidden>
-      <div class="lbl"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="13"/><path d="M15 11 L23 18 L15 25"/></g></svg><span class="kick">Next up</span></div>
-      <div class="t" id="w-next-t"></div>
-      <div class="w" id="w-next-w"></div>
-      <div class="sub" id="w-next-sub"></div>
-    </a>
-      <div class="mod leave" id="w-leave" data-owner="Atlas" data-tile="leave-by" data-tile-id="leave-by" hidden></div>
-      <div class="mod timer" id="w-timer" data-owner="Wright" data-tile="house-timer" data-tile-id="house-timer">
+    <div class="band-top" data-band="top">
+      <div class="row1">
+        <a class="mod next nx3" id="w-next" href="sheet-today.html" data-band="top" data-glance="next-up" data-owner="Atlas" data-tile="next-up" data-tile-id="next-up" aria-label="Next up" hidden>
+          <span class="lbl kick">Next up</span>
+          <span class="t" id="w-next-t"></span>
+          <span class="w w3"><span id="w-next-w"></span><small id="w-next-sub"></small></span>
+        </a>
+        <div class="mod leave" id="w-leave" data-owner="Atlas" data-tile="leave-by" data-tile-id="leave-by" hidden></div>
+        <div class="mod timer" id="w-timer" data-owner="Wright" data-tile="house-timer" data-tile-id="house-timer" aria-label="Timer">
+          <div class="ah"><span class="kick">Timer</span><small>Ends on the board</small></div>
         <div class="t-show" id="w-timer-show" hidden></div>
-        <div class="t-chips" id="w-timer-labels" role="group" aria-label="Timer label">
-          <button class="chip" data-timer-label="Oven">Oven</button><button class="chip" data-timer-label="Laundry">Laundry</button><button class="chip" data-timer-label="Bath">Bath</button>
-        </div>
-        <div class="t-chips" id="w-timer-mins" role="group" aria-label="Timer minutes">
-          <button class="chip" data-timer-min="5">5</button><button class="chip" data-timer-min="10">10</button><button class="chip" data-timer-min="15">15</button><button class="chip" data-timer-min="20">20</button><button class="chip" data-timer-min="30">30</button><button class="chip" data-timer-min="60">60</button><button class="chip" id="w-timer-clear" data-timer-clear hidden>Clear</button>
+          <div class="t-chips" id="w-timer-labels" role="group" aria-label="Timer label">
+            <button class="chip" data-timer-label="Oven">Oven</button><button class="chip" data-timer-label="Laundry">Laundry</button><button class="chip" data-timer-label="Bath">Bath</button>
+          </div>
+          <div class="t-chips" id="w-timer-mins" role="group" aria-label="Timer minutes">
+            <button class="chip" data-timer-min="5">5</button><button class="chip" data-timer-min="10">10</button><button class="chip" data-timer-min="15">15</button><button class="chip" data-timer-min="20">20</button><button class="chip" data-timer-min="30">30</button><button class="chip" data-timer-min="60">60</button><button class="chip" id="w-timer-clear" data-timer-clear hidden>Clear</button>
+          </div>
         </div>
       </div>
+      <div class="mod ctls" id="w-ctl" data-owner="Wright" data-tile="house-controls" data-tile-id="house-controls" aria-label="House controls">
+        <section class="ctl cg cg-temp" id="w-thermo-act" data-owner="Wright" data-tile="temperature" data-tile-id="temperature" aria-label="Temperature">
+          <div class="ah"><span class="kick">Temperature</span><span class="gate" id="w-temp-in"></span></div>
+          <div class="sp-rows" id="w-sp-rows"></div>
+          <div class="note" id="w-sp-note"></div>
+          <button class="tap travel" id="w-travel"><span class="tx"><span id="w-travel-l"></span><small id="w-travel-s"></small></span></button>
+          <div class="note" id="w-travel-note"></div>
+        </section>
+        <section class="ctl cg cg-lights" id="w-lts" data-owner="Wright" data-tile="kasa-lights" data-tile-id="kasa-lights" aria-label="Lights">
+          <div class="ah"><span class="kick">Lights</span></div>
+          <div class="lchips" id="w-lts-row"></div>
+        </section>
+        <section class="ctl cg cg-house" id="w-house" data-owner="Wright" data-tile="scenes" data-tile-id="scenes" aria-label="Scenes">
+          <div class="ah"><span class="kick">House</span><span class="gate">Scenes</span></div>
+          <div class="chips stack">
+            <button class="tap sm" id="w-scene-home" data-scene="home"><span class="tx"><span>I'm home</span><small></small></span></button>
+            <button class="tap sm" id="w-scene-leave" data-scene="leave"><span class="tx"><span>Leaving</span><small></small></span></button>
+          </div>
+          <div class="note" id="w-scene-note"></div>
+        </section>
+        <!-- Doors: a lamp only ("Doors ok" or the one that isn't). No door source exists on the box -> hidden, no reader. -->
+        <section class="ctl ctl-lamps cg cg-doors" id="w-doors" data-owner="Wright" data-tile="doors" data-tile-id="doors" hidden></section>
+        <!-- Doorbell: one text line (last ring time), never a feed or still. No ring source -> hidden, no reader. -->
+        <section class="ctl ctl-lamps cg cg-bell" id="w-bell" data-owner="Wright" data-tile="doorbell" data-tile-id="doorbell" hidden></section>
+      </div>
+      <div class="mod taps" id="w-ltaps" data-owner="Atlas" data-tile="logistics-taps" data-tile-id="logistics-taps" aria-label="Four taps" hidden><span id="w-ltaps-row" style="display:contents"></span></div>
+      <div class="mod who" id="w-who" data-glance="who-home" data-owner="Atlas" data-tile="who-home" data-tile-id="who-home" aria-label="Who's home" hidden><span class="kick">Who&#39;s home</span><span id="w-who-row" style="display:contents"></span><span class="hint">Resets 3 AM</span></div>
     </div>
 
-    <div class="mod school" id="w-school" data-owner="Atlas" data-tile="school-night" data-tile-id="school-night" hidden><span class="kick">School night</span><span id="w-school-row" style="display:contents"></span></div>
-
+    <div class="mod snight" id="w-school" data-owner="Atlas" data-tile="school-night" data-tile-id="school-night" aria-label="School night" hidden><span class="kick">School night</span><span id="w-school-row" style="display:contents"></span></div>
 
     <div class="mod chain" id="w-chain" data-owner="Atlas" data-tile="pickup-chain" data-tile-id="pickup-chain" aria-label="Pickup chain">
-      <div class="ch-lbl"><span class="kick">Pickup<br>chain</span><span class="dies" id="w-chain-dies"></span></div>
+      <div class="ch-lbl"><span class="kick">Pickup chain</span><span class="dies" id="w-chain-dies"></span></div>
       <div class="chain-cells" id="w-chain-cells"></div>
       <div class="empty-line" id="w-chain-empty" hidden></div>
     </div>
-    <div class="mod who" id="w-who" data-glance="who-home" data-owner="Atlas" data-tile="who-home" data-tile-id="who-home" aria-label="Who's home" hidden>
-      <svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17 L18 7 L30 17"/><path d="M10 15.5 V29 H26 V15.5"/><rect x="15" y="20" width="6" height="9" rx="1"/></g></svg><span class="kick">Who&#39;s home</span><span id="w-who-row" style="display:contents"></span>
-    </div>
 
-    <div class="mod ltaps" id="w-ltaps" data-owner="Atlas" data-tile="logistics-taps" data-tile-id="logistics-taps" hidden><span class="kick">Taps</span><span id="w-ltaps-row" style="display:contents"></span><span class="note">This screen only · nothing is sent</span></div>
-
-    <div class="kids" id="w-kids" aria-label="Kids" hidden>
-      <div class="mod kid" id="w-kid-ainsley" data-owner="Atlas" data-tile="kid-ainsley" data-tile-id="kid-ainsley" data-kid="ainsley">
-        <button class="tap kid-name" data-kid-checkin="ainsley" aria-label="Ainsley check in"><span class="tx"><span>Ainsley</span><small>Tap when home</small></span></button>
-        <div class="kid-law" data-kid-law="ainsley" hidden></div><!-- CHORELAW2: MUSTS / CHOICE / CLOSE / Pack / Mystery from data/kid-seats.json -->
-        <div class="kid-seat" data-kid-seat="ainsley" hidden></div>
-        <div data-nice-one-host="ainsley"></div><!-- NICEONE1: parent hold control lands here only when the hub has a PIN -->
-      </div>
-      <div class="mod kid" id="w-kid-hayes" data-owner="Atlas" data-tile="kid-hayes" data-tile-id="kid-hayes" data-kid="hayes">
-        <button class="tap kid-name" data-kid-checkin="hayes" aria-label="Hayes check in"><span class="tx"><span>Hayes</span><small>Tap when home</small></span></button>
-        <div class="kid-law" data-kid-law="hayes" hidden></div><!-- CHORELAW2: MUSTS / CHOICE / CLOSE / Pack / Mystery from data/kid-seats.json -->
-        <div class="kid-seat" data-kid-seat="hayes" hidden></div>
-        <div data-nice-one-host="hayes"></div><!-- NICEONE1: parent hold control lands here only when the hub has a PIN -->
-      </div>
-      <div class="mod kid" id="w-kid-harris" data-owner="Atlas" data-tile="kid-harris" data-tile-id="kid-harris" data-kid="harris">
-        <button class="tap kid-name" data-kid-checkin="harris" aria-label="Harris check in"><span class="tx"><span>Harris</span><small>Tap when home</small></span></button>
-        <div class="kid-law" data-kid-law="harris" hidden></div><!-- CHORELAW2: MUSTS / CHOICE / CLOSE / Pack / Mystery from data/kid-seats.json -->
+    <!-- CHORE LAW seats (KIDLAYER3.md): Harris · Hayes · Ainsley, Atlas's fixed order, equal weight, no ranking. Every word comes from data/kid-seats.json. -->
+    <div class="mod seats seats-law kids" id="w-kids" data-owner="Atlas" data-tile="kids" data-tile-id="kids" data-band="kids" data-law="CHORE-LAW-2026-10-01" aria-label="Kids" hidden>
+      <section class="seat kid" id="w-kid-harris" data-owner-split="Atlas · Wright" data-owner="Atlas" data-tile="kid-harris" data-tile-id="kid-harris" data-kid="harris" aria-label="Harris seat">
+        <div class="seat-h"><button class="kid-name" data-kid-checkin="harris" aria-label="Harris check in"><span>Harris</span><small>Tap when home</small></button></div>
+        <div class="kid-law" data-kid-law="harris" hidden></div>
         <div class="kid-seat" data-kid-seat="harris" hidden></div>
-        <div data-nice-one-host="harris"></div><!-- NICEONE1: parent hold control lands here only when the hub has a PIN -->
+        <div class="seat-foot" data-nice-one-host="harris"></div><!-- NICEONE1: parent hold control lands here only when the hub has a PIN -->
+      </section>
+      <section class="seat kid" id="w-kid-hayes" data-owner-split="Atlas · Wright" data-owner="Atlas" data-tile="kid-hayes" data-tile-id="kid-hayes" data-kid="hayes" aria-label="Hayes seat">
+        <div class="seat-h"><button class="kid-name" data-kid-checkin="hayes" aria-label="Hayes check in"><span>Hayes</span><small>Tap when home</small></button><div class="captain" data-captain-slot="hayes" data-owner="Atlas" data-tile="kid-hayes-captain" data-tile-id="kid-hayes-captain" hidden><i class="cap-mk"></i><span>Captain tonight.</span></div></div>
+        <div class="kid-law" data-kid-law="hayes" hidden></div>
+        <div class="kid-seat" data-kid-seat="hayes" hidden></div>
+        <div class="seat-foot" data-nice-one-host="hayes"></div><!-- NICEONE1: parent hold control lands here only when the hub has a PIN -->
+      </section>
+      <section class="seat kid" id="w-kid-ainsley" data-owner-split="Atlas · Wright" data-owner="Atlas" data-tile="kid-ainsley" data-tile-id="kid-ainsley" data-kid="ainsley" aria-label="Ainsley seat">
+        <div class="seat-h"><button class="kid-name" data-kid-checkin="ainsley" aria-label="Ainsley check in"><span>Ainsley</span><small>Tap when home</small></button></div>
+        <div class="kid-law" data-kid-law="ainsley" hidden></div>
+        <div class="kid-seat" data-kid-seat="ainsley" hidden></div>
+        <div class="seat-foot" data-nice-one-host="ainsley"></div><!-- NICEONE1: parent hold control lands here only when the hub has a PIN -->
+      </section>
+      <div class="seat shared" id="w-shared" data-owner="Atlas" data-tile="shared-seat" data-tile-id="shared-seat">
+        <div class="us-x" id="w-us-x" data-owner="Atlas" data-tile="us-together-count" data-tile-id="us-together-count" hidden></div>
+        <div class="mod us-row" id="w-us" data-owner="Atlas" data-tile="us-together" data-tile-id="us-together" hidden>
+          <span class="us-msg" id="w-us-msg"></span>
+          <button class="tap unlock" id="w-us-btn" data-unlock="" data-choice=""><span class="tx"><span>Weekend fun</span><small></small></span></button>
+        </div>
+        <div class="wwin" id="w-wwin" data-owner="Atlas" data-tile="week-win-sunday" data-tile-id="week-win-sunday" hidden></div>
       </div>
-    </div>
-    <!-- JARTILE1: Ledger's jar tile = HouseJar.wallDisplay() only (rule, names, sync). No numbers, no fill, no money. -->
-    <div class="mod" id="w-jar" data-owner="Ledger" data-tile="house-jar" data-tile-id="house-jar" data-house-jar hidden></div>
-    <div class="mod" id="w-nice-pad" data-owner="Wright" data-tile="nice-one-pad" data-tile-id="nice-one-pad" data-nice-pad-host hidden></div>
-    <div class="mod us-row" id="w-us" data-owner="Atlas" data-tile="us-together" data-tile-id="us-together" hidden>
-      <span class="us-msg" id="w-us-msg"></span>
-      <button class="tap unlock" id="w-us-btn" data-unlock="" data-choice=""><span class="tx"><span>Weekend fun</span><small></small></span></button>
+      <!-- CHOICE: one shared job (Atlas's choice.job). First tap owns it; siblings lock; it is never released. Hidden when Atlas has no open or owned job. -->
+      <div class="claim" id="w-claim" data-owner="Atlas" data-tile="choice-claim" data-tile-id="choice-claim" data-shared="true" hidden></div>
     </div>
 
-    <div class="acts" aria-label="Actuators">
-      <div class="mod act" id="w-pack" data-owner="Atlas" data-tile="pack-flag" data-tile-id="pack-flag" hidden>
-        <div class="ah"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 V32"/><path d="M10 6 H27 L23 12 L27 18 H10"/></g></svg><span class="kick">Pack</span><span class="gate">Today</span></div>
-        <div class="flags" id="w-pack-flags"></div>
-        <div class="note">Ride or gear flags. Clear at midnight.</div>
-      </div>
-      <div class="mod act groc" id="w-groc" data-owner="Ledger" data-tile="grocery" data-tile-id="grocery" hidden>
+    <div class="mod acts acts-v3" data-owner="Wright" data-tile="acts" data-tile-id="acts" aria-label="Actuators">
+      <section class="act groc" id="w-groc" data-owner="Ledger" data-tile="grocery" data-tile-id="grocery" hidden>
         <div class="ah"><span class="kick">Groceries</span><span class="g-filter" role="group" aria-label="Store">
           <button class="chip" data-groc-filter="all">All</button><button class="chip" data-groc-filter="costco">Costco</button></span></div>
         <div class="g-list" id="w-groc-list"></div>
         <div class="g-chips" id="w-groc-chips" aria-label="Add"></div>
         <div class="g-picks" id="w-groc-picks" aria-label="Pick list" hidden></div>
         <div class="g-foot"><button class="chip" id="w-groc-more" data-groc-more>More</button><button class="chip" id="w-groc-clear" data-groc-clear hidden>Clear checked</button></div>
-      </div>
+      </section>
+      <section class="act" id="w-pack" data-owner="Atlas" data-tile="pack-flag" data-tile-id="pack-flag" aria-label="Pack flag" hidden>
+        <div class="ah"><span class="kick">Pack</span><span class="gate">Today</span></div>
+        <div class="flags" id="w-pack-flags"></div>
+        <div class="note">Ride or gear flags. Clear at midnight.</div>
+      </section>
+      <!-- JARTILE1: Ledger's jar tile = HouseJar.wallDisplay() only (rule, names, sync). No numbers, no fill, no money. -->
+      <section class="act jar" id="w-jar" data-owner="Ledger" data-tile="house-jar" data-tile-id="house-jar" data-balances="none" aria-label="Jar" data-house-jar hidden></section>
       <!-- Ask pip: PARKED (ruling Oct 1). Single state change only (off -> listening -> off), no loop; never shown while parked. -->
-      <div class="mod act pip" id="w-pip" data-owner="Wright" data-tile="ask-pip" data-tile-id="ask-pip" data-state="off" hidden></div>
+      <section class="act pip" id="w-pip" data-owner="Wright" data-tile="ask-pip" data-tile-id="ask-pip" data-state="off" hidden></section>
     </div>
+    <div class="mod" id="w-nice-pad" data-owner="Wright" data-tile="nice-one-pad" data-tile-id="nice-one-pad" data-nice-pad-host hidden></div>
 
-    <div class="mod lights" id="w-lights" data-owner="Wright" data-tile="status-lights" data-tile-id="status-lights" aria-label="Status lights" hidden><span class="kick">Status</span><span id="w-lights-row" style="display:contents"></span></div>
-    <div class="mod loops" id="w-loops" data-owner="Wright" data-tile="open-loops" data-tile-id="open-loops" aria-label="Open loops"><span class="kick">Open loops</span><span id="w-loops-row" style="display:contents"></span><span class="empty-line" id="w-loops-empty" hidden></span></div>
+    <div class="statusrow">
+      <div class="mod lights" id="w-lights" data-owner="Wright" data-tile="status-lights" data-tile-id="status-lights" aria-label="Status lights" hidden><span class="kick">Status</span><span id="w-lights-row" style="display:contents"></span></div>
+      <div class="mod loops loops3" id="w-loops" data-owner="Wright" data-tile="open-loops" data-tile-id="open-loops" aria-label="Open loops"><span class="kick">Open loops</span><span id="w-loops-row" style="display:contents"></span><span class="empty-line" id="w-loops-empty" hidden></span></div>
+    </div>
   </div>
 
   <nav class="mod rail" data-owner="Wright" data-tile="rail" data-tile-id="rail" aria-label="One tap to every board">
-    <div class="rail-top"><span class="kick">One tap</span><span>every board</span></div>
+    <div class="rail-top"><span class="kick">Boards</span><span>One tap</span></div>
     <div class="rail-grp"><div class="rail-h">Days</div><div class="rail-grid">
-<a data-owner="Atlas" data-tile="rail-today" data-tile-id="rail-today" class="badge " href="sheet-today.html" data-sheet="sheet-today.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="6"/><path d="M18 4 V8 M18 28 V32 M4 18 H8 M28 18 H32 M8 8 L11 11 M25 25 L28 28 M28 8 L25 11 M11 25 L8 28"/></g></svg><span>Today</span></a>
-<a data-owner="Atlas" data-tile="rail-week" data-tile-id="rail-week" class="badge " href="sheet-index.html" data-sheet="sheet-index.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="28" height="18" rx="3"/><path d="M8 9 V27 M12 9 V27 M16 9 V27 M20 9 V27 M24 9 V27 M28 9 V27"/></g></svg><span>Week</span></a>
-<a data-owner="Atlas" data-tile="rail-month" data-tile-id="rail-month" class="badge " href="month.html" data-sheet="month.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="7" width="26" height="23" rx="3.5"/><path d="M5 13.5 H31 M12 4.5 V9.5 M24 4.5 V9.5"/></g></svg><span>Month</span></a>
-<a data-owner="Atlas" data-tile="rail-countdowns" data-tile-id="rail-countdowns" class="badge " href="sheet-countdowns.html" data-sheet="sheet-countdowns.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="19" r="12"/><path d="M18 11 V19 L23 22"/><path d="M14 4 H22"/></g></svg><span>Countdowns</span></a>
+<a data-owner="Atlas" data-tile="rail-today" data-tile-id="rail-today" class="badge " href="sheet-today.html" data-sheet="sheet-today.html"><span>Today</span></a>
+<a data-owner="Atlas" data-tile="rail-week" data-tile-id="rail-week" class="badge " href="sheet-index.html" data-sheet="sheet-index.html"><span>Week</span></a>
+<a data-owner="Atlas" data-tile="rail-month" data-tile-id="rail-month" class="badge " href="month.html" data-sheet="month.html"><span>Month</span></a>
+<a data-owner="Atlas" data-tile="rail-countdowns" data-tile-id="rail-countdowns" class="badge " href="sheet-countdowns.html" data-sheet="sheet-countdowns.html"><span>Countdowns</span></a>
 </div></div>
 <div class="rail-grp"><div class="rail-h">People</div><div class="rail-grid">
-<a data-owner="Atlas" data-tile="rail-dad-seat" data-tile-id="rail-dad-seat" class="badge " href="sheet-dan.html" data-sheet="sheet-dan.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6 V20 H26 V30"/><path d="M10 20 V30"/><path d="M10 6 H18"/></g></svg><span>Dad Seat</span></a>
-<a data-owner="Atlas" data-tile="rail-us-together" data-tile-id="rail-us-together" class="badge " href="sheet-us.html" data-sheet="sheet-us.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 30 Q5 21 5 13 Q5 7 11 7 Q15 7 18 11 Q21 7 25 7 Q31 7 31 13 Q31 21 18 30 Z"/></g></svg><span>Us together</span></a>
+<a data-owner="Atlas" data-tile="rail-dad-seat" data-tile-id="rail-dad-seat" class="badge " href="sheet-dan.html" data-sheet="sheet-dan.html"><span>Dad Seat</span></a>
+<a data-owner="Atlas" data-tile="rail-us-together" data-tile-id="rail-us-together" class="badge " href="sheet-us.html" data-sheet="sheet-us.html"><span>Us together</span></a>
 
 
 
 </div></div>
 <div class="rail-grp"><div class="rail-h">Do</div><div class="rail-grid">
 
-<a data-owner="Atlas" data-tile="rail-pack" data-tile-id="rail-pack" class="badge " href="sheet-pack.html" data-sheet="sheet-pack.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="10" width="20" height="20" rx="3"/><path d="M13 10 V7.5 Q13 5 18 5 Q23 5 23 7.5 V10"/><path d="M12 17 H24"/></g></svg><span>Pack</span></a>
-<a data-owner="Atlas" data-tile="rail-weekend-fun" data-tile-id="rail-weekend-fun" class="badge " href="sheet-weekend.html" data-sheet="sheet-weekend.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 4 L32 18 L18 32 L4 18 Z"/><circle cx="18" cy="18" r="2.5"/></g></svg><span>Weekend fun</span></a>
-<a data-owner="Atlas" data-tile="rail-week-win" data-tile-id="rail-week-win" class="badge " href="sheet-win.html" data-sheet="sheet-win.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 H25 V13 Q25 21 18 21 Q11 21 11 13 Z"/><path d="M18 21 V27 M12 31 H24"/><path d="M11 8 H6 Q6 15 11 15 M25 8 H30 Q30 15 25 15"/></g></svg><span>Week win</span></a>
-<a data-owner="Ledger" data-tile="rail-groceries-costco" data-tile-id="rail-groceries-costco" class="badge " href="sheet-groceries.html" data-sheet="sheet-groceries.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6 H8 L11 23 H28 L31 11 H9.5"/><circle cx="13" cy="29" r="2"/><circle cx="26" cy="29" r="2"/></g></svg><span>Groceries · Costco</span></a>
+<a data-owner="Atlas" data-tile="rail-pack" data-tile-id="rail-pack" class="badge " href="sheet-pack.html" data-sheet="sheet-pack.html"><span>Pack</span></a>
+<a data-owner="Atlas" data-tile="rail-weekend-fun" data-tile-id="rail-weekend-fun" class="badge " href="sheet-weekend.html" data-sheet="sheet-weekend.html"><span>Weekend fun</span></a>
+<a data-owner="Atlas" data-tile="rail-week-win" data-tile-id="rail-week-win" class="badge " href="sheet-win.html" data-sheet="sheet-win.html"><span>Week win</span></a>
+<a data-owner="Ledger" data-tile="rail-groceries-costco" data-tile-id="rail-groceries-costco" class="badge " href="sheet-groceries.html" data-sheet="sheet-groceries.html"><span>Groceries · Costco</span></a>
 
-<a data-owner="Vita" data-tile="rail-dinner-vote" data-tile-id="rail-dinner-vote" class="badge " href="sheet-dinner.html" data-sheet="sheet-dinner.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 V14 Q11 17 14 17 V31"/><path d="M8 5 V13"/><path d="M14 5 V13"/><path d="M24 31 V5 Q29 8 29 17 H24"/></g></svg><span>Dinner vote</span></a>
+<a data-owner="Vita" data-tile="rail-dinner-vote" data-tile-id="rail-dinner-vote" class="badge " href="sheet-dinner.html" data-sheet="sheet-dinner.html"><span>Dinner vote</span></a>
 </div></div>
 <div class="rail-grp"><div class="rail-h">Photos</div><div class="rail-grid">
-<a data-owner="Prism" data-tile="rail-gallery" data-tile-id="rail-gallery" class="badge " href="sheet-gallery.html" data-sheet="sheet-gallery.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="28" height="21" rx="3"/><circle cx="18" cy="18.5" r="5.5"/><path d="M12 8 L14 5 H22 L24 8"/></g></svg><span>Gallery</span></a>
-<a data-owner="Prism" data-tile="rail-needs-photo" data-tile-id="rail-needs-photo" class="badge " href="sheet-gallery-hero.html" data-sheet="sheet-gallery-hero.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="28" height="21" rx="3"/><path d="M18 13 V24 M12.5 18.5 H23.5"/></g></svg><span>Needs photo</span></a>
+<a data-owner="Prism" data-tile="rail-gallery" data-tile-id="rail-gallery" class="badge " href="sheet-gallery.html" data-sheet="sheet-gallery.html"><span>Gallery</span></a>
+<a data-owner="Prism" data-tile="rail-needs-photo" data-tile-id="rail-needs-photo" class="badge " href="sheet-gallery-hero.html" data-sheet="sheet-gallery-hero.html"><span>Needs photo</span></a>
 </div></div>
 <div class="rail-grp"><div class="rail-h">House</div><div class="rail-grid">
-<a data-owner="Wright" data-tile="rail-load-day" data-tile-id="rail-load-day" class="badge " href="sheet-load-day.html" data-sheet="sheet-load-day.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22 H22 V10 H4 Z"/><path d="M22 14 H28 L32 19 V22 H22"/><circle cx="10" cy="26" r="3"/><circle cx="26" cy="26" r="3"/></g></svg><span>Load day</span></a>
-<a data-owner="Wright" data-tile="rail-home-sensi-nest" data-tile-id="rail-home-sensi-nest" class="badge " href="sheet-google-home.html" data-sheet="sheet-google-home.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17 L18 6 L31 17"/><path d="M9 15 V30 H27 V15"/><path d="M14 23 Q18 19 22 23"/><circle cx="18" cy="26" r="1.3" fill="currentColor"/></g></svg><span>Home · Sensi · Nest</span></a>
-<a data-owner="Wright" data-tile="rail-desk-gate" data-tile-id="rail-desk-gate" class="badge " href="sheet-desk-gate.html" data-sheet="sheet-desk-gate.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="16" width="20" height="15" rx="2.5"/><path d="M12.5 16 V11 Q12.5 5 18 5 Q23.5 5 23.5 11 V16"/></g></svg><span>Desk gate</span></a>
-<a data-owner="Wright" data-tile="rail-status" data-tile-id="rail-status" class="badge " href="sheet-status.html" data-sheet="sheet-status.html"><svg class="ico" viewBox="0 0 36 36" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18 H10 L13 9 L18 27 L22 14 L25 18 H32"/></g></svg><span>Status</span></a>
+<a data-owner="Wright" data-tile="rail-load-day" data-tile-id="rail-load-day" class="badge " href="sheet-load-day.html" data-sheet="sheet-load-day.html"><span>Load day</span></a>
+<a data-owner="Wright" data-tile="rail-home-sensi-nest" data-tile-id="rail-home-sensi-nest" class="badge " href="sheet-google-home.html" data-sheet="sheet-google-home.html"><span>Home · Sensi · Nest</span></a>
+<a data-owner="Wright" data-tile="rail-desk-gate" data-tile-id="rail-desk-gate" class="badge " href="sheet-desk-gate.html" data-sheet="sheet-desk-gate.html"><span>Desk gate</span></a>
+<a data-owner="Wright" data-tile="rail-status" data-tile-id="rail-status" class="badge " href="sheet-status.html" data-sheet="sheet-status.html"><span>Status</span></a>
 </div></div>
     <div class="rail-foot">Branch build. Not live.</div>
   </nav>
@@ -291,7 +304,7 @@
     var t = P.lightToggles(eff, !!token());
     $("w-lts").hidden = !t.length;
     $("w-lts-row").innerHTML = t.map(function (x) {
-      return '<button class="tap sm lt-t' + (x.on ? " is-on" : "") + '" data-light="' + esc(x.id) + '"' + (x.disabled ? " disabled" : "") + '><span class="tx"><span>' + esc(x.name) + "</span><small>" + esc(x.sub) + "</small></span></button>";
+      return '<button class="lchip lt-t' + (x.on ? " is-on" : "") + '" data-light="' + esc(x.id) + '"' + (x.disabled ? " disabled" : "") + '><i class="led ' + (x.on ? "ok" : "off") + '"></i>' + esc(x.name) + "<small>" + esc(x.sub) + "</small></button>";
     }).join("");
   }
   if (L && L.onChange) L.onChange(function () { paintLightToggles(); });
@@ -324,14 +337,14 @@
     if (!ltControls) { $("w-ltaps-row").innerHTML = ""; return; }
     var st = LS.logisticsFor(LS.readState(store), now);
     var lastOf = function (c, kid) { return st.taps.filter(function (x) { return x.control === c && (!kid || x.kid === kid); }).pop(); };
-    $("w-ltaps-row").innerHTML = ltControls.map(function (c) {
-      if (c.id === "running-late") return '<span class="lt-grp"><b>' + esc(c.label) + "</b>" + c.chips.map(function (m) {
-        var r = lastOf("running-late"); return '<button class="chip' + (r && r.minutes === m ? " is-on" : "") + '" data-ltap="running-late" data-min="' + m + '">' + m + "</button>"; }).join("") + "</span>";
-      if (c.id === "check-in") return '<span class="lt-grp"><b>' + esc(c.label) + "</b>" + c.kids.map(function (k) {
-        return '<button class="chip' + (lastOf("check-in", k) ? " is-on" : "") + '" data-ltap="check-in" data-kid="' + esc(k) + '">' + esc(k) + "</button>"; }).join("") + "</span>";
+    $("w-ltaps-row").innerHTML = ltControls.map(function (c) { /* ION1: Prism's taps row (tap.big + tapgrp) */
+      if (c.id === "running-late") return '<div class="tapgrp late"><span class="kick">' + esc(c.label) + '</span><div class="chips">' + c.chips.map(function (m) {
+        var r = lastOf("running-late"); return '<button class="chip' + (r && r.minutes === m ? " is-on" : "") + '" data-ltap="running-late" data-min="' + m + '">' + m + "</button>"; }).join("") + "</div></div>";
+      if (c.id === "check-in") return '<div class="tapgrp"><span class="kick">' + esc(c.label) + '</span><div class="chips">' + c.kids.map(function (k) {
+        return '<button class="chip' + (lastOf("check-in", k) ? " is-on" : "") + '" data-ltap="check-in" data-kid="' + esc(k) + '">' + esc(k) + "</button>"; }).join("") + "</div></div>";
       var r = lastOf(c.id);
-      return '<button class="tap sm' + (r ? " is-on" : "") + '" data-ltap="' + esc(c.id) + '"><span class="tx"><span>' + esc(c.label) + "</span><small>" + (r ? esc(LS.fmtHM(Date.parse(r.at))) : "") + "</small></span></button>";
-    }).join("") + (st.status ? '<span class="lt-status">' + esc(st.status.line) + "</span>" : "");
+      return '<button class="tap big' + (r ? " is-on" : "") + '" data-ltap="' + esc(c.id) + '"><i class="mk"></i><span class="tx">' + esc(c.label) + "<small>" + (r ? esc(LS.fmtHM(Date.parse(r.at))) : "") + "</small></span></button>";
+    }).join("") + (st.status ? '<div class="tapgrp lt-status"><small>' + esc(st.status.line) + "</small></div>" : "");
   }
   /* one tap: local status line (+ who-home on check-in); lights only through the existing scene client, only with the key. Never sends. */
   function ltap(control, kid, minutes) {
@@ -355,7 +368,7 @@
     var game = sn ? LS.fieldGame(feeds.cal, now, renames) : null;
     if (game) { needWx(); var fw = LS.fieldWeather(game, wx); if (fw) lines.push({ k: "Field", v: fw.text }); }
     $("w-school").hidden = !sn;
-    $("w-school-row").innerHTML = lines.map(function (l) { return '<span class="sn"><small>' + esc(l.k) + "</small>" + esc(l.v) + "</span>"; }).join("");
+    $("w-school-row").innerHTML = lines.map(function (l) { return '<div class="sn-c"><span class="kick">' + esc(l.k) + "</span><b>" + esc(l.v) + "</b></div>"; }).join("");
     var lv = LS.leaveLine(feeds.nextUp, now, renames);
     $("w-leave").hidden = !lv;
     $("w-leave").textContent = lv ? lv.text : "";
@@ -421,24 +434,21 @@
   /* Harris: the tile fills in the same paint as the tap, plus the EXISTING soft tap tick from house-sfx.js
      (HouseSfx.tap: one 40 ms tick at ~0.04 gain, honours the house mute; ambient stays off). No other seat makes a sound. */
   function harrisTick() { try { if (window.HouseSfx && typeof window.HouseSfx.tap === "function") window.HouseSfx.tap(); } catch (e) { /* silent is fine */ } }
-  function lawTap(attr, kid, id, word, on, small) {
-    return '<button class="tap law' + (on ? " is-done" : "") + '" ' + attr + '="' + esc(kid) + '"' + (id ? ' data-law-id="' + esc(id) + '"' : "") +
-      ' aria-pressed="' + (on ? "true" : "false") + '"><span class="mark" aria-hidden="true"></span><span class="tx"><span>' + esc(word) + "</span>" +
-      (small ? "<small>" + esc(small) + "</small>" : "") + "</span></button>";
+  function mustBtn(attr, kid, id, word, on, extra) { /* ION1: Prism's .must (mark + word), data-state open|done */
+    return '<button class="must' + (extra ? " " + extra : "") + '" ' + attr + '="' + esc(kid) + '"' + (id ? ' data-law-id="' + esc(id) + '"' : "") +
+      ' data-state="' + (on ? "done" : "open") + '" aria-pressed="' + (on ? "true" : "false") + '"><i class="mk"></i><span>' + esc(word) + "</span></button>";
   }
   function lawHtml(kid, now) {
     var j = feeds.kidSeats, m = K.musts(j, store, kid, now);
     if (!m) return "";
-    var html = '<div class="law-musts" data-law-musts="' + esc(kid) + '">' + m.items.map(function (x) { return lawTap("data-law-must", kid, x.id, x.word, x.closed); }).join("") + "</div>";
+    var html = '<div class="musts" data-law-musts="' + esc(kid) + '" data-binary="true"' + (kid === "harris" ? ' data-feedback="tap-sound-fill"' : "") + ">" +
+      m.items.map(function (x) { return mustBtn("data-law-must", kid, x.id, x.word, x.closed); }).join("") + "</div>";
     if (kid === "harris") html += '<div class="law-fill" data-law-fill="' + m.done + '" aria-hidden="true"><i style="width:' + (m.done * 25) + '%"></i></div>';
-    var c = K.choice(j, store, kid, now);
-    if (c && c.open) html += lawTap("data-law-claim", kid, "", c.job.word, false, "First tap owns it."); /* Atlas's open-choice wording */
-    else if (c && c.mine) html += lawTap("data-law-choice-done", kid, "", c.job.word, c.done, c.done ? "Marked today" : "Today");
     var cl = K.close(j, store, kid, now);
-    if (cl) html += lawTap("data-law-close", kid, "", "Close", cl.closed);
+    if (cl) html += '<div class="musts law-close">' + mustBtn("data-law-close", kid, "", "Close", cl.closed, "close") + "</div>";
     var p = K.pack(j, store, kid, now);
-    if (!p.dark) html += '<div class="law-pack" data-law-pack-row="' + esc(kid) + '"><span class="kick">Pack</span>' +
-      p.items.map(function (x) { return lawTap("data-law-pack", kid, x.id, x.word, x.done); }).join("") + "</div>";
+    if (!p.dark) html += '<div class="law-pack" data-law-pack-row="' + esc(kid) + '"><span class="kick">Pack</span><div class="pk-row">' +
+      p.items.map(function (x) { return '<button class="pk' + (x.done ? " is-done" : "") + '" data-law-pack="' + esc(kid) + '" data-law-id="' + esc(x.id) + '" aria-pressed="' + (x.done ? "true" : "false") + '"><i></i>' + esc(x.word) + "</button>"; }).join("") + "</div></div>";
     var my = K.mystery(j, store, kid, now);
     if (my && !my.hidden) html += '<div class="law-mystery" data-law-mystery="' + esc(kid) + '">' + esc(my.copy) + "</div>";
     return html;
@@ -446,18 +456,42 @@
   function seatHtml(kid, now) {
     var r = K.reward(feeds.kidSeats, kid, now);
     if (!r) return "";
-    if (kid === "ainsley") return (r.trusted.length ? '<div class="trusted" data-kid-trusted="ainsley">' + r.trusted.map(function (x) { return "<span>" + esc(x) + "</span>"; }).join("") + "</div>" : "")
-      + (r.line ? '<div class="wk-next">' + esc(r.line) + "</div>" : ""); /* no stars, no counts, no fill */
+    if (kid === "ainsley") return (r.trusted.length ? '<div class="trusted" data-kid-trusted="ainsley" data-no-stars="true"><span class="kick">Trusted with</span><div class="tw-set">' +
+      r.trusted.map(function (x) { return '<span class="tw">' + esc(x) + "</span>"; }).join("") + "</div>" + (r.line ? '<div class="pub-line">' + esc(r.line) + "</div>" : "") + "</div>" : ""); /* no stars, no counts, no fill */
     var html = "", run = K.runText(r.days);
     if (run) html += '<div class="wk-next" data-run="' + esc(kid) + '"' + (r.paused ? ' data-paused="1"' : "") + ">" + esc(run) + "</div>";
     if (kid === "hayes") {
-      if (r.captain) html += '<div class="wk-next" data-captain="hayes">Captain tonight.</div>';
-      var s = (K.law(feeds.kidSeats, now) || {}).seats, y = s && s.hayes;
+      var s = (K.law(feeds.kidSeats, now) || {}).seats, y = s && s.hayes, cd = y && y.countdown;
+      if (cd && typeof cd.copy === "string" && D(cd.copy)) {
+        var what = D(cd.what || ""), rest = what && cd.copy.indexOf(cd.what + " \u00b7 ") === 0 ? cd.copy.slice(cd.what.length + 3) : D(cd.copy);
+        var st = Date.parse(cd.startIso || ""), when = isFinite(st) ? new Date(st).toLocaleDateString("en-US", { timeZone: TZ, weekday: "short", month: "short", day: "numeric" }).replace(",", "") + " \u00b7 " + (ct(cd.startIso) || "").replace(/ (AM|PM)$/, "") : "";
+        html += '<div class="frame" data-countdown="hayes">' + (what ? '<span class="fk">' + esc(what) + "</span>" : "") + "<b>" + esc(rest) + "</b>" + (when ? "<small>" + esc(when) + "</small>" : "") + "</div>";
+      }
       if (y && Array.isArray(y.row) && y.row.length === 7) html += '<div class="wk-row" aria-label="This week">' + y.row.map(function (d) {
-        return '<span class="wk m-' + esc(d.mark) + (d.today ? " is-today" : "") + '"><i></i>' + esc(d.dow) + "</span>"; }).join("") + "</div>";
-      if (y && y.countdown && typeof y.countdown.copy === "string" && D(y.countdown.copy)) html += '<div class="wk-next">' + esc(D(y.countdown.copy)) + "</div>";
+        return '<span class="wk-m m-' + esc(d.mark) + (d.mark === "closed" ? " is-done" : "") + (d.today ? " is-today" : "") + '"><i></i><em>' + esc(String(d.dow).slice(0, 2)) + "</em></span>"; }).join("") + "</div>";
     }
     return html;
+  }
+  /* CHOICE row: one shared job; one button per seat (names only). First tap owns it (claimer mark), siblings lock, never released. */
+  function claimHtml(now) {
+    var j = feeds.kidSeats, c0 = K.choice(j, store, "harris", now);
+    if (!c0 || (!c0.open && !c0.owner)) return "";
+    var head = '<div class="claim-h"><span class="kick">Choice</span><b>' + esc(c0.job.word) + "</b><small>" +
+      (c0.owner ? esc(c0.job.word + " \u00b7 " + c0.ownerName + ".") : "First tap owns it.") + "</small></div>"; /* Atlas's choice wording */
+    return head + '<div class="cj-row">' + K.ORDER.map(function (k) {
+      var c = K.choice(j, store, k, now), name = k.charAt(0).toUpperCase() + k.slice(1);
+      if (c.mine) return '<button class="cj is-claimed' + (c.done ? " is-done" : "") + '" data-law-choice-done="' + k + '" data-claimed-by="' + k + '" data-locked="false" aria-pressed="' + (c.done ? "true" : "false") + '"><span>' + esc(name) + '</span><i class="cj-slot claimer" aria-hidden="true">' + esc(name[0]) + "</i></button>";
+      if (c.lockedOut) return '<button class="cj" data-claimed-by="' + esc(c.owner) + '" data-locked="true" disabled><span>' + esc(name) + '</span><i class="lock" aria-hidden="true"></i></button>';
+      return '<button class="cj" data-law-claim="' + k + '" data-claimed-by="" data-locked="false"><span>' + esc(name) + '</span><i class="cj-slot" aria-hidden="true"></i></button>';
+    }).join("") + "</div>";
+  }
+  function sharedHtml(now) {
+    var L0 = K.law(feeds.kidSeats, now), u = L0 && L0.usTogether, w = L0 && L0.weekWin;
+    var us = u && isFinite(u.closes) && isFinite(u.available) && isFinite(u.unlockAt) ? '<span class="kick">Us together</span><b class="ux"><span class="ux-n">' + esc(u.closes) + '</span><span class="ux-d"> / ' + esc(u.available) +
+      "</span></b><small>Closes this week \u00b7 " + esc(u.unlockAt) + " or more unlocks Weekend fun</small>" : "";
+    var ww = w && typeof w.copy === "string" ? '<span class="kick">Week win \u00b7 Sunday</span>' + (w.houseHeld ? '<span class="ww-name">House held</span>' :
+      '<span class="ww-name">' + esc(w.name || "") + '</span><span class="ww-why">' + esc(w.reason || "") + "</span>") : "";
+    return { us: us, ww: ww };
   }
   function paintKids(mode) {
     var now = Date.now();
@@ -476,7 +510,13 @@
       box.innerHTML = lh; box.hidden = !lh;
       var ex = tile.querySelector("[data-kid-seat]"), sh = seatHtml(k.id, now);
       ex.innerHTML = sh; ex.hidden = !sh;
+      var cap = tile.querySelector("[data-captain-slot]"), rw = K.reward(feeds.kidSeats, k.id, now);
+      if (cap) cap.hidden = !(rw && rw.captain);
     });
+    var chq = claimHtml(now); $("w-claim").innerHTML = chq; $("w-claim").hidden = !chq;
+    var shd = sharedHtml(now);
+    $("w-us-x").innerHTML = shd.us; $("w-us-x").hidden = !shd.us;
+    $("w-wwin").innerHTML = shd.ww; $("w-wwin").hidden = !shd.ww;
     var us = ul.filter(function (x) { return x.kid === "house"; })[0];
     $("w-us").hidden = !us || !!away;
     var ub = $("w-us-btn");
@@ -516,7 +556,7 @@
   function lightHtml(l) {
     var led = l.need ? "off" : (l.ok ? "ok" : (l.stale || l.attention ? "warn" : "bad"));
     var label = l.id === "laundry" ? "Laundry<small>" + esc(l.text) + "</small>" : esc(l.text);
-    return '<a class="lt" href="' + esc(l.href || "sheet-google-home.html") + '"><span class="led ' + led + '"></span>' + (ICON[l.id] || "") + '<span class="lv">' + label + "</span></a>";
+    return '<a class="lt" href="' + esc(l.href || "sheet-google-home.html") + '"><i class="led ' + led + '"></i><span class="lv">' + label + "</span></a>"; /* ION1: no icons */
   }
 
   function paint() {
@@ -564,7 +604,7 @@
     var wh = S.whoHome(K.mergeWho(feeds.whoHome, K.readWho(store, now)), { now: now, mode: mode });
     $("w-who").hidden = !wh;
     if (wh) $("w-who-row").innerHTML = wh.kids.map(function (k) {
-      return '<span class="pill k-' + k.name.toLowerCase() + (k.inAt ? " is-in" : "") + '"><span class="dot">' + esc(k.name[0]) + "</span><b>" + esc(k.name) + "</b><span>" + (k.inAt ? "in \u00b7 " + esc(ct(k.inAt)) : "not in yet") + "</span></span>";
+      return '<div class="pill k-' + k.name.toLowerCase() + (k.inAt ? " is-in" : "") + '"><i class="dot"></i><b>' + esc(k.name) + "</b><span>" + (k.inAt ? "in \u00b7 " + esc(ct(k.inAt)) : "not in yet") + "</span></div>";
     }).join("");
     var pf = S.packFlags(feeds.pack, { now: now });
     $("w-pack").hidden = !pf;

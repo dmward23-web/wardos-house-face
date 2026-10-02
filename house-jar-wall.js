@@ -24,15 +24,19 @@
   /* ---------- jar tile ---------- */
   function jarTileModel(d) {
     if (!d || typeof d.ruleText !== "string" || !d.ruleText.trim() || !Array.isArray(d.jars) || !d.jars.length) return null;
-    var names = d.jars.map(function (j) { return String((j && j.name) || "").trim(); }).filter(Boolean);
-    if (!names.length) return null;
-    return { rule: d.ruleText.trim(), names: names, sync: d.synced === true ? "" : String(d.syncLabel || "Not synced") };
+    var jars = d.jars.map(function (j) { return { id: String((j && j.jar) || "").trim(), name: String((j && j.name) || "").trim() }; }).filter(function (j) { return j.name; });
+    if (!jars.length) return null;
+    return { rule: d.ruleText.trim(), names: jars.map(function (j) { return j.name; }), ids: jars.map(function (j) { return j.id; }),
+      sync: d.synced === true ? "" : String(d.syncLabel || "Not synced") };
   }
+  /* ION1: Prism's Ion jar markup (.jars / .jarg outline glyph / .jar-sync / .jar-rule). Outline glyphs only: no fill, no numbers. */
   function jarTileHtml(m) {
-    return '<span class="kick">Jar</span>' +
-      '<p data-jar-rule>' + esc(m.rule) + "</p>" +
-      '<ul data-jar-names aria-label="Jars">' + m.names.map(function (n) { return "<li>" + esc(n) + "</li>"; }).join("") + "</ul>" +
-      (m.sync ? '<span class="note" data-jar-sync>' + esc(m.sync) + "</span>" : "");
+    return '<div class="ah"><span class="kick">Jar</span></div>' +
+      '<div class="jar-mid"><div class="jars" data-jar-names aria-label="Jars">' + m.names.map(function (n, i) {
+        var id = (m.ids && m.ids[i]) || "";
+        return '<span class="jarg"' + (id ? ' data-jar="' + esc(id) + '"' : "") + '><i class="jar-glyph" aria-hidden="true"></i><em>' + esc(n) + "</em></span>"; }).join("") + "</div>" +
+      (m.sync ? '<span class="jar-sync" data-jar-sync>' + esc(m.sync) + "</span>" : "") + "</div>" +
+      '<p class="jar-rule" data-jar-rule>' + esc(m.rule) + "</p>";
   }
   function paintJarTile(el, display) {
     if (!el) return false;
@@ -136,8 +140,8 @@
     return j ? j.name : kid;
   }
   function controlHtml(kid) {
-    return '<button type="button" class="tap" data-nice-one="' + esc(kid) + '" aria-label="Nice one, parent hold">' +
-      '<span class="tx"><span>Nice one</span><small>Parent · hold</small></span>' +
+    return '<button type="button" class="nice1" data-nice-one="' + esc(kid) + '" aria-label="Nice one, parent hold">' +
+      '<span>Nice one</span><small>Parent · hold</small>' +
       '<progress data-nice-hold max="100" value="0" hidden></progress></button>';
   }
   function padHtml() {

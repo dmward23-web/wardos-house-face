@@ -79,7 +79,7 @@ await t("CHORELAW2: dinner-vote and gallery unlock controls gone; no leaderboard
   assert.doesNotMatch(kids, /sheet-dinner\.html|sheet-gallery-hero\.html|data-kid-unlock|leaderboard|\.sort\(/i, "kid seats: no dinner-vote / gallery unlock, no ranking (Vita's dinner rail badge is not a kid control)");
   assert.doesNotMatch(code.slice(code.indexOf("function paintKids")), /\.sort\(/);
   const order = [...wall.matchAll(/id="w-kid-([a-z]+)"/g)].map((x) => x[1]);
-  assert.deepEqual(order, ["ainsley", "hayes", "harris"], "fixed seat order in markup, never re-ordered by results");
+  assert.deepEqual(order, ["harris", "hayes", "ainsley"], "fixed seat order (Atlas ORDER + Ion master) in markup, never re-ordered by results");
 });
 await t("CHORELAW2: Harris's sound is the existing soft house-sfx tap only, on his seat only; no new audio code on the wall", () => {
   const code = wall.replace(/<!--[\s\S]*?-->/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
@@ -157,7 +157,7 @@ await t("grocery tile hosts Ledger's house-grocery-list.js as-is; tile hidden by
   assert.doesNotMatch(tile, /<a |href=/);
 });
 await t("doors lamp + doorbell line: hidden, no reader, never a feed or still", () => {
-  assert.match(wall, /id="w-doors"[^>]*hidden><\/div>/); assert.match(wall, /id="w-bell"[^>]*hidden><\/div>/);
+  assert.match(wall, /id="w-doors"[^>]*hidden><\/(div|section)>/); assert.match(wall, /id="w-bell"[^>]*hidden><\/(div|section)>/);
   assert.doesNotMatch(wall.replace(/<!--[\s\S]*?-->/g, ""), /doors?-live\.json|doorbell[^"\n]*\.json|ring-live/);
 });
 await t("no hardcoded Mom in wall code or copy (data labels render as given)", () => {
@@ -295,7 +295,7 @@ await t("CHORELAW1: Ainsley has NO stars and NO counts on her tile/seat/page; sl
   const ka = read("kid-ainsley.html").replace(/<style[\s\S]*?<\/style>/g, "").replace(/<!--[\s\S]*?-->/g, "");
   assert.doesNotMatch(ka, /\u2605|data-progress-meta|data-left-count|id="sec-jar"|data-grow-total|data-bank-life|data-got-it|href="#sec-jar"/, "no stars, counts or star goal on Ainsley's page");
   assert.match(ka, /data-trusted-line="ainsley"[^>]*hidden><\/section>/, "empty slot, no invented copy");
-  const wall = read("wall.html"); assert.match(wall, /data-kid-trusted="ainsley">/, "trusted-with renders from Atlas's trustedWith only");
+  const wall = read("wall.html"); assert.match(wall, /data-kid-trusted="ainsley" data-no-stars="true">/, "trusted-with renders from Atlas's trustedWith only");
   assert.match(wall, /if \(kid === "ainsley"\) return \(r\.trusted\.length/); assert.match(wall, /if \(kid === "harris"\) html \+= '<div class="law-fill"/);
   for (const f of ["sheet-allowance.html", "sheet-chores.html"]) assert.ok(read(f).includes("Ainsley"), f + " (Ainsley star rows there are a listed gap)");
 });
