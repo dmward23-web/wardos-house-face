@@ -143,3 +143,21 @@ Commits on `wall-redesign-1`: `d2b5177` FIDELITY1+FILL1 · `fa858ad` LANDFILL1 �
 - **Boards**: sticky header (Home one tap); SCROLL5 runway gone (`?v=SCROLLEND2`); header-middle glance (`house-hdr-home.js`
   HDRGLANCE1, only when it fits whole); DENSE1 card scale (largest scale whose words fit, no inner spill); groceries treat
   slots side by side; gallery "Photos" row folds in landscape. Most boards still miss Alfred's 2% empty-rect rule (see report).
+
+## HANDOFF
+
+### Scheduled data routines (agent routines, not GitHub Actions; nothing in the repo installs a timer)
+- **House board calendar refresh** (existing, every ~10 min). It is an agent routine, not an Actions schedule: `.github/workflows/` holds only `house-face-qa.yml` (push/PR gates). The routine dumps dmward23 `list_events` to `/workspace/cal-dmward23-week.json`, then runs `scripts/house-board-calendar-refresh.sh /workspace/cal-dmward23-week.json --push`. It commits data only, as `dmward23-web`, with the message "House Face · calendar refresh … data-only …".
+- **House feeds 3 AM regen** (new; Dan's routine, created at squash time; runs once at 3:00 AM America/Chicago):
+
+  ```bash
+  cd <wardos-house-face checkout> && scripts/house-feeds-regen.sh --push
+  ```
+
+  - It regenerates kids-week, cal-live, kids-data.js and the 8 wall feeds:
+    - house-mode, next-up, kid-seats and unlocks;
+    - pickup-chain, school-night, who-home and logistics-taps.
+  - Input is the latest dump the 10-minute routine wrote (`--events <dump>` to override). It goes through the same entrypoint and the same data-only allowlist.
+  - It is idempotent: when only the refresh stamps changed, it restores the files and prints `CLEAN … no commit`.
+  - It refuses to run over local edits (exit 3) and fails closed when the dump is missing (exit 2).
+  - Cadence lives in `config/house-feeds.schedule.json`, entry `house-day-reset`.

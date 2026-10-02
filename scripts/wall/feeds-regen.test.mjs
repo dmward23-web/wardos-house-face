@@ -1,0 +1,20 @@
+// REGEN3AM · node scripts/wall/feeds-regen.test.mjs : the 3 AM house-feeds regen is one idempotent, data-only command
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const read = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
+const sh = read("scripts/house-feeds-regen.sh"), cal = read("scripts/house-board-calendar-refresh.sh");
+const allow = cal.match(/ALLOW_WRITE=\(([\s\S]*?)\n\)/)[1].split("\n").map((l) => l.trim()).filter((l) => /^[\w./-]+\.(json|js)$/.test(l) && !l.includes("calendar-dmward23-dump"));
+const files = sh.match(/FILES=\(([^)]*)\)/)[1].split(/\s+/).filter(Boolean);
+assert.deepEqual([...files].sort(), [...allow].sort(), "regen commits exactly the calendar refresh's committed allowlist");
+assert.ok(fs.statSync(path.join(ROOT, "scripts/house-feeds-regen.sh")).mode & 0o111, "executable");
+assert.match(sh, /scripts\/house-board-calendar-refresh\.sh "\$EVENTS" --push --note "3 AM regen"/, "same entrypoint + allowlist");
+assert.match(sh, /CLEAN/, "no-op path");
+assert.doesNotMatch(sh.replace(/^#.*$/gm, ""), /house-face-deploy|curl|crontab|git push/, "no deploy, network, timer or direct push");
+const sched = JSON.parse(read("config/house-feeds.schedule.json"));
+const r = sched.runs.find((x) => x.id === "house-day-reset");
+assert.equal(r.name, "House feeds 3 AM regen"); assert.equal(r.cmd, "scripts/house-feeds-regen.sh --push");
+assert.match(read("docs/wall-redesign/WALL-BUILD.md"), /## HANDOFF[\s\S]*House feeds 3 AM regen[\s\S]*scripts\/house-feeds-regen\.sh --push/);
+console.log("feeds-regen: 1 file, all assertions pass");
