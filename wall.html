@@ -26,7 +26,7 @@
     <img class="mark" src="wardos-mark-header.png" alt="WardOS" data-tile="wardos-mark" data-tile-id="wardos-mark" data-owner="Prism">
     <span class="clock" id="w-clock" data-go="sheet-today.html#today-now" data-tile="clock" data-tile-id="clock" data-owner="Wright"></span>
     <span class="date" id="w-date" data-go="month.html#month-board" data-tile="date" data-tile-id="date" data-owner="Wright"></span>
-    <span class="sp"></span>
+    <span class="glance" id="w-glance" data-glance="header-glance" data-owner="Wright" data-tile="header-glance" data-tile-id="header-glance" hidden><span class="g-big"><b id="w-glance-a"></b><em id="w-glance-c"></em></span><span class="g-sub" id="w-glance-b"></span></span><span class="sp"></span>
     <!-- House mode: Atlas's data/house-mode.json. Past its until-time it stays as the last-known mode, dim, "ended". -->
     <span class="mode" id="w-mode" data-go="sheet-today.html#today-now" data-glance="mode" data-owner="Atlas" data-tile="house-mode" data-tile-id="house-mode" aria-label="House mode" hidden><span><span class="mk" id="w-mode-k">House mode</span><span class="mv" id="w-mode-v"></span></span></span>
     <!-- stale feeds: a dot only on the face; the words ride in the footer -->
@@ -44,7 +44,7 @@
           <span class="w w3" id="w-next-w"><span id="w-next-label"></span><small id="w-next-sub"></small></span>
         </a>
         <div class="mod timer" id="w-timer" data-owner="Wright" data-tile="house-timer" data-tile-id="house-timer" aria-label="Timer">
-          <div class="ah"><span class="kick">Timer</span><span class="t-chips" id="w-timer-labels" role="group" aria-label="Timer label"><button class="chip" data-timer-label="Oven">Oven</button><button class="chip" data-timer-label="Laundry">Laundry</button><button class="chip" data-timer-label="Bath">Bath</button></span><small>Ends on the board</small></div>
+          <div class="ah"><span class="kick" data-inplace="timer-hint" role="button" tabindex="0">Timer</span><span class="t-chips" id="w-timer-labels" role="group" aria-label="Timer label"><button class="chip" data-timer-label="Oven">Oven</button><button class="chip" data-timer-label="Laundry">Laundry</button><button class="chip" data-timer-label="Bath">Bath</button></span><small>Ends on the board</small></div>
           <div class="trow">
             <b class="t-show" id="w-timer-show" hidden></b>
             <span class="t-chips" id="w-timer-mins" role="group" aria-label="Timer minutes"><button class="chip" data-timer-min="5">5</button><button class="chip" data-timer-min="10">10</button><button class="chip" data-timer-min="15">15</button><button class="chip" data-timer-min="20">20</button><button class="chip" data-timer-min="30">30</button><button class="chip" data-timer-min="60">60</button></span>
@@ -70,7 +70,7 @@
           <div class="note" id="w-travel-note"></div>
         </section>
         <section class="ctl cg cg-lights" id="w-lts" data-owner="Wright" data-tile="kasa-lights" data-tile-id="kasa-lights" aria-label="Lights">
-          <div class="ah" data-go="sheet-lights.html#lights-pad-grid"><span class="kick">Lights</span><span class="gate" id="w-lts-g"></span></div>
+          <div class="ah" data-go="sheet-lights.html#lights-board"><span class="kick">Lights</span><span class="gate" id="w-lts-g"></span></div>
           <div class="lchips" id="w-lts-row"></div>
           <div class="note" id="w-scene-note"></div>
         </section>
@@ -86,9 +86,9 @@
         <button class="tap big" id="w-scene-home" data-scene="home" data-ltap="im-home"><i class="mk"></i><span class="tx" id="w-scene-home-l">I'm home<small></small></span></button>
         <button class="tap big" id="w-scene-leave" data-scene="leave" data-ltap="leaving"><i class="mk"></i><span class="tx" id="w-scene-leave-l">Leaving<small></small></span></button>
         <div class="tapgrp" id="w-ltap-checkin" role="button" tabindex="0" data-inplace="check-in-hint"><span class="kick">Check in</span><b>Tap I'm here</b><small id="w-ltap-checkin-s">On your seat, below</small></div>
-        <div class="tapgrp late" id="w-ltap-late"><span class="kick">Running late &middot; minutes</span><div class="chips" id="w-ltap-late-row"></div></div>
+        <div class="tapgrp late" id="w-ltap-late"><span class="kick" data-inplace="late-hint" role="button" tabindex="0">Running late &middot; minutes</span><div class="chips" id="w-ltap-late-row"></div></div>
       </div>
-      <div class="mod who" id="w-who" data-glance="who-home" data-owner="Atlas" data-tile="who-home" data-tile-id="who-home" aria-label="Who's home" hidden><span class="kick">Who&#39;s home</span><span id="w-who-row" style="display:contents"></span><span class="hint">Resets 3 AM</span></div>
+      <div class="mod who" id="w-who" data-glance="who-home" data-owner="Atlas" data-tile="who-home" data-tile-id="who-home" aria-label="Who's home" hidden><span class="kick" data-inplace="who-hint" role="button" tabindex="0">Who&#39;s home</span><span id="w-who-row" style="display:contents"></span><span class="hint">Resets 3 AM</span></div>
     </div>
 
     <div class="mod snight" id="w-school" data-go="sheet-today.html#today-day" data-owner="Atlas" data-tile="school-night" data-tile-id="school-night" aria-label="School night" hidden><span class="kick">School night</span><span class="ann" id="w-school-ann" hidden></span><span id="w-school-row" style="display:contents"></span></div>
@@ -102,24 +102,24 @@
 
     <!-- CHORE LAW seats (KIDLAYER3.md): Harris · Hayes · Ainsley, Atlas's fixed order, equal weight, no ranking. Every word comes from data. -->
     <div class="mod seats seats-law kids" id="w-kids" data-owner="Atlas" data-tile="kids" data-tile-id="kids" data-band="kids" data-law="CHORE-LAW-2026-10-01" aria-label="Kids" hidden>
-      <section class="seat kid" id="w-kid-harris" data-owner-split="Atlas · Wright" data-owner="Atlas" data-tile="kid-harris" data-tile-id="kid-harris" data-kid="harris" aria-label="Harris seat">
+      <section class="seat kid" id="w-kid-harris" data-owner-split="Atlas · Wright" data-owner="Atlas" data-tile="harris" data-tile-id="kid-harris" data-kid="harris" aria-label="Harris seat">
         <div class="seat-h"><button type="button" class="kid-name" data-go="kid-harris.html#kid-board" data-kid-board="harris" aria-label="Harris board"><span>Harris</span></button><button type="button" class="here-chip" data-kid-checkin="harris" data-inplace="check-in" aria-label="Harris: I'm here"><b>I'm here</b><small></small></button></div>
         <div class="kid-frame" data-kid-frame="harris" hidden></div>
-        <div class="kid-law" data-kid-law="harris" hidden></div>
+        <div class="kid-law" data-kid-law="harris" data-owner="Atlas" data-tile="chores-musts" data-tile-id="kid-law-harris" hidden></div>
         <div class="kid-seat" data-kid-seat="harris" hidden></div>
         <div class="seat-foot" data-nice-one-host="harris"><button type="button" class="nice1 is-dim" data-nice-dim data-inplace="nice-one" aria-label="Nice one, parent only (no PIN set)"><span>Nice one</span><small>Parent only</small></button></div>
       </section>
-      <section class="seat kid seat-ball" id="w-kid-hayes" data-owner-split="Atlas · Wright" data-owner="Atlas" data-tile="kid-hayes" data-tile-id="kid-hayes" data-kid="hayes" aria-label="Hayes seat">
+      <section class="seat kid seat-ball" id="w-kid-hayes" data-owner-split="Atlas · Wright" data-owner="Atlas" data-tile="hayes" data-tile-id="kid-hayes" data-kid="hayes" aria-label="Hayes seat">
         <div class="seat-h"><button type="button" class="kid-name" data-go="kid-hayes.html#kid-board" data-kid-board="hayes" aria-label="Hayes board"><span>Hayes</span></button><button type="button" class="here-chip" data-kid-checkin="hayes" data-inplace="check-in" aria-label="Hayes: I'm here"><b>I'm here</b><small></small></button><div class="captain" data-captain-slot="hayes" data-owner="Atlas" data-tile="kid-hayes-captain" data-tile-id="kid-hayes-captain" hidden><i class="cap-mk"></i><span>Captain<small>of the night</small></span></div></div>
         <div class="kid-frame" data-kid-frame="hayes" hidden></div>
-        <div class="kid-law" data-kid-law="hayes" hidden></div>
+        <div class="kid-law" data-kid-law="hayes" data-owner="Atlas" data-tile="chores-musts" data-tile-id="kid-law-hayes" hidden></div>
         <div class="kid-seat" data-kid-seat="hayes" hidden></div>
         <div class="seat-foot" data-nice-one-host="hayes"><button type="button" class="nice1 is-dim" data-nice-dim data-inplace="nice-one" aria-label="Nice one, parent only (no PIN set)"><span>Nice one</span><small>Parent only</small></button></div>
       </section>
-      <section class="seat kid seat-quiet" id="w-kid-ainsley" data-owner-split="Atlas · Wright" data-owner="Atlas" data-tile="kid-ainsley" data-tile-id="kid-ainsley" data-kid="ainsley" aria-label="Ainsley seat">
+      <section class="seat kid seat-quiet" id="w-kid-ainsley" data-owner-split="Atlas · Wright" data-owner="Atlas" data-tile="ainsley" data-tile-id="kid-ainsley" data-kid="ainsley" aria-label="Ainsley seat">
         <div class="seat-h"><button type="button" class="kid-name" data-go="kid-ainsley.html#kid-board" data-kid-board="ainsley" aria-label="Ainsley board"><span>Ainsley</span></button><button type="button" class="here-chip" data-kid-checkin="ainsley" data-inplace="check-in" aria-label="Ainsley: I'm here"><b>I'm here</b><small></small></button></div>
         <div class="kid-frame" data-kid-frame="ainsley" hidden></div>
-        <div class="kid-law" data-kid-law="ainsley" hidden></div>
+        <div class="kid-law" data-kid-law="ainsley" data-owner="Atlas" data-tile="chores-musts" data-tile-id="kid-law-ainsley" hidden></div>
         <div class="kid-seat" data-kid-seat="ainsley" hidden></div>
         <div class="seat-foot" data-nice-one-host="ainsley"><button type="button" class="nice1 is-dim" data-nice-dim data-inplace="nice-one" aria-label="Nice one, parent only (no PIN set)"><span>Nice one</span><small>Parent only</small></button></div>
       </section>
@@ -140,7 +140,7 @@
         <div class="ah"><span class="kick" data-go="sheet-groceries.html#groc-list">Groceries</span><span class="seg" role="group" aria-label="Store">
           <button class="chip" data-groc-filter="all">All</button><button class="chip" data-groc-filter="costco">Costco</button></span></div>
         <div class="glist g-list" id="w-groc-list"></div>
-        <div class="gadd"><span class="kick">Add</span><span class="g-chips" id="w-groc-chips" aria-label="Add"></span></div>
+        <div class="gadd"><span class="kick" data-go="sheet-groceries.html#groc-list">Add</span><span class="g-chips" id="w-groc-chips" aria-label="Add"></span></div>
         <div class="g-picks" id="w-groc-picks" aria-label="Pick list" hidden></div>
         <div class="trow g-foot"><button class="tap sm" id="w-groc-more" data-groc-more>More</button><button class="tap sm" id="w-groc-clear" data-groc-clear hidden>Clear checked</button></div>
       </section>
@@ -174,16 +174,16 @@
   </main>
 
   <nav class="mod rail" aria-label="One tap to every board">
-    <div class="rail-top"><span class="kick">Boards</span><span>One tap</span></div>
+    <div class="rail-top" data-go="sheet-index.html#hub-home"><span class="kick">Boards</span><span>One tap</span></div>
     <div class="rail-grp"><div class="rail-h">Days</div><div class="rail-grid">
-<a data-owner="Atlas" data-tile="rail-today" data-tile-id="rail-today" class="badge " href="sheet-today.html#today-now" data-sheet="sheet-today.html"><span>Today</span></a>
-<a data-owner="Atlas" data-tile="rail-week" data-tile-id="rail-week" class="badge " href="sheet-index.html#hub-home" data-sheet="sheet-index.html"><span>Week</span></a>
-<a data-owner="Atlas" data-tile="rail-month" data-tile-id="rail-month" class="badge " href="month.html#month-board" data-sheet="month.html"><span>Month</span></a>
-<a data-owner="Atlas" data-tile="rail-countdowns" data-tile-id="rail-countdowns" class="badge " href="sheet-countdowns.html#countdowns-board" data-sheet="sheet-countdowns.html"><span>Countdowns</span></a>
+<a data-owner="Atlas" data-tile="today" data-tile-id="rail-today" class="badge " href="sheet-today.html#today-now" data-sheet="sheet-today.html"><span>Today</span></a>
+<a data-owner="Atlas" data-tile="week" data-tile-id="rail-week" class="badge " href="sheet-index.html#hub-home" data-sheet="sheet-index.html"><span>Week</span></a>
+<a data-owner="Atlas" data-tile="month" data-tile-id="rail-month" class="badge " href="month.html#month-board" data-sheet="month.html"><span>Month</span></a>
+<a data-owner="Atlas" data-tile="countdowns" data-tile-id="rail-countdowns" class="badge " href="sheet-countdowns.html#countdowns-board" data-sheet="sheet-countdowns.html"><span>Countdowns</span></a>
 </div></div>
 <div class="rail-grp"><div class="rail-h">People</div><div class="rail-grid">
-<a data-owner="Atlas" data-tile="rail-dad-seat" data-tile-id="rail-dad-seat" class="badge " href="sheet-dan.html#ds-next" data-sheet="sheet-dan.html"><span>Dad Seat</span></a>
-<a data-owner="Atlas" data-tile="rail-us-together" data-tile-id="rail-us-together" class="badge " href="sheet-us.html#us-board" data-sheet="sheet-us.html"><span>Us together</span></a>
+<a data-owner="Atlas" data-tile="dad-seat" data-tile-id="rail-dad-seat" class="badge " href="sheet-dan.html#ds-next" data-sheet="sheet-dan.html"><span>Dad Seat</span></a>
+<a data-owner="Atlas" data-tile="us-together" data-tile-id="rail-us-together" class="badge " href="sheet-us.html#us-board" data-sheet="sheet-us.html"><span>Us together</span></a>
 
 
 
@@ -191,27 +191,27 @@
 <!-- PRESS3 (Atlas 10/2): a row with no data source (load day: no feed; dinner vote: no options source) collapses fully, no placeholder -->
 <div class="rail-grp"><div class="rail-h">Do</div><div class="rail-grid">
 
-<a data-owner="Atlas" data-tile="rail-pack" data-tile-id="rail-pack" class="badge " href="sheet-pack.html#pack-board" data-sheet="sheet-pack.html"><span>Pack</span></a>
-<a data-owner="Atlas" data-tile="rail-weekend-fun" data-tile-id="rail-weekend-fun" class="badge " href="sheet-weekend.html#weekend-board" data-sheet="sheet-weekend.html"><span>Weekend fun</span></a>
-<a data-owner="Atlas" data-tile="rail-week-win" data-tile-id="rail-week-win" class="badge " href="sheet-win.html#win-board" data-sheet="sheet-win.html"><span>Week win</span></a>
-<a data-owner="Ledger" data-tile="rail-groceries-costco" data-tile-id="rail-groceries-costco" class="badge " href="sheet-groceries.html#groc-list" data-sheet="sheet-groceries.html"><span>Groceries · Costco</span></a>
+<a data-owner="Atlas" data-tile="pack" data-tile-id="rail-pack" class="badge " href="sheet-pack.html#pack-board" data-sheet="sheet-pack.html"><span>Pack</span></a>
+<a data-owner="Atlas" data-tile="weekend-fun" data-tile-id="rail-weekend-fun" class="badge " href="sheet-weekend.html#weekend-board" data-sheet="sheet-weekend.html"><span>Weekend fun</span></a>
+<a data-owner="Atlas" data-tile="week-win" data-tile-id="rail-week-win" class="badge " href="sheet-win.html#win-board" data-sheet="sheet-win.html"><span>Week win</span></a>
+<a data-owner="Ledger" data-tile="groceries-costco" data-tile-id="rail-groceries-costco" class="badge " href="sheet-groceries.html#groc-list" data-sheet="sheet-groceries.html"><span>Groceries · Costco</span></a>
 
-<a data-owner="Vita" data-tile="rail-dinner-vote" data-tile-id="rail-dinner-vote" data-no-source class="badge " hidden href="sheet-dinner.html#dinner-board" data-sheet="sheet-dinner.html"><span>Dinner vote</span></a>
+<a data-owner="Vita" data-tile="dinner-vote" data-tile-id="rail-dinner-vote" data-no-source class="badge " hidden href="sheet-dinner.html#dinner-board" data-sheet="sheet-dinner.html"><span>Dinner vote</span></a>
 </div></div>
 <div class="rail-grp"><div class="rail-h">Photos</div><div class="rail-grid">
-<a data-owner="Prism" data-tile="rail-gallery" data-tile-id="rail-gallery" class="badge " href="sheet-gallery.html#gallery-board" data-sheet="sheet-gallery.html"><span>Gallery</span></a>
-<a data-owner="Prism" data-tile="rail-needs-photo" data-tile-id="rail-needs-photo" class="badge " href="sheet-gallery-hero.html#hero-board" data-sheet="sheet-gallery-hero.html"><span>Needs photo</span></a>
+<a data-owner="Prism" data-tile="gallery" data-tile-id="rail-gallery" class="badge " href="sheet-gallery.html#gallery-board" data-sheet="sheet-gallery.html"><span>Gallery</span></a>
+<a data-owner="Prism" data-tile="need-photo" data-tile-id="rail-needs-photo" class="badge " href="sheet-gallery-hero.html#hero-board" data-sheet="sheet-gallery-hero.html"><span>Needs photo</span></a>
 </div></div>
 <div class="rail-grp"><div class="rail-h">House</div><div class="rail-grid">
-<a data-owner="Wright" data-tile="rail-load-day" data-tile-id="rail-load-day" data-no-source class="badge " hidden href="sheet-load-day.html#loadday-board" data-sheet="sheet-load-day.html"><span>Load day</span></a>
-<a data-owner="Wright" data-tile="rail-home-sensi-nest" data-tile-id="rail-home-sensi-nest" class="badge " href="sheet-google-home.html#sensi-hero" data-sheet="sheet-google-home.html"><span>Home · Sensi · Nest</span></a>
-<a data-owner="Wright" data-tile="rail-status" data-tile-id="rail-status" class="badge " href="sheet-status.html#status-feeds" data-sheet="sheet-status.html"><span>Status</span></a>
+<a data-owner="Wright" data-tile="load-day" data-tile-id="rail-load-day" data-no-source class="badge " hidden href="sheet-load-day.html#loadday-board" data-sheet="sheet-load-day.html"><span>Load day</span></a>
+<a data-owner="Wright" data-tile="google-home" data-tile-id="rail-home-sensi-nest" class="badge " href="sheet-google-home.html#sensi-hero" data-sheet="sheet-google-home.html"><span>Home · Sensi · Nest</span></a>
+<a data-owner="Wright" data-tile="status" data-tile-id="rail-status" class="badge " href="sheet-status.html#status-feeds" data-sheet="sheet-status.html"><span>Status</span></a>
 </div></div>
     <div class="rail-foot">Branch build. Not live.</div>
   </nav>
 
   <footer class="ftr" data-owner="Wright" data-tile="sources" data-tile-id="sources">
-    <span id="w-src" style="display:contents"><span><b>Data</b></span></span><span class="ftr-stale" id="w-stale-t" hidden></span>
+    <span id="w-src" style="display:contents"><span><b>Data</b></span></span><span class="ftr-stale" id="w-stale-t" data-go="sheet-status.html#status-feeds" hidden></span>
     <span class="r modes" id="w-modes"></span>
   </footer>
 </div>
@@ -347,12 +347,13 @@
     act.sceneButtons().forEach(function (b) {
       var el = $("w-scene-" + b.id);
       el.classList.toggle("is-dim", !!b.disabled); /* no key: the tap still logs the house status; lights stay as they are */
-      el.querySelector("small").textContent = faceText(b.sub) || sceneWords(b.id);
+      if (!el.classList.contains("is-off")) el.querySelector("small").textContent = faceText(b.sub) || sceneWords(b.id);
     });
     $("w-scene-note").textContent = msg || (act.hasKey() ? "Scenes: I'm home, Leaving" : "Scenes: I'm home, Leaving");
   }
   ["home", "leave"].forEach(function (id) {
     $("w-scene-" + id).addEventListener("click", function () {
+      if ($("w-scene-" + id).getAttribute("aria-disabled") === "true") return; /* the delegated tap handler shows the reason */
       if (!act.hasKey()) return; /* no key: the logistics tap still logs; no lights request, no NEED KEY on the face */
       var r = act.scene(id);
       paintScenes(r.sent ? (id === "home" ? "Kitchen + Dining on" : "All Kasa off") : faceText(r.reason));
@@ -454,12 +455,18 @@
   var renames = null; /* config/display-rename.json compiled; board-only renames, calendar text otherwise as the data gives it */
   function D(s) { return LS.displayText(s, renames); }
   var ltControls = null;
+  function flashOff(el) { el.classList.add("is-said"); setTimeout(function () { el.classList.remove("is-said"); }, 2500); }
   function paintTaps() {
     var now = Date.now();
     ltControls = LS.logisticsControls(feeds.logistics, now);
     /* ION fidelity: one static band (I'm home / Leaving / Check in / Running late), copy from logistics-taps.json */
     var on = !!ltControls;
-    ["w-scene-home", "w-scene-leave"].forEach(function (id) { $(id).disabled = !on && !act.hasKey(); });
+    /* LIVEDATA1: off = drawn dim with the reason (today's taps file not in yet); a tap shows the reason, never a silent no-op */
+    ["w-scene-home", "w-scene-leave"].forEach(function (id) {
+      var off = !on && !act.hasKey(); $(id).disabled = false;
+      $(id).setAttribute("aria-disabled", off ? "true" : "false"); $(id).classList.toggle("is-off", off);
+      if (off) $(id).querySelector("small").textContent = "Off \u00b7 today's taps not in yet";
+    });
     var st = on ? LS.logisticsFor(LS.readState(store), now) : { taps: [], status: null };
     var lastOf = function (c, kid) { return st.taps.filter(function (x) { return x.control === c && (!kid || x.kid === kid); }).pop(); };
     var byId = function (id) { return on ? ltControls.filter(function (c) { return c.id === id; })[0] : null; };
@@ -536,9 +543,12 @@
     if (t.hasAttribute("data-timer-label")) { var l = t.getAttribute("data-timer-label"); timerLabel = timerLabel === l ? null : l; paintTimer(); return; }
     if (t.hasAttribute("data-timer-min")) { P.setTimer(store, Number(t.getAttribute("data-timer-min")), timerLabel, Date.now()); timerEndShown = false; paintTimer(); return; }
     if (t.hasAttribute("data-timer-clear")) { P.clearTimer(store); timerLabel = null; paintTimer(); return; }
+    if (t.hasAttribute("data-ltap") && t.getAttribute("aria-disabled") === "true") { flashOff(t); return; }
     if (t.hasAttribute("data-ltap")) { if (!ltControls) return; ltap(t.getAttribute("data-ltap"), t.getAttribute("data-kid") || undefined, t.hasAttribute("data-min") ? Number(t.getAttribute("data-min")) : undefined, t.hasAttribute("data-scene")); paint(); return; }
     if (!groc) return;
-    if (t.hasAttribute("data-groc-filter")) grocFilter = t.getAttribute("data-groc-filter") === "costco" ? "costco" : "all";
+    if (t.hasAttribute("data-groc-filter")) { var gf = t.getAttribute("data-groc-filter") === "costco" ? "costco" : "all";
+      if (gf === grocFilter) { var gl = $("w-groc-list"); gl.classList.add("is-hint"); setTimeout(function () { gl.classList.remove("is-hint"); }, 2500); } /* already on: the list answers */
+      grocFilter = gf; }
     else if (t.hasAttribute("data-groc-add")) groc.add(t.getAttribute("data-groc-add"));
     else if (t.hasAttribute("data-groc-toggle")) groc.toggle(t.getAttribute("data-groc-toggle"));
     else if (t.hasAttribute("data-groc-more")) grocMore = !grocMore;
@@ -636,10 +646,11 @@
     var L1 = K.law(j, now), cx = L1 && L1.choice;
     if (!c0.open && !c0.owner) { /* closed with nobody on it = Atlas's Dad Seat exception: his copy, the names dim (no tap writes), tap goes to the Dad Seat */
       if (!(cx && cx.exception === true && typeof cx.copy === "string" && cx.copy)) return "";
-      return '<div class="claim-h" data-go="sheet-dan.html#ds-next"><span class="kick">Choice</span><b>' + esc(c0.job.word) + "</b><small>" + esc(D(cx.copy)) + '</small></div><div class="cj-row is-closed" data-go="sheet-dan.html#ds-next">' +
-        K.ORDER.map(function (k) { return '<span class="cj is-dim"><span>' + esc(k.charAt(0).toUpperCase() + k.slice(1)) + '</span><i class="lock" aria-hidden="true"></i></span>'; }).join("") + "</div>";
+      /* PRESS-01: the chips answer in place (the closed line lights); nothing routes through the Dad Seat */
+      return '<div class="claim-h"><span class="kick" data-inplace="choice-hint" role="button" tabindex="0">Choice</span><b>' + esc(c0.job.word) + '</b><small class="claim-why">' + esc(D(cx.copy)) + '</small></div><div class="cj-row is-closed">' +
+        K.ORDER.map(function (k) { return '<button type="button" class="cj is-dim" data-inplace="choice-closed" aria-disabled="true"><span>' + esc(k.charAt(0).toUpperCase() + k.slice(1)) + '</span><i class="lock" aria-hidden="true"></i></button>'; }).join("") + "</div>";
     }
-    var head = '<div class="claim-h"><span class="kick">Choice</span><b>' + esc(c0.job.word) + "</b><small>" +
+    var head = '<div class="claim-h"><span class="kick" data-inplace="choice-hint" role="button" tabindex="0">Choice</span><b>' + esc(c0.job.word) + "</b><small>" +
       (c0.owner ? esc(c0.job.word + " \u00b7 " + c0.ownerName + ".") : "First tap owns it.") + "</small></div>"; /* Atlas's choice wording */
     return head + '<div class="cj-row">' + K.ORDER.map(function (k) {
       var c = K.choice(j, store, k, now), name = k.charAt(0).toUpperCase() + k.slice(1);
@@ -826,6 +837,7 @@
   function paint() {
     var now = Date.now();
     paintNext(now);
+    paintGlance(now); railSpans();
     var mode = paintMode(now);
 
     var ch = S.pickupChain(feeds.pickup, { now: now });
@@ -848,6 +860,7 @@
           + "</div>";
       }).join("");
     } else $("w-chain-cells").innerHTML = "";
+    $("w-chain").setAttribute("data-rows", ch && !snVisible ? String(Math.min(4, ch.rows.length)) : "0"); /* SPACE-01: one ride runs the row */
     paintWho(now, mode);
     var pf = S.packFlags(feeds.pack, { now: now });
     var flags = pf ? pf.flags.filter(function (f) { return D(f.text); }) : [];
@@ -858,14 +871,24 @@
     var ast = act.state();
     var sensiFeed = act.hasKey() && ast.liveAt ? { status: "live", updatedAt: ast.liveAt, thermostat: ast.th } : feeds.sensi;
     var stale = S.staleFeeds({ cal: feeds.cal, sensi: sensiFeed, nest: feeds.nest, lights: feeds.lights }, { now: now });
+    /* LIVEDATA1: the dot lights (dim amber, no red, no motion) when any feed is more than 2 h old */
+    var old2h = oldFeeds(now, sensiFeed);
+    old2h.forEach(function (n) { if (stale.indexOf(n) < 0) stale.push(n); });
     $("w-stale").hidden = !stale.length; /* a dot only; the words ride in the footer */
+    $("w-stale").classList.toggle("on", old2h.length > 0);
     $("w-stale-t").hidden = !stale.length;
     $("w-stale-t").textContent = stale.length ? "Behind \u00b7 " + stale.join(", ") : "";
     var strip = S.statusStrip({ nest: feeds.nest, sensi: sensiFeed, houseMode: feeds.houseMode, temps: feeds.temps, laundry: null }, { now: now })
       .filter(function (l) { return !l.need; }); /* NEED TOKEN items (laundry) stay off the face; their notice lives on sheet-status */
     $("w-lights-row").innerHTML = strip.map(lightHtml).join("");
-    var loops = S.openLoops ? S.openLoops([], { now: now }) : [];
-    $("w-loops").hidden = !(loops && loops.length); /* no open-loops source wired: collapse, never a blank list */
+    /* INV-01: today's calendar REMIND / GET items (agent names filtered); none that pass the face rules -> the row collapses */
+    var NA = window.HouseNoAgent;
+    var loops = S.openLoops && S.calLoops ? S.openLoops(S.calLoops(feeds.cal, { now: now, clean: function (t) { return D(NA && NA.clean ? NA.clean(t) : t); } }), { now: now }) : [];
+    $("w-loops-row").innerHTML = (loops || []).map(function (l) {
+      return '<span class="loop" data-go="' + esc(l.href || "sheet-today.html#today-now") + '" data-src="' + esc(l.source || "") + '">' + esc(l.text) +
+        (l.due ? "<span>" + esc(ct(l.due)) + "</span>" : "") + "</span>";
+    }).join("");
+    $("w-loops").hidden = !(loops && loops.length);
     $("w-loops-empty").hidden = true;
     $("w-lights").hidden = !strip.length && !(loops && loops.length);
     /* FILL1: no open loops -> the status lights join the who's-home band (before "Resets 3 AM"); otherwise their own strip */
@@ -889,6 +912,45 @@
     layout();
   }
 
+  var FEED_MAX_MS = 2 * 60 * 60 * 1000;
+  function oldFeeds(now, sensiFeed) {
+    var list = [["calendar", feeds.cal, "fetchedAt"], ["thermostat", sensiFeed, "updatedAt"], ["cams", feeds.nest, "updatedAt"], ["house mode", feeds.houseMode, "generatedAt"],
+      ["next up", feeds.nextUp, "generatedAt"], ["seats", feeds.kidSeats, "generatedAt"], ["pickups", feeds.pickup, "generatedAt"], ["school night", feeds.schoolNight, "generatedAt"],
+      ["unlocks", feeds.unlocks, "generatedAt"], ["taps", feeds.logistics, "generatedAt"]];
+    var out = [];
+    list.forEach(function (x) {
+      if (!x[1]) return;
+      var t = Date.parse(x[1][x[2]] || x[1].fetchedAt || x[1].updatedAt || x[1].generatedAt || "");
+      if (!isFinite(t) || now - t > FEED_MAX_MS) out.push(x[0]);
+    });
+    if (feeds.whoHome && feeds.whoHome.date && feeds.whoHome.date !== houseDayOf(now)) out.push("who's home");
+    return out;
+  }
+  /* SPACE-01 header glance: one line, the next leave countdown and today's handoff */
+  function paintGlance(now) {
+    var a = "", b = "", c = "";
+    var nx = feeds.nextUp && feeds.nextUp.next, lt = nx && Date.parse(nx.leaveIso || "");
+    if (isFinite(lt) && lt > now && feeds.nextUp.asOfIso === ctDay(now)) {
+      var m = Math.round((lt - now) / 60000), hh = Math.floor(m / 60), mm = m % 60;
+      a = "Leave in " + (hh ? hh + "h " : "") + mm + "m";
+      b = D(nx.label) || "";
+    }
+    /* today's handoff = Atlas's house-mode timeline: the kids-away span that starts later today */
+    var tl = feeds.houseMode && Array.isArray(feeds.houseMode.timeline) ? feeds.houseMode.timeline : [];
+    var hv = tl.filter(function (x) { var t0 = Date.parse(x && x.since || ""); return x && x.mode === "kids-away" && isFinite(t0) && t0 > now && ctDay(t0) === ctDay(now); })[0];
+    if (hv) {
+      var ho = "Handoff " + ct(hv.since);
+      if (a) c = ho; else { a = ho; b = "Today"; }
+    }
+    $("w-glance").hidden = !a;
+    $("w-glance-a").textContent = a; $("w-glance-b").textContent = b; $("w-glance-c").textContent = c;
+  }
+  function railSpans() { /* SPACE-01: the odd last badge of a group spans both columns (no rail holes) */
+    document.querySelectorAll(".rail .rail-grid").forEach(function (g) {
+      var vis = Array.prototype.filter.call(g.querySelectorAll(".badge"), function (b) { return !b.hidden; });
+      vis.forEach(function (b, i) { b.classList.toggle("is-span", vis.length % 2 === 1 && i === vis.length - 1); });
+    });
+  }
   function get(name) {
     return fetch("data/" + name + "?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
@@ -925,7 +987,13 @@
     var n = e.target.closest ? e.target.closest("[data-nice-dim]") : null;
     if (n) { var sm = n.querySelector("small"); sm.textContent = "Ask a parent"; n.classList.add("is-said"); setTimeout(function () { sm.textContent = "Parent only"; n.classList.remove("is-said"); }, 3000); return; }
     /* JARX1: a jar tap opens the jar explainer (sheet-index.html#jar-rules) through [data-go] above */
-    var h = e.target.closest ? e.target.closest("#w-ltap-checkin") : null;
+    /* PRESS-01: titles answer in place. Timer lights its minute chips; Who's home lights the I'm here chips; a closed CHOICE chip lights its line */
+    var ti = e.target.closest ? e.target.closest("[data-inplace=timer-hint],[data-inplace=late-hint],[data-inplace=choice-hint]") : null;
+    if (ti) { var hk = ti.getAttribute("data-inplace"), tm = hk === "timer-hint" ? $("w-timer-mins") : hk === "late-hint" ? $("w-ltap-late-row") : document.querySelector("#w-claim .cj-row");
+      if (tm) { tm.classList.add("is-hint"); setTimeout(function () { tm.classList.remove("is-hint"); }, 2500); } return; }
+    var cc = e.target.closest ? e.target.closest("[data-inplace=choice-closed]") : null;
+    if (cc) { var why = document.querySelector("#w-claim .claim-why"); if (why) { why.classList.add("is-said"); setTimeout(function () { why.classList.remove("is-said"); }, 2500); } return; }
+    var h = e.target.closest ? e.target.closest("#w-ltap-checkin, [data-inplace=who-hint]") : null;
     if (h) { document.querySelectorAll(".seat .here-chip").forEach(function (b) { b.classList.add("is-hint"); }); $("w-ltap-checkin-s").textContent = "I'm here is on each seat"; setTimeout(function () { document.querySelectorAll(".here-chip.is-hint").forEach(function (b) { b.classList.remove("is-hint"); }); paintTaps(); }, 3000); }
   });
   if (L && L.startPolling) L.startPolling(); /* existing lights client: no key -> no proxy requests (AUDIT1) */

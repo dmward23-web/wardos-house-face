@@ -243,3 +243,50 @@ html body.wall-kiosk[data-plate][data-master="ion"] .seats-law .here-chip small:
 html body.wall-kiosk[data-plate][data-master="ion"] .seats-law .here-chip.is-in { border-color: var(--ok); background: rgba(var(--ok-rgb), 0.16); }
 html body.wall-kiosk[data-plate][data-master="ion"] .here-chip.is-hint { box-shadow: 0 0 0 2px var(--acc); }
 html body.wall-kiosk[data-plate][data-master="ion"] .rail .badge[hidden] { display: none !important; } /* PRESS3: a no-source badge collapses */
+
+/* ---------- SPACE-01 / LIVEDATA1 / PRESS-01 (Atlas 10/2, real data at the current clock) ---------- */
+html body.wall-kiosk[data-plate][data-master="ion"] .hdr .glance:not([hidden]) + .sp { flex: 0 0 0; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .hdr .mark { align-self: flex-end; margin-top: 0; margin-bottom: 6px; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .hdr .home-hint { align-self: flex-end; margin-bottom: 4px; }
+html body.wall-kiosk[data-plate][data-master="ion"] .stale-dot.on i { background: rgba(var(--amber-rgb), 0.45); border-color: rgba(var(--amber-rgb), 0.55); box-shadow: none; }
+html body.wall-kiosk[data-plate][data-master="ion"] .tap.big.is-off { opacity: 0.42; cursor: default; filter: grayscale(0.6); }
+html body.wall-kiosk[data-plate][data-master="ion"] .tap.big.is-off small { color: var(--mute2); }
+html body.wall-kiosk[data-plate][data-master="ion"] .tap.big.is-off.is-said { opacity: 0.75; }
+html body.wall-kiosk[data-plate][data-master="ion"] .tap.big.is-off.is-said small { color: var(--amber); }
+html body.wall-kiosk[data-plate][data-master="ion"] .rail .rail-grid > .badge.is-span { grid-column: 1 / -1; }
+html body.wall-kiosk[data-plate][data-master="ion"] .rail-top[data-go] { cursor: pointer; }
+html body.wall-kiosk[data-plate][data-master="ion"] .ftr-stale[data-go] { cursor: pointer; }
+html body.wall-kiosk[data-plate][data-master="ion"] [data-inplace="timer-hint"], html body.wall-kiosk[data-plate][data-master="ion"] [data-inplace="who-hint"] { cursor: pointer; }
+html body.wall-kiosk[data-plate][data-master="ion"] #w-timer-mins.is-hint .chip { box-shadow: 0 0 0 2px var(--acc); }
+html body.wall-kiosk[data-plate][data-master="ion"] .claim .cj.is-dim { cursor: pointer; }
+html body.wall-kiosk[data-plate][data-master="ion"] .claim .claim-why.is-said { color: var(--amber); }
+html body.wall-kiosk[data-plate][data-master="ion"] .hdr .date, html body.wall-kiosk[data-plate][data-master="ion"] .hdr .mode, html body.wall-kiosk[data-plate][data-master="ion"] .hdr .home-hint, html body.wall-kiosk[data-plate][data-master="ion"] .hdr .clock { flex-shrink: 0; white-space: nowrap; }
+html body.wall-kiosk[data-plate][data-master="ion"] .hdr .mode .mv { white-space: nowrap; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-chain[data-rows="1"] .c-cell { display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; gap: 28px; flex-wrap: nowrap; flex: 1 1 auto; min-width: 0; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-chain[data-rows="1"] .c-cell > * { margin: 0; white-space: nowrap; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-chain[data-rows="1"] .c-top { display: flex; align-items: baseline; gap: 18px; }
+html body.wall-kiosk[data-plate][data-master="ion"] .rail-foot { text-align: center; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .hdr .date { align-self: flex-end; margin-top: 0; margin-bottom: 14px; }
+html body.wall-kiosk[data-plate][data-master="ion"] #w-bell > span { display: flex; flex-direction: column; gap: 4px; }
+
+html body.wall-kiosk[data-plate][data-master="ion"] .hdr .glance { flex: 1 1 auto; min-width: 0; align-self: stretch; display: flex; flex-direction: column; justify-content: center; gap: 4px; white-space: nowrap; overflow: hidden; padding: 12px 0 10px; }
+html body.wall-kiosk[data-plate][data-master="ion"] .hdr .glance .g-big { display: flex; align-items: baseline; justify-content: space-between; gap: 28px; min-width: 0; }
+html body.wall-kiosk[data-plate][data-master="ion"] .hdr .glance .g-big b { font-family: var(--display); font-weight: 600; font-size: 80px; line-height: 1; color: var(--ink); overflow: hidden; text-overflow: ellipsis; }
+html body.wall-kiosk[data-plate][data-master="ion"] .hdr .glance .g-big em { font-style: normal; font-family: var(--display); font-weight: 600; font-size: 48px; line-height: 1; color: var(--ink); flex: none; }
+html body.wall-kiosk[data-plate][data-master="ion"] .hdr .glance .g-sub { font-family: var(--body); font-size: 32px; line-height: 1.1; color: var(--mute); overflow: hidden; text-overflow: ellipsis; }
+html body.wall-kiosk[data-plate][data-master="ion"] .rail .badge { justify-content: center; text-align: center; }
+html body.wall-kiosk[data-plate][data-master="ion"] .rail .rail-h { text-align: center; }
+html body.wall-kiosk[data-plate][data-master="ion"] #w-lamps:not([hidden]) { display: flex; flex-direction: column; }
+html body.wall-kiosk[data-plate][data-master="ion"] #w-lamps > .lamp:not([hidden]) { flex: 1 1 auto; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .rail { padding-top: 8px; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-chain[data-rows="1"] .c-cell { align-items: center; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-chain[data-rows="1"] .c-top { align-items: center; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-chain[data-rows="1"] .c-time { font-size: 72px; line-height: 1; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-chain[data-rows="1"] .c-tag { font-size: 26px; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-chain[data-rows="1"] .c-who { font-size: 46px; line-height: 1.1; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) #w-chain[data-rows="1"] .c-where { font-size: 34px; line-height: 1.1; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .hdr .mode { align-self: flex-end; margin-bottom: 6px; }
+html body.wall-kiosk[data-plate][data-master="ion"]:not(.is-stacked) .rail { padding-bottom: 4px; }
+html body.wall-kiosk[data-plate][data-master="ion"] [data-inplace="late-hint"], html body.wall-kiosk[data-plate][data-master="ion"] [data-inplace="choice-hint"] { cursor: pointer; }
+html body.wall-kiosk[data-plate][data-master="ion"] #w-ltap-late-row.is-hint .chip, html body.wall-kiosk[data-plate][data-master="ion"] #w-claim .cj-row.is-hint .cj { box-shadow: 0 0 0 2px var(--acc); }
+html body.wall-kiosk[data-plate][data-master="ion"] #w-groc-list.is-hint { box-shadow: 0 0 0 2px var(--acc); }

@@ -20,7 +20,7 @@ Last run (Thu Oct 1, 10:40 PM CT): 1920x1080 and 2560x1440, 103 presses each (47
 - Jar = **in place** (shows the rule). There is no jar explainer page yet; that is a gap.
 - Thermostat - / + = **in place**: without the hub key it says it needs Dan's OK and draws dim. NEED KEY is never painted.
 - Rail badges go to anchored pages (`page.html#anchor`), not page tops.
-- Status lights go to their feed's page with an anchor (`PAGE_ANCHOR` map in `wall.html`); the lights head goes to `sheet-lights.html#lights-pad-grid`.
+- Status lights go to their feed's page with an anchor (`PAGE_ANCHOR` map in `wall.html`); the lights head goes to `sheet-lights.html#lights-board`.
 - The Desk gate is reached only through the Dad Seat (`sheet-dan.html#ds-desk`), never straight from the wall.
 - Dates in the countdown frame / date line go to `month.html#d-YYYY-MM-DD` (pattern `month.html#d-*`).
 
@@ -41,7 +41,7 @@ Last run (Thu Oct 1, 10:40 PM CT): 1920x1080 and 2560x1440, 103 presses each (47
 | `temp-read` | go | `sheet-google-home.html#sensi-hero` |  |
 | `temp-step` | inplace | feedback on the wall | says Needs Dan's OK (setpoint writes off) |
 | `travel` | inplace | feedback on the wall | without the hub key: says Needs the hub key; with it: Travel / Back home |
-| `lights-head` | go | `sheet-lights.html#lights-pad-grid` |  |
+| `lights-head` | go | `sheet-lights.html#lights-board` |  |
 | `light-chip` | inplace | feedback on the wall | without the hub key: Needs the hub key |
 | `doorbell` | go | `sheet-google-home.html#cam-next-step` |  |
 | `doors` | go | `sheet-google-home.html#sensi-hero` |  |

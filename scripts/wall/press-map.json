@@ -22,7 +22,7 @@
   "sheet-google-home.html#cam-next-step",
   "sheet-google-home.html#laundry",
   "sheet-status.html#status-feeds",
-  "sheet-lights.html#lights-pad-grid",
+  "sheet-lights.html#lights-board",
   "kid-hayes.html#kid-board",
   "kid-harris.html#kid-board",
   "kid-ainsley.html#kid-board"
@@ -111,7 +111,7 @@
    "id": "lights-head",
    "selector": ".ah[data-go^='sheet-lights.html']",
    "kind": "go",
-   "dest": "sheet-lights.html#lights-pad-grid"
+   "dest": "sheet-lights.html#lights-board"
   },
   {
    "id": "light-chip",

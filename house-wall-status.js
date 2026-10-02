@@ -458,6 +458,37 @@
     return list.slice(0, 3); /* [] -> strip hidden */
   }
 
+  /* INV-01 (Atlas 10/2): today's calendar REMIND / GET items are the open-loops source.
+     "REMIND · x", "GET · x", or "<who> — get x" on today's CT date, not yet past. The who-prefix and any
+     agent hand-off ("→ Ledger") are dropped; clean (house-noagent) runs on the words when given. Everything
+     still goes through isHouseLoop, so money, people and messages never reach the face. */
+  var LOOP_RE = /^\s*(?:(REMIND|GET)\b\s*[·:\-\u2014]?\s*|[^\u2014]{1,40}\s\u2014\s*(get|remind)\b\s*)(.+)$/i;
+  function ctDayOf(ms) {
+    try { return new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(ms)); }
+    catch (e) { return ""; }
+  }
+  function calLoops(cal, opts) {
+    opts = opts || {};
+    var now = nowMs(opts.now), clean = typeof opts.clean === "function" ? opts.clean : function (t) { return t; };
+    if (!cal || !Array.isArray(cal.upcomingLeaves)) return [];
+    var seen = {};
+    return cal.upcomingLeaves.filter(function (e) {
+      var t = parse(e && e.start);
+      return e && !e.allDay && t && ctDayOf(t) === ctDayOf(now) && parse(e.end || e.start) >= now;
+    }).map(function (e) {
+      var m = LOOP_RE.exec(String(e.summary || ""));
+      if (!m) return null;
+      var verb = (m[1] || m[2] || "").toLowerCase();
+      var what = clean(String(m[3]).replace(/\s*\u2192\s*[A-Z][\w ]*?(?=\s*\(|$)/, "").trim());
+      if (!what) return null;
+      var text = (verb === "get" ? "Get " : "Remind \u00b7 ") + what;
+      var obj = what.split(/\s*[(\u00b7]/)[0].trim() || what;
+      if (seen[text]) return null; seen[text] = 1;
+      return { kind: "house-object", object: obj, text: text, severity: "task", due: e.start,
+        asOf: cal.fetchedAt, freshMs: FRESH.cal, href: "sheet-today.html#today-now", source: "cal-live" };
+    }).filter(Boolean);
+  }
+
   /* Loops derivable from feeds that exist today: Kasa light offline. */
   function lightLoops(lightsLive) {
     if (!lightsLive || lightsLive.status !== "live" || !Array.isArray(lightsLive.lights)) return [];
@@ -477,7 +508,7 @@
     ARM_MS: ARM_MS, armTap: armTap, isArmed: isArmed, isTravelThermo: isTravelThermo, travelButton: travelButton,
     statusStrip: statusStrip, nextUp: nextUp, staleFeeds: staleFeeds,
     bandsFromTemps: bandsFromTemps, pickupChain: pickupChain, whoHome: whoHome, houseDay: houseDay, packFlags: packFlags, KID_NAMES: KID_NAMES,
-    isHouseLoop: isHouseLoop, openLoops: openLoops, lightLoops: lightLoops,
+    isHouseLoop: isHouseLoop, openLoops: openLoops, lightLoops: lightLoops, calLoops: calLoops,
     _ctIso: ctIso
   };
 });
