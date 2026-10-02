@@ -6,10 +6,16 @@
    Usage: node scripts/display-rename.mjs [--check] [--money] data/cal-months.json data/kids-week.json kids-week.json data/cal-live.json kids-data.js */
 import fs from "node:fs";
 import { displayDeepReport, momHits } from "./house/display-rename.mjs";
+import { kidCopyDeep, kidMoneyHits } from "./house/kid-copy.mjs";
+if (process.argv.includes("--help") || process.argv.includes("-h")) { /* ATLASLANE7 --help is print-only, never writes */
+  process.stdout.write("Usage: node scripts/display-rename.mjs [--check] [--money] [--kid-copy] <files…>\n--help prints this and writes nothing.\n");
+  process.exit(0);
+}
 
 const args = process.argv.slice(2);
 const check = args.includes("--check");
 const money = args.includes("--money"); /* calendar-label files only (cal-months.json) */
+const kidCopy = args.includes("--kid-copy"); /* kids-week files: no $ / jar / payday / balance copy (ATLASLANE7) */
 let bad = 0;
 for (const fp of args.filter((a) => !a.startsWith("--"))) {
   if (!fs.existsSync(fp)) { console.log(`${fp}: absent, skip`); continue; }
@@ -20,7 +26,14 @@ for (const fp of args.filter((a) => !a.startsWith("--"))) {
     if (!m) { console.log(`${fp}: no EMBEDDED block, skip`); continue; }
     obj = JSON.parse(m[1]); wrap = m;
   } else obj = JSON.parse(src);
-  const { value, renamed, dropped } = displayDeepReport(obj, undefined, { money });
+  const rep = displayDeepReport(obj, undefined, { money });
+  let { value } = rep;
+  const { renamed, dropped } = rep;
+  if (kidCopy) {
+    const before = JSON.stringify(value);
+    value = kidCopyDeep(value);
+    if (JSON.stringify(value) !== before) renamed.push({ from: `${kidMoneyHits(JSON.parse(before)).length} kid money strings`, to: `${kidMoneyHits(value).length}` });
+  }
   for (const r of renamed) console.log(`${fp}: renamed ${JSON.stringify(r.from)} -> ${JSON.stringify(r.to)}`);
   for (const d of dropped) console.log(`${fp}: dropped ${JSON.stringify(d)}`);
   const left = momHits(value);

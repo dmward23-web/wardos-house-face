@@ -9,7 +9,8 @@
  * into board-os/house-face when present.
  *
  * NEVER invents calendar facts. NEVER touches Family calendar.
- * Preserves quests / jars / currency / missions / streaks.
+ * Preserves quests / goals / currency / missions / streaks; every write runs kidCopyDeep (ATLASLANE7):
+ * no $, jar, payday or balance copy, only Ainsley's babysitting rate tag.
  *
  * Usage:
  *   node scripts/calendar-refresh.mjs --events /path/to/events.json
@@ -24,6 +25,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { displayDeep } from "./house/display-rename.mjs"; /* ATLASLANE6 display-only renames, never the calendar */
+import { kidCopyDeep } from "./house/kid-copy.mjs"; /* ATLASLANE7 no $ / jar / payday / balance copy (Ainsley's rate tag stays) */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -662,7 +664,7 @@ function rebuildEmbed(kidsDataPath, weekObj) {
 }
 
 function writeWeekTree(weekPath, weekObj, kidsDataPath, dryRun) {
-  weekObj = displayDeep(weekObj); /* "Mom & Dad" -> "Nonna and Papa" etc. (config/display-rename.json) */
+  weekObj = kidCopyDeep(displayDeep(weekObj)); /* renames (config/display-rename.json) + board-safe kid copy (kid-copy.mjs) */
   const dataTwin = path.join(path.dirname(weekPath), "data", "kids-week.json");
   const text = JSON.stringify(weekObj, null, 2) + "\n";
   if (dryRun) {
@@ -679,7 +681,7 @@ function writeWeekTree(weekPath, weekObj, kidsDataPath, dryRun) {
 }
 
 function mirrorToBoardOs(mirrorDir, weekObj, dryRun) {
-  weekObj = displayDeep(weekObj);
+  weekObj = kidCopyDeep(displayDeep(weekObj));
   if (!mirrorDir || !fs.existsSync(mirrorDir)) {
     console.log("calendar-refresh: mirror skip (no dir)", mirrorDir);
     return;

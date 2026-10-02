@@ -17,6 +17,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { displayDeep } from "./house/display-rename.mjs"; /* ATLASLANE6 display-only renames, never the calendar */
+import { kidCopyDeep } from "./house/kid-copy.mjs"; /* ATLASLANE7 no $ / jar / payday / balance kid copy */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -456,7 +457,7 @@ function patchKidsWeek(weekPath, cal, upcoming, slimAll) {
     }
   }
 
-  const text = JSON.stringify(displayDeep(week));
+  const text = JSON.stringify(kidCopyDeep(displayDeep(week)));
   fs.writeFileSync(weekPath, text + "\n");
 
   /* Keep data/kids-week.json identical */
@@ -477,7 +478,7 @@ function patchKidsWeek(weekPath, cal, upcoming, slimAll) {
 function syncEmbedded(weekObj) {
   const kidsDataPath = path.join(ROOT, "kids-data.js");
   let src = fs.readFileSync(kidsDataPath, "utf8");
-  const json = JSON.stringify(displayDeep(weekObj));
+  const json = JSON.stringify(kidCopyDeep(displayDeep(weekObj)));
   const re = /var EMBEDDED = \{[\s\S]*?\};/;
   if (!re.test(src)) {
     console.error("WARN: EMBEDDED block not found in kids-data.js — skip sync");

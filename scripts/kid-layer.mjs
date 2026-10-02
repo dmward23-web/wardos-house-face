@@ -12,6 +12,11 @@ import fs from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loadInputs, readJson, writeJson, ctIso } from "./house/lib.mjs";
 import { computeKidLayer } from "./house/kid-layer-lib.mjs";
+const USAGE = "Usage: node scripts/kid-layer.mjs [--data-dir data] [--events …] [--taps …] [--uses …] [--now ISO] [--stdout] [--help]\n--help prints this and writes nothing.";
+if (process.argv.includes("--help") || process.argv.includes("-h")) { /* ATLASLANE7 --help is print-only, never writes */
+  process.stdout.write(USAGE + "\n");
+  process.exit(0);
+}
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 

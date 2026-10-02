@@ -128,7 +128,12 @@ export function computeSchoolNight({ calendar, kidsWeek, config, packFlags, now,
   return out;
 }
 
+const USAGE = "Usage: node scripts/school-night.mjs [--data-dir data] [--events …] [--pack-flags data/pack-flags.json] [--now ISO] [--out data/school-night.json] [--stdout] [--help]\n--help prints this and writes nothing.";
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  if (process.argv.includes("--help") || process.argv.includes("-h")) { /* ATLASLANE7 --help is print-only, never writes */
+    process.stdout.write(USAGE + "\n");
+    process.exit(0);
+  }
   const argv = process.argv.slice();
   let pf = null;
   const i = argv.indexOf("--pack-flags");

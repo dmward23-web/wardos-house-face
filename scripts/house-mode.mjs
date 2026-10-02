@@ -163,7 +163,12 @@ export function loadInputs(a) {
   return { ...loadAll(a), config: readJson(a.config) };
 }
 
+const USAGE = "Usage: node scripts/house-mode.mjs [--data-dir data] [--cal-live …] [--events …] [--kids-week …] [--config …] [--override …] [--now ISO] [--out data/house-mode.json] [--stdout] [--help]\n--help prints this and writes nothing.";
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  if (process.argv.includes("--help") || process.argv.includes("-h")) { /* ATLASLANE7 --help is print-only, never writes */
+    process.stdout.write(USAGE + "\n");
+    process.exit(0);
+  }
   const a = parseArgs(process.argv);
   const inp = loadInputs(a);
   const out = computeHouseMode({ ...inp, now: a.now == null || isNaN(a.now) ? Date.now() : a.now });

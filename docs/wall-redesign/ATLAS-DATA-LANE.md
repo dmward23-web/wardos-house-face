@@ -162,3 +162,13 @@ Contract: `docs/wall-redesign/LOGISTICS-TAPS.md`. Four taps (I'm home, Leaving, 
 ### Zero dollars, no score (DAN RULING t2812u #1, Alfred KL-05)
 - The one allowed dollar string is Ainsley's babysitting rate tag (`moneyScrub.allow` in `config/display-rename.json`); it is never stripped. Every Atlas-lane file has zero dollar strings (`moneyHits`, test).
 - Ainsley's seat in `kid-seats.json` is `{name, week: {closed}}` (+ `copy` when closed). No XP, points, counts, streaks, stars. `computeKidLayer` refuses to write if `scoreHits` finds any.
+
+## ATLASLANE7: kid copy fixed at the source, --help print-only
+
+- `scripts/house/kid-copy.mjs` is the one kid-copy pass. `calendar-refresh.mjs` (root copy, data twin, board-os mirror) and `cal-from-events.mjs` (kids-week + kids-data.js EMBEDDED) run `kidCopyDeep(displayDeep(week))` on every write, so the preserved kid sections can never carry the old money copy back.
+- Wording follows Wright's KIDPATH1 scrub exactly (an exact-string map). Anything new falls back to generic rules: the old savings-container names become Gems / Victory Coins / Tour goal, a dollar-sign chore amount becomes a star count (`7★ wk`), the old reward-day word becomes "goal day", and the old stored-total word becomes Stars. One extra string versus Wright: the Hayes reward line now reads "Goal with Dad after honest musts".
+- Ainsley's babysitting rate tag stays verbatim; it is the only dollar sign in any kids-week copy.
+- Ids, keys, hrefs and numbers are left alone (saved state keys off them).
+- Apply by hand: `node scripts/display-rename.mjs --kid-copy data/kids-week.json kids-week.json kids-data.js`.
+- `--help` / `-h` is print-only on next-up, school-night, logistics-taps, pickup-chain, house-mode, kid-layer and display-rename. It prints usage and exits 0 before reading or writing anything.
+- Test: `scripts/house/tests/atlaslane7.test.mjs` regenerates kids-week from the old copy in a temp dir through `calendar-refresh.mjs --no-mirror` and asserts zero dollar signs except the tag (root, data twin, EMBEDDED).

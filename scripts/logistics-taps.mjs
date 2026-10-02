@@ -8,6 +8,11 @@ import { fileURLToPath } from "node:url";
 import { readJson, writeJson, scanObject } from "./house/lib.mjs";
 import { logisticsFile } from "./house/logistics-lib.mjs";
 import { momHits } from "./house/display-rename.mjs";
+const USAGE = "Usage: node scripts/logistics-taps.mjs [--state <local export>] [--now ISO] [--out data/logistics-taps.json] [--stdout] [--help]\n--help prints this and writes nothing.";
+if (process.argv.includes("--help") || process.argv.includes("-h")) { /* ATLASLANE7 --help is print-only, never writes */
+  process.stdout.write(USAGE + "\n");
+  process.exit(0);
+}
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const a = { state: null, now: null, out: path.join(ROOT, "data/logistics-taps.json"), stdout: false };

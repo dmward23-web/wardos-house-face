@@ -191,7 +191,7 @@
         "title": "Gems · earn then save",
         "blurb": "Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning). ALL musts required. Save what you earned.",
         "need": 10,
-        "reward": "Payday with Dad after honest musts",
+        "reward": "Goal with Dad after honest musts",
         "dollarNeed": 10,
         "weeklyAllowance": 10,
         "starDollar": 1
@@ -427,7 +427,7 @@
         "title": "Victory Coins · earn then save",
         "blurb": "Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning). ALL musts required. Save what you earned.",
         "need": 10,
-        "reward": "Payday with Dad after honest musts",
+        "reward": "Goal with Dad after honest musts",
         "dollarNeed": 10,
         "weeklyAllowance": 10,
         "starDollar": 1
@@ -675,7 +675,7 @@
         "title": "Tour goal",
         "blurb": "Dad-week musts. All musts required. Babysitting is separate.",
         "need": 20,
-        "reward": "Payday with Dad after honest musts",
+        "reward": "Goal with Dad after honest musts",
         "dollarNeed": 20,
         "starDollar": 1,
         "weeklyAllowance": 20
