@@ -1,48 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-01T22:11:41.429Z",
+  "fetchedAt": "2026-10-02T02:11:36.790Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-08",
   "asOfIso": "2026-10-01",
   "nextLeave": {
-    "id": "tah8oji0ahni4old2cd1a6jb5k",
-    "summary": "Pick up Hayes at Casey's",
-    "start": "2026-10-01T18:20:00-05:00",
-    "end": "2026-10-01T18:55:00-05:00",
-    "location": "Casey's, 9504 W 148th St, Overland Park, KS 66221",
-    "busy": true,
+    "id": "6rg63v1kn8df1a9mmdq7gtut4c",
+    "summary": "REMIND · donation receipts → Ledger (Erin list + Goodwill)",
+    "start": "2026-10-01T22:20:00-05:00",
+    "end": "2026-10-01T22:30:00-05:00",
+    "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
+    "busy": false,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "tah8oji0ahni4old2cd1a6jb5k",
-      "summary": "Pick up Hayes at Casey's",
-      "start": "2026-10-01T18:20:00-05:00",
-      "end": "2026-10-01T18:55:00-05:00",
-      "location": "Casey's, 9504 W 148th St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "21pjdlio8sqj8pkn601k6u3n90",
-      "summary": "Dan — HOA Fall Garage Sale",
-      "start": "2026-10-02T00:00:00Z",
-      "end": "2026-10-04T00:00:00Z",
-      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "cn7vvqun5npbi78hn0ece62ufg",
-      "summary": "Hayes — SRE field trip museum+park (chaperone slots)",
-      "start": "2026-10-02T00:00:00Z",
-      "end": "2026-10-02T00:00:00Z",
-      "location": "Johnson County Museum, 8788 Metcalf Ave, Overland Park, KS 66212",
-      "busy": false,
-      "allDay": true
-    },
     {
       "id": "6rg63v1kn8df1a9mmdq7gtut4c",
       "summary": "REMIND · donation receipts → Ledger (Erin list + Goodwill)",
@@ -94,15 +67,6 @@
       "start": "2026-10-02T11:30:00-05:00",
       "end": "2026-10-02T12:30:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "emal8gr2f0h9jidmc8pj332v1g",
-      "summary": "Ainsley — LKMS baby pic due · 3pm",
-      "start": "2026-10-02T12:00:00-05:00",
-      "end": "2026-10-02T12:15:00-05:00",
-      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
       "busy": false,
       "allDay": false
     },
@@ -406,9 +370,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "6:20",
-    "place": "Pick up Hayes at Casey's (Riley's",
-    "detailHtml": "<strong>6:20</strong> Pick up Hayes at Casey's (Riley's",
+    "time": "10:20",
+    "place": "REMIND · donation receipts → Ledger (Erin list + Good…",
+    "detailHtml": "<strong>10:20</strong> REMIND · donation receipts → Ledger (Erin list + Good…",
     "badge": "Thu"
   },
   "error": null

@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 1 2026",
   "asOfIso": "2026-10-01",
-  "refreshedAt": "2026-10-01T22:11:41.060Z",
+  "refreshedAt": "2026-10-02T02:11:36.371Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,27 +16,15 @@
     "endIso": "2026-10-02T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "6:20",
-    "place": "Pick up Hayes at Casey's",
+    "label": "Next up · Fri",
+    "time": "7:00",
+    "place": "SRE specials: No Specials",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-    "badge": "Thu",
-    "startIso": "2026-10-01T23:20:00.000Z",
-    "endIso": "2026-10-01T23:55:00.000Z",
-    "kind": "leave",
+    "badge": "Fri",
+    "startIso": "2026-10-02T12:00:00.000Z",
+    "endIso": "2026-10-02T12:15:00.000Z",
+    "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "6:20",
-        "place": "Pick up Hayes at Casey's",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-01T23:20:00.000Z",
-        "endIso": "2026-10-01T23:55:00.000Z",
-        "kind": "leave",
-        "whenLabel": "6:20",
-        "summary": "Pick up Hayes at Casey's"
-      },
       {
         "label": "Next up · Fri",
         "time": "7:00",
@@ -110,18 +98,6 @@
         "summary": "Hayes — SRE field trip museum+park (chaperone slots)"
       },
       {
-        "label": "Next up · Fri",
-        "time": "12:00",
-        "place": "LKMS baby pic due · 3pm",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
-        "badge": "Fri",
-        "startIso": "2026-10-02T17:00:00.000Z",
-        "endIso": "2026-10-02T17:15:00.000Z",
-        "kind": "other",
-        "whenLabel": "Fri 12:00",
-        "summary": "Ainsley — LKMS baby pic due · 3pm"
-      },
-      {
         "label": "Next up · Sat",
         "time": "8:30",
         "place": "Dan DRIVE → Nashville",
@@ -168,6 +144,30 @@
         "kind": "sport",
         "whenLabel": "Sun 8:30",
         "summary": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "7:00",
+        "place": "SRE specials: Music",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-05T12:00:00.000Z",
+        "endIso": "2026-10-05T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Mon 7:00",
+        "summary": "Harris — SRE specials: Music"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "7:00",
+        "place": "SRE specials: Spanish",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 2 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-05T12:00:00.000Z",
+        "endIso": "2026-10-05T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Mon 7:00",
+        "summary": "Hayes — SRE specials: Spanish"
       }
     ]
   },
@@ -188,10 +188,10 @@
       },
       "bankGoal": {
         "id": "gem-jar",
-        "title": "Gems · earn then save",
-        "blurb": "Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning). ALL musts required. Save what you earned.",
+        "title": "Gem Jar · earn then save",
+        "blurb": "Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Gem Jar $10 AND full $10 payday (1★=$1). ALL musts required — jar/allowance locked until every Must is done. Jar = save what you earned — not free money.",
         "need": 10,
-        "reward": "Goal with Dad after honest musts",
+        "reward": "Payday with Dad after honest musts",
         "dollarNeed": 10,
         "weeklyAllowance": 10,
         "starDollar": 1
@@ -262,7 +262,7 @@
         {
           "when": "Quest reward",
           "what": "🧱 BLOCK BUILD TIME",
-          "hint": "gems · craft optional",
+          "hint": "gems → jar → payday · craft optional",
           "tone": "fun"
         },
         {
@@ -279,17 +279,17 @@
         },
         {
           "when": "Base mission",
-          "what": "💎 Gems · save with Dad",
+          "what": "💎 Gem Jar · save with Dad",
           "hint": "FUN · craft unlock optional",
           "tone": "fun"
         }
       ],
-      "streakLabel": "Week 3 · craft — keep smashing",
+      "streakLabel": "🔥 3-day craft streak — keep smashing",
       "missions": [
         {
           "when": "Anytime",
-          "what": "ALL musts clear = gems",
-          "hint": "ALL musts clear",
+          "what": "🔥 ALL musts clear = gems in the jar",
+          "hint": "ALL musts → jar $10 + $10 payday",
           "tone": "fun"
         },
         {
@@ -424,10 +424,10 @@
       },
       "bankGoal": {
         "id": "victory-jar",
-        "title": "Victory Coins · earn then save",
-        "blurb": "Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning). ALL musts required. Save what you earned.",
+        "title": "Victory Jar · earn then save",
+        "blurb": "Honest Dad-week musts (Fri 3:00p→Fri 3:00p · taps Sat–Fri, leave Fri morning) hit Victory Jar $10 AND full $10 payday (1★=$1). ALL musts required — jar/allowance locked until every Must is done. Jar = save what you earned — not free money.",
         "need": 10,
-        "reward": "Goal with Dad after honest musts",
+        "reward": "Payday with Dad after honest musts",
         "dollarNeed": 10,
         "weeklyAllowance": 10,
         "starDollar": 1
@@ -498,7 +498,7 @@
         {
           "when": "After clears",
           "what": "👑 Victory round — game pick with Dad",
-          "hint": "coins · earn then save",
+          "hint": "coins → jar → payday",
           "tone": "fun"
         },
         {
@@ -509,7 +509,7 @@
         },
         {
           "when": "Base mission",
-          "what": "☂️ Victory Coins · save with Dad",
+          "what": "☂️ Victory Jar · save with Dad",
           "hint": "FUN · umbrella treat optional",
           "tone": "fun"
         },
@@ -520,12 +520,12 @@
           "tone": "fun"
         }
       ],
-      "streakLabel": "Week 6 — don't break it",
+      "streakLabel": "🔥 6-day fire streak — don't break it",
       "missions": [
         {
           "when": "Every clear",
-          "what": "💥 ALL musts clear = coins",
-          "hint": "ALL musts clear",
+          "what": "💥 ALL musts clear = coins in the jar",
+          "hint": "ALL musts → jar $10 + $10 payday",
           "tone": "fun"
         },
         {
@@ -672,10 +672,10 @@
       },
       "bankGoal": {
         "id": "tour-jar",
-        "title": "Tour goal",
-        "blurb": "Dad-week musts. All musts required. Babysitting is separate.",
+        "title": "Tour Jar",
+        "blurb": "Dad-week musts unlock Tour Jar $20 + $20 payday. All musts required. Babysit $15/hr separate.",
         "need": 20,
-        "reward": "Goal with Dad after honest musts",
+        "reward": "Payday with Dad after honest musts",
         "dollarNeed": 20,
         "starDollar": 1,
         "weeklyAllowance": 20
@@ -736,12 +736,12 @@
           "cadence": "addon",
           "optional": true,
           "hire": true,
-          "hint": "Dad handout",
+          "hint": "not for jar · Dad handout",
           "rateLabel": "$15/hr"
         }
       ],
       "fun": [],
-      "streakLabel": "",
+      "streakLabel": "◆ 4-day streak — hold the line",
       "missions": [
         {
           "when": "Weekly",
@@ -752,14 +752,14 @@
         {
           "when": "Add-on",
           "what": "Babysitting — optional · Dad books you",
-          "hint": "hire add-on",
+          "hint": "hire add-on · not for jar",
           "tone": "fun"
         }
       ],
       "goal": {
-        "name": "Tour goal",
+        "name": "Tour Jar",
         "need": 20,
-        "placeholder": "Tour goal"
+        "placeholder": "Tour Jar · $20"
       },
       "bag": {
         "place": "Dad",
@@ -790,22 +790,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "THU · 4:25",
-        "what": "AINSLEY SWIM — COACH ANN",
+        "when": "MON · 1:40",
+        "what": "LINDSAY APPT",
         "where": "with Dad @ 147th · through Fri Oct 2 · 3:00",
         "badges": [
-          "THU",
-          "4:25"
+          "MON",
+          "1:40"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Thu · 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -815,12 +808,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Thu 1 · leave 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Tue 6 · leave 5:00",
           "what": "Ainsley swim — Coach Ann",
@@ -942,7 +929,7 @@
         },
         {
           "when": "Thu · 3:15",
-          "what": "Dan picks up Harris — SRE pickup · 3:40 | Casey picks up Hayes; Hayes hangs at Casey's",
+          "what": "Dan picks up Harris — SRE pickup · 3:40 | Casey (Riley's mom) picks up Hayes; Hayes hangs at Casey's",
           "tone": "act"
         },
         {
@@ -952,21 +939,11 @@
         },
         {
           "when": "Thu · 6:20",
-          "what": "Pick up Hayes at Casey's",
+          "what": "Pick up Hayes at Casey's (Riley's mom)",
           "tone": "hot"
         }
       ],
       "week": [
-        {
-          "when": "Thu 1 · 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "tone": "hot"
-        },
-        {
-          "when": "Thu 1 · 6:20",
-          "what": "Pick up Hayes at Casey's",
-          "tone": "hot"
-        },
         {
           "when": "Fri 2 · 7:00",
           "what": "SRE specials: No Specials",
@@ -1076,6 +1053,16 @@
           "when": "Wed 7 · 7:00",
           "what": "SRE specials: PE + Library (tennis shoes, library book)",
           "tone": "act"
+        },
+        {
+          "when": "Wed 7 · 7:00",
+          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
+          "tone": "act"
+        },
+        {
+          "when": "Wed 7 · 4:45",
+          "what": "Harris flag practice · 5:30–6:30",
+          "tone": "hot"
         }
       ]
     }
