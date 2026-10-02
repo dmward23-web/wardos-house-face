@@ -29,7 +29,7 @@ html:not([data-export]) body.theme-harris .panel {
   height: auto !important;
   max-height: none !important;
   min-height: 1920px !important;
-  /* SCROLL5 (10/1) · runway now lives in shared house-scroll.css (body ≥ 100vh + 240px) */
+  /* SCROLL5 (10/1) · body min-height lives in shared house-scroll.css (body ≥ 100vh; SCROLLEND1 removed the runway) */
   overflow: visible !important;
 }
 html:not([data-export]) body.theme-ainsley .body,

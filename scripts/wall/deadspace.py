@@ -8,7 +8,7 @@
 # Plus overflow: no horizontal scroll anywhere; the wall never scrolls vertically in landscape.
 # States (wall): real data at a test clock (Playwright clock.install; data/ is never written) plus FIXTURE states
 # routed in from scripts/wall/fixtures/*.FIXTURE.json. Heatmaps: red = failing hole/gap, amber = empty cells.
-# Usage: python3 scripts/wall/deadspace.py [--wall] [--boards] [--vp WxH ...] [--out DIR]
+# Usage: python3 scripts/wall/deadspace.py [--wall] [--boards] [--vp WxH ...] [--page board.html ...] [--out DIR]
 import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import datasnap  # DAYWIN1
 import sys, os, json, subprocess, time, random, datetime
 from playwright.sync_api import sync_playwright
@@ -23,6 +23,8 @@ CELL = 16
 BOARDS = ["sheet-index.html", "kid-hayes.html", "kid-harris.html", "kid-ainsley.html", "sheet-today.html", "month.html", "sheet-dan.html",
           "sheet-us.html", "sheet-countdowns.html", "sheet-pack.html", "sheet-weekend.html", "sheet-win.html", "sheet-groceries.html", "sheet-dinner.html",
           "sheet-gallery.html", "sheet-gallery-hero.html", "sheet-load-day.html", "sheet-google-home.html", "sheet-status.html", "sheet-lights.html", "sheet-desk-gate.html"]
+_only = [args[i + 1] for i, a in enumerate(args) if a == "--page"]  # LANDFILL2: run a subset of boards
+if _only: BOARDS = [b for b in BOARDS if b in _only or b.replace(".html", "") in _only]
 def fx(name): return json.load(open(os.path.join(FX, name)))
 # (label, clock, {data path: fixture file}, localStorage seed)
 def must_done_seed(day):
