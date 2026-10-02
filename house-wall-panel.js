@@ -3,6 +3,8 @@
      - Setpoint −/+ through the EXISTING Sensi write path (POST /api/sensi/set {kind:"temp", mode, temp}, same key + proxy
        as house-sensi-ctl.js). Single-degree steps, no arm/confirm; debounced: one request per settled side.
        No key -> zero requests. Off / Travel / offline / no live reading -> no steps.
+       SENSIGATE1: the WRITE waits on Dan's last yes. deps.writeEnabled() (wall: config/wall-panel.config.json
+       sensiWriteEnabled, default false) false -> bump() answers {ok:false, reason:"needs-ok"} and flush() never fetches.
      - Kasa toggles: the EXISTING HouseLights.setLight, roster from HouseLights.effectiveLights() (Dining, Harris's Room, Kitchen).
      - House timer: ONE timer object, per device, persisted in localStorage so a reload keeps the countdown.
        Ends on the board only (caller shows a 2 s on-screen flash), then clears. Never touches lights, never a phone.
@@ -14,6 +16,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   var MIN_F = 50, MAX_F = 90, DEADBAND = 3, DEBOUNCE_MS = 1200; /* = house-sensi-ctl.js */
+  var NEEDS_OK = "Needs Dan's OK";
 
   function isTravel(th) { return !!(th && th.heatSetpoint === 55 && th.coolSetpoint === 85); }
 
@@ -27,6 +30,7 @@
     var getReading = deps.getReading || function () { return null; };
     var onChange = deps.onChange || function () {};
     var debounce = deps.debounceMs || DEBOUNCE_MS;
+    var writeEnabled = deps.writeEnabled || function () { return false; }; /* default OFF until Dan's yes */
     var pending = {}, timer = null, busy = false, msg = "";
     function hasKey() { return !!getToken() && !!getBase(); }
     function th() { return deps.override || getReading(); }
@@ -52,6 +56,7 @@
       return out;
     }
     function bump(k, d) {
+      if (writeEnabled() !== true) { msg = NEEDS_OK; onChange(); return { ok: false, reason: "needs-ok" }; }
       var t = th(), v = view();
       if (!v.rows.length || busy) return { ok: false, reason: v.reason || "busy" };
       var row = v.rows.filter(function (r) { return r.side === k; })[0];
@@ -71,7 +76,7 @@
     }
     function flush() {
       timer = null;
-      var t = th(); if (!t || !hasKey() || !deps.fetch) { pending = {}; onChange(); return Promise.resolve({ sent: 0 }); }
+      var t = th(); if (!t || !hasKey() || !deps.fetch || writeEnabled() !== true) { pending = {}; onChange(); return Promise.resolve({ sent: 0 }); }
       var jobs = Object.keys(pending).filter(function (k) {
         var cur = k === "heat" ? t.heatSetpoint : t.coolSetpoint; return pending[k] !== cur;
       }).map(function (k) { return { kind: "temp", mode: k, temp: pending[k] }; });
@@ -92,7 +97,7 @@
       return chain.then(function () { busy = false; pending = {}; msg = ""; onChange(); return { sent: sent }; },
         function () { busy = false; pending = {}; msg = "not sent \u00b7 showing the thermostat's setting"; onChange(); return { sent: sent, error: true }; });
     }
-    return { view: view, bump: bump, flush: flush, hasKey: hasKey, _pending: function () { return pending; } };
+    return { view: view, bump: bump, flush: flush, hasKey: hasKey, writeEnabled: function () { return writeEnabled() === true; }, _pending: function () { return pending; } };
   }
 
   /* Kasa toggles (existing roster only). */

@@ -14,7 +14,7 @@
   var TODAY = "sheet-today.html", MONTH = "month.html", CHORES = "sheet-chores.html",
       JAR = "sheet-allowance.html", STATUS = "sheet-status.html", US = "sheet-us.html",
       CAMS = "nest-webrtc.html", LIGHTS = "sheet-lights.html", HUBHOME = "sheet-google-home.html",
-      DAN = "sheet-dan.html", DESK = "sheet-desk-gate.html", PACK = "sheet-pack.html",
+      DAN = "sheet-dan.html", /* PRESSMAP1 (e): the desk gate is reached ONLY from the Dad Seat (sheet-dan.html); every other press lands on the Dad Seat */ DESK = "sheet-desk-gate.html", PACK = "sheet-pack.html",
       GALLERY = "sheet-gallery.html", HERO = "sheet-gallery-hero.html", INDEX = "sheet-index.html";
   var CONTROL = "a[href],button,input,select,textarea,label,summary,[role=button],[contenteditable=true]," +
     /* tap actions other House scripts own (delegated or direct) — never navigate over them */
@@ -116,7 +116,7 @@
     ["sheet-allowance.html", "section.link-banner", CHORES],
     ["sheet-allowance.html", "section.bank, .streak-pill, .g2-grow-chip", kid(null)],
     ["sheet-allowance.html", ".feed-row", CHORES],
-    ["sheet-allowance.html", ".desk-note, .badge", DESK],
+    ["sheet-allowance.html", ".desk-note, .badge", DAN],
 
     /* Our ideas (weekend) · kid idea cards → kid boards */
     ["sheet-weekend.html", ".vote-card", kid(null)],
@@ -131,15 +131,15 @@
       [/Sheets index/i, INDEX], [/Week board/i, INDEX], [/Month chat/i, "month-chat.html"], [/Month board/i, MONTH],
       [/Today/i, TODAY], [/Hayes|Ainsley|Harris/i, INDEX], [/Chores|Groceries/i, CHORES],
       [/Dinner/i, "sheet-dinner.html"], [/Win|Countdowns/i, "sheet-win.html"], [/Us .*Load|Load day/i, US],
-      [/Desk gate/i, DESK], [/Lights/i, LIGHTS], [/Sensi|Nest/i, HUBHOME], [/Checkoffs/i, CHORES]])],
+      [/Desk gate/i, DAN], [/Lights/i, LIGHTS], [/Sensi|Nest/i, HUBHOME], [/Checkoffs/i, CHORES]])],
     ["sheet-status.html", ".stat", byText([[/PAGES BUILT/i, INDEX], [/TEMPLATE LOCK/i, GALLERY], [/OPEN GAPS/i, TODAY], [/PROMO/i, HERO]])],
-    ["sheet-status.html", ".lock-row", byText([[/Kid color/i, INDEX], [/Never on House/i, DESK], [/Canvas|phone crop/i, HERO]], GALLERY)],
+    ["sheet-status.html", ".lock-row", byText([[/Kid color/i, INDEX], [/Never on House/i, DAN], [/Canvas|phone crop/i, HERO]], GALLERY)],
     ["sheet-status.html", ".gap-row", byText([[/weather/i, TODAY + "#house-wx"], [/Calendar/i, MONTH], [/School/i, TODAY], [/Lights/i, LIGHTS]])],
-    ["sheet-status.html", ".promo-row", byText([[/PNG plates/i, HERO], [/Desk gate/i, DESK]], GALLERY)],
+    ["sheet-status.html", ".promo-row", byText([[/PNG plates/i, HERO], [/Desk gate/i, DAN]], GALLERY)],
 
     /* Us */
     ["sheet-us.html", ".log-card", byText([[/calendar/i, MONTH]], US)],
-    ["sheet-us.html", ".safe-note", DESK],
+    ["sheet-us.html", ".safe-note", DAN],
 
     /* Countdowns */
     ["sheet-countdowns.html", "section.cheer, .flame-row", kid(MONTH)],
@@ -154,7 +154,7 @@
 
     /* Load day */
     ["sheet-load-day.html", "section.loadband", MONTH],
-    ["sheet-load-day.html", "article.beat", byText([[/House\+Desk/i, DESK]], kid(TODAY))],
+    ["sheet-load-day.html", "article.beat", byText([[/House\+Desk/i, DAN]], kid(TODAY))],
     ["sheet-load-day.html", ".kchip", kid(null)],
     ["sheet-load-day.html", "section.sec[aria-label*='glance' i], .handoff-card, .glance-row", TODAY],
 

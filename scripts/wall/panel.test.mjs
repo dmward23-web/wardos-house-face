@@ -24,7 +24,7 @@ await t("setpoint: no key -> no rows, bump sends nothing, zero requests", async 
 });
 await t("setpoint: three taps then settle -> ONE request with the final value", async () => {
   const log = [], c = clock();
-  const sp = P.createSetpoint({ fetch: fakeFetch(log, AUTO), getToken: () => "k", getBase: () => "https://hub.invalid", getReading: () => AUTO, ...c });
+  const sp = P.createSetpoint({ writeEnabled: () => true, fetch: fakeFetch(log, AUTO), getToken: () => "k", getBase: () => "https://hub.invalid", getReading: () => AUTO, ...c });
   sp.bump("heat", 1); await c.tick(500); sp.bump("heat", 1); await c.tick(500); sp.bump("heat", -1);
   assert.equal(log.length, 0, "nothing before it settles");
   await c.tick(P.DEBOUNCE_MS + 10);
@@ -34,19 +34,19 @@ await t("setpoint: three taps then settle -> ONE request with the final value", 
 });
 await t("setpoint: net zero change -> no request", async () => {
   const log = [], c = clock();
-  const sp = P.createSetpoint({ fetch: fakeFetch(log, AUTO), getToken: () => "k", getBase: () => "b", getReading: () => AUTO, ...c });
+  const sp = P.createSetpoint({ writeEnabled: () => true, fetch: fakeFetch(log, AUTO), getToken: () => "k", getBase: () => "b", getReading: () => AUTO, ...c });
   sp.bump("cool", 1); sp.bump("cool", -1); await c.tick(5000); assert.equal(log.length, 0);
 });
 await t("setpoint: auto, both sides changed -> one request per side", async () => {
   const log = [], c = clock();
-  const sp = P.createSetpoint({ fetch: fakeFetch(log, AUTO), getToken: () => "k", getBase: () => "b", getReading: () => AUTO, ...c });
+  const sp = P.createSetpoint({ writeEnabled: () => true, fetch: fakeFetch(log, AUTO), getToken: () => "k", getBase: () => "b", getReading: () => AUTO, ...c });
   sp.bump("heat", -1); sp.bump("cool", 1); await c.tick(5000);
   assert.deepEqual(log.map((x) => x[1]), [{ kind: "temp", mode: "heat", temp: 64 }, { kind: "temp", mode: "cool", temp: 74 }]);
 });
 await t("setpoint: deadband 3 held in auto; clamp 50-90", () => {
-  const sp = P.createSetpoint({ getToken: () => "k", getBase: () => "b", getReading: () => ({ ...AUTO, heatSetpoint: 70, coolSetpoint: 73 }), setTimeout: () => 0, clearTimeout: () => {} });
+  const sp = P.createSetpoint({ writeEnabled: () => true, getToken: () => "k", getBase: () => "b", getReading: () => ({ ...AUTO, heatSetpoint: 70, coolSetpoint: 73 }), setTimeout: () => 0, clearTimeout: () => {} });
   assert.equal(sp.bump("heat", 1).reason, "deadband");
-  const lo = P.createSetpoint({ getToken: () => "k", getBase: () => "b", getReading: () => ({ online: true, mode: "heat", heatSetpoint: 50 }), setTimeout: () => 0, clearTimeout: () => {} });
+  const lo = P.createSetpoint({ writeEnabled: () => true, getToken: () => "k", getBase: () => "b", getReading: () => ({ online: true, mode: "heat", heatSetpoint: 50 }), setTimeout: () => 0, clearTimeout: () => {} });
   assert.equal(lo.bump("heat", -1).value, 50);
 });
 await t("setpoint: Travel on / system off / offline / no live reading -> no steps", () => {
@@ -200,5 +200,19 @@ await t("field weather reuses the existing Open-Meteo pill call: same URL + hour
   assert.match(block, /W\.load\(/); assert.doesNotMatch(block, /fetch\(/);
   const ps = wall.slice(wall.indexOf("function paintSchool("), wall.indexOf("FIVE UPGRADES #4"));
   assert.match(ps, /var game = sn \? LS\.fieldGame/); assert.match(ps, /if \(game\) \{ needWx\(\)/, "weather is asked only when there is a game");
+});
+await t("SENSIGATE1: sensiWriteEnabled false (shipped config) -> -/+ inert: 'Needs Dan's OK', zero /api/sensi/set requests even with a key", async () => {
+  const fs = await import("node:fs");
+  const cfg = JSON.parse(fs.readFileSync(new URL("../../config/wall-panel.config.json", import.meta.url), "utf8"));
+  assert.equal(cfg.sensiWriteEnabled, false, "ships OFF until Dan's last yes");
+  const log = [], c = clock();
+  const sp = P.createSetpoint({ writeEnabled: () => cfg.sensiWriteEnabled, fetch: fakeFetch(log, AUTO), getToken: () => "k", getBase: () => "https://hub.invalid", getReading: () => AUTO, ...c });
+  for (let i = 0; i < 6; i++) { const r = sp.bump(i % 2 ? "cool" : "heat", i % 3 ? 1 : -1); assert.deepEqual(r, { ok: false, reason: "needs-ok" }); }
+  assert.equal(sp.view().msg, "Needs Dan's OK"); await c.tick(10000); await sp.flush();
+  assert.equal(log.filter(([u]) => /\/api\/sensi\/set/.test(u)).length, 0); assert.equal(log.length, 0);
+  const dflt = P.createSetpoint({ fetch: fakeFetch(log, AUTO), getToken: () => "k", getBase: () => "b", getReading: () => AUTO, ...c });
+  assert.equal(dflt.bump("heat", 1).reason, "needs-ok", "no flag passed = OFF"); await c.tick(5000); assert.equal(log.length, 0);
+  const wall = fs.readFileSync(new URL("../../wall.html", import.meta.url), "utf8");
+  assert.match(wall, /config\/wall-panel\.config\.json/); assert.match(wall, /writeEnabled: function \(\) \{ return panelCfg\.sensiWriteEnabled === true; \}/);
 });
 console.log(`panel: ${n} tests PASS`);

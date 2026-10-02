@@ -621,7 +621,7 @@
  <div class="leaveby-badge" data-live="leaveby-badge"></div>
  </a>
 
- <section class="month-wrap">
+ <section id="month-board" class="month-wrap">
  <div class="month-hdr">
  <div class="mnav">
  <button class="mbtn" type="button" data-mnav="-1" aria-label="Previous month">‹</button>
@@ -704,7 +704,7 @@
       var dy = dd.getFullYear(), dm = dd.getMonth() + 1, dn = dd.getDate();
       if (dm !== m) { html += '<div class="day out"><div class="day-top"><span class="dom">' + dn + "</span></div></div>"; continue; }
       var k = key(dy, dm, dn), day = DATA && DATA.days[k], isToday = k === t.iso;
-      html += '<a class="day' + (isToday ? " today" : "") + '" href="sheet-today.html"><div class="day-top"><span class="dom">' + dn + "</span>" + (isToday ? '<span class="day-tag">today</span>' : "") + "</div>";
+      html += '<a class="day' + (isToday ? " today" : "") + '" id="d-' + k + '" href="sheet-today.html"><div class="day-top"><span class="dom">' + dn + "</span>" + (isToday ? '<span class="day-tag">today</span>' : "") + "</div>";
       if (day && day.withDan) html += '<div class="mom dan">Kids with Dan</div>';
       html += '<div class="blocks">';
       (day ? day.items : []).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '" title="' + esc(it.l) + '">' + esc(it.l) + "</div>"; });
@@ -721,7 +721,10 @@
     }).join("");
     var r = document.querySelector("[data-month-range]");
     r.textContent = DATA ? "calendar through " + MS[+DATA.rangeEnd.slice(5, 7) - 1] + " " + +DATA.rangeEnd.slice(8, 10) + " · empty = unknown" : "calendar unavailable · empty = unknown";
-    if (location.hash !== "#" + y + "-" + pad(m)) history.replaceState(null, "", "#" + y + "-" + pad(m));
+    /* PRESSMAP1: a wall press can land on one day (#d-YYYY-MM-DD): keep that hash and bring the day into view */
+    var dayH = /^#d-(\d{4})-(\d{2})-\d{2}$/.exec(location.hash);
+    if (dayH && +dayH[1] === y && +dayH[2] === m) { var cell = document.getElementById(location.hash.slice(1)); if (cell) { cell.classList.add("is-target"); cell.scrollIntoView({ block: "center" }); } }
+    else if (location.hash !== "#" + y + "-" + pad(m) && location.hash !== "#month-board") history.replaceState(null, "", "#" + y + "-" + pad(m));
   }
   document.addEventListener("click", function (e) {
     var b = e.target.closest("[data-mnav]");
@@ -730,7 +733,7 @@
     if (p) { var v = p.getAttribute("data-ym").split("-"); render(+v[0], +v[1]); }
   });
   function initial() {
-    var h = /^#(\d{4})-(\d{2})$/.exec(location.hash), t = ctToday();
+    var h = /^#(?:d-)?(\d{4})-(\d{2})(?:-\d{2})?$/.exec(location.hash), t = ctToday();
     return h ? { y: +h[1], m: +h[2] } : { y: t.y, m: t.m };
   }
   var s0 = initial(); render(s0.y, s0.m);

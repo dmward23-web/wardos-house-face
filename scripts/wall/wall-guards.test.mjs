@@ -56,7 +56,11 @@ await t("wall.html source never touches house-bank / jar book keys; taps ride ho
 });
 await t("CHORELAW2: no old quest chart on the wall or the hub kid tiles (one chore copy from kid-seats.json)", () => {
   const code = wall.replace(/<!--[\s\S]*?-->/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
-  assert.doesNotMatch(code, /kids-week|kids-data\.js|WardKids|data-kid-quest|data-kid-done|Chore done|mustQuests|data-claim=/);
+  /* FIDELITY1: kids-week.json is read for ONE thing only, Ainsley's hire tag (hire === true && rateLabel "$15/hr"); no quest chart */
+  const hire = code.slice(code.indexOf("function hireHtml()"), code.indexOf("function harrisRow("));
+  assert.match(hire, /x\.hire === true && x\.rateLabel === "\$15\/hr"/); assert.doesNotMatch(hire, /quests\.map|forEach|data-kid-quest/);
+  const rest = code.replace(hire, "").replace(/"kids-week\.json"/g, "").replace(/\["kids-week", feeds\.kidsWeek\]/g, "").replace(/kidsWeek: r\[15\]/g, "");
+  assert.doesNotMatch(rest, /kids-week|kidsWeek|kids-data\.js|WardKids|data-kid-quest|data-kid-done|Chore done|mustQuests|data-claim=/);
   assert.match(code, /"kid-seats\.json"/);
   const eng = read("house-kid-engage.js");
   const chores = eng.slice(eng.indexOf('if (face === "chores") {'), eng.indexOf("/* leave */"));
@@ -90,7 +94,7 @@ await t("CHORELAW2: Harris's sound is the existing soft house-sfx tap only, on h
 });
 await t("wall.html has no badge or link to sheet-allowance, sheet-chores or kid-*.html", () => {
   assert.doesNotMatch(wall, /href="(sheet-allowance|sheet-chores|kid-[a-z]+)\.html"/);
-  assert.equal((wall.match(/class="badge/g) || []).length, 17);
+  assert.equal((wall.match(/class="badge/g) || []).length, 16); /* FIDELITY1: Desk gate badge removed; the Desk gate is reached via the Dad Seat only */
 });
 await t("no $ amounts or 'jar' in wall.html visible copy; no bot names either", () => {
   const c = copy(wall);
@@ -118,7 +122,7 @@ await t("v2 finish: no motion, hall flash config ships empty, pip parked", () =>
   assert.match(css, /animation: none !important; transition: none !important/);
   assert.doesNotMatch(css, /@keyframes/);
   assert.deepEqual(JSON.parse(read("config/wall-kid.config.json")).hallFlashLightIds, []);
-  assert.match(wall, /id="w-pip"[^>]*data-state="off" hidden/);
+  assert.match(wall, /id="w-pip"[^>]*data-state="off"[^>]*hidden>/);
 });
 await t("ALFREDP0-5: hub has no Show me the Money / Jars tile; kid surfaces show no Balance", () => {
   assert.doesNotMatch(hub.replace(/<!--[\s\S]*?-->/g, ""), /Show me the Money|Kids jars on board|class="tile stars"/);
@@ -157,7 +161,11 @@ await t("grocery tile hosts Ledger's house-grocery-list.js as-is; tile hidden by
   assert.doesNotMatch(tile, /<a |href=/);
 });
 await t("doors lamp + doorbell line: hidden, no reader, never a feed or still", () => {
-  assert.match(wall, /id="w-doors"[^>]*hidden><\/(div|section)>/); assert.match(wall, /id="w-bell"[^>]*hidden><\/(div|section)>/);
+  /* FIDELITY1: both start hidden; Doors never shows (no sensor); the doorbell line shows the nest DOORBELL name + last-still DATE only (no image, no feed) */
+  assert.match(wall, /id="w-doors"[^>]*hidden>/); assert.match(wall, /id="w-bell"[^>]*hidden>/);
+  assert.match(wall, /\$\("w-doors"\)\.hidden = true;/);
+  const bellTile = wall.slice(wall.indexOf('id="w-bell"'), wall.indexOf("</div>", wall.indexOf('id="w-bell"')));
+  assert.doesNotMatch(bellTile, /<img|<video|<iframe|src=/);
   assert.doesNotMatch(wall.replace(/<!--[\s\S]*?-->/g, ""), /doors?-live\.json|doorbell[^"\n]*\.json|ring-live/);
 });
 await t("no hardcoded Mom in wall code or copy (data labels render as given)", () => {
@@ -233,8 +241,8 @@ await t("WEEKLINK1: Week and Dad Seat open different pages; Week = existing hub 
   const href = (id) => (wall.match(new RegExp('data-tile-id="' + id + '"[^>]*href="([^"]+)"')) || [])[1];
   const wk = href("rail-week"), dad = href("rail-dad-seat");
   assert.ok(wk && dad); assert.notEqual(wk, dad);
-  assert.equal(dad, "sheet-dan.html"); assert.equal(wk, "sheet-index.html");
-  assert.ok(fs.existsSync(new URL(wk, root)), "Week target exists (not invented)");
+  assert.equal(dad, "sheet-dan.html#ds-next"); assert.equal(wk, "sheet-index.html#hub-home"); /* PRESSMAP1: anchored */
+  assert.ok(fs.existsSync(new URL(wk.split("#")[0], root)), "Week target exists (not invented)");
   assert.match(read("index.html"), /WEEKGONE1[^>]*old Week links go to the House hub/);
 });
 await t("WALLKIT9: Hayes reward line is exactly Atlas's 'Goal with Dad after honest musts' (no Payday) in every copy + our fallback", () => {
@@ -295,7 +303,7 @@ await t("CHORELAW1: Ainsley has NO stars and NO counts on her tile/seat/page; sl
   const ka = read("kid-ainsley.html").replace(/<style[\s\S]*?<\/style>/g, "").replace(/<!--[\s\S]*?-->/g, "");
   assert.doesNotMatch(ka, /\u2605|data-progress-meta|data-left-count|id="sec-jar"|data-grow-total|data-bank-life|data-got-it|href="#sec-jar"/, "no stars, counts or star goal on Ainsley's page");
   assert.match(ka, /data-trusted-line="ainsley"[^>]*hidden><\/section>/, "empty slot, no invented copy");
-  const wall = read("wall.html"); assert.match(wall, /data-kid-trusted="ainsley" data-no-stars="true">/, "trusted-with renders from Atlas's trustedWith only");
+  const wall = read("wall.html"); assert.match(wall, /data-kid-trusted="ainsley" data-no-stars="true"( data-go="kid-ainsley\.html#kid-board")?>/, "trusted-with renders from Atlas's trustedWith only");
   assert.match(wall, /if \(kid === "ainsley"\) return \(r\.trusted\.length/); assert.match(wall, /if \(kid === "harris"\) html \+= '<div class="law-fill"/);
   for (const f of ["sheet-allowance.html", "sheet-chores.html"]) assert.ok(read(f).includes("Ainsley"), f + " (Ainsley star rows there are a listed gap)");
 });
@@ -324,5 +332,14 @@ await t("TAPSYNC badge: no hub key saved -> no badge, no /api/taps call; key sav
   assert.equal(b.tagName, "DIV"); assert.match(b.style.cssText, /pointer-events:none/); assert.ok(!("href" in b) && !b.attrs.href, "plain text, not a link");
   assert.equal(keyed.attrs["data-tapsync"], "local");
   assert.doesNotMatch(src, /createElement\("a"\)|\.href\s*=/, "badge is never a link");
+});
+await t("FILL1: no clock override on the wall (test clocks are Playwright only); landscape fills the viewport; type floor 10 CSS px", () => {
+  const code = wall.replace(/<!--[\s\S]*?-->/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
+  assert.doesNotMatch(code, /location\.search|URLSearchParams|[?&](now|time|clock|at)=/, "no ?now= / ?time= style override");
+  assert.doesNotMatch(code, /Date\.now\s*=|new Date\(\s*(params|qs|q)\b/);
+  assert.match(code, /var z = Math\.min\(w \/ 2560, h \/ 1440\);/);
+  assert.match(code, /panel\.style\.width = \(w \/ z\) \+ "px"; panel\.style\.height = \(h \/ z\) \+ "px";/, "panel = whole viewport at zoom (no fixed center column)");
+  assert.match(code, /var TYPE_FLOOR = 10,/);
+  assert.doesNotMatch(read("wall-ion/ion-wright.css"), /max-width:\s*(4|5|6|7|8|9)\d\dpx/, "no phone/center column cap");
 });
 console.log(`wall-guards: ${n} tests PASS`);

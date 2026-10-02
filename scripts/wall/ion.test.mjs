@@ -56,7 +56,7 @@ await t("MOTION: exactly the four kit loops (drift 28s, scan 11s, sweep 6s, brea
 });
 await t("wall-scoped: Ion CSS only on wall.html; kid pages and the hub don't link it; the bridge only styles body.wall-kiosk[data-master=ion]", () => {
   for (const f of fs.readdirSync(new URL(".", root)).filter((f) => f.endsWith(".html") && f !== "wall.html")) assert.doesNotMatch(read(f), /wall-ion\//, f);
-  for (const line of css["ion-wright.css"].split("\n").filter((l) => /\{/.test(l) && !/^\s*\/\*/.test(l))) assert.match(line, /^html body\.wall-kiosk(\.is-stacked)?\[data-plate\]\[data-master="ion"\] /, line.slice(0, 90));
+  for (const line of css["ion-wright.css"].split("\n").filter((l) => /\{/.test(l) && !/^\s*\/\*/.test(l))) assert.match(line, /^html body\.wall-kiosk(\.is-stacked)?\[data-plate\]\[data-master="ion"\](:not\(\.is-stacked\))? /, line.slice(0, 90));
   const hex = [...css["ion-wright.css"].matchAll(/#[0-9a-f]{3,8}\b/gi)].map((m) => m[0].toLowerCase()).filter((h) => h !== "#07111d"); /* #07111d = the kit's ink-on-accent */
   assert.deepEqual(hex, [], "bridge uses Ion token colors only");
   assert.doesNotMatch(css["ion-wright.css"], /rgba?\(\s*\d/, "no raw rgb in the bridge: rgba(var(--*-rgb)) only");
@@ -69,8 +69,8 @@ await t("every tile keeps data-tile-id + data-owner; Week -> sheet-index, Dad Se
   const ids = [...wall.matchAll(/<[^>]*data-tile-id="([^"]+)"[^>]*>/g)];
   assert.ok(ids.length >= 50);
   for (const m of ids) assert.match(m[0], /data-owner="(Atlas|Wright|Ledger|Prism|Vita)"/, m[1]);
-  assert.match(wall, /data-tile-id="rail-week"[^>]*href="sheet-index\.html"/);
-  assert.match(wall, /data-tile-id="rail-dad-seat"[^>]*href="sheet-dan\.html"/);
+  assert.match(wall, /data-tile-id="rail-week"[^>]*href="sheet-index\.html#hub-home"/);
+  assert.match(wall, /data-tile-id="rail-dad-seat"[^>]*href="sheet-dan\.html#ds-next"/);
 });
 await t("Harris: same-minute fill (no transition) + the existing soft HouseSfx.tap only; no new audio", () => {
   assert.match(wall, /data-feedback="tap-sound-fill"/);

@@ -14,7 +14,7 @@ GEOM = """() => {
   const z = parseFloat(document.getElementById('wall-panel').style.zoom) || 1, vis = e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'; };
   const panel = document.getElementById('wall-panel').getBoundingClientRect();
   const tiles = [...document.querySelectorAll('.mod, .act, .ctl, .seat, .claim, .us-x, .wwin, .rail .badge')].filter(vis);
-  const noId = tiles.filter(e => !e.closest('[data-tile-id]') || !(e.closest('[data-tile-id]').getAttribute('data-owner') || e.closest('[data-owner]'))).map(e => e.className);
+  const noId = tiles.filter(e => !e.querySelector('[data-tile-id]')).filter(e => !e.closest('[data-tile-id]') || !(e.closest('[data-tile-id]').getAttribute('data-owner') || e.closest('[data-owner]'))).map(e => e.className);
   const missingOwner = [...document.querySelectorAll('[data-tile-id]')].filter(e => !e.hasAttribute('data-owner')).map(e => e.getAttribute('data-tile-id'));
   const clipped = [...document.querySelectorAll('[data-tile-id]')].filter(vis).filter(e => e.scrollHeight > e.clientHeight + 2 && getComputedStyle(e).overflowY !== 'visible').map(e => e.getAttribute('data-tile-id') + ' ' + e.scrollHeight + '>' + e.clientHeight);
   const outside = tiles.filter(e => { const r = e.getBoundingClientRect(); return r.right > panel.right + 1 || r.bottom > panel.bottom + 1 || r.bottom > innerHeight + 1; }).map(e => (e.closest('[data-tile-id]')||e).getAttribute('data-tile-id') || e.className);
@@ -43,7 +43,7 @@ ok = True
 try:
     with sync_playwright() as p:
         b = p.chromium.launch()
-        for vw, vh in [(2560, 1440), (1920, 1080), (1080, 1920)]:
+        for vw, vh in [(2560, 1440), (1920, 1080), (1536, 730), (1366, 768), (1280, 650), (1080, 1920)]:  # FILL1: laptop windows too
             ctx, pg, errs, reqs = page(b, vw, vh)
             g = pg.evaluate(GEOM); pg.evaluate(LED); pg.wait_for_timeout(200); anims = sorted(set(pg.evaluate(ANIM)))
             bad = (anims != ["x21-breathe", "x21-drift", "x21-scan", "x21-sweep"] or g["docOverflowX"] or (vw > vh and g["docOverflowY"]) or g["noId"] or g["missingOwner"] or g["clipped"] or (vw > vh and g["outside"]) or g["small"] or g["preview"] or errs or reqs)
