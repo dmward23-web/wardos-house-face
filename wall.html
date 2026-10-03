@@ -1034,15 +1034,20 @@
     $("w-loops").hidden = !(loops && loops.length);
     $("w-loops-empty").hidden = true;
     $("w-lights").hidden = !strip.length && !(loops && loops.length);
-    /* FILL1: no open loops -> the status lights join the who's-home band (before "Resets 3 AM"); otherwise their own strip */
-    var lt = $("w-lights"), inline = !(loops && loops.length) && !$("w-who").hidden && !document.body.classList.contains("is-stacked");
-    if (inline && lt.parentNode !== $("w-who")) $("w-who").insertBefore(lt, $("w-who").querySelector(".hint"));
-    if (!inline && lt.parentNode === $("w-who")) $("w-lights-home").parentNode.insertBefore(lt, $("w-lights-home"));
-    lt.classList.toggle("is-inline", inline);
     var hasBell = paintBell();
     $("w-doors").hidden = true; /* no door sensor exists: collapse, the doorbell takes the column */
     $("w-lamps").hidden = !hasBell;
     paintKids(mode); paintAway(now, mode);
+    /* FILL1: no open loops -> the status lights join the who's-home band (before "Resets 3 AM"); otherwise their own strip.
+       FILL2 (10/2): kids-away weeks hide who's home, so the lights sit under the Kids back line in the away card instead
+       of a near-empty strip of their own (SPACE-01); awayFit re-sizes the Kids back line around them */
+    var lt = $("w-lights"), noLoops = !(loops && loops.length), stk = document.body.classList.contains("is-stacked");
+    var host = !noLoops || stk || lt.hidden ? null : (!$("w-who").hidden ? $("w-who") : (!$("w-away").hidden ? $("w-away").querySelector(".aw-h") : null));
+    var wasIn = lt.parentNode;
+    if (host && lt.parentNode !== host) { if (host.id === "w-who") host.insertBefore(lt, host.querySelector(".hint")); else host.appendChild(lt); }
+    if (!host && lt.parentNode !== $("w-lights-home").parentNode) $("w-lights-home").parentNode.insertBefore(lt, $("w-lights-home"));
+    lt.classList.toggle("is-inline", !!host);
+    if (lt.parentNode !== wasIn && !$("w-away").hidden) awayFit();
     paintTemp(); paintLightToggles(); paintTimer(); paintTaps(); paintSchool(); paintGroc();
     var src = [["cal-live", feeds.cal], ["sensi", feeds.sensi], ["nest", feeds.nest], ["lights", feeds.lights],
       ["house-mode", feeds.houseMode], ["next-up", feeds.nextUp], ["school-night", feeds.schoolNight], ["kid-seats", feeds.kidSeats], ["kids-week", feeds.kidsWeek]]
