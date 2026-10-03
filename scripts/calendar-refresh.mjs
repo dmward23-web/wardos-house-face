@@ -164,6 +164,33 @@ function kidMentions(summary) {
   };
 }
 
+/* SOLOBOY1 2026-10-02 (Dan, Art Club Wed): "Hayes — SRE pickup · 3:40" names one boy →
+   that boy only. "Hayes + Harris — SRE pickup" / untitled-kid SRE runs → both boys (unchanged). */
+function soloBoy(summary) {
+  const m = kidMentions(summary);
+  if (m.hayes && !m.harris) return { kid: "hayes" };
+  if (m.harris && !m.hayes) return { kid: "harris" };
+  return {};
+}
+function isBoysRun(it, kidId) {
+  return (it.kind === "school_drop" || it.kind === "school_pickup") && (!it.kid || it.kid === kidId);
+}
+/* KIDRIDE1 2026-10-02 (Dan): "<Kid> — … pickup/drop-off · t" (start = leave-by) is Dad's
+   leave-by row for that one kid; it also stays on that kid's own glass (and wins his top card). */
+const KID_RIDE = /^(Ainsley|Hayes|Harris)\s*—\s*.*\b(pick\s*-?\s*up|drop\s*-?\s*off)\b/i;
+const KID_NAME = { ainsley: "Ainsley", hayes: "Hayes", harris: "Harris" };
+function isKidRide(it, kidId) {
+  return it.kind === "leave" && !!it.kidRide && it.kid === kidId;
+}
+/* Dad glass label: single-kid ride / SRE run says whose ("3:15 Hayes SRE pickup"). */
+function danWhat(it) {
+  const what = kidsSafeWhat(it.raw, it.kind);
+  const solo = it.kidRide || it.kind === "school_drop" || it.kind === "school_pickup";
+  if (!solo || !it.kid || !KID_NAME[it.kid]) return what;
+  if (new RegExp("\\b" + it.kid + "\\b", "i").test(what)) return what;
+  return `${KID_NAME[it.kid]} ${what}`;
+}
+
 function classify(ev) {
   const summary = summaryOf(ev);
   if (!summary || isAdminNoise(summary)) return null;
@@ -177,8 +204,17 @@ function classify(ev) {
   if (/^(Pick\s*up|Drop)\b/i.test(summary) && !/SRE (drop|pickup)/i.test(summary)) {
     return { kind: "leave", summary, busy: !isFree(ev), ride: true };
   }
-  if (/SRE drop-off|SRE drop\b/i.test(summary)) return { kind: "school_drop", summary };
-  if (/SRE pickup/i.test(summary)) return { kind: "school_pickup", summary };
+  /* KIDRIDE1: "Kristin: <Kid> — … pickup/drop-off" (Free, Kristin's week) = awareness on the kid's
+     glass only — never a Dad leave-by row or a sport card. */
+  if (/^Kristin:\s*/i.test(summary) && /\b(pick\s*-?\s*up|drop\s*-?\s*off)\b/i.test(summary)) {
+    return { kind: "other", summary, kids: kidMentions(summary) };
+  }
+  { const kr = KID_RIDE.exec(summary);
+    if (kr && !/SRE (drop|pickup)/i.test(summary)) {
+      return { kind: "leave", summary, busy: !isFree(ev), ride: true, kidRide: true, kid: kr[1].toLowerCase() };
+    } }
+  if (/SRE drop-off|SRE drop\b/i.test(summary)) return { kind: "school_drop", summary, ...soloBoy(summary) };
+  if (/SRE pickup/i.test(summary)) return { kind: "school_pickup", summary, ...soloBoy(summary) };
   if (/Homework Help/i.test(summary)) return { kind: "school", summary, kid: "ainsley" };
   if (/hearing\/vision|Hearing\/Vision|PE \(tennis|SRE specials?|SRE spirit|Peace Week|field trip|yearbook|picture (retake|makeup)|baby pic|LKMS (choir|fall conferences|Cougar Night|Bingo|baby)|Ward Kids \[[AH]+ No School\]|no school \(elem|conference sign-ups|Tailgate|Halloween Bash/i.test(summary)) { /* SPECIALS1+SCHOOL2: all kids school info on kid boards + hub */
     return { kind: "school", summary };
@@ -388,9 +424,9 @@ function pickStripQueue(items, now, homeWeek) {
   const queue = upcoming.slice(0, 12).map((it) => {
     const time = fmtTimeShort(it.start);
     let place;
-    if (it.kind === "leave") place = kidsSafeWhat(it.raw, "leave");
-    else if (it.kind === "school_pickup") place = "Boys SRE pickup";
-    else if (it.kind === "school_drop") place = "Boys SRE drop";
+    if (it.kind === "leave") place = it.kidRide ? danWhat(it) : kidsSafeWhat(it.raw, "leave");
+    else if (it.kind === "school_pickup") place = it.kid ? `${KID_NAME[it.kid]} SRE pickup` : "Boys SRE pickup";
+    else if (it.kind === "school_drop") place = it.kid ? `${KID_NAME[it.kid]} SRE drop` : "Boys SRE drop";
     else if (it.kind === "sport") place = kidsSafeWhat(it.raw, "sport");
     else place = kidsSafeWhat(it.raw, it.kind);
     // Cap length for strip
@@ -429,7 +465,7 @@ function detailFor(it, homeWeek, upcoming) {
   for (const x of sameDay) {
     if (x.kind === "sport") bits.push(`${fmtTime(x.start)} ${kidsSafeWhat(x.raw, "sport").split("·")[0].trim()}`);
     else if (x.kind === "leave") bits.push(`${fmtTime(x.start)} leave`);
-    else if (x.kind === "school_pickup") bits.push(`${fmtTime(x.start)} boys pickup`);
+    else if (x.kind === "school_pickup") bits.push(`${fmtTime(x.start)} ${x.kid ? KID_NAME[x.kid] : "boys"} pickup`);
   }
   const extra = bits.length ? bits.join(" · ") + " · " : "";
   return `${extra}${through}`;
@@ -478,8 +514,8 @@ function buildKidToday(kidId, items, now, homeWeek) {
     const kids = kidMentions(it.raw);
     const mine =
       (kidId === "ainsley" && (it.kid === "ainsley" || kids.ainsley)) ||
-      (kidId === "hayes" && (it.kid === "hayes" || kids.hayes || it.kind === "school_drop" || it.kind === "school_pickup")) ||
-      (kidId === "harris" && (it.kid === "harris" || kids.harris || it.kind === "school_drop" || it.kind === "school_pickup"));
+      (kidId === "hayes" && (it.kid === "hayes" || kids.hayes || isBoysRun(it, "hayes"))) ||
+      (kidId === "harris" && (it.kid === "harris" || kids.harris || isBoysRun(it, "harris")));
     if (!mine && it.kind !== "custody") continue;
     if (it.kind === "custody") continue;
     if (isAdminNoise(it.raw)) continue;
@@ -488,7 +524,8 @@ function buildKidToday(kidId, items, now, homeWeek) {
     let kind = "event";
     if (it.kind === "sport") { tone = "hot"; what = (kidId === "hayes" && /baseball/i.test(it.raw) ? "⚾ " : kidId === "harris" && /flag/i.test(it.raw) ? "🏁 " : kidId === "ainsley" && /swim/i.test(it.raw) ? "" : "") + what; }
     if (it.kind === "appointment") tone = "hot";
-    if (it.kind === "leave") continue; // leaves are Dad strip / dan box, not kid glass
+    if (it.kind === "leave" && !isKidRide(it, kidId)) continue; // leaves are Dad strip / dan box, not kid glass (KIDRIDE1: own ride stays)
+    if (isKidRide(it, kidId) && !rows.some((r) => r.ride)) { rows.unshift({ kind, when: rowWhen(it, now), what, hint: "", tone: "hot", ride: true }); continue; }
     rows.push({
       kind,
       when: rowWhen(it, now),
@@ -504,7 +541,7 @@ function buildKidToday(kidId, items, now, homeWeek) {
     hint: `through ${homeWeek.through}`,
     tone: "hot",
   });
-  return rows.slice(0, 6);
+  return rows.slice(0, 6).map(({ ride, ...r }) => r);
 }
 
 function buildKidSports(kidId, items, now) {
@@ -535,7 +572,7 @@ function buildKidSchool(kidId, items, now) {
     const mine =
       it.kid === kidId ||
       kids[kidId] ||
-      ((it.kind === "school_drop" || it.kind === "school_pickup") && (kidId === "hayes" || kidId === "harris"));
+      (isBoysRun(it, kidId) && (kidId === "hayes" || kidId === "harris"));
     if (!mine) continue;
     if (kidId === "ainsley" && (it.kind === "school_drop" || it.kind === "school_pickup")) continue;
     out.push({
@@ -569,14 +606,19 @@ function buildKidAppointments(kidId, items, now) {
 function hottestFor(kidId, items, now, homeWeek) {
   const upcoming = items.filter((it) => stillRelevant(it, now));
   const mine = upcoming.filter((it) => {
+    if (isKidRide(it, kidId)) return true;
     if (it.kind === "leave" || it.kind === "dad" || it.kind === "custody") return false;
     if (it.kid === kidId) return true;
     const kids = kidMentions(it.raw);
     if (kids[kidId]) return true;
-    if ((it.kind === "school_drop" || it.kind === "school_pickup") && (kidId === "hayes" || kidId === "harris")) return true;
+    if (isBoysRun(it, kidId) && (kidId === "hayes" || kidId === "harris")) return true;
     return false;
   });
-  const hit = mine.sort((a, b) => a.start - b.start || stripPriority(a) - stripPriority(b))[0];
+  mine.sort((a, b) => a.start - b.start || stripPriority(a) - stripPriority(b));
+  /* KIDRIDE1: on a day with his own pickup/drop-off, that ride is the top card */
+  const first = mine[0];
+  const ride = first && mine.find((x) => x.kidRide && partsInTZ(x.start).iso === partsInTZ(first.start).iso);
+  const hit = ride || first;
   if (!hit) {
     return {
       when: `${partsInTZ(now).weekday.toUpperCase()} · base @ 147th`,
@@ -605,7 +647,7 @@ function buildDanToday(items, now, homeWeek) {
     // Dad box: leaves, school logistics, sports, appointments, notable dad
     if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school", "dad"].includes(it.kind)) continue;
     const when = `${partsInTZ(now).weekday.slice(0, 3)} · ${fmtTime(it.start)}`;
-    const what = kidsSafeWhat(it.raw, it.kind);
+    const what = danWhat(it);
     const key = `${when}|${what}`.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
@@ -631,7 +673,7 @@ function buildDanWeek(items, now, homeWeek) {
     if (isAdminNoise(it.raw)) continue;
     if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school"].includes(it.kind)) continue;
     const when = `${fmtDayLabel(it.start)} · ${fmtTime(it.start)}`;
-    const what = kidsSafeWhat(it.raw, it.kind);
+    const what = danWhat(it);
     const key = `${when}|${what}`.toLowerCase();
     if (seen.has(key)) continue; /* Harris+Hayes PE → one card */
     seen.add(key);
