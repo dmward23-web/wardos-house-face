@@ -4335,7 +4335,7 @@ html body .leaveby .lb-day-cols > .lb-day-col{min-width:0 !important;max-width:1
 (function () {
   function go(e) { var t = e.target && e.target.closest ? e.target.closest("[data-house-jar]") : null; if (!t) return; if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return; e.preventDefault(); location.hash = "jar-rules"; }
   document.addEventListener("click", go); document.addEventListener("keydown", go);
-  function mark() { var t = document.querySelector("[data-house-jar]"); if (t) { t.setAttribute("role", "link"); t.setAttribute("tabindex", "0"); t.setAttribute("data-go", "sheet-index.html#jar-rules"); t.style.cursor = "pointer"; t.setAttribute("aria-label", "Jar: how it works"); } }
+  function mark() { var t = document.querySelector("[data-house-jar]"); if (t) { t.setAttribute("role", "link"); t.setAttribute("tabindex", "0"); t.setAttribute("data-go", "sheet-index.html#jar-rules"); t.style.cursor = "pointer"; t.setAttribute("aria-label", "How it works"); } }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mark); else mark();
 })();</script>
 <script src="house-sensi-ctl.js?v=SENSIAUTO1"></script>
