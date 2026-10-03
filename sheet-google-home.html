@@ -94,6 +94,9 @@
     padding:10px 12px;background:rgba(255,255,255,0.06);border-top:1px solid rgba(255,255,255,0.08)}
   .cam-name{font-size:18px;font-weight:800;color:#f0f4f8;letter-spacing:-0.02em}
   .cam-where{font-size:12px;font-weight:700;color:#90a0b8;text-transform:uppercase;letter-spacing:0.08em}
+  /* OCT8: a long camera name and its place wrap inside the tile instead of running past it */
+  .cam-meta{flex-wrap:wrap;min-width:0}
+  .cam-name{min-width:0;overflow-wrap:anywhere}
 
   /* SECONDARY · lights / garage / door strip */
   .sec-zone{flex-shrink:0;display:flex;flex-direction:column;gap:8px}
@@ -516,7 +519,7 @@
 })();
 </script>
 <script src="house-hdr-home.js?v=CLIP1"></script>
-<script src="house-links.js?v=LINKWEB1"></script>
+<script src="house-links.js?v=OCT8"></script>
 <script src="house-phrase.js?v=SEPWRAP3"></script>
 </body>
 </html>

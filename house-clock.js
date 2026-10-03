@@ -120,6 +120,19 @@
     if (!el || !el.getBoundingClientRect || typeof getComputedStyle === "undefined") return;
     var box = el.closest("header, .hdr, .card, section") || el.parentElement;
     if (!box) return;
+    /* OCT8: the landscape packer can re-place or re-size the header card after the first fit (late fonts, a slow
+       box); a size change of the card refits the clock so the header never ends up past its card */
+    if (!el._fitRO && typeof ResizeObserver === "function") {
+      var lastW = 0, lastH = 0;
+      el._fitRO = new ResizeObserver(function (en) {
+        var cr = en[0] && en[0].contentRect; if (!cr) return;
+        if (Math.abs(cr.width - lastW) < 1 && Math.abs(cr.height - lastH) < 1) return;
+        lastW = cr.width; lastH = cr.height;
+        if (el._fitRaf) cancelAnimationFrame(el._fitRaf);
+        el._fitRaf = requestAnimationFrame(function () { el._fitRaf = 0; fitClock(el); });
+      });
+      el._fitRO.observe(box);
+    }
     el.style.whiteSpace = "nowrap";
     el.style.fontSize = "";
     el.setAttribute("data-fit", "1");

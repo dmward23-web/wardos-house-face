@@ -353,6 +353,13 @@
  <div class="note"></div>
  </div>
  </section>
+ <section class="sec" aria-label="Coming up" id="cd-next">
+ <div class="sec-hdr">
+ <div class="sec-title">Coming up</div>
+ <div class="sec-meta" id="cd-next-meta">calendar</div>
+ </div>
+ <div id="cd-next-list" class="cd-list"><div class="cd-row"><span class="cd-what">Loading the calendar</span></div></div>
+ </section>
  <section class="sec" aria-label="Reading week">
  <div class="sec-hdr">
  <div class="sec-title">Reading week</div>
@@ -387,13 +394,56 @@
  </footer>
 </div>
 
+<style>
+ .cd-list { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+ .cd-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 8px 10px; border-radius: 12px; background: rgba(255,255,255,.06); }
+ .cd-what { font-weight: 750; min-width: 0; overflow-wrap: anywhere; }
+ .cd-when { font-size: 12px; opacity: .8; display: block; font-weight: 600; }
+ .cd-in { font-weight: 800; white-space: nowrap; flex-shrink: 0; }
+</style>
+<script>
+/* OCT8 #4 · Countdowns: every leave-by link lands here, so the page counts down to the next timed calendar events
+   (data/cal-live.json upcomingLeaves; school "specials" notes and all-day items left out). Re-counts every minute. */
+(function () {
+  var list = document.getElementById("cd-next-list"), meta = document.getElementById("cd-next-meta"), evs = null;
+  if (!list) return;
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  var fmt = function (ms) { return new Date(ms).toLocaleString("en-US", { timeZone: "America/Chicago", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); };
+  function until(ms) {
+    var m = Math.round((ms - Date.now()) / 60000);
+    if (m < 1) return "now";
+    if (m < 60) return "in " + m + " min";
+    var h = Math.floor(m / 60), r = m % 60;
+    if (h < 24) return "in " + h + " h" + (r ? " " + r + " m" : "");
+    var d = Math.floor(h / 24), hh = h % 24;
+    return "in " + d + (d === 1 ? " day" : " days") + (hh ? " " + hh + " h" : "");
+  }
+  function paint() {
+    if (!evs) return;
+    var now = Date.now();
+    var next = evs.filter(function (e) { var t = Date.parse(e.start); return e && !e.allDay && t > now && !/specials:/i.test(e.summary || ""); })
+      .sort(function (a, b) { return Date.parse(a.start) - Date.parse(b.start); }).slice(0, 3);
+    if (!next.length) { list.innerHTML = '<div class="cd-row"><span class="cd-what">Nothing timed on the calendar through the window</span></div>'; return; }
+    list.innerHTML = next.map(function (e) {
+      var t = Date.parse(e.start);
+      return '<div class="cd-row"><span class="cd-what">' + esc(String(e.summary || "UNKNOWN").replace(/\s*[\u2014\u2013]\s*/g, " · ")) + '<span class="cd-when">' + esc(fmt(t)) + '</span></span><span class="cd-in">' + esc(until(t)) + "</span></div>";
+    }).join("");
+  }
+  fetch("data/cal-live.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (d) {
+    if (!d || !Array.isArray(d.upcomingLeaves)) { list.innerHTML = '<div class="cd-row"><span class="cd-what">Calendar feed UNKNOWN right now</span></div>'; return; }
+    evs = d.upcomingLeaves;
+    if (meta) meta.textContent = d.windowEnd ? ("through " + new Date(d.windowEnd + "T12:00:00-05:00").toLocaleDateString("en-US", { timeZone: "America/Chicago", weekday: "short", month: "short", day: "numeric" })) : "calendar";
+    paint(); setInterval(paint, 60000);
+  });
+})();
+</script>
 <script src="house-clock.js?v=OCT8"></script>
 <script src="house-kid-match.js?v=HAYESJ1"></script>
 <script src="house-board-strip.js?v=OCT8"></script>
 <script src="house-glass-bind.js?v=HAYESJ1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-hdr-home.js?v=CLIP1"></script>
-<script src="house-links.js?v=LINKWEB1"></script>
+<script src="house-links.js?v=OCT8"></script>
 <script src="house-phrase.js?v=SEPWRAP3"></script>
 </body>
 </html>
