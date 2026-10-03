@@ -81,7 +81,7 @@
     }
   }
   var tm = 0;
-  function later() { clearTimeout(tm); tm = setTimeout(function () { mo.disconnect(); try { fit(); watchBlocks(); } finally { observe(); } }, 60); }
+  function later() { clearTimeout(tm); tm = setTimeout(function () { tm = 0; mo.disconnect(); try { fit(); watchBlocks(); } finally { observe(); } }, 60); }
   var mo = new MutationObserver(function (ms) {
     var k = 0;
     mo.disconnect();
@@ -102,5 +102,5 @@
   g.addEventListener("resize", later);
   if (typeof ResizeObserver === "function") { try { new ResizeObserver(later).observe(d.documentElement); bro = new ResizeObserver(later); } catch (e) {} }
   if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", start); else start();
-  g.HousePhrase = { fit: function () { mo.disconnect(); try { fit(); } finally { observe(); } }, wrap: wrapAll };
+  g.HousePhrase = { pending: function () { return !!tm; }, fit: function () { mo.disconnect(); try { fit(); } finally { observe(); } }, wrap: wrapAll };
 })(window);

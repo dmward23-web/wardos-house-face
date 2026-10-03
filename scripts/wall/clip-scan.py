@@ -107,6 +107,9 @@ def job(a):
             pg.clock.install(time=CLOCK); pg.goto(base + page, wait_until="load", timeout=30000); pg.wait_for_timeout(1800)
             try: pg.clock.run_for(1500)
             except Exception: pass
+            # wait on LAYOUT, not stillness: a separator re-check queued by a late re-layout lands first (<= 3 s)
+            try: pg.wait_for_function("() => !window.HousePhrase || !window.HousePhrase.pending || !window.HousePhrase.pending()", timeout=3000, polling=100)
+            except Exception: pass
             if MINFONT:
                 pg.evaluate(MINJS, MINFONT); pg.wait_for_timeout(400)
                 try: pg.clock.run_for(800)
