@@ -265,7 +265,7 @@
   }
 
   .lock-list, .gap-list, .promo-list {
-    display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0;
+    display: flex; flex-direction: column; gap: 8px; flex: 1 0 auto; min-height: min-content; /* CLIP1b: a list never shrinks under its rows (they ran into the next header at 1280) */
   }
   .lock-row, .gap-row, .promo-row {
     display: flex; align-items: flex-start; gap: 12px;
@@ -324,7 +324,7 @@
 <link rel="stylesheet" href="tokens-sheet-clock-first-heat.css?v=KITDEAD1" />
 <link rel="stylesheet" href="house-scroll.css?v=SCROLLEND2" />
 <link rel="stylesheet" href="house-landscape.css?v=SPLIT1" />
-<script src="house-landscape.js?v=FOOTCOL1"></script>
+<script src="house-landscape.js?v=SEPWRAP3"></script>
 <script src="house-nodash.js?v=NODASH1"></script>
 </head>
 <body>

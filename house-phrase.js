@@ -20,6 +20,10 @@
       if (i % 2) { var s = d.createElement("span"); s.className = "hp-sep"; s.textContent = parts[i]; f.appendChild(s); }
       else f.appendChild(d.createTextNode(parts[i]));
     }
+    /* SEPWRAP3 · in a flex / grid box each child is its own item: keep the run ONE item (a plain span around it) so the
+       separators never split the text into stacked pieces */
+    var pd = ""; try { pd = g.getComputedStyle(p).display; } catch (e) {}
+    if (/flex|grid/.test(pd)) { var run = d.createElement("span"); run.className = "hp-run"; run.appendChild(f); f = run; }
     p.replaceChild(f, t); return true;
   }
   function wrapAll(root) {
@@ -50,8 +54,10 @@
     return null;
   }
   function sameLine(a, q) { var m = (a.top + a.bottom) / 2; return m > q.top && m < q.bottom; }
+  function cutKey(seps) { var k = ""; for (var i = 0; i < seps.length; i++) k += seps[i].hasAttribute("data-cut") ? "1" : "0"; return k; }
+  var repacks = 0;
   function fit() {
-    var seps = d.querySelectorAll(".hp-sep");
+    var seps = d.querySelectorAll(".hp-sep"), before = cutKey(seps);
     for (var i = 0; i < seps.length; i++) if (seps[i].hasAttribute("data-cut")) { seps[i].textContent = seps[i].getAttribute("data-cut"); seps[i].removeAttribute("data-cut"); }
     /* a cut reflows its line, so a later separator can land on a break: re-check (cut only) until none moves */
     for (var pass = 0, cut = 1; pass < 4 && cut; pass++) { cut = 0;
@@ -66,6 +72,12 @@
         s.setAttribute("data-cut", t.nodeValue); s.textContent = " "; cut++;
       }
     }
+    }
+    /* SEPWRAP3 · a landscape board sized its cards' type before these breaks moved: when the set of cut separators
+       changes, let the packer measure again (resize = its own re-deal), at most 3 times in a row */
+    if (cutKey(seps) !== before && d.documentElement.hasAttribute("data-ls-pack") && repacks < 3) {
+      repacks++; setTimeout(function () { repacks = Math.max(0, repacks - 1); }, 3000);
+      setTimeout(function () { try { g.dispatchEvent(new Event("resize")); } catch (e) {} }, 0);
     }
   }
   var tm = 0;
