@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-03T13:23:30.334Z",
+  "fetchedAt": "2026-10-03T13:33:34.108Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-01",
   "windowEnd": "2026-10-09",
   "asOfIso": "2026-10-03",
   "nextLeave": {
-    "id": "4ug63o0oqfeld1ll1h7ff1eerc",
-    "summary": "Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. Alexander's",
-    "start": "2026-10-03T08:30:00-05:00",
-    "end": "2026-10-03T17:00:00-05:00",
-    "location": "6719 W 147th Terrace, Overland Park, KS 66223 → J. Alexander's, 73 White Bridge Rd #130, Nashville, TN 37205",
+    "id": "7la5t0sdbtph2v6t3v4si7k97g",
+    "summary": "Hayes Johnson's birthday dinner — J. Alexander's · 5:30 · leave 5:00",
+    "start": "2026-10-03T17:00:00-05:00",
+    "end": "2026-10-03T19:30:00-05:00",
+    "location": "J. Alexander's, 73 White Bridge Rd #130, Nashville, TN 37205",
     "busy": true,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "4ug63o0oqfeld1ll1h7ff1eerc",
-      "summary": "Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. Alexander's",
-      "start": "2026-10-03T08:30:00-05:00",
-      "end": "2026-10-03T17:00:00-05:00",
-      "location": "6719 W 147th Terrace, Overland Park, KS 66223 → J. Alexander's, 73 White Bridge Rd #130, Nashville, TN 37205",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "gfm3p4jh5agr5vdp6ra79ohbag",
       "summary": "Hayes + Harris — Saturday Morning Donuts · 10:00",
@@ -352,9 +343,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "8:30",
-    "place": "Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. A…",
-    "detailHtml": "<strong>8:30</strong> Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. A…",
+    "time": "5:00",
+    "place": "Hayes Johnson's birthday dinner — J. Alexander's · 5:…",
+    "detailHtml": "<strong>5:00</strong> Hayes Johnson's birthday dinner — J. Alexander's · 5:…",
     "badge": "Sat"
   },
   "error": null
