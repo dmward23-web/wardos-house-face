@@ -11,7 +11,8 @@
  *
  * Gates (a failed gate = the build is marked NOT PUBLISHABLE, exit 1):
  *   scripts/wall/press-map.py 1920x1080   every press lands somewhere real
- *   scripts/wall/alfred/space.py          no dead space on the wall: REAL data at the CURRENT clock, 5 viewports
+ *   scripts/wall/alfred/space.py          no dead space on the wall: REAL data at the CURRENT clock, 5 viewports,
+ *                                         read on the built copy itself (its bundled data/ is fresh-data.py output)
  *                                         (SPACE-01 10/2; fixtures never block)
  *   extra, never blocks: scripts/wall/deadspace.py --wall  (the pinned 06:45 / 15:30 fixture replays, reported only)
  *   scripts/preview/check-preview.py     the built copy: no writes, keys ignored, noindex, chip, hint
@@ -43,6 +44,16 @@ fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
 const tar = spawnSync("sh", ["-c", `git archive --format=tar ${REF} | tar -x -C "${OUT}"`], { cwd: ROOT, encoding: "utf8" });
 if (tar.status !== 0) { console.error(tar.stderr); process.exit(1); }
+/* OCT8 · the bundled data/ is real data at build time, not the branch's committed morning snapshot (that snapshot read a
+   Friday kid-seats on Saturday: three empty seats, space gate 0/5). fresh-data.py rebuilds the copy's calendar + wall feeds
+   from the scrubbed pull and main's live device feeds (it needs the copy's scripts/, so it runs before they are pruned).
+   Anything but FRESH DATA PASS (PARTIAL, a stale pull, no scrub file) blocks: the preview never ships stale data as real. */
+let freshLine = "SKIPPED";
+if (!SKIP) {
+  const fr = spawnSync("python3", [path.join(ROOT, "scripts/wall/fresh-data.py"), OUT], { cwd: ROOT, encoding: "utf8", timeout: 600000 });
+  freshLine = ((fr.stdout || "") + (fr.stderr || "")).trim().split("\n").filter(Boolean).pop() || `exit ${fr.status}`;
+  if (fr.status !== 0 || !/^FRESH DATA PASS/.test(freshLine)) fails.push(`bundled data not fresh: ${freshLine.slice(0, 160)}`);
+}
 for (const p of ["scripts", "docs", ".github", "test", "tests", "node_modules", "CNAME"]) fs.rmSync(path.join(OUT, p), { recursive: true, force: true });
 
 // notes, scripts and setup docs never ship (a preview is pages + assets + data)
@@ -107,7 +118,7 @@ if (fs.existsSync(path.join(OUT, "data/display-rename.private.json"))) fails.pus
 const gates = [
   ["press map 1920", "python3", ["scripts/wall/press-map.py", "1920x1080", "--out", path.join(OUT, "..", "preview-gates-press.json")]],
   ["preview guard", "python3", ["scripts/preview/check-preview.py", OUT]],
-  ["dead space wall (real data, now)", "python3", ["scripts/wall/alfred/space.py", ROOT, SPACE_OUT], { SPACE_PAGES: "wall.html" }, spaceVerdict],
+  ["dead space wall (real data, now)", "python3", ["scripts/wall/alfred/space.py", OUT, SPACE_OUT], { SPACE_PAGES: "wall.html" }, spaceVerdict],
 ];
 /* SPACE-01 (10/2): the dead-space gate reads the wall at the CURRENT clock on the real data/ (no pinned 06:45 / 15:30
    replay); space.py reports, this decides: any real-now render with a fail or an error blocks */
@@ -137,6 +148,7 @@ for (const [name, cmd, a] of extras) {
 }
 
 console.log(`preview build ${sha} -> ${OUT}  (${pages.length} pages, bundled data first, live fallback ${LIVE})`);
+console.log(`  bundled data: ${freshLine.slice(0, 140)}`);
 for (const [n, s] of gateResults) console.log(`  gate ${n}: ${s}`);
 const publishable = !fails.length && !SKIP;
 if (fails.length) { console.log("NOT PUBLISHABLE:"); for (const f of fails) console.log("  - " + f); }
