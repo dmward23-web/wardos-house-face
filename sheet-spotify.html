@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#02050a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon-20260926c.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<title>Spotify · House</title>
+<!-- SPOTIFY1 · Ori-style living player (Dan 10/3). World = ori/ori-scene.js (original art + code, Ori-INSPIRED mood).
+     Controls go board → house box (hub key) → Spotify Web API. No Spotify token ever lives on this page. -->
+<link rel="stylesheet" href="sheet-spotify.css?v=SPOTIFY2" />
+</head>
+<body class="spw-boot">
+<div id="spw-world" class="spw-world" aria-hidden="true"></div>
+<div class="spw-fallback" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div class="spw-shade" aria-hidden="true"></div>
+
+<main class="spw" id="spw" aria-label="Spotify player">
+  <header class="spw-top spw-in" style="--d:0">
+    <a class="spw-back" href="sheet-index.html" data-spw-back>‹ Sheets</a>
+    <div class="spw-brand"><span class="spw-brand-name">Spotify</span><span class="spw-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="spw-pill" id="spw-pill">…</span></div>
+  </header>
+
+  <section class="spw-stage" id="spw-stage">
+    <div class="spw-lantern spw-in" style="--d:1" id="spw-lantern">
+      <div class="spw-halo" aria-hidden="true"></div>
+      <svg class="spw-ring" viewBox="0 0 200 200" aria-hidden="true"><defs><linearGradient id="spwg" x1="0" x2="1"><stop offset="0" stop-color="rgba(var(--spw-c),0)"/><stop offset=".5" stop-color="rgba(var(--spw-c),.95)"/><stop offset="1" stop-color="rgba(255,255,255,.9)"/></linearGradient></defs><circle cx="100" cy="100" r="96" fill="none" stroke="url(#spwg)" stroke-width="1.6" stroke-dasharray="2 9 40 12 4 16 70 20"/></svg>
+      <div class="spw-art-frame">
+        <div class="spw-art-ph" aria-hidden="true"></div>
+        <img class="spw-art" id="spw-art" alt="" decoding="async" referrerpolicy="no-referrer" hidden>
+        <div class="spw-art-sheen" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="spw-titles spw-in" style="--d:2">
+      <h1 class="spw-title" id="spw-title">Spotify</h1>
+      <button type="button" class="spw-artist" id="spw-artist" data-go="artist"></button>
+      <button type="button" class="spw-album" id="spw-album" data-go="album"></button>
+      <button type="button" class="spw-like" id="spw-like" aria-label="Save to Liked Songs" aria-pressed="false" hidden></button>
+      <button type="button" class="spw-qbtn" id="spw-qbtn" aria-label="Up next (queue)" hidden></button>
+    </div>
+
+    <div class="spw-live" id="spw-live">
+      <div class="spw-scrub spw-in" style="--d:3">
+        <div class="spw-track"><div class="spw-fill" id="spw-fill"></div><div class="spw-knob" id="spw-knob"></div></div>
+        <input type="range" class="spw-seek" id="spw-seek" min="0" max="1000" value="0" step="1" aria-label="Seek">
+        <div class="spw-times"><span id="spw-t0">0:00</span><span id="spw-t1">0:00</span></div>
+      </div>
+
+      <div class="spw-ctrls spw-in" style="--d:4" role="group" aria-label="Playback">
+        <button type="button" class="spw-b spw-b-sm" data-a="shuffle" aria-label="Shuffle" aria-pressed="false"></button>
+        <button type="button" class="spw-b" data-a="previous" aria-label="Previous track"></button>
+        <button type="button" class="spw-b spw-b-play" data-a="toggle" aria-label="Play"></button>
+        <button type="button" class="spw-b" data-a="next" aria-label="Next track"></button>
+        <button type="button" class="spw-b spw-b-sm" data-a="repeat" aria-label="Repeat off"><span class="spw-r1">1</span></button>
+      </div>
+
+      <div class="spw-vol spw-in" style="--d:5">
+        <span class="spw-vol-ic" aria-hidden="true"></span>
+        <div class="spw-vtrack"><div class="spw-vfill" id="spw-vfill"></div></div>
+        <input type="range" id="spw-volume" min="0" max="100" value="50" aria-label="Volume">
+        <span class="spw-vol-n" id="spw-vol-n">–</span>
+      </div>
+
+      <button type="button" class="spw-device spw-in" style="--d:6" id="spw-device" aria-haspopup="dialog"><span class="spw-dev-ic" aria-hidden="true"></span><span class="spw-dev-txt" id="spw-dev-txt">Pick a speaker</span><span class="spw-dev-chev" aria-hidden="true">▾</span></button>
+    </div>
+
+    <div class="spw-gate spw-in" style="--d:2" id="spw-gate" hidden>
+      <div class="spw-gate-msg" id="spw-gate-msg"></div>
+      <button type="button" class="spw-orb-btn" id="spw-gate-btn">Connect Spotify</button>
+      <div class="spw-gate-sub" id="spw-gate-sub"></div>
+    </div>
+
+    <section class="spw-setup" id="spw-setup" hidden aria-label="One-time Spotify setup">
+      <h2>One-time Spotify setup</h2>
+      <p class="spw-setup-lead">Spotify only lets a home board in through your own free developer app. About 3 minutes, once — then every House screen just works.</p>
+      <ol>
+        <li>Open the <a href="https://developer.spotify.com/dashboard/create" target="_blank" rel="noopener">Spotify developer dashboard</a> (sign in as you) and create an app.<br><span class="spw-dim">Name: WardOS House · Description: House board</span></li>
+        <li>Redirect URI — paste exactly, tap Add:
+          <div class="spw-copy"><code id="spw-redirect">https://dmward23-web.github.io/wardos-house-face/spotify-callback.html</code><button type="button" id="spw-copy-btn">Copy</button></div>
+          Tick <b>Web API</b>, agree, tap <b>Save</b>.</li>
+        <li>Copy the <b>Client ID</b> from the app page and paste it here:
+          <input id="spw-client" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="32-character Client ID" maxlength="64">
+        </li>
+      </ol>
+      <button type="button" class="spw-orb-btn" id="spw-setup-go">Save &amp; connect Spotify</button>
+      <div class="spw-setup-err" id="spw-setup-err" role="alert"></div>
+    </section>
+  </section>
+
+  <!-- SPOTIFY2 · HOME AUDIO: the house speakers (Google/Nest cast speakers + groups, TVs) as Spotify Connect rooms -->
+  <section class="spw-rooms spw-panel spw-in" style="--d:7" id="spw-rooms" hidden aria-label="Home audio">
+    <div class="spw-ph"><span class="spw-ph-ic" data-ic="home"></span><h2>Home audio</h2><button type="button" class="spw-ph-act" id="spw-rooms-refresh">Refresh</button></div>
+    <div class="spw-room-list" id="spw-room-list"></div>
+    <div class="spw-room-ft" id="spw-room-ft"></div>
+  </section>
+
+  <!-- SPOTIFY2 · everything else Spotify does: search, library, queue, recent -->
+  <section class="spw-hub spw-in" style="--d:8" id="spw-hub" hidden>
+    <nav class="spw-nav" role="tablist" aria-label="Spotify">
+      <button type="button" role="tab" data-pane="search" aria-selected="false"><span data-ic="search"></span>Search</button>
+      <button type="button" role="tab" data-pane="library" class="on" aria-selected="true"><span data-ic="lib"></span>Library</button>
+      <button type="button" role="tab" data-pane="queue" aria-selected="false"><span data-ic="queue"></span>Queue</button>
+      <button type="button" role="tab" data-pane="recent" aria-selected="false"><span data-ic="clock"></span>Recent</button>
+    </nav>
+    <div class="spw-pane" id="spw-pane" role="tabpanel"></div>
+  </section>
+</main>
+
+<div class="spw-sheet" id="spw-sheet" hidden role="dialog" aria-label="Choose a speaker">
+  <div class="spw-sheet-card">
+    <div class="spw-sheet-hd">Play on<button type="button" class="spw-sheet-x" data-close aria-label="Close">×</button></div>
+    <div class="spw-sheet-list" id="spw-sheet-list"></div>
+    <div class="spw-sheet-ft">Don't see it? Open Spotify on that speaker, phone or computer once and it shows up here.</div>
+  </div>
+</div>
+<!-- SPOTIFY2 · album / artist / playlist / podcast / Liked Songs page (rises over the living world) -->
+<div class="spw-detail" id="spw-detail" hidden role="dialog" aria-modal="true" aria-label="Details">
+  <div class="spw-detail-glow" aria-hidden="true"></div>
+  <div class="spw-detail-scroll" id="spw-detail-scroll">
+    <div class="spw-detail-top"><button type="button" class="spw-back" data-detail-close>‹ Back</button></div>
+    <div class="spw-detail-body" id="spw-detail-body"></div>
+  </div>
+</div>
+<div class="spw-toast" id="spw-toast" role="status" aria-live="polite"></div>
+
+<script src="ori/plates/painted/manifest.js?v=SPOTIFY2"></script>
+<script src="ori/ori-scene.js?v=SPOTIFY2"></script>
+<script src="house-spotify.js?v=SPOTIFY2"></script>
+<script src="sheet-spotify.js?v=SPOTIFY2"></script>
+<script src="sheet-spotify-lib.js?v=SPOTIFY2"></script>
+</body>
+</html>

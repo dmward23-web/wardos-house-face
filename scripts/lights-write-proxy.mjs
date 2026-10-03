@@ -24,6 +24,7 @@ import http from "node:http";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import * as sensi from "./sensi-control.mjs"; /* SENSICTL1 */
+import * as spotify from "./spotify-control.mjs"; /* SPOTIFY1 */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -389,8 +390,23 @@ async function main() {
           warm: warm.ready,
           kasaCreds: hasKasaCreds(),
           sensi: true,
+          spotify: (() => { try { const s = spotify.status(); return { app: s.clientId, connected: s.connected }; } catch { return null; } })(),
           ts: new Date().toISOString(),
         });
+      }
+
+      /* SPOTIFY1 · finish a Spotify login from spotify-callback.html. Authorised by the single-use
+         state the box minted for an authed screen (the callback can land in a storage context with
+         no hub key, e.g. the iOS home-screen icon's sign-in sheet). */
+      if (pathname === "/api/spotify/exchange" && req.method === "POST") {
+        const body = await readBody(req);
+        try {
+          const r = await spotify.authExchange(String(body.code || ""), String(body.state || ""));
+          console.log(`[spotify] ${new Date().toISOString()} connected ${r.user ? r.user.name : ""}`);
+          return json(res, 200, r);
+        } catch (e) {
+          return json(res, e.status || 502, { ok: false, error: e.code || "error", message: String(e.message || e) });
+        }
       }
 
       if (!checkAuth(req, args)) {
@@ -439,6 +455,52 @@ async function main() {
           return json(res, 200, { ok: true, thermostat: t, ts: new Date().toISOString() });
         } catch (e) {
           return json(res, 502, { ok: false, error: String(e.message || e) });
+        }
+      }
+
+      /* SPOTIFY1 · Spotify Connect now-playing + control (same key + tunnel as lights) */
+      if (pathname.startsWith("/api/spotify")) {
+        const fail = (e) => json(res, e.status && e.status >= 400 && e.status < 600 ? e.status : 502, { ok: false, error: e.code || "error", message: String(e.message || e), retryAfter: e.retryAfter || 0 });
+        try {
+          if (pathname === "/api/spotify" && req.method === "GET") {
+            return json(res, 200, { ...(await spotify.snapshot({ devices: u.searchParams.get("devices") === "1" })), ts: new Date().toISOString() });
+          }
+          if (pathname === "/api/spotify/devices" && req.method === "GET") {
+            return json(res, 200, { ok: true, devices: await spotify.devices() });
+          }
+          if (pathname === "/api/spotify/library" && req.method === "GET") {
+            const [recent, playlists] = await Promise.allSettled([spotify.recent(), spotify.playlists()]);
+            return json(res, 200, { ok: true, recent: recent.status === "fulfilled" ? recent.value : [], playlists: playlists.status === "fulfilled" ? playlists.value : [],
+              errors: [recent, playlists].filter((x) => x.status === "rejected").map((x) => x.reason && (x.reason.code || x.reason.message)) });
+          }
+          if (pathname === "/api/spotify/browse" && req.method === "GET") { /* SPOTIFY2 · search / library / queue / detail pages */
+            const sp = u.searchParams;
+            const kind = String(sp.get("kind") || "");
+            const arg = sp.get("q") || sp.get("id") || "";
+            return json(res, 200, { ok: true, ...(await spotify.browse(kind, arg, { offset: sp.get("offset"), types: sp.get("types") || undefined })) });
+          }
+          if (pathname === "/api/spotify/control" && req.method === "POST") {
+            const body = await readBody(req);
+            const snap = await spotify.control(body);
+            console.log(`[spotify] ${new Date().toISOString()} ${body.action} -> ${snap.state}`);
+            return json(res, 200, { ...snap, ok: snap.ok !== false, ts: new Date().toISOString() });
+          }
+          if (pathname === "/api/spotify/auth-start" && req.method === "POST") {
+            const body = await readBody(req);
+            return json(res, 200, { ok: true, ...spotify.authStart(body.returnTo) });
+          }
+          if (pathname === "/api/spotify/setup" && req.method === "POST") {
+            const body = await readBody(req);
+            spotify.setClientId(body.clientId);
+            console.log(`[spotify] ${new Date().toISOString()} client id set`);
+            return json(res, 200, { ok: true, clientId: true, setup: spotify.status(), ...(body.connect ? spotify.authStart(body.returnTo) : {}) });
+          }
+          if (pathname === "/api/spotify/disconnect" && req.method === "POST") {
+            return json(res, 200, spotify.disconnect());
+          }
+          return json(res, 404, { ok: false, error: "not found" });
+        } catch (e) {
+          return fail(e);
         }
       }
 

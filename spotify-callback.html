@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#02050a">
+<title>Connecting Spotify · House</title>
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<!-- SPOTIFY1 · Spotify sends Dan back here after sign-in (registered Redirect URI). The page hands the
+     one-time code + state to the house box, which finishes the PKCE exchange and keeps the login.
+     No token ever lands in this page, the URL bar or the repo. -->
+<style>
+  html, body { margin: 0; height: 100%; background: radial-gradient(80% 60% at 50% 30%, #0b2a3a 0%, #02050a 70%); color: #eaf6ff; font: 16px/1.4 "Inter Display", Inter, -apple-system, system-ui, sans-serif; }
+  .wrap { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; box-sizing: border-box; text-align: center; }
+  .orb { width: 96px; height: 96px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fff 0%, #b6ffd6 18%, #1ed760 45%, rgba(30,215,96,0) 72%); box-shadow: 0 0 60px rgba(30,215,96,.6), 0 0 140px rgba(56,214,255,.25); animation: pulse 1.6s ease-in-out infinite; }
+  .orb.ok { animation: none; transform: scale(1.1); }
+  .orb.bad { background: radial-gradient(circle at 40% 35%, #fff 0%, #ffe3a3 18%, #ffb347 45%, rgba(255,179,71,0) 72%); box-shadow: 0 0 60px rgba(255,179,71,.5); animation: none; }
+  @keyframes pulse { 0%,100% { transform: scale(.92); opacity: .85; } 50% { transform: scale(1.05); opacity: 1; } }
+  h1 { margin: 0; font-size: 24px; font-weight: 800; text-shadow: 0 0 22px rgba(30,215,96,.45); }
+  p { margin: 0; max-width: 340px; color: rgba(226,238,250,.8); }
+  a.btn { display: inline-block; margin-top: 6px; padding: 12px 22px; border-radius: 999px; background: #1ed760; color: #03140a; font-weight: 800; text-decoration: none; box-shadow: 0 0 24px rgba(30,215,96,.5); }
+  .motes i { position: fixed; width: 4px; height: 4px; border-radius: 50%; background: #bff; box-shadow: 0 0 10px #8ef; opacity: .6; animation: rise 9s linear infinite; }
+  @keyframes rise { from { transform: translateY(20vh); opacity: 0; } 20% { opacity: .7; } to { transform: translateY(-110vh); opacity: 0; } }
+</style>
+</head>
+<body>
+<div class="motes" aria-hidden="true"><i style="left:12%;top:90%;animation-delay:-1s"></i><i style="left:30%;top:100%;animation-delay:-4s"></i><i style="left:55%;top:95%;animation-delay:-2s"></i><i style="left:72%;top:100%;animation-delay:-6s"></i><i style="left:88%;top:92%;animation-delay:-3s"></i></div>
+<main class="wrap" role="status" aria-live="polite">
+  <div class="orb" id="orb"></div>
+  <h1 id="h">Connecting Spotify…</h1>
+  <p id="p">Handing the sign-in to the house box.</p>
+  <a class="btn" id="go" href="sheet-spotify.html" hidden>Open the player</a>
+</main>
+<script>
+(function () {
+  "use strict";
+  var q = new URLSearchParams(location.search), code = q.get("code"), state = q.get("state"), err = q.get("error");
+  try { history.replaceState(null, "", location.pathname); } catch (e) {} /* the code is single-use; keep it out of history */
+  var h = document.getElementById("h"), p = document.getElementById("p"), orb = document.getElementById("orb"), go = document.getElementById("go");
+  function done(ok, title, msg, href) {
+    orb.className = "orb " + (ok ? "ok" : "bad"); h.textContent = title; p.textContent = msg;
+    go.hidden = false; if (href) go.href = href; go.textContent = ok ? "Open the player" : "Back to the player";
+  }
+  if (err || !code || !state) {
+    done(false, err === "access_denied" ? "Spotify sign-in was cancelled" : "Spotify didn't finish the sign-in", "Nothing changed. Tap Connect Spotify to try again.");
+    return;
+  }
+  var pages = /\.github\.io$/i.test(location.hostname);
+  function lsProxy() { try { var v = localStorage.getItem("wardos-lights-proxy") || ""; return (pages && /^https?:\/\/(127\.0\.0\.1|localhost)/i.test(v)) ? "" : v.replace(/\/$/, ""); } catch (e) { return ""; } }
+  function liveProxy() {
+    return fetch("data/lights-live.json?cb=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { var w = d && d.writeProxy ? String(d.writeProxy).replace(/\/$/, "") : ""; return /^https:\/\//i.test(w) ? w : ""; }).catch(function () { return ""; });
+  }
+  function exchange(base) {
+    return fetch(base + "/api/spotify/exchange", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: code, state: state }) })
+      .then(function (r) { return r.json().catch(function () { return { ok: false }; }); });
+  }
+  var first = pages ? liveProxy() : Promise.resolve(lsProxy());
+  first.then(function (b) { return b || (pages ? lsProxy() : liveProxy()); }).then(function (base) {
+    if (!base) base = pages ? "" : "http://127.0.0.1:8788";
+    if (!base) { done(false, "House box isn't answering", "Try again in a minute — the sign-in link is good for 15 minutes."); return; }
+    return exchange(base).then(function (j) {
+      if (j && j.ok) {
+        var back = j.returnTo || "sheet-spotify.html";
+        done(true, "Spotify connected", (j.user && j.user.name ? j.user.name + " · " : "") + "Every House screen can play and skip now.", back);
+        setTimeout(function () { location.replace(back); }, 1400);
+      } else {
+        done(false, "Spotify didn't connect", (j && j.message) || "The house box couldn't finish the sign-in. Tap Connect Spotify again.");
+      }
+    });
+  }).catch(function () { done(false, "House box isn't answering", "Try Connect Spotify again in a minute."); });
+})();
+</script>
+</body>
+</html>

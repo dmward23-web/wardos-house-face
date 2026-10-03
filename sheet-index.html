@@ -3790,6 +3790,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 @media (prefers-reduced-motion:reduce){.atlas-chip .atlas-live{animation:none}}
 </style>
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
+<link rel="stylesheet" href="house-spotify.css?v=SPOTIFY2" /><!-- SPOTIFY1 -->
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -4135,6 +4136,8 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <div class="hub-lights-grid" id="hub-lights-grid" aria-label="Per-room switches"></div>
  <a class="hub-lights-more" href="sheet-lights.html">Full lights board →</a>
  </section>
+ <!-- SPOTIFY1 · phone control strip (under lights) · painted by house-spotify.js -->
+ <section class="sp-tile sp-strip" id="hub-spotify-strip" data-sp-tile aria-label="Spotify"></section>
  </div>
 
 
@@ -4315,6 +4318,9 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  </div>
  <div class="tile-foot"><span class="tile-fact">Travel sheet</span><span class="tile-tap">OPEN</span></div>
  </a>
+
+ <!-- SPOTIFY1 · wall cell next to Family trips · tap = Ori player (sheet-spotify.html) -->
+ <div class="tile spotify sp-tile sp-cell" id="hub-spotify-tile" data-sp-tile aria-label="Spotify"></div>
 </nav>
  </div>
 
@@ -4444,5 +4450,7 @@ document.addEventListener("click", function (ev) {
 });
 </script>
 <script src="house-links.js?v=LINKWEB1"></script>
+<script src="house-spotify.js?v=SPOTIFY2"></script>
+<script>/* SPOTIFY1 */ try { HouseSpotify.mountTiles(document).start(); } catch (e) {}</script>
 </body>
 </html>
