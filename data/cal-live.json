@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-03T12:57:05.283Z",
+  "fetchedAt": "2026-10-03T13:07:25.552Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-01",
   "windowEnd": "2026-10-09",
@@ -16,15 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "806kf6gnibpjh3vq78g4mnfiqc",
-      "summary": "Dan — load car · haul + bags (before drive)",
-      "start": "2026-10-03T08:00:00-05:00",
-      "end": "2026-10-03T08:30:00-05:00",
-      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "4ug63o0oqfeld1ll1h7ff1eerc",
       "summary": "Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. Alexander's",
