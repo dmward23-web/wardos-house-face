@@ -821,7 +821,8 @@
     ".lb-day-stop:first-of-type{border-top:0}",
     ".lb-day-t{font-size:20px;font-weight:900;letter-spacing:-.04em;line-height:1;color:#f2eee6}",
     ".lb-day-stop.is-next .lb-day-t{color:#ffe080;text-shadow:0 0 16px rgba(255,180,30,.5)}",
-    ".lb-day-what{font-size:12px;font-weight:700;color:#e8e2d6;line-height:1.2;margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}",
+    ".lb-day-what{font-size:12px;font-weight:700;color:#e8e2d6;line-height:1.2;margin-top:2px;overflow-wrap:anywhere}", /* OCT8: whole title, no clamp; fitStrip drops whole stops instead */
+    ".lb-day-more{font-size:11px;font-weight:700;color:#bdb6a8;padding:3px 0 0}",
     ".lb-day-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}",
     ".lb-day-tag{font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:1px 5px;border-radius:6px;background:rgba(255,255,255,.1);color:#f2eee6}",
     ".lb-day-tag[data-who=Ainsley]{background:rgba(236,72,153,.28);color:#ffd1e8}",
@@ -976,13 +977,28 @@
       if (!br.height) return;
       var er = el.getBoundingClientRect(), rr = Math.min(br.right, er.right || br.right); /* OCT8: held to the layouts box too */
       var past = function (n) { var r = n.getBoundingClientRect(); return r.bottom > br.bottom + 1 || r.right > rr + 1; };
-      for (var k = 0; k < 12; k++) {
+      var over = function () {
+        if (box.scrollHeight > box.clientHeight + 1) return true;
+        var all = el.querySelectorAll(".lb-day-stop, .lb-day-more, .lb-day-tmr .lb-day-tchip");
+        for (var a = 0; a < all.length; a++) if (past(all[a])) return true;
+        return false;
+      };
+      for (var k = 0; k < 40; k++) {
+        if (!over()) return;
         var chips = el.querySelectorAll(".lb-day-tmr .lb-day-tchip"), last = chips[chips.length - 1];
-        var over = box.scrollHeight > box.clientHeight + 1 || (last && past(last));
-        if (!over) return;
         if (chips.length > 1) { last.parentNode.removeChild(last); continue; }
-        var row = el.querySelector(".lb-day-tmr"); if (row) row.parentNode.removeChild(row);
-        return;
+        var row = el.querySelector(".lb-day-tmr"); if (row) { row.parentNode.removeChild(row); continue; }
+        /* OCT8: today's stops that still run past the card leave whole, last first, from the busiest part of the day
+           (never the next stop); the part says how many it holds back ("+2 more"), never half a title */
+        var cols = el.querySelectorAll(".lb-day-col"), best = null, bn = 0;
+        for (var c = 0; c < cols.length; c++) { var nn = cols[c].querySelectorAll(".lb-day-stop:not(.is-next)").length; if (nn > bn) { bn = nn; best = cols[c]; } }
+        if (!best) return;
+        var st = best.querySelectorAll(".lb-day-stop:not(.is-next)"), lst = st[st.length - 1];
+        lst.parentNode.removeChild(lst);
+        var more = best.querySelector(".lb-day-more");
+        if (!more) { more = document.createElement("div"); more.className = "lb-day-more"; best.appendChild(more); }
+        var n = (Number(more.getAttribute("data-n")) || 0) + 1;
+        more.setAttribute("data-n", String(n)); more.textContent = "+" + n + " more";
       }
     } catch (e) { /* layout only */ }
   }

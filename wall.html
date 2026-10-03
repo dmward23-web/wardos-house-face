@@ -880,6 +880,33 @@
     $("w-next-t").innerHTML = esc(n.time) + "<small>" + esc(n.ampm) + "</small>";
     $("w-next-label").textContent = n.what;
     $("w-next-sub").textContent = [n.where ? "at " + n.where : "", n.ends ? "ends " + n.ends : ""].filter(Boolean).join(" \u00b7 ");
+    fitNext();
+  }
+  /* OCT8 · CLIP1 rule on the Next card: a long calendar title ("Sign up for SRE conferences (ParentSquare)") steps its
+     type down (wide or tall) to 60% of the card's size; past that it wraps onto a second line. Never an ellipsis, never cut. */
+  function fitNext() {
+    var w = $("w-next-w"), l = $("w-next-label"), sb = $("w-next-sub");
+    if (!w || !l || $("w-next").hidden) return;
+    [l, sb].forEach(function (e) { if (e) e.style.fontSize = ""; });
+    w.style.whiteSpace = ""; w.style.overflow = "";
+    var room = function () { return w.clientWidth; };
+    var rg = document.createRange();
+    var tall = function () {
+      if (w.scrollHeight > w.clientHeight + 1) return true;
+      var wb = w.getBoundingClientRect().bottom, t = sb && sb.textContent ? sb : l;
+      rg.selectNodeContents(t); var gb = rg.getBoundingClientRect().bottom;
+      return gb > wb + 1; /* the last line's glyphs, not just its line box */
+    };
+    [l, sb].forEach(function (e) {
+      if (!e || !e.textContent) return;
+      var f0 = parseFloat(getComputedStyle(e).fontSize) || 0;
+      for (var i = 0; i < 30 && (e.scrollWidth > room() + 1 || tall()); i++) {
+        var f = (parseFloat(getComputedStyle(e).fontSize) || 0) * 0.95;
+        if (f < f0 * 0.6) break;
+        e.style.fontSize = f + "px";
+      }
+    });
+    if ((l.scrollWidth > room() + 1) || (sb && sb.scrollWidth > room() + 1)) { w.style.whiteSpace = "normal"; w.style.overflow = "visible"; l.style.overflowWrap = "anywhere"; if (sb) sb.style.overflowWrap = "anywhere"; }
   }
   function paintBell() {
     var cams = feeds.nest && Array.isArray(feeds.nest.cameras) ? feeds.nest.cameras : [];

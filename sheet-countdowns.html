@@ -428,6 +428,13 @@
       var t = Date.parse(e.start);
       return '<div class="cd-row"><span class="cd-what">' + esc(String(e.summary || "UNKNOWN").replace(/\s*[\u2014\u2013]\s*/g, " · ")) + '<span class="cd-when">' + esc(fmt(t)) + '</span></span><span class="cd-in">' + esc(until(t)) + "</span></div>";
     }).join("");
+    fit(); setTimeout(fit, 400); setTimeout(fit, 1500);
+  }
+  /* a row that would run past the bottom of its card leaves whole (last first); the first one always stays */
+  function fit() {
+    var sec = document.getElementById("cd-next"); if (!sec) return;
+    var sr = sec.getBoundingClientRect(), rows = list.querySelectorAll(".cd-row");
+    for (var i = rows.length - 1; i > 0; i--) { if (rows[i].getBoundingClientRect().bottom > sr.bottom - 4) rows[i].parentNode.removeChild(rows[i]); else break; }
   }
   fetch("data/cal-live.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (d) {
     if (!d || !Array.isArray(d.upcomingLeaves)) { list.innerHTML = '<div class="cd-row"><span class="cd-what">Calendar feed UNKNOWN right now</span></div>'; return; }
