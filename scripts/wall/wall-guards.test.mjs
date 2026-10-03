@@ -220,12 +220,12 @@ await t("KIDPATH1: display text only; rate logic + star counts untouched (data-s
   const emb = JSON.parse(kd.match(/var EMBEDDED = (.*);\n/)[1]);
   assert.deepEqual(emb.kids.ainsley.goal, kw.kids.ainsley.goal, "EMBEDDED fallback mirrors kids-week.json");
 });
-await t("KIDPATH1: Pack tabs read Kids home / Kids away; Win says Kids away; Win's Fri Oct 2 Nashville item untouched", () => {
+await t("KIDPATH1: Pack tabs read Kids home / Kids away; Win says Kids away; Win's next trip reads the calendar (OCT8-5c)", () => {
   const pk = copy(read("sheet-pack.html")), win = read("sheet-win.html");
   assert.match(pk, /Kids home/); assert.match(pk, /Kids away/); assert.doesNotMatch(pk, /\bMom\b/i);
   assert.match(win, /return Oct 23 \u00b7 Kids away that week/);
-  assert.match(win, /<div class="trip-when">Fri Oct 2<br\/>\u2192 Thu Oct 9<\/div>\s*<div>\s*<div class="trip-title">Dan \u00b7 Nashville DRIVE<\/div>\s*<div class="trip-detail">Primary drive OP \u2192 Harbor Cove \u00b7 leave 9:00 after boys drop \u00b7 fly is backup only<\/div>/);
-  assert.match(win, /<div class="hero-title">Fri Oct 2 \u00b7 Dan DRIVE \u2192 Nashville<\/div>/);
+  /* OCT8-5c (Atlas-approved Oct 8 list): the Nashville item is no longer frozen copy; the hero + next card come from cal-live.json */
+  assert.match(win, /id="tr-title"/); assert.match(win, /data\/cal-live\.json/); assert.doesNotMatch(win, /leave 9:00/i);
 });
 await t("KIDPATH2: Hayes + Harris boards match Ainsley (no money chips, star-count readout, Goal wording); ids + goal math untouched", () => {
   for (const f of ["kid-hayes.html", "kid-harris.html", "kid-ainsley.html"]) assert.doesNotMatch(read(f), /data-bank-balance|data-bank-week-earn/, f + " has no Bal / Week $ chips");

@@ -184,7 +184,7 @@
     <div class="rail-top" data-go="sheet-index.html#hub-home"><span class="kick">Boards</span><span>One tap</span></div>
     <div class="rail-grp"><div class="rail-h">Days</div><div class="rail-grid">
 <a data-owner="Atlas" data-tile="today" data-tile-id="rail-today" class="badge " href="sheet-today.html#today-now" data-sheet="sheet-today.html"><span>Today</span></a>
-<a data-owner="Atlas" data-tile="week" data-tile-id="rail-week" class="badge " href="sheet-index.html#hub-home" data-sheet="sheet-index.html"><span>Week</span></a>
+<a data-owner="Atlas" data-tile="week" data-tile-id="rail-week" class="badge " href="sheet-index.html#hub-home" data-sheet="sheet-index.html"><span>Main board</span></a>
 <a data-owner="Atlas" data-tile="month" data-tile-id="rail-month" class="badge " href="month.html#month-board" data-sheet="month.html"><span>Month</span></a>
 <a data-owner="Atlas" data-tile="countdowns" data-tile-id="rail-countdowns" class="badge " href="sheet-countdowns.html#countdowns-board" data-sheet="sheet-countdowns.html"><span>Countdowns</span></a>
 </div></div>
@@ -199,8 +199,8 @@
 <div class="rail-grp"><div class="rail-h">Do</div><div class="rail-grid">
 
 <a data-owner="Atlas" data-tile="pack" data-tile-id="rail-pack" class="badge " href="sheet-pack.html#pack-board" data-sheet="sheet-pack.html"><span>Pack</span></a>
-<a data-owner="Atlas" data-tile="weekend-fun" data-tile-id="rail-weekend-fun" class="badge " href="sheet-weekend.html#weekend-board" data-sheet="sheet-weekend.html"><span>Weekend fun</span></a>
-<a data-owner="Atlas" data-tile="week-win" data-tile-id="rail-week-win" class="badge " href="sheet-win.html#win-board" data-sheet="sheet-win.html"><span>Week win</span></a>
+<a data-owner="Atlas" data-tile="weekend-fun" data-tile-id="rail-weekend-fun" class="badge " href="sheet-weekend.html#weekend-board" data-sheet="sheet-weekend.html"><span>Our Ideas</span></a>
+<a data-owner="Atlas" data-tile="week-win" data-tile-id="rail-week-win" class="badge " href="sheet-win.html#win-board" data-sheet="sheet-win.html"><span>Family trips</span></a>
 <a data-owner="Ledger" data-tile="groceries-costco" data-tile-id="rail-groceries-costco" class="badge " href="sheet-groceries.html#groc-list" data-sheet="sheet-groceries.html"><span>Groceries · Costco</span></a>
 
 <a data-owner="Vita" data-tile="dinner-vote" data-tile-id="rail-dinner-vote" data-no-source class="badge " hidden href="sheet-dinner.html#dinner-board" data-sheet="sheet-dinner.html"><span>Dinner vote</span></a>
@@ -1052,7 +1052,10 @@
     var src = [["cal-live", feeds.cal], ["sensi", feeds.sensi], ["nest", feeds.nest], ["lights", feeds.lights],
       ["house-mode", feeds.houseMode], ["next-up", feeds.nextUp], ["school-night", feeds.schoolNight], ["kid-seats", feeds.kidSeats], ["kids-week", feeds.kidsWeek]]
       .filter(function (x) { return x[1]; })
-      .map(function (x) { var t = ct(x[1].fetchedAt || x[1].updatedAt || x[1].generatedAt || x[1].refreshedAt); return '<span data-go="sheet-status.html#status-feeds">' + esc(x[0] + " " + (t || "UNKNOWN")) + "</span>"; });
+      .map(function (x) { var st = x[1].fetchedAt || x[1].updatedAt || x[1].generatedAt || x[1].refreshedAt, sm = Date.parse(st || ""), t = ct(st);
+        /* OCT8-5a: a stamp from an earlier day carries its weekday ("lights Thu 9:15 PM"), never a bare time that reads later than now */
+        if (t && isFinite(sm) && ctDay(sm) !== ctDay(now)) t = new Date(sm).toLocaleDateString("en-US", { timeZone: TZ, weekday: "short" }) + " " + t;
+        return '<span data-go="sheet-status.html#status-feeds">' + esc(x[0] + " " + (t || "UNKNOWN")) + "</span>"; });
     $("w-src").innerHTML = '<span data-go="sheet-status.html#status-feeds"><b>Data</b></span>' + src.join("") + '<span data-go="sheet-status.html#status-feeds">CT ' + esc(new Date(now).toLocaleDateString("en-US", { timeZone: TZ, weekday: "short", month: "short", day: "numeric" }).replace(",", "")) + "</span>";
     clipFit();
     $("w-modes").innerHTML = "Modes \u00b7 " + MODES.map(function (m) { return mode && mode.key === m[0] ? "<b>" + esc(m[1]) + "</b>" : esc(m[1]); }).join(" \u00b7 ");

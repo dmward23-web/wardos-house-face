@@ -136,7 +136,7 @@ for (const [name, cmd, a] of extras) {
   gateResults.push([name, (r.status === 0 ? "pass" : "fail") + " · extra, does not block"]);
 }
 
-console.log(`preview build ${sha} -> ${OUT}  (${pages.length} pages, live data ${LIVE})`);
+console.log(`preview build ${sha} -> ${OUT}  (${pages.length} pages, bundled data first, live fallback ${LIVE})`);
 for (const [n, s] of gateResults) console.log(`  gate ${n}: ${s}`);
 const publishable = !fails.length && !SKIP;
 if (fails.length) { console.log("NOT PUBLISHABLE:"); for (const f of fails) console.log("  - " + f); }
