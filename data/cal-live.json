@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-03T21:24:30.382Z",
+  "fetchedAt": "2026-10-03T21:33:16.441Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-01",
   "windowEnd": "2026-10-09",
@@ -40,6 +40,15 @@
       "start": "2026-10-04T10:00:00-05:00",
       "end": "2026-10-04T10:15:00-05:00",
       "location": "14 Harbor Cove Dr, Old Hickory, TN 37138",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "t3olko60fos60ugnqrg290c9jo",
+      "summary": "Ainsley appt: complete school absence verification (portal)",
+      "start": "2026-10-04T12:00:00-05:00",
+      "end": "2026-10-04T12:15:00-05:00",
+      "location": "8675 College Blvd, Overland Park, KS 66210-1946",
       "busy": false,
       "allDay": false
     },
