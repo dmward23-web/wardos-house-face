@@ -2,6 +2,7 @@
 # kid-hayes / kid-harris / kid-ainsley reaches past the viewport, pseudo-elements included (the board's own
 # overflow-x clip on body is lifted for the measurement so a hidden overflow can't hide). Test clock Thu Oct 1 9:30 PM CT.
 # Usage: python3 scripts/wall/kid-overflow.py [isoTime]   (exit 1 on any overflow; default = NOW CT on real data, the gate rule 10/2)
+#        KIDVPS=2560x1440,1920x1080,...,390x844 adds sizes (JARHERO3: the 5 landscape sizes + both phones)
 import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import datasnap  # DAYWIN1
 import sys, os, subprocess, time, random, datetime, json
 from playwright.sync_api import sync_playwright
@@ -17,7 +18,9 @@ ok = True
 try:
     with sync_playwright() as pw:
         b = pw.chromium.launch()
-        for vw, vh in [(1080, 1920), (440, 956)]:
+        VPS = [(1080, 1920), (440, 956)] + [tuple(int(n) for n in v.split("x")) for v in os.environ.get("KIDVPS", "").split(",") if "x" in v]
+        VPS = list(dict.fromkeys(VPS))
+        for vw, vh in VPS:
             for kid in ["hayes", "harris", "ainsley"]:
                 mob = vw <= 500
                 ctx = b.new_context(viewport={"width": vw, "height": vh}, is_mobile=mob, has_touch=mob, screen={"width": vw, "height": vh}); pg = ctx.new_page(); errs = []
