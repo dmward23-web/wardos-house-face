@@ -18,7 +18,7 @@ test("5c: the trips hero comes from cal-live.json, no static Leave 9:00", () => 
 test("6: rail labels name the page they open (destinations unchanged)", () => {
   const w = read("wall.html");
   assert.match(w, /data-tile-id="rail-week"[^>]*href="sheet-index\.html#hub-home"[^>]*><span>Main board<\/span>/);
-  assert.match(w, /data-tile-id="rail-weekend-fun"[^>]*href="sheet-weekend\.html#weekend-board"[^>]*><span>Our Ideas<\/span>/);
+  assert.match(w, /data-tile-id="rail-weekend-fun"[^>]*href="sheet-weekend\.html#weekend-board"[^>]*><span>Our Ideas · play<\/span>/);
   assert.match(w, /data-tile-id="rail-week-win"[^>]*href="sheet-win\.html#win-board"[^>]*><span>Family trips<\/span>/);
 });
 test("7: the preview guard reads bundled data first, live only as the fallback", () => {
