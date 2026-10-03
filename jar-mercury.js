@@ -260,13 +260,14 @@
     }
     this.alive = true; this.onscreen = !io; this.cssW = 0; this.scale = 1; this.fscale = 1; this.k = 1; this.lk = 1;
     this.target = null; this.lv = 0; this.lvV = 0; this.pendingLevel = undefined; this.pendingRipple = false;
-    this.hunger = 0; this.hungerShown = -1; this.nudge = false; this.nudgeT0 = 0;
+    this.binary = this.kid === "ainsley"; /* Alfred: Ainsley's hunger is BINARY (0 | 1) and never grades her glass */
+    this.hunger = 0; this.cool = 0; this.hungerShown = -1; this.nudge = false; this.nudgeT0 = 0;
     this.perkV = 0; this.leanDir = 0; this.surge = 0; this.overAmt = 0; this.wasOver = false;
     this.tilt = 0; this.tiltV = 0; this.rings = []; this.pops = []; this.blob = null; this.lidAnim = null; this.nextRattle = 0;
     this.bubbles = []; this.spatter = []; this.streams = []; this.poolAmt = 0; this.spawnAcc = 0;
     this.t0 = now(); this.last = 0; this.lastDraw = 0; this.minDt = 0;
     if (this.status) this.setStateRaw(opts.state, opts.unlock); else this.target = normLevel(opts.level);
-    if (opts.hunger != null) { var hh = Number(opts.hunger); this.hunger = isFinite(hh) ? clamp(hh, 0, 1) : 0; }
+    if (opts.hunger != null) this.hungerRaw(opts.hunger);
     this.lv = this.target || 0;
     this.readColors();
     wrap.__jm = this;
@@ -283,7 +284,7 @@
     this.col0 = c; this.hungerShown = -1; this.tint();
   };
   P.tint = function () { /* hunger: cooler, duller, a little desaturated; never red, never grey-dead (desat capped at 25%) */
-    var h = Math.round(this.hunger * 20) / 20;
+    var h = Math.round(this.cool * 20) / 20;
     if (h === this.hungerShown) return;
     this.hungerShown = h;
     var c0 = this.col0, H = M.hunger, c = {};
@@ -357,13 +358,19 @@
     if (reduced()) this.freezeFrame(); else { this.render(true); schedule(); }
     return true;
   };
-  P.setHunger = function (h) { h = Number(h); this.hunger = isFinite(h) ? clamp(h, 0, 1) : 0; this.tint(); if (reduced()) this.freezeFrame(); else schedule(); return true; };
+  P.hungerRaw = function (h) {
+    h = Number(h); h = isFinite(h) ? clamp(h, 0, 1) : 0;
+    if (this.binary) h = h > 0 ? 1 : 0;   /* Ainsley: anything > 0 is 1. Hungry = soft pulse + cap click, nothing graded */
+    this.hunger = h;
+    this.cool = this.binary ? 0 : h;      /* cooling (dull chrome, weaker boil, dim glow) is for the boys / family only */
+  };
+  P.setHunger = function (h) { this.hungerRaw(h); this.tint(); if (reduced()) this.freezeFrame(); else schedule(); return true; };
   P.setNudge = function (on) {
     on = !!on;
     if (on === this.nudge) return true;
     this.nudge = on;
     if (on) { this.nudgeT0 = now(); this.nextRattle = 0; }
-    else if (!reduced()) { /* cleared on the close tap: boil back up HARD */
+    else if (!reduced() && !this.binary) { /* cleared on the close tap: boil back up HARD (not Ainsley: two states only) */
       this.surge = Math.max(this.surge, M.boil.burstSurge);
       if (this.hasLiquid()) this.burst(1.2); else this.ring(this.g.cx, 0.6);
     }
@@ -415,8 +422,8 @@
   P.boilNow = function () { /* effective boil after hunger, nudge, surge, perk */
     var B = boilFor(this.lv > 0.002 ? this.lv : 0);
     if (!B) return 0;
-    B *= 1 - M.boil.hungerCut * this.hunger;
-    if (this.nudge) B = Math.min(B, M.boil.nudgeSimmer);
+    B *= 1 - M.boil.hungerCut * this.cool;
+    if (this.nudge && !this.binary) B = Math.min(B, M.boil.nudgeSimmer);
     return B + this.surge + this.perkV * 0.25;
   };
   P.surfaceBase = function () { var g = this.g, y = g.floor - this.lv * (g.floor - g.top); return lerp(y, g.overTop, this.overAmt); };
@@ -502,7 +509,7 @@
     }
     this.poolAmt = clamp(this.poolAmt + (this.overAmt > 0.5 ? dt * 0.35 : -dt * 0.5), 0, 1);
     /* lid: hunger / nudge rattle (classic lid) or a subtle cap click (Ainsley); more often + harder when hungrier */
-    var urge = Math.max(this.hunger, this.nudge ? 0.7 : 0);
+    var urge = this.binary ? (this.hunger || this.nudge ? 0.5 : 0) : Math.max(this.hunger, this.nudge ? 0.7 : 0);
     if (urge > 0.12 && !this.lidAnim && this.overAmt < 0.3 && !frozen) {
       if (!this.nextRattle) this.nextRattle = tnow + 0.6 + this.rand();
       if (tnow >= this.nextRattle) {
@@ -660,7 +667,7 @@
     var sw = gPh / (M.shimmer.glassSweep / M.shimmer.glassPeriod);
     if (sw > 1.05) return;
     ctx.save(); ctx.clip(this.clipOuter);
-    var gx = -14 + sw * 128, gg = ctx.createLinearGradient(gx - 7, 6, gx + 7, -4), ga = 0.10 + 0.06 * (1 - this.hunger);
+    var gx = -14 + sw * 128, gg = ctx.createLinearGradient(gx - 7, 6, gx + 7, -4), ga = 0.10 + 0.06 * (1 - this.cool);
     gg.addColorStop(0, "rgba(255,255,255,0)"); gg.addColorStop(0.45, "rgba(255,255,255," + (ga * 0.6).toFixed(3) + ")"); gg.addColorStop(0.5, "rgba(255,255,255," + ga.toFixed(3) + ")"); gg.addColorStop(1, "rgba(255,255,255,0)");
     ctx.fillStyle = gg; ctx.fillRect(0, 0, 100, 128); ctx.restore();
   };
@@ -723,7 +730,7 @@
     if (hr > 0.2) ctx.drawImage(this.sprite, hd[0] - hr * 1.32, hd[1] - hr * 1.2, hr * 2.64, hr * 2.64);
   };
   P.applyTransforms = function (t, frozen) {
-    var p = this.p, T = t - this.t0, wrapT = "", lidT = "", glow = (1 - M.hunger.glowCut * this.hunger) * (this.hasLiquid() ? 1 : this.nudge ? 0.9 : this.hunger > 0.12 ? 0.5 : 0.3), still = reduced() || frozen;
+    var p = this.p, T = t - this.t0, wrapT = "", lidT = "", glow = (1 - M.hunger.glowCut * this.cool) * (this.hasLiquid() ? 1 : this.nudge ? 0.9 : this.hunger > 0.12 ? 0.5 : 0.3), still = reduced() || frozen;
     if (!still) {
       var ty = 0, sx = 1, sy = 1, rot = 0;
       if (this.nudge) { /* hungry hop: squash, stretch + lift, land squash (Harris: a goofy double hop) */
@@ -737,7 +744,7 @@
           else if (u < 0.78) { var c3 = Math.sin(Math.PI * (u - 0.6) / 0.18); sy = 1 - sq * 0.7 * c3; sx = 1 + sq * 0.5 * c3; }
         }
         glow *= 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(2 * Math.PI * (t - this.nudgeT0) / M.nudge.glowPeriod));
-      } else if (this.hunger > 0.12 && !this.hasLiquid()) { /* hungry EMPTY glass: a soft pulse */
+      } else if (this.hunger > 0.12 && (this.binary || !this.hasLiquid())) { /* hungry EMPTY glass (or Ainsley hungry, either state): a soft pulse */
         glow *= 0.75 + 0.25 * Math.sin(2 * Math.PI * T / 2.4);
       }
       if (this.perkV > 0) { rot += this.leanDir * M.perk.leanDeg * p.lean * this.perkV; ty -= M.perk.hop * this.perkV * 2 * Math.abs(Math.sin(Math.PI * this.perkV)); glow += 0.3 * this.perkV; }
@@ -802,6 +809,7 @@
       level: function () { return j.status ? null : j.target; },
       state: function () { return j.status ? j.state : null; },
       refreshColors: function () { j.readColors(); j.render(true); },
+      crystallize: function () { return false; }, /* RESERVED (Phase 5 weekly memory crystals): not built, a no-op today */
       destroy: function () { j.destroy(); },
       _jar: j
     };
@@ -847,10 +855,12 @@
   }
 
   /* ===== Us-together eruption (one-shot ~4 s on the tile: bubbles + glow in all three kid colors) ===== */
-  function eruptUsTogether(tileEl, o) {
+  function eruptUsTogether(tileEl, familyUnlocked, o) {
+    /* Alfred: fires ONLY from Atlas's public Us together rule (10 of 12 Mon-Thu closes unlocks Weekend fun), passed in by
+       Wright as ONE family boolean. No per-kid inputs, never derived from jar states, always all three colors. */
     o = o || {};
-    if (!tileEl) return null;
-    var kids = (o.kids || ["harris", "hayes", "ainsley"]).filter(function (k) { return KIDS[k]; });
+    if (!tileEl || familyUnlocked !== true) return null;
+    var kids = ["harris", "hayes", "ainsley"];
     var r = tileEl.getBoundingClientRect(), padX = 0.3, padT = 0.9, padB = 0.7;
     var wcss = r.width * (1 + 2 * padX), hcss = r.height * (1 + padT + padB);
     if (global.getComputedStyle(tileEl).position === "static") tileEl.style.position = "relative";

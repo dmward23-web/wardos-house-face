@@ -20,7 +20,8 @@ html body .kj-card .bank-top { flex: 0 0 auto; }
 /* the slot carries the boil-over bleed (Prism 19:02 kit: fx 12% beside, ~6% below, feed blob above): room inside this card */
 .kj-slot { position: relative; flex: 1 1 auto; min-height: 340px; display: flex; align-items: center; justify-content: center;
   padding: 16% 12% 8%; box-sizing: border-box; pointer-events: none; }
-.kj-slot .kj-jar { position: relative; height: 100%; max-height: 100%; aspect-ratio: 100 / 128; max-width: 100%; pointer-events: none; }
+/* the host takes the touch only for Prism's perk (lean + hop, no action, no link); every jar layer stays pointer-events: none */
+.kj-slot .kj-jar { position: relative; height: 100%; max-height: 100%; aspect-ratio: 100 / 128; max-width: 100%; pointer-events: auto; touch-action: manipulation; }
 .kj-slot .kj-jar > .jm { width: 100%; height: 100%; max-height: none; }
 .kj-slot canvas, .kj-slot svg { pointer-events: none !important; }
 html body .kj-card .bank-links, html body .kj-card .saves-host { flex: 0 0 auto; }
@@ -77,3 +78,6 @@ html body .kj-trust .jm-line { max-width: 100% !important; white-space: normal; 
 @media (prefers-reduced-motion: reduce) {
   html body[data-kid] *, html body[data-kid] *::before, html body[data-kid] *::after { animation: none !important; transition: none !important; }
 }
+
+/* JARHERO3 · the Saves line under the jar clips (overflow hidden, nowrap): give its glyphs a full line box so no word is cut */
+html body .kj-card .saves-bar-text { line-height: 1.4 !important; }

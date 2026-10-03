@@ -69,7 +69,7 @@
     }
   }
   var tm = 0;
-  function later() { clearTimeout(tm); tm = setTimeout(function () { mo.disconnect(); try { fit(); } finally { observe(); } }, 60); }
+  function later() { clearTimeout(tm); tm = setTimeout(function () { mo.disconnect(); try { fit(); watchBlocks(); } finally { observe(); } }, 60); }
   var mo = new MutationObserver(function (ms) {
     var k = 0;
     mo.disconnect();
@@ -78,9 +78,17 @@
     later();
   });
   function observe() { if (d.body) mo.observe(d.body, { childList: true, subtree: true, characterData: true }); }
+  /* SEPWRAP2 · a board's packer re-deals tiles after first paint (no resize, no text change): watch every block that
+     holds a separator, so a width change there re-checks its line breaks */
+  var bro = null, watched = typeof WeakSet === "function" ? new WeakSet() : null;
+  function watchBlocks() {
+    if (!bro || !watched) return;
+    var seps = d.querySelectorAll(".hp-sep");
+    for (var i = 0; i < seps.length; i++) { var b = seps[i].parentElement && blockOf(seps[i].parentElement); if (b && !watched.has(b)) { watched.add(b); try { bro.observe(b); } catch (e) {} } }
+  }
   function start() { wrapAll(d.body); observe(); later(); if (d.fonts && d.fonts.ready) d.fonts.ready.then(later); }
   g.addEventListener("resize", later);
-  if (typeof ResizeObserver === "function") { try { new ResizeObserver(later).observe(d.documentElement); } catch (e) {} }
+  if (typeof ResizeObserver === "function") { try { new ResizeObserver(later).observe(d.documentElement); bro = new ResizeObserver(later); } catch (e) {} }
   if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", start); else start();
   g.HousePhrase = { fit: function () { mo.disconnect(); try { fit(); } finally { observe(); } }, wrap: wrapAll };
 })(window);

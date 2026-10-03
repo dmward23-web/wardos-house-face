@@ -117,6 +117,11 @@ test("JARHERO2: a MUSTS pill tap feeds the boys' jar; the eruption is clipped to
   const j = code(read("house-kid-jar.js"));
   assert.match(j, /getElementById\("sec-musts"\)/, "watches the MUSTS pills");
   assert.match(j, /c > lastClosed\) \{ call\(jar, "feed"\); sync\(true\)/, "each new closed box: feed + stepped ripple");
-  const e = read("house-us-erupt.js");
+  const e = read("house-us-erupt.js"), m = read("jar-mercury.js");
   assert.match(e, /#us-board:has\(> canvas\.jm-erupt\)\{overflow:clip!important\}/, "erupt canvas clipped to the tile");
+  assert.match(code(read("house-us-erupt.js")), /eruptUsTogether\(tile, shouldErupt\(d\)\)/, "erupt gets ONE family boolean from the rule (Prism 19:09 API)");
+  assert.match(m, /function eruptUsTogether\(tileEl, familyUnlocked, o\)[\s\S]{0,400}familyUnlocked !== true\) return null/, "the module refuses to erupt without the family boolean");
+  assert.match(m, /this\.binary = this\.kid === "ainsley"/, "Ainsley's hunger is binary in the module too");
+  assert.match(read("house-kid-hero.css"), /\.kj-slot \.kj-jar \{[^}]*pointer-events: auto/, "the jar host takes the touch for perk()");
+  for (const f of ["house-kid-jar.js", "jar-mercury.js", "jar-mercury.css", "house-us-erupt.js", "house-kid-hero.css", "kid-ainsley.html"]) assert.doesNotMatch(read(f), /streak/i, f + ": no streak code anywhere");
 });

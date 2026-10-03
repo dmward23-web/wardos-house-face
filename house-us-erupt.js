@@ -28,7 +28,7 @@
           st.textContent = "#us-board:has(> canvas.jm-erupt){overflow:clip!important}";
           (doc.head || doc.documentElement).appendChild(st);
         }
-        if (g.JarMercury && typeof g.JarMercury.eruptUsTogether === "function") g.JarMercury.eruptUsTogether(tile);
+        if (g.JarMercury && typeof g.JarMercury.eruptUsTogether === "function") g.JarMercury.eruptUsTogether(tile, shouldErupt(d)); /* Prism 19:09 API: one family boolean, true only on the rule */
       });
   }
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", run); else run();
