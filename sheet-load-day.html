@@ -287,7 +287,7 @@
  .sec-meta { font-size: 12px; font-weight: 550; color: #6a6e76; }
 
  .pack-strip {
- display: flex; gap: 8px; flex-wrap: nowrap; overflow: hidden; flex: 1; align-items: stretch;
+ display: flex; gap: 8px; flex-wrap: wrap; overflow: hidden; flex: 1; align-items: stretch; /* OCT8: items that do not fit wrap to a second row, never cut */
  }
  .pack-item {
  flex: 1; min-width: min-content; /* CLIP1: an item is never narrower than its longest word */
