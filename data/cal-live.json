@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-03T02:14:27.384Z",
+  "fetchedAt": "2026-10-03T02:21:12.717Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
-  "windowEnd": "2026-10-08",
+  "windowEnd": "2026-10-09",
   "asOfIso": "2026-10-02",
   "nextLeave": {
     "id": "806kf6gnibpjh3vq78g4mnfiqc",
@@ -44,11 +44,11 @@
       "allDay": false
     },
     {
-      "id": "b7h3cqm2jgaussraohpsuc2chc",
-      "summary": "Harris flag — vs BV Gardner (home) · arrive 1:00 · game 1:30",
-      "start": "2026-10-03T13:00:00-05:00",
-      "end": "2026-10-03T14:30:00-05:00",
-      "location": "Heritage Park Soccer Complex, Field 10, 17255 S Black Bob Rd, Olathe, KS 66062",
+      "id": "28ce76382ojqp80n5i014akadg",
+      "summary": "Free · Hayes Johnson gift $150 (before dinner)",
+      "start": "2026-10-03T12:00:00-05:00",
+      "end": "2026-10-03T12:15:00-05:00",
+      "location": "14 Harbor Cove Dr, Old Hickory, TN 37138",
       "busy": false,
       "allDay": false
     },
@@ -302,6 +302,69 @@
       "end": "2026-10-08T19:15:00-05:00",
       "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
       "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "2dt3uqd7n1dl5ms6brgs4qnu5k",
+      "summary": "Ward Kids [AHH No School]",
+      "start": "2026-10-09T00:00:00Z",
+      "end": "2026-10-10T00:00:00Z",
+      "location": "",
+      "busy": false,
+      "allDay": true
+    },
+    {
+      "id": "2jni71vsrsnkdbnelltspnmed8",
+      "summary": "Johnson Kids [RH No School]",
+      "start": "2026-10-09T00:00:00Z",
+      "end": "2026-10-19T00:00:00Z",
+      "location": "",
+      "busy": false,
+      "allDay": true
+    },
+    {
+      "id": "72rogmm397oa0f6huic6hep29h",
+      "summary": "Erin KC [drive w/ Dan Fri · no kids · #A6GW5X Mon]",
+      "start": "2026-10-09T00:00:00Z",
+      "end": "2026-10-13T00:00:00Z",
+      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": true
+    },
+    {
+      "id": "ohoma1ia1arueisdi6nqdm1kms",
+      "summary": "Dan + Erin DRIVE → KC · leave 6:30 · kids by 3:00",
+      "start": "2026-10-09T06:30:00-05:00",
+      "end": "2026-10-09T14:30:00-05:00",
+      "location": "14 Harbor Cove Dr, Old Hickory, TN → 6719 W 147th Terrace, Overland Park, KS 66223",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "eiu5bk2mlfrqmpdapcstf94tbg",
+      "summary": "Kids — pickup at Kristin's · 3:00",
+      "start": "2026-10-09T14:40:00-05:00",
+      "end": "2026-10-09T15:30:00-05:00",
+      "location": "14618 Floyd St, Overland Park, KS",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "dagalbg2jo15m0hfl3deim3f4n_20261009T200000Z",
+      "summary": "Kids with Dan",
+      "start": "2026-10-09T15:00:00-05:00",
+      "end": "2026-10-16T15:00:00-05:00",
+      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "2if10og9i26jc8mq24rabr0d00",
+      "summary": "Chris Stapleton · Morton Amphitheater · 7:30",
+      "start": "2026-10-09T18:30:00-05:00",
+      "end": "2026-10-09T23:00:00-05:00",
+      "location": "Morton Amphitheater, 6150 NW Music Blvd, Riverside, MO 64150",
+      "busy": true,
       "allDay": false
     }
   ],
