@@ -1,7 +1,7 @@
 {
   "status": "live",
-  "fetchedAt": "2026-10-03T04:02:29.609Z",
-  "updatedAt": "2026-10-03T04:02:29.609Z",
+  "fetchedAt": "2026-10-03T11:16:08.386Z",
+  "updatedAt": "2026-10-03T11:16:08.387Z",
   "source": "nest-sdm+webrtc-still",
   "cameras": [
     {
@@ -123,6 +123,6 @@
   "stillsPending": false,
   "stillNote": "WEB_RTC stills on disk (nest-snaps) · reattached by nest-fetch",
   "error": null,
-  "nestProxy": "https://fabrics-upcoming-curve-abc.trycloudflare.com",
+  "nestProxy": "https://pumps-stays-kit-dimension.trycloudflare.com",
   "nestProxyPath": "scripts/nest-webrtc-proxy.mjs → SDM GenerateWebRtcStream"
 }
