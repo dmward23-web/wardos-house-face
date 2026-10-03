@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-03T01:11:13.313Z",
+  "fetchedAt": "2026-10-03T01:20:12.909Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-09",
@@ -67,6 +67,15 @@
       "start": "2026-10-04T08:30:00-05:00",
       "end": "2026-10-04T10:00:00-05:00",
       "location": "Indian Woods Middle School, 9700 Woodson Dr, Overland Park, KS 66207",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "7dmipq4a7oc7epbk53fo87v7o0",
+      "summary": "Free · Send Kristin combined text",
+      "start": "2026-10-04T19:00:00-05:00",
+      "end": "2026-10-04T19:15:00-05:00",
+      "location": "14 Harbor Cove Dr, Old Hickory, TN 37138",
       "busy": false,
       "allDay": false
     },

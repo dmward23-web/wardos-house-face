@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 2 2026",
   "asOfIso": "2026-10-02",
-  "refreshedAt": "2026-10-03T01:11:12.949Z",
+  "refreshedAt": "2026-10-03T01:20:12.467Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -915,13 +915,13 @@
           "tone": "act"
         },
         {
-          "when": "Fri · 12:00",
-          "what": "get tree-trim bids (2–3 written)",
+          "when": "Fri · 1:00",
+          "what": "garage-sale haul · shake whole house",
           "tone": "hot"
         },
         {
-          "when": "Fri · 1:00",
-          "what": "garage-sale haul · shake whole house",
+          "when": "home week",
+          "what": "Kids with Dad @ 147th through Fri Oct 16 · 3:00",
           "tone": "hot"
         }
       ],
