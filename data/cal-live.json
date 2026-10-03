@@ -1,11 +1,11 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-03T02:58:52.621Z",
+  "fetchedAt": "2026-10-03T10:14:59.776Z",
   "tz": "America/Chicago",
-  "windowStart": "2026-09-25",
+  "windowStart": "2026-10-01",
   "windowEnd": "2026-10-09",
-  "asOfIso": "2026-10-02",
+  "asOfIso": "2026-10-03",
   "nextLeave": {
     "id": "4ug63o0oqfeld1ll1h7ff1eerc",
     "summary": "Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. Alexander's",
@@ -369,7 +369,7 @@
     }
   ],
   "boardStrip": {
-    "label": "Next up · Sat",
+    "label": "Next up · today",
     "time": "8:30",
     "place": "Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. A…",
     "detailHtml": "<strong>8:30</strong> Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. A…",
