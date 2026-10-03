@@ -1,7 +1,7 @@
 {
   "asOf": "Sat Oct 3 2026",
   "asOfIso": "2026-10-03",
-  "refreshedAt": "2026-10-03T15:51:24.321Z",
+  "refreshedAt": "2026-10-03T16:06:27.758Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -301,22 +301,15 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "SAT · 10:00",
-        "what": "SATURDAY MORNING DONUTS",
+        "when": "MON · 7:00",
+        "what": "SRE SPECIALS: MUSIC",
         "where": "with Mom · until Fri Oct 9 · 3:00",
         "badges": [
-          "SAT",
-          "10:00"
+          "MON",
+          "7:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Sat · 10:00",
-          "what": "Saturday Morning Donuts",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -526,22 +519,15 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "SAT · 10:00",
-        "what": "SATURDAY MORNING DONUTS",
+        "when": "SUN · 8:30",
+        "what": "HAYES FLAG — SRE FALCONS VS RIDLEY · ARRIVE 8:30",
         "where": "with Mom · until Fri Oct 9 · 3:00",
         "badges": [
-          "SAT",
-          "10:00"
+          "SUN",
+          "8:30"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Sat · 10:00",
-          "what": "Saturday Morning Donuts",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "note",
           "when": "All day",
