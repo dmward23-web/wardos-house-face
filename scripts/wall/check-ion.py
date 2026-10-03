@@ -9,7 +9,7 @@ T = datetime.datetime.fromisoformat(sys.argv[1]) if len(sys.argv) > 1 else datet
 sys.path.insert(0, os.path.join(WT, "scripts/wall")); import datasnap  # DAYWIN1: Oct 1 clocks read the Oct 1 data set
 seats = json.load(open(datasnap.path("kid-seats.json", T.isoformat())))
 FIX = copy.deepcopy(seats)  # states fixture: CHOICE open (no claim yet) + travel-week Pack; test-only, never written to data/
-FIX["choice"].update({"open": True, "exception": False, "lockAt": T.strftime("%Y-%m-%dT23:00:00-05:00"), "claimedBy": None})
+FIX["choice"] = dict(FIX.get("choice") or {}); FIX["choice"].update({"open": True, "exception": False, "lockAt": T.strftime("%Y-%m-%dT23:00:00-05:00"), "claimedBy": None})
 FIX["pack"] = {"travelWeek": True, "dark": False, "items": [{"id": "pack-dragon", "word": "Dragon care"}, {"id": "pack-bag", "word": "Bag"}, {"id": "pack-charger", "word": "Charger"}]}
 GEOM = """() => {
   const z = parseFloat(document.getElementById('wall-panel').style.zoom) || 1, vis = e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'; };
