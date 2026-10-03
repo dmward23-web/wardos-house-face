@@ -2,8 +2,9 @@
 /**
  * WardOS House Face · Lights live snapshot
  *
- * Creds: ~/.config/wardos/kasa.user + kasa.password (or env KASA_USER /
- * KASA_PASSWORD / KASA_USERNAME). Not the old kasa.token path.
+ * Creds: ~/.config/wardos/kasa.user + kasa.password (these win when present ·
+ * KASACREDS1); env KASA_USER / KASA_PASSWORD / KASA_USERNAME only as a
+ * fallback, and an env user without "@" is ignored. Not the old kasa.token path.
  *
  * If missing → status need_token · roster ids only · controls dark (never DEMO).
  * If present → spawn plates kasa-live venv python + scripts/kasa-probe.py,
@@ -87,11 +88,14 @@ function readCredFile(name) {
 
 /** Detect Kasa account email+password (not legacy kasa.token). */
 function hasCreds() {
-  const user =
-    (process.env.KASA_USER || process.env.KASA_USERNAME || "").trim() ||
-    readCredFile("kasa.user");
-  const pass =
-    (process.env.KASA_PASSWORD || "").trim() || readCredFile("kasa.password");
+  // KASACREDS1: cred files win over env (as a pair); env user must be an email.
+  const fUser = readCredFile("kasa.user");
+  const fPass = readCredFile("kasa.password");
+  if (fUser && fPass) return true;
+  let eUser = (process.env.KASA_USER || process.env.KASA_USERNAME || "").trim();
+  if (!eUser.includes("@")) eUser = "";
+  const user = eUser || fUser;
+  const pass = (process.env.KASA_PASSWORD || "").trim() || fPass;
   return Boolean(user && pass);
 }
 

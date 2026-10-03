@@ -132,15 +132,16 @@ function checkAuth(req, args) {
 }
 
 function hasKasaCreds() {
+  // KASACREDS1: cred files win over env (as a pair); env user must be an email.
+  // kasa-write.py / kasa-daemon.py apply the same rule when they log in.
   const home = os.homedir();
-  const user =
-    (process.env.KASA_USER || process.env.KASA_USERNAME || "").trim() ||
-    readText(path.join(home, ".config", "wardos", "kasa.user")) ||
-    "";
-  const pass =
-    (process.env.KASA_PASSWORD || "").trim() ||
-    readText(path.join(home, ".config", "wardos", "kasa.password")) ||
-    "";
+  const fUser = (readText(path.join(home, ".config", "wardos", "kasa.user")) || "").trim();
+  const fPass = (readText(path.join(home, ".config", "wardos", "kasa.password")) || "").trim();
+  if (fUser && fPass) return true;
+  let eUser = (process.env.KASA_USER || process.env.KASA_USERNAME || "").trim();
+  if (!eUser.includes("@")) eUser = "";
+  const user = eUser || fUser;
+  const pass = (process.env.KASA_PASSWORD || "").trim() || fPass;
   return Boolean(user && pass);
 }
 

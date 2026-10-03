@@ -81,14 +81,24 @@ def _read_secret_file(path: Path) -> str:
 
 
 def load_credentials() -> tuple[str, str] | None:
-    user = (
+    """KASACREDS1: the box cred files win over env vars, as a pair.
+
+    A stray box-level KASA_USER (e.g. holding the password) used to override
+    good files and break login after a restore. Env is only a fallback, and an
+    env user that isn't an email is ignored.
+    """
+    f_user = _read_secret_file(CONFIG_DIR / "kasa.user")
+    f_pass = _read_secret_file(CONFIG_DIR / "kasa.password")
+    if f_user and f_pass:
+        return f_user, f_pass
+    e_user = (
         os.environ.get("KASA_USER", "").strip()
         or os.environ.get("KASA_USERNAME", "").strip()
-        or _read_secret_file(CONFIG_DIR / "kasa.user")
     )
-    password = os.environ.get("KASA_PASSWORD", "").strip() or _read_secret_file(
-        CONFIG_DIR / "kasa.password"
-    )
+    if "@" not in e_user:
+        e_user = ""
+    user = e_user or f_user
+    password = os.environ.get("KASA_PASSWORD", "").strip() or f_pass
     if user and password:
         return user, password
     return None

@@ -5,6 +5,8 @@
 #     ~/.config/wardos/nest-webrtc-proxy.url (nest-fetch.mjs bakes it into
 #     data/nest-live.json; pages follow the newest address · PROXYFOLLOW1).
 #  2. Lights refresh loop running (it already heals the lights proxy + tunnel).
+#  0. SELFHEAL1: first rebuild the kasa .venv / reinstall cloudflared if a
+#     restore dropped them.
 # Prints one line: OK, or CHANGED:<what> when something was restarted.
 # Never prints keys. Kills only exact PIDs it found for its own port.
 set -uo pipefail
@@ -15,6 +17,53 @@ LOG_DIR="$HOME/.cache/wardos"; mkdir -p "$LOG_DIR"
 LOG="$LOG_DIR/house-keepalive.log"
 ts() { date '+%Y-%m-%d %H:%M:%S %Z'; }
 CHANGED=()
+
+# SELFHEAL1 · rebuild what a box restart/restore drops: the kasa .venv (from
+# plates requirements.txt) and cloudflared (~/.local/bin, official GitHub
+# release). Idempotent, flock-guarded, logs to ~/.cache/wardos/heal-deps.log.
+# Never reads or prints keys. Exit bits: 1 venv rebuilt · 2 cloudflared
+# installed · 4 a repair failed.
+KASA_VENV_DIR="${KASA_VENV_DIR:-/workspace/plates/2026-09-28/kasa-live}"
+CF_URL="https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64"
+case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac
+heal_lights_deps() {
+  mkdir -p "$HOME/.local/bin" "$HOME/.cache/wardos"
+  (
+    _ts() { date '+%Y-%m-%d %H:%M:%S %Z'; }
+    flock -w 600 9 || { echo "[$(_ts)] heal: lock busy — skip"; exit 0; }
+    rc=0
+    venv="$KASA_VENV_DIR/.venv"; req="$KASA_VENV_DIR/requirements.txt"
+    if ! "$venv/bin/python" -c 'import kasa, tplinkcloud' >/dev/null 2>&1; then
+      echo "[$(_ts)] heal: kasa venv missing/broken — rebuilding $venv"
+      mkdir -p "$KASA_VENV_DIR"; rm -rf "$venv"
+      if [[ -f "$req" ]]; then set -- -r "$req"; else set -- python-kasa==0.10.2 tplink-cloud-api==5.2.1; fi
+      if python3 -m venv "$venv" && "$venv/bin/pip" install -q "$@" \
+         && "$venv/bin/python" -c 'import kasa, tplinkcloud'; then
+        echo "[$(_ts)] heal: kasa venv rebuilt"; rc=$((rc | 1))
+      else
+        echo "[$(_ts)] heal: ERROR kasa venv rebuild failed"; rc=$((rc | 4))
+      fi
+    fi
+    if [[ ! -x /tmp/cloudflared ]] && ! command -v cloudflared >/dev/null 2>&1; then
+      echo "[$(_ts)] heal: cloudflared missing — installing to ~/.local/bin"
+      tmp="$HOME/.local/bin/.cloudflared.$$"
+      if curl -fsSL --max-time 180 -o "$tmp" "$CF_URL" && chmod +x "$tmp" \
+         && "$tmp" --version >/dev/null 2>&1 && mv -f "$tmp" "$HOME/.local/bin/cloudflared"; then
+        echo "[$(_ts)] heal: cloudflared installed ($("$HOME/.local/bin/cloudflared" --version 2>&1 | head -1))"
+        rc=$((rc | 2))
+      else
+        rm -f "$tmp"; echo "[$(_ts)] heal: ERROR cloudflared install failed"; rc=$((rc | 4))
+      fi
+    fi
+    exit $rc
+  ) 9>"$HOME/.cache/wardos/heal-deps.lock" >>"$HOME/.cache/wardos/heal-deps.log" 2>&1
+}
+
+# --- 0. Self-heal deps (SELFHEAL1) before anything needs them
+heal_lights_deps; HEAL_RC=$?
+(( HEAL_RC & 1 )) && CHANGED+=("kasa-venv")
+(( HEAL_RC & 2 )) && CHANGED+=("cloudflared")
+(( HEAL_RC & 4 )) && echo "[$(ts)] WARN self-heal failed (see heal-deps.log)" >>"$LOG"
 CF_BIN="/tmp/cloudflared"; [[ -x "$CF_BIN" ]] || CF_BIN="$(command -v cloudflared || true)"
 
 # --- 1a. Nest proxy
