@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-03T01:54:19.867Z",
+  "fetchedAt": "2026-10-03T02:03:38.721Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-25",
   "windowEnd": "2026-10-09",
@@ -53,6 +53,24 @@
       "allDay": false
     },
     {
+      "id": "j05aleahohbg2s5ea7g8ou8qh0",
+      "summary": "Kristin: Harris — flag drop-off · 1:00",
+      "start": "2026-10-03T13:00:00-05:00",
+      "end": "2026-10-03T13:15:00-05:00",
+      "location": "Heritage Park Soccer Complex, Field 10, 17255 S Black Bob Rd, Olathe, KS 66062",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "4c5hpoe1e6qnqauvte5e77ga00",
+      "summary": "Kristin: Harris — flag pickup · 2:30",
+      "start": "2026-10-03T14:30:00-05:00",
+      "end": "2026-10-03T14:45:00-05:00",
+      "location": "Heritage Park Soccer Complex, Field 10, 17255 S Black Bob Rd, Olathe, KS 66062",
+      "busy": false,
+      "allDay": false
+    },
+    {
       "id": "7la5t0sdbtph2v6t3v4si7k97g",
       "summary": "Hayes Johnson's birthday dinner — J. Alexander's · 5:30 · leave 5:00",
       "start": "2026-10-03T17:00:00-05:00",
@@ -62,10 +80,28 @@
       "allDay": false
     },
     {
+      "id": "2ulvcv2vqgvsbe1qc7q2m5b9ho",
+      "summary": "Kristin: Hayes — flag drop-off · 8:30",
+      "start": "2026-10-04T08:30:00-05:00",
+      "end": "2026-10-04T08:45:00-05:00",
+      "location": "Indian Woods Middle School, 9700 Woodson Dr, Overland Park, KS 66207",
+      "busy": false,
+      "allDay": false
+    },
+    {
       "id": "c58gg4509atj4eh3g3vbqdr05c",
       "summary": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00",
       "start": "2026-10-04T08:30:00-05:00",
       "end": "2026-10-04T10:00:00-05:00",
+      "location": "Indian Woods Middle School, 9700 Woodson Dr, Overland Park, KS 66207",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "92aebrmkb92e5h13sf47mgcb4k",
+      "summary": "Kristin: Hayes — flag pickup · 10:00",
+      "start": "2026-10-04T10:00:00-05:00",
+      "end": "2026-10-04T10:15:00-05:00",
       "location": "Indian Woods Middle School, 9700 Woodson Dr, Overland Park, KS 66207",
       "busy": false,
       "allDay": false
@@ -161,10 +197,28 @@
       "allDay": false
     },
     {
+      "id": "49of8nglf03q04he27e67sr4ok",
+      "summary": "Kristin: Hayes — baseball drop-off · 5:30",
+      "start": "2026-10-05T17:30:00-05:00",
+      "end": "2026-10-05T17:45:00-05:00",
+      "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
       "id": "f09ef0272gtar5bathk9f0m8sg",
       "summary": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
       "start": "2026-10-05T17:30:00-05:00",
       "end": "2026-10-05T19:00:00-05:00",
+      "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "ekejf5i9eh0af2092fv9899ldk",
+      "summary": "Kristin: Hayes — baseball pickup · 7:00",
+      "start": "2026-10-05T19:00:00-05:00",
+      "end": "2026-10-05T19:15:00-05:00",
       "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
       "busy": false,
       "allDay": false
@@ -215,6 +269,24 @@
       "allDay": false
     },
     {
+      "id": "9i4rgk7qcfv6gs05isjio89fis",
+      "summary": "Kristin: Ainsley — swim drop-off · 5:00",
+      "start": "2026-10-06T17:00:00-05:00",
+      "end": "2026-10-06T17:15:00-05:00",
+      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "q8vbjq2nhjd0jrp51dplgst3ek",
+      "summary": "Kristin: Ainsley — swim pickup · 6:00",
+      "start": "2026-10-06T18:00:00-05:00",
+      "end": "2026-10-06T18:15:00-05:00",
+      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
+      "busy": false,
+      "allDay": false
+    },
+    {
       "id": "8aimbl11odujl3cl1r73pokqvs",
       "summary": "Harris — SRE specials: Art",
       "start": "2026-10-07T07:00:00-05:00",
@@ -260,6 +332,33 @@
       "allDay": false
     },
     {
+      "id": "fckglpfrlku3ase6hen5aaqchk",
+      "summary": "Kristin: Ainsley — choir rehearsal pickup · 5:00",
+      "start": "2026-10-07T17:00:00-05:00",
+      "end": "2026-10-07T17:15:00-05:00",
+      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "oh0drp77cgca0ekksrhvj92ur4",
+      "summary": "Kristin: Harris — flag drop-off · 5:30",
+      "start": "2026-10-07T17:30:00-05:00",
+      "end": "2026-10-07T17:45:00-05:00",
+      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "b3sc4raqgrp1ufj3tk3quvj15g",
+      "summary": "Kristin: Harris — flag pickup · 6:30",
+      "start": "2026-10-07T18:30:00-05:00",
+      "end": "2026-10-07T18:45:00-05:00",
+      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
+      "busy": false,
+      "allDay": false
+    },
+    {
       "id": "6gc1db0v6m642r4t0uhhpagft0",
       "summary": "Hayes + Harris — SRE spirit day: Crazy Socks Day (Peace Week)",
       "start": "2026-10-08T07:00:00-05:00",
@@ -296,6 +395,24 @@
       "allDay": false
     },
     {
+      "id": "po041ekjfr8u9l9an2kpbftn98",
+      "summary": "Kristin: Ainsley — Homework Help pickup · 4:00",
+      "start": "2026-10-08T16:00:00-05:00",
+      "end": "2026-10-08T16:15:00-05:00",
+      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "2r8b5stvadfvb4r8q7mqc067co",
+      "summary": "Kristin: Ainsley — swim drop-off · 5:00",
+      "start": "2026-10-08T17:00:00-05:00",
+      "end": "2026-10-08T17:15:00-05:00",
+      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
+      "busy": false,
+      "allDay": false
+    },
+    {
       "id": "4iuge4862k2uhd3t5irr7jjmc8_20261008T212500Z",
       "summary": "Ainsley swim — Coach Ann · 5:00 practice",
       "start": "2026-10-08T17:00:00-05:00",
@@ -309,6 +426,24 @@
       "summary": "Hayes flag practice · 6:00",
       "start": "2026-10-08T18:00:00-05:00",
       "end": "2026-10-08T19:15:00-05:00",
+      "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "r73lshvj5ik7hmgrkd1256hnik",
+      "summary": "Kristin: Ainsley — swim pickup · 6:00",
+      "start": "2026-10-08T18:00:00-05:00",
+      "end": "2026-10-08T18:15:00-05:00",
+      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "t90vsbrpmv0028o6gekoj0p36s",
+      "summary": "Kristin: Hayes — flag drop-off · 6:00",
+      "start": "2026-10-08T18:00:00-05:00",
+      "end": "2026-10-08T18:15:00-05:00",
       "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
       "busy": false,
       "allDay": false
@@ -348,6 +483,15 @@
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
       "busy": false,
       "allDay": true
+    },
+    {
+      "id": "j40mpeebico66n9jqbrf0sbnpk",
+      "summary": "Kristin: Hayes — flag pickup · 7:15",
+      "start": "2026-10-08T19:15:00-05:00",
+      "end": "2026-10-08T19:30:00-05:00",
+      "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
     },
     {
       "id": "ohoma1ia1arueisdi6nqdm1kms",
