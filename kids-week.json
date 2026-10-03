@@ -1,7 +1,7 @@
 {
   "asOf": "Sat Oct 3 2026",
   "asOfIso": "2026-10-03",
-  "refreshedAt": "2026-10-03T10:48:27.521Z",
+  "refreshedAt": "2026-10-03T10:58:32.843Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -331,6 +331,12 @@
           "what": "Harris flag practice · 5:30–6:30",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Sat 10 · leave 7:40",
+          "what": "Harris flag — vs SH Proehl (home)",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -566,6 +572,12 @@
         {
           "when": "Thu 8 · leave 6:00",
           "what": "Hayes flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Sat 10 · leave 11:25",
+          "what": "Hayes flag — SRE Falcons vs Funk",
           "hint": "YOUR board",
           "tone": "hot"
         }
