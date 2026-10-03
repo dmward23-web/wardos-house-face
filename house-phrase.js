@@ -53,16 +53,19 @@
   function fit() {
     var seps = d.querySelectorAll(".hp-sep");
     for (var i = 0; i < seps.length; i++) if (seps[i].hasAttribute("data-cut")) { seps[i].textContent = seps[i].getAttribute("data-cut"); seps[i].removeAttribute("data-cut"); }
+    /* a cut reflows its line, so a later separator can land on a break: re-check (cut only) until none moves */
+    for (var pass = 0, cut = 1; pass < 4 && cut; pass++) { cut = 0;
     for (i = 0; i < seps.length; i++) {
-      var s = seps[i]; if (!s.isConnected || !s.offsetParent && g.getComputedStyle(s).position !== "fixed") continue;
+      var s = seps[i]; if (s.hasAttribute("data-cut")) continue; if (!s.isConnected || !s.offsetParent && g.getComputedStyle(s).position !== "fixed") continue;
       var t = s.firstChild; if (!t || t.nodeType !== 3) continue;
       var k = t.nodeValue.indexOf("\u00b7"); if (k < 0) continue;
       var dot = glyph(t, k); if (!dot || dot.width < 0.3) continue;
       var b = blockOf(s.parentElement), prev = neighbour(b, s, -1), next = neighbour(b, s, 1);
       if (!prev && !next) continue;
       if ((prev && !sameLine(dot, prev)) || (next && !sameLine(dot, next)) || !prev || !next) {
-        s.setAttribute("data-cut", t.nodeValue); s.textContent = " ";
+        s.setAttribute("data-cut", t.nodeValue); s.textContent = " "; cut++;
       }
+    }
     }
   }
   var tm = 0;

@@ -17,9 +17,9 @@ html body .sec-light.kls-card .kid-light-host { display: block; }
 html body .kj-card { display: flex !important; flex-direction: column !important; gap: 8px !important; overflow: hidden !important; contain: paint; }
 html body .kj-card[hidden] { display: none !important; }
 html body .kj-card .bank-top { flex: 0 0 auto; }
-/* the slot carries the boil-over bleed: about 12% beside and 14% below the jar, all inside this card */
+/* the slot carries the boil-over bleed (Prism 19:02 kit: fx 12% beside, ~6% below, feed blob above): room inside this card */
 .kj-slot { position: relative; flex: 1 1 auto; min-height: 340px; display: flex; align-items: center; justify-content: center;
-  padding: 10% 12% 14%; box-sizing: border-box; pointer-events: none; }
+  padding: 16% 12% 8%; box-sizing: border-box; pointer-events: none; }
 .kj-slot .kj-jar { position: relative; height: 100%; max-height: 100%; aspect-ratio: 100 / 128; max-width: 100%; pointer-events: none; }
 .kj-slot .kj-jar > .jm { width: 100%; height: 100%; max-height: none; }
 .kj-slot canvas, .kj-slot svg { pointer-events: none !important; }
@@ -70,4 +70,10 @@ html body .kj-trust .jm-line { max-width: 100% !important; white-space: normal; 
   html:not([data-export]) body[data-kid][data-theme] .panel > .ftr, html:not([data-export]) body[data-kid][data-theme] .panel > footer { flex-wrap: wrap !important; justify-content: center !important; text-align: center !important; row-gap: 4px !important; height: auto !important; white-space: normal !important; }
   html:not([data-export]) body[data-kid][data-theme] .panel img, html:not([data-export]) body[data-kid][data-theme] .panel canvas, html:not([data-export]) body[data-kid][data-theme] .panel svg { max-width: 100%; }
   html:not([data-export]) body[data-kid][data-theme] .kj-slot { min-height: 0; height: 62vw; flex: 0 0 auto; }
+}
+
+/* Reduced motion on the kid pages: everything stays static (the jar module freezes its own frame; this stops the
+   page's own CSS loops and layout transitions too, e.g. Ainsley's vinyl spin) */
+@media (prefers-reduced-motion: reduce) {
+  html body[data-kid] *, html body[data-kid] *::before, html body[data-kid] *::after { animation: none !important; transition: none !important; }
 }

@@ -86,12 +86,27 @@
     doc.addEventListener("house:earn", function (ev) {
       var d = ev && ev.detail;
       if (d && d.kidId && d.kidId !== kid) return;
-      setTimeout(function () { if (d && d.done === true) call(jar, "feed"); sync(true); }, 0);
+      setTimeout(function () { if (d && d.done === true) call(jar, "feed"); sync(true); if (typeof lastClosed === "number") lastClosed = closedNow(); }, 0);
     });
     ["house:kid-rendered", "house:kids-data-ready"].forEach(function (n) {
       doc.addEventListener(n, function (ev) { var d = ev && ev.detail; if (d && d.kidId && d.kidId !== kid) return; sync(false); });
     });
     g.addEventListener("storage", function () { sync(false); });
+    /* JARHERO2 (Prism 19:02 gap): a MUSTS day-pill tap fires no house:earn, so watch the pills themselves. Each new
+       closed box: feed() + a stepped ripple; an un-tap steps the glass back down, quietly. */
+    var closedNow = function () { var f = W && W.mustWeekFill ? W.mustWeekFill(kid) : null; return f && f.total > 0 ? f.closed : 0; };
+    var lastClosed = closedNow(), tapT = 0;
+    var musts = doc.getElementById("sec-musts");
+    if (musts && typeof MutationObserver === "function") {
+      new MutationObserver(function () {
+        clearTimeout(tapT);
+        tapT = setTimeout(function () {
+          var c = closedNow();
+          if (c > lastClosed) { call(jar, "feed"); sync(true); } else if (c !== lastClosed) sync(false);
+          lastClosed = c;
+        }, 30);
+      }).observe(musts, { subtree: true, attributes: true, attributeFilter: ["class", "aria-pressed"] });
+    }
     sync(false);
     return jar;
   }

@@ -21,6 +21,13 @@
       .catch(function () { return null; })
       .then(function (d) {
         if (!shouldErupt(d)) return;
+        /* the eruption stays on its own board: Prism's canvas reaches 30% beside / 90% above / 70% below the tile, so
+           while it runs the tile clips it to its own rounded box; it never paints over the header or other tiles */
+        if (!doc.getElementById("us-erupt-clip")) {
+          var st = doc.createElement("style"); st.id = "us-erupt-clip";
+          st.textContent = "#us-board:has(> canvas.jm-erupt){overflow:clip!important}";
+          (doc.head || doc.documentElement).appendChild(st);
+        }
         if (g.JarMercury && typeof g.JarMercury.eruptUsTogether === "function") g.JarMercury.eruptUsTogether(tile);
       });
   }

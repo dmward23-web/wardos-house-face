@@ -110,7 +110,11 @@
     s = s.replace(/\bMom\b[^·]*/gi, "");
     s = s.replace(/\s{2,}/g, " ").replace(/\s·\s*$/g, "").trim();
     cap = cap || 64;
-    if (s.length > cap) s = s.slice(0, cap - 3) + "…";
+    if (s.length > cap) { /* KIDPAGES1 · no ellipsis on the face: keep whole " · " phrases that fit; a lone long phrase stays whole (it wraps) */
+      var ph = s.split(/\s+·\s+/), out = ph[0];
+      for (var i = 1; i < ph.length && (out + " · " + ph[i]).length <= cap; i++) out += " · " + ph[i];
+      s = out;
+    }
     return s;
   }
 
@@ -964,6 +968,24 @@
     return html;
   }
 
+  /* KIDPAGES1 · CLIP rule on the leave-by card: tomorrow's chips that would run past the card's box leave, last first
+     (never half a chip, never an ellipsis); if even one does not fit, the Tmr row leaves. */
+  function fitStrip(el) {
+    try {
+      var box = el.closest(".leaveby-body") || el, br = box.getBoundingClientRect();
+      if (!br.height) return;
+      var past = function (n) { var r = n.getBoundingClientRect(); return r.bottom > br.bottom + 1 || r.right > br.right + 1; };
+      for (var k = 0; k < 12; k++) {
+        var chips = el.querySelectorAll(".lb-day-tmr .lb-day-tchip"), last = chips[chips.length - 1];
+        var over = box.scrollHeight > box.clientHeight + 1 || (last && past(last));
+        if (!over) return;
+        if (chips.length > 1) { last.parentNode.removeChild(last); continue; }
+        var row = el.querySelector(".lb-day-tmr"); if (row) row.parentNode.removeChild(row);
+        return;
+      }
+    } catch (e) { /* layout only */ }
+  }
+
   function paintLayouts(strip, clock, mode) {
     var el = document.querySelector("[data-live='leaveby-layouts']");
     if (!el) {
@@ -982,6 +1004,7 @@
       esc(LAYOUT_LABELS[mode] || mode) + "</strong></div>";
     el.innerHTML = banner + html;
     el.setAttribute("data-layout", mode);
+    fitStrip(el); setTimeout(function () { fitStrip(el); }, 350);
     syncChipUI(mode);
     paintLists(strip); /* keep legacy nodes in sync if present */
   }

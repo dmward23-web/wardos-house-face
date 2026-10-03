@@ -113,3 +113,10 @@ test("Us together erupt: only Atlas's Us together rule; Ainsley's jar / trusted 
   assert.equal(UE.shouldErupt(null), false); assert.equal(UE.shouldErupt({}), false);
   assert.doesNotMatch(code(read("house-us-erupt.js")), /ainsley|trust|level|HouseKidJar|jar\.|wallDisplay/i, "reads only usTogether.lit");
 });
+test("JARHERO2: a MUSTS pill tap feeds the boys' jar; the eruption is clipped to the Us together tile", () => {
+  const j = code(read("house-kid-jar.js"));
+  assert.match(j, /getElementById\("sec-musts"\)/, "watches the MUSTS pills");
+  assert.match(j, /c > lastClosed\) \{ call\(jar, "feed"\); sync\(true\)/, "each new closed box: feed + stepped ripple");
+  const e = read("house-us-erupt.js");
+  assert.match(e, /#us-board:has\(> canvas\.jm-erupt\)\{overflow:clip!important\}/, "erupt canvas clipped to the tile");
+});

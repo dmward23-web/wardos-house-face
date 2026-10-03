@@ -27,7 +27,7 @@
       lidOrigin: "50% 9.6%", hinge: "35% 9.6%"
     }
   };
-  var FX = { l: -30, t: -48, w: 160, h: 196 };
+  var FX = { l: -12, t: -48, w: 124, h: 184 }; /* fx canvas extent in units: room for the feed blob above, spatter, rivulets + pool */
   /* ===== motion + boil numbers (MOTION-SPEC-jar-mercury.md) ===== */
   var M = {
     ref: 160, ampExp: 0.4,
@@ -165,7 +165,7 @@
     schedule();
   }, { rootMargin: "96px" }) : null;
   var ro = (typeof ResizeObserver !== "undefined") ? new ResizeObserver(function (es) {
-    es.forEach(function (e) { var j = e.target.__jm; if (j && j.alive) { var w = e.target.getBoundingClientRect().width; if (Math.abs(w - j.cssW) > 0.5) { j.resize(); if (reduced()) j.freezeFrame(); else j.render(true); } } });
+    es.forEach(function (e) { var j = e.target.__jm; if (j && j.alive) { var w = Math.min(e.target.offsetWidth, (e.target.offsetHeight || 1e9) / 1.28); if (Math.abs(w - j.cssW) > 0.5) { j.resize(); if (reduced()) j.freezeFrame(); else j.render(true); } } });
   }) : null;
   function wantsLoop(j) { return j.alive && j.onscreen && !document.hidden && !reduced(); }
   function schedule() {
@@ -241,11 +241,12 @@
     wrap.className = "jm" + (this.status ? " jm--status" : "");
     wrap.setAttribute("data-kid", this.kid);
     wrap.setAttribute("aria-hidden", "true");
-    wrap.innerHTML = '<div class="jm-glow"></div>' + glassBack(id, this.shape) + '<canvas class="jm-liquid"></canvas>' + glassFront(id, this.shape) +
-      '<canvas class="jm-fx"></canvas>' + lidSvg(id, this.shape);
+    wrap.innerHTML = '<div class="jm-stage"><div class="jm-glow"></div>' + glassBack(id, this.shape) + '<canvas class="jm-liquid"></canvas>' + glassFront(id, this.shape) +
+      '<canvas class="jm-fx"></canvas>' + lidSvg(id, this.shape) + "</div>";
     host.classList.add("jm-host");
     host.appendChild(wrap);
     this.wrap = wrap;
+    this.stage = wrap.querySelector(".jm-stage");
     this.glowEl = wrap.querySelector(".jm-glow");
     this.lidEl = wrap.querySelector(".jm-lid");
     this.lidEl.style.transformOrigin = this.g.lidOrigin;
@@ -294,8 +295,17 @@
   };
   P.hasLiquid = function () { return this.target !== null && (this.target > 0.001 || this.lv > 0.002); };
   P.resize = function () {
-    var r = this.wrap.getBoundingClientRect();
-    var w = Math.max(1, r.width), h = w * 128 / 100;
+    /* layout size (no transforms). If the host stretches the box off 100:128, the stage fits inside it (contain, centred),
+       so glass, liquid and fx never distort or drift apart. */
+    var w0 = Math.max(1, this.wrap.offsetWidth || this.wrap.getBoundingClientRect().width), h0 = this.wrap.offsetHeight || w0 * 1.28;
+    var w = Math.min(w0, h0 / 1.28), h = w * 1.28, sl = (w0 - w) / 2, st = (h0 - h) / 2;
+    var key = w.toFixed(1) + "," + sl.toFixed(1) + "," + st.toFixed(1);
+    if (key !== this._stageKey) {
+      this._stageKey = key;
+      var full = sl < 0.5 && st < 0.5;
+      this.stage.style.cssText = full ? "" : "left:" + sl.toFixed(1) + "px;top:" + st.toFixed(1) + "px;width:" + w.toFixed(1) + "px;height:" + h.toFixed(1) + "px;right:auto;bottom:auto;";
+      this.wrap.style.transformOrigin = full ? "" : "50% " + (st + h).toFixed(1) + "px";
+    }
     var dev = global.devicePixelRatio || 1;
     var cap = this.optsDpr || ((w >= 180 && (global.innerWidth || 1000) <= 500) ? M.dprPhoneHero : M.dprMax);
     var dpr = Math.min(cap, dev);
@@ -566,15 +576,16 @@
     if (!force && !busy && !sweeping && !this.glintWas) { this.applyTransforms(t); return; }
     this.glintWas = sweeping;
     var fill = liquid ? "liquid" : "empty"; if (fill !== this._fill) { this.wrap.setAttribute("data-fill", fill); this._fill = fill; }
-    if (liquid || force || this.drewLiquid) { this.drawLiquid(T, liquid); this.drewLiquid = liquid; }
-    this.drawFx(T, liquid, gPh);
+    this.drawLiquid(T, liquid, gPh);
+    var fxBusy = !!(this.blob || this.spatter.length || this.overAmt > 0.02 || this.poolAmt > 0.01);
+    if (fxBusy || this.fxWas || force) { this.drawFx(T); this.fxWas = fxBusy; }
     this.applyTransforms(t);
   };
-  P.drawLiquid = function (T, liquid) {
+  P.drawLiquid = function (T, liquid, gPh) {
     var ctx = this.ctx, s = this.scale, c = this.col, g = this.g, lk = this.lk, i;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, this.cv.width, this.cv.height);
-    if (!liquid) return;
     ctx.setTransform(s, 0, 0, s, 0, 0);
+    if (!liquid) { this.drawGlint(ctx, gPh); return; }
     if (!this.grads) this.buildGrads(ctx);
     var gr = this.grads;
     ctx.save(); ctx.clip(this.clipInner);
@@ -643,20 +654,20 @@
     var gl = ctx.createRadialGradient(gx, gy, 0, gx, gy, 5); gl.addColorStop(0, rgba(c.spec, 0.9)); gl.addColorStop(1, rgba(c.spec, 0));
     ctx.fillStyle = gl; ctx.beginPath(); ctx.ellipse(gx, gy, 5, 1.4, 0, 0, 7); ctx.fill();
     ctx.restore();
+    this.drawGlint(ctx, gPh);
   };
-  P.drawFx = function (T, liquid, gPh) {
+  P.drawGlint = function (ctx, gPh) { /* glass glint sweep (every jar, EMPTY included): a diagonal band of light crossing the glass */
+    var sw = gPh / (M.shimmer.glassSweep / M.shimmer.glassPeriod);
+    if (sw > 1.05) return;
+    ctx.save(); ctx.clip(this.clipOuter);
+    var gx = -14 + sw * 128, gg = ctx.createLinearGradient(gx - 7, 6, gx + 7, -4), ga = 0.10 + 0.06 * (1 - this.hunger);
+    gg.addColorStop(0, "rgba(255,255,255,0)"); gg.addColorStop(0.45, "rgba(255,255,255," + (ga * 0.6).toFixed(3) + ")"); gg.addColorStop(0.5, "rgba(255,255,255," + ga.toFixed(3) + ")"); gg.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = gg; ctx.fillRect(0, 0, 100, 128); ctx.restore();
+  };
+  P.drawFx = function (T) {
     var ctx = this.fctx, s = this.fscale, c = this.col, g = this.g, lk = this.lk, i;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, this.fx.width, this.fx.height);
     ctx.setTransform(s, 0, 0, s, -FX.l * s, -FX.t * s);
-    /* glass glint sweep (every jar, EMPTY included): a diagonal band of light crossing the glass */
-    var sw = gPh / (M.shimmer.glassSweep / M.shimmer.glassPeriod);
-    if (sw <= 1.05) {
-      ctx.save(); ctx.clip(this.clipOuter);
-      var gx = -14 + sw * 128, gg = ctx.createLinearGradient(gx - 7, 6, gx + 7, -4);
-      var ga = 0.10 + 0.06 * (1 - this.hunger);
-      gg.addColorStop(0, "rgba(255,255,255,0)"); gg.addColorStop(0.45, "rgba(255,255,255," + (ga * 0.6).toFixed(3) + ")"); gg.addColorStop(0.5, "rgba(255,255,255," + ga.toFixed(3) + ")"); gg.addColorStop(1, "rgba(255,255,255,0)");
-      ctx.fillStyle = gg; ctx.fillRect(0, 0, 100, 128); ctx.restore();
-    }
     /* base pool (boil-over) */
     if (this.poolAmt > 0.01) {
       var pr = M.over.poolRx * (this.status ? 0.62 : 1) * (0.55 + 0.45 * this.poolAmt), py = g.bottom + 0.6;
@@ -811,7 +822,7 @@
     var fixed = boardEl === document.body || boardEl === document.documentElement;
     var ov = document.createElement("div");
     ov.className = "jm-spill"; ov.setAttribute("aria-hidden", "true");
-    ov.style.cssText = "position:" + (fixed ? "fixed" : "absolute") + ";inset:0;pointer-events:none;overflow:hidden;z-index:2147483000;mix-blend-mode:screen;contain:strict;";
+    ov.style.cssText = "position:" + (fixed ? "fixed" : "absolute") + ";inset:0;pointer-events:none;overflow:hidden;z-index:2147483000;contain:strict;";
     if (!fixed && global.getComputedStyle(boardEl).position === "static") boardEl.style.position = "relative";
     var ox = 50, oy = 40;
     try {
@@ -821,15 +832,15 @@
       }
     } catch (e) { ox = 50; oy = 40; }
     var flood = document.createElement("div"), run = document.createElement("div");
-    flood.style.cssText = "position:absolute;left:" + ox.toFixed(2) + "%;top:" + oy.toFixed(2) + "%;width:180vmax;height:180vmax;margin:-90vmax 0 0 -90vmax;border-radius:50%;" +
-      "background:radial-gradient(closest-side," + col + " 0%," + glow + " 30%,transparent 72%);opacity:0;transform:scale(.06);will-change:transform,opacity;";
-    run.style.cssText = "position:absolute;left:0;right:0;top:0;height:160%;background:linear-gradient(180deg,transparent 0%," + glow + " 30%," + col + " 42%,transparent 62%);opacity:0;transform:translateY(-75%);will-change:transform,opacity;";
+    flood.style.cssText = "position:absolute;left:" + ox.toFixed(2) + "%;top:" + oy.toFixed(2) + "%;width:50vmax;height:50vmax;margin:-25vmax 0 0 -25vmax;border-radius:50%;" +
+      "background:radial-gradient(closest-side," + col + " 0%," + glow + " 30%,transparent 72%);opacity:0;transform:scale(.2);will-change:transform,opacity;";
+    run.style.cssText = "position:absolute;left:0;right:0;top:0;height:50%;background:linear-gradient(180deg,transparent 0%," + glow + " 40%," + col + " 55%,transparent 100%);opacity:0;transform:translateY(-100%);will-change:transform,opacity;";
     ov.appendChild(flood); ov.appendChild(run); boardEl.appendChild(ov);
     var dur = o.duration || 3400;
     if (reduced() || !ov.animate) { flood.style.opacity = ".2"; flood.style.transform = "scale(1)"; setTimeout(function () { if (ov.parentNode) ov.parentNode.removeChild(ov); }, 1600); return ov; }
-    flood.animate([{ opacity: 0, transform: "scale(.06)" }, { opacity: 0.5, transform: "scale(.55)", offset: 0.22 }, { opacity: 0.34, transform: "scale(1.15)", offset: 0.6 }, { opacity: 0, transform: "scale(1.6)" }],
+    flood.animate([{ opacity: 0, transform: "scale(.2)" }, { opacity: 0.5, transform: "scale(2)", offset: 0.22 }, { opacity: 0.34, transform: "scale(4.1)", offset: 0.6 }, { opacity: 0, transform: "scale(5.8)" }],
       { duration: dur, easing: "cubic-bezier(.2,.7,.3,1)", fill: "forwards" });
-    var a2 = run.animate([{ opacity: 0, transform: "translateY(-75%)" }, { opacity: 0.3, transform: "translateY(-35%)", offset: 0.35 }, { opacity: 0.18, transform: "translateY(5%)", offset: 0.7 }, { opacity: 0, transform: "translateY(30%)" }],
+    var a2 = run.animate([{ opacity: 0, transform: "translateY(-100%)" }, { opacity: 0.3, transform: "translateY(10%)", offset: 0.35 }, { opacity: 0.18, transform: "translateY(90%)", offset: 0.7 }, { opacity: 0, transform: "translateY(160%)" }],
       { duration: dur, easing: "cubic-bezier(.45,0,.55,1)", fill: "forwards" });
     a2.onfinish = function () { if (ov.parentNode) ov.parentNode.removeChild(ov); };
     return ov;
