@@ -1,7 +1,7 @@
 {
   "asOf": "Sat Oct 3 2026",
   "asOfIso": "2026-10-03",
-  "refreshedAt": "2026-10-03T15:08:45.713Z",
+  "refreshedAt": "2026-10-03T15:10:24.659Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,27 +16,15 @@
     "endIso": "2026-10-09T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "10:00",
-    "place": "Saturday Morning Donuts",
+    "label": "Next up · Sun",
+    "time": "8:30",
+    "place": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · ga…",
     "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-    "badge": "Sat",
-    "startIso": "2026-10-03T15:00:00.000Z",
-    "endIso": "2026-10-03T16:00:00.000Z",
-    "kind": "other",
+    "badge": "Sun",
+    "startIso": "2026-10-04T13:30:00.000Z",
+    "endIso": "2026-10-04T15:00:00.000Z",
+    "kind": "sport",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "10:00",
-        "place": "Saturday Morning Donuts",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Sat",
-        "startIso": "2026-10-03T15:00:00.000Z",
-        "endIso": "2026-10-03T16:00:00.000Z",
-        "kind": "other",
-        "whenLabel": "10:00",
-        "summary": "Hayes + Harris — Saturday Morning Donuts · 10:00"
-      },
       {
         "label": "Next up · Sun",
         "time": "8:30",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Tue 7:00",
         "summary": "Hayes — SRE specials: Music"
+      },
+      {
+        "label": "Next up · Tue",
+        "time": "5:00",
+        "place": "Ainsley swim — Coach Ann",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-06T22:00:00.000Z",
+        "endIso": "2026-10-06T23:00:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Tue 5:00",
+        "summary": "Ainsley swim — Coach Ann · 5:00 practice"
       }
     ]
   },
