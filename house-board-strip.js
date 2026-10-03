@@ -832,7 +832,7 @@
     ".lb-day-none{font-size:11px;color:#8d877c;padding:4px 0}",
     ".lb-day-tmr{display:flex;flex-wrap:wrap;align-items:center;gap:5px;font-size:11px;color:#d8d2c6}",
     ".lb-day-tmr b{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#ffe080;margin-right:2px}",
-    ".lb-day-tchip{background:rgba(255,255,255,.06);border-radius:8px;padding:2px 7px;white-space:nowrap}",
+    ".lb-day-tchip{background:rgba(255,255,255,.06);border-radius:8px;padding:2px 7px;white-space:normal;max-width:100%;min-width:0}", /* OCT8: a long title wraps inside its chip, never runs past the card */
     ".lb-day-tchip strong{color:#f2eee6;margin-right:4px}"
   ].join("\n");
 
@@ -974,7 +974,8 @@
     try {
       var box = el.closest(".leaveby-body") || el, br = box.getBoundingClientRect();
       if (!br.height) return;
-      var past = function (n) { var r = n.getBoundingClientRect(); return r.bottom > br.bottom + 1 || r.right > br.right + 1; };
+      var er = el.getBoundingClientRect(), rr = Math.min(br.right, er.right || br.right); /* OCT8: held to the layouts box too */
+      var past = function (n) { var r = n.getBoundingClientRect(); return r.bottom > br.bottom + 1 || r.right > rr + 1; };
       for (var k = 0; k < 12; k++) {
         var chips = el.querySelectorAll(".lb-day-tmr .lb-day-tchip"), last = chips[chips.length - 1];
         var over = box.scrollHeight > box.clientHeight + 1 || (last && past(last));

@@ -130,7 +130,10 @@
     for (var k = 0; k < 60; k++) {
       rg.selectNodeContents(el);
       var r = rg.getBoundingClientRect();
-      if (!r.width || (r.right <= right + 0.5 && r.left >= left - 0.5 && el.scrollWidth <= el.clientWidth + 1)) break;
+      /* OCT8: a wider minute ("11:34 PM") must not push the header's other pieces (the page chip) out of the card */
+      var kidsIn = true;
+      for (var c = 0; c < box.children.length; c++) { var cr = box.children[c].getBoundingClientRect(); if (cr.width && cr.right > right + 0.5) { kidsIn = false; break; } }
+      if (!r.width || (r.right <= right + 0.5 && r.left >= left - 0.5 && el.scrollWidth <= el.clientWidth + 1 && kidsIn)) break;
       var fs = parseFloat(getComputedStyle(el).fontSize) || 0;
       if (fs <= 14) break;
       el.style.setProperty("font-size", (fs - 1) + "px", "important");
