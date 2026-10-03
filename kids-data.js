@@ -1019,7 +1019,8 @@
     var segs = Array.isArray(hm.timeline) && hm.timeline.length ? hm.timeline : [hm];
     for (var i = 0; i < segs.length; i++) {
       var a = Date.parse(segs[i].since || ""), b = Date.parse(segs[i].until || "");
-      if (a && b && a <= t && t < b) return segs[i];
+      /* JARHERO3 · an open-ended segment (until: null, the calendar does not reach the return yet) holds from its start */
+      if (a && a <= t && (segs[i].until == null ? true : (b && t < b))) return segs[i];
     }
     return null;
   }
