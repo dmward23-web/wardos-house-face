@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-03T14:56:12.343Z",
+  "fetchedAt": "2026-10-03T15:08:46.256Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-01",
   "windowEnd": "2026-10-09",
@@ -16,15 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "gfm3p4jh5agr5vdp6ra79ohbag",
-      "summary": "Hayes + Harris — Saturday Morning Donuts · 10:00",
-      "start": "2026-10-03T10:00:00-05:00",
-      "end": "2026-10-03T11:00:00-05:00",
-      "location": "Cardboard Corner Cafe, 9240 Metcalf Ave, Overland Park, KS 66212",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "7la5t0sdbtph2v6t3v4si7k97g",
       "summary": "Hayes Johnson's birthday dinner — J. Alexander's · 5:30 · leave 5:00",
