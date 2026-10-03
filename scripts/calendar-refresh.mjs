@@ -158,7 +158,7 @@ function kidMentions(summary) {
   const nsH = ns ? /H/i.test(ns[1]) : false;
   return {
     ainsley: /\bainsley\b/.test(s) || nsA,
-    hayes: /\bhayes\b/.test(s) || nsH,
+    hayes: /\bhayes\b(?!\s+johnson)/.test(s) || nsH,
     harris: /\bharris\b/.test(s) || nsH,
     boys: /\bboyes\b|\bharris\b.*\bhayes\b|\bhayes\b.*\bharris\b|\bboyes\b|SRE drop|SRE pickup|Hayes \+ Harris/i.test(summary),
   };
@@ -455,9 +455,11 @@ function pickStripQueue(items, now, homeWeek) {
 
 function detailFor(it, homeWeek, upcoming) {
   const bits = [];
-  const through = homeWeek && homeWeek.through
-    ? `kids with Dad @ <strong>147th</strong> through ${homeWeek.through}`
-    : "kids with Dad @ <strong>147th</strong>";
+  const through = homeWeek && homeWeek.with === "Mom"
+    ? (homeWeek.through ? `kids with Mom · until ${homeWeek.through}` : "kids with Mom")
+    : (homeWeek && homeWeek.through
+      ? `kids with Dad @ <strong>147th</strong> through ${homeWeek.through}`
+      : "kids with Dad @ <strong>147th</strong>");
   // Add a couple of later same-day anchors
   const sameDay = upcoming.filter(
     (x) => partsInTZ(x.start).iso === partsInTZ(it.start).iso && x.id !== it.id
@@ -472,30 +474,49 @@ function detailFor(it, homeWeek, upcoming) {
 }
 
 function custodyFromItems(items, now) {
-  const custody = items.filter((it) => it.kind === "custody");
-  // Active span: start <= now < end
-  let active = custody.find((it) => it.start <= now && now < it.end);
-  if (!active) {
-    // Next upcoming or last that ended
-    active = custody.find((it) => it.end > now) || custody[custody.length - 1];
-  }
-  if (!active) {
+  const custody = items.filter((it) => it.kind === "custody").slice().sort((a, b) => a.start - b.start);
+  // Active Dad span: start <= now < end
+  const active = custody.find((it) => it.start <= now && now < it.end);
+  if (active) {
+    const endP = partsInTZ(active.end);
+    const startP = partsInTZ(active.start);
+    const through = `${endP.weekday} ${endP.month} ${endP.day} · ${fmtTime(active.end)}`;
     return {
       with: "Dad",
       place: "147th",
-      through: "—",
-      throughLabel: "with Dad @ 147th",
+      through,
+      throughLabel: `with Dad @ 147th · ${startP.weekday} ${startP.month} ${startP.day} ${fmtTime(active.start)} → ${through}`,
+      endIso: active.endIso,
     };
   }
-  const endP = partsInTZ(active.end);
-  const startP = partsInTZ(active.start);
-  const through = `${endP.weekday} ${endP.month} ${endP.day} · ${fmtTime(active.end)}`;
+  // Between / after Dad weeks → Mom week. Never name Kristin on glass (CALENDAR LAW).
+  const nextDad = custody.find((it) => it.start > now);
+  const lastEnded = [...custody].filter((it) => it.end <= now).sort((a, b) => b.end - a.end)[0];
+  if (nextDad) {
+    const endP = partsInTZ(nextDad.start);
+    const through = `${endP.weekday} ${endP.month} ${endP.day} · ${fmtTime(nextDad.start)}`;
+    return {
+      with: "Mom",
+      place: "mom's",
+      through,
+      throughLabel: `with Mom · until Dad week ${through}`,
+      endIso: nextDad.startIso,
+    };
+  }
+  if (lastEnded) {
+    return {
+      with: "Mom",
+      place: "mom's",
+      through: "next Dad week",
+      throughLabel: "with Mom · Dad week ended",
+      endIso: lastEnded.endIso,
+    };
+  }
   return {
     with: "Dad",
     place: "147th",
-    through,
-    throughLabel: `with Dad @ 147th · ${startP.weekday} ${startP.month} ${startP.day} ${fmtTime(active.start)} → ${through}`,
-    endIso: active.endIso,
+    through: "—",
+    throughLabel: "with Dad @ 147th",
   };
 }
 
@@ -534,11 +555,14 @@ function buildKidToday(kidId, items, now, homeWeek) {
       tone,
     });
   }
+  const mom = homeWeek && homeWeek.with === "Mom";
   rows.push({
     kind: "note",
     when: "All day",
-    what: kidId === "ainsley" ? "Base @ 147th with Dad" : kidId === "hayes" ? "🏡 DROP ZONE HQ with Dad" : "🏡 YOUR BASE with Dad",
-    hint: `through ${homeWeek.through}`,
+    what: mom
+      ? (kidId === "ainsley" ? "At Mom's" : kidId === "hayes" ? "🏡 At Mom's" : "🏡 At Mom's")
+      : (kidId === "ainsley" ? "Base @ 147th with Dad" : kidId === "hayes" ? "🏡 DROP ZONE HQ with Dad" : "🏡 YOUR BASE with Dad"),
+    hint: mom ? `until ${homeWeek.through}` : `through ${homeWeek.through}`,
     tone: "hot",
   });
   return rows.slice(0, 6).map(({ ride, ...r }) => r);
@@ -619,18 +643,28 @@ function hottestFor(kidId, items, now, homeWeek) {
   const first = mine[0];
   const ride = first && mine.find((x) => x.kidRide && partsInTZ(x.start).iso === partsInTZ(first.start).iso);
   const hit = ride || first;
+  const mom = homeWeek && homeWeek.with === "Mom";
   if (!hit) {
-    return {
-      when: `${partsInTZ(now).weekday.toUpperCase()} · base @ 147th`,
-      what: "YOUR BASE WITH DAD",
-      where: `through ${homeWeek.through}`,
-      badges: ["DAD WEEK", "147th"],
-    };
+    return mom
+      ? {
+          when: `${partsInTZ(now).weekday.toUpperCase()} · at Mom's`,
+          what: "AT MOM'S",
+          where: `until ${homeWeek.through}`,
+          badges: ["MOM WEEK"],
+        }
+      : {
+          when: `${partsInTZ(now).weekday.toUpperCase()} · base @ 147th`,
+          what: "YOUR BASE WITH DAD",
+          where: `through ${homeWeek.through}`,
+          badges: ["DAD WEEK", "147th"],
+        };
   }
   return {
     when: `${fmtDowShort(hit.start).toUpperCase()} · ${fmtTime(hit.start)}`,
     what: kidsSafeWhat(hit.raw, hit.kind).toUpperCase().slice(0, 48),
-    where: `with Dad @ 147th · through ${homeWeek.through}`,
+    where: mom
+      ? `with Mom · until ${homeWeek.through}`
+      : `with Dad @ 147th · through ${homeWeek.through}`,
     badges: [fmtDowShort(hit.start).toUpperCase(), fmtTime(hit.start)],
   };
 }
@@ -659,7 +693,9 @@ function buildDanToday(items, now, homeWeek) {
   }
   rows.push({
     when: "home week",
-    what: `Kids with Dad @ 147th through ${homeWeek.through}`,
+    what: homeWeek.with === "Mom"
+      ? `Kids with Mom · until ${homeWeek.through}`
+      : `Kids with Dad @ 147th through ${homeWeek.through}`,
     tone: "hot",
   });
   return rows.slice(0, 10);
@@ -684,8 +720,8 @@ function buildDanWeek(items, now, homeWeek) {
     });
   }
   rows.push({
-    when: `through ${homeWeek.through}`,
-    what: "Kids with Dad @ 147th",
+    when: homeWeek.with === "Mom" ? `until ${homeWeek.through}` : `through ${homeWeek.through}`,
+    what: homeWeek.with === "Mom" ? "Kids with Mom" : "Kids with Dad @ 147th",
     tone: "hot",
   });
   return rows.slice(0, 24);
@@ -761,7 +797,9 @@ function main() {
     label: "Next up · today",
     time: "",
     place: "House day @ 147th",
-    detailHtml: `kids with Dad @ <strong>147th</strong> through ${homeWeek.through}`,
+    detailHtml: homeWeek.with === "Mom"
+      ? `kids with Mom · until ${homeWeek.through}`
+      : `kids with Dad @ <strong>147th</strong> through ${homeWeek.through}`,
     badge: nowP.weekday,
     startIso: now.toISOString(),
     endIso: new Date(now.getTime() + 3600000).toISOString(),
@@ -824,12 +862,19 @@ function main() {
   }
   next.kids.dan = {
     ...danKept,
-    hottest: {
-      when: `${nowP.asOf} · kids with you @ 147th`,
-      what: "Dad week live",
-      where: `through ${homeWeek.through}`,
-      badges: ["Dad week", "147th"],
-    },
+    hottest: homeWeek.with === "Mom"
+      ? {
+          when: `${nowP.asOf} · kids with Mom`,
+          what: "Mom week",
+          where: `until ${homeWeek.through}`,
+          badges: ["Mom week"],
+        }
+      : {
+          when: `${nowP.asOf} · kids with you @ 147th`,
+          what: "Dad week live",
+          where: `through ${homeWeek.through}`,
+          badges: ["Dad week", "147th"],
+        },
     today: buildDanToday(items, now, homeWeek),
     week: buildDanWeek(items, now, homeWeek),
   };

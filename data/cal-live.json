@@ -1,17 +1,17 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-03T02:44:29.364Z",
+  "fetchedAt": "2026-10-03T02:45:02.433Z",
   "tz": "America/Chicago",
   "windowStart": "2026-09-17",
   "windowEnd": "2026-10-16",
   "asOfIso": "2026-10-02",
   "nextLeave": {
-    "id": "806kf6gnibpjh3vq78g4mnfiqc",
-    "summary": "Dan — load car · haul + bags (before drive)",
-    "start": "2026-10-03T08:00:00-05:00",
-    "end": "2026-10-03T08:30:00-05:00",
-    "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
+    "id": "4ug63o0oqfeld1ll1h7ff1eerc",
+    "summary": "Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. Alexander's",
+    "start": "2026-10-03T08:30:00-05:00",
+    "end": "2026-10-03T17:00:00-05:00",
+    "location": "6719 W 147th Terrace, Overland Park, KS 66223 → J. Alexander's, 73 White Bridge Rd #130, Nashville, TN 37205",
     "busy": true,
     "allDay": false
   },
@@ -829,9 +829,9 @@
   ],
   "boardStrip": {
     "label": "Next up · Sat",
-    "time": "8:00",
-    "place": "Dan — load car · haul + bags (before drive)",
-    "detailHtml": "<strong>8:00</strong> Dan — load car · haul + bags (before drive)",
+    "time": "8:30",
+    "place": "Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. A…",
+    "detailHtml": "<strong>8:30</strong> Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. A…",
     "badge": "Sat"
   },
   "error": null

@@ -7,7 +7,7 @@
  * boardStrip / dan.today / dan.week track the calendar clock.
  *
  * Law: EVERY create/update/delete on dmward23 must re-run this path onto glass.
- * Past/done (end < now) DROP. Next Up = first future event by start.
+ * Past/done (end < now) DROP. Next Up = best future in ~18h (Busy leave/DRIVE > Busy > Free; skip Sign-up noise).
  * No Wright cron — Atlas owns standing refresh / on-arrival pull (see CAL-LIVE.md).
  *
  * Usage:
@@ -553,13 +553,26 @@ function main() {
     .filter((e) => !isSoft(e))
     .sort((a, b) => a.startMs - b.startMs);
 
-  /* nextLeave field = Next Up hero = first future event (Busy preferred only as tie-break same start) */
-  const heroPool = upcoming.filter((e) => !e.pinnedUntil);
-  let next = heroPool[0] || null;
-  if (heroPool.length >= 2 && heroPool[0].startMs === heroPool[1].startMs) {
-    const busy = heroPool.find((e) => e.busy && e.startMs === heroPool[0].startMs);
-    if (busy) next = busy;
+  /* nextLeave field = Next Up hero.
+     Hallway glance: prefer Busy leave/DRIVE over Free admin (Sign up / ParentSquare).
+     Rank within the next 18h window, then earliest start. */
+  const ADMIN_HERO_SKIP = /^Sign up\b|ParentSquare|conference sign-?ups?/i;
+  const heroPool = upcoming.filter((e) => !e.pinnedUntil && !ADMIN_HERO_SKIP.test(e.summary || ""));
+  function heroRank(e) {
+    const t = String(e.summary || "");
+    if (e.busy && /\bDRIVE\b/.test(t)) return 0; // case-sensitive DRIVE token (not "before drive")
+    if (e.busy && (/\bLeave\b/i.test(t) || /^Dan\b/i.test(t))) return 1;
+    if (e.busy) return 2;
+    return 4;
   }
+  const horizonMs = now.getTime() + 18 * 60 * 60 * 1000;
+  const near = heroPool.filter((e) => e.startMs <= horizonMs);
+  const pool = (near.length ? near : heroPool).slice().sort((a, b) => {
+    const ra = heroRank(a), rb = heroRank(b);
+    if (ra !== rb) return ra - rb;
+    return a.startMs - b.startMs;
+  });
+  let next = pool[0] || null;
 
   const leaveTitles = upcoming.filter(
     (e) => e.busy && (/^Leave\b/i.test(e.summary) || /^Leave\s*·/i.test(e.summary))
