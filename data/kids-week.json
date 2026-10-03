@@ -1,7 +1,7 @@
 {
   "asOf": "Sat Oct 3 2026",
   "asOfIso": "2026-10-03",
-  "refreshedAt": "2026-10-03T13:33:33.717Z",
+  "refreshedAt": "2026-10-03T13:45:27.989Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,31 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "8:30",
-    "place": "Dan DRIVE → Nashville",
+    "time": "10:00",
+    "place": "Saturday Morning Donuts",
     "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
     "badge": "Sat",
-    "startIso": "2026-10-03T13:30:00.000Z",
-    "endIso": "2026-10-03T22:00:00.000Z",
-    "kind": "leave",
+    "startIso": "2026-10-03T15:00:00.000Z",
+    "endIso": "2026-10-03T16:00:00.000Z",
+    "kind": "other",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "8:30",
-        "place": "Dan DRIVE → Nashville",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Sat",
-        "startIso": "2026-10-03T13:30:00.000Z",
-        "endIso": "2026-10-03T22:00:00.000Z",
-        "kind": "leave",
-        "whenLabel": "8:30",
-        "summary": "Dan DRIVE → Nashville · leave 8:30 · dinner 5:30 J. Alexander's"
-      },
       {
         "label": "Next up · today",
         "time": "10:00",
         "place": "Saturday Morning Donuts",
-        "detailHtml": "8:30 leave · kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
         "badge": "Sat",
         "startIso": "2026-10-03T15:00:00.000Z",
         "endIso": "2026-10-03T16:00:00.000Z",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Tue 7:00",
         "summary": "Harris — SRE specials: PE (tennis shoes)"
+      },
+      {
+        "label": "Next up · Tue",
+        "time": "7:00",
+        "place": "SRE specials: Music",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-06T12:00:00.000Z",
+        "endIso": "2026-10-06T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Tue 7:00",
+        "summary": "Hayes — SRE specials: Music"
       }
     ]
   },
