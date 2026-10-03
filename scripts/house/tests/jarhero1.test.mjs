@@ -123,5 +123,6 @@ test("JARHERO2: a MUSTS pill tap feeds the boys' jar; the eruption is clipped to
   assert.match(m, /function eruptUsTogether\(tileEl, familyUnlocked, o\)[\s\S]{0,400}familyUnlocked !== true\) return null/, "the module refuses to erupt without the family boolean");
   assert.match(m, /this\.binary = this\.kid === "ainsley"/, "Ainsley's hunger is binary in the module too");
   assert.match(read("house-kid-hero.css"), /\.kj-slot \.kj-jar \{[^}]*pointer-events: auto/, "the jar host takes the touch for perk()");
+  assert.match(read("house-kid-hero.css"), /\.kj-slot \{[^}]*padding: 25% 12% 3%/, "feed-blob headroom above the jar inside its card (Prism: 37.5% of the jar height)");
   for (const f of ["house-kid-jar.js", "jar-mercury.js", "jar-mercury.css", "house-us-erupt.js", "house-kid-hero.css", "kid-ainsley.html"]) assert.doesNotMatch(read(f), /streak/i, f + ": no streak code anywhere");
 });
