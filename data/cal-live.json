@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-03T12:03:10.878Z",
+  "fetchedAt": "2026-10-03T12:16:45.826Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-01",
   "windowEnd": "2026-10-09",
@@ -16,15 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "6jo9d8uj0oe7h3r4ftgt26qduo",
-      "summary": "Sign up for SRE conferences (ParentSquare)",
-      "start": "2026-10-03T07:15:00-05:00",
-      "end": "2026-10-03T07:30:00-05:00",
-      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "806kf6gnibpjh3vq78g4mnfiqc",
       "summary": "Dan — load car · haul + bags (before drive)",
