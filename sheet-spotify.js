@@ -233,7 +233,7 @@
     if (ph === "need_auth") return SP.connect("sheet-spotify.html");
     if (ph === "no_key" || ph === "bad_key") {
       if (window.WardHubKeyEntry) return WardHubKeyEntry.open();
-      var s = document.createElement("script"); s.src = "hub-key-entry.js?v=SPOTIFY1"; s.onload = function () { if (window.WardHubKeyEntry) WardHubKeyEntry.open(); }; document.body.appendChild(s); return;
+      var s = document.createElement("script"); s.src = "hub-key-entry.js?v=KEYAUTO2"; s.onload = function () { if (window.WardHubKeyEntry) WardHubKeyEntry.open(); }; document.body.appendChild(s); return;
     }
     SP.refresh();
   });

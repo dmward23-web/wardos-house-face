@@ -109,9 +109,9 @@
   function isPhone() {
     try { var w = Math.min(screen.width, screen.height); return !!(w && w <= 600); } catch (_) { return false; }
   }
-  function autoOpen() { if (!hasKey() && isPhone()) setTimeout(openBox, 1200); }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", autoOpen);
-  else autoOpen();
+  /* KEYAUTO2 · Dan 10/4: no popup on load, ever, on any screen. The key arrives by opening the setup link once
+     (KEYAUTO1 saves it). A key-less screen just shows the quiet NEED KEY pill; tapping it opens the box. */
+  void hasKey; void isPhone;
 
   window.WardHubKeyEntry = { open: openBox, parse: parseKeys };
 })();
