@@ -1,7 +1,7 @@
 {
   "asOf": "Sun Oct 4 2026",
   "asOfIso": "2026-10-04",
-  "refreshedAt": "2026-10-04T17:14:40.606Z",
+  "refreshedAt": "2026-10-04T17:20:52.356Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -760,22 +760,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "SUN · 12:00",
-        "what": "AINSLEY APPT: COMPLETE SCHOOL ABSENCE VERIFICATI",
+        "when": "MON · 2:40",
+        "what": "LINDSAY APPT",
         "where": "with Mom · until Fri Oct 9 · 3:00",
         "badges": [
-          "SUN",
-          "12:00"
+          "MON",
+          "2:40"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Sun · 12:00",
-          "what": "Ainsley appt: complete school absence verification (portal)",
-          "hint": "",
-          "tone": "hot"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -819,12 +812,6 @@
         }
       ],
       "appointments": [
-        {
-          "when": "Sun 4 · 12:00",
-          "what": "Ainsley appt: complete school absence verification (portal)",
-          "hint": "with Dad",
-          "tone": "hot"
-        },
         {
           "when": "Mon 5 · 2:40",
           "what": "Lindsay appt",
@@ -902,11 +889,6 @@
         }
       ],
       "week": [
-        {
-          "when": "Sun 4 · 12:00",
-          "what": "Ainsley appt: complete school absence verification (portal)",
-          "tone": "act"
-        },
         {
           "when": "Mon 5 · 7:00",
           "what": "SRE specials: Music",
@@ -1020,6 +1002,11 @@
         {
           "when": "Sat 10 · 7:40",
           "what": "Harris flag drop-off",
+          "tone": "hot"
+        },
+        {
+          "when": "Sat 10 · 7:40",
+          "what": "Harris flag — vs SH Proehl (home)",
           "tone": "hot"
         }
       ]
