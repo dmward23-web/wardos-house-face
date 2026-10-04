@@ -1,7 +1,7 @@
 {
   "asOf": "Sun Oct 4 2026",
   "asOfIso": "2026-10-04",
-  "refreshedAt": "2026-10-04T17:05:18.306Z",
+  "refreshedAt": "2026-10-04T17:14:40.606Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,27 +16,15 @@
     "endIso": "2026-10-09T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "12:00",
-    "place": "Ainsley appt: complete school absence verification (p…",
+    "label": "Next up · Mon",
+    "time": "7:00",
+    "place": "SRE specials: Music",
     "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-    "badge": "Sun",
-    "startIso": "2026-10-04T17:00:00.000Z",
-    "endIso": "2026-10-04T17:15:00.000Z",
-    "kind": "appointment",
+    "badge": "Mon",
+    "startIso": "2026-10-05T12:00:00.000Z",
+    "endIso": "2026-10-05T12:15:00.000Z",
+    "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "12:00",
-        "place": "Ainsley appt: complete school absence verification (p…",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Sun",
-        "startIso": "2026-10-04T17:00:00.000Z",
-        "endIso": "2026-10-04T17:15:00.000Z",
-        "kind": "appointment",
-        "whenLabel": "12:00",
-        "summary": "Ainsley appt: complete school absence verification (portal)"
-      },
       {
         "label": "Next up · Mon",
         "time": "7:00",
@@ -168,6 +156,18 @@
         "kind": "sport",
         "whenLabel": "Tue 5:00",
         "summary": "Ainsley swim — Coach Ann · 5:00 practice"
+      },
+      {
+        "label": "Next up · Wed",
+        "time": "7:00",
+        "place": "SRE specials: Art",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-10-07T12:00:00.000Z",
+        "endIso": "2026-10-07T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Wed 7:00",
+        "summary": "Harris — SRE specials: Art"
       }
     ]
   },
