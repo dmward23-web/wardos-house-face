@@ -1,44 +1,44 @@
 {
-  "_meta": {
-    "note": "Ledger owns SoT. Wright does not invent $. Source of truth live file is /workspace/board-os/data/cash.json (NOT in house-face git). Refresh this fixture when Ledger restamps. Cliff SoT now decree May 2028 (Dan exact-yes 28 Sep ~11:05p).",
-    "copiedFrom": "board-os/data/cash.json",
-    "copiedAtCT": "2026-09-29 ~10:35p CT (restamp to SoT as-of Tue 29 Sep ~9:15p CT · same dollars · Ledger item 25)",
-    "cliffPark": "cliff SoT decree May 2028 (Dan exact-yes 28 Sep ~11:05p) — CI holds available/eoy",
-    "cliff": "May 2028",
-    "cliffFirstPay": "2025-10-01",
-    "cliffMonths": 32,
-    "cliffNote": "¶32 first pay 2025-10-01 · 32 months · ends May 2028 · 2028 Jan–May full CS+maint $4,998 · Jun–Dec CS ASSUMED $2,600"
-  },
-  "schema": "board-os.cash.packet.v1",
-  "mode": "LIVE",
-  "lockedAt": "2026-09-29T21:15:00-05:00",
-  "as_of": "2026-09-29",
-  "asOfLabel": "Tue 29 Sep ~9:15p CT · nightly harvest Finance confirm · LIVE Wells Everyday …6854",
-  "available": 19961.9,
-  "availableDisplay": "$19,961.90",
-  "discGate": {
-    "threshold": 15000,
-    "state": "OPEN",
-    "posture": "ASK_BEFORE_BUYS"
-  },
-  "eoy": {
-    "floor": 20000,
-    "short": 38.1,
-    "gapDisplay": "SHORT $38.10",
-    "killLine": "SHORT",
-    "killLedgerClause": "OFF",
-    "state": "SHORT"
-  },
-  "guild": {
-    "monthlyPayment": 3589.57,
-    "additionalPrincipal": 0.0,
-    "totalAutopay": 3589.57,
-    "extra": "PAUSED",
-    "asOf": "2026-09-23T15:30:00-05:00",
-    "note": "statement-only · never double-count · updated successfully emailed dmward23"
-  },
-  "freeze": {
-    "posture": "GATE OPEN · ask-before-buys · EOY SHORT $38.10 · not FREEZE under $15k",
-    "guildExtra": "PAUSED"
-  }
+ "_meta": {
+  "note": "Ledger owns SoT. Wright does not invent $. Source of truth live file is /workspace/board-os/data/cash.json (NOT in house-face git). Refresh this fixture when Ledger restamps. Cliff SoT now decree May 2028 (Dan exact-yes 28 Sep ~11:05p).",
+  "copiedFrom": "board-os/data/cash.json",
+  "copiedAtCT": "2026-10-03 ~9:45p CT (Ledger restamp · LIVE · Plaid 2026-10-03 ~9:40p CT · AVAILABLE $13,923.03 · GATE CLOSED)",
+  "cliffPark": "cliff SoT decree May 2028 (Dan exact-yes 28 Sep ~11:05p) — CI holds available/eoy",
+  "cliff": "May 2028",
+  "cliffFirstPay": "2025-10-01",
+  "cliffMonths": 32,
+  "cliffNote": "¶32 first pay 2025-10-01 · 32 months · ends May 2028 · 2028 Jan–May full CS+maint $4,998 · Jun–Dec CS ASSUMED $2,600"
+ },
+ "schema": "board-os.cash.packet.v1",
+ "mode": "LIVE",
+ "lockedAt": "2026-10-03T21:40:00-05:00",
+ "as_of": "2026-10-03",
+ "asOfLabel": "Sat 3 Oct ~9:40p CT · LIVE · Plaid · Wells Everyday …6854",
+ "available": 13923.03,
+ "availableDisplay": "$13,923.03",
+ "discGate": {
+  "threshold": 15000,
+  "state": "CLOSED",
+  "posture": "DISC_ZERO"
+ },
+ "eoy": {
+  "floor": 20000,
+  "short": 6076.97,
+  "gapDisplay": "SHORT $6,076.97",
+  "killLine": "SHORT",
+  "killLedgerClause": "OFF",
+  "state": "SHORT"
+ },
+ "guild": {
+  "monthlyPayment": 3589.57,
+  "additionalPrincipal": 0.0,
+  "totalAutopay": 3589.57,
+  "extra": "PAUSED",
+  "asOf": "2026-09-23T15:30:00-05:00",
+  "note": "statement-only · never double-count · updated successfully emailed dmward23"
+ },
+ "freeze": {
+  "posture": "GATE CLOSED · disc $0 · EOY SHORT $6,076.97 · FREEZE under $15k",
+  "guildExtra": "PAUSED"
+ }
 }

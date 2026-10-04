@@ -7,8 +7,8 @@
  * CI fixture: scripts/qa/fixtures/cash.contract.json — refresh when Ledger restamps.
  *
  * Rules when cash present:
- *   · Wells AVAILABLE once · matches fixture (tonight $19,961.90)
- *   · EOY SHORT matches · GATE OPEN · kill OFF
+ *   · Wells AVAILABLE once · matches fixture (tonight $13,923.03 · LIVE · Plaid 2026-10-03 ~9:40p CT)
+ *   · EOY SHORT matches · GATE CLOSED (<$15k) · kill OFF
  *   · as-of stamp present
  *   · Guild once = statement amount (never $4k double / never double-count)
  *   · plate $ bound to stamp (fixture lockedAt / asOfLabel)
@@ -30,11 +30,11 @@ const IN_REPO_CASH = path.join(ROOT, "data/cash.json");
 
 /** Expected contract (must match fixture — Ledger restamp updates both). */
 const EXPECT = {
-  available: 19961.9,
-  availableDisplay: "$19,961.90",
-  eoyShort: 38.1,
-  eoyGapDisplay: "SHORT $38.10",
-  gateState: "OPEN",
+  available: 13923.03,
+  availableDisplay: "$13,923.03",
+  eoyShort: 6076.97,
+  eoyGapDisplay: "SHORT $6,076.97",
+  gateState: "CLOSED",
   killOff: "OFF",
   guildMonthly: 3589.57,
   guildMustNot: [4000, 4000.0, 7179.14], // never $4k double / never 2× statement
