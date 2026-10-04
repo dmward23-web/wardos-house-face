@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-04T14:51:34.402Z",
+  "fetchedAt": "2026-10-04T15:05:34.414Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-02",
-  "windowEnd": "2026-10-10",
+  "windowEnd": "2026-10-11",
   "asOfIso": "2026-10-04",
   "nextLeave": {
     "id": "t3olko60fos60ugnqrg290c9jo",
@@ -16,15 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "6jo9d8uj0oe7h3r4ftgt26qduo",
-      "summary": "Sign up for SRE conferences (ParentSquare)",
-      "start": "2026-10-04T10:00:00-05:00",
-      "end": "2026-10-04T10:15:00-05:00",
-      "location": "14 Harbor Cove Dr, Old Hickory, TN 37138",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "t3olko60fos60ugnqrg290c9jo",
       "summary": "Ainsley appt: complete school absence verification (portal)",
@@ -392,6 +383,15 @@
       "end": "2026-10-10T13:35:00-05:00",
       "location": "Heritage Park Football Complex, 16240 Pflumm Rd, Olathe, KS 66062",
       "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "3admd77de8o401617qde5n6eag",
+      "summary": "Kids' Christmas lists",
+      "start": "2026-10-11T14:00:00-05:00",
+      "end": "2026-10-11T15:00:00-05:00",
+      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
+      "busy": false,
       "allDay": false
     }
   ],

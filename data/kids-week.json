@@ -1,7 +1,7 @@
 {
   "asOf": "Sun Oct 4 2026",
   "asOfIso": "2026-10-04",
-  "refreshedAt": "2026-10-04T14:51:33.876Z",
+  "refreshedAt": "2026-10-04T15:05:33.942Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -525,22 +525,15 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "SUN · 8:30",
-        "what": "HAYES FLAG — SRE FALCONS VS RIDLEY · ARRIVE 8:30",
+        "when": "MON · 7:00",
+        "what": "SRE SPECIALS: SPANISH",
         "where": "with Mom · until Fri Oct 9 · 3:00",
         "badges": [
-          "SUN",
-          "8:30"
+          "MON",
+          "7:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Sun · 8:30",
-          "what": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -550,12 +543,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Sun 4 · leave 8:30",
-          "what": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Mon 5 · leave 5:30",
           "what": "Hayes baseball — Falcons vs KC Tigers (away)",
@@ -916,11 +903,6 @@
       ],
       "week": [
         {
-          "when": "Sun 4 · 8:30",
-          "what": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00",
-          "tone": "hot"
-        },
-        {
           "when": "Sun 4 · 12:00",
           "what": "Ainsley appt: complete school absence verification (portal)",
           "tone": "act"
@@ -1034,6 +1016,11 @@
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
           "tone": "act"
+        },
+        {
+          "when": "Sat 10 · 7:40",
+          "what": "Harris flag drop-off",
+          "tone": "hot"
         }
       ]
     }
