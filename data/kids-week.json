@@ -1,7 +1,7 @@
 {
-  "asOf": "Sat Oct 3 2026",
-  "asOfIso": "2026-10-03",
-  "refreshedAt": "2026-10-04T03:00:34.158Z",
+  "asOf": "Sun Oct 4 2026",
+  "asOfIso": "2026-10-04",
+  "refreshedAt": "2026-10-04T10:18:30.531Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,7 +16,7 @@
     "endIso": "2026-10-09T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · Sun",
+    "label": "Next up · today",
     "time": "8:30",
     "place": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · ga…",
     "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -26,7 +26,7 @@
     "kind": "sport",
     "queue": [
       {
-        "label": "Next up · Sun",
+        "label": "Next up · today",
         "time": "8:30",
         "place": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · ga…",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -34,11 +34,11 @@
         "startIso": "2026-10-04T13:30:00.000Z",
         "endIso": "2026-10-04T15:00:00.000Z",
         "kind": "sport",
-        "whenLabel": "Sun 8:30",
+        "whenLabel": "8:30",
         "summary": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00"
       },
       {
-        "label": "Next up · Sun",
+        "label": "Next up · today",
         "time": "12:00",
         "place": "Ainsley appt: complete school absence verification (p…",
         "detailHtml": "8:30 Hayes flag — SRE Falcons vs Ridley · kids with Mom · until Fri Oct 9 · 3:00",
@@ -46,7 +46,7 @@
         "startIso": "2026-10-04T17:00:00.000Z",
         "endIso": "2026-10-04T17:15:00.000Z",
         "kind": "appointment",
-        "whenLabel": "Sun 12:00",
+        "whenLabel": "12:00",
         "summary": "Ainsley appt: complete school absence verification (portal)"
       },
       {
@@ -324,6 +324,12 @@
           "what": "Harris flag practice · 5:30–6:30",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Sat 10 · leave 7:40",
+          "what": "Harris flag — vs SH Proehl (home)",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -529,6 +535,13 @@
       },
       "today": [
         {
+          "kind": "event",
+          "when": "Sun · 8:30",
+          "what": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
           "kind": "note",
           "when": "All day",
           "what": "🏡 At Mom's",
@@ -552,6 +565,12 @@
         {
           "when": "Thu 8 · leave 6:00",
           "what": "Hayes flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Sat 10 · leave 11:25",
+          "what": "Hayes flag — SRE Falcons vs Funk",
           "hint": "YOUR board",
           "tone": "hot"
         }
@@ -764,6 +783,13 @@
       },
       "today": [
         {
+          "kind": "event",
+          "when": "Sun · 12:00",
+          "what": "Ainsley appt: complete school absence verification (portal)",
+          "hint": "",
+          "tone": "hot"
+        },
+        {
           "kind": "note",
           "when": "All day",
           "what": "At Mom's",
@@ -864,7 +890,7 @@
         }
       ],
       "hottest": {
-        "when": "Sat Oct 3 2026 · kids with Mom",
+        "when": "Sun Oct 4 2026 · kids with Mom",
         "what": "Mom week",
         "where": "until Fri Oct 9 · 3:00",
         "badges": [
@@ -873,8 +899,13 @@
       },
       "today": [
         {
-          "when": "Sat · 8:30",
-          "what": "Dan DRIVE → Nashville",
+          "when": "Sun · 8:30",
+          "what": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00",
+          "tone": "hot"
+        },
+        {
+          "when": "Sun · 12:00",
+          "what": "Ainsley appt: complete school absence verification (portal)",
           "tone": "hot"
         },
         {
