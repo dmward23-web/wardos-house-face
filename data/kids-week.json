@@ -1,7 +1,7 @@
 {
   "asOf": "Sun Oct 4 2026",
   "asOfIso": "2026-10-04",
-  "refreshedAt": "2026-10-04T13:31:04.063Z",
+  "refreshedAt": "2026-10-04T13:45:02.207Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,31 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "8:30",
-    "place": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · ga…",
+    "time": "12:00",
+    "place": "Ainsley appt: complete school absence verification (p…",
     "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
     "badge": "Sun",
-    "startIso": "2026-10-04T13:30:00.000Z",
-    "endIso": "2026-10-04T15:00:00.000Z",
-    "kind": "sport",
+    "startIso": "2026-10-04T17:00:00.000Z",
+    "endIso": "2026-10-04T17:15:00.000Z",
+    "kind": "appointment",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "8:30",
-        "place": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · ga…",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Sun",
-        "startIso": "2026-10-04T13:30:00.000Z",
-        "endIso": "2026-10-04T15:00:00.000Z",
-        "kind": "sport",
-        "whenLabel": "8:30",
-        "summary": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00"
-      },
       {
         "label": "Next up · today",
         "time": "12:00",
         "place": "Ainsley appt: complete school absence verification (p…",
-        "detailHtml": "8:30 Hayes flag — SRE Falcons vs Ridley · kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
         "badge": "Sun",
         "startIso": "2026-10-04T17:00:00.000Z",
         "endIso": "2026-10-04T17:15:00.000Z",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Tue 7:00",
         "summary": "Hayes — SRE specials: Music"
+      },
+      {
+        "label": "Next up · Tue",
+        "time": "5:00",
+        "place": "Ainsley swim — Coach Ann",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-06T22:00:00.000Z",
+        "endIso": "2026-10-06T23:00:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Tue 5:00",
+        "summary": "Ainsley swim — Coach Ann · 5:00 practice"
       }
     ]
   },
