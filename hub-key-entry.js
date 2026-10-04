@@ -20,6 +20,15 @@
     return out;
   }
 
+  /* KEYAUTO1: opening the setup link saves its keys on this screen automatically, no paste. */
+  (function autoSaveFromUrl() {
+    try {
+      var k = parseKeys(location.search);
+      if (k.lights) localStorage.setItem(LIGHTS_LS, k.lights);
+      if (k.nest) localStorage.setItem(NEST_LS, k.nest);
+    } catch (_) {}
+  })();
+
   function el(tag, css, txt) {
     var e = document.createElement(tag);
     if (css) e.style.cssText = css;
