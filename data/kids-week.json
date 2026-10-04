@@ -1,7 +1,7 @@
 {
   "asOf": "Sun Oct 4 2026",
   "asOfIso": "2026-10-04",
-  "refreshedAt": "2026-10-04T22:08:17.224Z",
+  "refreshedAt": "2026-10-04T22:14:34.036Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -556,6 +556,12 @@
           "tone": "hot"
         },
         {
+          "when": "Sat 10 · leave 7:10",
+          "what": "Freckle Juice in bag before flag",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
           "when": "Sat 10 · leave 11:25",
           "what": "Hayes flag — SRE Falcons vs Funk",
           "hint": "YOUR board",
@@ -1000,13 +1006,13 @@
           "tone": "act"
         },
         {
-          "when": "Sat 10 · 7:40",
-          "what": "Harris flag drop-off",
+          "when": "Sat 10 · 7:10",
+          "what": "Freckle Juice in bag before flag",
           "tone": "hot"
         },
         {
           "when": "Sat 10 · 7:40",
-          "what": "Harris flag — vs SH Proehl (home)",
+          "what": "Harris flag drop-off",
           "tone": "hot"
         }
       ]

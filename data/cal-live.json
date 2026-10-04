@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-04T22:08:17.777Z",
+  "fetchedAt": "2026-10-04T22:14:34.622Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-02",
   "windowEnd": "2026-10-10",
@@ -305,6 +305,15 @@
       "allDay": false
     },
     {
+      "id": "8qbbrhhe0ukipe95cb727pennc",
+      "summary": "Hayes — Freckle Juice in bag before flag",
+      "start": "2026-10-10T07:10:00-05:00",
+      "end": "2026-10-10T07:20:00-05:00",
+      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": false
+    },
+    {
       "id": "hn57g71ndg4t3lvmm934g1gdao",
       "summary": "Harris — flag drop-off · 8:00",
       "start": "2026-10-10T07:40:00-05:00",
@@ -356,15 +365,6 @@
       "end": "2026-10-10T11:45:00-05:00",
       "location": "Heritage Park Football Complex, 16240 Pflumm Rd, Olathe, KS 66062",
       "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "8qbbrhhe0ukipe95cb727pennc",
-      "summary": "Hayes — Freckle Juice in bag (delivered Sep 19)",
-      "start": "2026-10-10T12:00:00-05:00",
-      "end": "2026-10-10T12:15:00-05:00",
-      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": false,
       "allDay": false
     },
     {
