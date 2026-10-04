@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-04T19:48:35.809Z",
+  "fetchedAt": "2026-10-04T20:07:01.589Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-02",
-  "windowEnd": "2026-10-10",
+  "windowEnd": "2026-10-11",
   "asOfIso": "2026-10-04",
   "nextLeave": {
     "id": "hf423ics0i46n9goqo9gsur99s",
@@ -374,6 +374,15 @@
       "end": "2026-10-10T13:35:00-05:00",
       "location": "Heritage Park Football Complex, 16240 Pflumm Rd, Olathe, KS 66062",
       "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "3admd77de8o401617qde5n6eag",
+      "summary": "Kids' Christmas lists",
+      "start": "2026-10-11T14:00:00-05:00",
+      "end": "2026-10-11T15:00:00-05:00",
+      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
+      "busy": false,
       "allDay": false
     }
   ],
