@@ -1,7 +1,7 @@
 {
   "asOf": "Sun Oct 4 2026",
   "asOfIso": "2026-10-04",
-  "refreshedAt": "2026-10-04T11:44:37.956Z",
+  "refreshedAt": "2026-10-04T11:49:48.969Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -330,6 +330,18 @@
           "what": "Harris flag — vs SH Proehl (home)",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Wed 14 · leave 4:45",
+          "what": "Harris flag practice · 5:30–6:30",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Sat 17 · leave 8:00",
+          "what": "Harris flag — vs ASC (home) · arrive 8:00 · game 8:30",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -390,6 +402,84 @@
         {
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 7:00",
+          "what": "SRE specials: Music",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 3:25",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 7:00",
+          "what": "SRE specials: PE (tennis shoes)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 14 · 7:00",
+          "what": "SRE specials: Art",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 14 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 14 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 7:00",
+          "what": "SRE specials: Spanish + Library checkout",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 16 · 7:00",
+          "what": "SRE specials: Music",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 16 · 8:10",
+          "what": "SRE drop-off",
           "tone": "act",
           "hint": ""
         }
@@ -573,6 +663,24 @@
           "what": "Hayes flag — SRE Falcons vs Funk",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Mon 12 · leave 4:55",
+          "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Thu 15 · leave 5:40",
+          "what": "Hayes flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Sat 17 · leave 4:45",
+          "what": "Hayes flag — SRE Falcons vs Pena · arrive 4:45 · game 5:15",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -633,6 +741,84 @@
         {
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 7:00",
+          "what": "SRE specials: Spanish",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 3:25",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 7:00",
+          "what": "SRE specials: Music",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 14 · 7:00",
+          "what": "SRE specials: PE + Library (tennis shoes, library book)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 14 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 14 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 7:00",
+          "what": "SRE specials: Art",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 16 · 7:00",
+          "what": "SRE specials: No Specials",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 16 · 8:10",
+          "what": "SRE drop-off",
           "tone": "act",
           "hint": ""
         }
@@ -809,6 +995,24 @@
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Wed 14 · leave 4:00",
+          "what": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Thu 15 · leave 4:25",
+          "what": "Ainsley swim — Coach Ann",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Thu 15 · leave 5:40",
+          "what": "ride to flag practice 6:00? (Ainsley at swim)",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -829,6 +1033,24 @@
           "what": "Ward Kids [AHH No School]",
           "tone": "act",
           "hint": ""
+        },
+        {
+          "when": "Tue 13 · 5:30",
+          "what": "LKMS choir Fall Concert",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 1:00",
+          "what": "LKMS choir Sing & Share field trip",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 3:00",
+          "what": "LKMS Homework Help",
+          "tone": "act",
+          "hint": ""
         }
       ],
       "appointments": [
@@ -840,6 +1062,12 @@
         },
         {
           "when": "Mon 5 · 2:40",
+          "what": "Lindsay appt",
+          "hint": "with Dad",
+          "tone": "hot"
+        },
+        {
+          "when": "Mon 12 · 2:20",
           "what": "Lindsay appt",
           "hint": "with Dad",
           "tone": "hot"
