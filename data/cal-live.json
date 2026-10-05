@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-05T12:08:11.496Z",
+  "fetchedAt": "2026-10-05T12:29:01.483Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-02",
   "windowEnd": "2026-10-11",
@@ -35,15 +35,6 @@
       "busy": false,
       "allDay": true,
       "pinnedUntil": "8:40"
-    },
-    {
-      "id": "lup0n0rfbp6cupsruab9tufglk",
-      "summary": "Harris — send TP tubes to Lind (1–2)",
-      "start": "2026-10-05T07:15:00-05:00",
-      "end": "2026-10-05T07:30:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
     },
     {
       "id": "jrhhe2nmio91r5u088ecjpbvl4_20261005T160000Z",

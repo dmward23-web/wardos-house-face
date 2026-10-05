@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 5 2026",
   "asOfIso": "2026-10-05",
-  "refreshedAt": "2026-10-05T12:08:10.837Z",
+  "refreshedAt": "2026-10-05T12:29:00.955Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -48,30 +48,6 @@
         "kind": "school",
         "whenLabel": "7:00",
         "summary": "Hayes — SRE specials: Music"
-      },
-      {
-        "label": "Next up · today",
-        "time": "7:00",
-        "place": "SRE spirit day: Hat Day (Peace Week)",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-05T12:00:00.000Z",
-        "endIso": "2026-10-05T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:00",
-        "summary": "Hayes + Harris — SRE spirit day: Hat Day (Peace Week)"
-      },
-      {
-        "label": "Next up · today",
-        "time": "7:15",
-        "place": "send TP tubes to Lind (1–2)",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-05T12:15:00.000Z",
-        "endIso": "2026-10-05T12:30:00.000Z",
-        "kind": "other",
-        "whenLabel": "7:15",
-        "summary": "Harris — send TP tubes to Lind (1–2)"
       },
       {
         "label": "Next up · today",
@@ -168,6 +144,30 @@
         "kind": "school",
         "whenLabel": "Wed 7:00",
         "summary": "Harris — SRE specials: Art"
+      },
+      {
+        "label": "Next up · Wed",
+        "time": "7:00",
+        "place": "SRE specials: Art + Library (library book)",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-10-07T12:00:00.000Z",
+        "endIso": "2026-10-07T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Wed 7:00",
+        "summary": "Hayes — SRE specials: Art + Library (library book)"
+      },
+      {
+        "label": "Next up · Wed",
+        "time": "7:00",
+        "place": "SRE spirit day: Workout Day / team jersey (Peace Week)",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-10-07T12:00:00.000Z",
+        "endIso": "2026-10-07T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Wed 7:00",
+        "summary": "Hayes + Harris — SRE spirit day: Workout Day / team jersey (Peace Week)"
       }
     ]
   },
@@ -319,13 +319,6 @@
         },
         {
           "kind": "event",
-          "when": "Mon · 7:00",
-          "what": "SRE spirit day: Hat Day (Peace Week)",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
           "when": "Mon · 7:15",
           "what": "send TP tubes to Lind (1–2)",
           "hint": "",
@@ -364,12 +357,6 @@
         {
           "when": "Mon 5 · 7:00",
           "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Mon 5 · 7:00",
-          "what": "SRE spirit day: Hat Day (Peace Week)",
           "tone": "act",
           "hint": ""
         },
@@ -571,13 +558,6 @@
         },
         {
           "kind": "event",
-          "when": "Mon · 7:00",
-          "what": "SRE spirit day: Hat Day (Peace Week)",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
           "when": "Mon · 12:00",
           "what": "SRE Peace Week",
           "hint": "",
@@ -628,12 +608,6 @@
         {
           "when": "Mon 5 · 7:00",
           "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Mon 5 · 7:00",
-          "what": "SRE spirit day: Hat Day (Peace Week)",
           "tone": "act",
           "hint": ""
         },
@@ -984,11 +958,6 @@
           "tone": "act"
         },
         {
-          "when": "Mon 5 · 7:00",
-          "what": "SRE spirit day: Hat Day (Peace Week)",
-          "tone": "act"
-        },
-        {
           "when": "Mon 5 · 12:00",
           "what": "SRE Peace Week",
           "tone": "act"
@@ -1096,6 +1065,11 @@
         {
           "when": "Sat 10 · 9:15",
           "what": "Harris flag pickup",
+          "tone": "hot"
+        },
+        {
+          "when": "Sat 10 · 11:25",
+          "what": "Hayes flag — SRE Falcons vs Funk",
           "tone": "hot"
         }
       ]
