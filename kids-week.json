@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 5 2026",
   "asOfIso": "2026-10-05",
-  "refreshedAt": "2026-10-05T20:53:48.163Z",
+  "refreshedAt": "2026-10-05T21:05:50.356Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -763,22 +763,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "MON · 3:00",
-        "what": "LINDSAY APPT · 3:00 VIDEO",
+        "when": "TUE · 5:00",
+        "what": "AINSLEY SWIM — COACH ANN",
         "where": "with Mom · until Fri Oct 9 · 3:00",
         "badges": [
-          "MON",
-          "3:00"
+          "TUE",
+          "5:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Mon · 3:00",
-          "what": "Lindsay appt · 3:00 video",
-          "hint": "",
-          "tone": "hot"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -821,14 +814,7 @@
           "hint": ""
         }
       ],
-      "appointments": [
-        {
-          "when": "Mon 5 · 3:00",
-          "what": "Lindsay appt · 3:00 video",
-          "hint": "with Dad",
-          "tone": "hot"
-        }
-      ]
+      "appointments": []
     },
     "dan": {
       "id": "dan",
@@ -922,11 +908,6 @@
         {
           "when": "Mon 5 · 12:00",
           "what": "SRE Peace Week",
-          "tone": "act"
-        },
-        {
-          "when": "Mon 5 · 3:00",
-          "what": "Lindsay appt · 3:00 video",
           "tone": "act"
         },
         {
@@ -1037,6 +1018,11 @@
         {
           "when": "Sat 10 · 11:25",
           "what": "Hayes flag drop-off",
+          "tone": "hot"
+        },
+        {
+          "when": "Sat 10 · 1:15",
+          "what": "Hayes flag pickup",
           "tone": "hot"
         }
       ]
