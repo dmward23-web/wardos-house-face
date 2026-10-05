@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-05T15:20:11.006Z",
+  "fetchedAt": "2026-10-05T15:35:49.672Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-02",
   "windowEnd": "2026-10-11",
@@ -85,6 +85,15 @@
       "start": "2026-10-06T07:00:00-05:00",
       "end": "2026-10-06T07:15:00-05:00",
       "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "9dob3b70gai8uf5srl5tnlnpuo",
+      "summary": "Buy: boys Target Deal Days (app)",
+      "start": "2026-10-06T08:30:00-05:00",
+      "end": "2026-10-06T09:15:00-05:00",
+      "location": "6719 W 147th Terrace, Overland Park, KS 66223",
       "busy": false,
       "allDay": false
     },
