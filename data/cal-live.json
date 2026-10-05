@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-05T19:33:46.670Z",
+  "fetchedAt": "2026-10-05T19:40:31.878Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-02",
   "windowEnd": "2026-10-11",
   "asOfIso": "2026-10-05",
   "nextLeave": {
-    "id": "7qmnbg7327q2kv9lm16etfdngg",
-    "summary": "Ainsley — Lindsay appt · 3:00",
-    "start": "2026-10-05T14:40:00-05:00",
-    "end": "2026-10-05T16:20:00-05:00",
-    "location": "8675 College Blvd, Overland Park, KS 66210-1946",
+    "id": "f09ef0272gtar5bathk9f0m8sg",
+    "summary": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
+    "start": "2026-10-05T17:30:00-05:00",
+    "end": "2026-10-05T19:00:00-05:00",
+    "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
     "busy": false,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "7qmnbg7327q2kv9lm16etfdngg",
-      "summary": "Ainsley — Lindsay appt · 3:00",
-      "start": "2026-10-05T14:40:00-05:00",
-      "end": "2026-10-05T16:20:00-05:00",
-      "location": "8675 College Blvd, Overland Park, KS 66210-1946",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "f09ef0272gtar5bathk9f0m8sg",
       "summary": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
@@ -334,9 +325,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "2:40",
-    "place": "Ainsley — Lindsay appt · 3:00",
-    "detailHtml": "<strong>2:40</strong> Ainsley — Lindsay appt · 3:00",
+    "time": "5:30",
+    "place": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
+    "detailHtml": "<strong>5:30</strong> Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
     "badge": "Mon"
   },
   "error": null
