@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 5 2026",
   "asOfIso": "2026-10-05",
-  "refreshedAt": "2026-10-05T19:40:31.491Z",
+  "refreshedAt": "2026-10-05T19:52:58.460Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,25 +17,25 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "2:40",
-    "place": "Lindsay appt",
+    "time": "3:00",
+    "place": "Lindsay appt · 3:00 video",
     "detailHtml": "5:30 Hayes baseball — Falcons vs KC Tigers (away) · kids with Mom · until Fri Oct 9 · 3:00",
     "badge": "Mon",
-    "startIso": "2026-10-05T19:40:00.000Z",
-    "endIso": "2026-10-05T21:20:00.000Z",
+    "startIso": "2026-10-05T20:00:00.000Z",
+    "endIso": "2026-10-05T21:00:00.000Z",
     "kind": "appointment",
     "queue": [
       {
         "label": "Next up · today",
-        "time": "2:40",
-        "place": "Lindsay appt",
+        "time": "3:00",
+        "place": "Lindsay appt · 3:00 video",
         "detailHtml": "5:30 Hayes baseball — Falcons vs KC Tigers (away) · kids with Mom · until Fri Oct 9 · 3:00",
         "badge": "Mon",
-        "startIso": "2026-10-05T19:40:00.000Z",
-        "endIso": "2026-10-05T21:20:00.000Z",
+        "startIso": "2026-10-05T20:00:00.000Z",
+        "endIso": "2026-10-05T21:00:00.000Z",
         "kind": "appointment",
-        "whenLabel": "2:40",
-        "summary": "Ainsley — Lindsay appt · 3:00"
+        "whenLabel": "3:00",
+        "summary": "Ainsley — Lindsay appt · 3:00 video"
       },
       {
         "label": "Next up · today",
@@ -763,19 +763,19 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "MON · 2:40",
-        "what": "LINDSAY APPT",
+        "when": "MON · 3:00",
+        "what": "LINDSAY APPT · 3:00 VIDEO",
         "where": "with Mom · until Fri Oct 9 · 3:00",
         "badges": [
           "MON",
-          "2:40"
+          "3:00"
         ]
       },
       "today": [
         {
           "kind": "event",
-          "when": "Mon · 2:40",
-          "what": "Lindsay appt",
+          "when": "Mon · 3:00",
+          "what": "Lindsay appt · 3:00 video",
           "hint": "",
           "tone": "hot"
         },
@@ -823,8 +823,8 @@
       ],
       "appointments": [
         {
-          "when": "Mon 5 · 2:40",
-          "what": "Lindsay appt",
+          "when": "Mon 5 · 3:00",
+          "what": "Lindsay appt · 3:00 video",
           "hint": "with Dad",
           "tone": "hot"
         }
@@ -903,8 +903,8 @@
           "tone": "act"
         },
         {
-          "when": "Mon · 2:40",
-          "what": "Lindsay appt",
+          "when": "Mon · 3:00",
+          "what": "Lindsay appt · 3:00 video",
           "tone": "hot"
         },
         {
@@ -925,8 +925,8 @@
           "tone": "act"
         },
         {
-          "when": "Mon 5 · 2:40",
-          "what": "Lindsay appt",
+          "when": "Mon 5 · 3:00",
+          "what": "Lindsay appt · 3:00 video",
           "tone": "act"
         },
         {
