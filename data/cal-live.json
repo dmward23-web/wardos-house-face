@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-05T15:44:16.324Z",
+  "fetchedAt": "2026-10-05T16:03:44.597Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-02",
   "windowEnd": "2026-10-11",
@@ -16,15 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "jrhhe2nmio91r5u088ecjpbvl4_20261005T160000Z",
-      "summary": "Dan — cleaners",
-      "start": "2026-10-05T11:00:00-05:00",
-      "end": "2026-10-05T13:00:00-05:00",
-      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "4ip0227j6v597bt3gnv95e6a3k",
       "summary": "Phone consult: Joe Wilner, LPC",
