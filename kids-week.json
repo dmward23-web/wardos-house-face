@@ -1,7 +1,7 @@
 {
-  "asOf": "Sun Oct 4 2026",
-  "asOfIso": "2026-10-04",
-  "refreshedAt": "2026-10-05T03:03:47.665Z",
+  "asOf": "Mon Oct 5 2026",
+  "asOfIso": "2026-10-05",
+  "refreshedAt": "2026-10-05T10:11:11.249Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,7 +16,7 @@
     "endIso": "2026-10-09T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · Mon",
+    "label": "Next up · today",
     "time": "7:00",
     "place": "SRE specials: Music",
     "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -26,7 +26,7 @@
     "kind": "school",
     "queue": [
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "7:00",
         "place": "SRE specials: Music",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -34,11 +34,11 @@
         "startIso": "2026-10-05T12:00:00.000Z",
         "endIso": "2026-10-05T12:15:00.000Z",
         "kind": "school",
-        "whenLabel": "Mon 7:00",
+        "whenLabel": "7:00",
         "summary": "Harris — SRE specials: Music"
       },
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "7:00",
         "place": "SRE specials: Spanish",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -46,11 +46,11 @@
         "startIso": "2026-10-05T12:00:00.000Z",
         "endIso": "2026-10-05T12:15:00.000Z",
         "kind": "school",
-        "whenLabel": "Mon 7:00",
+        "whenLabel": "7:00",
         "summary": "Hayes — SRE specials: Spanish"
       },
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "7:00",
         "place": "SRE spirit day: Hat Day (Peace Week)",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -58,11 +58,11 @@
         "startIso": "2026-10-05T12:00:00.000Z",
         "endIso": "2026-10-05T12:15:00.000Z",
         "kind": "school",
-        "whenLabel": "Mon 7:00",
+        "whenLabel": "7:00",
         "summary": "Hayes + Harris — SRE spirit day: Hat Day (Peace Week)"
       },
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "7:15",
         "place": "send TP tubes to Lind (1–2)",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -70,11 +70,11 @@
         "startIso": "2026-10-05T12:15:00.000Z",
         "endIso": "2026-10-05T12:30:00.000Z",
         "kind": "other",
-        "whenLabel": "Mon 7:15",
+        "whenLabel": "7:15",
         "summary": "Harris — send TP tubes to Lind (1–2)"
       },
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "12:00",
         "place": "SRE Peace Week",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -82,11 +82,11 @@
         "startIso": "2026-10-05T17:00:00.000Z",
         "endIso": "2026-10-09T17:00:00.000Z",
         "kind": "school",
-        "whenLabel": "Mon 12:00",
+        "whenLabel": "12:00",
         "summary": "Hayes + Harris — SRE Peace Week"
       },
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "2:40",
         "place": "Lindsay appt",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -94,11 +94,11 @@
         "startIso": "2026-10-05T19:40:00.000Z",
         "endIso": "2026-10-05T21:20:00.000Z",
         "kind": "appointment",
-        "whenLabel": "Mon 2:40",
+        "whenLabel": "2:40",
         "summary": "Ainsley — Lindsay appt · 3:00"
       },
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "5:30",
         "place": "Hayes baseball — Falcons vs KC Tigers (away)",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -106,7 +106,7 @@
         "startIso": "2026-10-05T22:30:00.000Z",
         "endIso": "2026-10-06T00:00:00.000Z",
         "kind": "sport",
-        "whenLabel": "Mon 5:30",
+        "whenLabel": "5:30",
         "summary": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game"
       },
       {
@@ -310,6 +310,34 @@
         ]
       },
       "today": [
+        {
+          "kind": "event",
+          "when": "Mon · 7:00",
+          "what": "SRE specials: Music",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 7:00",
+          "what": "SRE spirit day: Hat Day (Peace Week)",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 7:15",
+          "what": "send TP tubes to Lind (1–2)",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 12:00",
+          "what": "SRE Peace Week",
+          "hint": "",
+          "tone": "act"
+        },
         {
           "kind": "note",
           "when": "All day",
@@ -534,6 +562,34 @@
         ]
       },
       "today": [
+        {
+          "kind": "event",
+          "when": "Mon · 7:00",
+          "what": "SRE specials: Spanish",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 7:00",
+          "what": "SRE spirit day: Hat Day (Peace Week)",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 12:00",
+          "what": "SRE Peace Week",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 5:30",
+          "what": "⚾ Hayes baseball — Falcons vs KC Tigers (away)",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
         {
           "kind": "note",
           "when": "All day",
@@ -776,6 +832,13 @@
       },
       "today": [
         {
+          "kind": "event",
+          "when": "Mon · 2:40",
+          "what": "Lindsay appt",
+          "hint": "",
+          "tone": "hot"
+        },
+        {
           "kind": "note",
           "when": "All day",
           "what": "At Mom's",
@@ -870,7 +933,7 @@
         }
       ],
       "hottest": {
-        "when": "Sun Oct 4 2026 · kids with Mom",
+        "when": "Mon Oct 5 2026 · kids with Mom",
         "what": "Mom week",
         "where": "until Fri Oct 9 · 3:00",
         "badges": [
@@ -879,13 +942,38 @@
       },
       "today": [
         {
-          "when": "Sun · 8:30",
-          "what": "Hayes flag — SRE Falcons vs Ridley · arrive 8:30 · game 9:00",
+          "when": "Mon · 7:00",
+          "what": "SRE specials: Music",
+          "tone": "act"
+        },
+        {
+          "when": "Mon · 7:00",
+          "what": "SRE specials: Spanish",
+          "tone": "act"
+        },
+        {
+          "when": "Mon · 7:00",
+          "what": "SRE spirit day: Hat Day (Peace Week)",
+          "tone": "act"
+        },
+        {
+          "when": "Mon · 11:00",
+          "what": "cleaners",
           "tone": "hot"
         },
         {
-          "when": "Sun · 12:00",
-          "what": "Ainsley appt: complete school absence verification (portal)",
+          "when": "Mon · 12:00",
+          "what": "SRE Peace Week",
+          "tone": "act"
+        },
+        {
+          "when": "Mon · 2:40",
+          "what": "Lindsay appt",
+          "tone": "hot"
+        },
+        {
+          "when": "Mon · 5:30",
+          "what": "Hayes baseball — Falcons vs KC Tigers (away)",
           "tone": "hot"
         },
         {

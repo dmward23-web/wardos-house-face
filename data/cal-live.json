@@ -1,11 +1,11 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-05T03:03:48.059Z",
+  "fetchedAt": "2026-10-05T10:11:12.414Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-02",
   "windowEnd": "2026-10-11",
-  "asOfIso": "2026-10-04",
+  "asOfIso": "2026-10-05",
   "nextLeave": {
     "id": "4ip0227j6v597bt3gnv95e6a3k",
     "summary": "Phone consult: Joe Wilner, LPC",
@@ -378,7 +378,7 @@
     }
   ],
   "boardStrip": {
-    "label": "Next up · Mon",
+    "label": "Next up · today",
     "time": "11:30",
     "place": "Phone consult: Joe Wilner, LPC",
     "detailHtml": "<strong>11:30</strong> Phone consult: Joe Wilner, LPC",
