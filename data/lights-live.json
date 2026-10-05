@@ -1,6 +1,6 @@
 {
   "status": "live",
-  "fetchedAt": "2026-10-05T17:58:54.961Z",
+  "fetchedAt": "2026-10-05T18:14:00.021Z",
   "source": "tplink-cloud-api",
   "writeSupported": true,
   "brightnessControlSupported": true,
@@ -29,7 +29,7 @@
       "where": "Kitchen",
       "kind": "dimmer",
       "on": true,
-      "brightness": 17,
+      "brightness": 100,
       "online": true
     }
   ],
