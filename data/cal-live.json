@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-04T23:53:49.324Z",
+  "fetchedAt": "2026-10-05T00:02:15.691Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-02",
   "windowEnd": "2026-10-10",
@@ -16,15 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "hf423ics0i46n9goqo9gsur99s",
-      "summary": "Hayes + Harris — SRE Peace Week",
-      "start": "2026-10-05T00:00:00Z",
-      "end": "2026-10-09T00:00:00Z",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true
-    },
     {
       "id": "0ddhcag0admr07fdl70j0nphjk",
       "summary": "Harris — SRE specials: Music",
