@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 5 2026",
   "asOfIso": "2026-10-05",
-  "refreshedAt": "2026-10-05T11:46:08.004Z",
+  "refreshedAt": "2026-10-05T11:50:30.415Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -40,14 +40,14 @@
       {
         "label": "Next up · today",
         "time": "7:00",
-        "place": "SRE specials: Spanish",
+        "place": "SRE specials: Music",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
         "badge": "Mon",
         "startIso": "2026-10-05T12:00:00.000Z",
         "endIso": "2026-10-05T12:15:00.000Z",
         "kind": "school",
         "whenLabel": "7:00",
-        "summary": "Hayes — SRE specials: Spanish"
+        "summary": "Hayes — SRE specials: Music"
       },
       {
         "label": "Next up · today",
@@ -136,14 +136,14 @@
       {
         "label": "Next up · Tue",
         "time": "7:00",
-        "place": "SRE specials: Music",
+        "place": "SRE specials: PE (tennis shoes)",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
         "badge": "Tue",
         "startIso": "2026-10-06T12:00:00.000Z",
         "endIso": "2026-10-06T12:15:00.000Z",
         "kind": "school",
         "whenLabel": "Tue 7:00",
-        "summary": "Hayes — SRE specials: Music"
+        "summary": "Hayes — SRE specials: PE (tennis shoes)"
       },
       {
         "label": "Next up · Tue",
@@ -420,6 +420,24 @@
           "what": "Ward Kids [AHH No School]",
           "tone": "act",
           "hint": ""
+        },
+        {
+          "when": "Mon 12 · 7:00",
+          "what": "SRE specials: Music",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 3:25",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
         }
       ],
       "appointments": []
@@ -554,7 +572,7 @@
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
         "when": "MON · 7:00",
-        "what": "SRE SPECIALS: SPANISH",
+        "what": "SRE SPECIALS: MUSIC",
         "where": "with Mom · until Fri Oct 9 · 3:00",
         "badges": [
           "MON",
@@ -565,7 +583,7 @@
         {
           "kind": "event",
           "when": "Mon · 7:00",
-          "what": "SRE specials: Spanish",
+          "what": "SRE specials: Music",
           "hint": "",
           "tone": "act"
         },
@@ -622,12 +640,18 @@
           "what": "Hayes flag — SRE Falcons vs Funk",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Mon 12 · leave 4:55",
+          "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
         {
           "when": "Mon 5 · 7:00",
-          "what": "SRE specials: Spanish",
+          "what": "SRE specials: Music",
           "tone": "act",
           "hint": ""
         },
@@ -651,13 +675,13 @@
         },
         {
           "when": "Tue 6 · 7:00",
-          "what": "SRE specials: Music",
+          "what": "SRE specials: PE (tennis shoes)",
           "tone": "act",
           "hint": ""
         },
         {
           "when": "Wed 7 · 7:00",
-          "what": "SRE specials: PE + Library (tennis shoes, library book)",
+          "what": "SRE specials: Art + Library (library book)",
           "tone": "act",
           "hint": ""
         },
@@ -675,13 +699,31 @@
         },
         {
           "when": "Thu 8 · 7:00",
-          "what": "SRE specials: Art",
+          "what": "SRE specials: Spanish",
           "tone": "act",
           "hint": ""
         },
         {
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 7:00",
+          "what": "SRE specials: Music",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 3:25",
+          "what": "SRE pickup",
           "tone": "act",
           "hint": ""
         }
@@ -886,6 +928,12 @@
           "what": "Lindsay appt",
           "hint": "with Dad",
           "tone": "hot"
+        },
+        {
+          "when": "Mon 12 · 2:20",
+          "what": "Lindsay appt",
+          "hint": "with Dad",
+          "tone": "hot"
         }
       ]
     },
@@ -948,11 +996,6 @@
         },
         {
           "when": "Mon · 7:00",
-          "what": "SRE specials: Spanish",
-          "tone": "act"
-        },
-        {
-          "when": "Mon · 7:00",
           "what": "SRE spirit day: Hat Day (Peace Week)",
           "tone": "act"
         },
@@ -990,11 +1033,6 @@
         },
         {
           "when": "Mon 5 · 7:00",
-          "what": "SRE specials: Spanish",
-          "tone": "act"
-        },
-        {
-          "when": "Mon 5 · 7:00",
           "what": "SRE spirit day: Hat Day (Peace Week)",
           "tone": "act"
         },
@@ -1024,11 +1062,6 @@
           "tone": "act"
         },
         {
-          "when": "Tue 6 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act"
-        },
-        {
           "when": "Tue 6 · 5:00",
           "what": "Ainsley swim — Coach Ann",
           "tone": "hot"
@@ -1040,7 +1073,7 @@
         },
         {
           "when": "Wed 7 · 7:00",
-          "what": "SRE specials: PE + Library (tennis shoes, library book)",
+          "what": "SRE specials: Art + Library (library book)",
           "tone": "act"
         },
         {
@@ -1070,7 +1103,7 @@
         },
         {
           "when": "Thu 8 · 7:00",
-          "what": "SRE specials: Art",
+          "what": "SRE specials: Spanish",
           "tone": "act"
         },
         {
@@ -1101,6 +1134,16 @@
         {
           "when": "Sat 10 · 7:40",
           "what": "Harris flag drop-off",
+          "tone": "hot"
+        },
+        {
+          "when": "Sat 10 · 7:40",
+          "what": "Harris flag — vs SH Proehl (home)",
+          "tone": "hot"
+        },
+        {
+          "when": "Sat 10 · 9:15",
+          "what": "Harris flag pickup",
           "tone": "hot"
         }
       ]
