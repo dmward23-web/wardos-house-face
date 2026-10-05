@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 5 2026",
   "asOfIso": "2026-10-05",
-  "refreshedAt": "2026-10-05T22:28:48.324Z",
+  "refreshedAt": "2026-10-05T22:42:04.302Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,27 +16,15 @@
     "endIso": "2026-10-09T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "5:30",
-    "place": "Hayes baseball — Falcons vs KC Tigers (away)",
+    "label": "Next up · Tue",
+    "time": "7:00",
+    "place": "SRE spirit day: Tropical Day (Peace Week)",
     "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-    "badge": "Mon",
-    "startIso": "2026-10-05T22:30:00.000Z",
-    "endIso": "2026-10-06T00:00:00.000Z",
-    "kind": "sport",
+    "badge": "Tue",
+    "startIso": "2026-10-06T12:00:00.000Z",
+    "endIso": "2026-10-06T12:15:00.000Z",
+    "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "5:30",
-        "place": "Hayes baseball — Falcons vs KC Tigers (away)",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-05T22:30:00.000Z",
-        "endIso": "2026-10-06T00:00:00.000Z",
-        "kind": "sport",
-        "whenLabel": "5:30",
-        "summary": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game"
-      },
       {
         "label": "Next up · Tue",
         "time": "7:00",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Thu 7:00",
         "summary": "Harris — SRE specials: Spanish + Library checkout"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "7:00",
+        "place": "SRE specials: Spanish",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-08T12:00:00.000Z",
+        "endIso": "2026-10-08T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Thu 7:00",
+        "summary": "Hayes — SRE specials: Spanish"
       }
     ]
   },

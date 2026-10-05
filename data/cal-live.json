@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-05T22:28:48.843Z",
+  "fetchedAt": "2026-10-05T22:42:05.677Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-02",
   "windowEnd": "2026-10-11",
   "asOfIso": "2026-10-05",
   "nextLeave": {
-    "id": "f09ef0272gtar5bathk9f0m8sg",
-    "summary": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
-    "start": "2026-10-05T17:30:00-05:00",
-    "end": "2026-10-05T19:00:00-05:00",
-    "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
+    "id": "nipks59d70cl19j22e6edbvjug_20261006",
+    "summary": "Hayes Johnson birthday",
+    "start": "2026-10-06T00:00:00Z",
+    "end": "2026-10-07T00:00:00Z",
+    "location": "",
     "busy": false,
-    "allDay": false
+    "allDay": true
   },
   "upcomingLeaves": [
-    {
-      "id": "f09ef0272gtar5bathk9f0m8sg",
-      "summary": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
-      "start": "2026-10-05T17:30:00-05:00",
-      "end": "2026-10-05T19:00:00-05:00",
-      "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "nipks59d70cl19j22e6edbvjug_20261006",
       "summary": "Hayes Johnson birthday",
@@ -325,9 +316,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "5:30",
-    "place": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
-    "detailHtml": "<strong>5:30</strong> Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
+    "time": "7:00",
+    "place": "Hayes Johnson birthday",
+    "detailHtml": "<strong>7:00</strong> Hayes Johnson birthday",
     "badge": "Mon"
   },
   "error": null
