@@ -1,13 +1,27 @@
-# House Face · QA gates (push main + pull_request)
+# House Face · QA gates (real board changes only — NOT data refreshes)
 # GATE 1 — placeholder lint · GATE 2 — Ledger numbers contract
-# Job C dead-end/asset · PARK tonight (optional)
-# Red = tip not LIVE
+# Data-only pushes (cal / Sensi / Nest / lights / kids-week) skip this so
+# they never queue runners or spam failure emails.
 name: house-face-qa
 
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'data/**'
+      - 'kids-week.json'
+      - 'kids-data.js'
+      - '**/nest-snaps/**'
   pull_request:
+    paths-ignore:
+      - 'data/**'
+      - 'kids-week.json'
+      - 'kids-data.js'
+      - '**/nest-snaps/**'
+
+concurrency:
+  group: house-face-qa-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
