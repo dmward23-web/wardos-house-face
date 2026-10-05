@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 5 2026",
   "asOfIso": "2026-10-05",
-  "refreshedAt": "2026-10-05T12:29:00.955Z",
+  "refreshedAt": "2026-10-05T12:38:16.018Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -314,13 +314,6 @@
           "kind": "event",
           "when": "Mon · 7:00",
           "what": "SRE specials: Music",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Mon · 7:15",
-          "what": "send TP tubes to Lind (1–2)",
           "hint": "",
           "tone": "act"
         },
