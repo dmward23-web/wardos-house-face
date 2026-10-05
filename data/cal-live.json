@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-05T19:52:58.885Z",
+  "fetchedAt": "2026-10-05T20:08:58.626Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-02",
   "windowEnd": "2026-10-11",
   "asOfIso": "2026-10-05",
   "nextLeave": {
-    "id": "7qmnbg7327q2kv9lm16etfdngg",
-    "summary": "Ainsley — Lindsay appt · 3:00 video",
-    "start": "2026-10-05T15:00:00-05:00",
-    "end": "2026-10-05T16:00:00-05:00",
-    "location": "https://video.simplepractice.com/appt-922c5822456c398b505cbe44b590d391?origin=client",
+    "id": "f09ef0272gtar5bathk9f0m8sg",
+    "summary": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
+    "start": "2026-10-05T17:30:00-05:00",
+    "end": "2026-10-05T19:00:00-05:00",
+    "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
     "busy": false,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "7qmnbg7327q2kv9lm16etfdngg",
-      "summary": "Ainsley — Lindsay appt · 3:00 video",
-      "start": "2026-10-05T15:00:00-05:00",
-      "end": "2026-10-05T16:00:00-05:00",
-      "location": "https://video.simplepractice.com/appt-922c5822456c398b505cbe44b590d391?origin=client",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "f09ef0272gtar5bathk9f0m8sg",
       "summary": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
@@ -334,9 +325,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "3:00",
-    "place": "Ainsley — Lindsay appt · 3:00 video",
-    "detailHtml": "<strong>3:00</strong> Ainsley — Lindsay appt · 3:00 video",
+    "time": "5:30",
+    "place": "Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
+    "detailHtml": "<strong>5:30</strong> Hayes baseball — Falcons vs KC Tigers (away) · 5:30 game",
     "badge": "Mon"
   },
   "error": null
