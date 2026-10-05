@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 5 2026",
   "asOfIso": "2026-10-05",
-  "refreshedAt": "2026-10-05T16:03:43.321Z",
+  "refreshedAt": "2026-10-05T16:24:07.496Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -387,6 +387,24 @@
           "what": "Ward Kids [AHH No School]",
           "tone": "act",
           "hint": ""
+        },
+        {
+          "when": "Mon 12 · 7:00",
+          "what": "SRE specials: Music",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 3:25",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
         }
       ],
       "appointments": []
@@ -575,6 +593,12 @@
           "what": "Hayes flag — SRE Falcons vs Funk",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Mon 12 · leave 4:55",
+          "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -623,6 +647,24 @@
         {
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 7:00",
+          "what": "SRE specials: Music",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 3:25",
+          "what": "SRE pickup",
           "tone": "act",
           "hint": ""
         }
@@ -824,6 +866,12 @@
       "appointments": [
         {
           "when": "Mon 5 · 2:40",
+          "what": "Lindsay appt",
+          "hint": "with Dad",
+          "tone": "hot"
+        },
+        {
+          "when": "Mon 12 · 2:20",
           "what": "Lindsay appt",
           "hint": "with Dad",
           "tone": "hot"
