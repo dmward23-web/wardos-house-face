@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 5 2026",
   "asOfIso": "2026-10-05",
-  "refreshedAt": "2026-10-05T20:08:58.151Z",
+  "refreshedAt": "2026-10-05T20:19:12.955Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,26 +17,14 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "3:00",
-    "place": "Lindsay appt · 3:00 video",
-    "detailHtml": "5:30 Hayes baseball — Falcons vs KC Tigers (away) · kids with Mom · until Fri Oct 9 · 3:00",
+    "time": "5:30",
+    "place": "Hayes baseball — Falcons vs KC Tigers (away)",
+    "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
     "badge": "Mon",
-    "startIso": "2026-10-05T20:00:00.000Z",
-    "endIso": "2026-10-05T21:00:00.000Z",
-    "kind": "appointment",
+    "startIso": "2026-10-05T22:30:00.000Z",
+    "endIso": "2026-10-06T00:00:00.000Z",
+    "kind": "sport",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "3:00",
-        "place": "Lindsay appt · 3:00 video",
-        "detailHtml": "5:30 Hayes baseball — Falcons vs KC Tigers (away) · kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-05T20:00:00.000Z",
-        "endIso": "2026-10-05T21:00:00.000Z",
-        "kind": "appointment",
-        "whenLabel": "3:00",
-        "summary": "Ainsley — Lindsay appt · 3:00 video"
-      },
       {
         "label": "Next up · today",
         "time": "5:30",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Thu 7:00",
         "summary": "Hayes + Harris — SRE spirit day: Crazy Socks Day (Peace Week)"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "7:00",
+        "place": "SRE specials: Spanish + Library checkout",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-08T12:00:00.000Z",
+        "endIso": "2026-10-08T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Thu 7:00",
+        "summary": "Harris — SRE specials: Spanish + Library checkout"
       }
     ]
   },
