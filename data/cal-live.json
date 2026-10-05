@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-05T00:56:24.677Z",
+  "fetchedAt": "2026-10-05T01:31:40.300Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-02",
   "windowEnd": "2026-10-10",
@@ -266,6 +266,15 @@
       "end": "2026-10-09T14:30:00-05:00",
       "location": "14 Harbor Cove Dr, Old Hickory, TN → 6719 W 147th Terrace, Overland Park, KS 66223",
       "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "uf595m6tcdo14bl3dfccss4ibg",
+      "summary": "Flight to Kansas City (WN 606)",
+      "start": "2026-10-09T08:10:00-05:00",
+      "end": "2026-10-09T09:55:00-05:00",
+      "location": "Nashville BNA",
+      "busy": false,
       "allDay": false
     },
     {
