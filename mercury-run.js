@@ -444,11 +444,20 @@
     if (e.key === "i") { B.echo = false; B.want = 0.12; }
   });
 
+  function ambience() {
+    if (playing || document.hidden) return;
+    var t = performance.now() / 1000;
+    ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
+    paintWorld(ctx, t, view.w, view.h);
+    if (!reduced) requestAnimationFrame(ambience);
+  }
+
   function showGather() {
     ui.innerHTML = '<div class="gather"><div class="je-host" id="je"></div><a href="' + THEME.back + '">Back to the woods</a></div>';
     if (window.JarEngine) {
       JarEngine.mount(document.getElementById("je"), { kid: kid, getState: function () { return JarEngine.choreState(kid); } });
     }
+    ambience();
   }
 
   function showPlay() {
@@ -477,7 +486,9 @@
   };
 
   document.addEventListener("visibilitychange", function () {
-    if (playing && !document.hidden) requestAnimationFrame(frame);
+    if (document.hidden) return;
+    if (playing) requestAnimationFrame(frame);
+    else requestAnimationFrame(ambience);
   });
 
   function start() {
