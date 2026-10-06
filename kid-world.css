@@ -325,6 +325,8 @@ html.kw-reduce .kw-scene.is-on { animation: none; }
 .cw-lantern.is-past { opacity: 0.4; }
 .cw-lantern.is-fog .cw-orb { filter: blur(0.4px); opacity: 0.55; }
 .cw-lantern.is-now .cw-orb { width: 46px; height: 46px; }
+.cw-lantern.is-lit .cw-orb { box-shadow: 0 0 22px #ffe1a8, 0 0 8px #fff; }
+body.theme-harris.kw-on .cw-idea { font-size: 20px; min-height: 52px; }
 .cw-now {
   position: absolute; top: 0; bottom: 18px; width: 2px;
   background: linear-gradient(#fff, transparent);
