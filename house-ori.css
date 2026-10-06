@@ -723,14 +723,15 @@ html.ori-phone.ori-home body .panel.panel.panel {
   background: transparent !important;
 }
 html.ori-phone.ori-home body .panel.panel.panel > * { position: relative; z-index: 1; }
-html.ori-phone.ori-home .ori-path {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none;
-  overflow: visible;
+html.ori-phone.ori-home body .panel.panel.panel > svg.ori-path {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  overflow: visible !important;
+  margin: 0 !important;
 }
 html.ori-phone.ori-home .ori-spirit {
   position: fixed;
@@ -851,9 +852,10 @@ html.ori-phone.ori-home body .panel.panel.panel .hub-upper > section.leaveby {
   backdrop-filter: blur(7px);
   -webkit-backdrop-filter: blur(7px);
 }
-html.ori-phone.ori-home body .panel.panel.panel .leaveby .leaveby-layouts,
-html.ori-phone.ori-home body .panel.panel.panel .leaveby .lb-layout {
-  max-height: 148px !important;
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper.hub-upper--cams > section.leaveby .leaveby-layouts,
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper.hub-upper--cams > section.leaveby .lb-layout,
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper.hub-upper--cams > section.leaveby .lb-day-cols {
+  max-height: 112px !important;
   overflow: auto !important;
 }
 html.ori-phone.ori-home body .panel.panel.panel .leaveby-chip {
@@ -881,8 +883,10 @@ html.ori-phone.ori-home body .panel.panel.panel .leaveby-chips {
   flex-wrap: wrap !important;
 }
 
-html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel {
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper.hub-upper--cams > section#hub-lights-panel {
   width: min(84%, 330px) !important;
+  max-width: 330px !important;
+  justify-self: end !important;
   margin-left: auto !important;
   margin-right: 0 !important;
   padding: 26px 10px 10px !important;
