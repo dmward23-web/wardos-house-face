@@ -744,7 +744,10 @@
     S.bloomLevels = this.bloomLevels == null ? 6 : this.bloomLevels;
     S.bloomTh = 1.0; var bl = bloomAmt <= 0.001 ? S.blankBloom() : S.bloom(sc), rv = this.revealParams() || {};
     S.final(sc, bl, { exposure: (this.exposure || 1) * (night ? 0.72 : 1) * (rv.flash || 1), bloom: bloomAmt, vig: this.cfg.vig == null ? 1.25 : this.cfg.vig, grain: bloomAmt > 0 ? 0.035 : 0.02, dim: 1, reveal: rv.reveal, revealC: rv.revealC });
-    if (cost0 && this.onFrameCost) { try { this.onFrameCost(performance.now() - cost0); } catch (eCost) {} }
+    if (cost0 && this.onFrameCost) {
+      if (this.costSync && gl && gl.finish) { try { gl.finish(); } catch (eFin) {} }
+      try { this.onFrameCost(performance.now() - cost0); } catch (eCost) {}
+    }
     if (this.afterRender) this.afterRender(t);
     var self2 = this; this.objects.forEach(function (ob) { if (ob.btn && ob.box) { var b = ob.box(self2); if (b) self2.placeBtn(ob.btn, b[0], b[1], b[2], b[3]); } });
   };

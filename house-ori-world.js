@@ -152,10 +152,10 @@
     try { w.resize(); } catch (e) {}
   }
   function logBudget(tier, avg, p95, px) {
-    var fps = avg > 0 ? 1000 / avg : 0;
-    var row = { tier: tier.id, avg: +avg.toFixed(2), p95: +p95.toFixed(2), fps: Math.round(fps), px: px, dpr: tier.dprMax, scale: tier.renderScale, bloom: tier.bloom, layers: tier.layers, bloomLevels: tier.bloomLevels };
+    var present = tier.gap > 0 ? 1000 / tier.gap : 0;
+    var row = { tier: tier.id, draw: +avg.toFixed(2), p95: +p95.toFixed(2), present: Math.round(present), gap: tier.gap || 0, px: px, dpr: tier.dprMax, scale: tier.renderScale, bloom: tier.bloom, layers: tier.layers, bloomLevels: tier.bloomLevels };
     budgetLog.push(row);
-    try { console.info("[house-ori] budget " + tier.id + " avg " + avg.toFixed(1) + "ms p95 " + p95.toFixed(1) + "ms fps " + fps.toFixed(0) + " px " + px); } catch (e) {}
+    try { console.info("[house-ori] budget " + tier.id + " draw " + avg.toFixed(1) + "ms present " + (tier.gap || 0) + "ms fps " + present.toFixed(1) + " px " + px); } catch (e) {}
     return row;
   }
   function govern(w0) {
@@ -168,6 +168,7 @@
     var mode = "sample";
     applyTier(w0, steps[0]);
     w0.cfg.fpsCap = 120;
+    w0.costSync = true;
     function nowMs() { return (window.performance && performance.now) ? performance.now() : Date.now(); }
     function pack(arr) {
       if (!arr.length) return { avg: 999, p95: 999 };
@@ -208,12 +209,18 @@
         publish("css", 0);
         return;
       }
-      var st = pack(costs);
+      var sample = costs.length > 4 ? costs.slice(2) : costs;
+      var st = pack(sample);
       var tier = mode === "promo" ? TIERS[0] : steps[idx];
-      logBudget(tier, st.avg, st.p95, pxOf(world));
-      var hold60 = st.avg <= 15 && st.p95 <= 22;
       var gm = gapMed();
+      tier.gap = Math.round(gm);
+      logBudget(tier, st.avg, st.p95, pxOf(world));
+      try { console.info("[house-ori] gap " + tier.id + " " + gm.toFixed(1) + "ms"); } catch (eGap) {}
+      /* The present interval is the number that matters. WebGL records the draw
+         in well under a millisecond and the GPU bill shows up as a stretched frame. */
+      var hold60 = gm > 0 && gm <= 18.5;
       if (mode === "promo") {
+        world.costSync = false;
         if (st.avg < 8 && gm < 10) {
           world.cfg.fpsCap = 120;
           mode = "lock";
@@ -235,6 +242,7 @@
           applyTier(world, TIERS[0]);
           return;
         }
+        world.costSync = false;
         world.cfg.fpsCap = (st.avg < 8 && gm < 10) ? 120 : 60;
         mode = "lock";
         try { console.info("[house-ori] lock " + tier.id + " " + world.cfg.fpsCap); } catch (e) {}
@@ -242,14 +250,16 @@
         return;
       }
       if (idx >= steps.length - 1) {
-        if (st.avg > 20) {
+        world.costSync = false;
+        if (gm > 20 || st.avg > 20) {
           try { world.destroy(); } catch (e) {}
           world = null;
           document.documentElement.classList.remove("ori-gl");
           document.documentElement.classList.add("ori-nogl");
-          try { console.info("[house-ori] css-forest floor avg " + st.avg.toFixed(1) + "ms"); } catch (e2) {}
+          try { console.info("[house-ori] css-forest floor present " + gm.toFixed(0) + "ms"); } catch (e2) {}
           publish("css", 0);
         } else {
+          world.costSync = false;
           world.cfg.fpsCap = 60;
           mode = "lock";
           try { console.info("[house-ori] lock floor " + st.avg.toFixed(1) + "ms"); } catch (e) {}
@@ -533,7 +543,7 @@
     flyTo: flyTo,
     page: PAGE,
     theme: theme,
-    tier: world && world.tierId ? world.tierId : (world ? "probing" : "css"),
+    tier: world ? "probing" : "css",
     budget: budgetLog,
     fpsCap: world && world.cfg ? world.cfg.fpsCap : 0
   };
