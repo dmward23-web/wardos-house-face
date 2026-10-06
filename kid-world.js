@@ -455,7 +455,28 @@
     });
   }
 
+  function renameGlass() {
+    var swaps = [
+      [".consume-sub", /Victory world/g, "the island"],
+      [".consume-sub", /Gem world/g, "the block woods"],
+      [".consume-hero-meta", /Victory loadout/g, "island kit"],
+      [".consume-hero-meta", /Gem loadout/g, "block kit"],
+      [".consume-punch-title", /DROP ZONE HQ/g, "the island"],
+      [".consume-punch-title", /YOUR BASE/g, "the block woods"],
+      ["[data-grow-jar-name]", /Victory Jar|Gem Jar|Tour Jar/g, "Jar"],
+      [".bank-title", /Victory Jar|Gem Jar|Tour Jar/g, "Jar"]
+    ];
+    swaps.forEach(function (row) {
+      document.querySelectorAll(row[0]).forEach(function (n) {
+        row[1].lastIndex = 0;
+        var next = (n.textContent || "").replace(row[1], row[2]);
+        if (next !== n.textContent) n.textContent = next;
+      });
+    });
+  }
+
   function soften() {
+    renameGlass();
     document.querySelectorAll(".vfx-dollar").forEach(function (n) { n.remove(); });
     document.querySelectorAll("[data-streak-label]").forEach(function (n) {
       if (n.textContent) n.textContent = "";
