@@ -1,4 +1,4 @@
-/* House Face · ORIHOME4 · mount the living world and fly into a scene on every board tap.
+/* House Face · ORIHOME5 · mount the living world and fly into a scene on every board tap.
    Original code. The forest is ori/ori-scene.js (painted plates + motes). No Ori assets.
    HouseSfx owns the tap. This file adds the level-enter whoosh on the same mixer, so mute still wins.
    A key-less screen is left alone: no key modal from here. */

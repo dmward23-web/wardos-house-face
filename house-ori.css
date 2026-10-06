@@ -1,4 +1,4 @@
-/* House Face · ORIHOME4 · living overworld skin.
+/* House Face · ORIHOME5 · living overworld skin.
    Original code and colour. Ori-inspired mood only: no Ori assets, characters, or logo.
    The painted forest is ori/ori-scene.js. This file is the HUD, the portals, and the level-enter veil.
    Loaded last so it wins over the command-deck tokens. */
@@ -212,7 +212,7 @@ html.ori-on .ori-pressed { animation: ori-press 0.42s cubic-bezier(.2, .8, .2, 1
 
 /* Shared glass so a subpage is a scene, not a paper panel. */
 html.ori-on body .panel :is(header, footer, section, article, .hdr, .banner, .card, .sec, .day, .bulk, .ship, .stat, .row, .trip, .count-row, .vote-card, .log-card, .beat, .handoff, .handoff-card, .cmd-panel) {
-  background-color: rgba(7, 18, 32, 0.42) !important;
+  background-color: rgba(7, 18, 32, 0.34) !important;
   color: #e8f6ff !important;
   border-color: rgba(160, 216, 255, 0.28) !important;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
@@ -562,6 +562,21 @@ html.ori-phone:not(.ori-home) .cams {
 }
 html.ori-phone:not(.ori-home) :is(.ds-stop, .ds-row) {
   grid-template-columns: 1fr !important;
+}
+html.ori-phone:not(.ori-home) .climate-body {
+  flex-wrap: wrap !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+html.ori-phone:not(.ori-home) .sec,
+html.ori-phone:not(.ori-home) .climate,
+html.ori-phone:not(.ori-home) .climate-hero {
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+html.ori-phone.ori-home .leaveby-chip,
+html.ori-phone.ori-home .hub-sw {
+  min-height: 44px !important;
 }
 html.ori-phone:not(.ori-home) .shot-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
