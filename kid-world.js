@@ -441,16 +441,19 @@
     return (w && w.textContent) || el.getAttribute("aria-label") || el.textContent || "";
   }
 
-  function openFor(el) {
+  function openFor(el, wasDone) {
     if (!el) return;
     var label = textOf(el).replace(/\s+/g, " ").trim().slice(0, 80);
     var day = el.classList && el.classList.contains("day-tap");
     var done = el.classList && el.classList.contains("done");
+    var line = "It settles into the jar.";
+    if (wasDone && !done) line = "The jar eases back.";
+    else if (wasDone && done) line = "The light keeps that.";
     openScene({
       from: el,
       kicker: day ? "a tap in the week" : "in the world",
       title: label || "Here",
-      html: done ? "<p>The light keeps that.</p>" : "<p>It settles into the jar.</p>",
+      html: "<p>" + line + "</p>",
       paint: vignette(kindFor(label))
     });
   }
@@ -597,8 +600,9 @@
     var hit = t.closest(".day-tap, .quest[data-check], .quest, .consume-hero, .consume-ahead-row, .consume-day, .consume-punch-card, .hot-banner, .card");
     if (!hit) return;
     juice(hit);
+    var wasDone = !!(hit.classList && hit.classList.contains("done"));
     /* let the checkoff click finish, then open */
-    setTimeout(function () { openFor(hit); }, 30);
+    setTimeout(function () { openFor(hit, wasDone); }, 30);
   }
 
   var bg = null;
