@@ -8,9 +8,9 @@
   "use strict";
 
   var COLORS = {
-    hayes: { metal: [126, 232, 255], deep: [10, 36, 52], lip: [232, 248, 255], name: "Hayes" },
-    harris: { metal: [150, 236, 164], deep: [12, 40, 26], lip: [236, 255, 232], name: "Harris" },
-    ainsley: { metal: [236, 176, 132], deep: [46, 26, 22], lip: [255, 228, 206], name: "Ainsley" }
+    hayes: { metal: [198, 206, 216], deep: [8, 10, 14], lip: [230, 236, 242], name: "Hayes" },
+    harris: { metal: [196, 208, 202], deep: [8, 12, 10], lip: [228, 236, 230], name: "Harris" },
+    ainsley: { metal: [210, 204, 198], deep: [12, 10, 10], lip: [236, 230, 224], name: "Ainsley" }
   };
 
   var virtualNow = null;
@@ -154,35 +154,50 @@
     "  q.y=-q.y;",
     "  q.x/=1.0+uPoke*0.16;",
     "  q.y*=1.0-uPoke*0.2;",
+    "  q*=0.76;",
     "  float f=field(q);",
-    "  if(f<0.72) discard;",
+    "  if(f<0.80) discard;",
     "  vec2 e=vec2(0.007,0.0);",
     "  float fx=field(q+e.xy)-field(q-e.xy);",
     "  float fy=field(q+e.yx)-field(q-e.yx);",
     "  vec3 N=normalize(vec3(-fx,-fy,0.42));",
-    "  float fres=pow(clamp(1.0-max(N.z,0.0),0.0,1.0),1.7);",
-    "  vec2 uv=clamp(vec2(0.5+N.x*0.45,0.58+N.y*0.32),0.02,0.98);",
-    "  vec3 env=texture2D(uEnv,uv).rgb;",
-    "  vec3 metal=uMetal/255.0;",
-    "  vec3 L=normalize(vec3(-0.32,0.72,0.58));",
-    "  float spec=pow(max(dot(reflect(-L,N),vec3(0.0,0.0,1.0)),0.0),46.0);",
+    "  vec2 uv=clamp(vec2(0.5+N.x*0.55,0.62+N.y*0.28),0.0,1.0);",
+    "  vec3 world=texture2D(uEnv,uv).rgb;",
+    "  float luma=dot(world,vec3(0.299,0.587,0.114));",
+    "  float hy=uv.y;",
+    "  float lineA=smoothstep(0.46,0.478,hy)*(1.0-smoothstep(0.492,0.508,hy));",
+    "  float lineB=smoothstep(0.60,0.614,hy)*(1.0-smoothstep(0.626,0.642,hy));",
+    "  float skyM=smoothstep(0.47,0.53,hy);",
+    "  vec3 env=vec3(0.025,0.028,0.034);",
+    "  env=mix(env,vec3(0.58,0.60,0.64),skyM);",
+    "  env+=vec3(0.97,0.98,1.0)*lineA;",
+    "  env+=vec3(0.78,0.80,0.84)*lineB*0.65;",
+    "  env=mix(env,vec3(luma),0.05);",
+    "  vec3 metal=vec3(0.76,0.79,0.84);",
+    "  vec3 L=normalize(vec3(-0.32,0.78,0.54));",
+    "  float spec=pow(max(dot(reflect(-L,N),vec3(0.0,0.0,1.0)),0.0),96.0);",
     "  float ndl=max(dot(N,L),0.0);",
-    "  vec3 base=mix(metal*0.2,metal,0.88);",
-    "  vec3 col=mix(base,env,0.24+fres*0.22);",
-    "  col+=metal*ndl*0.22;",
-    "  col+=vec3(1.0,0.99,0.95)*spec*1.35;",
-    "  col+=fres*vec3(0.92,0.97,1.0)*0.7;",
-    "  float edge=smoothstep(0.72,1.05,f);",
+    "  float fres=pow(clamp(1.0-max(N.z,0.0),0.0,1.0),6.5);",
+    "  vec3 col=env*(0.62+ndl*0.38);",
+    "  col=mix(col,metal,0.10);",
+    "  col=col/(vec3(1.0)+max(col-vec3(0.80),vec3(0.0)));",
+    "  col=min(col,vec3(0.84));",
+    "  col+=vec3(1.0)*spec;",
+    "  col+=fres*vec3(0.74,0.82,0.94)*0.32;",
+    "  col=clamp(col,0.0,1.0);",
+    "  float edge=smoothstep(0.78,1.02,f);",
     "  float shut=uAsleep>0.5?2.6:1.0;",
-    "  vec2 eyeL=vec2(-0.07,0.34)+uLook*0.02;",
-    "  vec2 eyeR=vec2(0.07,0.34)+uLook*0.02;",
-    "  float el=length((q-eyeL)*vec2(1.2,shut));",
-    "  float er=length((q-eyeR)*vec2(1.2,shut));",
-    "  float eyes=smoothstep(0.05,0.036,min(el,er))*edge;",
-    "  col=mix(col,vec3(0.94,0.97,0.98),eyes);",
-    "  float pupil=smoothstep(0.026,0.014,min(length(q-(eyeL+uLook*0.01)),length(q-(eyeR+uLook*0.01))))*eyes*(uAsleep>0.5?0.35:1.0);",
-    "  col=mix(col,vec3(0.03,0.07,0.1),pupil);",
-    "  float a=smoothstep(0.72,0.92,f);",
+    "  vec2 eyeL=vec2(-0.05,0.30)+uLook*0.015;",
+    "  vec2 eyeR=vec2(0.05,0.30)+uLook*0.015;",
+    "  float el=length((q-eyeL)*vec2(1.7,shut*1.25));",
+    "  float er=length((q-eyeR)*vec2(1.7,shut*1.25));",
+    "  float eyes=smoothstep(0.020,0.012,min(el,er))*edge;",
+    "  col=mix(col,vec3(0.05,0.06,0.08),eyes);",
+    "  float catch=smoothstep(0.009,0.003,min(el,er));",
+    "  col=mix(col,vec3(0.96,0.97,0.98),catch);",
+    "  float pupil=smoothstep(0.011,0.005,min(length(q-(eyeL+uLook*0.008)),length(q-(eyeR+uLook*0.008))))*eyes*(uAsleep>0.5?0.2:1.0);",
+    "  col=mix(col,vec3(0.01,0.02,0.03),pupil);",
+    "  float a=smoothstep(0.80,0.98,f);",
     "  gl_FragColor=vec4(col,a);",
     "}"
   ].join("\n");
@@ -418,30 +433,33 @@
       var by = ((t * (18 + i * 7) * k) % 70) - 40;
       balls.push([Math.sin(t * 1.4 + i) * 16, Math.min(by, 10), 6 + energy * 2]);
     }
-    ctx.fillStyle = "rgba(0,0,0,0.28)";
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
     ctx.beginPath();
-    ctx.ellipse(0, 52, 36 * s, 7, 0, 0, 7);
+    ctx.ellipse(0, 52, 36 * s, 8, 0, 0, 7);
+    ctx.fill();
+    ctx.fillStyle = "rgba(170, 180, 190, 0.18)";
+    ctx.beginPath();
+    ctx.ellipse(0, 58, 28 * s, 5, 0, 0, 7);
     ctx.fill();
     for (i = 0; i < balls.length; i++) {
       var b = balls[i];
-      var g = ctx.createRadialGradient(b[0] - b[2] * 0.35, b[1] - b[2] * 0.45, 2, b[0], b[1], b[2]);
-      g.addColorStop(0, "rgba(255,255,255,0.95)");
-      g.addColorStop(0.28, rgba(this.col.metal, 0.95));
-      g.addColorStop(1, rgba(this.col.deep, 0.96));
+      var g = ctx.createRadialGradient(b[0] - b[2] * 0.2, b[1] - b[2] * 0.15, b[2] * 0.15, b[0], b[1], b[2]);
+      g.addColorStop(0, "rgba(28,32,38,0.98)");
+      g.addColorStop(0.55, "rgba(8,10,14,0.98)");
+      g.addColorStop(1, rgba(this.col.deep, 0.98));
       ctx.fillStyle = g;
       ctx.beginPath();
       ctx.arc(b[0], b[1], b[2], 0, 7);
       ctx.fill();
-    }
-    if (this.envCv) {
-      ctx.save();
-      ctx.globalCompositeOperation = "overlay";
-      ctx.globalAlpha = 0.55;
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.beginPath();
-      for (i = 0; i < balls.length; i++) ctx.arc(balls[i][0], balls[i][1], balls[i][2], 0, 7);
-      ctx.clip();
-      try { ctx.drawImage(this.envCv, -W * 0.5, -H * 0.55, W, H); } catch (e) {}
-      ctx.restore();
+      ctx.ellipse(b[0] - b[2] * 0.22, b[1] - b[2] * 0.32, b[2] * 0.16, b[2] * 0.07, -0.5, 0, 7);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(186, 204, 224, 0.55)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(b[0], b[1], b[2] - 0.6, 0, 7);
+      ctx.stroke();
     }
     ctx.globalAlpha = 0.85;
     ctx.fillStyle = "rgba(255,255,255,0.9)";
