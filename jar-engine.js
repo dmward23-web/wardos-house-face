@@ -13,6 +13,8 @@
     ainsley: { metal: [236, 176, 132], deep: [46, 26, 22], lip: [255, 228, 206], name: "Ainsley" }
   };
 
+  var virtualNow = null;
+  function nowMs() { return virtualNow == null ? performance.now() : virtualNow; }
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function lerp(a, b, t) { return a + (b - a) * t; }
   function rgba(c, a) { return "rgba(" + (c[0] | 0) + "," + (c[1] | 0) + "," + (c[2] | 0) + "," + a + ")"; }
@@ -122,7 +124,7 @@
     this.cv.setAttribute("aria-label", this.col.name + " jar");
     host.appendChild(this.cv);
     this.ctx = this.cv.getContext("2d", { alpha: true });
-    this.t0 = performance.now();
+    this.t0 = nowMs();
     this.look = { x: 0, y: 0 };
     this.bubbles = [];
     for (var i = 0; i < 16; i++) this.bubbles.push({ u: Math.random(), x: 0.15 + Math.random() * 0.7, r: 1.5 + Math.random() * 3.2, sp: 0.12 + Math.random() * 0.45 });
@@ -193,18 +195,20 @@
     var ctx = this.ctx;
     if (!ctx) return;
     var w = this.cv.width, h = this.cv.height;
-    var t = (performance.now() - this.t0) / 1000;
+    var t = (nowMs() - this.t0) / 1000;
     var st = this.getState() || choreState(this.kid);
     var target = st.fill || 0;
     if (this.reduced) this.display = target;
     else this.display = lerp(this.display, target, 0.08);
     if (this.lastFill >= 0 && target > this.lastFill + 0.001) {
-      tone("gulp");
-      this.pokeT = performance.now();
-      if (st.full) tone("over");
+      if (virtualNow == null) {
+        tone("gulp");
+        if (st.full) tone("over");
+      }
+      this.pokeT = nowMs();
     }
     this.lastFill = target;
-    if (st.hungry && !this.reduced && t - this.rattleAt > 2.6) {
+    if (st.hungry && !this.reduced && virtualNow == null && t - this.rattleAt > 2.6) {
       this.rattleAt = t;
       tone("rattle");
     }
@@ -348,7 +352,7 @@
     ctx.save();
     ctx.translate(cx, top - 2);
     ctx.rotate(shake);
-    var poke = this.pokeT ? Math.max(0, 1 - (performance.now() - this.pokeT) / 280) : 0;
+    var poke = this.pokeT ? Math.max(0, 1 - (nowMs() - this.pokeT) / 280) : 0;
     ctx.translate(0, -poke * 6);
     var lg = ctx.createLinearGradient(0, -lidH, 0, 4);
     lg.addColorStop(0, rgba(this.col.lip, 0.95));
@@ -427,6 +431,8 @@
     choreState: choreState,
     asleepWeek: asleepWeek,
     mount: mount,
-    tone: tone
+    tone: tone,
+    setVirtual: function (ms) { virtualNow = ms == null ? null : ms; },
+    now: nowMs
   };
 })(window);

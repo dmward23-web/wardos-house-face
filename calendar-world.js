@@ -1,8 +1,7 @@
 /* calendar-world.js · Calendar World inside each kid board.
    C1 is the path itself (lanterns, walker, fog, now-line, time ring, briefing).
-   C2–C9 open painted sub-scenes. Idea numbers follow Dan's phase list.
-   Where the Atlas chat text is not in the repo, the scene is named for the
-   phase job (seasons, agency, rites, the rest) and tagged with its number.
+   C2–C9 open painted sub-scenes. Sentences are Atlas's Oct 2 wording.
+   Numbers missing from that transcript are named plainly for their phase.
    No scores, money, shame, or red marks. Mom weeks: look, don't keep. */
 (function (global) {
   "use strict";
@@ -128,11 +127,16 @@
 
   function openDay(iso, diff, from) {
     var fog = diff > 0;
+    var line = fog
+      ? "Fog of tomorrow. Future days are misty, and tapping a day blows the fog away to reveal it."
+      : diff < 0
+        ? "Past fades gently. Finished events drift up as spirits instead of vanishing."
+        : "The week is a glowing path. Each day is a clearing in the forest, and events are lanterns along the trail.";
     open({
       from: from,
       kicker: fog ? "ahead, still soft" : diff < 0 ? "already faded" : "today",
       title: sleeps(Math.max(0, diff)),
-      html: fog ? "<p>Tomorrow stays misty until it is close. Nothing jumps out.</p>" : "<p>This day is on the path.</p>",
+      html: "<p>" + line + "</p><p>The creature walks the path and peeks at what is next.</p>",
       paint: global.KidWorld && KidWorld.vignette("woods")
     });
   }
@@ -143,9 +147,12 @@
     var rt = routineText();
     var hour = parseInt(chicagoParts().hour, 10);
     var hello = hour < 11 ? say("Good morning", "Morning", "Morning") : hour < 17 ? say("Good day", "Today", "This afternoon") : say("Quiet evening", "Evening", "Evening");
-    var line = hello + ". " + (n.title && n.title !== "Nothing timed next" ? n.title : "The path is open.");
-    if (sp && age() !== "small") line += " " + sp + ".";
-    if (asleep()) line = say("The woods are sleeping.", "The woods are resting this week.", "The woods are resting. Nothing new is kept.");
+    var bits = [];
+    if (n.title && n.title !== "Nothing timed next") bits.push(n.title);
+    if (sp && age() !== "small") bits.push(sp);
+    if (rt && age() === "teen") bits.push(rt);
+    var line = hello + ". " + say("Three lights.", "Morning briefing.", "Morning briefing.") + " " + (bits.slice(0, 3).join(" · ") || "The path is open.");
+    if (asleep()) line = "Forest sleeps. On mom's weeks the forest gently sleeps, with nothing tracked, and wakes when they're back.";
     else {
       var hw = data() && data().homeWeek;
       var end = hw && hw.endIso ? new Date(hw.endIso).getTime() : 0;
@@ -197,160 +204,159 @@
   /* ---------- phase scenes ---------- */
   var PHASES = [
     { id: "c2", phase: "C2", title: say("Pack", "Get ready", "Prep"), ideas: [
-      { n: 11, title: "Pack the bag", kind: "pack" },
-      { n: 14, title: "Scout the week", kind: "scout" },
-      { n: 18, title: "Prep lights", kind: "prep" },
-      { n: 19, title: "Carry the gear", kind: "carry" },
-      { n: 107, title: "Work backward", kind: "backplan" },
-      { n: 108, title: "Break it up", kind: "chunk" }
+      { n: 11, title: "Pack the bag", kind: "pack", line: "Pack your bag. Drag tomorrow's gear (cleats, swim bag, library book) into a glowing backpack the night before." },
+      { n: 14, title: "Weekly scout", kind: "scout", line: "Weekly scout. Sunday night, the creature asks \"want to scout the week?\" and flies them through the 7 days in 20 seconds." },
+      { n: 18, title: "Prep quests", kind: "prep", line: "Prep quests. The creature turns the next thing into a few small lights to get ready, only from what the week already knows." },
+      { n: 19, title: "Carry the gear", kind: "carry", line: "The creature carries the gear. It walks the bag, the book, and the shoes over so the kid can follow." },
+      { n: 107, title: "Backward planning", kind: "backplan", line: "Backward planning. The creature walks backward from an event (\"to leave at 8:10, shoes at 8:00, breakfast at 7:40\")." },
+      { n: 108, title: "Chunk the big thing", kind: "chunk", line: "Chunk the big thing. A project lantern breaks into stepping stones across the days before it's due." },
     ]},
     { id: "c3", phase: "C3", title: say("Two homes", "Two homes", "Two shores"), ideas: [
-      { n: 5, title: "Two shores", kind: "shores" },
-      { n: 59, title: "Lighthouse", kind: "shores" },
-      { n: 60, title: "Cross the bridge", kind: "bridge" },
-      { n: 61, title: "What travels", kind: "travel" },
-      { n: 62, title: "Welcome glow", kind: "welcome" },
-      { n: 99, title: "Forest sleeps", kind: "sleep" },
-      { n: 115, title: "Both are good", kind: "both" },
-      { n: 66, title: "Compass", kind: "compass" },
-      { n: 23, title: "A lantern here", kind: "lantern" },
-      { n: 116, title: "Goodnight, from far", kind: "stub-voice" },
-      { n: 118, title: "Steady stones", kind: "anchors" }
+      { n: 5, title: "Two lands", kind: "shores", line: "Mom-week and Dad-week are two lands joined by a bridge. Handoff day is crossing the bridge, shown as a calm moment, never sad." },
+      { n: 59, title: "Mom's lighthouse", kind: "shores", line: "Mom's lighthouse. Mom's house is a warm, always-lit lighthouse, with nothing tracked there." },
+      { n: 60, title: "Bridge ritual", kind: "bridge", line: "Bridge ritual. Handoff day has the same little animation and song every time, so transitions feel predictable." },
+      { n: 61, title: "Things that travel", kind: "travel", line: "Things that travel. Items that go between houses get tagged, and the creature reminds them before the bridge." },
+      { n: 62, title: "Welcome-back glow", kind: "welcome", line: "Welcome-back glow. When they return, the forest wakes up and their creature runs to greet them." },
+      { n: 99, title: "Forest sleeps", kind: "sleep", line: "Forest sleeps. On mom's weeks the forest gently sleeps, with nothing tracked, and wakes when they're back." },
+      { n: 115, title: "Both homes are okay", kind: "both", line: "Both homes are okay. Mom's shore and Dad's shore are both good places. Nothing is kept while the forest sleeps." },
+      { n: 66, title: "Dad's compass", kind: "compass", line: "Dad's compass. While Dad travels, a compass points toward him and counts the days to the reunion." },
+      { n: 23, title: "Dad's lantern", kind: "lantern", line: "Dad's lantern. A steady lantern stays lit on Dad's shore so the way back is easy to see." },
+      { n: 116, title: "Goodnight from afar", kind: "stub-voice", line: "Goodnight from afar. A short goodnight can ride a lantern once a voice is connected. Until then the lantern just dims." },
+      { n: 118, title: "Steady anchors", kind: "anchors", line: "Steady anchors. School, practice, and home sit in the same places every week." },
     ]},
     { id: "c4", phase: "C4", title: say("Calm", "Calm", "Steady"), ideas: [
-      { n: 51, title: "Worry stone", kind: "stone" },
-      { n: 52, title: "Feeling weather", kind: "weather" },
-      { n: 53, title: "Brave light", kind: "brave" },
-      { n: 54, title: "Before and after", kind: "before" },
-      { n: 55, title: "A breath", kind: "breath" },
-      { n: 56, title: "The glade", kind: "glade" },
-      { n: 117, title: "Sit in the glade", kind: "glade" },
-      { n: 139, title: "Wind, then still", kind: "wind" },
-      { n: 140, title: "Calm on cue", kind: "breath" },
-      { n: 141, title: "Quiet hours", kind: "quiet" },
-      { n: 142, title: "Rest", kind: "rest" },
-      { n: 49, title: "Rest is allowed", kind: "rest" }
+      { n: 51, title: "Worry stones", kind: "stone", line: "Worry stones. A kid drops a \"nervous\" stone on an upcoming event, so a parent sees it and can talk before the day." },
+      { n: 52, title: "Feeling weather", kind: "weather", line: "Feeling weather. After an event, the kid picks sunny, cloudy or stormy, and the forest remembers it with no judgment." },
+      { n: 53, title: "Brave lanterns", kind: "brave", line: "Brave lanterns. Hard or first-time things get a special flame, and the creature walks with them to it." },
+      { n: 54, title: "Before and after", kind: "before", line: "Before and after. The creature asks \"how will it go?\" before and \"how did it go?\" after, which teaches that worry usually shrinks." },
+      { n: 55, title: "Transition breath", kind: "breath", line: "Transition breath. Before big changes, the forest slows down and the creature does a 3-breath glow with them." },
+      { n: 56, title: "Decompress glade", kind: "glade", line: "Decompress glade. After a packed day, there's a quiet clearing to sit in for a minute." },
+      { n: 117, title: "The glade", kind: "glade", line: "The glade. The same quiet clearing is there after a full day, every time." },
+      { n: 139, title: "Overwhelm as weather", kind: "wind", line: "Overwhelm meter as weather. Too many events in a week shows as wind in the forest." },
+      { n: 140, title: "Calm on cue", kind: "breath", line: "Calm on cue. A kid taps their creature to slow the whole board into a breathing glow." },
+      { n: 141, title: "Quiet hours", kind: "quiet", line: "Quiet hours. Evenings after 8 dim the forest so screens wind down." },
+      { n: 142, title: "Rest is a quest", kind: "rest", line: "Rest is a quest. Doing nothing on a rest day is celebrated as finishing a quest." },
+      { n: 49, title: "Rest-day hammock", kind: "rest", line: "Rest-day hammock. Days with nothing planned show the creature napping in a hammock, and that's celebrated." },
     ]},
     { id: "c5", phase: "C5", title: say("Stories", "Stories", "Journal"), ideas: [
-      { n: 34, title: "A crystal", kind: "crystal" },
-      { n: 74, title: "This week's chapter", kind: "chapter" },
-      { n: 75, title: "The year book", kind: "year" },
-      { n: 77, title: "Journal", kind: "journal" },
-      { n: 113, title: "It remembers", kind: "journal" },
-      { n: 126, title: "Your words", kind: "journal" },
-      { n: 127, title: "A bright moment", kind: "hero" },
-      { n: 129, title: "Friday light", kind: "friday" },
-      { n: 130, title: "Sunday seed", kind: "seed" },
-      { n: 132, title: "This month", kind: "month" }
+      { n: 34, title: "Memory crystals", kind: "crystal", line: "Memory crystals. After an event, the lantern turns into a memory crystal, and a tap shows a photo." },
+      { n: 74, title: "Week chapters", kind: "chapter", line: "Week chapters. Each week becomes a short chapter the creature can read back, with no grades." },
+      { n: 75, title: "The year book", kind: "year", line: "The year book. The chapters stack into one book the kid can open." },
+      { n: 77, title: "Creature journal", kind: "journal", line: "The creature journal. It keeps a few plain lines about the week." },
+      { n: 113, title: "It remembers", kind: "journal", line: "The creature remembers them. It recalls past events (\"remember the rain game?\")." },
+      { n: 126, title: "Their words", kind: "note", line: "Their words. A kid can leave a line in their own words. It stays on this device during Dad weeks." },
+      { n: 127, title: "Hero moments", kind: "hero", line: "Hero moments. A bright thing from the week can be marked, just to remember it." },
+      { n: 129, title: "Friday lantern", kind: "friday", line: "Friday lantern. Friday gets its own warm lantern at the end of the school stretch." },
+      { n: 130, title: "Sunday seeds", kind: "seed", line: "Sunday seeds. Sunday plants one small idea for the week ahead." },
+      { n: 132, title: "Monthly story", kind: "month", line: "Monthly story. Once a month the creature tells the month as one short story." },
     ]},
     { id: "c6", phase: "C6", title: say("Seasons", "Seasons", "Senses"), ideas: [
-      { n: 7, title: "The season veil", kind: "season" },
-      { n: 9, title: "Sky right now", kind: "sky" },
-      { n: 10, title: "Light by the hour", kind: "sky" },
-      { n: 48, title: "Up close", kind: "texture" },
-      { n: 67, title: "Morning light", kind: "sky" },
-      { n: 68, title: "Evening light", kind: "sky" },
-      { n: 69, title: "Rain", kind: "rain" },
-      { n: 70, title: "Wind", kind: "wind" },
-      { n: 72, title: "A warm window", kind: "lantern" },
-      { n: 73, title: "Cool air", kind: "breath" },
-      { n: 81, title: "Small wings", kind: "motes" },
-      { n: 82, title: "The lake", kind: "lake" },
-      { n: 85, title: "Leaves", kind: "season" }
+      { n: 7, title: "Seasons", kind: "season", line: "Seasons change the forest to match the real month: fall leaves in October, snow for winter break." },
+      { n: 67, title: "Real sunlight", kind: "sky", line: "Real sunlight. Real sunrise and sunset times shift the forest light." },
+      { n: 68, title: "Evening color", kind: "sky", line: "Evening color. As the real day ends, the forest shifts toward dusk on its own." },
+      { n: 69, title: "Rain on the leaves", kind: "rain", line: "Rain on the leaves. A wet week sounds like soft rain in the canopy." },
+      { n: 70, title: "Wind in the trees", kind: "wind", line: "Wind in the trees. A breezy day moves the branches." },
+      { n: 72, title: "A warm window", kind: "lantern", line: "A warm window. Cold months show a lit window, a small sense of being indoors." },
+      { n: 73, title: "Cool air", kind: "breath", line: "Cool air. Hot months let the forest feel a little cooler in the shade." },
+      { n: 81, title: "Event sounds", kind: "sense", line: "Event sounds. Swim sounds like water, baseball like a bat crack, school like a bell." },
+      { n: 82, title: "Spirit colors", kind: "color", line: "Spirit colors. Each activity type has its own color, so a glance tells the kind of day." },
+      { n: 85, title: "Music by day", kind: "strings", line: "Music by day. Calm music on rest days, upbeat on game days." },
+      { n: 9, title: "A shooting star", kind: "sky", line: "A shooting star crosses the sky when something new lands on their calendar." },
+      { n: 10, title: "Night sky", kind: "sky", line: "Night sky mode. At bedtime the forest dims and tomorrow's 3 things appear as constellations." },
+      { n: 48, title: "Bedtime lullaby", kind: "sense", line: "Bedtime lullaby. The forest sings tomorrow's first event in one line, softly." },
     ]},
     { id: "c7", phase: "C7", title: say("Choose", "Choose", "Agency"), ideas: [
-      { n: 12, title: "Pick a path", kind: "pick" },
-      { n: 13, title: "A note for Dad", kind: "note" },
-      { n: 17, title: "Guide the light", kind: "guide" },
-      { n: 21, title: "Who is here", kind: "table" },
-      { n: 22, title: "Offer a hand", kind: "hand" },
-      { n: 25, title: "Your pace", kind: "pace" },
-      { n: 27, title: "Siblings", kind: "siblings" },
-      { n: 28, title: "Alone a while", kind: "glade" },
-      { n: 44, title: "More or less", kind: "density" },
-      { n: 45, title: "Pictures first", kind: "density" },
-      { n: 47, title: "A wish", kind: "note" },
-      { n: 57, title: "The weekly rhythm", kind: "anchors" },
-      { n: 64, title: "Something extra", kind: "extra" },
-      { n: 65, title: "Pass the light", kind: "pass" },
-      { n: 112, title: "A kept moment", kind: "hero" },
-      { n: 134, title: "Dinner light", kind: "lantern" },
-      { n: 135, title: "The ride", kind: "carry" },
-      { n: 136, title: "The porch", kind: "lantern" },
-      { n: 137, title: "A story", kind: "chapter" },
-      { n: 138, title: "Goodnight window", kind: "quiet" }
+      { n: 12, title: "Choose your path", kind: "pick", line: "Choose your path. On free weekend time the kid picks between 2-3 lantern options, and the pick becomes the plan." },
+      { n: 13, title: "Plant a seed", kind: "note", line: "Plant a seed. The kid adds an idea (\"go to the park\"), and it sprouts on a day once a parent approves it." },
+      { n: 17, title: "A say in the pace", kind: "guide", line: "A say in the pace. The kid can ask the creature to slow the next step. Nothing is marked wrong." },
+      { n: 21, title: "Who is here", kind: "table", line: "Who is here. The week shows the people it already knows are around." },
+      { n: 22, title: "A hand offered", kind: "hand", line: "A hand offered. Extra help is an offer. It never fills the jar." },
+      { n: 25, title: "Your own speed", kind: "pace", line: "Your own speed. Going slower is allowed. The path does not scold." },
+      { n: 27, title: "Siblings' woods", kind: "siblings", line: "Siblings' woods. Each kid keeps their own forest. A visit is just a visit." },
+      { n: 28, title: "Room to be quiet", kind: "glade", line: "Room to be quiet. There is a clearing for being alone a while." },
+      { n: 47, title: "Sunday campfire", kind: "table", line: "Sunday campfire. A 2-minute family look at the week, with all three creatures and Dad's." },
+      { n: 57, title: "Choice fruit", kind: "pick", line: "Choice fruit. Small choices on the plan get picked from fruit on a tree, giving kids real control over little things." },
+      { n: 64, title: "Weekly roles", kind: "extra", line: "Weekly roles. Lantern-keeper, pathfinder, weather-watcher, rotating each week." },
+      { n: 65, title: "Sibling trade post", kind: "pass", line: "Sibling trade post. Kids swap small tasks or choices with a parent's OK, which teaches negotiation." },
+      { n: 134, title: "Kid veto token", kind: "pick", line: "Kid veto token. Once a month each kid can gently request a swap on something optional, with a parent deciding." },
+      { n: 135, title: "Propose a plan", kind: "note", line: "Propose a plan. A kid designs a whole Saturday, and a parent approves pieces of it." },
+      { n: 136, title: "Rate the forest", kind: "pick", line: "Rate the forest. Kids pick what they want more of (more parks, more friends, more rest), and it shapes future plans." },
+      { n: 137, title: "Kid-built events", kind: "note", line: "Kid-built events. Kids create a family event, like \"movie night,\" which the parent sees and approves." },
+      { n: 138, title: "Kid's choice day", kind: "guide", line: "Kid's choice day. One day a month, one kid is the forest's guide and picks the plan." },
+      { n: 44, title: "Ask a question", kind: "note", line: "Ask a question. Kids tap a lantern and record \"what's this?\" for a parent to answer." },
+      { n: 45, title: "My own lantern", kind: "note", line: "My own lantern. Kids can add personal events like a friend's birthday or a project due, with parent approval." },
+      { n: 112, title: "Self-set reminders", kind: "wisp", line: "Self-set reminders. Older kids set their own wisp reminders." },
     ]},
     { id: "c8", phase: "C8", title: say("Far away", "Far lights", "Horizon"), ideas: [
-      { n: 35, title: "A far birthday light", kind: "far" },
-      { n: 46, title: "The turn of the season", kind: "season" },
-      { n: 92, title: "No far trip, or one", kind: "trip" },
-      { n: 93, title: "A long road", kind: "trip" },
-      { n: 94, title: "Coming home", kind: "welcome" },
-      { n: 95, title: "A year out", kind: "far" },
-      { n: 96, title: "School year", kind: "far" },
-      { n: 97, title: "Someday", kind: "far" },
-      { n: 100, title: "Far lighthouse", kind: "shores" },
-      { n: 119, title: "First day back", kind: "welcome" },
-      { n: 120, title: "A last day", kind: "far" },
-      { n: 121, title: "Solstice", kind: "astro" },
-      { n: 122, title: "Equinox", kind: "astro" },
-      { n: 123, title: "New moon", kind: "astro" },
-      { n: 124, title: "Full moon", kind: "astro" },
-      { n: 125, title: "Friday light", kind: "friday" },
-      { n: 128, title: "Place a marker", kind: "marker" },
-      { n: 133, title: "Growing", kind: "grow" },
-      { n: 147, title: "This month", kind: "month" },
-      { n: 148, title: "This season", kind: "season" },
-      { n: 149, title: "This school year", kind: "far" },
-      { n: 150, title: "Someday", kind: "far" }
+      { n: 35, title: "Birthday bloom", kind: "far", line: "Birthday bloom. Their birthday is a giant flower visible from weeks away that grows as it nears." },
+      { n: 46, title: "Planner rank by age", kind: "far", line: "Planner rank by age. Kids unlock features with age (scout, ranger, navigator), never by performance." },
+      { n: 95, title: "Growth rings", kind: "grow", line: "Growth rings. Every birthday adds a ring to their tree." },
+      { n: 119, title: "First light of the year", kind: "welcome", line: "First light of the year. The new year is a lantern on the far path." },
+      { n: 120, title: "A last day", kind: "far", line: "A last day. The end of a season gets one quiet lantern, then the path continues." },
+      { n: 121, title: "The long solstice", kind: "astro", line: "The long solstice. The longest and shortest days are marked as sky facts, gently." },
+      { n: 122, title: "The even day", kind: "astro", line: "The even day. Equinox is a day when light and dark share the path." },
+      { n: 123, title: "A thin moon", kind: "astro", line: "A thin moon. New moon is a small mark in the night sky." },
+      { n: 124, title: "A full moon", kind: "astro", line: "A full moon. Full moon is a bright mark, only to notice." },
+      { n: 125, title: "A year-end light", kind: "friday", line: "A year-end light. The last stretch of a season holds a lantern for looking back." },
+      { n: 128, title: "A marker", kind: "marker", line: "A marker. A kid can place one stone on a far day. It is a reminder, not a deadline." },
+      { n: 133, title: "Growing", kind: "grow", line: "Growing. Getting older only changes how much of the forest you can see." },
+      { n: 92, title: "Dream tree", kind: "far", line: "Dream tree. Far-off wishes hang on a tree, and a parent can turn one into a real plan." },
+      { n: 93, title: "Time capsule", kind: "note", line: "Time capsule. A yearly message to their future self, opened on the same day next year." },
+      { n: 94, title: "Summer island", kind: "trip", line: "Summer island. Summer is an island on the map all year that gets closer, and the kids help plan it." },
+      { n: 96, title: "Horizon view", kind: "far", line: "Horizon view. Ainsley sees high school, driving and college as far mountains." },
+      { n: 97, title: "Experience goals", kind: "far", line: "Experience goals. Kids plan toward experiences, like a special day with Dad, and see the path there." },
+      { n: 147, title: "Letters to graduation", kind: "note", line: "Letters to graduation. Each year Dad and the kids write a short letter sealed until their graduation year (Ainsley ~2031, Hayes ~2036, Harris ~2038)." },
+      { n: 148, title: "Family constitution", kind: "chapter", line: "Family constitution. The family's values grow as a tree the kids help write over the years." },
+      { n: 149, title: "The forest grows", kind: "grow", line: "The forest grows with them. By their teens the forest matures from a magical glade into a sleeker world." },
+      { n: 150, title: "Hand-me-down world", kind: "far", line: "Hand-me-down world. One day each kid can export their forest and memories to keep as adults." },
+      { n: 100, title: "Legacy grove", kind: "far", line: "Legacy grove. Every school year becomes a tree, so by graduation they walk through their whole childhood." },
     ]},
     { id: "c9", phase: "C9", title: say("More woods", "More woods", "The rest"), ideas: [
-      { n: 6, title: "Yesterday's echo", kind: "echo" },
-      { n: 8, title: "A leaving bell", kind: "wisp" },
-      { n: 24, title: "A question", kind: "note" },
-      { n: 26, title: "A soft no", kind: "rest" },
-      { n: 29, title: "See", kind: "sense" },
-      { n: 30, title: "Hear", kind: "sense" },
-      { n: 31, title: "Touch", kind: "stone" },
-      { n: 32, title: "Smell", kind: "sense" },
-      { n: 33, title: "Taste", kind: "sense" },
-      { n: 36, title: "Week map", kind: "scout" },
-      { n: 37, title: "Night sky", kind: "astro" },
-      { n: 38, title: "Sunrise", kind: "sky" },
-      { n: 39, title: "Kitchen light", kind: "lantern" },
-      { n: 40, title: "Porch", kind: "lantern" },
-      { n: 50, title: "Soft landing", kind: "glade" },
-      { n: 63, title: "Two times", kind: "twoclock" },
-      { n: 71, title: "Weather on the trees", kind: "season" },
-      { n: 76, title: "Strings, no words", kind: "strings" },
-      { n: 78, title: "A drawing", kind: "draw" },
-      { n: 79, title: "A color", kind: "color" },
-      { n: 80, title: "A smell-word", kind: "note" },
-      { n: 83, title: "Far thunder", kind: "rain" },
-      { n: 84, title: "Lake at dusk", kind: "lake" },
-      { n: 86, title: "House lights", kind: "stub-lights" },
-      { n: 87, title: "The long road", kind: "trip" },
-      { n: 88, title: "A bridge", kind: "bridge" },
-      { n: 89, title: "Cabin", kind: "lantern" },
-      { n: 90, title: "String lights", kind: "strings" },
-      { n: 91, title: "A line", kind: "note" },
-      { n: 98, title: "The woods keep it", kind: "sleep" },
-      { n: 103, title: "Soft sand", kind: "sand" },
-      { n: 106, title: "What faded", kind: "echo" },
-      { n: 110, title: "A nudge, not an alarm", kind: "wisp" },
-      { n: 111, title: "The path goes on", kind: "scout" },
-      { n: 114, title: "A voice, later", kind: "stub-voice" },
-      { n: 131, title: "An empty frame", kind: "frame" },
-      { n: 143, title: "One more breath", kind: "breath" },
-      { n: 144, title: "One more stone", kind: "stone" },
-      { n: 145, title: "One more light", kind: "lantern" },
-      { n: 146, title: "One more quiet", kind: "quiet" }
-    ]}
+      { n: 6, title: "Vine countdown", kind: "scout", line: "The countdown is a vine growing toward a big event (a game, a birthday, the trip home), one leaf per day." },
+      { n: 8, title: "School river", kind: "scout", line: "School days are a river crossing with stepping stones. Weekends are open meadow." },
+      { n: 24, title: "A question left", kind: "note", line: "A question left on a lantern. It waits for a parent, with no timer." },
+      { n: 26, title: "A soft no", kind: "rest", line: "A soft no. Skipping an optional thing leaves the forest the same." },
+      { n: 29, title: "See", kind: "sense", line: "See. Notice one color in today's clearing." },
+      { n: 30, title: "Hear", kind: "sense", line: "Hear. Notice one sound the day already has." },
+      { n: 31, title: "Touch", kind: "stone", line: "Touch. A stone in the path you can hold for a moment." },
+      { n: 32, title: "Smell", kind: "sense", line: "Smell. A season line, like leaves or rain." },
+      { n: 33, title: "Taste", kind: "sense", line: "Taste. A meal on the day can be named, or left unnamed." },
+      { n: 36, title: "Holiday creatures", kind: "season", line: "Holiday creatures. Special spirits appear near holidays and school breaks." },
+      { n: 37, title: "Game day face", kind: "color", line: "Game day face. Their creature wears team colors on game days." },
+      { n: 38, title: "Trip portals", kind: "trip", line: "Trip portals. Big trips appear as a glowing portal on the map, and the last day before is \"stepping through.\"" },
+      { n: 39, title: "Calm-week rain", kind: "rain", line: "Calm-week rain. Light weeks get a gentle rain that makes the forest lush, which teaches that quiet weeks are good too." },
+      { n: 40, title: "First-time lanterns", kind: "lantern", line: "First-time lanterns. New activities get a special golden lantern, so the unknown feels exciting, not scary." },
+      { n: 50, title: "Year path", kind: "year", line: "Year path. At year end, the whole year unrolls as one long glowing trail of memory crystals." },
+      { n: 63, title: "Family tree of time", kind: "table", line: "Family tree of time. Grandparents, cousins and Erin's side are branches that light up on visits." },
+      { n: 71, title: "Weather on the branches", kind: "season", line: "Weather on the branches. The forecast sits on a tree as a picture, with a one-line why nearby." },
+      { n: 76, title: "Strings, no words", kind: "strings", line: "Strings, no words. A hum with no lyrics, only a tone for the day." },
+      { n: 78, title: "A drawing", kind: "draw", line: "A drawing. A mark on a clear patch, kept only on Dad weeks." },
+      { n: 79, title: "A color", kind: "color", line: "A color. Pick a color for today. It changes nothing else." },
+      { n: 80, title: "A smell-word", kind: "note", line: "A smell-word. One word for the air, if you want it." },
+      { n: 83, title: "Haptic pulse", kind: "wisp", line: "Haptic pulse. The next event pulses softly on a phone or tablet." },
+      { n: 84, title: "Season lines", kind: "season", line: "Season lines. Short lines like \"smells like fall leaves\" make each season feel real." },
+      { n: 86, title: "Room light", kind: "stub-lights", line: "Room light. A kid's real room light glows their color 10 minutes before leave time (stub until backend + Alfred check)." },
+      { n: 87, title: "Friend spirits", kind: "table", line: "Friend spirits. Playdates show the friend's own spirit visiting." },
+      { n: 88, title: "Team spirits", kind: "table", line: "Team spirits. Each team or class has a group spirit on practice and game days." },
+      { n: 89, title: "Kindness echoes", kind: "echo", line: "Kindness echoes. A parent drops an echo through the forest when a kid helps someone." },
+      { n: 90, title: "Co-op adventures", kind: "siblings", line: "Co-op adventures. Events with cousins or friends become quests both creatures go on." },
+      { n: 91, title: "Invite crafting", kind: "draw", line: "Invite crafting. Kids design glowing invites for their own sleepovers and birthdays." },
+      { n: 98, title: "Treehouse", kind: "lantern", line: "Treehouse. Each kid's home base, decorated with memories from past events." },
+      { n: 103, title: "Day shape", kind: "scout", line: "Day shape. Each day shows as a shape (a hill for busy mornings, a valley for quiet evenings)." },
+      { n: 106, title: "Time travel tap", kind: "echo", line: "Time travel tap. Swipe back for last week's memories, forward for the fog of next week." },
+      { n: 110, title: "Forgot-it rescue", kind: "wisp", line: "Forgot-it rescue. If gear gets left behind, the creature helps make a \"next time\" pack note, with no blame." },
+      { n: 111, title: "Plan vs. real", kind: "chapter", line: "Plan vs. real. At night the creature shows what was planned and what actually happened; changes are just part of the story." },
+      { n: 114, title: "Dad's voice drops", kind: "stub-voice", line: "Dad's voice drops. Dad records short voice notes that attach to their lanterns, like \"good luck at swim\" (stub until backend)." },
+      { n: 131, title: "An empty frame", kind: "frame", line: "An empty frame. A picture can be added later. None is invented." },
+      { n: 143, title: "Math in the map", kind: "scout", line: "Math in the map. \"How many sleeps until?\" puzzles for Harris and Hayes, optional and playful." },
+      { n: 144, title: "Reading the week", kind: "sense", line: "Reading the week. Harris's creature points at words on lanterns, so the calendar helps him read." },
+      { n: 145, title: "Geography trips", kind: "trip", line: "Geography trips. Trips show the real map path, like KC to Nashville, with landmarks along the way." },
+      { n: 146, title: "Weather science", kind: "sky", line: "Weather science. Real forecasts come with a one-line \"why\" from the creature." },
+    ]},
   ];
-
   function ideaScene(idea, from) {
     var kind = idea.kind;
-    var html = "<p></p>";
+    var html = "";
     var mount = null;
     if (kind === "pack") {
       html = "<p>Tap what goes in the bag.</p><div class='cw-ideas'></div>";
@@ -579,6 +585,7 @@
     } else {
       html = "<p>A quiet place on the path.</p>";
     }
+    if (idea.line) html = "<p>" + idea.line + "</p>" + html;
     open({
       from: from,
       kicker: "idea " + idea.n,
@@ -612,13 +619,13 @@
   }
 
   function shell() {
-    var host = document.querySelector("#sec-days, .sec-schedule");
+    var host = document.querySelector("#kw-cal") || document.querySelector("#sec-days, .sec-schedule");
     if (!host || host.querySelector("[data-cw]")) return host && host.querySelector("[data-cw]");
     var el = document.createElement("div");
     el.className = "cw";
     el.setAttribute("data-cw", "1");
     el.innerHTML =
-      '<div class="cw-brief" data-cw-brief></div>' +
+      '<button type="button" class="cw-brief" data-cw-brief></button>' +
       '<div class="cw-row"><canvas class="cw-ring" data-cw-ring width="168" height="168" aria-hidden="true"></canvas>' +
       '<button type="button" class="cw-next" data-cw-next><strong>Next</strong><div data-cw-next-copy></div></button></div>' +
       '<button type="button" class="cw-phase" data-cw-wisp hidden></button>' +
@@ -627,13 +634,22 @@
     var hdr = host.querySelector(".sec-hdr");
     if (hdr && hdr.nextSibling) host.insertBefore(el, hdr.nextSibling);
     else host.insertBefore(el, host.firstChild);
+    el.querySelector("[data-cw-brief]").addEventListener("click", function (ev) {
+      open({
+        from: ev.currentTarget,
+        kicker: "morning",
+        title: "Got it",
+        html: "<p>Morning briefing. Their creature yawns, stretches and shows today's 3 lanterns. One tap says \"got it.\"</p>",
+        paint: global.KidWorld && KidWorld.vignette("glow")
+      });
+    });
     el.querySelector("[data-cw-next]").addEventListener("click", function (ev) {
       var n = nextText();
       open({
         from: ev.currentTarget,
         kicker: "what's next",
         title: n.title || "Next",
-        html: "<p>" + (n.when || "") + "</p><p>" + sleeps(0) + " stays clear. Later stays soft.</p>",
+        html: "<p>What's next. An orb shows the next thing on the path, and later days stay in fog.</p><p>No-surprise glow. Anything new or changed glows the day before, so nobody gets blindsided.</p><p>" + (n.when || "") + "</p><p>" + (n.title || "") + "</p>",
         paint: global.KidWorld && KidWorld.vignette("glow")
       });
     });
@@ -641,8 +657,8 @@
       open({
         from: ev.currentTarget,
         kicker: "leave-by",
-        title: "The leaving light",
-        html: "<p>" + routineText() + "</p>",
+        title: "Leave-by spirit",
+        html: "<p>Leave-by spirit. A little wisp appears 15 minutes before leave time.</p><p>" + routineText() + "</p><p>Transition warnings. A gentle 10-, 5- and 1-minute glow before switching activities.</p>",
         paint: global.KidWorld && KidWorld.vignette("glow")
       });
     });
@@ -651,6 +667,7 @@
       var b = document.createElement("button");
       b.type = "button";
       b.className = "cw-phase";
+      if (p.id === "c6" || p.id === "c7" || p.id === "c8" || p.id === "c9") b.setAttribute("data-late", "1");
       b.textContent = p.title;
       b.addEventListener("click", function () { openPhase(p, b); });
       box.appendChild(b);
