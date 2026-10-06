@@ -1,4 +1,4 @@
-/* House Face · ORIHOME5 · mount the living world and fly into a scene on every board tap.
+/* House Face · ORIHOME6 · mount the living world and fly into a scene on every board tap.
    Original code. The forest is ori/ori-scene.js (painted plates + motes). No Ori assets.
    HouseSfx owns the tap. This file adds the level-enter whoosh on the same mixer, so mute still wins.
    A key-less screen is left alone: no key modal from here. */
@@ -467,17 +467,19 @@
     whoosh();
     ripple(x, y);
     if (el) el.classList.add("ori-portal-hot");
-    if (REDUCED || !world || !world.exit) { location.href = url; return; }
+    var gone = false;
+    function go() { if (gone) return; gone = true; location.href = url; }
+    if (REDUCED) { go(); return; }
     document.documentElement.classList.add("ori-diving");
     var iris = document.createElement("div");
     iris.className = "ori-iris";
     iris.style.setProperty("--x", x + "px");
     iris.style.setProperty("--y", y + "px");
     document.body.appendChild(iris);
-    try { world.camPush(1.26, 0.6, x / Math.max(1, innerWidth), y / Math.max(1, innerHeight), 0.25); } catch (e) {}
-    var gone = false;
-    function go() { if (gone) return; gone = true; location.href = url; }
-    try { world.exit({ to: [x, y], dur: 0.6 }).then(go); } catch (e) {}
+    if (world && world.exit) {
+      try { world.camPush(1.26, 0.6, x / Math.max(1, innerWidth), y / Math.max(1, innerHeight), 0.25); } catch (e) {}
+      try { world.exit({ to: [x, y], dur: 0.6 }).then(go); } catch (e) {}
+    }
     setTimeout(go, 680);
   }
 
