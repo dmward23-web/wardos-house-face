@@ -59,7 +59,7 @@
       var cadence = q.getAttribute("data-cadence") || "daily";
       var btn = cadence === "daily" ? q.querySelector('.day-tap[data-day-iso="' + iso + '"]') : q.querySelector("[data-check]");
       if (!btn) return;
-      out.push({ label: label.slice(0, 32), done: btn.classList.contains("done"), btn: btn });
+      out.push({ label: label.slice(0, 18), done: btn.classList.contains("done"), btn: btn });
     });
     return out.slice(0, 9);
   }
@@ -71,9 +71,9 @@
       var c = i % cols;
       var r = Math.floor(i / cols);
       var rows = Math.ceil(n / cols);
-      q.x = W * (cols === 2 ? 0.28 + c * 0.44 : 0.2 + c * 0.3);
-      q.y = H * (0.4 + r * (0.42 / Math.max(1, rows)));
-      q.r = 46;
+      q.x = W * (cols === 2 ? 0.3 + c * 0.4 : 0.22 + c * 0.28);
+      q.y = H * (0.3 + r * (0.36 / Math.max(1, rows)));
+      q.r = 58;
     });
     return list;
   }
@@ -190,7 +190,7 @@
     fog(ctx, W, H, t, H * 0.7, "rgba(180, 230, 220, 0.08)");
     /* must islands */
     quests.forEach(function (q, i) {
-      island(ctx, q.x + px * 0.15, q.y, 0.85, i, q.done, t);
+      island(ctx, q.x + px * 0.15, q.y, 1.15, i, q.done, t);
       label(ctx, q.x, q.y + 28, q.label, q.done);
       if (q.done) {
         ctx.fillStyle = "rgba(255, 220, 140, 0.9)";
@@ -220,12 +220,12 @@
     ctx.save();
     ctx.translate(x, y);
     ctx.fillStyle = "rgba(8, 30, 44, 0.9)";
-    ctx.beginPath(); ctx.ellipse(0, 16 * s, 70 * s, 18 * s, 0, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, 18 * s, 78 * s, 22 * s, 0, 0, 7); ctx.fill();
     var top = ctx.createLinearGradient(0, -10 * s, 0, 16 * s);
     top.addColorStop(0, lit ? "#7dffa8" : (i % 2 ? "#2f8f62" : "#3aa37a"));
     top.addColorStop(1, lit ? "#1d6b40" : "#1a5a38");
     ctx.fillStyle = top;
-    ctx.beginPath(); ctx.ellipse(0, 6 * s, 58 * s, 14 * s, 0, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, 4 * s, 64 * s, 16 * s, 0, 0, 7); ctx.fill();
     ctx.strokeStyle = "rgba(30, 50, 30, 0.8)";
     ctx.lineWidth = 2;
     var sway = Math.sin(t * 1.3 + i) * 3 * s;
@@ -306,7 +306,7 @@
   }
 
   function ore(ctx, x, y, done, i, t, night) {
-    var s = 22;
+    var s = 30;
     ctx.fillStyle = night ? "#2a241c" : "#6a5438";
     ctx.fillRect(x - s, y - s * 0.2, s * 2, s);
     ctx.fillStyle = "rgba(255,255,255,0.16)";
@@ -451,7 +451,7 @@
     ctx.fillStyle = "#2a1a14";
     ctx.fillRect(x - 2, y, 4, 26);
     ctx.fillStyle = lit ? "rgba(255, 196, 120, 0.95)" : "rgba(80, 60, 50, 0.8)";
-    ctx.fillRect(x - 8, y - 16, 16, 16);
+    ctx.fillRect(x - 11, y - 22, 22, 22);
     if (lit) {
       var g = ctx.createRadialGradient(x, y - 8, 2, x, y - 8, 28 + Math.sin(t * 3 + i) * 3);
       g.addColorStop(0, "rgba(255, 220, 160, 0.7)");
@@ -478,13 +478,18 @@
   }
 
   function label(ctx, x, y, text, done) {
-    ctx.font = "700 12px Palatino, Georgia, serif";
+    ctx.save();
+    ctx.font = "700 16px Palatino, Georgia, serif";
     ctx.textAlign = "center";
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "rgba(0,0,0,0.55)";
-    ctx.strokeText(text, x, y);
+    ctx.textBaseline = "middle";
+    var w = Math.min(150, ctx.measureText(text).width + 18);
+    ctx.fillStyle = "rgba(4, 12, 18, 0.62)";
+    ctx.beginPath();
+    ctx.roundRect(x - w / 2, y - 13, w, 26, 13);
+    ctx.fill();
     ctx.fillStyle = done ? "#e9fff0" : "#f4fbff";
     ctx.fillText(text, x, y);
+    ctx.restore();
   }
 
   function warmth(ctx, W, H, fill) {
