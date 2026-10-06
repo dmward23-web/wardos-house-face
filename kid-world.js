@@ -137,33 +137,58 @@
     ctx.globalAlpha = 1;
   }
 
-  var plates = { hayes: {}, forest: {} };
+  var plates = {};
   var platesReady = false;
   var feed = null;
 
   function loadImg(src) {
     return new Promise(function (res) {
+      if (!src) { res(null); return; }
       var im = new Image();
       im.onload = function () { res(im); };
       im.onerror = function () { res(null); };
       im.src = src;
     });
   }
+  function loadFirst(urls) {
+    var i = 0;
+    function next() {
+      if (i >= urls.length) return Promise.resolve(null);
+      var src = urls[i++];
+      return loadImg(src).then(function (im) { return im || next(); });
+    }
+    return next();
+  }
+  function orientFor(w, h) {
+    return w > h * 1.15 ? "landscape" : "portrait";
+  }
   function loadPlates() {
-    var list = [
-      ["hayes", "sky", "art/hayes/sky.jpg"],
-      ["hayes", "far", "art/hayes/far.png"],
-      ["hayes", "mid", "art/hayes/mid.png"],
-      ["hayes", "near", "art/hayes/near.png"],
-      ["hayes", "fg", "art/hayes/fg.png"],
-      ["forest", "rays", "art/forest/rays.jpg"],
-      ["forest", "near", "art/forest/near.png"],
-      ["forest", "fg", "art/forest/fg.png"],
-      ["forest", "island", "art/forest/island.png"]
-    ];
-    return Promise.all(list.map(function (row) {
-      return loadImg(row[2]).then(function (im) { plates[row[0]][row[1]] = im; });
-    })).then(function () { platesReady = true; });
+    var book = global.HousePlates || {};
+    var worlds = ["hayes", "harris", "ainsley"];
+    var jobs = [];
+    worlds.forEach(function (world) {
+      var man = book[world];
+      if (!man) return;
+      plates[world] = plates[world] || {};
+      (man.layers || []).forEach(function (layer) {
+        var urls = book.urlFor ? book.urlFor(world, layer.id, "portrait", layer.standin) : [layer.standin];
+        jobs.push(loadFirst(urls).then(function (im) { plates[world][layer.id] = im; }));
+      });
+      if (man.stamp) {
+        var stampUrls = book.urlFor ? book.urlFor(world, "mid", "portrait", man.stamp) : [man.stamp];
+        jobs.push(loadFirst(stampUrls).then(function (im) { plates[world].stamp = im; }));
+      }
+      plates[world].bits = [];
+      (man.stamps || []).forEach(function (st, i) {
+        var urls = [
+          (book.root || "") + "/" + world + "/portrait/" + st.id + ".png",
+          (book.root || "") + "/" + world + "/" + st.id + ".png"
+        ];
+        jobs.push(loadFirst(urls).then(function (im) { plates[world].bits[i] = im; }));
+      });
+      if (man.rays) jobs.push(loadImg(man.rays).then(function (im) { plates[world].rays = im; }));
+    });
+    return Promise.all(jobs).then(function () { platesReady = true; });
   }
   function drawPlate(ctx, img, W, H, ox, oy, zoom, alpha, blur) {
     if (!img) return;
@@ -198,28 +223,45 @@
     if (cur) lines.push(cur);
     return lines;
   }
-  function layoutHayes(quests, W, H) {
-    /* One short label per slot. Slots stay apart at 440px. Full text is the tap card. */
+  function ledgeFor(world, i, n) {
+    var man = (global.HousePlates && HousePlates[world]) || {};
+    var list = man.landmarks || [];
+    if (list[i]) return list[i];
+    var col = i % 2;
+    var row = Math.floor(i / 2);
+    var rows = Math.max(1, Math.ceil(n / 2));
+    var top = 0.22;
+    var bot = Math.min(0.64, 0.22 + (rows - 1) * 0.08);
+    var y = rows <= 1 ? 0.4 : top + row * ((bot - top) / Math.max(1, rows - 1));
+    if (col) y = Math.min(0.64, y + 0.03);
+    return { x: col ? 0.76 : 0.24, y: y, depth: 0.2 + i * 0.05, scale: 0.75 + (i % 3) * 0.08 };
+  }
+  function layoutLedges(quests, W, H, world, px) {
     var n = quests.length;
-    var cols = W < 380 ? 1 : 2;
-    var rows = Math.ceil(n / cols);
-    var top = Math.max(112, H * 0.15);
-    var bot = H - 500;
-    if (bot - top < rows * 48) bot = top + rows * 48;
-    var span = Math.max(1, bot - top);
-    var xs = cols === 1 ? [W * 0.5] : [W * 0.28, W * 0.72];
+    var chipLift = 22;
+    var creatureTop = H - 250;
     quests.forEach(function (q, i) {
-      var c = cols === 1 ? 0 : i % 2;
-      var r = cols === 1 ? i : Math.floor(i / 2);
-      q.x = xs[c];
-      q.y = rows <= 1 ? (top + bot) / 2 : top + (rows === 1 ? 0 : r * (span / (rows - 1)));
+      var ledge = ledgeFor(world, i, n);
+      var depth = ledge.depth || 0.3;
+      q.depth = depth;
+      q.x = ledge.x * W + (px || 0) * depth;
+      q.seat = ledge.y * H;
+      q.scale = ledge.scale || 0.8;
       q.chip = shortLabel(q.label);
-      q.maxW = cols === 1 ? W - 36 : Math.min(176, (W / cols) - 18);
+      q.maxW = Math.min(156, W * 0.38);
       q.hw = q.maxW;
-      q.hh = 40;
-      q.r = 28;
+      q.hh = 36;
+      q.r = 26;
+      q.y = q.seat - chipLift;
+      if (q.y > creatureTop - 8) q.y = creatureTop - 8;
+      if (q.y < 168) q.y = 168;
     });
-    separateChips(quests, 16, top - 8, W - 16, bot + 24);
+    separateChips(quests, 12, 160, W - 12, creatureTop);
+    quests.forEach(function (q) {
+      q.chipY = q.y;
+      q.seat = q.y + chipLift;
+      q.ledY = q.seat;
+    });
   }
   function separateChips(quests, minX, minY, maxX, maxY) {
     var pass, i, j, a, b, dx, dy, needX, needY, push, s;
@@ -291,7 +333,7 @@
       lines = wrapLines(ctx, text, maxW - 20);
     }
     var h = lines.length * (size + 5) + 16;
-    var y = H - 455;
+    var y = 70;
     ctx.fillStyle = "rgba(6, 12, 18, 0.96)";
     ctx.beginPath();
     ctx.roundRect(14, y, W - 28, h, 12);
@@ -328,67 +370,196 @@
     }
   }
 
-  function paintHayes(ctx, W, H, t, px, quests, fill) {
-    var P = plates.hayes;
-    var F = plates.forest;
-    if (P.sky) {
-      drawPlate(ctx, P.sky, W, H, px * 0.05 + Math.sin(t * 0.12) * 10, Math.sin(t * 0.08) * 8, 1.06, 1, 0);
-    } else {
-      sky(ctx, W, H, [[0, "#1a120c"], [0.45, "#c47a3a"], [1, "#6a9ec4"]]);
-    }
-    if (F.rays) {
-      ctx.save();
-      ctx.globalCompositeOperation = "screen";
-      drawPlate(ctx, F.rays, W, H, px * 0.12 + Math.sin(t * 0.18) * 24, -H * 0.04, 1.15, 0.22, 0);
-      ctx.restore();
-      ctx.save();
-      ctx.globalCompositeOperation = "screen";
-      drawPlate(ctx, F.rays, W, H, px * 0.2 + Math.sin(t * 0.11) * 16, 0, 1.25, 0.16, 14);
-      ctx.restore();
-    }
-    shafts(ctx, W, H, t, "rgba(255, 214, 150, 0.045)");
-    drawPlate(ctx, P.far, W, H, px * 0.22 + Math.sin(t * 0.16) * 12, -H * 0.06, 1.04, 1, 0);
-    drawPlate(ctx, P.mid, W, H, px * 0.38, H * 0.02, 1.02, 1, 0);
-    drawPlate(ctx, P.near, W, H, px * 0.58, H * 0.06, 1.04, 1, 0);
-    var fogG = ctx.createLinearGradient(0, H * 0.42, 0, H);
-    fogG.addColorStop(0, "rgba(18, 16, 20, 0)");
-    fogG.addColorStop(0.7, "rgba(16, 18, 22, 0.18)");
-    fogG.addColorStop(1, "rgba(8, 12, 16, 0.55)");
-    ctx.fillStyle = fogG;
-    ctx.fillRect(0, H * 0.42, W, H * 0.58);
-    motes(ctx, W, H, t, px, "#fff1d0", 36);
-    layoutHayes(quests, W, H);
-    quests.forEach(function (q) {
-      var glow = ctx.createRadialGradient(q.x, q.y - 18, 2, q.x, q.y - 10, q.done ? 34 : 22);
-      glow.addColorStop(0, q.done ? "rgba(255, 210, 120, 0.9)" : "rgba(255, 236, 190, 0.55)");
-      glow.addColorStop(1, "rgba(255,255,255,0)");
+  function stormRing(ctx, W, H, t) {
+    var y = H * 0.40 + Math.sin(t * 0.07) * 4;
+    var rx = W * 0.62;
+    ctx.save();
+    ctx.translate(W * 0.5, y);
+    ctx.fillStyle = "rgba(12, 16, 28, 0.42)";
+    ctx.beginPath();
+    ctx.ellipse(0, 10, rx * 1.05, 28, 0, 0, 7);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 206, 140, 0.92)";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, rx, 16, 0, 0, 7);
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(150, 186, 255, 0.55)";
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.ellipse(0, 3, rx * 1.08, 24, 0, 0, 7);
+    ctx.stroke();
+    ctx.globalCompositeOperation = "screen";
+    var g = ctx.createRadialGradient(0, 0, rx * 0.45, 0, 0, rx);
+    g.addColorStop(0, "rgba(0,0,0,0)");
+    g.addColorStop(0.72, "rgba(255, 196, 120, 0)");
+    g.addColorStop(0.84, "rgba(255, 220, 160, 0.55)");
+    g.addColorStop(1, "rgba(120, 160, 255, 0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, rx, 22, 0, 0, 7);
+    ctx.fill();
+    ctx.restore();
+  }
+  function drawIsland(ctx, img, crop, q) {
+    if (!img) return;
+    var nx = crop && crop.nx != null ? crop.nx : 0;
+    var ny = crop && crop.ny != null ? crop.ny : 0;
+    var nw = crop && crop.nw != null ? crop.nw : 1;
+    var nh = crop && crop.nh != null ? crop.nh : 1;
+    var ledge = crop && crop.ledge != null ? crop.ledge : 0.28;
+    var sw = Math.max(1, img.width * nw);
+    var sh = Math.max(1, img.height * nh);
+    var sx = clamp(nx * img.width, 0, Math.max(0, img.width - sw));
+    var sy = clamp(ny * img.height, 0, Math.max(0, img.height - sh));
+    var iw = Math.min(q.maxW ? q.maxW + 36 : 190, 112 + 78 * (q.scale || 0.8));
+    var ih = iw * (sh / sw);
+    var top = q.seat - ih * ledge;
+    ctx.save();
+    ctx.globalAlpha = 0.78 + Math.min(0.22, (q.scale || 0.8) * 0.22);
+    ctx.drawImage(img, sx, sy, sw, sh, q.x - iw / 2, top, iw, ih);
+    ctx.restore();
+    q.ledY = q.seat;
+  }
+  function drawChest(ctx, q, open, t) {
+    ctx.save();
+    ctx.translate(q.x, q.seat - 2);
+    var pop = open ? 1 + Math.sin(t * 3) * 0.045 : 1;
+    ctx.scale(pop, pop);
+    if (open) {
+      var glow = ctx.createRadialGradient(0, -6, 2, 0, -4, 64);
+      glow.addColorStop(0, "rgba(255, 244, 210, 0.95)");
+      glow.addColorStop(0.35, "rgba(255, 186, 80, 0.72)");
+      glow.addColorStop(1, "rgba(255, 140, 40, 0)");
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(q.x, q.y - 8, q.done ? 34 : 22, 0, 7);
+      ctx.arc(0, -6, 64, 0, 7);
       ctx.fill();
-      drawChip(ctx, q);
+    } else {
+      var rest = ctx.createRadialGradient(0, 0, 2, 0, 0, 28);
+      rest.addColorStop(0, "rgba(255, 220, 160, 0.28)");
+      rest.addColorStop(1, "rgba(255, 220, 160, 0)");
+      ctx.fillStyle = rest;
+      ctx.beginPath();
+      ctx.arc(0, 0, 28, 0, 7);
+      ctx.fill();
+    }
+    ctx.fillStyle = open ? "#8a5a28" : "#4a3018";
+    ctx.fillRect(-13, -2, 26, 16);
+    ctx.save();
+    ctx.translate(0, -2);
+    ctx.rotate(open ? -0.85 : -0.04);
+    ctx.fillStyle = open ? "#ffe1a4" : "#c4924a";
+    ctx.fillRect(-14, -9, 28, 10);
+    ctx.restore();
+    ctx.fillStyle = open ? "#fff6d4" : "#e7c27a";
+    ctx.fillRect(-3, 2, 6, 5);
+    ctx.restore();
+  }
+  function paintKid(ctx, W, H, t, px, quests, fill, world) {
+    var man = (global.HousePlates && HousePlates[world]) || HousePlates.hayes;
+    var P = plates[world] || {};
+    var layers = man.layers || [];
+    if (!P.sky) sky(ctx, W, H, [[0, "#102028"], [0.5, "#3a6a55"], [1, "#142018"]]);
+    var stampIsMid = man.stamp && layers.some(function (layer) { return layer.id === "mid" && layer.standin === man.stamp; });
+    layers.forEach(function (layer) {
+      if (layer.id === "fg" || layer.id === "near") return;
+      if (layer.id === "mid" && stampIsMid) return;
+      var drift = Math.sin(t * 0.12 + layer.parallax) * 8;
+      drawPlate(ctx, P[layer.id], W, H, px * layer.parallax + drift, Math.sin(t * 0.08) * 4, 1.04, layer.id === "mid" ? 0.88 : 1, 0);
     });
-    /* Painted forest only as the ground the creature stands in. */
+    if (P.rays) {
+      ctx.save();
+      ctx.globalCompositeOperation = "screen";
+      drawPlate(ctx, P.rays, W, H, px * 0.1 + Math.sin(t * 0.18) * 20, -H * 0.02, 1.12, world === "hayes" ? 0.26 : 0.16, 0);
+      ctx.restore();
+      ctx.save();
+      ctx.globalCompositeOperation = "screen";
+      drawPlate(ctx, P.rays, W, H, px * 0.16 + Math.sin(t * 0.1) * 12, 0, 1.2, 0.12, 16);
+      ctx.restore();
+    }
+    if (world === "hayes") stormRing(ctx, W, H, t);
+    else shafts(ctx, W, H, t, world === "ainsley" ? "rgba(255, 186, 140, 0.04)" : "rgba(210, 255, 200, 0.035)");
+    var fogG = ctx.createLinearGradient(0, H * 0.72, 0, H);
+    fogG.addColorStop(0, "rgba(10, 14, 16, 0)");
+    fogG.addColorStop(1, "rgba(8, 10, 12, 0.42)");
+    ctx.fillStyle = fogG;
+    ctx.fillRect(0, H * 0.72, W, H * 0.28);
+    motes(ctx, W, H, t, px, world === "ainsley" ? "#ffd8c0" : "#fff1d0", 32);
+    if (world === "harris") {
+      ctx.fillStyle = "rgba(30, 70, 40, 0.14)";
+      ctx.fillRect(0, 0, W, H);
+    } else if (world === "ainsley") {
+      var dusk = ctx.createLinearGradient(0, 0, 0, H);
+      dusk.addColorStop(0, "rgba(40, 16, 28, 0.18)");
+      dusk.addColorStop(0.55, "rgba(120, 50, 30, 0.08)");
+      dusk.addColorStop(1, "rgba(20, 10, 12, 0.28)");
+      ctx.fillStyle = dusk;
+      ctx.fillRect(0, 0, W, H);
+    }
+    var cap = (man.landmarks && man.landmarks.length) || quests.length;
+    var shown = quests.slice(0, cap);
+    layoutLedges(shown, W, H, world, px);
+    var stamps = man.stamps || [];
+    shown.forEach(function (q, i) {
+      var bit = (P.bits && P.bits[i % Math.max(1, stamps.length)]) || null;
+      var crop = stamps[i % Math.max(1, stamps.length)] || { nx: 0, ny: 0, nw: 1, nh: 1, ledge: 0.34 };
+      drawIsland(ctx, bit || P.stamp || P.mid, bit ? { nx: 0, ny: 0, nw: 1, nh: 1, ledge: crop.ledge || 0.34 } : crop, q);
+      var open = q.done || (feed && feed.index === i && t < feed.t0 + 2.4);
+      var glowY = q.seat - 8;
+      var restG = ctx.createRadialGradient(q.x, glowY, 2, q.x, glowY, 36);
+      restG.addColorStop(0, "rgba(255, 236, 200, 0.22)");
+      restG.addColorStop(1, "rgba(255, 236, 200, 0)");
+      ctx.fillStyle = restG;
+      ctx.beginPath();
+      ctx.arc(q.x, glowY, 36, 0, 7);
+      ctx.fill();
+      if (world === "hayes") drawChest(ctx, q, open, t);
+      else {
+        var col = world === "ainsley" ? "rgba(255, 186, 120, 0.95)" : "rgba(170, 255, 190, 0.9)";
+        var rad = open ? 48 : 20;
+        var g = ctx.createRadialGradient(q.x, q.seat - 6, 2, q.x, q.seat - 4, rad);
+        g.addColorStop(0, col);
+        g.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(q.x, q.seat - 4, rad, 0, 7);
+        ctx.fill();
+      }
+      var hold = q.y;
+      q.y = q.chipY != null ? q.chipY : q.seat - 36;
+      drawChip(ctx, q);
+      q.chipY = q.y;
+      q.y = hold;
+    });
     ctx.save();
     ctx.beginPath();
-    ctx.rect(0, H * 0.78, W, H * 0.22);
+    ctx.rect(0, H * 0.82, W, H * 0.18);
     ctx.clip();
-    drawPlate(ctx, F.near, W, H, px * 0.7, H * 0.42, 1.3, 1, 0);
-    drawPlate(ctx, F.fg, W, H, px * 0.9, H * 0.48, 1.35, 1, 2);
+    var fgLayer = null;
+    layers.forEach(function (layer) { if (layer.id === "fg") fgLayer = layer; });
+    drawPlate(ctx, P.near, W, H, px * 0.7, H * 0.28, 1.15, 0.9, 0);
+    if (fgLayer) drawPlate(ctx, P.fg, W, H, px * fgLayer.parallax, H * 0.34, 1.08, 0.85, fgLayer.blur || 2);
     ctx.restore();
-    var ground = ctx.createLinearGradient(0, H * 0.74, 0, H * 0.86);
-    ground.addColorStop(0, "rgba(8,12,16,0)");
-    ground.addColorStop(1, "rgba(8,12,16,0.2)");
-    ctx.fillStyle = ground;
-    ctx.fillRect(0, H * 0.74, W, H * 0.12);
-    drawPlate(ctx, P.fg, W, H, px * 0.95, H * 0.08, 1.08, 0.95, 3);
-    if (feed && quests[feed.index]) {
-      var fq = quests[feed.index];
-      feedDrops(ctx, t, feed.t0, fq.x, fq.y, W * 0.5, H - 168);
+    var jx = W * 0.5;
+    var jy = H - 78 - 98;
+    ctx.fillStyle = "rgba(0,0,0,0.45)";
+    ctx.beginPath();
+    ctx.ellipse(jx, jy + 86, 54, 10, 0, 0, 7);
+    ctx.fill();
+    ctx.fillStyle = "rgba(180, 190, 200, 0.16)";
+    ctx.beginPath();
+    ctx.ellipse(jx, jy + 96, 46, 8, 0, 0, 7);
+    ctx.fill();
+    if (feed && shown[feed.index]) {
+      var fq = shown[feed.index];
+      var fromY = fq.ledY != null ? fq.ledY : fq.y;
+      feedDrops(ctx, t, feed.t0, fq.x, fromY, jx, jy);
       if (t < feed.t0 + 4.2) fullCard(ctx, feed.label || fq.label, W, H);
-      burst(ctx, t, feed.t0, fq.x, fq.y, "#ffe7a8");
+      burst(ctx, t, feed.t0, fq.x, fromY, "#ffe7a8");
     }
     warmth(ctx, W, H, fill);
+    return shown;
   }
 
   function island(ctx, x, y, s, i, lit, t) {
@@ -677,11 +848,8 @@
   }
 
   function paintWorld(ctx, W, H, t, which, quests, fill, px) {
-    var list = placeQuests(quests || [], W, H);
-    if (which === "harris") paintHarris(ctx, W, H, t, px || 0, list, fill || 0);
-    else if (which === "ainsley") paintAinsley(ctx, W, H, t, px || 0, list, fill || 0);
-    else paintHayes(ctx, W, H, t, px || 0, list, fill || 0);
-    return list;
+    var world = which === "harris" || which === "ainsley" ? which : "hayes";
+    return paintKid(ctx, W, H, t, px || 0, quests || [], fill || 0, world) || [];
   }
 
   /* ---------- live canvas ---------- */
@@ -890,7 +1058,8 @@
       var q = bg.hits[i];
       var hw = (q.hw || q.r || 40) / 2 + 8;
       var hh = (q.hh || q.r || 28) / 2 + 8;
-      if (Math.abs(q.x - x) <= hw && Math.abs(q.y - y) <= hh) return q;
+      var cy = q.chipY != null ? q.chipY : q.y;
+      if (Math.abs(q.x - x) <= hw && Math.abs(cy - y) <= hh) return q;
     }
     return null;
   }
@@ -1051,7 +1220,25 @@
       if (host._jar.setEnv) host._jar.setEnv(canvas);
       host._jar.frame();
       if (host._jar.cv && host._jar.cv.width) {
-        ctx.drawImage(host._jar.cv, cssW * 0.5 - 120, cssH - 340, 240, 280);
+        var jw = 200;
+        var jh = 228;
+        var jx = cssW * 0.5 - jw / 2;
+        var jy = cssH - 78 - jh;
+        ctx.save();
+        ctx.translate(jx + jw / 2, jy + jh - 2);
+        ctx.scale(1, -0.16);
+        ctx.globalAlpha = 0.16;
+        ctx.drawImage(host._jar.cv, -jw / 2, 0, jw, jh);
+        ctx.restore();
+        ctx.fillStyle = "rgba(0,0,0,0.55)";
+        ctx.beginPath();
+        ctx.ellipse(jx + jw / 2, jy + jh - 2, jw * 0.36, 11, 0, 0, 7);
+        ctx.fill();
+        ctx.fillStyle = "rgba(186, 196, 208, 0.2)";
+        ctx.beginPath();
+        ctx.ellipse(jx + jw / 2, jy + jh + 6, jw * 0.28, 7, 0, 0, 7);
+        ctx.fill();
+        ctx.drawImage(host._jar.cv, jx, jy, jw, jh);
       }
     }
     ctx.textAlign = "left";
@@ -1074,6 +1261,9 @@
     reduced: function () { return reduced; },
     exportFrame: exportFrame,
     paintWorld: paintWorld,
-    platesReady: function () { return platesReady && !!(plates.hayes && plates.hayes.sky); }
+    platesReady: function () {
+      var id = (document.body && document.body.getAttribute("data-kid")) || "hayes";
+      return platesReady && !!(plates[id] && plates[id].sky);
+    }
   };
 })(window);
