@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 5 2026",
   "asOfIso": "2026-10-05",
-  "refreshedAt": "2026-10-05T23:57:48.845Z",
+  "refreshedAt": "2026-10-06T00:35:08.790Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -537,13 +537,6 @@
           "tone": "act"
         },
         {
-          "kind": "event",
-          "when": "Mon · 5:30",
-          "what": "⚾ Hayes baseball — Falcons vs KC Tigers (away)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
           "kind": "note",
           "when": "All day",
           "what": "🏡 At Mom's",
@@ -552,12 +545,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Mon 5 · leave 5:30",
-          "what": "Hayes baseball — Falcons vs KC Tigers (away)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Thu 8 · leave 6:00",
           "what": "Hayes flag practice",
@@ -911,11 +898,6 @@
           "tone": "act"
         },
         {
-          "when": "Mon 5 · 5:30",
-          "what": "Hayes baseball — Falcons vs KC Tigers (away)",
-          "tone": "hot"
-        },
-        {
           "when": "Tue 6 · 7:00",
           "what": "SRE spirit day: Tropical Day (Peace Week)",
           "tone": "act"
@@ -1023,6 +1005,11 @@
         {
           "when": "Sat 10 · 1:15",
           "what": "Hayes flag pickup",
+          "tone": "hot"
+        },
+        {
+          "when": "until Fri Oct 9 · 3:00",
+          "what": "Kids with Mom",
           "tone": "hot"
         }
       ]
