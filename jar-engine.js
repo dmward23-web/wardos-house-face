@@ -111,6 +111,94 @@
     }
   }
 
+  function lowTier() {
+    try {
+      if (/(?:\?|&)tier=low(?:&|$)/.test(location.search)) return true;
+      var ua = navigator.userAgent || "";
+      var phone = /iPhone|iPod|Android.+Mobile/i.test(ua);
+      if (!phone) return false;
+      if (navigator.deviceMemory && navigator.deviceMemory <= 2) return true;
+      if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2) return true;
+    } catch (e) {}
+    return false;
+  }
+
+  var VERT = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos,0.0,1.0);}";
+  var FRAG = [
+    "precision mediump float;",
+    "uniform vec2 uRes;uniform float uTime;uniform float uFill;uniform float uEnergy;",
+    "uniform float uPoke;uniform vec2 uLook;uniform vec3 uMetal;uniform float uAsleep;",
+    "uniform sampler2D uEnv;",
+    "float ball(vec2 p,vec2 c,float r){vec2 d=p-c;return (r*r)/max(dot(d,d),0.00035);}",
+    "float field(vec2 q){",
+    "  float t=uTime*(uAsleep>0.5?0.32:1.0);",
+    "  float grow=0.42+uFill*0.12+uEnergy*0.04;",
+    "  vec2 hip=vec2(sin(t*1.15)*0.045,-0.16+sin(t*1.55)*0.03);",
+    "  vec2 chest=vec2(sin(t*1.35)*0.035,0.05+sin(t*1.8)*0.028);",
+    "  vec2 head=vec2(sin(t*1.1)*0.025,0.30+sin(t*1.45)*0.02);",
+    "  float f=ball(q,hip,grow)+ball(q,chest,grow*0.82)+ball(q,head,grow*0.58);",
+    "  f+=ball(q,vec2(-0.18+sin(t*0.9)*0.03,-0.02),0.13);",
+    "  f+=ball(q,vec2(0.18+cos(t*0.85)*0.03,-0.06),0.12);",
+    "  float y0=mod(t*0.28,1.2)-0.82;",
+    "  float y1=mod(t*0.33+0.45,1.2)-0.82;",
+    "  float y2=mod(t*0.24+0.9,1.2)-0.82;",
+    "  f+=ball(q,vec2(sin(t*1.4)*0.2,min(y0,0.22)),0.055+uEnergy*0.012);",
+    "  f+=ball(q,vec2(sin(t*1.15+2.1)*0.18,min(y1,0.26)),0.046);",
+    "  f+=ball(q,vec2(cos(t*1.5+1.2)*0.16,min(y2,0.16)),0.04);",
+    "  f+=ball(q,vec2(uLook.x*0.06,0.12+uPoke*0.18),0.04+uPoke*0.12);",
+    "  return f;",
+    "}",
+    "void main(){",
+    "  vec2 q=(gl_FragCoord.xy/uRes)*2.0-1.0;",
+    "  q.x*=uRes.x/max(uRes.y,1.0);",
+    "  q.y=-q.y;",
+    "  q.x/=1.0+uPoke*0.16;",
+    "  q.y*=1.0-uPoke*0.2;",
+    "  float f=field(q);",
+    "  if(f<0.72) discard;",
+    "  vec2 e=vec2(0.007,0.0);",
+    "  float fx=field(q+e.xy)-field(q-e.xy);",
+    "  float fy=field(q+e.yx)-field(q-e.yx);",
+    "  vec3 N=normalize(vec3(-fx,-fy,0.42));",
+    "  float fres=pow(clamp(1.0-max(N.z,0.0),0.0,1.0),1.7);",
+    "  vec2 uv=clamp(vec2(0.5+N.x*0.45,0.58+N.y*0.32),0.02,0.98);",
+    "  vec3 env=texture2D(uEnv,uv).rgb;",
+    "  vec3 metal=uMetal/255.0;",
+    "  vec3 L=normalize(vec3(-0.32,0.72,0.58));",
+    "  float spec=pow(max(dot(reflect(-L,N),vec3(0.0,0.0,1.0)),0.0),46.0);",
+    "  float ndl=max(dot(N,L),0.0);",
+    "  vec3 base=mix(metal*0.2,metal,0.88);",
+    "  vec3 col=mix(base,env,0.24+fres*0.22);",
+    "  col+=metal*ndl*0.22;",
+    "  col+=vec3(1.0,0.99,0.95)*spec*1.35;",
+    "  col+=fres*vec3(0.92,0.97,1.0)*0.7;",
+    "  float edge=smoothstep(0.72,1.05,f);",
+    "  float shut=uAsleep>0.5?2.6:1.0;",
+    "  vec2 eyeL=vec2(-0.07,0.34)+uLook*0.02;",
+    "  vec2 eyeR=vec2(0.07,0.34)+uLook*0.02;",
+    "  float el=length((q-eyeL)*vec2(1.2,shut));",
+    "  float er=length((q-eyeR)*vec2(1.2,shut));",
+    "  float eyes=smoothstep(0.05,0.036,min(el,er))*edge;",
+    "  col=mix(col,vec3(0.94,0.97,0.98),eyes);",
+    "  float pupil=smoothstep(0.026,0.014,min(length(q-(eyeL+uLook*0.01)),length(q-(eyeR+uLook*0.01))))*eyes*(uAsleep>0.5?0.35:1.0);",
+    "  col=mix(col,vec3(0.03,0.07,0.1),pupil);",
+    "  float a=smoothstep(0.72,0.92,f);",
+    "  gl_FragColor=vec4(col,a);",
+    "}"
+  ].join("\n");
+
+  function compile(gl, type, src) {
+    var sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+      compile.err = gl.getShaderInfoLog(sh);
+      gl.deleteShader(sh);
+      return null;
+    }
+    return sh;
+  }
+
   function Jar(host, opts) {
     opts = opts || {};
     this.kid = kidIdOf(opts.kid);
@@ -122,8 +210,36 @@
     this.cv.className = "je-jar-cv";
     this.cv.setAttribute("role", "img");
     this.cv.setAttribute("aria-label", this.col.name + " jar");
+    this.gl = null;
+    this.useGL = false;
+    this.glReason = "";
+    this.envCv = document.createElement("canvas");
+    this.envCv.width = 256;
+    this.envCv.height = 256;
+    this.envCtx = this.envCv.getContext("2d", { alpha: false });
+    var glAttr = { alpha: true, premultipliedAlpha: false, antialias: false, preserveDrawingBuffer: true };
+    if (!lowTier()) {
+      try {
+        this.gl = this.cv.getContext("webgl", glAttr) || this.cv.getContext("experimental-webgl", glAttr);
+      } catch (eGl) {
+        this.gl = null;
+        this.glReason = String(eGl && eGl.message || eGl);
+      }
+      if (!this.gl && !this.glReason) this.glReason = "no-context";
+    } else this.glReason = "low-tier";
+    if (this.gl && this.initGL()) this.useGL = true;
+    else {
+      if (this.gl && !this.useGL) this.glReason = compile.err || this.linkErr || "shader";
+      this.gl = null;
+      this.cv = document.createElement("canvas");
+      this.cv.className = "je-jar-cv";
+      this.cv.setAttribute("role", "img");
+      this.cv.setAttribute("aria-label", this.col.name + " jar");
+      this.ctx = this.cv.getContext("2d", { alpha: true });
+      this.cssFallback = true;
+      host.classList.add("je-css");
+    }
     host.appendChild(this.cv);
-    this.ctx = this.cv.getContext("2d", { alpha: true });
     this.t0 = nowMs();
     this.look = { x: 0, y: 0 };
     this.bubbles = [];
@@ -155,13 +271,97 @@
     this.loop();
   }
 
+  Jar.prototype.initGL = function () {
+    var gl = this.gl;
+    var vs = compile(gl, gl.VERTEX_SHADER, VERT);
+    var fs = compile(gl, gl.FRAGMENT_SHADER, FRAG);
+    if (!vs || !fs) return false;
+    var prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      this.linkErr = gl.getProgramInfoLog(prog) || "link";
+      return false;
+    }
+    this.prog = prog;
+    this.buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    this.tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, this.tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([20, 40, 50, 255]));
+    this.loc = {
+      aPos: gl.getAttribLocation(prog, "aPos"),
+      uRes: gl.getUniformLocation(prog, "uRes"),
+      uTime: gl.getUniformLocation(prog, "uTime"),
+      uFill: gl.getUniformLocation(prog, "uFill"),
+      uEnergy: gl.getUniformLocation(prog, "uEnergy"),
+      uPoke: gl.getUniformLocation(prog, "uPoke"),
+      uLook: gl.getUniformLocation(prog, "uLook"),
+      uMetal: gl.getUniformLocation(prog, "uMetal"),
+      uAsleep: gl.getUniformLocation(prog, "uAsleep"),
+      uEnv: gl.getUniformLocation(prog, "uEnv")
+    };
+    return true;
+  };
+
+  Jar.prototype.setEnv = function (source) {
+    if (!source || !this.envCtx) return;
+    try {
+      this.envCtx.drawImage(source, 0, 0, 256, 256);
+      this.envDirty = true;
+    } catch (e) {}
+  };
+
+  Jar.prototype.glFrame = function (st, t, energy) {
+    var gl = this.gl;
+    if (!gl) return;
+    var poke = this.pokeT ? Math.max(0, 1 - (nowMs() - this.pokeT) / 420) : 0;
+    gl.viewport(0, 0, this.cv.width, this.cv.height);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.useProgram(this.prog);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buf);
+    gl.enableVertexAttribArray(this.loc.aPos);
+    gl.vertexAttribPointer(this.loc.aPos, 2, gl.FLOAT, false, 0, 0);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.tex);
+    if (this.envDirty) {
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.envCv);
+      this.envDirty = false;
+    }
+    gl.uniform1i(this.loc.uEnv, 0);
+    gl.uniform2f(this.loc.uRes, this.cv.width, this.cv.height);
+    gl.uniform1f(this.loc.uTime, t * (st.asleep ? 0.35 : 1));
+    gl.uniform1f(this.loc.uFill, this.display);
+    gl.uniform1f(this.loc.uEnergy, energy);
+    gl.uniform1f(this.loc.uPoke, poke);
+    gl.uniform2f(this.loc.uLook, this.look.x, this.look.y);
+    gl.uniform3f(this.loc.uMetal, this.col.metal[0], this.col.metal[1], this.col.metal[2]);
+    gl.uniform1f(this.loc.uAsleep, st.asleep ? 1 : 0);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  };
+
   Jar.prototype.resize = function () {
     var r = this.host.getBoundingClientRect();
     var w = Math.max(80, r.width || 220);
     var h = Math.max(120, r.height || 280);
-    var dpr = Math.min(1.5, global.devicePixelRatio || 1);
-    this.cv.width = Math.round(w * dpr);
-    this.cv.height = Math.round(h * dpr);
+    var dpr = Math.min(2, global.devicePixelRatio || 1);
+    var nw = Math.round(w * dpr);
+    var nh = Math.round(h * dpr);
+    if (this.cv.width !== nw || this.cv.height !== nh) {
+      this.cv.width = nw;
+      this.cv.height = nh;
+      if (this.useGL) this.initGL();
+    }
     this.cv.style.width = w + "px";
     this.cv.style.height = h + "px";
     this.dpr = dpr;
@@ -191,10 +391,75 @@
     this._raf = requestAnimationFrame(function () { self.loop(); });
   };
 
-  Jar.prototype.frame = function () {
+  Jar.prototype.paintFallback = function (st, t, energy) {
     var ctx = this.ctx;
     if (!ctx) return;
     var w = this.cv.width, h = this.cv.height;
+    var dpr = this.dpr || 1;
+    ctx.clearRect(0, 0, w, h);
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    var W = w / dpr, H = h / dpr;
+    var cx = W * 0.5, cy = H * 0.56;
+    var poke = this.pokeT ? Math.max(0, 1 - (nowMs() - this.pokeT) / 420) : 0;
+    var k = st.asleep ? 0.35 : 1;
+    var s = (0.92 + this.display * 0.2) * (1 + poke * 0.08);
+    ctx.translate(cx, cy);
+    ctx.scale(1 + poke * 0.12, 1 - poke * 0.16);
+    var balls = [
+      [Math.sin(t * 1.15 * k) * 6, 18, 34 * s],
+      [Math.sin(t * 1.3 * k) * 5, -8, 28 * s],
+      [Math.sin(t * 1.1 * k) * 4, -36, 20 * s],
+      [-16, 4, 14 * s],
+      [16, 8, 13 * s]
+    ];
+    var i;
+    for (i = 0; i < 3; i++) {
+      var by = ((t * (18 + i * 7) * k) % 70) - 40;
+      balls.push([Math.sin(t * 1.4 + i) * 16, Math.min(by, 10), 6 + energy * 2]);
+    }
+    ctx.fillStyle = "rgba(0,0,0,0.28)";
+    ctx.beginPath();
+    ctx.ellipse(0, 52, 36 * s, 7, 0, 0, 7);
+    ctx.fill();
+    for (i = 0; i < balls.length; i++) {
+      var b = balls[i];
+      var g = ctx.createRadialGradient(b[0] - b[2] * 0.35, b[1] - b[2] * 0.45, 2, b[0], b[1], b[2]);
+      g.addColorStop(0, "rgba(255,255,255,0.95)");
+      g.addColorStop(0.28, rgba(this.col.metal, 0.95));
+      g.addColorStop(1, rgba(this.col.deep, 0.96));
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(b[0], b[1], b[2], 0, 7);
+      ctx.fill();
+    }
+    if (this.envCv) {
+      ctx.save();
+      ctx.globalCompositeOperation = "overlay";
+      ctx.globalAlpha = 0.55;
+      ctx.beginPath();
+      for (i = 0; i < balls.length; i++) ctx.arc(balls[i][0], balls[i][1], balls[i][2], 0, 7);
+      ctx.clip();
+      try { ctx.drawImage(this.envCv, -W * 0.5, -H * 0.55, W, H); } catch (e) {}
+      ctx.restore();
+    }
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.beginPath();
+    ctx.ellipse(-8, -46, 6, st.asleep ? 1.4 : 5, 0, 0, 7);
+    ctx.ellipse(8, -46, 6, st.asleep ? 1.4 : 5, 0, 0, 7);
+    ctx.fill();
+    if (!st.asleep) {
+      ctx.fillStyle = rgba(this.col.deep, 0.95);
+      ctx.beginPath();
+      ctx.arc(-6, -46, 2.2, 0, 7);
+      ctx.arc(10, -46, 2.2, 0, 7);
+      ctx.fill();
+    }
+    ctx.restore();
+  };
+
+  Jar.prototype.frame = function () {
     var t = (nowMs() - this.t0) / 1000;
     var st = this.getState() || choreState(this.kid);
     var target = st.fill || 0;
@@ -214,199 +479,14 @@
     }
     this.blink -= 1 / 60;
     if (this.blink < -this.nextBlink) { this.blink = 0.14; this.nextBlink = 2.2 + Math.random() * 3; }
-
-    ctx.clearRect(0, 0, w, h);
-    ctx.save();
-    ctx.scale(this.dpr, this.dpr);
-    var W = w / this.dpr, H = h / this.dpr;
-    var wob = st.hungry && !this.reduced ? Math.sin(t * 22) * 2.4 : Math.sin(t * 1.3) * 0.6;
-    if (st.asleep) wob *= 0.25;
-    ctx.translate(wob, 0);
-
-    var cx = W * 0.5;
-    var top = H * 0.16;
-    var bot = H * 0.86;
-    var jw = W * 0.34;
-    var neck = jw * 0.62;
     var energy = st.asleep ? 0.08 : (st.hungry ? 0.1 : (0.22 + this.display * 0.85));
     if (st.full && !st.asleep) energy = 1.35;
-    var amp = (st.hungry ? 1.2 : 2.2 + energy * 7) * (this.reduced ? 0.2 : 1);
-
-    /* halo */
-    var halo = ctx.createRadialGradient(cx, (top + bot) / 2, 10, cx, (top + bot) / 2, jw * 2.1);
-    halo.addColorStop(0, rgba(this.col.metal, 0.28 + energy * 0.12));
-    halo.addColorStop(1, rgba(this.col.metal, 0));
-    ctx.fillStyle = halo;
-    ctx.beginPath(); ctx.arc(cx, (top + bot) / 2, jw * 2.1, 0, Math.PI * 2); ctx.fill();
-
-    function jarPath(inset) {
-      var hw = jw - inset, nh = neck - inset * 0.4;
-      ctx.beginPath();
-      ctx.moveTo(cx - nh, top);
-      ctx.lineTo(cx + nh, top);
-      ctx.quadraticCurveTo(cx + hw * 0.72, top + 18, cx + hw, top + 48);
-      ctx.lineTo(cx + hw * 0.96, bot - 36);
-      ctx.quadraticCurveTo(cx + hw * 0.92, bot, cx, bot);
-      ctx.quadraticCurveTo(cx - hw * 0.92, bot, cx - hw * 0.96, bot - 36);
-      ctx.lineTo(cx - hw, top + 48);
-      ctx.quadraticCurveTo(cx - hw * 0.72, top + 18, cx - nh, top);
-      ctx.closePath();
+    if (this.useGL) {
+      this.glFrame(st, t, energy);
+      return;
     }
-
-    /* contact shadow */
-    ctx.fillStyle = "rgba(0,0,0,0.35)";
-    ctx.beginPath(); ctx.ellipse(cx, bot + 10, jw * 0.72, 8, 0, 0, Math.PI * 2); ctx.fill();
-
-    /* glass back */
-    jarPath(0);
-    var glass = ctx.createLinearGradient(cx - jw, top, cx + jw, bot);
-    glass.addColorStop(0, "rgba(255,255,255,0.16)");
-    glass.addColorStop(0.4, "rgba(180,210,230,0.05)");
-    glass.addColorStop(1, "rgba(0,0,0,0.18)");
-    ctx.fillStyle = glass;
-    ctx.fill();
-
-    /* mercury */
-    ctx.save();
-    jarPath(3);
-    ctx.clip();
-    var level = bot - (bot - (top + 36)) * this.display;
-    var surfAmp = amp;
-    ctx.beginPath();
-    ctx.moveTo(cx - jw - 4, bot + 8);
-    ctx.lineTo(cx + jw + 4, bot + 8);
-    var steps = 28;
-    for (var i = steps; i >= 0; i--) {
-      var x = cx - jw + (2 * jw) * (i / steps);
-      var y = level + Math.sin(x * 0.09 + t * (2 + energy * 3)) * surfAmp + Math.sin(x * 0.17 - t * 2.2) * surfAmp * 0.45;
-      ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    var mg = ctx.createLinearGradient(cx, level, cx, bot);
-    var deep = mix(this.col.deep, this.col.metal, 0.25 + this.display * 0.35);
-    var hot = mix(this.col.metal, [255, 255, 255], 0.35 + energy * 0.15);
-    mg.addColorStop(0, rgba(hot, 0.95));
-    mg.addColorStop(0.18, rgba(this.col.metal, 0.92));
-    mg.addColorStop(1, rgba(deep, 1));
-    ctx.fillStyle = mg;
-    ctx.fill();
-
-    /* moving chrome band */
-    var bandX = cx + Math.sin(t * 0.8) * jw * 0.35;
-    var band = ctx.createLinearGradient(bandX - 18, level, bandX + 22, bot);
-    band.addColorStop(0, "rgba(255,255,255,0)");
-    band.addColorStop(0.5, "rgba(255,255,255," + (0.28 + energy * 0.12) + ")");
-    band.addColorStop(1, "rgba(255,255,255,0)");
-    ctx.fillStyle = band;
-    ctx.fillRect(cx - jw, level - 8, jw * 2, bot - level + 12);
-
-    /* bubbles */
-    var boil = energy * (this.reduced ? 0 : 1);
-    for (var b = 0; b < this.bubbles.length; b++) {
-      var bb = this.bubbles[b];
-      bb.u += bb.sp * (0.15 + boil) * 0.016;
-      if (bb.u > 1) bb.u = 0;
-      if (this.display < 0.04) continue;
-      var bx = cx - jw * 0.7 + bb.x * jw * 1.4;
-      var by = bot - 8 - bb.u * (bot - level - 6);
-      if (by > level + 4) {
-        ctx.beginPath();
-        ctx.strokeStyle = "rgba(255,255,255," + (0.25 + boil * 0.35) + ")";
-        ctx.lineWidth = 1.2;
-        ctx.arc(bx, by, bb.r * (0.6 + boil), 0, Math.PI * 2);
-        ctx.stroke();
-      }
-    }
-    ctx.restore();
-
-    /* glass rim + highlight */
-    jarPath(0);
-    ctx.strokeStyle = "rgba(255,255,255,0.45)";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.strokeStyle = "rgba(255,255,255,0.38)";
-    ctx.lineWidth = 3;
-    ctx.moveTo(cx - jw * 0.55, top + 50);
-    ctx.quadraticCurveTo(cx - jw * 0.72, (top + bot) / 2, cx - jw * 0.42, bot - 30);
-    ctx.stroke();
-
-    /* boil-over drips */
-    if (st.full && !st.asleep && !this.reduced) {
-      if (Math.random() < 0.25 && this.drips.length < 8) {
-        this.drips.push({ x: cx + (Math.random() - 0.5) * neck, y: top + 8, v: 30 + Math.random() * 40, a: 1 });
-      }
-    }
-    for (var d = this.drips.length - 1; d >= 0; d--) {
-      var dp = this.drips[d];
-      dp.y += dp.v * 0.016;
-      dp.a -= 0.01;
-      ctx.fillStyle = rgba(this.col.metal, Math.max(0, dp.a));
-      ctx.beginPath(); ctx.ellipse(dp.x, dp.y, 3.2, 6, 0, 0, Math.PI * 2); ctx.fill();
-      if (dp.a <= 0 || dp.y > bot) this.drips.splice(d, 1);
-    }
-
-    /* lid */
-    var lidW = neck * 1.35, lidH = 14;
-    var shake = st.hungry && !this.reduced ? Math.sin(t * 28) * 0.14 : 0;
-    ctx.save();
-    ctx.translate(cx, top - 2);
-    ctx.rotate(shake);
-    var poke = this.pokeT ? Math.max(0, 1 - (nowMs() - this.pokeT) / 280) : 0;
-    ctx.translate(0, -poke * 6);
-    var lg = ctx.createLinearGradient(0, -lidH, 0, 4);
-    lg.addColorStop(0, rgba(this.col.lip, 0.95));
-    lg.addColorStop(1, rgba(this.col.deep, 0.95));
-    ctx.fillStyle = lg;
-    roundRect(ctx, -lidW / 2, -lidH, lidW, lidH, 4);
-    ctx.fill();
-    ctx.fillStyle = rgba(this.col.metal, 0.85);
-    roundRect(ctx, -lidW * 0.28, -lidH - 7, lidW * 0.56, 8, 3);
-    ctx.fill();
-    ctx.restore();
-
-    /* eyes — creature on the glass */
-    var eyeY = top + 62;
-    var eyeDX = 16;
-    var shut = st.asleep || (this.blink > 0 && this.blink < 0.12);
-    var lookX = clamp(this.look.x, -1, 1) * 3.2;
-    var lookY = clamp(this.look.y, -1, 1) * 2.2;
-    if (st.hungry) lookY += 1.5;
-    function eye(ex) {
-      ctx.save();
-      ctx.translate(ex, eyeY);
-      ctx.fillStyle = "rgba(255,255,255,0.92)";
-      ctx.beginPath();
-      if (shut) {
-        ctx.strokeStyle = rgba(this.col.lip, 0.9);
-        ctx.lineWidth = 2;
-        ctx.moveTo(-7, 0); ctx.quadraticCurveTo(0, st.asleep ? 3 : -2, 7, 0); ctx.stroke();
-      } else {
-        ctx.ellipse(0, 0, 7.5, st.hungry ? 8.5 : 7, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = rgba(this.col.deep, 0.95);
-        ctx.beginPath(); ctx.arc(lookX, lookY, 3.1, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "rgba(255,255,255,0.9)";
-        ctx.beginPath(); ctx.arc(lookX - 1.2, lookY - 1.3, 1.1, 0, Math.PI * 2); ctx.fill();
-      }
-      ctx.restore();
-    }
-    eye.call(this, cx - eyeDX);
-    eye.call(this, cx + eyeDX);
-    /* mouth */
-    ctx.strokeStyle = rgba(this.col.lip, 0.75);
-    ctx.lineWidth = 1.6;
-    ctx.beginPath();
-    if (st.full && !st.hungry) {
-      ctx.moveTo(cx - 6, eyeY + 16); ctx.quadraticCurveTo(cx, eyeY + 22, cx + 6, eyeY + 16);
-    } else if (st.hungry) {
-      ctx.moveTo(cx - 5, eyeY + 18); ctx.quadraticCurveTo(cx, eyeY + 15, cx + 5, eyeY + 18);
-    } else {
-      ctx.moveTo(cx - 4, eyeY + 16); ctx.lineTo(cx + 4, eyeY + 16);
-    }
-    ctx.stroke();
-
-    ctx.restore();
+    this.paintFallback(st, t, energy);
+    return;
   };
 
   function roundRect(ctx, x, y, w, h, r) {

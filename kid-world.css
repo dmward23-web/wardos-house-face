@@ -129,7 +129,8 @@ body.theme-harris.kw-on .quest { border-color: rgba(140, 230, 160, 0.4) !importa
   z-index: 2;
   cursor: pointer;
 }
-.je-jar-cv { width: 100%; height: 100%; display: block; }
+.je-jar-cv { width: 100%; height: 100%; display: block; background: transparent; }
+body.kw-on .je-css .je-jar-cv { filter: drop-shadow(0 8px 16px rgba(0,0,0,0.35)); }
 
 /* money, scores, streaks: nodes stay for the old scripts, off the kid glass */
 body.kw-on .money-row,

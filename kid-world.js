@@ -59,9 +59,9 @@
       var cadence = q.getAttribute("data-cadence") || "daily";
       var btn = cadence === "daily" ? q.querySelector('.day-tap[data-day-iso="' + iso + '"]') : q.querySelector("[data-check]");
       if (!btn) return;
-      out.push({ label: label.slice(0, 18), done: btn.classList.contains("done"), btn: btn });
+      out.push({ label: label, done: btn.classList.contains("done"), btn: btn });
     });
-    return out.slice(0, 9);
+    return out;
   }
 
   function placeQuests(list, W, H) {
@@ -137,83 +137,258 @@
     ctx.globalAlpha = 1;
   }
 
-  function paintHayes(ctx, W, H, t, px, quests, fill) {
-    sky(ctx, W, H, [[0, "#071826"], [0.35, "#1c5f86"], [0.62, "#e7b56a"], [0.82, "#1f6a4a"], [1, "#071610"]]);
-    /* far: storm ring on the horizon */
+  var plates = { hayes: {}, forest: {} };
+  var platesReady = false;
+  var feed = null;
+
+  function loadImg(src) {
+    return new Promise(function (res) {
+      var im = new Image();
+      im.onload = function () { res(im); };
+      im.onerror = function () { res(null); };
+      im.src = src;
+    });
+  }
+  function loadPlates() {
+    var list = [
+      ["hayes", "sky", "art/hayes/sky.jpg"],
+      ["hayes", "far", "art/hayes/far.png"],
+      ["hayes", "mid", "art/hayes/mid.png"],
+      ["hayes", "near", "art/hayes/near.png"],
+      ["hayes", "fg", "art/hayes/fg.png"],
+      ["forest", "rays", "art/forest/rays.jpg"],
+      ["forest", "near", "art/forest/near.png"],
+      ["forest", "fg", "art/forest/fg.png"],
+      ["forest", "island", "art/forest/island.png"]
+    ];
+    return Promise.all(list.map(function (row) {
+      return loadImg(row[2]).then(function (im) { plates[row[0]][row[1]] = im; });
+    })).then(function () { platesReady = true; });
+  }
+  function drawPlate(ctx, img, W, H, ox, oy, zoom, alpha, blur) {
+    if (!img) return;
+    var z = zoom || 1;
+    var scale = Math.max(W / img.width, H / img.height) * z;
+    var dw = img.width * scale;
+    var dh = img.height * scale;
     ctx.save();
-    ctx.translate(W * 0.72 + px * 0.08, H * 0.22);
-    ctx.strokeStyle = "rgba(210, 245, 255, 0.28)";
-    ctx.lineWidth = 14;
-    ctx.beginPath();
-    ctx.arc(0, 0, 78 + Math.sin(t * 0.5) * 6, t * 0.15, t * 0.15 + 4.6);
-    ctx.stroke();
-    ctx.strokeStyle = "rgba(255, 214, 120, 0.55)";
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.arc(0, 0, 52, -t * 0.35, -t * 0.35 + 3.4);
-    ctx.stroke();
+    if (blur) ctx.filter = "blur(" + blur + "px)";
+    if (alpha != null) ctx.globalAlpha = alpha;
+    ctx.drawImage(img, (W - dw) / 2 + (ox || 0), (H - dh) / 2 + (oy || 0), dw, dh);
     ctx.restore();
-    /* far islands */
-    for (var i = 0; i < 6; i++) {
-      var ix = ((i * 0.22 * W - t * 10 + px * 0.25) % (W + 220)) - 80;
-      var iy = H * (0.2 + (i % 3) * 0.045);
-      island(ctx, ix, iy, 0.45 + (i % 3) * 0.12, i, false, t);
+  }
+  function shortLabel(full) {
+    var s = String(full || "").replace(/\s+/g, " ").trim();
+    s = s.replace(/^\s*\p{Extended_Pictographic}\s*/u, "");
+    var head = s.split(/\s+[—–]\s+|\s+-\s+/)[0];
+    var bit = head.split(/\s+·\s+/)[0].trim();
+    return bit || head || s;
+  }
+  function wrapLines(ctx, text, maxW) {
+    var words = String(text || "").split(/\s+/).filter(Boolean);
+    var lines = [];
+    var cur = "";
+    for (var i = 0; i < words.length; i++) {
+      var next = cur ? cur + " " + words[i] : words[i];
+      if (cur && ctx.measureText(next).width > maxW) {
+        lines.push(cur);
+        cur = words[i];
+      } else cur = next;
     }
-    /* mid clouds */
-    ctx.fillStyle = "rgba(255,255,255,0.08)";
-    for (var c = 0; c < 5; c++) {
-      var cx = ((c * 180 - t * 22 + px * 0.45) % (W + 160)) - 40;
+    if (cur) lines.push(cur);
+    return lines;
+  }
+  function layoutHayes(quests, W, H) {
+    /* One short label per slot. Slots stay apart at 440px. Full text is the tap card. */
+    var n = quests.length;
+    var cols = W < 380 ? 1 : 2;
+    var rows = Math.ceil(n / cols);
+    var top = Math.max(112, H * 0.15);
+    var bot = H - 500;
+    if (bot - top < rows * 48) bot = top + rows * 48;
+    var span = Math.max(1, bot - top);
+    var xs = cols === 1 ? [W * 0.5] : [W * 0.28, W * 0.72];
+    quests.forEach(function (q, i) {
+      var c = cols === 1 ? 0 : i % 2;
+      var r = cols === 1 ? i : Math.floor(i / 2);
+      q.x = xs[c];
+      q.y = rows <= 1 ? (top + bot) / 2 : top + (rows === 1 ? 0 : r * (span / (rows - 1)));
+      q.chip = shortLabel(q.label);
+      q.maxW = cols === 1 ? W - 36 : Math.min(176, (W / cols) - 18);
+      q.hw = q.maxW;
+      q.hh = 40;
+      q.r = 28;
+    });
+    separateChips(quests, 16, top - 8, W - 16, bot + 24);
+  }
+  function separateChips(quests, minX, minY, maxX, maxY) {
+    var pass, i, j, a, b, dx, dy, needX, needY, push, s;
+    for (pass = 0; pass < 10; pass++) {
+      for (i = 0; i < quests.length; i++) {
+        for (j = i + 1; j < quests.length; j++) {
+          a = quests[i]; b = quests[j];
+          dx = b.x - a.x; dy = b.y - a.y;
+          needX = (a.hw + b.hw) / 2 + 10;
+          needY = (a.hh + b.hh) / 2 + 8;
+          if (Math.abs(dx) < needX && Math.abs(dy) < needY) {
+            if ((needX - Math.abs(dx)) <= (needY - Math.abs(dy))) {
+              push = (needX - Math.abs(dx)) / 2 + 0.5;
+              s = dx < 0 ? -1 : 1;
+              a.x -= s * push; b.x += s * push;
+            } else {
+              push = (needY - Math.abs(dy)) / 2 + 0.5;
+              s = dy < 0 ? -1 : 1;
+              a.y -= s * push; b.y += s * push;
+            }
+          }
+        }
+        a = quests[i];
+        a.x = Math.max(minX + a.hw / 2, Math.min(maxX - a.hw / 2, a.x));
+        a.y = Math.max(minY + a.hh / 2, Math.min(maxY - a.hh / 2, a.y));
+      }
+    }
+  }
+  function drawChip(ctx, q) {
+    ctx.save();
+    var size = 14;
+    var lines = [];
+    while (size >= 11) {
+      ctx.font = "700 " + size + "px Palatino, Georgia, serif";
+      lines = wrapLines(ctx, q.chip || q.label, q.maxW - 16);
+      var wide = false;
+      for (var i = 0; i < lines.length; i++) if (ctx.measureText(lines[i]).width > q.maxW - 16) wide = true;
+      if (lines.length <= 2 && !wide) break;
+      size -= 1;
+    }
+    if (lines.length > 2) lines = lines.slice(0, 2);
+    ctx.font = "700 " + size + "px Palatino, Georgia, serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    var tw = 0;
+    for (var j = 0; j < lines.length; j++) tw = Math.max(tw, ctx.measureText(lines[j]).width);
+    var w = Math.min(q.maxW, tw + 16);
+    var h = lines.length * (size + 4) + 10;
+    q.hw = w;
+    q.hh = h;
+    ctx.fillStyle = "rgba(6, 14, 22, 0.78)";
+    ctx.beginPath();
+    ctx.roundRect(q.x - w / 2, q.y - h / 2, w, h, 10);
+    ctx.fill();
+    ctx.fillStyle = q.done ? "#fff4d2" : "#f7fbff";
+    var y0 = q.y - ((lines.length - 1) * (size + 4)) / 2;
+    for (var k = 0; k < lines.length; k++) ctx.fillText(lines[k], q.x, y0 + k * (size + 4));
+    ctx.restore();
+  }
+  function fullCard(ctx, text, W, H) {
+    var maxW = W - 28;
+    var size = 15;
+    ctx.save();
+    ctx.font = "700 " + size + "px Palatino, Georgia, serif";
+    var lines = wrapLines(ctx, text, maxW - 20);
+    while (lines.length > 3 && size > 12) {
+      size -= 1;
+      ctx.font = "700 " + size + "px Palatino, Georgia, serif";
+      lines = wrapLines(ctx, text, maxW - 20);
+    }
+    var h = lines.length * (size + 5) + 16;
+    var y = H - 455;
+    ctx.fillStyle = "rgba(6, 12, 18, 0.96)";
+    ctx.beginPath();
+    ctx.roundRect(14, y, W - 28, h, 12);
+    ctx.fill();
+    ctx.fillStyle = "#fff8ea";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    for (var i = 0; i < lines.length; i++) ctx.fillText(lines[i], W / 2, y + 12 + size / 2 + i * (size + 5));
+    ctx.restore();
+  }
+  function feedDrops(ctx, t, t0, x, y, jx, jy) {
+    var age = t - t0;
+    if (!(age >= 0 && age < 1.35)) return;
+    var u = Math.min(1, age / 1.05);
+    var ease = u * u * (3 - 2 * u);
+    for (var i = 0; i < 6; i++) {
+      var lag = i * 0.07;
+      var uu = Math.max(0, Math.min(1, (age - lag) / 1.05));
+      var e = uu * uu * (3 - 2 * uu);
+      var px = x + (jx - x) * e + Math.sin(i * 2.1) * (1 - e) * 10;
+      var py = y + (jy - y) * e - Math.sin(e * Math.PI) * (36 + i * 6);
+      ctx.fillStyle = "rgba(210, 236, 255, " + (0.95 - e * 0.2) + ")";
       ctx.beginPath();
-      ctx.ellipse(cx, H * 0.16 + c * 8, 50, 12, 0, 0, 7);
+      ctx.arc(px, py, 3.2 + (1 - e) * 2, 0, 7);
       ctx.fill();
     }
-    /* water */
-    var wy = H * 0.78;
-    var wg = ctx.createLinearGradient(0, wy - 20, 0, H);
-    wg.addColorStop(0, "rgba(20, 90, 110, 0.2)");
-    wg.addColorStop(1, "#062018");
-    ctx.fillStyle = wg;
-    ctx.fillRect(0, wy, W, H - wy);
-    ctx.strokeStyle = "rgba(180, 240, 255, 0.28)";
-    ctx.lineWidth = 1.5;
-    for (var s = 0; s < 4; s++) {
+    if (ease > 0.92) {
+      ctx.globalAlpha = (1 - u) * 3;
+      ctx.fillStyle = "rgba(255,255,255,0.8)";
       ctx.beginPath();
-      var yy = wy + 10 + s * 12;
-      for (var x = 0; x <= W; x += 10) {
-        var y2 = yy + Math.sin(x * 0.04 + t * 1.6 + s) * 2.2;
-        if (x) ctx.lineTo(x, y2); else ctx.moveTo(x, y2);
-      }
-      ctx.stroke();
+      ctx.arc(jx, jy, 10 + (u - 0.9) * 40, 0, 7);
+      ctx.fill();
+      ctx.globalAlpha = 1;
     }
-    shafts(ctx, W, H, t, "rgba(190, 240, 255, 0.045)");
-    motes(ctx, W, H, t, px, null, 48);
-    fog(ctx, W, H, t, H * 0.7, "rgba(180, 230, 220, 0.08)");
-    /* must islands */
-    quests.forEach(function (q, i) {
-      island(ctx, q.x + px * 0.15, q.y, 1.15, i, q.done, t);
-      label(ctx, q.x, q.y + 28, q.label, q.done);
-      if (q.done) {
-        ctx.fillStyle = "rgba(255, 220, 140, 0.9)";
-        ctx.beginPath();
-        ctx.arc(q.x, q.y - 36, 4 + Math.sin(t * 3 + i) * 1.2, 0, 7);
-        ctx.fill();
-      }
+  }
+
+  function paintHayes(ctx, W, H, t, px, quests, fill) {
+    var P = plates.hayes;
+    var F = plates.forest;
+    if (P.sky) {
+      drawPlate(ctx, P.sky, W, H, px * 0.05 + Math.sin(t * 0.12) * 10, Math.sin(t * 0.08) * 8, 1.06, 1, 0);
+    } else {
+      sky(ctx, W, H, [[0, "#1a120c"], [0.45, "#c47a3a"], [1, "#6a9ec4"]]);
+    }
+    if (F.rays) {
+      ctx.save();
+      ctx.globalCompositeOperation = "screen";
+      drawPlate(ctx, F.rays, W, H, px * 0.12 + Math.sin(t * 0.18) * 24, -H * 0.04, 1.15, 0.22, 0);
+      ctx.restore();
+      ctx.save();
+      ctx.globalCompositeOperation = "screen";
+      drawPlate(ctx, F.rays, W, H, px * 0.2 + Math.sin(t * 0.11) * 16, 0, 1.25, 0.16, 14);
+      ctx.restore();
+    }
+    shafts(ctx, W, H, t, "rgba(255, 214, 150, 0.045)");
+    drawPlate(ctx, P.far, W, H, px * 0.22 + Math.sin(t * 0.16) * 12, -H * 0.06, 1.04, 1, 0);
+    drawPlate(ctx, P.mid, W, H, px * 0.38, H * 0.02, 1.02, 1, 0);
+    drawPlate(ctx, P.near, W, H, px * 0.58, H * 0.06, 1.04, 1, 0);
+    var fogG = ctx.createLinearGradient(0, H * 0.42, 0, H);
+    fogG.addColorStop(0, "rgba(18, 16, 20, 0)");
+    fogG.addColorStop(0.7, "rgba(16, 18, 22, 0.18)");
+    fogG.addColorStop(1, "rgba(8, 12, 16, 0.55)");
+    ctx.fillStyle = fogG;
+    ctx.fillRect(0, H * 0.42, W, H * 0.58);
+    motes(ctx, W, H, t, px, "#fff1d0", 36);
+    layoutHayes(quests, W, H);
+    quests.forEach(function (q) {
+      var glow = ctx.createRadialGradient(q.x, q.y - 18, 2, q.x, q.y - 10, q.done ? 34 : 22);
+      glow.addColorStop(0, q.done ? "rgba(255, 210, 120, 0.9)" : "rgba(255, 236, 190, 0.55)");
+      glow.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(q.x, q.y - 8, q.done ? 34 : 22, 0, 7);
+      ctx.fill();
+      drawChip(ctx, q);
     });
-    /* spirit */
-    var sx = W * (0.2 + (0.5 + 0.5 * Math.sin(t * 0.35)) * 0.6);
-    spirit(ctx, sx, H * 0.34 + Math.sin(t * 2) * 8, t, "#bff");
-    /* foreground reeds */
-    ctx.strokeStyle = "rgba(20, 70, 48, 0.85)";
-    ctx.lineWidth = 2;
-    for (var g = 0; g < 14; g++) {
-      var gx = (g * W) / 13;
-      ctx.beginPath();
-      ctx.moveTo(gx, H);
-      ctx.quadraticCurveTo(gx + Math.sin(t * 1.4 + g) * 8, H - 30, gx + Math.sin(t + g) * 10, H - 54);
-      ctx.stroke();
+    /* Painted forest only as the ground the creature stands in. */
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, H * 0.78, W, H * 0.22);
+    ctx.clip();
+    drawPlate(ctx, F.near, W, H, px * 0.7, H * 0.42, 1.3, 1, 0);
+    drawPlate(ctx, F.fg, W, H, px * 0.9, H * 0.48, 1.35, 1, 2);
+    ctx.restore();
+    var ground = ctx.createLinearGradient(0, H * 0.74, 0, H * 0.86);
+    ground.addColorStop(0, "rgba(8,12,16,0)");
+    ground.addColorStop(1, "rgba(8,12,16,0.2)");
+    ctx.fillStyle = ground;
+    ctx.fillRect(0, H * 0.74, W, H * 0.12);
+    drawPlate(ctx, P.fg, W, H, px * 0.95, H * 0.08, 1.08, 0.95, 3);
+    if (feed && quests[feed.index]) {
+      var fq = quests[feed.index];
+      feedDrops(ctx, t, feed.t0, fq.x, fq.y, W * 0.5, H - 168);
+      if (t < feed.t0 + 4.2) fullCard(ctx, feed.label || fq.label, W, H);
+      burst(ctx, t, feed.t0, fq.x, fq.y, "#ffe7a8");
     }
-    if (burstAt >= 0) burst(ctx, t, burstAt, W * 0.5, H * 0.5, "#ffe7a8");
-    warmth(ctx, W, H, fill, "rgba(255, 210, 120, 0.05)");
+    warmth(ctx, W, H, fill);
   }
 
   function island(ctx, x, y, s, i, lit, t) {
@@ -539,6 +714,8 @@
     var quests = readQuests(iso);
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };
     this.hits = paintWorld(this.ctx, W, H, t, which || kid(), quests, st.fill || 0, (this.ptr - 0.5) * 40);
+    var jhost = document.querySelector("[data-kw-jar]");
+    if (jhost && jhost._jar && jhost._jar.setEnv) jhost._jar.setEnv(this.cv);
     if (global.JarEngine && JarEngine.setVirtual) JarEngine.setVirtual(null);
   };
 
@@ -711,7 +888,9 @@
     var y = (ev.clientY - rect.top) * ((bg.cv.height / bg.dpr) / Math.max(1, rect.height));
     for (var i = 0; i < bg.hits.length; i++) {
       var q = bg.hits[i];
-      if (Math.hypot(q.x - x, q.y - y) < q.r + 8) return q;
+      var hw = (q.hw || q.r || 40) / 2 + 8;
+      var hh = (q.hh || q.r || 28) / 2 + 8;
+      if (Math.abs(q.x - x) <= hw && Math.abs(q.y - y) <= hh) return q;
     }
     return null;
   }
@@ -720,8 +899,11 @@
     var q = hitQuest(ev);
     if (!q || !q.btn) return;
     var was = q.btn.classList.contains("done");
+    var idx = 0;
+    for (var hi = 0; hi < bg.hits.length; hi++) if (bg.hits[hi] === q) idx = hi;
+    feed = { t0: (performance.now() - bg.t0) / 1000, index: idx, label: q.label };
     q.btn.click();
-    burstAt = (performance.now() - bg.t0) / 1000;
+    burstAt = feed.t0;
     if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap();
     if (!was && global.JarEngine && JarEngine.tone) JarEngine.tone("gulp");
     setTimeout(function () {
@@ -816,6 +998,7 @@
       soften();
       if (global.JarEngine && JarEngine.choreState(kid()).asleep) document.body.classList.add("kw-asleep");
     });
+    loadPlates();
     paintClock();
     setInterval(paintClock, 1000);
     paintWeek();
@@ -843,21 +1026,32 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     var iso = dayIso || todayIso();
     var quests = readQuests(iso);
-    if (t < 8) exportFrame.tapped = false;
-    if (t >= 8 && !exportFrame.tapped && quests[0] && quests[0].btn && !quests[0].done) {
+    if (t < 4) {
+      exportFrame.tapped = false;
+      feed = null;
+    }
+    if (t >= 4 && !exportFrame.tapped && quests[0] && quests[0].btn && !quests[0].done) {
       exportFrame.tapped = true;
+      feed = { t0: 4, index: 0, label: quests[0].label };
       quests[0].btn.click();
       quests = readQuests(iso);
     }
-    burstAt = t >= 8 ? 8 : -1;
+    burstAt = t >= 4 ? 4 : -1;
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };
     if (global.JarEngine && JarEngine.setVirtual) JarEngine.setVirtual(t * 1000);
     paintWorld(ctx, cssW, cssH, t, kid(), quests, st.fill || 0, Math.sin(t * 0.3) * 16);
     var host = document.querySelector("[data-kw-jar]");
     if (host && host._jar) {
+      if (host._jar.cv.width !== 360 || host._jar.cv.height !== 420) {
+        host._jar.cv.width = 360;
+        host._jar.cv.height = 420;
+        if (host._jar.useGL && host._jar.initGL) host._jar.initGL();
+      }
+      host._jar.dpr = 2;
+      if (host._jar.setEnv) host._jar.setEnv(canvas);
       host._jar.frame();
       if (host._jar.cv && host._jar.cv.width) {
-        ctx.drawImage(host._jar.cv, cssW * 0.5 - 78, cssH - 268, 156, 176);
+        ctx.drawImage(host._jar.cv, cssW * 0.5 - 120, cssH - 340, 240, 280);
       }
     }
     ctx.textAlign = "left";
@@ -879,6 +1073,7 @@
     kindFor: kindFor,
     reduced: function () { return reduced; },
     exportFrame: exportFrame,
-    paintWorld: paintWorld
+    paintWorld: paintWorld,
+    platesReady: function () { return platesReady && !!(plates.hayes && plates.hayes.sky); }
   };
 })(window);
