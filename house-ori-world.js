@@ -1,4 +1,4 @@
-/* House Face · ORIHOME1 · mount the living world and fly into a scene on every board tap.
+/* House Face · ORIHOME3 · mount the living world and fly into a scene on every board tap.
    Original code. The forest is ori/ori-scene.js (painted plates + motes). No Ori assets.
    HouseSfx owns the tap. This file adds the level-enter whoosh on the same mixer, so mute still wins.
    A key-less screen is left alone: no key modal from here. */
@@ -69,7 +69,8 @@
         plates: "ori/plates/",
         motes: small ? 64 : 120,
         fonts: false,
-        hotLight: 0.82,
+        hotLight: 1.35,
+        preserve: true,
         config: {
           dprMax: small ? 1.35 : 1.6,
           renderScale: small ? 0.8 : 1,
@@ -79,7 +80,7 @@
           ion: { acc: theme.acc, acc2: theme.key, ink: "#eaf6ff", ground: "#041018" },
           sound: { muted: true, ambient: false, volume: 0 }
         },
-        theme: function (wd) { return O.oriTheme(wd, { acc: theme.acc, key: theme.key, rays: theme.rays }); }
+        theme: function (wd) { return O.oriTheme(wd, { acc: theme.acc, key: theme.key, rays: theme.rays, night: 0.15, fog: 0.85 }); }
       });
     } catch (err) {
       try { console.info("[house-ori] world failed", err); } catch (e2) {}
@@ -120,11 +121,7 @@
 
   if (world && world.S) {
     document.documentElement.classList.add("ori-gl");
-    try {
-      var hh = new Date().toLocaleString("en-US", { timeZone: "America/Chicago", hour: "numeric", hour12: false });
-      var hour = parseInt(hh, 10);
-      if (isFinite(hour)) world.mode = (hour < 6 || hour >= 20) ? "night" : "day";
-    } catch (e) {}
+    world.exposure = 1.45;
     if (O.Orb) {
       [[0.14, 0.24, 0.011], [0.86, 0.2, 0.009], [0.22, 0.62, 0.008], [0.76, 0.66, 0.01], [0.48, 0.38, 0.007], [0.34, 0.84, 0.008], [0.66, 0.86, 0.009]].forEach(function (s, n) {
         world.add(new O.Orb({
@@ -199,6 +196,7 @@
     if (node.nodeType === 3) {
       if (node.nodeValue && node.nodeValue.indexOf("$") !== -1 && /\$\s?\d/.test(node.nodeValue)) {
         var next = node.nodeValue.replace(MONEY, "\u2605");
+        next = next.replace(/Balance\s*★\s*·\s*Week\s*★\s*·\s*Jar\s*★\s*\/\s*★/i, "Stars · payday with Dad");
         if (next !== node.nodeValue) node.nodeValue = next;
       }
       return;

@@ -1,4 +1,4 @@
-/* House Face · ORIHOME1 · living overworld skin.
+/* House Face · ORIHOME3 · living overworld skin.
    Original code and colour. Ori-inspired mood only: no Ori assets, characters, or logo.
    The painted forest is ori/ori-scene.js. This file is the HUD, the portals, and the level-enter veil.
    Loaded last so it wins over the command-deck tokens. */
@@ -170,7 +170,7 @@ html.ori-on .ori-pressed { animation: ori-press 0.42s cubic-bezier(.2, .8, .2, 1
 
 /* Shared glass so a subpage is a scene, not a paper panel. */
 html.ori-on body .panel :is(header, footer, section, article, .hdr, .banner, .card, .sec, .day, .bulk, .ship, .stat, .row, .trip, .count-row, .vote-card, .log-card, .beat, .handoff, .handoff-card, .cmd-panel) {
-  background-color: rgba(7, 18, 32, 0.58) !important;
+  background-color: rgba(7, 18, 32, 0.42) !important;
   color: #e8f6ff !important;
   border-color: rgba(160, 216, 255, 0.28) !important;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
@@ -378,7 +378,7 @@ html.ori-home body .panel .leaveby-chip.is-on {
 /* Places on the map */
 html.ori-home body .panel .tile-grid > .tile:not(.sp-tile) {
   position: relative;
-  background: linear-gradient(165deg, rgba(10, 28, 44, 0.58), rgba(4, 12, 22, 0.42)) !important;
+  background: linear-gradient(165deg, rgba(10, 28, 44, 0.46), rgba(4, 12, 22, 0.3)) !important;
   border: 1px solid rgba(176, 226, 255, 0.36) !important;
   border-radius: 24px !important;
   box-shadow:
