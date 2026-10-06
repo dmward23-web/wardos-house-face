@@ -33,8 +33,33 @@
 
   function sleeps(n) {
     if (n <= 0) return say("today", "today", "today");
-    if (n === 1) return say("1 sleep", "1 sleep", "tomorrow");
-    return say(n + " sleeps", n + " sleeps", n + " nights");
+    if (age() === "small") {
+      if (n > 7) return n + "☾";
+      var moons = "";
+      for (var i = 0; i < n; i++) moons += "☾";
+      return moons;
+    }
+    if (n === 1) return "1 sleep";
+    return age() === "teen" ? (n + " nights") : (n + " sleeps");
+  }
+  function chicagoMonth() {
+    try {
+      return parseInt(new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", month: "numeric" }).format(new Date()), 10) || 1;
+    } catch (e) { return new Date().getMonth() + 1; }
+  }
+  function monthName() {
+    try {
+      return new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", month: "long" }).format(new Date());
+    } catch (e2) { return ""; }
+  }
+  var litDays = {};
+  function lightLantern(iso) {
+    if (!iso) return;
+    litDays[iso] = 1;
+    keep("lantern-" + iso, "1");
+  }
+  function lanternOn(iso) {
+    return !!(litDays[iso] || kept("lantern-" + iso) === "1");
   }
 
   function canKeep() { return !asleep(); }
@@ -92,13 +117,15 @@
       var diff = dayDiff(today, iso);
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "cw-lantern" + (diff < 0 ? " is-past" : diff > 0 ? " is-fog" : " is-now");
+      b.className = "cw-lantern" + (diff < 0 ? " is-past" : diff > 0 ? " is-fog" : " is-now") + (lanternOn(iso) ? " is-lit" : "");
       b.style.setProperty("--orb", kid() === "ainsley" ? "#e7b089" : kid() === "harris" ? "#8ee7a0" : "#8fd8ff");
       var wd = btn.querySelector(".wd");
       var dn = btn.querySelector(".dn");
       b.innerHTML = '<span class="cw-orb"></span><small>' + (wd ? wd.textContent : "") + '</small><small>' + (diff > 0 ? sleeps(diff) : (dn ? dn.textContent : "")) + "</small>";
       b.addEventListener("click", function () {
         btn.click();
+        lightLantern(iso);
+        b.classList.add("is-lit");
         openDay(iso, diff, b);
       });
       path.appendChild(b);
@@ -152,6 +179,7 @@
     if (sp && age() !== "small") bits.push(sp);
     if (rt && age() === "teen") bits.push(rt);
     var line = hello + ". " + say("Three lights.", "Morning briefing.", "Morning briefing.") + " " + (bits.slice(0, 3).join(" · ") || "The path is open.");
+    if (age() === "teen") line += " " + monthName() + ".";
     if (asleep()) line = "Forest sleeps. On mom's weeks the forest gently sleeps, with nothing tracked, and wakes when they're back.";
     else {
       var hw = data() && data().homeWeek;
@@ -354,7 +382,309 @@
       { n: 146, title: "Weather science", kind: "sky", line: "Weather science. Real forecasts come with a one-line \"why\" from the creature." },
     ]},
   ];
+  function softTone(freq, dur, type) {
+    try {
+      if (!global.HouseSfx || (HouseSfx.isMuted && HouseSfx.isMuted())) return;
+      var ac = HouseSfx.ensureCtx && HouseSfx.ensureCtx();
+      var master = HouseSfx.masterGain && HouseSfx.masterGain();
+      if (!ac || !master) return;
+      var o = ac.createOscillator();
+      var g = ac.createGain();
+      var t0 = ac.currentTime;
+      o.type = type || "sine";
+      o.frequency.setValueAtTime(freq, t0);
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.05, t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g); g.connect(master);
+      o.start(t0); o.stop(t0 + dur + 0.05);
+    } catch (e) {}
+  }
+  function chips(body, names, onPick) {
+    names.forEach(function (name) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "cw-idea";
+      b.textContent = name;
+      b.addEventListener("click", function () {
+        if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap();
+        onPick(b, name);
+      });
+      body.appendChild(b);
+    });
+  }
+  function seasonPaint(ctx, W, H, t) {
+    var m = chicagoMonth();
+    var fall = m >= 9 && m <= 11;
+    var winter = m === 12 || m <= 2;
+    var spring = m >= 3 && m <= 5;
+    for (var i = 0; i < 16; i++) {
+      var x = (i * 53 + t * (winter ? 12 : 36)) % W;
+      var y = (i * 70 + t * (winter ? 22 : 48)) % (H * 0.7);
+      ctx.fillStyle = winter ? "rgba(255,255,255,0.85)" : spring ? "#f4c2d8" : fall ? (i % 2 ? "#e07a3a" : "#d4a017") : "#8fd18a";
+      ctx.beginPath();
+      ctx.ellipse(x, y, winter ? 2.2 : 7, winter ? 2.2 : 3.2, t + i, 0, 7);
+      ctx.fill();
+    }
+  }
+  function starPaint(ctx, W, H, t) {
+    var u = (t * 0.25) % 1;
+    var x = W * (0.15 + u * 0.75);
+    var y = H * (0.12 + u * 0.28);
+    ctx.strokeStyle = "rgba(255,255,255,0.75)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x - 48, y - 18);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.fillStyle = "#fff";
+    ctx.beginPath(); ctx.arc(x, y, 3.5, 0, 7); ctx.fill();
+  }
+  function skyPaint(ctx, W, H, t) {
+    ctx.fillStyle = "rgba(8, 12, 28, 0.35)";
+    ctx.fillRect(0, 0, W, H * 0.45);
+    var n = nextText();
+    var labels = [n.title || "one", specialLine() || "two", "three"];
+    for (var i = 0; i < 3; i++) {
+      var x = W * (0.22 + i * 0.26);
+      var y = H * (0.16 + (i === 1 ? 0.08 : 0));
+      ctx.fillStyle = "#fff";
+      ctx.beginPath(); ctx.arc(x, y, 3 + Math.sin(t * 2 + i), 0, 7); ctx.fill();
+      if (age() !== "small") {
+        ctx.font = "600 14px Palatino, Georgia, serif";
+        ctx.fillStyle = "rgba(255,255,255,0.8)";
+        ctx.fillText(String(labels[i]).slice(0, 16), x - 20, y + 22);
+      }
+    }
+  }
+  function sunPaint(ctx, W, H, t) {
+    var p = chicagoParts();
+    var mins = (parseInt(p.hour, 10) || 0) * 60 + (parseInt(p.minute, 10) || 0);
+    var rise = 7 * 60, set = 18 * 60 + 30;
+    var f = mins <= rise ? 0 : mins >= set ? 1 : (mins - rise) / (set - rise);
+    var ang = Math.PI + f * Math.PI;
+    var cx = W * 0.5, cy = H * 0.62, rad = Math.min(W, H) * 0.28;
+    var x = cx + Math.cos(ang) * rad;
+    var y = cy + Math.sin(ang) * rad * 0.55;
+    ctx.strokeStyle = "rgba(255,220,160,0.35)";
+    ctx.beginPath(); ctx.arc(cx, cy, rad, Math.PI, 0); ctx.stroke();
+    ctx.fillStyle = mins < rise || mins > set ? "#d8e4ff" : "#ffe1a0";
+    ctx.beginPath(); ctx.arc(x, y, 16, 0, 7); ctx.fill();
+  }
+  function rainPaint(ctx, W, H, t) {
+    ctx.strokeStyle = "rgba(180,210,230,0.45)";
+    ctx.lineWidth = 1.4;
+    for (var i = 0; i < 24; i++) {
+      var x = (i * 37 + t * 40) % W;
+      var y = (i * 61 + t * 90) % H;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 4, y + 14); ctx.stroke();
+    }
+  }
+  function playIdea(idea, from) {
+    var n = idea.n;
+    var handled = {
+      6: 1, 7: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 18: 1, 19: 1,
+      34: 1, 35: 1, 44: 1, 45: 1, 48: 1, 51: 1, 52: 1, 55: 1, 57: 1,
+      67: 1, 68: 1, 69: 1, 70: 1, 72: 1, 73: 1, 81: 1, 82: 1, 85: 1, 86: 1,
+      107: 1, 108: 1, 112: 1, 114: 1, 116: 1, 134: 1, 135: 1, 136: 1, 137: 1, 138: 1, 140: 1, 143: 1
+    };
+    if (!handled[n]) return false;
+    var line = "<p>" + (idea.line || "") + "</p>";
+    var html = "";
+    var mount = null;
+    var paint = global.KidWorld && KidWorld.vignette("woods");
+    if (n === 11) {
+      html = "<p>Cleats, swim bag, library book.</p>";
+      mount = function (body) { chips(body, ["cleats", "swim bag", "library book"], function (b, name) { b.textContent = name + " · in"; }); };
+    } else if (n === 14) {
+      html = "<p></p>";
+      mount = function (body) {
+        var names = [];
+        document.querySelectorAll(".kw-day b").forEach(function (el) { names.push(el.textContent || "·"); });
+        if (!names.length) names = ["S", "S", "M", "T", "W", "T", "F"];
+        var show = document.createElement("p");
+        show.style.cssText = "font-size:32px;font-weight:800;letter-spacing:0.08em";
+        body.appendChild(show);
+        var i = 0;
+        function step() {
+          show.textContent = names[i] || "";
+          i += 1;
+          if (i < names.length && !reduced()) setTimeout(step, 2800);
+        }
+        step();
+      };
+    } else if (n === 12 || n === 57 || n === 136) {
+      var opts = n === 136 ? ["more parks", "more friends", "more rest"] : n === 57 ? ["this one", "that one", "later"] : ["this lantern", "that lantern", "leave it open"];
+      mount = function (body) {
+        chips(body, opts, function (b, name) {
+          if (keep("pick-" + n, name)) b.textContent = name + " · the plan";
+          else b.textContent = name + " · seen";
+        });
+      };
+    } else if (n === 13 || n === 44 || n === 45 || n === 135 || n === 137) {
+      html = asleep() ? "<p>The forest is sleeping, so this stays unwritten.</p>" : "<p>A few words. A parent says yes before it sprouts.</p>";
+      mount = function (body) {
+        if (asleep()) return;
+        var input = document.createElement("input");
+        input.maxLength = 80;
+        input.placeholder = n === 44 ? "what's this?" : n === 137 ? "movie night" : "an idea";
+        input.style.cssText = "display:block;margin-top:8px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.3);background:transparent;color:inherit;width:min(100%,320px)";
+        var save = document.createElement("button");
+        save.type = "button"; save.className = "cw-idea"; save.textContent = "Offer";
+        save.addEventListener("click", function () {
+          if (keep("idea-" + n, input.value || "noted")) save.textContent = "Offered";
+        });
+        body.appendChild(input); body.appendChild(save);
+      };
+    } else if (n === 18 || n === 19 || n === 107 || n === 108) {
+      var rt = routineText();
+      var nx = nextText();
+      html = "<p>" + (nx.title || "The next thing") + (nx.when ? " · " + nx.when : "") + "</p>";
+      if (n === 107) html += "<p>" + (rt || "To leave at 8:10, shoes at 8:00, breakfast at 7:40.") + "</p>";
+      if (n === 108) html += "<p>One stone, then the next, then the day it is due.</p>";
+      if (n === 19) html += "<p>The creature walks the bag across.</p>";
+      mount = function (body) {
+        var steps = n === 107 ? ["breakfast", "shoes", "leave"] : n === 108 ? ["start", "middle", "due"] : ["bag", "book", "shoes"];
+        chips(body, steps, function (b, name) { b.textContent = name + " · ready"; });
+      };
+    } else if (n === 51) {
+      mount = function (body) {
+        chips(body, ["nervous"], function (b) {
+          if (keep("worry", nextText().title || "soon")) b.textContent = "stone set";
+          else b.textContent = "seen";
+        });
+      };
+    } else if (n === 52) {
+      mount = function (body) {
+        chips(body, ["sunny", "cloudy", "stormy"], function (b, name) {
+          if (keep("feel", name)) b.textContent = name + " · kept";
+          else b.textContent = name + " · not kept";
+        });
+      };
+    } else if (n === 55 || n === 140) {
+      mount = function (body) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "cw-idea"; b.textContent = "Breath 1";
+        var c = 0;
+        b.addEventListener("click", function () {
+          c = Math.min(3, c + 1);
+          b.textContent = c >= 3 ? "glow" : ("Breath " + (c + 1));
+          softTone(220 + c * 40, 0.6, "sine");
+        });
+        body.appendChild(b);
+      };
+    } else if (n === 34) {
+      html = "<p>The crystal can hold a few words. A photo waits until one is really here.</p>";
+    } else if (n === 48) {
+      var first = nextText().title || "a quiet morning";
+      html = "<p>" + first + "</p>";
+      softTone(196, 1.1, "sine");
+    } else if (n === 7) {
+      paint = seasonPaint;
+    } else if (n === 9) {
+      paint = starPaint;
+    } else if (n === 10) {
+      paint = skyPaint;
+    } else if (n === 67 || n === 68) {
+      paint = sunPaint;
+    } else if (n === 69 || n === 39) {
+      paint = rainPaint;
+    } else if (n === 70 || n === 139) {
+      paint = function (ctx, W, H, t) {
+        ctx.strokeStyle = "rgba(255,255,255,0.35)";
+        for (var i = 0; i < 6; i++) {
+          ctx.beginPath();
+          ctx.moveTo(0, H * (0.3 + i * 0.08));
+          ctx.quadraticCurveTo(W * 0.5, H * (0.28 + i * 0.08) + Math.sin(t * 2 + i) * 12, W, H * (0.32 + i * 0.08));
+          ctx.stroke();
+        }
+      };
+    } else if (n === 72) {
+      paint = function (ctx, W, H) {
+        ctx.fillStyle = "rgba(255, 186, 96, 0.35)";
+        ctx.fillRect(W * 0.62, H * 0.28, 70, 54);
+      };
+    } else if (n === 73) {
+      paint = function (ctx, W, H) {
+        ctx.fillStyle = "rgba(160, 200, 230, 0.2)";
+        ctx.fillRect(0, 0, W, H);
+      };
+    } else if (n === 81) {
+      mount = function (body) {
+        chips(body, ["swim", "bat", "bell"], function (b, name) {
+          if (name === "swim") softTone(520, 0.25, "triangle");
+          else if (name === "bat") softTone(140, 0.08, "square");
+          else softTone(880, 0.4, "sine");
+          b.textContent = name + " · heard";
+        });
+      };
+    } else if (n === 82) {
+      mount = function (body) {
+        [["school", "#8fd8ff"], ["sport", "#8ee7a0"], ["home", "#ffd56a"], ["rest", "#e7b089"]].forEach(function (pair) {
+          var b = document.createElement("button");
+          b.type = "button"; b.className = "cw-idea"; b.textContent = pair[0];
+          b.style.boxShadow = "0 0 16px " + pair[1];
+          b.addEventListener("click", function () { b.textContent = pair[0] + " · this color"; });
+          body.appendChild(b);
+        });
+      };
+    } else if (n === 85) {
+      mount = function (body) {
+        chips(body, ["rest day", "game day"], function (b, name) {
+          softTone(name === "rest day" ? 174 : 392, 0.5, "sine");
+          b.textContent = name + " · playing";
+        });
+      };
+    } else if (n === 86 || n === 114 || n === 116) {
+      html = n === 86
+        ? "<p>The real room light stays on its own switch. This is only a picture.</p>"
+        : "<p>A voice isn't connected yet. The lantern still dims.</p>";
+    } else if (n === 112) {
+      html = age() === "teen" ? "<p>Set your own wisp.</p>" : "<p>This one opens as you get older.</p>";
+      if (age() === "teen") {
+        mount = function (body) {
+          chips(body, ["15 minutes", "this evening"], function (b, name) {
+            if (keep("wisp", name)) b.textContent = name + " · set";
+            else b.textContent = name + " · seen";
+          });
+        };
+      }
+    } else if (n === 134) {
+      mount = function (body) {
+        chips(body, ["ask for a swap"], function (b) {
+          if (keep("veto", nextText().title || "optional")) b.textContent = "asked";
+          else b.textContent = "seen";
+        });
+      };
+    } else if (n === 138) {
+      mount = function (body) { chips(body, ["I'll guide"], function (b) { b.textContent = "guiding"; }); };
+    } else if (n === 143) {
+      var today = global.WardKids && WardKids.DAY_ISO;
+      var hw = (data() && data().homeWeek) || {};
+      var end = hw.endIso ? String(hw.endIso).slice(0, 10) : today;
+      var left = Math.max(0, dayDiff(today, end));
+      html = "<p>" + sleeps(left) + " until the week turns.</p>";
+    } else if (n === 6 || n === 35) {
+      var today2 = global.WardKids && WardKids.DAY_ISO;
+      var hw2 = (data() && data().homeWeek) || {};
+      var end2 = hw2.endIso ? String(hw2.endIso).slice(0, 10) : today2;
+      var leaves = Math.max(1, Math.min(12, dayDiff(today2, end2) || 3));
+      html = "<p>" + leaves + (n === 35 ? " lights until a far bloom." : " leaves on the vine.") + "</p>";
+      paint = seasonPaint;
+    }
+    open({
+      from: from,
+      kicker: "idea " + idea.n,
+      title: idea.title,
+      html: line + html,
+      paint: paint,
+      onMount: mount
+    });
+    return true;
+  }
+
   function ideaScene(idea, from) {
+    if (playIdea(idea, from)) return;
     var kind = idea.kind;
     var html = "";
     var mount = null;
@@ -635,12 +965,30 @@
     if (hdr && hdr.nextSibling) host.insertBefore(el, hdr.nextSibling);
     else host.insertBefore(el, host.firstChild);
     el.querySelector("[data-cw-brief]").addEventListener("click", function (ev) {
+      var n = nextText();
+      var sp = specialLine();
+      var rt = routineText();
+      var bits = [n.title, sp, rt].filter(function (x) { return x && x !== "Nothing timed next"; }).slice(0, 3);
+      while (bits.length < 3) bits.push(bits.length === 0 ? "quiet" : "open");
       open({
         from: ev.currentTarget,
         kicker: "morning",
         title: "Got it",
-        html: "<p>Morning briefing. Their creature yawns, stretches and shows today's 3 lanterns. One tap says \"got it.\"</p>",
-        paint: global.KidWorld && KidWorld.vignette("glow")
+        html: "<p>Morning briefing. Their creature yawns, stretches and shows today's 3 lanterns. One tap says \"got it.\"</p><div class='cw-ideas' data-three></div>",
+        paint: global.KidWorld && KidWorld.vignette("glow"),
+        onMount: function (body) {
+          var box = body.querySelector("[data-three]");
+          var glyphs = ["☀", "✦", "●"];
+          bits.forEach(function (name, i) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "cw-idea";
+            b.textContent = age() === "small" ? glyphs[i] : name;
+            b.setAttribute("aria-label", name);
+            b.addEventListener("click", function () { b.textContent = "got it"; });
+            box.appendChild(b);
+          });
+        }
       });
     });
     el.querySelector("[data-cw-next]").addEventListener("click", function (ev) {
