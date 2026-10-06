@@ -241,26 +241,32 @@
         g.beginPath(); g.moveTo(tx, H * 0.72); g.lineTo(tx, H * 0.48); g.stroke();
       }
     }
+    /* mid trees, slower than the course */
+    g.save();
+    g.translate(-cam * 0.35, 0);
+    g.strokeStyle = "rgba(20, 30, 24, 0.35)";
+    g.lineWidth = 3;
+    for (var tr = 0; tr < 10; tr++) {
+      var tx = tr * 220;
+      g.beginPath();
+      g.moveTo(tx, H * 0.78);
+      g.quadraticCurveTo(tx + Math.sin(t + tr) * 10, H * 0.5, tx + 8, H * 0.38);
+      g.stroke();
+    }
+    g.restore();
+    g.fillStyle = "rgba(255,255,255,0.05)";
+    for (var f = 0; f < 3; f++) {
+      g.beginPath();
+      g.ellipse((f * 280 - cam * 0.2) % (W + 100), H * 0.62, 120, 16, 0, 0, 7);
+      g.fill();
+    }
     g.save();
     g.translate(-cam, 0);
     for (var p = 0; p < plats.length; p++) {
       var pl = plats[p];
       var x = platX(pl, t);
       var py = GY(pl.y);
-      var pg = g.createLinearGradient(x, py, x, py + pl.h + 8);
-      pg.addColorStop(0, pl.grove ? "#fff6d8" : "rgba(236, 248, 252, 0.95)");
-      pg.addColorStop(1, pl.grove ? THEME.accent : "rgba(120, 160, 176, 0.55)");
-      g.fillStyle = pg;
-      round(g, x, py, pl.w, pl.h, 10);
-      g.fill();
-      g.strokeStyle = "rgba(255,255,255,0.55)";
-      g.lineWidth = 1.5;
-      g.beginPath();
-      g.moveTo(x + 8, py + 3);
-      for (var sx = 8; sx < pl.w - 6; sx += 8) {
-        g.lineTo(x + sx, py + 3 + Math.sin(t * 3 + sx * 0.2 + p) * 1.2);
-      }
-      g.stroke();
+      livingPlat(g, x, py, pl.w, t, p, pl.grove);
       if (pl.cp) {
         var lx = x + 18, ly = py - 18;
         var lg = g.createRadialGradient(lx, ly, 1, lx, ly, 22);
@@ -297,57 +303,125 @@
     g.restore();
   }
 
-  function round(g, x, y, w, h, r) {
+  function livingPlat(g, x, y, w, t, i, grove) {
+    var kind = grove ? "stone" : (i % 3 === 0 ? "stone" : i % 3 === 1 ? "root" : "branch");
+    var sway = Math.sin(t * 1.4 + i) * 3;
+    if (kind === "branch") {
+      g.strokeStyle = "#3a2618";
+      g.lineWidth = 16;
+      g.lineCap = "round";
+      g.beginPath();
+      g.moveTo(x, y + 6);
+      g.bezierCurveTo(x + w * 0.3, y - 12 + sway, x + w * 0.65, y + 14, x + w, y + 2 + sway);
+      g.stroke();
+      g.strokeStyle = "rgba(120, 168, 90, 0.85)";
+      g.lineWidth = 3;
+      g.stroke();
+    } else if (kind === "root") {
+      g.strokeStyle = "#4a3020";
+      g.lineWidth = 9;
+      g.lineCap = "round";
+      g.beginPath();
+      g.moveTo(x, y + 12);
+      g.quadraticCurveTo(x + w * 0.45, y - 6 + sway, x + w, y + 8);
+      g.stroke();
+      g.lineWidth = 5;
+      g.beginPath();
+      g.moveTo(x + w * 0.35, y + 4);
+      g.quadraticCurveTo(x + w * 0.5, y + 18, x + w * 0.68, y + 14);
+      g.stroke();
+    } else {
+      g.fillStyle = grove ? THEME.accent : "#7d8b92";
+      g.beginPath();
+      g.ellipse(x + w * 0.5, y + 8, w * 0.46, 13, sway * 0.01, 0, 7);
+      g.fill();
+      g.fillStyle = "rgba(255,255,255,0.38)";
+      g.beginPath();
+      g.ellipse(x + w * 0.36, y + 3, w * 0.16, 4, 0, 0, 7);
+      g.fill();
+    }
+  }
+
+  function blobPath(g, rad, t, squash) {
     g.beginPath();
-    g.moveTo(x + r, y);
-    g.arcTo(x + w, y, x + w, y + h, r);
-    g.arcTo(x + w, y + h, x, y + h, r);
-    g.arcTo(x, y + h, x, y, r);
-    g.arcTo(x, y, x + w, y, r);
+    var n = 22;
+    var sq = Math.max(0.55, squash);
+    for (var i = 0; i <= n; i++) {
+      var a = (i / n) * Math.PI * 2;
+      var wob = 1 + 0.09 * Math.sin(a * 3 + t * 5) + 0.045 * Math.sin(a * 6 - t * 4);
+      var x = Math.cos(a) * rad * wob * sq;
+      var y = Math.sin(a) * rad * wob / sq;
+      if (i) g.lineTo(x, y); else g.moveTo(x, y);
+    }
     g.closePath();
   }
 
   function paintBlob(g, b, t) {
-    if (b.inv > 0 && Math.sin(t * 40) > 0) return;
+    if (b.inv > 0 && Math.floor(t * 18) % 2 === 0) return;
     var sx = b.x - cam, sy = b.y;
-    var wob = reduced ? 0 : Math.sin(t * 7 + b.x * 0.02) * 1.4;
-    var rad = b.r + wob * 0.35;
+    var squash = b.squash;
+    var rad = b.r;
     g.save();
     g.translate(sx, sy);
-    g.scale(b.squash, 1 / Math.max(0.55, b.squash));
-    if (b.echo) g.globalAlpha = 0.82;
-    g.beginPath(); g.arc(0, 0, rad, 0, Math.PI * 2); g.clip();
-    /* local scene, flipped inside the metal */
+    if (b.echo) g.globalAlpha = 0.9;
+    blobPath(g, rad, t + (b.echo ? 1.2 : 0), squash);
+    g.save();
+    g.clip();
     g.save();
     g.scale(1, -1);
-    var src = rad * 2 * view.dpr;
-    var ox0 = (sx - rad) * view.dpr;
-    var oy0 = (sy - rad) * view.dpr;
+    var src = rad * 2.4 * view.dpr;
     try {
-      g.drawImage(off, ox0, oy0, src, src, -rad, -rad, rad * 2, rad * 2);
+      g.drawImage(off, (sx - rad) * view.dpr, (sy - rad) * view.dpr, src, src, -rad * 1.2, -rad * 1.2, rad * 2.4, rad * 2.4);
     } catch (err) {}
     g.restore();
-    var rg = g.createRadialGradient(-rad * 0.35, -rad * 0.45, 2, 0, 2, rad * 1.15);
-    rg.addColorStop(0, "rgba(255,255,255,0.92)");
-    rg.addColorStop(0.18, THEME.metal);
-    rg.addColorStop(0.55, "rgba(255,255,255,0.08)");
-    rg.addColorStop(1, "rgba(0,0,0,0.55)");
+    var rg = g.createRadialGradient(-rad * 0.32, -rad * 0.42, 2, 0, rad * 0.1, rad * 1.2);
+    rg.addColorStop(0, "rgba(255,255,255,0.95)");
+    rg.addColorStop(0.16, THEME.metal);
+    rg.addColorStop(0.5, "rgba(255,255,255,0.05)");
+    rg.addColorStop(1, "rgba(0,0,0,0.62)");
     g.globalCompositeOperation = "screen";
     g.fillStyle = rg;
-    g.fillRect(-rad, -rad, rad * 2, rad * 2);
+    g.fillRect(-rad * 2, -rad * 2, rad * 4, rad * 4);
     g.globalCompositeOperation = "source-over";
-    if (!reduced) {
-      var spec = (t * 48 + (b.echo ? 10 : 0)) % (rad * 2) - rad;
-      g.fillStyle = "rgba(255,255,255,0.5)";
-      g.fillRect(spec, -rad, 3, rad * 2);
+    g.fillStyle = "rgba(255,255,255,0.85)";
+    g.beginPath();
+    g.ellipse(-rad * 0.28, -rad * 0.32, rad * 0.16, rad * 0.08, -0.6, 0, 7);
+    g.fill();
+    g.restore();
+    blobPath(g, rad, t + (b.echo ? 1.2 : 0), squash);
+    g.strokeStyle = "rgba(255,255,255,0.22)";
+    g.lineWidth = 7;
+    g.stroke();
+    blobPath(g, rad * 0.96, t + (b.echo ? 1.2 : 0), squash);
+    g.strokeStyle = "rgba(255,255,255,0.8)";
+    g.lineWidth = 1.25;
+    g.stroke();
+    /* satellite droplets that ride the blob */
+    for (var s = 0; s < 3; s++) {
+      var ang = t * 2 + s * 2.1;
+      var ox = Math.cos(ang) * rad * 1.15;
+      var oy = Math.sin(ang) * rad * 0.45;
+      g.beginPath();
+      g.arc(ox, oy, 3 + s, 0, 7);
+      g.fillStyle = THEME.metal;
+      g.fill();
     }
     g.restore();
+  }
+
+  function paintBridge(g, t) {
+    var dx = (A.x - B.x), dy = (A.y - B.y);
+    var dist = Math.hypot(dx, dy);
+    if (dist > 78 || dist < 8) return;
     g.save();
-    g.translate(sx, sy);
-    g.scale(b.squash, 1 / Math.max(0.55, b.squash));
-    g.strokeStyle = "rgba(255,255,255,0.75)";
-    g.lineWidth = 1.5;
-    g.beginPath(); g.arc(0, 0, rad, 0, 7); g.stroke();
+    g.strokeStyle = THEME.metal;
+    g.globalAlpha = 1 - dist / 78;
+    g.lineWidth = 8 * (1 - dist / 78);
+    g.lineCap = "round";
+    g.beginPath();
+    g.moveTo(A.x - cam, A.y);
+    g.quadraticCurveTo((A.x + B.x) / 2 - cam, (A.y + B.y) / 2 - 10, B.x - cam, B.y);
+    g.stroke();
     g.restore();
   }
 
@@ -385,6 +459,7 @@
     ctx.drawImage(off, 0, 0, off.width, off.height, 0, 0, W, H);
     paintBlob(ctx, A, t);
     paintBlob(ctx, B, t);
+    paintBridge(ctx, t);
     drops.forEach(function (d) {
       ctx.globalAlpha = Math.max(0, d.a);
       ctx.fillStyle = d.c;
@@ -510,4 +585,89 @@
     document.addEventListener("house:kids-data-ready", start);
     WardKids.boot(kid);
   } else start();
+
+  var capCv = null;
+  function exportFrame(t, cssW, cssH, dpr) {
+    cssW = cssW || 1920;
+    cssH = cssH || 1080;
+    dpr = dpr || 1;
+    if (!capCv) capCv = document.createElement("canvas");
+    capCv.width = Math.round(cssW * dpr);
+    capCv.height = Math.round(cssH * dpr);
+    view.w = cssW;
+    view.h = cssH;
+    view.dpr = dpr;
+    off.width = capCv.width;
+    off.height = capCv.height;
+    var close = t >= 5.5 && t < 9.2;
+    var falling = t >= 12 && t < 13.5;
+    var gathered = t >= 13.5 && t < 15.4;
+    var splashOn = (t >= 9.2 && t < 11.1) || gathered;
+    var travel = Math.min(goalX - 120, 90 + t * 95);
+    var idx = 0;
+    for (var i = 0; i < plats.length; i++) {
+      if (plats[i].x + plats[i].w * 0.25 < travel) idx = i;
+    }
+    var pl = plats[idx];
+    var gx = platX(pl, t) + 42;
+    var gy = GY(pl.y) - 28;
+    if (falling) gy = GY(pl.y) - 28 + (t - 12) * 540;
+    if (gathered) {
+      var back = plats[Math.max(0, idx - 1)];
+      gx = platX(back, t) + 30;
+      gy = GY(back.y) - 28;
+    }
+    A.x = gx;
+    A.y = gy;
+    A.r = 26;
+    A.squash = falling ? 0.7 : (splashOn ? 1.28 : 1);
+    A.echo = false;
+    A.inv = 0;
+    B.x = gx - 62;
+    B.y = gy + (falling ? -8 : 2);
+    B.r = 22;
+    B.squash = 1;
+    B.echo = true;
+    B.inv = 0;
+    cam = Math.max(0, (A.x + B.x) / 2 - cssW * 0.42);
+    var gctx = capCv.getContext("2d", { alpha: false });
+    ox.setTransform(dpr, 0, 0, dpr, 0, 0);
+    paintWorld(ox, t, cssW, cssH);
+    gctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    gctx.drawImage(off, 0, 0, off.width, off.height, 0, 0, cssW, cssH);
+    paintBlob(gctx, A, t);
+    paintBlob(gctx, B, t);
+    paintBridge(gctx, t);
+    if (splashOn) {
+      var age = gathered ? (t - 13.5) : (t - 9.2);
+      var sx = A.x - cam;
+      var sy = A.y + 10;
+      for (var s = 0; s < 16; s++) {
+        var ang = -Math.PI * 0.15 - (s / 15) * Math.PI * 0.7;
+        var sp = 40 + (s % 5) * 28;
+        gctx.globalAlpha = Math.max(0, 1 - age / 1.5);
+        gctx.fillStyle = THEME.metal;
+        gctx.beginPath();
+        gctx.ellipse(sx + Math.cos(ang) * sp * age, sy + Math.sin(ang) * sp * age + 80 * age * age, 3 + (s % 3), 5, ang, 0, 7);
+        gctx.fill();
+      }
+      gctx.globalAlpha = 1;
+    }
+    if (close) {
+      var zoom = 2.7;
+      var src = document.createElement("canvas");
+      src.width = capCv.width;
+      src.height = capCv.height;
+      src.getContext("2d").drawImage(capCv, 0, 0);
+      var cx = (A.x - cam) * dpr;
+      var cy = A.y * dpr;
+      var cw = capCv.width / zoom;
+      var ch = capCv.height / zoom;
+      gctx.setTransform(1, 0, 0, 1, 0, 0);
+      gctx.drawImage(src, cx - cw / 2, cy - ch / 2, cw, ch, 0, 0, capCv.width, capCv.height);
+    }
+    return capCv;
+  }
+
+  window.MercuryRun = { exportFrame: exportFrame };
 })();
