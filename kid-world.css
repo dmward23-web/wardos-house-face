@@ -1,0 +1,402 @@
+/* kid-world.css · living worlds for the three kid boards
+   Phone, wall (1080), and landscape TV. Money, scores, and streak glass stay
+   in the DOM for the existing scripts and are clipped off the kid glass. */
+html.kw-root, html.kw-root body {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  background: #071018 !important;
+}
+html.kw-root body.kw-on {
+  color: #e9f6ff;
+}
+html.kw-root body.kw-on .panel,
+html.kw-root body.kw-on .panel::before,
+html.kw-root body.kw-on .panel::after {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+html.kw-root body.kw-on .panel {
+  width: 100% !important;
+  max-width: 1080px;
+  margin: 0 auto;
+  min-height: 100vh !important;
+  position: relative;
+  z-index: 1;
+}
+.kw-canvas, .kw-wash {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+.kw-wash { z-index: 0; }
+
+/* kid glass — dark luminous, not a white dashboard */
+body.kw-on .sec,
+body.kw-on .bank-card,
+body.kw-on .quest,
+body.kw-on .card,
+body.kw-on .consume-hero,
+body.kw-on .consume-ahead-row,
+body.kw-on .consume-punch-card,
+body.kw-on .hot-banner,
+body.kw-on .bar-card,
+body.kw-on .hdr,
+body.kw-on .jump-rail,
+body.kw-on .hotbar,
+body.kw-on .consume-day,
+body.kw-on .day-tap {
+  background: rgba(6, 12, 22, 0.46) !important;
+  color: #e9f6ff !important;
+  border-color: rgba(190, 230, 255, 0.28) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+body.kw-on .sec-title,
+body.kw-on .name,
+body.kw-on .name-accent,
+body.kw-on .quest .what,
+body.kw-on .card .what,
+body.kw-on .card .when,
+body.kw-on .card .hint,
+body.kw-on .consume-hero-title,
+body.kw-on .consume-hero-when,
+body.kw-on .consume-hero-meta,
+body.kw-on .consume-ahead-what,
+body.kw-on .consume-ahead-day,
+body.kw-on .consume-ahead-time,
+body.kw-on .hot-title,
+body.kw-on .live-clock,
+body.kw-on .live-clock-lab,
+body.kw-on .bank-title,
+body.kw-on .ftr,
+body.kw-on .consume-title,
+body.kw-on .consume-sub,
+body.kw-on .consume-punch-title,
+body.kw-on .consume-punch-sub,
+body.kw-on .tag {
+  color: #f3fbff !important;
+}
+body.kw-on .quest {
+  border-radius: 18px !important;
+  transition: transform 0.18s cubic-bezier(.2, .9, .2, 1), filter 0.18s ease;
+}
+body.kw-on .quest:active, body.kw-on .day-tap:active, body.kw-on .consume-day:active {
+  transform: translateY(2px) scale(0.985);
+}
+body.kw-on .quest.done {
+  box-shadow: 0 0 24px rgba(160, 240, 190, 0.28) !important;
+}
+body.kw-on .quest.done .what {
+  text-decoration: none !important;
+  opacity: 1 !important;
+}
+body.kw-on .day-tap {
+  min-width: 46px;
+  min-height: 46px;
+  border-radius: 14px !important;
+  font-weight: 800;
+  color: #f4fbff !important;
+}
+body.kw-on .day-tap.done {
+  background: rgba(170, 245, 190, 0.35) !important;
+  box-shadow: 0 0 16px rgba(160, 255, 190, 0.45) !important;
+}
+body.kw-on .day-tap.is-today {
+  outline: 2px solid rgba(255, 230, 170, 0.8);
+  outline-offset: 1px;
+}
+body.theme-harris.kw-on .day-tap { min-width: 54px; min-height: 54px; font-size: 18px; }
+body.theme-harris.kw-on .quest .what { font-size: 22px !important; }
+body.theme-ainsley.kw-on .sec,
+body.theme-ainsley.kw-on .quest,
+body.theme-ainsley.kw-on .card {
+  background: rgba(28, 16, 14, 0.5) !important;
+  border-color: rgba(232, 186, 140, 0.32) !important;
+}
+body.theme-hayes.kw-on .quest { border-color: rgba(120, 220, 255, 0.4) !important; }
+body.theme-harris.kw-on .quest { border-color: rgba(140, 230, 160, 0.4) !important; }
+
+/* jar host */
+.kw-jar-host {
+  width: min(280px, 70vw);
+  height: 320px;
+  margin: 8px auto 4px;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+.je-jar-cv { width: 100%; height: 100%; display: block; }
+
+/* money, scores, streaks: nodes stay for the old scripts, off the kid glass */
+body.kw-on .money-row,
+body.kw-on .grow-meter,
+body.kw-on .grow-total,
+body.kw-on .bank-count,
+body.kw-on .bank-meta,
+body.kw-on .bank-blurb,
+body.kw-on .bank-track,
+body.kw-on .jar-flow,
+body.kw-on .paid-stamp,
+body.kw-on [data-got-it],
+body.kw-on [data-streak-label],
+body.kw-on .xp-glass,
+body.kw-on .vfx-dollar,
+body.kw-on .kf-streak,
+body.kw-on .streak-sparks,
+body.kw-on [data-streak],
+body.kw-on .bars,
+body.kw-on .storm-meter,
+body.kw-on .storm-float,
+body.kw-on .vinyl-float,
+body.kw-on .spotlight,
+body.kw-on .stage-grid,
+body.kw-on .stage-ticks,
+body.kw-on .hud-tick {
+  display: none !important;
+}
+body.kw-on .bank-links a,
+body.kw-on .mute-btn,
+body.kw-on .ftr-chip {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #f4fbff !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+  border-radius: 999px !important;
+  text-decoration: none;
+}
+body.kw-on .jump-rail img { opacity: 0.0; height: 0; }
+body.kw-on .jump-rail {
+  display: flex !important;
+  gap: 8px;
+  padding: 8px !important;
+  border-radius: 16px !important;
+}
+body.kw-on .jump-rail a.row {
+  position: relative !important;
+  left: auto !important;
+  width: auto !important;
+  flex: 1;
+  min-height: 48px;
+  border-radius: 14px !important;
+  color: #f4fbff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+body.kw-on .hotbar { border-radius: 18px !important; }
+body.kw-on .hotbar .n, body.kw-on .hotbar-label { font-size: 0 !important; }
+body.kw-on .ftr { opacity: 0.8; padding: 12px 4px 28px; }
+
+/* sub-scene */
+.kw-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  color: #f4fbff;
+}
+.kw-scene.is-on { display: block; }
+.kw-scene-cv { position: absolute; inset: 0; width: 100%; height: 100%; }
+.kw-scene-ui {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: max(18px, env(safe-area-inset-top)) 18px 22px;
+  pointer-events: none;
+}
+.kw-scene-ui > * { pointer-events: auto; }
+.kw-kicker {
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.75;
+}
+.kw-scene-title {
+  font-size: clamp(28px, 6vw, 54px);
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  text-shadow: 0 0 24px rgba(180, 230, 255, 0.45);
+  margin: 6px 0 10px;
+}
+.kw-scene-body {
+  font-size: clamp(16px, 2.4vw, 20px);
+  line-height: 1.4;
+  max-width: 38rem;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
+}
+.kw-scene-body button, .kw-scene-body .kw-chip, .kw-back, .kw-go {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(8, 14, 22, 0.35);
+  color: #f6fcff;
+  border-radius: 999px;
+  padding: 12px 16px;
+  min-height: 48px;
+  font: inherit;
+  font-weight: 700;
+  margin: 6px 6px 0 0;
+  cursor: pointer;
+}
+.kw-scene-actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+.kw-scene.is-on { animation: kw-iris 0.7s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes kw-iris {
+  from { clip-path: circle(0% at var(--kx, 50%) var(--ky, 40%)); }
+  to { clip-path: circle(140% at var(--kx, 50%) var(--ky, 40%)); }
+}
+html.kw-reduce .kw-scene.is-on { animation: none; }
+
+/* calendar layer */
+.cw {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.cw-brief {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-shadow: 0 0 18px rgba(180, 220, 255, 0.35);
+}
+.cw-row { display: flex; gap: 8px; align-items: center; }
+.cw-ring { width: 84px; height: 84px; flex: 0 0 auto; }
+.cw-next {
+  flex: 1;
+  text-align: left;
+  border-radius: 18px !important;
+  padding: 12px 14px !important;
+  min-height: 72px;
+}
+.cw-path {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  min-height: 92px;
+}
+.cw-lantern {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 84px;
+  position: relative;
+}
+.cw-orb {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--orb, #8fd) 40%, rgba(0,0,0,0.2) 72%);
+  box-shadow: 0 0 16px var(--orb, #8fd);
+}
+.cw-lantern small { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; opacity: 0.8; }
+.cw-lantern.is-past { opacity: 0.4; }
+.cw-lantern.is-fog .cw-orb { filter: blur(0.4px); opacity: 0.55; }
+.cw-lantern.is-now .cw-orb { width: 46px; height: 46px; }
+.cw-now {
+  position: absolute; top: 0; bottom: 18px; width: 2px;
+  background: linear-gradient(#fff, transparent);
+  pointer-events: none;
+  box-shadow: 0 0 12px #fff;
+}
+.cw-creature {
+  position: absolute; top: -6px; width: 18px; height: 18px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, #9ef 45%, transparent 70%);
+  filter: drop-shadow(0 0 8px #9ef);
+  transition: left 1.6s cubic-bezier(.2, .8, .2, 1);
+  pointer-events: none;
+}
+.cw-phases, .cw-ideas { display: flex; flex-wrap: wrap; gap: 8px; }
+.cw-phase, .cw-idea {
+  appearance: none; font: inherit; font-weight: 700; color: inherit;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 999px;
+  padding: 10px 14px;
+  min-height: 44px;
+  cursor: pointer;
+}
+body.theme-harris.kw-on .cw-orb { width: 48px; height: 48px; }
+body.theme-harris.kw-on .cw-brief { font-size: 22px; }
+body.theme-ainsley.kw-on .cw-brief { font-weight: 560; letter-spacing: -0.01em; font-size: 17px; }
+body.kw-on.kw-asleep .cw-lantern { filter: saturate(0.7); }
+
+@media (max-width: 860px) {
+  html.kw-root body.kw-on .body {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  html.kw-root body.kw-on .panel { padding: 10px 12px 18px !important; }
+  .cw-path { gap: 3px; }
+}
+@media (min-width: 1500px) and (orientation: landscape) {
+  html.kw-root body.kw-on .panel { max-width: 1920px; }
+  html.kw-root body.kw-on .body {
+    display: grid !important;
+    grid-template-columns: 1fr 0.9fr 1.15fr !important;
+    align-items: start;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cw-creature, body.kw-on .quest { transition: none !important; }
+}
+
+/* Beat older theme sheets that force money, pills, and vinyl back on. */
+body.theme-hayes.kw-on .sec-bank .money-row,
+body.theme-harris.kw-on .sec-bank .money-row,
+body.theme-ainsley.kw-on .sec-bank .money-row,
+body.theme-hayes.kw-on .sec-bank .bank-meta,
+body.theme-harris.kw-on .sec-bank .bank-meta,
+body.theme-ainsley.kw-on .sec-bank .bank-meta,
+body.theme-hayes.kw-on .session-rail img,
+body.theme-harris.kw-on .session-rail img,
+body.theme-ainsley.kw-on .vinyl-float,
+body.kw-on .storm-float,
+body.kw-on .hud-tick {
+  display: none !important;
+}
+body.theme-hayes.kw-on .jump-rail,
+body.theme-harris.kw-on .jump-rail,
+body.theme-ainsley.kw-on .jump-rail {
+  display: flex !important;
+  position: relative !important;
+  min-height: 56px !important;
+  background: rgba(6, 12, 22, 0.46) !important;
+}
+body.theme-hayes.kw-on .jump-rail a.row,
+body.theme-harris.kw-on .jump-rail a.row,
+body.theme-ainsley.kw-on .jump-rail a.row {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  width: auto !important;
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14px !important;
+  color: #f4fbff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  overflow: visible !important;
+}
