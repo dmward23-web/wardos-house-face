@@ -1,4 +1,4 @@
-/* House Face · ORIHOME3 · mount the living world and fly into a scene on every board tap.
+/* House Face · ORIHOME4 · mount the living world and fly into a scene on every board tap.
    Original code. The forest is ori/ori-scene.js (painted plates + motes). No Ori assets.
    HouseSfx owns the tap. This file adds the level-enter whoosh on the same mixer, so mute still wins.
    A key-less screen is left alone: no key modal from here. */
@@ -57,7 +57,11 @@
   var fallback = document.createElement("div");
   fallback.className = "ori-fallback";
   fallback.setAttribute("aria-hidden", "true");
-  for (var i = 0; i < 8; i++) fallback.appendChild(document.createElement("i"));
+  var sun = document.createElement("div"); sun.className = "ori-sun";
+  var shaft = document.createElement("div"); shaft.className = "ori-shaft";
+  var canopy = document.createElement("div"); canopy.className = "ori-canopy";
+  fallback.appendChild(sun); fallback.appendChild(shaft); fallback.appendChild(canopy);
+  for (var i = 0; i < 16; i++) fallback.appendChild(document.createElement("i"));
   document.body.insertBefore(fallback, document.body.firstChild);
   document.body.insertBefore(host, document.body.firstChild);
 
@@ -72,10 +76,10 @@
         hotLight: 1.35,
         preserve: true,
         config: {
-          dprMax: small ? 1.35 : 1.6,
-          renderScale: small ? 0.8 : 1,
-          fpsCap: 60,
-          bloom: small ? 0.4 : 0.55,
+          dprMax: small ? 1.5 : 1.6,
+          renderScale: small ? 0.85 : 1,
+          fpsCap: 120,
+          bloom: small ? 0.45 : 0.55,
           vig: 1.15,
           ion: { acc: theme.acc, acc2: theme.key, ink: "#eaf6ff", ground: "#041018" },
           sound: { muted: true, ambient: false, volume: 0 }
@@ -119,6 +123,146 @@
   var fy0 = from ? Math.min(1, Math.max(0, from.y)) : 0.1;
   arrive(fx0, fy0);
 
+  /* Quality governor. First ~2s measures render cost (not the rAF gap), then steps
+     dpr, scale, layers, and bloom until a frame fits in 15ms (~60fps).
+     ProMotion (rAF gap under 10ms and cost under 8ms) may climb to 120.
+     The floor tier has to hold ~50fps or the painted world comes down and the CSS forest stays. */
+  var TIERS = [
+    { id: "promo", dprMax: 2, renderScale: 1, bloom: 0.62, bloomLevels: 6, layers: 5, fog: true, shafts: 5, wisps: true, moteStep: 1 },
+    { id: "high", dprMax: 1.5, renderScale: 0.85, bloom: 0.45, bloomLevels: 5, layers: 5, fog: true, shafts: 5, wisps: true, moteStep: 1 },
+    { id: "mid", dprMax: 1.25, renderScale: 0.75, bloom: 0.28, bloomLevels: 4, layers: 4, fog: true, shafts: 3, wisps: true, moteStep: 2 },
+    { id: "low", dprMax: 1, renderScale: 0.6, bloom: 0.12, bloomLevels: 3, layers: 4, fog: false, shafts: 2, wisps: false, moteStep: 2 },
+    { id: "floor", dprMax: 1, renderScale: 0.45, bloom: 0, bloomLevels: 0, layers: 3, fog: false, shafts: 0, wisps: false, moteStep: 3 }
+  ];
+  var WALL = { id: "wall", dprMax: 1.6, renderScale: 1, bloom: 0.55, bloomLevels: 6, layers: 5, fog: true, shafts: 5, wisps: true, moteStep: 1 };
+  var budgetLog = [];
+  function applyTier(w, tier) {
+    w.cfg.dprMax = tier.dprMax;
+    w.cfg.renderScale = tier.renderScale;
+    w.cfg.bloom = tier.bloom;
+    w.tierBloom = tier.bloom;
+    w.bloomLevels = tier.bloomLevels;
+    w.tierLayers = tier.layers;
+    w.tierFog = tier.fog;
+    w.shaftN = tier.shafts;
+    w.tierWisps = tier.wisps;
+    w.moteStep = tier.moteStep;
+    w.tierId = tier.id;
+    if (w.S) w.S.bloomLevels = tier.bloomLevels;
+    try { w.resize(); } catch (e) {}
+  }
+  function logBudget(tier, avg, p95, px) {
+    var fps = avg > 0 ? 1000 / avg : 0;
+    var row = { tier: tier.id, avg: +avg.toFixed(2), p95: +p95.toFixed(2), fps: Math.round(fps), px: px, dpr: tier.dprMax, scale: tier.renderScale, bloom: tier.bloom, layers: tier.layers, bloomLevels: tier.bloomLevels };
+    budgetLog.push(row);
+    try { console.info("[house-ori] budget " + tier.id + " avg " + avg.toFixed(1) + "ms p95 " + p95.toFixed(1) + "ms fps " + fps.toFixed(0) + " px " + px); } catch (e) {}
+    return row;
+  }
+  function govern(w0) {
+    if (!w0 || !w0.S) return;
+    var steps = small ? [TIERS[1], TIERS[2], TIERS[3], TIERS[4]] : [WALL, TIERS[1], TIERS[2], TIERS[3], TIERS[4]];
+    var idx = 0;
+    var costs = [];
+    var gaps = [];
+    var t0 = (window.performance && performance.now) ? performance.now() : Date.now();
+    var mode = "sample";
+    applyTier(w0, steps[0]);
+    w0.cfg.fpsCap = 120;
+    function nowMs() { return (window.performance && performance.now) ? performance.now() : Date.now(); }
+    function pack(arr) {
+      if (!arr.length) return { avg: 999, p95: 999 };
+      var s = arr.slice().sort(function (a, b) { return a - b; });
+      var sum = 0, i;
+      for (i = 0; i < s.length; i++) sum += s[i];
+      return { avg: sum / s.length, p95: s[Math.min(s.length - 1, Math.floor(s.length * 0.95))] };
+    }
+    function pxOf(w) { try { var st = w.stats(); return (st.w || 0) + "x" + (st.h || 0); } catch (e) { return "0x0"; } }
+    function gapMed() {
+      if (!gaps.length) return 16;
+      var g = gaps.slice().sort(function (a, b) { return a - b; });
+      return g[g.length >> 1];
+    }
+    function publish(tierName, cap) {
+      if (!window.HouseOri) return;
+      window.HouseOri.tier = tierName;
+      window.HouseOri.budget = budgetLog;
+      window.HouseOri.fpsCap = cap;
+      window.HouseOri.world = world;
+    }
+    w0.onFrameCost = function (ms) {
+      if (!world || mode === "lock" || document.hidden) return;
+      var elapsed = nowMs() - t0;
+      if (elapsed < 380) return;
+      costs.push(ms);
+      if (world.frameGap) gaps.push(world.frameGap * 1000);
+      var need = (mode === "promo" || idx > 0) ? 900 : 1600;
+      var ready = elapsed >= 380 + need && (costs.length >= 8 || elapsed >= 380 + need + 2200);
+      if (!ready) return;
+      if (!costs.length) {
+        mode = "lock";
+        try { world.destroy(); } catch (e) {}
+        world = null;
+        document.documentElement.classList.remove("ori-gl");
+        document.documentElement.classList.add("ori-nogl");
+        try { console.info("[house-ori] css-forest no frames"); } catch (e2) {}
+        publish("css", 0);
+        return;
+      }
+      var st = pack(costs);
+      var tier = mode === "promo" ? TIERS[0] : steps[idx];
+      logBudget(tier, st.avg, st.p95, pxOf(world));
+      var hold60 = st.avg <= 15 && st.p95 <= 22;
+      var gm = gapMed();
+      if (mode === "promo") {
+        if (st.avg < 8 && gm < 10) {
+          world.cfg.fpsCap = 120;
+          mode = "lock";
+          try { console.info("[house-ori] lock promo 120 gap " + gm.toFixed(1) + "ms"); } catch (e) {}
+          publish("promo", 120);
+        } else {
+          applyTier(world, steps[0]);
+          world.cfg.fpsCap = 60;
+          mode = "lock";
+          try { console.info("[house-ori] lock " + steps[0].id + " 60"); } catch (e) {}
+          publish(steps[0].id, 60);
+        }
+        return;
+      }
+      if (hold60) {
+        if (small && idx === 0 && st.avg < 8 && gm < 10) {
+          mode = "promo";
+          costs = []; gaps = []; t0 = nowMs();
+          applyTier(world, TIERS[0]);
+          return;
+        }
+        world.cfg.fpsCap = (st.avg < 8 && gm < 10) ? 120 : 60;
+        mode = "lock";
+        try { console.info("[house-ori] lock " + tier.id + " " + world.cfg.fpsCap); } catch (e) {}
+        publish(tier.id, world.cfg.fpsCap);
+        return;
+      }
+      if (idx >= steps.length - 1) {
+        if (st.avg > 20) {
+          try { world.destroy(); } catch (e) {}
+          world = null;
+          document.documentElement.classList.remove("ori-gl");
+          document.documentElement.classList.add("ori-nogl");
+          try { console.info("[house-ori] css-forest floor avg " + st.avg.toFixed(1) + "ms"); } catch (e2) {}
+          publish("css", 0);
+        } else {
+          world.cfg.fpsCap = 60;
+          mode = "lock";
+          try { console.info("[house-ori] lock floor " + st.avg.toFixed(1) + "ms"); } catch (e) {}
+          publish("floor", 60);
+        }
+        return;
+      }
+      idx += 1;
+      costs = []; gaps = []; t0 = nowMs();
+      applyTier(world, steps[idx]);
+    };
+  }
+
   if (world && world.S) {
     document.documentElement.classList.add("ori-gl");
     world.exposure = 1.45;
@@ -160,6 +304,11 @@
     world.onReady = openEye;
     try { world.start(); } catch (e) { document.documentElement.classList.remove("ori-gl"); }
     setTimeout(openEye, 2400);
+    govern(world);
+    document.addEventListener("visibilitychange", function () {
+      if (!world || !world.pause) return;
+      world.pause(document.hidden);
+    });
     window.addEventListener("pointermove", function (ev) {
       if (!world || REDUCED || !O.util) return;
       world.ptr = { x: ev.clientX / Math.max(1, innerWidth) * 2 - 1, y: ev.clientY / Math.max(1, innerHeight) * 2 - 1, t: O.util.now() };
@@ -383,6 +532,9 @@
     world: world,
     flyTo: flyTo,
     page: PAGE,
-    theme: theme
+    theme: theme,
+    tier: world && world.tierId ? world.tierId : (world ? "probing" : "css"),
+    budget: budgetLog,
+    fpsCap: world && world.cfg ? world.cfg.fpsCap : 0
   };
 })();

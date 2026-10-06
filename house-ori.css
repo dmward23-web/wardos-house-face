@@ -1,4 +1,4 @@
-/* House Face · ORIHOME3 · living overworld skin.
+/* House Face · ORIHOME4 · living overworld skin.
    Original code and colour. Ori-inspired mood only: no Ori assets, characters, or logo.
    The painted forest is ori/ori-scene.js. This file is the HUD, the portals, and the level-enter veil.
    Loaded last so it wins over the command-deck tokens. */
@@ -54,9 +54,42 @@ html.ori-on body {
   pointer-events: none;
   overflow: hidden;
   background:
+    radial-gradient(ellipse 42% 28% at 68% 6%, rgba(186, 228, 255, 0.55), transparent 62%),
     radial-gradient(ellipse 70% 42% at 72% 8%, rgba(140, 210, 255, 0.28), transparent 60%),
-    radial-gradient(ellipse 50% 40% at 18% 88%, rgba(80, 180, 130, 0.18), transparent 62%),
-    linear-gradient(180deg, #0c2030 0%, #07141f 42%, #041018 100%);
+    radial-gradient(ellipse 50% 40% at 18% 88%, rgba(80, 180, 130, 0.22), transparent 62%),
+    linear-gradient(180deg, #163044 0%, #0c2030 28%, #07141f 58%, #041018 100%);
+}
+.ori-fallback .ori-sun {
+  position: absolute;
+  left: 58%;
+  top: 2%;
+  width: 22vmin;
+  height: 22vmin;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 18%, #e7f6ff 36%, rgba(150, 210, 255, 0) 72%);
+  box-shadow: 0 0 48px 16px rgba(180, 220, 255, 0.45);
+}
+.ori-fallback .ori-shaft {
+  position: absolute;
+  left: 46%;
+  top: -12%;
+  width: 34%;
+  height: 130%;
+  background: linear-gradient(180deg, rgba(220, 240, 255, 0.28), rgba(180, 220, 255, 0.05) 62%, transparent);
+  transform: rotate(16deg);
+  filter: blur(8px);
+}
+.ori-fallback .ori-canopy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 48%;
+  background:
+    radial-gradient(ellipse 36% 80% at 8% 100%, rgba(10, 48, 32, 0.9), transparent 70%),
+    radial-gradient(ellipse 42% 90% at 86% 100%, rgba(6, 28, 40, 0.92), transparent 72%),
+    radial-gradient(ellipse 28% 70% at 40% 108%, rgba(8, 36, 28, 0.8), transparent 70%),
+    linear-gradient(180deg, transparent, rgba(4, 16, 22, 0.15) 18%, rgba(3, 12, 18, 0.78));
 }
 .ori-fallback i {
   position: absolute;
@@ -68,14 +101,23 @@ html.ori-on body {
   animation: ori-mote 14s linear infinite;
   opacity: 0.75;
 }
-.ori-fallback i:nth-child(1) { left: 12%; top: 80%; animation-duration: 16s; }
-.ori-fallback i:nth-child(2) { left: 28%; top: 90%; animation-duration: 12s; animation-delay: -3s; }
-.ori-fallback i:nth-child(3) { left: 46%; top: 70%; animation-duration: 18s; animation-delay: -6s; width: 3px; height: 3px; }
-.ori-fallback i:nth-child(4) { left: 63%; top: 86%; animation-duration: 15s; animation-delay: -2s; }
-.ori-fallback i:nth-child(5) { left: 78%; top: 74%; animation-duration: 13s; animation-delay: -8s; }
-.ori-fallback i:nth-child(6) { left: 88%; top: 92%; animation-duration: 17s; animation-delay: -4s; width: 4px; height: 4px; }
-.ori-fallback i:nth-child(7) { left: 8%; top: 40%; animation-duration: 20s; animation-delay: -9s; opacity: 0.4; }
-.ori-fallback i:nth-child(8) { left: 54%; top: 30%; animation-duration: 19s; animation-delay: -1s; opacity: 0.35; }
+.ori-fallback i:nth-of-type(1) { left: 12%; top: 80%; animation-duration: 16s; }
+.ori-fallback i:nth-of-type(2) { left: 28%; top: 90%; animation-duration: 12s; animation-delay: -3s; }
+.ori-fallback i:nth-of-type(3) { left: 46%; top: 70%; animation-duration: 18s; animation-delay: -6s; width: 3px; height: 3px; }
+.ori-fallback i:nth-of-type(4) { left: 63%; top: 86%; animation-duration: 15s; animation-delay: -2s; }
+.ori-fallback i:nth-of-type(5) { left: 78%; top: 74%; animation-duration: 13s; animation-delay: -8s; }
+.ori-fallback i:nth-of-type(6) { left: 88%; top: 92%; animation-duration: 17s; animation-delay: -4s; width: 4px; height: 4px; }
+.ori-fallback i:nth-of-type(7) { left: 8%; top: 40%; animation-duration: 20s; animation-delay: -9s; opacity: 0.4; }
+.ori-fallback i:nth-of-type(8) { left: 54%; top: 30%; animation-duration: 19s; animation-delay: -1s; opacity: 0.35; }
+.ori-fallback i:nth-of-type(n + 9) { width: 3px; height: 3px; opacity: 0.55; }
+.ori-fallback i:nth-of-type(9) { left: 18%; top: 96%; animation-duration: 11s; }
+.ori-fallback i:nth-of-type(10) { left: 36%; top: 88%; animation-duration: 15s; animation-delay: -5s; }
+.ori-fallback i:nth-of-type(11) { left: 70%; top: 94%; animation-duration: 13s; animation-delay: -7s; }
+.ori-fallback i:nth-of-type(12) { left: 84%; top: 60%; animation-duration: 18s; animation-delay: -2s; opacity: 0.35; }
+.ori-fallback i:nth-of-type(13) { left: 6%; top: 72%; animation-duration: 17s; animation-delay: -4s; }
+.ori-fallback i:nth-of-type(14) { left: 50%; top: 78%; animation-duration: 14s; animation-delay: -9s; }
+.ori-fallback i:nth-of-type(15) { left: 92%; top: 40%; animation-duration: 21s; animation-delay: -6s; opacity: 0.3; }
+.ori-fallback i:nth-of-type(16) { left: 24%; top: 48%; animation-duration: 19s; animation-delay: -11s; opacity: 0.3; }
 @keyframes ori-mote {
   0% { transform: translate3d(0, 0, 0); opacity: 0; }
   12% { opacity: 0.8; }
@@ -455,6 +497,86 @@ html.ori-home body .panel .tile.sp-tile {
     font-size: 8px !important;
     letter-spacing: 0.28em !important;
   }
+}
+
+/* Phone sheets · native 440. ori-phone is set only when the screen's short side is ≤600.
+   Wall 1080 and TV 1920 never get this class, so their canvases stay put.
+   The home board already has its own phone layout (tokens-hub-fit). */
+html.ori-phone:not(.ori-home),
+html.ori-phone:not(.ori-home) body {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-x: hidden !important;
+}
+html.ori-phone:not(.ori-home) body .panel,
+html.ori-phone:not(.ori-home) body .shell {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 100dvh !important;
+  box-sizing: border-box !important;
+  padding: 12px 12px calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+  overflow-x: hidden !important;
+}
+html.ori-phone:not(.ori-home) body :is(.hdr, header, .banner, .bulk, .pad-grid, .cam-grid, .ctrl-row, .body, .month-grid, .ftr, .shot-grid, .cams, .bar) {
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+html.ori-phone:not(.ori-home) :is(.hdr, header.hdr, .bar) {
+  flex-wrap: wrap !important;
+  height: auto !important;
+  white-space: normal !important;
+}
+html.ori-phone:not(.ori-home) :is(.name, .banner-title, h1) {
+  font-size: clamp(22px, 6.4vw, 32px) !important;
+  line-height: 1.12 !important;
+  overflow-wrap: anywhere;
+}
+html.ori-phone:not(.ori-home) :is(button, .back, .home-btn, .nav-week, .cmd-chip, .cbtn, .ctrl-btn, .ftr-chip, .bar a, .bar button, summary, [role="button"]) {
+  min-height: 48px !important;
+}
+html.ori-phone:not(.ori-home) .month-grid {
+  min-height: 0 !important;
+  height: auto !important;
+  grid-template-rows: none !important;
+  gap: 4px !important;
+}
+html.ori-phone:not(.ori-home) .month-grid .day {
+  min-height: 56px !important;
+  height: auto !important;
+}
+html.ori-phone:not(.ori-home) :is(.cam-grid, .ctrl-row, .body, .ds-grid, .pad-grid) {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: none !important;
+}
+html.ori-phone:not(.ori-home) .cam-zone { min-height: 0 !important; flex: none !important; }
+html.ori-phone:not(.ori-home) :is(.cam, .cam-tile) { min-height: 180px !important; }
+html.ori-phone:not(.ori-home) .cam-feed { min-height: 168px !important; }
+html.ori-phone:not(.ori-home) .cams {
+  flex-wrap: wrap !important;
+  overflow-x: hidden !important;
+}
+html.ori-phone:not(.ori-home) :is(.ds-stop, .ds-row) {
+  grid-template-columns: 1fr !important;
+}
+html.ori-phone:not(.ori-home) .shot-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-rows: none !important;
+  min-height: 0 !important;
+}
+html.ori-phone:not(.ori-home) .shot-grid .card { min-height: 140px !important; }
+html.ori-phone:not(.ori-home) :is(img, video, table, pre) { max-width: 100% !important; }
+html.ori-phone:not(.ori-home) pre,
+html.ori-phone:not(.ori-home) code { white-space: pre-wrap !important; overflow-wrap: anywhere; }
+html.ori-phone:not(.ori-home) .cam-feed img,
+html.ori-phone:not(.ori-home) .thumb-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
 }
 
 html.ori-diving body { pointer-events: none; }
