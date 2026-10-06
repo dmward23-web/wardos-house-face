@@ -602,12 +602,14 @@
   };
   WP.loadPlates = function () {
     var self = this, ln = this.lname, set = (this.B && this.B.plates) || ln, n = 0; this.platesReady = false;
-    function done() { if (++n === LAYERS.length) { self.platesReady = true; self.kick(true); if (self.onReady) self.onReady(); } }
     /* painted drop-ins: _test/plates/make_plates.py writes plates/painted/<set>-<layer>.png + plates/painted/manifest.js (window.ORI_PAINTED);
        a painted layer replaces the procedural mask plate, a missing one falls back to it. ?painted=0 forces procedural. */
     var PM = (global.ORI_PAINTED && !/[?&]painted=0/.test(global.location ? global.location.search : "")) ? global.ORI_PAINTED : {};
     var PL = global.ORI_PAINTED_LIGHT || {}; this.lightOverride = PM[set + "-sky"] && PL[set] ? PL[set] : null;
-    LAYERS.forEach(function (k) { var img = new Image(), key = set + "-" + k, pv = PM[key];
+    /* Optional painted light plate (grove-rays). Missing keys stay on the five depth layers. */
+    var keys = LAYERS.slice(); if (PM[set + "-rays"]) keys.push("rays");
+    function done() { if (++n === keys.length) { self.platesReady = true; self.kick(true); if (self.onReady) self.onReady(); } }
+    keys.forEach(function (k) { var img = new Image(), key = set + "-" + k, pv = PM[key];
       img.onload = function () { if (self.lname !== ln || !self.S) return; self.S.loadPlate(k, img, !!pv); done(); };
       img.onerror = done; var ext = global.ORI_PLATE_EXT || "png"; /* SPOTIFY1 vendored copy: plates ship as webp on Pages */
       img.src = pv ? self.plateBase + "painted/" + key + "." + ext + "?v=" + pv : self.plateBase + set + "-" + k + "." + ext; });
@@ -732,6 +734,10 @@
     var night = this.mode === "night" ? 1 : 0;
     var layers = this.tierLayers == null ? 5 : this.tierLayers;
     plate("sky");
+    if (S.plates.rays) {
+      var rk = 0.62 + 0.38 * Math.sin(Tm * 0.37);
+      S.drawPlate("rays", L.rect.sky, { dark: T.sky.dark, lit: T.sky.lit, rim: T.sky.rim, glow: T.sky.glow, fog: T.fog1, fogA: 0, bias: 0, rimI: 0, glowI: 0, tw: 0, light: Ln, paintK: rk });
+    }
     if (this.tierRays !== false) S.drawRays({ L: Ln, a: 0.6 * (1 - 0.5 * night), c: T.rays });
     var hk = (1 - 0.6 * night) * (this.o.hotLight == null ? 1 : this.o.hotLight), hr = Math.min(w, h);
     if (hk > 0) { S.spr(Lp[0], Lp[1], Lp[0], Lp[1], hr * 0.55, 1, 0, 0, [0.5 * hk, 0.62 * hk, 0.7 * hk], 0.5); S.spr(Lp[0], Lp[1], Lp[0], Lp[1], hr * 0.16, 1, 0, 0, [2.4 * hk, 2.45 * hk, 2.3 * hk], 0.9); S.spr(Lp[0], Lp[1], Lp[0], Lp[1], hr * 0.05, 1, 0, 0, [6.0 * hk, 6.0 * hk, 5.6 * hk], 1); S.flushSpr(); }

@@ -1,4 +1,4 @@
-/* House Face · ORIHOME7 · mount the living world and fly into a scene on every board tap.
+/* House Face · ORIHOME8 · mount the living world and fly into a scene on every board tap.
    Original code. The forest is ori/ori-scene.js (painted plates + motes). No Ori assets.
    HouseSfx owns the tap. This file adds the level-enter whoosh on the same mixer, so mute still wins.
    A key-less screen is left alone: no key modal from here. */
@@ -62,7 +62,7 @@
   host.className = "ori-world";
   host.setAttribute("aria-hidden", "true");
   var fallback = document.createElement("div");
-  fallback.className = "ori-fallback";
+  fallback.className = "ori-fallback ori-painted";
   fallback.setAttribute("aria-hidden", "true");
   function fbLayer(cls) {
     var d = document.createElement("div");
@@ -70,18 +70,20 @@
     fallback.appendChild(d);
     return d;
   }
-  var sky = fbLayer("ori-sky");
-  var far = fbLayer("ori-far");
-  var mid = fbLayer("ori-mid");
-  var fore = fbLayer("ori-fore");
-  var sun = document.createElement("div"); sun.className = "ori-sun"; sky.appendChild(sun);
-  var moon = document.createElement("div"); moon.className = "ori-moon"; sky.appendChild(moon);
-  far.appendChild(document.createElement("div")).className = "ori-ridge";
-  var shaft = document.createElement("div"); shaft.className = "ori-shaft"; mid.appendChild(shaft);
-  var shaft2 = document.createElement("div"); shaft2.className = "ori-shaft ori-shaft-b"; mid.appendChild(shaft2);
-  var canopy = document.createElement("div"); canopy.className = "ori-canopy"; far.appendChild(canopy);
-  mid.appendChild(document.createElement("div")).className = "ori-pathglow";
-  for (var i = 0; i < 18; i++) fore.appendChild(document.createElement("i"));
+  /* Painted plates (sky, soft grade, ray glint, mountains, island, near branches, foreground). Motion, shafts, fog, and motes stay in code. */
+  fbLayer("ori-sky");
+  fbLayer("ori-soft");
+  fbLayer("ori-rays");
+  fbLayer("ori-far");
+  fbLayer("ori-mid");
+  var light = fbLayer("ori-light");
+  fbLayer("ori-near");
+  fbLayer("ori-fore");
+  fbLayer("ori-fog");
+  var motes = fbLayer("ori-motes");
+  var shaft = document.createElement("div"); shaft.className = "ori-shaft"; light.appendChild(shaft);
+  var shaft2 = document.createElement("div"); shaft2.className = "ori-shaft ori-shaft-b"; light.appendChild(shaft2);
+  for (var i = 0; i < 18; i++) motes.appendChild(document.createElement("i"));
   document.body.insertBefore(fallback, document.body.firstChild);
   document.body.insertBefore(host, document.body.firstChild);
 
@@ -91,6 +93,11 @@
     try {
       world = new O.World(host, {
         plates: "ori/plates/",
+        layouts: {
+          phone: { W: 1280, H: 720, light: [0.83, 0.4], plates: "grove" },
+          single: { W: 1280, H: 720, light: [0.83, 0.4], plates: "grove" }
+        },
+        pickLayout: function (a) { return a < 0.8 ? "phone" : "single"; },
         motes: small ? 64 : 120,
         fonts: false,
         hotLight: 1.35,
@@ -324,7 +331,8 @@
       }
     };
     if (HOME) {
-      world.scrollMax = 1.7;
+      /* Landscape plates. scrollMax stays inside the cover crop so the fastest layer does not run off the painting. */
+      world.scrollMax = 0.2;
       world.applyScrollCam = function () {
         var doc = document.documentElement;
         var max = Math.max(1, (doc.scrollHeight || 0) - (window.innerHeight || 1));
@@ -332,8 +340,8 @@
         var f = Math.max(0, Math.min(1, y / max));
         this.scroll.t = f * this.scrollMax;
         if (CAPTURE) { this.scroll.v = this.scroll.t; this.scroll.vel = 0; }
-        this.cam.y.v += (0.42 - f) * 96;
-        this.cam.x.v += Math.sin(f * Math.PI) * 22;
+        this.cam.y.v += (0.42 - f) * 28;
+        this.cam.x.v += Math.sin(f * Math.PI) * 18;
         doc.style.setProperty("--ori-scroll", f.toFixed(4));
       };
       window.addEventListener("scroll", function () { if (world && world.kick) world.kick(); }, { passive: true });

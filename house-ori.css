@@ -1,4 +1,4 @@
-/* House Face · ORIHOME7 · living overworld skin.
+/* House Face · ORIHOME8 · living overworld skin.
    Original code and colour. Ori-inspired mood only: no Ori assets, characters, or logo.
    The painted forest is ori/ori-scene.js. This file is the HUD, the portals, and the level-enter veil.
    Loaded last so it wins over the command-deck tokens. */
@@ -191,6 +191,78 @@ html.ori-on { --ori-scroll: 0; }
   100% { transform: translate3d(18px, -110vh, 0); opacity: 0; }
 }
 html.ori-gl .ori-fallback { display: none; }
+
+/* Painted plates. The picture is the raster; shafts, fog, and motes stay as light and particles. */
+.ori-fallback.ori-painted .ori-sky,
+.ori-fallback.ori-painted .ori-soft,
+.ori-fallback.ori-painted .ori-rays,
+.ori-fallback.ori-painted .ori-far,
+.ori-fallback.ori-painted .ori-mid,
+.ori-fallback.ori-painted .ori-near,
+.ori-fallback.ori-painted .ori-fore,
+.ori-fallback.ori-painted .ori-fog,
+.ori-fallback.ori-painted .ori-light,
+.ori-fallback.ori-painted .ori-motes {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform: none;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.ori-fallback.ori-painted .ori-sky {
+  background-image: url("ori/plates/painted/grove-sky.webp?v=ORIHOME8");
+  background-position: calc(48% + var(--ori-scroll) * 8%) center;
+}
+.ori-fallback.ori-painted .ori-soft {
+  background-image: url("ori/plates/painted/grove-soft.webp?v=ORIHOME8");
+  background-position: calc(48% + var(--ori-scroll) * 8%) center;
+  mix-blend-mode: soft-light;
+  opacity: 0.34;
+  animation: ori-soft-breathe 16s ease-in-out infinite;
+}
+.ori-fallback.ori-painted .ori-rays {
+  background-image: url("ori/plates/painted/grove-rays.webp?v=ORIHOME8");
+  background-position: calc(48% + var(--ori-scroll) * 8%) center;
+  animation: ori-ray-pulse 8s ease-in-out infinite;
+}
+.ori-fallback.ori-painted .ori-far {
+  background-image: url("ori/plates/painted/grove-far.webp?v=ORIHOME8");
+  background-position: calc(40% + var(--ori-scroll) * 14%) center;
+}
+.ori-fallback.ori-painted .ori-mid {
+  background-image: url("ori/plates/painted/grove-mid.webp?v=ORIHOME8");
+  background-position: calc(34% + var(--ori-scroll) * 24%) center;
+}
+.ori-fallback.ori-painted .ori-near {
+  background-image: url("ori/plates/painted/grove-ground.webp?v=ORIHOME8");
+  background-position: calc(28% + var(--ori-scroll) * 34%) center;
+}
+.ori-fallback.ori-painted .ori-fore {
+  background-image: url("ori/plates/painted/grove-fore.webp?v=ORIHOME8");
+  background-position: calc(22% + var(--ori-scroll) * 44%) center;
+}
+.ori-fallback.ori-painted .ori-fog {
+  background:
+    linear-gradient(180deg, transparent 42%, rgba(190, 214, 216, 0.05) 68%, rgba(214, 228, 226, 0.14) 100%);
+  animation: ori-fog-drift 22s ease-in-out infinite;
+}
+.ori-fallback.ori-painted .ori-light { background: none; }
+.ori-fallback.ori-painted .ori-shaft { opacity: 0.42; }
+.ori-fallback.ori-painted .ori-motes { background: none; pointer-events: none; }
+@keyframes ori-soft-breathe {
+  0%, 100% { opacity: 0.16; }
+  50% { opacity: 0.4; }
+}
+@keyframes ori-ray-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+@keyframes ori-fog-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-18px, 8px, 0); }
+}
 
 html.ori-on body > .panel,
 html.ori-on body > .shell {
@@ -799,15 +871,15 @@ html.ori-phone.ori-home body .panel.panel.panel #hub-cam-deck.hub-cam-deck {
 html.ori-phone.ori-home body .panel.panel.panel #hub-cam-deck.hub-cam-deck::before {
   content: "";
   position: absolute;
-  left: 8%;
-  right: 8%;
-  top: 34px;
-  height: 92px;
-  border-radius: 50%;
-  background:
-    radial-gradient(ellipse at 50% 60%, rgba(80, 170, 210, 0.28), rgba(8, 24, 36, 0.05) 62%, transparent 70%);
-  box-shadow: inset 0 0 24px rgba(140, 220, 255, 0.35), 0 0 28px rgba(80, 180, 255, 0.25);
-  border: 1px solid rgba(180, 235, 255, 0.35);
+  left: 50%;
+  top: 8px;
+  width: 300px;
+  height: 168px;
+  transform: translateX(-50%);
+  border-radius: 0;
+  background: url("ori/plates/painted/landmark-pool.webp?v=ORIHOME8") center / contain no-repeat;
+  box-shadow: none;
+  border: 0;
   pointer-events: none;
 }
 html.ori-phone.ori-home body .panel.panel.panel .hub-cam {
@@ -840,7 +912,19 @@ html.ori-phone.ori-home body .panel.panel.panel .hub-upper {
   gap: 42px !important;
   align-items: stretch !important;
 }
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper > section.leaveby::before {
+  content: "";
+  position: absolute;
+  right: -6px;
+  top: -28px;
+  width: 78px;
+  height: 120px;
+  background: url("ori/plates/painted/landmark-waystone.webp?v=ORIHOME8") center / contain no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
 html.ori-phone.ori-home body .panel.panel.panel .hub-upper > section.leaveby {
+  position: relative !important;
   width: min(80%, 320px) !important;
   margin-right: auto !important;
   margin-left: 0 !important;
@@ -883,7 +967,19 @@ html.ori-phone.ori-home body .panel.panel.panel .leaveby-chips {
   flex-wrap: wrap !important;
 }
 
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper.hub-upper--cams > section#hub-lights-panel::before {
+  content: "";
+  position: absolute;
+  left: -28px;
+  top: -48px;
+  width: 132px;
+  height: 176px;
+  background: url("ori/plates/painted/landmark-lanterns.webp?v=ORIHOME8") center / contain no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
 html.ori-phone.ori-home body .panel.panel.panel .hub-upper.hub-upper--cams > section#hub-lights-panel {
+  position: relative !important;
   width: min(84%, 330px) !important;
   max-width: 330px !important;
   justify-self: end !important;
@@ -959,18 +1055,13 @@ html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip {
 html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip::after {
   content: "";
   position: absolute;
-  right: -54px;
-  top: -28px;
-  width: 70px;
-  height: 110px;
+  right: -42px;
+  top: -78px;
+  width: 96px;
+  height: 150px;
   pointer-events: none;
-  background:
-    radial-gradient(circle at 50% 22%, #123828 0 16%, transparent 18%),
-    radial-gradient(circle at 30% 34%, #0e3024 0 14%, transparent 16%),
-    radial-gradient(circle at 68% 32%, #143828 0 15%, transparent 17%),
-    radial-gradient(circle at 48% 46%, #0c281c 0 18%, transparent 20%),
-    linear-gradient(#1a4030, #1a4030) 50% 48% / 6px 48px no-repeat;
-  filter: drop-shadow(0 0 8px rgba(80, 200, 140, 0.35));
+  background: url("ori/plates/painted/landmark-tree.webp?v=ORIHOME8") center / contain no-repeat;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.28));
 }
 
 html.ori-phone.ori-home body .panel.panel.panel .who-up {
@@ -1003,7 +1094,11 @@ html.ori-phone.ori-home body .panel.panel.panel .tile-grid.tile-grid--cams > .ti
   height: auto !important;
   max-height: none !important;
   padding-top: 22px !important;
-  background: rgba(8, 20, 32, 0.36) !important;
+  background-color: rgba(8, 20, 32, 0.36) !important;
+  background-image: url("ori/plates/painted/landmark-stone.webp?v=ORIHOME8") !important;
+  background-repeat: no-repeat !important;
+  background-size: 58px 58px !important;
+  background-position: 6px -16px !important;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
@@ -1025,6 +1120,9 @@ html.ori-phone.ori-home .ori-place {
 
 @media (prefers-reduced-motion: reduce) {
   html.ori-on .ori-fallback i,
+  html.ori-on .ori-fallback.ori-painted .ori-soft,
+  html.ori-on .ori-fallback.ori-painted .ori-rays,
+  html.ori-on .ori-fallback.ori-painted .ori-fog,
   html.ori-on .ori-iris::before,
   html.ori-on .ori-arrive,
   html.ori-on .ori-ripple,
