@@ -581,10 +581,13 @@
     showPlay();
   }
 
-  if (window.WardKids && WardKids.boot) {
-    document.addEventListener("house:kids-data-ready", start);
-    WardKids.boot(kid);
-  } else start();
+  var capMode = /(?:\?|&)mrcap=1(?:&|$)/.test(location.search);
+  if (!capMode) {
+    if (window.WardKids && WardKids.boot) {
+      document.addEventListener("house:kids-data-ready", start);
+      WardKids.boot(kid);
+    } else start();
+  }
 
   var capCv = null;
   function exportFrame(t, cssW, cssH, dpr) {
@@ -600,9 +603,9 @@
     off.width = capCv.width;
     off.height = capCv.height;
     var close = t >= 5.5 && t < 9.2;
-    var falling = t >= 12 && t < 13.5;
-    var gathered = t >= 13.5 && t < 15.4;
-    var splashOn = (t >= 9.2 && t < 11.1) || gathered;
+    var falling = t >= 12 && t < 13.6;
+    var gathered = t >= 13.6 && t < 16.2;
+    var splashOn = (t >= 9.2 && t < 11.2) || gathered;
     var travel = Math.min(goalX - 120, 90 + t * 95);
     var idx = 0;
     for (var i = 0; i < plats.length; i++) {
@@ -611,7 +614,7 @@
     var pl = plats[idx];
     var gx = platX(pl, t) + 42;
     var gy = GY(pl.y) - 28;
-    if (falling) gy = GY(pl.y) - 28 + (t - 12) * 540;
+    if (falling) gy = view.h * (0.55 + (t - 12) * 0.28);
     if (gathered) {
       var back = plats[Math.max(0, idx - 1)];
       gx = platX(back, t) + 30;
@@ -638,29 +641,42 @@
     paintBlob(gctx, A, t);
     paintBlob(gctx, B, t);
     paintBridge(gctx, t);
+    if (falling) {
+      gctx.strokeStyle = "rgba(255,255,255,0.45)";
+      gctx.lineWidth = 3;
+      gctx.beginPath();
+      gctx.moveTo(A.x - cam, A.y - 80);
+      gctx.lineTo(A.x - cam, A.y - 10);
+      gctx.stroke();
+    }
     if (splashOn) {
-      var age = gathered ? (t - 13.5) : (t - 9.2);
+      var age = gathered ? (t - 13.6) : (t - 9.2);
       var sx = A.x - cam;
-      var sy = A.y + 10;
-      for (var s = 0; s < 16; s++) {
-        var ang = -Math.PI * 0.15 - (s / 15) * Math.PI * 0.7;
-        var sp = 40 + (s % 5) * 28;
-        gctx.globalAlpha = Math.max(0, 1 - age / 1.5);
-        gctx.fillStyle = THEME.metal;
+      var sy = gathered ? A.y : (GY(pl.y) - 10);
+      gctx.strokeStyle = THEME.metal;
+      gctx.globalAlpha = Math.max(0, 1 - age / 1.6);
+      gctx.lineWidth = 4;
+      gctx.beginPath();
+      gctx.arc(sx, sy, 18 + age * 90, 0, 7);
+      gctx.stroke();
+      for (var s = 0; s < 18; s++) {
+        var ang = -Math.PI * 0.1 - (s / 17) * Math.PI * 0.8;
+        var sp = 70 + (s % 5) * 36;
+        gctx.fillStyle = s % 2 ? "#fff" : THEME.metal;
         gctx.beginPath();
-        gctx.ellipse(sx + Math.cos(ang) * sp * age, sy + Math.sin(ang) * sp * age + 80 * age * age, 3 + (s % 3), 5, ang, 0, 7);
+        gctx.ellipse(sx + Math.cos(ang) * sp * age, sy + Math.sin(ang) * sp * age + 90 * age * age, 6 + (s % 3) * 3, 10, ang, 0, 7);
         gctx.fill();
       }
       gctx.globalAlpha = 1;
     }
     if (close) {
-      var zoom = 2.7;
+      var zoom = 1.85;
       var src = document.createElement("canvas");
       src.width = capCv.width;
       src.height = capCv.height;
       src.getContext("2d").drawImage(capCv, 0, 0);
       var cx = (A.x - cam) * dpr;
-      var cy = A.y * dpr;
+      var cy = (A.y + 70) * dpr;
       var cw = capCv.width / zoom;
       var ch = capCv.height / zoom;
       gctx.setTransform(1, 0, 0, 1, 0, 0);
