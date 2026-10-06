@@ -1,4 +1,4 @@
-/* House Face · ORIHOME6 · mount the living world and fly into a scene on every board tap.
+/* House Face · ORIHOME7 · mount the living world and fly into a scene on every board tap.
    Original code. The forest is ori/ori-scene.js (painted plates + motes). No Ori assets.
    HouseSfx owns the tap. This file adds the level-enter whoosh on the same mixer, so mute still wins.
    A key-less screen is left alone: no key modal from here. */
@@ -49,6 +49,13 @@
     try { return Math.min(screen.width, screen.height) <= 700; } catch (e) { return false; }
   }
   var small = phone();
+  var phoneLayout = false;
+  try { phoneLayout = document.documentElement.classList.contains("ori-phone"); } catch (e) {}
+  var CAPTURE = false, FORCE_CSS = false;
+  try {
+    CAPTURE = /(?:\?|&)ori-capture=1(?:&|$)/.test(location.search);
+    FORCE_CSS = /(?:\?|&)ori-css=1(?:&|$)/.test(location.search);
+  } catch (e) {}
 
   var host = document.createElement("div");
   host.id = "ori-world";
@@ -57,17 +64,30 @@
   var fallback = document.createElement("div");
   fallback.className = "ori-fallback";
   fallback.setAttribute("aria-hidden", "true");
-  var sun = document.createElement("div"); sun.className = "ori-sun";
-  var shaft = document.createElement("div"); shaft.className = "ori-shaft";
-  var canopy = document.createElement("div"); canopy.className = "ori-canopy";
-  fallback.appendChild(sun); fallback.appendChild(shaft); fallback.appendChild(canopy);
-  for (var i = 0; i < 16; i++) fallback.appendChild(document.createElement("i"));
+  function fbLayer(cls) {
+    var d = document.createElement("div");
+    d.className = cls;
+    fallback.appendChild(d);
+    return d;
+  }
+  var sky = fbLayer("ori-sky");
+  var far = fbLayer("ori-far");
+  var mid = fbLayer("ori-mid");
+  var fore = fbLayer("ori-fore");
+  var sun = document.createElement("div"); sun.className = "ori-sun"; sky.appendChild(sun);
+  var moon = document.createElement("div"); moon.className = "ori-moon"; sky.appendChild(moon);
+  far.appendChild(document.createElement("div")).className = "ori-ridge";
+  var shaft = document.createElement("div"); shaft.className = "ori-shaft"; mid.appendChild(shaft);
+  var shaft2 = document.createElement("div"); shaft2.className = "ori-shaft ori-shaft-b"; mid.appendChild(shaft2);
+  var canopy = document.createElement("div"); canopy.className = "ori-canopy"; far.appendChild(canopy);
+  mid.appendChild(document.createElement("div")).className = "ori-pathglow";
+  for (var i = 0; i < 18; i++) fore.appendChild(document.createElement("i"));
   document.body.insertBefore(fallback, document.body.firstChild);
   document.body.insertBefore(host, document.body.firstChild);
 
   var world = null;
   var O = window.OriScene;
-  if (O && O.World) {
+  if (!FORCE_CSS && O && O.World) {
     try {
       world = new O.World(host, {
         plates: "ori/plates/",
@@ -287,7 +307,7 @@
       });
     }
     var depthEls = [];
-    if (HOME && !REDUCED) {
+    if (HOME && !REDUCED && !phoneLayout) {
       [["header.hdr", 0.05], ["#hub-cam-deck", 0.1], [".hub-upper", 0.16], [".who-up", 0.22], [".grid-wrap", 0.3]].forEach(function (pair) {
         var el = document.querySelector(pair[0]);
         if (el) depthEls.push([el, pair[1]]);
@@ -303,18 +323,50 @@
         depthEls[d][0].style.transform = "translate3d(" + (x * depthEls[d][1]).toFixed(2) + "px," + (y * depthEls[d][1]).toFixed(2) + "px,0)";
       }
     };
+    if (HOME) {
+      world.scrollMax = 1.7;
+      world.applyScrollCam = function () {
+        var doc = document.documentElement;
+        var max = Math.max(1, (doc.scrollHeight || 0) - (window.innerHeight || 1));
+        var y = window.scrollY || doc.scrollTop || 0;
+        var f = Math.max(0, Math.min(1, y / max));
+        this.scroll.t = f * this.scrollMax;
+        if (CAPTURE) { this.scroll.v = this.scroll.t; this.scroll.vel = 0; }
+        this.cam.y.v += (0.42 - f) * 96;
+        this.cam.x.v += Math.sin(f * Math.PI) * 22;
+        doc.style.setProperty("--ori-scroll", f.toFixed(4));
+      };
+      window.addEventListener("scroll", function () { if (world && world.kick) world.kick(); }, { passive: true });
+    }
     var entered = false;
     function openEye() {
       if (entered) return;
       entered = true;
+      if (CAPTURE) {
+        try { world.pause(true); } catch (e) {}
+        document.documentElement.classList.add("ori-capture-ready");
+        return;
+      }
       var wpx = (world.cssW || window.innerWidth || 1);
       var hpx = (world.cssH || window.innerHeight || 1);
       try { world.enter({ from: [fx0 * wpx, fy0 * hpx], dur: REDUCED ? 0.35 : 1.2 }); } catch (e) {}
     }
     world.onReady = openEye;
+    if (CAPTURE) {
+      applyTier(world, { id: "high", dprMax: 2, renderScale: 1, bloom: 0.55, bloomLevels: 5, layers: 5, fog: true, shafts: 5, wisps: true, moteStep: 1 });
+      world.cfg.fpsCap = 60;
+      world.costSync = false;
+      world.exposure = 1.45;
+    }
     try { world.start(); } catch (e) { document.documentElement.classList.remove("ori-gl"); }
-    setTimeout(openEye, 2400);
-    govern(world);
+    if (!CAPTURE) {
+      setTimeout(openEye, 2400);
+      govern(world);
+    } else {
+      setTimeout(function () {
+        if (!entered) openEye();
+      }, 8000);
+    }
     document.addEventListener("visibilitychange", function () {
       if (!world || !world.pause) return;
       world.pause(document.hidden);
@@ -328,6 +380,18 @@
     document.documentElement.classList.add("ori-nogl");
   }
 
+  /* CSS forest travels with the page even when the painted world is down. */
+  if (HOME) {
+    function cssTravel() {
+      var doc = document.documentElement;
+      var max = Math.max(1, (doc.scrollHeight || 0) - (window.innerHeight || 1));
+      var y = window.scrollY || doc.scrollTop || 0;
+      doc.style.setProperty("--ori-scroll", Math.max(0, Math.min(1, y / max)).toFixed(4));
+    }
+    window.addEventListener("scroll", cssTravel, { passive: true });
+    cssTravel();
+  }
+
   /* Zone names on the map. Absolute, so they don't shove the live layout. */
   if (HOME) {
     function zone(sel, name) {
@@ -339,13 +403,92 @@
       p.textContent = name;
       el.appendChild(p);
     }
-    zone("#hub-cam-deck", "Scrying");
-    zone(".leaveby", "Day path");
-    zone("#hub-lights-panel", "Lanterns");
+    zone("#hub-cam-deck", "Scrying pool");
+    zone(".leaveby", "Waystones");
+    zone("#hub-lights-panel", "Lantern grove");
     zone(".who-up", "Who walks");
-    zone("#hub-spotify-strip", "Song");
+    zone("#hub-spotify-strip", "Song tree");
     var title = document.querySelector(".grid-title");
     if (title) title.textContent = "Places";
+    if (phoneLayout) mountMap();
+  }
+
+  function mountMap() {
+    var panel = document.querySelector("body > .panel");
+    if (!panel || panel.querySelector(":scope > .ori-path")) return;
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "ori-path");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("viewBox", "0 0 100 100");
+    svg.setAttribute("preserveAspectRatio", "none");
+    var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", "M30 4 C70 12 24 28 68 44 C22 62 74 78 36 96");
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", "rgba(150, 220, 255, 0.45)");
+    path.setAttribute("stroke-width", "7");
+    path.setAttribute("stroke-linecap", "round");
+    path.setAttribute("vector-effect", "non-scaling-stroke");
+    var core = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    core.setAttribute("fill", "none");
+    core.setAttribute("stroke", "rgba(236, 252, 255, 0.92)");
+    core.setAttribute("stroke-width", "2");
+    core.setAttribute("stroke-linecap", "round");
+    core.setAttribute("vector-effect", "non-scaling-stroke");
+    svg.appendChild(path);
+    svg.appendChild(core);
+    panel.insertBefore(svg, panel.firstChild);
+    var spirit = document.createElement("div");
+    spirit.className = "ori-spirit";
+    spirit.setAttribute("aria-hidden", "true");
+    spirit.innerHTML = "<i></i><b></b>";
+    document.body.appendChild(spirit);
+    function placeSpirit(x, y, instant) {
+      if (instant) spirit.classList.add("ori-spirit-snap");
+      spirit.style.left = Math.round(x) + "px";
+      spirit.style.top = Math.round(y) + "px";
+      if (instant) requestAnimationFrame(function () { spirit.classList.remove("ori-spirit-snap"); });
+    }
+    placeSpirit(innerWidth * 0.62, 72, true);
+    function redrawPath() {
+      var sels = ["header.hdr", "#hub-cam-deck", ".leaveby", "#hub-lights-panel", "#hub-spotify-strip", ".who-up"];
+      var pts = [];
+      var pr = panel.getBoundingClientRect();
+      if (pr.width < 8 || pr.height < 8) return;
+      function add(el) {
+        if (!el) return;
+        var r = el.getBoundingClientRect();
+        if (r.width < 4 || r.height < 4) return;
+        pts.push([((r.left + r.width * 0.5 - pr.left) / pr.width) * 100, ((r.top + r.height * 0.45 - pr.top) / pr.height) * 100]);
+      }
+      for (var s = 0; s < sels.length; s++) add(document.querySelector(sels[s]));
+      var tiles = document.querySelectorAll(".tile-grid > .tile");
+      for (var n = 0; n < tiles.length; n++) add(tiles[n]);
+      if (pts.length < 2) return;
+      var d = "M " + pts[0][0].toFixed(2) + " " + pts[0][1].toFixed(2);
+      for (var k = 1; k < pts.length; k++) {
+        var a = pts[k - 1], b = pts[k];
+        var cx = (a[0] + b[0]) / 2;
+        d += " Q " + cx.toFixed(2) + " " + a[1].toFixed(2) + " " + b[0].toFixed(2) + " " + b[1].toFixed(2);
+      }
+      path.setAttribute("d", d);
+      core.setAttribute("d", d);
+    }
+    window.addEventListener("resize", redrawPath);
+    setTimeout(redrawPath, 80);
+    setTimeout(redrawPath, 700);
+    setTimeout(redrawPath, 2200);
+    document.addEventListener("pointerdown", function (ev) {
+      var t = ev.target && ev.target.closest ? ev.target.closest("a, button, .tile, .hub-cam, .leaveby, #hub-lights-panel, .sp-tile, .who-up, header.hdr") : null;
+      var x = ev.clientX, y = ev.clientY;
+      if (t && t.getBoundingClientRect) {
+        var r = t.getBoundingClientRect();
+        x = r.left + Math.min(r.width * 0.72, r.width - 16);
+        y = r.top + Math.min(22, r.height * 0.4);
+      }
+      placeSpirit(x, y, false);
+    }, true);
+    window.HouseOri = window.HouseOri || {};
+    window.__oriSpirit = placeSpirit;
   }
 
   /* House Face never shows money. Stars stay. Kid boards are not this script. */
@@ -545,8 +688,17 @@
     flyTo: flyTo,
     page: PAGE,
     theme: theme,
-    tier: world ? "probing" : "css",
+    tier: CAPTURE ? "high" : (world ? "probing" : "css"),
     budget: budgetLog,
-    fpsCap: world && world.cfg ? world.cfg.fpsCap : 0
+    fpsCap: world && world.cfg ? world.cfg.fpsCap : 0,
+    capture: CAPTURE,
+    spiritTo: function (x, y, instant) { if (window.__oriSpirit) window.__oriSpirit(x, y, !!instant); },
+    captureFrame: function (dt) {
+      if (!world || !world.captureFrame) return false;
+      world.captureFrame(dt);
+      if (world.applyScrollCam) world.applyScrollCam();
+      return true;
+    }
   };
+  if (CAPTURE && world) window.HouseOri.tier = "high";
 })();

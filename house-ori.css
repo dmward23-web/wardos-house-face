@@ -1,4 +1,4 @@
-/* House Face · ORIHOME6 · living overworld skin.
+/* House Face · ORIHOME7 · living overworld skin.
    Original code and colour. Ori-inspired mood only: no Ori assets, characters, or logo.
    The painted forest is ori/ori-scene.js. This file is the HUD, the portals, and the level-enter veil.
    Loaded last so it wins over the command-deck tokens. */
@@ -47,49 +47,116 @@ html.ori-on body {
   width: 100%;
   height: 100%;
 }
+html.ori-on { --ori-scroll: 0; }
 .ori-fallback {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 42% 28% at 68% 6%, rgba(186, 228, 255, 0.55), transparent 62%),
-    radial-gradient(ellipse 70% 42% at 72% 8%, rgba(140, 210, 255, 0.28), transparent 60%),
-    radial-gradient(ellipse 50% 40% at 18% 88%, rgba(80, 180, 130, 0.22), transparent 62%),
-    linear-gradient(180deg, #163044 0%, #0c2030 28%, #07141f 58%, #041018 100%);
+  background: #07141c;
 }
-.ori-fallback .ori-sun {
+.ori-fallback .ori-sky,
+.ori-fallback .ori-far,
+.ori-fallback .ori-mid,
+.ori-fallback .ori-fore {
   position: absolute;
-  left: 58%;
-  top: 2%;
-  width: 22vmin;
-  height: 22vmin;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff 0 18%, #e7f6ff 36%, rgba(150, 210, 255, 0) 72%);
-  box-shadow: 0 0 48px 16px rgba(180, 220, 255, 0.45);
-}
-.ori-fallback .ori-shaft {
-  position: absolute;
-  left: 46%;
+  left: -8%;
+  width: 116%;
+  height: 150%;
   top: -12%;
-  width: 34%;
+  will-change: transform;
+}
+.ori-fallback .ori-sky {
   height: 130%;
-  background: linear-gradient(180deg, rgba(220, 240, 255, 0.28), rgba(180, 220, 255, 0.05) 62%, transparent);
-  transform: rotate(16deg);
-  filter: blur(8px);
+  background:
+    radial-gradient(circle at 72% 16%, rgba(255, 252, 240, 0.95) 0 1.1%, rgba(255, 236, 190, 0.35) 2.2%, transparent 8%),
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.85) 0 0.15%, transparent 0.4%),
+    radial-gradient(circle at 40% 12%, rgba(255, 255, 255, 0.8) 0 0.12%, transparent 0.35%),
+    radial-gradient(circle at 88% 28%, rgba(255, 255, 255, 0.75) 0 0.12%, transparent 0.3%),
+    radial-gradient(ellipse 50% 28% at 70% 10%, rgba(186, 220, 255, 0.55), transparent 70%),
+    linear-gradient(180deg, #1d4a62 0%, #12384c 22%, #0c2838 48%, #081c28 100%);
+  transform: translate3d(0, calc(var(--ori-scroll) * -36px), 0);
+}
+.ori-fallback .ori-sun,
+.ori-fallback .ori-moon {
+  position: absolute;
+  border-radius: 50%;
+}
+.ori-fallback .ori-moon {
+  left: 64%;
+  top: 8%;
+  width: 18vmin;
+  height: 18vmin;
+  background:
+    radial-gradient(circle at 35% 35%, #fff 0 18%, #f4fbff 40%, #d5ecff 62%, rgba(180, 220, 255, 0) 74%);
+  box-shadow: 0 0 40px 12px rgba(200, 230, 255, 0.55), 0 0 90px 28px rgba(120, 190, 255, 0.28);
+}
+.ori-fallback .ori-sun { display: none; }
+.ori-fallback .ori-far {
+  background:
+    radial-gradient(ellipse 14% 34% at 8% 78%, #062018 58%, transparent 60%),
+    radial-gradient(ellipse 10% 28% at 18% 82%, #0a2820 55%, transparent 58%),
+    radial-gradient(ellipse 16% 40% at 34% 80%, #071c18 56%, transparent 59%),
+    radial-gradient(ellipse 12% 32% at 52% 84%, #0a2420 55%, transparent 58%),
+    radial-gradient(ellipse 18% 42% at 70% 78%, #061814 58%, transparent 60%),
+    radial-gradient(ellipse 14% 36% at 88% 82%, #082018 56%, transparent 59%),
+    radial-gradient(ellipse 11% 26% at 96% 76%, #0a2822 54%, transparent 57%),
+    linear-gradient(180deg, transparent 40%, rgba(8, 28, 24, 0.2) 62%, rgba(4, 16, 18, 0.55) 100%);
+  transform: translate3d(calc(var(--ori-scroll) * -28px), calc(var(--ori-scroll) * -110px), 0);
 }
 .ori-fallback .ori-canopy {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 48%;
+  left: 0; right: 0; bottom: 0;
+  height: 46%;
   background:
-    radial-gradient(ellipse 36% 80% at 8% 100%, rgba(10, 48, 32, 0.9), transparent 70%),
-    radial-gradient(ellipse 42% 90% at 86% 100%, rgba(6, 28, 40, 0.92), transparent 72%),
-    radial-gradient(ellipse 28% 70% at 40% 108%, rgba(8, 36, 28, 0.8), transparent 70%),
-    linear-gradient(180deg, transparent, rgba(4, 16, 22, 0.15) 18%, rgba(3, 12, 18, 0.78));
+    radial-gradient(ellipse 22% 70% at 6% 100%, rgba(6, 36, 28, 0.95), transparent 72%),
+    radial-gradient(ellipse 26% 80% at 92% 100%, rgba(4, 22, 32, 0.95), transparent 74%),
+    linear-gradient(180deg, transparent, rgba(3, 14, 18, 0.35));
+}
+.ori-fallback .ori-ridge { display: none; }
+.ori-fallback .ori-mid {
+  background:
+    radial-gradient(ellipse 9% 46% at 14% 92%, #041610 62%, transparent 64%),
+    radial-gradient(ellipse 7% 38% at 27% 96%, #062018 60%, transparent 63%),
+    radial-gradient(ellipse 11% 52% at 78% 94%, #031410 64%, transparent 66%),
+    radial-gradient(ellipse 8% 40% at 90% 90%, #052018 60%, transparent 63%),
+    linear-gradient(180deg, transparent 30%, rgba(4, 18, 16, 0.18) 70%, rgba(3, 12, 14, 0.45) 100%);
+  transform: translate3d(calc(var(--ori-scroll) * 18px), calc(var(--ori-scroll) * -210px), 0);
+}
+.ori-fallback .ori-shaft,
+.ori-fallback .ori-shaft-b {
+  position: absolute;
+  top: -8%;
+  width: 22%;
+  height: 120%;
+  background: linear-gradient(180deg, rgba(236, 248, 255, 0.38), rgba(180, 220, 255, 0.08) 55%, transparent 78%);
+  filter: blur(6px);
+  mix-blend-mode: screen;
+}
+.ori-fallback .ori-shaft { left: 48%; transform: rotate(14deg); }
+.ori-fallback .ori-shaft-b { left: 18%; width: 14%; opacity: 0.65; transform: rotate(-8deg); }
+.ori-fallback .ori-pathglow {
+  position: absolute;
+  left: 18%;
+  top: 8%;
+  width: 64%;
+  height: 120%;
+  background:
+    radial-gradient(ellipse 8% 18% at 40% 12%, rgba(160, 230, 255, 0.35), transparent 70%),
+    radial-gradient(ellipse 10% 16% at 62% 38%, rgba(140, 220, 255, 0.28), transparent 70%),
+    radial-gradient(ellipse 9% 18% at 36% 64%, rgba(170, 240, 220, 0.22), transparent 70%),
+    radial-gradient(ellipse 8% 16% at 58% 88%, rgba(160, 230, 255, 0.26), transparent 70%);
+  filter: blur(8px);
+}
+.ori-fallback .ori-fore {
+  background:
+    radial-gradient(ellipse 18% 22% at -2% 8%, rgba(4, 16, 14, 0.92), transparent 70%),
+    radial-gradient(ellipse 16% 18% at 104% 6%, rgba(3, 12, 16, 0.9), transparent 72%),
+    radial-gradient(ellipse 20% 16% at -4% 96%, rgba(3, 14, 12, 0.95), transparent 70%),
+    radial-gradient(ellipse 22% 18% at 106% 98%, rgba(2, 10, 14, 0.95), transparent 72%),
+    linear-gradient(90deg, rgba(3, 12, 14, 0.45), transparent 12%, transparent 88%, rgba(3, 12, 14, 0.5));
+  transform: translate3d(0, calc(var(--ori-scroll) * -360px), 0);
 }
 .ori-fallback i {
   position: absolute;
@@ -596,6 +663,362 @@ html.ori-phone:not(.ori-home) .thumb-wrap img {
 
 html.ori-diving body { pointer-events: none; }
 
+/* Highlight pills and light chips keep dark ink. The glass rule paints light text on sections,
+   and a few headlines inherit that into a white-gold box, so the words vanish. */
+html.ori-on :is(.hl, .cheer-title .hl, .link-title .hl, .gm-title .hl, .big .hl) {
+  color: #1a1208 !important;
+  -webkit-text-fill-color: #1a1208 !important;
+  background: linear-gradient(180deg, #fff8dc 0%, #f0c56a 100%) !important;
+  background-color: #ffe7a8 !important;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 0 8px 1px !important;
+  border-radius: 8px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+}
+html.ori-on .hl:empty {
+  display: none !important;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+html.ori-on .hl .g2-inline {
+  display: inline-grid !important;
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 4px 0 0 !important;
+  vertical-align: -4px !important;
+}
+html.ori-on .hl .g2-inline .g2 {
+  width: 20px !important;
+  height: 20px !important;
+  filter: brightness(0.2) sepia(1) saturate(4) !important;
+}
+html.ori-on :is(.link-cta, a.link-cta, .ftr-chip, a.ftr-chip, .plus, .streak-pill, .cheer-bar) {
+  color: #1a1208 !important;
+  -webkit-text-fill-color: #1a1208 !important;
+}
+html.ori-on :is(.link-cta, a.link-cta) {
+  background: linear-gradient(180deg, #fff 0%, #ffe8a0 100%) !important;
+  border-color: rgba(90, 60, 10, 0.28) !important;
+}
+html.ori-on .bank :is(.feed-row, .feed-title, .star-label, .star-big, .kid-chip, .when) {
+  -webkit-text-fill-color: currentColor;
+}
+html.ori-on .feed-row {
+  color: #1c1408 !important;
+  -webkit-text-fill-color: #1c1408 !important;
+}
+html.ori-on .kid-chip.ainsley { color: #4a1860 !important; -webkit-text-fill-color: #4a1860 !important; }
+html.ori-on .kid-chip.hayes { color: #0e3328 !important; -webkit-text-fill-color: #0e3328 !important; }
+html.ori-on .kid-chip.harris { color: #142848 !important; -webkit-text-fill-color: #142848 !important; }
+
+/* ========== PHONE OVERWORLD ==========
+   Wall and TV never get .ori-phone. The command deck stays there.
+   On the phone the same live nodes become landmarks on a path. */
+html.ori-phone.ori-home body .panel.panel.panel {
+  gap: 36px !important;
+  padding: 18px 14px 48px !important;
+  background: transparent !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel > * { position: relative; z-index: 1; }
+html.ori-phone.ori-home .ori-path {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+html.ori-phone.ori-home .ori-spirit {
+  position: fixed;
+  z-index: 30;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  pointer-events: none;
+  transition: left 0.7s cubic-bezier(.18, .8, .2, 1), top 0.7s cubic-bezier(.18, .8, .2, 1);
+}
+html.ori-phone.ori-home .ori-spirit.ori-spirit-snap { transition: none; }
+html.ori-phone.ori-home .ori-spirit i {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #fff 0 20%, #d8f8ff 45%, rgba(140, 220, 255, 0.2) 72%, transparent 74%);
+  box-shadow: 0 0 14px 6px rgba(160, 230, 255, 0.85), 0 0 28px 10px rgba(120, 200, 255, 0.35);
+  animation: ori-spirit-drift 3.6s ease-in-out infinite;
+}
+html.ori-phone.ori-home .ori-spirit b {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  border-radius: 50%;
+  border: 1px solid rgba(200, 245, 255, 0.35);
+  animation: ori-spirit-ring 3.6s ease-out infinite;
+}
+@keyframes ori-spirit-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(5px, -8px, 0); }
+}
+@keyframes ori-spirit-ring {
+  0% { transform: scale(0.4); opacity: 0.7; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+html.ori-phone.ori-home body .panel.panel.panel header.hdr {
+  width: min(78%, 300px) !important;
+  margin: 0 auto 0 6% !important;
+  justify-self: start !important;
+  padding: 8px 12px !important;
+  border-radius: 18px !important;
+  background: rgba(6, 18, 30, 0.38) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .hdr-brand,
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .hdr-brand * {
+  font-size: 22px !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .hdr-date-time { font-size: 22px !important; }
+
+html.ori-phone.ori-home body .panel.panel.panel #hub-cam-deck.hub-cam-deck {
+  width: min(86%, 340px) !important;
+  margin: 8px 4% 0 auto !important;
+  padding: 28px 8px 4px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  position: relative !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-cam-deck.hub-cam-deck::before {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 34px;
+  height: 92px;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 50% 60%, rgba(80, 170, 210, 0.28), rgba(8, 24, 36, 0.05) 62%, transparent 70%);
+  box-shadow: inset 0 0 24px rgba(140, 220, 255, 0.35), 0 0 28px rgba(80, 180, 255, 0.25);
+  border: 1px solid rgba(180, 235, 255, 0.35);
+  pointer-events: none;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-cam {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-cam-media-wrap {
+  aspect-ratio: 1 !important;
+  height: auto !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  border: 2px solid rgba(200, 240, 255, 0.75) !important;
+  box-shadow: 0 0 16px rgba(100, 190, 255, 0.55), inset 0 0 12px rgba(80, 180, 220, 0.35) !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-cam-foot {
+  background: rgba(6, 16, 28, 0.42) !important;
+  border: 1px solid rgba(180, 230, 255, 0.28) !important;
+  border-radius: 999px !important;
+  margin-top: 4px !important;
+  padding: 2px 6px !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper {
+  background: transparent !important;
+  gap: 42px !important;
+  align-items: stretch !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper > section.leaveby {
+  width: min(80%, 320px) !important;
+  margin-right: auto !important;
+  margin-left: 0 !important;
+  padding: 28px 10px 10px !important;
+  background: rgba(6, 18, 28, 0.32) !important;
+  border: 1px solid rgba(170, 230, 200, 0.28) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22) !important;
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+html.ori-phone.ori-home body .panel.panel.panel .leaveby .leaveby-layouts,
+html.ori-phone.ori-home body .panel.panel.panel .leaveby .lb-layout {
+  max-height: 148px !important;
+  overflow: auto !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .leaveby-chip {
+  width: 46px !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  font-size: 8px !important;
+  letter-spacing: 0.04em !important;
+  color: #e7fff4 !important;
+  -webkit-text-fill-color: #e7fff4 !important;
+  background:
+    radial-gradient(circle at 40% 35%, rgba(230, 245, 230, 0.35), rgba(20, 40, 36, 0.55) 62%) !important;
+  border: 1px solid rgba(190, 240, 210, 0.45) !important;
+  box-shadow: 0 0 10px rgba(140, 220, 180, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .leaveby-chip.is-on {
+  box-shadow: 0 0 14px rgba(180, 255, 210, 0.7) !important;
+  border-color: rgba(220, 255, 230, 0.8) !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .leaveby-chips {
+  display: flex !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel {
+  width: min(84%, 330px) !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  padding: 26px 10px 10px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  grid-template-columns: none !important;
+  grid-template-areas: none !important;
+  background:
+    radial-gradient(ellipse 40% 50% at 18% 80%, rgba(20, 60, 30, 0.35), transparent 70%),
+    rgba(10, 22, 18, 0.34) !important;
+  border: 1px solid rgba(255, 210, 130, 0.32) !important;
+  border-radius: 26px !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24), inset 0 0 24px rgba(255, 190, 80, 0.05) !important;
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-lights-title {
+  font-size: 11px !important;
+  letter-spacing: 0.22em !important;
+  color: #ffe7b0 !important;
+  -webkit-text-fill-color: #ffe7b0 !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-lights-more {
+  display: inline-flex !important;
+  align-items: center;
+  margin-left: auto;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: #ffe7b0 !important;
+  -webkit-text-fill-color: #ffe7b0 !important;
+  background: rgba(8, 16, 12, 0.4);
+  border: 1px solid rgba(255, 210, 140, 0.35);
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-lights-grid {
+  width: 100% !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-sw--live,
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-sw--live.is-on {
+  height: 54px !important;
+  border-radius: 16px 16px 20px 20px !important;
+  background: linear-gradient(180deg, rgba(40, 28, 12, 0.2), rgba(8, 14, 12, 0.45)) !important;
+  border: 1px solid rgba(255, 210, 130, 0.35) !important;
+  box-shadow: inset 0 -8px 12px rgba(255, 180, 60, 0.08) !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-sw--live.is-on {
+  background: linear-gradient(180deg, rgba(255, 214, 120, 0.85), rgba(180, 110, 30, 0.55)) !important;
+  box-shadow: 0 0 16px rgba(255, 190, 70, 0.55) !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-sw--live.is-on .hub-sw-name {
+  color: #1a1206 !important;
+  -webkit-text-fill-color: #1a1206 !important;
+}
+
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper > .sp-strip,
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip {
+  width: min(74%, 280px) !important;
+  margin-right: auto !important;
+  margin-left: 4% !important;
+  position: relative !important;
+  background: rgba(6, 22, 16, 0.38) !important;
+  border: 1px solid rgba(140, 230, 170, 0.4) !important;
+  border-radius: 18px 18px 22px 8px !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24) !important;
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip::after {
+  content: "";
+  position: absolute;
+  right: -54px;
+  top: -28px;
+  width: 70px;
+  height: 110px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 22%, #123828 0 16%, transparent 18%),
+    radial-gradient(circle at 30% 34%, #0e3024 0 14%, transparent 16%),
+    radial-gradient(circle at 68% 32%, #143828 0 15%, transparent 17%),
+    radial-gradient(circle at 48% 46%, #0c281c 0 18%, transparent 20%),
+    linear-gradient(#1a4030, #1a4030) 50% 48% / 6px 48px no-repeat;
+  filter: drop-shadow(0 0 8px rgba(80, 200, 140, 0.35));
+}
+
+html.ori-phone.ori-home body .panel.panel.panel .who-up {
+  width: min(70%, 260px) !important;
+  margin-left: auto !important;
+  margin-right: 6% !important;
+  padding: 22px 12px 10px !important;
+  background: rgba(8, 18, 30, 0.34) !important;
+  border-radius: 20px !important;
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+html.ori-phone.ori-home body .panel.panel.panel .grid-wrap { background: transparent !important; }
+html.ori-phone.ori-home body .panel.panel.panel .grid-title {
+  width: max-content;
+  margin-left: 8%;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(6, 16, 26, 0.4);
+  border: 1px solid rgba(180, 230, 255, 0.28);
+}
+html.ori-phone.ori-home body .panel.panel.panel .tile-grid.tile-grid--cams {
+  grid-template-columns: 1fr !important;
+  gap: 22px !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .tile-grid.tile-grid--cams > .tile {
+  width: min(78%, 300px) !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  padding-top: 22px !important;
+  background: rgba(8, 20, 32, 0.36) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+html.ori-phone.ori-home body .panel.panel.panel .tile-grid.tile-grid--cams > .tile:nth-child(odd) {
+  justify-self: start !important;
+  margin-left: 2% !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .tile-grid.tile-grid--cams > .tile:nth-child(even) {
+  justify-self: end !important;
+  margin-right: 2% !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel nav.tile-grid > .tile:last-child { grid-column: auto !important; }
+html.ori-phone.ori-home body .panel.panel.panel .tile-micro { display: none !important; }
+html.ori-phone.ori-home body .panel.panel.panel .tile.kid-flip { min-height: 0 !important; }
+html.ori-phone.ori-home .ori-place {
+  letter-spacing: 0.18em;
+  background: rgba(4, 12, 20, 0.5);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html.ori-on .ori-fallback i,
   html.ori-on .ori-iris::before,
@@ -605,9 +1028,13 @@ html.ori-diving body { pointer-events: none; }
   html.ori-on.ori-enter body .panel > *,
   html.ori-on.ori-enter body .shell > *,
   html.ori-home body .panel .tile-grid > .tile,
-  html.ori-home body .panel .tile-grid > .tile::after {
+  html.ori-home body .panel .tile-grid > .tile::after,
+  html.ori-phone.ori-home .ori-spirit,
+  html.ori-phone.ori-home .ori-spirit i,
+  html.ori-phone.ori-home .ori-spirit b {
     animation: none !important;
   }
+  html.ori-phone.ori-home .ori-spirit { transition: none !important; }
   html.ori-home body .panel .tile-grid > .tile { transform: none !important; }
   .ori-arrive, .ori-iris { display: none !important; }
 }

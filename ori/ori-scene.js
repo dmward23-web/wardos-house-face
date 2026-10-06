@@ -671,6 +671,17 @@
   };
   /* pause while covered by a page scene (the home board sleeps under it) */
   WP.pause = function (on) { this.paused = !!on; if (!on) { this.last = 0; this.kick(true); } };
+  /* Deterministic frame. Caller advances a virtual clock; the present loop stays paused. */
+  WP.captureFrame = function (dt) {
+    dt = dt > 0 ? dt : 1 / 60;
+    if (this._capT == null) this._capT = this.t0 || now();
+    this._capT += dt;
+    this.step(this._capT, dt);
+    if (this.platesReady) this.render(this._capT);
+    this.frame = (this.frame || 0) + 1;
+    this.paused = true;
+    return this._capT;
+  };
   /* slow camera push-in toward fx,fy (screen fractions) with a rack focus 0 (background sharp) -> 1 (background soft, subject sharp) */
   WP.camPush = function (z1, dur, fx, fy, k1) { var t = now(); this.camP = { t0: t, dur: dur || 10, z0: this.pushZ || 1, z1: z1 || 1.12, f0: (this.pushF || [0.5, 0.5]).slice(), f1: [fx == null ? 0.5 : fx, fy == null ? 0.5 : fy], k0: this.focusV || 0, k1: k1 == null ? 1 : k1 }; this.kick(true); return this; };
   WP.step = function (t, dt) {
@@ -678,6 +689,8 @@
     var px = this.ptr && now() - this.ptr.t < 4 ? this.ptr.x : 0, py = this.ptr && now() - this.ptr.t < 4 ? this.ptr.y : 0;
     this.cam.x.t = -px * 26 + (red ? 0 : Math.sin(T * 0.11) * 16 + Math.sin(T * 0.047) * 9); this.cam.y.t = -py * 12 + (red ? 0 : Math.sin(T * 0.083 + 1) * 6);
     if (red) { this.cam.x.snap(); this.cam.y.snap(); this.scroll.snap(); } else { this.cam.x.step(dt); this.cam.y.step(dt); this.scroll.step(dt); }
+    /* Page scroll becomes a map travel: layers already carry different SCROLLK, this hook adds the camera rise before layout. */
+    if (this.applyScrollCam) this.applyScrollCam();
     this.stepTransition(t, dt);
     var cp2 = this.camP; if (cp2) { var cu = red ? 1 : clamp((t - cp2.t0) / cp2.dur, 0, 1), ce = cu * cu * (3 - 2 * cu); this.pushZ = lerp(cp2.z0, cp2.z1, ce); this.pushF = [lerp(cp2.f0[0], cp2.f1[0], ce), lerp(cp2.f0[1], cp2.f1[1], ce)]; this.focusV = lerp(cp2.k0, cp2.k1, ce); }
     this.layout(); this.theme = this.o.theme ? this.o.theme(this) : oriTheme(this, {});

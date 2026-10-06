@@ -324,7 +324,8 @@
     } else if (ph === "need_app" || ph === "need_auth") {
       title = "Connect Spotify"; artist = "One tap, once · then every screen"; connectTxt = "Connect Spotify";
     } else if (ph === "no_key" || ph === "bad_key") {
-      title = "Spotify"; artist = ph === "bad_key" ? "This screen's house key didn't work" : "This screen needs the house key"; connectTxt = "Add key";
+      /* Key-less screens stay quiet: the NEED KEY pill only. No sentence, no Add key button. */
+      title = "Spotify"; artist = ""; dev = ""; connectTxt = "";
     } else if (ph === "offline") {
       title = "Spotify"; artist = "House box isn't answering"; dev = "Comes back on its own"; connectTxt = "Retry";
     } else if (ph === "error") {
