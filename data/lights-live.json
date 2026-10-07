@@ -1,6 +1,6 @@
 {
   "status": "live",
-  "fetchedAt": "2026-10-07T04:55:58.391Z",
+  "fetchedAt": "2026-10-07T11:47:46.128Z",
   "source": "tplink-cloud-api",
   "writeSupported": true,
   "brightnessControlSupported": true,
@@ -61,6 +61,6 @@
   ],
   "error": null,
   "note": "Brightness READ from get_sysinfo.brightness (HS220/KS220). WRITE via scripts/kasa-write.py + lights-write-proxy.mjs (cloud passthrough).",
-  "writeProxy": "https://valuation-greatest-concentration-blocked.trycloudflare.com",
+  "writeProxy": "https://throw-smoke-studios-ebooks.trycloudflare.com",
   "writePath": "scripts/lights-write-proxy.mjs → kasa-write.py (cloud)"
 }
