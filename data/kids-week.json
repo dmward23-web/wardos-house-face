@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Oct 7 2026",
   "asOfIso": "2026-10-07",
-  "refreshedAt": "2026-10-08T02:58:02.007Z",
+  "refreshedAt": "2026-10-08T03:03:05.246Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -324,6 +324,12 @@
           "what": "Harris flag — vs SH Proehl (home)",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Wed 14 · leave 4:45",
+          "what": "Harris flag practice · 5:30–6:30",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
@@ -396,6 +402,24 @@
         {
           "when": "Tue 13 · 3:15",
           "what": "Cover — Hayes + Harris SRE pickup 3:40",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 14 · 7:00",
+          "what": "SRE specials: Art",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 14 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 14 · 3:15",
+          "what": "SRE pickup",
           "tone": "act",
           "hint": ""
         }
@@ -646,6 +670,24 @@
           "what": "Cover — Hayes + Harris SRE pickup 3:40",
           "tone": "act",
           "hint": ""
+        },
+        {
+          "when": "Wed 14 · 7:00",
+          "what": "SRE specials: Art + Library (library book)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 14 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Wed 14 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
         }
       ],
       "appointments": []
@@ -805,6 +847,12 @@
         {
           "when": "Thu 8 · leave 5:00",
           "what": "Ainsley swim — Coach Ann",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Wed 14 · leave 4:00",
+          "what": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
           "hint": "YOUR board",
           "tone": "hot"
         }

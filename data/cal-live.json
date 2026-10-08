@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-08T02:58:02.590Z",
+  "fetchedAt": "2026-10-08T03:03:05.825Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-03",
-  "windowEnd": "2026-10-13",
+  "windowEnd": "2026-10-14",
   "asOfIso": "2026-10-07",
   "nextLeave": {
     "id": "6gc1db0v6m642r4t0uhhpagft0",
@@ -445,6 +445,123 @@
       "start": "2026-10-13T19:30:00-05:00",
       "end": "2026-10-13T19:45:00-05:00",
       "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "lvjj0ha6s8h1ep1c0iftccpnlg",
+      "summary": "Cancel Google Home Premium trial",
+      "start": "2026-10-14T00:00:00-05:00",
+      "end": "2026-10-15T00:00:00-05:00",
+      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": true
+    },
+    {
+      "id": "crjbljb7v28p7q9ml7mniolm6k",
+      "summary": "Hayes — SRE specials: Art + Library (library book)",
+      "start": "2026-10-14T07:00:00-05:00",
+      "end": "2026-10-14T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "lvdau296id8bpskqll9uogsrp0",
+      "summary": "Harris — SRE specials: Art",
+      "start": "2026-10-14T07:00:00-05:00",
+      "end": "2026-10-14T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "1ni8dem5hrho45a0csgj81r3i4_20261014T131000Z",
+      "summary": "Hayes + Harris — SRE drop-off · 8:25",
+      "start": "2026-10-14T08:10:00-05:00",
+      "end": "2026-10-14T08:40:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "3hv9bcr87ggrhrkuf4ka3u6r2s_20261014T201500Z",
+      "summary": "Hayes + Harris — SRE pickup · 3:40",
+      "start": "2026-10-14T15:15:00-05:00",
+      "end": "2026-10-14T16:00:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "d9gpau31difggjm769p4723ums",
+      "summary": "Ainsley — LKMS Math Counts info meeting · 3:15",
+      "start": "2026-10-14T15:15:00-05:00",
+      "end": "2026-10-14T16:00:00-05:00",
+      "location": "Lakewood Middle School Library, 6601 Edgewater Dr, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "jruhjf4902aajn9r6mnnp1qfog",
+      "summary": "Ainsley — Math Counts pickup · 4:00",
+      "start": "2026-10-14T15:50:00-05:00",
+      "end": "2026-10-14T16:00:00-05:00",
+      "location": "Lakewood Middle School Library, 6601 Edgewater Dr, Overland Park, KS 66223",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "bu4mt7h83fsikbk91vo2bui1dg",
+      "summary": "Ainsley — swim drop-off · 5:00",
+      "start": "2026-10-14T16:00:00-05:00",
+      "end": "2026-10-14T16:30:00-05:00",
+      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "ubv3296mq8geqc38qobdeftmt8",
+      "summary": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
+      "start": "2026-10-14T16:00:00-05:00",
+      "end": "2026-10-14T18:05:00-05:00",
+      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "5uqtqjnc69b4mu6ma60kjqoams",
+      "summary": "Harris — flag drop-off · 5:30",
+      "start": "2026-10-14T16:40:00-05:00",
+      "end": "2026-10-14T17:30:00-05:00",
+      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "vluod9ndrvhcr20ovpera726dc_20261014T214500Z",
+      "summary": "Harris flag practice · 5:30–6:30",
+      "start": "2026-10-14T16:45:00-05:00",
+      "end": "2026-10-14T18:30:00-05:00",
+      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "1quruq2b8tso6plitjhqota96s",
+      "summary": "Ainsley — swim pickup · 6:00",
+      "start": "2026-10-14T17:30:00-05:00",
+      "end": "2026-10-14T18:05:00-05:00",
+      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "61r90a545v0g23kmn4qtq35fpo",
+      "summary": "Harris — flag pickup · 6:30",
+      "start": "2026-10-14T18:03:00-05:00",
+      "end": "2026-10-14T18:50:00-05:00",
+      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
       "busy": true,
       "allDay": false
     }
