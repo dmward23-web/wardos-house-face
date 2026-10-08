@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-08T19:58:48.214Z",
+  "fetchedAt": "2026-10-08T22:29:13.796Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-03",
   "windowEnd": "2026-10-14",
@@ -16,24 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "43chat4nm1cmv3tsqtd2p9cdjo_20261008T200000Z",
-      "summary": "Ainsley — LKMS Homework Help · 3:00",
-      "start": "2026-10-08T15:00:00-05:00",
-      "end": "2026-10-08T16:00:00-05:00",
-      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "4iuge4862k2uhd3t5irr7jjmc8_20261008T212500Z",
-      "summary": "Ainsley swim — Coach Ann · 5:00 practice",
-      "start": "2026-10-08T17:00:00-05:00",
-      "end": "2026-10-08T18:00:00-05:00",
-      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "gdlheaj2udj8ilargoqmor6m0s",
       "summary": "Hayes flag practice · 6:00",

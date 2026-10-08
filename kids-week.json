@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 8 2026",
   "asOfIso": "2026-10-08",
-  "refreshedAt": "2026-10-08T19:58:47.448Z",
+  "refreshedAt": "2026-10-08T22:29:13.256Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,43 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "3:00",
-    "place": "LKMS Homework Help",
-    "detailHtml": "5:00 Ainsley swim — Coach Ann · 6:00 Hayes flag practice · kids with Mom · until Fri Oct 9 · 3:00",
+    "time": "6:00",
+    "place": "Hayes flag practice",
+    "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
     "badge": "Thu",
-    "startIso": "2026-10-08T20:00:00.000Z",
-    "endIso": "2026-10-08T21:00:00.000Z",
-    "kind": "school",
+    "startIso": "2026-10-08T23:00:00.000Z",
+    "endIso": "2026-10-09T00:15:00.000Z",
+    "kind": "sport",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "3:00",
-        "place": "LKMS Homework Help",
-        "detailHtml": "5:00 Ainsley swim — Coach Ann · 6:00 Hayes flag practice · kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-08T20:00:00.000Z",
-        "endIso": "2026-10-08T21:00:00.000Z",
-        "kind": "school",
-        "whenLabel": "3:00",
-        "summary": "Ainsley — LKMS Homework Help · 3:00"
-      },
-      {
-        "label": "Next up · today",
-        "time": "5:00",
-        "place": "Ainsley swim — Coach Ann",
-        "detailHtml": "6:00 Hayes flag practice · kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-08T22:00:00.000Z",
-        "endIso": "2026-10-08T23:00:00.000Z",
-        "kind": "sport",
-        "whenLabel": "5:00",
-        "summary": "Ainsley swim — Coach Ann · 5:00 practice"
-      },
       {
         "label": "Next up · today",
         "time": "6:00",
         "place": "Hayes flag practice",
-        "detailHtml": "5:00 Ainsley swim — Coach Ann · kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-08T23:00:00.000Z",
         "endIso": "2026-10-09T00:15:00.000Z",
@@ -168,6 +144,30 @@
         "kind": "sport",
         "whenLabel": "Sat 11:25",
         "summary": "Hayes flag — SRE Falcons vs Funk · Field 6 · leave 11:25 · game 12:15"
+      },
+      {
+        "label": "Next up · Sat",
+        "time": "1:00",
+        "place": "Lindsay appt video",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-10T18:00:00.000Z",
+        "endIso": "2026-10-10T19:00:00.000Z",
+        "kind": "other",
+        "whenLabel": "Sat 1:00",
+        "summary": "Harris — Lindsay appt video · 1:00"
+      },
+      {
+        "label": "Next up · Sat",
+        "time": "1:15",
+        "place": "Hayes flag pickup",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-10T18:15:00.000Z",
+        "endIso": "2026-10-10T18:35:00.000Z",
+        "kind": "leave",
+        "whenLabel": "Sat 1:15",
+        "summary": "Hayes — flag pickup · 1:15"
       }
     ]
   },
@@ -809,22 +809,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "THU · 3:00",
-        "what": "LKMS HOMEWORK HELP",
+        "when": "THU · 5:00",
+        "what": "AINSLEY SWIM — COACH ANN",
         "where": "with Mom · until Fri Oct 9 · 3:00",
         "badges": [
           "THU",
-          "3:00"
+          "5:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Thu · 3:00",
-          "what": "LKMS Homework Help",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Thu · 5:00",
@@ -855,12 +848,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Thu 8 · 3:00",
-          "what": "LKMS Homework Help",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
@@ -978,11 +965,6 @@
           "tone": "act"
         },
         {
-          "when": "Thu 8 · 3:00",
-          "what": "LKMS Homework Help",
-          "tone": "act"
-        },
-        {
           "when": "Thu 8 · 5:00",
           "what": "Ainsley swim — Coach Ann",
           "tone": "hot"
@@ -1091,6 +1073,11 @@
           "when": "Tue 13 · 10:45",
           "what": "SRE pickup for dentist",
           "tone": "act"
+        },
+        {
+          "when": "Tue 13 · 11:00",
+          "what": "Ainsley LKMS pickup for dentist",
+          "tone": "hot"
         }
       ]
     }
