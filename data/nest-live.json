@@ -127,6 +127,6 @@
   "stillsPending": false,
   "stillNote": "WebRTC canvas stills via nest-webrtc-still.mjs · Pages-servable data/nest-snaps",
   "error": null,
-  "nestProxy": "https://pumps-stays-kit-dimension.trycloudflare.com",
+  "nestProxy": "https://sunshine-focused-rico-gmt.trycloudflare.com",
   "nestProxyPath": "scripts/nest-webrtc-proxy.mjs → SDM GenerateWebRtcStream"
 }
