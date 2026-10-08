@@ -64,9 +64,11 @@
     "void main(){ vUV = aP; vec2 px = uRect.xy + aP * uRect.zw; gl_Position = vec4(px.x / uRes.x * 2.0 - 1.0, 1.0 - px.y / uRes.y * 2.0, 0.0, 1.0); }";
   var VS_FS = "#version 300 es\nlayout(location=0) in vec2 aP; out vec2 vUV; void main(){ vUV = aP; gl_Position = vec4(aP * 2.0 - 1.0, 0.0, 1.0); }";
   /* painted plate: R value, G rim, B glow, A coverage -> tinted per theme */
-  var FS_PLATE = "#version 300 es\nprecision highp float;\nin vec2 vUV; uniform sampler2D uTex; uniform float uBias, uTime, uRimI, uGlowI, uFogA, uTw, uPaint, uPaintK;\n" +
+  var FS_PLATE = "#version 300 es\nprecision highp float;\nin vec2 vUV; uniform sampler2D uTex; uniform float uBias, uTime, uRimI, uGlowI, uFogA, uTw, uPaint, uPaintK, uEdge;\n" +
     "uniform vec3 uDark, uLit, uRim, uGlow, uFog; uniform vec2 uLight; uniform vec2 uRes; uniform vec4 uRect; out vec4 o;\n" + GLSL_NOISE +
     "void main(){ vec4 t = texture(uTex, vUV, uBias); vec2 sp = (uRect.xy + vUV * uRect.zw) / uRes;\n" +
+    /* Home board only (uEdge > 0): keep foreground silhouettes in the outer bands of the frame. */
+    " if (uEdge > 0.001) { float band = clamp(uEdge, 0.04, 0.4); float m = smoothstep(band, band - 0.05, sp.x) + smoothstep(1.0 - band, 1.0 - band + 0.05, sp.x); t.a *= clamp(m, 0.0, 1.0); }\n" +
     " float ld = length((sp - uLight) * vec2(uRes.x / uRes.y, 1.0));\n" +
     /* painterly pass: brush-stroke grain in the lit paint, bark striations in the darks, layered leaf/moss tints on the rims */
     " float pk = (1.0 - clamp(uBias / 2.0, 0.0, 1.0)) * step(0.02, t.a); vec2 bu = vUV * uRect.zw / 1100.0;\n" +
@@ -455,7 +457,7 @@
     var pl = this.plates[key]; if (!pl) return; var gl = this.gl, P = this.P.plate, u = P.u;
     gl.useProgram(P.p); gl.uniform2f(u.uRes, this.w, this.h); gl.uniform4f(u.uRect, rect[0], rect[1], rect[2], rect[3]);
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, pl.t); gl.uniform1i(u.uTex, 0);
-    gl.uniform1f(u.uBias, T.bias || 0); gl.uniform1f(u.uTime, this.time); gl.uniform1f(u.uRimI, T.rimI); gl.uniform1f(u.uGlowI, T.glowI); gl.uniform1f(u.uFogA, T.fogA || 0); gl.uniform1f(u.uTw, T.tw == null ? 1 : T.tw); if (u.uPaint) { gl.uniform1f(u.uPaint, pl.paint ? 1 : 0); gl.uniform1f(u.uPaintK, T.paintK || PAINTK[key] || 1); }
+    gl.uniform1f(u.uBias, T.bias || 0); gl.uniform1f(u.uTime, this.time); gl.uniform1f(u.uRimI, T.rimI); gl.uniform1f(u.uGlowI, T.glowI); gl.uniform1f(u.uFogA, T.fogA || 0); gl.uniform1f(u.uTw, T.tw == null ? 1 : T.tw); if (u.uPaint) { gl.uniform1f(u.uPaint, pl.paint ? 1 : 0); gl.uniform1f(u.uPaintK, T.paintK || PAINTK[key] || 1); } if (u.uEdge) gl.uniform1f(u.uEdge, T.edge || 0);
     gl.uniform3fv(u.uDark, T.dark); gl.uniform3fv(u.uLit, T.lit); gl.uniform3fv(u.uRim, T.rim); gl.uniform3fv(u.uGlow, T.glow); gl.uniform3fv(u.uFog, T.fog || T.lit);
     gl.uniform2f(u.uLight, T.light[0], T.light[1]);
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.bindVertexArray(this.vaoQ); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); };

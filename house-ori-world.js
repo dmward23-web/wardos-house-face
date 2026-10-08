@@ -1,4 +1,4 @@
-/* House Face · ORIHOME9 · mount the living world and fly into a scene on every board tap.
+/* House Face · ORIHOME10 · mount the living world and fly into a scene on every board tap.
    Original code. The forest is ori/ori-scene.js (painted plates + motes). No Ori assets.
    HouseSfx owns the tap. This file adds the level-enter whoosh on the same mixer, so mute still wins.
    A key-less screen is left alone: no key modal from here. */
@@ -107,11 +107,16 @@
           renderScale: small ? 0.85 : 1,
           fpsCap: 120,
           bloom: small ? 0.45 : 0.55,
-          vig: 1.15,
+          vig: HOME ? 0.78 : 1.15,
           ion: { acc: theme.acc, acc2: theme.key, ink: "#eaf6ff", ground: "#041018" },
           sound: { muted: true, ambient: false, volume: 0 }
         },
-        theme: function (wd) { return O.oriTheme(wd, { acc: theme.acc, key: theme.key, rays: theme.rays, night: 0.15, fog: 0.85 }); }
+        theme: function (wd) {
+          var t = O.oriTheme(wd, { acc: theme.acc, key: theme.key, rays: theme.rays, night: 0.12, fog: 0.62 });
+          if (HOME && t && t.fore) t.fore.edge = 0.075;
+          if (HOME && t && t.ground) t.ground.edge = 0.08;
+          return t;
+        }
       });
     } catch (err) {
       try { console.info("[house-ori] world failed", err); } catch (e2) {}
@@ -302,7 +307,7 @@
 
   if (world && world.S) {
     document.documentElement.classList.add("ori-gl");
-    world.exposure = 1.45;
+    world.exposure = HOME ? 2.05 : 1.45;
     if (O.Orb) {
       [[0.14, 0.24, 0.011], [0.86, 0.2, 0.009], [0.22, 0.62, 0.008], [0.76, 0.66, 0.01], [0.48, 0.38, 0.007], [0.34, 0.84, 0.008], [0.66, 0.86, 0.009]].forEach(function (s, n) {
         world.add(new O.Orb({
@@ -364,7 +369,7 @@
       applyTier(world, { id: "high", dprMax: 2, renderScale: 1, bloom: 0.55, bloomLevels: 5, layers: 5, fog: true, shafts: 5, wisps: true, moteStep: 1 });
       world.cfg.fpsCap = 60;
       world.costSync = false;
-      world.exposure = 1.45;
+      world.exposure = HOME ? 2.05 : 1.45;
     }
     try { world.start(); } catch (e) { document.documentElement.classList.remove("ori-gl"); }
     if (!CAPTURE) {
@@ -406,27 +411,10 @@
   function mountMap() {
     var panel = document.querySelector("body > .panel");
     if (!panel || panel.querySelector(":scope > .ori-path")) return;
-    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("class", "ori-path");
-    svg.setAttribute("aria-hidden", "true");
-    svg.setAttribute("viewBox", "0 0 100 100");
-    svg.setAttribute("preserveAspectRatio", "none");
-    var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("d", "M30 4 C70 12 24 28 68 44 C22 62 74 78 36 96");
-    path.setAttribute("fill", "none");
-    path.setAttribute("stroke", "rgba(150, 220, 255, 0.45)");
-    path.setAttribute("stroke-width", "7");
-    path.setAttribute("stroke-linecap", "round");
-    path.setAttribute("vector-effect", "non-scaling-stroke");
-    var core = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    core.setAttribute("fill", "none");
-    core.setAttribute("stroke", "rgba(236, 252, 255, 0.92)");
-    core.setAttribute("stroke-width", "2");
-    core.setAttribute("stroke-linecap", "round");
-    core.setAttribute("vector-effect", "non-scaling-stroke");
-    svg.appendChild(path);
-    svg.appendChild(core);
-    panel.insertBefore(svg, panel.firstChild);
+    var canvas = document.createElement("canvas");
+    canvas.className = "ori-path";
+    canvas.setAttribute("aria-hidden", "true");
+    panel.insertBefore(canvas, panel.firstChild);
     var spirit = document.createElement("div");
     spirit.className = "ori-spirit";
     spirit.setAttribute("aria-hidden", "true");
@@ -443,35 +431,156 @@
       var sels = ["header.hdr", "#hub-cam-deck", ".leaveby", "#hub-lights-panel", "#hub-spotify-strip", ".who-up"];
       var pts = [];
       var pr = panel.getBoundingClientRect();
-      if (pr.width < 8 || pr.height < 8) return;
-      /* A center gutter. Landmarks stay left or right of it, so the vine does not cut the paintings. */
-      var yOff = { "header.hdr": 40, "#hub-cam-deck": 44, ".leaveby": 48, "#hub-lights-panel": 64, "#hub-spotify-strip": 58, ".who-up": 24 };
+      var w = Math.max(1, Math.round(panel.clientWidth));
+      var h = Math.max(1, Math.round(panel.scrollHeight));
+      if (pr.width < 8 || h < 8) return;
+      if (canvas.width !== w) canvas.width = w;
+      if (canvas.height !== h) canvas.height = h;
+      var yOff = { "header.hdr": 36, "#hub-cam-deck": 56, ".leaveby": 70, "#hub-lights-panel": 80, "#hub-spotify-strip": 72, ".who-up": 28 };
       function add(el, off) {
         if (!el) return;
         var r = el.getBoundingClientRect();
         if (r.width < 4 || r.height < 4) return;
-        var ypx = r.top + (off == null ? 22 : off) - pr.top;
-        var wob = (pts.length % 2 ? 1.2 : -1.2);
-        pts.push([50 + wob, (ypx / pr.height) * 100]);
+        var ypx = r.top - pr.top + (off == null ? 40 : off);
+        var onLeft = (r.left + r.width * 0.5) < (pr.left + pr.width * 0.5);
+        var xpx = (onLeft ? 0.28 : 0.72) * w + Math.sin(pts.length * 1.7) * w * 0.05;
+        xpx = Math.max(36, Math.min(w - 36, xpx));
+        pts.push([xpx, ypx]);
       }
       for (var s = 0; s < sels.length; s++) add(document.querySelector(sels[s]), yOff[sels[s]]);
       var tiles = document.querySelectorAll(".tile-grid > .tile");
-      for (var n = 0; n < tiles.length; n++) add(tiles[n], 22);
+      for (var n = 0; n < tiles.length; n++) add(tiles[n], 52);
       pts.sort(function (a, b) { return a[1] - b[1]; });
+      var ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, w, h);
       if (pts.length < 2) return;
-      var d = "M " + pts[0][0].toFixed(2) + " " + pts[0][1].toFixed(2);
-      for (var k = 1; k < pts.length; k++) {
-        var a = pts[k - 1], b = pts[k];
-        var cx = (a[0] + b[0]) / 2;
-        d += " Q " + cx.toFixed(2) + " " + a[1].toFixed(2) + " " + b[0].toFixed(2) + " " + b[1].toFixed(2);
+      function trace() {
+        ctx.beginPath();
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        for (var i = 1; i < pts.length; i++) {
+          var a = pts[i - 1], b = pts[i];
+          ctx.quadraticCurveTo(a[0], (a[1] + b[1]) * 0.5, (a[0] + b[0]) * 0.5, (a[1] + b[1]) * 0.5);
+        }
+        ctx.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]);
       }
-      path.setAttribute("d", d);
-      core.setAttribute("d", d);
+      function stroke(width, color, blur) {
+        ctx.save();
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.shadowColor = color;
+        ctx.shadowBlur = blur;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        trace();
+        ctx.stroke();
+        ctx.restore();
+      }
+      stroke(96, "rgba(90, 170, 230, 0.10)", 54);
+      stroke(46, "rgba(150, 210, 255, 0.13)", 32);
+      stroke(22, "rgba(214, 242, 255, 0.08)", 18);
     }
     window.addEventListener("resize", redrawPath);
     setTimeout(redrawPath, 80);
     setTimeout(redrawPath, 700);
     setTimeout(redrawPath, 2200);
+    function cleanTitle(s) {
+      s = String(s || "");
+      s = s.replace(/\[[^\]]*\]/g, " ");
+      s = s.replace(/\([^)]*\)/g, " ");
+      var cut = s.indexOf(" · ");
+      if (cut >= 0) s = s.slice(0, cut);
+      return s.replace(/\s+/g, " ").replace(/^[\s·—–-]+|[\s·—–-]+$/g, "").trim();
+    }
+    function isJohnson(s) { return /johnson\s+kids/i.test(String(s || "")); }
+    function isAwareness(s) { return /no school|\ball day\b|awareness/i.test(String(s || "")); }
+    function upcoming() {
+      var out = [];
+      var stops = document.querySelectorAll(".lb-day-stop");
+      for (var i = 0; i < stops.length; i++) {
+        var timeNode = stops[i].querySelector(".lb-day-t");
+        var whatNode = stops[i].querySelector(".lb-day-what");
+        var time = timeNode ? timeNode.textContent.replace(/\s+/g, " ").trim() : "";
+        var raw = whatNode ? whatNode.textContent : "";
+        if (/^all day$/i.test(time) || isAwareness(raw) || isJohnson(raw)) continue;
+        var title = cleanTitle(raw);
+        if (!title || isJohnson(title) || isAwareness(title)) continue;
+        out.push({ time: time, title: title });
+        if (out.length === 3) break;
+      }
+      return out;
+    }
+    var heroQuiet = false;
+    function setText(el, value) {
+      if (el && el.textContent !== value) el.textContent = value;
+    }
+    function tidyHero() {
+      if (heroQuiet) return;
+      var main = document.querySelector("[data-live='leaveby-main']");
+      if (!main) return;
+      var dest = main.querySelector(".leaveby-dest");
+      if (!dest) return;
+      heroQuiet = true;
+      var raw = dest.getAttribute("data-ori-raw") || dest.textContent;
+      if (!dest.getAttribute("data-ori-raw")) dest.setAttribute("data-ori-raw", raw);
+      var timeEl = main.querySelector(".time");
+      var items = upcoming();
+      var awareness = !timeEl || isAwareness(raw) || isJohnson(raw) || /^all day$/i.test(timeEl ? timeEl.textContent : "");
+      if (awareness) {
+        if (items.length) {
+          if (!timeEl) {
+            timeEl = document.createElement("span");
+            timeEl.className = "time";
+            main.insertBefore(timeEl, dest);
+          }
+          setText(timeEl, items[0].time);
+          setText(dest, items[0].title);
+        } else {
+          if (timeEl) setText(timeEl, "");
+          setText(dest, "Clear");
+        }
+      } else {
+        var title = cleanTitle(raw);
+        if (title) setText(dest, title);
+      }
+      setTimeout(function () { heroQuiet = false; }, 0);
+    }
+    function fillPeek() {
+      var card = document.querySelector(".ori-peek-card");
+      if (!card) return;
+      var items = upcoming();
+      card.innerHTML = items.length ? items.map(function (it) {
+        return "<p><b>" + it.time.replace(/</g, "") + "</b> " + it.title.replace(/</g, "") + "</p>";
+      }).join("") : "<p>Nothing else coming up</p>";
+    }
+    var deck = document.querySelector("#hub-cam-deck");
+    if (deck && !deck.querySelector(".ori-pool-hit")) {
+      var peek = document.createElement("div");
+      peek.className = "ori-peek";
+      peek.hidden = true;
+      peek.innerHTML = '<div class="ori-peek-card"></div>';
+      deck.appendChild(peek);
+      var hit = document.createElement("button");
+      hit.type = "button";
+      hit.className = "ori-pool-hit";
+      hit.setAttribute("aria-label", "Show the next three leaves");
+      deck.appendChild(hit);
+      var peekOpen = false;
+      hit.addEventListener("click", function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        peekOpen = !peekOpen;
+        peek.hidden = !peekOpen;
+        if (peekOpen) fillPeek();
+        setTimeout(redrawPath, 60);
+      });
+    }
+    tidyHero();
+    setTimeout(tidyHero, 500);
+    setTimeout(tidyHero, 1700);
+    var leaveHost = document.querySelector(".leaveby");
+    if (leaveHost && window.MutationObserver) {
+      new MutationObserver(function () { tidyHero(); }).observe(leaveHost, { childList: true, subtree: true });
+    }
     document.addEventListener("pointerdown", function (ev) {
       var t = ev.target && ev.target.closest ? ev.target.closest("a, button, .tile, .hub-cam, .leaveby, #hub-lights-panel, .sp-tile, .who-up, header.hdr") : null;
       var x = ev.clientX, y = ev.clientY;
