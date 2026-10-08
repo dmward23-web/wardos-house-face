@@ -1,6 +1,6 @@
 {
   "status": "live",
-  "fetchedAt": "2026-10-08T19:07:20.210Z",
+  "fetchedAt": "2026-10-08T19:22:25.519Z",
   "source": "tplink-cloud-api",
   "writeSupported": true,
   "brightnessControlSupported": true,
