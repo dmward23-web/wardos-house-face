@@ -147,8 +147,8 @@
   html body .lights-cmd .light-bright::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; margin-top: -8px; border-radius: 50%; background: #ffe6b0; box-shadow: 0 0 12px rgba(255,214,140,0.8); }
 }
 </style>
-<script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
-<link rel="stylesheet" href="house-ori.css?v=ORIHOME15" />
+<script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{if(sessionStorage.getItem("ori-from")||/from=/.test(location.hash)){h.classList.add("ori-arriving");h.setAttribute("data-ori-veil","1");}}catch(e){}try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
+<link rel="stylesheet" href="house-ori.css?v=ORIHOME17" />
 </head>
 <body>
 <div class="panel lights-cmd">
@@ -258,8 +258,8 @@
 </script>
 <script src="house-hdr-home.js?v=HDRHOME1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>
-<script src="ori/plates/painted/manifest.js?v=ORIHOME15"></script>
-<script src="ori/ori-scene.js?v=ORIHOME15"></script>
-<script src="house-ori-world.js?v=ORIHOME15"></script>
+<script src="ori/plates/painted/manifest.js?v=ORIHOME17"></script>
+<script src="ori/ori-scene.js?v=ORIHOME17"></script>
+<script src="house-ori-world.js?v=ORIHOME17"></script>
 </body>
 </html>

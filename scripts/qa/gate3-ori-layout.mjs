@@ -279,6 +279,63 @@ const SCAN = `(() => {
     }
     if (alpha < 0.82) hits.push("row missing plate " + (ownText(el) || "light").slice(0, 48));
   });
+  if (document.documentElement.classList.contains("ori-phone")) {
+    const texts = [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let textNode;
+    while ((textNode = walker.nextNode())) {
+      const raw = (textNode.nodeValue || "").replace(/\\s+/g, " ").trim();
+      if (raw.length < 2) continue;
+      const parent = textNode.parentElement;
+      if (!parent || !shown(parent) || parent.closest("script, style, [hidden], .ori-iris, .ori-arrive")) continue;
+      const range = document.createRange();
+      range.selectNodeContents(textNode);
+      for (const box of range.getClientRects()) {
+        if (box.width < 2 || box.height < 2) continue;
+        if (box.bottom < 0 || box.top > innerHeight) continue;
+        texts.push({ t: raw.slice(0, 42), l: box.left, r: box.right, top: box.top, b: box.bottom });
+      }
+      range.detach && range.detach();
+    }
+    let overlaps = 0;
+    for (let i = 0; i < texts.length; i++) {
+      for (let j = i + 1; j < texts.length; j++) {
+        const a = texts[i], c = texts[j];
+        const ix = Math.min(a.r, c.r) - Math.max(a.l, c.l);
+        const iy = Math.min(a.b, c.b) - Math.max(a.top, c.top);
+        if (ix > 3 && iy > 3) {
+          overlaps++;
+          if (overlaps <= 8) hits.push("text overlap \\"" + a.t + "\\" x \\"" + c.t + "\\"");
+        }
+      }
+    }
+    document.querySelectorAll(".ori-day").forEach((day) => {
+      let prev = -1;
+      let sawUntimed = false;
+      const head = (day.querySelector(".ori-dom") || {}).textContent || "";
+      day.querySelectorAll(".ori-ev").forEach((el) => {
+        const text = (el.textContent || "").replace(/\\s+/g, " ").trim();
+        const raw = el.getAttribute("data-min");
+        if (raw == null || raw === "") {
+          sawUntimed = true;
+          return;
+        }
+        if (sawUntimed) hits.push("untimed before timed " + head.trim() + " " + text.slice(0, 40));
+        const mins = +raw;
+        if (mins < prev) hits.push("day out of order " + head.trim() + " " + text.slice(0, 48));
+        prev = mins;
+      });
+    });
+    const allDayRows = {};
+    document.querySelectorAll(".ori-day .ori-ev").forEach((el) => {
+      const text = (el.textContent || "").replace(/\\s+/g, " ").trim();
+      if (!/kids with dan|johnson kids|dan nashville|hayes bb|coach should reach|coach in/i.test(text)) return;
+      allDayRows[text] = (allDayRows[text] || 0) + 1;
+    });
+    Object.keys(allDayRows).forEach((title) => {
+      if (allDayRows[title] > 1) hits.push("all-day row repeats " + allDayRows[title] + " " + title.slice(0, 60));
+    });
+  }
   const pending = [...document.querySelectorAll(".light-pad.is-pending, .light-pad.is-need-connect, [data-unconnected-summary]")].filter(shown);
   if (pending.length > 1) hits.push("unconnected cards " + pending.length);
   pending.forEach((el) => {
@@ -377,6 +434,52 @@ async function main() {
         } else {
           console.log("  clean", view.name, file);
         }
+      }
+      if (view.phone) {
+        async function veilAt(where) {
+          return page.evaluate(() => {
+            const root = document.documentElement;
+            const held = root.classList.contains("ori-arriving") || root.classList.contains("ori-held");
+            let best = null;
+            document.querySelectorAll(".ori-iris, .ori-arrive").forEach((el) => {
+              const s = getComputedStyle(el);
+              const op = parseFloat(s.opacity) || 0;
+              const r = el.getBoundingClientRect();
+              if (!best || op > best.op) best = { op: op, w: r.width, h: r.height, display: s.display, name: el.className };
+            });
+            if (best && best.op >= 0.35) return best;
+            if (held || root.getAttribute("data-ori-veil") === "1") return { op: 1, w: innerWidth, h: innerHeight, display: "pseudo", name: held ? "held" : "marked" };
+            return best;
+          }).then((mid) => {
+            const ok = mid && mid.display !== "none" && mid.op >= 0.35 && mid.w >= view.width - 4 && mid.h >= view.height - 4;
+            if (!ok) failures.push("phone veil missing " + where + " " + JSON.stringify(mid));
+            else console.log("  veil", where, mid.op.toFixed(2));
+          });
+        }
+        console.log("check phone veil");
+        await page.goto("http://127.0.0.1:" + PORT + "/sheet-index.html", { waitUntil: "domcontentloaded", timeout: 90000 });
+        await prepare(page, "sheet-index.html");
+        await page.evaluate(() => {
+          const a = document.querySelector("a.tile.month");
+          if (a) a.click();
+        });
+        await new Promise((r) => setTimeout(r, 200));
+        await veilAt("home-to-month");
+        await page.waitForFunction(() => /month\.html/.test(location.pathname) && document.documentElement.getAttribute("data-ori-veil") === "1", { timeout: 5000 }).catch((err) => console.log("  arrive-month wait", err.message));
+        await veilAt("arrive-month");
+        await page.goBack({ waitUntil: "domcontentloaded" }).catch(() => {});
+        await new Promise((r) => setTimeout(r, 160));
+        await veilAt("back-home");
+        await page.goto("http://127.0.0.1:" + PORT + "/sheet-index.html", { waitUntil: "domcontentloaded", timeout: 90000 });
+        await prepare(page, "sheet-index.html");
+        await page.evaluate(() => {
+          const a = document.querySelector("a.hub-lights-more");
+          if (a) a.click();
+        });
+        await new Promise((r) => setTimeout(r, 200));
+        await veilAt("home-to-lights");
+        await page.waitForFunction(() => /sheet-lights\.html/.test(location.pathname) && document.documentElement.getAttribute("data-ori-veil") === "1", { timeout: 5000 }).catch((err) => console.log("  arrive-lights wait", err.message));
+        await veilAt("arrive-lights");
       }
       await page.close();
     }

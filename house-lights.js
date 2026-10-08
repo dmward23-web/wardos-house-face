@@ -148,6 +148,13 @@
   /* AUDIT1 · no key saved on this screen → no lights requests at all (no probe, no write) */
   function hasKey() { return !!proxyToken(); }
   function noKey(g) { g = g || gate(); return !!(g.live && g.writeSupported && !hasKey()); }
+  /* Cloud preview has no Kasa key. The wall and phone still follow the main write path. */
+  function previewHost() {
+    try {
+      var h = String(location.hostname || "");
+      return h === "localhost" || h === "127.0.0.1" || h === "0.0.0.0" || h === "[::1]";
+    } catch (e) { return false; }
+  }
 
   function canWrite() {
     if (!hasKey()) return false;
@@ -249,7 +256,7 @@
     if (st === "live") {
       var ws = !!data.writeSupported;
       var label = "LIVE";
-      if (ws && !hasKey()) label = "Needs key";
+      if (ws && !hasKey()) label = previewHost() ? "LIVE" : "Needs key";
       else if (ws && _proxyReachable === false) label = "LIVE · PROXY OFF";
       else if (ws && _proxyReachable === null) label = "LIVE";
       else if (!ws) label = "LIVE · READ ONLY";
@@ -701,7 +708,7 @@
     var pill = doc.getElementById("lights-ctrl-pill");
     if (pill) {
       var needsKey = noKey(g);
-      pill.textContent = needsKey ? "Needs key" : g.label;
+      pill.textContent = (previewHost() && g.live) ? "LIVE" : (needsKey ? "Needs key" : g.label);
       pill.classList.toggle("on", !!g.live && !needsKey);
       pill.classList.add("cmd-pill");
       pill.classList.toggle("cmd-pill--live", !!g.live && !needsKey);
@@ -750,7 +757,7 @@
             ? '<input class="light-bright" type="range" min="1" max="100" value="' + clampBright(L.brightness || 100) + '" data-id="' + L.id + '" aria-label="Brightness"' + (armedPad ? "" : " disabled") + ' />'
             : "")
           + "</div>"
-          + '<div class="light-pad-src">' + (noKey(g) ? "Needs key" : hubSrcLabel(eff, g)) + "</div>"
+          + '<div class="light-pad-src">' + ((previewHost() && g.live) ? "LIVE" : (noKey(g) ? "Needs key" : hubSrcLabel(eff, g))) + "</div>"
           + "</article>";
       }
       grid.innerHTML = html;

@@ -141,19 +141,24 @@
 
   function arrive(fx, fy) {
     if (REDUCED) return;
-    document.documentElement.classList.add("ori-enter");
     var veil = document.createElement("div");
     veil.className = "ori-arrive";
+    veil.setAttribute("data-ori-veil", "1");
     veil.style.setProperty("--x", (fx * 100) + "%");
     veil.style.setProperty("--y", (fy * 100) + "%");
+    document.documentElement.setAttribute("data-ori-veil", "1");
     document.body.appendChild(veil);
-    setTimeout(function () { if (veil.parentNode) veil.remove(); }, 620);
+    setTimeout(function () {
+      document.documentElement.classList.remove("ori-arriving");
+      document.documentElement.classList.remove("ori-held");
+      if (veil.parentNode) veil.remove();
+    }, 620);
   }
 
   var from = readFrom();
   var fx0 = from ? Math.min(1, Math.max(0, from.x)) : 0.72;
   var fy0 = from ? Math.min(1, Math.max(0, from.y)) : 0.1;
-  arrive(fx0, fy0);
+  if (from || document.documentElement.classList.contains("ori-arriving")) arrive(fx0, fy0);
 
   /* Quality governor. First ~2s measures render cost (not the rAF gap), then steps
      dpr, scale, layers, and bloom until a frame fits in 15ms (~60fps).
@@ -443,33 +448,41 @@
         if (r.width < 8 || r.height < 8) return;
         blocks.push({ l: r.left - pr.left, t: r.top - pr.top, r: r.right - pr.left, b: r.bottom - pr.top });
       }
-      function gutterX(ypx, prefer) {
-        var xpx = prefer;
+      function gutterX(ypx) {
+        var gaps = [{ l: 18, r: w - 18 }];
         for (var i = 0; i < blocks.length; i++) {
           var c = blocks[i];
-          if (ypx < c.t - 6 || ypx > c.b + 6) continue;
-          if (xpx <= c.l - 20 || xpx >= c.r + 20) continue;
-          var left = c.l - 26;
-          var right = c.r + 26;
-          var useLeft = left >= 16 && (w - right < 16 || left >= w - right);
-          xpx = useLeft ? left : Math.min(w - 16, right);
+          if (ypx < c.t - 14 || ypx > c.b + 14) continue;
+          var next = [];
+          for (var g = 0; g < gaps.length; g++) {
+            var gap = gaps[g];
+            var left = gap.l;
+            var right = Math.min(gap.r, c.l - 18);
+            if (right - left >= 18) next.push({ l: left, r: right });
+            left = Math.max(gap.l, c.r + 18);
+            right = gap.r;
+            if (right - left >= 18) next.push({ l: left, r: right });
+          }
+          gaps = next;
+          if (!gaps.length) break;
         }
-        return Math.max(16, Math.min(w - 16, xpx));
+        if (!gaps.length) return Math.max(18, w - 28);
+        var best = gaps[0];
+        for (var k = 1; k < gaps.length; k++) {
+          if (gaps[k].r - gaps[k].l > best.r - best.l) best = gaps[k];
+        }
+        return (best.l + best.r) / 2;
       }
-      var yOff = { "header.hdr": 36, "#hub-cam-deck": 56, ".leaveby": 70, "#hub-lights-panel": 80, "#hub-spotify-strip": 72, ".who-up": 28 };
-      function add(el, off) {
-        if (!el) return;
-        remember(el);
-        var r = el.getBoundingClientRect();
-        if (r.width < 4 || r.height < 4) return;
-        var ypx = r.top - pr.top + (off == null ? 40 : off);
-        var onLeft = (r.left + r.width * 0.5) < (pr.left + pr.width * 0.5);
-        pts.push([gutterX(ypx, w * (onLeft ? 0.22 : 0.78)), ypx]);
+      sels.forEach(function (sel) { remember(document.querySelector(sel)); });
+      document.querySelectorAll(".hdr-date, .hdr-ovals, .wx-card, .tile-grid > .tile").forEach(remember);
+      var y0 = 90;
+      var header = document.querySelector("header.hdr");
+      if (header) {
+        var hr = header.getBoundingClientRect();
+        y0 = Math.max(y0, hr.bottom - pr.top + 22);
       }
-      for (var s = 0; s < sels.length; s++) add(document.querySelector(sels[s]), yOff[sels[s]]);
-      var tiles = document.querySelectorAll(".tile-grid > .tile");
-      for (var n = 0; n < tiles.length; n++) add(tiles[n], 52);
-      pts.sort(function (a, b) { return a[1] - b[1]; });
+      var y1 = h - 36;
+      for (var y = y0; y <= y1; y += 16) pts.push([gutterX(y), y]);
       var ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, w, h);
       if (pts.length < 2) return;
@@ -502,10 +515,44 @@
       ctx.globalCompositeOperation = "destination-out";
       for (var c = 0; c < blocks.length; c++) {
         var box = blocks[c];
-        ctx.fillRect(box.l - 6, box.t - 6, (box.r - box.l) + 12, (box.b - box.t) + 12);
+        ctx.fillRect(box.l - 16, box.t - 16, (box.r - box.l) + 32, (box.b - box.t) + 32);
       }
       ctx.restore();
     }
+    if (!document.querySelector(".ori-motes")) {
+      var motes = document.createElement("div");
+      motes.className = "ori-motes";
+      motes.setAttribute("aria-hidden", "true");
+      var moteHtml = "";
+      for (var mi = 0; mi < 14; mi++) {
+        var left = 6 + ((mi * 37) % 88);
+        var delay = (mi * 0.7).toFixed(1);
+        var dur = (12 + (mi % 5) * 1.6).toFixed(1);
+        var top = (mi * 13) % 90;
+        moteHtml += '<i style="left:' + left + '%;top:' + top + '%;animation-delay:-' + delay + 's;animation-duration:' + dur + 's"></i>';
+      }
+      motes.innerHTML = moteHtml;
+      document.body.appendChild(motes);
+    }
+    function tidyWx() {
+      var temp = document.querySelector("header.hdr .wx-temp");
+      var sub = document.querySelector("header.hdr .wx-sub");
+      if (!temp || !sub) return;
+      var now = (String(temp.textContent || "").match(/(\d+)/) || [])[1];
+      var hi = (String(sub.getAttribute("data-ori-hi") || sub.textContent || "").match(/(\d+)/) || [])[1];
+      if (!sub.getAttribute("data-ori-hi") && /H\s*\d/.test(sub.textContent || "")) sub.setAttribute("data-ori-hi", sub.textContent);
+      hi = (String(sub.getAttribute("data-ori-hi") || "").match(/H\s*(\d+)/) || [])[1] || hi;
+      if (!now || !hi) return;
+      var nextTemp = now + "°";
+      var nextSub = "high " + hi + "°";
+      if (temp.textContent !== nextTemp) temp.textContent = nextTemp;
+      if (sub.textContent !== nextSub) sub.textContent = nextSub;
+    }
+    tidyWx();
+    setTimeout(tidyWx, 600);
+    setTimeout(tidyWx, 1800);
+    var wx = document.querySelector("#house-wx");
+    if (wx && window.MutationObserver) new MutationObserver(tidyWx).observe(wx, { childList: true, subtree: true, characterData: true });
     window.addEventListener("resize", redrawPath);
     setTimeout(redrawPath, 80);
     setTimeout(redrawPath, 700);
@@ -598,10 +645,20 @@
         ev.preventDefault();
         ev.stopPropagation();
         peekOpen = !peekOpen;
-        peek.hidden = !peekOpen;
         if (peekOpen) {
           if (peek.parentNode !== document.body) document.body.appendChild(peek);
           fillPeek();
+          var below = 0;
+          deck.querySelectorAll(".hub-cam-label").forEach(function (lab) {
+            below = Math.max(below, lab.getBoundingClientRect().bottom);
+          });
+          if (!below) below = deck.getBoundingClientRect().bottom;
+          peek.style.top = Math.round(below + 12) + "px";
+          peek.hidden = false;
+          requestAnimationFrame(function () { peek.classList.add("is-open"); });
+        } else {
+          peek.classList.remove("is-open");
+          setTimeout(function () { if (!peekOpen) peek.hidden = true; }, 440);
         }
         setTimeout(redrawPath, 60);
       });
@@ -756,8 +813,10 @@
       document.head.appendChild(pre);
     } catch (ePre) {}
     document.documentElement.classList.add("ori-diving");
+    document.querySelectorAll(".ori-iris, .ori-arrive").forEach(function (old) { old.remove(); });
     var iris = document.createElement("div");
     iris.className = "ori-iris";
+    iris.setAttribute("data-ori-veil", "1");
     iris.style.setProperty("--x", x + "px");
     iris.style.setProperty("--y", y + "px");
     document.body.appendChild(iris);
@@ -818,9 +877,21 @@
     try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
   }, true);
 
+  window.addEventListener("pagehide", function () {
+    document.documentElement.classList.add("ori-held");
+  });
   window.addEventListener("pageshow", function (ev) {
     diving = false;
     document.documentElement.classList.remove("ori-diving");
+    var back = false;
+    try {
+      var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+      back = !!(nav && nav.type === "back_forward");
+    } catch (e) {}
+    if (ev.persisted || back || document.documentElement.classList.contains("ori-held")) {
+      arrive(0.5, 0.32);
+      document.documentElement.classList.remove("ori-held");
+    }
     if (ev.persisted && world) { world.trans = null; try { world.kick(true); } catch (e) {} }
   });
 
