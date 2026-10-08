@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 8 2026",
   "asOfIso": "2026-10-08",
-  "refreshedAt": "2026-10-08T22:29:13.256Z",
+  "refreshedAt": "2026-10-08T23:58:29.280Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,27 +16,15 @@
     "endIso": "2026-10-09T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "6:00",
-    "place": "Hayes flag practice",
+    "label": "Next up · Fri",
+    "time": "12:00",
+    "place": "Ward Kids [AHH No School]",
     "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-    "badge": "Thu",
-    "startIso": "2026-10-08T23:00:00.000Z",
-    "endIso": "2026-10-09T00:15:00.000Z",
-    "kind": "sport",
+    "badge": "Fri",
+    "startIso": "2026-10-09T17:00:00.000Z",
+    "endIso": "2026-10-10T17:00:00.000Z",
+    "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "6:00",
-        "place": "Hayes flag practice",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-08T23:00:00.000Z",
-        "endIso": "2026-10-09T00:15:00.000Z",
-        "kind": "sport",
-        "whenLabel": "6:00",
-        "summary": "Hayes flag practice · 6:00"
-      },
       {
         "label": "Next up · Fri",
         "time": "12:00",
@@ -168,6 +156,18 @@
         "kind": "leave",
         "whenLabel": "Sat 1:15",
         "summary": "Hayes — flag pickup · 1:15"
+      },
+      {
+        "label": "Next up · Sat",
+        "time": "2:00",
+        "place": "Lindsay appt video",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-10T19:00:00.000Z",
+        "endIso": "2026-10-10T20:00:00.000Z",
+        "kind": "other",
+        "whenLabel": "Sat 2:00",
+        "summary": "Harris — Lindsay appt video · 2:00"
       }
     ]
   },
@@ -809,22 +809,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "THU · 5:00",
-        "what": "AINSLEY SWIM — COACH ANN",
+        "when": "FRI · 12:00",
+        "what": "WARD KIDS [AHH NO SCHOOL]",
         "where": "with Mom · until Fri Oct 9 · 3:00",
         "badges": [
-          "THU",
-          "5:00"
+          "FRI",
+          "12:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Thu · 5:00",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -834,12 +827,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Thu 8 · leave 5:00",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Wed 14 · leave 4:00",
           "what": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
@@ -965,11 +952,6 @@
           "tone": "act"
         },
         {
-          "when": "Thu 8 · 5:00",
-          "what": "Ainsley swim — Coach Ann",
-          "tone": "hot"
-        },
-        {
           "when": "Thu 8 · 6:00",
           "what": "Hayes flag practice",
           "tone": "hot"
@@ -1078,6 +1060,11 @@
           "when": "Tue 13 · 11:00",
           "what": "Ainsley LKMS pickup for dentist",
           "tone": "hot"
+        },
+        {
+          "when": "Tue 13 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act"
         }
       ]
     }
