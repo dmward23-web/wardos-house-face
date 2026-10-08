@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 8 2026",
   "asOfIso": "2026-10-08",
-  "refreshedAt": "2026-10-08T14:19:25.860Z",
+  "refreshedAt": "2026-10-08T18:13:46.601Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -123,6 +123,30 @@
       },
       {
         "label": "Next up · Sat",
+        "time": "10:00",
+        "place": "Lindsay appt",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-10T15:00:00.000Z",
+        "endIso": "2026-10-10T16:00:00.000Z",
+        "kind": "other",
+        "whenLabel": "Sat 10:00",
+        "summary": "Hayes — Lindsay appt · 10:00"
+      },
+      {
+        "label": "Next up · Sat",
+        "time": "10:00",
+        "place": "Lindsay appt",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-10T15:00:00.000Z",
+        "endIso": "2026-10-10T16:00:00.000Z",
+        "kind": "other",
+        "whenLabel": "Sat 10:00",
+        "summary": "Harris — Lindsay appt · 10:00"
+      },
+      {
+        "label": "Next up · Sat",
         "time": "11:25",
         "place": "Hayes flag drop-off",
         "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
@@ -136,38 +160,14 @@
       {
         "label": "Next up · Sat",
         "time": "11:25",
-        "place": "Hayes flag — SRE Falcons vs Funk",
+        "place": "Hayes flag — SRE Falcons vs Funk · Field 6",
         "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
         "badge": "Sat",
         "startIso": "2026-10-10T16:25:00.000Z",
         "endIso": "2026-10-10T18:15:00.000Z",
         "kind": "sport",
         "whenLabel": "Sat 11:25",
-        "summary": "Hayes flag — SRE Falcons vs Funk · leave 11:25 · game 12:15"
-      },
-      {
-        "label": "Next up · Sat",
-        "time": "1:15",
-        "place": "Hayes flag pickup",
-        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Sat",
-        "startIso": "2026-10-10T18:15:00.000Z",
-        "endIso": "2026-10-10T18:35:00.000Z",
-        "kind": "leave",
-        "whenLabel": "Sat 1:15",
-        "summary": "Hayes — flag pickup · 1:15"
-      },
-      {
-        "label": "Next up · Mon",
-        "time": "7:00",
-        "place": "SRE specials: Music",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-12T12:00:00.000Z",
-        "endIso": "2026-10-12T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Mon 7:00",
-        "summary": "Harris — SRE specials: Music"
+        "summary": "Hayes flag — SRE Falcons vs Funk · Field 6 · leave 11:25 · game 12:15"
       }
     ]
   },
@@ -582,7 +582,7 @@
         },
         {
           "when": "Sat 10 · leave 11:25",
-          "what": "Hayes flag — SRE Falcons vs Funk",
+          "what": "Hayes flag — SRE Falcons vs Funk · Field 6",
           "hint": "YOUR board",
           "tone": "hot"
         },
@@ -1019,7 +1019,7 @@
         },
         {
           "when": "Sat 10 · 11:25",
-          "what": "Hayes flag — SRE Falcons vs Funk",
+          "what": "Hayes flag — SRE Falcons vs Funk · Field 6",
           "tone": "hot"
         },
         {

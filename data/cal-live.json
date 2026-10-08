@@ -1,18 +1,18 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-08T14:19:26.393Z",
+  "fetchedAt": "2026-10-08T18:13:47.441Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-03",
   "windowEnd": "2026-10-14",
   "asOfIso": "2026-10-08",
   "nextLeave": {
-    "id": "43chat4nm1cmv3tsqtd2p9cdjo_20261008T200000Z",
-    "summary": "Ainsley — LKMS Homework Help · 3:00",
-    "start": "2026-10-08T15:00:00-05:00",
-    "end": "2026-10-08T16:00:00-05:00",
-    "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
-    "busy": false,
+    "id": "ohoma1ia1arueisdi6nqdm1kms",
+    "summary": "Dan + Erin DRIVE → KC · leave 6:30 · kids by 3:00",
+    "start": "2026-10-09T06:30:00-05:00",
+    "end": "2026-10-09T14:30:00-05:00",
+    "location": "14 Harbor Cove Dr, Old Hickory, TN → 6719 W 147th Terrace, Overland Park, KS 66223",
+    "busy": true,
     "allDay": false
   },
   "upcomingLeaves": [
@@ -120,7 +120,7 @@
       "summary": "Harris flag — vs SH Proehl (home) · leave 7:40 · game 8:30",
       "start": "2026-10-10T07:40:00-05:00",
       "end": "2026-10-10T09:30:00-05:00",
-      "location": "Heritage Park Soccer Complex, Field 10, 17255 S Black Bob Rd, Olathe, KS 66062",
+      "location": "Heritage Park Soccer Complex, Field 10 North SC, 17255 S Black Bob Rd, Olathe, KS 66062",
       "busy": true,
       "allDay": false
     },
@@ -143,11 +143,29 @@
       "allDay": false
     },
     {
+      "id": "5md4qeovmcuk1lt09out2hpsmo",
+      "summary": "Hayes — Lindsay appt · 10:00",
+      "start": "2026-10-10T10:00:00-05:00",
+      "end": "2026-10-10T11:00:00-05:00",
+      "location": "Midwest Anxiety · (913) 498-8200",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "l0rt882nma87ha059v23g7fsso",
+      "summary": "Harris — Lindsay appt · 10:00",
+      "start": "2026-10-10T10:00:00-05:00",
+      "end": "2026-10-10T11:00:00-05:00",
+      "location": "",
+      "busy": true,
+      "allDay": false
+    },
+    {
       "id": "mct16qm5fe6a891brded02hpck",
-      "summary": "Hayes flag — SRE Falcons vs Funk · leave 11:25 · game 12:15",
+      "summary": "Hayes flag — SRE Falcons vs Funk · Field 6 · leave 11:25 · game 12:15",
       "start": "2026-10-10T11:25:00-05:00",
       "end": "2026-10-10T13:15:00-05:00",
-      "location": "Heritage Park Football Complex, 16240 Pflumm Rd, Olathe, KS 66062",
+      "location": "Heritage Park Football Complex, Field 6 FB, 16240 Pflumm Rd, Olathe, KS 66062",
       "busy": true,
       "allDay": false
     },
@@ -156,7 +174,16 @@
       "summary": "Hayes — flag drop-off · 11:45",
       "start": "2026-10-10T11:25:00-05:00",
       "end": "2026-10-10T11:45:00-05:00",
-      "location": "Heritage Park Football Complex, 16240 Pflumm Rd, Olathe, KS 66062",
+      "location": "Heritage Park Football Complex, Field 6 FB, 16240 Pflumm Rd, Olathe, KS 66062",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "ush7f1je2k9lsqf215rm0gsdoo",
+      "summary": "Harris — Lindsay appt video · 1:00",
+      "start": "2026-10-10T13:00:00-05:00",
+      "end": "2026-10-10T14:00:00-05:00",
+      "location": "Video · https://video.simplepractice.com/appt-c8d42b89f6e9edf4b07956c8f8d4ec2f?origin=client",
       "busy": true,
       "allDay": false
     },
@@ -165,7 +192,7 @@
       "summary": "Hayes — flag pickup · 1:15",
       "start": "2026-10-10T13:15:00-05:00",
       "end": "2026-10-10T13:35:00-05:00",
-      "location": "Heritage Park Football Complex, 16240 Pflumm Rd, Olathe, KS 66062",
+      "location": "Heritage Park Football Complex, Field 6 FB, 16240 Pflumm Rd, Olathe, KS 66062",
       "busy": true,
       "allDay": false
     },
@@ -540,11 +567,11 @@
     }
   ],
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "3:00",
-    "place": "Ainsley — LKMS Homework Help · 3:00",
-    "detailHtml": "<strong>3:00</strong> Ainsley — LKMS Homework Help · 3:00",
-    "badge": "Thu"
+    "label": "Next up · Fri",
+    "time": "6:30",
+    "place": "Dan + Erin DRIVE → KC · leave 6:30 · kids by 3:00",
+    "detailHtml": "<strong>6:30</strong> Dan + Erin DRIVE → KC · leave 6:30 · kids by 3:00",
+    "badge": "Fri"
   },
   "error": null
 }
