@@ -599,7 +599,10 @@
         ev.stopPropagation();
         peekOpen = !peekOpen;
         peek.hidden = !peekOpen;
-        if (peekOpen) fillPeek();
+        if (peekOpen) {
+          if (peek.parentNode !== document.body) document.body.appendChild(peek);
+          fillPeek();
+        }
         setTimeout(redrawPath, 60);
       });
     }
