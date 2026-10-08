@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 8 2026",
   "asOfIso": "2026-10-08",
-  "refreshedAt": "2026-10-08T12:06:03.051Z",
+  "refreshedAt": "2026-10-08T12:11:03.225Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -48,18 +48,6 @@
         "kind": "school",
         "whenLabel": "7:00",
         "summary": "Hayes — SRE specials: Spanish"
-      },
-      {
-        "label": "Next up · today",
-        "time": "7:00",
-        "place": "SRE spirit day: Crazy Socks Day (Peace Week)",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-08T12:00:00.000Z",
-        "endIso": "2026-10-08T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:00",
-        "summary": "Hayes + Harris — SRE spirit day: Crazy Socks Day (Peace Week)"
       },
       {
         "label": "Next up · today",
@@ -168,6 +156,18 @@
         "kind": "leave",
         "whenLabel": "Sat 11:25",
         "summary": "Hayes — flag drop-off · 11:45"
+      },
+      {
+        "label": "Next up · Sat",
+        "time": "11:25",
+        "place": "Hayes flag — SRE Falcons vs Funk",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-10T16:25:00.000Z",
+        "endIso": "2026-10-10T18:15:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Sat 11:25",
+        "summary": "Hayes flag — SRE Falcons vs Funk · leave 11:25 · game 12:15"
       }
     ]
   },
