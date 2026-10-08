@@ -108,17 +108,41 @@
   }
   function motes(ctx, W, H, t, px, tint, n) {
     for (var i = 0; i < n; i++) {
-      var x = (rnd(i) * W + Math.sin(t * (0.3 + rnd(i + 2)) + i) * 18 + px * (0.2 + rnd(i + 4))) % W;
+      var drift = 14 + rnd(i + 3) * 22;
+      var x = (rnd(i) * W + Math.sin(t * 0.65 + i) * 26 + t * drift * 0.45 + (px || 0) * 0.15) % (W + 40);
       if (x < 0) x += W;
-      var y = (rnd(i + 9) * H * 0.85 - t * (8 + rnd(i + 3) * 16)) % H;
+      var y = (rnd(i + 9) * H * 0.86 + Math.cos(t * 0.5 + i * 1.2) * 18) % H;
       if (y < 0) y += H;
-      ctx.globalAlpha = 0.25 + 0.45 * (0.5 + 0.5 * Math.sin(t * 2 + i));
+      var tw = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * 2.4 + i));
+      ctx.globalAlpha = 0.35 + 0.5 * tw;
       ctx.fillStyle = tint || LOOT[i % 5];
       ctx.beginPath();
-      ctx.arc(x, y, 1.2 + rnd(i + 6) * 2.2, 0, 7);
+      ctx.arc(x, y, 2.1 + rnd(i + 6) * 2.6, 0, 7);
       ctx.fill();
     }
     ctx.globalAlpha = 1;
+  }
+  function driftClouds(ctx, W, H, t, world) {
+    if (reduced) return;
+    var tint = world === "harris" ? "rgba(214, 232, 220, 0.20)" : world === "ainsley" ? "rgba(255, 214, 196, 0.16)" : "rgba(255, 244, 226, 0.20)";
+    ctx.save();
+    for (var i = 0; i < 4; i++) {
+      var speed = 11 + i * 7;
+      var x = ((i * 0.28 + 0.05) * W + t * speed) % (W + 240) - 120;
+      var y = H * (0.06 + i * 0.065) + Math.sin(t * 0.28 + i) * 7;
+      ctx.fillStyle = tint;
+      ctx.beginPath();
+      ctx.ellipse(x, y, 78 + i * 16, 15 + (i % 2) * 4, 0, 0, 7);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+  function edgeVignette(ctx, W, H) {
+    var g = ctx.createRadialGradient(W * 0.5, H * 0.46, Math.min(W, H) * 0.5, W * 0.5, H * 0.46, Math.max(W, H) * 0.78);
+    g.addColorStop(0, "rgba(0,0,0,0)");
+    g.addColorStop(1, "rgba(0,0,0,0.16)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
   }
   function fog(ctx, W, H, t, y0, col) {
     for (var i = 0; i < 4; i++) {
@@ -161,10 +185,10 @@
   };
 
   function parallaxNow(t, drift) {
-    if (drift) return { x: Math.sin(t * 0.28) * 26, y: Math.sin(t * 0.16) * 8 };
+    if (drift) return { x: Math.sin(t * 0.22) * 14, y: Math.sin(t * 0.16) * 6 };
     if (reduced) return { x: 0, y: 0 };
     var wall = Math.max(global.innerWidth || 0, global.innerHeight || 0) >= 1000;
-    if (wall) return { x: Math.sin(t * 0.12) * 26, y: Math.sin(t * 0.08) * 8 };
+    if (wall) return { x: Math.sin(t * 0.12) * 14, y: Math.sin(t * 0.08) * 6 };
     var tx = ((bg && bg.ptr != null ? bg.ptr : 0.5) - 0.5);
     var gx = gyro.on ? clamp(gyro.gamma / 30, -1, 1) : 0;
     var gy = gyro.on ? clamp(((gyro.beta || 48) - 48) / 36, -1, 1) : 0;
@@ -207,14 +231,14 @@
     var worlds = ["hayes", "harris", "ainsley"];
     var jobs = [];
     [
-      ["idle", "assets/ori/creature/idle.webp"],
-      ["happy", "assets/ori/creature/happy_squish.webp"],
-      ["fed", "assets/ori/creature/fed_splash.webp"],
-      ["idleShadow", "assets/ori/creature/idle_shadow.webp"],
-      ["happyShadow", "assets/ori/creature/happy_squish_shadow.webp"],
-      ["fedShadow", "assets/ori/creature/fed_splash_shadow.webp"]
+      ["hayes", "assets/ori/creature/idle.webp"],
+      ["harris", "assets/ori/creature/harris.webp"],
+      ["ainsley", "assets/ori/creature/ainsley.webp"]
     ].forEach(function (row) {
-      jobs.push(loadImg(row[1]).then(function (im) { oriCreature[row[0]] = im; }));
+      jobs.push(loadImg(row[1]).then(function (im) {
+        oriCreature[row[0]] = im;
+        if (row[0] === "hayes") oriCreature.idle = im;
+      }));
     });
     [
       ["hayes", "assets/ori/items/hayes_chest.webp"],
@@ -244,16 +268,22 @@
       markJarVisual();
     });
   }
-  function drawPlate(ctx, img, W, H, ox, oy, zoom, alpha, blur) {
+  function drawPlate(ctx, img, W, H, ox, oy, zoom, alpha, blur, world) {
     if (!img) return;
     var z = zoom || 1;
     var scale = Math.max(W / img.width, H / img.height) * z;
     var dw = img.width * scale;
     var dh = img.height * scale;
+    var mx = Math.max(0, (dw - W) / 2 - 3);
+    var my = Math.max(0, (dh - H) / 2 - 3);
+    var x = clamp(ox || 0, -mx, mx);
+    var y = clamp(oy || 0, -my, my);
+    /* Harris fg carries a dark left curtain. Keep it cropped off at every pan. */
+    if (world === "harris") x = Math.min(x, Math.max(0, mx - 38));
     ctx.save();
     if (blur) ctx.filter = "blur(" + blur + "px)";
     if (alpha != null) ctx.globalAlpha = alpha;
-    ctx.drawImage(img, (W - dw) / 2 + (ox || 0), (H - dh) / 2 + (oy || 0), dw, dh);
+    ctx.drawImage(img, (W - dw) / 2 + x, (H - dh) / 2 + y, dw, dh);
     ctx.restore();
   }
   function shortLabel(full) {
@@ -419,6 +449,25 @@
     ctx.shadowBlur = 0;
     for (var k = 0; k < lines.length; k++) ctx.fillText(lines[k], x, y0 + k * step);
   }
+  function roundRect(ctx, x, y, w, h, r) {
+    var rr = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + rr, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rr);
+    ctx.arcTo(x + w, y + h, x, y + h, rr);
+    ctx.arcTo(x, y + h, x, y, rr);
+    ctx.arcTo(x, y, x + w, y, rr);
+    ctx.closePath();
+  }
+  function paintLabelPlate(ctx, x, y, hw, hh) {
+    var rw = hw / 2 + 3;
+    var rh = hh / 2 + 3;
+    ctx.save();
+    ctx.fillStyle = "rgba(14, 10, 8, 0.58)";
+    roundRect(ctx, x - rw, y - rh, rw * 2, rh * 2, 9);
+    ctx.fill();
+    ctx.restore();
+  }
   function drawLight(ctx, q) {
     ctx.save();
     var size = 16;
@@ -446,7 +495,7 @@
     }
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    paintHalo(ctx, q.x, q.y, tw * 0.62 + 14, q.hh * 0.78);
+    paintLabelPlate(ctx, q.x, q.y, q.hw || tw + 8, q.hh);
     ctx.font = "600 " + size + "px " + SANS;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -480,25 +529,26 @@
   }
   function feedDrops(ctx, t, t0, x, y, jx, jy) {
     var age = t - t0;
-    if (!(age >= 0 && age < 1.35)) return;
-    var u = Math.min(1, age / 1.05);
-    var ease = u * u * (3 - 2 * u);
-    for (var i = 0; i < 6; i++) {
-      var lag = i * 0.07;
-      var uu = Math.max(0, Math.min(1, (age - lag) / 1.05));
+    if (!(age >= 0.12 && age < 1.15)) return;
+    for (var i = 0; i < 18; i++) {
+      var lag = 0.1 + (i % 6) * 0.06;
+      var uu = (age - lag) / 0.82;
+      if (uu <= 0 || uu >= 1) continue;
       var e = uu * uu * (3 - 2 * uu);
-      var px = x + (jx - x) * e + Math.sin(i * 2.1) * (1 - e) * 10;
-      var py = y + (jy - y) * e - Math.sin(e * Math.PI) * (36 + i * 6);
-      ctx.fillStyle = "rgba(210, 236, 255, " + (0.95 - e * 0.2) + ")";
+      var px = x + (jx - x) * e + Math.sin(i * 1.7) * (1 - e) * 18;
+      var py = y + (jy - y) * e - Math.sin(e * Math.PI) * (42 + (i % 5) * 8);
+      var rad = 5.2 * (1 - e) + 2.2;
+      ctx.fillStyle = "rgba(255, 226, 160, " + (0.95 - e * 0.15) + ")";
       ctx.beginPath();
-      ctx.arc(px, py, 3.2 + (1 - e) * 2, 0, 7);
+      ctx.arc(px, py, rad, 0, 7);
       ctx.fill();
     }
-    if (ease > 0.92) {
-      ctx.globalAlpha = (1 - u) * 3;
-      ctx.fillStyle = "rgba(255,255,255,0.8)";
+    if (age > 0.85 && age < 1.15) {
+      var fade = 1 - (age - 0.85) / 0.3;
+      ctx.globalAlpha = Math.max(0, fade);
+      ctx.fillStyle = "rgba(255, 236, 190, 0.85)";
       ctx.beginPath();
-      ctx.arc(jx, jy, 10 + (u - 0.9) * 40, 0, 7);
+      ctx.arc(jx, jy, 16 + (1 - fade) * 18, 0, 7);
       ctx.fill();
       ctx.globalAlpha = 1;
     }
@@ -661,8 +711,6 @@
       var fq = shown[feed.index];
       var fromY = fq.ledY != null ? fq.ledY : fq.y;
       feedDrops(ctx, t, feed.t0, fq.x, fromY, jx, jy);
-      if (t < feed.t0 + 4.2) fullCard(ctx, feed.label || fq.label, W, H, world);
-      burst(ctx, t, feed.t0, fq.x, fromY, "#ffe7a8");
     }
     warmth(ctx, W, H, fill);
     return shown;
@@ -1017,7 +1065,7 @@
     if (feed && shown[feed.index]) {
       var fq = shown[feed.index];
       feedDrops(ctx, t, feed.t0, fq.x, fq.ledY || fq.seat, jx, jy);
-      if (t < feed.t0 + 4.2) fullCard(ctx, feed.label || fq.label, W, H, "harris");
+      /* completion is the marker and the mote stream, not a banner */
       burst(ctx, t, feed.t0, fq.x, fq.ledY || fq.seat, "#d8ffc4");
     }
     warmth(ctx, W, H, fill);
@@ -1102,7 +1150,7 @@
     if (feed && shown[feed.index]) {
       var fq = shown[feed.index];
       feedDrops(ctx, t, feed.t0, fq.x, fq.ledY || fq.seat, jx, jy);
-      if (t < feed.t0 + 4.2) fullCard(ctx, feed.label || fq.label, W, H, "ainsley");
+      /* completion is the marker and the mote stream, not a banner */
       burst(ctx, t, feed.t0, fq.x, fq.ledY || fq.seat, "#ffd0a4");
     }
     warmth(ctx, W, H, fill);
@@ -1158,58 +1206,61 @@
     if (reduced) return;
     ctx.save();
     ctx.globalCompositeOperation = "screen";
-    ctx.lineWidth = 1.5;
-    ctx.strokeStyle = "rgba(255, 226, 190, 0.9)";
-    for (var i = 0; i < 6; i++) {
-      var y = H * (0.56 + i * 0.045);
-      ctx.globalAlpha = 0.12 + 0.16 * (0.5 + 0.5 * Math.sin(t * 1.5 + i * 0.8));
+    ctx.lineWidth = 2;
+    for (var i = 0; i < 10; i++) {
+      var y = H * (0.52 + i * 0.038);
+      var slide = (t * (8 + i * 2)) % (W * 0.2);
+      ctx.globalAlpha = 0.22 + 0.28 * (0.5 + 0.5 * Math.sin(t * 1.6 + i * 0.7));
+      ctx.strokeStyle = i % 2 ? "rgba(255, 214, 160, 0.95)" : "rgba(255, 244, 220, 0.8)";
       ctx.beginPath();
-      ctx.moveTo(W * 0.08, y);
-      for (var s = 1; s <= 8; s++) {
-        var x = W * (0.08 + (s / 8) * 0.84);
-        ctx.lineTo(x, y + Math.sin(t * 1.7 + s * 0.65 + i) * 3.2);
+      ctx.moveTo(-20, y);
+      for (var s = 0; s <= 12; s++) {
+        var x = slide + W * (s / 12) * 1.05 - 10;
+        ctx.lineTo(x, y + Math.sin(t * 2.1 + s * 0.7 + i) * 4.5);
       }
       ctx.stroke();
     }
     ctx.restore();
   }
-  function creaturePose(t) {
-    if (!feed) return { a: "idle", b: "idle", u: 1 };
-    var age = t - feed.t0;
-    if (age < 0.35) return { a: "idle", b: "happy", u: age / 0.35 };
-    if (age < 0.95) return { a: "happy", b: "happy", u: 1 };
-    if (age < 1.3) return { a: "happy", b: "fed", u: (age - 0.95) / 0.35 };
-    if (age < 2.6) return { a: "fed", b: "fed", u: 1 };
-    if (age < 3.0) return { a: "fed", b: "idle", u: (age - 2.6) / 0.4 };
-    return { a: "idle", b: "idle", u: 1 };
-  }
-  function drawOriCreature(ctx, W, H, t) {
-    if (!oriCreature.idle) return false;
-    var box = creatureAnchor(W, H);
-    var pose = creaturePose(t);
-    var resting = pose.a === "idle" && pose.b === "idle";
+  function reactMotion(t) {
     var breath = Math.sin(t * 1.7);
-    var squash = resting ? breath : breath * 0.28;
-    var sx = 1 + squash * 0.04;
-    var sy = 1 - squash * 0.055;
+    if (!feed) return { squash: breath, hop: 0, glow: 0 };
+    var age = t - feed.t0;
+    if (age < 0 || age > 1.2) return { squash: breath * 0.6, hop: 0, glow: 0 };
+    var u = age / 1.05;
+    return {
+      squash: Math.sin(Math.min(1, u) * Math.PI * 2) * 1.1,
+      hop: Math.sin(Math.min(1, u) * Math.PI) * 16,
+      glow: Math.sin(Math.min(1, u) * Math.PI)
+    };
+  }
+  function drawOriCreature(ctx, W, H, t, world) {
+    var id = world || kid();
+    if (global.KidLayout && KidLayout.creatureSprite) id = KidLayout.creatureSprite(id);
+    var img = oriCreature[id];
+    if (!img) return false;
+    var box = creatureAnchor(W, H);
+    var mot = reactMotion(t);
+    var sx = 1 + mot.squash * 0.07;
+    var sy = 1 - mot.squash * 0.09;
     var draw = box.draw;
-    var bottom = box.foot + draw * 0.04;
-    function blit(img, alpha) {
-      if (!img || alpha <= 0.02) return;
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.translate(box.cx, bottom);
-      ctx.scale(sx, sy);
-      ctx.drawImage(img, -draw / 2, -draw, draw, draw);
-      ctx.restore();
+    var bottom = box.foot + draw * 0.04 - mot.hop;
+    ctx.save();
+    ctx.translate(box.cx, box.groundY + 3);
+    ctx.scale(1, 0.2);
+    ctx.fillStyle = "rgba(0,0,0,0.30)";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, draw * 0.24, draw * 0.24, 0, 0, 7);
+    ctx.fill();
+    ctx.restore();
+    if (mot.glow > 0.05) {
+      softBloom(ctx, box.cx, bottom - draw * 0.45, draw * 0.55, "rgba(255, 220, 150, " + (0.55 * mot.glow).toFixed(3) + ")");
     }
-    var same = pose.a === pose.b;
-    var sa = same ? 1 : 1 - pose.u;
-    var sb = same ? 0 : pose.u;
-    blit(oriCreature[pose.a + "Shadow"] || oriCreature.idleShadow, sa);
-    blit(oriCreature[pose.b + "Shadow"] || oriCreature.idleShadow, sb);
-    blit(oriCreature[pose.a] || oriCreature.idle, sa);
-    blit(oriCreature[pose.b] || oriCreature.idle, sb);
+    ctx.save();
+    ctx.translate(box.cx, bottom);
+    ctx.scale(sx, sy);
+    ctx.drawImage(img, -draw / 2, -draw, draw, draw);
+    ctx.restore();
     return true;
   }
   function markerAge(i, t) {
@@ -1220,21 +1271,32 @@
     if (sw < 1 || sh < 1 || dw < 1 || dh < 1) return;
     ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
   }
+  function lidAngle(age, done) {
+    if (age >= 0) return Math.min(1, age / 0.72) * 1.05;
+    return done ? 1.05 : 0;
+  }
   function drawChestSprite(ctx, img, dw, dh, age, done, popping) {
     var iw = img.width;
     var ih = img.height;
     var lidSrc = Math.round(ih * 0.40);
     var lidDh = dh * 0.40;
-    var ang = 0;
-    if (popping) {
-      var u = Math.min(1, age / 0.7);
-      ang = Math.sin(u * Math.PI) * 0.7;
-      if (age > 0.7) {
-        var v = Math.min(1, (age - 0.7) / 0.15);
-        ang = ang * (1 - v) + (done ? 0.18 : 0) * v;
-      }
-    } else if (done) ang = 0.18;
+    var ang = lidAngle(popping || done ? Math.max(age, done ? 2 : age) : -1, done);
+    if (age >= 0) ang = lidAngle(age, done);
+    else if (done) ang = 1.05;
+    else ang = 0;
     blitSlice(ctx, img, 0, lidSrc, iw, ih - lidSrc, -dw / 2, -dh / 2 + lidDh, dw, dh - lidDh);
+    if (ang > 0.25) {
+      ctx.save();
+      ctx.globalCompositeOperation = "screen";
+      var g = ctx.createRadialGradient(0, -dh * 0.02, 2, 0, dh * 0.05, dw * 0.42);
+      g.addColorStop(0, "rgba(255, 228, 160, " + (0.35 + 0.55 * Math.min(1, ang)).toFixed(3) + ")");
+      g.addColorStop(1, "rgba(255, 170, 60, 0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.ellipse(0, dh * 0.02, dw * 0.28, dh * 0.16, 0, 0, 7);
+      ctx.fill();
+      ctx.restore();
+    }
     ctx.save();
     ctx.translate(0, -dh / 2 + lidDh);
     ctx.rotate(-ang);
@@ -1245,23 +1307,25 @@
     var iw = img.width;
     var ih = img.height;
     var crySrc = Math.round(ih * 0.34);
+    var open = done || (age >= 0 && age > 0.45);
     ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
-    var flare = 1;
-    var alpha = 0;
-    if (popping) {
-      flare = 1 + Math.sin(Math.min(1, age / 0.85) * Math.PI) * 0.45;
-      alpha = 0.9;
-    } else if (done) {
-      flare = 1.08;
-      alpha = 0.45;
-    }
-    if (alpha <= 0) return;
+    if (!open && !popping) return;
+    var u = popping ? Math.min(1, Math.max(0, age) / 0.8) : 1;
     ctx.save();
     ctx.globalCompositeOperation = "screen";
-    ctx.globalAlpha = alpha;
-    ctx.translate(0, -dh / 2 + dh * 0.34);
-    ctx.scale(flare, flare);
-    blitSlice(ctx, img, 0, 0, iw, crySrc, -dw / 2, -dh * 0.34, dw, dh * 0.34);
+    ctx.globalAlpha = 0.35 + 0.6 * u;
+    var g = ctx.createRadialGradient(0, -dh * 0.08, 2, 0, -dh * 0.02, dw * 0.55);
+    g.addColorStop(0, "rgba(210, 255, 190, 0.95)");
+    g.addColorStop(0.45, "rgba(120, 255, 170, 0.45)");
+    g.addColorStop(1, "rgba(80, 200, 120, 0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(0, -dh * 0.05, dw * 0.48, 0, 7);
+    ctx.fill();
+    ctx.globalAlpha = 0.8 * u;
+    ctx.translate(0, -dh / 2 + dh * 0.28);
+    ctx.scale(1 + 0.28 * u, 1 + 0.22 * u);
+    blitSlice(ctx, img, 0, 0, iw, crySrc, -dw / 2, -dh * 0.28, dw, dh * 0.28);
     ctx.restore();
   }
   function drawLanternSprite(ctx, img, dw, dh, age, done, popping) {
@@ -1269,9 +1333,22 @@
     var ih = img.height;
     var flameSrc = Math.round(ih * 0.32);
     var swell = 1;
+    var warm = done || (age >= 0 && age > 0.35);
     blitSlice(ctx, img, 0, flameSrc, iw, ih - flameSrc, -dw / 2, -dh / 2 + dh * 0.32, dw, dh * 0.68);
-    if (popping) swell = 1 + Math.sin(Math.min(1, age / 0.85) * Math.PI) * 0.28;
-    else if (done) swell = 1.06;
+    if (age >= 0) swell = 1 + Math.min(1, age / 0.7) * 0.42;
+    else if (done) swell = 1.42;
+    if (warm) {
+      ctx.save();
+      ctx.globalCompositeOperation = "screen";
+      var g = ctx.createRadialGradient(0, -dh * 0.22, 2, 0, -dh * 0.16, dw * 0.9);
+      g.addColorStop(0, "rgba(255, 196, 90, 0.9)");
+      g.addColorStop(1, "rgba(255, 140, 40, 0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(0, -dh * 0.18, dw * 0.85, 0, 7);
+      ctx.fill();
+      ctx.restore();
+    }
     ctx.save();
     ctx.translate(0, -dh / 2 + dh * 0.32);
     ctx.scale(swell, swell);
@@ -1281,29 +1358,33 @@
   function drawCheckGlyph(ctx, x, y, fade) {
     ctx.save();
     ctx.globalAlpha = fade;
-    ctx.strokeStyle = "rgba(255, 248, 236, 0.96)";
-    ctx.lineWidth = 2.4;
+    ctx.fillStyle = "rgba(28, 18, 8, 0.55)";
+    ctx.beginPath();
+    ctx.arc(x, y, 11, 0, 7);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 248, 230, 0.98)";
+    ctx.lineWidth = 3;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.shadowColor = "rgba(255, 214, 150, 0.95)";
-    ctx.shadowBlur = 8;
+    ctx.shadowColor = "rgba(255, 210, 130, 0.95)";
+    ctx.shadowBlur = 10;
     ctx.beginPath();
     ctx.moveTo(x - 7, y);
-    ctx.lineTo(x - 2, y + 5);
-    ctx.lineTo(x + 7, y - 5);
+    ctx.lineTo(x - 2, y + 6);
+    ctx.lineTo(x + 8, y - 6);
     ctx.stroke();
     ctx.restore();
   }
   function drawMarker(ctx, q, world, i, open, t) {
     var age = markerAge(i, t);
-    var popping = age >= 0 && age < 0.85;
+    var popping = age >= 0 && age < 1.15;
     var done = !!q.done;
     var ms = q.ms || markerPx(440);
     var glow = world === "harris" ? "140, 255, 190" : world === "ainsley" ? "255, 170, 80" : "255, 210, 120";
     if (done || popping) glow = "255, 196, 120";
     var pulse = 0.35 + 0.2 * Math.sin(t * 1.3 + i);
-    var bloomA = popping ? 0.9 : done ? 0.55 : pulse;
-    softBloom(ctx, q.x, q.seat, popping ? ms * 1.35 : ms * 0.95, "rgba(" + glow + "," + bloomA.toFixed(3) + ")");
+    var bloomA = popping ? 0.95 : done ? 0.72 : pulse;
+    softBloom(ctx, q.x, q.seat, popping ? ms * 1.45 : done ? ms * 1.15 : ms * 0.95, "rgba(" + glow + "," + bloomA.toFixed(3) + ")");
     var img = oriItems[world];
     if (!img) return;
     var sc = ms / Math.max(img.width, img.height);
@@ -1314,9 +1395,9 @@
     if (world === "harris") drawOreSprite(ctx, img, dw, dh, age, done, popping);
     else if (world === "ainsley") drawLanternSprite(ctx, img, dw, dh, age, done, popping);
     else drawChestSprite(ctx, img, dw, dh, age, done, popping);
-    if (done) {
-      var fade = popping ? Math.max(0, (age - 0.45) / 0.4) : 1;
-      drawCheckGlyph(ctx, dw * 0.34, dh * 0.32, fade);
+    if (done && (age < 0 || age > 0.62)) {
+      var fade = age >= 0 && age < 1.05 ? Math.max(0, (age - 0.62) / 0.35) : 1;
+      drawCheckGlyph(ctx, dw * 0.32, dh * 0.28, fade);
     }
     ctx.restore();
   }
@@ -1328,18 +1409,25 @@
       var img = book && book[id];
       if (!img || img.width < 64) return;
       var p = layerShift(id, man);
-      var drift = reduced ? 0 : Math.sin(t * 0.12 + p * 5) * 3;
-      drawPlate(ctx, img, W, H, pan.x * p + drift, pan.y * p * 0.45, PLATE_ZOOM, 1, 0);
-      if (id === "sky") godRays(ctx, W, H, t, world);
+      var drift = reduced ? 0 : Math.sin(t * 0.18 + p * 4) * (id === "sky" ? 2 : 8);
+      drawPlate(ctx, img, W, H, pan.x * p + drift, pan.y * p * 0.45, PLATE_ZOOM, 1, 0, world);
+      if (id === "sky") {
+        godRays(ctx, W, H, t, world);
+        driftClouds(ctx, W, H, t, world);
+      }
     });
     if (world === "ainsley") waterShimmer(ctx, W, H, t);
-    motes(ctx, W, H, t, pan.x, world === "ainsley" ? "#ffd8c0" : world === "harris" ? "#e7ffe4" : "#fff1d0", reduced ? 8 : 24);
+    motes(ctx, W, H, t, pan.x, world === "ainsley" ? "#ffd8c0" : world === "harris" ? "#d8ffe4" : "#fff1d0", reduced ? 8 : 28);
     var cap = (man.landmarks && man.landmarks.length) || quests.length;
     var shown = quests.slice(0, cap);
     layoutLedges(shown, W, H, world, pan.x);
     shown.forEach(function (q, i) {
-      var open = q.done || (feed && feed.index === i && t < feed.t0 + 2.4);
-      drawMarker(ctx, q, world, i, open, t);
+      var bob = reduced || !global.KidLayout ? 0 : KidLayout.markerBob(i, t);
+      q.seat += bob;
+      q.y += bob;
+      q.ledY = q.seat;
+      q.chipY = q.y;
+      drawMarker(ctx, q, world, i, !!q.done, t);
       drawLight(ctx, q);
     });
     var fg = book && book.fg;
@@ -1350,18 +1438,17 @@
       ctx.translate(W / 2, H);
       ctx.transform(1, 0, sway, 1, 0, 0);
       ctx.translate(-W / 2, -H);
-      drawPlate(ctx, fg, W, H, pan.x * fp, pan.y * fp * 0.35, PLATE_ZOOM, 1, 0);
+      drawPlate(ctx, fg, W, H, pan.x * fp, pan.y * fp * 0.35, PLATE_ZOOM, 1, 0, world);
       ctx.restore();
     }
-    if (!reduced) motes(ctx, W, H, t * 0.85 + 4, pan.x * 0.4, "#fff6e0", 8);
-    drawOriCreature(ctx, W, H, t);
+    if (!reduced) motes(ctx, W, H, t * 0.7 + 3, pan.x * 0.3, "#fff6e0", 12);
+    drawOriCreature(ctx, W, H, t, world);
     var anchor = creatureAnchor(W, H);
     if (feed && shown[feed.index]) {
       var fq = shown[feed.index];
-      feedDrops(ctx, t, feed.t0, fq.x, fq.ledY || fq.y, anchor.cx, anchor.jy + anchor.jh * 0.45);
-      if (t < feed.t0 + 4.2) fullCard(ctx, feed.label || fq.label, W, H, world);
-      burst(ctx, t, feed.t0, fq.x, fq.ledY || fq.seat, world === "harris" ? "#d8ffc4" : "#ffe7a8");
+      feedDrops(ctx, t, feed.t0, fq.x, fq.ledY || fq.y, anchor.cx, anchor.jy + anchor.jh * 0.42);
     }
+    edgeVignette(ctx, W, H);
     warmth(ctx, W, H, fill);
     return shown;
   }
@@ -1729,19 +1816,24 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     var iso = dayIso || todayIso();
     var quests = readQuests(iso);
+    var tapAt = 3;
     if (exportFrame.skipTap) {
       feed = null;
-    } else if (t < 4) {
+    } else if (t < tapAt) {
       exportFrame.tapped = false;
       feed = null;
+      if (quests[0]) quests[0].done = false;
+    } else if (quests[0]) {
+      if (!exportFrame.tapped) {
+        exportFrame.tapped = true;
+        feed = { t0: tapAt, index: 0, label: quests[0].label };
+        if (quests[0].btn && !quests[0].done) quests[0].btn.click();
+        quests = readQuests(iso);
+      }
+      if (quests[0]) quests[0].done = true;
+      if (!feed) feed = { t0: tapAt, index: 0, label: quests[0].label };
     }
-    if (!exportFrame.skipTap && t >= 4 && !exportFrame.tapped && quests[0] && quests[0].btn && !quests[0].done) {
-      exportFrame.tapped = true;
-      feed = { t0: 4, index: 0, label: quests[0].label };
-      quests[0].btn.click();
-      quests = readQuests(iso);
-    }
-    burstAt = !exportFrame.skipTap && t >= 4 ? 4 : -1;
+    burstAt = !exportFrame.skipTap && t >= tapAt ? tapAt : -1;
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };
     if (global.JarEngine && JarEngine.setVirtual) JarEngine.setVirtual(t * 1000);
     paintWorld(ctx, cssW, cssH, t, kid(), quests, st.fill || 0, parallaxNow(t, true));
@@ -1803,20 +1895,18 @@
     return { x: x, y: y };
   }
   function paintLanternWeek(ctx, W, H, t) {
-    var meta = weekMeta();
-    var days = meta.length === 7 ? meta : [
-      { letter: "S" }, { letter: "M" }, { letter: "T" }, { letter: "W" },
-      { letter: "T" }, { letter: "F" }, { letter: "S" }
+    var days = (global.KidLayout && KidLayout.pathLabels) ? KidLayout.pathLabels().map(function (letter) {
+      return { letter: letter };
+    }) : [
+      { letter: "Fr" }, { letter: "Sa" }, { letter: "Su" }, { letter: "Mo" },
+      { letter: "Tu" }, { letter: "We" }, { letter: "Th" }
     ];
-    var today = -1;
-    for (var n = 0; n < days.length; n++) if (days[n].today) today = n;
-    if (today < 0) {
-      try {
-        var name = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", weekday: "short" }).format(new Date());
-        var map = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-        today = map[name] != null ? map[name] : 4;
-      } catch (e) { today = 4; }
-    }
+    var today = 6;
+    try {
+      var name = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", weekday: "short" }).format(new Date());
+      var map = { Fri: 0, Sat: 1, Sun: 2, Mon: 3, Tue: 4, Wed: 5, Thu: 6 };
+      if (map[name] != null) today = map[name];
+    } catch (e) { today = 6; }
     var pts = [];
     for (var i = 0; i < 7; i++) pts.push(lanternPoint(i, W, H, t));
     ctx.save();
@@ -1889,16 +1979,16 @@
         ctx.arc(p.x, p.y, 2.1, 0, 7);
         ctx.fill();
       }
-      ctx.font = "600 15px " + SANS;
+      ctx.font = "600 13px " + SANS;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       var letter = days[i].letter || "·";
-      paintHalo(ctx, p.x, p.y + 36, 14, 12);
-      ctx.font = "600 15px " + SANS;
+      paintLabelPlate(ctx, p.x, p.y + 32, Math.max(22, letter.length * 9), 16);
+      ctx.font = "600 13px " + SANS;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = state === "later" ? "rgba(236, 232, 226, 0.72)" : "rgba(255, 248, 240, 0.96)";
-      ctx.fillText(letter, p.x, p.y + 36);
+      ctx.fillStyle = state === "later" ? "rgba(236, 232, 226, 0.9)" : "rgba(255, 248, 240, 0.98)";
+      ctx.fillText(letter, p.x, p.y + 32);
     });
     ctx.restore();
   }

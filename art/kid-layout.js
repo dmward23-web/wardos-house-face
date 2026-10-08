@@ -113,10 +113,38 @@
     return { cx: b.cx, cy: b.jy + b.jh / 2, w: b.jw, h: b.jh, x: b.jx, y: b.jy };
   }
 
+  /* Custody week painted on the path: Friday through Thursday. Positions never use t. */
+  var PATH = ["Fr", "Sa", "Su", "Mo", "Tu", "We", "Th"];
+  var CREATURE = { hayes: "hayes", harris: "harris", ainsley: "ainsley" };
+
+  function pathLabels() { return PATH.slice(); }
+
+  function creatureSprite(world) {
+    return CREATURE[world] || CREATURE.hayes;
+  }
+
+  /* One sprite for the whole clip. Squash, hop, and glow are numbers, not a second file. */
+  function creatureMotion(world, t) {
+    var sprite = creatureSprite(world);
+    var phase = t || 0;
+    return {
+      sprite: sprite,
+      squash: Math.sin(phase * 1.7),
+      hop: 0,
+      glow: 0
+    };
+  }
+
+  /* Gentle vertical bob, ±3px, about a 3.6s loop. Shared with the painter. */
+  function markerBob(i, t) {
+    if (!t) return 0;
+    return Math.sin(t * (Math.PI * 2 / 3.6) + i * 0.85) * 3;
+  }
+
   function lanternPoint(i, W, H, t) {
     var u = i / 6;
-    var x = W * (0.58 + u * 0.36) + Math.sin((t || 0) * 0.2 + i) * 2;
-    var y = H * (0.785 + Math.sin(u * Math.PI * 1.35) * 0.028);
+    var x = W * (0.54 + u * 0.40);
+    var y = H * (0.792 + Math.sin(u * Math.PI) * 0.018);
     return { x: x, y: y };
   }
 
@@ -152,8 +180,9 @@
     }
     for (i = 0; i < pts.length; i++) {
       var q = pts[i];
-      boxes.push({ cx: q.x, cy: q.y, w: 44, h: 44, kind: "lantern" });
-      boxes.push({ cx: q.x, cy: q.y + 36, w: 16, h: 18, kind: "letter" });
+      var tw = textWidth(PATH[i], 13);
+      boxes.push({ cx: q.x, cy: q.y, w: 40, h: 40, kind: "lantern" });
+      boxes.push({ cx: q.x, cy: q.y + 32, w: tw + 8, h: 16, kind: "letter", label: PATH[i] });
     }
     return boxes;
   }
@@ -304,8 +333,16 @@
     return a.kind + "∩" + b.kind;
   }
 
-  function auditOne(world, labels, W, H, panX, tag) {
+  function shiftBob(boxes, bob) {
+    if (!bob) return boxes;
+    return boxes.map(function (b) {
+      return { cx: b.cx, cy: b.cy + bob, w: b.w, h: b.h, kind: b.kind };
+    });
+  }
+
+  function auditOne(world, labels, W, H, panX, tag, t) {
     var errors = [];
+    var gap = t == null ? GAP : 0;
     var items = placeLabels(world, labels, W, H, panX);
     var where = world + " " + tag + " " + W + "x" + H + " pan " + panX;
     var i, j, k, a, b;
@@ -313,7 +350,7 @@
       var it = items[i];
       var nudge = Math.max(Math.abs(it.x - it.ox), Math.abs(it.seat - it.oseat));
       if (nudge > 36) errors.push(where + " nudge " + it.chip + " by " + Math.round(nudge));
-      var boxes = itemBoxes(it);
+      var boxes = shiftBob(itemBoxes(it), t == null ? 0 : markerBob(it.i, t));
       var lb = boxes[1];
       var left = lb.cx - lb.w / 2;
       var right = lb.cx + lb.w / 2;
@@ -331,7 +368,7 @@
         var other = itemBoxes(items[j]);
         for (k = 0; k < boxes.length; k++) {
           for (a = 0; a < other.length; a++) {
-            b = boxProblem(boxes[k], other[a], GAP);
+            b = boxProblem(boxes[k], other[a], gap);
             if (b) errors.push(where + " " + it.chip + " " + b + " " + items[j].chip);
           }
         }
@@ -352,8 +389,10 @@
     }
     var path = calendarBoxes(W, H);
     var cre2 = creatureBox(world, W, H);
+    var letters = [];
     for (a = 0; a < path.length; a++) {
       var p = path[a];
+      if (p.kind === "letter") letters.push(p);
       if (p.cx - p.w / 2 < 0 || p.cx + p.w / 2 > W || p.cy - p.h / 2 < 0 || p.cy + p.h / 2 > H) {
         errors.push(where + " calendar " + p.kind + " clipped");
         break;
@@ -361,6 +400,13 @@
       if (overlaps(p, cre2, 6)) {
         errors.push(where + " calendar " + p.kind + "∩creature");
         break;
+      }
+    }
+    for (a = 0; a < letters.length; a++) {
+      for (var b2 = a + 1; b2 < letters.length; b2++) {
+        if (overlaps(letters[a], letters[b2], 1)) {
+          errors.push(where + " calendar letters overlap " + (letters[a].label || a) + " " + (letters[b2].label || b2));
+        }
       }
     }
     return errors;
@@ -371,14 +417,23 @@
       { id: "phone", w: 440, h: 956 },
       { id: "wall", w: 1080, h: 1920 }
     ];
-    var pans = [-26, 0, 26];
+    var pans = [-14, 0, 14];
+    var times = [0, 3, 4, 6, 10, 14, 15];
     var worlds = ["hayes", "harris", "ainsley"];
     var errors = [];
     worlds.forEach(function (world) {
       var labels = labelsByWorld[world] || [];
+      var sprite0 = creatureMotion(world, 0).sprite;
+      times.forEach(function (t) {
+        var sprite = creatureMotion(world, t).sprite;
+        if (sprite !== sprite0) errors.push(world + " creature sprite swap at t " + t + " " + sprite0 + " -> " + sprite);
+      });
       views.forEach(function (v) {
         pans.forEach(function (pan) {
           errors = errors.concat(auditOne(world, labels, v.w, v.h, pan, v.id));
+          times.forEach(function (t) {
+            errors = errors.concat(auditOne(world, labels, v.w, v.h, pan, v.id + " t" + t, t));
+          });
         });
       });
     });
@@ -393,6 +448,10 @@
     markerDraw: markerDraw,
     creatureAnchor: creatureAnchor,
     lanternPoint: lanternPoint,
+    pathLabels: pathLabels,
+    markerBob: markerBob,
+    creatureSprite: creatureSprite,
+    creatureMotion: creatureMotion,
     calendarBoxes: calendarBoxes,
     placeLabels: placeLabels,
     place: place,
