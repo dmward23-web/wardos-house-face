@@ -12,16 +12,16 @@
     return row;
   }
 
-  /* Seats sit on the painted mid/near land. The creature stands
-     lower-left, beside the lowest chest, not on top of it. */
+  /* Seats are viewport fractions on painted mid/near land, spread
+     in both axes. Depth matches the layer they sit on. */
   var LEDGES = [
-    { x: 0.23, y: 0.30, depth: 0.20, scale: 0.74 },
-    { x: 0.41, y: 0.36, depth: 0.28, scale: 0.80 },
-    { x: 0.23, y: 0.39, depth: 0.34, scale: 0.84 },
-    { x: 0.86, y: 0.45, depth: 0.42, scale: 0.86 },
-    { x: 0.68, y: 0.48, depth: 0.50, scale: 0.90 },
-    { x: 0.86, y: 0.55, depth: 0.62, scale: 0.94 },
-    { x: 0.14, y: 0.67, depth: 0.74, scale: 1.00 }
+    { x: 0.18, y: 0.26, depth: 0.35, scale: 1 },
+    { x: 0.46, y: 0.34, depth: 0.35, scale: 1 },
+    { x: 0.16, y: 0.42, depth: 0.35, scale: 1 },
+    { x: 0.82, y: 0.46, depth: 0.35, scale: 1 },
+    { x: 0.62, y: 0.52, depth: 0.35, scale: 1 },
+    { x: 0.86, y: 0.58, depth: 0.35, scale: 1 },
+    { x: 0.14, y: 0.70, depth: 0.60, scale: 1 }
   ];
   var HAYES_SCENE = [
     { stamp: 1, x: 0.82, y: 0.20, scale: 0.40, depth: 0.08, haze: 0.58, flip: true },
@@ -74,13 +74,13 @@
       rays: "art/forest/rays.jpg",
       ground: ["art/forest/near.png", "art/forest/fg.png"],
       landmarks: [
-        { x: 0.14, y: 0.27, depth: 0.18, scale: 0.72, kind: "slab" },
-        { x: 0.41, y: 0.27, depth: 0.22, scale: 0.74, kind: "crystal" },
-        { x: 0.41, y: 0.36, depth: 0.32, scale: 0.80, kind: "cluster" },
-        { x: 0.23, y: 0.39, depth: 0.40, scale: 0.84, kind: "geode" },
-        { x: 0.77, y: 0.45, depth: 0.48, scale: 0.88, kind: "block" },
-        { x: 0.59, y: 0.55, depth: 0.58, scale: 0.92, kind: "shard" },
-        { x: 0.77, y: 0.58, depth: 0.66, scale: 1.00, kind: "node" }
+        { x: 0.34, y: 0.22, depth: 0.35, scale: 1, kind: "slab" },
+        { x: 0.16, y: 0.32, depth: 0.35, scale: 1, kind: "crystal" },
+        { x: 0.40, y: 0.30, depth: 0.35, scale: 1, kind: "cluster" },
+        { x: 0.26, y: 0.38, depth: 0.35, scale: 1, kind: "geode" },
+        { x: 0.84, y: 0.42, depth: 0.35, scale: 1, kind: "block" },
+        { x: 0.72, y: 0.54, depth: 0.35, scale: 1, kind: "shard" },
+        { x: 0.86, y: 0.58, depth: 0.35, scale: 1, kind: "node" }
       ]
     },
     ainsley: {
@@ -97,13 +97,13 @@
       rays: "art/forest/rays.jpg",
       ground: ["art/forest/near.png", "art/forest/fg.png"],
       landmarks: [
-        { x: 0.86, y: 0.42, depth: 0.22, scale: 0.74, kind: "water" },
-        { x: 0.59, y: 0.45, depth: 0.30, scale: 0.78, kind: "water" },
-        { x: 0.59, y: 0.55, depth: 0.42, scale: 0.86, kind: "water" },
-        { x: 0.77, y: 0.55, depth: 0.50, scale: 0.90, kind: "dock" },
-        { x: 0.14, y: 0.58, depth: 0.56, scale: 0.92, kind: "dock" },
-        { x: 0.68, y: 0.64, depth: 0.66, scale: 0.96, kind: "dock" },
-        { x: 0.86, y: 0.64, depth: 0.72, scale: 1.00, kind: "dock" }
+        { x: 0.60, y: 0.40, depth: 0.35, scale: 1, kind: "dock" },
+        { x: 0.86, y: 0.46, depth: 0.35, scale: 1, kind: "dock" },
+        { x: 0.50, y: 0.48, depth: 0.35, scale: 1, kind: "dock" },
+        { x: 0.74, y: 0.54, depth: 0.35, scale: 1, kind: "dock" },
+        { x: 0.18, y: 0.58, depth: 0.35, scale: 1, kind: "dock" },
+        { x: 0.40, y: 0.58, depth: 0.35, scale: 1, kind: "dock" },
+        { x: 0.86, y: 0.64, depth: 0.35, scale: 1, kind: "dock" }
       ]
     },
     mercury: {

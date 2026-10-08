@@ -150,7 +150,15 @@
   var feed = null;
   var gyro = { gamma: 0, beta: 48, on: false };
   var oriCreature = {};
+  var oriItems = {};
+  var SANS = "system-ui, sans-serif";
   var PLATE_ZOOM = 1.22;
+  /* Opaque feet sit on the near ground. Portrait is the phone and the wall. */
+  var GROUND = {
+    hayes: { portrait: { x: 0.36, y: 0.865 }, landscape: { x: 0.36, y: 0.808 } },
+    harris: { portrait: { x: 0.32, y: 0.820 }, landscape: { x: 0.32, y: 0.902 } },
+    ainsley: { portrait: { x: 0.30, y: 0.942 }, landscape: { x: 0.48, y: 0.855 } }
+  };
 
   function parallaxNow(t, drift) {
     if (drift) return { x: Math.sin(t * 0.28) * 26, y: Math.sin(t * 0.16) * 8 };
@@ -207,6 +215,13 @@
       ["fedShadow", "assets/ori/creature/fed_splash_shadow.webp"]
     ].forEach(function (row) {
       jobs.push(loadImg(row[1]).then(function (im) { oriCreature[row[0]] = im; }));
+    });
+    [
+      ["hayes", "assets/ori/items/hayes_chest.webp"],
+      ["harris", "assets/ori/items/harris_ore.webp"],
+      ["ainsley", "assets/ori/items/ainsley_lantern.webp"]
+    ].forEach(function (row) {
+      jobs.push(loadImg(row[1]).then(function (im) { oriItems[row[0]] = im; }));
     });
     worlds.forEach(function (world) {
       var man = book[world];
@@ -275,12 +290,19 @@
     if (col) y = Math.min(0.64, y + 0.03);
     return { x: col ? 0.76 : 0.24, y: y, depth: 0.2 + i * 0.05, scale: 0.75 + (i % 3) * 0.08 };
   }
+  function markerPx(W) {
+    var cap = Math.max(W, 1) >= 1000 ? 96 : 80;
+    return clamp(Math.round(W * 72 / 440), 64, cap);
+  }
   function creatureAnchor(W, H) {
-    var draw = clamp(Math.round(Math.min(W, H) * 0.424), 186, 300);
+    var draw = clamp(Math.round(Math.min(W, H) * 0.318), 140, 226);
+    var book = (GROUND[kid()] || GROUND.hayes);
+    var g = book[orientFor(W, H)] || book.portrait;
     var bodyH = draw * (616 / 1024);
     var bodyW = draw * (615 / 1024);
-    var cx = W * 0.46;
-    var foot = H - 100;
+    var cx = W * g.x;
+    var groundY = H * g.y;
+    var foot = groundY + draw * 0.108;
     return {
       draw: draw,
       jw: bodyW,
@@ -288,41 +310,59 @@
       jx: cx - bodyW / 2,
       jy: foot - bodyH,
       cx: cx,
-      foot: foot
+      foot: foot,
+      groundY: groundY
     };
+  }
+  function nudgeLabels(quests, maxY) {
+    var pass, i, j, a, b, dx, dy, needX, needY, push, s;
+    for (pass = 0; pass < 8; pass++) {
+      for (i = 0; i < quests.length; i++) {
+        a = quests[i];
+        for (j = i + 1; j < quests.length; j++) {
+          b = quests[j];
+          dx = b.x - a.x;
+          dy = b.y - a.y;
+          needX = (a.hw + b.hw) / 2 + 8;
+          needY = (a.hh + b.hh) / 2 + 4;
+          if (Math.abs(dx) < needX && Math.abs(dy) < needY) {
+            push = (needY - Math.abs(dy)) / 2 + 1;
+            s = dy < 0 ? -1 : 1;
+            if (Math.abs(dy) < 1) s = a.seat <= b.seat ? -1 : 1;
+            a.y -= s * push;
+            b.y += s * push;
+          }
+        }
+        a.y = Math.min(maxY - a.hh / 2, Math.max(a.seat + (a.ms || 64) * 0.42, a.y));
+        a.chipY = a.y;
+      }
+    }
   }
   function layoutLedges(quests, W, H, world, px) {
     var n = quests.length;
-    var chipLift = 22;
+    var ms = markerPx(W);
     var box = creatureAnchor(W, H);
-    var floorY = H - 108;
     quests.forEach(function (q, i) {
       var ledge = ledgeFor(world, i, n);
-      var depth = ledge.depth || 0.3;
-      q.depth = depth;
+      q.depth = ledge.depth || 0.35;
       q.kind = ledge.kind || "";
-      q.x = ledge.x * W + (px || 0) * depth;
+      q.scale = 1;
+      q.ms = ms;
+      q.x = clamp(ledge.x * W + (px || 0) * q.depth, 58, W - 58);
       q.seat = ledge.y * H;
-      q.scale = ledge.scale || 0.8;
       q.chip = shortLabel(q.label);
-      q.maxW = Math.min(128, W * 0.34);
+      q.maxW = Math.min(132, W * 0.32);
       q.hw = q.maxW;
-      q.hh = 36;
-      q.r = 26;
-      q.y = q.seat - chipLift;
-      if (q.y > floorY) q.y = floorY;
-      if (q.y < 168) q.y = 168;
-      if (Math.abs(q.x - box.cx) < box.jw * 0.65 + 20 && q.y + 24 > box.jy) q.y = box.jy - 32;
-    });
-    separateChips(quests, 12, 160, W - 12, floorY);
-    quests.forEach(function (q) {
-      if (Math.abs(q.x - box.cx) < box.jw * 0.65 + 20 && q.y + 20 > box.jy) {
-        q.x = Math.min(q.x, box.jx - 16);
-      }
+      q.hh = 40;
+      q.r = ms * 0.5;
+      q.y = q.seat + ms * 0.5 + 16;
       q.chipY = q.y;
-      q.seat = q.y + chipLift;
       q.ledY = q.seat;
+      if (Math.abs(q.x - box.cx) < box.jw * 0.55 + ms * 0.45 && q.seat > box.jy - 10 && q.seat < box.foot + 12) {
+        q.x = q.x < box.cx ? Math.max(58, box.jx - ms * 0.7) : Math.min(W - 58, box.jx + box.jw + ms * 0.7);
+      }
     });
+    nudgeLabels(quests, H - 28);
   }
   function separateChips(quests, minX, minY, maxX, maxY) {
     var pass, i, j, a, b, dx, dy, needX, needY, push, s;
@@ -351,69 +391,73 @@
       }
     }
   }
-  function drawLight(ctx, q, world) {
+  function paintHalo(ctx, x, y, rx, ry) {
     ctx.save();
-    var size = 15;
-    var maxW = q.maxW || 140;
-    ctx.font = "600 " + size + "px Palatino, Georgia, serif";
-    var lines = wrapLines(ctx, q.chip || q.label, maxW);
-    while (lines.length > 2 && size > 12) {
-      size -= 1;
-      ctx.font = "600 " + size + "px Palatino, Georgia, serif";
-      lines = wrapLines(ctx, q.chip || q.label, maxW);
-    }
-    ctx.font = "600 " + size + "px Palatino, Georgia, serif";
-    var tw = 0;
-    for (var j = 0; j < lines.length; j++) tw = Math.max(tw, ctx.measureText(lines[j]).width);
-    q.hw = Math.max(44, tw + 8);
-    q.hh = lines.length * (size + 3) + 6;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.lineJoin = "round";
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = "rgba(10, 8, 6, 0.82)";
-    ctx.shadowColor = "rgba(6, 4, 2, 0.9)";
-    ctx.shadowBlur = 14;
-    ctx.shadowOffsetY = 1;
-    ctx.fillStyle = q.done ? "rgba(255, 226, 168, 0.98)" : "rgba(255, 248, 236, 0.96)";
-    var y0 = q.y - ((lines.length - 1) * (size + 3)) / 2;
-    for (var k = 0; k < lines.length; k++) {
-      var ly = y0 + k * (size + 3);
-      ctx.strokeText(lines[k], q.x, ly);
-      ctx.shadowBlur = 0;
-      ctx.fillText(lines[k], q.x, ly);
-      ctx.shadowBlur = 14;
-    }
+    ctx.filter = "blur(8px)";
+    var g = ctx.createRadialGradient(x, y, 2, x, y, Math.max(rx, ry));
+    g.addColorStop(0, "rgba(8, 6, 4, 0.82)");
+    g.addColorStop(0.55, "rgba(8, 6, 4, 0.4)");
+    g.addColorStop(1, "rgba(8, 6, 4, 0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.ellipse(x, y, Math.max(8, rx), Math.max(8, ry), 0, 0, 7);
+    ctx.fill();
     ctx.restore();
   }
-  function fullCard(ctx, text, W, H, world) {
+  function fillLines(ctx, lines, x, y, size, fill) {
+    var step = size + 3;
+    var y0 = y - ((lines.length - 1) * step) / 2;
+    ctx.fillStyle = fill || "rgba(255, 248, 240, 0.96)";
+    ctx.shadowBlur = 0;
+    for (var k = 0; k < lines.length; k++) ctx.fillText(lines[k], x, y0 + k * step);
+  }
+  function drawLight(ctx, q) {
+    ctx.save();
+    var size = 16;
+    var maxW = q.maxW || 132;
+    ctx.font = "600 " + size + "px " + SANS;
+    var lines = wrapLines(ctx, q.chip || q.label, maxW);
+    if (lines.length > 2) {
+      size = 15;
+      ctx.font = "600 " + size + "px " + SANS;
+      lines = wrapLines(ctx, q.chip || q.label, maxW);
+    }
+    var tw = 0;
+    for (var j = 0; j < lines.length; j++) tw = Math.max(tw, ctx.measureText(lines[j]).width);
+    q.hw = Math.max(36, tw + 8);
+    q.hh = lines.length * (size + 3) + 4;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    paintHalo(ctx, q.x, q.y, tw * 0.62 + 14, q.hh * 0.78);
+    ctx.font = "600 " + size + "px " + SANS;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    fillLines(ctx, lines, q.x, q.y, size, "rgba(255, 248, 240, 0.96)");
+    ctx.restore();
+  }
+  function fullCard(ctx, text, W) {
     var maxW = W - 56;
     var size = 16;
     ctx.save();
-    ctx.font = "600 " + size + "px Palatino, Georgia, serif";
+    ctx.font = "600 " + size + "px " + SANS;
     var lines = wrapLines(ctx, text, maxW);
-    while (lines.length > 4 && size > 13) {
+    while (lines.length > 4 && size > 15) {
       size -= 1;
-      ctx.font = "600 " + size + "px Palatino, Georgia, serif";
+      ctx.font = "600 " + size + "px " + SANS;
       lines = wrapLines(ctx, text, maxW);
     }
+    var tw = 0;
+    for (var j = 0; j < lines.length; j++) tw = Math.max(tw, ctx.measureText(lines[j]).width);
+    var hh = lines.length * (size + 4);
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.lineJoin = "round";
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = "rgba(10, 8, 6, 0.82)";
-    ctx.shadowColor = "rgba(6, 4, 2, 0.9)";
-    ctx.shadowBlur = 14;
-    ctx.shadowOffsetY = 1;
-    ctx.fillStyle = "rgba(255, 248, 236, 0.98)";
+    paintHalo(ctx, W / 2, 78 + hh * 0.15, tw * 0.58 + 18, hh * 0.7);
+    ctx.font = "600 " + size + "px " + SANS;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
     var y0 = 78;
-    for (var i = 0; i < lines.length; i++) {
-      var ly = y0 + i * (size + 6);
-      ctx.strokeText(lines[i], W / 2, ly);
-      ctx.shadowBlur = 0;
-      ctx.fillText(lines[i], W / 2, ly);
-      ctx.shadowBlur = 14;
-    }
+    ctx.fillStyle = "rgba(255, 248, 240, 0.96)";
+    for (var i = 0; i < lines.length; i++) ctx.fillText(lines[i], W / 2, y0 + i * (size + 4));
     ctx.restore();
   }
   function feedDrops(ctx, t, t0, x, y, jx, jy) {
@@ -462,42 +506,7 @@
     ctx.restore();
     q.ledY = q.seat;
   }
-  function drawChest(ctx, q, open, t) {
-    ctx.save();
-    ctx.translate(q.x, q.seat - 6);
-    var pop = open ? 1 + Math.sin(t * 3) * 0.04 : 1;
-    ctx.scale(pop, pop);
-    var glowR = open ? 86 : 48;
-    var glow = ctx.createRadialGradient(0, -10, 4, 0, -8, glowR);
-    glow.addColorStop(0, open ? "rgba(255, 246, 214, 0.96)" : "rgba(255, 214, 150, 0.42)");
-    glow.addColorStop(0.42, open ? "rgba(255, 176, 70, 0.5)" : "rgba(255, 170, 70, 0.1)");
-    glow.addColorStop(1, "rgba(255, 140, 40, 0)");
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(0, -10, glowR, 0, 7);
-    ctx.fill();
-    ctx.fillStyle = open ? "#7a4e22" : "#3a2612";
-    ctx.fillRect(-34, -6, 68, 40);
-    ctx.strokeStyle = "rgba(255, 232, 190, 0.82)";
-    ctx.lineWidth = 1.7;
-    ctx.strokeRect(-33, -5, 66, 38);
-    ctx.fillStyle = "rgba(255, 244, 214, 0.75)";
-    ctx.fillRect(-32, -5, 64, 3);
-    ctx.save();
-    ctx.translate(0, -6);
-    ctx.rotate(open ? -0.9 : -0.05);
-    ctx.fillStyle = open ? "#f2d39a" : "#b08048";
-    ctx.fillRect(-36, -18, 72, 18);
-    ctx.strokeStyle = "rgba(255, 246, 220, 0.9)";
-    ctx.lineWidth = 1.6;
-    ctx.strokeRect(-36, -18, 72, 18);
-    ctx.restore();
-    ctx.fillStyle = open ? "#fff8dc" : "#e8c888";
-    ctx.fillRect(-5, 6, 10, 10);
-    ctx.strokeStyle = "rgba(255, 250, 230, 0.8)";
-    ctx.strokeRect(-5, 6, 10, 10);
-    ctx.restore();
-  }
+  function drawChest() { /* painted sprite; see drawMarker */ }
   function islandImage(P, man, si) {
     var bit = P.bits && P.bits[si];
     if (bit) return { img: bit, crop: { nx: 0, ny: 0, nw: 1, nh: 1 } };
@@ -615,31 +624,8 @@
     layoutLedges(shown, W, H, world, px);
     shown.forEach(function (q, i) {
       var open = q.done || (feed && feed.index === i && t < feed.t0 + 2.4);
-      var glowY = q.seat - 8;
-      var restG = ctx.createRadialGradient(q.x, glowY, 2, q.x, glowY, 36);
-      restG.addColorStop(0, "rgba(255, 236, 200, 0.22)");
-      restG.addColorStop(1, "rgba(255, 236, 200, 0)");
-      ctx.fillStyle = restG;
-      ctx.beginPath();
-      ctx.arc(q.x, glowY, 36, 0, 7);
-      ctx.fill();
-      if (world === "hayes") drawChest(ctx, q, open, t);
-      else {
-        var col = world === "ainsley" ? "rgba(255, 186, 120, 0.95)" : "rgba(170, 255, 190, 0.9)";
-        var rad = open ? 48 : 20;
-        var g = ctx.createRadialGradient(q.x, q.seat - 6, 2, q.x, q.seat - 4, rad);
-        g.addColorStop(0, col);
-        g.addColorStop(1, "rgba(255,255,255,0)");
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(q.x, q.seat - 4, rad, 0, 7);
-        ctx.fill();
-      }
-      var hold = q.y;
-      q.y = q.chipY != null ? q.chipY : q.seat - 28;
-      drawLight(ctx, q, world);
-      q.chipY = q.y;
-      q.y = hold;
+      drawMarker(ctx, q, world, i, open, t);
+      drawLight(ctx, q);
     });
     ctx.save();
     ctx.beginPath();
@@ -925,17 +911,17 @@
     ctx.restore();
   }
 
-  function label(ctx, x, y, text, done) {
+  function label(ctx, x, y, text) {
     ctx.save();
-    ctx.font = "700 16px Palatino, Georgia, serif";
+    ctx.font = "600 16px " + SANS;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    var w = Math.min(150, ctx.measureText(text).width + 18);
-    ctx.fillStyle = "rgba(4, 12, 18, 0.62)";
-    ctx.beginPath();
-    ctx.roundRect(x - w / 2, y - 13, w, 26, 13);
-    ctx.fill();
-    ctx.fillStyle = done ? "#e9fff0" : "#f4fbff";
+    var w = Math.min(150, ctx.measureText(text).width);
+    paintHalo(ctx, x, y, w * 0.6 + 10, 16);
+    ctx.font = "600 16px " + SANS;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "rgba(255, 248, 240, 0.96)";
     ctx.fillText(text, x, y);
     ctx.restore();
   }
@@ -965,88 +951,7 @@
     ctx.fillStyle = "rgba(255,255,255,0.14)";
     ctx.fillRect(x + w * 0.4, y + 4, w * 0.18, 5);
   }
-  function drawOre(ctx, q, i, open, t) {
-    var kinds = ["slab", "crystal", "cluster", "geode", "block", "shard", "node"];
-    var kind = q.kind || kinds[i % kinds.length];
-    var hues = [150, 188, 48, 272, 118, 28, 200];
-    var hue = hues[i % hues.length];
-    ctx.save();
-    ctx.translate(q.x, q.seat);
-    var s = 0.85 + (q.scale || 0.8) * 0.35;
-    ctx.scale(s, s);
-    ctx.fillStyle = "rgba(20, 16, 12, 0.45)";
-    ctx.beginPath();
-    ctx.ellipse(0, 16, 28, 7, 0, 0, 7);
-    ctx.fill();
-    ctx.fillStyle = "#5c5144";
-    ctx.fillRect(-22, 4, 44, 12);
-    ctx.fillStyle = "rgba(255,255,255,0.16)";
-    ctx.fillRect(-22, 4, 44, 3);
-    var glow = open ? 0.95 : 0.35;
-    if (open) {
-      var g = ctx.createRadialGradient(0, 0, 2, 0, 0, 36);
-      g.addColorStop(0, "hsla(" + hue + ",80%,70%,0.95)");
-      g.addColorStop(1, "hsla(" + hue + ",80%,70%,0)");
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(0, 0, 36, 0, 7);
-      ctx.fill();
-    }
-    ctx.fillStyle = "hsl(" + hue + ",45%," + (open ? "62%" : "38%") + ")";
-    var crack = open ? 5 : 0;
-    if (kind === "crystal") {
-      ctx.beginPath();
-      ctx.moveTo(-8 - crack, 6);
-      ctx.lineTo(0, -22);
-      ctx.lineTo(8 + crack, 6);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = "hsl(" + hue + ",70%,72%)";
-      ctx.beginPath();
-      ctx.moveTo(6, 4);
-      ctx.lineTo(14, -12);
-      ctx.lineTo(16, 6);
-      ctx.fill();
-    } else if (kind === "cluster") {
-      for (var c = 0; c < 4; c++) {
-        ctx.fillRect(-16 + c * 9 + (open ? (c - 1.5) * crack : 0), -8 - (c % 2) * 8, 8, 14);
-      }
-    } else if (kind === "geode") {
-      ctx.beginPath();
-      ctx.arc(-crack, 0, 12, 0, 7);
-      ctx.fill();
-      ctx.fillStyle = "hsl(" + hue + ",80%,78%)";
-      ctx.beginPath();
-      ctx.arc(crack * 0.4, -1, 5, 0, 7);
-      ctx.fill();
-    } else if (kind === "shard") {
-      ctx.beginPath();
-      ctx.moveTo(-14, 8);
-      ctx.lineTo(-2 - crack, -16);
-      ctx.lineTo(4, 8);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(2, 6);
-      ctx.lineTo(10 + crack, -8);
-      ctx.lineTo(16, 8);
-      ctx.fill();
-    } else if (kind === "node") {
-      ctx.beginPath();
-      ctx.arc(-6 - crack, 0, 9, 0, 7);
-      ctx.arc(8 + crack, 2, 7, 0, 7);
-      ctx.fill();
-    } else if (kind === "block") {
-      ctx.fillRect(-14 - crack, -10, 16, 16);
-      ctx.fillRect(2 + crack, -6, 12, 12);
-    } else {
-      ctx.fillRect(-16 - crack, -4, 18, 10);
-      ctx.fillRect(2 + crack, -8, 14, 14);
-    }
-    ctx.globalAlpha = glow;
-    ctx.fillStyle = "rgba(255,255,255,0.8)";
-    ctx.fillRect(-4, -6, 3, 3);
-    ctx.restore();
-  }
+  function drawOre() { /* painted sprite; see drawMarker */ }
   function paintGrove(ctx, W, H, t, px, quests, fill) {
     var P = plates.harris || {};
     if (arrived(P.sky)) drawPlate(ctx, P.sky, W, H, px * 0.05, 0, 1.02, 1, 0);
@@ -1086,12 +991,8 @@
     layoutLedges(shown, W, H, "harris", px);
     shown.forEach(function (q, i) {
       var open = q.done || (feed && feed.index === i && t < feed.t0 + 2.4);
-      drawOre(ctx, q, i, open, t);
-      var hold = q.y;
-      q.y = q.chipY != null ? q.chipY : q.seat - 28;
-      drawLight(ctx, q, "harris");
-      q.chipY = q.y;
-      q.y = hold;
+      drawMarker(ctx, q, "harris", i, open, t);
+      drawLight(ctx, q);
     });
     var anchor = creatureAnchor(W, H);
     var jx = anchor.cx, jy = anchor.jy + anchor.jh * 0.42;
@@ -1104,50 +1005,7 @@
     warmth(ctx, W, H, fill);
     return shown;
   }
-  function drawLantern(ctx, q, i, open, t) {
-    ctx.save();
-    ctx.translate(q.x, q.seat);
-    var s = 0.8 + (q.scale || 0.8) * 0.4;
-    ctx.scale(s, s);
-    var hang = 18 + (i % 3) * 10;
-    ctx.strokeStyle = "rgba(80, 48, 28, 0.8)";
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.moveTo(0, -hang - 16);
-    ctx.lineTo(0, -16);
-    ctx.stroke();
-    ctx.fillStyle = open ? "#f3c98a" : "#6a5344";
-    ctx.beginPath();
-    ctx.moveTo(-8, -16);
-    ctx.lineTo(8, -16);
-    ctx.lineTo(6, 8);
-    ctx.lineTo(-6, 8);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = "#3a2a1c";
-    ctx.fillRect(-9, -18, 18, 3);
-    ctx.fillRect(-7, 8, 14, 3);
-    if (open) {
-      var g = ctx.createRadialGradient(0, -2, 1, 0, -2, 34);
-      g.addColorStop(0, "rgba(255, 236, 190, 0.95)");
-      g.addColorStop(0.4, "rgba(255, 170, 80, 0.55)");
-      g.addColorStop(1, "rgba(255, 140, 60, 0)");
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(0, -2, 34, 0, 7);
-      ctx.fill();
-      ctx.fillStyle = "#fff6d8";
-      ctx.beginPath();
-      ctx.ellipse(0, -2, 3, 6 + Math.sin(t * 6 + i) * 1.2, 0, 0, 7);
-      ctx.fill();
-    } else {
-      ctx.fillStyle = "rgba(255, 140, 60, 0.35)";
-      ctx.beginPath();
-      ctx.arc(0, 0, 2.2, 0, 7);
-      ctx.fill();
-    }
-    ctx.restore();
-  }
+  function drawLantern() { /* painted sprite; see drawMarker */ }
   function paintLake(ctx, W, H, t, px, quests, fill) {
     var P = plates.ainsley || {};
     if (arrived(P.sky)) drawPlate(ctx, P.sky, W, H, px * 0.04, 0, 1.02, 1, 0);
@@ -1218,21 +1076,8 @@
     layoutLedges(shown, W, H, "ainsley", px);
     shown.forEach(function (q, i) {
       var open = q.done || (feed && feed.index === i && t < feed.t0 + 2.4);
-      if ((q.kind || "dock") !== "dock") {
-        ctx.save();
-        ctx.globalAlpha = 0.35;
-        ctx.fillStyle = "rgba(255, 190, 120, 0.5)";
-        ctx.beginPath();
-        ctx.ellipse(q.x, H * 0.62 + (q.seat - H * 0.4) * 0.15, 16, 4, 0, 0, 7);
-        ctx.fill();
-        ctx.restore();
-      }
-      drawLantern(ctx, q, i, open, t);
-      var hold = q.y;
-      q.y = q.chipY != null ? q.chipY : q.seat - 28;
-      drawLight(ctx, q, "ainsley");
-      q.chipY = q.y;
-      q.y = hold;
+      drawMarker(ctx, q, "ainsley", i, open, t);
+      drawLight(ctx, q);
     });
     var anchor = creatureAnchor(W, H);
     var jx = anchor.cx, jy = anchor.jy + anchor.jh * 0.42;
@@ -1349,6 +1194,114 @@
     blit(oriCreature[pose.b] || oriCreature.idle, sb);
     return true;
   }
+  function markerAge(i, t) {
+    if (!feed || feed.index !== i) return -1;
+    return t - feed.t0;
+  }
+  function blitSlice(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) {
+    if (sw < 1 || sh < 1 || dw < 1 || dh < 1) return;
+    ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+  }
+  function drawChestSprite(ctx, img, dw, dh, age, done, popping) {
+    var iw = img.width;
+    var ih = img.height;
+    var lidSrc = Math.round(ih * 0.40);
+    var lidDh = dh * 0.40;
+    var ang = 0;
+    if (popping) {
+      var u = Math.min(1, age / 0.7);
+      ang = Math.sin(u * Math.PI) * 0.7;
+      if (age > 0.7) {
+        var v = Math.min(1, (age - 0.7) / 0.15);
+        ang = ang * (1 - v) + (done ? 0.18 : 0) * v;
+      }
+    } else if (done) ang = 0.18;
+    blitSlice(ctx, img, 0, lidSrc, iw, ih - lidSrc, -dw / 2, -dh / 2 + lidDh, dw, dh - lidDh);
+    ctx.save();
+    ctx.translate(0, -dh / 2 + lidDh);
+    ctx.rotate(-ang);
+    blitSlice(ctx, img, 0, 0, iw, lidSrc, -dw / 2, -lidDh, dw, lidDh);
+    ctx.restore();
+  }
+  function drawOreSprite(ctx, img, dw, dh, age, done, popping) {
+    var iw = img.width;
+    var ih = img.height;
+    var crySrc = Math.round(ih * 0.34);
+    ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
+    var flare = 1;
+    var alpha = 0;
+    if (popping) {
+      flare = 1 + Math.sin(Math.min(1, age / 0.85) * Math.PI) * 0.45;
+      alpha = 0.9;
+    } else if (done) {
+      flare = 1.08;
+      alpha = 0.45;
+    }
+    if (alpha <= 0) return;
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    ctx.globalAlpha = alpha;
+    ctx.translate(0, -dh / 2 + dh * 0.34);
+    ctx.scale(flare, flare);
+    blitSlice(ctx, img, 0, 0, iw, crySrc, -dw / 2, -dh * 0.34, dw, dh * 0.34);
+    ctx.restore();
+  }
+  function drawLanternSprite(ctx, img, dw, dh, age, done, popping) {
+    var iw = img.width;
+    var ih = img.height;
+    var flameSrc = Math.round(ih * 0.32);
+    var swell = 1;
+    blitSlice(ctx, img, 0, flameSrc, iw, ih - flameSrc, -dw / 2, -dh / 2 + dh * 0.32, dw, dh * 0.68);
+    if (popping) swell = 1 + Math.sin(Math.min(1, age / 0.85) * Math.PI) * 0.28;
+    else if (done) swell = 1.06;
+    ctx.save();
+    ctx.translate(0, -dh / 2 + dh * 0.32);
+    ctx.scale(swell, swell);
+    blitSlice(ctx, img, 0, 0, iw, flameSrc, -dw / 2, -dh * 0.32, dw, dh * 0.32);
+    ctx.restore();
+  }
+  function drawCheckGlyph(ctx, x, y, fade) {
+    ctx.save();
+    ctx.globalAlpha = fade;
+    ctx.strokeStyle = "rgba(255, 248, 236, 0.96)";
+    ctx.lineWidth = 2.4;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.shadowColor = "rgba(255, 214, 150, 0.95)";
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.moveTo(x - 7, y);
+    ctx.lineTo(x - 2, y + 5);
+    ctx.lineTo(x + 7, y - 5);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function drawMarker(ctx, q, world, i, open, t) {
+    var age = markerAge(i, t);
+    var popping = age >= 0 && age < 0.85;
+    var done = !!q.done;
+    var ms = q.ms || markerPx(440);
+    var glow = world === "harris" ? "140, 255, 190" : world === "ainsley" ? "255, 170, 80" : "255, 210, 120";
+    if (done || popping) glow = "255, 196, 120";
+    var pulse = 0.35 + 0.2 * Math.sin(t * 1.3 + i);
+    var bloomA = popping ? 0.9 : done ? 0.55 : pulse;
+    softBloom(ctx, q.x, q.seat, popping ? ms * 1.35 : ms * 0.95, "rgba(" + glow + "," + bloomA.toFixed(3) + ")");
+    var img = oriItems[world];
+    if (!img) return;
+    var sc = ms / Math.max(img.width, img.height);
+    var dw = img.width * sc;
+    var dh = img.height * sc;
+    ctx.save();
+    ctx.translate(q.x, q.seat);
+    if (world === "harris") drawOreSprite(ctx, img, dw, dh, age, done, popping);
+    else if (world === "ainsley") drawLanternSprite(ctx, img, dw, dh, age, done, popping);
+    else drawChestSprite(ctx, img, dw, dh, age, done, popping);
+    if (done) {
+      var fade = popping ? Math.max(0, (age - 0.45) / 0.4) : 1;
+      drawCheckGlyph(ctx, dw * 0.34, dh * 0.32, fade);
+    }
+    ctx.restore();
+  }
   function paintOri(ctx, W, H, t, pan, quests, fill, world) {
     var book = oriBook(world, W, H);
     var man = (global.HousePlates && HousePlates[world]) || {};
@@ -1366,29 +1319,10 @@
     var cap = (man.landmarks && man.landmarks.length) || quests.length;
     var shown = quests.slice(0, cap);
     layoutLedges(shown, W, H, world, pan.x);
-    var bloom = world === "harris" ? "rgba(176, 255, 196, 0.7)" : world === "ainsley" ? "rgba(255, 190, 130, 0.72)" : "rgba(255, 214, 156, 0.75)";
     shown.forEach(function (q, i) {
       var open = q.done || (feed && feed.index === i && t < feed.t0 + 2.4);
-      softBloom(ctx, q.x, q.seat - 10, open ? 72 : 46, bloom);
-      if (world === "hayes") drawChest(ctx, q, open, t);
-      else if (world === "harris") drawOre(ctx, q, i, open, t);
-      else {
-        if (q.kind === "water") {
-          ctx.save();
-          ctx.globalAlpha = 0.28;
-          ctx.fillStyle = "rgba(255, 196, 140, 0.55)";
-          ctx.beginPath();
-          ctx.ellipse(q.x, q.seat + 16, 18, 5, 0, 0, 7);
-          ctx.fill();
-          ctx.restore();
-        }
-        drawLantern(ctx, q, i, open, t);
-      }
-      var hold = q.y;
-      q.y = q.chipY != null ? q.chipY : q.seat - 28;
-      drawLight(ctx, q, world);
-      q.chipY = q.y;
-      q.y = hold;
+      drawMarker(ctx, q, world, i, open, t);
+      drawLight(ctx, q);
     });
     var fg = book && book.fg;
     if (fg && fg.width >= 64) {
@@ -1630,8 +1564,10 @@
     var y = (ev.clientY - rect.top) * ((bg.cv.height / bg.dpr) / Math.max(1, rect.height));
     for (var i = 0; i < bg.hits.length; i++) {
       var q = bg.hits[i];
-      var hw = (q.hw || q.r || 40) / 2 + 8;
-      var hh = (q.hh || q.r || 28) / 2 + 8;
+      var ms = q.ms || 72;
+      if (Math.abs(q.x - x) <= ms * 0.55 && Math.abs((q.seat || q.y) - y) <= ms * 0.62) return q;
+      var hw = (q.hw || 80) / 2 + 8;
+      var hh = (q.hh || 36) / 2 + 8;
       var cy = q.chipY != null ? q.chipY : q.y;
       if (Math.abs(q.x - x) <= hw && Math.abs(cy - y) <= hh) return q;
     }
@@ -1824,11 +1760,18 @@
       }
     }
     ctx.textAlign = "left";
-    ctx.font = "800 22px Palatino, Georgia, serif";
-    ctx.fillStyle = "#f7fbff";
+    ctx.textBaseline = "alphabetic";
+    ctx.font = "800 22px " + SANS;
+    paintHalo(ctx, 78, 28, 70, 18);
+    ctx.font = "800 22px " + SANS;
+    ctx.fillStyle = "rgba(255, 248, 240, 0.96)";
     ctx.fillText((document.querySelector(".name-accent") || {}).textContent || kid(), 16, 34);
     ctx.textAlign = "right";
-    ctx.font = "600 15px Palatino, Georgia, serif";
+    ctx.font = "600 15px " + SANS;
+    paintHalo(ctx, cssW - 70, 26, 62, 16);
+    ctx.font = "600 15px " + SANS;
+    ctx.textAlign = "right";
+    ctx.fillStyle = "rgba(255, 248, 240, 0.96)";
     ctx.fillText(clockLine(), cssW - 16, 32);
     if (global.JarEngine && JarEngine.setVirtual) JarEngine.setVirtual(null);
     return canvas;
@@ -1927,17 +1870,15 @@
         ctx.arc(p.x, p.y, 2.1, 0, 7);
         ctx.fill();
       }
-      ctx.font = "600 12px Palatino, Georgia, serif";
+      ctx.font = "600 15px " + SANS;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = "rgba(10, 8, 6, 0.8)";
-      ctx.shadowColor = "rgba(6, 4, 2, 0.85)";
-      ctx.shadowBlur = 8;
-      ctx.fillStyle = state === "later" ? "rgba(236, 232, 226, 0.55)" : "rgba(255, 248, 236, 0.96)";
       var letter = days[i].letter || "·";
-      ctx.strokeText(letter, p.x, p.y + 36);
-      ctx.shadowBlur = 0;
+      paintHalo(ctx, p.x, p.y + 36, 14, 12);
+      ctx.font = "600 15px " + SANS;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = state === "later" ? "rgba(236, 232, 226, 0.72)" : "rgba(255, 248, 240, 0.96)";
       ctx.fillText(letter, p.x, p.y + 36);
     });
     ctx.restore();
