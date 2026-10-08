@@ -1,0 +1,2111 @@
+/* House Face · ORIHOME12 · living overworld skin.
+   Original code and colour. Ori-inspired mood only: no Ori assets, characters, or logo.
+   The painted forest is ori/ori-scene.js. This file is the HUD, the portals, and the level-enter veil.
+   Loaded last so it wins over the command-deck tokens. */
+
+@property --bob {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+html.ori-on {
+  --cmd-glass: linear-gradient(180deg, rgba(8, 24, 38, 0.5), rgba(4, 12, 22, 0.36));
+  --hc-glass: linear-gradient(180deg, rgba(8, 24, 38, 0.5), rgba(4, 12, 22, 0.36));
+  --cmd-border: rgba(168, 220, 255, 0.4);
+  --cmd-border-hot: rgba(210, 245, 255, 0.62);
+  --hc-border: rgba(168, 220, 255, 0.42);
+  --hc-border-hot: rgba(210, 245, 255, 0.62);
+  --m2-hair: rgba(168, 220, 255, 0.4);
+  --m2-border: rgba(186, 230, 255, 0.5);
+  --m2-bloom: rgba(90, 190, 255, 0.32);
+  --cmd-bloom-amber: rgba(255, 214, 150, 0.22);
+  --cmd-bloom-cyan: rgba(110, 200, 255, 0.32);
+  --cmd-void: transparent;
+  --hc-void: transparent;
+  --ho-ink: #e8f6ff;
+  color-scheme: dark;
+}
+
+html.ori-on,
+html.ori-on body {
+  margin: 0 !important;
+  background-color: #062018 !important;
+  background-image: url("ori/plates/painted/grove-sky.webp?v=ORIHOME18") !important;
+  background-position: center center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  color: #e8f6ff !important;
+  overflow-x: hidden !important;
+  min-height: 100% !important;
+  width: 100% !important;
+}
+
+/* Living scene sits behind every board. Pointers pass through to the real controls. */
+.ori-world {
+  position: fixed;
+  left: -8px;
+  top: -8px;
+  right: -8px;
+  bottom: -8px;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ori-world canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+html.ori-on { --ori-scroll: 0; }
+.ori-fallback {
+  position: fixed;
+  left: -8px;
+  top: -8px;
+  right: -8px;
+  bottom: -8px;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: #07141c;
+}
+.ori-fallback .ori-sky,
+.ori-fallback .ori-far,
+.ori-fallback .ori-mid,
+.ori-fallback .ori-fore {
+  position: absolute;
+  left: -8%;
+  width: 116%;
+  height: 150%;
+  top: -12%;
+  will-change: transform;
+}
+.ori-fallback .ori-sky {
+  height: 130%;
+  background:
+    radial-gradient(circle at 72% 16%, rgba(255, 252, 240, 0.95) 0 1.1%, rgba(255, 236, 190, 0.35) 2.2%, transparent 8%),
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.85) 0 0.15%, transparent 0.4%),
+    radial-gradient(circle at 40% 12%, rgba(255, 255, 255, 0.8) 0 0.12%, transparent 0.35%),
+    radial-gradient(circle at 88% 28%, rgba(255, 255, 255, 0.75) 0 0.12%, transparent 0.3%),
+    radial-gradient(ellipse 50% 28% at 70% 10%, rgba(186, 220, 255, 0.55), transparent 70%),
+    linear-gradient(180deg, #1d4a62 0%, #12384c 22%, #0c2838 48%, #081c28 100%);
+  transform: translate3d(0, calc(var(--ori-scroll) * -36px), 0);
+}
+.ori-fallback .ori-sun,
+.ori-fallback .ori-moon {
+  position: absolute;
+  border-radius: 50%;
+}
+.ori-fallback .ori-moon {
+  left: 64%;
+  top: 8%;
+  width: 18vmin;
+  height: 18vmin;
+  background:
+    radial-gradient(circle at 35% 35%, #fff 0 18%, #f4fbff 40%, #d5ecff 62%, rgba(180, 220, 255, 0) 74%);
+  box-shadow: 0 0 40px 12px rgba(200, 230, 255, 0.55), 0 0 90px 28px rgba(120, 190, 255, 0.28);
+}
+.ori-fallback .ori-sun { display: none; }
+.ori-fallback .ori-far {
+  background:
+    radial-gradient(ellipse 14% 34% at 8% 78%, #062018 58%, transparent 60%),
+    radial-gradient(ellipse 10% 28% at 18% 82%, #0a2820 55%, transparent 58%),
+    radial-gradient(ellipse 16% 40% at 34% 80%, #071c18 56%, transparent 59%),
+    radial-gradient(ellipse 12% 32% at 52% 84%, #0a2420 55%, transparent 58%),
+    radial-gradient(ellipse 18% 42% at 70% 78%, #061814 58%, transparent 60%),
+    radial-gradient(ellipse 14% 36% at 88% 82%, #082018 56%, transparent 59%),
+    radial-gradient(ellipse 11% 26% at 96% 76%, #0a2822 54%, transparent 57%),
+    linear-gradient(180deg, transparent 40%, rgba(8, 28, 24, 0.2) 62%, rgba(4, 16, 18, 0.55) 100%);
+  transform: translate3d(calc(var(--ori-scroll) * -28px), calc(var(--ori-scroll) * -110px), 0);
+}
+.ori-fallback .ori-canopy {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 46%;
+  background:
+    radial-gradient(ellipse 22% 70% at 6% 100%, rgba(6, 36, 28, 0.95), transparent 72%),
+    radial-gradient(ellipse 26% 80% at 92% 100%, rgba(4, 22, 32, 0.95), transparent 74%),
+    linear-gradient(180deg, transparent, rgba(3, 14, 18, 0.35));
+  animation: ori-canopy-sway 11s ease-in-out infinite;
+}
+@keyframes ori-canopy-sway {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(12px, -6px, 0); }
+}
+@keyframes ori-glow {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.35), 0 0 14px rgba(120, 190, 255, 0.22); }
+  50% { box-shadow: 0 0 0 1px rgba(220, 245, 255, 0.7), 0 0 26px rgba(160, 220, 255, 0.55); }
+}
+@keyframes ori-mote {
+  0% { transform: translate3d(0, 12vh, 0); opacity: 0; }
+  12% { opacity: 0.85; }
+  100% { transform: translate3d(28px, -108vh, 0); opacity: 0; }
+}
+@keyframes ori-shimmer {
+  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.25; }
+  50% { transform: translateX(-30%) translateY(3px); opacity: 0.7; }
+}
+html.ori-phone.ori-home .ori-life {
+  position: fixed;
+  left: -8px;
+  top: -8px;
+  right: -8px;
+  bottom: -8px;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+html.ori-phone.ori-home .ori-life i {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 22px 12px rgba(200, 255, 255, 1), 0 0 64px 28px rgba(90, 190, 255, 0.9);
+  animation: ori-life-mote 2.8s linear infinite;
+}
+html.ori-phone.ori-home .ori-life .ori-shaft-sweep {
+  position: absolute;
+  left: 48px;
+  top: 24%;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(230, 255, 248, 0.55) 0%, transparent 68%);
+  filter: blur(10px);
+  animation: ori-sweep 3.6s ease-in-out infinite;
+}
+@keyframes ori-life-mote {
+  0% { transform: translate3d(0, 12vh, 0) scale(0.8); opacity: 0.35; }
+  8% { opacity: 1; }
+  78% { opacity: 1; }
+  100% { transform: translate3d(72px, -120vh, 0) scale(1.5); opacity: 0.2; }
+}
+@keyframes ori-sweep {
+  0% { transform: translate3d(0, 4vh, 0); opacity: 0.45; }
+  50% { transform: translate3d(32vw, -4vh, 0); opacity: 0.9; }
+  100% { transform: translate3d(0, 4vh, 0); opacity: 0.45; }
+}
+@keyframes ori-world-sway {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.06); }
+  50% { transform: translate3d(-16px, 12px, 0) scale(1.12); }
+}
+/* Sway the picture, not the resize host. Transforming .ori-world makes the WebGL canvas
+   chase its own bounding box and leave a black gap. */
+html.ori-phone.ori-home .ori-world {
+  background: #0c2428 url("ori/plates/painted/grove-sky.webp?v=ORIHOME18") center / cover no-repeat;
+}
+html.ori-phone.ori-home .ori-world canvas,
+html.ori-phone.ori-home .ori-fallback {
+  animation: ori-world-sway 3.4s ease-in-out infinite;
+  transform-origin: 50% 42%;
+  visibility: visible;
+}
+html.ori-phone.ori-home body > .panel {
+  z-index: 2;
+}
+html.ori-phone.ori-home #hub-cam-deck::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  width: 180px;
+  height: 64px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: linear-gradient(90deg, transparent, rgba(210, 255, 236, 0.85), transparent);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: ori-shimmer 2.2s ease-in-out infinite;
+  z-index: 2;
+}
+.ori-fallback .ori-ridge { display: none; }
+.ori-fallback .ori-mid {
+  background:
+    radial-gradient(ellipse 9% 46% at 14% 92%, #041610 62%, transparent 64%),
+    radial-gradient(ellipse 7% 38% at 27% 96%, #062018 60%, transparent 63%),
+    radial-gradient(ellipse 11% 52% at 78% 94%, #031410 64%, transparent 66%),
+    radial-gradient(ellipse 8% 40% at 90% 90%, #052018 60%, transparent 63%),
+    linear-gradient(180deg, transparent 30%, rgba(4, 18, 16, 0.18) 70%, rgba(3, 12, 14, 0.45) 100%);
+  transform: translate3d(calc(var(--ori-scroll) * 18px), calc(var(--ori-scroll) * -210px), 0);
+}
+.ori-fallback .ori-shaft,
+.ori-fallback .ori-shaft-b {
+  position: absolute;
+  top: -8%;
+  width: 22%;
+  height: 120%;
+  background: linear-gradient(180deg, rgba(236, 248, 255, 0.38), rgba(180, 220, 255, 0.08) 55%, transparent 78%);
+  filter: blur(6px);
+  mix-blend-mode: screen;
+}
+.ori-fallback .ori-shaft { left: 48%; transform: rotate(14deg); }
+.ori-fallback .ori-shaft-b { left: 18%; width: 14%; opacity: 0.65; transform: rotate(-8deg); }
+.ori-fallback .ori-pathglow {
+  position: absolute;
+  left: 18%;
+  top: 8%;
+  width: 64%;
+  height: 120%;
+  background:
+    radial-gradient(ellipse 8% 18% at 40% 12%, rgba(160, 230, 255, 0.35), transparent 70%),
+    radial-gradient(ellipse 10% 16% at 62% 38%, rgba(140, 220, 255, 0.28), transparent 70%),
+    radial-gradient(ellipse 9% 18% at 36% 64%, rgba(170, 240, 220, 0.22), transparent 70%),
+    radial-gradient(ellipse 8% 16% at 58% 88%, rgba(160, 230, 255, 0.26), transparent 70%);
+  filter: blur(8px);
+}
+.ori-fallback .ori-fore {
+  background:
+    radial-gradient(ellipse 18% 22% at -2% 8%, rgba(4, 16, 14, 0.92), transparent 70%),
+    radial-gradient(ellipse 16% 18% at 104% 6%, rgba(3, 12, 16, 0.9), transparent 72%),
+    radial-gradient(ellipse 20% 16% at -4% 96%, rgba(3, 14, 12, 0.95), transparent 70%),
+    radial-gradient(ellipse 22% 18% at 106% 98%, rgba(2, 10, 14, 0.95), transparent 72%),
+    linear-gradient(90deg, rgba(3, 12, 14, 0.45), transparent 12%, transparent 88%, rgba(3, 12, 14, 0.5));
+  transform: translate3d(0, calc(var(--ori-scroll) * -360px), 0);
+}
+.ori-fallback i {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #e8fbff;
+  box-shadow: 0 0 10px 3px rgba(170, 230, 255, 0.85);
+  animation: ori-mote 14s linear infinite;
+  opacity: 0.75;
+}
+.ori-fallback i:nth-of-type(1) { left: 12%; top: 80%; animation-duration: 16s; }
+.ori-fallback i:nth-of-type(2) { left: 28%; top: 90%; animation-duration: 12s; animation-delay: -3s; }
+.ori-fallback i:nth-of-type(3) { left: 46%; top: 70%; animation-duration: 18s; animation-delay: -6s; width: 3px; height: 3px; }
+.ori-fallback i:nth-of-type(4) { left: 63%; top: 86%; animation-duration: 15s; animation-delay: -2s; }
+.ori-fallback i:nth-of-type(5) { left: 78%; top: 74%; animation-duration: 13s; animation-delay: -8s; }
+.ori-fallback i:nth-of-type(6) { left: 88%; top: 92%; animation-duration: 17s; animation-delay: -4s; width: 4px; height: 4px; }
+.ori-fallback i:nth-of-type(7) { left: 8%; top: 40%; animation-duration: 20s; animation-delay: -9s; opacity: 0.4; }
+.ori-fallback i:nth-of-type(8) { left: 54%; top: 30%; animation-duration: 19s; animation-delay: -1s; opacity: 0.35; }
+.ori-fallback i:nth-of-type(n + 9) { width: 3px; height: 3px; opacity: 0.55; }
+.ori-fallback i:nth-of-type(9) { left: 18%; top: 96%; animation-duration: 11s; }
+.ori-fallback i:nth-of-type(10) { left: 36%; top: 88%; animation-duration: 15s; animation-delay: -5s; }
+.ori-fallback i:nth-of-type(11) { left: 70%; top: 94%; animation-duration: 13s; animation-delay: -7s; }
+.ori-fallback i:nth-of-type(12) { left: 84%; top: 60%; animation-duration: 18s; animation-delay: -2s; opacity: 0.35; }
+.ori-fallback i:nth-of-type(13) { left: 6%; top: 72%; animation-duration: 17s; animation-delay: -4s; }
+.ori-fallback i:nth-of-type(14) { left: 50%; top: 78%; animation-duration: 14s; animation-delay: -9s; }
+.ori-fallback i:nth-of-type(15) { left: 92%; top: 40%; animation-duration: 21s; animation-delay: -6s; opacity: 0.3; }
+.ori-fallback i:nth-of-type(16) { left: 24%; top: 48%; animation-duration: 19s; animation-delay: -11s; opacity: 0.3; }
+@keyframes ori-mote {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  12% { opacity: 0.8; }
+  100% { transform: translate3d(18px, -110vh, 0); opacity: 0; }
+}
+html.ori-gl .ori-fallback { display: none; }
+/* Phone frames are tall. The WebGL crop leaves a black gap at the edge, so the phone
+   shows the painted plates cover-fit instead. The wall keeps the WebGL world. */
+html.ori-phone.ori-gl .ori-fallback { display: block; }
+html.ori-phone .ori-world { visibility: hidden; }
+
+/* Painted plates. The picture is the raster; shafts, fog, and motes stay as light and particles. */
+.ori-fallback.ori-painted .ori-sky,
+.ori-fallback.ori-painted .ori-soft,
+.ori-fallback.ori-painted .ori-rays,
+.ori-fallback.ori-painted .ori-far,
+.ori-fallback.ori-painted .ori-mid,
+.ori-fallback.ori-painted .ori-near,
+.ori-fallback.ori-painted .ori-fore,
+.ori-fallback.ori-painted .ori-fog,
+.ori-fallback.ori-painted .ori-light,
+.ori-fallback.ori-painted .ori-motes {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform: none;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.ori-fallback.ori-painted .ori-sky {
+  background-image: url("ori/plates/painted/grove-sky.webp?v=ORIHOME12");
+  background-position: calc(48% + var(--ori-scroll) * 8%) center;
+}
+.ori-fallback.ori-painted .ori-soft {
+  background-image: url("ori/plates/painted/grove-soft.webp?v=ORIHOME12");
+  background-position: calc(48% + var(--ori-scroll) * 8%) center;
+  mix-blend-mode: soft-light;
+  opacity: 0.34;
+  animation: ori-soft-breathe 16s ease-in-out infinite;
+}
+.ori-fallback.ori-painted .ori-rays {
+  background-image: url("ori/plates/painted/grove-rays.webp?v=ORIHOME12");
+  background-position: calc(48% + var(--ori-scroll) * 8%) center;
+  animation: ori-ray-pulse 8s ease-in-out infinite;
+}
+.ori-fallback.ori-painted .ori-far {
+  background-image: url("ori/plates/painted/grove-far.webp?v=ORIHOME12");
+  background-position: calc(40% + var(--ori-scroll) * 14%) center;
+}
+.ori-fallback.ori-painted .ori-mid {
+  background-image: url("ori/plates/painted/grove-mid.webp?v=ORIHOME12");
+  background-position: calc(34% + var(--ori-scroll) * 24%) center;
+}
+.ori-fallback.ori-painted .ori-near {
+  background-image: url("ori/plates/painted/grove-ground.webp?v=ORIHOME12");
+  background-position: calc(28% + var(--ori-scroll) * 34%) center;
+}
+.ori-fallback.ori-painted .ori-fore {
+  background-image: url("ori/plates/painted/grove-fore.webp?v=ORIHOME12");
+  background-position: calc(22% + var(--ori-scroll) * 44%) center;
+}
+html.ori-phone.ori-home .ori-fallback.ori-painted .ori-fore,
+html.ori-phone.ori-home .ori-fallback.ori-painted .ori-near {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+.ori-fallback.ori-painted .ori-fog {
+  background:
+    linear-gradient(180deg, transparent 42%, rgba(190, 214, 216, 0.05) 68%, rgba(214, 228, 226, 0.14) 100%);
+  animation: ori-fog-drift 22s ease-in-out infinite;
+}
+.ori-fallback.ori-painted .ori-light { background: none; }
+.ori-fallback.ori-painted .ori-shaft { opacity: 0.42; }
+.ori-fallback.ori-painted .ori-motes { background: none; pointer-events: none; }
+@keyframes ori-soft-breathe {
+  0%, 100% { opacity: 0.16; }
+  50% { opacity: 0.4; }
+}
+@keyframes ori-ray-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+@keyframes ori-fog-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-18px, 8px, 0); }
+}
+
+html.ori-on body > .panel,
+html.ori-on body > .shell {
+  position: relative;
+  z-index: 1;
+}
+html.ori-on body .panel {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+html.ori-on body .panel::before,
+html.ori-on body .panel::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  opacity: 0 !important;
+}
+html.ori-on .float-orbs { display: none !important; }
+html.ori-home #tapsync-badge { display: none !important; }
+/* The amber lap is a dashboard instrument. On the overworld it reads as a gold bar on the screen edge. */
+html.ori-on body svg.led-ring {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Level enter: one flat colour, both ways. A photo or gradient veil does not
+   match the single frame the capture paints between documents, and that frame
+   reads as a cut. #062018 is that frame. */
+.ori-iris,
+.ori-arrive,
+html.ori-arriving::before,
+html.ori-held::before {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  background: #062018;
+}
+html.ori-arriving::before,
+html.ori-held::before { content: none; display: none; }
+/* Stay opaque until the page has actually painted. A CSS animation that starts
+   at parse time finishes while the main thread is busy, so the first shown
+   frame of a back-navigation was the bare page. */
+/* Opacity is driven from the first painted frame. A stylesheet animation
+   would finish on the compositor clock before that frame ever reached the screen. */
+html.ori-arriving::before {
+  opacity: var(--ori-veil-op, 1);
+  animation: none;
+}
+.ori-iris {
+  opacity: 0;
+  animation: ori-veil-in 0.42s linear forwards;
+}
+/* No extra layer. The outbound iris and the inbound veil have to be the same pixels,
+   or the recorded handoff reads as a cut. */
+.ori-iris::before,
+.ori-arrive::before { content: none; }
+@keyframes ori-veil-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.ori-arrive {
+  opacity: 1;
+  animation: ori-arrive 0.56s ease forwards;
+}
+@keyframes ori-arrive {
+  0% { opacity: 1; }
+  42% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.ori-ripple {
+  position: fixed;
+  z-index: 60;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95), rgba(150, 220, 255, 0.45) 42%, transparent 70%);
+  animation: ori-ripple 0.55s cubic-bezier(.2, .8, .2, 1) forwards;
+}
+@keyframes ori-ripple {
+  to { transform: scale(16); opacity: 0; }
+}
+
+@keyframes ori-rise {
+  from { opacity: 0; translate: 0 16px; }
+  to { opacity: 1; translate: 0 0; }
+}
+@keyframes ori-bob {
+  0%, 100% { --bob: 0px; }
+  50% { --bob: -6px; }
+}
+@keyframes ori-wisp {
+  0%, 100% { opacity: 0.4; transform: scale(0.75); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+@keyframes ori-press {
+  0% { filter: brightness(1); }
+  35% { filter: brightness(1.65); }
+  100% { filter: brightness(1); }
+}
+html.ori-on .ori-pressed { animation: ori-press 0.42s cubic-bezier(.2, .8, .2, 1); }
+
+/* Shared glass so a subpage is a scene, not a paper panel. */
+html.ori-on body .panel :is(header, footer, section, article, .hdr, .banner, .card, .sec, .day, .bulk, .ship, .stat, .row, .trip, .count-row, .vote-card, .log-card, .beat, .handoff, .handoff-card, .cmd-panel) {
+  background-color: rgba(7, 18, 32, 0.34) !important;
+  color: #e8f6ff !important;
+  border-color: rgba(160, 216, 255, 0.28) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+html.ori-on body .panel :is(.done, .lit, .is-on, .today, .is-today, .is-next, .on) {
+  box-shadow: 0 0 18px rgba(150, 230, 190, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+}
+html.ori-on body .panel :is(h1, h2, h3, h4, p, li, .name, .tile-label) {
+  color: #f4fbff !important;
+}
+html.ori-on body .panel :is(.eyebrow, .tagline, .tile-sub, .tile-fact, .md) {
+  color: rgba(214, 232, 246, 0.78) !important;
+}
+html.ori-on body .panel a.back,
+html.ori-on body .panel a.nav-week,
+html.ori-on body .panel .back,
+html.ori-on body .panel .nav-week {
+  background: rgba(8, 20, 34, 0.66) !important;
+  color: #f3fbff !important;
+  border: 1px solid rgba(170, 225, 255, 0.42) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 16px rgba(80, 180, 255, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+}
+html.ori-on.ori-enter body .panel > *,
+html.ori-on.ori-enter body .shell > * {
+  animation: ori-rise 0.85s cubic-bezier(.16, 1, .3, 1) both;
+}
+html.ori-on.ori-enter body .panel > *:nth-child(2) { animation-delay: 0.05s; }
+html.ori-on.ori-enter body .panel > *:nth-child(3) { animation-delay: 0.1s; }
+html.ori-on.ori-enter body .panel > *:nth-child(4) { animation-delay: 0.15s; }
+html.ori-on.ori-enter body .panel > *:nth-child(5) { animation-delay: 0.2s; }
+html.ori-on.ori-enter body .panel > *:nth-child(6) { animation-delay: 0.25s; }
+html.ori-on.ori-enter body .panel > *:nth-child(7) { animation-delay: 0.3s; }
+
+/* Nest live: the picture stays the picture. Chrome floats in the wood. */
+html.ori-on body .shell { background: transparent !important; min-height: 100dvh; }
+html.ori-on body .bar,
+html.ori-on body .cams {
+  background: rgba(4, 14, 24, 0.62) !important;
+  border-color: rgba(160, 216, 255, 0.28) !important;
+  color: #e8f6ff !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+html.ori-on body .cam-btn,
+html.ori-on body .bar a,
+html.ori-on body .bar button {
+  background: rgba(8, 22, 36, 0.8) !important;
+  color: #e8f6ff !important;
+  border-color: rgba(160, 216, 255, 0.35) !important;
+}
+
+/* ========== OVERWORLD · the home board is a map, not a dashboard ========== */
+.ori-place {
+  position: absolute;
+  z-index: 4;
+  top: 7px;
+  left: 12px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  pointer-events: none;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(214, 242, 255, 0.82);
+  background: rgba(4, 12, 22, 0.45);
+  border: 1px solid rgba(180, 230, 255, 0.28);
+  text-shadow: 0 0 10px rgba(120, 200, 255, 0.45);
+}
+html.ori-home #hub-cam-deck,
+html.ori-home .leaveby,
+html.ori-home #hub-lights-panel,
+html.ori-home .who-up,
+html.ori-home .grid-wrap,
+html.ori-home .sp-strip {
+  position: relative;
+}
+
+html.ori-home body .panel header.hdr {
+  background: linear-gradient(180deg, rgba(4, 14, 24, 0.42), rgba(4, 14, 24, 0.14)) !important;
+  border: 1px solid rgba(180, 230, 255, 0.32) !important;
+  border-radius: 26px !important;
+  box-shadow:
+    0 10px 36px rgba(0, 0, 0, 0.28),
+    0 0 28px rgba(80, 180, 255, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #f4fbff !important;
+}
+html.ori-home body .panel header.hdr .hdr-date-kicker {
+  color: rgba(180, 230, 255, 0.72) !important;
+  letter-spacing: 0.26em !important;
+}
+html.ori-home body .panel header.hdr .hdr-date-time {
+  color: #f7fcff !important;
+  text-shadow: 0 0 18px rgba(130, 210, 255, 0.85), 0 1px 0 rgba(0, 0, 0, 0.45) !important;
+}
+html.ori-home body .panel header.hdr .hdr-date-dow,
+html.ori-home body .panel header.hdr .hdr-date-long {
+  color: rgba(214, 236, 255, 0.86) !important;
+  text-shadow: 0 0 12px rgba(120, 190, 255, 0.35) !important;
+}
+html.ori-home body .panel header.hdr .hdr-brand .id-text {
+  flex-direction: column !important;
+  align-items: center !important;
+}
+html.ori-home body .panel header.hdr .hdr-brand .id-text::before {
+  content: "OVERWORLD";
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.42em;
+  color: rgba(190, 235, 255, 0.78);
+  text-shadow: 0 0 12px rgba(120, 200, 255, 0.45);
+  margin-bottom: 2px;
+}
+html.ori-home body .panel header.hdr .name,
+html.ori-home body .panel header.hdr .name-accent,
+html.ori-home body .panel header.hdr h1.name {
+  color: #f7fcff !important;
+  -webkit-text-fill-color: #f7fcff !important;
+  text-shadow: 0 0 22px rgba(160, 220, 255, 0.45), 0 2px 0 rgba(0, 0, 0, 0.35) !important;
+}
+html.ori-home body .panel .wx-card,
+html.ori-home body .panel .sensi-hdr,
+html.ori-home body .panel .sensi-chip,
+html.ori-home body .panel .atlas-chip {
+  background: rgba(6, 18, 30, 0.48) !important;
+  border: 1px solid rgba(170, 225, 255, 0.42) !important;
+  box-shadow: 0 0 18px rgba(80, 190, 255, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+  color: #f4fbff !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+html.ori-home body .panel .wx-card .wx-temp,
+html.ori-home body .panel .wx-card .wx-cond,
+html.ori-home body .panel .atlas-name {
+  color: #f7fcff !important;
+}
+
+/* Scrying stones */
+html.ori-home body .panel #hub-cam-deck .hub-cam {
+  background: rgba(2, 8, 16, 0.28) !important;
+  border: 1px solid rgba(190, 240, 255, 0.5) !important;
+  border-radius: 22px !important;
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.35),
+    0 0 24px rgba(80, 190, 255, 0.28),
+    inset 0 0 18px rgba(80, 180, 255, 0.12) !important;
+  overflow: hidden;
+}
+html.ori-home body .panel #hub-cam-deck .hub-cam-foot {
+  background: linear-gradient(180deg, rgba(4, 12, 20, 0.2), rgba(4, 10, 18, 0.72)) !important;
+  border-top-color: rgba(180, 230, 255, 0.24) !important;
+  color: #f4fbff !important;
+}
+html.ori-home body .panel #hub-cam-deck .hub-cam-label { color: #f4fbff !important; }
+
+/* Day path + lantern grove */
+html.ori-home body .panel .leaveby,
+html.ori-home body .panel #hub-lights-panel,
+html.ori-home body .panel .who-up {
+  background: linear-gradient(180deg, rgba(8, 22, 36, 0.5), rgba(4, 12, 22, 0.36)) !important;
+  border: 1px solid rgba(176, 226, 196, 0.32) !important;
+  border-radius: 24px !important;
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.3),
+    0 0 22px rgba(90, 190, 160, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  color: #eaf6ff !important;
+}
+html.ori-home body .panel #hub-lights-panel {
+  border-color: rgba(255, 214, 140, 0.38) !important;
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.3),
+    0 0 22px rgba(255, 190, 90, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+html.ori-home body .panel .hub-lights-title,
+html.ori-home body .panel .who-up-kicker,
+html.ori-home body .panel .who-up-name,
+html.ori-home body .panel .grid-title {
+  color: #f7fcff !important;
+  text-shadow: 0 0 14px rgba(160, 220, 255, 0.28);
+}
+html.ori-home body .panel .grid-title {
+  letter-spacing: 0.32em !important;
+  text-transform: uppercase !important;
+  font-size: 12px !important;
+}
+html.ori-home body .panel .hub-sw.is-on .hub-sw-name,
+html.ori-home body .panel .hub-sw.is-on .hub-sw-meta {
+  color: #fff6d8 !important;
+  text-shadow: 0 0 10px rgba(255, 210, 120, 0.55);
+}
+html.ori-home body .panel .leaveby-chip {
+  border-color: rgba(170, 220, 255, 0.28) !important;
+}
+html.ori-home body .panel .leaveby-chip.is-on {
+  box-shadow: 0 0 14px rgba(120, 210, 255, 0.35) !important;
+}
+
+/* Places on the map */
+html.ori-home body .panel .tile-grid > .tile:not(.sp-tile) {
+  position: relative;
+  background: linear-gradient(165deg, rgba(10, 28, 44, 0.46), rgba(4, 12, 22, 0.3)) !important;
+  border: 1px solid rgba(176, 226, 255, 0.36) !important;
+  border-radius: 24px !important;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.32),
+    0 0 20px rgba(80, 180, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+  color: #eaf6ff !important;
+  transform: translate3d(0, var(--bob), 0);
+  animation: ori-bob 8s ease-in-out infinite;
+}
+html.ori-home body .panel .tile-grid > .tile:nth-child(2n) { animation-delay: -2.2s; }
+html.ori-home body .panel .tile-grid > .tile:nth-child(3n) { animation-delay: -4.4s; }
+html.ori-home body .panel .tile-grid > .tile:not(.sp-tile)::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 18px;
+  border: 1px solid rgba(210, 245, 255, 0.16);
+  box-shadow: inset 0 0 24px rgba(120, 200, 255, 0.06);
+  pointer-events: none;
+}
+html.ori-home body .panel .tile-grid > .tile:not(.sp-tile)::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e7fbff;
+  box-shadow: 0 0 10px 3px rgba(160, 230, 255, 0.85);
+  pointer-events: none;
+  animation: ori-wisp 3.4s ease-in-out infinite;
+}
+html.ori-home body .panel .tile.ainsley { border-color: rgba(220, 170, 255, 0.55) !important; box-shadow: 0 12px 30px rgba(0,0,0,0.32), 0 0 22px rgba(200, 140, 255, 0.2), inset 0 1px 0 rgba(255,255,255,0.14) !important; }
+html.ori-home body .panel .tile.ainsley::after { background: #f3d6ff; box-shadow: 0 0 10px 3px rgba(220, 160, 255, 0.9); }
+html.ori-home body .panel .tile.hayes { border-color: rgba(140, 230, 170, 0.55) !important; box-shadow: 0 12px 30px rgba(0,0,0,0.32), 0 0 22px rgba(100, 220, 150, 0.2), inset 0 1px 0 rgba(255,255,255,0.14) !important; }
+html.ori-home body .panel .tile.hayes::after { background: #d8ffe6; box-shadow: 0 0 10px 3px rgba(120, 230, 160, 0.9); }
+html.ori-home body .panel .tile.harris { border-color: rgba(130, 196, 255, 0.6) !important; box-shadow: 0 12px 30px rgba(0,0,0,0.32), 0 0 22px rgba(80, 170, 255, 0.22), inset 0 1px 0 rgba(255,255,255,0.14) !important; }
+html.ori-home body .panel .tile.dan { border-color: rgba(255, 214, 130, 0.6) !important; box-shadow: 0 12px 30px rgba(0,0,0,0.32), 0 0 22px rgba(255, 190, 80, 0.2), inset 0 1px 0 rgba(255,255,255,0.14) !important; }
+html.ori-home body .panel .tile.dan::after { background: #ffe7b0; box-shadow: 0 0 10px 3px rgba(255, 200, 100, 0.9); }
+html.ori-home body .panel .tile.month::after { background: #ffe1a8; box-shadow: 0 0 10px 3px rgba(255, 196, 110, 0.85); }
+html.ori-home body .panel .tile.chores::after { background: #d9ffd0; box-shadow: 0 0 10px 3px rgba(150, 230, 130, 0.85); }
+html.ori-home body .panel .tile-grid > .tile.ori-pressed {
+  animation: ori-press 0.42s cubic-bezier(.2, .8, .2, 1);
+  filter: brightness(1.35);
+}
+html.ori-home body .panel .tile .tile-label,
+html.ori-home body .panel .tile .kf-loud,
+html.ori-home body .panel .tile .kf-title { color: #f7fcff !important; }
+html.ori-home body .panel .tile .tile-sub,
+html.ori-home body .panel .tile .tile-fact,
+html.ori-home body .panel .tile .md,
+html.ori-home body .panel .tile .mt,
+html.ori-home body .panel .tile .kf-kicker { color: rgba(214, 232, 246, 0.8) !important; }
+html.ori-home body .panel .tile .tile-top,
+html.ori-home body .panel .tile .tile-foot { border-color: rgba(180, 225, 255, 0.16) !important; }
+
+/* Song stone keeps its own green spirit. Just lift the amber command bezel. */
+html.ori-home body .panel .tile.sp-tile {
+  border: 1px solid rgba(110, 220, 160, 0.45) !important;
+  border-radius: 22px !important;
+  background: linear-gradient(165deg, rgba(6, 26, 18, 0.55), rgba(4, 12, 16, 0.4)) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32), 0 0 22px rgba(40, 200, 120, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+@media (max-width: 600px) {
+  html.ori-home body .panel.panel.panel .hub-upper > .sp-strip {
+    border: 1px solid rgba(140, 230, 180, 0.48) !important;
+    background: linear-gradient(165deg, rgba(8, 28, 22, 0.55), rgba(4, 12, 18, 0.4)) !important;
+    box-shadow: 0 0 24px rgba(80, 220, 160, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+    border-radius: 22px !important;
+  }
+  html.ori-home body .panel.panel.panel header.hdr .hdr-brand .id-text::before {
+    font-size: 8px !important;
+    letter-spacing: 0.28em !important;
+  }
+}
+
+/* Phone sheets · native 440. ori-phone is set only when the screen's short side is ≤600.
+   Wall 1080 and TV 1920 never get this class, so their canvases stay put.
+   The home board already has its own phone layout (tokens-hub-fit). */
+html.ori-phone:not(.ori-home),
+html.ori-phone:not(.ori-home) body {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-x: hidden !important;
+}
+html.ori-phone:not(.ori-home) body .panel,
+html.ori-phone:not(.ori-home) body .shell {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 100dvh !important;
+  box-sizing: border-box !important;
+  padding: 59px 12px 72px !important;
+  overflow-x: hidden !important;
+}
+html.ori-phone:not(.ori-home) body :is(.hdr, header, .banner, .bulk, .pad-grid, .cam-grid, .ctrl-row, .body, .month-grid, .ftr, .shot-grid, .cams, .bar) {
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+html.ori-phone:not(.ori-home) :is(.hdr, header.hdr, .bar) {
+  flex-wrap: wrap !important;
+  height: auto !important;
+  white-space: normal !important;
+}
+html.ori-phone:not(.ori-home) :is(.name, .banner-title, h1) {
+  font-size: clamp(22px, 6.4vw, 32px) !important;
+  line-height: 1.12 !important;
+  overflow-wrap: anywhere;
+}
+html.ori-phone:not(.ori-home) :is(button, .back, .home-btn, .nav-week, .cmd-chip, .cbtn, .ctrl-btn, .ftr-chip, .bar a, .bar button, summary, [role="button"]) {
+  min-height: 48px !important;
+}
+html.ori-phone:not(.ori-home) .month-grid {
+  min-height: 0 !important;
+  height: auto !important;
+  grid-template-rows: none !important;
+  gap: 4px !important;
+}
+html.ori-phone:not(.ori-home) .month-grid .day {
+  min-height: 56px !important;
+  height: auto !important;
+}
+html.ori-phone:not(.ori-home) :is(.cam-grid, .ctrl-row, .body, .ds-grid, .pad-grid) {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: none !important;
+}
+html.ori-phone:not(.ori-home) .cam-zone { min-height: 0 !important; flex: none !important; }
+html.ori-phone:not(.ori-home) :is(.cam, .cam-tile) { min-height: 180px !important; }
+html.ori-phone:not(.ori-home) .cam-feed { min-height: 168px !important; }
+html.ori-phone:not(.ori-home) .cams {
+  flex-wrap: wrap !important;
+  overflow-x: hidden !important;
+}
+html.ori-phone:not(.ori-home) :is(.ds-stop, .ds-row) {
+  grid-template-columns: 1fr !important;
+}
+html.ori-phone:not(.ori-home) .climate-body {
+  flex-wrap: wrap !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+html.ori-phone:not(.ori-home) .sec,
+html.ori-phone:not(.ori-home) .climate,
+html.ori-phone:not(.ori-home) .climate-hero {
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+html.ori-phone.ori-home .leaveby-chip,
+html.ori-phone.ori-home .hub-sw {
+  min-height: 44px !important;
+}
+html.ori-phone:not(.ori-home) .shot-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-rows: none !important;
+  min-height: 0 !important;
+}
+html.ori-phone:not(.ori-home) .shot-grid .card { min-height: 140px !important; }
+html.ori-phone:not(.ori-home) :is(img, video, table, pre) { max-width: 100% !important; }
+html.ori-phone:not(.ori-home) pre,
+html.ori-phone:not(.ori-home) code { white-space: pre-wrap !important; overflow-wrap: anywhere; }
+html.ori-phone:not(.ori-home) .cam-feed img,
+html.ori-phone:not(.ori-home) .thumb-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+html.ori-diving body { pointer-events: none; }
+
+/* Highlight pills and light chips keep dark ink. The glass rule paints light text on sections,
+   and a few headlines inherit that into a white-gold box, so the words vanish. */
+html.ori-on :is(.hl, .cheer-title .hl, .link-title .hl, .gm-title .hl, .big .hl) {
+  color: #1a1208 !important;
+  -webkit-text-fill-color: #1a1208 !important;
+  background: linear-gradient(180deg, #fff8dc 0%, #f0c56a 100%) !important;
+  background-color: #ffe7a8 !important;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 0 8px 1px !important;
+  border-radius: 8px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+}
+html.ori-on .hl:empty {
+  display: none !important;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+html.ori-on .hl .g2-inline {
+  display: inline-grid !important;
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 4px 0 0 !important;
+  vertical-align: -4px !important;
+}
+html.ori-on .hl .g2-inline .g2 {
+  width: 20px !important;
+  height: 20px !important;
+  filter: brightness(0.2) sepia(1) saturate(4) !important;
+}
+html.ori-on :is(.link-cta, a.link-cta, .ftr-chip, a.ftr-chip, .plus, .streak-pill, .cheer-bar) {
+  color: #1a1208 !important;
+  -webkit-text-fill-color: #1a1208 !important;
+}
+html.ori-on :is(.ftr-chip, a.ftr-chip) {
+  background: #163044 !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.4) !important;
+}
+html.ori-on :is(.link-cta, a.link-cta) {
+  background: linear-gradient(180deg, #fff 0%, #ffe8a0 100%) !important;
+  border-color: rgba(90, 60, 10, 0.28) !important;
+}
+html.ori-on .bank :is(.feed-row, .feed-title, .star-label, .star-big, .kid-chip, .when) {
+  -webkit-text-fill-color: currentColor;
+}
+html.ori-on .feed-row {
+  color: #1c1408 !important;
+  -webkit-text-fill-color: #1c1408 !important;
+}
+html.ori-on .kid-chip.ainsley { color: #4a1860 !important; -webkit-text-fill-color: #4a1860 !important; }
+html.ori-on .kid-chip.hayes { color: #0e3328 !important; -webkit-text-fill-color: #0e3328 !important; }
+html.ori-on .kid-chip.harris { color: #142848 !important; -webkit-text-fill-color: #142848 !important; }
+
+/* ========== PHONE OVERWORLD ==========
+   Wall and TV never get .ori-phone. The command deck stays there.
+   On the phone the same live nodes become landmarks on a path. */
+html.ori-phone.ori-home body .panel.panel.panel {
+  gap: 78px !important;
+  padding: 59px 18px 72px !important;
+  background: transparent !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel > * { position: relative; z-index: 1; }
+html.ori-phone.ori-home body .panel.panel.panel > canvas.ori-path {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  margin: 0 !important;
+}
+html.ori-phone.ori-home .ori-spirit {
+  position: fixed;
+  z-index: 30;
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  pointer-events: none;
+  background: url("ori/plates/painted/spirit-idle.webp?v=ORIHOME12") center / contain no-repeat;
+  filter: drop-shadow(0 0 10px rgba(170, 220, 255, 0.85));
+  transition: left 0.7s cubic-bezier(.18, .8, .2, 1), top 0.7s cubic-bezier(.18, .8, .2, 1);
+}
+html.ori-phone.ori-home .ori-spirit.ori-spirit-snap { transition: none; }
+html.ori-phone.ori-home .ori-spirit i,
+html.ori-phone.ori-home .ori-spirit b { display: none !important; }
+@keyframes ori-spirit-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(5px, -8px, 0); }
+}
+@keyframes ori-spirit-ring {
+  0% { transform: scale(0.4); opacity: 0.7; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+html.ori-phone.ori-home body .panel.panel.panel header.hdr {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  position: relative !important;
+  top: auto !important;
+  z-index: 8 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  overflow: visible !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .hdr-brand,
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .atlas-chip {
+  display: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .hdr-date {
+  flex: 0 1 auto !important;
+  width: max-content !important;
+  max-width: 58% !important;
+  margin: 0 !important;
+  padding: 8px 12px !important;
+  border-radius: 16px !important;
+  background: #081624 !important;
+  position: relative !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.45) !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .hdr-date::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 22px;
+  pointer-events: none;
+  animation: ori-clock-glow 2.1s ease-in-out infinite;
+}
+@keyframes ori-clock-glow {
+  0%, 100% { box-shadow: 0 0 8px 1px rgba(140, 200, 255, 0.2); opacity: 0.45; }
+  50% { box-shadow: 0 0 32px 12px rgba(180, 240, 255, 0.95); opacity: 1; }
+}
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .hdr-ovals {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 0 0 auto !important;
+  padding: 8px 12px !important;
+  border-radius: 16px !important;
+  background: #081624 !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.35), 0 0 18px rgba(120, 190, 255, 0.22) !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .sensi-chip,
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .sensi-hdr,
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .wx-kicker,
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .wx-cond,
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .wx-mode,
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .wx-rain,
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .hdr-live-dot {
+  display: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .wx-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #f4fbff !important;
+  text-shadow: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .wx-hdr-ico {
+  position: static !important;
+  flex: 0 0 auto !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .wx-hdr-text,
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .wx-text,
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .wx-line {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: baseline !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .wx-temp,
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .wx-sub {
+  position: static !important;
+  display: inline !important;
+  font-size: 18px !important;
+  font-weight: 750 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  text-shadow: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .wx-sub { font-size: 14px !important; color: #d7f6ff !important; -webkit-text-fill-color: #d7f6ff !important; text-transform: none !important; }
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .hdr-date-time { font-size: 22px !important; text-shadow: none !important; }
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .hdr-date-dow,
+html.ori-phone.ori-home body .panel.panel.panel header.hdr .hdr-date-long { text-shadow: none !important; }
+
+html.ori-phone.ori-home body .panel.panel.panel #hub-cam-deck.hub-cam-deck {
+  width: min(54%, 210px) !important;
+  margin: 0 8px 0 auto !important;
+  padding: 132px 8px 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  position: relative !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-cam-deck.hub-cam-deck::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 220px;
+  height: 120px;
+  transform: translateX(-50%);
+  border-radius: 0;
+  background: url("ori/plates/painted/landmark-pool.webp?v=ORIHOME12") center / contain no-repeat;
+  box-shadow: none;
+  border: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition: filter 300ms ease;
+}
+html.ori-phone.ori-home #hub-cam-deck.ori-pool-live::before {
+  filter: brightness(1.55) drop-shadow(0 0 18px rgba(180, 255, 230, 0.95));
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-cam {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  width: auto !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-cam-media-wrap {
+  aspect-ratio: 1 !important;
+  width: 46px !important;
+  height: 46px !important;
+  margin: 0 auto !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  border: 2px solid rgba(200, 240, 255, 0.75) !important;
+  box-shadow: 0 0 16px rgba(100, 190, 255, 0.55), inset 0 0 12px rgba(80, 180, 220, 0.35) !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-cam-pill {
+  display: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-cam-foot {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin-top: 4px !important;
+  padding: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-cam-label {
+  display: block !important;
+  width: max-content !important;
+  max-width: none !important;
+  margin: 4px auto 0 !important;
+  padding: 2px 8px !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  text-transform: none !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  background: #081624 !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.4), 0 0 12px rgba(120, 190, 255, 0.35) !important;
+  text-shadow: none !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-cam-deck .ori-pool-hit {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 0 !important;
+  height: 124px !important;
+  z-index: 3 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+html.ori-phone.ori-home .ori-peek {
+  position: fixed !important;
+  left: 16px !important;
+  right: 16px !important;
+  bottom: auto !important;
+  top: 420px !important;
+  height: auto !important;
+  width: auto !important;
+  z-index: 40 !important;
+  margin: 0 !important;
+  pointer-events: none;
+  transform: translate3d(0, -72px, 0) scale(0.62);
+  opacity: 0;
+  filter: blur(8px);
+  visibility: hidden;
+  transition: transform 300ms cubic-bezier(.16, 1, .3, 1), opacity 300ms ease, filter 300ms ease, visibility 0s linear 300ms;
+}
+html.ori-phone.ori-home .ori-peek.is-open {
+  transform: translate3d(0, 0, 0) scale(1);
+  opacity: 1;
+  filter: none;
+  visibility: visible;
+  transition: transform 300ms cubic-bezier(.16, 1, .3, 1), opacity 300ms ease, filter 300ms ease, visibility 0s;
+}
+html.ori-phone.ori-home .ori-peek::before { content: none !important; display: none !important; background: none !important; }
+html.ori-phone.ori-home .ori-peek-card {
+  position: relative !important;
+  z-index: 1 !important;
+  padding: 12px 14px !important;
+  border-radius: 18px !important;
+  background: #081624 !important;
+  color: #f4fbff !important;
+  box-shadow:
+    0 0 0 1px rgba(198, 230, 255, 0.48),
+    0 0 28px rgba(120, 190, 255, 0.55),
+    0 0 64px rgba(80, 160, 255, 0.28) !important;
+}
+html.ori-phone.ori-home .ori-peek-card p {
+  margin: 0 0 8px !important;
+  font-size: 15px !important;
+  line-height: 1.25 !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  text-shadow: none !important;
+}
+html.ori-phone.ori-home .ori-peek-card p:last-child { margin-bottom: 0 !important; }
+html.ori-phone.ori-home .ori-peek-card b {
+  display: inline-block;
+  min-width: 4.2em;
+  margin-right: 6px;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.03em;
+  color: #d7f6ff !important;
+  -webkit-text-fill-color: #d7f6ff !important;
+}
+
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper {
+  background: transparent !important;
+  align-items: stretch !important;
+  overflow: visible !important;
+}
+/* tokens-hub-fit sets gap:10px and order:-1 on this exact hub. Beat both. */
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper.hub-upper--cams.hub-upper--cmd.hub-upper--hot {
+  gap: 88px !important;
+  flex-direction: column !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper.hub-upper--cams > section.leaveby {
+  order: 1 !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper > .hub-lights {
+  order: 2 !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper > #hub-spotify-strip {
+  order: 3 !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper > section.leaveby::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: -176px;
+  width: 112px;
+  height: 168px;
+  display: block !important;
+  /* The dashboard sheen is !important and was painting a straight light rectangle here. The sprite has to win. */
+  background: url("ori/plates/painted/landmark-waystone.webp?v=ORIHOME12") center / contain no-repeat !important;
+  background-color: transparent !important;
+  filter: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  pointer-events: none;
+  z-index: 0;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper > section.leaveby {
+  position: relative !important;
+  overflow: visible !important;
+  width: min(78%, 260px) !important;
+  max-width: 260px !important;
+  margin-right: auto !important;
+  margin-left: 0 !important;
+  margin-top: 184px !important;
+  padding: 12px 14px !important;
+  background: #081624 !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.42), 0 0 28px rgba(120, 190, 255, 0.4) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .leaveby .leaveby-layouts,
+html.ori-phone.ori-home body .panel.panel.panel .leaveby .leaveby-when,
+html.ori-phone.ori-home body .panel.panel.panel .leaveby .leaveby-switch,
+html.ori-phone.ori-home body .panel.panel.panel .lb-mode-banner {
+  display: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .leaveby .leaveby-main .time {
+  display: block !important;
+  font-size: 28px !important;
+  font-weight: 750 !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1 !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  text-shadow: 0 0 14px rgba(180, 230, 255, 0.85) !important;
+  margin: 0 0 4px !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .leaveby .leaveby-main .leaveby-dest {
+  display: block !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+  font-size: 16px !important;
+  font-weight: 650 !important;
+  line-height: 1.25 !important;
+  max-height: none !important;
+  color: #e7fff6 !important;
+  -webkit-text-fill-color: #e7fff6 !important;
+  text-shadow: 0 0 10px rgba(160, 230, 200, 0.75) !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .leaveby-main,
+html.ori-phone.ori-home body .panel.panel.panel .leaveby-dest,
+html.ori-phone.ori-home body .panel.panel.panel .lb-day-t,
+html.ori-phone.ori-home body .panel.panel.panel .lb-day-what,
+html.ori-phone.ori-home body .panel.panel.panel .lb-day-part {
+  color: #e7fff6 !important;
+  -webkit-text-fill-color: #e7fff6 !important;
+  text-shadow: 0 0 10px rgba(160, 230, 200, 0.75);
+  background: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .lb-day-cols {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .lb-day-col,
+html.ori-phone.ori-home body .panel.panel.panel .lb-layout {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  max-height: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .lb-day-tag,
+html.ori-phone.ori-home body .panel.panel.panel .lb-day-tchip {
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 4px 0 0 !important;
+  color: #d7f6ff !important;
+  -webkit-text-fill-color: #d7f6ff !important;
+  text-shadow: 0 0 8px rgba(160, 220, 255, 0.8);
+}
+html.ori-phone.ori-home body .panel.panel.panel .leaveby-chip {
+  display: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .leaveby-chip.is-on {
+  box-shadow: 0 0 14px rgba(180, 255, 210, 0.7) !important;
+  border-color: rgba(220, 255, 230, 0.8) !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .leaveby-chips {
+  display: flex !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper.hub-upper--cams > section#hub-lights-panel::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: -196px;
+  width: 150px;
+  height: 196px;
+  display: block !important;
+  background: url("ori/plates/painted/landmark-lanterns.webp?v=ORIHOME12") center / contain no-repeat !important;
+  background-color: transparent !important;
+  pointer-events: none;
+  z-index: 0;
+}
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper.hub-upper--cams > section#hub-lights-panel {
+  position: relative !important;
+  overflow: visible !important;
+  width: min(62%, 220px) !important;
+  max-width: 220px !important;
+  justify-self: end !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  margin-top: 204px !important;
+  padding: 12px 14px 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 6px !important;
+  background: #0a1624 !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.38), 0 0 28px rgba(120, 190, 255, 0.42) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  color: #f4fbff !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-lights-title,
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-lights-more,
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-lights-bulk-btn,
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-sw-name {
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-lights-title {
+  font-size: 15px !important;
+  letter-spacing: 0.14em !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-lights-pill {
+  display: inline-flex !important;
+  align-self: flex-start;
+  margin: 0 !important;
+  padding: 2px 8px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 214, 150, 0.45) !important;
+  background: rgba(28, 22, 10, 0.55) !important;
+  color: #ffe6b0 !important;
+  -webkit-text-fill-color: #ffe6b0 !important;
+  font-size: 11px !important;
+  letter-spacing: 0.08em !important;
+  box-shadow: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-lights-more,
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-lights-bulk-btn,
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel #lights-all-off,
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel #lights-all-on {
+  display: inline-flex !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 15px !important;
+  font-weight: 650 !important;
+  letter-spacing: 0.02em !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel #lights-all-on { display: none !important; }
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-lights-grid {
+  width: 100% !important;
+  grid-template-columns: 1fr !important;
+  gap: 4px !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-sw--live,
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-sw--live.is-on {
+  height: auto !important;
+  min-height: 28px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-sw--live .hub-sw-name,
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-sw--live.is-on .hub-sw-name {
+  font-size: 16px !important;
+  font-weight: 650 !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  text-shadow: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-lights-panel .hub-sw--live.is-on .hub-sw-name {
+  color: #fff4c8 !important;
+  -webkit-text-fill-color: #fff4c8 !important;
+}
+
+html.ori-phone.ori-home body .panel.panel.panel .hub-upper > .sp-strip,
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip {
+  width: min(78%, 260px) !important;
+  margin-right: auto !important;
+  margin-left: 0 !important;
+  margin-top: 200px !important;
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 4px !important;
+  padding: 12px 14px !important;
+  background: #081624 !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 0 0 1px rgba(180, 230, 190, 0.4), 0 0 24px rgba(120, 200, 150, 0.32) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  overflow: visible !important;
+  color: #f4fbff !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip .sp-brand,
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip .sp-sub,
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip .sp-title,
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip .sp-artist,
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip .sp-dev {
+  color: #d9ffe8 !important;
+  -webkit-text-fill-color: #d9ffe8 !important;
+  background: none !important;
+  text-shadow: 0 0 10px rgba(140, 230, 170, 0.9);
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip .sp-art-wrap,
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip .sp-btn,
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip .sp-btn.sp-play,
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip .sp-room,
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip .sp-connect {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #d9ffe8 !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: -196px;
+  width: 140px;
+  height: 188px;
+  display: block !important;
+  pointer-events: none;
+  background: url("ori/plates/painted/landmark-tree.webp?v=ORIHOME12") center / contain no-repeat;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.28));
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-strip .sp-pill {
+  display: inline-flex !important;
+  margin-top: 4px !important;
+  padding: 2px 8px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 214, 150, 0.45) !important;
+  background: rgba(28, 22, 10, 0.55) !important;
+  box-shadow: none !important;
+  color: #ffe6b0 !important;
+  -webkit-text-fill-color: #ffe6b0 !important;
+  text-shadow: none !important;
+  font-size: 11px !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel #hub-spotify-tile { display: none !important; }
+
+html.ori-phone.ori-home body .panel.panel.panel .who-up {
+  width: min(78%, 240px) !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  padding: 12px 14px !important;
+  background: #081624 !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.42), 0 0 24px rgba(120, 190, 255, 0.35) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  color: #f4fbff !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .who-up-kicker,
+html.ori-phone.ori-home body .panel.panel.panel .who-up-name,
+html.ori-phone.ori-home body .panel.panel.panel .who-up-go,
+html.ori-phone.ori-home body .panel.panel.panel .who-up-meta {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #e7f6ff !important;
+  -webkit-text-fill-color: #e7f6ff !important;
+  text-shadow: 0 0 12px rgba(160, 220, 255, 0.85);
+  padding: 0 !important;
+}
+
+html.ori-phone.ori-home body .panel.panel.panel .grid-wrap { background: transparent !important; }
+html.ori-phone.ori-home body .panel.panel.panel .grid-title,
+html.ori-phone.ori-home body .panel.panel.panel .ori-place,
+html.ori-phone.ori-home .ori-place { display: none !important; }
+html.ori-phone.ori-home body .panel.panel.panel .tile-grid.tile-grid--cams {
+  grid-template-columns: 1fr !important;
+  gap: 72px !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .tile-grid.tile-grid--cams > .tile {
+  width: min(42%, 156px) !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 116px 6px 4px !important;
+  background-color: transparent !important;
+  background-image: url("ori/plates/painted/landmark-stone.webp?v=ORIHOME12") !important;
+  background-repeat: no-repeat !important;
+  background-size: 104px 104px !important;
+  filter: drop-shadow(0 0 14px rgba(180, 220, 255, 0.7));
+  background-position: 8px 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .tile-label {
+  display: block !important;
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  margin-top: 4px !important;
+  padding: 4px 10px !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  text-align: center !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  background: #081624 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.45), 0 0 16px rgba(120, 190, 255, 0.4) !important;
+  text-shadow: none !important;
+  letter-spacing: 0.08em;
+}
+html.ori-phone.ori-home body .panel.panel.panel .tile .tile-sub,
+html.ori-phone.ori-home body .panel.panel.panel .tile .tile-micro,
+html.ori-phone.ori-home body .panel.panel.panel .tile .kf-stage,
+html.ori-phone.ori-home body .panel.panel.panel .tile .kf-dots,
+html.ori-phone.ori-home body .panel.panel.panel .tile .tile-fact,
+html.ori-phone.ori-home body .panel.panel.panel .tile [data-kf-streak],
+html.ori-phone.ori-home body .panel.panel.panel .xp-glass {
+  display: none !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .tile-tap,
+html.ori-phone.ori-home body .panel.panel.panel .kid-flip-go {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #e7f7ff !important;
+  -webkit-text-fill-color: #e7f7ff !important;
+  text-shadow: 0 0 10px rgba(160, 220, 255, 0.85);
+  padding: 0 !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .tile-grid.tile-grid--cams > .tile:nth-child(odd) {
+  justify-self: start !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .tile-grid.tile-grid--cams > .tile:nth-child(even) {
+  justify-self: end !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  background-position: right 8px top 0 !important;
+}
+html.ori-phone.ori-home body .panel.panel.panel .leaveby-accent,
+html.ori-phone.ori-home body .panel.panel.panel .who-up-accent { display: none !important; }
+html.ori-phone.ori-home body .panel.panel.panel [data-live="asof-warn"] {
+  color: #e7fff6 !important;
+  -webkit-text-fill-color: #e7fff6 !important;
+  background: none !important;
+  text-shadow: 0 0 8px rgba(160, 230, 200, 0.75);
+}
+html.ori-phone.ori-home body .panel.panel.panel nav.tile-grid > .tile:last-child { grid-column: auto !important; }
+html.ori-phone.ori-home body .panel.panel.panel .tile-micro { display: none !important; }
+html.ori-phone.ori-home body .panel.panel.panel .tile.kid-flip { min-height: 0 !important; }
+html.ori-phone.ori-home body .panel.panel.panel .tile-grid > .tile::before { display: none !important; }
+html.ori-phone.ori-home body .panel.panel.panel .lb-day-col.is-past { display: none !important; }
+
+html.ori-on .month-range,
+html.ori-on body[data-glass*="month"] .ftr { display: none !important; }
+html.ori-on .blk,
+html.ori-on .day,
+html.ori-on .blocks {
+  white-space: normal !important;
+  text-overflow: clip !important;
+  overflow: visible !important;
+}
+html.ori-on .month-grid { height: auto !important; min-height: 0 !important; grid-auto-rows: auto !important; }
+html.ori-on .wx-cond,
+html.ori-on .sensi-hdr-set,
+html.ori-on .hub-cam-label,
+html.ori-on .who-up-name,
+html.ori-on .sp-title,
+html.ori-on .sp-artist,
+html.ori-on .blk {
+  max-width: 100% !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+}
+html.ori-on .tile-label {
+  max-width: 100% !important;
+  width: auto !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+}
+
+/* Phone month and lights. The home map rules above stay on ori-home only. */
+html.ori-phone body,
+html.ori-phone body > .panel {
+  width: 100% !important;
+  max-width: 100vw !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 100dvh !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+html.ori-phone .month-range,
+html.ori-phone body[data-glass*="month"] .ftr,
+html.ori-phone .dow-row,
+html.ori-phone .legend,
+html.ori-phone body[data-glass*="month"] .leaveby-detail,
+html.ori-phone body[data-glass*="month"] .leaveby-badge {
+  display: none !important;
+}
+html.ori-phone .month-hdr { display: block !important; width: 100% !important; }
+html.ori-phone body[data-glass*="month"] .hdr { flex-wrap: wrap !important; max-width: 100% !important; }
+html.ori-phone body[data-glass*="month"] .hdr-spacer { display: none !important; }
+html.ori-phone body[data-glass*="month"] .hdr-ovals { flex: 1 1 100% !important; max-width: 100% !important; flex-wrap: wrap !important; }
+html.ori-phone body[data-glass*="month"] .hdr .oval { min-width: 0 !important; height: 48px !important; padding: 6px 12px !important; }
+html.ori-phone .mnav {
+  display: flex !important;
+  width: 100% !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  position: relative !important;
+}
+html.ori-phone .month-title {
+  position: static !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  font-size: 22px !important;
+  letter-spacing: 0.16em !important;
+  text-align: center !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  text-shadow: 0 0 16px rgba(160, 220, 255, 0.75) !important;
+}
+html.ori-phone .mbtn,
+html.ori-phone .mpill {
+  position: static !important;
+  border: 0 !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  background: rgba(8, 22, 36, 0.78) !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.4), 0 0 16px rgba(120, 190, 255, 0.28) !important;
+}
+html.ori-phone .mbtn {
+  flex: 0 0 44px !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 14px !important;
+  font-size: 22px !important;
+}
+html.ori-phone .mpills { display: flex !important; flex-wrap: wrap !important; gap: 8px !important; }
+html.ori-phone .mpill {
+  border-radius: 999px !important;
+  min-height: 36px !important;
+  padding: 6px 14px !important;
+  font-size: 14px !important;
+}
+html.ori-phone .mpill.on {
+  background: rgba(16, 40, 64, 0.95) !important;
+  box-shadow: 0 0 0 1px rgba(230, 244, 255, 0.75), 0 0 18px rgba(140, 200, 255, 0.5) !important;
+}
+html.ori-phone body[data-glass*="month"] .leaveby {
+  display: block !important;
+  position: relative !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 8px 0 14px !important;
+  padding: 14px 16px !important;
+  background: rgba(8, 22, 36, 0.86) !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 0 0 1px rgba(255, 214, 140, 0.45), 0 0 28px rgba(240, 190, 90, 0.32) !important;
+}
+html.ori-phone body[data-glass*="month"] .leaveby::before {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+html.ori-phone body[data-glass*="month"] .leaveby-main .time {
+  display: block !important;
+  font-size: 32px !important;
+  color: #fff6d8 !important;
+  -webkit-text-fill-color: #fff6d8 !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  outline: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 0 4px !important;
+}
+html.ori-phone .month-chrome {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin: 0 0 12px !important;
+  padding: 14px 12px 12px !important;
+  border-radius: 18px !important;
+  background: #081624 !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.42), 0 0 24px rgba(120, 190, 255, 0.28) !important;
+}
+html.ori-phone .month-chrome .banner {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+html.ori-phone body[data-glass*="month"] .leaveby-dest {
+  display: block !important;
+  font-size: 16px !important;
+  line-height: 1.3 !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  white-space: normal !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+html.ori-phone body[data-glass*="month"] .nav-us { display: none !important; }
+html.ori-phone body[data-glass*="month"] .oval.sensi .oval-ico { font-size: 0 !important; }
+html.ori-phone body[data-glass*="month"] .oval.sensi .oval-ico::before {
+  content: "🌡";
+  font-size: 16px !important;
+  line-height: 1 !important;
+}
+html.ori-phone .month-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+html.ori-phone .ori-day {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 12px 14px !important;
+  border-radius: 16px !important;
+  background: rgba(8, 22, 36, 0.8) !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.35), 0 0 18px rgba(120, 190, 255, 0.24) !important;
+  text-decoration: none !important;
+  color: #f4fbff !important;
+}
+html.ori-phone .ori-dom {
+  font-size: 12px !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: #d7f6ff !important;
+}
+html.ori-phone .ori-day-head {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+html.ori-phone .ori-chip {
+  display: inline-block !important;
+  padding: 2px 8px !important;
+  border-radius: 999px !important;
+  background: rgba(16, 40, 64, 0.95) !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.4) !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+  color: #d7f6ff !important;
+  -webkit-text-fill-color: #d7f6ff !important;
+}
+html.ori-phone .ori-ev {
+  font-size: 16px !important;
+  line-height: 1.35 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  color: #f4fbff !important;
+  text-shadow: none !important;
+}
+html.ori-phone .ori-ev.ain { color: #f0d4ff !important; }
+html.ori-phone .ori-ev.hay { color: #c8ffe8 !important; }
+html.ori-phone .ori-ev.har { color: #d4e6ff !important; }
+html.ori-phone .banner {
+  background: rgba(8, 22, 36, 0.72) !important;
+  color: #f4fbff !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.28) !important;
+  white-space: normal !important;
+}
+
+html.ori-phone .lights-cmd .pad-grid.pad-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  width: 100% !important;
+  gap: 12px !important;
+}
+html.ori-on body .panel.lights-cmd article.light-pad {
+  background: #081624 !important;
+  background-color: #081624 !important;
+  opacity: 1 !important;
+}
+html.ori-phone #lights-status-pill {
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+}
+html.ori-on body .panel.lights-cmd article.light-pad[data-unconnected-summary] .light-pad-src {
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+}
+html.ori-phone .lights-cmd .light-pad.cmd-panel,
+html.ori-phone .lights-cmd .light-pad,
+html.ori-phone .lights-cmd .light-pad.is-pending,
+html.ori-phone .lights-cmd .light-pad.is-need-connect {
+  display: grid !important;
+  grid-template-areas: "top" "actions" "src" !important;
+  gap: 8px !important;
+  padding: 14px !important;
+  border: 0 !important;
+  border-style: solid !important;
+  border-radius: 18px !important;
+  background: #081624 !important;
+  background-color: #081624 !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.38), 0 0 20px rgba(120, 190, 255, 0.26) !important;
+  color: #f4fbff !important;
+  position: relative !important;
+  overflow: visible !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+html.ori-phone .light-pad-top { grid-area: top; display: flex !important; align-items: center !important; gap: 10px !important; position: static !important; }
+html.ori-phone .light-pad-actions { grid-area: actions; display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 10px !important; position: static !important; }
+html.ori-phone .light-pad-src { grid-area: src; position: static !important; font-size: 13px !important; letter-spacing: 0.08em !important; color: #ffe6b0 !important; }
+html.ori-phone .light-pad-name { color: #f4fbff !important; -webkit-text-fill-color: #f4fbff !important; white-space: normal !important; overflow: visible !important; text-overflow: clip !important; font-size: 18px !important; }
+html.ori-phone .light-pad-where,
+html.ori-phone .light-pad-state { display: none !important; }
+html.ori-phone .light-pad[data-unconnected-summary] { grid-template-areas: "src" !important; }
+html.ori-phone .lights-cmd .cmd-rocker {
+  position: relative !important;
+  width: 64px !important;
+  min-width: 64px !important;
+  max-width: 64px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: inset 0 0 0 1px rgba(198, 230, 255, 0.4) !important;
+}
+html.ori-phone .cmd-rocker.is-on { background: rgba(255, 214, 120, 0.9) !important; }
+html.ori-phone .cmd-rocker-knob {
+  position: absolute !important;
+  top: 3px !important;
+  left: 3px !important;
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 50% !important;
+  background: #f7fbff !important;
+}
+html.ori-phone .cmd-rocker.is-on .cmd-rocker-knob { left: auto !important; right: 3px !important; }
+html.ori-phone .light-bright {
+  width: 100% !important;
+  height: 28px !important;
+  margin: 0 !important;
+  accent-color: #ffd78a;
+}
+html.ori-phone .light-pad.is-pending .light-pad-actions,
+html.ori-phone .light-pad.is-need-connect .light-pad-actions,
+html.ori-phone .light-pad.is-pending .light-pad-state,
+html.ori-phone .light-pad.is-need-connect .light-pad-state {
+  display: none !important;
+}
+html.ori-phone .light-pad.is-pending .light-pad-src,
+html.ori-phone .light-pad.is-need-connect .light-pad-src {
+  color: rgba(210, 224, 236, 0.78) !important;
+  font-size: 15px !important;
+}
+html.ori-phone .lights-cmd {
+  padding: 59px 16px 72px !important;
+  box-sizing: border-box !important;
+}
+html.ori-phone .lights-cmd .ftr,
+html.ori-phone .lights-cmd #lights-ftr-status {
+  display: none !important;
+}
+html.ori-phone .lights-cmd .hdr .home-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 6px 14px !important;
+  border-radius: 999px !important;
+  background: #163044 !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  font-size: 15px !important;
+  line-height: 1.2 !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.45) !important;
+}
+html.ori-phone .lights-cmd .note,
+html.ori-phone #lights-note {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html.ori-phone .banner-sub,
+html.ori-phone .cmd-meta { display: none !important; }
+html.ori-phone .lights-cmd #lights-all-on,
+html.ori-phone .lights-cmd #lights-all-off,
+html.ori-phone .lights-cmd #lights-all-on:disabled,
+html.ori-phone .lights-cmd #lights-all-off:disabled {
+  opacity: 1 !important;
+  filter: none !important;
+  min-height: 48px !important;
+}
+html.ori-phone .lights-cmd #lights-all-on,
+html.ori-phone .lights-cmd #lights-all-on:disabled {
+  background: linear-gradient(180deg, #ffe7a8, #f0b84a) !important;
+  color: #1a1208 !important;
+  -webkit-text-fill-color: #1a1208 !important;
+  border: 0 !important;
+  box-shadow: 0 0 0 1px rgba(255, 220, 140, 0.85), 0 0 16px rgba(240, 180, 60, 0.35) !important;
+}
+html.ori-phone .lights-cmd #lights-all-off,
+html.ori-phone .lights-cmd #lights-all-off:disabled {
+  background: #163044 !important;
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+  border: 0 !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.55) !important;
+}
+html.ori-phone #lights-status-pill.cmd-pill--need {
+  background: rgba(28, 22, 10, 0.85) !important;
+  color: #ffe6b0 !important;
+  -webkit-text-fill-color: #ffe6b0 !important;
+  box-shadow: none !important;
+}
+html.ori-phone #lights-status-pill.cmd-pill--live {
+  background: #1c6b45 !important;
+  color: #e9fff2 !important;
+  -webkit-text-fill-color: #e9fff2 !important;
+}
+html.ori-phone .banner.cmd-panel,
+html.ori-phone .bulk.cmd-panel,
+html.ori-phone .lights-cmd .hdr {
+  background: #081624 !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 0 0 1px rgba(198, 230, 255, 0.32) !important;
+  color: #f4fbff !important;
+}
+html.ori-phone .banner .banner-title,
+html.ori-phone .banner .cmd-title,
+html.ori-phone .cmd-chip {
+  color: #f4fbff !important;
+  -webkit-text-fill-color: #f4fbff !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.ori-on .ori-fallback i,
+  html.ori-on .ori-fallback.ori-painted .ori-soft,
+  html.ori-on .ori-fallback.ori-painted .ori-rays,
+  html.ori-on .ori-fallback.ori-painted .ori-fog,
+  html.ori-on .ori-iris::before,
+  html.ori-on .ori-arrive,
+  html.ori-on .ori-ripple,
+  html.ori-on .ori-pressed,
+  html.ori-on.ori-enter body .panel > *,
+  html.ori-on.ori-enter body .shell > *,
+  html.ori-home body .panel .tile-grid > .tile,
+  html.ori-home body .panel .tile-grid > .tile::after,
+  html.ori-phone.ori-home .ori-spirit,
+  html.ori-phone.ori-home .ori-spirit i,
+  html.ori-phone.ori-home .ori-spirit b {
+    animation: none !important;
+  }
+  html.ori-phone.ori-home .ori-spirit { transition: none !important; }
+  html.ori-home body .panel .tile-grid > .tile { transform: none !important; }
+}
+/* Capture and the phone map keep the living world. Reduced motion must not freeze the clip or skip a veil. */
+@media (prefers-reduced-motion: reduce) {
+  html.ori-phone.ori-home .ori-life i { animation: ori-life-mote 2.8s linear infinite !important; }
+  html.ori-phone.ori-home .ori-life .ori-shaft-sweep { animation: ori-sweep 3.6s ease-in-out infinite !important; }
+  html.ori-phone.ori-home .ori-world canvas,
+  html.ori-phone.ori-home .ori-fallback { animation: ori-world-sway 3.4s ease-in-out infinite !important; visibility: visible !important; }
+  html.ori-phone.ori-home body .panel.panel.panel header.hdr .hdr-date::after { animation: ori-clock-glow 2.1s ease-in-out infinite !important; }
+  html.ori-phone.ori-home #hub-cam-deck::after { animation: ori-shimmer 2.2s ease-in-out infinite !important; }
+  .ori-iris { display: block !important; }
+  .ori-arrive { display: block !important; animation: ori-arrive 0.56s ease forwards !important; }
+  html.ori-arriving::before { display: block !important; animation: none !important; opacity: var(--ori-veil-op, 1) !important; }
+}

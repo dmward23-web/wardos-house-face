@@ -64,9 +64,11 @@
     "void main(){ vUV = aP; vec2 px = uRect.xy + aP * uRect.zw; gl_Position = vec4(px.x / uRes.x * 2.0 - 1.0, 1.0 - px.y / uRes.y * 2.0, 0.0, 1.0); }";
   var VS_FS = "#version 300 es\nlayout(location=0) in vec2 aP; out vec2 vUV; void main(){ vUV = aP; gl_Position = vec4(aP * 2.0 - 1.0, 0.0, 1.0); }";
   /* painted plate: R value, G rim, B glow, A coverage -> tinted per theme */
-  var FS_PLATE = "#version 300 es\nprecision highp float;\nin vec2 vUV; uniform sampler2D uTex; uniform float uBias, uTime, uRimI, uGlowI, uFogA, uTw, uPaint, uPaintK;\n" +
+  var FS_PLATE = "#version 300 es\nprecision highp float;\nin vec2 vUV; uniform sampler2D uTex; uniform float uBias, uTime, uRimI, uGlowI, uFogA, uTw, uPaint, uPaintK, uEdge;\n" +
     "uniform vec3 uDark, uLit, uRim, uGlow, uFog; uniform vec2 uLight; uniform vec2 uRes; uniform vec4 uRect; out vec4 o;\n" + GLSL_NOISE +
     "void main(){ vec4 t = texture(uTex, vUV, uBias); vec2 sp = (uRect.xy + vUV * uRect.zw) / uRes;\n" +
+    /* Home board only (uEdge > 0): keep foreground silhouettes in the outer bands of the frame. */
+    " if (uEdge > 0.001) { float band = clamp(uEdge, 0.04, 0.4); float m = smoothstep(band, band - 0.05, sp.x) + smoothstep(1.0 - band, 1.0 - band + 0.05, sp.x); t.a *= clamp(m, 0.0, 1.0); }\n" +
     " float ld = length((sp - uLight) * vec2(uRes.x / uRes.y, 1.0));\n" +
     /* painterly pass: brush-stroke grain in the lit paint, bark striations in the darks, layered leaf/moss tints on the rims */
     " float pk = (1.0 - clamp(uBias / 2.0, 0.0, 1.0)) * step(0.02, t.a); vec2 bu = vUV * uRect.zw / 1100.0;\n" +
@@ -455,7 +457,7 @@
     var pl = this.plates[key]; if (!pl) return; var gl = this.gl, P = this.P.plate, u = P.u;
     gl.useProgram(P.p); gl.uniform2f(u.uRes, this.w, this.h); gl.uniform4f(u.uRect, rect[0], rect[1], rect[2], rect[3]);
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, pl.t); gl.uniform1i(u.uTex, 0);
-    gl.uniform1f(u.uBias, T.bias || 0); gl.uniform1f(u.uTime, this.time); gl.uniform1f(u.uRimI, T.rimI); gl.uniform1f(u.uGlowI, T.glowI); gl.uniform1f(u.uFogA, T.fogA || 0); gl.uniform1f(u.uTw, T.tw == null ? 1 : T.tw); if (u.uPaint) { gl.uniform1f(u.uPaint, pl.paint ? 1 : 0); gl.uniform1f(u.uPaintK, T.paintK || PAINTK[key] || 1); }
+    gl.uniform1f(u.uBias, T.bias || 0); gl.uniform1f(u.uTime, this.time); gl.uniform1f(u.uRimI, T.rimI); gl.uniform1f(u.uGlowI, T.glowI); gl.uniform1f(u.uFogA, T.fogA || 0); gl.uniform1f(u.uTw, T.tw == null ? 1 : T.tw); if (u.uPaint) { gl.uniform1f(u.uPaint, pl.paint ? 1 : 0); gl.uniform1f(u.uPaintK, T.paintK || PAINTK[key] || 1); } if (u.uEdge) gl.uniform1f(u.uEdge, T.edge || 0);
     gl.uniform3fv(u.uDark, T.dark); gl.uniform3fv(u.uLit, T.lit); gl.uniform3fv(u.uRim, T.rim); gl.uniform3fv(u.uGlow, T.glow); gl.uniform3fv(u.uFog, T.fog || T.lit);
     gl.uniform2f(u.uLight, T.light[0], T.light[1]);
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.bindVertexArray(this.vaoQ); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); };
@@ -497,10 +499,19 @@
     gl.enable(gl.SCISSOR_TEST); gl.scissor(J.bbox[0], this.h - J.bbox[3], J.bbox[2] - J.bbox[0], J.bbox[3] - J.bbox[1]);
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     gl.disable(gl.SCISSOR_TEST); };
+  /* 2×2 clear target so final() can sample bloom when the pass is skipped. */
+  SP.blankBloom = function () {
+    var gl = this.gl, f = this.target("bl0", 2, 2);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, f.f); gl.viewport(0, 0, f.w, f.h);
+    gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+    return f;
+  };
   SP.bloom = function (src) {
     var gl = this.gl, w = this.w, h = this.h, levels = [], i, lw = Math.max(2, w >> 1), lh = Math.max(2, h >> 1);
+    var n = this.bloomLevels == null ? 6 : (this.bloomLevels | 0);
+    if (n < 1) return this.blankBloom();
     gl.disable(gl.BLEND);
-    for (i = 0; i < 6; i++) { levels.push(this.target("bl" + i, lw, lh)); lw = Math.max(2, lw >> 1); lh = Math.max(2, lh >> 1); }
+    for (i = 0; i < n; i++) { levels.push(this.target("bl" + i, lw, lh)); lw = Math.max(2, lw >> 1); lh = Math.max(2, lh >> 1); }
     var u = this.full(this.P.bright); gl.bindFramebuffer(gl.FRAMEBUFFER, levels[0].f); gl.viewport(0, 0, levels[0].w, levels[0].h);
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, src.t); gl.uniform1i(u.uT, 0); gl.uniform2f(u.uTx, 1 / src.w, 1 / src.h); gl.uniform1f(u.uTh, this.bloomTh || 0.85);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -593,12 +604,14 @@
   };
   WP.loadPlates = function () {
     var self = this, ln = this.lname, set = (this.B && this.B.plates) || ln, n = 0; this.platesReady = false;
-    function done() { if (++n === LAYERS.length) { self.platesReady = true; self.kick(true); if (self.onReady) self.onReady(); } }
     /* painted drop-ins: _test/plates/make_plates.py writes plates/painted/<set>-<layer>.png + plates/painted/manifest.js (window.ORI_PAINTED);
        a painted layer replaces the procedural mask plate, a missing one falls back to it. ?painted=0 forces procedural. */
     var PM = (global.ORI_PAINTED && !/[?&]painted=0/.test(global.location ? global.location.search : "")) ? global.ORI_PAINTED : {};
     var PL = global.ORI_PAINTED_LIGHT || {}; this.lightOverride = PM[set + "-sky"] && PL[set] ? PL[set] : null;
-    LAYERS.forEach(function (k) { var img = new Image(), key = set + "-" + k, pv = PM[key];
+    /* Optional painted light plate (grove-rays). Missing keys stay on the five depth layers. */
+    var keys = LAYERS.slice(); if (PM[set + "-rays"]) keys.push("rays");
+    function done() { if (++n === keys.length) { self.platesReady = true; self.kick(true); if (self.onReady) self.onReady(); } }
+    keys.forEach(function (k) { var img = new Image(), key = set + "-" + k, pv = PM[key];
       img.onload = function () { if (self.lname !== ln || !self.S) return; self.S.loadPlate(k, img, !!pv); done(); };
       img.onerror = done; var ext = global.ORI_PLATE_EXT || "png"; /* SPOTIFY1 vendored copy: plates ship as webp on Pages */
       img.src = pv ? self.plateBase + "painted/" + key + "." + ext + "?v=" + pv : self.plateBase + set + "-" + k + "." + ext; });
@@ -654,7 +667,7 @@
     if (!this.S || this.S.lost || this.dead || this.paused) return; if (document.hidden) return;
     var t = now(), cap = this.saver ? this.cfg.saverFps : this.cfg.fpsCap, red = this.reduced();
     if (!red && this.last && t - this.last < 1 / cap - 0.004) { this.kick(); return; }
-    var dt = this.last ? clamp(t - this.last, 0, 0.05) : 1 / 60; this.last = t;
+    var dt = this.last ? clamp(t - this.last, 0, 0.05) : 1 / 60; this.frameGap = this.last ? (t - this.last) : 0; this.last = t;
     var busy = red && (this.dirty || this.trans);
     if (!red || busy) { this.step(t, red ? 1 / 60 : dt); if (this.platesReady) this.render(t); this.dirty = false; this.frame++;
       this.fpsN = (this.fpsN || 0) + 1; if (!this.fpsT) this.fpsT = t; if (t - this.fpsT > 1) { this.fps = this.fpsN / (t - this.fpsT); this.fpsN = 0; this.fpsT = t; } }
@@ -662,6 +675,17 @@
   };
   /* pause while covered by a page scene (the home board sleeps under it) */
   WP.pause = function (on) { this.paused = !!on; if (!on) { this.last = 0; this.kick(true); } };
+  /* Deterministic frame. Caller advances a virtual clock; the present loop stays paused. */
+  WP.captureFrame = function (dt) {
+    dt = dt > 0 ? dt : 1 / 60;
+    if (this._capT == null) this._capT = this.t0 || now();
+    this._capT += dt;
+    this.step(this._capT, dt);
+    if (this.platesReady) this.render(this._capT);
+    this.frame = (this.frame || 0) + 1;
+    this.paused = true;
+    return this._capT;
+  };
   /* slow camera push-in toward fx,fy (screen fractions) with a rack focus 0 (background sharp) -> 1 (background soft, subject sharp) */
   WP.camPush = function (z1, dur, fx, fy, k1) { var t = now(); this.camP = { t0: t, dur: dur || 10, z0: this.pushZ || 1, z1: z1 || 1.12, f0: (this.pushF || [0.5, 0.5]).slice(), f1: [fx == null ? 0.5 : fx, fy == null ? 0.5 : fy], k0: this.focusV || 0, k1: k1 == null ? 1 : k1 }; this.kick(true); return this; };
   WP.step = function (t, dt) {
@@ -669,6 +693,8 @@
     var px = this.ptr && now() - this.ptr.t < 4 ? this.ptr.x : 0, py = this.ptr && now() - this.ptr.t < 4 ? this.ptr.y : 0;
     this.cam.x.t = -px * 26 + (red ? 0 : Math.sin(T * 0.11) * 16 + Math.sin(T * 0.047) * 9); this.cam.y.t = -py * 12 + (red ? 0 : Math.sin(T * 0.083 + 1) * 6);
     if (red) { this.cam.x.snap(); this.cam.y.snap(); this.scroll.snap(); } else { this.cam.x.step(dt); this.cam.y.step(dt); this.scroll.step(dt); }
+    /* Page scroll becomes a map travel: layers already carry different SCROLLK, this hook adds the camera rise before layout. */
+    if (this.applyScrollCam) this.applyScrollCam();
     this.stepTransition(t, dt);
     var cp2 = this.camP; if (cp2) { var cu = red ? 1 : clamp((t - cp2.t0) / cp2.dur, 0, 1), ce = cu * cu * (3 - 2 * cu); this.pushZ = lerp(cp2.z0, cp2.z1, ce); this.pushF = [lerp(cp2.f0[0], cp2.f1[0], ce), lerp(cp2.f0[1], cp2.f1[1], ce)]; this.focusV = lerp(cp2.k0, cp2.k1, ce); }
     this.layout(); this.theme = this.o.theme ? this.o.theme(this) : oriTheme(this, {});
@@ -698,6 +724,7 @@
   WP.pass = function (name, S, L, T, t, extra) { var self = this; var fn = this["pass_" + name]; if (fn) fn.call(this, S, L, T, t, extra);
     for (var i = 0; i < this.objects.length; i++) { var ob = this.objects[i]; if ((ob.pass || "ground") === name && ob.draw) ob.draw(S, L, T, t, self); } };
   WP.render = function (t) {
+    var cost0 = (global.performance && performance.now) ? performance.now() : 0;
     var S = this.S, gl = S.gl, L = this.L, T = this.theme, B = this.B, w = S.w, h = S.h, red = this.reduced(), Tm = t - this.t0;
     S.time = red ? 12.0 : Tm;
     var sc = S.target("scene", w, h, false); S.bindT(sc);
@@ -707,33 +734,48 @@
     function plate(k) { var th = T[k]; th.light = Ln; var r = L.rect[k];
       if (!tile) { S.drawPlate(k, r, th); return; } var x0 = r[0] - Math.ceil(r[0] / r[2]) * r[2]; for (var x = x0; x < w; x += r[2]) S.drawPlate(k, [x, r[1], r[2], r[3]], th); }
     var night = this.mode === "night" ? 1 : 0;
+    var layers = this.tierLayers == null ? 5 : this.tierLayers;
     plate("sky");
-    S.drawRays({ L: Ln, a: 0.6 * (1 - 0.5 * night), c: T.rays });
+    if (S.plates.rays) {
+      var rk = 0.62 + 0.38 * Math.sin(Tm * 0.37);
+      S.drawPlate("rays", L.rect.sky, { dark: T.sky.dark, lit: T.sky.lit, rim: T.sky.rim, glow: T.sky.glow, fog: T.fog1, fogA: 0, bias: 0, rimI: 0, glowI: 0, tw: 0, light: Ln, paintK: rk });
+    }
+    if (this.tierRays !== false) S.drawRays({ L: Ln, a: 0.6 * (1 - 0.5 * night), c: T.rays });
     var hk = (1 - 0.6 * night) * (this.o.hotLight == null ? 1 : this.o.hotLight), hr = Math.min(w, h);
     if (hk > 0) { S.spr(Lp[0], Lp[1], Lp[0], Lp[1], hr * 0.55, 1, 0, 0, [0.5 * hk, 0.62 * hk, 0.7 * hk], 0.5); S.spr(Lp[0], Lp[1], Lp[0], Lp[1], hr * 0.16, 1, 0, 0, [2.4 * hk, 2.45 * hk, 2.3 * hk], 0.9); S.spr(Lp[0], Lp[1], Lp[0], Lp[1], hr * 0.05, 1, 0, 0, [6.0 * hk, 6.0 * hk, 5.6 * hk], 1); S.flushSpr(); }
     plate("far");
-    S.drawFog({ a: 0.55, y0: 0.30, y1: 0.80, speed: 0.012, scale: 2.2, c: T.fog1 });
+    if (this.tierFog !== false) S.drawFog({ a: 0.55, y0: 0.30, y1: 0.80, speed: 0.012, scale: 2.2, c: T.fog1 });
     this.drawMotes(0, 0.42); this.pass("far", S, L, T, t); S.flushSpr();
-    plate("mid");
-    this.drawShafts(Lp, Tm); this.drawWisps(Tm); this.pass("mid", S, L, T, t); S.flushSpr();
-    S.drawFog({ a: 0.38, y0: 0.55, y1: 0.98, speed: 0.02, scale: 1.6, c: T.fog2 });
+    if (layers >= 4) plate("mid");
+    this.drawShafts(Lp, Tm); if (this.tierWisps !== false) this.drawWisps(Tm); this.pass("mid", S, L, T, t); S.flushSpr();
+    if (this.tierFog !== false) S.drawFog({ a: 0.38, y0: 0.55, y1: 0.98, speed: 0.02, scale: 1.6, c: T.fog2 });
     plate("ground");
     this.drawMotes(0.42, 0.8); this.pass("ground", S, L, T, t); S.flushSpr();
     /* scene copy: refraction / reflection source for glass + liquid chrome, then the page's composite pass */
-    var cp = S.target("copy", w, h, true); S.copyTo(sc, cp); S.bindT(sc);
-    this.pass("scene", S, L, T, t, { sc: sc, cp: cp }); S.bindT(sc); S.flushSpr();
-    S.drawFog({ a: 0.30, y0: 0.78, y1: 1.02, speed: 0.03, scale: 2.8, c: T.mist });
+    if (layers >= 4) {
+      var cp = S.target("copy", w, h, true); S.copyTo(sc, cp); S.bindT(sc);
+      this.pass("scene", S, L, T, t, { sc: sc, cp: cp });
+    } else this.pass("scene", S, L, T, t, { sc: sc, cp: sc });
+    S.bindT(sc); S.flushSpr();
+    if (this.tierFog !== false) S.drawFog({ a: 0.30, y0: 0.78, y1: 1.02, speed: 0.03, scale: 2.8, c: T.mist });
     this.pass("front", S, L, T, t); this.drawSparks(t); var self = this; this.fx.forEach(function (f) { if (f.draw) f.draw(S, L, T, t, self); }); S.flushSpr();
-    plate("fore");
+    if (layers >= 5) plate("fore");
     this.drawMotes(0.8, 1.01); this.pass("ui", S, L, T, t); S.flushSpr();
-    S.bloomTh = 1.0; var bl = S.bloom(sc), rv = this.revealParams() || {};
-    S.final(sc, bl, { exposure: (this.exposure || 1) * (night ? 0.72 : 1) * (rv.flash || 1), bloom: this.cfg.bloom == null ? 0.62 : this.cfg.bloom, vig: this.cfg.vig == null ? 1.25 : this.cfg.vig, grain: 0.035, dim: 1, reveal: rv.reveal, revealC: rv.revealC });
+    var bloomAmt = this.tierBloom != null ? this.tierBloom : (this.cfg.bloom == null ? 0.62 : this.cfg.bloom);
+    S.bloomLevels = this.bloomLevels == null ? 6 : this.bloomLevels;
+    S.bloomTh = 1.0; var bl = bloomAmt <= 0.001 ? S.blankBloom() : S.bloom(sc), rv = this.revealParams() || {};
+    S.final(sc, bl, { exposure: (this.exposure || 1) * (night ? 0.72 : 1) * (rv.flash || 1), bloom: bloomAmt, vig: this.cfg.vig == null ? 1.25 : this.cfg.vig, grain: bloomAmt > 0 ? 0.035 : 0.02, dim: 1, reveal: rv.reveal, revealC: rv.revealC });
+    if (cost0 && this.onFrameCost) {
+      if (this.costSync && gl && gl.finish) { try { gl.finish(); } catch (eFin) {} }
+      try { this.onFrameCost(performance.now() - cost0); } catch (eCost) {}
+    }
     if (this.afterRender) this.afterRender(t);
     var self2 = this; this.objects.forEach(function (ob) { if (ob.btn && ob.box) { var b = ob.box(self2); if (b) self2.placeBtn(ob.btn, b[0], b[1], b[2], b[3]); } });
   };
   WP.drawMotes = function (z0, z1) {
     var S = this.S, L = this.L, T = this.theme, Tm = this.S.time, k = L.k;
-    for (var i = 0; i < this.motes.length; i++) { var m = this.motes[i]; if (m.z < z0 || m.z >= z1) continue;
+    var step = this.moteStep > 1 ? (this.moteStep | 0) : 1;
+    for (var i = 0; i < this.motes.length; i += step) { var m = this.motes[i]; if (m.z < z0 || m.z >= z1) continue;
       var d = lerp(DEPTH.far, DEPTH.fore * 1.2, m.z), sk = lerp(SCROLLK.far, SCROLLK.fore, m.z), x = ((m.x * L.w - L.scrollPx * sk) % L.w + L.w) % L.w + L.cam[0] * d, y = m.y * L.h + L.cam[1] * d;
       var fl = 0.55 + 0.45 * Math.sin(Tm * m.fl + m.ph), tint = m.s < 0.22 ? T.key : T.mote;
       if (m.z > 0.8) { var r = (10 + 26 * (m.z - 0.8) / 0.2) * k * (0.6 + m.s); S.spr(x, y, x, y, r, 1, 0, 0, [tint[0] * 0.5, tint[1] * 0.5, tint[2] * 0.5], 0.10 + 0.12 * fl); }
@@ -742,7 +784,8 @@
   WP.drawShafts = function (Lp, Tm) {
     var S = this.S, L = this.L, T = this.theme, w = L.w, h = L.h;
     var sh = [[-0.13, 0.20, 0.035, 0.8], [-0.05, 0.12, 0.05, 1.0], [0.04, 0.03, 0.03, 0.75], [0.12, -0.06, 0.06, 0.6], [0.2, -0.12, 0.028, 0.5]];
-    for (var i = 0; i < sh.length; i++) { var s = sh[i], x0 = Lp[0] + s[0] * w, x1 = x0 + s[1] * w, a = s[3] * (0.65 + 0.35 * Math.sin(Tm * 0.23 + i * 1.9));
+    var nSh = this.shaftN == null ? sh.length : this.shaftN;
+    for (var i = 0; i < sh.length && i < nSh; i++) { var s = sh[i], x0 = Lp[0] + s[0] * w, x1 = x0 + s[1] * w, a = s[3] * (0.65 + 0.35 * Math.sin(Tm * 0.23 + i * 1.9));
       S.spr(x0, Lp[1] - 0.05 * h, x1, h * 1.02, s[2] * w, 6, 0, i * 3.7, T.shafts, 0.16 * a); }
   };
   WP.drawWisps = function (Tm) {
@@ -757,7 +800,7 @@
       S.spr(s.x, s.y, s.x - s.vx * 0.03, s.y - s.vy * 0.03, s.r, 0, 0, 0, [c[0] * b, c[1] * b, c[2] * b], 1); }); };
   WP.burst = function (p, col, n, o) { o = o || {}; for (var i = 0; i < n; i++) { var a = this.R() * TAU, s = (80 + this.R() * 260) * this.rs * (o.speed || 1);
     this.sparks.push({ x: p[0], y: p[1], vx: Math.cos(a) * s, vy: Math.sin(a) * s - 120 * this.rs, life: 0.6 + this.R() * 0.9, t0: now(), r: (1.4 + this.R() * 2.2) * this.rs, col: col, g: o.g == null ? 220 : o.g }); } };
-  WP.stats = function () { return { fps: this.fps || 0, w: this.S ? this.S.w : 0, h: this.S ? this.S.h : 0, gl: !!this.S, hf: this.S ? this.S.hf : false, layout: this.lname, reduced: this.reduced(), saver: this.saver }; };
+  WP.stats = function () { return { fps: this.fps || 0, w: this.S ? this.S.w : 0, h: this.S ? this.S.h : 0, gl: !!this.S, hf: this.S ? this.S.hf : false, layout: this.lname, reduced: this.reduced(), saver: this.saver, tier: this.tierId || "", layers: this.tierLayers == null ? 5 : this.tierLayers, bloom: this.tierBloom, dpr: this.cfg ? this.cfg.dprMax : 0, scale: this.cfg ? this.cfg.renderScale : 0, gap: this.frameGap || 0 }; };
   WP.destroy = function () { this.dead = true; if (this.raf) cancelAnimationFrame(this.raf); if (this.ro) this.ro.disconnect(); this.S = null; this.host.innerHTML = ""; };
   /* glowing orb object helper (lanterns, leave-by wisps, what's-next orbs...): place at ground-plate coords (fx may exceed 1 on scrolling worlds) */
   function Orb(o) { this.o = Object.assign({ layer: "ground", fx: 0.5, fy: 0.5, r: 0.02, color: null, pass: "ground", glow: 1.2, icon: null, bob: 1 }, o || {}); this.pass = this.o.pass; this.label = this.o.label; this.ph = Math.random() * 6; this.pop = new Spring(1, 120, 0.4); }

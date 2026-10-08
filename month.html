@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-<meta name="viewport" content="width=1080" />
+<meta name="viewport" content="width=1080" id="hf-viewport" />
+<script>/* Phones get the agenda. The wall keeps 1080. */(function(){try{var w=Math.min(screen.width,screen.height);if(w&&w<=600){var v=document.getElementById("hf-viewport");if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -204,7 +205,7 @@
  background: rgba(255,255,255,0.55);
  border: 1px solid rgba(255,255,255,0.82);
  border-radius: 10px; padding: 5px 6px 4px;
- display: flex; flex-direction: column; gap: 3px; min-height: 0; overflow: hidden;
+ display: flex; flex-direction: column; gap: 3px; min-height: auto; overflow: visible; height: auto;
  box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 5px 14px rgba(20,22,28,0.07);
  }
  .day.out {
@@ -228,12 +229,12 @@
  .day.out .dom { color: #a0a4ac; font-weight: 500; font-size: 12px; }
  .day.today .dom, .day.load .dom { color: #1a1c20; }
  .day-tag { font-size: 8px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #3a3e46; }
- .blocks { flex: 1; display: flex; flex-direction: column; gap: 2px; min-height: 0; overflow: hidden; }
+ .blocks { flex: none; display: flex; flex-direction: column; gap: 2px; min-height: auto; overflow: visible; }
 
  .blk {
  border-radius: 5px; padding: 2px 5px; font-size: 9.5px; font-weight: 600;
  line-height: 1.18; border: 1px solid transparent; letter-spacing: -0.01em;
- white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+ white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere;
  }
  .blk.ain {
  background: linear-gradient(145deg, rgba(180,120,200,0.22), rgba(150,100,180,0.1));
@@ -339,7 +340,30 @@
  background: rgba(255,255,255,0.55); border: 1px solid rgba(40,42,48,0.12);
  }
  .mpill.on { background: #2a2c32; color: #fff; border-color: #2a2c32; }
- .month-grid { min-height: 1000px; }
+ .month-grid { min-height: 0; height: auto; }
+ .month-range, .ftr, body[data-glass*="month"] .leaveby-detail, body[data-glass*="month"] .leaveby-badge { display: none !important; }
+ @media (max-width: 700px) {
+  html, body, .panel { width: 100% !important; max-width: 100vw !important; min-width: 0 !important; height: auto !important; min-height: 100dvh !important; overflow-x: hidden !important; overflow-y: auto !important; }
+  .month-hdr, .mnav { display: flex !important; width: 100% !important; align-items: center !important; justify-content: space-between !important; gap: 8px !important; }
+  .month-title { position: static !important; flex: 1 1 auto !important; min-width: 0 !important; margin: 0 !important; font-size: 22px !important; letter-spacing: 0.12em !important; text-align: center !important; color: #f4fbff !important; }
+  .mbtn { position: static !important; flex: 0 0 44px !important; width: 44px !important; height: 44px !important; border-radius: 14px !important; border: 0 !important; color: #f4fbff !important; background: #081624 !important; box-shadow: 0 0 0 1px rgba(198,230,255,0.4), 0 0 16px rgba(120,190,255,0.28) !important; }
+  .mpills { display: flex !important; flex-wrap: wrap !important; gap: 8px !important; }
+  .mpill { border-radius: 999px !important; min-height: 36px !important; padding: 6px 14px !important; border: 0 !important; color: #f4fbff !important; background: #081624 !important; box-shadow: 0 0 0 1px rgba(198,230,255,0.4), 0 0 16px rgba(120,190,255,0.28) !important; }
+  .mpill.on { background: #102840 !important; box-shadow: 0 0 0 1px rgba(230,244,255,0.75), 0 0 18px rgba(140,200,255,0.5) !important; color: #f4fbff !important; }
+  .dow-row, .legend { display: none !important; }
+  .leaveby { display: block !important; margin: 8px 0 14px !important; padding: 14px 16px !important; background: #081624 !important; border: 0 !important; border-radius: 18px !important; box-shadow: 0 0 0 1px rgba(255,214,140,0.45), 0 0 28px rgba(240,190,90,0.32) !important; color: #f4fbff !important; }
+  .leaveby-main { text-shadow: none !important; }
+  .leaveby-main .time { display: block !important; font-size: 32px !important; color: #fff6d8 !important; background: none !important; box-shadow: none !important; text-shadow: none !important; padding: 0 !important; margin: 0 0 4px !important; }
+  .leaveby-dest { display: block !important; white-space: normal !important; overflow: visible !important; text-overflow: clip !important; color: #f4fbff !important; font-size: 16px !important; text-shadow: none !important; }
+  .month-grid { display: flex !important; flex-direction: column !important; gap: 10px !important; min-height: 0 !important; }
+  .ori-day { display: flex !important; flex-direction: column !important; gap: 4px !important; padding: 12px 14px !important; border-radius: 16px !important; background: #081624 !important; box-shadow: 0 0 0 1px rgba(198,230,255,0.35), 0 0 18px rgba(120,190,255,0.24) !important; text-decoration: none !important; color: #f4fbff !important; }
+  .ori-dom { font-size: 12px !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; color: #d7f6ff !important; }
+  .ori-ev { font-size: 16px !important; line-height: 1.35 !important; white-space: normal !important; overflow: visible !important; text-overflow: clip !important; overflow-wrap: anywhere !important; color: #f4fbff !important; }
+  .banner { white-space: normal !important; overflow: visible !important; background: transparent !important; color: #f4fbff !important; border: 0 !important; box-shadow: none !important; }
+  .month-chrome { display: flex !important; flex-direction: column !important; gap: 10px !important; margin: 0 0 12px !important; padding: 14px 12px 12px !important; border-radius: 18px !important; background: #081624 !important; box-shadow: 0 0 0 1px rgba(198,230,255,0.42), 0 0 24px rgba(120,190,255,0.28) !important; }
+  .leaveby::before { content: none !important; display: none !important; background: none !important; }
+  .leaveby-main .time { border: 0 !important; outline: none !important; background: transparent !important; background-image: none !important; box-shadow: none !important; border-radius: 0 !important; }
+ }
  .mom.dan { color: #1a4038; }
  .day-empty { font-size: 9px; color: #a0a4ac; font-weight: 500; }
  .month-grid .day .dom { color: #eef0f4 !important; font-size: 17px; }
@@ -350,6 +374,16 @@
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
 <link rel="stylesheet" href="tokens-family-clock-first-heat.css?v=FAMCLK1" />
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
+<style>
+@media (max-width: 700px) {
+  body[data-glass*="month"] .hdr { flex-wrap: wrap !important; max-width: 100% !important; }
+  body[data-glass*="month"] .hdr-spacer { display: none !important; }
+  body[data-glass*="month"] .hdr-ovals { flex: 1 1 100% !important; max-width: 100% !important; flex-wrap: wrap !important; }
+  body[data-glass*="month"] .hdr .oval { min-width: 0 !important; height: 48px !important; padding: 6px 12px !important; }
+}
+</style>
+<script>(function(){var h=document.documentElement;h.classList.add("ori-on");var veil=false;try{if(sessionStorage.getItem("ori-from")||/from=/.test(location.hash||""))veil=true;var stamp=+sessionStorage.getItem("ori-veil-next")||0;if(stamp&&Date.now()-stamp<8000){veil=true;sessionStorage.removeItem("ori-veil-next");}}catch(e){}if(veil){h.classList.add("ori-arriving");h.setAttribute("data-ori-veil","1");var s=document.createElement("style");s.textContent="html.ori-arriving::before,html.ori-held::before{content:none!important;display:none!important;background:#062018!important}";(document.head||h).appendChild(s);var el=document.createElement("div");el.className="ori-iris";el.setAttribute("data-ori-veil","1");el.style.cssText="position:fixed;inset:0;z-index:2147483647;background:#062018;opacity:1";el.style.setProperty("animation","none","important");h.appendChild(el);addEventListener("pageshow",function(){var start=0;function step(now){if(!start)start=now;var t=now-start;var op=t<160?1:Math.max(0,1-(t-160)/420);el.style.opacity=String(op);el.style.transform="translate3d(0,"+(Math.min(t,400)*0.001).toFixed(3)+"px,0)";void el.offsetWidth;if(op>0.001)requestAnimationFrame(step);else{el.remove();h.classList.remove("ori-arriving");}}requestAnimationFrame(step);});}try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
+<link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
 </head>
 <body data-glass="ovals month-today">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -607,7 +641,7 @@
  <div class="hdr-spacer" aria-hidden="true"></div>
  <div class="hdr-ovals">
  <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather" data-wired="0" hidden style="display:none"><span class="oval-ico">🌤</span><span class="oval-deg"></span></a>
- <a class="oval sensi" href="sheet-google-home.html" aria-label="Thermostat" data-wired="0" hidden style="display:none"><span class="oval-ico">⌠</span><span class="oval-deg"></span></a>
+ <a class="oval sensi" href="sheet-google-home.html" aria-label="Thermostat" data-wired="0" hidden style="display:none"><span class="oval-ico">🌡</span><span class="oval-deg"></span></a>
  </div>
  </header>
 
@@ -622,6 +656,7 @@
  </a>
 
  <section class="month-wrap">
+ <div class="month-chrome">
  <div class="month-hdr">
  <div class="mnav">
  <button class="mbtn" type="button" data-mnav="-1" aria-label="Previous month">‹</button>
@@ -632,12 +667,13 @@
  </div>
  <div class="mpills" data-month-pills></div>
  <div class="banner-row">
- <div class="banner" data-month-banner>Loading calendar…</div>
+ <div class="banner" data-month-banner>Loading calendar</div>
  <div class="legend">
  <span class="leg ain"><i></i>Ainsley</span>
  <span class="leg hay"><i></i>Hayes</span>
  <span class="leg har"><i></i>Harris</span>
  <span class="leg shr"><i></i>Shared</span>
+ </div>
  </div>
  </div>
  <div class="dow-row">
@@ -648,13 +684,18 @@
 
  <footer class="ftr">
  <div class="ftr-left">
- <span class="ftr-chip">TABLET TEST · ~2 MO · THEN WALL STATION</span>
+ <span class="ftr-chip" hidden></span>
  </div>
  </footer>
 </div>
 
-<style id="audit1-hero">/* AUDIT1 · live time chip sits in its own line box (never over the label) */
-.leaveby-main .time{display:inline-block;margin:4px 10px 4px 0 !important;}</style>
+<style id="audit1-hero">/* AUDIT1 · live time sits on its own line, with no input-style chip */
+.leaveby-main .time{display:inline-block;margin:4px 10px 4px 0 !important;}
+@media (max-width: 700px) {
+  .leaveby::before { content: none !important; display: none !important; background: none !important; }
+  .leaveby-main .time { display: block !important; margin: 0 0 4px !important; padding: 0 !important; border: 0 !important; outline: none !important; background: transparent !important; background-image: none !important; box-shadow: none !important; border-radius: 0 !important; }
+}
+</style>
 <script>
 /* MONTHS1 · month view for any month (‹ › + pills), data from data/cal-months.json */
 (function () {
@@ -669,6 +710,131 @@
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function key(y, m, d) { return y + "-" + pad(m) + "-" + pad(d); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  var LIVE = null;
+  function cleanCal(s) {
+    s = String(s || "");
+    s = s.replace(/\[[^\]]*\]/g, " ");
+    s = s.replace(/#[A-Za-z0-9_-]+/g, " ");
+    s = s.replace(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{5,}\b/g, " ");
+    s = s.replace(/\(\s*\)/g, " ");
+    return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
+  }
+  function plainWords(s) {
+    s = cleanCal(s);
+    s = s.replace(/\s*(?:→|->|➔|➜)\s*/g, " to ");
+    s = s.replace(/\bDRIVE\b/g, "drives");
+    return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
+  }
+  function chipKey(s) {
+    var t = String(s || "").toLowerCase();
+    if (t.indexOf("hayes bb") >= 0 || t.indexOf("coach should") >= 0 || t.indexOf("coach in") >= 0) return "hayes-bb";
+    if (t.indexOf("johnson") >= 0) return "johnson";
+    if (t.indexOf("kids with dan") >= 0) return "with-dan";
+    if (t.indexOf("nashville") >= 0) return "nashville";
+    return "";
+  }
+  function colorOf(label) {
+    var t = String(label || "").toLowerCase();
+    if (t.indexOf("ainsley") >= 0) return "ain";
+    if (t.indexOf("hayes") >= 0 && t.indexOf("harris") >= 0) return "shr";
+    if (t.indexOf("hayes") >= 0) return "hay";
+    if (t.indexOf("harris") >= 0) return "har";
+    if (t.indexOf("dan") >= 0) return "dan";
+    return "shr";
+  }
+  function clockMinutes(label) {
+    var m = String(label || "").match(/(\d{1,2}):(\d{2})/);
+    if (!m) return null;
+    var h = +m[1], min = +m[2];
+    if (h >= 1 && h <= 6) h += 12;
+    return h * 60 + min;
+  }
+  function isoMinutes(start) {
+    var m = /T(\d{2}):(\d{2})/.exec(start || "");
+    if (!m) return null;
+    return (+m[1]) * 60 + (+m[2]);
+  }
+  function sortMin(label, isoMin) {
+    var m = String(label || "").match(/(\d{1,2}):(\d{2})/);
+    if (!m) return isoMin == null ? null : isoMin;
+    var h = +m[1], min = +m[2];
+    var cands = [h * 60 + min, (h % 12) * 60 + min, ((h % 12) + 12) * 60 + min];
+    if (isoMin == null) return (h >= 1 && h <= 6) ? (h + 12) * 60 + min : h * 60 + min;
+    var best = cands[0], dist = 1e9;
+    cands.forEach(function (c) { var d = Math.abs(c - isoMin); if (d < dist) { dist = d; best = c; } });
+    return best;
+  }
+  function withClock(label, min) {
+    if (min == null || /\d{1,2}:\d{2}/.test(label)) return label;
+    var h = Math.floor(min / 60), m = min % 60, h12 = h % 12 || 12;
+    return label + " · " + h12 + ":" + (m < 10 ? "0" : "") + m;
+  }
+  function eventCovers(ev, iso) {
+    var start = String(ev.start || "").slice(0, 10);
+    var end = String(ev.end || "").slice(0, 10);
+    if (!start) return false;
+    if (ev.allDay) return iso >= start && (!end || iso < end);
+    if (!end || end === start) return iso === start;
+    return iso >= start && iso <= end;
+  }
+  function eventSpans(ev) {
+    var start = String(ev.start || "").slice(0, 10);
+    var end = String(ev.end || "").slice(0, 10);
+    if (ev.allDay) return true;
+    return !!(end && end > start);
+  }
+  function repeatCounts() {
+    var counts = {};
+    if (!DATA || !DATA.days) return counts;
+    Object.keys(DATA.days).forEach(function (k) {
+      (DATA.days[k].items || []).forEach(function (it) {
+        var label = plainWords(it.l);
+        if (clockMinutes(label) != null) return;
+        var key = chipKey(label) || label.toLowerCase();
+        if (!key) return;
+        counts[key] = (counts[key] || 0) + 1;
+      });
+    });
+    return counts;
+  }
+  function modelDay(iso) {
+    var chips = {}, rows = [], counts = repeatCounts();
+    var monthDay = DATA && DATA.days && DATA.days[iso];
+    ((LIVE && LIVE.upcomingLeaves) || []).forEach(function (ev) {
+      if (!eventCovers(ev, iso)) return;
+      var label = plainWords(ev.summary);
+      if (!label) return;
+      if (eventSpans(ev)) {
+        chips[chipKey(label) || label.toLowerCase()] = label;
+      } else if (String(ev.start || "").slice(0, 10) === iso) {
+        var timed = /\d{1,2}:\d{2}/.test(label);
+        rows.push({ c: colorOf(label), l: label, min: timed ? sortMin(label, isoMinutes(ev.start)) : null });
+      }
+    });
+    var inLive = !!(LIVE && LIVE.windowStart && iso >= LIVE.windowStart && iso <= (LIVE.windowEnd || LIVE.windowStart));
+    if (monthDay && (!inLive || !rows.length)) {
+      (monthDay.items || []).forEach(function (it) {
+        var label = plainWords(it.l);
+        var key = chipKey(label);
+        if (key && chips[key]) return;
+        var min = clockMinutes(label);
+        var repeatKey = key || (min == null ? label.toLowerCase() : "");
+        if (min == null && repeatKey && counts[repeatKey] > 1) {
+          if (!chips[repeatKey]) chips[repeatKey] = label;
+          return;
+        }
+        rows.push({ c: it.c || colorOf(label), l: label, min: sortMin(label, min) });
+      });
+    }
+    if (monthDay && monthDay.withDan && !chips["with-dan"]) chips["with-dan"] = "Kids with Dan";
+    rows.sort(function (a, b) {
+      if (a.min == null && b.min == null) return 0;
+      if (a.min == null) return 1;
+      if (b.min == null) return -1;
+      return a.min - b.min;
+    });
+    return { chips: Object.keys(chips).map(function (k) { return chips[k]; }), rows: rows, withDan: !!(monthDay && monthDay.withDan) };
+  }
   function months() {
     var out = [], t = ctToday();
     var s = DATA && DATA.rangeStart ? DATA.rangeStart : key(t.y, t.m, 1);
@@ -690,6 +856,9 @@
     if (run) out.push(run);
     return out.map(function (r) { return MS[m - 1] + " " + r[0] + (r[1] > r[0] ? "–" + r[1] : ""); });
   }
+  function narrow() {
+    try { return window.matchMedia && matchMedia("(max-width: 700px)").matches; } catch (e) { return false; }
+  }
   function render(y, m) {
     cur = { y: y, m: m };
     var t = ctToday();
@@ -697,18 +866,42 @@
     document.querySelector("[data-month-title]").textContent = MN[m - 1] + " " + y;
     var first = new Date(y, m - 1, 1).getDay(), dim = new Date(y, m, 0).getDate();
     var weeks = Math.ceil((first + dim) / 7);
-    grid.style.gridTemplateRows = "repeat(" + weeks + ", 1fr)";
     var html = "", start = new Date(y, m - 1, 1 - first);
-    for (var i = 0; i < weeks * 7; i++) {
-      var dd = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-      var dy = dd.getFullYear(), dm = dd.getMonth() + 1, dn = dd.getDate();
-      if (dm !== m) { html += '<div class="day out"><div class="day-top"><span class="dom">' + dn + "</span></div></div>"; continue; }
-      var k = key(dy, dm, dn), day = DATA && DATA.days[k], isToday = k === t.iso;
-      html += '<a class="day' + (isToday ? " today" : "") + '" href="sheet-today.html"><div class="day-top"><span class="dom">' + dn + "</span>" + (isToday ? '<span class="day-tag">today</span>' : "") + "</div>";
-      if (day && day.withDan) html += '<div class="mom dan">Kids with Dan</div>';
-      html += '<div class="blocks">';
-      (day ? day.items : []).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '" title="' + esc(it.l) + '">' + esc(it.l) + "</div>"; });
-      html += "</div></a>";
+    var phone = narrow();
+    var dows = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    if (phone) {
+      grid.style.display = "flex";
+      grid.style.flexDirection = "column";
+      grid.style.gridTemplateRows = "none";
+      for (var d = 1; d <= dim; d++) {
+        var k = key(y, m, d), day = DATA && DATA.days[k], isToday = k === t.iso;
+        var model = modelDay(k);
+        if (!(day && ((day.items && day.items.length) || day.withDan)) && !model.rows.length && !model.chips.length && !isToday) continue;
+        var dt = new Date(y, m - 1, d);
+        html += '<a class="ori-day' + (isToday ? " is-today" : "") + '" href="sheet-today.html">';
+        html += '<span class="ori-day-head"><span class="ori-dom">' + dows[dt.getDay()] + " " + d + "</span>";
+        model.chips.forEach(function (chip) { html += '<span class="ori-chip">' + esc(chip) + "</span>"; });
+        html += "</span>";
+        model.rows.forEach(function (it) {
+          html += '<span class="ori-ev ' + esc(it.c) + '" data-min="' + (it.min == null ? "" : it.min) + '">' + esc(it.l) + "</span>";
+        });
+        html += "</a>";
+      }
+      if (!html) html = '<p class="ori-day-empty">Nothing on the calendar this month</p>';
+    } else {
+      grid.style.display = "";
+      grid.style.gridTemplateRows = "repeat(" + weeks + ", auto)";
+      for (var i = 0; i < weeks * 7; i++) {
+        var dd = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+        var dy = dd.getFullYear(), dm = dd.getMonth() + 1, dn = dd.getDate();
+        if (dm !== m) { html += '<div class="day out"><div class="day-top"><span class="dom">' + dn + "</span></div></div>"; continue; }
+        var k2 = key(dy, dm, dn), day2 = DATA && DATA.days[k2], isToday2 = k2 === t.iso;
+        html += '<a class="day' + (isToday2 ? " today" : "") + '" href="sheet-today.html"><div class="day-top"><span class="dom">' + dn + "</span>" + (isToday2 ? '<span class="day-tag">today</span>' : "") + "</div>";
+        if (day2 && day2.withDan) html += '<div class="mom dan">Kids with Dan</div>';
+        html += '<div class="blocks">';
+        (day2 ? day2.items : []).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '">' + esc(cleanCal(it.l)) + "</div>"; });
+        html += "</div></a>";
+      }
     }
     grid.innerHTML = html;
     var sp = spans(y, m);
@@ -720,7 +913,7 @@
       return '<button type="button" class="mpill' + (x.y === y && x.m === m ? " on" : "") + '" data-ym="' + x.y + "-" + x.m + '">' + MS[x.m - 1] + (x.y !== t.y ? " " + x.y : "") + "</button>";
     }).join("");
     var r = document.querySelector("[data-month-range]");
-    r.textContent = DATA ? "calendar through " + MS[+DATA.rangeEnd.slice(5, 7) - 1] + " " + +DATA.rangeEnd.slice(8, 10) + " · empty = unknown" : "calendar unavailable · empty = unknown";
+    if (r) { r.textContent = ""; r.hidden = true; }
     if (location.hash !== "#" + y + "-" + pad(m)) history.replaceState(null, "", "#" + y + "-" + pad(m));
   }
   document.addEventListener("click", function (e) {
@@ -734,8 +927,12 @@
     return h ? { y: +h[1], m: +h[2] } : { y: t.y, m: t.m };
   }
   var s0 = initial(); render(s0.y, s0.m);
-  fetch("data/cal-months.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-    if (d && d.days) DATA = d;
+  Promise.all([
+    fetch("data/cal-months.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+    fetch("data/cal-live.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+  ]).then(function (pair) {
+    if (pair[0] && pair[0].days) DATA = pair[0];
+    if (pair[1] && pair[1].upcomingLeaves) LIVE = pair[1];
     render(cur.y, cur.m);
   }).catch(function () { render(cur.y, cur.m); });
   setInterval(function () { if (cur) render(cur.y, cur.m); }, 10 * 60 * 1000);
@@ -743,11 +940,37 @@
 </script>
 <script src="house-clock.js?v=FAMCLK1"></script>
 <script src="house-board-strip.js?v=AUDIT1"></script>
+<script>
+/* The time lives in the hero clock. Drop the repeated " · 3:00" from the title. */
+(function () {
+  function once() {
+    var dest = document.querySelector("[data-live='leaveby-main'] .leaveby-dest");
+    if (!dest) return;
+    var raw = dest.getAttribute("data-ori-raw") || dest.textContent || "";
+    if (!dest.getAttribute("data-ori-raw")) dest.setAttribute("data-ori-raw", raw);
+    var title = raw.replace(/\[[^\]]*\]/g, " ").replace(/\([^)]*\)/g, " ").replace(/#[A-Za-z0-9_-]+/g, " ").replace(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{5,}\b/g, " ");
+    var cut = title.indexOf(" · ");
+    if (cut >= 0) title = title.slice(0, cut);
+    title = title.replace(/\s+/g, " ").replace(/^[\s·—–\-|]+|[\s·—–\-|]+$/g, "").trim();
+    if (title && dest.textContent !== title) dest.textContent = title;
+    var detail = document.querySelector("[data-live='leaveby-detail']");
+    if (detail && detail.textContent) { detail.textContent = ""; detail.hidden = true; }
+  }
+  once();
+  setTimeout(once, 400);
+  setTimeout(once, 1600);
+  var hero = document.querySelector("[data-live='leaveby-main']");
+  if (hero && window.MutationObserver) new MutationObserver(once).observe(hero, { childList: true, subtree: true, characterData: true });
+})();
+</script>
 <script src="house-weather.js?v=AUDIT1"></script>
 <script src="house-sensi.js?v=SENSIAUTO1"></script>
 <script src="house-glass-bind.js?v=AUDIT1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-hdr-home.js?v=HDRHOME1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>
+<script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
+<script src="ori/ori-scene.js?v=ORIHOME18"></script>
+<script src="house-ori-world.js?v=ORIHOME18"></script>
 </body>
 </html>

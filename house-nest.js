@@ -551,7 +551,7 @@
   var HUB_CAMS = [
     {
       key: "front",
-      label: "Front door",
+      label: "Front",
       snap: "data/nest-snaps/front-door.jpg",
       match: /front|door|doorbell/i
     },
@@ -563,7 +563,7 @@
     },
     {
       key: "backyard",
-      label: "Backyard",
+      label: "Yard",
       snap: "data/nest-snaps/backyard.jpg",
       match: /backyard|yard|patio/i
     }

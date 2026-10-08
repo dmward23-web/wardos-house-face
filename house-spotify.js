@@ -225,7 +225,7 @@
     '<div class="sp-aura" aria-hidden="true"></div>' +
     '<div class="sp-art-wrap" aria-hidden="true"><div class="sp-art-ph">' + ICONS.note + '</div><img class="sp-art" alt="" decoding="async" referrerpolicy="no-referrer" hidden></div>' +
     '<div class="sp-meta">' +
-      '<div class="sp-kick"><span class="sp-brand">Music</span><span class="sp-sub">Spotify · Home audio</span><span class="sp-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="sp-pill">…</span></div>' +
+      '<div class="sp-kick"><span class="sp-brand">Music</span><span class="sp-sub">Spotify · Home audio</span><span class="sp-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="sp-pill">Wait</span></div>' +
       '<div class="sp-title">Spotify</div>' +
       '<div class="sp-artist"></div>' +
       '<div class="sp-dev"></div>' +
@@ -310,7 +310,7 @@
   function paintTile(el) {
     var ph = S.phase, p = player(), it = p && p.item, live = ph === "playing" || ph === "paused" || ph === "idle";
     el.setAttribute("data-sp-phase", ph);
-    var pill = { loading: "…", playing: "LIVE", paused: "PAUSED", idle: "READY", need_app: "CONNECT", need_auth: "CONNECT", no_key: "NEED KEY", bad_key: "NEED KEY", offline: "OFFLINE", error: "CHECK" }[ph] || "…";
+    var pill = { loading: "Wait", playing: "LIVE", paused: "PAUSED", idle: "READY", need_app: "CONNECT", need_auth: "CONNECT", no_key: "NEED KEY", bad_key: "NEED KEY", offline: "OFFLINE", error: "CHECK" }[ph] || "Wait";
     setTxt(el, ".sp-pill", pill);
     var title = "Spotify", artist = "", dev = "", showCtl = false, connectTxt = "";
     if (live && it) {
@@ -324,12 +324,13 @@
     } else if (ph === "need_app" || ph === "need_auth") {
       title = "Connect Spotify"; artist = "One tap, once · then every screen"; connectTxt = "Connect Spotify";
     } else if (ph === "no_key" || ph === "bad_key") {
-      title = "Spotify"; artist = ph === "bad_key" ? "This screen's house key didn't work" : "This screen needs the house key"; connectTxt = "Add key";
+      /* Key-less screens stay quiet: the NEED KEY pill only. No sentence, no Add key button. */
+      title = "Spotify"; artist = ""; dev = ""; connectTxt = "";
     } else if (ph === "offline") {
       title = "Spotify"; artist = "House box isn't answering"; dev = "Comes back on its own"; connectTxt = "Retry";
     } else if (ph === "error") {
       title = "Spotify"; artist = S.msg || "Spotify had a hiccup"; dev = "Tap to open the player";
-    } else { title = "Spotify"; artist = "Checking…"; }
+    } else { title = "Spotify"; artist = "Checking"; }
     setTxt(el, ".sp-title", title); setTxt(el, ".sp-artist", artist); setTxt(el, ".sp-dev", dev);
     var c = el.querySelector(".sp-ctrls"); if (c) c.hidden = !showCtl;
     var cb = el.querySelector(".sp-connect"); if (cb) { cb.hidden = !connectTxt; if (connectTxt) cb.textContent = connectTxt; }

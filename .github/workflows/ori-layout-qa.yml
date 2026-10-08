@@ -1,0 +1,42 @@
+# GATE 3 — phone and wall layout. Overlap, clip, or ellipsis fails the build.
+# house-face-qa.yml is unchanged.
+name: ori-layout-qa
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'data/**'
+      - 'kids-week.json'
+      - 'kids-data.js'
+      - '**/nest-snaps/**'
+  pull_request:
+    paths-ignore:
+      - 'data/**'
+      - 'kids-week.json'
+      - 'kids-data.js'
+      - '**/nest-snaps/**'
+
+concurrency:
+  group: ori-layout-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  gate3-ori-layout:
+    name: "GATE 3 · overlap clip ellipsis"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: browser-actions/setup-chrome@v1
+      - name: puppeteer-core
+        run: npm install --prefix /tmp/ori-qa puppeteer-core@24.43.1
+      - name: Run GATE 3
+        env:
+          NODE_PATH: /tmp/ori-qa/node_modules
+        run: node scripts/qa/gate3-ori-layout.mjs
