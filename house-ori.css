@@ -1648,11 +1648,13 @@ html.ori-phone .lights-cmd .pad-grid.pad-grid {
   width: 100% !important;
   gap: 12px !important;
 }
-html.ori-on .lights-cmd .light-pad,
-html.ori-on .lights-cmd .light-pad.is-pending,
-html.ori-on .lights-cmd .light-pad.is-need-connect {
+html.ori-on body .panel.lights-cmd article.light-pad {
   background: #081624 !important;
   background-color: #081624 !important;
+}
+html.ori-on body .panel.lights-cmd article.light-pad[data-unconnected-summary] .light-pad-src {
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
 }
 html.ori-phone .lights-cmd .light-pad.cmd-panel,
 html.ori-phone .lights-cmd .light-pad,
