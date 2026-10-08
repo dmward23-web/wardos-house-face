@@ -729,21 +729,30 @@
       }
       return best;
     }
+    function orbFade(dist, reach) {
+      if (dist >= reach) return 1;
+      var t = Math.max(0, dist) / reach;
+      var s = t * t * (3 - 2 * t);
+      return 0.04 + 0.96 * s;
+    }
     function dimOrbs(ts) {
       refreshOrbCards(ts);
-      var reach = 118;
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
       for (var i = 0; i < motes.length; i++) {
         var el = motes[i];
         var r = el.getBoundingClientRect();
         if (r.width < 2) continue;
-        var d = orbClearance(r.left + r.width * 0.5, r.top + r.height * 0.5);
-        if (d >= reach) {
+        var cx = r.left + r.width * 0.5;
+        var cy = r.top + r.height * 0.5;
+        /* Card clearance keeps the bright core off a plate. Edge clearance
+           keeps that core from being sliced into a straight line by the screen. */
+        var op = Math.min(orbFade(orbClearance(cx, cy), 118), orbFade(Math.min(cx, cy, vw - cx, vh - cy), 78));
+        if (op > 0.97) {
           if (el.style.getPropertyPriority("opacity") === "important") el.style.removeProperty("opacity");
           continue;
         }
-        var t = d / reach;
-        var s = t * t * (3 - 2 * t);
-        el.style.setProperty("opacity", (0.05 + 0.95 * s).toFixed(3), "important");
+        el.style.setProperty("opacity", op.toFixed(3), "important");
       }
     }
     var lastSpark = 0;
