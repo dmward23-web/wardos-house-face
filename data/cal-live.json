@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-08T18:13:47.441Z",
+  "fetchedAt": "2026-10-08T19:10:08.519Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-03",
   "windowEnd": "2026-10-14",
@@ -193,6 +193,24 @@
       "start": "2026-10-10T13:15:00-05:00",
       "end": "2026-10-10T13:35:00-05:00",
       "location": "Heritage Park Football Complex, Field 6 FB, 16240 Pflumm Rd, Olathe, KS 66062",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "3f32rpubnb42bdd3a6tef1190o",
+      "summary": "Harris — Lindsay appt video · 2:00",
+      "start": "2026-10-10T14:00:00-05:00",
+      "end": "2026-10-10T15:00:00-05:00",
+      "location": "Video · https://video.simplepractice.com/appt-bd73fba3e316138a6bbb112e496250e2?origin=client",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "qqsvl7r18o5gjhjb3kthjpbjac",
+      "summary": "Harris — Lindsay appt video · 2:00",
+      "start": "2026-10-10T14:00:00-05:00",
+      "end": "2026-10-10T15:00:00-05:00",
+      "location": "Video · https://video.simplepractice.com/appt-bd73fba3e316138a6bbb112e496250e2?origin=client",
       "busy": true,
       "allDay": false
     },
