@@ -746,9 +746,11 @@
         if (r.width < 2) continue;
         var cx = r.left + r.width * 0.5;
         var cy = r.top + r.height * 0.5;
-        /* Card clearance keeps the bright core off a plate. Edge clearance
-           keeps that core from being sliced into a straight line by the screen. */
-        var op = Math.min(orbFade(orbClearance(cx, cy), 118), orbFade(Math.min(cx, cy, vw - cx, vh - cy), 78));
+        /* Card clearance is from the sprite center. Screen clearance is from
+           the sprite box, because a core that crosses the viewport is cut
+           into a straight line even when its center is still inside. */
+        var edgeDist = Math.min(r.left, r.top, vw - r.right, vh - r.bottom);
+        var op = Math.min(orbFade(orbClearance(cx, cy), 118), orbFade(edgeDist, 120));
         if (op > 0.97) {
           if (el.style.getPropertyPriority("opacity") === "important") el.style.removeProperty("opacity");
           continue;
