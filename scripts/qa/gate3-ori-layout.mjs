@@ -407,8 +407,10 @@ function edgeRuns(png, label, dpr) {
 }
 
 /* Straight luminance edges in the painting, outside the dark card plates.
-   A mask or rectangle leaves an ≥80px run. Card borders themselves are dark
-   and dilated out of the scan. */
+   A mask leaves an ≥80px run at a hard jump, and those card borders are dilated
+   out. A light wash on dark trees (the waystone sheen) sits ON a dark pixel, so
+   that dilation hid a 100px edge. A second pass takes a ≥40px run at a lower
+   jump when the bright side stays a flat wash for 12px inward. */
 function seamRuns(file) {
   const py = [
     "import numpy as np",
@@ -440,6 +442,44 @@ function seamRuns(file) {
     "    for v in strong:",
     "        cur = cur + 1 if v else 0",
     "        if cur == minlen: hits.append('H y%d len>=%d' % (y, minlen))",
+    "wjump, wlen, band = 6, 40, 12",
+    "def wash(kind, idx, strong, bright):",
+    "    cur = 0",
+    "    for i, v in enumerate(strong):",
+    "        if not v:",
+    "            cur = 0",
+    "            continue",
+    "        cur += 1",
+    "        if cur != wlen: continue",
+    "        a0 = i",
+    "        while a0 > 0 and strong[a0-1]: a0 -= 1",
+    "        a1 = i",
+    "        while a1+1 < len(strong) and strong[a1+1]: a1 += 1",
+    "        slab = bright(a0, a1)",
+    "        if slab is None: break",
+    "        if kind == 'V': js = dv[a0:a1+1, idx-1]",
+    "        else: js = dh[idx-1, a0:a1+1]",
+    "        if 28 <= slab.mean() <= 80 and slab.std() <= 12 and js.std() <= 8:",
+    "            hits.append('%s %s%d len>=%d' % (kind, 'x' if kind=='V' else 'y', idx, wlen))",
+    "        break",
+    "for x in range(1, w):",
+    "    col = dv[:, x-1]",
+    "    def bright(a0, a1, x=x):",
+    "        if L[a0:a1+1, x].mean() >= L[a0:a1+1, x-1].mean():",
+    "            if x+band > w: return None",
+    "            return L[a0:a1+1, x:x+band]",
+    "        if x-band < 0: return None",
+    "        return L[a0:a1+1, x-band:x]",
+    "    wash('V', x, col >= wjump, bright)",
+    "for y in range(1, h):",
+    "    row = dh[y-1]",
+    "    def bright(a0, a1, y=y):",
+    "        if L[y, a0:a1+1].mean() >= L[y-1, a0:a1+1].mean():",
+    "            if y+band > h: return None",
+    "            return L[y:y+band, a0:a1+1]",
+    "        if y-band < 0: return None",
+    "        return L[y-band:y, a0:a1+1]",
+    "    wash('H', y, row >= wjump, bright)",
     "print(' | '.join(hits) if hits else 'clean')"
   ].join("\n");
   const res = spawnSync("python3", ["-c", py], { encoding: "utf8" });

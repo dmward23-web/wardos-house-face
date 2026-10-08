@@ -397,6 +397,11 @@ html.ori-on body .panel::after {
 }
 html.ori-on .float-orbs { display: none !important; }
 html.ori-home #tapsync-badge { display: none !important; }
+/* The amber lap is a dashboard instrument. On the overworld it reads as a gold bar on the screen edge. */
+html.ori-on body svg.led-ring {
+  display: none !important;
+  visibility: hidden !important;
+}
 
 /* Level enter: one flat colour, both ways. A photo or gradient veil does not
    match the single frame the capture paints between documents, and that frame
@@ -1266,7 +1271,12 @@ html.ori-phone.ori-home body .panel.panel.panel .hub-upper > section.leaveby::be
   width: 112px;
   height: 168px;
   display: block !important;
-  background: url("ori/plates/painted/landmark-waystone.webp?v=ORIHOME12") center / contain no-repeat;
+  /* The dashboard sheen is !important and was painting a straight light rectangle here. The sprite has to win. */
+  background: url("ori/plates/painted/landmark-waystone.webp?v=ORIHOME12") center / contain no-repeat !important;
+  background-color: transparent !important;
+  filter: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
   pointer-events: none;
   z-index: 0;
 }
@@ -1372,7 +1382,8 @@ html.ori-phone.ori-home body .panel.panel.panel .hub-upper.hub-upper--cams > sec
   width: 150px;
   height: 196px;
   display: block !important;
-  background: url("ori/plates/painted/landmark-lanterns.webp?v=ORIHOME12") center / contain no-repeat;
+  background: url("ori/plates/painted/landmark-lanterns.webp?v=ORIHOME12") center / contain no-repeat !important;
+  background-color: transparent !important;
   pointer-events: none;
   z-index: 0;
 }
