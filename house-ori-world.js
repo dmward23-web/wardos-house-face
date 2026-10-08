@@ -1,4 +1,4 @@
-/* House Face · ORIHOME8 · mount the living world and fly into a scene on every board tap.
+/* House Face · ORIHOME9 · mount the living world and fly into a scene on every board tap.
    Original code. The forest is ori/ori-scene.js (painted plates + motes). No Ori assets.
    HouseSfx owns the tap. This file adds the level-enter whoosh on the same mixer, so mute still wins.
    A key-less screen is left alone: no key modal from here. */
@@ -400,26 +400,8 @@
     cssTravel();
   }
 
-  /* Zone names on the map. Absolute, so they don't shove the live layout. */
-  if (HOME) {
-    function zone(sel, name) {
-      var el = document.querySelector(sel);
-      if (!el || el.querySelector(":scope > .ori-place")) return;
-      var p = document.createElement("div");
-      p.className = "ori-place";
-      p.setAttribute("aria-hidden", "true");
-      p.textContent = name;
-      el.appendChild(p);
-    }
-    zone("#hub-cam-deck", "Scrying pool");
-    zone(".leaveby", "Waystones");
-    zone("#hub-lights-panel", "Lantern grove");
-    zone(".who-up", "Who walks");
-    zone("#hub-spotify-strip", "Song tree");
-    var title = document.querySelector(".grid-title");
-    if (title) title.textContent = "Places";
-    if (phoneLayout) mountMap();
-  }
+  /* Phone home is the painted map. Names live as glowing text on the landmarks, not as pills. */
+  if (HOME && phoneLayout) mountMap();
 
   function mountMap() {
     var panel = document.querySelector("body > .panel");
@@ -462,15 +444,20 @@
       var pts = [];
       var pr = panel.getBoundingClientRect();
       if (pr.width < 8 || pr.height < 8) return;
-      function add(el) {
+      /* A center gutter. Landmarks stay left or right of it, so the vine does not cut the paintings. */
+      var yOff = { "header.hdr": 40, "#hub-cam-deck": 44, ".leaveby": 48, "#hub-lights-panel": 64, "#hub-spotify-strip": 58, ".who-up": 24 };
+      function add(el, off) {
         if (!el) return;
         var r = el.getBoundingClientRect();
         if (r.width < 4 || r.height < 4) return;
-        pts.push([((r.left + r.width * 0.5 - pr.left) / pr.width) * 100, ((r.top + r.height * 0.45 - pr.top) / pr.height) * 100]);
+        var ypx = r.top + (off == null ? 22 : off) - pr.top;
+        var wob = (pts.length % 2 ? 1.2 : -1.2);
+        pts.push([50 + wob, (ypx / pr.height) * 100]);
       }
-      for (var s = 0; s < sels.length; s++) add(document.querySelector(sels[s]));
+      for (var s = 0; s < sels.length; s++) add(document.querySelector(sels[s]), yOff[sels[s]]);
       var tiles = document.querySelectorAll(".tile-grid > .tile");
-      for (var n = 0; n < tiles.length; n++) add(tiles[n]);
+      for (var n = 0; n < tiles.length; n++) add(tiles[n], 22);
+      pts.sort(function (a, b) { return a[1] - b[1]; });
       if (pts.length < 2) return;
       var d = "M " + pts[0][0].toFixed(2) + " " + pts[0][1].toFixed(2);
       for (var k = 1; k < pts.length; k++) {
