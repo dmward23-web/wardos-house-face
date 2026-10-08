@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-<meta name="viewport" content="width=1080" />
+<meta name="viewport" content="width=1080" id="hf-viewport" />
+<script>/* Phones scroll one column. The wall keeps 1080. */(function(){try{var w=Math.min(screen.width,screen.height);if(w&&w<=600){var v=document.getElementById("hf-viewport");if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon-20260926c.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -87,9 +88,57 @@
     font-size:13px;font-weight:650;color:var(--cmd-mute);flex-shrink:0}
   .ftr{display:flex;justify-content:space-between;font-size:12px;color:#5a5e66;font-weight:600;align-items:center;gap:8px;flex-wrap:wrap}
   .ftr-chip{padding:8px 12px;min-height:44px;display:inline-flex;align-items:center;border-radius:8px;border:2px solid #2a2e36;background:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;color:inherit}
+  @media (max-width: 700px) {
+    html, body, .panel { width: 100% !important; max-width: 100vw !important; min-width: 0 !important; height: auto !important; min-height: 100dvh !important; overflow-x: hidden !important; overflow-y: auto !important; }
+    .panel { padding: 16px 16px 96px !important; }
+    .pad-grid { grid-template-columns: 1fr !important; width: 100% !important; }
+    .light-pad { display: grid !important; grid-template-areas: "top" "actions" "src" !important; gap: 8px !important; position: relative !important; overflow: visible !important; height: auto !important; background: #081624 !important; border: 0 !important; border-radius: 18px !important; color: #f4fbff !important; box-shadow: 0 0 0 1px rgba(198,230,255,0.38), 0 0 20px rgba(120,190,255,0.26) !important; }
+    .light-pad-top { grid-area: top; position: static !important; }
+    .light-pad-actions { grid-area: actions; position: static !important; display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 10px !important; width: 100% !important; }
+    .light-pad-src { grid-area: src; position: static !important; }
+    .light-pad-state { position: static !important; margin-left: auto !important; }
+    .light-pad-name, .light-pad-where, .banner-title, .cmd-title { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; }
+    .light-pad.is-pending .light-pad-actions, .light-pad.is-need-connect .light-pad-actions,
+    .light-pad.is-pending .light-pad-state, .light-pad.is-need-connect .light-pad-state { display: none !important; }
+    .light-pad.is-pending .light-pad-src, .light-pad.is-need-connect .light-pad-src { color: rgba(210,224,236,0.78) !important; font-size: 15px !important; }
+    .cmd-rocker { position: relative !important; width: 64px !important; min-width: 64px !important; max-width: 64px !important; height: 32px !important; border: 0 !important; border-radius: 999px !important; background: rgba(255,255,255,0.14) !important; box-shadow: inset 0 0 0 1px rgba(198,230,255,0.4) !important; }
+    .cmd-rocker.is-on { background: rgba(255,214,120,0.9) !important; }
+    .cmd-rocker-knob { position: absolute !important; top: 3px !important; left: 3px !important; width: 26px !important; height: 26px !important; border-radius: 50% !important; background: #f7fbff !important; }
+    .cmd-rocker.is-on .cmd-rocker-knob { left: auto !important; right: 3px !important; }
+    .light-bright { width: 100% !important; min-width: 0 !important; height: 28px !important; margin: 0 !important; accent-color: #ffd78a; }
+    .banner.cmd-panel, .bulk.cmd-panel { background: #081624 !important; border: 0 !important; border-radius: 18px !important; color: #f4fbff !important; }
+  }
 </style>
 <link rel="stylesheet" href="tokens-sheet-clock-first-heat.css?v=SHEETCLK1" />
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
+<style>
+@media (max-width: 700px) {
+  html body .lights-cmd .pad-grid { display: grid !important; grid-template-columns: 1fr !important; width: 100% !important; }
+  html body .lights-cmd .light-pad.cmd-panel,
+  html body .lights-cmd .light-pad {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-areas: "top" "actions" "src" !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  html body .lights-cmd .light-pad-top { grid-area: top !important; width: 100% !important; position: static !important; }
+  html body .lights-cmd .light-pad-actions { grid-area: actions !important; width: 100% !important; position: static !important; display: flex !important; flex-direction: column !important; align-items: stretch !important; }
+  html body .lights-cmd .light-pad-src { grid-area: src !important; position: static !important; width: auto !important; justify-self: start !important; }
+  html body .lights-cmd .light-pad.is-pending .light-pad-actions,
+  html body .lights-cmd .light-pad.is-need-connect .light-pad-actions,
+  html body .lights-cmd .light-pad.is-pending .light-pad-state,
+  html body .lights-cmd .light-pad.is-need-connect .light-pad-state { display: none !important; }
+  html body .lights-cmd .cmd-rocker { width: 64px !important; min-width: 64px !important; max-width: 64px !important; height: 32px !important; min-height: 32px !important; max-height: 32px !important; border: 0 !important; border-radius: 999px !important; background: rgba(255,255,255,0.14) !important; box-shadow: inset 0 0 0 1px rgba(198,230,255,0.45) !important; }
+  html body .lights-cmd .cmd-rocker.is-on { background: rgba(255,214,120,0.92) !important; }
+  html body .lights-cmd .cmd-rocker-knob { width: 26px !important; height: 26px !important; min-width: 26px !important; flex-basis: 26px !important; border-radius: 50% !important; background: #f7fbff !important; }
+  html body .lights-cmd .light-bright { width: 100% !important; min-width: 0 !important; height: 22px !important; accent-color: #ffd78a; }
+  html body .lights-cmd .light-bright::-webkit-slider-runnable-track { height: 6px; background: rgba(198,230,255,0.35); border-radius: 999px; }
+  html body .lights-cmd .light-bright::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; margin-top: -8px; border-radius: 50%; background: #ffe6b0; box-shadow: 0 0 12px rgba(255,214,140,0.8); }
+}
+</style>
 </head>
 <body>
 <div class="panel lights-cmd">
@@ -153,7 +202,7 @@
 <script src="house-clock.js?v=SHEETCLK1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=HUM1"></script>
-<script src="house-lights.js?v=AUDIT1"></script>
+<script src="house-lights.js?v=LIGHTROW1"></script>
 <script>
 (function () {
   var L = window.HouseLights;

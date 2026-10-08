@@ -1,4 +1,4 @@
-/* House Face · ORIHOME10 · mount the living world and fly into a scene on every board tap.
+/* House Face · ORIHOME11 · mount the living world and fly into a scene on every board tap.
    Original code. The forest is ori/ori-scene.js (painted plates + motes). No Ori assets.
    HouseSfx owns the tap. This file adds the level-enter whoosh on the same mixer, so mute still wins.
    A key-less screen is left alone: no key modal from here. */
@@ -443,8 +443,8 @@
         if (r.width < 4 || r.height < 4) return;
         var ypx = r.top - pr.top + (off == null ? 40 : off);
         var onLeft = (r.left + r.width * 0.5) < (pr.left + pr.width * 0.5);
-        var xpx = (onLeft ? 0.28 : 0.72) * w + Math.sin(pts.length * 1.7) * w * 0.05;
-        xpx = Math.max(36, Math.min(w - 36, xpx));
+        var xpx = w * (onLeft ? 0.47 : 0.53);
+        xpx = Math.max(w * 0.42, Math.min(w * 0.58, xpx));
         pts.push([xpx, ypx]);
       }
       for (var s = 0; s < sels.length; s++) add(document.querySelector(sels[s]), yOff[sels[s]]);
@@ -475,9 +475,18 @@
         ctx.stroke();
         ctx.restore();
       }
-      stroke(96, "rgba(90, 170, 230, 0.10)", 54);
-      stroke(46, "rgba(150, 210, 255, 0.13)", 32);
-      stroke(22, "rgba(214, 242, 255, 0.08)", 18);
+      stroke(40, "rgba(90, 170, 230, 0.14)", 22);
+      stroke(18, "rgba(170, 220, 255, 0.16)", 12);
+      /* Keep the glow out of the words. Plates sit on top; this clears the trail under them. */
+      var cover = document.querySelectorAll(".tile-label, .hub-cam-label, .leaveby-main, .hub-lights-title, .hub-lights-pill, .sp-brand, .sp-sub, .sp-pill, .who-up-kicker, .who-up-name, .who-up-go, .who-up-meta, .hdr-date-time, .id-text");
+      ctx.save();
+      ctx.globalCompositeOperation = "destination-out";
+      for (var c = 0; c < cover.length; c++) {
+        var er = cover[c].getBoundingClientRect();
+        if (er.width < 2 || er.height < 2) continue;
+        ctx.fillRect(er.left - pr.left - 10, er.top - pr.top - 8, er.width + 20, er.height + 16);
+      }
+      ctx.restore();
     }
     window.addEventListener("resize", redrawPath);
     setTimeout(redrawPath, 80);
@@ -717,6 +726,12 @@
     var gone = false;
     function go() { if (gone) return; gone = true; location.href = url; }
     if (REDUCED) { go(); return; }
+    try {
+      var pre = document.createElement("link");
+      pre.rel = "prefetch";
+      pre.href = href.split("#")[0];
+      document.head.appendChild(pre);
+    } catch (ePre) {}
     document.documentElement.classList.add("ori-diving");
     var iris = document.createElement("div");
     iris.className = "ori-iris";
@@ -785,6 +800,67 @@
     document.documentElement.classList.remove("ori-diving");
     if (ev.persisted && world) { world.trans = null; try { world.kick(true); } catch (e) {} }
   });
+
+  function mountMonthAgenda() {
+    if (PAGE !== "month.html") return;
+    var narrow = phoneLayout;
+    try { if (window.matchMedia && matchMedia("(max-width: 700px)").matches) narrow = true; } catch (e) {}
+    if (!narrow) return;
+    var grid = document.querySelector(".month-grid");
+    if (!grid) return;
+    var range = document.querySelector("[data-month-range]");
+    if (range) { range.textContent = ""; range.hidden = true; }
+    var foot = document.querySelector(".ftr");
+    if (foot) foot.hidden = true;
+    var dows = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    function build() {
+      var days = grid.querySelectorAll(":scope > .day");
+      if (!days.length) return;
+      var y = +(grid.getAttribute("data-year") || 0);
+      var m = +(grid.getAttribute("data-month") || 0);
+      var html = "";
+      for (var i = 0; i < days.length; i++) {
+        var day = days[i];
+        if (day.classList.contains("out")) continue;
+        var dom = day.querySelector(".dom");
+        var n = dom ? parseInt(dom.textContent, 10) : 0;
+        if (!n) continue;
+        var blks = day.querySelectorAll(".blk");
+        var mom = day.querySelector(".mom");
+        if (!blks.length && !mom && !day.classList.contains("today")) continue;
+        var dt = new Date(y, m - 1, n);
+        html += '<a class="ori-day' + (day.classList.contains("today") ? " is-today" : "") + '" href="sheet-today.html">';
+        html += '<span class="ori-dom">' + dows[dt.getDay()] + " " + n + "</span>";
+        if (mom) html += '<span class="ori-ev dan">' + mom.textContent.replace(/</g, "") + "</span>";
+        for (var b = 0; b < blks.length; b++) {
+          var title = blks[b].getAttribute("title") || blks[b].textContent || "";
+          var tone = (blks[b].className || "").replace(/\bblk\b/, "").trim();
+          html += '<span class="ori-ev ' + tone + '">' + String(title).replace(/</g, "") + "</span>";
+        }
+        html += "</a>";
+      }
+      grid.innerHTML = html || '<p class="ori-day-empty">Nothing on the calendar this month</p>';
+    }
+    build();
+    if (window.MutationObserver) new MutationObserver(function () { build(); }).observe(grid, { childList: true });
+    function once() {
+      var detail = document.querySelector("[data-live='leaveby-detail']");
+      if (detail) { detail.hidden = true; detail.textContent = ""; }
+      var dest = document.querySelector("[data-live='leaveby-main'] .leaveby-dest");
+      if (!dest) return;
+      var raw = dest.getAttribute("data-ori-raw") || dest.textContent;
+      if (!dest.getAttribute("data-ori-raw")) dest.setAttribute("data-ori-raw", raw);
+      var cut = raw.indexOf(" · ");
+      var title = (cut >= 0 ? raw.slice(0, cut) : raw).replace(/\s+/g, " ").trim();
+      if (title && dest.textContent !== title) dest.textContent = title;
+    }
+    once();
+    setTimeout(once, 400);
+    setTimeout(once, 1600);
+    var hero = document.querySelector("[data-live='leaveby-main']");
+    if (hero && window.MutationObserver) new MutationObserver(function () { once(); }).observe(hero, { childList: true, subtree: true });
+  }
+  mountMonthAgenda();
 
   window.HouseOri = {
     booted: true,

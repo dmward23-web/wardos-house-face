@@ -838,7 +838,7 @@
     if (canWrite()) return "LIVE";
     if (noKey(g)) return "NEED KEY";
     if (g.live && g.writeSupported && _proxyReachable === false) return "LIVE · PROXY OFF";
-    if (g.live && g.writeSupported) return "LIVE · PROXY…";
+    if (g.live && g.writeSupported) return "LIVE · PROXY";
     if (g.live) return "LIVE · READ ONLY";
     if (g.needToken) return "NEED TOKEN";
     return g.label || "OFFLINE";
@@ -1000,7 +1000,7 @@
       if (_dimDrag && _dimDrag.id === L.id && typeof _dimDrag.bright === "number") {
         bright = clampBright(_dimDrag.bright);
       }
-      var meta = L.on == null ? "…" : (L.on ? "ON" : "OFF");
+      var meta = L.on == null ? "Wait" : (L.on ? "ON" : "OFF");
       var writable = canWrite() && !L.disabled;
       var dimCls = dim ? " hub-sw--dim" : " hub-sw--toggle";
       html +=
