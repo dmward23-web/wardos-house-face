@@ -736,6 +736,7 @@
       return 0.04 + 0.96 * s;
     }
     function dimOrbs(ts) {
+      if (document.querySelector(".ori-iris, .ori-arrive")) return;
       refreshOrbCards(ts);
       var vw = window.innerWidth;
       var vh = window.innerHeight;
@@ -756,11 +757,29 @@
       }
     }
     var lastSpark = 0;
+    var pathSig = "";
+    var pathSigAt = 0;
+    function followPath(ts) {
+      if (document.querySelector(".ori-iris, .ori-arrive")) return;
+      if (pathSigAt && ts - pathSigAt < 360) return;
+      pathSigAt = ts;
+      var bits = [];
+      var nodes = document.querySelectorAll("header.hdr, #hub-cam-deck, .leaveby, #hub-lights-panel, #hub-spotify-strip, .who-up, .tile-grid > .tile");
+      for (var i = 0; i < nodes.length; i++) {
+        var r = nodes[i].getBoundingClientRect();
+        bits.push((r.left | 0) + "," + (r.top | 0) + "," + (r.width | 0) + "," + (r.height | 0));
+      }
+      var sig = bits.join(";");
+      if (sig === pathSig) return;
+      pathSig = sig;
+      redrawPath();
+    }
     function lifeLoop(ts) {
       if (!lastSpark || ts - lastSpark > 48) {
         lastSpark = ts;
         paintPath(ts);
         dimOrbs(ts);
+        followPath(ts);
       }
       requestAnimationFrame(lifeLoop);
     }
