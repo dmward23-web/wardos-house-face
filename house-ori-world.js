@@ -778,7 +778,7 @@
     function lifeLoop(ts) {
       if (!lastSpark || ts - lastSpark > 48) {
         lastSpark = ts;
-        paintPath(ts);
+        if (!document.querySelector(".ori-iris, .ori-arrive")) paintPath(ts);
         dimOrbs(ts);
         followPath(ts);
       }
@@ -1080,7 +1080,7 @@
       try { world.camPush(1.26, 0.6, x / Math.max(1, innerWidth), y / Math.max(1, innerHeight), 0.25); } catch (e) {}
       try { world.exit({ to: [x, y], dur: 0.6 }).then(go); } catch (e) {}
     }
-    fadeCover(iris, 0, 1, 420, go);
+    fadeCover(iris, 0, 1, 540, go);
     setTimeout(go, 800);
   }
 
@@ -1201,7 +1201,7 @@
       void iris.offsetWidth;
       /* Step the fade on painted frames, then load home fresh so the next
          document's first frame is the same veil. */
-      fadeCover(iris, 0, 1, 420, function () {
+      fadeCover(iris, 0, 1, 540, function () {
         try { location.replace("sheet-index.html"); }
         catch (e) { location.href = "sheet-index.html"; }
       });
