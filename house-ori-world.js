@@ -429,13 +429,129 @@
     spirit.setAttribute("aria-hidden", "true");
     spirit.innerHTML = "<i></i><b></b>";
     document.body.appendChild(spirit);
-    function placeSpirit(x, y, instant) {
-      if (instant) spirit.classList.add("ori-spirit-snap");
-      spirit.style.left = Math.round(x) + "px";
-      spirit.style.top = Math.round(y) + "px";
-      if (instant) requestAnimationFrame(function () { spirit.classList.remove("ori-spirit-snap"); });
+    var spiritXY = [36, 36];
+    var spiritToken = 0;
+    var spiritHeld = false;
+    var SPIRIT_R = 36;
+    function cardBoxes() {
+      var out = [];
+      document.querySelectorAll("header.hdr .hdr-date, header.hdr .hdr-ovals, header.hdr .wx-card, #hub-cam-deck, .leaveby, #hub-lights-panel, #hub-spotify-strip, .who-up, .tile-grid > .tile, .ori-peek.is-open").forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        if (r.width < 12 || r.height < 12 || r.bottom < 0 || r.top > innerHeight) return;
+        out.push(r);
+      });
+      return out;
     }
-    placeSpirit(innerWidth * 0.62, 72, true);
+    function spiritHits(x, y, boxes) {
+      for (var i = 0; i < boxes.length; i++) {
+        var b = boxes[i];
+        if (x > b.left - SPIRIT_R && x < b.right + SPIRIT_R && y > b.top - SPIRIT_R && y < b.bottom + SPIRIT_R) return true;
+      }
+      return false;
+    }
+    function clampSpirit(x, y) {
+      var m = SPIRIT_R;
+      return [Math.max(m, Math.min(innerWidth - m, x)), Math.max(m, Math.min(innerHeight - m, y))];
+    }
+    function parkSpirit(x, y) {
+      var boxes = cardBoxes();
+      var c = clampSpirit(x, y);
+      x = c[0];
+      y = c[1];
+      if (!spiritHits(x, y, boxes)) return [x, y];
+      for (var rad = 18; rad <= 340; rad += 16) {
+        for (var k = 0; k < 18; k++) {
+          var ang = (k / 18) * Math.PI * 2;
+          var n = clampSpirit(x + Math.cos(ang) * rad, y + Math.sin(ang) * rad);
+          if (!spiritHits(n[0], n[1], boxes)) return n;
+        }
+      }
+      return clampSpirit(innerWidth * 0.18, innerHeight * 0.5);
+    }
+    function segmentClear(x0, y0, x1, y1, boxes) {
+      var dist = Math.hypot(x1 - x0, y1 - y0);
+      var n = Math.max(1, Math.ceil(dist / 8));
+      for (var i = 1; i < n; i++) {
+        var t = i / n;
+        if (spiritHits(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, boxes)) return false;
+      }
+      return true;
+    }
+    function routeSpirit(x0, y0, x1, y1) {
+      var boxes = cardBoxes();
+      var pts = [[x0, y0]];
+      var x = x0, y = y0, guard = 0;
+      while (Math.hypot(x1 - x, y1 - y) > 12 && guard < 70) {
+        guard++;
+        var dx = x1 - x, dy = y1 - y, dist = Math.hypot(dx, dy) || 1;
+        var step = Math.min(16, dist);
+        var nx = x + dx / dist * step, ny = y + dy / dist * step;
+        if (!spiritHits(nx, ny, boxes)) { x = nx; y = ny; pts.push([x, y]); continue; }
+        var slid = false;
+        for (var dir = -1; dir <= 1; dir += 2) {
+          var s = clampSpirit(x + (-dy / dist) * 28 * dir, y + (dx / dist) * 28 * dir);
+          if (!spiritHits(s[0], s[1], boxes)) { x = s[0]; y = s[1]; pts.push([x, y]); slid = true; break; }
+        }
+        if (!slid) { var p = parkSpirit(nx, ny); x = p[0]; y = p[1]; pts.push([x, y]); }
+      }
+      pts.push(parkSpirit(x1, y1));
+      return pts;
+    }
+    function idleSpiritPoint() {
+      var hdr = document.querySelector("header.hdr");
+      var y = hdr ? hdr.getBoundingClientRect().bottom + 52 : 168;
+      return [innerWidth * 0.16, y];
+    }
+    function placeSpirit(x, y, instant) {
+      var dest = parkSpirit(x, y);
+      x = dest[0];
+      y = dest[1];
+      var token = ++spiritToken;
+      spirit.classList.add("ori-spirit-snap");
+      if (instant || Math.hypot(x - spiritXY[0], y - spiritXY[1]) < 3) {
+        spirit.style.left = Math.round(x) + "px";
+        spirit.style.top = Math.round(y) + "px";
+        spiritXY = [x, y];
+        requestAnimationFrame(function () { if (token === spiritToken) spirit.classList.remove("ori-spirit-snap"); });
+        return;
+      }
+      var pts = routeSpirit(spiritXY[0], spiritXY[1], x, y);
+      var lens = [];
+      var total = 0;
+      for (var i = 1; i < pts.length; i++) {
+        var len = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+        lens.push(len);
+        total += len;
+      }
+      var start = 0;
+      function step(now) {
+        if (token !== spiritToken) return;
+        if (!start) start = now;
+        var u = Math.min(1, (now - start) / 700);
+        var eased = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+        var dist = eased * Math.max(total, 1);
+        var acc = 0, px = pts[0][0], py = pts[0][1];
+        for (var s = 0; s < lens.length; s++) {
+          if (acc + lens[s] >= dist || s === lens.length - 1) {
+            var f = lens[s] ? Math.max(0, Math.min(1, (dist - acc) / lens[s])) : 1;
+            px = pts[s][0] + (pts[s + 1][0] - pts[s][0]) * f;
+            py = pts[s][1] + (pts[s + 1][1] - pts[s][1]) * f;
+            break;
+          }
+          acc += lens[s];
+        }
+        spirit.style.left = Math.round(px) + "px";
+        spirit.style.top = Math.round(py) + "px";
+        spiritXY = [px, py];
+        if (u < 1) requestAnimationFrame(step);
+        else spirit.classList.remove("ori-spirit-snap");
+      }
+      requestAnimationFrame(step);
+    }
+    (function sit() {
+      var p = idleSpiritPoint();
+      placeSpirit(p[0], p[1], true);
+    })();
     var pathPts = [];
     var pathBlocks = [];
     function catmull(p0, p1, p2, p3, t) {
@@ -591,6 +707,35 @@
     }
     life.innerHTML = moteHtml;
     document.body.insertBefore(life, document.body.firstChild);
+    /* Bright mote cores stay out of the clock and weather plates so those edges stay crisp. */
+    function maskOrbs() {
+      if (!life.isConnected) return;
+      var nodes = document.querySelectorAll("header.hdr .hdr-date, header.hdr .hdr-ovals");
+      if (!nodes.length) return;
+      var lr = life.getBoundingClientRect();
+      var pad = 56;
+      var d = ["M0,0H", life.offsetWidth, "V", life.offsetHeight, "H0Z"];
+      nodes.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        if (r.width < 8 || r.height < 8) return;
+        var x = Math.round(r.left - lr.left - pad);
+        var y = Math.round(r.top - lr.top - pad);
+        var w = Math.round(r.width + pad * 2);
+        var h = Math.round(r.height + pad * 2);
+        d.push("M", x, ",", y, "h", w, "v", h, "h", -w, "Z");
+      });
+      var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='" + life.offsetWidth + "' height='" + life.offsetHeight + "'><path fill='white' fill-rule='evenodd' d='" + d.join("") + "'/></svg>";
+      var url = "url(\"data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg) + "\")";
+      life.style.webkitMaskImage = url;
+      life.style.maskImage = url;
+      life.style.webkitMaskRepeat = "no-repeat";
+      life.style.maskRepeat = "no-repeat";
+      life.style.webkitMaskSize = "100% 100%";
+      life.style.maskSize = "100% 100%";
+    }
+    maskOrbs();
+    window.addEventListener("resize", maskOrbs);
+    [300, 900, 1800].forEach(function (ms) { setTimeout(maskOrbs, ms); });
     var lastSpark = 0;
     function lifeLoop(ts) {
       if (!lastSpark || ts - lastSpark > 48) { lastSpark = ts; paintPath(ts); }
@@ -736,6 +881,7 @@
       new MutationObserver(function () { tidyHero(); }).observe(leaveHost, { childList: true, subtree: true });
     }
     document.addEventListener("pointerdown", function (ev) {
+      spiritHeld = true;
       var t = ev.target && ev.target.closest ? ev.target.closest("a, button, .tile, .hub-cam, .leaveby, #hub-lights-panel, .sp-tile, .who-up, header.hdr") : null;
       var x = ev.clientX, y = ev.clientY;
       if (t && t.getBoundingClientRect) {
@@ -745,6 +891,9 @@
       }
       placeSpirit(x, y, false);
     }, true);
+    [400, 1200].forEach(function (ms) {
+      setTimeout(function () { if (!spiritHeld) { var p = idleSpiritPoint(); placeSpirit(p[0], p[1], true); } }, ms);
+    });
     window.HouseOri = window.HouseOri || {};
     window.__oriSpirit = placeSpirit;
   }

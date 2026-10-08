@@ -89,7 +89,8 @@
   function setBadge(ok) {
     document.documentElement.setAttribute("data-tapsync", ok ? "on" : "local");
     var b = document.getElementById("tapsync-badge");
-    if (ok) { if (b) b.remove(); return; }
+    /* The home map is a scene, not a debug screen. Phone and wall both. */
+    if (ok || document.documentElement.classList.contains("ori-home")) { if (b) b.remove(); return; }
     if (!document.body) return;
     if (!b) {
       b = document.createElement("div"); b.id = "tapsync-badge";

@@ -396,6 +396,7 @@ html.ori-on body .panel::after {
   opacity: 0 !important;
 }
 html.ori-on .float-orbs { display: none !important; }
+html.ori-home #tapsync-badge { display: none !important; }
 
 /* Level enter: one flat colour, both ways. A photo or gradient veil does not
    match the single frame the capture paints between documents, and that frame
