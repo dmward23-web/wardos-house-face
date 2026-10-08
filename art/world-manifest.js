@@ -62,10 +62,18 @@
         layer("fg", 0.86, "art/forest/fg.png", { blur: 3 })
       ],
       stamp: "art/forest/island.png",
-      stamps: FOREST_ISLAND,
+      stamps: [],
       rays: "art/forest/rays.jpg",
       ground: ["art/forest/near.png", "art/forest/fg.png"],
-      landmarks: LEDGES
+      landmarks: [
+        { x: 0.22, y: 0.30, depth: 0.20, scale: 0.72, kind: "slab" },
+        { x: 0.74, y: 0.28, depth: 0.16, scale: 0.68, kind: "crystal" },
+        { x: 0.42, y: 0.40, depth: 0.34, scale: 0.82, kind: "cluster" },
+        { x: 0.80, y: 0.48, depth: 0.42, scale: 0.86, kind: "geode" },
+        { x: 0.18, y: 0.52, depth: 0.50, scale: 0.90, kind: "block" },
+        { x: 0.56, y: 0.58, depth: 0.60, scale: 0.94, kind: "shard" },
+        { x: 0.34, y: 0.66, depth: 0.72, scale: 1.00, kind: "node" }
+      ]
     },
     ainsley: {
       grade: "dusk",
@@ -77,10 +85,18 @@
         layer("fg", 0.84, "art/forest/fg.png", { blur: 4 })
       ],
       stamp: "art/forest/island.png",
-      stamps: FOREST_ISLAND,
+      stamps: [],
       rays: "art/forest/rays.jpg",
       ground: ["art/forest/near.png", "art/forest/fg.png"],
-      landmarks: LEDGES
+      landmarks: [
+        { x: 0.18, y: 0.36, depth: 0.16, scale: 0.70, kind: "water" },
+        { x: 0.78, y: 0.34, depth: 0.18, scale: 0.68, kind: "water" },
+        { x: 0.46, y: 0.44, depth: 0.30, scale: 0.78, kind: "water" },
+        { x: 0.20, y: 0.56, depth: 0.55, scale: 0.90, kind: "dock" },
+        { x: 0.48, y: 0.60, depth: 0.62, scale: 0.94, kind: "dock" },
+        { x: 0.76, y: 0.58, depth: 0.58, scale: 0.92, kind: "dock" },
+        { x: 0.36, y: 0.68, depth: 0.74, scale: 1.00, kind: "dock" }
+      ]
     },
     mercury: {
       grade: "grove",

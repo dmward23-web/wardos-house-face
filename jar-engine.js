@@ -129,75 +129,60 @@
     "uniform vec2 uRes;uniform float uTime;uniform float uFill;uniform float uEnergy;",
     "uniform float uPoke;uniform vec2 uLook;uniform vec3 uMetal;uniform float uAsleep;",
     "uniform sampler2D uEnv;",
-    "float ball(vec2 p,vec2 c,float r){vec2 d=p-c;return (r*r)/max(dot(d,d),0.00035);}",
+    "float sdEll(vec2 p,vec2 r){return (length(p/r)-1.0)*min(r.x,r.y);}",
+    "float smin(float a,float b,float k){float h=max(k-abs(a-b),0.0)/k;return min(a,b)-h*h*k*0.25;}",
     "float field(vec2 q){",
-    "  float t=uTime*(uAsleep>0.5?0.32:1.0);",
-    "  float grow=0.42+uFill*0.12+uEnergy*0.04;",
-    "  vec2 hip=vec2(sin(t*1.15)*0.045,-0.16+sin(t*1.55)*0.03);",
-    "  vec2 chest=vec2(sin(t*1.35)*0.035,0.05+sin(t*1.8)*0.028);",
-    "  vec2 head=vec2(sin(t*1.1)*0.025,0.30+sin(t*1.45)*0.02);",
-    "  float f=ball(q,hip,grow)+ball(q,chest,grow*0.82)+ball(q,head,grow*0.58);",
-    "  f+=ball(q,vec2(-0.18+sin(t*0.9)*0.03,-0.02),0.13);",
-    "  f+=ball(q,vec2(0.18+cos(t*0.85)*0.03,-0.06),0.12);",
-    "  float y0=mod(t*0.28,1.2)-0.82;",
-    "  float y1=mod(t*0.33+0.45,1.2)-0.82;",
-    "  float y2=mod(t*0.24+0.9,1.2)-0.82;",
-    "  f+=ball(q,vec2(sin(t*1.4)*0.2,min(y0,0.22)),0.055+uEnergy*0.012);",
-    "  f+=ball(q,vec2(sin(t*1.15+2.1)*0.18,min(y1,0.26)),0.046);",
-    "  f+=ball(q,vec2(cos(t*1.5+1.2)*0.16,min(y2,0.16)),0.04);",
-    "  f+=ball(q,vec2(uLook.x*0.06,0.12+uPoke*0.18),0.04+uPoke*0.12);",
-    "  return f;",
+    "  float t=uTime*(uAsleep>0.5?0.35:1.0);",
+    "  float breathe=1.0+sin(t*1.15)*0.028;",
+    "  float d=sdEll(q-vec2(0.0,-0.04),vec2(0.42,0.50)*breathe);",
+    "  d=smin(d,sdEll(q-vec2(sin(t*0.7)*0.012,0.30),vec2(0.22,0.20)),0.16);",
+    "  vec2 boil=vec2(sin(t*1.35)*0.14,cos(t*0.9)*0.08-0.06);",
+    "  d=smin(d,length(q-boil)-(0.055+uEnergy*0.012),0.11);",
+    "  vec2 drop=vec2(sin(t)*0.04,mix(0.78,0.18,clamp(uPoke,0.0,1.0)));",
+    "  d=smin(d,length(q-drop)-mix(0.02,0.11,clamp(uPoke,0.0,1.0)),0.02+0.14*clamp(uPoke,0.0,1.0));",
+    "  return d;",
     "}",
     "void main(){",
     "  vec2 q=(gl_FragCoord.xy/uRes)*2.0-1.0;",
     "  q.x*=uRes.x/max(uRes.y,1.0);",
     "  q.y=-q.y;",
-    "  q.x/=1.0+uPoke*0.16;",
-    "  q.y*=1.0-uPoke*0.2;",
-    "  q*=0.76;",
-    "  float f=field(q);",
-    "  if(f<0.80) discard;",
-    "  vec2 e=vec2(0.007,0.0);",
-    "  float fx=field(q+e.xy)-field(q-e.xy);",
-    "  float fy=field(q+e.yx)-field(q-e.yx);",
-    "  vec3 N=normalize(vec3(-fx,-fy,0.42));",
-    "  vec2 uv=clamp(vec2(0.5+N.x*0.55,0.62+N.y*0.28),0.0,1.0);",
+    "  q*=0.82;",
+    "  float d=field(q);",
+    "  if(d>0.012) discard;",
+    "  vec2 e=vec2(0.004,0.0);",
+    "  float dx=field(q+e.xy)-field(q-e.xy);",
+    "  float dy=field(q+e.yx)-field(q-e.yx);",
+    "  vec3 N=normalize(vec3(dx,dy,0.055));",
+    "  vec3 V=vec3(0.0,0.0,1.0);",
+    "  vec3 R=reflect(vec3(-N.xy,0.15),N);",
+    "  vec2 uv=clamp(0.5+R.xy*vec2(0.48,0.36),0.0,1.0);",
     "  vec3 world=texture2D(uEnv,uv).rgb;",
     "  float luma=dot(world,vec3(0.299,0.587,0.114));",
+    "  vec3 refl=mix(world,vec3(luma),0.62);",
+    "  refl=mix(vec3(0.03,0.035,0.045),refl*0.62,0.82);",
     "  float hy=uv.y;",
-    "  float lineA=smoothstep(0.46,0.478,hy)*(1.0-smoothstep(0.492,0.508,hy));",
-    "  float lineB=smoothstep(0.60,0.614,hy)*(1.0-smoothstep(0.626,0.642,hy));",
-    "  float skyM=smoothstep(0.47,0.53,hy);",
-    "  vec3 env=vec3(0.025,0.028,0.034);",
-    "  env=mix(env,vec3(0.58,0.60,0.64),skyM);",
-    "  env+=vec3(0.97,0.98,1.0)*lineA;",
-    "  env+=vec3(0.78,0.80,0.84)*lineB*0.65;",
-    "  env=mix(env,vec3(luma),0.05);",
-    "  vec3 metal=vec3(0.76,0.79,0.84);",
-    "  vec3 L=normalize(vec3(-0.32,0.78,0.54));",
-    "  float spec=pow(max(dot(reflect(-L,N),vec3(0.0,0.0,1.0)),0.0),96.0);",
-    "  float ndl=max(dot(N,L),0.0);",
-    "  float fres=pow(clamp(1.0-max(N.z,0.0),0.0,1.0),6.5);",
-    "  vec3 col=env*(0.62+ndl*0.38);",
-    "  col=mix(col,metal,0.10);",
-    "  col=col/(vec3(1.0)+max(col-vec3(0.80),vec3(0.0)));",
-    "  col=min(col,vec3(0.84));",
+    "  float lineA=smoothstep(0.47,0.488,hy)*(1.0-smoothstep(0.50,0.518,hy));",
+    "  vec3 L=normalize(vec3(-0.28,0.74,0.58));",
+    "  float spec=pow(max(dot(reflect(-L,N),V),0.0),80.0);",
+    "  float fres=pow(clamp(1.0-max(N.z,0.0),0.0,1.0),5.5);",
+    "  vec3 metal=vec3(0.74,0.77,0.82);",
+    "  vec3 col=mix(refl,metal,0.18);",
+    "  col+=vec3(1.0)*lineA*0.55;",
+    "  col=min(col,vec3(0.78));",
     "  col+=vec3(1.0)*spec;",
-    "  col+=fres*vec3(0.74,0.82,0.94)*0.32;",
+    "  col+=fres*vec3(0.72,0.82,0.96)*0.38;",
     "  col=clamp(col,0.0,1.0);",
-    "  float edge=smoothstep(0.78,1.02,f);",
-    "  float shut=uAsleep>0.5?2.6:1.0;",
-    "  vec2 eyeL=vec2(-0.05,0.30)+uLook*0.015;",
-    "  vec2 eyeR=vec2(0.05,0.30)+uLook*0.015;",
-    "  float el=length((q-eyeL)*vec2(1.7,shut*1.25));",
-    "  float er=length((q-eyeR)*vec2(1.7,shut*1.25));",
-    "  float eyes=smoothstep(0.020,0.012,min(el,er))*edge;",
-    "  col=mix(col,vec3(0.05,0.06,0.08),eyes);",
-    "  float catch=smoothstep(0.009,0.003,min(el,er));",
-    "  col=mix(col,vec3(0.96,0.97,0.98),catch);",
-    "  float pupil=smoothstep(0.011,0.005,min(length(q-(eyeL+uLook*0.008)),length(q-(eyeR+uLook*0.008))))*eyes*(uAsleep>0.5?0.2:1.0);",
-    "  col=mix(col,vec3(0.01,0.02,0.03),pupil);",
-    "  float a=smoothstep(0.80,0.98,f);",
+    "  float edge=smoothstep(0.012,-0.02,d);",
+    "  float shut=uAsleep>0.5?2.4:1.0;",
+    "  vec2 eyeL=vec2(-0.07,0.33)+uLook*0.012;",
+    "  vec2 eyeR=vec2(0.07,0.33)+uLook*0.012;",
+    "  float el=length((q-eyeL)*vec2(1.5,shut*1.35));",
+    "  float er=length((q-eyeR)*vec2(1.5,shut*1.35));",
+    "  float eyes=smoothstep(0.034,0.02,min(el,er))*edge;",
+    "  col=mix(col,vec3(0.03,0.04,0.06),eyes);",
+    "  float catch=smoothstep(0.012,0.004,min(el,er));",
+    "  col=mix(col,vec3(0.95,0.97,0.98),catch*0.85);",
+    "  float a=smoothstep(0.012,-0.008,d);",
     "  gl_FragColor=vec4(col,a);",
     "}"
   ].join("\n");
@@ -336,7 +321,7 @@
   Jar.prototype.glFrame = function (st, t, energy) {
     var gl = this.gl;
     if (!gl) return;
-    var poke = this.pokeT ? Math.max(0, 1 - (nowMs() - this.pokeT) / 420) : 0;
+    var poke = this.pokeT ? Math.max(0, 1 - (nowMs() - this.pokeT) / 980) : 0;
     gl.viewport(0, 0, this.cv.width, this.cv.height);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -416,64 +401,38 @@
     ctx.scale(dpr, dpr);
     var W = w / dpr, H = h / dpr;
     var cx = W * 0.5, cy = H * 0.56;
-    var poke = this.pokeT ? Math.max(0, 1 - (nowMs() - this.pokeT) / 420) : 0;
+    var poke = this.pokeT ? Math.max(0, 1 - (nowMs() - this.pokeT) / 980) : 0;
     var k = st.asleep ? 0.35 : 1;
     var s = (0.92 + this.display * 0.2) * (1 + poke * 0.08);
     ctx.translate(cx, cy);
     ctx.scale(1 + poke * 0.12, 1 - poke * 0.16);
-    var balls = [
-      [Math.sin(t * 1.15 * k) * 6, 18, 34 * s],
-      [Math.sin(t * 1.3 * k) * 5, -8, 28 * s],
-      [Math.sin(t * 1.1 * k) * 4, -36, 20 * s],
-      [-16, 4, 14 * s],
-      [16, 8, 13 * s]
-    ];
-    var i;
-    for (i = 0; i < 3; i++) {
-      var by = ((t * (18 + i * 7) * k) % 70) - 40;
-      balls.push([Math.sin(t * 1.4 + i) * 16, Math.min(by, 10), 6 + energy * 2]);
-    }
     ctx.fillStyle = "rgba(0,0,0,0.55)";
     ctx.beginPath();
-    ctx.ellipse(0, 52, 36 * s, 8, 0, 0, 7);
+    ctx.ellipse(0, 54, 40 * s, 8, 0, 0, 7);
     ctx.fill();
-    ctx.fillStyle = "rgba(170, 180, 190, 0.18)";
     ctx.beginPath();
-    ctx.ellipse(0, 58, 28 * s, 5, 0, 0, 7);
+    ctx.ellipse(0, 8, 36 * s, 48 * s, 0, 0, 7);
+    ctx.ellipse(Math.sin(t * 0.7 * k) * 2, -34, 20 * s, 18 * s, 0, 0, 7);
+    var g = ctx.createRadialGradient(-12, -20, 4, 0, 6, 52 * s);
+    g.addColorStop(0, "rgba(186,196,208,0.95)");
+    g.addColorStop(0.45, "rgba(28,32,38,0.96)");
+    g.addColorStop(1, "rgba(6,8,12,0.98)");
+    ctx.fillStyle = g;
     ctx.fill();
-    for (i = 0; i < balls.length; i++) {
-      var b = balls[i];
-      var g = ctx.createRadialGradient(b[0] - b[2] * 0.2, b[1] - b[2] * 0.15, b[2] * 0.15, b[0], b[1], b[2]);
-      g.addColorStop(0, "rgba(28,32,38,0.98)");
-      g.addColorStop(0.55, "rgba(8,10,14,0.98)");
-      g.addColorStop(1, rgba(this.col.deep, 0.98));
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(b[0], b[1], b[2], 0, 7);
-      ctx.fill();
-      ctx.fillStyle = "rgba(255,255,255,0.92)";
-      ctx.beginPath();
-      ctx.ellipse(b[0] - b[2] * 0.22, b[1] - b[2] * 0.32, b[2] * 0.16, b[2] * 0.07, -0.5, 0, 7);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(186, 204, 224, 0.55)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(b[0], b[1], b[2] - 0.6, 0, 7);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 0.85;
-    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.fillStyle = "rgba(255,255,255,0.95)";
     ctx.beginPath();
-    ctx.ellipse(-8, -46, 6, st.asleep ? 1.4 : 5, 0, 0, 7);
-    ctx.ellipse(8, -46, 6, st.asleep ? 1.4 : 5, 0, 0, 7);
+    ctx.ellipse(-10, -28, 7, 3, -0.6, 0, 7);
     ctx.fill();
-    if (!st.asleep) {
-      ctx.fillStyle = rgba(this.col.deep, 0.95);
-      ctx.beginPath();
-      ctx.arc(-6, -46, 2.2, 0, 7);
-      ctx.arc(10, -46, 2.2, 0, 7);
-      ctx.fill();
-    }
+    ctx.strokeStyle = "rgba(176, 198, 220, 0.7)";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.ellipse(0, 8, 35 * s, 47 * s, 0, 0, 7);
+    ctx.stroke();
+    ctx.fillStyle = st.asleep ? "rgba(8,10,14,0.9)" : "rgba(12,14,18,0.92)";
+    ctx.beginPath();
+    ctx.ellipse(-8, -36, 4, st.asleep ? 1.2 : 3.2, 0, 0, 7);
+    ctx.ellipse(8, -36, 4, st.asleep ? 1.2 : 3.2, 0, 0, 7);
+    ctx.fill();
     ctx.restore();
   };
 
