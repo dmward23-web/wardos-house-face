@@ -7,8 +7,8 @@
   if (window.HouseOri && window.HouseOri.booted) return;
   var PAGE = (location.pathname.split("/").pop() || "sheet-index.html").toLowerCase();
   var HOME = PAGE === "sheet-index.html" || PAGE === "index.html";
+  /* These boards are a living world. A reduced-motion capture was shipping a still map and a skipped veil. */
   var REDUCED = false;
-  try { REDUCED = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches); } catch (e) {}
   document.documentElement.classList.add("ori-on");
   if (HOME) document.documentElement.classList.add("ori-home");
 
@@ -56,6 +56,7 @@
     CAPTURE = /(?:\?|&)ori-capture=1(?:&|$)/.test(location.search);
     FORCE_CSS = /(?:\?|&)ori-css=1(?:&|$)/.test(location.search);
   } catch (e) {}
+  if (CAPTURE) document.documentElement.classList.add("ori-capture");
 
   var host = document.createElement("div");
   host.id = "ori-world";
@@ -89,7 +90,8 @@
 
   var world = null;
   var O = window.OriScene;
-  if (!FORCE_CSS && O && O.World) {
+  /* The phone shows cover-fit painted plates. WebGL's tall crop left a black edge. */
+  if (!phoneLayout && !FORCE_CSS && O && O.World) {
     try {
       world = new O.World(host, {
         plates: "ori/plates/",
@@ -102,19 +104,21 @@
         fonts: false,
         hotLight: 1.35,
         preserve: true,
+        reduced: false,
         config: {
           dprMax: small ? 1.5 : 1.6,
           renderScale: small ? 0.85 : 1,
           fpsCap: 120,
           bloom: small ? 0.45 : 0.55,
-          vig: HOME ? 0.78 : 1.15,
+          vig: HOME ? 0.22 : 0.7,
           ion: { acc: theme.acc, acc2: theme.key, ink: "#eaf6ff", ground: "#041018" },
           sound: { muted: true, ambient: false, volume: 0 }
         },
         theme: function (wd) {
           var t = O.oriTheme(wd, { acc: theme.acc, key: theme.key, rays: theme.rays, night: 0.12, fog: 0.62 });
-          if (HOME && t && t.fore) t.fore.edge = 0.075;
-          if (HOME && t && t.ground) t.ground.edge = 0.08;
+          /* Full-bleed plates. An edge mask left a dark gap down the side of the phone. */
+          if (HOME && t && t.fore) t.fore.edge = 0;
+          if (HOME && t && t.ground) t.ground.edge = 0;
           return t;
         }
       });
@@ -158,7 +162,7 @@
   var from = readFrom();
   var fx0 = from ? Math.min(1, Math.max(0, from.x)) : 0.72;
   var fy0 = from ? Math.min(1, Math.max(0, from.y)) : 0.1;
-  if (from || document.documentElement.classList.contains("ori-arriving")) arrive(fx0, fy0);
+  if ((from || document.documentElement.classList.contains("ori-arriving")) && !document.querySelector(".ori-iris")) arrive(fx0, fy0);
 
   /* Quality governor. First ~2s measures render cost (not the rAF gap), then steps
      dpr, scale, layers, and bloom until a frame fits in 15ms (~60fps).
@@ -432,9 +436,13 @@
       if (instant) requestAnimationFrame(function () { spirit.classList.remove("ori-spirit-snap"); });
     }
     placeSpirit(innerWidth * 0.62, 72, true);
+    var pathPts = [];
+    var pathBlocks = [];
+    function catmull(p0, p1, p2, p3, t) {
+      var t2 = t * t, t3 = t2 * t;
+      return 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3);
+    }
     function redrawPath() {
-      var sels = ["header.hdr", "#hub-cam-deck", ".leaveby", "#hub-lights-panel", "#hub-spotify-strip", ".who-up"];
-      var pts = [];
       var pr = panel.getBoundingClientRect();
       var w = Math.max(1, Math.round(panel.clientWidth));
       var h = Math.max(1, Math.round(panel.scrollHeight));
@@ -449,91 +457,146 @@
         blocks.push({ l: r.left - pr.left, t: r.top - pr.top, r: r.right - pr.left, b: r.bottom - pr.top });
       }
       function gutterX(ypx) {
-        var gaps = [{ l: 18, r: w - 18 }];
+        var gaps = [{ l: 22, r: w - 22 }];
         for (var i = 0; i < blocks.length; i++) {
           var c = blocks[i];
-          if (ypx < c.t - 14 || ypx > c.b + 14) continue;
+          if (ypx < c.t - 20 || ypx > c.b + 20) continue;
           var next = [];
           for (var g = 0; g < gaps.length; g++) {
             var gap = gaps[g];
             var left = gap.l;
-            var right = Math.min(gap.r, c.l - 18);
-            if (right - left >= 18) next.push({ l: left, r: right });
-            left = Math.max(gap.l, c.r + 18);
+            var right = Math.min(gap.r, c.l - 16);
+            if (right - left >= 16) next.push({ l: left, r: right });
+            left = Math.max(gap.l, c.r + 16);
             right = gap.r;
-            if (right - left >= 18) next.push({ l: left, r: right });
+            if (right - left >= 16) next.push({ l: left, r: right });
           }
           gaps = next;
           if (!gaps.length) break;
         }
-        if (!gaps.length) return Math.max(18, w - 28);
+        if (!gaps.length) return w * 0.5;
         var best = gaps[0];
         for (var k = 1; k < gaps.length; k++) {
           if (gaps[k].r - gaps[k].l > best.r - best.l) best = gaps[k];
         }
         return (best.l + best.r) / 2;
       }
-      sels.forEach(function (sel) { remember(document.querySelector(sel)); });
+      ["header.hdr", "#hub-cam-deck", ".leaveby", "#hub-lights-panel", "#hub-spotify-strip", ".who-up"].forEach(function (sel) {
+        remember(document.querySelector(sel));
+      });
       document.querySelectorAll(".hdr-date, .hdr-ovals, .wx-card, .tile-grid > .tile").forEach(remember);
       var y0 = 90;
       var header = document.querySelector("header.hdr");
-      if (header) {
-        var hr = header.getBoundingClientRect();
-        y0 = Math.max(y0, hr.bottom - pr.top + 22);
+      if (header) y0 = Math.max(y0, header.getBoundingClientRect().bottom - pr.top + 28);
+      var raw = [];
+      for (var y = y0; y <= h - 36; y += 18) raw.push([gutterX(y), y]);
+      var sm = raw.map(function (p) { return [p[0], p[1]]; });
+      for (var pass = 0; pass < 7; pass++) {
+        var nxt = sm.map(function (p) { return [p[0], p[1]]; });
+        for (var i = 1; i < sm.length - 1; i++) nxt[i][0] = sm[i - 1][0] * 0.25 + sm[i][0] * 0.5 + sm[i + 1][0] * 0.25;
+        sm = nxt;
       }
-      var y1 = h - 36;
-      for (var y = y0; y <= y1; y += 16) pts.push([gutterX(y), y]);
+      for (var j = 0; j < sm.length; j++) {
+        sm[j][0] += Math.sin(sm[j][1] * 0.016) * 26 + Math.sin(sm[j][1] * 0.041 + 1.4) * 10;
+        sm[j][1] += Math.sin(sm[j][0] * 0.02) * 4;
+      }
+      pathPts = sm;
+      pathBlocks = blocks;
+      trailReady = null;
+      paintPath(0);
+    }
+    var trailReady = null;
+    function ensureTrail() {
+      if (trailReady && trailReady.width === canvas.width && trailReady.height === canvas.height) return trailReady;
+      var off = document.createElement("canvas");
+      off.width = canvas.width;
+      off.height = canvas.height;
+      var octx = off.getContext("2d");
+      function trace() {
+        octx.beginPath();
+        octx.moveTo(pathPts[0][0], pathPts[0][1]);
+        var last = pathPts.length - 1;
+        for (var i = 0; i < last; i++) {
+          var p0 = pathPts[Math.max(0, i - 1)];
+          var p1 = pathPts[i];
+          var p2 = pathPts[Math.min(last, i + 1)];
+          var p3 = pathPts[Math.min(last, i + 2)];
+          for (var s = 1; s <= 6; s++) {
+            var u = s / 6;
+            octx.lineTo(catmull(p0[0], p1[0], p2[0], p3[0], u), catmull(p0[1], p1[1], p2[1], p3[1], u));
+          }
+        }
+      }
+      function stroke(width, color) {
+        octx.save();
+        octx.lineCap = "round";
+        octx.lineJoin = "round";
+        octx.strokeStyle = color;
+        octx.lineWidth = width;
+        trace();
+        octx.stroke();
+        octx.restore();
+      }
+      stroke(54, "rgba(70, 160, 230, 0.13)");
+      stroke(26, "rgba(130, 210, 255, 0.20)");
+      stroke(9, "rgba(186, 242, 255, 0.55)");
+      stroke(2.4, "rgba(248, 255, 255, 0.96)");
+      trailReady = off;
+      return off;
+    }
+    function paintPath(t) {
+      var w = canvas.width, h = canvas.height;
+      if (!w || !h || pathPts.length < 2) return;
       var ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, w, h);
-      if (pts.length < 2) return;
-      function trace() {
+      ctx.drawImage(ensureTrail(), 0, 0);
+      var n = pathPts.length;
+      var phase = ((t || 0) * 0.00012) % 1;
+      for (var k = 0; k < 12; k++) {
+        var idx = ((phase + k / 12) % 1) * (n - 1);
+        var i0 = Math.floor(idx);
+        var f = idx - i0;
+        var a = pathPts[i0], b = pathPts[Math.min(n - 1, i0 + 1)];
+        var x = a[0] + (b[0] - a[0]) * f;
+        var y = a[1] + (b[1] - a[1]) * f;
+        var rad = 11 + (k % 3) * 4;
+        ctx.fillStyle = "rgba(220, 250, 255, 0.9)";
         ctx.beginPath();
-        ctx.moveTo(pts[0][0], pts[0][1]);
-        for (var i = 1; i < pts.length; i++) {
-          var a = pts[i - 1], b = pts[i];
-          var midY = (a[1] + b[1]) * 0.5;
-          ctx.quadraticCurveTo(a[0], midY, gutterX(midY, (a[0] + b[0]) * 0.5), midY);
-        }
-        ctx.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]);
+        ctx.arc(x, y, rad, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(140, 220, 255, 0.35)";
+        ctx.beginPath();
+        ctx.arc(x, y, rad * 2.4, 0, Math.PI * 2);
+        ctx.fill();
       }
-      function stroke(width, color, blur) {
-        ctx.save();
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.shadowColor = color;
-        ctx.shadowBlur = blur;
-        ctx.strokeStyle = color;
-        ctx.lineWidth = width;
-        trace();
-        ctx.stroke();
-        ctx.restore();
-      }
-      stroke(28, "rgba(90, 170, 230, 0.16)", 16);
-      stroke(12, "rgba(170, 220, 255, 0.2)", 8);
-      /* The trail stays in the gutter. Mask every card so it never runs behind the plate. */
       ctx.save();
       ctx.globalCompositeOperation = "destination-out";
-      for (var c = 0; c < blocks.length; c++) {
-        var box = blocks[c];
-        ctx.fillRect(box.l - 16, box.t - 16, (box.r - box.l) + 32, (box.b - box.t) + 32);
+      for (var c = 0; c < pathBlocks.length; c++) {
+        var box = pathBlocks[c];
+        ctx.fillRect(box.l - 10, box.t - 10, (box.r - box.l) + 20, (box.b - box.t) + 20);
       }
       ctx.restore();
     }
-    if (!document.querySelector(".ori-motes")) {
-      var motes = document.createElement("div");
-      motes.className = "ori-motes";
-      motes.setAttribute("aria-hidden", "true");
-      var moteHtml = "";
-      for (var mi = 0; mi < 14; mi++) {
-        var left = 6 + ((mi * 37) % 88);
-        var delay = (mi * 0.7).toFixed(1);
-        var dur = (12 + (mi % 5) * 1.6).toFixed(1);
-        var top = (mi * 13) % 90;
-        moteHtml += '<i style="left:' + left + '%;top:' + top + '%;animation-delay:-' + delay + 's;animation-duration:' + dur + 's"></i>';
-      }
-      motes.innerHTML = moteHtml;
-      document.body.appendChild(motes);
+    var life = document.createElement("div");
+    life.className = "ori-life";
+    life.setAttribute("aria-hidden", "true");
+    var moteHtml = '<b class="ori-shaft-sweep"></b>';
+    for (var mi = 0; mi < 22; mi++) {
+      var left = 2 + ((mi * 41) % 92);
+      var delay = (mi * 0.17).toFixed(2);
+      var dur = (2.1 + (mi % 5) * 0.28).toFixed(2);
+      var size = 26 + (mi % 5) * 8;
+      var top = 6 + ((mi * 17) % 86);
+      moteHtml += '<i style="left:' + left + '%;top:' + top + '%;width:' + size + 'px;height:' + size + 'px;animation-delay:-' + delay + 's;animation-duration:' + dur + 's"></i>';
     }
+    life.innerHTML = moteHtml;
+    document.body.insertBefore(life, document.body.firstChild);
+    var lastSpark = 0;
+    function lifeLoop(ts) {
+      if (!lastSpark || ts - lastSpark > 48) { lastSpark = ts; paintPath(ts); }
+      requestAnimationFrame(lifeLoop);
+    }
+    requestAnimationFrame(lifeLoop);
     function tidyWx() {
       var temp = document.querySelector("header.hdr .wx-temp");
       var sub = document.querySelector("header.hdr .wx-sub");
@@ -632,9 +695,8 @@
     if (deck && !deck.querySelector(".ori-pool-hit")) {
       var peek = document.createElement("div");
       peek.className = "ori-peek";
-      peek.hidden = true;
       peek.innerHTML = '<div class="ori-peek-card"></div>';
-      deck.appendChild(peek);
+      document.body.appendChild(peek);
       var hit = document.createElement("button");
       hit.type = "button";
       hit.className = "ori-pool-hit";
@@ -646,21 +708,24 @@
         ev.stopPropagation();
         peekOpen = !peekOpen;
         if (peekOpen) {
-          if (peek.parentNode !== document.body) document.body.appendChild(peek);
           fillPeek();
-          var below = 0;
-          deck.querySelectorAll(".hub-cam-label").forEach(function (lab) {
-            below = Math.max(below, lab.getBoundingClientRect().bottom);
+          var floor = 0;
+          deck.querySelectorAll(".hub-cam, .hub-cam-label, .hub-cam-media-wrap").forEach(function (el) {
+            floor = Math.max(floor, el.getBoundingClientRect().bottom);
           });
-          if (!below) below = deck.getBoundingClientRect().bottom;
-          peek.style.top = Math.round(below + 12) + "px";
-          peek.hidden = false;
-          requestAnimationFrame(function () { peek.classList.add("is-open"); });
+          if (!floor) floor = deck.getBoundingClientRect().bottom;
+          var pool = deck.getBoundingClientRect();
+          peek.style.top = Math.round(floor + 16) + "px";
+          peek.style.transformOrigin = "50% " + Math.round((pool.top + 48) - (floor + 16)) + "px";
+          deck.classList.add("ori-pool-live");
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () { if (peekOpen) peek.classList.add("is-open"); });
+          });
         } else {
           peek.classList.remove("is-open");
-          setTimeout(function () { if (!peekOpen) peek.hidden = true; }, 440);
+          deck.classList.remove("ori-pool-live");
         }
-        setTimeout(redrawPath, 60);
+        setTimeout(redrawPath, 360);
       });
     }
     tidyHero();
@@ -789,6 +854,7 @@
     var fx = (x / Math.max(1, innerWidth)).toFixed(3);
     var fy = (y / Math.max(1, innerHeight)).toFixed(3);
     try { sessionStorage.setItem("ori-from", JSON.stringify({ x: +fx, y: +fy, t: Date.now() })); } catch (e) {}
+    try { sessionStorage.setItem("ori-veil-next", String(Date.now())); } catch (e2) {}
     var hash = "from=" + fx + "," + fy;
     var i = href.indexOf("#");
     if (i < 0) return href + "#" + hash;
@@ -814,9 +880,7 @@
     } catch (ePre) {}
     document.documentElement.classList.add("ori-diving");
     document.querySelectorAll(".ori-iris, .ori-arrive").forEach(function (old) { old.remove(); });
-    var iris = document.createElement("div");
-    iris.className = "ori-iris";
-    iris.setAttribute("data-ori-veil", "1");
+    var iris = makeVeil();
     iris.style.setProperty("--x", x + "px");
     iris.style.setProperty("--y", y + "px");
     document.body.appendChild(iris);
@@ -824,7 +888,8 @@
       try { world.camPush(1.26, 0.6, x / Math.max(1, innerWidth), y / Math.max(1, innerHeight), 0.25); } catch (e) {}
       try { world.exit({ to: [x, y], dur: 0.6 }).then(go); } catch (e) {}
     }
-    setTimeout(go, 520);
+    fadeCover(iris, 0, 1, 420, go);
+    setTimeout(go, 800);
   }
 
   var SKIP = "button,input,select,textarea,label,summary,[data-sp-act],[data-sp-tile],[data-layout],.leaveby-chip,[data-check],.hub-sw,.hub-sw-rocker,.hub-sw-track,.hub-sw-dim,[data-hub-key-entry],[data-mute-toggle],.sctl,.quest,.chore,[contenteditable=true]";
@@ -877,9 +942,91 @@
     try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) {}
   }, true);
 
-  window.addEventListener("pagehide", function () {
+  function makeVeil() {
+    var el = document.createElement("div");
+    el.className = "ori-iris";
+    el.setAttribute("data-ori-veil", "1");
+    el.style.setProperty("animation", "none", "important");
+    el.style.position = "fixed";
+    el.style.inset = "0";
+    el.style.zIndex = "2147483647";
+    /* Solid, same as the html background. A photo veil flashes one flat frame
+       while the next document decodes the image, and the clip reads that as a cut. */
+    el.style.background = "#062018";
+    el.style.opacity = "0";
+    return el;
+  }
+  function fadeCover(el, from, to, dur, done) {
+    el.style.setProperty("animation", "none", "important");
+    var start = 0;
+    function step(now) {
+      if (!start) start = now;
+      var t = Math.min(1, (now - start) / dur);
+      el.style.opacity = String(from + (to - from) * t);
+      /* A bare opacity change stays on a compositor layer that the capture
+         never flattens. Nudging the transform and reading layout pushes
+         every step into the screen buffer. */
+      el.style.transform = "translate3d(0," + (t * 0.4).toFixed(3) + "px,0)";
+      void el.offsetWidth;
+      if (t < 1) requestAnimationFrame(step);
+      else if (done) done();
+    }
+    requestAnimationFrame(step);
+  }
+  function stampVeil() {
+    try { sessionStorage.setItem("ori-veil-next", String(Date.now())); } catch (e) {}
+  }
+  function holdVeil() {
+    if (document.querySelector(".ori-iris, .ori-arrive")) return;
+    var veil = document.createElement("div");
+    veil.className = "ori-iris";
+    veil.setAttribute("data-ori-veil", "1");
+    veil.style.setProperty("animation", "none", "important");
+    veil.style.background = "#062018";
+    veil.style.position = "fixed";
+    veil.style.inset = "0";
+    veil.style.zIndex = "2147483647";
+    veil.style.opacity = "1";
     document.documentElement.classList.add("ori-held");
+    document.documentElement.setAttribute("data-ori-veil", "1");
+    if (document.body) document.body.appendChild(veil);
+    void veil.offsetWidth;
+  }
+  /* One extra history entry so the first Back stays on this page long enough to veil, then leaves. */
+  if (!HOME) {
+    try {
+      if (!history.state || !history.state.oriHold) history.pushState({ oriHold: 1 }, "", location.href);
+    } catch (e) {}
+    window.addEventListener("popstate", function () {
+      if (diving) return;
+      diving = true;
+      stampVeil();
+      document.querySelectorAll(".ori-iris, .ori-arrive").forEach(function (old) { old.remove(); });
+      var iris = makeVeil();
+      document.documentElement.classList.add("ori-diving");
+      document.documentElement.setAttribute("data-ori-veil", "1");
+      document.body.appendChild(iris);
+      void iris.offsetWidth;
+      /* Step the fade on painted frames, then load home fresh so the next
+         document's first frame is the same veil. */
+      fadeCover(iris, 0, 1, 420, function () {
+        try { location.replace("sheet-index.html"); }
+        catch (e) { location.href = "sheet-index.html"; }
+      });
+    });
+  }
+  window.addEventListener("pagehide", function () {
+    stampVeil();
+    var iris = document.querySelector(".ori-iris");
+    if (iris) {
+      iris.style.animation = "none";
+      iris.style.opacity = "1";
+      return;
+    }
+    holdVeil();
   });
+  window.addEventListener("beforeunload", function () {});
+  window.addEventListener("unload", function () {});
   window.addEventListener("pageshow", function (ev) {
     diving = false;
     document.documentElement.classList.remove("ori-diving");
