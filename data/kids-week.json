@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 8 2026",
   "asOfIso": "2026-10-08",
-  "refreshedAt": "2026-10-08T12:11:03.225Z",
+  "refreshedAt": "2026-10-08T12:31:34.396Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -313,13 +313,6 @@
         {
           "kind": "event",
           "when": "Thu · 7:00",
-          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Thu · 7:00",
           "what": "SRE specials: Spanish + Library checkout",
           "hint": "",
           "tone": "act"
@@ -350,12 +343,6 @@
         {
           "when": "Mon 5 · 12:00",
           "what": "SRE Peace Week",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 8 · 7:00",
-          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
           "tone": "act",
           "hint": ""
         },
@@ -581,13 +568,6 @@
         {
           "kind": "event",
           "when": "Thu · 7:00",
-          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Thu · 7:00",
           "what": "SRE specials: Spanish",
           "hint": "",
           "tone": "act"
@@ -637,12 +617,6 @@
         {
           "when": "Mon 5 · 12:00",
           "what": "SRE Peace Week",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 8 · 7:00",
-          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
           "tone": "act",
           "hint": ""
         },
@@ -1031,11 +1005,6 @@
         },
         {
           "when": "Thu 8 · 7:00",
-          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 8 · 7:00",
           "what": "SRE specials: Spanish + Library checkout",
           "tone": "act"
         },
@@ -1143,6 +1112,11 @@
           "when": "Mon 12 · 7:00",
           "what": "Hayes baseball pickup",
           "tone": "hot"
+        },
+        {
+          "when": "Tue 13 · 7:00",
+          "what": "SRE specials: PE (tennis shoes)",
+          "tone": "act"
         }
       ]
     }
