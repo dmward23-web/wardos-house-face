@@ -90,7 +90,15 @@
   .ftr-chip{padding:8px 12px;min-height:44px;display:inline-flex;align-items:center;border-radius:8px;border:2px solid #2a2e36;background:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;color:inherit}
   @media (max-width: 700px) {
     html, body, .panel { width: 100% !important; max-width: 100vw !important; min-width: 0 !important; height: auto !important; min-height: 100dvh !important; overflow-x: hidden !important; overflow-y: auto !important; }
-    .panel { padding: 16px 16px 96px !important; }
+    .panel { padding: 28px 16px 40px !important; box-sizing: border-box !important; }
+    .note, #lights-note { display: none !important; }
+    .banner-sub { display: none !important; }
+    .light-pad-where, .light-pad-state { display: none !important; }
+    #lights-all-on, #lights-all-off, #lights-all-on:disabled, #lights-all-off:disabled { opacity: 1 !important; }
+    #lights-all-on, #lights-all-on:disabled { background: linear-gradient(180deg, #ffe7a8, #f0b84a) !important; color: #1a1208 !important; }
+    #lights-all-off, #lights-all-off:disabled { background: #163044 !important; color: #f4fbff !important; }
+    .banner.cmd-panel, .bulk.cmd-panel, .lights-cmd > .hdr { background: #081624 !important; border-radius: 18px !important; }
+    .light-pad[data-unconnected-summary] { grid-template-areas: "src" !important; }
     .pad-grid { grid-template-columns: 1fr !important; width: 100% !important; }
     .light-pad { display: grid !important; grid-template-areas: "top" "actions" "src" !important; gap: 8px !important; position: relative !important; overflow: visible !important; height: auto !important; background: #081624 !important; border: 0 !important; border-radius: 18px !important; color: #f4fbff !important; box-shadow: 0 0 0 1px rgba(198,230,255,0.38), 0 0 20px rgba(120,190,255,0.26) !important; }
     .light-pad-top { grid-area: top; position: static !important; }
@@ -163,7 +171,6 @@
  <div class="cmd-meta">Elo · Kasa</div>
  </div>
  <div class="banner-title">Kasa lights · tap to switch</div>
- <div class="banner-sub">Kasa lights on this screen</div>
  </section>
 
  <section class="bulk cmd-panel" aria-label="All lights">
@@ -202,7 +209,7 @@
 <script src="house-clock.js?v=SHEETCLK1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=HUM1"></script>
-<script src="house-lights.js?v=LIGHTROW1"></script>
+<script src="house-lights.js?v=LIGHTROW2"></script>
 <script>
 (function () {
   var L = window.HouseLights;
@@ -211,19 +218,23 @@
     var eff = L.effectiveLights();
     var g = eff.gate;
     var pill = document.getElementById("lights-status-pill");
-    pill.textContent = g.label;
+    var needsKey = /needs key/i.test(g.label);
+    pill.textContent = needsKey ? "Needs key" : (/^LIVE$/i.test(g.label) ? "Live" : g.label);
     pill.classList.remove("cmd-pill--live", "cmd-pill--off", "cmd-pill--need", "cmd-pill--stub", "on", "off");
     pill.classList.add("cmd-pill");
-    if (g.live) pill.classList.add("cmd-pill--live");
-    else if (g.needToken || g.kind === "need_token") pill.classList.add("cmd-pill--need");
+    if (g.live && !needsKey) pill.classList.add("cmd-pill--live");
+    else if (needsKey || g.needToken || g.kind === "need_token") pill.classList.add("cmd-pill--need");
     else pill.classList.add("cmd-pill--off");
     var box = document.getElementById("lights-connect");
     box.classList.toggle("ok", !!g.live);
     var title = document.getElementById("lights-connect-title");
     var sub = document.getElementById("lights-connect-sub");
-    if (g.live) {
-      title.textContent = "Lights · LIVE";
-      sub.textContent = "Kasa lights on this screen";
+    if (needsKey) {
+      title.textContent = "Lights";
+      sub.textContent = "";
+    } else if (g.live) {
+      title.textContent = "Lights · Live";
+      sub.textContent = "";
     } else if (g.needToken || g.kind === "need_token") {
       title.textContent = "CONNECT · need Kasa on Atlas";
       sub.textContent = "Not connected yet · controls dark";
@@ -234,13 +245,7 @@
     var ftr = document.getElementById("lights-ftr-status");
     if (ftr) ftr.textContent = g.label;
     var note = document.getElementById("lights-note");
-    if (note && (g.needToken || g.kind === "need_token")) {
-      note.textContent = "Not connected yet · controls dark";
-    } else if (note && !g.live) {
-      note.textContent = "Controls dark · lights offline";
-    } else if (note && g.live) {
-      note.textContent = "";
-    }
+    if (note) { note.textContent = ""; note.hidden = true; }
     L.paintPads(document);
   }
   L.wireAllButtons(document);

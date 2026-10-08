@@ -147,7 +147,7 @@
     veil.style.setProperty("--x", (fx * 100) + "%");
     veil.style.setProperty("--y", (fy * 100) + "%");
     document.body.appendChild(veil);
-    setTimeout(function () { if (veil.parentNode) veil.remove(); }, 1300);
+    setTimeout(function () { if (veil.parentNode) veil.remove(); }, 620);
   }
 
   var from = readFrom();
@@ -436,16 +436,35 @@
       if (pr.width < 8 || h < 8) return;
       if (canvas.width !== w) canvas.width = w;
       if (canvas.height !== h) canvas.height = h;
+      var blocks = [];
+      function remember(el) {
+        if (!el) return;
+        var r = el.getBoundingClientRect();
+        if (r.width < 8 || r.height < 8) return;
+        blocks.push({ l: r.left - pr.left, t: r.top - pr.top, r: r.right - pr.left, b: r.bottom - pr.top });
+      }
+      function gutterX(ypx, prefer) {
+        var xpx = prefer;
+        for (var i = 0; i < blocks.length; i++) {
+          var c = blocks[i];
+          if (ypx < c.t - 6 || ypx > c.b + 6) continue;
+          if (xpx <= c.l - 20 || xpx >= c.r + 20) continue;
+          var left = c.l - 26;
+          var right = c.r + 26;
+          var useLeft = left >= 16 && (w - right < 16 || left >= w - right);
+          xpx = useLeft ? left : Math.min(w - 16, right);
+        }
+        return Math.max(16, Math.min(w - 16, xpx));
+      }
       var yOff = { "header.hdr": 36, "#hub-cam-deck": 56, ".leaveby": 70, "#hub-lights-panel": 80, "#hub-spotify-strip": 72, ".who-up": 28 };
       function add(el, off) {
         if (!el) return;
+        remember(el);
         var r = el.getBoundingClientRect();
         if (r.width < 4 || r.height < 4) return;
         var ypx = r.top - pr.top + (off == null ? 40 : off);
         var onLeft = (r.left + r.width * 0.5) < (pr.left + pr.width * 0.5);
-        var xpx = w * (onLeft ? 0.47 : 0.53);
-        xpx = Math.max(w * 0.42, Math.min(w * 0.58, xpx));
-        pts.push([xpx, ypx]);
+        pts.push([gutterX(ypx, w * (onLeft ? 0.22 : 0.78)), ypx]);
       }
       for (var s = 0; s < sels.length; s++) add(document.querySelector(sels[s]), yOff[sels[s]]);
       var tiles = document.querySelectorAll(".tile-grid > .tile");
@@ -459,7 +478,8 @@
         ctx.moveTo(pts[0][0], pts[0][1]);
         for (var i = 1; i < pts.length; i++) {
           var a = pts[i - 1], b = pts[i];
-          ctx.quadraticCurveTo(a[0], (a[1] + b[1]) * 0.5, (a[0] + b[0]) * 0.5, (a[1] + b[1]) * 0.5);
+          var midY = (a[1] + b[1]) * 0.5;
+          ctx.quadraticCurveTo(a[0], midY, gutterX(midY, (a[0] + b[0]) * 0.5), midY);
         }
         ctx.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]);
       }
@@ -475,16 +495,14 @@
         ctx.stroke();
         ctx.restore();
       }
-      stroke(40, "rgba(90, 170, 230, 0.14)", 22);
-      stroke(18, "rgba(170, 220, 255, 0.16)", 12);
-      /* Keep the glow out of the words. Plates sit on top; this clears the trail under them. */
-      var cover = document.querySelectorAll(".tile-label, .hub-cam-label, .leaveby-main, .hub-lights-title, .hub-lights-pill, .sp-brand, .sp-sub, .sp-pill, .who-up-kicker, .who-up-name, .who-up-go, .who-up-meta, .hdr-date-time, .id-text");
+      stroke(28, "rgba(90, 170, 230, 0.16)", 16);
+      stroke(12, "rgba(170, 220, 255, 0.2)", 8);
+      /* The trail stays in the gutter. Mask every card so it never runs behind the plate. */
       ctx.save();
       ctx.globalCompositeOperation = "destination-out";
-      for (var c = 0; c < cover.length; c++) {
-        var er = cover[c].getBoundingClientRect();
-        if (er.width < 2 || er.height < 2) continue;
-        ctx.fillRect(er.left - pr.left - 10, er.top - pr.top - 8, er.width + 20, er.height + 16);
+      for (var c = 0; c < blocks.length; c++) {
+        var box = blocks[c];
+        ctx.fillRect(box.l - 6, box.t - 6, (box.r - box.l) + 12, (box.b - box.t) + 12);
       }
       ctx.restore();
     }
@@ -496,9 +514,11 @@
       s = String(s || "");
       s = s.replace(/\[[^\]]*\]/g, " ");
       s = s.replace(/\([^)]*\)/g, " ");
+      s = s.replace(/#[A-Za-z0-9_-]+/g, " ");
+      s = s.replace(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{5,}\b/g, " ");
       var cut = s.indexOf(" · ");
       if (cut >= 0) s = s.slice(0, cut);
-      return s.replace(/\s+/g, " ").replace(/^[\s·—–-]+|[\s·—–-]+$/g, "").trim();
+      return s.replace(/\s+/g, " ").replace(/^[\s·—–\-|]+|[\s·—–\-|]+$/g, "").trim();
     }
     function isJohnson(s) { return /johnson\s+kids/i.test(String(s || "")); }
     function isAwareness(s) { return /no school|\ball day\b|awareness/i.test(String(s || "")); }
@@ -742,7 +762,7 @@
       try { world.camPush(1.26, 0.6, x / Math.max(1, innerWidth), y / Math.max(1, innerHeight), 0.25); } catch (e) {}
       try { world.exit({ to: [x, y], dur: 0.6 }).then(go); } catch (e) {}
     }
-    setTimeout(go, 680);
+    setTimeout(go, 520);
   }
 
   var SKIP = "button,input,select,textarea,label,summary,[data-sp-act],[data-sp-tile],[data-layout],.leaveby-chip,[data-check],.hub-sw,.hub-sw-rocker,.hub-sw-track,.hub-sw-dim,[data-hub-key-entry],[data-mute-toggle],.sctl,.quest,.chore,[contenteditable=true]";
@@ -833,7 +853,7 @@
         html += '<span class="ori-dom">' + dows[dt.getDay()] + " " + n + "</span>";
         if (mom) html += '<span class="ori-ev dan">' + mom.textContent.replace(/</g, "") + "</span>";
         for (var b = 0; b < blks.length; b++) {
-          var title = blks[b].getAttribute("title") || blks[b].textContent || "";
+          var title = cleanTitle(blks[b].getAttribute("title") || blks[b].textContent || "");
           var tone = (blks[b].className || "").replace(/\bblk\b/, "").trim();
           html += '<span class="ori-ev ' + tone + '">' + String(title).replace(/</g, "") + "</span>";
         }
@@ -850,8 +870,7 @@
       if (!dest) return;
       var raw = dest.getAttribute("data-ori-raw") || dest.textContent;
       if (!dest.getAttribute("data-ori-raw")) dest.setAttribute("data-ori-raw", raw);
-      var cut = raw.indexOf(" · ");
-      var title = (cut >= 0 ? raw.slice(0, cut) : raw).replace(/\s+/g, " ").trim();
+      var title = cleanTitle(raw);
       if (title && dest.textContent !== title) dest.textContent = title;
     }
     once();

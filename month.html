@@ -358,7 +358,10 @@
   .ori-day { display: flex !important; flex-direction: column !important; gap: 4px !important; padding: 12px 14px !important; border-radius: 16px !important; background: #081624 !important; box-shadow: 0 0 0 1px rgba(198,230,255,0.35), 0 0 18px rgba(120,190,255,0.24) !important; text-decoration: none !important; color: #f4fbff !important; }
   .ori-dom { font-size: 12px !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; color: #d7f6ff !important; }
   .ori-ev { font-size: 16px !important; line-height: 1.35 !important; white-space: normal !important; overflow: visible !important; text-overflow: clip !important; overflow-wrap: anywhere !important; color: #f4fbff !important; }
-  .banner { white-space: normal !important; overflow: visible !important; background: #081624 !important; color: #f4fbff !important; border: 0 !important; border-radius: 14px !important; }
+  .banner { white-space: normal !important; overflow: visible !important; background: transparent !important; color: #f4fbff !important; border: 0 !important; box-shadow: none !important; }
+  .month-chrome { display: flex !important; flex-direction: column !important; gap: 10px !important; margin: 0 0 12px !important; padding: 14px 12px 12px !important; border-radius: 18px !important; background: #081624 !important; box-shadow: 0 0 0 1px rgba(198,230,255,0.42), 0 0 24px rgba(120,190,255,0.28) !important; }
+  .leaveby::before { content: none !important; display: none !important; background: none !important; }
+  .leaveby-main .time { border: 0 !important; outline: none !important; background: transparent !important; background-image: none !important; box-shadow: none !important; border-radius: 0 !important; }
  }
  .mom.dan { color: #1a4038; }
  .day-empty { font-size: 9px; color: #a0a4ac; font-weight: 500; }
@@ -650,6 +653,7 @@
  </a>
 
  <section class="month-wrap">
+ <div class="month-chrome">
  <div class="month-hdr">
  <div class="mnav">
  <button class="mbtn" type="button" data-mnav="-1" aria-label="Previous month">‹</button>
@@ -668,6 +672,7 @@
  <span class="leg shr"><i></i>Shared</span>
  </div>
  </div>
+ </div>
  <div class="dow-row">
  <div class="dow-h">Sun</div><div class="dow-h">Mon</div><div class="dow-h">Tue</div><div class="dow-h">Wed</div><div class="dow-h">Thu</div><div class="dow-h">Fri</div><div class="dow-h">Sat</div>
  </div>
@@ -681,8 +686,13 @@
  </footer>
 </div>
 
-<style id="audit1-hero">/* AUDIT1 · live time chip sits in its own line box (never over the label) */
-.leaveby-main .time{display:inline-block;margin:4px 10px 4px 0 !important;}</style>
+<style id="audit1-hero">/* AUDIT1 · live time sits on its own line, with no input-style chip */
+.leaveby-main .time{display:inline-block;margin:4px 10px 4px 0 !important;}
+@media (max-width: 700px) {
+  .leaveby::before { content: none !important; display: none !important; background: none !important; }
+  .leaveby-main .time { display: block !important; margin: 0 0 4px !important; padding: 0 !important; border: 0 !important; outline: none !important; background: transparent !important; background-image: none !important; box-shadow: none !important; border-radius: 0 !important; }
+}
+</style>
 <script>
 /* MONTHS1 · month view for any month (‹ › + pills), data from data/cal-months.json */
 (function () {
@@ -697,6 +707,14 @@
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function key(y, m, d) { return y + "-" + pad(m) + "-" + pad(d); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function cleanCal(s) {
+    s = String(s || "");
+    s = s.replace(/\[[^\]]*\]/g, " ");
+    s = s.replace(/#[A-Za-z0-9_-]+/g, " ");
+    s = s.replace(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{5,}\b/g, " ");
+    s = s.replace(/\(\s*\)/g, " ");
+    return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
+  }
   function months() {
     var out = [], t = ctToday();
     var s = DATA && DATA.rangeStart ? DATA.rangeStart : key(t.y, t.m, 1);
@@ -743,7 +761,7 @@
         html += '<span class="ori-dom">' + dows[dt.getDay()] + " " + d + "</span>";
         if (day && day.withDan) html += '<span class="ori-ev dan">Kids with Dan</span>';
         (day ? day.items : []).forEach(function (it) {
-          html += '<span class="ori-ev ' + esc(it.c) + '">' + esc(it.l) + "</span>";
+          html += '<span class="ori-ev ' + esc(it.c) + '">' + esc(cleanCal(it.l)) + "</span>";
         });
         html += "</a>";
       }
@@ -759,7 +777,7 @@
         html += '<a class="day' + (isToday2 ? " today" : "") + '" href="sheet-today.html"><div class="day-top"><span class="dom">' + dn + "</span>" + (isToday2 ? '<span class="day-tag">today</span>' : "") + "</div>";
         if (day2 && day2.withDan) html += '<div class="mom dan">Kids with Dan</div>';
         html += '<div class="blocks">';
-        (day2 ? day2.items : []).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '">' + esc(it.l) + "</div>"; });
+        (day2 ? day2.items : []).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '">' + esc(cleanCal(it.l)) + "</div>"; });
         html += "</div></a>";
       }
     }
@@ -804,8 +822,10 @@
     if (!dest) return;
     var raw = dest.getAttribute("data-ori-raw") || dest.textContent || "";
     if (!dest.getAttribute("data-ori-raw")) dest.setAttribute("data-ori-raw", raw);
-    var cut = raw.indexOf(" · ");
-    var title = (cut >= 0 ? raw.slice(0, cut) : raw).replace(/\s+/g, " ").trim();
+    var title = raw.replace(/\[[^\]]*\]/g, " ").replace(/\([^)]*\)/g, " ").replace(/#[A-Za-z0-9_-]+/g, " ").replace(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{5,}\b/g, " ");
+    var cut = title.indexOf(" · ");
+    if (cut >= 0) title = title.slice(0, cut);
+    title = title.replace(/\s+/g, " ").replace(/^[\s·—–\-|]+|[\s·—–\-|]+$/g, "").trim();
     if (title && dest.textContent !== title) dest.textContent = title;
     var detail = document.querySelector("[data-live='leaveby-detail']");
     if (detail && detail.textContent) { detail.textContent = ""; detail.hidden = true; }

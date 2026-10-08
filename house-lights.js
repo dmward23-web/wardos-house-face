@@ -249,7 +249,7 @@
     if (st === "live") {
       var ws = !!data.writeSupported;
       var label = "LIVE";
-      if (ws && !hasKey()) label = "LIVE · NEED KEY";
+      if (ws && !hasKey()) label = "Needs key";
       else if (ws && _proxyReachable === false) label = "LIVE · PROXY OFF";
       else if (ws && _proxyReachable === null) label = "LIVE";
       else if (!ws) label = "LIVE · READ ONLY";
@@ -649,25 +649,33 @@
     doc = doc || document;
     var grid = doc.getElementById("lights-stub-grid");
     if (!grid) return;
-    var html = "";
+    var eff = effectiveLights();
+    var names = [];
+    var extra = 0;
     for (var i = 0; i < DOOR_GARAGE_STUBS.length; i++) {
-      var R = DOOR_GARAGE_STUBS[i];
-      html +=
-        '<article class="light-pad is-pending is-need-connect is-off" data-light-id="' + R.id + '" data-need-connect="1">'
-        + '<div class="light-pad-top">'
-        + '<div class="light-pad-ico" aria-hidden="true">🔌</div>'
-        + '<div><div class="light-pad-name">' + escapeHtml(R.name) + "</div>"
-        + '<div class="light-pad-where">' + escapeHtml(R.where) + "</div></div>"
-        + '<div class="light-pad-state cmd-pill cmd-pill--need">NEED CONNECT</div>'
-        + "</div>"
-        + '<div class="light-pad-actions">'
-        + '<button type="button" class="cmd-rocker is-stub is-off" disabled aria-label="' + escapeHtml(R.name) + ' · need connect">'
-        + '<span class="cmd-rocker-knob"></span></button>'
-        + "</div>"
-        + '<div class="light-pad-src">Not connected yet</div>'
-        + "</article>";
+      var stubName = String(DOOR_GARAGE_STUBS[i].name || "").trim();
+      if (stubName) names.push(stubName);
+      else extra++;
     }
-    grid.innerHTML = html;
+    var reserved = (eff && eff.reserved) || [];
+    for (var r = 0; r < reserved.length; r++) {
+      var reservedName = String(reserved[r].name || "").trim();
+      if (!reservedName || /not connected/i.test(reservedName)) extra++;
+      else names.push(reservedName);
+    }
+    if (!names.length && !extra) {
+      grid.innerHTML = "";
+      return;
+    }
+    var shown = names.slice(0, 3);
+    var more = extra + Math.max(0, names.length - shown.length);
+    var text = "Not connected yet";
+    if (shown.length) text += ": " + shown.join(", ");
+    if (more) text += (shown.length ? ", +" + more : ": +" + more);
+    grid.innerHTML =
+      '<article class="light-pad cmd-panel is-pending is-need-connect" data-unconnected-summary="1">'
+      + '<div class="light-pad-src">' + escapeHtml(text) + "</div>"
+      + "</article>";
   }
 
   /** Paint Google Home secondary Lights tile + optional pad row. */
@@ -692,12 +700,13 @@
     }
     var pill = doc.getElementById("lights-ctrl-pill");
     if (pill) {
-      pill.textContent = g.label;
-      pill.classList.toggle("on", !!g.live);
+      var needsKey = noKey(g);
+      pill.textContent = needsKey ? "Needs key" : g.label;
+      pill.classList.toggle("on", !!g.live && !needsKey);
       pill.classList.add("cmd-pill");
-      pill.classList.toggle("cmd-pill--live", !!g.live);
-      pill.classList.toggle("cmd-pill--need", !!(g.needToken || g.kind === "need_token"));
-      pill.classList.toggle("cmd-pill--off", !g.live && !(g.needToken || g.kind === "need_token"));
+      pill.classList.toggle("cmd-pill--live", !!g.live && !needsKey);
+      pill.classList.toggle("cmd-pill--need", !!(needsKey || g.needToken || g.kind === "need_token"));
+      pill.classList.toggle("cmd-pill--off", !g.live && !needsKey && !(g.needToken || g.kind === "need_token"));
     }
     var allOn = doc.getElementById("lights-all-on");
     var allOff = doc.getElementById("lights-all-off");
@@ -705,13 +714,13 @@
     if (allOn) {
       allOn.disabled = !armed;
       allOn.style.pointerEvents = armed ? "auto" : "none";
-      allOn.style.opacity = armed ? "1" : "0.45";
+      allOn.style.opacity = "1";
       allOn.style.cursor = armed ? "pointer" : "not-allowed";
     }
     if (allOff) {
       allOff.disabled = !armed;
       allOff.style.pointerEvents = armed ? "auto" : "none";
-      allOff.style.opacity = armed ? "1" : "0.45";
+      allOff.style.opacity = "1";
       allOff.style.cursor = armed ? "pointer" : "not-allowed";
     }
     var grid = doc.getElementById("lights-pad-grid");
@@ -741,25 +750,7 @@
             ? '<input class="light-bright" type="range" min="1" max="100" value="' + clampBright(L.brightness || 100) + '" data-id="' + L.id + '" aria-label="Brightness"' + (armedPad ? "" : " disabled") + ' />'
             : "")
           + "</div>"
-          + '<div class="light-pad-src">' + hubSrcLabel(eff, g) + "</div>"
-          + "</article>";
-      }
-      /* reserved OP slot */
-      for (var r = 0; r < eff.reserved.length; r++) {
-        var R = eff.reserved[r];
-        html +=
-          '<article class="light-pad cmd-panel is-pending" data-light-id="' + R.id + '">'
-          + '<div class="light-pad-top">'
-          + '<div class="light-pad-ico" aria-hidden="true">⏳</div>'
-          + '<div><div class="light-pad-name">' + escapeHtml(R.name || R.id) + "</div>"
-          + '<div class="light-pad-where">' + escapeHtml(R.where || "Not connected yet") + "</div></div>"
-          + '<div class="light-pad-state cmd-pill cmd-pill--need">NEED CONNECT</div>'
-          + "</div>"
-          + '<div class="light-pad-actions">'
-          + '<button type="button" class="cmd-rocker is-stub is-off" disabled aria-label="need connect">'
-          + '<span class="cmd-rocker-knob" aria-hidden="true"></span></button>'
-          + "</div>"
-          + '<div class="light-pad-src">Not connected yet</div>'
+          + '<div class="light-pad-src">' + (noKey(g) ? "Needs key" : hubSrcLabel(eff, g)) + "</div>"
           + "</article>";
       }
       grid.innerHTML = html;
@@ -836,7 +827,7 @@
   function hubSrcLabel(eff, g) {
     g = g || (eff && eff.gate) || gate();
     if (canWrite()) return "LIVE";
-    if (noKey(g)) return "NEED KEY";
+    if (noKey(g)) return "Needs key";
     if (g.live && g.writeSupported && _proxyReachable === false) return "LIVE · PROXY OFF";
     if (g.live && g.writeSupported) return "LIVE · PROXY";
     if (g.live) return "LIVE · READ ONLY";

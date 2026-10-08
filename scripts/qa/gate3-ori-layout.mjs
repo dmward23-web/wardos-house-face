@@ -179,7 +179,30 @@ const SCAN = `(() => {
     }
     const blob = document.body.innerText || "";
     if (/calendar through|empty = unknown|TABLET TEST/i.test(blob)) hits.push(tag + " debug copy still on screen");
+    if (document.documentElement.classList.contains("ori-phone")) {
+      const edge = 8;
+      const atTop = window.scrollY < 2;
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+      const atBot = window.scrollY >= maxScroll - 2;
+      const nodes = document.querySelectorAll(".hdr-date-long, .hdr-date-time, .live-clock, .home-btn, .cbtn, .cmd-chip, .month-title, .mpill, .ori-ev, .ori-dom, .banner, .light-pad-name, .light-pad-src, .connect-title, .cmd-title, .banner-title, .hub-cam-label, .tile-label, .leaveby-dest, .leaveby .time, .who-up-name, .who-up-kicker, .ori-peek-card");
+      nodes.forEach((el) => {
+        if (!shown(el) || el.closest(".ori-pool-hit")) return;
+        const r = el.getBoundingClientRect();
+        if (r.width < 2 || r.height < 2 || r.height > innerHeight * 0.92) return;
+        if (r.bottom <= 0 || r.top >= innerHeight) return;
+        const label = (ownText(el) || String(el.className || el.id || "").slice(0, 24)).slice(0, 48);
+        if (r.left < edge) hits.push(tag + " edge-left " + Math.round(r.left) + " " + label);
+        if (r.right > innerWidth - edge) hits.push(tag + " edge-right " + Math.round(innerWidth - r.right) + " " + label);
+        if (atTop && r.top >= 0 && r.top < edge) hits.push(tag + " edge-top " + Math.round(r.top) + " " + label);
+        if (atTop && r.top < 0 && r.bottom > edge) hits.push(tag + " cut-top " + label);
+        if (atBot && r.bottom <= innerHeight && r.bottom > innerHeight - edge) hits.push(tag + " edge-bottom " + Math.round(innerHeight - r.bottom) + " " + label);
+        if (atBot && r.bottom > innerHeight && r.top < innerHeight - edge && r.top >= 0) hits.push(tag + " cut-bottom " + label);
+      });
+    }
   }
+  const peekBtn = document.querySelector(".ori-pool-hit");
+  const peek = document.querySelector(".ori-peek");
+  if (document.documentElement.classList.contains("ori-phone") && peekBtn && peek && peek.hidden) peekBtn.click();
   const ys = [0];
   const max = Math.max(0, document.documentElement.scrollHeight - innerHeight);
   if (max > 80) ys.push(Math.round(max * 0.5), max);
@@ -213,18 +236,59 @@ const SCAN = `(() => {
     if (canvas) {
       const ctx = canvas.getContext("2d");
       const pr = canvas.getBoundingClientRect();
-      document.querySelectorAll(".tile-label, .hub-cam-label, .leaveby-dest, .leaveby .time, .hub-lights-title, .sp-brand, .who-up-name").forEach((el) => {
-        if (!shown(el) || plateOpaque(el)) return;
+      document.querySelectorAll("header.hdr, #hub-cam-deck, .leaveby, #hub-lights-panel, #hub-spotify-strip, .who-up, .tile-grid > .tile").forEach((el) => {
+        if (!shown(el)) return;
         const r = el.getBoundingClientRect();
-        const x = Math.round(r.left + r.width / 2 - pr.left);
-        const y = Math.round(r.top + r.height / 2 - pr.top);
-        if (x < 0 || y < 0 || x >= canvas.width || y >= canvas.height) return;
-        let px;
-        try { px = ctx.getImageData(x, y, 1, 1).data; } catch (e) { return; }
-        if (px[3] > 12) hits.push("path through " + (ownText(el) || el.className).toString().slice(0, 40));
+        const samples = [
+          [r.left + r.width * 0.5, r.top + Math.min(r.height * 0.5, 36)],
+          [r.left + 14, r.top + Math.min(r.height * 0.45, 28)],
+          [r.right - 14, r.top + Math.min(r.height * 0.45, 28)]
+        ];
+        for (const pair of samples) {
+          const x = Math.round(pair[0] - pr.left);
+          const y = Math.round(pair[1] - pr.top);
+          if (x < 0 || y < 0 || x >= canvas.width || y >= canvas.height) continue;
+          let px;
+          try { px = ctx.getImageData(x, y, 1, 1).data; } catch (e) { continue; }
+          if (px[3] > 12) {
+            hits.push("path through card " + String(el.id || el.className || "card").slice(0, 40));
+            break;
+          }
+        }
+      });
+    }
+    if (peek && !peek.hidden && shown(peek)) {
+      const a = peek.getBoundingClientRect();
+      document.querySelectorAll(".hub-cam-label").forEach((lab) => {
+        if (!shown(lab)) return;
+        const b = lab.getBoundingClientRect();
+        const ix = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+        const iy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+        if (ix > 0 && iy > 0) hits.push("peek covers " + (ownText(lab) || "label"));
       });
     }
   }
+  document.querySelectorAll(".light-pad").forEach((el) => {
+    if (!shown(el)) return;
+    const bg = getComputedStyle(el).backgroundColor || "";
+    const m = bg.match(/rgba?\\(([^)]+)\\)/);
+    let alpha = 0;
+    if (m) {
+      const p = m[1].split(",").map((s) => parseFloat(s));
+      alpha = p.length >= 4 ? p[3] : 1;
+    }
+    if (alpha < 0.82) hits.push("row missing plate " + (ownText(el) || "light").slice(0, 48));
+  });
+  const pending = [...document.querySelectorAll(".light-pad.is-pending, .light-pad.is-need-connect, [data-unconnected-summary]")].filter(shown);
+  if (pending.length > 1) hits.push("unconnected cards " + pending.length);
+  pending.forEach((el) => {
+    const name = el.querySelector(".light-pad-name");
+    if (!name) return;
+    const t = (name.textContent || "").replace(/\\s+/g, " ").trim();
+    if (!t || /not connected yet/i.test(t)) hits.push("nameless unconnected card");
+  });
+  const unconnectedHits = ((document.body.innerText || "").match(/NOT CONNECTED YET/gi) || []).length;
+  if (unconnectedHits > 1) hits.push("unconnected text repeated " + unconnectedHits);
   return [...new Set(hits)];
 })()`;
 
