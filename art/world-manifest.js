@@ -1,6 +1,6 @@
-/* One manifest per world. Drop high-res layers in
-   plates/2026-10-05/ori-layers/<world>/<portrait|landscape>/<id>.png
-   and they replace the stand-in. Real alpha. Original art only. */
+/* Painted layers live in assets/ori/<world>/<portrait|landscape>/<id>.webp.
+   Sky is an opaque matte. far/mid/near/fg are transparent.
+   The old plates path stays as a fallback. Original art only. */
 (function (global) {
   var ROOT = "plates/2026-10-05/ori-layers";
 
@@ -12,16 +12,16 @@
     return row;
   }
 
-  /* Seven seats across four islands: ledges, a root, and a bridge.
-     The creature stands lower-left, so Shower stays off its body. */
+  /* Seats sit on the painted mid/near land. The creature stands
+     lower-left, beside the lowest chest, not on top of it. */
   var LEDGES = [
-    { x: 0.16, y: 0.32, depth: 0.20, scale: 0.74 },
-    { x: 0.80, y: 0.18, depth: 0.08, scale: 0.62 },
-    { x: 0.76, y: 0.42, depth: 0.45, scale: 0.88 },
-    { x: 0.50, y: 0.48, depth: 0.45, scale: 0.86 },
-    { x: 0.46, y: 0.56, depth: 0.56, scale: 0.92 },
-    { x: 0.58, y: 0.64, depth: 0.70, scale: 0.98 },
-    { x: 0.36, y: 0.68, depth: 0.70, scale: 1.00 }
+    { x: 0.23, y: 0.30, depth: 0.20, scale: 0.74 },
+    { x: 0.41, y: 0.36, depth: 0.28, scale: 0.80 },
+    { x: 0.23, y: 0.39, depth: 0.34, scale: 0.84 },
+    { x: 0.86, y: 0.45, depth: 0.42, scale: 0.86 },
+    { x: 0.68, y: 0.48, depth: 0.50, scale: 0.90 },
+    { x: 0.86, y: 0.55, depth: 0.62, scale: 0.94 },
+    { x: 0.14, y: 0.67, depth: 0.74, scale: 1.00 }
   ];
   var HAYES_SCENE = [
     { stamp: 1, x: 0.82, y: 0.20, scale: 0.40, depth: 0.08, haze: 0.58, flip: true },
@@ -48,10 +48,10 @@
       grade: "storm",
       layers: [
         layer("sky", 0.05, "art/hayes/sky.jpg"),
-        layer("far", 0.16, "art/hayes/far.png"),
-        layer("mid", 0.32, "art/hayes/mid.png"),
-        layer("near", 0.52, "art/hayes/near.png"),
-        layer("fg", 0.88, "art/hayes/fg.png", { blur: 3 })
+        layer("far", 0.15, "art/hayes/far.png"),
+        layer("mid", 0.35, "art/hayes/mid.png"),
+        layer("near", 0.6, "art/hayes/near.png"),
+        layer("fg", 1.0, "art/hayes/fg.png")
       ],
       stamp: "art/hayes/mid.png",
       stamps: HAYES_ISLANDS,
@@ -63,47 +63,47 @@
     harris: {
       grade: "ore",
       layers: [
-        layer("sky", 0.04, "art/forest/sky.jpg"),
-        layer("far", 0.14, "art/forest/sky-soft.jpg"),
-        layer("mid", 0.30, "art/forest/mid.png"),
-        layer("near", 0.50, "art/forest/near.png"),
-        layer("fg", 0.86, "art/forest/fg.png", { blur: 3 })
+        layer("sky", 0.05, "art/forest/sky.jpg"),
+        layer("far", 0.15, "art/forest/sky-soft.jpg"),
+        layer("mid", 0.35, "art/forest/mid.png"),
+        layer("near", 0.6, "art/forest/near.png"),
+        layer("fg", 1.0, "art/forest/fg.png")
       ],
       stamp: "art/forest/island.png",
       stamps: [],
       rays: "art/forest/rays.jpg",
       ground: ["art/forest/near.png", "art/forest/fg.png"],
       landmarks: [
-        { x: 0.22, y: 0.30, depth: 0.20, scale: 0.72, kind: "slab" },
-        { x: 0.74, y: 0.28, depth: 0.16, scale: 0.68, kind: "crystal" },
-        { x: 0.42, y: 0.40, depth: 0.34, scale: 0.82, kind: "cluster" },
-        { x: 0.80, y: 0.48, depth: 0.42, scale: 0.86, kind: "geode" },
-        { x: 0.18, y: 0.52, depth: 0.50, scale: 0.90, kind: "block" },
-        { x: 0.56, y: 0.58, depth: 0.60, scale: 0.94, kind: "shard" },
-        { x: 0.34, y: 0.66, depth: 0.72, scale: 1.00, kind: "node" }
+        { x: 0.14, y: 0.27, depth: 0.18, scale: 0.72, kind: "slab" },
+        { x: 0.41, y: 0.27, depth: 0.22, scale: 0.74, kind: "crystal" },
+        { x: 0.41, y: 0.36, depth: 0.32, scale: 0.80, kind: "cluster" },
+        { x: 0.23, y: 0.39, depth: 0.40, scale: 0.84, kind: "geode" },
+        { x: 0.77, y: 0.45, depth: 0.48, scale: 0.88, kind: "block" },
+        { x: 0.59, y: 0.55, depth: 0.58, scale: 0.92, kind: "shard" },
+        { x: 0.77, y: 0.58, depth: 0.66, scale: 1.00, kind: "node" }
       ]
     },
     ainsley: {
       grade: "dusk",
       layers: [
-        layer("sky", 0.04, "art/forest/sky-soft.jpg"),
-        layer("far", 0.12, "art/forest/sky.jpg"),
-        layer("mid", 0.28, "art/forest/mid.png"),
-        layer("near", 0.48, "art/forest/near.png"),
-        layer("fg", 0.84, "art/forest/fg.png", { blur: 4 })
+        layer("sky", 0.05, "art/forest/sky-soft.jpg"),
+        layer("far", 0.15, "art/forest/sky.jpg"),
+        layer("mid", 0.35, "art/forest/mid.png"),
+        layer("near", 0.6, "art/forest/near.png"),
+        layer("fg", 1.0, "art/forest/fg.png")
       ],
       stamp: "art/forest/island.png",
       stamps: [],
       rays: "art/forest/rays.jpg",
       ground: ["art/forest/near.png", "art/forest/fg.png"],
       landmarks: [
-        { x: 0.18, y: 0.36, depth: 0.16, scale: 0.70, kind: "water" },
-        { x: 0.78, y: 0.34, depth: 0.18, scale: 0.68, kind: "water" },
-        { x: 0.46, y: 0.44, depth: 0.30, scale: 0.78, kind: "water" },
-        { x: 0.20, y: 0.56, depth: 0.55, scale: 0.90, kind: "dock" },
-        { x: 0.48, y: 0.60, depth: 0.62, scale: 0.94, kind: "dock" },
-        { x: 0.76, y: 0.58, depth: 0.58, scale: 0.92, kind: "dock" },
-        { x: 0.36, y: 0.68, depth: 0.74, scale: 1.00, kind: "dock" }
+        { x: 0.86, y: 0.42, depth: 0.22, scale: 0.74, kind: "water" },
+        { x: 0.59, y: 0.45, depth: 0.30, scale: 0.78, kind: "water" },
+        { x: 0.59, y: 0.55, depth: 0.42, scale: 0.86, kind: "water" },
+        { x: 0.77, y: 0.55, depth: 0.50, scale: 0.90, kind: "dock" },
+        { x: 0.14, y: 0.58, depth: 0.56, scale: 0.92, kind: "dock" },
+        { x: 0.68, y: 0.64, depth: 0.66, scale: 0.96, kind: "dock" },
+        { x: 0.86, y: 0.64, depth: 0.72, scale: 1.00, kind: "dock" }
       ]
     },
     mercury: {
@@ -120,8 +120,10 @@
   };
 
   global.HousePlates.urlFor = function (world, id, orient, standin) {
-    var base = ROOT + "/" + world + "/" + (orient || "portrait") + "/" + id + ".png";
+    var o = orient || "portrait";
+    var painted = "assets/ori/" + world + "/" + o + "/" + id + ".webp";
+    var base = ROOT + "/" + world + "/" + o + "/" + id + ".png";
     var flat = ROOT + "/" + world + "/" + id + ".png";
-    return [base, flat, standin];
+    return [painted, base, flat, standin];
   };
 })(window);

@@ -528,6 +528,7 @@
       this.rattleAt = t;
       tone("rattle");
     }
+    if (this.hideVisual) return;
     this.blink -= 1 / 60;
     if (this.blink < -this.nextBlink) { this.blink = 0.14; this.nextBlink = 2.2 + Math.random() * 3; }
     var energy = st.asleep ? 0.08 : (st.hungry ? 0.1 : (0.22 + this.display * 0.85));

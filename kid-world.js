@@ -148,6 +148,30 @@
   var plates = {};
   var platesReady = false;
   var feed = null;
+  var gyro = { gamma: 0, beta: 48, on: false };
+  var oriCreature = {};
+  var PLATE_ZOOM = 1.22;
+
+  function parallaxNow(t, drift) {
+    if (drift) return { x: Math.sin(t * 0.28) * 26, y: Math.sin(t * 0.16) * 8 };
+    if (reduced) return { x: 0, y: 0 };
+    var wall = Math.max(global.innerWidth || 0, global.innerHeight || 0) >= 1000;
+    if (wall) return { x: Math.sin(t * 0.12) * 26, y: Math.sin(t * 0.08) * 8 };
+    var tx = ((bg && bg.ptr != null ? bg.ptr : 0.5) - 0.5);
+    var gx = gyro.on ? clamp(gyro.gamma / 30, -1, 1) : 0;
+    var gy = gyro.on ? clamp(((gyro.beta || 48) - 48) / 36, -1, 1) : 0;
+    return { x: clamp(gx * 22 + tx * 36, -26, 26), y: clamp(gy * 14, -12, 12) };
+  }
+  function markJarVisual() {
+    var host = document.querySelector("[data-kw-jar]");
+    if (oriCreature.idle) {
+      document.body.classList.add("kw-sprite");
+      document.body.classList.remove("kw-jar-gl");
+      if (host && host._jar) host._jar.hideVisual = true;
+    } else if (platesReady) {
+      document.body.classList.add("kw-jar-gl");
+    }
+  }
 
   function loadImg(src) {
     return new Promise(function (res) {
@@ -174,29 +198,36 @@
     var book = global.HousePlates || {};
     var worlds = ["hayes", "harris", "ainsley"];
     var jobs = [];
+    [
+      ["idle", "assets/ori/creature/idle.webp"],
+      ["happy", "assets/ori/creature/happy_squish.webp"],
+      ["fed", "assets/ori/creature/fed_splash.webp"],
+      ["idleShadow", "assets/ori/creature/idle_shadow.webp"],
+      ["happyShadow", "assets/ori/creature/happy_squish_shadow.webp"],
+      ["fedShadow", "assets/ori/creature/fed_splash_shadow.webp"]
+    ].forEach(function (row) {
+      jobs.push(loadImg(row[1]).then(function (im) { oriCreature[row[0]] = im; }));
+    });
     worlds.forEach(function (world) {
       var man = book[world];
       if (!man) return;
-      plates[world] = plates[world] || {};
+      plates[world] = plates[world] || { portrait: {}, landscape: {} };
+      plates[world].portrait = plates[world].portrait || {};
+      plates[world].landscape = plates[world].landscape || {};
       (man.layers || []).forEach(function (layer) {
-        var urls = book.urlFor ? book.urlFor(world, layer.id, "portrait", layer.standin) : [layer.standin];
-        jobs.push(loadFirst(urls).then(function (im) { plates[world][layer.id] = im; }));
+        ["portrait", "landscape"].forEach(function (orient) {
+          var urls = book.urlFor ? book.urlFor(world, layer.id, orient, layer.standin) : [layer.standin];
+          jobs.push(loadFirst(urls).then(function (im) {
+            plates[world][orient][layer.id] = im;
+            if (orient === "portrait") plates[world][layer.id] = im;
+          }));
+        });
       });
-      if (man.stamp) {
-        var stampUrls = book.urlFor ? book.urlFor(world, "mid", "portrait", man.stamp) : [man.stamp];
-        jobs.push(loadFirst(stampUrls).then(function (im) { plates[world].stamp = im; }));
-      }
-      plates[world].bits = [];
-      (man.stamps || []).forEach(function (st, i) {
-        var urls = [
-          (book.root || "") + "/" + world + "/portrait/" + st.id + ".png",
-          (book.root || "") + "/" + world + "/" + st.id + ".png"
-        ];
-        jobs.push(loadFirst(urls).then(function (im) { plates[world].bits[i] = im; }));
-      });
-      if (man.rays) jobs.push(loadImg(man.rays).then(function (im) { plates[world].rays = im; }));
     });
-    return Promise.all(jobs).then(function () { platesReady = true; });
+    return Promise.all(jobs).then(function () {
+      platesReady = true;
+      markJarVisual();
+    });
   }
   function drawPlate(ctx, img, W, H, ox, oy, zoom, alpha, blur) {
     if (!img) return;
@@ -245,11 +276,20 @@
     return { x: col ? 0.76 : 0.24, y: y, depth: 0.2 + i * 0.05, scale: 0.75 + (i % 3) * 0.08 };
   }
   function creatureAnchor(W, H) {
-    var jw = 140;
-    var jh = 160;
-    var cx = W * 0.24;
-    var foot = H - 72;
-    return { jw: jw, jh: jh, jx: cx - jw / 2, jy: foot - jh, cx: cx, foot: foot };
+    var draw = clamp(Math.round(Math.min(W, H) * 0.424), 186, 300);
+    var bodyH = draw * (616 / 1024);
+    var bodyW = draw * (615 / 1024);
+    var cx = W * 0.46;
+    var foot = H - 100;
+    return {
+      draw: draw,
+      jw: bodyW,
+      jh: bodyH,
+      jx: cx - bodyW / 2,
+      jy: foot - bodyH,
+      cx: cx,
+      foot: foot
+    };
   }
   function layoutLedges(quests, W, H, world, px) {
     var n = quests.length;
@@ -347,51 +387,33 @@
     ctx.restore();
   }
   function fullCard(ctx, text, W, H, world) {
-    var maxW = W - 48;
+    var maxW = W - 56;
     var size = 16;
     ctx.save();
     ctx.font = "600 " + size + "px Palatino, Georgia, serif";
-    var lines = wrapLines(ctx, text, maxW - 28);
+    var lines = wrapLines(ctx, text, maxW);
     while (lines.length > 4 && size > 13) {
       size -= 1;
       ctx.font = "600 " + size + "px Palatino, Georgia, serif";
-      lines = wrapLines(ctx, text, maxW - 28);
+      lines = wrapLines(ctx, text, maxW);
     }
-    var h = lines.length * (size + 6) + 22;
-    var y = 62;
-    var x = 18;
-    var w = W - 36;
-    if (world === "harris") {
-      ctx.fillStyle = "rgba(232, 214, 176, 0.82)";
-      ctx.beginPath();
-      ctx.roundRect(x, y, w, h, 6);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(120, 86, 48, 0.45)";
-      ctx.stroke();
-    } else if (world === "ainsley") {
-      ctx.fillStyle = "rgba(255, 214, 170, 0.28)";
-      ctx.beginPath();
-      ctx.moveTo(x, y + 10);
-      ctx.quadraticCurveTo(W * 0.5, y - 8, x + w, y + 10);
-      ctx.lineTo(x + w, y + h - 8);
-      ctx.quadraticCurveTo(W * 0.5, y + h + 10, x, y + h - 8);
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle = "rgba(255, 220, 180, 0.55)";
-      ctx.stroke();
-    } else {
-      ctx.fillStyle = "rgba(186, 214, 150, 0.38)";
-      ctx.beginPath();
-      ctx.ellipse(W * 0.5, y + h / 2, w * 0.48, h * 0.55, 0, 0, 7);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(220, 240, 190, 0.45)";
-      ctx.stroke();
-    }
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = world === "harris" ? "#3a2614" : "#fff8ea";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    for (var i = 0; i < lines.length; i++) ctx.fillText(lines[i], W / 2, y + 14 + size / 2 + i * (size + 6));
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = "rgba(10, 8, 6, 0.82)";
+    ctx.shadowColor = "rgba(6, 4, 2, 0.9)";
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 1;
+    ctx.fillStyle = "rgba(255, 248, 236, 0.98)";
+    var y0 = 78;
+    for (var i = 0; i < lines.length; i++) {
+      var ly = y0 + i * (size + 6);
+      ctx.strokeText(lines[i], W / 2, ly);
+      ctx.shadowBlur = 0;
+      ctx.fillText(lines[i], W / 2, ly);
+      ctx.shadowBlur = 14;
+    }
     ctx.restore();
   }
   function feedDrops(ctx, t, t0, x, y, jx, jy) {
@@ -945,7 +967,7 @@
   }
   function drawOre(ctx, q, i, open, t) {
     var kinds = ["slab", "crystal", "cluster", "geode", "block", "shard", "node"];
-    var kind = kinds[i % kinds.length];
+    var kind = q.kind || kinds[i % kinds.length];
     var hues = [150, 188, 48, 272, 118, 28, 200];
     var hue = hues[i % hues.length];
     ctx.save();
@@ -1223,11 +1245,181 @@
     warmth(ctx, W, H, fill);
     return shown;
   }
+  function oriBook(world, W, H) {
+    var pack = plates[world];
+    if (!pack) return null;
+    var orient = orientFor(W, H);
+    var book = pack[orient];
+    var skyPlate = book && book.sky;
+    if (skyPlate && /assets\/ori\//.test(skyPlate.src || "")) return book;
+    return null;
+  }
+  function layerShift(id, man) {
+    var layers = (man && man.layers) || [];
+    for (var i = 0; i < layers.length; i++) if (layers[i].id === id) return layers[i].parallax;
+    return id === "fg" ? 1 : 0.3;
+  }
+  function softBloom(ctx, x, y, r, col) {
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    var g = ctx.createRadialGradient(x, y, 2, x, y, r);
+    g.addColorStop(0, col);
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 7);
+    ctx.fill();
+    ctx.restore();
+  }
+  function godRays(ctx, W, H, t, world) {
+    if (reduced) return;
+    var tint = world === "harris" ? "186, 236, 196" : world === "ainsley" ? "255, 198, 154" : "255, 228, 186";
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    for (var i = 0; i < 4; i++) {
+      var pulse = 0.42 + 0.58 * (0.5 + 0.5 * Math.sin(t * 0.45 + i * 1.7));
+      var x = W * (0.1 + i * 0.24) + Math.sin(t * 0.15 + i) * 12;
+      ctx.save();
+      ctx.translate(x, 0);
+      ctx.rotate(-0.18 + Math.sin(t * 0.2 + i) * 0.03);
+      var g = ctx.createLinearGradient(0, 0, 18, H * 0.7);
+      g.addColorStop(0, "rgba(" + tint + "," + (0.2 * pulse).toFixed(3) + ")");
+      g.addColorStop(1, "rgba(" + tint + ",0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(-8, 0, 22 + (i % 3) * 10, H * 0.66);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+  function waterShimmer(ctx, W, H, t) {
+    if (reduced) return;
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = "rgba(255, 226, 190, 0.9)";
+    for (var i = 0; i < 6; i++) {
+      var y = H * (0.56 + i * 0.045);
+      ctx.globalAlpha = 0.12 + 0.16 * (0.5 + 0.5 * Math.sin(t * 1.5 + i * 0.8));
+      ctx.beginPath();
+      ctx.moveTo(W * 0.08, y);
+      for (var s = 1; s <= 8; s++) {
+        var x = W * (0.08 + (s / 8) * 0.84);
+        ctx.lineTo(x, y + Math.sin(t * 1.7 + s * 0.65 + i) * 3.2);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function creaturePose(t) {
+    if (!feed) return { a: "idle", b: "idle", u: 1 };
+    var age = t - feed.t0;
+    if (age < 0.35) return { a: "idle", b: "happy", u: age / 0.35 };
+    if (age < 0.95) return { a: "happy", b: "happy", u: 1 };
+    if (age < 1.3) return { a: "happy", b: "fed", u: (age - 0.95) / 0.35 };
+    if (age < 2.6) return { a: "fed", b: "fed", u: 1 };
+    if (age < 3.0) return { a: "fed", b: "idle", u: (age - 2.6) / 0.4 };
+    return { a: "idle", b: "idle", u: 1 };
+  }
+  function drawOriCreature(ctx, W, H, t) {
+    if (!oriCreature.idle) return false;
+    var box = creatureAnchor(W, H);
+    var pose = creaturePose(t);
+    var resting = pose.a === "idle" && pose.b === "idle";
+    var breath = Math.sin(t * 1.7);
+    var squash = resting ? breath : breath * 0.28;
+    var sx = 1 + squash * 0.04;
+    var sy = 1 - squash * 0.055;
+    var draw = box.draw;
+    var bottom = box.foot + draw * 0.04;
+    function blit(img, alpha) {
+      if (!img || alpha <= 0.02) return;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(box.cx, bottom);
+      ctx.scale(sx, sy);
+      ctx.drawImage(img, -draw / 2, -draw, draw, draw);
+      ctx.restore();
+    }
+    var same = pose.a === pose.b;
+    var sa = same ? 1 : 1 - pose.u;
+    var sb = same ? 0 : pose.u;
+    blit(oriCreature[pose.a + "Shadow"] || oriCreature.idleShadow, sa);
+    blit(oriCreature[pose.b + "Shadow"] || oriCreature.idleShadow, sb);
+    blit(oriCreature[pose.a] || oriCreature.idle, sa);
+    blit(oriCreature[pose.b] || oriCreature.idle, sb);
+    return true;
+  }
+  function paintOri(ctx, W, H, t, pan, quests, fill, world) {
+    var book = oriBook(world, W, H);
+    var man = (global.HousePlates && HousePlates[world]) || {};
+    if (!book || !book.sky) sky(ctx, W, H, [[0, "#102028"], [0.55, "#243428"], [1, "#121610"]]);
+    ["sky", "far", "mid", "near"].forEach(function (id) {
+      var img = book && book[id];
+      if (!img || img.width < 64) return;
+      var p = layerShift(id, man);
+      var drift = reduced ? 0 : Math.sin(t * 0.12 + p * 5) * 3;
+      drawPlate(ctx, img, W, H, pan.x * p + drift, pan.y * p * 0.45, PLATE_ZOOM, 1, 0);
+      if (id === "sky") godRays(ctx, W, H, t, world);
+    });
+    if (world === "ainsley") waterShimmer(ctx, W, H, t);
+    motes(ctx, W, H, t, pan.x, world === "ainsley" ? "#ffd8c0" : world === "harris" ? "#e7ffe4" : "#fff1d0", reduced ? 8 : 24);
+    var cap = (man.landmarks && man.landmarks.length) || quests.length;
+    var shown = quests.slice(0, cap);
+    layoutLedges(shown, W, H, world, pan.x);
+    var bloom = world === "harris" ? "rgba(176, 255, 196, 0.7)" : world === "ainsley" ? "rgba(255, 190, 130, 0.72)" : "rgba(255, 214, 156, 0.75)";
+    shown.forEach(function (q, i) {
+      var open = q.done || (feed && feed.index === i && t < feed.t0 + 2.4);
+      softBloom(ctx, q.x, q.seat - 10, open ? 72 : 46, bloom);
+      if (world === "hayes") drawChest(ctx, q, open, t);
+      else if (world === "harris") drawOre(ctx, q, i, open, t);
+      else {
+        if (q.kind === "water") {
+          ctx.save();
+          ctx.globalAlpha = 0.28;
+          ctx.fillStyle = "rgba(255, 196, 140, 0.55)";
+          ctx.beginPath();
+          ctx.ellipse(q.x, q.seat + 16, 18, 5, 0, 0, 7);
+          ctx.fill();
+          ctx.restore();
+        }
+        drawLantern(ctx, q, i, open, t);
+      }
+      var hold = q.y;
+      q.y = q.chipY != null ? q.chipY : q.seat - 28;
+      drawLight(ctx, q, world);
+      q.chipY = q.y;
+      q.y = hold;
+    });
+    var fg = book && book.fg;
+    if (fg && fg.width >= 64) {
+      var fp = layerShift("fg", man);
+      var sway = reduced ? 0 : Math.sin(t * 0.9) * 0.016;
+      ctx.save();
+      ctx.translate(W / 2, H);
+      ctx.transform(1, 0, sway, 1, 0, 0);
+      ctx.translate(-W / 2, -H);
+      drawPlate(ctx, fg, W, H, pan.x * fp, pan.y * fp * 0.35, PLATE_ZOOM, 1, 0);
+      ctx.restore();
+    }
+    if (!reduced) motes(ctx, W, H, t * 0.85 + 4, pan.x * 0.4, "#fff6e0", 8);
+    drawOriCreature(ctx, W, H, t);
+    var anchor = creatureAnchor(W, H);
+    if (feed && shown[feed.index]) {
+      var fq = shown[feed.index];
+      feedDrops(ctx, t, feed.t0, fq.x, fq.ledY || fq.y, anchor.cx, anchor.jy + anchor.jh * 0.45);
+      if (t < feed.t0 + 4.2) fullCard(ctx, feed.label || fq.label, W, H, world);
+      burst(ctx, t, feed.t0, fq.x, fq.ledY || fq.seat, world === "harris" ? "#d8ffc4" : "#ffe7a8");
+    }
+    warmth(ctx, W, H, fill);
+    return shown;
+  }
   function paintWorld(ctx, W, H, t, which, quests, fill, px) {
     var world = which === "harris" || which === "ainsley" ? which : "hayes";
-    if (world === "harris") return paintGrove(ctx, W, H, t, px || 0, quests || [], fill || 0) || [];
-    if (world === "ainsley") return paintLake(ctx, W, H, t, px || 0, quests || [], fill || 0) || [];
-    return paintKid(ctx, W, H, t, px || 0, quests || [], fill || 0, world) || [];
+    var pan = px && typeof px === "object" ? px : { x: px || 0, y: 0 };
+    if (oriBook(world, W, H)) return paintOri(ctx, W, H, t, pan, quests || [], fill || 0, world) || [];
+    if (world === "harris") return paintGrove(ctx, W, H, t, pan.x, quests || [], fill || 0) || [];
+    if (world === "ainsley") return paintLake(ctx, W, H, t, pan.x, quests || [], fill || 0) || [];
+    return paintKid(ctx, W, H, t, pan.x, quests || [], fill || 0, world) || [];
   }
 
   /* ---------- live canvas ---------- */
@@ -1259,7 +1451,7 @@
     var iso = dayIso || todayIso();
     var quests = readQuests(iso);
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };
-    this.hits = paintWorld(this.ctx, W, H, t, which || kid(), quests, st.fill || 0, (this.ptr - 0.5) * 40);
+    this.hits = paintWorld(this.ctx, W, H, t, which || kid(), quests, st.fill || 0, parallaxNow(t, false));
     var jhost = document.querySelector("[data-kw-jar]");
     if (jhost && jhost._jar && jhost._jar.setEnv) {
       var skyPlate = plates[which || kid()] && plates[which || kid()].sky;
@@ -1429,6 +1621,7 @@
     });
     host._jar = jar;
     if (capMode && jar) jar.alive = false;
+    markJarVisual();
   }
   function hitQuest(ev) {
     if (!bg || !bg.hits) return null;
@@ -1541,6 +1734,12 @@
     cv.addEventListener("pointermove", function (e) {
       bg.ptr = e.clientX / Math.max(1, innerWidth);
     }, { passive: true });
+    global.addEventListener("deviceorientation", function (ev) {
+      if (ev.gamma == null) return;
+      gyro.gamma = ev.gamma;
+      if (ev.beta != null) gyro.beta = ev.beta;
+      gyro.on = true;
+    }, true);
     global.addEventListener("resize", function () { if (bg) bg.resize(); });
     document.addEventListener("house:kid-rendered", function () {
       paintWeek();
@@ -1591,9 +1790,9 @@
     burstAt = !exportFrame.skipTap && t >= 4 ? 4 : -1;
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };
     if (global.JarEngine && JarEngine.setVirtual) JarEngine.setVirtual(t * 1000);
-    paintWorld(ctx, cssW, cssH, t, kid(), quests, st.fill || 0, Math.sin(t * 0.3) * 16);
+    paintWorld(ctx, cssW, cssH, t, kid(), quests, st.fill || 0, parallaxNow(t, true));
     var host = document.querySelector("[data-kw-jar]");
-    if (host && host._jar) {
+    if (!oriCreature.idle && host && host._jar) {
       if (host._jar.cv.width !== 280 || host._jar.cv.height !== 320) {
         host._jar.cv.width = 280;
         host._jar.cv.height = 320;
