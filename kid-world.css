@@ -529,10 +529,27 @@ body.kw-on #tapsync-badge { display: none !important; }
   bottom: 128px;
   max-height: 46vh;
   overflow: auto;
-  padding: 12px;
+  padding: 14px 14px 16px;
+  border-radius: 22px;
+  background: rgba(28, 18, 12, 0.38);
+  color: #fff6ea;
+  box-shadow: 0 0 28px rgba(255, 210, 150, 0.18);
+  backdrop-filter: blur(8px);
+}
+.kw-scene-body {
+  margin-top: 8px;
+  padding: 14px 16px;
   border-radius: 18px;
-  background: rgba(6, 12, 18, 0.55);
-  color: #f4fbff;
+  background: rgba(255, 236, 210, 0.16);
+  max-width: 36rem;
+}
+.cw-phase, .cw-idea {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: 0 0 12px rgba(255, 214, 160, 0.85);
+  font-family: Palatino, Georgia, serif;
 }
 .kw-drawer .cw-phase[data-late] { display: none; }
 .kw-drawer.is-more .cw-phase[data-late] { display: inline-flex; }
