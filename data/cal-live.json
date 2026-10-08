@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-08T13:31:22.580Z",
+  "fetchedAt": "2026-10-08T13:48:55.238Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-03",
   "windowEnd": "2026-10-14",
@@ -16,26 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "jsv3ukvj82chj7v8tmk4mv4atk",
-      "summary": "Harris — SRE specials: Spanish + Library checkout",
-      "start": "2026-10-08",
-      "end": "2026-10-08",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true,
-      "pinnedUntil": "8:40"
-    },
-    {
-      "id": "t1sse9vtre7av9lvi2kctig9b8",
-      "summary": "Hayes — SRE specials: Spanish",
-      "start": "2026-10-08",
-      "end": "2026-10-08",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true,
-      "pinnedUntil": "8:40"
-    },
     {
       "id": "43chat4nm1cmv3tsqtd2p9cdjo_20261008T200000Z",
       "summary": "Ainsley — LKMS Homework Help · 3:00",

@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 8 2026",
   "asOfIso": "2026-10-08",
-  "refreshedAt": "2026-10-08T13:31:21.803Z",
+  "refreshedAt": "2026-10-08T13:48:54.752Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,43 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "7:00",
-    "place": "SRE specials: Spanish + Library checkout",
-    "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+    "time": "3:00",
+    "place": "LKMS Homework Help",
+    "detailHtml": "5:00 Ainsley swim — Coach Ann · 6:00 Hayes flag practice · kids with Mom · until Fri Oct 9 · 3:00",
     "badge": "Thu",
-    "startIso": "2026-10-08T12:00:00.000Z",
-    "endIso": "2026-10-08T12:15:00.000Z",
+    "startIso": "2026-10-08T20:00:00.000Z",
+    "endIso": "2026-10-08T21:00:00.000Z",
     "kind": "school",
     "queue": [
       {
         "label": "Next up · today",
-        "time": "7:00",
-        "place": "SRE specials: Spanish + Library checkout",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-08T12:00:00.000Z",
-        "endIso": "2026-10-08T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:00",
-        "summary": "Harris — SRE specials: Spanish + Library checkout"
-      },
-      {
-        "label": "Next up · today",
-        "time": "7:00",
-        "place": "SRE specials: Spanish",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-08T12:00:00.000Z",
-        "endIso": "2026-10-08T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:00",
-        "summary": "Hayes — SRE specials: Spanish"
-      },
-      {
-        "label": "Next up · today",
         "time": "3:00",
         "place": "LKMS Homework Help",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "5:00 Ainsley swim — Coach Ann · 6:00 Hayes flag practice · kids with Mom · until Fri Oct 9 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-08T20:00:00.000Z",
         "endIso": "2026-10-08T21:00:00.000Z",
@@ -65,7 +41,7 @@
         "label": "Next up · today",
         "time": "5:00",
         "place": "Ainsley swim — Coach Ann",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "6:00 Hayes flag practice · kids with Mom · until Fri Oct 9 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-08T22:00:00.000Z",
         "endIso": "2026-10-08T23:00:00.000Z",
@@ -77,7 +53,7 @@
         "label": "Next up · today",
         "time": "6:00",
         "place": "Hayes flag practice",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "5:00 Ainsley swim — Coach Ann · kids with Mom · until Fri Oct 9 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-08T23:00:00.000Z",
         "endIso": "2026-10-09T00:15:00.000Z",
@@ -168,6 +144,30 @@
         "kind": "sport",
         "whenLabel": "Sat 11:25",
         "summary": "Hayes flag — SRE Falcons vs Funk · leave 11:25 · game 12:15"
+      },
+      {
+        "label": "Next up · Sat",
+        "time": "1:15",
+        "place": "Hayes flag pickup",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-10T18:15:00.000Z",
+        "endIso": "2026-10-10T18:35:00.000Z",
+        "kind": "leave",
+        "whenLabel": "Sat 1:15",
+        "summary": "Hayes — flag pickup · 1:15"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "7:00",
+        "place": "SRE specials: Music",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-12T12:00:00.000Z",
+        "endIso": "2026-10-12T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Mon 7:00",
+        "summary": "Harris — SRE specials: Music"
       }
     ]
   },
@@ -311,13 +311,6 @@
       },
       "today": [
         {
-          "kind": "event",
-          "when": "Thu · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
-          "hint": "",
-          "tone": "act"
-        },
-        {
           "kind": "note",
           "when": "All day",
           "what": "🏡 At Mom's",
@@ -343,12 +336,6 @@
         {
           "when": "Mon 5 · 12:00",
           "what": "SRE Peace Week",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 8 · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
           "tone": "act",
           "hint": ""
         },
@@ -567,13 +554,6 @@
       "today": [
         {
           "kind": "event",
-          "when": "Thu · 7:00",
-          "what": "SRE specials: Spanish",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
           "when": "Thu · 6:00",
           "what": "Hayes flag practice",
           "hint": "YOUR board",
@@ -617,12 +597,6 @@
         {
           "when": "Mon 5 · 12:00",
           "what": "SRE Peace Week",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 8 · 7:00",
-          "what": "SRE specials: Spanish",
           "tone": "act",
           "hint": ""
         },
@@ -1004,16 +978,6 @@
           "tone": "act"
         },
         {
-          "when": "Thu 8 · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 8 · 7:00",
-          "what": "SRE specials: Spanish",
-          "tone": "act"
-        },
-        {
           "when": "Thu 8 · 3:00",
           "what": "LKMS Homework Help",
           "tone": "act"
@@ -1116,6 +1080,16 @@
         {
           "when": "Tue 13 · 7:00",
           "what": "SRE specials: PE (tennis shoes)",
+          "tone": "act"
+        },
+        {
+          "when": "Tue 13 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act"
+        },
+        {
+          "when": "Tue 13 · 10:45",
+          "what": "SRE pickup for dentist",
           "tone": "act"
         }
       ]
