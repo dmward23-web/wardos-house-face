@@ -170,8 +170,8 @@ html.ori-phone.ori-home .ori-life .ori-shaft-sweep {
   top: -20%;
   width: 26%;
   height: 160%;
-  background: linear-gradient(90deg, transparent, rgba(230, 255, 248, 0.7), transparent);
-  filter: blur(8px);
+  background: linear-gradient(90deg, transparent, rgba(230, 255, 248, 0.42), transparent);
+  filter: blur(18px);
   animation: ori-sweep 3.6s ease-in-out infinite;
 }
 @keyframes ori-life-mote {
