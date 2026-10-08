@@ -257,8 +257,11 @@
     ctx.restore();
   }
   function shortLabel(full) {
+    if (global.KidLayout && KidLayout.shortLabel) return KidLayout.shortLabel(full);
     var s = String(full || "").replace(/\s+/g, " ").trim();
-    s = s.replace(/^\s*\p{Extended_Pictographic}\s*/u, "");
+    s = s.replace(/^(?:\p{Extended_Pictographic}|\uFE0F|\uFE0E|\u200D|\s)+/u, "");
+    s = s.replace(/[\uFE0F\uFE0E\u200D]/g, "");
+    s = s.replace(/\s*\([^)]*\)/g, "");
     var head = s.split(/\s+[—–]\s+|\s+-\s+/)[0];
     var bit = head.split(/\s+·\s+/)[0].trim();
     return bit || head || s;
@@ -295,6 +298,7 @@
     return clamp(Math.round(W * 72 / 440), 64, cap);
   }
   function creatureAnchor(W, H) {
+    if (global.KidLayout && KidLayout.creatureAnchor) return KidLayout.creatureAnchor(kid(), W, H);
     var draw = clamp(Math.round(Math.min(W, H) * 0.318), 140, 226);
     var book = (GROUND[kid()] || GROUND.hayes);
     var g = book[orientFor(W, H)] || book.portrait;
@@ -339,6 +343,10 @@
     }
   }
   function layoutLedges(quests, W, H, world, px) {
+    if (global.KidLayout && KidLayout.place) {
+      KidLayout.place(quests, W, H, world, px || 0);
+      return;
+    }
     var n = quests.length;
     var ms = markerPx(W);
     var box = creatureAnchor(W, H);
@@ -415,17 +423,27 @@
     ctx.save();
     var size = 16;
     var maxW = q.maxW || 132;
-    ctx.font = "600 " + size + "px " + SANS;
-    var lines = wrapLines(ctx, q.chip || q.label, maxW);
-    if (lines.length > 2) {
-      size = 15;
+    var lines;
+    var tw = 0;
+    if (global.KidLayout && KidLayout.metrics) {
+      var met = KidLayout.metrics(q.chip || shortLabel(q.label), maxW);
+      lines = met.lines;
+      size = met.size;
+      tw = met.tw;
+      q.hw = met.hw;
+      q.hh = met.hh;
+    } else {
       ctx.font = "600 " + size + "px " + SANS;
       lines = wrapLines(ctx, q.chip || q.label, maxW);
+      if (lines.length > 2) {
+        size = 15;
+        ctx.font = "600 " + size + "px " + SANS;
+        lines = wrapLines(ctx, q.chip || q.label, maxW);
+      }
+      for (var j = 0; j < lines.length; j++) tw = Math.max(tw, ctx.measureText(lines[j]).width);
+      q.hw = Math.max(36, tw + 8);
+      q.hh = lines.length * (size + 3) + 4;
     }
-    var tw = 0;
-    for (var j = 0; j < lines.length; j++) tw = Math.max(tw, ctx.measureText(lines[j]).width);
-    q.hw = Math.max(36, tw + 8);
-    q.hh = lines.length * (size + 3) + 4;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     paintHalo(ctx, q.x, q.y, tw * 0.62 + 14, q.hh * 0.78);
@@ -1778,9 +1796,10 @@
   }
 
   function lanternPoint(i, W, H, t) {
+    if (global.KidLayout && KidLayout.lanternPoint) return KidLayout.lanternPoint(i, W, H, t);
     var u = i / 6;
-    var x = W * (0.08 + u * 0.5) + Math.sin(t * 0.2 + i) * 2;
-    var y = H * (0.8 + Math.sin(u * Math.PI * 1.35) * 0.045);
+    var x = W * (0.58 + u * 0.36) + Math.sin((t || 0) * 0.2 + i) * 2;
+    var y = H * (0.785 + Math.sin(u * Math.PI * 1.35) * 0.028);
     return { x: x, y: y };
   }
   function paintLanternWeek(ctx, W, H, t) {
@@ -1887,9 +1906,7 @@
     cssW = cssW || 440;
     cssH = cssH || 956;
     dpr = dpr || 2;
-    exportFrame.skipTap = true;
     var canvas = exportFrame(t, cssW, cssH, dpr);
-    exportFrame.skipTap = false;
     var ctx = canvas.getContext("2d");
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     paintLanternWeek(ctx, cssW, cssH, t);

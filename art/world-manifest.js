@@ -74,13 +74,13 @@
       rays: "art/forest/rays.jpg",
       ground: ["art/forest/near.png", "art/forest/fg.png"],
       landmarks: [
-        { x: 0.34, y: 0.22, depth: 0.35, scale: 1, kind: "slab" },
-        { x: 0.16, y: 0.32, depth: 0.35, scale: 1, kind: "crystal" },
-        { x: 0.40, y: 0.30, depth: 0.35, scale: 1, kind: "cluster" },
-        { x: 0.26, y: 0.38, depth: 0.35, scale: 1, kind: "geode" },
-        { x: 0.84, y: 0.42, depth: 0.35, scale: 1, kind: "block" },
-        { x: 0.72, y: 0.54, depth: 0.35, scale: 1, kind: "shard" },
-        { x: 0.86, y: 0.58, depth: 0.35, scale: 1, kind: "node" }
+        { x: 0.20, y: 0.17, depth: 0.35, scale: 1, kind: "slab" },
+        { x: 0.56, y: 0.30, depth: 0.35, scale: 1, kind: "crystal" },
+        { x: 0.18, y: 0.42, depth: 0.35, scale: 1, kind: "cluster" },
+        { x: 0.82, y: 0.36, depth: 0.35, scale: 1, kind: "geode" },
+        { x: 0.48, y: 0.54, depth: 0.35, scale: 1, kind: "block" },
+        { x: 0.84, y: 0.58, depth: 0.35, scale: 1, kind: "shard" },
+        { x: 0.18, y: 0.66, depth: 0.35, scale: 1, kind: "node" }
       ]
     },
     ainsley: {
@@ -97,13 +97,13 @@
       rays: "art/forest/rays.jpg",
       ground: ["art/forest/near.png", "art/forest/fg.png"],
       landmarks: [
-        { x: 0.60, y: 0.40, depth: 0.35, scale: 1, kind: "dock" },
-        { x: 0.86, y: 0.46, depth: 0.35, scale: 1, kind: "dock" },
-        { x: 0.50, y: 0.48, depth: 0.35, scale: 1, kind: "dock" },
-        { x: 0.74, y: 0.54, depth: 0.35, scale: 1, kind: "dock" },
-        { x: 0.18, y: 0.58, depth: 0.35, scale: 1, kind: "dock" },
-        { x: 0.40, y: 0.58, depth: 0.35, scale: 1, kind: "dock" },
-        { x: 0.86, y: 0.64, depth: 0.35, scale: 1, kind: "dock" }
+        { x: 0.22, y: 0.28, depth: 0.35, scale: 1, kind: "tree" },
+        { x: 0.72, y: 0.24, depth: 0.35, scale: 1, kind: "tree" },
+        { x: 0.16, y: 0.46, depth: 0.35, scale: 1, kind: "dock" },
+        { x: 0.84, y: 0.42, depth: 0.35, scale: 1, kind: "shore" },
+        { x: 0.46, y: 0.60, depth: 0.35, scale: 1, kind: "shore" },
+        { x: 0.82, y: 0.62, depth: 0.35, scale: 1, kind: "shore" },
+        { x: 0.18, y: 0.68, depth: 0.35, scale: 1, kind: "dock" }
       ]
     },
     mercury: {
