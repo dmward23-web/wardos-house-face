@@ -166,8 +166,8 @@ html.ori-phone.ori-home .ori-life i {
 }
 html.ori-phone.ori-home .ori-life .ori-shaft-sweep {
   position: absolute;
-  left: -8%;
-  top: 18%;
+  left: 48px;
+  top: 24%;
   width: 220px;
   height: 220px;
   background: radial-gradient(circle, rgba(230, 255, 248, 0.55) 0%, transparent 68%);
@@ -181,9 +181,9 @@ html.ori-phone.ori-home .ori-life .ori-shaft-sweep {
   100% { transform: translate3d(72px, -120vh, 0) scale(1.5); opacity: 0.2; }
 }
 @keyframes ori-sweep {
-  0% { transform: translate3d(0, 8vh, 0); opacity: 0.45; }
-  50% { transform: translate3d(62vw, -6vh, 0); opacity: 0.9; }
-  100% { transform: translate3d(0, 8vh, 0); opacity: 0.45; }
+  0% { transform: translate3d(0, 4vh, 0); opacity: 0.45; }
+  50% { transform: translate3d(32vw, -4vh, 0); opacity: 0.9; }
+  100% { transform: translate3d(0, 4vh, 0); opacity: 0.45; }
 }
 @keyframes ori-world-sway {
   0%, 100% { transform: translate3d(0, 0, 0) scale(1.06); }
