@@ -100,7 +100,11 @@
       return {
         temp: Number(c.temp_F),
         condition: (c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value) || "Outside",
-        icon: "🌤",
+        icon: /snow/i.test(c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value) ? "❄"
+          : /thunder|storm/i.test(c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value) ? "⛈"
+          : /rain|drizzle|shower/i.test(c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value) ? "🌧"
+          : /cloud|overcast/i.test(c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value) ? "☁"
+          : "☀",
         high: Number(d.maxtempF),
         low: Number(d.mintempF),
         place: PLACE,
@@ -113,8 +117,30 @@
    * real weather station (NWS, Johnson County Executive airport, a few miles
    * from 147th) and trust it for "is it raining right now". */
   var OBS_URL = "https://api.weather.gov/stations/KOJC/observations/latest";
+  /* A hung station request must not hold the plate on the LIVE placeholder. */
+  function within(ms, promise) {
+    return new Promise(function (resolve, reject) {
+      var done = false;
+      var timer = setTimeout(function () {
+        if (done) return;
+        done = true;
+        reject(new Error("wx timeout"));
+      }, ms);
+      promise.then(function (v) {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        resolve(v);
+      }, function (err) {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        reject(err);
+      });
+    });
+  }
   function fromObs() {
-    return fetch(OBS_URL, { cache: "no-store", headers: { Accept: "application/geo+json" } }).then(function (r) {
+    return within(2500, fetch(OBS_URL, { cache: "no-store", headers: { Accept: "application/geo+json" } }).then(function (r) {
       if (!r.ok) throw new Error("obs " + r.status);
       return r.json();
     }).then(function (j) {
@@ -124,7 +150,7 @@
       var txt = String(p.textDescription || "");
       var c = p.temperature && p.temperature.value;
       return { text: txt, tempF: c == null ? null : Math.round(c * 9 / 5 + 32) };
-    }).catch(function () { return null; });
+    })).catch(function () { return null; });
   }
   function rainyText(t) { return /rain|shower|thunder|storm|drizzle/i.test(t || ""); }
   function mergeObs(d, obs, omCode) {
@@ -144,11 +170,11 @@
   function load(cb) {
     var cached = readCache();
     if (cached) { cb(null, cached); return; }
-    Promise.all([fromOpenMeteo(), fromObs()]).then(function (res) {
+    Promise.all([within(4000, fromOpenMeteo()), fromObs()]).then(function (res) {
       var d = mergeObs(res[0], res[1], res[0].code);
       writeCache(d); cb(null, d);
     }).catch(function () {
-      return fromWttr().then(function (d) {
+      return within(4000, fromWttr()).then(function (d) {
         writeCache(d); cb(null, d);
       });
     }).catch(function (err) {

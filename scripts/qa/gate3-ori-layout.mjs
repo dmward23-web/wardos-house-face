@@ -179,7 +179,7 @@ const SCAN = `(() => {
       }
     }
     const blob = document.body.innerText || "";
-    if (/calendar through|empty = unknown|TABLET TEST/i.test(blob)) hits.push(tag + " debug copy still on screen");
+    if (/calendar through|empty = unknown|TABLET TEST|this device only/i.test(blob)) hits.push(tag + " debug copy still on screen");
     if (document.documentElement.classList.contains("ori-phone")) {
       const edge = 8;
       const atTop = window.scrollY < 2;
@@ -406,6 +406,47 @@ function edgeRuns(png, label, dpr) {
   return (res.stdout || "").trim() || ("error " + (res.stderr || "").slice(0, 180));
 }
 
+/* Straight luminance edges in the painting, outside the dark card plates.
+   A mask or rectangle leaves an ≥80px run. Card borders themselves are dark
+   and dilated out of the scan. */
+function seamRuns(file) {
+  const py = [
+    "import numpy as np",
+    "from PIL import Image",
+    "a = np.asarray(Image.open(" + JSON.stringify(file) + ").convert('RGB')).astype(np.float32)",
+    "L = 0.2126*a[:,:,0] + 0.7152*a[:,:,1] + 0.0722*a[:,:,2]",
+    "h,w = L.shape",
+    "m = (L < 40).astype(np.int32)",
+    "r = 3",
+    "p = np.pad(m, ((r,r),(r,r)))",
+    "c = np.cumsum(np.cumsum(p, 0), 1)",
+    "k = 2*r",
+    "cover = (c[k:k+h, k:k+w] - c[0:h, k:k+w] - c[k:k+h, 0:w] + c[0:h, 0:w]) > 0",
+    "jump, minlen = 12, 80",
+    "hits = []",
+    "dv = np.abs(L[:,1:] - L[:,:-1])",
+    "for x in range(1, w):",
+    "    col = dv[:, x-1]",
+    "    strong = (col >= jump) & ~(cover[:, x] | cover[:, x-1])",
+    "    cur = 0",
+    "    for v in strong:",
+    "        cur = cur + 1 if v else 0",
+    "        if cur == minlen: hits.append('V x%d len>=%d' % (x, minlen))",
+    "dh = np.abs(L[1:, :] - L[:-1, :])",
+    "for y in range(1, h):",
+    "    row = dh[y-1]",
+    "    strong = (row >= jump) & ~(cover[y] | cover[y-1])",
+    "    cur = 0",
+    "    for v in strong:",
+    "        cur = cur + 1 if v else 0",
+    "        if cur == minlen: hits.append('H y%d len>=%d' % (y, minlen))",
+    "print(' | '.join(hits) if hits else 'clean')"
+  ].join("\n");
+  const res = spawnSync("python3", ["-c", py], { encoding: "utf8" });
+  if (res.status !== 0) return "error " + (res.stderr || "").slice(0, 180);
+  return (res.stdout || "").trim() || "error empty";
+}
+
 function analyzeVideo(file) {
   const W = 48, H = 104, FPS = 60;
   return new Promise((resolve, reject) => {
@@ -517,7 +558,9 @@ async function prepare(page, file) {
   if (file.startsWith("sheet-index")) {
     await page.waitForFunction(() => {
       const t = document.querySelector("[data-live='leaveby-main'] .time, [data-live='leaveby-main'] .leaveby-dest");
-      return t && (t.textContent || "").trim().length > 1;
+      const wx = document.querySelector("#house-wx");
+      const plate = wx ? (wx.innerText || "") : "";
+      return t && (t.textContent || "").trim().length > 1 && /\d+°/.test(plate);
     }, { timeout: 20000 }).catch(() => {});
     await page.evaluate(() => {
       const b = document.querySelector(".ori-pool-hit");
@@ -603,6 +646,14 @@ async function main() {
           for (const h of hits) failures.push(view.name + " " + file + " :: " + h);
         } else {
           console.log("  clean", view.name, file);
+        }
+        if (file === "sheet-index.html") {
+          const plate = await page.evaluate(() => {
+            const el = document.querySelector("#house-wx");
+            return el ? (el.innerText || "").replace(/\s+/g, " ").trim() : "";
+          });
+          console.log("  weather", view.name, JSON.stringify(plate));
+          if (!/\d+°/.test(plate)) failures.push(view.name + " weather plate missing temperature " + JSON.stringify(plate));
         }
         if (view.phone) {
           await page.evaluate(() => scrollTo(0, 0));
@@ -705,6 +756,11 @@ async function main() {
     const edge = edgeRuns(fs.readFileSync(file), "still-" + name, 1);
     console.log("  still edge", name, edge);
     if (edge !== "clean") failures.push("still edge " + name + " " + edge);
+    if (name === "home-map-phone.jpg") {
+      const seams = seamRuns(file);
+      console.log("  still seams", name, seams);
+      if (seams !== "clean") failures.push("still seams " + name + " " + seams);
+    }
   }
   if (failures.length) {
     console.error("GATE 3 FAIL " + failures.length);

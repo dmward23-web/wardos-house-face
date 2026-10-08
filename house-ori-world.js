@@ -707,38 +707,52 @@
     }
     life.innerHTML = moteHtml;
     document.body.insertBefore(life, document.body.firstChild);
-    /* Bright mote cores stay out of the clock and weather plates so those edges stay crisp. */
-    function maskOrbs() {
-      if (!life.isConnected) return;
-      var nodes = document.querySelectorAll("header.hdr .hdr-date, header.hdr .hdr-ovals");
-      if (!nodes.length) return;
-      var lr = life.getBoundingClientRect();
-      var pad = 56;
-      var d = ["M0,0H", life.offsetWidth, "V", life.offsetHeight, "H0Z"];
-      nodes.forEach(function (el) {
-        var r = el.getBoundingClientRect();
-        if (r.width < 8 || r.height < 8) return;
-        var x = Math.round(r.left - lr.left - pad);
-        var y = Math.round(r.top - lr.top - pad);
-        var w = Math.round(r.width + pad * 2);
-        var h = Math.round(r.height + pad * 2);
-        d.push("M", x, ",", y, "h", w, "v", h, "h", -w, "Z");
-      });
-      var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='" + life.offsetWidth + "' height='" + life.offsetHeight + "'><path fill='white' fill-rule='evenodd' d='" + d.join("") + "'/></svg>";
-      var url = "url(\"data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg) + "\")";
-      life.style.webkitMaskImage = url;
-      life.style.maskImage = url;
-      life.style.webkitMaskRepeat = "no-repeat";
-      life.style.maskRepeat = "no-repeat";
-      life.style.webkitMaskSize = "100% 100%";
-      life.style.maskSize = "100% 100%";
+    /* Dim only the orb sprites whose glow reaches a card. Opacity follows the
+       distance from the sprite center to the card edge, so the falloff stays
+       radial on the sprite. No mask, clip, or rectangle is painted on the art. */
+    var motes = [].slice.call(life.querySelectorAll("i"));
+    var orbCards = [];
+    var orbCardAt = 0;
+    function refreshOrbCards(ts) {
+      if (orbCards.length && ts - orbCardAt < 180) return;
+      orbCardAt = ts || 0;
+      orbCards = cardBoxes();
     }
-    maskOrbs();
-    window.addEventListener("resize", maskOrbs);
-    [300, 900, 1800].forEach(function (ms) { setTimeout(maskOrbs, ms); });
+    function orbClearance(x, y) {
+      var best = 1e9;
+      for (var i = 0; i < orbCards.length; i++) {
+        var b = orbCards[i];
+        var dx = Math.max(b.left - x, 0, x - b.right);
+        var dy = Math.max(b.top - y, 0, y - b.bottom);
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d < best) best = d;
+      }
+      return best;
+    }
+    function dimOrbs(ts) {
+      refreshOrbCards(ts);
+      var reach = 118;
+      for (var i = 0; i < motes.length; i++) {
+        var el = motes[i];
+        var r = el.getBoundingClientRect();
+        if (r.width < 2) continue;
+        var d = orbClearance(r.left + r.width * 0.5, r.top + r.height * 0.5);
+        if (d >= reach) {
+          if (el.style.getPropertyPriority("opacity") === "important") el.style.removeProperty("opacity");
+          continue;
+        }
+        var t = d / reach;
+        var s = t * t * (3 - 2 * t);
+        el.style.setProperty("opacity", (0.05 + 0.95 * s).toFixed(3), "important");
+      }
+    }
     var lastSpark = 0;
     function lifeLoop(ts) {
-      if (!lastSpark || ts - lastSpark > 48) { lastSpark = ts; paintPath(ts); }
+      if (!lastSpark || ts - lastSpark > 48) {
+        lastSpark = ts;
+        paintPath(ts);
+        dimOrbs(ts);
+      }
       requestAnimationFrame(lifeLoop);
     }
     requestAnimationFrame(lifeLoop);
