@@ -352,8 +352,9 @@
   .mpill.on { background: #102840 !important; box-shadow: 0 0 0 1px rgba(230,244,255,0.75), 0 0 18px rgba(140,200,255,0.5) !important; color: #f4fbff !important; }
   .dow-row, .legend { display: none !important; }
   .leaveby { display: block !important; margin: 8px 0 14px !important; padding: 14px 16px !important; background: #081624 !important; border: 0 !important; border-radius: 18px !important; box-shadow: 0 0 0 1px rgba(255,214,140,0.45), 0 0 28px rgba(240,190,90,0.32) !important; color: #f4fbff !important; }
-  .leaveby-main .time { display: block !important; font-size: 32px !important; color: #fff6d8 !important; background: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 0 4px !important; }
-  .leaveby-dest { display: block !important; white-space: normal !important; overflow: visible !important; text-overflow: clip !important; color: #f4fbff !important; font-size: 16px !important; }
+  .leaveby-main { text-shadow: none !important; }
+  .leaveby-main .time { display: block !important; font-size: 32px !important; color: #fff6d8 !important; background: none !important; box-shadow: none !important; text-shadow: none !important; padding: 0 !important; margin: 0 0 4px !important; }
+  .leaveby-dest { display: block !important; white-space: normal !important; overflow: visible !important; text-overflow: clip !important; color: #f4fbff !important; font-size: 16px !important; text-shadow: none !important; }
   .month-grid { display: flex !important; flex-direction: column !important; gap: 10px !important; min-height: 0 !important; }
   .ori-day { display: flex !important; flex-direction: column !important; gap: 4px !important; padding: 12px 14px !important; border-radius: 16px !important; background: #081624 !important; box-shadow: 0 0 0 1px rgba(198,230,255,0.35), 0 0 18px rgba(120,190,255,0.24) !important; text-decoration: none !important; color: #f4fbff !important; }
   .ori-dom { font-size: 12px !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; color: #d7f6ff !important; }
@@ -381,6 +382,8 @@
   body[data-glass*="month"] .hdr .oval { min-width: 0 !important; height: 48px !important; padding: 6px 12px !important; }
 }
 </style>
+<script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{if(sessionStorage.getItem("ori-from")||/from=/.test(location.hash)){h.classList.add("ori-arriving");h.setAttribute("data-ori-veil","1");}}catch(e){}try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
+<link rel="stylesheet" href="house-ori.css?v=ORIHOME17" />
 </head>
 <body data-glass="ovals month-today">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -638,7 +641,7 @@
  <div class="hdr-spacer" aria-hidden="true"></div>
  <div class="hdr-ovals">
  <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather" data-wired="0" hidden style="display:none"><span class="oval-ico">🌤</span><span class="oval-deg"></span></a>
- <a class="oval sensi" href="sheet-google-home.html" aria-label="Thermostat" data-wired="0" hidden style="display:none"><span class="oval-ico">⌠</span><span class="oval-deg"></span></a>
+ <a class="oval sensi" href="sheet-google-home.html" aria-label="Thermostat" data-wired="0" hidden style="display:none"><span class="oval-ico">🌡</span><span class="oval-deg"></span></a>
  </div>
  </header>
 
@@ -707,6 +710,7 @@
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function key(y, m, d) { return y + "-" + pad(m) + "-" + pad(d); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  var LIVE = null;
   function cleanCal(s) {
     s = String(s || "");
     s = s.replace(/\[[^\]]*\]/g, " ");
@@ -714,6 +718,121 @@
     s = s.replace(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{5,}\b/g, " ");
     s = s.replace(/\(\s*\)/g, " ");
     return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
+  }
+  function plainWords(s) {
+    s = cleanCal(s);
+    s = s.replace(/\s*(?:→|->|➔|➜)\s*/g, " to ");
+    s = s.replace(/\bDRIVE\b/g, "drives");
+    return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
+  }
+  function chipKey(s) {
+    var t = String(s || "").toLowerCase();
+    if (t.indexOf("hayes bb") >= 0 || t.indexOf("coach should") >= 0 || t.indexOf("coach in") >= 0) return "hayes-bb";
+    if (t.indexOf("johnson") >= 0) return "johnson";
+    if (t.indexOf("kids with dan") >= 0) return "with-dan";
+    if (t.indexOf("nashville") >= 0) return "nashville";
+    return "";
+  }
+  function colorOf(label) {
+    var t = String(label || "").toLowerCase();
+    if (t.indexOf("ainsley") >= 0) return "ain";
+    if (t.indexOf("hayes") >= 0 && t.indexOf("harris") >= 0) return "shr";
+    if (t.indexOf("hayes") >= 0) return "hay";
+    if (t.indexOf("harris") >= 0) return "har";
+    if (t.indexOf("dan") >= 0) return "dan";
+    return "shr";
+  }
+  function clockMinutes(label) {
+    var m = String(label || "").match(/(\d{1,2}):(\d{2})/);
+    if (!m) return null;
+    var h = +m[1], min = +m[2];
+    if (h >= 1 && h <= 6) h += 12;
+    return h * 60 + min;
+  }
+  function isoMinutes(start) {
+    var m = /T(\d{2}):(\d{2})/.exec(start || "");
+    if (!m) return null;
+    return (+m[1]) * 60 + (+m[2]);
+  }
+  function sortMin(label, isoMin) {
+    var m = String(label || "").match(/(\d{1,2}):(\d{2})/);
+    if (!m) return isoMin == null ? null : isoMin;
+    var h = +m[1], min = +m[2];
+    var cands = [h * 60 + min, (h % 12) * 60 + min, ((h % 12) + 12) * 60 + min];
+    if (isoMin == null) return (h >= 1 && h <= 6) ? (h + 12) * 60 + min : h * 60 + min;
+    var best = cands[0], dist = 1e9;
+    cands.forEach(function (c) { var d = Math.abs(c - isoMin); if (d < dist) { dist = d; best = c; } });
+    return best;
+  }
+  function withClock(label, min) {
+    if (min == null || /\d{1,2}:\d{2}/.test(label)) return label;
+    var h = Math.floor(min / 60), m = min % 60, h12 = h % 12 || 12;
+    return label + " · " + h12 + ":" + (m < 10 ? "0" : "") + m;
+  }
+  function eventCovers(ev, iso) {
+    var start = String(ev.start || "").slice(0, 10);
+    var end = String(ev.end || "").slice(0, 10);
+    if (!start) return false;
+    if (ev.allDay) return iso >= start && (!end || iso < end);
+    if (!end || end === start) return iso === start;
+    return iso >= start && iso <= end;
+  }
+  function eventSpans(ev) {
+    var start = String(ev.start || "").slice(0, 10);
+    var end = String(ev.end || "").slice(0, 10);
+    if (ev.allDay) return true;
+    return !!(end && end > start);
+  }
+  function repeatCounts() {
+    var counts = {};
+    if (!DATA || !DATA.days) return counts;
+    Object.keys(DATA.days).forEach(function (k) {
+      (DATA.days[k].items || []).forEach(function (it) {
+        var label = plainWords(it.l);
+        if (clockMinutes(label) != null) return;
+        var key = chipKey(label) || label.toLowerCase();
+        if (!key) return;
+        counts[key] = (counts[key] || 0) + 1;
+      });
+    });
+    return counts;
+  }
+  function modelDay(iso) {
+    var chips = {}, rows = [], counts = repeatCounts();
+    var monthDay = DATA && DATA.days && DATA.days[iso];
+    ((LIVE && LIVE.upcomingLeaves) || []).forEach(function (ev) {
+      if (!eventCovers(ev, iso)) return;
+      var label = plainWords(ev.summary);
+      if (!label) return;
+      if (eventSpans(ev)) {
+        chips[chipKey(label) || label.toLowerCase()] = label;
+      } else if (String(ev.start || "").slice(0, 10) === iso) {
+        rows.push({ c: colorOf(label), l: withClock(label, isoMinutes(ev.start)), min: sortMin(label, isoMinutes(ev.start)) });
+      }
+    });
+    var inLive = !!(LIVE && LIVE.windowStart && iso >= LIVE.windowStart && iso <= (LIVE.windowEnd || LIVE.windowStart));
+    if (monthDay && (!inLive || !rows.length)) {
+      (monthDay.items || []).forEach(function (it) {
+        var label = plainWords(it.l);
+        var key = chipKey(label);
+        if (key && chips[key]) return;
+        var min = clockMinutes(label);
+        var repeatKey = key || (min == null ? label.toLowerCase() : "");
+        if (min == null && repeatKey && counts[repeatKey] > 1) {
+          if (!chips[repeatKey]) chips[repeatKey] = label;
+          return;
+        }
+        rows.push({ c: it.c || colorOf(label), l: label, min: sortMin(label, min) });
+      });
+    }
+    if (monthDay && monthDay.withDan && !chips["with-dan"]) chips["with-dan"] = "Kids with Dan";
+    rows.sort(function (a, b) {
+      if (a.min == null && b.min == null) return 0;
+      if (a.min == null) return 1;
+      if (b.min == null) return -1;
+      return a.min - b.min;
+    });
+    return { chips: Object.keys(chips).map(function (k) { return chips[k]; }), rows: rows, withDan: !!(monthDay && monthDay.withDan) };
   }
   function months() {
     var out = [], t = ctToday();
@@ -755,13 +874,15 @@
       grid.style.gridTemplateRows = "none";
       for (var d = 1; d <= dim; d++) {
         var k = key(y, m, d), day = DATA && DATA.days[k], isToday = k === t.iso;
-        if (!(day && ((day.items && day.items.length) || day.withDan)) && !isToday) continue;
+        var model = modelDay(k);
+        if (!(day && ((day.items && day.items.length) || day.withDan)) && !model.rows.length && !model.chips.length && !isToday) continue;
         var dt = new Date(y, m - 1, d);
         html += '<a class="ori-day' + (isToday ? " is-today" : "") + '" href="sheet-today.html">';
-        html += '<span class="ori-dom">' + dows[dt.getDay()] + " " + d + "</span>";
-        if (day && day.withDan) html += '<span class="ori-ev dan">Kids with Dan</span>';
-        (day ? day.items : []).forEach(function (it) {
-          html += '<span class="ori-ev ' + esc(it.c) + '">' + esc(cleanCal(it.l)) + "</span>";
+        html += '<span class="ori-day-head"><span class="ori-dom">' + dows[dt.getDay()] + " " + d + "</span>";
+        model.chips.forEach(function (chip) { html += '<span class="ori-chip">' + esc(chip) + "</span>"; });
+        html += "</span>";
+        model.rows.forEach(function (it) {
+          html += '<span class="ori-ev ' + esc(it.c) + '" data-min="' + (it.min == null ? "" : it.min) + '">' + esc(it.l) + "</span>";
         });
         html += "</a>";
       }
@@ -805,8 +926,12 @@
     return h ? { y: +h[1], m: +h[2] } : { y: t.y, m: t.m };
   }
   var s0 = initial(); render(s0.y, s0.m);
-  fetch("data/cal-months.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-    if (d && d.days) DATA = d;
+  Promise.all([
+    fetch("data/cal-months.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+    fetch("data/cal-live.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+  ]).then(function (pair) {
+    if (pair[0] && pair[0].days) DATA = pair[0];
+    if (pair[1] && pair[1].upcomingLeaves) LIVE = pair[1];
     render(cur.y, cur.m);
   }).catch(function () { render(cur.y, cur.m); });
   setInterval(function () { if (cur) render(cur.y, cur.m); }, 10 * 60 * 1000);
@@ -843,5 +968,8 @@
 <script src="house-zoom.js"></script>
 <script src="house-hdr-home.js?v=HDRHOME1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>
+<script src="ori/plates/painted/manifest.js?v=ORIHOME17"></script>
+<script src="ori/ori-scene.js?v=ORIHOME17"></script>
+<script src="house-ori-world.js?v=ORIHOME17"></script>
 </body>
 </html>
