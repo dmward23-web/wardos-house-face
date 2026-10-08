@@ -478,11 +478,11 @@ body.kw-on #tapsync-badge { display: none !important; }
 }
 .kw-jar-host {
   position: absolute;
-  left: 50%;
-  bottom: 78px;
+  left: 24%;
+  bottom: 72px;
   transform: translateX(-50%);
-  width: 156px;
-  height: 176px;
+  width: 140px;
+  height: 160px;
   z-index: 4;
 }
 .kw-week {

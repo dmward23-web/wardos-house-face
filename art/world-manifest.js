@@ -12,15 +12,22 @@
     return row;
   }
 
-  /* Seven ledges. y is the sit line: under the header, above the creature. */
+  /* Seven seats across four islands: ledges, a root, and a bridge.
+     The creature stands lower-left, so Shower stays off its body. */
   var LEDGES = [
-    { x: 0.20, y: 0.26, depth: 0.12, scale: 0.72 },
-    { x: 0.80, y: 0.30, depth: 0.18, scale: 0.68 },
-    { x: 0.17, y: 0.40, depth: 0.32, scale: 0.84 },
-    { x: 0.83, y: 0.44, depth: 0.38, scale: 0.80 },
-    { x: 0.22, y: 0.54, depth: 0.50, scale: 0.92 },
-    { x: 0.78, y: 0.58, depth: 0.58, scale: 0.88 },
-    { x: 0.48, y: 0.66, depth: 0.74, scale: 1.00 }
+    { x: 0.16, y: 0.32, depth: 0.20, scale: 0.74 },
+    { x: 0.80, y: 0.18, depth: 0.08, scale: 0.62 },
+    { x: 0.76, y: 0.42, depth: 0.45, scale: 0.88 },
+    { x: 0.50, y: 0.48, depth: 0.45, scale: 0.86 },
+    { x: 0.46, y: 0.56, depth: 0.56, scale: 0.92 },
+    { x: 0.58, y: 0.64, depth: 0.70, scale: 0.98 },
+    { x: 0.36, y: 0.68, depth: 0.70, scale: 1.00 }
+  ];
+  var HAYES_SCENE = [
+    { stamp: 1, x: 0.82, y: 0.20, scale: 0.40, depth: 0.08, haze: 0.58, flip: true },
+    { stamp: 0, x: 0.16, y: 0.36, scale: 0.74, depth: 0.20, haze: 0.32 },
+    { stamp: 2, x: 0.66, y: 0.44, scale: 1.02, depth: 0.45, haze: 0.10 },
+    { stamp: 3, x: 0.40, y: 0.60, scale: 1.36, depth: 0.70, haze: 0 }
   ];
 
   /* Crops of the Hayes stand-in island sheet (1080×1920). A dropped
@@ -48,6 +55,7 @@
       ],
       stamp: "art/hayes/mid.png",
       stamps: HAYES_ISLANDS,
+      scene: HAYES_SCENE,
       rays: "art/forest/rays.jpg",
       ground: ["art/forest/near.png", "art/forest/fg.png"],
       landmarks: LEDGES

@@ -244,10 +244,18 @@
     if (col) y = Math.min(0.64, y + 0.03);
     return { x: col ? 0.76 : 0.24, y: y, depth: 0.2 + i * 0.05, scale: 0.75 + (i % 3) * 0.08 };
   }
+  function creatureAnchor(W, H) {
+    var jw = 140;
+    var jh = 160;
+    var cx = W * 0.24;
+    var foot = H - 72;
+    return { jw: jw, jh: jh, jx: cx - jw / 2, jy: foot - jh, cx: cx, foot: foot };
+  }
   function layoutLedges(quests, W, H, world, px) {
     var n = quests.length;
     var chipLift = 22;
-    var creatureTop = H - 250;
+    var box = creatureAnchor(W, H);
+    var floorY = H - 108;
     quests.forEach(function (q, i) {
       var ledge = ledgeFor(world, i, n);
       var depth = ledge.depth || 0.3;
@@ -262,11 +270,15 @@
       q.hh = 36;
       q.r = 26;
       q.y = q.seat - chipLift;
-      if (q.y > creatureTop - 8) q.y = creatureTop - 8;
+      if (q.y > floorY) q.y = floorY;
       if (q.y < 168) q.y = 168;
+      if (Math.abs(q.x - box.cx) < box.jw * 0.65 + 20 && q.y + 24 > box.jy) q.y = box.jy - 32;
     });
-    separateChips(quests, 12, 160, W - 12, creatureTop);
+    separateChips(quests, 12, 160, W - 12, floorY);
     quests.forEach(function (q) {
+      if (Math.abs(q.x - box.cx) < box.jw * 0.65 + 20 && q.y + 20 > box.jy) {
+        q.x = Math.min(q.x, box.jx - 16);
+      }
       q.chipY = q.y;
       q.seat = q.y + chipLift;
       q.ledY = q.seat;
@@ -318,16 +330,19 @@
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.lineJoin = "round";
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "rgba(18, 12, 8, 0.55)";
-    ctx.shadowColor = world === "harris" ? "rgba(150, 255, 180, 0.95)" : world === "ainsley" ? "rgba(255, 176, 110, 0.95)" : "rgba(255, 214, 150, 0.95)";
-    ctx.shadowBlur = 12;
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = "rgba(10, 8, 6, 0.82)";
+    ctx.shadowColor = "rgba(6, 4, 2, 0.9)";
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 1;
     ctx.fillStyle = q.done ? "rgba(255, 226, 168, 0.98)" : "rgba(255, 248, 236, 0.96)";
     var y0 = q.y - ((lines.length - 1) * (size + 3)) / 2;
     for (var k = 0; k < lines.length; k++) {
       var ly = y0 + k * (size + 3);
       ctx.strokeText(lines[k], q.x, ly);
+      ctx.shadowBlur = 0;
       ctx.fillText(lines[k], q.x, ly);
+      ctx.shadowBlur = 14;
     }
     ctx.restore();
   }
@@ -405,37 +420,6 @@
     }
   }
 
-  function stormRing(ctx, W, H, t) {
-    var y = H * 0.40 + Math.sin(t * 0.07) * 4;
-    var rx = W * 0.62;
-    ctx.save();
-    ctx.translate(W * 0.5, y);
-    ctx.fillStyle = "rgba(12, 16, 28, 0.42)";
-    ctx.beginPath();
-    ctx.ellipse(0, 10, rx * 1.05, 28, 0, 0, 7);
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255, 206, 140, 0.92)";
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, rx, 16, 0, 0, 7);
-    ctx.stroke();
-    ctx.strokeStyle = "rgba(150, 186, 255, 0.55)";
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.ellipse(0, 3, rx * 1.08, 24, 0, 0, 7);
-    ctx.stroke();
-    ctx.globalCompositeOperation = "screen";
-    var g = ctx.createRadialGradient(0, 0, rx * 0.45, 0, 0, rx);
-    g.addColorStop(0, "rgba(0,0,0,0)");
-    g.addColorStop(0.72, "rgba(255, 196, 120, 0)");
-    g.addColorStop(0.84, "rgba(255, 220, 160, 0.55)");
-    g.addColorStop(1, "rgba(120, 160, 255, 0)");
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, rx, 22, 0, 0, 7);
-    ctx.fill();
-    ctx.restore();
-  }
   function drawIsland(ctx, img, crop, q) {
     if (!img) return;
     var nx = crop && crop.nx != null ? crop.nx : 0;
@@ -458,38 +442,110 @@
   }
   function drawChest(ctx, q, open, t) {
     ctx.save();
-    ctx.translate(q.x, q.seat - 2);
-    var pop = open ? 1 + Math.sin(t * 3) * 0.045 : 1;
+    ctx.translate(q.x, q.seat - 6);
+    var pop = open ? 1 + Math.sin(t * 3) * 0.04 : 1;
     ctx.scale(pop, pop);
-    if (open) {
-      var glow = ctx.createRadialGradient(0, -6, 2, 0, -4, 64);
-      glow.addColorStop(0, "rgba(255, 244, 210, 0.95)");
-      glow.addColorStop(0.35, "rgba(255, 186, 80, 0.72)");
-      glow.addColorStop(1, "rgba(255, 140, 40, 0)");
-      ctx.fillStyle = glow;
-      ctx.beginPath();
-      ctx.arc(0, -6, 64, 0, 7);
-      ctx.fill();
-    } else {
-      var rest = ctx.createRadialGradient(0, 0, 2, 0, 0, 28);
-      rest.addColorStop(0, "rgba(255, 220, 160, 0.28)");
-      rest.addColorStop(1, "rgba(255, 220, 160, 0)");
-      ctx.fillStyle = rest;
-      ctx.beginPath();
-      ctx.arc(0, 0, 28, 0, 7);
-      ctx.fill();
-    }
-    ctx.fillStyle = open ? "#8a5a28" : "#4a3018";
-    ctx.fillRect(-13, -2, 26, 16);
+    var glowR = open ? 86 : 48;
+    var glow = ctx.createRadialGradient(0, -10, 4, 0, -8, glowR);
+    glow.addColorStop(0, open ? "rgba(255, 246, 214, 0.96)" : "rgba(255, 214, 150, 0.42)");
+    glow.addColorStop(0.42, open ? "rgba(255, 176, 70, 0.5)" : "rgba(255, 170, 70, 0.1)");
+    glow.addColorStop(1, "rgba(255, 140, 40, 0)");
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(0, -10, glowR, 0, 7);
+    ctx.fill();
+    ctx.fillStyle = open ? "#7a4e22" : "#3a2612";
+    ctx.fillRect(-34, -6, 68, 40);
+    ctx.strokeStyle = "rgba(255, 232, 190, 0.82)";
+    ctx.lineWidth = 1.7;
+    ctx.strokeRect(-33, -5, 66, 38);
+    ctx.fillStyle = "rgba(255, 244, 214, 0.75)";
+    ctx.fillRect(-32, -5, 64, 3);
     ctx.save();
-    ctx.translate(0, -2);
-    ctx.rotate(open ? -0.85 : -0.04);
-    ctx.fillStyle = open ? "#ffe1a4" : "#c4924a";
-    ctx.fillRect(-14, -9, 28, 10);
+    ctx.translate(0, -6);
+    ctx.rotate(open ? -0.9 : -0.05);
+    ctx.fillStyle = open ? "#f2d39a" : "#b08048";
+    ctx.fillRect(-36, -18, 72, 18);
+    ctx.strokeStyle = "rgba(255, 246, 220, 0.9)";
+    ctx.lineWidth = 1.6;
+    ctx.strokeRect(-36, -18, 72, 18);
     ctx.restore();
-    ctx.fillStyle = open ? "#fff6d4" : "#e7c27a";
-    ctx.fillRect(-3, 2, 6, 5);
+    ctx.fillStyle = open ? "#fff8dc" : "#e8c888";
+    ctx.fillRect(-5, 6, 10, 10);
+    ctx.strokeStyle = "rgba(255, 250, 230, 0.8)";
+    ctx.strokeRect(-5, 6, 10, 10);
     ctx.restore();
+  }
+  function islandImage(P, man, si) {
+    var bit = P.bits && P.bits[si];
+    if (bit) return { img: bit, crop: { nx: 0, ny: 0, nw: 1, nh: 1 } };
+    var stamps = man.stamps || [];
+    return { img: P.stamp || P.mid, crop: stamps[si] || { nx: 0, ny: 0, nw: 1, nh: 1 } };
+  }
+  function drawPlacedIsland(ctx, img, crop, x, y, scale, haze, flip) {
+    if (!img) return;
+    var nw = crop && crop.nw != null ? crop.nw : 1;
+    var nh = crop && crop.nh != null ? crop.nh : 1;
+    var sw = Math.max(1, img.width * nw);
+    var sh = Math.max(1, img.height * nh);
+    var sx = clamp((crop && crop.nx || 0) * img.width, 0, Math.max(0, img.width - sw));
+    var sy = clamp((crop && crop.ny || 0) * img.height, 0, Math.max(0, img.height - sh));
+    var iw = 210 * (scale || 1);
+    var ih = iw * (sh / sw);
+    ctx.save();
+    ctx.globalAlpha = 1 - (haze || 0) * 0.45;
+    if (haze > 0.25) ctx.filter = "blur(" + (haze * 1.4).toFixed(2) + "px)";
+    ctx.translate(x, y);
+    if (flip) ctx.scale(-1, 1);
+    ctx.drawImage(img, sx, sy, sw, sh, -iw / 2, -ih * 0.78, iw, ih);
+    ctx.restore();
+  }
+  function drawSpan(ctx, x0, y0, x1, y1, bow) {
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.quadraticCurveTo((x0 + x1) / 2, Math.max(y0, y1) + (bow || 26), x1, y1);
+    ctx.strokeStyle = "rgba(42, 28, 16, 0.92)";
+    ctx.lineWidth = 16;
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(214, 176, 120, 0.42)";
+    ctx.lineWidth = 2.2;
+    ctx.stroke();
+    ctx.restore();
+  }
+  function drawHayesScene(ctx, P, man, W, H, px, t) {
+    var scene = (man && man.scene) || [];
+    var order = scene.map(function (isl, i) { return { isl: isl, i: i }; });
+    order.sort(function (a, b) { return (a.isl.depth || 0) - (b.isl.depth || 0); });
+    var placed = [];
+    order.forEach(function (row) {
+      var isl = row.isl;
+      var depth = isl.depth || 0.3;
+      var drift = Math.sin(t * 0.16 + row.i * 1.4) * (4 + (1 - depth) * 8);
+      var x = isl.x * W + (px || 0) * depth + drift;
+      var y = isl.y * H + Math.sin(t * 0.1 + row.i) * 3;
+      var pack = islandImage(P, man, isl.stamp || 0);
+      drawPlacedIsland(ctx, pack.img, pack.crop, x, y, isl.scale || 1, isl.haze || 0, !!isl.flip);
+      placed[row.i] = { x: x, y: y };
+    });
+    if (placed[2] && placed[3]) drawSpan(ctx, placed[2].x - 10, placed[2].y + 18, placed[3].x + 16, placed[3].y + 8, 34);
+    if (placed[1] && placed[3]) drawSpan(ctx, placed[1].x + 8, placed[1].y + 24, placed[3].x - 30, placed[3].y - 6, 18);
+    if (placed[3]) {
+      ctx.save();
+      ctx.strokeStyle = "rgba(54, 36, 20, 0.88)";
+      ctx.lineWidth = 8;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(placed[3].x - 20, placed[3].y + 10);
+      ctx.quadraticCurveTo(placed[3].x - 46, placed[3].y + 36, placed[3].x - 18, placed[3].y + 58);
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(196, 160, 110, 0.35)";
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+      ctx.restore();
+    }
   }
   function paintKid(ctx, W, H, t, px, quests, fill, world) {
     var man = (global.HousePlates && HousePlates[world]) || HousePlates.hayes;
@@ -513,7 +569,7 @@
       drawPlate(ctx, P.rays, W, H, px * 0.16 + Math.sin(t * 0.1) * 12, 0, 1.2, 0.12, 16);
       ctx.restore();
     }
-    if (world === "hayes") stormRing(ctx, W, H, t);
+    if (world === "hayes") drawHayesScene(ctx, P, man, W, H, px, t);
     else shafts(ctx, W, H, t, world === "ainsley" ? "rgba(255, 186, 140, 0.04)" : "rgba(210, 255, 200, 0.035)");
     var fogG = ctx.createLinearGradient(0, H * 0.72, 0, H);
     fogG.addColorStop(0, "rgba(10, 14, 16, 0)");
@@ -535,11 +591,7 @@
     var cap = (man.landmarks && man.landmarks.length) || quests.length;
     var shown = quests.slice(0, cap);
     layoutLedges(shown, W, H, world, px);
-    var stamps = man.stamps || [];
     shown.forEach(function (q, i) {
-      var bit = (P.bits && P.bits[i % Math.max(1, stamps.length)]) || null;
-      var crop = stamps[i % Math.max(1, stamps.length)] || { nx: 0, ny: 0, nw: 1, nh: 1, ledge: 0.34 };
-      drawIsland(ctx, bit || P.stamp || P.mid, bit ? { nx: 0, ny: 0, nw: 1, nh: 1, ledge: crop.ledge || 0.34 } : crop, q);
       var open = q.done || (feed && feed.index === i && t < feed.t0 + 2.4);
       var glowY = q.seat - 8;
       var restG = ctx.createRadialGradient(q.x, glowY, 2, q.x, glowY, 36);
@@ -576,16 +628,9 @@
     drawPlate(ctx, P.near, W, H, px * 0.7, H * 0.28, 1.15, 0.9, 0);
     if (fgLayer) drawPlate(ctx, P.fg, W, H, px * fgLayer.parallax, H * 0.34, 1.08, 0.85, fgLayer.blur || 2);
     ctx.restore();
-    var jx = W * 0.5;
-    var jy = H - 78 - 98;
-    ctx.fillStyle = "rgba(0,0,0,0.45)";
-    ctx.beginPath();
-    ctx.ellipse(jx, jy + 86, 54, 10, 0, 0, 7);
-    ctx.fill();
-    ctx.fillStyle = "rgba(180, 190, 200, 0.16)";
-    ctx.beginPath();
-    ctx.ellipse(jx, jy + 96, 46, 8, 0, 0, 7);
-    ctx.fill();
+    var anchor = creatureAnchor(W, H);
+    var jx = anchor.cx;
+    var jy = anchor.jy + anchor.jh * 0.42;
     if (feed && shown[feed.index]) {
       var fq = shown[feed.index];
       var fromY = fq.ledY != null ? fq.ledY : fq.y;
@@ -1026,7 +1071,8 @@
       q.chipY = q.y;
       q.y = hold;
     });
-    var jx = W * 0.5, jy = H - 78 - 98;
+    var anchor = creatureAnchor(W, H);
+    var jx = anchor.cx, jy = anchor.jy + anchor.jh * 0.42;
     if (feed && shown[feed.index]) {
       var fq = shown[feed.index];
       feedDrops(ctx, t, feed.t0, fq.x, fq.ledY || fq.seat, jx, jy);
@@ -1166,7 +1212,8 @@
       q.chipY = q.y;
       q.y = hold;
     });
-    var jx = W * 0.5, jy = H - 78 - 98;
+    var anchor = creatureAnchor(W, H);
+    var jx = anchor.cx, jy = anchor.jy + anchor.jh * 0.42;
     if (feed && shown[feed.index]) {
       var fq = shown[feed.index];
       feedDrops(ctx, t, feed.t0, fq.x, fq.ledY || fq.seat, jx, jy);
@@ -1214,7 +1261,10 @@
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };
     this.hits = paintWorld(this.ctx, W, H, t, which || kid(), quests, st.fill || 0, (this.ptr - 0.5) * 40);
     var jhost = document.querySelector("[data-kw-jar]");
-    if (jhost && jhost._jar && jhost._jar.setEnv) jhost._jar.setEnv(this.cv);
+    if (jhost && jhost._jar && jhost._jar.setEnv) {
+      var skyPlate = plates[which || kid()] && plates[which || kid()].sky;
+      jhost._jar.setEnv(skyPlate || this.cv);
+    }
     if (global.JarEngine && JarEngine.setVirtual) JarEngine.setVirtual(null);
   };
 
@@ -1544,34 +1594,34 @@
     paintWorld(ctx, cssW, cssH, t, kid(), quests, st.fill || 0, Math.sin(t * 0.3) * 16);
     var host = document.querySelector("[data-kw-jar]");
     if (host && host._jar) {
-      if (host._jar.cv.width !== 360 || host._jar.cv.height !== 420) {
-        host._jar.cv.width = 360;
-        host._jar.cv.height = 420;
+      if (host._jar.cv.width !== 280 || host._jar.cv.height !== 320) {
+        host._jar.cv.width = 280;
+        host._jar.cv.height = 320;
         if (host._jar.useGL && host._jar.initGL) host._jar.initGL();
       }
       host._jar.dpr = 2;
-      if (host._jar.setEnv) host._jar.setEnv(canvas);
+      if (host._jar.setEnv) {
+        var skyPlate = plates[kid()] && plates[kid()].sky;
+        host._jar.setEnv(skyPlate || canvas);
+      }
       host._jar.frame();
       if (host._jar.cv && host._jar.cv.width) {
-        var jw = 200;
-        var jh = 228;
-        var jx = cssW * 0.5 - jw / 2;
-        var jy = cssH - 78 - jh;
+        var box = creatureAnchor(cssW, cssH);
+        var footY = box.jy + box.jh * 0.88;
         ctx.save();
-        ctx.translate(jx + jw / 2, jy + jh - 2);
+        ctx.beginPath();
+        ctx.ellipse(box.cx, footY + 2, box.jw * 0.2, 6, 0, 0, 7);
+        ctx.clip();
+        ctx.translate(box.cx, footY);
         ctx.scale(1, -0.16);
-        ctx.globalAlpha = 0.16;
-        ctx.drawImage(host._jar.cv, -jw / 2, 0, jw, jh);
+        ctx.globalAlpha = 0.18;
+        ctx.drawImage(host._jar.cv, -box.jw / 2, 0, box.jw, box.jh);
         ctx.restore();
-        ctx.fillStyle = "rgba(0,0,0,0.55)";
+        ctx.fillStyle = "rgba(0,0,0,0.5)";
         ctx.beginPath();
-        ctx.ellipse(jx + jw / 2, jy + jh - 2, jw * 0.36, 11, 0, 0, 7);
+        ctx.ellipse(box.cx, footY, box.jw * 0.22, 4.5, 0, 0, 7);
         ctx.fill();
-        ctx.fillStyle = "rgba(186, 196, 208, 0.2)";
-        ctx.beginPath();
-        ctx.ellipse(jx + jw / 2, jy + jh + 6, jw * 0.28, 7, 0, 0, 7);
-        ctx.fill();
-        ctx.drawImage(host._jar.cv, jx, jy, jw, jh);
+        ctx.drawImage(host._jar.cv, box.jx, box.jy, box.jw, box.jh);
       }
     }
     ctx.textAlign = "left";
@@ -1585,6 +1635,114 @@
     return canvas;
   }
 
+  function lanternPoint(i, W, H, t) {
+    var u = i / 6;
+    var x = W * (0.08 + u * 0.5) + Math.sin(t * 0.2 + i) * 2;
+    var y = H * (0.8 + Math.sin(u * Math.PI * 1.35) * 0.045);
+    return { x: x, y: y };
+  }
+  function paintLanternWeek(ctx, W, H, t) {
+    var meta = weekMeta();
+    var days = meta.length === 7 ? meta : [
+      { letter: "S" }, { letter: "M" }, { letter: "T" }, { letter: "W" },
+      { letter: "T" }, { letter: "F" }, { letter: "S" }
+    ];
+    var today = -1;
+    for (var n = 0; n < days.length; n++) if (days[n].today) today = n;
+    if (today < 0) {
+      try {
+        var name = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", weekday: "short" }).format(new Date());
+        var map = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+        today = map[name] != null ? map[name] : 4;
+      } catch (e) { today = 4; }
+    }
+    var pts = [];
+    for (var i = 0; i < 7; i++) pts.push(lanternPoint(i, W, H, t));
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    pts.forEach(function (p, i) {
+      var gy = p.y + 26;
+      if (i === 0) ctx.moveTo(p.x, gy);
+      else ctx.quadraticCurveTo((pts[i - 1].x + p.x) / 2, Math.max(pts[i - 1].y, p.y) + 34, p.x, gy);
+    });
+    ctx.strokeStyle = "rgba(36, 24, 14, 0.78)";
+    ctx.lineWidth = 18;
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(196, 156, 98, 0.4)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    pts.forEach(function (p, i) {
+      var state = i < today ? "past" : i === today ? "today" : "later";
+      if (state === "later") {
+        ctx.save();
+        ctx.globalAlpha = 0.55;
+        var mist = ctx.createRadialGradient(p.x, p.y, 4, p.x, p.y, 36);
+        mist.addColorStop(0, "rgba(210, 214, 220, 0.45)");
+        mist.addColorStop(1, "rgba(180, 186, 196, 0)");
+        ctx.fillStyle = mist;
+        ctx.beginPath();
+        ctx.ellipse(p.x, p.y + 4, 34, 22, 0, 0, 7);
+        ctx.fill();
+        ctx.restore();
+      }
+      var glowR = state === "today" ? 34 : state === "past" ? 16 : 12;
+      var g = ctx.createRadialGradient(p.x, p.y - 4, 1, p.x, p.y - 2, glowR);
+      if (state === "today") {
+        g.addColorStop(0, "rgba(255, 246, 214, 0.98)");
+        g.addColorStop(0.45, "rgba(255, 176, 70, 0.62)");
+        g.addColorStop(1, "rgba(255, 140, 40, 0)");
+      } else if (state === "past") {
+        g.addColorStop(0, "rgba(255, 150, 70, 0.55)");
+        g.addColorStop(1, "rgba(120, 40, 16, 0)");
+      } else {
+        g.addColorStop(0, "rgba(220, 224, 230, 0.28)");
+        g.addColorStop(1, "rgba(200, 206, 214, 0)");
+      }
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y - 2, glowR, 0, 7);
+      ctx.fill();
+      ctx.fillStyle = state === "later" ? "rgba(90, 86, 80, 0.55)" : "#4a3424";
+      ctx.fillRect(p.x - 1.2, p.y + 8, 2.4, 16);
+      ctx.fillStyle = state === "today" ? "#f6d7a4" : state === "past" ? "#6a4630" : "rgba(120, 114, 108, 0.45)";
+      ctx.beginPath();
+      ctx.moveTo(p.x - 8, p.y - 10);
+      ctx.lineTo(p.x + 8, p.y - 10);
+      ctx.lineTo(p.x + 6, p.y + 8);
+      ctx.lineTo(p.x - 6, p.y + 8);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = state === "today" ? "rgba(255, 236, 200, 0.9)" : "rgba(80, 60, 40, 0.45)";
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      if (state === "today") {
+        ctx.fillStyle = "#fff6d4";
+        ctx.beginPath();
+        ctx.ellipse(p.x, p.y - 1, 2.2, 5 + Math.sin(t * 6) * 0.8, 0, 0, 7);
+        ctx.fill();
+      } else if (state === "past") {
+        ctx.fillStyle = "rgba(255, 120, 50, 0.85)";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2.1, 0, 7);
+        ctx.fill();
+      }
+      ctx.font = "600 12px Palatino, Georgia, serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "rgba(10, 8, 6, 0.8)";
+      ctx.shadowColor = "rgba(6, 4, 2, 0.85)";
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = state === "later" ? "rgba(236, 232, 226, 0.55)" : "rgba(255, 248, 236, 0.96)";
+      var letter = days[i].letter || "·";
+      ctx.strokeText(letter, p.x, p.y + 36);
+      ctx.shadowBlur = 0;
+      ctx.fillText(letter, p.x, p.y + 36);
+    });
+    ctx.restore();
+  }
   function exportCalendar(t, cssW, cssH, dpr) {
     cssW = cssW || 440;
     cssH = cssH || 956;
@@ -1594,43 +1752,7 @@
     exportFrame.skipTap = false;
     var ctx = canvas.getContext("2d");
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var y = cssH * 0.42;
-    var h = 168;
-    ctx.fillStyle = "rgba(18, 14, 10, 0.42)";
-    ctx.beginPath();
-    ctx.roundRect(16, y, cssW - 32, h, 18);
-    ctx.fill();
-    ctx.fillStyle = "#fff6e8";
-    ctx.font = "600 16px Palatino, Georgia, serif";
-    ctx.textAlign = "left";
-    ctx.fillText("The week is a path of lanterns.", 28, y + 28);
-    var days = ["S", "M", "T", "W", "T", "F", "S"];
-    var lit = t >= 4 ? 3 : -1;
-    for (var i = 0; i < 7; i++) {
-      var x = 36 + i * ((cssW - 72) / 6);
-      var on = i === lit || (t >= 6 && i === 4);
-      var g = ctx.createRadialGradient(x, y + 78, 2, x, y + 78, on ? 22 : 14);
-      g.addColorStop(0, on ? "#fff6d2" : "rgba(255,255,255,0.85)");
-      g.addColorStop(0.45, kid() === "ainsley" ? "#e7b089" : kid() === "harris" ? "#8ee7a0" : "#9fd8ff");
-      g.addColorStop(1, "rgba(255,255,255,0)");
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(x, y + 78, on ? 22 : 14, 0, 7);
-      ctx.fill();
-      ctx.fillStyle = "rgba(255,248,236,0.9)";
-      ctx.font = "600 12px Palatino, Georgia, serif";
-      ctx.textAlign = "center";
-      ctx.fillText(days[i], x, y + 112);
-    }
-    var walk = Math.min(6, Math.max(0, (t - 1) / 1.4));
-    var wx = 36 + walk * ((cssW - 72) / 6);
-    ctx.fillStyle = "rgba(230, 240, 255, 0.95)";
-    ctx.beginPath();
-    ctx.arc(wx, y + 54, 7, 0, 7);
-    ctx.fill();
-    if (t >= 4) {
-      fullCard(ctx, "Today's lantern is lit. Later days stay in the mist.", cssW, cssH, kid());
-    }
+    paintLanternWeek(ctx, cssW, cssH, t);
     return canvas;
   }
 
