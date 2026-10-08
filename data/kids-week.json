@@ -1,7 +1,7 @@
 {
-  "asOf": "Mon Oct 5 2026",
-  "asOfIso": "2026-10-05",
-  "refreshedAt": "2026-10-06T03:00:45.581Z",
+  "asOf": "Wed Oct 7 2026",
+  "asOfIso": "2026-10-07",
+  "refreshedAt": "2026-10-08T01:01:41.095Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,123 +16,15 @@
     "endIso": "2026-10-09T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · Tue",
+    "label": "Next up · Thu",
     "time": "7:00",
-    "place": "SRE spirit day: Tropical Day (Peace Week)",
+    "place": "SRE spirit day: Crazy Socks Day (Peace Week)",
     "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-    "badge": "Tue",
-    "startIso": "2026-10-06T12:00:00.000Z",
-    "endIso": "2026-10-06T12:15:00.000Z",
+    "badge": "Thu",
+    "startIso": "2026-10-08T12:00:00.000Z",
+    "endIso": "2026-10-08T12:15:00.000Z",
     "kind": "school",
     "queue": [
-      {
-        "label": "Next up · Tue",
-        "time": "7:00",
-        "place": "SRE spirit day: Tropical Day (Peace Week)",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-06T12:00:00.000Z",
-        "endIso": "2026-10-06T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Tue 7:00",
-        "summary": "Hayes + Harris — SRE spirit day: Tropical Day (Peace Week)"
-      },
-      {
-        "label": "Next up · Tue",
-        "time": "7:00",
-        "place": "SRE specials: PE (tennis shoes)",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-06T12:00:00.000Z",
-        "endIso": "2026-10-06T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Tue 7:00",
-        "summary": "Harris — SRE specials: PE (tennis shoes)"
-      },
-      {
-        "label": "Next up · Tue",
-        "time": "7:00",
-        "place": "SRE specials: PE (tennis shoes)",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-06T12:00:00.000Z",
-        "endIso": "2026-10-06T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Tue 7:00",
-        "summary": "Hayes — SRE specials: PE (tennis shoes)"
-      },
-      {
-        "label": "Next up · Tue",
-        "time": "5:00",
-        "place": "Ainsley swim — Coach Ann",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-06T22:00:00.000Z",
-        "endIso": "2026-10-06T23:00:00.000Z",
-        "kind": "sport",
-        "whenLabel": "Tue 5:00",
-        "summary": "Ainsley swim — Coach Ann · 5:00 practice"
-      },
-      {
-        "label": "Next up · Wed",
-        "time": "7:00",
-        "place": "SRE specials: Art",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-10-07T12:00:00.000Z",
-        "endIso": "2026-10-07T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Wed 7:00",
-        "summary": "Harris — SRE specials: Art"
-      },
-      {
-        "label": "Next up · Wed",
-        "time": "7:00",
-        "place": "SRE specials: Art + Library (library book)",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-10-07T12:00:00.000Z",
-        "endIso": "2026-10-07T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Wed 7:00",
-        "summary": "Hayes — SRE specials: Art + Library (library book)"
-      },
-      {
-        "label": "Next up · Wed",
-        "time": "7:00",
-        "place": "SRE spirit day: Workout Day / team jersey (Peace Week)",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-10-07T12:00:00.000Z",
-        "endIso": "2026-10-07T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Wed 7:00",
-        "summary": "Hayes + Harris — SRE spirit day: Workout Day / team jersey (Peace Week)"
-      },
-      {
-        "label": "Next up · Wed",
-        "time": "3:00",
-        "place": "LKMS choir combined rehearsal",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-10-07T20:00:00.000Z",
-        "endIso": "2026-10-07T22:00:00.000Z",
-        "kind": "school",
-        "whenLabel": "Wed 3:00",
-        "summary": "Ainsley — LKMS choir combined rehearsal"
-      },
-      {
-        "label": "Next up · Wed",
-        "time": "4:45",
-        "place": "Harris flag practice · 5:30–6:30",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-10-07T21:45:00.000Z",
-        "endIso": "2026-10-07T23:30:00.000Z",
-        "kind": "sport",
-        "whenLabel": "Wed 4:45",
-        "summary": "Harris flag practice · 5:30–6:30"
-      },
       {
         "label": "Next up · Thu",
         "time": "7:00",
@@ -168,6 +60,114 @@
         "kind": "school",
         "whenLabel": "Thu 7:00",
         "summary": "Hayes — SRE specials: Spanish"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "3:00",
+        "place": "LKMS Homework Help",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-08T20:00:00.000Z",
+        "endIso": "2026-10-08T21:00:00.000Z",
+        "kind": "school",
+        "whenLabel": "Thu 3:00",
+        "summary": "Ainsley — LKMS Homework Help · 3:00"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "5:00",
+        "place": "Ainsley swim — Coach Ann",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-08T22:00:00.000Z",
+        "endIso": "2026-10-08T23:00:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Thu 5:00",
+        "summary": "Ainsley swim — Coach Ann · 5:00 practice"
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "6:00",
+        "place": "Hayes flag practice",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-08T23:00:00.000Z",
+        "endIso": "2026-10-09T00:15:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Thu 6:00",
+        "summary": "Hayes flag practice · 6:00"
+      },
+      {
+        "label": "Next up · Fri",
+        "time": "12:00",
+        "place": "Ward Kids [AHH No School]",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-09T17:00:00.000Z",
+        "endIso": "2026-10-10T17:00:00.000Z",
+        "kind": "school",
+        "whenLabel": "Fri 12:00",
+        "summary": "Ward Kids [AHH No School]"
+      },
+      {
+        "label": "Next up · Sat",
+        "time": "7:10",
+        "place": "Freckle Juice in bag before flag",
+        "detailHtml": "7:40 leave · 7:40 Harris flag — vs SH Proehl (home) · kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-10T12:10:00.000Z",
+        "endIso": "2026-10-10T12:20:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Sat 7:10",
+        "summary": "Hayes — Freckle Juice in bag before flag"
+      },
+      {
+        "label": "Next up · Sat",
+        "time": "7:40",
+        "place": "Harris flag drop-off",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 Harris flag — vs SH Proehl (home) · kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-10T12:40:00.000Z",
+        "endIso": "2026-10-10T13:00:00.000Z",
+        "kind": "leave",
+        "whenLabel": "Sat 7:40",
+        "summary": "Harris — flag drop-off · 8:00"
+      },
+      {
+        "label": "Next up · Sat",
+        "time": "7:40",
+        "place": "Harris flag — vs SH Proehl (home)",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-10T12:40:00.000Z",
+        "endIso": "2026-10-10T14:30:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Sat 7:40",
+        "summary": "Harris flag — vs SH Proehl (home) · leave 7:40 · game 8:30"
+      },
+      {
+        "label": "Next up · Sat",
+        "time": "9:15",
+        "place": "Harris flag pickup",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-10T14:15:00.000Z",
+        "endIso": "2026-10-10T14:30:00.000Z",
+        "kind": "leave",
+        "whenLabel": "Sat 9:15",
+        "summary": "Harris — flag pickup · 9:15"
+      },
+      {
+        "label": "Next up · Sat",
+        "time": "11:25",
+        "place": "Hayes flag drop-off",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Sat",
+        "startIso": "2026-10-10T16:25:00.000Z",
+        "endIso": "2026-10-10T16:45:00.000Z",
+        "kind": "leave",
+        "whenLabel": "Sat 11:25",
+        "summary": "Hayes — flag drop-off · 11:45"
       }
     ]
   },
@@ -311,13 +311,6 @@
       },
       "today": [
         {
-          "kind": "event",
-          "when": "Mon · 12:00",
-          "what": "SRE Peace Week",
-          "hint": "",
-          "tone": "act"
-        },
-        {
           "kind": "note",
           "when": "All day",
           "what": "🏡 At Mom's",
@@ -326,12 +319,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Wed 7 · leave 4:45",
-          "what": "Harris flag practice · 5:30–6:30",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Sat 10 · leave 7:40",
           "what": "Harris flag — vs SH Proehl (home)",
@@ -343,30 +330,6 @@
         {
           "when": "Mon 5 · 12:00",
           "what": "SRE Peace Week",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 6 · 7:00",
-          "what": "SRE spirit day: Tropical Day (Peace Week)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 6 · 7:00",
-          "what": "SRE specials: PE (tennis shoes)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 7 · 7:00",
-          "what": "SRE specials: Art",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 7 · 7:00",
-          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
         },
@@ -385,6 +348,54 @@
         {
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 7:00",
+          "what": "SRE specials: Music",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 3:25",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 7:00",
+          "what": "SRE specials: PE (tennis shoes)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 10:45",
+          "what": "SRE pickup for dentist",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 3:15",
+          "what": "Cover — Hayes + Harris SRE pickup 3:40",
           "tone": "act",
           "hint": ""
         }
@@ -530,13 +541,6 @@
       },
       "today": [
         {
-          "kind": "event",
-          "when": "Mon · 12:00",
-          "what": "SRE Peace Week",
-          "hint": "",
-          "tone": "act"
-        },
-        {
           "kind": "note",
           "when": "All day",
           "what": "🏡 At Mom's",
@@ -562,36 +566,18 @@
           "what": "Hayes flag — SRE Falcons vs Funk",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Mon 12 · leave 4:55",
+          "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
         {
           "when": "Mon 5 · 12:00",
           "what": "SRE Peace Week",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 6 · 7:00",
-          "what": "SRE spirit day: Tropical Day (Peace Week)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 6 · 7:00",
-          "what": "SRE specials: PE (tennis shoes)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 7 · 7:00",
-          "what": "SRE specials: Art + Library (library book)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 7 · 7:00",
-          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act",
           "hint": ""
         },
@@ -610,6 +596,54 @@
         {
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 7:00",
+          "what": "SRE specials: Music",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Mon 12 · 3:25",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 7:00",
+          "what": "SRE specials: PE (tennis shoes)",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 10:45",
+          "what": "SRE pickup for dentist",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 3:15",
+          "what": "Cover — Hayes + Harris SRE pickup 3:40",
           "tone": "act",
           "hint": ""
         }
@@ -750,12 +784,12 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "TUE · 5:00",
-        "what": "AINSLEY SWIM — COACH ANN",
+        "when": "THU · 3:00",
+        "what": "LKMS HOMEWORK HELP",
         "where": "with Mom · until Fri Oct 9 · 3:00",
         "badges": [
-          "TUE",
-          "5:00"
+          "THU",
+          "3:00"
         ]
       },
       "today": [
@@ -769,12 +803,6 @@
       ],
       "sports": [
         {
-          "when": "Tue 6 · leave 5:00",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
           "when": "Thu 8 · leave 5:00",
           "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
@@ -782,12 +810,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Wed 7 · 3:00",
-          "what": "LKMS choir combined rehearsal",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Thu 8 · 3:00",
           "what": "LKMS Homework Help",
@@ -799,9 +821,22 @@
           "what": "Ward Kids [AHH No School]",
           "tone": "act",
           "hint": ""
+        },
+        {
+          "when": "Tue 13 · 5:30",
+          "what": "LKMS choir Fall Concert",
+          "tone": "act",
+          "hint": ""
         }
       ],
-      "appointments": []
+      "appointments": [
+        {
+          "when": "Mon 12 · 2:20",
+          "what": "Lindsay appt",
+          "hint": "with Dad",
+          "tone": "hot"
+        }
+      ]
     },
     "dan": {
       "id": "dan",
@@ -847,7 +882,7 @@
         }
       ],
       "hottest": {
-        "when": "Mon Oct 5 2026 · kids with Mom",
+        "when": "Wed Oct 7 2026 · kids with Mom",
         "what": "Mom week",
         "where": "until Fri Oct 9 · 3:00",
         "badges": [
@@ -856,33 +891,28 @@
       },
       "today": [
         {
-          "when": "Mon · 7:00",
-          "what": "SRE specials: Music",
+          "when": "Wed · 7:00",
+          "what": "SRE specials: Art",
           "tone": "act"
         },
         {
-          "when": "Mon · 7:00",
-          "what": "SRE spirit day: Hat Day (Peace Week)",
+          "when": "Wed · 7:00",
+          "what": "SRE specials: Art + Library (library book)",
           "tone": "act"
         },
         {
-          "when": "Mon · 11:00",
-          "what": "cleaners",
-          "tone": "hot"
-        },
-        {
-          "when": "Mon · 12:00",
-          "what": "SRE Peace Week",
+          "when": "Wed · 7:00",
+          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
           "tone": "act"
         },
         {
-          "when": "Mon · 3:00",
-          "what": "Lindsay appt · 3:00 video",
-          "tone": "hot"
+          "when": "Wed · 3:00",
+          "what": "LKMS choir combined rehearsal",
+          "tone": "act"
         },
         {
-          "when": "Mon · 5:30",
-          "what": "Hayes baseball — Falcons vs KC Tigers (away)",
+          "when": "Wed · 4:45",
+          "what": "Harris flag practice · 5:30–6:30",
           "tone": "hot"
         },
         {
@@ -896,46 +926,6 @@
           "when": "Mon 5 · 12:00",
           "what": "SRE Peace Week",
           "tone": "act"
-        },
-        {
-          "when": "Tue 6 · 7:00",
-          "what": "SRE spirit day: Tropical Day (Peace Week)",
-          "tone": "act"
-        },
-        {
-          "when": "Tue 6 · 7:00",
-          "what": "SRE specials: PE (tennis shoes)",
-          "tone": "act"
-        },
-        {
-          "when": "Tue 6 · 5:00",
-          "what": "Ainsley swim — Coach Ann",
-          "tone": "hot"
-        },
-        {
-          "when": "Wed 7 · 7:00",
-          "what": "SRE specials: Art",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 7 · 7:00",
-          "what": "SRE specials: Art + Library (library book)",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 7 · 7:00",
-          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 7 · 3:00",
-          "what": "LKMS choir combined rehearsal",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 7 · 4:45",
-          "what": "Harris flag practice · 5:30–6:30",
-          "tone": "hot"
         },
         {
           "when": "Thu 8 · 7:00",
@@ -1008,8 +998,48 @@
           "tone": "hot"
         },
         {
-          "when": "until Fri Oct 9 · 3:00",
-          "what": "Kids with Mom",
+          "when": "Mon 12 · 7:00",
+          "what": "SRE specials: Music",
+          "tone": "act"
+        },
+        {
+          "when": "Mon 12 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act"
+        },
+        {
+          "when": "Mon 12 · 2:20",
+          "what": "Lindsay appt",
+          "tone": "act"
+        },
+        {
+          "when": "Mon 12 · 2:20",
+          "what": "Ainsley appt drop-off",
+          "tone": "hot"
+        },
+        {
+          "when": "Mon 12 · 3:25",
+          "what": "SRE pickup",
+          "tone": "act"
+        },
+        {
+          "when": "Mon 12 · 3:45",
+          "what": "Ainsley appt pickup",
+          "tone": "hot"
+        },
+        {
+          "when": "Mon 12 · 4:55",
+          "what": "Hayes baseball drop-off",
+          "tone": "hot"
+        },
+        {
+          "when": "Mon 12 · 4:55",
+          "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
+          "tone": "hot"
+        },
+        {
+          "when": "Mon 12 · 7:00",
+          "what": "Hayes baseball pickup",
           "tone": "hot"
         }
       ]
