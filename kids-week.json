@@ -1,7 +1,7 @@
 {
-  "asOf": "Wed Oct 7 2026",
-  "asOfIso": "2026-10-07",
-  "refreshedAt": "2026-10-08T03:03:05.246Z",
+  "asOf": "Thu Oct 8 2026",
+  "asOfIso": "2026-10-08",
+  "refreshedAt": "2026-10-08T10:11:10.417Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,9 +16,9 @@
     "endIso": "2026-10-09T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · Thu",
+    "label": "Next up · today",
     "time": "7:00",
-    "place": "SRE spirit day: Crazy Socks Day (Peace Week)",
+    "place": "SRE specials: Spanish + Library checkout",
     "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
     "badge": "Thu",
     "startIso": "2026-10-08T12:00:00.000Z",
@@ -26,19 +26,7 @@
     "kind": "school",
     "queue": [
       {
-        "label": "Next up · Thu",
-        "time": "7:00",
-        "place": "SRE spirit day: Crazy Socks Day (Peace Week)",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-08T12:00:00.000Z",
-        "endIso": "2026-10-08T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Thu 7:00",
-        "summary": "Hayes + Harris — SRE spirit day: Crazy Socks Day (Peace Week)"
-      },
-      {
-        "label": "Next up · Thu",
+        "label": "Next up · today",
         "time": "7:00",
         "place": "SRE specials: Spanish + Library checkout",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -46,11 +34,11 @@
         "startIso": "2026-10-08T12:00:00.000Z",
         "endIso": "2026-10-08T12:15:00.000Z",
         "kind": "school",
-        "whenLabel": "Thu 7:00",
+        "whenLabel": "7:00",
         "summary": "Harris — SRE specials: Spanish + Library checkout"
       },
       {
-        "label": "Next up · Thu",
+        "label": "Next up · today",
         "time": "7:00",
         "place": "SRE specials: Spanish",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -58,11 +46,23 @@
         "startIso": "2026-10-08T12:00:00.000Z",
         "endIso": "2026-10-08T12:15:00.000Z",
         "kind": "school",
-        "whenLabel": "Thu 7:00",
+        "whenLabel": "7:00",
         "summary": "Hayes — SRE specials: Spanish"
       },
       {
-        "label": "Next up · Thu",
+        "label": "Next up · today",
+        "time": "7:00",
+        "place": "SRE spirit day: Crazy Socks Day (Peace Week)",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-08T12:00:00.000Z",
+        "endIso": "2026-10-08T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "7:00",
+        "summary": "Hayes + Harris — SRE spirit day: Crazy Socks Day (Peace Week)"
+      },
+      {
+        "label": "Next up · today",
         "time": "3:00",
         "place": "LKMS Homework Help",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -70,11 +70,11 @@
         "startIso": "2026-10-08T20:00:00.000Z",
         "endIso": "2026-10-08T21:00:00.000Z",
         "kind": "school",
-        "whenLabel": "Thu 3:00",
+        "whenLabel": "3:00",
         "summary": "Ainsley — LKMS Homework Help · 3:00"
       },
       {
-        "label": "Next up · Thu",
+        "label": "Next up · today",
         "time": "5:00",
         "place": "Ainsley swim — Coach Ann",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -82,11 +82,11 @@
         "startIso": "2026-10-08T22:00:00.000Z",
         "endIso": "2026-10-08T23:00:00.000Z",
         "kind": "sport",
-        "whenLabel": "Thu 5:00",
+        "whenLabel": "5:00",
         "summary": "Ainsley swim — Coach Ann · 5:00 practice"
       },
       {
-        "label": "Next up · Thu",
+        "label": "Next up · today",
         "time": "6:00",
         "place": "Hayes flag practice",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -94,7 +94,7 @@
         "startIso": "2026-10-08T23:00:00.000Z",
         "endIso": "2026-10-09T00:15:00.000Z",
         "kind": "sport",
-        "whenLabel": "Thu 6:00",
+        "whenLabel": "6:00",
         "summary": "Hayes flag practice · 6:00"
       },
       {
@@ -310,6 +310,20 @@
         ]
       },
       "today": [
+        {
+          "kind": "event",
+          "when": "Thu · 7:00",
+          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Thu · 7:00",
+          "what": "SRE specials: Spanish + Library checkout",
+          "hint": "",
+          "tone": "act"
+        },
         {
           "kind": "note",
           "when": "All day",
@@ -564,6 +578,27 @@
         ]
       },
       "today": [
+        {
+          "kind": "event",
+          "when": "Thu · 7:00",
+          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Thu · 7:00",
+          "what": "SRE specials: Spanish",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Thu · 6:00",
+          "what": "Hayes flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
         {
           "kind": "note",
           "when": "All day",
@@ -836,6 +871,20 @@
       },
       "today": [
         {
+          "kind": "event",
+          "when": "Thu · 3:00",
+          "what": "LKMS Homework Help",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Thu · 5:00",
+          "what": "Ainsley swim — Coach Ann",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
           "kind": "note",
           "when": "All day",
           "what": "At Mom's",
@@ -930,7 +979,7 @@
         }
       ],
       "hottest": {
-        "when": "Wed Oct 7 2026 · kids with Mom",
+        "when": "Thu Oct 8 2026 · kids with Mom",
         "what": "Mom week",
         "where": "until Fri Oct 9 · 3:00",
         "badges": [
@@ -939,28 +988,33 @@
       },
       "today": [
         {
-          "when": "Wed · 7:00",
-          "what": "SRE specials: Art",
+          "when": "Thu · 7:00",
+          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
           "tone": "act"
         },
         {
-          "when": "Wed · 7:00",
-          "what": "SRE specials: Art + Library (library book)",
+          "when": "Thu · 7:00",
+          "what": "SRE specials: Spanish + Library checkout",
           "tone": "act"
         },
         {
-          "when": "Wed · 7:00",
-          "what": "SRE spirit day: Workout Day / team jersey (Peace Week)",
+          "when": "Thu · 7:00",
+          "what": "SRE specials: Spanish",
           "tone": "act"
         },
         {
-          "when": "Wed · 3:00",
-          "what": "LKMS choir combined rehearsal",
+          "when": "Thu · 3:00",
+          "what": "LKMS Homework Help",
           "tone": "act"
         },
         {
-          "when": "Wed · 4:45",
-          "what": "Harris flag practice · 5:30–6:30",
+          "when": "Thu · 5:00",
+          "what": "Ainsley swim — Coach Ann",
+          "tone": "hot"
+        },
+        {
+          "when": "Thu · 6:00",
+          "what": "Hayes flag practice",
           "tone": "hot"
         },
         {

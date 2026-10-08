@@ -1,11 +1,11 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-08T03:03:05.825Z",
+  "fetchedAt": "2026-10-08T10:11:11.595Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-03",
   "windowEnd": "2026-10-14",
-  "asOfIso": "2026-10-07",
+  "asOfIso": "2026-10-08",
   "nextLeave": {
     "id": "6gc1db0v6m642r4t0uhhpagft0",
     "summary": "Hayes + Harris — SRE spirit day: Crazy Socks Day (Peace Week)",
@@ -567,7 +567,7 @@
     }
   ],
   "boardStrip": {
-    "label": "Next up · Thu",
+    "label": "Next up · today",
     "time": "7:00",
     "place": "Hayes + Harris — SRE spirit day: Crazy Socks Day (Pea…",
     "detailHtml": "<strong>7:00</strong> Hayes + Harris — SRE spirit day: Crazy Socks Day (Pea…",
