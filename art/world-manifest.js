@@ -100,7 +100,7 @@
         { x: 0.22, y: 0.28, depth: 0.35, scale: 1, kind: "tree" },
         { x: 0.72, y: 0.24, depth: 0.35, scale: 1, kind: "tree" },
         { x: 0.16, y: 0.46, depth: 0.35, scale: 1, kind: "dock" },
-        { x: 0.84, y: 0.42, depth: 0.35, scale: 1, kind: "shore" },
+        { x: 0.46, y: 0.14, depth: 0.35, scale: 1, kind: "shore" },
         { x: 0.46, y: 0.60, depth: 0.35, scale: 1, kind: "shore" },
         { x: 0.82, y: 0.62, depth: 0.35, scale: 1, kind: "shore" },
         { x: 0.18, y: 0.68, depth: 0.35, scale: 1, kind: "dock" }
@@ -121,7 +121,7 @@
 
   global.HousePlates.urlFor = function (world, id, orient, standin) {
     var o = orient || "portrait";
-    var painted = "assets/ori/" + world + "/" + o + "/" + id + ".webp";
+    var painted = "assets/ori/" + world + "/" + o + "/" + id + ".webp?v=WORLD22";
     var base = ROOT + "/" + world + "/" + o + "/" + id + ".png";
     var flat = ROOT + "/" + world + "/" + id + ".png";
     return [painted, base, flat, standin];
