@@ -833,6 +833,19 @@
     var foot = document.querySelector(".ftr");
     if (foot) foot.hidden = true;
     var dows = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    function stripShown(s, keepTime) {
+      s = String(s || "");
+      s = s.replace(/\[[^\]]*\]/g, " ");
+      s = s.replace(/#[A-Za-z0-9_-]+/g, " ");
+      s = s.replace(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{5,}\b/g, " ");
+      s = s.replace(/\(\s*\)/g, " ");
+      if (!keepTime) {
+        s = s.replace(/\([^)]*\)/g, " ");
+        var cut = s.indexOf(" · ");
+        if (cut >= 0) s = s.slice(0, cut);
+      }
+      return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/^[\s·—–\-|]+|[\s·—–\-|]+$/g, "").trim();
+    }
     function build() {
       var days = grid.querySelectorAll(":scope > .day");
       if (!days.length) return;
@@ -853,7 +866,7 @@
         html += '<span class="ori-dom">' + dows[dt.getDay()] + " " + n + "</span>";
         if (mom) html += '<span class="ori-ev dan">' + mom.textContent.replace(/</g, "") + "</span>";
         for (var b = 0; b < blks.length; b++) {
-          var title = cleanTitle(blks[b].getAttribute("title") || blks[b].textContent || "");
+          var title = stripShown(blks[b].getAttribute("title") || blks[b].textContent || "", true);
           var tone = (blks[b].className || "").replace(/\bblk\b/, "").trim();
           html += '<span class="ori-ev ' + tone + '">' + String(title).replace(/</g, "") + "</span>";
         }
@@ -870,7 +883,7 @@
       if (!dest) return;
       var raw = dest.getAttribute("data-ori-raw") || dest.textContent;
       if (!dest.getAttribute("data-ori-raw")) dest.setAttribute("data-ori-raw", raw);
-      var title = cleanTitle(raw);
+      var title = stripShown(raw, false);
       if (title && dest.textContent !== title) dest.textContent = title;
     }
     once();
