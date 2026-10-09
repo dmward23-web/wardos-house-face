@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-09T02:40:32.864Z",
+  "fetchedAt": "2026-10-09T03:17:35.791Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-03",
   "windowEnd": "2026-10-14",
@@ -80,10 +80,10 @@
       "allDay": false
     },
     {
-      "id": "hn57g71ndg4t3lvmm934g1gdao",
-      "summary": "Harris — flag drop-off · 8:00",
+      "id": "5173a2fg5417s7muq42ujqj37s",
+      "summary": "Harris flag — vs SH Proehl (home) · leave 7:40 · game 8:30",
       "start": "2026-10-10T07:40:00-05:00",
-      "end": "2026-10-10T08:00:00-05:00",
+      "end": "2026-10-10T09:30:00-05:00",
       "location": "Heritage Park Soccer Complex, Field 10 North SC, 17255 S Black Bob Rd, Olathe, KS 66062",
       "busy": true,
       "allDay": false
@@ -98,27 +98,9 @@
       "allDay": false
     },
     {
-      "id": "fah8t0vb29thajhe7fre20p65g",
-      "summary": "Harris — flag pickup · 9:15",
-      "start": "2026-10-10T09:15:00-05:00",
-      "end": "2026-10-10T09:30:00-05:00",
-      "location": "Heritage Park Soccer Complex, Field 10, 17255 S Black Bob Rd, Olathe, KS 66062",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "ri3mic2rjkp3vhtu4lv2abl6dc",
-      "summary": "Hayes — flag drop-off · 11:45",
+      "id": "3snh0eumn2qpus4jv2iqhr8pk0",
+      "summary": "Hayes flag — SRE Falcons vs Funk · Field 6 · leave 11:25 · game 12:15",
       "start": "2026-10-10T11:25:00-05:00",
-      "end": "2026-10-10T11:45:00-05:00",
-      "location": "Heritage Park Football Complex, Field 6 FB, 16240 Pflumm Rd, Olathe, KS 66062",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "6rcjqker1uvpit8oi1jajf2pmc",
-      "summary": "Hayes — flag pickup · 1:15",
-      "start": "2026-10-10T13:15:00-05:00",
       "end": "2026-10-10T13:35:00-05:00",
       "location": "Heritage Park Football Complex, Field 6 FB, 16240 Pflumm Rd, Olathe, KS 66062",
       "busy": true,
@@ -188,11 +170,11 @@
       "allDay": false
     },
     {
-      "id": "8h7e20k6adejlpl53i5p62ptsk",
-      "summary": "Ainsley — appt drop-off · 3:00",
+      "id": "9btt9aick4vt91eoco3dhvlva8",
+      "summary": "Ainsley — Lindsay appt · 3:00",
       "start": "2026-10-12T14:20:00-05:00",
-      "end": "2026-10-12T15:00:00-05:00",
-      "location": "Midwest Anxiety, 8675 College Blvd, Overland Park, KS 66210",
+      "end": "2026-10-12T16:20:00-05:00",
+      "location": "8675 College Blvd, Overland Park, KS 66210-1946",
       "busy": true,
       "allDay": false
     },
@@ -206,27 +188,9 @@
       "allDay": false
     },
     {
-      "id": "bt021sbegds6l5f344bnm4hpg8",
-      "summary": "Ainsley — appt pickup · 4:00",
-      "start": "2026-10-12T15:45:00-05:00",
-      "end": "2026-10-12T16:05:00-05:00",
-      "location": "Midwest Anxiety, 8675 College Blvd, Overland Park, KS 66210",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "1al07kc0m3no1tmhf64lh7gj0s",
-      "summary": "Hayes — baseball drop-off · 5:30",
+      "id": "q13gu6onji3irp8p6feteapsus",
+      "summary": "Hayes baseball — Falcons vs Blue Bananas (home) · 5:30 game",
       "start": "2026-10-12T16:55:00-05:00",
-      "end": "2026-10-12T17:30:00-05:00",
-      "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "sh7iln7oaajtqnjgavuufe9rpo",
-      "summary": "Hayes — baseball pickup · 7:00",
-      "start": "2026-10-12T19:00:00-05:00",
       "end": "2026-10-12T19:20:00-05:00",
       "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
       "busy": true,
@@ -323,18 +287,9 @@
       "allDay": false
     },
     {
-      "id": "bnilitdqb829f7lmh1bie19c3o",
-      "summary": "Ainsley — concert drop-off · 5:30",
+      "id": "6rjo81d3276pf0slm9hgif2l60",
+      "summary": "Ainsley — LKMS choir Fall Concert · 5:30–7:30",
       "start": "2026-10-13T17:15:00-05:00",
-      "end": "2026-10-13T17:30:00-05:00",
-      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "e58lple51g6qkn511c8thr0vl4",
-      "summary": "Ainsley — concert pickup · 7:30",
-      "start": "2026-10-13T19:30:00-05:00",
       "end": "2026-10-13T19:45:00-05:00",
       "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
       "busy": true,
@@ -386,8 +341,8 @@
       "allDay": false
     },
     {
-      "id": "jruhjf4902aajn9r6mnnp1qfog",
-      "summary": "Ainsley — Math Counts pickup · 4:00",
+      "id": "m10mhm86l2ba1m6dnjdj37g4js",
+      "summary": "Ainsley — LKMS Math Counts info meeting · 3:15–4:00 · pickup 4:00",
       "start": "2026-10-14T15:50:00-05:00",
       "end": "2026-10-14T16:00:00-05:00",
       "location": "Lakewood Middle School Library, 6601 Edgewater Dr, Overland Park, KS 66223",
@@ -395,39 +350,30 @@
       "allDay": false
     },
     {
-      "id": "bu4mt7h83fsikbk91vo2bui1dg",
-      "summary": "Ainsley — swim drop-off · 5:00",
+      "id": "iajqj9nb85bopr0ndinnqs642o",
+      "summary": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
       "start": "2026-10-14T16:00:00-05:00",
-      "end": "2026-10-14T16:30:00-05:00",
-      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "5uqtqjnc69b4mu6ma60kjqoams",
-      "summary": "Harris — flag drop-off · 5:30",
-      "start": "2026-10-14T16:40:00-05:00",
-      "end": "2026-10-14T17:30:00-05:00",
-      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "1quruq2b8tso6plitjhqota96s",
-      "summary": "Ainsley — swim pickup · 6:00",
-      "start": "2026-10-14T17:30:00-05:00",
       "end": "2026-10-14T18:05:00-05:00",
       "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
       "busy": true,
       "allDay": false
     },
     {
-      "id": "61r90a545v0g23kmn4qtq35fpo",
-      "summary": "Harris — flag pickup · 6:30",
-      "start": "2026-10-14T18:03:00-05:00",
+      "id": "nmfqrqn6lvnc8nro77i5ankg28",
+      "summary": "Harris flag practice · 5:30–6:30",
+      "start": "2026-10-14T16:40:00-05:00",
       "end": "2026-10-14T18:50:00-05:00",
       "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
       "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "dugkci3ufknsm669rbgf5rt1r8",
+      "summary": "BV Community Connections with BOE (optional) · 5:30",
+      "start": "2026-10-14T17:30:00-05:00",
+      "end": "2026-10-14T18:30:00-05:00",
+      "location": "Blue Valley District Offices, 15020 Metcalf Ave, Overland Park, KS",
+      "busy": false,
       "allDay": false
     }
   ],
