@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 9 2026",
   "asOfIso": "2026-10-09",
-  "refreshedAt": "2026-10-09T23:44:58.955Z",
+  "refreshedAt": "2026-10-09T23:45:35.937Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -910,6 +910,12 @@
           "hint": ""
         },
         {
+          "when": "Wed 14 · 12:00",
+          "what": "choir Sing & Share permission form due",
+          "tone": "act",
+          "hint": ""
+        },
+        {
           "when": "Wed 14 · 3:50",
           "what": "LKMS Math Counts info meeting · 3:15–4:00 · pickup 4:00",
           "tone": "act",
@@ -1093,6 +1099,11 @@
           "tone": "act"
         },
         {
+          "when": "Wed 14 · 12:00",
+          "what": "choir Sing & Share permission form due",
+          "tone": "act"
+        },
+        {
           "when": "Wed 14 · 3:15",
           "what": "SRE pickup",
           "tone": "act"
@@ -1115,11 +1126,6 @@
         {
           "when": "Thu 15 · 7:00",
           "what": "SRE specials: Spanish",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
           "tone": "act"
         }
       ]
