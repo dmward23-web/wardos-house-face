@@ -1,6 +1,6 @@
 {
   "status": "live",
-  "fetchedAt": "2026-10-09T13:54:09.175Z",
+  "fetchedAt": "2026-10-09T14:09:20.530Z",
   "source": "tplink-cloud-api",
   "writeSupported": true,
   "brightnessControlSupported": true,
@@ -61,6 +61,6 @@
   ],
   "error": null,
   "note": "Brightness READ from get_sysinfo.brightness (HS220/KS220). WRITE via scripts/kasa-write.py + lights-write-proxy.mjs (cloud passthrough).",
-  "writeProxy": "https://acm-competitive-harvest-birds.trycloudflare.com",
+  "writeProxy": "https://classifieds-calculated-extract-matter.trycloudflare.com",
   "writePath": "scripts/lights-write-proxy.mjs → kasa-write.py (cloud)"
 }
