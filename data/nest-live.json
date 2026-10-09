@@ -1,7 +1,7 @@
 {
   "status": "live",
   "fetchedAt": "2026-10-05T01:42:25.289Z",
-  "updatedAt": "2026-10-09T21:43:53.252Z",
+  "updatedAt": "2026-10-09T22:43:12.692Z",
   "source": "nest-sdm+webrtc-still",
   "cameras": [
     {
@@ -125,9 +125,9 @@
   "deviceCount": 5,
   "cameraCount": 5,
   "stillsPending": false,
-  "stillNote": "WebRTC canvas stills via nest-webrtc-still.mjs \u00b7 Pages-servable data/nest-snaps",
+  "stillNote": "WebRTC canvas stills via nest-webrtc-still.mjs · Pages-servable data/nest-snaps",
   "error": null,
-  "nestProxyPath": "scripts/nest-webrtc-proxy.mjs \u2192 SDM GenerateWebRtcStream",
-  "nestProxy": "https://lil-differential-lovers-expertise.trycloudflare.com",
+  "nestProxyPath": "scripts/nest-webrtc-proxy.mjs → SDM GenerateWebRtcStream",
+  "nestProxy": "https://reproduced-upgrades-penn-collected.trycloudflare.com",
   "nestProxyToken": "nest-ba68b55c44a8d394fddaf33bcab055d836a3fe0367d05ebe"
 }
