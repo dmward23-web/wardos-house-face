@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 8 2026",
   "asOfIso": "2026-10-08",
-  "refreshedAt": "2026-10-08T23:58:29.280Z",
+  "refreshedAt": "2026-10-09T02:31:43.632Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -41,7 +41,7 @@
         "label": "Next up · Sat",
         "time": "7:10",
         "place": "Freckle Juice in bag before flag",
-        "detailHtml": "7:40 leave · 7:40 Harris flag — vs SH Proehl (home) · kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "7:40 leave · 9:15 leave · kids with Mom · until Fri Oct 9 · 3:00",
         "badge": "Sat",
         "startIso": "2026-10-10T12:10:00.000Z",
         "endIso": "2026-10-10T12:20:00.000Z",
@@ -53,25 +53,13 @@
         "label": "Next up · Sat",
         "time": "7:40",
         "place": "Harris flag drop-off",
-        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 Harris flag — vs SH Proehl (home) · kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 9:15 leave · kids with Mom · until Fri Oct 9 · 3:00",
         "badge": "Sat",
         "startIso": "2026-10-10T12:40:00.000Z",
         "endIso": "2026-10-10T13:00:00.000Z",
         "kind": "leave",
         "whenLabel": "Sat 7:40",
         "summary": "Harris — flag drop-off · 8:00"
-      },
-      {
-        "label": "Next up · Sat",
-        "time": "7:40",
-        "place": "Harris flag — vs SH Proehl (home)",
-        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Sat",
-        "startIso": "2026-10-10T12:40:00.000Z",
-        "endIso": "2026-10-10T14:30:00.000Z",
-        "kind": "sport",
-        "whenLabel": "Sat 7:40",
-        "summary": "Harris flag — vs SH Proehl (home) · leave 7:40 · game 8:30"
       },
       {
         "label": "Next up · Sat",
@@ -87,30 +75,6 @@
       },
       {
         "label": "Next up · Sat",
-        "time": "10:00",
-        "place": "Lindsay appt",
-        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Sat",
-        "startIso": "2026-10-10T15:00:00.000Z",
-        "endIso": "2026-10-10T16:00:00.000Z",
-        "kind": "other",
-        "whenLabel": "Sat 10:00",
-        "summary": "Hayes — Lindsay appt · 10:00"
-      },
-      {
-        "label": "Next up · Sat",
-        "time": "10:00",
-        "place": "Lindsay appt",
-        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Sat",
-        "startIso": "2026-10-10T15:00:00.000Z",
-        "endIso": "2026-10-10T16:00:00.000Z",
-        "kind": "other",
-        "whenLabel": "Sat 10:00",
-        "summary": "Harris — Lindsay appt · 10:00"
-      },
-      {
-        "label": "Next up · Sat",
         "time": "11:25",
         "place": "Hayes flag drop-off",
         "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
@@ -120,30 +84,6 @@
         "kind": "leave",
         "whenLabel": "Sat 11:25",
         "summary": "Hayes — flag drop-off · 11:45"
-      },
-      {
-        "label": "Next up · Sat",
-        "time": "11:25",
-        "place": "Hayes flag — SRE Falcons vs Funk · Field 6",
-        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Sat",
-        "startIso": "2026-10-10T16:25:00.000Z",
-        "endIso": "2026-10-10T18:15:00.000Z",
-        "kind": "sport",
-        "whenLabel": "Sat 11:25",
-        "summary": "Hayes flag — SRE Falcons vs Funk · Field 6 · leave 11:25 · game 12:15"
-      },
-      {
-        "label": "Next up · Sat",
-        "time": "1:00",
-        "place": "Lindsay appt video",
-        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Sat",
-        "startIso": "2026-10-10T18:00:00.000Z",
-        "endIso": "2026-10-10T19:00:00.000Z",
-        "kind": "other",
-        "whenLabel": "Sat 1:00",
-        "summary": "Harris — Lindsay appt video · 1:00"
       },
       {
         "label": "Next up · Sat",
@@ -158,16 +98,76 @@
         "summary": "Hayes — flag pickup · 1:15"
       },
       {
-        "label": "Next up · Sat",
-        "time": "2:00",
-        "place": "Lindsay appt video",
-        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 leave · kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Sat",
-        "startIso": "2026-10-10T19:00:00.000Z",
-        "endIso": "2026-10-10T20:00:00.000Z",
+        "label": "Next up · Mon",
+        "time": "7:00",
+        "place": "SRE specials: Music",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-12T12:00:00.000Z",
+        "endIso": "2026-10-12T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Mon 7:00",
+        "summary": "Harris — SRE specials: Music"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "7:00",
+        "place": "SRE specials: Music",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-12T12:00:00.000Z",
+        "endIso": "2026-10-12T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Mon 7:00",
+        "summary": "Hayes — SRE specials: Music"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "8:10",
+        "place": "Boys SRE drop",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-12T13:10:00.000Z",
+        "endIso": "2026-10-12T13:40:00.000Z",
+        "kind": "school_drop",
+        "whenLabel": "Mon 8:10",
+        "summary": "Hayes + Harris — SRE drop-off · 8:25"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "12:00",
+        "place": "Hayes BB: coach in — practices by 19 Oct",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-12T17:00:00.000Z",
+        "endIso": "2026-10-17T17:00:00.000Z",
         "kind": "other",
-        "whenLabel": "Sat 2:00",
-        "summary": "Harris — Lindsay appt video · 2:00"
+        "whenLabel": "Mon 12:00",
+        "summary": "Hayes BB: coach in — practices by 19 Oct"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "2:20",
+        "place": "Ainsley appt drop-off",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-12T19:20:00.000Z",
+        "endIso": "2026-10-12T20:00:00.000Z",
+        "kind": "leave",
+        "whenLabel": "Mon 2:20",
+        "summary": "Ainsley — appt drop-off · 3:00"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "3:25",
+        "place": "Boys SRE pickup",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-12T20:25:00.000Z",
+        "endIso": "2026-10-12T20:50:00.000Z",
+        "kind": "school_pickup",
+        "whenLabel": "Mon 3:25",
+        "summary": "Hayes + Harris — SRE pickup · 3:45"
       }
     ]
   },
@@ -318,20 +318,7 @@
           "tone": "hot"
         }
       ],
-      "sports": [
-        {
-          "when": "Sat 10 · leave 7:40",
-          "what": "Harris flag — vs SH Proehl (home)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "when": "Wed 14 · leave 4:45",
-          "what": "Harris flag practice · 5:30–6:30",
-          "hint": "YOUR board",
-          "tone": "hot"
-        }
-      ],
+      "sports": [],
       "school": [
         {
           "when": "Mon 5 · 12:00",
@@ -384,12 +371,6 @@
         {
           "when": "Tue 13 · 3:15",
           "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 13 · 3:15",
-          "what": "Cover — Hayes + Harris SRE pickup 3:40",
           "tone": "act",
           "hint": ""
         },
@@ -553,13 +534,6 @@
       },
       "today": [
         {
-          "kind": "event",
-          "when": "Thu · 6:00",
-          "what": "Hayes flag practice",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
           "kind": "note",
           "when": "All day",
           "what": "🏡 At Mom's",
@@ -569,26 +543,8 @@
       ],
       "sports": [
         {
-          "when": "Thu 8 · leave 6:00",
-          "what": "Hayes flag practice",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
           "when": "Sat 10 · leave 7:10",
           "what": "Freckle Juice in bag before flag",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "when": "Sat 10 · leave 11:25",
-          "what": "Hayes flag — SRE Falcons vs Funk · Field 6",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "when": "Mon 12 · leave 4:55",
-          "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
           "hint": "YOUR board",
           "tone": "hot"
         }
@@ -645,12 +601,6 @@
         {
           "when": "Tue 13 · 3:15",
           "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 13 · 3:15",
-          "what": "Cover — Hayes + Harris SRE pickup 3:40",
           "tone": "act",
           "hint": ""
         },
@@ -826,36 +776,16 @@
           "tone": "hot"
         }
       ],
-      "sports": [
-        {
-          "when": "Wed 14 · leave 4:00",
-          "what": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        }
-      ],
+      "sports": [],
       "school": [
         {
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Tue 13 · 5:30",
-          "what": "LKMS choir Fall Concert",
-          "tone": "act",
-          "hint": ""
         }
       ],
-      "appointments": [
-        {
-          "when": "Mon 12 · 2:20",
-          "what": "Lindsay appt",
-          "hint": "with Dad",
-          "tone": "hot"
-        }
-      ]
+      "appointments": []
     },
     "dan": {
       "id": "dan",
@@ -952,11 +882,6 @@
           "tone": "act"
         },
         {
-          "when": "Thu 8 · 6:00",
-          "what": "Hayes flag practice",
-          "tone": "hot"
-        },
-        {
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
           "tone": "act"
@@ -972,18 +897,8 @@
           "tone": "hot"
         },
         {
-          "when": "Sat 10 · 7:40",
-          "what": "Harris flag — vs SH Proehl (home)",
-          "tone": "hot"
-        },
-        {
           "when": "Sat 10 · 9:15",
           "what": "Harris flag pickup",
-          "tone": "hot"
-        },
-        {
-          "when": "Sat 10 · 11:25",
-          "what": "Hayes flag — SRE Falcons vs Funk · Field 6",
           "tone": "hot"
         },
         {
@@ -1008,11 +923,6 @@
         },
         {
           "when": "Mon 12 · 2:20",
-          "what": "Lindsay appt",
-          "tone": "act"
-        },
-        {
-          "when": "Mon 12 · 2:20",
           "what": "Ainsley appt drop-off",
           "tone": "hot"
         },
@@ -1029,11 +939,6 @@
         {
           "when": "Mon 12 · 4:55",
           "what": "Hayes baseball drop-off",
-          "tone": "hot"
-        },
-        {
-          "when": "Mon 12 · 4:55",
-          "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
           "tone": "hot"
         },
         {
@@ -1064,6 +969,31 @@
         {
           "when": "Tue 13 · 3:15",
           "what": "SRE pickup",
+          "tone": "act"
+        },
+        {
+          "when": "Tue 13 · 5:15",
+          "what": "Ainsley concert drop-off",
+          "tone": "hot"
+        },
+        {
+          "when": "Tue 13 · 7:30",
+          "what": "Ainsley concert pickup",
+          "tone": "hot"
+        },
+        {
+          "when": "Wed 14 · 7:00",
+          "what": "SRE specials: Art + Library (library book)",
+          "tone": "act"
+        },
+        {
+          "when": "Wed 14 · 7:00",
+          "what": "SRE specials: Art",
+          "tone": "act"
+        },
+        {
+          "when": "Wed 14 · 8:10",
+          "what": "SRE drop-off",
           "tone": "act"
         }
       ]
