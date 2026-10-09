@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 9 2026",
   "asOfIso": "2026-10-09",
-  "refreshedAt": "2026-10-09T19:49:13.900Z",
+  "refreshedAt": "2026-10-09T20:01:07.324Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -9,17 +9,17 @@
     "note": "sports: event START = leave-by"
   },
   "homeWeek": {
-    "with": "Mom",
-    "place": "mom's",
-    "through": "Fri Oct 9 · 3:00",
-    "throughLabel": "with Mom · until Dad week Fri Oct 9 · 3:00",
-    "endIso": "2026-10-09T20:00:00.000Z"
+    "with": "Dad",
+    "place": "147th",
+    "through": "Fri Oct 16 · 3:00",
+    "throughLabel": "with Dad @ 147th · Fri Oct 9 3:00 → Fri Oct 16 · 3:00",
+    "endIso": "2026-10-16T20:00:00.000Z"
   },
   "boardStrip": {
     "label": "Next up · Sat",
     "time": "7:10",
     "place": "Freckle Juice in bag before flag",
-    "detailHtml": "7:40 Harris flag — vs SH Proehl (home) · 11:25 Hayes flag — SRE Falcons vs Funk · kids with Mom · until Fri Oct 9 · 3:00",
+    "detailHtml": "7:40 Harris flag — vs SH Proehl (home) · 11:25 Hayes flag — SRE Falcons vs Funk · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
     "badge": "Sat",
     "startIso": "2026-10-10T12:10:00.000Z",
     "endIso": "2026-10-10T12:20:00.000Z",
@@ -29,7 +29,7 @@
         "label": "Next up · Sat",
         "time": "7:10",
         "place": "Freckle Juice in bag before flag",
-        "detailHtml": "7:40 Harris flag — vs SH Proehl (home) · 11:25 Hayes flag — SRE Falcons vs Funk · kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "7:40 Harris flag — vs SH Proehl (home) · 11:25 Hayes flag — SRE Falcons vs Funk · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Sat",
         "startIso": "2026-10-10T12:10:00.000Z",
         "endIso": "2026-10-10T12:20:00.000Z",
@@ -41,7 +41,7 @@
         "label": "Next up · Sat",
         "time": "7:40",
         "place": "Harris flag — vs SH Proehl (home)",
-        "detailHtml": "7:10 Freckle Juice in bag before flag · 11:25 Hayes flag — SRE Falcons vs Funk · kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 11:25 Hayes flag — SRE Falcons vs Funk · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Sat",
         "startIso": "2026-10-10T12:40:00.000Z",
         "endIso": "2026-10-10T14:30:00.000Z",
@@ -53,7 +53,7 @@
         "label": "Next up · Sat",
         "time": "11:25",
         "place": "Hayes flag — SRE Falcons vs Funk · Field 6",
-        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 Harris flag — vs SH Proehl (home) · kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 Harris flag — vs SH Proehl (home) · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Sat",
         "startIso": "2026-10-10T16:25:00.000Z",
         "endIso": "2026-10-10T18:35:00.000Z",
@@ -65,7 +65,7 @@
         "label": "Next up · Mon",
         "time": "7:00",
         "place": "SRE specials: Music",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Mon",
         "startIso": "2026-10-12T12:00:00.000Z",
         "endIso": "2026-10-12T12:15:00.000Z",
@@ -77,7 +77,7 @@
         "label": "Next up · Mon",
         "time": "7:00",
         "place": "SRE specials: Music",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Mon",
         "startIso": "2026-10-12T12:00:00.000Z",
         "endIso": "2026-10-12T12:15:00.000Z",
@@ -89,7 +89,7 @@
         "label": "Next up · Mon",
         "time": "8:10",
         "place": "Boys SRE drop",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Mon",
         "startIso": "2026-10-12T13:10:00.000Z",
         "endIso": "2026-10-12T13:40:00.000Z",
@@ -101,7 +101,7 @@
         "label": "Next up · Mon",
         "time": "12:00",
         "place": "Hayes BB: coach in — practices by 19 Oct",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Mon",
         "startIso": "2026-10-12T17:00:00.000Z",
         "endIso": "2026-10-17T17:00:00.000Z",
@@ -113,7 +113,7 @@
         "label": "Next up · Mon",
         "time": "2:20",
         "place": "Lindsay appt",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Mon",
         "startIso": "2026-10-12T19:20:00.000Z",
         "endIso": "2026-10-12T21:20:00.000Z",
@@ -125,7 +125,7 @@
         "label": "Next up · Mon",
         "time": "3:25",
         "place": "Boys SRE pickup",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Mon",
         "startIso": "2026-10-12T20:25:00.000Z",
         "endIso": "2026-10-12T20:50:00.000Z",
@@ -137,7 +137,7 @@
         "label": "Next up · Mon",
         "time": "4:55",
         "place": "Hayes baseball — Falcons vs Blue Bananas (home)",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Mon",
         "startIso": "2026-10-12T21:55:00.000Z",
         "endIso": "2026-10-13T00:20:00.000Z",
@@ -149,7 +149,7 @@
         "label": "Next up · Tue",
         "time": "7:00",
         "place": "SRE specials: PE (tennis shoes)",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Tue",
         "startIso": "2026-10-13T12:00:00.000Z",
         "endIso": "2026-10-13T12:15:00.000Z",
@@ -161,7 +161,7 @@
         "label": "Next up · Tue",
         "time": "7:00",
         "place": "SRE specials: PE (tennis shoes)",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Tue",
         "startIso": "2026-10-13T12:00:00.000Z",
         "endIso": "2026-10-13T12:15:00.000Z",
@@ -303,7 +303,7 @@
       "hottest": {
         "when": "FRI · 12:00",
         "what": "WARD KIDS [AHH NO SCHOOL]",
-        "where": "with Mom · until Fri Oct 9 · 3:00",
+        "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "FRI",
           "12:00"
@@ -320,8 +320,8 @@
         {
           "kind": "note",
           "when": "All day",
-          "what": "🏡 At Mom's",
-          "hint": "until Fri Oct 9 · 3:00",
+          "what": "🏡 YOUR BASE with Dad",
+          "hint": "through Fri Oct 16 · 3:00",
           "tone": "hot"
         }
       ],
@@ -421,18 +421,6 @@
         {
           "when": "Thu 15 · 3:15",
           "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 8:10",
-          "what": "SRE drop-off",
           "tone": "act",
           "hint": ""
         }
@@ -570,7 +558,7 @@
       "hottest": {
         "when": "FRI · 12:00",
         "what": "WARD KIDS [AHH NO SCHOOL]",
-        "where": "with Mom · until Fri Oct 9 · 3:00",
+        "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "FRI",
           "12:00"
@@ -587,8 +575,8 @@
         {
           "kind": "note",
           "when": "All day",
-          "what": "🏡 At Mom's",
-          "hint": "until Fri Oct 9 · 3:00",
+          "what": "🏡 DROP ZONE HQ with Dad",
+          "hint": "through Fri Oct 16 · 3:00",
           "tone": "hot"
         }
       ],
@@ -700,24 +688,6 @@
         {
           "when": "Thu 15 · 3:15",
           "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 12:00",
-          "what": "SRE Chat & Chew lunch",
           "tone": "act",
           "hint": ""
         }
@@ -860,7 +830,7 @@
       "hottest": {
         "when": "FRI · 12:00",
         "what": "WARD KIDS [AHH NO SCHOOL]",
-        "where": "with Mom · until Fri Oct 9 · 3:00",
+        "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "FRI",
           "12:00"
@@ -877,8 +847,8 @@
         {
           "kind": "note",
           "when": "All day",
-          "what": "At Mom's",
-          "hint": "until Fri Oct 9 · 3:00",
+          "what": "Base @ 147th with Dad",
+          "hint": "through Fri Oct 16 · 3:00",
           "tone": "hot"
         }
       ],
@@ -981,11 +951,12 @@
         }
       ],
       "hottest": {
-        "when": "Fri Oct 9 2026 · kids with Mom",
-        "what": "Mom week",
-        "where": "until Fri Oct 9 · 3:00",
+        "when": "Fri Oct 9 2026 · kids with you @ 147th",
+        "what": "Dad week live",
+        "where": "through Fri Oct 16 · 3:00",
         "badges": [
-          "Mom week"
+          "Dad week",
+          "147th"
         ]
       },
       "today": [
@@ -996,7 +967,7 @@
         },
         {
           "when": "home week",
-          "what": "Kids with Mom · until Fri Oct 9 · 3:00",
+          "what": "Kids with Dad @ 147th through Fri Oct 16 · 3:00",
           "tone": "hot"
         }
       ],
