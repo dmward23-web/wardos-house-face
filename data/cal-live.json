@@ -1,17 +1,17 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-09T18:37:03.370Z",
+  "fetchedAt": "2026-10-09T18:50:22.332Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-03",
   "windowEnd": "2026-10-15",
   "asOfIso": "2026-10-09",
   "nextLeave": {
-    "id": "eiu5bk2mlfrqmpdapcstf94tbg",
-    "summary": "Kids — pickup at their mom's · 3:00",
-    "start": "2026-10-09T14:40:00-05:00",
-    "end": "2026-10-09T15:30:00-05:00",
-    "location": "14618 Floyd St, Overland Park, KS",
+    "id": "5173a2fg5417s7muq42ujqj37s",
+    "summary": "Harris flag — vs SH Proehl (home) · leave 7:40 · game 8:30",
+    "start": "2026-10-10T07:40:00-05:00",
+    "end": "2026-10-10T09:30:00-05:00",
+    "location": "Heritage Park Soccer Complex, Field 10 North SC, 17255 S Black Bob Rd, Olathe, KS 66062",
     "busy": true,
     "allDay": false
   },
@@ -423,11 +423,11 @@
     }
   ],
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "2:40",
-    "place": "Kids — pickup at their · 3:00",
-    "detailHtml": "<strong>2:40</strong> Kids — pickup at their · 3:00",
-    "badge": "Fri"
+    "label": "Next up · Sat",
+    "time": "7:40",
+    "place": "Harris flag — vs SH Proehl (home) · leave 7:40 · game…",
+    "detailHtml": "<strong>7:40</strong> Harris flag — vs SH Proehl (home) · leave 7:40 · game…",
+    "badge": "Sat"
   },
   "error": null
 }
