@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 9 2026",
   "asOfIso": "2026-10-09",
-  "refreshedAt": "2026-10-09T16:17:06.499Z",
+  "refreshedAt": "2026-10-09T16:43:03.372Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -874,8 +874,8 @@
           "hint": ""
         },
         {
-          "when": "Tue 13 · 5:15",
-          "what": "LKMS choir Fall Concert · 5:30–7:30",
+          "when": "Tue 13 · 4:45",
+          "what": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
           "tone": "act",
           "hint": ""
         },
@@ -886,7 +886,7 @@
           "hint": ""
         },
         {
-          "when": "Thu 15 · 1:00",
+          "when": "Thu 15 · 12:45",
           "what": "LKMS choir Sing & Share field trip",
           "tone": "act",
           "hint": ""
@@ -1042,8 +1042,8 @@
           "tone": "act"
         },
         {
-          "when": "Tue 13 · 5:15",
-          "what": "LKMS choir Fall Concert · 5:30–7:30",
+          "when": "Tue 13 · 4:45",
+          "what": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
           "tone": "act"
         },
         {
