@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-09T02:37:21.858Z",
+  "fetchedAt": "2026-10-09T02:40:32.864Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-03",
-  "windowEnd": "2026-10-15",
+  "windowEnd": "2026-10-14",
   "asOfIso": "2026-10-08",
   "nextLeave": {
     "id": "ohoma1ia1arueisdi6nqdm1kms",
@@ -427,105 +427,6 @@
       "start": "2026-10-14T18:03:00-05:00",
       "end": "2026-10-14T18:50:00-05:00",
       "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "1ta74oof602ddah7vbmqtpmb4g",
-      "summary": "Hayes — SRE specials: Spanish",
-      "start": "2026-10-15T07:00:00-05:00",
-      "end": "2026-10-15T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "ensu2vnvrco5bga16ugdkl8kik",
-      "summary": "Harris — SRE specials: Spanish + Library checkout",
-      "start": "2026-10-15T07:00:00-05:00",
-      "end": "2026-10-15T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "1ni8dem5hrho45a0csgj81r3i4_20261015T131000Z",
-      "summary": "Hayes + Harris — SRE drop-off · 8:25",
-      "start": "2026-10-15T08:10:00-05:00",
-      "end": "2026-10-15T08:40:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "2hdtd9b5349i9rgunbeifk9a40",
-      "summary": "Ainsley — LKMS choir Sing & Share field trip",
-      "start": "2026-10-15T13:00:00-05:00",
-      "end": "2026-10-15T14:30:00-05:00",
-      "location": "Blue Valley West High School, 16200 Antioch Road, Overland Park, KS 66085",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "3hv9bcr87ggrhrkuf4ka3u6r2s_20261015T201500Z",
-      "summary": "Hayes + Harris — SRE pickup · 3:40",
-      "start": "2026-10-15T15:15:00-05:00",
-      "end": "2026-10-15T16:00:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "tscee7jfbokn7i4snsor4a9hcg",
-      "summary": "Ainsley — Homework Help pickup · 4:00",
-      "start": "2026-10-15T15:50:00-05:00",
-      "end": "2026-10-15T16:00:00-05:00",
-      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "d4p0m8tbuibbp9gvapl8kl4p84",
-      "summary": "Ainsley — swim drop-off · 5:00",
-      "start": "2026-10-15T16:25:00-05:00",
-      "end": "2026-10-15T17:00:00-05:00",
-      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "1vkr7kuj46mfm5giau05uc4ooo",
-      "summary": "Hayes — flag drop-off · 6:00 (ride gap: Ainsley at swim)",
-      "start": "2026-10-15T17:40:00-05:00",
-      "end": "2026-10-15T18:00:00-05:00",
-      "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "f158cedksom2juak77hga0c0po",
-      "summary": "Ainsley — swim pickup · 6:00",
-      "start": "2026-10-15T18:00:00-05:00",
-      "end": "2026-10-15T18:20:00-05:00",
-      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "fmm3d7t42a977q3fsfm2kqakug",
-      "summary": "Hayes — flag pickup · 7:15",
-      "start": "2026-10-15T18:55:00-05:00",
-      "end": "2026-10-15T19:35:00-05:00",
-      "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "0oggddttnnj8bq5sm13a85iqf4_20261016T171500Z",
-      "summary": "Kids — pack sports + clothes for mom (Thu night, before Fri flight)",
-      "start": "2026-10-15T19:40:00-05:00",
-      "end": "2026-10-15T20:10:00-05:00",
-      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
       "busy": true,
       "allDay": false
     }
