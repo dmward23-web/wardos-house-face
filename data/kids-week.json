@@ -1,7 +1,7 @@
 {
-  "asOf": "Thu Oct 8 2026",
-  "asOfIso": "2026-10-08",
-  "refreshedAt": "2026-10-09T03:17:35.406Z",
+  "asOf": "Fri Oct 9 2026",
+  "asOfIso": "2026-10-09",
+  "refreshedAt": "2026-10-09T10:12:54.409Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,7 +16,7 @@
     "endIso": "2026-10-09T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · Fri",
+    "label": "Next up · today",
     "time": "12:00",
     "place": "Ward Kids [AHH No School]",
     "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -26,7 +26,7 @@
     "kind": "school",
     "queue": [
       {
-        "label": "Next up · Fri",
+        "label": "Next up · today",
         "time": "12:00",
         "place": "Ward Kids [AHH No School]",
         "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
@@ -34,7 +34,7 @@
         "startIso": "2026-10-09T17:00:00.000Z",
         "endIso": "2026-10-10T17:00:00.000Z",
         "kind": "school",
-        "whenLabel": "Fri 12:00",
+        "whenLabel": "12:00",
         "summary": "Ward Kids [AHH No School]"
       },
       {
@@ -301,15 +301,22 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "MON · 12:00",
-        "what": "SRE PEACE WEEK",
+        "when": "FRI · 12:00",
+        "what": "WARD KIDS [AHH NO SCHOOL]",
         "where": "with Mom · until Fri Oct 9 · 3:00",
         "badges": [
-          "MON",
+          "FRI",
           "12:00"
         ]
       },
       "today": [
+        {
+          "kind": "event",
+          "when": "Fri · 12:00",
+          "what": "Ward Kids [AHH No School]",
+          "hint": "",
+          "tone": "act"
+        },
         {
           "kind": "note",
           "when": "All day",
@@ -333,12 +340,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Mon 5 · 12:00",
-          "what": "SRE Peace Week",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
@@ -401,6 +402,24 @@
         },
         {
           "when": "Wed 14 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 7:00",
+          "what": "SRE specials: Spanish + Library checkout",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 3:15",
           "what": "SRE pickup",
           "tone": "act",
           "hint": ""
@@ -537,15 +556,22 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "MON · 12:00",
-        "what": "SRE PEACE WEEK",
+        "when": "FRI · 12:00",
+        "what": "WARD KIDS [AHH NO SCHOOL]",
         "where": "with Mom · until Fri Oct 9 · 3:00",
         "badges": [
-          "MON",
+          "FRI",
           "12:00"
         ]
       },
       "today": [
+        {
+          "kind": "event",
+          "when": "Fri · 12:00",
+          "what": "Ward Kids [AHH No School]",
+          "hint": "",
+          "tone": "act"
+        },
         {
           "kind": "note",
           "when": "All day",
@@ -572,15 +598,15 @@
           "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "when": "Thu 15 · leave 5:40",
+          "what": "Hayes flag practice",
+          "hint": "YOUR board",
+          "tone": "hot"
         }
       ],
       "school": [
-        {
-          "when": "Mon 5 · 12:00",
-          "what": "SRE Peace Week",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
@@ -643,6 +669,24 @@
         },
         {
           "when": "Wed 14 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 7:00",
+          "what": "SRE specials: Spanish",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 3:15",
           "what": "SRE pickup",
           "tone": "act",
           "hint": ""
@@ -794,6 +838,13 @@
       },
       "today": [
         {
+          "kind": "event",
+          "when": "Fri · 12:00",
+          "what": "Ward Kids [AHH No School]",
+          "hint": "",
+          "tone": "act"
+        },
+        {
           "kind": "note",
           "when": "All day",
           "what": "At Mom's",
@@ -805,6 +856,12 @@
         {
           "when": "Wed 14 · leave 4:00",
           "what": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "when": "Thu 15 · leave 4:25",
+          "what": "Ainsley swim — Coach Ann",
           "hint": "YOUR board",
           "tone": "hot"
         }
@@ -819,6 +876,12 @@
         {
           "when": "Tue 13 · 5:15",
           "what": "LKMS choir Fall Concert · 5:30–7:30",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 1:00",
+          "what": "LKMS choir Sing & Share field trip",
           "tone": "act",
           "hint": ""
         }
@@ -876,7 +939,7 @@
         }
       ],
       "hottest": {
-        "when": "Thu Oct 8 2026 · kids with Mom",
+        "when": "Fri Oct 9 2026 · kids with Mom",
         "what": "Mom week",
         "where": "until Fri Oct 9 · 3:00",
         "badges": [
@@ -885,34 +948,9 @@
       },
       "today": [
         {
-          "when": "Thu · 7:00",
-          "what": "SRE spirit day: Crazy Socks Day (Peace Week)",
+          "when": "Fri · 12:00",
+          "what": "Ward Kids [AHH No School]",
           "tone": "act"
-        },
-        {
-          "when": "Thu · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
-          "tone": "act"
-        },
-        {
-          "when": "Thu · 7:00",
-          "what": "SRE specials: Spanish",
-          "tone": "act"
-        },
-        {
-          "when": "Thu · 3:00",
-          "what": "LKMS Homework Help",
-          "tone": "act"
-        },
-        {
-          "when": "Thu · 5:00",
-          "what": "Ainsley swim — Coach Ann",
-          "tone": "hot"
-        },
-        {
-          "when": "Thu · 6:00",
-          "what": "Hayes flag practice",
-          "tone": "hot"
         },
         {
           "when": "home week",
@@ -921,11 +959,6 @@
         }
       ],
       "week": [
-        {
-          "when": "Mon 5 · 12:00",
-          "what": "SRE Peace Week",
-          "tone": "act"
-        },
         {
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
@@ -1037,9 +1070,14 @@
           "tone": "hot"
         },
         {
-          "when": "until Fri Oct 9 · 3:00",
-          "what": "Kids with Mom",
-          "tone": "hot"
+          "when": "Thu 15 · 7:00",
+          "what": "SRE specials: Spanish",
+          "tone": "act"
+        },
+        {
+          "when": "Thu 15 · 7:00",
+          "what": "SRE specials: Spanish + Library checkout",
+          "tone": "act"
         }
       ]
     }

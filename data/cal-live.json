@@ -1,11 +1,11 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-09T03:17:35.791Z",
+  "fetchedAt": "2026-10-09T10:12:54.931Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-03",
-  "windowEnd": "2026-10-14",
-  "asOfIso": "2026-10-08",
+  "windowEnd": "2026-10-15",
+  "asOfIso": "2026-10-09",
   "nextLeave": {
     "id": "ohoma1ia1arueisdi6nqdm1kms",
     "summary": "Dan + Erin DRIVE → KC · leave 6:30 · kids by 3:00",
@@ -16,33 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "2dt3uqd7n1dl5ms6brgs4qnu5k",
-      "summary": "Ward Kids [AHH No School]",
-      "start": "2026-10-09T00:00:00-05:00",
-      "end": "2026-10-10T00:00:00-05:00",
-      "location": "",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "2jni71vsrsnkdbnelltspnmed8",
-      "summary": "Johnson Kids [RH No School]",
-      "start": "2026-10-09T00:00:00-05:00",
-      "end": "2026-10-19T00:00:00-05:00",
-      "location": "",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "72rogmm397oa0f6huic6hep29h",
-      "summary": "Erin KC [drive w/ Dan Fri · no kids · #A6GW5X Mon]",
-      "start": "2026-10-09T00:00:00-05:00",
-      "end": "2026-10-13T00:00:00-05:00",
-      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": true
-    },
     {
       "id": "ohoma1ia1arueisdi6nqdm1kms",
       "summary": "Dan + Erin DRIVE → KC · leave 6:30 · kids by 3:00",
@@ -375,10 +348,100 @@
       "location": "Blue Valley District Offices, 15020 Metcalf Ave, Overland Park, KS",
       "busy": false,
       "allDay": false
+    },
+    {
+      "id": "1ta74oof602ddah7vbmqtpmb4g",
+      "summary": "Hayes — SRE specials: Spanish",
+      "start": "2026-10-15T07:00:00-05:00",
+      "end": "2026-10-15T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "ensu2vnvrco5bga16ugdkl8kik",
+      "summary": "Harris — SRE specials: Spanish + Library checkout",
+      "start": "2026-10-15T07:00:00-05:00",
+      "end": "2026-10-15T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "1ni8dem5hrho45a0csgj81r3i4_20261015T131000Z",
+      "summary": "Hayes + Harris — SRE drop-off · 8:25",
+      "start": "2026-10-15T08:10:00-05:00",
+      "end": "2026-10-15T08:40:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "2hdtd9b5349i9rgunbeifk9a40",
+      "summary": "Ainsley — LKMS choir Sing & Share field trip",
+      "start": "2026-10-15T13:00:00-05:00",
+      "end": "2026-10-15T14:30:00-05:00",
+      "location": "Blue Valley West High School, 16200 Antioch Road, Overland Park, KS 66085",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "3hv9bcr87ggrhrkuf4ka3u6r2s_20261015T201500Z",
+      "summary": "Hayes + Harris — SRE pickup · 3:40",
+      "start": "2026-10-15T15:15:00-05:00",
+      "end": "2026-10-15T16:00:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "d0mih3lub5n6ipsknqkh4nlfc4",
+      "summary": "Ainsley — LKMS Homework Help · 3:00–4:00 · pickup 4:00",
+      "start": "2026-10-15T15:50:00-05:00",
+      "end": "2026-10-15T16:15:00-05:00",
+      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "6d3ju9tl6338upga664ul7rhlk",
+      "summary": "Ainsley swim — Coach Ann · 5:00 practice",
+      "start": "2026-10-15T16:25:00-05:00",
+      "end": "2026-10-15T18:20:00-05:00",
+      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "n7h1vb535232nnpeetld2qehko",
+      "summary": "Hayes flag practice · leave 5:40 · 6:00–7:15",
+      "start": "2026-10-15T17:40:00-05:00",
+      "end": "2026-10-15T19:35:00-05:00",
+      "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "411ukv966ngh2482uahglmkhp8",
+      "summary": "BV Well — parent workshop (optional) · 6:00–7:30",
+      "start": "2026-10-15T18:00:00-05:00",
+      "end": "2026-10-15T19:30:00-05:00",
+      "location": "Blue Valley District Offices, High Plains Room, 15020 Metcalf Ave, Overland Park, KS",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "0oggddttnnj8bq5sm13a85iqf4_20261016T171500Z",
+      "summary": "Kids — pack sports + clothes for mom (Thu night, before Fri flight)",
+      "start": "2026-10-15T19:40:00-05:00",
+      "end": "2026-10-15T20:10:00-05:00",
+      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
+      "busy": true,
+      "allDay": false
     }
   ],
   "boardStrip": {
-    "label": "Next up · Fri",
+    "label": "Next up · today",
     "time": "6:30",
     "place": "Dan + Erin DRIVE → KC · leave 6:30 · kids by 3:00",
     "detailHtml": "<strong>6:30</strong> Dan + Erin DRIVE → KC · leave 6:30 · kids by 3:00",
