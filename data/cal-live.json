@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-09T17:36:09.818Z",
+  "fetchedAt": "2026-10-09T17:50:56.000Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-03",
-  "windowEnd": "2026-10-15",
+  "windowEnd": "2026-10-16",
   "asOfIso": "2026-10-09",
   "nextLeave": {
     "id": "eiu5bk2mlfrqmpdapcstf94tbg",
@@ -113,24 +113,6 @@
       "end": "2026-10-12T08:40:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
       "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "aa5l71e3j9c6qjjv7tc1uhq328",
-      "summary": "Dan — Erin curb MCI · #A6GW5X 10:40",
-      "start": "2026-10-12T08:50:00-05:00",
-      "end": "2026-10-12T10:50:00-05:00",
-      "location": "Kansas City International Airport (MCI), Kansas City, MO",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "nj4bc5fl9eu0lalp5f2je2i164",
-      "summary": "Erin #A6GW5X ✈️ MCI→BNA 10:40am · leave 8:50",
-      "start": "2026-10-12T08:50:00-05:00",
-      "end": "2026-10-12T12:15:00-05:00",
-      "location": "Kansas City International Airport (MCI) → Nashville International Airport (BNA)",
-      "busy": false,
       "allDay": false
     },
     {
@@ -258,6 +240,15 @@
       "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
       "busy": true,
       "allDay": false
+    },
+    {
+      "id": "4slsbqvsqv5gqjoq4dupo0k1k4",
+      "summary": "Ainsley — choir Sing & Share permission form due",
+      "start": "2026-10-14T00:00:00-05:00",
+      "end": "2026-10-15T00:00:00-05:00",
+      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": true
     },
     {
       "id": "lvjj0ha6s8h1ep1c0iftccpnlg",
@@ -428,6 +419,51 @@
       "end": "2026-10-15T20:10:00-05:00",
       "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
       "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "3a7puubvbq8hgsr0m7h46t9hi0_20261016",
+      "summary": "Dan Nashville · #BCCT63 WN2013 Fri 10/16 10:40a out · leave 8:40 · #BCG5CZ WN606 Fri 10/23 8:10a back · leave 6:55",
+      "start": "2026-10-16T00:00:00-05:00",
+      "end": "2026-10-24T00:00:00-05:00",
+      "location": "14 Harbor Cove Dr, Old Hickory, TN 37138",
+      "busy": false,
+      "allDay": true
+    },
+    {
+      "id": "fp0cudn8p70gv73fbnvu5at6po",
+      "summary": "Harris — SRE specials: Music",
+      "start": "2026-10-16T07:00:00-05:00",
+      "end": "2026-10-16T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "iu39krmi650otan9a7qk1e7d34",
+      "summary": "Hayes — SRE specials: Music",
+      "start": "2026-10-16T07:00:00-05:00",
+      "end": "2026-10-16T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "1ni8dem5hrho45a0csgj81r3i4_20261016T131000Z",
+      "summary": "Hayes + Harris — SRE drop-off · 8:25",
+      "start": "2026-10-16T08:10:00-05:00",
+      "end": "2026-10-16T08:40:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "32brmviemd2eaav4llc8g36vh0",
+      "summary": "Hayes — SRE Chat & Chew lunch",
+      "start": "2026-10-16T12:00:00-05:00",
+      "end": "2026-10-16T12:30:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
       "allDay": false
     }
   ],
