@@ -1,7 +1,7 @@
 {
   "status": "live",
   "fetchedAt": "2026-10-05T01:42:25.289Z",
-  "updatedAt": "2026-10-09T17:47:28.664Z",
+  "updatedAt": "2026-10-09T19:44:41.667Z",
   "source": "nest-sdm+webrtc-still",
   "cameras": [
     {
@@ -128,5 +128,5 @@
   "stillNote": "WebRTC canvas stills via nest-webrtc-still.mjs \u00b7 Pages-servable data/nest-snaps",
   "error": null,
   "nestProxyPath": "scripts/nest-webrtc-proxy.mjs \u2192 SDM GenerateWebRtcStream",
-  "nestProxy": "https://morning-drink-essay-inn.trycloudflare.com"
+  "nestProxy": "https://supplement-striking-walt-counseling.trycloudflare.com"
 }
