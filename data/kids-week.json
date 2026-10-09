@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 9 2026",
   "asOfIso": "2026-10-09",
-  "refreshedAt": "2026-10-09T11:53:35.399Z",
+  "refreshedAt": "2026-10-09T11:54:02.927Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -712,6 +712,12 @@
         {
           "when": "Fri 16 · 8:10",
           "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 16 · 12:00",
+          "what": "SRE Chat & Chew lunch",
           "tone": "act",
           "hint": ""
         }
