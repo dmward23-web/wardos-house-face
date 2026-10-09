@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 9 2026",
   "asOfIso": "2026-10-09",
-  "refreshedAt": "2026-10-09T22:53:48.374Z",
+  "refreshedAt": "2026-10-09T23:04:20.740Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -423,18 +423,6 @@
           "what": "SRE pickup",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Fri 16 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": []
@@ -700,24 +688,6 @@
         {
           "when": "Thu 15 · 3:15",
           "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 12:00",
-          "what": "SRE Chat & Chew lunch",
           "tone": "act",
           "hint": ""
         }
