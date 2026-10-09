@@ -209,16 +209,18 @@ function classify(ev) {
   if (/^Kristin:\s*/i.test(summary) && /\b(pick\s*-?\s*up|drop\s*-?\s*off)\b/i.test(summary)) {
     return { kind: "other", summary, kids: kidMentions(summary) };
   }
-  { const kr = KID_RIDE.exec(summary);
-    if (kr && !/SRE (drop|pickup)/i.test(summary)) {
-      return { kind: "leave", summary, busy: !isFree(ev), ride: true, kidRide: true, kid: kr[1].toLowerCase() };
-    } }
+  /* SCHOOL first (before KIDRIDE1): titles like "… Math Counts · pickup 4:00" are school,
+     not Dad leave-by rides. KIDRIDE1 still catches real kid pickup/drop-off leave-bys. */
   if (/SRE drop-off|SRE drop\b/i.test(summary)) return { kind: "school_drop", summary, ...soloBoy(summary) };
   if (/SRE pickup/i.test(summary)) return { kind: "school_pickup", summary, ...soloBoy(summary) };
   if (/Homework Help/i.test(summary)) return { kind: "school", summary, kid: "ainsley" };
   if (/hearing\/vision|Hearing\/Vision|PE \(tennis|SRE specials?|SRE spirit|Peace Week|field trip|yearbook|picture (retake|makeup)|baby pic|LKMS (choir|fall conferences|Cougar Night|Bingo|baby|Homework Help|Math Counts)|Ward Kids \[[AH]+ No School\]|no school \(elem|conference sign-ups|Tailgate|Halloween Bash|Halloween class parties|Chat\s*&\s*Chew|Chat and Chew|Art Club|fall conferences/i.test(summary)) { /* SPECIALS1+SCHOOL2: all kids school info on kid boards + hub */
     return { kind: "school", summary };
   }
+  { const kr = KID_RIDE.exec(summary);
+    if (kr && !/SRE (drop|pickup)/i.test(summary)) {
+      return { kind: "leave", summary, busy: !isFree(ev), ride: true, kidRide: true, kid: kr[1].toLowerCase() };
+    } }
   if (/swim|Swim|Coach Ann/i.test(summary)) return { kind: "sport", sport: "swim", summary, kid: "ainsley" };
   if (/baseball|BASEBALL|Falcons/i.test(summary) && /hayes/i.test(summary)) {
     return { kind: "sport", sport: "baseball", summary, kid: "hayes" };
