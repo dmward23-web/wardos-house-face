@@ -1,7 +1,7 @@
 {
   "status": "live",
   "fetchedAt": "2026-10-05T01:42:25.289Z",
-  "updatedAt": "2026-10-09T22:43:12.692Z",
+  "updatedAt": "2026-10-09T22:44:19.352Z",
   "source": "nest-sdm+webrtc-still",
   "cameras": [
     {
@@ -128,6 +128,6 @@
   "stillNote": "WebRTC canvas stills via nest-webrtc-still.mjs · Pages-servable data/nest-snaps",
   "error": null,
   "nestProxyPath": "scripts/nest-webrtc-proxy.mjs → SDM GenerateWebRtcStream",
-  "nestProxy": "https://reproduced-upgrades-penn-collected.trycloudflare.com",
+  "nestProxy": "https://dose-recipe-replica-hockey.trycloudflare.com",
   "nestProxyToken": "nest-ba68b55c44a8d394fddaf33bcab055d836a3fe0367d05ebe"
 }
