@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-09T17:06:02.855Z",
+  "fetchedAt": "2026-10-09T17:22:13.809Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-03",
-  "windowEnd": "2026-10-16",
+  "windowEnd": "2026-10-15",
   "asOfIso": "2026-10-09",
   "nextLeave": {
     "id": "eiu5bk2mlfrqmpdapcstf94tbg",
@@ -428,60 +428,6 @@
       "end": "2026-10-15T20:10:00-05:00",
       "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
       "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "3a7puubvbq8hgsr0m7h46t9hi0_20261016",
-      "summary": "Dan Nashville · #BCCT63 Fri 10:40 out · #BCG5CZ Fri 8:10 back",
-      "start": "2026-10-16T00:00:00-05:00",
-      "end": "2026-10-24T00:00:00-05:00",
-      "location": "14 Harbor Cove Dr, Old Hickory, TN",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "fp0cudn8p70gv73fbnvu5at6po",
-      "summary": "Harris — SRE specials: Music",
-      "start": "2026-10-16T07:00:00-05:00",
-      "end": "2026-10-16T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "iu39krmi650otan9a7qk1e7d34",
-      "summary": "Hayes — SRE specials: Music",
-      "start": "2026-10-16T07:00:00-05:00",
-      "end": "2026-10-16T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "1ni8dem5hrho45a0csgj81r3i4_20261016T131000Z",
-      "summary": "Hayes + Harris — SRE drop-off · 8:25",
-      "start": "2026-10-16T08:10:00-05:00",
-      "end": "2026-10-16T08:40:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "mp5gqk4066c3pi1be4bn0gr3vc",
-      "summary": "Dan #BCCT63 ✈️ MCI→BNA 10:40am · leave 8:40",
-      "start": "2026-10-16T08:40:00-05:00",
-      "end": "2026-10-16T13:15:00-05:00",
-      "location": "Kansas City International Airport (MCI) → Nashville International Airport (BNA)",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "32brmviemd2eaav4llc8g36vh0",
-      "summary": "Hayes — SRE Chat & Chew lunch",
-      "start": "2026-10-16T12:00:00-05:00",
-      "end": "2026-10-16T12:30:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
       "allDay": false
     }
   ],

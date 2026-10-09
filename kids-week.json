@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 9 2026",
   "asOfIso": "2026-10-09",
-  "refreshedAt": "2026-10-09T17:06:02.361Z",
+  "refreshedAt": "2026-10-09T17:22:13.226Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,27 +16,15 @@
     "endIso": "2026-10-09T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "12:00",
-    "place": "Ward Kids [AHH No School]",
-    "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-    "badge": "Fri",
-    "startIso": "2026-10-09T17:00:00.000Z",
-    "endIso": "2026-10-10T17:00:00.000Z",
-    "kind": "school",
+    "label": "Next up · Sat",
+    "time": "7:10",
+    "place": "Freckle Juice in bag before flag",
+    "detailHtml": "7:40 Harris flag — vs SH Proehl (home) · 11:25 Hayes flag — SRE Falcons vs Funk · kids with Mom · until Fri Oct 9 · 3:00",
+    "badge": "Sat",
+    "startIso": "2026-10-10T12:10:00.000Z",
+    "endIso": "2026-10-10T12:20:00.000Z",
+    "kind": "sport",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "12:00",
-        "place": "Ward Kids [AHH No School]",
-        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
-        "badge": "Fri",
-        "startIso": "2026-10-09T17:00:00.000Z",
-        "endIso": "2026-10-10T17:00:00.000Z",
-        "kind": "school",
-        "whenLabel": "12:00",
-        "summary": "Ward Kids [AHH No School]"
-      },
       {
         "label": "Next up · Sat",
         "time": "7:10",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Tue 7:00",
         "summary": "Harris — SRE specials: PE (tennis shoes)"
+      },
+      {
+        "label": "Next up · Tue",
+        "time": "7:00",
+        "place": "SRE specials: PE (tennis shoes)",
+        "detailHtml": "kids with Mom · until Fri Oct 9 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-13T12:00:00.000Z",
+        "endIso": "2026-10-13T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Tue 7:00",
+        "summary": "Hayes — SRE specials: PE (tennis shoes)"
       }
     ]
   },
@@ -421,18 +421,6 @@
         {
           "when": "Thu 15 · 3:15",
           "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 8:10",
-          "what": "SRE drop-off",
           "tone": "act",
           "hint": ""
         }
@@ -700,24 +688,6 @@
         {
           "when": "Thu 15 · 3:15",
           "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 12:00",
-          "what": "SRE Chat & Chew lunch",
           "tone": "act",
           "hint": ""
         }
