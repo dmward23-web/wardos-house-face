@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 8 2026",
   "asOfIso": "2026-10-08",
-  "refreshedAt": "2026-10-09T02:31:43.632Z",
+  "refreshedAt": "2026-10-09T02:37:21.333Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -391,6 +391,24 @@
           "what": "SRE pickup",
           "tone": "act",
           "hint": ""
+        },
+        {
+          "when": "Thu 15 · 7:00",
+          "what": "SRE specials: Spanish + Library checkout",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
         }
       ],
       "appointments": []
@@ -621,6 +639,24 @@
           "what": "SRE pickup",
           "tone": "act",
           "hint": ""
+        },
+        {
+          "when": "Thu 15 · 7:00",
+          "what": "SRE specials: Spanish",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 3:15",
+          "what": "SRE pickup",
+          "tone": "act",
+          "hint": ""
         }
       ],
       "appointments": []
@@ -781,6 +817,12 @@
         {
           "when": "Fri 9 · 12:00",
           "what": "Ward Kids [AHH No School]",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Thu 15 · 1:00",
+          "what": "LKMS choir Sing & Share field trip",
           "tone": "act",
           "hint": ""
         }
