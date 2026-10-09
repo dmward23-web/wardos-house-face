@@ -1,7 +1,7 @@
 {
   "status": "live",
   "fetchedAt": "2026-10-05T01:42:25.289Z",
-  "updatedAt": "2026-10-09T14:04:19.189Z",
+  "updatedAt": "2026-10-09T15:35:46.025Z",
   "source": "nest-sdm+webrtc-still",
   "cameras": [
     {
@@ -128,5 +128,5 @@
   "stillNote": "WebRTC canvas stills via nest-webrtc-still.mjs \u00b7 Pages-servable data/nest-snaps",
   "error": null,
   "nestProxyPath": "scripts/nest-webrtc-proxy.mjs \u2192 SDM GenerateWebRtcStream",
-  "nestProxy": "https://champion-rfc-medicines-clusters.trycloudflare.com"
+  "nestProxy": "https://tue-planners-food-appraisal.trycloudflare.com"
 }
