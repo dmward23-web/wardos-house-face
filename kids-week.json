@@ -1,7 +1,7 @@
 {
   "asOf": "Sat Oct 10 2026",
   "asOfIso": "2026-10-10",
-  "refreshedAt": "2026-10-10T18:31:52.546Z",
+  "refreshedAt": "2026-10-10T18:41:44.540Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -543,22 +543,15 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "SAT · 11:25",
-        "what": "HAYES FLAG — SRE FALCONS VS FUNK · FIELD 6",
+        "when": "MON · 7:00",
+        "what": "SRE SPECIALS: MUSIC",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "SAT",
-          "11:25"
+          "MON",
+          "7:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Sat · 11:25",
-          "what": "Hayes flag — SRE Falcons vs Funk · Field 6",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -568,12 +561,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Sat 10 · leave 11:25",
-          "what": "Hayes flag — SRE Falcons vs Funk · Field 6",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Mon 12 · leave 4:55",
           "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
@@ -963,11 +950,6 @@
       ],
       "week": [
         {
-          "when": "Sat 10 · 11:25",
-          "what": "Hayes flag — SRE Falcons vs Funk · Field 6",
-          "tone": "hot"
-        },
-        {
           "when": "Mon 12 · 7:00",
           "what": "SRE specials: Music",
           "tone": "act"
@@ -1081,6 +1063,11 @@
           "when": "Thu 15 · 3:50",
           "what": "LKMS Homework Help · 3:00–4:00 · pickup 4:00",
           "tone": "act"
+        },
+        {
+          "when": "Thu 15 · 4:25",
+          "what": "Ainsley swim — Coach Ann",
+          "tone": "hot"
         }
       ]
     }
