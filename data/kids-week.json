@@ -1,7 +1,7 @@
 {
   "asOf": "Sat Oct 10 2026",
   "asOfIso": "2026-10-10",
-  "refreshedAt": "2026-10-10T12:16:37.812Z",
+  "refreshedAt": "2026-10-10T12:28:17.596Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,31 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "7:10",
-    "place": "Freckle Juice in bag before flag",
-    "detailHtml": "7:40 Harris flag — vs SH Proehl (home) · 11:25 Hayes flag — SRE Falcons vs Funk · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+    "time": "7:40",
+    "place": "Harris flag — vs SH Proehl (home)",
+    "detailHtml": "11:25 Hayes flag — SRE Falcons vs Funk · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
     "badge": "Sat",
-    "startIso": "2026-10-10T12:10:00.000Z",
-    "endIso": "2026-10-10T12:20:00.000Z",
+    "startIso": "2026-10-10T12:40:00.000Z",
+    "endIso": "2026-10-10T14:30:00.000Z",
     "kind": "sport",
     "queue": [
       {
         "label": "Next up · today",
-        "time": "7:10",
-        "place": "Freckle Juice in bag before flag",
-        "detailHtml": "7:40 Harris flag — vs SH Proehl (home) · 11:25 Hayes flag — SRE Falcons vs Funk · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Sat",
-        "startIso": "2026-10-10T12:10:00.000Z",
-        "endIso": "2026-10-10T12:20:00.000Z",
-        "kind": "sport",
-        "whenLabel": "7:10",
-        "summary": "Hayes — Freckle Juice in bag before flag"
-      },
-      {
-        "label": "Next up · today",
         "time": "7:40",
         "place": "Harris flag — vs SH Proehl (home)",
-        "detailHtml": "7:10 Freckle Juice in bag before flag · 11:25 Hayes flag — SRE Falcons vs Funk · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "11:25 Hayes flag — SRE Falcons vs Funk · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Sat",
         "startIso": "2026-10-10T12:40:00.000Z",
         "endIso": "2026-10-10T14:30:00.000Z",
@@ -53,7 +41,7 @@
         "label": "Next up · today",
         "time": "11:25",
         "place": "Hayes flag — SRE Falcons vs Funk · Field 6",
-        "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 Harris flag — vs SH Proehl (home) · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "7:40 Harris flag — vs SH Proehl (home) · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Sat",
         "startIso": "2026-10-10T16:25:00.000Z",
         "endIso": "2026-10-10T18:35:00.000Z",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Tue 7:00",
         "summary": "Hayes — SRE specials: PE (tennis shoes)"
+      },
+      {
+        "label": "Next up · Tue",
+        "time": "8:10",
+        "place": "Boys SRE drop",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-13T13:10:00.000Z",
+        "endIso": "2026-10-13T13:40:00.000Z",
+        "kind": "school_drop",
+        "whenLabel": "Tue 8:10",
+        "summary": "Hayes + Harris — SRE drop-off · 8:25"
       }
     ]
   },
@@ -556,22 +556,15 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "SAT · 7:10",
-        "what": "FRECKLE JUICE IN BAG BEFORE FLAG",
+        "when": "SAT · 11:25",
+        "what": "HAYES FLAG — SRE FALCONS VS FUNK · FIELD 6",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "SAT",
-          "7:10"
+          "11:25"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Sat · 7:10",
-          "what": "Freckle Juice in bag before flag",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "kind": "event",
           "when": "Sat · 11:25",
@@ -588,12 +581,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Sat 10 · leave 7:10",
-          "what": "Freckle Juice in bag before flag",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Sat 10 · leave 11:25",
           "what": "Hayes flag — SRE Falcons vs Funk · Field 6",
@@ -989,11 +976,6 @@
       ],
       "week": [
         {
-          "when": "Sat 10 · 7:10",
-          "what": "Freckle Juice in bag before flag",
-          "tone": "hot"
-        },
-        {
           "when": "Sat 10 · 7:40",
           "what": "Harris flag — vs SH Proehl (home)",
           "tone": "hot"
@@ -1106,6 +1088,11 @@
         {
           "when": "Thu 15 · 12:45",
           "what": "LKMS choir Sing & Share field trip",
+          "tone": "act"
+        },
+        {
+          "when": "Thu 15 · 3:15",
+          "what": "SRE pickup",
           "tone": "act"
         }
       ]
