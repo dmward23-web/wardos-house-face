@@ -1,7 +1,7 @@
 {
   "asOf": "Sat Oct 10 2026",
   "asOfIso": "2026-10-10",
-  "refreshedAt": "2026-10-10T16:28:27.748Z",
+  "refreshedAt": "2026-10-10T16:36:19.333Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,27 +16,15 @@
     "endIso": "2026-10-16T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "11:25",
-    "place": "Hayes flag — SRE Falcons vs Funk · Field 6",
+    "label": "Next up · Mon",
+    "time": "7:00",
+    "place": "SRE specials: Music",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-    "badge": "Sat",
-    "startIso": "2026-10-10T16:25:00.000Z",
-    "endIso": "2026-10-10T18:35:00.000Z",
-    "kind": "sport",
+    "badge": "Mon",
+    "startIso": "2026-10-12T12:00:00.000Z",
+    "endIso": "2026-10-12T12:15:00.000Z",
+    "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "11:25",
-        "place": "Hayes flag — SRE Falcons vs Funk · Field 6",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Sat",
-        "startIso": "2026-10-10T16:25:00.000Z",
-        "endIso": "2026-10-10T18:35:00.000Z",
-        "kind": "sport",
-        "whenLabel": "11:25",
-        "summary": "Hayes flag — SRE Falcons vs Funk · Field 6 · leave 11:25 · game 12:15"
-      },
       {
         "label": "Next up · Mon",
         "time": "7:00",
@@ -168,6 +156,18 @@
         "kind": "school_pickup",
         "whenLabel": "Tue 3:15",
         "summary": "Hayes + Harris — SRE pickup · 3:40"
+      },
+      {
+        "label": "Next up · Tue",
+        "time": "4:45",
+        "place": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-13T21:45:00.000Z",
+        "endIso": "2026-10-14T00:45:00.000Z",
+        "kind": "school",
+        "whenLabel": "Tue 4:45",
+        "summary": "Ainsley — LKMS choir Fall Concert · call 5:00 / starts 5:30"
       }
     ]
   },
