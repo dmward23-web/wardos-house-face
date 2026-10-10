@@ -1,7 +1,7 @@
 {
   "asOf": "Sat Oct 10 2026",
   "asOfIso": "2026-10-10",
-  "refreshedAt": "2026-10-10T12:48:36.519Z",
+  "refreshedAt": "2026-10-10T13:05:26.307Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,31 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "7:40",
-    "place": "Harris flag — vs SH Proehl (home)",
-    "detailHtml": "11:25 Hayes flag — SRE Falcons vs Funk · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+    "time": "11:25",
+    "place": "Hayes flag — SRE Falcons vs Funk · Field 6",
+    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
     "badge": "Sat",
-    "startIso": "2026-10-10T12:40:00.000Z",
-    "endIso": "2026-10-10T14:30:00.000Z",
+    "startIso": "2026-10-10T16:25:00.000Z",
+    "endIso": "2026-10-10T18:35:00.000Z",
     "kind": "sport",
     "queue": [
       {
         "label": "Next up · today",
-        "time": "7:40",
-        "place": "Harris flag — vs SH Proehl (home)",
-        "detailHtml": "11:25 Hayes flag — SRE Falcons vs Funk · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Sat",
-        "startIso": "2026-10-10T12:40:00.000Z",
-        "endIso": "2026-10-10T14:30:00.000Z",
-        "kind": "sport",
-        "whenLabel": "7:40",
-        "summary": "Harris flag — vs SH Proehl (home) · leave 7:40 · game 8:30"
-      },
-      {
-        "label": "Next up · today",
         "time": "11:25",
         "place": "Hayes flag — SRE Falcons vs Funk · Field 6",
-        "detailHtml": "7:40 Harris flag — vs SH Proehl (home) · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Sat",
         "startIso": "2026-10-10T16:25:00.000Z",
         "endIso": "2026-10-10T18:35:00.000Z",
@@ -168,6 +156,18 @@
         "kind": "school_drop",
         "whenLabel": "Tue 8:10",
         "summary": "Hayes + Harris — SRE drop-off · 8:25"
+      },
+      {
+        "label": "Next up · Tue",
+        "time": "3:15",
+        "place": "Boys SRE pickup",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-13T20:15:00.000Z",
+        "endIso": "2026-10-13T21:00:00.000Z",
+        "kind": "school_pickup",
+        "whenLabel": "Tue 3:15",
+        "summary": "Hayes + Harris — SRE pickup · 3:40"
       }
     ]
   },
