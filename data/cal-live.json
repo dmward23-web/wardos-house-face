@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-10T20:57:06.235Z",
+  "fetchedAt": "2026-10-10T21:05:46.129Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
-  "windowEnd": "2026-10-16",
+  "windowEnd": "2026-10-17",
   "asOfIso": "2026-10-10",
   "nextLeave": {
     "id": "n7h1vb535232nnpeetld2qehko",
@@ -382,6 +382,24 @@
       "start": "2026-10-16T12:00:00-05:00",
       "end": "2026-10-16T12:30:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "e37m1nsdohatig2c284tl49trk",
+      "summary": "Harris flag — vs ASC (home) · game 8:30",
+      "start": "2026-10-17T08:00:00-05:00",
+      "end": "2026-10-17T09:30:00-05:00",
+      "location": "Heritage Park Soccer Complex, Field 10, 17255 S Black Bob Rd, Olathe, KS 66062",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "114kmjpd0jj6t277enqfp5dmd0",
+      "summary": "Hayes flag — SRE Falcons vs Pena · 5:15–6:15",
+      "start": "2026-10-17T16:45:00-05:00",
+      "end": "2026-10-17T18:15:00-05:00",
+      "location": "Heritage Park Soccer Complex, 17255 S Black Bob Rd, Olathe, KS 66062",
       "busy": false,
       "allDay": false
     }
