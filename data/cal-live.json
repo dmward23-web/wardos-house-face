@@ -1,21 +1,30 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-10T21:12:20.103Z",
+  "fetchedAt": "2026-10-10T21:25:27.120Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-16",
   "asOfIso": "2026-10-10",
   "nextLeave": {
-    "id": "n7h1vb535232nnpeetld2qehko",
-    "summary": "Hayes flag practice · leave 5:40 · 6:00–7:15",
-    "start": "2026-10-15T17:40:00-05:00",
-    "end": "2026-10-15T19:35:00-05:00",
-    "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+    "id": "u4futr2q51u26rle7gllbfogas",
+    "summary": "Hy-Vee pickup · Order #44925063",
+    "start": "2026-10-10T18:30:00-05:00",
+    "end": "2026-10-10T19:00:00-05:00",
+    "location": "8900 W 135 St, Overland Park, KS 66221",
     "busy": true,
     "allDay": false
   },
   "upcomingLeaves": [
+    {
+      "id": "u4futr2q51u26rle7gllbfogas",
+      "summary": "Hy-Vee pickup · Order #44925063",
+      "start": "2026-10-10T18:30:00-05:00",
+      "end": "2026-10-10T19:00:00-05:00",
+      "location": "8900 W 135 St, Overland Park, KS 66221",
+      "busy": true,
+      "allDay": false
+    },
     {
       "id": "3admd77de8o401617qde5n6eag",
       "summary": "Kids' Christmas lists",
@@ -387,11 +396,11 @@
     }
   ],
   "boardStrip": {
-    "label": "Next up · Thu",
-    "time": "5:40",
-    "place": "Hayes flag practice · leave 5:40 · 6:00–7:15",
-    "detailHtml": "<strong>5:40</strong> Hayes flag practice · leave 5:40 · 6:00–7:15",
-    "badge": "Thu"
+    "label": "Next up · today",
+    "time": "6:30",
+    "place": "Hy-Vee pickup · Order #44925063",
+    "detailHtml": "<strong>6:30</strong> Hy-Vee pickup · Order #44925063",
+    "badge": "Sat"
   },
   "error": null
 }
