@@ -1,7 +1,7 @@
 {
   "asOf": "Sat Oct 10 2026",
   "asOfIso": "2026-10-10",
-  "refreshedAt": "2026-10-10T20:12:21.749Z",
+  "refreshedAt": "2026-10-10T20:18:56.376Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -324,12 +324,6 @@
           "what": "Harris flag practice · 5:30–6:30",
           "hint": "YOUR board",
           "tone": "hot"
-        },
-        {
-          "when": "Sat 17 · leave 8:00",
-          "what": "Harris flag — vs ASC (home) · game 8:30",
-          "hint": "YOUR board",
-          "tone": "hot"
         }
       ],
       "school": [
@@ -576,12 +570,6 @@
         {
           "when": "Thu 15 · leave 5:40",
           "what": "Hayes flag practice",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "when": "Sat 17 · leave 4:45",
-          "what": "Hayes flag — SRE Falcons vs Pena · 5:15–6:15",
           "hint": "YOUR board",
           "tone": "hot"
         }
