@@ -1,7 +1,7 @@
 {
-  "asOf": "Fri Oct 9 2026",
-  "asOfIso": "2026-10-09",
-  "refreshedAt": "2026-10-10T03:05:32.285Z",
+  "asOf": "Sat Oct 10 2026",
+  "asOfIso": "2026-10-10",
+  "refreshedAt": "2026-10-10T10:10:42.671Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,7 +16,7 @@
     "endIso": "2026-10-16T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · Sat",
+    "label": "Next up · today",
     "time": "7:10",
     "place": "Freckle Juice in bag before flag",
     "detailHtml": "7:40 Harris flag — vs SH Proehl (home) · 11:25 Hayes flag — SRE Falcons vs Funk · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -26,7 +26,7 @@
     "kind": "sport",
     "queue": [
       {
-        "label": "Next up · Sat",
+        "label": "Next up · today",
         "time": "7:10",
         "place": "Freckle Juice in bag before flag",
         "detailHtml": "7:40 Harris flag — vs SH Proehl (home) · 11:25 Hayes flag — SRE Falcons vs Funk · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -34,11 +34,11 @@
         "startIso": "2026-10-10T12:10:00.000Z",
         "endIso": "2026-10-10T12:20:00.000Z",
         "kind": "sport",
-        "whenLabel": "Sat 7:10",
+        "whenLabel": "7:10",
         "summary": "Hayes — Freckle Juice in bag before flag"
       },
       {
-        "label": "Next up · Sat",
+        "label": "Next up · today",
         "time": "7:40",
         "place": "Harris flag — vs SH Proehl (home)",
         "detailHtml": "7:10 Freckle Juice in bag before flag · 11:25 Hayes flag — SRE Falcons vs Funk · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -46,11 +46,11 @@
         "startIso": "2026-10-10T12:40:00.000Z",
         "endIso": "2026-10-10T14:30:00.000Z",
         "kind": "sport",
-        "whenLabel": "Sat 7:40",
+        "whenLabel": "7:40",
         "summary": "Harris flag — vs SH Proehl (home) · leave 7:40 · game 8:30"
       },
       {
-        "label": "Next up · Sat",
+        "label": "Next up · today",
         "time": "11:25",
         "place": "Hayes flag — SRE Falcons vs Funk · Field 6",
         "detailHtml": "7:10 Freckle Juice in bag before flag · 7:40 Harris flag — vs SH Proehl (home) · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -58,7 +58,7 @@
         "startIso": "2026-10-10T16:25:00.000Z",
         "endIso": "2026-10-10T18:35:00.000Z",
         "kind": "sport",
-        "whenLabel": "Sat 11:25",
+        "whenLabel": "11:25",
         "summary": "Hayes flag — SRE Falcons vs Funk · Field 6 · leave 11:25 · game 12:15"
       },
       {
@@ -301,21 +301,21 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "FRI · 12:00",
-        "what": "WARD KIDS [AHH NO SCHOOL]",
+        "when": "SAT · 7:40",
+        "what": "HARRIS FLAG — VS SH PROEHL (HOME)",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "FRI",
-          "12:00"
+          "SAT",
+          "7:40"
         ]
       },
       "today": [
         {
           "kind": "event",
-          "when": "Fri · 12:00",
-          "what": "Ward Kids [AHH No School]",
-          "hint": "",
-          "tone": "act"
+          "when": "Sat · 7:40",
+          "what": "🏁 Harris flag — vs SH Proehl (home)",
+          "hint": "YOUR board",
+          "tone": "hot"
         },
         {
           "kind": "note",
@@ -340,12 +340,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Fri 9 · 12:00",
-          "what": "Ward Kids [AHH No School]",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Mon 12 · 7:00",
           "what": "SRE specials: Music",
@@ -373,12 +367,6 @@
         {
           "when": "Tue 13 · 8:10",
           "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 13 · 10:45",
-          "what": "SRE pickup for dentist",
           "tone": "act",
           "hint": ""
         },
@@ -568,21 +556,28 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "FRI · 12:00",
-        "what": "WARD KIDS [AHH NO SCHOOL]",
+        "when": "SAT · 7:10",
+        "what": "FRECKLE JUICE IN BAG BEFORE FLAG",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "FRI",
-          "12:00"
+          "SAT",
+          "7:10"
         ]
       },
       "today": [
         {
           "kind": "event",
-          "when": "Fri · 12:00",
-          "what": "Ward Kids [AHH No School]",
-          "hint": "",
-          "tone": "act"
+          "when": "Sat · 7:10",
+          "what": "Freckle Juice in bag before flag",
+          "hint": "YOUR board",
+          "tone": "hot"
+        },
+        {
+          "kind": "event",
+          "when": "Sat · 11:25",
+          "what": "Hayes flag — SRE Falcons vs Funk · Field 6",
+          "hint": "YOUR board",
+          "tone": "hot"
         },
         {
           "kind": "note",
@@ -620,12 +615,6 @@
       ],
       "school": [
         {
-          "when": "Fri 9 · 12:00",
-          "what": "Ward Kids [AHH No School]",
-          "tone": "act",
-          "hint": ""
-        },
-        {
           "when": "Mon 12 · 7:00",
           "what": "SRE specials: Music",
           "tone": "act",
@@ -652,12 +641,6 @@
         {
           "when": "Tue 13 · 8:10",
           "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 13 · 10:45",
-          "what": "SRE pickup for dentist",
           "tone": "act",
           "hint": ""
         },
@@ -858,22 +841,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "FRI · 12:00",
-        "what": "WARD KIDS [AHH NO SCHOOL]",
+        "when": "MON · 2:20",
+        "what": "LINDSAY APPT",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "FRI",
-          "12:00"
+          "MON",
+          "2:20"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Fri · 12:00",
-          "what": "Ward Kids [AHH No School]",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -897,12 +873,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Fri 9 · 12:00",
-          "what": "Ward Kids [AHH No School]",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Tue 13 · 4:45",
           "what": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
@@ -987,7 +957,7 @@
         }
       ],
       "hottest": {
-        "when": "Fri Oct 9 2026 · kids with you @ 147th",
+        "when": "Sat Oct 10 2026 · kids with you @ 147th",
         "what": "Dad week live",
         "where": "through Fri Oct 16 · 3:00",
         "badges": [
@@ -997,9 +967,19 @@
       },
       "today": [
         {
-          "when": "Fri · 12:00",
-          "what": "Ward Kids [AHH No School]",
-          "tone": "act"
+          "when": "Sat · 7:10",
+          "what": "Freckle Juice in bag before flag",
+          "tone": "hot"
+        },
+        {
+          "when": "Sat · 7:40",
+          "what": "Harris flag — vs SH Proehl (home)",
+          "tone": "hot"
+        },
+        {
+          "when": "Sat · 11:25",
+          "what": "Hayes flag — SRE Falcons vs Funk · Field 6",
+          "tone": "hot"
         },
         {
           "when": "home week",
@@ -1008,11 +988,6 @@
         }
       ],
       "week": [
-        {
-          "when": "Fri 9 · 12:00",
-          "what": "Ward Kids [AHH No School]",
-          "tone": "act"
-        },
         {
           "when": "Sat 10 · 7:10",
           "what": "Freckle Juice in bag before flag",
@@ -1062,16 +1037,6 @@
           "when": "Tue 13 · 8:10",
           "what": "SRE drop-off",
           "tone": "act"
-        },
-        {
-          "when": "Tue 13 · 10:45",
-          "what": "SRE pickup for dentist",
-          "tone": "act"
-        },
-        {
-          "when": "Tue 13 · 11:00",
-          "what": "Ainsley LKMS pickup for dentist",
-          "tone": "hot"
         },
         {
           "when": "Tue 13 · 3:15",
@@ -1126,6 +1091,21 @@
         {
           "when": "Thu 15 · 7:00",
           "what": "SRE specials: Spanish",
+          "tone": "act"
+        },
+        {
+          "when": "Thu 15 · 7:00",
+          "what": "SRE specials: Spanish + Library checkout",
+          "tone": "act"
+        },
+        {
+          "when": "Thu 15 · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act"
+        },
+        {
+          "when": "Thu 15 · 12:45",
+          "what": "LKMS choir Sing & Share field trip",
           "tone": "act"
         }
       ]

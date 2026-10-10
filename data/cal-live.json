@@ -1,11 +1,11 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-10T03:05:32.696Z",
+  "fetchedAt": "2026-10-10T10:10:43.096Z",
   "tz": "America/Chicago",
-  "windowStart": "2026-10-03",
+  "windowStart": "2026-10-09",
   "windowEnd": "2026-10-16",
-  "asOfIso": "2026-10-09",
+  "asOfIso": "2026-10-10",
   "nextLeave": {
     "id": "5173a2fg5417s7muq42ujqj37s",
     "summary": "Harris flag — vs SH Proehl (home) · leave 7:40 · game 8:30",
@@ -152,47 +152,11 @@
       "allDay": false
     },
     {
-      "id": "o02ehra5gan8ee02g3gjiqt294",
-      "summary": "Hayes + Harris — SRE pickup for dentist · 11:00",
-      "start": "2026-10-13T10:45:00-05:00",
-      "end": "2026-10-13T11:00:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "q28sqiv5k99pv1vq920q5ftgqc",
-      "summary": "Ainsley — LKMS pickup for dentist · 11:10",
-      "start": "2026-10-13T11:00:00-05:00",
-      "end": "2026-10-13T11:10:00-05:00",
-      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
-      "busy": true,
-      "allDay": false
-    },
-    {
       "id": "rf6dko91o9tt1okf856j7a5s3g",
       "summary": "Kids — Starting Point cleanings · 11:30",
-      "start": "2026-10-13T11:10:00-05:00",
-      "end": "2026-10-13T13:50:00-05:00",
-      "location": "Starting Point Pediatric Dentistry, 14465 Metcalf Ave, Overland Park, KS 66223",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "nkp9kpv36rf85oks5bsstpd2mo",
-      "summary": "Ainsley — back to LKMS · leave 1:50",
-      "start": "2026-10-13T13:50:00-05:00",
-      "end": "2026-10-13T14:00:00-05:00",
-      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "4sd8vovnjtqih28eeatsk7b7ao",
-      "summary": "Hayes + Harris — back to SRE · 2:10",
-      "start": "2026-10-13T14:00:00-05:00",
+      "start": "2026-10-13T10:45:00-05:00",
       "end": "2026-10-13T14:25:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "location": "Starting Point Dental Metcalf, 14465 Metcalf Ave, Overland Park, KS 66223",
       "busy": true,
       "allDay": false
     },
@@ -413,6 +377,15 @@
       "allDay": true
     },
     {
+      "id": "dutfnpmlnngr5qaph6eaaks17g",
+      "summary": "SRE Fall Family Fun Night (Allen)",
+      "start": "2026-10-16T00:00:00-05:00",
+      "end": "2026-10-17T00:00:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": true
+    },
+    {
       "id": "fp0cudn8p70gv73fbnvu5at6po",
       "summary": "Harris — SRE specials: Music",
       "start": "2026-10-16T07:00:00-05:00",
@@ -450,7 +423,7 @@
     }
   ],
   "boardStrip": {
-    "label": "Next up · Sat",
+    "label": "Next up · today",
     "time": "7:40",
     "place": "Harris flag — vs SH Proehl (home) · leave 7:40 · game…",
     "detailHtml": "<strong>7:40</strong> Harris flag — vs SH Proehl (home) · leave 7:40 · game…",
