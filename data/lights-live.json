@@ -1,6 +1,6 @@
 {
   "status": "live",
-  "fetchedAt": "2026-10-10T03:43:26.612Z",
+  "fetchedAt": "2026-10-10T10:28:52.819Z",
   "source": "tplink-cloud-api",
   "writeSupported": true,
   "brightnessControlSupported": true,
@@ -35,18 +35,6 @@
   ],
   "reserved": [
     {
-      "alias": "QmFzZW1lbnQ=",
-      "model": "deco X20(US)",
-      "list_online": false,
-      "mapped": null
-    },
-    {
-      "alias": "Archer AX4400",
-      "model": "Archer AX4400(US)",
-      "list_online": false,
-      "mapped": null
-    },
-    {
       "alias": "RGVjb19EMzU4",
       "model": "deco X20(US)",
       "list_online": false,
@@ -57,10 +45,22 @@
       "model": "deco X20(US)",
       "list_online": false,
       "mapped": null
+    },
+    {
+      "alias": "QmFzZW1lbnQ=",
+      "model": "deco X20(US)",
+      "list_online": false,
+      "mapped": null
+    },
+    {
+      "alias": "Archer AX4400",
+      "model": "Archer AX4400(US)",
+      "list_online": false,
+      "mapped": null
     }
   ],
   "error": null,
   "note": "Brightness READ from get_sysinfo.brightness (HS220/KS220). WRITE via scripts/kasa-write.py + lights-write-proxy.mjs (cloud passthrough).",
-  "writeProxy": "https://dimension-introduce-schemes-seek.trycloudflare.com",
+  "writeProxy": "https://fonts-authority-fiction-powerful.trycloudflare.com",
   "writePath": "scripts/lights-write-proxy.mjs → kasa-write.py (cloud)"
 }
