@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-10T14:39:58.524Z",
+  "fetchedAt": "2026-10-10T14:53:02.927Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-16",
@@ -16,15 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "8nbeni0091v8tbdcj1a1bv05e0",
-      "summary": "Return Amazon brake lever at UPS",
-      "start": "2026-10-10T09:45:00-05:00",
-      "end": "2026-10-10T10:00:00-05:00",
-      "location": "The UPS Store, 151st & Metcalf, Overland Park, KS",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "3snh0eumn2qpus4jv2iqhr8pk0",
       "summary": "Hayes flag — SRE Falcons vs Funk · Field 6 · leave 11:25 · game 12:15",
