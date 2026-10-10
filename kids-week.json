@@ -1,7 +1,7 @@
 {
   "asOf": "Sat Oct 10 2026",
   "asOfIso": "2026-10-10",
-  "refreshedAt": "2026-10-10T14:32:16.199Z",
+  "refreshedAt": "2026-10-10T14:39:58.084Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -301,22 +301,15 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "SAT · 7:40",
-        "what": "HARRIS FLAG — VS SH PROEHL (HOME)",
+        "when": "MON · 7:00",
+        "what": "SRE SPECIALS: MUSIC",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "SAT",
-          "7:40"
+          "MON",
+          "7:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Sat · 7:40",
-          "what": "🏁 Harris flag — vs SH Proehl (home)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -326,12 +319,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Sat 10 · leave 7:40",
-          "what": "Harris flag — vs SH Proehl (home)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Wed 14 · leave 4:40",
           "what": "Harris flag practice · 5:30–6:30",
@@ -976,11 +963,6 @@
       ],
       "week": [
         {
-          "when": "Sat 10 · 7:40",
-          "what": "Harris flag — vs SH Proehl (home)",
-          "tone": "hot"
-        },
-        {
           "when": "Sat 10 · 11:25",
           "what": "Hayes flag — SRE Falcons vs Funk · Field 6",
           "tone": "hot"
@@ -1093,6 +1075,11 @@
         {
           "when": "Thu 15 · 3:15",
           "what": "SRE pickup",
+          "tone": "act"
+        },
+        {
+          "when": "Thu 15 · 3:50",
+          "what": "LKMS Homework Help · 3:00–4:00 · pickup 4:00",
           "tone": "act"
         }
       ]
