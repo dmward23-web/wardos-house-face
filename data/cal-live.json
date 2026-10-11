@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-11T18:58:47.193Z",
+  "fetchedAt": "2026-10-11T19:13:25.019Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-18",
   "asOfIso": "2026-10-11",
   "nextLeave": {
-    "id": "3admd77de8o401617qde5n6eag",
-    "summary": "Kids' Christmas lists",
-    "start": "2026-10-11T14:00:00-05:00",
-    "end": "2026-10-11T15:00:00-05:00",
-    "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-    "busy": false,
+    "id": "1ni8dem5hrho45a0csgj81r3i4_20261012T131000Z",
+    "summary": "Hayes + Harris — SRE drop-off · 8:25",
+    "start": "2026-10-12T08:10:00-05:00",
+    "end": "2026-10-12T08:40:00-05:00",
+    "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+    "busy": true,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "3admd77de8o401617qde5n6eag",
-      "summary": "Kids' Christmas lists",
-      "start": "2026-10-11T14:00:00-05:00",
-      "end": "2026-10-11T15:00:00-05:00",
-      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "bl640l6g1pnc7auq8stliuirqc",
       "summary": "Hayes BB: coach in — practices by 19 Oct",
@@ -450,11 +441,11 @@
     }
   ],
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "2:00",
-    "place": "Kids' Christmas lists",
-    "detailHtml": "<strong>2:00</strong> Kids' Christmas lists",
-    "badge": "Sun"
+    "label": "Next up · Mon",
+    "time": "8:10",
+    "place": "Hayes + Harris — SRE drop-off · 8:25",
+    "detailHtml": "<strong>8:10</strong> Hayes + Harris — SRE drop-off · 8:25",
+    "badge": "Mon"
   },
   "error": null
 }
