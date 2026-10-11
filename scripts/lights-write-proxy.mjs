@@ -137,17 +137,19 @@ function rateOk(bucket, limit, windowMs) {
   return true;
 }
 function clientIp(req) {
-  return String(req.headers["cf-connecting-ip"] || req.headers["x-forwarded-for"] || req.socket.remoteAddress || "?").split(",")[0].trim();
+  const ip = String(req.headers["cf-connecting-ip"] || req.headers["x-forwarded-for"] || req.socket.remoteAddress || "?").split(",")[0].trim();
+  /* IPv6 clients rotate inside their /48 — bucket by prefix */
+  return ip.includes(":") ? ip.split(":").slice(0, 3).join(":") + "::/48" : ip;
 }
 /** returns "" when allowed, else reason. Only called for no-key requests. */
 function houseRateCheck(req, pathname) {
   const ip = clientIp(req);
   if (req.method !== "POST") return rateOk("r:" + ip, 240, 60000) ? "" : "rate";
   if (pathname.startsWith("/api/lights")) {
-    if (!rateOk("lw:" + ip, 20, 60000) || !rateOk("lw:all", 60, 60000)) return "rate";
+    if (!rateOk("lw:" + ip, 20, 60000) || !rateOk("lw:all", 30, 60000)) return "rate"; /* whole house: 30 no-key light writes/min */
     return "";
   }
-  return rateOk("tw:" + ip, 120, 60000) && rateOk("tw:all", 600, 60000) ? "" : "rate";
+  return rateOk("tw:" + ip, 120, 60000) && rateOk("tw:all", 300, 60000) ? "" : "rate";
 }
 function hasKeyHeader(req, args) {
   if (!args.authToken) return false;
