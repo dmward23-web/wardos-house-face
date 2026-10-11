@@ -1,7 +1,7 @@
 {
-  "asOf": "Sat Oct 10 2026",
-  "asOfIso": "2026-10-10",
-  "refreshedAt": "2026-10-11T03:02:05.358Z",
+  "asOf": "Sun Oct 11 2026",
+  "asOfIso": "2026-10-11",
+  "refreshedAt": "2026-10-11T10:18:09.319Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,7 +16,7 @@
     "endIso": "2026-10-16T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · Sun",
+    "label": "Next up · today",
     "time": "12:00",
     "place": "Ainsley appt: school absence verification due (portal)",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -26,7 +26,7 @@
     "kind": "appointment",
     "queue": [
       {
-        "label": "Next up · Sun",
+        "label": "Next up · today",
         "time": "12:00",
         "place": "Ainsley appt: school absence verification due (portal)",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -34,7 +34,7 @@
         "startIso": "2026-10-11T17:00:00.000Z",
         "endIso": "2026-10-12T17:00:00.000Z",
         "kind": "appointment",
-        "whenLabel": "Sun 12:00",
+        "whenLabel": "12:00",
         "summary": "Ainsley appt: school absence verification due (portal)"
       },
       {
@@ -824,6 +824,13 @@
       },
       "today": [
         {
+          "kind": "event",
+          "when": "Sun · 12:00",
+          "what": "Ainsley appt: school absence verification due (portal)",
+          "hint": "",
+          "tone": "hot"
+        },
+        {
           "kind": "note",
           "when": "All day",
           "what": "Base @ 147th with Dad",
@@ -936,7 +943,7 @@
         }
       ],
       "hottest": {
-        "when": "Sat Oct 10 2026 · kids with you @ 147th",
+        "when": "Sun Oct 11 2026 · kids with you @ 147th",
         "what": "Dad week live",
         "where": "through Fri Oct 16 · 3:00",
         "badges": [
@@ -946,18 +953,8 @@
       },
       "today": [
         {
-          "when": "Sat · 7:10",
-          "what": "Freckle Juice in bag before flag",
-          "tone": "hot"
-        },
-        {
-          "when": "Sat · 7:40",
-          "what": "Harris flag — vs SH Proehl (home)",
-          "tone": "hot"
-        },
-        {
-          "when": "Sat · 11:25",
-          "what": "Hayes flag — SRE Falcons vs Funk · Field 6",
+          "when": "Sun · 12:00",
+          "what": "Ainsley appt: school absence verification due (portal)",
           "tone": "hot"
         },
         {

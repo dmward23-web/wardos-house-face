@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-11T03:02:05.925Z",
+  "fetchedAt": "2026-10-11T10:18:09.955Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-17",
-  "asOfIso": "2026-10-10",
+  "asOfIso": "2026-10-11",
   "nextLeave": {
-    "id": "a0q5i9sri25c3n71dm513nabgk",
-    "summary": "Ainsley appt: school absence verification due (portal)",
-    "start": "2026-10-11T00:00:00-05:00",
-    "end": "2026-10-12T00:00:00-05:00",
-    "location": "8675 College Blvd, Overland Park, KS 66210-1946",
+    "id": "3admd77de8o401617qde5n6eag",
+    "summary": "Kids' Christmas lists",
+    "start": "2026-10-11T14:00:00-05:00",
+    "end": "2026-10-11T15:00:00-05:00",
+    "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
     "busy": false,
-    "allDay": true
+    "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "a0q5i9sri25c3n71dm513nabgk",
-      "summary": "Ainsley appt: school absence verification due (portal)",
-      "start": "2026-10-11T00:00:00-05:00",
-      "end": "2026-10-12T00:00:00-05:00",
-      "location": "8675 College Blvd, Overland Park, KS 66210-1946",
-      "busy": false,
-      "allDay": true
-    },
     {
       "id": "3admd77de8o401617qde5n6eag",
       "summary": "Kids' Christmas lists",
@@ -395,20 +386,20 @@
       "allDay": false
     },
     {
+      "id": "h6tq2fhq3ljhbv3v2m03nin7e4",
+      "summary": "Dan+Erin CLE ALCS · #AEAVR5/#2ENK5V WN4778 Sat 10/17 BNA 3:30p→CLE · leave 2:10 · #2EL4PS WN441 Sun 10/18 CLE 6:25a→BNA · leave 4:55a ET",
+      "start": "2026-10-17T00:00:00-05:00",
+      "end": "2026-10-19T00:00:00-05:00",
+      "location": "Cleveland Hopkins International Airport (CLE), 5300 Riverside Dr, Cleveland, OH 44135",
+      "busy": false,
+      "allDay": true
+    },
+    {
       "id": "e37m1nsdohatig2c284tl49trk",
       "summary": "Harris flag — vs ASC (home) · game 8:30",
       "start": "2026-10-17T08:00:00-05:00",
       "end": "2026-10-17T09:30:00-05:00",
       "location": "Heritage Park Soccer Complex, Field 10, 17255 S Black Bob Rd, Olathe, KS 66062",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "77hkmlh8bkk80h1bklk2flra90",
-      "summary": "Flight to Cleveland (WN 4778)",
-      "start": "2026-10-17T15:30:00-05:00",
-      "end": "2026-10-17T17:00:00-05:00",
-      "location": "Nashville BNA",
       "busy": false,
       "allDay": false
     },
@@ -432,10 +423,10 @@
     }
   ],
   "boardStrip": {
-    "label": "Next up · Sun",
-    "time": "12:00",
-    "place": "Ainsley appt: school absence verification due (portal)",
-    "detailHtml": "<strong>12:00</strong> Ainsley appt: school absence verification due (portal)",
+    "label": "Next up · today",
+    "time": "2:00",
+    "place": "Kids' Christmas lists",
+    "detailHtml": "<strong>2:00</strong> Kids' Christmas lists",
     "badge": "Sun"
   },
   "error": null
