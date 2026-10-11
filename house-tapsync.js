@@ -7,7 +7,7 @@
   var META = "house-tapsync:meta", SEEDED = "house-tapsync:seeded", QUEUE = "house-tapsync:queue";
   var PROXY_LS = "wardos-lights-proxy", TOKEN_LS = "wardos-lights-proxy-token";
   var ls = window.localStorage, rawSet = ls.setItem.bind(ls);
-  var lastTap = 0, pushTimer = null, applying = false;
+  var lastTap = 0, pushTimer = null, applying = false, offset = 0; /* TAPSTICK1 · hub clock − device clock */
 
   function jget(k, d) { try { return JSON.parse(ls.getItem(k) || "") || d; } catch (e) { return d; } }
   function jset(k, v) { try { rawSet(k, JSON.stringify(v)); } catch (e) { /* */ } }
@@ -68,6 +68,8 @@
 
   function applyServer(taps) {
     var meta = jget(META, {}), changed = false;
+    var pending = {};
+    jget(QUEUE, []).forEach(function (c) { pending[c.key + "|" + c.id] = 1; }); /* never overwrite an unsent tap */
     applying = true;
     try {
       Object.keys(taps || {}).forEach(function (k) {
@@ -75,9 +77,11 @@
         var st = jget(k, {}), dirty = false;
         Object.keys(taps[k]).forEach(function (id) {
           var s = taps[k][id], mt = meta[k + "|" + id] || 0;
-          if (s.t < mt) return;
+          if (pending[k + "|" + id]) return;
+          var st0 = s.t ? s.t - offset : 0; /* hub time → this device's clock */
+          if (st0 < mt) return;
           if (!!st[id] !== !!s.v) { st[id] = !!s.v; dirty = true; }
-          meta[k + "|" + id] = s.t;
+          meta[k + "|" + id] = st0;
         });
         if (dirty) { rawSet(k, JSON.stringify(st)); changed = true; }
       });
@@ -100,10 +104,11 @@
     }
   }
 
-  function afterPull(res) {
+  function afterPull(res, sentAt) {
+    if (res && typeof res.now === "number") offset = res.now - (sentAt ? (sentAt + Date.now()) / 2 : Date.now());
     setBadge(true);
     rawSet(SEEDED, "1"); /* SEED2 · once the hub answered, never re-send what we downloaded */
-    if (applyServer(res.taps) && Date.now() - lastTap > 8000) {
+    if (applyServer(res.taps) && Date.now() - lastTap > 30000 && !jget(QUEUE, []).length) {
       var n = +(sessionStorage.getItem("tapsync-reloads") || 0);
       if (n < 3) { sessionStorage.setItem("tapsync-reloads", String(n + 1)); location.reload(); return; }
     }
@@ -114,12 +119,19 @@
     var q = jget(QUEUE, []);
     if (!ls.getItem(SEEDED)) q = seedChanges().concat(q);
     if (!q.length) return pull();
-    return call("POST", { changes: q }).then(function (res) {
-      rawSet(SEEDED, "1"); jset(QUEUE, []); afterPull(res);
+    var sentAt = Date.now();
+    var sent = q.map(function (c) { return { key: c.key, id: c.id, v: c.v, t: c.t, age: c.t ? Math.max(0, sentAt - c.t) : undefined }; });
+    return call("POST", { changes: sent }).then(function (res) {
+      rawSet(SEEDED, "1");
+      /* drop only what we sent; taps made while in flight stay queued */
+      var sentKeys = {}; q.forEach(function (c) { sentKeys[c.key + "|" + c.id + "|" + c.t] = 1; });
+      jset(QUEUE, jget(QUEUE, []).filter(function (c) { return !sentKeys[c.key + "|" + c.id + "|" + c.t]; }));
+      afterPull(res, sentAt);
     }).catch(function () { setBadge(false); });
   }
   function pull() {
-    return call("GET").then(afterPull).catch(function () { setBadge(false); });
+    var sentAt = Date.now();
+    return call("GET").then(function (res) { afterPull(res, sentAt); }).catch(function () { setBadge(false); });
   }
 
   function tick() { if (document.visibilityState !== "hidden") push(); }
