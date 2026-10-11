@@ -267,6 +267,7 @@
     return Promise.all(jobs).then(function () {
       platesReady = true;
       markJarVisual();
+      if (bg && !capMode) bg.frame(kid());
     });
   }
   function drawPlate(ctx, img, W, H, ox, oy, zoom, alpha, blur, world) {
@@ -1759,7 +1760,9 @@
   function loop() {
     if (capMode || !bg) return;
     if (!document.hidden && !(sceneEl && sceneEl.classList.contains("is-on"))) bg.frame(kid());
-    if (reduced) return;
+    /* STILL1 · reduced motion: same static frame (t fixed), repainted gently so plates/chests
+       appear once loaded and taps show — no animation. */
+    if (reduced) { setTimeout(loop, 700); return; }
     requestAnimationFrame(loop);
   }
 

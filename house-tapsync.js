@@ -102,6 +102,7 @@
 
   function afterPull(res) {
     setBadge(true);
+    rawSet(SEEDED, "1"); /* SEED2 · once the hub answered, never re-send what we downloaded */
     if (applyServer(res.taps) && Date.now() - lastTap > 8000) {
       var n = +(sessionStorage.getItem("tapsync-reloads") || 0);
       if (n < 3) { sessionStorage.setItem("tapsync-reloads", String(n + 1)); location.reload(); return; }

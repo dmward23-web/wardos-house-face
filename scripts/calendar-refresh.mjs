@@ -456,7 +456,7 @@ function pickStripQueue(items, now, homeWeek) {
 
 function detailFor(it, homeWeek, upcoming) {
   const bits = [];
-  const through = homeWeek && homeWeek.with === "Mom"
+  const through = homeWeek && homeWeek.with === "away"
     ? (homeWeek.through ? `kids away · back ${homeWeek.through}` : "kids away")
     : (homeWeek && homeWeek.through
       ? `kids with Dad @ <strong>147th</strong> through ${homeWeek.through}`
@@ -497,8 +497,8 @@ function custodyFromItems(items, now) {
     const endP = partsInTZ(nextDad.start);
     const through = `${endP.weekday} ${endP.month} ${endP.day} · ${fmtTime(nextDad.start)}`;
     return {
-      with: "Mom",
-      place: "mom's",
+      with: "away",
+      place: "",
       through,
       throughLabel: `kids away · back ${through}`,
       endIso: nextDad.startIso,
@@ -506,8 +506,8 @@ function custodyFromItems(items, now) {
   }
   if (lastEnded) {
     return {
-      with: "Mom",
-      place: "mom's",
+      with: "away",
+      place: "",
       through: "next Dad week",
       throughLabel: "kids away",
       endIso: lastEnded.endIso,
@@ -556,7 +556,7 @@ function buildKidToday(kidId, items, now, homeWeek) {
       tone,
     });
   }
-  const mom = homeWeek && homeWeek.with === "Mom";
+  const mom = homeWeek && homeWeek.with === "away";
   rows.push({
     kind: "note",
     when: "All day",
@@ -639,13 +639,15 @@ function hottestFor(kidId, items, now, homeWeek) {
     if (isBoysRun(it, kidId) && (kidId === "hayes" || kidId === "harris")) return true;
     return false;
   });
-  mine.sort((a, b) => a.start - b.start || stripPriority(a) - stripPriority(b));
+  /* TOPDAY1 · a note that spans days (started before today, runs >20h) sinks below real timed items */
+  const longNote = (x) => x.start < now && (x.end - x.start) > 20 * 3600 * 1000;
+  mine.sort((a, b) => (longNote(a) - longNote(b)) || a.start - b.start || stripPriority(a) - stripPriority(b));
   /* KIDRIDE1: on a day with his own pickup/drop-off, that ride is the top card */
   const first = mine[0];
   const firstIso = first ? partsInTZ(first.start < now ? now : first.start).iso : "";
   const ride = first && mine.find((x) => x.kidRide && x.start >= now && partsInTZ(x.start).iso === firstIso); /* DADSPAN1 · same day as the real next thing */
   const hit = ride || first;
-  const mom = homeWeek && homeWeek.with === "Mom";
+  const mom = homeWeek && homeWeek.with === "away";
   if (!hit) {
     return mom
       ? {
@@ -695,7 +697,7 @@ function buildDanToday(items, now, homeWeek) {
   }
   rows.push({
     when: "home week",
-    what: homeWeek.with === "Mom"
+    what: homeWeek.with === "away"
       ? `Kids away · back ${homeWeek.through}`
       : `Kids with Dad @ 147th through ${homeWeek.through}`,
     tone: "hot",
@@ -722,8 +724,8 @@ function buildDanWeek(items, now, homeWeek) {
     });
   }
   rows.push({
-    when: homeWeek.with === "Mom" ? `back ${homeWeek.through}` : `through ${homeWeek.through}`,
-    what: homeWeek.with === "Mom" ? "Kids away" : "Kids with Dad @ 147th",
+    when: homeWeek.with === "away" ? `back ${homeWeek.through}` : `through ${homeWeek.through}`,
+    what: homeWeek.with === "away" ? "Kids away" : "Kids with Dad @ 147th",
     tone: "hot",
   });
   return rows.slice(0, 24);
@@ -811,7 +813,7 @@ function main() {
     label: "Next up · today",
     time: "",
     place: "House day @ 147th",
-    detailHtml: homeWeek.with === "Mom"
+    detailHtml: homeWeek.with === "away"
       ? `kids away · back ${homeWeek.through}`
       : `kids with Dad @ <strong>147th</strong> through ${homeWeek.through}`,
     badge: nowP.weekday,
@@ -876,7 +878,7 @@ function main() {
   }
   next.kids.dan = {
     ...danKept,
-    hottest: homeWeek.with === "Mom"
+    hottest: homeWeek.with === "away"
       ? {
           when: `${nowP.asOf} · kids away`,
           what: "Kids away",

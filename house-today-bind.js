@@ -21,11 +21,21 @@
     var today = ctIso();
     if (today && week.asOfIso && week.asOfIso !== today) return; /* day-lagged: stay empty */
     var hw = week.homeWeek || {};
-    if (hw.with && hw.place) {
-      show(document.querySelector("[data-today-bind='homeweek']"),
-        "Kids with " + hw.with + " @ " + hw.place + (hw.through ? " through " + hw.through : ""));
+    var away = hw.with === "away" || hw.with === "Mom"; /* AWAY2 · never name her house */
+    if (away) {
+      show(document.querySelector("[data-today-bind='homeweek']"), "Kids away" + (hw.through && !/next Dad week/i.test(hw.through) ? " · back " + hw.through : ""));
+      show(document.querySelector("[data-today-bind='through']"), "Kids away");
+      var lbl = document.querySelector("[data-today-bind='homeweek-lbl']"); if (lbl) lbl.textContent = "KIDS AWAY";
+      var big = document.querySelector("[data-today-bind='homeweek-big']"); if (big) big.textContent = "Kids away";
+    } else {
+      var lbl2 = document.querySelector("[data-today-bind='homeweek-lbl']"); if (lbl2 && hw.with) lbl2.textContent = "WITH " + String(hw.with).toUpperCase();
+      var big2 = document.querySelector("[data-today-bind='homeweek-big']"); if (big2 && hw.with) big2.textContent = "With " + hw.with + (hw.place ? " · @ " + hw.place : "");
+      if (hw.with && hw.place) {
+        show(document.querySelector("[data-today-bind='homeweek']"),
+          "Kids with " + hw.with + " @ " + hw.place + (hw.through ? " through " + hw.through : ""));
+      }
+      if (hw.through) show(document.querySelector("[data-today-bind='through']"), "Through " + hw.through);
     }
-    if (hw.through) show(document.querySelector("[data-today-bind='through']"), "Through " + hw.through);
     ["harris", "hayes", "ainsley"].forEach(function (id) {
       var kid = week.kids[id];
       var rows = ((kid && kid.today) || []).filter(function (r) {

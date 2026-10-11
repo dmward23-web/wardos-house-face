@@ -909,7 +909,7 @@
   function buildNoSurprise(kid, data) {
     var bits = [];
     var cust = data && data.homeWeek;
-    if (cust) bits.push({ kind: "house", when: "Now", what: (cust.with === "Mom" ? "Kids away" : "With " + (cust.with || "Dad") + (cust.place ? " @ " + cust.place : "")) /* AWAY1 */, hint: cust.throughLabel || cust.through || "", tone: "hot" });
+    if (cust) bits.push({ kind: "house", when: "Now", what: ((cust.with === "away" || cust.with === "Mom") ? "Kids away" : "With " + (cust.with || "Dad") + (cust.place ? " @ " + cust.place : "")) /* AWAY1 */, hint: cust.throughLabel || cust.through || "", tone: "hot" });
     if (kid && kid.hottest) bits.push({ kind: "next", when: kid.hottest.when || "Next", what: kid.hottest.what || "Next up", hint: kid.hottest.where || "", tone: "hot" });
     (kid && kid.today || []).slice(0, 2).forEach(function (t) {
       bits.push({ kind: "today", when: t.when || "Today", what: t.what || "", hint: t.hint || "next 24h", tone: t.tone || "act" });
