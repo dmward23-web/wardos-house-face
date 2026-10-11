@@ -106,8 +106,11 @@
     s = s.replace(/\(\s*Mom[^)]*\)/gi, "");
     s = s.replace(/\bMom\b[^·]*/gi, "");
     s = s.replace(/\s{2,}/g, " ").replace(/\s·\s*$/g, "").trim();
+    /* GATE3WRAP1 · let the line wrap; never cut mid-word or add an ellipsis glyph */
     cap = cap || 64;
-    if (s.length > cap) s = s.slice(0, cap - 3) + "…";
+    if (s.length > cap) {
+      s = s.slice(0, cap).replace(/\s+\S*$/, "").replace(/[\s·:—–\-(]+$/, "");
+    }
     return s;
   }
 

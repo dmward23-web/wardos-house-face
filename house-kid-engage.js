@@ -210,7 +210,8 @@
     s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
     s = s.replace(/\(\s*Mom[^)]*\)/gi, "");
     s = s.replace(/\s{2,}/g, " ").trim();
-    if (s.length > 48) s = s.slice(0, 45) + "…";
+    /* GATE3WRAP1 · wrap instead of an ellipsis glyph; cut only at a word */
+    if (s.length > 72) s = s.slice(0, 72).replace(/\s+\S*$/, "").replace(/[\s·:—–\-(]+$/, "");
     return s;
   }
 
@@ -514,7 +515,7 @@
         var cadence = q.cadence || "daily";
         var done = cadence === "daily" ? getCheck(q.id, iso) : getCheck(q.id);
         var label = String(q.what || "").replace(/^[^A-Za-z0-9]+/, "").trim();
-        if (label.length > 28) label = label.slice(0, 26) + "…";
+        if (label.length > 28) label = label.slice(0, 28).replace(/\s+\S*$/, "").replace(/[\s·:—–\-(]+$/, "");
         html += '<button type="button" class="kf-claim' + (done ? " is-done" : "") +
           '" data-claim="' + esc(q.id) + '" data-cadence="' + esc(cadence) +
           '" data-kid="' + esc(kidId) + '" aria-pressed="' + (done ? "true" : "false") + '">' +
