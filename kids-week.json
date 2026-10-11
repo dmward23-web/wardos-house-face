@@ -1,7 +1,7 @@
 {
   "asOf": "Sun Oct 11 2026",
   "asOfIso": "2026-10-11",
-  "refreshedAt": "2026-10-11T18:38:05.776Z",
+  "refreshedAt": "2026-10-11T18:51:32.976Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -159,15 +159,15 @@
       },
       {
         "label": "Next up · Tue",
-        "time": "3:15",
-        "place": "Boys SRE pickup",
+        "time": "1:30",
+        "place": "Lindsay appt",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Tue",
-        "startIso": "2026-10-13T20:15:00.000Z",
-        "endIso": "2026-10-13T21:00:00.000Z",
-        "kind": "school_pickup",
-        "whenLabel": "Tue 3:15",
-        "summary": "Hayes + Harris — SRE pickup · 3:40"
+        "startIso": "2026-10-13T18:30:00.000Z",
+        "endIso": "2026-10-13T19:00:00.000Z",
+        "kind": "other",
+        "whenLabel": "Tue 1:30",
+        "summary": "Harris — Lindsay appt · 1:30"
       }
     ]
   },
