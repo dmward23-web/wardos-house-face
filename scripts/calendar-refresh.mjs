@@ -876,6 +876,17 @@ function main() {
   for (const k of PRESERVE_DAN) {
     if (prevDan[k] !== undefined) danKept[k] = prevDan[k];
   }
+  /* BAGHINT1 · bag hint follows the live week end, never a frozen date; no kid-$ placeholder */
+  for (const kidId of ["harris", "hayes", "ainsley"]) {
+    const k = next.kids[kidId];
+    if (!k) continue;
+    if (k.bag) {
+      k.bag.hint = homeWeek.with === "away"
+        ? "Kids away"
+        : `147th through ${homeWeek.through} · pack for Dad week`;
+    }
+    if (k.goal && typeof k.goal.placeholder === "string") k.goal.placeholder = k.goal.placeholder.replace(/\s*·?\s*\$\d+(\.\d+)?/g, "").trim();
+  }
   next.kids.dan = {
     ...danKept,
     hottest: homeWeek.with === "away"

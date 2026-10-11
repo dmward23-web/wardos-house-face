@@ -22,6 +22,12 @@
     if (today && week.asOfIso && week.asOfIso !== today) return; /* day-lagged: stay empty */
     var hw = week.homeWeek || {};
     var away = hw.with === "away" || hw.with === "Mom"; /* AWAY2 · never name her house */
+    var badge = document.querySelector("[data-today-bind='badge-days']"); /* BADGE1 · live week end, hidden on her days */
+    if (badge) {
+      var endDay = String(hw.through || "").split("·")[0].trim();
+      if (away || !endDay) { badge.hidden = true; badge.textContent = ""; }
+      else { badge.textContent = "Dad week · → " + endDay; badge.hidden = false; }
+    }
     if (away) {
       show(document.querySelector("[data-today-bind='homeweek']"), "Kids away" + (hw.through && !/next Dad week/i.test(hw.through) ? " · back " + hw.through : ""));
       show(document.querySelector("[data-today-bind='through']"), "Kids away");
