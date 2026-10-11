@@ -1,7 +1,7 @@
 {
   "asOf": "Sun Oct 11 2026",
   "asOfIso": "2026-10-11",
-  "refreshedAt": "2026-10-11T16:29:57.084Z",
+  "refreshedAt": "2026-10-11T16:44:05.945Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -11,165 +11,19 @@
   "homeWeek": {
     "with": "Dad",
     "place": "147th",
-    "through": "Fri Oct 16 · 3:00",
-    "throughLabel": "with Dad @ 147th · Fri Oct 9 3:00 → Fri Oct 16 · 3:00",
-    "endIso": "2026-10-16T20:00:00.000Z"
+    "through": "—",
+    "throughLabel": "with Dad @ 147th"
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "12:00",
-    "place": "Ainsley appt: school absence verification due (portal)",
-    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+    "time": "",
+    "place": "House day @ 147th",
+    "detailHtml": "kids with Dad @ <strong>147th</strong> through —",
     "badge": "Sun",
-    "startIso": "2026-10-11T17:00:00.000Z",
-    "endIso": "2026-10-12T17:00:00.000Z",
-    "kind": "appointment",
-    "queue": [
-      {
-        "label": "Next up · today",
-        "time": "12:00",
-        "place": "Ainsley appt: school absence verification due (portal)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Sun",
-        "startIso": "2026-10-11T17:00:00.000Z",
-        "endIso": "2026-10-12T17:00:00.000Z",
-        "kind": "appointment",
-        "whenLabel": "12:00",
-        "summary": "Ainsley appt: school absence verification due (portal)"
-      },
-      {
-        "label": "Next up · Mon",
-        "time": "7:00",
-        "place": "SRE specials: Music",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-12T12:00:00.000Z",
-        "endIso": "2026-10-12T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Mon 7:00",
-        "summary": "Harris — SRE specials: Music"
-      },
-      {
-        "label": "Next up · Mon",
-        "time": "7:00",
-        "place": "SRE specials: Music",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-12T12:00:00.000Z",
-        "endIso": "2026-10-12T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Mon 7:00",
-        "summary": "Hayes — SRE specials: Music"
-      },
-      {
-        "label": "Next up · Mon",
-        "time": "8:10",
-        "place": "Boys SRE drop",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-12T13:10:00.000Z",
-        "endIso": "2026-10-12T13:40:00.000Z",
-        "kind": "school_drop",
-        "whenLabel": "Mon 8:10",
-        "summary": "Hayes + Harris — SRE drop-off · 8:25"
-      },
-      {
-        "label": "Next up · Mon",
-        "time": "12:00",
-        "place": "Hayes BB: coach in — practices by 19 Oct",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-12T17:00:00.000Z",
-        "endIso": "2026-10-17T17:00:00.000Z",
-        "kind": "other",
-        "whenLabel": "Mon 12:00",
-        "summary": "Hayes BB: coach in — practices by 19 Oct"
-      },
-      {
-        "label": "Next up · Mon",
-        "time": "2:20",
-        "place": "Lindsay appt",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-12T19:20:00.000Z",
-        "endIso": "2026-10-12T21:20:00.000Z",
-        "kind": "appointment",
-        "whenLabel": "Mon 2:20",
-        "summary": "Ainsley — Lindsay appt · 3:00"
-      },
-      {
-        "label": "Next up · Mon",
-        "time": "3:25",
-        "place": "Boys SRE pickup",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-12T20:25:00.000Z",
-        "endIso": "2026-10-12T20:50:00.000Z",
-        "kind": "school_pickup",
-        "whenLabel": "Mon 3:25",
-        "summary": "Hayes + Harris — SRE pickup · 3:45"
-      },
-      {
-        "label": "Next up · Mon",
-        "time": "4:55",
-        "place": "Hayes baseball — Falcons vs Blue Bananas (home)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-12T21:55:00.000Z",
-        "endIso": "2026-10-13T00:20:00.000Z",
-        "kind": "sport",
-        "whenLabel": "Mon 4:55",
-        "summary": "Hayes baseball — Falcons vs Blue Bananas (home) · 5:30 game"
-      },
-      {
-        "label": "Next up · Tue",
-        "time": "7:00",
-        "place": "SRE specials: PE (tennis shoes)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-13T12:00:00.000Z",
-        "endIso": "2026-10-13T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Tue 7:00",
-        "summary": "Harris — SRE specials: PE (tennis shoes)"
-      },
-      {
-        "label": "Next up · Tue",
-        "time": "7:00",
-        "place": "SRE specials: PE (tennis shoes)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-13T12:00:00.000Z",
-        "endIso": "2026-10-13T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "Tue 7:00",
-        "summary": "Hayes — SRE specials: PE (tennis shoes)"
-      },
-      {
-        "label": "Next up · Tue",
-        "time": "8:10",
-        "place": "Boys SRE drop",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-13T13:10:00.000Z",
-        "endIso": "2026-10-13T13:40:00.000Z",
-        "kind": "school_drop",
-        "whenLabel": "Tue 8:10",
-        "summary": "Hayes + Harris — SRE drop-off · 8:25"
-      },
-      {
-        "label": "Next up · Tue",
-        "time": "3:15",
-        "place": "Boys SRE pickup",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-13T20:15:00.000Z",
-        "endIso": "2026-10-13T21:00:00.000Z",
-        "kind": "school_pickup",
-        "whenLabel": "Tue 3:15",
-        "summary": "Hayes + Harris — SRE pickup · 3:40"
-      }
-    ]
+    "startIso": "2026-10-11T16:44:05.945Z",
+    "endIso": "2026-10-11T17:44:05.945Z",
+    "kind": "fallback",
+    "queue": []
   },
   "kids": {
     "harris": {
@@ -301,12 +155,12 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "MON · 7:00",
-        "what": "SRE SPECIALS: MUSIC",
-        "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
+        "when": "SUN · base @ 147th",
+        "what": "YOUR BASE WITH DAD",
+        "where": "through —",
         "badges": [
-          "MON",
-          "7:00"
+          "DAD WEEK",
+          "147th"
         ]
       },
       "today": [
@@ -314,104 +168,12 @@
           "kind": "note",
           "when": "All day",
           "what": "🏡 YOUR BASE with Dad",
-          "hint": "through Fri Oct 16 · 3:00",
+          "hint": "through —",
           "tone": "hot"
         }
       ],
-      "sports": [
-        {
-          "when": "Wed 14 · leave 4:40",
-          "what": "Harris flag practice · 5:30–6:30",
-          "hint": "YOUR board",
-          "tone": "hot"
-        }
-      ],
-      "school": [
-        {
-          "when": "Mon 12 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Mon 12 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Mon 12 · 3:25",
-          "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 13 · 7:00",
-          "what": "SRE specials: PE (tennis shoes)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 13 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 13 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 14 · 7:00",
-          "what": "SRE specials: Art",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 14 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 14 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        }
-      ],
+      "sports": [],
+      "school": [],
       "appointments": []
     },
     "hayes": {
@@ -543,12 +305,12 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "MON · 7:00",
-        "what": "SRE SPECIALS: MUSIC",
-        "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
+        "when": "SUN · base @ 147th",
+        "what": "YOUR BASE WITH DAD",
+        "where": "through —",
         "badges": [
-          "MON",
-          "7:00"
+          "DAD WEEK",
+          "147th"
         ]
       },
       "today": [
@@ -556,116 +318,12 @@
           "kind": "note",
           "when": "All day",
           "what": "🏡 DROP ZONE HQ with Dad",
-          "hint": "through Fri Oct 16 · 3:00",
+          "hint": "through —",
           "tone": "hot"
         }
       ],
-      "sports": [
-        {
-          "when": "Mon 12 · leave 4:55",
-          "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "when": "Thu 15 · leave 5:40",
-          "what": "Hayes flag practice",
-          "hint": "YOUR board",
-          "tone": "hot"
-        }
-      ],
-      "school": [
-        {
-          "when": "Mon 12 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Mon 12 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Mon 12 · 3:25",
-          "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 13 · 7:00",
-          "what": "SRE specials: PE (tennis shoes)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 13 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 13 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 14 · 7:00",
-          "what": "SRE specials: Art + Library (library book)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 14 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 14 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 7:00",
-          "what": "SRE specials: Spanish",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 12:00",
-          "what": "SRE Chat & Chew lunch",
-          "tone": "act",
-          "hint": ""
-        }
-      ],
+      "sports": [],
+      "school": [],
       "appointments": []
     },
     "ainsley": {
@@ -776,7 +434,7 @@
       "bag": {
         "place": "Dad",
         "label": "This week @ Dad · bag",
-        "hint": "147th through Fri Oct 16 · 3:00 · pack for Dad week"
+        "hint": "147th through — · pack for Dad week"
       },
       "rides": [
         {
@@ -802,90 +460,26 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "SUN · 12:00",
-        "what": "AINSLEY APPT: SCHOOL ABSENCE VERIFICATION DUE (P",
-        "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
+        "when": "SUN · base @ 147th",
+        "what": "YOUR BASE WITH DAD",
+        "where": "through —",
         "badges": [
-          "SUN",
-          "12:00"
+          "DAD WEEK",
+          "147th"
         ]
       },
       "today": [
         {
-          "kind": "event",
-          "when": "Sun · 12:00",
-          "what": "Ainsley appt: school absence verification due (portal)",
-          "hint": "",
-          "tone": "hot"
-        },
-        {
           "kind": "note",
           "when": "All day",
           "what": "Base @ 147th with Dad",
-          "hint": "through Fri Oct 16 · 3:00",
+          "hint": "through —",
           "tone": "hot"
         }
       ],
-      "sports": [
-        {
-          "when": "Wed 14 · leave 4:00",
-          "what": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
-          "when": "Thu 15 · leave 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        }
-      ],
-      "school": [
-        {
-          "when": "Tue 13 · 4:45",
-          "what": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 14 · 12:00",
-          "what": "choir Sing & Share permission form due",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 14 · 3:50",
-          "what": "LKMS Math Counts info meeting · 3:15–4:00 · pickup 4:00",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 12:45",
-          "what": "LKMS choir Sing & Share field trip",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 3:50",
-          "what": "LKMS Homework Help · 3:00–4:00 · pickup 4:00",
-          "tone": "act",
-          "hint": ""
-        }
-      ],
-      "appointments": [
-        {
-          "when": "Sun 11 · 12:00",
-          "what": "Ainsley appt: school absence verification due (portal)",
-          "hint": "with Dad",
-          "tone": "hot"
-        },
-        {
-          "when": "Mon 12 · 2:20",
-          "what": "Lindsay appt",
-          "hint": "with Dad",
-          "tone": "hot"
-        }
-      ]
+      "sports": [],
+      "school": [],
+      "appointments": []
     },
     "dan": {
       "id": "dan",
@@ -933,7 +527,7 @@
       "hottest": {
         "when": "Sun Oct 11 2026 · kids with you @ 147th",
         "what": "Dad week live",
-        "where": "through Fri Oct 16 · 3:00",
+        "where": "through —",
         "badges": [
           "Dad week",
           "147th"
@@ -941,136 +535,16 @@
       },
       "today": [
         {
-          "when": "Sun · 12:00",
-          "what": "Ainsley appt: school absence verification due (portal)",
-          "tone": "hot"
-        },
-        {
           "when": "home week",
-          "what": "Kids with Dad @ 147th through Fri Oct 16 · 3:00",
+          "what": "Kids with Dad @ 147th through —",
           "tone": "hot"
         }
       ],
       "week": [
         {
-          "when": "Sun 11 · 12:00",
-          "what": "Ainsley appt: school absence verification due (portal)",
-          "tone": "act"
-        },
-        {
-          "when": "Mon 12 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act"
-        },
-        {
-          "when": "Mon 12 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act"
-        },
-        {
-          "when": "Mon 12 · 2:20",
-          "what": "Lindsay appt",
-          "tone": "act"
-        },
-        {
-          "when": "Mon 12 · 3:25",
-          "what": "SRE pickup",
-          "tone": "act"
-        },
-        {
-          "when": "Mon 12 · 4:55",
-          "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
+          "when": "through —",
+          "what": "Kids with Dad @ 147th",
           "tone": "hot"
-        },
-        {
-          "when": "Tue 13 · 7:00",
-          "what": "SRE specials: PE (tennis shoes)",
-          "tone": "act"
-        },
-        {
-          "when": "Tue 13 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act"
-        },
-        {
-          "when": "Tue 13 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act"
-        },
-        {
-          "when": "Tue 13 · 4:45",
-          "what": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 14 · 7:00",
-          "what": "SRE specials: Art + Library (library book)",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 14 · 7:00",
-          "what": "SRE specials: Art",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 14 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 14 · 12:00",
-          "what": "choir Sing & Share permission form due",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 14 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 14 · 3:50",
-          "what": "LKMS Math Counts info meeting · 3:15–4:00 · pickup 4:00",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 14 · 4:00",
-          "what": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
-          "tone": "hot"
-        },
-        {
-          "when": "Wed 14 · 4:40",
-          "what": "Harris flag practice · 5:30–6:30",
-          "tone": "hot"
-        },
-        {
-          "when": "Thu 15 · 7:00",
-          "what": "SRE specials: Spanish",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 12:45",
-          "what": "LKMS choir Sing & Share field trip",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 3:50",
-          "what": "LKMS Homework Help · 3:00–4:00 · pickup 4:00",
-          "tone": "act"
         }
       ]
     }
