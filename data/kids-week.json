@@ -771,12 +771,12 @@
       "goal": {
         "name": "Tour Jar",
         "need": 20,
-        "placeholder": "Tour Jar · $20"
+        "placeholder": "Tour Jar"
       },
       "bag": {
         "place": "Dad",
         "label": "This week @ Dad · bag",
-        "hint": "147th through Fri Oct 2 · pack for Dad week"
+        "hint": "147th through Fri Oct 16 · 3:00 · pack for Dad week"
       },
       "rides": [
         {
