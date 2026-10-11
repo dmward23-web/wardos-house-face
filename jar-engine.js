@@ -477,21 +477,9 @@
   function loadCreatureSprites() {
     if (loadCreatureSprites.started) return;
     loadCreatureSprites.started = true;
-    var root = "plates/2026-10-05/ori-layers/creature/";
-    loadSprite([
-      root + "fallback.png",
-      root + "body.png",
-      root + "chrome.png",
-      root + "creature.png",
-      root + "open.png",
-      root + "idle.png",
-      "art/creature/fallback.png"
-    ], "fallback");
-    loadSprite([
-      root + "closed.png",
-      root + "blink.png",
-      "art/creature/closed.png"
-    ], "closed");
+    /* NO404 · only sprites that ship (the plates/ layers never deployed) */
+    loadSprite(["art/creature/fallback.png"], "fallback");
+    loadSprite(["art/creature/closed.png"], "closed");
   }
 
   Jar.prototype.paintFallback = function (st, t) {

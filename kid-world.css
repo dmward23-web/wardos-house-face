@@ -584,3 +584,9 @@ body.theme-ainsley.kw-on .kw-jar-host { left: 30%; bottom: 4%; }
 }
 @keyframes kw-iris { to { transform: scale(1); } }
 html.kw-reduce .kw-iris::before { animation: none; transform: scale(1); }
+
+/* CHESTFLY1 · done chore flies into the jar */
+.kw-fly-orb { width: 60px; height: 60px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,240,180,1) 0%, rgba(255,210,110,.85) 35%, rgba(255,190,80,0) 70%);
+  box-shadow: 0 0 28px 10px rgba(255,214,120,.55); }
+.kw-fly-txt { font: 800 13px/1.1 system-ui, sans-serif; color: #fff6dc; text-shadow: 0 1px 4px rgba(0,0,0,.8); white-space: nowrap; }

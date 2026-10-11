@@ -1679,6 +1679,35 @@
     }
     return null;
   }
+  /* CHESTFLY1 · a done chore visibly travels into the jar: glow + label shrink along an arc, jar pulses. */
+  function flyToJar(x, y, label) {
+    try {
+      var host = document.querySelector("[data-kw-jar]");
+      var r = host ? host.getBoundingClientRect() : null;
+      var tx = r && r.width ? r.left + r.width / 2 : innerWidth / 2;
+      var ty = r && r.height ? r.top + r.height * 0.45 : innerHeight - 120;
+      var el = document.createElement("div");
+      el.className = "kw-fly";
+      el.setAttribute("aria-hidden", "true");
+      el.innerHTML = '<span class="kw-fly-orb"></span><span class="kw-fly-txt"></span>';
+      el.querySelector(".kw-fly-txt").textContent = String(label || "").replace(/^[^A-Za-z]+/, "").split(/[—·]/)[0].trim().slice(0, 22);
+      el.style.cssText = "position:fixed;left:0;top:0;z-index:70;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:4px;transform:translate(" + (x - 30) + "px," + (y - 30) + "px)";
+      document.body.appendChild(el);
+      var mx = (x + tx) / 2, my = Math.min(y, ty) - 120;
+      var dur = reduced ? 1 : 900;
+      var anim = el.animate([
+        { transform: "translate(" + (x - 30) + "px," + (y - 30) + "px) scale(1)", opacity: 1 },
+        { transform: "translate(" + (mx - 30) + "px," + (my - 30) + "px) scale(.85)", opacity: 1, offset: 0.45 },
+        { transform: "translate(" + (tx - 30) + "px," + (ty - 30) + "px) scale(.2)", opacity: 0.2 }
+      ], { duration: dur, easing: "cubic-bezier(.45,0,.2,1)", fill: "forwards" });
+      anim.onfinish = function () {
+        el.remove();
+        if (host && host.animate && !reduced) host.animate([{ transform: "scale(1)" }, { transform: "scale(1.14)" }, { transform: "scale(1)" }], { duration: 420, easing: "ease-out" });
+      };
+      setTimeout(function () { if (el.parentNode) el.remove(); }, dur + 400);
+    } catch (e) { /* never block a tap */ }
+  }
+
   function onWorldDown(ev) {
     if (!ev.isTrusted) return;
     var q = hitQuest(ev);
@@ -1688,6 +1717,7 @@
     for (var hi = 0; hi < bg.hits.length; hi++) if (bg.hits[hi] === q) idx = hi;
     feed = { t0: (performance.now() - bg.t0) / 1000, index: idx, label: q.label };
     q.btn.click();
+    if (!was) flyToJar(ev.clientX, ev.clientY, q.label); /* CHESTFLY1 */
     burstAt = feed.t0;
     if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap();
     if (!was && global.JarEngine && JarEngine.tone) JarEngine.tone("gulp");
@@ -1699,7 +1729,7 @@
         html: "<p>" + (!was ? "It settles into the jar." : (q.btn.classList.contains("done") ? "The light keeps that." : "The jar eases back.")) + "</p>",
         paint: vignette(kindFor(q.label))
       });
-    }, 30);
+    }, was || reduced ? 30 : 1350); /* CHESTFLY1 · let the flight land first */
   }
 
   function goHome(x, y) {
