@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-11T02:51:56.255Z",
+  "fetchedAt": "2026-10-11T03:02:05.925Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-17",
@@ -400,6 +400,15 @@
       "start": "2026-10-17T08:00:00-05:00",
       "end": "2026-10-17T09:30:00-05:00",
       "location": "Heritage Park Soccer Complex, Field 10, 17255 S Black Bob Rd, Olathe, KS 66062",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "77hkmlh8bkk80h1bklk2flra90",
+      "summary": "Flight to Cleveland (WN 4778)",
+      "start": "2026-10-17T15:30:00-05:00",
+      "end": "2026-10-17T17:00:00-05:00",
+      "location": "Nashville BNA",
       "busy": false,
       "allDay": false
     },
