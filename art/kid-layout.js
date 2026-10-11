@@ -250,14 +250,15 @@
   function placeLabels(world, rawLabels, W, H, panX) {
     var plates = root.HousePlates || {};
     var marks = (plates[world] && plates[world].landmarks) || [];
-    var n = Math.min(rawLabels.length, marks.length || rawLabels.length);
+    /* KIDWEEKLY1 · never drop a must: every quest gets a seat (extra seats fan out, then pushApart) */
+    var n = rawLabels.length;
     var ms = markerPx(W);
     var dim = markerDraw(world, ms);
     var maxW = Math.min(132, W * 0.32);
     var items = [];
     var i;
     for (i = 0; i < n; i++) {
-      var ledge = marks[i] || { x: 0.5, y: 0.4, depth: 0.35 };
+      var ledge = marks[i] || { x: 0.25 + ((i * 0.37) % 0.5), y: 0.2 + ((i * 0.13) % 0.5), depth: 0.35 };
       var chip = shortLabel(rawLabels[i]);
       var met = metrics(chip, maxW);
       var depth = ledge.depth == null ? 0.35 : ledge.depth;

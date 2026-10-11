@@ -25,7 +25,7 @@ const labels = {};
 for (const id of ["hayes", "harris", "ainsley"]) {
   const quests = (week.kids[id] && week.kids[id].quests) || [];
   labels[id] = quests
-    .filter((q) => !q.optional && (q.cadence || "daily") === "daily")
+    .filter((q) => !q.optional && (q.cadence || "daily") !== "addon") /* KIDWEEKLY1 · weekly musts are markers too */
     .map((q) => q.what);
   const shown = labels[id].map((s) => sandbox.KidLayout.shortLabel(s));
   console.log(id, shown.join(" | "));

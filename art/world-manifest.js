@@ -21,7 +21,11 @@
     { x: 0.82, y: 0.46, depth: 0.35, scale: 1 },
     { x: 0.62, y: 0.52, depth: 0.35, scale: 1 },
     { x: 0.86, y: 0.58, depth: 0.35, scale: 1 },
-    { x: 0.14, y: 0.70, depth: 0.60, scale: 1 }
+    { x: 0.14, y: 0.70, depth: 0.60, scale: 1 },
+    /* KIDWEEKLY1 · seats for weekly musts (8–10 musts) */
+    { x: 0.80, y: 0.20, depth: 0.35, scale: 1 },
+    { x: 0.44, y: 0.62, depth: 0.45, scale: 1 },
+    { x: 0.50, y: 0.14, depth: 0.35, scale: 1 }
   ];
   var HAYES_SCENE = [
     { stamp: 1, x: 0.82, y: 0.20, scale: 0.40, depth: 0.08, haze: 0.58, flip: true },
@@ -80,7 +84,10 @@
         { x: 0.82, y: 0.36, depth: 0.35, scale: 1, kind: "geode" },
         { x: 0.48, y: 0.54, depth: 0.35, scale: 1, kind: "block" },
         { x: 0.84, y: 0.58, depth: 0.35, scale: 1, kind: "shard" },
-        { x: 0.18, y: 0.66, depth: 0.35, scale: 1, kind: "node" }
+        { x: 0.18, y: 0.66, depth: 0.35, scale: 1, kind: "node" },
+        { x: 0.84, y: 0.18, depth: 0.35, scale: 1, kind: "geode" },
+        { x: 0.50, y: 0.42, depth: 0.35, scale: 1, kind: "crystal" },
+        { x: 0.54, y: 0.15, depth: 0.35, scale: 1, kind: "block" }
       ]
     },
     ainsley: {
@@ -103,7 +110,10 @@
         { x: 0.46, y: 0.14, depth: 0.35, scale: 1, kind: "shore" },
         { x: 0.46, y: 0.60, depth: 0.35, scale: 1, kind: "shore" },
         { x: 0.82, y: 0.62, depth: 0.35, scale: 1, kind: "shore" },
-        { x: 0.18, y: 0.68, depth: 0.35, scale: 1, kind: "dock" }
+        { x: 0.18, y: 0.68, depth: 0.35, scale: 1, kind: "dock" },
+        { x: 0.84, y: 0.42, depth: 0.35, scale: 1, kind: "tree" },
+        { x: 0.50, y: 0.38, depth: 0.35, scale: 1, kind: "shore" },
+        { x: 0.86, y: 0.15, depth: 0.35, scale: 1, kind: "tree" }
       ]
     },
     mercury: {
