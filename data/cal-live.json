@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-11T23:51:31.741Z",
+  "fetchedAt": "2026-10-11T23:52:42.326Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
-  "windowEnd": "2026-10-17",
+  "windowEnd": "2026-10-18",
   "asOfIso": "2026-10-11",
   "nextLeave": {
     "id": "1ni8dem5hrho45a0csgj81r3i4_20261012T131000Z",
@@ -16,6 +16,15 @@
     "allDay": false
   },
   "upcomingLeaves": [
+    {
+      "id": "5j2pksbrn1i6eqg2r0i0p9iruk",
+      "summary": "Hayes + Harris — SRE Orange Day",
+      "start": "2026-10-12T00:00:00-05:00",
+      "end": "2026-10-13T00:00:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": true
+    },
     {
       "id": "bl640l6g1pnc7auq8stliuirqc",
       "summary": "Hayes BB: coach in — practices by 19 Oct",
@@ -78,6 +87,15 @@
       "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
       "busy": true,
       "allDay": false
+    },
+    {
+      "id": "hiah6oggslaccjgvq07spa821o",
+      "summary": "Hayes + Harris — SRE Yellow Day",
+      "start": "2026-10-13T00:00:00-05:00",
+      "end": "2026-10-14T00:00:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": true
     },
     {
       "id": "jmgnpuvk85bkpthecq6lvoe0hk",
@@ -179,6 +197,15 @@
       "allDay": true
     },
     {
+      "id": "vghbnvkm369c4sjp18ltguh9r4",
+      "summary": "Hayes + Harris — SRE Green Day",
+      "start": "2026-10-14T00:00:00-05:00",
+      "end": "2026-10-15T00:00:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": true
+    },
+    {
       "id": "crjbljb7v28p7q9ml7mniolm6k",
       "summary": "Hayes — SRE specials: Art + Library (library book)",
       "start": "2026-10-14T07:00:00-05:00",
@@ -249,6 +276,15 @@
       "location": "Blue Valley District Offices, 15020 Metcalf Ave, Overland Park, KS",
       "busy": false,
       "allDay": false
+    },
+    {
+      "id": "44bg4l5n1gfsl9t8lmjlbt33hc",
+      "summary": "Hayes + Harris — SRE Red Day",
+      "start": "2026-10-15T00:00:00-05:00",
+      "end": "2026-10-16T00:00:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": true
     },
     {
       "id": "1ta74oof602ddah7vbmqtpmb4g",
@@ -350,8 +386,17 @@
       "allDay": true
     },
     {
+      "id": "7sd890a027pi1u1cf20t3rbin4",
+      "summary": "Hayes + Harris — SRE Orange Day",
+      "start": "2026-10-16T00:00:00-05:00",
+      "end": "2026-10-17T00:00:00-05:00",
+      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": true
+    },
+    {
       "id": "dutfnpmlnngr5qaph6eaaks17g",
-      "summary": "SRE Fall Family Fun Night (Allen)",
+      "summary": "Hayes + Harris — SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
       "start": "2026-10-16T00:00:00-05:00",
       "end": "2026-10-17T00:00:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
@@ -427,6 +472,15 @@
       "start": "2026-10-17T19:00:00-05:00",
       "end": "2026-10-17T22:00:00-05:00",
       "location": "Progressive Field, Cleveland, OH",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "dopoqm5v0vea68hneo5ab69e7g",
+      "summary": "Erin + Dan — Live on the Green (Guster + Grace Potter)",
+      "start": "2026-10-18T16:30:00-05:00",
+      "end": "2026-10-18T21:00:00-05:00",
+      "location": "Ascend Federal Credit Union Amphitheater, Nashville, TN",
       "busy": true,
       "allDay": false
     }

@@ -1,7 +1,7 @@
 {
   "asOf": "Sun Oct 11 2026",
   "asOfIso": "2026-10-11",
-  "refreshedAt": "2026-10-11T23:51:31.334Z",
+  "refreshedAt": "2026-10-11T23:52:41.841Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -60,6 +60,18 @@
         "kind": "school_drop",
         "whenLabel": "Mon 8:10",
         "summary": "Hayes + Harris — SRE drop-off · 8:25"
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "12:00",
+        "place": "SRE Orange Day",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-12T17:00:00.000Z",
+        "endIso": "2026-10-13T17:00:00.000Z",
+        "kind": "other",
+        "whenLabel": "Mon 12:00",
+        "summary": "Hayes + Harris — SRE Orange Day"
       },
       {
         "label": "Next up · Mon",
@@ -147,27 +159,15 @@
       },
       {
         "label": "Next up · Tue",
-        "time": "1:00",
-        "place": "Lindsay appt · 1:00 (provider Floyd)",
+        "time": "12:00",
+        "place": "SRE Yellow Day",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Tue",
-        "startIso": "2026-10-13T18:00:00.000Z",
-        "endIso": "2026-10-13T18:30:00.000Z",
+        "startIso": "2026-10-13T17:00:00.000Z",
+        "endIso": "2026-10-14T17:00:00.000Z",
         "kind": "other",
-        "whenLabel": "Tue 1:00",
-        "summary": "Hayes — Lindsay appt · 1:00 (provider Floyd)"
-      },
-      {
-        "label": "Next up · Tue",
-        "time": "1:30",
-        "place": "Lindsay appt",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-13T18:30:00.000Z",
-        "endIso": "2026-10-13T19:00:00.000Z",
-        "kind": "other",
-        "whenLabel": "Tue 1:30",
-        "summary": "Harris — Lindsay appt · 1:30"
+        "whenLabel": "Tue 12:00",
+        "summary": "Hayes + Harris — SRE Yellow Day"
       }
     ]
   },
