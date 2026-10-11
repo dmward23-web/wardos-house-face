@@ -642,7 +642,8 @@ function hottestFor(kidId, items, now, homeWeek) {
   mine.sort((a, b) => a.start - b.start || stripPriority(a) - stripPriority(b));
   /* KIDRIDE1: on a day with his own pickup/drop-off, that ride is the top card */
   const first = mine[0];
-  const ride = first && mine.find((x) => x.kidRide && partsInTZ(x.start).iso === partsInTZ(first.start).iso);
+  const firstIso = first ? partsInTZ(first.start < now ? now : first.start).iso : "";
+  const ride = first && mine.find((x) => x.kidRide && x.start >= now && partsInTZ(x.start).iso === firstIso); /* DADSPAN1 · same day as the real next thing */
   const hit = ride || first;
   const mom = homeWeek && homeWeek.with === "Mom";
   if (!hit) {
@@ -791,7 +792,19 @@ function main() {
   const now = chicagoNow(args.nowIso);
   const nowP = partsInTZ(now);
   const events = loadEvents(args.eventsPath);
-  const items = buildBoardItems(events, now);
+  /* DADSPAN1 · kid/strip/ride logistics only inside a "Kids with Dan" span. */
+  const allItems = buildBoardItems(events, now);
+  const spans = allItems.filter((it) => it.kind === "custody");
+  const isKidLogistics = (it) => {
+    if (it.kind === "custody") return false;
+    if (it.kid || it.kidRide || it.ride || it.kind === "school_drop" || it.kind === "school_pickup" || it.kind === "sport") return true;
+    const m = kidMentions(it.raw || it.summary || "");
+    return !!(m.hayes || m.harris || m.ainsley);
+  };
+  const inDadSpan = (it) => spans.some((c) => it.start >= c.start && it.start < c.end);
+  const nowInSpan = spans.some((c) => now >= c.start && now < c.end);
+  /* an all-day kid note that started in Dad's span doesn't carry into the kids-away days */
+  const items = allItems.filter((it) => !isKidLogistics(it) || (inDadSpan(it) && (nowInSpan || it.start >= now)));
   const homeWeek = custodyFromItems(items, now);
   const queue = pickStripQueue(items, now, homeWeek);
   const head = queue[0] || {
