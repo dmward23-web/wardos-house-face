@@ -1,7 +1,7 @@
 {
   "asOf": "Sun Oct 11 2026",
   "asOfIso": "2026-10-11",
-  "refreshedAt": "2026-10-11T18:14:57.223Z",
+  "refreshedAt": "2026-10-11T18:23:20.547Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -147,6 +147,18 @@
       },
       {
         "label": "Next up · Tue",
+        "time": "1:00",
+        "place": "Lindsay appt · 1:00 (provider Floyd)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-13T18:00:00.000Z",
+        "endIso": "2026-10-13T18:30:00.000Z",
+        "kind": "other",
+        "whenLabel": "Tue 1:00",
+        "summary": "Hayes — Lindsay appt · 1:00 (provider Floyd)"
+      },
+      {
+        "label": "Next up · Tue",
         "time": "3:15",
         "place": "Boys SRE pickup",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -156,18 +168,6 @@
         "kind": "school_pickup",
         "whenLabel": "Tue 3:15",
         "summary": "Hayes + Harris — SRE pickup · 3:40"
-      },
-      {
-        "label": "Next up · Tue",
-        "time": "4:45",
-        "place": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-13T21:45:00.000Z",
-        "endIso": "2026-10-14T00:45:00.000Z",
-        "kind": "school",
-        "whenLabel": "Tue 4:45",
-        "summary": "Ainsley — LKMS choir Fall Concert · call 5:00 / starts 5:30"
       }
     ]
   },
