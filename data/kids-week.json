@@ -1,7 +1,7 @@
 {
   "asOf": "Sun Oct 11 2026",
   "asOfIso": "2026-10-11",
-  "refreshedAt": "2026-10-11T23:52:41.841Z",
+  "refreshedAt": "2026-10-11T23:53:10.529Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -69,7 +69,7 @@
         "badge": "Mon",
         "startIso": "2026-10-12T17:00:00.000Z",
         "endIso": "2026-10-13T17:00:00.000Z",
-        "kind": "other",
+        "kind": "school",
         "whenLabel": "Mon 12:00",
         "summary": "Hayes + Harris — SRE Orange Day"
       },
@@ -165,7 +165,7 @@
         "badge": "Tue",
         "startIso": "2026-10-13T17:00:00.000Z",
         "endIso": "2026-10-14T17:00:00.000Z",
-        "kind": "other",
+        "kind": "school",
         "whenLabel": "Tue 12:00",
         "summary": "Hayes + Harris — SRE Yellow Day"
       }
@@ -340,6 +340,12 @@
           "hint": ""
         },
         {
+          "when": "Mon 12 · 12:00",
+          "what": "SRE Orange Day",
+          "tone": "act",
+          "hint": ""
+        },
+        {
           "when": "Mon 12 · 3:25",
           "what": "SRE pickup",
           "tone": "act",
@@ -354,6 +360,12 @@
         {
           "when": "Tue 13 · 8:10",
           "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 12:00",
+          "what": "SRE Yellow Day",
           "tone": "act",
           "hint": ""
         },
@@ -376,6 +388,12 @@
           "hint": ""
         },
         {
+          "when": "Wed 14 · 12:00",
+          "what": "SRE Green Day",
+          "tone": "act",
+          "hint": ""
+        },
+        {
           "when": "Wed 14 · 3:15",
           "what": "SRE pickup",
           "tone": "act",
@@ -394,6 +412,12 @@
           "hint": ""
         },
         {
+          "when": "Thu 15 · 12:00",
+          "what": "SRE Red Day",
+          "tone": "act",
+          "hint": ""
+        },
+        {
           "when": "Thu 15 · 3:15",
           "what": "SRE pickup",
           "tone": "act",
@@ -408,6 +432,18 @@
         {
           "when": "Fri 16 · 8:10",
           "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 16 · 12:00",
+          "what": "SRE Orange Day",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 16 · 12:00",
+          "what": "SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
           "tone": "act",
           "hint": ""
         }
@@ -588,6 +624,12 @@
           "hint": ""
         },
         {
+          "when": "Mon 12 · 12:00",
+          "what": "SRE Orange Day",
+          "tone": "act",
+          "hint": ""
+        },
+        {
           "when": "Mon 12 · 3:25",
           "what": "SRE pickup",
           "tone": "act",
@@ -602,6 +644,12 @@
         {
           "when": "Tue 13 · 8:10",
           "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · 12:00",
+          "what": "SRE Yellow Day",
           "tone": "act",
           "hint": ""
         },
@@ -624,6 +672,12 @@
           "hint": ""
         },
         {
+          "when": "Wed 14 · 12:00",
+          "what": "SRE Green Day",
+          "tone": "act",
+          "hint": ""
+        },
+        {
           "when": "Wed 14 · 3:15",
           "what": "SRE pickup",
           "tone": "act",
@@ -642,6 +696,12 @@
           "hint": ""
         },
         {
+          "when": "Thu 15 · 12:00",
+          "what": "SRE Red Day",
+          "tone": "act",
+          "hint": ""
+        },
+        {
           "when": "Thu 15 · 3:15",
           "what": "SRE pickup",
           "tone": "act",
@@ -656,6 +716,18 @@
         {
           "when": "Fri 16 · 8:10",
           "what": "SRE drop-off",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 16 · 12:00",
+          "what": "SRE Orange Day",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 16 · 12:00",
+          "what": "SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
           "tone": "act",
           "hint": ""
         },
@@ -968,6 +1040,11 @@
           "tone": "act"
         },
         {
+          "when": "Mon 12 · 12:00",
+          "what": "SRE Orange Day",
+          "tone": "act"
+        },
+        {
           "when": "Mon 12 · 2:20",
           "what": "Lindsay appt",
           "tone": "act"
@@ -990,6 +1067,11 @@
         {
           "when": "Tue 13 · 8:10",
           "what": "SRE drop-off",
+          "tone": "act"
+        },
+        {
+          "when": "Tue 13 · 12:00",
+          "what": "SRE Yellow Day",
           "tone": "act"
         },
         {
@@ -1020,6 +1102,11 @@
         {
           "when": "Wed 14 · 12:00",
           "what": "choir Sing & Share permission form due",
+          "tone": "act"
+        },
+        {
+          "when": "Wed 14 · 12:00",
+          "what": "SRE Green Day",
           "tone": "act"
         },
         {
@@ -1055,21 +1142,6 @@
         {
           "when": "Thu 15 · 8:10",
           "what": "SRE drop-off",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 12:45",
-          "what": "LKMS choir Sing & Share field trip",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 3:50",
-          "what": "LKMS Homework Help · 3:00–4:00 · pickup 4:00",
           "tone": "act"
         }
       ]
