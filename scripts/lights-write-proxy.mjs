@@ -124,7 +124,36 @@ function saveTaps(taps) {
 const HOUSE_ORIGINS = new Set(
   (process.env.HOUSE_ORIGINS || "https://dmward23-web.github.io").split(",").map((s) => s.trim()).filter(Boolean)
 );
-const HOUSE_ROUTES = /^\/api\/(taps|lights(\/set|\/refresh)?|sensi(\/set)?)$/;
+/* LOCK2 · thermostat + Spotify always need the key. No-key (origin) is only lights + taps. */
+const HOUSE_ROUTES = /^\/api\/(taps|lights(\/set)?)$/;
+/* LOCK2 · rate limit no-key traffic (Origin is forgeable outside a browser). */
+const RL = new Map();
+function rateOk(bucket, limit, windowMs) {
+  const now = Date.now();
+  const arr = (RL.get(bucket) || []).filter((t) => now - t < windowMs);
+  if (arr.length >= limit) { RL.set(bucket, arr); return false; }
+  arr.push(now); RL.set(bucket, arr);
+  if (RL.size > 5000) RL.clear();
+  return true;
+}
+function clientIp(req) {
+  return String(req.headers["cf-connecting-ip"] || req.headers["x-forwarded-for"] || req.socket.remoteAddress || "?").split(",")[0].trim();
+}
+/** returns "" when allowed, else reason. Only called for no-key requests. */
+function houseRateCheck(req, pathname) {
+  const ip = clientIp(req);
+  if (req.method !== "POST") return rateOk("r:" + ip, 240, 60000) ? "" : "rate";
+  if (pathname.startsWith("/api/lights")) {
+    if (!rateOk("lw:" + ip, 20, 60000) || !rateOk("lw:all", 60, 60000)) return "rate";
+    return "";
+  }
+  return rateOk("tw:" + ip, 120, 60000) && rateOk("tw:all", 600, 60000) ? "" : "rate";
+}
+function hasKeyHeader(req, args) {
+  if (!args.authToken) return false;
+  const h = req.headers["x-lights-proxy-token"] || req.headers["x-nest-proxy-token"] || (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+  return h === args.authToken;
+}
 function houseOrigin(req) {
   return HOUSE_ORIGINS.has(String(req.headers.origin || ""));
 }
@@ -132,7 +161,8 @@ function houseOrigin(req) {
 function checkAuth(req, args) {
   try {
     const p = new URL(req.url || "/", "http://x").pathname;
-    if (houseOrigin(req) && HOUSE_ROUTES.test(p)) return true;
+    if (hasKeyHeader(req, args)) return true;
+    if (houseOrigin(req) && HOUSE_ROUTES.test(p)) { req._noKey = true; return true; }
   } catch { /* fall through */ }
   // Always require token when set (even on localhost) so tunnel cannot be open.
   if (!args.authToken) {
@@ -431,6 +461,9 @@ async function main() {
           error: "unauthorized · need X-Lights-Proxy-Token / ?proxyToken=",
         });
       }
+      if (req._noKey && houseRateCheck(req, pathname)) {
+        return json(res, 429, { error: "slow down" });
+      }
 
       /* TAPSYNC1 · kids chore taps shared across every device (same key + tunnel) */
       if (pathname === "/api/taps" && (req.method === "GET" || req.method === "POST")) {
@@ -563,6 +596,9 @@ async function main() {
           }
           argv = ["--id", id];
           if (typeof body.on === "boolean") argv.push("--on", body.on ? "true" : "false");
+          if (body.brightness != null && !(typeof body.brightness === "number" && body.brightness >= 0 && body.brightness <= 100)) {
+            return json(res, 400, { error: "brightness 0-100" });
+          }
           if (typeof body.brightness === "number") {
             argv.push("--brightness", String(Math.round(body.brightness)));
           }

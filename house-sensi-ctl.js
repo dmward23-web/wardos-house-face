@@ -23,7 +23,7 @@
   }
   function api(path, body) {
     var b = base();
-    if (!b || (!token() && !/\.github\.io$/i.test(location.hostname))) return Promise.reject(new Error("nokey")); /* NOKEY1 */
+    if (!b || !token()) return Promise.reject(new Error("nokey")); /* LOCK2 · thermostat keeps the key */
     return fetch(b + path, body ? { method: "POST", headers: headers(), body: JSON.stringify(body) } : { headers: headers(), cache: "no-store" })
       .then(function (r) { return r.json().then(function (j) { if (!r.ok || !j.ok) throw new Error(j.error || ("HTTP " + r.status)); return j; }); });
   }
