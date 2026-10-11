@@ -173,6 +173,9 @@
   var plates = {};
   var platesReady = false;
   var feed = null;
+  /* One slot used to own every chest. A second tap replaced it, the first
+     lid lost its clock, and the scene on top ate the next check. */
+  var drops = [];
   var gyro = { gamma: 0, beta: 48, on: false };
   var oriCreature = {};
   var oriItems = {};
@@ -692,7 +695,7 @@
     var shown = quests.slice(0, cap);
     layoutLedges(shown, W, H, world, px);
     shown.forEach(function (q, i) {
-      var open = q.done || (feed && feed.index === i && t < feed.t0 + 2.4);
+      var open = q.done || markerAge(i, t) >= 0;
       drawMarker(ctx, q, world, i, open, t);
       drawLight(ctx, q);
     });
@@ -708,10 +711,12 @@
     var anchor = creatureAnchor(W, H);
     var jx = anchor.cx;
     var jy = anchor.jy + anchor.jh * 0.42;
-    if (feed && shown[feed.index]) {
-      var fq = shown[feed.index];
+    for (var di = 0; di < drops.length; di++) {
+      var d = drops[di];
+      var fq = shown[d.index];
+      if (!fq) continue;
       var fromY = fq.ledY != null ? fq.ledY : fq.y;
-      feedDrops(ctx, t, feed.t0, fq.x, fromY, jx, jy);
+      feedDrops(ctx, t, d.t0, fq.x, fromY, jx, jy);
     }
     warmth(ctx, W, H, fill);
     return shown;
@@ -1057,17 +1062,18 @@
     var shown = quests.slice(0, cap);
     layoutLedges(shown, W, H, "harris", px);
     shown.forEach(function (q, i) {
-      var open = q.done || (feed && feed.index === i && t < feed.t0 + 2.4);
+      var open = q.done || markerAge(i, t) >= 0;
       drawMarker(ctx, q, "harris", i, open, t);
       drawLight(ctx, q);
     });
     var anchor = creatureAnchor(W, H);
     var jx = anchor.cx, jy = anchor.jy + anchor.jh * 0.42;
-    if (feed && shown[feed.index]) {
-      var fq = shown[feed.index];
-      feedDrops(ctx, t, feed.t0, fq.x, fq.ledY || fq.seat, jx, jy);
-      /* completion is the marker and the mote stream, not a banner */
-      burst(ctx, t, feed.t0, fq.x, fq.ledY || fq.seat, "#d8ffc4");
+    for (var di = 0; di < drops.length; di++) {
+      var d = drops[di];
+      var fq = shown[d.index];
+      if (!fq) continue;
+      feedDrops(ctx, t, d.t0, fq.x, fq.ledY || fq.seat, jx, jy);
+      burst(ctx, t, d.t0, fq.x, fq.ledY || fq.seat, "#d8ffc4");
     }
     warmth(ctx, W, H, fill);
     return shown;
@@ -1142,17 +1148,18 @@
     var shown = quests.slice(0, cap);
     layoutLedges(shown, W, H, "ainsley", px);
     shown.forEach(function (q, i) {
-      var open = q.done || (feed && feed.index === i && t < feed.t0 + 2.4);
+      var open = q.done || markerAge(i, t) >= 0;
       drawMarker(ctx, q, "ainsley", i, open, t);
       drawLight(ctx, q);
     });
     var anchor = creatureAnchor(W, H);
     var jx = anchor.cx, jy = anchor.jy + anchor.jh * 0.42;
-    if (feed && shown[feed.index]) {
-      var fq = shown[feed.index];
-      feedDrops(ctx, t, feed.t0, fq.x, fq.ledY || fq.seat, jx, jy);
-      /* completion is the marker and the mote stream, not a banner */
-      burst(ctx, t, feed.t0, fq.x, fq.ledY || fq.seat, "#ffd0a4");
+    for (var di = 0; di < drops.length; di++) {
+      var d = drops[di];
+      var fq = shown[d.index];
+      if (!fq) continue;
+      feedDrops(ctx, t, d.t0, fq.x, fq.ledY || fq.seat, jx, jy);
+      burst(ctx, t, d.t0, fq.x, fq.ledY || fq.seat, "#ffd0a4");
     }
     warmth(ctx, W, H, fill);
     return shown;
@@ -1225,8 +1232,9 @@
   }
   function reactMotion(t) {
     var breath = Math.sin(t * 1.7);
-    if (!feed) return { squash: breath, hop: 0, glow: 0 };
-    var age = t - feed.t0;
+    var latest = drops.length ? drops[drops.length - 1] : null;
+    if (!latest) return { squash: breath, hop: 0, glow: 0 };
+    var age = t - latest.t0;
     if (age < 0 || age > 1.2) return { squash: breath * 0.6, hop: 0, glow: 0 };
     var u = age / 1.05;
     return {
@@ -1264,27 +1272,42 @@
     ctx.restore();
     return true;
   }
+  function noteDrop(index, t0) {
+    var keep = [];
+    for (var i = 0; i < drops.length; i++) {
+      if (drops[i].index === index) continue;
+      if (t0 - drops[i].t0 < 3.2) keep.push(drops[i]);
+    }
+    keep.push({ index: index, t0: t0 });
+    drops = keep;
+    feed = { t0: t0, index: index };
+  }
+  function clearDrops() {
+    drops = [];
+    feed = null;
+  }
   function markerAge(i, t) {
-    if (!feed || feed.index !== i) return -1;
-    return t - feed.t0;
+    for (var k = drops.length - 1; k >= 0; k--) {
+      if (drops[k].index === i) return t - drops[k].t0;
+    }
+    return -1;
   }
   function blitSlice(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) {
     if (sw < 1 || sh < 1 || dw < 1 || dh < 1) return;
     ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
   }
   function lidAngle(age, done) {
-    if (age >= 0) return Math.min(1, age / 0.72) * 1.05;
-    return done ? 1.05 : 0;
+    /* A finished check stays open. A new tap must not rewind this lid to shut. */
+    if (!done) return 0;
+    if (age >= 0 && age < 0.72) return (age / 0.72) * 1.05;
+    return 1.05;
   }
   function drawChestSprite(ctx, img, dw, dh, age, done, popping) {
     var iw = img.width;
     var ih = img.height;
     var lidSrc = Math.round(ih * 0.40);
     var lidDh = dh * 0.40;
-    var ang = lidAngle(popping || done ? Math.max(age, done ? 2 : age) : -1, done);
-    if (age >= 0) ang = lidAngle(age, done);
-    else if (done) ang = 1.05;
-    else ang = 0;
+    var ang = lidAngle(age, done);
     blitSlice(ctx, img, 0, lidSrc, iw, ih - lidSrc, -dw / 2, -dh / 2 + lidDh, dw, dh - lidDh);
     if (ang > 0.25) {
       ctx.save();
@@ -1308,10 +1331,9 @@
     var iw = img.width;
     var ih = img.height;
     var crySrc = Math.round(ih * 0.34);
-    var open = done || (age >= 0 && age > 0.45);
     ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
-    if (!open && !popping) return;
-    var u = popping ? Math.min(1, Math.max(0, age) / 0.8) : 1;
+    if (!done) return;
+    var u = age >= 0 ? Math.min(1, Math.max(0, age) / 0.8) : 1;
     ctx.save();
     ctx.globalCompositeOperation = "screen";
     ctx.globalAlpha = 0.35 + 0.6 * u;
@@ -1334,9 +1356,9 @@
     var ih = img.height;
     var flameSrc = Math.round(ih * 0.32);
     var swell = 1;
-    var warm = done || (age >= 0 && age > 0.35);
+    var warm = !!done;
     blitSlice(ctx, img, 0, flameSrc, iw, ih - flameSrc, -dw / 2, -dh / 2 + dh * 0.32, dw, dh * 0.68);
-    if (age >= 0) swell = 1 + Math.min(1, age / 0.7) * 0.42;
+    if (done && age >= 0 && age < 0.7) swell = 1 + (age / 0.7) * 0.42;
     else if (done) swell = 1.42;
     if (warm) {
       ctx.save();
@@ -1378,8 +1400,8 @@
   }
   function drawMarker(ctx, q, world, i, open, t) {
     var age = markerAge(i, t);
-    var popping = age >= 0 && age < 1.15;
     var done = !!q.done;
+    var popping = done && age >= 0 && age < 1.15;
     var ms = q.ms || markerPx(440);
     var glow = world === "harris" ? "140, 255, 190" : world === "ainsley" ? "255, 170, 80" : "255, 210, 120";
     if (done || popping) glow = "255, 196, 120";
@@ -1445,9 +1467,11 @@
     if (!reduced) motes(ctx, W, H, t * 0.7 + 3, pan.x * 0.3, "#fff6e0", 12);
     drawOriCreature(ctx, W, H, t, world);
     var anchor = creatureAnchor(W, H);
-    if (feed && shown[feed.index]) {
-      var fq = shown[feed.index];
-      feedDrops(ctx, t, feed.t0, fq.x, fq.ledY || fq.y, anchor.cx, anchor.jy + anchor.jh * 0.42);
+    for (var di = 0; di < drops.length; di++) {
+      var d = drops[di];
+      var fq = shown[d.index];
+      if (!fq) continue;
+      feedDrops(ctx, t, d.t0, fq.x, fq.ledY || fq.y, anchor.cx, anchor.jy + anchor.jh * 0.42);
     }
     edgeVignette(ctx, W, H);
     warmth(ctx, W, H, fill);
@@ -1668,38 +1692,46 @@
     var rect = bg.cv.getBoundingClientRect();
     var x = (ev.clientX - rect.left) * ((bg.cv.width / bg.dpr) / Math.max(1, rect.width));
     var y = (ev.clientY - rect.top) * ((bg.cv.height / bg.dpr) / Math.max(1, rect.height));
+    var best = null;
+    var bestD = 1e9;
     for (var i = 0; i < bg.hits.length; i++) {
       var q = bg.hits[i];
       var ms = q.ms || 72;
-      if (Math.abs(q.x - x) <= ms * 0.55 && Math.abs((q.seat || q.y) - y) <= ms * 0.62) return q;
+      var marker = Math.abs(q.x - x) <= ms * 0.55 && Math.abs((q.seat || q.y) - y) <= ms * 0.62;
       var hw = (q.hw || 80) / 2 + 8;
       var hh = (q.hh || 36) / 2 + 8;
       var cy = q.chipY != null ? q.chipY : q.y;
-      if (Math.abs(q.x - x) <= hw && Math.abs(cy - y) <= hh) return q;
+      var label = Math.abs(q.x - x) <= hw && Math.abs(cy - y) <= hh;
+      if (!marker && !label) continue;
+      var sx = q.x;
+      var sy = marker ? (q.seat || q.y) : cy;
+      var d = (sx - x) * (sx - x) + (sy - y) * (sy - y);
+      if (marker) d *= 0.65;
+      if (d < bestD) { bestD = d; best = q; }
     }
-    return null;
+    return best;
   }
   function onWorldDown(ev) {
     if (!ev.isTrusted) return;
+    /* A scene over the board swallows the next tap, so the check never lands. */
+    if (sceneEl && sceneEl.classList.contains("is-on")) return;
     var q = hitQuest(ev);
     if (!q || !q.btn) return;
     var was = q.btn.classList.contains("done");
     var idx = 0;
     for (var hi = 0; hi < bg.hits.length; hi++) if (bg.hits[hi] === q) idx = hi;
-    feed = { t0: (performance.now() - bg.t0) / 1000, index: idx, label: q.label };
+    var t0 = (performance.now() - bg.t0) / 1000;
+    if (!was) noteDrop(idx, t0);
+    else {
+      var kept = [];
+      for (var di = 0; di < drops.length; di++) if (drops[di].index !== idx) kept.push(drops[di]);
+      drops = kept;
+      feed = drops.length ? { t0: drops[drops.length - 1].t0, index: drops[drops.length - 1].index } : null;
+    }
     q.btn.click();
-    burstAt = feed.t0;
+    if (!was) burstAt = t0;
     if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap();
     if (!was && global.JarEngine && JarEngine.tone) JarEngine.tone("gulp");
-    setTimeout(function () {
-      openScene({
-        from: q.btn,
-        kicker: "in the world",
-        title: q.label,
-        html: "<p>" + (!was ? "It settles into the jar." : (q.btn.classList.contains("done") ? "The light keeps that." : "The jar eases back.")) + "</p>",
-        paint: vignette(kindFor(q.label))
-      });
-    }, 30);
   }
 
   function goHome(x, y) {
@@ -1819,20 +1851,20 @@
     var quests = readQuests(iso);
     var tapAt = 3;
     if (exportFrame.skipTap) {
-      feed = null;
+      clearDrops();
     } else if (t < tapAt) {
       exportFrame.tapped = false;
-      feed = null;
+      clearDrops();
       if (quests[0]) quests[0].done = false;
     } else if (quests[0]) {
       if (!exportFrame.tapped) {
         exportFrame.tapped = true;
-        feed = { t0: tapAt, index: 0, label: quests[0].label };
+        noteDrop(0, tapAt);
         if (quests[0].btn && !quests[0].done) quests[0].btn.click();
         quests = readQuests(iso);
       }
       if (quests[0]) quests[0].done = true;
-      if (!feed) feed = { t0: tapAt, index: 0, label: quests[0].label };
+      if (!drops.length) noteDrop(0, tapAt);
     }
     burstAt = !exportFrame.skipTap && t >= tapAt ? tapAt : -1;
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };
