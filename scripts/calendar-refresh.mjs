@@ -952,6 +952,9 @@ function main() {
       { cwd: ROOT, stdio: "inherit" }
     );
     if (r.status !== 0) die("git commit failed exit " + r.status, r.status || 5);
+    /* DATAGUARD1 · never push code from a data routine */
+    const guard = spawnSync("bash", ["scripts/data-only-guard.sh"], { cwd: ROOT, stdio: "inherit" });
+    if (guard.status !== 0) die("DATAGUARD1: outgoing commits touch code — not pushing", 3);
     r = spawnSync("git", ["push", "origin", "main"], { cwd: ROOT, stdio: "inherit" });
     if (r.status !== 0) die("git push failed exit " + r.status, r.status || 5);
     console.log("calendar-refresh: PUSHED data-only · protected HTML/CSS/sensi/nest untouched");

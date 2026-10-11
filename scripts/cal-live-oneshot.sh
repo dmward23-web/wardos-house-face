@@ -77,5 +77,6 @@ if git diff --cached --quiet; then
   exit 0
 fi
 git -c user.email='dmward23@gmail.com' -c user.name='dmward23-web' commit -m "House Face · $NOTE"
+scripts/data-only-guard.sh || { echo "DATAGUARD1: not pushing"; exit 3; }
 git push origin main
 echo "PUSHED · $(git rev-parse --short HEAD) · $NOTE"

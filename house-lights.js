@@ -146,7 +146,8 @@
   }
 
   /* AUDIT1 · no key saved on this screen → no lights requests at all (no probe, no write) */
-  function hasKey() { return !!proxyToken(); }
+  /* NOKEY1 · on the live House Face the hub trusts this page by origin — no key, ever. */
+  function hasKey() { return !!proxyToken() || isPagesHost(); }
   function noKey(g) { g = g || gate(); return !!(g.live && g.writeSupported && !hasKey()); }
   /* Cloud preview has no Kasa key. The wall and phone still follow the main write path. */
   function previewHost() {

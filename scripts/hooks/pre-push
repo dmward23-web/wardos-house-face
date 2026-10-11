@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# DATAGUARD1 pre-push: a routine-style push to main may only carry data.
+while read -r lref lsha rref rsha; do
+  [[ "$rref" == "refs/heads/main" ]] || continue
+  [[ "$rsha" =~ ^0+$ ]] && continue
+  if git log --format=%s "$rsha..$lsha" | grep -qE 'data-only|LIGHTS-live|SENSIFRESH|NESTSTILL'; then
+    BAD="$(git diff --name-only "$rsha" "$lsha" | grep -Ev '^(data/|kids-week\.json$|kids-data\.js$|cal-live\.json$)')"
+    if [[ -n "$BAD" ]]; then
+      echo "DATAGUARD1 BLOCK: routine push carries code:" >&2; echo "$BAD" >&2; exit 1
+    fi
+  fi
+done
+exit 0

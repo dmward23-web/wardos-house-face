@@ -79,34 +79,11 @@ if ! curl -sf --max-time 3 http://127.0.0.1:8787/health >/dev/null 2>&1; then
   fi
 fi
 
-# --- 1b. Nest tunnel
+# --- 1b. Named tunnel wardos-hub (cams./lights.wardhousehub.com) — stable URLs, no quick tunnels
 URL_FILE="$CFG/nest-webrtc-proxy.url"
-CUR="$( [[ -f "$URL_FILE" ]] && tr -d '[:space:]' < "$URL_FILE" )"
-if [[ -z "$CUR" ]] || ! curl -sf --max-time 8 "$CUR/health" >/dev/null 2>&1; then
-  # second look before reopening (quick tunnels blip)
-  sleep 5
-  if [[ -z "$CUR" ]] || ! curl -sf --max-time 8 "$CUR/health" >/dev/null 2>&1; then
-    for pid in $(ps -eo pid=,args= | awk '$2 ~ /cloudflared$/ && /--url http:\/\/127\.0\.0\.1:8787( |$)/ {print $1}'); do
-      kill "$pid" 2>/dev/null || true
-    done
-    if [[ -n "$CF_BIN" && -x "$CF_BIN" ]]; then
-      rm -f /tmp/nest-cf-tunnel.log
-      setsid nohup "$CF_BIN" tunnel --url http://127.0.0.1:8787 --no-autoupdate \
-        >>/tmp/nest-cf-tunnel.log 2>&1 < /dev/null &
-      NEW=""
-      for i in $(seq 1 40); do
-        NEW="$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' /tmp/nest-cf-tunnel.log 2>/dev/null | tail -1)"
-        [[ -n "$NEW" ]] && break; sleep 1
-      done
-      if [[ -n "$NEW" ]]; then
-        umask 077; printf '%s\n' "$NEW" > "$URL_FILE"; chmod 600 "$URL_FILE"
-        CHANGED+=("nest-tunnel")
-        echo "[$(ts)] nest tunnel reopened -> $NEW" >>"$LOG"
-      else
-        echo "[$(ts)] ERROR nest tunnel started but no URL" >>"$LOG"
-      fi
-    fi
-  fi
+printf '%s\n' "https://cams.wardhousehub.com" > "$URL_FILE"
+if [[ "$("$HOME/.local/bin/wardos-hub-tunnel.sh")" == RESTARTED ]]; then
+  CHANGED+=("hub-tunnel"); echo "[$(ts)] named tunnel wardos-hub restarted" >>"$LOG"
 fi
 
 # --- 2. Lights refresh loop

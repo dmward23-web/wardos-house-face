@@ -23,6 +23,6 @@ RC=$?
 git add data/nest-live.json data/nest-snaps/garage.jpg data/nest-snaps/backyard.jpg 2>/dev/null
 if git diff --cached --quiet; then echo "[$(ts)] no change" >>"$LOG"; echo "NOCHANGE rc=$RC"; exit 0; fi
 git commit -qm "NESTSTILL · fresh hub cam pictures $(date -u +%Y%m%d-%H%M)Z"
-git pull -q --rebase --autostash && git push -q origin main
+git pull -q --rebase --autostash && scripts/data-only-guard.sh && git push -q origin main
 echo "[$(ts)] pushed $(git rev-parse --short HEAD)" >>"$LOG"
 echo "PUSHED rc=$RC"
