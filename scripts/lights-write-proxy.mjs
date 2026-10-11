@@ -476,16 +476,18 @@ async function main() {
           let applied = 0;
           for (const c of changes) {
             if (!c || !TAP_KEY_RE.test(String(c.key)) || !TAP_ID_RE.test(String(c.id)) || typeof c.v !== "boolean") continue;
-            const t = Number(c.t) || 0;
+            /* TAPSTICK1 · stamp with the hub clock: device sends how long ago it tapped */
+            const age = Number(c.age);
+            const t = Number.isFinite(age) && age >= 0 && age < 864e5 ? Date.now() - age : (Number(c.t) || 0);
             const k = (taps[c.key] = taps[c.key] || {});
             const cur = k[c.id];
             if (!cur || t > cur.t) { k[c.id] = { v: c.v, t }; applied++; }
             else if (t === cur.t && c.v && !cur.v) { k[c.id] = { v: true, t }; applied++; }
           }
           if (applied) saveTaps(taps);
-          return json(res, 200, { ok: true, applied, taps, ts: new Date().toISOString() });
+          return json(res, 200, { ok: true, applied, taps, now: Date.now(), ts: new Date().toISOString() });
         }
-        return json(res, 200, { ok: true, taps, ts: new Date().toISOString() });
+        return json(res, 200, { ok: true, taps, now: Date.now(), ts: new Date().toISOString() });
       }
 
       /* SENSICTL1 · live Sensi thermostat read + control (same key + tunnel as lights) */

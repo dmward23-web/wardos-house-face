@@ -1709,28 +1709,36 @@
     } catch (e) { /* never block a tap */ }
   }
 
+  /* TAPSTICK1 · a tap fills a chest and that's it: no pop-up card blocks the next chest,
+     a quick second tap can't undo it. Undo = press and hold a done chest ~0.7s. */
+  var lastHit = { q: null, at: 0 }, holdTimer = 0;
+  function clearHold() { if (holdTimer) { clearTimeout(holdTimer); holdTimer = 0; } }
   function onWorldDown(ev) {
     if (!ev.isTrusted) return;
     var q = hitQuest(ev);
     if (!q || !q.btn) return;
+    var now = performance.now();
+    if (lastHit.q && lastHit.q.btn === q.btn && now - lastHit.at < 1500) return;
+    lastHit = { q: q, at: now };
     var was = q.btn.classList.contains("done");
     var idx = 0;
     for (var hi = 0; hi < bg.hits.length; hi++) if (bg.hits[hi] === q) idx = hi;
+    if (was) {
+      clearHold();
+      holdTimer = setTimeout(function () {
+        holdTimer = 0;
+        if (!q.btn.classList.contains("done")) return;
+        q.btn.click();
+        if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap();
+      }, 700);
+      return;
+    }
     feed = { t0: (performance.now() - bg.t0) / 1000, index: idx, label: q.label };
     q.btn.click();
-    if (!was) flyToJar(ev.clientX, ev.clientY, q.label); /* CHESTFLY1 */
+    flyToJar(ev.clientX, ev.clientY, q.label); /* CHESTFLY1 */
     burstAt = feed.t0;
     if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap();
-    if (!was && global.JarEngine && JarEngine.tone) JarEngine.tone("gulp");
-    setTimeout(function () {
-      openScene({
-        from: q.btn,
-        kicker: "in the world",
-        title: q.label,
-        html: "<p>" + (!was ? "It settles into the jar." : (q.btn.classList.contains("done") ? "The light keeps that." : "The jar eases back.")) + "</p>",
-        paint: vignette(kindFor(q.label))
-      });
-    }, was || reduced ? 30 : 1350); /* CHESTFLY1 · let the flight land first */
+    if (global.JarEngine && JarEngine.tone) JarEngine.tone("gulp");
   }
 
   function goHome(x, y) {
@@ -1806,6 +1814,7 @@
       this.textContent = d.classList.contains("is-more") ? "Closer" : "Farther";
     });
     cv.addEventListener("pointerdown", onWorldDown);
+    ["pointerup", "pointercancel", "pointerleave"].forEach(function (n) { cv.addEventListener(n, clearHold); });
     cv.addEventListener("pointermove", function (e) {
       bg.ptr = e.clientX / Math.max(1, innerWidth);
     }, { passive: true });
