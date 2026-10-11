@@ -28,10 +28,10 @@
   }
   function call(method, body) {
     return proxy().then(function (base) {
-      if (!base || !token()) throw new Error("nokey");
+      if (!base || (!token() && !/\.github\.io$/i.test(location.hostname))) throw new Error("nokey"); /* NOKEY1 */
       return fetch(base + "/api/taps", {
         method: method, cache: "no-store",
-        headers: { "Content-Type": "application/json", "X-Lights-Proxy-Token": token() },
+        headers: token() ? { "Content-Type": "application/json", "X-Lights-Proxy-Token": token() } : { "Content-Type": "application/json" },
         body: body ? JSON.stringify(body) : undefined
       }).then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); });
     });

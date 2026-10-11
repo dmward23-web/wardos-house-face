@@ -206,9 +206,8 @@ function classify(ev) {
   }
   /* KIDRIDE1: "Kristin: <Kid> — … pickup/drop-off" (Free, Kristin's week) = awareness on the kid's
      glass only — never a Dad leave-by row or a sport card. */
-  if (/^Kristin:\s*/i.test(summary) && /\b(pick\s*-?\s*up|drop\s*-?\s*off)\b/i.test(summary)) {
-    return { kind: "other", summary, kids: kidMentions(summary) };
-  }
+  /* AWAY1 (Oct 11): Kristin: events never reach the House Face. */
+  if (/^Kristin:\s*/i.test(summary) || /\bKristin\b/i.test(summary)) return null;
   /* SCHOOL first (before KIDRIDE1): titles like "… Math Counts · pickup 4:00" are school,
      not Dad leave-by rides. KIDRIDE1 still catches real kid pickup/drop-off leave-bys. */
   if (/SRE drop-off|SRE drop\b/i.test(summary)) return { kind: "school_drop", summary, ...soloBoy(summary) };
@@ -458,7 +457,7 @@ function pickStripQueue(items, now, homeWeek) {
 function detailFor(it, homeWeek, upcoming) {
   const bits = [];
   const through = homeWeek && homeWeek.with === "Mom"
-    ? (homeWeek.through ? `kids with Mom · until ${homeWeek.through}` : "kids with Mom")
+    ? (homeWeek.through ? `kids away · back ${homeWeek.through}` : "kids away")
     : (homeWeek && homeWeek.through
       ? `kids with Dad @ <strong>147th</strong> through ${homeWeek.through}`
       : "kids with Dad @ <strong>147th</strong>");
@@ -501,7 +500,7 @@ function custodyFromItems(items, now) {
       with: "Mom",
       place: "mom's",
       through,
-      throughLabel: `with Mom · until Dad week ${through}`,
+      throughLabel: `kids away · back ${through}`,
       endIso: nextDad.startIso,
     };
   }
@@ -510,7 +509,7 @@ function custodyFromItems(items, now) {
       with: "Mom",
       place: "mom's",
       through: "next Dad week",
-      throughLabel: "with Mom · Dad week ended",
+      throughLabel: "kids away",
       endIso: lastEnded.endIso,
     };
   }
@@ -562,9 +561,9 @@ function buildKidToday(kidId, items, now, homeWeek) {
     kind: "note",
     when: "All day",
     what: mom
-      ? (kidId === "ainsley" ? "At Mom's" : kidId === "hayes" ? "🏡 At Mom's" : "🏡 At Mom's")
+      ? "Kids away" /* AWAY1 */
       : (kidId === "ainsley" ? "Base @ 147th with Dad" : kidId === "hayes" ? "🏡 DROP ZONE HQ with Dad" : "🏡 YOUR BASE with Dad"),
-    hint: mom ? `until ${homeWeek.through}` : `through ${homeWeek.through}`,
+    hint: mom ? `back ${homeWeek.through}` : `through ${homeWeek.through}`,
     tone: "hot",
   });
   return rows.slice(0, 6).map(({ ride, ...r }) => r);
@@ -649,10 +648,10 @@ function hottestFor(kidId, items, now, homeWeek) {
   if (!hit) {
     return mom
       ? {
-          when: `${partsInTZ(now).weekday.toUpperCase()} · at Mom's`,
-          what: "AT MOM'S",
+          when: `${partsInTZ(now).weekday.toUpperCase()} · kids away`,
+          what: "KIDS AWAY",
           where: `until ${homeWeek.through}`,
-          badges: ["MOM WEEK"],
+          badges: ["KIDS AWAY"],
         }
       : {
           when: `${partsInTZ(now).weekday.toUpperCase()} · base @ 147th`,
@@ -665,7 +664,7 @@ function hottestFor(kidId, items, now, homeWeek) {
     when: `${fmtDowShort(hit.start).toUpperCase()} · ${fmtTime(hit.start)}`,
     what: kidsSafeWhat(hit.raw, hit.kind).toUpperCase().slice(0, 48),
     where: mom
-      ? `with Mom · until ${homeWeek.through}`
+      ? `kids away · back ${homeWeek.through}`
       : `with Dad @ 147th · through ${homeWeek.through}`,
     badges: [fmtDowShort(hit.start).toUpperCase(), fmtTime(hit.start)],
   };
@@ -696,7 +695,7 @@ function buildDanToday(items, now, homeWeek) {
   rows.push({
     when: "home week",
     what: homeWeek.with === "Mom"
-      ? `Kids with Mom · until ${homeWeek.through}`
+      ? `Kids away · back ${homeWeek.through}`
       : `Kids with Dad @ 147th through ${homeWeek.through}`,
     tone: "hot",
   });
@@ -722,8 +721,8 @@ function buildDanWeek(items, now, homeWeek) {
     });
   }
   rows.push({
-    when: homeWeek.with === "Mom" ? `until ${homeWeek.through}` : `through ${homeWeek.through}`,
-    what: homeWeek.with === "Mom" ? "Kids with Mom" : "Kids with Dad @ 147th",
+    when: homeWeek.with === "Mom" ? `back ${homeWeek.through}` : `through ${homeWeek.through}`,
+    what: homeWeek.with === "Mom" ? "Kids away" : "Kids with Dad @ 147th",
     tone: "hot",
   });
   return rows.slice(0, 24);
@@ -800,7 +799,7 @@ function main() {
     time: "",
     place: "House day @ 147th",
     detailHtml: homeWeek.with === "Mom"
-      ? `kids with Mom · until ${homeWeek.through}`
+      ? `kids away · back ${homeWeek.through}`
       : `kids with Dad @ <strong>147th</strong> through ${homeWeek.through}`,
     badge: nowP.weekday,
     startIso: now.toISOString(),
@@ -866,10 +865,10 @@ function main() {
     ...danKept,
     hottest: homeWeek.with === "Mom"
       ? {
-          when: `${nowP.asOf} · kids with Mom`,
-          what: "Mom week",
+          when: `${nowP.asOf} · kids away`,
+          what: "Kids away",
           where: `until ${homeWeek.through}`,
-          badges: ["Mom week"],
+          badges: ["Kids away"],
         }
       : {
           when: `${nowP.asOf} · kids with you @ 147th`,
@@ -952,6 +951,9 @@ function main() {
       { cwd: ROOT, stdio: "inherit" }
     );
     if (r.status !== 0) die("git commit failed exit " + r.status, r.status || 5);
+    /* DATAGUARD1 · never push code from a data routine */
+    const guard = spawnSync("bash", ["scripts/data-only-guard.sh"], { cwd: ROOT, stdio: "inherit" });
+    if (guard.status !== 0) die("DATAGUARD1: outgoing commits touch code — not pushing", 3);
     r = spawnSync("git", ["push", "origin", "main"], { cwd: ROOT, stdio: "inherit" });
     if (r.status !== 0) die("git push failed exit " + r.status, r.status || 5);
     console.log("calendar-refresh: PUSHED data-only · protected HTML/CSS/sensi/nest untouched");

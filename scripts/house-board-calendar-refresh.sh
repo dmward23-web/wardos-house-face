@@ -231,6 +231,7 @@ fi
 
 MSG="House Face · ${NOTE} ${TODAY} CT · data-only ${STAMP}"
 git -c user.email='dmward23@gmail.com' -c user.name='dmward23-web' commit -m "$MSG"
+scripts/data-only-guard.sh || { echo "DATAGUARD1: not pushing"; exit 3; }
 git push origin main
 echo "PUSHED data-only · $(git rev-parse --short HEAD) · $MSG"
 echo "PROTECTED intact: kid-*.html sheet-*.html heat-v3.css house-engage.css sensi-live nest-live"

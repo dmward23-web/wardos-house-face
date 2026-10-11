@@ -209,6 +209,7 @@
     var s = kidsSafe(String(summary || "").trim());
     s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
     s = s.replace(/\(\s*Mom[^)]*\)/gi, "");
+    s = s.replace(/\s*\((portal|online|link)\)\s*$/i, ""); /* FITDAY1 */
     s = s.replace(/\s{2,}/g, " ").trim();
     /* GATE3WRAP1 · wrap instead of an ellipsis glyph; cut only at a word */
     if (s.length > 72) s = s.slice(0, 72).replace(/\s+\S*$/, "").replace(/[\s·:—–\-(]+$/, "");
@@ -456,7 +457,7 @@
 
     if (face === "day") {
       var hot = kid.hottest || {};
-      var todayBits = (kid.today || []).slice(0, 2);
+      var todayBits = (kid.today || []).filter(function (r) { return shortTitle(r.what || "") !== shortTitle(hot.what || ""); }).slice(0, 2); /* FITDAY1 · no repeat of the loud line */
       html += '<div class="kf-face kf-day">';
       html += '<div class="kf-kicker">' + esc(dayKicker(hot)) + "</div>";
       html += '<div class="kf-loud">' + esc(hot.when || "Dad week") + "</div>";
@@ -557,7 +558,20 @@
     var dots = root.querySelector("[data-kf-dots]");
     var streakEl = root.querySelector("[data-kf-streak]");
     var sub = root.querySelector("[data-kf-sub]");
-    if (stage) stage.innerHTML = paintFace(kidId, face);
+    if (stage) {
+      stage.innerHTML = paintFace(kidId, face);
+      /* FITDAY1 · drop extra rows (then the title) until the face fits its tile — no hidden text */
+      var fit = function () {
+        var guard = 0;
+        while (stage.scrollHeight > stage.clientHeight + 2 && guard++ < 6) {
+          var rows = stage.querySelectorAll(".kf-row");
+          if (rows.length) { var last = rows[rows.length - 1], box = last.parentNode; box.removeChild(last); if (!box.children.length) box.remove(); continue; }
+          var meta = stage.querySelector(".kf-meta"); if (meta) { meta.remove(); continue; }
+          break;
+        }
+      };
+      if (!document.documentElement.classList.contains("ori-phone")) fit();
+    }
     if (dots) {
       dots.innerHTML = FACES.map(function (f) {
         return '<i class="' + (f === face ? "is-on" : "") + '" data-face-dot="' + f + '"></i>';

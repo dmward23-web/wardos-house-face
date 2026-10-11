@@ -117,7 +117,23 @@ function saveTaps(taps) {
   fs.renameSync(tmp, TAPS_FILE);
 }
 
+/* NOKEY1 · the House Face itself (GitHub Pages origin) may use the everyday
+   house routes without a key: lights, chore taps, thermostat. Browsers set
+   Origin and pages cannot forge it, so no key/seed link lives on any screen.
+   Everything else (Spotify setup, etc.) still needs the token. */
+const HOUSE_ORIGINS = new Set(
+  (process.env.HOUSE_ORIGINS || "https://dmward23-web.github.io").split(",").map((s) => s.trim()).filter(Boolean)
+);
+const HOUSE_ROUTES = /^\/api\/(taps|lights(\/set|\/refresh)?|sensi(\/set)?)$/;
+function houseOrigin(req) {
+  return HOUSE_ORIGINS.has(String(req.headers.origin || ""));
+}
+
 function checkAuth(req, args) {
+  try {
+    const p = new URL(req.url || "/", "http://x").pathname;
+    if (houseOrigin(req) && HOUSE_ROUTES.test(p)) return true;
+  } catch { /* fall through */ }
   // Always require token when set (even on localhost) so tunnel cannot be open.
   if (!args.authToken) {
     // localhost without token only when not --lan
@@ -386,6 +402,7 @@ async function main() {
           bind: `${args.host}:${args.port}`,
           lan: args.lan,
           authRequired: Boolean(args.authToken),
+          houseOrigin: houseOrigin(req),
           writeSupported: true,
           warm: warm.ready,
           kasaCreds: hasKasaCreds(),
