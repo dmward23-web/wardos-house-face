@@ -1,7 +1,7 @@
 {
   "asOf": "Sun Oct 11 2026",
   "asOfIso": "2026-10-11",
-  "refreshedAt": "2026-10-11T16:53:46.394Z",
+  "refreshedAt": "2026-10-11T17:06:38.926Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -802,12 +802,12 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "SUN · 12:00",
-        "what": "AINSLEY APPT: SCHOOL ABSENCE VERIFICATION DUE (P",
+        "when": "MON · 2:20",
+        "what": "LINDSAY APPT",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "SUN",
-          "12:00"
+          "MON",
+          "2:20"
         ]
       },
       "today": [
