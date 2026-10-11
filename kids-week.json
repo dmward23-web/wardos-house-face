@@ -1,7 +1,7 @@
 {
   "asOf": "Sun Oct 11 2026",
   "asOfIso": "2026-10-11",
-  "refreshedAt": "2026-10-11T17:06:38.926Z",
+  "refreshedAt": "2026-10-11T17:16:02.134Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,27 +16,15 @@
     "endIso": "2026-10-16T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "12:00",
-    "place": "Ainsley appt: school absence verification due (portal)",
+    "label": "Next up · Mon",
+    "time": "7:00",
+    "place": "SRE specials: Music",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-    "badge": "Sun",
-    "startIso": "2026-10-11T17:00:00.000Z",
-    "endIso": "2026-10-12T17:00:00.000Z",
-    "kind": "appointment",
+    "badge": "Mon",
+    "startIso": "2026-10-12T12:00:00.000Z",
+    "endIso": "2026-10-12T12:15:00.000Z",
+    "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "12:00",
-        "place": "Ainsley appt: school absence verification due (portal)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Sun",
-        "startIso": "2026-10-11T17:00:00.000Z",
-        "endIso": "2026-10-12T17:00:00.000Z",
-        "kind": "appointment",
-        "whenLabel": "12:00",
-        "summary": "Ainsley appt: school absence verification due (portal)"
-      },
       {
         "label": "Next up · Mon",
         "time": "7:00",
@@ -168,6 +156,18 @@
         "kind": "school_pickup",
         "whenLabel": "Tue 3:15",
         "summary": "Hayes + Harris — SRE pickup · 3:40"
+      },
+      {
+        "label": "Next up · Tue",
+        "time": "4:45",
+        "place": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-13T21:45:00.000Z",
+        "endIso": "2026-10-14T00:45:00.000Z",
+        "kind": "school",
+        "whenLabel": "Tue 4:45",
+        "summary": "Ainsley — LKMS choir Fall Concert · call 5:00 / starts 5:30"
       }
     ]
   },
