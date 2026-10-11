@@ -519,7 +519,6 @@ body.theme-ainsley.kw-on .kw-jar-host { left: 30%; bottom: 4%; }
 .kw-day small { font-size: 10px; opacity: 0.8; }
 .kw-day.is-on { box-shadow: 0 0 16px rgba(255, 230, 170, 0.7); }
 .kw-day.is-today { outline: 1px solid rgba(255, 230, 170, 0.85); }
-.kw-more { right: 96px; }
 .kw-path {
   position: absolute;
   right: 12px;
@@ -532,6 +531,8 @@ body.theme-ainsley.kw-on .kw-jar-host { left: 30%; bottom: 4%; }
   padding: 8px 12px;
   background: rgba(6, 12, 18, 0.35);
 }
+/* KIDWEEKLY1 · Farther sat on top of Path (specificity), read as FARPATH */
+.kw-path.kw-more { right: 96px; }
 .kw-drawer {
   position: absolute;
   left: 10px; right: 10px;

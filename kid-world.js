@@ -65,7 +65,8 @@
       var whatEl = q.querySelector(".what");
       var label = ((whatEl && whatEl.textContent) || "Must").replace(/\s+/g, " ").trim();
       var cadence = q.getAttribute("data-cadence") || "daily";
-      var btn = cadence === "daily" ? q.querySelector('.day-tap[data-day-iso="' + iso + '"]') : q.querySelector("[data-check]");
+      /* KIDWEEKLY1 · weekly/once musts carry data-check on the row itself */
+      var btn = cadence === "daily" ? q.querySelector('.day-tap[data-day-iso="' + iso + '"]') : (q.matches("[data-check]") ? q : q.querySelector("[data-check]"));
       if (!btn) return;
       out.push({ label: label, done: btn.classList.contains("done"), btn: btn });
     });
