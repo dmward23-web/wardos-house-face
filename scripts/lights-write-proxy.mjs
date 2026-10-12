@@ -125,7 +125,9 @@ const HOUSE_ORIGINS = new Set(
   (process.env.HOUSE_ORIGINS || "https://dmward23-web.github.io").split(",").map((s) => s.trim()).filter(Boolean)
 );
 /* LOCK2 · thermostat + Spotify always need the key. No-key (origin) is only lights + taps. */
-const HOUSE_ROUTES = /^\/api\/(taps|lights(\/set)?)$/;
+/* SPKEY1 · Spotify play/read/connect ride the house origin like lights (no key on any screen).
+   Spotify setup (client id) + disconnect still need the key. */
+const HOUSE_ROUTES = /^\/api\/(taps|lights(\/set)?|spotify(\/(browse|control|auth-start))?)$/;
 /* LOCK2 · rate limit no-key traffic (Origin is forgeable outside a browser). */
 const RL = new Map();
 function rateOk(bucket, limit, windowMs) {

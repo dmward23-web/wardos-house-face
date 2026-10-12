@@ -45,16 +45,17 @@
 
   function req(method, path, body, timeoutMs) {
     var b = base(), k = key();
-    if (!k) return Promise.resolve({ ok: false, error: "no_key" });
+    /* SPKEY1 · no key needed: the box trusts the House Face origin for Spotify. */
     if (!b) return Promise.resolve({ ok: false, error: "offline" });
     var ctl = window.AbortController ? new AbortController() : null;
     var to = setTimeout(function () { if (ctl) ctl.abort(); }, timeoutMs || 12000);
-    var h = { Accept: "application/json", "X-Lights-Proxy-Token": k };
+    var h = { Accept: "application/json" };
+    if (k) h["X-Lights-Proxy-Token"] = k;
     if (body) h["Content-Type"] = "application/json";
     return fetch(b + path, { method: method, headers: h, body: body ? JSON.stringify(body) : undefined, cache: "no-store", signal: ctl ? ctl.signal : undefined })
       .then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
-          if (r.status === 401) return { ok: false, error: "bad_key" };
+          if (r.status === 401) return { ok: false, error: k ? "bad_key" : "no_key" };
           if (!r.ok && j && j.ok === undefined) j.ok = false;
           if (!r.ok && !j.error) j.error = "http_" + r.status;
           return j;
