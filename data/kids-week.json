@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 12 2026",
   "asOfIso": "2026-10-12",
-  "refreshedAt": "2026-10-12T21:13:24.112Z",
+  "refreshedAt": "2026-10-12T21:35:21.925Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -847,22 +847,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "MON · 2:20",
-        "what": "LINDSAY APPT",
+        "when": "TUE · 4:45",
+        "what": "LKMS CHOIR FALL CONCERT · CALL 5:00 / STARTS 5:3",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "MON",
-          "2:20"
+          "TUE",
+          "4:45"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Mon · 2:20",
-          "what": "Lindsay appt",
-          "hint": "",
-          "tone": "hot"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -911,14 +904,7 @@
           "hint": ""
         }
       ],
-      "appointments": [
-        {
-          "when": "Mon 12 · 2:20",
-          "what": "Lindsay appt",
-          "hint": "with Dad",
-          "tone": "hot"
-        }
-      ]
+      "appointments": []
     },
     "dan": {
       "id": "dan",
@@ -1013,11 +999,6 @@
         {
           "when": "Mon 12 · 12:00",
           "what": "SRE Orange Day",
-          "tone": "act"
-        },
-        {
-          "when": "Mon 12 · 2:20",
-          "what": "Lindsay appt",
           "tone": "act"
         },
         {
@@ -1129,6 +1110,11 @@
           "when": "Thu 15 · 5:40",
           "what": "Hayes flag practice",
           "tone": "hot"
+        },
+        {
+          "when": "Fri 16 · 7:00",
+          "what": "SRE specials: PE (tennis shoes)",
+          "tone": "act"
         }
       ]
     }
