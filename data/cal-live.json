@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-12T21:45:09.978Z",
+  "fetchedAt": "2026-10-12T21:55:53.651Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-18",
@@ -16,15 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "q13gu6onji3irp8p6feteapsus",
-      "summary": "Hayes baseball — Falcons vs Blue Bananas (home) · 5:30 game",
-      "start": "2026-10-12T16:55:00-05:00",
-      "end": "2026-10-12T19:20:00-05:00",
-      "location": "Blue Valley Rec Sports Complex, Field 23, 9701 W 137th St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "o2l7f8ejuglit0vpbeg1mt4hu8",
       "summary": "CVS Rx pickup · leave 7:30 (NAP, LOS, LIS)",
