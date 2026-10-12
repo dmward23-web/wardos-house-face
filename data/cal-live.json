@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-12T16:18:51.476Z",
+  "fetchedAt": "2026-10-12T16:42:28.758Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-18",
@@ -93,16 +93,16 @@
       "summary": "Initial Intake (Alma) Meeting w/ Joe Wilner",
       "start": "2026-10-13T15:00:00-05:00",
       "end": "2026-10-13T16:00:00-05:00",
-      "location": "9401 Indian Creek Pkwy, Suite 1030, Overland Park, KS 66210",
+      "location": "9401 Indian Creek Pkwy, Building 40, Suite 1030, Overland Park, KS 66210",
       "busy": true,
       "allDay": false
     },
     {
       "id": "3hv9bcr87ggrhrkuf4ka3u6r2s_20261013T201500Z",
-      "summary": "Hayes + Harris — SRE pickup · 3:40",
-      "start": "2026-10-13T15:15:00-05:00",
-      "end": "2026-10-13T16:00:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+      "summary": "Hayes + Harris — pickup at Riley's · 4:15",
+      "start": "2026-10-13T16:05:00-05:00",
+      "end": "2026-10-13T16:30:00-05:00",
+      "location": "Fender home (Riley), 9504 W 148th St, Overland Park, KS",
       "busy": true,
       "allDay": false
     },
