@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-12T13:30:00.761Z",
+  "fetchedAt": "2026-10-12T13:58:28.941Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-18",
@@ -16,26 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "4v57lpmcaqbems5hfhffcoubi4",
-      "summary": "Harris — SRE specials: Music",
-      "start": "2026-10-12",
-      "end": "2026-10-12",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true,
-      "pinnedUntil": "8:40"
-    },
-    {
-      "id": "j3blj0qagdbk3vejttg3v7b5d4",
-      "summary": "Hayes — SRE specials: Music",
-      "start": "2026-10-12",
-      "end": "2026-10-12",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true,
-      "pinnedUntil": "8:40"
-    },
     {
       "id": "9btt9aick4vt91eoco3dhvlva8",
       "summary": "Ainsley — Lindsay appt · 3:00",

@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 12 2026",
   "asOfIso": "2026-10-12",
-  "refreshedAt": "2026-10-12T13:30:00.192Z",
+  "refreshedAt": "2026-10-12T13:58:28.342Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,38 +17,14 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "7:00",
-    "place": "SRE specials: Music",
+    "time": "12:00",
+    "place": "SRE Orange Day",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
     "badge": "Mon",
-    "startIso": "2026-10-12T12:00:00.000Z",
-    "endIso": "2026-10-12T12:15:00.000Z",
+    "startIso": "2026-10-12T17:00:00.000Z",
+    "endIso": "2026-10-13T17:00:00.000Z",
     "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "7:00",
-        "place": "SRE specials: Music",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-12T12:00:00.000Z",
-        "endIso": "2026-10-12T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:00",
-        "summary": "Harris — SRE specials: Music"
-      },
-      {
-        "label": "Next up · today",
-        "time": "7:00",
-        "place": "SRE specials: Music",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-12T12:00:00.000Z",
-        "endIso": "2026-10-12T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:00",
-        "summary": "Hayes — SRE specials: Music"
-      },
       {
         "label": "Next up · today",
         "time": "12:00",
@@ -168,6 +144,30 @@
         "kind": "other",
         "whenLabel": "Tue 1:00",
         "summary": "Hayes — Lindsay appt · 1:00 (provider Floyd)"
+      },
+      {
+        "label": "Next up · Tue",
+        "time": "1:30",
+        "place": "Lindsay appt",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-13T18:30:00.000Z",
+        "endIso": "2026-10-13T19:00:00.000Z",
+        "kind": "other",
+        "whenLabel": "Tue 1:30",
+        "summary": "Harris — Lindsay appt · 1:30"
+      },
+      {
+        "label": "Next up · Tue",
+        "time": "3:15",
+        "place": "Boys SRE pickup",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-13T20:15:00.000Z",
+        "endIso": "2026-10-13T21:00:00.000Z",
+        "kind": "school_pickup",
+        "whenLabel": "Tue 3:15",
+        "summary": "Hayes + Harris — SRE pickup · 3:40"
       }
     ]
   },
@@ -301,29 +301,15 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "MON · 7:00",
-        "what": "SRE SPECIALS: MUSIC",
+        "when": "MON · 12:00",
+        "what": "SRE ORANGE DAY",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "MON",
-          "7:00"
+          "12:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Mon · 7:00",
-          "what": "SRE specials: Music",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Mon · 8:10",
-          "what": "SRE drop-off",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Mon · 12:00",
@@ -355,18 +341,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Mon 12 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Mon 12 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Mon 12 · 12:00",
           "what": "SRE Orange Day",
@@ -607,29 +581,15 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "MON · 7:00",
-        "what": "SRE SPECIALS: MUSIC",
+        "when": "MON · 12:00",
+        "what": "SRE ORANGE DAY",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "MON",
-          "7:00"
+          "12:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Mon · 7:00",
-          "what": "SRE specials: Music",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Mon · 8:10",
-          "what": "SRE drop-off",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Mon · 12:00",
@@ -657,6 +617,13 @@
           "what": "⚾ Hayes baseball — Falcons vs Blue Bananas (home)",
           "hint": "YOUR board",
           "tone": "hot"
+        },
+        {
+          "kind": "note",
+          "when": "All day",
+          "what": "🏡 DROP ZONE HQ with Dad",
+          "hint": "through Fri Oct 16 · 3:00",
+          "tone": "hot"
         }
       ],
       "sports": [
@@ -674,18 +641,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Mon 12 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Mon 12 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Mon 12 · 12:00",
           "what": "SRE Orange Day",
@@ -1107,16 +1062,6 @@
       ],
       "week": [
         {
-          "when": "Mon 12 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act"
-        },
-        {
-          "when": "Mon 12 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act"
-        },
-        {
           "when": "Mon 12 · 12:00",
           "what": "SRE Orange Day",
           "tone": "act"
@@ -1224,6 +1169,16 @@
         {
           "when": "Thu 15 · 12:00",
           "what": "SRE Red Day",
+          "tone": "act"
+        },
+        {
+          "when": "Thu 15 · 12:45",
+          "what": "LKMS choir Sing & Share field trip",
+          "tone": "act"
+        },
+        {
+          "when": "Thu 15 · 3:15",
+          "what": "SRE pickup",
           "tone": "act"
         }
       ]
