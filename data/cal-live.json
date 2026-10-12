@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-12T02:32:20.204Z",
+  "fetchedAt": "2026-10-12T02:47:01.254Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
-  "windowEnd": "2026-10-18",
+  "windowEnd": "2026-10-17",
   "asOfIso": "2026-10-11",
   "nextLeave": {
     "id": "1ni8dem5hrho45a0csgj81r3i4_20261012T131000Z",
@@ -472,15 +472,6 @@
       "start": "2026-10-17T19:00:00-05:00",
       "end": "2026-10-17T22:00:00-05:00",
       "location": "Progressive Field, Cleveland, OH",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "dopoqm5v0vea68hneo5ab69e7g",
-      "summary": "Erin + Dan — Live on the Green (Guster + Grace Potter)",
-      "start": "2026-10-18T16:30:00-05:00",
-      "end": "2026-10-18T21:00:00-05:00",
-      "location": "Ascend Federal Credit Union Amphitheater, Nashville, TN",
       "busy": true,
       "allDay": false
     }
