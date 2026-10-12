@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-12T22:33:47.084Z",
+  "fetchedAt": "2026-10-12T22:41:33.609Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
-  "windowEnd": "2026-10-18",
+  "windowEnd": "2026-10-19",
   "asOfIso": "2026-10-12",
   "nextLeave": {
     "id": "o2l7f8ejuglit0vpbeg1mt4hu8",
@@ -365,6 +365,42 @@
       "end": "2026-10-18T21:00:00-05:00",
       "location": "Ascend Federal Credit Union Amphitheater, Nashville, TN",
       "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "rkmtnuhr4110st2pu32hr6j0sc",
+      "summary": "Ainsley — LKMS virtual conference signup closes",
+      "start": "2026-10-19T00:00:00-05:00",
+      "end": "2026-10-20T00:00:00-05:00",
+      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": true
+    },
+    {
+      "id": "lunhn35v4udg9i9df3vg1hu06s",
+      "summary": "Hayes — SRE specials: Music",
+      "start": "2026-10-19T07:00:00-05:00",
+      "end": "2026-10-19T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "t82534f4damlpqaqb8gmpdu624",
+      "summary": "Harris — SRE specials: Music",
+      "start": "2026-10-19T07:00:00-05:00",
+      "end": "2026-10-19T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "9nlg7djdjmc9vtd133ka27n848",
+      "summary": "Ainsley — Lindsay appt · 3:00",
+      "start": "2026-10-19T15:00:00-05:00",
+      "end": "2026-10-19T16:00:00-05:00",
+      "location": "8675 College Blvd, Overland Park, KS 66210-1946",
+      "busy": false,
       "allDay": false
     }
   ],
