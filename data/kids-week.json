@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 12 2026",
   "asOfIso": "2026-10-12",
-  "refreshedAt": "2026-10-12T20:32:32.654Z",
+  "refreshedAt": "2026-10-12T20:52:59.267Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,31 +17,19 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "3:25",
-    "place": "Boys SRE pickup",
-    "detailHtml": "4:55 Hayes baseball — Falcons vs Blue Bananas (home) · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+    "time": "4:55",
+    "place": "Hayes baseball — Falcons vs Blue Bananas (home)",
+    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
     "badge": "Mon",
-    "startIso": "2026-10-12T20:25:00.000Z",
-    "endIso": "2026-10-12T20:50:00.000Z",
-    "kind": "school_pickup",
+    "startIso": "2026-10-12T21:55:00.000Z",
+    "endIso": "2026-10-13T00:20:00.000Z",
+    "kind": "sport",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "3:25",
-        "place": "Boys SRE pickup",
-        "detailHtml": "4:55 Hayes baseball — Falcons vs Blue Bananas (home) · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-12T20:25:00.000Z",
-        "endIso": "2026-10-12T20:50:00.000Z",
-        "kind": "school_pickup",
-        "whenLabel": "3:25",
-        "summary": "Hayes + Harris — SRE pickup · 3:45"
-      },
       {
         "label": "Next up · today",
         "time": "4:55",
         "place": "Hayes baseball — Falcons vs Blue Bananas (home)",
-        "detailHtml": "3:25 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Mon",
         "startIso": "2026-10-12T21:55:00.000Z",
         "endIso": "2026-10-13T00:20:00.000Z",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Wed 12:00",
         "summary": "Hayes + Harris — SRE Green Day"
+      },
+      {
+        "label": "Next up · Wed",
+        "time": "3:15",
+        "place": "Boys SRE pickup",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-10-14T20:15:00.000Z",
+        "endIso": "2026-10-14T21:00:00.000Z",
+        "kind": "school_pickup",
+        "whenLabel": "Wed 3:15",
+        "summary": "Hayes + Harris — SRE pickup · 3:40"
       }
     ]
   },
