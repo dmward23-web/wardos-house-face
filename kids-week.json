@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 12 2026",
   "asOfIso": "2026-10-12",
-  "refreshedAt": "2026-10-12T20:13:29.437Z",
+  "refreshedAt": "2026-10-12T20:32:32.654Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -52,14 +52,14 @@
       {
         "label": "Next up · Tue",
         "time": "7:00",
-        "place": "SRE specials: PE (tennis shoes)",
+        "place": "SRE specials: Art",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Tue",
         "startIso": "2026-10-13T12:00:00.000Z",
         "endIso": "2026-10-13T12:15:00.000Z",
         "kind": "school",
         "whenLabel": "Tue 7:00",
-        "summary": "Harris — SRE specials: PE (tennis shoes)"
+        "summary": "Harris — SRE specials: Art"
       },
       {
         "label": "Next up · Tue",
@@ -136,14 +136,14 @@
       {
         "label": "Next up · Wed",
         "time": "7:00",
-        "place": "SRE specials: Art",
+        "place": "SRE specials: Spanish",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Wed",
         "startIso": "2026-10-14T12:00:00.000Z",
         "endIso": "2026-10-14T12:15:00.000Z",
         "kind": "school",
         "whenLabel": "Wed 7:00",
-        "summary": "Harris — SRE specials: Art"
+        "summary": "Harris — SRE specials: Spanish"
       },
       {
         "label": "Next up · Wed",
@@ -348,7 +348,7 @@
         },
         {
           "when": "Tue 13 · 7:00",
-          "what": "SRE specials: PE (tennis shoes)",
+          "what": "SRE specials: Art",
           "tone": "act",
           "hint": ""
         },
@@ -366,7 +366,7 @@
         },
         {
           "when": "Wed 14 · 7:00",
-          "what": "SRE specials: Art",
+          "what": "SRE specials: Spanish",
           "tone": "act",
           "hint": ""
         },
@@ -390,7 +390,7 @@
         },
         {
           "when": "Thu 15 · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
+          "what": "SRE specials: Music + Library checkout (library book)",
           "tone": "act",
           "hint": ""
         },
@@ -414,7 +414,7 @@
         },
         {
           "when": "Fri 16 · 7:00",
-          "what": "SRE specials: Music",
+          "what": "SRE specials: PE (tennis shoes)",
           "tone": "act",
           "hint": ""
         },
@@ -1058,6 +1058,11 @@
         },
         {
           "when": "Tue 13 · 7:00",
+          "what": "SRE specials: Art",
+          "tone": "act"
+        },
+        {
+          "when": "Tue 13 · 7:00",
           "what": "SRE specials: PE (tennis shoes)",
           "tone": "act"
         },
@@ -1083,7 +1088,7 @@
         },
         {
           "when": "Wed 14 · 7:00",
-          "what": "SRE specials: Art",
+          "what": "SRE specials: Spanish",
           "tone": "act"
         },
         {
@@ -1118,7 +1123,7 @@
         },
         {
           "when": "Thu 15 · 7:00",
-          "what": "SRE specials: Spanish + Library checkout",
+          "what": "SRE specials: Music + Library checkout (library book)",
           "tone": "act"
         },
         {
@@ -1149,11 +1154,6 @@
         {
           "when": "Thu 15 · 4:25",
           "what": "Ainsley swim — Coach Ann",
-          "tone": "hot"
-        },
-        {
-          "when": "Thu 15 · 5:40",
-          "what": "Hayes flag practice",
           "tone": "hot"
         }
       ]

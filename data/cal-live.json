@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-12T20:13:29.824Z",
+  "fetchedAt": "2026-10-12T20:32:33.095Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-18",
@@ -16,15 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "3hv9bcr87ggrhrkuf4ka3u6r2s_20261012T201500Z",
-      "summary": "Hayes + Harris — SRE pickup · 3:45",
-      "start": "2026-10-12T15:25:00-05:00",
-      "end": "2026-10-12T15:50:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "q13gu6onji3irp8p6feteapsus",
       "summary": "Hayes baseball — Falcons vs Blue Bananas (home) · 5:30 game",
@@ -54,7 +45,7 @@
     },
     {
       "id": "jmgnpuvk85bkpthecq6lvoe0hk",
-      "summary": "Harris — SRE specials: PE (tennis shoes)",
+      "summary": "Harris — SRE specials: Art",
       "start": "2026-10-13T07:00:00-05:00",
       "end": "2026-10-13T07:15:00-05:00",
       "location": "14901 England St, Overland Park, KS 66221",
@@ -144,7 +135,7 @@
     },
     {
       "id": "lvdau296id8bpskqll9uogsrp0",
-      "summary": "Harris — SRE specials: Art",
+      "summary": "Harris — SRE specials: Spanish",
       "start": "2026-10-14T07:00:00-05:00",
       "end": "2026-10-14T07:15:00-05:00",
       "location": "14901 England St, Overland Park, KS 66221",
@@ -207,7 +198,7 @@
     },
     {
       "id": "ensu2vnvrco5bga16ugdkl8kik",
-      "summary": "Harris — SRE specials: Spanish + Library checkout",
+      "summary": "Harris — SRE specials: Music + Library checkout (library book)",
       "start": "2026-10-15T07:00:00-05:00",
       "end": "2026-10-15T07:15:00-05:00",
       "location": "14901 England St, Overland Park, KS 66221",
@@ -306,7 +297,7 @@
     },
     {
       "id": "fp0cudn8p70gv73fbnvu5at6po",
-      "summary": "Harris — SRE specials: Music",
+      "summary": "Harris — SRE specials: PE (tennis shoes)",
       "start": "2026-10-16T07:00:00-05:00",
       "end": "2026-10-16T07:15:00-05:00",
       "location": "14901 England St, Overland Park, KS 66221",
