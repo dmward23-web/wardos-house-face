@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 12 2026",
   "asOfIso": "2026-10-12",
-  "refreshedAt": "2026-10-12T15:01:11.784Z",
+  "refreshedAt": "2026-10-12T15:32:01.014Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -135,30 +135,6 @@
       },
       {
         "label": "Next up · Tue",
-        "time": "1:00",
-        "place": "Lindsay appt · 1:00 (provider Floyd)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-13T18:00:00.000Z",
-        "endIso": "2026-10-13T18:30:00.000Z",
-        "kind": "other",
-        "whenLabel": "Tue 1:00",
-        "summary": "Hayes — Lindsay appt · 1:00 (provider Floyd)"
-      },
-      {
-        "label": "Next up · Tue",
-        "time": "1:30",
-        "place": "Lindsay appt",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-13T18:30:00.000Z",
-        "endIso": "2026-10-13T19:00:00.000Z",
-        "kind": "other",
-        "whenLabel": "Tue 1:30",
-        "summary": "Harris — Lindsay appt · 1:30"
-      },
-      {
-        "label": "Next up · Tue",
         "time": "3:15",
         "place": "Boys SRE pickup",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -168,6 +144,30 @@
         "kind": "school_pickup",
         "whenLabel": "Tue 3:15",
         "summary": "Hayes + Harris — SRE pickup · 3:40"
+      },
+      {
+        "label": "Next up · Tue",
+        "time": "4:45",
+        "place": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-13T21:45:00.000Z",
+        "endIso": "2026-10-14T00:45:00.000Z",
+        "kind": "school",
+        "whenLabel": "Tue 4:45",
+        "summary": "Ainsley — LKMS choir Fall Concert · call 5:00 / starts 5:30"
+      },
+      {
+        "label": "Next up · Wed",
+        "time": "7:00",
+        "place": "SRE specials: Art + Library (library book)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-10-14T12:00:00.000Z",
+        "endIso": "2026-10-14T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Wed 7:00",
+        "summary": "Hayes — SRE specials: Art + Library (library book)"
       }
     ]
   },
@@ -332,14 +332,7 @@
           "tone": "hot"
         }
       ],
-      "sports": [
-        {
-          "when": "Wed 14 · leave 4:40",
-          "what": "Harris flag practice · 5:30–6:30",
-          "hint": "YOUR board",
-          "tone": "hot"
-        }
-      ],
+      "sports": [],
       "school": [
         {
           "when": "Mon 12 · 12:00",
@@ -1136,11 +1129,6 @@
           "tone": "hot"
         },
         {
-          "when": "Wed 14 · 4:40",
-          "what": "Harris flag practice · 5:30–6:30",
-          "tone": "hot"
-        },
-        {
           "when": "Thu 15 · 7:00",
           "what": "SRE specials: Spanish",
           "tone": "act"
@@ -1174,6 +1162,11 @@
           "when": "Thu 15 · 3:50",
           "what": "LKMS Homework Help · 3:00–4:00 · pickup 4:00",
           "tone": "act"
+        },
+        {
+          "when": "Thu 15 · 4:25",
+          "what": "Ainsley swim — Coach Ann",
+          "tone": "hot"
         }
       ]
     }

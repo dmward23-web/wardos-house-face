@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-12T15:01:12.352Z",
+  "fetchedAt": "2026-10-12T15:32:01.454Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-18",
@@ -85,24 +85,6 @@
       "start": "2026-10-13T10:45:00-05:00",
       "end": "2026-10-13T14:25:00-05:00",
       "location": "Starting Point Dental Metcalf, 14465 Metcalf Ave, Overland Park, KS 66223",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "tdthfu4ejg1sa1ucicofe45b20",
-      "summary": "Hayes — Lindsay appt · 1:00 (provider Floyd)",
-      "start": "2026-10-13T13:00:00-05:00",
-      "end": "2026-10-13T13:30:00-05:00",
-      "location": "Location TBD (portal blank)",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "cct8a59hgpem7gd65ggov4vmts",
-      "summary": "Harris — Lindsay appt · 1:30",
-      "start": "2026-10-13T13:30:00-05:00",
-      "end": "2026-10-13T14:00:00-05:00",
-      "location": "Location TBD (portal blank)",
       "busy": true,
       "allDay": false
     },
@@ -206,24 +188,6 @@
       "allDay": false
     },
     {
-      "id": "nmfqrqn6lvnc8nro77i5ankg28",
-      "summary": "Harris flag practice · 5:30–6:30",
-      "start": "2026-10-14T16:40:00-05:00",
-      "end": "2026-10-14T18:50:00-05:00",
-      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "dugkci3ufknsm669rbgf5rt1r8",
-      "summary": "BV Community Connections with BOE (optional) · 5:30",
-      "start": "2026-10-14T17:30:00-05:00",
-      "end": "2026-10-14T18:30:00-05:00",
-      "location": "Blue Valley District Offices, 15020 Metcalf Ave, Overland Park, KS",
-      "busy": false,
-      "allDay": false
-    },
-    {
       "id": "44bg4l5n1gfsl9t8lmjlbt33hc",
       "summary": "Hayes + Harris — SRE Red Day",
       "start": "2026-10-15T00:00:00-05:00",
@@ -302,15 +266,6 @@
       "end": "2026-10-15T19:35:00-05:00",
       "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
       "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "411ukv966ngh2482uahglmkhp8",
-      "summary": "BV Well — parent workshop (optional) · 6:00–7:30",
-      "start": "2026-10-15T18:00:00-05:00",
-      "end": "2026-10-15T19:30:00-05:00",
-      "location": "Blue Valley District Offices, High Plains Room, 15020 Metcalf Ave, Overland Park, KS",
-      "busy": false,
       "allDay": false
     },
     {
