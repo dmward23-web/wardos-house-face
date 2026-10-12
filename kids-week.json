@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 12 2026",
   "asOfIso": "2026-10-12",
-  "refreshedAt": "2026-10-12T23:54:48.252Z",
+  "refreshedAt": "2026-10-12T23:56:26.908Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -100,14 +100,14 @@
       {
         "label": "Next up · Wed",
         "time": "7:00",
-        "place": "SRE specials: Art + Library (library book)",
+        "place": "SRE specials: Art + Library (library book, old clothes)",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Wed",
         "startIso": "2026-10-14T12:00:00.000Z",
         "endIso": "2026-10-14T12:15:00.000Z",
         "kind": "school",
         "whenLabel": "Wed 7:00",
-        "summary": "Hayes — SRE specials: Art + Library (library book)"
+        "summary": "Hayes — SRE specials: Art + Library (library book, old clothes)"
       },
       {
         "label": "Next up · Wed",
@@ -634,7 +634,7 @@
         },
         {
           "when": "Wed 14 · 7:00",
-          "what": "SRE specials: Art + Library (library book)",
+          "what": "SRE specials: Art + Library (library book, old clothes)",
           "tone": "act",
           "hint": ""
         },
@@ -961,6 +961,11 @@
       "today": [
         {
           "when": "Mon · 7:00",
+          "what": "SRE specials: PE (tennis shoes)",
+          "tone": "act"
+        },
+        {
+          "when": "Mon · 7:00",
           "what": "SRE specials: Music",
           "tone": "act"
         },
@@ -1033,7 +1038,7 @@
         },
         {
           "when": "Wed 14 · 7:00",
-          "what": "SRE specials: Art + Library (library book)",
+          "what": "SRE specials: Art + Library (library book, old clothes)",
           "tone": "act"
         },
         {
