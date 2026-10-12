@@ -1709,8 +1709,8 @@
     } catch (e) { /* never block a tap */ }
   }
 
-  /* TAPSTICK1 · a tap fills a chest and that's it: no pop-up card blocks the next chest,
-     a quick second tap can't undo it. Undo = press and hold a done chest ~0.7s. */
+  /* TAPSTICK1 · a tap fills a chest: no pop-up card blocks the next chest.
+     UNDO1 · tap a done chest again (after 1s) to un-check it. */
   var lastHit = { q: null, at: 0 }, holdTimer = 0;
   function clearHold() { if (holdTimer) { clearTimeout(holdTimer); holdTimer = 0; } }
   function onWorldDown(ev) {
@@ -1718,19 +1718,17 @@
     var q = hitQuest(ev);
     if (!q || !q.btn) return;
     var now = performance.now();
-    if (lastHit.q && lastHit.q.btn === q.btn && now - lastHit.at < 1500) return;
+    if (lastHit.q && lastHit.q.btn === q.btn && now - lastHit.at < 1000) return; /* UNDO1 · double-tap guard: a fumble can't undo what was just checked */
     lastHit = { q: q, at: now };
     var was = q.btn.classList.contains("done");
     var idx = 0;
     for (var hi = 0; hi < bg.hits.length; hi++) if (bg.hits[hi] === q) idx = hi;
     if (was) {
+      /* UNDO1 · tap a done chest again = un-check it. Same q.btn.click() path as a check,
+         so the jar, stars/points, hub sync and offline queue all reverse the same way. */
       clearHold();
-      holdTimer = setTimeout(function () {
-        holdTimer = 0;
-        if (!q.btn.classList.contains("done")) return;
-        q.btn.click();
-        if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap();
-      }, 700);
+      q.btn.click();
+      if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap();
       return;
     }
     feed = { t0: (performance.now() - bg.t0) / 1000, index: idx, label: q.label };

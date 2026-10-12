@@ -8,6 +8,17 @@
   var PROXY_LS = "wardos-lights-proxy", TOKEN_LS = "wardos-lights-proxy-token";
   var ls = window.localStorage, rawSet = ls.setItem.bind(ls);
   var lastTap = 0, pushTimer = null, applying = false, offset = 0; /* TAPSTICK1 · hub clock − device clock */
+  /* HUBHEAL1 · a slow or dead hub can never hang the page or strand taps:
+     every request times out, a failed hub lookup is retried (not cached),
+     failures retry fast with backoff, and we resync on online / visible / pageshow. */
+  var TIMEOUT_MS = 6000, POLL_MS = 10000, inflight = null, retryTimer = null, fails = 0;
+  function tfetch(url, opts) {
+    opts = opts || {};
+    var ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    var timer = setTimeout(function () { try { if (ctrl) ctrl.abort(); } catch (e) { /* */ } }, TIMEOUT_MS);
+    if (ctrl) opts.signal = ctrl.signal;
+    return fetch(url, opts).then(function (r) { clearTimeout(timer); return r; }, function (e) { clearTimeout(timer); throw e; });
+  }
 
   function jget(k, d) { try { return JSON.parse(ls.getItem(k) || "") || d; } catch (e) { return d; } }
   function jset(k, v) { try { rawSet(k, JSON.stringify(v)); } catch (e) { /* */ } }
@@ -20,16 +31,17 @@
   var proxyP = null;
   function proxy() {
     if (proxyP) return proxyP;
-    proxyP = fetch("data/lights-live.json?t=" + Date.now(), { cache: "no-store" })
+    proxyP = tfetch("data/lights-live.json?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : {}; })
       .then(function (d) { var wp = d && d.writeProxy ? String(d.writeProxy).replace(/\/$/, "") : ""; return /^https:\/\//.test(wp) ? wp : (ls.getItem(PROXY_LS) || ""); })
-      .catch(function () { return ls.getItem(PROXY_LS) || ""; });
+      .catch(function () { return ls.getItem(PROXY_LS) || ""; })
+      .then(function (base) { if (!base) proxyP = null; return base; }); /* HUBHEAL1 · never cache "no hub" */
     return proxyP;
   }
   function call(method, body) {
     return proxy().then(function (base) {
       if (!base || (!token() && !/\.github\.io$/i.test(location.hostname))) throw new Error("nokey"); /* NOKEY1 */
-      return fetch(base + "/api/taps", {
+      return tfetch(base + "/api/taps", {
         method: method, cache: "no-store",
         headers: token() ? { "Content-Type": "application/json", "X-Lights-Proxy-Token": token() } : { "Content-Type": "application/json" },
         body: body ? JSON.stringify(body) : undefined
@@ -52,7 +64,7 @@
     });
     if (!changed) return;
     lastTap = now; jset(META, meta); jset(QUEUE, q.slice(-2000));
-    clearTimeout(pushTimer); pushTimer = setTimeout(push, 600);
+    clearTimeout(pushTimer); pushTimer = setTimeout(function () { if (inflight) inflight.then(sync); else sync(); }, 600);
   };
 
   function seedChanges() {
@@ -115,6 +127,19 @@
     sessionStorage.setItem("tapsync-reloads", "0");
   }
 
+  function ok() { fails = 0; clearTimeout(retryTimer); retryTimer = null; }
+  function failed() {
+    setBadge(false);
+    proxyP = null; /* re-read writeProxy next time (address may have moved) */
+    fails++;
+    clearTimeout(retryTimer);
+    retryTimer = setTimeout(sync, Math.min(POLL_MS, 1000 * Math.pow(2, Math.min(fails, 4)))); /* 2s,4s,8s,10s… */
+  }
+  function sync() {
+    if (inflight) return inflight;
+    inflight = push().then(function () { inflight = null; }, function () { inflight = null; });
+    return inflight;
+  }
   function push() {
     var q = jget(QUEUE, []);
     if (!ls.getItem(SEEDED)) q = seedChanges().concat(q);
@@ -126,17 +151,21 @@
       /* drop only what we sent; taps made while in flight stay queued */
       var sentKeys = {}; q.forEach(function (c) { sentKeys[c.key + "|" + c.id + "|" + c.t] = 1; });
       jset(QUEUE, jget(QUEUE, []).filter(function (c) { return !sentKeys[c.key + "|" + c.id + "|" + c.t]; }));
+      ok();
       afterPull(res, sentAt);
-    }).catch(function () { setBadge(false); });
+    }).catch(failed);
   }
   function pull() {
     var sentAt = Date.now();
-    return call("GET").then(function (res) { afterPull(res, sentAt); }).catch(function () { setBadge(false); });
+    return call("GET").then(function (res) { ok(); afterPull(res, sentAt); }).catch(failed);
   }
 
-  function tick() { if (document.visibilityState !== "hidden") push(); }
+  function tick() { if (document.visibilityState !== "hidden") sync(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", tick); else tick();
-  setInterval(tick, 20000);
+  setInterval(tick, POLL_MS);
   document.addEventListener("visibilitychange", tick);
-  window.HouseTapSync = { push: push, pull: pull };
+  window.addEventListener("online", tick);
+  window.addEventListener("focus", tick);
+  window.addEventListener("pageshow", tick);
+  window.HouseTapSync = { push: sync, pull: pull, state: function () { return { fails: fails, queued: jget(QUEUE, []).length }; } };
 })();
