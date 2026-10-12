@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-12T14:28:29.626Z",
+  "fetchedAt": "2026-10-12T15:01:12.352Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-18",
@@ -132,15 +132,6 @@
       "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
       "busy": true,
       "allDay": false
-    },
-    {
-      "id": "4slsbqvsqv5gqjoq4dupo0k1k4",
-      "summary": "Ainsley — choir Sing & Share permission form due",
-      "start": "2026-10-14T00:00:00-05:00",
-      "end": "2026-10-15T00:00:00-05:00",
-      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": true
     },
     {
       "id": "lvjj0ha6s8h1ep1c0iftccpnlg",
