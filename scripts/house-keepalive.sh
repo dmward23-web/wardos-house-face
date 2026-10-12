@@ -79,6 +79,9 @@ if ! curl -sf --max-time 3 http://127.0.0.1:8787/health >/dev/null 2>&1; then
   fi
 fi
 
+# HUBDOG1 · 60s tunnel watchdog (catches a connector that is up but answers 502)
+[[ -x "$HOME/.local/bin/wardos-hub-watchdog.sh" ]] && ! pgrep -f wardos-hub-watchdog.sh >/dev/null && { setsid nohup "$HOME/.local/bin/wardos-hub-watchdog.sh" >/dev/null 2>&1 </dev/null & CHANGED+=("hub-watchdog"); }
+
 # --- 1b. Named tunnel wardos-hub (cams./lights.wardhousehub.com) — stable URLs, no quick tunnels
 URL_FILE="$CFG/nest-webrtc-proxy.url"
 printf '%s\n' "https://cams.wardhousehub.com" > "$URL_FILE"
