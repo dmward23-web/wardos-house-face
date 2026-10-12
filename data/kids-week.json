@@ -1,7 +1,7 @@
 {
-  "asOf": "Sun Oct 11 2026",
-  "asOfIso": "2026-10-11",
-  "refreshedAt": "2026-10-12T03:03:46.927Z",
+  "asOf": "Mon Oct 12 2026",
+  "asOfIso": "2026-10-12",
+  "refreshedAt": "2026-10-12T10:17:59.279Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,7 +16,7 @@
     "endIso": "2026-10-16T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · Mon",
+    "label": "Next up · today",
     "time": "7:00",
     "place": "SRE specials: Music",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -26,7 +26,7 @@
     "kind": "school",
     "queue": [
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "7:00",
         "place": "SRE specials: Music",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -34,11 +34,11 @@
         "startIso": "2026-10-12T12:00:00.000Z",
         "endIso": "2026-10-12T12:15:00.000Z",
         "kind": "school",
-        "whenLabel": "Mon 7:00",
+        "whenLabel": "7:00",
         "summary": "Harris — SRE specials: Music"
       },
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "7:00",
         "place": "SRE specials: Music",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -46,11 +46,11 @@
         "startIso": "2026-10-12T12:00:00.000Z",
         "endIso": "2026-10-12T12:15:00.000Z",
         "kind": "school",
-        "whenLabel": "Mon 7:00",
+        "whenLabel": "7:00",
         "summary": "Hayes — SRE specials: Music"
       },
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "8:10",
         "place": "Boys SRE drop",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -58,11 +58,11 @@
         "startIso": "2026-10-12T13:10:00.000Z",
         "endIso": "2026-10-12T13:40:00.000Z",
         "kind": "school_drop",
-        "whenLabel": "Mon 8:10",
+        "whenLabel": "8:10",
         "summary": "Hayes + Harris — SRE drop-off · 8:25"
       },
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "12:00",
         "place": "SRE Orange Day",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -70,11 +70,11 @@
         "startIso": "2026-10-12T17:00:00.000Z",
         "endIso": "2026-10-13T17:00:00.000Z",
         "kind": "school",
-        "whenLabel": "Mon 12:00",
+        "whenLabel": "12:00",
         "summary": "Hayes + Harris — SRE Orange Day"
       },
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "12:00",
         "place": "Hayes BB: coach in — practices by 19 Oct",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -82,11 +82,11 @@
         "startIso": "2026-10-12T17:00:00.000Z",
         "endIso": "2026-10-17T17:00:00.000Z",
         "kind": "other",
-        "whenLabel": "Mon 12:00",
+        "whenLabel": "12:00",
         "summary": "Hayes BB: coach in — practices by 19 Oct"
       },
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "2:20",
         "place": "Lindsay appt",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -94,11 +94,11 @@
         "startIso": "2026-10-12T19:20:00.000Z",
         "endIso": "2026-10-12T21:20:00.000Z",
         "kind": "appointment",
-        "whenLabel": "Mon 2:20",
+        "whenLabel": "2:20",
         "summary": "Ainsley — Lindsay appt · 3:00"
       },
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "3:25",
         "place": "Boys SRE pickup",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -106,11 +106,11 @@
         "startIso": "2026-10-12T20:25:00.000Z",
         "endIso": "2026-10-12T20:50:00.000Z",
         "kind": "school_pickup",
-        "whenLabel": "Mon 3:25",
+        "whenLabel": "3:25",
         "summary": "Hayes + Harris — SRE pickup · 3:45"
       },
       {
-        "label": "Next up · Mon",
+        "label": "Next up · today",
         "time": "4:55",
         "place": "Hayes baseball — Falcons vs Blue Bananas (home)",
         "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
@@ -118,7 +118,7 @@
         "startIso": "2026-10-12T21:55:00.000Z",
         "endIso": "2026-10-13T00:20:00.000Z",
         "kind": "sport",
-        "whenLabel": "Mon 4:55",
+        "whenLabel": "4:55",
         "summary": "Hayes baseball — Falcons vs Blue Bananas (home) · 5:30 game"
       },
       {
@@ -310,6 +310,34 @@
         ]
       },
       "today": [
+        {
+          "kind": "event",
+          "when": "Mon · 7:00",
+          "what": "SRE specials: Music",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 8:10",
+          "what": "SRE drop-off",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 12:00",
+          "what": "SRE Orange Day",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 3:25",
+          "what": "SRE pickup",
+          "hint": "",
+          "tone": "act"
+        },
         {
           "kind": "note",
           "when": "All day",
@@ -589,10 +617,45 @@
       },
       "today": [
         {
-          "kind": "note",
-          "when": "All day",
-          "what": "🏡 DROP ZONE HQ with Dad",
-          "hint": "through Fri Oct 16 · 3:00",
+          "kind": "event",
+          "when": "Mon · 7:00",
+          "what": "SRE specials: Music",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 8:10",
+          "what": "SRE drop-off",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 12:00",
+          "what": "SRE Orange Day",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 12:00",
+          "what": "Hayes BB: coach in — practices by 19 Oct",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 3:25",
+          "what": "SRE pickup",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Mon · 4:55",
+          "what": "⚾ Hayes baseball — Falcons vs Blue Bananas (home)",
+          "hint": "YOUR board",
           "tone": "hot"
         }
       ],
@@ -885,8 +948,8 @@
       "today": [
         {
           "kind": "event",
-          "when": "Sun · 12:00",
-          "what": "Ainsley appt: school absence verification due (portal)",
+          "when": "Mon · 2:20",
+          "what": "Lindsay appt",
           "hint": "",
           "tone": "hot"
         },
@@ -946,12 +1009,6 @@
       ],
       "appointments": [
         {
-          "when": "Sun 11 · 12:00",
-          "what": "Ainsley appt: school absence verification due (portal)",
-          "hint": "with Dad",
-          "tone": "hot"
-        },
-        {
           "when": "Mon 12 · 2:20",
           "what": "Lindsay appt",
           "hint": "with Dad",
@@ -1003,7 +1060,7 @@
         }
       ],
       "hottest": {
-        "when": "Sun Oct 11 2026 · kids with you @ 147th",
+        "when": "Mon Oct 12 2026 · kids with you @ 147th",
         "what": "Dad week live",
         "where": "through Fri Oct 16 · 3:00",
         "badges": [
@@ -1013,8 +1070,33 @@
       },
       "today": [
         {
-          "when": "Sun · 12:00",
-          "what": "Ainsley appt: school absence verification due (portal)",
+          "when": "Mon · 7:00",
+          "what": "SRE specials: Music",
+          "tone": "act"
+        },
+        {
+          "when": "Mon · 8:10",
+          "what": "SRE drop-off",
+          "tone": "act"
+        },
+        {
+          "when": "Mon · 12:00",
+          "what": "SRE Orange Day",
+          "tone": "act"
+        },
+        {
+          "when": "Mon · 2:20",
+          "what": "Lindsay appt",
+          "tone": "hot"
+        },
+        {
+          "when": "Mon · 3:25",
+          "what": "SRE pickup",
+          "tone": "act"
+        },
+        {
+          "when": "Mon · 4:55",
+          "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
           "tone": "hot"
         },
         {
@@ -1024,11 +1106,6 @@
         }
       ],
       "week": [
-        {
-          "when": "Sun 11 · 12:00",
-          "what": "Ainsley appt: school absence verification due (portal)",
-          "tone": "act"
-        },
         {
           "when": "Mon 12 · 7:00",
           "what": "SRE specials: Music",
@@ -1142,6 +1219,11 @@
         {
           "when": "Thu 15 · 8:10",
           "what": "SRE drop-off",
+          "tone": "act"
+        },
+        {
+          "when": "Thu 15 · 12:00",
+          "what": "SRE Red Day",
           "tone": "act"
         }
       ]
