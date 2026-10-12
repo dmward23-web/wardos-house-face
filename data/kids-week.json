@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 12 2026",
   "asOfIso": "2026-10-12",
-  "refreshedAt": "2026-10-12T13:08:24.924Z",
+  "refreshedAt": "2026-10-12T13:30:00.192Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -48,18 +48,6 @@
         "kind": "school",
         "whenLabel": "7:00",
         "summary": "Hayes — SRE specials: Music"
-      },
-      {
-        "label": "Next up · today",
-        "time": "8:10",
-        "place": "Boys SRE drop",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-12T13:10:00.000Z",
-        "endIso": "2026-10-12T13:40:00.000Z",
-        "kind": "school_drop",
-        "whenLabel": "8:10",
-        "summary": "Hayes + Harris — SRE drop-off · 8:25"
       },
       {
         "label": "Next up · today",
@@ -168,6 +156,18 @@
         "kind": "school",
         "whenLabel": "Tue 12:00",
         "summary": "Hayes + Harris — SRE Yellow Day"
+      },
+      {
+        "label": "Next up · Tue",
+        "time": "1:00",
+        "place": "Lindsay appt · 1:00 (provider Floyd)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-13T18:00:00.000Z",
+        "endIso": "2026-10-13T18:30:00.000Z",
+        "kind": "other",
+        "whenLabel": "Tue 1:00",
+        "summary": "Hayes — Lindsay appt · 1:00 (provider Floyd)"
       }
     ]
   },
