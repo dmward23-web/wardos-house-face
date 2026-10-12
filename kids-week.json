@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 12 2026",
   "asOfIso": "2026-10-12",
-  "refreshedAt": "2026-10-12T21:55:53.118Z",
+  "refreshedAt": "2026-10-12T22:12:21.883Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,27 +16,15 @@
     "endIso": "2026-10-16T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "4:55",
-    "place": "Hayes baseball — Falcons vs Blue Bananas (home)",
+    "label": "Next up · Tue",
+    "time": "7:00",
+    "place": "SRE specials: Art",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-    "badge": "Mon",
-    "startIso": "2026-10-12T21:55:00.000Z",
-    "endIso": "2026-10-13T00:20:00.000Z",
-    "kind": "sport",
+    "badge": "Tue",
+    "startIso": "2026-10-13T12:00:00.000Z",
+    "endIso": "2026-10-13T12:15:00.000Z",
+    "kind": "school",
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "4:55",
-        "place": "Hayes baseball — Falcons vs Blue Bananas (home)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Mon",
-        "startIso": "2026-10-12T21:55:00.000Z",
-        "endIso": "2026-10-13T00:20:00.000Z",
-        "kind": "sport",
-        "whenLabel": "4:55",
-        "summary": "Hayes baseball — Falcons vs Blue Bananas (home) · 5:30 game"
-      },
       {
         "label": "Next up · Tue",
         "time": "7:00",
@@ -168,6 +156,18 @@
         "kind": "school_pickup",
         "whenLabel": "Wed 3:15",
         "summary": "Hayes + Harris — SRE pickup · 3:40"
+      },
+      {
+        "label": "Next up · Wed",
+        "time": "3:50",
+        "place": "LKMS Math Counts info meeting · 3:15–4:00 · pickup 4:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-10-14T20:50:00.000Z",
+        "endIso": "2026-10-14T21:00:00.000Z",
+        "kind": "school",
+        "whenLabel": "Wed 3:50",
+        "summary": "Ainsley — LKMS Math Counts info meeting · 3:15–4:00 · pickup 4:00"
       }
     ]
   },
