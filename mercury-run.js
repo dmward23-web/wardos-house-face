@@ -325,16 +325,20 @@
      (transparent PNG, walkable top edge at PLAT_ART[type].top of the image height, end caps PLAT_ART[type].cap
      of the width each side; the middle stretches). If a file is missing the procedural placeholder below draws.
      Each platform is painted once into a cached sprite (per width/type/seed/dpr), so a frame is one drawImage. */
-  var PLAT_ART = {
-    stone: { src: "art/mercury/platforms/stone.png", top: 0.18, cap: 0.16 },
-    root: { src: "art/mercury/platforms/root.png", top: 0.22, cap: 0.14 }
-  };
+  /* Prism plates (2026-10-13/mercury-platforms, 2x set): <type>-<a..d>-{capL,mid,capR} 80x112 / 256x112 and matching
+     -shadow-* 48px strips. Drawn at half size: caps 40 css px, mid tiles every 128 css px, 56 tall, walk line 12 px down. */
+  var PLAT_ART = { dir: "art/mercury/platforms/", variants: ["a", "b", "c", "d"], parts: ["capL", "mid", "capR", "shadow-capL", "shadow-mid", "shadow-capR"], walk: 12, h: 56, sh: 24 };
   var platImg = {};
-  Object.keys(PLAT_ART).forEach(function (k) {
-    if (q.get("platart") === "0") return;
-    var im = new Image();
-    im.onload = function () { platImg[k] = im; platCache = {}; };
-    im.src = PLAT_ART[k].src + "?v=PLATFORMS1";
+  if (q.get("platart") !== "0") ["stone", "root"].forEach(function (t) {
+    PLAT_ART.variants.forEach(function (v) {
+      var set = {}, left = PLAT_ART.parts.length;
+      PLAT_ART.parts.forEach(function (part) {
+        var im = new Image();
+        im.onload = function () { set[part] = im; if (--left === 0) { platImg[t + "-" + v] = set; platCache = {}; } };
+        im.onerror = function () { left = -99; };
+        im.src = PLAT_ART.dir + t + "-" + v + "-" + part + ".png?v=PLATFORMS2";
+      });
+    });
   });
   var platCache = {};
   function platType(i, grove) { return grove ? "stone" : (i % 3 === 1 ? "root" : "stone"); }
@@ -342,7 +346,8 @@
   var PAD = 40, DEPTH = 120; /* sprite margin around the slab; how far the body hangs below the walk line */
   function platSprite(type, w, i, grove) {
     var dpr = view.dpr || 1;
-    var key = type + "|" + Math.round(w) + "|" + i + "|" + dpr.toFixed(2) + "|" + (platImg[type] ? "art" : "proc");
+    var art = platImg[type + "-" + PLAT_ART.variants[i % 4]];
+    var key = type + "|" + Math.round(w) + "|" + i + "|" + dpr.toFixed(2) + "|" + (art ? "art" : "proc");
     if (platCache[key]) return platCache[key];
     var cw = w + PAD * 2, chh = DEPTH + PAD * 2;
     var c = document.createElement("canvas");
@@ -350,20 +355,23 @@
     var g = c.getContext("2d");
     g.scale(dpr, dpr);
     g.translate(PAD, PAD);
-    if (platImg[type]) paintPlatArt(g, platImg[type], PLAT_ART[type], w);
+    if (art) paintPlatArt(g, art, w, grove);
     else if (type === "root") paintRoot(g, w, i);
     else paintStone(g, w, i, grove);
     platCache[key] = c;
     return c;
   }
-  function paintPlatArt(g, img, spec, w) {
-    var h = img.height * (w / img.width); /* natural scale at this width */
-    var scale = Math.min(1, (DEPTH + 20) / h);
-    var dh = h * scale, y0 = -dh * spec.top;
-    var sw = img.width * spec.cap, dwCap = Math.min(w * 0.3, sw * (dh / img.height));
-    g.drawImage(img, 0, 0, sw, img.height, 0, y0, dwCap, dh);
-    g.drawImage(img, sw, 0, img.width - sw * 2, img.height, dwCap, y0, w - dwCap * 2, dh);
-    g.drawImage(img, img.width - sw, 0, sw, img.height, w - dwCap, y0, dwCap, dh);
+  function paintPlatArt(g, set, w, grove) {
+    var cap = 40, tile = 128, y0 = -PLAT_ART.walk;
+    function strip(pre, y, h) {
+      var mw = Math.max(0, w - cap * 2);
+      for (var x = 0; x < mw; x += tile) { var tw = Math.min(tile, mw - x); var im = set[pre + "mid"]; g.drawImage(im, 0, 0, im.width * (tw / tile), im.height, cap + x, y, tw, h); }
+      g.drawImage(set[pre + "capL"], 0, y, cap, h);
+      g.drawImage(set[pre + "capR"], w - cap, y, cap, h);
+    }
+    strip("shadow-", y0 + PLAT_ART.h - 6, PLAT_ART.sh);
+    strip("", y0, PLAT_ART.h);
+    if (grove) { var gg = g.createRadialGradient(w / 2, 0, 4, w / 2, 0, w * 0.7); gg.addColorStop(0, "rgba(255,240,200,0.24)"); gg.addColorStop(1, "rgba(255,240,200,0)"); g.fillStyle = gg; g.fillRect(-PAD, -PAD, w + PAD * 2, PAD + 60); }
   }
   function stonePath(g, w, i, inset) {
     var n = 9, depth = 46 + rnd(i + 3) * 30;
