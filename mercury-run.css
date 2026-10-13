@@ -25,3 +25,9 @@ html, body { margin: 0; height: 100%; background: #070b10; color: #f4fbff; overf
 .je-host { width: min(280px, 70vw); height: 320px; }
 .hint { position: absolute; bottom: max(16px, env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center; opacity: 0.7; font-size: 14px; letter-spacing: 0.04em; }
 @media (prefers-reduced-motion: reduce) { .hint { opacity: 0.85; } }
+/* POWERUPS1 · quiet chips, no counts */
+.hud .pw { font-style: normal; margin: 0 10px; opacity: .9; font-size: 14px; }
+.hud .pw em { font-style: normal; padding: 2px 8px; border-radius: 10px; margin-left: 4px; }
+.hud .pw em.on { background: rgba(255,236,190,.18); color: #fff3d6; }
+.hud .pw em.off { opacity: .38; }
+.hud .fixture { background: #6a4a10; color: #ffe2a0; padding: 2px 8px; border-radius: 6px; font-size: 12px; letter-spacing: .08em; }

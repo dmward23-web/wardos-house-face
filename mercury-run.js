@@ -136,6 +136,32 @@
   var spawn = { x: plats[0].x + 40, y: plats[0].y - 30 };
   var A = new Blob(spawn.x, spawn.y, false);
   var B = new Blob(spawn.x + 28, spawn.y, true);
+  /* POWERUPS1 · closed chores become power-ups. READ-ONLY: JarEngine.choreState(kid), the same read the gate uses.
+     double jump = that kid's musts for today are all closed; drop magnet = that kid's week jar is at least half full.
+     ?fixture=1 swaps in FIXTURE values (badge on screen) for proof captures only. */
+  var KIDS = ["hayes", "harris", "ainsley"];
+  var NAMES = { hayes: "Hayes", harris: "Harris", ainsley: "Ainsley" };
+  var SIBS = KIDS.filter(function (k) { return k !== kid; });
+  var FIXTURE = q.get("fixture") === "1";
+  var FIX_PW = {}; FIX_PW[kid] = { dbl: true, magnet: true }; FIX_PW[SIBS[0]] = { dbl: true, magnet: false }; FIX_PW[SIBS[1]] = { dbl: false, magnet: false };
+  A.kid = kid; B.kid = SIBS[0];
+  function powersFor(k) {
+    if (FIXTURE) return FIX_PW[k];
+    try {
+      var st = window.JarEngine && JarEngine.choreState(k);
+      if (!st) return { dbl: false, magnet: false };
+      return { dbl: st.todayNeed > 0 && st.todayDone >= st.todayNeed, magnet: (st.fill || 0) >= 0.5 };
+    } catch (e) { return { dbl: false, magnet: false }; }
+  }
+  function refreshPowers() { allBlobs().forEach(function (b) { b.pw = powersFor(b.kid); }); paintPowerHud(); }
+  function allBlobs() { return [A, B]; }
+  function paintPowerHud() {
+    var el = ui.querySelector(".hud span"); if (!el) return;
+    el.innerHTML = (FIXTURE ? '<b class="fixture">FIXTURE</b> ' : "") + allBlobs().map(function (b) {
+      var pw = b.pw || {};
+      return '<i class="pw">' + NAMES[b.kid] + ' <em class="' + (pw.dbl ? "on" : "off") + '">double jump</em> <em class="' + (pw.magnet ? "on" : "off") + '">drop magnet</em></i>';
+    }).join(" ");
+  }
   var drops = [];
   var rings = [];
   var cam = 0;
@@ -155,8 +181,12 @@
     }
     rings.push({ x: x, y: y, r: 6, a: 0.85 });
   }
-  function gather(b) {
+  function gather(b, why) {
     if (b.inv > 0) return;
+    if (why === "drip" && b.pw && b.pw.magnet) { /* drop magnet: the splash pulls straight back in, no trip to the lantern */
+      burst(b.x, b.y, 10, THEME.metal); tone("splash");
+      b.vy = Math.min(b.vy, -260); b.inv = 0.6; b.magnetT = 0.6; return;
+    }
     burst(b.x, b.y, 12, THEME.metal);
     tone("splash");
     shake = 0;
@@ -166,12 +196,13 @@
   function stepBlob(b, dt, t, input) {
     if (won) return;
     b.inv = Math.max(0, b.inv - dt);
+    b.magnetT = Math.max(0, (b.magnetT || 0) - dt);
     var accel = 0;
     if (input) {
       var worldX = cam + input.x;
       accel = clamp(worldX - b.x, -160, 160);
       b.vx += accel * 8 * dt;
-      if (input.jump) { b.want = 0.12; input.jump = false; }
+      if (input.jump) { b.want = 0.12; b.press = true; input.jump = false; }
     } else if (b.echo) {
       var here = null, next = null;
       for (var i = 0; i < plats.length; i++) {
@@ -192,10 +223,18 @@
       }
     }
     b.want = (b.want || 0) - dt;
+    if (b.want <= 0) b.press = false;
     if (b.grounded) b.coyote = 0.12; else b.coyote -= dt;
+    if (b.grounded) b.air2 = false;
     if (b.want > 0 && (b.grounded || b.coyote > 0)) {
       b.vy = -720; b.grounded = false; b.coyote = 0; b.want = 0; b.squash = 0.72;
       tone("jump");
+    } else if (b.want > 0 && b.press && b.pw && b.pw.dbl && !b.air2 && b.coyote <= 0) {
+      b.vy = -600; b.air2 = true; b.want = 0; b.squash = 0.8; /* double jump: a soft second push, a quiet ring */
+      rings.push({ x: b.x, y: b.y + b.r, r: 8, a: 0.5 });
+      tone("jump");
+    } else if (b.echo && b.pw && b.pw.dbl && !b.air2 && b.vy > 260 && b.y > view.h * 0.62) {
+      b.vy = -600; b.air2 = true; rings.push({ x: b.x, y: b.y + b.r, r: 8, a: 0.4 });
     }
     b.vy += 1700 * dt;
     b.vx = clamp(b.vx, -380, 380);
@@ -226,7 +265,7 @@
     for (var d = 0; d < drips.length; d++) {
       var dr = drips[d];
       var dy = GY(dr.y) + ((t * 90 + dr.p * 40) % 180);
-      if (Math.hypot(b.x - dr.x, b.y - dy) < b.r + dr.r * 0.45) gather(b);
+      if (Math.hypot(b.x - dr.x, b.y - dy) < b.r + dr.r * 0.45) gather(b, "drip");
     }
     if (was && !b.grounded) { /* stepped off */ }
   }
@@ -238,8 +277,9 @@
     if (d.age > 0.22) {
       var tx = A.x, ty = A.y;
       if (Math.hypot(B.x - d.x, B.y - d.y) < Math.hypot(tx - d.x, ty - d.y)) { tx = B.x; ty = B.y; }
-      d.vx += (tx - d.x) * 8 * dt;
-      d.vy += (ty - d.y) * 8 * dt;
+      var pull = ((tx === A.x ? A : B).magnetT > 0) ? 22 : 8;
+      d.vx += (tx - d.x) * pull * dt;
+      d.vy += (ty - d.y) * pull * dt;
       d.r *= Math.max(0.2, 1 - dt * 1.4);
       if (Math.hypot(tx - d.x, ty - d.y) < 10 || d.r < 0.7) { drops.splice(i, 1); continue; }
     }
@@ -718,7 +758,7 @@
       var rec = cv.getBoundingClientRect();
       if (p.ly - (e.clientY - rec.top) > 18) p.jump = true;
       var b = p.blob === 0 ? A : B;
-      if (p.jump) b.want = 0.14;
+      if (p.jump) { b.want = 0.14; b.press = true; }
     }
     delete pointers[e.pointerId];
   }
@@ -728,10 +768,10 @@
   window.addEventListener("keydown", function (e) {
     if (e.key === "ArrowRight" || e.key === "d") A.vx += 40;
     if (e.key === "ArrowLeft" || e.key === "a") A.vx -= 40;
-    if (e.key === "ArrowUp" || e.key === "w" || e.key === " ") A.want = 0.12;
+    if (e.key === "ArrowUp" || e.key === "w" || e.key === " ") { A.want = 0.12; A.press = true; }
     if (e.key === "l") B.vx += 40;
     if (e.key === "j") B.vx -= 40;
-    if (e.key === "i") { B.echo = false; B.want = 0.12; }
+    if (e.key === "i") { B.echo = false; B.want = 0.12; B.press = true; }
   });
 
   function ambience() {
@@ -752,6 +792,8 @@
 
   function showPlay() {
     playing = true;
+    setTimeout(refreshPowers, 0);
+    setInterval(refreshPowers, 30000); /* a chore closed mid-run lights its power-up within half a minute */
     ui.innerHTML = '<div class="hud"><a href="' + THEME.back + '">Back</a><span></span></div><div class="hint">One hand to roll and flick upward. A second hand wakes the other drop.</div>';
     resize();
     frame();
@@ -917,7 +959,7 @@
   }
 
   window.MercuryRun = {
-    debug: function () { return { A: [A.x, A.y, A.r], B: [B.x, B.y], cam: cam, drops: drops.length, view: view }; },
+    debug: function () { return { A: [A.x, A.y, A.r], B: [B.x, B.y], cam: cam, drops: drops.length, view: view, pw: allBlobs().map(function (b) { return [b.kid, b.pw]; }), air2: allBlobs().map(function (b) { return !!b.air2; }) }; },
     exportFrame: exportFrame,
     platesReady: function () { return runPlatesReady && !!runPlates.sky; }
   };
