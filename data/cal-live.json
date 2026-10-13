@@ -1,17 +1,17 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-13T13:08:13.474Z",
+  "fetchedAt": "2026-10-13T13:28:48.652Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-19",
   "asOfIso": "2026-10-13",
   "nextLeave": {
-    "id": "58euc5df4fbe3u32tfsc0imquk",
-    "summary": "Hayes + Harris — SRE drop-off · 8:25",
-    "start": "2026-10-13T08:10:00-05:00",
-    "end": "2026-10-13T08:40:00-05:00",
-    "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
+    "id": "rf6dko91o9tt1okf856j7a5s3g",
+    "summary": "Kids — Starting Point cleanings · 11:30",
+    "start": "2026-10-13T10:45:00-05:00",
+    "end": "2026-10-13T14:25:00-05:00",
+    "location": "Starting Point Dental Metcalf, 14465 Metcalf Ave, Overland Park, KS 66223",
     "busy": true,
     "allDay": false
   },
@@ -35,15 +35,6 @@
       "busy": false,
       "allDay": true,
       "pinnedUntil": "8:40"
-    },
-    {
-      "id": "58euc5df4fbe3u32tfsc0imquk",
-      "summary": "Hayes + Harris — SRE drop-off · 8:25",
-      "start": "2026-10-13T08:10:00-05:00",
-      "end": "2026-10-13T08:40:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
     },
     {
       "id": "rf6dko91o9tt1okf856j7a5s3g",
@@ -399,9 +390,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "8:10",
-    "place": "Hayes + Harris — SRE drop-off · 8:25",
-    "detailHtml": "<strong>8:10</strong> Hayes + Harris — SRE drop-off · 8:25",
+    "time": "10:45",
+    "place": "Kids — Starting Point cleanings · 11:30",
+    "detailHtml": "<strong>10:45</strong> Kids — Starting Point cleanings · 11:30",
     "badge": "Tue"
   },
   "error": null

@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Oct 13 2026",
   "asOfIso": "2026-10-13",
-  "refreshedAt": "2026-10-13T13:08:13.134Z",
+  "refreshedAt": "2026-10-13T13:28:48.239Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -19,22 +19,22 @@
     "label": "Next up · today",
     "time": "7:00",
     "place": "SRE specials: Art",
-    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+    "detailHtml": "4:05 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
     "badge": "Tue",
     "startIso": "2026-10-13T12:00:00.000Z",
     "endIso": "2026-10-13T12:15:00.000Z",
     "kind": "school",
     "nextLeave": {
       "label": "Next up · today",
-      "time": "8:10",
-      "place": "Boys SRE drop",
+      "time": "4:05",
+      "place": "Harris pickup at Riley's",
       "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
       "badge": "Tue",
-      "startIso": "2026-10-13T13:10:00.000Z",
-      "endIso": "2026-10-13T13:40:00.000Z",
-      "kind": "school_drop",
-      "whenLabel": "8:10",
-      "summary": "Hayes + Harris — SRE drop-off · 8:25",
+      "startIso": "2026-10-13T21:05:00.000Z",
+      "endIso": "2026-10-13T21:30:00.000Z",
+      "kind": "leave",
+      "whenLabel": "4:05",
+      "summary": "Harris — pickup at Riley's · 4:15",
       "leaveBy": true
     },
     "queue": [
@@ -42,7 +42,7 @@
         "label": "Next up · today",
         "time": "7:00",
         "place": "SRE specials: Art",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "4:05 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Tue",
         "startIso": "2026-10-13T12:00:00.000Z",
         "endIso": "2026-10-13T12:15:00.000Z",
@@ -55,7 +55,7 @@
         "label": "Next up · today",
         "time": "7:00",
         "place": "SRE specials: PE (tennis shoes)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "4:05 leave · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Tue",
         "startIso": "2026-10-13T12:00:00.000Z",
         "endIso": "2026-10-13T12:15:00.000Z",
@@ -63,19 +63,6 @@
         "whenLabel": "7:00",
         "summary": "Hayes — SRE specials: PE (tennis shoes)",
         "leaveBy": false
-      },
-      {
-        "label": "Next up · today",
-        "time": "8:10",
-        "place": "Boys SRE drop",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-13T13:10:00.000Z",
-        "endIso": "2026-10-13T13:40:00.000Z",
-        "kind": "school_drop",
-        "whenLabel": "8:10",
-        "summary": "Hayes + Harris — SRE drop-off · 8:25",
-        "leaveBy": true
       },
       {
         "label": "Next up · today",
@@ -193,6 +180,19 @@
         "whenLabel": "Wed 4:00",
         "summary": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
         "leaveBy": true
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "7:00",
+        "place": "SRE specials: Spanish",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-15T12:00:00.000Z",
+        "endIso": "2026-10-15T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Thu 7:00",
+        "summary": "Hayes — SRE specials: Spanish",
+        "leaveBy": false
       }
     ]
   },
