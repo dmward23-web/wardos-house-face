@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-13T13:28:48.652Z",
+  "fetchedAt": "2026-10-13T13:46:36.322Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-19",
@@ -16,26 +16,6 @@
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "jmgnpuvk85bkpthecq6lvoe0hk",
-      "summary": "Harris — SRE specials: Art",
-      "start": "2026-10-13",
-      "end": "2026-10-13",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true,
-      "pinnedUntil": "8:40"
-    },
-    {
-      "id": "tpf8lk5uk3lpkubf62qidajlc4",
-      "summary": "Hayes — SRE specials: PE (tennis shoes)",
-      "start": "2026-10-13",
-      "end": "2026-10-13",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true,
-      "pinnedUntil": "8:40"
-    },
     {
       "id": "rf6dko91o9tt1okf856j7a5s3g",
       "summary": "Kids — Starting Point cleanings · 11:30",
