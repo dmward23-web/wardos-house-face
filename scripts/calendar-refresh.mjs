@@ -834,6 +834,9 @@ function main() {
   const spans = allItems.filter((it) => it.kind === "custody");
   const isKidLogistics = (it) => {
     if (it.kind === "custody") return false;
+    /* SCHOOLALWAYS1 · school awareness (specials, dress-up days, conferences, no-school)
+       stays on kid boards even on mom weeks / Nashville — standing "Kids school info on boards". */
+    if (it.kind === "school") return false;
     if (it.kid || it.kidRide || it.ride || it.kind === "school_drop" || it.kind === "school_pickup" || it.kind === "sport") return true;
     const m = kidMentions(it.raw || it.summary || "");
     return !!(m.hayes || m.harris || m.ainsley);
