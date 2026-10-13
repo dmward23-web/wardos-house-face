@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 12 2026",
   "asOfIso": "2026-10-12",
-  "refreshedAt": "2026-10-13T02:43:49.723Z",
+  "refreshedAt": "2026-10-13T02:49:18.337Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -24,6 +24,19 @@
     "startIso": "2026-10-13T12:00:00.000Z",
     "endIso": "2026-10-13T12:15:00.000Z",
     "kind": "school",
+    "nextLeave": {
+      "label": "Next up · Tue",
+      "time": "8:10",
+      "place": "Boys SRE drop",
+      "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+      "badge": "Tue",
+      "startIso": "2026-10-13T13:10:00.000Z",
+      "endIso": "2026-10-13T13:40:00.000Z",
+      "kind": "school_drop",
+      "whenLabel": "Tue 8:10",
+      "summary": "Hayes + Harris — SRE drop-off · 8:25",
+      "leaveBy": true
+    },
     "queue": [
       {
         "label": "Next up · Tue",
@@ -35,7 +48,8 @@
         "endIso": "2026-10-13T12:15:00.000Z",
         "kind": "school",
         "whenLabel": "Tue 7:00",
-        "summary": "Harris — SRE specials: Art"
+        "summary": "Harris — SRE specials: Art",
+        "leaveBy": false
       },
       {
         "label": "Next up · Tue",
@@ -47,7 +61,8 @@
         "endIso": "2026-10-13T12:15:00.000Z",
         "kind": "school",
         "whenLabel": "Tue 7:00",
-        "summary": "Hayes — SRE specials: PE (tennis shoes)"
+        "summary": "Hayes — SRE specials: PE (tennis shoes)",
+        "leaveBy": false
       },
       {
         "label": "Next up · Tue",
@@ -59,19 +74,8 @@
         "endIso": "2026-10-13T13:40:00.000Z",
         "kind": "school_drop",
         "whenLabel": "Tue 8:10",
-        "summary": "Hayes + Harris — SRE drop-off · 8:25"
-      },
-      {
-        "label": "Next up · Tue",
-        "time": "12:00",
-        "place": "SRE Yellow Day",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-13T17:00:00.000Z",
-        "endIso": "2026-10-14T17:00:00.000Z",
-        "kind": "school",
-        "whenLabel": "Tue 12:00",
-        "summary": "Hayes + Harris — SRE Yellow Day"
+        "summary": "Hayes + Harris — SRE drop-off · 8:25",
+        "leaveBy": true
       },
       {
         "label": "Next up · Tue",
@@ -83,7 +87,8 @@
         "endIso": "2026-10-13T21:30:00.000Z",
         "kind": "other",
         "whenLabel": "Tue 4:05",
-        "summary": "Hayes + Harris — pickup at Riley's · 4:15"
+        "summary": "Hayes + Harris — pickup at Riley's · 4:15",
+        "leaveBy": true
       },
       {
         "label": "Next up · Tue",
@@ -95,7 +100,8 @@
         "endIso": "2026-10-14T00:45:00.000Z",
         "kind": "school",
         "whenLabel": "Tue 4:45",
-        "summary": "Ainsley — LKMS choir Fall Concert · call 5:00 / starts 5:30"
+        "summary": "Ainsley — LKMS choir Fall Concert · call 5:00 / starts 5:30",
+        "leaveBy": false
       },
       {
         "label": "Next up · Wed",
@@ -107,7 +113,8 @@
         "endIso": "2026-10-14T12:15:00.000Z",
         "kind": "school",
         "whenLabel": "Wed 7:00",
-        "summary": "Hayes — SRE specials: Art + Library (library book, old clothes)"
+        "summary": "Hayes — SRE specials: Art + Library (library book, old clothes)",
+        "leaveBy": false
       },
       {
         "label": "Next up · Wed",
@@ -119,7 +126,8 @@
         "endIso": "2026-10-14T12:15:00.000Z",
         "kind": "school",
         "whenLabel": "Wed 7:00",
-        "summary": "Harris — SRE specials: Spanish"
+        "summary": "Harris — SRE specials: Spanish",
+        "leaveBy": false
       },
       {
         "label": "Next up · Wed",
@@ -131,19 +139,8 @@
         "endIso": "2026-10-14T13:40:00.000Z",
         "kind": "school_drop",
         "whenLabel": "Wed 8:10",
-        "summary": "Hayes + Harris — SRE drop-off · 8:25"
-      },
-      {
-        "label": "Next up · Wed",
-        "time": "12:00",
-        "place": "SRE Green Day",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-10-14T17:00:00.000Z",
-        "endIso": "2026-10-15T17:00:00.000Z",
-        "kind": "school",
-        "whenLabel": "Wed 12:00",
-        "summary": "Hayes + Harris — SRE Green Day"
+        "summary": "Hayes + Harris — SRE drop-off · 8:25",
+        "leaveBy": true
       },
       {
         "label": "Next up · Wed",
@@ -155,7 +152,8 @@
         "endIso": "2026-10-14T21:00:00.000Z",
         "kind": "school_pickup",
         "whenLabel": "Wed 3:15",
-        "summary": "Hayes + Harris — SRE pickup · 3:40"
+        "summary": "Hayes + Harris — SRE pickup · 3:40",
+        "leaveBy": true
       },
       {
         "label": "Next up · Wed",
@@ -167,7 +165,34 @@
         "endIso": "2026-10-14T21:00:00.000Z",
         "kind": "school",
         "whenLabel": "Wed 3:50",
-        "summary": "Ainsley — LKMS Math Counts info meeting · 3:15–4:00 · pickup 4:00"
+        "summary": "Ainsley — LKMS Math Counts info meeting · 3:15–4:00 · pickup 4:00",
+        "leaveBy": true
+      },
+      {
+        "label": "Next up · Wed",
+        "time": "4:00",
+        "place": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-10-14T21:00:00.000Z",
+        "endIso": "2026-10-14T23:20:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Wed 4:00",
+        "summary": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
+        "leaveBy": true
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "7:00",
+        "place": "SRE specials: Spanish",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-15T12:00:00.000Z",
+        "endIso": "2026-10-15T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Thu 7:00",
+        "summary": "Hayes — SRE specials: Spanish",
+        "leaveBy": false
       }
     ]
   },
@@ -301,18 +326,18 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "TUE · 7:00",
-        "what": "SRE SPECIALS: ART",
+        "when": "TUE · All day",
+        "what": "SRE YELLOW DAY",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "TUE",
-          "7:00"
+          "All day"
         ]
       },
       "today": [
         {
           "kind": "event",
-          "when": "Mon · 12:00",
+          "when": "Mon · All day",
           "what": "SRE Orange Day",
           "hint": "",
           "tone": "act"
@@ -328,8 +353,14 @@
       "sports": [],
       "school": [
         {
-          "when": "Mon 12 · 12:00",
+          "when": "Mon 12 · All day",
           "what": "SRE Orange Day",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · All day",
+          "what": "SRE Yellow Day",
           "tone": "act",
           "hint": ""
         },
@@ -346,8 +377,8 @@
           "hint": ""
         },
         {
-          "when": "Tue 13 · 12:00",
-          "what": "SRE Yellow Day",
+          "when": "Wed 14 · All day",
+          "what": "SRE Green Day",
           "tone": "act",
           "hint": ""
         },
@@ -364,14 +395,14 @@
           "hint": ""
         },
         {
-          "when": "Wed 14 · 12:00",
-          "what": "SRE Green Day",
+          "when": "Wed 14 · 3:15",
+          "what": "SRE pickup",
           "tone": "act",
           "hint": ""
         },
         {
-          "when": "Wed 14 · 3:15",
-          "what": "SRE pickup",
+          "when": "Thu 15 · All day",
+          "what": "SRE Red Day",
           "tone": "act",
           "hint": ""
         },
@@ -388,14 +419,20 @@
           "hint": ""
         },
         {
-          "when": "Thu 15 · 12:00",
-          "what": "SRE Red Day",
+          "when": "Thu 15 · 3:15",
+          "what": "SRE pickup",
           "tone": "act",
           "hint": ""
         },
         {
-          "when": "Thu 15 · 3:15",
-          "what": "SRE pickup",
+          "when": "Fri 16 · All day",
+          "what": "SRE Orange Day",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 16 · All day",
+          "what": "SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
           "tone": "act",
           "hint": ""
         },
@@ -408,18 +445,6 @@
         {
           "when": "Fri 16 · 8:10",
           "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 12:00",
-          "what": "SRE Orange Day",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 12:00",
-          "what": "SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
           "tone": "act",
           "hint": ""
         }
@@ -555,25 +580,25 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "TUE · 7:00",
-        "what": "SRE SPECIALS: PE (TENNIS SHOES)",
+        "when": "TUE · All day",
+        "what": "SRE YELLOW DAY",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "TUE",
-          "7:00"
+          "All day"
         ]
       },
       "today": [
         {
           "kind": "event",
-          "when": "Mon · 12:00",
+          "when": "Mon · All day",
           "what": "SRE Orange Day",
           "hint": "",
           "tone": "act"
         },
         {
           "kind": "event",
-          "when": "Mon · 12:00",
+          "when": "Mon · All day",
           "what": "Hayes BB: coach in — practices by 19 Oct",
           "hint": "",
           "tone": "act"
@@ -596,8 +621,14 @@
       ],
       "school": [
         {
-          "when": "Mon 12 · 12:00",
+          "when": "Mon 12 · All day",
           "what": "SRE Orange Day",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Tue 13 · All day",
+          "what": "SRE Yellow Day",
           "tone": "act",
           "hint": ""
         },
@@ -614,8 +645,8 @@
           "hint": ""
         },
         {
-          "when": "Tue 13 · 12:00",
-          "what": "SRE Yellow Day",
+          "when": "Wed 14 · All day",
+          "what": "SRE Green Day",
           "tone": "act",
           "hint": ""
         },
@@ -632,14 +663,14 @@
           "hint": ""
         },
         {
-          "when": "Wed 14 · 12:00",
-          "what": "SRE Green Day",
+          "when": "Wed 14 · 3:15",
+          "what": "SRE pickup",
           "tone": "act",
           "hint": ""
         },
         {
-          "when": "Wed 14 · 3:15",
-          "what": "SRE pickup",
+          "when": "Thu 15 · All day",
+          "what": "SRE Red Day",
           "tone": "act",
           "hint": ""
         },
@@ -656,14 +687,20 @@
           "hint": ""
         },
         {
-          "when": "Thu 15 · 12:00",
-          "what": "SRE Red Day",
+          "when": "Thu 15 · 3:15",
+          "what": "SRE pickup",
           "tone": "act",
           "hint": ""
         },
         {
-          "when": "Thu 15 · 3:15",
-          "what": "SRE pickup",
+          "when": "Fri 16 · All day",
+          "what": "SRE Orange Day",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Fri 16 · All day",
+          "what": "SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
           "tone": "act",
           "hint": ""
         },
@@ -676,18 +713,6 @@
         {
           "when": "Fri 16 · 8:10",
           "what": "SRE drop-off",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 12:00",
-          "what": "SRE Orange Day",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 12:00",
-          "what": "SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
           "tone": "act",
           "hint": ""
         },
@@ -947,6 +972,11 @@
       },
       "today": [
         {
+          "when": "Mon · All day",
+          "what": "SRE Orange Day",
+          "tone": "act"
+        },
+        {
           "when": "Mon · 7:00",
           "what": "SRE specials: PE (tennis shoes)",
           "tone": "act"
@@ -959,11 +989,6 @@
         {
           "when": "Mon · 8:10",
           "what": "SRE drop-off",
-          "tone": "act"
-        },
-        {
-          "when": "Mon · 12:00",
-          "what": "SRE Orange Day",
           "tone": "act"
         },
         {
@@ -989,8 +1014,13 @@
       ],
       "week": [
         {
-          "when": "Mon 12 · 12:00",
+          "when": "Mon 12 · All day",
           "what": "SRE Orange Day",
+          "tone": "act"
+        },
+        {
+          "when": "Tue 13 · All day",
+          "what": "SRE Yellow Day",
           "tone": "act"
         },
         {
@@ -1009,13 +1039,13 @@
           "tone": "act"
         },
         {
-          "when": "Tue 13 · 12:00",
-          "what": "SRE Yellow Day",
+          "when": "Tue 13 · 4:45",
+          "what": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
           "tone": "act"
         },
         {
-          "when": "Tue 13 · 4:45",
-          "what": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
+          "when": "Wed 14 · All day",
+          "what": "SRE Green Day",
           "tone": "act"
         },
         {
@@ -1034,11 +1064,6 @@
           "tone": "act"
         },
         {
-          "when": "Wed 14 · 12:00",
-          "what": "SRE Green Day",
-          "tone": "act"
-        },
-        {
           "when": "Wed 14 · 3:15",
           "what": "SRE pickup",
           "tone": "act"
@@ -1054,6 +1079,11 @@
           "tone": "hot"
         },
         {
+          "when": "Thu 15 · All day",
+          "what": "SRE Red Day",
+          "tone": "act"
+        },
+        {
           "when": "Thu 15 · 7:00",
           "what": "SRE specials: Spanish",
           "tone": "act"
@@ -1066,11 +1096,6 @@
         {
           "when": "Thu 15 · 8:10",
           "what": "SRE drop-off",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 12:00",
-          "what": "SRE Red Day",
           "tone": "act"
         },
         {
@@ -1099,13 +1124,13 @@
           "tone": "hot"
         },
         {
-          "when": "Fri 16 · 7:00",
-          "what": "SRE specials: PE (tennis shoes)",
+          "when": "Fri 16 · All day",
+          "what": "SRE Orange Day",
           "tone": "act"
         },
         {
-          "when": "Fri 16 · 7:00",
-          "what": "SRE specials: Music",
+          "when": "Fri 16 · All day",
+          "what": "SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
           "tone": "act"
         }
       ]
