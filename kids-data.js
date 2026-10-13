@@ -1381,13 +1381,13 @@
 
   function consumeParseWhen(when) {
     var s = String(when || "").trim();
-    var out = { dow: "", dayNum: "", time: "", leave: false, raw: s };
+    var out = { dow: "", dayNum: "", time: "", leave: false, allDay: /\bAll day\b/i.test(s), raw: s }; /* ALLDAY1 */
     var m = s.match(/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b(?:\s+(\d{1,2}))?/i);
     if (m) {
       out.dow = m[1].slice(0, 1).toUpperCase() + m[1].slice(1, 3).toLowerCase();
       if (m[2]) out.dayNum = String(Number(m[2]));
     }
-    var t = s.match(/(?:leave\s*)?(\d{1,2}:\d{2})\s*(am|pm)?/i);
+    var t = out.allDay ? null : s.match(/(?:leave\s*)?(\d{1,2}:\d{2})\s*(am|pm)?/i);
     if (t) {
       out.time = t[1];
       out.leave = /leave/i.test(s);
@@ -1566,7 +1566,7 @@
       var e0 = events[0];
       var p = consumeParseWhen(e0.when);
       return {
-        whenLabel: ((p.dow || "").toUpperCase() + (p.time ? (" · " + p.time) : "")).replace(/^\s·\s/, ""),
+        whenLabel: ((p.dow || "").toUpperCase() + (p.time ? (" · " + p.time) : p.allDay ? " · All day" : "")).replace(/^\s·\s/, ""), /* ALLDAY1 */
         time: p.time || "",
         badge: p.dow || "",
         title: e0.what,
@@ -1870,7 +1870,7 @@
           return '<div class="consume-ahead-row">' +
             '<span class="consume-ahead-day">' + esc(dow + " " + dn) + "</span>" +
             '<div class="consume-ahead-what">' + esc(what) + dim + "</div>" +
-            '<span class="consume-ahead-time">' + esc(time || "—") + "</span>" +
+            '<span class="consume-ahead-time">' + esc(time || (r.p.allDay ? "All day" : "—")) + "</span>" + /* ALLDAY1 */
             "</div>";
         }).join("");
       }

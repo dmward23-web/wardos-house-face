@@ -55,6 +55,7 @@
     var queue = ((week.boardStrip && week.boardStrip.queue) || []).filter(function (it) {
       var end = Date.parse(it.endIso || "") || 0;
       var start = Date.parse(it.startIso || "") || 0;
+      if (it.allDay) return false; /* ALLDAY1: all-day notes are not timed rows */
       if (end && end < now) return false;
       if (!end && start && start + 90 * 60 * 1000 < now) return false;
       return true;
@@ -118,7 +119,17 @@
     /* SEATS1 · Dad card = kid card face: big next leave-by + next two after it */
     var stage = document.querySelector(".tile.dan [data-dad-stage]");
     if (stage) {
-      var first = queue[0];
+      /* NEXTLEAVE1 · "Next leave" is the first REAL leave/drop (generator flag leaveBy), never queue[0]:
+         the 7:00 SRE specials note and all-day notes are not leaves. Older data without the flag: same rule by kind. */
+      var isLeave = function (it) {
+        if (!it || it.allDay) return false;
+        if (typeof it.leaveBy === "boolean") return it.leaveBy;
+        var t = String(it.summary || it.place || "");
+        if (/SRE specials?/i.test(t)) return false;
+        return /^(leave|school_drop|school_pickup|sport|appointment)$/.test(String(it.kind || "")) || /\b(pick\s*-?\s*up|drop(\s*-?\s*off)?|leave)\b/i.test(t);
+      };
+      var leaves = queue.filter(isLeave);
+      var first = leaves[0];
       var dd = '<div class="kf-face kf-day"><div class="kf-kicker">Next leave</div>';
       if (!first) {
         dd += '<div class="kf-loud">Clear</div><div class="kf-title">Nothing queued</div>';
@@ -126,7 +137,7 @@
         var dow = isToday(first) ? "TODAY" : String(first.badge || "").toUpperCase();
         dd += '<div class="kf-loud">' + esc((dow ? dow + " · " : "") + (first.time || "")) + "</div>";
         dd += '<div class="kf-title">' + esc(titleOf(first)) + "</div>";
-        var rest = queue.slice(1, 3);
+        var rest = leaves.slice(1, 3);
         if (rest.length) {
           dd += '<div class="kf-rows">' + rest.map(function (it) {
             return '<div class="kf-row"><span class="kf-mt">' + esc(mtFor(it)) + '</span><span class="kf-md">' + esc(titleOf(it)) + "</span></div>";

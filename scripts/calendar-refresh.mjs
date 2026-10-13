@@ -114,6 +114,24 @@ function partsInTZ(date, tz = TZ) {
   };
 }
 
+/* ALLDAY1 · an all-day event (date-only start) is a whole civil day, never a clock time. It starts at that
+   day's CT midnight (so it sorts before the day's timed rows, never as noon) and carries allDay: true. */
+function ctMidnight(civil) {
+  const guess = new Date(civil + "T00:00:00Z");
+  if (Number.isNaN(guess.getTime())) return null;
+  const f = new Intl.DateTimeFormat("en-US", { timeZone: TZ, timeZoneName: "shortOffset" }); // that civil day's offset (CDT -5 / CST -6)
+  const off = (f.formatToParts(new Date(guess.getTime() + 12 * 3600000)).find((x) => x.type === "timeZoneName") || {}).value || "GMT-5";
+  const m = /GMT([+-])(\d{1,2})(?::(\d{2}))?/.exec(off);
+  const mins = m ? (m[1] === "-" ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3] || 0)) : -300;
+  return new Date(guess.getTime() - mins * 60000);
+}
+
+function isAllDay(ev) {
+  const block = ev.start;
+  if (block && typeof block === "object") return !block.dateTime && !!block.date;
+  return typeof block === "string" && block.length === 10;
+}
+
 function parseEventTime(ev, which) {
   const block = ev[which] || {};
   if (block.dateTime) {
@@ -121,19 +139,33 @@ function parseEventTime(ev, which) {
     return Number.isNaN(d.getTime()) ? null : d;
   }
   if (block.date) {
-    // All-day: treat as noon CT of that civil date.
+    // All-day: CT midnight of that civil date (ALLDAY1; was noon CT, which printed 12:00 on kid cards).
     // MCP dumps sometimes emit "2026-10-09T00:00:00Z" in date — take YYYY-MM-DD only.
-    const civil = String(block.date).slice(0, 10);
-    const d = new Date(civil + "T12:00:00-05:00");
-    return Number.isNaN(d.getTime()) ? null : d;
+    return ctMidnight(String(block.date).slice(0, 10));
   }
   // compact dump shape
   if (typeof ev[which] === "string") {
     const s = ev[which];
-    const d = new Date(s.length === 10 ? s + "T12:00:00-05:00" : s);
+    if (s.length === 10) return ctMidnight(s);
+    const d = new Date(s);
     return Number.isNaN(d.getTime()) ? null : d;
   }
   return null;
+}
+
+/* ALLDAY1 · the clock part of a row: "All day" for an all-day item, never 12:00 */
+function whenTime(it) {
+  return it.allDay ? "All day" : fmtTime(it.start);
+}
+
+/* NEXTLEAVE1 · what counts as a real leave-by for "Next leave": a leave, an SRE drop / pickup, a sport
+   (event start = leave-by), an appointment, or any title that says pickup / drop / leave. Never an all-day note,
+   never an SRE specials note. */
+const LEAVE_KINDS = new Set(["leave", "school_drop", "school_pickup", "sport", "appointment"]);
+const LEAVE_WORD_RE = /\b(pick\s*-?\s*up|drop(\s*-?\s*off)?|leave)\b/i; // "pickup at Riley's" is a leave whatever its kind
+function isRealLeave(it) {
+  if (it.allDay || /SRE specials?/i.test(it.raw || "")) return false;
+  return LEAVE_KINDS.has(it.kind) || LEAVE_WORD_RE.test(it.raw || "");
 }
 
 function isFree(ev) {
@@ -367,6 +399,7 @@ function buildBoardItems(events, now) {
       location: ev.location || "",
       free: isFree(ev),
       raw: summaryOf(ev),
+      allDay: isAllDay(ev),
     });
   }
   items.sort((a, b) => a.start - b.start);
@@ -412,6 +445,7 @@ function pickStripQueue(items, now, homeWeek) {
   const upcoming = items
     .filter((it) => stillRelevant(it, now) && it.kind !== "custody")
     .filter((it) => it.kind !== "dad") // Dad chores stay on dan.today/week, not Next Up strip
+    .filter((it) => !it.allDay) // ALLDAY1: Next Up is timed rows only; all-day notes live on the day lists as "All day"
     .filter((it) => pinnedSpecials(it, now) || it.start.getTime() + leadMs >= now.getTime()) // future / just-started only (PINSPEC1 keeps today's specials)
     .slice()
     .sort((a, b) => {
@@ -448,6 +482,7 @@ function pickStripQueue(items, now, homeWeek) {
       kind: it.kind,
       whenLabel,
       summary: it.raw,
+      leaveBy: isRealLeave(it), // NEXTLEAVE1
     };
   });
 
@@ -463,7 +498,7 @@ function detailFor(it, homeWeek, upcoming) {
       : "kids with Dad @ <strong>147th</strong>");
   // Add a couple of later same-day anchors
   const sameDay = upcoming.filter(
-    (x) => partsInTZ(x.start).iso === partsInTZ(it.start).iso && x.id !== it.id
+    (x) => partsInTZ(x.start).iso === partsInTZ(it.start).iso && x.id !== it.id && !x.allDay
   ).slice(0, 2);
   for (const x of sameDay) {
     if (x.kind === "sport") bits.push(`${fmtTime(x.start)} ${kidsSafeWhat(x.raw, "sport").split("·")[0].trim()}`);
@@ -524,7 +559,7 @@ function custodyFromItems(items, now) {
 function rowWhen(it, now) {
   const same = partsInTZ(it.start).iso === partsInTZ(now).iso;
   const day = same ? partsInTZ(now).weekday.slice(0, 3) : fmtDayLabel(it.start);
-  return `${day} · ${fmtTime(it.start)}`;
+  return `${day} · ${whenTime(it)}`;
 }
 
 function buildKidToday(kidId, items, now, homeWeek) {
@@ -577,7 +612,7 @@ function buildKidSports(kidId, items, now) {
     if (it.kid && it.kid !== kidId) continue;
     const kids = kidMentions(it.raw);
     if (it.kid !== kidId && !(kids[kidId])) continue;
-    const leaveHint = `leave ${fmtTime(it.start)}`;
+    const leaveHint = it.allDay ? "All day" : `leave ${fmtTime(it.start)}`;
     out.push({
       when: `${fmtDayLabel(it.start)} · ${leaveHint}`,
       what: kidsSafeWhat(it.raw, "sport"),
@@ -601,7 +636,7 @@ function buildKidSchool(kidId, items, now) {
     if (!mine) continue;
     if (kidId === "ainsley" && (it.kind === "school_drop" || it.kind === "school_pickup")) continue;
     out.push({
-      when: `${fmtDayLabel(it.start)} · ${fmtTime(it.start)}`,
+      when: `${fmtDayLabel(it.start)} · ${whenTime(it)}`,
       what: kidsSafeWhat(it.raw, "school"),
       tone: "act",
       hint: "",
@@ -617,7 +652,7 @@ function buildKidAppointments(kidId, items, now) {
     if (!stillRelevant(it, now)) continue;
     if (it.kid && it.kid !== kidId) continue;
     const row = {
-      when: `${fmtDayLabel(it.start)} · ${fmtTime(it.start)}`,
+      when: `${fmtDayLabel(it.start)} · ${whenTime(it)}`,
       what: kidsSafeWhat(it.raw, "appointment"),
       hint: "with Dad",
       tone: "hot",
@@ -664,12 +699,12 @@ function hottestFor(kidId, items, now, homeWeek) {
         };
   }
   return {
-    when: `${fmtDowShort(hit.start).toUpperCase()} · ${fmtTime(hit.start)}`,
+    when: `${fmtDowShort(hit.start).toUpperCase()} · ${whenTime(hit)}`,
     what: kidsSafeWhat(hit.raw, hit.kind).toUpperCase().slice(0, 48),
     where: mom
       ? `kids away · back ${homeWeek.through}`
       : `with Dad @ 147th · through ${homeWeek.through}`,
-    badges: [fmtDowShort(hit.start).toUpperCase(), fmtTime(hit.start)],
+    badges: [fmtDowShort(hit.start).toUpperCase(), whenTime(hit)],
   };
 }
 
@@ -684,7 +719,7 @@ function buildDanToday(items, now, homeWeek) {
     if (isAdminNoise(it.raw)) continue;
     // Dad box: leaves, school logistics, sports, appointments, notable dad
     if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school", "dad"].includes(it.kind)) continue;
-    const when = `${partsInTZ(now).weekday.slice(0, 3)} · ${fmtTime(it.start)}`;
+    const when = `${partsInTZ(now).weekday.slice(0, 3)} · ${whenTime(it)}`;
     const what = danWhat(it);
     const key = `${when}|${what}`.toLowerCase();
     if (seen.has(key)) continue;
@@ -712,7 +747,7 @@ function buildDanWeek(items, now, homeWeek) {
     if (!stillRelevant(it, now)) continue;
     if (isAdminNoise(it.raw)) continue;
     if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school"].includes(it.kind)) continue;
-    const when = `${fmtDayLabel(it.start)} · ${fmtTime(it.start)}`;
+    const when = `${fmtDayLabel(it.start)} · ${whenTime(it)}`;
     const what = danWhat(it);
     const key = `${when}|${what}`.toLowerCase();
     if (seen.has(key)) continue; /* Harris+Hayes PE → one card */
@@ -846,6 +881,7 @@ function main() {
       startIso: head.startIso,
       endIso: head.endIso,
       kind: head.kind,
+      nextLeave: queue.find((q) => q.leaveBy) || null, // NEXTLEAVE1: Dad card "Next leave" (never specials / all-day)
       queue,
     },
     kids: {},

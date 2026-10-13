@@ -309,6 +309,7 @@
 
     function consider(item) {
       if (!item) return;
+      if (item.allDay) return; /* ALLDAY1: an all-day note is never a leave with a clock time */
       if (isDadLogistics(item)) return;
       if (isPrepItem(item) !== wantPrep) return;
       var start = Date.parse(item.startIso || item.start || "") || 0;
@@ -348,6 +349,7 @@
           var ev = calQ[c];
           var wh2 = whoInSummary(ev.summary || "");
           if (wh2.indexOf(kidId) < 0) continue;
+          if (ev.allDay) continue; /* ALLDAY1 */
           consider({
             startIso: ev.start,
             endIso: ev.end,
