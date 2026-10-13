@@ -98,6 +98,7 @@
     cv.height = off.height = Math.round(h * dpr);
     cv.style.width = w + "px";
     cv.style.height = h + "px";
+    if (view.dpr !== dpr) platCache = {};
     view.dpr = dpr;
     view.w = w; view.h = h;
   }
@@ -319,27 +320,150 @@
     g.restore();
   }
 
-  function livingPlat(g, x, y, w, t, i, grove) {
-    var img = grove ? (runPlates.mid || runPlates.near) : (i % 3 === 0 ? runPlates.mid : i % 3 === 1 ? runPlates.fg : runPlates.near);
-    var sway = Math.sin(t * 1.1 + i) * 2;
-    g.save();
+  /* PLATFORMS1 · painted root + stone platforms, Ori-style (layered, soft-lit, organic; never flat watercolor).
+     ASSET SWAP: Prism's plates drop in as art/mercury/platforms/stone.png and art/mercury/platforms/root.png
+     (transparent PNG, walkable top edge at PLAT_ART[type].top of the image height, end caps PLAT_ART[type].cap
+     of the width each side; the middle stretches). If a file is missing the procedural placeholder below draws.
+     Each platform is painted once into a cached sprite (per width/type/seed/dpr), so a frame is one drawImage. */
+  var PLAT_ART = {
+    stone: { src: "art/mercury/platforms/stone.png", top: 0.18, cap: 0.16 },
+    root: { src: "art/mercury/platforms/root.png", top: 0.22, cap: 0.14 }
+  };
+  var platImg = {};
+  Object.keys(PLAT_ART).forEach(function (k) {
+    if (q.get("platart") === "0") return;
+    var im = new Image();
+    im.onload = function () { platImg[k] = im; platCache = {}; };
+    im.src = PLAT_ART[k].src + "?v=PLATFORMS1";
+  });
+  var platCache = {};
+  function platType(i, grove) { return grove ? "stone" : (i % 3 === 1 ? "root" : "stone"); }
+  function rnd(seed) { var x = Math.sin(seed * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+  var PAD = 40, DEPTH = 120; /* sprite margin around the slab; how far the body hangs below the walk line */
+  function platSprite(type, w, i, grove) {
+    var dpr = view.dpr || 1;
+    var key = type + "|" + Math.round(w) + "|" + i + "|" + dpr.toFixed(2) + "|" + (platImg[type] ? "art" : "proc");
+    if (platCache[key]) return platCache[key];
+    var cw = w + PAD * 2, chh = DEPTH + PAD * 2;
+    var c = document.createElement("canvas");
+    c.width = Math.ceil(cw * dpr); c.height = Math.ceil(chh * dpr);
+    var g = c.getContext("2d");
+    g.scale(dpr, dpr);
+    g.translate(PAD, PAD);
+    if (platImg[type]) paintPlatArt(g, platImg[type], PLAT_ART[type], w);
+    else if (type === "root") paintRoot(g, w, i);
+    else paintStone(g, w, i, grove);
+    platCache[key] = c;
+    return c;
+  }
+  function paintPlatArt(g, img, spec, w) {
+    var h = img.height * (w / img.width); /* natural scale at this width */
+    var scale = Math.min(1, (DEPTH + 20) / h);
+    var dh = h * scale, y0 = -dh * spec.top;
+    var sw = img.width * spec.cap, dwCap = Math.min(w * 0.3, sw * (dh / img.height));
+    g.drawImage(img, 0, 0, sw, img.height, 0, y0, dwCap, dh);
+    g.drawImage(img, sw, 0, img.width - sw * 2, img.height, dwCap, y0, w - dwCap * 2, dh);
+    g.drawImage(img, img.width - sw, 0, sw, img.height, w - dwCap, y0, dwCap, dh);
+  }
+  function stonePath(g, w, i, inset) {
+    var n = 9, depth = 46 + rnd(i + 3) * 30;
     g.beginPath();
-    g.roundRect(x, y + sway, w, 26, 10);
-    g.clip();
-    if (img) g.drawImage(img, -((i * 90) % 400), y - 80, w + 220, 160);
-    else {
-      g.fillStyle = "#3c4638";
-      g.fillRect(x, y, w, 26);
+    g.moveTo(-6 + inset, 4);
+    for (var k = 1; k < n; k++) { var x = (k / n) * w; g.lineTo(x, -2 + rnd(i * 13 + k) * 4 + inset * 0.3); }
+    g.quadraticCurveTo(w + 12 - inset, 2, w + 4 - inset, 16);
+    for (var k2 = n; k2 >= 0; k2--) {
+      var u = k2 / n, bulge = Math.sin(u * Math.PI);
+      var y = 16 + bulge * depth * (0.75 + rnd(i * 7 + k2) * 0.35) - inset;
+      g.lineTo(u * w + (rnd(i * 5 + k2) - 0.5) * 10, y);
+    }
+    g.quadraticCurveTo(-14 + inset, 20, -6 + inset, 4);
+    g.closePath();
+  }
+  function paintStone(g, w, i, grove) {
+    /* 1 depth layer: a cooler, softer silhouette behind (atmosphere) */
+    g.save(); g.translate(10, 10); g.globalAlpha = 0.35; g.filter = "blur(6px)";
+    stonePath(g, w, i + 50, 0); g.fillStyle = "#0b1a1c"; g.fill();
+    g.restore();
+    /* 2 body: lit top to deep underside, soft mottling (no hard lines) */
+    stonePath(g, w, i, 0);
+    var body = g.createLinearGradient(0, -4, 0, 90);
+    body.addColorStop(0, "#5f7468"); body.addColorStop(0.18, "#3a4c48"); body.addColorStop(0.55, "#1b2a2b"); body.addColorStop(1, "#0a1214");
+    g.fillStyle = body; g.fill();
+    g.save(); g.clip();
+    for (var m = 0; m < 7; m++) {
+      var mx = rnd(i * 31 + m) * w, my = 10 + rnd(i * 17 + m) * 50, mr = 18 + rnd(i * 3 + m) * 34;
+      var mg = g.createRadialGradient(mx, my, 0, mx, my, mr);
+      mg.addColorStop(0, m % 2 ? "rgba(140,170,150,0.16)" : "rgba(10,18,20,0.30)"); mg.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = mg; g.fillRect(mx - mr, my - mr, mr * 2, mr * 2);
+    }
+    /* 3 cool bounce light along the underside, warm key from the upper left */
+    var bounce = g.createLinearGradient(0, 40, 0, 100); bounce.addColorStop(0, "rgba(90,160,170,0)"); bounce.addColorStop(1, "rgba(90,160,170,0.18)");
+    g.fillStyle = bounce; g.fillRect(-20, 40, w + 40, 80);
+    var key = g.createRadialGradient(w * 0.2, -10, 4, w * 0.2, -10, w * 0.9); key.addColorStop(0, "rgba(255,226,170,0.22)"); key.addColorStop(1, "rgba(255,226,170,0)");
+    g.fillStyle = key; g.fillRect(-20, -20, w + 40, 80);
+    /* lichen specks */
+    for (var l = 0; l < Math.round(w / 14); l++) {
+      g.fillStyle = "rgba(170,200,120," + (0.12 + rnd(i * 41 + l) * 0.18).toFixed(2) + ")";
+      g.beginPath(); g.ellipse(rnd(i * 23 + l) * w, 8 + rnd(i * 29 + l) * 28, 2 + rnd(l + i) * 4, 1.4 + rnd(l * 3 + i) * 2, 0, 0, 7); g.fill();
     }
     g.restore();
-    var lip = g.createLinearGradient(0, y + sway - 3, 0, y + sway + 6);
-    lip.addColorStop(0, "rgba(150, 190, 120, 0)");
-    lip.addColorStop(0.45, "rgba(120, 168, 96, 0.75)");
-    lip.addColorStop(1, "rgba(20, 34, 18, 0.5)");
-    g.fillStyle = lip;
-    g.beginPath(); g.roundRect(x - 2, y + sway - 3, w + 4, 9, 5); g.fill();
-    g.fillStyle = "rgba(0,0,0,0.28)";
-    g.beginPath(); g.ellipse(x + w / 2, y + sway + 30, w * 0.48, 6, 0, 0, 7); g.fill();
+    /* 4 rim light on the walk edge + moss tufts */
+    rimAndMoss(g, w, i, grove ? "rgba(255,236,190,0.9)" : "rgba(255,226,170,0.65)");
+    if (grove) { var gg = g.createRadialGradient(w / 2, 0, 4, w / 2, 0, w * 0.7); gg.addColorStop(0, "rgba(255,240,200,0.28)"); gg.addColorStop(1, "rgba(255,240,200,0)"); g.fillStyle = gg; g.fillRect(-PAD, -PAD, w + PAD * 2, PAD + 60); }
+  }
+  function paintRoot(g, w, i) {
+    /* a gnarled root bridge: a tapering trunk with knots and hanging rootlets, glowing tips (Ori lanterns) */
+    var th = 20;
+    function trunk(off, inset) {
+      g.beginPath();
+      g.moveTo(-10, 2 + off);
+      g.bezierCurveTo(w * 0.3, -3 + off, w * 0.7, 3 + off, w + 10, 0 + off);
+      g.bezierCurveTo(w + 16, th * 0.6 + off, w + 6, th + 4 + off, w - 10, th + 6 + off - inset);
+      g.bezierCurveTo(w * 0.65, th + 14 + off - inset, w * 0.35, th + 4 + off - inset, 6, th + 10 + off - inset);
+      g.bezierCurveTo(-8, th + 6 + off, -16, th * 0.4 + off, -10, 2 + off);
+      g.closePath();
+    }
+    g.save(); g.translate(8, 12); g.globalAlpha = 0.32; g.filter = "blur(5px)"; trunk(0, 0); g.fillStyle = "#120d0a"; g.fill(); g.restore();
+    /* hanging rootlets behind the trunk */
+    for (var r = 0; r < Math.round(w / 34); r++) {
+      var rx = 10 + rnd(i * 11 + r) * (w - 20), len = 30 + rnd(i * 7 + r) * 60, sway = (rnd(r + i) - 0.5) * 24;
+      g.strokeStyle = "rgba(38,28,22,0.9)"; g.lineWidth = 2.6 - rnd(r) * 1.2; g.lineCap = "round";
+      g.beginPath(); g.moveTo(rx, th); g.bezierCurveTo(rx + sway * 0.3, th + len * 0.4, rx + sway, th + len * 0.7, rx + sway * 0.8, th + len); g.stroke();
+      if (r % 2 === 0) {
+        var tx = rx + sway * 0.8, ty = th + len, gl = g.createRadialGradient(tx, ty, 0, tx, ty, 9);
+        gl.addColorStop(0, "rgba(190,240,255,0.85)"); gl.addColorStop(1, "rgba(120,200,255,0)");
+        g.fillStyle = gl; g.beginPath(); g.arc(tx, ty, 9, 0, 7); g.fill();
+      }
+    }
+    trunk(0, 0);
+    var bark = g.createLinearGradient(0, -2, 0, th + 12);
+    bark.addColorStop(0, "#7a5a3e"); bark.addColorStop(0.3, "#4a3424"); bark.addColorStop(1, "#160e0a");
+    g.fillStyle = bark; g.fill();
+    g.save(); g.clip();
+    for (var k = 0; k < Math.round(w / 40); k++) { /* knots and soft bark grain */
+      var kx = rnd(i * 19 + k) * w, ky = 8 + rnd(i * 37 + k) * 10;
+      var kg = g.createRadialGradient(kx, ky, 0, kx, ky, 10); kg.addColorStop(0, "rgba(20,12,8,0.55)"); kg.addColorStop(1, "rgba(20,12,8,0)");
+      g.fillStyle = kg; g.fillRect(kx - 10, ky - 10, 20, 20);
+    }
+    g.strokeStyle = "rgba(255,210,160,0.08)"; g.lineWidth = 1;
+    for (var s2 = 0; s2 < 4; s2++) { g.beginPath(); g.moveTo(-10, 6 + s2 * 4); g.bezierCurveTo(w * 0.3, 2 + s2 * 4, w * 0.7, 8 + s2 * 4, w + 10, 4 + s2 * 4); g.stroke(); }
+    g.restore();
+    rimAndMoss(g, w, i, "rgba(255,214,150,0.7)");
+  }
+  function rimAndMoss(g, w, i, rim) {
+    var rl = g.createLinearGradient(0, -4, 0, 6);
+    rl.addColorStop(0, "rgba(0,0,0,0)"); rl.addColorStop(0.5, rim); rl.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = rl; g.beginPath(); g.ellipse(w / 2, 1, w / 2 + 4, 3.2, 0, 0, 7); g.fill();
+    for (var m = 0; m < Math.round(w / 9); m++) {
+      var mx = rnd(i * 53 + m) * w, mh = 3 + rnd(i * 59 + m) * 6;
+      var mg = g.createLinearGradient(0, -mh, 0, 3); mg.addColorStop(0, "rgba(170,210,120,0.75)"); mg.addColorStop(1, "rgba(60,96,52,0.0)");
+      g.fillStyle = mg; g.beginPath(); g.ellipse(mx, 0, 3 + rnd(m + i * 2) * 5, mh, 0, 0, 7); g.fill();
+    }
+  }
+  function livingPlat(g, x, y, w, t, i, grove) {
+    var sway = reduced ? 0 : Math.sin(t * 0.9 + i) * 1.5; /* calm: a slow breath, no bob */
+    var spr = platSprite(platType(i, grove), w, i, grove);
+    g.drawImage(spr, 0, 0, spr.width, spr.height, x - PAD, y + sway - PAD, w + PAD * 2, DEPTH + PAD * 2);
   }
 
   function blobPath(g, rad, t, squash) {
