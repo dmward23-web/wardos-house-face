@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-13T11:40:39.956Z",
+  "fetchedAt": "2026-10-13T11:54:32.716Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-19",
@@ -63,7 +63,7 @@
     },
     {
       "id": "3hv9bcr87ggrhrkuf4ka3u6r2s_20261013T201500Z",
-      "summary": "Hayes + Harris — pickup at Riley's · 4:15",
+      "summary": "Harris — pickup at Riley's · 4:15",
       "start": "2026-10-13T16:05:00-05:00",
       "end": "2026-10-13T16:30:00-05:00",
       "location": "Fender home (Riley), 9504 W 148th St, Overland Park, KS",
@@ -76,6 +76,15 @@
       "start": "2026-10-13T16:45:00-05:00",
       "end": "2026-10-13T19:45:00-05:00",
       "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "vfobj4acm5in4d3s514dhf7eu0",
+      "summary": "Hayes flag practice 6:00–7:00 (with Fenders)",
+      "start": "2026-10-13T18:00:00-05:00",
+      "end": "2026-10-13T19:00:00-05:00",
+      "location": "Fields by the Library and SRE, Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
       "busy": true,
       "allDay": false
     },
