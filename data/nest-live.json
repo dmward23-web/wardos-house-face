@@ -1,7 +1,7 @@
 {
   "status": "live",
-  "fetchedAt": "2026-10-13T11:39:26.790Z",
-  "updatedAt": "2026-10-13T11:39:26.790Z",
+  "fetchedAt": "2026-10-13T12:46:54.473Z",
+  "updatedAt": "2026-10-13T12:46:54.473Z",
   "source": "nest-sdm+webrtc-still",
   "cameras": [
     {
@@ -72,7 +72,7 @@
       "protocols": [
         "WEB_RTC"
       ],
-      "snapCapturedAt": "2026-10-13T11:39:19.421Z",
+      "snapCapturedAt": "2026-10-13T12:46:45.583Z",
       "snapSize": "640x360"
     },
     {
@@ -118,7 +118,7 @@
       "protocols": [
         "WEB_RTC"
       ],
-      "snapCapturedAt": "2026-10-13T11:39:26.789Z",
+      "snapCapturedAt": "2026-10-13T12:46:54.473Z",
       "snapSize": "640x360"
     }
   ],
