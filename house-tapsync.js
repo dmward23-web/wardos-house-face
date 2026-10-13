@@ -106,7 +106,7 @@
     document.documentElement.setAttribute("data-tapsync", ok ? "on" : "local");
     var b = document.getElementById("tapsync-badge");
     /* The home map is a scene, not a debug screen. Phone and wall both. */
-    if (ok || document.documentElement.classList.contains("ori-home")) { if (b) b.remove(); return; }
+    if (ok || document.documentElement.classList.contains("ori-home") || document.documentElement.classList.contains("ori-calm")) { if (b) b.remove(); return; }
     if (!document.body) return;
     if (!b) {
       b = document.createElement("div"); b.id = "tapsync-badge";

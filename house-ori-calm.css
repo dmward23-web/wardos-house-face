@@ -23,3 +23,5 @@ html.ori-calm header.hdr { box-shadow: 0 0 28px rgba(120, 210, 255, 0.10); }
 }
 @keyframes ori-calm-breathe { 0%, 100% { opacity: .5; } 50% { opacity: .72; } }
 @media (prefers-reduced-motion: reduce) { .ori-calm-orb { animation: none; opacity: .6; } }
+html.ori-calm #tapsync-badge { display: none !important; }
+html.ori-calm body [data-live="leaveby-main"].leaveby-main > .time.time { display: block; line-height: 1.18 !important; margin-bottom: 8px !important; padding: 6px 0 !important; }
