@@ -1,0 +1,25 @@
+/* ORICALM1 · main board: control board look, a light Ori touch. Main board only. */
+html.ori-calm body {
+  background-image:
+    radial-gradient(120% 70% at 15% 0%, rgba(70, 170, 210, 0.13), transparent 60%),
+    radial-gradient(90% 60% at 90% 100%, rgba(60, 200, 170, 0.08), transparent 65%);
+  background-attachment: fixed;
+}
+html.ori-calm header.hdr { box-shadow: 0 0 28px rgba(120, 210, 255, 0.10); }
+.ori-calm-orb {
+  position: fixed; z-index: 40; pointer-events: none;
+  left: var(--orb-x, 16vw); top: var(--orb-y, 180px);
+  width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(250,255,255,.95) 0%, rgba(190,240,255,.55) 35%, rgba(90,180,255,0) 70%);
+  box-shadow: 0 0 14px 5px rgba(150,220,255,.30);
+  opacity: .65;
+  animation: ori-calm-loop 14s ease-in-out infinite, ori-calm-breathe 7s ease-in-out infinite;
+}
+@keyframes ori-calm-loop {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(8px, -5px, 0); }
+  50% { transform: translate3d(0, -9px, 0); }
+  75% { transform: translate3d(-8px, -4px, 0); }
+}
+@keyframes ori-calm-breathe { 0%, 100% { opacity: .5; } 50% { opacity: .72; } }
+@media (prefers-reduced-motion: reduce) { .ori-calm-orb { animation: none; opacity: .6; } }
