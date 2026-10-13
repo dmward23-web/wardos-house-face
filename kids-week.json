@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Oct 13 2026",
   "asOfIso": "2026-10-13",
-  "refreshedAt": "2026-10-13T21:47:19.793Z",
+  "refreshedAt": "2026-10-13T21:57:15.205Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,13 +17,13 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "4:45",
-    "place": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
-    "detailHtml": "6:00 Hayes flag practice 6:00–7:00 (with Fenders) · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+    "time": "6:00",
+    "place": "Hayes flag practice 6:00–7:00 (with Fenders)",
+    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
     "badge": "Tue",
-    "startIso": "2026-10-13T21:45:00.000Z",
-    "endIso": "2026-10-14T00:45:00.000Z",
-    "kind": "school",
+    "startIso": "2026-10-13T23:00:00.000Z",
+    "endIso": "2026-10-14T00:00:00.000Z",
+    "kind": "sport",
     "nextLeave": {
       "label": "Next up · today",
       "time": "6:00",
@@ -38,19 +38,6 @@
       "leaveBy": true
     },
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "4:45",
-        "place": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
-        "detailHtml": "6:00 Hayes flag practice 6:00–7:00 (with Fenders) · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Tue",
-        "startIso": "2026-10-13T21:45:00.000Z",
-        "endIso": "2026-10-14T00:45:00.000Z",
-        "kind": "school",
-        "whenLabel": "4:45",
-        "summary": "Ainsley — LKMS choir Fall Concert · call 5:00 / starts 5:30",
-        "leaveBy": false
-      },
       {
         "label": "Next up · today",
         "time": "6:00",
@@ -193,6 +180,19 @@
         "whenLabel": "Thu 12:45",
         "summary": "Ainsley — LKMS choir Sing & Share field trip",
         "leaveBy": false
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "3:15",
+        "place": "Boys SRE pickup",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-15T20:15:00.000Z",
+        "endIso": "2026-10-15T21:00:00.000Z",
+        "kind": "school_pickup",
+        "whenLabel": "Thu 3:15",
+        "summary": "Hayes + Harris — SRE pickup · 3:40",
+        "leaveBy": true
       }
     ]
   },
