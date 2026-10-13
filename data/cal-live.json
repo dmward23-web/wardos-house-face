@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-13T12:03:03.166Z",
+  "fetchedAt": "2026-10-13T12:21:37.360Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
-  "windowEnd": "2026-10-20",
+  "windowEnd": "2026-10-19",
   "asOfIso": "2026-10-13",
   "nextLeave": {
     "id": "58euc5df4fbe3u32tfsc0imquk",
@@ -393,60 +393,6 @@
       "start": "2026-10-19T15:00:00-05:00",
       "end": "2026-10-19T16:00:00-05:00",
       "location": "8675 College Blvd, Overland Park, KS 66210-1946",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "b5jqa30tv5hscp5itkhbviq5u8",
-      "summary": "Hayes — SRE fall conferences (Allen · Room B8)",
-      "start": "2026-10-20T00:00:00-05:00",
-      "end": "2026-10-23T00:00:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "gbio18cnn7tj0581g17h3vv57c_20261020",
-      "summary": "Matt birthday",
-      "start": "2026-10-20T00:00:00-05:00",
-      "end": "2026-10-21T00:00:00-05:00",
-      "location": "",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "obo1og66nho35a3998g8vl4j58",
-      "summary": "Harris — SRE fall conferences (Lind)",
-      "start": "2026-10-20T00:00:00-05:00",
-      "end": "2026-10-23T00:00:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "9jhch37m86pldc6nelvqh8l2ag",
-      "summary": "Hayes — SRE specials: Art",
-      "start": "2026-10-20T07:00:00-05:00",
-      "end": "2026-10-20T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "gpc96prks3dp7aifdm3v8lgp78",
-      "summary": "Harris — SRE specials: Spanish",
-      "start": "2026-10-20T07:00:00-05:00",
-      "end": "2026-10-20T07:15:00-05:00",
-      "location": "14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "4iuge4862k2uhd3t5irr7jjmc8_20261020T212500Z",
-      "summary": "Ainsley swim — Coach Ann · 5:00 practice",
-      "start": "2026-10-20T17:00:00-05:00",
-      "end": "2026-10-20T18:00:00-05:00",
-      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
       "busy": false,
       "allDay": false
     }
