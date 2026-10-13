@@ -1,7 +1,7 @@
 {
   "asOf": "Mon Oct 12 2026",
   "asOfIso": "2026-10-12",
-  "refreshedAt": "2026-10-13T00:20:57.077Z",
+  "refreshedAt": "2026-10-13T00:53:43.018Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -555,12 +555,12 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "MON · 4:55",
-        "what": "HAYES BASEBALL — FALCONS VS BLUE BANANAS (HOME)",
+        "when": "TUE · 7:00",
+        "what": "SRE SPECIALS: PE (TENNIS SHOES)",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "MON",
-          "4:55"
+          "TUE",
+          "7:00"
         ]
       },
       "today": [
@@ -579,13 +579,6 @@
           "tone": "act"
         },
         {
-          "kind": "event",
-          "when": "Mon · 4:55",
-          "what": "⚾ Hayes baseball — Falcons vs Blue Bananas (home)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
           "kind": "note",
           "when": "All day",
           "what": "🏡 DROP ZONE HQ with Dad",
@@ -594,12 +587,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Mon 12 · leave 4:55",
-          "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Thu 15 · leave 5:40",
           "what": "Hayes flag practice",
@@ -1007,11 +994,6 @@
           "tone": "act"
         },
         {
-          "when": "Mon 12 · 4:55",
-          "what": "Hayes baseball — Falcons vs Blue Bananas (home)",
-          "tone": "hot"
-        },
-        {
           "when": "Tue 13 · 7:00",
           "what": "SRE specials: Art",
           "tone": "act"
@@ -1119,6 +1101,11 @@
         {
           "when": "Fri 16 · 7:00",
           "what": "SRE specials: PE (tennis shoes)",
+          "tone": "act"
+        },
+        {
+          "when": "Fri 16 · 7:00",
+          "what": "SRE specials: Music",
           "tone": "act"
         }
       ]
