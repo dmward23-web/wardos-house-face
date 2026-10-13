@@ -15,6 +15,7 @@
     ainsley: { sky: ["#1a1424", "#8a4a48", "#e0a070"], ground: "#241610", metal: "#e4ddd6", accent: "#ffd8b0", back: "kid-ainsley.html" }
   }[kid];
 
+  var LIQUID = q.get("liquid") !== "0";
   var reduced = false;
   try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
 
@@ -148,16 +149,16 @@
     if (reduced) n = Math.min(n, 6);
     for (var i = 0; i < n; i++) {
       var a = Math.random() * Math.PI * 2;
-      var s = 80 + Math.random() * 260;
+      var s = 60 + Math.random() * 150;
       drops.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 120, a: 1, r: 2 + Math.random() * 5, c: color });
     }
     rings.push({ x: x, y: y, r: 6, a: 0.85 });
   }
   function gather(b) {
     if (b.inv > 0) return;
-    burst(b.x, b.y, 22, THEME.metal);
+    burst(b.x, b.y, 12, THEME.metal);
     tone("splash");
-    shake = 8;
+    shake = 0;
     b.x = b.cp.x; b.y = b.cp.y; b.vx = 0; b.vy = 0; b.inv = 0.45; b.alive = true;
   }
 
@@ -209,7 +210,7 @@
           var top = GY(pl.y);
           if (b.y + b.r <= top + 12 && nextY + b.r >= top) {
             nextY = top - b.r;
-            if (b.vy > 220) { burst(b.x, top, 8, THEME.metal); tone("land"); b.squash = 1.35; shake = Math.min(6, b.vy / 200); }
+            if (b.vy > 220) { burst(b.x, top, 8, THEME.metal); tone("land"); b.squash = 1.35; }
             b.vy = 0; b.grounded = true;
             if (pl.cp) b.cp = { x: b.x, y: nextY };
           }
@@ -331,8 +332,14 @@
       g.fillRect(x, y, w, 26);
     }
     g.restore();
-    g.fillStyle = "rgba(12, 18, 14, 0.35)";
-    g.fillRect(x, y + sway, w, 4);
+    var lip = g.createLinearGradient(0, y + sway - 3, 0, y + sway + 6);
+    lip.addColorStop(0, "rgba(150, 190, 120, 0)");
+    lip.addColorStop(0.45, "rgba(120, 168, 96, 0.75)");
+    lip.addColorStop(1, "rgba(20, 34, 18, 0.5)");
+    g.fillStyle = lip;
+    g.beginPath(); g.roundRect(x - 2, y + sway - 3, w + 4, 9, 5); g.fill();
+    g.fillStyle = "rgba(0,0,0,0.28)";
+    g.beginPath(); g.ellipse(x + w / 2, y + sway + 30, w * 0.48, 6, 0, 0, 7); g.fill();
   }
 
   function blobPath(g, rad, t, squash) {
@@ -402,6 +409,87 @@
     g.restore();
   }
 
+
+  /* Liquid chrome: one metaball field for both blobs + every splash drop,
+     shaded per cell with fresnel, the painted world reflected, and a soft key light. */
+  var liq = document.createElement("canvas"), lq = liq.getContext("2d");
+  var env = document.createElement("canvas"), eq = env.getContext("2d", { willReadFrequently: true });
+  function paintLiquid(g, t, src, dpr) {
+    var balls = [];
+    [A, B].forEach(function (b, k) {
+      if (b.inv > 0 && Math.floor(t * 6) % 2 === 0) return;
+      balls.push({ x: b.x - cam, y: b.y, r: b.r * 1.05, sq: Math.max(0.6, b.squash), w: t * 2.2 + k * 1.7, fade: b.echo ? 0.82 : 1 });
+    });
+    drops.forEach(function (d) { if (d.a > 0.05) balls.push({ x: d.x - cam, y: d.y, r: d.r * 1.6 * Math.min(1, d.a * 1.6), sq: 1, w: 0, fade: 1 }); });
+    if (!balls.length) return;
+    var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    balls.forEach(function (b) { var m = b.r * 2.2; x0 = Math.min(x0, b.x - m); y0 = Math.min(y0, b.y - m); x1 = Math.max(x1, b.x + m); y1 = Math.max(y1, b.y + m); });
+    x0 = Math.max(-40, x0); y0 = Math.max(-40, y0); x1 = Math.min(view.w + 40, x1); y1 = Math.min(view.h + 40, y1);
+    var C = Math.max(1.5, Math.sqrt((x1 - x0) * (y1 - y0) / 40000)); /* css px per cell, capped work */
+    var cw = Math.ceil((x1 - x0) / C), ch = Math.ceil((y1 - y0) / C);
+    if (cw < 2 || ch < 2) return;
+    var M = 24; /* env margin so reflections can look past the edge */
+    var ew = cw + 2 * Math.ceil(M / C), eh = ch + 2 * Math.ceil(M / C);
+    env.width = ew; env.height = eh;
+    try { eq.drawImage(src, (x0 - M) * dpr, (y0 - M) * dpr, ew * C * dpr, eh * C * dpr, 0, 0, ew, eh); } catch (e) {}
+    var ed = eq.getImageData(0, 0, ew, eh).data;
+    liq.width = cw; liq.height = ch;
+    var img = lq.createImageData(cw, ch), o = img.data;
+    var em = Math.ceil(M / C);
+    var lx = -0.45, ly = -0.7, lz = 0.55, ll = Math.hypot(lx, ly, lz); lx /= ll; ly /= ll; lz /= ll;
+    var tint = THEME.metal, tr = parseInt(tint.substr(1, 2), 16), tg = parseInt(tint.substr(3, 2), 16), tb = parseInt(tint.substr(5, 2), 16);
+    function field(px, py) {
+      var f = 0, fa = 0;
+      for (var i = 0; i < balls.length; i++) {
+        var b = balls[i], dx = (px - b.x) / b.sq, dy = (py - b.y) * b.sq;
+        if (b.w) { var a = Math.atan2(dy, dx); var wob = 1 + 0.05 * Math.sin(a * 3 + b.w) + 0.025 * Math.sin(a * 5 - b.w * 1.3); dx /= wob; dy /= wob; }
+        var v = (b.r * b.r) / (dx * dx + dy * dy + 1);
+        f += v; fa += v * b.fade;
+      }
+      return [f, fa / (f || 1)];
+    }
+    for (var j = 0; j < ch; j++) {
+      for (var i = 0; i < cw; i++) {
+        var px = x0 + (i + 0.5) * C, py = y0 + (j + 0.5) * C;
+        var F = field(px, py), f = F[0];
+        var k = (j * cw + i) * 4;
+        if (f < 0.85) { o[k + 3] = 0; continue; }
+        var fx = field(px + C, py)[0] - field(px - C, py)[0];
+        var fy = field(px, py + C)[0] - field(px, py - C)[0];
+        var gl = Math.hypot(fx, fy) + 1e-6;
+        var edge = Math.min(1, (f - 0.85) / 0.9); /* 0 at rim, 1 deep inside */
+        var nz = Math.sqrt(edge) ;
+        var s2 = Math.sqrt(Math.max(0, 1 - nz * nz));
+        var nx = -fx / gl * s2, ny = -fy / gl * s2;
+        /* reflection: look along the bent normal into the painted world */
+        var rx = Math.round(i + em + nx * 16 / C * 1.6), ry = Math.round(j + em + ny * 16 / C * 1.6 - (1 - nz) * 6);
+        rx = rx < 0 ? 0 : rx >= ew ? ew - 1 : rx; ry = ry < 0 ? 0 : ry >= eh ? eh - 1 : ry;
+        var e = (ry * ew + rx) * 4;
+        var lum = (ed[e] * 0.3 + ed[e + 1] * 0.55 + ed[e + 2] * 0.15) / 255;
+        /* chrome = mostly a contrasty mirror of the world + sky band above the horizon of the normal */
+        var sky = ny < -0.15 ? Math.min(1, (-ny - 0.15) * 1.6) : 0;
+        var band = Math.exp(-Math.pow((ny + 0.05) / 0.08, 2)) * 0.45; /* chrome horizon line */
+        var base = Math.pow(lum, 1.1) * 0.9 + sky * 0.7 + band;
+        var fres = Math.pow(1 - nz, 3);
+        var spec = Math.pow(Math.max(0, nx * lx + ny * ly + nz * lz), 48) * 1.4;
+        var dark = ny > 0.35 ? (ny - 0.35) * 0.6 : 0;
+        var v = Math.min(1.2, base * (1 - dark) + fres * 0.65 + spec);
+        var cr = ed[e] / 255 * 0.25 + v * 0.75, cg = ed[e + 1] / 255 * 0.25 + v * 0.75, cb = ed[e + 2] / 255 * 0.25 + v * 0.75;
+        o[k] = Math.min(255, cr * tr * 1.05);
+        o[k + 1] = Math.min(255, cg * tg * 1.05);
+        o[k + 2] = Math.min(255, cb * tb * 1.08);
+        o[k + 3] = Math.round(255 * Math.min(1, (f - 0.85) / 0.12) * F[1]);
+      }
+    }
+    lq.putImageData(img, 0, 0);
+    g.save();
+    g.imageSmoothingEnabled = true;
+    /* contact shadows under grounded blobs */
+    [A, B].forEach(function (b) { if (!b.grounded) return; g.fillStyle = "rgba(0,0,0,0.35)"; g.beginPath(); g.ellipse(b.x - cam, b.y + b.r * 0.95, b.r * 0.8, b.r * 0.16, 0, 0, 7); g.fill(); });
+    g.drawImage(liq, 0, 0, cw, ch, x0, y0, cw * C, ch * C);
+    g.restore();
+  }
+
   function paintBridge(g, t) {
     var dx = (A.x - B.x), dy = (A.y - B.y);
     var dist = Math.hypot(dx, dy);
@@ -439,7 +527,7 @@
     }
     var mid = (A.x + B.x) / 2;
     var aim = mid - W * 0.38;
-    cam += (aim - cam) * (reduced ? 1 : 0.08);
+    cam += (aim - cam) * (reduced ? 1 : 0.05);
     cam = Math.max(0, cam);
     shake *= 0.86;
     ox.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
@@ -447,18 +535,20 @@
     paintWorld(ox, t, W, H);
     ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
-    if (!reduced && shake > 0.4) ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
-    else shake = 0;
+    shake = 0; /* calm: no camera jitter (Dan 10/12 rejected aggressive motion) */
     ctx.drawImage(off, 0, 0, off.width, off.height, 0, 0, W, H);
-    paintBlob(ctx, A, t);
-    paintBlob(ctx, B, t);
-    paintBridge(ctx, t);
-    drops.forEach(function (d) {
-      ctx.globalAlpha = Math.max(0, d.a);
-      ctx.fillStyle = d.c;
-      ctx.beginPath(); ctx.ellipse(d.x - cam, d.y, d.r, d.r * 1.4, 0, 0, 7); ctx.fill();
-    });
-    ctx.globalAlpha = 1;
+    if (LIQUID) paintLiquid(ctx, t, off, view.dpr);
+    else {
+      paintBlob(ctx, A, t);
+      paintBlob(ctx, B, t);
+      paintBridge(ctx, t);
+      drops.forEach(function (d) {
+        ctx.globalAlpha = Math.max(0, d.a);
+        ctx.fillStyle = d.c;
+        ctx.beginPath(); ctx.ellipse(d.x - cam, d.y, d.r, d.r * 1.4, 0, 0, 7); ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+    }
     if (playing && !document.hidden) requestAnimationFrame(frame);
   }
 
@@ -695,6 +785,7 @@
   }
 
   window.MercuryRun = {
+    debug: function () { return { A: [A.x, A.y, A.r], B: [B.x, B.y], cam: cam, drops: drops.length, view: view }; },
     exportFrame: exportFrame,
     platesReady: function () { return runPlatesReady && !!runPlates.sky; }
   };
