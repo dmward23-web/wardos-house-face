@@ -90,10 +90,31 @@
     } catch (err) {}
   }
 
+  /* SHARP1 · devicePixelRatio-aware backing: up to 2x, capped at 2560x1440 total pixels (a 1440p wall at 1:1).
+     Floor = the old 1400px-wide cap. If frames run slow (avg > 20 ms over 2 s) the scale steps down toward the floor;
+     if they run fast (< 13 ms over 4 s) it steps back up. ?adapt=0 pins the full target for measuring. */
+  var MAX_PX = 2560 * 1440;
+  var dprScale = 1, adaptT = 0, adaptN = 0, adaptSum = 0;
+  var ADAPT = q.get("adapt") !== "0";
+  function targetDpr(w, h) {
+    var d = Math.min(2, devicePixelRatio || 1);
+    if (w * h * d * d > MAX_PX) d = Math.sqrt(MAX_PX / (w * h));
+    return d;
+  }
+  function floorDpr(w) { return Math.min(1.35, devicePixelRatio || 1, 1400 / w); }
+  function adapt(dtMs) {
+    if (!ADAPT) return;
+    adaptT += dtMs; adaptN++; adaptSum += dtMs;
+    var avg = adaptSum / adaptN, w = innerWidth, h = innerHeight;
+    var lo = floorDpr(w) / targetDpr(w, h);
+    if (adaptT > 2000 && avg > 20 && dprScale > lo + 0.001) { dprScale = Math.max(lo, dprScale * 0.85); resize(); }
+    else if (adaptT > 4000 && avg < 13 && dprScale < 1) { dprScale = Math.min(1, dprScale / 0.85); resize(); }
+    else if (adaptT <= 4000) return;
+    adaptT = 0; adaptN = 0; adaptSum = 0;
+  }
   function resize() {
-    var dpr = Math.min(1.35, devicePixelRatio || 1);
     var w = innerWidth, h = innerHeight;
-    if (w * dpr > 1400) dpr = 1400 / w;
+    var dpr = Math.max(floorDpr(w), targetDpr(w, h) * dprScale);
     cv.width = off.width = Math.round(w * dpr);
     cv.height = off.height = Math.round(h * dpr);
     cv.style.width = w + "px";
@@ -372,7 +393,7 @@
      Each platform is painted once into a cached sprite (per width/type/seed/dpr), so a frame is one drawImage. */
   /* Prism plates (2026-10-13/mercury-platforms, 2x set): <type>-<a..d>-{capL,mid,capR} 80x112 / 256x112 and matching
      -shadow-* 48px strips. Drawn at half size: caps 40 css px, mid tiles every 128 css px, 56 tall, walk line 12 px down. */
-  var PLAT_ART = { dir: "art/mercury/platforms/", variants: ["a", "b", "c", "d"], parts: ["capL", "mid", "capR", "shadow-capL", "shadow-mid", "shadow-capR"], walk: 12, h: 56, sh: 24 };
+  var PLAT_ART = { dir: "art/mercury/platforms/", variants: ["a", "b", "c", "d"], parts: ["capL", "mid", "capR", "shadow-capL", "shadow-mid", "shadow-capR"], walk: 10, shY: 14, h: 56, sh: 24 }; /* Prism README: tile at y-10 (moss lip = walk line), shadow at y+14 */
   var platImg = {};
   if (q.get("platart") !== "0") ["stone", "root"].forEach(function (t) {
     PLAT_ART.variants.forEach(function (v) {
@@ -381,7 +402,7 @@
         var im = new Image();
         im.onload = function () { set[part] = im; if (--left === 0) { platImg[t + "-" + v] = set; platCache = {}; } };
         im.onerror = function () { left = -99; };
-        im.src = PLAT_ART.dir + t + "-" + v + "-" + part + ".png?v=PLATFORMS2";
+        im.src = PLAT_ART.dir + ((devicePixelRatio || 1) > 1 || innerWidth >= 2400 ? "2x/" : "1x/") + t + "-" + v + "-" + part + ".png?v=PLATFORMS3";
       });
     });
   });
@@ -391,7 +412,8 @@
   var PAD = 40, DEPTH = 120; /* sprite margin around the slab; how far the body hangs below the walk line */
   function platSprite(type, w, i, grove) {
     var dpr = view.dpr || 1;
-    var art = platImg[type + "-" + PLAT_ART.variants[i % 4]];
+    var vr = type === "root" ? (i % 2 ? "c" : "a") : PLAT_ART.variants[i % 4]; /* Prism: prefer root-a / root-c */
+    var art = platImg[type + "-" + vr];
     var key = type + "|" + Math.round(w) + "|" + i + "|" + dpr.toFixed(2) + "|" + (art ? "art" : "proc");
     if (platCache[key]) return platCache[key];
     var cw = w + PAD * 2, chh = DEPTH + PAD * 2;
@@ -414,7 +436,7 @@
       g.drawImage(set[pre + "capL"], 0, y, cap, h);
       g.drawImage(set[pre + "capR"], w - cap, y, cap, h);
     }
-    strip("shadow-", y0 + PLAT_ART.h - 6, PLAT_ART.sh);
+    strip("shadow-", PLAT_ART.shY, PLAT_ART.sh);
     strip("", y0, PLAT_ART.h);
     if (grove) { var gg = g.createRadialGradient(w / 2, 0, 4, w / 2, 0, w * 0.7); gg.addColorStop(0, "rgba(255,240,200,0.24)"); gg.addColorStop(1, "rgba(255,240,200,0)"); g.fillStyle = gg; g.fillRect(-PAD, -PAD, w + PAD * 2, PAD + 60); }
   }
@@ -615,24 +637,28 @@
     var em = Math.ceil(M / C);
     var lx = -0.45, ly = -0.7, lz = 0.55, ll = Math.hypot(lx, ly, lz); lx /= ll; ly /= ll; lz /= ll;
     var tint = THEME.metal, tr = parseInt(tint.substr(1, 2), 16), tg = parseInt(tint.substr(3, 2), 16), tb = parseInt(tint.substr(5, 2), 16);
+    var FA = 1; /* SHARP1 perf: no per-call array; balls beyond 4r add < 0.07 and are skipped */
+    balls.forEach(function (b) { b.cut = b.r * b.r * 16; });
     function field(px, py) {
       var f = 0, fa = 0;
       for (var i = 0; i < balls.length; i++) {
         var b = balls[i], dx = (px - b.x) / b.sq, dy = (py - b.y) * b.sq;
+        if (dx * dx + dy * dy > b.cut) continue;
         if (b.w) { var a = Math.atan2(dy, dx); var wob = 1 + 0.05 * Math.sin(a * 3 + b.w) + 0.025 * Math.sin(a * 5 - b.w * 1.3); dx /= wob; dy /= wob; }
         var v = (b.r * b.r) / (dx * dx + dy * dy + 1);
         f += v; fa += v * b.fade;
       }
-      return [f, fa / (f || 1)];
+      FA = fa / (f || 1);
+      return f;
     }
     for (var j = 0; j < ch; j++) {
       for (var i = 0; i < cw; i++) {
         var px = x0 + (i + 0.5) * C, py = y0 + (j + 0.5) * C;
-        var F = field(px, py), f = F[0];
+        var f = field(px, py), fade = FA;
         var k = (j * cw + i) * 4;
         if (f < 0.85) { o[k + 3] = 0; continue; }
-        var fx = field(px + C, py)[0] - field(px - C, py)[0];
-        var fy = field(px, py + C)[0] - field(px, py - C)[0];
+        var fx = field(px + C, py) - field(px - C, py);
+        var fy = field(px, py + C) - field(px, py - C);
         var gl = Math.hypot(fx, fy) + 1e-6;
         var edge = Math.min(1, (f - 0.85) / 0.9); /* 0 at rim, 1 deep inside */
         var nz = Math.sqrt(edge) ;
@@ -655,7 +681,7 @@
         o[k] = Math.min(255, cr * tr * 1.05);
         o[k + 1] = Math.min(255, cg * tg * 1.05);
         o[k + 2] = Math.min(255, cb * tb * 1.08);
-        o[k + 3] = Math.round(255 * Math.min(1, (f - 0.85) / 0.12) * F[1]);
+        o[k + 3] = Math.round(255 * Math.min(1, (f - 0.85) / 0.12) * fade);
       }
     }
     lq.putImageData(img, 0, 0);
@@ -687,6 +713,7 @@
     var now = performance.now();
     var t = (now - t0) / 1000;
     var dt = reduced ? 1 / 60 : Math.min(0.033, (frame.l ? (now - frame.l) / 1000 : 1 / 60));
+    if (frame.l && playing) adapt(now - frame.l);
     frame.l = now;
     var W = view.w, H = view.h;
     var ids = Object.keys(pointers);
