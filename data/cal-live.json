@@ -1,19 +1,19 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-13T02:35:45.849Z",
+  "fetchedAt": "2026-10-13T02:43:50.136Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-18",
   "asOfIso": "2026-10-12",
   "nextLeave": {
-    "id": "hiah6oggslaccjgvq07spa821o",
-    "summary": "Hayes + Harris — SRE Yellow Day",
-    "start": "2026-10-13T00:00:00-05:00",
-    "end": "2026-10-14T00:00:00-05:00",
+    "id": "58euc5df4fbe3u32tfsc0imquk",
+    "summary": "Hayes + Harris — SRE drop-off · 8:25",
+    "start": "2026-10-13T08:10:00-05:00",
+    "end": "2026-10-13T08:40:00-05:00",
     "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
     "busy": true,
-    "allDay": true
+    "allDay": false
   },
   "upcomingLeaves": [
     {
@@ -22,7 +22,7 @@
       "start": "2026-10-13T00:00:00-05:00",
       "end": "2026-10-14T00:00:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": true
     },
     {
@@ -31,7 +31,7 @@
       "start": "2026-10-13T07:00:00-05:00",
       "end": "2026-10-13T07:15:00-05:00",
       "location": "14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": false
     },
     {
@@ -40,7 +40,7 @@
       "start": "2026-10-13T07:00:00-05:00",
       "end": "2026-10-13T07:15:00-05:00",
       "location": "14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": false
     },
     {
@@ -94,7 +94,7 @@
       "start": "2026-10-14T00:00:00-05:00",
       "end": "2026-10-15T00:00:00-05:00",
       "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
-      "busy": true,
+      "busy": false,
       "allDay": true
     },
     {
@@ -103,7 +103,7 @@
       "start": "2026-10-14T00:00:00-05:00",
       "end": "2026-10-15T00:00:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": true
     },
     {
@@ -112,7 +112,7 @@
       "start": "2026-10-14T07:00:00-05:00",
       "end": "2026-10-14T07:15:00-05:00",
       "location": "14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": false
     },
     {
@@ -121,7 +121,7 @@
       "start": "2026-10-14T07:00:00-05:00",
       "end": "2026-10-14T07:15:00-05:00",
       "location": "14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": false
     },
     {
@@ -166,7 +166,7 @@
       "start": "2026-10-15T00:00:00-05:00",
       "end": "2026-10-16T00:00:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": true
     },
     {
@@ -175,7 +175,7 @@
       "start": "2026-10-15T07:00:00-05:00",
       "end": "2026-10-15T07:15:00-05:00",
       "location": "14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": false
     },
     {
@@ -184,7 +184,7 @@
       "start": "2026-10-15T07:00:00-05:00",
       "end": "2026-10-15T07:15:00-05:00",
       "location": "14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": false
     },
     {
@@ -202,7 +202,7 @@
       "start": "2026-10-15T12:45:00-05:00",
       "end": "2026-10-15T14:40:00-05:00",
       "location": "Blue Valley West High School, 16200 Antioch Road, Overland Park, KS 66085",
-      "busy": true,
+      "busy": false,
       "allDay": false
     },
     {
@@ -256,7 +256,7 @@
       "start": "2026-10-16T00:00:00-05:00",
       "end": "2026-10-24T00:00:00-05:00",
       "location": "14 Harbor Cove Dr, Old Hickory, TN 37138",
-      "busy": true,
+      "busy": false,
       "allDay": true
     },
     {
@@ -265,7 +265,7 @@
       "start": "2026-10-16T00:00:00-05:00",
       "end": "2026-10-17T00:00:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": true
     },
     {
@@ -274,7 +274,7 @@
       "start": "2026-10-16T00:00:00-05:00",
       "end": "2026-10-17T00:00:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": true
     },
     {
@@ -283,7 +283,7 @@
       "start": "2026-10-16T07:00:00-05:00",
       "end": "2026-10-16T07:15:00-05:00",
       "location": "14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": false
     },
     {
@@ -292,7 +292,7 @@
       "start": "2026-10-16T07:00:00-05:00",
       "end": "2026-10-16T07:15:00-05:00",
       "location": "14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": false
     },
     {
@@ -310,7 +310,7 @@
       "start": "2026-10-16T12:00:00-05:00",
       "end": "2026-10-16T12:30:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
+      "busy": false,
       "allDay": false
     },
     {
@@ -319,7 +319,7 @@
       "start": "2026-10-17T00:00:00-05:00",
       "end": "2026-10-19T00:00:00-05:00",
       "location": "Cleveland Hopkins International Airport (CLE), 5300 Riverside Dr, Cleveland, OH 44135",
-      "busy": true,
+      "busy": false,
       "allDay": true
     },
     {
@@ -328,7 +328,7 @@
       "start": "2026-10-17T08:00:00-05:00",
       "end": "2026-10-17T09:30:00-05:00",
       "location": "Heritage Park Soccer Complex, Field 10, 17255 S Black Bob Rd, Olathe, KS 66062",
-      "busy": true,
+      "busy": false,
       "allDay": false
     },
     {
@@ -337,7 +337,7 @@
       "start": "2026-10-17T16:45:00-05:00",
       "end": "2026-10-17T18:15:00-05:00",
       "location": "Heritage Park Soccer Complex, 17255 S Black Bob Rd, Olathe, KS 66062",
-      "busy": true,
+      "busy": false,
       "allDay": false
     },
     {
@@ -361,9 +361,9 @@
   ],
   "boardStrip": {
     "label": "Next up · Tue",
-    "time": "12:00",
-    "place": "Hayes + Harris — SRE Yellow Day",
-    "detailHtml": "<strong>12:00</strong> Hayes + Harris — SRE Yellow Day",
+    "time": "8:10",
+    "place": "Hayes + Harris — SRE drop-off · 8:25",
+    "detailHtml": "<strong>8:10</strong> Hayes + Harris — SRE drop-off · 8:25",
     "badge": "Tue"
   },
   "error": null
