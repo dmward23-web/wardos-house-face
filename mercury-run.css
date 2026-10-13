@@ -31,3 +31,9 @@ html, body { margin: 0; height: 100%; background: #070b10; color: #f4fbff; overf
 .hud .pw em.on { background: rgba(255,236,190,.18); color: #fff3d6; }
 .hud .pw em.off { opacity: .38; }
 .hud .fixture { background: #6a4a10; color: #ffe2a0; padding: 2px 8px; border-radius: 6px; font-size: 12px; letter-spacing: .08em; }
+/* COOP1 · one quiet zone per kid along the bottom of the wall */
+.zones { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; display: flex; pointer-events: none; }
+.zones .zone { flex: 1; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 14px; border-left: 1px solid rgba(255,255,255,.07); }
+.zones .zone:first-child { border-left: 0; }
+.zones .zone span { font-size: 15px; color: rgba(255,248,230,.55); text-shadow: 0 0 10px rgba(0,0,0,.6); }
+.hint { bottom: 76px; }

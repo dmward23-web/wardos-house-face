@@ -144,7 +144,11 @@
   var SIBS = KIDS.filter(function (k) { return k !== kid; });
   var FIXTURE = q.get("fixture") === "1";
   var FIX_PW = {}; FIX_PW[kid] = { dbl: true, magnet: true }; FIX_PW[SIBS[0]] = { dbl: true, magnet: false }; FIX_PW[SIBS[1]] = { dbl: false, magnet: false };
-  A.kid = kid; B.kid = SIBS[0];
+  /* COOP1 · up to three kids on one wall: host + siblings. The wall splits into one touch zone per kid
+     (left to right); a zone with no hand runs its blob as a calm echo. ?coop=2 keeps it to two. */
+  var C = new Blob(spawn.x + 56, spawn.y, true);
+  A.kid = kid; B.kid = SIBS[0]; C.kid = SIBS[1];
+  var blobs = q.get("coop") === "2" ? [A, B] : [A, B, C];
   function powersFor(k) {
     if (FIXTURE) return FIX_PW[k];
     try {
@@ -154,7 +158,7 @@
     } catch (e) { return { dbl: false, magnet: false }; }
   }
   function refreshPowers() { allBlobs().forEach(function (b) { b.pw = powersFor(b.kid); }); paintPowerHud(); }
-  function allBlobs() { return [A, B]; }
+  function allBlobs() { return blobs; }
   function paintPowerHud() {
     var el = ui.querySelector(".hud span"); if (!el) return;
     el.innerHTML = (FIXTURE ? '<b class="fixture">FIXTURE</b> ' : "") + allBlobs().map(function (b) {
@@ -275,9 +279,10 @@
       var d = drops[i];
       d.age = (d.age || 0) + dt;
     if (d.age > 0.22) {
-      var tx = A.x, ty = A.y;
-      if (Math.hypot(B.x - d.x, B.y - d.y) < Math.hypot(tx - d.x, ty - d.y)) { tx = B.x; ty = B.y; }
-      var pull = ((tx === A.x ? A : B).magnetT > 0) ? 22 : 8;
+      var near = blobs[0];
+      blobs.forEach(function (b) { if (Math.hypot(b.x - d.x, b.y - d.y) < Math.hypot(near.x - d.x, near.y - d.y)) near = b; });
+      var tx = near.x, ty = near.y;
+      var pull = near.magnetT > 0 ? 22 : 8;
       d.vx += (tx - d.x) * pull * dt;
       d.vy += (ty - d.y) * pull * dt;
       d.r *= Math.max(0.2, 1 - dt * 1.4);
@@ -588,7 +593,7 @@
   var env = document.createElement("canvas"), eq = env.getContext("2d", { willReadFrequently: true });
   function paintLiquid(g, t, src, dpr) {
     var balls = [];
-    [A, B].forEach(function (b, k) {
+    blobs.forEach(function (b, k) {
       if (b.inv > 0 && Math.floor(t * 6) % 2 === 0) return;
       balls.push({ x: b.x - cam, y: b.y, r: b.r * 1.05, sq: Math.max(0.6, b.squash), w: t * 2.2 + k * 1.7, fade: b.echo ? 0.82 : 1 });
     });
@@ -657,7 +662,7 @@
     g.save();
     g.imageSmoothingEnabled = true;
     /* contact shadows under grounded blobs */
-    [A, B].forEach(function (b) { if (!b.grounded) return; g.fillStyle = "rgba(0,0,0,0.35)"; g.beginPath(); g.ellipse(b.x - cam, b.y + b.r * 0.95, b.r * 0.8, b.r * 0.16, 0, 0, 7); g.fill(); });
+    blobs.forEach(function (b) { if (!b.grounded) return; g.fillStyle = "rgba(0,0,0,0.35)"; g.beginPath(); g.ellipse(b.x - cam, b.y + b.r * 0.95, b.r * 0.8, b.r * 0.16, 0, 0, 7); g.fill(); });
     g.drawImage(liq, 0, 0, cw, ch, x0, y0, cw * C, ch * C);
     g.restore();
   }
@@ -685,19 +690,13 @@
     frame.l = now;
     var W = view.w, H = view.h;
     var ids = Object.keys(pointers);
-    var inA = null, inB = null;
-    ids.forEach(function (id) {
-      if (pointers[id].blob === 0) inA = pointers[id];
-      else inB = pointers[id];
-    });
-    B.echo = !inB;
-    stepBlob(A, dt, t, inA);
-    stepBlob(B, dt, t, inB);
+    var ins = blobs.map(function () { return null; });
+    ids.forEach(function (id) { var k = Math.min(blobs.length - 1, pointers[id].blob); ins[k] = pointers[id]; });
+    blobs.forEach(function (b, k) { if (k > 0) b.echo = !ins[k]; stepBlob(b, dt, t, ins[k]); });
     stepDrops(dt);
-    if (!won && A.x > goalX + 20 && B.x > goalX + 20 && A.grounded && B.grounded) {
-      won = true; tone("grove"); burst((A.x + B.x) / 2, A.y, 30, "#fff");
-    }
-    var mid = (A.x + B.x) / 2;
+    var mid = 0, home = !won;
+    blobs.forEach(function (b) { mid += b.x / blobs.length; if (!(b.x > goalX + 20 && b.grounded)) home = false; });
+    if (home) { won = true; tone("grove"); burst(mid, A.y, 30, "#fff"); }
     var aim = mid - W * 0.38;
     cam += (aim - cam) * (reduced ? 1 : 0.05);
     cam = Math.max(0, cam);
@@ -711,8 +710,7 @@
     ctx.drawImage(off, 0, 0, off.width, off.height, 0, 0, W, H);
     if (LIQUID) paintLiquid(ctx, t, off, view.dpr);
     else {
-      paintBlob(ctx, A, t);
-      paintBlob(ctx, B, t);
+      blobs.forEach(function (b) { paintBlob(ctx, b, t); });
       paintBridge(ctx, t);
       drops.forEach(function (d) {
         ctx.globalAlpha = Math.max(0, d.a);
@@ -727,12 +725,7 @@
   function assignPointer(e) {
     var rec = cv.getBoundingClientRect();
     var x = e.clientX - rec.left, y = e.clientY - rec.top;
-    var blob = 0;
-    var used = {};
-    Object.keys(pointers).forEach(function (id) { used[pointers[id].blob] = 1; });
-    if (used[0] && !used[1]) blob = 1;
-    else if (!used[0]) blob = 0;
-    else blob = x > view.w * 0.5 ? 1 : 0;
+    var blob = Math.max(0, Math.min(blobs.length - 1, Math.floor(x / (view.w / blobs.length)))); /* the kid's own zone */
     pointers[e.pointerId] = { x: x, y: y, blob: blob, ly: y, jump: false };
     try { cv.setPointerCapture(e.pointerId); } catch (err) {}
     if (window.HouseSfx && HouseSfx.unlockAudio) HouseSfx.unlockAudio();
@@ -757,7 +750,7 @@
     if (p) {
       var rec = cv.getBoundingClientRect();
       if (p.ly - (e.clientY - rec.top) > 18) p.jump = true;
-      var b = p.blob === 0 ? A : B;
+      var b = blobs[Math.min(blobs.length - 1, p.blob)];
       if (p.jump) { b.want = 0.14; b.press = true; }
     }
     delete pointers[e.pointerId];
@@ -794,7 +787,7 @@
     playing = true;
     setTimeout(refreshPowers, 0);
     setInterval(refreshPowers, 30000); /* a chore closed mid-run lights its power-up within half a minute */
-    ui.innerHTML = '<div class="hud"><a href="' + THEME.back + '">Back</a><span></span></div><div class="hint">One hand to roll and flick upward. A second hand wakes the other drop.</div>';
+    ui.innerHTML = '<div class="hud"><a href="' + THEME.back + '">Back</a><span></span></div><div class="hint">Each of you has a part of the wall. Roll in your part, flick up to jump.</div><div class="zones">' + blobs.map(function (b) { return '<div class="zone"><span>' + NAMES[b.kid] + '</span></div>'; }).join("") + '</div>';
     resize();
     frame();
     setTimeout(function () {
@@ -806,7 +799,7 @@
   function winWatch() {
     var note = document.createElement("div");
     note.className = "gather";
-    note.innerHTML = '<p style="font-size:28px;font-weight:700;text-shadow:0 0 18px #fff">The grove holds both.</p><a href="' + THEME.back + '">Back</a>';
+    note.innerHTML = '<p style="font-size:28px;font-weight:700;text-shadow:0 0 18px #fff">The grove holds everyone.</p><a href="' + THEME.back + '">Back</a>';
     ui.appendChild(note);
   }
 
@@ -829,6 +822,7 @@
     window.addEventListener("resize", resize);
     A.x = spawn.x; A.y = GY(plats[0].y) - 40; A.cp = { x: A.x, y: A.y };
     B.x = spawn.x + 36; B.y = A.y; B.cp = { x: B.x, y: B.y };
+    C.x = spawn.x + 72; C.y = A.y; C.cp = { x: C.x, y: C.y };
     if (!st.full) {
       showGather();
       ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
