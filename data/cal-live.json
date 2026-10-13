@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-13T19:54:28.269Z",
+  "fetchedAt": "2026-10-13T20:08:51.262Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-20",
   "asOfIso": "2026-10-13",
   "nextLeave": {
-    "id": "65e289m91bkrcj9ropg8h1bo3m",
-    "summary": "Initial Intake (Alma) Meeting w/ Joe Wilner",
-    "start": "2026-10-13T15:00:00-05:00",
-    "end": "2026-10-13T16:00:00-05:00",
-    "location": "9401 Indian Creek Pkwy, Building 40, Suite 1030, Overland Park, KS 66210",
+    "id": "3hv9bcr87ggrhrkuf4ka3u6r2s_20261013T201500Z",
+    "summary": "Harris — pickup at Riley's · 4:15",
+    "start": "2026-10-13T16:05:00-05:00",
+    "end": "2026-10-13T16:30:00-05:00",
+    "location": "Fender home (Riley), 9504 W 148th St, Overland Park, KS",
     "busy": true,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "65e289m91bkrcj9ropg8h1bo3m",
-      "summary": "Initial Intake (Alma) Meeting w/ Joe Wilner",
-      "start": "2026-10-13T15:00:00-05:00",
-      "end": "2026-10-13T16:00:00-05:00",
-      "location": "9401 Indian Creek Pkwy, Building 40, Suite 1030, Overland Park, KS 66210",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "3hv9bcr87ggrhrkuf4ka3u6r2s_20261013T201500Z",
       "summary": "Harris — pickup at Riley's · 4:15",
@@ -424,9 +415,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "3:00",
-    "place": "Initial Intake (Alma) Meeting w/ Joe Wilner",
-    "detailHtml": "<strong>3:00</strong> Initial Intake (Alma) Meeting w/ Joe Wilner",
+    "time": "4:05",
+    "place": "Harris — pickup at Riley's · 4:15",
+    "detailHtml": "<strong>4:05</strong> Harris — pickup at Riley's · 4:15",
     "badge": "Tue"
   },
   "error": null
