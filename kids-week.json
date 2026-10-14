@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Oct 13 2026",
   "asOfIso": "2026-10-13",
-  "refreshedAt": "2026-10-13T23:59:37.691Z",
+  "refreshedAt": "2026-10-14T00:14:12.806Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -580,12 +580,12 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "TUE · 6:00",
-        "what": "HAYES FLAG PRACTICE 6:00–7:00 (WITH FENDERS)",
+        "when": "WED · All day",
+        "what": "SRE GREEN DAY",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "TUE",
-          "6:00"
+          "WED",
+          "All day"
         ]
       },
       "today": [
@@ -597,13 +597,6 @@
           "tone": "act"
         },
         {
-          "kind": "event",
-          "when": "Tue · 6:00",
-          "what": "Hayes flag practice 6:00–7:00 (with Fenders)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
           "kind": "note",
           "when": "All day",
           "what": "🏡 DROP ZONE HQ with Dad",
@@ -612,12 +605,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Tue 13 · leave 6:00",
-          "what": "Hayes flag practice 6:00–7:00 (with Fenders)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Thu 15 · leave 5:40",
           "what": "Hayes flag practice",
@@ -1043,11 +1030,6 @@
           "tone": "act"
         },
         {
-          "when": "Tue 13 · 6:00",
-          "what": "Hayes flag practice 6:00–7:00 (with Fenders)",
-          "tone": "hot"
-        },
-        {
           "when": "Wed 14 · All day",
           "what": "SRE Green Day",
           "tone": "act"
@@ -1150,6 +1132,11 @@
         {
           "when": "Fri 16 · 8:10",
           "what": "SRE drop-off",
+          "tone": "act"
+        },
+        {
+          "when": "Fri 16 · 12:00",
+          "what": "SRE Chat & Chew lunch",
           "tone": "act"
         }
       ]
