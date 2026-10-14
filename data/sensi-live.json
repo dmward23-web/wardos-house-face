@@ -1,6 +1,6 @@
 {
   "status": "live",
-  "updatedAt": "2026-10-14T20:30:48.080Z",
+  "updatedAt": "2026-10-14T21:32:42.385Z",
   "source": "sensi-cloud",
   "writeSupported": false,
   "thermostat": {
@@ -14,7 +14,7 @@
     "coolSetpoint": 77,
     "mode": "Auto",
     "fan": "Auto",
-    "humidity": 56,
+    "humidity": 57,
     "hold": false,
     "scale": "f"
   },
