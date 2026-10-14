@@ -472,7 +472,7 @@
   }
   /* CALLOUT1 · a board page may define window.KidCallouts { short label: [title, plain subtitle] }.
      Big playful title, small plain chore underneath. Boards without it are unchanged. */
-  function drawCallout(ctx, q, co) {
+  function drawCallout(ctx, q, co, measureOnly) {
     var maxW = 124;
     ctx.font = "800 15px " + SANS;
     var lines = wrapLines(ctx, co[0], maxW);
@@ -484,7 +484,8 @@
     q.hw = Math.max(40, tw + 16);
     q.hh = lines.length * 18 + 16 + 6;
     var vw = ctx.canvas.width / Math.max(1, (bg && bg.dpr) || 1);
-    var lx = clamp(q.x, q.hw / 2 + 4, vw - q.hw / 2 - 4); q.labelX = lx;   /* never off the phone edge */
+    if (measureOnly) { q.labelX = clamp(q.x, q.hw / 2 + 4, vw - q.hw / 2 - 4); return; }
+    var lx = q.labelX != null ? q.labelX : clamp(q.x, q.hw / 2 + 4, vw - q.hw / 2 - 4); q.labelX = lx;   /* never off the phone edge */
     paintLabelPlate(ctx, lx, q.y, q.hw, q.hh);
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     var top = q.y - q.hh / 2 + 3 + 9;
@@ -494,6 +495,36 @@
     }
     ctx.font = "600 11.5px " + SANS; ctx.fillStyle = "rgba(214, 230, 236, 0.92)";
     ctx.fillText(co[1], lx, top + lines.length * 18 + 1);
+  }
+  /* CALLOUT2 · callout plates are bigger than plain chips: measure them all, then nudge apart
+     (small vertical moves first, then sideways) so no two plates touch. */
+  function spaceCallouts(ctx, shown, W) {
+    var co = global.KidCallouts; if (!co) return;
+    ctx.save();
+    shown.forEach(function (q) { var c = co[q.chip || shortLabel(q.label)]; if (c) { drawCallout(ctx, q, c, true); q.y0 = q.y; } });
+    ctx.restore();
+    var GAP = 14;
+    for (var it = 0; it < 24; it++) {
+      var moved = false;
+      for (var i = 0; i < shown.length; i++) for (var j = i + 1; j < shown.length; j++) {
+        var a = shown[i], b = shown[j];
+        if (a.labelX == null || b.labelX == null) continue;
+        var ox = (a.hw + b.hw) / 2 + GAP - Math.abs(a.labelX - b.labelX);
+        var oy = (a.hh + b.hh) / 2 + GAP - Math.abs(a.y - b.y);
+        if (ox <= 0 || oy <= 0) continue;
+        moved = true;
+        var up = a.y <= b.y ? a : b, dn = up === a ? b : a;
+        var canV = Math.abs(up.y - up.y0) < 22 && Math.abs(dn.y - dn.y0) < 22;
+        if (canV && oy <= ox) { up.y -= oy / 2 + 0.5; dn.y += oy / 2 + 0.5; }
+        else {
+          var lf = a.labelX <= b.labelX ? a : b, rt = lf === a ? b : a;
+          lf.labelX = clamp(lf.labelX - ox / 2 - 0.5, lf.hw / 2 + 4, W - lf.hw / 2 - 4);
+          rt.labelX = clamp(rt.labelX + ox / 2 + 0.5, rt.hw / 2 + 4, W - rt.hw / 2 - 4);
+        }
+      }
+      if (!moved) break;
+    }
+    shown.forEach(function (q) { if (q.y0 != null) q.chipY = q.y; });
   }
   function drawLight(ctx, q) {
     var co = global.KidCallouts && global.KidCallouts[q.chip || shortLabel(q.label)];
@@ -1457,8 +1488,9 @@
       q.ledY = q.seat;
       q.chipY = q.y;
       drawMarker(ctx, q, world, i, !!q.done, t);
-      drawLight(ctx, q);
+      if (!global.KidCallouts) drawLight(ctx, q);
     });
+    if (global.KidCallouts) { spaceCallouts(ctx, shown, W); shown.forEach(function (q) { drawLight(ctx, q); }); }
     var fg = book && book.fg;
     if (fg && fg.width >= 64) {
       var fp = layerShift("fg", man);

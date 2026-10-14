@@ -42,7 +42,14 @@
    "beam-common", "beam-uncommon", "beam-rare", "beam-epic", "beam-legendary",
    "particles-far", "particles-mid", "particles-near", "fog-mid", "fog-low", "light-shafts",
    "fg-left", "fg-right", "fg-bottom", "victory-rays", "victory-burst", "victory-confetti-strip"
-  ].forEach(function (n) { var im = new Image(); im.onload = function () { ART[n] = im; }; im.src = DIR + n + ".png"; });
+  ].forEach(function (n) {
+    var im = new Image();
+    im.onload = function () { ART[n] = im; };
+    /* 3x phones get the 3x cards (tiny); everything else uses 2x (or 1x on 1x screens) */
+    var dir = /^card-/.test(n) && (global.devicePixelRatio || 1) >= 2.6 ? "art/hayes-loot/3x/" : DIR;
+    im.onerror = function () { if (!im._png) { im._png = 1; im.src = dir + n + ".png"; } };   /* WebP first, PNG fallback */
+    im.src = dir + n + ".webp";
+  });
   /* 1x design sizes from Prism's README */
   var SZ = { glider: [240, 192, 120, 131], card: [240, 84], beam: [112, 176, 56, 160] };
   function cover(name, alpha, blend, ox, oy, extra) {
@@ -55,7 +62,7 @@
   var t0 = performance.now();
   function now() { return (performance.now() - t0) / 1000; }
   var pops = [];          /* loot moments */
-  var victoryAt = -1, victoryCy = null;
+  var victoryAt = -1, victoryCy = null, victoryScale = 1, victoryCx = null;
   var lastFill = null;
 
   /* ---------- sound (own WebAudio, unlocked on first touch) ---------- */
@@ -214,14 +221,14 @@
     if (age > 5.6) { victoryAt = -1; victoryCy = null; return; }
     if (victoryCy == null) victoryCy = victoryY();
     var a = Math.min(1, age / 0.35) * Math.min(1, (5.6 - age) / 0.7);
-    var cx = W / 2, cy = victoryCy;
+    var cx = victoryCx != null ? victoryCx : W / 2, cy = victoryCy;
     ctx.save();
-    ctx.fillStyle = "rgba(20, 10, 40," + (0.35 * a).toFixed(3) + ")"; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "rgba(20, 10, 40," + (0.18 * a).toFixed(3) + ")"; ctx.fillRect(0, 0, W, H);
     var R = ART["victory-rays"], B = ART["victory-burst"], C = ART["victory-confetti-strip"];
     ctx.globalCompositeOperation = "screen";
     if (R) { ctx.save(); ctx.globalAlpha = (0.6 + 0.2 * Math.sin(age * 1.4)) * a; ctx.translate(cx, cy); ctx.rotate(age * 0.12);
       var rs = Math.max(W, H) * 1.3; ctx.drawImage(R, -rs / 2, -rs / 2, rs, rs); ctx.restore(); }
-    if (B) { var bp = Math.min(1, age / 0.5), bs = 300 * (0.6 + 0.4 * bp) * (1 + 0.04 * Math.sin(age * 3));
+    if (B) { var bp = Math.min(1, age / 0.5), bs = 300 * victoryScale * (0.6 + 0.4 * bp) * (1 + 0.04 * Math.sin(age * 3));
       ctx.globalAlpha = a * (age < 0.5 ? 1 : 0.85); ctx.drawImage(B, cx - bs / 2, cy - bs / 2, bs, bs); }
     ctx.globalCompositeOperation = "source-over";
     if (C) { var fr = Math.floor(age * 8) % 8;
@@ -232,7 +239,10 @@
     ctx.restore();
     ctx.save();
     var s = 0.8 + 0.2 * Math.min(1, age / 0.4) + (age < 0.6 ? Math.sin(age / 0.6 * Math.PI) * 0.08 : 0);
-    ctx.translate(cx, cy); ctx.scale(s, s); ctx.globalAlpha = a; ctx.textAlign = "center";
+    ctx.translate(cx, cy); s *= victoryScale; ctx.scale(s, s); ctx.globalAlpha = a; ctx.textAlign = "center";
+    /* frosted glass panel behind the words so they read without a full-screen dim */
+    ctx.save(); ctx.globalAlpha = a * 0.78; ctx.fillStyle = "rgba(24, 16, 48, 0.72)"; roundRect(-170, -70, 340, 120, 22); ctx.fill();
+    ctx.strokeStyle = "rgba(255, 214, 140, 0.55)"; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
     ctx.font = "900 24px system-ui, sans-serif"; ctx.fillStyle = "#fff4d6";
     ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 10;
     ctx.fillText("#1", 0, -40);
@@ -245,17 +255,23 @@
     ctx.restore();
   }
   function victoryY() {
-    var info = global.KidWorld && KidWorld.hits && KidWorld.hits();
-    var occ = [];
+    /* glass panel beside the jar creature (never over it, never over a chest or label):
+       right of the creature, below the lowest chest/label in that column, above the Farther/Path buttons */
+    var jar = document.querySelector("[data-kw-jar]"), jr = jar && jar.getBoundingClientRect();
+    var left = jr && jr.width ? jr.right + 8 : W * 0.5;
+    var btn = document.querySelector("[data-kw-more]"), br = btn && btn.getBoundingClientRect();
+    var bottom = br && br.height ? br.top - 8 : H * 0.88;
+    var info = global.KidWorld && KidWorld.hits && KidWorld.hits(), top = H * 0.6;
     if (info && info.hits) info.hits.forEach(function (q) {
-      var ms = q.ms || 72, top = (q.seat || q.y) - ms * 0.7, bot = (q.chipY != null ? q.chipY : q.y) + (q.hh || 36) / 2 + 4;
-      occ.push([Math.min(top, bot), Math.max(top, bot)]);
+      var ms = q.ms || 72, lx = q.labelX != null ? q.labelX : q.x, cy = q.chipY != null ? q.chipY : q.y;
+      if (q.x + ms * 0.5 > left) top = Math.max(top, (q.seat || q.y) + ms * 0.45);
+      if (lx + (q.hw || 80) / 2 > left) top = Math.max(top, cy + (q.hh || 36) / 2);
     });
-    occ.sort(function (a, b) { return a[0] - b[0]; });
-    var lo = 70, hi = H * 0.86, best = [lo, lo], cur = lo;
-    occ.forEach(function (o) { if (o[0] - cur > best[1] - best[0]) best = [cur, o[0]]; cur = Math.max(cur, o[1]); });
-    if (hi - cur > best[1] - best[0]) best = [cur, hi];
-    return (best[0] + best[1]) / 2 + 4;
+    top += 8;
+    var availW = W - 6 - left, availH = Math.max(40, bottom - top);
+    victoryScale = Math.max(0.5, Math.min(1, availW / 344, availH / 124));
+    victoryCx = left + availW / 2;
+    return top + availH / 2 + 10 * victoryScale;
   }
   /* ---------- immersion: depth, air, light, sound ---------- */
   var tilt = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -264,13 +280,6 @@
     tilt.tx = Math.max(-1, Math.min(1, (e.gamma || 0) / 25));
     tilt.ty = Math.max(-1, Math.min(1, ((e.beta || 45) - 45) / 25));
   });
-  var DUST = [];
-  (function () {
-    for (var i = 0; i < 70; i++) {
-      var z = i < 40 ? 0.25 : i < 62 ? 0.6 : 1.3;          /* far, mid, near */
-      DUST.push({ x: Math.random(), y: Math.random(), z: z, sp: 0.004 + Math.random() * 0.01, ph: Math.random() * 6.28 });
-    }
-  })();
   /* Prism depth stack, back -> front. Each depth drifts and tilts at its own rate. */
   function back(t) {
     var ox = tilt.x * 6, oy = tilt.y * 4;

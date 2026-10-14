@@ -9,6 +9,6 @@ window.KidCallouts = {
   "Post-game": ["Gear Up", "Rinse gear, set bag"],
   "Shower": ["Respawn Fresh", "Shower + brush"],
   "Room reset": ["Rebuild the Base", "Room reset"],
-  "Shoes": ["Stash the Kicks", "Shoes away (not hallway)"],
+  "Shoes": ["Stash the Kicks", "Shoes away, not hallway"],
   "Backpack + sports bag in garage cubby": ["Gear to Base", "Bags in garage cubby"]
 };
