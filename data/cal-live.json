@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-14T12:15:39.116Z",
+  "fetchedAt": "2026-10-14T12:29:58.632Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-21",
@@ -56,11 +56,11 @@
     },
     {
       "id": "m10mhm86l2ba1m6dnjdj37g4js",
-      "summary": "Ainsley — LKMS Math Counts info meeting · 3:15–4:00 · pickup 4:00",
-      "start": "2026-10-14T15:50:00-05:00",
+      "summary": "Ainsley — LKMS Math Counts info meeting · 3:15",
+      "start": "2026-10-14T15:15:00-05:00",
       "end": "2026-10-14T16:00:00-05:00",
       "location": "Lakewood Middle School Library, 6601 Edgewater Dr, Overland Park, KS 66223",
-      "busy": true,
+      "busy": false,
       "allDay": false
     },
     {
@@ -118,20 +118,20 @@
       "allDay": false
     },
     {
+      "id": "d0mih3lub5n6ipsknqkh4nlfc4",
+      "summary": "Ainsley — LKMS Homework Help · 3:00",
+      "start": "2026-10-15T15:00:00-05:00",
+      "end": "2026-10-15T16:00:00-05:00",
+      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": false
+    },
+    {
       "id": "3hv9bcr87ggrhrkuf4ka3u6r2s_20261015T201500Z",
       "summary": "Hayes + Harris — SRE pickup · 3:40",
       "start": "2026-10-15T15:15:00-05:00",
       "end": "2026-10-15T16:00:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "d0mih3lub5n6ipsknqkh4nlfc4",
-      "summary": "Ainsley — LKMS Homework Help · 3:00–4:00 · pickup 4:00",
-      "start": "2026-10-15T15:50:00-05:00",
-      "end": "2026-10-15T16:15:00-05:00",
-      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
       "busy": true,
       "allDay": false
     },
