@@ -37,3 +37,6 @@ html, body { margin: 0; height: 100%; background: #070b10; color: #f4fbff; overf
 .zones .zone:first-child { border-left: 0; }
 .zones .zone span { font-size: 15px; color: rgba(255,248,230,.55); text-shadow: 0 0 10px rgba(0,0,0,.6); }
 .hint { bottom: 76px; }
+
+/* POWERUPS2 · power-ups are drawn in-world; the old text pills stay in the DOM for a11y only */
+.hud .pw { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

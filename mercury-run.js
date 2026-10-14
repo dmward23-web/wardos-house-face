@@ -48,11 +48,42 @@
     Promise.all(jobs).then(function () { runPlatesReady = true; });
   }
   loadRunPlates();
+  /* SEAM1 · plates tile forever as mirrored copies (edge meets its own mirror, so no hard cut and no black strip
+     at any width or scroll). Opaque sky plates get smeared/stretched edge columns trimmed once on load. */
+  var plateTrim = typeof WeakMap === "function" ? new WeakMap() : null;
+  function trimFor(img) {
+    if (!plateTrim) return { l: 0, r: 0 };
+    var hit = plateTrim.get(img); if (hit) return hit;
+    var res = { l: 0, r: 0 };
+    try {
+      var sw = 256, sh = 144, c = document.createElement("canvas"); c.width = sw; c.height = sh;
+      var g2 = c.getContext("2d", { willReadFrequently: true }); g2.drawImage(img, 0, 0, sw, sh);
+      var d = g2.getImageData(0, 0, sw, sh).data, opaque = d[3] > 250 && d[(sw * sh - 1) * 4 + 3] > 250;
+      if (opaque) {
+        var colVar = function (x) { var s = 0; for (var y = 1; y < sh; y++) { var a = (y * sw + x) * 4, b = ((y - 1) * sw + x) * 4; s += Math.abs(d[a] - d[b]) + Math.abs(d[a + 1] - d[b + 1]); } return s / sh; };
+        var ref = 0; for (var x = sw * 0.4; x < sw * 0.6; x++) ref += colVar(Math.floor(x)); ref /= sw * 0.2;
+        var lim = Math.max(0.6, ref * 0.12), L = 0, R = 0;
+        while (L < sw * 0.25 && colVar(L) < lim) L++;
+        while (R < sw * 0.25 && colVar(sw - 1 - R) < lim) R++;
+        res = { l: (L ? L + 2 : 0) / sw, r: (R ? R + 2 : 0) / sw };
+      }
+    } catch (e) {}
+    plateTrim.set(img, res);
+    return res;
+  }
   function drawRunPlate(g, img, W, H, oxOff, parallax) {
     if (!img) return;
-    var scale = Math.max(W / img.width, H / img.height) * 1.08;
-    var dw = img.width * scale, dh = img.height * scale;
-    g.drawImage(img, (W - dw) / 2 - cam * parallax + (oxOff || 0), (H - dh) / 2, dw, dh);
+    var tr = trimFor(img);
+    var sx = img.width * tr.l, sw = img.width * (1 - tr.l - tr.r);
+    var scale = Math.max(W / sw, H / img.height) * 1.08;
+    var dw = Math.ceil(sw * scale), dh = img.height * scale;
+    var x = (W - dw) / 2 - cam * parallax + (oxOff || 0), y = (H - dh) / 2;
+    var k0 = Math.floor(-x / dw), k1 = Math.ceil((W - x) / dw);
+    for (var k = k0; k < k1; k++) {
+      var tx = Math.floor(x + k * dw);
+      if (k & 1) { g.save(); g.translate(tx + dw, y); g.scale(-1, 1); g.drawImage(img, sx, 0, sw, img.height, -0.5, 0, dw + 1, dh); g.restore(); }
+      else g.drawImage(img, sx, 0, sw, img.height, tx - 0.5, y, dw + 1, dh);
+    }
   }
 
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -170,6 +201,8 @@
   var C = new Blob(spawn.x + 56, spawn.y, true);
   A.kid = kid; B.kid = SIBS[0]; C.kid = SIBS[1];
   var blobs = q.get("coop") === "2" ? [A, B] : [A, B, C];
+  /* DEMO1 · ?demo=1 attract mode: the host blob runs itself too (preview captures / idle wall). */
+  if (q.get("demo") === "1") A.auto = true;
   function powersFor(k) {
     if (FIXTURE) return FIX_PW[k];
     try {
@@ -228,7 +261,7 @@
       accel = clamp(worldX - b.x, -160, 160);
       b.vx += accel * 8 * dt;
       if (input.jump) { b.want = 0.12; b.press = true; input.jump = false; }
-    } else if (b.echo) {
+    } else if (b.echo || b.auto) {
       var here = null, next = null;
       for (var i = 0; i < plats.length; i++) {
         var px = platX(plats[i], t);
@@ -363,10 +396,15 @@
     for (var d = 0; d < drips.length; d++) {
       var dr = drips[d];
       var dy = GY(dr.y) + ((t * 90 + dr.p * 40) % 180);
-      g.fillStyle = "rgba(12, 16, 22, 0.88)";
-      g.beginPath(); g.arc(dr.x, dy, dr.r, 0, 7); g.fill();
-      g.fillStyle = "rgba(255,255,255,0.25)";
-      g.beginPath(); g.arc(dr.x - 4, dy - 4, dr.r * 0.35, 0, 7); g.fill();
+      /* DRIP2 · the hazard reads as a dark-thorn ember with a violet glow, never as a second blob */
+      var hg = g.createRadialGradient(dr.x, dy, 2, dr.x, dy, dr.r * 2.6);
+      hg.addColorStop(0, "rgba(190,120,255,0.55)"); hg.addColorStop(0.45, "rgba(120,60,200,0.18)"); hg.addColorStop(1, "rgba(80,30,160,0)");
+      g.fillStyle = hg; g.beginPath(); g.arc(dr.x, dy, dr.r * 2.6, 0, 7); g.fill();
+      g.fillStyle = "rgba(30, 12, 48, 0.92)";
+      g.beginPath();
+      for (var sp = 0; sp < 14; sp++) { var an = sp / 14 * Math.PI * 2 + t * 0.4, rr = sp % 2 ? dr.r * 0.55 : dr.r * 1.05; g[sp ? "lineTo" : "moveTo"](dr.x + Math.cos(an) * rr, dy + Math.sin(an) * rr); }
+      g.closePath(); g.fill();
+      g.fillStyle = "rgba(220,170,255,0.7)"; g.beginPath(); g.arc(dr.x, dy, dr.r * 0.22, 0, 7); g.fill();
     }
     rings.forEach(function (ring) {
       g.globalAlpha = Math.max(0, ring.a);
@@ -621,10 +659,27 @@
     });
     drops.forEach(function (d) { if (d.a > 0.05) balls.push({ x: d.x - cam, y: d.y, r: d.r * 1.6 * Math.min(1, d.a * 1.6), sq: 1, w: 0, fade: 1 }); });
     if (!balls.length) return;
+    /* CHROME2 · cluster balls that can touch and shade each cluster on its own tight grid, so three blobs spread
+       across the wall don't share one giant coarse grid (that was the blocky, flat-grey look). */
+    var par = balls.map(function (_, i) { return i; });
+    function root(i) { while (par[i] !== i) i = par[i] = par[par[i]]; return i; }
+    for (var bi = 0; bi < balls.length; bi++) for (var bj = bi + 1; bj < balls.length; bj++) {
+      var u = balls[bi], w2 = balls[bj];
+      if (Math.hypot(u.x - w2.x, u.y - w2.y) < (u.r + w2.r) * 2.4) par[root(bi)] = root(bj);
+    }
+    var groups = {};
+    balls.forEach(function (bb, i) { var r0 = root(i); (groups[r0] = groups[r0] || []).push(bb); });
+    Object.keys(groups).forEach(function (key) { paintLiquidGroup(g, t, src, dpr, groups[key]); });
+    g.save();
+    blobs.forEach(function (b) { if (!b.grounded) return; g.fillStyle = "rgba(0,0,0,0.35)"; g.beginPath(); g.ellipse(b.x - cam, b.y + b.r * 0.95, b.r * 0.8, b.r * 0.16, 0, 0, 7); g.fill(); });
+    g.restore();
+  }
+  function paintLiquidGroup(g, t, src, dpr, balls) {
     var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
     balls.forEach(function (b) { var m = b.r * 2.2; x0 = Math.min(x0, b.x - m); y0 = Math.min(y0, b.y - m); x1 = Math.max(x1, b.x + m); y1 = Math.max(y1, b.y + m); });
     x0 = Math.max(-40, x0); y0 = Math.max(-40, y0); x1 = Math.min(view.w + 40, x1); y1 = Math.min(view.h + 40, y1);
-    var C = Math.max(1.5, Math.sqrt((x1 - x0) * (y1 - y0) / 40000)); /* css px per cell, capped work */
+    if (!(x1 - x0 > 4 && y1 - y0 > 4)) return; /* group fully off-wall */
+    var C = Math.max(1 / Math.min(2, dpr), Math.sqrt((x1 - x0) * (y1 - y0) / 30000)); /* css px per cell, capped work */
     var cw = Math.ceil((x1 - x0) / C), ch = Math.ceil((y1 - y0) / C);
     if (cw < 2 || ch < 2) return;
     var M = 24; /* env margin so reflections can look past the edge */
@@ -664,32 +719,78 @@
         var nz = Math.sqrt(edge) ;
         var s2 = Math.sqrt(Math.max(0, 1 - nz * nz));
         var nx = -fx / gl * s2, ny = -fy / gl * s2;
-        /* reflection: look along the bent normal into the painted world */
-        var rx = Math.round(i + em + nx * 16 / C * 1.6), ry = Math.round(j + em + ny * 16 / C * 1.6 - (1 - nz) * 6);
+        /* CHROME2 · mirror chrome: the bent normal looks into the painted world (env), upper hemisphere reads sky,
+           a crisp dark horizon band splits it, lower hemisphere goes dark with a warm ground bounce, bright fresnel rim,
+           and a hard key spec + soft secondary. Contrast is what sells metal; flat grey reads as plastic. */
+        var rx = Math.round(i + em + nx * 22 / C), ry = Math.round(j + em + ny * 22 / C - (1 - nz) * 8 / C);
         rx = rx < 0 ? 0 : rx >= ew ? ew - 1 : rx; ry = ry < 0 ? 0 : ry >= eh ? eh - 1 : ry;
         var e = (ry * ew + rx) * 4;
-        var lum = (ed[e] * 0.3 + ed[e + 1] * 0.55 + ed[e + 2] * 0.15) / 255;
-        /* chrome = mostly a contrasty mirror of the world + sky band above the horizon of the normal */
-        var sky = ny < -0.15 ? Math.min(1, (-ny - 0.15) * 1.6) : 0;
-        var band = Math.exp(-Math.pow((ny + 0.05) / 0.08, 2)) * 0.45; /* chrome horizon line */
-        var base = Math.pow(lum, 1.1) * 0.9 + sky * 0.7 + band;
-        var fres = Math.pow(1 - nz, 3);
-        var spec = Math.pow(Math.max(0, nx * lx + ny * ly + nz * lz), 48) * 1.4;
-        var dark = ny > 0.35 ? (ny - 0.35) * 0.6 : 0;
-        var v = Math.min(1.2, base * (1 - dark) + fres * 0.65 + spec);
-        var cr = ed[e] / 255 * 0.25 + v * 0.75, cg = ed[e + 1] / 255 * 0.25 + v * 0.75, cb = ed[e + 2] / 255 * 0.25 + v * 0.75;
-        o[k] = Math.min(255, cr * tr * 1.05);
-        o[k + 1] = Math.min(255, cg * tg * 1.05);
-        o[k + 2] = Math.min(255, cb * tb * 1.08);
+        var er = ed[e] / 255, eg = ed[e + 1] / 255, eb = ed[e + 2] / 255;
+        var lum = er * 0.3 + eg * 0.55 + eb * 0.15;
+        var hz = ny - 0.22 + 0.04 * Math.sin(t * 0.9 + px * 0.02); /* horizon wobbles slowly with the liquid */
+        var up = hz < 0 ? Math.min(1, -hz * 2.2) : 0, down = hz > 0 ? Math.min(1, hz * 2.4) : 0;
+        var line = Math.exp(-Math.pow(hz / 0.035, 2));
+        /* studio chrome: bright cool sky above the horizon, dark warm ground below, env mixed in for the world */
+        var sr, sg, sb;
+        if (hz < 0) { sr = 0.92 - up * 0.25; sg = 0.95 - up * 0.15; sb = 1.0; }
+        else { var dd = Math.min(1, down * 1.6); sr = 0.42 - dd * 0.32; sg = 0.38 - dd * 0.29; sb = 0.36 - dd * 0.28; }
+        var em2 = 0.5;
+        var cr = sr * (1 - em2) + er * em2 * (hz < 0 ? 1.1 : 0.6), cg = sg * (1 - em2) + eg * em2 * (hz < 0 ? 1.1 : 0.6), cb = sb * (1 - em2) + eb * em2 * (hz < 0 ? 1.1 : 0.6);
+        cr *= 1 - line * 0.8; cg *= 1 - line * 0.8; cb *= 1 - line * 0.75;  /* chrome horizon */
+        var fres = Math.pow(1 - nz, 2.5);
+        cr += fres * 0.75; cg += fres * 0.8; cb += fres * 0.9;
+        var dl = nx * lx + ny * ly + nz * lz;
+        var spec = Math.pow(Math.max(0, dl), 90) * 2.2 + Math.pow(Math.max(0, dl), 12) * 0.25;
+        var spec2 = Math.pow(Math.max(0, -nx * 0.6 + ny * 0.5 + nz * 0.62), 40) * 0.5;
+        cr += spec + spec2; cg += spec + spec2; cb += spec + spec2 * 1.1;
+        o[k] = Math.min(255, cr * tr * 1.02);
+        o[k + 1] = Math.min(255, cg * tg * 1.02);
+        o[k + 2] = Math.min(255, cb * tb * 1.04);
         o[k + 3] = Math.round(255 * Math.min(1, (f - 0.85) / 0.12) * fade);
       }
     }
     lq.putImageData(img, 0, 0);
     g.save();
     g.imageSmoothingEnabled = true;
-    /* contact shadows under grounded blobs */
-    blobs.forEach(function (b) { if (!b.grounded) return; g.fillStyle = "rgba(0,0,0,0.35)"; g.beginPath(); g.ellipse(b.x - cam, b.y + b.r * 0.95, b.r * 0.8, b.r * 0.16, 0, 0, 7); g.fill(); });
     g.drawImage(liq, 0, 0, cw, ch, x0, y0, cw * C, ch * C);
+    g.restore();
+  }
+
+  /* POWERUPS2 · power-ups live in the world: double jump = a pair of soft spirit-light wings riding the blob
+     (they flare on the second jump); drop magnet = three warm motes orbiting slowly. No text on screen. */
+  function paintPowers(g, t) {
+    g.save();
+    g.globalCompositeOperation = "lighter";
+    blobs.forEach(function (b, k) {
+      if (b.inv > 0 && Math.floor(t * 6) % 2 === 0) return;
+      var pw = b.pw || {}, x = b.x - cam, y = b.y, r = b.r;
+      if (pw.dbl) {
+        var flare = b.air2 ? 1 : 0.55 + 0.15 * Math.sin(t * 1.6 + k);
+        var halo = g.createRadialGradient(x, y, r * 0.6, x, y, r * 2.4);
+        halo.addColorStop(0, "rgba(140,230,255," + (0.22 * flare) + ")"); halo.addColorStop(1, "rgba(140,230,255,0)");
+        g.fillStyle = halo; g.beginPath(); g.arc(x, y, r * 2.4, 0, 7); g.fill();
+        for (var sd = -1; sd <= 1; sd += 2) {
+          var flap = Math.sin(t * 2.2 + k) * 0.18;
+          g.save(); g.translate(x + sd * r * 0.85, y - r * 0.15); g.scale(sd, 1); g.rotate(-0.35 - flap);
+          var wg = g.createLinearGradient(0, 0, r * 1.5, -r * 0.6);
+          wg.addColorStop(0, "rgba(200,245,255," + (0.85 * flare) + ")"); wg.addColorStop(1, "rgba(120,210,255,0)");
+          g.fillStyle = wg;
+          g.beginPath(); g.moveTo(0, 0);
+          g.quadraticCurveTo(r * 0.7, -r * 1.25, r * 1.6, -r * 0.85);
+          g.quadraticCurveTo(r * 0.9, -r * 0.45, r * 1.35, -r * 0.2);
+          g.quadraticCurveTo(r * 0.6, -r * 0.1, 0, 0);
+          g.fill(); g.restore();
+        }
+      }
+      if (pw.magnet) {
+        for (var m = 0; m < 3; m++) {
+          var an = t * 0.9 + m * 2.094 + k, ox2 = x + Math.cos(an) * r * 1.7, oy2 = y + Math.sin(an) * r * 0.75 - r * 0.2;
+          var mg = g.createRadialGradient(ox2, oy2, 0, ox2, oy2, r * 0.55);
+          mg.addColorStop(0, "rgba(255,240,190,0.95)"); mg.addColorStop(0.3, "rgba(255,200,110,0.5)"); mg.addColorStop(1, "rgba(255,170,60,0)");
+          g.fillStyle = mg; g.beginPath(); g.arc(ox2, oy2, r * 0.55, 0, 7); g.fill();
+        }
+      }
+    });
     g.restore();
   }
 
@@ -724,8 +825,12 @@
     var mid = 0, home = !won;
     blobs.forEach(function (b) { mid += b.x / blobs.length; if (!(b.x > goalX + 20 && b.grounded)) home = false; });
     if (home) { won = true; tone("grove"); burst(mid, A.y, 30, "#fff"); }
-    var aim = mid - W * 0.38;
+    var aim = (A.x * 0.8 + mid * 0.2) - W * 0.4; /* CAM2: favor the host blob so it never leaves frame */
     cam += (aim - cam) * (reduced ? 1 : 0.05);
+    /* CAM2: soft keep-in — never let the host blob drift out of the middle 70% (eased, no snap) */
+    var hx = A.x - cam;
+    if (hx < W * 0.15) cam -= (W * 0.15 - hx) * 0.12;
+    if (hx > W * 0.85) cam += (hx - W * 0.85) * 0.12;
     cam = Math.max(0, cam);
     shake *= 0.86;
     ox.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
@@ -746,6 +851,7 @@
       });
       ctx.globalAlpha = 1;
     }
+    paintPowers(ctx, t);
     if (playing && !document.hidden) requestAnimationFrame(frame);
   }
 
