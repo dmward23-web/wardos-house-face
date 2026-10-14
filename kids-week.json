@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Oct 14 2026",
   "asOfIso": "2026-10-14",
-  "refreshedAt": "2026-10-14T23:13:20.513Z",
+  "refreshedAt": "2026-10-14T23:32:51.338Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -828,22 +828,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "WED · 4:00",
-        "what": "AINSLEY SWIM — COACH ANN · 5:00 PRACTICE (MAKEUP",
+        "when": "THU · 12:45",
+        "what": "LKMS CHOIR SING & SHARE FIELD TRIP",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "WED",
-          "4:00"
+          "THU",
+          "12:45"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Wed · 4:00",
-          "what": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -853,12 +846,6 @@
         }
       ],
       "sports": [
-        {
-          "when": "Wed 14 · leave 4:00",
-          "what": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "when": "Thu 15 · leave 4:25",
           "what": "Ainsley swim — Coach Ann",
@@ -995,11 +982,6 @@
           "tone": "act"
         },
         {
-          "when": "Wed 14 · 4:00",
-          "what": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
-          "tone": "hot"
-        },
-        {
           "when": "Thu 15 · All day",
           "what": "SRE Red Day",
           "tone": "act"
@@ -1107,6 +1089,11 @@
         {
           "when": "Tue 20 · 7:00",
           "what": "SRE specials: Spanish",
+          "tone": "act"
+        },
+        {
+          "when": "Wed 21 · All day",
+          "what": "LKMS fall conferences",
           "tone": "act"
         }
       ]
