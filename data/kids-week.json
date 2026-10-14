@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Oct 14 2026",
   "asOfIso": "2026-10-14",
-  "refreshedAt": "2026-10-14T13:15:11.255Z",
+  "refreshedAt": "2026-10-14T13:36:40.533Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -19,22 +19,22 @@
     "label": "Next up · today",
     "time": "7:00",
     "place": "SRE specials: Art + Library (library book, old clothes)",
-    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+    "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
     "badge": "Wed",
     "startIso": "2026-10-14T12:00:00.000Z",
     "endIso": "2026-10-14T12:15:00.000Z",
     "kind": "school",
     "nextLeave": {
       "label": "Next up · today",
-      "time": "8:10",
-      "place": "Boys SRE drop",
+      "time": "3:15",
+      "place": "Boys SRE pickup",
       "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
       "badge": "Wed",
-      "startIso": "2026-10-14T13:10:00.000Z",
-      "endIso": "2026-10-14T13:40:00.000Z",
-      "kind": "school_drop",
-      "whenLabel": "8:10",
-      "summary": "Hayes + Harris — SRE drop-off · 8:25",
+      "startIso": "2026-10-14T20:15:00.000Z",
+      "endIso": "2026-10-14T21:00:00.000Z",
+      "kind": "school_pickup",
+      "whenLabel": "3:15",
+      "summary": "Hayes + Harris — SRE pickup · 3:40",
       "leaveBy": true
     },
     "queue": [
@@ -42,7 +42,7 @@
         "label": "Next up · today",
         "time": "7:00",
         "place": "SRE specials: Art + Library (library book, old clothes)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Wed",
         "startIso": "2026-10-14T12:00:00.000Z",
         "endIso": "2026-10-14T12:15:00.000Z",
@@ -55,7 +55,7 @@
         "label": "Next up · today",
         "time": "7:00",
         "place": "SRE specials: Spanish",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Wed",
         "startIso": "2026-10-14T12:00:00.000Z",
         "endIso": "2026-10-14T12:15:00.000Z",
@@ -63,19 +63,6 @@
         "whenLabel": "7:00",
         "summary": "Harris — SRE specials: Spanish",
         "leaveBy": false
-      },
-      {
-        "label": "Next up · today",
-        "time": "8:10",
-        "place": "Boys SRE drop",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-10-14T13:10:00.000Z",
-        "endIso": "2026-10-14T13:40:00.000Z",
-        "kind": "school_drop",
-        "whenLabel": "8:10",
-        "summary": "Hayes + Harris — SRE drop-off · 8:25",
-        "leaveBy": true
       },
       {
         "label": "Next up · today",
@@ -192,6 +179,19 @@
         "kind": "school_pickup",
         "whenLabel": "Thu 3:15",
         "summary": "Hayes + Harris — SRE pickup · 3:40",
+        "leaveBy": true
+      },
+      {
+        "label": "Next up · Thu",
+        "time": "4:25",
+        "place": "Ainsley swim — Coach Ann",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-15T21:25:00.000Z",
+        "endIso": "2026-10-15T23:20:00.000Z",
+        "kind": "sport",
+        "whenLabel": "Thu 4:25",
+        "summary": "Ainsley swim — Coach Ann · 5:00 practice",
         "leaveBy": true
       }
     ]
@@ -460,18 +460,6 @@
         {
           "when": "Tue 20 · 7:00",
           "what": "SRE specials: Spanish",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 21 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 21 · 4:00",
-          "what": "Lind conference (VIRTUAL)",
           "tone": "act",
           "hint": ""
         }
@@ -756,18 +744,6 @@
           "what": "SRE specials: Art",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Wed 21 · 7:00",
-          "what": "SRE specials: Spanish",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 21 · 4:20",
-          "what": "Allen conference (VIRTUAL)",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": []
@@ -973,12 +949,6 @@
         {
           "when": "Tue 20 · All day",
           "what": "LKMS Outsiders Day (Greaser or Soc dress-up)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 21 · All day",
-          "what": "LKMS fall conferences",
           "tone": "act",
           "hint": ""
         }
