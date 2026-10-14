@@ -60,20 +60,61 @@
       var g2 = c.getContext("2d", { willReadFrequently: true }); g2.drawImage(img, 0, 0, sw, sh);
       var d = g2.getImageData(0, 0, sw, sh).data, opaque = d[3] > 250 && d[(sw * sh - 1) * 4 + 3] > 250;
       if (opaque) {
-        var colVar = function (x) { var s = 0; for (var y = 1; y < sh; y++) { var a = (y * sw + x) * 4, b = ((y - 1) * sw + x) * 4; s += Math.abs(d[a] - d[b]) + Math.abs(d[a + 1] - d[b + 1]); } return s / sh; };
+        var colVar = function (x) { var s = 0, x2 = x < sw - 1 ? x + 1 : x - 1; for (var y = 0; y < sh; y++) { var a = (y * sw + x) * 4, b = (y * sw + x2) * 4; s += Math.abs(d[a] - d[b]) + Math.abs(d[a + 1] - d[b + 1]) + Math.abs(d[a + 2] - d[b + 2]); } return s / sh; }; /* smear = rows stretched sideways, so neighbour columns match */
         var ref = 0; for (var x = sw * 0.4; x < sw * 0.6; x++) ref += colVar(Math.floor(x)); ref /= sw * 0.2;
-        var lim = Math.max(0.6, ref * 0.12), L = 0, R = 0;
+        var lim = Math.max(1.2, ref * 0.25), L = 0, R = 0;
         while (L < sw * 0.25 && colVar(L) < lim) L++;
         while (R < sw * 0.25 && colVar(sw - 1 - R) < lim) R++;
-        res = { l: (L ? L + 2 : 0) / sw, r: (R ? R + 2 : 0) / sw };
+        res = { l: (L ? L + 2 : 0) / sw, r: (R ? R + 2 : 0) / sw, opaque: true };
       }
     } catch (e) {}
     plateTrim.set(img, res);
     return res;
   }
+  /* SEAM2 · transparent layers (islands, ground, ferns) tile un-mirrored with a feathered 14% overlap, so the
+     join crossfades instead of showing a mirror-symmetric fern pair. Opaque sky keeps the mirror tiling. */
+  var FEATHER = 0.08, featherCache = typeof WeakMap === "function" ? new WeakMap() : null;
+  function feathered(img) {
+    var hit = featherCache && featherCache.get(img); if (hit) return hit;
+    var c = document.createElement("canvas"); c.width = img.width; c.height = img.height;
+    var g2 = c.getContext("2d"); g2.drawImage(img, 0, 0);
+    g2.globalCompositeOperation = "destination-in";
+    var fw = img.width * FEATHER, gr = g2.createLinearGradient(0, 0, fw, 0);
+    gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "rgba(0,0,0,1)");
+    /* destination-in clears everything outside the drawn op, so one full-width fill: ramp then solid */
+    var full = g2.createLinearGradient(0, 0, img.width, 0);
+    full.addColorStop(0, "rgba(0,0,0,0)"); full.addColorStop(FEATHER, "rgba(0,0,0,1)"); full.addColorStop(1, "rgba(0,0,0,1)");
+    g2.fillStyle = full; g2.fillRect(0, 0, img.width, img.height);
+    g2.globalCompositeOperation = "source-over";
+    /* some plates carry a cut-off, unpainted (pure black) island at an edge; clear those pixels in the outer 12% */
+    try {
+      var ew2 = Math.round(img.width * 0.12), hh = Math.round(img.height * 0.7);
+      [0, img.width - ew2].forEach(function (x0) {
+        var id = g2.getImageData(x0, 0, ew2, hh), dd = id.data, lo = ew2, hi2 = -1;
+        for (var i = 0; i < dd.length; i += 4) if (dd[i + 3] > 40 && dd[i] + dd[i + 1] + dd[i + 2] < 25) { var cx = (i / 4) % ew2; if (cx < lo) lo = cx; if (cx > hi2) hi2 = cx; }
+        if (hi2 < 0) return;
+        /* wipe the whole cut-off island band (edge → past its last black column), so no dark outline is left */
+        /* extend to the first empty column so the island goes whole, not sliced */
+        var span = Math.round(img.width * 0.3), sd = g2.getImageData(x0 === 0 ? 0 : img.width - span, 0, span, hh).data;
+        function colEmpty(c) { for (var y = 0; y < hh; y += 2) if (sd[(y * span + c) * 4 + 3] > 90) return false; return true; }
+        if (x0 === 0) { var c = hi2; while (c < span - 1 && !colEmpty(c)) c++; g2.clearRect(0, 0, c + 2, hh); }
+        else { var c2 = span - (ew2 - lo); while (c2 > 0 && !colEmpty(c2)) c2--; g2.clearRect(img.width - span + c2 - 2, 0, span - c2 + 2, hh); }
+      });
+    } catch (e) {}
+    if (featherCache) featherCache.set(img, c);
+    return c;
+  }
   function drawRunPlate(g, img, W, H, oxOff, parallax) {
     if (!img) return;
     var tr = trimFor(img);
+    if (!tr.opaque) {
+      var fi = feathered(img), sc = Math.max(W / img.width, H / img.height) * 1.08;
+      var fdw = img.width * sc, fdh = img.height * sc, step = fdw * (1 - FEATHER);
+      var fx = (W - fdw) / 2 - cam * parallax + (oxOff || 0), fy = (H - fdh) / 2;
+      var j0 = Math.floor(-fx / step) - 1, j1 = Math.ceil((W - fx) / step);
+      for (var j = j0; j <= j1; j++) g.drawImage(fi, Math.floor(fx + j * step), fy, fdw, fdh);
+      return;
+    }
     var sx = img.width * tr.l, sw = img.width * (1 - tr.l - tr.r);
     var scale = Math.max(W / sw, H / img.height) * 1.08;
     var dw = Math.ceil(sw * scale), dh = img.height * scale;
@@ -169,19 +210,21 @@
       x += gap;
       y = 280 + Math.sin(i * 0.7) * 70 + (i % 5 === 4 ? -50 : 0);
       plats.push({ x: x, y: y, w: w, h: 22, cp: i % 3 === 0, vx: i % 5 === 2 ? 36 : 0, phase: i });
-      if (i % 4 === 3) drips.push({ x: x + w * 0.5, y: y - 160, r: 16, p: i });
+      if (i % 4 === 3) { drips.push({ x: x + w * 0.5, y: y - 160, r: 16, p: i }); plats[plats.length - 1].drip = true; }
       x += w;
     }
     goalX = x + 40;
     plats.push({ x: goalX, y: 300, w: 180, h: 26, cp: true, vx: 0, phase: 0, grove: true });
   })();
 
+  var gatherLog = [];
+  function lowestTop() { var m = -1e9; for (var i = 0; i < plats.length; i++) m = Math.max(m, GY(plats[i].y)); return m; }
   function platX(p, t) { return p.x + (p.vx ? Math.sin(t * 0.8 + p.phase) * 46 : 0); }
   function GY(y) { return y - 340 + view.h * 0.62; }
 
   function Blob(x, y, echo) {
     this.x = x; this.y = y; this.vx = 0; this.vy = 0;
-    this.r = 22; this.grounded = false; this.coyote = 0; this.squash = 1;
+    this.r = q.get("demo") === "1" ? 30 : 26; /* BIG1: reads on a phone */ this.grounded = false; this.coyote = 0; this.squash = 1;
     this.cp = { x: x, y: y }; this.alive = true; this.echo = echo; this.hold = null;
     this.inv = 0;
   }
@@ -241,18 +284,86 @@
   }
   function gather(b, why) {
     if (b.inv > 0) return;
+    gatherLog.push([b.kid, why || "fall", Math.round(b.x)]);
     if (why === "drip" && b.pw && b.pw.magnet) { /* drop magnet: the splash pulls straight back in, no trip to the lantern */
       burst(b.x, b.y, 10, THEME.metal); tone("splash");
       b.vy = Math.min(b.vy, -260); b.inv = 0.6; b.magnetT = 0.6; return;
     }
-    burst(b.x, b.y, 12, THEME.metal);
+    burst(b.x, Math.min(b.y, view.h * 0.86), 12, THEME.metal);
     tone("splash");
     shake = 0;
-    b.x = b.cp.x; b.y = b.cp.y; b.vx = 0; b.vy = 0; b.inv = 0.45; b.alive = true;
+    b.ret = { x0: b.x, y0: Math.min(b.y, view.h * 0.86), k: 0 }; b.vx = 0; b.vy = 0; b.inv = 0.45; b.alive = true;
+  }
+
+  /* PILOT1 · echo + ?demo=1 blobs plan every hop: walk calmly to a take-off point, jump, then steer in the air
+     toward a landing spot on the next platform (moving platforms predicted to the landing moment). If the next
+     top is above the arc they use the double jump. Same physics as a kid's blob; only the steering is planned. */
+  function platUnder(b, t) {
+    for (var i = 0; i < plats.length; i++) {
+      var px = platX(plats[i], t), top = GY(plats[i].y);
+      if (b.x > px - b.r * 0.4 && b.x < px + plats[i].w + b.r * 0.4 && Math.abs(b.y + b.r - top) < 6) return i;
+    }
+    return -1;
+  }
+  function landSpot(pl, tt) { return platX(pl, tt) + (pl.drip ? 22 : Math.min(70, pl.w * 0.4)); } /* land short of a drip lane */
+  function autoPilot(b, dt, t) {
+    var WALK = 120;
+    if (b.grounded) {
+      var hi = platUnder(b, t);
+      if (hi < 0) return;
+      b.tgt = hi + 1 < plats.length ? hi + 1 : -1;
+      var here = plats[hi];
+      if (b.tgt < 0) { b.vx += clamp(platX(here, t) + here.w * 0.5 - b.x, -WALK, WALK) * 4 * dt; return; }
+      var nx = plats[b.tgt];
+      var off = platX(here, t) + here.w - 34;
+      /* time the dark drips: stop short of one hanging in our lane, go the moment it has dropped past us */
+      var dripClear = false;
+      for (var di = 0; di < drips.length; di++) {
+        var dr = drips[di], ddx = dr.x - b.x;
+        if (ddx > -44 && ddx < 110 && Math.abs(GY(dr.y) + 160 - (b.y + b.r)) < 40) {
+          var rel = ((t * 90 + dr.p * 40) % 180) - 160; /* collides while rel is in (-67, 7) */
+          if (b.cross === di) { dripClear = true; continue; }       /* committed: keep rolling through */
+          if (ddx > 38 && ddx < 95) { if (rel > 9) { b.cross = di; dripClear = true; } else { b.vx *= Math.pow(1e-6, dt); return; } }
+          else if (ddx <= 38) dripClear = true;
+        }
+      }
+      if (dripClear) { b.vx = 170; return; }
+      if (b.x < off - 4) { b.vx += (WALK - b.vx) * Math.min(1, dt * 3); return; }
+      /* moving target: wait on the lip until it is swinging toward us or near its closest point */
+      if (nx.vx && Math.cos(t * 0.8 + nx.phase) > 0.2) { b.vx *= Math.pow(0.05, dt); return; }
+      b.want = 0.14; b.press = true; b.jumps = (b.jumps || 0) + 1;
+      b.flourish = !!(b.pw && b.pw.dbl && b.jumps % 3 === 0);
+      return;
+    }
+    if (b.tgt == null || b.tgt < 0) return;
+    var pl = plats[b.tgt], ty = GY(pl.y) - b.r, dy = ty - b.y;
+    var disc = b.vy * b.vy + 3400 * dy;
+    var canDbl = b.pw && b.pw.dbl && !b.air2;
+    if (canDbl && (disc < 0 || (b.flourish && b.vy > -60 && b.vy < 120))) {
+      b.vy = -600; b.air2 = true; b.flourish = false; b.squash = 0.8;
+      rings.push({ x: b.x, y: b.y + b.r, r: 8, a: 0.5 }); tone("jump");
+      disc = b.vy * b.vy + 3400 * dy;
+    }
+    if (disc < 0) return;
+    var tau = (-b.vy + Math.sqrt(disc)) / 1700;
+    if (tau < 0.02) return;
+    var want = (landSpot(pl, t + tau) - b.x) / tau;
+    b.vx += (clamp(want, -340, 340) - b.vx) * Math.min(1, dt * 10);
+  }
+  /* SOFT1 · a fall is a soft, on-purpose return: the metal mists and flows back to the last lantern along an arc
+     (0.9 s, eased) instead of popping. Falling past the platform line counts, so nothing sinks into the painted ground. */
+  function stepReturn(b, dt) {
+    var r = b.ret; r.k = Math.min(1, r.k + dt / 0.9);
+    var e = r.k * r.k * (3 - 2 * r.k);
+    b.x = r.x0 + (b.cp.x - r.x0) * e;
+    b.y = r.y0 + (b.cp.y - r.y0) * e - Math.sin(e * Math.PI) * 90;
+    b.squash = 0.85 + 0.15 * e;
+    if (r.k >= 1) { b.ret = null; b.vx = 0; b.vy = 0; b.inv = 0.3; rings.push({ x: b.x, y: b.y + b.r, r: 8, a: 0.5 }); }
   }
 
   function stepBlob(b, dt, t, input) {
     if (won) return;
+    if (b.ret) { stepReturn(b, dt); return; }
     b.inv = Math.max(0, b.inv - dt);
     b.magnetT = Math.max(0, (b.magnetT || 0) - dt);
     var accel = 0;
@@ -262,23 +373,7 @@
       b.vx += accel * 8 * dt;
       if (input.jump) { b.want = 0.12; b.press = true; input.jump = false; }
     } else if (b.echo || b.auto) {
-      var here = null, next = null;
-      for (var i = 0; i < plats.length; i++) {
-        var px = platX(plats[i], t);
-        var top = GY(plats[i].y);
-        if (!here && b.x > px - 8 && b.x < px + plats[i].w + 8 && Math.abs(b.y + b.r - top) < 36) here = plats[i];
-        if (!next && px > b.x + 24) next = plats[i];
-      }
-      var aim = next || here || plats[0];
-      if (aim) {
-        var tx = platX(aim, t) + Math.min(48, aim.w * 0.45);
-        b.vx += clamp(tx - b.x, -140, 160) * 7 * dt;
-      }
-      if (b.grounded && here && next) {
-        var edge = platX(here, t) + here.w;
-        var rise = GY(here.y) - GY(next.y);
-        if (b.x > edge - 42 || rise > 24) b.want = 0.14;
-      }
+      autoPilot(b, dt, t);
     }
     b.want = (b.want || 0) - dt;
     if (b.want <= 0) b.press = false;
@@ -291,8 +386,6 @@
       b.vy = -600; b.air2 = true; b.want = 0; b.squash = 0.8; /* double jump: a soft second push, a quiet ring */
       rings.push({ x: b.x, y: b.y + b.r, r: 8, a: 0.5 });
       tone("jump");
-    } else if (b.echo && b.pw && b.pw.dbl && !b.air2 && b.vy > 260 && b.y > view.h * 0.62) {
-      b.vy = -600; b.air2 = true; rings.push({ x: b.x, y: b.y + b.r, r: 8, a: 0.4 });
     }
     b.vy += 1700 * dt;
     b.vx = clamp(b.vx, -380, 380);
@@ -310,6 +403,7 @@
             nextY = top - b.r;
             if (b.vy > 220) { burst(b.x, top, 8, THEME.metal); tone("land"); b.squash = 1.35; }
             b.vy = 0; b.grounded = true;
+            if (pl.vx) b.x += platX(pl, t) - platX(pl, t - dt); /* CARRY1: ride moving platforms */
             if (pl.cp) b.cp = { x: b.x, y: nextY };
           }
         }
@@ -319,7 +413,7 @@
     if (b.grounded) b.vx *= Math.pow(0.15, dt);
     else b.vx *= Math.pow(0.55, dt);
     b.squash += (1 - b.squash) * Math.min(1, dt * 8);
-    if (b.y > view.h + 120) gather(b);
+    if (b.y > lowestTop() + 70) gather(b); /* SOFT1: below every platform = gentle return, before it reaches the painted ground */
     for (var d = 0; d < drips.length; d++) {
       var dr = drips[d];
       var dy = GY(dr.y) + ((t * 90 + dr.p * 40) % 180);
@@ -794,6 +888,19 @@
     g.restore();
   }
 
+  /* PUSHIN1 · ?demo=1 only: a slow push-in on the host blob (1.0 → 1.32 over ~9 s), origin eased so it glides. */
+  var zoom = { z: 1, ox: null, oy: null };
+  function pushIn(t, dt) {
+    var goal = 1 + 0.32 * Math.min(1, Math.max(0, (t - 1) / 9));
+    zoom.z += (goal - zoom.z) * Math.min(1, dt * 1.5);
+    var hx = A.x - cam, hy = A.y;
+    if (zoom.ox == null) { zoom.ox = hx; zoom.oy = hy; }
+    zoom.ox += (hx - zoom.ox) * Math.min(1, dt * 1.2);
+    zoom.oy += (hy - zoom.oy) * Math.min(1, dt * 0.8);
+    cv.style.transformOrigin = zoom.ox.toFixed(1) + "px " + zoom.oy.toFixed(1) + "px";
+    cv.style.transform = "scale(" + zoom.z.toFixed(4) + ")";
+  }
+
   function paintBridge(g, t) {
     var dx = (A.x - B.x), dy = (A.y - B.y);
     var dist = Math.hypot(dx, dy);
@@ -852,6 +959,7 @@
       ctx.globalAlpha = 1;
     }
     paintPowers(ctx, t);
+    if (A.auto) pushIn(t, dt);
     if (playing && !document.hidden) requestAnimationFrame(frame);
   }
 
@@ -1086,7 +1194,7 @@
   }
 
   window.MercuryRun = {
-    debug: function () { return { A: [A.x, A.y, A.r], B: [B.x, B.y], cam: cam, drops: drops.length, view: view, pw: allBlobs().map(function (b) { return [b.kid, b.pw]; }), air2: allBlobs().map(function (b) { return !!b.air2; }) }; },
+    debug: function () { return { A: [A.x, A.y, A.r], B: [B.x, B.y], cam: cam, drops: drops.length, view: view, pw: allBlobs().map(function (b) { return [b.kid, b.pw]; }), air2: allBlobs().map(function (b) { return !!b.air2; }), gathers: gatherLog.slice(), won: won, xs: allBlobs().map(function (b) { return Math.round(b.x); }) }; },
     exportFrame: exportFrame,
     platesReady: function () { return runPlatesReady && !!runPlates.sky; }
   };
