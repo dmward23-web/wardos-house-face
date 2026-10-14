@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Oct 14 2026",
   "asOfIso": "2026-10-14",
-  "refreshedAt": "2026-10-14T12:49:58.276Z",
+  "refreshedAt": "2026-10-14T13:14:36.702Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -462,18 +462,6 @@
           "what": "SRE specials: Spanish",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Wed 21 · 7:00",
-          "what": "SRE specials: Music",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 21 · 4:00",
-          "what": "Lind conference (VIRTUAL)",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": []
@@ -756,18 +744,6 @@
           "what": "SRE specials: Art",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Wed 21 · 7:00",
-          "what": "SRE specials: Spanish",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 21 · 4:20",
-          "what": "Allen conference (VIRTUAL)",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": []
@@ -973,12 +949,6 @@
         {
           "when": "Tue 20 · All day",
           "what": "LKMS Outsiders Day (Greaser or Soc dress-up)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 21 · All day",
-          "what": "LKMS fall conferences",
           "tone": "act",
           "hint": ""
         }
