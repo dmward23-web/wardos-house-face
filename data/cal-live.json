@@ -1,10 +1,10 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-14T14:16:52.790Z",
+  "fetchedAt": "2026-10-14T14:17:19.137Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
-  "windowEnd": "2026-10-20",
+  "windowEnd": "2026-10-21",
   "asOfIso": "2026-10-14",
   "nextLeave": {
     "id": "3hv9bcr87ggrhrkuf4ka3u6r2s_20261014T201500Z",
@@ -346,6 +346,60 @@
       "start": "2026-10-20T17:00:00-05:00",
       "end": "2026-10-20T18:00:00-05:00",
       "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "upkqsi50et109pc7brlackeb1s",
+      "summary": "Ainsley — LKMS fall conferences",
+      "start": "2026-10-21T00:00:00-05:00",
+      "end": "2026-10-23T00:00:00-05:00",
+      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": true
+    },
+    {
+      "id": "bctdg2jl290pmotu4v2rtogvm0",
+      "summary": "Hayes — SRE specials: Spanish",
+      "start": "2026-10-21T07:00:00-05:00",
+      "end": "2026-10-21T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "n59hsf3na7s1d2mcffkn20gr5s",
+      "summary": "Harris — SRE specials: Music",
+      "start": "2026-10-21T07:00:00-05:00",
+      "end": "2026-10-21T07:15:00-05:00",
+      "location": "14901 England St, Overland Park, KS 66221",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "9a31d67igojgavt99o4lvmk0mc",
+      "summary": "Harris — Lind conference (VIRTUAL) · 4:00",
+      "start": "2026-10-21T16:00:00-05:00",
+      "end": "2026-10-21T16:20:00-05:00",
+      "location": "Virtual (Dan in Nashville)",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "ma5tm5fjvsltu91upbhaksf2h0",
+      "summary": "Hayes — Allen conference (VIRTUAL) · 4:30",
+      "start": "2026-10-21T16:20:00-05:00",
+      "end": "2026-10-21T17:10:00-05:00",
+      "location": "Virtual (Dan in Nashville)",
+      "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "vluod9ndrvhcr20ovpera726dc_20261021T214500Z",
+      "summary": "Harris flag practice · 5:30–6:30",
+      "start": "2026-10-21T16:45:00-05:00",
+      "end": "2026-10-21T18:30:00-05:00",
+      "location": "Grassy area behind Timber Sage Elementary, 15800 W 173rd Terrace, Olathe, KS 66062",
       "busy": false,
       "allDay": false
     }
