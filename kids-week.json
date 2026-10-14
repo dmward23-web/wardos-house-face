@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Oct 13 2026",
   "asOfIso": "2026-10-13",
-  "refreshedAt": "2026-10-14T00:37:09.155Z",
+  "refreshedAt": "2026-10-14T00:58:08.246Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -828,22 +828,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "TUE · 4:45",
-        "what": "LKMS CHOIR FALL CONCERT · CALL 5:00 / STARTS 5:3",
+        "when": "WED · 3:50",
+        "what": "LKMS MATH COUNTS INFO MEETING · 3:15–4:00 · PICK",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "TUE",
-          "4:45"
+          "WED",
+          "3:50"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Tue · 4:45",
-          "what": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -867,12 +860,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Tue 13 · 4:45",
-          "what": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Wed 14 · 3:50",
           "what": "LKMS Math Counts info meeting · 3:15–4:00 · pickup 4:00",
@@ -995,11 +982,6 @@
           "tone": "act"
         },
         {
-          "when": "Tue 13 · 4:45",
-          "what": "LKMS choir Fall Concert · call 5:00 / starts 5:30",
-          "tone": "act"
-        },
-        {
           "when": "Wed 14 · All day",
           "what": "SRE Green Day",
           "tone": "act"
@@ -1107,6 +1089,11 @@
         {
           "when": "Fri 16 · 12:00",
           "what": "SRE Chat & Chew lunch",
+          "tone": "act"
+        },
+        {
+          "when": "Mon 19 · 7:00",
+          "what": "SRE specials: PE (tennis shoes)",
           "tone": "act"
         }
       ]
