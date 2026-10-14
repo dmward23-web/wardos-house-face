@@ -227,15 +227,28 @@
   function orientFor(w, h) {
     return w > h * 1.15 ? "landscape" : "portrait";
   }
+  /* LEANLOAD1 · a board with data-lean-plates="1" loads only its own kid's world, creature and
+     items, in the current orientation; the other orientation loads on first rotate. */
+  function lean() { return !!(document.body && document.body.getAttribute("data-lean-plates") === "1"); }
+  var leanLoaded = {};
   function loadPlates() {
     var book = global.HousePlates || {};
     var worlds = ["hayes", "harris", "ainsley"];
+    var orients = ["portrait", "landscape"];
+    var me = kid();
+    if (lean()) {
+      worlds = [me];
+      orients = [orientFor(global.innerWidth || 440, global.innerHeight || 800)].filter(function (o) { return !leanLoaded[o]; });
+      if (!orients.length) return Promise.resolve();
+      leanLoaded[orients[0]] = true;
+    }
     var jobs = [];
     [
       ["hayes", "assets/ori/creature/idle.webp"],
       ["harris", "assets/ori/creature/harris.webp"],
       ["ainsley", "assets/ori/creature/ainsley.webp"]
     ].forEach(function (row) {
+      if (lean() && (row[0] !== me || oriCreature[me])) return;
       jobs.push(loadImg(row[1]).then(function (im) {
         oriCreature[row[0]] = im;
         if (row[0] === "hayes") oriCreature.idle = im;
@@ -246,6 +259,7 @@
       ["harris", "assets/ori/items/harris_ore.webp"],
       ["ainsley", "assets/ori/items/ainsley_lantern.webp"]
     ].forEach(function (row) {
+      if (lean() && (row[0] !== me || oriItems[me])) return;
       jobs.push(loadImg(row[1]).then(function (im) { oriItems[row[0]] = im; }));
     });
     worlds.forEach(function (world) {
@@ -255,11 +269,11 @@
       plates[world].portrait = plates[world].portrait || {};
       plates[world].landscape = plates[world].landscape || {};
       (man.layers || []).forEach(function (layer) {
-        ["portrait", "landscape"].forEach(function (orient) {
+        orients.forEach(function (orient) {
           var urls = book.urlFor ? book.urlFor(world, layer.id, orient, layer.standin) : [layer.standin];
           jobs.push(loadFirst(urls).then(function (im) {
             plates[world][orient][layer.id] = im;
-            if (orient === "portrait") plates[world][layer.id] = im;
+            if (orient === "portrait" || (lean() && !plates[world][layer.id])) plates[world][layer.id] = im;
           }));
         });
       });
@@ -473,28 +487,29 @@
   /* CALLOUT1 · a board page may define window.KidCallouts { short label: [title, plain subtitle] }.
      Big playful title, small plain chore underneath. Boards without it are unchanged. */
   function drawCallout(ctx, q, co, measureOnly) {
-    var maxW = 124;
-    ctx.font = "800 15px " + SANS;
+    var maxW = 150, TF = "800 17px " + SANS, SF = "600 16px " + SANS, TL = 20, SL = 19;
+    ctx.font = TF;
     var lines = wrapLines(ctx, co[0], maxW);
     if (lines.length > 2) lines = [lines[0], lines.slice(1).join(" ")];
-    ctx.font = "600 11.5px " + SANS;
-    var subW = ctx.measureText(co[1]).width, tw = subW;
-    ctx.font = "800 15px " + SANS;
+    ctx.font = SF;
+    var tw = ctx.measureText(co[1]).width;
+    ctx.font = TF;
     for (var j = 0; j < lines.length; j++) tw = Math.max(tw, ctx.measureText(lines[j]).width);
-    q.hw = Math.max(40, tw + 16);
-    q.hh = lines.length * 18 + 16 + 6;
+    q.hw = Math.max(40, tw + 18);
+    q.hh = lines.length * TL + SL + 10;
     var vw = ctx.canvas.width / Math.max(1, (bg && bg.dpr) || 1);
     if (measureOnly) { q.labelX = clamp(q.x, q.hw / 2 + 4, vw - q.hw / 2 - 4); return; }
     var lx = q.labelX != null ? q.labelX : clamp(q.x, q.hw / 2 + 4, vw - q.hw / 2 - 4); q.labelX = lx;   /* never off the phone edge */
-    paintLabelPlate(ctx, lx, q.y, q.hw, q.hh);
+    /* GATE1 · opaque plate so the words hold contrast over bright sky */
+    roundRect(ctx, lx - q.hw / 2, q.y - q.hh / 2, q.hw, q.hh, 10);
+    ctx.fillStyle = "rgba(14, 22, 26, 0.9)"; ctx.fill();
+    ctx.strokeStyle = "rgba(255, 236, 200, 0.22)"; ctx.lineWidth = 1; ctx.stroke();
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    var top = q.y - q.hh / 2 + 3 + 9;
-    for (var k = 0; k < lines.length; k++) {
-      ctx.fillStyle = "rgba(255, 246, 228, 0.98)"; ctx.font = "800 15px " + SANS;
-      ctx.fillText(lines[k], lx, top + k * 18);
-    }
-    ctx.font = "600 11.5px " + SANS; ctx.fillStyle = "rgba(214, 230, 236, 0.92)";
-    ctx.fillText(co[1], lx, top + lines.length * 18 + 1);
+    var top = q.y - q.hh / 2 + 5 + TL / 2;
+    ctx.font = TF; ctx.fillStyle = "#fff6e4";
+    for (var k = 0; k < lines.length; k++) ctx.fillText(lines[k], lx, top + k * TL);
+    ctx.font = SF; ctx.fillStyle = "#d6e6ec";
+    ctx.fillText(co[1], lx, top + lines.length * TL - TL / 2 + SL / 2 + 1);
   }
   /* CALLOUT2 · callout plates are bigger than plain chips: measure them all, then nudge apart
      (small vertical moves first, then sideways) so no two plates touch. */
@@ -503,27 +518,50 @@
     ctx.save();
     shown.forEach(function (q) { var c = co[q.chip || shortLabel(q.label)]; if (c) { drawCallout(ctx, q, c, true); q.y0 = q.y; } });
     ctx.restore();
-    var GAP = 14;
-    for (var it = 0; it < 24; it++) {
-      var moved = false;
-      for (var i = 0; i < shown.length; i++) for (var j = i + 1; j < shown.length; j++) {
-        var a = shown[i], b = shown[j];
-        if (a.labelX == null || b.labelX == null) continue;
-        var ox = (a.hw + b.hw) / 2 + GAP - Math.abs(a.labelX - b.labelX);
-        var oy = (a.hh + b.hh) / 2 + GAP - Math.abs(a.y - b.y);
-        if (ox <= 0 || oy <= 0) continue;
-        moved = true;
-        var up = a.y <= b.y ? a : b, dn = up === a ? b : a;
-        var canV = Math.abs(up.y - up.y0) < 22 && Math.abs(dn.y - dn.y0) < 22;
-        if (canV && oy <= ox) { up.y -= oy / 2 + 0.5; dn.y += oy / 2 + 0.5; }
-        else {
-          var lf = a.labelX <= b.labelX ? a : b, rt = lf === a ? b : a;
-          lf.labelX = clamp(lf.labelX - ox / 2 - 0.5, lf.hw / 2 + 4, W - lf.hw / 2 - 4);
-          rt.labelX = clamp(rt.labelX + ox / 2 + 0.5, rt.hw / 2 + 4, W - rt.hw / 2 - 4);
-        }
+    /* GATE1 · greedy placement: each label tries spots near its own chest (below, nudged sideways,
+       then above) and takes the first that clears every chest and every label already placed. */
+    var GAP = 6, placed = [];
+    function hitsChest(x, y, L) {
+      for (var c = 0; c < shown.length; c++) {
+        var C = shown[c]; if (C === L) continue;
+        var cms = C.ms || 72, cy = C.seat || C.y;
+        if (Math.abs(x - C.x) < L.hw / 2 + cms * 0.48 + 4 && y + L.hh / 2 > cy - cms * 0.55 - 4 && y - L.hh / 2 < cy + cms * 0.42 + 4) return true;
       }
-      if (!moved) break;
+      return false;
     }
+    var jarEl = document.querySelector("[data-kw-jar]"), JR = jarEl && jarEl.getBoundingClientRect();
+    function hitsJar(x, y, L) {
+      if (!JR || !JR.width) return false;
+      return Math.abs(x - (JR.left + JR.width / 2)) < L.hw / 2 + JR.width * 0.5 && y + L.hh / 2 > JR.top + 8 && y - L.hh / 2 < JR.bottom;
+    }
+    function hitsLabel(x, y, L) {
+      for (var k = 0; k < placed.length; k++) {
+        var P = placed[k];
+        if (Math.abs(x - P.labelX) < (L.hw + P.hw) / 2 + GAP && Math.abs(y - P.y) < (L.hh + P.hh) / 2 + GAP) return true;
+      }
+      return false;
+    }
+    var order = shown.filter(function (q) { return q.labelX != null; }).sort(function (a, b) { return (a.seat || a.y) - (b.seat || b.y); });
+    var DX = [0, -20, 20, -40, 40, -64, 64, -90, 90, -120, 120], DY = [0, 8, -8, 16, -16, 26, -26, 38, -38, 52];
+    order.forEach(function (L) {
+      var ms = L.ms || 72, seat = L.seat || L.y, above = seat - ms * 0.58 - L.hh / 2 - 2, best = null;
+      var ys = DY.map(function (d) { return L.y0 + d; }).concat([above]);
+      outer: for (var yi = 0; yi < ys.length; yi++) for (var xi = 0; xi < DX.length; xi++) {
+        var x = clamp(L.x + DX[xi], L.hw / 2 + 4, W - L.hw / 2 - 4), y = ys[yi];
+        if (y - L.hh / 2 < 58) continue;
+        if (!hitsChest(x, y, L) && !hitsLabel(x, y, L) && !hitsJar(x, y, L)) { best = [x, y]; break outer; }
+      }
+      if (!best) {   /* nothing fully clear: take the spot that overlaps least */
+        var bestP = 1e9;
+        ys.forEach(function (y) { DX.forEach(function (dx) {
+          var x = clamp(L.x + dx, L.hw / 2 + 4, W - L.hw / 2 - 4);
+          var pen = (hitsChest(x, y, L) ? 2 : 0) + (hitsJar(x, y, L) ? 2 : 0) + (hitsLabel(x, y, L) ? 1 : 0) + Math.abs(dx) / 400 + Math.abs(y - L.y0) / 400;
+          if (y - L.hh / 2 >= 58 && pen < bestP) { bestP = pen; best = [x, y]; }
+        }); });
+      }
+      if (best) { L.labelX = best[0]; L.y = best[1]; }
+      placed.push(L);
+    });
     shown.forEach(function (q) { if (q.y0 != null) q.chipY = q.y; });
   }
   function drawLight(ctx, q) {
@@ -1782,6 +1820,7 @@
     var was = q.btn.classList.contains("done");
     var idx = 0;
     for (var hi = 0; hi < bg.hits.length; hi++) if (bg.hits[hi] === q) idx = hi;
+    if (was && global.KidUndoGate && !global.KidUndoGate(q, ev)) return; /* GATE1 · board may require a deliberate undo */
     if (was) {
       /* UNDO1 · tap a done chest again = un-check it. Same q.btn.click() path as a check,
          so the jar, stars/points, hub sync and offline queue all reverse the same way. */
@@ -1883,7 +1922,7 @@
       if (ev.beta != null) gyro.beta = ev.beta;
       gyro.on = true;
     }, true);
-    global.addEventListener("resize", function () { if (bg) bg.resize(); });
+    global.addEventListener("resize", function () { if (bg) bg.resize(); if (lean()) loadPlates(); });
     document.addEventListener("house:kid-rendered", function () {
       paintWeek();
       mountJar();

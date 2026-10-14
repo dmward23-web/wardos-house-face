@@ -13,7 +13,7 @@
     common:    { name: "COMMON",    rgb: "196, 206, 214" },
     uncommon:  { name: "UNCOMMON",  rgb: "96, 224, 120" },
     rare:      { name: "RARE",      rgb: "80, 170, 255" },
-    epic:      { name: "EPIC",      rgb: "196, 110, 255" },
+    epic:      { name: "MIGHTY",    rgb: "196, 110, 255" },
     legendary: { name: "LEGENDARY", rgb: "255, 184, 60" }
   };
   var CYCLE = ["uncommon", "rare", "common", "rare", "uncommon", "epic", "common"];
@@ -41,15 +41,22 @@
   ["glider", "card-common", "card-uncommon", "card-rare", "card-epic", "card-legendary",
    "beam-common", "beam-uncommon", "beam-rare", "beam-epic", "beam-legendary",
    "particles-far", "particles-mid", "particles-near", "fog-mid", "fog-low", "light-shafts",
-   "fg-left", "fg-right", "fg-bottom", "victory-rays", "victory-burst", "victory-confetti-strip"
-  ].forEach(function (n) {
+   "fg-left", "fg-right", "fg-bottom"
+  ].forEach(loadArt);
+  /* victory art (~0.5MB) loads only once the jar is close to full */
+  var victoryArtAsked = false;
+  function loadVictoryArt() {
+    if (victoryArtAsked) return; victoryArtAsked = true;
+    ["victory-rays", "victory-burst", "victory-confetti-strip"].forEach(loadArt);
+  }
+  function loadArt(n) {
     var im = new Image();
     im.onload = function () { ART[n] = im; };
     /* 3x phones get the 3x cards (tiny); everything else uses 2x (or 1x on 1x screens) */
     var dir = /^card-/.test(n) && (global.devicePixelRatio || 1) >= 2.6 ? "art/hayes-loot/3x/" : DIR;
     im.onerror = function () { if (!im._png) { im._png = 1; im.src = dir + n + ".png"; } };   /* WebP first, PNG fallback */
     im.src = dir + n + ".webp";
-  });
+  }
   /* 1x design sizes from Prism's README */
   var SZ = { glider: [240, 192, 120, 131], card: [240, 84], beam: [112, 176, 56, 160] };
   function cover(name, alpha, blend, ox, oy, extra) {
@@ -103,6 +110,7 @@
   var STEPS = { common: 2, uncommon: 3, rare: 4, epic: 5, legendary: 6 };
   function lootSting(tier) {
     var a = audio(); if (!a || muted()) return;
+    if (isMuted()) return;
     if (a.state === "suspended") a.resume();
     var t = a.currentTime + 0.01;
     whoosh(t, 0.28);
@@ -118,7 +126,7 @@
     [523.25, 659.25, 783.99, 1046.5].forEach(function (f) { note(f, t + 0.7, 1.4, "sawtooth", 0.07); note(f, t + 0.7, 1.6, "triangle", 0.12); });
     whoosh(t + 0.6, 0.5);
   }
-  document.addEventListener("pointerdown", function () { var a = audio(); if (a && a.state === "suspended") a.resume(); }, true);
+  document.addEventListener("pointerdown", function () { if (isMuted()) return; var a = audio(); if (a && a.state === "suspended") a.resume(); }, true);
 
   /* ---------- painters ---------- */
   function stormEdge(t) {
@@ -201,7 +209,7 @@
   function lootCard(p, t) {
     var age = t - p.t0; if (age < 0.15 || age > 2.4) return;
     var a = Math.min(1, (age - 0.15) / 0.2) * Math.min(1, (2.4 - age) / 0.4);
-    var rise = (1 - Math.min(1, (age - 0.15) / 0.3)) * 14;
+    var rise = reduced ? 0 : (1 - Math.min(1, (age - 0.15) / 0.3)) * 14;
     var w = 240, h = 84, cxc = Math.min(W - w / 2 - 2, W * 0.68), x = cxc - w / 2, y = H * 0.755 + rise;
     var im = ART["card-" + p.tier];
     ctx.save(); ctx.globalAlpha = a;
@@ -209,10 +217,10 @@
     else { ctx.fillStyle = "rgba(16,32,42,.9)"; roundRect(x + 21, y + 21, 198, 42, 10); ctx.fill(); }
     var tx = x + 21 + 99;
     ctx.textAlign = "center"; ctx.shadowColor = "rgba(0,0,0,.75)"; ctx.shadowBlur = 5;
-    ctx.font = "900 11px system-ui, sans-serif"; ctx.fillStyle = "rgba(" + TIERS[p.tier].rgb + ",1)";
-    ctx.fillText(TIERS[p.tier].name + " LOOT", tx, y + 21 + 14);
+    ctx.font = "900 14px system-ui, sans-serif"; ctx.fillStyle = "rgba(" + TIERS[p.tier].rgb + ",1)";
+    ctx.fillText(TIERS[p.tier].name + " LOOT", tx, y + 21 + 15);
     ctx.font = "800 16px system-ui, sans-serif"; ctx.fillStyle = "#fffaf0";
-    ctx.fillText(p.label, tx, y + 21 + 34);
+    ctx.fillText(p.label, tx, y + 21 + 36);
     ctx.restore();
   }
   function victory(t) {
@@ -225,6 +233,9 @@
     ctx.save();
     ctx.fillStyle = "rgba(20, 10, 40," + (0.18 * a).toFixed(3) + ")"; ctx.fillRect(0, 0, W, H);
     var R = ART["victory-rays"], B = ART["victory-burst"], C = ART["victory-confetti-strip"];
+    if (reduced) { R = B = C = null; }
+    /* GATE1 · keep rays/burst/confetti off the jar creature */
+    var jar = document.querySelector("[data-kw-jar]"), jr = jar && jar.getBoundingClientRect();
     ctx.globalCompositeOperation = "screen";
     if (R) { ctx.save(); ctx.globalAlpha = (0.6 + 0.2 * Math.sin(age * 1.4)) * a; ctx.translate(cx, cy); ctx.rotate(age * 0.12);
       var rs = Math.max(W, H) * 1.3; ctx.drawImage(R, -rs / 2, -rs / 2, rs, rs); ctx.restore(); }
@@ -237,11 +248,18 @@
         ctx.globalAlpha = a; ctx.drawImage(C, fr * 256, 0, 256, 256, cxp - 40, cyp, 170, 170);
       } }
     ctx.restore();
+    if (jr && jr.width) {   /* soft-erase the effects over the creature so it stays clear */
+      var ex = jr.left + jr.width / 2, ey = jr.top + jr.height * 0.55, er = Math.max(jr.width, jr.height) * 0.95;
+      ctx.save(); ctx.globalCompositeOperation = "destination-out";
+      var eg = ctx.createRadialGradient(ex, ey, er * 0.45, ex, ey, er);
+      eg.addColorStop(0, "rgba(0,0,0,1)"); eg.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = eg; ctx.fillRect(ex - er, ey - er, er * 2, er * 2); ctx.restore();
+    }
     ctx.save();
-    var s = 0.8 + 0.2 * Math.min(1, age / 0.4) + (age < 0.6 ? Math.sin(age / 0.6 * Math.PI) * 0.08 : 0);
+    var s = reduced ? 1 : 0.8 + 0.2 * Math.min(1, age / 0.4) + (age < 0.6 ? Math.sin(age / 0.6 * Math.PI) * 0.08 : 0);
     ctx.translate(cx, cy); s *= victoryScale; ctx.scale(s, s); ctx.globalAlpha = a; ctx.textAlign = "center";
     /* frosted glass panel behind the words so they read without a full-screen dim */
-    ctx.save(); ctx.globalAlpha = a * 0.78; ctx.fillStyle = "rgba(24, 16, 48, 0.72)"; roundRect(-170, -70, 340, 120, 22); ctx.fill();
+    ctx.save(); ctx.globalAlpha = a * 0.78; ctx.fillStyle = "rgba(24, 16, 48, 0.72)"; roundRect(-170, -70, 340, 142, 22); ctx.fill();
     ctx.strokeStyle = "rgba(255, 214, 140, 0.55)"; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
     ctx.font = "900 24px system-ui, sans-serif"; ctx.fillStyle = "#fff4d6";
     ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 10;
@@ -252,6 +270,8 @@
     ctx.lineWidth = 6; ctx.strokeStyle = "#3a1a60"; ctx.strokeText("VICTORY!", 0, 8); ctx.fillText("VICTORY!", 0, 8);
     ctx.font = "800 16px system-ui, sans-serif"; ctx.fillStyle = "#fff"; ctx.shadowBlur = 8;
     ctx.fillText("All loot secured · jar full", 0, 36);
+    ctx.font = "700 14px system-ui, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.75)"; ctx.shadowBlur = 4;
+    ctx.fillText("tap to close", 0, 60);
     ctx.restore();
   }
   function victoryY() {
@@ -396,6 +416,7 @@
     var f = fill();
     if (lastFill !== null && lastFill < 0.999 && f >= 0.999) { victoryAt = now() + 0.9; setTimeout(victorySting, 900); }
     lastFill = f;
+    if (f >= 0.75) loadVictoryArt();
   }
 
   document.addEventListener("kw:feed", function (ev) {
@@ -433,16 +454,19 @@
           beam(r.left + q.x * sx, r.top + ((q.seat || q.y) - ms * 0.3) * sx, tierFor(q, i), t, i);
         });
       }
-      pops.forEach(function (p) { sceneLight(p, t); });
+      var tm = now();   /* moments run on the real clock, also with reduced motion */
+      if (!reduced) pops.forEach(function (p) { sceneLight(p, tm); });
       if (!reduced) glider(t);
       if (!reduced) middle(t);
-      pops = pops.filter(function (p) { return drawPop(p, t); });
+      pops = pops.filter(function (p) { return reduced ? tm - p.t0 < 2.6 : drawPop(p, tm); });
       if (!reduced) nearLayer(t);
       if (info && info.hits) clearLabels(info, r, sx);
-      pops.forEach(function (p) { lootCard(p, t); });
-      victory(t);
+      pops.forEach(function (p) { lootCard(p, tm); });
+      victory(tm);
+      undoHint(tm);
+      syncMute();
     } catch (e) { /* overlay must never break the board */ }
-    if (lastFill === null) lastFill = fill();
+    if (lastFill === null) { lastFill = fill(); if (lastFill >= 0.75) loadVictoryArt(); }
     requestAnimationFrame(frame);
   }
   /* slow camera breathing: the world canvas scales ~1% on a 14s cycle; taps map through its rect */
@@ -459,7 +483,70 @@
     document.body.appendChild(cv);
     global.addEventListener("resize", resize);
     requestAnimationFrame(frame);
+    mountMute();
   }
+  /* ---------- GATE1: mute in the world header, deliberate undo, tap-to-close victory ---------- */
+  function isMuted() { return global.HouseSfx && HouseSfx.isMuted ? HouseSfx.isMuted() : muted(); }
+  var muteBtn = null, lastMute = null;
+  function mountMute() {
+    var hud = document.querySelector(".kw-hud");
+    if (!hud) return setTimeout(mountMute, 300);
+    if (muteBtn) return;
+    muteBtn = document.createElement("button");
+    muteBtn.type = "button"; muteBtn.className = "hl-mute";
+    muteBtn.style.cssText = "pointer-events:auto;min-width:44px;min-height:44px;margin-left:auto;margin-right:8px;border:0;border-radius:22px;background:rgba(14,22,26,.72);color:#fff6e4;font:700 20px/1 system-ui,sans-serif";
+    muteBtn.addEventListener("click", function (e) {
+      e.preventDefault(); e.stopPropagation();
+      var on = !isMuted();
+      if (global.HouseSfx && HouseSfx.setMuted) HouseSfx.setMuted(on);
+      else { try { localStorage.setItem("house-sfx:mute", on ? "1" : "0"); } catch (x) {} }
+      if (!on) { var a = audio(); if (a && a.state === "suspended") a.resume(); startAmbient(); }
+      syncMute();
+    });
+    var clock = hud.querySelector("[data-kw-clock]");
+    hud.insertBefore(muteBtn, clock);
+    syncMute();
+  }
+  function syncMute() {
+    var m = isMuted();
+    if (m === lastMute) return;
+    lastMute = m;
+    if (muteBtn) { muteBtn.textContent = m ? "\uD83D\uDD07" : "\uD83D\uDD0A"; muteBtn.setAttribute("aria-label", m ? "Sound off. Tap for sound" : "Sound on. Tap to mute"); muteBtn.setAttribute("aria-pressed", m ? "true" : "false"); }
+    if (ac) { if (m && ac.state === "running") ac.suspend(); }   /* stops the ambient loop and every sting */
+  }
+  function busy() {
+    var t = now();
+    if (victoryAt >= 0) return true;
+    for (var i = 0; i < pops.length; i++) if (t - pops[i].t0 < 2.4) return true;
+    return false;
+  }
+  var undoArm = null;
+  global.KidUndoGate = function (q) {
+    if (busy()) return false;                         /* never lose a check mid-celebration */
+    var t = now();
+    if (undoArm && undoArm.btn === q.btn && t - undoArm.t > 0.9 && t - undoArm.t < 4) { undoArm = null; return true; }
+    var info = global.KidWorld && KidWorld.hits && KidWorld.hits();
+    var r = info && info.cv ? info.cv.getBoundingClientRect() : { left: 0, top: 0 };
+    undoArm = { btn: q.btn, t: t, x: r.left + q.x, y: r.top + (q.seat || q.y) - (q.ms || 72) * 0.75 };
+    return false;
+  };
+  function undoHint(t) {
+    if (!undoArm) return;
+    var age = t - undoArm.t; if (age > 4) { undoArm = null; return; }
+    var a = Math.min(1, age / 0.2) * Math.min(1, (4 - age) / 0.4);
+    ctx.save(); ctx.globalAlpha = a; ctx.font = "800 16px system-ui, sans-serif";
+    var txt = "Tap again to undo", w = ctx.measureText(txt).width + 24, x = Math.max(4, Math.min(W - w - 4, undoArm.x - w / 2));
+    ctx.fillStyle = "rgba(14, 22, 26, 0.92)"; roundRect(x, undoArm.y - 34, w, 32, 16); ctx.fill();
+    ctx.fillStyle = "#fff6e4"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(txt, x + w / 2, undoArm.y - 18);
+    ctx.restore();
+  }
+  /* tap anywhere closes the victory panel (and that tap does nothing else) */
+  document.addEventListener("pointerdown", function (e) {
+    if (victoryAt < 0 || now() - victoryAt < 0.6) return;
+    if (e.target && e.target.closest && e.target.closest(".hl-mute")) return;
+    e.stopPropagation(); e.preventDefault();
+    victoryAt = -1; victoryCy = null;
+  }, true);
   global.HayesLoot = { tierFor: tierFor, previewVictory: function () { victoryAt = now(); victorySting(); } };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })(window);
