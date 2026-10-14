@@ -15,6 +15,7 @@
     ainsley: { sky: ["#1a1424", "#8a4a48", "#e0a070"], ground: "#241610", metal: "#e4ddd6", accent: "#ffd8b0", back: "kid-ainsley.html" }
   }[kid];
 
+  var LIQUID = q.get("liquid") !== "0";
   var reduced = false;
   try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
 
@@ -47,11 +48,83 @@
     Promise.all(jobs).then(function () { runPlatesReady = true; });
   }
   loadRunPlates();
+  /* SEAM1 · plates tile forever as mirrored copies (edge meets its own mirror, so no hard cut and no black strip
+     at any width or scroll). Opaque sky plates get smeared/stretched edge columns trimmed once on load. */
+  var plateTrim = typeof WeakMap === "function" ? new WeakMap() : null;
+  function trimFor(img) {
+    if (!plateTrim) return { l: 0, r: 0 };
+    var hit = plateTrim.get(img); if (hit) return hit;
+    var res = { l: 0, r: 0 };
+    try {
+      var sw = 256, sh = 144, c = document.createElement("canvas"); c.width = sw; c.height = sh;
+      var g2 = c.getContext("2d", { willReadFrequently: true }); g2.drawImage(img, 0, 0, sw, sh);
+      var d = g2.getImageData(0, 0, sw, sh).data, opaque = d[3] > 250 && d[(sw * sh - 1) * 4 + 3] > 250;
+      if (opaque) {
+        var colVar = function (x) { var s = 0, x2 = x < sw - 1 ? x + 1 : x - 1; for (var y = 0; y < sh; y++) { var a = (y * sw + x) * 4, b = (y * sw + x2) * 4; s += Math.abs(d[a] - d[b]) + Math.abs(d[a + 1] - d[b + 1]) + Math.abs(d[a + 2] - d[b + 2]); } return s / sh; }; /* smear = rows stretched sideways, so neighbour columns match */
+        var ref = 0; for (var x = sw * 0.4; x < sw * 0.6; x++) ref += colVar(Math.floor(x)); ref /= sw * 0.2;
+        var lim = Math.max(1.2, ref * 0.25), L = 0, R = 0;
+        while (L < sw * 0.25 && colVar(L) < lim) L++;
+        while (R < sw * 0.25 && colVar(sw - 1 - R) < lim) R++;
+        res = { l: (L ? L + 2 : 0) / sw, r: (R ? R + 2 : 0) / sw, opaque: true };
+      }
+    } catch (e) {}
+    plateTrim.set(img, res);
+    return res;
+  }
+  /* SEAM2 · transparent layers (islands, ground, ferns) tile un-mirrored with a feathered 14% overlap, so the
+     join crossfades instead of showing a mirror-symmetric fern pair. Opaque sky keeps the mirror tiling. */
+  var FEATHER = 0.08, featherCache = typeof WeakMap === "function" ? new WeakMap() : null;
+  function feathered(img) {
+    var hit = featherCache && featherCache.get(img); if (hit) return hit;
+    var c = document.createElement("canvas"); c.width = img.width; c.height = img.height;
+    var g2 = c.getContext("2d"); g2.drawImage(img, 0, 0);
+    g2.globalCompositeOperation = "destination-in";
+    var fw = img.width * FEATHER, gr = g2.createLinearGradient(0, 0, fw, 0);
+    gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "rgba(0,0,0,1)");
+    /* destination-in clears everything outside the drawn op, so one full-width fill: ramp then solid */
+    var full = g2.createLinearGradient(0, 0, img.width, 0);
+    full.addColorStop(0, "rgba(0,0,0,0)"); full.addColorStop(FEATHER, "rgba(0,0,0,1)"); full.addColorStop(1, "rgba(0,0,0,1)");
+    g2.fillStyle = full; g2.fillRect(0, 0, img.width, img.height);
+    g2.globalCompositeOperation = "source-over";
+    /* some plates carry a cut-off, unpainted (pure black) island at an edge; clear those pixels in the outer 12% */
+    try {
+      var ew2 = Math.round(img.width * 0.12), hh = Math.round(img.height * 0.7);
+      [0, img.width - ew2].forEach(function (x0) {
+        var id = g2.getImageData(x0, 0, ew2, hh), dd = id.data, lo = ew2, hi2 = -1;
+        for (var i = 0; i < dd.length; i += 4) if (dd[i + 3] > 40 && dd[i] + dd[i + 1] + dd[i + 2] < 25) { var cx = (i / 4) % ew2; if (cx < lo) lo = cx; if (cx > hi2) hi2 = cx; }
+        if (hi2 < 0) return;
+        /* wipe the whole cut-off island band (edge → past its last black column), so no dark outline is left */
+        /* extend to the first empty column so the island goes whole, not sliced */
+        var span = Math.round(img.width * 0.3), sd = g2.getImageData(x0 === 0 ? 0 : img.width - span, 0, span, hh).data;
+        function colEmpty(c) { for (var y = 0; y < hh; y += 2) if (sd[(y * span + c) * 4 + 3] > 90) return false; return true; }
+        if (x0 === 0) { var c = hi2; while (c < span - 1 && !colEmpty(c)) c++; g2.clearRect(0, 0, c + 2, hh); }
+        else { var c2 = span - (ew2 - lo); while (c2 > 0 && !colEmpty(c2)) c2--; g2.clearRect(img.width - span + c2 - 2, 0, span - c2 + 2, hh); }
+      });
+    } catch (e) {}
+    if (featherCache) featherCache.set(img, c);
+    return c;
+  }
   function drawRunPlate(g, img, W, H, oxOff, parallax) {
     if (!img) return;
-    var scale = Math.max(W / img.width, H / img.height) * 1.08;
-    var dw = img.width * scale, dh = img.height * scale;
-    g.drawImage(img, (W - dw) / 2 - cam * parallax + (oxOff || 0), (H - dh) / 2, dw, dh);
+    var tr = trimFor(img);
+    if (!tr.opaque) {
+      var fi = feathered(img), sc = Math.max(W / img.width, H / img.height) * 1.08;
+      var fdw = img.width * sc, fdh = img.height * sc, step = fdw * (1 - FEATHER);
+      var fx = (W - fdw) / 2 - cam * parallax + (oxOff || 0), fy = (H - fdh) / 2;
+      var j0 = Math.floor(-fx / step) - 1, j1 = Math.ceil((W - fx) / step);
+      for (var j = j0; j <= j1; j++) g.drawImage(fi, Math.floor(fx + j * step), fy, fdw, fdh);
+      return;
+    }
+    var sx = img.width * tr.l, sw = img.width * (1 - tr.l - tr.r);
+    var scale = Math.max(W / sw, H / img.height) * 1.08;
+    var dw = Math.ceil(sw * scale), dh = img.height * scale;
+    var x = (W - dw) / 2 - cam * parallax + (oxOff || 0), y = (H - dh) / 2;
+    var k0 = Math.floor(-x / dw), k1 = Math.ceil((W - x) / dw);
+    for (var k = k0; k < k1; k++) {
+      var tx = Math.floor(x + k * dw);
+      if (k & 1) { g.save(); g.translate(tx + dw, y); g.scale(-1, 1); g.drawImage(img, sx, 0, sw, img.height, -0.5, 0, dw + 1, dh); g.restore(); }
+      else g.drawImage(img, sx, 0, sw, img.height, tx - 0.5, y, dw + 1, dh);
+    }
   }
 
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -89,14 +162,36 @@
     } catch (err) {}
   }
 
+  /* SHARP1 · devicePixelRatio-aware backing: up to 2x, capped at 2560x1440 total pixels (a 1440p wall at 1:1).
+     Floor = the old 1400px-wide cap. If frames run slow (avg > 20 ms over 2 s) the scale steps down toward the floor;
+     if they run fast (< 13 ms over 4 s) it steps back up. ?adapt=0 pins the full target for measuring. */
+  var MAX_PX = 2560 * 1440;
+  var dprScale = 1, adaptT = 0, adaptN = 0, adaptSum = 0;
+  var ADAPT = q.get("adapt") !== "0";
+  function targetDpr(w, h) {
+    var d = Math.min(2, devicePixelRatio || 1);
+    if (w * h * d * d > MAX_PX) d = Math.sqrt(MAX_PX / (w * h));
+    return d;
+  }
+  function floorDpr(w) { return Math.min(1.35, devicePixelRatio || 1, 1400 / w); }
+  function adapt(dtMs) {
+    if (!ADAPT) return;
+    adaptT += dtMs; adaptN++; adaptSum += dtMs;
+    var avg = adaptSum / adaptN, w = innerWidth, h = innerHeight;
+    var lo = floorDpr(w) / targetDpr(w, h);
+    if (adaptT > 2000 && avg > 20 && dprScale > lo + 0.001) { dprScale = Math.max(lo, dprScale * 0.85); resize(); }
+    else if (adaptT > 4000 && avg < 13 && dprScale < 1) { dprScale = Math.min(1, dprScale / 0.85); resize(); }
+    else if (adaptT <= 4000) return;
+    adaptT = 0; adaptN = 0; adaptSum = 0;
+  }
   function resize() {
-    var dpr = Math.min(1.35, devicePixelRatio || 1);
     var w = innerWidth, h = innerHeight;
-    if (w * dpr > 1400) dpr = 1400 / w;
+    var dpr = Math.max(floorDpr(w), targetDpr(w, h) * dprScale);
     cv.width = off.width = Math.round(w * dpr);
     cv.height = off.height = Math.round(h * dpr);
     cv.style.width = w + "px";
     cv.style.height = h + "px";
+    if (view.dpr !== dpr) platCache = {};
     view.dpr = dpr;
     view.w = w; view.h = h;
   }
@@ -115,25 +210,59 @@
       x += gap;
       y = 280 + Math.sin(i * 0.7) * 70 + (i % 5 === 4 ? -50 : 0);
       plats.push({ x: x, y: y, w: w, h: 22, cp: i % 3 === 0, vx: i % 5 === 2 ? 36 : 0, phase: i });
-      if (i % 4 === 3) drips.push({ x: x + w * 0.5, y: y - 160, r: 16, p: i });
+      if (i % 4 === 3) { drips.push({ x: x + w * 0.5, y: y - 160, r: 16, p: i }); plats[plats.length - 1].drip = true; }
       x += w;
     }
     goalX = x + 40;
     plats.push({ x: goalX, y: 300, w: 180, h: 26, cp: true, vx: 0, phase: 0, grove: true });
   })();
 
+  var gatherLog = [];
+  function lowestTop() { var m = -1e9; for (var i = 0; i < plats.length; i++) m = Math.max(m, GY(plats[i].y)); return m; }
   function platX(p, t) { return p.x + (p.vx ? Math.sin(t * 0.8 + p.phase) * 46 : 0); }
   function GY(y) { return y - 340 + view.h * 0.62; }
 
   function Blob(x, y, echo) {
     this.x = x; this.y = y; this.vx = 0; this.vy = 0;
-    this.r = 22; this.grounded = false; this.coyote = 0; this.squash = 1;
+    this.r = q.get("demo") === "1" ? 30 : 26; /* BIG1: reads on a phone */ this.grounded = false; this.coyote = 0; this.squash = 1;
     this.cp = { x: x, y: y }; this.alive = true; this.echo = echo; this.hold = null;
     this.inv = 0;
   }
   var spawn = { x: plats[0].x + 40, y: plats[0].y - 30 };
   var A = new Blob(spawn.x, spawn.y, false);
   var B = new Blob(spawn.x + 28, spawn.y, true);
+  /* POWERUPS1 · closed chores become power-ups. READ-ONLY: JarEngine.choreState(kid), the same read the gate uses.
+     double jump = that kid's musts for today are all closed; drop magnet = that kid's week jar is at least half full.
+     ?fixture=1 swaps in FIXTURE values (badge on screen) for proof captures only. */
+  var KIDS = ["hayes", "harris", "ainsley"];
+  var NAMES = { hayes: "Hayes", harris: "Harris", ainsley: "Ainsley" };
+  var SIBS = KIDS.filter(function (k) { return k !== kid; });
+  var FIXTURE = q.get("fixture") === "1";
+  var FIX_PW = {}; FIX_PW[kid] = { dbl: true, magnet: true }; FIX_PW[SIBS[0]] = { dbl: true, magnet: false }; FIX_PW[SIBS[1]] = { dbl: false, magnet: false };
+  /* COOP1 · up to three kids on one wall: host + siblings. The wall splits into one touch zone per kid
+     (left to right); a zone with no hand runs its blob as a calm echo. ?coop=2 keeps it to two. */
+  var C = new Blob(spawn.x + 56, spawn.y, true);
+  A.kid = kid; B.kid = SIBS[0]; C.kid = SIBS[1];
+  var blobs = q.get("coop") === "2" ? [A, B] : [A, B, C];
+  /* DEMO1 · ?demo=1 attract mode: the host blob runs itself too (preview captures / idle wall). */
+  if (q.get("demo") === "1") A.auto = true;
+  function powersFor(k) {
+    if (FIXTURE) return FIX_PW[k];
+    try {
+      var st = window.JarEngine && JarEngine.choreState(k);
+      if (!st) return { dbl: false, magnet: false };
+      return { dbl: st.todayNeed > 0 && st.todayDone >= st.todayNeed, magnet: (st.fill || 0) >= 0.5 };
+    } catch (e) { return { dbl: false, magnet: false }; }
+  }
+  function refreshPowers() { allBlobs().forEach(function (b) { b.pw = powersFor(b.kid); }); paintPowerHud(); }
+  function allBlobs() { return blobs; }
+  function paintPowerHud() {
+    var el = ui.querySelector(".hud span"); if (!el) return;
+    el.innerHTML = (FIXTURE ? '<b class="fixture">FIXTURE</b> ' : "") + allBlobs().map(function (b) {
+      var pw = b.pw || {};
+      return '<i class="pw">' + NAMES[b.kid] + ' <em class="' + (pw.dbl ? "on" : "off") + '">double jump</em> <em class="' + (pw.magnet ? "on" : "off") + '">drop magnet</em></i>';
+    }).join(" ");
+  }
   var drops = [];
   var rings = [];
   var cam = 0;
@@ -148,51 +277,114 @@
     if (reduced) n = Math.min(n, 6);
     for (var i = 0; i < n; i++) {
       var a = Math.random() * Math.PI * 2;
-      var s = 80 + Math.random() * 260;
+      var s = 60 + Math.random() * 150;
       drops.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 120, a: 1, r: 2 + Math.random() * 5, c: color });
     }
     rings.push({ x: x, y: y, r: 6, a: 0.85 });
   }
-  function gather(b) {
+  function gather(b, why) {
     if (b.inv > 0) return;
-    burst(b.x, b.y, 22, THEME.metal);
+    gatherLog.push([b.kid, why || "fall", Math.round(b.x)]);
+    if (why === "drip" && b.pw && b.pw.magnet) { /* drop magnet: the splash pulls straight back in, no trip to the lantern */
+      burst(b.x, b.y, 10, THEME.metal); tone("splash");
+      b.vy = Math.min(b.vy, -260); b.inv = 0.6; b.magnetT = 0.6; return;
+    }
+    burst(b.x, Math.min(b.y, view.h * 0.86), 12, THEME.metal);
     tone("splash");
-    shake = 8;
-    b.x = b.cp.x; b.y = b.cp.y; b.vx = 0; b.vy = 0; b.inv = 0.45; b.alive = true;
+    shake = 0;
+    b.ret = { x0: b.x, y0: Math.min(b.y, view.h * 0.86), k: 0 }; b.vx = 0; b.vy = 0; b.inv = 0.45; b.alive = true;
+  }
+
+  /* PILOT1 · echo + ?demo=1 blobs plan every hop: walk calmly to a take-off point, jump, then steer in the air
+     toward a landing spot on the next platform (moving platforms predicted to the landing moment). If the next
+     top is above the arc they use the double jump. Same physics as a kid's blob; only the steering is planned. */
+  function platUnder(b, t) {
+    for (var i = 0; i < plats.length; i++) {
+      var px = platX(plats[i], t), top = GY(plats[i].y);
+      if (b.x > px - b.r * 0.4 && b.x < px + plats[i].w + b.r * 0.4 && Math.abs(b.y + b.r - top) < 6) return i;
+    }
+    return -1;
+  }
+  function landSpot(pl, tt) { return platX(pl, tt) + (pl.drip ? 22 : Math.min(70, pl.w * 0.4)); } /* land short of a drip lane */
+  function autoPilot(b, dt, t) {
+    var WALK = 120;
+    if (b.grounded) {
+      var hi = platUnder(b, t);
+      if (hi < 0) return;
+      b.tgt = hi + 1 < plats.length ? hi + 1 : -1;
+      var here = plats[hi];
+      if (b.tgt < 0) { b.vx += clamp(platX(here, t) + here.w * 0.5 - b.x, -WALK, WALK) * 4 * dt; return; }
+      var nx = plats[b.tgt];
+      var off = platX(here, t) + here.w - 34;
+      /* time the dark drips: stop short of one hanging in our lane, go the moment it has dropped past us */
+      var dripClear = false;
+      for (var di = 0; di < drips.length; di++) {
+        var dr = drips[di], ddx = dr.x - b.x;
+        if (ddx > -44 && ddx < 110 && Math.abs(GY(dr.y) + 160 - (b.y + b.r)) < 40) {
+          var rel = ((t * 90 + dr.p * 40) % 180) - 160; /* collides while rel is in (-67, 7) */
+          if (b.cross === di) { dripClear = true; continue; }       /* committed: keep rolling through */
+          if (ddx > 38 && ddx < 95) { if (rel > 9) { b.cross = di; dripClear = true; } else { b.vx *= Math.pow(1e-6, dt); return; } }
+          else if (ddx <= 38) dripClear = true;
+        }
+      }
+      if (dripClear) { b.vx = 170; return; }
+      if (b.x < off - 4) { b.vx += (WALK - b.vx) * Math.min(1, dt * 3); return; }
+      /* moving target: wait on the lip until it is swinging toward us or near its closest point */
+      if (nx.vx && Math.cos(t * 0.8 + nx.phase) > 0.2) { b.vx *= Math.pow(0.05, dt); return; }
+      b.want = 0.14; b.press = true; b.jumps = (b.jumps || 0) + 1;
+      b.flourish = !!(b.pw && b.pw.dbl && b.jumps % 3 === 0);
+      return;
+    }
+    if (b.tgt == null || b.tgt < 0) return;
+    var pl = plats[b.tgt], ty = GY(pl.y) - b.r, dy = ty - b.y;
+    var disc = b.vy * b.vy + 3400 * dy;
+    var canDbl = b.pw && b.pw.dbl && !b.air2;
+    if (canDbl && (disc < 0 || (b.flourish && b.vy > -60 && b.vy < 120))) {
+      b.vy = -600; b.air2 = true; b.flourish = false; b.squash = 0.8;
+      rings.push({ x: b.x, y: b.y + b.r, r: 8, a: 0.5 }); tone("jump");
+      disc = b.vy * b.vy + 3400 * dy;
+    }
+    if (disc < 0) return;
+    var tau = (-b.vy + Math.sqrt(disc)) / 1700;
+    if (tau < 0.02) return;
+    var want = (landSpot(pl, t + tau) - b.x) / tau;
+    b.vx += (clamp(want, -340, 340) - b.vx) * Math.min(1, dt * 10);
+  }
+  /* SOFT1 · a fall is a soft, on-purpose return: the metal mists and flows back to the last lantern along an arc
+     (0.9 s, eased) instead of popping. Falling past the platform line counts, so nothing sinks into the painted ground. */
+  function stepReturn(b, dt) {
+    var r = b.ret; r.k = Math.min(1, r.k + dt / 0.9);
+    var e = r.k * r.k * (3 - 2 * r.k);
+    b.x = r.x0 + (b.cp.x - r.x0) * e;
+    b.y = r.y0 + (b.cp.y - r.y0) * e - Math.sin(e * Math.PI) * 90;
+    b.squash = 0.85 + 0.15 * e;
+    if (r.k >= 1) { b.ret = null; b.vx = 0; b.vy = 0; b.inv = 0.3; rings.push({ x: b.x, y: b.y + b.r, r: 8, a: 0.5 }); }
   }
 
   function stepBlob(b, dt, t, input) {
     if (won) return;
+    if (b.ret) { stepReturn(b, dt); return; }
     b.inv = Math.max(0, b.inv - dt);
+    b.magnetT = Math.max(0, (b.magnetT || 0) - dt);
     var accel = 0;
     if (input) {
       var worldX = cam + input.x;
       accel = clamp(worldX - b.x, -160, 160);
       b.vx += accel * 8 * dt;
-      if (input.jump) { b.want = 0.12; input.jump = false; }
-    } else if (b.echo) {
-      var here = null, next = null;
-      for (var i = 0; i < plats.length; i++) {
-        var px = platX(plats[i], t);
-        var top = GY(plats[i].y);
-        if (!here && b.x > px - 8 && b.x < px + plats[i].w + 8 && Math.abs(b.y + b.r - top) < 36) here = plats[i];
-        if (!next && px > b.x + 24) next = plats[i];
-      }
-      var aim = next || here || plats[0];
-      if (aim) {
-        var tx = platX(aim, t) + Math.min(48, aim.w * 0.45);
-        b.vx += clamp(tx - b.x, -140, 160) * 7 * dt;
-      }
-      if (b.grounded && here && next) {
-        var edge = platX(here, t) + here.w;
-        var rise = GY(here.y) - GY(next.y);
-        if (b.x > edge - 42 || rise > 24) b.want = 0.14;
-      }
+      if (input.jump) { b.want = 0.12; b.press = true; input.jump = false; }
+    } else if (b.echo || b.auto) {
+      autoPilot(b, dt, t);
     }
     b.want = (b.want || 0) - dt;
+    if (b.want <= 0) b.press = false;
     if (b.grounded) b.coyote = 0.12; else b.coyote -= dt;
+    if (b.grounded) b.air2 = false;
     if (b.want > 0 && (b.grounded || b.coyote > 0)) {
       b.vy = -720; b.grounded = false; b.coyote = 0; b.want = 0; b.squash = 0.72;
+      tone("jump");
+    } else if (b.want > 0 && b.press && b.pw && b.pw.dbl && !b.air2 && b.coyote <= 0) {
+      b.vy = -600; b.air2 = true; b.want = 0; b.squash = 0.8; /* double jump: a soft second push, a quiet ring */
+      rings.push({ x: b.x, y: b.y + b.r, r: 8, a: 0.5 });
       tone("jump");
     }
     b.vy += 1700 * dt;
@@ -209,8 +401,9 @@
           var top = GY(pl.y);
           if (b.y + b.r <= top + 12 && nextY + b.r >= top) {
             nextY = top - b.r;
-            if (b.vy > 220) { burst(b.x, top, 8, THEME.metal); tone("land"); b.squash = 1.35; shake = Math.min(6, b.vy / 200); }
+            if (b.vy > 220) { burst(b.x, top, 8, THEME.metal); tone("land"); b.squash = 1.35; }
             b.vy = 0; b.grounded = true;
+            if (pl.vx) b.x += platX(pl, t) - platX(pl, t - dt); /* CARRY1: ride moving platforms */
             if (pl.cp) b.cp = { x: b.x, y: nextY };
           }
         }
@@ -220,11 +413,11 @@
     if (b.grounded) b.vx *= Math.pow(0.15, dt);
     else b.vx *= Math.pow(0.55, dt);
     b.squash += (1 - b.squash) * Math.min(1, dt * 8);
-    if (b.y > view.h + 120) gather(b);
+    if (b.y > lowestTop() + 70) gather(b); /* SOFT1: below every platform = gentle return, before it reaches the painted ground */
     for (var d = 0; d < drips.length; d++) {
       var dr = drips[d];
       var dy = GY(dr.y) + ((t * 90 + dr.p * 40) % 180);
-      if (Math.hypot(b.x - dr.x, b.y - dy) < b.r + dr.r * 0.45) gather(b);
+      if (Math.hypot(b.x - dr.x, b.y - dy) < b.r + dr.r * 0.45) gather(b, "drip");
     }
     if (was && !b.grounded) { /* stepped off */ }
   }
@@ -234,10 +427,12 @@
       var d = drops[i];
       d.age = (d.age || 0) + dt;
     if (d.age > 0.22) {
-      var tx = A.x, ty = A.y;
-      if (Math.hypot(B.x - d.x, B.y - d.y) < Math.hypot(tx - d.x, ty - d.y)) { tx = B.x; ty = B.y; }
-      d.vx += (tx - d.x) * 8 * dt;
-      d.vy += (ty - d.y) * 8 * dt;
+      var near = blobs[0];
+      blobs.forEach(function (b) { if (Math.hypot(b.x - d.x, b.y - d.y) < Math.hypot(near.x - d.x, near.y - d.y)) near = b; });
+      var tx = near.x, ty = near.y;
+      var pull = near.magnetT > 0 ? 22 : 8;
+      d.vx += (tx - d.x) * pull * dt;
+      d.vy += (ty - d.y) * pull * dt;
       d.r *= Math.max(0.2, 1 - dt * 1.4);
       if (Math.hypot(tx - d.x, ty - d.y) < 10 || d.r < 0.7) { drops.splice(i, 1); continue; }
     }
@@ -295,10 +490,15 @@
     for (var d = 0; d < drips.length; d++) {
       var dr = drips[d];
       var dy = GY(dr.y) + ((t * 90 + dr.p * 40) % 180);
-      g.fillStyle = "rgba(12, 16, 22, 0.88)";
-      g.beginPath(); g.arc(dr.x, dy, dr.r, 0, 7); g.fill();
-      g.fillStyle = "rgba(255,255,255,0.25)";
-      g.beginPath(); g.arc(dr.x - 4, dy - 4, dr.r * 0.35, 0, 7); g.fill();
+      /* DRIP2 · the hazard reads as a dark-thorn ember with a violet glow, never as a second blob */
+      var hg = g.createRadialGradient(dr.x, dy, 2, dr.x, dy, dr.r * 2.6);
+      hg.addColorStop(0, "rgba(190,120,255,0.55)"); hg.addColorStop(0.45, "rgba(120,60,200,0.18)"); hg.addColorStop(1, "rgba(80,30,160,0)");
+      g.fillStyle = hg; g.beginPath(); g.arc(dr.x, dy, dr.r * 2.6, 0, 7); g.fill();
+      g.fillStyle = "rgba(30, 12, 48, 0.92)";
+      g.beginPath();
+      for (var sp = 0; sp < 14; sp++) { var an = sp / 14 * Math.PI * 2 + t * 0.4, rr = sp % 2 ? dr.r * 0.55 : dr.r * 1.05; g[sp ? "lineTo" : "moveTo"](dr.x + Math.cos(an) * rr, dy + Math.sin(an) * rr); }
+      g.closePath(); g.fill();
+      g.fillStyle = "rgba(220,170,255,0.7)"; g.beginPath(); g.arc(dr.x, dy, dr.r * 0.22, 0, 7); g.fill();
     }
     rings.forEach(function (ring) {
       g.globalAlpha = Math.max(0, ring.a);
@@ -318,21 +518,159 @@
     g.restore();
   }
 
-  function livingPlat(g, x, y, w, t, i, grove) {
-    var img = grove ? (runPlates.mid || runPlates.near) : (i % 3 === 0 ? runPlates.mid : i % 3 === 1 ? runPlates.fg : runPlates.near);
-    var sway = Math.sin(t * 1.1 + i) * 2;
-    g.save();
+  /* PLATFORMS1 · painted root + stone platforms, Ori-style (layered, soft-lit, organic; never flat watercolor).
+     ASSET SWAP: Prism's plates drop in as art/mercury/platforms/stone.png and art/mercury/platforms/root.png
+     (transparent PNG, walkable top edge at PLAT_ART[type].top of the image height, end caps PLAT_ART[type].cap
+     of the width each side; the middle stretches). If a file is missing the procedural placeholder below draws.
+     Each platform is painted once into a cached sprite (per width/type/seed/dpr), so a frame is one drawImage. */
+  /* Prism plates (2026-10-13/mercury-platforms, 2x set): <type>-<a..d>-{capL,mid,capR} 80x112 / 256x112 and matching
+     -shadow-* 48px strips. Drawn at half size: caps 40 css px, mid tiles every 128 css px, 56 tall, walk line 12 px down. */
+  var PLAT_ART = { dir: "art/mercury/platforms/", variants: ["a", "b", "c", "d"], parts: ["capL", "mid", "capR", "shadow-capL", "shadow-mid", "shadow-capR"], walk: 10, shY: 14, h: 56, sh: 24 }; /* Prism README: tile at y-10 (moss lip = walk line), shadow at y+14 */
+  var platImg = {};
+  if (q.get("platart") !== "0") ["stone", "root"].forEach(function (t) {
+    PLAT_ART.variants.forEach(function (v) {
+      var set = {}, left = PLAT_ART.parts.length;
+      PLAT_ART.parts.forEach(function (part) {
+        var im = new Image();
+        im.onload = function () { set[part] = im; if (--left === 0) { platImg[t + "-" + v] = set; platCache = {}; } };
+        im.onerror = function () { left = -99; };
+        im.src = PLAT_ART.dir + ((devicePixelRatio || 1) > 1 || innerWidth >= 2400 ? "2x/" : "1x/") + t + "-" + v + "-" + part + ".png?v=PLATFORMS3";
+      });
+    });
+  });
+  var platCache = {};
+  function platType(i, grove) { return grove ? "stone" : (i % 3 === 1 ? "root" : "stone"); }
+  function rnd(seed) { var x = Math.sin(seed * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+  var PAD = 40, DEPTH = 120; /* sprite margin around the slab; how far the body hangs below the walk line */
+  function platSprite(type, w, i, grove) {
+    var dpr = view.dpr || 1;
+    var vr = type === "root" ? (i % 2 ? "c" : "a") : PLAT_ART.variants[i % 4]; /* Prism: prefer root-a / root-c */
+    var art = platImg[type + "-" + vr];
+    var key = type + "|" + Math.round(w) + "|" + i + "|" + dpr.toFixed(2) + "|" + (art ? "art" : "proc");
+    if (platCache[key]) return platCache[key];
+    var cw = w + PAD * 2, chh = DEPTH + PAD * 2;
+    var c = document.createElement("canvas");
+    c.width = Math.ceil(cw * dpr); c.height = Math.ceil(chh * dpr);
+    var g = c.getContext("2d");
+    g.scale(dpr, dpr);
+    g.translate(PAD, PAD);
+    if (art) paintPlatArt(g, art, w, grove);
+    else if (type === "root") paintRoot(g, w, i);
+    else paintStone(g, w, i, grove);
+    platCache[key] = c;
+    return c;
+  }
+  function paintPlatArt(g, set, w, grove) {
+    var cap = 40, tile = 128, y0 = -PLAT_ART.walk;
+    function strip(pre, y, h) {
+      var mw = Math.max(0, w - cap * 2);
+      for (var x = 0; x < mw; x += tile) { var tw = Math.min(tile, mw - x); var im = set[pre + "mid"]; g.drawImage(im, 0, 0, im.width * (tw / tile), im.height, cap + x, y, tw, h); }
+      g.drawImage(set[pre + "capL"], 0, y, cap, h);
+      g.drawImage(set[pre + "capR"], w - cap, y, cap, h);
+    }
+    strip("shadow-", PLAT_ART.shY, PLAT_ART.sh);
+    strip("", y0, PLAT_ART.h);
+    if (grove) { var gg = g.createRadialGradient(w / 2, 0, 4, w / 2, 0, w * 0.7); gg.addColorStop(0, "rgba(255,240,200,0.24)"); gg.addColorStop(1, "rgba(255,240,200,0)"); g.fillStyle = gg; g.fillRect(-PAD, -PAD, w + PAD * 2, PAD + 60); }
+  }
+  function stonePath(g, w, i, inset) {
+    var n = 9, depth = 46 + rnd(i + 3) * 30;
     g.beginPath();
-    g.roundRect(x, y + sway, w, 26, 10);
-    g.clip();
-    if (img) g.drawImage(img, -((i * 90) % 400), y - 80, w + 220, 160);
-    else {
-      g.fillStyle = "#3c4638";
-      g.fillRect(x, y, w, 26);
+    g.moveTo(-6 + inset, 4);
+    for (var k = 1; k < n; k++) { var x = (k / n) * w; g.lineTo(x, -2 + rnd(i * 13 + k) * 4 + inset * 0.3); }
+    g.quadraticCurveTo(w + 12 - inset, 2, w + 4 - inset, 16);
+    for (var k2 = n; k2 >= 0; k2--) {
+      var u = k2 / n, bulge = Math.sin(u * Math.PI);
+      var y = 16 + bulge * depth * (0.75 + rnd(i * 7 + k2) * 0.35) - inset;
+      g.lineTo(u * w + (rnd(i * 5 + k2) - 0.5) * 10, y);
+    }
+    g.quadraticCurveTo(-14 + inset, 20, -6 + inset, 4);
+    g.closePath();
+  }
+  function paintStone(g, w, i, grove) {
+    /* 1 depth layer: a cooler, softer silhouette behind (atmosphere) */
+    g.save(); g.translate(10, 10); g.globalAlpha = 0.35; g.filter = "blur(6px)";
+    stonePath(g, w, i + 50, 0); g.fillStyle = "#0b1a1c"; g.fill();
+    g.restore();
+    /* 2 body: lit top to deep underside, soft mottling (no hard lines) */
+    stonePath(g, w, i, 0);
+    var body = g.createLinearGradient(0, -4, 0, 90);
+    body.addColorStop(0, "#5f7468"); body.addColorStop(0.18, "#3a4c48"); body.addColorStop(0.55, "#1b2a2b"); body.addColorStop(1, "#0a1214");
+    g.fillStyle = body; g.fill();
+    g.save(); g.clip();
+    for (var m = 0; m < 7; m++) {
+      var mx = rnd(i * 31 + m) * w, my = 10 + rnd(i * 17 + m) * 50, mr = 18 + rnd(i * 3 + m) * 34;
+      var mg = g.createRadialGradient(mx, my, 0, mx, my, mr);
+      mg.addColorStop(0, m % 2 ? "rgba(140,170,150,0.16)" : "rgba(10,18,20,0.30)"); mg.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = mg; g.fillRect(mx - mr, my - mr, mr * 2, mr * 2);
+    }
+    /* 3 cool bounce light along the underside, warm key from the upper left */
+    var bounce = g.createLinearGradient(0, 40, 0, 100); bounce.addColorStop(0, "rgba(90,160,170,0)"); bounce.addColorStop(1, "rgba(90,160,170,0.18)");
+    g.fillStyle = bounce; g.fillRect(-20, 40, w + 40, 80);
+    var key = g.createRadialGradient(w * 0.2, -10, 4, w * 0.2, -10, w * 0.9); key.addColorStop(0, "rgba(255,226,170,0.22)"); key.addColorStop(1, "rgba(255,226,170,0)");
+    g.fillStyle = key; g.fillRect(-20, -20, w + 40, 80);
+    /* lichen specks */
+    for (var l = 0; l < Math.round(w / 14); l++) {
+      g.fillStyle = "rgba(170,200,120," + (0.12 + rnd(i * 41 + l) * 0.18).toFixed(2) + ")";
+      g.beginPath(); g.ellipse(rnd(i * 23 + l) * w, 8 + rnd(i * 29 + l) * 28, 2 + rnd(l + i) * 4, 1.4 + rnd(l * 3 + i) * 2, 0, 0, 7); g.fill();
     }
     g.restore();
-    g.fillStyle = "rgba(12, 18, 14, 0.35)";
-    g.fillRect(x, y + sway, w, 4);
+    /* 4 rim light on the walk edge + moss tufts */
+    rimAndMoss(g, w, i, grove ? "rgba(255,236,190,0.9)" : "rgba(255,226,170,0.65)");
+    if (grove) { var gg = g.createRadialGradient(w / 2, 0, 4, w / 2, 0, w * 0.7); gg.addColorStop(0, "rgba(255,240,200,0.28)"); gg.addColorStop(1, "rgba(255,240,200,0)"); g.fillStyle = gg; g.fillRect(-PAD, -PAD, w + PAD * 2, PAD + 60); }
+  }
+  function paintRoot(g, w, i) {
+    /* a gnarled root bridge: a tapering trunk with knots and hanging rootlets, glowing tips (Ori lanterns) */
+    var th = 20;
+    function trunk(off, inset) {
+      g.beginPath();
+      g.moveTo(-10, 2 + off);
+      g.bezierCurveTo(w * 0.3, -3 + off, w * 0.7, 3 + off, w + 10, 0 + off);
+      g.bezierCurveTo(w + 16, th * 0.6 + off, w + 6, th + 4 + off, w - 10, th + 6 + off - inset);
+      g.bezierCurveTo(w * 0.65, th + 14 + off - inset, w * 0.35, th + 4 + off - inset, 6, th + 10 + off - inset);
+      g.bezierCurveTo(-8, th + 6 + off, -16, th * 0.4 + off, -10, 2 + off);
+      g.closePath();
+    }
+    g.save(); g.translate(8, 12); g.globalAlpha = 0.32; g.filter = "blur(5px)"; trunk(0, 0); g.fillStyle = "#120d0a"; g.fill(); g.restore();
+    /* hanging rootlets behind the trunk */
+    for (var r = 0; r < Math.round(w / 34); r++) {
+      var rx = 10 + rnd(i * 11 + r) * (w - 20), len = 30 + rnd(i * 7 + r) * 60, sway = (rnd(r + i) - 0.5) * 24;
+      g.strokeStyle = "rgba(38,28,22,0.9)"; g.lineWidth = 2.6 - rnd(r) * 1.2; g.lineCap = "round";
+      g.beginPath(); g.moveTo(rx, th); g.bezierCurveTo(rx + sway * 0.3, th + len * 0.4, rx + sway, th + len * 0.7, rx + sway * 0.8, th + len); g.stroke();
+      if (r % 2 === 0) {
+        var tx = rx + sway * 0.8, ty = th + len, gl = g.createRadialGradient(tx, ty, 0, tx, ty, 9);
+        gl.addColorStop(0, "rgba(190,240,255,0.85)"); gl.addColorStop(1, "rgba(120,200,255,0)");
+        g.fillStyle = gl; g.beginPath(); g.arc(tx, ty, 9, 0, 7); g.fill();
+      }
+    }
+    trunk(0, 0);
+    var bark = g.createLinearGradient(0, -2, 0, th + 12);
+    bark.addColorStop(0, "#7a5a3e"); bark.addColorStop(0.3, "#4a3424"); bark.addColorStop(1, "#160e0a");
+    g.fillStyle = bark; g.fill();
+    g.save(); g.clip();
+    for (var k = 0; k < Math.round(w / 40); k++) { /* knots and soft bark grain */
+      var kx = rnd(i * 19 + k) * w, ky = 8 + rnd(i * 37 + k) * 10;
+      var kg = g.createRadialGradient(kx, ky, 0, kx, ky, 10); kg.addColorStop(0, "rgba(20,12,8,0.55)"); kg.addColorStop(1, "rgba(20,12,8,0)");
+      g.fillStyle = kg; g.fillRect(kx - 10, ky - 10, 20, 20);
+    }
+    g.strokeStyle = "rgba(255,210,160,0.08)"; g.lineWidth = 1;
+    for (var s2 = 0; s2 < 4; s2++) { g.beginPath(); g.moveTo(-10, 6 + s2 * 4); g.bezierCurveTo(w * 0.3, 2 + s2 * 4, w * 0.7, 8 + s2 * 4, w + 10, 4 + s2 * 4); g.stroke(); }
+    g.restore();
+    rimAndMoss(g, w, i, "rgba(255,214,150,0.7)");
+  }
+  function rimAndMoss(g, w, i, rim) {
+    var rl = g.createLinearGradient(0, -4, 0, 6);
+    rl.addColorStop(0, "rgba(0,0,0,0)"); rl.addColorStop(0.5, rim); rl.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = rl; g.beginPath(); g.ellipse(w / 2, 1, w / 2 + 4, 3.2, 0, 0, 7); g.fill();
+    for (var m = 0; m < Math.round(w / 9); m++) {
+      var mx = rnd(i * 53 + m) * w, mh = 3 + rnd(i * 59 + m) * 6;
+      var mg = g.createLinearGradient(0, -mh, 0, 3); mg.addColorStop(0, "rgba(170,210,120,0.75)"); mg.addColorStop(1, "rgba(60,96,52,0.0)");
+      g.fillStyle = mg; g.beginPath(); g.ellipse(mx, 0, 3 + rnd(m + i * 2) * 5, mh, 0, 0, 7); g.fill();
+    }
+  }
+  function livingPlat(g, x, y, w, t, i, grove) {
+    var sway = reduced ? 0 : Math.sin(t * 0.9 + i) * 1.5; /* calm: a slow breath, no bob */
+    var spr = platSprite(platType(i, grove), w, i, grove);
+    g.drawImage(spr, 0, 0, spr.width, spr.height, x - PAD, y + sway - PAD, w + PAD * 2, DEPTH + PAD * 2);
   }
 
   function blobPath(g, rad, t, squash) {
@@ -402,6 +740,167 @@
     g.restore();
   }
 
+
+  /* Liquid chrome: one metaball field for both blobs + every splash drop,
+     shaded per cell with fresnel, the painted world reflected, and a soft key light. */
+  var liq = document.createElement("canvas"), lq = liq.getContext("2d");
+  var env = document.createElement("canvas"), eq = env.getContext("2d", { willReadFrequently: true });
+  function paintLiquid(g, t, src, dpr) {
+    var balls = [];
+    blobs.forEach(function (b, k) {
+      if (b.inv > 0 && Math.floor(t * 6) % 2 === 0) return;
+      balls.push({ x: b.x - cam, y: b.y, r: b.r * 1.05, sq: Math.max(0.6, b.squash), w: t * 2.2 + k * 1.7, fade: b.echo ? 0.82 : 1 });
+    });
+    drops.forEach(function (d) { if (d.a > 0.05) balls.push({ x: d.x - cam, y: d.y, r: d.r * 1.6 * Math.min(1, d.a * 1.6), sq: 1, w: 0, fade: 1 }); });
+    if (!balls.length) return;
+    /* CHROME2 · cluster balls that can touch and shade each cluster on its own tight grid, so three blobs spread
+       across the wall don't share one giant coarse grid (that was the blocky, flat-grey look). */
+    var par = balls.map(function (_, i) { return i; });
+    function root(i) { while (par[i] !== i) i = par[i] = par[par[i]]; return i; }
+    for (var bi = 0; bi < balls.length; bi++) for (var bj = bi + 1; bj < balls.length; bj++) {
+      var u = balls[bi], w2 = balls[bj];
+      if (Math.hypot(u.x - w2.x, u.y - w2.y) < (u.r + w2.r) * 2.4) par[root(bi)] = root(bj);
+    }
+    var groups = {};
+    balls.forEach(function (bb, i) { var r0 = root(i); (groups[r0] = groups[r0] || []).push(bb); });
+    Object.keys(groups).forEach(function (key) { paintLiquidGroup(g, t, src, dpr, groups[key]); });
+    g.save();
+    blobs.forEach(function (b) { if (!b.grounded) return; g.fillStyle = "rgba(0,0,0,0.35)"; g.beginPath(); g.ellipse(b.x - cam, b.y + b.r * 0.95, b.r * 0.8, b.r * 0.16, 0, 0, 7); g.fill(); });
+    g.restore();
+  }
+  function paintLiquidGroup(g, t, src, dpr, balls) {
+    var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    balls.forEach(function (b) { var m = b.r * 2.2; x0 = Math.min(x0, b.x - m); y0 = Math.min(y0, b.y - m); x1 = Math.max(x1, b.x + m); y1 = Math.max(y1, b.y + m); });
+    x0 = Math.max(-40, x0); y0 = Math.max(-40, y0); x1 = Math.min(view.w + 40, x1); y1 = Math.min(view.h + 40, y1);
+    if (!(x1 - x0 > 4 && y1 - y0 > 4)) return; /* group fully off-wall */
+    var C = Math.max(1 / Math.min(2, dpr), Math.sqrt((x1 - x0) * (y1 - y0) / 30000)); /* css px per cell, capped work */
+    var cw = Math.ceil((x1 - x0) / C), ch = Math.ceil((y1 - y0) / C);
+    if (cw < 2 || ch < 2) return;
+    var M = 24; /* env margin so reflections can look past the edge */
+    var ew = cw + 2 * Math.ceil(M / C), eh = ch + 2 * Math.ceil(M / C);
+    env.width = ew; env.height = eh;
+    try { eq.drawImage(src, (x0 - M) * dpr, (y0 - M) * dpr, ew * C * dpr, eh * C * dpr, 0, 0, ew, eh); } catch (e) {}
+    var ed = eq.getImageData(0, 0, ew, eh).data;
+    liq.width = cw; liq.height = ch;
+    var img = lq.createImageData(cw, ch), o = img.data;
+    var em = Math.ceil(M / C);
+    var lx = -0.45, ly = -0.7, lz = 0.55, ll = Math.hypot(lx, ly, lz); lx /= ll; ly /= ll; lz /= ll;
+    var tint = THEME.metal, tr = parseInt(tint.substr(1, 2), 16), tg = parseInt(tint.substr(3, 2), 16), tb = parseInt(tint.substr(5, 2), 16);
+    var FA = 1; /* SHARP1 perf: no per-call array; balls beyond 4r add < 0.07 and are skipped */
+    balls.forEach(function (b) { b.cut = b.r * b.r * 16; });
+    function field(px, py) {
+      var f = 0, fa = 0;
+      for (var i = 0; i < balls.length; i++) {
+        var b = balls[i], dx = (px - b.x) / b.sq, dy = (py - b.y) * b.sq;
+        if (dx * dx + dy * dy > b.cut) continue;
+        if (b.w) { var a = Math.atan2(dy, dx); var wob = 1 + 0.05 * Math.sin(a * 3 + b.w) + 0.025 * Math.sin(a * 5 - b.w * 1.3); dx /= wob; dy /= wob; }
+        var v = (b.r * b.r) / (dx * dx + dy * dy + 1);
+        f += v; fa += v * b.fade;
+      }
+      FA = fa / (f || 1);
+      return f;
+    }
+    for (var j = 0; j < ch; j++) {
+      for (var i = 0; i < cw; i++) {
+        var px = x0 + (i + 0.5) * C, py = y0 + (j + 0.5) * C;
+        var f = field(px, py), fade = FA;
+        var k = (j * cw + i) * 4;
+        if (f < 0.85) { o[k + 3] = 0; continue; }
+        var fx = field(px + C, py) - field(px - C, py);
+        var fy = field(px, py + C) - field(px, py - C);
+        var gl = Math.hypot(fx, fy) + 1e-6;
+        var edge = Math.min(1, (f - 0.85) / 0.9); /* 0 at rim, 1 deep inside */
+        var nz = Math.sqrt(edge) ;
+        var s2 = Math.sqrt(Math.max(0, 1 - nz * nz));
+        var nx = -fx / gl * s2, ny = -fy / gl * s2;
+        /* CHROME2 · mirror chrome: the bent normal looks into the painted world (env), upper hemisphere reads sky,
+           a crisp dark horizon band splits it, lower hemisphere goes dark with a warm ground bounce, bright fresnel rim,
+           and a hard key spec + soft secondary. Contrast is what sells metal; flat grey reads as plastic. */
+        var rx = Math.round(i + em + nx * 22 / C), ry = Math.round(j + em + ny * 22 / C - (1 - nz) * 8 / C);
+        rx = rx < 0 ? 0 : rx >= ew ? ew - 1 : rx; ry = ry < 0 ? 0 : ry >= eh ? eh - 1 : ry;
+        var e = (ry * ew + rx) * 4;
+        var er = ed[e] / 255, eg = ed[e + 1] / 255, eb = ed[e + 2] / 255;
+        var lum = er * 0.3 + eg * 0.55 + eb * 0.15;
+        var hz = ny - 0.22 + 0.04 * Math.sin(t * 0.9 + px * 0.02); /* horizon wobbles slowly with the liquid */
+        var up = hz < 0 ? Math.min(1, -hz * 2.2) : 0, down = hz > 0 ? Math.min(1, hz * 2.4) : 0;
+        var line = Math.exp(-Math.pow(hz / 0.035, 2));
+        /* studio chrome: bright cool sky above the horizon, dark warm ground below, env mixed in for the world */
+        var sr, sg, sb;
+        if (hz < 0) { sr = 0.92 - up * 0.25; sg = 0.95 - up * 0.15; sb = 1.0; }
+        else { var dd = Math.min(1, down * 1.6); sr = 0.42 - dd * 0.32; sg = 0.38 - dd * 0.29; sb = 0.36 - dd * 0.28; }
+        var em2 = 0.5;
+        var cr = sr * (1 - em2) + er * em2 * (hz < 0 ? 1.1 : 0.6), cg = sg * (1 - em2) + eg * em2 * (hz < 0 ? 1.1 : 0.6), cb = sb * (1 - em2) + eb * em2 * (hz < 0 ? 1.1 : 0.6);
+        cr *= 1 - line * 0.8; cg *= 1 - line * 0.8; cb *= 1 - line * 0.75;  /* chrome horizon */
+        var fres = Math.pow(1 - nz, 2.5);
+        cr += fres * 0.75; cg += fres * 0.8; cb += fres * 0.9;
+        var dl = nx * lx + ny * ly + nz * lz;
+        var spec = Math.pow(Math.max(0, dl), 90) * 2.2 + Math.pow(Math.max(0, dl), 12) * 0.25;
+        var spec2 = Math.pow(Math.max(0, -nx * 0.6 + ny * 0.5 + nz * 0.62), 40) * 0.5;
+        cr += spec + spec2; cg += spec + spec2; cb += spec + spec2 * 1.1;
+        o[k] = Math.min(255, cr * tr * 1.02);
+        o[k + 1] = Math.min(255, cg * tg * 1.02);
+        o[k + 2] = Math.min(255, cb * tb * 1.04);
+        o[k + 3] = Math.round(255 * Math.min(1, (f - 0.85) / 0.12) * fade);
+      }
+    }
+    lq.putImageData(img, 0, 0);
+    g.save();
+    g.imageSmoothingEnabled = true;
+    g.drawImage(liq, 0, 0, cw, ch, x0, y0, cw * C, ch * C);
+    g.restore();
+  }
+
+  /* POWERUPS2 · power-ups live in the world: double jump = a pair of soft spirit-light wings riding the blob
+     (they flare on the second jump); drop magnet = three warm motes orbiting slowly. No text on screen. */
+  function paintPowers(g, t) {
+    g.save();
+    g.globalCompositeOperation = "lighter";
+    blobs.forEach(function (b, k) {
+      if (b.inv > 0 && Math.floor(t * 6) % 2 === 0) return;
+      var pw = b.pw || {}, x = b.x - cam, y = b.y, r = b.r;
+      if (pw.dbl) {
+        var flare = b.air2 ? 1 : 0.55 + 0.15 * Math.sin(t * 1.6 + k);
+        var halo = g.createRadialGradient(x, y, r * 0.6, x, y, r * 2.4);
+        halo.addColorStop(0, "rgba(140,230,255," + (0.22 * flare) + ")"); halo.addColorStop(1, "rgba(140,230,255,0)");
+        g.fillStyle = halo; g.beginPath(); g.arc(x, y, r * 2.4, 0, 7); g.fill();
+        for (var sd = -1; sd <= 1; sd += 2) {
+          var flap = Math.sin(t * 2.2 + k) * 0.18;
+          g.save(); g.translate(x + sd * r * 0.85, y - r * 0.15); g.scale(sd, 1); g.rotate(-0.35 - flap);
+          var wg = g.createLinearGradient(0, 0, r * 1.5, -r * 0.6);
+          wg.addColorStop(0, "rgba(200,245,255," + (0.85 * flare) + ")"); wg.addColorStop(1, "rgba(120,210,255,0)");
+          g.fillStyle = wg;
+          g.beginPath(); g.moveTo(0, 0);
+          g.quadraticCurveTo(r * 0.7, -r * 1.25, r * 1.6, -r * 0.85);
+          g.quadraticCurveTo(r * 0.9, -r * 0.45, r * 1.35, -r * 0.2);
+          g.quadraticCurveTo(r * 0.6, -r * 0.1, 0, 0);
+          g.fill(); g.restore();
+        }
+      }
+      if (pw.magnet) {
+        for (var m = 0; m < 3; m++) {
+          var an = t * 0.9 + m * 2.094 + k, ox2 = x + Math.cos(an) * r * 1.7, oy2 = y + Math.sin(an) * r * 0.75 - r * 0.2;
+          var mg = g.createRadialGradient(ox2, oy2, 0, ox2, oy2, r * 0.55);
+          mg.addColorStop(0, "rgba(255,240,190,0.95)"); mg.addColorStop(0.3, "rgba(255,200,110,0.5)"); mg.addColorStop(1, "rgba(255,170,60,0)");
+          g.fillStyle = mg; g.beginPath(); g.arc(ox2, oy2, r * 0.55, 0, 7); g.fill();
+        }
+      }
+    });
+    g.restore();
+  }
+
+  /* PUSHIN1 · ?demo=1 only: a slow push-in on the host blob (1.0 → 1.32 over ~9 s), origin eased so it glides. */
+  var zoom = { z: 1, ox: null, oy: null };
+  function pushIn(t, dt) {
+    var goal = 1 + 0.32 * Math.min(1, Math.max(0, (t - 1) / 9));
+    zoom.z += (goal - zoom.z) * Math.min(1, dt * 1.5);
+    var hx = A.x - cam, hy = A.y;
+    if (zoom.ox == null) { zoom.ox = hx; zoom.oy = hy; }
+    zoom.ox += (hx - zoom.ox) * Math.min(1, dt * 1.2);
+    zoom.oy += (hy - zoom.oy) * Math.min(1, dt * 0.8);
+    cv.style.transformOrigin = zoom.ox.toFixed(1) + "px " + zoom.oy.toFixed(1) + "px";
+    cv.style.transform = "scale(" + zoom.z.toFixed(4) + ")";
+  }
+
   function paintBridge(g, t) {
     var dx = (A.x - B.x), dy = (A.y - B.y);
     var dist = Math.hypot(dx, dy);
@@ -422,24 +921,23 @@
     var now = performance.now();
     var t = (now - t0) / 1000;
     var dt = reduced ? 1 / 60 : Math.min(0.033, (frame.l ? (now - frame.l) / 1000 : 1 / 60));
+    if (frame.l && playing) adapt(now - frame.l);
     frame.l = now;
     var W = view.w, H = view.h;
     var ids = Object.keys(pointers);
-    var inA = null, inB = null;
-    ids.forEach(function (id) {
-      if (pointers[id].blob === 0) inA = pointers[id];
-      else inB = pointers[id];
-    });
-    B.echo = !inB;
-    stepBlob(A, dt, t, inA);
-    stepBlob(B, dt, t, inB);
+    var ins = blobs.map(function () { return null; });
+    ids.forEach(function (id) { var k = Math.min(blobs.length - 1, pointers[id].blob); ins[k] = pointers[id]; });
+    blobs.forEach(function (b, k) { if (k > 0) b.echo = !ins[k]; stepBlob(b, dt, t, ins[k]); });
     stepDrops(dt);
-    if (!won && A.x > goalX + 20 && B.x > goalX + 20 && A.grounded && B.grounded) {
-      won = true; tone("grove"); burst((A.x + B.x) / 2, A.y, 30, "#fff");
-    }
-    var mid = (A.x + B.x) / 2;
-    var aim = mid - W * 0.38;
-    cam += (aim - cam) * (reduced ? 1 : 0.08);
+    var mid = 0, home = !won;
+    blobs.forEach(function (b) { mid += b.x / blobs.length; if (!(b.x > goalX + 20 && b.grounded)) home = false; });
+    if (home) { won = true; tone("grove"); burst(mid, A.y, 30, "#fff"); }
+    var aim = (A.x * 0.8 + mid * 0.2) - W * 0.4; /* CAM2: favor the host blob so it never leaves frame */
+    cam += (aim - cam) * (reduced ? 1 : 0.05);
+    /* CAM2: soft keep-in — never let the host blob drift out of the middle 70% (eased, no snap) */
+    var hx = A.x - cam;
+    if (hx < W * 0.15) cam -= (W * 0.15 - hx) * 0.12;
+    if (hx > W * 0.85) cam += (hx - W * 0.85) * 0.12;
     cam = Math.max(0, cam);
     shake *= 0.86;
     ox.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
@@ -447,30 +945,28 @@
     paintWorld(ox, t, W, H);
     ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
-    if (!reduced && shake > 0.4) ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
-    else shake = 0;
+    shake = 0; /* calm: no camera jitter (Dan 10/12 rejected aggressive motion) */
     ctx.drawImage(off, 0, 0, off.width, off.height, 0, 0, W, H);
-    paintBlob(ctx, A, t);
-    paintBlob(ctx, B, t);
-    paintBridge(ctx, t);
-    drops.forEach(function (d) {
-      ctx.globalAlpha = Math.max(0, d.a);
-      ctx.fillStyle = d.c;
-      ctx.beginPath(); ctx.ellipse(d.x - cam, d.y, d.r, d.r * 1.4, 0, 0, 7); ctx.fill();
-    });
-    ctx.globalAlpha = 1;
+    if (LIQUID) paintLiquid(ctx, t, off, view.dpr);
+    else {
+      blobs.forEach(function (b) { paintBlob(ctx, b, t); });
+      paintBridge(ctx, t);
+      drops.forEach(function (d) {
+        ctx.globalAlpha = Math.max(0, d.a);
+        ctx.fillStyle = d.c;
+        ctx.beginPath(); ctx.ellipse(d.x - cam, d.y, d.r, d.r * 1.4, 0, 0, 7); ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+    }
+    paintPowers(ctx, t);
+    if (A.auto) pushIn(t, dt);
     if (playing && !document.hidden) requestAnimationFrame(frame);
   }
 
   function assignPointer(e) {
     var rec = cv.getBoundingClientRect();
     var x = e.clientX - rec.left, y = e.clientY - rec.top;
-    var blob = 0;
-    var used = {};
-    Object.keys(pointers).forEach(function (id) { used[pointers[id].blob] = 1; });
-    if (used[0] && !used[1]) blob = 1;
-    else if (!used[0]) blob = 0;
-    else blob = x > view.w * 0.5 ? 1 : 0;
+    var blob = Math.max(0, Math.min(blobs.length - 1, Math.floor(x / (view.w / blobs.length)))); /* the kid's own zone */
     pointers[e.pointerId] = { x: x, y: y, blob: blob, ly: y, jump: false };
     try { cv.setPointerCapture(e.pointerId); } catch (err) {}
     if (window.HouseSfx && HouseSfx.unlockAudio) HouseSfx.unlockAudio();
@@ -495,8 +991,8 @@
     if (p) {
       var rec = cv.getBoundingClientRect();
       if (p.ly - (e.clientY - rec.top) > 18) p.jump = true;
-      var b = p.blob === 0 ? A : B;
-      if (p.jump) b.want = 0.14;
+      var b = blobs[Math.min(blobs.length - 1, p.blob)];
+      if (p.jump) { b.want = 0.14; b.press = true; }
     }
     delete pointers[e.pointerId];
   }
@@ -506,10 +1002,10 @@
   window.addEventListener("keydown", function (e) {
     if (e.key === "ArrowRight" || e.key === "d") A.vx += 40;
     if (e.key === "ArrowLeft" || e.key === "a") A.vx -= 40;
-    if (e.key === "ArrowUp" || e.key === "w" || e.key === " ") A.want = 0.12;
+    if (e.key === "ArrowUp" || e.key === "w" || e.key === " ") { A.want = 0.12; A.press = true; }
     if (e.key === "l") B.vx += 40;
     if (e.key === "j") B.vx -= 40;
-    if (e.key === "i") { B.echo = false; B.want = 0.12; }
+    if (e.key === "i") { B.echo = false; B.want = 0.12; B.press = true; }
   });
 
   function ambience() {
@@ -530,7 +1026,9 @@
 
   function showPlay() {
     playing = true;
-    ui.innerHTML = '<div class="hud"><a href="' + THEME.back + '">Back</a><span></span></div><div class="hint">One hand to roll and flick upward. A second hand wakes the other drop.</div>';
+    setTimeout(refreshPowers, 0);
+    setInterval(refreshPowers, 30000); /* a chore closed mid-run lights its power-up within half a minute */
+    ui.innerHTML = '<div class="hud"><a href="' + THEME.back + '">Back</a><span></span></div><div class="hint">Each of you has a part of the wall. Roll in your part, flick up to jump.</div><div class="zones">' + blobs.map(function (b) { return '<div class="zone"><span>' + NAMES[b.kid] + '</span></div>'; }).join("") + '</div>';
     resize();
     frame();
     setTimeout(function () {
@@ -542,7 +1040,7 @@
   function winWatch() {
     var note = document.createElement("div");
     note.className = "gather";
-    note.innerHTML = '<p style="font-size:28px;font-weight:700;text-shadow:0 0 18px #fff">The grove holds both.</p><a href="' + THEME.back + '">Back</a>';
+    note.innerHTML = '<p style="font-size:28px;font-weight:700;text-shadow:0 0 18px #fff">The grove holds everyone.</p><a href="' + THEME.back + '">Back</a>';
     ui.appendChild(note);
   }
 
@@ -565,6 +1063,7 @@
     window.addEventListener("resize", resize);
     A.x = spawn.x; A.y = GY(plats[0].y) - 40; A.cp = { x: A.x, y: A.y };
     B.x = spawn.x + 36; B.y = A.y; B.cp = { x: B.x, y: B.y };
+    C.x = spawn.x + 72; C.y = A.y; C.cp = { x: C.x, y: C.y };
     if (!st.full) {
       showGather();
       ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
@@ -695,6 +1194,7 @@
   }
 
   window.MercuryRun = {
+    debug: function () { return { A: [A.x, A.y, A.r], B: [B.x, B.y], cam: cam, drops: drops.length, view: view, pw: allBlobs().map(function (b) { return [b.kid, b.pw]; }), air2: allBlobs().map(function (b) { return !!b.air2; }), gathers: gatherLog.slice(), won: won, xs: allBlobs().map(function (b) { return Math.round(b.x); }) }; },
     exportFrame: exportFrame,
     platesReady: function () { return runPlatesReady && !!runPlates.sky; }
   };

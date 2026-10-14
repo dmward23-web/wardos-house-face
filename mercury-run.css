@@ -25,3 +25,18 @@ html, body { margin: 0; height: 100%; background: #070b10; color: #f4fbff; overf
 .je-host { width: min(280px, 70vw); height: 320px; }
 .hint { position: absolute; bottom: max(16px, env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center; opacity: 0.7; font-size: 14px; letter-spacing: 0.04em; }
 @media (prefers-reduced-motion: reduce) { .hint { opacity: 0.85; } }
+/* POWERUPS1 · quiet chips, no counts */
+.hud .pw { font-style: normal; margin: 0 10px; opacity: .9; font-size: 14px; }
+.hud .pw em { font-style: normal; padding: 2px 8px; border-radius: 10px; margin-left: 4px; }
+.hud .pw em.on { background: rgba(255,236,190,.18); color: #fff3d6; }
+.hud .pw em.off { opacity: .38; }
+.hud .fixture { background: #6a4a10; color: #ffe2a0; padding: 2px 8px; border-radius: 6px; font-size: 12px; letter-spacing: .08em; }
+/* COOP1 · one quiet zone per kid along the bottom of the wall */
+.zones { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; display: flex; pointer-events: none; }
+.zones .zone { flex: 1; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 14px; border-left: 1px solid rgba(255,255,255,.07); }
+.zones .zone:first-child { border-left: 0; }
+.zones .zone span { font-size: 15px; color: rgba(255,248,230,.55); text-shadow: 0 0 10px rgba(0,0,0,.6); }
+.hint { bottom: 76px; }
+
+/* POWERUPS2 · power-ups are drawn in-world; the old text pills stay in the DOM for a11y only */
+.hud .pw { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
