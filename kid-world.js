@@ -1737,6 +1737,8 @@
     burstAt = feed.t0;
     if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap();
     if (global.JarEngine && JarEngine.tone) JarEngine.tone("gulp");
+    /* LOOT1 · tell an optional per-kid overlay (hayes-loot.js) a chore just dropped. Never blocks the tap. */
+    try { document.dispatchEvent(new CustomEvent("kw:feed", { detail: { index: idx, x: ev.clientX, y: ev.clientY, label: q.label } })); } catch (e) {}
   }
 
   function goHome(x, y) {
@@ -2054,6 +2056,7 @@
     exportFrame: exportFrame,
     exportCalendar: exportCalendar,
     paintWorld: paintWorld,
+    hits: function () { return bg ? { hits: bg.hits || [], cv: bg.cv } : null; }, /* LOOT1 · read-only */
     platesReady: function () {
       var id = (document.body && document.body.getAttribute("data-kid")) || "hayes";
       return platesReady && !!(plates[id] && plates[id].sky);
