@@ -1,7 +1,7 @@
 {
   "asOf": "Tue Oct 13 2026",
   "asOfIso": "2026-10-13",
-  "refreshedAt": "2026-10-14T01:49:47.430Z",
+  "refreshedAt": "2026-10-14T02:09:43.244Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -435,18 +435,6 @@
           "what": "SRE specials: Art",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Tue 20 · All day",
-          "what": "SRE fall conferences (Lind)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 20 · 7:00",
-          "what": "SRE specials: Spanish",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": []
@@ -702,18 +690,6 @@
           "what": "SRE specials: PE (tennis shoes)",
           "tone": "act",
           "hint": ""
-        },
-        {
-          "when": "Tue 20 · All day",
-          "what": "SRE fall conferences (Allen · Room B8)",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 20 · 7:00",
-          "what": "SRE specials: Art",
-          "tone": "act",
-          "hint": ""
         }
       ],
       "appointments": []
@@ -899,12 +875,6 @@
         {
           "when": "Thu 15 · 3:50",
           "what": "LKMS Homework Help · 3:00–4:00 · pickup 4:00",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Tue 20 · All day",
-          "what": "LKMS Outsiders Day (Greaser or Soc dress-up)",
           "tone": "act",
           "hint": ""
         }
