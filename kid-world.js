@@ -470,7 +470,34 @@
     ctx.fill();
     ctx.restore();
   }
+  /* CALLOUT1 · a board page may define window.KidCallouts { short label: [title, plain subtitle] }.
+     Big playful title, small plain chore underneath. Boards without it are unchanged. */
+  function drawCallout(ctx, q, co) {
+    var maxW = 124;
+    ctx.font = "800 15px " + SANS;
+    var lines = wrapLines(ctx, co[0], maxW);
+    if (lines.length > 2) lines = [lines[0], lines.slice(1).join(" ")];
+    ctx.font = "600 11.5px " + SANS;
+    var subW = ctx.measureText(co[1]).width, tw = subW;
+    ctx.font = "800 15px " + SANS;
+    for (var j = 0; j < lines.length; j++) tw = Math.max(tw, ctx.measureText(lines[j]).width);
+    q.hw = Math.max(40, tw + 16);
+    q.hh = lines.length * 18 + 16 + 6;
+    var vw = ctx.canvas.width / Math.max(1, (bg && bg.dpr) || 1);
+    var lx = clamp(q.x, q.hw / 2 + 4, vw - q.hw / 2 - 4); q.labelX = lx;   /* never off the phone edge */
+    paintLabelPlate(ctx, lx, q.y, q.hw, q.hh);
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    var top = q.y - q.hh / 2 + 3 + 9;
+    for (var k = 0; k < lines.length; k++) {
+      ctx.fillStyle = "rgba(255, 246, 228, 0.98)"; ctx.font = "800 15px " + SANS;
+      ctx.fillText(lines[k], lx, top + k * 18);
+    }
+    ctx.font = "600 11.5px " + SANS; ctx.fillStyle = "rgba(214, 230, 236, 0.92)";
+    ctx.fillText(co[1], lx, top + lines.length * 18 + 1);
+  }
   function drawLight(ctx, q) {
+    var co = global.KidCallouts && global.KidCallouts[q.chip || shortLabel(q.label)];
+    if (co) { ctx.save(); drawCallout(ctx, q, co); ctx.restore(); return; }
     ctx.save();
     var size = 16;
     var maxW = q.maxW || 132;
@@ -1676,7 +1703,7 @@
       var hw = (q.hw || 80) / 2 + 8;
       var hh = (q.hh || 36) / 2 + 8;
       var cy = q.chipY != null ? q.chipY : q.y;
-      if (Math.abs(q.x - x) <= hw && Math.abs(cy - y) <= hh) return q;
+      if (Math.abs((q.labelX != null ? q.labelX : q.x) - x) <= hw && Math.abs(cy - y) <= hh) return q;
     }
     return null;
   }

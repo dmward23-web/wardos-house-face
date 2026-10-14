@@ -36,23 +36,22 @@
     W = global.innerWidth || 440; H = global.innerHeight || 800;
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   }
-  /* Painted sprites: Prism's folder wins if present, else ours (art/hayes-loot/). */
-  var ART = {}, dpx = (global.devicePixelRatio || 1) > 1.4 ? "@2x" : "";
-  var PRISM = "art/hayes-loot/prism/";
-  var HAS_PRISM = global.HAYES_LOOT_PRISM || [];   /* names Prism has delivered (art/hayes-loot/prism.js) */
-  function loadArt(name) {
-    function tryLoad(list) {
-      if (!list.length) return;
-      var im = new Image();
-      im.onload = function () { ART[name] = im; };
-      im.onerror = function () { tryLoad(list.slice(1)); };
-      im.src = list[0];
-    }
-    var list = ["art/hayes-loot/" + name + dpx + ".png", "art/hayes-loot/" + name + ".png"];
-    if (HAS_PRISM.indexOf(name) >= 0) list.unshift(PRISM + name + dpx + ".png", PRISM + name + ".png");
-    tryLoad(list);
+  /* Painted layers + sprites (Prism, art/hayes-loot/1x|2x). Missing art just skips its layer. */
+  var ART = {}, DIR = "art/hayes-loot/" + ((global.devicePixelRatio || 1) > 1.4 ? "2x/" : "1x/");
+  ["glider", "card-common", "card-uncommon", "card-rare", "card-epic", "card-legendary",
+   "beam-common", "beam-uncommon", "beam-rare", "beam-epic", "beam-legendary",
+   "particles-far", "particles-mid", "particles-near", "fog-mid", "fog-low", "light-shafts",
+   "fg-left", "fg-right", "fg-bottom", "victory-rays", "victory-burst", "victory-confetti-strip"
+  ].forEach(function (n) { var im = new Image(); im.onload = function () { ART[n] = im; }; im.src = DIR + n + ".png"; });
+  /* 1x design sizes from Prism's README */
+  var SZ = { glider: [240, 192, 120, 131], card: [240, 84], beam: [112, 176, 56, 160] };
+  function cover(name, alpha, blend, ox, oy, extra) {
+    var im = ART[name]; if (!im) return;
+    var k = Math.max(W / 1280, H / 800) * (extra || 1.06), w = 1280 * k, h = 800 * k;
+    ctx.save(); ctx.globalAlpha = alpha; if (blend) ctx.globalCompositeOperation = blend;
+    ctx.drawImage(im, (W - w) / 2 + (ox || 0), (H - h) / 2 + (oy || 0), w, h);
+    ctx.restore();
   }
-  ["glider", "card-common", "card-uncommon", "card-rare", "card-epic", "card-legendary"].forEach(loadArt);
   var t0 = performance.now();
   function now() { return (performance.now() - t0) / 1000; }
   var pops = [];          /* loot moments */
@@ -133,31 +132,11 @@
     }
     ctx.restore();
   }
-  function beam(x, y, tier, t, i, boost) {
-    var rgb = TIERS[tier].rgb;
-    var h = 70 + (tier === "legendary" ? 26 : tier === "epic" ? 14 : 0);
-    var a = (0.5 + 0.12 * Math.sin(t * 1.1 + i * 1.7)) * (boost || 1);
-    ctx.save();
-    ctx.globalCompositeOperation = "lighter";
-    var g = ctx.createLinearGradient(0, y - h, 0, y);
-    g.addColorStop(0, "rgba(" + rgb + ",0)");
-    g.addColorStop(0.7, "rgba(" + rgb + "," + (a * 0.8).toFixed(3) + ")");
-    g.addColorStop(1, "rgba(" + rgb + "," + a.toFixed(3) + ")");
-    ctx.fillStyle = g;
-    var w = 12;
-    ctx.beginPath(); ctx.moveTo(x - w, y); ctx.lineTo(x - w * 0.4, y - h); ctx.lineTo(x + w * 0.4, y - h); ctx.lineTo(x + w, y); ctx.closePath(); ctx.fill();
-    var e = ctx.createRadialGradient(x, y + 2, 2, x, y + 2, 42);
-    e.addColorStop(0, "rgba(" + rgb + "," + (a * 1.3).toFixed(3) + ")");
-    e.addColorStop(1, "rgba(" + rgb + ",0)");
-    ctx.fillStyle = e; ctx.beginPath(); ctx.ellipse(x, y + 4, 44, 14, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "rgba(255,255,255," + (a * 0.35).toFixed(3) + ")";
-    ctx.beginPath(); ctx.moveTo(x - 2.5, y); ctx.lineTo(x - 1, y - h * 0.9); ctx.lineTo(x + 1, y - h * 0.9); ctx.lineTo(x + 2.5, y); ctx.closePath(); ctx.fill();
-    /* two lazy rising sparks */
-    for (var s = 0; s < 2; s++) {
-      var p = ((t * 0.35 + i * 0.37 + s * 0.5) % 1);
-      ctx.fillStyle = "rgba(" + rgb + "," + ((1 - p) * 0.7).toFixed(3) + ")";
-      ctx.beginPath(); ctx.arc(x + Math.sin(p * 6 + i + s) * 5, y - p * h, 2.2, 0, Math.PI * 2); ctx.fill();
-    }
+  function beam(x, y, tier, t, i) {
+    var im = ART["beam-" + tier]; if (!im) return;
+    var k = 0.62, a = 0.82 + 0.18 * Math.sin(t * 1.1 + i * 1.7);
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = a;
+    ctx.drawImage(im, x - SZ.beam[2] * k, y - SZ.beam[3] * k, SZ.beam[0] * k, SZ.beam[1] * k);
     ctx.restore();
   }
   function glider(t) {
@@ -180,7 +159,8 @@
     var im = ART.glider;
     if (!im) return;
     ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x, y); ctx.rotate(tilt); ctx.scale(sc, sc);
-    ctx.drawImage(im, -64, -87, 128, 124);
+    var gk = 0.62;   /* 240px art -> ~150px on a phone, then grows as it nears */
+    ctx.drawImage(im, -SZ.glider[2] * gk, -SZ.glider[3] * gk, SZ.glider[0] * gk, SZ.glider[1] * gk);
     ctx.restore();
   }
 
@@ -215,59 +195,55 @@
     var age = t - p.t0; if (age < 0.15 || age > 2.4) return;
     var a = Math.min(1, (age - 0.15) / 0.2) * Math.min(1, (2.4 - age) / 0.4);
     var rise = (1 - Math.min(1, (age - 0.15) / 0.3)) * 14;
-    var w = 232, h = 74, cxc = Math.min(W - w / 2 - 6, W * 0.68), x = cxc - w / 2, y = H * 0.76 + rise;
+    var w = 240, h = 84, cxc = Math.min(W - w / 2 - 2, W * 0.68), x = cxc - w / 2, y = H * 0.755 + rise;
     var im = ART["card-" + p.tier];
     ctx.save(); ctx.globalAlpha = a;
     if (im) ctx.drawImage(im, x, y, w, h);
-    else { ctx.fillStyle = "rgba(16,32,42,.9)"; roundRect(x + 6, y + 6, w - 12, h - 12, 18); ctx.fill(); }
-    ctx.textAlign = "center"; ctx.fillStyle = "#fff";
-    ctx.shadowColor = "rgba(0,0,0,.65)"; ctx.shadowBlur = 6;
-    ctx.font = "900 12px system-ui, sans-serif";
-    ctx.fillStyle = "rgba(" + TIERS[p.tier].rgb + ",1)";
-    ctx.fillText(TIERS[p.tier].name + " LOOT", x + 128 + 8, y + 29);
-    ctx.font = "800 19px system-ui, sans-serif"; ctx.fillStyle = "#fffaf0";
-    ctx.fillText(p.label, x + 128 + 8, y + 53);
+    else { ctx.fillStyle = "rgba(16,32,42,.9)"; roundRect(x + 21, y + 21, 198, 42, 10); ctx.fill(); }
+    var tx = x + 21 + 99;
+    ctx.textAlign = "center"; ctx.shadowColor = "rgba(0,0,0,.75)"; ctx.shadowBlur = 5;
+    ctx.font = "900 11px system-ui, sans-serif"; ctx.fillStyle = "rgba(" + TIERS[p.tier].rgb + ",1)";
+    ctx.fillText(TIERS[p.tier].name + " LOOT", tx, y + 21 + 14);
+    ctx.font = "800 16px system-ui, sans-serif"; ctx.fillStyle = "#fffaf0";
+    ctx.fillText(p.label, tx, y + 21 + 34);
     ctx.restore();
   }
-
   function victory(t) {
     if (victoryAt < 0) return;
-    var age = t - victoryAt; if (age > 5.2) { victoryAt = -1; victoryCy = null; return; }
-    var a = Math.min(1, age / 0.35) * Math.min(1, (5.2 - age) / 0.6);
+    var age = t - victoryAt; if (age < 0) return;
+    if (age > 5.6) { victoryAt = -1; victoryCy = null; return; }
+    if (victoryCy == null) victoryCy = victoryY();
+    var a = Math.min(1, age / 0.35) * Math.min(1, (5.6 - age) / 0.7);
+    var cx = W / 2, cy = victoryCy;
     ctx.save();
     ctx.fillStyle = "rgba(20, 10, 40," + (0.35 * a).toFixed(3) + ")"; ctx.fillRect(0, 0, W, H);
-    if (victoryCy == null) victoryCy = victoryY();
-    var cx = W / 2, cy = victoryCy;
-    ctx.globalCompositeOperation = "lighter";
-    for (var k = 0; k < 14; k++) {
-      var ang = k / 14 * Math.PI * 2 + age * 0.12;
-      ctx.fillStyle = "rgba(255, 200, 90," + (0.12 * a).toFixed(3) + ")";
-      ctx.beginPath(); ctx.moveTo(cx, cy);
-      ctx.arc(cx, cy, Math.max(W, H), ang, ang + 0.12); ctx.closePath(); ctx.fill();
-    }
-    for (var c = 0; c < 46; c++) {
-      var cxp = (c * 97.3 % W), fall = ((age * (70 + c % 7 * 18)) + c * 31) % (H + 40) - 20;
-      var hue = ["255,184,60", "196,110,255", "80,170,255", "96,224,120"][c % 4];
-      ctx.fillStyle = "rgba(" + hue + "," + (0.85 * a).toFixed(3) + ")";
-      ctx.save(); ctx.translate(cxp + Math.sin(age * 2 + c) * 12, fall); ctx.rotate(age * 3 + c); ctx.fillRect(-4, -2, 8, 4); ctx.restore();
-    }
+    var R = ART["victory-rays"], B = ART["victory-burst"], C = ART["victory-confetti-strip"];
+    ctx.globalCompositeOperation = "screen";
+    if (R) { ctx.save(); ctx.globalAlpha = (0.6 + 0.2 * Math.sin(age * 1.4)) * a; ctx.translate(cx, cy); ctx.rotate(age * 0.12);
+      var rs = Math.max(W, H) * 1.3; ctx.drawImage(R, -rs / 2, -rs / 2, rs, rs); ctx.restore(); }
+    if (B) { var bp = Math.min(1, age / 0.5), bs = 300 * (0.6 + 0.4 * bp) * (1 + 0.04 * Math.sin(age * 3));
+      ctx.globalAlpha = a * (age < 0.5 ? 1 : 0.85); ctx.drawImage(B, cx - bs / 2, cy - bs / 2, bs, bs); }
     ctx.globalCompositeOperation = "source-over";
+    if (C) { var fr = Math.floor(age * 8) % 8;
+      for (var c = 0; c < 9; c++) {
+        var cxp = (c % 3) * W / 3 + (c * 37 % 50), cyp = ((age * (60 + c * 9) + c * 140) % (H + 200)) - 160;
+        ctx.globalAlpha = a; ctx.drawImage(C, fr * 256, 0, 256, 256, cxp - 40, cyp, 170, 170);
+      } }
+    ctx.restore();
+    ctx.save();
     var s = 0.8 + 0.2 * Math.min(1, age / 0.4) + (age < 0.6 ? Math.sin(age / 0.6 * Math.PI) * 0.08 : 0);
-    ctx.translate(cx, cy); ctx.scale(s, s); ctx.globalAlpha = a;
-    ctx.textAlign = "center";
-    ctx.font = "900 26px system-ui, sans-serif"; ctx.fillStyle = "#fff4d6";
+    ctx.translate(cx, cy); ctx.scale(s, s); ctx.globalAlpha = a; ctx.textAlign = "center";
+    ctx.font = "900 24px system-ui, sans-serif"; ctx.fillStyle = "#fff4d6";
     ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 10;
-    ctx.fillText("#1", 0, -44);
-    var g = ctx.createLinearGradient(0, -34, 0, 14);
+    ctx.fillText("#1", 0, -40);
+    var g = ctx.createLinearGradient(0, -30, 0, 12);
     g.addColorStop(0, "#fff3b0"); g.addColorStop(0.5, "#ffc23a"); g.addColorStop(1, "#e07a10");
-    ctx.font = "900 italic 58px system-ui, sans-serif"; ctx.fillStyle = g;
+    ctx.font = "900 italic 52px system-ui, sans-serif"; ctx.fillStyle = g;
     ctx.lineWidth = 6; ctx.strokeStyle = "#3a1a60"; ctx.strokeText("VICTORY!", 0, 8); ctx.fillText("VICTORY!", 0, 8);
-    ctx.font = "800 18px system-ui, sans-serif"; ctx.fillStyle = "#fff"; ctx.shadowBlur = 8;
-    ctx.fillText("All loot secured · jar full", 0, 42);
+    ctx.font = "800 16px system-ui, sans-serif"; ctx.fillStyle = "#fff"; ctx.shadowBlur = 8;
+    ctx.fillText("All loot secured · jar full", 0, 36);
     ctx.restore();
   }
-
-  /* the banner sits in the widest chest-free horizontal band between the HUD and the week strip */
   function victoryY() {
     var info = global.KidWorld && KidWorld.hits && KidWorld.hits();
     var occ = [];
@@ -295,42 +271,18 @@
       DUST.push({ x: Math.random(), y: Math.random(), z: z, sp: 0.004 + Math.random() * 0.01, ph: Math.random() * 6.28 });
     }
   })();
-  function air(t) {
-    var ox = tilt.x * 10, oy = tilt.y * 6;
-    ctx.save(); ctx.globalCompositeOperation = "lighter";
-    /* light shafts from upper right, breathing */
-    for (var k = 0; k < 3; k++) {
-      var sx = W * (0.62 + k * 0.16) + Math.sin(t * 0.07 + k) * 18 + ox * 0.4;
-      var a = 0.05 + 0.03 * Math.sin(t * 0.21 + k * 2);
-      var g = ctx.createLinearGradient(sx, 0, sx - W * 0.5, H * 0.8);
-      g.addColorStop(0, "rgba(255, 228, 180," + a.toFixed(3) + ")"); g.addColorStop(1, "rgba(255, 228, 180, 0)");
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.moveTo(sx - 20, -10); ctx.lineTo(sx + 26 + k * 10, -10); ctx.lineTo(sx - W * 0.42, H * 0.85); ctx.lineTo(sx - W * 0.6, H * 0.85); ctx.closePath(); ctx.fill();
-    }
-    /* fog banks at three depths, drifting */
-    [[0.58, 0.07, 0.018, 0.4], [0.72, 0.09, 0.03, 0.7], [0.88, 0.12, 0.05, 1.1]].forEach(function (f, i) {
-      var yb = H * f[0] + oy * f[3];
-      for (var b = 0; b < 4; b++) {
-        var bx = ((b / 4 + t * f[2] * 0.25 + i * 0.13) % 1.3 - 0.15) * W + ox * f[3];
-        var g2 = ctx.createRadialGradient(bx, yb, 4, bx, yb, W * 0.34);
-        g2.addColorStop(0, "rgba(190, 215, 225," + f[1].toFixed(3) + ")"); g2.addColorStop(1, "rgba(190, 215, 225, 0)");
-        ctx.fillStyle = g2; ctx.beginPath(); ctx.ellipse(bx, yb, W * 0.34, H * 0.05, 0, 0, Math.PI * 2); ctx.fill();
-      }
-    });
-    /* dust/firefly motes at multiple depths */
-    DUST.forEach(function (d) {
-      var x = ((d.x + t * d.sp * d.z + Math.sin(t * 0.3 + d.ph) * 0.01) % 1) * W + ox * d.z;
-      var y = ((d.y - t * d.sp * 0.6 * d.z) % 1 + 1) % 1 * H + oy * d.z;
-      var r = d.z < 0.5 ? 1.1 : d.z < 1 ? 2 : 6;
-      var a = d.z < 0.5 ? 0.35 : d.z < 1 ? 0.55 : 0.16;
-      a *= 0.6 + 0.4 * Math.sin(t * 0.8 + d.ph);
-      var g3 = ctx.createRadialGradient(x, y, 0, x, y, r * 2.4);
-      g3.addColorStop(0, "rgba(255, 240, 205," + a.toFixed(3) + ")"); g3.addColorStop(1, "rgba(255, 240, 205, 0)");
-      ctx.fillStyle = g3; ctx.beginPath(); ctx.arc(x, y, r * 2.4, 0, Math.PI * 2); ctx.fill();
-    });
-    ctx.restore();
+  /* Prism depth stack, back -> front. Each depth drifts and tilts at its own rate. */
+  function back(t) {
+    var ox = tilt.x * 6, oy = tilt.y * 4;
+    cover("particles-far", 0.8, "screen", ((t * 4) % 60) - 30 + ox, Math.sin(t * 0.1) * 6 + oy);
+    cover("fog-mid", 0.6, null, Math.sin(t * 0.05) * 24 + ox * 1.5, oy);
+    cover("light-shafts", 0.5 + 0.1 * Math.sin(t * 2 * Math.PI / 8), "screen", ox * 0.5, 0);
   }
-  /* near-camera fronds drifting slowly past the side edges, out of focus */
+  function middle(t) {
+    var ox = tilt.x * 12, oy = tilt.y * 7;
+    cover("fog-low", 0.5, null, Math.sin(t * 0.07 + 1) * 34 + ox, oy);
+    cover("particles-mid", 1, "screen", ((t * 9) % 80) - 40 + ox, -((t * 5) % 60) + 30 + oy);
+  }
   function frond(x, y, len, ang, sway) {
     ctx.save(); ctx.translate(x, y); ctx.rotate(ang + sway);
     ctx.beginPath(); ctx.moveTo(0, 0);
@@ -348,17 +300,17 @@
     ctx.restore();
   }
   function nearLayer(t) {
-    ctx.save();
-    try { ctx.filter = "blur(5px)"; } catch (e) {}
-    var ox = tilt.x * 22, oy = tilt.y * 12;
-    var sw = Math.sin(t * 0.5) * 0.05;
-    /* left fern dips into frame and back on a slow 26s cycle */
-    var c = 0.5 - 0.5 * Math.cos(t * 2 * Math.PI / 26);
-    frond(-30 + ox - 40 * (1 - c), H * 0.62 + oy, 150, -0.35, sw);
-    /* right branch at the top corner, opposite phase */
-    var c2 = 0.5 - 0.5 * Math.cos(t * 2 * Math.PI / 31 + 2);
-    frond(W + 30 + ox + 50 * (1 - c2), H * 0.08 + oy, 170, Math.PI + 0.45, -sw);
+    /* foreground plants close to camera: sit at the edges below the chores, sway, slide with tilt */
+    var ox = tilt.x * 24, oy = tilt.y * 12, sw = Math.sin(t * 2 * Math.PI / 11);
+    var L = ART["fg-left"], R = ART["fg-right"], B = ART["fg-bottom"];
+    ctx.save(); ctx.globalAlpha = 0.9;
+    var fw = W * 0.34, fh = fw * 800 / 426;          /* scaled to a third of the phone width */
+    var breathIn = 0.5 - 0.5 * Math.cos(t * 2 * Math.PI / 26);
+    if (L) ctx.drawImage(L, -fw * 0.18 - 10 * (1 - breathIn) + ox + sw * 3, H - fh * 0.92 + oy, fw, fh);
+    if (R) ctx.drawImage(R, W - fw * 0.82 + 10 * (1 - breathIn) + ox - sw * 3, H - fh * 0.92 + oy, fw, fh);
+    if (B) { var bw = W * 1.15, bh = bw * 170 / 1280; ctx.drawImage(B, (W - bw) / 2 + ox * 1.2, H - bh + 6 + oy, bw, bh); }
     ctx.restore();
+    cover("particles-near", 0.7, "screen", ((t * 16) % 120) - 60 + tilt.x * 40, Math.sin(t * 0.2) * 14 + tilt.y * 20, 1.15);
   }
   function grounding(info, r, sx) {
     /* contact shadow + warm bounce under each chest so it sits on its island */
@@ -376,7 +328,7 @@
     info.hits.forEach(function (q) {
       if (q.x == null) return;
       var hw = (q.hw || 80) / 2 + 4, hh = (q.hh || 36) / 2 + 4, cy = q.chipY != null ? q.chipY : q.y;
-      roundRect(r.left + (q.x - hw) * sx, r.top + (cy - hh) * sx, hw * 2 * sx, hh * 2 * sx, 10); ctx.fill();
+      roundRect(r.left + ((q.labelX != null ? q.labelX : q.x) - hw) * sx, r.top + (cy - hh) * sx, hw * 2 * sx, hh * 2 * sx, 10); ctx.fill();
     });
     ctx.restore();
   }
@@ -416,6 +368,8 @@
   }
   document.addEventListener("pointerdown", function () { if (!muted()) startAmbient(); }, true);
   function shortName(l) {
+    var co = global.KidCallouts, info = global.KidWorld && KidWorld.hits && KidWorld.hits();
+    if (co && info) for (var i = 0; i < info.hits.length; i++) if (info.hits[i].label === l && co[info.hits[i].chip]) return co[info.hits[i].chip][0];
     return String(l || "").replace(/^[^A-Za-z]+/, "").split(/[—·(]/)[0].trim().slice(0, 20) || "Chore";
   }
 
@@ -460,21 +414,22 @@
       var info = global.KidWorld && KidWorld.hits && KidWorld.hits();
       var r = info && info.cv ? info.cv.getBoundingClientRect() : null;
       var sx = r ? r.width / Math.max(1, W) : 1;
+      if (!reduced) back(t);
       if (info && info.hits) grounding(info, r, sx);
-      air(t);
       stormEdge(t);
       if (info && info.hits) {
         info.hits.forEach(function (q, i) {
           if (q.done || q.x == null) return;
           var ms = q.ms || 72;
-          beam(r.left + q.x * sx, r.top + ((q.seat || q.y) - ms * 0.42) * sx, tierFor(q, i), t, i);
+          beam(r.left + q.x * sx, r.top + ((q.seat || q.y) - ms * 0.3) * sx, tierFor(q, i), t, i);
         });
       }
       pops.forEach(function (p) { sceneLight(p, t); });
       if (!reduced) glider(t);
+      if (!reduced) middle(t);
       pops = pops.filter(function (p) { return drawPop(p, t); });
-      if (info && info.hits) clearLabels(info, r, sx);
       if (!reduced) nearLayer(t);
+      if (info && info.hits) clearLabels(info, r, sx);
       pops.forEach(function (p) { lootCard(p, t); });
       victory(t);
     } catch (e) { /* overlay must never break the board */ }
