@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-14T20:55:55.316Z",
+  "fetchedAt": "2026-10-14T21:10:52.756Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-21",
   "asOfIso": "2026-10-14",
   "nextLeave": {
-    "id": "iajqj9nb85bopr0ndinnqs642o",
-    "summary": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
-    "start": "2026-10-14T16:00:00-05:00",
-    "end": "2026-10-14T18:20:00-05:00",
-    "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
+    "id": "1ni8dem5hrho45a0csgj81r3i4_20261015T131000Z",
+    "summary": "Hayes + Harris — SRE drop-off · 8:25",
+    "start": "2026-10-15T08:10:00-05:00",
+    "end": "2026-10-15T08:40:00-05:00",
+    "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
     "busy": true,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "iajqj9nb85bopr0ndinnqs642o",
-      "summary": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
-      "start": "2026-10-14T16:00:00-05:00",
-      "end": "2026-10-14T18:20:00-05:00",
-      "location": "Genesis Health Clubs Olathe Ridgeview, 17800 W 106th St, Olathe, KS 66061",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "44bg4l5n1gfsl9t8lmjlbt33hc",
       "summary": "Hayes + Harris — SRE Red Day",
@@ -396,11 +387,11 @@
     }
   ],
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "4:00",
-    "place": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
-    "detailHtml": "<strong>4:00</strong> Ainsley swim — Coach Ann · 5:00 practice (makeup)",
-    "badge": "Wed"
+    "label": "Next up · Thu",
+    "time": "8:10",
+    "place": "Hayes + Harris — SRE drop-off · 8:25",
+    "detailHtml": "<strong>8:10</strong> Hayes + Harris — SRE drop-off · 8:25",
+    "badge": "Thu"
   },
   "error": null
 }

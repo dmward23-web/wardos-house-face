@@ -1,7 +1,7 @@
 {
   "asOf": "Wed Oct 14 2026",
   "asOfIso": "2026-10-14",
-  "refreshedAt": "2026-10-14T20:55:54.875Z",
+  "refreshedAt": "2026-10-14T21:10:52.352Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,41 +16,28 @@
     "endIso": "2026-10-16T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "4:00",
-    "place": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
+    "label": "Next up · Thu",
+    "time": "7:00",
+    "place": "SRE specials: Spanish",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-    "badge": "Wed",
-    "startIso": "2026-10-14T21:00:00.000Z",
-    "endIso": "2026-10-14T23:20:00.000Z",
-    "kind": "sport",
+    "badge": "Thu",
+    "startIso": "2026-10-15T12:00:00.000Z",
+    "endIso": "2026-10-15T12:15:00.000Z",
+    "kind": "school",
     "nextLeave": {
-      "label": "Next up · today",
-      "time": "4:00",
-      "place": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
+      "label": "Next up · Thu",
+      "time": "8:10",
+      "place": "Boys SRE drop",
       "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-      "badge": "Wed",
-      "startIso": "2026-10-14T21:00:00.000Z",
-      "endIso": "2026-10-14T23:20:00.000Z",
-      "kind": "sport",
-      "whenLabel": "4:00",
-      "summary": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
+      "badge": "Thu",
+      "startIso": "2026-10-15T13:10:00.000Z",
+      "endIso": "2026-10-15T13:40:00.000Z",
+      "kind": "school_drop",
+      "whenLabel": "Thu 8:10",
+      "summary": "Hayes + Harris — SRE drop-off · 8:25",
       "leaveBy": true
     },
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "4:00",
-        "place": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Wed",
-        "startIso": "2026-10-14T21:00:00.000Z",
-        "endIso": "2026-10-14T23:20:00.000Z",
-        "kind": "sport",
-        "whenLabel": "4:00",
-        "summary": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
-        "leaveBy": true
-      },
       {
         "label": "Next up · Thu",
         "time": "7:00",
@@ -193,6 +180,19 @@
         "whenLabel": "Fri 8:10",
         "summary": "Hayes + Harris — SRE drop-off · 8:25",
         "leaveBy": true
+      },
+      {
+        "label": "Next up · Fri",
+        "time": "12:00",
+        "place": "SRE Chat & Chew lunch",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-16T17:00:00.000Z",
+        "endIso": "2026-10-16T17:30:00.000Z",
+        "kind": "school",
+        "whenLabel": "Fri 12:00",
+        "summary": "Hayes — SRE Chat & Chew lunch",
+        "leaveBy": false
       }
     ]
   },
@@ -326,12 +326,12 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "WED · 3:15",
-        "what": "SRE PICKUP",
+        "when": "THU · All day",
+        "what": "SRE RED DAY",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "WED",
-          "3:15"
+          "THU",
+          "All day"
         ]
       },
       "today": [
@@ -339,13 +339,6 @@
           "kind": "event",
           "when": "Wed · All day",
           "what": "SRE Green Day",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Wed · 3:15",
-          "what": "SRE pickup",
           "hint": "",
           "tone": "act"
         },
@@ -362,12 +355,6 @@
         {
           "when": "Wed 14 · All day",
           "what": "SRE Green Day",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 14 · 3:15",
-          "what": "SRE pickup",
           "tone": "act",
           "hint": ""
         },
@@ -581,12 +568,12 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "WED · 3:15",
-        "what": "SRE PICKUP",
+        "when": "THU · All day",
+        "what": "SRE RED DAY",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "WED",
-          "3:15"
+          "THU",
+          "All day"
         ]
       },
       "today": [
@@ -594,13 +581,6 @@
           "kind": "event",
           "when": "Wed · All day",
           "what": "SRE Green Day",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Wed · 3:15",
-          "what": "SRE pickup",
           "hint": "",
           "tone": "act"
         },
@@ -624,12 +604,6 @@
         {
           "when": "Wed 14 · All day",
           "what": "SRE Green Day",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Wed 14 · 3:15",
-          "what": "SRE pickup",
           "tone": "act",
           "hint": ""
         },
@@ -854,22 +828,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "WED · 3:15",
-        "what": "LKMS MATH COUNTS INFO MEETING",
+        "when": "WED · 4:00",
+        "what": "AINSLEY SWIM — COACH ANN · 5:00 PRACTICE (MAKEUP",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "WED",
-          "3:15"
+          "4:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Wed · 3:15",
-          "what": "LKMS Math Counts info meeting",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Wed · 4:00",
@@ -900,12 +867,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Wed 14 · 3:15",
-          "what": "LKMS Math Counts info meeting",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Thu 15 · 12:45",
           "what": "LKMS choir Sing & Share field trip",
@@ -1034,16 +995,6 @@
           "tone": "act"
         },
         {
-          "when": "Wed 14 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act"
-        },
-        {
-          "when": "Wed 14 · 3:15",
-          "what": "LKMS Math Counts info meeting",
-          "tone": "act"
-        },
-        {
           "when": "Wed 14 · 4:00",
           "what": "Ainsley swim — Coach Ann · 5:00 practice (makeup)",
           "tone": "hot"
@@ -1146,6 +1097,16 @@
         {
           "when": "Tue 20 · All day",
           "what": "SRE fall conferences (Lind)",
+          "tone": "act"
+        },
+        {
+          "when": "Tue 20 · 7:00",
+          "what": "SRE specials: Art",
+          "tone": "act"
+        },
+        {
+          "when": "Tue 20 · 7:00",
+          "what": "SRE specials: Spanish",
           "tone": "act"
         }
       ]
