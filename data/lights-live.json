@@ -1,6 +1,6 @@
 {
   "status": "live",
-  "fetchedAt": "2026-10-14T04:21:09.352Z",
+  "fetchedAt": "2026-10-14T05:30:48.168Z",
   "source": "tplink-cloud-api",
   "writeSupported": true,
   "brightnessControlSupported": true,
@@ -35,18 +35,6 @@
   ],
   "reserved": [
     {
-      "alias": "QmFzZW1lbnQ=",
-      "model": "deco X20(US)",
-      "list_online": false,
-      "mapped": null
-    },
-    {
-      "alias": "Archer AX4400",
-      "model": "Archer AX4400(US)",
-      "list_online": false,
-      "mapped": null
-    },
-    {
       "alias": "RGVjb19EMzU4",
       "model": "deco X20(US)",
       "list_online": false,
@@ -55,6 +43,18 @@
     {
       "alias": "RGVjb19DQzZD",
       "model": "deco X20(US)",
+      "list_online": false,
+      "mapped": null
+    },
+    {
+      "alias": "QmFzZW1lbnQ=",
+      "model": "deco X20(US)",
+      "list_online": false,
+      "mapped": null
+    },
+    {
+      "alias": "Archer AX4400",
+      "model": "Archer AX4400(US)",
       "list_online": false,
       "mapped": null
     }
