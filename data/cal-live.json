@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-15T12:34:30.368Z",
+  "fetchedAt": "2026-10-15T12:53:34.530Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-22",
@@ -35,15 +35,6 @@
       "busy": false,
       "allDay": true,
       "pinnedUntil": "8:40"
-    },
-    {
-      "id": "pce0u1147molgv244orp3fo6u0",
-      "summary": "Ainsley — LKMS PSAT (if signed up) · Chromebook charged · 8:00",
-      "start": "2026-10-15T07:45:00-05:00",
-      "end": "2026-10-15T08:00:00-05:00",
-      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
-      "busy": false,
-      "allDay": false
     },
     {
       "id": "1ni8dem5hrho45a0csgj81r3i4_20261015T131000Z",
