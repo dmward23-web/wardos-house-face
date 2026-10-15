@@ -796,7 +796,8 @@
     });
     ctx.save();
     ctx.beginPath();
-    ctx.rect(0, H * 0.82, W, H * 0.18);
+    var fgTop = W > H * 1.15 ? 0.9 : 0.82; /* LANDFIT1 · landscape: fern band stays under the labels */
+    ctx.rect(0, H * fgTop, W, H * (1 - fgTop));
     ctx.clip();
     var fgLayer = null;
     layers.forEach(function (layer) { if (layer.id === "fg") fgLayer = layer; });
@@ -1333,8 +1334,29 @@
       glow: Math.sin(Math.min(1, u) * Math.PI)
     };
   }
+  function drawVinylJar(ctx, W, H, t) {
+    var box = creatureAnchor(W, H);
+    var st = global.JarEngine ? JarEngine.choreState("ainsley") : { fill: 0 };
+    var f = clamp(st.fill || 0, 0, 1), R = box.jw * 0.42, cx = box.cx, cy = box.foot - R - 4;
+    var spin = st.asleep || (global.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) ? 0 : t * (0.5 + f * 1.4);
+    ctx.save();
+    ctx.fillStyle = "rgba(0,0,0,0.4)"; ctx.beginPath(); ctx.ellipse(cx, box.foot, R * 0.9, R * 0.14, 0, 0, 7); ctx.fill();
+    ctx.translate(cx, cy); ctx.rotate(spin);
+    var g = ctx.createRadialGradient(0, 0, R * 0.1, 0, 0, R); g.addColorStop(0, "#1c1b1d"); g.addColorStop(1, "#060607");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = 1;
+    for (var k = 0.42; k < 0.98; k += 0.08) { ctx.beginPath(); ctx.arc(0, 0, R * k, 0, 7); ctx.stroke(); }
+    ctx.strokeStyle = "rgba(255,255,255,0.2)"; ctx.lineWidth = R * 0.05; ctx.beginPath(); ctx.arc(0, 0, R * 0.8, -0.9, -0.3); ctx.stroke();
+    ctx.rotate(-spin);
+    ctx.strokeStyle = "rgba(212,168,96,0.25)"; ctx.lineWidth = R * 0.09; ctx.beginPath(); ctx.arc(0, 0, R * 0.62, 0, 7); ctx.stroke();
+    if (f > 0.002) { ctx.strokeStyle = st.full ? "#f2cf86" : "#d4a860"; ctx.lineCap = "round"; ctx.beginPath(); ctx.arc(0, 0, R * 0.62, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * f); ctx.stroke(); }
+    ctx.fillStyle = "#8a3b2e"; ctx.beginPath(); ctx.arc(0, 0, R * 0.3, 0, 7); ctx.fill();
+    ctx.fillStyle = "#e9e0cf"; ctx.beginPath(); ctx.arc(0, 0, R * 0.04, 0, 7); ctx.fill();
+    ctx.restore();
+  }
   function drawOriCreature(ctx, W, H, t, world) {
     var id = world || kid();
+    if (id === "ainsley" || kid() === "ainsley") { drawVinylJar(ctx, W, H, t); return true; } /* VINYLJAR1 · no cartoon mascot on Ainsley's board (she's 14): a record that fills */
     if (global.KidLayout && KidLayout.creatureSprite) id = KidLayout.creatureSprite(id);
     var img = oriCreature[id];
     if (!img) return false;
@@ -1527,9 +1549,12 @@
       q.ledY = q.seat;
       q.chipY = q.y;
       drawMarker(ctx, q, world, i, !!q.done, t);
-      if (!global.KidCallouts) drawLight(ctx, q);
     });
-    if (global.KidCallouts) { spaceCallouts(ctx, shown, W); shown.forEach(function (q) { drawLight(ctx, q); }); }
+    /* LANDFIT2 · labels paint after the foreground fern so it never hides a must */
+    var paintLabels = function () {
+      if (global.KidCallouts) { spaceCallouts(ctx, shown, W); shown.forEach(function (q) { drawLight(ctx, q); }); }
+      else shown.forEach(function (q) { drawLight(ctx, q); });
+    };
     var fg = book && book.fg;
     if (fg && fg.width >= 64) {
       var fp = layerShift("fg", man);
@@ -1541,6 +1566,7 @@
       drawPlate(ctx, fg, W, H, pan.x * fp, pan.y * fp * 0.35, PLATE_ZOOM, 1, 0, world);
       ctx.restore();
     }
+    paintLabels();
     if (!reduced) motes(ctx, W, H, t * 0.7 + 3, pan.x * 0.3, "#fff6e0", 12);
     drawOriCreature(ctx, W, H, t, world);
     var anchor = creatureAnchor(W, H);
