@@ -607,3 +607,5 @@ html, body { overflow-x: hidden !important; overscroll-behavior-x: none; }
   .kw-path { top: 64px !important; bottom: auto !important; }
   .kw-hud { right: max(16px, env(safe-area-inset-right)) !important; }
 }
+/* MYWEEK1 · "My Week" (was Path): keep it on one line inside its pill */
+.kw-path { white-space: nowrap !important; letter-spacing: 0.08em !important; }

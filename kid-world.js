@@ -2006,7 +2006,7 @@
       '<header class="kw-hud"><button type="button" class="kw-home" data-kw-home>' + name + '</button><div class="kw-clock" data-kw-clock></div></header>' +
       '<div class="kw-jar-host" data-kw-jar></div>' +
       '<div class="kw-week" data-kw-week></div>' +
-      '<button type="button" class="kw-path" data-kw-path>Path</button>' +
+      '<button type="button" class="kw-path" data-kw-path aria-label="My Week">My Week</button>' +
       '<div class="kw-drawer" id="kw-cal" hidden></div>';
     document.body.appendChild(stage);
     var cv = document.createElement("canvas");

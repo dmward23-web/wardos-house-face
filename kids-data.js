@@ -1635,7 +1635,7 @@
     return "DAD WEEK";
   }
 
-  /* DAYPICK1 · plain list of one day's items for the Path drawer */
+  /* DAYPICK1 · plain list of one day's items for the My Week drawer */
   function consumeEventsForIso(kidId, data, iso) {
     var kid = data && data.kids && data.kids[kidId];
     if (!kid || !iso) return [];

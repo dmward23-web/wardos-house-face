@@ -3807,6 +3807,13 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
   .hub-upper > .sp-tile { order: 6 !important; }
 }
 </style>
+<style id="wall-fit-day">
+/* WALLFIT1 · wall (1080 wide): give the leave card the room its day columns need (no hidden scroll cut);
+   the cam strip gives up the height. Phone layout untouched. */
+@media (min-width: 601px) {
+  html body .panel { --hub-cam-deck-h: 220px !important; --hub-command-h: 520px !important; }
+}
+</style>
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
