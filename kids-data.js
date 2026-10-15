@@ -1633,6 +1633,28 @@
     return "DAD WEEK";
   }
 
+  /* DAYPICK1 · plain list of one day's items for the Path drawer */
+  function consumeEventsForIso(kidId, data, iso) {
+    var kid = data && data.kids && data.kids[kidId];
+    if (!kid || !iso) return [];
+    var ws = mondayOfIso(iso), wk = [];
+    for (var i = 0; i < 7; i++) wk.push(addDaysIsoLocal(ws, i));
+    var seen = {}, out = [];
+    consumeCollectEvents(kid).forEach(function (e) {
+      if (consumeIsHq(e)) return;
+      var p = consumeParseWhen(e.when);
+      var d = consumeIsoForParsed(p, wk);
+      if (!d && !p.dayNum && !p.dow && e.bucket === "today") d = DAY_ISO;
+      if (d !== iso) return;
+      var key = String(e.what).toLowerCase().replace(/\s+/g, " ");
+      if (seen[key]) return;
+      seen[key] = 1;
+      out.push({ time: p.allDay ? "All day" : (p.time || ""), what: e.what, min: consumeTimeMin(p.time) });
+    });
+    out.sort(function (a, b) { return (a.min == null ? -1 : a.min) - (b.min == null ? -1 : b.min); });
+    return out;
+  }
+
   function renderConsumeSchedule(kidId, data) {
     var root = document.querySelector(".sec-schedule.consume-sched");
     if (!root || !data || !data.kids || !data.kids[kidId]) return;
@@ -2105,6 +2127,7 @@
     renderHarborStrips: renderHarborStrips,
     renderKidPage: renderKidPage,
     renderConsumeSchedule: renderConsumeSchedule,
+    eventsForIso: consumeEventsForIso,
     nextPaydayInfo: nextPaydayInfo,
     resetJarCycle: resetJarCycle,
     settlePriorWeeksIntoBalance: settlePriorWeeksIntoBalance,

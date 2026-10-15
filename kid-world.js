@@ -41,6 +41,7 @@
   }
 
   var dayIso = "";
+  var dayPicked = false; /* DAYPICK1 · follow today until a kid taps a day */
   var burstAt = -1;
   var capMode = false;
 
@@ -1714,7 +1715,8 @@
     var host = document.querySelector("[data-kw-week]");
     if (!host) return;
     var days = weekMeta();
-    if (!dayIso) {
+    if (!dayPicked || !days.some(function (x) { return x.iso === dayIso; })) {
+      dayIso = "";
       for (var i = 0; i < days.length; i++) if (days[i].today) dayIso = days[i].iso;
       if (!dayIso && days[0]) dayIso = days[0].iso;
     }
@@ -1723,14 +1725,20 @@
       var b = document.createElement("button");
       b.type = "button";
       b.className = "kw-day" + (d.iso === dayIso ? " is-on" : "") + (d.today ? " is-today" : "");
+      b.setAttribute("aria-pressed", d.iso === dayIso ? "true" : "false");
       b.innerHTML = "<b>" + d.letter + "</b><small>" + d.num + "</small>";
       b.addEventListener("click", function () {
-        dayIso = d.iso;
-        paintWeek();
-        if (bg) bg.frame(kid());
+        setDay(d.iso);
       });
       host.appendChild(b);
     });
+  }
+  function setDay(iso) {
+    dayIso = iso;
+    dayPicked = true;
+    paintWeek();
+    if (bg) bg.frame(kid());
+    document.dispatchEvent(new CustomEvent("kw:day", { detail: { iso: iso } }));
   }
   function mountJar() {
     var host = document.querySelector("[data-kw-jar]");
@@ -1885,7 +1893,6 @@
       '<header class="kw-hud"><button type="button" class="kw-home" data-kw-home>' + name + '</button><div class="kw-clock" data-kw-clock></div></header>' +
       '<div class="kw-jar-host" data-kw-jar></div>' +
       '<div class="kw-week" data-kw-week></div>' +
-      '<button type="button" class="kw-path kw-more" data-kw-more>Farther</button>' +
       '<button type="button" class="kw-path" data-kw-path>Path</button>' +
       '<div class="kw-drawer" id="kw-cal" hidden></div>';
     document.body.appendChild(stage);
@@ -1904,13 +1911,7 @@
       if (!d) return;
       d.hidden = !d.hidden;
     });
-    stage.querySelector("[data-kw-more]").addEventListener("click", function () {
-      var d = document.getElementById("kw-cal");
-      if (!d) return;
-      d.hidden = false;
-      d.classList.toggle("is-more");
-      this.textContent = d.classList.contains("is-more") ? "Closer" : "Farther";
-    });
+    cv.addEventListener("pointerdown", function () { var d = document.getElementById("kw-cal"); if (d) d.hidden = true; }, true);
     cv.addEventListener("pointerdown", onWorldDown);
     ["pointerup", "pointercancel", "pointerleave"].forEach(function (n) { cv.addEventListener(n, clearHold); });
     cv.addEventListener("pointermove", function (e) {
@@ -2154,6 +2155,8 @@
     exportFrame: exportFrame,
     exportCalendar: exportCalendar,
     paintWorld: paintWorld,
+    day: function () { return dayIso; },
+    setDay: setDay,
     hits: function () { return bg ? { hits: bg.hits || [], cv: bg.cv } : null; }, /* LOOT1 · read-only */
     platesReady: function () {
       var id = (document.body && document.body.getAttribute("data-kid")) || "hayes";

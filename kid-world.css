@@ -327,7 +327,7 @@ html.kw-reduce .kw-scene.is-on { animation: none; }
 .cw-lantern small { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; opacity: 0.8; }
 .cw-lantern.is-past { opacity: 0.4; }
 .cw-lantern.is-fog .cw-orb { filter: blur(0.4px); opacity: 0.55; }
-.cw-lantern.is-now .cw-orb { width: 46px; height: 46px; }
+.cw-lantern.is-now small { text-decoration: underline; }
 .cw-lantern.is-lit .cw-orb { box-shadow: 0 0 22px #ffe1a8, 0 0 8px #fff; }
 body.theme-harris.kw-on .cw-idea { font-size: 20px; min-height: 52px; }
 .cw-now {
@@ -517,7 +517,7 @@ body.theme-ainsley.kw-on .kw-jar-host { left: 30%; bottom: 4%; }
 }
 .kw-day b { font-size: 14px; letter-spacing: 0.04em; }
 .kw-day small { font-size: 10px; opacity: 0.8; }
-.kw-day.is-on { box-shadow: 0 0 16px rgba(255, 230, 170, 0.7); }
+.kw-day.is-on { background: rgba(255, 244, 220, 0.92); color: #1a1208; border-color: #fff; box-shadow: 0 0 16px rgba(255, 230, 170, 0.7); }
 .kw-day.is-today { outline: 1px solid rgba(255, 230, 170, 0.85); }
 .kw-path {
   position: absolute;
@@ -532,7 +532,6 @@ body.theme-ainsley.kw-on .kw-jar-host { left: 30%; bottom: 4%; }
   background: rgba(6, 12, 18, 0.35);
 }
 /* KIDWEEKLY1 · Farther sat on top of Path (specificity), read as FARPATH */
-.kw-path.kw-more { right: 96px; }
 .kw-drawer {
   position: absolute;
   left: 10px; right: 10px;
@@ -561,8 +560,13 @@ body.theme-ainsley.kw-on .kw-jar-host { left: 30%; bottom: 4%; }
   text-shadow: 0 0 12px rgba(255, 214, 160, 0.85);
   font-family: system-ui, sans-serif;
 }
-.kw-drawer .cw-phase[data-late] { display: none; }
-.kw-drawer.is-more .cw-phase[data-late] { display: inline-flex; }
+.cw-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cw-x { appearance: none; border: 0; background: rgba(255,255,255,0.14); color: inherit; border-radius: 999px; min-width: 40px; min-height: 40px; font-size: 20px; }
+.cw-day { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.cw-day li { display: flex; gap: 10px; font-size: 16px; }
+.cw-day li b { min-width: 64px; opacity: 0.85; }
+.cw-lantern.is-sel .cw-orb { width: 46px; height: 46px; box-shadow: 0 0 18px #fff; }
+.cw-lantern.is-sel small { opacity: 1; }
 .kw-iris {
   position: fixed;
   inset: 0;

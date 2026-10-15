@@ -279,7 +279,7 @@
        right of the creature, below the lowest chest/label in that column, above the Farther/Path buttons */
     var jar = document.querySelector("[data-kw-jar]"), jr = jar && jar.getBoundingClientRect();
     var left = jr && jr.width ? jr.right + 8 : W * 0.5;
-    var btn = document.querySelector("[data-kw-more]"), br = btn && btn.getBoundingClientRect();
+    var btn = document.querySelector("[data-kw-path]"), br = btn && btn.getBoundingClientRect();
     var bottom = br && br.height ? br.top - 8 : H * 0.88;
     var info = global.KidWorld && KidWorld.hits && KidWorld.hits(), top = H * 0.6;
     if (info && info.hits) info.hits.forEach(function (q) {
