@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 15 2026",
   "asOfIso": "2026-10-15",
-  "refreshedAt": "2026-10-15T23:17:20.313Z",
+  "refreshedAt": "2026-10-15T23:37:42.240Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -806,22 +806,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "THU · 4:25",
-        "what": "AINSLEY SWIM — COACH ANN",
+        "when": "TUE · All day",
+        "what": "LKMS OUTSIDERS DAY (GREASER OR SOC DRESS-UP)",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "THU",
-          "4:25"
+          "TUE",
+          "All day"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Thu · 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
         {
           "kind": "note",
           "when": "All day",
@@ -830,14 +823,7 @@
           "tone": "hot"
         }
       ],
-      "sports": [
-        {
-          "when": "Thu 15 · leave 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "hint": "YOUR board",
-          "tone": "hot"
-        }
-      ],
+      "sports": [],
       "school": [
         {
           "when": "Tue 20 · All day",
@@ -975,11 +961,6 @@
           "when": "Thu 15 · All day",
           "what": "SRE Red Day",
           "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 4:25",
-          "what": "Ainsley swim — Coach Ann",
-          "tone": "hot"
         },
         {
           "when": "Thu 15 · 5:40",
