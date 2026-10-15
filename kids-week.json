@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 15 2026",
   "asOfIso": "2026-10-15",
-  "refreshedAt": "2026-10-15T20:50:52.706Z",
+  "refreshedAt": "2026-10-15T21:12:32.451Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -326,12 +326,12 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "THU · 3:15",
-        "what": "SRE PICKUP",
+        "when": "FRI · All day",
+        "what": "SRE ORANGE DAY",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "THU",
-          "3:15"
+          "FRI",
+          "All day"
         ]
       },
       "today": [
@@ -339,13 +339,6 @@
           "kind": "event",
           "when": "Thu · All day",
           "what": "SRE Red Day",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Thu · 3:15",
-          "what": "SRE pickup",
           "hint": "",
           "tone": "act"
         },
@@ -362,12 +355,6 @@
         {
           "when": "Thu 15 · All day",
           "what": "SRE Red Day",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 3:15",
-          "what": "SRE pickup",
           "tone": "act",
           "hint": ""
         },
@@ -563,12 +550,12 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "THU · 3:15",
-        "what": "SRE PICKUP",
+        "when": "THU · 5:40",
+        "what": "HAYES FLAG PRACTICE",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "THU",
-          "3:15"
+          "5:40"
         ]
       },
       "today": [
@@ -576,13 +563,6 @@
           "kind": "event",
           "when": "Thu · All day",
           "what": "SRE Red Day",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Thu · 3:15",
-          "what": "SRE pickup",
           "hint": "",
           "tone": "act"
         },
@@ -613,12 +593,6 @@
         {
           "when": "Thu 15 · All day",
           "what": "SRE Red Day",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 3:15",
-          "what": "SRE pickup",
           "tone": "act",
           "hint": ""
         },
@@ -825,22 +799,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "THU · 3:00",
-        "what": "LKMS HOMEWORK HELP",
+        "when": "THU · 4:25",
+        "what": "AINSLEY SWIM — COACH ANN",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "THU",
-          "3:00"
+          "4:25"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Thu · 3:00",
-          "what": "LKMS Homework Help",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Thu · 4:25",
@@ -865,12 +832,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Thu 15 · 3:00",
-          "what": "LKMS Homework Help",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Tue 20 · All day",
           "what": "LKMS Outsiders Day (Greaser or Soc dress-up)",
@@ -1009,16 +970,6 @@
           "tone": "act"
         },
         {
-          "when": "Thu 15 · 3:00",
-          "what": "LKMS Homework Help",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 3:15",
-          "what": "SRE pickup",
-          "tone": "act"
-        },
-        {
           "when": "Thu 15 · 4:25",
           "what": "Ainsley swim — Coach Ann",
           "tone": "hot"
@@ -1122,6 +1073,16 @@
           "when": "Thu 22 · All day",
           "what": "Ward Kids [AHH No School]",
           "tone": "act"
+        },
+        {
+          "when": "Thu 22 · 3:00",
+          "what": "LKMS Homework Help",
+          "tone": "act"
+        },
+        {
+          "when": "through Fri Oct 16 · 3:00",
+          "what": "Kids with Dad @ 147th",
+          "tone": "hot"
         }
       ]
     }
