@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 15 2026",
   "asOfIso": "2026-10-15",
-  "refreshedAt": "2026-10-15T13:43:10.182Z",
+  "refreshedAt": "2026-10-15T13:59:44.219Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -326,12 +326,12 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "THU · 8:10",
-        "what": "SRE DROP-OFF",
+        "when": "THU · 3:15",
+        "what": "SRE PICKUP",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "THU",
-          "8:10"
+          "3:15"
         ]
       },
       "today": [
@@ -339,13 +339,6 @@
           "kind": "event",
           "when": "Thu · All day",
           "what": "SRE Red Day",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Thu · 8:10",
-          "what": "SRE drop-off",
           "hint": "",
           "tone": "act"
         },
@@ -369,12 +362,6 @@
         {
           "when": "Thu 15 · All day",
           "what": "SRE Red Day",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 8:10",
-          "what": "SRE drop-off",
           "tone": "act",
           "hint": ""
         },
@@ -576,12 +563,12 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "THU · 8:10",
-        "what": "SRE DROP-OFF",
+        "when": "THU · 3:15",
+        "what": "SRE PICKUP",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "THU",
-          "8:10"
+          "3:15"
         ]
       },
       "today": [
@@ -589,13 +576,6 @@
           "kind": "event",
           "when": "Thu · All day",
           "what": "SRE Red Day",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Thu · 8:10",
-          "what": "SRE drop-off",
           "hint": "",
           "tone": "act"
         },
@@ -633,12 +613,6 @@
         {
           "when": "Thu 15 · All day",
           "what": "SRE Red Day",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 8:10",
-          "what": "SRE drop-off",
           "tone": "act",
           "hint": ""
         },
@@ -1048,11 +1022,6 @@
           "tone": "act"
         },
         {
-          "when": "Thu 15 · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act"
-        },
-        {
           "when": "Thu 15 · 12:45",
           "what": "LKMS choir Sing & Share field trip",
           "tone": "act"
@@ -1160,6 +1129,11 @@
         {
           "when": "Wed 21 · 4:00",
           "what": "Lind conference (VIRTUAL)",
+          "tone": "act"
+        },
+        {
+          "when": "Wed 21 · 4:20",
+          "what": "Allen conference (VIRTUAL)",
           "tone": "act"
         }
       ]
