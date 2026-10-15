@@ -609,3 +609,8 @@ html, body { overflow-x: hidden !important; overscroll-behavior-x: none; }
 }
 /* MYWEEK1 · "My Week" (was Path): keep it on one line inside its pill */
 .kw-path { white-space: nowrap !important; letter-spacing: 0.08em !important; }
+/* MYWEEK2 · solid My Week pill per theme so the art never bleeds through (both orientations) */
+.kw-path { background: rgba(10, 14, 20, 0.94) !important; border: 1px solid rgba(255,255,255,0.35) !important; text-shadow: none !important; box-shadow: 0 2px 10px rgba(0,0,0,0.45); }
+body.theme-hayes .kw-path { background: rgba(12, 28, 22, 0.94) !important; border-color: rgba(170, 230, 190, 0.55) !important; color: #f2fff6 !important; }
+body.theme-harris .kw-path { background: rgba(18, 34, 64, 0.94) !important; border-color: rgba(255, 214, 102, 0.7) !important; color: #fff8e6 !important; }
+body.theme-ainsley .kw-path { background: rgba(14, 12, 16, 0.95) !important; border-color: rgba(214, 186, 140, 0.6) !important; color: #f3e6cf !important; font-weight: 700 !important; }
