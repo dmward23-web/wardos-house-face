@@ -1334,6 +1334,90 @@
       glow: Math.sin(Math.min(1, u) * Math.PI)
     };
   }
+  /* STAGE1 · venue scene for Ainsley: dark room, truss + moving-head beams, haze, stage deck, crowd silhouettes.
+     Poster palette: oxblood, amber, bone, ink. Beams brighten as her musts fill the jar. */
+  function drawVenue(ctx, W, H, t, pan, fill) {
+    var f = clamp(fill || 0, 0, 1), still = reduced;
+    var g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#07060a"); g.addColorStop(0.45, "#140a10"); g.addColorStop(0.78, "#2a0f12"); g.addColorStop(1, "#0a0507");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    var deck = H * 0.80;
+    /* back wall glow behind the stage */
+    var bw = ctx.createRadialGradient(W * 0.5, deck, W * 0.05, W * 0.5, deck, W * 0.9);
+    bw.addColorStop(0, "rgba(212,120,60," + (0.30 + f * 0.25).toFixed(3) + ")"); bw.addColorStop(1, "rgba(212,120,60,0)");
+    ctx.fillStyle = bw; ctx.fillRect(0, 0, W, H);
+    /* truss */
+    var ty = Math.max(70, H * 0.075);
+    ctx.strokeStyle = "rgba(200,190,175,0.35)"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, ty); ctx.lineTo(W, ty); ctx.moveTo(0, ty + 12); ctx.lineTo(W, ty + 12); ctx.stroke();
+    ctx.lineWidth = 1;
+    for (var x = 0; x < W; x += 16) { ctx.beginPath(); ctx.moveTo(x, ty); ctx.lineTo(x + 8, ty + 12); ctx.lineTo(x + 16, ty); ctx.stroke(); }
+    /* moving-head beams */
+    var n = W > H ? 7 : 5, cols = ["255,184,96", "236,92,72", "255,226,180", "236,92,72", "255,184,96", "255,226,180", "236,92,72"];
+    ctx.save(); ctx.globalCompositeOperation = "lighter";
+    for (var i = 0; i < n; i++) {
+      var bx = W * (i + 0.5) / n, sw = still ? 0 : Math.sin(t * (0.22 + i * 0.03) + i * 1.7) * 0.32;
+      var ang = Math.PI / 2 + sw + (i - (n - 1) / 2) * 0.06, len = H * 1.05, spread = 0.085;
+      var a = (0.10 + f * 0.16) * (0.75 + 0.25 * Math.sin(t * 0.8 + i));
+      var lg = ctx.createLinearGradient(bx, ty + 14, bx + Math.cos(ang) * len, ty + 14 + Math.sin(ang) * len);
+      lg.addColorStop(0, "rgba(" + cols[i] + "," + (a * 2.2).toFixed(3) + ")"); lg.addColorStop(1, "rgba(" + cols[i] + ",0)");
+      ctx.fillStyle = lg; ctx.beginPath(); ctx.moveTo(bx, ty + 14);
+      ctx.lineTo(bx + Math.cos(ang - spread) * len, ty + 14 + Math.sin(ang - spread) * len);
+      ctx.lineTo(bx + Math.cos(ang + spread) * len, ty + 14 + Math.sin(ang + spread) * len); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "rgba(" + cols[i] + ",0.9)"; ctx.beginPath(); ctx.arc(bx, ty + 16, 3.2, 0, 7); ctx.fill();
+    }
+    ctx.restore();
+    /* haze bands */
+    for (var h = 0; h < 4; h++) {
+      var hy = H * (0.35 + h * 0.13) + (still ? 0 : Math.sin(t * 0.12 + h) * 10), hx = W * 0.5 + (still ? 0 : Math.sin(t * 0.07 + h * 2) * W * 0.2);
+      var hz = ctx.createRadialGradient(hx, hy, 4, hx, hy, W * 0.6);
+      hz.addColorStop(0, "rgba(230,200,180,0.05)"); hz.addColorStop(1, "rgba(230,200,180,0)");
+      ctx.fillStyle = hz; ctx.fillRect(0, 0, W, H);
+    }
+    /* stage deck + monitors */
+    var dg = ctx.createLinearGradient(0, deck, 0, H); dg.addColorStop(0, "rgba(120,52,36," + (0.55 + f * 0.3).toFixed(3) + ")"); dg.addColorStop(1, "#1a0b0c");
+    ctx.fillStyle = dg; ctx.fillRect(0, deck, W, H - deck);
+    ctx.fillStyle = "rgba(255,190,120," + (0.35 + f * 0.4).toFixed(3) + ")"; ctx.fillRect(0, deck - 1, W, 2);
+    ctx.fillStyle = "#050304";
+    [0.18, 0.5, 0.82].forEach(function (mx) { ctx.beginPath(); ctx.moveTo(W * mx - 26, deck + 1); ctx.lineTo(W * mx + 26, deck + 1); ctx.lineTo(W * mx + 20, deck - 16); ctx.lineTo(W * mx - 20, deck - 16); ctx.closePath(); ctx.fill(); });
+    /* mic stand, centre stage */
+    ctx.strokeStyle = "rgba(20,14,16,0.95)"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(W * 0.5, deck - 2); ctx.lineTo(W * 0.5, deck - H * 0.11); ctx.lineTo(W * 0.5 + 16, deck - H * 0.125); ctx.stroke();
+  }
+  function drawCrowd(ctx, W, H, t, pan) {
+    var base = H + 4, rows = [[0.875, 14, "#0a0507"], [0.915, 18, "#030203"]];
+    rows.forEach(function (r, ri) {
+      ctx.fillStyle = r[2];
+      ctx.beginPath(); ctx.moveTo(0, base);
+      for (var x = -10, k = 0; x < W + 30; x += r[1] * 1.9, k++) {
+        var bob = reduced ? 0 : Math.max(0, Math.sin(t * 2.1 + k * 1.3 + ri)) * 3;
+        var hy = H * r[0] - (k * 37 % 11) - bob, hr = r[1] * (0.82 + (k * 13 % 5) / 14);
+        ctx.lineTo(x - hr * 1.3, H * r[0] + hr * 1.2);
+        ctx.arc(x, hy, hr, Math.PI * 0.95, Math.PI * 2.05);
+        ctx.lineTo(x + hr * 1.3, H * r[0] + hr * 1.2);
+        if (k % 7 === 3 && !reduced) { /* a raised hand */ ctx.lineTo(x + hr * 0.9, hy - hr * 2.6 - bob * 2); ctx.lineTo(x + hr * 1.25, hy - hr * 2.5 - bob * 2); ctx.lineTo(x + hr * 1.3, H * r[0] + hr * 1.2); }
+      }
+      ctx.lineTo(W + 40, base); ctx.closePath(); ctx.fill();
+    });
+  }
+  /* STAGE1 · each must is a record: black vinyl, oxblood label; done = gold label + groove shine */
+  function drawRecordMarker(ctx, x, y, ms, age, done, popping, t, i) {
+    var R = ms * 0.42 * (popping ? 1 + 0.12 * Math.sin(Math.min(1, age / 1.15) * Math.PI) : 1);
+    var spin = reduced ? 0 : t * (done ? 1.6 : 0.25) + i;
+    ctx.save(); ctx.translate(x, y);
+    ctx.fillStyle = "rgba(0,0,0,0.45)"; ctx.beginPath(); ctx.ellipse(3, 5, R, R, 0, 0, 7); ctx.fill();
+    ctx.rotate(spin);
+    var g = ctx.createRadialGradient(0, 0, R * 0.1, 0, 0, R); g.addColorStop(0, "#1e1c1f"); g.addColorStop(1, "#070607");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.08)"; ctx.lineWidth = 1;
+    for (var k = 0.45; k < 0.97; k += 0.1) { ctx.beginPath(); ctx.arc(0, 0, R * k, 0, 7); ctx.stroke(); }
+    ctx.strokeStyle = done ? "rgba(255,220,150,0.55)" : "rgba(255,255,255,0.16)"; ctx.lineWidth = R * 0.06;
+    ctx.beginPath(); ctx.arc(0, 0, R * 0.78, -1, -0.35); ctx.stroke();
+    ctx.fillStyle = done ? "#d4a860" : "#7e2f28"; ctx.beginPath(); ctx.arc(0, 0, R * 0.32, 0, 7); ctx.fill();
+    ctx.fillStyle = "rgba(240,228,206,0.85)"; ctx.fillRect(-R * 0.18, -R * 0.03, R * 0.36, R * 0.04);
+    ctx.fillStyle = "#e9e0cf"; ctx.beginPath(); ctx.arc(0, 0, R * 0.045, 0, 7); ctx.fill();
+    ctx.restore();
+  }
   function drawVinylJar(ctx, W, H, t) {
     var box = creatureAnchor(W, H);
     var st = global.JarEngine ? JarEngine.choreState("ainsley") : { fill: 0 };
@@ -1501,11 +1585,12 @@
     var popping = age >= 0 && age < 1.15;
     var done = !!q.done;
     var ms = q.ms || markerPx(440);
-    var glow = world === "harris" ? "140, 255, 190" : world === "ainsley" ? "255, 170, 80" : "255, 210, 120";
+    var glow = world === "harris" ? "140, 255, 190" : world === "ainsley" ? "200, 90, 60" : "255, 210, 120";
     if (done || popping) glow = "255, 196, 120";
     var pulse = 0.35 + 0.2 * Math.sin(t * 1.3 + i);
     var bloomA = popping ? 0.95 : done ? 0.72 : pulse;
     softBloom(ctx, q.x, q.seat, popping ? ms * 1.45 : done ? ms * 1.15 : ms * 0.95, "rgba(" + glow + "," + bloomA.toFixed(3) + ")");
+    if (world === "ainsley") { drawRecordMarker(ctx, q.x, q.seat, ms, age, done, popping, t, i); return; }
     var img = oriItems[world];
     if (!img) return;
     var sc = ms / Math.max(img.width, img.height);
@@ -1525,8 +1610,10 @@
   function paintOri(ctx, W, H, t, pan, quests, fill, world) {
     var book = oriBook(world, W, H);
     var man = (global.HousePlates && HousePlates[world]) || {};
-    if (!book || !book.sky) sky(ctx, W, H, [[0, "#102028"], [0.55, "#243428"], [1, "#121610"]]);
-    ["sky", "far", "mid", "near"].forEach(function (id) {
+    var venue = world === "ainsley"; /* STAGE1 · Ainsley: concert-poster venue, painted in code (no lake, no mascot) */
+    if (venue) { book = null; drawVenue(ctx, W, H, t, pan, fill); }
+    else if (!book || !book.sky) sky(ctx, W, H, [[0, "#102028"], [0.55, "#243428"], [1, "#121610"]]);
+    if (!venue) ["sky", "far", "mid", "near"].forEach(function (id) {
       var img = book && book[id];
       if (!img || img.width < 64) return;
       var p = layerShift(id, man);
@@ -1537,8 +1624,7 @@
         driftClouds(ctx, W, H, t, world);
       }
     });
-    if (world === "ainsley") waterShimmer(ctx, W, H, t);
-    motes(ctx, W, H, t, pan.x, world === "ainsley" ? "#ffd8c0" : world === "harris" ? "#d8ffe4" : "#fff1d0", reduced ? 8 : 28);
+    if (!venue) motes(ctx, W, H, t, pan.x, world === "ainsley" ? "#ffd8c0" : world === "harris" ? "#d8ffe4" : "#fff1d0", reduced ? 8 : 28);
     var cap = (man.landmarks && man.landmarks.length) || quests.length;
     var shown = quests.slice(0, cap);
     layoutLedges(shown, W, H, world, pan.x);
@@ -1566,8 +1652,9 @@
       drawPlate(ctx, fg, W, H, pan.x * fp, pan.y * fp * 0.35, PLATE_ZOOM, 1, 0, world);
       ctx.restore();
     }
+    if (venue) drawCrowd(ctx, W, H, t, pan);
     paintLabels();
-    if (!reduced) motes(ctx, W, H, t * 0.7 + 3, pan.x * 0.3, "#fff6e0", 12);
+    if (!reduced && !venue) motes(ctx, W, H, t * 0.7 + 3, pan.x * 0.3, "#fff6e0", 12);
     drawOriCreature(ctx, W, H, t, world);
     var anchor = creatureAnchor(W, H);
     if (feed && shown[feed.index]) {

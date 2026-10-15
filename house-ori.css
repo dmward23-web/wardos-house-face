@@ -2109,3 +2109,18 @@ html.ori-phone .cmd-chip {
   .ori-arrive { display: block !important; animation: ori-arrive 0.56s ease forwards !important; }
   html.ori-arriving::before { display: block !important; animation: none !important; opacity: var(--ori-veil-op, 1) !important; }
 }
+
+/* HIRES1 · Month on phones: the 1280x720 grove plates upscale ~4x on a 3x screen (soft). Use the 1152x2048 portrait
+   plate for the sky and drop the low-res depth layers; light, fog and motes stay as CSS. */
+@media (max-width: 600px) and (orientation: portrait) {
+  html.ori-on body[data-glass~="month-today"] { background-image: url("ori/plates/painted/phone-sky.webp?v=HIRES1") !important; }
+  body[data-glass~="month-today"] .ori-fallback.ori-painted .ori-sky { background-image: url("ori/plates/painted/phone-sky.webp?v=HIRES1") !important; background-position: center top !important; }
+  body[data-glass~="month-today"] .ori-fallback.ori-painted .ori-soft,
+  body[data-glass~="month-today"] .ori-fallback.ori-painted .ori-far,
+  body[data-glass~="month-today"] .ori-fallback.ori-painted .ori-mid,
+  body[data-glass~="month-today"] .ori-fallback.ori-painted .ori-near,
+  body[data-glass~="month-today"] .ori-fallback.ori-painted .ori-fore { background-image: none !important; }
+  body[data-glass~="month-today"] .ori-fallback.ori-painted .ori-near {
+    background-image: linear-gradient(180deg, transparent 72%, rgba(4, 14, 12, 0.55) 88%, rgba(3, 10, 9, 0.85) 100%) !important;
+  }
+}
