@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 15 2026",
   "asOfIso": "2026-10-15",
-  "refreshedAt": "2026-10-15T19:32:39.297Z",
+  "refreshedAt": "2026-10-15T19:48:54.556Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -825,22 +825,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "THU · 12:45",
-        "what": "LKMS CHOIR SING & SHARE FIELD TRIP",
+        "when": "THU · 3:00",
+        "what": "LKMS HOMEWORK HELP",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "THU",
-          "12:45"
+          "3:00"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Thu · 12:45",
-          "what": "LKMS choir Sing & Share field trip",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Thu · 3:00",
@@ -872,12 +865,6 @@
         }
       ],
       "school": [
-        {
-          "when": "Thu 15 · 12:45",
-          "what": "LKMS choir Sing & Share field trip",
-          "tone": "act",
-          "hint": ""
-        },
         {
           "when": "Thu 15 · 3:00",
           "what": "LKMS Homework Help",
@@ -1022,11 +1009,6 @@
           "tone": "act"
         },
         {
-          "when": "Thu 15 · 12:45",
-          "what": "LKMS choir Sing & Share field trip",
-          "tone": "act"
-        },
-        {
           "when": "Thu 15 · 3:00",
           "what": "LKMS Homework Help",
           "tone": "act"
@@ -1134,6 +1116,11 @@
         {
           "when": "Wed 21 · 4:20",
           "what": "Allen conference (VIRTUAL)",
+          "tone": "act"
+        },
+        {
+          "when": "Thu 22 · All day",
+          "what": "Ward Kids [AHH No School]",
           "tone": "act"
         }
       ]
