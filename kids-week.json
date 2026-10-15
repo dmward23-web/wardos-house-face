@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 15 2026",
   "asOfIso": "2026-10-15",
-  "refreshedAt": "2026-10-15T21:12:32.451Z",
+  "refreshedAt": "2026-10-15T21:39:51.268Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,45 +17,32 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "4:25",
-    "place": "Ainsley swim — Coach Ann",
-    "detailHtml": "5:40 Hayes flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+    "time": "5:40",
+    "place": "Hayes flag practice",
+    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
     "badge": "Thu",
-    "startIso": "2026-10-15T21:25:00.000Z",
-    "endIso": "2026-10-15T23:20:00.000Z",
+    "startIso": "2026-10-15T22:40:00.000Z",
+    "endIso": "2026-10-16T00:35:00.000Z",
     "kind": "sport",
     "nextLeave": {
       "label": "Next up · today",
-      "time": "4:25",
-      "place": "Ainsley swim — Coach Ann",
-      "detailHtml": "5:40 Hayes flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+      "time": "5:40",
+      "place": "Hayes flag practice",
+      "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
       "badge": "Thu",
-      "startIso": "2026-10-15T21:25:00.000Z",
-      "endIso": "2026-10-15T23:20:00.000Z",
+      "startIso": "2026-10-15T22:40:00.000Z",
+      "endIso": "2026-10-16T00:35:00.000Z",
       "kind": "sport",
-      "whenLabel": "4:25",
-      "summary": "Ainsley swim — Coach Ann · 5:00 practice",
+      "whenLabel": "5:40",
+      "summary": "Hayes flag practice · leave 5:40 · 6:00–7:15",
       "leaveBy": true
     },
     "queue": [
       {
         "label": "Next up · today",
-        "time": "4:25",
-        "place": "Ainsley swim — Coach Ann",
-        "detailHtml": "5:40 Hayes flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-15T21:25:00.000Z",
-        "endIso": "2026-10-15T23:20:00.000Z",
-        "kind": "sport",
-        "whenLabel": "4:25",
-        "summary": "Ainsley swim — Coach Ann · 5:00 practice",
-        "leaveBy": true
-      },
-      {
-        "label": "Next up · today",
         "time": "5:40",
         "place": "Hayes flag practice",
-        "detailHtml": "4:25 Ainsley swim — Coach Ann · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-15T22:40:00.000Z",
         "endIso": "2026-10-16T00:35:00.000Z",
@@ -63,6 +50,19 @@
         "whenLabel": "5:40",
         "summary": "Hayes flag practice · leave 5:40 · 6:00–7:15",
         "leaveBy": true
+      },
+      {
+        "label": "Next up · today",
+        "time": "8:15",
+        "place": "Harris music: talk about respect (Giuliani)",
+        "detailHtml": "5:40 Hayes flag practice · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Thu",
+        "startIso": "2026-10-16T01:15:00.000Z",
+        "endIso": "2026-10-16T01:30:00.000Z",
+        "kind": "other",
+        "whenLabel": "8:15",
+        "summary": "Harris music: talk about respect (Giuliani)",
+        "leaveBy": false
       },
       {
         "label": "Next up · Fri",
@@ -326,12 +326,12 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "FRI · All day",
-        "what": "SRE ORANGE DAY",
+        "when": "THU · 8:15",
+        "what": "HARRIS MUSIC: TALK ABOUT RESPECT (GIULIANI)",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "FRI",
-          "All day"
+          "THU",
+          "8:15"
         ]
       },
       "today": [
@@ -339,6 +339,13 @@
           "kind": "event",
           "when": "Thu · All day",
           "what": "SRE Red Day",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Thu · 8:15",
+          "what": "Harris music: talk about respect (Giuliani)",
           "hint": "",
           "tone": "act"
         },
