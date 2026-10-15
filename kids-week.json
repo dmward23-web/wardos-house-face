@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 15 2026",
   "asOfIso": "2026-10-15",
-  "refreshedAt": "2026-10-15T12:53:34.043Z",
+  "refreshedAt": "2026-10-15T13:23:05.340Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -26,15 +26,15 @@
     "kind": "school",
     "nextLeave": {
       "label": "Next up · today",
-      "time": "8:10",
-      "place": "Boys SRE drop",
+      "time": "3:15",
+      "place": "Boys SRE pickup",
       "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
       "badge": "Thu",
-      "startIso": "2026-10-15T13:10:00.000Z",
-      "endIso": "2026-10-15T13:40:00.000Z",
-      "kind": "school_drop",
-      "whenLabel": "8:10",
-      "summary": "Hayes + Harris — SRE drop-off · 8:25",
+      "startIso": "2026-10-15T20:15:00.000Z",
+      "endIso": "2026-10-15T21:00:00.000Z",
+      "kind": "school_pickup",
+      "whenLabel": "3:15",
+      "summary": "Hayes + Harris — SRE pickup · 3:40",
       "leaveBy": true
     },
     "queue": [
@@ -63,32 +63,6 @@
         "whenLabel": "7:00",
         "summary": "Harris — SRE specials: Music + Library checkout (library book)",
         "leaveBy": false
-      },
-      {
-        "label": "Next up · today",
-        "time": "7:45",
-        "place": "LKMS PSAT (if signed up) · Chromebook charged",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-15T12:45:00.000Z",
-        "endIso": "2026-10-15T13:00:00.000Z",
-        "kind": "other",
-        "whenLabel": "7:45",
-        "summary": "Ainsley — LKMS PSAT (if signed up) · Chromebook charged · 8:00",
-        "leaveBy": false
-      },
-      {
-        "label": "Next up · today",
-        "time": "8:10",
-        "place": "Boys SRE drop",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-15T13:10:00.000Z",
-        "endIso": "2026-10-15T13:40:00.000Z",
-        "kind": "school_drop",
-        "whenLabel": "8:10",
-        "summary": "Hayes + Harris — SRE drop-off · 8:25",
-        "leaveBy": true
       },
       {
         "label": "Next up · today",
@@ -193,6 +167,32 @@
         "whenLabel": "Fri 8:10",
         "summary": "Hayes + Harris — SRE drop-off · 8:25",
         "leaveBy": true
+      },
+      {
+        "label": "Next up · Fri",
+        "time": "12:00",
+        "place": "SRE Chat & Chew lunch",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Fri",
+        "startIso": "2026-10-16T17:00:00.000Z",
+        "endIso": "2026-10-16T17:30:00.000Z",
+        "kind": "school",
+        "whenLabel": "Fri 12:00",
+        "summary": "Hayes — SRE Chat & Chew lunch",
+        "leaveBy": false
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "7:00",
+        "place": "SRE specials: PE (tennis shoes)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-19T12:00:00.000Z",
+        "endIso": "2026-10-19T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Mon 7:00",
+        "summary": "Hayes — SRE specials: PE (tennis shoes)",
+        "leaveBy": false
       }
     ]
   },
@@ -877,22 +877,15 @@
       "appointmentsEmpty": "No appointments on your board.",
       "sportsEmpty": "",
       "hottest": {
-        "when": "THU · 7:45",
-        "what": "LKMS PSAT (IF SIGNED UP) · CHROMEBOOK CHARGED",
+        "when": "THU · 12:45",
+        "what": "LKMS CHOIR SING & SHARE FIELD TRIP",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "THU",
-          "7:45"
+          "12:45"
         ]
       },
       "today": [
-        {
-          "kind": "event",
-          "when": "Thu · 7:45",
-          "what": "LKMS PSAT (if signed up) · Chromebook charged",
-          "hint": "",
-          "tone": "act"
-        },
         {
           "kind": "event",
           "when": "Thu · 12:45",
