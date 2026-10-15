@@ -1302,32 +1302,43 @@
     ainsley: { world: "Ainsley", loadout: "Musts", markSym: "g2-ainsley", hqTitle: "Home base · with Dad", hqSym: "g2-home" }
   };
 
-  /* HUBSCROLL1 · daily SPECIAL — sourced only, never invented.
-     Hayes: Ms. Allen ParentSquare / cal PE note (“Specials: Mon Art, Tue Spanish, Wed Music, Thu PE, Fri Art”).
-     Harris: Kysa cal PE notes only (Thu PE · tennis shoes) — no weekly rotation in source. */
+  /* SPECIALS-COLOR1 2026-10-15 (Dan: "fix the schedule"). SRE specials follow the
+     4-day COLOR rotation (Orange → Yellow → Green → Red, school days only), NOT the weekday.
+     Sourced: Allen letters 9/25, 10/4, 10/9 + Lind letters 9/25, 10/12, matched to the
+     SRE "News from the Ridge" color days (10/12 Orange … 10/15 Red). Library checkout is a
+     fixed WEEKDAY: Hayes Wed, Harris Thu. Color comes only from an "SRE <Color> Day" row in
+     the feed — no color row, no special (never guessed from the weekday). Live calendar
+     specials always win over this table. */
   var SRE_SPECIALS = {
-    hayes: {
-      source: "Ms. Allen · ParentSquare / cal PE note",
-      Mon: "Art",
-      Tue: "Spanish",
-      Wed: "Music",
-      Thu: "PE · tennis shoes",
-      Fri: "Art"
-    },
-    harris: {
-      source: "Kysa · cal PE notes",
-      Thu: "PE · tennis shoes"
-    }
+    hayes: { source: "Ms. Allen letters · SRE color day", Orange: "Music", Yellow: "PE · tennis shoes", Green: "Art", Red: "Spanish", libraryDow: "Wed" },
+    harris: { source: "Ms. Lind letters · SRE color day", Orange: "PE · tennis shoes", Yellow: "Art", Green: "Spanish", Red: "Music", libraryDow: "Thu" }
   };
 
-  function specialForIso(kidId, iso) {
+  function sreColorForIso(rows, iso) {
+    if (!rows || !iso) return null;
+    var dow = CONSUME_DOW[dowIndexFromIso(iso)];
+    var dn = String(Number(String(iso).split("-")[2]));
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i] || {};
+      var m = /SRE (Orange|Yellow|Green|Red) Day/i.exec(String(r.what || ""));
+      if (!m) continue;
+      var w = String(r.when || "");
+      var hit = new RegExp("^" + dow + "\\s+" + dn + "\\b").test(w) || (iso === DAY_ISO && new RegExp("^(" + dow + "|Today)\\s*·").test(w));
+      if (hit) return m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase();
+    }
+    return null;
+  }
+
+  function specialForIso(kidId, iso, rows) {
     var map = SRE_SPECIALS[kidId];
     if (!map || !iso) return null;
     var dow = CONSUME_DOW[dowIndexFromIso(iso)];
-    if (!dow || !map[dow]) return null;
+    var color = sreColorForIso(rows, iso);
+    if (!dow || !color || !map[color]) return null;
+    var what = map[color] + (map.libraryDow === dow ? " + Library checkout (library book)" : "");
     return {
       when: dow + " · Special",
-      what: "Special · " + map[dow],
+      what: "Special · " + what,
       hint: map.source || "",
       tone: "act",
       kind: "special"
@@ -1457,7 +1468,7 @@
       var weekStart = mondayOfIso(DAY_ISO);
       for (var si = 0; si < 7; si++) {
         var iso = addDaysIsoLocal(weekStart, si);
-        var sp = specialForIso(kidId, iso);
+        var sp = specialForIso(kidId, iso, list);
         if (!sp) continue;
         /* Stamp day num so consumeParseWhen buckets correctly */
         var dow = CONSUME_DOW[dowIndexFromIso(iso)];
@@ -1949,7 +1960,8 @@
       renderList(document.querySelector("[data-mount-sports]"), kid.sports, kid.sportsEmpty || "no sports on your board right now");
       (function () {
         var schoolRows = (kid.school || []).slice();
-        var sp = specialForIso(kidId, DAY_ISO);
+        var hasLive = schoolRows.some(function (x) { return /special/i.test(String(x.what || "")); });
+        var sp = hasLive ? null : specialForIso(kidId, DAY_ISO, schoolRows.concat(kid.today || []));
         if (sp) {
           schoolRows = [{ when: "Today · Special", what: sp.what, hint: sp.hint, tone: "act" }].concat(schoolRows);
         }
