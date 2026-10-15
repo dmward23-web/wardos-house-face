@@ -453,6 +453,8 @@ body.kw-on #tapsync-badge { display: none !important; }
   pointer-events: none;
 }
 .kw-hud, .kw-week, .kw-path, .kw-jar-host, .kw-drawer, .kw-drawer * { pointer-events: auto; }
+/* DAYPICK2 · day strip, Path and drawer sit above the jar so its canvas never eats day taps */
+.kw-week, .kw-path, .kw-drawer { z-index: 5; }
 .kw-hud {
   position: absolute;
   left: 12px; right: 12px;
