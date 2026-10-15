@@ -1927,6 +1927,21 @@
     cv.setAttribute("aria-hidden", "true");
     document.body.insertBefore(cv, document.body.firstChild);
     bg = new World(cv);
+    /* MUTEHUD1 · a visible sound toggle in the world HUD (the old header one sits under the canvas). Hayes has his own. */
+    if (kid() !== "hayes" && global.HouseSfx && HouseSfx.setMuted) {
+      var mb = document.createElement("button");
+      mb.type = "button"; mb.className = "kw-mute"; mb.setAttribute("data-mute-toggle", ""); mb.setAttribute("data-mute-wired", "1");
+      mb.style.cssText = "pointer-events:auto;min-width:44px;min-height:44px;margin-left:auto;margin-right:8px;border:0;border-radius:22px;background:rgba(14,22,26,.6);color:#fff6e4;font:700 15px/1 system-ui,sans-serif;padding:0 12px";
+      mb.textContent = HouseSfx.isMuted() ? "🔇 OFF" : "🔊 ON";
+      mb.addEventListener("click", function (ev) {
+        ev.preventDefault(); ev.stopPropagation();
+        var next = !HouseSfx.isMuted();
+        var go = function () { HouseSfx.setMuted(next); };
+        if (!next && HouseSfx.unlockAudio) HouseSfx.unlockAudio().then(go, go); else go();
+      });
+      var hud = stage.querySelector(".kw-hud"), clk = hud.querySelector("[data-kw-clock]");
+      hud.insertBefore(mb, clk);
+    }
     stage.querySelector("[data-kw-home]").addEventListener("click", function (ev) {
       ev.preventDefault();
       ev.stopPropagation();
