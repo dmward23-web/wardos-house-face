@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-15T15:45:27.092Z",
+  "fetchedAt": "2026-10-15T16:00:08.960Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-22",
@@ -158,24 +158,6 @@
       "end": "2026-10-17T09:30:00-05:00",
       "location": "Heritage Park Soccer Complex, Field 10, 17255 S Black Bob Rd, Olathe, KS 66062",
       "busy": false,
-      "allDay": false
-    },
-    {
-      "id": "2dc0h3dg4lfcfp0rl1q75dn4go",
-      "summary": "Harris — Lindsay appt · 10:00",
-      "start": "2026-10-17T10:00:00-05:00",
-      "end": "2026-10-17T11:00:00-05:00",
-      "location": "8675 College Blvd, Overland Park, KS 66210-1946",
-      "busy": true,
-      "allDay": false
-    },
-    {
-      "id": "58qtgsidcan3blm27ap7g4pp9k",
-      "summary": "Hayes — Lindsay appt · 10:00",
-      "start": "2026-10-17T10:00:00-05:00",
-      "end": "2026-10-17T11:00:00-05:00",
-      "location": "",
-      "busy": true,
       "allDay": false
     },
     {
