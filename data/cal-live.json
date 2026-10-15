@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-15T15:20:02.907Z",
+  "fetchedAt": "2026-10-15T15:45:27.092Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-22",
@@ -189,10 +189,10 @@
     },
     {
       "id": "114kmjpd0jj6t277enqfp5dmd0",
-      "summary": "Hayes flag — SRE Falcons vs Pena · 5:15–6:15",
+      "summary": "Hayes flag — SRE Falcons (3rd BV Edelen) vs Pena · Field 8 · 5:15–6:15",
       "start": "2026-10-17T16:45:00-05:00",
       "end": "2026-10-17T18:15:00-05:00",
-      "location": "Heritage Park Soccer Complex, 17255 S Black Bob Rd, Olathe, KS 66062",
+      "location": "Heritage Park Soccer Complex Field 8 SC, 17255 S Black Bob Road, Olathe, KS 66062",
       "busy": false,
       "allDay": false
     },
