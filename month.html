@@ -878,14 +878,15 @@
         var model = modelDay(k);
         if (!(day && ((day.items && day.items.length) || day.withDan)) && !model.rows.length && !model.chips.length && !isToday) continue;
         var dt = new Date(y, m - 1, d);
-        html += '<a class="ori-day' + (isToday ? " is-today" : "") + '" href="sheet-today.html">';
+        /* DAYLINK1 · only today opens the Today sheet; other days show their rows here instead of opening the wrong day */
+        html += (isToday ? '<a class="ori-day is-today" href="sheet-today.html">' : '<div class="ori-day">');
         html += '<span class="ori-day-head"><span class="ori-dom">' + dows[dt.getDay()] + " " + d + "</span>";
         model.chips.forEach(function (chip) { html += '<span class="ori-chip">' + esc(chip) + "</span>"; });
         html += "</span>";
         model.rows.forEach(function (it) {
           html += '<span class="ori-ev ' + esc(it.c) + '" data-min="' + (it.min == null ? "" : it.min) + '">' + esc(it.l) + "</span>";
         });
-        html += "</a>";
+        html += isToday ? "</a>" : "</div>";
       }
       if (!html) html = '<p class="ori-day-empty">Nothing on the calendar this month</p>';
     } else {
@@ -896,11 +897,11 @@
         var dy = dd.getFullYear(), dm = dd.getMonth() + 1, dn = dd.getDate();
         if (dm !== m) { html += '<div class="day out"><div class="day-top"><span class="dom">' + dn + "</span></div></div>"; continue; }
         var k2 = key(dy, dm, dn), day2 = DATA && DATA.days[k2], isToday2 = k2 === t.iso;
-        html += '<a class="day' + (isToday2 ? " today" : "") + '" href="sheet-today.html"><div class="day-top"><span class="dom">' + dn + "</span>" + (isToday2 ? '<span class="day-tag">today</span>' : "") + "</div>";
+        html += (isToday2 ? '<a class="day today" href="sheet-today.html">' : '<div class="day">') + '<div class="day-top"><span class="dom">' + dn + "</span>" + (isToday2 ? '<span class="day-tag">today</span>' : "") + "</div>";
         if (day2 && day2.withDan) html += '<div class="mom dan">Kids with Dan</div>';
         html += '<div class="blocks">';
         (day2 ? day2.items : []).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '">' + esc(cleanCal(it.l)) + "</div>"; });
-        html += "</div></a>";
+        html += "</div>" + (isToday2 ? "</a>" : "</div>");
       }
     }
     grid.innerHTML = html;
@@ -931,6 +932,10 @@
     fetch("data/cal-months.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
     fetch("data/cal-live.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
   ]).then(function (pair) {
+    /* THEIRMOM1 · her name never shows as a label */
+    function scrub(o) { if (typeof o === "string") return o.replace(/pickup at Kristin's/gi, "pickup at their mom's").replace(/\bto Kristin\b/gi, "to their mom").replace(/Kristin's/g, "their mom's").replace(/\bKristin\b/g, "their mom"); if (Array.isArray(o)) return o.map(scrub); if (o && typeof o === "object") { for (var k in o) o[k] = scrub(o[k]); } return o; }
+    if (pair[0]) pair[0] = scrub(pair[0]);
+    if (pair[1]) pair[1] = scrub(pair[1]);
     if (pair[0] && pair[0].days) DATA = pair[0];
     if (pair[1] && pair[1].upcomingLeaves) LIVE = pair[1];
     render(cur.y, cur.m);
@@ -967,7 +972,7 @@
 <script src="house-sensi.js?v=SENSIAUTO1"></script>
 <script src="house-glass-bind.js?v=AUDIT1"></script>
 <script src="house-zoom.js"></script>
-<script src="house-hdr-home.js?v=HDRHOME1"></script>
+<script src="house-hdr-home.js?v=MUTEHIT1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>
 <script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>

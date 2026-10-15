@@ -264,7 +264,7 @@
     this.envCv.height = 256;
     this.envCtx = this.envCv.getContext("2d", { alpha: false });
     var glAttr = { alpha: true, premultipliedAlpha: false, antialias: false, preserveDrawingBuffer: true };
-    if (!lowTier()) {
+    if (!lowTier() && this.kid !== "ainsley") { /* VINYLJAR1 · Ainsley gets a record, not a creature */
       try {
         this.gl = this.cv.getContext("webgl", glAttr) || this.cv.getContext("experimental-webgl", glAttr);
       } catch (eGl) {
@@ -498,6 +498,35 @@
     ctx.drawImage(img, w * 0.08, h * 0.02, w * 0.84, h * 0.86);
   };
 
+  /* VINYLJAR1 · mature jar for Ainsley: a spinning record; the gold groove ring fills with her musts. No face, no count. */
+  Jar.prototype.paintVinyl = function (st, t) {
+    var ctx = this.ctx || (this.ctx = this.cv.getContext("2d"));
+    if (!ctx) return;
+    var w = this.cv.width, h = this.cv.height, cx = w / 2, cy = h * 0.5, R = Math.min(w, h) * 0.44;
+    ctx.clearRect(0, 0, w, h);
+    var spin = (st && st.asleep) || this.reduced ? 0 : t * (0.6 + this.display * 1.6);
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(spin);
+    ctx.fillStyle = "rgba(0,0,0,0.45)"; ctx.beginPath(); ctx.arc(4, 6, R, 0, 7); ctx.fill();
+    var g = ctx.createRadialGradient(0, 0, R * 0.1, 0, 0, R);
+    g.addColorStop(0, "#1b1a1c"); g.addColorStop(1, "#070708");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = Math.max(1, R * 0.012);
+    for (var k = 0.42; k < 0.98; k += 0.07) { ctx.beginPath(); ctx.arc(0, 0, R * k, 0, 7); ctx.stroke(); }
+    ctx.strokeStyle = "rgba(255,255,255,0.18)"; ctx.lineWidth = R * 0.05;
+    ctx.beginPath(); ctx.arc(0, 0, R * 0.8, -0.9, -0.3); ctx.stroke();
+    ctx.restore();
+    ctx.save(); ctx.translate(cx, cy);
+    ctx.strokeStyle = "rgba(212,168,96,0.22)"; ctx.lineWidth = R * 0.09;
+    ctx.beginPath(); ctx.arc(0, 0, R * 0.62, 0, 7); ctx.stroke();
+    if (this.display > 0.002) {
+      ctx.strokeStyle = st && st.full ? "#f2cf86" : "#d4a860"; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.arc(0, 0, R * 0.62, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, this.display)); ctx.stroke();
+    }
+    ctx.fillStyle = "#8a3b2e"; ctx.beginPath(); ctx.arc(0, 0, R * 0.3, 0, 7); ctx.fill();
+    ctx.fillStyle = "#e9e0cf"; ctx.beginPath(); ctx.arc(0, 0, R * 0.04, 0, 7); ctx.fill();
+    ctx.restore();
+  };
+
   Jar.prototype.frame = function () {
     var t = virtualNow == null ? (nowMs() - this.t0) / 1000 : virtualNow / 1000;
     var st = this.getState() || choreState(this.kid);
@@ -521,6 +550,7 @@
     if (this.blink < -this.nextBlink) { this.blink = 0.14; this.nextBlink = 2.2 + Math.random() * 3; }
     var energy = st.asleep ? 0.08 : (st.hungry ? 0.1 : (0.22 + this.display * 0.85));
     if (st.full && !st.asleep) energy = 1.35;
+    if (this.kid === "ainsley") { this.paintVinyl(st, t); return; }
     if (this.useGL) {
       this.glFrame(st, t, energy);
       return;

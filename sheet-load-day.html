@@ -11,8 +11,8 @@
 <meta name="apple-mobile-web-app-title" content="WardOS House" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
-<meta name="description" content="Board-OS House face · Mon Sep 28 LOAD DAY · House+Desk LIVE · school · sports" />
-<title>BOARD-OS · HOUSE FACE · LOAD DAY · MON SEP 28</title>
+<meta name="description" content="Board-OS House face · LOAD DAY (live) · House+Desk LIVE · school · sports" />
+<title>BOARD-OS · HOUSE FACE · LOAD DAY</title>
 <link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
 <link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=LIVEGREEN1" />
 <style>
@@ -398,59 +398,18 @@
  <div class="loadband-accent"></div>
  <div class="loadband-body">
  <div class="loadband-main">
- <div class="loadband-label">Mon Sep 28 · load day</div>
+ <div class="loadband-label" data-ld="label">Load day</div>
  <div class="loadband-title">House+Desk LIVE · <span class="time">8:00</span></div>
  <div class="loadband-sub">SRE drop <strong>8:25</strong> · Ainsley HW <strong>3:00</strong> · boys pickup <strong>3:40</strong> · Hayes BB <strong>6:15</strong></div>
  </div>
  <div class="loadband-stamp" aria-hidden="true">
  <div class="big">Load day</div>
- <div class="sm">Mon 28</div>
+ <div class="sm" data-ld="stamp">—</div>
  </div>
  </div>
  </section>
 
- <div class="timeline" aria-label="Day timeline">
- <article class="beat leave">
- <span class="pill">1 · Live</span>
- <div class="clock">8:00</div>
- <div class="what">House+Desk LIVE</div>
- <div class="detail">Flip · wall station day</div>
- </article>
- <article class="beat flight">
- <span class="pill">2 · Drop</span>
- <div class="clock">8:10 / 8:25</div>
- <div class="what">SRE drop · Hayes + Harris</div>
- <div class="detail">Leave 8:10 for 8:25</div>
- <div class="chip-row">
- <span class="kchip hay"><span class="d">H</span>Hayes</span>
- <span class="kchip har"><span class="d">H</span>Harris</span>
- </div>
- </article>
- <article class="beat bday">
- <span class="pill">3 · HW</span>
- <div class="clock">3:00</div>
- <div class="what">Ainsley LKMS HW Help</div>
- <div class="detail">Locked · her board</div>
- <div class="chip-row"><span class="kchip ain"><span class="d">A</span>Ainsley</span></div>
- </article>
- <article class="beat handoff">
- <span class="pill">4 · Pickup</span>
- <div class="clock">3:15 / 3:40</div>
- <div class="what">Boys pickup</div>
- <div class="detail">Leave 3:15 for 3:40</div>
- <div class="chip-row">
- <span class="kchip hay"><span class="d">H</span></span>
- <span class="kchip har"><span class="d">H</span></span>
- </div>
- </article>
- <article class="beat glow">
- <span class="pill">5 · Baseball</span>
- <div class="clock">~5:40 / 6:15</div>
- <div class="what">Hayes baseball · BV Rec Field 3</div>
- <div class="detail">Leave ~5:40 · practice 6:15</div>
- <div class="chip-row"><span class="kchip hay"><span class="d">H</span>Hayes</span></div>
- </article>
- </div>
+ <div class="timeline" aria-label="Day timeline" data-ld="timeline"></div>
 
  <div class="lower">
  <section class="sec" aria-label="Pack checklist strip">
@@ -505,38 +464,44 @@
  <div class="handoff-card">
  <div class="lbl">WITH DAD</div>
  <div class="big">Kids with Dad @ <span class="hl">147th</span></div>
- <div class="sub">Mon school + House+Desk LIVE</div>
+ <div class="sub" data-ld="sub">from the live calendar</div>
  </div>
- <div class="glance">
- <div class="glance-row loud">
- <span class="t">8:00</span>
- <span class="w">House+Desk LIVE</span>
- </div>
- <div class="glance-row">
- <span class="t">8:25</span>
- <span class="w">SRE drop · Hayes + Harris</span>
- </div>
- <div class="glance-row">
- <span class="t">6:15</span>
- <span class="w">Hayes baseball · BV Rec Field 3</span>
- </div>
- </div>
+ <div class="glance" data-ld="glance"></div>
  </section>
  </div>
 
  <footer class="ftr">
  <div class="ftr-left">
- <span class="ftr-chip">LOAD DAY · MON SEP 28</span>
+ <span class="ftr-chip" data-ld="ftr">LOAD DAY</span>
  </div>
  </footer>
 </div>
 
 <script src="house-clock.js?v=KITDEAD1"></script>
 <script src="house-zoom.js"></script>
-<script src="house-hdr-home.js?v=HDRHOME1"></script>
+<script src="house-hdr-home.js?v=MUTEHIT1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>
 <script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
 <script src="house-ori-world.js?v=ORIHOME18"></script>
+<script>/* LOADLIVE1 · load day reads data/cal-live.json (today, or the next day with leaves) — no hardcoded date */
+(function(){function q(k){return document.querySelector('[data-ld="'+k+'"]')}
+function e(t){return String(t).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+function day(iso){var d=new Date(iso+"T12:00:00");return d}
+function hm(s){var m=/T(\d\d):(\d\d)/.exec(s);if(!m)return"";var h=+m[1]%12||12;return h+":"+m[2]}
+fetch("data/cal-live.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json()}).then(function(d){
+var now=new Date(),today=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Chicago"}).format(now);
+var L=(d.upcomingLeaves||[]).filter(function(x){return x&&x.start&&!x.allDay&&new Date(x.end||x.start)>now});
+var iso=L.length?L[0].start.slice(0,10):today;var rows=L.filter(function(x){return x.start.slice(0,10)===iso});
+var dd=day(iso),lab=dd.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+q("label").textContent=lab+" · load day";q("ftr").textContent="LOAD DAY · "+lab.toUpperCase();
+q("stamp").textContent=dd.toLocaleDateString("en-US",{weekday:"short"})+" "+dd.getDate();
+var t=document.querySelector(".loadband-title"),sb=document.querySelector(".loadband-sub");
+if(t)t.innerHTML=rows.length?e(rows[0].summary.split(" · ")[0])+' · <span class="time">'+hm(rows[0].start)+'</span>':"Nothing on the calendar";
+if(sb)sb.innerHTML=rows.slice(1,5).map(function(x){return e(x.summary.split(" · ")[0])+" <strong>"+hm(x.start)+"</strong>"}).join(" · ");
+q("timeline").innerHTML=rows.map(function(x,i){return '<article class="beat leave"><span class="pill">'+(i+1)+'</span><div class="clock">'+hm(x.start)+'</div><div class="what">'+e(x.summary)+'</div><div class="detail">'+e((x.location||"").split(",")[0])+'</div></article>'}).join("")||'<article class="beat"><div class="what">No leaves</div></article>';
+q("glance").innerHTML=rows.slice(0,3).map(function(x){return '<div class="glance-row"><span class="t">'+hm(x.start)+'</span><span class="w">'+e(x.summary.split(" · ")[0])+'</span></div>'}).join("");
+q("sub").textContent=rows.length+" on the calendar · "+lab;
+}).catch(function(){q("label").textContent="Load day · calendar offline"});})();</script>
 </body>
 </html>

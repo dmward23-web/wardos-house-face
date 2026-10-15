@@ -761,14 +761,14 @@
  </div>
  <div class="star-count">
  <div class="star-big"><span class="s g2-inline"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-tour"/></svg></span>0</div>
- <div class="star-label">Tour Stars</div>
+ <div class="star-label">Tour Jar</div>
  <div class="star-row" hidden>
  <span class="tap-star dim" data-check="ainsley-star-1" aria-label="Star 1" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-2" aria-label="Star 2" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-3" aria-label="Star 3" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-4" aria-label="Star 4" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-5" aria-label="Star 5" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-6" aria-label="Star 6" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-7" aria-label="Star 7" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-8" aria-label="Star 8" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-9" aria-label="Star 9" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-10" aria-label="Star 10" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-11" aria-label="Star 11" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-12" aria-label="Star 12" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-13" aria-label="Star 13" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-14" aria-label="Star 14" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-15" aria-label="Star 15" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-16" aria-label="Star 16" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-17" aria-label="Star 17" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-18" aria-label="Star 18" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-19" aria-label="Star 19" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-20" aria-label="Star 20" aria-pressed="false">★</span>
  </div>
  </div>
  <div class="feed">
- <div class="feed-title">Musts that earn ★ into the jar</div>
- <div class="feed-row"><span class="plus">$7 ea wk</span> Bed · room · dishes · empty DW · shoes/coats<div class="when">daily · 1★×7 Sat–Fri</div></div>
+ <div class="feed-title">Musts that fill the jar</div>
+ <div class="feed-row"><span class="plus">$7 ea wk</span> Bed · room · dishes · empty DW · shoes/coats<div class="when">daily · Sat–Fri</div></div>
  <div class="feed-row"><span class="plus">$3</span> Bathroom wipe<div class="when">weekly</div></div>
  <div class="feed-row"><span class="plus">$5</span> Laundry full cycle<div class="when">weekly</div></div>
  <div class="feed-row"><span class="plus">$1</span> Garage cubby · bag + sports<div class="when">weekly</div></div>
@@ -843,11 +843,11 @@
 </div>
 <script src="house-clock.js?v=SHEETCLK1"></script>
 <script src="house-tapsync.js?v=UNDO1"></script>
-<script src="kids-data.js?v=DAYPICK1"></script>
+<script src="kids-data.js?v=LIVESPEC1"></script>
 <script src="house-saves.js?v=JARMATH1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=HUM1"></script>
-<script src="house-checkoffs.js?v=MUSTGATE1" defer></script>
+<script src="house-checkoffs.js?v=DBLTAP1" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
  if (window.HouseSaves) { HouseSaves.mount("ainsley"); HouseSaves.mount("hayes"); HouseSaves.mount("harris"); }
@@ -863,10 +863,13 @@ document.addEventListener("DOMContentLoaded", function () {
  var big = document.querySelector('.bank.'+id+' .star-big');
  if (big) {
  var sym = (v.currency && v.currency.symbol) || "★";
- big.innerHTML = '<span class="s">'+sym+'</span>'+(v.week != null ? v.week : v.lifetime);
+ /* AINSNOSCORE1 · Ainsley gets no star tally — show her jar in dollars */
+ if (id === "ainsley") { big.textContent = "Tour Jar"; big.setAttribute("data-noscore","1"); }
+ else big.innerHTML = '<span class="s">'+sym+'</span>'+(v.week != null ? v.week : v.lifetime);
  }
  var lab = document.querySelector('.bank.'+id+' .star-label');
- if (lab) {
+ if (lab && id === "ainsley") lab.textContent = "Musts fill it · payday with Dad";
+ else if (lab) {
  lab.textContent = "Balance $"+v.balance+" · Week $"+v.weekEarn+" · Jar $"+v.toward+"/$"+v.need;
  }
  });
@@ -890,7 +893,7 @@ document.addEventListener("DOMContentLoaded", function () {
 })();
 </script>
 <script src="house-fresh.js?v=FRESH1"></script>
-<script src="house-hdr-home.js?v=HDRHOME1"></script>
+<script src="house-hdr-home.js?v=MUTEHIT1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>
 <script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>

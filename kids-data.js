@@ -1451,7 +1451,9 @@
     push(kid.appointments, "appointments");
     /* Daily SPECIAL into school strip · sourced rotation only */
     var kidId = kid && kid.id;
-    if (kidId && SRE_SPECIALS[kidId]) {
+    /* LIVESPEC1 · live calendar specials win; the hardcoded table is only a fallback when the feed has none */
+    var liveSpecial = list.some(function (x) { return /special/i.test(String(x.what || "") + " " + String(x.when || "") + " " + String(x.hint || "")); });
+    if (kidId && SRE_SPECIALS[kidId] && !liveSpecial) {
       var weekStart = mondayOfIso(DAY_ISO);
       for (var si = 0; si < 7; si++) {
         var iso = addDaysIsoLocal(weekStart, si);

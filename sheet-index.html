@@ -3794,6 +3794,19 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 <link rel="stylesheet" href="house-spotify.css?v=SPOTIFY3" /><!-- SPOTIFY1 -->
 <script>(function(){var h=document.documentElement;h.classList.add("ori-calm");var veil=false;try{if(sessionStorage.getItem("ori-from")||/from=/.test(location.hash||""))veil=true;var stamp=+sessionStorage.getItem("ori-veil-next")||0;if(stamp&&Date.now()-stamp<8000){veil=true;sessionStorage.removeItem("ori-veil-next");}}catch(e){}if(veil){h.classList.add("ori-arriving");h.setAttribute("data-ori-veil","1");var s=document.createElement("style");s.textContent="html.ori-arriving::before,html.ori-held::before{content:none!important;display:none!important;background:#062018!important}";(document.head||h).appendChild(s);var el=document.createElement("div");el.className="ori-iris";el.setAttribute("data-ori-veil","1");el.style.cssText="position:fixed;inset:0;z-index:2147483647;background:#062018;opacity:1";el.style.setProperty("animation","none","important");h.appendChild(el);addEventListener("pageshow",function(){var start=0;function step(now){if(!start)start=now;var t=now-start;var op=t<160?1:Math.max(0,1-(t-160)/420);el.style.opacity=String(op);el.style.transform="translate3d(0,"+(Math.min(t,400)*0.001).toFixed(3)+"px,0)";void el.offsetWidth;if(op>0.001)requestAnimationFrame(step);else{el.remove();h.classList.remove("ori-arriving");}}requestAnimationFrame(step);});}try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-calm-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="stylesheet" href="house-ori-calm.css?v=CALM1" />
+<style id="glance-first">
+/* GLANCE1 · phone: kids + next leave first, then cams / lights / music */
+@media (max-width: 600px) {
+  .panel > header { order: -10 !important; }
+  .panel > .who-up { order: -9 !important; }
+  .panel > .hub-upper { order: -8 !important; }
+  .panel > .hub-cam-deck { order: -7 !important; }
+  .panel > .grid-wrap { order: -6 !important; }
+  .hub-upper > .leaveby { order: -5 !important; }
+  .hub-upper > .hub-lights { order: 5 !important; }
+  .hub-upper > .sp-tile { order: 6 !important; }
+}
+</style>
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -4230,12 +4243,12 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <div class="tile-icon g2-mark" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-month"/></svg></div>
  <div class="tile-titles">
  <div class="tile-label">Month</div>
- <div class="tile-sub">Sep → Oct horizon</div>
+ <div class="tile-sub" data-mtile="sub">This month → next</div>
  </div>
  </div>
  <div class="tile-micro">
- <div class="tile-mrow"><span class="mt">SEP</span><span class="md">Week 5 · wrap practices</span><span class="tile-mchip amber">Now</span></div>
- <div class="tile-mrow"><span class="mt">OCT</span><span class="md">School nights · swim load</span><span class="tile-mchip">Peek</span></div>
+ <div class="tile-mrow"><span class="mt" data-mtile="m0">—</span><span class="md" data-mtile="w0">This month</span><span class="tile-mchip amber">Now</span></div>
+ <div class="tile-mrow"><span class="mt" data-mtile="m1">—</span><span class="md">Next month</span><span class="tile-mchip">Peek</span></div>
  <div class="tile-mrow"><span class="mt">KEY</span><span class="md">Screens · flag · travel</span></div>
  <div class="tile-mrow"><span class="mt">HOLD</span><span class="md">Trips · weekend blocks</span></div>
  </div>
@@ -4338,7 +4351,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 <script src="house-weather.js?v=ORIHOME20"></script>
 <script src="house-sfx.js?v=HUM1"></script>
 <script src="house-tapsync.js?v=CALM1"></script>
-<script src="kids-data.js?v=DAYPICK1"></script>
+<script src="kids-data.js?v=LIVESPEC1"></script>
 <script src="house-kid-engage.js?v=ALLDAY1"></script>
 <script src="house-hub-tiles-bind.js?v=ALLDAY1"></script>
 <script src="house-sensi.js?v=SENSIAUTO1"></script>
@@ -4456,5 +4469,10 @@ document.addEventListener("click", function (ev) {
 <script src="house-spotify.js?v=SPOTIFY4"></script>
 <script>/* SPOTIFY1 */ try { HouseSpotify.mountTiles(document).start(); } catch (e) {}</script>
 <script src="house-ori-calm.js?v=CALM1"></script>
+<script>/* MONTHNOW1 · month tile follows the real date (Chicago) */
+(function(){try{var p=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Chicago"}).format(new Date()).split("-");var y=+p[0],m=+p[1]-1,d=+p[2];
+var M=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"],N=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function s(k,v){var e=document.querySelector('[data-mtile="'+k+'"]');if(e)e.textContent=v}
+s("m0",M[m]);s("m1",M[(m+1)%12]);s("w0","Week "+Math.ceil((d+new Date(y,m,1).getDay())/7)+" · this month");s("sub",N[m]+" → "+N[(m+1)%12]+" horizon")}catch(e){}})();</script>
 </body>
 </html>

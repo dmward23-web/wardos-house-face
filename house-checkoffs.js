@@ -467,6 +467,10 @@
         }
         /* Daily week rows are shells — only .day-tap buttons count */
         if (el.classList.contains("daily-week") && !el.classList.contains("day-tap")) return;
+        /* DBLTAP1 · a fumbled double tap (<800ms) must not undo the check */
+        var tnow = Date.now();
+        if (el.__lastToggle && tnow - el.__lastToggle < 800) return;
+        el.__lastToggle = tnow;
         var nowDone = el.classList.contains("tap-star")
           ? !el.classList.contains("lit")
           : !el.classList.contains("done");

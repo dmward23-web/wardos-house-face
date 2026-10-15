@@ -154,7 +154,7 @@
     var list = root.querySelector("[data-cw-day]");
     if (!list) return;
     var rows = (global.WardKids && WardKids.eventsForIso && WardKids.eventsForIso(kid(), data(), sel)) || [];
-    if (asleep()) { list.innerHTML = "<li>Mom's week. Nothing to do here.</li>"; return; }
+    if (asleep()) { list.innerHTML = "<li>Their mom's week. Nothing to do here.</li>"; return; }
     if (!rows.length) { list.innerHTML = "<li>Nothing on the schedule.</li>"; return; }
     list.innerHTML = "";
     rows.forEach(function (r) {

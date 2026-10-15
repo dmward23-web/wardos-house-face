@@ -596,3 +596,14 @@ html.kw-reduce .kw-iris::before { animation: none; transform: scale(1); }
   background: radial-gradient(circle, rgba(255,240,180,1) 0%, rgba(255,210,110,.85) 35%, rgba(255,190,80,0) 70%);
   box-shadow: 0 0 28px 10px rgba(255,214,120,.55); }
 .kw-fly-txt { font: 800 13px/1.1 system-ui, sans-serif; color: #fff6dc; text-shadow: 0 1px 4px rgba(0,0,0,.8); white-space: nowrap; }
+
+/* FITW1 · nothing wider than the phone: chore day taps share the row, world layers never pan sideways */
+html, body { overflow-x: hidden !important; overscroll-behavior-x: none; }
+.quest-days { min-width: 0; }
+.quest-days .day-tap { flex: 1 1 0 !important; min-width: 0 !important; width: auto !important; }
+.kw-stage, .kw-canvas, .hl-layer { max-width: 100vw !important; }
+/* LANDFIT1 · landscape: PATH moves up out of the label field; HUD clock stays on screen */
+@media (orientation: landscape) and (max-height: 600px) {
+  .kw-path { top: 64px !important; bottom: auto !important; }
+  .kw-hud { right: max(16px, env(safe-area-inset-right)) !important; }
+}

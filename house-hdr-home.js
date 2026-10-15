@@ -62,6 +62,13 @@
       if (!inHeader(ev)) return;
       var t = ev.target && ev.target.closest ? ev.target.closest(CONTROL) : null;
       if (t && t !== h) return; /* a real control inside/over the header */
+      /* MUTEHIT1 · a canvas/HUD drawn over a header control (mute) must not swallow it: hit-test real controls by rect */
+      var hit = null;
+      h.querySelectorAll(CONTROL).forEach(function (c) {
+        if (hit) return; var r = c.getBoundingClientRect();
+        if (r.width && r.height && ev.clientX >= r.left - 6 && ev.clientX <= r.right + 6 && ev.clientY >= r.top - 6 && ev.clientY <= r.bottom + 6) hit = c;
+      });
+      if (hit) { ev.preventDefault(); ev.stopPropagation(); hit.click(); return; }
       ev.preventDefault();
       goHome();
     });

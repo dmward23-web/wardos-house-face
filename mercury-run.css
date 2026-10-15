@@ -40,3 +40,5 @@ html, body { margin: 0; height: 100%; background: #070b10; color: #f4fbff; overf
 
 /* POWERUPS2 · power-ups are drawn in-world; the old text pills stay in the DOM for a11y only */
 .hud .pw { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* BACKPILL1 · "Back to the woods" label centred in its pill */
+.gather a { display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1.1 !important; box-sizing: border-box; }

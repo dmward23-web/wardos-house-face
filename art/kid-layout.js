@@ -243,7 +243,7 @@
     it.x = clamp(it.x, lo, hi);
     var labelDrop = it.dh / 2 + GAP + it.met.hh;
     var seatMin = Math.max(it.dh / 2 + 4, 50 - it.dh / 2 - GAP);
-    var seatMax = (H - 64) - labelDrop;
+    var seatMax = (H - (W > H * 1.15 ? 96 : 64)) - labelDrop; /* LANDFIT1 · landscape labels clear the day strip + fern */
     if (seatMax < seatMin) seatMax = H - labelDrop - 4;
     it.seat = clamp(it.seat, seatMin, seatMax);
   }
