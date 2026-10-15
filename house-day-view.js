@@ -22,8 +22,9 @@
   function mount(months, live) {
     var panel = document.querySelector(".panel");
     if (!panel) return;
-    [".gm", ".wx-card", ".body", ".leaveby", "[data-live=\"leaveby\"]"].forEach(function (s) { panel.querySelectorAll(s).forEach(function (e) { e.style.display = "none"; }); });
-    setTimeout(function () { panel.querySelectorAll(".leaveby").forEach(function (e) { e.style.display = "none"; }); }, 1500);
+    var st = document.createElement("style");
+    st.textContent = "html.day-view-on .panel > .gm, html.day-view-on .panel > .wx-card, html.day-view-on .panel > .body, html.day-view-on .panel > .leaveby, html.day-view-on .panel .leaveby, html.day-view-on .panel > .ftr { display: none !important; }";
+    document.head.appendChild(st); document.documentElement.classList.add("day-view-on");
     var chip = document.querySelector("[data-sheet-chip]"); if (chip) chip.textContent = "Day";
     var day = months && months.days && months.days[iso];
     var rows = [];
