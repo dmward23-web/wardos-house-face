@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 15 2026",
   "asOfIso": "2026-10-15",
-  "refreshedAt": "2026-10-15T13:23:05.340Z",
+  "refreshedAt": "2026-10-15T13:43:10.182Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -17,12 +17,12 @@
   },
   "boardStrip": {
     "label": "Next up · today",
-    "time": "7:00",
-    "place": "SRE specials: Spanish",
-    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+    "time": "12:45",
+    "place": "LKMS choir Sing & Share field trip",
+    "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
     "badge": "Thu",
-    "startIso": "2026-10-15T12:00:00.000Z",
-    "endIso": "2026-10-15T12:15:00.000Z",
+    "startIso": "2026-10-15T17:45:00.000Z",
+    "endIso": "2026-10-15T19:40:00.000Z",
     "kind": "school",
     "nextLeave": {
       "label": "Next up · today",
@@ -40,35 +40,9 @@
     "queue": [
       {
         "label": "Next up · today",
-        "time": "7:00",
-        "place": "SRE specials: Spanish",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-15T12:00:00.000Z",
-        "endIso": "2026-10-15T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:00",
-        "summary": "Hayes — SRE specials: Spanish",
-        "leaveBy": false
-      },
-      {
-        "label": "Next up · today",
-        "time": "7:00",
-        "place": "SRE specials: Music + Library checkout (library book)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-15T12:00:00.000Z",
-        "endIso": "2026-10-15T12:15:00.000Z",
-        "kind": "school",
-        "whenLabel": "7:00",
-        "summary": "Harris — SRE specials: Music + Library checkout (library book)",
-        "leaveBy": false
-      },
-      {
-        "label": "Next up · today",
         "time": "12:45",
         "place": "LKMS choir Sing & Share field trip",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-15T17:45:00.000Z",
         "endIso": "2026-10-15T19:40:00.000Z",
@@ -81,7 +55,7 @@
         "label": "Next up · today",
         "time": "3:00",
         "place": "LKMS Homework Help",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "3:15 boys pickup · kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-15T20:00:00.000Z",
         "endIso": "2026-10-15T21:00:00.000Z",
@@ -192,6 +166,32 @@
         "kind": "school",
         "whenLabel": "Mon 7:00",
         "summary": "Hayes — SRE specials: PE (tennis shoes)",
+        "leaveBy": false
+      },
+      {
+        "label": "Next up · Mon",
+        "time": "7:00",
+        "place": "SRE specials: Art",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Mon",
+        "startIso": "2026-10-19T12:00:00.000Z",
+        "endIso": "2026-10-19T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Mon 7:00",
+        "summary": "Harris — SRE specials: Art",
+        "leaveBy": false
+      },
+      {
+        "label": "Next up · Tue",
+        "time": "7:00",
+        "place": "SRE specials: Art",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Tue",
+        "startIso": "2026-10-20T12:00:00.000Z",
+        "endIso": "2026-10-20T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Tue 7:00",
+        "summary": "Hayes — SRE specials: Art",
         "leaveBy": false
       }
     ]
@@ -326,12 +326,12 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "THU · 7:00",
-        "what": "SRE SPECIALS: MUSIC + LIBRARY CHECKOUT (LIBRARY ",
+        "when": "THU · 8:10",
+        "what": "SRE DROP-OFF",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "THU",
-          "7:00"
+          "8:10"
         ]
       },
       "today": [
@@ -339,13 +339,6 @@
           "kind": "event",
           "when": "Thu · All day",
           "what": "SRE Red Day",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Thu · 7:00",
-          "what": "SRE specials: Music + Library checkout (library book)",
           "hint": "",
           "tone": "act"
         },
@@ -376,12 +369,6 @@
         {
           "when": "Thu 15 · All day",
           "what": "SRE Red Day",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 7:00",
-          "what": "SRE specials: Music + Library checkout (library book)",
           "tone": "act",
           "hint": ""
         },
@@ -589,12 +576,12 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "THU · 7:00",
-        "what": "SRE SPECIALS: SPANISH",
+        "when": "THU · 8:10",
+        "what": "SRE DROP-OFF",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "THU",
-          "7:00"
+          "8:10"
         ]
       },
       "today": [
@@ -602,13 +589,6 @@
           "kind": "event",
           "when": "Thu · All day",
           "what": "SRE Red Day",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Thu · 7:00",
-          "what": "SRE specials: Spanish",
           "hint": "",
           "tone": "act"
         },
@@ -653,12 +633,6 @@
         {
           "when": "Thu 15 · All day",
           "what": "SRE Red Day",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Thu 15 · 7:00",
-          "what": "SRE specials: Spanish",
           "tone": "act",
           "hint": ""
         },
@@ -1074,16 +1048,6 @@
           "tone": "act"
         },
         {
-          "when": "Thu 15 · 7:00",
-          "what": "SRE specials: Spanish",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 7:00",
-          "what": "SRE specials: Music + Library checkout (library book)",
-          "tone": "act"
-        },
-        {
           "when": "Thu 15 · 8:10",
           "what": "SRE drop-off",
           "tone": "act"
@@ -1186,6 +1150,16 @@
         {
           "when": "Wed 21 · 7:00",
           "what": "SRE specials: Spanish + Library (library book)",
+          "tone": "act"
+        },
+        {
+          "when": "Wed 21 · 7:00",
+          "what": "SRE specials: Music",
+          "tone": "act"
+        },
+        {
+          "when": "Wed 21 · 4:00",
+          "what": "Lind conference (VIRTUAL)",
           "tone": "act"
         }
       ]
