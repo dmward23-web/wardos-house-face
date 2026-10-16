@@ -9,7 +9,7 @@
   };
   var t = THEMES[m]; if (!t) return;
   function mount() {
-    var L = document.createElement("div"); L.className = "km-layer " + t.cls; L.setAttribute("aria-hidden", "true");
+    var L = document.createElement("div"); L.className = "km-layer " + t.cls + (document.querySelector(".kw-canvas") ? " km-kid" : ""); L.setAttribute("aria-hidden", "true");
     if (t.grade) { var g = document.createElement("div"); g.className = "km-grade"; L.appendChild(g); }
     if (t.glow) ["l", "r"].forEach(function (s) { var d = document.createElement("div"); d.className = "km-glow " + s; L.appendChild(d); });
     var vids = t.vids.map(function (p) {

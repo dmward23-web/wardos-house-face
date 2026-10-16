@@ -13,3 +13,8 @@
 .km-oct .km-grade{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,transparent 55%,rgba(20,8,0,.30));mix-blend-mode:multiply}
 @keyframes km-flick{0%{opacity:.78}35%{opacity:.92}60%{opacity:.84}100%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.km-glow{animation:none}}
+/* kid boards: the overlay never crosses chore art (Alfred 4:24). No bats; fog and embers stay in a thin floor band under the week strip. */
+.km-kid .km-bats{display:none}
+.km-kid .km-fog{height:14%;bottom:-3%}
+.km-kid .km-embers{height:12%}
+.km-kid .km-glow{height:26vmin;bottom:-14vmin}
