@@ -1,7 +1,7 @@
 {
   "asOf": "Thu Oct 15 2026",
   "asOfIso": "2026-10-15",
-  "refreshedAt": "2026-10-16T00:37:13.547Z",
+  "refreshedAt": "2026-10-16T00:53:54.779Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,14 +16,14 @@
     "endIso": "2026-10-16T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "8:15",
-    "place": "Harris music: talk about respect (Giuliani)",
+    "label": "Next up · Fri",
+    "time": "7:00",
+    "place": "SRE specials: PE (tennis shoes)",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-    "badge": "Thu",
-    "startIso": "2026-10-16T01:15:00.000Z",
-    "endIso": "2026-10-16T01:30:00.000Z",
-    "kind": "other",
+    "badge": "Fri",
+    "startIso": "2026-10-16T12:00:00.000Z",
+    "endIso": "2026-10-16T12:15:00.000Z",
+    "kind": "school",
     "nextLeave": {
       "label": "Next up · Fri",
       "time": "8:10",
@@ -38,19 +38,6 @@
       "leaveBy": true
     },
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "8:15",
-        "place": "Harris music: talk about respect (Giuliani)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-16T01:15:00.000Z",
-        "endIso": "2026-10-16T01:30:00.000Z",
-        "kind": "other",
-        "whenLabel": "8:15",
-        "summary": "Harris music: talk about respect (Giuliani)",
-        "leaveBy": false
-      },
       {
         "label": "Next up · Fri",
         "time": "7:00",
@@ -193,6 +180,19 @@
         "whenLabel": "Wed 4:00",
         "summary": "Harris — Lind conference (VIRTUAL) · 4:00",
         "leaveBy": false
+      },
+      {
+        "label": "Next up · Wed",
+        "time": "4:20",
+        "place": "Allen conference (VIRTUAL)",
+        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "badge": "Wed",
+        "startIso": "2026-10-21T21:20:00.000Z",
+        "endIso": "2026-10-21T22:10:00.000Z",
+        "kind": "school",
+        "whenLabel": "Wed 4:20",
+        "summary": "Hayes — Allen conference (VIRTUAL) · 4:30",
+        "leaveBy": false
       }
     ]
   },
@@ -326,12 +326,12 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "THU · 8:15",
-        "what": "HARRIS MUSIC: TALK ABOUT RESPECT (GIULIANI)",
+        "when": "FRI · All day",
+        "what": "SRE ORANGE DAY",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "THU",
-          "8:15"
+          "FRI",
+          "All day"
         ]
       },
       "today": [
@@ -339,13 +339,6 @@
           "kind": "event",
           "when": "Thu · All day",
           "what": "SRE Red Day",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Thu · 8:15",
-          "what": "Harris music: talk about respect (Giuliani)",
           "hint": "",
           "tone": "act"
         },
@@ -557,12 +550,12 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "THU · 5:40",
-        "what": "HAYES FLAG PRACTICE",
+        "when": "FRI · All day",
+        "what": "SRE ORANGE DAY",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "THU",
-          "5:40"
+          "FRI",
+          "All day"
         ]
       },
       "today": [
@@ -574,13 +567,6 @@
           "tone": "act"
         },
         {
-          "kind": "event",
-          "when": "Thu · 5:40",
-          "what": "Hayes flag practice",
-          "hint": "YOUR board",
-          "tone": "hot"
-        },
-        {
           "kind": "note",
           "when": "All day",
           "what": "🏡 DROP ZONE HQ with Dad",
@@ -588,14 +574,7 @@
           "tone": "hot"
         }
       ],
-      "sports": [
-        {
-          "when": "Thu 15 · leave 5:40",
-          "what": "Hayes flag practice",
-          "hint": "YOUR board",
-          "tone": "hot"
-        }
-      ],
+      "sports": [],
       "school": [
         {
           "when": "Thu 15 · All day",
@@ -961,11 +940,6 @@
           "when": "Thu 15 · All day",
           "what": "SRE Red Day",
           "tone": "act"
-        },
-        {
-          "when": "Thu 15 · 5:40",
-          "what": "Hayes flag practice",
-          "tone": "hot"
         },
         {
           "when": "Fri 16 · All day",
