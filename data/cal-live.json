@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-16T18:17:26.172Z",
+  "fetchedAt": "2026-10-16T18:32:57.183Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-23",
   "asOfIso": "2026-10-16",
   "nextLeave": {
-    "id": "hpo8a54p2ec55b890fmgrfh0lo",
-    "summary": "✈️ Dan #BCCT63 WN3196 MCI→BNA 3:35p–5:10p · leave 1:30",
-    "start": "2026-10-16T13:30:00-05:00",
-    "end": "2026-10-16T17:10:00-05:00",
-    "location": "Kansas City International Airport (MCI), 1 International Square, Kansas City, MO 64153",
+    "id": "4ehm3sebvom1sno0a8mgiiik20",
+    "summary": "Riverside Wellness pickup (en route MCI)",
+    "start": "2026-10-16T14:05:00-05:00",
+    "end": "2026-10-16T14:20:00-05:00",
+    "location": "Riverside Wellness, 4403 NW Gateway Ave, Riverside, MO 64150",
     "busy": true,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "hpo8a54p2ec55b890fmgrfh0lo",
-      "summary": "✈️ Dan #BCCT63 WN3196 MCI→BNA 3:35p–5:10p · leave 1:30",
-      "start": "2026-10-16T13:30:00-05:00",
-      "end": "2026-10-16T17:10:00-05:00",
-      "location": "Kansas City International Airport (MCI), 1 International Square, Kansas City, MO 64153",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "4ehm3sebvom1sno0a8mgiiik20",
       "summary": "Riverside Wellness pickup (en route MCI)",
@@ -343,9 +334,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "1:30",
-    "place": "✈️ Dan #BCCT63 WN3196 MCI→BNA 3:35p–5:10p · leave 1:30",
-    "detailHtml": "<strong>1:30</strong> ✈️ Dan #BCCT63 WN3196 MCI→BNA 3:35p–5:10p · leave 1:30",
+    "time": "2:05",
+    "place": "Riverside Wellness pickup (en route MCI)",
+    "detailHtml": "<strong>2:05</strong> Riverside Wellness pickup (en route MCI)",
     "badge": "Fri"
   },
   "error": null
