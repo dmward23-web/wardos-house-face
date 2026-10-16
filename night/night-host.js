@@ -34,7 +34,7 @@
     btn.type = "button"; btn.className = "night52-snd";
     btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" stroke="none"/><path class="w" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="x" d="M16 9l5 6M21 9l-5 6"/></svg>';
     btn.addEventListener("click", function (e) { e.stopPropagation(); setSnd(!on, true); });
-    var kidBoard = document.body.hasAttribute("data-kid");
+    var kidBoard = /^(hayes|harris|ainsley)$/.test(document.body.getAttribute("data-kid") || "");
     var pref = null; try { pref = localStorage.getItem(KEY); } catch (_) {}
     var tapped = false;
     if (kidBoard) {

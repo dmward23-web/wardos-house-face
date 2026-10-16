@@ -11,3 +11,6 @@ html.night52 body > .night52-snd { position: fixed; z-index: 2147483600; left: 2
 /* hub: drop the opaque panel paint so the scene shows between cards; cards keep their glass */
 html.night52 .panel { background: transparent !important; }
 html.night52 .panel::before, html.night52 .panel::after { display: none !important; }
+/* desk sheets: the painted Ori backdrop steps aside so the night scene is the one world behind every board */
+html.night52 #ori-world, html.night52 .ori-world, html.night52 .ori-fallback, html.night52 .ori-host > canvas { display: none !important; }
+html.night52 body.ori-on, html.night52 body.ori-home { background: transparent !important; }

@@ -377,6 +377,7 @@
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
+<link rel="stylesheet" href="night/night-host.css?v=NIGHT52c" />
 </head>
 <body>
 <div class="panel">
@@ -503,5 +504,6 @@ q("timeline").innerHTML=rows.map(function(x,i){return '<article class="beat leav
 q("glance").innerHTML=rows.slice(0,3).map(function(x){return '<div class="glance-row"><span class="t">'+hm(x.start)+'</span><span class="w">'+e(x.summary.split(" · ")[0])+'</span></div>'}).join("");
 q("sub").textContent=rows.length+" on the calendar · "+lab;
 }).catch(function(){q("label").textContent="Load day · calendar offline"});})();</script>
+<script src="night/night-host.js?v=NIGHT52c" defer></script>
 </body>
 </html>
