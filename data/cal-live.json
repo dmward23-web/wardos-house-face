@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-16T20:12:44.785Z",
+  "fetchedAt": "2026-10-16T20:38:40.048Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-23",
   "asOfIso": "2026-10-16",
   "nextLeave": {
-    "id": "pdtfmsvt057qm0ktp90leuq594",
-    "summary": "Flight to Nashville (WN 3196)",
-    "start": "2026-10-16T15:35:00-05:00",
-    "end": "2026-10-16T17:10:00-05:00",
-    "location": "Kansas City MCI",
+    "id": "h6tq2fhq3ljhbv3v2m03nin7e4",
+    "summary": "Dan+Erin CLE ALCS · #AEAVR5/#2ENK5V WN4778 Sat 10/17 BNA 3:30p→CLE · leave 2:10 · #2EL4PS WN441 Sun 10/18 CLE 6:25a→BNA · leave 4:55a ET",
+    "start": "2026-10-17T00:00:00-05:00",
+    "end": "2026-10-19T00:00:00-05:00",
+    "location": "Cleveland Hopkins International Airport (CLE), 5300 Riverside Dr, Cleveland, OH 44135",
     "busy": false,
-    "allDay": false
+    "allDay": true
   },
   "upcomingLeaves": [
-    {
-      "id": "pdtfmsvt057qm0ktp90leuq594",
-      "summary": "Flight to Nashville (WN 3196)",
-      "start": "2026-10-16T15:35:00-05:00",
-      "end": "2026-10-16T17:10:00-05:00",
-      "location": "Kansas City MCI",
-      "busy": false,
-      "allDay": false
-    },
     {
       "id": "h6tq2fhq3ljhbv3v2m03nin7e4",
       "summary": "Dan+Erin CLE ALCS · #AEAVR5/#2ENK5V WN4778 Sat 10/17 BNA 3:30p→CLE · leave 2:10 · #2EL4PS WN441 Sun 10/18 CLE 6:25a→BNA · leave 4:55a ET",
@@ -324,11 +315,11 @@
     }
   ],
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "3:35",
-    "place": "Flight to Nashville (WN 3196)",
-    "detailHtml": "<strong>3:35</strong> Flight to Nashville (WN 3196)",
-    "badge": "Fri"
+    "label": "Next up · Sat",
+    "time": "12:00",
+    "place": "Dan+Erin CLE ALCS · #AEAVR5/#2ENK5V WN4778 Sat 10/17 …",
+    "detailHtml": "<strong>12:00</strong> Dan+Erin CLE ALCS · #AEAVR5/#2ENK5V WN4778 Sat 10/17 …",
+    "badge": "Sat"
   },
   "error": null
 }
