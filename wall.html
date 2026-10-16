@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>WardOS · Wall</title>
+<!-- NIGHT52 · wall station = the v5.2 night scene at full size (clock, W mark, sound toggle, four chips). STAGED: not live until Dan reviews. -->
+<style>html,body{margin:0;height:100%;background:#04060a;overflow:hidden}iframe{position:fixed;inset:0;width:100vw;height:100vh;border:0;display:block}</style>
+</head><body>
+<iframe id="wall-scene" title="WardOS wall" allow="autoplay"></iframe>
+<script>(function(){var q=new URLSearchParams(location.search),p=new URLSearchParams();["phase","weather","wind","dir"].forEach(function(k){if(q.get(k))p.set(k,q.get(k))});document.getElementById("wall-scene").src="night/scene.html"+(p.toString()?"?"+p:"");})();</script>
+</body></html>
