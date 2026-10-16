@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 16 2026",
   "asOfIso": "2026-10-16",
-  "refreshedAt": "2026-10-16T19:56:09.485Z",
+  "refreshedAt": "2026-10-16T20:12:44.570Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -9,17 +9,17 @@
     "note": "sports: event START = leave-by"
   },
   "homeWeek": {
-    "with": "Dad",
-    "place": "147th",
-    "through": "Fri Oct 16 · 3:00",
-    "throughLabel": "with Dad @ 147th · Fri Oct 9 3:00 → Fri Oct 16 · 3:00",
-    "endIso": "2026-10-16T20:00:00.000Z"
+    "with": "away",
+    "place": "",
+    "through": "Fri Oct 23 · 3:00",
+    "throughLabel": "kids away · back Fri Oct 23 · 3:00",
+    "endIso": "2026-10-23T20:00:00.000Z"
   },
   "boardStrip": {
     "label": "Next up · Mon",
     "time": "7:00",
     "place": "SRE specials: PE (tennis shoes)",
-    "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+    "detailHtml": "kids away · back Fri Oct 23 · 3:00",
     "badge": "Mon",
     "startIso": "2026-10-19T12:00:00.000Z",
     "endIso": "2026-10-19T12:15:00.000Z",
@@ -30,7 +30,7 @@
         "label": "Next up · Mon",
         "time": "7:00",
         "place": "SRE specials: PE (tennis shoes)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "kids away · back Fri Oct 23 · 3:00",
         "badge": "Mon",
         "startIso": "2026-10-19T12:00:00.000Z",
         "endIso": "2026-10-19T12:15:00.000Z",
@@ -43,7 +43,7 @@
         "label": "Next up · Mon",
         "time": "7:00",
         "place": "SRE specials: Art",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "kids away · back Fri Oct 23 · 3:00",
         "badge": "Mon",
         "startIso": "2026-10-19T12:00:00.000Z",
         "endIso": "2026-10-19T12:15:00.000Z",
@@ -56,7 +56,7 @@
         "label": "Next up · Tue",
         "time": "7:00",
         "place": "SRE specials: Art",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "kids away · back Fri Oct 23 · 3:00",
         "badge": "Tue",
         "startIso": "2026-10-20T12:00:00.000Z",
         "endIso": "2026-10-20T12:15:00.000Z",
@@ -69,7 +69,7 @@
         "label": "Next up · Tue",
         "time": "7:00",
         "place": "SRE specials: Spanish",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "kids away · back Fri Oct 23 · 3:00",
         "badge": "Tue",
         "startIso": "2026-10-20T12:00:00.000Z",
         "endIso": "2026-10-20T12:15:00.000Z",
@@ -82,7 +82,7 @@
         "label": "Next up · Wed",
         "time": "7:00",
         "place": "SRE specials: Spanish + Library (library book)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "kids away · back Fri Oct 23 · 3:00",
         "badge": "Wed",
         "startIso": "2026-10-21T12:00:00.000Z",
         "endIso": "2026-10-21T12:15:00.000Z",
@@ -95,7 +95,7 @@
         "label": "Next up · Wed",
         "time": "7:00",
         "place": "SRE specials: Music",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "kids away · back Fri Oct 23 · 3:00",
         "badge": "Wed",
         "startIso": "2026-10-21T12:00:00.000Z",
         "endIso": "2026-10-21T12:15:00.000Z",
@@ -108,7 +108,7 @@
         "label": "Next up · Wed",
         "time": "4:00",
         "place": "Lind conference (VIRTUAL)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "kids away · back Fri Oct 23 · 3:00",
         "badge": "Wed",
         "startIso": "2026-10-21T21:00:00.000Z",
         "endIso": "2026-10-21T21:20:00.000Z",
@@ -121,7 +121,7 @@
         "label": "Next up · Wed",
         "time": "4:20",
         "place": "Allen conference (VIRTUAL)",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "kids away · back Fri Oct 23 · 3:00",
         "badge": "Wed",
         "startIso": "2026-10-21T21:20:00.000Z",
         "endIso": "2026-10-21T22:10:00.000Z",
@@ -134,7 +134,7 @@
         "label": "Next up · Thu",
         "time": "3:00",
         "place": "LKMS Homework Help",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
+        "detailHtml": "kids away · back Fri Oct 23 · 3:00",
         "badge": "Thu",
         "startIso": "2026-10-22T20:00:00.000Z",
         "endIso": "2026-10-22T21:00:00.000Z",
@@ -277,7 +277,7 @@
       "hottest": {
         "when": "MON · 7:00",
         "what": "SRE SPECIALS: ART",
-        "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
+        "where": "kids away · back Fri Oct 23 · 3:00",
         "badges": [
           "MON",
           "7:00"
@@ -301,8 +301,8 @@
         {
           "kind": "note",
           "when": "All day",
-          "what": "🏡 YOUR BASE with Dad",
-          "hint": "through Fri Oct 16 · 3:00",
+          "what": "Kids away",
+          "hint": "back Fri Oct 23 · 3:00",
           "tone": "hot"
         }
       ],
@@ -496,7 +496,7 @@
       "hottest": {
         "when": "MON · 7:00",
         "what": "SRE SPECIALS: PE (TENNIS SHOES)",
-        "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
+        "where": "kids away · back Fri Oct 23 · 3:00",
         "badges": [
           "MON",
           "7:00"
@@ -520,8 +520,8 @@
         {
           "kind": "note",
           "when": "All day",
-          "what": "🏡 DROP ZONE HQ with Dad",
-          "hint": "through Fri Oct 16 · 3:00",
+          "what": "Kids away",
+          "hint": "back Fri Oct 23 · 3:00",
           "tone": "hot"
         }
       ],
@@ -692,7 +692,7 @@
       "bag": {
         "place": "Dad",
         "label": "This week @ Dad · bag",
-        "hint": "147th through Fri Oct 16 · 3:00 · pack for Dad week"
+        "hint": "Kids away"
       },
       "rides": [
         {
@@ -720,7 +720,7 @@
       "hottest": {
         "when": "TUE · All day",
         "what": "LKMS OUTSIDERS DAY (GREASER OR SOC DRESS-UP)",
-        "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
+        "where": "kids away · back Fri Oct 23 · 3:00",
         "badges": [
           "TUE",
           "All day"
@@ -730,8 +730,8 @@
         {
           "kind": "note",
           "when": "All day",
-          "what": "Base @ 147th with Dad",
-          "hint": "through Fri Oct 16 · 3:00",
+          "what": "Kids away",
+          "hint": "back Fri Oct 23 · 3:00",
           "tone": "hot"
         }
       ],
@@ -814,12 +814,11 @@
         }
       ],
       "hottest": {
-        "when": "Fri Oct 16 2026 · kids with you @ 147th",
-        "what": "Dad week live",
-        "where": "through Fri Oct 16 · 3:00",
+        "when": "Fri Oct 16 2026 · kids away",
+        "what": "Kids away",
+        "where": "until Fri Oct 23 · 3:00",
         "badges": [
-          "Dad week",
-          "147th"
+          "Kids away"
         ]
       },
       "today": [
@@ -844,18 +843,13 @@
           "tone": "act"
         },
         {
-          "when": "Fri · 8:10",
-          "what": "SRE drop-off",
-          "tone": "act"
-        },
-        {
           "when": "Fri · 12:00",
           "what": "SRE Chat & Chew lunch",
           "tone": "act"
         },
         {
           "when": "home week",
-          "what": "Kids with Dad @ 147th through Fri Oct 16 · 3:00",
+          "what": "Kids away · back Fri Oct 23 · 3:00",
           "tone": "hot"
         }
       ],
@@ -946,8 +940,8 @@
           "tone": "act"
         },
         {
-          "when": "through Fri Oct 16 · 3:00",
-          "what": "Kids with Dad @ 147th",
+          "when": "back Fri Oct 23 · 3:00",
+          "what": "Kids away",
           "tone": "hot"
         }
       ]
