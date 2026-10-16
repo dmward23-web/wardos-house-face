@@ -1,48 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-16T02:50:27.107Z",
+  "fetchedAt": "2026-10-16T10:10:53.441Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
-  "windowEnd": "2026-10-22",
-  "asOfIso": "2026-10-15",
+  "windowEnd": "2026-10-23",
+  "asOfIso": "2026-10-16",
   "nextLeave": {
     "id": "hpo8a54p2ec55b890fmgrfh0lo",
-    "summary": "✈️ Dan #BCCT63 WN2013 MCI→BNA 10:40a–12:15p · leave 8:40",
-    "start": "2026-10-16T08:40:00-05:00",
-    "end": "2026-10-16T12:15:00-05:00",
+    "summary": "✈️ Dan #BCCT63 WN4502 MCI→BNA 6:00p–7:35p · leave 4:00",
+    "start": "2026-10-16T16:00:00-05:00",
+    "end": "2026-10-16T19:35:00-05:00",
     "location": "Kansas City International Airport (MCI), 1 International Square, Kansas City, MO 64153",
     "busy": true,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "3a7puubvbq8hgsr0m7h46t9hi0_20261016",
-      "summary": "Dan Nashville · Oct 16–23",
-      "start": "2026-10-16T00:00:00-05:00",
-      "end": "2026-10-24T00:00:00-05:00",
-      "location": "14 Harbor Cove Dr, Old Hickory, TN 37138",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "7sd890a027pi1u1cf20t3rbin4",
-      "summary": "Hayes + Harris — SRE Orange Day",
-      "start": "2026-10-16T00:00:00-05:00",
-      "end": "2026-10-17T00:00:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true
-    },
-    {
-      "id": "dutfnpmlnngr5qaph6eaaks17g",
-      "summary": "Hayes + Harris — SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
-      "start": "2026-10-16T00:00:00-05:00",
-      "end": "2026-10-17T00:00:00-05:00",
-      "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
-      "busy": false,
-      "allDay": true
-    },
     {
       "id": "fp0cudn8p70gv73fbnvu5at6po",
       "summary": "Harris — SRE specials: PE (tennis shoes)",
@@ -71,21 +44,21 @@
       "allDay": false
     },
     {
-      "id": "hpo8a54p2ec55b890fmgrfh0lo",
-      "summary": "✈️ Dan #BCCT63 WN2013 MCI→BNA 10:40a–12:15p · leave 8:40",
-      "start": "2026-10-16T08:40:00-05:00",
-      "end": "2026-10-16T12:15:00-05:00",
-      "location": "Kansas City International Airport (MCI), 1 International Square, Kansas City, MO 64153",
-      "busy": true,
-      "allDay": false
-    },
-    {
       "id": "32brmviemd2eaav4llc8g36vh0",
       "summary": "Hayes — SRE Chat & Chew lunch",
       "start": "2026-10-16T12:00:00-05:00",
       "end": "2026-10-16T12:30:00-05:00",
       "location": "Sunset Ridge Elementary, 14901 England St, Overland Park, KS 66221",
       "busy": false,
+      "allDay": false
+    },
+    {
+      "id": "hpo8a54p2ec55b890fmgrfh0lo",
+      "summary": "✈️ Dan #BCCT63 WN4502 MCI→BNA 6:00p–7:35p · leave 4:00",
+      "start": "2026-10-16T16:00:00-05:00",
+      "end": "2026-10-16T19:35:00-05:00",
+      "location": "Kansas City International Airport (MCI), 1 International Square, Kansas City, MO 64153",
+      "busy": true,
       "allDay": false
     },
     {
@@ -339,13 +312,58 @@
       "location": "Blue Valley Rec Sports Complex, Field 21, 9701 W 137th St, Overland Park, KS 66221",
       "busy": false,
       "allDay": false
+    },
+    {
+      "id": "42fk92bo42t09rj0ai5nqkq78l",
+      "summary": "Ward Kids [AHH No School]",
+      "start": "2026-10-23T00:00:00-05:00",
+      "end": "2026-10-24T00:00:00-05:00",
+      "location": "",
+      "busy": false,
+      "allDay": true
+    },
+    {
+      "id": "ilbvj05i190e33ju9vmp1dt550",
+      "summary": "Ainsley — LKMS raffle donation due (Cougar Night / Bingo Loco)",
+      "start": "2026-10-23T00:00:00-05:00",
+      "end": "2026-10-24T00:00:00-05:00",
+      "location": "Lakewood Middle School, 6601 Edgewater Dr, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": true
+    },
+    {
+      "id": "j78jkur9co1qeg2t6vdd0cfmg8",
+      "summary": "✈️ Dan #BCG5CZ WN606 BNA→MCI 8:10a–9:55a · leave 6:55",
+      "start": "2026-10-23T06:55:00-05:00",
+      "end": "2026-10-23T09:55:00-05:00",
+      "location": "Nashville International Airport (BNA), 1 Terminal Dr, Nashville, TN 37214",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "k9do3s3fmcprdo1d267v4vd4i8",
+      "summary": "Kids — pickup at their mom's · 3:00",
+      "start": "2026-10-23T14:40:00-05:00",
+      "end": "2026-10-23T15:30:00-05:00",
+      "location": "14618 Floyd St, Overland Park, KS",
+      "busy": true,
+      "allDay": false
+    },
+    {
+      "id": "dagalbg2jo15m0hfl3deim3f4n_20261023T200000Z",
+      "summary": "Kids with Dan",
+      "start": "2026-10-23T15:00:00-05:00",
+      "end": "2026-10-30T15:00:00-05:00",
+      "location": "Home, 6719 W 147th Terrace, Overland Park, KS 66223",
+      "busy": false,
+      "allDay": false
     }
   ],
   "boardStrip": {
-    "label": "Next up · Fri",
-    "time": "8:40",
-    "place": "✈️ Dan #BCCT63 WN2013 MCI→BNA 10:40a–12:15p · leave 8:40",
-    "detailHtml": "<strong>8:40</strong> ✈️ Dan #BCCT63 WN2013 MCI→BNA 10:40a–12:15p · leave 8:40",
+    "label": "Next up · today",
+    "time": "4:00",
+    "place": "✈️ Dan #BCCT63 WN4502 MCI→BNA 6:00p–7:35p · leave 4:00",
+    "detailHtml": "<strong>4:00</strong> ✈️ Dan #BCCT63 WN4502 MCI→BNA 6:00p–7:35p · leave 4:00",
     "badge": "Fri"
   },
   "error": null
