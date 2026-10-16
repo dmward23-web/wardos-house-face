@@ -31,7 +31,8 @@ canvas{position:fixed;inset:0;width:100vw;height:100vh;display:block}
 .phone #snd{right:61px;top:144px;width:32px;height:32px}
 #clock{background:radial-gradient(closest-side,rgba(0,0,0,calc(var(--scr,0)*.75)),rgba(0,0,0,0));text-shadow:0 0 calc(var(--scr,0)*30px) rgba(0,0,0,calc(var(--scr,0)*1.2))}#mark{filter:drop-shadow(0 0 calc(var(--scr,0)*16px) rgba(0,0,0,calc(var(--scr,0)*.95)))}.chip{background-color:rgba(0,0,0,calc(var(--scr,0)*.6))!important}
 .wall #time{font-size:clamp(66px,4.6vw,124px)}.wall #date{font-size:clamp(12px,.95vw,24px)!important}
-</style><style>body.fireon .chip{backdrop-filter:blur(14px) saturate(0) brightness(.55)!important;-webkit-backdrop-filter:blur(14px) saturate(0) brightness(.55)!important;background-color:rgba(8,9,11,.45)!important}</style></head><body>
+</style><style>body.fireon .chip{backdrop-filter:blur(14px) saturate(0) brightness(.55)!important;-webkit-backdrop-filter:blur(14px) saturate(0) brightness(.55)!important;background-color:rgba(8,9,11,.45)!important}</style><link rel="stylesheet" href="month-theme/month-overlay.css?v=MONTHFX1" />
+</head><body>
 <video id="bg" muted loop playsinline preload="auto"></video><canvas id="gl"></canvas><canvas id="fx"></canvas>
 <div id="ui"><div id="wvig"></div><div id="cvig"></div>
  <div id="clock"><div id="time">--:--</div><div id="date"></div></div>
@@ -590,4 +591,5 @@ html.embed #clock,html.embed #mark,html.embed #chips,html.embed #wvig,html.embed
   else if(d.night==='state'){}});
  setInterval(function(){try{if(emb&&parent!==window)parent.postMessage({night:'status',snd:!!(SND&&SND.on),phase:(window.__env&&__env().phase)||null},location.origin)}catch(_){}},2000);
 })();
-</script></body></html>
+</script><script src="month-theme/month-overlay.js?v=MONTHFX1" defer></script>
+</body></html>

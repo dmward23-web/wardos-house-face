@@ -1,6 +1,6 @@
 /* MONTHFX1 · month theme layered over a kid board's own world (kid theme stays dominant).
-   z-index 2: above the world canvas (1), below the HUD/week/path (3+). Never takes taps. */
-.km-layer{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden;contain:strict}
+   z-index is set per host by month-overlay.js: just above the base layer, under the UI. Never takes taps. */
+.km-layer{position:fixed;inset:0;pointer-events:none;overflow:hidden;contain:strict}
 .km-layer *{pointer-events:none}
 .km-vid{position:absolute;object-fit:cover;opacity:0;transition:opacity 2.4s ease}
 .km-vid.on{opacity:var(--o,.3)}
