@@ -1,30 +1,21 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-16T18:50:07.132Z",
+  "fetchedAt": "2026-10-16T19:10:31.046Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-23",
   "asOfIso": "2026-10-16",
   "nextLeave": {
-    "id": "4ehm3sebvom1sno0a8mgiiik20",
-    "summary": "Riverside Wellness pickup (en route MCI)",
-    "start": "2026-10-16T14:05:00-05:00",
-    "end": "2026-10-16T14:20:00-05:00",
-    "location": "Riverside Wellness, 4403 NW Gateway Ave, Riverside, MO 64150",
-    "busy": true,
+    "id": "pdtfmsvt057qm0ktp90leuq594",
+    "summary": "Flight to Nashville (WN 3196)",
+    "start": "2026-10-16T15:35:00-05:00",
+    "end": "2026-10-16T17:10:00-05:00",
+    "location": "Kansas City MCI",
+    "busy": false,
     "allDay": false
   },
   "upcomingLeaves": [
-    {
-      "id": "4ehm3sebvom1sno0a8mgiiik20",
-      "summary": "Riverside Wellness pickup (en route MCI)",
-      "start": "2026-10-16T14:05:00-05:00",
-      "end": "2026-10-16T14:20:00-05:00",
-      "location": "Riverside Wellness, 4403 NW Gateway Ave, Riverside, MO 64150",
-      "busy": true,
-      "allDay": false
-    },
     {
       "id": "pdtfmsvt057qm0ktp90leuq594",
       "summary": "Flight to Nashville (WN 3196)",
@@ -334,9 +325,9 @@
   ],
   "boardStrip": {
     "label": "Next up · today",
-    "time": "2:05",
-    "place": "Riverside Wellness pickup (en route MCI)",
-    "detailHtml": "<strong>2:05</strong> Riverside Wellness pickup (en route MCI)",
+    "time": "3:35",
+    "place": "Flight to Nashville (WN 3196)",
+    "detailHtml": "<strong>3:35</strong> Flight to Nashville (WN 3196)",
     "badge": "Fri"
   },
   "error": null
