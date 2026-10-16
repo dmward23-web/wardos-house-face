@@ -1275,7 +1275,8 @@
         var mom = day.querySelector(".mom");
         if (!blks.length && !mom && !day.classList.contains("today")) continue;
         var dt = new Date(y, m - 1, n);
-        html += '<a class="ori-day' + (day.classList.contains("today") ? " is-today" : "") + '" href="sheet-today.html">';
+        var dIso = y + "-" + (m < 10 ? "0" : "") + m + "-" + (n < 10 ? "0" : "") + n; /* DAYLINK1 · each card opens its own day (was always today) */
+        html += '<a class="ori-day' + (day.classList.contains("today") ? " is-today" : "") + '" href="' + (/^sheet-today\.html/.test(day.getAttribute("href") || "") ? day.getAttribute("href") : "sheet-today.html" + (day.classList.contains("today") ? "" : "?d=" + dIso)) + '">';
         html += '<span class="ori-dom">' + dows[dt.getDay()] + " " + n + "</span>";
         if (mom) html += '<span class="ori-ev dan">' + mom.textContent.replace(/</g, "") + "</span>";
         for (var b = 0; b < blks.length; b++) {

@@ -3814,6 +3814,8 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
   html body .panel { --hub-cam-deck-h: 220px !important; --hub-command-h: 520px !important; }
 }
 </style>
+<link rel="stylesheet" href="night/night-host.css?v=NIGHT52d" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=MONTHFX2" />
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -4354,8 +4356,8 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  </footer>
 </div>
 <script src="house-clock.js?v=INDEXCLK1"></script>
-<script src="house-board-strip.js?v=GATE3WRAP1"></script>
-<script src="house-weather.js?v=ORIHOME20"></script>
+<script src="house-board-strip.js?v=CODESTRIP1"></script>
+<script src="house-weather.js?v=NODATA1"></script>
 <script src="house-sfx.js?v=HUM1"></script>
 <script src="house-tapsync.js?v=CALM1"></script>
 <script src="kids-data.js?v=LIVESPEC1"></script>
@@ -4363,7 +4365,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 <script src="house-hub-tiles-bind.js?v=ALLDAY1"></script>
 <script src="house-sensi.js?v=SENSIAUTO1"></script>
 <script src="nest-webrtc-client.js?v=PROXYFOLLOW2"></script>
-<script src="house-nest.js?v=CAMIOS3"></script>
+<script src="house-nest.js?v=NODATA1"></script>
 <script src="hub-key-entry.js?v=KEYAUTO2"></script>
 <script src="house-lights.js?v=NOKEY1"></script>
 <script src="house-sensi-ctl.js?v=LOCK2"></script>
@@ -4473,7 +4475,7 @@ document.addEventListener("click", function (ev) {
 });
 </script>
 <script src="house-links.js?v=LINKWEB1"></script>
-<script src="house-spotify.js?v=SPOTIFY4"></script>
+<script src="house-spotify.js?v=NODATA1"></script>
 <script>/* SPOTIFY1 */ try { HouseSpotify.mountTiles(document).start(); } catch (e) {}</script>
 <script src="house-ori-calm.js?v=CALM1"></script>
 <script>/* MONTHNOW1 · month tile follows the real date (Chicago) */
@@ -4481,5 +4483,7 @@ document.addEventListener("click", function (ev) {
 var M=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"],N=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 function s(k,v){var e=document.querySelector('[data-mtile="'+k+'"]');if(e)e.textContent=v}
 s("m0",M[m]);s("m1",M[(m+1)%12]);s("w0","Week "+Math.ceil((d+new Date(y,m,1).getDay())/7)+" · this month");s("sub",N[m]+" → "+N[(m+1)%12]+" horizon")}catch(e){}})();</script>
+<script src="night/night-host.js?v=NIGHT52d" defer></script>
+<script src="month-theme/month-overlay.js?v=MONTHFX2" defer></script>
 </body>
 </html>

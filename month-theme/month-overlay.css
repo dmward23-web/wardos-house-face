@@ -1,0 +1,20 @@
+/* MONTHFX1 · month theme layered over a kid board's own world (kid theme stays dominant).
+   z-index is set per host by month-overlay.js: just above the base layer, under the UI. Never takes taps. */
+.km-layer{position:fixed;inset:0;pointer-events:none;overflow:hidden;contain:strict}
+.km-layer *{pointer-events:none}
+.km-vid{position:absolute;object-fit:cover;opacity:0;transition:opacity 2.4s ease}
+.km-vid.on{opacity:var(--o,.3)}
+/* October · photoreal footage only: smoke as low fog, embers rising from the floor, real bats, candle light */
+.km-oct .km-fog{left:-10%;right:-10%;bottom:-4%;width:120%;height:34%;mix-blend-mode:screen;--o:.28;filter:blur(2px) saturate(.6);-webkit-mask-image:linear-gradient(to top,#000 40%,transparent);mask-image:linear-gradient(to top,#000 40%,transparent)}
+.km-oct .km-embers{left:0;bottom:0;width:100%;height:30%;mix-blend-mode:screen;--o:.22;-webkit-mask-image:linear-gradient(to top,#000 30%,transparent);mask-image:linear-gradient(to top,#000 30%,transparent)}
+.km-oct .km-bats{left:0;top:0;width:100%;height:26%;mix-blend-mode:multiply;--o:.32;-webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent);mask-image:linear-gradient(to bottom,#000 55%,transparent)}
+.km-glow{position:absolute;bottom:-12vmin;width:62vmin;height:46vmin;border-radius:50%;background:radial-gradient(closest-side,rgba(255,140,40,.30),rgba(255,96,20,.12) 55%,transparent);mix-blend-mode:screen;animation:km-flick 3.8s ease-in-out infinite alternate}
+.km-glow.l{left:-18vmin}.km-glow.r{right:-18vmin;animation-delay:-1.7s}
+.km-oct .km-grade{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,transparent 55%,rgba(20,8,0,.30));mix-blend-mode:multiply}
+@keyframes km-flick{0%{opacity:.78}35%{opacity:.92}60%{opacity:.84}100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.km-glow{animation:none}}
+/* kid boards: the overlay never crosses chore art (Alfred 4:24). No bats; fog and embers stay in a thin floor band under the week strip. */
+.km-kid .km-bats{display:none}
+.km-kid .km-fog{height:14%;bottom:-3%}
+.km-kid .km-embers{height:12%}
+.km-kid .km-glow{height:26vmin;bottom:-14vmin}

@@ -1,0 +1,16 @@
+/* NIGHT52 · board over the v5.2 night scene. UI keeps its own glass plates (above the grade). */
+html.night52 { background: #04060a !important; }
+html.night52 body { background: transparent !important; }
+.night52-scene { position: fixed; inset: 0; width: 100vw; height: 100vh; border: 0; z-index: -1; pointer-events: none; background: #04060a; }
+html.night52 body > .night52-snd { position: fixed; z-index: 2147483600; left: 22px; top: calc(20px + env(safe-area-inset-top)); width: 36px; height: 36px; border-radius: 18px; padding: 0;
+  border: 1px solid rgba(255,255,255,.28); background: rgba(8,12,18,.72); color: #e9eef5; display: flex; align-items: center; justify-content: center;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 6px 18px rgba(0,0,0,.45); cursor: pointer; }
+.night52-snd::after { content: ""; position: absolute; inset: -4px; }
+.night52-snd svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+.night52-snd .w { display: none; } .night52-snd.on .w { display: inline; } .night52-snd.on .x { display: none; }
+/* hub: drop the opaque panel paint so the scene shows between cards; cards keep their glass */
+html.night52 .panel { background: transparent !important; }
+html.night52 .panel::before, html.night52 .panel::after { display: none !important; }
+/* desk sheets: the painted Ori backdrop steps aside so the night scene is the one world behind every board */
+html.night52 #ori-world, html.night52 .ori-world, html.night52 .ori-fallback, html.night52 .ori-host > canvas { display: none !important; }
+html.night52 body.ori-on, html.night52 body.ori-home { background: transparent !important; }

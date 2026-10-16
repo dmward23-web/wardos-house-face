@@ -10,6 +10,8 @@
   var reduced = false;
   try { reduced = !!(global.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches); } catch (e) {}
 
+  /* NIGHT52 · when the v5.2 night scene sits behind the board, the world canvas paints only the musts, labels and creature */
+  function nightOn() { return kid() !== "ainsley" /* Ainsley keeps her concert venue (Alfred 10/16) */ && !/[?&]night=0(&|$)/.test(location.search) && !!document.querySelector('script[src*="night/night-host.js"]'); }
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function kid() { return (document.body && document.body.getAttribute("data-kid")) || "hayes"; }
   function rnd(i) { var x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.floor(x); }
@@ -1611,9 +1613,11 @@
     var book = oriBook(world, W, H);
     var man = (global.HousePlates && HousePlates[world]) || {};
     var venue = world === "ainsley"; /* STAGE1 · Ainsley: concert-poster venue, painted in code (no lake, no mascot) */
-    if (venue) { book = null; drawVenue(ctx, W, H, t, pan, fill); }
+    var night = nightOn() && !!(ctx.canvas && ctx.canvas.classList && ctx.canvas.classList.contains("kw-canvas"));
+    if (night) { if (venue) book = null; }
+    else if (venue) { book = null; drawVenue(ctx, W, H, t, pan, fill); }
     else if (!book || !book.sky) sky(ctx, W, H, [[0, "#102028"], [0.55, "#243428"], [1, "#121610"]]);
-    if (!venue) ["sky", "far", "mid", "near"].forEach(function (id) {
+    if (!venue && !night) ["sky", "far", "mid", "near"].forEach(function (id) {
       var img = book && book[id];
       if (!img || img.width < 64) return;
       var p = layerShift(id, man);
@@ -1624,7 +1628,7 @@
         driftClouds(ctx, W, H, t, world);
       }
     });
-    if (!venue) motes(ctx, W, H, t, pan.x, world === "ainsley" ? "#ffd8c0" : world === "harris" ? "#d8ffe4" : "#fff1d0", reduced ? 8 : 28);
+    if (!venue && !night) motes(ctx, W, H, t, pan.x, world === "ainsley" ? "#ffd8c0" : world === "harris" ? "#d8ffe4" : "#fff1d0", reduced ? 8 : 28);
     var cap = (man.landmarks && man.landmarks.length) || quests.length;
     var shown = quests.slice(0, cap);
     layoutLedges(shown, W, H, world, pan.x);
@@ -1642,7 +1646,7 @@
       else shown.forEach(function (q) { drawLight(ctx, q); });
     };
     var fg = book && book.fg;
-    if (fg && fg.width >= 64) {
+    if (fg && fg.width >= 64 && !night) {
       var fp = layerShift("fg", man);
       var sway = reduced ? 0 : Math.sin(t * 0.9) * 0.016;
       ctx.save();
@@ -1652,17 +1656,16 @@
       drawPlate(ctx, fg, W, H, pan.x * fp, pan.y * fp * 0.35, PLATE_ZOOM, 1, 0, world);
       ctx.restore();
     }
-    if (venue) drawCrowd(ctx, W, H, t, pan);
+    if (venue && !night) drawCrowd(ctx, W, H, t, pan);
     paintLabels();
-    if (!reduced && !venue) motes(ctx, W, H, t * 0.7 + 3, pan.x * 0.3, "#fff6e0", 12);
+    if (!reduced && !venue && !night) motes(ctx, W, H, t * 0.7 + 3, pan.x * 0.3, "#fff6e0", 12);
     drawOriCreature(ctx, W, H, t, world);
     var anchor = creatureAnchor(W, H);
     if (feed && shown[feed.index]) {
       var fq = shown[feed.index];
       feedDrops(ctx, t, feed.t0, fq.x, fq.ledY || fq.y, anchor.cx, anchor.jy + anchor.jh * 0.42);
     }
-    edgeVignette(ctx, W, H);
-    warmth(ctx, W, H, fill);
+    if (!night) { edgeVignette(ctx, W, H); warmth(ctx, W, H, fill); }
     return shown;
   }
   function paintWorld(ctx, W, H, t, which, quests, fill, px) {
@@ -1677,7 +1680,8 @@
   /* ---------- live canvas ---------- */
   function World(canvas) {
     this.cv = canvas;
-    this.ctx = canvas.getContext("2d", { alpha: false });
+    this.night = nightOn() && canvas.classList.contains("kw-canvas");
+    this.ctx = canvas.getContext("2d", { alpha: this.night });
     this.t0 = performance.now();
     this.ptr = 0;
     this.hits = [];
@@ -1700,6 +1704,7 @@
     var W = this.cv.width / this.dpr;
     var H = this.cv.height / this.dpr;
     this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    if (this.night) this.ctx.clearRect(0, 0, W, H);
     var iso = dayIso || todayIso();
     var quests = readQuests(iso);
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };

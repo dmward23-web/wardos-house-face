@@ -224,7 +224,7 @@
 
   function Blob(x, y, echo) {
     this.x = x; this.y = y; this.vx = 0; this.vy = 0;
-    this.r = q.get("demo") === "1" ? 30 : 26; /* BIG1: reads on a phone */ this.grounded = false; this.coyote = 0; this.squash = 1;
+    this.r = this.r0 = q.get("demo") === "1" ? 30 : 26; /* BIG1: reads on a phone */ this.rT = this.r; this.days = -1; this.fillK = 0; this.grounded = false; this.coyote = 0; this.squash = 1;
     this.cp = { x: x, y: y }; this.alive = true; this.echo = echo; this.hold = null;
     this.inv = 0;
   }
@@ -254,7 +254,61 @@
       return { dbl: st.todayNeed > 0 && st.todayDone >= st.todayNeed, magnet: (st.fill || 0) >= 0.5 };
     } catch (e) { return { dbl: false, magnet: false }; }
   }
-  function refreshPowers() { allBlobs().forEach(function (b) { b.pw = powersFor(b.kid); }); paintPowerHud(); }
+  /* NIGHT52 · GROW1: a day is "filled" when every daily must for that day is closed (same WardKids read as the jar).
+     Each filled day this week grows the blob a step; a new filled day lands with an in-world pulse (FILLFX1). */
+  var GROW_STEP = 3, WEEK_N = 7;
+  function filledDays(k) {
+    try {
+      var WK = window.WardKids, data = WK && WK._data;
+      if (!WK || !data || !data.kids || !data.kids[k] || typeof WK.mustQuests !== "function" || typeof WK.weekDayIsos !== "function") return null;
+      var qs = (WK.mustQuests(k, data) || []).filter(function (x) { return x && !x.optional && x.cadence !== "addon" && (x.cadence || "daily") === "daily"; });
+      if (!qs.length) return null;
+      var days = WK.weekDayIsos(WK.DAY_ISO) || [], n = 0;
+      days.forEach(function (iso) { if (qs.every(function (x) { return !!WK.getCheck(x.id, data, iso); })) n += 1; });
+      return { n: n, of: days.length || WEEK_N };
+    } catch (e) { return null; }
+  }
+  function refreshGrowth(first) {
+    allBlobs().forEach(function (b) {
+      var fd = FIXTURE ? { n: b === A ? 4 : b === B ? 2 : 0, of: 7 } : filledDays(b.kid);
+      if (!fd) { b.daysOf = 0; return; }
+      var was = b.days; b.days = fd.n; b.daysOf = fd.of;
+      b.rT = b.r0 + GROW_STEP * fd.n;
+      if (first) b.r = b.rT;
+      else if (was >= 0 && fd.n > was) fillPulse(b);
+    });
+  }
+  function fillPulse(b) {
+    b.fillK = 1; b.squash = 1.25;
+    burst(b.x, b.y - b.r * 0.4, reduced ? 6 : 14, "#ffe2a8");
+    rings.push({ x: b.x, y: b.y, r: b.r, a: 0.7 });
+    tone("grove");
+  }
+  window.__merc = function () { return blobs.map(function (b) { return { kid: b.kid, x: Math.round(b.x), y: Math.round(b.y), vy: Math.round(b.vy), r: +b.r.toFixed(1), rT: b.rT, days: b.days, of: b.daysOf }; }); }; /* read-only QA probe */
+  window.__mercFillTest = function (k) { var b = allBlobs().filter(function (x) { return x.kid === (k || kid); })[0]; if (!b) return null; b.days = Math.max(0, b.days) + 1; b.rT = b.r0 + GROW_STEP * b.days; fillPulse(b); return { days: b.days, rT: b.rT }; };
+  function paintFill(g, t) {
+    g.save();
+    blobs.forEach(function (b) {
+      if (!b.daysOf) return;
+      var x = b.x - cam, y = b.y + b.r + 14, n = b.daysOf, gap = 9, x0 = x - (n - 1) * gap / 2;
+      for (var i = 0; i < n; i++) {
+        var on = i < b.days;
+        g.beginPath(); g.arc(x0 + i * gap, y, on ? 3 : 2.2, 0, 7);
+        g.fillStyle = on ? "rgba(255,226,168,0.95)" : "rgba(255,255,255,0.22)"; g.fill();
+        if (on) { g.globalCompositeOperation = "lighter"; g.beginPath(); g.arc(x0 + i * gap, y, 6, 0, 7); g.fillStyle = "rgba(255,200,120,0.18)"; g.fill(); g.globalCompositeOperation = "source-over"; }
+      }
+      if (b.fillK > 0.01) {
+        var k = b.fillK, e = 1 - k;
+        g.globalCompositeOperation = "lighter";
+        var rg = g.createRadialGradient(x, b.y, b.r * 0.6, x, b.y, b.r * (1.4 + e * 1.2));
+        rg.addColorStop(0, "rgba(255,220,150," + (0.45 * k).toFixed(3) + ")"); rg.addColorStop(1, "rgba(255,220,150,0)");
+        g.fillStyle = rg; g.beginPath(); g.arc(x, b.y, b.r * (1.4 + e * 1.2), 0, 7); g.fill();
+        g.globalCompositeOperation = "source-over";
+      }
+    });
+    g.restore();
+  }
+  function refreshPowers() { allBlobs().forEach(function (b) { b.pw = powersFor(b.kid); }); refreshGrowth(!refreshPowers.done); refreshPowers.done = true; paintPowerHud(); }
   function allBlobs() { return blobs; }
   function paintPowerHud() {
     var el = ui.querySelector(".hud span"); if (!el) return;
@@ -365,6 +419,7 @@
     if (won) return;
     if (b.ret) { stepReturn(b, dt); return; }
     b.inv = Math.max(0, b.inv - dt);
+    b.r += (b.rT - b.r) * Math.min(1, dt * 2.5); b.fillK = Math.max(0, (b.fillK || 0) - dt / 1.6);
     b.magnetT = Math.max(0, (b.magnetT || 0) - dt);
     var accel = 0;
     if (input) {
@@ -959,6 +1014,7 @@
       ctx.globalAlpha = 1;
     }
     paintPowers(ctx, t);
+    paintFill(ctx, t);
     if (A.auto) pushIn(t, dt);
     if (playing && !document.hidden) requestAnimationFrame(frame);
   }
@@ -967,7 +1023,7 @@
     var rec = cv.getBoundingClientRect();
     var x = e.clientX - rec.left, y = e.clientY - rec.top;
     var blob = Math.max(0, Math.min(blobs.length - 1, Math.floor(x / (view.w / blobs.length)))); /* the kid's own zone */
-    pointers[e.pointerId] = { x: x, y: y, blob: blob, ly: y, jump: false };
+    pointers[e.pointerId] = { x: x, y: y, blob: blob, ly: y, low: y, x0: x, y0: y, t0: performance.now(), jump: false, fired: false };
     try { cv.setPointerCapture(e.pointerId); } catch (err) {}
     if (window.HouseSfx && HouseSfx.unlockAudio) HouseSfx.unlockAudio();
   }
@@ -981,7 +1037,10 @@
     if (!p) return;
     var rec = cv.getBoundingClientRect();
     var y = e.clientY - rec.top;
-    if (p.ly - y > 28) p.jump = true;
+    /* JUMPFIX1 · the old check needed 28 px of upward travel inside ONE move event; real touch moves arrive in 4-10 px
+       steps, so a flick almost never jumped. Measure the upward travel since the lowest point of the gesture instead. */
+    if (y > p.low) p.low = y;
+    if (p.low - y > 22 && !p.jump) { p.jump = true; p.fired = true; p.low = y; }
     p.ly = y;
     p.x = e.clientX - rec.left;
     p.y = y;
@@ -990,9 +1049,10 @@
     var p = pointers[e.pointerId];
     if (p) {
       var rec = cv.getBoundingClientRect();
-      if (p.ly - (e.clientY - rec.top) > 18) p.jump = true;
+      var uy = e.clientY - rec.top, ux = e.clientX - rec.left;
+      var tap = performance.now() - p.t0 < 280 && Math.hypot(ux - p.x0, uy - p.y0) < 14; /* JUMPFIX1 · a quick tap jumps too */
       var b = blobs[Math.min(blobs.length - 1, p.blob)];
-      if (p.jump) { b.want = 0.14; b.press = true; }
+      if ((!p.fired && p.low - uy > 16) || tap || p.jump) { b.want = 0.14; b.press = true; }
     }
     delete pointers[e.pointerId];
   }
@@ -1028,7 +1088,7 @@
     playing = true;
     setTimeout(refreshPowers, 0);
     setInterval(refreshPowers, 30000); /* a chore closed mid-run lights its power-up within half a minute */
-    ui.innerHTML = '<div class="hud"><a href="' + THEME.back + '">Back</a><span></span></div><div class="hint">Each of you has a part of the wall. Roll in your part, flick up to jump.</div><div class="zones">' + blobs.map(function (b) { return '<div class="zone"><span>' + NAMES[b.kid] + '</span></div>'; }).join("") + '</div>';
+    ui.innerHTML = '<div class="hud"><a href="' + THEME.back + '">Back</a><span></span></div><div class="hint">Each of you has a part of the wall. Slide to roll. Tap or flick up to jump.</div><div class="zones">' + blobs.map(function (b) { return '<div class="zone"><span>' + NAMES[b.kid] + '</span></div>'; }).join("") + '</div>';
     resize();
     frame();
     setTimeout(function () {
