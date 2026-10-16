@@ -81,7 +81,7 @@ const SC_DEAD={phone:{w:440,h:956,vid:'media/loop-phone',moon:[180,161,32],grass
   ghosts:[{x0:30,x1:200,y:300,s:38},{x0:20,x1:150,y:648,s:40}],
   owl:[81,254,38],gh:[[60,320,130],[90,640,120],[330,620,110]],winG:[118,524,48,107],emb:110,batS:220,batP:[[330,110],[30,190]],bat:[[480,260],[300,200],[180,161],[-40,120]],witch:[[-60,330],[80,190],[220,140],[480,200]],pair:[[480,260],[320,230],[140,330],[-50,320]],bs:.8,
   fog:[[372,40,.34],[690,50,.16],[840,70,.16]]}};
-const Q=new URLSearchParams(location.search),DPR3=Q.get('dpr')==='3',DEMO=Q.has('demo'),MANUAL=Q.has('manual');
+const Q=new URLSearchParams(location.search),DPR3=Q.get('dpr')==='3',TAPDOT=Q.has('tapdot'),MANUAL=Q.has('manual');
 const RM=matchMedia('(prefers-reduced-motion: reduce)');
 const $=s=>document.querySelector(s);
 const gl$=$('#gl'),fx=$('#fx'),c2=fx.getContext('2d'),dot=$('#dot'),V=$('#bg');
@@ -480,11 +480,11 @@ function eyesNow(){const n=P.eyes.length,f=Math.floor(((V.currentTime||0)/(V.dur
 const rips=[];let flare=0,press=null,NOW=0,T=0;const chipP=new Map();
 function ripple(x,y){rips.push({x,y,t:0});if(rips.length>4)rips.shift()}
 addEventListener('pointerdown',e=>{if(e.target.closest('#snd'))return;if(SND.user===null&&!SND.on)sndSet(true);const t=e.target.closest('.chip,#mark');press={t0:NOW,long:false,pt:toPlate(e.clientX,e.clientY),el:t};if(t&&t.classList.contains('chip'))chipP.set(t,1);
- if(DEMO){dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';dot.style.opacity=1}});
-addEventListener('pointermove',e=>{if(press)press.pt=toPlate(e.clientX,e.clientY);if(DEMO){dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px'}});
+ if(TAPDOT){dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';dot.style.opacity=1}});
+addEventListener('pointermove',e=>{if(press)press.pt=toPlate(e.clientX,e.clientY);if(TAPDOT){dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px'}});
 addEventListener('pointerup',()=>{if(!press)return;const el=press.el;
  if(!press.long){if(el&&el.id==='mark'){flare=1}else if(el){const b=el.getBoundingClientRect(),c=toPlate(b.x+b.width/2,b.y+b.height/2);ripple(c.x,c.y)}else if(!hwTap(press.pt))ripple(press.pt.x,press.pt.y)}
- press=null;if(DEMO)dot.style.opacity=0});
+ press=null;if(TAPDOT)dot.style.opacity=0});
 addEventListener('resize',layout);
 // ---------- light-form drawing (all soft radial light, no outlines) ----------
 function glow(c,x,y,R,rgb,a,sy=1){if(a<.004||R<.5)return;const g=c.createRadialGradient(x,y,0,x,y,R);g.addColorStop(0,`rgba(${rgb},${a})`);g.addColorStop(.45,`rgba(${rgb},${a*.35})`);g.addColorStop(1,`rgba(${rgb},0)`);
