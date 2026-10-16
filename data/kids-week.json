@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 16 2026",
   "asOfIso": "2026-10-16",
-  "refreshedAt": "2026-10-16T16:55:31.038Z",
+  "refreshedAt": "2026-10-16T17:10:07.835Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -16,29 +16,16 @@
     "endIso": "2026-10-16T20:00:00.000Z"
   },
   "boardStrip": {
-    "label": "Next up · today",
-    "time": "12:00",
-    "place": "SRE Chat & Chew lunch",
+    "label": "Next up · Mon",
+    "time": "7:00",
+    "place": "SRE specials: PE (tennis shoes)",
     "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-    "badge": "Fri",
-    "startIso": "2026-10-16T17:00:00.000Z",
-    "endIso": "2026-10-16T17:30:00.000Z",
+    "badge": "Mon",
+    "startIso": "2026-10-19T12:00:00.000Z",
+    "endIso": "2026-10-19T12:15:00.000Z",
     "kind": "school",
     "nextLeave": null,
     "queue": [
-      {
-        "label": "Next up · today",
-        "time": "12:00",
-        "place": "SRE Chat & Chew lunch",
-        "detailHtml": "kids with Dad @ <strong>147th</strong> through Fri Oct 16 · 3:00",
-        "badge": "Fri",
-        "startIso": "2026-10-16T17:00:00.000Z",
-        "endIso": "2026-10-16T17:30:00.000Z",
-        "kind": "school",
-        "whenLabel": "12:00",
-        "summary": "Hayes — SRE Chat & Chew lunch",
-        "leaveBy": false
-      },
       {
         "label": "Next up · Mon",
         "time": "7:00",
