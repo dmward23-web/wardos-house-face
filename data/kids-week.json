@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 16 2026",
   "asOfIso": "2026-10-16",
-  "refreshedAt": "2026-10-16T13:40:28.630Z",
+  "refreshedAt": "2026-10-16T14:00:05.170Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -288,12 +288,12 @@
       ],
       "appointmentsEmpty": "No doctor stuff on your board — lucky!!! More play time.",
       "hottest": {
-        "when": "FRI · 8:10",
-        "what": "SRE DROP-OFF",
+        "when": "MON · 7:00",
+        "what": "SRE SPECIALS: ART",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
-          "FRI",
-          "8:10"
+          "MON",
+          "7:00"
         ]
       },
       "today": [
@@ -308,13 +308,6 @@
           "kind": "event",
           "when": "Fri · All day",
           "what": "SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Fri · 8:10",
-          "what": "SRE drop-off",
           "hint": "",
           "tone": "act"
         },
@@ -337,12 +330,6 @@
         {
           "when": "Fri 16 · All day",
           "what": "SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 8:10",
-          "what": "SRE drop-off",
           "tone": "act",
           "hint": ""
         },
@@ -520,12 +507,12 @@
       ],
       "appointmentsEmpty": "No appointments. Clear skies. GO PLAY.",
       "hottest": {
-        "when": "FRI · 8:10",
-        "what": "SRE DROP-OFF",
+        "when": "FRI · 12:00",
+        "what": "SRE CHAT & CHEW LUNCH",
         "where": "with Dad @ 147th · through Fri Oct 16 · 3:00",
         "badges": [
           "FRI",
-          "8:10"
+          "12:00"
         ]
       },
       "today": [
@@ -540,13 +527,6 @@
           "kind": "event",
           "when": "Fri · All day",
           "what": "SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
-          "hint": "",
-          "tone": "act"
-        },
-        {
-          "kind": "event",
-          "when": "Fri · 8:10",
-          "what": "SRE drop-off",
           "hint": "",
           "tone": "act"
         },
@@ -576,12 +556,6 @@
         {
           "when": "Fri 16 · All day",
           "what": "SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
-          "tone": "act",
-          "hint": ""
-        },
-        {
-          "when": "Fri 16 · 8:10",
-          "what": "SRE drop-off",
           "tone": "act",
           "hint": ""
         },
@@ -920,11 +894,6 @@
         {
           "when": "Fri 16 · All day",
           "what": "SRE Fall Family Fun Night MOVED → Oct 30 Abraca-Boo",
-          "tone": "act"
-        },
-        {
-          "when": "Fri 16 · 8:10",
-          "what": "SRE drop-off",
           "tone": "act"
         },
         {
