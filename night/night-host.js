@@ -5,6 +5,7 @@
 (function () {
   var q = new URLSearchParams(location.search);
   if (q.get("night") === "0") return;
+  /* Ainsley keeps her concert venue: no night scene behind her board (Alfred 10/16, kid-world.js nightOn) */
   var KEY = "night52:snd"; /* "0" = user muted, "1" = user on, unset = muted until first tap */
   var root = (document.currentScript && document.currentScript.src) || "night/night-host.js";
   var base = root.replace(/night-host\.js.*$/, "");
@@ -23,6 +24,8 @@
     return !!(el && el.closest && el.closest("a,button,input,select,textarea,label,[role=button],[role=link],[onclick],[data-tap],.chip,.tile,.card,.hub-tile,.kw-hud,.kw-week,.kw-path,.kw-jar-host,header,footer,nav,section,.hotbar"));
   }
   function mount() {
+    /* Ainsley keeps her concert venue: no night scene behind her board (Alfred 10/16; kid-world.js nightOn agrees) */
+    if (document.body.getAttribute("data-kid") === "ainsley") { window.HouseNight = { on: false, sound: function () { return false; }, set: function () {} }; return; }
     document.documentElement.classList.add("night52");
     fr = document.createElement("iframe");
     fr.className = "night52-scene"; fr.title = ""; fr.setAttribute("aria-hidden", "true"); fr.tabIndex = -1;
@@ -44,6 +47,11 @@
       btn = null;
       setSnd(false, false);
       document.addEventListener("pointerdown", function first() { document.removeEventListener("pointerdown", first, true); tapped = true; setTimeout(function () { setSnd(houseOn(), false); }, 0); }, true);
+    } else if (!/(^|\/)(sheet-index|index)\.html$|\/$/.test(location.pathname)) {
+      /* desk sheets: one sound control lives on the hub; here the scene follows that choice (default muted) */
+      btn = null;
+      setSnd(false, false);
+      document.addEventListener("pointerdown", function first() { document.removeEventListener("pointerdown", first, true); tapped = true; if (pref === "1") setSnd(true, false); }, true);
     } else {
       document.body.appendChild(btn);
       setSnd(false, false);
