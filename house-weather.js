@@ -227,6 +227,7 @@
       + '<div class="wx-sub"><i class="hdr-live-dot" aria-hidden="true"></i>LIVE</div>'
       + "</div>";
     load(function (err, data) {
+      if (!(err || !data)) el.style.display = "";
       if (err || !data) {
         el.classList.remove("is-live");
         el.innerHTML =
@@ -236,6 +237,7 @@
           + '<div class="wx-line"><span class="wx-temp">—</span><span class="wx-cond">glance later</span></div>'
           + '<div class="wx-sub">retry</div>'
           + "</div>";
+        el.style.display = "none"; /* NODATA1 · no reading = no chip (never show a dash); comes back on the next good load */
         return;
       }
       paint(el, data);

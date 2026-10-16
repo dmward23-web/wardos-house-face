@@ -627,6 +627,9 @@
     doc = doc || document;
     var deck = doc.getElementById("hub-cam-deck");
     if (!deck) return;
+    /* NODATA1 · never show broken copy: stale/stub camera tiles hide; the deck hides when none is left */
+    if (!doc.getElementById("nodata1-cams")) { var st = doc.createElement("style"); st.id = "nodata1-cams"; st.textContent = ".hub-cam.hub-cam-stale,.hub-cam.hub-cam-stub{display:none!important}#hub-cam-deck.nodata1-empty{display:none!important}"; (doc.head || doc.documentElement).appendChild(st); }
+    setTimeout(function () { var vis = [].some.call(deck.querySelectorAll(".hub-cam"), function (t) { return getComputedStyle(t).display !== "none"; }); deck.classList.toggle("nodata1-empty", !vis); }, 0);
     var data = cachedData();
     var g = gate(data);
     var cams = (data && data.cameras) || [];
