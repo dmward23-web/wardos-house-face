@@ -659,18 +659,18 @@
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
 <script src="house-ori-world.js?v=DAYLINK1"></script>
 <script src="night/night-host.js?v=NIGHT52d" defer></script>
-<script>/* ADDIDEA1 · "Tap to add an idea" opens a text box; ideas stay on this device (localStorage), never in data/*.json */
+<script>/* ADDIDEA1 · "Tap to add an idea" idea slots open a text box; ideas stay on this device (localStorage), never in data/*.json */
 (function(){var K="weekend:ideas";function load(){try{return JSON.parse(localStorage.getItem(K)||"{}")}catch(e){return{}}}
 function save(o){try{localStorage.setItem(K,JSON.stringify(o))}catch(e){}}
 var slots=[].slice.call(document.querySelectorAll(".empty-slot")).map(function(el,i){return{el:el,txt:el.querySelector(".title"),key:"slot"+i}});
-[].slice.call(document.querySelectorAll(".vote-card")).forEach(function(c){var a=c.querySelector(".a"),q=c.querySelector(".q");if(a&&q&&/Tap to add an idea/.test(a.textContent)){c.setAttribute("role","button");c.tabIndex=0;c.setAttribute("aria-label",q.textContent.trim()+": tap to add an idea");slots.push({el:c,txt:a,key:"kid-"+q.textContent.trim().toLowerCase()})}});
+/* kid chips (.vote-card) stay links to each kid board (house-links.js) */
 function show(s,v){if(v){s.txt.textContent=v;s.txt.style.color="";s.el.classList.add("has-idea")}else{s.txt.textContent="Tap to add an idea";s.txt.style.color="#8a8e96";s.el.classList.remove("has-idea")}}
-var st=load();slots.forEach(function(s){show(s,st[s.key])});
+function paint(){var st=load();slots.forEach(function(s){if(!s.el.querySelector("input"))show(s,st[s.key])})}paint();addEventListener("load",function(){paint();setTimeout(paint,1500)});
 function edit(s){if(s.el.querySelector("input"))return;var i=document.createElement("input");i.type="text";i.maxLength=60;i.placeholder="Type an idea";i.value=load()[s.key]||"";i.setAttribute("aria-label","Weekend idea");
 i.style.cssText="width:100%;font:inherit;font-weight:650;padding:6px 10px;border-radius:10px;border:1px solid rgba(245,196,70,.6);background:rgba(10,12,18,.9);color:#f5f6f8;min-height:36px";
 s.txt.style.display="none";s.txt.parentNode.insertBefore(i,s.txt.nextSibling);i.focus();var done=false;
 function fin(keep){if(done)return;done=true;var o=load(),v=i.value.trim();if(keep){if(v)o[s.key]=v;else delete o[s.key];save(o)}i.remove();s.txt.style.display="";show(s,load()[s.key])}
 i.addEventListener("keydown",function(e){e.stopPropagation();if(e.key==="Enter")fin(true);if(e.key==="Escape")fin(false)});i.addEventListener("blur",function(){fin(true)});i.addEventListener("click",function(e){e.stopPropagation()})}
-slots.forEach(function(s){s.el.style.cursor="pointer";s.el.addEventListener("click",function(){edit(s)});s.el.addEventListener("keydown",function(e){if(e.target!==s.el)return;if(e.key==="Enter"||e.key===" "){e.preventDefault();edit(s)}})});})();</script>
+slots.forEach(function(s){s.el.style.cursor="pointer";s.el.addEventListener("click",function(e){e.preventDefault();e.stopImmediatePropagation();edit(s)},true);s.el.addEventListener("keydown",function(e){if(e.target!==s.el)return;if(e.key==="Enter"||e.key===" "){e.preventDefault();edit(s)}})});})();</script>
 </body>
 </html>
