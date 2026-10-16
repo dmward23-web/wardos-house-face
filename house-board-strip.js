@@ -105,6 +105,8 @@
     s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
     s = s.replace(/\(\s*Mom[^)]*\)/gi, "");
     s = s.replace(/\bMom\b[^·]*/gi, "");
+    /* CODESTRIP1 · booking/confirmation codes and flight numbers are noise on the face: "#AEAVR5/#2ENK5V", "WN4778", "(WN 441)" */
+    s = s.replace(/#[A-Z0-9]{5,8}(\/#[A-Z0-9]{5,8})*/g, "").replace(/\(\s*[A-Z]{2}\s?\d{2,4}\s*\)/g, "").replace(/\b(WN|AA|DL|UA|AS|B6|F9|NK)\s?\d{2,4}\b/g, "");
     s = s.replace(/\s{2,}/g, " ").replace(/\s·\s*$/g, "").trim();
     /* GATE3WRAP1 · let the line wrap; never cut mid-word or add an ellipsis glyph */
     cap = cap || 64;
