@@ -1,7 +1,7 @@
 {
   "asOf": "Fri Oct 16 2026",
   "asOfIso": "2026-10-16",
-  "refreshedAt": "2026-10-16T20:56:36.424Z",
+  "refreshedAt": "2026-10-16T21:17:23.664Z",
   "sourceCalendar": "dmward23@gmail.com",
   "leaveBys": {
     "SRE_drop": "leave 8:10 for 8:25",
@@ -128,19 +128,6 @@
         "kind": "school",
         "whenLabel": "Wed 4:20",
         "summary": "Hayes — Allen conference (VIRTUAL) · 4:30",
-        "leaveBy": false
-      },
-      {
-        "label": "Next up · Thu",
-        "time": "3:00",
-        "place": "LKMS Homework Help",
-        "detailHtml": "kids away · back Fri Oct 23 · 3:00",
-        "badge": "Thu",
-        "startIso": "2026-10-22T20:00:00.000Z",
-        "endIso": "2026-10-22T21:00:00.000Z",
-        "kind": "school",
-        "whenLabel": "Thu 3:00",
-        "summary": "Ainsley — LKMS Homework Help · 3:00",
         "leaveBy": false
       }
     ]
@@ -756,12 +743,6 @@
           "hint": ""
         },
         {
-          "when": "Thu 22 · 3:00",
-          "what": "LKMS Homework Help",
-          "tone": "act",
-          "hint": ""
-        },
-        {
           "when": "Fri 23 · All day",
           "what": "Ward Kids [AHH No School]",
           "tone": "act",
@@ -927,11 +908,6 @@
         {
           "when": "Thu 22 · All day",
           "what": "Ward Kids [AHH No School]",
-          "tone": "act"
-        },
-        {
-          "when": "Thu 22 · 3:00",
-          "what": "LKMS Homework Help",
           "tone": "act"
         },
         {
