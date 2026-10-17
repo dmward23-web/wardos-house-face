@@ -29,7 +29,9 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
 test.after(() => server.close());
 
 async function get(p, headers = {}) {
-  const r = await fetch(BASE + p, { headers });
+  /* the sync privacy-scan/gate tests block this process for seconds on a loaded box; a pooled keep-alive socket the
+     server closed meanwhile then fails the next fetch ("fetch failed"). One connection per request. */
+  const r = await fetch(BASE + p, { headers: { Connection: "close", ...headers } });
   return { status: r.status, headers: r.headers, body: Buffer.from(await r.arrayBuffer()) };
 }
 
