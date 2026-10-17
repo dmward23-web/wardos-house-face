@@ -1,7 +1,7 @@
 {
   "status": "live",
   "source": "dmward23",
-  "fetchedAt": "2026-10-17T01:14:38.719Z",
+  "fetchedAt": "2026-10-17T01:23:39.765Z",
   "tz": "America/Chicago",
   "windowStart": "2026-10-09",
   "windowEnd": "2026-10-23",
@@ -54,10 +54,10 @@
     },
     {
       "id": "0p4gftfe91280f6g0i3btdvrv0",
-      "summary": "ALCS Game 5: Guardians vs Rays",
+      "summary": "ALCS Game 4: Rays @ Guardians (Sec 169 Row B 5-6)",
       "start": "2026-10-17T19:00:00-05:00",
-      "end": "2026-10-17T22:00:00-05:00",
-      "location": "Progressive Field, Cleveland, OH",
+      "end": "2026-10-17T22:30:00-05:00",
+      "location": "Progressive Field, 2401 Ontario St, Cleveland, OH 44115",
       "busy": true,
       "allDay": false
     },
