@@ -2,6 +2,12 @@
 <html lang="en" class="kw-root">
 <head>
 <meta charset="UTF-8" />
+<script src="house-hub.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="house-nomoney.js?v=NOMONEY1"></script>
+<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-pair.js?v=HUBPIN1"></script>
+<script src="house-money-bind.js?v=PRIVFEED2"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -354,6 +360,8 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   /* HEAT2 · Drop Zone float / session rail layering */
   body.theme-hayes .panel { position: relative; }
   body.theme-hayes .panel > *:not(.storm-float):not(.hud-tick) { position: relative; z-index: 2; }
+  /* PRIVFEED3 · the storm-ring pulse scales the full-width panel ::before past the screen edge (sideways scroll at 1920 and 1080): clip it sideways only */
+  html:not([data-export]) body.theme-hayes .panel.cmd-kid { overflow-x: clip !important; overflow-y: visible !important; }
   body.theme-hayes .storm-float { position: absolute !important; pointer-events: none; z-index: 1; }
   /* GLYPH-RAIL2 · amber SVG pills visible · text labels off · Elo hitboxes */
   body.theme-hayes .session-rail.jump-rail {
@@ -650,7 +658,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="hdr-right">
  <div class="live-clock-host" aria-label="America/Chicago time">
  <div class="live-clock-lab">CT</div>
- <div class="live-clock" data-live-clock>—:— —</div>
+ <div class="live-clock" data-live-clock></div>
  </div>
  <div style="display:flex;gap:8px;align-items:center">
  <button type="button" class="mute-btn" data-mute-toggle aria-label="Sound">🔊</button>
@@ -711,7 +719,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
  <div class="bank-meta"><span data-bank-meta></span><span class="bank-meta-sep" aria-hidden="true">·</span><span class="bank-meta-today">Today <span data-bank-today>0</span></span></div>
  <div class="bank-links">
- <a class="primary-foil" href="sheet-allowance.html">Jar →</a>
+ <a class="primary-foil" href="sheet-allowance.html">Jar</a>
  <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">Jar full · show Dad</a>
  <button type="button" class="got-it" data-got-it hidden>Paid</button>
  <div class="paid-stamp" data-paid-stamp hidden>Paid</div>
@@ -743,14 +751,14 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
  </footer>
 </div>
 
-<script src="house-clock.js?v=TEXTBACK1"></script>
-<script src="house-tapsync.js?v=UNDO1"></script>
-<script src="kids-data.js?v=LIVESPEC1"></script>
+<script src="house-clock.js?v=PRIVFEED3"></script>
+<script src="house-tapsync.js?v=HUBPIN1"></script>
+<script src="kids-data.js?v=PRIVFEED3"></script>
 <script src="house-saves.js?v=JARMATH1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=HUM1"></script>
-<script src="house-kid-engage.js?v=ALLDAY1"></script>
-<script src="house-checkoffs.js?v=DBLTAP1" defer></script>
+<script src="house-kid-engage.js?v=PRIVFEED3"></script>
+<script src="house-checkoffs.js?v=PRIVFEED3" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
  if (window.HouseSaves) HouseSaves.mount("hayes");
@@ -793,7 +801,7 @@ document.addEventListener("DOMContentLoaded", function(){
 <script src="art/kid-layout.js?v=LANDFIT2"></script>
 <script src="kid-world.js?v=MYWEEK1"></script>
 <script src="art/hayes-loot/callouts.js?v=GATE1"></script>
-<script src="hayes-loot.js?v=FITW1"></script>
+<script src="hayes-loot.js?v=PRIVFEED3"></script>
 <script src="calendar-world.js?v=MYWEEK1"></script>
 </body>
 </html>

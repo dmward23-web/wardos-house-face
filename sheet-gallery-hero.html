@@ -2,6 +2,10 @@
 <html data-export lang="en">
 <head>
 <meta charset="UTF-8" />
+<script src="house-hub.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-pair.js?v=HUBPIN1"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1170" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -138,6 +142,8 @@
     padding: 4px 8px; border-radius: 999px;
     background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(230,232,236,0.7));
   }
+  /* HUBPIN1 · screenshots left the repo (privacy); each card opens the live page instead */
+  .thumb-live{display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-height:120px;font:800 18px/1.2 Inter,system-ui,sans-serif;color:#f4ead8;opacity:.8}
 </style>
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
@@ -148,7 +154,7 @@
  <header class="hdr hdr--clockfirst">
  <div class="hdr-left-col">
  <div class="live-clock-host" aria-label="America/Chicago time">
- <div class="board-clock live-clock" data-live="time" data-live-clock>—:—</div>
+ <div class="board-clock live-clock" data-live="time" data-live-clock></div>
  </div>
  <div class="hdr-micros">
  <a class="nav-week" href="sheet-gallery.html">Full gallery</a>
@@ -160,35 +166,35 @@
 
  <nav class="shot-grid" aria-label="Hero eight phone plates">
  <a class="card" href="sheet-index.html">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-index-phone.png" alt="Index" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Index</span></div>
  <div class="card-label">Index</div>
  </a>
  <a class="card" href="sheet-today.html">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-today-phone.png" alt="Today" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Today</span></div>
  <div class="card-label">Today</div>
  </a>
  <a class="card" href="sheet-index.html">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-face-week-phone.png" alt="Week" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Week</span></div>
  <div class="card-label">Week</div>
  </a>
  <a class="card" href="month.html">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-face-month-phone.png" alt="Month" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Month</span></div>
  <div class="card-label">Month</div>
  </a>
  <a class="card" href="kid-hayes.html">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-face-hayes-phone.png" alt="Hayes" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Hayes</span></div>
  <div class="card-label">Hayes</div>
  </a>
  <a class="card" href="sheet-chores.html">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-chores-phone.png" alt="Chores" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Chores</span></div>
  <div class="card-label">Chores</div>
  </a>
  <a class="card" href="sheet-load-day.html">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-load-day-phone.png" alt="Load day" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Load day</span></div>
  <div class="card-label">Load day</div>
  </a>
  <a class="card" href="sheet-status.html">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-status-phone.png" alt="Status" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Status</span></div>
  <div class="card-label">Status</div>
  </a>
  </nav>
@@ -199,7 +205,7 @@
  </footer>
 </div>
 
-<script src="house-clock.js?v=SHEETCLK3"></script>
+<script src="house-clock.js?v=PRIVFEED3"></script>
 <script src="house-zoom.js"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>

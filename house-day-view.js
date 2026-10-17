@@ -11,7 +11,7 @@
   function clean(s) {
     s = String(s || "").replace(/\[[^\]]*\]/g, " ").replace(/#[A-Za-z0-9_-]+/g, " ")
       .replace(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{5,}\b/g, " ").replace(/\(\s*\)/g, " ");
-    s = s.replace(/pickup at Kristin's/gi, "pickup at their mom's").replace(/\bto Kristin\b/gi, "to their mom").replace(/Kristin's/g, "their mom's").replace(/\bKristin\b/g, "their mom");
+    /* PRIVFEED1 · the co-parent name is scrubbed on the box (cal-months.py THEIRMOM1); no name lives here */
     return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
   }
   function shift(d, n) { var t = new Date(d + "T12:00:00"); t.setDate(t.getDate() + n); return t.toISOString().slice(0, 10); }

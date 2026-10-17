@@ -1,0 +1,36 @@
+# PRIVFEED1 · privacy gate. The repo is PUBLIC: every push and PR is scanned (all paths, data included).
+# CI has no private names/denylist (those live only on the box), so generic patterns run here; the box hooks
+# (scripts/hooks/pre-commit + pre-push) add the private denylist before anything leaves the box.
+# Output is category + path:line only, never the matched value.
+name: privacy-scan
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  privacy-scan:
+    name: "PRIVACY · no private data in the tree or the new commits"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Scan tree
+        run: node scripts/privacy-scan.mjs --tree
+      - name: Scan new commits (PR)
+        if: github.event_name == 'pull_request'
+        run: node scripts/privacy-scan.mjs --range "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
+      - name: Scan new commits (push)
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        run: node scripts/privacy-scan.mjs --range "${{ github.event.before }}..${{ github.sha }}"
+      - name: House-face test suite (QA1 · one command, every scripts/qa/*.test.mjs, parallel, no skips)
+        run: |
+          npm install --no-save --prefix "$HOME/.cache/wardos-deps" ws@8 >/dev/null 2>&1
+          QA_NO_BROWSER=1 scripts/qa/run-tests.sh

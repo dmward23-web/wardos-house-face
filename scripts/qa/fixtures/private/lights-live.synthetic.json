@@ -1,0 +1,14 @@
+{
+  "status": "live",
+  "fetchedAt": "2026-10-13T11:40:00.000Z",
+  "source": "synthetic",
+  "writeSupported": true,
+  "brightnessControlSupported": true,
+  "lights": [
+    { "id": "dining-room", "name": "Dining Room", "where": "Dining Room", "kind": "dimmer", "on": false, "brightness": 40, "online": true },
+    { "id": "kitchen", "name": "Kitchen", "where": "Kitchen", "kind": "dimmer", "on": true, "brightness": 60, "online": true }
+  ],
+  "reserved": [],
+  "error": null,
+  "writeProxy": "http://127.0.0.1:1"
+}

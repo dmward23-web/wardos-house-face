@@ -2,6 +2,12 @@
 <html lang="en" data-sound="on">
 <head>
 <meta charset="UTF-8" />
+<script src="house-hub.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="house-nomoney.js?v=NOMONEY1"></script>
+<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-pair.js?v=HUBPIN1"></script>
+<script src="house-money-bind.js?v=PRIVFEED2"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -669,7 +675,7 @@
  <header class="hdr hdr--clockfirst">
  <div class="hdr-left-col">
  <div class="live-clock-host" aria-label="America/Chicago time">
- <div class="live-clock" data-live-clock>—:—</div>
+ <div class="live-clock" data-live-clock></div>
  </div>
  <div class="hdr-micros">
  
@@ -687,7 +693,7 @@
  <div class="cheer-main">
  <div class="cheer-label">Today’s vibe</div>
  <div class="cheer-title">Tap musts · <span class="hl"><span class="g2-inline"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-star"/></svg></span> into the jar</span> · <a href="sheet-allowance.html" style="color:inherit">Dad checks</a></div>
- <div class="cheer-sub"><span data-live="date-short">…</span> · Dad week @ 147th · chores Fri→Fri</div>
+ <div class="cheer-sub"><span data-live="date-short">…</span> · Dad week at home · chores Fri to Fri</div>
  </div>
  <div class="cheer-badges">
  <div class="cheer-badge">3 kids</div>
@@ -707,10 +713,10 @@
  <div class="chore open ainsley" data-check="ain-bed">
  <span class="ring"></span>
  <div class="txt">
- <div class="what">Make bed — stage reset</div>
+ <div class="what">Make bed · stage reset</div>
  <div class="hint">daily must · morning</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open ainsley" data-check="ain-toys">
  <span class="ring"></span>
@@ -718,7 +724,7 @@
  <div class="what">Room reset</div>
  <div class="hint">daily must · morning clean pass</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open ainsley" data-check="ain-dishwasher">
  <span class="ring"></span>
@@ -726,7 +732,7 @@
  <div class="what">Clean up · rinse · dishwasher</div>
  <div class="hint">daily must · after you eat</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open ainsley" data-check="ain-empty">
  <span class="ring"></span>
@@ -734,7 +740,7 @@
  <div class="what">Empty dishwasher</div>
  <div class="hint">daily must · when clean</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open ainsley" data-check="ain-living">
  <span class="ring"></span>
@@ -742,7 +748,7 @@
  <div class="what">Shoes & coats · closet / cubby / room</div>
  <div class="hint">daily must · never hallway</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open ainsley" data-check="ain-bath">
  <span class="ring"></span>
@@ -750,15 +756,15 @@
  <div class="what">Bathroom wipe</div>
  <div class="hint">weekly must · ask Dad to inspect</div>
  </div>
- <span class="star-earn" data-stars="3">$3</span>
+ <span class="star-earn" data-stars="3" data-money-suffix=""></span>
  </div>
  <div class="chore open ainsley" data-check="ain-laundry">
  <span class="ring"></span>
  <div class="txt">
- <div class="what">Laundry full cycle — her clothes</div>
- <div class="hint">weekly must · wash → dry → put away</div>
+ <div class="what">Laundry full cycle · her clothes</div>
+ <div class="hint">weekly must · wash, dry, put away</div>
  </div>
- <span class="star-earn" data-stars="5">$5</span>
+ <span class="star-earn" data-stars="5" data-money-suffix=""></span>
  </div>
  <div class="chore open ainsley" data-check="ain-cubby">
  <span class="ring"></span>
@@ -766,18 +772,18 @@
  <div class="what">Backpack + sports bag in garage cubby</div>
  <div class="hint">weekly must · ask Dad to inspect</div>
  </div>
- <span class="star-earn" data-stars="1">$1</span>
+ <span class="star-earn" data-stars="1" data-money-suffix=""></span>
  </div>
  <div class="chore open ainsley addon" data-check="ain-babysit" data-optional="1">
  <span class="ring">＋</span>
  <div class="txt">
- <div class="what">Babysitting — optional add-on</div>
+ <div class="what">Babysitting · optional add-on</div>
  <div class="hint">when Dad books you · not for jar</div>
  </div>
- <span class="star-earn addon-tag" data-stars="0">$15/hr</span>
+ <span class="star-earn addon-tag" data-stars="0" data-money="babysit"></span>
  </div>
  </div>
-<div class="tap-hint"><span class="ring">✓</span> <a href="sheet-allowance.html" style="color:inherit;font-weight:800">★ Reward jar →</a></div>
+<div class="tap-hint"><span class="ring">✓</span> <a href="sheet-allowance.html" style="color:inherit;font-weight:800">★ Reward jar</a></div>
  </section>
 
  <!-- Hayes -->
@@ -793,7 +799,7 @@
  <div class="what">Make bed</div>
  <div class="hint">daily must · morning · pre-game</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open hayes" data-check="hay-backpack">
  <span class="ring"></span>
@@ -801,7 +807,7 @@
  <div class="what">Backpack ready</div>
  <div class="hint">daily must · morning · loadout</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open hayes" data-check="hay-dishes">
  <span class="ring"></span>
@@ -809,7 +815,7 @@
  <div class="what">Clean up · rinse · dishwasher</div>
  <div class="hint">daily must · after you eat</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open hayes" data-check="hay-empty">
  <span class="ring"></span>
@@ -817,7 +823,7 @@
  <div class="what">Empty dishwasher</div>
  <div class="hint">daily must · when clean</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open hayes" data-check="hay-trash">
  <span class="ring"></span>
@@ -825,7 +831,7 @@
  <div class="what">Trash out</div>
  <div class="hint">daily must · school-day</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open hayes" data-check="hay-postgame">
  <span class="ring"></span>
@@ -833,7 +839,7 @@
  <div class="what">Post-game · gear rinsed · bag set</div>
  <div class="hint">daily must · after practice/game</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open hayes" data-check="hay-shower">
  <span class="ring"></span>
@@ -841,7 +847,7 @@
  <div class="what">Shower · brush · ready for bed</div>
  <div class="hint">daily must · evening bedtime</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open hayes" data-check="hay-room">
  <span class="ring"></span>
@@ -849,7 +855,7 @@
  <div class="what">Room reset</div>
  <div class="hint">weekly must · clear the drop zone</div>
  </div>
- <span class="star-earn" data-stars="2">$2</span>
+ <span class="star-earn" data-stars="2" data-money-suffix=""></span>
  </div>
  <div class="chore open hayes" data-check="hay-shoes">
  <span class="ring"></span>
@@ -857,7 +863,7 @@
  <div class="what">Shoes · closet / cubby / room</div>
  <div class="hint">weekly must · never hallway</div>
  </div>
- <span class="star-earn" data-stars="1">$1</span>
+ <span class="star-earn" data-stars="1" data-money-suffix=""></span>
  </div>
  <div class="chore open hayes" data-check="hay-cubby">
  <span class="ring"></span>
@@ -865,7 +871,7 @@
  <div class="what">Backpack + sports bag in garage cubby</div>
  <div class="hint">weekly must · ask Dad to inspect</div>
  </div>
- <span class="star-earn" data-stars="1">$1</span>
+ <span class="star-earn" data-stars="1" data-money-suffix=""></span>
  </div>
  </div>
 <div class="tap-hint"><span class="ring">✓</span> Green streak king</div>
@@ -884,7 +890,7 @@
  <div class="what">Make bed</div>
  <div class="hint">daily must · morning · pre-game</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open harris" data-check="har-backpack">
  <span class="ring"></span>
@@ -892,7 +898,7 @@
  <div class="what">Backpack ready</div>
  <div class="hint">daily must · morning · loot ready</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open harris" data-check="har-dishes">
  <span class="ring"></span>
@@ -900,7 +906,7 @@
  <div class="what">Clean up · rinse · dishwasher</div>
  <div class="hint">daily must · after you eat</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open harris" data-check="har-empty">
  <span class="ring"></span>
@@ -908,7 +914,7 @@
  <div class="what">Empty dishwasher</div>
  <div class="hint">daily must · when clean</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open harris" data-check="har-trash">
  <span class="ring"></span>
@@ -916,7 +922,7 @@
  <div class="what">Trash out</div>
  <div class="hint">daily must · school-day</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open harris" data-check="har-postgame">
  <span class="ring"></span>
@@ -924,7 +930,7 @@
  <div class="what">Post-game · gear rinsed · bag set</div>
  <div class="hint">daily must · after practice/game</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open harris" data-check="har-shower">
  <span class="ring"></span>
@@ -932,7 +938,7 @@
  <div class="what">Shower · brush · ready for bed</div>
  <div class="hint">daily must · evening bedtime</div>
  </div>
- <span class="star-earn" data-stars="7">$7 wk</span>
+ <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open harris" data-check="har-toys">
  <span class="ring"></span>
@@ -940,7 +946,7 @@
  <div class="what">Toys reset</div>
  <div class="hint">weekly must · ask Dad to inspect</div>
  </div>
- <span class="star-earn" data-stars="2">$2</span>
+ <span class="star-earn" data-stars="2" data-money-suffix=""></span>
  </div>
  <div class="chore open harris" data-check="har-shoes">
  <span class="ring"></span>
@@ -948,7 +954,7 @@
  <div class="what">Shoes · closet / cubby / room</div>
  <div class="hint">weekly must · never hallway</div>
  </div>
- <span class="star-earn" data-stars="1">$1</span>
+ <span class="star-earn" data-stars="1" data-money-suffix=""></span>
  </div>
  <div class="chore open harris" data-check="har-cubby">
  <span class="ring"></span>
@@ -956,7 +962,7 @@
  <div class="what">Backpack + sports bag in garage cubby</div>
  <div class="hint">weekly must · ask Dad to inspect</div>
  </div>
- <span class="star-earn" data-stars="1">$1</span>
+ <span class="star-earn" data-stars="1" data-money-suffix=""></span>
  </div>
  </div>
 <div class="tap-hint"><span class="ring">✓</span> Blue team · go</div>
@@ -970,13 +976,13 @@
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=SHEETCLK1"></script>
+<script src="house-clock.js?v=PRIVFEED3"></script>
 <script>document.addEventListener("DOMContentLoaded",function(){if(window.HouseClock){document.querySelectorAll("[data-live='date-short']").forEach(function(n){n.textContent=HouseClock.shortLabel();});}});</script>
-<script src="house-tapsync.js?v=UNDO1"></script>
-<script src="kids-data.js?v=LIVESPEC1"></script>
+<script src="house-tapsync.js?v=HUBPIN1"></script>
+<script src="kids-data.js?v=PRIVFEED3"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js"></script>
-<script src="house-checkoffs.js?v=DBLTAP1" defer></script>
+<script src="house-checkoffs.js?v=PRIVFEED3" defer></script>
 <script>document.addEventListener("DOMContentLoaded",function(){if(window.WardKids){WardKids.loadJSON(function(e,d){if(d){WardKids._data=d;WardKids.syncBankFromChecks(d);if(WardKids.enhanceSharedChores)WardKids.enhanceSharedChores(document,d);try{document.dispatchEvent(new CustomEvent("house:kids-data-ready",{detail:{data:d}}));}catch(err){}if(window.HouseCheckoffs&&HouseCheckoffs.rewire)HouseCheckoffs.rewire();}});}})</script>
 
 

@@ -23,34 +23,26 @@
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* */ } }
 
-  var liveProxy = "";
-  function loadLiveProxy() {
-    return fetch("data/lights-live.json?sp=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-      var wp = d && d.writeProxy ? String(d.writeProxy).replace(/\/$/, "") : "";
-      if (!wp || (isPages() && isLoop(wp))) return;
-      liveProxy = wp;
-      /* PROXYFOLLOW1 (same rule as house-lights.js): always follow the newest public tunnel address */
-      if (/^https:\/\//i.test(wp) && lsGet(PROXY_LS) !== wp) lsSet(PROXY_LS, wp);
-    }).catch(function () {});
+  var liveProxy = ""; /* HUBPIN1 · kept for API shape; the hub comes from HouseHub only */
+  function loadLiveProxy() { return Promise.resolve(); }
+  function base() { /* HUBPIN1 · built-in hub only; no ?spotifyProxy= / ?lightsProxy= / ?proxy= */
+    var H = window.HouseHub;
+    if (!H) return "";
+    var b = H.lights();
+    if (!b && H.okForKey(DEFAULT_PROXY)) b = String(DEFAULT_PROXY).replace(/\/$/, "");
+    return b;
   }
-  function base() {
-    var q = qs("spotifyProxy") || qs("lightsProxy") || qs("proxy");
-    if (q) return String(q).replace(/\/$/, "");
-    var ls = lsGet(PROXY_LS);
-    if (ls && !(isPages() && isLoop(ls))) return String(ls).replace(/\/$/, "");
-    if (liveProxy) return liveProxy;
-    return isPages() ? "" : DEFAULT_PROXY;
-  }
-  function key() { return qs("lightsProxyToken") || qs("proxyToken") || lsGet(KEY_LS) || ""; }
+  function key() { return lsGet(KEY_LS) || ""; } /* PRIVFEED3 · local storage only; private-feed.js stores + strips a seed link */
 
   function req(method, path, body, timeoutMs) {
     var b = base(), k = key();
     /* SPKEY1 · no key needed: the box trusts the House Face origin for Spotify. */
     if (!b) return Promise.resolve({ ok: false, error: "offline" });
+    if (!k) return Promise.resolve({ ok: false, error: "no_key" }); /* HUBPIN1 · no key, no request (the hub checks the key only) */
     var ctl = window.AbortController ? new AbortController() : null;
     var to = setTimeout(function () { if (ctl) ctl.abort(); }, timeoutMs || 12000);
     var h = { Accept: "application/json" };
-    if (k) h["X-Lights-Proxy-Token"] = k;
+    if (k && window.HouseHub && HouseHub.okForKey(b)) h["X-Lights-Proxy-Token"] = k; /* HUBPIN1 */
     if (body) h["Content-Type"] = "application/json";
     return fetch(b + path, { method: method, headers: h, body: body ? JSON.stringify(body) : undefined, cache: "no-store", signal: ctl ? ctl.signal : undefined })
       .then(function (r) {
@@ -311,7 +303,7 @@
   function paintTile(el) {
     var ph = S.phase, p = player(), it = p && p.item, live = ph === "playing" || ph === "paused" || ph === "idle";
     el.setAttribute("data-sp-phase", ph);
-    var pill = { loading: "Wait", playing: "LIVE", paused: "PAUSED", idle: "READY", need_app: "CONNECT", need_auth: "CONNECT", no_key: "NEED KEY", bad_key: "NEED KEY", offline: "OFFLINE", error: "CHECK" }[ph] || "Wait";
+    var pill = { loading: "Wait", playing: "LIVE", paused: "PAUSED", idle: "READY", need_app: "CONNECT", need_auth: "CONNECT", no_key: "PAIR", bad_key: "PAIR", offline: "OFFLINE", error: "CHECK" }[ph] || "Wait";
     setTxt(el, ".sp-pill", pill);
     var title = "Spotify", artist = "", dev = "", showCtl = false, connectTxt = "";
     if (live && it) {

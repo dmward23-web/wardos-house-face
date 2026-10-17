@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<script src="house-hub.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-pair.js?v=HUBPIN1"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1170" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -211,6 +215,8 @@
     background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(230,232,236,0.7));
   }
   .ftr-meta { color: #8a8e96; }
+  /* HUBPIN1 · screenshots left the repo (privacy); each card opens the live page instead */
+  .thumb-live{display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-height:120px;font:800 18px/1.2 Inter,system-ui,sans-serif;color:#f4ead8;opacity:.8}
 </style>
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
@@ -221,7 +227,7 @@
  <header class="hdr hdr--clockfirst">
  <div class="hdr-left-col">
  <div class="live-clock-host" aria-label="America/Chicago time">
- <div class="board-clock live-clock" data-live="time" data-live-clock>—:—</div>
+ <div class="board-clock live-clock" data-live="time" data-live-clock></div>
  </div>
  <div class="hdr-micros">
  </div>
@@ -236,92 +242,92 @@
  </div>
 
  <nav class="shot-grid" aria-label="House phone plate gallery">
- <a class="card hero" href="phone-shots/board-os-house-index-phone.png">
+ <a class="card hero" href="sheet-index.html">
  <span class="badge">Hero</span>
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-index-phone.png" alt="Index phone" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Index</span></div>
  <div class="card-meta"><span class="card-label">Index</span><span class="card-file">index-phone</span></div>
  </a>
- <a class="card hero" href="phone-shots/board-os-house-today-phone.png">
+ <a class="card hero" href="sheet-today.html">
  <span class="badge">Hero</span>
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-today-phone.png" alt="Today phone" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Today</span></div>
  <div class="card-meta"><span class="card-label">Today</span><span class="card-file">today-phone</span></div>
  </a>
- <a class="card hero" href="phone-shots/board-os-house-face-week-phone.png">
+ <a class="card hero" href="sheet-weekend.html">
  <span class="badge">Hero</span>
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-face-week-phone.png" alt="Week phone" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Week</span></div>
  <div class="card-meta"><span class="card-label">Week</span><span class="card-file">face-week-phone</span></div>
  </a>
- <a class="card hero" href="phone-shots/board-os-house-face-month-phone.png">
+ <a class="card hero" href="month.html">
  <span class="badge">Hero</span>
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-face-month-phone.png" alt="Month phone" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Month</span></div>
  <div class="card-meta"><span class="card-label">Month</span><span class="card-file">face-month-phone</span></div>
  </a>
 
- <a class="card hero" href="phone-shots/board-os-house-face-hayes-phone.png">
+ <a class="card hero" href="kid-hayes.html">
  <span class="badge">Hero</span>
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-face-hayes-phone.png" alt="Hayes phone" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Hayes</span></div>
  <div class="card-meta"><span class="card-label">Hayes</span><span class="card-file">face-hayes-phone</span></div>
  </a>
- <a class="card" href="phone-shots/board-os-house-face-ainsley-phone.png">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-face-ainsley-phone.png" alt="Ainsley phone" /></div>
+ <a class="card" href="kid-ainsley.html">
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Ainsley</span></div>
  <div class="card-meta"><span class="card-label">Ainsley</span><span class="card-file">face-ainsley-phone</span></div>
  </a>
- <a class="card" href="phone-shots/board-os-house-face-harris-phone.png">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-face-harris-phone.png" alt="Harris phone" /></div>
+ <a class="card" href="kid-harris.html">
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Harris</span></div>
  <div class="card-meta"><span class="card-label">Harris</span><span class="card-file">face-harris-phone</span></div>
  </a>
- <a class="card hero" href="phone-shots/board-os-house-chores-phone.png">
+ <a class="card hero" href="sheet-chores.html">
  <span class="badge">Hero</span>
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-chores-phone.png" alt="Chores phone" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Chores</span></div>
  <div class="card-meta"><span class="card-label">Chores</span><span class="card-file">chores-phone</span></div>
  </a>
 
- <a class="card" href="phone-shots/board-os-house-groceries-phone.png">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-groceries-phone.png" alt="Groceries phone" /></div>
+ <a class="card" href="sheet-groceries.html">
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Groceries</span></div>
  <div class="card-meta"><span class="card-label">Groceries</span><span class="card-file">groceries-phone</span></div>
  </a>
- <a class="card" href="phone-shots/board-os-house-allowance-phone.png">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-allowance-phone.png" alt="Allowance phone" /></div>
+ <a class="card" href="sheet-allowance.html">
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Allowance</span></div>
  <div class="card-meta"><span class="card-label">Allowance ★</span><span class="card-file">allowance-phone</span></div>
  </a>
- <a class="card" href="phone-shots/board-os-house-dinner-phone.png">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-dinner-phone.png" alt="Dinner phone" /></div>
+ <a class="card" href="sheet-dinner.html">
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Dinner</span></div>
  <div class="card-meta"><span class="card-label">Dinner vote</span><span class="card-file">dinner-phone</span></div>
  </a>
- <a class="card" href="phone-shots/board-os-house-weekend-phone.png">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-weekend-phone.png" alt="Weekend phone" /></div>
+ <a class="card" href="sheet-weekend.html">
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Weekend</span></div>
  <div class="card-meta"><span class="card-label">Weekend</span><span class="card-file">weekend-phone</span></div>
  </a>
 
- <a class="card" href="phone-shots/board-os-house-pack-phone.png">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-pack-phone.png" alt="Pack phone" /></div>
+ <a class="card" href="sheet-pack.html">
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Pack</span></div>
  <div class="card-meta"><span class="card-label">Pack list</span><span class="card-file">pack-phone</span></div>
  </a>
- <a class="card" href="phone-shots/board-os-house-win-phone.png">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-win-phone.png" alt="Win phone" /></div>
+ <a class="card" href="sheet-win.html">
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Win</span></div>
  <div class="card-meta"><span class="card-label">Week win</span><span class="card-file">win-phone</span></div>
  </a>
- <a class="card" href="phone-shots/board-os-house-countdowns-phone.png">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-countdowns-phone.png" alt="Countdowns phone" /></div>
+ <a class="card" href="sheet-countdowns.html">
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Countdowns</span></div>
  <div class="card-meta"><span class="card-label">Countdowns</span><span class="card-file">countdowns-phone</span></div>
  </a>
- <a class="card" href="phone-shots/board-os-house-us-phone.png">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-us-phone.png" alt="Us phone" /></div>
+ <a class="card" href="sheet-us.html">
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Us</span></div>
  <div class="card-meta"><span class="card-label">Us · together</span><span class="card-file">us-phone</span></div>
  </a>
 
- <a class="card hero" href="phone-shots/board-os-house-load-day-phone.png">
+ <a class="card hero" href="sheet-load-day.html">
  <span class="badge">Hero</span>
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-load-day-phone.png" alt="Load day phone" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Load day</span></div>
  <div class="card-meta"><span class="card-label">Load day</span><span class="card-file">load-day-phone</span></div>
  </a>
- <a class="card" href="phone-shots/board-os-house-desk-gate-phone.png">
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-desk-gate-phone.png" alt="Desk gate phone" /></div>
+ <a class="card" href="sheet-desk-gate.html">
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Desk gate</span></div>
  <div class="card-meta"><span class="card-label">Desk gate</span><span class="card-file">desk-gate-phone</span></div>
  </a>
- <a class="card hero" href="phone-shots/board-os-house-status-phone.png">
+ <a class="card hero" href="sheet-status.html">
  <span class="badge">Hero</span>
- <div class="thumb-wrap"><img src="phone-shots/board-os-house-status-phone.png" alt="Status phone" /></div>
+ <div class="thumb-wrap"><span class="thumb-live" aria-hidden="true">Status</span></div>
  <div class="card-meta"><span class="card-label">Status</span><span class="card-file">status-phone</span></div>
  </a>
  </nav>
@@ -334,7 +340,7 @@
  </footer>
 </div>
 
-<script src="house-clock.js?v=SHEETCLK3"></script>
+<script src="house-clock.js?v=PRIVFEED3"></script>
 <script src="house-zoom.js"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>

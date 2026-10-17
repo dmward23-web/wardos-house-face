@@ -475,6 +475,14 @@
     if (!wc) return;
     /* FITW1 · on a phone the breathing zoom pushed the page 3-7px wider than the screen (sideways pan); keep it still there */
     if (global.innerWidth < 1000) { if (wc.style.transform) wc.style.transform = ""; return; }
+    /* PRIVFEED3 · on the wall and desktop the zoomed canvas was still ~20px wider than the screen (sideways scroll at 1920):
+       breathe inside a fixed, clipped frame so the page never gets wider than the viewport */
+    if (!wc.parentNode || !wc.parentNode.classList || !wc.parentNode.classList.contains("kw-clip")) {
+      var clip = document.createElement("div");
+      clip.className = "kw-clip";
+      clip.style.cssText = "position:fixed;inset:0;overflow:hidden;z-index:1;pointer-events:none;contain:paint";
+      wc.parentNode.insertBefore(clip, wc); clip.appendChild(wc);
+    }
     var s = 1.012 + 0.008 * Math.sin(t * 2 * Math.PI / 14);
     var dx = Math.sin(t * 2 * Math.PI / 23) * 3;
     wc.style.transformOrigin = "50% 60%";

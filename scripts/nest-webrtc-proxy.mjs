@@ -14,8 +14,15 @@
  *   node scripts/nest-webrtc-proxy.mjs --host 0.0.0.0 --port 8787 --lan
  *   node scripts/nest-webrtc-proxy.mjs --token-file ~/.config/wardos/nest-refresh.token
  *
- * Default bind: 127.0.0.1:8787 (localhost only).
- * --lan binds 0.0.0.0 and requires NEST_PROXY_TOKEN (or --auth-token) header.
+ * Default bind: 127.0.0.1:8787. NOTE: cloudflared forwards public traffic FROM 127.0.0.1, so loopback is NOT trusted.
+ *
+ * CAMLOCK1 · auth is mandatory:
+ *   - every /api/* call needs header X-Nest-Proxy-Token (or Authorization: Bearer); no ?proxyToken= query (URLs leak into logs)
+ *   - constant-time compare; no localhost / X-Forwarded-For trust; no open or ephemeral mode
+ *   - the proxy REFUSES TO START without an auth token. Sources (any number, each >= 16 chars):
+ *       --auth-token-file <path> (repeatable)  · default files ~/.config/wardos/nest-proxy.token + nest-device.token
+ *       NEST_PROXY_TOKEN env · --auth-token <t> (avoid: visible in ps)
+ *   - /health answers only {"ok":true}; static page code (no data/, scripts/, dotfiles) is the only keyless content.
  *
  * See ../NEST-LIVE.md
  */
@@ -24,12 +31,19 @@ import path from "node:path";
 import os from "node:os";
 import http from "node:http";
 import { fileURLToPath } from "node:url";
+import crypto from "node:crypto";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 
-const OAUTH_URL = "https://oauth2.googleapis.com/token";
-const SDM_BASE = "https://smartdevicemanagement.googleapis.com/v1";
+/* CAMLOCK1 tests: NEST_PROXY_TEST_GOOGLE may point Google calls at a LOOPBACK http mock only. */
+const TEST_GOOGLE = /^http:\/\/127\.0\.0\.1:\d+$/.test(process.env.NEST_PROXY_TEST_GOOGLE || "") ? process.env.NEST_PROXY_TEST_GOOGLE : "";
+const OAUTH_URL = TEST_GOOGLE ? TEST_GOOGLE + "/token" : "https://oauth2.googleapis.com/token";
+const SDM_BASE = TEST_GOOGLE ? TEST_GOOGLE + "/v1" : "https://smartdevicemanagement.googleapis.com/v1";
+const DEFAULT_AUTH_FILES = [
+  path.join(os.homedir(), ".config", "wardos", "nest-proxy.token"),
+  path.join(os.homedir(), ".config", "wardos", "nest-device.token"),
+];
 
 const DEFAULT_TOKEN = path.join(os.homedir(), ".config", "wardos", "nest-refresh.token");
 const DEFAULT_CONFIG = path.join(os.homedir(), ".config", "wardos", "nest-sdm.json");
@@ -39,7 +53,9 @@ function parseArgs(argv) {
     host: "127.0.0.1",
     port: 8787,
     lan: false,
-    authToken: process.env.NEST_PROXY_TOKEN || "",
+    authTokens: [],
+    authFiles: [],
+    cliToken: "",
     tokenFile: DEFAULT_TOKEN,
     configFile: DEFAULT_CONFIG,
     help: false,
@@ -51,7 +67,8 @@ function parseArgs(argv) {
     else if (a === "--lan") {
       out.lan = true;
       if (out.host === "127.0.0.1") out.host = "0.0.0.0";
-    } else if (a === "--auth-token" && argv[i + 1]) out.authToken = argv[++i];
+    } else if (a === "--auth-token" && argv[i + 1]) out.cliToken = argv[++i];
+    else if (a === "--auth-token-file" && argv[i + 1]) out.authFiles.push(path.resolve(argv[++i]));
     else if (a === "--token-file" && argv[i + 1]) out.tokenFile = path.resolve(argv[++i]);
     else if (a === "--config" && argv[i + 1]) out.configFile = path.resolve(argv[++i]);
     else if (a === "--help" || a === "-h") out.help = true;
@@ -254,9 +271,22 @@ function mimeFor(p) {
   if (p.endsWith(".svg")) return "image/svg+xml";
   if (p.endsWith(".png")) return "image/png";
   if (p.endsWith(".jpg") || p.endsWith(".jpeg")) return "image/jpeg";
+  if (p.endsWith(".webp")) return "image/webp";
+  if (p.endsWith(".gif")) return "image/gif";
+  if (p.endsWith(".woff2")) return "font/woff2";
+  if (p.endsWith(".ttf")) return "font/ttf";
+  if (p.endsWith(".woff")) return "font/woff";
   return "application/octet-stream";
 }
 
+export const DEVICE_NAME_RE = /^enterprises\/[A-Za-z0-9_-]+\/devices\/[A-Za-z0-9_-]+$/;
+/* PRIVFEED3 · vendor/ holds the in-page QR library (Dad's Pair a screen tile); nothing else under it.
+   HUBPIN1 · art/, assets/ and theme-tiles/ serve page art and their scripts (image + js only, every image there is on
+   the privacy art allow-list); no traversal (no "..", no dot-segments, no backslash, no encoded slash tricks). */
+export const STATIC_OK = /^(?:ori\/[A-Za-z0-9_\/.-]+|[A-Za-z0-9_.-]+)\.(?:html|js|css|png|jpg|webp|svg|woff2?)$|^vendor\/[A-Za-z0-9_.-]+\.js$|^fonts\/[A-Za-z0-9_-][A-Za-z0-9_.-]*\.(?:ttf|woff2?)$|^(?:art|assets|theme-tiles)\/(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*\/)*[A-Za-z0-9_-][A-Za-z0-9_.-]*\.(?:png|jpe?g|webp|gif|svg|js)$/;
+export function staticOk(rel) {
+  return typeof rel === "string" && STATIC_OK.test(rel) && !rel.includes("..") && !rel.includes("\\") && !rel.split("/").some((seg) => !seg || seg.startsWith("."));
+}
 function safeJoin(root, urlPath) {
   const cleaned = decodeURIComponent(String(urlPath || "/").split("?")[0].split("#")[0]);
   const rel = cleaned.replace(/^\/+/, "") || "nest-webrtc.html";
@@ -265,14 +295,32 @@ function safeJoin(root, urlPath) {
   return abs;
 }
 
-function checkAuth(req, args) {
-  if (!args.lan && !args.authToken) return true;
-  if (!args.authToken) return true; // localhost without token OK
-  const h =
-    req.headers["x-nest-proxy-token"] ||
-    (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
-  const q = new URL(req.url || "/", "http://x").searchParams.get("proxyToken");
-  return h === args.authToken || q === args.authToken;
+/** CAMLOCK1 · collect auth tokens; never logs them. */
+export function loadAuthTokens(args, env = process.env) {
+  const out = [];
+  const add = (t) => { t = String(t || "").trim(); if (t.length >= 16 && !out.includes(t)) out.push(t); };
+  add(args.cliToken);
+  add(env.NEST_PROXY_TOKEN);
+  for (const f of (args.authFiles.length ? args.authFiles : DEFAULT_AUTH_FILES)) {
+    try { for (const t of fs.readFileSync(f, "utf8").split(/\s+/)) add(t); } catch { /* missing file */ }
+  }
+  return out;
+}
+
+function safeEq(a, b) {
+  const x = crypto.createHash("sha256").update(String(a)).digest();
+  const y = crypto.createHash("sha256").update(String(b)).digest();
+  return crypto.timingSafeEqual(x, y);
+}
+
+/** CAMLOCK1 · header only, constant time, no loopback / forwarded-for trust, deny when no tokens. */
+export function checkAuth(req, tokens) {
+  if (!tokens || !tokens.length) return false;
+  const h = String(req.headers["x-nest-proxy-token"] || (req.headers.authorization || "").replace(/^Bearer\s+/i, "") || "");
+  if (!h) return false;
+  let ok = false;
+  for (const t of tokens) ok = safeEq(h, t) || ok;
+  return ok;
 }
 
 async function main() {
@@ -293,10 +341,10 @@ async function main() {
     console.error("FATAL: nest-refresh.token missing at " + args.tokenFile);
     process.exit(2);
   }
-  if (args.lan && !args.authToken) {
-    // generate ephemeral LAN token so we never bind open
-    args.authToken = "nest-" + Math.random().toString(36).slice(2, 12) + Math.random().toString(36).slice(2, 8);
-    console.warn("WARN: --lan without NEST_PROXY_TOKEN — generated ephemeral: " + args.authToken);
+  args.authTokens = loadAuthTokens(args);
+  if (!args.authTokens.length) {
+    console.error("FATAL: CAMLOCK1 · no auth token (--auth-token-file, ~/.config/wardos/nest-proxy.token / nest-device.token, or NEST_PROXY_TOKEN; >= 16 chars). Refusing to start.");
+    process.exit(3);
   }
 
   async function loadCams(accessToken, force) {
@@ -314,6 +362,9 @@ async function main() {
   async function resolveDevice(accessToken, idOrName) {
     const q = String(idOrName || "").trim();
     // Direct resource name bypasses list (avoids 429)
+    /* PRIVFEED3 · a full resource name must be exactly enterprises/<id>/devices/<id> (no '..', no extra slashes),
+       so a keyed caller can never steer the Google bearer to another SDM path */
+    if (q.startsWith("enterprises/") && !DEVICE_NAME_RE.test(q)) return { cams: _deviceCache.cams, device: null };
     if (q.startsWith("enterprises/")) {
       return {
         cams: _deviceCache.cams,
@@ -338,7 +389,9 @@ async function main() {
   }
 
   const server = http.createServer(async (req, res) => {
-    const u = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
+    /* PRIVFEED3 · never build a URL from the Host header; a bad request line is a 400, never a crash */
+    let u;
+    try { u = new URL(req.url || "/", "http://proxy.invalid"); } catch { return json(res, 400, { error: "bad request" }); }
     const pathname = u.pathname;
 
     if (req.method === "OPTIONS") {
@@ -352,21 +405,20 @@ async function main() {
 
     try {
       if (pathname === "/health" || pathname === "/api/health") {
-        return json(res, 200, {
-          ok: true,
-          service: "nest-webrtc-proxy",
-          bind: `${args.host}:${args.port}`,
-          lan: args.lan,
-          authRequired: Boolean(args.authToken),
-          ts: new Date().toISOString(),
-        });
+        return json(res, 200, { ok: true }); /* CAMLOCK1 · reveals nothing else */
       }
 
       // Static viewer + assets from repo root (nest-webrtc.html etc.)
       if (req.method === "GET" && !pathname.startsWith("/api/")) {
-        let filePath = safeJoin(ROOT, pathname === "/" ? "/nest-webrtc.html" : pathname);
+        /* PRIVFEED2 · this port is reachable through the hub tunnel. Serve ONLY public page code (the same files
+         * Pages serves): root or ori/ html/js/css/images. Never data/, scripts/, plates/, dotfiles (.git), json, md. */
+        let rel = "";
+        try { rel = decodeURIComponent(pathname === "/" ? "/nest-webrtc.html" : pathname).replace(/^\/+/, ""); } catch { return json(res, 404, { error: "not found" }); }
+        if (!staticOk(rel)) {
+          return json(res, 404, { error: "not found" });
+        }
+        let filePath = safeJoin(ROOT, "/" + rel);
         if (!filePath || !fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
-          // also allow serving data/nest-live.json for camera list fallback
           return json(res, 404, { error: "not found" });
         }
         const buf = fs.readFileSync(filePath);
@@ -378,8 +430,8 @@ async function main() {
         return res.end(buf);
       }
 
-      if (!checkAuth(req, args)) {
-        return json(res, 401, { error: "unauthorized · need X-Nest-Proxy-Token / ?proxyToken=" });
+      if (!checkAuth(req, args.authTokens)) {
+        return json(res, 401, { error: "unauthorized", locked: true });
       }
 
       if (pathname === "/api/cameras" && req.method === "GET") {
@@ -474,12 +526,14 @@ async function main() {
     console.log(`  viewer:  http://127.0.0.1:${args.port}/nest-webrtc.html`);
     console.log(`  health:  http://127.0.0.1:${args.port}/health`);
     console.log(`  cameras: http://127.0.0.1:${args.port}/api/cameras`);
-    if (args.authToken) console.log(`  auth:    X-Nest-Proxy-Token (set)`);
+    console.log(`  auth:    X-Nest-Proxy-Token required (${args.authTokens.length} token(s) loaded)`);
     console.log(`  secrets: ${args.configFile} + token file (mode 600)`);
   });
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}

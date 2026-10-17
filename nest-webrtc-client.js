@@ -50,10 +50,10 @@
     if (!data) return;
     try {
       var wp = data.nestProxy ? String(data.nestProxy).replace(/\/$/, "") : "";
-      var tok = data.nestProxyToken ? String(data.nestProxyToken) : "";
+      var tok = ""; /* CAMLOCK1 · never take a key from a data file */
       if (!wp || (isPagesHost() && isLoopbackProxy(wp))) return;
       _liveProxy = { nestProxy: wp, nestProxyToken: tok || "" };
-      if (!localStorage.getItem(PROXY_LS_KEY)) localStorage.setItem(PROXY_LS_KEY, wp);
+      /* HUBPIN1 · data files no longer save a camera host */
       if (tok && !localStorage.getItem(PROXY_TOKEN_LS_KEY)) {
         localStorage.setItem(PROXY_TOKEN_LS_KEY, tok);
       }
@@ -78,41 +78,13 @@
     return _liveProxyPromise;
   }
 
-  function proxyBase() {
-    var fromQs = qs("proxy") || qs("nestProxy");
-    if (fromQs) {
-      try {
-        localStorage.setItem(PROXY_LS_KEY, fromQs.replace(/\/$/, ""));
-      } catch (_) {}
-      return fromQs.replace(/\/$/, "");
-    }
-    // PROXYFOLLOW1: newest public address from nest-live.json beats a saved one
-    // (the tunnel address changes when Atlas's computer restarts).
-    if (location.port === "8787") return location.origin; // served by the proxy itself
-    if (_liveProxy && _liveProxy.nestProxy && /^https:\/\//i.test(_liveProxy.nestProxy)) {
-      try { localStorage.setItem(PROXY_LS_KEY, _liveProxy.nestProxy); } catch (_) {}
-      return _liveProxy.nestProxy;
-    }
-    try {
-      var saved = localStorage.getItem(PROXY_LS_KEY);
-      if (saved) {
-        var lsUrl = saved.replace(/\/$/, "");
-        if (!(isPagesHost() && isLoopbackProxy(lsUrl))) return lsUrl;
-      }
-    } catch (_) {}
-    if (_liveProxy && _liveProxy.nestProxy) {
-      var wp = _liveProxy.nestProxy;
-      if (!(isPagesHost() && isLoopbackProxy(wp))) return wp;
-    }
-    // Same-origin when served by the proxy itself (box / LAN)
-    if (location.port === "8787" || (location.protocol === "http:" && /nest-webrtc/.test(location.pathname) && !isPagesHost())) {
-      return location.origin;
-    }
-    // GitHub Pages / phone: 127.0.0.1 is THE PHONE, not Atlas — refuse silent black.
-    if (isPagesHost()) {
-      return "";
-    }
-    return "http://127.0.0.1:8787";
+  function proxyBase() { /* HUBPIN1 · built-in camera host only; ?proxy= / ?nestProxy= / data files cannot move it */
+    var H = window.HouseHub;
+    if (!H) return "";
+    if (H.okForKey(location.origin)) return location.origin; /* served by the camera proxy itself */
+    var b = H.cams();
+    if (!b && H.okForKey("http://127.0.0.1:8787")) b = "http://127.0.0.1:8787"; /* box preview */
+    return b;
   }
 
   function proxyUnreachableHint(base) {
@@ -135,29 +107,33 @@
     return null;
   }
 
-  function proxyToken() {
-    var t = qs("proxyToken") || qs("nestProxyToken") || qs("token");
-    if (t) {
-      try {
-        localStorage.setItem(PROXY_TOKEN_LS_KEY, t);
-      } catch (_) {}
-      return t;
-    }
+  /* CAMLOCK1 · the camera key is the wall's stored device key (same one the lights / private feed use).
+   * A one-time ?proxyToken= pairing link is saved then stripped from the address bar; the key is only ever
+   * sent as the X-Nest-Proxy-Token header, never in a URL. */
+  var DEVICE_TOKEN_KEYS = [PROXY_TOKEN_LS_KEY, "wardos-lights-proxy-token", "wardos-private-feed-token"];
+  (function seedFromPairingLink() {
+    var t = qs("proxyToken") || qs("nestProxyToken");
+    if (!t) return;
+    try { if (/^[A-Za-z0-9_-]{16,}$/.test(t)) localStorage.setItem(PROXY_TOKEN_LS_KEY, t); } catch (_) {}
     try {
-      var ls = localStorage.getItem(PROXY_TOKEN_LS_KEY);
-      if (ls) return ls;
+      var u = new URL(location.href);
+      ["proxyToken", "nestProxyToken", "token"].forEach(function (k) { u.searchParams.delete(k); });
+      history.replaceState(null, "", u.pathname + u.search + u.hash);
     } catch (_) {}
-    if (_liveProxy && _liveProxy.nestProxyToken) return _liveProxy.nestProxyToken;
+  })();
+  function proxyToken() {
+    for (var i = 0; i < DEVICE_TOKEN_KEYS.length; i++) {
+      try { var v = localStorage.getItem(DEVICE_TOKEN_KEYS[i]); if (v) return v; } catch (_) {}
+    }
     return "";
   }
+  function lockedError() { var e = new Error("Camera locked · needs pairing"); e.code = "LOCKED"; return e; }
+  function needKey() { if (!proxyToken()) throw lockedError(); }
 
   function authHeaders() {
     var h = { "Content-Type": "application/json", Accept: "application/json" };
     var t = proxyToken();
-    if (t) {
-      h["X-Nest-Proxy-Token"] = t;
-      h["Authorization"] = "Bearer " + t;
-    }
+    if (t && window.HouseHub && HouseHub.okForKey(proxyBase())) h["X-Nest-Proxy-Token"] = t; /* HUBPIN1 */
     return h;
   }
 
@@ -314,20 +290,22 @@
       err.code = "NEST_PROXY_UNREACHABLE";
       throw err;
     }
-    if (!proxyToken()) { var ek = new Error("NEED KEY"); ek.code = "NEED_KEY"; throw ek; } /* CAMKEY1 · no keyless calls */
+    needKey(); /* CAMLOCK1 · no keyless calls */
     var r = await fetch(base + "/api/cameras", { headers: authHeaders(), cache: "no-store" });
+    if (r.status === 401 || r.status === 403) throw lockedError();
     if (!r.ok) throw new Error("cameras HTTP " + r.status);
     return r.json();
   }
 
   async function exchangeOffer(deviceId, offerSdp) {
     var base = proxyBase();
-    if (!proxyToken()) { var ek = new Error("NEED KEY"); ek.code = "NEED_KEY"; throw ek; } /* CAMKEY1 · no keyless calls */
+    needKey();
     var r = await fetch(base + "/api/webrtc", {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({ deviceId: deviceId, offerSdp: offerSdp }),
     });
+    if (r.status === 401 || r.status === 403) throw lockedError();
     var text = await r.text();
     var data;
     try {
@@ -342,11 +320,13 @@
 
   async function extendSession(deviceId, mediaSessionId) {
     var base = proxyBase();
+    needKey();
     var r = await fetch(base + "/api/webrtc/extend", {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({ deviceId: deviceId, mediaSessionId: mediaSessionId }),
     });
+    if (r.status === 401 || r.status === 403) throw lockedError();
     if (!r.ok) {
       var t = await r.text();
       throw new Error("extend HTTP " + r.status + " " + t.slice(0, 120));
@@ -357,6 +337,7 @@
   async function stopSession(deviceId, mediaSessionId) {
     try {
       var base = proxyBase();
+      if (!proxyToken()) return;
       await fetch(base + "/api/webrtc/stop", {
         method: "POST",
         headers: authHeaders(),

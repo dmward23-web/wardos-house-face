@@ -19,7 +19,7 @@ House Face UI
   fail-closed if missing / error / asOfIso ≠ Chicago today / age > 6h
 ```
 
-- **Ingest ALL event classes:** Busy leaves, Free stubs, sports, therapy, travel, kids blocks — not Leave· only.
+- **Ingest ALL event classes:** Busy leaves, Free stubs, sports, appointments, travel, kids blocks — not Leave· only.
 - **Past/done DROP forever** when `end`/`start` is before now — never manual board edit to clear.
 - **Next Up** always advances to the real next calendar event (client-side filter inside a fresh window).
 - **No Wright cron** (law). Atlas may attach standing refresh later.
@@ -97,7 +97,7 @@ Suggested cadence: every 15 min while Dan is active, plus **on-arrival** after a
   "boardStrip": {
     "label": "Next up · today",
     "time": "3:00",
-    "place": "Ainsley — LKMS Homework Help",
+    "place": "<kid> · <school event>",
     "detailHtml": "<strong>3:00</strong> …",
     "badge": "Mon"
   },

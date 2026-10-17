@@ -18,6 +18,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
+import { privPath, assertPrivateOut } from "./private-dir.mjs"; /* PRIVFEED2 */
 
 const require = createRequire(import.meta.url);
 const WebSocket = require("ws");
@@ -36,7 +37,7 @@ const MODE_MAP = { heat: "Heat", cool: "Cool", auto: "Auto", off: "Off", aux: "H
 const FAN_MAP = { auto: "Auto", on: "On", smart: "Auto" };
 
 function parseArgs(argv) {
-  const out = { tokenFile: null, outPath: path.join(ROOT, "data", "sensi-live.json"), timeoutMs: 25000 };
+  const out = { tokenFile: null, outPath: privPath("sensi-live.json") /* PRIVFEED2 */, timeoutMs: 25000 };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--token-file" && argv[i + 1]) out.tokenFile = argv[++i];
@@ -54,9 +55,10 @@ function chicagoNowIso() {
 }
 
 function writeJson(outPath, payload) {
-  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  assertPrivateOut(outPath, "sensi-live"); /* PRIVFEED2 · house device state never inside a git work tree */
+  fs.mkdirSync(path.dirname(outPath), { recursive: true, mode: 0o700 });
   const tmp = outPath + ".tmp";
-  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n");
+  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n", { mode: 0o600 });
   fs.renameSync(tmp, outPath);
 }
 

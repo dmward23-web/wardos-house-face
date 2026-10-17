@@ -32,7 +32,7 @@
     ainsley: /\bainsley\b/i
   };
   /* Hub is a shared house screen: appointments show as "appointment", never provider detail. */
-  var APPT_RE = /anxiety|therap|counsel|doctor|dentist|ortho|pediatric|clinic|\bappt\b/i;
+  var APPT_RE = /therap|counsel|doctor|dentist|ortho|pediatric|clinic|\bappt\b/i;
   function isAppt(it) { return it && (it.kind === "appointment" || APPT_RE.test(String(it.summary || it.place || it.what || ""))); }
   function micro(sel) {
     var tile = document.querySelector(sel);

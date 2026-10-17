@@ -20,7 +20,9 @@ vm.runInNewContext(fs.readFileSync(path.join(ROOT, "art/kid-layout.js"), "utf8")
   filename: "art/kid-layout.js"
 });
 
-const week = JSON.parse(fs.readFileSync(path.join(ROOT, "kids-week.json"), "utf8"));
+/* PRIVFEED1 · kids-week is private: box copy when present, else the synthetic fixture */
+const PRIV_WEEK = path.join(process.env.WARDOS_PRIVATE_DIR || path.join(process.env.HOME || "", ".local/share/wardos-private"), "kids-week.json");
+const week = JSON.parse(fs.readFileSync(fs.existsSync(PRIV_WEEK) ? PRIV_WEEK : path.join(ROOT, "scripts/qa/fixtures/private/kids-week.synthetic.json"), "utf8"));
 const labels = {};
 for (const id of ["hayes", "harris", "ainsley"]) {
   const quests = (week.kids[id] && week.kids[id].quests) || [];

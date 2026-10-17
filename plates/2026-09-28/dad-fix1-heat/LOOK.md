@@ -45,7 +45,7 @@ RIGHT:  (ovals absent)         ← if Wx/Sensi not wired yet
 | 1 · NEXT | Tue 7:30 · pack late-lunch snacks | `sheet-today.html` / next-up focus |
 | 2 · LEAVE | 8:10 · Boys SRE drop | `sheet-countdowns.html` |
 | 3 · MUSTS | Musts · kids clear | `sheet-chores.html` |
-| 4 · HOME (hot) | Kids with Dad @ 147th · through Fri Oct 2 · 3:00 | `sheet-today.html` |
+| 4 · HOME (hot) | Kids with Dad at home · through Fri Oct 2 · 3:00 | `sheet-today.html` |
 | (overflow) | Tue 4:25 · Ainsley swim leave | `sheet-countdowns.html` |
 
 **Words KEEP:** Next · Leave · Musts · Today · Kids with Dad · SRE drop · swim · flag  

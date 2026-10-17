@@ -17,6 +17,7 @@ import os from "node:os";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
+import { privPath, assertPrivateOut } from "./private-dir.mjs"; /* PRIVFEED2 */
 
 const require = createRequire(import.meta.url);
 const WebSocket = require("ws");
@@ -25,7 +26,7 @@ const ROOT = path.resolve(__dirname, "..");
 
 const TOKEN_FILE = process.env.SENSI_TOKEN_FILE || path.join(os.homedir(), ".config", "wardos", "sensi-refresh.token");
 const LOCK_DIR = TOKEN_FILE + ".lock";
-const LIVE_JSON = path.join(ROOT, "data", "sensi-live.json");
+const LIVE_JSON = privPath("sensi-live.json"); /* PRIVFEED2 */
 const OAUTH_URL = "https://oauth.sensiapi.io/token";
 const CLIENT_ID = "fleet";
 const CLIENT_SECRET = "JLFjJmketRhj>M9uoDhusYKyi?zUyNqhGB)H2XiwLEF#KcGKrRD2JZsDQ7ufNven";
@@ -154,7 +155,8 @@ function saveLive(t) {
     prev.thermostat.mode = t.mode.charAt(0).toUpperCase() + t.mode.slice(1);
     prev.updatedAt = new Date().toISOString();
     prev.status = "live";
-    fs.writeFileSync(LIVE_JSON, JSON.stringify(prev, null, 2) + "\n");
+    assertPrivateOut(LIVE_JSON, "sensi-live");
+    fs.writeFileSync(LIVE_JSON, JSON.stringify(prev, null, 2) + "\n", { mode: 0o600 });
   } catch (_) {}
 }
 

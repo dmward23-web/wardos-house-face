@@ -818,7 +818,7 @@
       if (cut >= 0) s = s.slice(0, cut);
       return s.replace(/\s+/g, " ").replace(/^[\s·—–\-|]+|[\s·—–\-|]+$/g, "").trim();
     }
-    function isJohnson(s) { return /johnson\s+kids/i.test(String(s || "")); }
+    function isOtherFamily(s) { return /\b(?!Ward\b)[A-Z][a-z]+ Kids\b/.test(String(s || "")); } /* another family's "<Surname> Kids" row; no surname in git */
     function isAwareness(s) { return /no school|\ball day\b|awareness/i.test(String(s || "")); }
     function upcoming() {
       var out = [];
@@ -828,9 +828,9 @@
         var whatNode = stops[i].querySelector(".lb-day-what");
         var time = timeNode ? timeNode.textContent.replace(/\s+/g, " ").trim() : "";
         var raw = whatNode ? whatNode.textContent : "";
-        if (/^all day$/i.test(time) || isAwareness(raw) || isJohnson(raw)) continue;
+        if (/^all day$/i.test(time) || isAwareness(raw) || isOtherFamily(raw)) continue;
         var title = cleanTitle(raw);
-        if (!title || isJohnson(title) || isAwareness(title)) continue;
+        if (!title || isOtherFamily(title) || isAwareness(title)) continue;
         out.push({ time: time, title: title });
         if (out.length === 3) break;
       }
@@ -851,7 +851,7 @@
       if (!dest.getAttribute("data-ori-raw")) dest.setAttribute("data-ori-raw", raw);
       var timeEl = main.querySelector(".time");
       var items = upcoming();
-      var awareness = !timeEl || isAwareness(raw) || isJohnson(raw) || /^all day$/i.test(timeEl ? timeEl.textContent : "");
+      var awareness = !timeEl || isAwareness(raw) || isOtherFamily(raw) || /^all day$/i.test(timeEl ? timeEl.textContent : "");
       if (awareness) {
         if (items.length) {
           if (!timeEl) {

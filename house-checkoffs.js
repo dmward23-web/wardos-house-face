@@ -309,7 +309,7 @@
 
     document.querySelectorAll("[data-left-count]").forEach(function (el) {
       if (stats.total === 0) {
-        el.textContent = "—";
+        el.textContent = "";
       } else if (stats.left === 0) {
         el.textContent = "CLEAR";
         el.classList.add("is-clear");

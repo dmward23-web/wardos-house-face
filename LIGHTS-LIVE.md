@@ -120,7 +120,8 @@ Secrets **never** on Pages / git.
   "fetchedAt": "2026-09-29T00:01:00.000Z",
   "source": "kasa-pending",
   "writeSupported": true,  // when status=live
-  "writeProxy": "https://….trycloudflare.com",
+  // PRIVFEED2: this file is PRIVATE now (~/.local/share/wardos-private/lights-live.json, served via /api/private/lights-live.json)
+  "writeProxy": "<https hub address, box-only>",
   "writeProxyToken": "lights-…",  // LIGHTS6 UX · proxy auth only · NOT kasa password
   "lights": [
     { "id": "dining-room", "name": "Dining Room", "where": "Dining Room", "kind": "dimmer", "on": true, "brightness": 52, "online": true },

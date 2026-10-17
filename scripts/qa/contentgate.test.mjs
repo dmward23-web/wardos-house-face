@@ -1,0 +1,156 @@
+/* CONTENTGATE1 · Alfred's 04:55 content gate, as tests.
+ *  1. the hub host serves art/ assets/ theme-tiles/ fonts/ (images, js, fonts only; no traversal), and every local
+ *     asset a root page references exists and is servable (the static half of "zero 404s from the hub host");
+ *     unpaired / offline boards say "Calendar offline" / "Cameras offline", never dev text.
+ *  2. SEATLAW1: ticket section / row / seat never reaches the glass (render-time law, live and cached feeds, and the writers).
+ *  3. NOMONEY1: kid dollar figures are stripped at render time at every viewport, 1920x1080 included (real browser).
+ *  5. SCHOOLWORD1 ('LKMS' reads 'school'); NAMESDIR1 (private-names.tsv in the private dir, old path as fallback).
+ * Run with the rest:  scripts/qa/run-tests.sh */
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import vm from "node:vm";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const rd = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
+const LAW = JSON.parse(rd("scripts/text-law.json"));
+const FIX = JSON.parse(rd("scripts/qa/fixtures/seatlaw-cal.json"));
+
+function faceLaw() {
+  const g = {}; g.window = g; g.globalThis = g;
+  vm.runInNewContext(rd("house-face-law.js"), g);
+  return g.HouseFaceLaw;
+}
+
+test("hub host: staticOk serves art/assets/theme-tiles/fonts images, js and fonts only; traversal, dotfiles and data never", async () => {
+  const { staticOk } = await import(path.join(ROOT, "scripts/nest-webrtc-proxy.mjs"));
+  for (const ok of ["art/kid-hayes.png", "assets/kids-grow/grow-hayes-victory-bg.jpg", "theme-tiles/a/b.webp", "assets/x/y.svg",
+                    "art/plates.js", "fonts/InterDisplay-Bold.woff2", "fonts/InterDisplay-Bold.ttf", "house-hub.js", "vendor/qr.js", "sheet-index.html"])
+    assert.equal(staticOk(ok), true, ok);
+  for (const bad of ["art/../data/cal-live.json", "assets/../../etc/passwd.png", "art/.hidden.png", "art//x.png", "assets\\x.png",
+                     "art/x.json", "assets/x.html", "fonts/a/b.ttf", "fonts/../x.ttf", "data/cal-live.json", "kids-week.json", "theme-tiles/x.txt",
+                     ".git/config", "scripts/private-feed.mjs", "art/x.png.json"])
+    assert.equal(staticOk(bad), false, bad);
+});
+
+test("hub host: every local asset referenced by a root page exists and is servable (static zero-404 sweep)", async () => {
+  const { staticOk } = await import(path.join(ROOT, "scripts/nest-webrtc-proxy.mjs"));
+  const tracked = new Set(spawnSync("git", ["ls-files"], { cwd: ROOT, encoding: "utf8" }).stdout.split("\n"));
+  const pages = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html"));
+  const css = fs.readdirSync(ROOT).filter((f) => f.endsWith(".css"));
+  const misses = [];
+  const refRe = /(?:src|href)\s*=\s*["']([^"'#?]+\.(?:png|jpe?g|webp|gif|svg|js|css|woff2?|ttf))(?:[?#][^"']*)?["']|url\(\s*["']?([^"')#?]+\.(?:png|jpe?g|webp|gif|svg|woff2?|ttf))/gi;
+  for (const f of [...pages, ...css]) {
+    for (const m of rd(f).matchAll(refRe)) {
+      const ref = (m[1] || m[2]).trim();
+      if (/^(?:[a-z]+:)?\/\//i.test(ref) || ref.startsWith("data:") || ref.includes("${") || ref.includes("'+") || ref.includes("\"+")) continue;
+      const rel = path.posix.normalize(ref.replace(/^\.\//, "").replace(/^\//, ""));
+      if (rel.startsWith("ori/") || rel.startsWith("plates/")) continue; /* the ori world has its own layout gate (gate3) */
+      if (!tracked.has(rel) && !fs.existsSync(path.join(ROOT, rel))) misses.push(`${f}: ${ref} (missing)`);
+      else if (!staticOk(rel)) misses.push(`${f}: ${ref} (not served by the hub host)`);
+    }
+  }
+  assert.deepEqual(misses, []);
+  for (const g of ["sheet-gallery.html", "sheet-gallery-hero.html"]) assert.doesNotMatch(rd(g), /phone-shots\//, g + " still points at removed screenshots");
+});
+
+test("plain empty states: no dev text ('cal-live missing', 'STUB · NO JSON', 'CAL STALE', SDM/secret-request notes) reaches the glass", () => {
+  const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  const files = ["house-board-strip.js", "house-nest.js", "house-sensi.js", "house-lights.js", "sheet-google-home.html", "sheet-index.html", "sheet-today.html", "sheet-sensi.html"];
+  const bad = [/["'][^"'\n]*cal-live missing/, /STUB · NO JSON/, /["'][^"'\n]*\bSTUB\b[^"'\n]*["']/, /["'][^"'\n]*CAL STALE/, /secret-request/, /need SDM/];
+  const hits = [];
+  for (const f of files) {
+    const s = strip(rd(f));
+    for (const re of bad) { const m = s.match(re); if (m) hits.push(`${f}: ${m[0].slice(0, 80)}`); }
+  }
+  assert.deepEqual(hits, []);
+  assert.match(rd("house-board-strip.js"), /place: "Calendar offline"/);
+  assert.match(rd("house-nest.js"), /label: "Cameras offline"/);
+});
+
+test("SEATLAW1: render-time rule strips section / row / seat from every string of a feed (fixture); JS and JSON rules are identical", () => {
+  const F = faceLaw();
+  const seatRules = LAW.rules.filter((r) => /^(SEATLAW1|SCHOOLWORD1)/.test(r.why));
+  assert.equal(seatRules.length, 4);
+  assert.equal(JSON.stringify(F.RENDER_RULES.map((r) => [r[0].source, r[0].flags, r[1]])),
+    JSON.stringify(seatRules.map((r) => [new RegExp(r.re, (r.global ? "g" : "") + r.flags).source, new RegExp(r.re, (r.global ? "g" : "") + r.flags).flags, r.to])));
+  const out = F.cleanFeed("cal-live", JSON.parse(JSON.stringify(FIX)));
+  const all = JSON.stringify(out);
+  assert.doesNotMatch(all, /\bSec(?:tion)?\b\s*\d|\bRow\s+[A-Z0-9]{1,3}\b(?!\s*your)|\bSeats?\s*\d/i, all);
+  assert.equal(out.events[0].summary, "Mudcats @ Riverhawks, Game 2");
+  assert.equal(out.events[1].summary, "Concert");
+  assert.equal(out.events[2].summary, "Titans game · 3:25");
+  assert.equal(out.events[4].summary, "Row your boat sing-along", "ordinary words survive");
+  assert.equal(out.boardStrip.detailHtml, "<strong>6:35</strong> Playoff Game 2: Mudcats @ Riverhawks");
+  assert.equal(out.events[0].start, FIX.events[0].start, "times untouched");
+  /* live and cached both pass through the law: private-feed.js applies it after getRaw(), which returns live or cache */
+  const pf = rd("private-feed.js");
+  assert.match(pf, /return getRaw\(name\); \}\)\.then\(function \(res\) \{ if \(res && res\.data\) res\.data = law\(name, res\.data\)/);
+});
+
+test("SEATLAW1 + SCHOOLWORD1: the Python writer (text_law.py) gives the same words", () => {
+  const strs = FIX.events.map((e) => e.summary);
+  const r = spawnSync("python3", [path.join(ROOT, "scripts/text_law.py")], { input: JSON.stringify(strs), encoding: "utf8", env: { ...process.env, WARDOS_NAMES: "partner=Zedna;coparent=Yolanthe" } });
+  assert.equal(r.status, 0, r.stderr);
+  assert.deepEqual(JSON.parse(r.stdout), ["Mudcats @ Riverhawks, Game 2", "Concert", "Titans game · 3:25", "Ainsley · school picture day", "Row your boat sing-along"]);
+});
+
+test("SCHOOLWORD1: a school entry reads 'school', not LKMS (render time + static hub text)", () => {
+  const F = faceLaw();
+  assert.equal(F.faceText("Ainsley · LKMS picture day"), "Ainsley · school picture day");
+  assert.doesNotMatch(rd("sheet-index.html"), /LKMS/);
+  assert.doesNotMatch(rd("kid-ainsley.html"), /LKMS/);
+});
+
+test("NOMONEY1: dollar text becomes stars; every kid-money page loads house-nomoney.js; no viewport gate", () => {
+  const g = {}; g.window = g; g.globalThis = g; g.document = { readyState: "loading", addEventListener() {} }; g.addEventListener = () => {};
+  vm.runInNewContext(rd("house-nomoney.js"), g);
+  /* figures are written with ¤ and turned into dollars here, so the privacy scan never sees a money figure in git */
+  const t = (s) => g.HouseNoMoney.text(s.replace(/¤/g, () => String.fromCharCode(36)));
+  assert.equal(t("Balance ¤20 · Week ¤7 · Jar ¤3/¤5"), "Stars · payday with Dad");
+  assert.equal(t("¤7 ea wk"), "★ ea wk");
+  assert.equal(t("Babysitting ¤12/hr"), "Babysitting ★");
+  assert.equal(t("Harris earned ¤4.50 today"), "Harris earned ★ today");
+  assert.equal(t("no money here"), "no money here");
+  assert.doesNotMatch(rd("house-nomoney.js"), /innerWidth|matchMedia|min-width|max-width/);
+  for (const f of ["sheet-allowance.html", "sheet-chores.html", "kid-hayes.html", "kid-harris.html", "kid-ainsley.html", "sheet-index.html", "sheet-weekend.html"])
+    assert.match(rd(f), /<script src="house-nomoney\.js\?v=NOMONEY1"><\/script>/, f);
+});
+
+const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
+function money(page, w, h, block) {
+  const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/money_viewport.py"), page, String(w), String(h)],
+    { encoding: "utf8", timeout: 120000, env: { ...process.env, ...(block ? { QA_BLOCK_NOMONEY: "1" } : {}) } });
+  assert.equal(r.status, 0, r.stderr);
+  return JSON.parse(r.stdout.trim().split("\n").pop());
+}
+test("NOMONEY1 at 1920x1080 (real browser): sheet-allowance and sheet-chores show zero dollar figures; the check catches them when the scrub is off",
+  { skip: !browser && "QA_NO_BROWSER=1 or python playwright missing" }, () => {
+    const neg = money("sheet-allowance.html", 1920, 1080, true);
+    assert.ok(neg.injected && neg.dollars >= 20, "negative control must see the injected figures: " + JSON.stringify(neg));
+    for (const [p, w, h] of [["sheet-allowance.html", 1920, 1080], ["sheet-chores.html", 1920, 1080], ["sheet-allowance.html", 1080, 1920], ["sheet-allowance.html", 440, 956]]) {
+      const r = money(p, w, h, false);
+      assert.equal(r.dollars, 0, `${p} @ ${w}x${h}: ${JSON.stringify(r.sample)}`);
+    }
+  });
+
+test("NAMESDIR1: private-names.tsv is read from the private data dir, with ~/.config/wardos as the fallback", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "namesdir-"));
+  const home = path.join(tmp, "home"), priv = path.join(tmp, "priv");
+  fs.mkdirSync(path.join(home, ".config", "wardos"), { recursive: true }); fs.mkdirSync(priv, { recursive: true });
+  fs.writeFileSync(path.join(home, ".config", "wardos", "private-names.tsv"), "partner\tOldplace\ncoparent\tOldco\n");
+  const run = (code, py) => spawnSync(py ? "python3" : process.execPath, py ? ["-c", code] : ["--input-type=module", "-e", code],
+    { cwd: ROOT, encoding: "utf8", env: { PATH: process.env.PATH, HOME: home, WARDOS_PRIVATE_DIR: priv } });
+  const js = `import { privateNames } from "./scripts/private-dir.mjs"; console.log(privateNames().partner[0]);`;
+  const py = `import sys; sys.path.insert(0, "scripts"); import text_law; print(text_law._NAMES["partner"][0])`;
+  assert.equal(run(js).stdout.trim(), "Oldplace", "fallback (JS)");
+  assert.equal(run(py, true).stdout.trim(), "Oldplace", "fallback (Python)");
+  fs.writeFileSync(path.join(priv, "private-names.tsv"), "partner\tNewplace\ncoparent\tNewco\n");
+  assert.equal(run(js).stdout.trim(), "Newplace", "private dir wins (JS)");
+  assert.equal(run(py, true).stdout.trim(), "Newplace", "private dir wins (Python)");
+  fs.rmSync(tmp, { recursive: true, force: true });
+});

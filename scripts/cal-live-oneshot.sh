@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# CAL-LIVE one-shot: events dump → cal-live + kids-week patch → commit+push only if dirty
+# CAL-LIVE one-shot: events dump → cal-live + kids-week patch in the box-only private folder (PRIVFEED1).
+# Nothing is committed or pushed: the house hub serves the private folder with a token. --push is a no-op.
 # Atlas standing / on-arrival path (see CAL-LIVE.md + /workspace/cal-refresh-wire.md)
 #
 # Usage:
@@ -7,6 +8,7 @@
 #   ./scripts/cal-live-oneshot.sh /path/to/events-dump.json --push --note "CAL-live · auto"
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+PRIV="${WARDOS_PRIVATE_DIR:-$HOME/.local/share/wardos-private}"; mkdir -p "$PRIV"; chmod 700 "$PRIV"
 EVENTS="${1:?events json required (dmward23 MCP list_events dump)}"
 shift || true
 PUSH=0
@@ -25,22 +27,14 @@ NOTE="${NOTE:-CAL-live · snapshot ${STAMP} CT}"
 
 node "$ROOT/scripts/cal-from-events.mjs" \
   --events "$EVENTS" \
-  --out "$ROOT/data/cal-live.json" \
-  --patch-week "$ROOT/kids-week.json"
+  --out "$PRIV/cal-live.json" \
+  --patch-week "$PRIV/kids-week.json"
 
-# Mirror into board-os house-face when present (deploy roundtrip optional)
-if [[ -d /workspace/board-os/house-face ]]; then
-  BOS=/workspace/board-os/house-face
-  mkdir -p "$BOS/data"
-  cp -f "$ROOT/kids-week.json" "$BOS/kids-week.json"
-  cp -f "$ROOT/data/kids-week.json" "$BOS/data/kids-week.json"
-  cp -f "$ROOT/data/cal-live.json" "$BOS/data/cal-live.json"
-  cp -f "$ROOT/kids-data.js" "$BOS/kids-data.js" 2>/dev/null || true
-fi
+# PRIVFEED1 · board-os mirror retired (it copied private data into another work tree)
 
-CAL_ASOF=$(python3 -c "import json;print(json.load(open('$ROOT/data/cal-live.json'))['asOfIso'])")
-CAL_STATUS=$(python3 -c "import json;print(json.load(open('$ROOT/data/cal-live.json')).get('status'))")
-NEXT=$(python3 -c "import json;d=json.load(open('$ROOT/data/cal-live.json'));n=d.get('nextLeave') or {};print(n.get('summary') or '')")
+CAL_ASOF=$(python3 -c "import json;print(json.load(open('$PRIV/cal-live.json'))['asOfIso'])")
+CAL_STATUS=$(python3 -c "import json;print(json.load(open('$PRIV/cal-live.json')).get('status'))")
+NEXT=$(python3 -c "import json;d=json.load(open('$PRIV/cal-live.json'));n=d.get('nextLeave') or {};print(n.get('summary') or '')")
 
 if [[ "$CAL_ASOF" != "$TODAY" ]]; then
   echo "HARD FAIL: cal-live asOfIso=$CAL_ASOF != today CT $TODAY" >&2
@@ -57,7 +51,7 @@ fi
 
 python3 - <<PY
 import json,sys
-cal=json.load(open("$ROOT/data/cal-live.json"))
+cal=json.load(open("$PRIV/cal-live.json"))
 ups=cal.get("upcomingLeaves") or []
 blob=json.dumps(ups)
 if "2209" not in blob and "HD" not in blob:
@@ -65,18 +59,7 @@ if "2209" not in blob and "HD" not in blob:
 print("cal-live-oneshot: OK", cal["asOfIso"], "status", cal["status"], "next", (cal.get("nextLeave") or {}).get("summary"))
 PY
 
-if [[ "$PUSH" != "1" ]]; then
-  echo "dry-run complete (pass --push to commit+push if dirty)"
-  exit 0
-fi
-
-cd "$ROOT"
-git add data/cal-live.json kids-week.json data/kids-week.json kids-data.js
-if git diff --cached --quiet; then
-  echo "CLEAN · no cal-live / kids-week changes to push"
-  exit 0
-fi
-git -c user.email='dmward23@gmail.com' -c user.name='dmward23-web' commit -m "House Face · $NOTE"
-scripts/data-only-guard.sh || { echo "DATAGUARD1: not pushing"; exit 3; }
-git push origin main
-echo "PUSHED · $(git rev-parse --short HEAD) · $NOTE"
+# PRIVFEED1 · no git: private data never enters any repo. Old --push callers get a clean exit.
+[[ "$PUSH" == "1" ]] && echo "--push ignored (PRIVFEED1): private data stays in $PRIV, served by the hub"
+echo "cal-live-oneshot: wrote $PRIV/cal-live.json + $PRIV/kids-week.json"
+exit 0

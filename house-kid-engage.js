@@ -172,7 +172,7 @@
     if (/\bHarris\b/i.test(s)) out.push("harris");
     /* Boys / shared SRE-style titles → both boys when neither named alone */
     var boys = /\bBoys\b/i.test(s) || /\bboth\s+boys\b/i.test(s);
-    /* SRE (Sunset Ridge Elementary) drop / pickup with no kid named = the boys' school run */
+    /* SRE (the boys' elementary) drop / pickup with no kid named = the boys' school run */
     if (!out.length && /\bSRE\b|Sunset\s+Ridge/i.test(s) && /\bdrop\b|drop-?off|pick\s*-?up/i.test(s)) boys = true;
     if (boys) {
       if (out.indexOf("hayes") < 0) out.push("hayes");
@@ -540,7 +540,7 @@
       html += '<div class="kf-loud">Clear</div><div class="kf-title">Nothing queued</div>';
     } else {
       var mins = minsUntilIso(leave.startIso);
-      html += '<div class="kf-loud">' + esc(leave.time || leave.badge || "—") + "</div>";
+      html += '<div class="kf-loud">' + esc(leave.time || leave.badge || "") + "</div>";
       html += '<div class="kf-title">' + esc(leave.title) + "</div>";
       html += '<div class="kf-chip kf-chip--hot">' + esc(fmtLeave(mins)) + "</div>";
       if (leave.summary && leave.summary !== leave.title) {
@@ -885,7 +885,7 @@
     var claims = host.querySelector("[data-hq-claims]");
     var go = host.querySelector("[data-hq-go]");
     if (title) title.textContent = accent.name + " · musts";
-    if (musts) musts.textContent = tp.need ? (tp.done + "/" + tp.need) : "—";
+    if (musts) musts.textContent = tp.need ? (tp.done + "/" + tp.need) : "";
     if (streakEl) streakEl.textContent = streak > 0 ? ("🔥 " + streak + "-day streak") : "🔥 Start streak";
     if (go) {
       go.setAttribute("href", HREF[kidId]);

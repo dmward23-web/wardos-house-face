@@ -1,0 +1,182 @@
+{
+ "law": "TEXTLAW5",
+ "note": "Visible-text law shared by scripts/cal-from-events.mjs and scripts/cal-months.py (scripts/text_law.py). Order matters. 'global': replace every match (else first). Replacements use $1-style groups. After the steps: collapse runs of whitespace, trim. Strings that are empty, 400+ chars, URLs or ISO dates are left alone. PRIVNAME1: private names never live in git. {PARTNER} and {COPARENT} are filled at load time from private-names.tsv (NAMESDIR1: ~/.local/share/wardos-private, fallback ~/.config/wardos) (role<TAB>name; env WARDOS_PRIVATE_NAMES = another path, or WARDOS_NAMES='partner=X;coparent=Y' for tests); a missing file is a hard fail for the writers. SHAREDLAW2 (Atlas ruling): a Dan trip that names the partner is written as 'Dad: <trip>' with no partner name, so no glass and no data file carries the name; the Dad-only page (sheet-dan.html) drops the 'Dad: ' prefix in the browser. TEXTLAW5: SEATLAW1 (no ticket section/row/seat anywhere) and SCHOOLWORD1 ('LKMS' reads 'school'); house-face-law.js applies the same rules at render time to live and cached feeds. CALSCRUB1: event-specific title rules (trips, venues, games, named teams) live box-only in <private dir>/text-law.private.json (same shape, applied FIRST); public git keeps only the generic rules.",
+ "maxLen": 400,
+ "rules": [
+  {
+   "re": "\\s*\\([^()]*\\b(?:Sec(?:tion)?|Row|Seats?)\\b\\.?\\s*[A-Za-z0-9][^()]*\\)",
+   "flags": "i",
+   "global": true,
+   "to": "",
+   "why": "SEATLAW1 · ticket seats in brackets (section / row / seat) never show"
+  },
+  {
+   "re": "\\s*,?\\s*\\b(?:(?:Sec(?:tion)?\\.?\\s*[A-Z]?\\d{1,4}[A-Z]?)(?:\\s*,?\\s*Row\\s*[A-Z0-9]{1,3})?|Row\\s*[A-Z0-9]{1,3}(?=\\s*,?\\s*Seats?\\b))(?:\\s*,?\\s*(?:Seats?\\s*)?\\d{1,3}(?:\\s*[-–]\\s*\\d{1,3})?(?![:\\d]))?(?:\\s*,?\\s*Seats?\\s*\\d{1,3}(?:\\s*[-–]\\s*\\d{1,3})?)?",
+   "flags": "",
+   "global": true,
+   "to": "",
+   "why": "SEATLAW1 · bare section · row · seat codes never show"
+  },
+  {
+   "re": "\\s*,?\\s*\\b(?:Seats\\s*\\d{1,3}(?:\\s*[-–,&]\\s*\\d{1,3})*|Seat\\s*\\d{1,3}\\s*[-–]\\s*\\d{1,3})\\b",
+   "flags": "i",
+   "global": true,
+   "to": "",
+   "why": "SEATLAW1 · bare 'Seats 5-6' never shows"
+  },
+  {
+   "re": "\\bLKMS\\b",
+   "flags": "",
+   "global": true,
+   "to": "school",
+   "why": "SCHOOLWORD1 · the middle school reads 'school' on the glass"
+  },
+  {
+   "re": "#[A-Za-z0-9_]+(\\/#[A-Za-z0-9_]+)*",
+   "flags": "",
+   "global": true,
+   "to": "",
+   "why": "booking codes"
+  },
+  {
+   "re": "\\(?\\b[A-Z]{2} ?\\d{3,4}\\b\\)?",
+   "flags": "",
+   "global": true,
+   "to": "",
+   "why": "flight numbers"
+  },
+  {
+   "re": "\\b[A-Z]{3}(→|->)[A-Z]{3}\\b",
+   "flags": "",
+   "global": true,
+   "to": "",
+   "why": "airport legs"
+  },
+  {
+   "re": "\\s*\\b(at|to|from) (their )?(mom|{COPARENT})['’]?s\\b",
+   "flags": "i",
+   "global": true,
+   "to": "",
+   "why": "the other house as a place: drop the place, keep the pickup"
+  },
+  {
+   "re": "\\b([A-Z][a-z]+)(['’])s mom\\b",
+   "flags": "",
+   "global": true,
+   "to": "$1$2s family",
+   "why": "another kid's parent reads as their family; no 'mom' on the glass"
+  },
+  {
+   "re": "\\bmom['’]?s?\\b|\\b{COPARENT}(['’]?s)?\\b",
+   "flags": "i",
+   "global": true,
+   "to": "",
+   "why": "the other house stays off the glass"
+  },
+  {
+   "re": "^(<strong>[^<]*<\\/strong>\\s*)?Ward Kids\\s*\\[\\s*(?:[A-Z]{1,4}\\s+)?([^\\]]*?)\\s*\\]",
+   "flags": "",
+   "global": false,
+   "to": "$1$2",
+   "why": "our own kids' school day: the day itself, no family label, no kid-initial code"
+  },
+  {
+   "re": "\\s*\\[\\s*[A-Z]{1,4}\\s*\\]",
+   "flags": "",
+   "global": true,
+   "to": "",
+   "why": "bracket holding only a code"
+  },
+  {
+   "re": "\\s*\\[\\s*(?:[A-Z]{2,4}\\s+)?([^\\]]*?)\\s*\\]",
+   "flags": "",
+   "global": true,
+   "to": " · $1",
+   "why": "bracket tags: drop the brackets and the leading code, keep the words"
+  },
+  {
+   "re": "^(<strong>[^<]*<\\/strong>\\s*)?(?:Dan\\s*\\+\\s*{PARTNER}|{PARTNER}\\s*\\+\\s*\\/?(?:Dan|Dad))\\b\\s*(?:·\\s*)?",
+   "flags": "",
+   "global": false,
+   "to": "$1Dad: ",
+   "why": "a Dan plan led by 'Dan + <partner>' reads 'Dad: <plan>' (SHAREDLAW2)"
+  },
+  {
+   "re": "\\b(?:Dan\\s*\\+\\s*{PARTNER}|{PARTNER}\\s*\\+\\s*\\/?(?:Dan|Dad))\\b",
+   "flags": "",
+   "global": true,
+   "to": "Dad",
+   "why": "'Dan + <partner>' inside a row reads 'Dad' (SHAREDLAW2)"
+  },
+  {
+   "re": "^(<strong>[^<]*<\\/strong>\\s*)?(.+?)\\s+with\\s+{PARTNER}$",
+   "flags": "",
+   "global": false,
+   "to": "$1Dad: $2",
+   "why": "a Dan plan 'X with <partner>' reads 'Dad: X' (SHAREDLAW2)"
+  },
+  {
+   "re": "\\s*\\b(?:with |w\\/ )?{PARTNER}(?:['’]s)?\\b",
+   "flags": "",
+   "global": true,
+   "to": "",
+   "why": "no partner name anywhere else: the name drops, the row stays (SHAREDLAW2)"
+  },
+  {
+   "re": "\\(\\s+",
+   "flags": "",
+   "global": true,
+   "to": "(",
+   "why": "tidy after a dropped name"
+  },
+  {
+   "re": "\\s+,",
+   "flags": "",
+   "global": true,
+   "to": ",",
+   "why": "tidy after a dropped name"
+  },
+  {
+   "re": " — ",
+   "flags": "",
+   "global": true,
+   "to": " · ",
+   "why": "em dash"
+  },
+  {
+   "re": "—",
+   "flags": "",
+   "global": true,
+   "to": " · ",
+   "why": "bare em dash"
+  },
+  {
+   "re": "\\s*\\bMOVED\\s*(→|->)\\s*",
+   "flags": "",
+   "global": true,
+   "to": " moved to ",
+   "why": "moved"
+  },
+  {
+   "re": "\\s*(→|->|⇒|➜)\\s*",
+   "flags": "",
+   "global": true,
+   "to": " to ",
+   "why": "arrows"
+  },
+  {
+   "re": "(\\s·\\s*)+$",
+   "flags": "",
+   "global": true,
+   "to": "",
+   "why": "trailing dot"
+  },
+  {
+   "re": "^(\\s*·\\s*)+",
+   "flags": "",
+   "global": false,
+   "to": "",
+   "why": "leading dot"
+  }
+ ]
+}

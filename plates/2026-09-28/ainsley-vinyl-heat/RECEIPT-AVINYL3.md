@@ -12,7 +12,7 @@
 4. TEXTLESS: short chore names (all three kids) · Hayes/Harris session-rail markup killed · eyebrows/taglines/hot-labels/blurbs stripped
 5. Hub header heat: huge CT clock · icon-only Weather/Sensi · `tokens-hub-heat-pass.css?v=AVINYL3`
 6. Plate SoT synced (tokens + day-record-pills + polish PNG)
-7. Jar money untouched: Ainsley $20/$20 · Hayes $10/$10 · Harris $10/$10
+7. Jar money untouched: amounts live in the private kids-week
 
 ## HOLD / next
 - Boys icon-first packs (unlabeled session-rail SVGs) when Prism drops — Atlas already removed rail markup

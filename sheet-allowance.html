@@ -2,6 +2,12 @@
 <html lang="en" data-sound="on">
 <head>
 <meta charset="UTF-8" />
+<script src="house-hub.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="house-nomoney.js?v=NOMONEY1"></script>
+<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-pair.js?v=HUBPIN1"></script>
+<script src="house-money-bind.js?v=PRIVFEED2"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -726,7 +732,7 @@
  <header class="hdr hdr--clockfirst">
  <div class="hdr-left-col">
  <div class="live-clock-host" aria-label="America/Chicago time">
- <div class="live-clock" data-live-clock>—:—</div>
+ <div class="live-clock" data-live-clock></div>
  </div>
  <div class="hdr-micros">
  
@@ -743,11 +749,11 @@
  <div class="link-body">
  <div class="link-main">
  <div class="link-label">Path · clear &amp; calm</div>
- <div class="link-title">ALL musts → jar unlocks → <span class="hl">Dad checks · payday</span></div>
+ <div class="link-title">All musts, then the jar unlocks, then <span class="hl">Dad checks · payday</span></div>
  <div class="link-sub">Stars only · Home is up top</div>
  </div>
  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
- <a class="link-cta" href="sheet-chores.html" style="text-decoration:none;color:inherit;">→ Chores</a>
+ <a class="link-cta" href="sheet-chores.html" style="text-decoration:none;color:inherit;">Chores</a>
  </div>
  </div>
  </section>
@@ -757,7 +763,7 @@
  <section class="bank ainsley" data-bank-kid="ainsley" aria-label="Ainsley star bank">
  <div class="bank-hdr">
  <a class="kid-chip ainsley" href="kid-ainsley.html"><span class="dot g2-av ains"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-ainsley"/></svg></span> Ainsley</a>
- <div class="streak-pill">Tour Jar · $20</div>
+ <div class="streak-pill" data-jar-goal="tour-jar">Tour Jar</div>
  </div>
  <div class="star-count">
  <div class="star-big"><span class="s g2-inline"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-tour"/></svg></span>0</div>
@@ -768,11 +774,11 @@
  </div>
  <div class="feed">
  <div class="feed-title">Musts that fill the jar</div>
- <div class="feed-row"><span class="plus">$7 ea wk</span> Bed · room · dishes · empty DW · shoes/coats<div class="when">daily · Sat–Fri</div></div>
- <div class="feed-row"><span class="plus">$3</span> Bathroom wipe<div class="when">weekly</div></div>
- <div class="feed-row"><span class="plus">$5</span> Laundry full cycle<div class="when">weekly</div></div>
- <div class="feed-row"><span class="plus">$1</span> Garage cubby · bag + sports<div class="when">weekly</div></div>
-  <div class="feed-row"><span class="plus">$15/hr</span> Babysitting hire · Dad handout · never fills jar<div class="when">add-on</div></div>
+ <div class="feed-row"><span class="plus" data-stars="7" data-money-suffix=" ea wk"></span> Bed · room · dishes · empty DW · shoes/coats<div class="when">daily · Sat–Fri</div></div>
+ <div class="feed-row"><span class="plus" data-stars="3" data-money-suffix=""></span> Bathroom wipe<div class="when">weekly</div></div>
+ <div class="feed-row"><span class="plus" data-stars="5" data-money-suffix=""></span> Laundry full cycle<div class="when">weekly</div></div>
+ <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Garage cubby · bag + sports<div class="when">weekly</div></div>
+  <div class="feed-row"><span class="plus" data-money="babysit"></span> Babysitting hire · Dad handout · never fills jar<div class="when">add-on</div></div>
  </div>
  <div class="cheer-bar">Ask Dad to inspect</div>
  <div class="saves-host" data-saves-panel data-kid="ainsley"></div>
@@ -782,7 +788,7 @@
  <section class="bank hayes" data-bank-kid="hayes" aria-label="Hayes star bank">
  <div class="bank-hdr">
  <a class="kid-chip hayes" href="kid-hayes.html"><span class="dot g2-av hayes"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-hayes"/></svg></span> Hayes</a>
- <div class="streak-pill">Victory Jar · $10</div>
+ <div class="streak-pill" data-jar-goal="victory-jar">Victory Jar</div>
  </div>
  <div class="star-count">
  <div class="star-big"><span class="s g2-inline"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-victory"/></svg></span>0</div>
@@ -793,10 +799,10 @@
  </div>
  <div class="feed">
  <div class="feed-title">Musts that earn ★ into the jar</div>
- <div class="feed-row"><span class="plus">$7 ea wk</span> Bed · backpack · dishes · empty DW · trash · post-game · shower<div class="when">daily · 1★×7 Sat–Fri</div></div>
- <div class="feed-row"><span class="plus">$2</span> Room reset<div class="when">weekly</div></div>
- <div class="feed-row"><span class="plus">$1</span> Shoes · closet / cubby / room · never hallway<div class="when">weekly</div></div>
- <div class="feed-row"><span class="plus">$1</span> Garage cubby · bag + sports<div class="when">weekly</div></div>
+ <div class="feed-row"><span class="plus" data-stars="7" data-money-suffix=" ea wk"></span> Bed · backpack · dishes · empty DW · trash · post-game · shower<div class="when">daily · ★×7 Sat–Fri</div></div>
+ <div class="feed-row"><span class="plus" data-stars="2" data-money-suffix=""></span> Room reset<div class="when">weekly</div></div>
+ <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Shoes · closet / cubby / room · never hallway<div class="when">weekly</div></div>
+ <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Garage cubby · bag + sports<div class="when">weekly</div></div>
   </div>
  <div class="cheer-bar">Ask Dad to inspect</div>
  <div class="saves-host" data-saves-panel data-kid="hayes"></div>
@@ -806,7 +812,7 @@
  <section class="bank harris" data-bank-kid="harris" aria-label="Harris star bank">
  <div class="bank-hdr">
  <a class="kid-chip harris" href="kid-harris.html"><span class="dot g2-av harr"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-harris"/></svg></span> Harris</a>
- <div class="streak-pill">Gem Jar · $10</div>
+ <div class="streak-pill" data-jar-goal="gem-jar">Gem Jar</div>
  </div>
  <div class="star-count">
  <div class="star-big"><span class="s g2-inline"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-gem"/></svg></span>0</div>
@@ -817,10 +823,10 @@
  </div>
  <div class="feed">
  <div class="feed-title">Musts that earn ★ into the jar</div>
- <div class="feed-row"><span class="plus">$7 ea wk</span> Bed · backpack · dishes · empty DW · trash · post-game · shower<div class="when">daily · 1★×7 Sat–Fri</div></div>
- <div class="feed-row"><span class="plus">$2</span> Toys reset<div class="when">weekly</div></div>
- <div class="feed-row"><span class="plus">$1</span> Shoes · closet / cubby / room<div class="when">weekly</div></div>
- <div class="feed-row"><span class="plus">$1</span> Garage cubby · bag + sports<div class="when">weekly</div></div>
+ <div class="feed-row"><span class="plus" data-stars="7" data-money-suffix=" ea wk"></span> Bed · backpack · dishes · empty DW · trash · post-game · shower<div class="when">daily · ★×7 Sat–Fri</div></div>
+ <div class="feed-row"><span class="plus" data-stars="2" data-money-suffix=""></span> Toys reset<div class="when">weekly</div></div>
+ <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Shoes · closet / cubby / room<div class="when">weekly</div></div>
+ <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Garage cubby · bag + sports<div class="when">weekly</div></div>
   </div>
  <div class="cheer-bar">Ask Dad to inspect</div>
  <div class="saves-host" data-saves-panel data-kid="harris"></div>
@@ -828,7 +834,7 @@
  </div>
 
  <div class="desk-note">
- <div class="msg"><strong>Rates above.</strong> Stars fill the jar · payday converts week ★→$ balance (carry survives) · Dad subtracts what he paid.</div>
+ <div class="msg"><strong>Rates above.</strong> Stars fill the jar · payday turns the week's stars into the balance (carry survives) · Dad subtracts what he paid.</div>
  <div class="badge">Adults · Dad only</div>
  </div>
 
@@ -837,17 +843,17 @@
 <footer class="ftr">
  <div class="ftr-left">
  <span class="ftr-chip">STARS ONLY · NO MONEY</span>
- <a class="ftr-chip" href="sheet-chores.html" style="text-decoration:none;color:inherit">→ Chores</a>
+ <a class="ftr-chip" href="sheet-chores.html" style="text-decoration:none;color:inherit">Chores</a>
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=SHEETCLK1"></script>
-<script src="house-tapsync.js?v=UNDO1"></script>
-<script src="kids-data.js?v=LIVESPEC1"></script>
+<script src="house-clock.js?v=PRIVFEED3"></script>
+<script src="house-tapsync.js?v=HUBPIN1"></script>
+<script src="kids-data.js?v=PRIVFEED3"></script>
 <script src="house-saves.js?v=JARMATH1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=HUM1"></script>
-<script src="house-checkoffs.js?v=DBLTAP1" defer></script>
+<script src="house-checkoffs.js?v=PRIVFEED3" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
  if (window.HouseSaves) { HouseSaves.mount("ainsley"); HouseSaves.mount("hayes"); HouseSaves.mount("harris"); }

@@ -11,7 +11,7 @@ nest-sdm.json
 nest-refresh.token
 **/nest-refresh.token
 .nest-secrets/
-# Nest stills: commit Pages-servable jpgs (no tokens in files). Keep .gitkeep.
+# Nest stills: PRIVFEED1 · never committed (private folder + hub). Keep .gitkeep.
 # Uncomment to ignore local-only scratch snaps:
 # data/nest-snaps/*.jpg
 # data/nest-snaps/*.jpeg
@@ -21,3 +21,27 @@ nest-refresh.token
 # Calendar dumps — never publish raw dmward23 events to Pages
 data/calendar-*.json
 **/calendar-dmward23*.json
+
+# PRIVFEED1 · private runtime data never enters git (served by the house hub from ~/.local/share/wardos-private)
+/private/
+**/*.private.json
+**/*.private.tsv
+data/cal-live.json
+data/cal-months.json
+data/kids-week.json
+/kids-week.json
+# PRIVFEED2 · house device state (lights, thermostat, cameras) is private too
+data/lights-live.json
+data/sensi-live.json
+data/nest-live.json
+data/*-live.json
+data/nest-snaps/*.jpg
+data/nest-snaps/*.jpeg
+data/nest-snaps/*.png
+data/nest-snaps/*.webp
+data/calendar-*.json
+data/cash.json
+phone-shots/
+*.ics
+.env*
+*.token

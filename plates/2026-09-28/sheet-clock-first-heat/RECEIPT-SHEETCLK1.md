@@ -7,7 +7,7 @@ Chunk: roll clock-first CONTROL PANEL header DNA to sheets still showing WardOS 
 - New shared tokens: `tokens-sheet-clock-first-heat.css?v=SHEETCLK1` (HEADER ONLY — cmd-panel body chrome untouched)
 - Clock-first headers (`hdr--clockfirst` + `data-live-clock` + micros nav + status/mute tools)
 - `house-clock.js?v=SHEETCLK1` on every touched sheet (added where missing on status / load-day / desk-gate)
-- Killed `Climate · WardOS` merch → `Sensi · 147th` on `sheet-google-home.html`
+- Killed `Climate · WardOS` merch → `Sensi · Home` on `sheet-google-home.html`
 
 ## Sheets heated
 1. `sheet-lights.html` — clock + Cams/Sheets + NEED TOKEN pill
@@ -22,7 +22,7 @@ Chunk: roll clock-first CONTROL PANEL header DNA to sheets still showing WardOS 
 ## Protect (confirmed)
 - `data/sensi-live.json` · `data/nest-live.json` · any `data/*.json` — **untouched**
 - Lights write proxy / nest webrtc script tags left alone (`house-lights.js` / `house-nest.js` / `house-sensi.js`)
-- Jar math body copy left alone (Ainsley Tour Jar $20 · Hayes Victory Jar $10 · Harris Gem Jar as previously on board)
+- Jar math body copy left alone (jar amounts now come from the private kids-week)
 - Hub / kids / dad / today / weekend / us — **not regresssed** (not in this commit)
 
 ## Hard-refresh tips

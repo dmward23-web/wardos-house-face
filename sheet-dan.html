@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<script src="house-hub.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-pair.js?v=HUBPIN1"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -109,6 +113,9 @@
 .ds-tag[data-who=Ainsley]{background:rgba(236,72,153,.3);color:#ffd1e8}.ds-tag[data-who=Hayes]{background:rgba(56,152,255,.3);color:#cfe6ff}.ds-tag[data-who=Harris]{background:rgba(52,199,120,.3);color:#c9f5dc}
 .ds-line{font-size:24px;font-weight:700;color:rgba(232,220,180,.85);padding:0 8px;margin-top:-4px}
 .ds .kids-row{margin:0}
+.ds-pair-btn{font:700 16px/1 Inter,system-ui,sans-serif;padding:12px 18px;border-radius:14px;border:2px solid #e8b64a;background:linear-gradient(#ffd36b,#e0a33a);color:#1b1206;margin:10px 0}
+.ds-pair-qr svg{width:220px;height:220px;background:#fff;border-radius:12px;display:block}
+.ds-pair-st{font-size:14px;color:#d8c9a8;margin-top:8px}
 .ds-sec{background:rgba(14,13,11,.86);border:1px solid rgba(255,200,80,.28);border-radius:22px;padding:18px 20px}
 .ds-hd{font-size:20px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#ffe080;margin-bottom:10px}
 .ds-hd span{font-size:15px;letter-spacing:.06em;color:rgba(232,220,180,.55);margin-left:10px;text-transform:none}
@@ -133,6 +140,8 @@
 .ds-rt{font-size:19px;font-weight:800;color:rgba(255,224,128,.9)}
 .ds-rw{font-size:19px;font-weight:700;color:#e8e2d6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .ds-day.is-open .ds-rw{white-space:normal}
+/* PRIVFEED3 · phone (440): rows wrap instead of clipping with an ellipsis (Alfred measured 9 clipped rows) */
+@media (max-width:600px){.ds-rw{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}}
 .ds-more{font-size:16px;font-weight:800;color:rgba(232,220,180,.6);letter-spacing:.04em}
 .ds-none{font-size:19px;color:#8d877c}
 .ds-foot{font-size:17px;font-weight:700;color:rgba(232,220,180,.7);padding:6px 10px;border-top:1px solid rgba(255,200,80,.2)}
@@ -387,7 +396,7 @@
  <header class="hdr hdr--clockfirst">
  <div class="hdr-left-col">
  <div class="live-clock-host" aria-label="America/Chicago time">
- <div class="live-clock" data-live-clock>—:—</div>
+ <div class="live-clock" data-live-clock></div>
  </div>
  <div class="hdr-micros">
  
@@ -417,6 +426,13 @@
  <div class="ds-hd">This week <span>tap a day for everything</span></div>
  <div class="ds-grid" data-ds-week></div>
  </section>
+ <!-- PRIVFEED3 · Dad-only pairing tile: shown only on a screen that already holds the house key -->
+ <section class="ds-sec ds-pair" data-pair-tile hidden>
+ <div class="ds-hd">Pair a screen <span>no typing: scan once</span></div>
+ <button type="button" class="ds-pair-btn" data-pair-btn>Show a pairing code</button>
+ <div class="ds-pair-qr" data-pair-qr aria-label="Pairing QR code"></div>
+ <div class="ds-pair-st" data-pair-status>Makes a one-time code. It works once and only for 5 minutes.</div>
+ </section>
  <div class="ds-foot" data-ds-foot></div>
  </main>
 
@@ -425,15 +441,15 @@
  <span>House face · Dad box · <span data-live="date-long">Mon Sep 28 2026</span></span>
  <span class="ftr-chip">DAN · DADGLANCE1</span>
  </div>
- <span>kids-safe · no Desk cash · every tap → dest</span>
+ <span>kids-safe · no Desk cash · every tap opens its page</span>
  </footer>
 </div>
-<script src="house-clock.js?v=DADGLANCE1"></script>
-<script src="house-board-strip.js?v=GATE3WRAP1"></script>
-<script src="house-tapsync.js?v=UNDO1"></script>
-<script src="kids-data.js?v=LIVESPEC1"></script>
-<script src="house-weather.js?v=AUDIT1"></script>
-<script src="house-sensi.js?v=DADGLANCE1"></script>
+<script src="house-clock.js?v=PRIVFEED3"></script>
+<script src="house-board-strip.js?v=PRIVFEED3"></script>
+<script src="house-tapsync.js?v=HUBPIN1"></script>
+<script src="kids-data.js?v=PRIVFEED3"></script>
+<script src="house-weather.js?v=PRIVFEED3"></script>
+<script src="house-sensi.js?v=PRIVFEED3"></script>
 <script>
 (function () {
   function wireOval(sel, degText, label) {
@@ -492,7 +508,7 @@
     if (!data) return;
     var hw = data.homeWeek || {};
     if (title && hw.through) {
-      title.textContent = "Kids with you @ 147th · through " + hw.through;
+      title.textContent = "Kids with you at home · through " + hw.through;
     }
     var strip = data.boardStrip || {};
     if (sub && strip.time && strip.place) {
@@ -521,6 +537,7 @@
 })();
 </script>
 
+<script src="vendor/qrcode-generator-2.0.4.js"></script>
 <script src="dad-seat.js?v=AUDIT1"></script>
 <script src="house-fresh.js?v=DADSEAT1"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>

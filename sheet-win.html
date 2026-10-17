@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<script src="house-hub.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-pair.js?v=HUBPIN1"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -359,7 +363,7 @@
  <header class="hdr hdr--clockfirst">
  <div class="hdr-left-col">
  <div class="live-clock-host" aria-label="America/Chicago time">
- <div class="board-clock live-clock" data-live="time" data-live-clock>—:—</div>
+ <div class="board-clock live-clock" data-live="time" data-live-clock></div>
  </div>
  <div class="hdr-micros">
  
@@ -369,65 +373,25 @@
  <div class="sheet-chip" data-sheet-chip>Trips</div>
  </header>
 
- <section class="hero" aria-label="Next trip">
+ <section class="hero" aria-label="Next trip" data-trips-hero>
   <div class="hero-accent"></div>
   <div class="hero-body">
    <div class="hero-label">Next up · travel</div>
-   <div class="hero-title">Fri Oct 16 · Dan fly → Nashville</div>
-   <div class="hero-sub"><strong>Leave 8:40</strong> · WN2013 MCI 10:40a · back Fri Oct 23</div>
+   <div class="hero-title"></div>
+   <div class="hero-sub"></div>
   </div>
  </section>
 
  <div class="sec-title">Upcoming</div>
- <div class="list" aria-label="Upcoming family trips">
-  <article class="trip is-next">
-   <div class="trip-when">Fri Oct 16<br/>→ Fri Oct 23</div>
-   <div>
-    <div class="trip-title">Dan · Nashville (fly)</div>
-    <div class="trip-detail">WN2013 out Fri 10:40a · WN606 back Fri Oct 23 8:10a · kids with their mom that week</div>
-   </div>
-   <div class="trip-badge">NEXT</div>
-  </article>
-  <article class="trip">
-   <div class="trip-when">Sat Oct 17<br/>→ Sun Oct 18</div>
-   <div>
-    <div class="trip-title">Dan + Erin · Cleveland (ALCS)</div>
-    <div class="trip-detail">WN4778 Sat BNA 3:30p → CLE · leave 2:10 · WN441 Sun CLE 6:25a ET → BNA</div>
-   </div>
-   <div class="trip-badge">FLY</div>
-  </article>
-  <article class="trip">
-   <div class="trip-when">Sun Oct 18<br/>4:30p</div>
-   <div>
-    <div class="trip-title">Live on the Green</div>
-    <div class="trip-detail">Erin + Dan · Guster + Grace Potter · Ascend Amphitheater</div>
-   </div>
-   <div class="trip-badge">SHOW</div>
-  </article>
-  <article class="trip">
-   <div class="trip-when">Sat Nov 21<br/>→ Sat Nov 28</div>
-   <div>
-    <div class="trip-title">Thanksgiving · Dan + kids Nashville</div>
-    <div class="trip-detail">Family drive week · Ainsley · Hayes · Harris with Dad</div>
-   </div>
-   <div class="trip-badge">DRIVE</div>
-  </article>
-  <article class="trip">
-   <div class="trip-when">Sun Dec 28</div>
-   <div>
-    <div class="trip-title">Erin + Dan · CLE → Nashville</div>
-    <div class="trip-detail">Post-Christmas drive Avon Lake → Nashville · no outbound flight</div>
-   </div>
-   <div class="trip-badge">DRIVE</div>
-  </article>
- </div>
+ <div class="list" aria-label="Upcoming family trips" data-trips-list></div>
 
  <footer class="ftr">
   <span class="ftr-chip">FAMILY TRIPS · HUBNEXT2</span>
   <span style="margin-left:10px">Kids-safe · WITH DAD / Dad week on glass</span>
  </footer>
 </div>
-<script src="house-clock.js?v=SHEETCLK2"></script>
+<script src="house-clock.js?v=PRIVFEED3"></script>
+<script src="house-trips-bind.js?v=PRIVFEED1"></script>
 <script src="house-zoom.js?v=HUBNEXT2"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>

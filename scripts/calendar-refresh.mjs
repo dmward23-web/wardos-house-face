@@ -23,11 +23,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { privPath, assertPrivateOut, namesRe, privateNames } from "./private-dir.mjs"; /* PRIVFEED1 */
+const OTHER_FAM = (privateNames().otherfamily || []).map((n) => n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+const OTHER_HAYES = OTHER_FAM.length ? new RegExp("\\bhayes\\s+(?:" + OTHER_FAM.join("|") + ")\\b") : /(?!)/;
+const COPARENT_RE = namesRe("coparent"); /* PRIVNAME1 · co-parent name from ~/.config/wardos, never in git */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const TZ = "America/Chicago";
-const HOME = "6719 W 147th Terrace, Overland Park, KS 66223";
 
 const PRESERVE_KID = [
   "id", "name", "you", "theme", "themeLabel", "gradeVoice", "avatar",
@@ -39,8 +42,8 @@ const PRESERVE_DAN = ["id", "name", "theme", "themeLabel", "avatar", "note", "pi
 function parseArgs(argv) {
   const out = {
     eventsPath: null,
-    weekPath: path.join(ROOT, "kids-week.json"),
-    mirrorDir: "/workspace/board-os/house-face",
+    weekPath: privPath("kids-week.json"), /* PRIVFEED1 · box-only */
+    mirrorDir: null, /* PRIVFEED1 · no board-os mirror of private data */
     deployNote: null,
     dryRun: false,
     nowIso: null,
@@ -162,7 +165,7 @@ function whenTime(it) {
    (event start = leave-by), an appointment, or any title that says pickup / drop / leave. Never an all-day note,
    never an SRE specials note. */
 const LEAVE_KINDS = new Set(["leave", "school_drop", "school_pickup", "sport", "appointment"]);
-const LEAVE_WORD_RE = /\b(pick\s*-?\s*up|drop(\s*-?\s*off)?|leave)\b/i; // "pickup at Riley's" is a leave whatever its kind
+const LEAVE_WORD_RE = /\b(pick\s*-?\s*up|drop(\s*-?\s*off)?|leave)\b/i; // "pickup at Quinn's" is a leave whatever its kind
 function isRealLeave(it) {
   if (it.allDay || /SRE specials?/i.test(it.raw || "")) return false;
   return LEAVE_KINDS.has(it.kind) || LEAVE_WORD_RE.test(it.raw || "");
@@ -184,13 +187,13 @@ function isAdminNoise(summary) {
 
 function kidMentions(summary) {
   const s = summary.toLowerCase();
-  /* SCHOOL2: "Ward Kids [AHH No School]" → A = Ainsley, HH = Hayes + Harris */
+  /* SCHOOL2: "<Family> Kids [<initials> No School]" → each initial names a kid */
   const ns = /Ward Kids \[([AH]+) No School\]/i.exec(summary);
   const nsA = ns ? /A/i.test(ns[1]) : false;
   const nsH = ns ? /H/i.test(ns[1]) : false;
   return {
     ainsley: /\bainsley\b/.test(s) || nsA,
-    hayes: /\bhayes\b(?!\s+johnson)/.test(s) || nsH,
+    hayes: (/\bhayes\b/.test(s) && !OTHER_HAYES.test(s)) || nsH, /* the other Hayes: surname from private-names.tsv role "otherfamily" */
     harris: /\bharris\b/.test(s) || nsH,
     boys: /\bboyes\b|\bharris\b.*\bhayes\b|\bhayes\b.*\bharris\b|\bboyes\b|SRE drop|SRE pickup|Hayes \+ Harris/i.test(summary),
   };
@@ -230,22 +233,22 @@ function classify(ev) {
   if (/^Leave\s*·/i.test(summary) || /^Leave\b/i.test(summary)) {
     return { kind: "leave", summary, busy: !isFree(ev) };
   }
-  /* RIDES LAW (Dan 9/29): Dad's own pickups/drop-offs ("Pick up Hayes + Theo…",
-     "Drop Hayes at Maria's…") are Dad logistics, never a kid's activity. Treat as
+  /* RIDES LAW (Dan 9/29): Dad's own pickups/drop-offs ("Pick up <kid> + a friend…",
+     "Drop <kid> at a friend's…") are Dad logistics, never a kid's activity. Treat as
      leave → Dad strip / dan box only; kid glass shows the kid's own practice event. */
   if (/^(Pick\s*up|Drop)\b/i.test(summary) && !/SRE (drop|pickup)/i.test(summary)) {
     return { kind: "leave", summary, busy: !isFree(ev), ride: true };
   }
-  /* KIDRIDE1: "Kristin: <Kid> — … pickup/drop-off" (Free, Kristin's week) = awareness on the kid's
+  /* KIDRIDE1: "<co-parent>: <Kid> — … pickup/drop-off" (Free, their week) = awareness on the kid's
      glass only — never a Dad leave-by row or a sport card. */
-  /* AWAY1 (Oct 11): Kristin: events never reach the House Face. */
-  if (/^Kristin:\s*/i.test(summary) || /\bKristin\b/i.test(summary)) return null;
+  /* AWAY1 (Oct 11): co-parent events never reach the House Face. */
+  if (COPARENT_RE.test(summary)) return null;
   /* SCHOOL first (before KIDRIDE1): titles like "… Math Counts · pickup 4:00" are school,
      not Dad leave-by rides. KIDRIDE1 still catches real kid pickup/drop-off leave-bys. */
   if (/SRE drop-off|SRE drop\b/i.test(summary)) return { kind: "school_drop", summary, ...soloBoy(summary) };
   if (/SRE pickup/i.test(summary)) return { kind: "school_pickup", summary, ...soloBoy(summary) };
   if (/Homework Help/i.test(summary)) return { kind: "school", summary, kid: "ainsley" };
-  if (/hearing\/vision|Hearing\/Vision|PE \(tennis|SRE specials?|SRE spirit|SRE (Orange|Yellow|Green|Red) Day|Peace Week|field trip|yearbook|picture (retake|makeup)|baby pic|LKMS (choir|fall conferences|Cougar Night|Bingo|baby|Homework Help|Math Counts|Outsiders)|Outsiders Day|Lind conference|Allen conference|choir Sing|permission form due|Ward Kids \[[AH]+ No School\]|no school \(elem|conference sign-ups|Tailgate|Halloween Bash|Halloween parade|Halloween class parties|Abraca-Boo|Fall Family Fun Night|Chat\s*&\s*Chew|Chat and Chew|Art Club|fall conferences/i.test(summary)) { /* SPECIALS1+SCHOOL2: all kids school info on kid boards + hub */
+  if (/hearing\/vision|Hearing\/Vision|PE \(tennis|SRE specials?|SRE spirit|SRE (Orange|Yellow|Green|Red) Day|Peace Week|field trip|yearbook|picture (retake|makeup)|baby pic|LKMS (choir|fall conferences|Cougar Night|Bingo|baby|Homework Help|Math Counts|Outsiders)|Outsiders Day|\b[A-Z][a-z]+ conference\b|choir Sing|permission form due|Ward Kids \[[AH]+ No School\]|no school \(elem|conference sign-ups|Tailgate|Halloween Bash|Halloween parade|Halloween class parties|Abraca-Boo|Fall Family Fun Night|Chat\s*&\s*Chew|Chat and Chew|Art Club|fall conferences/i.test(summary)) { /* SPECIALS1+SCHOOL2: all kids school info on kid boards + hub */
     return { kind: "school", summary };
   }
   { const kr = KID_RIDE.exec(summary);
@@ -273,7 +276,7 @@ function classify(ev) {
   }
   if (/^Dan\s*—/i.test(summary) || /^Dan\s+—/i.test(summary)) {
     // Dad box only — skip pure adult chores unless Leave/Drive
-    if (/Large Item|garage-sale|HOA|cleaners|Dr Ramirez|KS DL|tree-trim|Johnson gift/i.test(summary)) {
+    if (/Large Item|garage-sale|HOA|cleaners|\bDr\.? [A-Z][a-z]+|KS DL|tree-trim|\bgift\b/i.test(summary)) {
       return { kind: "dad", summary, busy: !isFree(ev) };
     }
   }
@@ -366,6 +369,7 @@ function kidsSafeWhat(summary, kind) {
     .replace(/\s+/g, " ")
     .trim();
   s = stripDollars(s);
+  s = s.replace(/\s*\((?:tennis shoes|wear [^)]*)\)/gi, "").trim(); /* LAW8C1 · no clothing hints */
   // kids-safe: drop Mom order IDs / adult refund chatter from leave titles on kid glass
   if (kind === "leave") {
     s = s.replace(/\(Mom[^)]*\)/gi, "").replace(/WK\d+/gi, "").trim();
@@ -376,9 +380,12 @@ function kidsSafeWhat(summary, kind) {
   return s;
 }
 
+/* LAW8C1 · no colour-day / dress-up / spirit / clothing prompts anywhere on glass (same law as house-face-law.js) */
+const DRESS_RE = /\b(?:orange|red|blue|green|pink|purple|yellow|black|white|gold|maroon|colou?r|crazy hair|pajamas?|pj|twin|hat|jersey|spirit|outsiders)\s+day\b|dress[- ]?up|spirit\s+week|\bwear\b/i;
 function buildBoardItems(events, now) {
   const items = [];
   for (const ev of events) {
+    if (DRESS_RE.test(String(ev.summary || ""))) continue;
     if (ev.status === "cancelled" || ev.status === "canceled") continue;
     /* CANCELGONE1 · title marked canceled = gone from board */
     if (/^\s*[\[(]?\s*(cancel+ed|cxl)\b/i.test(String(ev.summary || ""))) continue;
@@ -494,8 +501,8 @@ function detailFor(it, homeWeek, upcoming) {
   const through = homeWeek && homeWeek.with === "away"
     ? (homeWeek.through ? `kids away · back ${homeWeek.through}` : "kids away")
     : (homeWeek && homeWeek.through
-      ? `kids with Dad @ <strong>147th</strong> through ${homeWeek.through}`
-      : "kids with Dad @ <strong>147th</strong>");
+      ? `kids with Dad at <strong>home</strong> through ${homeWeek.through}`
+      : "kids with Dad at <strong>home</strong>");
   // Add a couple of later same-day anchors
   const sameDay = upcoming.filter(
     (x) => partsInTZ(x.start).iso === partsInTZ(it.start).iso && x.id !== it.id && !x.allDay
@@ -519,13 +526,13 @@ function custodyFromItems(items, now) {
     const through = `${endP.weekday} ${endP.month} ${endP.day} · ${fmtTime(active.end)}`;
     return {
       with: "Dad",
-      place: "147th",
+      place: "Home",
       through,
-      throughLabel: `with Dad @ 147th · ${startP.weekday} ${startP.month} ${startP.day} ${fmtTime(active.start)} → ${through}`,
+      throughLabel: `with Dad at home · ${startP.weekday} ${startP.month} ${startP.day} ${fmtTime(active.start)} → ${through}`,
       endIso: active.endIso,
     };
   }
-  // Between / after Dad weeks → Mom week. Never name Kristin on glass (CALENDAR LAW).
+  // Between / after Dad weeks → Mom week. Never name the co-parent on glass (CALENDAR LAW).
   const nextDad = custody.find((it) => it.start > now);
   const lastEnded = [...custody].filter((it) => it.end <= now).sort((a, b) => b.end - a.end)[0];
   if (nextDad) {
@@ -550,9 +557,9 @@ function custodyFromItems(items, now) {
   }
   return {
     with: "Dad",
-    place: "147th",
+    place: "Home",
     through: "—",
-    throughLabel: "with Dad @ 147th",
+    throughLabel: "with Dad at home",
   };
 }
 
@@ -597,7 +604,7 @@ function buildKidToday(kidId, items, now, homeWeek) {
     when: "All day",
     what: mom
       ? "Kids away" /* AWAY1 */
-      : (kidId === "ainsley" ? "Base @ 147th with Dad" : kidId === "hayes" ? "🏡 DROP ZONE HQ with Dad" : "🏡 YOUR BASE with Dad"),
+      : (kidId === "ainsley" ? "Base at home with Dad" : kidId === "hayes" ? "🏡 DROP ZONE HQ with Dad" : "🏡 YOUR BASE with Dad"),
     hint: mom ? `back ${homeWeek.through}` : `through ${homeWeek.through}`,
     tone: "hot",
   });
@@ -692,10 +699,10 @@ function hottestFor(kidId, items, now, homeWeek) {
           badges: ["KIDS AWAY"],
         }
       : {
-          when: `${partsInTZ(now).weekday.toUpperCase()} · base @ 147th`,
+          when: `${partsInTZ(now).weekday.toUpperCase()} · base at home`,
           what: "YOUR BASE WITH DAD",
           where: `through ${homeWeek.through}`,
-          badges: ["DAD WEEK", "147th"],
+          badges: ["DAD WEEK", "Home"],
         };
   }
   return {
@@ -703,7 +710,7 @@ function hottestFor(kidId, items, now, homeWeek) {
     what: kidsSafeWhat(hit.raw, hit.kind).toUpperCase().slice(0, 48),
     where: mom
       ? `kids away · back ${homeWeek.through}`
-      : `with Dad @ 147th · through ${homeWeek.through}`,
+      : `with Dad at home · through ${homeWeek.through}`,
     badges: [fmtDowShort(hit.start).toUpperCase(), whenTime(hit)],
   };
 }
@@ -734,7 +741,7 @@ function buildDanToday(items, now, homeWeek) {
     when: "home week",
     what: homeWeek.with === "away"
       ? `Kids away · back ${homeWeek.through}`
-      : `Kids with Dad @ 147th through ${homeWeek.through}`,
+      : `Kids with Dad at home through ${homeWeek.through}`,
     tone: "hot",
   });
   return rows.slice(0, 10);
@@ -760,7 +767,7 @@ function buildDanWeek(items, now, homeWeek) {
   }
   rows.push({
     when: homeWeek.with === "away" ? `back ${homeWeek.through}` : `through ${homeWeek.through}`,
-    what: homeWeek.with === "away" ? "Kids away" : "Kids with Dad @ 147th",
+    what: homeWeek.with === "away" ? "Kids away" : "Kids with Dad at home",
     tone: "hot",
   });
   return rows.slice(0, 24);
@@ -777,45 +784,22 @@ function rebuildEmbed(kidsDataPath, weekObj) {
   return next;
 }
 
-function writeWeekTree(weekPath, weekObj, kidsDataPath, dryRun) {
-  const dataTwin = path.join(path.dirname(weekPath), "data", "kids-week.json");
+function writeWeekTree(weekPath, weekObj, _kidsDataPath, dryRun) {
+  /* PRIVFEED1 · kids-week lives only in the private folder: no data/ twin, no kids-data.js EMBEDDED rebuild */
   const text = JSON.stringify(weekObj, null, 2) + "\n";
   if (dryRun) {
     console.log("dry-run: would write", weekPath);
-    console.log("dry-run: would write", dataTwin);
-    console.log("dry-run: would rebuild EMBEDDED in", kidsDataPath);
     return;
   }
-  fs.mkdirSync(path.dirname(dataTwin), { recursive: true });
-  fs.writeFileSync(weekPath, text);
-  fs.writeFileSync(dataTwin, text);
-  const embedded = rebuildEmbed(kidsDataPath, weekObj);
-  fs.writeFileSync(kidsDataPath, embedded);
+  assertPrivateOut(weekPath, "kids-week");
+  const tmp = weekPath + ".tmp";
+  fs.writeFileSync(tmp, text, { mode: 0o600 });
+  fs.renameSync(tmp, weekPath);
 }
 
-function mirrorToBoardOs(mirrorDir, weekObj, dryRun) {
-  if (!mirrorDir || !fs.existsSync(mirrorDir)) {
-    console.log("calendar-refresh: mirror skip (no dir)", mirrorDir);
-    return;
-  }
-  const weekPath = path.join(mirrorDir, "kids-week.json");
-  const dataTwin = path.join(mirrorDir, "data", "kids-week.json");
-  const kidsDataPath = path.join(mirrorDir, "kids-data.js");
-  const stripPath = path.join(mirrorDir, "house-board-strip.js");
-  const text = JSON.stringify(weekObj, null, 2) + "\n";
-  if (dryRun) {
-    console.log("dry-run: mirror", weekPath);
-    return;
-  }
-  fs.mkdirSync(path.dirname(dataTwin), { recursive: true });
-  fs.writeFileSync(weekPath, text);
-  fs.writeFileSync(dataTwin, text);
-  if (fs.existsSync(kidsDataPath)) {
-    fs.writeFileSync(kidsDataPath, rebuildEmbed(kidsDataPath, weekObj));
-  }
-  // mirror strip js from repo
-  const repoStrip = path.join(ROOT, "house-board-strip.js");
-  if (fs.existsSync(repoStrip)) fs.copyFileSync(repoStrip, stripPath);
+function mirrorToBoardOs(mirrorDir) {
+  /* PRIVFEED1 · board-os mirror retired: it copied private data into another work tree */
+  if (mirrorDir) console.log("calendar-refresh: mirror retired (PRIVFEED1) · skip", mirrorDir);
 }
 
 function main() {
@@ -850,10 +834,10 @@ function main() {
   const head = queue[0] || {
     label: "Next up · today",
     time: "",
-    place: "House day @ 147th",
+    place: "House day at home",
     detailHtml: homeWeek.with === "away"
       ? `kids away · back ${homeWeek.through}`
-      : `kids with Dad @ <strong>147th</strong> through ${homeWeek.through}`,
+      : `kids with Dad at <strong>home</strong> through ${homeWeek.through}`,
     badge: nowP.weekday,
     startIso: now.toISOString(),
     endIso: new Date(now.getTime() + 3600000).toISOString(),
@@ -868,7 +852,7 @@ function main() {
     asOf: nowP.asOf,
     asOfIso: nowP.iso,
     refreshedAt: now.toISOString(),
-    sourceCalendar: "dmward23@gmail.com",
+    sourceCalendar: "primary", /* PRIVFEED1 · no address in data */
     leaveBys: prev.leaveBys || {
       SRE_drop: "leave 8:10 for 8:25",
       SRE_pickup: "leave 3:15 for 3:40",
@@ -922,7 +906,7 @@ function main() {
     if (k.bag) {
       k.bag.hint = homeWeek.with === "away"
         ? "Kids away"
-        : `147th through ${homeWeek.through} · pack for Dad week`;
+        : `Home through ${homeWeek.through} · pack for Dad week`;
     }
     if (k.goal && typeof k.goal.placeholder === "string") k.goal.placeholder = k.goal.placeholder.replace(/\s*·?\s*\$\d+(\.\d+)?/g, "").trim();
   }
@@ -936,10 +920,10 @@ function main() {
           badges: ["Kids away"],
         }
       : {
-          when: `${nowP.asOf} · kids with you @ 147th`,
+          when: `${nowP.asOf} · kids with you at home`,
           what: "Dad week live",
           where: `through ${homeWeek.through}`,
-          badges: ["Dad week", "147th"],
+          badges: ["Dad week", "Home"],
         },
     today: buildDanToday(items, now, homeWeek),
     week: buildDanWeek(items, now, homeWeek),
@@ -965,63 +949,9 @@ function main() {
   console.log("calendar-refresh: OK", JSON.stringify(receipt, null, 2));
 
   if (args.deployNote && !args.dryRun) {
-    // HARDEN 2026-09-28: data-only push. NEVER house-face-deploy.sh (full
-    // board-os copy stomped HEAT/CONSUME HTML/CSS + sensi/nest on cal refresh).
-    const allow = [
-      "kids-week.json",
-      "data/kids-week.json",
-      "data/cal-live.json",
-      "kids-data.js",
-    ];
-    // Mirror DATA only into board-os (no HTML/CSS/sensi/nest)
-    if (args.mirrorDir && fs.existsSync(args.mirrorDir)) {
-      for (const f of ["kids-week.json", "kids-data.js"]) {
-        const s = path.join(ROOT, f);
-        const d = path.join(args.mirrorDir, f);
-        if (fs.existsSync(s)) fs.copyFileSync(s, d);
-      }
-      fs.mkdirSync(path.join(args.mirrorDir, "data"), { recursive: true });
-      for (const f of ["kids-week.json", "cal-live.json"]) {
-        const s = path.join(ROOT, "data", f);
-        const d = path.join(args.mirrorDir, "data", f);
-        if (fs.existsSync(s)) fs.copyFileSync(s, d);
-      }
-    }
-    const note = args.deployNote.includes("calendar")
-      ? args.deployNote
-      : `calendar refresh ${next.asOfIso} CT · ${args.deployNote}`;
-    const addArgs = ["add", "--", ...allow.filter((f) => fs.existsSync(path.join(ROOT, f)))];
-    let r = spawnSync("git", addArgs, { cwd: ROOT, stdio: "inherit" });
-    if (r.status !== 0) die("git add failed exit " + r.status, r.status || 5);
-    // Refuse anything outside allowlist
-    const staged = spawnSync("git", ["diff", "--cached", "--name-only"], {
-      cwd: ROOT,
-      encoding: "utf8",
-    });
-    const allowSet = new Set(allow);
-    const bad = (staged.stdout || "").split("\n").map((s) => s.trim()).filter((s) => s && !allowSet.has(s));
-    if (bad.length) {
-      spawnSync("git", ["reset", "HEAD", "--", "."], { cwd: ROOT });
-      die("refusing to stage non-data files in calendar --deploy: " + bad.join(", "), 7);
-    }
-    const dirty = spawnSync("git", ["diff", "--cached", "--quiet"], { cwd: ROOT });
-    if (dirty.status === 0) {
-      console.log("calendar-refresh: CLEAN · no data changes to push");
-      return;
-    }
-    const msg = `House Face · ${note} · data-only`;
-    r = spawnSync(
-      "git",
-      ["-c", "user.email=dmward23@gmail.com", "-c", "user.name=dmward23-web", "commit", "-m", msg],
-      { cwd: ROOT, stdio: "inherit" }
-    );
-    if (r.status !== 0) die("git commit failed exit " + r.status, r.status || 5);
-    /* DATAGUARD1 · never push code from a data routine */
-    const guard = spawnSync("bash", ["scripts/data-only-guard.sh"], { cwd: ROOT, stdio: "inherit" });
-    if (guard.status !== 0) die("DATAGUARD1: outgoing commits touch code — not pushing", 3);
-    r = spawnSync("git", ["push", "origin", "main"], { cwd: ROOT, stdio: "inherit" });
-    if (r.status !== 0) die("git push failed exit " + r.status, r.status || 5);
-    console.log("calendar-refresh: PUSHED data-only · protected HTML/CSS/sensi/nest untouched");
+    /* PRIVFEED1 · nothing private is committed or pushed any more. The hub serves the private folder;
+       --deploy is accepted for old callers and does nothing. */
+    console.log("calendar-refresh: --deploy is a no-op (PRIVFEED1) · data stays in " + path.dirname(weekPath));
   }
 }
 

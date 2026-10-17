@@ -25,25 +25,21 @@
   function qs(n) { var m = location.search.match(new RegExp("[?&]" + n + "=([^&]+)")); return m ? decodeURIComponent(m[1]) : ""; }
 
   var tok = qs("lightsProxyToken") || qs("proxyToken");
-  if (tok && /^[A-Za-z0-9_-]{8,}$/.test(tok)) rawSet(TOKEN_LS, tok);
+  if (tok && /^[A-Za-z0-9_-]{16,}$/.test(tok)) rawSet(TOKEN_LS, tok); /* PRIVFEED3 · 16+ like the server */
+  if (tok) { try { var _u = new URL(location.href); ["lightsProxyToken", "proxyToken"].forEach(function (k) { _u.searchParams.delete(k); }); history.replaceState(history.state, "", _u.pathname + _u.search + _u.hash); } catch (e) { /* */ } }
 
   function token() { return ls.getItem(TOKEN_LS) || ""; }
   var proxyP = null;
-  function proxy() {
-    if (proxyP) return proxyP;
-    proxyP = tfetch("data/lights-live.json?t=" + Date.now(), { cache: "no-store" })
-      .then(function (r) { return r.ok ? r.json() : {}; })
-      .then(function (d) { var wp = d && d.writeProxy ? String(d.writeProxy).replace(/\/$/, "") : ""; return /^https:\/\//.test(wp) ? wp : (ls.getItem(PROXY_LS) || ""); })
-      .catch(function () { return ls.getItem(PROXY_LS) || ""; })
-      .then(function (base) { if (!base) proxyP = null; return base; }); /* HUBHEAL1 · never cache "no hub" */
-    return proxyP;
+  function proxy() { /* HUBPIN1 · built-in hub only, never from data or a link */
+    var H = window.HouseHub;
+    return Promise.resolve(H ? H.lights() : "");
   }
   function call(method, body) {
     return proxy().then(function (base) {
-      if (!base || (!token() && !/\.github\.io$/i.test(location.hostname))) throw new Error("nokey"); /* NOKEY1 */
+      if (!base || !token()) throw new Error("nokey"); /* HUBPIN1 · the hub checks the key only; no key, no request */
       return tfetch(base + "/api/taps", {
         method: method, cache: "no-store",
-        headers: token() ? { "Content-Type": "application/json", "X-Lights-Proxy-Token": token() } : { "Content-Type": "application/json" },
+        headers: token() && window.HouseHub && HouseHub.okForKey(base) ? { "Content-Type": "application/json", "X-Lights-Proxy-Token": token() } : { "Content-Type": "application/json" },
         body: body ? JSON.stringify(body) : undefined
       }).then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); });
     });

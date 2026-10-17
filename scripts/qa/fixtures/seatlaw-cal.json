@@ -1,0 +1,12 @@
+{
+ "note": "SEATLAW1 fixture: synthetic rows shaped like the private cal-live feed. No real names.",
+ "status": "live",
+ "events": [
+  { "id": "a1", "summary": "Mudcats @ Riverhawks (Sec 912 Row Q 7-8), Game 2", "start": "2026-10-17T19:08:00-05:00" },
+  { "id": "a2", "summary": "Concert · Section 12, Row C, Seats 3-4", "start": "2026-10-18T19:00:00-05:00" },
+  { "id": "a3", "summary": "Titans game Sec 101 Row 5 Seats 7-8 · 3:25", "start": "2026-10-19T15:25:00-05:00" },
+  { "id": "a4", "summary": "Ainsley · LKMS picture day", "start": "2026-10-20T16:00:00-05:00" },
+  { "id": "a5", "summary": "Row your boat sing-along", "start": "2026-10-21T10:00:00-05:00" }
+ ],
+ "boardStrip": { "place": "Mudcats @ Riverhawks (Sec 912 Row Q 7-8), Game 2", "detailHtml": "<strong>6:35</strong> Playoff Game 2: Mudcats @ Riverhawks (Sec 912 Row Q 7-8)" }
+}

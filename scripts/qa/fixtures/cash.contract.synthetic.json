@@ -1,0 +1,45 @@
+{
+ "_meta": {
+  "note": "PRIVFEED1 \u00b7 SYNTHETIC fixture. Real Ledger numbers live only in the box-only private folder (<private>/qa/cash.contract.json); GATE2 prefers that file when present.",
+  "synthetic": true
+ },
+ "schema": "board-os.cash.packet.v1",
+ "mode": "SYNTHETIC",
+ "lockedAt": "2000-01-01T00:00:00-06:00",
+ "as_of": "2000-01-01",
+ "asOfLabel": "Sat 1 Jan \u00b7 SYNTHETIC",
+ "available": 1234.56,
+ "availableDisplay": "$1,234.56",
+ "discGate": {
+  "threshold": 1000,
+  "state": "CLOSED",
+  "posture": "DISC_ZERO"
+ },
+ "eoy": {
+  "floor": 2000,
+  "short": 765.44,
+  "gapDisplay": "SHORT $765.44",
+  "killLine": "SHORT",
+  "killLedgerClause": "OFF",
+  "state": "SHORT"
+ },
+ "guild": {
+  "monthlyPayment": 111.11,
+  "additionalPrincipal": 0,
+  "totalAutopay": 111.11,
+  "extra": "PAUSED"
+ },
+ "expect": {
+  "available": 1234.56,
+  "availableDisplay": "$1,234.56",
+  "eoyShort": 765.44,
+  "eoyGapDisplay": "SHORT $765.44",
+  "gateState": "CLOSED",
+  "killOff": "OFF",
+  "guildMonthly": 111.11,
+  "guildMustNot": [
+   222.22
+  ],
+  "paintPatterns": []
+ }
+}

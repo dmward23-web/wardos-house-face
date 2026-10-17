@@ -14,6 +14,7 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { fileURLToPath } from "node:url";
+import { privPath, assertPrivateOut } from "./private-dir.mjs";
 import WebSocket from "ws";
 
 // KEYROT1: fall back to the box-only key file so rotation needs no env change.
@@ -26,8 +27,8 @@ function proxyTokenFromFile() {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const SNAPS = path.join(ROOT, "data", "nest-snaps");
-const LIVE = path.join(ROOT, "data", "nest-live.json");
+const SNAPS = privPath("nest-snaps"); /* PRIVFEED1 · box-only; the hub serves /api/private/nest/<cam>.jpg with a token */
+const LIVE = privPath("nest-live.json"); /* PRIVFEED2 */
 const PROXY = process.env.NEST_PROXY || "http://127.0.0.1:8787";
 
 function parseArgs(argv) {
@@ -213,9 +214,10 @@ function writeLive(cameras, meta) {
   if (prev.nestProxy) payload.nestProxy = prev.nestProxy;
   // KEYROT1: never carry nestProxyToken into public JSON.
   if (prev.nestProxyPath) payload.nestProxyPath = prev.nestProxyPath;
-  fs.mkdirSync(path.dirname(LIVE), { recursive: true });
+  assertPrivateOut(LIVE, "nest-live");
+  fs.mkdirSync(path.dirname(LIVE), { recursive: true, mode: 0o700 });
   const tmp = LIVE + ".tmp";
-  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n");
+  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n", { mode: 0o600 });
   fs.renameSync(tmp, LIVE);
   return payload;
 }
@@ -251,7 +253,7 @@ async function main() {
       await navigate(send, url);
       const info = await waitForVideo(send, args.waitMs);
       const file = slug(name) + ".jpg";
-      const abs = path.join(SNAPS, file);
+      const abs = assertPrivateOut(path.join(SNAPS, file), "camera still");
       const shot = await captureJpeg(send, abs);
       if (shot.bytes < 800) throw new Error("jpeg too small (" + shot.bytes + ")");
       snaps[cam.id] = {

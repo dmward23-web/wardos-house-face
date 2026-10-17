@@ -114,7 +114,7 @@ Mock PNG = **groceries-representative** (clock-first hdr + densest list/treat bo
 
 ### 4 · Countdowns · `sheet-countdowns.html`
 
-**Live cues:** Birthday countdown (6 days · Hayes) · Reading streak (Freckle Juice).
+**Live cues:** Birthday countdown (from the calendar) · Reading streak (Freckle Juice).
 
 **LOOK move:** Clock-first · sheet-chip `Countdowns` · huge day digit heat · streak row denser.
 
@@ -123,7 +123,7 @@ Mock PNG = **groceries-representative** (clock-first hdr + densest list/treat bo
 | TIME | ambient | |
 | Home / Week | index | |
 | Sheet chip | ambient | `Countdowns` |
-| Birthday count-box | stay / deepen · optional `kid-hayes.html` | known Fri Sep 25 |
+| Birthday count-box | stay / deepen | from the calendar |
 | Reading streak days | stay (M–S flames) | Freckle Juice |
 
 ---

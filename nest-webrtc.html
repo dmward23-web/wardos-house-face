@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<script src="house-hub.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-pair.js?v=HUBPIN1"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0e141c" />
@@ -76,8 +80,8 @@
   </div>
   <div class="cams" id="cam-row" aria-label="Cameras" hidden></div>
 </div>
-<script src="nest-webrtc-client.js?v=PROXYFOLLOW2"></script>
-<script src="hub-key-entry.js?v=KEYAUTO2"></script>
+<script src="nest-webrtc-client.js?v=HUBPIN1"></script>
+<script src="hub-key-entry.js?v=PRIVFEED3"></script>
 <script>
 (function () {
   var N = window.NestWebRtc;
@@ -137,6 +141,16 @@
       .catch(function () { return null; });
   }
 
+  /* CAMLOCK1 · honest locked state: no video, no demo frame; the private still shows only if this screen can read it. */
+  function showLocked(want) {
+    if (stageEl) stageEl.classList.add("fail");
+    setPill("err", "LOCKED");
+    setStatus("Camera locked · needs pairing (this screen has no house key, or the key was rejected)");
+    errbox.textContent = "Camera locked · needs pairing\n\nThis screen has no house key, or the key was rejected. Pair it once from the hub, then reopen.";
+    errbox.classList.add("show");
+    showStillFallback(want).then(function (hit) { if (hit) setPill("dim", "STILL · LOCKED"); });
+  }
+
   async function loadCams() {
     setStatus("loading cameras…");
     var want = new URLSearchParams(location.search).get("cam") ||
@@ -146,14 +160,7 @@
       if (N.ensureProxyFromLive) await N.ensureProxyFromLive();
       proxyMeta.textContent = "proxy " + (N.proxyBase() || "NEED PROXY") + (N.proxyToken() ? " · authed" : "");
       /* AUDIT1 · no key on this screen → don't call the proxy; say NEED KEY and show the still */
-      if (!N.proxyToken()) {
-        if (stageEl) stageEl.classList.add("fail");
-        setStatus("NEED KEY · live video needs the key on this screen");
-        showStillFallback(want).then(function (hit) {
-          setPill(hit ? "dim" : "err", hit ? "STILL · NEED KEY" : "NEED KEY");
-        });
-        return;
-      }
+      if (!N.proxyToken()) { showLocked(want); return; } /* CAMLOCK1 */
       var data = await N.fetchCameras();
       cams = data.cameras || [];
       row.innerHTML = "";
@@ -178,6 +185,7 @@
         else if (cams[0]) startCam(cams[0].id);
       }
     } catch (e) {
+      if (e && e.code === "LOCKED") { showLocked(want); return; }
       if (stageEl) stageEl.classList.add("fail");
       var msg = (e && e.message) ? e.message : String(e);
       var base = N.proxyBase() || "(none — Pages/phone)";

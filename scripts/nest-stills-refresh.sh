@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # STILLFRESH1 · refresh hub camera pictures (Garage + Backyard) from live video.
 # Headless Chrome (own profile, CDP :19333) → nest-webrtc-still.mjs →
-# data/nest-snaps/*.jpg + snapCapturedAt in data/nest-live.json → push main.
+# <private>/nest-snaps/*.jpg (PRIVFEED1, box-only, served by the hub with a token) + snapCapturedAt in
+# data/nest-live.json. Camera pictures never enter git and nothing is pushed.
 # Front door is skipped until the doorbell is hardwired (battery = no live).
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
@@ -19,10 +20,6 @@ for i in $(seq 1 20); do curl -sf http://127.0.0.1:19333/json/version >/dev/null
 echo "[$(ts)] stills start ($CAMS)" >>"$LOG"
 node scripts/nest-webrtc-still.mjs --cdp 19333 --cams "$CAMS" --wait 20000 >>"$LOG" 2>&1
 RC=$?
-[[ "${NO_PUSH:-0}" == "1" ]] && { echo "rc=$RC (no push)"; exit $RC; }
-git add data/nest-live.json data/nest-snaps/garage.jpg data/nest-snaps/backyard.jpg 2>/dev/null
-if git diff --cached --quiet; then echo "[$(ts)] no change" >>"$LOG"; echo "NOCHANGE rc=$RC"; exit 0; fi
-git commit -qm "NESTSTILL · fresh hub cam pictures $(date -u +%Y%m%d-%H%M)Z"
-git pull -q --rebase --autostash && scripts/data-only-guard.sh && git push -q origin main
-echo "[$(ts)] pushed $(git rev-parse --short HEAD)" >>"$LOG"
-echo "PUSHED rc=$RC"
+echo "[$(ts)] stills done rc=$RC (private folder, no push · PRIVFEED1)" >>"$LOG"
+echo "STILLS rc=$RC"
+exit $RC

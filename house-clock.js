@@ -120,7 +120,7 @@
     if (!root || !root.querySelectorAll) return stamp(new Date());
     var s = stamp(new Date());
     root.querySelectorAll("[data-live-clock], [data-live='time'], [data-live='clock-time']").forEach(function (el) {
-      el.textContent = s.time || "—";
+      el.textContent = s.time || "";
       if (el.tagName === "TIME") el.setAttribute("datetime", s.iso + "T" + (s.time || "").replace(" ", ""));
       el.setAttribute("title", "America/Chicago · " + s.long + " · " + (s.time || ""));
     });

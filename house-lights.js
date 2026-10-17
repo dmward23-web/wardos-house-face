@@ -71,12 +71,13 @@
   }
 
   /** Optional override: seed proxy URL/token from ?lightsProxy= into localStorage. */
+  /** HUBPIN1 · a link can no longer set the hub (?lightsProxy= / ?proxy= are ignored). Only a legacy key seed is kept:
+      16+ chars like the server, stripped from the address bar at once. */
   function ingestProxyFromQuery() {
     try {
-      var p = qs("lightsProxy") || qs("proxy");
       var t = qs("lightsProxyToken") || qs("proxyToken");
-      if (p) localStorage.setItem(PROXY_LS_KEY, String(p).replace(/\/$/, ""));
-      if (t) localStorage.setItem(PROXY_TOKEN_LS_KEY, String(t));
+      if (t && /^[A-Za-z0-9_-]{16,}$/.test(t)) localStorage.setItem(PROXY_TOKEN_LS_KEY, String(t));
+      if (t) { try { var _u = new URL(location.href); ["lightsProxyToken", "proxyToken"].forEach(function (k) { _u.searchParams.delete(k); }); history.replaceState(history.state, "", _u.pathname + _u.search + _u.hash); } catch (e) { /* */ } }
     } catch (e) { /* */ }
   }
 
@@ -85,47 +86,24 @@
    * (+ token), persist once so later polls keep working even if JSON briefly
    * drops the fields. Never persist loopback on Pages.
    */
+  /** HUBPIN1 · the hub address in live data is only saved when it is on the built-in allow-list (HouseHub). */
   function ingestProxyFromLive(data) {
-    if (!data) return;
-    try {
-      var wp = data.writeProxy ? String(data.writeProxy).replace(/\/$/, "") : "";
-      var tok = data.writeProxyToken ? String(data.writeProxyToken) : "";
-      if (!wp || (isPagesHost() && isLoopbackProxy(wp))) return;
-      // PROXYFOLLOW1: the tunnel address can change when Atlas's computer
-      // restarts; always follow the newest public address from live JSON.
-      if (/^https:\/\//i.test(wp) || !localStorage.getItem(PROXY_LS_KEY)) {
-        if (localStorage.getItem(PROXY_LS_KEY) !== wp) localStorage.setItem(PROXY_LS_KEY, wp);
-      }
-      if (tok && !localStorage.getItem(PROXY_TOKEN_LS_KEY)) {
-        localStorage.setItem(PROXY_TOKEN_LS_KEY, tok);
-      }
-    } catch (e) { /* */ }
+    if (!data || !data.writeProxy) return;
+    try { var H = window.HouseHub; if (H && !H.lights()) H.saveLights(String(data.writeProxy)); } catch (e) { /* */ }
   }
 
+  /** HUBPIN1 · built-in hub only (HouseHub allow-list); box previews on 127.0.0.1 may use the local proxy. */
   function proxyBase() {
     ingestProxyFromQuery();
-    var fromQs = qs("lightsProxy") || qs("proxy");
-    if (fromQs) return String(fromQs).replace(/\/$/, "");
-    try {
-      var ls = localStorage.getItem(PROXY_LS_KEY);
-      if (ls) {
-        var lsUrl = String(ls).replace(/\/$/, "");
-        if (!(isPagesHost() && isLoopbackProxy(lsUrl))) return lsUrl;
-      }
-    } catch (e) { /* */ }
-    var data = (_liveCache && _liveCache.data) || null;
-    if (data && data.writeProxy) {
-      var wp = String(data.writeProxy).replace(/\/$/, "");
-      // Pages cannot reach Atlas loopback — skip localhost hints in live JSON.
-      if (!(isPagesHost() && isLoopbackProxy(wp))) return wp;
-    }
-    if (isPagesHost()) return "";
-    return DEFAULT_PROXY;
+    var H = window.HouseHub;
+    if (!H) return "";
+    var b = H.lights();
+    if (!b && H.okForKey(DEFAULT_PROXY)) b = String(DEFAULT_PROXY).replace(/\/$/, "");
+    return b;
   }
 
   function proxyToken() {
-    var t = qs("lightsProxyToken") || qs("proxyToken");
-    if (t) return t;
+    /* PRIVFEED3 · the key lives in local storage only (a seed link is stored once, then stripped) */
     try {
       var ls = localStorage.getItem(PROXY_TOKEN_LS_KEY);
       if (ls) return ls;
@@ -137,8 +115,8 @@
 
   function proxyHeaders() {
     var h = { "Content-Type": "application/json", Accept: "application/json" };
-    var t = proxyToken();
-    if (t) {
+    var t = proxyToken(), H = window.HouseHub;
+    if (t && H && H.okForKey(proxyBase())) { /* HUBPIN1 · never send the key off the allow-list */
       h["X-Lights-Proxy-Token"] = t;
       h["Authorization"] = "Bearer " + t;
     }
@@ -147,7 +125,7 @@
 
   /* AUDIT1 · no key saved on this screen → no lights requests at all (no probe, no write) */
   /* NOKEY1 · on the live House Face the hub trusts this page by origin — no key, ever. */
-  function hasKey() { return !!proxyToken() || isPagesHost(); }
+  function hasKey() { return !!proxyToken(); } /* PRIVFEED3 · the house origin is not a key any more (server checks the header only) */
   function noKey(g) { g = g || gate(); return !!(g.live && g.writeSupported && !hasKey()); }
   /* Cloud preview has no Kasa key. The wall and phone still follow the main write path. */
   function previewHost() {
@@ -236,7 +214,7 @@
       return {
         kind: "offline",
         live: false,
-        needToken: true,
+        needToken: !hasKey(), /* HUBPIN1 · a keyed screen whose feeds are down says OFFLINE, never NEED TOKEN */
         label: "OFFLINE",
         writeSupported: false,
         data: null,
@@ -611,7 +589,7 @@
     var status = g.label;
     if (hdr) {
       var ico = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.7c.6.5 1 1.2 1.1 2H14.4c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3z"/></svg>';
-      var big = n ? String(n) : "—";
+      var big = n ? String(n) : "";
       var unit = n ? "pads" : "";
       var quiet = g.needToken ? "Kasa" : (onN ? (onN + " on") : "all off");
       el.innerHTML =
@@ -696,7 +674,7 @@
       meta.textContent = canWrite()
         ? ("Lights LIVE · " + eff.lights.length + " pads · write armed")
         : (g.live
-          ? ("Lights LIVE · " + eff.lights.length + " pads · " + (noKey(g) ? "NEED KEY" : g.writeSupported ? "PROXY OFF" : "READ ONLY"))
+          ? ("Lights LIVE · " + eff.lights.length + " pads · " + (noKey(g) ? "NEEDS PAIRING" : g.writeSupported ? "PROXY OFF" : "READ ONLY"))
           : (g.needToken
             ? ("Lights · NEED TOKEN · controls dark")
             : ("Lights · " + g.label + " · controls dark")));
@@ -846,7 +824,7 @@
   function hubHonesty(g) {
     g = g || gate();
     if (canWrite()) return "LIVE";
-    if (noKey(g)) return "NEED KEY";
+    if (noKey(g)) return "NEEDS PAIRING";
     if (g.live && g.writeSupported && _proxyReachable === false) return "PROXY OFF";
     if (g.live && g.writeSupported) return "LIVE";
     if (g.live) return "READ ONLY";
@@ -963,7 +941,7 @@
       sub.textContent = canWrite()
         ? "3 LIVE · 6 OFF · wait"
         : (noKey(g)
-          ? "NEED KEY · controls dark"
+          ? "NEEDS PAIRING · controls dark"
           : g.live && g.writeSupported
           ? "PROXY OFF · write proxy unreachable (check tunnel)"
           : (g.live
@@ -1012,7 +990,7 @@
       if (dim) {
         /* Premium fill · tap rocker = on/off · drag track = brightness. Stubs never get this. */
         var fillPct = L.on ? bright : 0;
-        var showPct = (L.on == null) ? "—" : (bright + "%");
+        var showPct = (L.on == null) ? "" : (bright + "%") /* PRIVFEED3 · unknown state shows nothing, not a dash */;
         html +=
           '<div class="hub-sw-dim' + (writable ? "" : " is-disabled") + '" data-id="' + L.id + '">'
           + '<div class="hub-sw-track" role="slider" tabindex="' + (writable ? "0" : "-1") + '"'

@@ -1,10 +1,10 @@
-/* House Face · HUBOVAL1 oval weather pill · Overland Park / 147th · client-side, no key.
+/* House Face · HUBOVAL1 oval weather pill · Overland Park (PRIVFEED1 · city-level coords, ~1 km) · client-side, no key.
    Primary: Open-Meteo. Fallback: wttr.in. Kids-safe · no $. */
 (function (global) {
   "use strict";
-  var LAT = 38.884;
-  var LON = -94.671;
-  var PLACE = "Overland Park · 147th";
+  var LAT = 38.88;
+  var LON = -94.67;
+  var PLACE = "Overland Park";
   var CACHE_KEY = "house-wx:v4";
   var CACHE_MS = 10 * 60 * 1000;
 
@@ -114,8 +114,8 @@
   }
 
   /* RAINNOW1 · the forecast model misses a storm that's already here. Check the
-   * real weather station (NWS, Johnson County Executive airport, a few miles
-   * from 147th) and trust it for "is it raining right now". */
+   * real weather station (the nearest NWS airport station, a few miles
+   * from home) and trust it for "is it raining right now". */
   var OBS_URL = "https://api.weather.gov/stations/KOJC/observations/latest";
   /* A hung station request must not hold the plate on the LIVE placeholder. */
   function within(ms, promise) {
@@ -233,7 +233,7 @@
           '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
           + '<div class="wx-hdr-text wx-text">'
           + '<div class="wx-kicker">Weather</div>'
-          + '<div class="wx-line"><span class="wx-temp">—</span><span class="wx-cond">glance later</span></div>'
+          + '<div class="wx-line"><span class="wx-temp"></span><span class="wx-cond">Weather later</span></div>'
           + '<div class="wx-sub">retry</div>'
           + "</div>";
         return;

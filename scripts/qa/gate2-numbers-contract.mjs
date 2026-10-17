@@ -2,43 +2,28 @@
 /**
  * GATE 2 — Numbers / money contract (Ledger-owned)
  *
- * Ledger owns SoT. Wright / house-face CI never invents $.
- * Live SoT: /workspace/board-os/data/cash.json (NOT in house-face git).
- * CI fixture: scripts/qa/fixtures/cash.contract.json — refresh when Ledger restamps.
+ * PRIVFEED1 · no real money in git. The contract (Ledger restamp + expected values + paint patterns) lives in the
+ * box-only private folder: <private>/qa/cash.contract.json (scripts/private-dir.mjs; WARDOS_PRIVATE_DIR overrides).
+ * When that file is absent (CI, cloud builders) GATE 2 runs against the SYNTHETIC fixture
+ * scripts/qa/fixtures/cash.contract.synthetic.json so the contract logic is still exercised.
  *
- * Rules when cash present:
- *   · Wells AVAILABLE once · matches fixture (tonight $13,923.03 · LIVE · Plaid 2026-10-03 ~9:40p CT)
- *   · EOY SHORT matches · GATE CLOSED (<$15k) · kill OFF
- *   · as-of stamp present
- *   · Guild once = statement amount (never $4k double / never double-count)
- *   · plate $ bound to stamp (fixture lockedAt / asOfLabel)
- *   · cliff SoT decree May 2028 (Dan exact-yes) — CI holds available/eoy; does not invent cliff $
- *
- * If no fixture AND no in-repo cash.json: SKIP with explicit Ledger message
- * (legacy path). Tonight fixture is required so CI asserts the contract.
- *
- * Also: if house-face live HTML/JS paints AVAILABLE / Guild $ copy, enforce
- * single AVAILABLE · Guild not doubled · as-of present — never invent values.
+ * Rules: AVAILABLE once and matching · EOY SHORT matches · gate state · kill clause · as-of stamp ·
+ * Guild once = statement amount (never doubled / never a forbidden stand-in) · glass paints no Wells/Guild figures.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { privPath } from "../private-dir.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const FIXTURE = path.join(ROOT, "scripts/qa/fixtures/cash.contract.json");
+const PRIVATE_CONTRACT = privPath("qa", "cash.contract.json");
+const FIXTURE = fs.existsSync(PRIVATE_CONTRACT) ? PRIVATE_CONTRACT : path.join(ROOT, "scripts/qa/fixtures/cash.contract.synthetic.json");
+const FIXTURE_LABEL = FIXTURE === PRIVATE_CONTRACT ? "private contract (box-only)" : "SYNTHETIC fixture";
 const IN_REPO_CASH = path.join(ROOT, "data/cash.json");
 
-/** Expected contract (must match fixture — Ledger restamp updates both). */
-const EXPECT = {
-  available: 13923.03,
-  availableDisplay: "$13,923.03",
-  eoyShort: 6076.97,
-  eoyGapDisplay: "SHORT $6,076.97",
-  gateState: "CLOSED",
-  killOff: "OFF",
-  guildMonthly: 3589.57,
-  guildMustNot: [4000, 4000.0, 7179.14], // never $4k double / never 2× statement
-};
+/** Expected contract comes from the contract file itself (expect block). */
+let EXPECT = { availableDisplay: "?", eoyGapDisplay: "?", gateState: "?", killOff: "?", guildMonthly: 0, guildMustNot: [], paintPatterns: [] };
+try { EXPECT = { ...EXPECT, ...(JSON.parse(fs.readFileSync(FIXTURE, "utf8")).expect || {}) }; } catch { /* reported in main */ }
 
 function nearly(a, b, eps = 0.009) {
   return Math.abs(Number(a) - Number(b)) <= eps;
@@ -77,7 +62,7 @@ function assertFixture(cash, bad) {
   const addl = Number(cash.guild?.additionalPrincipal || 0);
   const total = Number(cash.guild?.totalAutopay ?? guild);
   if (addl > 0 && nearly(total, EXPECT.guildMonthly * 2)) {
-    bad.push("Guild looks doubled (totalAutopay ≈ 2× statement) — never $4k double");
+    bad.push("Guild looks doubled (totalAutopay ≈ 2× statement)");
   }
   for (const forbid of EXPECT.guildMustNot) {
     if (nearly(guild, forbid)) {
@@ -91,12 +76,12 @@ function assertFixture(cash, bad) {
     bad.push("plate $ not bound to stamp (need lockedAt or asOfLabel with available)");
   }
 
-  // cliff decree May 2028 — note from fixture meta; never invent cliff $ in CI
+  // cliff note from the private contract meta; never invent cliff $ in CI
   const meta = cash._meta || {};
   const cliff = meta.cliff || meta.cliffNote || "";
-  if (cliff || /2028|2029/.test(JSON.stringify(cash))) {
+  if (cliff) {
     console.log(
-      "GATE2 NOTE — cliff SoT decree May 2028 (Ledger) · CI holds available/eoy only · no invent cliff $"
+      "GATE2 NOTE — cliff SoT (Ledger, private) · CI holds available/eoy only · no invent cliff $"
     );
   }
 }
@@ -112,7 +97,7 @@ function scanHouseFaceMoney(bad) {
       surfaces.push(name);
     }
   }
-  const moneyPaint = /AVAILABLE\s*\$|Guild[^\n]{0,40}\$|\$19,?\d{3}|\$3,?589|\$4,000|\$4000/i;
+  const moneyPaint = new RegExp(["AVAILABLE\\s*\\$", "Guild[^\\n]{0,40}\\$", "\\$\\d{1,3},\\d{3}\\.\\d\\d"].concat(EXPECT.paintPatterns || []).join("|"), "i");
   const hits = [];
   for (const rel of surfaces) {
     let text = fs.readFileSync(path.join(ROOT, rel), "utf8");
@@ -121,11 +106,11 @@ function scanHouseFaceMoney(bad) {
       .replace(/\/\*[\s\S]*?\*\//g, "")
       .replace(/(^|[^:])\/\/.*$/gm, "$1");
     // desk-gate may mention AVAILABLE as concept without painting the number — OK
-    if (/sheet-desk-gate\.html/.test(rel) && !/\$19,?\d{3}/.test(text) && !/\$3,589/.test(text)) {
+    if (/sheet-desk-gate\.html/.test(rel) && !/\$\d{1,3},\d{3}\.\d\d/.test(text)) {
       continue;
     }
     // kid jar "Available $" voice ≠ Wells AVAILABLE — skip kids-data / kid-* unless Wells/Guild figures
-    if (/^(kids-data\.js|kid-)/.test(rel) && !/\$19,?\d{3}|Guild|\$3,589|\$4,000/.test(text)) {
+    if (/^(kids-data\.js|kid-)/.test(rel) && !/\$\d{1,3},\d{3}\.\d\d|Guild/.test(text)) {
       continue;
     }
     const lines = text.split(/\n/);
@@ -142,9 +127,9 @@ function scanHouseFaceMoney(bad) {
   // If painted: enforce once AVAILABLE, Guild not doubled, as-of nearby in same file-ish
   const avail = hits.filter((h) => /AVAILABLE/i.test(h));
   const guild = hits.filter((h) => /Guild/i.test(h));
-  const fourk = hits.filter((h) => /\$4,000|\$4000\b/.test(h));
+  const fourk = hits.filter((h) => (EXPECT.paintPatterns || []).some((p) => new RegExp(p).test(h)));
   if (fourk.length) {
-    bad.push("Guild/$4k double smell on house-face glass:\n  " + fourk.join("\n  "));
+    bad.push("Guild double / contract figure painted on house-face glass:\n  " + fourk.join("\n  "));
   }
   if (avail.length > 3) {
     bad.push(`AVAILABLE appears heavily duplicated on glass (${avail.length} hits) — want once`);
@@ -166,7 +151,7 @@ function main() {
   }
 
   const fp = hasFixture ? FIXTURE : IN_REPO_CASH;
-  const label = hasFixture ? "scripts/qa/fixtures/cash.contract.json" : "data/cash.json";
+  const label = hasFixture ? FIXTURE_LABEL : "data/cash.json";
   console.log(`GATE2 — loading ${label}`);
   console.log(
     "GATE2 — Ledger owns SoT · Wright does not invent $ · refresh fixture when Ledger restamps"
@@ -183,7 +168,7 @@ function main() {
   assertFixture(cash, bad);
   scanHouseFaceMoney(bad);
 
-  console.log("GATE2 — cliff decree May 2028 · available/eoy asserted · cliff $ not invented");
+  console.log("GATE2 — available/eoy asserted · cliff $ not invented");
 
   if (bad.length) {
     console.error("GATE2 FAIL — numbers contract:");
@@ -191,9 +176,8 @@ function main() {
     process.exit(1);
   }
 
-  console.log(
-    `GATE2 PASS — AVAILABLE ${EXPECT.availableDisplay} · EOY ${EXPECT.eoyGapDisplay} · GATE ${EXPECT.gateState} · kill ${EXPECT.killOff} · Guild $${EXPECT.guildMonthly.toFixed(2)} once · as-of ok`
-  );
+  /* PRIVFEED1 · never print real figures (CI logs are public): state only */
+  console.log(`GATE2 PASS — ${FIXTURE_LABEL} · AVAILABLE once · EOY matches · GATE ${EXPECT.gateState} · kill ${EXPECT.killOff} · Guild once · as-of ok`);
 }
 
 main();

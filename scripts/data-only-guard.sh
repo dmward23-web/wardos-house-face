@@ -8,7 +8,7 @@
 # SENSIFRESH / NESTSTILL), so human PR merges are unaffected.
 set -uo pipefail
 BASE="${1:-origin/main}"
-ALLOW_RE='^(data/|kids-week\.json$|kids-data\.js$|cal-live\.json$)'
+ALLOW_RE='^$'   # PRIVFEED2 · no data file is ever pushed by a routine (all house data is private)
 git fetch -q origin 2>/dev/null || true
 BAD="$(git diff --name-only "$BASE"...HEAD 2>/dev/null | grep -Ev "$ALLOW_RE" || true)"
 if [[ -n "$BAD" ]]; then

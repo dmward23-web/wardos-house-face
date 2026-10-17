@@ -16,6 +16,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { privPath, assertPrivateOut, namesRe, privateNames } from "./private-dir.mjs"; /* PRIVFEED1 */
+import { createRequire } from "node:module";
+createRequire(import.meta.url)("../house-face-law.js");   /* PRIVFEED3 · LAW8C1: sets globalThis.HouseFaceLaw (one dress-up law, shared with the glass) */
+const FACE_LAW = globalThis.HouseFaceLaw;
+const PARTNER_RE = namesRe("partner"); /* PRIVNAME1 · "us" flag computed on the box so no name lives in client code */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -24,7 +29,7 @@ const TZ = "America/Chicago";
 function parseArgs(argv) {
   const out = {
     eventsPath: null,
-    outPath: path.join(ROOT, "data", "cal-live.json"),
+    outPath: privPath("cal-live.json"), /* PRIVFEED1 · box-only, served by the hub with a token */
     patchWeek: null,
     help: false,
   };
@@ -36,7 +41,7 @@ function parseArgs(argv) {
       out.patchWeek =
         argv[i + 1] && !argv[i + 1].startsWith("-")
           ? path.resolve(argv[++i])
-          : path.join(ROOT, "kids-week.json");
+          : privPath("kids-week.json");
     } else if (a === "--help" || a === "-h") out.help = true;
   }
   return out;
@@ -195,6 +200,7 @@ function slimEvent(e) {
     location: e.location || "",
     busy: isBusy(e),
     allDay: !!(e.start && e.start.date && !e.start.dateTime),
+    us: PARTNER_RE.test(e.summary || "") || /\btogether\b/i.test(e.summary || ""),
     startMs: start ? start.getTime() : 0,
     endMs: end ? end.getTime() : 0,
   };
@@ -278,10 +284,44 @@ function windowBounds(events) {
   };
 }
 
+/* TEXTLAW1 (ported in PRIVFEED3 from the v52 line) · every string the glass shows is written clean by this script, on
+ * every refresh: no booking codes / flight numbers / airport legs, no em dashes or arrows, no other-house names, no partner
+ * name, and the few raw titles get a human name. Rules live in scripts/text-law.json (shared with scripts/text_law.py /
+ * cal-months.py). {PARTNER}/{COPARENT} come from private-names.tsv (~/.local/share/wardos-private, fallback ~/.config/wardos; never git); missing = hard fail.
+ * Ids, ISO times, URLs and custody are never touched. Idempotent. */
+const TEXT_LAW = JSON.parse(fs.readFileSync(path.join(__dirname, "text-law.json"), "utf8"));
+let TEXT_RULES = null;
+function textRules() {
+  if (TEXT_RULES) return TEXT_RULES;
+  const names = privateNames();
+  for (const role of ["partner", "coparent"]) if (!names[role] || !names[role].length) throw new Error("HARD FAIL: private names have no " + role + " (private-names.tsv), refusing to write glass text");
+  const reEsc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const fill = (re) => re.replace(/\{(PARTNER|COPARENT)\}/g, (_, k) => "(?:" + names[k.toLowerCase()].map(reEsc).join("|") + ")");
+  /* CALSCRUB1 · event-specific rules live box-only (WARDOS_TEXT_LAW_PRIVATE or <private dir>/text-law.private.json), applied first */
+  let priv = [];
+  try { priv = JSON.parse(fs.readFileSync(process.env.WARDOS_TEXT_LAW_PRIVATE || privPath("text-law.private.json"), "utf8")).rules || []; } catch { priv = []; }
+  return (TEXT_RULES = [...priv, ...TEXT_LAW.rules].map((r) => [new RegExp(fill(r.re), (r.flags || "") + (r.global ? "g" : "")), r.to]));
+}
+export function cleanText(s) {
+  if (typeof s !== "string" || !s.trim() || s.length >= TEXT_LAW.maxLen || /^(https?:|\d{4}-\d\d-\d\d)/.test(s)) return s;
+  for (const [a, b] of textRules()) s = s.replace(a, b);
+  return s.replace(/\s{2,}/g, " ").trim();
+}
+const TEXT_SKIP_KEY = /^(id|icdId|href|url|link|htmlLink|sourceCalendar|source|tz|status|kind|tone|cadence|theme|.*Iso|start|end|fetchedAt|refreshedAt|updatedAt|windowStart|windowEnd)$/;
+export function cleanDeep(o, key) {
+  if (Array.isArray(o)) return o.map((v) => cleanDeep(v, key));
+  if (o && typeof o === "object") { const r = {}; for (const k of Object.keys(o)) r[k] = cleanDeep(o[k], k); return r; }
+  if (typeof o === "string" && !(key && TEXT_SKIP_KEY.test(key))) return cleanText(o);
+  return o;
+}
+/* LAW8C1 · colour-day / dress-up rows are dropped at the source (same regex the glass uses) */
+export function dressFree(list) { return (list || []).filter((e) => !FACE_LAW.isDressDay(e && (e.summary || e.what || e.title) || "")); }
+
 function writeJson(outPath, payload) {
-  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  assertPrivateOut(outPath, "cal-live"); /* PRIVFEED1 */
+  fs.mkdirSync(path.dirname(outPath), { recursive: true, mode: 0o700 });
   const tmp = outPath + ".tmp";
-  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n");
+  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n", { mode: 0o600 });
   fs.renameSync(tmp, outPath);
 }
 
@@ -320,7 +360,7 @@ function danTodayFromDayEvents(dayEvents, todayIso, homeWeekThrough) {
   const through = homeWeekThrough || "Fri Oct 2 · 3:00";
   rows.push({
     when: "home week",
-    what: `Kids with Dad @ 147th through ${through}`,
+    what: `Kids with Dad at home through ${through}`,
     tone: "hot",
   });
   return rows;
@@ -336,7 +376,7 @@ function ensureHdInWeek(week, hd) {
       what: "Leave · HD #2209 vanity return",
       tone: "hot",
     };
-    /* Insert before first Wed 30 row so 9:00 sits ahead of 12:40 therapy */
+    /* Insert before the first Wed 30 row so the 9:00 item sits ahead of later rows */
     const idx = list.findIndex((r) => /^Wed 30/i.test(r.when || ""));
     if (idx >= 0) list.splice(idx, 0, row);
     else list.push(row);
@@ -362,7 +402,7 @@ function dropPastFromToday(rows, nowMs) {
 
 function patchKidsWeek(weekPath, cal, upcoming, slimAll) {
   const raw = fs.readFileSync(weekPath, "utf8");
-  const week = JSON.parse(raw);
+  let week = JSON.parse(raw);
   const todayIso = cal.asOfIso;
   const nowMs = Date.now();
 
@@ -441,7 +481,7 @@ function patchKidsWeek(weekPath, cal, upcoming, slimAll) {
             {
               kind: "note",
               when: "All day",
-              what: "Base @ 147th with Dad",
+              what: "Base at home with Dad",
               hint: "through Fri Oct 2 3:00",
               tone: "hot",
             },
@@ -455,42 +495,44 @@ function patchKidsWeek(weekPath, cal, upcoming, slimAll) {
     }
   }
 
+  week = cleanWeek(week); /* PRIVFEED3 · TEXTLAW1 words + LAW8C1 no dress-up rows, at the source */
   const text = JSON.stringify(week);
+  assertPrivateOut(weekPath, "kids-week"); /* PRIVFEED1 */
   fs.writeFileSync(weekPath, text + "\n");
 
-  /* Keep data/kids-week.json identical */
-  const dataCopy = path.join(ROOT, "data", "kids-week.json");
-  if (path.resolve(weekPath) !== path.resolve(dataCopy)) {
-    fs.mkdirSync(path.dirname(dataCopy), { recursive: true });
-    fs.writeFileSync(dataCopy, text + "\n");
-  }
-  /* If patch target was data/, also sync root */
-  const rootCopy = path.join(ROOT, "kids-week.json");
-  if (path.resolve(weekPath) !== path.resolve(rootCopy)) {
-    fs.writeFileSync(rootCopy, text + "\n");
-  }
+  /* PRIVFEED1 · one private copy only (no data/ twin, no root copy, no kids-data.js EMBEDDED) */
 
   return week;
 }
 
-function syncEmbedded(weekObj) {
-  const kidsDataPath = path.join(ROOT, "kids-data.js");
-  let src = fs.readFileSync(kidsDataPath, "utf8");
-  const json = JSON.stringify(weekObj);
-  const re = /var EMBEDDED = \{[\s\S]*?\};/;
-  if (!re.test(src)) {
-    console.error("WARN: EMBEDDED block not found in kids-data.js — skip sync");
-    return false;
+/* PRIVFEED3 · kids-week through the same law: dress-up / colour-day rows out (FACE_LAW.cleanFeed), then text law words */
+export function cleanWeek(week) { return cleanDeep(FACE_LAW.cleanFeed("kids-week", week)); }
+export function cleanCal(cal) { return cleanDeep(FACE_LAW.cleanFeed("cal-live", cal)); }
+
+/* TEXTLAW3-style --reclean for the PRIVATE copies (words + dress rows only; no fetch, ids/times/custody untouched; idempotent) */
+function reclean() {
+  for (const [name, fn] of [["cal-live.json", cleanCal], ["kids-week.json", cleanWeek]]) {
+    const f = privPath(name);
+    if (!fs.existsSync(f)) { console.log(`--reclean · ${name} not found`); continue; }
+    assertPrivateOut(f, name);
+    const j = JSON.parse(fs.readFileSync(f, "utf8"));
+    const c = fn(j);
+    const changed = JSON.stringify(c) !== JSON.stringify(j);
+    if (changed) { const tmp = f + ".tmp"; fs.writeFileSync(tmp, JSON.stringify(c, null, 2) + "\n", { mode: 0o600 }); fs.renameSync(tmp, f); }
+    console.log(`--reclean · ${name} ${changed ? "rewritten" : "already clean"} (private)`);
   }
-  src = src.replace(re, `var EMBEDDED = ${json};`);
-  fs.writeFileSync(kidsDataPath, src);
-  return true;
+}
+
+function syncEmbedded() {
+  /* PRIVFEED1 · kids-data.js carries no embedded copy any more (public file). Kept as a no-op for callers. */
+  return false;
 }
 
 function main() {
+  if (process.argv.includes("--reclean")) return reclean();
   const args = parseArgs(process.argv);
   if (args.help || !args.eventsPath) {
-    console.log(`Usage: node scripts/cal-from-events.mjs --events <dump.json> [--out data/cal-live.json] [--patch-week [kids-week.json]]`);
+    console.log(`Usage: node scripts/cal-from-events.mjs --events <dump.json> [--out <private>/cal-live.json] [--patch-week [<private>/kids-week.json]]`);
     process.exit(args.help ? 0 : 1);
   }
 
@@ -551,6 +593,7 @@ function main() {
     .map((e) => (isPinnedSpecial(e) ? { ...e, allDay: true, start: todayIso, end: todayIso, pinnedUntil: "8:40" } : e))
     .filter((e) => !/^GET\s*·/i.test(e.summary || "") && !/^Atlas:/i.test(e.summary || ""))
     .filter((e) => !isSoft(e))
+    .filter((e) => !FACE_LAW.isDressDay(e.summary || ""))   /* LAW8C1 */
     .sort((a, b) => a.startMs - b.startMs);
 
   /* nextLeave field = Next Up hero.
@@ -601,18 +644,16 @@ function main() {
     error: null,
   };
 
-  writeJson(args.outPath, cal);
+  writeJson(args.outPath, cleanCal(cal));   /* TEXTLAW1 + LAW8C1 */
   console.log(
     `cal-live → ${args.outPath} · status=${cal.status} · upcoming=${publicUpcoming.length} · next=${publicNext ? publicNext.summary : "(none)"}`
   );
 
   if (args.patchWeek) {
     const week = patchKidsWeek(args.patchWeek, cal, upcoming, slimAll);
-    const ok = syncEmbedded(week);
-    console.log(
-      `patched kids-week asOfIso=${week.asOfIso} · EMBEDDED ${ok ? "synced" : "SKIPPED"} · HD in week=${JSON.stringify(week.kids.dan.week).includes("HD #2209")}`
-    );
+    console.log(`patched kids-week asOfIso=${week.asOfIso} → ${args.patchWeek} (private, no EMBEDDED)`);
   }
 }
 
-main();
+/* run as a script (the refresh), not when a test imports cleanText */
+if (process.argv[1] && fs.existsSync(process.argv[1]) && fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url))) main();

@@ -26,6 +26,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { privPath, assertPrivateOut } from "./private-dir.mjs"; /* PRIVFEED2 */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -66,7 +67,7 @@ const STARTER = [
 
 function parseArgs(argv) {
   const out = {
-    outPath: path.join(ROOT, "data", "lights-live.json"),
+    outPath: privPath("lights-live.json"), /* PRIVFEED2 */
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
@@ -144,9 +145,10 @@ function attachWriteProxy(payload) {
 }
 
 function writeJson(outPath, payload) {
-  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  assertPrivateOut(outPath, "lights-live"); /* PRIVFEED2 · house device state never inside a git work tree */
+  fs.mkdirSync(path.dirname(outPath), { recursive: true, mode: 0o700 });
   const tmp = outPath + ".tmp";
-  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n");
+  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n", { mode: 0o600 });
   fs.renameSync(tmp, outPath);
 }
 

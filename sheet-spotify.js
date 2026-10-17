@@ -89,7 +89,7 @@
     body.classList.toggle("spw-playing", ph === "playing");
     body.classList.toggle("spw-paused", ph !== "playing");
     var pill = $("spw-pill");
-    pill.textContent = { loading: "…", playing: "LIVE", paused: "PAUSED", idle: "READY", need_app: "SETUP", need_auth: "CONNECT", no_key: "NEED KEY", bad_key: "NEED KEY", offline: "OFFLINE", error: "CHECK" }[ph] || "…";
+    pill.textContent = { loading: "…", playing: "LIVE", paused: "PAUSED", idle: "READY", need_app: "SETUP", need_auth: "CONNECT", no_key: "PAIR", bad_key: "PAIR", offline: "OFFLINE", error: "CHECK" }[ph] || "…";
     pill.classList.toggle("live", ph === "playing");
     glowT = ph === "playing" ? 1.06 : live ? 0.86 : 0.8;
 
@@ -103,7 +103,7 @@
     $("spw-hub").hidden = !live; $("spw-rooms").hidden = !live;
     var gb = $("spw-gate-btn"), msg = "", sub = "", btn = "";
     if (ph === "need_auth") { msg = "Connect your Spotify once. Then the wall, your phone and every House screen can play, skip and switch speakers."; btn = "Connect Spotify"; sub = "Opens Spotify sign-in, then comes right back here."; }
-    else if (ph === "no_key" || ph === "bad_key") { msg = ph === "bad_key" ? "This screen's house key didn't work." : "This screen needs the house key (same one the lights use)."; btn = "Add key"; sub = "Paste the setup link once. It stays on this screen."; }
+    else if (ph === "no_key" || ph === "bad_key") { msg = "This screen needs pairing."; btn = "How to pair"; sub = "On Dad's page, tap Pair a screen and scan the code with this screen."; }
     else if (ph === "offline") { msg = "The house box isn't answering right now."; btn = "Try again"; sub = "It comes back on its own — no need to do anything."; }
     else if (ph === "error") { msg = S.msg || "Spotify had a hiccup."; btn = "Try again"; sub = S.err === "not_allowlisted" ? "Spotify dashboard → your app → Settings → User Management → add your Spotify email." : S.err === "premium_required" ? "Playback control needs Spotify Premium on this account." : ""; }
     setText("spw-gate-msg", msg); setText("spw-gate-sub", sub); gb.textContent = btn; gb.hidden = !btn;

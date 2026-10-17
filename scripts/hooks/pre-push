@@ -1,13 +1,26 @@
 #!/usr/bin/env bash
-# DATAGUARD1 pre-push: a routine-style push to main may only carry data.
+# PRIVFEED1 pre-push: privacy-scan EVERY outgoing commit (any branch), then DATAGUARD1 for routine pushes to main.
+# Install (per clone): git config core.hooksPath scripts/hooks
+ROOT="$(git rev-parse --show-toplevel)"
+Z=0000000000000000000000000000000000000000
 while read -r lref lsha rref rsha; do
-  [[ "$rref" == "refs/heads/main" ]] || continue
-  [[ "$rsha" =~ ^0+$ ]] && continue
-  if git log --format=%s "$rsha..$lsha" | grep -qE 'data-only|LIGHTS-live|SENSIFRESH|NESTSTILL'; then
-    BAD="$(git diff --name-only "$rsha" "$lsha" | grep -Ev '^(data/|kids-week\.json$|kids-data\.js$|cal-live\.json$)')"
-    if [[ -n "$BAD" ]]; then
-      echo "DATAGUARD1 BLOCK: routine push carries code:" >&2; echo "$BAD" >&2; exit 1
-    fi
+  [[ "$lsha" == "$Z" ]] && continue   # branch delete
+  if [[ "$rsha" == "$Z" ]]; then
+    RANGE="$lsha --not --remotes"      # new branch: every commit not already on a remote branch
+    BASEREF="$(git merge-base "$lsha" origin/main 2>/dev/null || echo "$lsha")"
+  else
+    RANGE="$rsha..$lsha"; BASEREF="$rsha"
+  fi
+  node "$ROOT/scripts/privacy-scan.mjs" --range "$RANGE" || { echo "PRIVFEED1 BLOCK: private data in outgoing commits ($rref). Not pushing." >&2; exit 1; }
+  # PRIVFEED3 · every image in the pushed tree must be on the art allow-list (no camera stills / screenshots)
+  node "$ROOT/scripts/privacy-scan.mjs" --images --rev "$lsha" || { echo "PRIVFEED3 BLOCK: unlisted image in the pushed tree ($rref). Not pushing." >&2; exit 1; }
+  # PRIVFEED3 · every outgoing commit is authored AND committed by a GitHub noreply identity (no personal mail in history)
+  BADID="$(git log --format='%h %ae %ce' $RANGE | awk '$2 !~ /@users\.noreply\.github\.com$/ || $3 !~ /@users\.noreply\.github\.com$/ {print $1}')"
+  if [[ -n "$BADID" ]]; then echo "PRIVFEED3 BLOCK: commit(s) not authored/committed by a noreply identity: $(echo $BADID | tr '\n' ' ')" >&2; exit 1; fi
+  # DATAGUARD1 · a routine-style push to main carries no data files at all (PRIVFEED2: all house data is private)
+  if [[ "$rref" == "refs/heads/main" ]] && git log --format=%s $RANGE | grep -qE 'data-only|LIGHTS-live|SENSIFRESH|NESTSTILL'; then
+    BAD="$(git diff --name-only "$BASEREF" "$lsha" | grep -Ev '^$')"
+    if [[ -n "$BAD" ]]; then echo "DATAGUARD1 BLOCK: routine push carries non-public-data files:" >&2; echo "$BAD" >&2; exit 1; fi
   fi
 done
 exit 0

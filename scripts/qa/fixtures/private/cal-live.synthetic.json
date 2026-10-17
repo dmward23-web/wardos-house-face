@@ -1,0 +1,317 @@
+{
+ "status": "live",
+ "source": "Sample source 1",
+ "fetchedAt": "2026-10-17T02:50:13.031Z",
+ "tz": "America/Chicago",
+ "windowStart": "2026-10-09",
+ "windowEnd": "2026-10-23",
+ "asOfIso": "2026-10-16",
+ "nextLeave": {
+  "id": "Sample id 2",
+  "summary": "Sample summary 3",
+  "start": "2026-10-17T00:00:00-05:00",
+  "end": "2026-10-19T00:00:00-05:00",
+  "location": "Sample location 4",
+  "busy": false,
+  "allDay": true
+ },
+ "upcomingLeaves": [
+  {
+   "id": "Sample id 5",
+   "summary": "Sample summary 6",
+   "start": "2026-10-17T00:00:00-05:00",
+   "end": "2026-10-19T00:00:00-05:00",
+   "location": "Sample location 7",
+   "busy": false,
+   "allDay": true
+  },
+  {
+   "id": "Sample id 8",
+   "summary": "Sample summary 9",
+   "start": "2026-10-17T08:00:00-05:00",
+   "end": "2026-10-17T09:30:00-05:00",
+   "location": "Sample location 10",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 11",
+   "summary": "Sample summary 12",
+   "start": "2026-10-17T15:30:00-05:00",
+   "end": "2026-10-17T17:00:00-05:00",
+   "location": "Sample location 13",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 14",
+   "summary": "Sample summary 15",
+   "start": "2026-10-17T16:45:00-05:00",
+   "end": "2026-10-17T18:15:00-05:00",
+   "location": "Sample location 16",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 17",
+   "summary": "Sample summary 18",
+   "start": "2026-10-17T19:00:00-05:00",
+   "end": "2026-10-17T22:30:00-05:00",
+   "location": "Sample location 19",
+   "busy": true,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 20",
+   "summary": "Sample summary 21",
+   "start": "2026-10-18T05:25:00-05:00",
+   "end": "2026-10-18T07:05:00-05:00",
+   "location": "Sample location 22",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 23",
+   "summary": "Sample summary 24",
+   "start": "2026-10-18T16:30:00-05:00",
+   "end": "2026-10-18T21:00:00-05:00",
+   "location": "Sample location 25",
+   "busy": true,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 26",
+   "summary": "Sample summary 27",
+   "start": "2026-10-19T00:00:00-05:00",
+   "end": "2026-10-20T00:00:00-05:00",
+   "location": "Sample location 28",
+   "busy": false,
+   "allDay": true
+  },
+  {
+   "id": "Sample id 29",
+   "summary": "Sample summary 30",
+   "start": "2026-10-19T07:00:00-05:00",
+   "end": "2026-10-19T07:15:00-05:00",
+   "location": "Sample location 31",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 32",
+   "summary": "Sample summary 33",
+   "start": "2026-10-19T07:00:00-05:00",
+   "end": "2026-10-19T07:15:00-05:00",
+   "location": "Sample location 34",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 35",
+   "summary": "Sample summary 36",
+   "start": "2026-10-19T15:00:00-05:00",
+   "end": "2026-10-19T16:00:00-05:00",
+   "location": "Sample location 37",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 38",
+   "summary": "Sample summary 39",
+   "start": "2026-10-20T00:00:00-05:00",
+   "end": "2026-10-23T00:00:00-05:00",
+   "location": "Sample location 40",
+   "busy": false,
+   "allDay": true
+  },
+  {
+   "id": "Sample id 41",
+   "summary": "Sample summary 42",
+   "start": "2026-10-20T00:00:00-05:00",
+   "end": "2026-10-21T00:00:00-05:00",
+   "location": "",
+   "busy": false,
+   "allDay": true
+  },
+  {
+   "id": "Sample id 43",
+   "summary": "Sample summary 44",
+   "start": "2026-10-20T00:00:00-05:00",
+   "end": "2026-10-21T00:00:00-05:00",
+   "location": "Sample location 45",
+   "busy": false,
+   "allDay": true
+  },
+  {
+   "id": "Sample id 46",
+   "summary": "Sample summary 47",
+   "start": "2026-10-20T00:00:00-05:00",
+   "end": "2026-10-23T00:00:00-05:00",
+   "location": "Sample location 48",
+   "busy": false,
+   "allDay": true
+  },
+  {
+   "id": "Sample id 49",
+   "summary": "Sample summary 50",
+   "start": "2026-10-20T07:00:00-05:00",
+   "end": "2026-10-20T07:15:00-05:00",
+   "location": "Sample location 51",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 52",
+   "summary": "Sample summary 53",
+   "start": "2026-10-20T07:00:00-05:00",
+   "end": "2026-10-20T07:15:00-05:00",
+   "location": "Sample location 54",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 55",
+   "summary": "Sample summary 56",
+   "start": "2026-10-20T17:00:00-05:00",
+   "end": "2026-10-20T18:00:00-05:00",
+   "location": "Sample location 57",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 58",
+   "summary": "Sample summary 59",
+   "start": "2026-10-21T00:00:00-05:00",
+   "end": "2026-10-23T00:00:00-05:00",
+   "location": "Sample location 60",
+   "busy": false,
+   "allDay": true
+  },
+  {
+   "id": "Sample id 61",
+   "summary": "Sample summary 62",
+   "start": "2026-10-21T07:00:00-05:00",
+   "end": "2026-10-21T07:15:00-05:00",
+   "location": "Sample location 63",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 64",
+   "summary": "Sample summary 65",
+   "start": "2026-10-21T07:00:00-05:00",
+   "end": "2026-10-21T07:15:00-05:00",
+   "location": "Sample location 66",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 67",
+   "summary": "Sample summary 68",
+   "start": "2026-10-21T16:00:00-05:00",
+   "end": "2026-10-21T16:20:00-05:00",
+   "location": "Sample location 69",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 70",
+   "summary": "Sample summary 71",
+   "start": "2026-10-21T16:20:00-05:00",
+   "end": "2026-10-21T17:10:00-05:00",
+   "location": "Sample location 72",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 73",
+   "summary": "Sample summary 74",
+   "start": "2026-10-21T16:45:00-05:00",
+   "end": "2026-10-21T18:30:00-05:00",
+   "location": "Sample location 75",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 76",
+   "summary": "Sample summary 77",
+   "start": "2026-10-22T00:00:00-05:00",
+   "end": "2026-10-23T00:00:00-05:00",
+   "location": "",
+   "busy": false,
+   "allDay": true
+  },
+  {
+   "id": "Sample id 78",
+   "summary": "Sample summary 79",
+   "start": "2026-10-22T17:00:00-05:00",
+   "end": "2026-10-22T18:00:00-05:00",
+   "location": "Sample location 80",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 81",
+   "summary": "Sample summary 82",
+   "start": "2026-10-22T17:30:00-05:00",
+   "end": "2026-10-22T19:20:00-05:00",
+   "location": "Sample location 83",
+   "busy": false,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 84",
+   "summary": "Sample summary 85",
+   "start": "2026-10-23T00:00:00-05:00",
+   "end": "2026-10-24T00:00:00-05:00",
+   "location": "",
+   "busy": false,
+   "allDay": true
+  },
+  {
+   "id": "Sample id 86",
+   "summary": "Sample summary 87",
+   "start": "2026-10-23T00:00:00-05:00",
+   "end": "2026-10-24T00:00:00-05:00",
+   "location": "Sample location 88",
+   "busy": false,
+   "allDay": true
+  },
+  {
+   "id": "Sample id 89",
+   "summary": "Sample summary 90",
+   "start": "2026-10-23T06:55:00-05:00",
+   "end": "2026-10-23T09:55:00-05:00",
+   "location": "Sample location 91",
+   "busy": true,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 92",
+   "summary": "Sample summary 93",
+   "start": "2026-10-23T14:40:00-05:00",
+   "end": "2026-10-23T15:30:00-05:00",
+   "location": "Sample location 94",
+   "busy": true,
+   "allDay": false
+  },
+  {
+   "id": "Sample id 95",
+   "summary": "Sample summary 96",
+   "start": "2026-10-23T15:00:00-05:00",
+   "end": "2026-10-30T15:00:00-05:00",
+   "location": "Sample location 97",
+   "busy": false,
+   "allDay": false
+  }
+ ],
+ "boardStrip": {
+  "label": "Sample label 98",
+  "time": "12:00",
+  "place": "Sample place 99",
+  "detailHtml": "Sample detailHtml 100",
+  "badge": "Sat"
+ },
+ "error": null,
+ "_synthetic": "PRIVFEED1 synthetic fixture: structure only, no real names, places, codes or amounts"
+}

@@ -7,12 +7,18 @@
  *
  * Secrets (mode 600, never git):
  *   ~/.config/wardos/kasa.user + kasa.password
- *   ~/.config/wardos/lights-proxy.token  (optional auth; required for --lan)
+ *   ~/.config/wardos/lights-proxy.token  (REQUIRED · CAMLOCK1: no token, no start)
+ *
+ * CAMLOCK1 auth rules (the tunnel forwards from 127.0.0.1, so loopback proves nothing):
+ *   - no token configured  -> refuse to start (exit 3); there is no open or ephemeral mode
+ *   - every /api/* call needs the X-Lights-Proxy-Token header (or Bearer); no ?proxyToken
+ *   - Origin is NOT a key (any non-browser client can send it). The old NOKEY1 origin
+ *     shortcut is gone for good (PRIVFEED3, Atlas): there is no keyless mode at all.
+ *   - constant-time compare; X-Forwarded-For is never trusted
+ *   - public /health says only {ok, service}; details need the key
  *
  * Usage:
- *   node scripts/lights-write-proxy.mjs
- *   node scripts/lights-write-proxy.mjs --host 0.0.0.0 --port 8788 --lan
- *   LIGHTS_PROXY_TOKEN=… node scripts/lights-write-proxy.mjs --lan
+ *   node scripts/lights-write-proxy.mjs --host 127.0.0.1 --port 8788   (token from the file)
  *
  * Default bind: 127.0.0.1:8788
  * See ../LIGHTS-LIVE.md
@@ -21,10 +27,13 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import http from "node:http";
+import crypto from "node:crypto";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import * as sensi from "./sensi-control.mjs"; /* SENSICTL1 */
 import * as spotify from "./spotify-control.mjs"; /* SPOTIFY1 */
+import { handlePrivate, readTokens } from "./private-feed.mjs"; /* PRIVFEED1 */
+import { privPath, assertPrivateOut } from "./private-dir.mjs"; /* PRIVFEED2 */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -35,7 +44,7 @@ const DEFAULT_PYTHON =
   "/workspace/plates/2026-09-28/kasa-live/.venv/bin/python";
 const DEFAULT_WRITE = path.join(ROOT, "scripts", "kasa-write.py");
 const DEFAULT_DAEMON = path.join(ROOT, "scripts", "kasa-daemon.py");
-const LIVE_JSON = path.join(ROOT, "data", "lights-live.json");
+const LIVE_JSON = privPath("lights-live.json"); /* PRIVFEED2 · private folder, served via /api/private/lights-live.json */
 
 const ROSTER_IDS = new Set(["dining-room", "harris-room", "kitchen"]);
 
@@ -117,17 +126,10 @@ function saveTaps(taps) {
   fs.renameSync(tmp, TAPS_FILE);
 }
 
-/* NOKEY1 · the House Face itself (GitHub Pages origin) may use the everyday
-   house routes without a key: lights, chore taps, thermostat. Browsers set
-   Origin and pages cannot forge it, so no key/seed link lives on any screen.
-   Everything else (Spotify setup, etc.) still needs the token. */
+/* PRIVFEED3 · HOUSE_ORIGINS is used ONLY for CORS on the private feed. It is never a key (NOKEY1 removed). */
 const HOUSE_ORIGINS = new Set(
   (process.env.HOUSE_ORIGINS || "https://dmward23-web.github.io").split(",").map((s) => s.trim()).filter(Boolean)
 );
-/* LOCK2 · thermostat + Spotify always need the key. No-key (origin) is only lights + taps. */
-/* SPKEY1 · Spotify play/read/connect ride the house origin like lights (no key on any screen).
-   Spotify setup (client id) + disconnect still need the key. */
-const HOUSE_ROUTES = /^\/api\/(taps|lights(\/set)?|spotify(\/(browse|control|auth-start))?)$/;
 /* LOCK2 · rate limit no-key traffic (Origin is forgeable outside a browser). */
 const RL = new Map();
 function rateOk(bucket, limit, windowMs) {
@@ -139,7 +141,8 @@ function rateOk(bucket, limit, windowMs) {
   return true;
 }
 function clientIp(req) {
-  const ip = String(req.headers["cf-connecting-ip"] || req.headers["x-forwarded-for"] || req.socket.remoteAddress || "?").split(",")[0].trim();
+  /* CAMLOCK1 · cf-connecting-ip is set by Cloudflare at the edge; X-Forwarded-For is client-controlled */
+  const ip = String(req.headers["cf-connecting-ip"] || req.socket.remoteAddress || "?").split(",")[0].trim();
   /* IPv6 clients rotate inside their /48 — bucket by prefix */
   return ip.includes(":") ? ip.split(":").slice(0, 3).join(":") + "::/48" : ip;
 }
@@ -153,33 +156,54 @@ function houseRateCheck(req, pathname) {
   }
   return rateOk("tw:" + ip, 120, 60000) && rateOk("tw:all", 300, 60000) ? "" : "rate";
 }
-function hasKeyHeader(req, args) {
-  if (!args.authToken) return false;
-  const h = req.headers["x-lights-proxy-token"] || req.headers["x-nest-proxy-token"] || (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
-  return h === args.authToken;
+function safeEq(a, b) {
+  const x = crypto.createHash("sha256").update(String(a)).digest();
+  const y = crypto.createHash("sha256").update(String(b)).digest();
+  return crypto.timingSafeEqual(x, y);
 }
-function houseOrigin(req) {
+export function hasKeyHeader(req, args) {
+  if (!args.authToken) return false;
+  const h = String(req.headers["x-lights-proxy-token"] || req.headers["x-nest-proxy-token"] ||
+    (req.headers.authorization || "").replace(/^Bearer\s+/i, ""));
+  if (!h) return false;
+  return safeEq(h, args.authToken);
+}
+export function houseOrigin(req) {
   return HOUSE_ORIGINS.has(String(req.headers.origin || ""));
 }
 
-function checkAuth(req, args) {
-  try {
-    const p = new URL(req.url || "/", "http://x").pathname;
-    if (hasKeyHeader(req, args)) return true;
-    if (houseOrigin(req) && HOUSE_ROUTES.test(p)) { req._noKey = true; return true; }
-  } catch { /* fall through */ }
-  // Always require token when set (even on localhost) so tunnel cannot be open.
-  if (!args.authToken) {
-    // localhost without token only when not --lan
-    return !args.lan;
-  }
-  const h =
-    req.headers["x-lights-proxy-token"] ||
-    req.headers["x-nest-proxy-token"] ||
-    (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
-  const u = new URL(req.url || "/", "http://x");
-  const q = u.searchParams.get("proxyToken") || u.searchParams.get("lightsProxyToken");
-  return h === args.authToken || q === args.authToken;
+/* CAMLOCK1 + PRIVFEED3 · device key header ONLY. No token configured means deny (main() refuses to start anyway).
+   Never trusts Origin, loopback, X-Forwarded-For or a ?proxyToken query. There is no keyless mode. */
+export function checkAuth(req, args) {
+  if (!args || !args.authToken) return false;
+  return hasKeyHeader(req, args);
+}
+
+/* PRIVFEED3 · QR pairing (Atlas-approved design b). A paired Dad screen asks (with the key) for a one-time code;
+   the new screen trades the code for the device key. Codes: 128-bit random, single use, 5-minute expiry, held in
+   memory only (sha256 of the code; a restart forgets them all). /api/pair is rate limited per client and house-wide. */
+export const PAIR_TTL_MS = 5 * 60 * 1000;
+const PAIR = new Map(); /* sha256(code) -> { exp } */
+const pairHash = (c) => crypto.createHash("sha256").update(String(c)).digest("hex");
+export function pairMint(now = Date.now()) {
+  for (const [h, v] of PAIR) if (v.exp <= now) PAIR.delete(h);
+  if (PAIR.size >= 10) { const oldest = [...PAIR.entries()].sort((a, b) => a[1].exp - b[1].exp)[0]; if (oldest) PAIR.delete(oldest[0]); }
+  const code = crypto.randomBytes(16).toString("base64url");
+  PAIR.set(pairHash(code), { exp: now + PAIR_TTL_MS });
+  return { code, expiresAt: new Date(now + PAIR_TTL_MS).toISOString(), ttlSec: Math.round(PAIR_TTL_MS / 1000) };
+}
+/** "ok" | "invalid" (wrong, used or expired all look the same to the caller) */
+export function pairCodeShape(code) { return typeof code === "string" && /^[A-Za-z0-9_-]{22}$/.test(code); } /* 16 random bytes, base64url */
+export function pairRedeem(code, now = Date.now()) {
+  if (!pairCodeShape(code)) return "invalid";
+  const h = pairHash(code), v = PAIR.get(h);
+  if (!v) return "invalid";
+  PAIR.delete(h); /* single use: gone on first try, even if expired */
+  return v.exp > now ? "ok" : "invalid";
+}
+function pairRateOk(req) {
+  const ip = clientIp(req);
+  return rateOk("pair:" + ip, 5, 60000) && rateOk("pair:all", 20, 60000);
 }
 
 function hasKasaCreds() {
@@ -389,16 +413,10 @@ async function main() {
   if (!args.authToken) {
     args.authToken = readText(args.tokenFile) || "";
   }
-  if (args.lan && !args.authToken) {
-    args.authToken =
-      "lights-" +
-      Math.random().toString(36).slice(2, 12) +
-      Math.random().toString(36).slice(2, 8);
-    console.warn("WARN: --lan without token — generated ephemeral: " + args.authToken);
-  }
-  // Prefer always-auth when token file exists (tunnel-safe)
-  if (!args.authToken) {
-    console.warn("WARN: no lights-proxy.token — localhost API open (no auth)");
+  /* CAMLOCK1 · no token, no start. No ephemeral token, no open localhost mode. */
+  if (!args.authToken || args.authToken.length < 16) {
+    console.error("FATAL: CAMLOCK1 · no auth token (need LIGHTS_PROXY_TOKEN or " + args.tokenFile + ", 16+ chars). Refusing to start.");
+    process.exit(3);
   }
 
   if (!fs.existsSync(args.python)) {
@@ -414,9 +432,20 @@ async function main() {
     process.exit(2);
   }
 
+  /* PRIVFEED1 · private calendar / kids-week / cam stills: token ALWAYS required (never the no-key house origin) */
+  const privTokens = readTokens([args.tokenFile, path.join(os.homedir(), ".config", "wardos", "private-feed.token")]);
+  if (args.authToken && !privTokens.includes(args.authToken)) privTokens.push(args.authToken);
+
   const server = http.createServer(async (req, res) => {
-    const u = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
+    /* PRIVFEED3 · never build a URL from the Host header; a bad request line is a 400, never a crash */
+    let u;
+    try { u = new URL(req.url || "/", "http://proxy.invalid"); } catch { return json(res, 400, { error: "bad request" }); }
     const pathname = u.pathname;
+
+    if (pathname.startsWith("/api/private/")) {
+      handlePrivate(req, res, { tokens: privTokens, origins: HOUSE_ORIGINS });
+      return;
+    }
 
     if (req.method === "OPTIONS") {
       res.writeHead(204, {
@@ -430,6 +459,8 @@ async function main() {
 
     try {
       if (pathname === "/health" || pathname === "/api/health") {
+        /* CAMLOCK1 · public health says nothing beyond ok + service name (the wall's probe needs it) */
+        if (!hasKeyHeader(req, args)) return json(res, 200, { ok: true, service: "lights-write-proxy" });
         return json(res, 200, {
           ok: true,
           service: "lights-write-proxy",
@@ -460,13 +491,34 @@ async function main() {
         }
       }
 
+      /* PRIVFEED3 · trade a one-time pairing code for the device key (no key needed; rate limited; single use) */
+      if (pathname === "/api/pair" && req.method === "POST") {
+        /* HUBPIN1 · junk never touches the house-wide pairing bucket: a malformed code gets 400 and only counts in its
+           own per-IP junk bucket, so nobody can block real pairing by spraying garbage */
+        const body = await readBody(req).catch(() => ({}));
+        const code = body && body.code;
+        if (!pairCodeShape(code)) {
+          if (!rateOk("pairjunk:" + clientIp(req), 30, 60000)) return json(res, 429, { ok: false, error: "slow down" });
+          return json(res, 400, { ok: false, error: "pair_malformed", message: "That is not a pairing code." });
+        }
+        if (!pairRateOk(req)) return json(res, 429, { ok: false, error: "slow down" });
+        const r = pairRedeem(code);
+        if (r !== "ok") { console.log(`[pair] ${new Date().toISOString()} refused`); return json(res, 401, { ok: false, error: "pair_invalid", message: "Code expired, used or wrong. Ask Dad for a new code." }); }
+        console.log(`[pair] ${new Date().toISOString()} screen paired`);
+        return json(res, 200, { ok: true, key: args.authToken });
+      }
+
       if (!checkAuth(req, args)) {
         return json(res, 401, {
-          error: "unauthorized · need X-Lights-Proxy-Token / ?proxyToken=",
+          error: "unauthorized", locked: true,
         });
       }
-      if (req._noKey && houseRateCheck(req, pathname)) {
-        return json(res, 429, { error: "slow down" });
+
+      /* PRIVFEED3 · mint a pairing code: device key required (checked above), Dad page only */
+      if (pathname === "/api/pair/mint" && req.method === "POST") {
+        const m = pairMint();
+        console.log(`[pair] ${new Date().toISOString()} code minted (expires ${m.expiresAt})`);
+        return json(res, 200, { ok: true, ...m });
       }
 
       /* TAPSYNC1 · kids chore taps shared across every device (same key + tunnel) */
@@ -683,7 +735,10 @@ async function main() {
   });
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+/* CAMLOCK1 · run only when invoked directly so tests can import checkAuth */
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}

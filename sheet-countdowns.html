@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<script src="house-hub.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-pair.js?v=HUBPIN1"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -306,7 +310,7 @@
  <header class="hdr hdr--clockfirst">
  <div class="hdr-left-col">
  <div class="live-clock-host" aria-label="America/Chicago time">
- <div class="board-clock live-clock" data-live="time" data-live-clock>—:—</div>
+ <div class="board-clock live-clock" data-live="time" data-live-clock></div>
  </div>
  <div class="hdr-micros">
  
@@ -321,7 +325,7 @@
  <div class="cheer-body">
  <div class="cheer-main">
  <div class="cheer-label">Countdown</div>
- <div class="cheer-title">Hayes birthday · <span class="hl"></span></div>
+ <div class="cheer-title"><span data-bday-who></span> birthday · <span class="hl"></span></div>
  <div class="cheer-sub"></div>
  </div>
  <div class="cheer-badges"><div class="cheer-badge">BDAY</div><div class="cheer-badge">STREAK</div></div>
@@ -329,14 +333,14 @@
  </section>
 
  <div class="body">
- <section class="sec" aria-label="Hayes birthday countdown" data-glass-bday hidden style="display:none">
+ <section class="sec" aria-label="Birthday countdown" data-glass-bday hidden style="display:none">
  <div class="sec-hdr">
  <div class="sec-title">Birthday countdown</div>
  <div class="sec-meta"></div>
  </div>
  <div class="bday">
  <div class="lbl">Counting down</div>
- <div class="who"><span>Hayes</span> birthday</div>
+ <div class="who"><span data-bday-who></span> birthday</div>
  <div class="when"></div>
  <div class="count-row">
  <div class="count-box"><div class="n"></div><div class="u"></div></div>
@@ -380,8 +384,8 @@
  </footer>
 </div>
 
-<script src="house-clock.js?v=SHEETCLK3"></script>
-<script src="house-board-strip.js?v=GATE3WRAP1"></script>
+<script src="house-clock.js?v=PRIVFEED3"></script>
+<script src="house-board-strip.js?v=PRIVFEED3"></script>
 <script src="house-glass-bind.js?v=AUDIT1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>

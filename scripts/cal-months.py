@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Build data/cal-months.json (month view) from calendar dump pages.
+"""Build cal-months.json (month view) from calendar dump pages into the box-only private folder (PRIVFEED1).
 
-Usage: cal-months.py OUT.json PAGE.json [PAGE.json ...]
+Usage: cal-months.py --private PAGE.json [PAGE.json ...]   (writes $WARDOS_PRIVATE_DIR/cal-months.json)
+       cal-months.py OUT.json PAGE.json [...]             (OUT must be outside any git work tree)
 Pages: Google Calendar MCP search output ({"events":[...]}) or Google API
 shape ({"items":[...]} / list). Only start/end/summary are used; descriptions
 and locations never leave this script. Summaries are scrubbed with
@@ -11,7 +12,14 @@ import json, os, re, sys, datetime as dt
 from zoneinfo import ZoneInfo
 
 TZ = ZoneInfo("America/Chicago")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from private_dir import priv_path, assert_private_out
+from text_law import clean_text, names_path   # NAMESDIR1 names_path · PRIVFEED3 · TEXTLAW2: one shared rules file (scripts/text-law.json) with cal-from-events.mjs
+# PRIVFEED3 · LAW8C1: colour-day / dress-up rows never reach the month view (same regex as house-face-law.js / calendar-refresh.mjs)
+DRESS = re.compile(r"\b(?:orange|red|blue|green|pink|purple|yellow|black|white|gold|maroon|colou?r|crazy hair|pajamas?|pj|twin|hat|jersey|spirit|outsiders)\s+day\b|dress[- ]?up|spirit\s+week|\bwear\b|\bcostume|\bpajama", re.I)
 out, pages = sys.argv[1], sys.argv[2:]
+if out == "--private": out = priv_path("cal-months.json")
+if out != "--reclean-private": assert_private_out(out, "cal-months")
 
 fp = os.path.expanduser("~/.config/wardos/privacy-scrub.tsv")
 if not os.path.exists(fp):
@@ -22,11 +30,34 @@ for line in open(fp):
     if not line or line.startswith("#"): continue
     rx, _, rep = line.partition("\t")
     RULES.append((re.compile(rx, re.I), rep))
-BLOCK = re.compile(r"midwest anxiety|bonebrake|\brandy\b|therap|counsel", re.I)
+# PRIVFEED1 · provider / person names live in ~/.config/wardos/privacy-block.txt (one regex per line, never in git)
+_bf = os.path.expanduser("~/.config/wardos/privacy-block.txt")
+_bx = [l.strip() for l in open(_bf) if l.strip() and not l.startswith("#")] if os.path.exists(_bf) else []
+BLOCK = re.compile("|".join(_bx + [r"therap", r"counsel"]), re.I)
+
+def _names_early(role):
+    fp2 = names_path()
+    if not os.path.exists(fp2): return []
+    return [l.rstrip("\n").split("\t", 1)[1].strip() for l in open(fp2, encoding="utf-8")
+            if "\t" in l and not l.startswith("#") and l.split("\t", 1)[0].strip().lower() == role and l.split("\t", 1)[1].strip()]
+_CP = "|".join(re.escape(n) for n in _names_early("coparent"))
+# THEIRMOM1 on the box (PRIVFEED1): the co-parent's name never reaches any label; the client no longer carries it.
+COPARENT_RULES = [(re.compile(rf"pickup at (?:{_CP})'s", re.I), "pickup at their mom's"), (re.compile(rf"\bto (?:{_CP})\b", re.I), "to their mom"),
+                  (re.compile(rf"\b(?:{_CP})'s", re.I), "their mom's"), (re.compile(rf"\b(?:{_CP})\b", re.I), "their mom")] if _CP else []
 
 def scrub(s):
-    for rx, rep in RULES: s = rx.sub(rep, s)
+    for rx, rep in RULES + COPARENT_RULES: s = rx.sub(rep, s)
     return re.sub(r"\s{2,}", " ", s).strip()
+
+if out == "--reclean-private" or (len(sys.argv) > 1 and sys.argv[1] == "--reclean-private"):
+    # PRIVFEED1 · re-apply scrub to labels of the private cal-months in place (withDan/order untouched)
+    tgt = priv_path("cal-months.json"); doc = json.load(open(tgt, encoding="utf-8")); n = 0
+    for day in doc.get("days", {}).values():
+        for it in day.get("items", []):
+            l = clean_text(scrub(it.get("l", ""))); n += l != it.get("l"); it["l"] = l
+        day["items"] = [it for it in day.get("items", []) if it.get("l") and not DRESS.search(it["l"])]
+    json.dump(doc, open(tgt, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+    print(f"cal-months --reclean-private: {n} labels changed"); sys.exit(0)
 
 def norm(x):
     s = x.get("start"); e = x.get("end")
@@ -45,13 +76,22 @@ for p in pages:
         ev[i] = (summ, s, e, allday)
 
 SKIP = re.compile(r"^(atlas:|get\b|buy\b|backup\b|free\b|kids — pack)", re.I)
-DAN_KEEP = re.compile(r"✈|\bWN\d|#[A-Z0-9]{6}|DRIVE|Nashville|Erin", re.I)
+def _names(role):
+    fp = names_path()
+    if not os.path.exists(fp): return []
+    return [l.rstrip("\n").split("\t", 1)[1] for l in open(fp, encoding="utf-8")
+            if "\t" in l and not l.startswith("#") and l.split("\t", 1)[0].strip().lower() == role]
+DAN_KEEP = re.compile("|".join([r"✈", r"\bWN\d", r"#[A-Z0-9]{6}", r"DRIVE", r"Nashville"] + [re.escape(n.strip()) for n in _names("partner") if n.strip()]), re.I)
 FLIGHT = re.compile(r"✈|\bWN\d|#[A-Z0-9]{6}|DRIVE\b", re.I)
 LOW = re.compile(r"specials|drop-off|pickup|spirit day", re.I)
 HAS_TIME = re.compile(r"\b\d{1,2}:\d{2}")
 
+_OF = [re.escape(n.strip()) for n in _names("otherfamily") if n.strip()]
+_OTHER = re.compile(r"\bHayes (?:" + "|".join(_OF) + r")\b") if _OF else None
 def kid(summ):
-    s = re.sub(r"Hayes Johnson|Johnson Kids", "", summ)
+    # another family's kids / the other Hayes: surnames come from private-names.tsv role "otherfamily" (never in git)
+    s = re.sub(_OTHER, "", summ) if _OTHER else summ
+    s = re.sub(r"\b(?!Ward\b)[A-Z][a-z]+ Kids\b", "", s)
     names = [k for k, rx in (("ain", r"\bAinsley\b"), ("hay", r"\bHayes\b"), ("har", r"\bHarris\b")) if re.search(rx, s)]
     if len(names) > 1 or re.match(r"^(Kids|Ward Kids)\b", s): return "shr"
     return names[0] if names else None
@@ -82,6 +122,8 @@ for i, (summ, s, e, allday) in ev.items():
     elif allday or not c: c = c if (c and not allday) else "aware"
     if not allday and (d1 - d0).days <= 1 and not HAS_TIME.search(label) and not LOW.search(label):
         label = f"{label} · {hm(t0)}"
+    label = clean_text(label)   # PRIVFEED3 · TEXTLAW2: words only, after the row is classed on the raw title (withDan untouched)
+    if not label or DRESS.search(label): continue   # LAW8C1
     pri = 0 if c == "flight" else (3 if c == "aware" else (2 if LOW.search(label) else 1))
     sort = (t0.hour * 60 + t0.minute) if t0 else -1
     d = d0

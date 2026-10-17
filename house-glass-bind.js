@@ -103,8 +103,9 @@
     });
   }
 
-  /* ── sheet-us · next shared leave-by from cal-live (Erin / Nashville / Harbor) ── */
-  var US_RE = /\b(Erin|Nashville|Harbor Cove|together)\b/i;
+  /* ── sheet-us · next shared leave-by from cal-live. PRIVFEED1 · the box marks shared events (e.us) from the
+     private names file, so no name or place lives in this public file. ── */
+  function isUs(e) { return !!(e && (e.us || /\btogether\b/i.test(e.summary || ""))); }
   function paintUsLeave(cal) {
     var h = H();
     var card = document.querySelector("[data-glass-us-leave]");
@@ -114,7 +115,7 @@
     var badge = card.querySelector(".leaveby-badge");
     var now = Date.now();
     var list = cal ? h.listEvents(cal) : [];
-    var next = list.filter(function (e) { return !e.allDay && h.eventStartMs(e) > now && US_RE.test(e.summary || ""); })
+    var next = list.filter(function (e) { return !e.allDay && h.eventStartMs(e) > now && isUs(e); })
       .sort(function (a, b) { return h.eventStartMs(a) - h.eventStartMs(b); })[0];
     if (!next) {
       if (main) main.textContent = "Nothing shared next on the calendar";
@@ -134,8 +135,8 @@
     if (badge) { badge.textContent = p ? DOW[p.dow] : ""; show(badge, !!p); }
   }
 
-  /* ── sheet-countdowns · Hayes birthday from cal-live, days from the clock ── */
-  var BDAY_RE = /^Hayes birthday\b/i;
+  /* ── sheet-countdowns · next kid birthday from the private cal-live, days from the clock (PRIVFEED2: no name in markup) ── */
+  var BDAY_RE = /^(Ainsley|Hayes|Harris)(?:'s)? birthday\b/i;
   function paintCountdown(cal) {
     var h = H();
     var sec = document.querySelector("[data-glass-bday]");
@@ -146,6 +147,9 @@
       return BDAY_RE.test(e.summary || "") && h.eventDayIso(e) >= today;
     }).sort(function (a, b) { return h.eventStartMs(a) - h.eventStartMs(b); })[0];
     if (!ev) { show(sec, false); if (cheer) show(cheer, false); return; }
+    var who = (BDAY_RE.exec(ev.summary || "") || [])[1] || "";
+    who = who ? who.charAt(0).toUpperCase() + who.slice(1).toLowerCase() : "";
+    [].forEach.call(document.querySelectorAll("[data-bday-who]"), function (el) { el.textContent = who; });
     var iso = h.eventDayIso(ev), p = isoParts(iso), n = dayDiff(today, iso);
     if (!p || n == null) { show(sec, false); if (cheer) show(cheer, false); return; }
     var mdy = MON[p.mo - 1] + " " + p.d;

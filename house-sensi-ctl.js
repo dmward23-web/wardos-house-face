@@ -18,7 +18,7 @@
   function token() { try { return localStorage.getItem(TOKEN_LS) || ""; } catch (e) { return ""; } }
   function headers() {
     var h = { "Content-Type": "application/json", Accept: "application/json" }, t = token();
-    if (t) { h["X-Lights-Proxy-Token"] = t; h.Authorization = "Bearer " + t; }
+    if (t && global.HouseHub && HouseHub.okForKey(base())) { h["X-Lights-Proxy-Token"] = t; h.Authorization = "Bearer " + t; } /* HUBPIN1 */
     return h;
   }
   function api(path, body) {
@@ -75,7 +75,7 @@
   }
   function row(k, v) {
     return '<div class="sctl-row" data-k="' + k + '"><button type="button" data-d="-1" aria-label="' + k + ' down">−</button>'
-      + '<div style="text-align:center"><div class="lab">' + (k === "heat" ? "Heat to" : "Cool to") + '</div><div class="val">' + (v == null ? "—" : v + "°") + "</div></div>"
+      + '<div style="text-align:center"><div class="lab">' + (k === "heat" ? "Heat to" : "Cool to") + '</div><div class="val">' + (v == null ? "Not set" : v + "°") + "</div></div>"
       + '<button type="button" data-d="1" aria-label="' + k + ' up">+</button></div>';
   }
   function paint() {
@@ -155,7 +155,7 @@
     root = document.createElement("div");
     root.className = "sctl-back";
     root.innerHTML = '<div class="sctl" role="dialog" aria-label="Thermostat"><div class="sctl-top"><div class="sctl-kick">Thermostat</div><button type="button" class="sctl-x" aria-label="Close">×</button></div>'
-      + '<div class="sctl-in">—</div><div class="sctl-body"></div><div class="sctl-msg"></div></div>';
+      + '<div class="sctl-in"></div><div class="sctl-body"></div><div class="sctl-msg"></div></div>';
     document.body.appendChild(root);
     root.addEventListener("click", function (e) {
       if (e.target === root || e.target.closest(".sctl-x")) return close();

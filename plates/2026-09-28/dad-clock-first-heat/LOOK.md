@@ -45,7 +45,7 @@ Palette: void `#0a0908` / `#010205` + amber `#f5c446` / `#ffe894` / `#b85a28`.
 |--------------|------------|
 | Leave by · Next · Today · This week · Leave-bys · Picks | Setlist · Track · Encore · LOADOUT · DROP · VICTORY (corn) |
 | Kid names (Harris · Hayes · Ainsley) | Desk cash · Ledger · Harbor drafts · inventing $ |
-| Dad week · @ 147th · known / empty = unknown | Weather words · “CT” label · brand tagline |
+| Dad week · at home · known / empty = unknown | Weather words · “CT” label · brand tagline |
 | Home · Week (nav) | Duplicate eyebrow spam |
 
 ---

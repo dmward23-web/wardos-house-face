@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# PRIVFEED1 pre-commit: the repo is PUBLIC. Block any staged file that carries private data.
+# Install (per clone): git config core.hooksPath scripts/hooks
+# Prints category + path:line only, never the value. Names list: ~/.config/wardos (private-names.tsv, privacy-denylist.txt).
+ROOT="$(git rev-parse --show-toplevel)"
+node "$ROOT/scripts/privacy-scan.mjs" --staged || {
+  echo "PRIVFEED1 BLOCK: private data in staged files. Move it to the private folder (~/.local/share/wardos-private) and re-stage." >&2
+  exit 1
+}

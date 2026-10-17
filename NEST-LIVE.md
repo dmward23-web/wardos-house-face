@@ -38,13 +38,14 @@ sheet-google-home.html polls every ~60s
 
 ### Pages stills (NESTSTILL1)
 
-Phone/Pages cannot talk to `127.0.0.1:8787` on the Atlas box. Capture frames on the box, commit jpgs:
+Phone/Pages cannot talk to `127.0.0.1:8787` on the Atlas box. Capture frames on the box; since PRIVFEED1 the stills
+stay in the box-only private folder (`~/.local/share/wardos-private/nest-snaps`) and devices fetch them from the hub
+(`/api/private/nest/<cam>.jpg`, device token required). **Never commit camera stills: the repo is public.**
 
 ```bash
 # proxy + chrome CDP already running (or start them)
 node scripts/nest-webrtc-still.mjs --cams "Front,Garage,Backyard"
-git add data/nest-snaps/*.jpg data/nest-live.json
-git commit -m "NESTSTILL · refresh snaps" && git push
+# no git: stills land in the private folder only
 ```
 
 Pad thumbnails read `snapshotUrl` from `data/nest-live.json`. Live video remains box-local (`http://127.0.0.1:8787/nest-webrtc.html`) or LAN `?proxy=` when `--lan` is reachable.

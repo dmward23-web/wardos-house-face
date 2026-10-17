@@ -62,7 +62,7 @@
         live: false,
         hasSnaps: false,
         needToken: false,
-        label: "STUB · NO JSON",
+        label: "Cameras offline", /* HUBPIN1 · plain empty state */
         reason: "missing nest-live.json",
         deviceCount: 0,
       };
@@ -73,7 +73,7 @@
         hasSnaps: false,
         needToken: true,
         label: "NEED TOKEN",
-        reason: data.error || "need SDM token",
+        reason: data.error || "cameras offline",
         deviceCount: 0,
       };
     }
@@ -133,7 +133,7 @@
       live: false,
       hasSnaps: false,
       needToken: false,
-      label: "STUB",
+      label: "Cameras offline",
       reason: "unknown status",
       deviceCount: 0,
     };
@@ -262,7 +262,7 @@
       } else if (g.live) {
         zoneMeta.textContent = g.deviceCount + " cams · LIVE · still pending";
       } else if (g.needToken) {
-        zoneMeta.textContent = "4 pads · STUB · need SDM token";
+        zoneMeta.textContent = "Cameras offline";
       } else {
         zoneMeta.textContent = g.label;
       }
@@ -279,13 +279,8 @@
           g.deviceCount +
           " cams · <strong>tap pad → WebRTC video</strong> (nestProxy from live JSON) · SDM tokens off Pages · " +
           DOCS;
-      } else if (g.needToken) {
-        path.innerHTML =
-          "WORKING path staged · no fake LIVE video · hand Atlas Nest refresh_token via secret-request → <code>~/.config/wardos/nest-refresh.token</code> + <code>nest-sdm.json</code> · see <code>" +
-          DOCS +
-          "</code>";
       } else {
-        path.textContent = g.label + (g.reason ? " · " + g.reason : "") + " · " + DOCS;
+        path.textContent = "Cameras offline"; /* HUBPIN1 · no dev paths on glass */
       }
     }
 
@@ -303,18 +298,9 @@
           "</code>.";
       } else if (g.needToken) {
         note.innerHTML =
-          "<strong>Cams = STUB (need token).</strong> Stage ready: <code>scripts/nest-fetch.mjs</code> + <code>" +
-          DOCS +
-          "</code>. Dan: enable Google Device Access (SDM) → hand Atlas refresh_token via <em>secret-request</em> (masked). Until then pads stay honest STUB — no invented video.";
+          "<strong>Cameras offline.</strong> No video until the camera feed is back."; /* HUBPIN1 · plain empty state */
       } else {
-        note.innerHTML =
-          "<strong>Cams = " +
-          g.label +
-          ".</strong> " +
-          (g.reason || "") +
-          " · see <code>" +
-          DOCS +
-          "</code>.";
+        note.innerHTML = "<strong>Cameras offline.</strong> No video until the camera feed is back.";
       }
     }
 
@@ -355,10 +341,10 @@
           liveEl.innerHTML = "<i></i>LIVE · NO STILL";
         } else if (g.needToken) {
           liveEl.className = "cam-live stub";
-          liveEl.innerHTML = "<i></i>STUB · NO FEED";
+          liveEl.innerHTML = "<i></i>Offline";
         } else {
           liveEl.className = "cam-live stub";
-          liveEl.innerHTML = "<i></i>" + (g.label || "STUB");
+          liveEl.innerHTML = "<i></i>" + (g.label || "Offline");
         }
       }
 
@@ -378,8 +364,12 @@
             img.decoding = "async";
             feed.insertBefore(img, feed.firstChild);
           }
-          if (img.getAttribute("src") !== cam.snapshotUrl) img.src = cam.snapshotUrl;
-          if (glyph) glyph.style.display = "none";
+          if (/(^|\/)data\/nest-snaps\//.test(cam.snapshotUrl)) { /* PRIVFEED3 · private still: feed only */
+            var PF2 = window.PrivateFeed;
+            if (PF2 && PF2.canSnap && PF2.canSnap()) { if (img._pfSnap !== cam.snapshotUrl) { img._pfSnap = cam.snapshotUrl; PF2.bindSnap(img, cam.snapshotUrl); } }
+            else { img.remove(); img = null; if (glyph) glyph.style.display = ""; }
+          } else if (img.getAttribute("src") !== cam.snapshotUrl) img.src = cam.snapshotUrl;
+          if (img && glyph) glyph.style.display = "none";
         } else {
           if (img) img.remove();
           if (glyph) glyph.style.display = "";
@@ -392,7 +382,7 @@
     if (bannerTitle) {
       if (g.live && g.hasSnaps) bannerTitle.textContent = "Climate + Nest cams LIVE";
       else if (g.live) bannerTitle.textContent = "Climate LIVE · Nest LIVE · still pending";
-      else bannerTitle.textContent = "Climate LIVE glass · Nest cams STUB";
+      else bannerTitle.textContent = "Cameras offline";
     }
     wirePadClicks(root);
 
@@ -439,12 +429,17 @@
   }
 
   /** Optional override: seed proxy URL/token from ?proxy= into localStorage. */
+  /** HUBPIN1 · a link can no longer set the camera proxy (?proxy= / ?nestProxy= ignored). Legacy key seed only:
+      16+ chars, stripped from the address bar at once. */
   function ingestProxyFromQuery() {
     try {
-      var p = qs("proxy") || qs("nestProxy");
       var t = qs("proxyToken") || qs("nestProxyToken") || qs("token");
-      if (p) localStorage.setItem(PROXY_LS_KEY, String(p).replace(/\/$/, ""));
-      if (t) localStorage.setItem(PROXY_TOKEN_LS_KEY, String(t));
+      if (t) {
+        if (/^[A-Za-z0-9_-]{16,}$/.test(t)) localStorage.setItem(PROXY_TOKEN_LS_KEY, String(t));
+        var u = new URL(location.href);
+        ["proxyToken", "nestProxyToken", "token"].forEach(function (k) { u.searchParams.delete(k); });
+        history.replaceState(null, "", u.pathname + u.search + u.hash);
+      }
     } catch (e) { /* */ }
   }
 
@@ -452,54 +447,25 @@
    * NESTVID1: after live JSON loads, if LS empty and JSON has a public nestProxy
    * (+ token), persist once. Never persist loopback on Pages.
    */
-  function ingestProxyFromLive(data) {
-    if (!data) return;
-    try {
-      var wp = data.nestProxy ? String(data.nestProxy).replace(/\/$/, "") : "";
-      var tok = data.nestProxyToken ? String(data.nestProxyToken) : "";
-      if (!wp || (isPagesHost() && isLoopbackProxy(wp))) return;
-      // PROXYFOLLOW1: the tunnel address can change when Atlas's computer
-      // restarts; always follow the newest public address from live JSON.
-      if (/^https:\/\//i.test(wp) || !localStorage.getItem(PROXY_LS_KEY)) {
-        if (localStorage.getItem(PROXY_LS_KEY) !== wp) localStorage.setItem(PROXY_LS_KEY, wp);
-      }
-      if (tok && !localStorage.getItem(PROXY_TOKEN_LS_KEY)) {
-        localStorage.setItem(PROXY_TOKEN_LS_KEY, tok);
-      }
-    } catch (e) { /* */ }
-  }
+  /** HUBPIN1 · the camera proxy address comes from HouseHub only; data files cannot move it. */
+  function ingestProxyFromLive(data) { return; }
 
-  function proxyBaseGuess() {
+  function proxyBaseGuess() { /* HUBPIN1 · built-in camera host (allow-list), box previews may use the local proxy */
     ingestProxyFromQuery();
-    var fromQs = qs("proxy") || qs("nestProxy");
-    if (fromQs) return String(fromQs).replace(/\/$/, "");
-    try {
-      var saved = localStorage.getItem(PROXY_LS_KEY);
-      if (saved) {
-        var lsUrl = String(saved).replace(/\/$/, "");
-        if (!(isPagesHost() && isLoopbackProxy(lsUrl))) return lsUrl;
-      }
-    } catch (e) {}
-    var data = cachedData();
-    if (data && data.nestProxy) {
-      var wp = String(data.nestProxy).replace(/\/$/, "");
-      if (!(isPagesHost() && isLoopbackProxy(wp))) return wp;
-    }
-    // On Pages/phone, do NOT default to 127.0.0.1 (that is the phone).
-    if (isPagesHost()) return "";
-    return DEFAULT_PROXY;
+    var H = window.HouseHub;
+    if (!H) return "";
+    var b = H.cams();
+    if (!b && H.okForKey(DEFAULT_PROXY)) b = String(DEFAULT_PROXY).replace(/\/$/, "");
+    return b;
   }
 
   function proxyTokenGuess() {
     ingestProxyFromQuery();
-    var fromQs = qs("proxyToken") || qs("nestProxyToken") || qs("token");
-    if (fromQs) return String(fromQs);
-    try {
-      var ls = localStorage.getItem(PROXY_TOKEN_LS_KEY);
-      if (ls) return String(ls);
-    } catch (e) {}
-    var data = cachedData();
-    if (data && data.nestProxyToken) return String(data.nestProxyToken);
+    /* CAMLOCK1 · the stored device key (camera key, else the wall's lights / private-feed key). Never from data or URLs. */
+    var keys = [PROXY_TOKEN_LS_KEY, "wardos-lights-proxy-token", "wardos-private-feed-token"];
+    for (var i = 0; i < keys.length; i++) {
+      try { var v = localStorage.getItem(keys[i]); if (v) return String(v); } catch (e) {}
+    }
     return "";
   }
 
@@ -511,10 +477,7 @@
     var token = proxyTokenGuess();
     // Pages + loopback/missing proxy → NEED PROXY + still (not silent black).
     var url = "nest-webrtc.html?cam=" + id + "&v=NESTVID1";
-    if (proxy && !(isPagesHost() && isLoopbackProxy(proxy))) {
-      url += "&proxy=" + encodeURIComponent(proxy);
-      if (token) url += "&proxyToken=" + encodeURIComponent(token);
-    }
+    /* HUBPIN1 · the viewer finds the camera host itself (HouseHub); no proxy address in the URL */
     try {
       if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap();
     } catch (e) {}
@@ -593,7 +556,7 @@
       return { pill: "NEED TOKEN", cls: "hub-cam-stub", pillCls: "is-need", kind: "need" };
     }
     if (!g || !g.live) {
-      return { pill: g && g.label ? g.label : "STUB", cls: "hub-cam-stub", pillCls: "is-stub", kind: "stub" };
+      return { pill: g && g.label ? g.label : "Offline", cls: "hub-cam-stub", pillCls: "is-stub", kind: "stub" };
     }
     var snapUrl = (cam && cam.snapshotUrl) || (slot && slot.snap) || null;
     if (!snapUrl) {
@@ -679,6 +642,11 @@
       var vid = el.querySelector("video.hub-cam-video");
       /* Prefer real still path; fall back to known NESTSTILL1 slot file so wall never goes black */
       var snapUrl = h.snapUrl || slot.snap || null;
+      /* PRIVFEED3 · camera stills are private: only through the private feed, never the static data/ path (no 404s);
+         with no key or the feed offline the still is simply not drawn */
+      var privSnap = !!snapUrl && /(^|\/)data\/nest-snaps\//.test(snapUrl);
+      var PF = window.PrivateFeed;
+      if (privSnap && !(PF && PF.canSnap && PF.canSnap() && PF.state().status !== "offline")) snapUrl = null;
       var showStill = !!snapUrl;
 
       if (showStill) {
@@ -690,7 +658,8 @@
         }
         if (img) {
           var bust = snapUrl + (snapUrl.indexOf("?") >= 0 ? "&" : "?") + "v=CAMLIVE2";
-          if (img.getAttribute("src") !== bust) img.setAttribute("src", bust);
+          if (privSnap) { if (img._pfSnap !== bust) { img._pfSnap = bust; PF.bindSnap(img, bust); } }
+          else if (img.getAttribute("src") !== bust) img.setAttribute("src", bust);
           /* Keep still visible until LIVE video proves frames */
           if (!el._hubLivePlaying) img.style.display = "block";
           img.onerror = (function (wrap, image) {
@@ -750,10 +719,7 @@
     var url = "nest-webrtc.html?cam=" + id + "&v=CAMLIVE2";
     var proxy = proxyBaseGuess();
     var token = proxyTokenGuess();
-    if (proxy && !(isPagesHost() && isLoopbackProxy(proxy))) {
-      url += "&proxy=" + encodeURIComponent(proxy);
-      if (token) url += "&proxyToken=" + encodeURIComponent(token);
-    }
+    /* HUBPIN1 · the viewer finds the camera host itself (HouseHub); no proxy address in the URL */
     return url;
   }
 
@@ -846,15 +812,15 @@
       }
     }
     /* CAMKEY1: proxy says this screen has no/old camera key — say so, not STALE. */
-    if (reason && /unauthorized|\b401\b/i.test(String(reason))) {
+    if (reason && /unauthorized|locked|\b401\b/i.test(String(reason))) {
       var kp = el.querySelector(".hub-cam-pill");
       if (kp) {
-        kp.textContent = "NEED KEY";
+        kp.textContent = "LOCKED · PAIR";
         kp.classList.remove("is-live", "is-still", "is-stale", "is-stub");
         kp.classList.add("is-need");
       }
       var lbl = el.getAttribute("aria-label") || "";
-      el.setAttribute("aria-label", lbl.replace(/·.*$/, "· NEED KEY"));
+      el.setAttribute("aria-label", lbl.replace(/·.*$/, "· camera locked, needs pairing"));
     }
     if (reason && typeof console !== "undefined" && console.info) {
       try { console.info("[CAMLIVE2] hub not LIVE:", reason); } catch (_) {}

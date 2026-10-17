@@ -331,7 +331,7 @@ const SCAN = `(() => {
     const allDayRows = {};
     document.querySelectorAll(".ori-day .ori-ev").forEach((el) => {
       const text = (el.textContent || "").replace(/\\s+/g, " ").trim();
-      if (!/kids with dan|johnson kids|dan nashville|hayes bb|coach should reach|coach in/i.test(text)) return;
+      if (!/kids with dan|\b(?!ward\b)[a-z]+ kids\b|dan nashville|hayes bb|coach should reach|coach in/i.test(text)) return;
       allDayRows[text] = (allDayRows[text] || 0) + 1;
     });
     Object.keys(allDayRows).forEach((title) => {

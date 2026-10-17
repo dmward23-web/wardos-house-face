@@ -26,6 +26,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { privPath, assertPrivateOut } from "./private-dir.mjs";
 import os from "node:os";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -36,7 +37,7 @@ const SDM_BASE = "https://smartdevicemanagement.googleapis.com/v1";
 
 const DEFAULT_TOKEN = path.join(os.homedir(), ".config", "wardos", "nest-refresh.token");
 const DEFAULT_CONFIG = path.join(os.homedir(), ".config", "wardos", "nest-sdm.json");
-const SNAPS_DIR = path.join(ROOT, "data", "nest-snaps");
+const SNAPS_DIR = privPath("nest-snaps"); /* PRIVFEED1 · box-only, never in git */
 const CRED_DIR = path.join(os.homedir(), ".config", "wardos");
 
 function readCredFile(name) {
@@ -128,8 +129,8 @@ function attachExistingStills(cameras, outPath) {
     for (const name of candidates) {
       if (!name || seen.has(name)) continue;
       seen.add(name);
-      const rel = "data/nest-snaps/" + name;
-      const abs = path.join(ROOT, rel);
+      const rel = "data/nest-snaps/" + name; /* logical URL; private-feed.js maps it to the hub */
+      const abs = path.join(SNAPS_DIR, name);
       if (!fs.existsSync(abs) || fs.statSync(abs).size <= 800) continue;
       // Only attach if name matches this cam (avoid cross-wiring)
       const n = String(pad.name || "").toLowerCase();
@@ -164,7 +165,7 @@ function parseArgs(argv) {
   const out = {
     tokenFile: DEFAULT_TOKEN,
     configFile: DEFAULT_CONFIG,
-    outPath: path.join(ROOT, "data", "nest-live.json"),
+    outPath: privPath("nest-live.json"), /* PRIVFEED2 */
     help: false,
   };
   for (let i = 2; i < argv.length; i++) {
@@ -182,9 +183,10 @@ function chicagoNowIso() {
 }
 
 function writeJson(outPath, payload) {
-  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  assertPrivateOut(outPath, "nest-live"); /* PRIVFEED2 · house device state never inside a git work tree */
+  fs.mkdirSync(path.dirname(outPath), { recursive: true, mode: 0o700 });
   const tmp = outPath + ".tmp";
-  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n");
+  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n", { mode: 0o600 });
   fs.renameSync(tmp, outPath);
 }
 
@@ -378,7 +380,7 @@ async function tryGenerateImage(accessToken, deviceName, eventId) {
 /** Download auth-gated SDM image bytes → data/nest-snaps/<slug>.jpg (relative snapshotUrl). */
 async function downloadSnapToPages(img, slug) {
   if (!img || !img.url || !img.token) return null;
-  fs.mkdirSync(SNAPS_DIR, { recursive: true });
+  assertPrivateOut(path.join(SNAPS_DIR, "x"), "camera still");
   const fileName = String(slug || "cam").replace(/[^a-zA-Z0-9_-]+/g, "-").toLowerCase() + ".jpg";
   const abs = path.join(SNAPS_DIR, fileName);
   const resp = await fetch(img.url + (img.url.includes("?") ? "&" : "?") + "width=640", {

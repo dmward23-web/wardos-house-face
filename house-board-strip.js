@@ -16,7 +16,7 @@
   function isKidActivity(ev) {
     var s = String((ev && (ev.summary || ev.place || "")) || "");
     if (/\b(Ainsley|Hayes|Harris|Boys)\b/i.test(s)) return true;
-    if (/\b(swim|flag|baseball|SRE|LKMS|practice|game|PE|special|hearing|vision|field\s*trip|homework|collab|screening)\b/i.test(s)) return true;
+    if (/\b(swim|flag|baseball|SRE|LKMS|school|conferences?|practice|game|PE|special|hearing|vision|field\s*trip|homework|collab|screening)\b/i.test(s)) return true;
     return false;
   }
 
@@ -293,18 +293,18 @@
     return {
       label: "Schedule · today",
       time: "",
-      place: "CAL STALE",
-      detailHtml: esc(reason || "cal-live missing"),
+      place: "Calendar offline", /* HUBPIN1 · plain empty state; the reason stays internal (_reason) */
+      detailHtml: "",
       badge: clock.dow,
       _stale: true,
-      _reason: reason || "cal-live missing",
+      _reason: reason || "calendar offline",
       today: [],
       tomorrow: { day: "", dow: "", items: [] }
     };
   }
 
   function calIsFresh(cal, clock) {
-    if (!cal) return { ok: false, reason: "cal-live missing" };
+    if (!cal) return { ok: false, reason: "calendar offline" };
     if (cal.status === "error") {
       return { ok: false, reason: "cal error: " + (cal.error || "unknown") };
     }
@@ -351,7 +351,7 @@
     var parts = same.map(function (e) { return String(e.summary || "").match(rx); });
     var summary;
     if (parts.every(function (m) { return m && m[2].trim() === parts[0][2].trim(); })) {
-      summary = parts.map(function (m) { return m[1]; }).join(" + ") + " — " + parts[0][2].trim() + ": " +
+      summary = parts.map(function (m) { return m[1]; }).join(" + ") + " · " + parts[0][2].trim() + ": " +
         parts.map(function (m) { return m[1] + " " + m[3].trim(); }).join(" · ");
     } else {
       summary = same.map(function (e) { return String(e.summary || ""); }).join(" · ");
@@ -571,7 +571,7 @@
   }
 
   function fmtMins(m) {
-    if (m == null) return "—";
+    if (m == null) return "";
     if (m < 60) return m + "m";
     var h = Math.floor(m / 60);
     var r = m % 60;
@@ -580,7 +580,7 @@
 
   function rowHtml(ev, isNext) {
     var title = shortPlace(ev.summary || ev.place || "");
-    var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "—");
+    var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
     var cls = "leaveby-row" + (isNext ? " is-next" : "") + (ev.allDay ? " is-allday" : "");
     return '<li class="' + cls + '">' +
       '<span class="leaveby-row-time">' + esc(timeLab) + "</span>" +
@@ -598,7 +598,7 @@
 
     if (todayEl) {
       if (strip && strip._stale) {
-        todayEl.innerHTML = '<li class="leaveby-empty">CAL STALE</li>';
+        todayEl.innerHTML = '<li class="leaveby-empty">Calendar offline</li>';
       } else if (!today.length) {
         todayEl.innerHTML = '<li class="leaveby-empty">Clear · nothing left today</li>';
       } else {
@@ -617,7 +617,7 @@
     }
     if (tmrEl) {
       if (strip && strip._stale) {
-        tmrEl.innerHTML = '<li class="leaveby-empty">—</li>';
+        tmrEl.innerHTML = '<li class="leaveby-empty">Nothing yet</li>';
       } else if (!tmr.items || !tmr.items.length) {
         tmrEl.innerHTML = '<li class="leaveby-empty">Clear on glass</li>';
       } else {
@@ -633,7 +633,7 @@
   function layoutRail(strip) {
     var items = upcomingFlat(strip, 7);
     if (strip && strip._stale) {
-      return '<div class="lb-layout lb-rail"><div class="lb-empty">CAL STALE</div></div>';
+      return '<div class="lb-layout lb-rail"><div class="lb-empty">Calendar offline</div></div>';
     }
     if (!items.length) {
       return '<div class="lb-layout lb-rail"><div class="lb-empty">Clear on glass</div></div>';
@@ -641,7 +641,7 @@
     var html = '<div class="lb-layout lb-rail" aria-label="Timeline rail"><div class="lb-rail-spine">';
     for (var i = 0; i < items.length; i++) {
       var ev = items[i].ev;
-      var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "—");
+      var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
       var title = shortPlace(ev.summary || ev.place || "");
       var cls = "lb-rail-item" + (i === 0 ? " is-next" : "") +
         (items[i].when === "tmr" ? " is-tmr" : "");
@@ -660,7 +660,7 @@
     var buckets = { Hayes: [], Ainsley: [], Harris: [], Dan: [] };
     var items = upcomingFlat(strip, 12);
     if (strip && strip._stale) {
-      return '<div class="lb-layout lb-who"><div class="lb-empty">CAL STALE</div></div>';
+      return '<div class="lb-layout lb-who"><div class="lb-empty">Calendar offline</div></div>';
     }
     for (var i = 0; i < items.length; i++) {
       var names = whoNames(items[i].ev);
@@ -682,7 +682,7 @@
         '<div class="lb-who-rows">';
       for (var j = 0; j < list.length; j++) {
         var ev2 = list[j].ev;
-        var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "—");
+        var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "");
         var title2 = shortPlace(ev2.summary || ev2.place || "");
         html += '<div class="lb-who-row' + (j === 0 ? " is-next" : "") + '">' +
           '<span class="lb-who-time">' + esc(t2) + "</span>" +
@@ -699,13 +699,13 @@
   function layoutPeek(strip) {
     var items = upcomingFlat(strip, 3);
     if (strip && strip._stale) {
-      return '<div class="lb-layout lb-peek"><div class="lb-empty">CAL STALE</div></div>';
+      return '<div class="lb-layout lb-peek"><div class="lb-empty">Calendar offline</div></div>';
     }
     if (!items.length) {
       return '<div class="lb-layout lb-peek"><div class="lb-empty">Clear on glass</div></div>';
     }
     var first = items[0].ev;
-    var t0 = first.allDay ? "day" : (clockTimeFromIso(first.start) || "—");
+    var t0 = first.allDay ? "day" : (clockTimeFromIso(first.start) || "");
     var html = '<div class="lb-layout lb-peek" aria-label="Next plus peek">' +
       '<div class="lb-peek-hero">' +
       '<span class="lb-peek-kicker">Next</span>' +
@@ -716,7 +716,7 @@
       html += '<div class="lb-peek-quiet">';
       for (var i = 1; i < items.length; i++) {
         var ev = items[i].ev;
-        var t = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "—");
+        var t = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
         html += '<div class="lb-peek-row">' +
           '<span class="lb-peek-row-time">' + esc(t) + "</span>" +
           '<span class="lb-peek-row-title">' + esc(shortPlace(ev.summary || ev.place || "")) + "</span>" +
@@ -730,7 +730,7 @@
 
   function layoutRadar(strip) {
     if (strip && strip._stale) {
-      return '<div class="lb-layout lb-radar"><div class="lb-empty">CAL STALE</div></div>';
+      return '<div class="lb-layout lb-radar"><div class="lb-empty">Calendar offline</div></div>';
     }
     var items = upcomingFlat(strip, 1);
     if (!items.length) {
@@ -739,7 +739,7 @@
     var ev = items[0].ev;
     var mins = minsUntil(ev);
     var title = shortPlace(ev.summary || ev.place || "");
-    var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "—");
+    var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
     var windowM = 180;
     var pct = mins == null ? 0 : Math.max(0, Math.min(1, 1 - (mins / windowM)));
     var r = 42;
@@ -766,7 +766,7 @@
     var today = (strip && strip.today) || [];
     var tmr = (strip && strip.tomorrow) || { items: [], dow: "" };
     if (strip && strip._stale) {
-      return '<div class="lb-layout lb-list"><div class="lb-empty">CAL STALE</div></div>';
+      return '<div class="lb-layout lb-list"><div class="lb-empty">Calendar offline</div></div>';
     }
     var html = '<div class="lb-layout lb-list" aria-label="Schedule list">';
     html += '<div class="lb-list-sec"><div class="lb-list-hdr">Remaining</div><ul class="lb-list-ul">';
@@ -775,7 +775,7 @@
     } else {
       for (var i = 0; i < today.length; i++) {
         var ev = today[i];
-        var t = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "—");
+        var t = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
         html += '<li class="lb-list-row' + (i === 0 && !ev.allDay ? " is-next" : "") + '">' +
           '<span class="lb-list-time">' + esc(t) + "</span>" +
           '<span class="lb-list-title">' + esc(shortPlace(ev.summary || ev.place || "")) + "</span>" +
@@ -793,7 +793,7 @@
       var showTmr = preferKidItems(tmr.items, Math.max(8, tmr.items.length));
       for (var j = 0; j < showTmr.length; j++) {
         var ev2 = showTmr[j];
-        var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "—");
+        var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "");
         html += '<li class="lb-list-row">' +
           '<span class="lb-list-time">' + esc(t2) + "</span>" +
           '<span class="lb-list-title">' + esc(shortPlace(ev2.summary || ev2.place || "")) + "</span>" +
@@ -871,7 +871,7 @@
   }
 
   function shortTime(iso) {
-    var t = clockTimeFromIso(iso) || "—";
+    var t = clockTimeFromIso(iso) || "";
     return t.replace(/\s*([AP])M$/i, function (_, ap) { return ap.toLowerCase(); });
   }
 
@@ -894,7 +894,7 @@
   function layoutDay(strip) {
     ensureDayCss();
     if (strip && strip._stale) {
-      return '<div class="lb-layout lb-day"><div class="lb-empty">CAL STALE</div></div>';
+      return '<div class="lb-layout lb-day"><div class="lb-empty">Calendar offline</div></div>';
     }
     var today = ((strip && strip.today) || []).slice();
     var parts = [
@@ -1019,7 +1019,7 @@
 
     var hotEv = document.querySelector("[data-live='hot-pill-event']");
     if (hotEv) {
-      if (strip._stale) hotEv.textContent = "CAL STALE";
+      if (strip._stale) hotEv.textContent = "Calendar offline";
       else if (strip.time && strip.place) hotEv.textContent = strip.time + " · " + strip.place;
       else if (strip.place) hotEv.textContent = strip.place;
       else hotEv.textContent = "";
@@ -1028,7 +1028,7 @@
     if (main && !strip._boot) {
       /* HUBCMD2 · pass-by hero = huge time + destination only · no Next/label chrome */
       if (strip._stale) {
-        main.innerHTML = '<span class="leaveby-dest">CAL STALE</span>';
+        main.innerHTML = '<span class="leaveby-dest">Calendar offline</span>';
       } else if (strip.time && strip.place) {
         /* AUDIT1 · label row hidden on this page (hub) → carry the day as a small kicker in the hero */
         var labHidden = !label || label.offsetParent === null;
@@ -1054,7 +1054,7 @@
     if (warn) {
       if (strip._stale) {
         warn.hidden = false;
-        warn.textContent = strip._reason || "CAL STALE";
+        warn.textContent = "Calendar offline"; /* HUBPIN1 · no internal reason on glass */
       } else {
         warn.hidden = true;
         warn.textContent = "";
@@ -1076,7 +1076,7 @@
     ];
     var i = 0;
     function next() {
-      if (i >= urls.length) { cb(new Error("cal-live missing"), null); return; }
+      if (i >= urls.length) { cb(new Error("calendar offline"), null); return; }
       var u = urls[i++];
       fetchJson(u).then(function (d) { cb(null, d); })
         .catch(function () { next(); });
@@ -1118,7 +1118,7 @@
         applyStrip(pickStripFromCal(cal, clock), clock);
         return;
       }
-      var reason = gate.reason || (err && err.message) || "cal-live missing";
+      var reason = gate.reason || (err && err.message) || "calendar offline";
       applyStrip(staleStrip(clock, reason), clock);
       loadWeek(function () { /* no-op for strip */ });
     });

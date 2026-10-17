@@ -1,0 +1,927 @@
+{
+  "asOf": "Sample asOf 101",
+  "asOfIso": "2026-10-16",
+  "refreshedAt": "2026-10-17T02:50:11.910Z",
+  "sourceCalendar": "Sample sourceCalendar 102",
+  "leaveBys": {
+    "SRE_drop": "Sample SRE_drop 103",
+    "SRE_pickup": "Sample SRE_pickup 104",
+    "note": "Sample note 105"
+  },
+  "homeWeek": {
+    "with": "away",
+    "place": "",
+    "through": "Sample through 106",
+    "throughLabel": "Sample throughLabel 107",
+    "endIso": "2026-10-23T20:00:00.000Z"
+  },
+  "boardStrip": {
+    "label": "Sample label 108",
+    "time": "7:00",
+    "place": "Sample place 109",
+    "detailHtml": "Sample detailHtml 110",
+    "badge": "Mon",
+    "startIso": "2026-10-19T12:00:00.000Z",
+    "endIso": "2026-10-19T12:15:00.000Z",
+    "kind": "school",
+    "nextLeave": null,
+    "queue": [
+      {
+        "label": "Sample label 111",
+        "time": "7:00",
+        "place": "Sample place 112",
+        "detailHtml": "Sample detailHtml 113",
+        "badge": "Mon",
+        "startIso": "2026-10-19T12:00:00.000Z",
+        "endIso": "2026-10-19T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Sample whenLabel 114",
+        "summary": "Sample summary 115",
+        "leaveBy": false
+      },
+      {
+        "label": "Sample label 116",
+        "time": "7:00",
+        "place": "Sample place 117",
+        "detailHtml": "Sample detailHtml 118",
+        "badge": "Mon",
+        "startIso": "2026-10-19T12:00:00.000Z",
+        "endIso": "2026-10-19T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Sample whenLabel 119",
+        "summary": "Sample summary 120",
+        "leaveBy": false
+      },
+      {
+        "label": "Sample label 121",
+        "time": "7:00",
+        "place": "Sample place 122",
+        "detailHtml": "Sample detailHtml 123",
+        "badge": "Tue",
+        "startIso": "2026-10-20T12:00:00.000Z",
+        "endIso": "2026-10-20T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Sample whenLabel 124",
+        "summary": "Sample summary 125",
+        "leaveBy": false
+      },
+      {
+        "label": "Sample label 126",
+        "time": "7:00",
+        "place": "Sample place 127",
+        "detailHtml": "Sample detailHtml 128",
+        "badge": "Tue",
+        "startIso": "2026-10-20T12:00:00.000Z",
+        "endIso": "2026-10-20T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Sample whenLabel 129",
+        "summary": "Sample summary 130",
+        "leaveBy": false
+      },
+      {
+        "label": "Sample label 131",
+        "time": "7:00",
+        "place": "Sample place 132",
+        "detailHtml": "Sample detailHtml 133",
+        "badge": "Wed",
+        "startIso": "2026-10-21T12:00:00.000Z",
+        "endIso": "2026-10-21T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Sample whenLabel 134",
+        "summary": "Sample summary 135",
+        "leaveBy": false
+      },
+      {
+        "label": "Sample label 136",
+        "time": "7:00",
+        "place": "Sample place 137",
+        "detailHtml": "Sample detailHtml 138",
+        "badge": "Wed",
+        "startIso": "2026-10-21T12:00:00.000Z",
+        "endIso": "2026-10-21T12:15:00.000Z",
+        "kind": "school",
+        "whenLabel": "Sample whenLabel 139",
+        "summary": "Sample summary 140",
+        "leaveBy": false
+      },
+      {
+        "label": "Sample label 141",
+        "time": "4:00",
+        "place": "Sample place 142",
+        "detailHtml": "Sample detailHtml 143",
+        "badge": "Wed",
+        "startIso": "2026-10-21T21:00:00.000Z",
+        "endIso": "2026-10-21T21:20:00.000Z",
+        "kind": "school",
+        "whenLabel": "Sample whenLabel 144",
+        "summary": "Sample summary 145",
+        "leaveBy": false
+      },
+      {
+        "label": "Sample label 146",
+        "time": "4:20",
+        "place": "Sample place 147",
+        "detailHtml": "Sample detailHtml 148",
+        "badge": "Wed",
+        "startIso": "2026-10-21T21:20:00.000Z",
+        "endIso": "2026-10-21T22:10:00.000Z",
+        "kind": "school",
+        "whenLabel": "Sample whenLabel 149",
+        "summary": "Sample summary 150",
+        "leaveBy": false
+      }
+    ]
+  },
+  "kids": {
+    "harris": {
+      "id": "harris",
+      "name": "Harris",
+      "you": "you",
+      "theme": "block-world",
+      "themeLabel": "Sample themeLabel 151",
+      "gradeVoice": "Sample gradeVoice 152",
+      "avatar": "Sample avatar 153",
+      "currency": {
+        "unit": "gem",
+        "plural": "gems",
+        "symbol": "Sample symbol 154",
+        "label": "Sample label 155"
+      },
+      "bankGoal": {
+        "id": "gem-jar",
+        "title": "Sample title 156",
+        "blurb": "Sample blurb 157",
+        "need": 4,
+        "reward": "Sample reward 158",
+        "dollarNeed": 4,
+        "weeklyAllowance": 4,
+        "starDollar": 2
+      },
+      "quests": [
+        {
+          "id": "har-bed",
+          "what": "Sample what 159",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "har-backpack",
+          "what": "Sample what 160",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "har-dishes",
+          "what": "Sample what 161",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "har-empty",
+          "what": "Sample what 162",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "har-trash",
+          "what": "Sample what 163",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "har-postgame",
+          "what": "Sample what 164",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "har-shower",
+          "what": "Sample what 165",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "har-toys",
+          "what": "Sample what 166",
+          "stars": 2,
+          "cadence": "weekly"
+        },
+        {
+          "id": "har-shoes",
+          "what": "Sample what 167",
+          "stars": 1,
+          "cadence": "weekly"
+        },
+        {
+          "id": "har-cubby",
+          "what": "Sample what 168",
+          "stars": 1,
+          "cadence": "weekly"
+        }
+      ],
+      "fun": [
+        {
+          "when": "Sample when 169",
+          "what": "Sample what 170",
+          "hint": "Sample hint 171",
+          "tone": "fun"
+        },
+        {
+          "when": "Sample when 172",
+          "what": "Sample what 173",
+          "hint": "Sample hint 174",
+          "tone": "fun"
+        },
+        {
+          "when": "Sample when 175",
+          "what": "Sample what 176",
+          "hint": "Sample hint 177",
+          "tone": "fun"
+        },
+        {
+          "when": "Sample when 178",
+          "what": "Sample what 179",
+          "hint": "Sample hint 180",
+          "tone": "fun"
+        }
+      ],
+      "streakLabel": "Sample streakLabel 181",
+      "missions": [
+        {
+          "when": "Sample when 182",
+          "what": "Sample what 183",
+          "hint": "Sample hint 184",
+          "tone": "fun"
+        },
+        {
+          "when": "Sample when 185",
+          "what": "Sample what 186",
+          "hint": "Sample hint 187",
+          "tone": "fun"
+        }
+      ],
+      "appointmentsEmpty": "Sample appointmentsEmpty 188",
+      "hottest": {
+        "when": "Sample when 189",
+        "what": "Sample what 190",
+        "where": "Sample where 191",
+        "badges": [
+          "Sample badges 192",
+          "7:00"
+        ]
+      },
+      "today": [
+        {
+          "kind": "event",
+          "when": "Sample when 193",
+          "what": "Sample what 194",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Sample when 195",
+          "what": "Sample what 196",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "note",
+          "when": "Sample when 197",
+          "what": "Sample what 198",
+          "hint": "Sample hint 199",
+          "tone": "hot"
+        }
+      ],
+      "sports": [],
+      "school": [
+        {
+          "when": "Sample when 200",
+          "what": "Sample what 201",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 202",
+          "what": "Sample what 203",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 204",
+          "what": "Sample what 205",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 206",
+          "what": "Sample what 207",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 208",
+          "what": "Sample what 209",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 210",
+          "what": "Sample what 211",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 212",
+          "what": "Sample what 213",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 214",
+          "what": "Sample what 215",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 216",
+          "what": "Sample what 217",
+          "tone": "act",
+          "hint": ""
+        }
+      ],
+      "appointments": []
+    },
+    "hayes": {
+      "id": "hayes",
+      "name": "Hayes",
+      "you": "you",
+      "theme": "drop-zone",
+      "themeLabel": "Sample themeLabel 218",
+      "gradeVoice": "Sample gradeVoice 219",
+      "avatar": "Sample avatar 220",
+      "currency": {
+        "unit": "coin",
+        "plural": "coins",
+        "symbol": "Sample symbol 221",
+        "label": "Sample label 222"
+      },
+      "bankGoal": {
+        "id": "victory-jar",
+        "title": "Sample title 223",
+        "blurb": "Sample blurb 224",
+        "need": 6,
+        "reward": "Sample reward 225",
+        "dollarNeed": 6,
+        "weeklyAllowance": 6,
+        "starDollar": 2
+      },
+      "quests": [
+        {
+          "id": "hay-bed",
+          "what": "Sample what 226",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "hay-backpack",
+          "what": "Sample what 227",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "hay-dishes",
+          "what": "Sample what 228",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "hay-empty",
+          "what": "Sample what 229",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "hay-trash",
+          "what": "Sample what 230",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "hay-postgame",
+          "what": "Sample what 231",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "hay-shower",
+          "what": "Sample what 232",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "hay-room",
+          "what": "Sample what 233",
+          "stars": 2,
+          "cadence": "weekly"
+        },
+        {
+          "id": "hay-shoes",
+          "what": "Sample what 234",
+          "stars": 1,
+          "cadence": "weekly"
+        },
+        {
+          "id": "hay-cubby",
+          "what": "Sample what 235",
+          "stars": 1,
+          "cadence": "weekly"
+        }
+      ],
+      "fun": [
+        {
+          "when": "Sample when 236",
+          "what": "Sample what 237",
+          "hint": "Sample hint 238",
+          "tone": "fun"
+        },
+        {
+          "when": "Sample when 239",
+          "what": "Sample what 240",
+          "hint": "Sample hint 241",
+          "tone": "fun"
+        },
+        {
+          "when": "Sample when 242",
+          "what": "Sample what 243",
+          "hint": "Sample hint 244",
+          "tone": "fun"
+        },
+        {
+          "when": "Sample when 245",
+          "what": "Sample what 246",
+          "hint": "Sample hint 247",
+          "tone": "fun"
+        }
+      ],
+      "streakLabel": "Sample streakLabel 248",
+      "missions": [
+        {
+          "when": "Sample when 249",
+          "what": "Sample what 250",
+          "hint": "Sample hint 251",
+          "tone": "fun"
+        },
+        {
+          "when": "Sample when 252",
+          "what": "Sample what 253",
+          "hint": "Sample hint 254",
+          "tone": "fun"
+        }
+      ],
+      "appointmentsEmpty": "Sample appointmentsEmpty 255",
+      "hottest": {
+        "when": "Sample when 256",
+        "what": "Sample what 257",
+        "where": "Sample where 258",
+        "badges": [
+          "Sample badges 259",
+          "7:00"
+        ]
+      },
+      "today": [
+        {
+          "kind": "event",
+          "when": "Sample when 260",
+          "what": "Sample what 261",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "event",
+          "when": "Sample when 262",
+          "what": "Sample what 263",
+          "hint": "",
+          "tone": "act"
+        },
+        {
+          "kind": "note",
+          "when": "Sample when 264",
+          "what": "Sample what 265",
+          "hint": "Sample hint 266",
+          "tone": "hot"
+        }
+      ],
+      "sports": [],
+      "school": [
+        {
+          "when": "Sample when 267",
+          "what": "Sample what 268",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 269",
+          "what": "Sample what 270",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 271",
+          "what": "Sample what 272",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 273",
+          "what": "Sample what 274",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 275",
+          "what": "Sample what 276",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 277",
+          "what": "Sample what 278",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 279",
+          "what": "Sample what 280",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 281",
+          "what": "Sample what 282",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 283",
+          "what": "Sample what 284",
+          "tone": "act",
+          "hint": ""
+        }
+      ],
+      "appointments": []
+    },
+    "ainsley": {
+      "id": "ainsley",
+      "name": "Ainsley",
+      "you": "you",
+      "theme": "vinyl-night",
+      "themeLabel": "Ainsley",
+      "gradeVoice": "Sample gradeVoice 285",
+      "avatar": "Sample avatar 286",
+      "currency": {
+        "unit": "star",
+        "plural": "stars",
+        "symbol": "Sample symbol 287",
+        "label": "Sample label 288"
+      },
+      "bankGoal": {
+        "id": "tour-jar",
+        "title": "Sample title 289",
+        "blurb": "Sample blurb 290",
+        "need": 8,
+        "reward": "Sample reward 291",
+        "dollarNeed": 8,
+        "starDollar": 2,
+        "weeklyAllowance": 8
+      },
+      "quests": [
+        {
+          "id": "ain-bed",
+          "what": "Sample what 292",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "ain-toys",
+          "what": "Sample what 293",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "ain-dishwasher",
+          "what": "Sample what 294",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "ain-empty",
+          "what": "Sample what 295",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "ain-living",
+          "what": "Sample what 296",
+          "stars": 1,
+          "cadence": "daily"
+        },
+        {
+          "id": "ain-bath",
+          "what": "Sample what 297",
+          "stars": 3,
+          "cadence": "weekly"
+        },
+        {
+          "id": "ain-laundry",
+          "what": "Sample what 298",
+          "stars": 5,
+          "cadence": "weekly"
+        },
+        {
+          "id": "ain-cubby",
+          "what": "Sample what 299",
+          "stars": 1,
+          "cadence": "weekly"
+        },
+        {
+          "id": "ain-babysit",
+          "what": "Sample what 300",
+          "stars": 0,
+          "cadence": "addon",
+          "optional": true,
+          "hire": true,
+          "hint": "Sample hint 301",
+          "rateLabel": "$9/hr (sample)"
+        }
+      ],
+      "fun": [],
+      "streakLabel": "Sample streakLabel 303",
+      "missions": [
+        {
+          "when": "Sample when 304",
+          "what": "Sample what 305",
+          "hint": "Sample hint 306",
+          "tone": "fun"
+        },
+        {
+          "when": "Sample when 307",
+          "what": "Sample what 308",
+          "hint": "Sample hint 309",
+          "tone": "fun"
+        }
+      ],
+      "goal": {
+        "name": "Sample name 310",
+        "need": 20,
+        "placeholder": "Sample placeholder 311"
+      },
+      "bag": {
+        "place": "Sample place 312",
+        "label": "Sample label 313",
+        "hint": "Sample hint 314"
+      },
+      "rides": [
+        {
+          "id": "scooter",
+          "what": "Sample what 315",
+          "when": "Sample when 316",
+          "clear": true
+        },
+        {
+          "id": "bv-rec",
+          "what": "Sample what 317",
+          "when": "Sample when 318",
+          "clear": true
+        },
+        {
+          "id": "swim",
+          "what": "Sample what 319",
+          "when": "Sample when 320",
+          "clear": true,
+          "hours": "Sample hours 321"
+        }
+      ],
+      "appointmentsEmpty": "Sample appointmentsEmpty 322",
+      "sportsEmpty": "",
+      "hottest": {
+        "when": "Sample when 323",
+        "what": "Sample what 324",
+        "where": "Sample where 325",
+        "badges": [
+          "Sample badges 326",
+          "Sample badges 327"
+        ]
+      },
+      "today": [
+        {
+          "kind": "note",
+          "when": "Sample when 328",
+          "what": "Sample what 329",
+          "hint": "Sample hint 330",
+          "tone": "hot"
+        }
+      ],
+      "sports": [],
+      "school": [
+        {
+          "when": "Sample when 331",
+          "what": "Sample what 332",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 333",
+          "what": "Sample what 334",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 335",
+          "what": "Sample what 336",
+          "tone": "act",
+          "hint": ""
+        },
+        {
+          "when": "Sample when 337",
+          "what": "Sample what 338",
+          "tone": "act",
+          "hint": ""
+        }
+      ],
+      "appointments": []
+    },
+    "dan": {
+      "id": "dan",
+      "name": "Sample name 339",
+      "theme": "house-dad",
+      "themeLabel": "Sample themeLabel 340",
+      "avatar": "Sample avatar 341",
+      "note": "Sample note 342",
+      "picks": [
+        {
+          "when": "Sample when 343",
+          "what": "Sample what 344",
+          "hint": "Sample hint 345",
+          "tone": "fun"
+        },
+        {
+          "when": "Sample when 346",
+          "what": "Sample what 347",
+          "hint": "Sample hint 348",
+          "tone": "fun"
+        }
+      ],
+      "leaveBys": [
+        {
+          "when": "Sample when 349",
+          "what": "Sample what 350",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 351",
+          "what": "Sample what 352",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 353",
+          "what": "Sample what 354",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 355",
+          "what": "Sample what 356",
+          "tone": "act"
+        }
+      ],
+      "hottest": {
+        "when": "Sample when 357",
+        "what": "Sample what 358",
+        "where": "Sample where 359",
+        "badges": [
+          "Sample badges 360"
+        ]
+      },
+      "today": [
+        {
+          "when": "Sample when 361",
+          "what": "Sample what 362",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 363",
+          "what": "Sample what 364",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 365",
+          "what": "Sample what 366",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 367",
+          "what": "Sample what 368",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 369",
+          "what": "Sample what 370",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 371",
+          "what": "Sample what 372",
+          "tone": "hot"
+        }
+      ],
+      "week": [
+        {
+          "when": "Sample when 373",
+          "what": "Sample what 374",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 375",
+          "what": "Sample what 376",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 377",
+          "what": "Sample what 378",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 379",
+          "what": "Sample what 380",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 381",
+          "what": "Sample what 382",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 383",
+          "what": "Sample what 384",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 385",
+          "what": "Sample what 386",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 387",
+          "what": "Sample what 388",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 389",
+          "what": "Sample what 390",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 391",
+          "what": "Sample what 392",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 393",
+          "what": "Sample what 394",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 395",
+          "what": "Sample what 396",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 397",
+          "what": "Sample what 398",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 399",
+          "what": "Sample what 400",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 401",
+          "what": "Sample what 402",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 403",
+          "what": "Sample what 404",
+          "tone": "act"
+        },
+        {
+          "when": "Sample when 405",
+          "what": "Sample what 406",
+          "tone": "hot"
+        }
+      ]
+    }
+  },
+  "_synthetic": "PRIVFEED1 synthetic fixture: structure only, no real names, places, codes or amounts"
+}

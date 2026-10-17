@@ -1,7 +1,7 @@
 # Wall station · format law
 
 **Locked:** Sun Sep 27 2026 (CT), from the live hallway column photo.
-**Cadence lock (~4:24p CT Sun 27 Sep 2026 — SUPERSEDES any three-week wall rush):** **Prove = home use at 147th through YE26 (2026-12-31).** No rush live. Plumb named installs / public offer from **2027-01-01**. Atlas owns the prove board (`wardos-kit/WALL-STATION-PROVE-PLAN-2026-09-27.md`).
+**Cadence lock (~4:24p CT Sun 27 Sep 2026 — SUPERSEDES any three-week wall rush):** **Prove = home use at home through YE26 (2026-12-31).** No rush live. Plumb named installs / public offer from **2027-01-01**. Atlas owns the prove board (`wardos-kit/WALL-STATION-PROVE-PLAN-2026-09-27.md`).
 **Surface:** House Face only. Not Desk. Not money. Not PIN.
 **Home URL (only one):** https://dmward23-web.github.io/wardos-house-face/sheet-index.html
 
@@ -37,7 +37,7 @@ This file is the format law for every bot that paints, copies, or ships WardOS o
 ## What never goes on this glass
 
 - Dollar amounts, balances, card owed, Autopay, Ledger FREEZE / BUY
-- Therapy notes, medical detail, Harbor drafts, texts to a person
+- Medical detail, Harbor drafts, texts to a person
 - Desk dark shell (`#070b10`), Vita meters, homework-scold chrome
 - Browser UI, cursors, "check in" 15-minute blocks, 9:00 appointment
 - A second home, a fifth board, or a phone layout stretched to 32"
@@ -74,7 +74,7 @@ No new bot for the wall. House Face is the face. This file is the format.
 
 ## Plumb Path A master (locked 2026-09-27; cadence ~4:24p CT)
 
-**Path A Mode A master = prove at 147th home through YE26.** Hang/use when iron last-yes’d. Kids live on House glass. Straight-on column photo when hung. Harden day-7 until boring through holidays. Whole prove window = **now → 2026-12-31** — **not** a 3-week forced ship; **no rush live**.
+**Path A Mode A master = prove at home through YE26.** Hang/use when iron last-yes’d. Kids live on House glass. Straight-on column photo when hung. Harden day-7 until boring through holidays. Whole prove window = **now → 2026-12-31** — **not** a 3-week forced ship; **no rush live**.
 
 **Plumb LIVE / Mode B named installs from 2027-01-01** (first named only if Dan names + last-yes).
 

@@ -397,7 +397,9 @@
     window.setTimeout(function () { banner.remove(); }, 2800);
   }
 
-  /* 1★ = $1 · kids WATCH work earn real money. Themes keep particle chrome. */
+  /* Kids WATCH work earn real money: stars x the private star value (PRIVFEED2 · HouseMoney, from the private kids-week).
+   * Unknown star value (offline) -> show stars, never a guessed dollar figure. Themes keep particle chrome. */
+  function starValue() { var v = global.HouseMoney && global.HouseMoney.starValue && global.HouseMoney.starValue(); return typeof v === "number" ? v : null; }
   function dollarsFor(el) {
     var n = 1;
     if (el) {
@@ -411,11 +413,12 @@
     }
     return n;
   }
+  function moneyText(stars) { var v = starValue(); return v == null ? "+★" + stars : "+$" + (stars * v); }
   function currencyLabel(el) {
     var n = dollarsFor(el);
     if (n <= 0) return "hire · not jar";
     var t = theme();
-    var cash = "+$" + n;
+    var cash = moneyText(n);
     if (t === "harris") return cash + " ◆";
     if (t === "hayes") return cash + " ◎";
     if (t === "ainsley") return cash + " ★";
@@ -428,7 +431,7 @@
     var r = el && el.getBoundingClientRect ? el.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 0, height: 0 };
     var pop = document.createElement("div");
     pop.className = "vfx-float vfx-dollar vfx-" + theme();
-    pop.textContent = "+$" + (dollars == null ? 1 : dollars);
+    pop.textContent = moneyText(dollars == null ? 1 : dollars);
     pop.style.left = (r.left + r.width / 2) + "px";
     pop.style.top = (r.top + 8) + "px";
     layer.appendChild(pop);

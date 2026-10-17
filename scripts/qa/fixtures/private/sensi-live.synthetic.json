@@ -1,0 +1,8 @@
+{
+  "status": "live",
+  "updatedAt": "2026-10-13T11:40:00.000Z",
+  "source": "synthetic",
+  "writeSupported": false,
+  "thermostat": { "name": "Thermostat", "online": true, "ambient": 70, "ambientRaw": 70, "setpoint": 68, "heatSetpoint": 68, "coolSetpoint": 76, "mode": "Auto", "fan": "Auto", "humidity": 40, "hold": false, "scale": "f" },
+  "error": null
+}

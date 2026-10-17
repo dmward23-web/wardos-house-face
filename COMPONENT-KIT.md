@@ -168,7 +168,7 @@ Week-level leave-by stays family-wide charcoal; hottest stays kid-tinted.
 
 - Ledger FREEZE / BUY / AVAILABLE chrome  
 - Harbor draft / send / Hot Gate  
-- Vita rings / therapy meters  
+- Vita rings / wellness meters  
 - Dollar amounts / allowance cash  
 - Dark SCADA Desk shell tokens (`#070b10`, etc.) on House plates  
 

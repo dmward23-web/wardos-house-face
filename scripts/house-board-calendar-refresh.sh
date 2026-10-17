@@ -11,6 +11,9 @@
 #   ./scripts/house-board-calendar-refresh.sh /path/to/events.json [--deploy|--push]
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# PRIVFEED1 · calendar data is written ONLY to the box-only private folder, served by the house hub with a token.
+# Nothing is committed or pushed; --deploy/--push are accepted for old callers and do nothing.
+PRIV="${WARDOS_PRIVATE_DIR:-$HOME/.local/share/wardos-private}"; mkdir -p "$PRIV"; chmod 700 "$PRIV"
 EVENTS="${1:?events json required (dmward23 list_events dump)}"
 shift || true
 DEPLOY=0
@@ -98,7 +101,7 @@ BEFORE_HASH=$(snapshot_protected)
 # Optional: keep a local (gitignored) dump copy for receipts — never publish
 if [[ -f "$EVENTS" ]]; then
   mkdir -p "$ROOT/data"
-  cp -f "$EVENTS" "$ROOT/data/calendar-dmward23-dump.json" 2>/dev/null || true
+  cp -f "$EVENTS" "$PRIV/calendar-dump.json" 2>/dev/null || true  # PRIVFEED1 · raw dump stays private
 fi
 
 # 0) PRIVACY1: public Pages never carries therapy/provider names (kid privacy).
@@ -135,28 +138,19 @@ PRIV
 EVENTS="$SCRUBBED"
 
 # 1) Full kids-week schedule rewrite (sports/school/appointments/boardStrip queue)
-node "$ROOT/scripts/calendar-refresh.mjs" --events "$EVENTS" --week "$ROOT/kids-week.json" --no-mirror
+[[ -f "$PRIV/kids-week.json" ]] || { echo "HARD FAIL: $PRIV/kids-week.json missing (seed it once from the last good copy)" >&2; exit 4; }
+node "$ROOT/scripts/calendar-refresh.mjs" --events "$EVENTS" --week "$PRIV/kids-week.json" --no-mirror
 
 # 2) cal-live.json = House Face Next Up authority (fail-closed client)
 node "$ROOT/scripts/cal-from-events.mjs" \
   --events "$EVENTS" \
-  --out "$ROOT/data/cal-live.json"
+  --out "$PRIV/cal-live.json"
 
-# Mirror DATA ONLY into board-os when present (never HTML/CSS)
-if [[ -d /workspace/board-os/house-face ]]; then
-  BOS=/workspace/board-os/house-face
-  mkdir -p "$BOS/data"
-  cp -f "$ROOT/kids-week.json" "$BOS/kids-week.json"
-  cp -f "$ROOT/data/kids-week.json" "$BOS/data/kids-week.json"
-  cp -f "$ROOT/data/cal-live.json" "$BOS/data/cal-live.json"
-  cp -f "$ROOT/kids-data.js" "$BOS/kids-data.js"
-  # Explicitly do NOT copy kid-*.html sheet-*.html heat-v3.css house-engage.css
-  # Explicitly do NOT copy sensi-live.json nest-live.json
-fi
+# PRIVFEED1 · board-os mirror retired
 
-ASOF=$(python3 -c "import json;print(json.load(open('$ROOT/kids-week.json'))['asOfIso'])")
-CAL_ASOF=$(python3 -c "import json;print(json.load(open('$ROOT/data/cal-live.json'))['asOfIso'])")
-CAL_STATUS=$(python3 -c "import json;print(json.load(open('$ROOT/data/cal-live.json')).get('status'))")
+ASOF=$(python3 -c "import json;print(json.load(open('$PRIV/kids-week.json'))['asOfIso'])")
+CAL_ASOF=$(python3 -c "import json;print(json.load(open('$PRIV/cal-live.json'))['asOfIso'])")
+CAL_STATUS=$(python3 -c "import json;print(json.load(open('$PRIV/cal-live.json')).get('status'))")
 
 if [[ "$ASOF" != "$TODAY" || "$CAL_ASOF" != "$TODAY" ]]; then
   echo "HARD FAIL: asOfIso kids=$ASOF cal=$CAL_ASOF != today CT $TODAY" >&2
@@ -173,8 +167,8 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 CT=ZoneInfo("America/Chicago")
 now=datetime.now(CT)
-w=json.load(open("$ROOT/kids-week.json"))
-cal=json.load(open("$ROOT/data/cal-live.json"))
+w=json.load(open("$PRIV/kids-week.json"))
+cal=json.load(open("$PRIV/cal-live.json"))
 place=(w.get("boardStrip") or {}).get("place") or ""
 if "jessy" in place.lower() and w.get("asOfIso","") >= "2026-09-28":
     print("HARD FAIL: boardStrip still shows past Jessy vanity", place, file=sys.stderr)
@@ -192,46 +186,6 @@ PY
 
 assert_protected_untouched "$BEFORE_HASH"
 
-if [[ "$DEPLOY" != "1" ]]; then
-  echo "dry-run complete (pass --deploy or --push to commit+push DATA ONLY)"
-  exit 0
-fi
-
-# DATA-ONLY ship — NEVER house-face-deploy.sh (full board-os copy stomps HEAT/CONSUME)
-cd "$ROOT"
-# Refuse if protected paths are staged somehow
-git add -- "${ALLOW_WRITE[@]}" 2>/dev/null || true
-# Only the allowlist that exists
-ADD_LIST=()
-for f in "${ALLOW_WRITE[@]}"; do
-  if [[ -f "$ROOT/$f" ]] && [[ "$f" != data/calendar-dmward23-dump.json ]]; then
-    ADD_LIST+=("$f")
-  fi
-done
-git add -- "${ADD_LIST[@]}"
-
-# Guard: nothing outside allowlist in the index for this commit
-BAD=$(git diff --cached --name-only | python3 -c "
-import sys
-allow = set('''$(printf '%s\n' "${ADD_LIST[@]}")'''.strip().splitlines())
-bad = [l.strip() for l in sys.stdin if l.strip() and l.strip() not in allow]
-print('\n'.join(bad))
-")
-if [[ -n "${BAD}" ]]; then
-  echo "HARD FAIL: attempted to stage non-data files in calendar refresh:" >&2
-  echo "$BAD" >&2
-  git reset HEAD -- . >/dev/null 2>&1 || true
-  exit 7
-fi
-
-if git diff --cached --quiet; then
-  echo "CLEAN · no cal-live / kids-week changes to push"
-  exit 0
-fi
-
-MSG="House Face · ${NOTE} ${TODAY} CT · data-only ${STAMP}"
-git -c user.email='dmward23@gmail.com' -c user.name='dmward23-web' commit -m "$MSG"
-scripts/data-only-guard.sh || { echo "DATAGUARD1: not pushing"; exit 3; }
-git push origin main
-echo "PUSHED data-only · $(git rev-parse --short HEAD) · $MSG"
-echo "PROTECTED intact: kid-*.html sheet-*.html heat-v3.css house-engage.css sensi-live nest-live"
+[[ "$DEPLOY" == "1" ]] && echo "--deploy/--push ignored (PRIVFEED1): data stays in $PRIV, served by the hub"
+echo "house-board-calendar-refresh: wrote $PRIV/kids-week.json + $PRIV/cal-live.json (no git)"
+exit 0

@@ -165,7 +165,7 @@ function checkHeaderDates(rel, text, today, bad) {
       const m = line.match(
         /cheer-title[^>]*>\s*(?:<span[^>]*>)?\s*((?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)(?:,)?\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2})/i
       );
-      if (!m) return; // e.g. "Hayes birthday · Fri Sep 25" — event, not today chrome
+      if (!m) return; // e.g. a dated event row in a cheer title — event, not today chrome
       if (!dateEqualsToday(m[1], today)) {
         bad.push(`${rel}:${i + 1}: header date ≠ today CT (${today.short}): ${line.trim().slice(0, 120)}`);
       }
