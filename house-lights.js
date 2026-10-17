@@ -73,10 +73,12 @@
   /** Optional override: seed proxy URL/token from ?lightsProxy= into localStorage. */
   /** HUBPIN1 · a link can no longer set the hub (?lightsProxy= / ?proxy= are ignored). Only a legacy key seed is kept:
       16+ chars like the server, stripped from the address bar at once. */
+  /* SEEDGUARD1 · a legacy ?lightsProxyToken= / ?nestProxyToken= seed is saved ONLY when this screen holds no device key yet, so a crafted link can never replace (unpair) a paired screen's key. The param is still stripped. */
+  function noDeviceKey() { var ks = ["wardos-lights-proxy-token", "wardosNestProxyToken", "wardos-private-feed-token"]; try { for (var i = 0; i < ks.length; i++) { if (localStorage.getItem(ks[i])) return false; } return true; } catch (e) { return false; } }
   function ingestProxyFromQuery() {
     try {
       var t = qs("lightsProxyToken") || qs("proxyToken");
-      if (t && /^[A-Za-z0-9_-]{16,}$/.test(t)) localStorage.setItem(PROXY_TOKEN_LS_KEY, String(t));
+      if (t && /^[A-Za-z0-9_-]{16,}$/.test(t) && noDeviceKey()) localStorage.setItem(PROXY_TOKEN_LS_KEY, String(t));
       if (t) { try { var _u = new URL(location.href); ["lightsProxyToken", "proxyToken"].forEach(function (k) { _u.searchParams.delete(k); }); history.replaceState(history.state, "", _u.pathname + _u.search + _u.hash); } catch (e) { /* */ } }
     } catch (e) { /* */ }
   }

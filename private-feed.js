@@ -27,8 +27,10 @@
   function qs(n) { var m = String(g.location && g.location.search || "").match(new RegExp("[?&]" + n + "=([^&]+)")); return m ? decodeURIComponent(m[1]) : ""; }
 
   /* PRIVFEED3 · a pairing seed is stored once (16+ chars, same rule as the server), then stripped from the address bar */
+  /* SEEDGUARD1 · a legacy ?lightsProxyToken= / ?nestProxyToken= seed is saved ONLY when this screen holds no device key yet, so a crafted link can never replace (unpair) a paired screen's key. The param is still stripped. */
+  function noDeviceKey() { var ks = ["wardos-lights-proxy-token", "wardosNestProxyToken", "wardos-private-feed-token"]; for (var i = 0; i < ks.length; i++) { if (lsGet(ks[i])) return false; } return true; }
   var seed = qs("lightsProxyToken") || qs("proxyToken");
-  if (seed && /^[A-Za-z0-9_-]{16,}$/.test(seed)) lsSet("wardos-lights-proxy-token", seed);
+  if (seed && /^[A-Za-z0-9_-]{16,}$/.test(seed) && noDeviceKey()) lsSet("wardos-lights-proxy-token", seed);
   if (seed) stripParams(["lightsProxyToken", "proxyToken"]);
   function stripParams(keys) {
     try {

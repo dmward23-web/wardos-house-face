@@ -24,8 +24,10 @@
   function jset(k, v) { try { rawSet(k, JSON.stringify(v)); } catch (e) { /* */ } }
   function qs(n) { var m = location.search.match(new RegExp("[?&]" + n + "=([^&]+)")); return m ? decodeURIComponent(m[1]) : ""; }
 
+  /* SEEDGUARD1 · a legacy ?lightsProxyToken= / ?nestProxyToken= seed is saved ONLY when this screen holds no device key yet, so a crafted link can never replace (unpair) a paired screen's key. The param is still stripped. */
+  function noDeviceKey() { var ks = ["wardos-lights-proxy-token", "wardosNestProxyToken", "wardos-private-feed-token"]; try { for (var i = 0; i < ks.length; i++) { if (localStorage.getItem(ks[i])) return false; } return true; } catch (e) { return false; } }
   var tok = qs("lightsProxyToken") || qs("proxyToken");
-  if (tok && /^[A-Za-z0-9_-]{16,}$/.test(tok)) rawSet(TOKEN_LS, tok); /* PRIVFEED3 · 16+ like the server */
+  if (tok && /^[A-Za-z0-9_-]{16,}$/.test(tok) && noDeviceKey()) rawSet(TOKEN_LS, tok); /* PRIVFEED3 · 16+ like the server */
   if (tok) { try { var _u = new URL(location.href); ["lightsProxyToken", "proxyToken"].forEach(function (k) { _u.searchParams.delete(k); }); history.replaceState(history.state, "", _u.pathname + _u.search + _u.hash); } catch (e) { /* */ } }
 
   function token() { return ls.getItem(TOKEN_LS) || ""; }

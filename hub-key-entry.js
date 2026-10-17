@@ -20,13 +20,17 @@
     return out;
   }
 
+  function noDeviceKey() { var ks = ["wardos-lights-proxy-token", "wardosNestProxyToken", "wardos-private-feed-token"]; try { for (var i = 0; i < ks.length; i++) { if (localStorage.getItem(ks[i])) return false; } return true; } catch (e) { return false; } }
+
   /* KEYAUTO1: opening the setup link saves its keys on this screen automatically, no paste. */
   (function autoSaveFromUrl() {
     try {
       var k = parseKeys(location.search);
       /* PRIVFEED3 · legacy setup links still work once (same storage keys), 16+ chars like the server, then stripped */
-      if (k.lights && k.lights.length >= 16) localStorage.setItem(LIGHTS_LS, k.lights);
-      if (k.nest && k.nest.length >= 16) localStorage.setItem(NEST_LS, k.nest);
+      /* SEEDGUARD1 · a legacy ?lightsProxyToken= / ?nestProxyToken= seed is saved ONLY when this screen holds no device key yet, so a crafted link can never replace (unpair) a paired screen's key. The param is still stripped. */
+      var fresh = noDeviceKey(); /* checked once, before either write, so one link can seed both keys on an empty screen */
+      if (fresh && k.lights && k.lights.length >= 16) localStorage.setItem(LIGHTS_LS, k.lights);
+      if (fresh && k.nest && k.nest.length >= 16) localStorage.setItem(NEST_LS, k.nest);
       if (k.lights || k.nest) {
         var u = new URL(location.href);
         ["lightsProxyToken", "nestProxyToken", "proxyToken"].forEach(function (n) { u.searchParams.delete(n); });

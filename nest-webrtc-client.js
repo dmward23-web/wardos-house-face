@@ -111,10 +111,12 @@
    * A one-time ?proxyToken= pairing link is saved then stripped from the address bar; the key is only ever
    * sent as the X-Nest-Proxy-Token header, never in a URL. */
   var DEVICE_TOKEN_KEYS = [PROXY_TOKEN_LS_KEY, "wardos-lights-proxy-token", "wardos-private-feed-token"];
+  function noDeviceKey() { var ks = ["wardos-lights-proxy-token", "wardosNestProxyToken", "wardos-private-feed-token"]; try { for (var i = 0; i < ks.length; i++) { if (localStorage.getItem(ks[i])) return false; } return true; } catch (e) { return false; } }
   (function seedFromPairingLink() {
     var t = qs("proxyToken") || qs("nestProxyToken");
     if (!t) return;
-    try { if (/^[A-Za-z0-9_-]{16,}$/.test(t)) localStorage.setItem(PROXY_TOKEN_LS_KEY, t); } catch (_) {}
+    /* SEEDGUARD1 · a legacy ?lightsProxyToken= / ?nestProxyToken= seed is saved ONLY when this screen holds no device key yet, so a crafted link can never replace (unpair) a paired screen's key. The param is still stripped. */
+    try { if (/^[A-Za-z0-9_-]{16,}$/.test(t) && noDeviceKey()) localStorage.setItem(PROXY_TOKEN_LS_KEY, t); } catch (_) {}
     try {
       var u = new URL(location.href);
       ["proxyToken", "nestProxyToken", "token"].forEach(function (k) { u.searchParams.delete(k); });
