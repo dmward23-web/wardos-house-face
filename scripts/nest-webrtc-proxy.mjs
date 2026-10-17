@@ -32,6 +32,7 @@ import os from "node:os";
 import http from "node:http";
 import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
+import { createAccessLog } from "./access-log.mjs"; /* ACCESSLOG */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -295,16 +296,30 @@ function safeJoin(root, urlPath) {
   return abs;
 }
 
-/** CAMLOCK1 · collect auth tokens; never logs them. */
-export function loadAuthTokens(args, env = process.env) {
+/** ACCESSLOG · auth tokens with the slot each came from (never logged). nest-proxy.token and NEST_PROXY_TOKEN are the
+    retired cams key ("retired"); nest-device.token and --auth-token are the device key ("device"). First source wins. */
+export function loadAuthEntries(args, env = process.env) {
   const out = [];
-  const add = (t) => { t = String(t || "").trim(); if (t.length >= 16 && !out.includes(t)) out.push(t); };
-  add(args.cliToken);
-  add(env.NEST_PROXY_TOKEN);
+  const add = (t, slot) => { t = String(t || "").trim(); if (t.length >= 16 && !out.some((e) => e.t === t)) out.push({ t, slot }); };
+  add(args.cliToken, "device");
+  add(env.NEST_PROXY_TOKEN, "retired");
   for (const f of (args.authFiles.length ? args.authFiles : DEFAULT_AUTH_FILES)) {
-    try { for (const t of fs.readFileSync(f, "utf8").split(/\s+/)) add(t); } catch { /* missing file */ }
+    const slot = /^nest-proxy\.token/.test(path.basename(f)) ? "retired" : "device";
+    try { for (const t of fs.readFileSync(f, "utf8").split(/\s+/)) add(t, slot); } catch { /* missing file */ }
   }
   return out;
+}
+/** CAMLOCK1 · collect auth tokens; never logs them. */
+export function loadAuthTokens(args, env = process.env) {
+  return loadAuthEntries(args, env).map((e) => e.t);
+}
+/** ACCESSLOG · which slot the request's key header matched: "device" | "retired" | "none" (constant time over all) */
+export function authSlot(req, entries) {
+  const h = String(req.headers["x-nest-proxy-token"] || (req.headers.authorization || "").replace(/^Bearer\s+/i, "") || "");
+  if (!h || !entries || !entries.length) return "none";
+  let slot = "none";
+  for (const e of entries) if (safeEq(h, e.t) && slot === "none") slot = e.slot;
+  return slot;
 }
 
 function safeEq(a, b) {
@@ -341,7 +356,8 @@ async function main() {
     console.error("FATAL: nest-refresh.token missing at " + args.tokenFile);
     process.exit(2);
   }
-  args.authTokens = loadAuthTokens(args);
+  const authEntries = loadAuthEntries(args);
+  args.authTokens = authEntries.map((e) => e.t);
   if (!args.authTokens.length) {
     console.error("FATAL: CAMLOCK1 · no auth token (--auth-token-file, ~/.config/wardos/nest-proxy.token / nest-device.token, or NEST_PROXY_TOKEN; >= 16 chars). Refusing to start.");
     process.exit(3);
@@ -388,7 +404,11 @@ async function main() {
     return { cams, device: hit || null };
   }
 
+  /* ACCESSLOG · one JSON line per request (route, status, slot, cf-connecting-ip, UA); keys are scrubbed, never logged */
+  const access = createAccessLog({ name: "nest-webrtc-proxy", secrets: () => args.authTokens });
+
   const server = http.createServer(async (req, res) => {
+    try { access.setSlot(req, authSlot(req, authEntries)); access.attach(req, res); } catch { /* logging never breaks a request */ }
     /* PRIVFEED3 · never build a URL from the Host header; a bad request line is a 400, never a crash */
     let u;
     try { u = new URL(req.url || "/", "http://proxy.invalid"); } catch { return json(res, 400, { error: "bad request" }); }

@@ -33,6 +33,7 @@ import { fileURLToPath } from "node:url";
 import * as sensi from "./sensi-control.mjs"; /* SENSICTL1 */
 import * as spotify from "./spotify-control.mjs"; /* SPOTIFY1 */
 import { handlePrivate, readTokens } from "./private-feed.mjs"; /* PRIVFEED1 */
+import { createAccessLog } from "./access-log.mjs"; /* ACCESSLOG */
 import { privPath, assertPrivateOut } from "./private-dir.mjs"; /* PRIVFEED2 */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -167,6 +168,17 @@ export function hasKeyHeader(req, args) {
     (req.headers.authorization || "").replace(/^Bearer\s+/i, ""));
   if (!h) return false;
   return safeEq(h, args.authToken);
+}
+/** ACCESSLOG · slot label for the access log: "device" | "pair" | "none" (never the value) */
+export function accessSlot(req, args, privTokens = []) {
+  const p = String(req.url || "/").split(/[?#]/)[0];
+  if (req.method === "POST" && p === "/api/pair") return "pair";
+  if (hasKeyHeader(req, args)) return "device";
+  if (p.startsWith("/api/private/") && privTokens.length) {
+    const h = String(req.headers["x-private-feed-token"] || req.headers["x-lights-proxy-token"] || req.headers["x-nest-proxy-token"] || (req.headers.authorization || "").replace(/^Bearer\s+/i, ""));
+    if (h) { let ok = false; for (const t of privTokens) ok = safeEq(h, t) || ok; if (ok) return "device"; }
+  }
+  return "none";
 }
 export function houseOrigin(req) {
   return HOUSE_ORIGINS.has(String(req.headers.origin || ""));
@@ -436,7 +448,13 @@ async function main() {
   const privTokens = readTokens([args.tokenFile, path.join(os.homedir(), ".config", "wardos", "private-feed.token")]);
   if (args.authToken && !privTokens.includes(args.authToken)) privTokens.push(args.authToken);
 
+  /* ACCESSLOG · one JSON line per request (route, status, slot, cf-connecting-ip, UA); keys are scrubbed, never logged.
+     slot: "device" = device key header (or a private-feed token on /api/private/), "pair" = a pairing-code redeem
+     (POST /api/pair, authorised by the one-time code), else "none". */
+  const access = createAccessLog({ name: "lights-write-proxy", secrets: () => [args.authToken, ...privTokens] });
+
   const server = http.createServer(async (req, res) => {
+    try { access.setSlot(req, accessSlot(req, args, privTokens)); access.attach(req, res); } catch { /* logging never breaks a request */ }
     /* PRIVFEED3 · never build a URL from the Host header; a bad request line is a 400, never a crash */
     let u;
     try { u = new URL(req.url || "/", "http://proxy.invalid"); } catch { return json(res, 400, { error: "bad request" }); }
