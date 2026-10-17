@@ -150,6 +150,24 @@ test("MERCNODATA1 (real browser): mercury-run.html paints the world, not a black
     }
   });
 
+test("FOLLOWUP1 (real browser): mercury-run paints before data, and a 5 s hub with a full jar starts play once",
+  { skip: !browser && "QA_NO_BROWSER=1 or python playwright missing" }, () => {
+    const run = (mode) => {
+      const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/slow_hub.py"), mode, "5"], { encoding: "utf8", timeout: 120000 });
+      assert.equal(r.status, 0, r.stderr);
+      return JSON.parse(r.stdout.trim().split("\n").pop());
+    };
+    const full = run("full");
+    assert.ok(full.seeded > 0 && full.hub_hits > 0, JSON.stringify(full));
+    assert.ok(full.early_lit > 0.3, "canvas black at 1.2 s: " + JSON.stringify(full));
+    assert.deepEqual(full.at_4500, { gather: true, hud: 0 }, "empty start at 4.5 s");
+    assert.deepEqual(full.after_hub, { gather: false, hud: 1 }, "full jar from the slow hub plays once");
+    assert.deepEqual(full.errors, []);
+    const empty = run("empty");
+    assert.deepEqual(empty.after_hub, { gather: true, hud: 0 }, "a not-full jar stays on gather");
+    assert.deepEqual(empty.errors, []);
+  });
+
 test("NAMESDIR1: private-names.tsv is read from the private data dir, with ~/.config/wardos as the fallback", () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "namesdir-"));
   const home = path.join(tmp, "home"), priv = path.join(tmp, "priv");

@@ -2,7 +2,7 @@
 
 **Honest gate:** GitHub Pages is static. Nest / Google Home cams use **Google Device Access (SDM)** OAuth.
 
-**Status (2026-09-28 · CAMLIVE2):** Refresh token + `nest-sdm.json` on box (mode 600). **WebRTC live** via Atlas `nest-webrtc-proxy` (`127.0.0.1:8787`) + public CF tunnel. **NESTVID1 bake:** `nest-fetch` writes public `nestProxy` + `nestProxyToken` into `data/nest-live.json` (LIGHTS6 pattern) — Pages hard-refresh just works. **CAMLIVE2:** hub deck Front/Garage/Backyard run inline WebRTC `<video>` via `NestWebRtc.startStream`; pill = **LIVE** only when frames play (videoWidth + playing) — **never** LIVE on a JPEG (STILL/STALE/NEED PROXY until then). If proxy/tunnel down → reopen CF + re-bake nestProxy + still fallback (no silent black). SDM OAuth never on Pages.
+**Status (2026-09-28 · CAMLIVE2):** Refresh token + `nest-sdm.json` on box (mode 600). **WebRTC live** via Atlas `nest-webrtc-proxy` (`127.0.0.1:8787`) + public CF tunnel. **NESTVID1 bake:** `nest-fetch` writes public `nestProxy` + `nestProxyToken` into `data/nest-live.json` (LIGHTS6 pattern) · Pages hard-refresh just works. **CAMLIVE2:** hub deck camera tiles run inline WebRTC `<video>` via `NestWebRtc.startStream`; pill = **LIVE** only when frames play (videoWidth + playing) · **never** LIVE on a JPEG (STILL/STALE/NEED PROXY until then). If proxy/tunnel down to reopen CF + re-bake nestProxy + still fallback (no silent black). SDM OAuth never on Pages.
 
 ## Live data flow (stage)
 
@@ -44,7 +44,7 @@ stay in the box-only private folder (`~/.local/share/wardos-private/nest-snaps`)
 
 ```bash
 # proxy + chrome CDP already running (or start them)
-node scripts/nest-webrtc-still.mjs --cams "Front,Garage,Backyard"
+node scripts/nest-webrtc-still.mjs --cams "<name part>,<name part>"
 # no git: stills land in the private folder only
 ```
 
@@ -150,9 +150,9 @@ git push origin main
   "source": "nest-sdm",
   "cameras": [
     {
-      "id": "stub-front",
-      "name": "Front door",
-      "where": "Entry",
+      "id": "stub-1",
+      "name": "Camera 1",
+      "where": "Camera",
       "type": "CAMERA",
       "online": null,
       "snapshotUrl": null,

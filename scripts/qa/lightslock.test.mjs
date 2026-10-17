@@ -55,7 +55,9 @@ async function up(p) {
 }
 const ROUTES = [["GET", "/api/lights"], ["GET", "/api/taps"], ["GET", "/api/spotify"], ["POST", "/api/lights/set", { id: "kitchen", on: true }]];
 async function call(base, [method, p, body], headers = {}, suffix = "") {
-  const r = await fetch(base + p + suffix, { method, headers: { "Content-Type": "application/json", ...headers }, body: body ? JSON.stringify(body) : undefined });
+  /* FOLLOWUP6 · one connection per request (as QAKEEPALIVE1 in privfeed): on a loaded box a pooled keep-alive socket the
+     proxy closed meanwhile fails the next fetch ("fetch failed") */
+  const r = await fetch(base + p + suffix, { method, headers: { "Content-Type": "application/json", Connection: "close", ...headers }, body: body ? JSON.stringify(body) : undefined });
   let j = null; try { j = await r.json(); } catch { /* */ }
   return { status: r.status, j };
 }

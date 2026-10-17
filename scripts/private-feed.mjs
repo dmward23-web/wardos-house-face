@@ -11,8 +11,9 @@
  *   GET /api/private/cal-months.json        -> private cal-months
  *   GET /api/private/kids-week.json         -> private kids-week
  *   GET /api/private/{lights,sensi,nest}-live.json -> private house device state (PRIVFEED2)
- *   GET /api/private/nest/<cam>.jpg         -> front-door | garage | backyard still
- *   GET /api/private/private-names.json     -> {"school":[...]} only (SCHOOLNAMES1 · school-names.js; no other role ever)
+ *   GET /api/private/nest/<cam>.jpg         : a camera still by slug (FOLLOWUP2: no camera names in git; any
+ *                                              existing <slug>.jpg in the private nest-snaps folder)
+ *   GET /api/private/private-names.json     : {"school":[...]} only (SCHOOLNAMES1 · school-names.js; no other role ever)
  *
  * The house ORIGIN alone never unlocks these routes (anyone who opens the public site has that Origin).
  * Mounted by scripts/lights-write-proxy.mjs (handlePrivate) or run standalone:
@@ -29,8 +30,13 @@ import { PRIVATE_DIR, privateNamesPath } from "./private-dir.mjs";
 export const FEEDS = { "cal-live": "cal-live.json", "cal-months": "cal-months.json", "kids-week": "kids-week.json",
   /* PRIVFEED2 · house device state (lights, thermostat, cameras) is private too */
   "lights-live": "lights-live.json", "sensi-live": "sensi-live.json", "nest-live": "nest-live.json" };
-export const CAMS = new Set(["front-door", "garage", "backyard"]);
-const ROUTE = /^\/api\/private\/(?:(health)|(cal-live|cal-months|kids-week|lights-live|sensi-live|nest-live)\.json|nest\/([a-z-]+)\.jpg|(private-names)\.json)$/;
+/* FOLLOWUP2 · camera stills by slug only (lowercase words joined by single hyphens, <= 40 chars); the camera list
+   lives in the private folder, never in git */
+export const CAM_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+){0,5}$/;
+export function listCams(dir) {
+  try { return fs.readdirSync(path.join(dir, "nest-snaps")).filter((f) => f.endsWith(".jpg")).map((f) => f.slice(0, -4)).filter((c) => c.length <= 40 && CAM_SLUG.test(c)); } catch { return []; }
+}
+const ROUTE = /^\/api\/private\/(?:(health)|(cal-live|cal-months|kids-week|lights-live|sensi-live|nest-live)\.json|nest\/([a-z0-9-]{1,40})\.jpg|(private-names)\.json)$/;
 
 function tokenEq(a, b) {
   const x = Buffer.from(String(a || "")), y = Buffer.from(String(b || ""));
@@ -104,7 +110,7 @@ export function handlePrivate(req, res, opts) {
     for (const [k, f] of Object.entries(FEEDS)) {
       try { const st = fs.statSync(path.join(dir, f)); files[k] = { at: st.mtime.toISOString(), bytes: st.size }; } catch { files[k] = null; }
     }
-    for (const c of CAMS) {
+    for (const c of listCams(dir)) {
       try { const st = fs.statSync(path.join(dir, "nest-snaps", c + ".jpg")); files["nest/" + c] = { at: st.mtime.toISOString(), bytes: st.size }; } catch { files["nest/" + c] = null; }
     }
     send(200, JSON.stringify({ ok: true, files }));
@@ -129,7 +135,7 @@ export function handlePrivate(req, res, opts) {
   let fp, type;
   if (m[2]) { fp = path.join(dir, FEEDS[m[2]]); type = "application/json; charset=utf-8"; }
   else {
-    if (!CAMS.has(m[3])) { send(404, '{"error":"unknown cam"}'); return true; }
+    if (!CAM_SLUG.test(m[3])) { send(404, '{"error":"unknown cam"}'); return true; }
     fp = path.join(dir, "nest-snaps", m[3] + ".jpg"); type = "image/jpeg";
   }
   let buf;

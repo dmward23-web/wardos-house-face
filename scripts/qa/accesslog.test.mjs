@@ -11,10 +11,10 @@ import path from "node:path";
 import http from "node:http";
 import crypto from "node:crypto";
 import { EventEmitter } from "node:events";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
-import { createAccessLog, cleanPath, cleanIp, cleanUa, isoLocal } from "../access-log.mjs";
+import { createAccessLog, cleanPath, cleanIp, cleanUa, isoLocal, redactRuns } from "../access-log.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const NEST = path.join(ROOT, "scripts/nest-webrtc-proxy.mjs");
@@ -94,7 +94,7 @@ test("ACCESSLOG cams: one line per request, right slot/status/ip/ua, no key/quer
     const reqs = [
       ["no key", "/api/cameras", {}, 401, "none"],
       ["device key", "/api/cameras?refresh=1", { "X-Nest-Proxy-Token": DEV, "cf-connecting-ip": "203.0.113.9", "User-Agent": UA_IOS }, 200, "device"],
-      ["retired key", "/api/cameras", { "X-Nest-Proxy-Token": RET, "cf-connecting-ip": "2001:db8::7" }, 200, "retired"],
+      ["retired key", "/api/cameras", { "X-Nest-Proxy-Token": RET, "cf-connecting-ip": "2001:db8::7" }, 401, "retired"],
       ["bearer device", "/api/cameras", { Authorization: "Bearer " + DEV }, 200, "device"],
       ["wrong key", "/api/cameras", { "X-Nest-Proxy-Token": "wrong-key-0123456789abcdef" }, 401, "none"],
       ["key in URL", `/api/cameras?nestProxyToken=${DEV}&proxyToken=${encodeURIComponent(RET)}#k=${DEV}`, {}, 401, "none"],
@@ -249,7 +249,7 @@ test("ACCESSLOG: a broken log never breaks a request; a log dir inside the repo 
     assert.equal((await fetch(p.base + "/api/cameras", { headers: { "X-Nest-Proxy-Token": DEV } })).status, 200);
     assert.equal((await fetch(p.base + "/api/cameras")).status, 401);
     assert.match(p.out(), /access logging degraded; requests unaffected/);
-    assert.equal((p.out().match(/\[access-log\]/g) || []).length, 1, "warns once, not per request");
+    assert.equal((p.out().match(/\[access-log\]/g) || []).length, 1, "warning is rate limited, not per request");
   } finally { p.child.kill(); }
 });
 
@@ -263,4 +263,108 @@ test("ACCESSLOG helpers: path strips query/fragment, ip shape-checked, ua capped
   assert.equal(cleanUa("a\nb", []), "a b");
   assert.equal(cleanUa("z".repeat(500), []).length, 120);
   assert.match(isoLocal(), TIME_RE);
+});
+
+/* ---------- FOLLOWUP1 · Alfred ACCESSLOG P3s ---------- */
+const PFK = "acclog-privfeed-key-55aa55aa55aaPFK";
+const RETIRED_ONLY = "acclog-retired-only-0123456789RTO";
+test("FOLLOWUP1 cams: the retired nest-proxy.token never authorises but logs 'retired' even when not passed; every house key file is scrubbed in any case", async () => {
+  const h = nestHome();
+  fs.writeFileSync(path.join(h.cfg, "nest-proxy.token"), RETIRED_ONLY + "\n", { mode: 0o600 });
+  fs.writeFileSync(path.join(h.cfg, "lights-proxy.token"), LKEY + "\n", { mode: 0o600 });
+  fs.writeFileSync(path.join(h.cfg, "private-feed.token"), PFK + "\n", { mode: 0o600 });
+  /* only the device file is passed, like the live launch */
+  const p = launch(NEST, ["--auth-token-file", path.join(h.cfg, "nest-device.token")], { HOME: h.home, NEST_PROXY_TEST_GOOGLE: GOOGLE });
+  try {
+    assert.ok(await up(p.base), p.out());
+    const reqs = [
+      ["/api/cameras", { "X-Nest-Proxy-Token": RETIRED_ONLY }, 401],
+      ["/api/cameras", { Authorization: "Bearer " + RETIRED_ONLY }, 401],
+      ["/api/cameras", { "X-Nest-Proxy-Token": DEV }, 200],
+      [`/api/${LKEY}/x`, {}, 401],
+      [`/api/${PFK.toUpperCase()}/x`, {}, 401],
+      [`/api/${encodeURIComponent(DEV.toUpperCase())}/x`, {}, 401],
+      [`/api/${RETIRED_ONLY}/x`, {}, 401],
+      ["/health", { "User-Agent": "probe " + LKEY.toUpperCase() + " " + PFK + " tok=AbCdEf0123456789GhIjKl end" }, 200],
+    ];
+    for (const [url, headers, want] of reqs) { const r = await fetch(p.base + url, { headers }); assert.equal(r.status, want, url.slice(0, 24)); await r.arrayBuffer(); }
+    const file = path.join(h.home, ".cache", "wardos", "nest-webrtc-proxy-access.log");
+    await waitLines(file, reqs.length + 1);
+    const raw = fs.readFileSync(file, "utf8");
+    for (const k of [DEV, RETIRED_ONLY, LKEY, PFK]) for (const f of [k, k.toUpperCase(), k.toLowerCase(), encodeURIComponent(k)]) assert.ok(!raw.includes(f), "a house key form leaked");
+    assert.ok(!raw.includes("AbCdEf0123456789GhIjKl"), "base64url run in UA");
+    const L = readLines(file).filter((l) => !(l.p === "/health" && l.ua.startsWith("node")));
+    assert.deepEqual(L.slice(0, 3).map((l) => `${l.s} ${l.slot}`), ["401 retired", "401 retired", "200 device"]);
+    for (const l of L.slice(3, 7)) assert.equal(l.p, "/api/<redacted>/x");
+    assert.equal(L[7].ua, "probe <redacted> <redacted> tok=<redacted> end");
+  } finally { p.child.kill(); }
+});
+
+test("FOLLOWUP1 cams: a proxy started with ONLY the retired key file refuses to start", async () => {
+  const h = nestHome();
+  const p = launch(NEST, ["--auth-token-file", path.join(h.cfg, "nest-proxy.token")], { HOME: h.home, NEST_PROXY_TEST_GOOGLE: GOOGLE });
+  const code = await new Promise((r) => p.child.on("exit", r));
+  assert.equal(code, 3, p.out());
+  assert.ok(!p.out().includes(RET));
+});
+
+test("FOLLOWUP1 path hardening: symlinked log dir refused (into the repo or not), rotated files forced to 600, access logs gitignored", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "acclog-sym-"));
+  const intoRepo = path.join(tmp, "into-repo"); fs.symlinkSync(path.join(ROOT, "data"), intoRepo);
+  const a = createAccessLog({ name: "symunit", env: { WARDOS_ACCESS_LOG_DIR: intoRepo } });
+  assert.equal(a.enabled, false, "symlink into the repo");
+  const x = fakeReqRes("/a"); a.attach(x.req, x.res); x.res.emit("finish");
+  assert.ok(!fs.existsSync(path.join(ROOT, "data", "symunit-access.log")));
+  const sub = path.join(intoRepo, "deeper");
+  const a2 = createAccessLog({ name: "symunit", env: { WARDOS_ACCESS_LOG_DIR: sub } });
+  assert.equal(a2.enabled, false, "a path under a symlinked parent resolves into the repo");
+  const real = path.join(tmp, "real"); fs.mkdirSync(real); const link = path.join(tmp, "link"); fs.symlinkSync(real, link);
+  const b = createAccessLog({ name: "symunit", env: { WARDOS_ACCESS_LOG_DIR: link } });
+  assert.equal(b.enabled, false, "any symlinked log dir");
+  const y = fakeReqRes("/b"); b.attach(y.req, y.res); y.res.emit("finish");
+  assert.deepEqual(fs.readdirSync(real), []);
+  /* a pre-existing 644 rotation is tightened */
+  const dir = path.join(tmp, "logs"); fs.mkdirSync(dir, { mode: 0o700 });
+  fs.writeFileSync(path.join(dir, "rot-access.log.1"), "{}\n", { mode: 0o644 }); fs.chmodSync(path.join(dir, "rot-access.log.1"), 0o644);
+  const c = createAccessLog({ name: "rot", env: { WARDOS_ACCESS_LOG_DIR: dir, WARDOS_ACCESS_LOG_MAX_BYTES: "300" } });
+  for (let i = 0; i < 12; i++) { const z = fakeReqRes("/r" + i); c.attach(z.req, z.res); z.res.emit("finish"); }
+  for (const f of fs.readdirSync(dir)) assert.equal(mode(path.join(dir, f)), 0o600, f);
+  for (const f of ["data/nest-webrtc-proxy-access.log", "x/lights-write-proxy-access.log.2"]) {
+    assert.equal(spawnSync("git", ["check-ignore", "-q", "--no-index", f], { cwd: ROOT }).status, 0, f + " ignored");
+  }
+});
+
+test("FOLLOWUP1 retention: lines older than the cap are dropped from the log and its rotations at the first write", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "acclog-ret-")); fs.chmodSync(dir, 0o700);
+  const old = (d) => JSON.stringify({ t: isoLocal(new Date(Date.now() - d * 86400000)), m: "GET", p: "/old" + d, s: 200, slot: "none", ip: "-", ua: "" });
+  fs.writeFileSync(path.join(dir, "ret-access.log"), [old(45), old(31), old(2)].join("\n") + "\n", { mode: 0o600 });
+  fs.writeFileSync(path.join(dir, "ret-access.log.2"), [old(60), old(40)].join("\n") + "\n", { mode: 0o600 });
+  const log = createAccessLog({ name: "ret", env: { WARDOS_ACCESS_LOG_DIR: dir } });
+  const { req, res } = fakeReqRes("/new"); log.attach(req, res); res.emit("finish");
+  assert.deepEqual(readLines(path.join(dir, "ret-access.log")).map((l) => l.p), ["/old2", "/new"]);
+  assert.ok(!fs.existsSync(path.join(dir, "ret-access.log.2")), "an all-old rotation is removed");
+  assert.equal(mode(path.join(dir, "ret-access.log")), 0o600);
+});
+
+test("FOLLOWUP1 warnings repeat (rate limited) instead of only once", async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "acclog-warn-"));
+  const notDir = path.join(tmp, "file"); fs.writeFileSync(notDir, "x");
+  const seen = []; const orig = console.warn; console.warn = (m) => seen.push(String(m));
+  try {
+    const log = createAccessLog({ name: "w", env: { WARDOS_ACCESS_LOG_DIR: path.join(notDir, "sub"), WARDOS_ACCESS_LOG_WARN_MS: "20" } });
+    for (let i = 0; i < 3; i++) { const { req, res } = fakeReqRes("/x"); log.attach(req, res); res.emit("finish"); }
+    await new Promise((r) => setTimeout(r, 40));
+    const { req, res } = fakeReqRes("/x"); log.attach(req, res); res.emit("finish");
+  } finally { console.warn = orig; }
+  assert.equal(seen.length, 2, seen.join(" | "));
+  assert.match(seen[1], /2 more since the last warning/);
+});
+
+test("FOLLOWUP1 base64url runs: mixed 20+ runs redacted, plain words and short tokens kept", () => {
+  assert.equal(redactRuns("a AbCdEf0123456789GhIjKl b"), "a <redacted> b");
+  assert.equal(redactRuns("x".repeat(30)), "x".repeat(30));
+  assert.equal(redactRuns("nest-webrtc-client-js-file"), "nest-webrtc-client-js-file");
+  assert.equal(cleanPath("/nest-webrtc-client.js", []), "/nest-webrtc-client.js");
+  assert.equal(cleanPath("/api/cameras", []), "/api/cameras");
+  assert.equal(cleanPath("/api/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855/x", []), "/api/<redacted>/x");
 });

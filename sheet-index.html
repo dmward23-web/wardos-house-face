@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
-<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=FOLLOWUP6"></script>
 <script src="school-names.js?v=SCHOOLNAMES1"></script>
 <script src="house-nomoney.js?v=NOMONEY1"></script>
 <script src="house-face-law.js?v=PRIVFEED3"></script>
@@ -441,7 +441,7 @@
     border: 2px solid rgba(255,255,255,0.65);
     box-shadow: 0 3px 0 rgba(80,50,10,0.22), 0 0 10px rgba(255,180,40,0.28);
   }
-  /* Compact next-line (hub scale — never 48/56) */
+  /* Compact next-line (hub scale, never 48/56) */
   .leaveby-main {
     font-size: 22px; font-weight: 850; letter-spacing: -0.03em;
     color: #121418; line-height: 1.15;
@@ -464,7 +464,7 @@
     letter-spacing: -0.01em;
   }
   .leaveby-detail strong { color: #8a5010; font-weight: 800; }
-  /* Dense schedule lists — space = rows, not type */
+  /* Dense schedule lists, space = rows, not type */
   .leaveby-sched {
     display: flex; flex-direction: column; gap: 8px; min-width: 0; flex: 1; min-height: 0;
   }
@@ -532,7 +532,7 @@
     gap: 10px;
   }
 
-  /* HUBNEXT2 · Mission-glass tiles (depth/blur/edge light — NOT crayon squares) */
+  /* HUBNEXT2 · Mission-glass tiles (depth/blur/edge light, NOT crayon squares) */
   .tile {
     --tile-accent: #c8a050;
     --tile-glow: rgba(255,180,60,0.28);
@@ -618,7 +618,7 @@
   }
 
 
-  /* —— HUBNEXT2 personalities · tinted mission-glass (accent only, not crayon fill) —— */
+  /* HUBNEXT2 personalities · tinted mission-glass (accent only, not crayon fill) */
   .tile.today {
     --tile-accent: #f0a020; --tile-glow: rgba(255,180,40,0.38);
     --tile-ink: #2a1808; --tile-mute: #6a4820;
@@ -794,7 +794,7 @@
   .tile.harris .tile-tap { background: #ffe060; color: #1a1000; border: 2px solid #8a5010; font-weight: 800; }
 
 
-  /* —— Hub badge portraits · real photos when present; NEED PHOTO hooks otherwise —— */
+  /* Hub badge portraits · real photos when present; NEED PHOTO hooks otherwise */
   .tile-icon.tile-icon--portrait {
     width: 56px; height: 56px; border-radius: 14px;
     padding: 0; overflow: hidden;
@@ -823,7 +823,7 @@
   .tile.harris .tile-icon--portrait { border-radius: 6px !important; box-shadow: 0 4px 0 #0e2008 !important; border-color: #1a3010 !important; }
   .tile.dan .tile-icon--portrait { border-color: #ffe080 !important; box-shadow: 0 0 0 3px rgba(0,0,0,0.35), 0 0 16px rgba(255,200,80,0.35) !important; }
 
-  /* —— CANVAS LAW · Elo 3202L portrait 1080×1920 —— */
+  /* CANVAS LAW · Elo 3202L portrait 1080×1920 */
   .hdr { flex-wrap: wrap; gap: 12px; padding: 12px 14px; }
   .hdr-left { flex-wrap: wrap; gap: 12px; }
   .name { font-size: 34px; }
@@ -1561,7 +1561,7 @@
   .leaveby-row.is-next .leaveby-row-title { font-size: 15px; }
   .sensi-hdr-temp, .nest-hdr-main { font-size: 26px !important; }
 
-  /* HUBNEXT2 · final glass lock — beat any leftover crayon tile fills */
+  /* HUBNEXT2 · final glass lock, beat any leftover crayon tile fills */
   .tile.today, .tile.week, .tile.month, .tile.chores, .tile.groceries,
   .tile.stars, .tile.fun, .tile.win, .tile.ghome, .tile.google-home {
     backdrop-filter: blur(18px) saturate(1.25) !important;
@@ -2242,7 +2242,7 @@
     width: 100% !important;
   }
 
-  /* Schedule · dark mission glass (mock v4 heat) — kill beige */
+  /* Schedule · dark mission glass (mock v4 heat), kill beige */
   .leaveby {
     border-radius: 18px !important;
     overflow: hidden !important;
@@ -2586,7 +2586,7 @@
       0 2px 6px rgba(0,0,0,0.35) !important;
   }
 
-  /* Hide NEED PHOTO chrome — letter avatars only */
+  /* Hide NEED PHOTO chrome, letter avatars only */
   .tile-icon .tile-portrait,
   .tile-icon .need-photo-label { display: none !important; }
   .tile-icon.need-photo::after { content: none !important; }
@@ -2642,7 +2642,7 @@
     justify-content: center !important;
     gap: 8px !important;
   }
-  /* HUBFMT1 · pass-by glance date — huge DOW + high-contrast long */
+  /* HUBFMT1 · pass-by glance date, huge DOW + high-contrast long */
   .hdr.hdr--spread .hdr-date {
     flex: 1 1 0 !important;
     min-width: 0 !important;
@@ -4097,33 +4097,33 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  </header>
 
  <div class="hub-cam-deck" id="hub-cam-deck" aria-label="Nest cameras · live when stream plays">
- <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Front door camera · STILL">
+ <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Camera 1 · STILL">
  <div class="hub-cam-media-wrap">
- <img class="hub-cam-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-pf-snap="data/nest-snaps/front-door.jpg" alt="Front door still"/>
+ <img class="hub-cam-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Camera 1 still"/>
  <span class="hub-cam-pill hub-cam-pill--corner is-still">STILL</span>
  </div>
  <div class="hub-cam-foot">
- <span class="hub-cam-label">Front</span>
+ <span class="hub-cam-label">Camera 1</span>
  <span class="hub-cam-kind" hidden aria-hidden="true">STILL</span>
  </div>
  </a>
- <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Garage camera · STILL">
+ <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Camera 2 · STILL">
  <div class="hub-cam-media-wrap">
- <img class="hub-cam-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-pf-snap="data/nest-snaps/garage.jpg" alt="Garage still"/>
+ <img class="hub-cam-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Camera 2 still"/>
  <span class="hub-cam-pill hub-cam-pill--corner is-still">STILL</span>
  </div>
  <div class="hub-cam-foot">
- <span class="hub-cam-label">Garage</span>
+ <span class="hub-cam-label">Camera 2</span>
  <span class="hub-cam-kind" hidden aria-hidden="true">STILL</span>
  </div>
  </a>
- <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Backyard camera · STILL">
+ <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Camera 3 · STILL">
  <div class="hub-cam-media-wrap">
- <img class="hub-cam-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-pf-snap="data/nest-snaps/backyard.jpg" alt="Backyard still"/>
+ <img class="hub-cam-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Camera 3 still"/>
  <span class="hub-cam-pill hub-cam-pill--corner is-still">STILL</span>
  </div>
  <div class="hub-cam-foot">
- <span class="hub-cam-label">Yard</span>
+ <span class="hub-cam-label">Camera 3</span>
  <span class="hub-cam-kind" hidden aria-hidden="true">STILL</span>
  </div>
  </a>
@@ -4376,14 +4376,14 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 <script src="house-weather.js?v=PRIVFEED3"></script>
 <script src="house-sfx.js?v=HUM1"></script>
 <script src="house-tapsync.js?v=HUBPIN1"></script>
-<script src="kids-data.js?v=PRIVFEED3"></script>
+<script src="kids-data.js?v=MERCNODATA1"></script>
 <script src="house-kid-engage.js?v=PRIVFEED3"></script>
 <script src="house-hub-tiles-bind.js?v=ALLDAY1"></script>
 <script src="house-sensi.js?v=PRIVFEED3"></script>
-<script src="nest-webrtc-client.js?v=HUBPIN1"></script>
+<script src="nest-webrtc-client.js?v=FOLLOWUP6"></script>
 <script src="house-nest.js?v=HUBPIN1"></script>
-<script src="hub-key-entry.js?v=PRIVFEED3"></script>
-<script src="house-lights.js?v=HUBPIN1"></script>
+<script src="hub-key-entry.js?v=FOLLOWUP6"></script>
+<script src="house-lights.js?v=FOLLOWUP6"></script>
 <script src="house-sensi-ctl.js?v=HUBPIN1"></script>
 <script src="hub-led-ring.js?v=LEDPHONE1"></script>
 <script>
@@ -4431,7 +4431,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
   function fitPortrait() {
     var panel = document.querySelector(".panel");
     if (!panel) return;
-    /* HUBFIT1 · phones use their own responsive layout (tokens-hub-fit.css) — never shrink the wall canvas */
+    /* HUBFIT1 · phones use their own responsive layout (tokens-hub-fit.css), never shrink the wall canvas */
     try {
       if (Math.min(screen.width, screen.height) <= 600) {
         panel.style.transform = ""; panel.style.transformOrigin = "";
@@ -4472,7 +4472,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 </script>
 <script src="house-fresh.js?v=NOOPEN1"></script>
 <style>
-/* NOOPEN1 · no OPEN buttons anywhere — the whole card is the tap target */
+/* NOOPEN1 · no OPEN buttons anywhere, the whole card is the tap target */
 .tile .tile-tap, .tile .kid-flip-go, .who-up-go { display: none !important; }
 [data-who-up] { cursor: pointer; }
 /* SEATS1 · Dad seat wears the kid card, last in the lineup */

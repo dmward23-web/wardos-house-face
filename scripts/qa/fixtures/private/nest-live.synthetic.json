@@ -4,7 +4,7 @@
   "updatedAt": "2026-10-13T11:40:00.000Z",
   "source": "synthetic",
   "cameras": [
-    { "id": "cam-sample-1", "name": "Front", "where": "Front", "type": "camera", "online": true, "snapshotUrl": "data/nest-snaps/front-door.jpg", "streamUrl": null, "traits": [], "rawName": "Sample camera", "protocols": ["WEB_RTC"] }
+    { "id": "cam-sample-1", "name": "Camera 1", "where": "Camera", "type": "camera", "online": true, "snapshotUrl": "data/nest-snaps/cam-a.jpg", "streamUrl": null, "traits": [], "rawName": "Sample camera", "protocols": ["WEB_RTC"] }
   ],
   "deviceCount": 1,
   "cameraCount": 1,

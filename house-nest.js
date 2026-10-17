@@ -187,8 +187,6 @@
     if (/entry|front|door|doorbell/.test(n)) return "🚪";
     if (/drive/.test(n)) return "🚗";
     if (/yard|back|patio/.test(n)) return "🌳";
-    if (/garage/.test(n)) return "🏠";
-    if (/kitchen/.test(n)) return "🍳";
     if (/living|family|inside/.test(n)) return "🛋";
     return "📷";
   }
@@ -507,40 +505,28 @@
   }
 
 
-  /* ── CAMDECK1 · hub still tiles (Front / Garage / Backyard only) ── */
+  /* ── CAMDECK1 · hub still tiles: three slots. FOLLOWUP2 · no camera names or rooms in git: slot i shows the i-th
+     camera from the private live list, cameras that have a still first; the label is the camera's own name. ── */
   var HUB_CAMS = [
-    {
-      key: "front",
-      label: "Front",
-      snap: "data/nest-snaps/front-door.jpg",
-      match: /front|door|doorbell/i
-    },
-    {
-      key: "garage",
-      label: "Garage",
-      snap: "data/nest-snaps/garage.jpg",
-      match: /garage/i
-    },
-    {
-      key: "backyard",
-      label: "Yard",
-      snap: "data/nest-snaps/backyard.jpg",
-      match: /backyard|yard|patio/i
-    }
+    { key: "cam1", label: "Camera 1", snap: null },
+    { key: "cam2", label: "Camera 2", snap: null },
+    { key: "cam3", label: "Camera 3", snap: null }
   ];
 
   var SNAP_FRESH_MS = 30 * 60 * 1000;
 
-  function findCamForHub(slot, cams) {
-    cams = cams || [];
-    for (var i = 0; i < cams.length; i++) {
-      var c = cams[i];
-      if (!c) continue;
-      var blob = String((c.name || "") + " " + (c.where || ""));
-      if (slot.match.test(blob)) return c;
-    }
-    return null;
+  function hubCamOrder(cams) {
+    var real = (cams || []).filter(function (c) { return c && !String(c.id || "").startsWith("stub-"); });
+    var withStill = real.filter(function (c) { return !!c.snapshotUrl; });
+    var rest = real.filter(function (c) { return !c.snapshotUrl; });
+    return withStill.concat(rest);
   }
+  function findCamForHub(slot, cams) {
+    var i = HUB_CAMS.indexOf(slot);
+    var list = hubCamOrder(cams);
+    return i >= 0 && list[i] ? list[i] : null;
+  }
+  function hubLabel(slot, cam) { return String((cam && cam.name) || slot.label).slice(0, 40); }
 
   /**
    * Honest ONE status for a hub tile (HUBFMT1 / CAMLIVE2).
@@ -601,14 +587,14 @@
         if (cam && !String(cam.id || "").startsWith("stub-")) {
           el.setAttribute("data-cam-id", cam.id);
           el.setAttribute("href", viewerHref(cam));
-          el.setAttribute("aria-label", slot.label + " camera · LIVE");
+          el.setAttribute("aria-label", hubLabel(slot, cam) + " camera · LIVE");
         }
         continue;
       }
       var h = hubCamHonesty(slot, cam, g, data);
       el.classList.remove("hub-cam-live", "hub-cam-still", "hub-cam-stale", "hub-cam-stub");
       el.classList.add(h.cls);
-      el.setAttribute("aria-label", slot.label + " camera · " + h.pill);
+      el.setAttribute("aria-label", hubLabel(slot, cam) + " camera · " + h.pill);
       if (cam && !String(cam.id || "").startsWith("stub-")) {
         el.setAttribute("data-cam-id", cam.id);
         el.setAttribute("href", viewerHref(cam));
@@ -624,7 +610,7 @@
         pill.classList.add(h.pillCls);
       }
       var label = el.querySelector(".hub-cam-label");
-      if (label) label.textContent = slot.label;
+      if (label) label.textContent = hubLabel(slot, cam);
       /* HUBFMT1 · one status only — pill owns it; hide foot kind duplicate */
       var kind = el.querySelector(".hub-cam-kind");
       if (kind) {
@@ -650,7 +636,7 @@
         if (!img && mediaWrap) {
           img = doc.createElement("img");
           img.className = "hub-cam-media";
-          img.alt = slot.label + " still";
+          img.alt = hubLabel(slot, cam) + " still";
           mediaWrap.insertBefore(img, mediaWrap.firstChild);
         }
         if (img) {
@@ -797,7 +783,7 @@
         var h = hubCamHonesty(slot, cam, g, data);
         el.classList.remove("hub-cam-still", "hub-cam-stale", "hub-cam-stub");
         el.classList.add(h.cls);
-        el.setAttribute("aria-label", slot.label + " camera · " + h.pill);
+        el.setAttribute("aria-label", hubLabel(slot, cam) + " camera · " + h.pill);
         var pill = el.querySelector(".hub-cam-pill");
         if (pill) {
           pill.textContent = h.pill;
@@ -864,10 +850,10 @@
     }, 120);
   }
 
-  /* CAMIOS2 · start the cams that can stream first (front-door battery bell
-   * last), back off a cam Google says can't stream, and if the iPhone won't
+  /* CAMIOS2 · start the cams in slot order (FOLLOWUP3: slots already put cameras with a still, the ones that can
+   * stream, first), back off a cam Google says can't stream, and if the iPhone won't
    * autoplay, show "TAP FOR LIVE" and start every hub video on the first tap. */
-  var HUB_ORDER = [1, 2, 0];
+  var HUB_ORDER = [0, 1, 2];
   var _hubCamBackoff = {};
   var _hubTapArmed = false;
   function hubVideoHasTrack(vid) {

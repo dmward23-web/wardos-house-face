@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
-<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=FOLLOWUP6"></script>
 <script src="school-names.js?v=SCHOOLNAMES1"></script>
 <script src="house-face-law.js?v=PRIVFEED3"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
@@ -86,7 +86,7 @@
   .kid-link.ainsley .dot{background:#8a40a8}
   .note{padding:10px 14px;border-radius:10px;background:rgba(40,42,48,0.08);border:2px dashed rgba(40,42,48,0.3);
     font-size:13px;font-weight:650;color:#3a3e46;flex-shrink:0}
-  /* DADFIX1 · zoom chrome is junk under clock-first — kill */
+  /* DADFIX1 · zoom chrome is junk under clock-first, kill */
   .house-zoom,[data-house-zoom-ctl]{display:none!important}
   .ftr{display:flex;justify-content:space-between;font-size:12px;color:#5a5e66;font-weight:600}
   .ftr-chip{padding:6px 10px;border-radius:8px;border:2px solid #2a2e36;background:#fff;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase}
@@ -96,7 +96,7 @@
 <link rel="stylesheet" href="tokens-dad-clock-first-heat.css?v=DADGLANCE1" />
 <link rel="stylesheet" href="tokens-dad-fix1-heat.css?v=DADGLANCE1" />
 <style>
-/* DADSEAT1 · Dad seat page — kid-card look, gold */
+/* DADSEAT1 · Dad seat page, kid-card look, gold */
 /* DADNAME1 · page says whose it is */
 .ds-title{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;margin:4px 2px 0;font-size:56px;font-weight:900;letter-spacing:.04em;line-height:1}
 .ds-title .name-accent{color:#ffd76a!important;opacity:1!important;text-shadow:0 0 18px rgba(255,190,60,.7)}
@@ -448,7 +448,7 @@
 <script src="house-clock.js?v=PRIVFEED3"></script>
 <script src="house-board-strip.js?v=PRIVFEED3"></script>
 <script src="house-tapsync.js?v=HUBPIN1"></script>
-<script src="kids-data.js?v=PRIVFEED3"></script>
+<script src="kids-data.js?v=MERCNODATA1"></script>
 <script src="house-weather.js?v=PRIVFEED3"></script>
 <script src="house-sensi.js?v=PRIVFEED3"></script>
 <script>
@@ -473,7 +473,7 @@
     oval.classList.remove("unwired");
     if (label) oval.setAttribute("aria-label", label);
   }
-  /* Live Wx/Sensi ° — real live only; omit oval if not (never dash-degree) */
+  /* Live Wx/Sensi °, real live only; omit oval if not (never dash-degree) */
   function paintDanOvals() {
     wireOval(".hdr .oval.wx", null);
     wireOval(".hdr .oval.sensi", null);

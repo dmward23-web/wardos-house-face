@@ -13,7 +13,8 @@
  *   ~/.config/wardos/nest-sdm.json        (mode 600) — { projectId, clientId, clientSecret }
  *
  * NESTVID1 (LIGHTS6 pattern): bake public nestProxy (+ nestProxyToken) from
- *   ~/.config/wardos/nest-webrtc-proxy.url + nest-proxy.token into nest-live.json
+ *   ~/.config/wardos/nest-webrtc-proxy.url + nest-device.token into nest-live.json (FOLLOWUP2: the retired
+ *   nest-proxy.token / NEST_PROXY_TOKEN get 401 from the proxy, so they are not read)
  *   so Pages hard-refresh plays video without ?proxy= seed. SDM secrets stay box-only.
  *
  * Usage:
@@ -65,11 +66,7 @@ function resolveNestProxy() {
 
 /** Proxy auth token (NOT SDM OAuth). Baked when proxy is public so Pages works without seed. */
 function resolveNestProxyToken() {
-  return (
-    (process.env.NEST_PROXY_TOKEN || "").trim() ||
-    readCredFile("nest-proxy.token") ||
-    ""
-  );
+  return readCredFile("nest-device.token") || "";
 }
 
 function isLoopbackProxyUrl(url) {
@@ -120,10 +117,6 @@ function attachExistingStills(cameras, outPath) {
     const candidates = [
       base + ".jpg",
       base.replace(/-doorbell$/, "") + ".jpg",
-      base.replace(/-door$/, "-door.jpg"),
-      "front-door.jpg",
-      "garage.jpg",
-      "backyard.jpg",
     ];
     const seen = new Set();
     for (const name of candidates) {
@@ -133,12 +126,8 @@ function attachExistingStills(cameras, outPath) {
       const abs = path.join(SNAPS_DIR, name);
       if (!fs.existsSync(abs) || fs.statSync(abs).size <= 800) continue;
       // Only attach if name matches this cam (avoid cross-wiring)
-      const n = String(pad.name || "").toLowerCase();
       const stem = name.replace(/\.jpg$/, "");
       const ok =
-        (stem === "front-door" && /front/.test(n)) ||
-        (stem === "garage" && /garage/.test(n)) ||
-        (stem === "backyard" && /back|yard/.test(n)) ||
         stem === base ||
         stem === base.replace(/-doorbell$/, "");
       if (!ok) continue;
@@ -155,10 +144,11 @@ function attachExistingStills(cameras, outPath) {
 
 /** Honest stub pads when no live devices yet — matches sheet-google-home.html */
 const STUB_PADS = [
-  { id: "stub-front", name: "Front door", where: "Entry", type: "CAMERA" },
-  { id: "stub-drive", name: "Driveway", where: "Drive", type: "CAMERA" },
-  { id: "stub-yard", name: "Backyard", where: "Yard", type: "CAMERA" },
-  { id: "stub-garage", name: "Garage cam", where: "Garage", type: "CAMERA" },
+  /* FOLLOWUP2 · generic stub names: no camera rooms in git */
+  { id: "stub-1", name: "Camera 1", where: "Camera", type: "CAMERA" },
+  { id: "stub-2", name: "Camera 2", where: "Camera", type: "CAMERA" },
+  { id: "stub-3", name: "Camera 3", where: "Camera", type: "CAMERA" },
+  { id: "stub-4", name: "Camera 4", where: "Camera", type: "CAMERA" },
 ];
 
 function parseArgs(argv) {
@@ -262,13 +252,9 @@ function deviceTypeShort(type) {
   return parts[parts.length - 1] || "DEVICE";
 }
 
-function guessWhere(name) {
-  const n = String(name || "").toLowerCase();
-  if (/front|door|entry|porch/.test(n)) return "Entry";
-  if (/drive|garage/.test(n)) return /drive/.test(n) ? "Drive" : "Garage";
-  if (/back|yard|patio|garden/.test(n)) return "Yard";
-  if (/living|family|room/.test(n)) return "Inside";
-  return "Cam";
+/* FOLLOWUP2 · no room mapping in git: "where" is a generic label; the camera's own name (private feed) says the rest */
+function guessWhere() {
+  return "Camera";
 }
 
 function isCameraLike(type) {

@@ -1,6 +1,6 @@
 """MERCNODATA1 · render-time check: load a page unpaired (no device key) or offline (?pfOffline=1) in a real browser and
 measure how much of the screen is not black. Usage: python3 scripts/qa/blank_viewport.py <page.html> <width> <height> <unpaired|offline> [shot.png]
--> prints JSON {"lit": fraction of sampled pixels brighter than near-black, "canvas": bool, "errors": [...]}
+Prints JSON {"lit": fraction of sampled pixels brighter than near-black, "canvas": bool, "errors": [...]}
 Serves the repo on a random loopback port; every non-loopback request is stubbed (204), so the hub is never reached."""
 import json, os, sys, threading, functools, io
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler

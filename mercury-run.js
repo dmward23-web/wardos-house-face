@@ -1077,11 +1077,20 @@
   if (!capMode) {
     if (window.WardKids && WardKids.boot) {
       /* MERCNODATA1 · unpaired / offline: no kids week, so start the world with an empty week instead of a black canvas */
-      var started = false;
+      var started = false, lateDone = false;
       var go = function () { if (started) return; started = true; start(); };
-      document.addEventListener("house:kids-data-ready", go);
+      /* FOLLOWUP1 · a slow hub (4 to 6 s) answers after the empty start: if the real week fills the jar, play once */
+      document.addEventListener("house:kids-data-ready", function () {
+        if (!started) { go(); return; }
+        if (lateDone || playing) return;
+        lateDone = true;
+        var st = window.JarEngine ? JarEngine.choreState(kid) : { full: false };
+        if (st.full) showPlay();
+      });
       document.addEventListener("house:kids-data-missing", go);
       setTimeout(go, 4000);
+      /* FOLLOWUP1 · paint the world before any data so the canvas is never black at start */
+      try { resize(); ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0); paintWorld(ctx, 0, view.w, view.h); } catch (e) { /* first paint is cosmetic */ }
       WardKids.boot(kid);
     } else start();
   }

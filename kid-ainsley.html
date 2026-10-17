@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
-<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=FOLLOWUP6"></script>
 <script src="school-names.js?v=SCHOOLNAMES1"></script>
 <script src="house-nomoney.js?v=NOMONEY1"></script>
 <script src="house-face-law.js?v=PRIVFEED3"></script>
@@ -176,7 +176,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     letter-spacing:0.08em;
   }
 
-  /* Ainsley · awareness: schedule / appointments / school — transit-board loud */
+  /* Ainsley · awareness: schedule / appointments / school, transit-board loud */
   body.theme-ainsley .sec-schedule {
     gap:10px; padding:14px 16px;
     border-width:2px;
@@ -208,7 +208,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   body.theme-ainsley .sec-schedule .card .hint {
     font-size:13px; margin-top:3px; line-height:1.3;
   }
-  /* Appointments — gold left rail + loud .when */
+  /* Appointments, gold left rail + loud .when */
   body.theme-ainsley .sec-schedule .sec-list[data-mount-appointments] .card {
     min-height:48px; padding:10px 12px 10px 14px;
     border-color:rgba(184,90,40,.5);
@@ -222,7 +222,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   body.theme-ainsley .sec-schedule .sec-list[data-mount-appointments] .card .what {
     font-size:15px;
   }
-  /* School — period/time column aligned, high contrast */
+  /* School, period/time column aligned, high contrast */
   body.theme-ainsley .sec-schedule .sec-list[data-mount-school] .card {
     min-height:52px; padding:10px 14px;
     border-color:#3a4a5a;
@@ -242,7 +242,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   body.theme-ainsley .sec-schedule .sec-list[data-mount-school] .card.quiet {
     display:block; grid-template-columns:none;
   }
-  /* Leave-bys — transit board */
+  /* Leave-bys, transit board */
   body.theme-ainsley .leave-strip {
     display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 8px;
   }
@@ -343,7 +343,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   @keyframes spot-pulse{0%,100%{opacity:.45}50%{opacity:.7}}
   .panel::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
     box-shadow:inset 0 0 0 2px rgba(90,106,80,.35),inset 0 0 0 5px rgba(58,74,56,.18),inset 0 0 100px rgba(0,0,0,.5)}
-  /* Deco layers stay absolute — never flex children */
+  /* Deco layers stay absolute, never flex children */
   .panel > *:not(.spotlight):not(.vinyl-float):not(.stage-grid):not(.stage-ticks){position:relative;z-index:2}
   .spotlight,.vinyl-float,.stage-grid,.stage-ticks{position:absolute!important;pointer-events:none;z-index:1}
   .hdr{background:linear-gradient(180deg,rgba(26,28,22,.97),rgba(18,20,15,.95));border:2px solid #5a6a50;box-shadow:inset 0 1px 0 rgba(232,228,212,.12),0 5px 0 #0e100c,0 0 16px rgba(0,0,0,.28);border-radius:8px}
@@ -351,7 +351,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .avatar{border-radius:6px;background:linear-gradient(145deg,#5a6a50,#3a4a38 55%,#1a1c16);box-shadow:0 0 0 2px #d4d0c0,0 0 0 5px rgba(184,90,40,.28),0 5px 0 #0e100c}
   .eyebrow{color:#c87840}.name{color:#e8e4d4}.name-accent{color:#e8e4d4;text-shadow:0 0 14px rgba(184,90,40,.25)}
   .tagline{color:#a8a490}.hot-pill{background:linear-gradient(180deg,#2a2418,#1a1c16);color:#e8e4d4;border-color:#b85a28;border-radius:6px}
-  /* Mood tabs — quiet folk (recolored eras) */
+  /* Mood tabs, quiet folk (recolored eras) */
   .eras{display:flex;align-items:center;gap:4px;padding:0 2px;flex-shrink:0;flex-wrap:nowrap;min-height:0}
   .eras-lab{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#8a9080;margin-right:4px;flex-shrink:0}
   /* BINDFIX1 / AVINYL5 · kill live eras chrome */
@@ -398,7 +398,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .sec{border-radius:8px}
   .card{border-radius:6px}
   .quest{border-radius:6px}
-  /* Tour Jar — woodsmoke poster · honey amber foil */
+  /* Tour Jar, woodsmoke poster · honey amber foil */
   body.theme-ainsley .bank-card{
     border-radius:8px;color:#e8e4d4;
     border:2px solid #c87840;
@@ -443,7 +443,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .xp-stage{flex-shrink:0}
   .hot-banner{flex-shrink:0}
 
-  /* jar-flow — slim ticket stub · warm metal */
+  /* jar-flow, slim ticket stub · warm metal */
   .jar-flow{display:flex;align-items:center;justify-content:flex-start;gap:0;flex-wrap:nowrap;
     margin-top:2px;padding:0;border-radius:3px;overflow:hidden;
     background:rgba(14,16,12,.88);border:1px solid rgba(184,90,40,.4);
@@ -567,7 +567,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   body.theme-ainsley .sec-schedule .bag-strip { padding: 8px 10px; margin: 2px 0 6px; }
   body.theme-ainsley .body { overflow: visible; }
 
-  /* quiet folk autumn — color homage only · no album/artist on glass */
+  /* quiet folk autumn, color homage only · no album/artist on glass */
 
 
   /* KIDSLAY3 · polish · no fun/bonus restore · keep unsquish */
@@ -813,7 +813,7 @@ body.theme-ainsley .setlist-foot { display: none !important; }
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
 <link rel="stylesheet" href="kid-world.css?v=MYWEEK2" />
 </head>
-<body data-clear-label="ALL CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley stick-season">
+<body data-kid-world="1" data-clear-label="ALL CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley stick-season">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
   <defs>
     <!-- Shared paints · HEAT v3 cyan+gold -->
@@ -1166,7 +1166,7 @@ document.addEventListener("house:kid-rendered", function(){
 
 <script src="house-clock.js?v=PRIVFEED3"></script>
 <script src="house-tapsync.js?v=HUBPIN1"></script>
-<script src="kids-data.js?v=PRIVFEED3"></script>
+<script src="kids-data.js?v=MERCNODATA1"></script>
 <script src="house-saves.js?v=JARMATH1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=HUM1"></script>

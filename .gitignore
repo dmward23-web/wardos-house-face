@@ -45,3 +45,6 @@ phone-shots/
 *.ics
 .env*
 *.token
+
+# FOLLOWUP1 · proxy access logs (IP + UA) never enter git, wherever a misconfigured log dir puts them
+*-access.log*

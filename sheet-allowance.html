@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
-<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=FOLLOWUP6"></script>
 <script src="school-names.js?v=SCHOOLNAMES1"></script>
 <script src="house-nomoney.js?v=NOMONEY1"></script>
 <script src="house-face-law.js?v=PRIVFEED3"></script>
@@ -850,7 +850,7 @@
 </div>
 <script src="house-clock.js?v=PRIVFEED3"></script>
 <script src="house-tapsync.js?v=HUBPIN1"></script>
-<script src="kids-data.js?v=PRIVFEED3"></script>
+<script src="kids-data.js?v=MERCNODATA1"></script>
 <script src="house-saves.js?v=JARMATH1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=HUM1"></script>
@@ -870,7 +870,7 @@ document.addEventListener("DOMContentLoaded", function () {
  var big = document.querySelector('.bank.'+id+' .star-big');
  if (big) {
  var sym = (v.currency && v.currency.symbol) || "★";
- /* AINSNOSCORE1 · Ainsley gets no star tally — show her jar in dollars */
+ /* AINSNOSCORE1 · Ainsley gets no star tally, show her jar in dollars */
  if (id === "ainsley") { big.textContent = "Tour Jar"; big.setAttribute("data-noscore","1"); }
  else big.innerHTML = '<span class="s">'+sym+'</span>'+(v.week != null ? v.week : v.lifetime);
  }

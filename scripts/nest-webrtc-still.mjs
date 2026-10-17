@@ -8,7 +8,7 @@
  *
  * Usage:
  *   node scripts/nest-webrtc-still.mjs
- *   node scripts/nest-webrtc-still.mjs --cdp 19333 --cams "Front,Garage,Backyard"
+ *   node scripts/nest-webrtc-still.mjs --cdp 19333 --cams "<name part>,<name part>"
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -17,10 +17,10 @@ import { fileURLToPath } from "node:url";
 import { privPath, assertPrivateOut } from "./private-dir.mjs";
 import WebSocket from "ws";
 
-// KEYROT1: fall back to the box-only key file so rotation needs no env change.
+// KEYROT1 / FOLLOWUP2: the device key file (the retired nest-proxy.token and NEST_PROXY_TOKEN get 401 from the proxy).
 function proxyTokenFromFile() {
   try {
-    return fs.readFileSync(path.join(os.homedir(), ".config", "wardos", "nest-proxy.token"), "utf8").trim();
+    return fs.readFileSync(path.join(os.homedir(), ".config", "wardos", "nest-device.token"), "utf8").trim();
   } catch { return ""; }
 }
 
@@ -167,7 +167,7 @@ async function captureJpeg(send, outPath) {
 
 async function listCams() {
   const headers = {};
-  const tok = (process.env.NEST_PROXY_TOKEN || proxyTokenFromFile());
+  const tok = proxyTokenFromFile();
   if (tok) headers["X-Nest-Proxy-Token"] = tok;
   const data = await fetch(PROXY + "/api/cameras", { headers }).then((r) => r.json());
   if (!Array.isArray(data.cameras)) {
@@ -225,7 +225,7 @@ function writeLive(cameras, meta) {
 async function main() {
   const args = parseArgs(process.argv);
   if (args.help) {
-    console.log("Usage: node scripts/nest-webrtc-still.mjs [--cdp PORT] [--cams Front,Garage] [--wait MS]");
+    console.log("Usage: node scripts/nest-webrtc-still.mjs [--cdp PORT] [--cams <name part>,<name part>] [--wait MS]");
     process.exit(0);
   }
   fs.mkdirSync(SNAPS, { recursive: true });
@@ -245,7 +245,7 @@ async function main() {
 
   for (const cam of want) {
     const name = cam.name || "cam";
-    const tok = (process.env.NEST_PROXY_TOKEN || proxyTokenFromFile());
+    const tok = proxyTokenFromFile();
     let url = PROXY + "/nest-webrtc.html?cam=" + encodeURIComponent(cam.id);
     if (tok) url += "&proxyToken=" + encodeURIComponent(tok);
     process.stdout.write("capture " + name + " … ");

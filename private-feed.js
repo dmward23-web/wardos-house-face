@@ -160,7 +160,7 @@
   }
 
   var JSON_RE = /(?:^|\/)(?:data\/)?(cal-live|cal-months|kids-week|lights-live|sensi-live|nest-live)\.json(?:[?#].*)?$/;
-  var CAM_RE = /(?:^|\/)data\/nest-snaps\/(front-door|garage|backyard)\.jpg(?:[?#].*)?$/;
+  var CAM_RE = /(?:^|\/)data\/nest-snaps\/([a-z0-9]+(?:-[a-z0-9]+){0,5})\.jpg(?:[?#].*)?$/; /* FOLLOWUP2 · any camera slug; no names in git */
   function sameOriginPath(u) {
     try { var x = new URL(u, g.location.href); return x.origin === g.location.origin ? x.pathname + x.search : null; } catch (e) { return null; }
   }
@@ -242,6 +242,48 @@
       ? (dadOnly && state.lastOk ? "Calendar offline since " + hm(state.lastOk) : "Calendar offline")
       : "Calendar as of " + hm(state.lastOk);
     chip.style.display = "block";
+    placeKidFlag();
+  }
+  /* FOLLOWUP3 · kid pages are full-screen worlds: on phones the chip floats just below their header (name, sound,
+     clock) instead of in the page flow, which there would land on top of that header */
+  /* FOLLOWUP4 · only the 6 kid world pages carry data-kid-world; sheet-dan (data-kid="dan") stays in the page flow */
+  /* FOLLOWUP5 · a header inside the hidden classic list (opacity 0 / display none ancestor) is not on screen */
+  function painted(el) {
+    if (!g.getComputedStyle) return true;
+    for (var a = el; a && a !== document.documentElement; a = a.parentElement) {
+      var s = g.getComputedStyle(a);
+      if (s.display === "none" || parseFloat(s.opacity) === 0) return false;
+    }
+    return true;
+  }
+  function placeKidFlag() {
+    if (!chip || !document.body) return;
+    /* FOLLOWUP5 · only while the painted world is up (body.kw-on): if kid-world.js never ran, the classic page is
+       showing and the chip stays in the page flow, where it cannot cover anything */
+    var kid = document.body.hasAttribute && document.body.hasAttribute("data-kid-world") && document.body.classList.contains("kw-on") && typeof g.matchMedia === "function" && g.matchMedia("(max-width:700px)").matches;
+    chip.classList.toggle("pf-flag--kid", !!kid);
+    if (!kid) { chip.style.top = ""; return; }
+    var bottom = 0;
+    var heads = document.querySelectorAll(".kw-hud, header.hdr, .hdr");
+    for (var i = 0; i < heads.length; i++) {
+      var st = g.getComputedStyle ? g.getComputedStyle(heads[i]) : { display: "", visibility: "" };
+      if (st.display === "none" || st.visibility === "hidden" || !painted(heads[i])) continue;
+      var r = heads[i].getBoundingClientRect();
+      if (r.height > 0 && r.top < 320 && r.bottom > bottom) bottom = r.bottom;
+    }
+    chip.style.top = Math.round(Math.max(bottom, 0) + 10) + "px";
+  }
+  if (typeof g.addEventListener === "function") {
+    g.addEventListener("resize", placeKidFlag);
+    g.addEventListener("load", function () { placeKidFlag(); setTimeout(placeKidFlag, 800); setTimeout(placeKidFlag, 2500); });
+  }
+  if (g.ResizeObserver) {
+    document.addEventListener("DOMContentLoaded", function () {
+      if (!document.body || !document.body.hasAttribute("data-kid-world")) return;
+      var ro = new g.ResizeObserver(placeKidFlag);
+      var heads = document.querySelectorAll(".kw-hud, .hdr");
+      for (var i = 0; i < heads.length; i++) ro.observe(heads[i]);
+    });
   }
   var css = document.createElement("style");
   css.setAttribute("data-private-feed", "");
@@ -249,7 +291,20 @@
   css.textContent = "html.pf-offline [data-mount-today-events],html.pf-offline [data-mount-sports],html.pf-offline [data-mount-school]," +
     "html.pf-offline [data-mount-appointments],html.pf-offline [data-mount-consume-next],html.pf-offline [data-mount-consume-ahead]," +
     "html.pf-offline [data-mount-dan-leave],html.pf-offline [data-mount-dan-week]{display:none!important}" +
-    "img[data-pf-offline]{visibility:hidden}";
+    "img[data-pf-offline]{visibility:hidden}" +
+    /* FOLLOWUP2 · phone widths: the status chip sits in the page flow at the end instead of floating over content */
+    /* FOLLOWUP4 · a 48px bottom margin, so at the bottom of the page the fixed "taps: this device only" badge (bottom
+       8px) sits clear of the chip; the visible gap measured there is 17px (390 wide) to 26px (440 wide).
+       FOLLOWUP5 · mid-scroll the in-flow chip still slides past the badge, so it stacks BELOW the badge (z-index 1,
+       badge 99) instead of covering it; the fixed kid-world chip keeps its own top layer */
+    /* FOLLOWUP6 · the wall too: a fixed chip over a board that scrolls always ends up on top of some row (the 'Room
+       reset' title on Chores, tiles on the hub, the footer chip on Today), so on every screen size the chip now sits in
+       the page flow at the end of the board, where it takes its own space and cannot cover anything. Only the phone
+       kid worlds (full-screen scene, JS places it under their header) keep a fixed chip. */
+    ".pf-flag[data-private-feed-flag]{position:relative!important;z-index:1!important;left:auto!important;bottom:auto!important;top:auto;display:block;width:max-content;max-width:calc(100% - 32px);margin:16px auto 48px;white-space:normal;grid-column:1/-1;flex:none;align-self:center;clear:both}" +
+    "@media (max-width:700px){.pf-flag--kid[data-private-feed-flag]{position:fixed!important;z-index:2147483000!important;bottom:auto!important;left:50%!important;transform:translateX(-50%);margin:0!important}}" +
+    /* FOLLOWUP3 · kid pages: no chip over the open My Week drawer */
+    "body:has(#kw-cal:not([hidden])) .pf-flag[data-private-feed-flag]{display:none!important}";
   (document.head || document.documentElement).appendChild(css);
   document.addEventListener("DOMContentLoaded", function () { scanImgs(document); });
 

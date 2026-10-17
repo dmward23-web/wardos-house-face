@@ -145,13 +145,19 @@ test("nest proxy: right key passes auth on all four routes (Google mocked)", asy
   } finally { p.child.kill(); }
 });
 
-test("nest proxy: token from env works, and any one of several files works", async () => {
+test("nest proxy: NEST_PROXY_TOKEN env is label-only (alone it refuses to start; with a device file it gets 401), and any one of several files works", async () => {
+  /* FOLLOWUP2 · the env var is a retired source like nest-proxy.token */
   const p = startProxy(fakeHome(), { NEST_PROXY_TOKEN: KEY });
+  const code = await Promise.race([p.exited, new Promise((r) => setTimeout(() => r("timeout"), 5000))]);
+  if (code === "timeout") p.child.kill();
+  assert.equal(code, 3, "env key alone must not start the proxy");
+  const ENVK = "env-retired-key-0123456789abcdef";
+  const pe = startProxy(fakeHome({ tokenFile: KEY }), { NEST_PROXY_TOKEN: ENVK });
   try {
-    assert.ok(await waitUp(p.base));
-    assert.equal((await call(p.base, API[0], { "X-Nest-Proxy-Token": KEY })).status, 200);
-    assert.equal((await call(p.base, API[0])).status, 401);
-  } finally { p.child.kill(); }
+    assert.ok(await waitUp(pe.base));
+    assert.equal((await call(pe.base, API[0], { "X-Nest-Proxy-Token": ENVK })).status, 401);
+    assert.equal((await call(pe.base, API[0], { "X-Nest-Proxy-Token": KEY })).status, 200);
+  } finally { pe.child.kill(); }
   const home = fakeHome();
   const a = path.join(home, "a.token"), b = path.join(home, "b.token");
   fs.writeFileSync(a, "first-key-0123456789abcdef\n"); fs.writeFileSync(b, KEY + "\n");

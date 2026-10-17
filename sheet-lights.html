@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
-<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=FOLLOWUP6"></script>
 <script src="house-face-law.js?v=PRIVFEED3"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
 <script src="house-money-bind.js?v=PRIVFEED2"></script>
@@ -216,7 +216,7 @@
 <script src="house-clock.js?v=PRIVFEED3"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=HUM1"></script>
-<script src="house-lights.js?v=HUBPIN1"></script>
+<script src="house-lights.js?v=FOLLOWUP6"></script>
 <script>
 (function () {
   var L = window.HouseLights;
@@ -244,7 +244,7 @@
       sub.textContent = "";
     } else if (g.needToken || g.kind === "need_token") {
       title.textContent = "CONNECT · need Kasa on Atlas";
-      sub.textContent = "Not connected yet · controls dark";
+      sub.textContent = "Controls dark"; /* FOLLOWUP2 · one empty-state line: the pad card already says Not connected yet */
     } else {
       title.textContent = "Lights · " + g.label;
       sub.textContent = g.label + " · controls dark";

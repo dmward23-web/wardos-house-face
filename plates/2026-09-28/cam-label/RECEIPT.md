@@ -15,9 +15,9 @@
 
 | Cam | Status |
 |-----|--------|
-| Front door | **STILL** |
-| Garage | **STILL** |
-| Backyard | **STILL** |
+| Camera 1 | **STILL** |
+| Camera 2 | **STILL** |
+| Camera 3 | **STILL** |
 
 (If snap ages out → STALE; if nest token/proxy missing → NEED TOKEN / NEED PROXY. Never LIVE+STILL.)
 

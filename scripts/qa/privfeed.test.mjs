@@ -7,6 +7,7 @@ import os from "node:os";
 import path from "node:path";
 import http from "node:http";
 import { spawnSync } from "node:child_process";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -15,7 +16,9 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), "privfeed-"));
 const PRIV = path.join(TMP, "private");
 fs.mkdirSync(path.join(PRIV, "nest-snaps"), { recursive: true });
 for (const n of ["cal-live", "cal-months", "kids-week"]) fs.copyFileSync(path.join(FX, n + ".synthetic.json"), path.join(PRIV, n + ".json"));
-fs.writeFileSync(path.join(PRIV, "nest-snaps", "garage.jpg"), Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 0xff, 0xd9]));
+fs.writeFileSync(path.join(PRIV, "nest-snaps", "cam-a.jpg"), Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 0xff, 0xd9]));
+/* FOLLOWUP1 · synthetic private names, so the producers run the same on CI (no box files) as on the box */
+fs.writeFileSync(path.join(PRIV, "private-names.tsv"), "partner\tSynthpartner\ncoparent\tSynthco\n", { mode: 0o600 });
 process.env.WARDOS_PRIVATE_DIR = PRIV;
 const { handlePrivate } = await import("../private-feed.mjs");
 
@@ -39,7 +42,7 @@ test("no token → 401, house Origin alone never unlocks", async () => {
   assert.equal((await get("/api/private/cal-live.json")).status, 401);
   assert.equal((await get("/api/private/cal-live.json", { Origin: ORIGIN })).status, 401);
   assert.equal((await get("/api/private/cal-live.json", { "X-Private-Feed-Token": "wrong-token-0123456789" })).status, 401);
-  assert.equal((await get("/api/private/nest/garage.jpg", { Origin: ORIGIN })).status, 401);
+  assert.equal((await get("/api/private/nest/cam-a.jpg", { Origin: ORIGIN })).status, 401);
 });
 
 test("token → feed bytes, no-store, CORS only for the house origin", async () => {
@@ -55,12 +58,14 @@ test("token → feed bytes, no-store, CORS only for the house origin", async () 
   assert.equal(other.headers.get("access-control-allow-origin"), null, "foreign origin gets no CORS grant");
 });
 
-test("cam stills: token only, known cams only, no path tricks", async () => {
-  const ok = await get("/api/private/nest/garage.jpg", { "X-Lights-Proxy-Token": TOKEN });
+test("cam stills: token only, slug only, no path tricks", async () => {
+  const ok = await get("/api/private/nest/cam-a.jpg", { "X-Lights-Proxy-Token": TOKEN });
   assert.equal(ok.status, 200);
   assert.equal(ok.headers.get("content-type"), "image/jpeg");
-  assert.equal((await get("/api/private/nest/backyard.jpg", { "X-Lights-Proxy-Token": TOKEN })).status, 404, "missing still = 404 offline");
-  assert.equal((await get("/api/private/nest/kitchen.jpg", { "X-Lights-Proxy-Token": TOKEN })).status, 404);
+  assert.equal((await get("/api/private/nest/cam-b.jpg", { "X-Lights-Proxy-Token": TOKEN })).status, 404, "missing still = 404 offline");
+  assert.equal((await get("/api/private/nest/Cam-A.jpg", { "X-Lights-Proxy-Token": TOKEN })).status, 404, "uppercase slug refused");
+  assert.equal((await get("/api/private/nest/cam--a.jpg", { "X-Lights-Proxy-Token": TOKEN })).status, 404, "double hyphen refused");
+  assert.equal((await get("/api/private/nest/" + "a".repeat(41) + ".jpg", { "X-Lights-Proxy-Token": TOKEN })).status, 404, "long slug refused");
   for (const p of ["/api/private/nest/..%2F..%2Fcal-live.jpg", "/api/private/%2e%2e/qa/cash.contract.json", "/api/private/nest/%2e%2e%2fcal-live.jpg", "/api/private/cal-live.json.bak", "/api/private/qa/cash.contract.json"]) {
     assert.notEqual((await get(p, { "X-Lights-Proxy-Token": TOKEN })).status, 200, p);
   }
@@ -103,16 +108,18 @@ test("producers write to the private folder by default", () => {
 
 test("public tree carries no private data files and no embedded copy", () => {
   for (const f of ["data/cal-live.json", "data/cal-months.json", "kids-week.json", "data/kids-week.json", "scripts/qa/fixtures/cash.contract.json",
-    "data/nest-snaps/front-door.jpg", "data/nest-snaps/garage.jpg", "data/nest-snaps/backyard.jpg"]) {
+    "data/nest-snaps/cam-a.jpg"]) {
     const tracked = spawnSync("git", ["ls-files", "--error-unmatch", f], { cwd: ROOT });
     assert.notEqual(tracked.status, 0, f + " must not be tracked");
   }
+  const snaps = spawnSync("git", ["ls-files", "data/nest-snaps"], { cwd: ROOT, encoding: "utf8" });
+  assert.deepEqual(snaps.stdout.split("\n").filter((f) => f && !f.endsWith("/.gitkeep")), [], "no camera still is tracked");
   const kd = fs.readFileSync(path.join(ROOT, "kids-data.js"), "utf8");
   assert.match(kd, /var EMBEDDED = null;/);
   assert.ok(!fs.existsSync(path.join(ROOT, "phone-shots")) || spawnSync("git", ["ls-files", "phone-shots"], { cwd: ROOT, encoding: "utf8" }).stdout.trim() === "");
   /* OAUTHPAGES · the Google consent-screen pages are plain static text: no scripts at all, so no feed and no hub key */
   const STATIC_PAGES = new Set(["about.html", "privacy.html"]);
-  for (const f of STATIC_PAGES) assert.doesNotMatch(fs.readFileSync(path.join(ROOT, f), "utf8"), /<script|<link|<iframe|@import|url\(/i, f + " stays script-free and self-contained");
+  for (const f of STATIC_PAGES) assert.deepEqual(staticPageViolations(fs.readFileSync(path.join(ROOT, f), "utf8"), f), [], f + " passes the static-page allowlist");
   for (const f of fs.readdirSync(ROOT).filter((n) => /\.html$/.test(n) && !STATIC_PAGES.has(n))) {
     const s = fs.readFileSync(path.join(ROOT, f), "utf8");
     /* HUBPIN1 · house-hub.js (the key allow-list guard) loads first, then private-feed.js before everything else */
@@ -123,8 +130,129 @@ test("public tree carries no private data files and no embedded copy", () => {
   }
 });
 
+/* FOLLOWUP1 · OAUTHPAGES allowlist (replaces the old 5-pattern blocklist). The consent pages may only use these tags and
+   attributes, carry no handler/src/data:/javascript:/http-equiv/CSS escape, and link only to the sibling page, the Google
+   permissions page, the Google user data policy and the one public contact mailto. Anything else is a violation. */
+const STATIC_TAGS = new Set(["html", "head", "meta", "title", "style", "body", "main", "h1", "h2", "p", "a", "footer"]);
+const STATIC_ATTRS = new Set(["lang", "charset", "name", "content", "href"]);
+const STATIC_SIBLING = { "about.html": "privacy.html", "privacy.html": "about.html" };
+/* FOLLOWUP2 · the <style> block is pinned by exact text (sha256 per page): any CSS change, including rules that hide text
+   or inject it with content:, must be a deliberate edit of these hashes */
+const STATIC_STYLE_SHA256 = {
+  "about.html": "796eb8b952f2c1f560d40e7b1288fd7b048abef5f4fb41da77dbc369f83a7e29",
+  "privacy.html": "c64d50aaa987cee51f33cea8bc67c654356e897517a909758f46de22fe8e5eb1",
+};
+const STATIC_META_NAMES = new Set(["viewport", "description", "robots"]);
+const STATIC_LINKS = ["https://myaccount.google.com/permissions", "https://developers.google.com/terms/api-services-user-data-policy", "mailto:atlasward" + "@" + "mail.grokbot.com"];
+function staticPageViolations(html, name) {
+  const bad = [];
+  const body = html.replace(/^<!doctype html>\s*/i, "");
+  if (/<!/.test(body)) bad.push("comment or declaration");
+  if (/\son[a-z]+\s*=/i.test(html)) bad.push("on* handler");
+  for (const [rx, why] of [[/\bsrc\s*=/i, "src="], [/\bsrcset\s*=/i, "srcset="], [/data:/i, "data:"], [/javascript:/i, "javascript:"], [/http-equiv/i, "http-equiv"],
+    [/\\/, "backslash escape"], [/url\s*\(/i, "url("], [/image-set/i, "image-set"], [/@import/i, "@import"], [/expression\s*\(/i, "expression("]]) if (rx.test(html)) bad.push(why);
+  const styles = [...html.matchAll(/<style>([\s\S]*?)<\/style>/gi)].map((m) => m[1]);
+  if (styles.length > 1) bad.push("more than one style block");
+  for (const css of styles) if (crypto.createHash("sha256").update(css).digest("hex") !== STATIC_STYLE_SHA256[name]) bad.push("style block changed");
+  if ((html.match(/<\s*style\b/gi) || []).length !== styles.length) bad.push("style tag with attributes or unclosed");
+  for (const m of body.matchAll(/<\s*\/?\s*([^\s>\/]+)([^>]*)>/g)) {
+    const tag = m[1].toLowerCase();
+    if (!STATIC_TAGS.has(tag)) bad.push("tag " + tag);
+    if (tag === "meta") {
+      const at = {};
+      for (const a of m[2].matchAll(/([^\s="'\/]+)(?:\s*=\s*("[^"]*"|'[^']*'|[^\s>]+))?/g)) at[a[1].toLowerCase()] = (a[2] || "").replace(/^["']|["']$/g, "");
+      const keys = Object.keys(at).sort().join(",");
+      const okCharset = keys === "charset";
+      const okNamed = keys === "content,name" && STATIC_META_NAMES.has(at.name.toLowerCase()) && !/\/\/|:/.test(at.content);
+      if (!okCharset && !okNamed) bad.push("meta not allowed");
+    }
+    for (const a of m[2].matchAll(/([^\s="'\/]+)(?:\s*=\s*("[^"]*"|'[^']*'|[^\s>]+))?/g)) {
+      const attr = a[1].toLowerCase();
+      if (!STATIC_ATTRS.has(attr)) { bad.push("attr " + attr + " on " + tag); continue; }
+      if (attr === "href") {
+        const v = (a[2] || "").replace(/^["']|["']$/g, "");
+        if (tag !== "a") bad.push("href on " + tag);
+        else if (v !== STATIC_SIBLING[name] && !STATIC_LINKS.includes(v)) bad.push("link " + v.slice(0, 40));
+      }
+    }
+  }
+  if (/</.test(body.replace(/<[^>]*>/g, ""))) bad.push("stray or unclosed tag");
+  return bad;
+}
+
+test("FOLLOWUP1 static-page allowlist catches every hidden-content trick", () => {
+  const base = fs.readFileSync(path.join(ROOT, "privacy.html"), "utf8");
+  assert.deepEqual(staticPageViolations(base, "privacy.html"), []);
+  const inject = (frag) => base.replace("</main>", frag + "\n</main>");
+  const mustFail = {
+    "img onerror": '<img src="x" onerror="alert(1)">',
+    "svg onload": '<svg onload="alert(1)"></svg>',
+    "javascript: link": '<a href="javascript:alert(1)">x</a>',
+    "javascript: link unquoted": "<a href=javascript:alert(1)>x</a>",
+    "meta refresh": '<meta http-equiv="refresh" content="0;url=https://example.invalid/">',
+    "base href": '<base href="https://example.invalid/">',
+    "CSS-escaped url": "<style>body { background: \\75rl(https://example.invalid/x.png); }</style>",
+    "image-set": '<style>body { background: image-set("https://example.invalid/x.png" 1x); }</style>',
+    "script": "<script>1</script>",
+    "uppercase script": "<SCRIPT>1</SCRIPT>",
+    "link stylesheet": '<link rel="stylesheet" href="https://example.invalid/x.css">',
+    "iframe": '<iframe src="https://example.invalid/"></iframe>',
+    "object": '<object data="x.swf"></object>',
+    "embed": '<embed src="x">',
+    "form": '<form action="https://example.invalid/"></form>',
+    "frameset": "<frameset><frame></frameset>",
+    "video src": '<video src="x.mp4"></video>',
+    "srcset": '<p srcset="a.png 1x">x</p>',
+    "data: image": '<a href="data:text/html;base64,PGI+">x</a>',
+    "outside link": '<a href="https://example.invalid/">x</a>',
+    "other mailto": '<a href="mailto:someone' + '@' + 'example.invalid">x</a>',
+    "comment": "<!-- hidden --" + ">",
+    "data attribute": '<p data-x="1">x</p>',
+    "style attribute": '<p style="color:red">x</p>',
+    "css import": "<style>@import 'x.css';</style>",
+    "css url": "<style>body { background: url(x.png); }</style>",
+    "og meta": '<meta property="og:title" content="x">',
+    "og:image outside URL": '<meta name="og:image" content="https://example.invalid/x.png">',
+    "twitter:image outside URL": '<meta name="twitter:image" content="https://example.invalid/x.png">',
+    "meta referrer": '<meta name="referrer" content="unsafe-url">',
+    "meta description with URL": '<meta name="description" content="see https://example.invalid">',
+    "meta robots with colon": '<meta name="robots" content="x:y">',
+    "CSS content injection": "<style>h2::after { content: 'Call now'; }</style>",
+    "CSS hide text": "<style>h2 + p { display: none; }</style>",
+  };
+  for (const [why, frag] of Object.entries(mustFail)) assert.notDeepEqual(staticPageViolations(inject(frag), "privacy.html"), [], "must fail: " + why);
+});
+
+test("FOLLOWUP2 static pages: an edited style block fails; plain description/robots meta passes", () => {
+  const base = fs.readFileSync(path.join(ROOT, "privacy.html"), "utf8");
+  assert.notDeepEqual(staticPageViolations(base.replace("main {", "h2 + p { display: none; }\n  main {"), "privacy.html"), []);
+  assert.notDeepEqual(staticPageViolations(base.replace("main {", "h1::after { content: 'x'; }\n  main {"), "privacy.html"), []);
+  const ok = base.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<meta name="description" content="Privacy policy">\n<meta name="robots" content="index, follow">');
+  assert.deepEqual(staticPageViolations(ok, "privacy.html"), []);
+});
+
+test("FOLLOWUP2 privacy-scan email: the one allowed address only as an exact whole match on privacy.html; encoded @ caught everywhere", async () => {
+  const { emailHit, decodeAt } = await import("../privacy-scan.mjs");
+  const A = "atlasward" + "@" + "mail.grokbot.com";
+  assert.equal(emailHit("privacy.html", A), false);
+  assert.equal(emailHit("privacy.html", '<a href="mailto:' + A + '">' + A + "</a>"), false);
+  for (const bad of [A + ".evil", A.replace(/\.com$/, ".company"), "x" + A, "evil." + A, A + " and bob" + "@" + "example.org", A.toUpperCase()]) {
+    assert.equal(emailHit("privacy.html", bad), true, "must hit on privacy.html (" + bad.length + " chars)");
+  }
+  assert.equal(emailHit("about.html", A), true, "allowed only on privacy.html");
+  assert.equal(emailHit("scripts/x.mjs", A), true);
+  /* encoded forms are assembled at run time so this file itself carries none */
+  for (const sep of ["%" + "40", "%" + "40", "&#" + "64;", "&#" + "064;", "&#" + "x40;", "&" + "commat;"]) {
+    assert.equal(emailHit("README.md", "bob" + sep + "example.org"), true, "encoded @ must hit: " + sep.length);
+  }
+  assert.equal(emailHit("README.md", "bob" + "%" + "40" + "EXAMPLE.org"), true);
+  assert.equal(emailHit("privacy.html", A.replace("@", "%" + "40")), false, "the allowed address encoded on its own page stays allowed");
+  assert.equal(emailHit("about.html", A.replace("@", "&#" + "64;")), true);
+  assert.equal(decodeAt("a&" + "commat;b"), "a@b");
+});
+
 test("gitignore keeps private files out", () => {
-  for (const f of ["data/cal-live.json", "data/cal-months.json", "kids-week.json", "data/kids-week.json", "data/nest-snaps/garage.jpg", "phone-shots/x.png", "x.private.json"]) {
+  for (const f of ["data/cal-live.json", "data/cal-months.json", "kids-week.json", "data/kids-week.json", "data/nest-snaps/cam-a.jpg", "phone-shots/x.png", "x.private.json"]) {
     const r = spawnSync("git", ["check-ignore", "-q", "--no-index", f], { cwd: ROOT });
     assert.equal(r.status, 0, f + " should be ignored");
   }
@@ -133,11 +261,13 @@ test("gitignore keeps private files out", () => {
 test("privacy-scan: clean tree passes; planted secrets fail with category only", () => {
   const clean = spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--tree", "--skip", "(^|/)zz-"], { cwd: ROOT, encoding: "utf8" });
   assert.equal(clean.status, 0, clean.stdout);
-  const plant = path.join(ROOT, "zz-privfeed-plant.txt");
+  /* per-run name so parallel runs never share or delete each other's plant */
+  const plantName = "zz-privfeed-plant-" + process.pid + "-" + crypto.randomBytes(4).toString("hex") + ".txt";
+  const plant = path.join(ROOT, plantName);
   const planted = ["someone@" + "example-mail.com", "$" + "12,345.67", "#QX7" + "K2M", "WN" + "1234", "1234 Main" + " Street", "LAT" + " = 39.12345"].join("\n");
   fs.writeFileSync(plant, planted);
   try {
-    const r = spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--tree", "--only", "(^|/)zz-privfeed-plant"], { cwd: ROOT, encoding: "utf8" });
+    const r = spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--tree", "--only", "(^|/)" + plantName.replace(/\./g, "\\.") + "$"], { cwd: ROOT, encoding: "utf8" });
     assert.equal(r.status, 1);
     for (const cat of ["email", "money_figure", "booking_code", "flight_number", "street_address", "precise_coords"]) assert.match(r.stdout, new RegExp("PRIVACY " + cat + " "));
     assert.ok(!r.stdout.includes("12,345.67") && !r.stdout.includes("Main Street"), "values never printed");
@@ -192,9 +322,11 @@ test("PRIVFEED2 nest proxy (tunnel-reachable) serves only public page code", asy
   fs.mkdirSync(path.join(home, ".config", "wardos"), { recursive: true });
   fs.writeFileSync(path.join(home, ".config", "wardos", "nest-refresh.token"), "fake-refresh\n");
   fs.writeFileSync(path.join(home, ".config", "wardos", "nest-sdm.json"), '{"projectId":"p","clientId":"c","clientSecret":"s"}');
+  fs.writeFileSync(path.join(home, ".config", "wardos", "nest-device.token"), "test-nest-key-0123456789\n", { mode: 0o600 }); /* FOLLOWUP2 · env key is label-only */
   const port = freePortSync();
   const { spawn } = await import("node:child_process");
-  const child = spawn("node", [path.join(ROOT, "scripts/nest-webrtc-proxy.mjs"), "--host", "127.0.0.1", "--port", String(port)], { env: { ...process.env, HOME: home, NEST_PROXY_TOKEN: "test-nest-key-0123456789" }, stdio: "ignore" }); /* CAMLOCK1 · no token, no start */
+  const env = { ...process.env, HOME: home }; delete env.NEST_PROXY_TOKEN;
+  const child = spawn("node", [path.join(ROOT, "scripts/nest-webrtc-proxy.mjs"), "--host", "127.0.0.1", "--port", String(port)], { env, stdio: "ignore" }); /* CAMLOCK1 · no token, no start */
   try {
     let up = false;
     for (let i = 0; i < 40 && !up; i++) { await new Promise((r) => setTimeout(r, 100)); try { up = (await fetch(`http://127.0.0.1:${port}/nest-webrtc.html`)).status === 200; } catch { /* starting */ } }
@@ -249,4 +381,65 @@ test("CALSCRUB1 · privacy-scan catches seat codes and calendar-derived strings 
     assert.equal(cal, 2, "title and confirmation code, case-insensitive");
     assert.ok(!/Quokka|QX7|Row Q/i.test(r.stdout));
   } finally { fs.rmSync(plant, { force: true }); fs.rmSync(list, { force: true }); }
+});
+
+test("FOLLOWUP4 · privacy-scan fails when the loaded denylist falls below the floor recorded in the list header", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "denyfloor-"));
+  const names = path.join(dir, "names.tsv"), deny = path.join(dir, "deny.txt");
+  const scan = () => spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--tree", "--only", "(^|/)zz-no-such-file-denyfloor$"],
+    { cwd: ROOT, encoding: "utf8", env: { PATH: process.env.PATH, HOME: dir, WARDOS_PRIVATE_NAMES: names, WARDOS_PRIVACY_DENYLIST: deny, WARDOS_CAL_STRINGS: path.join(dir, "none.txt") } });
+  try {
+    fs.writeFileSync(names, "partner\tZqfloorp\ncoparent\tZqfloorc\n", { mode: 0o600 });
+    fs.writeFileSync(deny, "# wardos-min-patterns: 4\nzzsynthone\nzzsynthtwo\n", { mode: 0o600 });
+    let r = scan();
+    assert.equal(r.status, 0, "4 loaded, floor 4: " + r.stdout);
+    assert.match(r.stdout, /denylist patterns 4/);
+    fs.writeFileSync(deny, "# wardos-min-patterns: 4\nzzsynthone\n", { mode: 0o600 });
+    r = scan();
+    assert.equal(r.status, 2, "3 loaded, floor 4 must fail");
+    assert.match(r.stdout, /below the recorded floor 4/);
+    assert.ok(!/zzsynth|Zqfloor/.test(r.stdout), "no list values printed");
+    fs.writeFileSync(names, "# wardos-min-patterns: 9\npartner\tZqfloorp\n", { mode: 0o600 });
+    fs.writeFileSync(deny, "zzsynthone\nzzsynthtwo\n", { mode: 0o600 });
+    assert.equal(scan().status, 2, "a floor in the names list counts too");
+    fs.writeFileSync(names, "partner\tZqfloorp\n", { mode: 0o600 });
+    assert.equal(scan().status, 0, "no floor recorded: old behaviour");
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("FOLLOWUP5 · privacy-scan exits 2 on an empty or missing required list and on a malformed floor line", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "denyempty-"));
+  const names = path.join(dir, "names.tsv"), deny = path.join(dir, "deny.txt");
+  const scan = (...extra) => spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--tree", "--only", "(^|/)zz-no-such-file-denyempty$", ...extra],
+    { cwd: ROOT, encoding: "utf8", env: { PATH: process.env.PATH, HOME: dir, WARDOS_PRIVATE_NAMES: names, WARDOS_PRIVACY_DENYLIST: deny, WARDOS_CAL_STRINGS: path.join(dir, "none.txt") } });
+  try {
+    fs.writeFileSync(names, "partner\tZqemptyp\ncoparent\tZqemptyc\n", { mode: 0o600 });
+    fs.writeFileSync(deny, "# wardos-min-patterns: 3\nzzsynthone\nzzsynthtwo\n", { mode: 0o600 });
+    assert.equal(scan("--require-denylist").status, 0, "both lists present and at the floor");
+    fs.writeFileSync(deny, "", { mode: 0o600 });
+    let r = scan();
+    assert.equal(r.status, 2, "0-byte denylist must fail even with names present");
+    assert.match(r.stdout, /deny list loaded 0 entries/);
+    assert.equal(scan("--require-denylist").status, 2, "0-byte denylist with --require-denylist");
+    fs.writeFileSync(deny, "# only a comment\n\n", { mode: 0o600 });
+    assert.equal(scan().status, 2, "comments-only denylist loads 0 entries");
+    fs.writeFileSync(deny, "zzsynthone\n", { mode: 0o600 });
+    fs.writeFileSync(names, "", { mode: 0o600 });
+    assert.equal(scan().status, 2, "0-byte names list must fail");
+    fs.rmSync(names);
+    assert.equal(scan().status, 0, "names list absent without the flag: generic + denylist still run");
+    r = scan("--require-denylist");
+    assert.equal(r.status, 2, "names list missing with --require-denylist");
+    assert.match(r.stdout, /names list missing/);
+    fs.writeFileSync(names, "partner\tZqemptyp\n", { mode: 0o600 });
+    fs.writeFileSync(deny, "# wardos-min-patterns: 15 (note text after the number)\nzzsynthone\n", { mode: 0o600 });
+    r = scan();
+    assert.equal(r.status, 2, "a floor line with trailing text must not silently set no floor");
+    assert.match(r.stdout, /1 malformed wardos-min-patterns line/);
+    fs.writeFileSync(deny, "# wardos-min-patterns: 15\n# note text on its own line\nzzsynthone\n", { mode: 0o600 });
+    r = scan();
+    assert.equal(r.status, 2, "fixed floor line now enforces the floor (2 loaded, floor 15)");
+    assert.match(r.stdout, /below the recorded floor 15/);
+    assert.ok(!/zzsynth|Zqempty|note text/.test(r.stdout + r.stderr), "no list values printed");
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });

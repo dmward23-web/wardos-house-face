@@ -650,7 +650,8 @@ async function main() {
     }
   ];
   try {
-    for (const view of views) {
+    /* FOLLOWUP5 · GATE3_KID_ONLY=1 runs only the notice section (quick local loop; the full gate stays the gate) */
+    for (const view of process.env.GATE3_KID_ONLY === "1" ? [] : views) {
       const page = await browser.newPage();
       await page.setViewport(view);
       if (view.phone) {
@@ -763,6 +764,211 @@ async function main() {
       }
       await page.close();
     }
+    /* FOLLOWUP3 · kid pages on phones, unpaired: the pairing chip must not cover any visible control or text
+       (name, sound toggle, clock). Only what is really on top at that point counts (hit test). */
+    /* FOLLOWUP5/6 · the notice must never cover content. Phones (440, 390): sheet-dan and the three kid worlds every
+       10px of scroll (the -pre-theme copies at rest, 50% and bottom). Wall (1080x1920 and 1920x1080): every board,
+       every 10px where the page scrolls. Kid worlds again with the My Week drawer open and with kid-world.js blocked
+       (classic page). One paint-order probe (below) covers text, tap-through or not, and controls. */
+    const KID_PAGES = ["kid-hayes.html", "kid-harris.html", "kid-ainsley.html", "kid-hayes-pre-theme.html", "kid-harris-pre-theme.html", "kid-ainsley-pre-theme.html", "sheet-dan.html"];
+    /* FOLLOWUP6 · every board (all top-level pages) on both wall shapes, every 10px where the page scrolls */
+    const ALL_BOARDS = fs.readdirSync(ROOT).filter((f) => /\.html$/.test(f)).sort();
+    const KID_SIZES = [
+      { name: "440", width: 440, height: 956, deviceScaleFactor: 1, isMobile: true, hasTouch: true, pages: KID_PAGES },
+      { name: "390", width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true, pages: KID_PAGES },
+      { name: "wall", width: 1080, height: 1920, deviceScaleFactor: 1, isMobile: false, hasTouch: false, pages: ALL_BOARDS },
+      { name: "wall-land", width: 1920, height: 1080, deviceScaleFactor: 1, isMobile: false, hasTouch: false, pages: ALL_BOARDS }
+    ];
+    if (process.env.GATE3_SIZES) { const keep = process.env.GATE3_SIZES.split(","); KID_SIZES.splice(0, KID_SIZES.length, ...KID_SIZES.filter((z) => keep.includes(z.name))); }
+    let noticeCovers = 0;
+    for (const size of KID_SIZES) {
+      /* FOLLOWUP6 · a board that never answers (a modal dialog, a hung main thread) must not stall the gate: dialogs are
+         dismissed, and a board that takes longer than GATE3_PAGE_MS (default 15 min) fails as timed out and gets a
+         fresh tab */
+      const newTab = async () => {
+        const t = await browser.newPage();
+        t.on("dialog", (d) => d.dismiss().catch(() => {}));
+        await t.setViewport({ width: size.width, height: size.height, deviceScaleFactor: size.deviceScaleFactor, isMobile: size.isMobile, hasTouch: size.hasTouch });
+        return t;
+      };
+      let page = await newTab();
+      /* GATE3_PAGES=a.html,b.html scopes a local loop to some boards (the full gate stays the gate) */
+      const only = process.env.GATE3_PAGES ? process.env.GATE3_PAGES.split(",") : null;
+      for (const file of size.pages.filter((f) => !only || only.includes(f))) {
+        console.log("check kid chip", size.name, file);
+        let timedOut = false;
+        const dog = setTimeout(() => { timedOut = true; page.close().catch(() => {}); }, Number(process.env.GATE3_PAGE_MS || 900000));
+        try {
+        await page.goto("http://127.0.0.1:" + PORT + "/" + file, { waitUntil: "load", timeout: 90000 });
+        await new Promise((r) => setTimeout(r, 3000));
+        const probe = () => page.evaluate(() => {
+          /* FOLLOWUP6 · paint-order probe. With every element taking hits for a moment, elementsFromPoint gives the
+             full stack at a point, top first. On a grid over the notice (every 6px), anything painted BELOW the notice
+             that is content counts as covered: a text box at that point (any visible text, tap-through or not) or a
+             control (button, link, input, image). Hidden content (display:none, visibility:hidden, opacity 0, clipped
+             away by an ancestor) is skipped; background canvases are not content. */
+          const c = document.querySelector("[data-private-feed-flag]");
+          if (!c || getComputedStyle(c).display === "none") return { chip: false, hits: [] };
+          const cr = c.getBoundingClientRect();
+          if (cr.width < 2 || cr.height < 2) return { chip: false, hits: [] };
+          const hits = [];
+          const memo = new Map();
+          const shown = (el) => {
+            if (memo.has(el)) return memo.get(el);
+            let ok = getComputedStyle(el).visibility !== "hidden";
+            for (let a = el; ok && a && a !== document.documentElement; a = a.parentElement) {
+              const s = getComputedStyle(a);
+              if (s.display === "none" || parseFloat(s.opacity) === 0) ok = false;
+              else if ((s.position === "absolute" || s.position === "fixed") && /rect\(\s*0px,?\s*0px,?\s*0px,?\s*0px\s*\)/.test(s.clip || "")) ok = false;
+              else if (s.clipPath && /inset\(\s*50%/.test(s.clipPath)) ok = false;
+            }
+            memo.set(el, ok);
+            return ok;
+          };
+          const inClip = (el, x, y) => {
+            for (let a = el.parentElement; a && a !== document.body && a !== document.documentElement; a = a.parentElement) {
+              const s = getComputedStyle(a);
+              if (/(hidden|clip|scroll|auto)/.test(s.overflowX + s.overflowY)) { const b = a.getBoundingClientRect(); if (x < b.left || x > b.right || y < b.top || y > b.bottom) return false; }
+            }
+            return true;
+          };
+          const textAt = (el, x, y) => {
+            for (const n of el.childNodes) {
+              if (n.nodeType !== 3 || !n.nodeValue.trim()) continue;
+              const rg = document.createRange(); rg.selectNodeContents(n);
+              for (const r of rg.getClientRects()) if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return n.nodeValue.trim();
+            }
+            return null;
+          };
+          const lock = document.createElement("style");
+          lock.textContent = "*{pointer-events:auto!important}";
+          document.head.appendChild(lock);
+          const seen = new Set();
+          try {
+            for (let y = cr.top + 3; y < cr.bottom - 2; y += 6) {
+              for (let x = cr.left + 3; x < cr.right - 2; x += 6) {
+                if (x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) continue;
+                const stack = document.elementsFromPoint(x, y);
+                const at = stack.findIndex((e) => e === c || c.contains(e));
+                if (at < 0) continue; /* something paints over the notice here: the notice covers nothing at this point */
+                for (const e of stack.slice(at + 1)) {
+                  if (c.contains(e) || e === document.body || e === document.documentElement || /^(CANVAS|svg|VIDEO)$/i.test(e.tagName)) continue;
+                  if (seen.has(e) || !shown(e)) continue;
+                  const t = textAt(e, x, y);
+                  const ctl = !t && /^(BUTTON|A|INPUT|SELECT|TEXTAREA|IMG)$/.test(e.tagName) && (e.tagName !== "A" || (e.textContent || "").trim() || e.querySelector("img"));
+                  if (!t && !ctl) continue;
+                  if (!inClip(e, x, y)) continue;
+                  seen.add(e);
+                  hits.push("under notice " + String(e.className && e.className.baseVal === undefined ? e.className : e.tagName).split(" ")[0].slice(0, 24) + " " + (t || e.getAttribute("aria-label") || (e.textContent || "").trim() || e.tagName).slice(0, 20));
+                }
+              }
+            }
+          } finally { lock.remove(); }
+          return { chip: true, hits, onScreen: cr.bottom > 0 && cr.top < innerHeight && cr.right > 0 && cr.left < innerWidth };
+        });
+        const dense = !size.isMobile || file === "sheet-dan.html" || /^kid-(hayes|harris|ainsley)\.html$/.test(file);
+        /* FOLLOWUP6 · a board that keeps the page still and scrolls an inner box (body overflow hidden) is swept on
+           its largest visible inner scroller instead, so "every 10px where the page scrolls" holds there too */
+        await page.evaluate(() => {
+          window.__g3s = null;
+          if (document.documentElement.scrollHeight - innerHeight > 0) return;
+          let best = null, area = 0;
+          for (const e of document.querySelectorAll("body *")) {
+            const s = getComputedStyle(e);
+            if (!/(auto|scroll)/.test(s.overflowY) || e.scrollHeight - e.clientHeight < 10 || s.display === "none" || s.visibility === "hidden") continue;
+            const r = e.getBoundingClientRect(); const a = r.width * r.height;
+            if (a > area) { area = a; best = e; }
+          }
+          window.__g3s = best;
+        });
+        const sweep = async (state) => {
+          const max = await page.evaluate(() => window.__g3s ? Math.max(0, window.__g3s.scrollHeight - window.__g3s.clientHeight) : Math.max(0, document.documentElement.scrollHeight - innerHeight));
+          const stops = [0];
+          if (dense) { for (let y = 10; y < max; y += 10) stops.push(y); if (max > 0) stops.push(max); }
+          else if (max >= 40) stops.push(Math.round(max * 0.5), max);
+          const out = { chipSeen: false, onScreen: false, hits: [], probes: 0, max };
+          const seen = new Set();
+          for (const y of stops) {
+            /* FOLLOWUP6 · a busy animated board on a loaded box can take seconds per frame; the probe forces layout itself,
+               so wait for two frames OR 60ms, whichever is first */
+            await page.evaluate((v) => new Promise((ok) => { if (window.__g3s) window.__g3s.scrollTop = v; else scrollTo(0, v); requestAnimationFrame(() => requestAnimationFrame(ok)); setTimeout(ok, 60); }), y);
+            if (!dense) await new Promise((r) => setTimeout(r, 250));
+            const r = await probe(); out.probes++;
+            /* FOLLOWUP6 · no notice on the board at the top means none at any scroll (it does not depend on scroll) */
+            if (!r.chip && y === stops[0] && !out.chipSeen) break;
+            if (r.chip) out.chipSeen = true;
+            if (r.onScreen) out.onScreen = true;
+            for (const h of r.hits) { if (seen.has(h)) continue; seen.add(h); out.hits.push(h + " (" + state + ", scroll " + y + "px)"); }
+          }
+          await page.evaluate(() => { if (window.__g3s) window.__g3s.scrollTop = 0; scrollTo(0, 0); });
+          return out;
+        };
+        const res = await sweep("closed");
+        console.log("  kid chip probes", size.name, file, res.probes, "max scroll", res.max);
+        if (res.chipSeen && res.max > 0) {
+          /* report the visible gap between the in-flow chip and the fixed badge at the bottom of the page (margin is not the gap) */
+          await page.evaluate((v) => new Promise((ok) => { scrollTo(0, v); requestAnimationFrame(() => requestAnimationFrame(ok)); }), res.max);
+          const gap = await page.evaluate(() => {
+            const c = document.querySelector("[data-private-feed-flag]");
+            const b = [...document.querySelectorAll("body *")].find((e) => getComputedStyle(e).position === "fixed" && /this device only/.test(e.textContent || ""));
+            if (!c || !b || getComputedStyle(c).position === "fixed" || getComputedStyle(b).display === "none") return null;
+            return Math.round(b.getBoundingClientRect().top - c.getBoundingClientRect().bottom);
+          });
+          if (gap !== null) console.log("  kid chip to badge gap at bottom", size.name, file, gap + "px");
+          await page.evaluate(() => scrollTo(0, 0));
+        }
+        if (!res.chipSeen && KID_PAGES.includes(file)) failures.push("kid chip missing unpaired " + size.name + " " + file);
+        else if (res.hits.length) for (const h of res.hits) { noticeCovers++; failures.push("kid chip covers " + size.name + " " + file + " :: " + h); }
+        else if (!res.chipSeen) console.log("  no notice", size.name, file);
+        else console.log("  clean kid chip", size.name, file, res.onScreen ? "" : "(notice below a board that does not scroll: not on screen)");
+        /* open My Week: the chip must not sit over the open drawer, nor over any text with the drawer open */
+        const opened = await page.evaluate(() => { const b = document.querySelector("[data-kw-path]"); if (!b) return false; b.click(); return true; });
+        if (opened) {
+          await new Promise((r) => setTimeout(r, 600));
+          const dr = await page.evaluate(() => {
+            const d = document.getElementById("kw-cal");
+            const c = document.querySelector("[data-private-feed-flag]");
+            if (!d || d.hidden) return { open: false };
+            if (!c || getComputedStyle(c).display === "none") return { open: true, over: false };
+            const a = d.getBoundingClientRect(), b = c.getBoundingClientRect();
+            const ix = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+            const iy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+            return { open: true, over: ix > 2 && iy > 2 };
+          });
+          if (dr.open && dr.over) failures.push("kid chip over open My Week drawer " + size.name + " " + file);
+          if (dr.open) {
+            const ro = await sweep("drawer open");
+            for (const h of ro.hits) { noticeCovers++; failures.push("kid chip covers " + size.name + " " + file + " :: " + h); }
+            if (!dr.over && !ro.hits.length) console.log("  clean kid drawer", size.name, file, "open", ro.probes, "probes");
+          } else console.log("  clean kid drawer", size.name, file, "no drawer");
+        }
+        /* world off: if kid-world.js never runs, the classic page shows; the notice must still cover nothing */
+        if (/^kid-(hayes|harris|ainsley)\.html$/.test(file)) {
+          const block = (req) => (/\/kid-world\.js(\?|$)/.test(req.url()) ? req.abort() : req.continue());
+          await page.setRequestInterception(true);
+          page.on("request", block);
+          try {
+            await page.goto("http://127.0.0.1:" + PORT + "/" + file, { waitUntil: "load", timeout: 90000 });
+            await new Promise((r) => setTimeout(r, 3000));
+            const kwOn = await page.evaluate(() => document.body.classList.contains("kw-on"));
+            const rw = await sweep("world off");
+            if (kwOn) failures.push("kid world off did not take " + size.name + " " + file);
+            for (const h of rw.hits) { noticeCovers++; failures.push("kid chip covers " + size.name + " " + file + " :: " + h); }
+            if (!rw.hits.length) console.log("  clean kid chip world off", size.name, file, rw.probes, "probes, max scroll", rw.max);
+          } finally {
+            page.off("request", block);
+            await page.setRequestInterception(false);
+          }
+        }
+        } catch (e) {
+          failures.push("notice check " + (timedOut ? "timed out" : "error") + " " + size.name + " " + file + " :: " + String(e && e.message || e).slice(0, 80));
+          try { await page.close(); } catch { /* already closed */ }
+          page = await newTab();
+        } finally { clearTimeout(dog); }
+      }
+      await page.close();
+    }
+    console.log("notice covers " + noticeCovers + " (sizes " + KID_SIZES.map((z) => z.name).join(",") + ")");
   } finally {
     await browser.close();
     server.close();

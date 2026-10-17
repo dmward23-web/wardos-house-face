@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <script src="house-hub.js?v=HUBPIN1"></script>
-<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=FOLLOWUP6"></script>
 <script src="house-face-law.js?v=PRIVFEED3"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -67,7 +67,7 @@
         <span class="spw-vol-ic" aria-hidden="true"></span>
         <div class="spw-vtrack"><div class="spw-vfill" id="spw-vfill"></div></div>
         <input type="range" id="spw-volume" min="0" max="100" value="50" aria-label="Volume">
-        <span class="spw-vol-n" id="spw-vol-n">–</span>
+        <span class="spw-vol-n" id="spw-vol-n"></span>
       </div>
 
       <button type="button" class="spw-device spw-in" style="--d:6" id="spw-device" aria-haspopup="dialog"><span class="spw-dev-ic" aria-hidden="true"></span><span class="spw-dev-txt" id="spw-dev-txt">Pick a speaker</span><span class="spw-dev-chev" aria-hidden="true">▾</span></button>
@@ -81,10 +81,10 @@
 
     <section class="spw-setup" id="spw-setup" hidden aria-label="One-time Spotify setup">
       <h2>One-time Spotify setup</h2>
-      <p class="spw-setup-lead">Spotify only lets a home board in through your own free developer app. About 3 minutes, once — then every House screen just works.</p>
+      <p class="spw-setup-lead">Spotify only lets a home board in through your own free developer app. About 3 minutes, once. Then every House screen just works.</p>
       <ol>
         <li>Open the <a href="https://developer.spotify.com/dashboard/create" target="_blank" rel="noopener">Spotify developer dashboard</a> (sign in as you) and create an app.<br><span class="spw-dim">Name: WardOS House · Description: House board</span></li>
-        <li>Redirect URI — paste exactly, tap Add:
+        <li>Redirect URI (paste exactly, tap Add):
           <div class="spw-copy"><code id="spw-redirect">https://dmward23-web.github.io/wardos-house-face/spotify-callback.html</code><button type="button" id="spw-copy-btn">Copy</button></div>
           Tick <b>Web API</b>, agree, tap <b>Save</b>.</li>
         <li>Copy the <b>Client ID</b> from the app page and paste it here:
@@ -135,7 +135,7 @@
 <script src="ori/plates/painted/manifest.js?v=SPOTIFY2"></script>
 <script src="ori/ori-scene.js?v=SPOTIFY2"></script>
 <script src="house-spotify.js?v=HUBPIN1"></script>
-<script src="sheet-spotify.js?v=PRIVFEED3"></script>
+<script src="sheet-spotify.js?v=FOLLOWUP6"></script>
 <script src="sheet-spotify-lib.js?v=SPOTIFY2"></script>
 </body>
 </html>

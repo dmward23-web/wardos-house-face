@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
-<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=FOLLOWUP6"></script>
 <script src="house-face-law.js?v=PRIVFEED3"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
@@ -80,8 +80,8 @@
   </div>
   <div class="cams" id="cam-row" aria-label="Cameras" hidden></div>
 </div>
-<script src="nest-webrtc-client.js?v=HUBPIN1"></script>
-<script src="hub-key-entry.js?v=PRIVFEED3"></script>
+<script src="nest-webrtc-client.js?v=FOLLOWUP6"></script>
+<script src="hub-key-entry.js?v=FOLLOWUP6"></script>
 <script>
 (function () {
   var N = window.NestWebRtc;
@@ -188,7 +188,7 @@
       if (e && e.code === "LOCKED") { showLocked(want); return; }
       if (stageEl) stageEl.classList.add("fail");
       var msg = (e && e.message) ? e.message : String(e);
-      var base = N.proxyBase() || "(none — Pages/phone)";
+      var base = N.proxyBase() || "(none, Pages/phone)";
       showErr(
         "Cannot reach nest-webrtc-proxy at " + base + "\n\n" + msg
       );

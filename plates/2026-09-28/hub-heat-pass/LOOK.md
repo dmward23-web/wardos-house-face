@@ -14,7 +14,7 @@
 Loud → quiet:
 
 1. **HUGE leave-by next time**
-2. **Clear cam faces** — Front / Garage / Backyard
+2. **Clear cam faces** · Camera 1 / 2 / 3
 3. **Dense lights** — 9 rockers (LIVE + honest STUB)
 4. **Quiet roster** — ≤2 micro rows · no fight with command
 

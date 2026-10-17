@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
-<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=FOLLOWUP6"></script>
 <script src="school-names.js?v=SCHOOLNAMES1"></script>
 <script src="house-face-law.js?v=PRIVFEED3"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
@@ -665,7 +665,7 @@
  <div class="month-hdr">
  <div class="mnav">
  <button class="mbtn" type="button" data-mnav="-1" aria-label="Previous month">‹</button>
- <div class="month-title" data-month-title>—</div>
+ <div class="month-title" data-month-title></div>
  <button class="mbtn" type="button" data-mnav="1" aria-label="Next month">›</button>
  </div>
  <div class="month-range" data-month-range>known facts only · empty = unknown</div>
@@ -959,7 +959,7 @@
     var title = raw.replace(/\[[^\]]*\]/g, " ").replace(/\([^)]*\)/g, " ").replace(/#[A-Za-z0-9_-]+/g, " ").replace(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{5,}\b/g, " ");
     var cut = title.indexOf(" · ");
     if (cut >= 0) title = title.slice(0, cut);
-    title = title.replace(/\s+/g, " ").replace(/^[\s·—–\-|]+|[\s·—–\-|]+$/g, "").trim();
+    title = title.replace(/\s+/g, " ").replace(/^[\s·\u2014\u2013\-|]+|[\s·\u2014\u2013\-|]+$/g, "").trim();
     if (title && dest.textContent !== title) dest.textContent = title;
     var detail = document.querySelector("[data-live='leaveby-detail']");
     if (detail && detail.textContent) { detail.textContent = ""; detail.hidden = true; }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <script src="house-hub.js?v=HUBPIN1"></script>
-<script src="private-feed.js?v=HUBPIN1"></script>
+<script src="private-feed.js?v=FOLLOWUP6"></script>
 <script src="house-face-law.js?v=PRIVFEED3"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -63,7 +63,7 @@
   var first = pages ? liveProxy() : Promise.resolve(lsProxy());
   first.then(function (b) { return b || (pages ? lsProxy() : liveProxy()); }).then(function (base) {
     if (!base) base = pages ? "" : "http://127.0.0.1:8788";
-    if (!base) { done(false, "House box isn't answering", "Try again in a minute — the sign-in link is good for 15 minutes."); return; }
+    if (!base) { done(false, "House box isn't answering", "Try again in a minute. The sign-in link is good for 15 minutes."); return; }
     return exchange(base).then(function (j) {
       if (j && j.ok) {
         var back = j.returnTo || "sheet-spotify.html";

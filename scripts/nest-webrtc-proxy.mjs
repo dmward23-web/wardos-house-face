@@ -20,8 +20,8 @@
  *   - every /api/* call needs header X-Nest-Proxy-Token (or Authorization: Bearer); no ?proxyToken= query (URLs leak into logs)
  *   - constant-time compare; no localhost / X-Forwarded-For trust; no open or ephemeral mode
  *   - the proxy REFUSES TO START without an auth token. Sources (any number, each >= 16 chars):
- *       --auth-token-file <path> (repeatable)  · default files ~/.config/wardos/nest-proxy.token + nest-device.token
- *       NEST_PROXY_TOKEN env · --auth-token <t> (avoid: visible in ps)
+ *       --auth-token-file <path> (repeatable)  · default file ~/.config/wardos/nest-device.token (nest-proxy.token is retired: log label only)
+ *       --auth-token <t> (avoid: visible in ps). NEST_PROXY_TOKEN env is retired: log label only, never authorises
  *   - /health answers only {"ok":true}; static page code (no data/, scripts/, dotfiles) is the only keyless content.
  *
  * See ../NEST-LIVE.md
@@ -42,7 +42,6 @@ const TEST_GOOGLE = /^http:\/\/127\.0\.0\.1:\d+$/.test(process.env.NEST_PROXY_TE
 const OAUTH_URL = TEST_GOOGLE ? TEST_GOOGLE + "/token" : "https://oauth2.googleapis.com/token";
 const SDM_BASE = TEST_GOOGLE ? TEST_GOOGLE + "/v1" : "https://smartdevicemanagement.googleapis.com/v1";
 const DEFAULT_AUTH_FILES = [
-  path.join(os.homedir(), ".config", "wardos", "nest-proxy.token"),
   path.join(os.homedir(), ".config", "wardos", "nest-device.token"),
 ];
 
@@ -112,14 +111,9 @@ function deviceTypeShort(type) {
   return "DEVICE";
 }
 
-function guessWhere(name) {
-  const n = String(name || "").toLowerCase();
-  if (/front|door|entry|porch/.test(n)) return "Entry";
-  if (/drive|garage/.test(n)) return /drive/.test(n) ? "Drive" : "Garage";
-  if (/back|yard|patio|garden/.test(n)) return "Yard";
-  if (/living|family|room/.test(n)) return "Inside";
-  if (/kitchen/.test(n)) return "Kitchen";
-  return "Cam";
+/* FOLLOWUP2 · no room mapping in git: "where" is a generic label; the camera's own name (private feed) says the rest */
+function guessWhere() {
+  return "Camera";
 }
 
 function normalizeDevice(dev) {
@@ -296,16 +290,30 @@ function safeJoin(root, urlPath) {
   return abs;
 }
 
-/** ACCESSLOG · auth tokens with the slot each came from (never logged). nest-proxy.token and NEST_PROXY_TOKEN are the
-    retired cams key ("retired"); nest-device.token and --auth-token are the device key ("device"). First source wins. */
+/** ACCESSLOG · auth tokens with the slot each came from (never logged): nest-device.token and --auth-token are the device
+    key ("device"). FOLLOWUP1/2: nest-proxy.token and NEST_PROXY_TOKEN are never auth sources (retired cams key; log label
+    only, see loadRetiredLabels). */
 export function loadAuthEntries(args, env = process.env) {
   const out = [];
   const add = (t, slot) => { t = String(t || "").trim(); if (t.length >= 16 && !out.some((e) => e.t === t)) out.push({ t, slot }); };
   add(args.cliToken, "device");
-  add(env.NEST_PROXY_TOKEN, "retired");
+  /* FOLLOWUP2 · NEST_PROXY_TOKEN is label-only like nest-proxy.token (never authorises; see loadRetiredLabels) */
   for (const f of (args.authFiles.length ? args.authFiles : DEFAULT_AUTH_FILES)) {
-    const slot = /^nest-proxy\.token/.test(path.basename(f)) ? "retired" : "device";
-    try { for (const t of fs.readFileSync(f, "utf8").split(/\s+/)) add(t, slot); } catch { /* missing file */ }
+    if (RETIRED_FILE_RE.test(path.basename(f))) continue; /* FOLLOWUP1 · label only, never authorises (loadRetiredLabels) */
+    try { for (const t of fs.readFileSync(f, "utf8").split(/\s+/)) add(t, "device"); } catch { /* missing file */ }
+  }
+  return out;
+}
+/** FOLLOWUP1 · the retired cams key file (nest-proxy.token) is read ONLY as a log label: a request carrying it is still
+    401, but the access log says slot "retired" instead of "none". Read from ~/.config/wardos and from any
+    --auth-token-file that names it. Values that are also an auth key stay with their auth slot. */
+const RETIRED_FILE_RE = /^nest-proxy\.token/;
+export function loadRetiredLabels(args, authTokens = [], home = os.homedir(), env = process.env) {
+  const files = new Set([path.join(home, ".config", "wardos", "nest-proxy.token"), ...(args.authFiles || []).filter((f) => RETIRED_FILE_RE.test(path.basename(f)))]);
+  const out = [];
+  { const t = String(env.NEST_PROXY_TOKEN || "").trim(); if (t.length >= 16 && !authTokens.includes(t)) out.push(t); }
+  for (const f of files) {
+    try { for (let t of fs.readFileSync(f, "utf8").split(/\s+/)) { t = t.trim(); if (t.length >= 16 && !authTokens.includes(t) && !out.includes(t)) out.push(t); } } catch { /* missing file */ }
   }
   return out;
 }
@@ -314,11 +322,12 @@ export function loadAuthTokens(args, env = process.env) {
   return loadAuthEntries(args, env).map((e) => e.t);
 }
 /** ACCESSLOG · which slot the request's key header matched: "device" | "retired" | "none" (constant time over all) */
-export function authSlot(req, entries) {
+export function authSlot(req, entries, retired = []) {
   const h = String(req.headers["x-nest-proxy-token"] || (req.headers.authorization || "").replace(/^Bearer\s+/i, "") || "");
-  if (!h || !entries || !entries.length) return "none";
+  if (!h) return "none";
   let slot = "none";
-  for (const e of entries) if (safeEq(h, e.t) && slot === "none") slot = e.slot;
+  for (const e of entries || []) if (safeEq(h, e.t) && slot === "none") slot = e.slot;
+  for (const t of retired || []) if (safeEq(h, t) && slot === "none") slot = "retired"; /* label only: checkAuth never sees these */
   return slot;
 }
 
@@ -342,7 +351,7 @@ async function main() {
   const args = parseArgs(process.argv);
   if (args.help) {
     console.log(`Usage: node scripts/nest-webrtc-proxy.mjs [--host 127.0.0.1] [--port 8787] [--lan]
-  --lan           bind 0.0.0.0 (set NEST_PROXY_TOKEN for auth)
+  --lan           bind 0.0.0.0 (auth: nest-device.token)
   Secrets: ~/.config/wardos/nest-refresh.token + nest-sdm.json`);
     process.exit(0);
   }
@@ -359,7 +368,7 @@ async function main() {
   const authEntries = loadAuthEntries(args);
   args.authTokens = authEntries.map((e) => e.t);
   if (!args.authTokens.length) {
-    console.error("FATAL: CAMLOCK1 · no auth token (--auth-token-file, ~/.config/wardos/nest-proxy.token / nest-device.token, or NEST_PROXY_TOKEN; >= 16 chars). Refusing to start.");
+    console.error("FATAL: CAMLOCK1 · no auth token (--auth-token-file or ~/.config/wardos/nest-device.token, >= 16 chars; the retired nest-proxy.token and NEST_PROXY_TOKEN never count). Refusing to start.");
     process.exit(3);
   }
 
@@ -405,10 +414,11 @@ async function main() {
   }
 
   /* ACCESSLOG · one JSON line per request (route, status, slot, cf-connecting-ip, UA); keys are scrubbed, never logged */
-  const access = createAccessLog({ name: "nest-webrtc-proxy", secrets: () => args.authTokens });
+  const retiredLabels = loadRetiredLabels(args, args.authTokens);
+  const access = createAccessLog({ name: "nest-webrtc-proxy", secrets: () => [...args.authTokens, ...retiredLabels] });
 
   const server = http.createServer(async (req, res) => {
-    try { access.setSlot(req, authSlot(req, authEntries)); access.attach(req, res); } catch { /* logging never breaks a request */ }
+    try { access.setSlot(req, authSlot(req, authEntries, retiredLabels)); access.attach(req, res); } catch { /* logging never breaks a request */ }
     /* PRIVFEED3 · never build a URL from the Host header; a bad request line is a 400, never a crash */
     let u;
     try { u = new URL(req.url || "/", "http://proxy.invalid"); } catch { return json(res, 400, { error: "bad request" }); }

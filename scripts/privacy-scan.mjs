@@ -13,6 +13,8 @@
  * the box: private-names.tsv (~/.local/share/wardos-private, fallback ~/.config/wardos; every name column) + ~/.config/wardos/privacy-denylist.txt
  * (one regex per line). WARDOS_PRIVACY_DENYLIST / WARDOS_PRIVATE_NAMES override. When neither exists (CI, cloud
  * builders) the generic patterns still run and a WARN line says so (--require-denylist turns that into a failure).
+ * A list file that exists but loads 0 entries fails (exit 2); --require-denylist also fails (exit 2) when either list is
+ * missing. A '# wardos-min-patterns: N' line (alone on its line) sets a floor on the total loaded (exit 2 below it).
  * A line may opt out of ONE generic category with a trailing comment:  privacy-scan:allow <category>
  */
 import fs from "node:fs";
@@ -75,9 +77,19 @@ function loadDeny() {
   const namesFp = process.env.WARDOS_PRIVATE_NAMES || (fs.existsSync(namesPrimary) ? namesPrimary : path.join(home, ".config", "wardos", "private-names.tsv"));
   const denyFp = process.env.WARDOS_PRIVACY_DENYLIST || path.join(home, ".config", "wardos", "privacy-denylist.txt");
   let found = 0;
+  let floor = 0;
+  /* FOLLOWUP5 · per-list state: a list file that exists but loads no entries (0 bytes, blank, comments only) is a
+     half-written list and fails the scan (exit 2); --require-denylist also needs BOTH lists present and non-empty */
+  const lists = { names: { present: false, n: 0 }, deny: { present: false, n: 0 } };
+  /* FOLLOWUP4 · a list can carry "# wardos-min-patterns: N" in a comment line; loading fewer patterns than the largest
+     such floor fails the scan (a truncated or half-written list must not quietly pass) */
+  /* FOLLOWUP5 · a floor line with anything else on it would silently set no floor, so it fails the scan instead */
+  let badFloor = 0;
+  const readFloor = (ln) => { const m = /^#\s*wardos-min-patterns:\s*(\d+)\s*$/.exec(ln.trim()); if (m) floor = Math.max(floor, +m[1]); else if (/^#\s*wardos-min-patterns\b/.test(ln.trim())) badFloor++; };
   if (fs.existsSync(namesFp)) {
-    found++;
+    found++; lists.names.present = true;
     for (const ln of fs.readFileSync(namesFp, "utf8").split("\n")) {
+      if (ln.startsWith("#")) readFloor(ln);
       if (!ln.trim() || ln.startsWith("#") || !ln.includes("\t")) continue;
       const role = ln.slice(0, ln.indexOf("\t")).trim().toLowerCase();
       const name = ln.slice(ln.indexOf("\t") + 1).trim();
@@ -87,20 +99,22 @@ function loadDeny() {
          name (<CODE>Drop, <CODE>X) is caught while a lowercase letter after it, or any letter before it, still blocks. */
       if (role === "school" && name.length >= 2) {
         const cls = Array.from(name).map((ch) => /[A-Za-z]/.test(ch) ? "[" + ch.toUpperCase() + ch.toLowerCase() + "]" : /\s/.test(ch) ? "\\s+" : ch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("");
+        lists.names.n++;
         pats.push(new RegExp("(?<![A-Za-z])" + cls + "(?![a-z])"));
       }
-      else if (name.length >= 3) pats.push(new RegExp("\\b" + esc + "\\b", "i"));
+      else if (name.length >= 3) { lists.names.n++; pats.push(new RegExp("\\b" + esc + "\\b", "i")); }
     }
   }
   if (fs.existsSync(denyFp)) {
-    found++;
+    found++; lists.deny.present = true;
     for (const ln of fs.readFileSync(denyFp, "utf8").split("\n")) {
       const t = ln.trim();
+      if (t.startsWith("#")) readFloor(t);
       if (!t || t.startsWith("#")) continue;
-      try { pats.push(new RegExp(t, "i")); } catch { console.error("privacy-scan: bad denylist regex skipped (line not shown)"); }
+      try { pats.push(new RegExp(t, "i")); lists.deny.n++; } catch { console.error("privacy-scan: bad denylist regex skipped (line not shown)"); }
     }
   }
-  return { pats, found };
+  return { pats, found, floor, lists, badFloor };
 }
 
 /* CALSCRUB1 · calendar-derived strings (event titles, places, seat and confirmation codes) from the private caches.
@@ -118,6 +132,23 @@ const CAL_STRINGS = has("--no-calstrings") ? null : loadCalStrings();
 
 /* synthetic QA fixtures may carry fake money figures and fake dated birthdays (denylist still applies) */
 const FIXTURE_ALLOW = { seat_code: /^scripts\/qa\/fixtures\//, money_figure: /^scripts\/qa\/fixtures\//, birthday_dated: /^scripts\/qa\/fixtures\//, allowance_figure: /^scripts\/qa\/fixtures\// };
+/* FOLLOWUP1 · the ONE public contact address, allowed only on the Google consent page (privacy.html). FOLLOWUP2: exact
+   match only: every email match on the line is checked and only a match whose WHOLE text equals the address (in that exact
+   file) is allowed, so x<addr>, <addr>.evil, evil.<addr> and <addr>pany still hit.
+   Encoded '@' (%40, &#64;, &#x40;, &commat;) is decoded first, so encoded addresses are caught in every file. */
+const PUBLIC_EMAIL_ALLOW = { "privacy.html": new Set(["atlasward@mail.grokbot.com"]) };
+const EMAIL_SRC = GENERIC.find(([c]) => c === "email")[1].source;
+export function decodeAt(line) {
+  return String(line).replace(/%40/gi, "@").replace(/&#0*64;?/g, "@").replace(/&#x0*40;?/gi, "@").replace(/&commat;/gi, "@");
+}
+export function emailHit(rel, line) {
+  const allow = PUBLIC_EMAIL_ALLOW[rel] || new Set();
+  const dec = decodeAt(line);
+  for (const v of dec === line ? [line] : [line, dec]) {
+    for (const m of v.matchAll(new RegExp(EMAIL_SRC, "g"))) if (!allow.has(m[0])) return true;
+  }
+  return false;
+}
 function scanText(rel, text, deny, hits) {
   const isJson = /\.json$/i.test(rel);
   const lines = text.split("\n");
@@ -128,7 +159,7 @@ function scanText(rel, text, deny, hits) {
     for (const [cat, rx] of GENERIC) {
       if (allow && allow[1] === cat) continue;
       if (FIXTURE_ALLOW[cat] && FIXTURE_ALLOW[cat].test(rel)) continue;
-      if (rx.test(line)) hits.push({ rel, line: i + 1, cat });
+      if (cat === "email" ? emailHit(rel, line) : rx.test(line)) hits.push({ rel, line: i + 1, cat });
     }
     if (BDAY.test(line) && (isJson || DATEISH.test(line)) && !(allow && allow[1] === "birthday_dated") && !FIXTURE_ALLOW.birthday_dated.test(rel)) hits.push({ rel, line: i + 1, cat: "birthday_dated" });
     for (const rx of deny.pats) if (rx.test(line)) { hits.push({ rel, line: i + 1, cat: "denylist" }); break; }
@@ -205,6 +236,24 @@ function main() {
     fs.writeFileSync(rep, md);
   }
   if (!deny.found && has("--require-denylist")) process.exit(2);
+  /* FOLLOWUP5 · counts and list kinds only, never a value */
+  const empty = Object.entries(deny.lists).filter(([, l]) => l.present && l.n === 0).map(([k]) => k);
+  const absent = has("--require-denylist") ? Object.entries(deny.lists).filter(([, l]) => !l.present).map(([k]) => k) : [];
+  if (deny.badFloor) {
+    console.log(`FAIL: ${deny.badFloor} malformed wardos-min-patterns line(s); put "# wardos-min-patterns: N" alone on its line (line not shown)`);
+    process.exit(2);
+  }
+  if (empty.length || absent.length) {
+    console.log(`FAIL: required list ${[...empty.map((k) => k + " list loaded 0 entries"), ...absent.map((k) => k + " list missing")].join(", ")} (list truncated, half-written or missing?)`);
+    process.exit(2);
+  }
+  if (deny.floor && deny.pats.length < deny.floor) {
+    console.log(`FAIL: denylist patterns loaded ${deny.pats.length}, below the recorded floor ${deny.floor} (list truncated or half-written?)`);
+    process.exit(2);
+  }
   process.exit(hits.length ? 1 : 0);
 }
-main();
+/* FOLLOWUP2 · run only as a script, so tests can import emailHit / decodeAt without scanning or exiting */
+let isMain = false;
+try { isMain = !!process.argv[1] && fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url)); } catch { isMain = false; }
+if (isMain) main();

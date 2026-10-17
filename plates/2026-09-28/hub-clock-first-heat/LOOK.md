@@ -14,7 +14,7 @@ Loud → quiet:
 
 1. **Huge live TIME** in header (digits only · owns left)
 2. **HUGE leave-by next time** (command hero)
-3. **Clear cam faces** — Front / Garage / Backyard
+3. **Clear cam faces** · Camera 1 / 2 / 3
 4. **Dense lights** — 9 rockers · room names + LIVE / honest STUB
 5. **Quiet roster** — ≤2 micro rows · essential words only
 
@@ -48,7 +48,7 @@ TEXTLESS swung mute. TEXTBACK1 restores **readable essentials** — not merch.
 | Leave by · Next · Today / Tomorrow | Setlist · Track · Encore · LOADOUT · DROP · VICTORY (corn) |
 | Lights room names (Dining · Harris · Kitchen · Dad · Ainsley · Hayes · Living · Family · Basement) | Weather words · “CT” label |
 | LIVE / STUB honesty · All On / All Off | DEMO fake-LIVE on stubs |
-| Cam labels (Front door · Garage · Backyard) | Roster eyebrow spam · inventing money |
+| Cam labels (Camera 1 · 2 · 3) | Roster eyebrow spam · inventing money |
 
 ---
 

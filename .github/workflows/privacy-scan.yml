@@ -30,7 +30,41 @@ jobs:
       - name: Scan new commits (push)
         if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
         run: node scripts/privacy-scan.mjs --range "${{ github.event.before }}..${{ github.sha }}"
-      - name: House-face test suite (QA1 · one command, every scripts/qa/*.test.mjs, parallel, no skips)
+
+  # FOLLOWUP1 · the test suite is its own REPORT-ONLY job: the result goes to the job summary and a failure never turns
+  # the run red (no failure mail). The privacy job above stays blocking. The box gate (Alfred) runs the full suite,
+  # browser tests included, before every push; CI has no browser and no box files, so browser tests skip here.
+  house-face-tests:
+    name: "TESTS · house-face suite (report-only)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: House-face test suite (QA1 · every scripts/qa/*.test.mjs; browser tests skip without a browser)
+        id: suite
+        # TODO(FOLLOWUP2): flip back to blocking (delete this continue-on-error) after the FIRST GREEN CI run of this job
+        # on main (the CI root cause, missing synthetic private names, is fixed in FOLLOWUP1).
+        # FOLLOWUP3 · time-boxed: the "Report-only window" step below fails the job hard on a red suite after
+        # 2026-10-24 (Central time), even if nobody flips this back by hand.
+        continue-on-error: true
         run: |
           npm install --no-save --prefix "$HOME/.cache/wardos-deps" ws@8 >/dev/null 2>&1
           QA_NO_BROWSER=1 scripts/qa/run-tests.sh
+      - name: Report
+        if: always()
+        run: |
+          if [ "${{ steps.suite.outcome }}" = "success" ]; then echo "QA1 suite: PASS" >> "$GITHUB_STEP_SUMMARY"
+          else echo "QA1 suite: FAIL (report-only; see the suite step log)" >> "$GITHUB_STEP_SUMMARY"; echo "::warning::QA1 suite failed (report-only)"; fi
+      - name: Report-only window (ends 2026-10-24 CT; flips back to blocking after the first green run)
+        if: always()
+        env:
+          SUITE_OUTCOME: ${{ steps.suite.outcome }}
+        run: |
+          today=$(TZ=America/Chicago date +%F)
+          if [ "$SUITE_OUTCOME" != "success" ] && [[ "$today" > "2026-10-24" ]]; then
+            echo "::error::QA1 suite is red and the report-only window ended 2026-10-24; failing hard"
+            exit 1
+          fi
+          echo "report-only window: today $today, suite $SUITE_OUTCOME"

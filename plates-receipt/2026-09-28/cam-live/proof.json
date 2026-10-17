@@ -5,7 +5,7 @@
   "cams": [
     {
       "i": 0,
-      "label": "Front door",
+      "label": "Camera 1",
       "pill": "LIVE",
       "cls": "hub-cam hub-cam-live",
       "liveClass": true,
@@ -24,7 +24,7 @@
     },
     {
       "i": 1,
-      "label": "Garage",
+      "label": "Camera 2",
       "pill": "LIVE",
       "cls": "hub-cam hub-cam-live",
       "liveClass": true,
@@ -43,7 +43,7 @@
     },
     {
       "i": 2,
-      "label": "Backyard",
+      "label": "Camera 3",
       "pill": "LIVE",
       "cls": "hub-cam hub-cam-live",
       "liveClass": true,

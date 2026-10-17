@@ -165,7 +165,7 @@
     var canVol = !!(d && d.supportsVolume !== false && d.volume != null);
     vbox.classList.toggle("off", !canVol); vol.disabled = !canVol;
     if (!volDrag && canVol) { vol.value = d.volume; $("spw-vfill").style.width = d.volume + "%"; setText("spw-vol-n", d.volume + "%"); }
-    if (!canVol) { $("spw-vfill").style.width = "0%"; setText("spw-vol-n", "–"); }
+    if (!canVol) { $("spw-vfill").style.width = "0%"; setText("spw-vol-n", ""); }
 
     /* device chip */
     var dn = d ? d.name : p && p.lastDevice ? p.lastDevice.name : "";
@@ -233,7 +233,7 @@
     if (ph === "need_auth") return SP.connect("sheet-spotify.html");
     if (ph === "no_key" || ph === "bad_key") {
       if (window.WardHubKeyEntry) return WardHubKeyEntry.open();
-      var s = document.createElement("script"); s.src = "hub-key-entry.js?v=KEYAUTO2"; s.onload = function () { if (window.WardHubKeyEntry) WardHubKeyEntry.open(); }; document.body.appendChild(s); return;
+      var s = document.createElement("script"); s.src = "hub-key-entry.js?v=FOLLOWUP6"; s.onload = function () { if (window.WardHubKeyEntry) WardHubKeyEntry.open(); }; document.body.appendChild(s); return;
     }
     SP.refresh();
   });
