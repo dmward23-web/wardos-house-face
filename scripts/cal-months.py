@@ -14,7 +14,8 @@ from zoneinfo import ZoneInfo
 TZ = ZoneInfo("America/Chicago")
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from private_dir import priv_path, assert_private_out
-from text_law import clean_text, names_path   # NAMESDIR1 names_path · PRIVFEED3 · TEXTLAW2: one shared rules file (scripts/text-law.json) with cal-from-events.mjs
+from ext_roles import EXT_ROLES   # EXTNAMES1 · shared role constant
+from text_law import clean_text, names_path, external_filter, external_drop   # EXTFILTER1 · NAMESDIR1 names_path · PRIVFEED3 · TEXTLAW2: one shared rules file (scripts/text-law.json) with cal-from-events.mjs
 # PRIVFEED3 · LAW8C1: colour-day / dress-up rows never reach the month view (same regex as house-face-law.js / calendar-refresh.mjs)
 DRESS = re.compile(r"\b(?:orange|red|blue|green|pink|purple|yellow|black|white|gold|maroon|colou?r|crazy hair|pajamas?|pj|twin|hat|jersey|spirit|outsiders)\s+day\b|dress[- ]?up|spirit\s+week|\bwear\b|\bcostume|\bpajama", re.I)
 out, pages = sys.argv[1], sys.argv[2:]
@@ -54,7 +55,8 @@ if out == "--reclean-private" or (len(sys.argv) > 1 and sys.argv[1] == "--reclea
     tgt = priv_path("cal-months.json"); doc = json.load(open(tgt, encoding="utf-8")); n = 0
     for day in doc.get("days", {}).values():
         for it in day.get("items", []):
-            l = clean_text(scrub(it.get("l", ""))); n += l != it.get("l"); it["l"] = l
+            l = external_filter(clean_text(scrub(it.get("l", ""))))   # EXTFILTER1: None = row filtered out
+            n += l != it.get("l"); it["l"] = l
         day["items"] = [it for it in day.get("items", []) if it.get("l") and not DRESS.search(it["l"])]
     json.dump(doc, open(tgt, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(f"cal-months --reclean-private: {n} labels changed"); sys.exit(0)
@@ -101,7 +103,7 @@ def _all_roles():
             if n.strip(): out.setdefault(r.strip().lower(), []).append(n.strip())
     return out
 _ROLES = _all_roles()
-_EXT_ROLES = ("external", "otherfamily")
+_EXT_ROLES = EXT_ROLES   # shared constant (scripts/ext_roles.py)
 _KNOWN_ROLES = set(_EXT_ROLES) | {"partner", "coparent", "household", "school"}
 _EXT = [re.escape(n) for r in _EXT_ROLES for n in _ROLES.get(r, [])]
 _UNKNOWN = sum(1 for r in _ROLES if r not in _KNOWN_ROLES)
@@ -136,12 +138,13 @@ for i, (summ, s, e, allday) in ev.items():
     if summ.startswith("Dan") and not DAN_KEEP.search(summ): continue
     label = scrub(summ)
     if BLOCK.search(label): sys.exit(f"HARD FAIL: private term survived scrub in: {label!r}")
+    if external_drop(summ) or external_drop(label): continue   # EXTFILTER1: filtered rows never reach the month board
     c = kid(label)
     if FLIGHT.search(label) and not allday: c = "flight"
     elif allday or not c: c = c if (c and not allday) else "aware"
     if not allday and (d1 - d0).days <= 1 and not HAS_TIME.search(label) and not LOW.search(label):
         label = f"{label} · {hm(t0)}"
-    label = clean_text(label)   # PRIVFEED3 · TEXTLAW2: words only, after the row is classed on the raw title (withDan untouched)
+    label = external_filter(clean_text(label))   # EXTFILTER1 (term -> placeholder) · PRIVFEED3 · TEXTLAW2: words only, after the row is classed on the raw title (withDan untouched)
     if not label or DRESS.search(label): continue   # LAW8C1
     pri = 0 if c == "flight" else (3 if c == "aware" else (2 if LOW.search(label) else 1))
     sort = (t0.hour * 60 + t0.minute) if t0 else -1

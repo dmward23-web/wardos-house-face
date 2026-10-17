@@ -16,7 +16,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { privPath, assertPrivateOut, namesRe, privateNames } from "./private-dir.mjs"; /* PRIVFEED1 */
+import { privPath, assertPrivateOut, namesRe, privateNames, externalEvents } from "./private-dir.mjs"; /* PRIVFEED1 · EXTFILTER1 */
 import { createRequire } from "node:module";
 createRequire(import.meta.url)("../house-face-law.js");   /* PRIVFEED3 · LAW8C1: sets globalThis.HouseFaceLaw (one dress-up law, shared with the glass) */
 const FACE_LAW = globalThis.HouseFaceLaw;
@@ -116,7 +116,7 @@ function parseDump(raw) {
         ? data.items
         : null;
   if (!events) throw new Error("dump missing events[]");
-  return { meta: data, events };
+  return { meta: data, events: externalEvents(events) };   /* EXTFILTER1 · same filter as cal-months.py */
 }
 
 function normalizeDateField(v) {

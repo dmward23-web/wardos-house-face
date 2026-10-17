@@ -7,7 +7,8 @@
   var iso = m[1];
   var today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date());
   if (iso === today) return;
-  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function faceDash(s) { return String(s == null ? "" : s).replace(/\bMOVED\s*[\u2192\u21d2\u27a1]\s*/gi, "moved to ").replace(/\s*[\u2192\u21d2\u27a1]\s*/g, " to ").replace(/\s*\u2014\s*/g, " \u00b7 ").replace(/(\s*\u00b7\s*){2,}/g, " \u00b7 ").replace(/^\s*\u00b7\s*|\s*\u00b7\s*$/g, ""); } /* NODATA3 · no em dashes or arrows on the face */
+  function esc(s) { return faceDash((typeof window !== "undefined" && window.AwayFilter ? window.AwayFilter.glass(s) : s)).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function clean(s) {
     s = String(s || "").replace(/\[[^\]]*\]/g, " ").replace(/#[A-Za-z0-9_-]+/g, " ")
       .replace(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{5,}\b/g, " ").replace(/\(\s*\)/g, " ");
@@ -29,10 +30,12 @@
     var day = months && months.days && months.days[iso];
     var rows = [];
     var timed = ((live && live.upcomingLeaves) || []).filter(function (x) { return x && x.start && x.start.slice(0, 10) === iso && !x.allDay; });
+    var law = typeof window !== "undefined" && window.HouseFaceLaw; /* LIVELAW1 · colour / dress-up days are never rows */
+    if (law) timed = timed.filter(function (x) { return !law.isDressDay(x.summary); });
     timed.forEach(function (x) { rows.push({ t: hm(x.start), l: clean(x.summary), w: clean((x.location || "").split(",")[0]) }); });
     var seen = rows.map(function (r) { return r.l.toLowerCase().slice(0, 18); });
     ((day && day.items) || []).forEach(function (it) {
-      var l = clean(it.l); if (!l) return;
+      var l = clean(it.l); if (!l || (law && law.isDressDay(l))) return;
       if (seen.indexOf(l.toLowerCase().slice(0, 18)) >= 0) return;
       rows.push({ t: "", l: l, w: "", c: it.c });
     });

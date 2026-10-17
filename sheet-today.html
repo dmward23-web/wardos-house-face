@@ -5,8 +5,9 @@
 <script src="house-hub.js?v=HUBPIN1"></script>
 <script src="private-feed.js?v=FOLLOWUP6"></script>
 <script src="school-names.js?v=SCHOOLNAMES1"></script>
-<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-face-law.js?v=MERGE1C"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
+<script src="house-sound.js?v=MERGE1C"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -539,8 +540,12 @@
 </style>
 <style id="heat1-hide-brand">.brand img,.brand{display:none!important}.eyebrow{display:none!important}</style>
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
+<script src="away-filter.js?v=MERGE1C" data-away-install></script>
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
+<link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<script src="house-face-law.js?v=MERGE1C"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -943,10 +948,10 @@
 <script src="house-clock.js?v=PRIVFEED3"></script>
 <style id="audit1-hero">/* AUDIT1 · live time chip sits in its own line box (never over the label) */
 .leaveby-main .time{display:inline-block;line-height:1;margin:6px 10px 4px 0 !important;}</style>
-<script src="house-board-strip.js?v=PRIVFEED3"></script>
-<script src="house-today-bind.js?v=BADGE1"></script>
-<script src="house-day-view.js?v=DAYVIEW3"></script>
-<script src="house-weather.js?v=PRIVFEED3"></script>
+<script src="house-board-strip.js?v=MERGE1C"></script>
+<script src="house-today-bind.js?v=MERGE1C"></script>
+<script src="house-day-view.js?v=MERGE1C"></script>
+<script src="house-weather.js?v=MERGE1C"></script>
 <script src="house-sensi.js?v=PRIVFEED3"></script>
 <script src="house-zoom.js"></script>
 <script>
@@ -962,6 +967,7 @@ try { if (window.HouseWeather) HouseWeather.mount("#house-wx"); } catch (e) {}
     if (degText == null) {
       oval.setAttribute("data-wired", "0");
       oval.setAttribute("hidden", "");
+      oval.style.setProperty("display", "none", "important"); /* NODATA3 · [hidden] alone loses to the phone header's display !important */
       oval.classList.add("unwired");
       deg.textContent = "";
       return;
@@ -971,6 +977,7 @@ try { if (window.HouseWeather) HouseWeather.mount("#house-wx"); } catch (e) {}
     if (ico && arguments[3]) ico.textContent = arguments[3]; /* AUDIT1 · icon from the same wx state */
     oval.setAttribute("data-wired", "1");
     oval.removeAttribute("hidden");
+    oval.style.removeProperty("display");
     oval.classList.remove("unwired");
     if (label) oval.setAttribute("aria-label", label);
   }
@@ -1018,6 +1025,8 @@ try { if (window.HouseWeather) HouseWeather.mount("#house-wx"); } catch (e) {}
 <script src="house-links.js?v=LINKWEB1"></script>
 <script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
-<script src="house-ori-world.js?v=ORIHOME18"></script>
+<script src="house-ori-world.js?v=MERGE1C"></script>
+<script src="night/night-host.js?v=MERGE1C" defer></script>
+<script src="month-theme/month-overlay.js?v=MERGE1C" defer></script>
 </body>
 </html>

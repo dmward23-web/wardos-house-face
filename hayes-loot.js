@@ -84,6 +84,7 @@
     return ac;
   }
   function muted() {
+    if (global.HouseSound) return !HouseSound.isOn();   /* LAW8C3 · shared house sound state */
     try { if (localStorage.getItem("house-sfx:mute") === "1") return true; } catch (e) {}
     return document.documentElement.getAttribute("data-sound") === "off";
   }
@@ -206,6 +207,12 @@
     ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
     ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
   }
+  function fitLabel(s, maxW) {   /* LAW8C1 · whole words only, never a clipped "sports ba" */
+    s = String(s || ""); if (ctx.measureText(s).width <= maxW) return s;
+    var w = s.split(/\s+/), out = "";
+    for (var i = 0; i < w.length; i++) { var n = out ? out + " " + w[i] : w[i]; if (ctx.measureText(n).width > maxW) break; out = n; }
+    return (out || w[0]).replace(/[\s+·,&]+$/, "");
+  }
   function lootCard(p, t) {
     var age = t - p.t0; if (age < 0.15 || age > 2.4) return;
     var a = Math.min(1, (age - 0.15) / 0.2) * Math.min(1, (2.4 - age) / 0.4);
@@ -217,10 +224,9 @@
     else { ctx.fillStyle = "rgba(16,32,42,.9)"; roundRect(x + 21, y + 21, 198, 42, 10); ctx.fill(); }
     var tx = x + 21 + 99;
     ctx.textAlign = "center"; ctx.shadowColor = "rgba(0,0,0,.75)"; ctx.shadowBlur = 5;
-    ctx.font = "900 14px system-ui, sans-serif"; ctx.fillStyle = "rgba(" + TIERS[p.tier].rgb + ",1)";
-    ctx.fillText(TIERS[p.tier].name + " LOOT", tx, y + 21 + 15);
-    ctx.font = "800 16px system-ui, sans-serif"; ctx.fillStyle = "#fffaf0";
-    ctx.fillText(p.label, tx, y + 21 + 36);
+    /* LAW8C1 · the card names the chore only: no "MIGHTY / RARE ... LOOT" tier words (the card colour still carries the tier) */
+    ctx.font = "800 16px system-ui, sans-serif"; ctx.fillStyle = "#fffaf0"; ctx.textBaseline = "middle";
+    ctx.fillText(fitLabel(p.label, 186), tx, y + 21 + 21);
     ctx.restore();
   }
   function victory(t) {
@@ -269,7 +275,7 @@
     ctx.font = "900 italic 52px system-ui, sans-serif"; ctx.fillStyle = g;
     ctx.lineWidth = 6; ctx.strokeStyle = "#3a1a60"; ctx.strokeText("VICTORY!", 0, 8); ctx.fillText("VICTORY!", 0, 8);
     ctx.font = "800 16px system-ui, sans-serif"; ctx.fillStyle = "#fff"; ctx.shadowBlur = 8;
-    ctx.fillText("All loot secured · jar full", 0, 36);
+    ctx.fillText("Jar full", 0, 36); /* LAW8C1 · no loot words */
     ctx.font = "700 14px system-ui, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.75)"; ctx.shadowBlur = 4;
     ctx.fillText("tap to close", 0, 60);
     ctx.restore();
@@ -399,7 +405,7 @@
   function shortName(l) {
     var co = global.KidCallouts, info = global.KidWorld && KidWorld.hits && KidWorld.hits();
     if (co && info) for (var i = 0; i < info.hits.length; i++) if (info.hits[i].label === l && co[info.hits[i].chip]) return co[info.hits[i].chip][0];
-    return String(l || "").replace(/^[^A-Za-z]+/, "").split(/[—·(]/)[0].trim().slice(0, 20) || "Chore";
+    return String(l || "").replace(/^[^A-Za-z]+/, "").split(/[—·(]/)[0].trim() || "Chore";   /* LAW8C2 · no char cut; fitLabel trims to whole words */
   }
 
   function addPop(x, y, tier, label) {
@@ -504,11 +510,13 @@
     if (muteBtn) return;
     muteBtn = document.createElement("button");
     muteBtn.type = "button"; muteBtn.className = "hl-mute";
-    muteBtn.style.cssText = "pointer-events:auto;min-width:44px;min-height:44px;margin-left:auto;margin-right:8px;border:0;border-radius:22px;background:rgba(14,22,26,.72);color:#fff6e4;font:700 20px/1 system-ui,sans-serif";
+    if (global.HouseSound) { muteBtn.style.cssText = "pointer-events:auto;margin-left:auto;margin-right:8px;flex:none"; HouseSound.icon(muteBtn); }   /* LAW8C3 · same icon as the hub */
+    else muteBtn.style.cssText = "pointer-events:auto;min-width:44px;min-height:44px;margin-left:auto;margin-right:8px;border:0;border-radius:22px;background:rgba(14,22,26,.72);color:#fff6e4;font:700 20px/1 system-ui,sans-serif";
     muteBtn.addEventListener("click", function (e) {
       e.preventDefault(); e.stopPropagation();
       var on = !isMuted();
       if (global.HouseSfx && HouseSfx.setMuted) HouseSfx.setMuted(on);
+      else if (global.HouseSound) HouseSound.set(!on);
       else { try { localStorage.setItem("house-sfx:mute", on ? "1" : "0"); } catch (x) {} }
       if (!on) { var a = audio(); if (a && a.state === "suspended") a.resume(); startAmbient(); }
       syncMute();
@@ -521,7 +529,8 @@
     var m = isMuted();
     if (m === lastMute) return;
     lastMute = m;
-    if (muteBtn) { muteBtn.textContent = m ? "\uD83D\uDD07" : "\uD83D\uDD0A"; muteBtn.setAttribute("aria-label", m ? "Sound off. Tap for sound" : "Sound on. Tap to mute"); muteBtn.setAttribute("aria-pressed", m ? "true" : "false"); }
+    if (muteBtn && global.HouseSound) HouseSound.icon(muteBtn);
+    else if (muteBtn) { muteBtn.textContent = m ? "\uD83D\uDD07" : "\uD83D\uDD0A"; muteBtn.setAttribute("aria-label", m ? "Sound off. Tap for sound" : "Sound on. Tap to mute"); muteBtn.setAttribute("aria-pressed", m ? "true" : "false"); }
     if (ac) { if (m && ac.state === "running") ac.suspend(); }   /* stops the ambient loop and every sting */
   }
   function busy() {

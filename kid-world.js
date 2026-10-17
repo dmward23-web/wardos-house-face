@@ -10,6 +10,8 @@
   var reduced = false;
   try { reduced = !!(global.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches); } catch (e) {}
 
+  /* NIGHT52 · when the v5.2 night scene sits behind the board, the world canvas paints only the musts, labels and creature */
+  function nightOn() { return kid() !== "ainsley" /* Ainsley keeps her concert venue (Alfred 10/16) */ && !/[?&]night=0(&|$)/.test(location.search) && !!document.querySelector('script[src*="night/night-host.js"]'); }
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function kid() { return (document.body && document.body.getAttribute("data-kid")) || "hayes"; }
   function rnd(i) { var x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.floor(x); }
@@ -71,7 +73,12 @@
       if (!btn) return;
       out.push({ label: label, done: btn.classList.contains("done"), btn: btn });
     });
-    return out;
+    /* LAW8C1 · one chest per real job: a chore that is already inside a combined chore ("Backpack" vs
+       "Backpack + sports bag in garage cubby") is not drawn twice on the board; the combined one stays */
+    return out.filter(function (q) {
+      var k = String(shortLabel(q.label) || q.label).toLowerCase();
+      return !out.some(function (o) { return o !== q && String(shortLabel(o.label) || o.label).toLowerCase().indexOf(k + " +") === 0; });
+    });
   }
 
   function placeQuests(list, W, H) {
@@ -1611,9 +1618,11 @@
     var book = oriBook(world, W, H);
     var man = (global.HousePlates && HousePlates[world]) || {};
     var venue = world === "ainsley"; /* STAGE1 · Ainsley: concert-poster venue, painted in code (no lake, no mascot) */
-    if (venue) { book = null; drawVenue(ctx, W, H, t, pan, fill); }
+    var night = nightOn() && !!(ctx.canvas && ctx.canvas.classList && ctx.canvas.classList.contains("kw-canvas"));
+    if (night) { if (venue) book = null; }
+    else if (venue) { book = null; drawVenue(ctx, W, H, t, pan, fill); }
     else if (!book || !book.sky) sky(ctx, W, H, [[0, "#102028"], [0.55, "#243428"], [1, "#121610"]]);
-    if (!venue) ["sky", "far", "mid", "near"].forEach(function (id) {
+    if (!venue && !night) ["sky", "far", "mid", "near"].forEach(function (id) {
       var img = book && book[id];
       if (!img || img.width < 64) return;
       var p = layerShift(id, man);
@@ -1624,7 +1633,7 @@
         driftClouds(ctx, W, H, t, world);
       }
     });
-    if (!venue) motes(ctx, W, H, t, pan.x, world === "ainsley" ? "#ffd8c0" : world === "harris" ? "#d8ffe4" : "#fff1d0", reduced ? 8 : 28);
+    if (!venue && !night) motes(ctx, W, H, t, pan.x, world === "ainsley" ? "#ffd8c0" : world === "harris" ? "#d8ffe4" : "#fff1d0", reduced ? 8 : 28);
     var cap = (man.landmarks && man.landmarks.length) || quests.length;
     var shown = quests.slice(0, cap);
     layoutLedges(shown, W, H, world, pan.x);
@@ -1642,7 +1651,7 @@
       else shown.forEach(function (q) { drawLight(ctx, q); });
     };
     var fg = book && book.fg;
-    if (fg && fg.width >= 64) {
+    if (fg && fg.width >= 64 && !night) {
       var fp = layerShift("fg", man);
       var sway = reduced ? 0 : Math.sin(t * 0.9) * 0.016;
       ctx.save();
@@ -1652,17 +1661,16 @@
       drawPlate(ctx, fg, W, H, pan.x * fp, pan.y * fp * 0.35, PLATE_ZOOM, 1, 0, world);
       ctx.restore();
     }
-    if (venue) drawCrowd(ctx, W, H, t, pan);
+    if (venue && !night) drawCrowd(ctx, W, H, t, pan);
     paintLabels();
-    if (!reduced && !venue) motes(ctx, W, H, t * 0.7 + 3, pan.x * 0.3, "#fff6e0", 12);
+    if (!reduced && !venue && !night) motes(ctx, W, H, t * 0.7 + 3, pan.x * 0.3, "#fff6e0", 12);
     drawOriCreature(ctx, W, H, t, world);
     var anchor = creatureAnchor(W, H);
     if (feed && shown[feed.index]) {
       var fq = shown[feed.index];
       feedDrops(ctx, t, feed.t0, fq.x, fq.ledY || fq.y, anchor.cx, anchor.jy + anchor.jh * 0.42);
     }
-    edgeVignette(ctx, W, H);
-    warmth(ctx, W, H, fill);
+    if (!night) { edgeVignette(ctx, W, H); warmth(ctx, W, H, fill); }
     return shown;
   }
   function paintWorld(ctx, W, H, t, which, quests, fill, px) {
@@ -1677,7 +1685,8 @@
   /* ---------- live canvas ---------- */
   function World(canvas) {
     this.cv = canvas;
-    this.ctx = canvas.getContext("2d", { alpha: false });
+    this.night = nightOn() && canvas.classList.contains("kw-canvas");
+    this.ctx = canvas.getContext("2d", { alpha: this.night });
     this.t0 = performance.now();
     this.ptr = 0;
     this.hits = [];
@@ -1700,6 +1709,7 @@
     var W = this.cv.width / this.dpr;
     var H = this.cv.height / this.dpr;
     this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    if (this.night) this.ctx.clearRect(0, 0, W, H);
     var iso = dayIso || todayIso();
     var quests = readQuests(iso);
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };
@@ -1834,11 +1844,19 @@
       if (!dayIso && days[0]) dayIso = days[0].iso;
     }
     host.innerHTML = "";
+    /* LAW8C1 · away days: the strip shows the days plainly, no "today" lamp until a day is picked */
+    /* AWAYONE1 · away comes only from away-filter.js (cal-months withDan); repaint once the away window has loaded */
+    var away = false, AF = global.AwayFilter;
+    try {
+      if (AF && AF.hasMonths && AF.hasMonths()) away = AF.isAwayNow();
+      else if (AF && AF.ready && !paintWeek._waiting) { paintWeek._waiting = true; AF.ready().then(function (ok) { if (ok) paintWeek(); }); }
+    } catch (eA) { away = false; }
+    var lamp = !(away && !dayPicked);
     days.forEach(function (d) {
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "kw-day" + (d.iso === dayIso ? " is-on" : "") + (d.today ? " is-today" : "");
-      b.setAttribute("aria-pressed", d.iso === dayIso ? "true" : "false");
+      b.className = "kw-day" + (lamp && d.iso === dayIso ? " is-on" : "") + (lamp && d.today ? " is-today" : "");
+      b.setAttribute("aria-pressed", lamp && d.iso === dayIso ? "true" : "false");
       b.innerHTML = "<b>" + d.letter + "</b><small>" + d.num + "</small>";
       b.addEventListener("click", function () {
         setDay(d.iso);
@@ -1846,6 +1864,7 @@
       host.appendChild(b);
     });
   }
+  document.addEventListener("house:kids-data-ready", function () { try { paintWeek(); } catch (eW) { /* */ } }); /* LAW8C1 */
   function setDay(iso) {
     dayIso = iso;
     dayPicked = true;
@@ -1910,14 +1929,17 @@
       el.setAttribute("aria-hidden", "true");
       el.innerHTML = '<span class="kw-fly-orb"></span><span class="kw-fly-txt"></span>';
       el.querySelector(".kw-fly-txt").textContent = String(label || "").replace(/^[^A-Za-z]+/, "").split(/[—·]/)[0].trim().slice(0, 22);
-      el.style.cssText = "position:fixed;left:0;top:0;z-index:70;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:4px;transform:translate(" + (x - 30) + "px," + (y - 30) + "px)";
+      /* LAW8C4 · the flying name rides ABOVE the orb, so it never sits on the chest's own label (which is under the chest) */
+      el.style.cssText = "position:fixed;left:0;top:0;z-index:70;pointer-events:none;display:flex;flex-direction:column-reverse;align-items:center;gap:4px;visibility:hidden";
       document.body.appendChild(el);
+      var ox = (el.offsetWidth || 60) / 2, oy = (el.offsetHeight || 60) - 30;   /* orb centre = the tap point */
+      el.style.transform = "translate(" + (x - ox) + "px," + (y - oy) + "px)"; el.style.visibility = "";
       var mx = (x + tx) / 2, my = Math.min(y, ty) - 120;
       var dur = reduced ? 1 : 900;
       var anim = el.animate([
-        { transform: "translate(" + (x - 30) + "px," + (y - 30) + "px) scale(1)", opacity: 1 },
-        { transform: "translate(" + (mx - 30) + "px," + (my - 30) + "px) scale(.85)", opacity: 1, offset: 0.45 },
-        { transform: "translate(" + (tx - 30) + "px," + (ty - 30) + "px) scale(.2)", opacity: 0.2 }
+        { transform: "translate(" + (x - ox) + "px," + (y - oy) + "px) scale(1)", opacity: 1 },
+        { transform: "translate(" + (mx - ox) + "px," + (my - oy) + "px) scale(.85)", opacity: 1, offset: 0.45 },
+        { transform: "translate(" + (tx - ox) + "px," + (ty - oy) + "px) scale(.2)", opacity: 0.2 }
       ], { duration: dur, easing: "cubic-bezier(.45,0,.2,1)", fill: "forwards" });
       anim.onfinish = function () {
         el.remove();
@@ -2018,8 +2040,11 @@
     if (kid() !== "hayes" && global.HouseSfx && HouseSfx.setMuted) {
       var mb = document.createElement("button");
       mb.type = "button"; mb.className = "kw-mute"; mb.setAttribute("data-mute-toggle", ""); mb.setAttribute("data-mute-wired", "1");
-      mb.style.cssText = "pointer-events:auto;min-width:44px;min-height:44px;margin-left:auto;margin-right:8px;border:0;border-radius:22px;background:rgba(14,22,26,.6);color:#fff6e4;font:700 15px/1 system-ui,sans-serif;padding:0 12px";
-      mb.textContent = HouseSfx.isMuted() ? "🔇 OFF" : "🔊 ON";
+      if (global.HouseSound) { mb.style.cssText = "pointer-events:auto;margin-left:auto;margin-right:8px;flex:none"; HouseSound.icon(mb); }   /* LAW8C3 · same icon as the hub */
+      else {
+        mb.style.cssText = "pointer-events:auto;min-width:44px;min-height:44px;margin-left:auto;margin-right:8px;border:0;border-radius:22px;background:rgba(14,22,26,.6);color:#fff6e4;font:700 15px/1 system-ui,sans-serif;padding:0 12px";
+        mb.textContent = HouseSfx.isMuted() ? "🔇 OFF" : "🔊 ON";
+      }
       mb.addEventListener("click", function (ev) {
         ev.preventDefault(); ev.stopPropagation();
         var next = !HouseSfx.isMuted();

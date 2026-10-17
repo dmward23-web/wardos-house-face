@@ -22,22 +22,23 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
+createRequire(import.meta.url)("../house-face-law.js");   /* sets globalThis.HouseFaceLaw */
+const FACE_LAW = globalThis.HouseFaceLaw;
 import { spawnSync } from "node:child_process";
-import { privPath, assertPrivateOut, namesRe, privateNames } from "./private-dir.mjs"; /* PRIVFEED1 */
+import { privPath, assertPrivateOut, namesRe, privateNames, externalEvents, EXT_ROLES } from "./private-dir.mjs"; /* PRIVFEED1 · EXTFILTER1 */
 /* EXTNAMES1 · private-names.tsv role "external" names people outside the household (never in git). A kid's first name
    followed by one of them is not our kid, so it is cut out before the kid tests. ONLY "external" is filtered, plus the
    old key "otherfamily" during the transition (a later commit drops it). partner, coparent, household, school and every
    other role are never filtered. An unknown role gets one count-only warning and stays unfiltered. No external rows at
    all (and none under the old key) = a config error: one count-only warning. */
 const PN = privateNames();
-const EXT_ROLES = ["external", "otherfamily"];
 const KNOWN_ROLES = new Set(EXT_ROLES.concat(["partner", "coparent", "household", "school"]));
 const EXT_NAMES = EXT_ROLES.flatMap((r) => PN[r] || []).map((n) => n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 const UNKNOWN_ROLES = Object.keys(PN).filter((r) => !KNOWN_ROLES.has(r)).length;
 if (UNKNOWN_ROLES) process.stderr.write("WARN private-names: " + UNKNOWN_ROLES + " unknown role(s), not filtered\n");
 if (!EXT_NAMES.length) process.stderr.write("WARN private-names: role external has 0 entries (config error)\n");
 const EXT_KID = EXT_NAMES.length ? new RegExp("\\b(?:ainsley|hayes|harris)\\s+(?:" + EXT_NAMES.join("|") + ")\\b", "g") : null;
-import { createRequire } from "node:module";
 /* SCHOOLNAMES1 · the kids' school code never lives in git: role "school" from private-names.tsv (school-names.js, same
    sources as LHRules). None known = every school pattern below matches nothing (no school drop / pickup / specials). */
 const SchoolNames = createRequire(import.meta.url)("../school-names.js");
@@ -338,9 +339,10 @@ function fmtDowShort(date) {
 
 function loadEvents(filePath) {
   const raw = JSON.parse(fs.readFileSync(filePath, "utf8"));
-  if (Array.isArray(raw)) return dedupeEvents(raw);
-  if (Array.isArray(raw.events)) return dedupeEvents(raw.events);
-  if (raw.result && Array.isArray(raw.result.events)) return dedupeEvents(raw.result.events);
+  /* EXTFILTER1 · external calendar rows filtered at ingest (same rule as cal-months.py) */
+  if (Array.isArray(raw)) return dedupeEvents(externalEvents(raw));
+  if (Array.isArray(raw.events)) return dedupeEvents(externalEvents(raw.events));
+  if (raw.result && Array.isArray(raw.result.events)) return dedupeEvents(externalEvents(raw.result.events));
   die("events file has no events[]: " + filePath);
 }
 
@@ -399,8 +401,8 @@ function kidsSafeWhat(summary, kind) {
   return s;
 }
 
-/* LAW8C1 · no colour-day / dress-up / spirit / clothing prompts anywhere on glass (same law as house-face-law.js) */
-const DRESS_RE = /\b(?:orange|red|blue|green|pink|purple|yellow|black|white|gold|maroon|colou?r|crazy hair|pajamas?|pj|twin|hat|jersey|spirit|outsiders)\s+day\b|dress[- ]?up|spirit\s+week|\bwear\b/i;
+/* LAW8C1 · no colour-day / dress-up / spirit / clothing prompts anywhere on glass (Dan: no colour or clothing prompts) */
+const DRESS_RE = FACE_LAW.DRESS;   /* AWAYONE1 · one dress-up law, shared with the glass (house-face-law.js) */
 function buildBoardItems(events, now) {
   const items = [];
   for (const ev of events) {

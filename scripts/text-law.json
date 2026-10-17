@@ -151,6 +151,13 @@
    "why": "bare em dash"
   },
   {
+   "re": "^(<strong>[^<]*<\\/strong>\\s*)?Dad:\\s*·\\s*",
+   "flags": "",
+   "global": false,
+   "to": "$1Dad: ",
+   "why": "tidy: 'Dan + <partner> — X' reads 'Dad: X', not 'Dad: · X' (SHAREDLAW2 on PF4)"
+  },
+  {
    "re": "\\s*\\bMOVED\\s*(→|->)\\s*",
    "flags": "",
    "global": true,

@@ -49,6 +49,30 @@ def clean_text(s):
     for rx, rep, n in RULES: s = rx.sub(rep, s, count=n)
     return re.sub(r"\s{2,}", " ", s).strip()
 
+# EXTFILTER1 · external calendar rows are filtered (terms from the private names file, loaded above; never in git).
+# Shared by cal-months.py and the JS twin in scripts/private-dir.mjs: a matching row is dropped, any other match is replaced by the placeholder.
+EXT_PLACEHOLDER = "Friends"
+from ext_roles import EXT_ROLES   # EXTNAMES1 · shared role constant (JS twin in private-dir.mjs)
+_EX = [n for r in EXT_ROLES for n in _NAMES.get(r, []) if n]
+def _ci(n):   # case-insensitive term
+    return "".join(f"[{c.upper()}{c.lower()}]" if c.isalpha() else re.escape(c) for c in n)
+_EX_ALT = "(?:" + "|".join(_ci(n) for n in _EX) + ")" if _EX else None
+_EX_DROP = re.compile(r"\b(?!(?:The|Ward|Kids|Dad|Dan|At)\b)[A-Z][a-z]+ " + _EX_ALT + r"\b(?![ \t]+(?:[Kk]ids|KIDS|[Ff]amily|FAMILY|[Hh]ouse|HOUSE)\b)") if _EX else None
+_EX_DROP_REV = re.compile(r"\b" + _EX_ALT + r",\s*(?!(?:Kids|Family|House)\b)[A-Z][a-z]+\b") if _EX else None
+_EX_POSS = re.compile(r"\b" + _EX_ALT + r"(?:['\u2019][Ss])\b") if _EX else None
+_EX_WORD = re.compile(r"\b" + _EX_ALT + r"(?:[Ee]?[Ss])?\b") if _EX else None
+def external_drop(s):
+    """True when the row is filtered out entirely."""
+    return bool(_EX_DROP and isinstance(s, str) and (_EX_DROP.search(s) or _EX_DROP_REV.search(s)))
+def external_mask(s):
+    """Matched term -> EXT_PLACEHOLDER (rows that are not dropped)."""
+    if not (_EX_WORD and isinstance(s, str)): return s
+    s = _EX_POSS.sub(EXT_PLACEHOLDER + "'", s)
+    return re.sub(r"\s{2,}", " ", _EX_WORD.sub(EXT_PLACEHOLDER, s)).strip()
+def external_filter(s):
+    """None = drop the row, else the label with the term masked."""
+    return None if external_drop(s) else external_mask(s)
+
 if __name__ == "__main__":   # test hook: JSON list of strings on stdin -> cleaned list on stdout
     import sys
     print(json.dumps([clean_text(x) for x in json.load(sys.stdin)], ensure_ascii=False))

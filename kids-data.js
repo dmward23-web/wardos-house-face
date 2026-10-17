@@ -305,8 +305,16 @@
   /* PRIVFEED1 · no embedded copy: kids-week is private and arrives through private-feed.js (hub + device cache). */
   var EMBEDDED = null;
 
-  function esc(s) {
+  /* NODATA3 · no em dashes or arrows on the face: " — " reads " · ", "MOVED →" reads "moved to", "3:30p→CLE" reads "3:30p to CLE" */
+  function faceDash(s) {
     return String(s == null ? "" : s)
+      .replace(/\bMOVED\s*[\u2192\u21d2\u27a1]\s*/g, "moved to ").replace(/\bmoved\s*[\u2192\u21d2\u27a1]\s*/gi, "moved to ")
+      .replace(/\s*[\u2192\u21d2\u27a1]\s*/g, " to ")
+      .replace(/\s*\u2014\s*/g, " \u00b7 ")
+      .replace(/(\s*\u00b7\s*){2,}/g, " \u00b7 ").replace(/^\s*\u00b7\s*|\s*\u00b7\s*$/g, "");
+  }
+  function esc(s) {
+    return faceDash(s)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -314,6 +322,16 @@
   }
 
   function loadJSON(cb) {
+    /* LIVELAW1 · every kids-week payload (fresh or embedded) passes Dan's face laws before any board renders it:
+       no colour / dress-up day rows, no rows that already ended today, NEXT is the next real item */
+    var cbRaw = cb;
+    cb = function (err, d) {
+      function go() { if (d && global.HouseFaceLaw) { try { HouseFaceLaw.cleanKidsWeek(d); } catch (e) { /* */ } } cbRaw(err, d); }
+      /* AWAYLAW1 · no kid times on away days (cal-months withDan via away-filter.js), embedded copy included */
+      var AF = global.AwayFilter;
+      if (!d || !AF) { go(); return; }
+      AF.ready().then(function () { try { AF.filterKidsWeek(d); } catch (e) { /* */ } go(); }, go);
+    };
     var urls = ["kids-week.json", "data/kids-week.json"];
     var i = 0;
     function tryNext() {
@@ -1339,6 +1357,9 @@
   function specialForIso(kidId, iso, rows) {
     var map = SCHOOL_SPECIALS[kidId];
     if (!map || !iso) return null;
+    /* LIVELAW1 · colour rows never print, but they still pick the quiet specials rotation */
+    var lk = global.WardKids && WardKids._data && WardKids._data.kids && WardKids._data.kids[kidId];
+    if (lk && lk._lawColorRows && lk._lawColorRows.length) rows = (rows || []).concat(lk._lawColorRows);
     var dow = CONSUME_DOW[dowIndexFromIso(iso)];
     var color = schoolColorForIso(rows, iso);
     if (!dow || !color || !map[color]) return null;
@@ -1355,7 +1376,8 @@
   function kidsSafeGlass(s) {
     var t = String(s == null ? "" : s);
     t = t.replace(/\s*\bcustody\b\s*/gi, " ").replace(/\s{2,}/g, " ").trim(); /* NOCUSTODY1 · the word is removed, nothing put in its place */ /* custody-law:allow */
-    return t;
+    if (typeof window !== "undefined" && window.AwayFilter) t = window.AwayFilter.glass(t); /* AWAYLAW1 */
+    return faceDash(t);
   }
 
   function addDaysIsoLocal(iso, days) {

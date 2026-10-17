@@ -350,3 +350,10 @@ icon-512.png
 icons-g2.svg
 wardos-mark-header.png
 wardos-mark.png
+
+# --- night/ (MERGE1 on PF4, NIGHT52 scene host). Generated night-scene sky and snow art (the .mp4 scene loops are NOT in git: P1 bans video);
+# no camera frame, screenshot or photo. Reviewed 2026-10-17 from a one-frame-per-file contact sheet.
+night/media/sky-phone.png
+night/media/sky-wall.png
+night/media/snow-phone.png
+night/media/snow-wall.png

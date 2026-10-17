@@ -325,6 +325,9 @@
       title = "Spotify"; artist = S.msg || "Spotify had a hiccup"; dev = "Tap to open the player";
     } else { title = "Spotify"; artist = "Checking"; }
     setTxt(el, ".sp-title", title); setTxt(el, ".sp-artist", artist); setTxt(el, ".sp-dev", dev);
+    /* NODATA1 · never show broken copy: when the house box is down or Spotify errors, the card hides until it answers again */
+    var nod = ph === "offline" || ph === "error" || ph === "no_key" || ph === "bad_key", /* NODATA3 · a key-less 401 is operator copy (NEED KEY), never a face card */ host = (el.closest && el.closest(".tile")) || el;
+    if (host !== document.body && !/sheet-spotify/.test(location.pathname)) { if (nod) host.style.setProperty("display", "none", "important"); else host.style.removeProperty("display"); } /* NODATA2 · beats the phone strip's display:grid !important */
     var c = el.querySelector(".sp-ctrls"); if (c) c.hidden = !showCtl;
     var cb = el.querySelector(".sp-connect"); if (cb) { cb.hidden = !connectTxt; if (connectTxt) cb.textContent = connectTxt; }
     var img = el.querySelector(".sp-art"), src = it && (it.art || it.artSmall) || "";

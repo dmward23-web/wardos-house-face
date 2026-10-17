@@ -33,10 +33,19 @@
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
+  /* NODATA3 · no em dashes or arrows on the face: " — " reads " · ", "MOVED →" reads "moved to", "3:30p→CLE" reads "3:30p to CLE" */
+  function faceDash(s) {
+    return String(s == null ? "" : s)
+      .replace(/\bMOVED\s*[\u2192\u21d2\u27a1]\s*/g, "moved to ").replace(/\bmoved\s*[\u2192\u21d2\u27a1]\s*/gi, "moved to ")
+      .replace(/\s*[\u2192\u21d2\u27a1]\s*/g, " to ")
+      .replace(/\s*\u2014\s*/g, " \u00b7 ")
+      .replace(/(\s*\u00b7\s*){2,}/g, " \u00b7 ").replace(/^\s*\u00b7\s*|\s*\u00b7\s*$/g, "");
+  }
   function kidsSafe(s) {
     var t = String(s == null ? "" : s);
     t = t.replace(/\s*\bcustody\b\s*/gi, " ").replace(/\s{2,}/g, " ").trim(); /* NOCUSTODY1 · the word is removed, nothing put in its place */ /* custody-law:allow */
-    return t;
+    if (typeof window !== "undefined" && window.AwayFilter) t = window.AwayFilter.glass(t); /* AWAYLAW1 */
+    return faceDash(t);
   }
 
   function sfxTap() {
@@ -318,6 +327,7 @@
       if (!item) return;
       if (item.allDay) return; /* ALLDAY1: an all-day note is never a leave with a clock time */
       if (isDadLogistics(item)) return;
+      if (global.HouseFaceLaw && HouseFaceLaw.isDressDay((item.summary || "") + " " + (item.place || "") + " " + (item.what || ""))) return; /* LIVELAW1 */
       if (isPrepItem(item) !== wantPrep) return;
       var start = Date.parse(item.startIso || item.start || "") || 0;
       var end = Date.parse(item.endIso || item.end || "") || 0;
@@ -468,9 +478,12 @@
       var hot = kid.hottest || {};
       var todayBits = (kid.today || []).filter(function (r) { return shortTitle(r.what || "") !== shortTitle(hot.what || ""); }).slice(0, 2); /* FITDAY1 · no repeat of the loud line */
       html += '<div class="kf-face kf-day">';
-      html += '<div class="kf-kicker">' + esc(dayKicker(hot)) + "</div>";
-      html += '<div class="kf-loud">' + esc(hot.when || "Today") + "</div>";
-      html += '<div class="kf-title">' + esc(shortTitle(hot.what || "On deck")) + "</div>";
+      /* LIVELAW1 · no next item left (all ended / colour days filtered) = no NEXT lines, never a stand-in */
+      if (hot.what) {
+        html += '<div class="kf-kicker">' + esc(dayKicker(hot)) + "</div>";
+        html += '<div class="kf-loud">' + esc(hot.when || "") + "</div>";
+        html += '<div class="kf-title">' + esc(shortTitle(hot.what)) + "</div>";
+      }
       if (todayBits.length) {
         html += '<div class="kf-rows">';
         todayBits.forEach(function (row) {
@@ -595,8 +608,18 @@
     }
     if (sub) {
       var leave = nextLeaveFor(kidId);
-      if (face === "day" && leave) sub.textContent = (leave.time || "") + " · " + leave.title;
+      /* LIVELAW1 · the roster sub-line never shows an item that already ended (device clock), whatever fed it */
+      var law = global.HouseFaceLaw;
+      if (leave && law && (leave.start || leave.startIso
+        ? law.rowEnded({ startIso: leave.startIso || new Date(leave.start).toISOString(), endIso: leave.endIso || "" })
+        : law.rowEnded({ when: (leave.badge || "") + " · " + (leave.time || ""), what: leave.title || "" }))) leave = null;
+      /* LIVELAW1 · a leave on a later day names its day ("MON 3:00 PM"), so a bare time never reads as tonight's */
+      var ldow = leave && leave.start && ctDowShort(leave.start) !== ctDowShort(Date.now()) ? ctDowShort(leave.start) + " " : "";
+      if (leave && !leave.start && leave.badge && /^(SUN|MON|TUE|WED|THU|FRI|SAT)$/i.test(leave.badge) && leave.badge.toUpperCase() !== ctDowShort(Date.now())) ldow = leave.badge.toUpperCase() + " ";
+      if (face === "day" && leave) sub.textContent = ldow + (leave.time || "") + " · " + leave.title;
       else if (kidObj(kidId) && kidObj(kidId).themeLabel) sub.textContent = kidObj(kidId).themeLabel;
+      else if (sub.getAttribute("data-kf-leave") === "1") sub.textContent = ""; /* LIVELAW1 · an ended leave never lingers on the sub-line */
+      sub.setAttribute("data-kf-leave", face === "day" && leave ? "1" : "0");
     }
     root.setAttribute("data-face", face);
     root.setAttribute("aria-label", (ACCENT[kidId].name) + " · " + (FACE_LABEL[face] || face) + " · tap OPEN · swipe to flip");
@@ -972,8 +995,10 @@
       if (main) main.innerHTML = '<span class="who-up-name">Quiet</span><span class="who-up-what">No leave window</span>';
       if (meta) meta.textContent = "LIVE cal";
       if (go) { go.setAttribute("href", "sheet-today.html"); go.hidden = true; }
+      host.style.setProperty("display", "none", "important"); /* LAW8C1 · nothing up = no hollow "Quiet · No leave window" card */
       return;
     }
+    host.style.removeProperty("display");
     var kidIds = (pick.kidIds && pick.kidIds.length) ? pick.kidIds.slice() : [pick.kidId];
     var id = kidIds[0];
     var leave = pick.leave;

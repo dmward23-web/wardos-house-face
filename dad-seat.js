@@ -62,6 +62,11 @@
   }
 
   var _cal = null, _kw = null, _open = {};
+  /* AWAYLAW1 · a kid item on another day names its day with the time ('SAT 9:00 AM'), never a bare '3:00p' */
+  var KIDRX = /\b(Ainsley|Hayes|Harris|Boys|Kids)\b|\bschool\b|\b(No School|Early Release|Half Day|1\/2 Day)\b/i;   /* TEXTLAW3: same words as AwayFilter KID_RE */   /* privacy-scan:allow calendar_string */
+  function isKid(e) { var t = (e && e.summary) || ""; return window.AwayFilter ? window.AwayFilter.isKidText(t) : KIDRX.test(t); }
+  function longTime(e) { return String(H.shortTime(e.start) || "").replace(/([ap])m?$/i, function (_, x) { return " " + x.toUpperCase() + "M"; }); }
+  function kidDayTime(e, iso, todayIso) { return dayShort(iso).dow.toUpperCase() + " " + longTime(e); }
   function paint() {
     var root = document.querySelector("[data-dad-seat]");
     if (!root || !_cal) return;
@@ -101,8 +106,9 @@
     tl = tl.slice(0, 6);
     var tlh = tl.map(function (e) {
       var iso = H.eventDayIso(e);
-      return '<div class="ds-stop"><span class="ds-st">' + esc(H.shortTime(e.start)) +
-        (iso !== todayIso ? '<em>' + esc(dayShort(iso).dow) + "</em>" : "") + "</span>" +
+      var kd = iso !== todayIso && isKid(e);
+      return '<div class="ds-stop"><span class="ds-st">' + esc(kd ? kidDayTime(e, iso, todayIso) : H.shortTime(e.start)) +
+        (iso !== todayIso && !kd ? '<em>' + esc(dayShort(iso).dow) + "</em>" : "") + "</span>" +
         '<span class="ds-sw">' + esc(H.dayTitle(e)) + "</span><span class=\"ds-sd\">" + dots(e) + "</span></div>";
     }).join("");
     root.querySelector("[data-ds-tl]").innerHTML = tlh || '<div class="ds-none">Nothing else in the next day</div>';
@@ -129,7 +135,7 @@
         '<span class="ds-dc">' + (evs.length ? evs.length : "") + "</span></div>";
       if (!evs.length) gh += '<div class="ds-none">Open day</div>';
       shown.forEach(function (e) {
-        gh += '<div class="ds-row' + (AWARE.test(e.summary || "") ? " is-aware" : "") + '"><span class="ds-rt">' + esc(e.allDay ? "All day" : H.shortTime(e.start)) +
+        gh += '<div class="ds-row' + (AWARE.test(e.summary || "") ? " is-aware" : "") + '"><span class="ds-rt">' + esc(e.allDay ? "All day" : (iso !== todayIso && isKid(e) ? kidDayTime(e, iso, todayIso) : H.shortTime(e.start))) +
           '</span><span class="ds-rw">' + esc(H.dayTitle(e)) + '</span><span class="ds-rd">' + dots(e) + "</span></div>";
       });
       if (more > 0) gh += '<div class="ds-more">+' + more + " more · tap</div>";

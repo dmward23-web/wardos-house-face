@@ -104,7 +104,8 @@
     document.documentElement.setAttribute("data-tapsync", ok ? "on" : "local");
     var b = document.getElementById("tapsync-badge");
     /* The home map is a scene, not a debug screen. Phone and wall both. */
-    if (ok || document.documentElement.classList.contains("ori-home") || document.documentElement.classList.contains("ori-calm")) { if (b) b.remove(); return; }
+    /* LAW8C1 · glass never shows sync chrome: the state lives on <html data-tapsync> for the health checks only */
+    if (b) b.remove(); return;
     if (!document.body) return;
     if (!b) {
       b = document.createElement("div"); b.id = "tapsync-badge";

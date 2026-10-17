@@ -21,8 +21,11 @@
   /** Kid / school / sports glass — never drop these for errands. */
   function isKidActivity(ev) {
     var s = String((ev && (ev.summary || ev.place || "")) || "");
-    if (/\b(Ainsley|Hayes|Harris|Boys)\b/i.test(s)) return true;
-    if (SCHRX(String.raw`\b(swim|flag|baseball|§|LKMS|school|conferences?|practice|game|PE|special|hearing|vision|field\s*trip|homework|collab|screening)\b`, "i").test(s)) return true;
+    /* TMRSORT1 · a kid item is named for a kid or comes off a kid school calendar; a bare word like "game" is not a kid
+       (Dan's "ALCS Game 4" is his). TEXTLAW3/SCHOOLWORD1: school days read "No School", the school code reads "school" */
+    if (/\b(Ainsley|Hayes|Harris|Boys|Kids)\b/i.test(s)) return true;
+    if (SCHRX(String.raw`\b(§|LKMS|school)\b`, "i").test(s)) return true;   /* SCHOOLNAMES1 · school code via the private names route */
+    if (/\b(No School|Early Release|Half Day|1\/2 Day)\b/i.test(s)) return true;   /* privacy-scan:allow calendar_string */
     return false;
   }
 
@@ -38,6 +41,24 @@
 
   function sortByStart(a, b) {
     return eventStartMs(a) - eventStartMs(b);
+  }
+
+  /** TMRSORT1 · the Tomorrow list reads in clock order: all-day first, then timed rows by start. Over the cap,
+      the latest non-kid rows go first; kid rows are never sliced off; order never changes. */
+  function byClock(a, b) {
+    if (!!a.allDay !== !!b.allDay) return a.allDay ? -1 : 1;
+    return eventStartMs(a) - eventStartMs(b);
+  }
+  function capByClock(items, softCap) {
+    var list = (items || []).slice().sort(byClock);
+    softCap = softCap || MAX_TOMORROW;
+    while (list.length > softCap) {
+      var drop = -1;
+      for (var i = list.length - 1; i >= 0; i--) { if (!isKidActivity(list[i]) || isNoiseEvent(list[i])) { drop = i; break; } }
+      if (drop < 0) break;
+      list.splice(drop, 1);
+    }
+    return list;
   }
 
   /** Prefer kid activities; never slice them off for noise. */
@@ -62,11 +83,20 @@
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
+  /* NODATA3 · no em dashes or arrows on the face: " — " reads " · ", "MOVED →" reads "moved to", "3:30p→CLE" reads "3:30p to CLE" */
+  function faceDash(s) {
+    return String(s == null ? "" : s)
+      .replace(/\bMOVED\s*[\u2192\u21d2\u27a1]\s*/g, "moved to ").replace(/\bmoved\s*[\u2192\u21d2\u27a1]\s*/gi, "moved to ")
+      .replace(/\s*[\u2192\u21d2\u27a1]\s*/g, " to ")
+      .replace(/\s*\u2014\s*/g, " \u00b7 ")
+      .replace(/(\s*\u00b7\s*){2,}/g, " \u00b7 ").replace(/^\s*\u00b7\s*|\s*\u00b7\s*$/g, "");
+  }
   /** Kids-safe glass law NOCUSTODY1. */
   function kidsSafe(s) {
     var t = String(s == null ? "" : s);
     t = t.replace(/\s*\bcustody\b\s*/gi, " ").replace(/\s{2,}/g, " ").trim(); /* NOCUSTODY1 · the word is removed, nothing put in its place */ /* custody-law:allow */
-    return t;
+    if (typeof window !== "undefined" && window.AwayFilter) t = window.AwayFilter.glass(t); /* AWAYLAW1 */
+    return faceDash(t);
   }
 
   function parseMs(iso) {
@@ -110,6 +140,10 @@
     s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
     s = s.replace(/\(\s*Mom[^)]*\)/gi, "");
     s = s.replace(/\bMom\b[^·]*/gi, "");
+    /* CODESTRIP1 · booking/confirmation codes and flight numbers are noise on the face (codes, flight numbers, airport legs) */
+    s = s.replace(/#[A-Z0-9]{5,8}(\/#[A-Z0-9]{5,8})*/g, "").replace(/\(\s*[A-Z]{2}\s?\d{2,4}\s*\)/g, "").replace(/\b(WN|AA|DL|UA|AS|B6|F9|NK)\s?\d{2,4}\b/g, "");
+    /* LAW8C1 · tickets read as the game, never the seats: "A @ B (Sec N Row X n-n), Game 4" -> "A vs B, Game 4" */
+    s = s.replace(/\s*\(\s*(?:Sec(?:tion)?|Row|Seats?)\b[^)]*\)/gi, "").replace(/\s+@\s+/g, " vs ");
     s = s.replace(/\s{2,}/g, " ").replace(/\s·\s*$/g, "").trim();
     /* GATE3WRAP1 · let the line wrap; never cut mid-word or add an ellipsis glyph */
     cap = cap || 64;
@@ -166,9 +200,18 @@
 
   /* SOFTGONE1 · placeholders never get the big card or a countdown */
   var SOFT_TITLE = /(^\s*[\[(]?\s*(cancel+ed|cxl|done|backup|tentative)\b)|\btbd\b|\bcancel if\b/i;
+  /* AWAYONE1 · one dress-up law (HouseFaceLaw.keepEvent, house-face-law.js) and one away source (AwayFilter on
+     cal-months withDan, away-filter.js); cal-live already arrives away-filtered through its fetch, this is the same law
+     for a payload handed in directly. Both callers are defensive (old cached page = no filter, never a throw). */
+  function lawOk(e) {
+    if (global.HouseFaceLaw && !HouseFaceLaw.keepEvent(e)) return false;
+    var AF = global.AwayFilter;
+    if (AF && AF.hasMonths && AF.hasMonths() && !AF.keepItem(e, AF.now())) return false;
+    return true;
+  }
   function listEvents(cal) {
     var l = (cal && (cal.upcomingLeaves || cal.events)) || [];
-    return l.filter(function (e) { return !(e && SOFT_TITLE.test(String(e.summary || e.title || ""))); });
+    return l.filter(function (e) { return !(e && SOFT_TITLE.test(String(e.summary || e.title || ""))) && lawOk(e); }); /* LAW8C1 + LIVELAW1 + AWAYLAW1 · AWAYONE1 */
   }
 
   /** First future event by start (> now). */
@@ -251,13 +294,11 @@
         other.push(ev);
       }
     }
-    kid.sort(sortByStart);
-    busy.sort(sortByStart);
-    other.sort(sortByStart);
-    noise.sort(sortByStart);
-    /* Kid/school/sports first · errands last · never drop kid rows for noise */
-    var merged = kid.concat(allday).concat(busy).concat(other).concat(noise);
-    return { day: tmr, dow: dowShortFromIso(tmr), items: preferKidItems(merged, MAX_TOMORROW) };
+    /* TMRSORT1 · clock order (all-day first, then by start); noise rows are the first to go over the cap */
+    var merged = kid.concat(allday).concat(busy).concat(other);
+    var items = capByClock(merged, MAX_TOMORROW);
+    if (items.length < MAX_TOMORROW) items = capByClock(items.concat(noise.slice(0, MAX_TOMORROW - items.length)), MAX_TOMORROW);
+    return { day: tmr, dow: dowShortFromIso(tmr), items: items };
   }
 
   function stripFromEvent(ev, clock) {
@@ -795,7 +836,7 @@
       html += '<li class="lb-empty">Clear on glass</li>';
     } else {
       /* Show every kid/school/sports row · soft-cap only after those */
-      var showTmr = preferKidItems(tmr.items, Math.max(8, tmr.items.length));
+      var showTmr = capByClock(tmr.items, Math.max(8, tmr.items.length)); /* TMRSORT1 */
       for (var j = 0; j < showTmr.length; j++) {
         var ev2 = showTmr[j];
         var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "");
@@ -937,13 +978,12 @@
     var html = '<div class="lb-layout lb-day" aria-label="Today at a glance"><div class="lb-day-cols">';
     for (var q = 0; q < parts.length; q++) {
       var part = parts[q];
+      if (!part.items.length) continue;
       var cls = "lb-day-col";
       if (nowH != null && nowH >= part.to && !part.items.length) cls += " is-past";
       if (nowH != null && nowH >= part.from && nowH < part.to) cls += " is-now";
       html += '<div class="' + cls + '"><div class="lb-day-part">' + part.label + "</div>";
-      if (!part.items.length) {
-        html += '<div class="lb-day-none">' + (nowH != null && nowH >= part.to ? "Done" : "Open") + "</div>";
-      }
+      /* LAW8C1 · an empty part is simply not drawn (no hollow "Done" / "Open" slots) */
       for (var r = 0; r < part.items.length; r++) {
         var isNext = !nextSet && !part.items[r].ev.allDay;
         if (isNext) nextSet = true;
@@ -958,7 +998,7 @@
     if (!tItems.length) {
       html += '<span class="lb-day-tchip">Clear</span>';
     } else {
-      var showT = preferKidItems(tItems, 6);
+      var showT = capByClock(tItems, 6); /* TMRSORT1 */
       for (var t = 0; t < showT.length; t++) {
         var e2 = showT[t];
         html += '<span class="lb-day-tchip"><strong>' + esc(e2.allDay ? "Day" : shortTime(e2.start)) + "</strong>" +
@@ -983,9 +1023,7 @@
     else if (mode === "peek") html = layoutPeek(strip);
     else if (mode === "radar") html = layoutRadar(strip);
     else html = layoutList(strip);
-    var banner = '<div class="lb-mode-banner" aria-live="polite">Layout · <strong>' +
-      esc(LAYOUT_LABELS[mode] || mode) + "</strong></div>";
-    el.innerHTML = banner + html;
+    el.innerHTML = html; /* LAW8C1 · no "Layout · Day" debug banner on glass */
     el.setAttribute("data-layout", mode);
     syncChipUI(mode);
     paintLists(strip); /* keep legacy nodes in sync if present */

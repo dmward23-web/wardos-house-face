@@ -1,0 +1,43 @@
+/* LAW8C1 · calm phone glass (Alfred ship-2026-10-17T0006 / Atlas order): no debug or hollow labels on the hub.
+   Loaded after tokens-hub-fit.css. Wall (>600px) keeps its own layout except the shared kids-away card. */
+@media (max-width: 600px) {
+  /* schedule card: the layout switch (Day/Rail/Who/Peek/Radar/List + mode label) is a wall tool, not phone glass; swipe still cycles */
+  html body .panel .leaveby .leaveby-switch { display: none !important; }
+  /* "Sheet roster" section label */
+  html body .grid-wrap .grid-hdr { display: none !important; }
+  /* tiles: status chips (NOW / PEEK / DUE / PLAN / SOON / IDEA), sub/foot captions, XP + streak counters */
+  html body .tile .tile-mchip { display: none !important; }
+  html body .tile .tile-sub, html body .tile .tile-foot, html body .tile .kf-xp, html body .tile .kf-streak-chip { visibility: hidden !important; }
+  /* chores tile: the rows speak for themselves (no OPEN / DUE / KIDS mono labels) */
+  html body .tile.chores .tile-mrow .mt { display: none !important; }
+}
+/* away days: legacy card styles (house-hub-tiles-bind.js paintAway no longer builds the card; NOCUSTODY) */
+html body .tile-grid .tile.kids-away {
+  grid-column: 1 / -1 !important; display: flex !important; flex-direction: row; align-items: center; justify-content: space-between;
+  gap: 12px; min-height: 0 !important; height: auto !important; padding: 14px 16px !important;
+}
+html body .tile.kids-away .ka-line { font-weight: 800; font-size: 20px; letter-spacing: .01em; color: #fff6dc; }
+html body .tile.kids-away .ka-kids { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+html body .tile.kids-away .ka-kid {
+  display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 18px; text-decoration: none;
+  font-weight: 700; font-size: 14px; color: #fff; background: rgba(0, 0, 0, .35); border: 1px solid var(--ka, rgba(255, 224, 128, .5));
+}
+html body .tile.kids-away .ka-kid.ainsley { --ka: #f098d4; }
+html body .tile.kids-away .ka-kid.hayes { --ka: #5ec8e8; }
+html body .tile.kids-away .ka-kid.harris { --ka: #7ed492; }
+/* LAW8C3 · hub jargon off on every load (Alfred ship-2026-10-17T0134): no mono row labels (LIST/RUN/JARS/PAY/SAT/SUN/NEXT/PACK/OCT/NOV…),
+   no "Lists · leave-bys" row on Family trips, no ASK Atlas pill. Rows keep their plain words. */
+html body .tile .tile-mrow .mt { display: none !important; }
+html body .tile.win .tile-micro .tile-mrow:nth-of-type(2) { display: none !important; }
+html body .atlas-chip { display: none !important; }
+/* LAW8C6 · phone hub: the Kids and Dad cards hug their content (Alfred ship-2026-10-17T0226 P3 "roomy": ~40% empty).
+   tokens-hub-fit.css gives every phone tile min-height 150px (Dad flip card 170px), and the hidden sub/foot captions
+   (visibility:hidden above) still held their lines. Same selector weight as hub-fit, loaded after it. */
+@media (max-width: 600px) {
+  html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.kids-away,
+  html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.dan.kid-flip { min-height: 0 !important; height: auto !important; }
+  html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.kids-away { padding: 12px 14px !important; gap: 10px !important; }
+  html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.dan.kid-flip .tile-sub,
+  html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.dan.kid-flip .tile-foot { display: none !important; }
+  html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.dan.kid-flip .kf-stage { flex: none !important; }
+}

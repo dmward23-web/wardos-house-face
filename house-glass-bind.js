@@ -36,8 +36,8 @@
   }
   function show(el, on) {
     if (!el) return;
-    if (on) { el.removeAttribute("hidden"); el.style.display = ""; }
-    else { el.setAttribute("hidden", ""); el.style.display = "none"; }
+    if (on) { el.removeAttribute("hidden"); el.style.removeProperty("display"); }
+    else { el.setAttribute("hidden", ""); el.style.setProperty("display", "none", "important"); } /* NODATA3 · beats the phone header's display !important (a bare icon oval with no reading) */
   }
   function H() { return global.HouseBoardStrip && global.HouseBoardStrip._h; }
 

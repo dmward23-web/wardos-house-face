@@ -219,6 +219,9 @@
     if (!el) return;
     el.setAttribute("aria-label", "Weather · " + PLACE);
     el.classList.add("wx-card", "wx-live");
+    /* LAW8C1 · no empty pill while loading: the chip stays hidden until a real reading lands; a failed load stays hidden and is
+       flagged on the element (data-wx-state="down") for the health checks, never drawn as a dash */
+    if (!el.classList.contains("is-live")) { el.style.setProperty("display", "none", "important"); el.setAttribute("data-wx-state", "loading"); }
     el.innerHTML =
       '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
       + '<div class="wx-hdr-text wx-text">'
@@ -227,8 +230,10 @@
       + '<div class="wx-sub"><i class="hdr-live-dot" aria-hidden="true"></i>LIVE</div>'
       + "</div>";
     load(function (err, data) {
+      if (!(err || !data)) { el.style.removeProperty("display"); el.setAttribute("data-wx-state", "live"); }
       if (err || !data) {
         el.classList.remove("is-live");
+        el.setAttribute("data-wx-state", "down");
         el.innerHTML =
           '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
           + '<div class="wx-hdr-text wx-text">'
@@ -236,6 +241,7 @@
           + '<div class="wx-line"><span class="wx-temp"></span><span class="wx-cond">Weather later</span></div>'
           + '<div class="wx-sub">retry</div>'
           + "</div>";
+        el.style.setProperty("display", "none", "important"); /* NODATA1 · no reading = no chip (never show a dash); comes back on the next good load. NODATA3 · !important so the phone header's display:flex !important can't show a bare dash */
         return;
       }
       paint(el, data);
@@ -243,7 +249,7 @@
     /* RAINLINE1 · wall stays open all day: repaint every 20 min */
     if (!el.__wxTimer) {
       el.__wxTimer = setInterval(function () {
-        load(function (err, data) { if (!err && data) paint(el, data); });
+        load(function (err, data) { if (!err && data) { el.style.removeProperty("display"); paint(el, data); } });
       }, CACHE_MS);
     }
   }

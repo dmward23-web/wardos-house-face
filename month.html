@@ -5,10 +5,12 @@
 <script src="house-hub.js?v=HUBPIN1"></script>
 <script src="private-feed.js?v=FOLLOWUP6"></script>
 <script src="school-names.js?v=SCHOOLNAMES1"></script>
-<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-face-law.js?v=MERGE1C"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
+<script src="house-sound.js?v=MERGE1C"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" id="hf-viewport" />
+<script src="away-filter.js?v=MERGE1C" data-away-install></script>
 <script>/* Phones get the agenda. The wall keeps 1080. */(function(){try{var w=Math.min(screen.width,screen.height);if(w&&w<=600){var v=document.getElementById("hf-viewport");if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -389,6 +391,9 @@
 </style>
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");var veil=false;try{if(sessionStorage.getItem("ori-from")||/from=/.test(location.hash||""))veil=true;var stamp=+sessionStorage.getItem("ori-veil-next")||0;if(stamp&&Date.now()-stamp<8000){veil=true;sessionStorage.removeItem("ori-veil-next");}}catch(e){}if(veil){h.classList.add("ori-arriving");h.setAttribute("data-ori-veil","1");var s=document.createElement("style");s.textContent="html.ori-arriving::before,html.ori-held::before{content:none!important;display:none!important;background:#062018!important}";(document.head||h).appendChild(s);var el=document.createElement("div");el.className="ori-iris";el.setAttribute("data-ori-veil","1");el.style.cssText="position:fixed;inset:0;z-index:2147483647;background:#062018;opacity:1";el.style.setProperty("animation","none","important");h.appendChild(el);addEventListener("pageshow",function(){var start=0;function step(now){if(!start)start=now;var t=now-start;var op=t<160?1:Math.max(0,1-(t-160)/420);el.style.opacity=String(op);el.style.transform="translate3d(0,"+(Math.min(t,400)*0.001).toFixed(3)+"px,0)";void el.offsetWidth;if(op>0.001)requestAnimationFrame(step);else{el.remove();h.classList.remove("ori-arriving");}}requestAnimationFrame(step);});}try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="stylesheet" href="house-ori.css?v=HIRES1" />
+<link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<script src="house-face-law.js?v=MERGE1C"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
 </head>
 <body data-glass="ovals month-today">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -714,7 +719,8 @@
   }
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function key(y, m, d) { return y + "-" + pad(m) + "-" + pad(d); }
-  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function faceDash(s) { return String(s == null ? "" : s).replace(/\bMOVED\s*[\u2192\u21d2\u27a1]\s*/gi, "moved to ").replace(/\s*[\u2192\u21d2\u27a1]\s*/g, " to ").replace(/\s*\u2014\s*/g, " \u00b7 ").replace(/(\s*\u00b7\s*){2,}/g, " \u00b7 ").replace(/^\s*\u00b7\s*|\s*\u00b7\s*$/g, ""); } /* NODATA3 · no em dashes or arrows on the face */
+  function esc(s) { return faceDash((typeof window !== "undefined" && window.AwayFilter ? window.AwayFilter.glass(s) : s)).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   var LIVE = null;
   function cleanCal(s) {
     s = String(s || "");
@@ -726,7 +732,7 @@
   }
   function plainWords(s) {
     s = cleanCal(s);
-    s = s.replace(/\s*(?:→|->|➔|➜)\s*/g, " to ");
+    s = faceDash(s.replace(/\bMOVED\s*(?:→|->|➔|➜)\s*/gi, "moved to ").replace(/\s*(?:→|->|➔|➜)\s*/g, " to "));
     s = s.replace(/\bDRIVE\b/g, "drives");
     return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
   }
@@ -808,7 +814,7 @@
     ((LIVE && LIVE.upcomingLeaves) || []).forEach(function (ev) {
       if (!eventCovers(ev, iso)) return;
       var label = plainWords(ev.summary);
-      if (!label) return;
+      if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label))) return; /* LIVELAW1 · colour / dress-up days are never rows */
       if (eventSpans(ev)) {
         chips[chipKey(label) || label.toLowerCase()] = label;
       } else if (String(ev.start || "").slice(0, 10) === iso) {
@@ -820,6 +826,7 @@
     if (monthDay && (!inLive || !rows.length)) {
       (monthDay.items || []).forEach(function (it) {
         var label = plainWords(it.l);
+        if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label))) return; /* LIVELAW1 */
         var key = chipKey(label);
         if (key && chips[key]) return;
         var min = clockMinutes(label);
@@ -883,7 +890,7 @@
         if (!(day && ((day.items && day.items.length) || day.withDan)) && !model.rows.length && !model.chips.length && !isToday) continue;
         var dt = new Date(y, m - 1, d);
         /* DAYLINK2 · each day opens the Today sheet for that day (?d=) */
-        html += '<a class="ori-day' + (isToday ? " is-today" : "") + '" href="sheet-today.html' + (isToday ? "" : "?d=" + k) + '">';
+        html += '<a class="ori-day' + (isToday ? " is-today" : "") + '" data-away-day="' + k + '" href="sheet-today.html' + (isToday ? "" : "?d=" + k) + '">';
         html += '<span class="ori-day-head"><span class="ori-dom">' + dows[dt.getDay()] + " " + d + "</span>";
         model.chips.forEach(function (chip) { html += '<span class="ori-chip">' + esc(chip) + "</span>"; });
         html += "</span>";
@@ -901,9 +908,9 @@
         var dy = dd.getFullYear(), dm = dd.getMonth() + 1, dn = dd.getDate();
         if (dm !== m) { html += '<div class="day out"><div class="day-top"><span class="dom">' + dn + "</span></div></div>"; continue; }
         var k2 = key(dy, dm, dn), day2 = DATA && DATA.days[k2], isToday2 = k2 === t.iso;
-        html += '<a class="day' + (isToday2 ? " today" : "") + '" href="sheet-today.html' + (isToday2 ? "" : "?d=" + k2) + '">' + '<div class="day-top"><span class="dom">' + dn + "</span>" + (isToday2 ? '<span class="day-tag">today</span>' : "") + "</div>";
+        html += '<a class="day' + (isToday2 ? " today" : "") + '" data-away-day="' + k2 + '" href="sheet-today.html' + (isToday2 ? "" : "?d=" + k2) + '">' + '<div class="day-top"><span class="dom">' + dn + "</span>" + (isToday2 ? '<span class="day-tag">today</span>' : "") + "</div>";
         html += '<div class="blocks">';
-        (day2 ? day2.items : []).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '">' + esc(cleanCal(it.l)) + "</div>"; });
+        (day2 ? day2.items : []).forEach(function (it) { if (window.HouseFaceLaw && HouseFaceLaw.isDressDay(it.l)) return; /* LIVELAW1 */ html += '<div class="blk ' + esc(it.c) + '">' + esc(cleanCal(it.l)) + "</div>"; });
         html += "</div></a>";
       }
     }
@@ -947,7 +954,7 @@
 })();
 </script>
 <script src="house-clock.js?v=PRIVFEED3"></script>
-<script src="house-board-strip.js?v=PRIVFEED3"></script>
+<script src="house-board-strip.js?v=MERGE1C"></script>
 <script>
 /* The time lives in the hero clock. Drop the repeated " · 3:00" from the title. */
 (function () {
@@ -971,14 +978,16 @@
   if (hero && window.MutationObserver) new MutationObserver(once).observe(hero, { childList: true, subtree: true, characterData: true });
 })();
 </script>
-<script src="house-weather.js?v=PRIVFEED3"></script>
+<script src="house-weather.js?v=MERGE1C"></script>
 <script src="house-sensi.js?v=PRIVFEED3"></script>
-<script src="house-glass-bind.js?v=AUDIT1"></script>
+<script src="house-glass-bind.js?v=MERGE1C"></script>
 <script src="house-zoom.js"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>
 <script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
-<script src="house-ori-world.js?v=ORIHOME18"></script>
+<script src="house-ori-world.js?v=MERGE1C"></script>
+<script src="night/night-host.js?v=MERGE1C" defer></script>
+<script src="month-theme/month-overlay.js?v=MERGE1C" defer></script>
 </body>
 </html>

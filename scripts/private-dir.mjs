@@ -68,3 +68,41 @@ export function namesRe(role, flags = "i") {
   const list = (privateNames()[role] || []).map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   return list.length ? new RegExp("\\b(?:" + list.join("|") + ")\\b", flags) : /(?!)/;
 }
+
+/* EXTFILTER1 · twin of scripts/text_law.py external_filter(): external calendar rows are filtered (terms from
+   privateNames(), never in git). A matching row is dropped; any other match is replaced by the placeholder. Case-insensitive. */
+/* EXTNAMES1 · the only roles ever filtered (partner, coparent, household and school never are); calendar-refresh.mjs
+   imports this, scripts/text_law.py carries the Python twin. */
+export const EXT_ROLES = Object.freeze(["external", "otherfamily"]);
+export const EXT_PLACEHOLDER = "Friends";
+let _exCache = null;
+function exRes() {
+  if (_exCache) return _exCache;
+  /* case-insensitive term */
+  const ci = (n) => n.split("").map((c) => (/[a-z]/i.test(c) ? "[" + c.toUpperCase() + c.toLowerCase() + "]" : c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))).join("");
+  const pn = privateNames();
+  const list = EXT_ROLES.flatMap((r) => pn[r] || []).map(ci);
+  if (!list.length) return (_exCache = {});
+  const alt = "(?:" + list.join("|") + ")";
+  return (_exCache = {
+    drop: new RegExp("\\b(?!(?:The|Ward|Kids|Dad|Dan|At)\\b)[A-Z][a-z]+ " + alt + "\\b(?![ \\t]+(?:[Kk]ids|KIDS|[Ff]amily|FAMILY|[Hh]ouse|HOUSE)\\b)"),
+    dropRev: new RegExp("\\b" + alt + ",\\s*(?!(?:Kids|Family|House)\\b)[A-Z][a-z]+\\b"),
+    poss: new RegExp("\\b" + alt + "['\\u2019][Ss]\\b", "g"),
+    word: new RegExp("\\b" + alt + "(?:[Ee]?[Ss])?\\b", "g"),
+  });
+}
+export function externalDrop(s) {
+  const r = exRes(); if (!r.drop || typeof s !== "string") return false;
+  return r.drop.test(s) || r.dropRev.test(s);
+}
+export function externalMask(s) {
+  const r = exRes(); if (!r.word || typeof s !== "string") return s;
+  return s.replace(r.poss, EXT_PLACEHOLDER + "'").replace(r.word, EXT_PLACEHOLDER).replace(/\s{2,}/g, " ").trim();
+}
+/** filter any event list: matching rows out, term masked in summary/title. */
+export function externalEvents(events) {
+  return (events || []).filter((e) => !(e && (externalDrop(e.summary) || externalDrop(e.title))))
+    .map((e) => (e && (typeof e.summary === "string" || typeof e.title === "string"))
+      ? { ...e, ...(typeof e.summary === "string" ? { summary: externalMask(e.summary) } : {}), ...(typeof e.title === "string" ? { title: externalMask(e.title) } : {}) }
+      : e);
+}

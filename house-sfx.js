@@ -10,6 +10,7 @@
     catch (e) { return false; }
   }
   function isMuted() {
+    if (global.HouseSound) return !HouseSound.isOn();   /* LAW8C3 · the one shared house sound state */
     try { if (localStorage.getItem(MUTE_KEY) === "1") return true; } catch (e) {}
     var root = document.documentElement.getAttribute("data-sound");
     return root === "off" || root === "0" || root === "false";
@@ -44,10 +45,19 @@
     applyMasterGain();
   }
   function setMuted(on) {
+    if (global.HouseSound) {   /* LAW8C3 · saves + tells every control (paintMute runs from its change event) */
+      var same = HouseSound.isOn() === !on; HouseSound.set(!on); if (same) paintMute(on); return;
+    }
     try { localStorage.setItem(MUTE_KEY, on ? "1" : "0"); } catch (e) {}
+    paintMute(on);
+  }
+  /* LAW8C3 · paint every mute control + the audio from a state; never writes the state (page load only reads it) */
+  function paintMute(on) {
+    on = !!on;
     document.documentElement.setAttribute("data-sound", on ? "off" : "on");
-    document.body.classList.toggle("sfx-muted", !!on);
+    if (document.body) document.body.classList.toggle("sfx-muted", !!on);
     document.querySelectorAll("[data-mute-toggle]").forEach(function (btn) {
+      if (global.HouseSound) { HouseSound.icon(btn); return; }   /* LAW8C3 · one icon style, no ON/OFF pill */
       btn.setAttribute("aria-pressed", on ? "true" : "false");
       btn.textContent = on ? "🔇 OFF" : "🔊 ON";
     });
@@ -570,7 +580,7 @@
   }
 
   function wireMute() {
-    setMuted(isMuted());
+    paintMute(isMuted());
     document.querySelectorAll("[data-mute-toggle]").forEach(function (btn) {
       if (btn.getAttribute("data-mute-wired") === "1") return;
       btn.setAttribute("data-mute-wired", "1");
@@ -635,6 +645,7 @@
     }, 12);
   });
 
+  if (global.HouseSound) HouseSound.onChange(function (on) { paintMute(!on); });
   function bootFx() {
     wireMute();
     wireGrowFx();

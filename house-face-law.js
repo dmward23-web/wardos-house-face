@@ -170,7 +170,7 @@
   }
   /* NOCUSTODY1 · glass law for every board: a feed string that carries one is blanked, and a row whose text carries
      one is dropped. Nothing is put in its place. Same phrase list as scripts/qa/nocustody.test.mjs. */
-  var NOCUST_RX = /kids with (?:dad|mom|dan)\b|\b(?:dad|mom)(?:'?s)? weeks?\b|\bhome week|\baway week|\bcustody\b|\btheir mom'?s week|\bkids away\b|\btheir week\b|kids-with-dan|\b(?:your base|base at home|drop zone hq) with dad\b/i; /* custody-law:allow */
+  var NOCUST_RX = /kids with (?:dad|mom|dan|you)\b|\b(?:dad|mom)(?:['\u2019]?s)? weeks?\b|\bhome week|\baway week|\bcustody\b|\btheir mom['\u2019]?s week|\bkids away\b|\btheir week\b|kids-with-dan|\b(?:your base|base at home|drop zone hq) with dad\b|hand-?\s?offs?\b|\b(?:chores|payday) with dad\b|who.{1,6}s where/i; /* custody-law:allow */
   function isCustody(s) { return NOCUST_RX.test(String(s == null ? "" : s)); }
   function rowCustody(o) {
     if (!o || typeof o !== "object" || Array.isArray(o)) return false;

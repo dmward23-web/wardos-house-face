@@ -7,9 +7,11 @@
       return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     } catch (e) { return ""; }
   }
+  function faceDash(s) { return String(s == null ? "" : s).replace(/\bMOVED\s*[\u2192\u21d2\u27a1]\s*/gi, "moved to ").replace(/\s*[\u2192\u21d2\u27a1]\s*/g, " to ").replace(/\s*\u2014\s*/g, " \u00b7 ").replace(/(\s*\u00b7\s*){2,}/g, " \u00b7 ").replace(/^\s*\u00b7\s*|\s*\u00b7\s*$/g, ""); } /* NODATA3 · no em dashes or arrows on the face */
   function show(el, text) {
     if (!el) return;
-    el.textContent = text || "";
+    text = faceDash((typeof window !== "undefined" && window.AwayFilter ? window.AwayFilter.glass(text || "") : text || "")); /* AWAYLAW1 glass */
+    el.textContent = text;
     if (text) el.removeAttribute("hidden"); else el.setAttribute("hidden", "");
   }
   function timeOf(when) {
@@ -40,7 +42,7 @@
     if (typeof fetch !== "function") return;
     fetch("kids-week.json?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : null; })
-      .then(paint)
+      .then(function (w) { var law = typeof window !== "undefined" && window.HouseFaceLaw; if (w && law) law.cleanKidsWeek(w); paint(w); }) /* LIVELAW1 */
       .catch(function () { /* stay empty */ });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", load);

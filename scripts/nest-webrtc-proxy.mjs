@@ -271,14 +271,16 @@ function mimeFor(p) {
   if (p.endsWith(".woff2")) return "font/woff2";
   if (p.endsWith(".ttf")) return "font/ttf";
   if (p.endsWith(".woff")) return "font/woff";
+  if (p.endsWith(".mp3")) return "audio/mpeg";
   return "application/octet-stream";
 }
 
 export const DEVICE_NAME_RE = /^enterprises\/[A-Za-z0-9_-]+\/devices\/[A-Za-z0-9_-]+$/;
 /* PRIVFEED3 · vendor/ holds the in-page QR library (Dad's Pair a screen tile); nothing else under it.
    HUBPIN1 · art/, assets/ and theme-tiles/ serve page art and their scripts (image + js only, every image there is on
-   the privacy art allow-list); no traversal (no "..", no dot-segments, no backslash, no encoded slash tricks). */
-export const STATIC_OK = /^(?:ori\/[A-Za-z0-9_\/.-]+|[A-Za-z0-9_.-]+)\.(?:html|js|css|png|jpg|webp|svg|woff2?)$|^vendor\/[A-Za-z0-9_.-]+\.js$|^fonts\/[A-Za-z0-9_-][A-Za-z0-9_.-]*\.(?:ttf|woff2?)$|^(?:art|assets|theme-tiles)\/(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*\/)*[A-Za-z0-9_-][A-Za-z0-9_.-]*\.(?:png|jpe?g|webp|gif|svg|js)$/;
+   the privacy art allow-list). MERGE1-PF4 · night/ and month-theme/ serve the NIGHT52 scene host and month overlay
+   (page code, sky art and sounds; every image there is on the art allow-list; no video in git); no traversal (no "..", no dot-segments, no backslash, no encoded slash tricks). */
+export const STATIC_OK = /^(?:ori\/[A-Za-z0-9_\/.-]+|[A-Za-z0-9_.-]+)\.(?:html|js|css|png|jpg|webp|svg|woff2?)$|^vendor\/[A-Za-z0-9_.-]+\.js$|^fonts\/[A-Za-z0-9_-][A-Za-z0-9_.-]*\.(?:ttf|woff2?)$|^(?:art|assets|theme-tiles)\/(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*\/)*[A-Za-z0-9_-][A-Za-z0-9_.-]*\.(?:png|jpe?g|webp|gif|svg|js)$|^(?:night|month-theme)\/(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*\/)*[A-Za-z0-9_-][A-Za-z0-9_.-]*\.(?:html|js|css|png|mp3|json)$/;
 export function staticOk(rel) {
   return typeof rel === "string" && STATIC_OK.test(rel) && !rel.includes("..") && !rel.includes("\\") && !rel.split("/").some((seg) => !seg || seg.startsWith("."));
 }

@@ -4,8 +4,9 @@
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
 <script src="private-feed.js?v=FOLLOWUP6"></script>
-<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-face-law.js?v=MERGE1C"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
+<script src="house-sound.js?v=MERGE1C"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -379,8 +380,11 @@
 </style>
 <link rel="stylesheet" href="tokens-sheet-clock-first-heat.css?v=KITDEAD1" />
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
+<script src="away-filter.js?v=MERGE1C" data-away-install></script>
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
+<link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
 </head>
 <body>
 <div class="panel">
@@ -416,7 +420,7 @@
  <div class="timeline" aria-label="Day timeline" data-ld="timeline"></div>
 
  <div class="lower">
- <section class="sec" aria-label="Pack checklist strip">
+ <section class="sec" aria-label="Pack checklist strip" data-away-hide>
  <div class="sec-hdr">
  <a class="sec-title" href="sheet-pack.html?v=KITDEAD1" style="text-decoration:none;color:inherit">Pack checklist · Open Pack</a>
  <div class="sec-meta">glance only · checkoffs on Pack sheet</div>
@@ -487,10 +491,11 @@
 <script src="house-links.js?v=LINKWEB1"></script>
 <script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
-<script src="house-ori-world.js?v=ORIHOME18"></script>
+<script src="house-ori-world.js?v=MERGE1C"></script>
 <script>/* LOADLIVE1 · load day reads data/cal-live.json (today, or the next day with leaves), no hardcoded date */
 (function(){function q(k){return document.querySelector('[data-ld="'+k+'"]')}
-function e(t){return String(t).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+function faceDash(s) { return String(s == null ? "" : s).replace(/\bMOVED\s*[\u2192\u21d2\u27a1]\s*/gi, "moved to ").replace(/\s*[\u2192\u21d2\u27a1]\s*/g, " to ").replace(/\s*\u2014\s*/g, " \u00b7 ").replace(/(\s*\u00b7\s*){2,}/g, " \u00b7 ").replace(/^\s*\u00b7\s*|\s*\u00b7\s*$/g, ""); }/* NODATA3 · no em dashes or arrows on the face */
+function e(t){return faceDash(window.AwayFilter?window.AwayFilter.glass(t):t).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
 function day(iso){var d=new Date(iso+"T12:00:00");return d}
 function hm(s){var m=/T(\d\d):(\d\d)/.exec(s);if(!m)return"";var h=+m[1]%12||12;return h+":"+m[2]}
 fetch("data/cal-live.json?t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("offline");return r.json()}).then(function(d){if(!d||d.offline||d.status==="offline")throw new Error("offline");
@@ -505,7 +510,9 @@ if(t)t.innerHTML=rows.length?e(rows[0].summary.split(" · ")[0])+' · <span clas
 if(sb)sb.innerHTML=rows.slice(1,5).map(function(x){return e(x.summary.split(" · ")[0])+" <strong>"+hm(x.start)+"</strong>"}).join(" · ");
 q("timeline").innerHTML=rows.map(function(x,i){return '<article class="beat leave"><span class="pill">'+(i+1)+'</span><div class="clock">'+hm(x.start)+'</div><div class="what">'+e(x.summary)+'</div><div class="detail">'+e((x.location||"").split(",")[0])+'</div></article>'}).join("")||'<article class="beat"><div class="what">No leaves</div></article>';
 q("glance").innerHTML=rows.slice(0,3).map(function(x){return '<div class="glance-row"><span class="t">'+hm(x.start)+'</span><span class="w">'+e(x.summary.split(" · ")[0])+'</span></div>'}).join("");
-q("sub").textContent=rows.length+" on the calendar · "+lab;
+var sb=q("sub");if(sb)sb.textContent=rows.length+" on the calendar · "+lab;
 }).catch(function(){q("label").textContent="Load day · calendar offline"});})();</script>
+<script src="night/night-host.js?v=MERGE1C" defer></script>
+<script src="month-theme/month-overlay.js?v=MERGE1C" defer></script>
 </body>
 </html>

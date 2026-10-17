@@ -15,8 +15,9 @@
       return new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
     } catch (e) { return ""; }
   }
+  function faceDash(s) { return String(s == null ? "" : s).replace(/\bMOVED\s*[\u2192\u21d2\u27a1]\s*/gi, "moved to ").replace(/\s*[\u2192\u21d2\u27a1]\s*/g, " to ").replace(/\s*\u2014\s*/g, " \u00b7 ").replace(/(\s*\u00b7\s*){2,}/g, " \u00b7 ").replace(/^\s*\u00b7\s*|\s*\u00b7\s*$/g, ""); } /* NODATA3 · no em dashes or arrows on the face */
   function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return faceDash(s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
@@ -76,6 +77,13 @@
       return stripKid(it.place || it.summary || "");
     }
 
+    /* LAW8C1 + NOCUSTODY · on away days the kid tiles render nothing. AWAYONE1 (Atlas): away has ONE source of truth,
+       away-filter.js on cal-months withDan (AwayFilter.awayUntil); no kids-week path. */
+    var AF = typeof window !== "undefined" ? window.AwayFilter : null;
+    var awayUntil = AF && AF.hasMonths && AF.hasMonths() ? AF.awayUntil(AF.now()) : 0;
+    var away = awayUntil > 0;
+    paintAway(away ? awayUntil : 0);
+
     /* Kid tiles */
     ["ainsley", "hayes", "harris"].forEach(function (id) {
       var re = KID_RE[id];
@@ -103,7 +111,7 @@
     else if (todayItems.length > 3) th += row("+" + (todayItems.length - 3), "more today", "", "");
     setMicro(micro(".tile.today"), th);
 
-    /* Week tile · next 4 days from Dan's week list */
+    /* Week tile · next 4 days from the week list */
     var dan = (week.kids && week.kids.dan) || {};
     var days = [];
     var byDay = {};
@@ -136,11 +144,19 @@
         if (SCHRX(String.raw`§ specials?`, "i").test(t)) return false;
         return /^(leave|school_drop|school_pickup|sport|appointment)$/.test(String(it.kind || "")) || /\b(pick\s*-?\s*up|drop(\s*-?\s*off)?|leave)\b/i.test(t);
       };
-      var leaves = queue.filter(isLeave);
+      var leaves = away ? [] : queue.filter(isLeave); /* LAW8C1 · away days: Dad's card is Dad's own next thing */
       var first = leaves[0];
       var dd = '<div class="kf-face kf-day"><div class="kf-kicker">Next leave</div>';
       if (!first) {
-        dd += '<div class="kf-loud">Clear</div><div class="kf-title">Nothing queued</div>';
+        /* LAW8C1 · never an empty "Clear · Nothing queued" card: Dad's own next calendar stop (cal-live, already kid/away-filtered) */
+        var own = dadNext(now);
+        if (own) {
+          dd = '<div class="kf-face kf-day"><div class="kf-kicker">Up next</div>';
+          dd += '<div class="kf-loud">' + esc(own.mt) + "</div>";
+          dd += '<div class="kf-title">' + esc(own.title) + "</div>";
+        } else {
+          dd = '<div class="kf-face kf-day"><div class="kf-kicker">Dad</div><div class="kf-loud">Calendar</div>';
+        }
       } else {
         var dow = isToday(first) ? "TODAY" : String(first.badge || "").toUpperCase();
         dd += '<div class="kf-loud">' + esc((dow ? dow + " · " : "") + (first.time || "")) + "</div>";
@@ -162,12 +178,57 @@
     }
   }
 
+  /* LAW8C1 helpers */
+  var CAL = null;
+  function dadNext(now) {
+    var l = (CAL && CAL.upcomingLeaves) || [];
+    var H = window.HouseBoardStrip || window.HouseStrip || null;
+    for (var i = 0; i < l.length; i++) {
+      var e = l[i]; if (!e || e.allDay) continue;
+      var ms = Date.parse(e.start || "") || 0; if (ms <= now) continue;
+      if (/\b(Harris|Hayes|Ainsley|Boys|Kids?)\b/i.test(String(e.summary || ""))) continue;
+      var d = new Date(ms), isT = ctDate(d) === ctDate(new Date(now));
+      var t = ""; try { t = new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "numeric", minute: "2-digit" }).format(d); } catch (e1) { /* */ }
+      var dow = ""; try { dow = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short" }).format(d).toUpperCase(); } catch (e2) { /* */ }
+      var title = String(e.summary || "");
+      if (H && typeof H.dayTitle === "function") title = H.dayTitle({ summary: title });
+      return { mt: (isT ? "TODAY" : dow) + " · " + t, title: title };
+    }
+    return null;
+  }
+  function paintAway(untilMs) {
+    /* NOCUSTODY (Atlas law): on away days the kid tiles render nothing and no line takes their place (no "back <day>"
+       computed); the grid hides when nothing is left in it. */
+    var grid = document.querySelector(".tile-grid");
+    if (!grid) return;
+    var kids = grid.querySelectorAll(".tile.ainsley,.tile.hayes,.tile.harris,.tile[data-kid-seed='ainsley'],.tile[data-kid-seed='hayes'],.tile[data-kid-seed='harris']");
+    var old = grid.querySelector(".tile.kids-away"); if (old) old.remove();
+    if (!untilMs) {
+      kids.forEach(function (t) { t.removeAttribute("hidden"); t.style.removeProperty("display"); });
+    } else {
+      kids.forEach(function (t) { t.setAttribute("hidden", ""); t.style.setProperty("display", "none", "important"); });
+    }
+    if (!grid.children || !grid.style) return;
+    var shown = Array.prototype.some.call(grid.children, function (c) { return !c.hidden && !(c.style && c.style.display === "none"); });
+    if (shown) { grid.removeAttribute("hidden"); grid.style.removeProperty("display"); }
+    else { grid.setAttribute("hidden", ""); grid.style.setProperty("display", "none", "important"); }
+  }
+
   function load() {
     if (typeof fetch !== "function") return;
+    fetch("data/cal-live.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (c) { if (c) CAL = c; })
+      .catch(function () { /* Dad card falls back to its board line */ })
+      .then(function () { return 0; })
+      .then(function () {
+    (typeof window !== "undefined" && window.AwayFilter && window.AwayFilter.ready ? window.AwayFilter.ready() : Promise.resolve()).then(function () {   /* AWAYONE1 · away state known before the first paint */
     fetch("kids-week.json?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (w) { if (w) paint(w); })
+      .then(function (w) { var law = typeof window !== "undefined" && window.HouseFaceLaw; if (w && law) law.cleanKidsWeek(w); if (w) paint(w); }) /* LIVELAW1 */
       .catch(function () { /* keep static rows */ });
+    });
+      });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", load);
   else load();

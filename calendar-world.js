@@ -154,7 +154,8 @@
     var list = root.querySelector("[data-cw-day]");
     if (!list) return;
     var rows = (global.WardKids && WardKids.eventsForIso && WardKids.eventsForIso(kid(), data(), sel)) || [];
-    if (asleep()) { list.innerHTML = ""; return; } /* AWAYWK1 · resting week: dark windows, no sentence */
+    list.hidden = false;
+    if (asleep()) { list.innerHTML = ""; list.hidden = true; return; }   /* AWAYWK1 · resting week: dark windows, no sentence */
     if (!rows.length) { list.innerHTML = "<li>Nothing on the schedule.</li>"; return; }
     list.innerHTML = "";
     rows.forEach(function (r) {

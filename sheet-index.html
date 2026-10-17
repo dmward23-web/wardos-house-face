@@ -6,10 +6,12 @@
 <script src="private-feed.js?v=FOLLOWUP6"></script>
 <script src="school-names.js?v=SCHOOLNAMES1"></script>
 <script src="house-nomoney.js?v=NOMONEY1"></script>
-<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-face-law.js?v=MERGE1C"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
 <script src="house-money-bind.js?v=PRIVFEED2"></script>
+<script src="house-sound.js?v=MERGE1C"></script>
 <meta name="viewport" id="hf-viewport" content="width=1080" />
+<script src="away-filter.js?v=MERGE1C" data-away-install></script>
 <script>/* HUBFIT1 · phones get their own layout; the wall keeps 1080 */(function(){try{var w=Math.min(screen.width,screen.height);if(w&&w<=600){document.getElementById("hf-viewport").setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon-20260926c.png" />
@@ -3774,6 +3776,7 @@
 </style>
 <!-- HUBFIT2 · must load after every inline <style> so wall-fit + phone rules win -->
 <link rel="stylesheet" href="tokens-hub-fit.css?v=LIGHTSDIM1" />
+<link rel="stylesheet" href="tokens-law8c.css?v=MERGE1C" />
 <style id="atlas1-chip">/* ATLAS2 · one-tap Atlas chat, top-right glass pill */
 .hdr{position:relative;}
 .hdr > .atlas-chip{position:absolute;top:10px;right:10px;z-index:5;display:inline-flex;align-items:center;gap:6px;
@@ -3832,6 +3835,9 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
   .led-ring path { animation: none !important; }
 }
 </style>
+<link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<script src="house-face-law.js?v=MERGE1C"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -4077,6 +4083,10 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 
 <div class="panel">
  <div class="float-orbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+ <!-- WALLBACK1 · opened from the wall's Family chip (?from=wall): one plain way back to the wall -->
+ <a class="wall-back" href="wall.html" data-wall-back hidden aria-label="Back to the wall">Back to wall</a>
+ <style>.wall-back{position:fixed;right:16px;bottom:16px;z-index:2147482000;padding:10px 16px;border-radius:999px;font:700 14px/1.2 Inter,system-ui,sans-serif;color:#fff6dc;background:rgba(20,24,30,.82);border:1px solid rgba(255,255,255,.22);text-decoration:none;backdrop-filter:blur(8px)}.wall-back[hidden]{display:none}</style>
+ <script>(function(){try{var k="wardos-from-wall",q=/[?&]from=wall\b/.test(location.search);if(q)sessionStorage.setItem(k,"1");if(q||sessionStorage.getItem(k)==="1"){var a=document.querySelector("[data-wall-back]");if(a){a.hidden=false;a.addEventListener("click",function(){try{sessionStorage.removeItem(k)}catch(e){}});}}}catch(e){}})();</script>
  <header class="hdr hdr--spread hdr--premium hdr--heat">
  <div class="hdr-date" aria-label="Today · America/Chicago">
  <div class="hdr-date-kicker">CT · LIVE</div>
@@ -4284,7 +4294,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <div class="tile-top">
  <div class="tile-icon g2-mark" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-chores"/></svg></div>
  <div class="tile-titles">
- <div class="tile-label">Chores · MUSTS</div>
+ <div class="tile-label">Chores</div>
  <div class="tile-sub">Musts · tap when done</div>
  </div>
  </div>
@@ -4372,16 +4382,16 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  </footer>
 </div>
 <script src="house-clock.js?v=PRIVFEED3"></script>
-<script src="house-board-strip.js?v=PRIVFEED3"></script>
-<script src="house-weather.js?v=PRIVFEED3"></script>
-<script src="house-sfx.js?v=HUM1"></script>
-<script src="house-tapsync.js?v=HUBPIN1"></script>
-<script src="kids-data.js?v=MERCNODATA1"></script>
-<script src="house-kid-engage.js?v=PRIVFEED3"></script>
-<script src="house-hub-tiles-bind.js?v=ALLDAY1"></script>
+<script src="house-board-strip.js?v=MERGE1C"></script>
+<script src="house-weather.js?v=MERGE1C"></script>
+<script src="house-sfx.js?v=MERGE1C"></script>
+<script src="house-tapsync.js?v=MERGE1C"></script>
+<script src="kids-data.js?v=MERGE1C"></script>
+<script src="house-kid-engage.js?v=MERGE1C"></script>
+<script src="house-hub-tiles-bind.js?v=MERGE1C"></script>
 <script src="house-sensi.js?v=PRIVFEED3"></script>
 <script src="nest-webrtc-client.js?v=FOLLOWUP6"></script>
-<script src="house-nest.js?v=HUBPIN1"></script>
+<script src="house-nest.js?v=MERGE1C"></script>
 <script src="hub-key-entry.js?v=FOLLOWUP6"></script>
 <script src="house-lights.js?v=FOLLOWUP6"></script>
 <script src="house-sensi-ctl.js?v=HUBPIN1"></script>
@@ -4491,7 +4501,7 @@ document.addEventListener("click", function (ev) {
 });
 </script>
 <script src="house-links.js?v=LINKWEB1"></script>
-<script src="house-spotify.js?v=HUBPIN1"></script>
+<script src="house-spotify.js?v=MERGE1C"></script>
 <script>/* SPOTIFY1 */ try { HouseSpotify.mountTiles(document).start(); } catch (e) {}</script>
 <script src="house-ori-calm.js?v=CALM1"></script>
 <script>/* MONTHNOW1 · month tile follows the real date (Chicago) */
@@ -4499,5 +4509,7 @@ document.addEventListener("click", function (ev) {
 var M=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"],N=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 function s(k,v){var e=document.querySelector('[data-mtile="'+k+'"]');if(e)e.textContent=v}
 s("m0",M[m]);s("m1",M[(m+1)%12]);s("w0","Week "+Math.ceil((d+new Date(y,m,1).getDay())/7)+" · this month");s("sub",N[m]+" and "+N[(m+1)%12])}catch(e){}})();</script>
+<script src="night/night-host.js?v=MERGE1C" defer></script>
+<script src="month-theme/month-overlay.js?v=MERGE1C" defer></script>
 </body>
 </html>

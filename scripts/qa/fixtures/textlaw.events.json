@@ -1,0 +1,9 @@
+{"items": [
+ {"id": "t1", "summary": "Kids with Dan", "start": {"date": "2026-11-06"}, "end": {"date": "2026-11-09"}},
+ {"id": "t2", "summary": "Flight to Springfield ✈️ XY 1234", "start": {"dateTime": "2026-11-06T15:30:00-06:00"}, "end": {"dateTime": "2026-11-06T18:00:00-06:00"}},
+ {"id": "t3", "summary": "Owls vs Hawks — game night", "start": {"dateTime": "2026-11-06T19:00:00-06:00"}, "end": {"dateTime": "2026-11-06T22:00:00-06:00"}},
+ {"id": "t4", "summary": "Kids — pickup at their mom's", "start": {"dateTime": "2026-11-09T15:00:00-06:00"}, "end": {"dateTime": "2026-11-09T15:30:00-06:00"}},
+ {"id": "t5", "summary": "Ainsley practice — field 3 → field 5", "start": {"dateTime": "2026-11-07T09:00:00-06:00"}, "end": {"dateTime": "2026-11-07T10:00:00-06:00"}},
+ {"id": "t6", "summary": "Hayes dentist MOVED → Thu 4:00", "start": {"dateTime": "2026-11-12T16:00:00-06:00"}, "end": {"dateTime": "2026-11-12T17:00:00-06:00"}},
+ {"id": "t7", "summary": "Partner + Dan — Park concert (two bands)", "start": {"dateTime": "2026-11-08T16:30:00-06:00"}, "end": {"dateTime": "2026-11-08T22:00:00-06:00"}}
+]}

@@ -5,8 +5,9 @@
 <script src="house-hub.js?v=HUBPIN1"></script>
 <script src="private-feed.js?v=FOLLOWUP6"></script>
 <script src="school-names.js?v=SCHOOLNAMES1"></script>
-<script src="house-face-law.js?v=PRIVFEED3"></script>
+<script src="house-face-law.js?v=MERGE1C"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
+<script src="house-sound.js?v=MERGE1C"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -148,8 +149,12 @@
 .ds-foot{font-size:17px;font-weight:700;color:rgba(232,220,180,.7);padding:6px 10px;border-top:1px solid rgba(255,200,80,.2)}
 </style>
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
+<script src="away-filter.js?v=MERGE1C" data-away-install data-dad-only></script><!-- SHAREDLAW2: Dad-only page, drops the "Dad: " prefix on Dan's trips -->
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
+<link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<script src="house-face-law.js?v=MERGE1C"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
 </head>
 <body data-kid="dan" data-theme="dan">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -411,7 +416,7 @@
  </header>
 
  <main class="ds" data-dad-seat>
- <h1 class="ds-title name"><span class="name-accent">DAD</span><span class="ds-sub">Your page · leave-bys · rides · week</span></h1>
+ <h1 class="ds-title name"><span class="name-accent">DAD</span></h1>
  <section class="ds-next" data-ds-next><div class="ds-kick">Up next</div><div class="ds-big"><span class="ds-time">Today</span></div><div class="ds-what">Reading your calendar</div></section>
  <div class="ds-line" data-ds-line></div>
  <div class="kids-row" aria-label="Jump to kid boards">
@@ -446,10 +451,10 @@
  </footer>
 </div>
 <script src="house-clock.js?v=PRIVFEED3"></script>
-<script src="house-board-strip.js?v=PRIVFEED3"></script>
-<script src="house-tapsync.js?v=HUBPIN1"></script>
-<script src="kids-data.js?v=MERCNODATA1"></script>
-<script src="house-weather.js?v=PRIVFEED3"></script>
+<script src="house-board-strip.js?v=MERGE1C"></script>
+<script src="house-tapsync.js?v=MERGE1C"></script>
+<script src="kids-data.js?v=MERGE1C"></script>
+<script src="house-weather.js?v=MERGE1C"></script>
 <script src="house-sensi.js?v=PRIVFEED3"></script>
 <script>
 (function () {
@@ -534,12 +539,14 @@
 </script>
 
 <script src="vendor/qrcode-generator-2.0.4.js"></script>
-<script src="dad-seat.js?v=AUDIT1"></script>
+<script src="dad-seat.js?v=MERGE1C"></script>
 <script src="house-fresh.js?v=DADSEAT1"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>
 <script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
-<script src="house-ori-world.js?v=ORIHOME18"></script>
+<script src="house-ori-world.js?v=MERGE1C"></script>
+<script src="night/night-host.js?v=MERGE1C" defer></script>
+<script src="month-theme/month-overlay.js?v=MERGE1C" defer></script>
 </body>
 </html>
