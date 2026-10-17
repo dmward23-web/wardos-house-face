@@ -2094,7 +2094,11 @@
   function boot(kidId) {
     loadJSON(function (err, data) {
       if (err || !data) {
-        console.warn("[kids-data]", err);
+        /* MERCNODATA1 · no public kids week anymore: quiet when this screen has no key, info otherwise */
+        var tok = "";
+        try { tok = localStorage.getItem("wardos-private-feed-token") || localStorage.getItem("wardos-lights-proxy-token") || ""; } catch (e) { /* */ }
+        if (tok) console.info("[kids-data]", err && err.message ? err.message : err);
+        try { document.dispatchEvent(new CustomEvent("house:kids-data-missing", { detail: { kidId: kidId } })); } catch (e) { /* */ }
         return;
       }
       global.WardKids._data = data;

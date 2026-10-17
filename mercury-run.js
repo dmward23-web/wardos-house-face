@@ -1076,7 +1076,12 @@
   var capMode = /(?:\?|&)mrcap=1(?:&|$)/.test(location.search);
   if (!capMode) {
     if (window.WardKids && WardKids.boot) {
-      document.addEventListener("house:kids-data-ready", start);
+      /* MERCNODATA1 · unpaired / offline: no kids week, so start the world with an empty week instead of a black canvas */
+      var started = false;
+      var go = function () { if (started) return; started = true; start(); };
+      document.addEventListener("house:kids-data-ready", go);
+      document.addEventListener("house:kids-data-missing", go);
+      setTimeout(go, 4000);
       WardKids.boot(kid);
     } else start();
   }

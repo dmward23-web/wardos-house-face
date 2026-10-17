@@ -138,6 +138,18 @@ test("NOMONEY1 at 1920x1080 (real browser): sheet-allowance and sheet-chores sho
     }
   });
 
+test("MERCNODATA1 (real browser): mercury-run.html paints the world, not a black canvas, when unpaired or offline",
+  { skip: !browser && "QA_NO_BROWSER=1 or python playwright missing" }, () => {
+    for (const [w, h, mode] of [[440, 956, "unpaired"], [1920, 1080, "unpaired"], [440, 956, "offline"]]) {
+      const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/blank_viewport.py"), "mercury-run.html", String(w), String(h), mode], { encoding: "utf8", timeout: 120000 });
+      assert.equal(r.status, 0, r.stderr);
+      const o = JSON.parse(r.stdout.trim().split("\n").pop());
+      assert.ok(o.canvas, `canvas visible @ ${w} ${mode}`);
+      assert.ok(o.lit > 0.3, `mercury-run @ ${w} ${mode} is black: ${JSON.stringify(o)}`);
+      assert.deepEqual(o.errors, [], `page errors @ ${w} ${mode}`);
+    }
+  });
+
 test("NAMESDIR1: private-names.tsv is read from the private data dir, with ~/.config/wardos as the fallback", () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "namesdir-"));
   const home = path.join(tmp, "home"), priv = path.join(tmp, "priv");
