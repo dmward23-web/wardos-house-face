@@ -108,7 +108,10 @@ test("public tree carries no private data files and no embedded copy", () => {
   const kd = fs.readFileSync(path.join(ROOT, "kids-data.js"), "utf8");
   assert.match(kd, /var EMBEDDED = null;/);
   assert.ok(!fs.existsSync(path.join(ROOT, "phone-shots")) || spawnSync("git", ["ls-files", "phone-shots"], { cwd: ROOT, encoding: "utf8" }).stdout.trim() === "");
-  for (const f of fs.readdirSync(ROOT).filter((n) => /\.html$/.test(n))) {
+  /* OAUTHPAGES · the Google consent-screen pages are plain static text: no scripts at all, so no feed and no hub key */
+  const STATIC_PAGES = new Set(["about.html", "privacy.html"]);
+  for (const f of STATIC_PAGES) assert.doesNotMatch(fs.readFileSync(path.join(ROOT, f), "utf8"), /<script|<link|<iframe|@import|url\(/i, f + " stays script-free and self-contained");
+  for (const f of fs.readdirSync(ROOT).filter((n) => /\.html$/.test(n) && !STATIC_PAGES.has(n))) {
     const s = fs.readFileSync(path.join(ROOT, f), "utf8");
     /* HUBPIN1 · house-hub.js (the key allow-list guard) loads first, then private-feed.js before everything else */
     const i = s.indexOf("private-feed.js"), j = s.search(/<script(?![^>]*(private-feed|house-hub))[^>]*>/), h = s.indexOf("house-hub.js");
