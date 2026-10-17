@@ -64,7 +64,7 @@ test("P2 · TEXTLAW1 cleanText: no em dashes, arrows, booking codes, partner or 
     assert.doesNotMatch(out, /[\u2014\u2192]|#\w|Partnerly|Coparentia/, out);
   }
   assert.equal(cleanText("2026-10-17"), "2026-10-17");
-  const wk = cleanWeek({ kids: { ainsley: { today: [{ when: "Fri", what: "SRE Orange Day" }, { when: "Fri", what: "Dress-up day: wear a hat" }, { when: "Fri 3:00", what: "Dance — studio" }] } } });
+  const wk = cleanWeek({ kids: { ainsley: { today: [{ when: "Fri", what: "QXS Orange Day" }, { when: "Fri", what: "Dress-up day: wear a hat" }, { when: "Fri 3:00", what: "Dance — studio" }] } } });
   assert.deepEqual(wk.kids.ainsley.today.map((r) => r.what), ["Dance · studio"]);
 });
 
@@ -78,7 +78,7 @@ test("P2 · LAW8C1 glass law: dress-up and colour days drop, face text has no em
   createRequire(import.meta.url)(path.join(ROOT, "house-face-law.js"));
   const L = globalThis.HouseFaceLaw;
   const cal = L.cleanFeed("cal-live", {
-    upcomingLeaves: [{ summary: "SRE Red Day", start: "2026-10-20" }, { summary: "Pajama day", start: "2026-10-21" }, { summary: "Dentist — 3:00", start: "2026-10-22T15:00:00-05:00" }],
+    upcomingLeaves: [{ summary: "QXS Red Day", start: "2026-10-20" }, { summary: "Pajama day", start: "2026-10-21" }, { summary: "Dentist — 3:00", start: "2026-10-22T15:00:00-05:00" }],
     boardStrip: { queue: [{ what: "Spirit week: wear blue" }, { what: "Swim MOVED → 5:00" }] },
     dan: { week: [{ what: "HD #2209 pickup", theme: "#e8b64a" }] },
   });

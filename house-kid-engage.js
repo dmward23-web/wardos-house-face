@@ -1,11 +1,17 @@
 /* House Face · WHOSUP3 · kid flip · who’s up leave-window · hide scroll chrome · tap/OPEN → board
    WHOSUP2: prep/reminder items (pack · snacks · get/buy …) never own Who's up / Next leave —
    they bridge to the next REAL leave they feed; Who's up names every kid on that leave
-   (Boys / SRE drop·pickup with no kid named → Hayes + Harris). Never invents events.
+   (Boys / school drop·pickup with no kid named → Hayes + Harris). Never invents events.
    LIVE only · WardKids · HUBTOK1 atoms. Bind-once · swipe flips · tap/OPEN navigates · claims safe.
    No leaveby/cam/nest/sensi JSON. */
 (function (global) {
   "use strict";
+  /* SCHOOLNAMES1 · the school code / name never live in git: "§" = role "school" tokens, "¶" = full names, from school-names.js
+     (private runtime source; none known = the school part of the pattern matches nothing). */
+  var SCHRX = function (src, flags) {
+    var S = (typeof globalThis !== "undefined" ? globalThis : window).SchoolNames;
+    return S ? S.rx(src, flags) : new RegExp(String(src).split("§").join("(?!)").split("¶").join("(?!)"), flags || "");
+  };
 
   var KIDS = ["ainsley", "hayes", "harris"];
   var FACES = ["day", "stars", "chores", "leave"];
@@ -29,8 +35,7 @@
 
   function kidsSafe(s) {
     var t = String(s == null ? "" : s);
-    t = t.replace(/\bCUSTODY\b/gi, "WITH DAD");
-    t = t.replace(/\bcustody\b/gi, "Dad week");
+    t = t.replace(/\s*\bcustody\b\s*/gi, " ").replace(/\s{2,}/g, " ").trim(); /* NOCUSTODY1 · the word is removed, nothing put in its place */ /* custody-law:allow */
     return t;
   }
 
@@ -164,16 +169,18 @@
     return { done: done, need: need, complete: need > 0 && done >= need };
   }
 
-  function whoInSummary(summary) {
+  function whoInSummary(summary, kind) {
     var s = String(summary || "");
     var out = [];
     if (/\bAinsley\b/i.test(s)) out.push("ainsley");
     if (/\bHayes\b/i.test(s)) out.push("hayes");
     if (/\bHarris\b/i.test(s)) out.push("harris");
-    /* Boys / shared SRE-style titles → both boys when neither named alone */
+    /* Boys / shared school-run titles → both boys when neither named alone */
     var boys = /\bBoys\b/i.test(s) || /\bboth\s+boys\b/i.test(s);
-    /* SRE (the boys' elementary) drop / pickup with no kid named = the boys' school run */
-    if (!out.length && /\bSRE\b|Sunset\s+Ridge/i.test(s) && /\bdrop\b|drop-?off|pick\s*-?up/i.test(s)) boys = true;
+    /* the boys' school drop / pickup with no kid named = the boys' school run */
+    if (!out.length && SCHRX(String.raw`\b§\b|¶`, "i").test(s) && /\bdrop\b|drop-?off|pick\s*-?up/i.test(s)) boys = true;
+    /* SCHOOLKEY2 · a generator-tagged school run with no kid named is the boys' run, with or without the private names */
+    if (!out.length && /^school_(drop|pickup)$/.test(String(kind || ""))) boys = true;
     if (boys) {
       if (out.indexOf("hayes") < 0) out.push("hayes");
       if (out.indexOf("harris") < 0) out.push("harris");
@@ -327,7 +334,7 @@
         badge: item.badge || "",
         title: shortTitle(item.place || item.summary || item.what || item.title || "Next up"),
         summary: shortTitle(item.summary || item.hint || ""),
-        who: whoInSummary((item.summary || "") + " " + (item.place || "")),
+        who: whoInSummary((item.summary || "") + " " + (item.place || ""), item.kind),
         prep: wantPrep
       };
     }
@@ -335,7 +342,7 @@
     var queue = (d && d.boardStrip && d.boardStrip.queue) || [];
     for (var i = 0; i < queue.length; i++) {
       var it = queue[i];
-      var who = whoInSummary(it.summary || it.place || "");
+      var who = whoInSummary(it.summary || it.place || "", it.kind);
       if (who.indexOf(kidId) >= 0 || (name && new RegExp("\\b" + name + "\\b", "i").test(it.summary || it.place || ""))) {
         consider(it);
       }
@@ -379,7 +386,7 @@
   }
 
   /* WHOSUP2 · a prep item that is live now (e.g. 7:30 "Hayes — pack snacks") lights the
-     REAL leave it feeds (8:10 boys SRE drop) when that leave starts within PREP_BRIDGE_MS. */
+     REAL leave it feeds (8:10 boys school drop) when that leave starts within PREP_BRIDGE_MS. */
   var PREP_BRIDGE_MS = 2 * 60 * 60 * 1000;
   function prepBridges(kidId, leave) {
     if (!leave || !leave.start) return false;
@@ -390,7 +397,7 @@
 
   function soonestWhoUp() {
     /* Only light when someone is IN an active leave window — quiet otherwise.
-       Prep/reminder items never win; shared events (Hayes + Harris SRE) name ALL kids on that leave. */
+       Prep/reminder items never win; shared events (Hayes + Harris school) name ALL kids on that leave. */
     /* WHOSUP3 · UPCOMING beats UNDERWAY: once a leave's time has passed (swim 4:25 in progress)
        and a later leave's window is open (flag 5:40), the upcoming one owns Who's up.
        Upcoming → soonest first. All underway → most recent departure first. */
@@ -462,7 +469,7 @@
       var todayBits = (kid.today || []).filter(function (r) { return shortTitle(r.what || "") !== shortTitle(hot.what || ""); }).slice(0, 2); /* FITDAY1 · no repeat of the loud line */
       html += '<div class="kf-face kf-day">';
       html += '<div class="kf-kicker">' + esc(dayKicker(hot)) + "</div>";
-      html += '<div class="kf-loud">' + esc(hot.when || "Dad week") + "</div>";
+      html += '<div class="kf-loud">' + esc(hot.when || "Today") + "</div>";
       html += '<div class="kf-title">' + esc(shortTitle(hot.what || "On deck")) + "</div>";
       if (todayBits.length) {
         html += '<div class="kf-rows">';

@@ -91,7 +91,7 @@
     border:1px solid rgba(255,255,255,0.2)}
   .cam-live.stub i{width:8px;height:8px;border-radius:50%;background:#8a909a;box-shadow:none;
     animation:none}
-  /* NO fake LIVE — Atlas wires real streams later */
+  /* NO fake LIVE: Atlas wires real streams later */
   .cam-stub{position:absolute;bottom:10px;right:10px;z-index:2;
     font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;
     padding:5px 8px;border-radius:6px;background:rgba(0,0,0,0.65);color:#c8d0dc;border:1px solid rgba(255,255,255,0.18)}
@@ -265,10 +265,10 @@
  <section class="banner cmd-panel cmd-panel--hot" aria-label="Cams mission">
  <div class="cmd-hdr">
  <div class="cmd-title">Google Home · climate + cameras</div>
- <div class="cmd-meta">Elo · Nest SDM</div>
+ <div class="cmd-meta">Elo · Nest</div>
  </div>
  <div class="banner-title">Climate LIVE · Nest · tap for video</div>
- <div class="banner-sub">Sensi live · Nest SDM · tap pad → WebRTC via box proxy · Elo 3202L</div>
+ <div class="banner-sub">Sensi live · Nest · tap a pad for video · Elo 3202L</div>
  </section>
 
 
@@ -283,18 +283,18 @@
  <div class="climate-temps">
  <div class="climate-amb">
  <div class="lab">Indoor</div>
- <div class="big" id="sensi-hero-amb">—<span>°</span></div>
+ <div class="big" id="sensi-hero-amb">--<span>°</span></div>
  </div>
  <div class="climate-set">
  <div class="lab">Set</div>
  <div class="val" id="sensi-hero-set"></div>
  </div>
  <div class="climate-mode" id="sensi-hero-mode">HEAT</div>
- <div class="climate-humid" id="sensi-hero-humid">—% RH</div>
+ <div class="climate-humid" id="sensi-hero-humid">--% RH</div>
  </div>
  <div class="climate-cta">
- <div class="climate-pill cmd-pill cmd-pill--need" id="sensi-hero-pill">NEED TOKEN</div>
- <div class="climate-open">Open Sensi →</div>
+ <div class="climate-pill cmd-pill cmd-pill--need" id="sensi-hero-pill">Needs pairing</div>
+ <div class="climate-open">Open Sensi</div>
  </div>
  </div>
  </a>
@@ -304,13 +304,13 @@
  <div class="zone-title">Cameras · Nest / Google Home</div>
  <div class="zone-meta">5 cams · LIVE · tap for video</div>
  </div>
- <div class="cam-path">Nest SDM <strong>LIVE</strong> · 5 cams · <strong>tap pad → WebRTC video</strong> (<code>nestProxy</code> baked in live JSON) · SDM tokens off Pages · NEST-LIVE.md</div>
+ <div class="cam-path">Cameras offline</div>
  <div class="cam-grid">
  <article class="cam cmd-bezel" aria-label="Living Room camera">
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🛋</span>
- <span class="cam-stub">TAP · WebRTC live</span>
+ <span class="cam-stub">Cameras offline</span>
  </div>
  <div class="cam-meta">
  <div class="cam-name">Living Room</div>
@@ -321,7 +321,7 @@
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🚪</span>
- <span class="cam-stub">TAP · WebRTC live</span>
+ <span class="cam-stub">Cameras offline</span>
  </div>
  <div class="cam-meta">
  <div class="cam-name">Front door doorbell</div>
@@ -332,7 +332,7 @@
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🏠</span>
- <span class="cam-stub">TAP · WebRTC live</span>
+ <span class="cam-stub">Cameras offline</span>
  </div>
  <div class="cam-meta">
  <div class="cam-name">Garage</div>
@@ -343,7 +343,7 @@
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🍳</span>
- <span class="cam-stub">TAP · WebRTC live</span>
+ <span class="cam-stub">Cameras offline</span>
  </div>
  <div class="cam-meta">
  <div class="cam-name">Kitchen</div>
@@ -354,7 +354,7 @@
  <div class="cam-feed">
  <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
  <span class="cam-glyph" aria-hidden="true">🌳</span>
- <span class="cam-stub">TAP · WebRTC live</span>
+ <span class="cam-stub">Cameras offline</span>
  </div>
  <div class="cam-meta">
  <div class="cam-name">Backyard</div>
@@ -377,7 +377,7 @@
  <div class="ctrl-title">Lights</div>
  <div class="ctrl-sub" id="lights-ctrl-sub">Dining · Harris · Kitchen</div>
  </div>
- <div class="climate-pill cmd-pill cmd-pill--need" id="lights-ctrl-pill" style="margin-left:auto;font-size:10px">NEED TOKEN</div>
+ <div class="climate-pill cmd-pill cmd-pill--need" id="lights-ctrl-pill" style="margin-left:auto;font-size:10px">Needs pairing</div>
  </div>
  <div class="ctrl-actions">
  <button type="button" class="cmd-chip cmd-chip--loud" id="lights-all-on">All on</button>
@@ -416,7 +416,7 @@
  </div>
  </section>
 
- <div class="note" id="cam-next-step"><strong>Cams = LIVE · tap for video.</strong> Normal open uses baked <code>nestProxy</code> from <code>data/nest-live.json</code> (NESTVID1 · no ?proxy= seed). Atlas keeps <code>nest-webrtc-proxy</code> + CF tunnel up. If proxy down → honest <strong>NEED PROXY</strong> + stills — never silent black. SDM tokens never on Pages. See <code>NEST-LIVE.md</code>.</div>
+ <div class="note" id="cam-next-step"><strong>Cameras offline.</strong> No video until the camera feed is back.</div>
 
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -464,7 +464,7 @@
     var nestBit = nestGate.live
       ? (nestGate.hasSnaps ? "cams LIVE" : "cams LIVE · no still")
       : (nestGate.needToken ? "Cameras offline" : "cams " + nestGate.label);
-    var lightsBit = lightsGate.live ? "Lights LIVE" : (lightsGate.needToken ? "Lights NEED TOKEN" : "Lights " + lightsGate.label);
+    var lightsBit = lightsGate.live ? "Lights LIVE" : (lightsGate.needToken ? "Lights needs pairing" : "Lights " + lightsGate.label);
     ftr.textContent = sensiBit + " · " + nestBit + " · " + lightsBit;
   }
   if (S) { S.onChange(paint); S.startPolling(); }

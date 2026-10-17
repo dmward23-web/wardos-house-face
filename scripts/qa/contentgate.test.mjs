@@ -111,7 +111,7 @@ test("NOMONEY1: dollar text becomes stars; every kid-money page loads house-nomo
   vm.runInNewContext(rd("house-nomoney.js"), g);
   /* figures are written with ¤ and turned into dollars here, so the privacy scan never sees a money figure in git */
   const t = (s) => g.HouseNoMoney.text(s.replace(/¤/g, () => String.fromCharCode(36)));
-  assert.equal(t("Balance ¤20 · Week ¤7 · Jar ¤3/¤5"), "Stars · payday with Dad");
+  assert.equal(t("Balance ¤20 · Week ¤7 · Jar ¤3/¤5"), "Stars · payday");
   assert.equal(t("¤7 ea wk"), "★ ea wk");
   assert.equal(t("Babysitting ¤12/hr"), "Babysitting ★");
   assert.equal(t("Harris earned ¤4.50 today"), "Harris earned ★ today");

@@ -148,15 +148,15 @@
 
     /* Pack */
     ["sheet-pack.html", "section.cheer", US],
-    ["sheet-pack.html", ".tab", byText([[/Mom week/i, US]], DAN)],
-    ["sheet-pack.html", ".handoff", "sheet-load-day.html"],
+    ["sheet-pack.html", ".tab", byText([[/^\s*Later/i, US]], DAN)],
+    ["sheet-pack.html", ".bagcard", "sheet-load-day.html"],
     ["sheet-pack.html", ".cheer-badge", byText([[/FRI|MON|TUE|WED|THU|SAT|SUN/i, MONTH]], "sheet-win.html")],
 
     /* Load day */
     ["sheet-load-day.html", "section.loadband", MONTH],
     ["sheet-load-day.html", "article.beat", byText([[/House\+Desk/i, DESK]], kid(TODAY))],
     ["sheet-load-day.html", ".kchip", kid(null)],
-    ["sheet-load-day.html", "section.sec[aria-label*='glance' i], .handoff-card, .glance-row", TODAY],
+    ["sheet-load-day.html", "section.sec[aria-label*='glance' i], .bag-card, .glance-row", TODAY],
 
     /* Month chat (plate) */
     ["month-chat.html", ".day, .dow-row", MONTH],

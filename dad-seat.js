@@ -43,7 +43,7 @@
     return t.replace(/([ap])$/i, function (_, ap) { return " " + ap.toUpperCase() + "M"; });
   }
 
-  /* AUDIT1 · same start + same title for different kids → one row ("Hayes + Harris — SRE PE") */
+  /* AUDIT1 · same start + same title for different kids → one row ("Hayes + Harris — school PE") */
   function mergeSame(list) {
     var out = [], by = {};
     list.forEach(function (e) {

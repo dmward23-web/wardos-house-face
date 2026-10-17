@@ -628,3 +628,8 @@ body.theme-ainsley .jump-rail a.row.stub {
   border: 1.5px dashed rgba(160,156,140,0.4) !important;
 }
 
+/* SCHOOLKEY2 · reduced motion: the vinyl spins stop */
+@media (prefers-reduced-motion: reduce) {
+  html body.theme-ainsley .panel.cmd-kid::after,
+  html body.theme-ainsley .vinyl-float { animation: none !important; }
+}

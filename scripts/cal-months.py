@@ -86,11 +86,30 @@ FLIGHT = re.compile(r"✈|\bWN\d|#[A-Z0-9]{6}|DRIVE\b", re.I)
 LOW = re.compile(r"specials|drop-off|pickup|spirit day", re.I)
 HAS_TIME = re.compile(r"\b\d{1,2}:\d{2}")
 
-_OF = [re.escape(n.strip()) for n in _names("otherfamily") if n.strip()]
-_OTHER = re.compile(r"\bHayes (?:" + "|".join(_OF) + r")\b") if _OF else None
+# EXTNAMES1 · private-names.tsv role "external" names people outside the household (never in git). A kid's first name
+# followed by one of them is not our kid. ONLY "external" is filtered, plus the old key "otherfamily" during the
+# transition (a later commit drops it). partner, coparent, household, school and every other role are never filtered.
+# An unknown role gets one count-only warning and stays unfiltered. No external rows at all (and none under the old key)
+# = a config error: one count-only warning.
+def _all_roles():
+    fp = names_path()
+    if not os.path.exists(fp): return {}
+    out = {}
+    for l in open(fp, encoding="utf-8"):
+        if "\t" in l and not l.startswith("#"):
+            r, n = l.rstrip("\n").split("\t", 1)
+            if n.strip(): out.setdefault(r.strip().lower(), []).append(n.strip())
+    return out
+_ROLES = _all_roles()
+_EXT_ROLES = ("external", "otherfamily")
+_KNOWN_ROLES = set(_EXT_ROLES) | {"partner", "coparent", "household", "school"}
+_EXT = [re.escape(n) for r in _EXT_ROLES for n in _ROLES.get(r, [])]
+_UNKNOWN = sum(1 for r in _ROLES if r not in _KNOWN_ROLES)
+if _UNKNOWN: sys.stderr.write(f"WARN private-names: {_UNKNOWN} unknown role(s), not filtered\n")
+if not _EXT: sys.stderr.write("WARN private-names: role external has 0 entries (config error)\n")
+_EXT_KID = re.compile(r"\b(?:Ainsley|Hayes|Harris)\s+(?:" + "|".join(_EXT) + r")\b", re.I) if _EXT else None
 def kid(summ):
-    # another family's kids / the other Hayes: surnames come from private-names.tsv role "otherfamily" (never in git)
-    s = re.sub(_OTHER, "", summ) if _OTHER else summ
+    s = _EXT_KID.sub("", summ) if _EXT_KID else summ
     s = re.sub(r"\b(?!Ward\b)[A-Z][a-z]+ Kids\b", "", s)
     names = [k for k, rx in (("ain", r"\bAinsley\b"), ("hay", r"\bHayes\b"), ("har", r"\bHarris\b")) if re.search(rx, s)]
     if len(names) > 1 or re.match(r"^(Kids|Ward Kids)\b", s): return "shr"

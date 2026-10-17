@@ -125,7 +125,7 @@
     data = data || (_liveCache && _liveCache.data) || null;
     if (!data) return { kind: "stub", label: "Thermostat offline", live: false };
     if (data.status === "need_token") {
-      return { kind: "need_token", label: "NEED TOKEN", live: false, error: data.error || null };
+      return { kind: "need_token", label: "Needs pairing", live: false, error: data.error || null };
     }
     if (data.status === "error") {
       return { kind: "error", label: "FETCH ERR", live: false, error: data.error || null };
@@ -221,7 +221,7 @@
           status: "need_token",
           updatedAt: null,
           thermostat: null,
-          error: "data/sensi-live.json unavailable"
+          error: "Offline"
         });
       }
       if (cb) cb(err || new Error("live fetch fail"), liveStatus(), null);
@@ -260,10 +260,10 @@
     }
   }
 
-  /* SENSIAUTO1 · Auto runs a range (heat–cool), not one number. Not live → no invented temp. */
+  /* SENSIAUTO1 · Auto runs a range (heat to cool), not one number. Not live → no invented temp. */
   function setLabel(st) {
     if (st.source !== "live") return "";
-    if (st.mode === "Auto" && st.heatSetpoint != null && st.coolSetpoint != null) return st.heatSetpoint + "–" + st.coolSetpoint + "°";
+    if (st.mode === "Auto" && st.heatSetpoint != null && st.coolSetpoint != null) return st.heatSetpoint + " to " + st.coolSetpoint + "°";
     return st.setpoint + "°";
   }
   function ambLabel(st) { return st.source === "live" ? st.ambient : ""; } /* PRIVFEED3 · no dash placeholder: no reading, no number */
@@ -349,7 +349,7 @@
       ambLab.textContent = st.gate.live ? "Indoor live" : "Indoor · not live";
     }
     if (sub) {
-      var src = st.gate.live ? "LIVE" : (st.gate.kind === "need_token" ? "NEED TOKEN" : (st.gate.kind === "error" || st.gate.kind === "stale" ? "OFF" : "LOCAL"));
+      var src = st.gate.live ? "LIVE" : (st.gate.kind === "need_token" ? "Needs pairing" : (st.gate.kind === "error" || st.gate.kind === "stale" ? "OFF" : "LOCAL"));
       sub.textContent = src + " · " + st.mode + " · fan " + st.fan + " · not Nest";
     }
   }

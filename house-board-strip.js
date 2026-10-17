@@ -3,10 +3,16 @@
    Authority: data/cal-live.json (dmward23 → cal-from-events.mjs).
    Panel paints today's remaining + tomorrow peek (dense list, hub-scale type).
    Never paint a past boardStrip.time/place. Never silent day-lagged kids-week.
-   Glass law: never CUSTODY — WITH DAD / Dad week.
+   Glass law NOCUSTODY1 (scripts/qa/nocustody.test.mjs).
    CAL_FRESH_MS = 6 hours — past that, or asOfIso ≠ clock day → fail-closed CAL STALE. */
 (function (global) {
   "use strict";
+  /* SCHOOLNAMES1 · the school code / name never live in git: "§" = role "school" tokens, "¶" = full names, from school-names.js
+     (private runtime source; none known = the school part of the pattern matches nothing). */
+  var SCHRX = function (src, flags) {
+    var S = (typeof globalThis !== "undefined" ? globalThis : window).SchoolNames;
+    return S ? S.rx(src, flags) : new RegExp(String(src).split("§").join("(?!)").split("¶").join("(?!)"), flags || "");
+  };
 
   var CAL_FRESH_MS = 6 * 60 * 60 * 1000;
   var MAX_TODAY = 12;
@@ -16,7 +22,7 @@
   function isKidActivity(ev) {
     var s = String((ev && (ev.summary || ev.place || "")) || "");
     if (/\b(Ainsley|Hayes|Harris|Boys)\b/i.test(s)) return true;
-    if (/\b(swim|flag|baseball|SRE|LKMS|school|conferences?|practice|game|PE|special|hearing|vision|field\s*trip|homework|collab|screening)\b/i.test(s)) return true;
+    if (SCHRX(String.raw`\b(swim|flag|baseball|§|LKMS|school|conferences?|practice|game|PE|special|hearing|vision|field\s*trip|homework|collab|screening)\b`, "i").test(s)) return true;
     return false;
   }
 
@@ -26,7 +32,7 @@
     if (/^Free\b/i.test(s)) return true;
     if (/\b(Amazon|Hank|HD #\d+|lever return|vanity|scooter)\b/i.test(s)) return true;
     if (/^Dan\b/i.test(s) && !/\b(Hayes|Harris|Ainsley|Boys)\b/i.test(s)) return true;
-    if (/^Leave\s*·/i.test(s) && !/\b(Hayes|Harris|Ainsley|Boys|SRE|swim|flag|baseball)\b/i.test(s)) return true;
+    if (/^Leave\s*·/i.test(s) && !SCHRX(String.raw`\b(Hayes|Harris|Ainsley|Boys|§|swim|flag|baseball)\b`, "i").test(s)) return true;
     return false;
   }
 
@@ -56,11 +62,10 @@
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
-  /** Kids-safe: never surface CUSTODY on glass. */
+  /** Kids-safe glass law NOCUSTODY1. */
   function kidsSafe(s) {
     var t = String(s == null ? "" : s);
-    t = t.replace(/\bCUSTODY\b/gi, "WITH DAD");
-    t = t.replace(/\bcustody\b/gi, "Dad week");
+    t = t.replace(/\s*\bcustody\b\s*/gi, " ").replace(/\s{2,}/g, " ").trim(); /* NOCUSTODY1 · the word is removed, nothing put in its place */ /* custody-law:allow */
     return t;
   }
 

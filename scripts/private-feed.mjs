@@ -12,6 +12,7 @@
  *   GET /api/private/kids-week.json         -> private kids-week
  *   GET /api/private/{lights,sensi,nest}-live.json -> private house device state (PRIVFEED2)
  *   GET /api/private/nest/<cam>.jpg         -> front-door | garage | backyard still
+ *   GET /api/private/private-names.json     -> {"school":[...]} only (SCHOOLNAMES1 · school-names.js; no other role ever)
  *
  * The house ORIGIN alone never unlocks these routes (anyone who opens the public site has that Origin).
  * Mounted by scripts/lights-write-proxy.mjs (handlePrivate) or run standalone:
@@ -23,13 +24,13 @@ import path from "node:path";
 import http from "node:http";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
-import { PRIVATE_DIR } from "./private-dir.mjs";
+import { PRIVATE_DIR, privateNamesPath } from "./private-dir.mjs";
 
 export const FEEDS = { "cal-live": "cal-live.json", "cal-months": "cal-months.json", "kids-week": "kids-week.json",
   /* PRIVFEED2 · house device state (lights, thermostat, cameras) is private too */
   "lights-live": "lights-live.json", "sensi-live": "sensi-live.json", "nest-live": "nest-live.json" };
 export const CAMS = new Set(["front-door", "garage", "backyard"]);
-const ROUTE = /^\/api\/private\/(?:(health)|(cal-live|cal-months|kids-week|lights-live|sensi-live|nest-live)\.json|nest\/([a-z-]+)\.jpg)$/;
+const ROUTE = /^\/api\/private\/(?:(health)|(cal-live|cal-months|kids-week|lights-live|sensi-live|nest-live)\.json|nest\/([a-z-]+)\.jpg|(private-names)\.json)$/;
 
 function tokenEq(a, b) {
   const x = Buffer.from(String(a || "")), y = Buffer.from(String(b || ""));
@@ -107,6 +108,22 @@ export function handlePrivate(req, res, opts) {
       try { const st = fs.statSync(path.join(dir, "nest-snaps", c + ".jpg")); files["nest/" + c] = { at: st.mtime.toISOString(), bytes: st.size }; } catch { files["nest/" + c] = null; }
     }
     send(200, JSON.stringify({ ok: true, files }));
+    return true;
+  }
+  if (m[4]) {
+    /* SCHOOLNAMES1 · role "school" rows only (same token rule as school-names.js / LHRules); partner, co-parent and
+       other-family names never leave the box. Missing file = empty list. */
+    const fpN = dir === PRIVATE_DIR ? privateNamesPath() : path.join(dir, "private-names.tsv");
+    const school = [];
+    try {
+      for (const ln of fs.readFileSync(fpN, "utf8").split("\n")) {
+        if (!ln.trim() || ln.startsWith("#") || !ln.includes("\t")) continue;
+        const i = ln.indexOf("\t");
+        const role = ln.slice(0, i).trim().toLowerCase(), name = ln.slice(i + 1).trim().replace(/\s+/g, " ");
+        if (role === "school" && (/^[A-Za-z]{2,8}$/.test(name) || /^[A-Za-z]{2,}(?: [A-Za-z]{2,}){1,3}$/.test(name))) school.push(name);
+      }
+    } catch { /* no names file = no school names */ }
+    send(200, JSON.stringify({ school }));
     return true;
   }
   let fp, type;

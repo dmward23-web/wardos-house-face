@@ -1,6 +1,12 @@
 /* House face · kids shared data + bank · kids-safe · localStorage only */
 (function (global) {
   "use strict";
+  /* SCHOOLNAMES1 · the school code / name never live in git: "§" = role "school" tokens, "¶" = full names, from school-names.js
+     (private runtime source; none known = the school part of the pattern matches nothing). */
+  var SCHRX = function (src, flags) {
+    var S = (typeof globalThis !== "undefined" ? globalThis : window).SchoolNames;
+    return S ? S.rx(src, flags) : new RegExp(String(src).split("§").join("(?!)").split("¶").join("(?!)"), flags || "");
+  };
 
   var DAY_ISO = (function () {
     try {
@@ -35,7 +41,7 @@
 
   function pad2(n) { return String(n).padStart(2, "0"); }
 
-  /** Chicago hour 0–23 (for Fri 3:00p homeWeek handoff). */
+  /** Chicago hour 0 to 23 (for the chore week change). */
   function chicagoHourNow() {
     try {
       var parts = new Intl.DateTimeFormat("en-US", {
@@ -51,10 +57,8 @@
   }
 
   /**
-   * homeWeek chore week = Fri 3:00p → next Fri 3:00p.
-   * Day taps: Sat Sun Mon Tue Wed Thu Fri (7) — LEAVE Friday morning still counts.
-   * Arrival Friday after 3:00p starts the week; leave Friday before 3:00p ends it.
-   * No chore-free leave Friday.
+   * Chore week: seven tap days from one week change to the next.
+   * The last day still counts, so no day in the week is chore-free.
    */
   function weekStartIso(dayIso) {
     var iso = dayIso || DAY_ISO;
@@ -65,12 +69,12 @@
     var dow = d.getDay(); /* 0=Sun … 5=Fri */
     var sinceFri = (dow - 5 + 7) % 7; /* Fri=0 … Thu=6 */
     d.setDate(d.getDate() - sinceFri);
-    /* Friday = leave-morning of prior Dad week unless TODAY after 3:00p (new week starts). */
+    /* On the week-change day, today counts in the prior week until the change hour. */
     if (sinceFri === 0) {
       if (iso === DAY_ISO) {
         if (chicagoHourNow() < 15) d.setDate(d.getDate() - 7);
       } else {
-        /* Historical Friday date = leave-morning tap (Sat→Fri), not arrival after 3p */
+        /* A past week-change day counts in the prior week. */
         d.setDate(d.getDate() - 7);
       }
     }
@@ -120,13 +124,13 @@
     return CHECK_PREFIX + kidId + ":" + iso;
   }
 
-  /** Sat–Fri inclusive = 7 Dad-week tap days (Sat Sun Mon Tue Wed Thu Fri leave-morning). */
+  /** Seven tap days per chore week. */
   var DAD_WEEK_DAYS = 7;
 
   function weekDayIsos(anchorIso) {
     var start = weekStartIso(anchorIso || DAY_ISO);
     var parts = String(start).split("-");
-    /* First tap day = Saturday after Fri 3:00p arrival (start+1). Last = leave Friday. */
+    /* First tap day = the day after the week change (start+1). */
     var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
     d.setDate(d.getDate() + 1);
     var out = [];
@@ -231,7 +235,7 @@
   }
 
   /**
-   * MUSTGATE1 · jar/allowance unlocks only when EVERY must is done for the Dad week
+   * MUSTGATE1 · jar/allowance unlocks only when EVERY must is done for the week
    * (daily = all Sat→Fri taps; weekly = one tap). One chore done for the week does NOT credit $.
    * Credits all must stars onto first Sat tap day when gate opens; scrubs when gate closes.
    */
@@ -288,7 +292,7 @@
     var root = loadBankRoot();
     var bag = root[kidId];
     if (!bag || !bag.days) return 0;
-    /* Sum Sat→leave-Fri tap days only (matches syncDailyWeekBank credit bucket). */
+    /* Sum this chore week's tap days only (matches syncDailyWeekBank credit bucket). */
     var days = weekDayIsos(DAY_ISO);
     var sum = 0;
     for (var i = 0; i < days.length; i++) {
@@ -912,7 +916,7 @@
   function buildNoSurprise(kid, data) {
     var bits = [];
     var cust = data && data.homeWeek;
-    if (cust) bits.push({ kind: "house", when: "Now", what: ((cust.with === "away" || cust.with === "Mom") ? "Kids away" : "With " + (cust.with || "Dad") + (cust.place ? " @ " + cust.place : "")) /* AWAY1 */, hint: cust.throughLabel || cust.through || "", tone: "hot" });
+    /* NOCUSTODY1 · no "who has the kids" row on glass */
     if (kid && kid.hottest) bits.push({ kind: "next", when: kid.hottest.when || "Next", what: kid.hottest.what || "Next up", hint: kid.hottest.where || "", tone: "hot" });
     (kid && kid.today || []).slice(0, 2).forEach(function (t) {
       bits.push({ kind: "today", when: t.when || "Today", what: t.what || "", hint: t.hint || "next 24h", tone: t.tone || "act" });
@@ -1049,7 +1053,7 @@
     root.querySelectorAll("[data-payday-copy]").forEach(function (el) {
       el.textContent = (bank.kidId === "ainsley")
         ? "Friday drop · payday after honest musts"
-        : "Payday with Dad after honest musts";
+        : "Payday after honest musts";
     });
     root.querySelectorAll("[data-bank-goal-blurb]").forEach(function (el) {
       // already set above from goalBlurb — ensure cash blurbs stick
@@ -1270,7 +1274,7 @@
     } else if (bag) {
       bag.hidden = false;
       var lab2 = bag.querySelector("[data-bag-label]");
-      if (lab2) lab2.textContent = "Bag for Dad week";
+      if (lab2) lab2.textContent = "Bag list";
     }
     var her = document.querySelector("[data-mount-her-space]");
     if (her) {
@@ -1300,30 +1304,30 @@
   /* CONSUME1 · schedule consume layout (week strip · NEXT UP · HQ · routine · ahead) */
   var CONSUME_DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   var CONSUME_META = {
-    hayes: { world: "Victory world", loadout: "Victory loadout", markSym: "g2-hayes", hqTitle: "DROP ZONE HQ with Dad", hqSym: "g2-home" },
-    harris: { world: "Gem world", loadout: "Gem loadout", markSym: "g2-harris", hqTitle: "YOUR BASE with Dad", hqSym: "g2-home" },
-    ainsley: { world: "Ainsley", loadout: "Musts", markSym: "g2-ainsley", hqTitle: "Home base · with Dad", hqSym: "g2-home" }
+    hayes: { world: "Victory world", loadout: "Victory loadout", markSym: "g2-hayes", hqTitle: "DROP ZONE HQ", hqSym: "g2-home" },
+    harris: { world: "Gem world", loadout: "Gem loadout", markSym: "g2-harris", hqTitle: "YOUR BASE", hqSym: "g2-home" },
+    ainsley: { world: "Ainsley", loadout: "Musts", markSym: "g2-ainsley", hqTitle: "Home base", hqSym: "g2-home" }
   };
 
-  /* SPECIALS-COLOR1 2026-10-15 (Dan: "fix the schedule"). SRE specials follow the
+  /* SPECIALS-COLOR1 2026-10-15 (Dan: "fix the schedule"). school specials follow the
      4-day COLOR rotation (Orange → Yellow → Green → Red, school days only), NOT the weekday.
      Sourced: Allen letters 9/25, 10/4, 10/9 + Lind letters 9/25, 10/12, matched to the
-     SRE "News from the Ridge" color days (10/12 Orange … 10/15 Red). Library checkout is a
-     fixed WEEKDAY: Hayes Wed, Harris Thu. Color comes only from an "SRE <Color> Day" row in
+     school newsletter color days (10/12 Orange … 10/15 Red). Library checkout is a
+     fixed WEEKDAY: Hayes Wed, Harris Thu. Color comes only from a "<school> <Color> Day" row in
      the feed — no color row, no special (never guessed from the weekday). Live calendar
      specials always win over this table. */
-  var SRE_SPECIALS = {
-    hayes: { source: "Ms. Allen letters · SRE color day", Orange: "Music", Yellow: "PE · tennis shoes", Green: "Art", Red: "Spanish", libraryDow: "Wed" },
-    harris: { source: "Ms. Lind letters · SRE color day", Orange: "PE · tennis shoes", Yellow: "Art", Green: "Spanish", Red: "Music", libraryDow: "Thu" }
+  var SCHOOL_SPECIALS = {
+    hayes: { source: "Ms. Allen letters · school color day", Orange: "Music", Yellow: "PE · tennis shoes", Green: "Art", Red: "Spanish", libraryDow: "Wed" },
+    harris: { source: "Ms. Lind letters · school color day", Orange: "PE · tennis shoes", Yellow: "Art", Green: "Spanish", Red: "Music", libraryDow: "Thu" }
   };
 
-  function sreColorForIso(rows, iso) {
+  function schoolColorForIso(rows, iso) {
     if (!rows || !iso) return null;
     var dow = CONSUME_DOW[dowIndexFromIso(iso)];
     var dn = String(Number(String(iso).split("-")[2]));
     for (var i = 0; i < rows.length; i++) {
       var r = rows[i] || {};
-      var m = /SRE (Orange|Yellow|Green|Red) Day/i.exec(String(r.what || ""));
+      var m = SCHRX(String.raw`§ (Orange|Yellow|Green|Red) Day`, "i").exec(String(r.what || ""));
       if (!m) continue;
       var w = String(r.when || "");
       var hit = new RegExp("^" + dow + "\\s+" + dn + "\\b").test(w) || (iso === DAY_ISO && new RegExp("^(" + dow + "|Today)\\s*·").test(w));
@@ -1333,10 +1337,10 @@
   }
 
   function specialForIso(kidId, iso, rows) {
-    var map = SRE_SPECIALS[kidId];
+    var map = SCHOOL_SPECIALS[kidId];
     if (!map || !iso) return null;
     var dow = CONSUME_DOW[dowIndexFromIso(iso)];
-    var color = sreColorForIso(rows, iso);
+    var color = schoolColorForIso(rows, iso);
     if (!dow || !color || !map[color]) return null;
     var what = map[color] + (map.libraryDow === dow ? " + Library checkout (library book)" : "");
     return {
@@ -1350,8 +1354,7 @@
 
   function kidsSafeGlass(s) {
     var t = String(s == null ? "" : s);
-    t = t.replace(/\bCUSTODY\b/gi, "WITH DAD");
-    t = t.replace(/\bcustody\b/gi, "Dad week");
+    t = t.replace(/\s*\bcustody\b\s*/gi, " ").replace(/\s{2,}/g, " ").trim(); /* NOCUSTODY1 · the word is removed, nothing put in its place */ /* custody-law:allow */
     return t;
   }
 
@@ -1373,16 +1376,18 @@
   }
 
   function consumeIsRoutine(item) {
+    /* SCHOOLKEY2 · rows the generator tagged as the school run count as school with or without the private names */
+    if (item && /^school_(drop|pickup)$/.test(String(item.kind || ""))) return true;
     var what = String((item && item.what) || "");
     var when = String((item && item.when) || "");
     var blob = what + " " + when;
     if (/Hearing\s*\/?\s*Vision|field\s*trip|PE\b|collab|Homework Help|yearbook|appointment|swim|flag|baseball|game|practice/i.test(what)) {
-      if (!/SRE\s*(drop|pickup|drop-off)/i.test(what)) return false;
+      if (!SCHRX(String.raw`§\s*(drop|pickup|drop-off)`, "i").test(what)) return false;
     }
-    if (/SRE\s*(drop-?off|drop|pickup)/i.test(what)) return true;
-    if (/^(Boys\s+)?SRE\s+(drop|pickup)/i.test(what)) return true;
-    if (/\bdrop-?off\b/i.test(what) && /SRE|Boys/i.test(blob)) return true;
-    if (/\bpickup\b/i.test(what) && /SRE|Boys/i.test(blob)) return true;
+    if (SCHRX(String.raw`§\s*(drop-?off|drop|pickup)`, "i").test(what)) return true;
+    if (SCHRX(String.raw`^(Boys\s+)?§\s+(drop|pickup)`, "i").test(what)) return true;
+    if (/\bdrop-?off\b/i.test(what) && SCHRX(String.raw`§|Boys`, "i").test(blob)) return true;
+    if (/\bpickup\b/i.test(what) && SCHRX(String.raw`§|Boys`, "i").test(blob)) return true;
     return false;
   }
 
@@ -1390,7 +1395,7 @@
     if (!item) return false;
     if (item.kind === "note") return true;
     var what = String(item.what || "");
-    return /DROP ZONE HQ|YOUR BASE|Base @|with Dad|Dad week|at home/i.test(what) && /All day|home|HQ|BASE|Dad/i.test((item.when || "") + " " + what);
+    return /DROP ZONE HQ|YOUR BASE|Base @|with Dad|Dad week|base at home\b/i.test(what) && /All day|home|HQ|BASE|Dad/i.test((item.when || "") + " " + what); /* custody-law:allow (matcher that hides these rows) */
   }
 
   function consumeParseWhen(when) {
@@ -1467,7 +1472,7 @@
     var kidId = kid && kid.id;
     /* LIVESPEC1 · live calendar specials win; the hardcoded table is only a fallback when the feed has none */
     var liveSpecial = list.some(function (x) { return /special/i.test(String(x.what || "") + " " + String(x.when || "") + " " + String(x.hint || "")); });
-    if (kidId && SRE_SPECIALS[kidId] && !liveSpecial) {
+    if (kidId && SCHOOL_SPECIALS[kidId] && !liveSpecial) {
       var weekStart = mondayOfIso(DAY_ISO);
       for (var si = 0; si < 7; si++) {
         var iso = addDaysIsoLocal(weekStart, si);
@@ -1500,7 +1505,7 @@
     if (/\bpe\b|tennis/.test(w)) return { html: "", text: "👟" };
     if (/collab|madi|provider/.test(w)) return { html: "", text: "👥" };
     if (/doctor|clinic|therap|appt/.test(w)) return { html: "", text: "🩺" };
-    if (/homework|yearbook|school|lkms|sre/.test(w)) return { html: "", text: "📚" };
+    if (SCHRX(String.raw`homework|yearbook|school|lkms|§`, "i").test(w)) return { html: "", text: "📚" };
     return { html: '<span class="g2-lead">' + g2Ico("g2-next") + "</span>", text: "" };
   }
 
@@ -1524,11 +1529,13 @@
       var item = q[i];
       var blob = ((item.summary || "") + " " + (item.place || "")).toLowerCase();
       var mine = false;
-      if (kidId === "hayes") mine = /hayes/.test(blob) || (/boys|sre/.test(blob) && !/ainsley|harris flag|harris —/.test(blob));
-      else if (kidId === "harris") mine = /harris/.test(blob) || (/boys|sre/.test(blob) && !/ainsley|hayes baseball|hayes flag|hayes —|madi/.test(blob));
+      if (kidId === "hayes") mine = /hayes/.test(blob) || (SCHRX(String.raw`boys|§`, "i").test(blob) && !/ainsley|harris flag|harris —/.test(blob));
+      else if (kidId === "harris") mine = /harris/.test(blob) || (SCHRX(String.raw`boys|§`, "i").test(blob) && !/ainsley|hayes baseball|hayes flag|hayes —|madi/.test(blob));
       else if (kidId === "ainsley") mine = /ainsley/.test(blob);
-      /* shared boys SRE counts for both */
-      if ((kidId === "hayes" || kidId === "harris") && /hayes \+ harris|boys sre|sre (drop|pickup|hearing)/i.test(blob)) mine = true;
+      /* shared boys school counts for both */
+      if ((kidId === "hayes" || kidId === "harris") && SCHRX(String.raw`hayes \+ harris|boys §|§ (drop|pickup|hearing)`, "i").test(blob)) mine = true;
+      /* SCHOOLKEY2 · a generator-tagged school run is the boys' (or the named boy's) with or without the private names */
+      if ((kidId === "hayes" || kidId === "harris") && /^school_(drop|pickup)$/.test(String(item.kind || "")) && (blob.indexOf(kidId) >= 0 || !/\bhayes\b|\bharris\b/.test(blob))) mine = true;
       if (kidId === "hayes" && /madi|provider collab/i.test(blob)) mine = true;
       if (!mine && kidId === "ainsley" && /appointment/i.test(blob)) mine = true;
       if (!mine) continue;
@@ -1549,7 +1556,7 @@
       var start = Date.parse(it.startIso || "") || 0;
       if (end && end < now) continue;
       if (!end && start && start + 90 * 60 * 1000 < now) continue;
-      if (consumeIsRoutine({ what: it.place || it.summary || "" }) && queue.length > 1) {
+      if (consumeIsRoutine({ what: it.place || it.summary || "", kind: it.kind }) && queue.length > 1) {
         /* Prefer unique over routine when another future unique exists */
         var hasUniqueLater = false;
         for (var j = i; j < queue.length; j++) {
@@ -1558,7 +1565,7 @@
           var je = Date.parse(jt.endIso || "") || 0;
           if (je && je < now) continue;
           if (!je && js && js + 90 * 60 * 1000 < now) continue;
-          if (!consumeIsRoutine({ what: jt.place || jt.summary || "" })) { hasUniqueLater = true; break; }
+          if (!consumeIsRoutine({ what: jt.place || jt.summary || "", kind: jt.kind })) { hasUniqueLater = true; break; }
         }
         if (hasUniqueLater && start && start > now + 45 * 60 * 1000) continue;
       }
@@ -1646,7 +1653,7 @@
     var t = String(through || "");
     var m = t.match(/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i);
     if (m) return "THRU " + m[1].toUpperCase().slice(0, 3);
-    return "DAD WEEK";
+    return "THIS WEEK";
   }
 
   /* DAYPICK1 · plain list of one day's items for the My Week drawer */
@@ -1755,7 +1762,7 @@
     if (nextMount) {
       if (!next) {
         nextMount.className = "consume-hero empty";
-        nextMount.innerHTML = '<div class="consume-hero-inner"><div class="consume-hero-title">Nothing timed next</div><div class="consume-hero-meta">Quests + Dad week still on</div></div>';
+        nextMount.innerHTML = '<div class="consume-hero-inner"><div class="consume-hero-title">Nothing timed next</div><div class="consume-hero-meta">Quests still on</div></div>';
       } else {
         var cd = consumeCountdown(next);
         var title = consumeStripKidName(next.title, kid);
@@ -1785,7 +1792,7 @@
     var punch = root.querySelector("[data-mount-consume-punch]");
     if (punch) {
       var hw = data.homeWeek || {};
-      var through = kidsSafeGlass(hw.through || hw.throughLabel || "Dad week");
+      var through = kidsSafeGlass(hw.through || hw.throughLabel || "this week");
       var place = hw.place ? (" @ " + hw.place) : "";
       var sub = "Multi-day · " + through + (hw.with ? "" : "");
       if (hw.with && hw.place) sub = "Multi-day · through " + through;
@@ -1804,8 +1811,10 @@
     var routine = root.querySelector("[data-mount-consume-routine]");
     if (routine) {
       var lb = data.leaveBys || {};
-      var drop = String(lb.SRE_drop || "leave 8:10 for 8:25");
-      var pick = String(lb.SRE_pickup || "leave 3:15 for 3:40");
+      /* SCHOOLNAMES1 + SCHOOLKEY2 · leave-by keys end in "_drop" / "_pickup" (generator default school_drop / school_pickup); read them by suffix */
+      var lbPick = function (suf) { for (var k in lb) if (Object.prototype.hasOwnProperty.call(lb, k) && /^[A-Za-z]{2,8}_/.test(k) && k.slice(-suf.length - 1) === "_" + suf) return lb[k]; return ""; };
+      var drop = String(lbPick("drop") || "leave 8:10 for 8:25");
+      var pick = String(lbPick("pickup") || "leave 3:15 for 3:40");
       var dropT = (drop.match(/(\d{1,2}:\d{2})/) || [])[1] || "8:10";
       var pickT = (pick.match(/(\d{1,2}:\d{2})/) || [])[1] || "3:15";
       if (kidId === "ainsley") {
@@ -1824,13 +1833,13 @@
           routine.innerHTML = "";
         }
       } else {
-        var hasSre = all.some(consumeIsRoutine);
-        if (hasSre) {
+        var hasSchoolRun = all.some(consumeIsRoutine);
+        if (hasSchoolRun) {
           routine.hidden = false;
           routine.innerHTML =
             '<span class="consume-routine-ico g2-inline">' + g2Ico("g2-routine") + "</span>" +
-            '<div class="consume-routine-txt"><b>SRE</b> · drop ' + esc(dropT) + " · pickup " + esc(pickT) + "</div>" +
-            '<span class="consume-routine-badge">Tue–Fri</span>';
+            '<div class="consume-routine-txt"><b>' + esc(((typeof globalThis !== "undefined" ? globalThis : window).SchoolNames || { label: function () { return "School"; } }).label("School")) + '</b> · drop ' + esc(dropT) + " · pickup " + esc(pickT) + "</div>" +
+            '<span class="consume-routine-badge">Tue-Fri</span>';
         } else {
           routine.hidden = true;
           routine.innerHTML = "";
@@ -1916,7 +1925,7 @@
   }
 
   function renderKidPage(kidId, data) {
-    var kid = data.kids[kidId];
+    var kid = data && data.kids && data.kids[kidId]; /* EMPTYFEED1 · a {} feed keeps the normal board */
     if (!kid) return;
     syncBankFromChecks(data);
     var bank = getBankView(kidId, data);
@@ -1989,7 +1998,7 @@
       var unlock = document.querySelector("[data-goal-unlock]");
       if (unlock) {
         unlock.hidden = false;
-        unlock.textContent = "JAR FULL · Payday with Dad";
+        unlock.textContent = "JAR FULL · Payday";
       }
       if (!prevReached) {
         try {
@@ -2068,7 +2077,7 @@
       if (!o.href) {
         var w = ((o.what || "") + " " + (o.when || "")).toLowerCase();
         if (/must|chore/.test(w)) o.href = "sheet-chores.html";
-        else if (/sre drop|sre pickup|leave|swim|flag|baseball|pack/.test(w)) o.href = "sheet-countdowns.html";
+        else if (SCHRX(String.raw`§ drop|§ pickup|leave|swim|flag|baseball|pack`, "i").test(w)) o.href = "sheet-countdowns.html";
         else o.href = "sheet-today.html";
       }
       return o;
@@ -2076,7 +2085,7 @@
   }
 
   function renderDanPage(data) {
-    var dan = data.kids.dan;
+    var dan = data && data.kids && data.kids.dan; /* EMPTYFEED1 */
     if (!dan) return;
     /* DADFIX1 · denser Today (next/musts/leave) · dedupe PE twins · every card → dest */
     renderList(document.querySelector("[data-mount-dan-today]"), densifyDanToday(data), "quiet day");

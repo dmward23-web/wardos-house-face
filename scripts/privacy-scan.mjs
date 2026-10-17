@@ -79,8 +79,17 @@ function loadDeny() {
     found++;
     for (const ln of fs.readFileSync(namesFp, "utf8").split("\n")) {
       if (!ln.trim() || ln.startsWith("#") || !ln.includes("\t")) continue;
+      const role = ln.slice(0, ln.indexOf("\t")).trim().toLowerCase();
       const name = ln.slice(ln.indexOf("\t") + 1).trim();
-      if (name.length >= 3) pats.push(new RegExp("\\b" + name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i"));
+      const esc = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      /* SCHOOLKEY2 · school names: '_' and digits count as a boundary, so "<code>_drop" style keys are caught (\b treats
+         '_' as a word character and missed them). No i flag: each letter is its own [Xx] class, so a capital right after the
+         name (<CODE>Drop, <CODE>X) is caught while a lowercase letter after it, or any letter before it, still blocks. */
+      if (role === "school" && name.length >= 2) {
+        const cls = Array.from(name).map((ch) => /[A-Za-z]/.test(ch) ? "[" + ch.toUpperCase() + ch.toLowerCase() + "]" : /\s/.test(ch) ? "\\s+" : ch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("");
+        pats.push(new RegExp("(?<![A-Za-z])" + cls + "(?![a-z])"));
+      }
+      else if (name.length >= 3) pats.push(new RegExp("\\b" + esc + "\\b", "i"));
     }
   }
   if (fs.existsSync(denyFp)) {

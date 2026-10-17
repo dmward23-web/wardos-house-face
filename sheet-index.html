@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
 <script src="private-feed.js?v=HUBPIN1"></script>
+<script src="school-names.js?v=SCHOOLNAMES1"></script>
 <script src="house-nomoney.js?v=NOMONEY1"></script>
 <script src="house-face-law.js?v=PRIVFEED3"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
@@ -3820,6 +3821,17 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
   html body .panel { --hub-cam-deck-h: 220px !important; --hub-command-h: 520px !important; }
 }
 </style>
+<style id="reduced-motion-schoolkey2">
+/* SCHOOLKEY2 · reduced motion: the live-header ring (the later !important rule beat the earlier reduce rule) and the
+   LED ring laps stop. hub-led-ring.js also skips its 60 s Web Animations when reduce is on. */
+@media (prefers-reduced-motion: reduce) {
+  html body .wx-card.wx-live::after,
+  html body .sensi-hdr.is-live::after,
+  html body .nest-hdr.is-live::after,
+  html body .hdr-live-dot,
+  .led-ring path { animation: none !important; }
+}
+</style>
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -4224,12 +4236,12 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <div class="tile-icon av g2-av harr" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-harris"/></svg></div>
  <div class="tile-titles">
  <div class="tile-label">Harris</div>
- <div class="tile-sub">SRE · chores · play</div>
+ <div class="tile-sub">School · chores · play</div>
  </div>
  </div>
  <div class="tile-micro">
- <div class="tile-mrow"><span class="mt">TUE</span><span class="md">SRE drop 8:10 · pickup 3:15</span></div>
- <div class="tile-mrow"><span class="mt">MUST</span><span class="md">Chores with Dad</span><span class="tile-mchip green">Due</span></div>
+ <div class="tile-mrow"><span class="mt">TUE</span><span class="md">School drop 8:10 · pickup 3:15</span></div>
+ <div class="tile-mrow"><span class="mt">MUST</span><span class="md">Chores</span><span class="tile-mchip green">Due</span></div>
  <div class="tile-mrow"><span class="mt">EVE</span><span class="md">Open after pickup</span></div>
  </div>
  <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
@@ -4243,7 +4255,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <div class="tile-sub" data-dad-sub>Leave-bys · rides · week</div>
  </div>
  </div>
- <div class="kf-stage" data-dad-stage><div class="kf-face kf-day"><div class="kf-kicker">Next leave</div><div class="kf-loud">Dad week</div><div class="kf-title">Leave-bys · rides</div></div></div>
+ <div class="kf-stage" data-dad-stage><div class="kf-face kf-day"><div class="kf-kicker">Next leave</div><div class="kf-loud">Today</div><div class="kf-title">Leave-bys · rides</div></div></div>
  <div class="tile-foot"><span class="tile-fact">Dad board</span></div>
  </a>
 
@@ -4305,12 +4317,12 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <div class="tile-icon g2-mark" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-jar"/></svg></div>
  <div class="tile-titles">
  <div class="tile-label">Show me the Money</div>
- <div class="tile-sub">Jars · payday with Dad</div>
+ <div class="tile-sub">Jars · payday</div>
  </div>
  </div>
  <div class="tile-micro">
  <div class="tile-mrow"><span class="mt">JARS</span><span class="md">Kids jars on board</span></div>
- <div class="tile-mrow"><span class="mt">PAY</span><span class="md">Payday with Dad</span><span class="tile-mchip amber">Soon</span></div>
+ <div class="tile-mrow"><span class="mt">PAY</span><span class="md">Payday</span><span class="tile-mchip amber">Soon</span></div>
  <div class="tile-mrow"><span class="mt">RULE</span><span class="md">Earn · bank · spend</span></div>
  </div>
  <div class="tile-foot"><span class="tile-fact">No cash on House</span><span class="tile-tap">OPEN</span></div>

@@ -396,7 +396,7 @@ def patch_kids_data(js: str) -> str:
     if (/\\bpe\\b|tennis/.test(w)) return "👟";
     if (/collab|madi|provider/.test(w)) return "👥";
     if (/doctor|clinic|therap|appt/.test(w)) return "🩺";
-    if (/homework|yearbook|school|lkms|sre/.test(w)) return "📚";
+    if (/homework|yearbook|school|lkms/.test(w)) return "📚";
     return "◆";
   }'''
     new_icon = '''  function consumeEventIcon(what) {
@@ -409,7 +409,7 @@ def patch_kids_data(js: str) -> str:
     if (/\\bpe\\b|tennis/.test(w)) return { html: "", text: "👟" };
     if (/collab|madi|provider/.test(w)) return { html: "", text: "👥" };
     if (/doctor|clinic|therap|appt/.test(w)) return { html: "", text: "🩺" };
-    if (/homework|yearbook|school|lkms|sre/.test(w)) return { html: "", text: "📚" };
+    if (/homework|yearbook|school|lkms/.test(w)) return { html: "", text: "📚" };
     return { html: '<span class="g2-lead">' + g2Ico("g2-next") + "</span>", text: "" };
   }'''
     if old_icon not in js:

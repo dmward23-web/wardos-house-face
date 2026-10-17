@@ -42,7 +42,7 @@
     var html = '<div class="sec-hdr" style="display:flex;align-items:center;justify-content:space-between;gap:8px">' +
       '<a class="dv-nav" data-dv="prev" href="sheet-today.html?d=' + shift(iso, -1) + '" aria-label="Previous day" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;font-size:22px;text-decoration:none;color:inherit">‹</a>' +
       '<div style="text-align:center"><div class="sec-title" style="font-size:22px">' + esc(nice) + '</div>' +
-      '<div class="sec-meta">' + (day && day.withDan ? "Kids with Dad" : "") + '</div></div>' +
+      '<div class="sec-meta">' + "" + '</div></div>' +
       '<a class="dv-nav" data-dv="next" href="sheet-today.html?d=' + shift(iso, 1) + '" aria-label="Next day" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;font-size:22px;text-decoration:none;color:inherit">›</a></div>';
     if (!rows.length) html += '<div style="padding:16px;opacity:.75">Nothing on the calendar.</div>';
     rows.forEach(function (r) {

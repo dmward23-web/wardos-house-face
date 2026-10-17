@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
 <script src="private-feed.js?v=HUBPIN1"></script>
+<script src="school-names.js?v=SCHOOLNAMES1"></script>
 <script src="house-face-law.js?v=PRIVFEED3"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
@@ -276,7 +277,7 @@
  color: #7a7e86; font-weight: 500; font-size: 9px;
  margin-top: auto; text-align: center;
  }
- .mom {
+ .wk-note {
  font-size: 8.5px; font-weight: 600; color: #6a6e76; letter-spacing: -0.01em;
  padding: 1px 0; flex-shrink: 0;
  }
@@ -368,7 +369,7 @@
   .leaveby::before { content: none !important; display: none !important; background: none !important; }
   .leaveby-main .time { border: 0 !important; outline: none !important; background: transparent !important; background-image: none !important; box-shadow: none !important; border-radius: 0 !important; }
  }
- .mom.dan { color: #1a4038; }
+ .wk-note.dan { color: #1a4038; }
  .day-empty { font-size: 9px; color: #a0a4ac; font-weight: 500; }
  .month-grid .day .dom { color: #eef0f4 !important; font-size: 17px; }
  .month-grid .day.out .dom { color: #6a6e76 !important; font-size: 12px; }
@@ -732,8 +733,8 @@
   function chipKey(s) {
     var t = String(s || "").toLowerCase();
     if (t.indexOf("hayes bb") >= 0 || t.indexOf("coach should") >= 0 || t.indexOf("coach in") >= 0) return "hayes-bb";
-    if (/\b(?!ward\b)[a-z]+ kids\b/.test(t) && t.indexOf("kids with dan") < 0) return "other-family"; /* another family's "<Surname> Kids" row; no surname in git */
-    if (t.indexOf("kids with dan") >= 0) return "with-dan";
+    if (/\b(?!ward\b)[a-z]+ kids\b/.test(t) && t.indexOf("kids with dan") < 0) return "other-family"; /* another family's "<Surname> Kids" row; no surname in git */ /* custody-law:allow (matcher; face law drops these rows first) */
+    if (t.indexOf("kids with dan") >= 0) return "with-dan"; /* custody-law:allow (matcher) */
     if (t.indexOf("nashville") >= 0) return "nashville";
     return "";
   }
@@ -830,7 +831,6 @@
         rows.push({ c: it.c || colorOf(label), l: label, min: sortMin(label, min) });
       });
     }
-    if (monthDay && monthDay.withDan && !chips["with-dan"]) chips["with-dan"] = "Kids with Dan";
     rows.sort(function (a, b) {
       if (a.min == null && b.min == null) return 0;
       if (a.min == null) return 1;
@@ -858,7 +858,7 @@
       else if (run) { out.push(run); run = null; }
     }
     if (run) out.push(run);
-    return out.map(function (r) { return MS[m - 1] + " " + r[0] + (r[1] > r[0] ? "–" + r[1] : ""); });
+    return out.map(function (r) { return MS[m - 1] + " " + r[0] + (r[1] > r[0] ? "-" + r[1] : ""); });
   }
   function narrow() {
     try { return window.matchMedia && matchMedia("(max-width: 700px)").matches; } catch (e) { return false; }
@@ -902,7 +902,6 @@
         if (dm !== m) { html += '<div class="day out"><div class="day-top"><span class="dom">' + dn + "</span></div></div>"; continue; }
         var k2 = key(dy, dm, dn), day2 = DATA && DATA.days[k2], isToday2 = k2 === t.iso;
         html += '<a class="day' + (isToday2 ? " today" : "") + '" href="sheet-today.html' + (isToday2 ? "" : "?d=" + k2) + '">' + '<div class="day-top"><span class="dom">' + dn + "</span>" + (isToday2 ? '<span class="day-tag">today</span>' : "") + "</div>";
-        if (day2 && day2.withDan) html += '<div class="mom dan">Kids with Dan</div>';
         html += '<div class="blocks">';
         (day2 ? day2.items : []).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '">' + esc(cleanCal(it.l)) + "</div>"; });
         html += "</div></a>";
@@ -910,7 +909,7 @@
     }
     grid.innerHTML = html;
     var sp = spans(y, m);
-    document.querySelector("[data-month-banner]").textContent = sp.length ? "Kids with Dan · " + sp.join(" · ") : "No Kids-with-Dan days on the calendar this month";
+    var ban = document.querySelector("[data-month-banner]"); if (ban) { ban.textContent = ""; ban.hidden = true; } /* NOCUSTODY1 · banner hidden (sp unused) */
     var list = months(), idx = list.findIndex(function (x) { return x.y === y && x.m === m; });
     document.querySelector('[data-mnav="-1"]').disabled = idx <= 0;
     document.querySelector('[data-mnav="1"]').disabled = idx < 0 || idx >= list.length - 1;

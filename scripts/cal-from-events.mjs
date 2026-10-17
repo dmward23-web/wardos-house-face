@@ -20,6 +20,8 @@ import { privPath, assertPrivateOut, namesRe, privateNames } from "./private-dir
 import { createRequire } from "node:module";
 createRequire(import.meta.url)("../house-face-law.js");   /* PRIVFEED3 · LAW8C1: sets globalThis.HouseFaceLaw (one dress-up law, shared with the glass) */
 const FACE_LAW = globalThis.HouseFaceLaw;
+/* SCHOOLNAMES1 · school code from private-names.tsv role "school" (school-names.js); none known = no pinned specials */
+const SCHOOL_SPECIALS_RE = new RegExp("(?:" + createRequire(import.meta.url)("../school-names.js").alt() + ") specials?", "i");
 const PARTNER_RE = namesRe("partner"); /* PRIVNAME1 · "us" flag computed on the box so no name lives in client code */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -209,7 +211,7 @@ function slimEvent(e) {
 function shortPlace(summary) {
   let s = String(summary || "").trim();
   s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
-  /* Kid-safe: no Mom custody / handoff framing on glass strip */
+  /* Kid-safe: parenthesised adult notes never reach the glass strip */
   s = s.replace(/\(\s*Mom[^)]*\)/gi, "");
   s = s.replace(/\bMom\b[^·]*/gi, "");
   s = s.replace(/\s{2,}/g, " ").replace(/\s·\s*$/g, "").trim();
@@ -426,7 +428,7 @@ function patchKidsWeek(weekPath, cal, upcoming, slimAll) {
   const daySrc = Array.isArray(slimAll) && slimAll.length ? slimAll : upcoming;
   week.kids.dan.today = danTodayFromDayEvents(daySrc, todayIso, week.homeWeek && week.homeWeek.through);
   week.kids.dan.today = dropPastFromToday(week.kids.dan.today, nowMs);
-  /* Dedupe week display twins (Harris+Hayes PE → one SRE PE card) */
+  /* Dedupe week display twins (Harris+Hayes PE → one school PE card) */
   if (Array.isArray(week.kids.dan.week)) {
     const seenW = new Set();
     week.kids.dan.week = week.kids.dan.week.filter((r) => {
@@ -577,7 +579,7 @@ function main() {
 
   /* Upcoming = start > now (Next Up advances by clock). Drop past forever.
      House glass: drop Desk GET · / Atlas: stubs from Next Up (still in raw dump). */
-  /* PINSPEC1 2026-09-30 (Dan): today's SRE specials stay on the main board's
+  /* PINSPEC1 2026-09-30 (Dan): today's school specials stay on the main board's
      today list (published as all-day so they sort to the top) until drop-off
      is done at 8:40 CT; the 10-min refresh drops them after that. */
   const ctMin = (() => {
@@ -586,7 +588,7 @@ function main() {
     return Number(b.hour) * 60 + Number(b.minute);
   })();
   const isPinnedSpecial = (e) =>
-    /SRE specials?/i.test(e.summary || "") && !/No Specials/i.test(e.summary || "") &&
+    SCHOOL_SPECIALS_RE.test(e.summary || "") && !/No Specials/i.test(e.summary || "") &&
     String(e.start || "").slice(0, 10) === todayIso && ctMin < 8 * 60 + 40 && e.startMs <= now.getTime();
   const upcoming = slimAll
     .filter((e) => e.startMs > now.getTime() || isPinnedSpecial(e))

@@ -818,7 +818,7 @@
       if (cut >= 0) s = s.slice(0, cut);
       return s.replace(/\s+/g, " ").replace(/^[\s·—–\-|]+|[\s·—–\-|]+$/g, "").trim();
     }
-    function isOtherFamily(s) { return /\b(?!Ward\b)[A-Z][a-z]+ Kids\b/.test(String(s || "")); } /* another family's "<Surname> Kids" row; no surname in git */
+    function isExternalRow(s) { return /\b(?!Ward\b)[A-Z][a-z]+ Kids\b/.test(String(s || "")); } /* a "<Surname> Kids" row from outside the household; no surname in git */
     function isAwareness(s) { return /no school|\ball day\b|awareness/i.test(String(s || "")); }
     function upcoming() {
       var out = [];
@@ -828,9 +828,9 @@
         var whatNode = stops[i].querySelector(".lb-day-what");
         var time = timeNode ? timeNode.textContent.replace(/\s+/g, " ").trim() : "";
         var raw = whatNode ? whatNode.textContent : "";
-        if (/^all day$/i.test(time) || isAwareness(raw) || isOtherFamily(raw)) continue;
+        if (/^all day$/i.test(time) || isAwareness(raw) || isExternalRow(raw)) continue;
         var title = cleanTitle(raw);
-        if (!title || isOtherFamily(title) || isAwareness(title)) continue;
+        if (!title || isExternalRow(title) || isAwareness(title)) continue;
         out.push({ time: time, title: title });
         if (out.length === 3) break;
       }
@@ -851,7 +851,7 @@
       if (!dest.getAttribute("data-ori-raw")) dest.setAttribute("data-ori-raw", raw);
       var timeEl = main.querySelector(".time");
       var items = upcoming();
-      var awareness = !timeEl || isAwareness(raw) || isOtherFamily(raw) || /^all day$/i.test(timeEl ? timeEl.textContent : "");
+      var awareness = !timeEl || isAwareness(raw) || isExternalRow(raw) || /^all day$/i.test(timeEl ? timeEl.textContent : "");
       if (awareness) {
         if (items.length) {
           if (!timeEl) {
@@ -948,7 +948,7 @@
     if (node.nodeType === 3) {
       if (node.nodeValue && node.nodeValue.indexOf("$") !== -1 && /\$\s?\d/.test(node.nodeValue)) {
         var next = node.nodeValue.replace(MONEY, "\u2605");
-        next = next.replace(/Balance\s*★\s*·\s*Week\s*★\s*·\s*Jar\s*★\s*\/\s*★/i, "Stars · payday with Dad");
+        next = next.replace(/Balance\s*★\s*·\s*Week\s*★\s*·\s*Jar\s*★\s*\/\s*★/i, "Stars · payday");
         if (next !== node.nodeValue) node.nodeValue = next;
       }
       return;
@@ -1272,12 +1272,12 @@
         var n = dom ? parseInt(dom.textContent, 10) : 0;
         if (!n) continue;
         var blks = day.querySelectorAll(".blk");
-        var mom = day.querySelector(".mom");
-        if (!blks.length && !mom && !day.classList.contains("today")) continue;
+        var wkn = day.querySelector(".wk-note");
+        if (!blks.length && !wkn && !day.classList.contains("today")) continue;
         var dt = new Date(y, m - 1, n);
         html += '<a class="ori-day' + (day.classList.contains("today") ? " is-today" : "") + '" href="sheet-today.html">';
         html += '<span class="ori-dom">' + dows[dt.getDay()] + " " + n + "</span>";
-        if (mom) html += '<span class="ori-ev dan">' + mom.textContent.replace(/</g, "") + "</span>";
+        if (wkn) html += '<span class="ori-ev dan">' + wkn.textContent.replace(/</g, "") + "</span>";
         for (var b = 0; b < blks.length; b++) {
           var title = stripShown(blks[b].getAttribute("title") || blks[b].textContent || "", true);
           var tone = (blks[b].className || "").replace(/\bblk\b/, "").trim();

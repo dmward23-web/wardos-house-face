@@ -43,12 +43,11 @@ RIGHT:  (ovals absent)         ← if Wx/Sensi not wired yet
 | Slot | Plain label (example Mon→Tue) | Wire target |
 |------|-------------------------------|-------------|
 | 1 · NEXT | Tue 7:30 · pack late-lunch snacks | `sheet-today.html` / next-up focus |
-| 2 · LEAVE | 8:10 · Boys SRE drop | `sheet-countdowns.html` |
+| 2 · LEAVE | 8:10 · Boys School drop | `sheet-countdowns.html` |
 | 3 · MUSTS | Musts · kids clear | `sheet-chores.html` |
-| 4 · HOME (hot) | Kids with Dad at home · through Fri Oct 2 · 3:00 | `sheet-today.html` |
 | (overflow) | Tue 4:25 · Ainsley swim leave | `sheet-countdowns.html` |
 
-**Words KEEP:** Next · Leave · Musts · Today · Kids with Dad · SRE drop · swim · flag  
+**Words KEEP:** Next · Leave · Musts · Today · School drop · swim · flag  
 **Words KILL on Dad:** Setlist · Track · Encore · Eras · Stage · Vinyl · Tour · LOADOUT · DROP (corn)
 
 If calendar thin after midnight, still show: standing leave-bys (8:10 / 3:15) + musts + Dad-week home card. Never blank.

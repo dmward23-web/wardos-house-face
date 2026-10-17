@@ -432,7 +432,7 @@ html.ori-arriving::before {
   animation: ori-veil-in 0.42s linear forwards;
 }
 /* No extra layer. The outbound iris and the inbound veil have to be the same pixels,
-   or the recorded handoff reads as a cut. */
+   or the recorded switch reads as a cut. */
 .ori-iris::before,
 .ori-arrive::before { content: none; }
 @keyframes ori-veil-in {
@@ -483,7 +483,7 @@ html.ori-arriving::before {
 html.ori-on .ori-pressed { animation: ori-press 0.42s cubic-bezier(.2, .8, .2, 1); }
 
 /* Shared glass so a subpage is a scene, not a paper panel. */
-html.ori-on body .panel :is(header, footer, section, article, .hdr, .banner, .card, .sec, .day, .bulk, .ship, .stat, .row, .trip, .count-row, .vote-card, .log-card, .beat, .handoff, .handoff-card, .cmd-panel) {
+html.ori-on body .panel :is(header, footer, section, article, .hdr, .banner, .card, .sec, .day, .bulk, .ship, .stat, .row, .trip, .count-row, .vote-card, .log-card, .beat, .bagcard, .bag-card, .cmd-panel) {
   background-color: rgba(7, 18, 32, 0.34) !important;
   color: #e8f6ff !important;
   border-color: rgba(160, 216, 255, 0.28) !important;

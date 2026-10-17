@@ -40,11 +40,17 @@
       + " Z";
     paths.forEach(function (p) { p.setAttribute("d", d); });
   }
+  /* SCHOOLKEY2 · reduced motion: the three 60 s laps stop; the ring stays as a still line (head parked at top-center) */
+  var RM = null;
+  try { RM = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null; } catch (e) { RM = null; }
+  function still() { return !!(RM && RM.matches); }
   function run() {
     var into = Date.now() % LAP_MS;
     paths.forEach(function (p, i) {
       var L = layers[i].len;
-      if (p.__anim) p.__anim.cancel();
+      if (p.__anim) { p.__anim.cancel(); p.__anim = null; }
+      if (still()) { p.style.strokeDashoffset = String(L); return; }
+      p.style.strokeDashoffset = "";
       // head = start + L; start = -offset  →  offset runs L → L-1000 over one lap
       p.__anim = p.animate(
         [{ strokeDashoffset: L }, { strokeDashoffset: L - 1000 }],
@@ -62,6 +68,7 @@
     if (window.visualViewport) window.visualViewport.addEventListener("resize", again);
     // re-sync after the tablet wakes / tab comes back
     document.addEventListener("visibilitychange", function () { if (!document.hidden) run(); });
+    if (RM) { if (RM.addEventListener) RM.addEventListener("change", run); else if (RM.addListener) RM.addListener(run); }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
   else start();

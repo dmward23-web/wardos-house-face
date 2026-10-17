@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
 <script src="private-feed.js?v=HUBPIN1"></script>
+<script src="school-names.js?v=SCHOOLNAMES1"></script>
 <script src="house-face-law.js?v=PRIVFEED3"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
@@ -411,7 +412,7 @@
 
  <main class="ds" data-dad-seat>
  <h1 class="ds-title name"><span class="name-accent">DAD</span><span class="ds-sub">Your page · leave-bys · rides · week</span></h1>
- <section class="ds-next" data-ds-next><div class="ds-kick">Up next</div><div class="ds-big"><span class="ds-time">Dad week</span></div><div class="ds-what">Reading your calendar</div></section>
+ <section class="ds-next" data-ds-next><div class="ds-kick">Up next</div><div class="ds-big"><span class="ds-time">Today</span></div><div class="ds-what">Reading your calendar</div></section>
  <div class="ds-line" data-ds-line></div>
  <div class="kids-row" aria-label="Jump to kid boards">
  <a class="kid-link harris" href="kid-harris.html"><span class="dot g2-av harr"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-harris"/></svg></span> Harris</a>
@@ -504,12 +505,7 @@
   }
   function paintBanner(data) {
     var sub = document.querySelector("[data-dan-banner-sub]");
-    var title = document.querySelector(".banner-title");
     if (!data) return;
-    var hw = data.homeWeek || {};
-    if (title && hw.through) {
-      title.textContent = "Kids with you at home · through " + hw.through;
-    }
     var strip = data.boardStrip || {};
     if (sub && strip.time && strip.place) {
       var lab = strip.label || "Next";

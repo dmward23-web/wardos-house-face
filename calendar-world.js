@@ -2,7 +2,7 @@
    C1 is the path itself (lanterns, walker, fog, now-line, time ring, briefing).
    C2–C9 open painted sub-scenes. Sentences are Atlas's Oct 2 wording.
    Numbers missing from that transcript are named plainly for their phase.
-   No scores, money, shame, or red marks. Mom weeks: look, don't keep. */
+   No scores, money, shame, or red marks. Off weeks: look, don't keep. */
 (function (global) {
   "use strict";
 
@@ -154,7 +154,7 @@
     var list = root.querySelector("[data-cw-day]");
     if (!list) return;
     var rows = (global.WardKids && WardKids.eventsForIso && WardKids.eventsForIso(kid(), data(), sel)) || [];
-    if (asleep()) { list.innerHTML = "<li>Their mom's week. Nothing to do here.</li>"; return; }
+    if (asleep()) { list.innerHTML = ""; return; } /* AWAYWK1 · resting week: dark windows, no sentence */
     if (!rows.length) { list.innerHTML = "<li>Nothing on the schedule.</li>"; return; }
     list.innerHTML = "";
     rows.forEach(function (r) {

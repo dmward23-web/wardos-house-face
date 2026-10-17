@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
 <script src="private-feed.js?v=HUBPIN1"></script>
+<script src="school-names.js?v=SCHOOLNAMES1"></script>
 <script src="house-nomoney.js?v=NOMONEY1"></script>
 <script src="house-face-law.js?v=PRIVFEED3"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
@@ -774,7 +775,7 @@
  </div>
  <div class="feed">
  <div class="feed-title">Musts that fill the jar</div>
- <div class="feed-row"><span class="plus" data-stars="7" data-money-suffix=" ea wk"></span> Bed · room · dishes · empty DW · shoes/coats<div class="when">daily · Sat–Fri</div></div>
+ <div class="feed-row"><span class="plus" data-stars="7" data-money-suffix=" ea wk"></span> Bed · room · dishes · empty DW · shoes/coats<div class="when">daily · Sat to Fri</div></div>
  <div class="feed-row"><span class="plus" data-stars="3" data-money-suffix=""></span> Bathroom wipe<div class="when">weekly</div></div>
  <div class="feed-row"><span class="plus" data-stars="5" data-money-suffix=""></span> Laundry full cycle<div class="when">weekly</div></div>
  <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Garage cubby · bag + sports<div class="when">weekly</div></div>
@@ -799,7 +800,7 @@
  </div>
  <div class="feed">
  <div class="feed-title">Musts that earn ★ into the jar</div>
- <div class="feed-row"><span class="plus" data-stars="7" data-money-suffix=" ea wk"></span> Bed · backpack · dishes · empty DW · trash · post-game · shower<div class="when">daily · ★×7 Sat–Fri</div></div>
+ <div class="feed-row"><span class="plus" data-stars="7" data-money-suffix=" ea wk"></span> Bed · backpack · dishes · empty DW · trash · post-game · shower<div class="when">daily · ★×7 Sat to Fri</div></div>
  <div class="feed-row"><span class="plus" data-stars="2" data-money-suffix=""></span> Room reset<div class="when">weekly</div></div>
  <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Shoes · closet / cubby / room · never hallway<div class="when">weekly</div></div>
  <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Garage cubby · bag + sports<div class="when">weekly</div></div>
@@ -823,7 +824,7 @@
  </div>
  <div class="feed">
  <div class="feed-title">Musts that earn ★ into the jar</div>
- <div class="feed-row"><span class="plus" data-stars="7" data-money-suffix=" ea wk"></span> Bed · backpack · dishes · empty DW · trash · post-game · shower<div class="when">daily · ★×7 Sat–Fri</div></div>
+ <div class="feed-row"><span class="plus" data-stars="7" data-money-suffix=" ea wk"></span> Bed · backpack · dishes · empty DW · trash · post-game · shower<div class="when">daily · ★×7 Sat to Fri</div></div>
  <div class="feed-row"><span class="plus" data-stars="2" data-money-suffix=""></span> Toys reset<div class="when">weekly</div></div>
  <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Shoes · closet / cubby / room<div class="when">weekly</div></div>
  <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Garage cubby · bag + sports<div class="when">weekly</div></div>
@@ -874,7 +875,7 @@ document.addEventListener("DOMContentLoaded", function () {
  else big.innerHTML = '<span class="s">'+sym+'</span>'+(v.week != null ? v.week : v.lifetime);
  }
  var lab = document.querySelector('.bank.'+id+' .star-label');
- if (lab && id === "ainsley") lab.textContent = "Musts fill it · payday with Dad";
+ if (lab && id === "ainsley") lab.textContent = "Musts fill it · payday";
  else if (lab) {
  lab.textContent = "Balance $"+v.balance+" · Week $"+v.weekEarn+" · Jar $"+v.toward+"/$"+v.need;
  }

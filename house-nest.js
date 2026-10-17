@@ -123,9 +123,9 @@
         needToken: false,
         label: "LIVE · NO STILL",
         reason:
-          "SDM live · " +
+          "Live · " +
           deviceCount +
-          " cam(s) · stills pending (WEB_RTC-only · GenerateImage needs event + auth proxy)",
+          " cameras · no still yet",
         deviceCount: deviceCount,
       };
     }
@@ -272,13 +272,12 @@
     if (path) {
       if (g.live && g.hasSnaps) {
         path.textContent =
-          "Nest SDM live · Pages stills from data/nest-snaps · see " + DOCS;
+          "Cameras live"; /* TEXTLAW · no dev paths on glass */
       } else if (g.live) {
         path.innerHTML =
-          "Nest SDM <strong>LIVE</strong> · " +
+          "Nest <strong>LIVE</strong> · " +
           g.deviceCount +
-          " cams · <strong>tap pad → WebRTC video</strong> (nestProxy from live JSON) · SDM tokens off Pages · " +
-          DOCS;
+          " cams · <strong>tap a pad for video</strong>";
       } else {
         path.textContent = "Cameras offline"; /* HUBPIN1 · no dev paths on glass */
       }
@@ -288,14 +287,10 @@
     if (note) {
       if (g.live && g.hasSnaps) {
         note.innerHTML =
-          "<strong>Cams = LIVE + stills.</strong> Snapshots from nest-live.json → data/nest-snaps · polling ~60s.";
+          "<strong>Cameras live.</strong> Stills refresh about every minute.";
       } else if (g.live) {
         note.innerHTML =
-          "<strong>Cams = LIVE · tap pad for video.</strong> SDM roster (" +
-          g.deviceCount +
-          "). Tap a pad → <code>nest-webrtc.html</code> via box proxy <code>scripts/nest-webrtc-proxy.mjs</code> (:8787). Tokens stay off Pages. See <code>" +
-          DOCS +
-          "</code>.";
+          "<strong>Cameras live.</strong> " + g.deviceCount + " cameras · tap a pad for video.";
       } else if (g.needToken) {
         note.innerHTML =
           "<strong>Cameras offline.</strong> No video until the camera feed is back."; /* HUBPIN1 · plain empty state */
@@ -349,9 +344,9 @@
       }
 
       if (stubEl) {
-        if (showSnap) stubEl.textContent = "SDM · still";
-        else if (g.live && realCam) stubEl.textContent = "TAP · WebRTC live";
-        else if (g.needToken) stubEl.textContent = "Need SDM token";
+        if (showSnap) stubEl.textContent = "Still";
+        else if (g.live && realCam) stubEl.textContent = "Live";
+        else if (g.needToken) stubEl.textContent = "Cameras offline";
         else stubEl.textContent = g.label;
       }
 
@@ -391,12 +386,12 @@
         bannerSub.textContent = "Sensi + Nest stills · Elo 3202L";
       } else if (g.live) {
         bannerSub.textContent =
-          "Sensi live · Nest SDM roster (" +
+          "Sensi live · Nest · " +
           g.deviceCount +
-          ") · stills need event/WebRTC bridge · no fake video";
+          " cameras · tap a pad for video";
       } else {
         bannerSub.textContent =
-          "Sensi polls live JSON · Nest needs SDM token · no fake video";
+          "Cameras offline";
       }
     }
   }

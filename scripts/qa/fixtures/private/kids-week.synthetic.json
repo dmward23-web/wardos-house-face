@@ -4,8 +4,8 @@
   "refreshedAt": "2026-10-17T02:50:11.910Z",
   "sourceCalendar": "Sample sourceCalendar 102",
   "leaveBys": {
-    "SRE_drop": "Sample SRE_drop 103",
-    "SRE_pickup": "Sample SRE_pickup 104",
+    "QXS_drop": "Sample QXS_drop 103",
+    "QXS_pickup": "Sample QXS_pickup 104",
     "note": "Sample note 105"
   },
   "homeWeek": {

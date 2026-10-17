@@ -1,13 +1,13 @@
 { "events": [
   {"id": "fx-custody", "summary": "Kids with Dan", "start": {"dateTime": "2026-10-09T15:00:00-05:00"}, "end": {"dateTime": "2026-10-16T15:00:00-05:00"}},
-  {"id": "fx-yellow", "summary": "Hayes + Harris — SRE Yellow Day", "start": {"date": "2026-10-13"}, "end": {"date": "2026-10-14"}, "transparency": "transparent"},
-  {"id": "fx-fieldtrip", "summary": "Hayes + Harris — SRE field trip", "start": {"date": "2026-10-13"}, "end": {"date": "2026-10-14"}, "transparency": "transparent"},
-  {"id": "fx-spec-art", "summary": "Harris — SRE specials: Art", "start": {"dateTime": "2026-10-13T06:30:00-05:00"}, "end": {"dateTime": "2026-10-13T06:45:00-05:00"}},
-  {"id": "fx-spec-pe", "summary": "Hayes — SRE specials: PE (tennis shoes)", "start": {"dateTime": "2026-10-13T06:30:00-05:00"}, "end": {"dateTime": "2026-10-13T06:45:00-05:00"}},
-  {"id": "fx-drop", "summary": "Hayes + Harris — SRE drop-off · 7:55", "start": {"dateTime": "2026-10-13T07:40:00-05:00"}, "end": {"dateTime": "2026-10-13T07:55:00-05:00"}},
+  {"id": "fx-yellow", "summary": "Hayes + Harris — QXS Yellow Day", "start": {"date": "2026-10-13"}, "end": {"date": "2026-10-14"}, "transparency": "transparent"},
+  {"id": "fx-fieldtrip", "summary": "Hayes + Harris — QXS field trip", "start": {"date": "2026-10-13"}, "end": {"date": "2026-10-14"}, "transparency": "transparent"},
+  {"id": "fx-spec-art", "summary": "Harris — QXS specials: Art", "start": {"dateTime": "2026-10-13T06:30:00-05:00"}, "end": {"dateTime": "2026-10-13T06:45:00-05:00"}},
+  {"id": "fx-spec-pe", "summary": "Hayes — QXS specials: PE (tennis shoes)", "start": {"dateTime": "2026-10-13T06:30:00-05:00"}, "end": {"dateTime": "2026-10-13T06:45:00-05:00"}},
+  {"id": "fx-drop", "summary": "Hayes + Harris — QXS drop-off · 7:55", "start": {"dateTime": "2026-10-13T07:40:00-05:00"}, "end": {"dateTime": "2026-10-13T07:55:00-05:00"}},
   {"id": "fx-quinn", "summary": "Hayes + Harris — pickup at Quinn's · 4:15", "start": {"dateTime": "2026-10-13T16:05:00-05:00"}, "end": {"dateTime": "2026-10-13T16:15:00-05:00"}},
-  {"id": "fx-pick", "summary": "Hayes + Harris — SRE pickup · 3:10", "start": {"dateTime": "2026-10-13T14:45:00-05:00"}, "end": {"dateTime": "2026-10-13T15:10:00-05:00"}},
-  {"id": "fx-orange", "summary": "Hayes + Harris — SRE Orange Day", "start": {"date": "2026-10-16"}, "end": {"date": "2026-10-17"}},
+  {"id": "fx-pick", "summary": "Hayes + Harris — QXS pickup · 3:10", "start": {"dateTime": "2026-10-13T14:45:00-05:00"}, "end": {"dateTime": "2026-10-13T15:10:00-05:00"}},
+  {"id": "fx-orange", "summary": "Hayes + Harris — QXS Orange Day", "start": {"date": "2026-10-16"}, "end": {"date": "2026-10-17"}},
   {"id": "fx-hj", "summary": "Hayes Testerly birthday", "start": {"date": "2026-10-14"}, "end": {"date": "2026-10-15"}},
-  {"id": "fx-nov", "summary": "Hayes + Harris — SRE Green Day", "start": {"date": "2026-11-10"}, "end": {"date": "2026-11-11"}}
+  {"id": "fx-nov", "summary": "Hayes + Harris — QXS Green Day", "start": {"date": "2026-11-10"}, "end": {"date": "2026-11-11"}}
 ] }

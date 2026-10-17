@@ -11,7 +11,8 @@
  * Hub:   localStorage "wardos-lights-proxy" (https only; already saved on every device that ran the lights tile),
  *        HUBPIN1: the hub is built in (house-hub.js, SHA-256 pinned origins); links cannot set it. Pair via QR.
  *        ?pfBase=http://127.0.0.1:<port> is honoured ONLY for a loopback http base (local tests / box preview).
- * ?pfOffline=1 forces the offline path (QA screenshots). */
+ * ?pfOffline=1 forces the offline path (QA screenshots).
+ * SCHOOLNAMES1 · also fetches /api/private/private-names.json (role "school" only) into window.WARDOS_PRIVATE_NAMES for school-names.js. */
 (function (g) {
   "use strict";
   if (g.PrivateFeed) return;
@@ -86,7 +87,41 @@
     var wait = (g.HousePairing && g.HousePairing.ready) || Promise.resolve();
     return wait.then(function () { return getRaw(name); }, function () { return getRaw(name); }).then(function (res) { if (res && res.data) res.data = law(name, res.data); return res; });
   }
+  /* SCHOOLNAMES1 · calendar payloads are handed out only after the school names are in (or known missing);
+     both requests run side by side, after the pairing wait (so a fresh #pair= key is used for both) */
   function getRaw(name) {
+    return LAW_FEEDS[name] ? Promise.all([getFeed(name), loadNames()]).then(function (r) { return r[0]; }) : getFeed(name);
+  }
+
+  /* SCHOOLNAMES1 · school names (role "school" only) for school-names.js. The school code and name never live in git:
+     the hub serves them with the device token (GET /api/private/private-names.json -> {"school":[...]}), kept
+     device-local like the feeds. No token / no hub / offline with no cache = no names (school patterns match nothing). */
+  var namesP = null, NAMES_KEY = CACHE + "private-names";
+  function applyNames(d) {
+    var list = d && Object.prototype.toString.call(d.school) === "[object Array]" ? d.school.filter(function (t) { return typeof t === "string"; }) : [];
+    if (!list.length) return;
+    g.WARDOS_PRIVATE_NAMES = { school: list };
+    if (g.SchoolNames) g.SchoolNames.setSchools(null);
+  }
+  function cachedNames() { try { var c = JSON.parse(lsGet(NAMES_KEY) || "null"); if (c && c.data && Date.now() - c.at < MAX_AGE) applyNames(c.data); } catch (e) { /* bad cache = none */ } }
+  function loadNames() {
+    if (namesP) return namesP;
+    if (forceOffline || !origFetch || !token()) { cachedNames(); return (namesP = Promise.resolve()); }
+    namesP = hubBase().then(function (b) {
+      if (!b) { cachedNames(); return; }
+      return tfetch(b + "/api/private/private-names.json", { cache: "no-store", headers: { "X-Private-Feed-Token": token() }, credentials: "omit", referrerPolicy: "no-referrer" })
+        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        /* SCHOOLKEY2 · an empty list is never cached and never replaces a good cache; a 404 / error keeps the cache too */
+        .then(function (d) {
+          var list = d && Object.prototype.toString.call(d.school) === "[object Array]" ? d.school.filter(function (t) { return typeof t === "string" && t; }) : [];
+          if (!list.length) { cachedNames(); return; }
+          applyNames({ school: list }); lsSet(NAMES_KEY, JSON.stringify({ at: Date.now(), data: { school: list } }));
+        })
+        .catch(function () { cachedNames(); });
+    });
+    return namesP;
+  }
+  function getFeed(name) {
     var cacheKey = CACHE + name;
     function fromCache(why) {
       var c = null; try { c = JSON.parse(lsGet(cacheKey) || "null"); } catch (e) { c = null; }
@@ -218,5 +253,5 @@
   (document.head || document.documentElement).appendChild(css);
   document.addEventListener("DOMContentLoaded", function () { scanImgs(document); });
 
-  g.PrivateFeed = { hasHub: function () { return !!(g.HouseHub && (g.HouseHub.lights() || (qs("pfBase") && g.HouseHub.okForKey(qs("pfBase"))))); }, get: getJSON, cam: getCam, canSnap: function () { return !forceOffline && !!token() && !!origFetch; }, bindSnap: function (img, url) { img.setAttribute("data-pf-snap", url); fixImg(img); }, /* PRIVFEED3 · cam stills never hit the static path */ state: function () { return state; }, _hubBase: hubBase };
+  g.PrivateFeed = { hasHub: function () { return !!(g.HouseHub && (g.HouseHub.lights() || (qs("pfBase") && g.HouseHub.okForKey(qs("pfBase"))))); }, get: getJSON, cam: getCam, canSnap: function () { return !forceOffline && !!token() && !!origFetch; }, bindSnap: function (img, url) { img.setAttribute("data-pf-snap", url); fixImg(img); }, /* PRIVFEED3 · cam stills never hit the static path */ state: function () { return state; }, names: loadNames, _hubBase: hubBase };
 })(window);

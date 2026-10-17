@@ -329,8 +329,8 @@
  <div class="cheer-body">
  <div class="cheer-main">
  <div class="cheer-label">Tonight</div>
- <div class="cheer-title"><span data-live="date-short">—</span> · <span class="hl" data-dinner-tonight>no pick yet</span></div>
- <div class="cheer-sub"><strong>Fuel</strong> · sleep → water → protein when you eat · no grocery dollars</div>
+ <div class="cheer-title"><span data-live="date-short">Today</span> · <span class="hl" data-dinner-tonight>no pick yet</span></div>
+ <div class="cheer-sub"><strong>Fuel</strong> · sleep, water, protein when you eat · no grocery dollars</div>
  </div>
  <div class="cheer-badges"><div class="cheer-badge">OPEN</div></div>
  </div>
@@ -340,29 +340,29 @@
  <section class="sec" aria-label="This week picks">
  <div class="sec-hdr">
  <div class="sec-title">This week’s picks</div>
- <div class="sec-meta" data-dinner-week-end>Sat → Fri</div>
+ <div class="sec-meta" data-dinner-week-end>Sat to Fri</div>
  </div>
  <div class="list">
  <div class="meal">
  <div class="rank">Locked</div>
  <div class="title">Nothing locked</div>
- <div class="meta">Dad names dinner → tile updates · no invented meals</div>
+ <div class="meta">Dad names dinner, the tile updates · no invented meals</div>
  </div>
  </div>
  </section>
  <section class="sec" aria-label="Night by night">
  <div class="sec-hdr">
  <div class="sec-title">Night by night</div>
- <div class="sec-meta" data-dinner-week-range>Sat → Fri</div>
+ <div class="sec-meta" data-dinner-week-range>Sat to Fri</div>
  </div>
  <div class="list" data-dinner-week>
- <div class="day-row"><span class="dow">Sat</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row"><span class="dow">Sun</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row"><span class="dow">Mon</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row"><span class="dow">Tue</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row"><span class="dow">Wed</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row"><span class="dow">Thu</span><span class="pick">—</span><span class="tag">open</span></div>
- <div class="day-row"><span class="dow">Fri</span><span class="pick">—</span><span class="tag">open</span></div>
+ <div class="day-row"><span class="dow">Sat</span><span class="pick">·</span><span class="tag">open</span></div>
+ <div class="day-row"><span class="dow">Sun</span><span class="pick">·</span><span class="tag">open</span></div>
+ <div class="day-row"><span class="dow">Mon</span><span class="pick">·</span><span class="tag">open</span></div>
+ <div class="day-row"><span class="dow">Tue</span><span class="pick">·</span><span class="tag">open</span></div>
+ <div class="day-row"><span class="dow">Wed</span><span class="pick">·</span><span class="tag">open</span></div>
+ <div class="day-row"><span class="dow">Thu</span><span class="pick">·</span><span class="tag">open</span></div>
+ <div class="day-row"><span class="dow">Fri</span><span class="pick">·</span><span class="tag">open</span></div>
  </div>
  <div class="suggest">
  <div class="lbl">Suggest</div>
@@ -378,15 +378,15 @@
  <div class="list">
  <div class="kv ain">
  <a class="chip ain" href="kid-ainsley.html"><span class="d">A</span>Ainsley</a>
- <div class="picked">→ —</div>
+ <div class="picked">No vote yet</div>
  </div>
  <div class="kv hay">
  <a class="chip hay" href="kid-hayes.html"><span class="d">H</span>Hayes</a>
- <div class="picked">→ —</div>
+ <div class="picked">No vote yet</div>
  </div>
  <div class="kv har">
  <a class="chip har" href="kid-harris.html"><span class="d">H</span>Harris</a>
- <div class="picked">→ —</div>
+ <div class="picked">No vote yet</div>
  </div>
  </div>
  <div style="margin-top:auto;font-size:12px;font-weight:650;color:#8a6a40;padding:4px 2px 0;">One vote each · winner gets the loud card · no money</div>
@@ -403,7 +403,7 @@
 <script src="house-clock.js?v=PRIVFEED3"></script>
 <script>
 /* DINNERLIVE1 · header date from HouseClock (data-live="date-short").
-   VITAWEEK1 · the Sat→Fri week is built here from today's America/Chicago date,
+   VITAWEEK1 · the Sat to Fri week is built here from today's America/Chicago date,
    so the strip rolls itself every Saturday (no hardcoded dates in the HTML).
    Every night starts honest-open: no meal is ever invented; today reads "no pick yet",
    earlier nights this week are muted "past". No-JS fallback = generic Sat–Fri rows, open. */
@@ -413,7 +413,7 @@
   var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   var lastIso = null;
 
-  /* Today in CT as {y, m, d, iso} via Intl (en-CA → YYYY-MM-DD). */
+  /* Today in CT as {y, m, d, iso} via Intl (en-CA gives YYYY-MM-DD). */
   function ctToday() {
     var iso;
     try {
@@ -450,7 +450,7 @@
       var iso = isoOf(dt);
       var isToday = iso === t.iso, isPast = iso < t.iso;
       var cls = "day-row" + (isToday ? " is-today" : "") + (isPast ? " is-past" : "");
-      var pick = isToday ? "no pick yet" : "—";
+      var pick = isToday ? "no pick yet" : "·";
       var state = isToday ? "today" : (isPast ? "past" : "open");
       html += '<div class="' + cls + '" data-date="' + iso + '"' + (isToday ? ' aria-current="date"' : "") + ">" +
         '<span class="dow">' + DOWS[i] + "</span>" +
@@ -460,7 +460,7 @@
     list.innerHTML = html;
 
     var range = document.querySelector("[data-dinner-week-range]");
-    if (range) range.textContent = "Sat " + label(sat) + " → Fri " + label(fri);
+    if (range) range.textContent = "Sat " + label(sat) + " to Fri " + label(fri);
     var end = document.querySelector("[data-dinner-week-end]");
     if (end) end.textContent = "This week · through Fri " + label(fri);
   }

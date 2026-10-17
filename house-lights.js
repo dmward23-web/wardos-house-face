@@ -228,7 +228,7 @@
         kind: "need_token",
         live: false,
         needToken: true,
-        label: "NEED TOKEN",
+        label: "Needs pairing",
         writeSupported: false,
         data: data,
         ageMs: age
@@ -552,7 +552,7 @@
             };
           }),
           reserved: [],
-          error: "data/lights-live.json unavailable"
+          error: "Offline"
         });
       }
       if (cb) cb(err || new Error("live fetch fail"), gate(), null);
@@ -678,7 +678,7 @@
         : (g.live
           ? ("Lights LIVE · " + eff.lights.length + " pads · " + (noKey(g) ? "NEEDS PAIRING" : g.writeSupported ? "PROXY OFF" : "READ ONLY"))
           : (g.needToken
-            ? ("Lights · NEED TOKEN · controls dark")
+            ? ("Lights · needs pairing · controls dark")
             : ("Lights · " + g.label + " · controls dark")));
     }
     var sub = doc.getElementById("lights-ctrl-sub");
@@ -819,7 +819,7 @@
     if (g.live && g.writeSupported && _proxyReachable === false) return "LIVE · PROXY OFF";
     if (g.live && g.writeSupported) return "LIVE · PROXY";
     if (g.live) return "LIVE · READ ONLY";
-    if (g.needToken) return "NEED TOKEN";
+    if (g.needToken) return "Needs pairing";
     return g.label || "OFFLINE";
   }
 
@@ -830,7 +830,7 @@
     if (g.live && g.writeSupported && _proxyReachable === false) return "PROXY OFF";
     if (g.live && g.writeSupported) return "LIVE";
     if (g.live) return "READ ONLY";
-    if (g.needToken) return "NEED TOKEN";
+    if (g.needToken) return "Needs pairing";
     return g.label || "OFFLINE";
   }
 
@@ -948,7 +948,7 @@
           ? "PROXY OFF · write proxy unreachable (check tunnel)"
           : (g.live
             ? "LIVE read · write not armed"
-            : (g.needToken ? "NEED TOKEN · controls dark" : ((g.label || "OFFLINE") + " · controls dark"))));
+            : (g.needToken ? "Needs pairing · controls dark" : ((g.label || "OFFLINE") + " · controls dark"))));
     }
 
     var grid = doc.getElementById("hub-lights-grid");
@@ -1220,7 +1220,7 @@
     var pillCls = "light-pad-state cmd-pill";
     var pillTxt = "OFFLINE";
     if (g.live) { pillCls += " cmd-pill--live"; pillTxt = "LIVE"; }
-    else if (g.needToken || g.kind === "need_token") { pillCls += " cmd-pill--need"; pillTxt = "NEED TOKEN"; }
+    else if (g.needToken || g.kind === "need_token") { pillCls += " cmd-pill--need"; pillTxt = "Needs pairing"; }
     else { pillCls += " cmd-pill--off"; pillTxt = hubHonesty(g) || "OFF"; }
     host.innerHTML =
       '<article class="light-pad cmd-panel kid-light-pad' + onCls + '" data-light-id="' + L.id + '">'

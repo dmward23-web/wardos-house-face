@@ -114,7 +114,7 @@
     return { cx: b.cx, cy: b.jy + b.jh / 2, w: b.jw, h: b.jh, x: b.jx, y: b.jy };
   }
 
-  /* Custody week painted on the path: Friday through Thursday. Positions never use t. */
+  /* The kids' week painted on the path: Friday through Thursday. Positions never use t. */
   var PATH = ["Fr", "Sa", "Su", "Mo", "Tu", "We", "Th"];
   var CREATURE = { hayes: "hayes", harris: "harris", ainsley: "ainsley" };
 

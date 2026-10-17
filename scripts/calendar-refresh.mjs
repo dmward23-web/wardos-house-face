@@ -24,8 +24,26 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { privPath, assertPrivateOut, namesRe, privateNames } from "./private-dir.mjs"; /* PRIVFEED1 */
-const OTHER_FAM = (privateNames().otherfamily || []).map((n) => n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-const OTHER_HAYES = OTHER_FAM.length ? new RegExp("\\bhayes\\s+(?:" + OTHER_FAM.join("|") + ")\\b") : /(?!)/;
+/* EXTNAMES1 · private-names.tsv role "external" names people outside the household (never in git). A kid's first name
+   followed by one of them is not our kid, so it is cut out before the kid tests. ONLY "external" is filtered, plus the
+   old key "otherfamily" during the transition (a later commit drops it). partner, coparent, household, school and every
+   other role are never filtered. An unknown role gets one count-only warning and stays unfiltered. No external rows at
+   all (and none under the old key) = a config error: one count-only warning. */
+const PN = privateNames();
+const EXT_ROLES = ["external", "otherfamily"];
+const KNOWN_ROLES = new Set(EXT_ROLES.concat(["partner", "coparent", "household", "school"]));
+const EXT_NAMES = EXT_ROLES.flatMap((r) => PN[r] || []).map((n) => n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+const UNKNOWN_ROLES = Object.keys(PN).filter((r) => !KNOWN_ROLES.has(r)).length;
+if (UNKNOWN_ROLES) process.stderr.write("WARN private-names: " + UNKNOWN_ROLES + " unknown role(s), not filtered\n");
+if (!EXT_NAMES.length) process.stderr.write("WARN private-names: role external has 0 entries (config error)\n");
+const EXT_KID = EXT_NAMES.length ? new RegExp("\\b(?:ainsley|hayes|harris)\\s+(?:" + EXT_NAMES.join("|") + ")\\b", "g") : null;
+import { createRequire } from "node:module";
+/* SCHOOLNAMES1 · the kids' school code never lives in git: role "school" from private-names.tsv (school-names.js, same
+   sources as LHRules). None known = every school pattern below matches nothing (no school drop / pickup / specials). */
+const SchoolNames = createRequire(import.meta.url)("../school-names.js");
+const SCH = "(?:" + SchoolNames.alt() + ")";
+const RX = (src, flags) => new RegExp(src.replace(/§/g, SCH), flags);
+const SCHOOL_WORD = SchoolNames.label("school");
 const COPARENT_RE = namesRe("coparent"); /* PRIVNAME1 · co-parent name from ~/.config/wardos, never in git */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -161,13 +179,13 @@ function whenTime(it) {
   return it.allDay ? "All day" : fmtTime(it.start);
 }
 
-/* NEXTLEAVE1 · what counts as a real leave-by for "Next leave": a leave, an SRE drop / pickup, a sport
+/* NEXTLEAVE1 · what counts as a real leave-by for "Next leave": a leave, a school drop / pickup, a sport
    (event start = leave-by), an appointment, or any title that says pickup / drop / leave. Never an all-day note,
-   never an SRE specials note. */
+   never a school specials note. */
 const LEAVE_KINDS = new Set(["leave", "school_drop", "school_pickup", "sport", "appointment"]);
 const LEAVE_WORD_RE = /\b(pick\s*-?\s*up|drop(\s*-?\s*off)?|leave)\b/i; // "pickup at Quinn's" is a leave whatever its kind
 function isRealLeave(it) {
-  if (it.allDay || /SRE specials?/i.test(it.raw || "")) return false;
+  if (it.allDay || RX(String.raw`§ specials?`, "i").test(it.raw || "")) return false;
   return LEAVE_KINDS.has(it.kind) || LEAVE_WORD_RE.test(it.raw || "");
 }
 
@@ -186,21 +204,22 @@ function isAdminNoise(summary) {
 }
 
 function kidMentions(summary) {
-  const s = summary.toLowerCase();
+  const s0 = summary.toLowerCase();
+  const s = EXT_KID ? s0.replace(EXT_KID, " ") : s0; /* EXTNAMES1 */
   /* SCHOOL2: "<Family> Kids [<initials> No School]" → each initial names a kid */
   const ns = /Ward Kids \[([AH]+) No School\]/i.exec(summary);
   const nsA = ns ? /A/i.test(ns[1]) : false;
   const nsH = ns ? /H/i.test(ns[1]) : false;
   return {
     ainsley: /\bainsley\b/.test(s) || nsA,
-    hayes: (/\bhayes\b/.test(s) && !OTHER_HAYES.test(s)) || nsH, /* the other Hayes: surname from private-names.tsv role "otherfamily" */
+    hayes: /\bhayes\b/.test(s) || nsH,
     harris: /\bharris\b/.test(s) || nsH,
-    boys: /\bboyes\b|\bharris\b.*\bhayes\b|\bhayes\b.*\bharris\b|\bboyes\b|SRE drop|SRE pickup|Hayes \+ Harris/i.test(summary),
+    boys: RX(String.raw`\bboyes\b|\bharris\b.*\bhayes\b|\bhayes\b.*\bharris\b|\bboyes\b|§ drop|§ pickup|Hayes \+ Harris`, "i").test(s),
   };
 }
 
-/* SOLOBOY1 2026-10-02 (Dan, Art Club Wed): "Hayes — SRE pickup · 3:40" names one boy →
-   that boy only. "Hayes + Harris — SRE pickup" / untitled-kid SRE runs → both boys (unchanged). */
+/* SOLOBOY1 2026-10-02 (Dan, Art Club Wed): "Hayes — school pickup · 3:40" names one boy →
+   that boy only. "Hayes + Harris — school pickup" / untitled-kid school runs → both boys (unchanged). */
 function soloBoy(summary) {
   const m = kidMentions(summary);
   if (m.hayes && !m.harris) return { kid: "hayes" };
@@ -217,7 +236,7 @@ const KID_NAME = { ainsley: "Ainsley", hayes: "Hayes", harris: "Harris" };
 function isKidRide(it, kidId) {
   return it.kind === "leave" && !!it.kidRide && it.kid === kidId;
 }
-/* Dad glass label: single-kid ride / SRE run says whose ("3:15 Hayes SRE pickup"). */
+/* Dad glass label: single-kid ride / school run says whose ("3:15 Hayes school pickup"). */
 function danWhat(it) {
   const what = kidsSafeWhat(it.raw, it.kind);
   const solo = it.kidRide || it.kind === "school_drop" || it.kind === "school_pickup";
@@ -236,7 +255,7 @@ function classify(ev) {
   /* RIDES LAW (Dan 9/29): Dad's own pickups/drop-offs ("Pick up <kid> + a friend…",
      "Drop <kid> at a friend's…") are Dad logistics, never a kid's activity. Treat as
      leave → Dad strip / dan box only; kid glass shows the kid's own practice event. */
-  if (/^(Pick\s*up|Drop)\b/i.test(summary) && !/SRE (drop|pickup)/i.test(summary)) {
+  if (/^(Pick\s*up|Drop)\b/i.test(summary) && !RX(String.raw`§ (drop|pickup)`, "i").test(summary)) {
     return { kind: "leave", summary, busy: !isFree(ev), ride: true };
   }
   /* KIDRIDE1: "<co-parent>: <Kid> — … pickup/drop-off" (Free, their week) = awareness on the kid's
@@ -245,14 +264,14 @@ function classify(ev) {
   if (COPARENT_RE.test(summary)) return null;
   /* SCHOOL first (before KIDRIDE1): titles like "… Math Counts · pickup 4:00" are school,
      not Dad leave-by rides. KIDRIDE1 still catches real kid pickup/drop-off leave-bys. */
-  if (/SRE drop-off|SRE drop\b/i.test(summary)) return { kind: "school_drop", summary, ...soloBoy(summary) };
-  if (/SRE pickup/i.test(summary)) return { kind: "school_pickup", summary, ...soloBoy(summary) };
+  if (RX(String.raw`§ drop-off|§ drop\b`, "i").test(summary)) return { kind: "school_drop", summary, ...soloBoy(summary) };
+  if (RX(String.raw`§ pickup`, "i").test(summary)) return { kind: "school_pickup", summary, ...soloBoy(summary) };
   if (/Homework Help/i.test(summary)) return { kind: "school", summary, kid: "ainsley" };
-  if (/hearing\/vision|Hearing\/Vision|PE \(tennis|SRE specials?|SRE spirit|SRE (Orange|Yellow|Green|Red) Day|Peace Week|field trip|yearbook|picture (retake|makeup)|baby pic|LKMS (choir|fall conferences|Cougar Night|Bingo|baby|Homework Help|Math Counts|Outsiders)|Outsiders Day|\b[A-Z][a-z]+ conference\b|choir Sing|permission form due|Ward Kids \[[AH]+ No School\]|no school \(elem|conference sign-ups|Tailgate|Halloween Bash|Halloween parade|Halloween class parties|Abraca-Boo|Fall Family Fun Night|Chat\s*&\s*Chew|Chat and Chew|Art Club|fall conferences/i.test(summary)) { /* SPECIALS1+SCHOOL2: all kids school info on kid boards + hub */
+  if (RX(String.raw`hearing\/vision|Hearing\/Vision|PE \(tennis|§ specials?|§ spirit|§ (Orange|Yellow|Green|Red) Day|Peace Week|field trip|yearbook|picture (retake|makeup)|baby pic|LKMS (choir|fall conferences|Cougar Night|Bingo|baby|Homework Help|Math Counts|Outsiders)|Outsiders Day|\b[A-Z][a-z]+ conference\b|choir Sing|permission form due|Ward Kids \[[AH]+ No School\]|no school \(elem|conference sign-ups|Tailgate|Halloween Bash|Halloween parade|Halloween class parties|Abraca-Boo|Fall Family Fun Night|Chat\s*&\s*Chew|Chat and Chew|Art Club|fall conferences`, "i").test(summary)) { /* SPECIALS1+SCHOOL2: all kids school info on kid boards + hub */
     return { kind: "school", summary };
   }
   { const kr = KID_RIDE.exec(summary);
-    if (kr && !/SRE (drop|pickup)/i.test(summary)) {
+    if (kr && !RX(String.raw`§ (drop|pickup)`, "i").test(summary)) {
       return { kind: "leave", summary, busy: !isFree(ev), ride: true, kidRide: true, kid: kr[1].toLowerCase() };
     } }
   if (/swim|Swim|Coach Ann/i.test(summary)) return { kind: "sport", sport: "swim", summary, kid: "ainsley" };
@@ -327,7 +346,7 @@ function loadEvents(filePath) {
 
 /* DEDUPE1 · same start + same who + same title (ignoring "(...)" notes, punctuation, case)
  * = one card. Keep the longest title (most detail). Stops double-booked calendar
- * writes (e.g. two "Hayes — SRE specials: PE + Library" at 7:00) from showing twice. */
+ * writes (e.g. two "Hayes — school specials: PE + Library" at 7:00) from showing twice. */
 function dedupeKey(ev) {
   const st = (ev.start && (ev.start.dateTime || ev.start.date)) || ev.start || "";
   const t = new Date(st);
@@ -370,7 +389,7 @@ function kidsSafeWhat(summary, kind) {
     .trim();
   s = stripDollars(s);
   s = s.replace(/\s*\((?:tennis shoes|wear [^)]*)\)/gi, "").trim(); /* LAW8C1 · no clothing hints */
-  // kids-safe: drop Mom order IDs / adult refund chatter from leave titles on kid glass
+  // kids-safe: drop parenthesised adult notes / refund chatter from leave titles on kid glass
   if (kind === "leave") {
     s = s.replace(/\(Mom[^)]*\)/gi, "").replace(/WK\d+/gi, "").trim();
   }
@@ -413,7 +432,7 @@ function buildBoardItems(events, now) {
   return items;
 }
 
-/* PINSPEC1 2026-09-30 (Dan): today's SRE specials stay pinned at the top of
+/* PINSPEC1 2026-09-30 (Dan): today's school specials stay pinned at the top of
    Next Up until morning drop-off is done (8:40 CT), even after their 7:00 stub ends. */
 function ctMinutes(date) {
   const f = new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "numeric", minute: "2-digit", hourCycle: "h23" });
@@ -422,7 +441,7 @@ function ctMinutes(date) {
   return Number(b.hour) * 60 + Number(b.minute);
 }
 function pinnedSpecials(item, now) {
-  if (!/SRE specials?/i.test(item.raw || "")) return false;
+  if (!RX(String.raw`§ specials?`, "i").test(item.raw || "")) return false;
   if (partsInTZ(item.start).iso !== partsInTZ(now).iso) return false;
   return ctMinutes(now) < 8 * 60 + 40;
 }
@@ -467,8 +486,8 @@ function pickStripQueue(items, now, homeWeek) {
     const time = fmtTimeShort(it.start);
     let place;
     if (it.kind === "leave") place = it.kidRide ? danWhat(it) : kidsSafeWhat(it.raw, "leave");
-    else if (it.kind === "school_pickup") place = it.kid ? `${KID_NAME[it.kid]} SRE pickup` : "Boys SRE pickup";
-    else if (it.kind === "school_drop") place = it.kid ? `${KID_NAME[it.kid]} SRE drop` : "Boys SRE drop";
+    else if (it.kind === "school_pickup") place = it.kid ? `${KID_NAME[it.kid]} ${SCHOOL_WORD} pickup` : `Boys ${SCHOOL_WORD} pickup`;
+    else if (it.kind === "school_drop") place = it.kid ? `${KID_NAME[it.kid]} ${SCHOOL_WORD} drop` : `Boys ${SCHOOL_WORD} drop`;
     else if (it.kind === "sport") place = kidsSafeWhat(it.raw, "sport");
     else place = kidsSafeWhat(it.raw, it.kind);
     // Cap length for strip
@@ -532,7 +551,7 @@ function custodyFromItems(items, now) {
       endIso: active.endIso,
     };
   }
-  // Between / after Dad weeks → Mom week. Never name the co-parent on glass (CALENDAR LAW).
+  // Outside the week windows: away. Never name the co-parent on glass (CALENDAR LAW).
   const nextDad = custody.find((it) => it.start > now);
   const lastEnded = [...custody].filter((it) => it.end <= now).sort((a, b) => b.end - a.end)[0];
   if (nextDad) {
@@ -598,14 +617,14 @@ function buildKidToday(kidId, items, now, homeWeek) {
       tone,
     });
   }
-  const mom = homeWeek && homeWeek.with === "away";
+  const away = homeWeek && homeWeek.with === "away";
   rows.push({
     kind: "note",
     when: "All day",
-    what: mom
+    what: away
       ? "Kids away" /* AWAY1 */
       : (kidId === "ainsley" ? "Base at home with Dad" : kidId === "hayes" ? "🏡 DROP ZONE HQ with Dad" : "🏡 YOUR BASE with Dad"),
-    hint: mom ? `back ${homeWeek.through}` : `through ${homeWeek.through}`,
+    hint: away ? `back ${homeWeek.through}` : `through ${homeWeek.through}`,
     tone: "hot",
   });
   return rows.slice(0, 6).map(({ ride, ...r }) => r);
@@ -689,9 +708,9 @@ function hottestFor(kidId, items, now, homeWeek) {
   const firstIso = first ? partsInTZ(first.start < now ? now : first.start).iso : "";
   const ride = first && mine.find((x) => x.kidRide && x.start >= now && partsInTZ(x.start).iso === firstIso); /* DADSPAN1 · same day as the real next thing */
   const hit = ride || first;
-  const mom = homeWeek && homeWeek.with === "away";
+  const away = homeWeek && homeWeek.with === "away";
   if (!hit) {
-    return mom
+    return away
       ? {
           when: `${partsInTZ(now).weekday.toUpperCase()} · kids away`,
           what: "KIDS AWAY",
@@ -708,7 +727,7 @@ function hottestFor(kidId, items, now, homeWeek) {
   return {
     when: `${fmtDowShort(hit.start).toUpperCase()} · ${whenTime(hit)}`,
     what: kidsSafeWhat(hit.raw, hit.kind).toUpperCase().slice(0, 48),
-    where: mom
+    where: away
       ? `kids away · back ${homeWeek.through}`
       : `with Dad at home · through ${homeWeek.through}`,
     badges: [fmtDowShort(hit.start).toUpperCase(), whenTime(hit)],
@@ -819,7 +838,7 @@ function main() {
   const isKidLogistics = (it) => {
     if (it.kind === "custody") return false;
     /* SCHOOLALWAYS1 · school awareness (specials, dress-up days, conferences, no-school)
-       stays on kid boards even on mom weeks / Nashville — standing "Kids school info on boards". */
+       stays on kid boards every week and on trips (standing "Kids school info on boards"). */
     if (it.kind === "school") return false;
     if (it.kid || it.kidRide || it.ride || it.kind === "school_drop" || it.kind === "school_pickup" || it.kind === "sport") return true;
     const m = kidMentions(it.raw || it.summary || "");
@@ -854,8 +873,8 @@ function main() {
     refreshedAt: now.toISOString(),
     sourceCalendar: "primary", /* PRIVFEED1 · no address in data */
     leaveBys: prev.leaveBys || {
-      SRE_drop: "leave 8:10 for 8:25",
-      SRE_pickup: "leave 3:15 for 3:40",
+      school_drop: "leave 8:10 for 8:25",
+      school_pickup: "leave 3:15 for 3:40",
       note: "sports: event START = leave-by",
     },
     homeWeek,

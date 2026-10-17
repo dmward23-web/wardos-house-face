@@ -1,6 +1,6 @@
 /* LIVELAW1 · Dan's face laws applied at render time to calendar-fed rows (never by editing data/*-live.json or kids-week.json).
- *  1. SRE colour days ("SRE Orange Day", "Red Day") and dress-up / spirit / pajama / costume days never show as kid rows or
- *     clothing prompts. The colour still drives the quiet SRE specials indicator (kids-data.js SPECIALS-COLOR1) through
+ *  1. School colour days ("<school> Orange Day", "Red Day") and dress-up / spirit / pajama / costume days never show as kid rows or
+ *     clothing prompts. The colour still drives the quiet school specials indicator (kids-data.js SPECIALS-COLOR1) through
  *     kid._lawColorRows, which no renderer prints.
  *  2. Rows that already ended today (device clock, CT) drop out of kid cards and TODAY / NEXT slots; the next real item
  *     takes the slot, or the slot is left out. Nothing is invented and no placeholder is written.
@@ -10,7 +10,7 @@
 (function (g) {
   var COLORS = "orange|red|yellow|green|blue|purple|pink|white|black|gold|silver|maroon|rainbow|neon|tie[- ]?dye|camo|pastel|teal|navy";
   var DRESS = new RegExp(
-    "\\b(?:" + COLORS + ")\\s+(?:day|out)\\b" +                       /* SRE Orange Day · Red Day · white out */
+    "\\b(?:" + COLORS + ")\\s+(?:day|out)\\b" +                       /* <school> Orange Day · Red Day · white out */
     "|\\bcolou?r\\s+day\\b" +
     "|\\bdress[- ]?up\\b|\\bdress\\s+(?:as|like)\\b" +
     "|\\bspirit\\s+(?:day|week|wear)\\b" +
@@ -29,6 +29,8 @@
       .replace(/\bMOVED\s*[\u2192\u21d2\u27a1]\s*/gi, "moved to ")
       .replace(/\s*[\u2192\u21d2\u27a1]\s*/g, " to ")
       .replace(/\s*\u2014\s*/g, " \u00b7 ")
+      /* SCHOOLKEY2 · no en dash on glass: number ranges keep a tight hyphen (5:30-6:30), word ranges read "to", spaced ones a hyphen */
+      .replace(/(\d)\s*\u2013\s*(?=\d)/g, "$1-").replace(/([A-Za-z])\u2013(?=[A-Za-z])/g, "$1 to ").replace(/\s*\u2013\s*/g, " - ")
       .replace(/(\s*\u00b7\s*){2,}/g, " \u00b7 ").replace(/^\s*\u00b7\s*|\s*\u00b7\s*$/g, "");
   }
 
@@ -68,7 +70,7 @@
     if (di < 0 || ti < 0) return null;
     return (di - ti + 7) % 7; /* weekday only: this or the coming week */
   }
-  /* End minute of a timed row today: "5:15–6:15" range end, else start + 90 min (SRE specials run the school day) */
+  /* End minute of a timed row today: "5:15–6:15" range end, else start + 90 min (school specials run the school day) */
   function endMin(when, what) {
     var txt = String(when || "") + " · " + String(what || "");
     if (/\bAll day\b/i.test(String(when || ""))) return null;
@@ -119,7 +121,7 @@
     var hot = kid.hottest;
     if (hot && (isDressDay(rowText(hot)) || rowEnded(hot, now))) {
       var pool = [];
-      ["today", "appointments", "sports", "school", "week"].forEach(function (k) { (kid[k] || []).forEach(function (r) { if (r && r.what && keepRow(r, now) && r.kind !== "note" && !/\bwith Dad\b|\bDad week\b|\bat home\b/i.test(r.what) && !(dayOffset(r.when, now) === 0 && /\bAll day\b/i.test(String(r.when || "")))) pool.push(r); /* NEXT = the next thing coming up; today's all-day notes stay in their own rows */ }); });
+      ["today", "appointments", "sports", "school", "week"].forEach(function (k) { (kid[k] || []).forEach(function (r) { if (r && r.what && keepRow(r, now) && r.kind !== "note" && !/\bwith Dad\b|\bDad week\b|\bat home\b/i.test(r.what) && !(dayOffset(r.when, now) === 0 && /\bAll day\b/i.test(String(r.when || "")))) pool.push(r); /* NEXT = the next thing coming up; today's all-day notes stay in their own rows */ }); }); /* custody-law:allow (matcher that skips these rows) */
       pool.sort(function (a, b) { return rowKey(a, now) - rowKey(b, now); });
       var nx = pool[0];
       if (nx) {
@@ -149,7 +151,7 @@
 
   /* PRIVFEED3 · one pass over a private-feed payload (cal-live / cal-months / kids-week) before any page sees it:
      colour-day and dress-up rows drop out, face text loses em dashes, arrows and booking codes ('#...').
-     Words only: ids, times, urls, colours and custody fields are never touched. Data files are never edited. */
+     Words only: ids, times, urls, colours and week-state fields are never touched. Data files are never edited. */
   var SKIP_KEY = /^(id|icdId|href|url|link|htmlLink|sourceCalendar|source|tz|status|kind|tone|cadence|theme|color|colour|c|cls|class|.*Iso|start|end|at|fetchedAt|refreshedAt|updatedAt|windowStart|windowEnd|with|withDan)$/;
   /* SEATLAW1 + SCHOOLWORD1 (TEXTLAW5) · same regexes as scripts/text-law.json (scripts/qa/seatlaw.test.mjs keeps them equal):
      ticket section / row / seat never shows, at any viewport, live or cached; 'LKMS' reads 'school'. */
@@ -166,19 +168,27 @@
       .replace(/\s*\((?:tennis shoes|sneakers|wear [^)]*)\)/gi, "") /* LAW8C1 · no what-to-wear hints on glass */.replace(/\s{2,}/g, " ").replace(/\s*,\s*(?=,|$)/g, "").replace(/(\s\u00b7\s*)+$/, "").trim();
     return t || s.replace(/[\u2014\u2192]/g, " ").trim();
   }
+  /* NOCUSTODY1 · glass law for every board: a feed string that carries one is blanked, and a row whose text carries
+     one is dropped. Nothing is put in its place. Same phrase list as scripts/qa/nocustody.test.mjs. */
+  var NOCUST_RX = /kids with (?:dad|mom|dan)\b|\b(?:dad|mom)(?:'?s)? weeks?\b|\bhome week|\baway week|\bcustody\b|\btheir mom'?s week|\bkids away\b|\btheir week\b|kids-with-dan|\b(?:your base|base at home|drop zone hq) with dad\b/i; /* custody-law:allow */
+  function isCustody(s) { return NOCUST_RX.test(String(s == null ? "" : s)); }
+  function rowCustody(o) {
+    if (!o || typeof o !== "object" || Array.isArray(o)) return false;
+    return isCustody([o.summary, o.title, o.what, o.l, o.label, o.text].filter(function (x) { return typeof x === "string"; }).join(" "));
+  }
   function rowDress(o) {
     if (!o || typeof o !== "object" || Array.isArray(o)) return false;
     return isDressDay([o.summary, o.title, o.what, o.l, o.label, o.text, o.hint].filter(function (x) { return typeof x === "string"; }).join(" "));
   }
   function cleanFeed(name, data) {
     function walk(v, key) {
-      if (Array.isArray(v)) { var out = []; for (var i = 0; i < v.length; i++) { if (!rowDress(v[i])) out.push(walk(v[i], key)); } return out; }
-      if (v && typeof v === "object") { var r = {}; for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k)) { if (rowDress(v[k]) && k !== "kids") continue; r[k] = walk(v[k], k); } return r; }
-      if (typeof v === "string" && !(key && SKIP_KEY.test(key))) return faceText(v);
+      if (Array.isArray(v)) { var out = []; for (var i = 0; i < v.length; i++) { if (!rowDress(v[i]) && !rowCustody(v[i]) && !(typeof v[i] === "string" && isCustody(v[i]))) out.push(walk(v[i], key)); } return out; }
+      if (v && typeof v === "object") { var r = {}; for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k)) { if ((rowDress(v[k]) || rowCustody(v[k])) && k !== "kids") continue; r[k] = walk(v[k], k); } return r; }
+      if (typeof v === "string" && !(key && SKIP_KEY.test(key))) return isCustody(v) ? "" : faceText(v);
       return v;
     }
     try { return data && typeof data === "object" ? walk(data, "") : data; } catch (e) { return data; }
   }
 
-  g.HouseFaceLaw = { cleanFeed: cleanFeed, faceText: faceText, isDressDay: isDressDay, faceDash: faceDash, rowEnded: rowEnded, keepRow: keepRow, keepEvent: keepEvent, cleanKidsWeek: cleanKidsWeek, cleanKid: cleanKid, ctNow: ctNow, DRESS: DRESS, RENDER_RULES: RENDER_RULES };
+  g.HouseFaceLaw = { isCustody: isCustody, cleanFeed: cleanFeed, faceText: faceText, isDressDay: isDressDay, faceDash: faceDash, rowEnded: rowEnded, keepRow: keepRow, keepEvent: keepEvent, cleanKidsWeek: cleanKidsWeek, cleanKid: cleanKid, ctNow: ctNow, DRESS: DRESS, RENDER_RULES: RENDER_RULES };
 })(typeof window !== "undefined" ? window : globalThis);

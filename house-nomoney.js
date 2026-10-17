@@ -1,6 +1,6 @@
 /* NOMONEY1 · kid dollar figures never reach the glass, at any viewport, live or cached.
    Render-time only: data files and the private feed are untouched. Every dollar figure in visible text (a whole-dollar amount, an hourly rate, a per-week chip)
-   becomes a star, and the bank line reads "Stars · payday with Dad". house-ori-world.js has the same scrub, but it
+   becomes a star, and the bank line reads "Stars · payday". house-ori-world.js has the same scrub, but it
    only runs where the ori world boots; this file runs on every kid-money page regardless of layout or viewport.
    The grown-ups desk gate never shows dollars either (WALL-STATION.md). */
 (function (g) {
@@ -10,7 +10,7 @@
   var BANK = /Balance\s*★\s*·\s*Week\s*★\s*·\s*Jar\s*★\s*\/\s*★/i;
   function text(s) {
     if (!s || s.indexOf("$") < 0 || !/\$\s?\d/.test(s)) return s;
-    return s.replace(MONEY, "\u2605").replace(BANK, "Stars · payday with Dad");
+    return s.replace(MONEY, "\u2605").replace(BANK, "Stars · payday");
   }
   var SKIP = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, INPUT: 1, CODE: 1, NOSCRIPT: 1 };
   function scrub(node) {

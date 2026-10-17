@@ -3,6 +3,12 @@
    RIDES law: kid tiles never show Dad logistics (kind leave/ride, "Pick up …"/"Drop …"). */
 (function () {
   "use strict";
+  /* SCHOOLNAMES1 · the school code / name never live in git: "§" = role "school" tokens, "¶" = full names, from school-names.js
+     (private runtime source; none known = the school part of the pattern matches nothing). */
+  var SCHRX = function (src, flags) {
+    var S = (typeof globalThis !== "undefined" ? globalThis : window).SchoolNames;
+    return S ? S.rx(src, flags) : new RegExp(String(src).split("§").join("(?!)").split("¶").join("(?!)"), flags || "");
+  };
   var TZ = "America/Chicago";
   function ctDate(d) {
     try {
@@ -78,7 +84,9 @@
         var blob = (it.summary || "") + " " + (it.place || "");
         if (id === "harris" && /\bhayes\b/i.test(blob) && !/\bharris\b|\bboys\b/i.test(blob)) return false;
         if (id === "hayes" && /\bharris\b/i.test(blob) && !/\bhayes\b|\bboys\b/i.test(blob)) return false;
-        return re.test(blob) || (id !== "ainsley" && /\bSRE\b/.test(blob) && /\bhayes \+ harris\b|\bboys\b/i.test(blob));
+        return re.test(blob) || (id !== "ainsley" && SCHRX(String.raw`\b§\b`, "").test(blob) && /\bhayes \+ harris\b|\bboys\b/i.test(blob)) ||
+          /* SCHOOLKEY2 · generator-tagged school run with no boy named = both boys, with or without the private names */
+          (id !== "ainsley" && /^school_(drop|pickup)$/.test(String(it.kind || "")) && !/\bhayes\b|\bharris\b/i.test(blob));
       }).slice(0, 3);
       var html = mine.map(function (it, i) {
         return row(mtFor(it), titleOf(it), i === 0 ? (isToday(it) ? "Next" : "Up next") : "", i === 0 ? "amber" : "");
@@ -95,7 +103,7 @@
     else if (todayItems.length > 3) th += row("+" + (todayItems.length - 3), "more today", "", "");
     setMicro(micro(".tile.today"), th);
 
-    /* Week tile · next 4 days from Dad week list */
+    /* Week tile · next 4 days from Dan's week list */
     var dan = (week.kids && week.kids.dan) || {};
     var days = [];
     var byDay = {};
@@ -120,12 +128,12 @@
     var stage = document.querySelector(".tile.dan [data-dad-stage]");
     if (stage) {
       /* NEXTLEAVE1 · "Next leave" is the first REAL leave/drop (generator flag leaveBy), never queue[0]:
-         the 7:00 SRE specials note and all-day notes are not leaves. Older data without the flag: same rule by kind. */
+         the 7:00 school specials note and all-day notes are not leaves. Older data without the flag: same rule by kind. */
       var isLeave = function (it) {
         if (!it || it.allDay) return false;
         if (typeof it.leaveBy === "boolean") return it.leaveBy;
         var t = String(it.summary || it.place || "");
-        if (/SRE specials?/i.test(t)) return false;
+        if (SCHRX(String.raw`§ specials?`, "i").test(t)) return false;
         return /^(leave|school_drop|school_pickup|sport|appointment)$/.test(String(it.kind || "")) || /\b(pick\s*-?\s*up|drop(\s*-?\s*off)?|leave)\b/i.test(t);
       };
       var leaves = queue.filter(isLeave);

@@ -1,8 +1,8 @@
 /* jar-engine.js · shared chore-jar creature
    Glossy liquid metal in the kid's color. Simmers when low, boils as it fills,
-   boils over when the week's musts are complete. Hungry (a due chore, Dad week
-   only) drops the boil, wobbles the glass, and rattles the lid.
-   No dollars, scores, or shame language. Mom weeks: the creature rests.
+   boils over when the week's musts are complete. Hungry (a due chore, this
+   week only) drops the boil, wobbles the glass, and rattles the lid.
+   No dollars, scores, or shame language. Off weeks: the creature rests.
    Original drawing only. Theme notes live in comments. */
 (function (global) {
   "use strict";
@@ -27,10 +27,13 @@
     id = id || (document.body && document.body.getAttribute("data-kid")) || "hayes";
     return COLORS[id] ? id : "hayes";
   }
+  /* AWAYWK1 · a resting week rests the jar (no words). A missing, unreadable or empty week feed is a normal awake week. */
   function asleepWeek(data) {
-    var hw = data && data.homeWeek;
-    if (!hw) return false;
-    return /mom/i.test(String(hw.with || "") + " " + String(hw.place || ""));
+    try {
+      var hw = data && typeof data === "object" ? data.homeWeek : null;
+      if (!hw || typeof hw !== "object") return false;
+      return String(hw.with || "").trim().toLowerCase() === "away"; /* the generator writes with: "away" | "Dad" */
+    } catch (e) { return false; }
   }
 
   function choreState(kidId) {

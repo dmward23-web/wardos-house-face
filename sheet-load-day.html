@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="WardOS House" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#d8dadf" />
-<meta name="description" content="Board-OS House face · LOAD DAY (live) · House+Desk LIVE · school · sports" />
+<meta name="description" content="Board-OS House face · LOAD DAY (live)" />
 <title>BOARD-OS · HOUSE FACE · LOAD DAY</title>
 <link rel="stylesheet" href="house-engage.css?v=HUBSCROLL2" />
 <link rel="stylesheet" href="tokens-hub-command-deck-shared.css?v=LIVEGREEN1" />
@@ -224,7 +224,7 @@
  .beat.leave::before { background: linear-gradient(90deg, #f0c040, #d0a020); height: 5px; }
  .beat.flight::before { background: linear-gradient(90deg, #5a9ae8, #3a6fc0); }
  .beat.bday::before { background: linear-gradient(90deg, #3ec9a0, #2a9a78); }
- .beat.handoff::before { background: linear-gradient(90deg, #6a7078, #3a4048); }
+ .beat.bagday::before { background: linear-gradient(90deg, #6a7078, #3a4048); }
  .beat.glow::before { background: linear-gradient(90deg, #f0a060, #d07840); }
  .beat.leave {
  background: linear-gradient(165deg, rgba(255,255,255,0.95) 0%, rgba(255,240,180,0.7) 100%);
@@ -317,27 +317,27 @@
  font-size: 11px; font-weight: 550; color: #7a8494;
  }
 
- .handoff-card {
+ .bag-card {
  border-radius: 14px; padding: 16px 18px; flex-shrink: 0;
  background: linear-gradient(105deg, #262830 0%, #3a3e46 50%, #2a2c32 100%);
  color: #f4f6f8; position: relative; overflow: hidden;
  }
- .handoff-card::before {
+ .bag-card::before {
  content: ""; position: absolute; inset: 0; pointer-events: none;
  background: linear-gradient(118deg, transparent 0 40%, rgba(255,255,255,0.12) 40% 44%, transparent 44%);
  }
- .handoff-card .lbl {
+ .bag-card .lbl {
  font-size: 11px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase;
  color: rgba(220,224,230,0.7); position: relative;
  }
- .handoff-card .big {
+ .bag-card .big {
  font-size: 24px; font-weight: 800; letter-spacing: -0.04em; margin: 6px 0 4px; position: relative;
  }
- .handoff-card .big .hl {
+ .bag-card .big .hl {
  color: #0e1014; padding: 2px 12px; border-radius: 9px;
  background: linear-gradient(180deg, #fff, #e8ebf0);
  }
- .handoff-card .sub {
+ .bag-card .sub {
  font-size: 14px; font-weight: 550; color: rgba(230,234,240,0.9); position: relative;
  }
 
@@ -403,12 +403,12 @@
  <div class="loadband-body">
  <div class="loadband-main">
  <div class="loadband-label" data-ld="label">Load day</div>
- <div class="loadband-title">House+Desk LIVE · <span class="time">8:00</span></div>
- <div class="loadband-sub">SRE drop <strong>8:25</strong> · Ainsley HW <strong>3:00</strong> · boys pickup <strong>3:40</strong> · Hayes BB <strong>6:15</strong></div>
+ <div class="loadband-title"></div>
+ <div class="loadband-sub"></div>
  </div>
  <div class="loadband-stamp" aria-hidden="true">
  <div class="big">Load day</div>
- <div class="sm" data-ld="stamp">—</div>
+ <div class="sm" data-ld="stamp"></div>
  </div>
  </div>
  </section>
@@ -418,7 +418,7 @@
  <div class="lower">
  <section class="sec" aria-label="Pack checklist strip">
  <div class="sec-hdr">
- <a class="sec-title" href="sheet-pack.html?v=KITDEAD1" style="text-decoration:none;color:inherit">Pack checklist · open Pack →</a>
+ <a class="sec-title" href="sheet-pack.html?v=KITDEAD1" style="text-decoration:none;color:inherit">Pack checklist · Open Pack</a>
  <div class="sec-meta">glance only · checkoffs on Pack sheet</div>
  </div>
  <div class="pack-strip" aria-hidden="true">
@@ -465,9 +465,9 @@
  <div class="sec-title">One glance</div>
  <div class="sec-meta">known facts</div>
  </div>
- <div class="handoff-card">
- <div class="lbl">WITH DAD</div>
- <div class="big">Kids with Dad at <span class="hl">home</span></div>
+ <div class="bag-card">
+ <div class="lbl">LOAD DAY</div>
+ <div class="big">Bags and <span class="hl">rides</span></div>
  <div class="sub" data-ld="sub">from the live calendar</div>
  </div>
  <div class="glance" data-ld="glance"></div>
@@ -493,7 +493,7 @@
 function e(t){return String(t).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
 function day(iso){var d=new Date(iso+"T12:00:00");return d}
 function hm(s){var m=/T(\d\d):(\d\d)/.exec(s);if(!m)return"";var h=+m[1]%12||12;return h+":"+m[2]}
-fetch("data/cal-live.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json()}).then(function(d){
+fetch("data/cal-live.json?t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("offline");return r.json()}).then(function(d){if(!d||d.offline||d.status==="offline")throw new Error("offline");
 var now=new Date(),today=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Chicago"}).format(now);
 var L=(d.upcomingLeaves||[]).filter(function(x){return x&&x.start&&!x.allDay&&new Date(x.end||x.start)>now});
 var iso=L.length?L[0].start.slice(0,10):today;var rows=L.filter(function(x){return x.start.slice(0,10)===iso});

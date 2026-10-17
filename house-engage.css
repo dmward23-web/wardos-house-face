@@ -1755,7 +1755,7 @@ body.theme-harris .sec-chores .quest .ring {
 }
 
 
-/* ==== LAYOUT32 GRID OVERRIDE · Elo 3202L portrait · Prism handoff ==== */
+/* ==== LAYOUT32 GRID OVERRIDE · Elo 3202L portrait · Prism pass ==== */
 body.theme-ainsley .body,
 body.theme-hayes .body,
 body.theme-harris .body {
@@ -2735,7 +2735,7 @@ body.theme-ainsley .sec-bank .bank-goal-title {
    CONSUME1 · kid schedule consume layout
    week strip · NEXT UP hero · HQ punch · collapsed routine · unique ahead
    Themes: Hayes Victory (cyan/gold) · Harris Gem (green/gold) · Ainsley Tour (amber/honey)
-   Glass law: never CUSTODY — WITH DAD / Dad week only
+   Glass law NOCUSTODY1 (scripts/qa/nocustody.test.mjs)
    ============================================================ */
 
 .sec-schedule.consume-sched {

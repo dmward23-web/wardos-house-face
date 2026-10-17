@@ -56,7 +56,7 @@
     var dayNow = String(t[i0]).slice(0, 10);
     var tmrw = String(t[s]).slice(0, 10) !== dayNow ? "Tmrw " : "";
     var endIso = t[e + 1] || t[e];
-    var when = (s === i0 ? "now" : tmrw + hourLabel(t[s])) + "–" + hourLabel(endIso);
+    var when = (s === i0 ? "now" : tmrw + hourLabel(t[s])) + " to " + hourLabel(endIso); /* SCHOOLKEY2 · no en dash on glass */
     return { text: "Rain " + when + " · " + Math.round(maxP) + "%", wet: true };
   }
 
@@ -209,7 +209,7 @@
     t = String(t || "");
     if (/^No rain/i.test(t)) return "No rain 24h";
     t = t.replace(/\s*·\s*\d+%$/, "");
-    var m = t.match(/^Rain(?:ing)? now[–-](.+)$/i);
+    var m = t.match(/^Rain(?:ing)? now(?:\s+to\s+|[–-])(.+)$/i);
     if (m) return "Rain till " + m[1];
     return t;
   }
