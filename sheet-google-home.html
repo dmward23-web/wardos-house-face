@@ -142,7 +142,7 @@
   .climate-title{font-size:28px;font-weight:900;letter-spacing:-0.04em;line-height:1.05}
   .climate-title em{font-style:normal;color:#ffe080}
   .climate-sub{font-size:14px;font-weight:650;color:rgba(220,210,190,0.9);margin-top:2px}
-  .climate-temps{display:flex;align-items:center;gap:14px;flex-shrink:0}
+  .climate-temps{display:flex;align-items:center;gap:14px;flex-shrink:0;flex-wrap:wrap;min-width:0;max-width:100%} /* P1FIX B64 · chips wrap, never run off the edge */
   .climate-amb{text-align:center}
   .climate-amb .big{font-size:56px;font-weight:900;letter-spacing:-0.05em;line-height:1}
   .climate-amb .big span{font-size:24px;vertical-align:super;opacity:0.85}
@@ -247,6 +247,15 @@
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
 <link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
 <link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<style>
+/* P1FIX B63 · header pill was white text on a white pill: amber outline pill on dark glass, like the other sheets */
+html body .hot-pill.gh-title-pill{background:rgba(18,14,8,.62)!important;background-image:none!important;color:#ffe894!important;-webkit-text-fill-color:#ffe894!important;border:1.5px solid rgba(240,197,106,.8)!important;text-shadow:none!important;box-shadow:none!important}
+html body .hot-pill.gh-title-pill::before,html body .hot-pill.gh-title-pill::after{display:none!important}
+</style>
+<style id="p1fix-climate-words">
+/* P1FIX climate tech lines: the dev notes (cam path, next-step note) stay off glass even when house-nest.js repaints them */
+html body .cam-path,html body #cam-next-step{display:none!important}
+</style>
 </head>
 <body>
 <div class="panel cams-cmd">
@@ -261,7 +270,7 @@
  </div>
  <div class="hdr-spacer" aria-hidden="true"></div>
  <div class="hdr-right-tools">
- <div class="hot-pill cmd-pill cmd-pill--live">CLIMATE + CAMS</div>
+ <div class="hot-pill cmd-pill cmd-pill--live gh-title-pill">CLIMATE + CAMS</div>
  </div>
  </header>
 
@@ -275,7 +284,7 @@
  </section>
 
 
- <a class="climate-hero" id="sensi-hero" href="sheet-sensi.html" aria-label="Sensi thermostat · open controls">
+ <a class="climate-hero" id="sensi-hero" href="#sensi-hero" aria-label="Sensi thermostat">
  <div class="climate-accent" aria-hidden="true"></div>
  <div class="climate-body">
  <div class="climate-left">
@@ -286,18 +295,17 @@
  <div class="climate-temps">
  <div class="climate-amb">
  <div class="lab">Indoor</div>
- <div class="big" id="sensi-hero-amb">--<span>°</span></div>
+ <div class="big" id="sensi-hero-amb"></div>
  </div>
  <div class="climate-set">
  <div class="lab">Set</div>
  <div class="val" id="sensi-hero-set"></div>
  </div>
  <div class="climate-mode" id="sensi-hero-mode">HEAT</div>
- <div class="climate-humid" id="sensi-hero-humid">--% RH</div>
+ <div class="climate-humid" id="sensi-hero-humid" hidden style="display:none"></div>
  </div>
  <div class="climate-cta">
  <div class="climate-pill cmd-pill cmd-pill--need" id="sensi-hero-pill">Needs pairing</div>
- <div class="climate-open">Open Sensi</div>
  </div>
  </div>
  </a>
@@ -424,7 +432,6 @@
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
  <span>House · Cams + Sensi + Lights</span>
- <a class="ftr-chip" href="sheet-sensi.html">Sensi</a>
  <a class="ftr-chip" href="sheet-lights.html">Lights</a>
  <a class="ftr-chip" href="sheet-index.html">Sheets</a>
  </div>
@@ -434,7 +441,7 @@
 <script src="house-clock.js?v=PRIVFEED3"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=MERGE1C"></script>
-<script src="house-sensi.js?v=PRIVFEED3"></script>
+<script src="house-sensi.js?v=P1FIX"></script>
 <script src="nest-webrtc-client.js?v=FOLLOWUP6"></script>
 <script src="house-nest.js?v=MERGE1C"></script>
 <script src="house-lights.js?v=FOLLOWUP6"></script>

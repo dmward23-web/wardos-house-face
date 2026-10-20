@@ -385,6 +385,17 @@
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
 <link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
 <link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<style id="p1fix-load-day-list">
+/* P1FIX B81 · the pack strip read as a bar chart: it becomes a 2-column checklist of 16 px rows on dark glass */
+html body .pack-strip{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;flex:none!important;overflow:visible!important}
+
+html body .pack-item{flex-direction:row!important;justify-content:flex-start!important;align-items:center!important;text-align:left!important;gap:12px!important;padding:12px 14px!important;
+  background:rgba(10,12,18,.66)!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:12px!important;min-height:56px}
+html body .pack-item.done{background:rgba(20,70,52,.62)!important;border-color:rgba(90,220,170,.45)!important}
+html body .pack-item .lbl{font-size:16px!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+html body .pack-item .who{font-size:13px!important;color:rgba(255,255,255,.72)!important;-webkit-text-fill-color:rgba(255,255,255,.72)!important}
+html body .pack-item .box{flex-shrink:0}
+</style>
 </head>
 <body>
 <div class="panel">
@@ -425,36 +436,36 @@
  <a class="sec-title" href="sheet-pack.html?v=KITDEAD1" style="text-decoration:none;color:inherit">Pack checklist · Open Pack</a>
  <div class="sec-meta">glance only · checkoffs on Pack sheet</div>
  </div>
- <div class="pack-strip" aria-hidden="true">
+ <div class="pack-strip" aria-hidden="true" data-ld-pack>
  <div class="pack-item done">
  <div class="box">✓</div>
  <div class="lbl">Backpacks</div>
  <div class="who">chargers</div>
  </div>
- <div class="pack-item done">
+ <div class="pack-item done" data-away-kid>
  <div class="box">✓</div>
  <div class="lbl">Swim bag</div>
  <div class="who">Ainsley</div>
  </div>
- <div class="pack-item">
+ <div class="pack-item" data-away-kid>
  <div class="box" aria-hidden="true">·</div>
  <div class="lbl">Flag gear</div>
  <div class="who">Hayes</div>
  </div>
- <div class="pack-item">
+ <div class="pack-item" data-away-kid>
  <div class="box" aria-hidden="true">·</div>
  <div class="lbl">Flag stuff</div>
  <div class="who">Harris</div>
  </div>
- <div class="pack-item">
+ <div class="pack-item" data-away-kid>
  <div class="box" aria-hidden="true">·</div>
  <div class="lbl">Snacks bag</div>
- <div class="who">Hayes 7:30</div>
+ <div class="who">Hayes</div>
  </div>
- <div class="pack-item">
+ <div class="pack-item" data-away-kid>
  <div class="box" aria-hidden="true">·</div>
  <div class="lbl">BB gear</div>
- <div class="who">Hayes 6:15</div>
+ <div class="who">Hayes</div>
  </div>
  <div class="pack-item">
  <div class="box" aria-hidden="true">·</div>
@@ -498,11 +509,18 @@ function faceDash(s) { return String(s == null ? "" : s).replace(/\bMOVED\s*[\u2
 function e(t){return faceDash(window.AwayFilter?window.AwayFilter.glass(t):t).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
 function day(iso){var d=new Date(iso+"T12:00:00");return d}
 function hm(s){var m=/T(\d\d):(\d\d)/.exec(s);if(!m)return"";var h=+m[1]%12||12;return h+":"+m[2]}
+/* LDAWAY1 · the pack strip is the shown load day's kid list: its [data-away-kid] items follow away-filter.js on that day.
+   No month data (missing feed) means withDan is unknown, so nothing is away and the normal board shows. */
+function ctIso(ms){return new Intl.DateTimeFormat("en-CA",{timeZone:"America/Chicago"}).format(new Date(ms))}
+function packDay(iso){var A=window.AwayFilter,pk=document.querySelector("[data-ld-pack]");if(!pk)return;pk.setAttribute("data-away-day",iso);
+Array.prototype.forEach.call(pk.querySelectorAll("[data-away-kid][data-away-hidden]"),function(el){el.removeAttribute("data-away-hidden");el.style.removeProperty("display")});
+if(A)A.ready().then(function(){A.scrubDom(pk.parentNode)})}
+packDay(ctIso(window.AwayFilter?window.AwayFilter.now():Date.now()));
 fetch("data/cal-live.json?t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("offline");return r.json()}).then(function(d){if(!d||d.offline||d.status==="offline")throw new Error("offline");
 var now=new Date(),today=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Chicago"}).format(now);
 var L=(d.upcomingLeaves||[]).filter(function(x){return x&&x.start&&!x.allDay&&new Date(x.end||x.start)>now});
 var iso=L.length?L[0].start.slice(0,10):today;var rows=L.filter(function(x){return x.start.slice(0,10)===iso});
-var dd=day(iso),lab=dd.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+packDay(iso);var dd=day(iso),lab=dd.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
 q("label").textContent=lab+" · load day";q("ftr").textContent="LOAD DAY · "+lab.toUpperCase();
 q("stamp").textContent=dd.toLocaleDateString("en-US",{weekday:"short"})+" "+dd.getDate();
 var t=document.querySelector(".loadband-title"),sb=document.querySelector(".loadband-sub");

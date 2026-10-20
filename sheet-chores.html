@@ -434,6 +434,42 @@
 <link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
 <link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
 <script src="house-face-law.js?v=MERGE1C"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
+<style id="p1fix-chores-kidtabs">
+/* P1FIX B45 + N1 · Chores on the 1920x1080 wall: one kid at a time (three kids x ten chores cannot fit one screen at
+   48 px taps), switched by three big kid tabs; the kid's card keeps its own chip and chores together; chore names 22 px. */
+.wf-kidtabs{display:none}
+@media (min-width:1600px) and (orientation:landscape){
+  html:not(#hf-wall-off) body > .panel .body > section.col .chore-list{break-inside:auto!important;display:block!important;height:auto!important;overflow:visible!important}
+  html:not(#hf-wall-off) body > .panel .body > section.col .chore{break-inside:avoid!important;margin:0 0 8px!important}
+  html:not(#hf-wall-off) body > .panel .body > section.col{display:block!important;break-inside:auto!important;-webkit-box-decoration-break:clone;box-decoration-break:clone;background:rgba(10,12,18,.55);border-radius:16px;padding:10px 10px}
+  html body .chore{padding:8px 8px!important}
+  html body .chore .quest-days{gap:5px!important;flex-wrap:nowrap!important}
+  html:not(#hf-wall-off) body > .panel .body > section.col.wf-hide{display:none!important}
+  html:not(#hf-wall-off) body > .panel .wf-kidtabs{display:flex!important;gap:10px;margin:0 0 12px!important;break-inside:avoid}
+  .wf-kidtabs button{flex:1;min-height:56px;border-radius:14px;border:2px solid rgba(255,255,255,.3);color:#fff;font-family:inherit;font-size:20px;font-weight:800;line-height:1;cursor:pointer;opacity:.6}
+  .wf-kidtabs button.ain{background:#9b55b8}.wf-kidtabs button.hay{background:#1f7a60}.wf-kidtabs button.har{background:#2a5aa8}
+  .wf-kidtabs button[aria-pressed="true"]{opacity:1;border-color:#f0b440;box-shadow:0 0 0 3px rgba(240,180,64,.45)}
+  html body .chore .txt .what{font-size:22px!important;line-height:1.25!important}
+  html body .chore .txt .hint{font-size:17px!important}
+}
+</style>
+<style id="p1fix-chores-wall">
+/* P1FIX B45 · Chores wall: day toggles 48 px with 17 px letters (27in wall minimums); today carries a gold outline */
+@media (min-width:601px){
+  html body .chore .quest-days{gap:8px!important;flex-wrap:wrap!important}
+  html body .chore .day-tap{width:48px!important;height:48px!important;min-width:48px!important;font-size:17px!important;border-radius:10px!important}
+}
+html body .chore .day-tap.is-today{border-color:#f0b440!important;outline:3px solid #f0b440!important;outline-offset:2px}
+</style>
+<style id="p1fix-chores-chips">
+/* P1FIX B44 · Chores name chips: white names on each kid's own solid colour (outranks house-ori.css "html.ori-on .kid-chip.<kid>" !important) */
+html.ori-on body .kid-chip,html body .kid-chip{color:#fff!important;-webkit-text-fill-color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.35)!important}
+html.ori-on body .kid-chip.ainsley,html body .kid-chip.ainsley{background:#9b55b8!important}
+html.ori-on body .kid-chip.hayes,html body .kid-chip.hayes{background:#1f7a60!important}
+html.ori-on body .kid-chip.harris,html body .kid-chip.harris{background:#2a5aa8!important}
+html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+</style>
+<link rel="stylesheet" href="house-wall-frame.css?v=P1FIX" />
 </head>
 <body data-clear-label="ALL CLEAR" data-chores-shared="1" data-theme="house">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -699,7 +735,7 @@
  <div class="cheer-main">
  <div class="cheer-label">Today’s vibe</div>
  <div class="cheer-title">Tap musts · <span class="hl"><span class="g2-inline"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-star"/></svg></span> into the jar</span> · <a href="sheet-allowance.html" style="color:inherit">Dad checks</a></div>
- <div class="cheer-sub"><span data-live="date-short">…</span> · chores Fri to Fri</div>
+ <div class="cheer-sub"><span data-live="date-short">…</span></div>
  </div>
  <div class="cheer-badges">
  <div class="cheer-badge">3 kids</div>
@@ -713,7 +749,6 @@
  <section class="col" aria-label="Ainsley chores">
  <div class="col-hdr">
  <a class="kid-chip ainsley" href="kid-ainsley.html"><span class="dot">A</span> Ainsley</a>
- <div class="streak"><span class="star g2-inline"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-star"/></svg></span> 4-day</div>
  </div>
   <div class="chore-list">
  <div class="chore open ainsley" data-check="ain-bed">
@@ -722,7 +757,6 @@
  <div class="what">Make bed · stage reset</div>
  <div class="hint">daily must · morning</div>
  </div>
- <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open ainsley" data-check="ain-toys">
  <span class="ring"></span>
@@ -730,7 +764,6 @@
  <div class="what">Room reset</div>
  <div class="hint">daily must · morning clean pass</div>
  </div>
- <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open ainsley" data-check="ain-dishwasher">
  <span class="ring"></span>
@@ -738,7 +771,6 @@
  <div class="what">Clean up · rinse · dishwasher</div>
  <div class="hint">daily must · after you eat</div>
  </div>
- <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open ainsley" data-check="ain-empty">
  <span class="ring"></span>
@@ -746,7 +778,6 @@
  <div class="what">Empty dishwasher</div>
  <div class="hint">daily must · when clean</div>
  </div>
- <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open ainsley" data-check="ain-living">
  <span class="ring"></span>
@@ -754,7 +785,6 @@
  <div class="what">Shoes & coats · closet / cubby / room</div>
  <div class="hint">daily must · never hallway</div>
  </div>
- <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
  <div class="chore open ainsley" data-check="ain-bath">
  <span class="ring"></span>
@@ -762,7 +792,6 @@
  <div class="what">Bathroom wipe</div>
  <div class="hint">weekly must · ask Dad to inspect</div>
  </div>
- <span class="star-earn" data-stars="3" data-money-suffix=""></span>
  </div>
  <div class="chore open ainsley" data-check="ain-laundry">
  <span class="ring"></span>
@@ -770,7 +799,6 @@
  <div class="what">Laundry full cycle · her clothes</div>
  <div class="hint">weekly must · wash, dry, put away</div>
  </div>
- <span class="star-earn" data-stars="5" data-money-suffix=""></span>
  </div>
  <div class="chore open ainsley" data-check="ain-cubby">
  <span class="ring"></span>
@@ -778,7 +806,6 @@
  <div class="what">Backpack + sports bag in garage cubby</div>
  <div class="hint">weekly must · ask Dad to inspect</div>
  </div>
- <span class="star-earn" data-stars="1" data-money-suffix=""></span>
  </div>
  <div class="chore open ainsley addon" data-check="ain-babysit" data-optional="1">
  <span class="ring">＋</span>
@@ -786,10 +813,9 @@
  <div class="what">Babysitting · optional add-on</div>
  <div class="hint">when Dad books you · not for jar</div>
  </div>
- <span class="star-earn addon-tag" data-stars="0" data-money="babysit"></span>
  </div>
  </div>
-<div class="tap-hint"><span class="ring">✓</span> <a href="sheet-allowance.html" style="color:inherit;font-weight:800">★ Reward jar</a></div>
+<div class="tap-hint"><span class="ring">✓</span> <a href="sheet-allowance.html" style="color:inherit;font-weight:800">Reward jar</a></div>
  </section>
 
  <!-- Hayes -->
@@ -984,7 +1010,7 @@
 </div>
 <script src="house-clock.js?v=PRIVFEED3"></script>
 <script>document.addEventListener("DOMContentLoaded",function(){if(window.HouseClock){document.querySelectorAll("[data-live='date-short']").forEach(function(n){n.textContent=HouseClock.shortLabel();});}});</script>
-<script src="house-tapsync.js?v=MERGE1C"></script>
+<script src="house-tapsync.js?v=P1FIX"></script>
 <script src="kids-data.js?v=MERGE1C"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=MERGE1C"></script>
@@ -1014,5 +1040,13 @@
 <script src="house-ori-world.js?v=MERGE1C"></script>
 <script src="night/night-host.js?v=MERGE1C" defer></script>
 <script src="month-theme/month-overlay.js?v=MERGE1C" defer></script>
+<script>/* P1FIX B45 + N1 · wall kid tabs (only shown at 1600+ landscape; phone untouched) */
+(function(){var body=document.querySelector(".panel .body");if(!body)return;var cols=[].slice.call(body.querySelectorAll(":scope > section.col"));if(cols.length<2)return;
+var bar=document.createElement("div");bar.className="wf-kidtabs";bar.setAttribute("role","group");bar.setAttribute("aria-label","Pick a kid");
+var cls={ainsley:"ain",hayes:"hay",harris:"har"};
+function pick(i){cols.forEach(function(c,k){c.classList.toggle("wf-hide",k!==i)});[].forEach.call(bar.children,function(b,k){b.setAttribute("aria-pressed",k===i?"true":"false")})}
+cols.forEach(function(c,i){var chip=c.querySelector(".kid-chip");var name=chip?chip.textContent.replace(/^\s*\S\s+/,"").trim():"Kid "+(i+1);var id=(chip&&chip.className.match(/ainsley|hayes|harris/)||[""])[0];
+var b=document.createElement("button");b.type="button";b.className=cls[id]||"";b.textContent=name;b.addEventListener("click",function(){pick(i)});bar.appendChild(b)});
+body.parentNode.insertBefore(bar,body);pick(0);})();</script>
 </body>
 </html>

@@ -330,6 +330,12 @@
     var ambLab = document.querySelector(".climate-amb .lab");
     if (amb) amb.innerHTML = ambLabel(st) === "" ? "" : ambLabel(st) + "<span>°</span>";
     if (set) set.textContent = setLabel(st) || "";
+    /* P1FIX B64 · humidity only when the live thermostat reports it; otherwise no chip at all (NODATA: never a dash) */
+    var hum = document.getElementById(ids.humid || "sensi-hero-humid");
+    if (hum) {
+      if (st.source === "live" && typeof st.humidity === "number") { hum.textContent = Math.round(st.humidity) + "% RH"; hum.hidden = false; hum.style.removeProperty("display"); }
+      else { hum.textContent = ""; hum.hidden = true; hum.style.setProperty("display", "none", "important"); }
+    }
     if (mode) {
       mode.textContent = mc.label;
       mode.style.background = mc.soft;

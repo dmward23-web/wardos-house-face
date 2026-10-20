@@ -346,7 +346,10 @@ test("PRIVFEED2 no allowance figures or kid birthday names in markup (street lab
     assert.ok(!/\b(?:Ainsley|Hayes|Harris)(?:'s)?\s+birthday\b/i.test(s), f + " names a kid's birthday");
   }
   const allowance = fs.readFileSync(path.join(ROOT, "sheet-allowance.html"), "utf8");
-  assert.match(allowance, /data-jar-goal="tour-jar"/);
+  /* AINSSTAR1 (Atlas Oct 20) · Ainsley's jar carries no money or star rate; the boys' jars stay bound to the private feed */
+  assert.match(allowance, /data-jar-goal="victory-jar"/);
+  assert.match(allowance, /data-jar-goal="gem-jar"/);
+  assert.doesNotMatch(allowance, /data-jar-goal="tour-jar"/);
   assert.match(allowance, /house-money-bind\.js/);
 });
 

@@ -317,6 +317,18 @@
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
 <link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
 <link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<style id="p1fix-ideas">
+/* P1FIX B87 · Our Ideas: cards size to their content (no full-height empty slabs); the 3 "Tap to add" rows stay compact;
+   the 3 kid chips sit in one row. */
+html body .panel .body{flex:0 0 auto!important;align-content:start!important}
+html body .body .sec,html body .body .side,html body .options{flex:none!important;min-height:0!important;height:auto!important}
+html body .opt,html body .opt.empty-slot{min-height:64px!important}
+html body .side .peace{flex:none!important}
+html body .kid-chips-sec{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:10px!important;align-items:stretch}
+html body .kid-chips-sec .sec-hdr{flex:0 0 100%}
+html body .kid-chips-sec .vote-card{flex:1 1 0!important;min-width:0;min-height:64px!important;margin:0!important}
+html body .kid-chips-sec .vote-card .a{font-size:14px}
+</style>
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -624,7 +636,7 @@
  </div>
  </section>
  <div class="side">
- <section class="sec" style="flex:1;min-height:0">
+ <section class="sec kid-chips-sec">
  <div class="sec-hdr">
  <div class="sec-title">Kid chips</div>
  </div>

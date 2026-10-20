@@ -32,7 +32,8 @@
         if (r.kind === "leave" || r.kind === "ride") return false;
         return !/^(Pick\s*-?\s*up|Drop)\b/i.test(String(r.what || ""));
       });
-      var times = rows.map(function (r) { return timeOf(r.when); }).filter(Boolean);
+      var times = rows.map(function (r) { return timeOf(r.when); }).filter(Boolean)
+        .filter(function (t, i, a) { return a.indexOf(t) === i; }); /* P1FIX B74 · "All day · All day" reads once */
       var whats = rows.map(function (r) { return String(r.what || "").trim(); }).filter(Boolean);
       show(document.querySelector("[data-today-kid-when='" + id + "']"), times.join(" · "));
       show(document.querySelector("[data-today-kid-what='" + id + "']"), whats.join(" · "));

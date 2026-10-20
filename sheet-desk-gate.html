@@ -404,6 +404,25 @@
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
 <link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
 <link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<style id="p1fix-desk-gate">
+/* P1FIX B50 · tiles read: dark glass, white titles, light lines; icons are gold glyphs on a dark chip (were blank on white)
+   P1FIX B51 · phone: one column, the side headings wrap instead of colliding, nothing cut */
+html body .item{background:rgba(10,12,18,.72)!important;border:1px solid rgba(255,255,255,.18)!important}
+html body .item .t{color:#fff!important;-webkit-text-fill-color:#fff!important}
+html body .item .d{color:rgba(255,255,255,.75)!important;-webkit-text-fill-color:rgba(255,255,255,.75)!important;font-size:13px!important}
+html body .item .ico{background:rgba(0,0,0,.55)!important;border:1px solid rgba(240,180,64,.5)!important;color:#ffd78a!important;-webkit-text-fill-color:#ffd78a!important;font-family:system-ui,"Segoe UI Symbol","Noto Sans Symbols 2","Apple Color Emoji","Noto Color Emoji",sans-serif!important}
+html body .item .tag{color:#1a1206!important;background:#f0b440!important}
+html body .item-grid{flex:none!important}
+@media (max-width:600px){
+  html body .split{grid-template-columns:1fr!important;flex:none!important}
+  html body .side{overflow:visible!important}
+  html body .side-top{flex-wrap:wrap!important}
+  html body .side-id{flex:1 1 100%}
+  html body .side-title{font-size:24px!important}
+  html body .loud-big{font-size:26px!important}
+  html body .item-grid{grid-template-columns:1fr 1fr!important}
+}
+</style>
 </head>
 <body>
 <div class="panel">

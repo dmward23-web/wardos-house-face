@@ -387,6 +387,19 @@
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
 <link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
 <link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<style id="p1fix-groceries">
+/* P1FIX B68 · cards size to their content (an empty list is one 64 px row, not a tall empty slab).
+   P1FIX B69 · add pills read: amber outline, light text on dark glass. Empty rows 60% white. */
+html body .panel .body{flex:0 0 auto!important;align-content:start!important}
+html body .body .sec{flex:none!important;min-height:0!important;height:auto!important}
+html body .sec .item-list,html body .sec .treats{flex:none!important}
+html body .sec .list-empty{min-height:64px;display:flex;align-items:center;padding:0 14px;border-radius:14px;
+  color:rgba(255,255,255,.6)!important;-webkit-text-fill-color:rgba(255,255,255,.6)!important;background:rgba(10,12,16,.45);border:1px dashed rgba(255,255,255,.22)}
+html body .treat.empty{min-height:64px!important}
+html body .treat.empty .treat-pick,html body .treat.empty .treat-hint{color:rgba(255,255,255,.6)!important;-webkit-text-fill-color:rgba(255,255,255,.6)!important}
+html body .add-btn,html body .fav.add{background:rgba(12,10,6,.55)!important;border:2px solid #f0b440!important;color:#ffd78a!important;-webkit-text-fill-color:#ffd78a!important;font-weight:800}
+html body .favs-empty{color:rgba(255,255,255,.6)!important;-webkit-text-fill-color:rgba(255,255,255,.6)!important}
+</style>
 </head>
 <body data-clear-label="CLEARED">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">

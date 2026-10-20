@@ -1087,7 +1087,10 @@
     }
     if (detail && strip.detailHtml) {
       detail.innerHTML = strip.detailHtml;
+    } else if (detail && strip._stale) {
+      detail.innerHTML = "";
     }
+    staleChip(!!strip._stale);
 
     _lastStrip = strip;
     _lastClock = clock;
@@ -1103,6 +1106,28 @@
         warn.textContent = "";
       }
     }
+  }
+
+  /* P1FIX B33 · a stale calendar collapses the full-width leave-by banner to one small, untappable chip, so the
+     freed height goes back to the scene (Month, Today, Us, hub). Style is injected once; no page CSS edits needed. */
+  function staleChip(on) {
+    try {
+      if (!document.getElementById("p1fix-stale-chip")) {
+        var st = document.createElement("style");
+        st.id = "p1fix-stale-chip";
+        st.textContent =
+          "html body a.leaveby.is-stale{display:inline-flex!important;align-items:center;width:auto!important;max-width:max-content;min-height:32px!important;height:auto!important;max-height:none!important;overflow:visible!important;padding:6px 14px!important;box-sizing:border-box!important;margin:8px 16px!important;border-radius:16px!important;pointer-events:none;box-shadow:none!important}" +
+          "html body a.leaveby.is-stale .leaveby-label,html body a.leaveby.is-stale .leaveby-detail,html body a.leaveby.is-stale .leaveby-badge,html body a.leaveby.is-stale .leaveby-accent{display:none!important}" +
+          "html body a.leaveby.is-stale .leaveby-body{padding:0!important;min-height:0!important;height:auto!important;overflow:visible!important}" +
+          "html body a.leaveby.is-stale .leaveby-main,html body a.leaveby.is-stale .leaveby-dest{font-size:14px!important;line-height:20px!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-weight:700!important;letter-spacing:.02em!important;color:rgba(242,230,204,.85)!important;margin:0!important}";
+        (document.head || document.documentElement).appendChild(st);
+      }
+      var els = document.querySelectorAll("a.leaveby");
+      for (var i = 0; i < els.length; i++) {
+        els[i].classList.toggle("is-stale", on);
+        if (on) els[i].setAttribute("aria-disabled", "true"); else els[i].removeAttribute("aria-disabled");
+      }
+    } catch (e) { /* old browser: banner stays as it was */ }
   }
 
   function fetchJson(url) {

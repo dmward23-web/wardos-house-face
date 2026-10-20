@@ -310,6 +310,17 @@
 <link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
 <link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
 <script src="house-face-law.js?v=MERGE1C"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
+<style id="p1fix-countdowns">
+/* P1FIX B46 · the light grey slab becomes a dark glass card sized to its content, light text */
+html body .panel .body{flex:0 0 auto!important;align-content:start!important}
+html body .body .sec{flex:none!important;min-height:0!important;height:auto!important;background:rgba(10,12,18,.72)!important;border:1px solid rgba(240,180,64,.38)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+html body .streak{background:transparent!important;border:0!important;box-shadow:none!important;flex:none!important;min-height:0!important}
+html body .streak .lbl{color:#f0c8ff!important;-webkit-text-fill-color:#f0c8ff!important}
+html body .streak .book,html body .streak-num .n{color:#fff!important;-webkit-text-fill-color:#fff!important}
+html body .streak .meta,html body .streak-num .u,html body .flame .day{color:rgba(255,255,255,.75)!important;-webkit-text-fill-color:rgba(255,255,255,.75)!important}
+html body .sec .sec-title{color:#F2E6CC!important;-webkit-text-fill-color:#F2E6CC!important}
+html body .sec .sec-meta{color:rgba(242,230,204,.7)!important;-webkit-text-fill-color:rgba(242,230,204,.7)!important}
+</style>
 </head>
 <body data-glass="countdown">
 <div class="panel">
@@ -391,7 +402,7 @@
 </div>
 
 <script src="house-clock.js?v=PRIVFEED3"></script>
-<script src="house-board-strip.js?v=MERGE1C"></script>
+<script src="house-board-strip.js?v=P1FIX"></script>
 <script src="house-glass-bind.js?v=MERGE1C"></script>
 <script src="house-zoom.js"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>

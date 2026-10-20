@@ -51,7 +51,7 @@
     rows.forEach(function (r) {
       html += '<div class="dv-row" style="display:flex;gap:12px;align-items:baseline;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06)">' +
         '<span style="min-width:52px;font-weight:800;font-variant-numeric:tabular-nums">' + esc(r.t || "·") + '</span>' +
-        '<span style="flex:1"><span style="display:block;font-weight:650">' + esc(r.l) + '</span>' + (r.w ? '<span style="display:block;opacity:.65;font-size:13px">' + esc(r.w) + '</span>' : "") + '</span></div>';
+        '<span style="flex:1"><span style="display:block;font-weight:650">' + esc(r.l) + '</span>' + (r.w ? '<span class="dv-where" style="display:block;opacity:.65;font-size:13px">' + esc(r.w) + '</span>' : "") + '</span></div>';
     });
     html += '<div style="display:flex;gap:10px;justify-content:center;padding-top:4px">' +
       '<a href="month.html#' + iso.slice(0, 7) + '" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:22px;border:1px solid rgba(255,255,255,.3);color:inherit;text-decoration:none">Month</a>' +

@@ -20,6 +20,19 @@
 <link rel="stylesheet" href="sheet-spotify.css?v=SPOTIFY2" />
 <link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
 <link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<style id="p1fix-spw-ring">
+/* P1FIX B65 · the big spinning green ring around the art read as a second moon over the night sky.
+   It leaves the art and becomes a 64 px ring beside the track title. */
+html body .spw-lantern .spw-ring{display:none!important}
+html body .spw-titles{display:block}
+html body .spw-title{display:inline-flex;align-items:center;gap:14px;justify-content:center;max-width:100%}
+html body .spw-title::before{content:"";flex:0 0 64px;width:64px;height:64px;border-radius:50%;box-sizing:border-box;
+  border:3px solid rgba(30,215,96,.25);border-top-color:rgba(30,215,96,.95);border-right-color:rgba(255,255,255,.8);
+  animation:spw-spin 46s linear infinite}
+html body.spw-paused .spw-title::before,html body .spw-paused .spw-title::before{animation-play-state:paused;opacity:.45}
+@media (prefers-reduced-motion:reduce){html body .spw-title::before{animation:none}}
+@media (max-width:600px){html body .spw-title::before{flex-basis:44px;width:44px;height:44px}}
+</style>
 </head>
 <body class="spw-boot">
 <div id="spw-world" class="spw-world" aria-hidden="true"></div>

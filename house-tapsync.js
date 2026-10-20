@@ -109,9 +109,13 @@
     if (!document.body) return;
     if (!b) {
       b = document.createElement("div"); b.id = "tapsync-badge";
-      b.style.cssText = "position:fixed;left:8px;bottom:8px;z-index:99;padding:4px 10px;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font:600 11px/1.4 system-ui;opacity:.7;pointer-events:none";
+      /* P1FIX Prism P1 · a page with a [data-tapsync-slot] (Dad) carries the tag in its footer, in flow, so it never sits over a list */
+      var slot = document.querySelector("[data-tapsync-slot]");
+      b.style.cssText = slot
+        ? "display:inline-block;padding:4px 10px;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font:600 13px/1.4 system-ui;opacity:.85;pointer-events:none"
+        : "position:fixed;left:8px;bottom:8px;z-index:99;padding:4px 10px;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font:600 11px/1.4 system-ui;opacity:.7;pointer-events:none";
       b.textContent = "taps: this device only";
-      document.body.appendChild(b);
+      (slot || document.body).appendChild(b);
     }
   }
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-dad-only>
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
@@ -110,6 +110,8 @@
 .ds-time{font-size:96px;font-weight:900;letter-spacing:-.04em;line-height:1;color:#ffe080;text-shadow:0 0 24px rgba(255,180,30,.45)}
 .ds-cd{font-size:30px;font-weight:800;color:#0e0a02;background:#ffd35a;border-radius:999px;padding:6px 18px}
 .ds-what{font-size:40px;font-weight:800;color:#f4f0e4;line-height:1.15;margin-top:10px}
+/* P1FIX B11 · phone Up Next: the time stays on one line and the title stops at 2 lines, so one item no longer eats the fold */
+@media (max-width:600px){.ds-time{font-size:clamp(56px,16vw,76px);white-space:nowrap}.ds-what{font-size:28px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
 .ds-tags{display:flex;gap:8px;margin-top:12px}
 .ds-tag{font-size:18px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 12px;border-radius:10px;background:rgba(255,224,128,.18);color:#ffe9a8}
 .ds-tag[data-who=Ainsley]{background:rgba(236,72,153,.3);color:#ffd1e8}.ds-tag[data-who=Hayes]{background:rgba(56,152,255,.3);color:#cfe6ff}.ds-tag[data-who=Harris]{background:rgba(52,199,120,.3);color:#c9f5dc}
@@ -155,6 +157,7 @@
 <link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
 <link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
 <script src="house-face-law.js?v=MERGE1C"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
+<link rel="stylesheet" href="house-wall-frame.css?v=P1FIX" />
 </head>
 <body data-kid="dan" data-theme="dan">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -410,8 +413,8 @@
  </div>
  <div class="hdr-spacer" aria-hidden="true"></div>
  <div class="hdr-ovals">
- <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather" data-wired="0" hidden><span class="oval-ico">☀</span><span class="oval-deg"></span></a>
- <a class="oval sensi" href="sheet-sensi.html" aria-label="Sensi" data-wired="0" hidden><span class="oval-ico">⌠</span><span class="oval-deg"></span></a>
+ <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather" data-wired="0" hidden><span class="oval-ico"></span><span class="oval-deg"></span></a>
+ <a class="oval sensi" href="sheet-google-home.html#sensi-hero" aria-label="Sensi" data-wired="0" hidden><span class="oval-ico"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="display:block"><path d="M10 4a2 2 0 0 1 4 0v9.3a4 4 0 1 1-4 0z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="16.5" r="1.8" fill="currentColor"/></svg></span><span class="oval-deg"></span></a>
  </div>
  </header>
 
@@ -447,15 +450,16 @@
  <span>House face · Dad box · <span data-live="date-long">Mon Sep 28 2026</span></span>
  <span class="ftr-chip">DAN · DADGLANCE1</span>
  </div>
- <span>kids-safe · no Desk cash · every tap opens its page</span>
+ <span>Kids-safe · every tap opens its page</span>
+ <span data-tapsync-slot></span>
  </footer>
 </div>
 <script src="house-clock.js?v=PRIVFEED3"></script>
-<script src="house-board-strip.js?v=MERGE1C"></script>
-<script src="house-tapsync.js?v=MERGE1C"></script>
+<script src="house-board-strip.js?v=P1FIX"></script>
+<script src="house-tapsync.js?v=P1FIX"></script>
 <script src="kids-data.js?v=MERGE1C"></script>
-<script src="house-weather.js?v=MERGE1C"></script>
-<script src="house-sensi.js?v=PRIVFEED3"></script>
+<script src="house-weather.js?v=P1FIX"></script>
+<script src="house-sensi.js?v=P1FIX"></script>
 <script>
 (function () {
   function wireOval(sel, degText, label) {

@@ -442,6 +442,7 @@
     box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 8px 22px rgba(20,22,28,0.2);
   }
   .bank.ainsley .star-big { color: #f0e8d4; }
+  .bank.ainsley .jar-state { display: inline-block; margin-top: 6px; padding: 4px 10px; border-radius: 4px; border: 2px solid #d4a860; font-weight: 800; letter-spacing: .16em; color: #f0e8d4; }
   .bank.ainsley .star-big .s { color: #d4a860; }
   .bank.ainsley .star-label { color: #b8a888; }
   .bank.ainsley .feed-title { color: #b8a888; }
@@ -491,6 +492,22 @@
 <link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
 <link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
 <script src="house-face-law.js?v=MERGE1C"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
+<style id="p1fix-money-rows">
+/* P1FIX B40 · jar chore rows readable on the dark glass. Selectors carry html.ori-on + body.allow-shell and the fill colour is
+   !important so house-ori.css "html.ori-on .feed-row" (-webkit-text-fill-color #1c1408 !important) cannot paint dark-on-dark. */
+html body.allow-shell .bank .feed-row,html.ori-on body.allow-shell .bank .feed-row,html.ori-on body.allow-shell .bank.ainsley .feed-row{color:#F2E6CC!important;-webkit-text-fill-color:#F2E6CC!important;font-size:16px!important;background:rgba(14,10,6,.62)!important;border:1px solid rgba(242,230,204,.22)!important}
+html body.allow-shell .bank .feed-row .when,html.ori-on body.allow-shell .bank .feed-row .when{color:rgba(242,230,204,.78)!important;-webkit-text-fill-color:rgba(242,230,204,.78)!important}
+html.ori-on body.allow-shell .bank .feed-title{color:#F2E6CC!important;-webkit-text-fill-color:#F2E6CC!important}
+@media (min-width:1000px){html.ori-on body.allow-shell .bank .feed-row,html body.allow-shell .bank .feed-row{font-size:18px!important}}
+</style>
+<style id="p1fix-money-chips">
+/* P1FIX B41 · kid name chips: white names on a solid kid-colour chip (Ainsley was purple on purple, Hayes blank, Harris faint).
+   Selectors carry html.ori-on + body.allow-shell so they outrank house-ori.css "html.ori-on .kid-chip.<kid>" !important. */
+html body.allow-shell .kid-chip,html.ori-on body.allow-shell .kid-chip,html.ori-on body.allow-shell .bank .kid-chip{color:#fff!important;-webkit-text-fill-color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+html body.allow-shell .kid-chip.ainsley,html.ori-on body.allow-shell .kid-chip.ainsley,html.ori-on body.allow-shell .bank.ainsley .kid-chip.ainsley{background:#9b55b8!important;border:1px solid rgba(255,255,255,.35)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+html body.allow-shell .kid-chip.hayes,html.ori-on body.allow-shell .kid-chip.hayes{background:#1f7a60!important;border:1px solid rgba(255,255,255,.35)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.harris{background:#2a5aa8!important;border:1px solid rgba(255,255,255,.35)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+</style>
 </head>
 <body data-clear-label="CLEARED" data-chores-shared="1" data-theme="house" class="allow-shell">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -769,25 +786,22 @@
  <section class="bank ainsley" data-bank-kid="ainsley" aria-label="Ainsley star bank">
  <div class="bank-hdr">
  <a class="kid-chip ainsley" href="kid-ainsley.html"><span class="dot g2-av ains"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-ainsley"/></svg></span> Ainsley</a>
- <div class="streak-pill" data-jar-goal="tour-jar">Tour Jar</div>
+ <div class="streak-pill">Tour Jar</div>
  </div>
  <div class="star-count">
- <div class="star-big"><span class="s g2-inline"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-tour"/></svg></span>0</div>
+ <div class="star-big" data-noscore="1">Tour Jar</div><!-- AINSNOSCORE2 · her jar is EMPTY/TRUSTED only: no icon tally, no number, before or after data -->
  <div class="star-label">Tour Jar</div>
- <div class="star-row" hidden>
- <span class="tap-star dim" data-check="ainsley-star-1" aria-label="Star 1" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-2" aria-label="Star 2" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-3" aria-label="Star 3" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-4" aria-label="Star 4" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-5" aria-label="Star 5" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-6" aria-label="Star 6" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-7" aria-label="Star 7" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-8" aria-label="Star 8" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-9" aria-label="Star 9" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-10" aria-label="Star 10" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-11" aria-label="Star 11" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-12" aria-label="Star 12" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-13" aria-label="Star 13" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-14" aria-label="Star 14" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-15" aria-label="Star 15" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-16" aria-label="Star 16" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-17" aria-label="Star 17" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-18" aria-label="Star 18" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-19" aria-label="Star 19" aria-pressed="false">★</span><span class="tap-star dim" data-check="ainsley-star-20" aria-label="Star 20" aria-pressed="false">★</span>
- </div>
+ <div class="jar-state" data-jar-state="trusted">TRUSTED</div><!-- AINSJAR1 · a state, never a number or star -->
  </div>
  <div class="feed">
  <div class="feed-title">Musts that fill the jar</div>
- <div class="feed-row"><span class="plus" data-stars="7" data-money-suffix=" ea wk"></span> Bed · room · dishes · empty DW · shoes/coats<div class="when">daily · Sat to Fri</div></div>
- <div class="feed-row"><span class="plus" data-stars="3" data-money-suffix=""></span> Bathroom wipe<div class="when">weekly</div></div>
- <div class="feed-row"><span class="plus" data-stars="5" data-money-suffix=""></span> Laundry full cycle<div class="when">weekly</div></div>
- <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Garage cubby · bag + sports<div class="when">weekly</div></div>
-  <div class="feed-row"><span class="plus" data-money="babysit"></span> Babysitting hire · Dad handout · never fills jar<div class="when">add-on</div></div>
+ <div class="feed-row">Bed · room · dishes · empty DW · shoes/coats<div class="when">daily · Sat to Fri</div></div>
+ <div class="feed-row">Bathroom wipe<div class="when">weekly</div></div>
+ <div class="feed-row">Laundry full cycle<div class="when">weekly</div></div>
+ <div class="feed-row">Garage cubby · bag + sports<div class="when">weekly</div></div>
+  <div class="feed-row">Babysitting hire · Dad handout · never fills jar<div class="when">add-on</div></div>
  </div>
  <div class="cheer-bar">Ask Dad to inspect</div>
- <div class="saves-host" data-saves-panel data-kid="ainsley"></div>
  </section>
 
  <!-- Hayes bank -->
@@ -854,15 +868,16 @@
  </footer>
 </div>
 <script src="house-clock.js?v=PRIVFEED3"></script>
-<script src="house-tapsync.js?v=MERGE1C"></script>
+<script src="house-tapsync.js?v=P1FIX"></script>
 <script src="kids-data.js?v=MERGE1C"></script>
 <script src="house-saves.js?v=JARMATH1"></script>
+<script src="ains-jar-state.js?v=AINSJAR1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=MERGE1C"></script>
 <script src="house-checkoffs.js?v=PRIVFEED3" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
- if (window.HouseSaves) { HouseSaves.mount("ainsley"); HouseSaves.mount("hayes"); HouseSaves.mount("harris"); }
+ if (window.HouseSaves) { HouseSaves.mount("hayes"); HouseSaves.mount("harris"); }
  if (!window.WardKids) return;
  WardKids.loadJSON(function (err, data) {
  if (!data) return;

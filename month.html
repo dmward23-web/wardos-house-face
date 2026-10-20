@@ -340,6 +340,7 @@
  box-shadow: 0 2px 8px rgba(20,22,28,0.06);
  }
  .mbtn:disabled { opacity: 0.35; cursor: default; }
+.mbtn { min-width: 48px; min-height: 48px; touch-action: manipulation; } /* P1FIX Prism · month chevrons are controls: 48 px or bigger tap area everywhere */
  .mpills { display: flex; flex-wrap: wrap; gap: 8px; flex-shrink: 0; }
  .mpill {
  font: inherit; font-size: 13px; font-weight: 650; color: #3a3e46; cursor: pointer;
@@ -353,7 +354,7 @@
   html, body, .panel { width: 100% !important; max-width: 100vw !important; min-width: 0 !important; height: auto !important; min-height: 100dvh !important; overflow-x: hidden !important; overflow-y: auto !important; }
   .month-hdr, .mnav { display: flex !important; width: 100% !important; align-items: center !important; justify-content: space-between !important; gap: 8px !important; }
   .month-title { position: static !important; flex: 1 1 auto !important; min-width: 0 !important; margin: 0 !important; font-size: 22px !important; letter-spacing: 0.12em !important; text-align: center !important; color: #f4fbff !important; }
-  .mbtn { position: static !important; flex: 0 0 44px !important; width: 44px !important; height: 44px !important; border-radius: 14px !important; border: 0 !important; color: #f4fbff !important; background: #081624 !important; box-shadow: 0 0 0 1px rgba(198,230,255,0.4), 0 0 16px rgba(120,190,255,0.28) !important; }
+  .mbtn { position: static !important; flex: 0 0 48px !important; width: 48px !important; height: 48px !important; min-width: 48px !important; min-height: 48px !important; border-radius: 14px !important; border: 0 !important; color: #f4fbff !important; background: #081624 !important; box-shadow: 0 0 0 1px rgba(198,230,255,0.4), 0 0 16px rgba(120,190,255,0.28) !important; }
   .mpills { display: flex !important; flex-wrap: wrap !important; gap: 8px !important; }
   .mpill { border-radius: 999px !important; min-height: 36px !important; padding: 6px 14px !important; border: 0 !important; color: #f4fbff !important; background: #081624 !important; box-shadow: 0 0 0 1px rgba(198,230,255,0.4), 0 0 16px rgba(120,190,255,0.28) !important; }
   .mpill.on { background: #102840 !important; box-shadow: 0 0 0 1px rgba(230,244,255,0.75), 0 0 18px rgba(140,200,255,0.5) !important; color: #f4fbff !important; }
@@ -394,6 +395,14 @@
 <link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
 <link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
 <script src="house-face-law.js?v=MERGE1C"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
+<style id="p1fix-month-wall">
+/* P1FIX B32 · wall cells: 15 px items, max 3 lines each, "+N more" in a quiet line */
+@media (min-width:601px){
+  html body .month-grid .day .blk{font-size:15px!important;line-height:1.25!important;padding:3px 7px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  html body .month-grid .day .blk.more{background:transparent!important;border:0!important;box-shadow:none!important;color:rgba(255,255,255,.72)!important;-webkit-text-fill-color:rgba(255,255,255,.72)!important;font-weight:700!important}
+}
+</style>
+<link rel="stylesheet" href="house-wall-frame.css?v=P1FIX" />
 </head>
 <body data-glass="ovals month-today">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -650,12 +659,12 @@
  </div>
  <div class="hdr-spacer" aria-hidden="true"></div>
  <div class="hdr-ovals">
- <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather" data-wired="0" hidden style="display:none"><span class="oval-ico">🌤</span><span class="oval-deg"></span></a>
+ <a class="oval wx" href="sheet-today.html#house-wx" aria-label="Weather" data-wired="0" hidden style="display:none"><span class="oval-ico"></span><span class="oval-deg"></span></a>
  <a class="oval sensi" href="sheet-google-home.html" aria-label="Thermostat" data-wired="0" hidden style="display:none"><span class="oval-ico">🌡</span><span class="oval-deg"></span></a>
  </div>
  </header>
 
- <a class="leaveby" href="sheet-countdowns.html" aria-label="Next leave-by">
+ <a class="leaveby" href="sheet-today.html" aria-label="Next leave-by">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
  <div class="leaveby-label" data-live="leaveby-label"></div>
@@ -736,6 +745,9 @@
     s = s.replace(/\bDRIVE\b/g, "drives");
     return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
   }
+  /* P1FIX B29 · Month is shared glass: a row whose title says whose week it is never paints here (the shared
+     house-face-law.js phrase list, the same one the board test sweeps for); nothing is put in its place. */
+  function ownerRow(s) { return !!(window.HouseFaceLaw && HouseFaceLaw.isCustody && HouseFaceLaw.isCustody(String(s || ""))); }
   function chipKey(s) {
     var t = String(s || "").toLowerCase();
     if (t.indexOf("hayes bb") >= 0 || t.indexOf("coach should") >= 0 || t.indexOf("coach in") >= 0) return "hayes-bb";
@@ -814,7 +826,7 @@
     ((LIVE && LIVE.upcomingLeaves) || []).forEach(function (ev) {
       if (!eventCovers(ev, iso)) return;
       var label = plainWords(ev.summary);
-      if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label))) return; /* LIVELAW1 · colour / dress-up days are never rows */
+      if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label)) || ownerRow(label)) return; /* LIVELAW1 · P1FIX B29 · colour / dress-up days are never rows */
       if (eventSpans(ev)) {
         chips[chipKey(label) || label.toLowerCase()] = label;
       } else if (String(ev.start || "").slice(0, 10) === iso) {
@@ -826,7 +838,7 @@
     if (monthDay && (!inLive || !rows.length)) {
       (monthDay.items || []).forEach(function (it) {
         var label = plainWords(it.l);
-        if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label))) return; /* LIVELAW1 */
+        if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label)) || ownerRow(label)) return; /* LIVELAW1 · P1FIX B29 */
         var key = chipKey(label);
         if (key && chips[key]) return;
         var min = clockMinutes(label);
@@ -906,11 +918,16 @@
       for (var i = 0; i < weeks * 7; i++) {
         var dd = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
         var dy = dd.getFullYear(), dm = dd.getMonth() + 1, dn = dd.getDate();
-        if (dm !== m) { html += '<div class="day out"><div class="day-top"><span class="dom">' + dn + "</span></div></div>"; continue; }
+        /* P1FIX B32 · weeks that ended before this week carry wf-past; the 1920x1080 wall frame hides them so today's row is on screen */
+        var wkEnd = new Date(start.getFullYear(), start.getMonth(), start.getDate() + Math.floor(i / 7) * 7 + 6), wkPast = key(wkEnd.getFullYear(), wkEnd.getMonth() + 1, wkEnd.getDate()) < t.iso;
+        if (dm !== m) { html += '<div class="day out' + (wkPast ? " wf-past" : "") + '"><div class="day-top"><span class="dom">' + dn + "</span></div></div>"; continue; }
         var k2 = key(dy, dm, dn), day2 = DATA && DATA.days[k2], isToday2 = k2 === t.iso;
-        html += '<a class="day' + (isToday2 ? " today" : "") + '" data-away-day="' + k2 + '" href="sheet-today.html' + (isToday2 ? "" : "?d=" + k2) + '">' + '<div class="day-top"><span class="dom">' + dn + "</span>" + (isToday2 ? '<span class="day-tag">today</span>' : "") + "</div>";
+        html += '<a class="day' + (isToday2 ? " today" : "") + (wkPast ? " wf-past" : "") + '" data-away-day="' + k2 + '" href="sheet-today.html' + (isToday2 ? "" : "?d=" + k2) + '">' + '<div class="day-top"><span class="dom">' + dn + "</span>" + (isToday2 ? '<span class="day-tag">today</span>' : "") + "</div>";
         html += '<div class="blocks">';
-        (day2 ? day2.items : []).forEach(function (it) { if (window.HouseFaceLaw && HouseFaceLaw.isDressDay(it.l)) return; /* LIVELAW1 */ html += '<div class="blk ' + esc(it.c) + '">' + esc(cleanCal(it.l)) + "</div>"; });
+        /* P1FIX B32 · wall cells show at most 3 items at 15 px, then one "+N" line (the day opens Today for the rest) */
+        var shown2 = (day2 ? day2.items : []).filter(function (it) { return !((window.HouseFaceLaw && HouseFaceLaw.isDressDay(it.l)) || ownerRow(it.l)); /* LIVELAW1 · P1FIX B29 */ });
+        shown2.slice(0, 3).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '">' + esc(cleanCal(it.l)) + "</div>"; });
+        if (shown2.length > 3) html += '<div class="blk more">+' + (shown2.length - 3) + " more</div>";
         html += "</div></a>";
       }
     }
@@ -949,12 +966,22 @@
     if (pair[0] && pair[0].days) DATA = pair[0];
     if (pair[1] && pair[1].upcomingLeaves) LIVE = pair[1];
     render(cur.y, cur.m);
-  }).catch(function () { render(cur.y, cur.m); });
+    toToday();
+  }).catch(function () { render(cur.y, cur.m); toToday(); });
+  /* P1FIX B31 · phone list opens on today, not the 1st (once, after the real data paints; never on the 10 min repaint) */
+  function toToday() {
+    try {
+      if (!narrow()) return;
+      var el = grid.querySelector(".ori-day.is-today");
+      if (!el) return;
+      el.scrollIntoView({ block: "center" }); /* works whether the window or a panel is the scroller */
+    } catch (e) { /* stay at the top */ }
+  }
   setInterval(function () { if (cur) render(cur.y, cur.m); }, 10 * 60 * 1000);
 })();
 </script>
 <script src="house-clock.js?v=PRIVFEED3"></script>
-<script src="house-board-strip.js?v=MERGE1C"></script>
+<script src="house-board-strip.js?v=P1FIX"></script>
 <script>
 /* The time lives in the hero clock. Drop the repeated " · 3:00" from the title. */
 (function () {
@@ -978,8 +1005,8 @@
   if (hero && window.MutationObserver) new MutationObserver(once).observe(hero, { childList: true, subtree: true, characterData: true });
 })();
 </script>
-<script src="house-weather.js?v=MERGE1C"></script>
-<script src="house-sensi.js?v=PRIVFEED3"></script>
+<script src="house-weather.js?v=P1FIX"></script>
+<script src="house-sensi.js?v=P1FIX"></script>
 <script src="house-glass-bind.js?v=MERGE1C"></script>
 <script src="house-zoom.js"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>

@@ -805,6 +805,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
 /* HEAT3 · tagline/day-record killed in markup + tokens */
 body.theme-ainsley .setlist-foot { display: none !important; }
 
+body.theme-ainsley .jar-state{display:inline-block;margin-top:6px;padding:4px 10px;border-radius:4px;border:2px solid #c87840;font-size:14px;font-weight:800;letter-spacing:.16em;color:#e8e4d4}
 </style>
 <link rel="stylesheet" href="heat-v3.css?v=HUBCLK1" />
 <link rel="stylesheet" href="tokens-ainsley-vinyl-heat.css?v=HUBCLK1" />
@@ -1089,13 +1090,7 @@ body.theme-ainsley .setlist-foot { display: none !important; }
  <a class="row stub jump-pill" href="#sec-jar">Jar</a>
  <a class="row stub jump-pill" href="#sec-days">Days</a>
  </nav>
-<div class="xp-stage" aria-label="Today progress">
- <div class="xp-stage-lab">TODAY</div>
- <div class="xp-stage-track"><div class="xp-stage-fill" data-progress-fill></div></div>
- <div data-progress-meta="{done}/{total}" style="font-size:13px;font-weight:800;color:#a8a490">0/6</div>
- <div class="left-chip" data-left-count>··</div>
- </div>
- <section class="hot-banner" aria-label="Next">
+<section class="hot-banner" aria-label="Next">
  <div class="hot-accent"></div>
  <div class="hot-body">
  <div class="hot-main">
@@ -1112,34 +1107,14 @@ body.theme-ainsley .setlist-foot { display: none !important; }
  <div class="bank-top">
  <div>
  <div class="bank-title">Tour Jar</div>
+ <div class="jar-state" data-jar-state="trusted">TRUSTED</div><!-- AINSJAR1 · a state, never a number or star -->
  </div>
- <div class="bank-count"><span data-bank-symbol>★</span> <span data-bank-life>0</span></div>
  </div>
- <button type="button" class="grow-meter grow-jar" data-grow-meter aria-label="Tour Jar">
- <div class="grow-stage">
- <div class="grow-fill grow-fill-balance" data-grow-fill-balance></div>
- <div class="grow-fill grow-fill-week" data-grow-fill-week></div>
- <div class="grow-goal-line" data-grow-goal-line aria-hidden="true"></div>
- <div class="grow-icons" data-grow-icons aria-hidden="true"></div>
- <div class="grow-pct" data-grow-pct></div>
- </div>
- <div class="grow-readout">
- <div class="grow-jar-name" data-grow-jar-name>Tour Jar</div>
- <div class="grow-total">$<span data-grow-total>0</span> / $<span data-grow-save-need>0</span></div>
- </div>
- </button>
- <div class="money-row" aria-label="Money">
- <div class="money-chip"><span class="lab">Bal</span> $<span data-bank-balance>0</span></div>
- <div class="money-chip"><span class="lab">Week</span> +$<span data-bank-week-earn>0</span></div>
- </div>
- <div class="bank-track"><div class="bank-fill" data-bank-fill></div></div>
- <div class="bank-meta"><span data-bank-meta></span><span class="bank-meta-sep" aria-hidden="true">·</span><span class="bank-meta-today">Today <span data-bank-today>0</span></span></div>
  <div class="bank-links">
  <a class="primary-foil" href="sheet-allowance.html">Jar</a>
  <a class="unlock-cta" data-unlock-cta hidden href="sheet-allowance.html">Jar full · show Dad</a>
  <button type="button" class="got-it" data-got-it hidden>Paid</button>
  </div>
- <div class="saves-host" data-saves-panel data-kid="ainsley"></div>
  <div class="paid-stamp" data-paid-stamp hidden>Paid</div>
  </section>
  <section class="sec sec-schedule consume-sched" id="sec-days" aria-label="Week" data-consume-sel="">
@@ -1169,16 +1144,17 @@ document.addEventListener("house:kid-rendered", function(){
 </script>
 
 <script src="house-clock.js?v=PRIVFEED3"></script>
-<script src="house-tapsync.js?v=MERGE1C"></script>
+<script src="house-tapsync.js?v=P1FIX"></script>
 <script src="kids-data.js?v=MERGE1C"></script>
 <script src="house-saves.js?v=JARMATH1"></script>
+<script src="ains-jar-state.js?v=AINSJAR1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=MERGE1C"></script>
 <script src="house-kid-engage.js?v=MERGE1C"></script>
 <script src="house-checkoffs.js?v=PRIVFEED3" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
- if (window.HouseSaves) HouseSaves.mount("ainsley");
+ /* AINSJAR1 · no saves panel for Ainsley (saves carry star targets) */
  if (window.WardKids) WardKids.boot("ainsley");
  if (window.HouseSfx) HouseSfx.wireMute();
 

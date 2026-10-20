@@ -1,0 +1,208 @@
+/* P1FIX N1 + B10 (+B79) · ONE shared sheet frame for the narrow sheets on the 27in 1920x1080 LANDSCAPE wall
+   (Prism re-judge 17 Oct). Dad, Month, Chores, Dinner, Today, Us, Lights, Pack, Trips link this file LAST in <head>.
+   - Content sits at scale 1 in a centred band about x 500 to 1380 (880 px), as two card columns, so the moon and
+     graves (left) and the porch and skeleton (right) stay clear.
+   - Height is capped at the screen (1080) with no page scroll: the kiosk has no scroll gesture. Cards size to content;
+     whatever does not fit the two columns is clipped, never pushed below a fold nobody can reach.
+   - Only applies at min-width 1600px AND landscape: the 440 phone and the portrait canvas are untouched.
+   - Two-ID selectors so this outranks house-scroll.css (SCROLL5, one-ID weight).
+   P1FIX N3 · wall minimums on the 27in panel: body text 22 px, labels 17 px (one token block, not per page). */
+@media (min-width: 1600px) and (orientation: landscape) {
+  html:not(#hf-wall-off):not(#hf-scroll-off) {
+    width: 100% !important; height: 100vh !important; max-height: 100vh !important;
+    overflow: hidden !important; overflow-y: hidden !important;
+  }
+  html:not(#hf-wall-off):not(#hf-scroll-off) > body {
+    width: 100% !important; height: 100vh !important; min-height: 0 !important; max-height: 100vh !important;
+    overflow: hidden !important; overflow-y: hidden !important;
+  }
+  html:not(#hf-wall-off) body > .panel {
+    --wf-band: 880px;
+    position: relative !important;
+    width: var(--wf-band) !important; max-width: var(--wf-band) !important;
+    margin: 0 0 0 calc(50vw - (var(--wf-band) / 2)) !important;
+    height: 100vh !important; min-height: 0 !important; max-height: 100vh !important;
+    overflow: hidden !important;
+    padding: 14px 0 14px !important;
+    display: block !important;
+    column-count: 2 !important; column-gap: 16px !important; column-fill: auto !important;
+    background: transparent !important;
+  }
+  /* wrappers dissolve so each card is a column item */
+  html:not(#hf-wall-off) body > .panel :is(.body, .lower, .col, .side, .split, .wf-flat) { display: contents !important; }
+  html:not(#hf-wall-off) body > .panel > *,
+  html:not(#hf-wall-off) body > .panel :is(.body, .lower, .col, .side, .split, .wf-flat) > * {
+    break-inside: avoid !important; -webkit-column-break-inside: avoid !important;
+    width: auto !important; max-width: 100% !important; min-height: 0 !important; height: auto !important;
+    flex: none !important; margin: 0 0 12px !important; box-sizing: border-box !important;
+  }
+  /* the header (clock) spans both columns */
+  html:not(#hf-wall-off) body > .panel > :is(header, .hdr) { column-span: all !important; -webkit-column-span: all !important; }
+  /* inner lists stop stretching to a 1920 canvas */
+  html:not(#hf-wall-off) body > .panel :is(.item-list, .list, .cal-list, .clist, .options, .treats, .quick, .feed) { flex: none !important; min-height: 0 !important; height: auto !important; }
+  html:not(#hf-wall-off) body > .panel :is(.sec, section) { min-height: 0 !important; }
+  /* footers waste a slot on the wall */
+  html:not(#hf-wall-off) body > .panel > footer.ftr { display: none !important; }
+
+  /* N3 · labels 17 px */
+  html:not(#hf-wall-off) body > .panel :is(.sec-title, .sec-meta, .cheer-label, .leaveby-label, .link-label, .lbl, .label, .tag,
+    .badge, .cheer-badge, .dow, .sm, .kicker, .loud-kicker, .day-tag, .qtile-tap, .side-pill, .streak-pill, .ftr-chip,
+    .cal-tag, .rank, .feed-title, .star-label, .favs-label, .gm-kicker, .ds-label, .card-kicker, .k-label) {
+    font-size: 17px !important; line-height: 1.25 !important;
+  }
+  /* N3 · body text 22 px */
+  html:not(#hf-wall-off) body > .panel :is(.sub, .meta, .hint, .d, .who, .when, .detail, .note, .msg, .cheer-sub, .leaveby-detail,
+    .qtile-sub, .link-sub, .feed-row, .pick, .cal-what .hint, .treat-hint, .treat-pick, .list-empty, .favs-empty, .item,
+    .picked, .kv-foot, .ev, .ori-ev, .row-sub, .trip-sub, .t-sub) {
+    font-size: 22px !important; line-height: 1.3 !important;
+  }
+}
+
+/* P1FIX B32 + Month P2 · Month on the wall: one full-band column, weeks that already ended drop (today's row on screen),
+   cells show up to 3 items at 17 px on 2 lines each, the month heading reads (28 px, light on dark glass). */
+@media (min-width: 1600px) and (orientation: landscape) {
+  html:not(#hf-wall-off) body > .panel:has(.month-grid) { column-count: 1 !important; }
+  html:not(#hf-wall-off) body > .panel .month-grid .wf-past { display: none !important; }
+  html:not(#hf-wall-off) body > .panel .month-grid { grid-template-rows: none !important; grid-auto-rows: minmax(150px, auto) !important; }
+  html:not(#hf-wall-off) body > .panel .month-grid .day .blk { font-size: 17px !important; line-height: 1.22 !important; white-space: normal !important;
+    display: -webkit-box !important; -webkit-line-clamp: 2 !important; -webkit-box-orient: vertical !important; overflow: hidden !important; text-overflow: clip !important; }
+  html:not(#hf-wall-off) body > .panel .month-grid .day .dom { font-size: 20px !important; }
+  html:not(#hf-wall-off) body > .panel .month-title { font-size: 28px !important; color: #F2E6CC !important; -webkit-text-fill-color: #F2E6CC !important;
+    background: rgba(10,12,18,.72) !important; border-radius: 12px !important; padding: 4px 14px !important; letter-spacing: .08em !important; }
+  html:not(#hf-wall-off) body > .panel .dow-h { font-size: 17px !important; color: rgba(242,230,204,.8) !important; }
+}
+
+/* P1FIX N1 · hidden stays hidden inside the frame; Trips (sheet-win) labels and sublines meet the wall minimums */
+@media (min-width: 1600px) and (orientation: landscape) {
+  html:not(#hf-wall-off) body > .panel [hidden] { display: none !important; }
+  html:not(#hf-wall-off) body > .panel :is(.trip-when, .trip-badge, .eyebrow, .hero-label) { font-size: 17px !important; line-height: 1.25 !important; }
+  html:not(#hf-wall-off) body > .panel .trip-detail { font-size: 22px !important; line-height: 1.3 !important; color: rgba(255,255,255,.8) !important; -webkit-text-fill-color: rgba(255,255,255,.8) !important; }
+  html:not(#hf-wall-off) body > .panel .trip-title { font-size: 24px !important; }
+}
+
+/* P1FIX N3b · wall minimums, second token pass: page-local classes the first N3 block missed (static scan of every
+   frame page's own CSS for text under 17 px). Labels, pills, chips and buttons 17 px; card titles and sublines 22 px.
+   Checkbox glyphs (.ring, .box), icons (.oval-ico, .dot) and footers (hidden on the wall) are left alone. */
+@media (min-width: 1600px) and (orientation: landscape) {
+  html:not(#hf-wall-off) body > .panel :is(.nav-us, .sheet-chip, .chip, .kchip, .kid-chip, .kid-tap, .gm-label, .gm-badge,
+    .leaveby-badge, .legend, .month-range, .mpill, .ori-chip, .ori-dom, .banner-lab, .ds-hd span, .cal-when, .cal-when .sm,
+    .streak, .streak .star, .star-earn, .tap-hint, .mute-btn, .cmd-pill, #lights-status-pill.cmd-pill, .cmd-meta, .cmd-chip,
+    .bulk .cmd-chip, .cbtn, .home-btn) {
+    font-size: 17px !important; line-height: 1.25 !important;
+  }
+  html:not(#hf-wall-off) body > .panel :is(.what, .card .what, .kid-hint, .gm-sub, .safe-note, .banner-sub, .hero-sub,
+    .connect-sub, .connect-title, .cmd-title, .banner .cmd-title, .log-card .t) {
+    font-size: 22px !important; line-height: 1.3 !important;
+  }
+}
+
+/* P1FIX N3c · inline-styled small lines on frame pages: Today day-view 'where' line and the Pack footnote read 22 px, light */
+@media (min-width: 1600px) and (orientation: landscape) {
+  html:not(#hf-wall-off) body > .panel :is(.dv-where, .pack-note) {
+    font-size: 22px !important; line-height: 1.3 !important;
+    color: rgba(242,236,224,.82) !important; -webkit-text-fill-color: rgba(242,236,224,.82) !important; opacity: 1 !important;
+  }
+}
+
+/* P1FIX N3d · last labels under 17 px found by the 1920x1080 measure (r4): Dad kid links, week-day names, day counts and
+   '+N more'; Today rail links (Musts, Jar, Days); Lights pad room, state and source; the stale leave-by chip text
+   (font only, the 32 px chip line stays) and its empty line reads 22 px. Kid initial dots and check glyphs stay. */
+@media (min-width: 1600px) and (orientation: landscape) {
+  html:not(#hf-wall-off) body > .panel :is(.kid-link, .ds-st em, .ds-dc, .ds-more, .family-rail a, .tap-rail a,
+    .light-pad-where, .light-pad-state, .light-pad-src) {
+    font-size: 17px !important; line-height: 1.25 !important;
+  }
+  html:not(#hf-wall-off) body > .panel :is(.leaveby-dest, a.leaveby.is-stale .leaveby-main) { font-size: 17px !important; }
+  html:not(#hf-wall-off) body > .panel .leaveby-empty { font-size: 22px !important; line-height: 1.3 !important; }
+}
+
+/* P1FIX N3e (Prism P2, 17 Oct) · Today on the wall: all three kid cards stay together as ONE group (no kid sits apart).
+   The static 'Musts · Jar · Days on board' hint hides on the wall (the rail right under the kids carries the same three
+   links) and the cards pad tighter, so the group fits under Today in column one and Big taps keeps column two. Live
+   rows (when / what) still show. If a long live day ever overfills column one, the group may break between cards
+   (never inside one) so Big taps is never pushed off screen. */
+@media (min-width: 1600px) and (orientation: landscape) {
+  html:not(#hf-wall-off) body > .panel .body > section.kids-col {
+    display: block !important; break-inside: auto !important; -webkit-column-break-inside: auto !important;
+    margin: 0 0 12px !important; padding: 0 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .body > section.kids-col > .kid-card {
+    break-inside: avoid !important; -webkit-column-break-inside: avoid !important;
+    min-height: 0 !important; height: auto !important; flex: none !important;
+    margin: 0 0 8px !important; padding: 12px 16px 12px !important; gap: 4px !important;
+  }
+  html:not(#hf-wall-off) body > .panel .body > section.kids-col > .kid-card:last-child { margin-bottom: 0 !important; }
+  html:not(#hf-wall-off) body > .panel .body > section.kids-col .kid-hint { display: none !important; }
+}
+
+/* P1FIX Prism · Month chevrons are controls, not text arrows: 48 px or bigger tap area on the wall too */
+@media (min-width: 1600px) and (orientation: landscape) {
+  html:not(#hf-wall-off) body > .panel .mbtn { min-width: 52px !important; min-height: 52px !important; }
+}
+
+/* P1FIX Prism P1 (r7 glass fail, 17 Oct) · ONE glass recipe for every sheet panel, wall AND phone, on the nine frame
+   sheets (this file is linked last on Dad, Month, Chores, Dinner, Today, Us, Lights, Pack, Trips). It replaces the
+   house-ori.css 0.34 shared glass there, which let the bright grove wash out body text.
+   Outer panels: rgba(10,14,12,0.80), blur(14px) saturate(0.8), 1px white 8% border. A panel inside a panel (Month day
+   cells, nested sections and rows) is inner glass at 0.5 on top, no second blur. Pass bar: body text 4.5:1 against the
+   brightest scene pixel behind it (measured by the r8 render script). */
+:root { --hf-glass-bg: rgba(10, 14, 12, 0.80); --hf-glass-inner: rgba(10, 14, 12, 0.50); --hf-glass-filter: blur(14px) saturate(0.8); --hf-glass-border: 1px solid rgba(255, 255, 255, 0.08); }
+html:not(#hf-glass-off) body > .panel :is(header, footer, section, article, .hdr, .banner, .card, .sec, .day, .bulk, .ship, .stat, .row, .trip, .count-row, .vote-card, .log-card, .beat, .cmd-panel, .ds-line, .ds-foot) {
+  background-color: var(--hf-glass-bg) !important; background-image: none !important;
+  -webkit-backdrop-filter: var(--hf-glass-filter) !important; backdrop-filter: var(--hf-glass-filter) !important;
+  border: var(--hf-glass-border) !important;
+}
+html:not(#hf-glass-off) body > .panel :is(header, footer, section, article, .hdr, .banner, .card, .sec, .day, .bulk, .ship, .stat, .row, .trip, .count-row, .vote-card, .log-card, .beat, .cmd-panel, .ds-line, .ds-foot)
+  :is(header, footer, section, article, .hdr, .banner, .card, .sec, .day, .bulk, .ship, .stat, .row, .trip, .count-row, .vote-card, .log-card, .beat, .cmd-panel, .ds-line, .ds-foot) {
+  background-color: var(--hf-glass-inner) !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+}
+/* P1FIX Lights plate (Alfred 0715 GATE 3) · each light row keeps main's solid #081624 plate on phone and wall; the inner
+   glass above (0.5) would let the scene through a .light-pad.cmd-panel. */
+html:not(#hf-glass-off) body > .panel .pad-grid .light-pad.cmd-panel { background-color: #081624 !important; background-image: none !important; }
+/* Month: ONE scrim behind the whole month (nav, pills, legend, weekday row, grid); the cells are inner glass on it */
+html:not(#hf-glass-off) body > .panel section.month-wrap { padding: 12px !important; border-radius: 18px !important; }
+html:not(#hf-glass-off) body > .panel section.month-wrap .month-grid .day { background-color: var(--hf-glass-inner) !important; background-image: none !important; }
+/* P1FIX Prism P2 (r8) · legend swatches read at 14 px (were about 6 px after the wall type scale), full colour */
+html:not(#hf-glass-off) body > .panel .legend .leg i { width: 14px !important; height: 14px !important; min-width: 14px !important; flex: 0 0 14px !important; border-radius: 4px !important; opacity: 1 !important; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35) !important; }
+html:not(#hf-glass-off) body > .panel .legend .leg.ain i { background: rgb(180, 120, 200) !important; }
+html:not(#hf-glass-off) body > .panel .legend .leg.hay i { background: rgb(60, 170, 140) !important; }
+html:not(#hf-glass-off) body > .panel .legend .leg.har i { background: rgb(90, 140, 210) !important; }
+html:not(#hf-glass-off) body > .panel .legend .leg.shr i { background: rgb(120, 150, 190) !important; }
+html:not(#hf-glass-off) body > .panel .legend .leg { color: #F2E6CC !important; -webkit-text-fill-color: #F2E6CC !important; opacity: 1 !important; font-weight: 700 !important; }
+html:not(#hf-glass-off) body > .panel .dow-h { color: rgba(242, 230, 204, 0.9) !important; }
+/* Dad: 'Also today' rides in its own glass panel (phone and wall); empty line takes no space */
+html:not(#hf-glass-off) body > .panel .ds-line { border-radius: 16px !important; padding: 12px 16px !important; margin-top: 0 !important; }
+html:not(#hf-glass-off) body > .panel .ds-line:empty { display: none !important; }
+html:not(#hf-glass-off) body > .panel footer.ftr [data-tapsync-slot]:empty { display: none; }
+/* Glass ink (r8 contrast pass): grey and dark "paper" inks were written for the old light cards; on the 0.80 glass the
+   meta lines, tags and kid chips take a light ink so body text holds 4.5:1 over the brightest grove pixel. */
+html:not(#hf-glass-off) body > .panel :is(.sec-meta, .cmd-meta, .light-pad-src, .light-pad-where, .day-tag, .safe-note, .safe-note strong, .ds-title .ds-sub, .ds-hd span, .ds-more, .qtile-sub, .leaveby-main, .leaveby-dest, .tap-hint, .hint) {
+  color: #E4DFD2 !important; -webkit-text-fill-color: #E4DFD2 !important; opacity: 1 !important;
+}
+html:not(#hf-glass-off) body > .panel :is(.cal-tag, .cal-tag.known) { color: #F2F4F6 !important; -webkit-text-fill-color: #F2F4F6 !important; background: rgba(255, 255, 255, 0.10) !important; border-color: rgba(255, 255, 255, 0.22) !important; }
+html:not(#hf-glass-off) body > .panel .streak { color: #FFE7A3 !important; -webkit-text-fill-color: #FFE7A3 !important; background: rgba(255, 215, 106, 0.14) !important; background-image: none !important; }
+html:not(#hf-glass-off) body > .panel .ds-title .name-accent { color: #FFE6A0 !important; -webkit-text-fill-color: #FFE6A0 !important; }
+html:not(#hf-glass-off) body > .panel a.kid-chip { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; }
+html:not(#hf-glass-off) body > .panel :is(.wf-kidtabs button, .mpill) { opacity: 1 !important; }
+html:not(#hf-glass-off) body > .panel .mpill { color: #F2F4F6 !important; -webkit-text-fill-color: #F2F4F6 !important; background: rgba(255, 255, 255, 0.10) !important; border-color: rgba(255, 255, 255, 0.22) !important; }
+html:not(#hf-glass-off) body > .panel .mpill.on { background: rgba(255, 255, 255, 0.24) !important; }
+/* text that sat straight on the scene (Dad title, Trips section titles) rides on glass too */
+html:not(#hf-glass-off) body > .panel :is(.ds-title, .sec-title:not(:is(section, article, header, .sec, .card) .sec-title)) {
+  background-color: var(--hf-glass-bg) !important; background-image: none !important; -webkit-background-clip: border-box !important; background-clip: border-box !important; -webkit-backdrop-filter: var(--hf-glass-filter) !important; backdrop-filter: var(--hf-glass-filter) !important;
+  border: var(--hf-glass-border) !important; border-radius: 14px !important; padding: 8px 14px !important;
+}
+/* empty header ovals never show (Today weather pill offline) */
+html:not(#hf-glass-off) body > .panel .hdr .oval[hidden] { display: none !important; }
+
+@media (min-width: 1600px) and (orientation: landscape) {
+  /* Pack on the wall: the checklists read as one column of 48 px rows inside each card, so the two cards fit the two
+     band columns (no clipped third column); a card that still runs long scrolls inside itself. */
+  html:not(#hf-wall-off) body > .panel .clist { grid-template-columns: 1fr !important; gap: 6px !important; }
+  html:not(#hf-wall-off) body > .panel .clist .check { min-height: 48px !important; padding: 8px 14px !important; }
+  html:not(#hf-wall-off) body > .panel .clist .check .item { padding: 0 !important; border: 0 !important; min-height: 0 !important; }
+  html:not(#hf-wall-off) body > .panel section.sec:has(> .clist) { max-height: calc(100vh - 160px) !important; overflow-y: auto !important; overscroll-behavior: contain; }
+  /* Dad on the wall: Next 24 hours shows two stops (Also today and the week grid carry the rest), so the seat fits the two band
+     columns; before, the footer line fell into a third, clipped column (main.ds measured 1328 px wide). */
+  html:not(#hf-wall-off) body > .panel .ds-tl > .ds-stop:nth-child(n+3) { display: none !important; }
+}
