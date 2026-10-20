@@ -5,7 +5,7 @@
 @font-face { font-family: "LH Text"; src: url(../fonts/InterVariable.ttf) format("truetype"); font-weight: 100 900; font-display: block; }
 html, body { margin: 0; height: 100%; overflow: hidden; background: #04060a; }
 body { font-family: "LH Text", system-ui, sans-serif; color: #eef1f6; -webkit-font-smoothing: antialiased; }
-#lh { position: fixed; inset: 0; pointer-events: none; opacity: 0; transition: opacity 1.4s ease; --k: 1; }
+#lh { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 1.4s ease; --k: 1; }
 html.lh-ready #lh { opacity: 1; }
 #lh > * { position: absolute; }
 [hidden] { display: none !important; }
@@ -273,3 +273,36 @@ html.lh-phone .lh-dad { box-sizing: border-box; min-height: 44px; padding: 3px 0
 /* Alfred 1702 P3: at 390 the Hayes and Harris tag tap boxes reached 12 px into the Dad plaque box. On the phone the tag is already a 44 x 44 box (borders), so its wider desktop tap halo is off, and Dad sits 16 px lower: 0 px overlap at 390, 440 and 1920. */
 html.lh-phone .lh-kw .name::before { display: none; }
 html.lh-phone .lh-dad { margin-top: 13px; }
+
+/* ---------- Layer 4: season gates, crypt, idle cinema ---------- */
+#lh button { pointer-events: auto; font: inherit; color: inherit; }
+.lh-count { transform: translate(-50%, 0); display: flex; flex-direction: column; align-items: center; gap: calc(6px * var(--k)); pointer-events: none; }
+.lh-count .n { font: 700 calc(32px * var(--k))/1 "LH Display", sans-serif; color: #f6dfae; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); }
+.lh-count .pumpkins { display: flex; gap: calc(8px * var(--k)); }
+.lh-count .pumpkin { width: calc(18px * var(--k)); height: calc(14px * var(--k)); border-radius: 50% 50% 46% 46%; background: radial-gradient(circle at 40% 35%, #ffb15a, #d2641a 70%); position: relative; }
+.lh-count .pumpkin::before { content: ""; position: absolute; left: 50%; top: -5px; width: 2px; height: 6px; margin-left: -1px; background: #3d6b32; border-radius: 1px; }
+html.lh-phone .lh-count { transform: none; }
+html.lh-phone .lh-count .n { font-size: 22px; }
+html.lh-phone .lh-count .pumpkin { width: 12px; height: 10px; }
+html.lh-phone .lh-count .pumpkin::before { top: -4px; height: 4px; }
+.lh-streetglow { left: 0; right: 0; bottom: 0; height: 16%; opacity: 0; pointer-events: none; background: linear-gradient(rgba(255, 140, 40, 0), rgba(255, 120, 40, .22)); }
+html.lh-street .lh-streetglow { opacity: 1; }
+.lh-plate { left: 50%; top: calc(78px * var(--k)); transform: translateX(-50%); max-width: calc(100% - 24px); pointer-events: none; font: 600 calc(18px * var(--k))/1.2 "LH Display", sans-serif; letter-spacing: .03em; color: #f3d6a8; background: rgba(12, 10, 8, .88); border: 1px solid rgba(243, 214, 168, .3); border-radius: calc(6px * var(--k)); padding: calc(8px * var(--k)) calc(14px * var(--k)); text-align: center; }
+html.lh-wall .lh-plate { font-size: max(17px, calc(18px * var(--k))); }
+html.lh-phone .lh-plate { top: 64px; font-size: 14px; padding: 6px 10px; }
+.lh-crypt-door { transform: translate(-50%, 0); min-width: 44px; min-height: 44px; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255, 210, 150, .3); background: linear-gradient(#3a2a1b, #20160d); color: #fde7b8; font: 700 16px/1 "LH Display", sans-serif; letter-spacing: .06em; box-shadow: 0 6px 16px rgba(0, 0, 0, .45); }
+html.lh-phone .lh-crypt-door { transform: none; }
+.lh-crypt { position: fixed; z-index: 30; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(520px, calc(100vw - 24px)); max-height: min(70vh, 640px); overflow: auto; pointer-events: auto; padding: 16px 16px 20px; border-radius: 10px; background: rgba(16, 14, 12, .94); border: 1px solid rgba(243, 214, 168, .28); color: #f4e6c8; box-shadow: 0 16px 40px rgba(0, 0, 0, .55); }
+.lh-crypt h2 { margin: 0 0 6px; font: 700 18px/1 "LH Display", sans-serif; color: #f6dfae; }
+.lh-crypt ul { margin: 0 0 14px; padding: 0 0 0 18px; }
+.lh-crypt li { margin: 0 0 4px; font: 600 16px/1.3 "LH Display", sans-serif; }
+.lh-crypt .empty { margin: 8px 0 14px; font: 600 16px/1.3 "LH Display", sans-serif; }
+#lh-crypt-close { min-width: 44px; min-height: 44px; margin-bottom: 10px; border-radius: 6px; border: 1px solid rgba(255, 210, 150, .3); background: #2a1d13; color: #fde7b8; font: 700 16px/1 "LH Display", sans-serif; }
+.lh-crypt-photo { min-height: 72px; border-radius: 8px; border: 1px dashed rgba(243, 214, 168, .35); display: flex; align-items: center; justify-content: center; color: #c9b89a; font: 600 15px/1.2 "LH Display", sans-serif; }
+html.lh-phone .lh-crypt { width: calc(100vw - 16px); top: auto; bottom: 8px; transform: translate(-50%, 0); max-height: 58vh; }
+.lh-cinema { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; pointer-events: none; background: #04060a; }
+html.lh-drift .night52-scene, html.lh-drift #lh { animation: lh-drift 48s ease-in-out infinite alternate; }
+@keyframes lh-drift { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-14px, -8px, 0); } }
+@media (prefers-reduced-motion: reduce) {
+  html.lh-drift .night52-scene, html.lh-drift #lh { animation: none !important; }
+}

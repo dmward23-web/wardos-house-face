@@ -32,7 +32,7 @@ const inj = js.match(/if \(q\.get\("probe"\) === "1"\) \{[^}]*probe\.js[^}]*\}/)
 assert.ok(inj, "probe.js injected only inside the ?probe=1 guard");
 assert.equal((js.match(/probe\.js/g) || []).length, 1, "no other probe.js reference");
 // 5. only clock.js reads the current time
-for (const f of ["lh.js", "probe.js", "../phone2/leaveby.js", "../house-face-law.js"]) {
+for (const f of ["lh.js", "probe.js", "scene-packs.js", "cinema.js", "crypt.js", "rhythm.js", "../phone2/leaveby.js", "../house-face-law.js"]) {
   const s = src(f).replace(/g\.LHClock \? g\.LHClock\.(now|ms)\(\) : (new Date\(\)|Date\.now\(\))/g, "");
   assert.ok(!/Date\.now\(\)|new Date\(\)/.test(s), f + " reads the current time outside clock.js");
 }

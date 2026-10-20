@@ -283,14 +283,68 @@
     $$(".lh-cr").forEach(function (c) { var k = c.getAttribute("data-kid"), soon = !cu.away && raw.some(function (e) { var s = C.at(e.start), m = (s - n) / 6e4;
       return !(e.allDay === true || e.allDay === "True") && m > 0 && m <= 60 && LHRules.kidName(k, e.summary || "") && !dress(e.summary); }); c.classList.toggle("pace", soon && !RM.matches); });
   }
-  function md(n) { var p = new Intl.DateTimeFormat("en-US", { timeZone: TZ, month: "numeric", day: "numeric" }).format(n).split("/"); return { m: +p[0], d: +p[1] }; }
-  function season(n) { /* date driven: Oct = leaves + October night; Oct 31 (or ?halloween=preview) = Halloween glow; Nov / Dec arcs are Layer 4 */
-    var x = md(n), hw = (x.m === 10 && x.d === 31) || q.get("halloween") === "preview", G = $("#lh-pglow");
-    de.classList.toggle("lh-halloween", hw); G.innerHTML = "";
+  function season(n) { /* scene pack from clock.now() via LHScenePacks.forDate. Oct 24 starts the count. Oct 31 is street mode. */
+    var pack = window.LHScenePacks.forDate(n), hw = pack.glow || q.get("halloween") === "preview", G = $("#lh-pglow");
+    de.setAttribute("data-season", pack.id); de.setAttribute("data-plate", pack.plate); de.setAttribute("data-art", pack.art);
+    de.classList.toggle("lh-halloween", hw); de.classList.toggle("lh-street", !!pack.street);
+    if (pack.streetArt) de.setAttribute("data-street-art", pack.streetArt); else de.removeAttribute("data-street-art");
+    G.innerHTML = "";
     if (hw) [[680, 494], [987, 550], [1066, 511], [1087, 427]].forEach(function (a) { var p = P(a[0], a[1]), i = document.createElement("i"), r = 90 * S; i.style.left = p[0] + "px"; i.style.top = p[1] + "px"; i.style.width = i.style.height = r + "px"; G.appendChild(i); });
-    if (q.get("halloween") === "preview") { var pv = $("#lh-preview"); pv.hidden = false; pv.textContent = "PREVIEW · Halloween night look"; }
-    $("#lh-leaves").hidden = x.m !== 10;
-    yard(n);
+    $("#lh-leaves").hidden = !pack.leaves;
+    countdown(pack); emptyPlate(pack); yard(n);
+  }
+  function countdown(pack) {
+    var el = $("#lh-count"); if (!el) return;
+    if (!pack.countdown || !pack.days) { el.hidden = true; el.setAttribute("data-days", "0"); return; }
+    el.hidden = false; el.setAttribute("data-days", String(pack.days));
+    el.querySelector("[data-lh=count]").textContent = String(pack.days);
+    var host = el.querySelector(".pumpkins"); host.innerHTML = "";
+    for (var i = 0; i < pack.days; i++) { var pump = document.createElement("i"); pump.className = "pumpkin"; host.appendChild(pump); }
+    if (phone) { el.style.left = "12px"; el.style.top = Math.max(72, VH - 92) + "px"; }
+  }
+  function emptyPlate(pack) {
+    var el = $("#lh-plate"); if (!el) return;
+    if (pack.art !== "missing") { el.hidden = true; return; }
+    el.hidden = false; el.setAttribute("data-feed", "missing"); el.setAttribute("data-plate", pack.plate); el.setAttribute("data-why", pack.why);
+    $("[data-lh=season]").textContent = pack.id === "december" ? "No snow yet" : "No harvest yet";
+  }
+  function monthKey(d) {
+    var y = "", m = "";
+    new Intl.DateTimeFormat("en-US", { timeZone: TZ, year: "numeric", month: "2-digit" }).formatToParts(d).forEach(function (p) {
+      if (p.type === "year") y = p.value; if (p.type === "month") m = p.value;
+    });
+    return y && m ? y + "-" + m : "";
+  }
+  function cryptFill(ev) {
+    var box = $("#lh-jars"); if (!box || !window.LHCrypt) return;
+    var photo = LHCrypt.photoHook();
+    var slot = $(".lh-crypt-photo");
+    slot.setAttribute("data-feed", photo.feed); slot.setAttribute("data-why", photo.why); slot.removeAttribute("src");
+    var items = (ev || []).map(function (e) { return { t: e.t, month: monthKey(e.s) }; }).filter(function (e) { return e.t && !LHRules.stateText(e.t) && !LHRules.money(e.t); });
+    var list = LHCrypt.jars(items);
+    box.innerHTML = "";
+    box.setAttribute("data-feed", list.length ? "live" : (D.feeds.cal === "live" ? "empty" : "missing"));
+    if (!list.length) { var p = document.createElement("p"); p.className = "empty"; p.textContent = "No moments yet"; box.appendChild(p); return; }
+    list.forEach(function (j) {
+      var sec = document.createElement("section"), h = document.createElement("h2"), ul = document.createElement("ul");
+      h.textContent = j.label; sec.className = "jar"; sec.appendChild(h);
+      j.items.forEach(function (it) { var li = document.createElement("li"); li.textContent = it.t; ul.appendChild(li); });
+      sec.appendChild(ul); box.appendChild(sec);
+    });
+  }
+  function leaveSlot(d) {
+    var map = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }, wd = 0, h = 0, mi = 0;
+    new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short", hour: "numeric", minute: "numeric", hourCycle: "h23" }).formatToParts(d).forEach(function (p) {
+      if (p.type === "weekday") wd = map[p.value] || 0; if (p.type === "hour") h = +p.value; if (p.type === "minute") mi = +p.value;
+    });
+    return { wd: wd, min: h * 60 + mi };
+  }
+  function rhythm(pick) {
+    if (!window.LHRhythm) return;
+    var info = pick && pick.lb && pick.lb.leave ? leaveSlot(pick.lb.leave) : null, store = null;
+    try { store = localStorage; } catch (_) { store = null; }
+    LHRhythm.observe(info, store);
+    de.setAttribute("data-rhythm", LHRhythm.decide().mode);
   }
   function yard(n) { /* MISSING FEED hooks: weekly yard element + memory yard need a shared chore history; nothing is drawn until one exists */
     var Y = $("#lh-yard"); Y.innerHTML = ""; return null; }
@@ -305,15 +359,47 @@
     if (!VW) return; var n = now(), cu = homeState(n);
     moon(n); windows(n, cu); var ev = events(n, cu), ce = candleEvent(ev, n); stones(n, ev, ce); candle(n, ce); signFit(); callout(n, cu); fitPhone(); cauldron(n, cu); weatherFog(); leaves();
     de.classList.toggle("lh-state-away", cu.away); de.classList.toggle("lh-state-home", !cu.away);
-    creatures(n, cu); season(n); mirror();
+    creatures(n, cu); season(n); mirror(); cryptFill(ev); rhythm(ce);
+    if (phone) { var door = $("#lh-crypt-door"); door.style.left = "8px"; door.style.top = (bandY + 8) + "px"; door.style.transform = "none"; }
     var pv = $("#lh-preview"); pv.hidden = !cu.preview; if (cu.preview) pv.textContent = "PREVIEW · sample look · not live data";
+    if (q.get("halloween") === "preview") { pv.hidden = false; pv.textContent = "PREVIEW · Halloween night look"; }
   }
+  var lastTouch = C.ms(), capsVideo = false;
+  function applyCinema(elapsed) {
+    if (!window.LHCinema) return;
+    var v = $("#lh-cinema"), view = LHCinema.consider(elapsed, { reduced: RM.matches, caps: capsVideo === true, phone: phone });
+    var dead = !!(v && v.dataset.dead);
+    de.setAttribute("data-cinema", view.on ? (view.video && !dead ? "video" : "poster") : "off");
+    de.classList.toggle("lh-drift", !!view.on && (view.drift || dead) && !RM.matches);
+    if (!v) return;
+    if (!view.on) {
+      v.hidden = true; try { v.pause(); } catch (_) {}
+      if (v.getAttribute("src")) { v.removeAttribute("src"); try { v.load(); } catch (_) {} }
+      return;
+    }
+    v.hidden = false; if (view.posterUrl) v.poster = view.posterUrl;
+    if (view.video && view.src && !dead) {
+      if (v.getAttribute("src") !== view.src) v.src = view.src;
+      try { v.play().catch(function () {}); } catch (_) {}
+    } else if (v.getAttribute("src")) { v.removeAttribute("src"); try { v.load(); } catch (_) {} }
+  }
+  function noteIdle(ms) { lastTouch = C.ms() - ms; applyCinema(ms); }
+  function touchCinema() { lastTouch = C.ms(); applyCinema(0); }
   function go() { layout(); load(); var f = frame(); if (f) f.addEventListener("load", function () { layout(); setTimeout(weatherFog, 3000); }); }
   addEventListener("resize", layout);
   setInterval(function () { paint(); }, 20000); setInterval(load, 5 * 6e4); setInterval(function () { moon(now()); }, 1000);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(go, 50); }); else setTimeout(go, 50);
   if (q.get("probe") === "1") { var ps = document.createElement("script"); ps.src = "probe.js?v=LH1"; document.body.appendChild(ps); } /* perf probe, off by default */
-  window.LivingHouse = { paint: paint, data: D, phase: moonPhase };
+  addEventListener("pointerdown", touchCinema, true);
+  addEventListener("keydown", touchCinema, true);
+  setInterval(function () { applyCinema(C.ms() - lastTouch); }, 1000);
+  fetch("../night/media/caps.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+    capsVideo = !!(j && j.video === true); applyCinema(C.ms() - lastTouch);
+  }).catch(function () { capsVideo = false; });
+  var cryptPanel = $("#lh-crypt");
+  $("#lh-crypt-door").addEventListener("click", function () { cryptPanel.hidden = !cryptPanel.hidden; });
+  $("#lh-crypt-close").addEventListener("click", function () { cryptPanel.hidden = true; });
+  window.LivingHouse = { paint: paint, data: D, phase: moonPhase, noteIdle: noteIdle };
 })();
 /* LHVID1 · the porch-lantern flame video gets its src only when night/media/caps.json says the videos are reachable (the proxy).
    On Pages it stays the poster still and never requests the mp4; a later load error drops the src (onerror in index.html). */
