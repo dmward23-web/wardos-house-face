@@ -86,6 +86,12 @@ const Q=new URLSearchParams(location.search),DPR3=Q.get('dpr')==='3',TAPDOT=Q.ha
 const RM=matchMedia('(prefers-reduced-motion: reduce)');
 const $=s=>document.querySelector(s);
 const gl$=$('#gl'),fx=$('#fx'),c2=fx.getContext('2d'),dot=$('#dot'),V=$('#bg');
+// LHVID1 · media capability: ask media/caps.json ONCE (Pages serves the committed {video:false}; the proxy answers true when its private folder has the loops).
+// No video src is set until the answer is true, so Pages never requests an mp4 (0 404s). Any later load error drops the src quietly: the poster or still shows.
+let VOK=false;const VQ=[];function vdead(){const v=this;if(v.dataset.dead)return;v.dataset.dead=1;v.removeAttribute('src');try{v.load()}catch(_){}}
+function vsrc(v,u,auto){v.dataset.src=u;v.dataset.auto=auto?1:'';v.onerror=vdead;if(VOK)vgo(v);else VQ.push(v)}
+function vgo(v){if(v.dataset.dead||!v.dataset.src)return;v.src=v.dataset.src;if(v.preload!=='none')v.load();if(v.dataset.auto&&!MANUAL)v.play().catch(()=>{})}
+fetch('media/caps.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.video===true){VOK=true;for(const v of VQ.splice(0))vgo(v)}}).catch(()=>{});
 let P,mode,dpr,vw,vh,S,OX,OY,ready=0;
 const vn=t=>{const i=Math.floor(t),f=t-i,h=n=>{const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s)};const u=f*f*(3-2*f);return h(i)*(1-u)+h(i+1)*u};
 function windAt(t){const n=.55*vn(t*.11)+.3*vn(t*.29+7.3)+.15*vn(t*.83+19.1);const g=Math.min(1,Math.max(0,(n-.32)/.42));return g*g*(3-2*g)}
@@ -111,12 +117,12 @@ const MODE0=(BAND||innerWidth/innerHeight>=.8)?'wall':'phone';function fxPre(k){
 function fxWake(){window.__woke=1;for(const k in FXV){const v=FXV[k].v,m=k.match(/-(wall|phone)$/);if(/^(fire|smoke|grassfire)-black$/.test(k))continue;if(m&&m[1]!==mode)continue;if(v.preload!=='auto'){v.preload='auto';v.load()}}}
 addEventListener('pointerdown',()=>{if(!window.__woke)fxWake()},{capture:true,passive:true});
 const FXV={};function fxVid(k,loop){const v=document.createElement('video');v.muted=true;v.playsInline=true;v.loop=!!loop;v.preload=fxPre(k);v.setAttribute('playsinline','');
- for(const[e,t]of[['mp4','video/mp4']]){const s=document.createElement('source');s.src=(window.VID&&VID[k+e])||('media/'+k+'.'+e);s.type=t;v.appendChild(s)}
+ vsrc(v,(window.VID&&VID[k+'mp4'])||('media/'+k+'.mp4'),0);
  v.style.cssText='position:fixed;width:2px;height:2px;opacity:0;pointer-events:none';document.body.appendChild(v);if(v.preload!=='none')v.load();FXV[k]={v,t:-1,loop:!!loop};return FXV[k]}
 ['bats-matte','embers-black','ghost-black','owl-packed'].forEach(k=>fxVid(k,k!=='bats-matte'&&k!=='embers-black'));FXV['owl-packed'].rate=.7;
 function fxStart(k,t0=0){const f=FXV[k];if(f&&f.v.preload!=='auto'){f.v.preload='auto';f.v.load()}f.t=t0;if(!MANUAL){try{f.v.currentTime=t0;f.v.playbackRate=f.rate||1;f.v.play().catch(()=>{})}catch(e){}}}
-function setVideo(){ready=0;V.innerHTML='';if(mode==='phone'&&(DPR3||(devicePixelRatio||1)>=2.5)&&window.VID&&VID.phone3xmp4){const s=document.createElement('source');s.src=VID.phone3xmp4;s.type='video/mp4';V.appendChild(s)}for(const[e,t]of[['mp4','video/mp4']]){const s=document.createElement('source');s.src=(window.VID&&VID[mode+e])||(P.vid+'.'+e);s.type=t;V.appendChild(s)}
- V.load();const ok=()=>{ready=1};if(V.readyState>=2)ok();else V.addEventListener('loadeddata',ok,{once:true});if(!MANUAL)V.play().catch(()=>{})}
+function setVideo(){ready=0;V.innerHTML='';V.poster=`media/poster/v52-loop-${mode}.webp`;delete V.dataset.dead;V.removeAttribute('src');vsrc(V,(mode==='phone'&&(DPR3||(devicePixelRatio||1)>=2.5)&&window.VID&&VID.phone3xmp4)||(window.VID&&VID[mode+'mp4'])||(P.vid+'.mp4'),1);
+const ok=()=>{ready=1};V.addEventListener('loadeddata',ok,{once:true});{const pi=poster('night');if(imOk(pi))ok();else pi.addEventListener('load',ok,{once:true})}/* LHVID1: the still poster starts the scene when the loop video is missing */if(!MANUAL)V.play().catch(()=>{})}
 function layout(){dpr=MANUAL?1:Math.min(devicePixelRatio||1,2);vw=innerWidth;vh=innerHeight;const nm=(BAND||vw/vh>=.8)?'wall':'phone';
  if(nm!==mode){mode=nm;P=SC[mode];document.body.className=mode;setVideo();init();if(window.__woke)fxWake()}
  S=Math.max(vw/P.w,vh/P.h);OX=(vw-P.w*S)/2;OY=(vh-P.h*S)/2;
@@ -396,10 +402,10 @@ function envStep(dt){let ph;if(QP&&PHK[QP])ph={A:QP,B:QP,m:0,a:NaN};else ph=phas
  if(ENV.thT&&T>=ENV.thT){snd('thunder2',ENV.thG,rr(-.6,.6));ENV.thT=0}}
 // ---- background compositor: phase videos (2 decoders + preload), wet loop, snow plate, precipitation layers, clouds ----
 const PV={};function pvGet(n){if(n==='night')return V;if(PV[n])return PV[n];const v=document.createElement('video');v.muted=true;v.loop=true;v.playsInline=true;v.preload='auto';v.crossOrigin='anonymous';
- v.src=(window.VID&&VID[n+mode+'mp4'])||`media/loop-${n}-${mode}.mp4`;v.load();if(!MANUAL)v.play().catch(()=>{});PV[n]=v;return v}
+ v.poster=`media/poster/loop-${n}-${mode}.webp`;vsrc(v,(window.VID&&VID[n+mode+'mp4'])||`media/loop-${n}-${mode}.mp4`,1);PV[n]=v;return v}
 function pvGC(keep){for(const n in PV)if(!keep.includes(n)){PV[n].pause();PV[n].removeAttribute('src');PV[n].load();delete PV[n]}}
-const WV={};function wvGet(n){if(WV[n])return WV[n];const v=document.createElement('video');v.muted=true;v.loop=true;v.playsInline=true;v.preload='auto';v.src=(window.VID&&VID[n+mode+'mp4'])||`media/loop-${n}-${mode}.mp4`;v.load();if(!MANUAL)v.play().catch(()=>{});WV[n]=v;return v}
-const PRV={};function prGet(n){if(PRV[n])return PRV[n];const v=document.createElement('video');v.muted=true;v.loop=true;v.playsInline=true;v.preload='auto';v.src=(window.VID&&VID[n+'mp4'])||`media/${n}.mp4`;v.load();if(!MANUAL)v.play().catch(()=>{});PRV[n]=v;return v}
+const WV={};function wvGet(n){if(WV[n])return WV[n];const v=document.createElement('video');v.muted=true;v.loop=true;v.playsInline=true;v.preload='auto';v.poster=`media/poster/loop-${n}-${mode}.webp`;vsrc(v,(window.VID&&VID[n+mode+'mp4'])||`media/loop-${n}-${mode}.mp4`,1);WV[n]=v;return v}
+const PRV={};function prGet(n){if(PRV[n])return PRV[n];const v=document.createElement('video');v.muted=true;v.loop=true;v.playsInline=true;v.preload='auto';vsrc(v,(window.VID&&VID[n+'mp4'])||`media/${n}.mp4`,1);PRV[n]=v;return v}
 const SKP={};let SKY=null,BG=null,BGc=null,SNC=null,SNI=null,SNlvl=-1,CLD=null,HAIL=[];
 function snowLoad(){if(SNI)return;SNI=new Image();SNI.src=(window.VID&&VID['snow'+mode+'png'])||`media/snow-${mode}.png`}
 function snowMask(W,H,lv){// alpha = smoothstep over per-pixel accumulation key (luma/noise mask in PNG alpha)
@@ -413,12 +419,15 @@ function cloudTex(){if(CLD)return CLD;CLD=document.createElement('canvas');CLD.w
  for(let y=0;y<256;y++)for(let x=0;x<512;x++){let v=0,a=.5,f=1/32;for(let o=0;o<5;o++){v+=a*vn2(x*f,y*f*1.6+o*7,16<<o);a*=.5;f*=2}const q=Math.max(0,Math.min(1,(v-.38)*2.6));const i=(y*512+x)*4;im.data[i]=im.data[i+1]=im.data[i+2]=235+20*q;im.data[i+3]=q*255}
  c.putImageData(im,0,0);return CLD}
 function vidT(v){return v===V?null:(V.currentTime||0)%(v.duration||14.54)}
-function bgCompose(){const W=V.videoWidth,H=V.videoHeight;if(!W)return V;if(!BG){BG=document.createElement('canvas');BG.width=W;BG.height=H;BGc=BG.getContext('2d')}const c=BGc,sx=W/P.w,sy=H/P.h;
+// LHVID1 · still poster per loop (night/media/poster, scenery only, in git): drawn whenever a loop video is missing (404, error, not ready yet), so the scene is never an empty box
+var PST;function poster(n){PST=PST||{};const k=n+'-'+mode;if(PST[k])return PST[k];const i=new Image();i.decoding='async';i.src=`media/poster/${n==='night'?'v52-loop':'loop-'+n}-${mode}.webp`;PST[k]=i;return i}
+function imOk(i){return !!(i&&i.complete&&i.naturalWidth)}
+function bgCompose(){const PN=poster('night'),vR=V.readyState>=2&&V.videoWidth;const W=vR?V.videoWidth:(imOk(PN)?PN.naturalWidth:0),H=vR?V.videoHeight:(imOk(PN)?PN.naturalHeight:0);if(!W)return V;if(!BG){BG=document.createElement('canvas');BGc=BG.getContext('2d')}if(BG.width!==W||BG.height!==H){BG.width=W;BG.height=H;for(const k in SKP)delete SKP[k]}const base=vR?V:PN;const c=BGc,sx=W/P.w,sy=H/P.h;
  const ph=ENV.phase,va=PHK[ph.A].vid,vb=PHK[ph.B].vid;const A=pvGet(va),B=ph.m>0?pvGet(vb):null;
  // preload the next phase once within 3 degrees of a threshold
  const keep=[va,vb];if(!QP){const nx=phaseAt(envNow()+20*6e4);keep.push(PHK[nx.A].vid,PHK[nx.B].vid);for(const n of keep)if(n!=='night')pvGet(n)}pvGC(keep);
  c.globalCompositeOperation='source-over';c.globalAlpha=1;c.filter='none';
- const ok=v=>v&&v.readyState>=2;if(ok(A))c.drawImage(A,0,0,W,H);else c.drawImage(V,0,0,W,H);if(B&&ph.m>0){c.globalAlpha=ok(B)?ph.m:0;if(ok(B))c.drawImage(B,0,0,W,H);c.globalAlpha=1}
+ const ok=v=>v&&v.readyState>=2&&v.videoWidth>0;const pick=(v,n)=>ok(v)?v:(n!=='night'&&imOk(poster(n))?poster(n):null);const sA=pick(A,va),sB2=B?pick(B,vb):null;c.drawImage(sA||base,0,0,W,H);if(sB2&&ph.m>0){c.globalAlpha=ph.m;c.drawImage(sB2,0,0,W,H);c.globalAlpha=1}
  // 3) porch skeleton: hold it still (the plate's continuous arm wave read as a stiff prop) -> feathered still patch per source
  {const sp=(v,nm,al,bx)=>{if(!ok(v)||al<=0)return;let P0=SKP[nm+'_'+bx[0]];const r=[bx[0]*sx,bx[1]*sy,bx[2]*sx,bx[3]*sy];
    if(!P0){P0=SKP[nm+'_'+bx[0]]=document.createElement('canvas');P0.width=Math.ceil(r[2]);P0.height=Math.ceil(r[3]);const k=P0.getContext('2d');k.drawImage(v,r[0]*v.videoWidth/W,r[1]*v.videoHeight/H,r[2]*v.videoWidth/W,r[3]*v.videoHeight/H,0,0,r[2],r[3]);

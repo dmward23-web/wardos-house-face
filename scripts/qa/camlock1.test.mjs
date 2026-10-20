@@ -1,6 +1,6 @@
 /* CAMLOCK1 · camera + lights proxies lock without a key (node --test scripts/qa/camlock1.test.mjs).
    No real Google, no real lights: Google is a loopback mock; the lights proxy is tested at its auth function. */
-import { freePortSync } from "./free-port.mjs";
+import { spawnListening } from "./free-port.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -53,25 +53,13 @@ function fakeHome({ tokenFile } = {}) {
   if (tokenFile) fs.writeFileSync(path.join(cfg, "nest-device.token"), tokenFile + "\n", { mode: 0o600 });
   return home;
 }
-function freePort() { return freePortSync(); }
 function startProxy(home, extraEnv = {}, extraArgs = []) {
-  const port = freePort();
   const env = { ...process.env, HOME: home, NEST_PROXY_TEST_GOOGLE: GOOGLE, ...extraEnv };
   delete env.NEST_PROXY_TOKEN; delete env.NEST_REFRESH_TOKEN;
   if (extraEnv.NEST_PROXY_TOKEN) env.NEST_PROXY_TOKEN = extraEnv.NEST_PROXY_TOKEN;
-  const child = spawn("node", [PROXY, "--host", "127.0.0.1", "--port", String(port), ...extraArgs], { env, stdio: ["ignore", "pipe", "pipe"] });
-  let log = "";
-  child.stdout.on("data", (d) => (log += d)); child.stderr.on("data", (d) => (log += d));
-  const exited = new Promise((r) => child.on("exit", (code) => r(code)));
-  return { child, port, base: `http://127.0.0.1:${port}`, exited, log: () => log };
+  return spawnListening("node", [PROXY, "--host", "127.0.0.1", "--port", "0", ...extraArgs], { env });   /* LHVID1' · port 0, no race */
 }
-async function waitUp(base) {
-  for (let i = 0; i < 50; i++) {
-    await new Promise((r) => setTimeout(r, 100));
-    try { if ((await fetch(base + "/health")).status === 200) return true; } catch { /* starting */ }
-  }
-  return false;
-}
+async function waitUp(h) { if (!(await h.ready)) return false; try { return (await fetch(h.base + "/health")).ok; } catch { return false; } }
 const API = [
   ["GET", "/api/cameras"],
   ["POST", "/api/webrtc", { deviceId: "cam1", offerSdp: "v=0" }],
@@ -104,7 +92,7 @@ test("nest proxy refuses a short (weak) token too", async () => {
 test("nest proxy: no key, wrong key, query key, Origin, loopback XFF all → 401 and Google is never called", async () => {
   const p = startProxy(fakeHome({ tokenFile: KEY }));
   try {
-    assert.ok(await waitUp(p.base), "proxy did not start: " + p.log());
+    assert.ok(await waitUp(p), "proxy did not start: " + p.log());
     assert.ok(!p.log().includes(KEY), "startup log must not print the token");
     googleHits.length = 0;
     for (const ep of API) {
@@ -128,7 +116,7 @@ test("nest proxy: no key, wrong key, query key, Origin, loopback XFF all → 401
 test("nest proxy: right key passes auth on all four routes (Google mocked)", async () => {
   const p = startProxy(fakeHome({ tokenFile: KEY }));
   try {
-    assert.ok(await waitUp(p.base), "proxy did not start: " + p.log());
+    assert.ok(await waitUp(p), "proxy did not start: " + p.log());
     const h = { "X-Nest-Proxy-Token": KEY };
     const cams = await call(p.base, API[0], h);
     assert.equal(cams.status, 200);
@@ -154,7 +142,7 @@ test("nest proxy: NEST_PROXY_TOKEN env is label-only (alone it refuses to start;
   const ENVK = "env-retired-key-0123456789abcdef";
   const pe = startProxy(fakeHome({ tokenFile: KEY }), { NEST_PROXY_TOKEN: ENVK });
   try {
-    assert.ok(await waitUp(pe.base));
+    assert.ok(await waitUp(pe));
     assert.equal((await call(pe.base, API[0], { "X-Nest-Proxy-Token": ENVK })).status, 401);
     assert.equal((await call(pe.base, API[0], { "X-Nest-Proxy-Token": KEY })).status, 200);
   } finally { pe.child.kill(); }
@@ -163,7 +151,7 @@ test("nest proxy: NEST_PROXY_TOKEN env is label-only (alone it refuses to start;
   fs.writeFileSync(a, "first-key-0123456789abcdef\n"); fs.writeFileSync(b, KEY + "\n");
   const q = startProxy(home, {}, ["--auth-token-file", a, "--auth-token-file", b]);
   try {
-    assert.ok(await waitUp(q.base));
+    assert.ok(await waitUp(q));
     assert.equal((await call(q.base, API[0], { "X-Nest-Proxy-Token": KEY })).status, 200);
     assert.equal((await call(q.base, API[0], { "X-Nest-Proxy-Token": "first-key-0123456789abcdef" })).status, 200);
   } finally { q.child.kill(); }
@@ -172,7 +160,7 @@ test("nest proxy: NEST_PROXY_TOKEN env is label-only (alone it refuses to start;
 test("nest proxy: /health says only ok; .git, data, scripts → 404; page code is public", async () => {
   const p = startProxy(fakeHome({ tokenFile: KEY }));
   try {
-    assert.ok(await waitUp(p.base));
+    assert.ok(await waitUp(p));
     for (const hp of ["/health", "/api/health"]) {
       const r = await fetch(p.base + hp);
       assert.equal(r.status, 200);
@@ -251,7 +239,7 @@ test("nest proxy: bad Host / bad request target never crash it; deviceId must be
   const net = await import("node:net");
   const p = startProxy(fakeHome({ tokenFile: KEY }));
   try {
-    assert.ok(await waitUp(p.base));
+    assert.ok(await waitUp(p));
     for (const raw of [`GET /api/cameras HTTP/1.1\r\nHost: [bad\r\nX-Nest-Proxy-Token: ${KEY}\r\n\r\n`, `GET //[x HTTP/1.1\r\nHost: a b\r\n\r\n`]) {
       await new Promise((resolve) => { const s = net.connect(p.port, "127.0.0.1", () => s.end(raw)); s.on("data", () => {}); s.on("close", resolve); s.on("error", resolve); });
     }

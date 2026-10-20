@@ -4,6 +4,7 @@
    household, school, anything unknown) is NEVER filtered; an unknown role gets one count-only warning. No external
    rows = one count-only config warning. Synthetic stand-ins only (Smith, Jones, Zedna, Yolanthe, Quill, QXS); the
    cal-months runs use a temp HOME with a stand-in privacy-scrub.tsv so the empty-HOME CI run works too. */
+import { assertSealed } from "./temp-home.mjs";   // TEMPHOME1 (LHVID1): WARDOS_* unset and a temp HOME before any private-list reader loads
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -61,6 +62,7 @@ function months(names) {
   return { stderr: r.stderr, item: (re) => items.find((i) => re.test(i.l)) || {} };
 }
 
+assertSealed();
 test("calendar-refresh: external and old-key rows are filtered; partner, coparent, household and unknown rows stay", () => {
   const r = refresh(NAMES);
   assert.doesNotMatch(r.hayes, /Smith/, "external filtered");

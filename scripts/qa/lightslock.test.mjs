@@ -2,7 +2,7 @@
    (single use, 5-minute expiry, mint needs the key, /api/pair rate limited).
    node --test scripts/qa/lightslock.test.mjs   (needs the ws module: NODE_PATH=<deps>/node_modules)
    No real light is ever touched: the Kasa python is a fake that only logs what it was asked. */
-import { freePortSync } from "./free-port.mjs";
+import { spawnListening } from "./free-port.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -41,18 +41,11 @@ else{fs.appendFileSync(log,"write "+a.slice(1).join(" ")+"\\n");process.stdout.w
 function writes(h) { try { return fs.readFileSync(h.log, "utf8").split("\n").filter((l) => /^(write|daemon) /.test(l)); } catch { return []; } }
 
 function start(h, extraEnv = {}, tokenFile = path.join(h.home, ".config/wardos/lights-proxy.token")) {
-  const port = freePortSync();
   const env = { ...process.env, HOME: h.home, WARDOS_PRIVATE_DIR: h.priv, KASA_VENV_PYTHON: h.fakePy, ...extraEnv };
   delete env.LIGHTS_PROXY_TOKEN; if (extraEnv.LIGHTS_PROXY_TOKEN) env.LIGHTS_PROXY_TOKEN = extraEnv.LIGHTS_PROXY_TOKEN;
-  const child = spawn("node", [PROXY, "--host", "127.0.0.1", "--port", String(port), "--token-file", tokenFile], { env, stdio: ["ignore", "pipe", "pipe"] });
-  let out = ""; child.stdout.on("data", (d) => (out += d)); child.stderr.on("data", (d) => (out += d));
-  const exited = new Promise((r) => child.on("exit", (c) => r(c)));
-  return { child, base: `http://127.0.0.1:${port}`, exited, log: () => out };
+  return spawnListening("node", [PROXY, "--host", "127.0.0.1", "--port", "0", "--token-file", tokenFile], { env });   /* LHVID1' · port 0, no race */
 }
-async function up(p) {
-  for (let i = 0; i < 60; i++) { await new Promise((r) => setTimeout(r, 100)); try { if ((await fetch(p.base + "/health")).ok) return true; } catch { /* starting */ } }
-  return false;
-}
+async function up(h) { if (!(await h.ready)) return false; try { return (await fetch(h.base + "/health")).ok; } catch { return false; } }
 const ROUTES = [["GET", "/api/lights"], ["GET", "/api/taps"], ["GET", "/api/spotify"], ["POST", "/api/lights/set", { id: "kitchen", on: true }]];
 async function call(base, [method, p, body], headers = {}, suffix = "") {
   /* FOLLOWUP6 · one connection per request (as QAKEEPALIVE1 in privfeed): on a loaded box a pooled keep-alive socket the

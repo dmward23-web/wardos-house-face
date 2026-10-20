@@ -744,6 +744,7 @@ async function main() {
   for (const sig of ["SIGTERM", "SIGINT"]) process.on(sig, () => process.exit(0));
 
   server.listen(args.port, args.host, () => {
+    args.port = server.address().port;   /* LHVID1' · --port 0 (tests): the kernel picks the port and we print the real one */
     const shown = args.host === "0.0.0.0" ? "0.0.0.0 (all interfaces)" : args.host;
     console.log(`lights-write-proxy listening http://${shown}:${args.port}`);
     console.log(`  health:  http://127.0.0.1:${args.port}/health`);

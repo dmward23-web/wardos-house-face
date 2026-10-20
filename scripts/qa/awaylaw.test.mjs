@@ -2,6 +2,7 @@
 // Away days come only from cal-months withDan: scripts/qa/fixtures/private/cal-months.synthetic.json marks
 // Mon 10/19 to Sun 10/25 as away, so with the 3:00 PM switch the window is Sun 10/18 3:00 PM to Mon 10/26 3:00 PM CT.
 // Run: node --test scripts/qa/awaylaw.test.mjs
+import { assertSealed } from "./temp-home.mjs";   // TEMPHOME1 (LHVID1): WARDOS_* unset and a temp HOME before any private-list reader loads
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
@@ -10,6 +11,7 @@ import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const require = createRequire(import.meta.url);
+assertSealed();
 const A = require(join(root, "away-filter.js"));
 const months = JSON.parse(readFileSync(join(root, "scripts/qa/fixtures/private/cal-months.synthetic.json"), "utf8"));
 function at(iso) { globalThis.location = { search: "?now=" + encodeURIComponent(iso) }; A.setMonths(months); }

@@ -23,13 +23,13 @@ jobs:
         with:
           node-version: "20"
       - name: Scan tree
-        run: node scripts/privacy-scan.mjs --tree
+        run: node scripts/privacy-scan.mjs --tree --generic-only   # CI has no private lists (public runner); the box hook fails closed
       - name: Scan new commits (PR)
         if: github.event_name == 'pull_request'
-        run: node scripts/privacy-scan.mjs --range "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
+        run: node scripts/privacy-scan.mjs --generic-only --range "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
       - name: Scan new commits (push)
         if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
-        run: node scripts/privacy-scan.mjs --range "${{ github.event.before }}..${{ github.sha }}"
+        run: node scripts/privacy-scan.mjs --generic-only --range "${{ github.event.before }}..${{ github.sha }}"
 
   # FOLLOWUP1 · the test suite is its own REPORT-ONLY job: the result goes to the job summary and a failure never turns
   # the run red (no failure mail). The privacy job above stays blocking. The box gate (Alfred) runs the full suite,

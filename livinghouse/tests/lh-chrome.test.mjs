@@ -1,10 +1,12 @@
 // node livinghouse/tests/lh-chrome.test.mjs
 // Prism P2 (v2 stills) and Alfred's test-chrome rule, checked on the shipped CSS and scripts.
+import { assertSealed } from "../../scripts/qa/temp-home.mjs";   // TEMPHOME1 (LHVID1'): names lh-rules.js, so it runs sealed
 import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 const dir = fileURLToPath(new URL("..", import.meta.url));
 const src = (f) => readFileSync(dir + f, "utf8");
+assertSealed();
 const css = src("lh.css");
 const rule = (sel) => { const i = css.indexOf(sel + " {"); assert.ok(i >= 0, "missing rule " + sel); return css.slice(i, css.indexOf("}", i)); };
 

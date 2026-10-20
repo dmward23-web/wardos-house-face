@@ -210,7 +210,7 @@
       pl.setAttribute("href", "../kid-" + k + ".html" + (nx && nx.id ? "?next=" + encodeURIComponent(nx.id) : ""));   /* the room opens on the next item */
     });
     var aw = $(".lh-away"); aw.hidden = !cu.away;   /* Alfred: the lantern carries no words (no return countdown, no away wording); Dad has no coarse status feed yet, so nothing */
-    var fv = $(".lan-fire"); try { if (cu.away && !RM.matches) fv.play().catch(function () {}); else fv.pause(); } catch (_) {}
+    var fv = $(".lan-fire"); if (fv && fv.getAttribute("src")) try { if (cu.away && !RM.matches) fv.play().catch(function () {}); else fv.pause(); } catch (_) {}
     var st = ["ainsley", "hayes", "harris"].map(function (k) { var w = $(".lh-win[data-kid=" + k + "]"); return w.classList.contains("dark") ? "dark" : "lit"; }), anyGlow = !!$(".lh-win.glow");
     var kw = $("#lh-kidwins"); kw.style.setProperty("--strip", "url(art/facade-strip-" + st.join("-") + "-576x180.webp)");
     kw.style.setProperty("--sglow", st.indexOf("lit") < 0 ? "none" : "url(art/facade-strip-glow-" + st.join("-") + "-576x180.webp)"); kw.style.setProperty("--sgo", anyGlow ? "1" : ".6");
@@ -314,4 +314,15 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(go, 50); }); else setTimeout(go, 50);
   if (q.get("probe") === "1") { var ps = document.createElement("script"); ps.src = "probe.js?v=LH1"; document.body.appendChild(ps); } /* perf probe, off by default */
   window.LivingHouse = { paint: paint, data: D, phase: moonPhase };
+})();
+/* LHVID1 · the porch-lantern flame video gets its src only when night/media/caps.json says the videos are reachable (the proxy).
+   On Pages it stays the poster still and never requests the mp4; a later load error drops the src (onerror in index.html). */
+(function () {
+  var v = document.querySelector(".lan-fire"); if (!v || !v.dataset.src) return;
+  fetch("../night/media/caps.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+    if (!(j && j.video === true) || v.dataset.dead) return;
+    v.src = v.dataset.src;
+    var aw = document.querySelector(".lh-away"), rm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (aw && !aw.hidden && !rm) v.play().catch(function () {});
+  }).catch(function () {});
 })();

@@ -51,6 +51,16 @@ test("setSchools: tokens, full names and the LHRules token rule", () => {
   assert.equal(S.rx("\\b§\\b", "").test("boys qxs run"), false, "no flag stays case-sensitive");
   assert.ok(S.rx("\\b§\\b|¶", "i").test("Quux  Hill pickup"));
   assert.equal(S.stripSchool("QXS specials: Art"), "specials: Art");
+  for (const [x, want] of [["QXSDrop 7:55", "Drop 7:55"], ["Hayes qxsPickup", "Hayes Pickup"], ["QXS_drop", "QXS_drop"]]) assert.equal(S.stripSchool(x), want, "LHVID1 P4 glued: " + x.length);
+  /* LHVID1' P4 (Alfred 0720 #5): glued to a lowercase logistics word drops; ordinary words that only share letters stay */
+  for (const [x, want] of [["Hayes QXSdrop", "Hayes drop"], ["qxsdrop 7:55", "drop 7:55"], ["QXSpickup at 3", "pickup at 3"], ["(qxsdismissal)", "(dismissal)"], ["qxsbus", "bus"]])
+    assert.equal(S.stripSchool(x), want, "glued lowercase: " + x.length);
+  for (const keep of ["qxsdropping", "qxsdroplet", "QXSabc", "qxsday", "aqxsdrop", "QXS_drop", "dropqxs", "Smith droppedoff"])
+    assert.equal(S.stripSchool(keep), keep, "not a glued logistics word: " + keep.length);
+  /* LHVID1'' P4 (Alfred 0803 #3): hyphen- or space-joined, either case, the token drops */
+  for (const [x, want] of [["QXS-Drop 7:55", "Drop 7:55"], ["qxs-drop", "drop"], ["Hayes QXS-pickup", "Hayes pickup"], ["QXS Drop", "Drop"], ["qxs drop 7:55", "drop 7:55"], ["Boys QXS run", "Boys run"]])
+    assert.equal(S.stripSchool(x), want, "joined: " + x.length);
+  for (const keep of ["aqxs-drop", "QXS_drop", "drop-qxs"]) assert.equal(S.stripSchool(keep), keep, "not a joined token: " + keep.length);
   assert.equal(S.label("School"), "QXS");
   S.setSchools(null);
 });
@@ -125,15 +135,16 @@ test("the tree carries no school name rule outside school-names.js (no literal s
    uses (?<![A-Za-z])CODE(?![a-z]) for role school. Synthetic QXS only; the plant is a zz-* file this test owns. */
 test("privacy-scan catches a school code joined by '_', a digit or a capital (QXS_drop, QXSDrop, QXSX, qxsDrop) and still ignores it inside words", () => {
   assert.equal(/\bQXS\b/i.test("QXS_drop"), false, "the old \\b rule is blind to this form");
-  const plant = path.join(ROOT, "zz-schoolkey2-plant.txt");
-  const scan = (env) => spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--tree", "--only", "(^|/)zz-schoolkey2-plant"],
+  const PL = "zz-schoolkey2-plant-" + process.pid;   /* LHVID1' · per-process name: two runs at once never share one plant */
+  const plant = path.join(ROOT, PL + ".txt");
+  const scan = (env) => spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--tree", "--only", "(^|/)" + PL],
     { cwd: ROOT, encoding: "utf8", env: { ...process.env, WARDOS_PRIVACY_DENYLIST: path.join(TMP, "no-denylist"), ...env } });
   try {
     for (const bad of ['leaveBys: { QXS_drop: "leave 8:10" }', '"qxs_pickup": "x"', "row.QXS_drop", "kind=QXS-run", "QXS2", "QXSDrop", "QXSX", "qxsDrop", "Quux  Hill_x"]) {
       fs.writeFileSync(plant, "plain line\n" + bad + "\n");
       const r = scan({ WARDOS_PRIVATE_NAMES: NAMES });
       assert.equal(r.status, 1, "caught: line " + bad.length + " chars");
-      assert.match(r.stdout, /PRIVACY denylist\s+zz-schoolkey2-plant\.txt:2/);
+      assert.match(r.stdout, new RegExp("PRIVACY denylist\\s+" + PL + "\\.txt:2"));
       assert.doesNotMatch(r.stdout, /QXS/i, "the code itself is never printed");
     }
     for (const ok of ["AQXSB", "fqxsx drop", "QXSdrop", "school_drop", "QXZ_drop"]) {
@@ -141,7 +152,10 @@ test("privacy-scan catches a school code joined by '_', a digit or a capital (QX
       assert.equal(scan({ WARDOS_PRIVATE_NAMES: NAMES }).status, 0, "letters on either side still block: " + ok.length);
     }
     fs.writeFileSync(plant, "QXS_drop\n");
-    assert.equal(scan({ WARDOS_PRIVATE_NAMES: path.join(TMP, "no-names.tsv"), HOME: TMP, WARDOS_PRIVATE_DIR: path.join(TMP, "none") }).status, 0, "with no school row the scanner has nothing to find");
+    const none = { WARDOS_PRIVATE_NAMES: path.join(TMP, "no-names.tsv"), HOME: TMP, WARDOS_PRIVATE_DIR: path.join(TMP, "none") };
+    assert.equal(scan(none).status, 2, "LHVID1: with no lists at all the scanner fails closed");
+    assert.equal(spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--tree", "--generic-only", "--only", "(^|/)" + PL],
+      { cwd: ROOT, encoding: "utf8", env: { ...process.env, WARDOS_PRIVACY_DENYLIST: path.join(TMP, "no-denylist"), ...none } }).status, 0, "--generic-only: with no school row the scanner has nothing to find");
   } finally { fs.rmSync(plant, { force: true }); }
 });
 

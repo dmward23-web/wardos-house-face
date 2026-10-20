@@ -117,7 +117,7 @@
   var JARN = NUMW.replace("a|", "").replace("|couple(?: of)?|few", "");   /* a number word after "jar" (not "a", "few") */
   var MONEY = [/\$\s?\d/, /\d\s?\$/, /[\u00a2\u20ac\u00a3]/, /\b\d+(?:[.,]\d+)?[\s-]*(?:dollars?|bucks?|cents?|usd)\b/i, /\b(?:usd|dollars?|bucks?)[\s-]*\d/i,
     new RegExp("\\b" + NUMW + "(?:[\\s-]+" + NUMW + ")*[\\s-]+(?:dollars?|bucks?|cents?)\\b", "i"), /\bjar\b[^0-9]{0,12}\d+[.,]\d{1,2}\b/i,
-    /\bjars?\b\W{0,3}\d/i, new RegExp("\\bjars?\\b\\W{0,3}" + JARN + "\\b", "i")];   /* Alfred P2 x3: "5-dollar", "five-dollar", "jar 5", "jar: 5", "jar five" */
+    /\bjars?\b\W{0,3}\d/i, /\bjars?\b\W{0,3}(?:x|\u00d7|times)\W{0,2}\d/i, new RegExp("\\bjars?\\b\\W{0,3}" + JARN + "\\b", "i")];   /* Alfred P2 x3: "5-dollar", "five-dollar", "jar 5", "jar: 5", "jar five"; LHVID1 P4: "jars x 2" */
   function money(s) { var t = String(s || ""); return MONEY.some(function (r) { return r.test(t); }); }
   /* residue(s): what a strip leaves behind (Alfred P3). "" = drop the row whole:
      - the subject was stripped (a name, then a verb, loses its name): a line that now starts with a bare lower-case verb;
@@ -245,6 +245,7 @@
     } catch (e) { out = []; }
     return out;
   }
+  function glueApi() { var M = mainSchools(); if (M && M.stripGlued) return M; try { if (typeof require === "function") { var r = require("../school-names.js"); if (r && r.stripGlued) return r; } } catch (e) { /* browser */ } return null; }
   function mainSchools() { var g = typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : null); return g && g.SchoolNames && g.SchoolNames.schoolTokens ? g.SchoolNames : null; }
   /* Same row rule as main's school-names.js: a TOKEN is 2 to 8 letters, a FULL name is 2 to 4 words of letters. */
   var TOK_RE = /^[A-Za-z]{2,8}$/, FULL_RE = /^[A-Za-z]{2,}(?: [A-Za-z]{2,}){1,3}$/;
@@ -267,7 +268,8 @@
   function schoolRe(flags) { var a = schoolAlt(); return a ? new RegExp("\\b(?:" + a + ")\\b", flags || "i") : null; }
   function isSchoolText(s) { var re = schoolRe(); return !!(re && re.test(String(s || ""))); }
   /* stripSchool(s): a token or full name before a word drops (any case, Alfred P3); one left anywhere else reads "school" */
-  function stripSchool(s) { var a = schoolAlt(); s = String(s || ""); if (!a) return s; return s.replace(new RegExp("\\b(?:" + a + ")\\b['\u2019]?s?\\s+(?=\\S)", "gi"), "").replace(new RegExp("\\b(?:" + a + ")\\b", "gi"), "school").replace(/\s{2,}/g, " ").trim(); }
+  function stripSchool(s) { var a = schoolAlt(); s = String(s || ""); if (!a) return s; var G = glueApi(); s = G ? G.stripGlued(s, schoolTokens()) : s;   /* LHVID1'' P4: the ONE glue rule (capital, lowercase-logistics, hyphen) lives in main's school-names.js stripGlued */
+    return s.replace(new RegExp("\\b(?:" + a + ")\\b['\u2019]?s?\\s+(?=\\S)", "gi"), "").replace(new RegExp("\\b(?:" + a + ")\\b", "gi"), "school").replace(/\s{2,}/g, " ").trim(); }
   /* stripNamesakes(s): removes "<KidFirstName> <private surname>" (runtime private names), so someone else who shares a kid's first name
      never reads as our kid (used by away-filter.js isKidText). */
   function stripNamesakes(s) { return String(s || "").replace(/\b(ainsley|hayes|harris)\s+([A-Za-z]+)\b/gi, function (m, a, b) { return isPrivateName(b) ? "" : m; }); }

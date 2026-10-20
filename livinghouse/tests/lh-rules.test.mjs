@@ -1,5 +1,6 @@
 // node livinghouse/tests/lh-rules.test.mjs  (fixtures are synthetic: no real names, codes or addresses; the repo is public)
 import { assertSealed } from "../../scripts/qa/temp-home.mjs";   // TEMPHOME1: WARDOS_* unset and a temp HOME before any private-list reader loads
+import fs from "node:fs";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 assertSealed(); const R = createRequire(import.meta.url)("../lh-rules.js");
@@ -62,6 +63,13 @@ const AF = createRequire(import.meta.url)("../../away-filter.js");
 R.setSchools(["QXS"]);
 assert.equal(R.isSchoolText("QXS Picture Day"), true);
 assert.equal(R.stripSchool("QXS Picture Day"), "Picture Day");
+for (const [x, want] of [["QXSDrop off", "Drop off"], ["Hayes qxsPicture Day", "Hayes Picture Day"], ["Hayes QXSField trip", "Hayes Field trip"]]) assert.equal(R.stripSchool(x), want, "LHVID1 P4 glued to a capital word: " + x.length);
+/* LHVID1'' P4 (Alfred 0803 #2, #3): LH shares main's ONE glue rule (school-names.js stripGlued): lowercase logistics glue and hyphen/space joins */
+for (const [x, want] of [["Hayes QXSdrop", "Hayes drop"], ["qxspickup 3:10", "pickup 3:10"], ["QXS-Drop 7:55", "Drop 7:55"], ["qxs-drop", "drop"], ["QXS Drop", "Drop"], ["qxs drop", "drop"]])
+  assert.equal(R.stripSchool(x), want, "LH strip: " + x.length);
+for (const keep of ["qxsdropping", "QXSabc", "aqxsdrop"]) assert.ok(!/^drop|^abc/.test(R.stripSchool(keep)), "not cut inside an ordinary word: " + keep.length);
+{ const src = fs.readFileSync(new URL("../lh-rules.js", import.meta.url), "utf8");
+  assert.ok(/stripGlued/.test(src) && !/GLUE\s*=/.test(src), "lh-rules.js calls main's stripGlued and holds no copy of the glue list"); }
 assert.equal(AF.isKidText("QXS Field Day"), true);
 R.setSchools([]);
 assert.equal(R.isSchoolText("QXS Picture Day"), false);
@@ -92,7 +100,7 @@ for (const x of [w("before", "Fri" + "day"), w("after", "Fri" + "day"), w("Fri",
 assert.equal(R.stateText("Fri · 4:30 PM"), false);
 // Alfred 1702 P2 kid money: hyphen and jar forms drop the kid row whole (with the forms that already dropped); non-money stays
 for (const x of ["Hayes 5-dollar bill", "five-dollar payday", "Harris jar 5", "Harris jar: 5", "Ainsley jar five", "Hayes 5 - dollars", "twenty-five-dollar gift", "10-buck card",
-  "$5 Hayes", "Hayes 5$", "5 dollars", "dollars 5", "USD 5", "5 USD", "five bucks", "50 cents", "\u00a2 50", "jar 5.00", "jars: 12", "dollar-5 deal"]) assert.equal(R.money(x), true, "money: " + x);
+  "$5 Hayes", "Hayes 5$", "5 dollars", "dollars 5", "USD 5", "5 USD", "five bucks", "50 cents", "\u00a2 50", "jar 5.00", "jars: 12", "dollar-5 deal", "Hayes jars x 2", "Harris jar x2", "Ainsley jars \u00d7 3", "Hayes jars times 2"]) assert.equal(R.money(x), true, "money: " + x);
 for (const x of ["Room 5", "Grade 5", "5:00 practice", "Jar of pickles", "Hayes swim 4:00", "Game 5", "Bake sale jars", "Harris dentist"]) assert.equal(R.money(x), false, "not money: " + x);
 // Alfred 1702 P3 custody leftovers: rows that name the other household or a return to it drop whole; strip remnants are orphans
 for (const x of [w("Kids", "at", "moms"), w("Kids", "go", "to", "Mom's"), w("Mom:", "kids"), w("Mom's", "house"), w("back", "home", "Sunday"), w("Return", "to", "Dad"), w("Kids", "head", "to", "their", "mother's")]) assert.equal(R.stateText(x), true, x);

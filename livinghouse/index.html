@@ -4,7 +4,7 @@
 <title>The Ward's · Living House</title>
 <link rel="stylesheet" href="../night/night-host.css?v=SH1" />
 <link rel="stylesheet" href="../month-theme/month-overlay.css?v=MONTHFX2" />
-<link rel="stylesheet" href="lh.css?v=LH3" />
+<link rel="stylesheet" href="lh.css?v=LHV1" />
 </head>
 <body>
 <!-- LIVING HOUSE · the night scene IS the interface. Every element below is placed on the house plate by lh.js and is
@@ -42,7 +42,7 @@
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="lh-luma" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  1.2 1.2 1.2 0 -.08"/></filter></svg>
   <a class="lh-dad" href="../sheet-dan.html" data-at="944,300" aria-label="Dad"><span class="lh-dad-glow"></span><span class="lh-plaque">Dad</span></a>
   <div class="lh-away" data-lan="1166,322" data-lan-ph="575,566" aria-label="Porch lantern" hidden><!-- the porch lantern kept lit in the away state (art: art/lantern-body, flame: night/media/fire-black.mp4 at the wick) -->
-    <div class="lan"><img src="art/lantern-body-400x560.webp" alt="" draggable="false" /><video class="lan-fire" src="../night/media/fire-black.mp4" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div></div>
+    <div class="lan"><img src="art/lantern-body-400x560.webp" alt="" draggable="false" /><video class="lan-fire" data-src="../night/media/fire-black.mp4" poster="../night/media/poster/fire-black.webp" muted loop playsinline preload="auto" aria-hidden="true" onerror="this.dataset.dead=1;this.removeAttribute('src');this.load()"></video></div></div>
   <div class="lh-candle" data-at="640,446" hidden><div class="wax"><div class="flame"></div></div><div class="slate"><span class="v" data-lh="cand-v"></span><span class="k" data-lh="cand-k"></span></div></div>
   <div class="lh-cauldron" data-at="452,486" data-at-ph="170,610"><div class="glow"></div><div class="pot"></div><div class="lab">Chores<small data-lh="chores-sub"></small></div></div>
   <div class="lh-fogfar" aria-hidden="true"></div>
@@ -62,11 +62,11 @@
 </div>
 <script src="clock.js?v=LH1"></script>
 <script src="../night/night-host.js?v=SH1" defer></script>
-<script src="../month-theme/month-overlay.js?v=MONTHFX2" defer></script>
+<script src="../month-theme/month-overlay.js?v=LHV1" defer></script>
 <script src="../school-names.js?v=SCHOOLNAMES1" defer></script>
 <script src="../away-filter.js?v=AWAYLAW1" defer></script>
 <script src="../house-face-law.js?v=PRIVFEED3" defer></script>
 <script src="../phone2/leaveby.js?v=PHONE2" defer></script>
 <script src="lh-rules.js?v=LH4" defer></script>
-<script src="lh.js?v=LH4" defer></script>
+<script src="lh.js?v=LHV1" defer></script>
 </body></html>

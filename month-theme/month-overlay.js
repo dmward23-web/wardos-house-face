@@ -14,11 +14,16 @@
     if (t.glow) ["l", "r"].forEach(function (s) { var d = document.createElement("div"); d.className = "km-glow " + s; L.appendChild(d); });
     var vids = t.vids.map(function (p) {
       var v = document.createElement("video"); v.className = "km-vid " + p[0]; v.muted = true; v.loop = true; v.playsInline = true; v.setAttribute("playsinline", "");
-      v.preload = "metadata"; v.src = base + p[1]; v.playbackRate = 0.8;
+      v.preload = "metadata"; v.dataset.src = base + p[1]; v.playbackRate = 0.8;
+      v.onerror = function () { v.classList.remove("on"); v.removeAttribute("src"); try { v.load(); } catch (_) {} };   /* LHVID1: a load error drops the player quietly (it only shows once frames load) */
       v.addEventListener("loadeddata", function () { v.classList.add("on"); }, { once: true });
       L.appendChild(v); return v;
     });
-    function sync() { vids.forEach(function (v) { if (RM.matches || document.hidden) v.pause(); else v.play().catch(function () {}); }); }
+    /* LHVID1 · set the sources only when night/media/caps.json says the videos are reachable (the proxy); Pages never requests an mp4 */
+    fetch(base + "night/media/caps.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (j && j.video === true) { vids.forEach(function (v) { v.src = v.dataset.src; }); sync(); }
+    }).catch(function () {});
+    function sync() { vids.forEach(function (v) { if (!v.getAttribute("src")) return; if (RM.matches || document.hidden) v.pause(); else v.play().catch(function () {}); }); }
     RM.addEventListener && RM.addEventListener("change", sync); document.addEventListener("visibilitychange", sync);
     /* sits right above each board's base layer and under its UI */
     var kw = document.querySelector(".kw-canvas"), fr = document.querySelector("iframe.night52-scene"), fx = document.getElementById("fx");

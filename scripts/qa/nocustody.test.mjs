@@ -3,6 +3,7 @@
    (1) the board HTML, JS and CSS in the public tree carry none of the phrases (case-insensitive), in visible text,
        aria text or JS-built strings. Only matcher lines marked "custody-law:allow" may name them (capped).
    (2) house-face-law.js blanks feed strings and drops feed rows that carry one, so live or cached data can't show one. */
+import { assertSealed } from "./temp-home.mjs";   // TEMPHOME1 (LHVID1'): names lh-rules.js, so it runs sealed
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -17,6 +18,7 @@ const ALLOW = "custody-law:allow";
    whitespace collapsed, per line and (for HTML) across the whole page. */
 export function textOf(s) { return String(s).replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " "); }
 export function hasPhrase(s) { return PHRASES.test(s) || PHRASES.test(textOf(s)); }
+assertSealed();
 const MAX_ALLOW = 10;   // 8 on main + the two Living House matchers (livinghouse/lh-rules.js STATE_RE and LEAVE_RE)
 
 function boardFiles() {
