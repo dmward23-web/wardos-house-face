@@ -55,13 +55,21 @@ EXT_ROW = re.compile(r"\b(?!(?:the|at|ward|kids|dad|dan)\b)[a-z]+\s+(?:" + "|".j
 TIME = re.compile(r"(?<![\d/])(\d{1,2}):(\d{2})(?!\d)|(?<![\d/:])(\d{1,2})\s?(a|p|am|pm)\b|~\s?(\d{1,2})\b", re.I)
 def _nocust():   # NOCUSTODY1 · one phrase list: main's scripts/qa/nocustody.test.mjs PHRASES (read at run time)
     src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "nocustody.test.mjs"), encoding="utf-8").read()
-    m = re.search(r"^export const PHRASES = /(.*)/i;\s*$", src, re.M)
+    # QAFIX1 · the declaration line now carries a trailing // comment and its own ['\u2019] classes; take the literal up to
+    # the last "/i;" on the line, turn JS \uXXXX into the real char, and widen only bare apostrophes (not ones in a class)
+    m = re.search(r"^export const PHRASES = /(.*)/i;[ \t]*(?://.*)?$", src, re.M)
     if not m: raise SystemExit("away-pages: PHRASES not found in nocustody.test.mjs")
-    return re.compile(m.group(1).replace("'", "['\u2019]"), re.I)
+    body = re.sub(r"\\u([0-9a-fA-F]{4})", lambda u: chr(int(u.group(1), 16)), m.group(1))
+    return re.compile(re.sub(r"(?<!\[)'", "['\u2019]", body), re.I)
 NOCUST = _nocust()
 DRESS = re.compile(r"\b(orange|red|yellow|green|blue|purple|pink|white|black|gold|tie[- ]?dye|neon|camo|maroon)\s+(day|out)\b|dress[- ]?up|spirit\s+(day|week)|pajama|pj day|costume|outsiders day|greaser|crazy (hair|sock)|hat day", re.I)
 from datetime import timedelta, timezone
-MONTHS = json.load(open(os.path.join(root, "data/cal-months.json")))["days"]
+def _months():  # QAFIX1 · a missing, empty or bad month file means no away window: the normal awake board (P3 crash fix)
+    try: d = json.load(open(os.path.join(root, "data/cal-months.json"), encoding="utf-8"))
+    except (OSError, ValueError): return {}
+    d = d.get("days") if isinstance(d, dict) else None
+    return d if isinstance(d, dict) else {}
+MONTHS = _months()
 DOWS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 def ct(dt):  # aware datetime -> CT wall (fixtures carry -05:00, CDT through Nov 1)
     return dt.astimezone(timezone(timedelta(hours=-5)))

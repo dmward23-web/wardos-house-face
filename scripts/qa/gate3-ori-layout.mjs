@@ -27,7 +27,7 @@ const puppeteer = loadPuppeteer();
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const PAGES = ["sheet-index.html", "month.html", "sheet-lights.html"];
-const PORT = Number(process.env.ORI_QA_PORT || 8773);
+let PORT = Number(process.env.ORI_QA_PORT || 0);   /* QAFIX1 · 0 = a kernel-picked free port (a fixed 8773 collided with any other GATE3 run on the box) */
 
 function chromePath() {
   const candidates = [
@@ -76,7 +76,7 @@ function startServer() {
       res.end(buf);
     });
   });
-  return new Promise((resolve) => server.listen(PORT, "127.0.0.1", () => resolve(server)));
+  return new Promise((resolve, reject) => { server.once("error", reject); server.listen(PORT, "127.0.0.1", () => { PORT = server.address().port; resolve(server); }); });
 }
 
 const SCAN = `(() => {
@@ -601,7 +601,7 @@ async function prepare(page, file) {
       const wx = document.querySelector("#house-wx");
       const plate = wx ? (wx.innerText || "") : "";
       return t && (t.textContent || "").trim().length > 1 && /\d+°/.test(plate);
-    }, { timeout: 20000 }).catch(() => {});
+    }, { timeout: 20000, polling: 250 }).catch(() => {});
     await page.evaluate(() => {
       const b = document.querySelector(".ori-pool-hit");
       const p = document.querySelector(".ori-peek");
@@ -613,10 +613,10 @@ async function prepare(page, file) {
     await page.waitForFunction(() => {
       const b = document.querySelector("[data-month-banner]");
       return b && (b.textContent || "").indexOf("Loading") < 0;
-    }, { timeout: 20000 });
+    }, { timeout: 20000, polling: 250 });
   }
   if (file.startsWith("sheet-lights")) {
-    await page.waitForFunction(() => document.querySelector(".light-pad"), { timeout: 20000 });
+    await page.waitForFunction(() => document.querySelector(".light-pad"), { timeout: 20000, polling: 250 });
   }
   await new Promise((r) => setTimeout(r, 400));
 }
@@ -626,7 +626,12 @@ async function main() {
   const browser = await puppeteer.launch({
     executablePath: chromePath(),
     headless: "new",
-    args: ["--no-sandbox", "--disable-dev-shm-usage", "--hide-scrollbars"]
+    /* QAFIX1 · on a loaded box a hidden headless tab is treated as backgrounded: Chrome stops its animation frames, so
+       every rAF-polled waitForFunction stalled (month banner, light pads) and CDP calls such as newPage ran past
+       puppeteer's 180 s default protocol timeout. Keep renderers foregrounded and give CDP a budget sized to the gate. */
+    args: ["--no-sandbox", "--disable-dev-shm-usage", "--hide-scrollbars", "--disable-gpu",
+      "--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows"],
+    protocolTimeout: Number(process.env.GATE3_PROTOCOL_MS || 600000)
   });
   const failures = [];
   const views = [
@@ -743,10 +748,10 @@ async function main() {
         });
         await new Promise((r) => setTimeout(r, 280));
         await veilAt("home-to-month");
-        await page.waitForFunction(() => /month\.html/.test(location.pathname) && document.documentElement.getAttribute("data-ori-veil") === "1", { timeout: 8000 }).catch((err) => console.log("  arrive-month wait", err.message));
+        await page.waitForFunction(() => /month\.html/.test(location.pathname) && document.documentElement.getAttribute("data-ori-veil") === "1", { timeout: 8000, polling: 250 }).catch((err) => console.log("  arrive-month wait", err.message));
         await veilAt("arrive-month");
         await page.evaluate(() => history.back());
-        await page.waitForFunction(() => /sheet-index\.html/.test(location.pathname), { timeout: 8000 }).catch((err) => {
+        await page.waitForFunction(() => /sheet-index\.html/.test(location.pathname), { timeout: 8000, polling: 250 }).catch((err) => {
           failures.push("phone back did not return home " + err.message);
         });
         await new Promise((r) => setTimeout(r, 160));
@@ -759,7 +764,7 @@ async function main() {
         });
         await new Promise((r) => setTimeout(r, 280));
         await veilAt("home-to-lights");
-        await page.waitForFunction(() => /sheet-lights\.html/.test(location.pathname) && document.documentElement.getAttribute("data-ori-veil") === "1", { timeout: 8000 }).catch((err) => console.log("  arrive-lights wait", err.message));
+        await page.waitForFunction(() => /sheet-lights\.html/.test(location.pathname) && document.documentElement.getAttribute("data-ori-veil") === "1", { timeout: 8000, polling: 250 }).catch((err) => console.log("  arrive-lights wait", err.message));
         await veilAt("arrive-lights");
       }
       await page.close();
