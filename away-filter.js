@@ -1,19 +1,25 @@
 /* AWAYLAW1 · away-filter.js · one shared away-day filter (standalone; no page code, no other house script needed).
  *
- * Law: on the kids' away days no kid time or kid logistics renders on any surface. Away comes ONLY from
- * data/cal-months.json days[iso].withDan (no hard-coded dates, no kids-week.json). The switch is at 3:00 PM CT:
- *   - a day with withDan false is away all day;
- *   - a withDan day that FOLLOWS an away day is still away before 3:00 PM (kids come back at 3:00);
- *   - a withDan day that is FOLLOWED by an away day is away from 3:00 PM on (kids leave at 3:00).
- *   With the current calendar that is Fri 10/16 3:00 PM to Fri 10/23 3:00 PM CT.
- * A kid item is one named for a kid (Ainsley, Hayes, Harris, Boys, Kids), off a kid school calendar (its code reads 'school' on the glass), a school
- * day (No School, Early Release, Half Day, 1/2 Day),   privacy-scan:allow calendar_string
- * or a cal-months item whose colour key is a kid key. External calendar rows are filtered on the box; no private term lives here.
+ * Law: in the away state no kid time or kid logistics renders on any surface. The state comes ONLY from the per-day
+ * flag in data/cal-months.json days[iso] (an external feed; no hard-coded dates or hours, no kids-week.json).
+ * The feed is valid only when days{} holds at least one day whose withDan is a real boolean; a missing, empty or junk feed
+ * is UNKNOWN (hasMonths() false): never away, the normal board. A day whose flag is not a boolean is an unknown day.
+ * The change minute comes from the feed too: changeMin (CT minutes after midnight, 0..1439, never shown). With it, on a
+ * change day:
+ *   - a day flagged away is away all day;
+ *   - a home day after an away day stays away until changeMin;
+ *   - a home day before an away day is away from changeMin on.
+ * Without it (or junk) there is no intra-day switch: the day flag alone decides the state, midnight to midnight, and on a
+ * switch day (a day whose flag differs from the day before or after it in the feed; no weekday is assumed) kid items are
+ * simply not shown (Atlas 2026-10-17). Nothing on any surface says why; the rest of the board is normal.
+ * A kid item is one named for a kid (Ainsley, Hayes, Harris, Boys, Kids) or off a kid school calendar (LKMS, or the school token loaded at runtime by LHRules from the private names file),
+ * or a cal-months item whose colour key is a kid key. "Hayes <private surname>" is never our Hayes (LHRules.stripNamesakes, names read at run time; no names in git).
  *
  * API (window.AwayFilter, or module.exports under Node):
  *   setMonths(json) / hasMonths() / ready() -> Promise (loads data/cal-months.json once)
  *   now()                     ?now=<ISO> on the page URL (test fixture) else Date.now()
- *   isAwayAt(ms) / isAwayDay(iso) / isAwayNow() / awayUntil(ms) -> ms of the 3:00 PM switch that ends this away window, or 0
+ *   isAwayAt(ms) / isAwayDay(iso) / isAwayNow() / awayUntil(ms) -> ms when this away window ends (the feed's changeMin on the
+ *                             first home day, or that day's midnight when the feed gives none), or 0
  *   isKidText(s) / isKidItem(obj)
  *   keepItem(obj, nowMs)      false when a kid item's own time (or its explicit day) falls in an away window
  *   filterCalLive(json) / filterCalMonths(json) / filterKidsWeek(json)   pure, return the same object filtered
@@ -28,10 +34,14 @@
 (function (g) {
   "use strict";
   var TZ = "America/Chicago";
-  var HANDOFF_MIN = 15 * 60;
+  var CHANGE_MIN = null;   /* from the feed (changeMin); null = no intra-day switch */
   var MONTHS = null, readyP = null, origFetch = null;
-  var KID_RE = /\b(Ainsley|Hayes|Harris|Boys|Kids)\b|\bschool\b|\b(No School|Early Release|Half Day|1\/2 Day)\b/i;   /* TEXTLAW3: our school days read just "No School" now (no "Ward Kids" label), so the school-day words mark a kid item */   /* privacy-scan:allow calendar_string */
-  var EXT_ROW = /(?!)/;   /* PF4 · external calendar rows are filtered box side; nothing to strip here */
+  var KID_RE = /\b(Ainsley|Hayes|Harris|Boys|Kids)\b|\bLKMS\b|\bschool\b|\b(No School|Early Release|Half Day|1\/2 Day)\b/i;   /* TEXTLAW3 (main): school-day words mark a kid item */   /* privacy-scan:allow calendar_string */
+  function notOurs(s) { /* someone else who shares a kid's first name: matched in livinghouse/lh-rules.js against names read at run time, never by a name in git.
+     Without lh-rules the text stays kid text, so the item stays hidden on away days (the safe side). */
+    var R = lhr(); return R && R.stripNamesakes ? R.stripNamesakes(s) : s; }
+  function lhr() { var R = g.LHRules; if (!R && typeof require === "function") { try { R = require("./livinghouse/lh-rules.js"); } catch (e) { R = null; } } return R || null; }
+  function isSchool(s) { var R = lhr(); if (R && R.isSchoolText && R.isSchoolText(s)) return true; return !!(g.SchoolNames && g.SchoolNames.isSchoolText && g.SchoolNames.isSchoolText(s)); }   /* SCHOOLNAMES1 (main) as a second source */
   var KID_KEYS = { hay: 1, har: 1, ain: 1, shr: 1, kids: 1, boys: 1, hand: 1 };
   var DOW = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
@@ -59,38 +69,52 @@
   function day(iso) { return MONTHS && MONTHS.days ? MONTHS.days[iso] : null; }
   function withDan(iso) { var d = day(iso); return d ? !!d.withDan : null; }
 
-  function setMonths(j) {
-    if (j && j.days) {
-      var days = {};
-      Object.keys(j.days).forEach(function (k) { days[k] = { withDan: !!(j.days[k] && j.days[k].withDan) }; });
-      MONTHS = { days: days };
-    }
+  function setMonths(j) {   /* every call replaces the state: a missing, empty or junk feed resets to UNKNOWN */
+    MONTHS = null; CHANGE_MIN = null; api.CHANGE_MIN = null;
+    if (!j || typeof j !== "object" || !j.days || typeof j.days !== "object" || Array.isArray(j.days)) return;
+    var days = {}, n = 0;
+    Object.keys(j.days).forEach(function (k) { var d = j.days[k];
+      if (/^\d{4}-\d{2}-\d{2}$/.test(k) && d && typeof d === "object" && typeof d.withDan === "boolean") { days[k] = { withDan: d.withDan }; n++; } });
+    if (!n) return;
+    MONTHS = { days: days };
+    var cm = j.changeMin; if (typeof cm === "number" && isFinite(cm) && cm === Math.floor(cm) && cm >= 0 && cm < 1440) CHANGE_MIN = cm;
+    api.CHANGE_MIN = CHANGE_MIN;
   }
   function hasMonths() { return !!MONTHS; }
 
-  /* away at a clock moment; unknown (no calendar or day out of range) is not away */
+  /* away at a clock moment; an unknown state (no calendar or day out of range) is not away */
   function isAwayAt(ms) {
     if (!MONTHS || !ms) return false;
     var c = ct(ms), w = withDan(c.iso);
     if (w === null) return false;
     if (!w) return true;
-    if (c.min < HANDOFF_MIN && withDan(addDays(c.iso, -1)) === false) return true;
-    if (c.min >= HANDOFF_MIN && withDan(addDays(c.iso, 1)) === false) return true;
+    if (CHANGE_MIN === null) return false;   /* the feed gave no change minute: no intra-day switch */
+    if (c.min < CHANGE_MIN && withDan(addDays(c.iso, -1)) === false) return true;
+    if (c.min >= CHANGE_MIN && withDan(addDays(c.iso, 1)) === false) return true;
     return false;
   }
+  /* a switch day: its flag differs from the previous or next day's flag in the feed (both must be known) */
+  function isSwitchDay(iso) {
+    var w = withDan(iso); if (w === null) return false;
+    var a = withDan(addDays(iso, -1)), b = withDan(addDays(iso, 1));
+    return (a !== null && a !== w) || (b !== null && b !== w);
+  }
+  /* no change minute in the feed: kid items on a switch day are hidden all day (Atlas); with it, isAwayAt decides */
+  function hiddenSwitch(iso) { return !!MONTHS && CHANGE_MIN === null && isSwitchDay(iso); }
   /* an untimed (all-day) item on this date: away only when the whole day is away */
   function isAwayDay(iso) { return withDan(iso) === false; }
   function isAwayNow() { return isAwayAt(now()); }
-  /* AWAYONE1 · when the away window that holds ms ends (3:00 PM CT on the first withDan day after it),
-     or 0 when ms is not away or the calendar does not reach the end of the window. The hub reads it only as "away now". */
+  /* AWAYONE1 · when the away window that holds ms ends: the feed's change minute on the first home day after it (or that
+     day's midnight when the feed gives none), or 0 when ms is not away or the calendar does not reach the end of the window.
+     The hub reads it only as "away now". No hour is assumed here. */
   function awayUntil(ms) {
     if (!isAwayAt(ms)) return 0;
-    var c = ct(ms), iso = c.iso;
-    if (withDan(iso) === true && c.min < HANDOFF_MIN) return msAt(iso, HANDOFF_MIN);
+    var c = ct(ms), at = CHANGE_MIN === null ? 0 : CHANGE_MIN;
+    if (withDan(c.iso) === true && CHANGE_MIN !== null && c.min < CHANGE_MIN) return msAt(c.iso, CHANGE_MIN);
     for (var i = 1; i <= 62; i++) {
       var d = addDays(c.iso, i), w = withDan(d);
       if (w === null) return 0;
-      if (w) return msAt(d, HANDOFF_MIN);
+      if (w) return msAt(d, at);
     }
     return 0;
   }
@@ -100,7 +124,7 @@
     if (typeof o === "string") return o;
     return [o.summary, o.title, o.what, o.place, o.label && /\w/.test(o.label) && !/^Next up/i.test(o.label) ? o.label : "", o.l].filter(Boolean).join(" ");
   }
-  function isKidText(s) { s = String(s || ""); var t = s.replace(EXT_ROW, ""); return KID_RE.test(t) || !!(g.SchoolNames && g.SchoolNames.isSchoolText(t)); }   /* SCHOOLNAMES1 · a school-coded row is a kid row (codes from the private names route) */
+  function isKidText(s) { s = String(s || ""); s = notOurs(s); return KID_RE.test(s) || isSchool(s); }
   function isKidItem(o) { return !!(o && ((o.c && KID_KEYS[o.c]) || isKidText(textOf(o)))); }
 
   /* ---- clock parsing for items that carry no ISO time ---- */
@@ -157,6 +181,7 @@
     if (!MONTHS || !isKidItem(o)) return true;
     var w = whenOf(o, nowMs || now());
     if (!w) return true;
+    if (hiddenSwitch(w.ms != null ? ct(w.ms).iso : w.iso)) return false;
     return w.ms != null ? !isAwayAt(w.ms) : !isAwayDay(w.iso);
   }
 
@@ -246,7 +271,7 @@
       var iso = cell.getAttribute("data-away-day");
       Array.prototype.forEach.call(cell.querySelectorAll("[data-away-kid]"), function (el) {
         var w = whenOf({ c: "kids", l: el.textContent, _day: iso, when: "" }, now());
-        var away = w && (w.ms != null ? isAwayAt(w.ms) : isAwayDay(w.iso));
+        var away = w && (hiddenSwitch(w.ms != null ? ct(w.ms).iso : w.iso) || (w.ms != null ? isAwayAt(w.ms) : isAwayDay(w.iso)));
         if (away) hide(el);
       });
     });
@@ -315,8 +340,8 @@
   }
 
   var api = {
-    HANDOFF_MIN: HANDOFF_MIN, setMonths: setMonths, hasMonths: hasMonths, ready: ready, now: now,
-    isAwayAt: isAwayAt, isAwayDay: isAwayDay, isAwayNow: isAwayNow, awayUntil: awayUntil, isKidText: isKidText, isKidItem: isKidItem,
+    CHANGE_MIN: CHANGE_MIN, setMonths: setMonths, hasMonths: hasMonths, ready: ready, now: now,
+    isAwayAt: isAwayAt, isAwayDay: isAwayDay, isSwitchDay: isSwitchDay, isAwayNow: isAwayNow, awayUntil: awayUntil, isKidText: isKidText, isKidItem: isKidItem,
     whenOf: whenOf, keepItem: keepItem, filterCalLive: filterCalLive, filterCalMonths: filterCalMonths,
     filterKidsWeek: filterKidsWeek, glass: glass, scrubDom: scrubDom, install: install,
     dadText: dadText, dadDeep: dadDeep, isDadOnly: isDadOnly

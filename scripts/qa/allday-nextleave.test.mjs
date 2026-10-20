@@ -3,6 +3,7 @@
       sorts before the day's timed rows (never as noon) and stays out of the timed Next Up queue.
    2. "Next leave" (generator boardStrip.nextLeave + the hub Dad card) skips the 6:30 QXS specials note and all-day
       notes and picks the first real leave/drop (7:40 QXS drop in the fixture). Fixture only; no real data written. */
+import { assertSealed } from "./temp-home.mjs";   // TEMPHOME1: WARDOS_* unset and a temp HOME before any private-list reader loads
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -25,7 +26,7 @@ function generate(nowIso) {
   execFileSync("node", [path.join(ROOT, "scripts/calendar-refresh.mjs"), "--events", FX, "--week", path.join(dir, "kids-week.json"), "--no-mirror", "--now", nowIso], { stdio: "pipe", env: { ...process.env, WARDOS_NAMES: SCHOOL_ENV } });
   return JSON.parse(fs.readFileSync(path.join(dir, "kids-week.json"), "utf8"));
 }
-const W = generate("2026-10-13T06:40:00-05:00");
+assertSealed(); const W = generate("2026-10-13T06:40:00-05:00");
 const rows = (k, list) => (W.kids[k][list] || []);
 
 /* LAW8C1 (ported in PRIVFEED3 from ALLDAYQA1) · QXS colour / dress-up days are dropped on purpose (never a row anywhere); the all-day law is checked on a

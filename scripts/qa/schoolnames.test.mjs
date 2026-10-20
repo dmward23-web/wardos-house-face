@@ -2,6 +2,7 @@
    school-names.js reads role "school" at run time (same sources and token rule as livinghouse/lh-rules.js), the hub
    serves only that role with the device token, and with no names every school pattern matches nothing.
    Synthetic values only (QXS / Quux Hill); temp dirs, no real data. */
+import { assertSealed } from "./temp-home.mjs";   // TEMPHOME1: WARDOS_* unset and a temp HOME before any private-list reader loads
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -24,7 +25,7 @@ fs.mkdirSync(PRIV, { recursive: true, mode: 0o700 });
 const NAMES = path.join(PRIV, "private-names.tsv");
 fs.writeFileSync(NAMES, "# synthetic\npartner\tZed Partnerly\ncoparent\tYolanda\nschool\tQXS\nschool\tQuux Hill\nschool\tbad-token!\n", { mode: 0o600 });
 
-function freshSchoolNames() {
+assertSealed(); function freshSchoolNames() {
   const src = fs.readFileSync(path.join(ROOT, "school-names.js"), "utf8");
   const ctx = vm.createContext({});
   vm.runInContext(src, ctx);

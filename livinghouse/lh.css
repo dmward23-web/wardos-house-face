@@ -1,0 +1,275 @@
+/* LIVING HOUSE · diegetic UI on the v5.2 night plate. Sizes are in screen px (legibility beats scale): wall sizes scale
+   with --k (1 at 1920 wide), phone sizes are fixed for 390-440 wide. Calm motion only; reduced motion holds still. */
+@font-face { font-family: "LH Display"; src: url(../fonts/InterDisplay-SemiBold.woff2) format("woff2"); font-weight: 600; font-display: block; }
+@font-face { font-family: "LH Display"; src: url(../fonts/InterDisplay-Bold.woff2) format("woff2"); font-weight: 700; font-display: block; }
+@font-face { font-family: "LH Text"; src: url(../fonts/InterVariable.ttf) format("truetype"); font-weight: 100 900; font-display: block; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #04060a; }
+body { font-family: "LH Text", system-ui, sans-serif; color: #eef1f6; -webkit-font-smoothing: antialiased; }
+#lh { position: fixed; inset: 0; pointer-events: none; opacity: 0; transition: opacity 1.4s ease; --k: 1; }
+html.lh-ready #lh { opacity: 1; }
+#lh > * { position: absolute; }
+[hidden] { display: none !important; }
+#lh a { pointer-events: auto; }
+/* the footage moon steps behind a passing cloud so the clock moon is the only moon */
+.lh-veil { width: calc(300px * var(--k)); height: calc(220px * var(--k)); transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(58, 72, 96, .96) 30%, rgba(52, 66, 90, .7) 62%, rgba(52, 66, 90, 0)); filter: blur(calc(14px * var(--k))); }
+.lh-veil::after { content: ""; position: absolute; left: 35%; top: -20%; width: 90%; height: 70%; border-radius: 50%; background: radial-gradient(closest-side, rgba(64, 78, 102, .7), rgba(64, 78, 102, 0)); }
+.lh-moon { width: calc(250px * var(--k)); height: calc(250px * var(--k)); transform: translate(-50%, -50%); overflow: visible; }
+.lh-etch text { paint-order: stroke; }
+.lh-etch g:first-child text { stroke: rgba(255, 255, 255, .28); stroke-width: .8; }
+/* porch sign */
+.lh-sign { transform: translate(-50%, 0); display: flex; flex-direction: column; align-items: center; }
+.lh-chain { position: absolute; top: 0; width: 2px; height: calc(22px * var(--k)); background: linear-gradient(#2a2620, #8a7a5c); }
+.lh-chain.l { left: 22%; } .lh-chain.r { right: 22%; }
+.lh-board { margin-top: calc(20px * var(--k)); padding: calc(10px * var(--k)) calc(30px * var(--k)); border-radius: calc(6px * var(--k));
+  font: 700 calc(40px * var(--k))/1 "LH Display", sans-serif; letter-spacing: .02em; color: #f6dfae; white-space: nowrap;
+  background: linear-gradient(180deg, #3b2a1c, #24180f 70%, #1a110a); border: 1px solid rgba(255, 210, 150, .22);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 170, .18), 0 8px 24px rgba(0, 0, 0, .6), 0 0 40px rgba(255, 150, 60, .18);
+  text-shadow: 0 0 14px rgba(255, 170, 70, .55), 0 1px 0 rgba(0, 0, 0, .7); }
+/* kid windows: the away state and dark rooms dim the real glowing pane; a room with something today glows a little warmer */
+.lh-win { border-radius: 2px; background: rgba(8, 11, 20, 0); transition: background 2s ease, box-shadow 2s ease; }
+.lh-win.dim { background: rgba(14, 20, 34, .5); box-shadow: inset 0 0 calc(10px * var(--k)) rgba(10, 14, 24, .6); }
+.lh-win.dark { background: rgba(8, 11, 18, .72); box-shadow: inset 0 0 calc(8px * var(--k)) rgba(6, 8, 14, .7); }
+.lh-win.glow { box-shadow: 0 0 calc(30px * var(--k)) rgba(255, 170, 80, .55); background: rgba(255, 190, 110, .14); }
+.lh-tag { white-space: nowrap; font: 600 calc(20px * var(--k))/1 "LH Display", sans-serif; letter-spacing: .04em; color: #f4e6c8;
+  padding: calc(6px * var(--k)) calc(10px * var(--k)); border-radius: calc(4px * var(--k)); background: rgba(16, 12, 8, .8); box-shadow: 0 4px 12px rgba(0, 0, 0, .5); }
+.lh-tag.r { transform: translate(-100%, -50%); } .lh-tag.l { transform: translate(0, -50%); }
+.lh-tag.r::after, .lh-tag.l::before { content: ""; position: absolute; top: 50%; width: calc(8px * var(--k)); border-top: 1px solid rgba(244, 230, 200, .55); }
+.lh-tag.r::after { left: 100%; } .lh-tag.l::before { right: 100%; }
+html.lh-phone .lh-tag { display: none; }
+.lh-win { outline: 1px solid rgba(255, 214, 160, .3); }
+.lh-sill { transform: translate(-50%, 0); display: flex; gap: calc(14px * var(--k)); white-space: nowrap;
+  font: 600 calc(20px * var(--k))/1 "LH Display", sans-serif; letter-spacing: .04em; color: #f4e6c8;
+  padding: calc(6px * var(--k)) calc(12px * var(--k)); border-radius: calc(4px * var(--k)); background: rgba(16, 12, 8, .72); box-shadow: 0 4px 12px rgba(0, 0, 0, .5); }
+/* Dad lantern (the porch lamp in the footage) */
+.lh-dad { transform: translate(-50%, 0); display: flex; flex-direction: column; align-items: center; text-decoration: none; }
+.lh-dad-glow { width: calc(70px * var(--k)); height: calc(70px * var(--k)); margin-top: calc(-80px * var(--k)); border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 190, 100, .35), rgba(255, 150, 60, 0)); animation: lh-flick 4s ease-in-out infinite alternate; }
+.lh-plaque { margin-top: calc(10px * var(--k)); font: 700 calc(24px * var(--k))/1 "LH Display", sans-serif; color: #fde7b8; letter-spacing: .06em;
+  padding: calc(8px * var(--k)) calc(16px * var(--k)); border-radius: calc(6px * var(--k)); background: linear-gradient(#3a2a1b, #20160d); border: 1px solid rgba(255, 210, 150, .3);
+  box-shadow: 0 0 22px rgba(255, 160, 70, .3), 0 6px 16px rgba(0, 0, 0, .55); }
+@keyframes lh-flick { 0% { opacity: .8 } 50% { opacity: 1 } 100% { opacity: .88 } }
+/* away lantern sign */
+.lh-away { transform: translate(-50%, 0); display: flex; flex-direction: column; align-items: center; gap: calc(6px * var(--k)); white-space: nowrap;
+  padding: calc(12px * var(--k)) calc(20px * var(--k)); border-radius: calc(8px * var(--k)); background: rgba(14, 18, 28, .82); border: 1px solid rgba(190, 210, 255, .22);
+  box-shadow: 0 0 30px rgba(150, 180, 255, .12), 0 8px 20px rgba(0, 0, 0, .55); }
+.lh-away .k { font: 600 calc(17px * var(--k))/1 "LH Display", sans-serif; letter-spacing: .22em; text-transform: uppercase; color: #c8d6f5; }
+.lh-away .v { font: 600 calc(26px * var(--k))/1 "LH Display", sans-serif; color: #f2f5fb; }
+/* candle that burns down toward the next real time */
+.lh-candle { transform: translate(-50%, 0); display: flex; flex-direction: column; align-items: center; }
+.lh-candle .wax { position: absolute !important; bottom: 100%; left: 50%; margin-left: calc(-13px * var(--k)); }
+.lh-candle .wax { position: relative; width: calc(26px * var(--k)); height: var(--h, 90px); border-radius: 4px 4px 3px 3px; background: linear-gradient(90deg, #cfc2a4, #f2e8d0 45%, #b9ab8c); box-shadow: 0 0 24px rgba(255, 170, 70, .35); }
+.lh-candle .flame { position: absolute; left: 50%; top: calc(-26px * var(--k)); width: calc(12px * var(--k)); height: calc(24px * var(--k)); transform: translateX(-50%); border-radius: 50% 50% 45% 45%;
+  background: radial-gradient(ellipse at 50% 70%, #fff6d8, #ffc35a 45%, rgba(255, 120, 30, 0) 75%); filter: blur(.4px); box-shadow: 0 0 30px 10px rgba(255, 160, 60, .35); animation: lh-flick 2.6s ease-in-out infinite alternate; }
+.lh-candle .slate { margin-top: calc(12px * var(--k)); display: flex; flex-direction: column; align-items: center; gap: calc(5px * var(--k)); white-space: nowrap;
+  padding: calc(9px * var(--k)) calc(14px * var(--k)); border-radius: calc(6px * var(--k)); background: rgba(18, 18, 20, .84); border: 1px solid rgba(255, 255, 255, .14); }
+.lh-candle .k { font: 600 calc(20px * var(--k))/1 "LH Display", sans-serif; color: #f3d6a8; }
+.lh-candle .v { font: 700 calc(34px * var(--k))/1 "LH Display", sans-serif; color: #fff4dc; }
+/* cauldron (chores) */
+.lh-cauldron { transform: translate(-50%, -100%); width: calc(110px * var(--k)); display: flex; flex-direction: column; align-items: center; }
+.lh-cauldron .pot { width: calc(96px * var(--k)); height: calc(70px * var(--k)); border-radius: 18% 18% 46% 46%; background: radial-gradient(ellipse at 50% 30%, #2c2f33, #0b0c0e 70%); box-shadow: inset 0 3px 0 rgba(160, 170, 180, .25), 0 6px 14px rgba(0, 0, 0, .7); }
+.lh-cauldron .glow { width: calc(90px * var(--k)); height: calc(26px * var(--k)); margin-bottom: calc(-14px * var(--k)); border-radius: 50%; position: relative; z-index: 1;
+  background: radial-gradient(closest-side, rgba(150, 255, 170, var(--heat, .22)), rgba(90, 200, 120, 0)); filter: blur(2px); }
+.lh-cauldron .lab { margin-top: calc(8px * var(--k)); font: 600 calc(18px * var(--k))/1 "LH Display", sans-serif; letter-spacing: .08em; color: #e9f3ea; padding: calc(5px * var(--k)) calc(10px * var(--k)); border-radius: 4px; background: rgba(10, 14, 12, .72); }
+/* tombstones: near = today + tomorrow, sharp; far = rest of the week, back in deeper fog */
+.lh-stones { left: 0; top: 0; width: 100%; height: 100%; }
+.lh-stone { position: absolute; transform: translate(-50%, -100%); box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center;
+  border-radius: 48% 48% 6px 6px / 34% 34% 6px 6px; color: #1b1d21;
+  background: radial-gradient(ellipse at 40% 25%, #c3c6c8, #9b9fa3 55%, #7d8186), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .35 0'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>");
+  background-blend-mode: multiply; box-shadow: inset 0 2px 0 rgba(255, 255, 255, .25), inset 0 -10px 18px rgba(0, 0, 0, .35), 0 10px 22px rgba(0, 0, 0, .6); }
+.lh-stone .d { font: 700 var(--fd)/1 "LH Display", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: #25282d; text-shadow: 0 1px 0 rgba(255, 255, 255, .35); }
+.lh-stone .w { font: 600 var(--fw)/1.12 "LH Display", sans-serif; color: #15171a; text-shadow: 0 1px 0 rgba(255, 255, 255, .35); }
+.near .lh-stone { width: var(--sw); height: var(--sh); padding: calc(var(--sh) * .2) calc(var(--sw) * .1) 0; gap: calc(var(--sh) * .07); }
+.far .lh-stone { width: var(--sw); height: var(--sh); padding: calc(var(--sh) * .22) calc(var(--sw) * .1) 0; gap: calc(var(--sh) * .06); filter: blur(var(--b, 0px)) brightness(var(--br, 1)); }
+.lh-fogfar { left: 0; right: 0; height: 30%; background: linear-gradient(rgba(150, 165, 185, 0), rgba(150, 165, 185, var(--fogfar, .16)) 55%, rgba(150, 165, 185, 0)); filter: blur(10px); }
+.lh-fognear { left: -5%; right: -5%; bottom: -2%; height: 16%; background: radial-gradient(ellipse at 50% 100%, rgba(160, 175, 195, var(--fognear, .18)), rgba(160, 175, 195, 0) 70%); filter: blur(8px); }
+/* falling leaves: few, slow */
+.lh-leaves { inset: 0; overflow: hidden; }
+.lh-leaf { position: absolute; top: -4%; width: 11px; height: 7px; border-radius: 70% 10% 70% 10%; background: linear-gradient(135deg, #b5612a, #6e3413); opacity: .75; filter: blur(.3px);
+  animation: lh-fall var(--d, 18s) linear infinite; animation-delay: var(--dl, 0s); }
+@keyframes lh-fall { 0% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(var(--dx, 40px), 55vh) rotate(200deg); } 100% { transform: translate(calc(var(--dx, 40px) * -.5), 108vh) rotate(420deg); } }
+.lh-creatures { inset: 0; }
+.lh-preview { left: 50%; top: 18px; transform: translateX(-50%); font: 700 18px/1 "LH Display", sans-serif; letter-spacing: .1em; color: #1a1205; background: #ffcf6a; padding: 8px 14px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) { .lh-leaf, .lh-dad-glow, .lh-candle .flame { animation: none !important; } .lh-leaf { display: none; } }
+/* phone: fixed legible sizes */
+html.lh-phone .lh-board { font-size: 26px; padding: 8px 18px; margin-top: 12px; }
+html.lh-phone .lh-chain { height: 14px; }
+html.lh-phone .lh-sill { display: none; }
+html.lh-phone .lh-plaque { font-size: 18px; padding: 6px 12px; }
+html.lh-phone .lh-dad-glow { width: 40px; height: 40px; margin-top: -44px; }
+html.lh-phone .lh-away .k { font-size: 12px; } html.lh-phone .lh-away .v { font-size: 18px; } html.lh-phone .lh-away { padding: 8px 12px; gap: 5px; }
+html.lh-phone .lh-candle .wax { width: 16px; margin-left: -8px; }
+html.lh-phone .lh-candle .slate { white-space: normal; max-width: 100%; text-align: center; box-sizing: border-box; } html.lh-phone .lh-candle .k { line-height: 1.25; } html.lh-phone .lh-candle .flame { width: 9px; height: 17px; top: -18px; }
+html.lh-phone .lh-candle .k { font-size: 13px; } html.lh-phone .lh-candle .v { font-size: 22px; } html.lh-phone .lh-candle .slate { padding: 6px 10px; margin-top: 8px; }
+html.lh-phone .lh-cauldron { width: 70px; } html.lh-phone .lh-cauldron .pot { width: 54px; height: 40px; } html.lh-phone .lh-cauldron .glow { width: 50px; height: 14px; margin-bottom: -8px; }
+html.lh-phone .lh-cauldron .lab { font-size: 13px; }
+html.lh-phone .lh-veil { width: 130px; height: 96px; }
+html.lh-wall .lh-preview { left: auto; right: calc(28px * var(--k)); top: calc(22px * var(--k)); transform: none; font-size: calc(20px * var(--k)); }
+html.lh-phone .lh-preview { font-size: 13px; top: 10px; white-space: nowrap; padding: 6px 10px; }
+
+/* ---------- layer 2 ---------- */
+.lh-cr { position: absolute; width: calc(40px * var(--k)); height: calc(52px * var(--k)); transform: translate(-50%, -100%); overflow: visible; filter: drop-shadow(0 0 6px rgba(255, 190, 110, .25)); transition: opacity 1.5s ease; }
+html.lh-phone .lh-cr { width: 18px; height: 24px; }
+.lh-cr.pace { animation: lh-pace 3.2s ease-in-out infinite alternate; }
+@keyframes lh-pace { from { margin-left: calc(-6px * var(--k)); } to { margin-left: calc(6px * var(--k)); } }
+html.lh-state-away .lh-cr { display: none; }
+.lh-cool { inset: 0; background: radial-gradient(ellipse at 60% 35%, rgba(70, 95, 150, 0), rgba(40, 60, 110, .16)); opacity: 0; transition: opacity 2s ease; }
+html.lh-state-away .lh-cool { opacity: 1; }
+html.lh-state-away .lh-dad-glow { opacity: .55; animation: none; }
+html.lh-state-home .lh-board { box-shadow: inset 0 1px 0 rgba(255, 220, 170, .18), 0 8px 24px rgba(0, 0, 0, .6), 0 0 60px rgba(255, 150, 60, .32); }
+.lh-pglow { inset: 0; }
+.lh-pglow i { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 150, 40, .42), rgba(255, 120, 30, 0)); animation: lh-flick 3.4s ease-in-out infinite alternate; }
+.lh-smoke { width: calc(60px * var(--k)); height: calc(160px * var(--k)); transform: translate(-50%, 0); }
+.lh-smoke i { position: absolute; left: 30%; bottom: 0; width: 40%; height: 30%; border-radius: 50%; background: rgba(200, 205, 215, .16); filter: blur(6px); animation: lh-rise 9s linear infinite; }
+.lh-smoke i:nth-child(2) { animation-delay: -3s; } .lh-smoke i:nth-child(3) { animation-delay: -6s; }
+@keyframes lh-rise { from { transform: translate(0, 0) scale(.6); opacity: 0; } 20% { opacity: 1; } to { transform: translate(18px, -260%) scale(1.6); opacity: 0; } }
+.lh-camlamp { width: calc(10px * var(--k)); height: calc(10px * var(--k)); border-radius: 50%; background: #ff4a3a; box-shadow: 0 0 12px 4px rgba(255, 60, 40, .45); transform: translate(-50%, -50%); }
+@media (prefers-reduced-motion: reduce) { .lh-cr.pace, .lh-pglow i, .lh-smoke i { animation: none !important; } }
+
+/* clock override tag + perf probe (debug only) */
+.lh-clocktag { position: fixed; left: 70px; top: 16px; z-index: 50; font: 700 13px/1 "LH Display", monospace; letter-spacing: .06em; color: #fff; background: #b3261e; padding: 6px 9px; border-radius: 5px; pointer-events: none; }
+html.lh-wall .lh-clocktag { font-size: 18px; padding: 8px 12px; }
+html.lh-phone .lh-clocktag { font-size: 11px; max-width: calc(100vw - 84px); white-space: normal; line-height: 1.25; }
+html.lh-phone .lh-preview { top: 36px; }
+.lh-probe { position: fixed; right: 10px; bottom: 10px; z-index: 60; background: rgba(0, 0, 0, .78); color: #9f9; font: 12px/1.35 monospace; padding: 8px 10px; border-radius: 6px; }
+.lh-probe pre { margin: 0 0 6px; font: inherit; } .lh-probe button { font: 11px monospace; }
+html.lh-phone .lh-stones .lh-stone .d { letter-spacing: .04em; }
+@media (max-width: 419px) { html.lh-phone .lh-board { font-size: 22px; padding: 7px 14px; } }
+.lh-stone.fog::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(rgba(150, 165, 185, 0) 35%, rgba(150, 165, 185, var(--fo, .2))); pointer-events: none; }
+
+/* ---------- L1 review 3 (Prism P1/P2, Atlas) ---------- */
+.lh-kidwins { display: flex; gap: calc(26px * var(--k)); transform: translate(-50%, 0); }
+.lh-kw { display: flex; flex-direction: column; align-items: center; gap: calc(8px * var(--k)); width: calc(96px * var(--k)); }
+.lh-kw .lh-win { position: relative; width: calc(76px * var(--k)); height: calc(102px * var(--k)); border-radius: 3px; outline: none;
+  border: calc(5px * var(--k)) solid #2a1d13; box-shadow: inset 0 0 0 1px rgba(255, 220, 170, .18), 0 4px 14px rgba(0, 0, 0, .6);
+  background: linear-gradient(160deg, rgba(160, 180, 220, .1), rgba(0, 0, 0, 0) 40%), linear-gradient(#141a26, #0b0f17); transition: background 2s ease, box-shadow 2s ease; }
+.lh-kw .lh-win .m { position: absolute; inset: 0; background: linear-gradient(90deg, transparent calc(50% - 2px), #2a1d13 calc(50% - 2px), #2a1d13 calc(50% + 2px), transparent calc(50% + 2px)), linear-gradient(transparent calc(48% - 2px), #2a1d13 calc(48% - 2px), #2a1d13 calc(48% + 2px), transparent calc(48% + 2px)); }
+.lh-kw .lh-win.glow { background: radial-gradient(ellipse at 50% 60%, #ffd9a0, #f0a24e 55%, #b4621f); box-shadow: inset 0 0 0 1px rgba(255, 220, 170, .3), 0 0 calc(34px * var(--k)) rgba(255, 170, 80, .55); }
+.lh-kw .lh-win.dim { background: radial-gradient(ellipse at 50% 70%, rgba(150, 95, 45, .55), rgba(40, 26, 14, .9) 70%), #120d08; }
+.lh-kw .lh-win.dark { background: linear-gradient(155deg, rgba(170, 190, 230, .16) 0 18%, rgba(0, 0, 0, 0) 32%), linear-gradient(#121826, #070a10); }
+.lh-kw .name { white-space: nowrap; font: 600 calc(20px * var(--k))/1 "LH Display", sans-serif; letter-spacing: .04em; color: #f4e6c8;
+  padding: calc(6px * var(--k)) calc(10px * var(--k)); border-radius: calc(4px * var(--k)); background: rgba(16, 12, 8, .82); box-shadow: 0 4px 12px rgba(0, 0, 0, .5); }
+html.lh-phone .lh-kidwins { gap: 6px; } html.lh-phone .lh-kw { width: 58px; gap: 4px; }
+html.lh-phone .lh-kw .lh-win { width: 30px; height: 40px; border-width: 3px; }
+html.lh-phone .lh-kw .name { font-size: 12px; padding: 3px 5px; }
+/* the away sign hangs from the porch lamp, lamp-lit like the Dad plaque */
+.lh-away { background: linear-gradient(#3a2a1b, #20160d); border: 1px solid rgba(255, 210, 150, .3); box-shadow: 0 0 26px rgba(255, 160, 70, .28), 0 8px 20px rgba(0, 0, 0, .55); }
+.lh-away .k { color: #f3c98a; } .lh-away .v { color: #fde7b8; }
+.lh-away::before { content: ""; position: absolute; left: 50%; bottom: 100%; width: 2px; height: calc(14px * var(--k)); background: linear-gradient(#2a2620, #8a7a5c); }
+html.lh-phone .lh-away::before { display: none; }
+/* leaves stay over the tree, never across text */
+html.lh-wall .lh-leaves { right: 76%; bottom: 46%; } html.lh-phone .lh-leaves { display: none; }
+.lh-cauldron .glow { --heat: .4; } .lh-cauldron .lab { font-size: calc(20px * var(--k)); }
+.near .lh-stone:nth-child(odd) { rotate: -1.2deg; } .near .lh-stone:nth-child(even) { rotate: 1deg; }
+
+/* ---------- L1 re-check (Prism N1/N2 + P2s) ---------- */
+/* kid windows: dark = cold glass; lit = warm lamp on; glow = something today, brighter with light spilling on the sill */
+.lh-kw .lh-win.lit { background: radial-gradient(ellipse at 50% 55%, #ffd08a, #e8913c 60%, #9c5218); box-shadow: inset 0 0 0 1px rgba(255, 220, 170, .35), 0 0 calc(22px * var(--k)) rgba(255, 160, 70, .45); }
+.lh-kw .lh-win.glow { background: radial-gradient(ellipse at 50% 55%, #fff3d6, #ffc36e 45%, #e98a2e); box-shadow: inset 0 0 0 1px rgba(255, 235, 200, .5), 0 0 calc(46px * var(--k)) calc(6px * var(--k)) rgba(255, 175, 80, .7); }
+.lh-kw .lh-win.lit::after, .lh-kw .lh-win.glow::after { content: ""; position: absolute; left: -30%; right: -30%; top: 100%; height: calc(28px * var(--k)); pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0, rgba(255, 180, 90, .55), rgba(255, 160, 70, 0) 70%); }
+.lh-kw .lh-win.lit::after { opacity: .6; }
+.lh-kw .lh-win.dark { background: linear-gradient(155deg, rgba(170, 190, 230, .14) 0 16%, rgba(0, 0, 0, 0) 30%), linear-gradient(#0e1320, #05070c); }
+html.lh-wall .lh-kw .name { background: rgba(16, 12, 8, .9); }
+/* stones: the fog fades the stone, never the words (text stays dark on light stone, AA) */
+.lh-stone.fog { filter: none !important; }
+.lh-stone.fog::after { z-index: -1; background: linear-gradient(rgba(120, 135, 160, calc(var(--fo, .2) * .6)), rgba(120, 135, 160, var(--fo, .2))); }
+.lh-stone .d { color: #1f2227; } .lh-stone .w { color: #111316; }
+/* candle: lit only on the leave day; an earlier day shows an unlit candle naming the day */
+.lh-candle.unlit .flame { display: none; } .lh-candle .flame { z-index: 1; }
+/* Prism P2: an unlit candle reads as a wax stub that is out (melted rim, a drip, a dark wick), never a plain grey bar. CSS only, no image asset */
+.lh-candle .wax::before { content: ""; position: absolute; left: 50%; top: calc(-10px * var(--k)); width: calc(3px * var(--k)); height: calc(11px * var(--k)); margin-left: calc(-1.5px * var(--k)); border-radius: 2px 2px 0 0; background: linear-gradient(#0b0807, #2b211a 70%, #4a3b2c); }
+.lh-candle .wax::after { content: ""; position: absolute; left: -6%; right: -6%; top: calc(-4px * var(--k)); height: calc(9px * var(--k)); border-radius: 50%; background: radial-gradient(ellipse at 50% 35%, #fbf3e0, #e2d4b4 60%, #c9b993); box-shadow: inset 0 calc(-2px * var(--k)) calc(3px * var(--k)) rgba(120, 96, 60, .35); }
+.lh-candle.unlit .wax { box-shadow: none; filter: none; border-radius: 3px 3px 4px 4px;
+  background: radial-gradient(ellipse 18% 34% at 26% 14%, #f6ecd6 55%, rgba(246, 236, 214, 0) 60%), linear-gradient(90deg, #b8a682, #efe3c7 42%, #e2d3b2 60%, #a8966f); }
+.lh-candle.unlit .wax::before { transform: rotate(9deg); transform-origin: 50% 100%; background: linear-gradient(#050404, #1d1611 60%, #3a2d21); }
+html.lh-phone .lh-candle .wax::before { top: -8px; width: 2px; height: 9px; margin-left: -1px; }
+html.lh-phone .lh-candle .wax::after { top: -3px; height: 6px; }
+/* cauldron: liquid level = chores done this week; no feed = an honest empty pot, flagged */
+.lh-cauldron .pot { position: relative; overflow: hidden; }
+.lh-cauldron .pot::before { content: ""; position: absolute; left: 10%; right: 10%; top: 4%; height: 18%; border-radius: 50%; background: radial-gradient(#050607, #15181b); box-shadow: inset 0 2px 4px rgba(0, 0, 0, .9); }
+.lh-cauldron .pot::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--fill, 0) * 85%); background: linear-gradient(rgba(140, 240, 160, .85), rgba(40, 140, 70, .9)); }
+.lh-cauldron[data-feed="missing"] .glow { display: none; }
+.lh-cauldron .lab { display: flex; flex-direction: column; align-items: center; gap: calc(4px * var(--k)); }
+.lh-cauldron .lab small { font: 600 calc(14px * var(--k))/1 "LH Display", sans-serif; letter-spacing: .02em; color: #c9d2cc; }
+html.lh-phone .lh-cauldron .lab small { font-size: 10px; }
+.lh-cauldron[data-feed="rest"] .glow { display: none; }
+
+/* ---------- Prism art batch 1: photoreal windows + lantern (art/, CREDITS in the art brief) ---------- */
+/* wall: each window is the art unit (lit or dark, one shared outline) with its shadow and glow as separate layers that fade */
+.lh-kidwins { --s: 1.5; }
+html.lh-wall .lh-kidwins { transform: none; gap: 0; }
+html.lh-wall .lh-kw { width: calc(88px * var(--s)); gap: calc(6px * var(--k)); }
+html.lh-wall .lh-kw .lh-win, .lh-kw .lh-win.lit, .lh-kw .lh-win.glow, .lh-kw .lh-win.dark, .lh-kw .lh-win.dim { border: 0; border-radius: 0; outline: none; box-shadow: none; background: transparent; }
+html.lh-wall .lh-kw .lh-win { width: calc(72px * var(--s)); height: calc(88px * var(--s)); background: url(art/window-lit-108x132.webp) center / 100% 100% no-repeat; transition: none; }
+html.lh-wall .lh-kw .lh-win.dark { background-image: url(art/window-dark-108x132.webp); }
+.lh-kw .lh-win::after { display: none !important; }
+.lh-kw .lh-win .sh, .lh-kw .lh-win .gl { position: absolute; left: -50%; top: -50%; width: 200%; height: 200%; pointer-events: none; background: center / 100% 100% no-repeat; }
+html.lh-wall .lh-kw .lh-win .sh { z-index: -1; background-image: url(art/window-shadow-108x132-canvas216x264.webp); }
+html.lh-wall .lh-kw .lh-win .gl { background-image: url(art/window-glow-108x132-canvas216x264.webp); mix-blend-mode: screen; opacity: 0; transition: opacity 2s ease; }
+html.lh-wall .lh-kw .lh-win.lit .gl { opacity: .6; } html.lh-wall .lh-kw .lh-win.glow .gl { opacity: 1; }
+html.lh-wall .lh-kw .name { width: calc(124px * var(--k)); box-sizing: border-box; text-align: center; padding-left: 0; padding-right: 0; }
+html.lh-wall .lh-kidwins .strip, html.lh-wall .lh-kidwins .sglow { display: none; }
+/* phone: the 3-window siding strip (every lit / dark combo), glow strip faded on top; the windows are tap areas over it */
+html.lh-phone .lh-kidwins { width: 192px; height: 84px; gap: 0; padding: 0 0 0 0; }
+html.lh-phone .lh-kidwins .strip, html.lh-phone .lh-kidwins .sglow { position: absolute; left: 0; top: 0; width: 192px; height: 60px; background: var(--strip) center / 100% 100% no-repeat; pointer-events: none; }
+html.lh-phone .lh-kidwins .sglow { background-image: var(--sglow); mix-blend-mode: screen; opacity: var(--sgo, .6); }
+html.lh-phone .lh-kw { width: 64px; gap: 6px; position: relative; z-index: 1; }
+html.lh-phone .lh-kw .lh-win { width: 40px; height: 52px; margin-top: 4px; border: 0; }
+html.lh-phone .lh-kw .lh-win .sh, html.lh-phone .lh-kw .lh-win .gl { display: none; }
+/* the away-time porch lantern: iron and glass body, a real flame loop at the wick, words beneath (never on it) */
+.lh-away { background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; gap: calc(6px * var(--k)); transform: translate(-50%, 0); }
+.lh-away::before { display: none !important; }
+.lh-away .lan { position: relative; width: var(--lw); height: var(--lh); flex: none; }
+.lh-away .lan img { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 0 calc(10px * var(--k)) rgba(255, 170, 80, .45)); }
+.lh-away .lan-fire { position: absolute; left: 50%; top: 52%; width: 16%; height: 16%; transform: translateX(-50%); object-fit: cover; filter: url(#lh-luma); }
+.lh-away .lan::after { content: ""; position: absolute; left: 20%; right: 20%; top: 40%; height: 40%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 180, 90, .35), rgba(255, 150, 60, 0)); pointer-events: none; }
+
+.lh-away .k, .lh-away .v { text-shadow: 0 0 calc(10px * var(--k)) rgba(255, 160, 70, .55), 0 2px 4px rgba(0, 0, 0, .95), 0 0 3px rgba(0, 0, 0, .95); }
+.lh-away .k { color: #f3c98a; font-size: calc(17px * var(--k)); } .lh-away .v { color: #fde7b8; font-size: calc(28px * var(--k)); }
+html.lh-phone .lh-away { gap: 3px; } html.lh-phone .lh-away .k { font-size: 12px; } html.lh-phone .lh-away .v { font-size: 18px; }
+
+/* honest feed tag: the calendar is shown from its last real sync */
+.lh-feedtag { right: calc(28px * var(--k)); bottom: calc(18px * var(--k)); font: 600 calc(18px * var(--k))/1 "LH Display", sans-serif; letter-spacing: .03em; color: #f3d6a8; background: rgba(12, 10, 8, .82); padding: calc(7px * var(--k)) calc(12px * var(--k)); border-radius: calc(5px * var(--k)); border: 1px solid rgba(243, 214, 168, .3); white-space: nowrap; }
+html.lh-wall .lh-feedtag { font-size: max(17px, calc(18px * var(--k))); }   /* Prism P2: the Calendar offline tag never drops under 17 px on the wall */
+html.lh-phone .lh-feedtag { right: auto; left: 50%; transform: translateX(-50%); bottom: 8px; font-size: 14px; padding: 6px 10px; color: #f3d6a8; background: rgba(12, 10, 8, .92); }   /* Alfred P3: never under 14 px on the phone; #f3d6a8 on the near-opaque glass is about 12:1 (>= 4.5 even over a white sky) */
+
+
+/* Prism gable band: the three windows sit in it on the wall (replaces the y 24 workaround and the siding / sky patches) */
+.lh-gable { background: url(art/gable-band-500x200.webp) center / 100% 100% no-repeat; }
+html.lh-phone .lh-gable { display: none; }
+
+/* ---------- L1 fix (Prism rulings a, b, P1, P2 + Wright items 1, 3, 4, 6) ---------- */
+/* (a) name plaques: brass fill + warm dot when the kid has something today; the plaque is the tap into the kid's room */
+.lh-kw .name { position: relative; text-decoration: none; pointer-events: auto; }
+.lh-kw .name::before { content: ""; position: absolute; left: -6px; right: -6px; top: -10px; bottom: -10px; }   /* 44 px tap area */
+.lh-kw .name.today { background: linear-gradient(180deg, #d9b56a, #a77c35 60%, #8a6328) !important; color: #24170a; text-shadow: 0 1px 0 rgba(255, 236, 190, .45); box-shadow: inset 0 1px 0 rgba(255, 240, 200, .5), 0 4px 12px rgba(0, 0, 0, .5); }
+.lh-kw .name.today::after { content: ""; position: absolute; right: calc(7px * var(--k)); top: 50%; width: calc(7px * var(--k)); height: calc(7px * var(--k)); margin-top: calc(-3.5px * var(--k)); border-radius: 50%; background: #ffb347; box-shadow: 0 0 calc(6px * var(--k)) rgba(255, 170, 60, .9); }
+html.lh-phone .lh-kw .name.today::after { right: 3px; width: 5px; height: 5px; margin-top: -2.5px; }
+html.lh-phone .lh-kw .name.today { padding-right: 10px; }
+/* Alfred P3: every phone name tag is a 44 x 44 tap target. The plaque looks the same; the transparent border grows the box
+   (background stays inside it) and the negative margin keeps the layout where it was. The top part stops at its own window
+   (6 px gap), the rest hangs below; lh.js fitPhone() lowers the title sign just enough that no tap box reaches it. */
+html.lh-phone .lh-kw .name { display: inline-block; box-sizing: border-box; min-width: 44px; min-height: 44px; line-height: 12px; border: 0 solid transparent; border-top-width: 6px; border-bottom-width: 20px; margin: -6px 0 -20px; background-clip: padding-box; text-align: center; box-shadow: none; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .5)); }
+html.lh-phone .lh-kw .name.today { box-shadow: inset 0 1px 0 rgba(255, 240, 200, .5); filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .5)); background-clip: padding-box !important; }   /* the brass fill stays on the tag, never the tap box */
+/* P1: the callout is plain glass hanging straight from the kid's plaque (a thin thread up to the plaque) */
+.lh-callout { transform: translate(-50%, 0); display: block; white-space: nowrap; padding: calc(9px * var(--k)) calc(16px * var(--k)); border-radius: calc(8px * var(--k));
+  background: rgba(200, 214, 236, .16); -webkit-backdrop-filter: blur(6px) saturate(1.1); backdrop-filter: blur(6px) saturate(1.1); border: 1px solid rgba(235, 242, 255, .38);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 6px 18px rgba(0, 0, 0, .35); color: #f4f6fb; font: 600 calc(22px * var(--k))/1.15 "LH Display", sans-serif; text-shadow: 0 1px 2px rgba(0, 0, 0, .7); }
+.lh-callout .thread { position: absolute; left: 50%; bottom: 100%; width: 1px; height: var(--th, 6px); margin-left: -.5px; background: rgba(235, 242, 255, .55); }
+html.lh-phone .lh-callout { font-size: 15px; padding: 7px 10px; white-space: nowrap; width: max-content; max-width: calc(100vw - 16px); box-sizing: border-box; text-align: center; overflow: hidden; text-overflow: ellipsis; }
+html.lh-phone .lh-cauldron .lab small { white-space: nowrap; }
+/* 1: candle max 2 lines (value line + detail line), times kept whole with no-break spaces; truncation on width only */
+.lh-candle .slate { max-width: 100%; box-sizing: border-box; }
+.lh-candle .v, .lh-candle .k { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+html.lh-phone .lh-candle .slate { white-space: nowrap; }
+.lh-candle.empty .slate { display: none; }
+/* 3: stone titles keep the whole place; only width truncates (2 lines, then an ellipsis) */
+.lh-stone .w { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; max-width: 100%; overflow-wrap: anywhere; }
+/* 4: wall chores sub-label legible: 17 px or more, one line */
+html.lh-wall .lh-cauldron .lab small { font-size: max(17px, calc(17px * var(--k))); white-space: nowrap; }
+/* Alfred P3: the phone Dad plaque link is a 44 px tall tap target (was 63 x 38); padding grows the box, the margin keeps it in place */
+html.lh-phone .lh-dad { box-sizing: border-box; min-height: 44px; padding: 3px 0; margin: -3px 0; }
+/* Alfred 1702 P3: at 390 the Hayes and Harris tag tap boxes reached 12 px into the Dad plaque box. On the phone the tag is already a 44 x 44 box (borders), so its wider desktop tap halo is off, and Dad sits 16 px lower: 0 px overlap at 390, 440 and 1920. */
+html.lh-phone .lh-kw .name::before { display: none; }
+html.lh-phone .lh-dad { margin-top: 13px; }

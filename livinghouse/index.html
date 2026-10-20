@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" data-sh="lh"><head><meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>The Ward's · Living House</title>
+<link rel="stylesheet" href="../night/night-host.css?v=SH1" />
+<link rel="stylesheet" href="../month-theme/month-overlay.css?v=MONTHFX2" />
+<link rel="stylesheet" href="lh.css?v=LH3" />
+</head>
+<body>
+<!-- LIVING HOUSE · the night scene IS the interface. Every element below is placed on the house plate by lh.js and is
+     filled only from a real feed (see /workspace/artifacts/livinghouse/FEEDS.md); no feed = nothing drawn. -->
+<div id="lh" aria-label="The Ward's house">
+  <div class="lh-veil" data-at="259,92" aria-hidden="true"></div>
+  <svg class="lh-moon" id="lh-moon" viewBox="-120 -120 240 240" role="img" aria-label="Moon clock">
+    <defs>
+      <radialGradient id="mg" cx="40%" cy="38%" r="70%"><stop offset="0" stop-color="#fbf8ee"/><stop offset=".7" stop-color="#e3dfd2"/><stop offset="1" stop-color="#c9c4b5"/></radialGradient>
+      <radialGradient id="ms" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#8f8b80" stop-opacity=".55"/><stop offset="1" stop-color="#8f8b80" stop-opacity="0"/></radialGradient>
+      <filter id="mgl" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter>
+      <clipPath id="lit"><path id="litp" d=""/></clipPath>
+      <clipPath id="dark"><path id="darkp" d=""/></clipPath>
+    </defs>
+    <circle r="118" fill="#cfd8ec" opacity=".18" filter="url(#mgl)" class="lh-moon-halo"/>
+    <circle r="100" fill="#1b2232"/>
+    <g clip-path="url(#dark)"><circle r="100" fill="#2b3346"/></g>
+    <g clip-path="url(#lit)"><circle r="100" fill="url(#mg)"/>
+      <ellipse cx="-30" cy="-26" rx="26" ry="20" fill="url(#ms)"/><ellipse cx="22" cy="-8" rx="30" ry="22" fill="url(#ms)"/><ellipse cx="-10" cy="34" rx="22" ry="16" fill="url(#ms)"/><ellipse cx="40" cy="38" rx="14" ry="11" fill="url(#ms)"/></g>
+    <g class="lh-etch" font-family="LH Display, sans-serif" text-anchor="middle">
+      <g clip-path="url(#lit)" fill="#2a2d33"><text y="-40" font-size="17" font-weight="600" letter-spacing="2" data-lh="ap"></text><text y="14" class="t-time" font-size="58" font-weight="600" data-lh="time"></text><text y="50" class="t-date" font-size="21" font-weight="600" letter-spacing="1.5" data-lh="date"></text></g>
+      <g clip-path="url(#dark)" fill="#e6e9f2"><text y="-40" font-size="17" font-weight="600" letter-spacing="2" data-lh="ap"></text><text y="14" class="t-time" font-size="58" font-weight="600" data-lh="time"></text><text y="50" class="t-date" font-size="21" font-weight="600" letter-spacing="1.5" data-lh="date"></text></g>
+    </g>
+  </svg>
+  <div class="lh-sign" data-at="700,214" data-at-ph="480,240"><div class="lh-chain l"></div><div class="lh-chain r"></div><div class="lh-board">The Ward's</div></div>
+  <!-- the three kid windows: same size, same frame, same label, side by side on the upper facade (wall and phone) -->
+  <i class="lh-gable" data-rect="800,0,1133.33,133.33" aria-hidden="true"></i><!-- Prism gable band (art/gable-band-500x200): upper-storey siding + eave behind the three windows; the name plaques sit on its eave -->
+  <div class="lh-kidwins" id="lh-kidwins"><!-- art/: one shared window outline, lit and dark, glow and shadow as separate layers (wall); phone uses the 3-window siding strip -->
+    <i class="strip" aria-hidden="true"></i><i class="sglow" aria-hidden="true"></i>
+    <div class="lh-kw"><div class="lh-win" data-kid="ainsley"><i class="sh"></i><i class="gl"></i></div><a class="name" data-kid="ainsley" href="../kid-ainsley.html" aria-label="Ainsley's room">Ainsley</a></div>
+    <div class="lh-kw"><div class="lh-win" data-kid="hayes"><i class="sh"></i><i class="gl"></i></div><a class="name" data-kid="hayes" href="../kid-hayes.html" aria-label="Hayes's room">Hayes</a></div>
+    <div class="lh-kw"><div class="lh-win" data-kid="harris"><i class="sh"></i><i class="gl"></i></div><a class="name" data-kid="harris" href="../kid-harris.html" aria-label="Harris's room">Harris</a></div>
+  </div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="lh-luma" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  1.2 1.2 1.2 0 -.08"/></filter></svg>
+  <a class="lh-dad" href="../sheet-dan.html" data-at="944,300" aria-label="Dad"><span class="lh-dad-glow"></span><span class="lh-plaque">Dad</span></a>
+  <div class="lh-away" data-lan="1166,322" data-lan-ph="575,566" aria-label="Porch lantern" hidden><!-- the porch lantern kept lit in the away state (art: art/lantern-body, flame: night/media/fire-black.mp4 at the wick) -->
+    <div class="lan"><img src="art/lantern-body-400x560.webp" alt="" draggable="false" /><video class="lan-fire" src="../night/media/fire-black.mp4" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video></div></div>
+  <div class="lh-candle" data-at="640,446" hidden><div class="wax"><div class="flame"></div></div><div class="slate"><span class="v" data-lh="cand-v"></span><span class="k" data-lh="cand-k"></span></div></div>
+  <div class="lh-cauldron" data-at="452,486" data-at-ph="170,610"><div class="glow"></div><div class="pot"></div><div class="lab">Chores<small data-lh="chores-sub"></small></div></div>
+  <div class="lh-fogfar" aria-hidden="true"></div>
+  <div class="lh-stones far" id="lh-far"></div>
+  <div class="lh-fognear" aria-hidden="true"></div>
+  <div class="lh-stones near" id="lh-near"></div>
+  <div class="lh-callout" id="lh-callout" hidden><i class="thread" aria-hidden="true"></i><span data-lh="c-line"></span></div><!-- Prism P1: no cartoon ghost; the kid's next item hangs from their name plaque as plain glass -->
+  <div class="lh-leaves" id="lh-leaves" aria-hidden="true"></div>
+  <div class="lh-cool" aria-hidden="true"></div>
+  <div class="lh-pglow" id="lh-pglow" aria-hidden="true"></div>
+  <div class="lh-smoke" data-at="1010,0" hidden aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="lh-camlamp" data-at="1236,150" hidden aria-hidden="true"></div>
+  <div class="lh-yard" id="lh-yard" aria-hidden="true"></div>
+  <div class="lh-creatures" id="lh-creatures"><!-- MISSING ASSET: photoreal perched loops (owl, cat, raven). Nothing renders until real loops exist; no invented art (Prism P1-3). --></div>
+  <div class="lh-preview" id="lh-preview" hidden>PREVIEW</div>
+  <div class="lh-feedtag" id="lh-feedtag" hidden></div>
+</div>
+<script src="clock.js?v=LH1"></script>
+<script src="../night/night-host.js?v=SH1" defer></script>
+<script src="../month-theme/month-overlay.js?v=MONTHFX2" defer></script>
+<script src="../school-names.js?v=SCHOOLNAMES1" defer></script>
+<script src="../away-filter.js?v=AWAYLAW1" defer></script>
+<script src="../house-face-law.js?v=PRIVFEED3" defer></script>
+<script src="../phone2/leaveby.js?v=PHONE2" defer></script>
+<script src="lh-rules.js?v=LH4" defer></script>
+<script src="lh.js?v=LH4" defer></script>
+</body></html>

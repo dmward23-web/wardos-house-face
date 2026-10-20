@@ -36,7 +36,7 @@
 
   var DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   function ctNow() {
-    var d = new Date(), p = {};
+    var d = g.LHClock ? g.LHClock.now() : new Date(), p = {}; /* Living House: follows its ?now test clock when LHClock exists; every other board has none */
     try {
       new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit", hour: "numeric", minute: "2-digit", hourCycle: "h23", weekday: "short" })
         .formatToParts(d).forEach(function (x) { p[x.type] = x.value; });
@@ -89,7 +89,7 @@
     var iso = r.startIso || r.start || "";
     if (iso && /T\d{2}:/.test(String(iso))) {
       var end = Date.parse(r.endIso || r.end || "") || (Date.parse(iso) + 90 * 60000);
-      return Number.isFinite(end) && end < Date.now();
+      return Number.isFinite(end) && end < (g.LHClock ? g.LHClock.ms() : Date.now());
     }
     var off = dayOffset(r.when, now);
     if (off === null) return false;
@@ -170,8 +170,10 @@
   }
   /* NOCUSTODY1 · glass law for every board: a feed string that carries one is blanked, and a row whose text carries
      one is dropped. Nothing is put in its place. Same phrase list as scripts/qa/nocustody.test.mjs. */
-  var NOCUST_RX = /kids with (?:dad|mom|dan|you)\b|\b(?:dad|mom)(?:['\u2019]?s)? weeks?\b|\bhome week|\baway week|\bcustody\b|\btheir mom['\u2019]?s week|\bkids away\b|\btheir week\b|kids-with-dan|\b(?:your base|base at home|drop zone hq) with dad\b|hand-?\s?offs?\b|\b(?:chores|payday) with dad\b|who.{1,6}s where/i; /* custody-law:allow */
-  function isCustody(s) { return NOCUST_RX.test(String(s == null ? "" : s)); }
+  var NOCUST_RX = /kids with (?:dad|mom|dan|you)\b|\b(?:dad|mom)(?:['\u2019]?s)? weeks?\b|\bhome week|\baway week|\bcustody\b|\btheir mom['\u2019]?s week|\bkids away\b|\btheir week\b|kids-with-dan|\b(?:your base|base at home|drop zone hq) with dad\b|\bwhose (?:week|weekend|night|turn)\b|\b(?:kids?|boys|weeks?|weekends?|nights?) (?:with|at) (?:mom|mommy|mother|dad|daddy|father)(?:['\u2019]?s)?\b|\bwith (?:mom|mommy|mother)\b|\b(?:mom|mommy|mother|dad|daddy|father)['\u2019]?s (?:kids|weekend|night|house|place)\b|\b(?:mom|mommy|mother)(?:['\u2019]?s)? (?:has|have|had|gets?|got|takes?|keeps?) (?:the )?kids\b|\bhand-?\s?offs?\b|\b(?:chores|payday) with dad\b|who.{1,6}s where|\b(?:kids?|custody) exchange\b|\bexchange (?:day|time|point)\b|(?:^\s*|\b(?!who\b)[a-z]+\s+)(?:has|have|had|gets?|got|keeps?) (?:the )?kids\b(?=\s*(?:$|[\u00b7|]|(?:this|next) (?:week|weekend)\b|(?:until|till|through|thru)\b|all week\b))/i; /* custody-law:allow (Atlas + Alfred: only which parent or household the kids are with; logistics stay) */
+  /* a co-parent name joined to kids, week or weekend counts the same; the name is read at run time only (role coparent, never in git) */
+  function cpRe() { var w = g.WARDOS_PRIVATE_NAMES, l = w && w.coparent ? [].concat(w.coparent) : []; l = l.map(function (n) { return String(n || "").trim().split(/\s+/)[0]; }).filter(function (n) { return /^[A-Za-z]{2,}$/.test(n); }); if (!l.length) return null; var N = "(?:" + l.join("|") + ")"; return new RegExp("\\b" + N + "(?:['\u2019]?s)? (?:kids|week|weekend|night|house|place)\\b|\\b" + N + " (?:has|have|had|gets?|got|takes?|keeps?) (?:the )?kids\\b|\\b(?:kids?|weeks?|weekends?) (?:with|at) " + N + "\\b", "i"); }
+  function isCustody(s) { var t = String(s == null ? "" : s), c; return NOCUST_RX.test(t) || !!((c = cpRe()) && c.test(t)); }
   function rowCustody(o) {
     if (!o || typeof o !== "object" || Array.isArray(o)) return false;
     return isCustody([o.summary, o.title, o.what, o.l, o.label, o.text].filter(function (x) { return typeof x === "string"; }).join(" "));

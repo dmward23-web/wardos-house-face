@@ -27,8 +27,8 @@ const WEEK = () => ({ kids: {
   dan: { name: "Dan", today: [{ when: "Wed 21 · 7:00", what: "Dinner downtown" }] }
 }, boardStrip: { queue: [{ summary: "Harris flag football", startIso: "2026-10-24T09:00:00-05:00" }, { summary: "Ainsley piano", startIso: "2026-10-27T16:00:00-05:00" }] } });
 
-test("window from cal-months withDan: Sun 10/18 3:00 PM to Mon 10/26 3:00 PM CT", () => {
-  A.setMonths(months);
+test("window from cal-months withDan and the feed's changeMin (900): Sun 10/18 3:00 PM to Mon 10/26 3:00 PM CT", () => {
+  A.setMonths({ ...months, changeMin: 900 });
   assert.equal(A.isAwayAt(ms("2026-10-18T14:59:00-05:00")), false);
   assert.equal(A.isAwayAt(ms("2026-10-18T15:00:00-05:00")), true);
   assert.equal(A.isAwayAt(ms("2026-10-20T16:00:00-05:00")), true);
