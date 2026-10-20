@@ -15,7 +15,7 @@ const scan = (...extra) => spawnSync("node", [path.join(ROOT, "scripts/privacy-s
 test("P1 · no camera stills or page screenshots anywhere; every tracked image is on the art allow-list", () => {
   const files = execFileSync("git", ["ls-files"], { cwd: ROOT, encoding: "utf8" }).split("\n").filter(Boolean);
   const allow = new Set(read("scripts/privacy-art-allowlist.txt").split("\n").map((l) => l.replace(/#.*/, "").trim()).filter(Boolean));
-  const IMGX = /\.(png|jpe?g|webp|gif|heic|heif|avif|bmp|tiff?|svg|mp4|mov|m4v|webm)$/i;
+  const IMGX = /\.(png|jpe?g|webp|gif|heic|heif|avif|bmp|tiff?|svg|ico|jxl|mp4|mov|m4v|webm|mkv|avi)$/i;
   for (const f of files) {
     if (!IMGX.test(f)) continue;
     assert.doesNotMatch(f, /(^|\/)snaps\/|cam-live|-heat\.png$|hub-header-|hub-heat-pass\.png$|screenshot|phone-shots\//i, f);

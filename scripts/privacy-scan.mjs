@@ -29,7 +29,7 @@ const has = (k) => args.includes(k);
 const val = (k) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null; };
 const git = (a, opts = {}) => execFileSync("git", a, { cwd: ROOT, maxBuffer: 1 << 28, ...opts });
 
-const BIN = /\.(png|jpe?g|webp|gif|ico|woff2?|ttf|otf|mp4|mov|pdf|zip|gz)$/i;
+const BIN = /\.(png|jpe?g|webp|gif|ico|jxl|mkv|avi|woff2?|ttf|otf|mp4|mov|pdf|zip|gz)$/i;
 const IMG = /\.(png|jpe?g|webp|gif|heic)$/i;
 const PRIVATE_PATHS = [
   /^data\/(cal-live|cal-months|kids-week|cash|lights-live|sensi-live|nest-live)\.json$/, /* PRIVFEED2: house device state */ /^kids-week\.json$/, /(^|\/)[^/]*\.private\.(json|tsv)$/,
@@ -39,7 +39,8 @@ const PRIVATE_IMG_DIRS = [/^data\//, /^phone-shots\//, /(^|\/)nest-snaps\//, /(^
 /* PRIVFEED3 · ANY image or video in the tree is flagged unless its exact repo path is in
    scripts/privacy-art-allowlist.txt (hand-made art, icons, UI vectors only; one path per line). Camera stills,
    screenshots and photos can never ride in by accident: a new image is a deliberate, reviewed allow-list line. */
-const ANY_IMG = /\.(png|jpe?g|webp|gif|heic|heif|avif|bmp|tiff?|svg|mp4|mov|m4v|webm)$/i;
+/* SCANMEDIA1 (Alfred P2 1213) · ico, jxl, mkv and avi are images/media too (same list as the box importer). */
+const ANY_IMG = /\.(png|jpe?g|webp|gif|heic|heif|avif|bmp|tiff?|svg|ico|jxl|mp4|mov|m4v|webm|mkv|avi)$/i;
 function loadArtAllow() {
   let txt = "";
   try { txt = val("--rev") ? git(["show", val("--rev") + ":scripts/privacy-art-allowlist.txt"]).toString() : fs.readFileSync(path.join(ROOT, "scripts", "privacy-art-allowlist.txt"), "utf8"); } catch { txt = ""; }
