@@ -34,7 +34,7 @@ canvas{position:fixed;inset:0;width:100vw;height:100vh;display:block}
 </style><style>body.fireon .chip{backdrop-filter:blur(14px) saturate(0) brightness(.55)!important;-webkit-backdrop-filter:blur(14px) saturate(0) brightness(.55)!important;background-color:rgba(8,9,11,.45)!important}</style></head><body>
 <video id="bg" muted loop playsinline preload="auto"></video><canvas id="gl"></canvas><canvas id="fx"></canvas>
 <div id="ui"><div id="wvig"></div><div id="cvig"></div>
- <div id="clock"><div id="time">--:--</div><div id="date"></div></div>
+ <div id="clock"><div id="time"></div><div id="date"></div></div>
  <svg id="mark" viewBox="0 0 200 200" aria-label="WardOS">
   <defs>
    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6f8fb"/><stop offset=".45" stop-color="#b9c2cc"/><stop offset=".55" stop-color="#7d8792"/><stop offset="1" stop-color="#dfe5ec"/></linearGradient>
@@ -58,7 +58,7 @@ canvas{position:fixed;inset:0;width:100vw;height:100vh;display:block}
   <div class="chip" id="chip-money" data-href="../sheet-allowance.html" role="link" tabindex="0" data-n="Money"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="11"/><path d="M20 11.5c-1-1.2-2.4-1.7-4-1.7-2.2 0-3.8 1.1-3.8 2.8 0 4 7.8 2.2 7.8 6.4 0 1.8-1.7 3-4 3-1.8 0-3.3-.7-4.2-1.9M16 7.5v17"/></svg><span>Money</span></div>
   <div class="chip" id="chip-body" data-href="../sheet-dan.html" role="link" tabindex="0" data-n="Dad"><svg viewBox="0 0 32 32"><path d="M16 27S4 19.6 4 11.8C4 8 6.8 5.5 10 5.5c2.6 0 4.6 1.6 6 3.6 1.4-2 3.4-3.6 6-3.6 3.2 0 6 2.5 6 6.3C28 19.6 16 27 16 27z"/><path d="M6 16h6l2-3 3 6 2-3h7"/></svg><span>Dad</span></div>
  </div>
-</div><div id="dot"></div>
+</div><div id="dot"></div><div id="bandT"></div><div id="bandB"></div>
 <script>window.VID={"wallmp4": "media/v52/loop-wall.mp4", "phonemp4": "media/v52/loop-phone.mp4", "fv-ignite-wallmp4": "media/v52/ignite-wall.mp4", "fv-burn-wallmp4": "media/v52/burn-wall.mp4", "fv-down-wallmp4": "media/v52/down-wall.mp4", "fv-ignite-phonemp4": "media/v52/ignite-phone.mp4", "fv-burn-phonemp4": "media/v52/burn-phone.mp4", "fv-down-phonemp4": "media/v52/down-phone.mp4"};window.AUD={};</script>
 <script>
 // ===== v5 photoreal: generated footage loop is the plate; code adds only light, fog, silhouettes, UI =====
@@ -106,7 +106,8 @@ function witch(c,x,y,s,ang,t){c.save();c.translate(x,y);c.rotate(ang);c.scale(s,
 let hs=91;const hr=()=>(hs=(hs*16807)%2147483647)/2147483647;const rr=(a,b)=>a+(b-a)*hr();
 const sL=document.createElement('canvas'),sB=document.createElement('canvas'),xL=sL.getContext('2d'),xB=sB.getContext('2d');const SR=1.5;
 let H=null;
-const MODE0=innerWidth/innerHeight<.8?'phone':'wall';function fxPre(k){if(/^(fire|smoke|grassfire)-black$/.test(k))return'none';const m=k.match(/-(wall|phone)$/);if(m&&m[1]!==MODE0)return'none';return k==='owl-packed'?'auto':'metadata'}
+const BR={x:30,y:20,w:1120,h:690};let BAND=new URLSearchParams(location.search).has('band')?{y:150}:null;window.__band=()=>BAND&&{y:BAND.y,h:BR.h*innerWidth/BR.w};
+const MODE0=(BAND||innerWidth/innerHeight>=.8)?'wall':'phone';function fxPre(k){if(/^(fire|smoke|grassfire)-black$/.test(k))return'none';const m=k.match(/-(wall|phone)$/);if(m&&m[1]!==MODE0)return'none';return k==='owl-packed'?'auto':'metadata'}
 function fxWake(){window.__woke=1;for(const k in FXV){const v=FXV[k].v,m=k.match(/-(wall|phone)$/);if(/^(fire|smoke|grassfire)-black$/.test(k))continue;if(m&&m[1]!==mode)continue;if(v.preload!=='auto'){v.preload='auto';v.load()}}}
 addEventListener('pointerdown',()=>{if(!window.__woke)fxWake()},{capture:true,passive:true});
 const FXV={};function fxVid(k,loop){const v=document.createElement('video');v.muted=true;v.playsInline=true;v.loop=!!loop;v.preload=fxPre(k);v.setAttribute('playsinline','');
@@ -116,9 +117,10 @@ const FXV={};function fxVid(k,loop){const v=document.createElement('video');v.mu
 function fxStart(k,t0=0){const f=FXV[k];if(f&&f.v.preload!=='auto'){f.v.preload='auto';f.v.load()}f.t=t0;if(!MANUAL){try{f.v.currentTime=t0;f.v.playbackRate=f.rate||1;f.v.play().catch(()=>{})}catch(e){}}}
 function setVideo(){ready=0;V.innerHTML='';if(mode==='phone'&&(DPR3||(devicePixelRatio||1)>=2.5)&&window.VID&&VID.phone3xmp4){const s=document.createElement('source');s.src=VID.phone3xmp4;s.type='video/mp4';V.appendChild(s)}for(const[e,t]of[['mp4','video/mp4']]){const s=document.createElement('source');s.src=(window.VID&&VID[mode+e])||(P.vid+'.'+e);s.type=t;V.appendChild(s)}
  V.load();const ok=()=>{ready=1};if(V.readyState>=2)ok();else V.addEventListener('loadeddata',ok,{once:true});if(!MANUAL)V.play().catch(()=>{})}
-function layout(){dpr=MANUAL?1:Math.min(devicePixelRatio||1,2);vw=innerWidth;vh=innerHeight;const nm=vw/vh<.8?'phone':'wall';
+function layout(){dpr=MANUAL?1:Math.min(devicePixelRatio||1,2);vw=innerWidth;vh=innerHeight;const nm=(BAND||vw/vh>=.8)?'wall':'phone';
  if(nm!==mode){mode=nm;P=SC[mode];document.body.className=mode;setVideo();init();if(window.__woke)fxWake()}
  S=Math.max(vw/P.w,vh/P.h);OX=(vw-P.w*S)/2;OY=(vh-P.h*S)/2;
+ if(BAND){S=vw/BR.w;OX=-BR.x*S;OY=BAND.y-BR.y*S;const r=document.documentElement.style;r.setProperty('--by',BAND.y+'px');r.setProperty('--bh',(BR.h*S)+'px')}document.documentElement.classList.toggle('band',!!BAND);
  for(const c of[gl$,fx]){c.width=vw*dpr;c.height=vh*dpr}if(gl)gl.viewport(0,0,gl$.width,gl$.height)}
 const toPlate=(x,y)=>({x:(x-OX)/S,y:(y-OY)/S});
 function init(){sL.width=sB.width=Math.round(P.w*SR);sL.height=sB.height=Math.round(P.h*SR);
@@ -577,6 +579,10 @@ fxStart('ghost-black');fxStart('owl-packed');
 </script><style>
 html.embed #clock,html.embed #mark,html.embed #chips,html.embed #wvig,html.embed #cvig,html.embed #snd,html.embed #dot{display:none!important}
 .chip[data-href]{cursor:pointer}
+#bandT,#bandB{display:none;position:fixed;left:0;right:0;pointer-events:none;z-index:5}
+html.band #bandT,html.band #bandB{display:block}
+html.band #bandT{top:0;height:var(--by);background:linear-gradient(#04060a,#04060a calc(100% - 26px),rgba(4,6,10,0))}
+html.band #bandB{top:calc(var(--by) + var(--bh) - 40px);bottom:0;background:linear-gradient(rgba(4,6,10,0),rgba(4,6,10,.86) 70px,#04060a 160px)}
 </style><script>
 (function(){var q=new URLSearchParams(location.search),emb=q.get('embed')==='1';
  if(emb)document.documentElement.classList.add('embed');
@@ -587,6 +593,7 @@ html.embed #clock,html.embed #mark,html.embed #chips,html.embed #wvig,html.embed
  addEventListener('message',function(e){if(e.origin!==location.origin)return;var d=e.data||{};if(d.night==='snd'){try{SND.user=!!d.on;sndSet(!!d.on)}catch(_){}}
   else if(d.night==='tap'){var t={down:'pointerdown',move:'pointermove',up:'pointerup',cancel:'pointercancel'}[d.type];if(!t)return;
    var ev=new PointerEvent(t,{clientX:d.x,clientY:d.y,bubbles:true,pointerId:1,isPrimary:true,pointerType:d.pt||'touch'});document.body.dispatchEvent(ev)}
+  else if(d.night==='band'){try{BAND=(d.y==null)?null:{y:Math.max(0,+d.y||0)};layout()}catch(_){}}
   else if(d.night==='state'){}});
  setInterval(function(){try{if(emb&&parent!==window)parent.postMessage({night:'status',snd:!!(SND&&SND.on),phase:(window.__env&&__env().phase)||null},location.origin)}catch(_){}},2000);
 })();

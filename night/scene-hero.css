@@ -1,0 +1,22 @@
+/* SCENEHERO1 (Dan 10/16 9:16 PM: "I wanna be able to see more of the theme though. It's super fucking hidden.")
+   One shared layer for every board over the v5.2 night scene. Pages opt in with <html data-sh="hub|dad|sheet|month|kid|game">.
+   1) Glass: scene-hero.js lowers the fill alpha of each dark card plate (.sh-glass) and this blur + dim of what is behind
+      keeps the words readable (AA) while the scene reads through.  2) Band: on portrait screens an open window of scene
+      sits between the page header and the first card; the scene iframe frames its key strip there (moon, dead tree,
+      graves, fog, porch, jack-o'-lanterns). Headers, the Dad chip/tile and the v5.2 card order are not touched. */
+html.sh-on .sh-glass {
+  -webkit-backdrop-filter: blur(var(--sh-blur, 14px)) saturate(1.2) brightness(var(--sh-dim, .7)) !important;
+  backdrop-filter: blur(var(--sh-blur, 14px)) saturate(1.2) brightness(var(--sh-dim, .7)) !important;
+}
+/* words on a lighter plate get a soft dark under-shadow; any shadow a board already sets wins (zero specificity) */
+:where(html.sh-on .sh-glass) { text-shadow: 0 1px 2px rgba(0, 0, 0, .85), 0 0 12px rgba(0, 0, 0, .55); }
+/* portrait band: the month overlay's living layer (bats) flies in the open band, never behind the cards */
+html.sh-band .km-layer:not(.km-kid) .km-bats { --o: .2; top: var(--sh-by) !important; height: var(--sh-bh) !important; -webkit-mask-image: linear-gradient(#000 60%, transparent); mask-image: linear-gradient(#000 60%, transparent); }
+html.sh-on .sh-band-anchor { transition: none; }
+/* wall / landscape: the column's cards go light (scene-hero.js fill 0.3) with a stronger blur, so the night reads between and behind them */
+html.sh-night:not(.sh-band) .sh-glass { --sh-blur: 16px; --sh-dim: 1.05; }
+html.sh-night:not(.sh-band) .sh-glass.sh-dense { --sh-blur: 18px; --sh-dim: .6; }
+/* the hub column's gold slab glow steps back so the scene reads as one world across the column; on portrait it is dropped
+   (its top edge drew a thin gold bar over the header fade) */
+html.sh-night.sh-hub:not(.sh-band) .panel { box-shadow: inset 0 1px 0 rgba(255, 230, 160, .14), 0 0 40px rgba(255, 170, 30, .16) !important; }
+html.sh-band .panel { box-shadow: none !important; }

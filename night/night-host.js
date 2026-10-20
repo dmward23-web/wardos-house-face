@@ -14,6 +14,9 @@
   var pass = new URLSearchParams();
   ["phase", "weather", "wind", "dir"].forEach(function (k) { if (q.get(k)) pass.set(k, q.get(k)); });
   pass.set("embed", "1");
+  pass.set("v", "SH1"); /* cache-bust scene.html for the band mode */
+  /* SCENEHERO1: pages with a scene-hero hook open the scene in band framing on portrait screens (night/scene-hero.js places the band) */
+  if (document.documentElement.hasAttribute("data-sh") && innerWidth / innerHeight < 0.8 && q.get("hero") !== "0") pass.set("band", "1");
   var fr, btn, on = false, ready = false;
   function post(m) { try { if (fr && fr.contentWindow) fr.contentWindow.postMessage(m, location.origin); } catch (_) {} }
   function setSnd(v, user) {
