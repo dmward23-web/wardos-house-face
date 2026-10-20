@@ -52,6 +52,18 @@ For stills and clips, the data is a snapshot run through wright-scratch/tools/re
 |---|---|---|---|
 | Harris room raven (idle loop) | READY, NOT WIRED | Prism art: /workspace/artifacts/livinghouse/art/raven/ (raven-idle-packed-960x640.mp4 packed alpha like owl-packed, raven-idle-480x640.webm VP9 alpha, raven-idle-poster-480x640.png for reduced motion) | Room art: no Harris room view exists in L1, so it is not on the house. Draw it in the Harris room at 380 to 420 px tall, never at sill size. Copy only the final files into the repo when the room ships, and scan them. |
 
+## Layer 3
+
+| Element | Status | Source |
+|---|---|---|
+| School morning sequence (6:30, Hayes and Harris) | REAL when the calendar feed is loaded | data/cal-live.json timed events for the two boys, through AwayFilter.keepItem, on a weekday that is not a no-school day, from 6:30 until 8:30 (or until the later morning item, never past 10:00). Leave times only from phone2/leaveby.js on the raw event. Away days, switch days that hide kid items, weekends, and no-school days draw no lines. `data-morning` is `on`, `away`, `weekend`, `before`, `after`, `held`, `noschool`, or `missing` |
+| School morning when the calendar feed is missing | MISSING FEED | `data-morning=missing` and `data-morning-feed=missing`. No line, no guessed leave, the moon stays on its ordinary arc. A missing cal-months feed is the normal awake board, not an away day |
+| Long-press text on the moon, sign, Dad chip, windows, candle, cauldron, and stones | REAL | the line is the object's own lawful text (kid lines only while home). Away days: no window, candle, or stone line. Nothing is written |
+| Voice on long-press | MUTED HOOK | text only. `LHLayer3.voice.speak` returns false and speech is not called. Stays muted until the same hook is proven on a Linux Chromium wall and on iOS Safari |
+| Audience mode | REAL, device local | default kid hours. Tap the Audience control for the guest view (Dan-only trips and the Dad sheet link hide; the chip still reads Dad). Long-press that control for Dan-only. Saved in localStorage `lh-audience`. `?audience=kids\|guest\|dan` pins a view for a still and does not choose it from the clock |
+| Rough-day weather | MISSING FEED | empty hook `#lh-rough`, Dan-only, no words |
+| Partner house on the far hill | MISSING FEED | empty hook `#lh-partner`, Dan-only, no name and no place in the page |
+
 ## Alfred L1 fixes (Sat Oct 17)
 - data/cal-live.raw.json is requested only with ?rec=1 (recording snapshots); live pages never ask for it.
 - No away-state feed (cal-months missing): the three windows draw dark, never lit.

@@ -273,3 +273,23 @@ html.lh-phone .lh-dad { box-sizing: border-box; min-height: 44px; padding: 3px 0
 /* Alfred 1702 P3: at 390 the Hayes and Harris tag tap boxes reached 12 px into the Dad plaque box. On the phone the tag is already a 44 x 44 box (borders), so its wider desktop tap halo is off, and Dad sits 16 px lower: 0 px overlap at 390, 440 and 1920. */
 html.lh-phone .lh-kw .name::before { display: none; }
 html.lh-phone .lh-dad { margin-top: 13px; }
+
+/* ---------- layer 3: school morning, long-press text, audience ---------- */
+#lh [data-press] { pointer-events: auto; }
+#lh > .lh-morning { transform: translate(-50%, 0); display: flex; flex-direction: column; align-items: center; gap: calc(6px * var(--k)); pointer-events: none; z-index: 5; }
+.lh-morning .ln { white-space: nowrap; max-width: calc(100vw - 16px); overflow: hidden; text-overflow: ellipsis; box-sizing: border-box;
+  padding: calc(8px * var(--k)) calc(14px * var(--k)); border-radius: calc(8px * var(--k));
+  background: rgba(200, 214, 236, .18); border: 1px solid rgba(235, 242, 255, .38); color: #f4f6fb;
+  font: 600 max(17px, calc(22px * var(--k)))/1.2 "LH Display", sans-serif; text-shadow: 0 1px 2px rgba(0, 0, 0, .7); }
+html.lh-phone .lh-morning { gap: 4px; }
+html.lh-phone .lh-morning .ln { font-size: 16px; padding: 7px 10px; }
+.lh-moon.lh-set { filter: saturate(.8) brightness(.92); }
+#lh > .lh-aud { position: fixed; z-index: 45; right: 16px; top: 16px; left: auto; min-width: 44px; min-height: 44px; padding: 0 12px;
+  border-radius: 8px; border: 1px solid rgba(243, 214, 168, .35); background: rgba(12, 10, 8, .82); color: #f3d6a8;
+  font: 600 14px/1 "LH Display", sans-serif; letter-spacing: .04em; pointer-events: auto; }
+html.lh-phone #lh > .lh-aud { top: 8px; right: 8px; font-size: 13px; }
+#lh > .lh-press { position: fixed; z-index: 70; transform: translate(-50%, -120%); pointer-events: none; max-width: calc(100vw - 24px);
+  padding: 12px 14px; border-radius: 8px; background: rgba(16, 12, 8, .92); color: #f6edd8; border: 1px solid rgba(243, 214, 168, .4);
+  font: 600 16px/1.25 "LH Display", sans-serif; text-align: center; }
+html[data-audience="guest"] .lh-dad-glow { opacity: .55; animation: none; }
+@media (prefers-reduced-motion: reduce) { .lh-moon.lh-set, .lh-morning, .lh-press { transition: none !important; } }

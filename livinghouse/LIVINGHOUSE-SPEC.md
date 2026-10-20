@@ -23,14 +23,14 @@ mirror (Kasa windows, Sensi chimney smoke when heat runs, garage and cam lamp as
 
 ## Layer 3 (plan, then build item by item)
 1. Interactions: every tap target 44px or more; taps open the matching page (name plaque = the kid's room); no tap ever writes data.
-2. Morning sequence: at sunrise the moon sets and the candle lights for the first real item of the day.
+2. Morning sequence (built): at 6:30 on a school morning, only when the two boys are home per away-filter.js, the moon sets and a text line names each boy's leave. The leave time comes only from leaveby.js on a real calendar event. No leave in the raw text means the event's own start, never a guessed leave. Away days, weekends, no-school days, and a missing calendar draw nothing (missing is flagged). The candle still lights only for a real leave-by.
 3. Kid-to-kid notes: device-local only (localStorage / IndexedDB), never sent anywhere, never committed.
 4. Hidden secrets: small friendly finds (a bat behind the chimney), purely decorative.
 5. Dad page view: money and body signs read at runtime from a private source if one exists (never from this public
    repo), otherwise coarse status only ("on track") or an empty hook.
-6. Audience mode: kid hours by default; Dan-only mode by an explicit local toggle, never automatic.
+6. Audience mode (built): kid hours by default. Audience (guest) is an explicit tap and hides Dan-only trips plus the link to Dad's sheet. Dan-only is a long-press on that same control, never chosen from the clock. Rough-day weather and the partner house are empty hooks in Dan-only mode.
 7. Halloween countdown: pumpkins on the steps count down the days to Oct 31.
-8. Voice (Beelink or iPhone): empty hook tonight, flagged in FEEDS.md.
+8. Voice (built as a muted hook): a long-press shows a text line. Speech stays off until the same hook is proven on a Linux Chromium wall and on iOS Safari. Flagged in FEEDS.md.
 
 ## Layer 4 (queued; build after layer 3 if time allows, otherwise spec only tonight)
 1. Learned rhythm. Local heuristics over calendar history (on device, no new service) find Dan's typical leave time per

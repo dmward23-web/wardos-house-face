@@ -75,8 +75,13 @@
       var top = 10; [".night52-snd", ".lh-clocktag"].forEach(function (sel) { var o = document.querySelector(sel); if (o) { var r = o.getBoundingClientRect(); if (r.height) top = Math.max(top, r.bottom + 8); } });
       size = Math.max(96, Math.min(170, bandY - top - 6)); x = VW * (0.22 + 0.56 * t); y = top + size / 2; }
     else { var a = P(320 + 280 * t, 205 - 110 * Math.sin(Math.PI * t)); x = a[0]; y = Math.max(a[1], 135 * K); size = 250 * K;
-      [".night52-snd", ".lh-clocktag"].forEach(function (sel) { var o = document.querySelector(sel); if (!o) return; var r = o.getBoundingClientRect();   /* wall: the moon never sits on the mute button or the CLOCK OVERRIDE tag */
+      [".night52-snd", ".lh-clocktag", ".lh-aud"].forEach(function (sel) { var o = document.querySelector(sel); if (!o) return; var r = o.getBoundingClientRect();   /* wall: the moon never sits on the mute button, the audience control, or the CLOCK OVERRIDE tag */
         if (r.height && x - size / 2 < r.right + 8 && x + size / 2 > r.left - 8) y = Math.max(y, r.bottom + 8 + size / 2); }); }
+    if (de.classList.contains("lh-morning")) { /* school morning: the moon sets, low but still a readable clock */
+      if (phone) y = Math.min(VH - size / 2 - 8, Math.max(y, bandY - size * 0.12));
+      else y = Math.min(VH - size * 0.2, Math.max(y, P(0, 360)[1]));
+      m.classList.add("lh-set");
+    } else m.classList.remove("lh-set");
     m.style.left = x + "px"; m.style.top = y + "px"; m.style.width = m.style.height = size + "px";
     var tt = t12(n).replace(/\s?[AP]M$/, ""), ap = /PM$/.test(t12(n)) ? "PM" : "AM";
     $$("[data-lh=time]").forEach(function (e) { e.textContent = tt; }); $$("[data-lh=date]").forEach(function (e) { e.textContent = fD.format(n).toUpperCase().replace(",", ""); }); $$("[data-lh=ap]").forEach(function (e) { e.textContent = ap; });
@@ -129,7 +134,7 @@
     var di = e.day != null ? e.day : Math.max(0, dayIdx(e.s, n)), day = di === 0 ? "Today" : di === 1 ? "Tomorrow" : fW.format(e.s);
     var d = document.createElement("div"); d.className = "d"; d.textContent = nb(day + " · " + (e.all ? "All day" : t12(e.s).replace(":00", "")));
     var w = document.createElement("div"); w.className = "w"; w.textContent = e.t;
-    el.appendChild(d); el.appendChild(w); if (far) { el.style.setProperty("--b", (0.35 * Math.max(0, di - 1)) + "px"); el.style.setProperty("--br", String(1 - 0.06 * Math.max(0, di - 1))); }
+    el.appendChild(d); el.appendChild(w); el.setAttribute("data-press", "stone"); if (far) { el.style.setProperty("--b", (0.35 * Math.max(0, di - 1)) + "px"); el.style.setProperty("--br", String(1 - 0.06 * Math.max(0, di - 1))); }
     return el;
   }
   function stones(n, ev, ce) { /* LHRules.pickStones: today's remaining items first (all-day stays all day), then the next days fogged by
@@ -186,7 +191,7 @@
     var c = $(".lh-candle"); if (c.hidden) return;
     var cr = c.getBoundingClientRect(), wx = c.querySelector(".wax").getBoundingClientRect(), fl = c.querySelector(".flame").getBoundingClientRect();
     var topNow = Math.min(cr.top, wx.top, fl.height ? fl.top : cr.top), need = 0;
-    [".lh-away .lan", ".lh-cauldron .lab", ".lh-board", ".lh-dad .lh-plaque", "#lh-callout"].forEach(function (sel) { var o = $(sel); if (!o || o.closest("[hidden]")) return; var r = o.getBoundingClientRect();
+    [".lh-away .lan", ".lh-cauldron .lab", ".lh-board", ".lh-dad .lh-plaque", "#lh-callout", "#lh-morning"].forEach(function (sel) { var o = $(sel); if (!o || o.closest("[hidden]")) return; var r = o.getBoundingClientRect();
       if (!r.height || r.right < Math.min(cr.left, wx.left) || r.left > Math.max(cr.right, wx.right)) return; if (r.bottom + 8 > topNow) need = Math.max(need, r.bottom + 8 - topNow); });
     if (need) { c.style.top = (parseFloat(c.style.top) + need) + "px"; cr = c.getBoundingClientRect(); }
     var cb = c.classList.contains("empty") ? cr.bottom : c.querySelector(".slate").getBoundingClientRect().bottom, stones = $$("#lh-near .lh-stone"), shift = 0;
@@ -229,7 +234,9 @@
     return best;
   }
   function callout(n, cu) { /* Prism P1: plain glass hanging straight from the kid's plaque, centred on that plaque, below every plaque */
-    var g = $("#lh-callout"), k = calloutKid(n, cu), line = k ? kidLine(k, n, cu) : ""; if (!line) { g.hidden = true; return; }
+    var g = $("#lh-callout");
+    if (de.classList.contains("lh-morning") && !$("#lh-morning").hidden) { g.hidden = true; return; }
+    var k = calloutKid(n, cu), line = k ? kidLine(k, n, cu) : ""; if (!line) { g.hidden = true; return; }
     g.hidden = false; $("[data-lh=c-line]").textContent = nb(line);
     var pr = $(".lh-kw .name[data-kid=" + k + "]").getBoundingClientRect(), low = 0;
     $$(".lh-kw .name").forEach(function (e) { low = Math.max(low, e.getBoundingClientRect().bottom); });
@@ -301,14 +308,126 @@
     $(".lh-camlamp").hidden = !cam;            /* eave lamp only if a camera reports live; garage door state is a MISSING FEED hook */
     de.setAttribute("data-mirror", "heat=" + heat + " cam=" + !!cam + " harris=" + lightOn("harris-room"));
   }
+  /* ---------- layer 3: audience, school morning, long-press text (voice stays muted) ---------- */
+  function L3() { return window.LHLayer3 || null; }
+  function aud() {
+    var L = L3(); if (!L) return "kids";
+    var stored = ""; try { stored = localStorage.getItem("lh-audience") || ""; } catch (e) {}
+    return L.audienceFrom(q.get("audience"), stored);
+  }
+  function applyAudience() {
+    var mode = aud(), L = L3(), a = $(".lh-dad"), btn = $("#lh-audience"), hooks = $("#lh-danhooks");
+    de.setAttribute("data-audience", mode);
+    if (btn && L) btn.textContent = L.audienceLabel(mode);
+    if (a) {
+      var plaque = a.querySelector(".lh-plaque"); if (plaque) plaque.textContent = "Dad";
+      if (mode === "guest") { a.removeAttribute("href"); a.setAttribute("aria-disabled", "true"); }
+      else { a.setAttribute("href", "../sheet-dan.html"); a.removeAttribute("aria-disabled"); }
+    }
+    if (hooks) hooks.hidden = mode !== "dan";
+  }
+  function morningOf(n, cu) {
+    var L = L3(); if (!L) return { active: false, why: "missing", feed: "missing", lines: [], moonSet: false };
+    var A = AF();
+    return L.schoolMorning({
+      nowMs: n.getTime(), away: !!cu.away, cal: D.cal, raws: (D.raw && D.raw.upcomingLeaves) || null,
+      keepItem: function (ev, t) { return !A || A.keepItem(ev, t); },
+      find: window.LeaveBy ? LeaveBy.find : null,
+      rules: window.LHRules,
+      allow: function (ev) { var s = String(ev.summary || ""); return !dress(s) && !NOTITEM.test(s) && !LHRules.money(s) && !LHRules.otherPerson(s) && !LHRules.stateText(s); },
+      show: function (s) { return face(window.LHRules ? LHRules.glassTitle(clean(s)) : clean(s)); }
+    });
+  }
+  function renderMorning(res) {
+    var box = $("#lh-morning"); if (!box) return;
+    box.innerHTML = "";
+    var lines = (res && res.active && res.lines) || [];
+    box.hidden = !lines.length;
+    lines.forEach(function (ln) { var d = document.createElement("div"); d.className = "ln"; d.textContent = ln.text; box.appendChild(d); });
+    if (box.hidden) return;
+    var hy = $(".lh-kw[data-kid=hayes] .name"), hr = $(".lh-kw[data-kid=harris] .name");
+    if (!hy || !hr) return;
+    var a = hy.getBoundingClientRect(), b = hr.getBoundingClientRect();
+    var top = Math.max(a.bottom, b.bottom) + (phone ? 8 : 12 * K);
+    box.style.left = ((a.left + a.width / 2 + b.left + b.width / 2) / 2) + "px";
+    box.style.top = top + "px";
+  }
+  var PRESS = {};
+  function refreshPress(n, cu, res) {
+    var L = L3(); PRESS = {}; if (!L) return;
+    var base = { away: !!cu.away, audience: aud() };
+    PRESS.moon = L.pressCopy("moon", base); PRESS.sign = L.pressCopy("sign", base); PRESS.dad = L.pressCopy("dad", base);
+    var sub = $("[data-lh=chores-sub]") ? $("[data-lh=chores-sub]").textContent : "";
+    PRESS.cauldron = L.pressCopy("cauldron", { away: base.away, audience: base.audience, line: sub ? "Chores · " + sub : "Chores" });
+    var cv = $("[data-lh=cand-v]") ? $("[data-lh=cand-v]").textContent : "", ck = $("[data-lh=cand-k]") ? $("[data-lh=cand-k]").textContent : "";
+    var candleLine = [cv, ck].filter(Boolean).join(" · ");
+    PRESS.candle = L.pressCopy("candle", { away: base.away, audience: base.audience, danOnly: L.danOnlyText(ck) || L.danOnlyText(candleLine), line: candleLine });
+    ["ainsley", "hayes", "harris"].forEach(function (k) {
+      var ml = (res.lines || []).filter(function (x) { return x.kid === k; })[0];
+      var line = base.away ? "" : (ml ? ml.text : kidLine(k, n, cu));
+      PRESS["window:" + k] = L.pressCopy("window", { away: base.away, audience: base.audience, line: line });
+    });
+  }
   function paint() {
     if (!VW) return; var n = now(), cu = homeState(n);
-    moon(n); windows(n, cu); var ev = events(n, cu), ce = candleEvent(ev, n); stones(n, ev, ce); candle(n, ce); signFit(); callout(n, cu); fitPhone(); cauldron(n, cu); weatherFog(); leaves();
+    applyAudience();
+    var morn = morningOf(n, cu);
+    de.classList.toggle("lh-morning", !!morn.active);
+    de.setAttribute("data-morning", morn.why || "off");
+    de.setAttribute("data-morning-feed", morn.feed || "missing");
+    moon(n); windows(n, cu); var ev = events(n, cu);
+    if (aud() === "guest" && L3()) ev = ev.filter(function (e) { return !L3().danOnlyText(e.t) && !L3().danOnlyText(e.raw); });
+    var ce = candleEvent(ev, n); stones(n, ev, ce); candle(n, ce); signFit(); renderMorning(morn); callout(n, cu); fitPhone(); cauldron(n, cu); weatherFog(); leaves();
     de.classList.toggle("lh-state-away", cu.away); de.classList.toggle("lh-state-home", !cu.away);
-    creatures(n, cu); season(n); mirror();
+    creatures(n, cu); season(n); mirror(); refreshPress(n, cu, morn);
     var pv = $("#lh-preview"); pv.hidden = !cu.preview; if (cu.preview) pv.textContent = "PREVIEW · sample look · not live data";
   }
-  function go() { layout(); load(); var f = frame(); if (f) f.addEventListener("load", function () { layout(); setTimeout(weatherFog, 3000); }); }
+  function pressTarget(node) {
+    while (node && node !== document) {
+      if (node.getAttribute && node.getAttribute("data-press") && node.id !== "lh-audience") return node;
+      node = node.parentNode;
+    }
+    return null;
+  }
+  var pressTimer = 0, pressArm = 0, pressX = 0, pressY = 0;
+  function hidePress() { var p = $("#lh-press"); if (p) p.hidden = true; }
+  function showPress(el) {
+    var L = L3(), p = $("#lh-press"); if (!L || !p) return;
+    var key = el.getAttribute("data-press"), kid = el.getAttribute("data-kid") || "";
+    var text = key === "stone"
+      ? L.pressCopy("stone", { away: de.classList.contains("lh-state-away"), audience: aud(), danOnly: L.danOnlyText(el.textContent || ""), line: (el.innerText || "").replace(/\s*\n\s*/g, " · ").trim() })
+      : (PRESS[key === "window" ? "window:" + kid : key] || "");
+    p.setAttribute("data-voice", "muted");
+    p.setAttribute("data-spoken", L.voice.speak(text) ? "1" : "0");
+    if (!text) { p.hidden = true; p.textContent = ""; return; }
+    p.textContent = text; p.hidden = false;
+    var r = el.getBoundingClientRect(), cx = Math.max(70, Math.min(VW - 70, r.left + r.width / 2));
+    p.style.left = cx + "px"; p.style.top = Math.max(48, r.top) + "px";
+  }
+  function bindPress() {
+    addEventListener("pointerdown", function (e) {
+      if (e.target && e.target.closest && e.target.closest("#lh-audience")) return;
+      var el = pressTarget(e.target); clearTimeout(pressTimer); pressArm = 0; if (!el) return;
+      pressX = e.clientX; pressY = e.clientY;
+      pressTimer = setTimeout(function () { pressArm = 1; showPress(el); }, 520);
+    });
+    addEventListener("pointermove", function (e) { if (pressTimer && (Math.abs(e.clientX - pressX) > 12 || Math.abs(e.clientY - pressY) > 12)) { clearTimeout(pressTimer); pressTimer = 0; } });
+    addEventListener("pointerup", function () { clearTimeout(pressTimer); pressTimer = 0; });
+    addEventListener("pointercancel", function () { clearTimeout(pressTimer); pressTimer = 0; hidePress(); pressArm = 0; });
+    addEventListener("click", function (e) { if (!pressArm) return; e.preventDefault(); e.stopPropagation(); pressArm = 0; }, true);
+    var btn = $("#lh-audience"), hold = 0, held = false;
+    if (!btn) return;
+    btn.addEventListener("pointerdown", function (e) { held = false; clearTimeout(hold); hold = setTimeout(function () { held = true; rememberAudience("hold"); }, 520); e.preventDefault(); });
+    btn.addEventListener("pointerup", function () { clearTimeout(hold); if (!held) rememberAudience("tap"); });
+    btn.addEventListener("pointerleave", function () { clearTimeout(hold); });
+  }
+  function rememberAudience(gesture) {
+    var L = L3(); if (!L) return;
+    var next = L.cycleAudience(aud(), gesture);
+    try { localStorage.setItem("lh-audience", next); } catch (e) {}
+    paint();
+  }
+  function go() { bindPress(); layout(); load(); var f = frame(); if (f) f.addEventListener("load", function () { layout(); setTimeout(weatherFog, 3000); }); }
   addEventListener("resize", layout);
   setInterval(function () { paint(); }, 20000); setInterval(load, 5 * 6e4); setInterval(function () { moon(now()); }, 1000);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(go, 50); }); else setTimeout(go, 50);
