@@ -4,11 +4,12 @@
 <title>The Ward's · Living House</title>
 <link rel="stylesheet" href="../night/night-host.css?v=SH1" />
 <link rel="stylesheet" href="../month-theme/month-overlay.css?v=MONTHFX2" />
-<link rel="stylesheet" href="lh.css?v=LHV1" />
+<link rel="stylesheet" href="lh.css?v=L4A" />
 </head>
 <body>
 <!-- LIVING HOUSE · the night scene IS the interface. Every element below is placed on the house plate by lh.js and is
-     filled only from a real feed (see /workspace/artifacts/livinghouse/FEEDS.md); no feed = nothing drawn. -->
+     filled only from a real feed (see FEEDS.md); no feed = nothing drawn. -->
+<video id="lh-cinema" class="lh-cinema" poster="../night/media/poster/loop-night-rain-calm-wall.webp" muted loop playsinline preload="none" hidden aria-hidden="true" onerror="this.dataset.dead=1;this.removeAttribute('src');this.load()"></video>
 <div id="lh" aria-label="The Ward's house">
   <div class="lh-veil" data-at="259,92" aria-hidden="true"></div>
   <svg class="lh-moon" id="lh-moon" viewBox="-120 -120 240 240" role="img" aria-label="Moon clock">
@@ -52,7 +53,16 @@
   <div class="lh-callout" id="lh-callout" hidden><i class="thread" aria-hidden="true"></i><span data-lh="c-line"></span></div><!-- Prism P1: no cartoon ghost; the kid's next item hangs from their name plaque as plain glass -->
   <div class="lh-leaves" id="lh-leaves" aria-hidden="true"></div>
   <div class="lh-cool" aria-hidden="true"></div>
+  <div class="lh-streetglow" aria-hidden="true"></div>
   <div class="lh-pglow" id="lh-pglow" aria-hidden="true"></div>
+  <div class="lh-count" id="lh-count" data-at="800,560" data-days="0" hidden><span class="n" data-lh="count"></span><span class="pumpkins" aria-hidden="true"></span></div>
+  <div class="lh-plate" id="lh-plate" hidden data-feed="missing"><span data-lh="plate"></span></div>
+  <button type="button" id="lh-crypt-door" class="lh-crypt-door" data-at="250,530" data-at-ph="70,620" aria-label="Crypt">Crypt</button>
+  <div id="lh-crypt" class="lh-crypt" hidden>
+    <button type="button" id="lh-crypt-close" aria-label="Close crypt">Close</button>
+    <div id="lh-jars"></div>
+    <div class="lh-crypt-photo" data-feed="missing" data-why="photo index not approved"><span>No photo feed yet</span></div>
+  </div>
   <div class="lh-smoke" data-at="1010,0" hidden aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="lh-camlamp" data-at="1236,150" hidden aria-hidden="true"></div>
   <div class="lh-yard" id="lh-yard" aria-hidden="true"></div>
@@ -68,5 +78,9 @@
 <script src="../house-face-law.js?v=PRIVFEED3" defer></script>
 <script src="../phone2/leaveby.js?v=PHONE2" defer></script>
 <script src="lh-rules.js?v=LH4" defer></script>
-<script src="lh.js?v=LHV1" defer></script>
+<script src="scene-packs.js?v=L4A" defer></script>
+<script src="cinema.js?v=L4A" defer></script>
+<script src="crypt.js?v=L4A" defer></script>
+<script src="rhythm.js?v=L4A" defer></script>
+<script src="lh.js?v=L4A" defer></script>
 </body></html>

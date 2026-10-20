@@ -47,6 +47,20 @@ For stills and clips, the data is a snapshot run through wright-scratch/tools/re
 | Eave camera lamp | REAL feed, currently off | nest-live.json: drawn only if a camera reports `online: true` or a snapshot/stream URL (tonight all null, so none) |
 | Garage door open / shut | MISSING FEED | no garage door state anywhere |
 
+## Layer 4 (crypt, idle cinema, rhythm, season gates)
+
+| Element | Status | Source |
+|---|---|---|
+| Season pack | REAL clock | `scene-packs.js` `forDate(LHClock.now())`. October night is the plate already on the page. No feed is invented |
+| Halloween count | date | On from Oct 24 through Oct 30. The number is days until Oct 31. Off on Oct 23 and earlier. CSS pumpkins, no photo |
+| Oct 31 street mode | date | `data-season=october-street` plus the Halloween glow on the October night plate. Separate street art is MISSING (`data-street-art=missing`); the mode does not draw a fake street |
+| November harvest plate | MISSING ASSET | Nov 1 through Nov 30. Empty plate, `data-feed=missing`, `data-why=no november harvest art`. No harvest picture is drawn |
+| December snow plate | MISSING ASSET | Dec 1 through Dec 31. Empty plate, `data-feed=missing`, `data-why=no december snow art`. No snow picture is drawn |
+| Crypt moments | REAL when the calendar feed is live | `cal-live.json` `upcomingLeaves[]` after the same face, money, dress-up, and away filters as the stones. Jars by month. No month archive feed: only what that list already holds. Offline or empty: "No moments yet", `data-feed=missing` or `empty` |
+| Crypt photo slot | MISSING FEED | Empty hook. `data-feed=missing`, `data-why=photo index not approved`. No photo index, Drive, gallery, or snapshot is read. Nothing is committed |
+| Idle cinema | REAL gate, video MISSING on Pages | After 60s untouched, a slow drift. Any pointer or key stops it. Reduced motion never starts it. A loop plays only when `night/media/caps.json` has `video: true` (the proxy). The names are `loop-night-rain-calm-wall.mp4` and `loop-night-rain-calm-phone.mp4` (on `allow.json`). Pages (`video: false`) keeps the poster and makes no mp4 request. No video file is in git |
+| Learned rhythm | COLLECT ONLY, device local | `localStorage` key `lh-rhythm-v1`: weekday and minute of a real leave-by, nothing else. `decide()` never lights a path and never draws a cloud. No new service |
+
 ## Room art ready for the rooms builder (not wired in L1)
 | Piece | Status | Where | Notes |
 |---|---|---|---|

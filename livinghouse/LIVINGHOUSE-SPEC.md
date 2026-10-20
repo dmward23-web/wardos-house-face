@@ -53,3 +53,8 @@ mirror (Kasa windows, Sensi chimney smoke when heat runs, garage and cam lamp as
 6. Season arc, date-driven: October night, then November harvest, then December snow village.
 7. Idle cinema: after 60 s untouched, a slow camera drift around the house that stops instantly on any touch;
    off under reduced motion.
+
+Shipped on this branch (collect and gates only): the crypt shows calendar moments and an empty photo hook,
+idle cinema drifts (a video only when caps.json says the proxy has loops), rhythm logs weekday and minute on the
+device and never acts, and the season pack follows the clock (count from Oct 24, street mode on Oct 31, empty
+November and December plates until art exists). Rooms, the far hill, and Dan-only clouds are not in this track.
