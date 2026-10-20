@@ -23,7 +23,7 @@ For stills and clips, the data is a snapshot run through wright-scratch/tools/re
 | Tombstones: today first (all-day items stay all day, timed items until they end), then the next days fogged by days out (the stone fades, the words keep full contrast), max 4 (wall) / 3 (phone) | REAL | data/cal-live.json `upcomingLeaves[]` via LHRules.pickStones; the candle's own item is not repeated; all-day birthdays stay off |
 | Weather: rain, snow, wind | REAL | the scene's own live feed (night/scene.html `WX`, Open-Meteo). Nothing drawn if that feed isn't live |
 | Cold thickens the fog | REAL when the scene weather is live | `__env().cur.temp` (°C). If the feed isn't live, the fog stays at its base and no weather is claimed |
-| Cauldron (chores): fill = daily musts done today / due today, all three kids; rests on away days | REAL when readable | hub tap store (TAPSYNC1, GET /api/taps on the house hub with the device's hub key, read only) over kids-week.json `kids.*.quests[]` cadence daily, LHRules.choreFill. No hub key on the device or no answer: an EMPTY pot labelled "No chore feed yet" (data-feed=missing, data-why) and no demo data |
+| Cauldron (chores): fill = daily musts done today / due today, all three kids; the pot rests on away days (no word, no fill) | REAL when readable | hub tap store (TAPSYNC1, GET /api/taps on the house hub with the device's hub key, read only) over kids-week.json `kids.*.quests[]` cadence daily, LHRules.choreFill. The level is the liquid only: no count, dollars, or shame. No hub key on the device or no answer: an EMPTY pot labelled "No chore feed yet" (data-feed=missing, data-why) and no stand-in data. Cleartext hub URLs are accepted only for a loopback origin (local proxy); any other hub must be https. |
 | "The Ward's" porch sign | static | |
 | Dad lantern (the porch lamp), links to sheet-dan.html | static link | |
 | Porch lantern (art body + fire loop), no words: no countdown, no state wording (Alfred). Dad has no coarse status feed yet, so it carries nothing | REAL | the away state from cal-months (AwayFilter.isAwayAt) decides only whether the lantern burns; aria-label "Porch lantern" |
@@ -33,19 +33,19 @@ For stills and clips, the data is a snapshot run through wright-scratch/tools/re
 
 | Element | Status | Source |
 |---|---|---|
-| Windowsill creatures (owl Ainsley, cat Hayes, raven Harris) | MISSING ASSET | the logic is wired (home state only; pace inside 60 min) but nothing renders until photoreal perched loops exist; no invented art (Prism P1-3) |
-| Away-state look | REAL | away: cooler moonlit wash, dark kid windows, no creatures, the porch lantern (art body + fire loop) with no words under it; home state: warm |
-| Fog priority | REAL | stone fog by days out (cal-live.json); text keeps contrast |
+| Windowsill creatures (owl Ainsley, cat Hayes, raven Harris) | MECHANIC REAL, ART MISSING | home state only. Perch when clear, pace when one of their timed items starts within 60 min (`LHRules.creaturePose`), absent while away. Photoreal loops `livinghouse/art/sill-owl.webp`, `sill-cat.webp`, `sill-raven.webp` are not in the repo, so each perch renders empty with `data-art=missing` and `data-why="no perched loop"`. No invented art (Prism P1-3). A loop that appears later shows on load; a broken file stays empty. |
+| Away-state look | REAL | lighting only, from `away-filter.js` `isAwayAt` (cal-months `withDan`, `changeMin` from the feed). Away: cooler moonlit wash, dark kid windows, no creatures, porch lantern (art body + fire loop) with no words and no countdown. Home: warm. A missing cal-months feed is the normal awake board, never an away day. |
+| Fog priority | REAL | `LHRules.fogPriority`: today and tomorrow stay sharp (rank 0 and 1); from two days out `--fo` is `0.16 * (days out - 1)`, capped at 0.5. Each stone carries `data-priority`. Text keeps contrast. `data-fog-priority` on the page is the soonest stone, or `none`. |
 | Season arc: leaves | date | October only |
 | Season arc: moon phase | REAL | computed |
 | Season arc: Halloween glow | date | Oct 31 (or `?halloween=preview`, labelled PREVIEW) |
-| Weekly yard element | MISSING FEED | hook `yard()`, needs a shared chore history |
-| Memory yard (an item per day of chores done) | MISSING FEED | same hook; chores are device localStorage only |
-| Harris's window | REAL | lights-live.json harris-room |
+| Weekly yard element | MISSING FEED | hook `#lh-yard-week`, `data-feed=missing`, `data-why="no shared chore history"`. Nothing drawn. |
+| Memory yard (an item per night of chores done) | DEVICE LOCAL | `localStorage` key `lh-yard-nights` only, never git. `LHRules.memoryNight` writes at or after 21:00 CT when the hub fill is real and the day is not away: `1` if any daily must was done, `0` if none. The yard shows up to 7 pebbles (newest nights with chores done) and keeps 21 nights on the device. No counts, names, or notes. Away days are not recorded and the yard draws nothing while away. No hub fill: nothing new is written. |
+| Harris's window | REAL | lights-live.json `lights[id=harris-room].on` when that feed is live |
 | Kitchen and dining lights | REAL feed, no spot | those rooms aren't visible windows on the plate; mapped in Layer 4 (rooms as doors) |
-| Chimney smoke | REAL | sensi-live.json `thermostat`: drawn only while ambient < heatSetpoint in Heat/Auto (tonight 65 vs 55, so none) |
-| Eave camera lamp | REAL feed, currently off | nest-live.json: drawn only if a camera reports `online: true` or a snapshot/stream URL (tonight all null, so none) |
-| Garage door open / shut | MISSING FEED | no garage door state anywhere |
+| Chimney smoke | MISSING FEED | hook `.lh-smoke`, `data-feed=missing`, `data-why="no chimney smoke feed"`. Nothing drawn. Thermostat heat is not a smoke feed, so `sensi-live.json` is not used to invent a wisp. |
+| Eave camera lamp | REAL | nest-live.json: drawn only while that feed is live and a camera reports `online: true` or a snapshot/stream URL. Otherwise the lamp stays off. |
+| Garage door open / shut | MISSING FEED | hook `#lh-garage`, `data-feed=missing`, `data-why="no garage door state"`. Nothing drawn. |
 
 ## Room art ready for the rooms builder (not wired in L1)
 | Piece | Status | Where | Notes |
@@ -54,7 +54,7 @@ For stills and clips, the data is a snapshot run through wright-scratch/tools/re
 
 ## Alfred L1 fixes (Sat Oct 17)
 - data/cal-live.raw.json is requested only with ?rec=1 (recording snapshots); live pages never ask for it.
-- No away-state feed (cal-months missing): the three windows draw dark, never lit.
+- No away-state feed (cal-months missing, empty, or junk): the normal awake board, never an away day. Windows follow home rules (lit, or glow only when a live lamp feed says on).
 - Bracketed tags ("[AB Tag]") are stripped from glass titles; private first names are stripped by SHA-256 match only (no names in git).
 - An item naming a kid's first name with another surname belongs to someone else: off the windows, the candle and the stones.
 

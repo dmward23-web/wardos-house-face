@@ -274,6 +274,71 @@
      never reads as our kid (used by away-filter.js isKidText). */
   function stripNamesakes(s) { return String(s || "").replace(/\b(ainsley|hayes|harris)\s+([A-Za-z]+)\b/gi, function (m, a, b) { return isPrivateName(b) ? "" : m; }); }
   function otherPerson(text) { var t = String(text || ""); return /\b(ainsley|hayes|harris)\b/i.test(t) && !kidName("ainsley", t) && !kidName("hayes", t) && !kidName("harris", t); }
-  var api = { orphan: orphan, schoolFull: schoolFull, setSchools: setSchools, schoolTokens: schoolTokens, isSchoolText: isSchoolText, stripSchool: stripSchool, stripNamesakes: stripNamesakes, setPrivateNames: setPrivateNames, stripPrivate: stripPrivate, otherPerson: otherPerson, feedState: feedState, feedTime: feedTime, candlePick: candlePick, plaqueState: plaqueState, stateText: stateText, money: money, seats: seats, residue: residue, seatsResidue: seatsResidue, feedsAllowed: feedsAllowed, kidName: kidName, choreFill: choreFill, glassTitle: glassTitle, placeShort: placeShort, dayDiff: dayDiff, pickStones: pickStones, candle: candle, t12: t12 };
+  /* hubBase(url): the house hub origin for GET /api/taps. https hubs stay as published. Cleartext is only a loopback
+     origin with no path and no userinfo, so a local test proxy can answer and a LAN address cannot. */
+  function hubBase(url) {
+    var u = String(url || "").trim().replace(/\/$/, "");
+    if (!u || /@/.test(u)) return "";
+    if (/^https:\/\/[^/?#]+$/i.test(u)) return u;
+    if (/^http:\/\/(?:127\.0\.0\.1|localhost|\[::1\])(?::\d+)?$/i.test(u)) return u;
+    return "";
+  }
+  /* fogPriority(day): how far a stone sits, as fog. Today and tomorrow stay sharp (highest priority). From two days
+     out the stone fogs, deeper each day, capped. rank is days out. No words, no score. */
+  function fogPriority(day) {
+    var d = typeof day === "number" && isFinite(day) ? Math.max(0, Math.floor(day)) : 0;
+    if (d <= 1) return { fog: false, fo: 0, rank: d };
+    return { fog: true, fo: Math.min(0.5, 0.16 * (d - 1)), rank: d };
+  }
+  /* creaturePose(o): windowsill mechanic. Absent while away. Pace when one of their timed items starts within 60 min,
+     unless reduced motion is on. Otherwise perch. Art is a separate flag; a missing loop still has a pose. */
+  function creaturePose(o) {
+    o = o || {};
+    if (o.away) return "absent";
+    if (o.soon && !o.reduced) return "pace";
+    return "perch";
+  }
+  /* mirrorRead(o): real-house mirror. Harris's lamp and the eave camera come only from a live lights or nest feed.
+     Garage state and chimney smoke have no feed: both stay missing hooks. A thermostat is not smoke, so sensi is ignored. */
+  function mirrorRead(o) {
+    o = o || {};
+    var harris = null;
+    if (o.lightsLive && o.lights && Array.isArray(o.lights.lights)) {
+      var row = null;
+      o.lights.lights.forEach(function (x) { if (x && x.id === "harris-room") row = x; });
+      harris = row ? !!(row.on && row.online !== false) : null;
+    }
+    var cam = false;
+    if (o.nestLive && o.nest && Array.isArray(o.nest.cameras)) {
+      cam = o.nest.cameras.some(function (c) { return !!(c && (c.online === true || c.snapshotUrl || c.streamUrl)); });
+    }
+    return {
+      harris: harris,
+      cam: cam,
+      garage: { feed: "missing", why: "no garage door state" },
+      smoke: { feed: "missing", why: "no chimney smoke feed" }
+    };
+  }
+  /* Nightly memory yard. Device storage only (the page writes localStorage; this function never touches a disk).
+     A night at or after MEMORY_HOUR (21:00 CT) with a real chore fill, and not an away day, records 1 when any daily
+     must was done and 0 when none were. Counts are not returned for display. Up to 21 nights are kept. The yard shows
+     the newest SHOW_NIGHTS nights that had chores done, as items with no numbers. */
+  var MEMORY_HOUR = 21, YARD_KEEP = 21, SHOW_NIGHTS = 7, DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+  function memoryNight(store, o) {
+    o = o || {};
+    var days = {}, src = store && store.days && typeof store.days === "object" && !Array.isArray(store.days) ? store.days : {};
+    Object.keys(src).forEach(function (k) { if (DAY_RE.test(k) && (src[k] === 0 || src[k] === 1)) days[k] = src[k]; });
+    var wrote = false, day = String(o.day || ""), hour = typeof o.hour === "number" && isFinite(o.hour) ? o.hour : -1;
+    var fill = o.fill;
+    if (DAY_RE.test(day) && !o.away && hour >= MEMORY_HOUR && fill && typeof fill.total === "number" && fill.total > 0) {
+      var mark = fill.done > 0 ? 1 : 0;
+      if (days[day] !== mark) { days[day] = mark; wrote = true; }
+    }
+    var keys = Object.keys(days).sort();
+    while (keys.length > YARD_KEEP) { delete days[keys.shift()]; wrote = true; }
+    var doneDays = Object.keys(days).filter(function (k) { return days[k] === 1; }).sort();
+    return { store: { days: days }, wrote: wrote, items: doneDays.slice(-SHOW_NIGHTS) };
+  }
+  var api = { orphan: orphan, schoolFull: schoolFull, setSchools: setSchools, schoolTokens: schoolTokens, isSchoolText: isSchoolText, stripSchool: stripSchool, stripNamesakes: stripNamesakes, setPrivateNames: setPrivateNames, stripPrivate: stripPrivate, otherPerson: otherPerson, feedState: feedState, feedTime: feedTime, candlePick: candlePick, plaqueState: plaqueState, stateText: stateText, money: money, seats: seats, residue: residue, seatsResidue: seatsResidue, feedsAllowed: feedsAllowed, kidName: kidName, choreFill: choreFill, glassTitle: glassTitle, placeShort: placeShort, dayDiff: dayDiff, pickStones: pickStones, candle: candle, t12: t12, hubBase: hubBase, fogPriority: fogPriority, creaturePose: creaturePose, mirrorRead: mirrorRead, memoryNight: memoryNight, MEMORY_HOUR: MEMORY_HOUR, SHOW_NIGHTS: SHOW_NIGHTS };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else root.LHRules = api;
 })(typeof window !== "undefined" ? window : this);

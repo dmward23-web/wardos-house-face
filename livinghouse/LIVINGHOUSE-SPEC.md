@@ -15,11 +15,8 @@ stones for days 2 to 6 in deeper fog · scene weather (rain renders rain, cold t
 simmers low) · "The Ward's" porch sign · Dad lantern linking to sheet-dan.html · porch lantern in the away state with no words (no state or countdown wording, Atlas + Alfred law).
 Debug: `?now=<iso>` pins the clock for stills (it ticks from there; `?freeze=1` or `?rec=1` holds it), `?state=home` renders a labelled PREVIEW of the home-state look.
 
-## Layer 2 (next)
-Memory yard (missing chore feed, empty hook) · windowsill creatures (owl Ainsley, cat Hayes, raven Harris; perch when
-clear, pace inside 60 min; absent in the away state) · away-state look (lit and alive in the home state, quiet and moonlit when away) ·
-fog priority · season arc hooks (leaves, real moon phase, weekly yard element, Halloween mode on Oct 31) · real-house
-mirror (Kasa windows, Sensi chimney smoke when heat runs, garage and cam lamp as empty hooks unless a feed exists).
+## Layer 2
+Memory yard: one device-local pebble per night a daily must was done (localStorage, never git; no counts). The weekly shared yard stays an empty hook. Windowsill creatures (owl Ainsley, cat Hayes, raven Harris) perch when clear and pace inside 60 min; they are absent in the away state. Sill art is not in the repo, so a missing loop renders empty and flagged, never invented. Away state is house lighting only (away-filter.js): quiet and moonlit when away, warm when home, no words and no countdown. Fog is the priority signal (near stones sharp, later stones deeper). Season arc: October leaves, real moon phase, Halloween glow on Oct 31. Real-house mirror: Harris's lamp and the eave camera lamp from the live lights and nest feeds. Garage door and chimney smoke are empty flagged hooks (a thermostat is not smoke).
 
 ## Layer 3 (plan, then build item by item)
 1. Interactions: every tap target 44px or more; taps open the matching page (name plaque = the kid's room); no tap ever writes data.

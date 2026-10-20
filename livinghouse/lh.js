@@ -95,7 +95,6 @@
   var STATE = q.get("state"); /* ?state=home: labelled PREVIEW of the home-state look, never live */
   /* Away state (Atlas ruling): the per-day flag in data/cal-months.json days[YYYY-MM-DD]. On a change day it flips at the hour
      away-filter.js keeps. Nothing about it is ever shown: no time, no day, no count, no event. */
-  function wd(d) { var x = D.months && D.months.days && D.months.days[key(d)]; return x ? x.withDan : null; }
   var AF = function () { return window.AwayFilter && window.AwayFilter.hasMonths() ? window.AwayFilter : null; };
   function homeState(n) { /* AWAYLAW1 (away-filter.js): the cal-months day flag. Drives the law filters only, never any words. */
     if (STATE === "home") return { away: false, preview: true };
@@ -121,6 +120,7 @@
         if (/\bpick-?up\b|\bdrop-?off\b|\bexchange\b/i.test(t) || LHRules.stateText(t)) return false;   /* Atlas law: no away-state words, no computed replacement */              /* a pickup is never an item */                                             /* no LKMS legs for Ainsley */
         if (KID.test(t) && LHRules.money(t)) return false;   /* Alfred P2: no dollar figure on a kid row */
         var A = AF(); if (A && !A.keepItem({ summary: t, start: e.start0, allDay: e.all }, n.getTime())) return false; /* AWAYLAW1: no kid time or logistics on away time */
+        if (cu && cu.away && KID.test(t)) return false; /* the whole away state drops kid rows, including ones that fall on a later home day */
         return true; })
       .map(function (e) { e.t = window.LHRules ? LHRules.glassTitle(clean(e.raw)) : short(e.raw); e.t = face(e.t); return e; }).filter(function (e) { return e.t && !LHRules.stateText(e.t); })   /* Atlas law: no AwayFilter.glass rewording; away-state rows drop whole */.sort(function (a, b) { return (a.s - b.s) || (b.all - a.all); });
   }
@@ -136,7 +136,7 @@
      days out; the candle's own item is not repeated; birthdays off. Max 4 wall, 3 phone, no overlap. */
     var list = LHRules.pickStones(ev, n.getTime(), { max: phone ? 3 : 4, skipId: ce && ce.ev && ce.ev.id });
     var N = $("#lh-near"), F = $("#lh-far"); N.innerHTML = ""; F.innerHTML = "";
-    function fog(el, e) { var d = e.day; if (d > 1) { el.classList.add("fog"); el.style.setProperty("--fo", String(Math.min(0.5, 0.16 * (d - 1)))); } } /* the stone fades into fog; its text keeps full contrast */
+    function fog(el, e) { var fp = LHRules.fogPriority(e.day); el.setAttribute("data-priority", String(fp.rank)); if (fp.fog) { el.classList.add("fog"); el.style.setProperty("--fo", String(fp.fo)); } } /* fog is the priority signal: nearer stones stay sharp, later stones sink; the words keep full contrast */
     if (phone) {
       var Z = bandY + 640 * S, sh = Math.min(140, (VH - Z - 160) / 2 - 10), sw = Math.min(196, VW * 0.44), rows = [Z + 160 + sh, Z + 175 + 2 * sh];
       N.style.setProperty("--sw", sw + "px"); N.style.setProperty("--sh", sh + "px"); N.style.setProperty("--fd", "11px"); N.style.setProperty("--fw", "17px");
@@ -147,6 +147,8 @@
     }
     de.classList.toggle("lh-no-stones", !list.length);
     de.setAttribute("data-stones", list.map(function (e) { return e.day + ":" + (e.all ? "all" : "t"); }).join(","));
+    var soonest = list.reduce(function (m, e) { return e.day < m ? e.day : m; }, 99);
+    de.setAttribute("data-fog-priority", list.length ? String(soonest) : "none");
   }
   var hooted = false;
   function rawOf(id) { return ((D.raw && D.raw.upcomingLeaves) || []).filter(function (r) { return r.id === id; })[0] || null; }
@@ -246,7 +248,7 @@
      Away days the pot rests. No hub key on this device, or no answer = an honest EMPTY pot, flagged (no demo data). */
   var TOKEN_LS = "wardos-lights-proxy-token";
   function loadTaps() {
-    var base = D.lights && /^https:\/\//.test(String(D.lights.writeProxy || "")) ? String(D.lights.writeProxy).replace(/\/$/, "") : "", tok = "";
+    var base = LHRules.hubBase(D.lights && D.lights.writeProxy), tok = "";
     try { tok = localStorage.getItem(TOKEN_LS) || ""; } catch (_) {}
     if (!base || (!tok && !/\.github\.io$/i.test(location.hostname))) { D.taps = null; D.tapsWhy = base ? "no hub key on this device" : "no hub address"; return Promise.resolve(); }
     var ctl = typeof AbortController !== "undefined" ? new AbortController() : null, tm = setTimeout(function () { try { ctl && ctl.abort(); } catch (_) {} }, 6000);
@@ -267,7 +269,7 @@
     var c = $(".lh-cauldron"), r = cu.away ? null : LHRules.choreFill(D.taps, D.kw, key(n)), f = r ? Math.max(0, Math.min(1, r.done / r.total)) : null;
     c.setAttribute("data-feed", cu.away ? "rest" : f == null ? "missing" : "live"); c.style.setProperty("--fill", f == null ? "0" : String(f));
     if (f == null && !cu.away) c.setAttribute("data-why", D.tapsWhy || "no chore feed"); else c.removeAttribute("data-why");
-    $("[data-lh=chores-sub]").textContent = cu.away ? "Resting" : f == null ? "No chore feed yet" : ""; }
+    $("[data-lh=chores-sub]").textContent = f == null && !cu.away ? "No chore feed yet" : ""; }
   function weatherFog() {
     try { var e = frame().contentWindow.__env && frame().contentWindow.__env(); var c = e && e.cur; var t = c && (c.temp != null ? c.temp : c.temperature);
       if (e && e.wx && /live|meteo|api/i.test(String(e.wx)) && typeof t === "number") { var f = Math.max(0, Math.min(1, (10 - t) / 15)); /* scene temp is in C */
@@ -278,10 +280,29 @@
     l.style.left = (8 + i * 10.5) + "%"; l.style.setProperty("--d", (16 + (i * 7) % 9) + "s"); l.style.setProperty("--dl", (-i * 2.3) + "s"); l.style.setProperty("--dx", ((i % 2 ? 1 : -1) * (30 + i * 6)) + "px"); L.appendChild(l); } }
   /* ---------- layer 2: creatures, away-state look, season arc, real-house mirror ---------- */
   var KIDRE = { ainsley: /\bainsley\b/i, hayes: /\bhayes\b/i, harris: /\bharris\b/i };
-  function creatures(n, cu) { /* perch when clear, pace when something of theirs starts within 60 min; absent in the away state (CSS) */
-    var raw = ((D.cal && D.cal.upcomingLeaves) || []);
-    $$(".lh-cr").forEach(function (c) { var k = c.getAttribute("data-kid"), soon = !cu.away && raw.some(function (e) { var s = C.at(e.start), m = (s - n) / 6e4;
-      return !(e.allDay === true || e.allDay === "True") && m > 0 && m <= 60 && LHRules.kidName(k, e.summary || "") && !dress(e.summary); }); c.classList.toggle("pace", soon && !RM.matches); });
+  var CR_KIND = { ainsley: "owl", hayes: "cat", harris: "raven" };
+  function mountCreatures() {
+    var host = $("#lh-creatures"); if (!host || host.querySelector(".lh-cr")) return;
+    ["ainsley", "hayes", "harris"].forEach(function (k) {
+      var el = document.createElement("div"); el.className = "lh-cr"; el.setAttribute("data-kid", k); el.setAttribute("data-kind", CR_KIND[k]);
+      el.setAttribute("data-art", "missing"); el.setAttribute("data-why", "no perched loop"); el.setAttribute("aria-hidden", "true");
+      var img = document.createElement("img"); img.alt = ""; img.draggable = false; img.src = "art/sill-" + CR_KIND[k] + ".webp";
+      img.addEventListener("load", function () { el.setAttribute("data-art", "live"); el.removeAttribute("data-why"); });
+      img.addEventListener("error", function () { img.remove(); });
+      el.appendChild(img); host.appendChild(el);
+    });
+  }
+  function creatures(n, cu) { /* perch when clear, pace inside 60 min, absent while away. A missing loop stays an empty flagged perch. */
+    mountCreatures();
+    $$(".lh-cr").forEach(function (c) {
+      var k = c.getAttribute("data-kid");
+      var soon = !cu.away && kidItems(k, n).some(function (e) { var m = (C.at(e.start) - n) / 6e4; return !(e.allDay === true || e.allDay === "True") && m > 0 && m <= 60; });
+      var pose = LHRules.creaturePose({ away: !!cu.away, reduced: RM.matches, soon: soon });
+      c.setAttribute("data-pose", pose); c.classList.toggle("pace", pose === "pace"); c.hidden = pose === "absent";
+      var w = $(".lh-win[data-kid=" + k + "]"); if (!w || pose === "absent") return;
+      var r = w.getBoundingClientRect(); if (!r.width) return;
+      c.style.left = (r.left + r.width / 2) + "px"; c.style.top = (r.bottom - 1) + "px";
+    });
   }
   function md(n) { var p = new Intl.DateTimeFormat("en-US", { timeZone: TZ, month: "numeric", day: "numeric" }).format(n).split("/"); return { m: +p[0], d: +p[1] }; }
   function season(n) { /* date driven: Oct = leaves + October night; Oct 31 (or ?halloween=preview) = Halloween glow; Nov / Dec arcs are Layer 4 */
@@ -290,23 +311,42 @@
     if (hw) [[680, 494], [987, 550], [1066, 511], [1087, 427]].forEach(function (a) { var p = P(a[0], a[1]), i = document.createElement("i"), r = 90 * S; i.style.left = p[0] + "px"; i.style.top = p[1] + "px"; i.style.width = i.style.height = r + "px"; G.appendChild(i); });
     if (q.get("halloween") === "preview") { var pv = $("#lh-preview"); pv.hidden = false; pv.textContent = "PREVIEW · Halloween night look"; }
     $("#lh-leaves").hidden = x.m !== 10;
-    yard(n);
   }
-  function yard(n) { /* MISSING FEED hooks: weekly yard element + memory yard need a shared chore history; nothing is drawn until one exists */
-    var Y = $("#lh-yard"); Y.innerHTML = ""; return null; }
+  var YARD_LS = "lh-yard-nights";
+  function readYard() { try { var j = JSON.parse(localStorage.getItem(YARD_LS) || ""); return j && typeof j === "object" ? j : { days: {} }; } catch (e) { return { days: {} }; } }
+  function writeYard(s) { try { localStorage.setItem(YARD_LS, JSON.stringify({ days: s.days || {} })); } catch (e) {} }
+  function yard(n, cu) { /* memory yard: one pebble per device-local night that had a daily must done. No counts. Away draws none.
+     The weekly shared yard stays an empty hook (no shared chore history on this public repo). */
+    var Y = $("#lh-yard"); if (!Y) return;
+    var fill = cu.away || D.feeds.taps !== "live" ? null : LHRules.choreFill(D.taps, D.kw, key(n));
+    var rec = LHRules.memoryNight(readYard(), { day: key(n), hour: hm(n), fill: fill, away: !!cu.away });
+    if (rec.wrote) writeYard(rec.store);
+    var show = cu.away ? [] : rec.items;
+    Y.innerHTML = ""; Y.setAttribute("data-feed", "local");
+    show.forEach(function (day, i) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return;
+      var el = document.createElement("i"); el.className = "lh-pebble"; el.setAttribute("data-day", day);
+      if (phone) { el.style.left = (16 + i * 14) + "px"; el.style.top = (bandY + 500 * S) + "px"; }
+      else { var p = P(64 + i * 26, 628); el.style.left = p[0] + "px"; el.style.top = p[1] + "px"; }
+      Y.appendChild(el);
+    });
+    var W = $("#lh-yard-week"); if (W) { W.hidden = true; W.setAttribute("data-feed", "missing"); W.setAttribute("data-why", "no shared chore history"); W.textContent = ""; }
+    de.setAttribute("data-yard", String(show.length));
+  }
   function mirror() {
-    var t = D.sensi && D.feeds.sensi === "live" && D.sensi.thermostat, heat = !!(t && t.online && /heat|auto/i.test(t.mode || "") && typeof t.ambient === "number" && typeof t.heatSetpoint === "number" && t.ambient < t.heatSetpoint);
-    $(".lh-smoke").hidden = !heat || phone;  /* chimney wisp only while the furnace would be calling for heat */
-    var cam = D.nest && D.feeds.nest === "live" && (D.nest.cameras || []).some(function (c) { return c.online === true || !!c.snapshotUrl || !!c.streamUrl; });
-    $(".lh-camlamp").hidden = !cam;            /* eave lamp only if a camera reports live; garage door state is a MISSING FEED hook */
-    de.setAttribute("data-mirror", "heat=" + heat + " cam=" + !!cam + " harris=" + lightOn("harris-room"));
+    var m = LHRules.mirrorRead({ lightsLive: D.feeds.lights === "live", lights: D.lights, nestLive: D.feeds.nest === "live", nest: D.nest, sensi: D.sensi });
+    var smoke = $(".lh-smoke"); smoke.hidden = true; smoke.setAttribute("data-feed", m.smoke.feed); smoke.setAttribute("data-why", m.smoke.why);
+    var gar = $("#lh-garage"); if (gar) { gar.hidden = true; gar.setAttribute("data-feed", m.garage.feed); gar.setAttribute("data-why", m.garage.why); gar.textContent = ""; }
+    $(".lh-camlamp").hidden = !m.cam;
+    de.setAttribute("data-mirror", "harris=" + m.harris + " cam=" + (m.cam ? "true" : "false") + " garage=missing smoke=missing");
   }
   function paint() {
     if (!VW) return; var n = now(), cu = homeState(n);
     moon(n); windows(n, cu); var ev = events(n, cu), ce = candleEvent(ev, n); stones(n, ev, ce); candle(n, ce); signFit(); callout(n, cu); fitPhone(); cauldron(n, cu); weatherFog(); leaves();
     de.classList.toggle("lh-state-away", cu.away); de.classList.toggle("lh-state-home", !cu.away);
-    creatures(n, cu); season(n); mirror();
-    var pv = $("#lh-preview"); pv.hidden = !cu.preview; if (cu.preview) pv.textContent = "PREVIEW · sample look · not live data";
+    creatures(n, cu); season(n); yard(n, cu); mirror();
+    var pv = $("#lh-preview");
+    if (q.get("halloween") !== "preview") { pv.hidden = !cu.preview; if (cu.preview) pv.textContent = "PREVIEW · sample look · not live data"; }
   }
   function go() { layout(); load(); var f = frame(); if (f) f.addEventListener("load", function () { layout(); setTimeout(weatherFog, 3000); }); }
   addEventListener("resize", layout);
