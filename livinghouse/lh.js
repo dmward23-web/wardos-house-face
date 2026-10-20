@@ -207,7 +207,8 @@
       w.classList.add(ps.win);
       var pl = $(".lh-kw .name[data-kid=" + k + "]"), nx = cu.away ? null : kidItems(k, n)[0];
       pl.classList.toggle("today", ps.plaque === "today");
-      pl.setAttribute("href", "../kid-" + k + ".html" + (nx && nx.id ? "?next=" + encodeURIComponent(nx.id) : ""));   /* the room opens on the next item */
+      var room = "room.html?kid=" + k + (nx && nx.id ? "&next=" + encodeURIComponent(nx.id) : "");   /* photoreal room, not the retired cartoon world */
+      pl.setAttribute("href", room); w.setAttribute("href", room);
     });
     var aw = $(".lh-away"); aw.hidden = !cu.away;   /* Alfred: the lantern carries no words (no return countdown, no away wording); Dad has no coarse status feed yet, so nothing */
     var fv = $(".lan-fire"); if (fv && fv.getAttribute("src")) try { if (cu.away && !RM.matches) fv.play().catch(function () {}); else fv.pause(); } catch (_) {}
@@ -307,10 +308,62 @@
     de.classList.toggle("lh-state-away", cu.away); de.classList.toggle("lh-state-home", !cu.away);
     creatures(n, cu); season(n); mirror();
     var pv = $("#lh-preview"); pv.hidden = !cu.preview; if (cu.preview) pv.textContent = "PREVIEW · sample look · not live data";
+    fitDoors();
+  }
+  function fitDoors() { /* new door tags stay inside the screen and off the words that are already placed */
+    var md = $(".lh-door[data-door=moon]"), moonEl = $("#lh-moon");
+    if (md && moonEl) {
+      var mr = moonEl.getBoundingClientRect();
+      if (mr.width) {
+        if (phone) { md.style.transform = "none"; md.style.left = Math.min(VW - 8, mr.right + 6) + "px"; md.style.top = Math.max(8, mr.top + 8) + "px"; }
+        else { md.style.transform = "translate(-50%, 0)"; md.style.left = (mr.left + mr.width / 2) + "px"; md.style.top = (mr.bottom + 8) + "px"; }
+      }
+    }
+    if (phone) {
+      var ids = ["front", "kitchen", "garage", "mail", "gate", "yard"], x0 = 8, y = bandY + 8, x = x0, rowH = 0, gap = 6;
+      var kw = $("#lh-kidwins").getBoundingClientRect(), maxX = Math.max(120, (kw.left || VW) - 8);
+      ids.forEach(function (id) {
+        var el = $(".lh-door[data-door=" + id + "]"); if (!el) return;
+        el.style.transform = "none";
+        var w = el.offsetWidth, h = el.offsetHeight;
+        if (x > x0 && x + w > maxX) { x = x0; y += rowH + gap; rowH = 0; }
+        el.style.left = x + "px"; el.style.top = y + "px";
+        rowH = Math.max(rowH, h); x += w + gap;
+      });
+    }
+    var protect = ".lh-board, .lh-kw .name, .lh-kw .lh-win, .lh-plaque, .lh-candle .slate, .lh-stone, #lh-callout, .lh-feedtag, .lh-cauldron, .lh-preview, .lh-clocktag, .night52-snd, #lh-moon";
+    for (var pass = 0; pass < 40; pass++) {
+      var moved = false;
+      $$("#lh-doors .lh-door").forEach(function (el) {
+        var r = el.getBoundingClientRect(), dx = 0, dy = 0;
+        if (r.width < 2) return;
+        if (r.left < 4) dx = 4 - r.left;
+        if (r.top < 4) dy = 4 - r.top;
+        if (r.right > VW - 4) dx += (VW - 4) - r.right;
+        if (r.bottom > VH - 4) dy += (VH - 4) - r.bottom;
+        $$(protect).forEach(function (o) {
+          if (!o || o === el || (o.closest && o.closest("[hidden]"))) return;
+          var b = o.getBoundingClientRect(); if (b.width < 2 || b.height < 2) return;
+          var L = r.left + dx, R = r.right + dx, T = r.top + dy, B = r.bottom + dy, pad = 6;
+          if (L < b.right + pad && R > b.left - pad && T < b.bottom + pad && B > b.top - pad) {
+            var down = (b.bottom + pad) - T, up = B - (b.top - pad);
+            if (down <= up && T + down + (B - T) < VH - 4) dy += down; else dy -= up;
+          }
+        });
+        $$("#lh-doors .lh-door").forEach(function (other) {
+          if (other === el) return;
+          var b2 = other.getBoundingClientRect(); if (b2.width < 2) return;
+          var L2 = r.left + dx, R2 = r.right + dx, T2 = r.top + dy, B2 = r.bottom + dy;
+          if (L2 < b2.right + 4 && R2 > b2.left - 4 && T2 < b2.bottom + 4 && B2 > b2.top - 4) dy += (b2.bottom + 4) - T2;
+        });
+        if (dx || dy) { el.style.left = ((parseFloat(el.style.left) || 0) + dx) + "px"; el.style.top = ((parseFloat(el.style.top) || 0) + dy) + "px"; moved = true; }
+      });
+      if (!moved) break;
+    }
   }
   function go() { layout(); load(); var f = frame(); if (f) f.addEventListener("load", function () { layout(); setTimeout(weatherFog, 3000); }); }
   addEventListener("resize", layout);
-  setInterval(function () { paint(); }, 20000); setInterval(load, 5 * 6e4); setInterval(function () { moon(now()); }, 1000);
+  setInterval(function () { paint(); }, 20000); setInterval(load, 5 * 6e4); setInterval(function () { if (!VW) return; moon(now()); fitDoors(); }, 1000);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(go, 50); }); else setTimeout(go, 50);
   if (q.get("probe") === "1") { var ps = document.createElement("script"); ps.src = "probe.js?v=LH1"; document.body.appendChild(ps); } /* perf probe, off by default */
   window.LivingHouse = { paint: paint, data: D, phase: moonPhase };

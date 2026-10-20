@@ -115,3 +115,45 @@
 
   g.HouseHub = { blockedCount: function () { return blocked; }, lights: lights, cams: cams, okForKey: okForKey, saveLights: saveLights, originOf: originOf, _sha256: sha256 };
 })(typeof window !== "undefined" ? window : globalThis);
+/* LHDOORS1 · House chip only while this URL has from=lh. Each hop keeps that param on the link. Nothing is stored. */
+(function () {
+  try {
+    var search = "";
+    try { search = String(location.search || ""); } catch (e0) { return; }
+    if (!/(?:^|[?&])from=lh(?:&|$)/.test(search)) return;
+    function carry(raw) {
+      if (!raw || raw.charAt(0) === "#") return raw;
+      if (/^(?:mailto|tel|javascript):/i.test(raw)) return raw;
+      var abs;
+      try { abs = new URL(raw, location.href); } catch (e1) { return raw; }
+      if (abs.origin !== location.origin) return raw;
+      if (!/\.html$/i.test(abs.pathname)) return raw;
+      if (/\/livinghouse\/(?:index|room|yard)\.html$/i.test(abs.pathname)) return raw;
+      if (/(?:^|[?&])from=lh(?:&|$)/.test(abs.search)) return raw;
+      return abs.pathname + abs.search + (abs.search ? "&" : "?") + "from=lh" + abs.hash;
+    }
+    function stamp(root) {
+      var list = root.querySelectorAll ? root.querySelectorAll("a[href]") : [];
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].id === "lh-return") continue;
+        var next = carry(list[i].getAttribute("href"));
+        if (next && next !== list[i].getAttribute("href")) list[i].setAttribute("href", next);
+      }
+    }
+    function arm() {
+      stamp(document);
+      document.addEventListener("click", function (ev) {
+        var t = ev.target, a = t && t.closest ? t.closest("a[href]") : null;
+        if (!a || a.id === "lh-return") return;
+        var next = carry(a.getAttribute("href"));
+        if (next && next !== a.getAttribute("href")) a.setAttribute("href", next);
+      }, true);
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", arm);
+    else arm();
+    var s = document.createElement("script");
+    var nested = /\/livinghouse\//.test(String(location.pathname || ""));
+    s.src = (nested ? "" : "livinghouse/") + "return.js?v=LHDOORS2";
+    (document.head || document.documentElement).appendChild(s);
+  } catch (e3) { /* a page with no document yet stays as it was */ }
+})();

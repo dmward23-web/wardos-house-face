@@ -273,3 +273,12 @@ html.lh-phone .lh-dad { box-sizing: border-box; min-height: 44px; padding: 3px 0
 /* Alfred 1702 P3: at 390 the Hayes and Harris tag tap boxes reached 12 px into the Dad plaque box. On the phone the tag is already a 44 x 44 box (borders), so its wider desktop tap halo is off, and Dad sits 16 px lower: 0 px overlap at 390, 440 and 1920. */
 html.lh-phone .lh-kw .name::before { display: none; }
 html.lh-phone .lh-dad { margin-top: 13px; }
+
+/* ---------- L4 rooms as doors ---------- */
+#lh-doors { inset: 0; z-index: 4; pointer-events: none; }
+.lh-door { position: absolute; pointer-events: auto; box-sizing: border-box; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center;
+  padding: 8px 12px; border-radius: 8px; text-decoration: none; white-space: nowrap; font: 600 16px/1.2 "LH Display", sans-serif; color: #f6dfae;
+  background: rgba(18, 12, 8, .9); border: 1px solid rgba(255, 210, 150, .38); box-shadow: 0 4px 14px rgba(0, 0, 0, .45); }
+html.lh-phone .lh-door { font-size: 14px; padding: 8px 10px; }
+a.lh-cauldron { text-decoration: none; color: inherit; pointer-events: auto; }
+.lh-kw .lh-win { display: block; text-decoration: none; }

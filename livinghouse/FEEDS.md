@@ -47,6 +47,20 @@ For stills and clips, the data is a snapshot run through wright-scratch/tools/re
 | Eave camera lamp | REAL feed, currently off | nest-live.json: drawn only if a camera reports `online: true` or a snapshot/stream URL (tonight all null, so none) |
 | Garage door open / shut | MISSING FEED | no garage door state anywhere |
 
+## Layer 4 · rooms as doors
+
+| Element | Status | Source |
+|---|---|---|
+| Door map (one row per board page) | REAL pages, no new feed | livinghouse/doors.js. Front door opens index.html (the hub). Dad lantern opens sheet-dan.html. Moon opens month.html. Kitchen opens sheet-groceries.html. Mail opens month-chat.html. Cauldron opens sheet-chores.html. Gate opens mercury-run.html. Yard opens yard.html, one row per remaining sheet. Each of those pages gets ?from=lh and a House link back (livinghouse/return.js, via house-hub.js). The chip shows only while the current URL has from=lh. Links onward to another board keep that param. The visit is not stored. |
+| Kid windows and name plaques | REAL link, MISSING art | Open livinghouse/room.html?kid= (Ainsley, Hayes, Harris). The retired cartoon worlds (kid-*.html) are not the house nav. |
+| Kid room plate | MISSING ASSET | No photoreal room view is in the repo. The room ships the door, the House link, and an empty plate flagged data-art=missing / data-feed=missing. Harris raven loops named in the L1 note are not in this tree, and video files are not committed. |
+| Hayes sports / Harris football | REAL when cal-live.json is readable on a local host, else MISSING FEED | Upcoming items for that kid only, through the face law, the money drop, and AwayFilter.keepItem. Away time draws the quiet plate and no list. A live feed with nothing for that kid says "Nothing on the list". |
+| Ainsley wallpaper | MISSING ASSET | Same empty plate. |
+| Ainsley earned items | device local only | localStorage key lh-room-earned-ainsley on this device. Empty until someone adds a line here. Never sent, never committed. |
+| Garage cam | MISSING FEED tonight | The garage door opens the garage room. A still is drawn only for a same-origin data/nest-snaps/ file named by nest-live.json snapshotUrl. Anything else stays an empty plate ("No cam feed yet"). The Cam link opens the existing nest-webrtc.html page, which uses the existing proxy. No token is added in git. |
+| Run | REAL page | mercury-run.html from the gate and from each room. Existing page and scripts. No new token. |
+| Basement crypt, far-hill house, learned rhythm, idle cinema | not this track | Still spec only. |
+
 ## Room art ready for the rooms builder (not wired in L1)
 | Piece | Status | Where | Notes |
 |---|---|---|---|

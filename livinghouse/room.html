@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Room</title>
+<link rel="stylesheet" href="room.css?v=LHDOORS1" />
+</head>
+<body>
+<main class="room" id="room" data-art="missing" data-feed="missing" data-why="no room art">
+  <div class="top">
+    <h1 data-room="title">Room</h1>
+    <a class="back" data-room="back" href="index.html" aria-label="Back to the house">House</a>
+  </div>
+  <p class="plate" data-room="plate"><span data-room="plate-text">Room art is not in yet</span><img data-room="cam-still" alt="" hidden /></p>
+  <section class="list" data-room="list" hidden>
+    <h2 data-room="list-title"></h2>
+    <ul data-room="items"></ul>
+    <p class="empty" data-room="empty" hidden></p>
+  </section>
+  <section class="earn" data-room="earn" hidden>
+    <h2>Earned</h2>
+    <p class="empty" data-room="earn-empty">Nothing earned on this device yet</p>
+    <ul></ul>
+    <form data-room="earn-form">
+      <input type="text" maxlength="48" aria-label="Something earned" placeholder="Something earned" />
+      <button type="submit">Add</button>
+    </form>
+  </section>
+  <nav class="out" aria-label="From this room">
+    <a href="../mercury-run.html?from=lh">Run</a>
+    <a href="../nest-webrtc.html?from=lh">Cam</a>
+  </nav>
+</main>
+<script src="clock.js?v=LH1"></script>
+<script src="../school-names.js?v=SCHOOLNAMES1"></script>
+<script src="../away-filter.js?v=AWAYLAW1"></script>
+<script src="../house-face-law.js?v=PRIVFEED3"></script>
+<script src="lh-rules.js?v=LH4"></script>
+<script src="room.js?v=LHDOORS1"></script>
+</body>
+</html>

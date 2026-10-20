@@ -4,7 +4,7 @@
 <title>The Ward's · Living House</title>
 <link rel="stylesheet" href="../night/night-host.css?v=SH1" />
 <link rel="stylesheet" href="../month-theme/month-overlay.css?v=MONTHFX2" />
-<link rel="stylesheet" href="lh.css?v=LHV1" />
+<link rel="stylesheet" href="lh.css?v=LHDOORS1" />
 </head>
 <body>
 <!-- LIVING HOUSE · the night scene IS the interface. Every element below is placed on the house plate by lh.js and is
@@ -34,17 +34,17 @@
   <i class="lh-gable" data-rect="800,0,1133.33,133.33" aria-hidden="true"></i><!-- Prism gable band (art/gable-band-500x200): upper-storey siding + eave behind the three windows; the name plaques sit on its eave -->
   <div class="lh-kidwins" id="lh-kidwins"><!-- art/: one shared window outline, lit and dark, glow and shadow as separate layers (wall); phone uses the 3-window siding strip -->
     <i class="strip" aria-hidden="true"></i><i class="sglow" aria-hidden="true"></i>
-    <div class="lh-kw"><div class="lh-win" data-kid="ainsley"><i class="sh"></i><i class="gl"></i></div><a class="name" data-kid="ainsley" href="../kid-ainsley.html" aria-label="Ainsley's room">Ainsley</a></div>
-    <div class="lh-kw"><div class="lh-win" data-kid="hayes"><i class="sh"></i><i class="gl"></i></div><a class="name" data-kid="hayes" href="../kid-hayes.html" aria-label="Hayes's room">Hayes</a></div>
-    <div class="lh-kw"><div class="lh-win" data-kid="harris"><i class="sh"></i><i class="gl"></i></div><a class="name" data-kid="harris" href="../kid-harris.html" aria-label="Harris's room">Harris</a></div>
+    <div class="lh-kw"><a class="lh-win" data-kid="ainsley" data-door="ainsley" href="room.html?kid=ainsley" aria-label="Ainsley's room"><i class="sh"></i><i class="gl"></i></a><a class="name" data-kid="ainsley" data-door="ainsley" href="room.html?kid=ainsley" aria-label="Ainsley's room">Ainsley</a></div>
+    <div class="lh-kw"><a class="lh-win" data-kid="hayes" data-door="hayes" href="room.html?kid=hayes" aria-label="Hayes's room"><i class="sh"></i><i class="gl"></i></a><a class="name" data-kid="hayes" data-door="hayes" href="room.html?kid=hayes" aria-label="Hayes's room">Hayes</a></div>
+    <div class="lh-kw"><a class="lh-win" data-kid="harris" data-door="harris" href="room.html?kid=harris" aria-label="Harris's room"><i class="sh"></i><i class="gl"></i></a><a class="name" data-kid="harris" data-door="harris" href="room.html?kid=harris" aria-label="Harris's room">Harris</a></div>
   </div>
 
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="lh-luma" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  1.2 1.2 1.2 0 -.08"/></filter></svg>
-  <a class="lh-dad" href="../sheet-dan.html" data-at="944,300" aria-label="Dad"><span class="lh-dad-glow"></span><span class="lh-plaque">Dad</span></a>
+  <a class="lh-dad" data-door="dad" href="../sheet-dan.html?from=lh" data-at="944,300" aria-label="Dad"><span class="lh-dad-glow"></span><span class="lh-plaque">Dad</span></a>
   <div class="lh-away" data-lan="1166,322" data-lan-ph="575,566" aria-label="Porch lantern" hidden><!-- the porch lantern kept lit in the away state (art: art/lantern-body, flame: night/media/fire-black.mp4 at the wick) -->
     <div class="lan"><img src="art/lantern-body-400x560.webp" alt="" draggable="false" /><video class="lan-fire" data-src="../night/media/fire-black.mp4" poster="../night/media/poster/fire-black.webp" muted loop playsinline preload="auto" aria-hidden="true" onerror="this.dataset.dead=1;this.removeAttribute('src');this.load()"></video></div></div>
   <div class="lh-candle" data-at="640,446" hidden><div class="wax"><div class="flame"></div></div><div class="slate"><span class="v" data-lh="cand-v"></span><span class="k" data-lh="cand-k"></span></div></div>
-  <div class="lh-cauldron" data-at="452,486" data-at-ph="170,610"><div class="glow"></div><div class="pot"></div><div class="lab">Chores<small data-lh="chores-sub"></small></div></div>
+  <a class="lh-cauldron" data-door="chores" href="../sheet-chores.html?from=lh" data-at="452,486" data-at-ph="170,610" aria-label="Chores"><div class="glow"></div><div class="pot"></div><div class="lab">Chores<small data-lh="chores-sub"></small></div></a>
   <div class="lh-fogfar" aria-hidden="true"></div>
   <div class="lh-stones far" id="lh-far"></div>
   <div class="lh-fognear" aria-hidden="true"></div>
@@ -57,6 +57,15 @@
   <div class="lh-camlamp" data-at="1236,150" hidden aria-hidden="true"></div>
   <div class="lh-yard" id="lh-yard" aria-hidden="true"></div>
   <div class="lh-creatures" id="lh-creatures"><!-- MISSING ASSET: photoreal perched loops (owl, cat, raven). Nothing renders until real loops exist; no invented art (Prism P1-3). --></div>
+  <nav id="lh-doors" aria-label="House doors">
+    <a class="lh-door" data-door="front" data-at="700,500" href="../index.html?from=lh" aria-label="Front door, the hub">Front door</a>
+    <a class="lh-door" data-door="moon" href="../month.html?from=lh" aria-label="Month">Month</a>
+    <a class="lh-door" data-door="kitchen" data-at="200,430" href="../sheet-groceries.html?from=lh" aria-label="Groceries">Groceries</a>
+    <a class="lh-door" data-door="garage" data-at="1100,470" href="room.html?door=garage" aria-label="Garage">Garage</a>
+    <a class="lh-door" data-door="mail" data-at="1200,390" href="../month-chat.html?from=lh" aria-label="Mail">Mail</a>
+    <a class="lh-door" data-door="gate" data-at="1100,600" href="../mercury-run.html?from=lh" aria-label="Run">Run</a>
+    <a class="lh-door" data-door="yard" data-at="1210,600" href="yard.html" aria-label="Yard">Yard</a>
+  </nav>
   <div class="lh-preview" id="lh-preview" hidden>PREVIEW</div>
   <div class="lh-feedtag" id="lh-feedtag" hidden></div>
 </div>
@@ -68,5 +77,5 @@
 <script src="../house-face-law.js?v=PRIVFEED3" defer></script>
 <script src="../phone2/leaveby.js?v=PHONE2" defer></script>
 <script src="lh-rules.js?v=LH4" defer></script>
-<script src="lh.js?v=LHV1" defer></script>
+<script src="lh.js?v=LHDOORS1" defer></script>
 </body></html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Yard</title>
+<link rel="stylesheet" href="room.css?v=LHDOORS1" />
+<style>
+  .yard { box-sizing: border-box; height: 100%; display: flex; flex-direction: column; gap: 12px; padding: 16px 18px 18px; }
+  .yard h1 { margin: 0; font-size: 32px; font-weight: 600; line-height: 1.5; }
+  .yard ul { list-style: none; margin: 0; padding: 0; overflow: visible; flex: 1 1 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start; }
+  .yard li a { display: flex; align-items: center; min-height: 48px; padding: 10px 14px; border-radius: 12px; text-decoration: none;
+    font: 600 18px/1.3 "LH Display", system-ui, sans-serif; color: #f6efe4; background: rgba(36, 24, 16, .9); border: 1px solid rgba(255, 214, 170, .28); }
+  @media (max-width: 700px) { .yard h1 { font-size: 24px; } .yard li a { font-size: 17px; } }
+</style>
+</head>
+<body>
+<main class="yard">
+  <div class="top">
+    <h1>Yard</h1>
+    <a class="back" data-room="back" href="index.html" aria-label="Back to the house">House</a>
+  </div>
+  <ul aria-label="Yard pages">
+    <li><a href="../sheet-desk-gate.html?from=lh">Desk</a></li>
+    <li><a href="../sheet-dinner.html?from=lh">Dinner</a></li>
+    <li><a href="../sheet-gallery-hero.html?from=lh">Frames</a></li>
+    <li><a href="../sheet-gallery.html?from=lh">Gallery</a></li>
+    <li><a href="../sheet-google-home.html?from=lh">Home</a></li>
+    <li><a href="../sheet-lights.html?from=lh">Lights</a></li>
+    <li><a href="../sheet-load-day.html?from=lh">Load day</a></li>
+    <li><a href="../sheet-pack.html?from=lh">Pack</a></li>
+    <li><a href="../sheet-sensi.html?from=lh">Heat</a></li>
+    <li><a href="../sheet-spotify.html?from=lh">Music</a></li>
+    <li><a href="../sheet-status.html?from=lh">Status</a></li>
+    <li><a href="../sheet-today.html?from=lh">Today</a></li>
+    <li><a href="../sheet-us.html?from=lh">Together</a></li>
+    <li><a href="../sheet-weekend.html?from=lh">Ideas</a></li>
+    <li><a href="../sheet-win.html?from=lh">Trips</a></li>
+    <li><a href="../sheet-allowance.html?from=lh">Stars</a></li>
+    <li><a href="../sheet-countdowns.html?from=lh">Countdowns</a></li>
+  </ul>
+</main>
+<script src="clock.js?v=LH1"></script>
+<script>
+(function () {
+  var back = document.querySelector("[data-room=back]"); if (!back) return;
+  var q = new URLSearchParams(location.search), keep = new URLSearchParams();
+  ["now", "freeze", "rec", "probe", "halloween", "state"].forEach(function (k) { if (q.get(k)) keep.set(k, q.get(k)); });
+  var s = keep.toString(); if (s) back.href = "index.html?" + s;
+  if (q.get("probe") === "1") { var ps = document.createElement("script"); ps.src = "probe.js?v=LH1"; document.body.appendChild(ps); }
+})();
+</script>
+</body>
+</html>

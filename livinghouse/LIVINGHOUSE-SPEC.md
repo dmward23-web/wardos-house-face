@@ -36,7 +36,7 @@ mirror (Kasa windows, Sensi chimney smoke when heat runs, garage and cam lamp as
 1. Learned rhythm. Local heuristics over calendar history (on device, no new service) find Dan's typical leave time per
    weekday; the path lights a few minutes before it. Storm clouds on historically rough days show ONLY in Dan-only
    audience mode, never in kid hours, and never name or hint at a state change.
-2. Rooms as doors. The house is the nav for every existing page. Kitchen window: groceries / Costco as crates. Garage:
+2. Rooms as doors (built on lh-l4-rooms-doors: livinghouse/doors.js, room.html, yard.html, return.js). The house is the nav for every existing page. Kitchen window: groceries / Costco as crates. Garage:
    the real cam through a dusty window, only if a cam feed exists (data/nest-live.json `snapshotUrl` or a still in
    data/nest-snaps/), otherwise an empty hook. Page map (one spot per page): front door = index (hub), porch lantern =
    sheet-dan, upper left pane = kid-ainsley, upper right pane = kid-hayes, lower window = kid-harris, moon = month,
