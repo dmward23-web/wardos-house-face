@@ -290,7 +290,6 @@
     if (pack.streetArt) de.setAttribute("data-street-art", pack.streetArt); else de.removeAttribute("data-street-art");
     G.innerHTML = "";
     if (hw) [[680, 494], [987, 550], [1066, 511], [1087, 427]].forEach(function (a) { var p = P(a[0], a[1]), i = document.createElement("i"), r = 90 * S; i.style.left = p[0] + "px"; i.style.top = p[1] + "px"; i.style.width = i.style.height = r + "px"; G.appendChild(i); });
-    if (q.get("halloween") === "preview") { var pv = $("#lh-preview"); pv.hidden = false; pv.textContent = "PREVIEW · Halloween night look"; }
     $("#lh-leaves").hidden = !pack.leaves;
     countdown(pack); emptyPlate(pack); yard(n);
   }
@@ -363,6 +362,7 @@
     creatures(n, cu); season(n); mirror(); cryptFill(ev); rhythm(ce);
     if (phone) { var door = $("#lh-crypt-door"); door.style.left = "8px"; door.style.top = (bandY + 8) + "px"; door.style.transform = "none"; }
     var pv = $("#lh-preview"); pv.hidden = !cu.preview; if (cu.preview) pv.textContent = "PREVIEW · sample look · not live data";
+    if (q.get("halloween") === "preview") { pv.hidden = false; pv.textContent = "PREVIEW · Halloween night look"; }
   }
   var lastTouch = C.ms(), capsVideo = false;
   function applyCinema(elapsed) {

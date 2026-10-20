@@ -1,0 +1,489 @@
+{
+ "viewport": {
+  "w": 390,
+  "h": 844
+ },
+ "samples": 60,
+ "log": [
+  {
+   "t": 1792505223562,
+   "fps": 62,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.4 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505224564,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "4.2 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505225560,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.2 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505226563,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.8 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505227560,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "4.3 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505228563,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.4 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505229560,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.1 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505230563,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.7 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505231561,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.4 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505232563,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.3 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505233560,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.7 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505234562,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.6 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505235560,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.3 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505236562,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "4.0 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505237560,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.5 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505238564,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "4.0 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505239560,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.5 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505240562,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "4.0 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505241560,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.5 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505242562,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.4 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505243560,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.7 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505244562,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.5 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505245559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.8 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505246562,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.6 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505247559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.1 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505248562,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.7 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505249559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.4 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505250562,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "4.0 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505251560,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.6 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505252561,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.5 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505253559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "4.0 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505254563,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.8 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505255559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.6 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505256563,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.4 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505257559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.9 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505258561,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.8 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505259560,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.4 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505260562,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "4.1 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505261559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.1 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505262561,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.3 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505263559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.8 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505264562,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.6 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505265559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.4 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505266562,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "4.0 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505267559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.7 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505268561,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.5 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505269559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.9 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505270563,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.8 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505271559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.5 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505272561,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.4 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505273558,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.8 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505274563,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.6 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505275559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.9 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505276562,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.6 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505277560,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.9 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505278561,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.6 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505279559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "4.0 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505280563,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.7 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505281559,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "4.0 MB",
+   "dom": 168
+  },
+  {
+   "t": 1792505282561,
+   "fps": 60,
+   "longtasks": 0,
+   "longMax": 0,
+   "heap": "3.9 MB",
+   "dom": 168
+  }
+ ]
+}
