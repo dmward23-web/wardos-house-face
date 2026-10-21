@@ -34,7 +34,7 @@ for line in open(fp):
 # PRIVFEED1 · provider / person names live in ~/.config/wardos/privacy-block.txt (one regex per line, never in git)
 _bf = os.path.expanduser("~/.config/wardos/privacy-block.txt")
 _bx = [l.strip() for l in open(_bf) if l.strip() and not l.startswith("#")] if os.path.exists(_bf) else []
-BLOCK = re.compile("|".join(_bx + [r"therap", r"counsel"]), re.I)
+BLOCK = re.compile("|".join(_bx + [r"therap", r"counsel", r"\bpsycholog", r"\bpsychiatr", r"\banxiety\b"]), re.I)   # LIVEFIX1 · same words as house-face-law.js THERAPY
 
 def _names_early(role):
     fp2 = names_path()
@@ -57,7 +57,7 @@ if out == "--reclean-private" or (len(sys.argv) > 1 and sys.argv[1] == "--reclea
         for it in day.get("items", []):
             l = external_filter(clean_text(scrub(it.get("l", ""))))   # EXTFILTER1: None = row filtered out
             n += l != it.get("l"); it["l"] = l
-        day["items"] = [it for it in day.get("items", []) if it.get("l") and not DRESS.search(it["l"])]
+        day["items"] = [it for it in day.get("items", []) if it.get("l") and not DRESS.search(it["l"]) and not BLOCK.search(it["l"])]   # LIVEFIX1
     json.dump(doc, open(tgt, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(f"cal-months --reclean-private: {n} labels changed"); sys.exit(0)
 
@@ -136,6 +136,7 @@ for i, (summ, s, e, allday) in ev.items():
         while d < d1: withdan[d.isoformat()] = 1; d += dt.timedelta(days=1)
         continue
     if summ.startswith("Dan") and not DAN_KEEP.search(summ): continue
+    if BLOCK.search(summ): continue   # LIVEFIX1 · therapy / provider rows never reach the month board (drop, not fail)
     label = scrub(summ)
     if BLOCK.search(label): sys.exit(f"HARD FAIL: private term survived scrub in: {label!r}")
     if external_drop(summ) or external_drop(label): continue   # EXTFILTER1: filtered rows never reach the month board

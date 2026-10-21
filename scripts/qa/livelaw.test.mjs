@@ -65,7 +65,7 @@ test("8:08 PM Friday: colour/dress-up rows and ended rows are gone, NEXT moves t
   assert.match(w.kids.hayes.hottest.when, /^SAT · 4:45$/);
   assert.equal(w.kids.hayes._lawColorRows.length, 2, "colour rows kept for the quiet specials rotation");
   assert.doesNotMatch(all("ainsley"), /Outsiders/);
-  assert.match(w.kids.ainsley.hottest.when, /^MON · 3:00$/);
+  assert.equal(w.kids.ainsley.hottest.when, "MON"); /* LIVEFIX1 · Ainsley rows carry no time */
   assert.equal(w.boardStrip.queue.length, 1);
 });
 

@@ -99,9 +99,24 @@ export function externalMask(s) {
   const r = exRes(); if (!r.word || typeof s !== "string") return s;
   return s.replace(r.poss, EXT_PLACEHOLDER + "'").replace(r.word, EXT_PLACEHOLDER).replace(/\s{2,}/g, " ").trim();
 }
-/** filter any event list: matching rows out, term masked in summary/title. */
+/* LIVEFIX1 · therapy law at ingest: generic words (house-face-law.js THERAPY, shared with the glass) plus provider / person
+   names from the box-only ~/.config/wardos/privacy-block.txt (one regex per line, never in git; missing = generic only). */
+let _thCache = null;
+function therapyRe() {
+  if (_thCache) return _thCache;
+  const g = (globalThis.HouseFaceLaw && globalThis.HouseFaceLaw.THERAPY) ? globalThis.HouseFaceLaw.THERAPY.source : "\\btherap|\\bcounsel|\\bpsycholog|\\bpsychiatr|\\banxiety\\b";
+  let extra = [];
+  try {
+    extra = fs.readFileSync(path.join(os.homedir(), ".config", "wardos", "privacy-block.txt"), "utf8").split("\n")
+      .map((l) => l.trim()).filter((l) => l && !l.startsWith("#"))
+      .filter((l) => { try { new RegExp(l, "i"); return true; } catch { return false; } });
+  } catch { extra = []; }
+  return (_thCache = new RegExp([g].concat(extra).join("|"), "i"));
+}
+export function therapyDrop(s) { return typeof s === "string" && therapyRe().test(s); }
+/** filter any event list: matching rows out, term masked in summary/title. LIVEFIX1: therapy rows out. */
 export function externalEvents(events) {
-  return (events || []).filter((e) => !(e && (externalDrop(e.summary) || externalDrop(e.title))))
+  return (events || []).filter((e) => !(e && (externalDrop(e.summary) || externalDrop(e.title) || therapyDrop(e.summary) || therapyDrop(e.title))))
     .map((e) => (e && (typeof e.summary === "string" || typeof e.title === "string"))
       ? { ...e, ...(typeof e.summary === "string" ? { summary: externalMask(e.summary) } : {}), ...(typeof e.title === "string" ? { title: externalMask(e.title) } : {}) }
       : e);

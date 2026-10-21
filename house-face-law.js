@@ -106,6 +106,49 @@
     var t = String(r.when || "").match(/(\d{1,2}):(\d{2})\s*(am|pm|a\b|p\b)?/i);
     return off * 1440 + (/\bAll day\b/i.test(String(r.when || "")) ? -1 : (t ? toMin(t[1], t[2], t[3]) : 720));
   }
+  /* LIVEFIX1 · therapy law (every board): a therapy / counseling row never shows. Generic words here; provider and person
+     names live only on the box (~/.config/wardos/privacy-block.txt, read by scripts/private-dir.mjs and cal-months.py),
+     so the builders drop those rows before any data file is written. */
+  var THERAPY = /\btherap|\bcounsel(?:or|ors|ing|ling|ling)?\b|\bpsycholog|\bpsychiatr|\banxiety\b/i;
+  function isTherapy(s) { return THERAPY.test(String(s == null ? "" : s)); }
+  function rowTherapy(o) {
+    if (typeof o === "string") return isTherapy(o);
+    if (!o || typeof o !== "object" || Array.isArray(o)) return false;
+    return isTherapy([o.summary, o.title, o.what, o.l, o.label, o.text, o.hint, o.place].filter(function (x) { return typeof x === "string"; }).join(" "));
+  }
+  /* LIVEFIX1 · Ainsley law: her rows carry no digit, time, date, star, $ or %. The time is read for ordering and ended
+     rows first (cleanKid), then dropped from every string she sees, so "Mon 26 · 2:20" reads "Mon". */
+  var AP = "(?:a\\.?m\\.?|p\\.?m\\.?|a\\b|p\\b)";
+  var AIN_RANGE = new RegExp("\\d{1,2}(?::\\d{2})?\\s*" + AP + "?\\s*(?:[-\\u2013]|\\bto\\b)\\s*\\d{1,2}(?::\\d{2})?\\s*" + AP + "?", "gi");
+  var AIN_CLOCK = new RegExp("\\d{1,2}:\\d{2}\\s*" + AP + "?|\\b\\d{1,2}\\s*(?:am|pm)\\b", "gi");
+  function ainsleyText(s) {
+    if (typeof s !== "string") return s;
+    var t = s.replace(/\b(?:leave|leaves|at|by|from|until|til|till|@)\s*(?=\$?\d)/gi, "")
+      .replace(AIN_RANGE, "").replace(AIN_CLOCK, "")
+      .replace(/\$\s*\d[\d,.]*(?:\s*\/\s*[a-z]+)?/gi, "")
+      .replace(/\d+(?:\.\d+)?\s*%/g, "")
+      .replace(/\b\d+\s*-\s*(?=[a-z])/gi, "")
+      .replace(/[\d$%\u2605\u2606\u272a-\u2730\u2b50]/g, "");
+    return t.split(/\s*\u00b7\s*/).map(function (x) { return x.replace(/\s{2,}/g, " ").replace(/^[\s,:+/-]+|[\s,:+/-]+$/g, ""); })
+      .filter(Boolean).join(" \u00b7 ");
+  }
+  var AIN_KEYS = { when: 1, what: 1, hint: 1, hours: 1, where: 1, label: 1, whenLabel: 1, place: 1, summary: 1, title: 1, text: 1, time: 1, blurb: 1 };
+  function ainsleyRow(r) {
+    if (typeof r === "string") return ainsleyText(r);
+    if (Array.isArray(r)) return r.map(ainsleyRow).filter(function (x) { return x !== ""; });
+    if (!r || typeof r !== "object") return r;
+    for (var k in r) if (Object.prototype.hasOwnProperty.call(r, k)) {
+      if (AIN_KEYS[k] && typeof r[k] === "string") r[k] = ainsleyText(r[k]);
+      else if (k === "badges" && Array.isArray(r[k])) r[k] = ainsleyRow(r[k]);
+    }
+    return r;
+  }
+  function isAinsley(kid, id) { return /^ainsley$/i.test(String(id || "")) || /^ainsley$/i.test(String((kid && (kid.id || kid.name)) || "")); }
+  function cleanAinsley(kid) {
+    ROW_LISTS.concat(["rides", "missions"]).forEach(function (k) { if (Array.isArray(kid[k])) kid[k] = kid[k].map(ainsleyRow); });
+    ["hottest", "bag"].forEach(function (k) { if (kid[k] && typeof kid[k] === "object") ainsleyRow(kid[k]); });
+    if (typeof kid.streakLabel === "string") kid.streakLabel = ainsleyText(kid.streakLabel);
+  }
   var ROW_LISTS = ["today", "school", "sports", "appointments", "week", "events", "ahead", "upcoming"];
   function cleanKid(kid, now) {
     if (!kid || typeof kid !== "object") return;
@@ -113,13 +156,14 @@
     ROW_LISTS.forEach(function (k) {
       if (!Array.isArray(kid[k])) return;
       kid[k] = kid[k].filter(function (r) {
+        if (r && rowTherapy(r)) return false;   /* LIVEFIX1 */
         if (r && isDressDay(rowText(r))) { if (/\b(orange|yellow|green|red)\s+day\b/i.test(rowText(r))) colorRows.push(r); return false; }
         return !rowEnded(r, now);
       });
     });
     kid._lawColorRows = colorRows;
     var hot = kid.hottest;
-    if (hot && (isDressDay(rowText(hot)) || rowEnded(hot, now))) {
+    if (hot && (isDressDay(rowText(hot)) || rowTherapy(hot) || rowEnded(hot, now))) {
       var pool = [];
       ["today", "appointments", "sports", "school", "week"].forEach(function (k) { (kid[k] || []).forEach(function (r) { if (r && r.what && keepRow(r, now) && r.kind !== "note" && !/\bwith Dad\b|\bDad week\b|\bat home\b/i.test(r.what) && !(dayOffset(r.when, now) === 0 && /\bAll day\b/i.test(String(r.when || "")))) pool.push(r); /* NEXT = the next thing coming up; today's all-day notes stay in their own rows */ }); }); /* custody-law:allow (matcher that skips these rows) */
       pool.sort(function (a, b) { return rowKey(a, now) - rowKey(b, now); });
@@ -140,14 +184,15 @@
     var now = ctNow();
     try {
       var kids = data.kids || {};
-      Object.keys(kids).forEach(function (id) { cleanKid(kids[id], now); });
+      Object.keys(kids).forEach(function (id) { cleanKid(kids[id], now); if (kids[id] && isAinsley(kids[id], id)) cleanAinsley(kids[id]); });
+      if (Array.isArray(data.leaveBys)) data.leaveBys = data.leaveBys.filter(function (it) { return !rowTherapy(it); });   /* LIVEFIX1 */
       var q = data.boardStrip && data.boardStrip.queue;
-      if (Array.isArray(q)) data.boardStrip.queue = q.filter(function (it) { return !isDressDay(rowText(it)); });
+      if (Array.isArray(q)) data.boardStrip.queue = q.filter(function (it) { return !isDressDay(rowText(it)) && !rowTherapy(it); });
     } catch (e) { /* never break a board over a filter */ }
     return data;
   }
   /* cal-live / cal-months events: drop colour + dress-up days (they are never rows on the face) */
-  function keepEvent(ev) { return !(ev && isDressDay(String(ev.summary || ev.title || ev.what || ""))); }
+  function keepEvent(ev) { return !(ev && (isDressDay(String(ev.summary || ev.title || ev.what || "")) || rowTherapy(ev))); }   /* LIVEFIX1 · therapy out */
 
   /* PRIVFEED3 · one pass over a private-feed payload (cal-live / cal-months / kids-week) before any page sees it:
      colour-day and dress-up rows drop out, face text loses em dashes, arrows and booking codes ('#...').
@@ -182,13 +227,13 @@
   }
   function cleanFeed(name, data) {
     function walk(v, key) {
-      if (Array.isArray(v)) { var out = []; for (var i = 0; i < v.length; i++) { if (!rowDress(v[i]) && !rowCustody(v[i]) && !(typeof v[i] === "string" && isCustody(v[i]))) out.push(walk(v[i], key)); } return out; }
-      if (v && typeof v === "object") { var r = {}; for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k)) { if ((rowDress(v[k]) || rowCustody(v[k])) && k !== "kids") continue; r[k] = walk(v[k], k); } return r; }
+      if (Array.isArray(v)) { var out = []; for (var i = 0; i < v.length; i++) { if (!rowDress(v[i]) && !rowCustody(v[i]) && !rowTherapy(v[i]) && !(typeof v[i] === "string" && isCustody(v[i]))) out.push(walk(v[i], key)); } return out; }
+      if (v && typeof v === "object") { var r = {}; for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k)) { if ((rowDress(v[k]) || rowCustody(v[k]) || (rowTherapy(v[k]) && typeof v[k] === "object")) && k !== "kids") continue; r[k] = walk(v[k], k); } return r; }
       if (typeof v === "string" && !(key && SKIP_KEY.test(key))) return isCustody(v) ? "" : faceText(v);
       return v;
     }
     try { return data && typeof data === "object" ? walk(data, "") : data; } catch (e) { return data; }
   }
 
-  g.HouseFaceLaw = { isCustody: isCustody, cleanFeed: cleanFeed, faceText: faceText, isDressDay: isDressDay, faceDash: faceDash, rowEnded: rowEnded, keepRow: keepRow, keepEvent: keepEvent, cleanKidsWeek: cleanKidsWeek, cleanKid: cleanKid, ctNow: ctNow, DRESS: DRESS, RENDER_RULES: RENDER_RULES };
+  g.HouseFaceLaw = { isCustody: isCustody, cleanFeed: cleanFeed, faceText: faceText, isDressDay: isDressDay, faceDash: faceDash, rowEnded: rowEnded, keepRow: keepRow, keepEvent: keepEvent, isTherapy: isTherapy, rowTherapy: rowTherapy, ainsleyText: ainsleyText, THERAPY: THERAPY, cleanKidsWeek: cleanKidsWeek, cleanKid: cleanKid, ctNow: ctNow, DRESS: DRESS, RENDER_RULES: RENDER_RULES };
 })(typeof window !== "undefined" ? window : globalThis);
