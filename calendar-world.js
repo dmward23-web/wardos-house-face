@@ -139,7 +139,7 @@
       b.className = "cw-lantern" + (diff < 0 ? " is-past" : diff > 0 ? " is-fog" : " is-now") + (iso === sel ? " is-sel" : "");
       b.setAttribute("aria-pressed", iso === sel ? "true" : "false");
       b.style.setProperty("--orb", kid() === "ainsley" ? "#e7b089" : kid() === "harris" ? "#8ee7a0" : "#8fd8ff");
-      b.innerHTML = '<span class="cw-orb"></span><small>' + wdOf(iso) + '</small><small>' + (diff > 0 ? sleeps(diff) : String(+iso.slice(-2))) + "</small>";
+      b.innerHTML = '<span class="cw-orb"></span><small>' + wdOf(iso) + "</small>" + (kid() === "ainsley" ? "" : "<small>" + (diff > 0 ? sleeps(diff) : String(+iso.slice(-2))) + "</small>");   /* LIVEFIX3 · Ainsley: weekday only */
       b.addEventListener("click", function () { pickDay(iso); });
       path.appendChild(b);
     });
@@ -150,7 +150,7 @@
     var today = global.WardKids && WardKids.DAY_ISO;
     var head = root.querySelector("[data-cw-title]");
     var diff = dayDiff(today, sel);
-    if (head) head.textContent = diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : diff === -1 ? "Yesterday" : wdOf(sel) + " " + (+sel.slice(-2));
+    if (head) head.textContent = diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : diff === -1 ? "Yesterday" : wdOf(sel) + (kid() === "ainsley" ? "" : " " + (+sel.slice(-2)));   /* LIVEFIX3 */
     var list = root.querySelector("[data-cw-day]");
     if (!list) return;
     var rows = (global.WardKids && WardKids.eventsForIso && WardKids.eventsForIso(kid(), data(), sel)) || [];
@@ -160,8 +160,9 @@
     list.innerHTML = "";
     rows.forEach(function (r) {
       var li = document.createElement("li");
-      var b = document.createElement("b"); b.textContent = r.time || "";
-      var t = document.createElement("span"); t.textContent = r.what;
+      var ain = kid() === "ainsley", AL = global.HouseFaceLaw;   /* LIVEFIX3 · Ainsley rows: no time, no digit */
+      var b = document.createElement("b"); b.textContent = ain ? "" : (r.time || "");
+      var t = document.createElement("span"); t.textContent = ain ? (AL && AL.ainsleyText ? AL.ainsleyText(String(r.what || "")) : String(r.what || "")).replace(/[\d$%\u2605\u2606\u2b50]/g, "") : r.what;
       li.appendChild(b); li.appendChild(t);
       list.appendChild(li);
     });

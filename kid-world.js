@@ -1857,7 +1857,7 @@
       b.type = "button";
       b.className = "kw-day" + (lamp && d.iso === dayIso ? " is-on" : "") + (lamp && d.today ? " is-today" : "");
       b.setAttribute("aria-pressed", lamp && d.iso === dayIso ? "true" : "false");
-      b.innerHTML = "<b>" + d.letter + "</b><small>" + d.num + "</small>";
+      b.innerHTML = "<b>" + d.letter + "</b>" + (kid() === "ainsley" ? "" : "<small>" + d.num + "</small>");   /* LIVEFIX3 · Ainsley: letters only */
       b.addEventListener("click", function () {
         setDay(d.iso);
       });

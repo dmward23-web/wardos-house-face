@@ -20,7 +20,7 @@ function run(mode, w = 440, h = 956) {
   return o;
 }
 
-test("Ainsley schedule at 440 and 1920 (feed via the hub route /api/private/*.json): no digit, date or away-window end outside the header clock", SKIP, () => {
+test("Ainsley page at 440 and 1920 (feed via the hub route /api/private/*.json): no digit, date or away-window end outside the header clock", SKIP, () => {
   for (const [w, h] of [[440, 956], [1920, 1080]]) {
     const o = run("ainsley", w, h);
     assert.ok(o.hub_hits > 0, "fed through /api/private/ " + JSON.stringify(o));
