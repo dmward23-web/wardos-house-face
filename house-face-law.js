@@ -125,6 +125,7 @@
     if (typeof s !== "string") return s;
     var t = s.replace(/\b(?:leave|leaves|at|by|from|until|til|till|@)\s*(?=\$?\d)/gi, "")
       .replace(AIN_RANGE, "").replace(AIN_CLOCK, "")
+      .replace(/\b\d+\s*(?:x|times|min|mins|minutes|hr|hrs|hours|pages?)\b/gi, "")   /* LIVEFIX3d · quest counts ("20 min", "3x") */
       .replace(/\$\s*\d[\d,.]*(?:\s*\/\s*[a-z]+)?/gi, "")
       .replace(/\d+(?:\.\d+)?\s*%/g, "")
       .replace(/\b\d+\s*-\s*(?=[a-z])/gi, "")
@@ -145,7 +146,7 @@
   }
   function isAinsley(kid, id) { return /^ainsley$/i.test(String(id || "")) || /^ainsley$/i.test(String((kid && (kid.id || kid.name)) || "")); }
   function cleanAinsley(kid) {
-    ROW_LISTS.concat(["rides", "missions"]).forEach(function (k) { if (Array.isArray(kid[k])) kid[k] = kid[k].map(ainsleyRow); });
+    ROW_LISTS.concat(["rides", "missions", "quests"]).forEach(function (k) { if (Array.isArray(kid[k])) kid[k] = kid[k].map(ainsleyRow); });
     ["hottest", "bag"].forEach(function (k) { if (kid[k] && typeof kid[k] === "object") ainsleyRow(kid[k]); });
     if (typeof kid.streakLabel === "string") kid.streakLabel = ainsleyText(kid.streakLabel);
   }
@@ -225,6 +226,11 @@
     if (!o || typeof o !== "object" || Array.isArray(o)) return false;
     return isDressDay([o.summary, o.title, o.what, o.l, o.label, o.text, o.hint].filter(function (x) { return typeof x === "string"; }).join(" "));
   }
+  /* LIVEFIX3d · Ainsley's quest rows are scrubbed as the feed arrives too, so every renderer (quests, claims, flight) gets clean text */
+  function feedAinsley(name, d) {
+    try { if (name === "kids-week" && d && d.kids && d.kids.ainsley) cleanAinsley(d.kids.ainsley); } catch (e) { /* never break a board */ }
+    return d;
+  }
   function cleanFeed(name, data) {
     function walk(v, key) {
       if (Array.isArray(v)) { var out = []; for (var i = 0; i < v.length; i++) { if (!rowDress(v[i]) && !rowCustody(v[i]) && !rowTherapy(v[i]) && !(typeof v[i] === "string" && isCustody(v[i]))) out.push(walk(v[i], key)); } return out; }
@@ -232,7 +238,7 @@
       if (typeof v === "string" && !(key && SKIP_KEY.test(key))) return isCustody(v) ? "" : faceText(v);
       return v;
     }
-    try { return data && typeof data === "object" ? walk(data, "") : data; } catch (e) { return data; }
+    try { return data && typeof data === "object" ? feedAinsley(name, walk(data, "")) : data; } catch (e) { return data; }
   }
 
   g.HouseFaceLaw = { isCustody: isCustody, cleanFeed: cleanFeed, faceText: faceText, isDressDay: isDressDay, faceDash: faceDash, rowEnded: rowEnded, keepRow: keepRow, keepEvent: keepEvent, isTherapy: isTherapy, rowTherapy: rowTherapy, ainsleyText: ainsleyText, THERAPY: THERAPY, cleanKidsWeek: cleanKidsWeek, cleanKid: cleanKid, ctNow: ctNow, DRESS: DRESS, RENDER_RULES: RENDER_RULES };

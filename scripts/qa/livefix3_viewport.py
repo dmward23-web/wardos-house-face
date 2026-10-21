@@ -32,10 +32,10 @@ class Q(SimpleHTTPRequestHandler):
                 body = json.dumps(CAL).encode()
             elif f and os.path.isfile(f):
                 body = open(f, "rb").read()
-                if name == "kids-week":   # the synthetic quest names carry serial numbers ("Sample what 292"); real chore names have none and are out of scope here
+                if name == "kids-week" and mode == "ainsley":   # LIVEFIX3d · Alfred's fixture: a quest label full of counts and a time
                     d = json.loads(body)
                     for q in d.get("kids", {}).get("ainsley", {}).get("quests", []) or []:
-                        if isinstance(q, dict) and isinstance(q.get("what"), str): q["what"] = re.sub(r"\s*\d+", "", q["what"])
+                        if isinstance(q, dict): q["what"] = "Read 20 min 3x by 7:30"
                     body = json.dumps(d).encode()
             else:
                 body = b"{}"; self.send_response(404); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
@@ -55,7 +55,7 @@ AIN = r"""() => { const D = /[\d$%\u2605\u2606\u2b50]/;
   const CLK = /^(?:[A-Z][a-z]{2}\s*·\s*)?\d{1,2}:\d{2}\s*[AP]M$/;   /* the header clock is chrome */
   const o = []; const tw = document.createTreeWalker(sec, NodeFilter.SHOW_TEXT); let n;
   while ((n = tw.nextNode())) { const el = n.parentElement, t = n.nodeValue.trim(); if (!t || !el || !vis(el) || el.closest('script,style,[data-mount-consume-hdr]') || CLK.test(t)) continue; o.push(t); }
-  return { digits: o.filter(t => D.test(t)).slice(0, 8), texts: o.length, endDate: o.filter(t => /\bOct\b|\bthrough\b|Multi-day/i.test(t)).slice(0, 4) }; }"""
+  return { digits: o.filter(t => D.test(t)).slice(0, 8), texts: o.length, readRows: o.filter(t => /^Read\b/.test(t)).length, endDate: o.filter(t => /\bOct\b|\bthrough\b|Multi-day/i.test(t)).slice(0, 4) }; }"""
 TMR = r"""() => [...document.querySelectorAll('.lb-day-tmr, .lb-list-sec--tmr, [data-live="leaveby-tomorrow"], .leaveby-sec--tmr')].map(e => e.innerText.replace(/\s+/g, ' ')).join(' || ')"""
 out = {"mode": mode, "size": f"{w}x{h}"}
 with sync_playwright() as p:

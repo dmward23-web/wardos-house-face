@@ -25,6 +25,7 @@ test("Ainsley page at 440 and 1920 (feed via the hub route /api/private/*.json):
     const o = run("ainsley", w, h);
     assert.ok(o.hub_hits > 0, "fed through /api/private/ " + JSON.stringify(o));
     assert.ok(o.state.texts > 3, JSON.stringify(o));
+    assert.ok(o.state.readRows > 0, "the 'Read 20 min 3x by 7:30' quest fixture renders (scrubbed) " + JSON.stringify(o));
     assert.deepEqual(o.state.digits, [], w + " " + JSON.stringify(o));
     assert.deepEqual(o.state.endDate, [], w + " " + JSON.stringify(o));
   }
