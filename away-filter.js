@@ -171,7 +171,7 @@
     if (!w) return true;
     var away = w.ms != null ? isAwayAt(w.ms) : isAwayDay(w.iso);
     if (!away) return true;
-    var dad = opts && opts.dadOnly != null ? !!opts.dadOnly : isDadOnly();
+    var dad = opts && opts.dadOnly != null ? !!opts.dadOnly : isDanView();
     return dad && dadActs(o);
   }
 
@@ -292,6 +292,15 @@
     if (typeof o === "string" && !(key && SKIP_KEY.test(key))) return dadText(o);
     return o;
   }
+  /* LIVEFIX3 · Atlas: the hub (sheet-index.html, install tag carries data-dan-view) is Dan's phone view and gets the same
+     narrow away exception as the Dad-only page. Opened from the wall (?from=wall) or the wall itself, the strict law stands. */
+  function isDanView() {
+    if (isDadOnly()) return true;
+    try {
+      if (/[?&]from=wall\b/.test(String((g.location && g.location.search) || ""))) return false;
+      return !!(g.document && g.document.querySelector("script[data-away-install][data-dan-view]"));
+    } catch (e) { return false; }
+  }
   function isDadOnly() {
     try { return !!(g.document && g.document.querySelector("script[data-away-install][data-dad-only]")); } catch (e) { return false; }
   }
@@ -334,7 +343,7 @@
     isAwayAt: isAwayAt, isAwayDay: isAwayDay, isAwayNow: isAwayNow, awayUntil: awayUntil, isKidText: isKidText, isKidItem: isKidItem, dadActs: dadActs,
     whenOf: whenOf, keepItem: keepItem, filterCalLive: filterCalLive, filterCalMonths: filterCalMonths,
     filterKidsWeek: filterKidsWeek, glass: glass, scrubDom: scrubDom, install: install,
-    dadText: dadText, dadDeep: dadDeep, isDadOnly: isDadOnly
+    dadText: dadText, dadDeep: dadDeep, isDadOnly: isDadOnly, isDanView: isDanView
   };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (typeof g === "object" && g) g.AwayFilter = api;

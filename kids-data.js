@@ -1944,6 +1944,31 @@
         }).join("");
       }
     }
+    if (kidId === "ainsley") consumeAinsleyScrub(root);   /* LIVEFIX3 */
+  }
+
+  /* LIVEFIX3 · Ainsley law on her schedule section: no digit, time or date anywhere in it (weekday words only),
+     no countdown, and no away-window end (no week-change framing). The boys' render path is untouched. */
+  function consumeAinsleyScrub(root) {
+    var L = global.HouseFaceLaw;
+    var strip = function (t) {
+      var out = (L && L.ainsleyText) ? L.ainsleyText(String(t)) : String(t).replace(/[\d$%\u2605\u2606\u2b50]/g, "");
+      return out.replace(/[\d$%\u2605\u2606\u2b50]/g, "");
+    };
+    try {
+      Array.prototype.forEach.call(root.querySelectorAll(".consume-countdown, .consume-punch-sub, .consume-punch-chip"), function (el) {
+        el.textContent = ""; el.hidden = true; el.style.setProperty("display", "none", "important");
+      });
+      var w = document.createTreeWalker(root, 4 /* NodeFilter.SHOW_TEXT */), n, list = [];
+      while ((n = w.nextNode())) { if (!(n.parentElement && n.parentElement.closest("[data-mount-consume-hdr]"))) list.push(n); }   /* the header clock is chrome */
+      list.forEach(function (tn) {
+        if (/[\d$%\u2605\u2606\u2b50]/.test(tn.nodeValue)) {
+          var lead = /^\s/.test(tn.nodeValue) ? " " : "", trail = /\s$/.test(tn.nodeValue) ? " " : "";
+          var v = strip(tn.nodeValue);
+          tn.nodeValue = v ? lead + v + trail : "";
+        }
+      });
+    } catch (e) { /* never break her board over a filter */ }
   }
 
   function renderKidPage(kidId, data) {
