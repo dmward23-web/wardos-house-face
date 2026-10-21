@@ -153,11 +153,26 @@
     if (d) return { iso: d };
     return null;
   }
-  function keepItem(o, nowMs) {
+  /* LIVEFIX1 · Atlas ruling (b), narrow: on away time the Dan-only views (script tag carries data-dad-only, sheet-dan.html)
+     still show the kid rows Dan himself attends or acts on: parent-teacher conferences (virtual too), school-closure notices,
+     and school events marked as Dan's. Nothing else (practices, skate nights, activities). Generic words only, no names.
+     Shared, wall and kid pages keep the away law unchanged; the therapy filter and the house-face-law word filters run separately on every row. */
+  var DAD_ACT = /\bconferences?\b|\bparent[- ]teacher\b|\bno school\b|\bearly release\b|\b(?:school\s+)?clos(?:ed|ure|ing)\b/i;   /* privacy-scan:allow calendar_string */
+  var DAD_NOT = /\bpractice\b|\bskate\b|\bgame\b|\bswim\b|\blesson\b|\bcamp\b|\btryouts?\b|\bparty\b|\bnight\b/i;
+  function dadActs(o) {
+    var t = textOf(o);
+    if (!t || DAD_NOT.test(t)) return false;
+    if (DAD_ACT.test(t)) return true;
+    return /\bschool\b/i.test(t) && /\b(?:Dad|Dan)\b/.test(t);
+  }
+  function keepItem(o, nowMs, opts) {
     if (!MONTHS || !isKidItem(o)) return true;
     var w = whenOf(o, nowMs || now());
     if (!w) return true;
-    return w.ms != null ? !isAwayAt(w.ms) : !isAwayDay(w.iso);
+    var away = w.ms != null ? isAwayAt(w.ms) : isAwayDay(w.iso);
+    if (!away) return true;
+    var dad = opts && opts.dadOnly != null ? !!opts.dadOnly : isDadOnly();
+    return dad && dadActs(o);
   }
 
   /* ---- data filters (pure on the passed object; return it) ---- */
@@ -316,7 +331,7 @@
 
   var api = {
     HANDOFF_MIN: HANDOFF_MIN, setMonths: setMonths, hasMonths: hasMonths, ready: ready, now: now,
-    isAwayAt: isAwayAt, isAwayDay: isAwayDay, isAwayNow: isAwayNow, awayUntil: awayUntil, isKidText: isKidText, isKidItem: isKidItem,
+    isAwayAt: isAwayAt, isAwayDay: isAwayDay, isAwayNow: isAwayNow, awayUntil: awayUntil, isKidText: isKidText, isKidItem: isKidItem, dadActs: dadActs,
     whenOf: whenOf, keepItem: keepItem, filterCalLive: filterCalLive, filterCalMonths: filterCalMonths,
     filterKidsWeek: filterKidsWeek, glass: glass, scrubDom: scrubDom, install: install,
     dadText: dadText, dadDeep: dadDeep, isDadOnly: isDadOnly
