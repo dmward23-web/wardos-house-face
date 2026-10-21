@@ -12,19 +12,22 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
 const SKIP = browser ? {} : { skip: "SKIP no playwright (QA_NO_BROWSER)" };
-function run(mode) {
-  const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/livefix3_viewport.py"), mode, "440", "956"], { encoding: "utf8", timeout: 240000 });
+function run(mode, w = 440, h = 956) {
+  const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/livefix3_viewport.py"), mode, String(w), String(h)], { encoding: "utf8", timeout: 240000 });
   assert.equal(r.status, 0, r.stderr);
   const o = JSON.parse(r.stdout.trim().split("\n").pop());
   assert.deepEqual(o.errors, [], mode + " page errors");
   return o;
 }
 
-test("Ainsley schedule at 440: no digit, time, date or away-window end outside the header clock", SKIP, () => {
-  const o = run("ainsley");
-  assert.ok(o.state.texts > 3, JSON.stringify(o));
-  assert.deepEqual(o.state.digits, [], JSON.stringify(o));
-  assert.deepEqual(o.state.endDate, [], JSON.stringify(o));
+test("Ainsley schedule at 440 and 1920 (feed via the hub route /api/private/*.json): no digit, date or away-window end outside the header clock", SKIP, () => {
+  for (const [w, h] of [[440, 956], [1920, 1080]]) {
+    const o = run("ainsley", w, h);
+    assert.ok(o.hub_hits > 0, "fed through /api/private/ " + JSON.stringify(o));
+    assert.ok(o.state.texts > 3, JSON.stringify(o));
+    assert.deepEqual(o.state.digits, [], w + " " + JSON.stringify(o));
+    assert.deepEqual(o.state.endDate, [], w + " " + JSON.stringify(o));
+  }
 });
 
 test("hub on an away day: conferences show, practice and skate hidden; from the wall and on the wall: nothing", SKIP, () => {

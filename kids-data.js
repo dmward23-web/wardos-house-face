@@ -1754,7 +1754,7 @@
       var wh = "";
       weekIsos.forEach(function (iso) {
         var dow = CONSUME_DOW[dowIndexFromIso(iso)];
-        var dn = String(Number(iso.split("-")[2]));
+        var dn = kidId === "ainsley" ? "" : String(Number(iso.split("-")[2]));   /* LIVEFIX3 · her week strip: letters only */
         var bits = byIso[iso] || [];
         var sel = iso === selected ? " sel" : "";
         var dots = "";
@@ -1807,7 +1807,8 @@
     var selDn = String(Number(selected.split("-")[2]));
     var todayLab = root.querySelector("[data-mount-consume-today-label]");
     if (todayLab) {
-      var lab = selected === DAY_ISO ? ("Today · " + selDow + " " + selDn) : (selDow + " " + selDn);
+      var labDn = kidId === "ainsley" ? "" : " " + selDn;   /* LIVEFIX3 · weekday words only on her board */
+      var lab = selected === DAY_ISO ? ("Today · " + selDow + labDn) : (selDow + labDn);
       todayLab.innerHTML = '<span class="tag">' + esc(lab) + '</span><span class="line"></span>';
     }
 
@@ -1823,9 +1824,9 @@
         '<div class="consume-punch-ico g2-mark">' + g2Ico(meta.hqSym || "g2-home") + "</div>" +
         '<div class="consume-punch-body">' +
         '<div class="consume-punch-title">' + esc(meta.hqTitle) + "</div>" +
-        '<div class="consume-punch-sub">' + esc(kidsSafeGlass(sub)) + "</div>" +
+        (kidId === "ainsley" ? "" : '<div class="consume-punch-sub">' + esc(kidsSafeGlass(sub)) + "</div>") +   /* LIVEFIX3 · no away-window end on her board */
         "</div>" +
-        '<div class="consume-punch-chip">' + esc(consumeThruChip(through)) + "</div>" +
+        (kidId === "ainsley" ? "" : '<div class="consume-punch-chip">' + esc(consumeThruChip(through)) + "</div>") +
         "</div>";
     }
 
@@ -1937,7 +1938,7 @@
           var time = r.p.time || "";
           if (r.p.leave && time) time = time; /* already leave-aware in when */
           return '<div class="consume-ahead-row">' +
-            '<span class="consume-ahead-day">' + esc(dow + " " + dn) + "</span>" +
+            '<span class="consume-ahead-day">' + esc(kidId === "ainsley" ? dow : (dow + " " + dn)) + "</span>" +   /* LIVEFIX3 */
             '<div class="consume-ahead-what">' + esc(what) + dim + "</div>" +
             '<span class="consume-ahead-time">' + esc(time || (r.p.allDay ? "All day" : "")) + "</span>" + /* ALLDAY1 */
             "</div>";
