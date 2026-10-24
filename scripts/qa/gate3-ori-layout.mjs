@@ -629,8 +629,10 @@ async function main() {
     /* G3GL1 · the runner has no GPU. Without these two flags Chrome falls back to software WebGL on its own (deprecated
        path); after a few seconds of a WebGL board (sheet-spotify: ori scene + the MERGE1 night scene) that fallback
        stalls, and the next board's WebGL context blocks its main thread, so "load" never fires (sheet-status nav timeout
-       on wall and wall-land since MERGE1). Asking for SwiftShader explicitly is the supported GPU-less setup. The gate
-       only loads this repo's own pages. */
+       on wall and wall-land since MERGE1). Asking for SwiftShader explicitly is the supported GPU-less setup.
+       --enable-unsafe-swiftshader is acceptable ONLY because this gate loads loopback pages (this repo served on
+       127.0.0.1 by startServer); software WebGL is not a sandbox boundary, so never reuse these args for a browser that
+       opens third-party or internet pages. */
     args: ["--no-sandbox", "--disable-dev-shm-usage", "--hide-scrollbars", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"]
   });
   const failures = [];

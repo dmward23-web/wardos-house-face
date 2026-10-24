@@ -801,7 +801,11 @@
   WP.burst = function (p, col, n, o) { o = o || {}; for (var i = 0; i < n; i++) { var a = this.R() * TAU, s = (80 + this.R() * 260) * this.rs * (o.speed || 1);
     this.sparks.push({ x: p[0], y: p[1], vx: Math.cos(a) * s, vy: Math.sin(a) * s - 120 * this.rs, life: 0.6 + this.R() * 0.9, t0: now(), r: (1.4 + this.R() * 2.2) * this.rs, col: col, g: o.g == null ? 220 : o.g }); } };
   WP.stats = function () { return { fps: this.fps || 0, w: this.S ? this.S.w : 0, h: this.S ? this.S.h : 0, gl: !!this.S, hf: this.S ? this.S.hf : false, layout: this.lname, reduced: this.reduced(), saver: this.saver, tier: this.tierId || "", layers: this.tierLayers == null ? 5 : this.tierLayers, bloom: this.tierBloom, dpr: this.cfg ? this.cfg.dprMax : 0, scale: this.cfg ? this.cfg.renderScale : 0, gap: this.frameGap || 0 }; };
-  WP.destroy = function () { this.dead = true; if (this.raf) cancelAnimationFrame(this.raf); if (this.ro) this.ro.disconnect(); this.S = null; this.host.innerHTML = ""; };
+  WP.destroy = function () { this.dead = true; if (this.raf) cancelAnimationFrame(this.raf); if (this.ro) this.ro.disconnect();
+    /* G3GL2 · hand the WebGL context back now instead of at GC: a closed world must not hold one of the browser's few
+       contexts (SwiftShader runners stall when the next board asks for one) */
+    try { var gl = this.S && this.S.gl, lose = gl && gl.getExtension("WEBGL_lose_context"); if (lose) lose.loseContext(); } catch (e) { /* already lost */ }
+    this.S = null; this.host.innerHTML = ""; };
   /* glowing orb object helper (lanterns, leave-by wisps, what's-next orbs...): place at ground-plate coords (fx may exceed 1 on scrolling worlds) */
   function Orb(o) { this.o = Object.assign({ layer: "ground", fx: 0.5, fy: 0.5, r: 0.02, color: null, pass: "ground", glow: 1.2, icon: null, bob: 1 }, o || {}); this.pass = this.o.pass; this.label = this.o.label; this.ph = Math.random() * 6; this.pop = new Spring(1, 120, 0.4); }
   Orb.prototype.pos = function (W) { var L = W.L, p = L.toPx(this.o.layer, this.o.fx, this.o.fy), T = (W.S ? W.S.time : 0); return [p[0], p[1] + Math.sin(T * 1.2 + this.ph) * 4 * L.k * this.o.bob]; };
