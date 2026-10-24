@@ -63,8 +63,8 @@
   }
 
   var state = { status: "idle", lastOk: 0, stale: false, feeds: {} };
-  function note(name, st, at) {
-    state.feeds[name] = { status: st, at: at || 0 };
+  function note(name, st, at, why) {
+    state.feeds[name] = { status: st, at: at || 0, why: why ? String(why).slice(0, 40) : "" }; /* CAMREST2 · why: "HTTP 401" lets a tile say "needs pairing" */
     var anyOffline = false, anyStale = false, newest = 0;
     for (var k in state.feeds) {
       var f = state.feeds[k];
@@ -125,8 +125,8 @@
     var cacheKey = CACHE + name;
     function fromCache(why) {
       var c = null; try { c = JSON.parse(lsGet(cacheKey) || "null"); } catch (e) { c = null; }
-      if (c && c.data && Date.now() - c.at < (DEVICE[name] ? DEVICE_MAX_AGE : MAX_AGE)) { note(name, "stale", c.at); return { data: c.data, status: "stale", at: c.at, why: why }; }
-      note(name, "offline", 0);
+      if (c && c.data && Date.now() - c.at < (DEVICE[name] ? DEVICE_MAX_AGE : MAX_AGE)) { note(name, "stale", c.at, why); return { data: c.data, status: "stale", at: c.at, why: why }; }
+      note(name, "offline", 0, why);
       return { data: null, status: "offline", at: 0, why: why };
     }
     if (forceOffline || !origFetch) return Promise.resolve(fromCache("forced"));

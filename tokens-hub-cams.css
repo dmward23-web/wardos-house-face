@@ -257,8 +257,10 @@
   opacity: 0.55;
 }
 
-/* CAMREST1 · Camera resting. A tile with no real picture (feed 5xx, token or auth failure, a still that failed) shows
-   the painted grove, dimmed and softened, behind one quiet word. No pill, no broken image, no error text. */
+/* CAMREST1/CAMREST2 · Camera resting (Prism spec). A tile with no real picture (feed 5xx, token or auth failure, a
+   still that failed or has not loaded) shows the painted grove, lightly softened, behind one lit warm pill.
+   No status pill, no broken image, no error text. */
+@font-face { font-family: "Inter Display"; src: url(fonts/InterDisplay-Medium.woff2) format("woff2"), url(fonts/InterDisplay-Medium.ttf) format("truetype"); font-weight: 500; font-display: swap; }
 html body .hub-cam.hub-cam-resting .hub-cam-pill,
 html body .hub-cam.hub-cam-resting .hub-cam-stub-void,
 html body .hub-cam.hub-cam-resting img.hub-cam-media {
@@ -271,34 +273,77 @@ html body .hub-cam.hub-cam-resting img.hub-cam-media {
   align-items: center;
   justify-content: center;
   background: #0b0f14;
+  container-type: inline-size;
 }
 .hub-cam-rest::before {
   content: "";
   position: absolute;
-  inset: -16px;
+  inset: -6px;
   background: url("ori/plates/painted/grove-mid.webp") center 42% / cover no-repeat;
-  filter: blur(7px) saturate(0.72) brightness(0.46);
+  filter: brightness(0.8) saturate(1.05) blur(2px);
 }
 .hub-cam-rest::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 85% 75% at 50% 45%, rgba(4, 6, 10, 0) 35%, rgba(4, 6, 10, 0.62));
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(10, 6, 2, 0.45) 100%);
 }
-.hub-cam-rest-word {
+.hub-cam-rest-pill {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  white-space: nowrap;
   z-index: 1;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  color: rgba(226, 236, 244, 0.74);
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.65);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(28, 18, 8, 0.82);
+  border: 1.5px solid #e8a33d;
+  box-shadow: 0 0 14px rgba(232, 163, 61, 0.45), inset 0 0 8px rgba(232, 163, 61, 0.18);
 }
-/* the phone's 46px camera dots keep only the painted rest, no word */
+.hub-cam-rest-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e8a33d;
+  animation: hubCamRestPulse 2.4s ease-in-out infinite;
+}
+@keyframes hubCamRestPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+.hub-cam-rest-word {
+  font-family: "Inter Display", "Inter", system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: #ffe2b0;
+}
+/* phone (Prism): 15px word, 10px 22px pill, whenever the tile is wide enough to hold it */
+@media (max-width: 600px) {
+  .hub-cam-rest-pill { padding: 10px 22px; }
+  .hub-cam-rest-word { font-size: 15px; }
+}
+html.ori-phone .hub-cam-rest-pill {
+  padding: 10px 22px;
+}
 html.ori-phone .hub-cam-rest-word {
-  display: none;
+  font-size: 15px;
+}
+/* the phone's three-across camera row (~140px tiles) cannot hold a 10px 22px pill: same pill, tighter, word at the
+   14px floor (never smaller); below 128px (the old 46px dots) only the painted rest shows, never a squeezed word */
+@container (max-width: 199px) {
+  html body .hub-cam-rest-pill { padding: 5px 10px; gap: 5px; }
+  html body .hub-cam-rest-word { font-size: 14px; letter-spacing: 0.01em; }
+}
+@container (max-width: 127px) {
+  html body .hub-cam-rest-pill { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hub-cam-rest-dot { animation: none; opacity: 1; }
 }

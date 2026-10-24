@@ -157,19 +157,28 @@
     return _liveCache && _liveCache.data ? _liveCache.data : null;
   }
 
+  /* CAMREST2 · last camera-feed HTTP failure (0 = fine) and a quicker retry while it is down: 15 s doubling to 2 min */
+  var _liveErr = 0, _liveRetryMs = 0, _liveRetryT = null;
   function fetchLive() {
     return fetch(LIVE_URL + "?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) {
-        if (!r.ok) throw new Error("HTTP " + r.status);
+        if (!r.ok) { _liveErr = r.status || -1; throw new Error("HTTP " + r.status); }
         return r.json();
       })
       .then(function (data) {
+        _liveErr = 0;
+        _liveRetryMs = 0;
         _liveCache = { at: Date.now(), data: data };
         notify();
         return data;
       })
       .catch(function () {
+        if (!_liveErr) _liveErr = -1;
         if (!_liveCache) _liveCache = { at: Date.now(), data: null };
+        if (!_liveRetryT) {
+          _liveRetryMs = Math.min(Math.max(15000, _liveRetryMs * 2), 120000);
+          _liveRetryT = setTimeout(function () { _liveRetryT = null; fetchLive(); }, _liveRetryMs);
+        }
         notify();
         return null;
       });
@@ -568,18 +577,64 @@
     };
   }
 
-  /* CAMREST1 · a camera that cannot show a real picture (feed 5xx, token or auth failure, offline, a still that failed)
-     rests: the painted grove, dimmed and softened, behind one quiet "Camera resting". No pill, no broken image, no
-     error text. Any real still or LIVE video takes the tile back. */
-  function setHubCamResting(el, label, on) {
+  /* CAMREST1/CAMREST2 · a camera that cannot show a real picture (feed 5xx, token or auth failure, offline, a still that
+     failed or has not loaded yet) rests: the painted grove behind one lit "Camera resting" pill (Prism spec). No status
+     pill, no broken image, no error text. A resting tile carries only its slot label: no camera name, no device id,
+     no viewer link. Only a still that really loaded, or LIVE video, takes the tile back; a repaint never does. */
+  var STILL_PLACEHOLDER = /^data:image\/gif/;
+  var REST_RETRY_MIN = 15000, REST_RETRY_MAX = 120000;
+  function hubStillFailed(img) {
+    return !!(img && (img.hasAttribute("data-pf-offline") || img.getAttribute("data-hub-still") === "failed"));
+  }
+  function hubStillOk(img) {
+    return !!(img && img.getAttribute("data-hub-still") === "ok" && !hubStillFailed(img) &&
+      img.getAttribute("src") && !STILL_PLACEHOLDER.test(img.getAttribute("src")));
+  }
+  /* "pair" when the camera feed says the device key or the Google consent is refused (401/403 or need_token) */
+  function hubFeedWhy(data) {
+    if (data && data.status === "need_token") return "pair";
+    if (_liveErr === 401 || _liveErr === 403) return "pair";
+    var PF = global.PrivateFeed;
+    try {
+      var f = PF && PF.state && PF.state().feeds && PF.state().feeds["nest-live"];
+      if (f && f.status === "offline" && /\b40[13]\b/.test(String(f.why || ""))) return "pair";
+    } catch (_) {}
+    return "";
+  }
+  function hubRestPrivacy(el, label) {
+    var lab = el.querySelector(".hub-cam-label");
+    if (lab) lab.textContent = label;
+    el.removeAttribute("data-cam-id");
+    el.setAttribute("href", "sheet-google-home.html");
+    var img = el.querySelector("img.hub-cam-media");
+    if (img) {
+      img.alt = label + " still";
+      /* data-pf-cam names the camera; while a fetch is in flight the feed needs it, so drop it only once the attempt ended */
+      if (img.getAttribute("data-hub-still") !== "wait") img.removeAttribute("data-pf-cam");
+    }
+    var vid = el.querySelector("video.hub-cam-video");
+    if (vid) vid.setAttribute("aria-label", label + " live");
+  }
+  function hubUnrestIdentity(el) {
+    var id = el._hubIdentity;
+    if (!id) return;
+    var lab = el.querySelector(".hub-cam-label");
+    if (lab) lab.textContent = id.name;
+    if (id.camId) { el.setAttribute("data-cam-id", id.camId); el.setAttribute("href", id.href); }
+    var img = el.querySelector("img.hub-cam-media");
+    if (img) img.alt = id.name + " still";
+  }
+  function setHubCamResting(el, label, on, why) {
     if (!el) return;
     var doc = el.ownerDocument || document;
+    label = label || el._hubLabel || "Camera";
     var pill = el.querySelector(".hub-cam-pill");
     var wrap = el.querySelector(".hub-cam-media-wrap");
     var rest = wrap ? wrap.querySelector(".hub-cam-rest") : null;
     if (on) {
       el.classList.add("hub-cam-resting");
-      el.setAttribute("aria-label", (label || "Camera") + " camera · resting");
+      el.setAttribute("aria-label", label + " camera · resting" + (why === "pair" ? ", needs pairing" : ""));
+      if (why === "pair") el.setAttribute("data-rest-why", "pair"); else el.removeAttribute("data-rest-why");
       if (pill) { pill.setAttribute("hidden", ""); pill.setAttribute("aria-hidden", "true"); }
       var img = el.querySelector("img.hub-cam-media");
       if (img) img.style.display = "none";
@@ -589,22 +644,75 @@
         rest = doc.createElement("div");
         rest.className = "hub-cam-media hub-cam-rest";
         rest.setAttribute("aria-hidden", "true");
+        var p = doc.createElement("span");
+        p.className = "hub-cam-rest-pill";
+        var dot = doc.createElement("i");
+        dot.className = "hub-cam-rest-dot";
         var word = doc.createElement("span");
         word.className = "hub-cam-rest-word";
         word.textContent = "Camera resting";
-        rest.appendChild(word);
+        p.appendChild(dot);
+        p.appendChild(word);
+        rest.appendChild(p);
         wrap.insertBefore(rest, wrap.firstChild);
       }
       if (rest) rest.style.display = "";
+      hubRestPrivacy(el, label);
     } else {
+      var was = el.classList.contains("hub-cam-resting");
       el.classList.remove("hub-cam-resting");
+      el.removeAttribute("data-rest-why");
       if (pill) { pill.removeAttribute("hidden"); pill.removeAttribute("aria-hidden"); }
       if (rest) rest.style.display = "none";
+      if (was) hubUnrestIdentity(el);
     }
   }
-
-  function hubStillFailed(img) {
-    return !!(img && img.getAttribute("data-pf-offline") === "1");
+  /* CAMREST2 · a failed still is retried on its own, 15 s doubling to 2 min; other tiles and other feeds are untouched */
+  function hubStillRetry(el, img, doc) {
+    if (!el || !img || el._hubRetryT) return;
+    var delay = el._hubRetryMs || REST_RETRY_MIN;
+    el._hubRetryT = setTimeout(function () {
+      el._hubRetryT = null;
+      el._hubRetryMs = Math.min(delay * 2, REST_RETRY_MAX);
+      if (el._hubLivePlaying || !hubStillFailed(img)) return;
+      img._hubTry = (img._hubTry || 0) + 1;
+      img._pfSnap = null;
+      paintHubCamDeck(doc || el.ownerDocument || document);
+    }, delay);
+  }
+  function hubStillSettled(el, img, ok) {
+    if (ok) {
+      img.setAttribute("data-hub-still", "ok");
+      el._hubRetryMs = 0;
+      if (el._hubRetryT) { clearTimeout(el._hubRetryT); el._hubRetryT = null; }
+      if (el._hubLivePlaying) return;
+      setHubCamResting(el, el._hubLabel, false);
+      img.style.display = "block";
+    } else {
+      img.setAttribute("data-hub-still", "failed");
+      img.style.display = "none";
+      if (el._hubLivePlaying) return;
+      setHubCamResting(el, el._hubLabel, true, el._hubWhy);
+      hubStillRetry(el, img);
+    }
+  }
+  function armHubStill(el, img) {
+    if (img._hubArmed) return;
+    img._hubArmed = true;
+    img.addEventListener("load", function () {
+      if (STILL_PLACEHOLDER.test(img.getAttribute("src") || "") || img.hasAttribute("data-pf-offline")) return;
+      hubStillSettled(el, img, true);
+    });
+    img.addEventListener("error", function () {
+      if (STILL_PLACEHOLDER.test(img.getAttribute("src") || "")) return;
+      hubStillSettled(el, img, false);
+    });
+    /* the private feed marks a still it could not fetch (5xx, 401) with data-pf-offline instead of firing onerror */
+    if (typeof MutationObserver !== "undefined") {
+      new MutationObserver(function () {
+        if (img.hasAttribute("data-pf-offline") && img.getAttribute("data-hub-still") !== "failed") hubStillSettled(el, img, false);
+      }).observe(img, { attributes: true, attributeFilter: ["data-pf-offline"] });
+    }
   }
 
   function paintHubCamDeck(doc) {
@@ -612,11 +720,13 @@
     doc = doc || document;
     var deck = doc.getElementById("hub-cam-deck");
     if (!deck) return;
-    /* NODATA1 · never show broken copy: stale/stub camera tiles hide; the deck hides when none is left */
-    if (!doc.getElementById("nodata1-cams")) { var st = doc.createElement("style"); st.id = "nodata1-cams"; st.textContent = ".hub-cam.hub-cam-stale,.hub-cam.hub-cam-stub{display:none!important}#hub-cam-deck.nodata1-empty{display:none!important}"; (doc.head || doc.documentElement).appendChild(st); }
+    /* NODATA1 · never show broken copy: stale/stub camera tiles hide; the deck hides when none is left.
+       CAMREST2 · a resting tile is calm, not broken, so it stays: a whole-feed 5xx/401/offline rests the deck, never hides it */
+    if (!doc.getElementById("nodata1-cams")) { var st = doc.createElement("style"); st.id = "nodata1-cams"; st.textContent = ".hub-cam.hub-cam-stale:not(.hub-cam-resting),.hub-cam.hub-cam-stub:not(.hub-cam-resting){display:none!important}#hub-cam-deck.nodata1-empty{display:none!important}"; (doc.head || doc.documentElement).appendChild(st); }
     setTimeout(function () { var vis = [].some.call(deck.querySelectorAll(".hub-cam"), function (t) { return getComputedStyle(t).display !== "none"; }); deck.classList.toggle("nodata1-empty", !vis); }, 0);
     var data = cachedData();
     var g = gate(data);
+    var why = hubFeedWhy(data);
     var cams = (data && data.cameras) || [];
     var tiles = deck.querySelectorAll(".hub-cam");
     for (var i = 0; i < HUB_CAMS.length; i++) {
@@ -624,10 +734,13 @@
       var el = tiles[i] || null;
       if (!el) continue;
       var cam = findCamForHub(slot, cams);
+      var realCam = !!(cam && !String(cam.id || "").startsWith("stub-"));
       el._hubLabel = slot.label;
+      el._hubWhy = why;
+      el._hubIdentity = { name: hubLabel(slot, cam), camId: realCam ? cam.id : "", href: realCam ? viewerHref(cam) : "sheet-google-home.html" };
       /* CAMLIVE2 · never clobber a proven LIVE playing tile with STILL on poll */
       if (el._hubLivePlaying && el.classList.contains("hub-cam-live")) {
-        if (cam && !String(cam.id || "").startsWith("stub-")) {
+        if (realCam) {
           el.setAttribute("data-cam-id", cam.id);
           el.setAttribute("href", viewerHref(cam));
           el.setAttribute("aria-label", hubLabel(slot, cam) + " camera · LIVE");
@@ -637,23 +750,12 @@
       var h = hubCamHonesty(slot, cam, g, data);
       el.classList.remove("hub-cam-live", "hub-cam-still", "hub-cam-stale", "hub-cam-stub");
       el.classList.add(h.cls);
-      el.setAttribute("aria-label", hubLabel(slot, cam) + " camera · " + h.pill);
-      if (cam && !String(cam.id || "").startsWith("stub-")) {
-        el.setAttribute("data-cam-id", cam.id);
-        el.setAttribute("href", viewerHref(cam));
-      } else {
-        el.removeAttribute("data-cam-id");
-        el.setAttribute("href", "sheet-google-home.html");
-      }
-
       var pill = el.querySelector(".hub-cam-pill");
       if (pill) {
         pill.textContent = h.pill;
         pill.classList.remove("is-live", "is-still", "is-stale", "is-stub", "is-need");
         pill.classList.add(h.pillCls);
       }
-      var label = el.querySelector(".hub-cam-label");
-      if (label) label.textContent = hubLabel(slot, cam);
       /* HUBFMT1 · one status only — pill owns it; hide foot kind duplicate */
       var kind = el.querySelector(".hub-cam-kind");
       if (kind) {
@@ -669,43 +771,41 @@
       /* Prefer real still path; fall back to known NESTSTILL1 slot file so wall never goes black */
       var snapUrl = h.snapUrl || slot.snap || null;
       /* PRIVFEED3 · camera stills are private: only through the private feed, never the static data/ path (no 404s);
-         with no key or the feed offline the still is simply not drawn */
+         with no key or the CAMERA feed offline the still is simply not drawn. CAMREST2 · only the camera feed counts:
+         a calendar or lights feed being down never rests the cameras */
       var privSnap = !!snapUrl && /(^|\/)data\/nest-snaps\//.test(snapUrl);
       var PF = window.PrivateFeed;
-      if (privSnap && !(PF && PF.canSnap && PF.canSnap() && PF.state().status !== "offline")) snapUrl = null;
+      var nestFeed = null;
+      try { nestFeed = PF && PF.state && PF.state().feeds ? PF.state().feeds["nest-live"] : null; } catch (_) { nestFeed = null; }
+      if (privSnap && !(PF && PF.canSnap && PF.canSnap() && !(nestFeed && nestFeed.status === "offline"))) snapUrl = null;
       var showStill = !!snapUrl;
 
       if (showStill) {
         if (!img && mediaWrap) {
           img = doc.createElement("img");
           img.className = "hub-cam-media";
-          img.alt = hubLabel(slot, cam) + " still";
+          img.alt = slot.label + " still";
+          img.style.display = "none";
           mediaWrap.insertBefore(img, mediaWrap.firstChild);
         }
         if (img) {
-          var bust = snapUrl + (snapUrl.indexOf("?") >= 0 ? "&" : "?") + "v=CAMLIVE2";
-          if (privSnap) { if (img._pfSnap !== bust) { img._pfSnap = bust; PF.bindSnap(img, bust); } }
-          else if (img.getAttribute("src") !== bust) img.setAttribute("src", bust);
-          /* Keep still visible until LIVE video proves frames */
-          if (!el._hubLivePlaying) img.style.display = "block";
-          /* CAMREST1 · a still that will not load (proxy 5xx, auth) rests the tile: never a broken image or an error pill */
-          img.onerror = (function (tile, image) {
-            return function () {
-              image.style.display = "none";
-              if (tile && !tile._hubLivePlaying) setHubCamResting(tile, tile._hubLabel, true);
-            };
-          })(el, img);
-          /* the private feed marks a still it could not fetch (5xx, 401) with data-pf-offline instead of firing onerror */
-          if (privSnap && !img._hubRestObs && typeof MutationObserver !== "undefined") {
-            img._hubRestObs = new MutationObserver((function (tile, image) {
-              return function () {
-                if (!tile || tile._hubLivePlaying) return;
-                if (hubStillFailed(image)) setHubCamResting(tile, tile._hubLabel, true);
-                else if (tile.classList.contains("hub-cam-resting") && image.getAttribute("src")) { setHubCamResting(tile, tile._hubLabel, false); image.style.display = "block"; }
-              };
-            })(el, img));
-            img._hubRestObs.observe(img, { attributes: true, attributeFilter: ["data-pf-offline", "src"] });
+          armHubStill(el, img);
+          var bust = snapUrl + (snapUrl.indexOf("?") >= 0 ? "&" : "?") + "v=CAMLIVE2" + (img._hubTry ? "&r=" + img._hubTry : "");
+          if (privSnap) {
+            if (img._pfSnap !== bust) {
+              img._pfSnap = bust;
+              img.setAttribute("data-hub-still", "wait");
+              img.removeAttribute("data-pf-offline");
+              img.removeAttribute("data-pf-cam");
+              PF.bindSnap(img, bust);
+            }
+          } else if (img.getAttribute("src") !== bust) {
+            img.setAttribute("data-hub-still", "wait");
+            img.setAttribute("src", bust);
           }
+          /* CAMREST2 · the still shows only once it has really loaded */
+          if (!el._hubLivePlaying) img.style.display = hubStillOk(img) ? "block" : "none";
+          if (hubStillFailed(img)) hubStillRetry(el, img, doc);
         }
         if (voidEl) voidEl.style.display = "none";
       } else {
@@ -718,8 +818,16 @@
         }
         if (voidEl && !el._hubLivePlaying) voidEl.style.display = "block";
       }
-      /* CAMREST1 · no real picture to show ⇒ the tile rests (no pill, no void, no error words) */
-      if (!el._hubLivePlaying) setHubCamResting(el, slot.label, !showStill || hubStillFailed(img));
+      /* CAMREST2 · rest unless a real still has loaded; a repaint can rest a tile, never un-rest it */
+      var resting = !showStill || !hubStillOk(img);
+      if (!el._hubLivePlaying) {
+        if (resting) setHubCamResting(el, slot.label, true, why);
+        else {
+          setHubCamResting(el, slot.label, false);
+          el.setAttribute("aria-label", hubLabel(slot, cam) + " camera · " + h.pill);
+          hubUnrestIdentity(el);
+        }
+      }
       /* Ensure video element exists for CAMLIVE2 (hidden until playing) */
       if (mediaWrap && !vid) {
         vid = doc.createElement("video");
@@ -772,6 +880,7 @@
     if (!el) return;
     el._hubLivePlaying = true;
     setHubCamResting(el, slotLabel, false);
+    hubUnrestIdentity(el);
     el.classList.remove("hub-cam-still", "hub-cam-stale", "hub-cam-stub");
     el.classList.add("hub-cam-live");
     el.setAttribute("aria-label", (slotLabel || "Cam") + " camera · LIVE");
@@ -834,19 +943,17 @@
           pill.classList.add(h.pillCls);
         }
         var img = el.querySelector("img.hub-cam-media");
-        if (img && h.snapUrl) img.style.display = "block";
+        if (img && h.snapUrl && hubStillOk(img)) img.style.display = "block";
+        else setHubCamResting(el, el._hubLabel, true, el._hubWhy);
       }
     }
-    /* CAMREST1 (was CAMKEY1's LOCKED · PAIR pill) · an auth or server failure (401, 403, 5xx) rests the tile unless a
+    /* CAMREST1 (replaces CAMKEY1's locked pill) · an auth or server failure (401, 403, 5xx) rests the tile unless a
        real still is on screen; screen readers still hear that the camera needs pairing on a 401 */
     if (reason && /unauthorized|forbidden|locked|\b40[13]\b|\b5\d\d\b|server error|bad gateway|unavailable/i.test(String(reason))) {
       var still = el.querySelector("img.hub-cam-media");
-      var stillUp = !!(still && still.style.display !== "none" && still.getAttribute("src") && !hubStillFailed(still));
-      if (!stillUp) setHubCamResting(el, el._hubLabel, true);
-      if (/unauthorized|locked|\b401\b/i.test(String(reason))) {
-        var lbl = el.getAttribute("aria-label") || "";
-        el.setAttribute("aria-label", lbl.replace(/·.*$/, "· camera resting, needs pairing"));
-      }
+      var stillUp = hubStillOk(still) && still.style.display !== "none";
+      var pair = /unauthorized|locked|\b401\b/i.test(String(reason)) ? "pair" : el._hubWhy;
+      if (!stillUp) setHubCamResting(el, el._hubLabel, true, pair);
     }
     if (reason && typeof console !== "undefined" && console.info) {
       try { console.info("[CAMLIVE2] hub not LIVE:", reason); } catch (_) {}

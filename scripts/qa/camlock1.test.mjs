@@ -206,7 +206,9 @@ test("client code: token only from local storage, sent as header, never in a URL
   assert.match(client, /wardos-lights-proxy-token/);
   assert.match(client, /Camera locked · needs pairing/);
   assert.doesNotMatch(tile, /[&?]proxyToken=/, "tile must not put the key in a viewer link");
-  assert.match(tile, /LOCKED · PAIR/);
+  /* CAMREST2: a locked tile rests ("Camera resting") and says "needs pairing" in its label, never LOCKED · PAIR */
+  assert.doesNotMatch(tile, /LOCKED · PAIR/);
+  assert.match(tile, /needs pairing/);
   assert.match(viewer, /showLocked/);
   for (const src of [client, tile]) assert.match(src, /replaceState/, "pairing key is stripped from the address bar");
 });
