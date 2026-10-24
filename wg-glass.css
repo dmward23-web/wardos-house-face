@@ -47,3 +47,11 @@ body[data-asset-on][data-kid-world]::before { z-index: 2 !important; }
 /* HUBTXT1 · Halloween hub: no status pills or status words (Now/Peek/Due/Plan/Soon/Idea/OPEN/READY); small text stays legible */
 .tile-mchip, .tile-tap, #hub-lights-pill, #hub-lights-sub { display: none !important; }
 .tile-fact, .tile-sub { font-size: max(13px, 0.82rem) !important; color: rgba(246, 230, 200, .88) !important; letter-spacing: .01em; }
+/* H1-14PX (Alfred P2, Prism pill floor) · phone kid boards: the header clock label (Hayes 11 px), the week day letters (10 px)
+   and the path pill (13 px) all paint at 14 px. One-letter and two-letter labels, so no short form is needed. The day letters
+   were 10 px on the wall too, so their floor holds at every width. */
+html body .kw-day small { font-size: 14px !important; }
+@media (max-width: 600px) {
+  html body[class] .live-clock-lab { font-size: 14px !important; letter-spacing: .12em !important; }
+  html body .kw-path { font-size: 14px !important; }
+}

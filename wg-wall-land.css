@@ -24,3 +24,12 @@
   html, body { background: #07080b var(--wg-hubbg, url("night/media/poster/loop-dusk-wall.webp")) center / cover no-repeat fixed !important; }
   html body .panel.panel { background: linear-gradient(180deg, rgba(6, 7, 10, .42), rgba(6, 7, 10, .62)) !important; }
 }
+/* H1-LHVIS (Alfred P2) · wall kicker overlap: a kid or Dad stage taller than its tile was centred, so it spilled up under the
+   two-line tile sub ("Next leave" / "Today" under "Leave-bys · rides · week"). Safe centring keeps the overflow below,
+   the sub holds one line, and the stage type clamps to the wall height. */
+@media (min-width: 1200px) and (min-aspect-ratio: 4/3) {
+  html body .tile .kf-stage { justify-content: safe center !important; min-height: 0 !important; }
+  html body .tile .kf-face { min-height: 0 !important; gap: clamp(2px, .35vh, 4px) !important; }
+  html body .tile .tile-titles .tile-sub { white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+  html body .tile .kf-loud { font-size: clamp(18px, 2.3vh, 24px) !important; }
+}

@@ -24,6 +24,11 @@
   if (!root.classList.contains("ori-calm")) return;
   /* VEILPAUSE1 · on leave, hold the board's ambient CSS motion so a slow phone frame paints the veil first; resume on back. */
   var held = [];
+  /* VEILPAUSE1 P3 (Alfred) · reduced motion is the OS setting too, not only the ori-reduced class (nothing set that class, so
+     the instant path never ran). VEILDROP1 · if the navigation never lands (offline, a stalled server), the veil drops after
+     4s and the held motion resumes, so the board is never left behind a blank veil. */
+  var RMQ = typeof matchMedia === "function" ? matchMedia("(prefers-reduced-motion: reduce)") : null, DROP_MS = 4000;
+  function leave(href) { location.href = href; setTimeout(clear, DROP_MS); }
   function clear() { document.querySelectorAll(".ori-iris[data-calm]").forEach(function (el) { el.remove(); }); held.splice(0).forEach(function (an) { try { an.play(); } catch (e) {} }); }
   addEventListener("pageshow", clear);
   document.addEventListener("click", function (ev) {
@@ -43,10 +48,10 @@
     root.appendChild(el);
     void getComputedStyle(el).opacity;
     el.style.opacity = "1";
-    if (root.classList.contains("ori-reduced")) { setTimeout(function () { location.href = u.href; }, 0); return; }
+    if (root.classList.contains("ori-reduced") || (RMQ && RMQ.matches)) { setTimeout(function () { leave(u.href); }, 0); return; }
     /* VEILPAUSE1 · leave on the frame after the veil was drawn at opacity >= .9 (and >= 320ms), never later than 1.5s. */
     var t0 = Date.now(), gone = false, shown = false;
-    function go() { if (gone) return; gone = true; location.href = u.href; }
+    function go() { if (gone) return; gone = true; leave(u.href); }
     function tick() { if (gone) return; if (shown) return go(); if (Date.now() - t0 >= 320 && (parseFloat(getComputedStyle(el).opacity) || 0) >= 0.9) shown = true; requestAnimationFrame(tick); }
     requestAnimationFrame(tick);
     setTimeout(go, 1500);

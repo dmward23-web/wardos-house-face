@@ -414,3 +414,19 @@ html.lh-phone .lh-treeline { background-position: center top; }
 html.lh-wall .lh-kw .lh-win .gl, html.lh-wall .lh-kw .lh-win .sh {
   -webkit-mask-image: linear-gradient(to right, transparent, #000 25%, #000 75%, transparent), linear-gradient(to bottom, transparent, #000 25%, #000 75%, transparent);
   -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent, #000 25%, #000 75%, transparent), linear-gradient(to bottom, transparent, #000 25%, #000 75%, transparent); mask-composite: intersect; }
+
+/* H1-14PX (Alfred P2, Prism pill floor) · nothing painted under 14 px on the phone: the cauldron sign and its sub line (the
+   SWAY1 skin copies the sign font, so the .wg-gu clone follows), the near stone day line (lh.js sets --fd 11px), and the
+   candle, away, preview and debug tags. Short labels already fit one line at 14 px; the candle slate wraps. */
+html.lh-phone .lh-cauldron .lab, html.lh-phone .lh-cauldron .lab small, html.lh-phone .lh-cauldron .wg-gu, html.lh-phone .lh-cauldron .wg-gu small { font-size: 14px !important; }
+html.lh-phone .lh-stones .lh-stone .d { font-size: max(14px, var(--fd)); }
+html.lh-phone .lh-away .k, html.lh-phone .lh-candle .k, html.lh-phone .lh-preview, html.lh-phone .lh-clocktag { font-size: 14px; }
+/* H1-LHVIS (Alfred P2) · with one or two near stones the phone path below them sat empty (568 to 864 px at 440 x 956).
+   Those stones move down onto the path and grow with the screen (clamp), so the walk reads as the foreground. Three
+   stones keep lh.js rows. No stones keeps the bare path until Prism's phone re-plate (see the H1 delta gate request). */
+html.lh-phone #lh-near .lh-stone:only-child,
+html.lh-phone #lh-near .lh-stone:first-child:nth-last-child(2),
+html.lh-phone #lh-near .lh-stone:nth-child(2):last-child {
+  top: calc(100% - clamp(96px, 12%, 150px)) !important; height: clamp(140px, 20vh, 210px); justify-content: center; padding-top: 0; }
+html.lh-phone #lh-near .lh-stone:only-child { left: 50% !important; width: clamp(196px, 58vw, 280px); }
+html.lh-phone #lh-near .lh-stone:only-child .w { font-size: clamp(17px, 5.2vw, 24px); }

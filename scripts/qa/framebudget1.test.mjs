@@ -84,7 +84,11 @@ test("calm leave veil: navigates on the frame after the veil was drawn (>= 320ms
   assert.ok(!/setTimeout\(function \(\) \{ location\.href = u\.href; \}, root\.classList\.contains\("ori-reduced"\) \? 0 : 320\)/.test(src), "the fixed 320ms leave timer is gone");
   assert.match(src, /if \(shown\) return go\(\); if \(Date\.now\(\) - t0 >= 320 && \(parseFloat\(getComputedStyle\(el\)\.opacity\) \|\| 0\) >= 0\.9\) shown = true; requestAnimationFrame\(tick\)/);
   assert.match(src, /setTimeout\(go, 1500\)/);
-  assert.match(src, /ori-reduced"\)\) \{ setTimeout\(function \(\) \{ location\.href = u\.href; \}, 0\); return; \}/);
+  /* H1 P2 delta · reduced motion is the class OR the OS setting (the class alone was never set); VEILDROP1 drops a stuck veil */
+  assert.match(src, /ori-reduced"\) \|\| \(RMQ && RMQ\.matches\)\) \{ setTimeout\(function \(\) \{ leave\(u\.href\); \}, 0\); return; \}/);
+  assert.match(src, /matchMedia\("\(prefers-reduced-motion: reduce\)"\)/);
+  assert.match(src, /function leave\(href\) \{ location\.href = href; setTimeout\(clear, DROP_MS\); \}/);
+  assert.match(src, /DROP_MS = 4000/);
   assert.match(src, /an\.playState === "running"\) \{ an\.pause\(\); held\.push\(an\); \}/);
   assert.match(src, /held\.splice\(0\)\.forEach\(function \(an\) \{ try \{ an\.play\(\); \} catch \(e\) \{\} \}\)/);
   assert.match(src, /addEventListener\("pageshow", clear\)/);
