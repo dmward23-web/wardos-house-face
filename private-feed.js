@@ -217,6 +217,118 @@
   /* offline / stale flag: one calm chip, never demo data */
   function hm(t) { var d = new Date(t); var h = d.getHours() % 12 || 12; return h + ":" + String(d.getMinutes()).padStart(2, "0") + (d.getHours() < 12 ? " AM" : " PM"); }
   var chip = null;
+  /* HUBPAIR1 · a screen is paired only with BOTH a device key and a valid hub. Kid boards stay plain (no notice). */
+  function kidBoard() {
+    try { if (/(^|\/)kid-[^/]*\.html$/.test(String(g.location.pathname || ""))) return true; } catch (e) { /* */ }
+    return !!(document.body && document.body.hasAttribute && document.body.hasAttribute("data-kid-world"));
+  }
+  function hubNow() { var H = g.HouseHub, o = qs("pfBase"); if (!H) return ""; if (o && /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/?$/.test(o) && H.okForKey(o)) return o; return H.lights() || ""; }
+  function pairState() { var k = !!token(), h = !!hubNow(); return k && h ? "paired" : (k ? "key-no-hub" : (h ? "hub-no-key" : "none")); }
+  function needsPairing() { return !forceOffline && pairState() !== "paired" && !kidBoard(); }
+  var pairChip = null, pairWhy = null;
+  function paintPairing() {
+    var root = document.documentElement, ps = pairState();
+    try { root.setAttribute("data-pair-state", ps); } catch (_) {}
+    var on = needsPairing();
+    if (!on) { if (pairChip) { pairChip.style.display = "none"; padForChip(false); } return; }
+    if (!pairChip) {
+      pairChip = document.createElement("div");
+      pairChip.className = "pf-flag pf-flag--pair";
+      pairChip.setAttribute("role", "status");
+      pairChip.setAttribute("data-pair-needed", "");
+      pairChip.style.cssText = "position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:2147483000;padding:10px 18px;border-radius:999px;" +
+        "font:700 15px/1.25 Inter,system-ui,sans-serif;letter-spacing:.01em;color:#fff6e4;text-align:center;width:max-content;max-width:min(92vw,560px);box-sizing:border-box;" +
+        "background:rgba(120,62,20,.88);border:1px solid rgba(255,214,150,.5);backdrop-filter:blur(8px);pointer-events:none";
+      var a = document.createElement("div"); a.textContent = "Needs pairing";
+      var b = pairWhy = document.createElement("div"); b.setAttribute("data-pair-why", ""); b.style.cssText = "font-weight:500;font-size:14px;opacity:.85;margin-top:2px";
+      pairChip.appendChild(a); pairChip.appendChild(b);
+      document.body.appendChild(pairChip);
+    }
+    pairWhy.textContent = ps === "key-no-hub" ? "This screen has its key but lost the house address. Open a new pairing link here."
+      : "Open a pairing link from Dad on this screen, then tap Pair.";
+    pairChip.style.display = "block";
+    padForChip(true);
+  }
+  /* HUBPAIR1b · the chip never sits over page text. Normal-flow pages: the chip rides in the flow at the top of the page
+     (it pushes content down, so nothing is under it at any scroll). Fixed full-screen pages (wall, scenes): the chip stays
+     fixed and takes the first band (bottom, top, then scanning down) that covers no text (no page padding there: it would only add scroll room under a fixed scene). */
+  var placeT = 0, CTRL = "button,a[href],[role=button],[role=link],input,select,textarea,summary", GAP = 8;
+  /* HUBPAIR1c · Alfred D1/D2: visible controls are occupied space too (the mute button and the W logo drew over or touched
+     the chip). floatOnly: only controls that are fixed/absolute themselves or inside a fixed/absolute box (they do not move
+     with the page flow). Each one is grown by GAP px so the chip keeps an 8 px gap. Returns { n, bottom } of the hits. */
+  function floating(el) {
+    for (var e = el; e && e !== document.body && e.nodeType === 1; e = e.parentElement) {
+      var p = g.getComputedStyle(e).position; if (p === "fixed" || p === "absolute" || p === "sticky") return true;
+    }
+    return false;
+  }
+  function ctrlUnder(r, floatOnly) {
+    var out = { n: 0, bottom: 0 }, all = document.body.querySelectorAll(CTRL);
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i]; if (el === pairChip || pairChip.contains(el)) continue;
+      var cs = g.getComputedStyle(el); if (cs.visibility === "hidden" || cs.display === "none" || +cs.opacity === 0) continue;
+      if (el.type === "hidden") continue;
+      var q = el.getBoundingClientRect(); if (!q.width || !q.height) continue;
+      if (Math.min(q.right + GAP, r.right) > Math.max(q.left - GAP, r.left) && Math.min(q.bottom + GAP, r.bottom) > Math.max(q.top - GAP, r.top)) {
+        if (floatOnly && !floating(el)) continue;
+        out.n++; if (q.bottom > out.bottom) out.bottom = q.bottom;
+      }
+    }
+    return out;
+  }
+  function textUnder(r) {
+    var n = 0, all = document.body.getElementsByTagName("*");
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i]; if (el === pairChip || pairChip.contains(el)) continue;
+      var own = false; for (var c = el.firstChild; c; c = c.nextSibling) if (c.nodeType === 3 && /\S/.test(c.textContent)) { own = true; break; }
+      if (!own) { var dn = el.getAttribute && el.getAttribute("data-n"); if (!dn) continue; }
+      var cs = g.getComputedStyle(el); if (cs.visibility === "hidden" || cs.display === "none" || +cs.opacity === 0) continue;
+      var q = el.getBoundingClientRect();
+      if (q.width && q.height && Math.min(q.right, r.right) > Math.max(q.left, r.left) && Math.min(q.bottom, r.bottom) > Math.max(q.top, r.top)) n++;
+    }
+    return n;
+  }
+  function placeChip(on) {
+    var b = document.body; if (!b || !b.style || !pairChip) return;
+    if (!on) return;
+    var st = pairChip.style, cs = null;
+    try { cs = g.getComputedStyle(b); } catch (_) {}
+    var fixedPage = !cs || cs.overflow === "hidden" || cs.overflowY === "hidden" || (cs.display !== "block");
+    if (!fixedPage) {
+      st.position = "relative"; st.left = st.bottom = st.top = "auto"; st.transform = "none"; st.margin = "12px auto"; st.display = "block";
+      try { if (b.firstChild !== pairChip) b.insertBefore(pairChip, b.firstChild); } catch (_) {}
+      /* HUBPAIR1c · a fixed/absolute control over the in-flow chip: drop the chip below it (plus GAP); the page flows down with it */
+      try {
+        var mt = 12;
+        for (var k = 0; k < 4; k++) {
+          var cr = pairChip.getBoundingClientRect(), hit = ctrlUnder(cr, true);
+          if (!hit.n) break;
+          mt += Math.ceil(hit.bottom + GAP - cr.top); st.marginTop = mt + "px";
+        }
+      } catch (_) {}
+      return;
+    }
+    st.position = "fixed"; st.left = "50%"; st.transform = "translateX(-50%)"; st.margin = "0";
+    var best = null;
+    try {
+      var spots = [["bottom", "18px"], ["top", "12px"]], vh = g.innerHeight || 0, ch = pairChip.getBoundingClientRect().height || 0;
+      for (var y = 36; y + ch + 18 < vh; y += 24) spots.push(["top", y + "px"]); /* first free band, scanning down */
+      spots.some(function (spot) {
+        st.top = st.bottom = "auto"; st[spot[0]] = spot[1];
+        var cr = pairChip.getBoundingClientRect(), gr = { left: cr.left - GAP, right: cr.right + GAP, top: cr.top - GAP, bottom: cr.bottom + GAP };
+        var n = textUnder(gr) * 1000 + ctrlUnder(cr, false).n; /* text first (with the same 8 px margin, so a settling plank cannot creep under), then controls */
+        if (!best || n < best.n) best = { spot: spot, n: n };
+        return n === 0;
+      });
+      st.top = st.bottom = "auto"; st[best.spot[0]] = best.spot[1];
+    } catch (_) {}
+  }
+  function padForChip(on) {
+    placeChip(on);
+    if (on && !placeT) { placeT = 1; try { g.addEventListener("resize", function () { if (pairChip && pairChip.style.display !== "none") placeChip(true); });
+      var again = function () { if (pairChip && pairChip.style.display !== "none") placeChip(true); };
+      g.addEventListener("load", function () { [400, 1500, 4000, 8000].forEach(function (ms) { setTimeout(again, ms); }); }); } catch (_) {} }
+  }
   function paintFlag() {
     var root = document.documentElement;
     if (!root) return;
@@ -226,8 +338,11 @@
     if (!document.body) { document.addEventListener("DOMContentLoaded", paintFlag, { once: true }); return; }
     /* WGQUIET1 · Atlas P1: no offline / pairing / status pill on any board. A missing feed shows the awake board silently;
        the state stays readable for QA on <html data-feed-status>. */
-    try { document.documentElement.setAttribute("data-feed-status", show ? (!token() && !forceOffline ? "unpaired" : state.status) : "live"); } catch (_) {}
+    /* HUBPAIR1 · "unpaired" also when the key is saved but no valid hub (was reported as plain offline) */
+    try { document.documentElement.setAttribute("data-feed-status", show ? (pairState() !== "paired" && !forceOffline ? "unpaired" : state.status) : "live"); } catch (_) {}
     if (chip) chip.style.display = "none";
+    /* HUBPAIR1 · WGQUIET1 stays for offline / stale, but a Dad screen that cannot pair is no longer masked as Ready */
+    paintPairing();
     return;
     if (!chip) {
       chip = document.createElement("div");
@@ -311,6 +426,8 @@
     "body:has(#kw-cal:not([hidden])) .pf-flag[data-private-feed-flag]{display:none!important}";
   (document.head || document.documentElement).appendChild(css);
   document.addEventListener("DOMContentLoaded", function () { scanImgs(document); });
+  /* HUBPAIR1 · the pairing notice does not wait for a feed answer */
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { paintPairing(); }, { once: true }); else if (document.body) paintPairing();
 
-  g.PrivateFeed = { hasHub: function () { return !!(g.HouseHub && (g.HouseHub.lights() || (qs("pfBase") && g.HouseHub.okForKey(qs("pfBase"))))); }, get: getJSON, cam: getCam, canSnap: function () { return !forceOffline && !!token() && !!origFetch; }, bindSnap: function (img, url) { img.setAttribute("data-pf-snap", url); fixImg(img); }, /* PRIVFEED3 · cam stills never hit the static path */ state: function () { return state; }, names: loadNames, _hubBase: hubBase };
+  g.PrivateFeed = { hasHub: function () { return !!(g.HouseHub && (g.HouseHub.lights() || (qs("pfBase") && g.HouseHub.okForKey(qs("pfBase"))))); }, get: getJSON, cam: getCam, needsPairing: needsPairing, pairState: pairState, canSnap: function () { return !forceOffline && !!token() && !!origFetch; }, bindSnap: function (img, url) { img.setAttribute("data-pf-snap", url); fixImg(img); }, /* PRIVFEED3 · cam stills never hit the static path */ state: function () { return state; }, names: loadNames, _hubBase: hubBase };
 })(window);

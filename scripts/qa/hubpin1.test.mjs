@@ -1,7 +1,8 @@
 /* HUBPIN1 · a crafted link can never move a paired screen's hub or carry its key anywhere.
    - house-hub.js: SHA-256 pinned origins, fail closed, fetch guard strips key headers off-list
    - no client script ingests a hub/proxy address from ?lightsProxy= / ?proxy= / ?nestProxy= / ?spotifyProxy= / #hub=
-   - pairing redeems only against the built-in hub and its link carries no &hub=
+   - pairing redeems against the built-in or saved hub; HUBPAIR1: a link's &hub= is used only by a screen with no valid hub,
+     only through HouseHub.okLinkHub (pinned, no QA origin on a real host); hubpair1.test.mjs covers accept/reject
    - no house hostname in the tree (checked against the box's private config when present)
    node --test scripts/qa/hubpin1.test.mjs */
 import test from "node:test";
@@ -110,15 +111,21 @@ test("crafted ?lightsProxy / ?proxy / #hub with a saved key: hub unchanged, key 
   for (const c of b.calls) if (keyHeaders(c.headers).length) assert.ok(b.win.HouseHub.okForKey(c.url), c.url);
 });
 
-test("no client script reads a hub or proxy address from the URL; pair links carry no &hub=", () => {
+test("no client script reads a hub or proxy address from the URL (pairing: only via okLinkHub, HUBPAIR1)", () => {
   for (const f of ["house-lights.js", "house-nest.js", "house-spotify.js", "house-tapsync.js", "private-feed.js", "nest-webrtc-client.js", "house-pair.js", "hub-key-entry.js", "house-sensi-ctl.js"]) {
     const src = read(f).replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
     assert.doesNotMatch(src, /qs\(\s*["'](lightsProxy|proxy|nestProxy|spotifyProxy|hub)["']\s*\)/, f + " reads a hub from the query");
-    assert.doesNotMatch(src, /frag\.hub|searchParams\.get\(\s*["'](lightsProxy|proxy|nestProxy|hub)["']/, f + " reads a hub from the URL");
+    if (f !== "house-pair.js") assert.doesNotMatch(src, /frag\.hub/, f + " reads a hub from the URL");
+    assert.doesNotMatch(src, /searchParams\.get\(\s*["'](lightsProxy|proxy|nestProxy|hub)["']/, f + " reads a hub from the URL");
     assert.doesNotMatch(src, /setItem\(\s*(PROXY_LS_KEY|PROXY_LS|HUB_LS|"wardos-lights-proxy"|"wardosNestProxy")\s*,/, f + " writes the saved hub directly (only HouseHub.saveLights may)");
   }
-  assert.doesNotMatch(read("house-pair.js").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, ""), /&hub=/);
-  assert.doesNotMatch(read("scripts/pair-link.mjs").replace(/\/\*[\s\S]*?\*\//g, ""), /&hub=/);
+  /* HUBPAIR1 · house-pair reads the link hub in exactly one place, and only hands it to pickHub (own hub first, then okLinkHub) */
+  const hp = read("house-pair.js").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+  assert.equal((hp.match(/frag\.hub/g) || []).length, 1, "one read of the link hub");
+  assert.match(hp, /pickHub\(frag\.hub \|\| ""\)/);
+  assert.match(hp, /function pickHub\(linkHub\) \{[\s\S]*?var own = H\.lights\(\);\s*if \(validHub\(own\)\) return own;[\s\S]*?H\.okLinkHub\(linkHub\)/, "own valid hub wins; link hub only via okLinkHub");
+  /* the link a Dad screen makes names its own (pinned, valid) hub, never another */
+  assert.match(hp, /var link = pairLink\(res\.j\.code, hub\);/);
   assert.doesNotMatch(read("house-nest.js").replace(/\/\*[\s\S]*?\*\//g, ""), /&proxy=/, "viewer links carry no proxy address");
 });
 

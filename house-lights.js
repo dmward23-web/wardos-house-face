@@ -128,6 +128,10 @@
   /* AUDIT1 · no key saved on this screen → no lights requests at all (no probe, no write) */
   /* NOKEY1 · on the live House Face the hub trusts this page by origin — no key, ever. */
   function hasKey() { return !!proxyToken(); } /* PRIVFEED3 · the house origin is not a key any more (server checks the header only) */
+  /* HUBPAIR1 · halloween1 said "Ready" for a screen that cannot reach the house. On a Dad screen that is not paired
+     (no key, or a key with no valid hub) say Needs pairing; kid boards keep the plain word. */
+  function pairNeeded() { try { var P = window.PrivateFeed; return !!(P && typeof P.needsPairing === "function" && P.needsPairing()); } catch (e) { return false; } }
+  function readyWord(up) { var n = pairNeeded(); return up ? (n ? "NEEDS PAIRING" : "READY") : (n ? "Needs pairing" : "Ready"); }
   function noKey(g) { g = g || gate(); return !!(g.live && g.writeSupported && !hasKey()); }
   /* Cloud preview has no Kasa key. The wall and phone still follow the main write path. */
   function previewHost() {
@@ -216,7 +220,7 @@
       return {
         kind: "offline",
         live: false,
-        needToken: !hasKey(), /* HUBPIN1 · a keyed screen whose feeds are down says OFFLINE, never NEED TOKEN */
+        needToken: !hasKey() || pairNeeded(), /* HUBPAIR1 · or a key with no hub. HUBPIN1 · a keyed screen whose feeds are down says OFFLINE, never NEED TOKEN */
         label: "OFFLINE",
         writeSupported: false,
         data: null,
@@ -228,7 +232,7 @@
         kind: "need_token",
         live: false,
         needToken: true,
-        label: "Ready",
+        label: readyWord(false),
         writeSupported: false,
         data: data,
         ageMs: age
@@ -819,18 +823,18 @@
     if (g.live && g.writeSupported && _proxyReachable === false) return "LIVE · PROXY OFF";
     if (g.live && g.writeSupported) return "LIVE · PROXY";
     if (g.live) return "LIVE · READ ONLY";
-    if (g.needToken) return "Ready";
+    if (g.needToken) return readyWord(false);
     return g.label || "OFFLINE";
   }
 
   function hubHonesty(g) {
     g = g || gate();
     if (canWrite()) return "LIVE";
-    if (noKey(g)) return "READY";
+    if (noKey(g)) return readyWord(true);
     if (g.live && g.writeSupported && _proxyReachable === false) return "PROXY OFF";
     if (g.live && g.writeSupported) return "LIVE";
     if (g.live) return "READ ONLY";
-    if (g.needToken) return "Ready";
+    if (g.needToken) return readyWord(false);
     return g.label || "OFFLINE";
   }
 
@@ -943,12 +947,12 @@
       sub.textContent = canWrite()
         ? "3 LIVE · 6 OFF · wait"
         : (noKey(g)
-          ? "READY"
+          ? readyWord(true)
           : g.live && g.writeSupported
           ? "PROXY OFF · write proxy unreachable (check tunnel)"
           : (g.live
             ? "LIVE read · write not armed"
-            : (g.needToken ? "Ready" : ((g.label || "OFFLINE") + " · controls dark"))));
+            : (g.needToken ? readyWord(false) : ((g.label || "OFFLINE") + " · controls dark"))));
     }
 
     var grid = doc.getElementById("hub-lights-grid");

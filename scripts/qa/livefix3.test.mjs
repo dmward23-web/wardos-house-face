@@ -46,11 +46,12 @@ test("hub on an away day: conferences show, practice and skate hidden; from the 
    script, and the data-asset* attributes on <body>. Anything else that differs is a real drift and fails. */
 /* KIDWORLD1/LIVEWX2 · the theme layer also carries the shared clock + season-gate tags that load ahead of wg-assets, and
    cache tokens (?v=) on scripts the layer changed; only the token is normalized, the file name and tag must still match.
-   H1-CB (Alfred P2): the halloween1 range re-tokens every ref to a changed script (?v=HALLOWEEN1), so those names join the list. */
+   H1-CB (Alfred P2): the halloween1 range re-tokens every ref to a changed script (?v=HALLOWEEN1), so those names join the list.
+   HUBPAIR1 re-tokens house-hub / house-pair the same way (token only). */
 const THEME_TAGS = /(?:<script src="livinghouse\/clock\.js\?v=[A-Z0-9]+"><\/script><script src="livinghouse\/scene-packs\.js\?v=[A-Z0-9]+"><\/script>)?<script src="wg-assets\.js(?:\?v=[A-Z0-9]+)?" defer><\/script>\n?/g;
 const THEME_STRIP = (t) => t.replace(/<link rel="stylesheet" href="wg-glass\.css[^"]*" \/>\n?/g, "").replace(THEME_TAGS, "").split("\n")
   .filter((l) => !/^<link rel="stylesheet" href="wg-glass\.css[^"]*" \/>$/.test(l))
-  .map((l) => l.replace(/ data-asset(?:-ph|-var|-lit)?="[^"]*"/g, "").replace(/(<script src="(?:house-clock|hayes-loot|private-feed|school-names|house-face-law|away-filter|house-lights|month-theme\/month-overlay)\.js)\?v=[A-Z0-9]+"/g, '$1?v=V"'))
+  .map((l) => l.replace(/ data-asset(?:-ph|-var|-lit)?="[^"]*"/g, "").replace(/(<script src="(?:house-clock|hayes-loot|private-feed|school-names|house-face-law|away-filter|house-lights|house-hub|house-pair|month-theme\/month-overlay)\.js)\?v=[A-Z0-9]+"/g, '$1?v=V"'))
   .join("\n");
 test("the boys' pages are byte-identical to main 442eb257 apart from the Halloween theme layer", () => {
   for (const f of ["kid-hayes.html", "kid-harris.html", "kid-hayes-pre-theme.html", "kid-harris-pre-theme.html"]) {

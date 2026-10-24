@@ -63,6 +63,15 @@ test("COLDLOAD1 browser: a fresh-profile first load (no reload) paints the kid n
         await g.goto(base + "/livinghouse/index.html?pfOffline=1&spook=0", { waitUntil: "domcontentloaded", timeout: 90000 });
         await g.waitForFunction(() => document.fonts.status === "loaded" && [...document.querySelectorAll(".lh-kw .name")].every((el) => el.hasAttribute("data-asset-baked") && el.querySelector(":scope > .wg-sw .wg-gu")), { timeout: 60000 });
         await new Promise((ok) => setTimeout(ok, 1500));   /* past the 120 ms MutationObserver refresh and the fonts.ready re-skin */
+        /* HUBPAIR1c · Alfred D3: ready-wait so suite load cannot sample a half-painted plank. Wait for fonts.ready, the plaque art on
+           every name, the live word visible on the phone plank, then two animation frames. Same checks below, just not raced. */
+        await g.evaluate(() => document.fonts.ready.then(() => true));
+        await g.waitForFunction((phone) => [...document.querySelectorAll(".lh-kw .name")].every((el) => {
+          const gu = el.querySelector(":scope > .wg-sw .wg-gu"); if (!gu || !/plaque-/.test(getComputedStyle(el).getPropertyValue("--wg-art"))) return false;
+          if (!phone) return true; const h = [...gu.childNodes].find((n) => (n.textContent || "").trim()), cs = getComputedStyle(h && h.nodeType === 1 ? h : gu), b = gu.getBoundingClientRect();
+          return cs.visibility === "visible" && b.width > 0 && b.height > 0;
+        }), { timeout: 60000, polling: 100 }, w < 800);
+        await g.evaluate(() => new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(() => ok(true)))));
         const r = await g.evaluate(() => [...document.querySelectorAll(".lh-kw .name")].map((el) => {
           const gu = el.querySelector(":scope > .wg-sw .wg-gu"), h = [...gu.childNodes].find((n) => (n.textContent || "").trim());
           const cs = getComputedStyle(h && h.nodeType === 1 ? h : gu), bx = gu.getBoundingClientRect();
@@ -77,9 +86,16 @@ test("COLDLOAD1 browser: a fresh-profile first load (no reload) paints the kid n
             /* rendered glyphs, not just textContent: the plank's pixels change when only its words are made transparent */
             const clip = { x: Math.max(0, x.box.x), y: Math.max(0, x.box.y), width: Math.max(1, x.box.width), height: Math.max(1, x.box.height) };
             const still = await g.addStyleTag({ content: "*, *::before, *::after { animation-play-state: paused !important; transition: none !important; }" });
-            const a = await shot(g, clip), a2 = await shot(g, clip), flip = (on) => g.evaluate(HIDE, x.kid, on);
-            await flip(true); const z = await shot(g, clip); await flip(false); await still.evaluate((n) => n.remove());
-            const [noise, words] = await g.evaluate(diff, [a, a2, z].map((u) => "data:image/png;base64," + u.toString("base64")));
+            const flip = (on) => g.evaluate(HIDE, x.kid, on), settle = () => g.evaluate(() => new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(() => ok(true)))));
+            /* HUBPAIR1c · under load a shot can land mid-frame; settle two frames around each flip and take up to 3 tries */
+            let noise = 0, words = 0;
+            for (let t = 0; t < 3; t++) {
+              await settle(); const a = await shot(g, clip), a2 = await shot(g, clip);
+              await flip(true); await settle(); const z = await shot(g, clip); await flip(false); await settle();
+              [noise, words] = await g.evaluate(diff, [a, a2, z].map((u) => "data:image/png;base64," + u.toString("base64")));
+              if (words > 40 && words > 4 * noise) break;
+            }
+            await still.evaluate((n) => n.remove());
             assert.ok(words > 40 && words > 4 * noise, `${w} ${order} ${x.kid}: the name's glyphs are painted on the plank (${words} px change with the words hidden, ${noise} px frame noise)`);
           } else assert.ok(x.vis === "hidden" || /rgba\(0, 0, 0, 0\)/.test(x.fill), `${w} ${order} ${x.kid}: the wall plaque art carries the name, the live word stays unpainted`);
         }

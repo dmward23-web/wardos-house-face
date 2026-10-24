@@ -37,7 +37,14 @@ const STALE = [
   ["livinghouse/scene-packs.js", "KIDWORLD2"],
   /* H1P2D4 · the wall fit block and the hashed event id move these two off delta-3 */
   ["wg-wall-land.css", "H1P2D3"],
-  ["livinghouse/scene-packs.js", "H1P2D3"]
+  ["livinghouse/scene-packs.js", "H1P2D3"],
+  /* HUBPAIR1 · pairing hotfix: every changed script moves off the token it carried on efd454b6 */
+  ["house-hub.js", "HUBPIN1"],
+  ["house-pair.js", "HUBPIN1"],
+  ["private-feed.js", "HALLOWEEN1"],
+  ["private-feed.js", "WGQUIET1"],
+  ["house-lights.js", "HALLOWEEN1"],
+  ["house-board-strip.js", "HALLOWEEN1"]
 ];
 const SKIP = /^(scripts|tests?|plates|plates-receipt|vendor|node_modules|\.git)$/;
 function pages(dir, out = []) {
@@ -58,11 +65,13 @@ test("H1-CB · no served page loads a halloween1-changed asset with its pre-rang
   }
   assert.deepEqual(hits, []);
 });
+/* HUBPAIR1 · a script changed again after halloween1 carries the newer token */
+const NEWER = { "house-board-strip.js": "HUBPAIR1", "house-lights.js": "HUBPAIR1" };
 test("H1-CB · the six named scripts are re-tokened on the pages that load them", () => {
   const want = { "house-board-strip.js": "sheet-index.html", "house-lights.js": "sheet-lights.html", "house-ori-calm.js": "sheet-index.html",
     "house-spotify.js": "sheet-spotify.html", "house-trips-bind.js": "sheet-us.html", "school-names.js": "kid-hayes.html" };
   for (const [a, f] of Object.entries(want))
-    assert.match(fs.readFileSync(path.join(ROOT, f), "utf8"), new RegExp('src="' + a.replace(/[.]/g, "\\.") + '\\?v=HALLOWEEN1"'), a + " in " + f);
+    assert.match(fs.readFileSync(path.join(ROOT, f), "utf8"), new RegExp('src="' + a.replace(/[.]/g, "\\.") + '\\?v=' + (NEWER[a] || "HALLOWEEN1") + '"'), a + " in " + f);
 });
 test("H1-CB · the check is not a blanket pass", () => {
   assert.ok(STALE.some(([a, t]) => a === "house-lights.js" && t === "FOLLOWUP6"));

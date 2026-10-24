@@ -5,7 +5,8 @@
  *   HouseHub.lights() / HouseHub.cams()  the built-in hub origins, or "" (fail closed)
  *   HouseHub.okForKey(url)               true only for an allow-listed origin; the key is never sent anywhere else
  * The allow-list is pinned as SHA-256 of each origin ("https://host"), so no house hostname is written in git.
- * No ?lightsProxy=, ?proxy=, #hub= or any other URL input can add or change a hub. A saved hub (localStorage) is
+ * No ?lightsProxy=, ?proxy= or any other URL input can change a hub. HUBPAIR1: a #pair= link's &hub= may ADD one only on a
+ * screen with no valid hub yet, and only if it is on the list (okLinkHub). A saved hub (localStorage) is
  * honoured only while it is on the list; anything else saved by an old link is ignored and never gets the key.
  * Box-only previews: a page served from 127.0.0.1/localhost may also use loopback http bases.
  * Allow-list entries: the two house origins (lights, cams) and two reserved .invalid QA origins (never resolve).
@@ -78,6 +79,18 @@
     var hub = savedLights();
     return pick([lsGet(CAM_LS), here, sibling("cams"), hub ? siblingOf(hostOf(hub), "cams") : "", pageIsLoop() ? "https://cams.qa.invalid" : ""]);
   }
+  /* HUBPAIR1 · a pairing link may name a hub, honoured only to bootstrap a screen with NO valid hub yet (a Pages home
+     has no sibling hub). It must be a bare https origin whose SHA-256 is on the list. The reserved .invalid QA origins
+     pass only on a QA page (loopback or a .invalid page host), never on a real host. Nothing is sent before this check. */
+  function qaPage() { var h = pageHost(); return loopHost(h) || /\.invalid$/.test(h); }
+  function okLinkHub(u) {
+    u = String(u || "");
+    if (!/^https:\/\/[A-Za-z0-9.-]+(:\d+)?\/?$/.test(u)) return "";
+    var o = originOf(u);
+    if (!o || !pinned(o)) return "";
+    if (/\.invalid(:\d+)?$/.test(o) && !qaPage()) return "";
+    return o;
+  }
   /* the only writer of the saved hub: pairing, after a successful exchange with the built-in hub */
   function saveLights(o) { o = originOf(o); if (o && pinned(o)) { lsSet(HUB_LS, o); return true; } return false; }
 
@@ -113,5 +126,5 @@
     g.fetch = guarded;
   }
 
-  g.HouseHub = { blockedCount: function () { return blocked; }, lights: lights, cams: cams, okForKey: okForKey, saveLights: saveLights, originOf: originOf, _sha256: sha256 };
+  g.HouseHub = { blockedCount: function () { return blocked; }, lights: lights, cams: cams, okForKey: okForKey, okLinkHub: okLinkHub, saveLights: saveLights, originOf: originOf, _sha256: sha256 };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -335,11 +335,13 @@
     };
   }
 
+  /* HUBPAIR1 · a Dad screen that cannot pair says so instead of "All clear" (kid boards keep the plain word) */
+  function clearWord() { try { var P = window.PrivateFeed; return P && typeof P.needsPairing === "function" && P.needsPairing() ? "Needs pairing" : "All clear"; } catch (e) { return "All clear"; } }
   function staleStrip(clock, reason) {
     return {
       label: "Schedule · today",
       time: "",
-      place: "All clear", /* HUBPIN1 · plain empty state; the reason stays internal (_reason) */
+      place: clearWord(), /* HUBPIN1 · plain empty state; the reason stays internal (_reason). HUBPAIR1 · or Needs pairing */
       detailHtml: "",
       badge: clock.dow,
       _stale: true,
@@ -1071,7 +1073,7 @@
     if (main && !strip._boot) {
       /* HUBCMD2 · pass-by hero = huge time + destination only · no Next/label chrome */
       if (strip._stale) {
-        main.innerHTML = '<span class="leaveby-dest">All clear</span>';
+        main.innerHTML = '<span class="leaveby-dest">' + clearWord() + '</span>'; /* HUBPAIR1 */
       } else if (strip.time && strip.place) {
         /* AUDIT1 · label row hidden on this page (hub) → carry the day as a small kicker in the hero */
         var labHidden = !label || label.offsetParent === null;

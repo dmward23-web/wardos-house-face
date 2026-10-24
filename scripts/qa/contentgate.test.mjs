@@ -70,7 +70,9 @@ test("plain empty states: no dev text ('cal-live missing', 'STUB · NO JSON', 'C
     for (const re of bad) { const m = s.match(re); if (m) hits.push(`${f}: ${m[0].slice(0, 80)}`); }
   }
   assert.deepEqual(hits, []);
-  assert.match(rd("house-board-strip.js"), /place: "All clear"/);
+  /* HUBPAIR1 · the plain word now comes from clearWord(): "All clear", or "Needs pairing" on an unpaired Dad screen */
+  assert.match(rd("house-board-strip.js"), /place: clearWord\(\)/);
+  assert.match(rd("house-board-strip.js"), /\? "Needs pairing" : "All clear"/);
   assert.match(rd("house-nest.js"), /label: "Cameras offline"/);
 });
 

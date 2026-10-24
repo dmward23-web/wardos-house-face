@@ -1,6 +1,9 @@
 /* PRIVFEED3 · QR pairing (Atlas-approved design b). Two jobs, no paste anywhere:
  *  1. Redeem: a new screen opened from a pairing QR/link (…/sheet-index.html#pair=<code>) strips the fragment
  *     at once (history.replaceState), and only after a real tap on "Pair this screen" (TAPPAIR1) POSTs the one-time code to the BUILT-IN hub (HouseHub; never a host from the link), stores the device key under the SAME
+ *     HUBPAIR1: a screen with NO valid hub yet (the Pages home has no sibling hub) may take the hub from the link's &hub=,
+ *     but only a pinned house origin (HouseHub.okLinkHub; .invalid QA origins never on a real host). A saved valid hub is
+ *     never replaced; the link's hub is then ignored. Nothing is sent before that check and the tap. Stores the key under the SAME
  *     storage key every screen already uses (wardos-lights-proxy-token, HUBTOK / lightsProxyToken seed), then reloads clean.
  *     The fragment never reaches any server log. A wrong, used or expired code shows an honest "needs pairing" note.
  *  2. Dad page tile ("Pair a screen"): only on a screen that already holds the key. Asks the hub (with the key) for a
@@ -41,7 +44,8 @@
   /* ---- 1. redeem (TAPPAIR1: only on a real tap) ---- */
   /* The code leaves the address bar before anything else and is kept only in this closure. Nothing is sent until a
      person taps "Pair this screen" (event.isTrusted), so a link-preview bot that runs the page's JS cannot burn the
-     code or receive the key. Redeem goes ONLY to the built-in hub (HouseHub); a #hub= or any host in the link is ignored. */
+     code or receive the key. Redeem goes to the built-in or saved hub (HouseHub.lights()). HUBPAIR1: only when that is empty
+     may a pinned &hub= from the link stand in (pickHub); any other host in the link is refused before any request. */
   var ready = Promise.resolve(false);
   var frag = readFragment();
   function redeem(code, hub, done) {
@@ -85,13 +89,34 @@
     }
     if (document.body) paint(); else document.addEventListener("DOMContentLoaded", paint, { once: true });
   }
+  /* HUBPAIR1 · the hub a pairing link may use: the screen's own valid hub always wins (never overwritten);
+     only a screen with none takes a pinned, non-QA (on a real host) &hub= from the link. "" = refuse. */
+  function validHub(o) { return !!(o && HUB_RE.test(o) && g.HouseHub && g.HouseHub.okForKey(o)); }
+  function pickHub(linkHub) {
+    var H = g.HouseHub; if (!H) return "";
+    var own = H.lights();
+    if (validHub(own)) return own;
+    if (!linkHub || typeof H.okLinkHub !== "function") return "";
+    var o = H.okLinkHub(linkHub);
+    return validHub(o) ? o : "";
+  }
   if (frag) {
     stripFragment(); /* first thing: the code leaves the address bar before any network call */
-    var code0 = frag.pair || "", hub0 = g.HouseHub ? g.HouseHub.lights() : "";
-    if (!CODE_RE.test(code0) || !HUB_RE.test(hub0) || !g.HouseHub.okForKey(hub0)) { note("This pairing link is not valid. Ask Dad for a new code.", false); }
+    var code0 = frag.pair || "", hub0 = pickHub(frag.hub || "");
+    if (!CODE_RE.test(code0) || !hub0) { note("This pairing link is not valid. Ask Dad for a new code.", false); }
     else askTap(code0, hub0);
   }
-  try { if (g.sessionStorage.getItem("wardos-paired-note")) { g.sessionStorage.removeItem("wardos-paired-note"); note("Screen paired", true); } } catch (e) { /* */ }
+  /* HUBPAIR1 · a soft glow once paired (none with reduced motion) */
+  function pulse() {
+    try {
+      if (g.matchMedia && g.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      var r = document.createElement("div"); r.setAttribute("data-pair-pulse", ""); r.setAttribute("aria-hidden", "true");
+      r.style.cssText = "position:fixed;inset:0;z-index:2147483000;pointer-events:none;box-shadow:inset 0 0 0 0 rgba(142,231,255,0);transition:box-shadow .9s ease";
+      document.body.appendChild(r);
+      requestAnimationFrame(function () { r.style.boxShadow = "inset 0 0 90px 18px rgba(142,231,255,.45)"; setTimeout(function () { r.style.boxShadow = "inset 0 0 0 0 rgba(142,231,255,0)"; setTimeout(function () { r.remove(); }, 1000); }, 1100); });
+    } catch (e) { /* */ }
+  }
+  try { if (g.sessionStorage.getItem("wardos-paired-note")) { g.sessionStorage.removeItem("wardos-paired-note"); note("Screen paired", true); if (document.body) pulse(); else document.addEventListener("DOMContentLoaded", pulse, { once: true }); } } catch (e) { /* */ }
 
   /* ---- 2. Dad tile ---- */
   /* the QR opens the house host (built-in camera/page host) so the new screen finds the hub with no address in the link */
@@ -99,6 +124,9 @@
     var c = g.HouseHub ? g.HouseHub.cams() : "";
     return (c && /^https:/.test(c) ? c + "/" : g.location.origin + g.location.pathname.replace(/[^/]*$/, "")) + "sheet-index.html";
   }
+  /* HUBPAIR1 · the link also names this screen's pinned hub, so a new screen whose home has no sibling hub (Pages) can
+     bootstrap. The new screen honours it only if pinned and only while it has no valid hub of its own. */
+  function pairLink(code, hub) { return houseUrl() + "#pair=" + encodeURIComponent(code) + "&hub=" + encodeURIComponent(hub); }
   function mountTile(el) {
     var key = lsGet(KEY_LS), hub = g.HouseHub ? g.HouseHub.lights() : "";
     if (!el || !key || !HUB_RE.test(hub) || !g.HouseHub.okForKey(hub)) { if (el) el.hidden = true; return false; } /* only on a paired screen */
@@ -114,7 +142,7 @@
         .then(function (res) {
           btn.disabled = false;
           if (res.status !== 200 || !res.j || !CODE_RE.test(res.j.code || "")) { status(res.status === 401 ? "This screen's key was not accepted. It needs pairing again." : "The house hub did not answer. Try again."); return; }
-          var link = houseUrl() + "#pair=" + encodeURIComponent(res.j.code); /* HUBPIN1 · no &hub= */
+          var link = pairLink(res.j.code, hub); /* HUBPAIR1 */
           if (typeof g.qrcode === "function" && box) {
             var q = g.qrcode(0, "M"); q.addData(link); q.make();
             box.innerHTML = q.createSvgTag({ cellSize: 5, margin: 4, scalable: true });
