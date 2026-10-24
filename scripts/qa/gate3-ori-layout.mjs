@@ -626,7 +626,12 @@ async function main() {
   const browser = await puppeteer.launch({
     executablePath: chromePath(),
     headless: "new",
-    args: ["--no-sandbox", "--disable-dev-shm-usage", "--hide-scrollbars"]
+    /* G3GL1 · the runner has no GPU. Without these two flags Chrome falls back to software WebGL on its own (deprecated
+       path); after a few seconds of a WebGL board (sheet-spotify: ori scene + the MERGE1 night scene) that fallback
+       stalls, and the next board's WebGL context blocks its main thread, so "load" never fires (sheet-status nav timeout
+       on wall and wall-land since MERGE1). Asking for SwiftShader explicitly is the supported GPU-less setup. The gate
+       only loads this repo's own pages. */
+    args: ["--no-sandbox", "--disable-dev-shm-usage", "--hide-scrollbars", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"]
   });
   const failures = [];
   const views = [
