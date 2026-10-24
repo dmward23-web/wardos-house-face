@@ -25,7 +25,7 @@ Timezone drift (UTC vs CT) was **not** the primary failure this time — pure **
 |-------|------|
 | `house-clock.js` | Single source of “today” · `America/Chicago` via `Intl` · `short` / `long` / `iso` / `dow` / `daypart` |
 | `house-board-strip.js` | Paints `[data-live=…]` leave-by + today labels from **clock** + `kids-week.json` `boardStrip` · **queue + startIso/endIso** · drops past items client-side · re-fetches ~5 min |
-| `house-weather.js` | Client Open-Meteo (wttr.in fallback) · Overland Park · no key · no Atlas cron |
+| `house-weather.js` | Client Open-Meteo (wttr.in fallback) · coarse 0.1° cell · no key · no Atlas cron |
 | `kids-week.json` → `boardStrip` | **Facts only** (time / place / detail / ISO / queue). **Never** put the calendar day label here for the strip — clock owns the day. |
 | `kids-data.js` `DAY_ISO` | Chicago ISO for chore/bank day keys |
 | `scripts/calendar-refresh.mjs` | **Durable** dmward23 events dump → rewrite schedule fields + boardStrip queue · preserve jars/quests · hard asOfIso=today |

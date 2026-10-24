@@ -5,7 +5,7 @@
 **Surface:** House Face only. Not Desk. Not money. Not PIN.
 **Home URL (only one):** https://dmward23-web.github.io/wardos-house-face/sheet-index.html
 
-This file is the format law for every bot that paints, copies, or ships WardOS onto the Overland Park wall panel. Reuse `COMPONENT-KIT.md`. Do not invent a second chrome.
+This file is the format law for every bot that paints, copies, or ships WardOS onto the home wall panel. Reuse `COMPONENT-KIT.md`. Do not invent a second chrome.
 
 ---
 
@@ -13,7 +13,7 @@ This file is the format law for every bot that paints, copies, or ships WardOS o
 
 | Fact | Law |
 |------|-----|
-| Where | Hallway column, Overland Park home. Flush on the gray wall (switch relocated). Not the kitchen. Not a tabletop. |
+| Where | Hallway column, home. Flush on the gray wall (switch relocated). Not the kitchen. Not a tabletop. |
 | Size | **32" Elo 3202L PCAP · portrait.** Overall ~18.0" W × 30.0" H. VESA **400×400**. Mini PC behind (Beelink SER8). Dan LAST-YES Sun Sep 27 2026. |
 | How it is read | Standing glance, about 6–10 ft, walking past. One idea has to land without stepping up to the glass. |
 | Orientation | **Portrait only.** Design canvas matches OS-rotated panel. |
