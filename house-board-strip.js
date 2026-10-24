@@ -339,7 +339,7 @@
     return {
       label: "Schedule · today",
       time: "",
-      place: "Calendar offline", /* HUBPIN1 · plain empty state; the reason stays internal (_reason) */
+      place: "All clear", /* HUBPIN1 · plain empty state; the reason stays internal (_reason) */
       detailHtml: "",
       badge: clock.dow,
       _stale: true,
@@ -644,7 +644,7 @@
 
     if (todayEl) {
       if (strip && strip._stale) {
-        todayEl.innerHTML = '<li class="leaveby-empty">Calendar offline</li>';
+        todayEl.innerHTML = "";   /* CLEAR1: the hero says All clear once */
       } else if (!today.length) {
         todayEl.innerHTML = '<li class="leaveby-empty">Clear · nothing left today</li>';
       } else {
@@ -679,7 +679,7 @@
   function layoutRail(strip) {
     var items = upcomingFlat(strip, 7);
     if (strip && strip._stale) {
-      return '<div class="lb-layout lb-rail"><div class="lb-empty">Calendar offline</div></div>';
+      return '<div class="lb-layout lb-rail"><div class="lb-empty"></div></div>';
     }
     if (!items.length) {
       return '<div class="lb-layout lb-rail"><div class="lb-empty">Clear on glass</div></div>';
@@ -706,7 +706,7 @@
     var buckets = { Hayes: [], Ainsley: [], Harris: [], Dan: [] };
     var items = upcomingFlat(strip, 12);
     if (strip && strip._stale) {
-      return '<div class="lb-layout lb-who"><div class="lb-empty">Calendar offline</div></div>';
+      return '<div class="lb-layout lb-who"><div class="lb-empty"></div></div>';
     }
     for (var i = 0; i < items.length; i++) {
       var names = whoNames(items[i].ev);
@@ -745,7 +745,7 @@
   function layoutPeek(strip) {
     var items = upcomingFlat(strip, 3);
     if (strip && strip._stale) {
-      return '<div class="lb-layout lb-peek"><div class="lb-empty">Calendar offline</div></div>';
+      return '<div class="lb-layout lb-peek"><div class="lb-empty"></div></div>';
     }
     if (!items.length) {
       return '<div class="lb-layout lb-peek"><div class="lb-empty">Clear on glass</div></div>';
@@ -776,7 +776,7 @@
 
   function layoutRadar(strip) {
     if (strip && strip._stale) {
-      return '<div class="lb-layout lb-radar"><div class="lb-empty">Calendar offline</div></div>';
+      return '<div class="lb-layout lb-radar"><div class="lb-empty"></div></div>';
     }
     var items = upcomingFlat(strip, 1);
     if (!items.length) {
@@ -812,7 +812,7 @@
     var today = (strip && strip.today) || [];
     var tmr = (strip && strip.tomorrow) || { items: [], dow: "" };
     if (strip && strip._stale) {
-      return '<div class="lb-layout lb-list"><div class="lb-empty">Calendar offline</div></div>';
+      return '<div class="lb-layout lb-list"><div class="lb-empty"></div></div>';
     }
     var html = '<div class="lb-layout lb-list" aria-label="Schedule list">';
     html += '<div class="lb-list-sec"><div class="lb-list-hdr">Remaining</div><ul class="lb-list-ul">';
@@ -940,7 +940,7 @@
   function layoutDay(strip) {
     ensureDayCss();
     if (strip && strip._stale) {
-      return '<div class="lb-layout lb-day"><div class="lb-empty">Calendar offline</div></div>';
+      return '<div class="lb-layout lb-day"><div class="lb-empty"></div></div>';
     }
     var today = ((strip && strip.today) || []).slice();
     var parts = [
@@ -1062,7 +1062,7 @@
 
     var hotEv = document.querySelector("[data-live='hot-pill-event']");
     if (hotEv) {
-      if (strip._stale) hotEv.textContent = "Calendar offline";
+      if (strip._stale) hotEv.textContent = "";   /* CLEAR1 */
       else if (strip.time && strip.place) hotEv.textContent = strip.time + " · " + strip.place;
       else if (strip.place) hotEv.textContent = strip.place;
       else hotEv.textContent = "";
@@ -1071,7 +1071,7 @@
     if (main && !strip._boot) {
       /* HUBCMD2 · pass-by hero = huge time + destination only · no Next/label chrome */
       if (strip._stale) {
-        main.innerHTML = '<span class="leaveby-dest">Calendar offline</span>';
+        main.innerHTML = '<span class="leaveby-dest">All clear</span>';
       } else if (strip.time && strip.place) {
         /* AUDIT1 · label row hidden on this page (hub) → carry the day as a small kicker in the hero */
         var labHidden = !label || label.offsetParent === null;
@@ -1100,7 +1100,7 @@
     if (warn) {
       if (strip._stale) {
         warn.hidden = false;
-        warn.textContent = "Calendar offline"; /* HUBPIN1 · no internal reason on glass */
+        warn.textContent = ""; /* HUBPIN1 · no internal reason on glass */
       } else {
         warn.hidden = true;
         warn.textContent = "";

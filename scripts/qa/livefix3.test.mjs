@@ -6,6 +6,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import path from "node:path";
+import fs from "node:fs";
 import { spawnSync, execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -41,7 +42,24 @@ test("hub on an away day: conferences show, practice and skate hidden; from the 
   }
 });
 
-test("the boys' pages are byte-identical to main 442eb257", () => {
-  const d = execFileSync("git", ["diff", "--name-only", "442eb25762967d4a1e7de1de70cd0991e15e0426", "--", "kid-hayes.html", "kid-harris.html", "kid-hayes-pre-theme.html", "kid-harris-pre-theme.html"], { cwd: ROOT }).toString().trim();
-  assert.equal(d, "");
+/* RESCOPE146 · byte-identical to main 442eb257 once the Halloween theme layer is stripped: the wg-glass link, the wg-assets
+   script, and the data-asset* attributes on <body>. Anything else that differs is a real drift and fails. */
+/* KIDWORLD1/LIVEWX2 · the theme layer also carries the shared clock + season-gate tags that load ahead of wg-assets, and
+   cache tokens (?v=) on scripts the layer changed; only the token is normalized, the file name and tag must still match. */
+const THEME_TAGS = /(?:<script src="livinghouse\/clock\.js\?v=[A-Z0-9]+"><\/script><script src="livinghouse\/scene-packs\.js\?v=[A-Z0-9]+"><\/script>)?<script src="wg-assets\.js(?:\?v=[A-Z0-9]+)?" defer><\/script>\n?/g;
+const THEME_STRIP = (t) => t.replace(/<link rel="stylesheet" href="wg-glass\.css[^"]*" \/>\n?/g, "").replace(THEME_TAGS, "").split("\n")
+  .filter((l) => !/^<link rel="stylesheet" href="wg-glass\.css[^"]*" \/>$/.test(l))
+  .map((l) => l.replace(/ data-asset(?:-ph|-var|-lit)?="[^"]*"/g, "").replace(/(<script src="(?:house-clock|hayes-loot)\.js)\?v=[A-Z0-9]+"/g, '$1?v=V"'))
+  .join("\n");
+test("the boys' pages are byte-identical to main 442eb257 apart from the Halloween theme layer", () => {
+  for (const f of ["kid-hayes.html", "kid-harris.html", "kid-hayes-pre-theme.html", "kid-harris-pre-theme.html"]) {
+    const base = execFileSync("git", ["show", "442eb25762967d4a1e7de1de70cd0991e15e0426:" + f], { cwd: ROOT }).toString();
+    const now = fs.readFileSync(path.join(ROOT, f), "utf8");
+    assert.equal(THEME_STRIP(now), THEME_STRIP(base), f + " drifted beyond the theme layer");
+  }
+});
+test("the theme strip is not a blanket pass: a copy change still fails", () => {
+  assert.notEqual(THEME_STRIP("<p>ALL CLEAR</p>"), THEME_STRIP("<p>ALL DONE</p>"));
+  assert.notEqual(THEME_STRIP('<script src="house-clock.js?v=A"></script>'), THEME_STRIP('<script src="house-lights.js?v=A"></script>'), "a swapped script still fails");
+  assert.notEqual(THEME_STRIP('<script src="livinghouse/scene-packs.js?v=A"></script>'), "", "a lone season tag is not theme layer");
 });

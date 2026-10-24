@@ -48,3 +48,5 @@ phone-shots/
 
 # FOLLOWUP1 · proxy access logs (IP + UA) never enter git, wherever a misconfigured log dir puts them
 *-access.log*
+# PIIGUARD2 · the art hash list lives in the private night-media folder, never git
+night/media/art-halloween-allow.json

@@ -303,7 +303,7 @@
   function paintTile(el) {
     var ph = S.phase, p = player(), it = p && p.item, live = ph === "playing" || ph === "paused" || ph === "idle";
     el.setAttribute("data-sp-phase", ph);
-    var pill = { loading: "Wait", playing: "LIVE", paused: "PAUSED", idle: "READY", need_app: "CONNECT", need_auth: "CONNECT", no_key: "PAIR", bad_key: "PAIR", offline: "OFFLINE", error: "CHECK" }[ph] || "Wait";
+    var pill = { loading: "READY", playing: "LIVE", paused: "PAUSED", idle: "READY", need_app: "CONNECT", need_auth: "CONNECT", no_key: "PAIR", bad_key: "PAIR", offline: "OFFLINE", error: "CHECK" }[ph] || "Wait";
     setTxt(el, ".sp-pill", pill);
     var title = "Spotify", artist = "", dev = "", showCtl = false, connectTxt = "";
     if (live && it) {

@@ -2,6 +2,7 @@
 Serves the repo on a loopback port and plays the hub (?pfBase=, loopback only) with the synthetic fixtures in
 scripts/qa/fixtures/private (Smith/QXS stand-ins). 'hub*' answer cal-live with synthetic rows for an away Wednesday.
 Prints one JSON line."""
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from pw_chrome import launch_kw
 import json, os, sys, threading, functools, re
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse
@@ -59,7 +60,7 @@ AIN = r"""() => { const D = /[\d$%\u2605\u2606\u2b50]/;
 TMR = r"""() => [...document.querySelectorAll('.lb-day-tmr, .lb-list-sec--tmr, [data-live="leaveby-tomorrow"], .leaveby-sec--tmr')].map(e => e.innerText.replace(/\s+/g, ' ')).join(' || ')"""
 out = {"mode": mode, "size": f"{w}x{h}"}
 with sync_playwright() as p:
-    b = p.chromium.launch(args=["--disable-gpu"])
+    b = p.chromium.launch(**launch_kw(p, args=["--disable-gpu"]))
     mob = w < 600
     ctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=2 if mob else 1, is_mobile=mob, has_touch=mob, reduced_motion="reduce")
     pg = ctx.new_page(); errors = []

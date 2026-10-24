@@ -2,6 +2,7 @@
 measure how much of the screen is not black. Usage: python3 scripts/qa/blank_viewport.py <page.html> <width> <height> <unpaired|offline> [shot.png]
 Prints JSON {"lit": fraction of sampled pixels brighter than near-black, "canvas": bool, "errors": [...]}
 Serves the repo on a random loopback port; every non-loopback request is stubbed (204), so the hub is never reached."""
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from pw_chrome import launch_kw
 import json, os, sys, threading, functools, io
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse
@@ -17,7 +18,7 @@ base = f"http://127.0.0.1:{srv.server_address[1]}/"
 PROBE = r"""() => { const c = document.querySelector('canvas'); const s = c && getComputedStyle(c);
   return { canvas: !!(c && c.width > 0 && c.height > 0 && s.display !== 'none' && s.visibility !== 'hidden') }; }"""
 with sync_playwright() as p:
-    b = p.chromium.launch(args=["--disable-gpu"])
+    b = p.chromium.launch(**launch_kw(p, args=["--disable-gpu"]))
     pg = b.new_page(); pg.set_viewport_size({"width": w, "height": h})
     errors = []
     pg.on("pageerror", lambda e: errors.append(str(e)))

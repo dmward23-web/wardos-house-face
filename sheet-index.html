@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-asset="backgrounds/bg-wall-night-v2.webp|backgrounds/bg-wall-night-v2.png|backgrounds/bg-wall-night-onemoon.webp|backgrounds/bg-wall-night-onemoon.png" data-asset-var="--wg-hubbg">
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
@@ -3838,6 +3838,11 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 <link rel="stylesheet" href="night/night-host.css?v=MERGE1C" />
 <link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
 <script src="house-face-law.js?v=LIVEFIX1"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
+<link rel="stylesheet" href="wg-glass.css?v=WGGLASS1" />
+<link rel="stylesheet" href="wg-wall-land.css?v=WALLFILL1" />
+<script src="wg-assets.js" defer></script>
+<script src="wg-spook.js" defer></script>
+<link rel="stylesheet" href="wg-spook.css?v=SPOOK1" />
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -4382,7 +4387,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 </div>
 <script src="house-clock.js?v=PRIVFEED3"></script>
 <script src="house-board-strip.js?v=P1FIX"></script>
-<script src="house-weather.js?v=COORDFIX1"></script>
+<script src="livewx-core.js?v=LIVEWX2B"></script><script src="house-weather.js?v=LIVEWX2"></script>
 <script src="house-sfx.js?v=MERGE1C"></script>
 <script src="house-tapsync.js?v=P1FIX"></script>
 <script src="kids-data.js?v=MERGE1C"></script>
@@ -4508,7 +4513,7 @@ document.addEventListener("click", function (ev) {
 var M=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"],N=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 function s(k,v){var e=document.querySelector('[data-mtile="'+k+'"]');if(e)e.textContent=v}
 s("m0",M[m]);s("m1",M[(m+1)%12]);s("w0","Week "+Math.ceil((d+new Date(y,m,1).getDay())/7)+" · this month");s("sub",N[m]+" and "+N[(m+1)%12])}catch(e){}})();</script>
-<script src="night/night-host.js?v=MERGE1C" defer></script>
+<script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/month-overlay.js?v=MERGE1C" defer></script>
 </body>
 </html>

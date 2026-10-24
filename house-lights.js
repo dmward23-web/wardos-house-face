@@ -228,7 +228,7 @@
         kind: "need_token",
         live: false,
         needToken: true,
-        label: "Needs pairing",
+        label: "Ready",
         writeSupported: false,
         data: data,
         ageMs: age
@@ -819,18 +819,18 @@
     if (g.live && g.writeSupported && _proxyReachable === false) return "LIVE · PROXY OFF";
     if (g.live && g.writeSupported) return "LIVE · PROXY";
     if (g.live) return "LIVE · READ ONLY";
-    if (g.needToken) return "Needs pairing";
+    if (g.needToken) return "Ready";
     return g.label || "OFFLINE";
   }
 
   function hubHonesty(g) {
     g = g || gate();
     if (canWrite()) return "LIVE";
-    if (noKey(g)) return "NEEDS PAIRING";
+    if (noKey(g)) return "READY";
     if (g.live && g.writeSupported && _proxyReachable === false) return "PROXY OFF";
     if (g.live && g.writeSupported) return "LIVE";
     if (g.live) return "READ ONLY";
-    if (g.needToken) return "Needs pairing";
+    if (g.needToken) return "Ready";
     return g.label || "OFFLINE";
   }
 
@@ -943,12 +943,12 @@
       sub.textContent = canWrite()
         ? "3 LIVE · 6 OFF · wait"
         : (noKey(g)
-          ? "NEEDS PAIRING · controls dark"
+          ? "READY"
           : g.live && g.writeSupported
           ? "PROXY OFF · write proxy unreachable (check tunnel)"
           : (g.live
             ? "LIVE read · write not armed"
-            : (g.needToken ? "Needs pairing · controls dark" : ((g.label || "OFFLINE") + " · controls dark"))));
+            : (g.needToken ? "Ready" : ((g.label || "OFFLINE") + " · controls dark"))));
     }
 
     var grid = doc.getElementById("hub-lights-grid");
@@ -979,7 +979,7 @@
       if (_dimDrag && _dimDrag.id === L.id && typeof _dimDrag.bright === "number") {
         bright = clampBright(_dimDrag.bright);
       }
-      var meta = L.on == null ? "Wait" : (L.on ? "ON" : "OFF");
+      var meta = L.on == null ? "" : (L.on ? "ON" : "OFF");
       var writable = canWrite() && !L.disabled;
       var dimCls = dim ? " hub-sw--dim" : " hub-sw--toggle";
       html +=

@@ -1,0 +1,368 @@
+{
+"events": [
+{
+"id": "c1",
+"summary": "Kids with Dan",
+"start": {
+"dateTime": "2026-10-23T15:00:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-30T15:00:00-05:00"
+}
+},
+{
+"id": "raffle",
+"summary": "Ainsley — LKMS raffle donation due (Cougar Night)",
+"start": {
+"date": "2026-10-23"
+},
+"end": {
+"date": "2026-10-24"
+},
+"transparency": "transparent"
+},
+{
+"id": "notice",
+"summary": "Hayes — QXS book order due",
+"start": {
+"dateTime": "2026-10-26T06:30:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-26T06:45:00-05:00"
+}
+},
+{
+"id": "pj",
+"summary": "Ainsley — LKMS PJ day",
+"start": {
+"date": "2026-10-30"
+},
+"end": {
+"date": "2026-10-31"
+},
+"transparency": "transparent"
+},
+{
+"id": "costume",
+"summary": "Hayes — costume parade",
+"start": {
+"date": "2026-10-29"
+},
+"end": {
+"date": "2026-10-30"
+},
+"transparency": "transparent"
+},
+{
+"id": "orange",
+"summary": "Hayes + Harris — QXS Orange Day (wear orange)",
+"start": {
+"date": "2026-10-27"
+},
+"end": {
+"date": "2026-10-28"
+},
+"transparency": "transparent"
+},
+{
+"id": "dentist",
+"summary": "Hayes — dentist filling",
+"start": {
+"dateTime": "2026-10-28T07:40:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-28T08:40:00-05:00"
+}
+},
+{
+"id": "party",
+"summary": "Hayes — Smith's 9th birthday party",
+"start": {
+"dateTime": "2026-10-24T15:15:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-24T17:00:00-05:00"
+}
+},
+{
+"id": "tutor",
+"summary": "Ainsley & Mrs. Jones",
+"start": {
+"dateTime": "2026-10-27T15:00:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-27T16:00:00-05:00"
+}
+},
+{
+"id": "pack",
+"summary": "Kids — pack sports + clothes for mom (Thu night)",
+"start": {
+"dateTime": "2026-10-29T19:40:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-29T20:00:00-05:00"
+}
+},
+{
+"id": "hoa",
+"summary": "Dan — Large Item Pickup (HOA)",
+"start": {
+"dateTime": "2026-10-24T08:00:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-24T09:00:00-05:00"
+}
+},
+{
+"id": "grocery",
+"summary": "Grocery curbside pickup",
+"start": {
+"dateTime": "2026-10-24T09:00:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-24T09:15:00-05:00"
+}
+},
+{
+"id": "flight",
+"summary": "✈️ Dan flight MCI to BNA",
+"start": {
+"dateTime": "2026-10-30T09:00:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-30T10:30:00-05:00"
+}
+},
+{
+"id": "therapy",
+"summary": "Hayes — therapy session",
+"start": {
+"dateTime": "2026-10-26T16:00:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-26T17:00:00-05:00"
+}
+},
+{
+"id": "ainswim",
+"summary": "Ainsley swim · Coach Ann $15/hr",
+"start": {
+"dateTime": "2026-10-27T16:25:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-27T17:25:00-05:00"
+}
+},
+{
+"id": "sh26",
+"summary": "Harris — QXS specials: PE",
+"start": {
+"dateTime": "2026-10-26T07:00:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-26T07:15:00-05:00"
+}
+},
+{
+"id": "sy26",
+"summary": "Hayes — QXS specials: Art",
+"start": {
+"dateTime": "2026-10-26T07:01:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-26T07:15:00-05:00"
+}
+},
+{
+"id": "dr26",
+"summary": "Hayes + Harris — QXS drop-off · 8:25",
+"start": {
+"dateTime": "2026-10-26T08:10:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-26T08:25:00-05:00"
+}
+},
+{
+"id": "pu26",
+"summary": "Hayes + Harris — QXS pickup · 3:40",
+"start": {
+"dateTime": "2026-10-26T15:15:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-26T15:40:00-05:00"
+}
+},
+{
+"id": "sh27",
+"summary": "Harris — QXS specials: PE",
+"start": {
+"dateTime": "2026-10-27T07:00:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-27T07:15:00-05:00"
+}
+},
+{
+"id": "sy27",
+"summary": "Hayes — QXS specials: Art",
+"start": {
+"dateTime": "2026-10-27T07:01:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-27T07:15:00-05:00"
+}
+},
+{
+"id": "dr27",
+"summary": "Hayes + Harris — QXS drop-off · 8:25",
+"start": {
+"dateTime": "2026-10-27T08:10:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-27T08:25:00-05:00"
+}
+},
+{
+"id": "pu27",
+"summary": "Hayes + Harris — QXS pickup · 3:40",
+"start": {
+"dateTime": "2026-10-27T15:15:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-27T15:40:00-05:00"
+}
+},
+{
+"id": "sh28",
+"summary": "Harris — QXS specials: PE",
+"start": {
+"dateTime": "2026-10-28T07:00:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-28T07:15:00-05:00"
+}
+},
+{
+"id": "sy28",
+"summary": "Hayes — QXS specials: Art",
+"start": {
+"dateTime": "2026-10-28T07:01:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-28T07:15:00-05:00"
+}
+},
+{
+"id": "dr28",
+"summary": "Hayes + Harris — QXS drop-off · 8:25",
+"start": {
+"dateTime": "2026-10-28T08:10:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-28T08:25:00-05:00"
+}
+},
+{
+"id": "pu28",
+"summary": "Hayes + Harris — QXS pickup · 3:40",
+"start": {
+"dateTime": "2026-10-28T15:15:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-28T15:40:00-05:00"
+}
+},
+{
+"id": "sh29",
+"summary": "Harris — QXS specials: PE",
+"start": {
+"dateTime": "2026-10-29T07:00:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-29T07:15:00-05:00"
+}
+},
+{
+"id": "sy29",
+"summary": "Hayes — QXS specials: Art",
+"start": {
+"dateTime": "2026-10-29T07:01:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-29T07:15:00-05:00"
+}
+},
+{
+"id": "dr29",
+"summary": "Hayes + Harris — QXS drop-off · 8:25",
+"start": {
+"dateTime": "2026-10-29T08:10:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-29T08:25:00-05:00"
+}
+},
+{
+"id": "pu29",
+"summary": "Hayes + Harris — QXS pickup · 3:40",
+"start": {
+"dateTime": "2026-10-29T15:15:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-29T15:40:00-05:00"
+}
+},
+{
+"id": "sh30",
+"summary": "Harris — QXS specials: PE",
+"start": {
+"dateTime": "2026-10-30T07:00:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-30T07:15:00-05:00"
+}
+},
+{
+"id": "sy30",
+"summary": "Hayes — QXS specials: Art",
+"start": {
+"dateTime": "2026-10-30T07:01:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-30T07:15:00-05:00"
+}
+},
+{
+"id": "dr30",
+"summary": "Hayes + Harris — QXS drop-off · 8:25",
+"start": {
+"dateTime": "2026-10-30T08:10:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-30T08:25:00-05:00"
+}
+},
+{
+"id": "pu30",
+"summary": "Hayes + Harris — QXS pickup · 3:40",
+"start": {
+"dateTime": "2026-10-30T15:15:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-30T15:40:00-05:00"
+}
+},
+{
+"id": "parade",
+"summary": "Harris — QXS Halloween parade",
+"start": {
+"dateTime": "2026-10-30T14:00:00-05:00"
+},
+"end": {
+"dateTime": "2026-10-30T14:45:00-05:00"
+}
+}
+]
+}

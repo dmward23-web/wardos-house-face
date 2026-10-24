@@ -5,6 +5,7 @@ any em dash (U+2014) in visible rendered text (aria labels, titles and SVG defs 
 in calendar-fed text are reported as WARN lines (static UI arrows exist by design), never a fail.
 Read-only, local only (every non-local request is aborted).
 Usage: python3 scripts/qa/no-emdash.py [root] [--vps 1920x1080,440x956,390x844]   env CLOCK=<iso> pins the clock (default now, CT)"""
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from pw_chrome import launch_kw
 import sys, re, os, socket, subprocess, time, datetime
 from pathlib import Path
 args = [a for a in sys.argv[1:] if not a.startswith("--") and not re.match(r"^\d+x\d+(,\d+x\d+)*$", a)]
@@ -26,7 +27,7 @@ def main():
     try:
         from playwright.sync_api import sync_playwright
         with sync_playwright() as p:
-            b = p.chromium.launch()
+            b = p.chromium.launch(**launch_kw(p))
             for W, H in VPS:
                 mob = W < 600
                 ctx = b.new_context(viewport={"width": W, "height": H}, reduced_motion="reduce", is_mobile=mob, has_touch=mob, device_scale_factor=2 if mob else 1)

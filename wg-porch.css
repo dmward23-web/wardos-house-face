@@ -1,0 +1,4 @@
+/* PORCH1 · porchlight layer: opacity only, never a hit target. Placeholder glow until Prism's overlays/porchlight.png lands. */
+.wg-porch { position: absolute; pointer-events: none; will-change: opacity; mix-blend-mode: screen; z-index: 3;
+  background: radial-gradient(closest-side, rgba(255, 196, 120, .55), rgba(255, 160, 70, .18) 55%, rgba(255, 150, 60, 0)); }
+.wg-porch[data-asset-on] { background: var(--wg-art) center / contain no-repeat; }

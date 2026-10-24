@@ -22,7 +22,9 @@
 (function () {
   var root = document.documentElement;
   if (!root.classList.contains("ori-calm")) return;
-  function clear() { document.querySelectorAll(".ori-iris[data-calm]").forEach(function (el) { el.remove(); }); }
+  /* VEILPAUSE1 · on leave, hold the board's ambient CSS motion so a slow phone frame paints the veil first; resume on back. */
+  var held = [];
+  function clear() { document.querySelectorAll(".ori-iris[data-calm]").forEach(function (el) { el.remove(); }); held.splice(0).forEach(function (an) { try { an.play(); } catch (e) {} }); }
   addEventListener("pageshow", clear);
   document.addEventListener("click", function (ev) {
     if (ev.defaultPrevented || ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
@@ -37,8 +39,16 @@
     el.setAttribute("data-calm", "1");
     el.setAttribute("aria-hidden", "true");
     el.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#062018;opacity:0;pointer-events:none;transition:opacity .2s ease";
+    try { document.getAnimations().forEach(function (an) { if (an.playState === "running") { an.pause(); held.push(an); } }); } catch (e) {}
     root.appendChild(el);
-    requestAnimationFrame(function () { el.style.opacity = "1"; });
-    setTimeout(function () { location.href = u.href; }, root.classList.contains("ori-reduced") ? 0 : 320);
+    void getComputedStyle(el).opacity;
+    el.style.opacity = "1";
+    if (root.classList.contains("ori-reduced")) { setTimeout(function () { location.href = u.href; }, 0); return; }
+    /* VEILPAUSE1 · leave on the frame after the veil was drawn at opacity >= .9 (and >= 320ms), never later than 1.5s. */
+    var t0 = Date.now(), gone = false, shown = false;
+    function go() { if (gone) return; gone = true; location.href = u.href; }
+    function tick() { if (gone) return; if (shown) return go(); if (Date.now() - t0 >= 320 && (parseFloat(getComputedStyle(el).opacity) || 0) >= 0.9) shown = true; requestAnimationFrame(tick); }
+    requestAnimationFrame(tick);
+    setTimeout(go, 1500);
   }, false);
 })();

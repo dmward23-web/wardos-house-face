@@ -186,9 +186,13 @@
     ctx.save(); ctx.globalCompositeOperation = "lighter";
     /* column flash */
     var ca = Math.max(0, 1 - age / 0.9);
-    var cg = ctx.createLinearGradient(0, p.y - 260, 0, p.y);
-    cg.addColorStop(0, "rgba(" + rgb + ",0)"); cg.addColorStop(1, "rgba(" + rgb + "," + (0.55 * ca).toFixed(3) + ")");
-    ctx.fillStyle = cg; ctx.fillRect(p.x - 22 * (1 + age), p.y - 260, 44 * (1 + age), 260);
+    /* LIVEWX2 (Alfred P3) · a soft plume (scaled radial, feathered on both sides and the top), never a hard-edged rectangle mid-pop */
+    if (ca > 0) {
+      ctx.save(); ctx.translate(p.x, p.y); ctx.scale(22 * (1 + age), 260);
+      var cg = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+      cg.addColorStop(0, "rgba(" + rgb + "," + (0.55 * ca).toFixed(3) + ")"); cg.addColorStop(0.55, "rgba(" + rgb + "," + (0.22 * ca).toFixed(3) + ")"); cg.addColorStop(1, "rgba(" + rgb + ",0)");
+      ctx.fillStyle = cg; ctx.fillRect(-1, -1, 2, 1); ctx.restore();
+    }
     /* shockwave ring */
     var r = 20 + age * 120, ra = Math.max(0, 0.75 - age * 0.55);
     ctx.strokeStyle = "rgba(" + rgb + "," + ra.toFixed(3) + ")"; ctx.lineWidth = 5 * (1 - age / 2.6) + 1;
@@ -450,9 +454,11 @@
       var info = global.KidWorld && KidWorld.hits && KidWorld.hits();
       var r = info && info.cv ? info.cv.getBoundingClientRect() : null;
       var sx = r ? r.width / Math.max(1, W) : 1;
-      if (!reduced) back(t);
-      if (info && info.hits) grounding(info, r, sx);
-      stormEdge(t);
+      /* KIDWORLD1 · with Prism's plate on, the plate IS the world: no drawn fog, motes, light shafts, storm rim, glider or fronds over it (costumes stay visible); chore beams, pops and the victory moment stay */
+      var plate = document.body.hasAttribute("data-asset-on");
+      if (!reduced && !plate) back(t);
+      if (info && info.hits && !plate) grounding(info, r, sx);
+      if (!plate) stormEdge(t);
       if (info && info.hits) {
         info.hits.forEach(function (q, i) {
           if (q.done || q.x == null) return;
@@ -462,10 +468,10 @@
       }
       var tm = now();   /* moments run on the real clock, also with reduced motion */
       if (!reduced) pops.forEach(function (p) { sceneLight(p, tm); });
-      if (!reduced) glider(t);
-      if (!reduced) middle(t);
+      if (!reduced && !plate) glider(t);
+      if (!reduced && !plate) middle(t);
       pops = pops.filter(function (p) { return reduced ? tm - p.t0 < 2.6 : drawPop(p, tm); });
-      if (!reduced) nearLayer(t);
+      if (!reduced && !plate) nearLayer(t);
       if (info && info.hits) clearLabels(info, r, sx);
       pops.forEach(function (p) { lootCard(p, tm); });
       victory(tm);
@@ -566,6 +572,7 @@
     e.stopPropagation(); e.preventDefault();
     victoryAt = -1; victoryCy = null;
   }, true);
-  global.HayesLoot = { tierFor: tierFor, previewVictory: function () { victoryAt = now(); victorySting(); } };
+  global.HayesLoot = { tierFor: tierFor, previewVictory: function () { victoryAt = now(); victorySting(); },
+    previewPop: function (tier) { addPop(W * 0.5, H * 0.7, TIERS[tier] ? tier : "rare", "Preview"); } };   /* QA stills only, draws nothing until called */
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })(window);

@@ -1,0 +1,11 @@
+/* FOGSOFT1: CSS-only softening of the ambient worker's fog band. No hard top edge: masked gradient wisps at several heights, blurred. */
+html .amb-fog { -webkit-mask-image: linear-gradient(to top, #000 0%, #000 38%, rgba(0,0,0,.55) 62%, transparent 100%); mask-image: linear-gradient(to top, #000 0%, #000 38%, rgba(0,0,0,.55) 62%, transparent 100%); filter: blur(10px); }
+html .amb-fog:not([data-asset-on]) { background:
+  radial-gradient(ellipse 18% 22% at 12% 46%, rgba(200,208,226,.32), transparent 70%),
+  radial-gradient(ellipse 26% 30% at 38% 62%, rgba(186,196,216,.40), transparent 72%),
+  radial-gradient(ellipse 22% 18% at 61% 38%, rgba(196,204,222,.26), transparent 70%),
+  radial-gradient(ellipse 30% 34% at 82% 70%, rgba(176,188,210,.42), transparent 72%),
+  radial-gradient(ellipse 60% 40% at 50% 100%, rgba(170,182,205,.5), transparent 75%); }
+html .amb-fog-b { filter: blur(16px); }
+html.amb-phone .amb-fog { filter: blur(6px); }
+@media (prefers-reduced-motion: reduce) { html .amb-fog { filter: blur(8px); } }

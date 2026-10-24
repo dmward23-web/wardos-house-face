@@ -3,6 +3,7 @@
 QA_BLOCK_NOMONEY=1 is the negative control (scrub file stubbed out; the figures must then show).
 Usage: python3 scripts/qa/money_viewport.py <page.html> <width> <height>  -> prints JSON {"dollars": n, "sample": [...]}
 Serves the repo on a random loopback port; every non-loopback request and the WebGL ori world are stubbed so it is fast. house-ori-world.js (which has its own scrub) is stubbed too, so the result proves house-nomoney.js alone."""
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from pw_chrome import launch_kw
 import json, os, sys, threading, functools, re
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse
@@ -24,7 +25,7 @@ INJECT = r"""() => new Promise(res => {
   setTimeout(() => res({len: document.body.innerText.length, raw: document.body.textContent.includes(M('¤4')), figs: [...document.body.innerText.matchAll(/\$\s?\d[\d,]*(?:\.\d+)?/g)].map(m => m[0])}), 400);
 })"""
 with sync_playwright() as p:
-    b = p.chromium.launch(args=["--disable-gpu"])
+    b = p.chromium.launch(**launch_kw(p, args=["--disable-gpu"]))
     pg = b.new_page(); pg.set_viewport_size({"width": w, "height": h})
     def gate(route):
         u = urlparse(route.request.url)

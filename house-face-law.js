@@ -9,19 +9,11 @@
  * defensive (window.HouseFaceLaw may be missing on an old cached page). */
 (function (g) {
   var COLORS = "orange|red|yellow|green|blue|purple|pink|white|black|gold|silver|maroon|rainbow|neon|tie[- ]?dye|camo|pastel|teal|navy";
-  var DRESS = new RegExp(
-    "\\b(?:" + COLORS + ")\\s+(?:day|out)\\b" +                       /* <school> Orange Day · Red Day · white out */
-    "|\\bcolou?r\\s+day\\b" +
-    "|\\bdress[- ]?up\\b|\\bdress\\s+(?:as|like)\\b" +
-    "|\\bspirit\\s+(?:day|week|wear)\\b" +
-    "|\\bpajama|\\bpyjama|\\bpj'?s?\\s+day\\b" +
-    "|\\bcostume" +
-    "|\\b(?:hat|socks?|crazy\\s+\\w+|tropical|twin|twins|jersey|workout|decade|character|superhero|western|beach|mismatch|wacky|tacky|flannel|hawaiian|sports?\\s+team|team\\s+jersey|favorite\\s+team|book\\s+character)\\s+day\\b" +
-    "|\\boutsiders\\s+day\\b|\\bgreaser\\b|\\bwear\\s+(?:your|a|an|their)\\b" +
-    /* AWAYONE1 · the ONE dress-up law: LIVELAW1 above plus LAW8C1's data filter (any "wear", "<colour> day"), so render
-       and data (scripts/calendar-refresh.mjs, scripts/cal-from-events.mjs load this file) can never disagree */
-    "|\\b(?:orange|red|blue|green|pink|purple|yellow|black|white|gold|maroon|colou?r|crazy hair|pajamas?|pj|twin|hat|jersey|spirit|outsiders)\\s+day\\b|dress[- ]?up|spirit\\s+week|\\bwear\\b",
-    "i");
+  /* DRESSOK1 (Dan 2026-10-23 18:48): PJ / pajama / costume / spirit / theme days SHOW as rows. Colour days (Red Day) stay a
+     schedule marker only; a "wear <x>" prompt never shows (row dropped if it is only a prompt, clause stripped otherwise). */
+  var COLORDAY = new RegExp("\\b(?:" + COLORS + ")\\s+(?:day|out)\\b|\\bcolou?r\\s+day\\b", "i");
+  var DRESS = new RegExp(COLORDAY.source + "|^\\s*wear\\b", "i");
+  function isColorDay(s) { return COLORDAY.test(String(s == null ? "" : s)); }
   function isDressDay(s) { return DRESS.test(String(s == null ? "" : s)); }
 
   function faceDash(s) {
@@ -36,7 +28,7 @@
 
   var DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   function ctNow() {
-    var d = new Date(), p = {};
+    var d = g.LHClock ? g.LHClock.now() : new Date(), p = {}; /* Living House: follows its ?now test clock when LHClock exists; every other board has none */
     try {
       new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit", hour: "numeric", minute: "2-digit", hourCycle: "h23", weekday: "short" })
         .formatToParts(d).forEach(function (x) { p[x.type] = x.value; });
@@ -89,7 +81,7 @@
     var iso = r.startIso || r.start || "";
     if (iso && /T\d{2}:/.test(String(iso))) {
       var end = Date.parse(r.endIso || r.end || "") || (Date.parse(iso) + 90 * 60000);
-      return Number.isFinite(end) && end < Date.now();
+      return Number.isFinite(end) && end < (g.LHClock ? g.LHClock.ms() : Date.now());
     }
     var off = dayOffset(r.when, now);
     if (off === null) return false;
@@ -207,17 +199,25 @@
     [new RegExp("\\s*,?\\s*\\b(?:Seats\\s*\\d{1,3}(?:\\s*[-–,&]\\s*\\d{1,3})*|Seat\\s*\\d{1,3}\\s*[-–]\\s*\\d{1,3})\\b", "gi"), ""],
     [new RegExp("\\bLKMS\\b", "g"), "school"]
   ];
+  /* DATA1 P2-8 · ONE school word + ONE "for mom" rule for both feeds (cal-from-events.mjs via text-law.json, calendar-refresh.mjs
+     via these): "for mom" / "for their mom's" goes as a whole phrase, so no dangling "for (" is left behind. */
+  var SCHOOL_WORD = RENDER_RULES[RENDER_RULES.length - 1];
+  function schoolWord(t) { return String(t == null ? "" : t).replace(new RegExp(SCHOOL_WORD[0].source, "g"), SCHOOL_WORD[1]); }
+  var MOM_PHRASE = /\s*\b(?:for|with|at|to|from) (?:their )?mom(?:['\u2019]?s)?\b|\s*\bmom(?:['\u2019]?s)?\b/gi;
+  function momFree(t) { return String(t == null ? "" : t).replace(MOM_PHRASE, "").replace(/\(\s*\)/g, "").replace(/\s{2,}/g, " ").trim(); }
   function renderRules(t) { for (var i = 0; i < RENDER_RULES.length; i++) t = t.replace(RENDER_RULES[i][0], RENDER_RULES[i][1]); return t; }
   function faceText(s) {
     if (typeof s !== "string" || !s || /^(https?:|data:|\d{4}-\d\d-\d\d|#[0-9a-f]{3,8}$)/i.test(s)) return s;
     var t = faceDash(renderRules(s)).replace(/\s*#[A-Za-z0-9_]+(\/#[A-Za-z0-9_]+)*/g, "")
-      .replace(/\s*\((?:tennis shoes|sneakers|wear [^)]*)\)/gi, "") /* LAW8C1 · no what-to-wear hints on glass */.replace(/\s{2,}/g, " ").replace(/\s*,\s*(?=,|$)/g, "").replace(/(\s\u00b7\s*)+$/, "").trim();
+      .replace(/\s*\((?:tennis shoes|sneakers|wear [^)]*)\)/gi, "").replace(/\s*[-\u2013\u2014\u00b7,:;]?\s*\bwear\b[^()]*$/i, "") /* LAW8C1 · no what-to-wear hints on glass */.replace(/\s{2,}/g, " ").replace(/\s*,\s*(?=,|$)/g, "").replace(/(\s\u00b7\s*)+$/, "").trim();
     return t || s.replace(/[\u2014\u2192]/g, " ").trim();
   }
   /* NOCUSTODY1 · glass law for every board: a feed string that carries one is blanked, and a row whose text carries
      one is dropped. Nothing is put in its place. Same phrase list as scripts/qa/nocustody.test.mjs. */
-  var NOCUST_RX = /kids with (?:dad|mom|dan|you)\b|\b(?:dad|mom)(?:['\u2019]?s)? weeks?\b|\bhome week|\baway week|\bcustody\b|\btheir mom['\u2019]?s week|\bkids away\b|\btheir week\b|kids-with-dan|\b(?:your base|base at home|drop zone hq) with dad\b|hand-?\s?offs?\b|\b(?:chores|payday) with dad\b|who.{1,6}s where/i; /* custody-law:allow */
-  function isCustody(s) { return NOCUST_RX.test(String(s == null ? "" : s)); }
+  var NOCUST_RX = /kids with (?:dad|mom|dan|you)\b|\b(?:dad|mom)(?:['\u2019]?s)? weeks?\b|\bhome week|\baway week|\bcustody\b|\btheir mom['\u2019]?s week|\bkids away\b|\btheir week\b|kids-with-dan|\b(?:your base|base at home|drop zone hq) with dad\b|\bwhose (?:week|weekend|night|turn)\b|\b(?:kids?|boys|weeks?|weekends?|nights?) (?:with|at) (?:mom|mommy|mother|dad|daddy|father)(?:['\u2019]?s)?\b|\bwith (?:mom|mommy|mother)\b|\b(?:mom|mommy|mother|dad|daddy|father)['\u2019]?s (?:kids|weekend|night|house|place)\b|\b(?:mom|mommy|mother)(?:['\u2019]?s)? (?:has|have|had|gets?|got|takes?|keeps?) (?:the )?kids\b|\bhand-?\s?offs?\b|\b(?:chores|payday) with dad\b|who.{1,6}s where|\b(?:kids?|custody) exchange\b|\bexchange (?:day|time|point)\b|(?:^\s*|\b(?!who\b)[a-z]+\s+)(?:has|have|had|gets?|got|keeps?) (?:the )?kids\b(?=\s*(?:$|[\u00b7|]|(?:this|next) (?:week|weekend)\b|(?:until|till|through|thru)\b|all week\b))/i; /* custody-law:allow (Atlas + Alfred: only which parent or household the kids are with; logistics stay) */
+  /* a co-parent name joined to kids, week or weekend counts the same; the name is read at run time only (role coparent, never in git) */
+  function cpRe() { var w = g.WARDOS_PRIVATE_NAMES, l = w && w.coparent ? [].concat(w.coparent) : []; l = l.map(function (n) { return String(n || "").trim().split(/\s+/)[0]; }).filter(function (n) { return /^[A-Za-z]{2,}$/.test(n); }); if (!l.length) return null; var N = "(?:" + l.join("|") + ")"; return new RegExp("\\b" + N + "(?:['\u2019]?s)? (?:kids|week|weekend|night|house|place)\\b|\\b" + N + " (?:has|have|had|gets?|got|takes?|keeps?) (?:the )?kids\\b|\\b(?:kids?|weeks?|weekends?) (?:with|at) " + N + "\\b", "i"); }
+  function isCustody(s) { var t = String(s == null ? "" : s), c; return NOCUST_RX.test(t) || !!((c = cpRe()) && c.test(t)); }
   function rowCustody(o) {
     if (!o || typeof o !== "object" || Array.isArray(o)) return false;
     return isCustody([o.summary, o.title, o.what, o.l, o.label, o.text].filter(function (x) { return typeof x === "string"; }).join(" "));
@@ -241,5 +241,5 @@
     try { return data && typeof data === "object" ? feedAinsley(name, walk(data, "")) : data; } catch (e) { return data; }
   }
 
-  g.HouseFaceLaw = { isCustody: isCustody, cleanFeed: cleanFeed, faceText: faceText, isDressDay: isDressDay, faceDash: faceDash, rowEnded: rowEnded, keepRow: keepRow, keepEvent: keepEvent, isTherapy: isTherapy, rowTherapy: rowTherapy, ainsleyText: ainsleyText, THERAPY: THERAPY, cleanKidsWeek: cleanKidsWeek, cleanKid: cleanKid, ctNow: ctNow, DRESS: DRESS, RENDER_RULES: RENDER_RULES };
+  g.HouseFaceLaw = { isCustody: isCustody, cleanFeed: cleanFeed, faceText: faceText, isDressDay: isDressDay, isColorDay: isColorDay, faceDash: faceDash, rowEnded: rowEnded, keepRow: keepRow, keepEvent: keepEvent, isTherapy: isTherapy, rowTherapy: rowTherapy, ainsleyText: ainsleyText, THERAPY: THERAPY, cleanKidsWeek: cleanKidsWeek, cleanKid: cleanKid, ctNow: ctNow, DRESS: DRESS, RENDER_RULES: RENDER_RULES, schoolWord: schoolWord, momFree: momFree, cleanAinsley: cleanAinsley };
 })(typeof window !== "undefined" ? window : globalThis);

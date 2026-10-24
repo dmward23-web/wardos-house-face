@@ -6,6 +6,7 @@
  *  3. NOMONEY1: kid dollar figures are stripped at render time at every viewport, 1920x1080 included (real browser).
  *  5. SCHOOLWORD1 ('LKMS' reads 'school'); NAMESDIR1 (private-names.tsv in the private dir, old path as fallback).
  * Run with the rest:  scripts/qa/run-tests.sh */
+import { assertSealed } from "./temp-home.mjs";   // TEMPHOME1 (LHVID1): WARDOS_* unset and a temp HOME before any private-list reader loads
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -26,6 +27,7 @@ function faceLaw() {
   return g.HouseFaceLaw;
 }
 
+assertSealed();
 test("hub host: staticOk serves art/assets/theme-tiles/fonts images, js and fonts only; traversal, dotfiles and data never", async () => {
   const { staticOk } = await import(path.join(ROOT, "scripts/nest-webrtc-proxy.mjs"));
   for (const ok of ["art/kid-hayes.png", "assets/kids-grow/grow-hayes-victory-bg.jpg", "theme-tiles/a/b.webp", "assets/x/y.svg",
@@ -68,7 +70,7 @@ test("plain empty states: no dev text ('cal-live missing', 'STUB · NO JSON', 'C
     for (const re of bad) { const m = s.match(re); if (m) hits.push(`${f}: ${m[0].slice(0, 80)}`); }
   }
   assert.deepEqual(hits, []);
-  assert.match(rd("house-board-strip.js"), /place: "Calendar offline"/);
+  assert.match(rd("house-board-strip.js"), /place: "All clear"/);
   assert.match(rd("house-nest.js"), /label: "Cameras offline"/);
 });
 

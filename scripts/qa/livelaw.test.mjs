@@ -49,7 +49,9 @@ const week = () => ({
 
 test("colour and dress-up/spirit days are recognised; ordinary rows are not", () => {
   const L = law("2026-10-16T20:08:00-05:00");
-  for (const t of ["Elm Orange Day", "Hayes + Harris — Elm Red Day", "OAK OUTSIDERS DAY (GREASER OR SOC DRESS-UP)", "Elm spirit day: Hat Day", "Pajama Day", "Wear your jersey", "Halloween costume parade"]) assert.ok(L.isDressDay(t), t);
+  for (const t of ["Elm Orange Day", "Hayes + Harris — Elm Red Day", "Wear your jersey"]) assert.ok(L.isDressDay(t), t);
+  /* DRESSOK1 (Dan 2026-10-23): dress-up / spirit / PJ / costume days show */
+  for (const t of ["OAK OUTSIDERS DAY (GREASER OR SOC DRESS-UP)", "Elm spirit day: Hat Day", "Pajama Day", "Halloween costume parade"]) assert.ok(!L.isDressDay(t), t);
   for (const t of ["Elm specials: PE (tennis shoes)", "Harris flag — vs ASC (home)", "OAK fall conferences", "Elm Fall Family Fun Night MOVED → Oct 30", "Ward Kids [AHH No School]", "Red Ribbon Week assembly", "Field trip"]) assert.ok(!L.isDressDay(t), t);
 });
 
@@ -57,15 +59,15 @@ test("8:08 PM Friday: colour/dress-up rows and ended rows are gone, NEXT moves t
   const L = law("2026-10-16T20:08:00-05:00");
   const w = L.cleanKidsWeek(week());
   const all = (k) => ["today", "school", "sports", "appointments"].flatMap((l) => w.kids[k][l] || []).map((r) => r.what).join(" | ");
-  assert.doesNotMatch(all("hayes"), /Orange Day|Crazy Socks|Chat & Chew/, all("hayes"));
+  assert.doesNotMatch(all("hayes"), /Orange Day|Chat & Chew/, all("hayes"));
+  assert.match(all("hayes"), /Crazy Socks/, "DRESSOK1: spirit days show");
   assert.match(all("hayes"), /Fun Night/, "today's all-day note stays (it has not ended)");
   assert.match(all("hayes"), /specials: PE/);
   assert.match(all("hayes"), /Falcons/);
   assert.equal(w.kids.hayes.hottest.what, "HAYES FLAG — ELM FALCONS VS PENA · 5:15–6:15");
   assert.match(w.kids.hayes.hottest.when, /^SAT · 4:45$/);
   assert.equal(w.kids.hayes._lawColorRows.length, 2, "colour rows kept for the quiet specials rotation");
-  assert.doesNotMatch(all("ainsley"), /Outsiders/);
-  assert.equal(w.kids.ainsley.hottest.when, "MON"); /* LIVEFIX1 · Ainsley rows carry no time */
+  assert.match(w.kids.ainsley.hottest.when, /^TUE(?!.*\d)/); /* LIVEFIX1 · Ainsley rows carry no time; DRESSOK1: the Outsiders day now leads */
   assert.equal(w.boardStrip.queue.length, 1);
 });
 

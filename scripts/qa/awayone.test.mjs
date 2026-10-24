@@ -13,13 +13,20 @@ const AF = require(path.join(ROOT, "away-filter.js"));
 require(path.join(ROOT, "house-face-law.js"));
 const read = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 
-test("hub away window end comes from away-filter (synthetic cal-months: back Mon 10/26, 3:00 PM CT)", () => {
-  AF.setMonths(JSON.parse(read("scripts/qa/fixtures/private/cal-months.synthetic.json")));
+test("hub away window end comes from away-filter (synthetic cal-months: back Mon 10/26, feed changeMin 900)", () => {
+  AF.setMonths({ ...JSON.parse(read("scripts/qa/fixtures/private/cal-months.synthetic.json")), changeMin: 900 });
   for (const t of ["2026-10-18T15:00:00-05:00", "2026-10-20T16:00:00-05:00", "2026-10-26T14:59:00-05:00"]) {
     assert.equal(new Date(AF.awayUntil(Date.parse(t))).toISOString(), "2026-10-26T20:00:00.000Z", t);
   }
   assert.equal(AF.awayUntil(Date.parse("2026-10-26T15:00:00-05:00")), 0, "home again at the 3:00 PM switch");
   assert.equal(AF.awayUntil(Date.parse("2026-10-18T14:00:00-05:00")), 0, "before the away window");
+});
+
+test("no changeMin in the feed: no hour is assumed, the window ends at the first home day's midnight", () => {
+  const j = JSON.parse(read("scripts/qa/fixtures/private/cal-months.synthetic.json")); delete j.changeMin;
+  AF.setMonths(j);
+  assert.equal(new Date(AF.awayUntil(Date.parse("2026-10-20T16:00:00-05:00"))).toISOString(), "2026-10-26T05:00:00.000Z");
+  assert.equal(AF.awayUntil(Date.parse("2026-10-26T14:59:00-05:00")), 0, "a home day without changeMin is not away (switch-day hide covers kid items)");
 });
 
 test("no second away path: no homeWeek / cal.away reads on the glass, no away flag written to cal-live", () => {
@@ -35,6 +42,8 @@ test("one dress-up law: scripts and board strip use house-face-law.js DRESS, no 
     assert.doesNotMatch(read(f), /DRESS_RE\s*=\s*\//, `${f} keeps its own dress regex`);
   }
   const D = globalThis.HouseFaceLaw.DRESS;
-  for (const s of ["Elm Yellow Day", "Hayes + Harris — Elm Orange Day", "Coug Fest wear green", "pajama day", "spirit week", "dress-up day"]) assert.ok(D.test(s), s);
+  for (const s of ["Elm Yellow Day", "Hayes + Harris — Elm Orange Day", "Wear green"]) assert.ok(D.test(s), s);
+  /* DRESSOK1 (Dan 2026-10-23): PJ / spirit / dress-up days show */
+  for (const s of ["pajama day", "spirit week", "dress-up day"]) assert.ok(!D.test(s), s);
   for (const s of ["Elm field trip", "Rays vs Guardians, Game 4", "Hayes flag football · 6:15", "Dad: Park concert"]) assert.ok(!D.test(s), s);
 });

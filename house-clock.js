@@ -3,9 +3,12 @@
 (function (global) {
   "use strict";
   var TZ = "America/Chicago";
+  /* LIVEWX2 · one clock per page: when livinghouse/clock.js is loaded the header follows LHClock (so a ?now= still never shows two
+     different times); absent = real time */
+  function cur() { var L = global.LHClock; return L && typeof L.now === "function" ? L.now() : new Date(); }
 
   function parts(date) {
-    var d = date || new Date();
+    var d = date || cur();
     var map = {};
     try {
       new Intl.DateTimeFormat("en-US", {
@@ -47,9 +50,9 @@
         year: "numeric",
         month: "2-digit",
         day: "2-digit"
-      }).format(date || new Date()); /* YYYY-MM-DD */
+      }).format(date || cur()); /* YYYY-MM-DD */
     } catch (e) {
-      var d = date || new Date();
+      var d = date || cur();
       return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
     }
   }
@@ -75,9 +78,9 @@
         timeZone: TZ,
         hour: "numeric",
         hour12: false
-      }).format(date || new Date()));
+      }).format(date || cur()));
     } catch (e) {
-      h = (date || new Date()).getHours();
+      h = (date || cur()).getHours();
     }
     if (h < 12) return "morning";
     if (h < 17) return "afternoon";
@@ -117,8 +120,8 @@
   /** Paint every [data-live-clock] / [data-live="time"] with CT wall time. */
   function paintLive(root) {
     root = root || (typeof document !== "undefined" ? document : null);
-    if (!root || !root.querySelectorAll) return stamp(new Date());
-    var s = stamp(new Date());
+    if (!root || !root.querySelectorAll) return stamp(cur());
+    var s = stamp(cur());
     root.querySelectorAll("[data-live-clock], [data-live='time'], [data-live='clock-time']").forEach(function (el) {
       el.textContent = s.time || "";
       if (el.tagName === "TIME") el.setAttribute("datetime", s.iso + "T" + (s.time || "").replace(" ", ""));
@@ -167,7 +170,7 @@
     dow: dow,
     daypart: daypart,
     stamp: stamp,
-    now: function () { return stamp(new Date()); },
+    now: function () { return stamp(cur()); },
     paintLive: paintLive,
     startLive: startLive,
     stopLive: stopLive

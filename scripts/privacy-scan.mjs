@@ -12,7 +12,7 @@
  * Generic patterns live here. Names, places, schools, providers and figures that must never appear are read from
  * the box: private-names.tsv (~/.local/share/wardos-private, fallback ~/.config/wardos; every name column) + ~/.config/wardos/privacy-denylist.txt
  * (one regex per line). WARDOS_PRIVACY_DENYLIST / WARDOS_PRIVATE_NAMES override. When neither exists (CI, cloud
- * builders) the generic patterns still run and a WARN line says so (--require-denylist turns that into a failure).
+ * builders) the scan fails closed (exit 2) unless --generic-only is passed; then the generic patterns run and a WARN line says so.
  * A list file that exists but loads 0 entries fails (exit 2); --require-denylist also fails (exit 2) when either list is
  * missing. A '# wardos-min-patterns: N' line (alone on its line) sets a floor on the total loaded (exit 2 below it).
  * A line may opt out of ONE generic category with a trailing comment:  privacy-scan:allow <category>
@@ -237,6 +237,9 @@ function main() {
     fs.writeFileSync(rep, md);
   }
   if (!deny.found && has("--require-denylist")) process.exit(2);
+  /* LHVID1 (Alfred P3 0622) · fail closed: 0 denylist patterns is exit 2 everywhere (tests and the hook), not a WARN and a pass.
+     A run that means to check the generic patterns only must say so with --generic-only (synthetic fixtures under a temp HOME). */
+  if (deny.pats.length === 0 && !has("--generic-only")) { console.log("FAIL: 0 denylist patterns loaded (fail closed; pass --generic-only for a generic-patterns-only run)"); process.exit(2); }
   /* FOLLOWUP5 · counts and list kinds only, never a value */
   const empty = Object.entries(deny.lists).filter(([, l]) => l.present && l.n === 0).map(([k]) => k);
   const absent = has("--require-denylist") ? Object.entries(deny.lists).filter(([, l]) => !l.present).map(([k]) => k) : [];

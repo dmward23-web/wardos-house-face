@@ -1,4 +1,5 @@
 /* PRIVFEED3 · Alfred's privfeed1 FAIL defects stay fixed (node --test scripts/qa/privfeed3.test.mjs). Synthetic names only. */
+import { assertSealed } from "./temp-home.mjs";   // TEMPHOME1 (LHVID1): WARDOS_* unset and a temp HOME before any private-list reader loads
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -10,8 +11,9 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const read = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 process.env.WARDOS_NAMES = "partner=Partnerly;coparent=Coparentia";
-const scan = (...extra) => spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--tree", ...extra], { cwd: ROOT, encoding: "utf8" });
+const scan = (...extra) => spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--tree", "--generic-only", ...extra], { cwd: ROOT, encoding: "utf8" });
 
+assertSealed();
 test("P1 · no camera stills or page screenshots anywhere; every tracked image is on the art allow-list", () => {
   const files = execFileSync("git", ["ls-files"], { cwd: ROOT, encoding: "utf8" }).split("\n").filter(Boolean);
   const allow = new Set(read("scripts/privacy-art-allowlist.txt").split("\n").map((l) => l.replace(/#.*/, "").trim()).filter(Boolean));
@@ -27,7 +29,7 @@ test("P1 · no camera stills or page screenshots anywhere; every tracked image i
 
 test("P1 · privacy-scan flags ANY image or video outside the allow-list (tree, and --images --rev for pre-push)", () => {
   assert.equal(scan("--skip", "(^|/)zz-").status, 0);
-  const rev = spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--images", "--rev", "HEAD"], { cwd: ROOT, encoding: "utf8" });
+  const rev = spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--images", "--generic-only", "--rev", "HEAD"], { cwd: ROOT, encoding: "utf8" });
   assert.match(rev.stdout, /privacy-scan/);
   const png = Buffer.from("89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000d4944415478da63f8ffff3f0005fe02fea7d6a4ae0000000049454e44ae426082", "hex");
   const plants = ["plates/zz-plant/frame.png", "plates-receipt/zz-plant/x.jpg", "zz-plant-shot.png", "ori/plates/zz-plant.webp", "assets/zz-plant.webp", "art/zz-plant.gif", "zz-plant-clip.mp4", "theme-tiles/zz-plant.svg"].map((f) => path.join(ROOT, f));
@@ -65,7 +67,7 @@ test("P2 · TEXTLAW1 cleanText: no em dashes, arrows, booking codes, partner or 
   }
   assert.equal(cleanText("2026-10-17"), "2026-10-17");
   const wk = cleanWeek({ kids: { ainsley: { today: [{ when: "Fri", what: "QXS Orange Day" }, { when: "Fri", what: "Dress-up day: wear a hat" }, { when: "Fri 3:00", what: "Dance — studio" }] } } });
-  assert.deepEqual(wk.kids.ainsley.today.map((r) => r.what), ["Dance · studio"]);
+  assert.deepEqual(wk.kids.ainsley.today.map((r) => r.what), ["Dress-up day", "Dance · studio"]);   /* DRESSOK1: shows, wear prompt stripped */
 });
 
 test("P2 · TEXTLAW2 Python reader matches (cal-months labels)", () => {
@@ -82,11 +84,11 @@ test("P2 · LAW8C1 glass law: dress-up and colour days drop, face text has no em
     boardStrip: { queue: [{ what: "Spirit week: wear blue" }, { what: "Swim MOVED → 5:00" }] },
     dan: { week: [{ what: "HD #2209 pickup", theme: "#e8b64a" }] },
   });
-  assert.deepEqual(cal.upcomingLeaves.map((e) => e.summary), ["Dentist · 3:00"]);
-  assert.deepEqual(cal.boardStrip.queue.map((e) => e.what), ["Swim moved to 5:00"]);
+  assert.deepEqual(cal.upcomingLeaves.map((e) => e.summary), ["Pajama day", "Dentist · 3:00"]);   /* DRESSOK1 */
+  assert.deepEqual(cal.boardStrip.queue.map((e) => e.what), ["Spirit week", "Swim moved to 5:00"]);   /* DRESSOK1: shows, no wear prompt */
   assert.equal(cal.dan.week[0].what, "HD pickup");
   assert.equal(cal.dan.week[0].theme, "#e8b64a", "colours are not text");
-  assert.equal(cal.upcomingLeaves[0].start, "2026-10-22T15:00:00-05:00", "times untouched");
+  assert.equal(cal.upcomingLeaves[1].start, "2026-10-22T15:00:00-05:00", "times untouched");
   const months = L.cleanFeed("cal-months", { days: { "2026-10-20": { withDan: true, items: [{ c: "aware", l: "Orange Day" }, { c: "kid", l: "Game → Field 2" }] } } });
   assert.deepEqual(months.days["2026-10-20"].items, [{ c: "kid", l: "Game to Field 2" }]);
   assert.equal(months.days["2026-10-20"].withDan, true);
@@ -149,4 +151,16 @@ test("house host serves the vendored QR library and nothing else new", async () 
   assert.ok(STATIC_OK.test("vendor/qrcode-generator-2.0.4.js"));
   for (const p of ["vendor/x.json", "vendor/a/b.js", "data/cal-live.json", "scripts/lights-write-proxy.mjs", ".git/config"]) assert.ok(!STATIC_OK.test(p), p);
   assert.match(read("sheet-dan.html"), /src="vendor\/qrcode-generator-2\.0\.4\.js/);
+});
+
+test("LHVID1 · privacy-scan fails closed (exit 2) when 0 denylist patterns load, unless --generic-only says so", () => {
+  const empty = fs.mkdtempSync(path.join(process.env.TMPDIR || "/tmp", "lhvid1-nolists-"));
+  const env = { ...process.env, HOME: empty, WARDOS_PRIVATE_NAMES: path.join(empty, "none.tsv"), WARDOS_PRIVATE_DIR: path.join(empty, "none"), WARDOS_PRIVACY_DENYLIST: path.join(empty, "none.txt") };
+  const run = (...x) => spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--tree", "--only", "(^|/)zz-no-such-file-lhvid1$", ...x], { cwd: ROOT, encoding: "utf8", env });
+  const r = run();
+  assert.equal(r.status, 2, "0 patterns is a failure, not a WARN and a pass");
+  assert.match(r.stdout, /FAIL: 0 denylist patterns/);
+  assert.equal(run("--require-denylist").status, 2);
+  const g = run("--generic-only");
+  assert.equal(g.status, 0); assert.match(g.stdout, /WARN: no private names/);
 });

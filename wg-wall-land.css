@@ -1,0 +1,26 @@
+/* HALLOWEEN1 WALLFILL · a landscape wall (wider than tall, 1200 px and up) fills the whole screen: the portrait
+   1080 x 1920 column becomes two fluid columns (scene-side upper deck | kid grid) under a full-width header. */
+@media (min-width: 1200px) and (min-aspect-ratio: 4/3) {
+  html body .panel.panel {
+    width: 100vw !important; max-width: none !important; height: 100vh !important; min-height: 0 !important; max-height: 100vh !important;
+    display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr);
+    column-gap: 24px; row-gap: 14px; padding: 18px 28px 16px !important; align-content: stretch;
+  }
+  html body .panel.panel > header.hdr { grid-column: 1 / -1; grid-row: 1 !important; order: 0 !important; }
+  html body .panel.panel > .hub-upper { grid-column: 1; grid-row: 2; height: auto !important; min-height: 0 !important; max-height: none !important; flex-direction: column !important; }
+  html body .panel.panel > .hub-upper > * { flex: 1 1 0 !important; min-height: 0 !important; width: 100% !important; align-self: stretch !important; max-width: none !important; }
+  html body .panel.panel > .grid-wrap { grid-column: 2; grid-row: 2; min-height: 0 !important; height: auto !important; overflow: hidden auto; }
+  html body .panel.panel > .who-up, html body .panel.panel > .hub-cam-deck, html body .panel.panel > footer.ftr { grid-column: 1 / -1; }
+}
+/* WGTYPE1 · across-the-room floor on the landscape wall: no hub text under 15 px (chips, tile facts, lights, roster) */
+@media (min-width: 1200px) and (min-aspect-ratio: 4/3) {
+  .leaveby-mode-label, .leaveby-chip, .lb-empty, .hub-lights-title, #hub-lights-pill, #lights-all-on, #lights-all-off, .hub-sw-name, .hub-sw-meta,
+  .grid-title, .tile-sub, .tile-fact, .kf-kicker, .md, .tile-mchip, .pf-flag, .tile-hint, .tile-kicker, [class*="-meta"], [class*="-sub"], [class*="chip"] { font-size: max(15px, 1em) !important; }
+  .hub-panel *, .grid-wrap * { min-width: 0; }
+}
+/* WGBG1 · the Halloween night scene behind the landscape hub instead of black: Prism's backgrounds/bg-wall-night.png when the
+   private folder has it (wg-assets.js sets --wg-hubbg on <html>), else the committed photoreal dusk still; a soft scrim keeps tiles readable */
+@media (min-width: 1200px) and (min-aspect-ratio: 4/3) {
+  html, body { background: #07080b var(--wg-hubbg, url("night/media/poster/loop-dusk-wall.webp")) center / cover no-repeat fixed !important; }
+  html body .panel.panel { background: linear-gradient(180deg, rgba(6, 7, 10, .42), rgba(6, 7, 10, .62)) !important; }
+}

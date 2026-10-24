@@ -1,0 +1,7 @@
+/* WGMATTE1 · black matte screened away; sprites never take taps */
+[data-matte] { position: relative; }
+.wg-matte { position: absolute; pointer-events: none; mix-blend-mode: screen; object-fit: contain; }
+.lh-candle .wax[data-matte] .wg-matte { left: 50%; bottom: 82%; width: 420%; aspect-ratio: 1; transform: translateX(-50%); }
+.lh-candle .wax[data-matte-on]::before { opacity: 0; }   /* the CSS flame steps aside for the filmed one */
+.lh-cauldron .pot[data-matte] .wg-matte { left: 50%; bottom: 62%; width: 70%; aspect-ratio: 9 / 16; transform: translateX(-50%); opacity: .7; }
+#lh-moon[data-moonface] .lh-moonface { opacity: .38; mix-blend-mode: multiply; }   /* texture only: the etched time must stay crisp */

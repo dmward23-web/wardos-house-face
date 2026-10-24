@@ -1,0 +1,28 @@
+/* SPOOK1 · overlay never takes taps and never covers data for long: transform + opacity only */
+.wg-spook { position: fixed; inset: 0; pointer-events: none; z-index: 40; overflow: hidden; }
+.wg-spook i { position: absolute; opacity: 0; will-change: transform, opacity; pointer-events: none; }
+.wg-spook .sp-ghost { left: -20vw; top: 18vh; width: 22vw; height: 30vh; border-radius: 50% 50% 40% 40%;
+  background: radial-gradient(ellipse at 50% 35%, rgba(235, 240, 255, .55), rgba(200, 210, 240, .18) 55%, transparent 72%); }
+.wg-spook .sp-lantern { inset: 0; background: radial-gradient(circle at 50% 60%, rgba(255, 170, 60, .18), transparent 60%); }
+.wg-spook .sp-crow { right: -10vw; top: 8vh; width: 9vw; height: 5vw;
+  background: radial-gradient(ellipse at 50% 50%, rgba(8, 8, 10, .85) 40%, transparent 70%); border-radius: 50%; }
+.wg-spook.on.b-ghost .sp-ghost { animation: sp-ghost 3.2s ease-in-out 1; }
+.wg-spook.on.b-lantern .sp-lantern { animation: sp-flick 1.6s steps(8, end) 2; }
+.wg-spook.on.b-crow .sp-crow { animation: sp-crow 2.6s cubic-bezier(.3, .6, .4, 1) 1; }
+.wg-spook.on.min i { animation: none !important; }
+.wg-spook.on.min .sp-lantern { opacity: .35; transition: opacity .6s; }
+@keyframes sp-ghost { 0% { opacity: 0; transform: translateX(0) translateY(0); } 25% { opacity: .9; } 75% { opacity: .7; }
+  100% { opacity: 0; transform: translateX(130vw) translateY(-6vh); } }
+@keyframes sp-flick { 0%, 100% { opacity: 0; } 20% { opacity: .9; } 35% { opacity: .2; } 55% { opacity: 1; } 70% { opacity: .3; } }
+@keyframes sp-crow { 0% { opacity: 0; transform: translate(0, 0) scaleY(1); } 15% { opacity: 1; } 30% { transform: translate(-30vw, 4vh) scaleY(.4); }
+  45% { transform: translate(-50vw, 0) scaleY(1); } 60% { transform: translate(-70vw, 3vh) scaleY(.4); } 100% { opacity: 0; transform: translate(-120vw, -6vh) scaleY(1); } }
+@media (prefers-reduced-motion: reduce) { .wg-spook i { animation: none !important; } }
+/* SPOOK2 · Prism ghost loop: black matte screened away, fades in and out with the beat, never interactive */
+/* PLATE1: spook never repaints the plate. Ghost clip is a masked sprite, blacks crushed, so any baked scene in the clip cannot read as a background swap. */
+.wg-spook .sp-ghostv { position: absolute; left: 34%; top: 18%; width: 32%; height: 58%; object-fit: contain; mix-blend-mode: screen; opacity: 0; pointer-events: none; transition: opacity .7s ease-in-out; filter: brightness(.9) contrast(1.7) saturate(.6); -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 40%, transparent 72%); mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 40%, transparent 72%); }
+.wg-spook.has-ghostv .sp-ghost { display: none; }
+.wg-spook.on.b-ghost .sp-ghostv { opacity: .7; }
+.wg-spook.on.b-ghost img.sp-ghostv { animation: sp-ghostdrift 3.2s ease-in-out 1; }
+@keyframes sp-ghostdrift { 0% { opacity: 0; transform: translateX(-6vw); } 30% { opacity: .8; } 70% { opacity: .7; } 100% { opacity: 0; transform: translateX(8vw); } }
+.wg-spook.on.min .sp-ghostv { opacity: 0 !important; }
+@media (prefers-reduced-motion: reduce) { .wg-spook .sp-ghostv { display: none; } }

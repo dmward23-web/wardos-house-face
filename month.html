@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
-<script src="private-feed.js?v=FOLLOWUP6"></script>
+<script src="private-feed.js?v=WGQUIET1"></script>
 <script src="school-names.js?v=SCHOOLNAMES1"></script>
 <script src="house-face-law.js?v=LIVEFIX1"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
@@ -403,6 +403,7 @@
 }
 </style>
 <link rel="stylesheet" href="house-wall-frame.css?v=P1FIX" />
+<link rel="stylesheet" href="wg-glass.css?v=WGGLASS1" />
 </head>
 <body data-glass="ovals month-today">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -745,7 +746,7 @@
     s = s.replace(/\bDRIVE\b/g, "drives");
     return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
   }
-  /* P1FIX B29 · Month is shared glass: a row whose title says whose week it is never paints here (the shared
+  /* P1FIX B29 · Month is shared glass: a row whose title names a household split never paints here (the shared
      house-face-law.js phrase list, the same one the board test sweeps for); nothing is put in its place. */
   function ownerRow(s) { return !!(window.HouseFaceLaw && HouseFaceLaw.isCustody && HouseFaceLaw.isCustody(String(s || ""))); }
   function chipKey(s) {
@@ -980,7 +981,7 @@
   setInterval(function () { if (cur) render(cur.y, cur.m); }, 10 * 60 * 1000);
 })();
 </script>
-<script src="house-clock.js?v=PRIVFEED3"></script>
+<script src="house-clock.js?v=LIVEWX2"></script>
 <script src="house-board-strip.js?v=P1FIX"></script>
 <script>
 /* The time lives in the hero clock. Drop the repeated " · 3:00" from the title. */
@@ -1005,7 +1006,7 @@
   if (hero && window.MutationObserver) new MutationObserver(once).observe(hero, { childList: true, subtree: true, characterData: true });
 })();
 </script>
-<script src="house-weather.js?v=COORDFIX1"></script>
+<script src="livewx-core.js?v=LIVEWX2B"></script><script src="house-weather.js?v=LIVEWX2"></script>
 <script src="house-sensi.js?v=P1FIX"></script>
 <script src="house-glass-bind.js?v=MERGE1C"></script>
 <script src="house-zoom.js"></script>
@@ -1014,7 +1015,7 @@
 <script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
 <script src="house-ori-world.js?v=MERGE1C"></script>
-<script src="night/night-host.js?v=MERGE1C" defer></script>
+<script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/month-overlay.js?v=MERGE1C" defer></script>
 </body>
 </html>

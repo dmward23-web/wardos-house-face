@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPIN1"></script>
-<script src="private-feed.js?v=FOLLOWUP6"></script>
+<script src="private-feed.js?v=WGQUIET1"></script>
 <script src="house-face-law.js?v=LIVEFIX1"></script>
 <script src="house-pair.js?v=HUBPIN1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
@@ -396,6 +396,7 @@ html body .pack-item .lbl{font-size:16px!important;color:#fff!important;-webkit-
 html body .pack-item .who{font-size:13px!important;color:rgba(255,255,255,.72)!important;-webkit-text-fill-color:rgba(255,255,255,.72)!important}
 html body .pack-item .box{flex-shrink:0}
 </style>
+<link rel="stylesheet" href="wg-glass.css?v=WGGLASS1" />
 </head>
 <body>
 <div class="panel">
@@ -496,7 +497,7 @@ html body .pack-item .box{flex-shrink:0}
  </footer>
 </div>
 
-<script src="house-clock.js?v=PRIVFEED3"></script>
+<script src="house-clock.js?v=LIVEWX2"></script>
 <script src="house-zoom.js"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>
@@ -509,7 +510,7 @@ function faceDash(s) { return String(s == null ? "" : s).replace(/\bMOVED\s*[\u2
 function e(t){return faceDash(window.AwayFilter?window.AwayFilter.glass(t):t).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
 function day(iso){var d=new Date(iso+"T12:00:00");return d}
 function hm(s){var m=/T(\d\d):(\d\d)/.exec(s);if(!m)return"";var h=+m[1]%12||12;return h+":"+m[2]}
-/* LDAWAY1 · the pack strip is the shown load day's kid list: its [data-away-kid] items follow away-filter.js on that day.
+/* LDAWAY1 (QAFIX2, ported from main) · the pack strip is the shown load day's kid list: its [data-away-kid] items follow away-filter.js on that day.
    No month data (missing feed) means withDan is unknown, so nothing is away and the normal board shows. */
 function ctIso(ms){return new Intl.DateTimeFormat("en-CA",{timeZone:"America/Chicago"}).format(new Date(ms))}
 function packDay(iso){var A=window.AwayFilter,pk=document.querySelector("[data-ld-pack]");if(!pk)return;pk.setAttribute("data-away-day",iso);
@@ -530,7 +531,7 @@ q("timeline").innerHTML=rows.map(function(x,i){return '<article class="beat leav
 q("glance").innerHTML=rows.slice(0,3).map(function(x){return '<div class="glance-row"><span class="t">'+hm(x.start)+'</span><span class="w">'+e(x.summary.split(" · ")[0])+'</span></div>'}).join("");
 var sb=q("sub");if(sb)sb.textContent=rows.length+" on the calendar · "+lab;
 }).catch(function(){q("label").textContent="Load day · calendar offline"});})();</script>
-<script src="night/night-host.js?v=MERGE1C" defer></script>
+<script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/month-overlay.js?v=MERGE1C" defer></script>
 </body>
 </html>

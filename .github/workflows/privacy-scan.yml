@@ -24,13 +24,13 @@ jobs:
         with:
           node-version: "20"
       - name: Scan tree
-        run: node scripts/privacy-scan.mjs --tree
+        run: node scripts/privacy-scan.mjs --tree --generic-only   # CI has no private lists (public runner); the box hook fails closed
       - name: Scan new commits (PR)
         if: github.event_name == 'pull_request'
-        run: node scripts/privacy-scan.mjs --range "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
+        run: node scripts/privacy-scan.mjs --generic-only --range "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
       - name: Scan new commits (push)
         if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
-        run: node scripts/privacy-scan.mjs --range "${{ github.event.before }}..${{ github.sha }}"
+        run: node scripts/privacy-scan.mjs --generic-only --range "${{ github.event.before }}..${{ github.sha }}"
 
   # PIIGUARD1 · PII guard (scripts/qa/pii-guard.mjs). BLOCKING. Coarse rules always run with no secret: coordinates
   # finer than 0.1 deg, phones/emails outside scripts/qa/pii-guard-allow.txt, token/key and device-id patterns, over

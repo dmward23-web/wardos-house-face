@@ -19,12 +19,16 @@
     });
   }
   g.AinsJarState = { stateOf: stateOf, paint: paint };
+  /* LIVEWX2 · html[data-jar-settled] marks the one feed read as finished (painted, or TRUSTED kept), so a check waits on the
+     page instead of a wall-clock guess; it never changes what is shown */
+  function settled() { var r = document.documentElement; if (r && r.setAttribute) r.setAttribute("data-jar-settled", "settled"); }
   function load() {
-    if (typeof fetch !== "function") return;
+    if (typeof fetch !== "function") return settled();
     fetch("kids-week.json", { cache: "no-store" })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(function (d) { paint(stateOf(d)); })
-      .catch(function () { /* bad or missing feed: the template's TRUSTED stands */ });
+      .catch(function () { /* bad or missing feed: the template's TRUSTED stands */ })
+      .then(settled);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", load, { once: true }); else load();
 })(window);

@@ -1,5 +1,6 @@
 /* PRIVFEED1 · private runtime feed tests (node --test scripts/qa/privfeed.test.mjs). No real data: temp dirs + synthetic fixtures. */
-import { freePortSync } from "./free-port.mjs";
+import { assertSealed } from "./temp-home.mjs";   // TEMPHOME1 (LHVID1): WARDOS_* unset and a temp HOME before any private-list reader loads
+import { spawnListening } from "./free-port.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -38,6 +39,7 @@ async function get(p, headers = {}) {
   return { status: r.status, headers: r.headers, body: Buffer.from(await r.arrayBuffer()) };
 }
 
+assertSealed();
 test("no token → 401, house Origin alone never unlocks", async () => {
   assert.equal((await get("/api/private/cal-live.json")).status, 401);
   assert.equal((await get("/api/private/cal-live.json", { Origin: ORIGIN })).status, 401);
@@ -323,14 +325,12 @@ test("PRIVFEED2 nest proxy (tunnel-reachable) serves only public page code", asy
   fs.writeFileSync(path.join(home, ".config", "wardos", "nest-refresh.token"), "fake-refresh\n");
   fs.writeFileSync(path.join(home, ".config", "wardos", "nest-sdm.json"), '{"projectId":"p","clientId":"c","clientSecret":"s"}');
   fs.writeFileSync(path.join(home, ".config", "wardos", "nest-device.token"), "test-nest-key-0123456789\n", { mode: 0o600 }); /* FOLLOWUP2 · env key is label-only */
-  const port = freePortSync();
-  const { spawn } = await import("node:child_process");
   const env = { ...process.env, HOME: home }; delete env.NEST_PROXY_TOKEN;
-  const child = spawn("node", [path.join(ROOT, "scripts/nest-webrtc-proxy.mjs"), "--host", "127.0.0.1", "--port", String(port)], { env, stdio: "ignore" }); /* CAMLOCK1 · no token, no start */
+  const h = spawnListening("node", [path.join(ROOT, "scripts/nest-webrtc-proxy.mjs"), "--host", "127.0.0.1", "--port", "0"], { env }); /* CAMLOCK1 · no token, no start; LHVID1' · port 0 */
+  const child = h.child;
   try {
-    let up = false;
-    for (let i = 0; i < 40 && !up; i++) { await new Promise((r) => setTimeout(r, 100)); try { up = (await fetch(`http://127.0.0.1:${port}/nest-webrtc.html`)).status === 200; } catch { /* starting */ } }
-    assert.ok(up, "nest proxy test instance did not start");
+    assert.ok(await h.ready, "nest proxy test instance did not start");
+    const port = h.port;
     for (const p of ["/.git/config", "/.git/HEAD", "/data/nest-snaps/.gitkeep", "/scripts/privacy-scan.mjs", "/%2e%2e/%2e%2e/etc/passwd", "/LIGHTS-LIVE.md", "/plates/x.html", "/package.json"]) {
       assert.equal((await fetch(`http://127.0.0.1:${port}${p}`)).status, 404, p);
     }

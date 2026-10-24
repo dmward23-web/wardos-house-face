@@ -4,6 +4,7 @@ Serves the repo on a random loopback port and plays the hub on the same port (?p
 synthetic fixtures in scripts/qa/fixtures/private (Smith/QXS stand-ins). 'nofeed' answers every feed with 404, so the
 page has no month data; 'slow' answers after 5 s; 'trusted' / 'other' set kids.ainsley.jarState to trusted / empty; 'bad' answers kids-week with unreadable JSON. A fake key in a fresh browser profile; non-loopback requests get 204.
 Prints one JSON line."""
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from pw_chrome import launch_kw
 import json, os, sys, threading, functools, time, re
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse
@@ -72,7 +73,7 @@ KC = r"""() => { const STAR = /[\u2605\u2606\u272d\u2b50]/, D = /\d/;
   return { star: o.filter(t => STAR.test(t)).slice(0, 6), digit: o.filter(t => D.test(t)).slice(0, 6), rows: sec.querySelectorAll('.chore').length, starIcons: [...sec.querySelectorAll('use')].filter(u => /star/.test(u.getAttribute('href') || '') && vis(u)).length }; }"""
 out = {"page": page, "mode": mode, "size": f"{w}x{h}"}
 with sync_playwright() as p:
-    b = p.chromium.launch(args=["--disable-gpu"])
+    b = p.chromium.launch(**launch_kw(p, args=["--disable-gpu"]))
     mob = w < 600
     ctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=2 if mob else 1, is_mobile=mob, has_touch=mob, reduced_motion="reduce")
     pg = ctx.new_page(); errors = []
@@ -89,12 +90,17 @@ with sync_playwright() as p:
         out["state"] = pg.evaluate(LD)
     else:
         samples = []; Jx = {"allowance": AL, "kid-ainsley": KA, "chores": KC}[page]
-        url = {"allowance": "/sheet-allowance.html?pfBase=", "chores": "/sheet-chores.html?pfBase=",
+        url = {"allowance": "/sheet-allowance.html?now=" + NOW.replace("+", "%2B") + "&pfBase=", "chores": "/sheet-chores.html?pfBase=",
                "kid-ainsley": "/kid-ainsley.html?now=" + NOW.replace("+", "%2B") + "&pfBase="}[page]
         pg.goto(base + url + base, wait_until="domcontentloaded", timeout=120000)
         samples.append(pg.evaluate(Jx))
-        for t in ([300, 2000, 7000] if mode == "slow" else [300, 2000, 4000]):
+        for t in [300, 2000]:
             pg.wait_for_timeout(t); samples.append(pg.evaluate(Jx))
+        if page in ("allowance", "kid-ainsley"):   # deterministic final sample: wait for the jar's one feed read to finish, not a guess
+            pg.wait_for_function("() => document.documentElement.hasAttribute('data-jar-settled')", timeout=90000)
+        else:
+            pg.wait_for_timeout(7000 if mode == "slow" else 4000)
+        samples.append(pg.evaluate(Jx))
         out["samples"] = samples
     b.close()
 srv.shutdown()

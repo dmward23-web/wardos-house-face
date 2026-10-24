@@ -26,6 +26,7 @@ import { createRequire } from "node:module";
 createRequire(import.meta.url)("../house-face-law.js");   /* sets globalThis.HouseFaceLaw */
 const FACE_LAW = globalThis.HouseFaceLaw;
 import { spawnSync } from "node:child_process";
+import { ctMidnight } from "./ct-midnight.mjs"; /* DATA1 P1-5 · one all-day clock for both feeds */
 import { privPath, assertPrivateOut, namesRe, privateNames, externalEvents, EXT_ROLES } from "./private-dir.mjs"; /* PRIVFEED1 · EXTFILTER1 */
 /* EXTNAMES1 · private-names.tsv role "external" names people outside the household (never in git). A kid's first name
    followed by one of them is not our kid, so it is cut out before the kid tests. ONLY "external" is filtered, plus the
@@ -138,15 +139,7 @@ function partsInTZ(date, tz = TZ) {
 
 /* ALLDAY1 · an all-day event (date-only start) is a whole civil day, never a clock time. It starts at that
    day's CT midnight (so it sorts before the day's timed rows, never as noon) and carries allDay: true. */
-function ctMidnight(civil) {
-  const guess = new Date(civil + "T00:00:00Z");
-  if (Number.isNaN(guess.getTime())) return null;
-  const f = new Intl.DateTimeFormat("en-US", { timeZone: TZ, timeZoneName: "shortOffset" }); // that civil day's offset (CDT -5 / CST -6)
-  const off = (f.formatToParts(new Date(guess.getTime() + 12 * 3600000)).find((x) => x.type === "timeZoneName") || {}).value || "GMT-5";
-  const m = /GMT([+-])(\d{1,2})(?::(\d{2}))?/.exec(off);
-  const mins = m ? (m[1] === "-" ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3] || 0)) : -300;
-  return new Date(guess.getTime() - mins * 60000);
-}
+/* ctMidnight lives in ./ct-midnight.mjs (DATA1 P1-5) */
 
 function isAllDay(ev) {
   const block = ev.start;
@@ -234,13 +227,28 @@ function isBoysRun(it, kidId) {
    leave-by row for that one kid; it also stays on that kid's own glass (and wins his top card). */
 const KID_RIDE = /^(Ainsley|Hayes|Harris)\s*—\s*.*\b(pick\s*-?\s*up|drop\s*-?\s*off)\b/i;
 const KID_NAME = { ainsley: "Ainsley", hayes: "Hayes", harris: "Harris" };
+/* DATA1 helpers */
+const KID_PREFIX_RE = /^(Ainsley|Hayes|Harris)\s*[—-]/i;
+const SCHOOL_NOTICE_RE = { exec(s) {
+  const k = KID_PREFIX_RE.exec(s);
+  if (/\bLKMS\b.*\b(raffle|donation|due)\b/i.test(s)) return [s, k ? k[1] : "Ainsley"];
+  if (k && RX(String.raw`^(Ainsley|Hayes|Harris)\s*[—-]\s*(?:LKMS|§)\b`, "i").test(s)) return [s, k[1]];
+  return null;
+} };
+const RIDE_WORD_RE = /\b(pick\s*-?\s*up|drop\s*-?\s*off)\b/i;
+const DRESS_NOTICE_RE = /\b(pj'?s?|pajamas?|pyjamas?|costumes?|spirit)\b/i;
+function soloKid(summary) {
+  const m = kidMentions(summary);
+  const n = ["ainsley", "hayes", "harris"].filter((k) => m[k]);
+  return n.length === 1 ? { kid: n[0] } : {};
+}
 function isKidRide(it, kidId) {
   return it.kind === "leave" && !!it.kidRide && it.kid === kidId;
 }
 /* Dad glass label: single-kid ride / school run says whose ("3:15 Hayes school pickup"). */
 function danWhat(it) {
   const what = kidsSafeWhat(it.raw, it.kind);
-  const solo = it.kidRide || it.kind === "school_drop" || it.kind === "school_pickup";
+  const solo = it.kidRide || it.kind === "school_drop" || it.kind === "school_pickup" || ((it.kind === "school" || it.kind === "appointment" || it.kind === "other") && it.kid); /* DATA1 P2-7 */
   if (!solo || !it.kid || !KID_NAME[it.kid]) return what;
   if (new RegExp("\\b" + it.kid + "\\b", "i").test(what)) return what;
   return `${KID_NAME[it.kid]} ${what}`;
@@ -268,8 +276,14 @@ function classify(ev) {
   if (RX(String.raw`§ drop-off|§ drop\b`, "i").test(summary)) return { kind: "school_drop", summary, ...soloBoy(summary) };
   if (RX(String.raw`§ pickup`, "i").test(summary)) return { kind: "school_pickup", summary, ...soloBoy(summary) };
   if (/Homework Help/i.test(summary)) return { kind: "school", summary, kid: "ainsley" };
+  /* DATA1 P0-1 · "<kid> — LKMS raffle / donation / … due" and any "<kid> — <school> <notice>" is school info (never a
+     ride: pickup / drop-off titles fall through to KIDRIDE1). P0-2 · school dress-up notices (PJ / pajama / costume /
+     spirit days, Dan 10/23) are school rows too; colour days stay schedule markers (house-face-law.js isColorDay). */
+  { const km = SCHOOL_NOTICE_RE.exec(summary);
+    if (km && !RIDE_WORD_RE.test(summary.replace(/\([^)]*\)/g, ""))) return { kind: "school", summary, kid: km[1] ? km[1].toLowerCase() : undefined }; }
+  if (DRESS_NOTICE_RE.test(summary) && KID_PREFIX_RE.test(summary)) return { kind: "school", summary, kid: KID_PREFIX_RE.exec(summary)[1].toLowerCase(), dressNotice: true };
   if (RX(String.raw`hearing\/vision|Hearing\/Vision|PE \(tennis|§ specials?|§ spirit|§ (Orange|Yellow|Green|Red) Day|Peace Week|field trip|yearbook|picture (retake|makeup)|baby pic|LKMS (choir|fall conferences|Cougar Night|Bingo|baby|Homework Help|Math Counts|Outsiders)|Outsiders Day|\b[A-Z][a-z]+ conference\b|choir Sing|permission form due|Ward Kids \[[AH]+ No School\]|no school \(elem|conference sign-ups|Tailgate|Halloween Bash|Halloween parade|Halloween class parties|Abraca-Boo|Fall Family Fun Night|Chat\s*&\s*Chew|Chat and Chew|Art Club|fall conferences`, "i").test(summary)) { /* SPECIALS1+SCHOOL2: all kids school info on kid boards + hub */
-    return { kind: "school", summary };
+    return { kind: "school", summary, ...soloKid(summary) }; /* DATA1 P2-7 · a one-kid specials row knows whose */
   }
   { const kr = KID_RIDE.exec(summary);
     if (kr && !RX(String.raw`§ (drop|pickup)`, "i").test(summary)) {
@@ -285,12 +299,14 @@ function classify(ev) {
   if (/flag/i.test(summary) && /hayes/i.test(summary)) {
     return { kind: "sport", sport: "flag", summary, kid: "hayes" };
   }
-  if (/^Ainsley\b.*\b(appointment|appt)\b/i.test(summary)) {
-    return { kind: "appointment", summary, kid: "ainsley" };
-  }
+  /* DATA1 P1-4 · dentist / doctor / appointment works for any kid (was Ainsley only) */
+  { const am = /^(Ainsley|Hayes|Harris)\b.*\b(appointment|appt|dentist|doctor|dr\.?|orthodontist|ortho|checkup|check-up|physical|eye exam)\b/i.exec(summary);
+    if (am) return { kind: "appointment", summary, kid: am[1].toLowerCase() }; }
   if (/vanity|Jessy/i.test(summary) && /ainsley/i.test(summary)) {
     return { kind: "appointment", summary, kid: "ainsley", herSpace: true };
   }
+  /* DATA1 P1-4 · "✈️ Dan …" flights are Dad travel leaves (leave-by = event start) */
+  if (/^\s*\u2708\uFE0F?\s*Dan\b/u.test(summary)) return { kind: "leave", summary, busy: !isFree(ev), travel: true };
   if (/DRIVE\s*→\s*Nashville|Dan DRIVE/i.test(summary)) {
     return { kind: "leave", summary, busy: !isFree(ev), travel: true };
   }
@@ -309,9 +325,11 @@ function classify(ev) {
   // Fallback: kid-named timed events land on boards
   const kids = kidMentions(summary);
   if (kids.ainsley || kids.hayes || kids.harris) {
-    return { kind: "other", summary, kids };
+    return { kind: "other", summary, kids, ...soloKid(summary) };
   }
-  return null;
+  /* DATA1 P1-4 · Dad-only and household items (HOA pickup, curbside order, "Kids — pack night") reach Dad's week */
+  if (/^Dan\s*[—-]/i.test(summary)) return { kind: "dad", summary, busy: !isFree(ev) };
+  return { kind: "generic", summary, busy: !isFree(ev) };
 }
 
 function fmtTime(date) {
@@ -375,8 +393,10 @@ function dedupeEvents(list) {
   return out;
 }
 
+export const schoolWord = (s) => FACE_LAW.schoolWord(s);
+export const momFree = (s) => FACE_LAW.momFree(s);
 function stripDollars(s) {
-  return String(s || "").replace(/\$\d+(?:\.\d+)?/g, "").replace(/\s{2,}/g, " ").trim();
+  return String(s || "").replace(/\$\d+(?:\.\d+)?(?:\s*\/\s*(?:hr|hour|h|wk|week|day|mo|month)\b)?/gi, "") /* DATA1 P2-10 · rates go whole */.replace(/\s{2,}/g, " ").trim();
 }
 
 function kidsSafeWhat(summary, kind) {
@@ -390,7 +410,10 @@ function kidsSafeWhat(summary, kind) {
     .replace(/\s+/g, " ")
     .trim();
   s = stripDollars(s);
+  s = momFree(schoolWord(s)); /* DATA1 P2-8 · one school word + whole "for mom" phrase, same law as cal-live */
+  s = s.replace(/^Kids\s*[—-]\s*/i, "").replace(/\s*#[A-Z0-9]{5,8}\b/g, "").trim(); /* DATA1 P1-4 · no booking codes */
   s = s.replace(/\s*\((?:tennis shoes|wear [^)]*)\)/gi, "").trim(); /* LAW8C1 · no clothing hints */
+  s = FACE_LAW.faceText(s); /* DRESSOK1 · a colour day keeps its marker, never the "wear …" prompt */
   // kids-safe: drop parenthesised adult notes / refund chatter from leave titles on kid glass
   if (kind === "leave") {
     s = s.replace(/\(Mom[^)]*\)/gi, "").replace(/WK\d+/gi, "").trim();
@@ -406,7 +429,8 @@ const DRESS_RE = FACE_LAW.DRESS;   /* AWAYONE1 · one dress-up law, shared with 
 function buildBoardItems(events, now) {
   const items = [];
   for (const ev of events) {
-    if (DRESS_RE.test(String(ev.summary || ""))) continue;
+    if (DRESS_RE.test(String(ev.summary || ""))) continue; /* LAW8C1 · colour days stay calendar markers (cal-live), never board rows */
+    if (FACE_LAW.isTherapy(String(ev.summary || ""))) continue; /* LIVEFIX1 · therapy never reaches a board */
     if (ev.status === "cancelled" || ev.status === "canceled") continue;
     /* CANCELGONE1 · title marked canceled = gone from board */
     if (/^\s*[\[(]?\s*(cancel+ed|cxl)\b/i.test(String(ev.summary || ""))) continue;
@@ -472,6 +496,7 @@ function pickStripQueue(items, now, homeWeek) {
   const leadMs = 10 * 60 * 1000;
   const upcoming = items
     .filter((it) => stillRelevant(it, now) && it.kind !== "custody")
+    .filter((it) => it.kind !== "generic") // DATA1 P1-4 · household items live on Dad's week, never Next Up
     .filter((it) => it.kind !== "dad") // Dad chores stay on dan.today/week, not Next Up strip
     .filter((it) => !it.allDay) // ALLDAY1: Next Up is timed rows only; all-day notes live on the day lists as "All day"
     .filter((it) => pinnedSpecials(it, now) || it.start.getTime() + leadMs >= now.getTime()) // future / just-started only (PINSPEC1 keeps today's specials)
@@ -519,11 +544,7 @@ function pickStripQueue(items, now, homeWeek) {
 
 function detailFor(it, homeWeek, upcoming) {
   const bits = [];
-  const through = homeWeek && homeWeek.with === "away"
-    ? (homeWeek.through ? `kids away · back ${homeWeek.through}` : "kids away")
-    : (homeWeek && homeWeek.through
-      ? `kids with Dad at <strong>home</strong> through ${homeWeek.through}`
-      : "kids with Dad at <strong>home</strong>");
+  /* DATA1 P2-11 · no custody wording in the detail line (was "kids with Dad at home through …" / "kids away") */
   // Add a couple of later same-day anchors
   const sameDay = upcoming.filter(
     (x) => partsInTZ(x.start).iso === partsInTZ(it.start).iso && x.id !== it.id && !x.allDay
@@ -533,8 +554,7 @@ function detailFor(it, homeWeek, upcoming) {
     else if (x.kind === "leave") bits.push(`${fmtTime(x.start)} leave`);
     else if (x.kind === "school_pickup") bits.push(`${fmtTime(x.start)} ${x.kid ? KID_NAME[x.kid] : "boys"} pickup`);
   }
-  const extra = bits.length ? bits.join(" · ") + " · " : "";
-  return `${extra}${through}`;
+  return bits.length ? bits.join(" · ") : `${fmtDayLabel(it.start)} · ${whenTime(it)}`;
 }
 
 function custodyFromItems(items, now) {
@@ -549,7 +569,7 @@ function custodyFromItems(items, now) {
       with: "Dad",
       place: "Home",
       through,
-      throughLabel: `with Dad at home · ${startP.weekday} ${startP.month} ${startP.day} ${fmtTime(active.start)} → ${through}`,
+      throughLabel: through, /* DATA1 P2-11 · a date, never a computed custody label */
       endIso: active.endIso,
     };
   }
@@ -563,7 +583,7 @@ function custodyFromItems(items, now) {
       with: "away",
       place: "",
       through,
-      throughLabel: `kids away · back ${through}`,
+      throughLabel: through,
       endIso: nextDad.startIso,
     };
   }
@@ -571,16 +591,16 @@ function custodyFromItems(items, now) {
     return {
       with: "away",
       place: "",
-      through: "next Dad week",
-      throughLabel: "kids away",
+      through: "",
+      throughLabel: "",
       endIso: lastEnded.endIso,
     };
   }
   return {
     with: "Dad",
     place: "Home",
-    through: "—",
-    throughLabel: "with Dad at home",
+    through: "",
+    throughLabel: "",
   };
 }
 
@@ -619,16 +639,8 @@ function buildKidToday(kidId, items, now, homeWeek) {
       tone,
     });
   }
-  const away = homeWeek && homeWeek.with === "away";
-  rows.push({
-    kind: "note",
-    when: "All day",
-    what: away
-      ? "Kids away" /* AWAY1 */
-      : (kidId === "ainsley" ? "Base at home with Dad" : kidId === "hayes" ? "🏡 DROP ZONE HQ with Dad" : "🏡 YOUR BASE with Dad"),
-    hint: away ? `back ${homeWeek.through}` : `through ${homeWeek.through}`,
-    tone: "hot",
-  });
+  /* DATA1 P2-11 · no custody note row on a kid's today (was "YOUR BASE with Dad" / "Kids away") */
+  if (!rows.length) rows.push({ kind: "note", when: "Today", what: "Nothing else on the calendar today", hint: "", tone: "act" });
   return rows.slice(0, 6).map(({ ride, ...r }) => r);
 }
 
@@ -691,6 +703,27 @@ function buildKidAppointments(kidId, items, now) {
   return out;
 }
 
+/* DATA1 P1-4 · every kid gets an "upcoming" list: his own future rows across the week (no Dad-only leaves) */
+function buildKidUpcoming(kidId, items, now) {
+  const out = [];
+  const seen = new Set();
+  for (const it of items) {
+    if (!stillRelevant(it, now)) continue;
+    if (["custody", "dad", "generic"].includes(it.kind)) continue;
+    if (it.kind === "leave" && !isKidRide(it, kidId)) continue;
+    if (kidId === "ainsley" && (it.kind === "school_drop" || it.kind === "school_pickup")) continue;
+    const kids = kidMentions(it.raw);
+    const mine = it.kid === kidId || kids[kidId] || (isBoysRun(it, kidId) && (kidId === "hayes" || kidId === "harris"));
+    if (!mine) continue;
+    const row = { when: `${fmtDayLabel(it.start)} · ${whenTime(it)}`, what: kidsSafeWhat(it.raw, it.kind), tone: it.kind === "sport" || it.kind === "appointment" ? "hot" : "act" };
+    const key = `${row.when}|${row.what}`.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(row);
+  }
+  return out;
+}
+
 function hottestFor(kidId, items, now, homeWeek) {
   const upcoming = items.filter((it) => stillRelevant(it, now));
   const mine = upcoming.filter((it) => {
@@ -710,28 +743,14 @@ function hottestFor(kidId, items, now, homeWeek) {
   const firstIso = first ? partsInTZ(first.start < now ? now : first.start).iso : "";
   const ride = first && mine.find((x) => x.kidRide && x.start >= now && partsInTZ(x.start).iso === firstIso); /* DADSPAN1 · same day as the real next thing */
   const hit = ride || first;
-  const away = homeWeek && homeWeek.with === "away";
+  /* DATA1 P2-11 · no custody fallback or "where" text (was KIDS AWAY / YOUR BASE WITH DAD / DAD WEEK) */
   if (!hit) {
-    return away
-      ? {
-          when: `${partsInTZ(now).weekday.toUpperCase()} · kids away`,
-          what: "KIDS AWAY",
-          where: `until ${homeWeek.through}`,
-          badges: ["KIDS AWAY"],
-        }
-      : {
-          when: `${partsInTZ(now).weekday.toUpperCase()} · base at home`,
-          what: "YOUR BASE WITH DAD",
-          where: `through ${homeWeek.through}`,
-          badges: ["DAD WEEK", "Home"],
-        };
+    return { when: partsInTZ(now).weekday.toUpperCase(), what: "NOTHING NEXT ON THE CALENDAR", where: "", badges: [partsInTZ(now).weekday.toUpperCase()] };
   }
   return {
     when: `${fmtDowShort(hit.start).toUpperCase()} · ${whenTime(hit)}`,
     what: kidsSafeWhat(hit.raw, hit.kind).toUpperCase().slice(0, 48),
-    where: away
-      ? `kids away · back ${homeWeek.through}`
-      : `with Dad at home · through ${homeWeek.through}`,
+    where: fmtDayLabel(hit.start),
     badges: [fmtDowShort(hit.start).toUpperCase(), whenTime(hit)],
   };
 }
@@ -746,7 +765,7 @@ function buildDanToday(items, now, homeWeek) {
     if (it.kind === "custody") continue;
     if (isAdminNoise(it.raw)) continue;
     // Dad box: leaves, school logistics, sports, appointments, notable dad
-    if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school", "dad"].includes(it.kind)) continue;
+    if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school", "dad", "generic", "other"].includes(it.kind)) continue; /* DATA1 P1-4 */
     const when = `${partsInTZ(now).weekday.slice(0, 3)} · ${whenTime(it)}`;
     const what = danWhat(it);
     const key = `${when}|${what}`.toLowerCase();
@@ -758,13 +777,8 @@ function buildDanToday(items, now, homeWeek) {
       tone: it.kind === "leave" || it.kind === "sport" || it.kind === "appointment" || it.kind === "dad" ? "hot" : "act",
     });
   }
-  rows.push({
-    when: "home week",
-    what: homeWeek.with === "away"
-      ? `Kids away · back ${homeWeek.through}`
-      : `Kids with Dad at home through ${homeWeek.through}`,
-    tone: "hot",
-  });
+  /* DATA1 P2-11 · no custody closing row (was "Kids with Dad at home through …") */
+  if (!rows.length) rows.push({ when: partsInTZ(now).weekday.slice(0, 3), what: "Nothing else on the calendar today", tone: "act" });
   return rows.slice(0, 10);
 }
 
@@ -774,7 +788,7 @@ function buildDanWeek(items, now, homeWeek) {
   for (const it of items) {
     if (!stillRelevant(it, now)) continue;
     if (isAdminNoise(it.raw)) continue;
-    if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school"].includes(it.kind)) continue;
+    if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school", "dad", "generic", "other"].includes(it.kind)) continue; /* DATA1 P1-4 · Dad + household items too */
     const when = `${fmtDayLabel(it.start)} · ${whenTime(it)}`;
     const what = danWhat(it);
     const key = `${when}|${what}`.toLowerCase();
@@ -783,15 +797,12 @@ function buildDanWeek(items, now, homeWeek) {
     rows.push({
       when,
       what,
-      tone: it.kind === "leave" || it.kind === "sport" ? "hot" : it.kind === "appointment" ? "act" : "act",
+      tone: it.kind === "leave" || it.kind === "sport" || it.kind === "dad" ? "hot" : "act",
     });
   }
-  rows.push({
-    when: homeWeek.with === "away" ? `back ${homeWeek.through}` : `through ${homeWeek.through}`,
-    what: homeWeek.with === "away" ? "Kids away" : "Kids with Dad at home",
-    tone: "hot",
-  });
-  return rows.slice(0, 24);
+  /* DATA1 P1-3 · no row cap (slice(0,24) cut Fri 10/30 off) and always one neutral closing row */
+  rows.push({ when: "Later", what: "More on the month calendar", tone: "act", closing: true });
+  return rows;
 }
 
 function rebuildEmbed(kidsDataPath, weekObj) {
@@ -846,7 +857,8 @@ function main() {
     const m = kidMentions(it.raw || it.summary || "");
     return !!(m.hayes || m.harris || m.ainsley);
   };
-  const inDadSpan = (it) => spans.some((c) => it.start >= c.start && it.start < c.end);
+  /* DATA1 P0-1 · an all-day item that OVERLAPS Dad's span stays (start-only check dropped the 10/23 raffle note) */
+  const inDadSpan = (it) => spans.some((c) => (it.allDay ? (it.start < c.end && it.end > c.start) : (it.start >= c.start && it.start < c.end)));
   const nowInSpan = spans.some((c) => now >= c.start && now < c.end);
   /* an all-day kid note that started in Dad's span doesn't carry into the kids-away days */
   const items = allItems.filter((it) => !isKidLogistics(it) || (inDadSpan(it) && (nowInSpan || it.start >= now)));
@@ -856,9 +868,7 @@ function main() {
     label: "Next up · today",
     time: "",
     place: "House day at home",
-    detailHtml: homeWeek.with === "away"
-      ? `kids away · back ${homeWeek.through}`
-      : `kids with Dad at <strong>home</strong> through ${homeWeek.through}`,
+    detailHtml: "", /* DATA1 P2-11 · no custody fallback text */
     badge: nowP.weekday,
     startIso: now.toISOString(),
     endIso: new Date(now.getTime() + 3600000).toISOString(),
@@ -908,7 +918,22 @@ function main() {
       sports: buildKidSports(kidId, items, now),
       school: buildKidSchool(kidId, items, now),
       appointments: buildKidAppointments(kidId, items, now),
+      upcoming: buildKidUpcoming(kidId, items, now),
     };
+    /* DATA1 P2-10 · Ainsley sees no stars, star counts, dollar amounts, rates or streaks; the builder strips them */
+    if (kidId === "ainsley") {
+      for (const k of ["streakLabel", "currency", "bankGoal"]) delete next.kids[kidId][k];
+      if (next.kids[kidId].goal && typeof next.kids[kidId].goal === "object") for (const g of Object.keys(next.kids[kidId].goal)) if (typeof next.kids[kidId].goal[g] === "string") next.kids[kidId].goal[g] = FACE_LAW.ainsleyText(next.kids[kidId].goal[g]).replace(/\bstreaks?\b|\bstars?\b/gi, "").trim();
+      const MONEYISH = /[\u2605\u2606\u2b50]|\$\s*\d|\/\s*hr\b|\bstreaks?\b|\bstars?\b/i;
+      const scrub = (v) => {
+        if (Array.isArray(v)) return v.map(scrub);
+        if (!v || typeof v !== "object") return typeof v === "string" && MONEYISH.test(v) ? FACE_LAW.ainsleyText(v).replace(/\bstreaks?\b|\bstars?\b/gi, "").replace(/\s{2,}/g, " ").trim() : v;
+        for (const k of Object.keys(v)) { if (/rate|stars?|streak|dollar|price|amount|reward|earn|pay/i.test(k)) delete v[k]; else v[k] = scrub(v[k]); }
+        return v;
+      };
+      for (const k of ["quests", "missions", "fun", "rides", "goal"]) if (next.kids[kidId][k] !== undefined) next.kids[kidId][k] = scrub(next.kids[kidId][k]);
+      FACE_LAW.cleanAinsley(next.kids[kidId]);
+    }
     // Ensure empty-state strings remain
     if (!next.kids[kidId].appointmentsEmpty && Array.isArray(next.kids[kidId].appointments) && next.kids[kidId].appointments.length === 0) {
       next.kids[kidId].appointmentsEmpty = prevKid.appointmentsEmpty || "No appointments on your board.";
@@ -925,27 +950,16 @@ function main() {
     const k = next.kids[kidId];
     if (!k) continue;
     if (k.bag) {
-      k.bag.hint = homeWeek.with === "away"
-        ? "Kids away"
-        : `Home through ${homeWeek.through} · pack for Dad week`;
+      k.bag.hint = "Pack the night before"; /* DATA1 P2-11 · no custody wording in the bag hint */
     }
     if (k.goal && typeof k.goal.placeholder === "string") k.goal.placeholder = k.goal.placeholder.replace(/\s*·?\s*\$\d+(\.\d+)?/g, "").trim();
   }
   next.kids.dan = {
     ...danKept,
-    hottest: homeWeek.with === "away"
-      ? {
-          when: `${nowP.asOf} · kids away`,
-          what: "Kids away",
-          where: `until ${homeWeek.through}`,
-          badges: ["Kids away"],
-        }
-      : {
-          when: `${nowP.asOf} · kids with you at home`,
-          what: "Dad week live",
-          where: `through ${homeWeek.through}`,
-          badges: ["Dad week", "Home"],
-        },
+    /* DATA1 P2-11 · Dad's hottest is his real next thing, never "Dad week live" / "Kids away" */
+    hottest: queue[0]
+      ? { when: queue[0].whenLabel, what: queue[0].place, where: "", badges: [queue[0].badge, queue[0].time].filter(Boolean) }
+      : { when: nowP.asOf, what: "Nothing next on the calendar", where: "", badges: [] },
     today: buildDanToday(items, now, homeWeek),
     week: buildDanWeek(items, now, homeWeek),
   };
@@ -976,4 +990,6 @@ function main() {
   }
 }
 
-main();
+/* DATA1 · importable for tests; runs only as a script */
+export { classify, buildBoardItems, buildDanWeek, buildDanToday, buildKidUpcoming, buildKidToday, hottestFor, detailFor, custodyFromItems, kidsSafeWhat, danWhat, pickStripQueue };
+if (process.argv[1] && fs.existsSync(process.argv[1]) && fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url))) main();

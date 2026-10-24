@@ -4,6 +4,7 @@
    2. Known titles come out plain (no codes, flight numbers, em dashes, arrows, other-house names, partner name), and the law is idempotent.
    3. cal-months.py writes clean labels into cal-months.json from a fixture pull and leaves withDan exactly as the pull says.
    Fixture only; no real data written. */
+import { assertSealed } from "./temp-home.mjs";   // TEMPHOME1 (LHVID1): WARDOS_* unset and a temp HOME before any private-list reader loads
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -61,6 +62,7 @@ const CASES = [
   ["", ""],
 ];
 
+assertSealed();
 test("both writers read the same law and agree word for word", () => {
   const inputs = CASES.map((c) => c[0]);
   assert.deepEqual(py(inputs), inputs.map(cleanText));

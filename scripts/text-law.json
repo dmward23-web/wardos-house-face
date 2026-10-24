@@ -53,6 +53,13 @@
    "why": "airport legs"
   },
   {
+   "re": "\\s*\\b(?:for|with) (?:their )?(?:mom|{COPARENT})(?:['’]?s)?\\b",
+   "flags": "i",
+   "global": true,
+   "to": "",
+   "why": "DATA1 P2-8 · 'for mom' goes as a whole phrase, never a dangling 'for ('"
+  },
+  {
    "re": "\\s*\\b(at|to|from) (their )?(mom|{COPARENT})['’]?s\\b",
    "flags": "i",
    "global": true,

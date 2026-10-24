@@ -23,11 +23,11 @@ Note: the great horned owl recordings on Commons are CC BY-SA, so I used a CC0 t
 ## v5.1 additions: fire, ember, weather and day
 | Use | Source | License | URL |
 |---|---|---|---|
-| ember crackle loop (crackleL), gain = ember heat | "crackle.ogg" (listed above), looped and EQ'd | as above | — |
-| swish on fast ember moves | "whoosh.wav" (listed above), trimmed | as above | — |
-| fire roar loop, gain = fire mass | crackle.ogg layered with a **synthesized** low rumble (filtered noise) | CC0 + own synth | — |
-| rain loop (drizzle → heavy, gain = intensity) | "Summer Rain on Terrace" #1019, Joseph Sardin, BigSoundBank | CC0 | https://bigsoundbank.com/summer-rain-on-terrace-s1019.html |
-| hail loop | #1019 rain + **synthesized** ice ticks (decaying 2.5–6 kHz partials and noise) | CC0 + own synth | — |
+| ember crackle loop (crackleL), gain = ember heat | "crackle.ogg" (listed above), looped and EQ'd | as above | n/a |
+| swish on fast ember moves | "whoosh.wav" (listed above), trimmed | as above | n/a |
+| fire roar loop, gain = fire mass | crackle.ogg layered with a **synthesized** low rumble (filtered noise) | CC0 + own synth | n/a |
+| rain loop (drizzle to heavy, gain = intensity) | "Summer Rain on Terrace" #1019, Joseph Sardin, BigSoundBank | CC0 | https://bigsoundbank.com/summer-rain-on-terrace-s1019.html |
+| hail loop | #1019 rain + **synthesized** ice ticks (decaying 2.5 to 6 kHz partials and noise) | CC0 + own synth | n/a |
 | thunder (delayed, low-passed, 0.6 s fade-in, ≤ .45 gain) | "Thunder #1" #2718, Joseph Sardin, BigSoundBank | CC0 | https://bigsoundbank.com/thunder-s2718.html |
 | day bed (birds and wind, darkened EQ and echo) | "Campaign Morning" #912, Joseph Sardin, BigSoundBank | CC0 | https://bigsoundbank.com/campaign-morning-s0912.html |
 | day crows (owl replacement in daylight) | "Crows #2" #956, Joseph Sardin, BigSoundBank | CC0 | https://bigsoundbank.com/search?q=crows |

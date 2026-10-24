@@ -1,9 +1,8 @@
-/* House Face · HUBOVAL1 oval weather pill · house area (PRIVFEED1 · city-level coords, ~1 km) · client-side, no key.
-   Primary: Open-Meteo. Fallback: wttr.in. Kids-safe · no $. */
+/* House Face · HUBOVAL1 oval weather pill · kids-safe · no $.
+   LIVEWX2 · the hub's /wx is the only forecast source (it holds the coarse cell server-side; this file carries no location).
+   The NWS airport station (RAINNOW1) still confirms "raining now". Feed down: the last reading, marked stale with its age. */
 (function (global) {
   "use strict";
-  var LAT = 38.9;   /* coarse 0.1 deg cell only, never the address */
-  var LON = -94.7;
   var PLACE = ""; /* P1FIX · no city name on glass or in aria text */
   var CACHE_KEY = "house-wx:v4";
   var CACHE_MS = 10 * 60 * 1000;
@@ -60,55 +59,39 @@
     return { text: "Rain " + when + " · " + Math.round(maxP) + "%", wet: true };
   }
 
-  function fromOpenMeteo() {
-    var url = "https://api.open-meteo.com/v1/forecast"
-      + "?latitude=" + LAT + "&longitude=" + LON
-      + "&current=temperature_2m,weather_code,is_day"
-      + "&daily=temperature_2m_max,temperature_2m_min"
-      + "&hourly=precipitation_probability,precipitation"
-      + "&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FChicago&forecast_days=2";
-    return fetch(url, { cache: "no-store" }).then(function (r) {
-      if (!r.ok) throw new Error("om " + r.status);
-      return r.json();
-    }).then(function (j) {
-      var code = (j.current && j.current.weather_code) || 0;
+  var cToF = function (c) { return c * 9 / 5 + 32; };
+  function skyCell(j) {
+    var c = j && j.sky; if (c && isFinite(c.lat) && isFinite(c.lon)) { try { localStorage.setItem("wxsky", JSON.stringify({ lat: c.lat, lon: c.lon })); } catch (e) { /* */ } return c; }
+    try { var s = JSON.parse(localStorage.getItem("wxsky") || "null"); if (s && isFinite(s.lat) && isFinite(s.lon)) return s; } catch (e) { /* */ }
+    return null;
+  }
+  function fromWx() {
+    var L = global.LiveWxCore;   /* livewx-core.js: same-origin /wx, then the pinned hub */
+    var get = L && L.fetchWx ? L.fetchWx(global, 8000) : fetch("/wx", { cache: "no-store" }).then(function (r) { if (!r.ok) throw new Error("wx " + r.status); return r.json(); });
+    return get.then(function (j) {
+      var raw = j && j.raw, cur = raw && raw.current;
+      if (!cur || typeof cur.temperature_2m !== "number") throw new Error("wx no reading");
+      skyCell(j);
+      var code = cur.weather_code || 0;
       var pair = WMO[code] || ["Outside", "🌤"];
       /* AUDIT1 · no sun icon after dark */
-      var night = j.current && j.current.is_day === 0;
+      var night = cur.is_day === 0;
       var icon = night && (pair[1] === "☀" || pair[1] === "⛅") ? (pair[1] === "☀" ? "🌙" : "☁") : pair[1];
+      var d = raw.daily || {}, h = raw.hourly || null;
+      var hourly = h ? { time: h.time, precipitation_probability: h.precipitation_probability, precipitation: (h.precipitation || []).map(function (mm) { return mm == null ? mm : mm / 25.4; }) } : null;
       return {
-        temp: Math.round(j.current.temperature_2m),
+        temp: Math.round(cToF(cur.temperature_2m)),
         condition: pair[0],
         icon: icon,
-        high: Math.round(j.daily.temperature_2m_max[0]),
-        low: Math.round(j.daily.temperature_2m_min[0]),
-        rain: rainOutlook(j.hourly, j.current && j.current.time),
+        high: d.temperature_2m_max ? Math.round(cToF(d.temperature_2m_max[0])) : null,
+        low: d.temperature_2m_min ? Math.round(cToF(d.temperature_2m_min[0])) : null,
+        rain: rainOutlook(hourly, cur.time),
+        gust: j.livewx && j.livewx.gustMph,
+        isDay: cur.is_day,
         place: PLACE,
         code: code,
-        source: "open-meteo"
-      };
-    });
-  }
-
-  function fromWttr() {
-    return fetch("https://wttr.in/" + LAT + "," + LON + "?format=j1", { cache: "no-store" }).then(function (r) {
-      if (!r.ok) throw new Error("wttr " + r.status);
-      return r.json();
-    }).then(function (j) {
-      var c = j.current_condition[0];
-      var d = j.weather[0];
-      return {
-        temp: Number(c.temp_F),
-        condition: (c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value) || "Outside",
-        icon: /snow/i.test(c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value) ? "❄"
-          : /thunder|storm/i.test(c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value) ? "⛈"
-          : /rain|drizzle|shower/i.test(c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value) ? "🌧"
-          : /cloud|overcast/i.test(c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value) ? "☁"
-          : "☀",
-        high: Number(d.maxtempF),
-        low: Number(d.mintempF),
-        place: PLACE,
-        source: "wttr"
+        stale: !!j.stale, at: j.ts,
+        source: "hub-wx"
       };
     });
   }
@@ -175,8 +158,9 @@
     var L = (280.460 + 0.9856474 * n) % 360, g = ((357.528 + 0.9856003 * n) % 360) * rad;
     var lam = (L + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) * rad, eps = (23.439 - 0.0000004 * n) * rad;
     var ra = Math.atan2(Math.cos(eps) * Math.sin(lam), Math.cos(lam)), dec = Math.asin(Math.sin(eps) * Math.sin(lam));
-    var gmst = (18.697374558 + 24.06570982441908 * n) % 24, lst = (gmst * 15 + Number(LON)) * rad;
-    var ha = lst - ra, lat = Number(LAT) * rad;
+    var cell = skyCell(null); if (!cell) return null;   /* no sky cell yet: the reading's own is_day decides */
+    var gmst = (18.697374558 + 24.06570982441908 * n) % 24, lst = (gmst * 15 + Number(cell.lon)) * rad;
+    var ha = lst - ra, lat = Number(cell.lat) * rad;
     var el = Math.asin(Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(ha)) / rad;
     return el < -0.833;
   }
@@ -184,7 +168,7 @@
      Night = sunDown() (solar elevation under -0.833 deg at the house); sun and sun-cloud icons read as moon and cloud. */
   function nightIcon(d) {
     if (!d || !d.icon) return d;
-    if (!sunDown(new Date())) return d;
+    var dn = sunDown(new Date()); if (dn === null ? d.isDay !== 0 : !dn) return d;
     var map = { "\u2600": "\ud83c\udf19", "\u2600\ufe0f": "\ud83c\udf19", "\u26c5": "\u2601", "\ud83c\udf24": "\u2601", "\ud83c\udf24\ufe0f": "\u2601", "\ud83c\udf25": "\u2601" };
     if (!map[d.icon]) return d;
     var o = {}; for (var k in d) o[k] = d[k];
@@ -195,23 +179,25 @@
     var cb = function (err, d) { cb0(err, nightIcon(d)); };
     var cached = readCache();
     if (cached) { cb(null, cached); return; }
-    Promise.all([within(4000, fromOpenMeteo()), fromObs()]).then(function (res) {
+    Promise.all([within(9000, fromWx()), fromObs()]).then(function (res) {
       var d = mergeObs(res[0], res[1], res[0].code);
+      if (d.stale) { cb(null, d); return; }   /* the hub's last-known reading: shown with its age, never cached as fresh */
       writeCache(d); cb(null, d);
-    }).catch(function () {
-      return within(4000, fromWttr()).then(function (d) {
-        writeCache(d); cb(null, d);
-      });
     }).catch(function (err) {
-      cb(err || new Error("wx fail"), null);
+      /* LIVEWX1 · feed down: the last known reading (any age, marked stale), never a default; nothing only when no reading ever */
+      var last = null; try { var o = JSON.parse(localStorage.getItem(CACHE_KEY) || "null"); if (o && o.data) { last = {}; for (var k in o.data) last[k] = o.data[k]; last.stale = true; last.at = o.at; } } catch (e) {}
+      if (last) cb(null, last); else cb(err || new Error("wx fail"), null);
     });
   }
 
+  function ageText(ms) { var m = Math.max(0, Math.round(ms / 6e4)); return m < 60 ? m + " min ago" : m < 2880 ? Math.round(m / 60) + " h ago" : Math.round(m / 1440) + " d ago"; }
   function paint(el, data) {
     if (!el || !data) return;
+    el.setAttribute("data-wx-state", data.stale ? "stale" : "live");
     var hi = (data.high != null && data.low != null)
       ? ("H " + data.high + "° · L " + data.low + "°")
       : "LIVE";
+    if (data.stale && data.at) hi += " · " + ageText(Date.now() - data.at);   /* LIVEWX2 · a stale reading shows its age */
     var ico = data.icon || "🌤";
     el.classList.add("wx-card", "wx-live", "is-live");
     el.hidden = false; el.style.removeProperty("display");

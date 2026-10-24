@@ -27,7 +27,7 @@ const puppeteer = loadPuppeteer();
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const PAGES = ["sheet-index.html", "month.html", "sheet-lights.html"];
-const PORT = Number(process.env.ORI_QA_PORT || 8773);
+let PORT = Number(process.env.ORI_QA_PORT || 0);   /* QAFIX1 · 0 = a kernel-picked free port (a fixed 8773 collided with any other GATE3 run on the box) */
 
 function chromePath() {
   const candidates = [
@@ -43,6 +43,15 @@ function chromePath() {
   throw new Error("Chrome not found. Set CHROME_PATH.");
 }
 
+/* LIVEWX2B G3WX · the boards are /wx-only, so the gate's static server answers /wx with a SYNTHETIC reading (no location: no
+   sky cell, no lat/lon), built through the canonical livewx-core toLiveWx so the reply carries the full LiveWx shape incl. code */
+const WXCORE = createRequire(path.join(ROOT, "livewx-core.js"))(path.join(ROOT, "livewx-core.js"));
+function wxStub() {
+  const ts = Date.now(), raw = { current: { time: new Date(ts).toISOString().slice(0, 16), interval: 900, temperature_2m: 11.5, dew_point_2m: 6, precipitation: 0, rain: 0, showers: 0,
+    snowfall: 0, weather_code: 3, cloud_cover: 72, wind_speed_10m: 14, wind_gusts_10m: 26, wind_direction_10m: 225, visibility: 24000, is_day: 0 },
+    minutely_15: {}, hourly: {}, daily: { temperature_2m_max: [15], temperature_2m_min: [7] } };
+  return { livewx: WXCORE.toLiveWx(WXCORE.parse(raw), ts, false, ts), raw, ts, stale: false, ageMin: 0 };
+}
 function startServer() {
   const types = {
     ".html": "text/html",
@@ -58,6 +67,7 @@ function startServer() {
   };
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://127.0.0.1");
+    if (url.pathname === "/wx") { res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" }); res.end(JSON.stringify(wxStub())); return; }
     let rel = decodeURIComponent(url.pathname);
     if (rel.endsWith("/")) rel += "index.html";
     const file = path.join(ROOT, path.normalize(rel).replace(/^(\.\.(\/|\\|$))+/, ""));
@@ -76,7 +86,7 @@ function startServer() {
       res.end(buf);
     });
   });
-  return new Promise((resolve) => server.listen(PORT, "127.0.0.1", () => resolve(server)));
+  return new Promise((resolve, reject) => { server.once("error", reject); server.listen(PORT, "127.0.0.1", () => { PORT = server.address().port; resolve(server); }); });
 }
 
 const SCAN = `(() => {
@@ -601,7 +611,7 @@ async function prepare(page, file) {
       const wx = document.querySelector("#house-wx");
       const plate = wx ? (wx.innerText || "") : "";
       return t && (t.textContent || "").trim().length > 1 && /\d+°/.test(plate);
-    }, { timeout: 20000 }).catch(() => {});
+    }, { timeout: 20000, polling: 250 }).catch(() => {});
     await page.evaluate(() => {
       const b = document.querySelector(".ori-pool-hit");
       const p = document.querySelector(".ori-peek");
@@ -613,10 +623,14 @@ async function prepare(page, file) {
     await page.waitForFunction(() => {
       const b = document.querySelector("[data-month-banner]");
       return b && (b.textContent || "").indexOf("Loading") < 0;
-    }, { timeout: 20000 });
+    }, { timeout: 20000, polling: 250 });
   }
   if (file.startsWith("sheet-lights")) {
-    await page.waitForFunction(() => document.querySelector(".light-pad"), { timeout: 20000 });
+    /* LIVEWX2B G3PAD · a readiness wait, not a check (the overlap/clip/ellipsis scan is unchanged): since LHVID1 the
+       poster starts the embedded night scene when the loop video is missing, and under software WebGL its
+       frames starve the lights board's first paint for 5-15 s on a loaded box (about 30 ms when the scene iframe is blocked).
+       BGONCE1 (plate uploaded only on change) took desktop to about 0.2 s; phone stays about 3-5 s (shader cost), so 30 s, not 60 */
+    await page.waitForFunction(() => document.querySelector(".light-pad"), { timeout: 30000, polling: 250 });
   }
   await new Promise((r) => setTimeout(r, 400));
 }
@@ -633,7 +647,13 @@ async function main() {
        --enable-unsafe-swiftshader is acceptable ONLY because this gate loads loopback pages (this repo served on
        127.0.0.1 by startServer); software WebGL is not a sandbox boundary, so never reuse these args for a browser that
        opens third-party or internet pages. */
-    args: ["--no-sandbox", "--disable-dev-shm-usage", "--hide-scrollbars", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"]
+    /* QAFIX1 · on a loaded box a hidden headless tab is treated as backgrounded: Chrome stops its animation frames, so
+       every rAF-polled waitForFunction stalled (month banner, light pads) and CDP calls such as newPage ran past
+       puppeteer's 180 s default protocol timeout. Keep renderers foregrounded and give CDP a budget sized to the gate.
+       (QAFIX1's --disable-gpu is gone: it forced the in-process software path G3GL1 replaces with SwiftShader.) */
+    args: ["--no-sandbox", "--disable-dev-shm-usage", "--hide-scrollbars", "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
+      "--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows"],
+    protocolTimeout: Number(process.env.GATE3_PROTOCOL_MS || 600000)
   });
   const failures = [];
   const views = [
@@ -721,7 +741,34 @@ async function main() {
         }
       }
       if (view.phone) {
-        async function veilAt(where) {
+        /* P3 (Alfred, main live scan) · the leave checks poll up to ~2s for the veil instead of one read after a fixed sleep.
+           Same bar (opacity >= 0.35, full size, displayed); a navigation mid-poll ends the poll and the last read is judged. */
+        function veilOk(mid) {
+          return !!(mid && mid.display !== "none" && mid.op >= 0.35 && mid.w >= view.width - 4 && mid.h >= view.height - 4);
+        }
+        async function veilAt(where, budget) {
+          if (budget) {
+            const t0 = Date.now();
+            let mid = null;
+            for (;;) {
+              try {
+                mid = await veilRead();
+              } catch (err) {
+                break;
+              }
+              if (veilOk(mid) || Date.now() - t0 >= budget) break;
+              await new Promise((r) => setTimeout(r, 100));
+            }
+            if (!veilOk(mid)) failures.push("phone veil missing " + where + " " + JSON.stringify(mid) + " after " + (Date.now() - t0) + "ms");
+            else console.log("  veil", where, mid.op.toFixed(2), "in", Date.now() - t0 + "ms");
+            return;
+          }
+          return veilRead().then((mid) => {
+            if (!veilOk(mid)) failures.push("phone veil missing " + where + " " + JSON.stringify(mid));
+            else console.log("  veil", where, mid.op.toFixed(2));
+          });
+        }
+        function veilRead() {
           return page.evaluate(() => {
             const root = document.documentElement;
             const held = root.classList.contains("ori-arriving") || root.classList.contains("ori-held");
@@ -735,10 +782,6 @@ async function main() {
             if (best && best.op >= 0.35) return best;
             if (held) return { op: 1, w: innerWidth, h: innerHeight, display: "pseudo", name: "held" };
             return best;
-          }).then((mid) => {
-            const ok = mid && mid.display !== "none" && mid.op >= 0.35 && mid.w >= view.width - 4 && mid.h >= view.height - 4;
-            if (!ok) failures.push("phone veil missing " + where + " " + JSON.stringify(mid));
-            else console.log("  veil", where, mid.op.toFixed(2));
           });
         }
         console.log("check phone veil");
@@ -748,12 +791,11 @@ async function main() {
           const a = document.querySelector("a.tile.month");
           if (a) a.click();
         });
-        await new Promise((r) => setTimeout(r, 280));
-        await veilAt("home-to-month");
-        await page.waitForFunction(() => /month\.html/.test(location.pathname) && document.documentElement.getAttribute("data-ori-veil") === "1", { timeout: 8000 }).catch((err) => console.log("  arrive-month wait", err.message));
+        await veilAt("home-to-month", 2000);
+        await page.waitForFunction(() => /month\.html/.test(location.pathname) && document.documentElement.getAttribute("data-ori-veil") === "1", { timeout: 8000, polling: 250 }).catch((err) => console.log("  arrive-month wait", err.message));
         await veilAt("arrive-month");
         await page.evaluate(() => history.back());
-        await page.waitForFunction(() => /sheet-index\.html/.test(location.pathname), { timeout: 8000 }).catch((err) => {
+        await page.waitForFunction(() => /sheet-index\.html/.test(location.pathname), { timeout: 8000, polling: 250 }).catch((err) => {
           failures.push("phone back did not return home " + err.message);
         });
         await new Promise((r) => setTimeout(r, 160));
@@ -764,9 +806,8 @@ async function main() {
           const a = document.querySelector("a.hub-lights-more");
           if (a) a.click();
         });
-        await new Promise((r) => setTimeout(r, 280));
-        await veilAt("home-to-lights");
-        await page.waitForFunction(() => /sheet-lights\.html/.test(location.pathname) && document.documentElement.getAttribute("data-ori-veil") === "1", { timeout: 8000 }).catch((err) => console.log("  arrive-lights wait", err.message));
+        await veilAt("home-to-lights", 2000);
+        await page.waitForFunction(() => /sheet-lights\.html/.test(location.pathname) && document.documentElement.getAttribute("data-ori-veil") === "1", { timeout: 8000, polling: 250 }).catch((err) => console.log("  arrive-lights wait", err.message));
         await veilAt("arrive-lights");
       }
       await page.close();
@@ -806,7 +847,7 @@ async function main() {
         let timedOut = false;
         const dog = setTimeout(() => { timedOut = true; page.close().catch(() => {}); }, Number(process.env.GATE3_PAGE_MS || 900000));
         try {
-        await page.goto("http://127.0.0.1:" + PORT + "/" + file, { waitUntil: "load", timeout: 90000 });
+        await page.goto("http://127.0.0.1:" + PORT + "/" + file, { waitUntil: "domcontentloaded", timeout: 90000 }); await new Promise((r) => setTimeout(r, 3000)); /* HALLOWEEN1 G3LOAD: wall sheet-status/today never fire load */
         await new Promise((r) => setTimeout(r, 3000));
         const probe = () => page.evaluate(() => {
           /* FOLLOWUP6 · paint-order probe. With every element taking hits for a moment, elementsFromPoint gives the
@@ -924,8 +965,13 @@ async function main() {
           if (gap !== null) console.log("  kid chip to badge gap at bottom", size.name, file, gap + "px");
           await page.evaluate(() => scrollTo(0, 0));
         }
-        if (!res.chipSeen && KID_PAGES.includes(file)) failures.push("kid chip missing unpaired " + size.name + " " + file);
-        else if (res.hits.length) for (const h of res.hits) { noticeCovers++; failures.push("kid chip covers " + size.name + " " + file + " :: " + h); }
+        /* WGQUIET1 (Atlas P1, d8701b02) · no offline / pairing pill on any board: an unpaired kid page is silent and says so
+           on <html data-feed-status="unpaired">. A visible pill is a failure (its cover probes still run); a page
+           that does not report unpaired is a failure too. */
+        const fst = await page.evaluate(() => document.documentElement.getAttribute("data-feed-status"));
+        if (KID_PAGES.includes(file) && fst !== "unpaired") failures.push("kid page not reporting unpaired " + size.name + " " + file + " (" + fst + ")");
+        if (res.chipSeen) failures.push("WGQUIET1 pill visible " + size.name + " " + file);
+        if (res.hits.length) for (const h of res.hits) { noticeCovers++; failures.push("kid chip covers " + size.name + " " + file + " :: " + h); }
         else if (!res.chipSeen) console.log("  no notice", size.name, file);
         else console.log("  clean kid chip", size.name, file, res.onScreen ? "" : "(notice below a board that does not scroll: not on screen)");
         /* open My Week: the chip must not sit over the open drawer, nor over any text with the drawer open */
@@ -955,7 +1001,7 @@ async function main() {
           await page.setRequestInterception(true);
           page.on("request", block);
           try {
-            await page.goto("http://127.0.0.1:" + PORT + "/" + file, { waitUntil: "load", timeout: 90000 });
+            await page.goto("http://127.0.0.1:" + PORT + "/" + file, { waitUntil: "domcontentloaded", timeout: 90000 }); await new Promise((r) => setTimeout(r, 3000)); /* HALLOWEEN1 G3LOAD: wall sheet-status/today never fire load */
             await new Promise((r) => setTimeout(r, 3000));
             const kwOn = await page.evaluate(() => document.body.classList.contains("kw-on"));
             const rw = await sweep("world off");

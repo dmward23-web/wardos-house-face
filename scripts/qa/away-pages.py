@@ -7,6 +7,7 @@ every other renderer reads the clock). Visible text only. A FAIL is any visible 
 (data/cal-months.json withDan, 3:00 PM switch; the row's day from its text, its dated cell, a day word above it, else
 today; the page's own clock reading excepted). Kid times on Dad days (Month, next week) are allowed. Also reported: NOCUSTODY phrases on shared pages (all but sheet-dan), colour/dress-up rows, em dashes.
 Exit 1 when any page FAILs."""
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from pw_chrome import launch_kw
 import sys, os, json, re, socket, subprocess, time
 from datetime import datetime
 from playwright.sync_api import sync_playwright
@@ -55,13 +56,21 @@ EXT_ROW = re.compile(r"\b(?!(?:the|at|ward|kids|dad|dan)\b)[a-z]+\s+(?:" + "|".j
 TIME = re.compile(r"(?<![\d/])(\d{1,2}):(\d{2})(?!\d)|(?<![\d/:])(\d{1,2})\s?(a|p|am|pm)\b|~\s?(\d{1,2})\b", re.I)
 def _nocust():   # NOCUSTODY1 · one phrase list: main's scripts/qa/nocustody.test.mjs PHRASES (read at run time)
     src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "nocustody.test.mjs"), encoding="utf-8").read()
-    m = re.search(r"^export const PHRASES = /(.*)/i;\s*$", src, re.M)
+    # QAFIX1 · the declaration line now carries a trailing // comment and its own ['\u2019] classes; take the literal up to
+    # the last "/i;" on the line, turn JS \uXXXX into the real char, and widen only bare apostrophes (not ones in a class)
+    m = re.search(r"^export const PHRASES = /(.*)/i;[ \t]*(?://.*)?$", src, re.M)
     if not m: raise SystemExit("away-pages: PHRASES not found in nocustody.test.mjs")
-    return re.compile(m.group(1).replace("'", "['\u2019]"), re.I)
+    body = re.sub(r"\\u([0-9a-fA-F]{4})", lambda u: chr(int(u.group(1), 16)), m.group(1))
+    return re.compile(re.sub(r"(?<!\[)'", "['\u2019]", body), re.I)
 NOCUST = _nocust()
 DRESS = re.compile(r"\b(orange|red|yellow|green|blue|purple|pink|white|black|gold|tie[- ]?dye|neon|camo|maroon)\s+(day|out)\b|dress[- ]?up|spirit\s+(day|week)|pajama|pj day|costume|outsiders day|greaser|crazy (hair|sock)|hat day", re.I)
 from datetime import timedelta, timezone
-MONTHS = json.load(open(os.path.join(root, "data/cal-months.json")))["days"]
+def _months():  # QAFIX1 · a missing, empty or bad month file means no away window: the normal awake board (P3 crash fix)
+    try: d = json.load(open(os.path.join(root, "data/cal-months.json"), encoding="utf-8"))
+    except (OSError, ValueError): return {}
+    d = d.get("days") if isinstance(d, dict) else None
+    return d if isinstance(d, dict) else {}
+MONTHS = _months()
 DOWS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 def ct(dt):  # aware datetime -> CT wall (fixtures carry -05:00, CDT through Nov 1)
     return dt.astimezone(timezone(timedelta(hours=-5)))
@@ -127,7 +136,7 @@ srv = subprocess.Popen([sys.executable, "-m", "http.server", str(port), "--bind"
 res = {"label": label, "root": root, "nows": NOWS, "pages": {}}; fails = 0
 try:
     with sync_playwright() as p:
-        b = p.chromium.launch()
+        b = p.chromium.launch(**launch_kw(p))
         for now in NOWS:
             for W, H in VPS:
                 mob = W < 600

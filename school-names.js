@@ -20,6 +20,7 @@
   var TOKEN = /^[A-Za-z]{2,8}$/;
   var FULL = /^[A-Za-z]{2,}(?: [A-Za-z]{2,}){1,3}$/;
   var LIST = null;
+  var GLUE = "drop|dropoff|pickup|dismissal|carpool|bus|lunch|conference|conferences";
 
   function readRows() {
     var out = [];
@@ -69,10 +70,21 @@
   function fullAlt() { var t = fullNames(); return t.length ? t.map(function (n) { return n.split(" ").join("\\s+"); }).join("|") : NEVER; }
   function schoolRe(flags) { var t = schoolTokens(); return t.length ? new RegExp("\\b(?:" + t.join("|") + ")\\b", flags || "i") : null; }
   function isSchoolText(s) { var re = schoolRe(); return !!(re && re.test(String(s || ""))); }
-  function stripSchool(s) { var t = schoolTokens(); s = String(s || ""); return t.length ? s.replace(new RegExp("\\b(?:" + t.join("|") + ")\\s+", "g"), "") : s; }
+  /* stripGlued(s, tokens): THE one glue rule for every board (lh-rules.js calls it too, never a copy). The token drops when
+     (1) glued to a capital word ("QXSDrop", "qxsPickup"), (2) glued to a LOWERCASE school-logistics word ("QXSdrop" -> "drop";
+     only when the token starts the word and the rest is exactly one GLUE word, so ordinary words are never cut), or
+     (3) joined by a hyphen to a word ("QXS-Drop", "qxs-drop" -> "Drop", "drop"; LHVID1'' P4). */
+  function stripGlued(s, tokens) { var t = [].concat(tokens || []).filter(function (x) { return TOKEN.test(x); }); s = String(s || ""); if (!t.length) return s;
+    var A = "(?:" + t.join("|") + ")";
+    s = s.replace(new RegExp("(^|[^A-Za-z])" + A + "(?=[A-Za-z])", "gi"), function (m, p, off, str) { return /[A-Z]/.test(str.charAt(off + m.length)) ? p : m; });
+    s = s.replace(new RegExp("(^|[^A-Za-z])" + A + "(" + GLUE + ")(?![A-Za-z])", "gi"), function (m, p, w) { return /^[a-z]/.test(w) ? p + w : m; });
+    return s.replace(new RegExp("(^|[^A-Za-z0-9_])" + A + "-+(?=[A-Za-z])", "gi"), "$1"); }
+  function stripSchool(s) { var t = schoolTokens(); s = String(s || ""); if (!t.length) return s;
+    s = stripGlued(s, t);
+    return s.replace(new RegExp("\\b(?:" + t.join("|") + ")\\s+(?=[A-Za-z])", "gi"), ""); }   /* LHVID1'' P4: space-joined in any case ("QXS Drop", "qxs drop") */
   /* rx(src, flags): a regex from source text where "§" stands for the tokens and "¶" for the full names */
   function rx(src, flags) { return new RegExp(String(src).split("§").join("(?:" + alt() + ")").split("¶").join("(?:" + fullAlt() + ")"), flags || ""); }
   /* display word: the first token (private, box/device only), else the plain word */
   function label(fallback) { var t = schoolTokens(); return t.length ? t[0] : (fallback == null ? "School" : fallback); }
-  return { setSchools: setSchools, schoolTokens: schoolTokens, fullNames: fullNames, alt: alt, fullAlt: fullAlt, schoolRe: schoolRe, rx: rx, isSchoolText: isSchoolText, stripSchool: stripSchool, label: label, NEVER: NEVER };
+  return { setSchools: setSchools, schoolTokens: schoolTokens, fullNames: fullNames, alt: alt, fullAlt: fullAlt, schoolRe: schoolRe, rx: rx, isSchoolText: isSchoolText, stripSchool: stripSchool, stripGlued: stripGlued, label: label, NEVER: NEVER };
 });

@@ -18,6 +18,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { privPath, assertPrivateOut, namesRe, privateNames, externalEvents } from "./private-dir.mjs"; /* PRIVFEED1 · EXTFILTER1 */
 import { createRequire } from "node:module";
+import { ctMidnight, ctMidnightIso } from "./ct-midnight.mjs"; /* DATA1 P1-5 */
 createRequire(import.meta.url)("../house-face-law.js");   /* PRIVFEED3 · LAW8C1: sets globalThis.HouseFaceLaw (one dress-up law, shared with the glass) */
 const FACE_LAW = globalThis.HouseFaceLaw;
 /* SCHOOLNAMES1 · school code from private-names.tsv role "school" (school-names.js); none known = no pinned specials */
@@ -119,11 +120,11 @@ function parseDump(raw) {
   return { meta: data, events: externalEvents(events) };   /* EXTFILTER1 · same filter as cal-months.py */
 }
 
-function normalizeDateField(v) {
+export function normalizeDateField(v) {
   if (!v) return null;
   const s = String(v);
   /* True all-day YYYY-MM-DD */
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(`${s}T00:00:00-05:00`);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return ctMidnight(s); /* DATA1 P1-5 · CST after Nov 1 */
   /* Some dumps put an ISO datetime in .date — parse directly */
   const d = new Date(s);
   return Number.isNaN(d.getTime()) ? null : d;
@@ -171,21 +172,21 @@ function isCancelled(e) {
   return !!(e && (e.status === "cancelled" || e.status === "canceled" || CANCEL_TITLE.test(String(e.summary || ""))));
 }
 
-function startIsoLocal(e) {
+export function startIsoLocal(e) {
   if (e.start?.dateTime) return e.start.dateTime;
   if (e.start?.date) {
     const s = String(e.start.date);
-    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return `${s}T00:00:00-05:00`;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return ctMidnightIso(s); /* DATA1 P1-5 */
     return s; /* already datetime-shaped */
   }
   return null;
 }
 
-function endIsoLocal(e) {
+export function endIsoLocal(e) {
   if (e.end?.dateTime) return e.end.dateTime;
   if (e.end?.date) {
     const s = String(e.end.date);
-    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return `${s}T00:00:00-05:00`;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return ctMidnightIso(s); /* DATA1 P1-5 */
     return s;
   }
   return null;
@@ -208,12 +209,12 @@ function slimEvent(e) {
   };
 }
 
-function shortPlace(summary) {
+export function shortPlace(summary) {
   let s = String(summary || "").trim();
   s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
   /* Kid-safe: parenthesised adult notes never reach the glass strip */
   s = s.replace(/\(\s*Mom[^)]*\)/gi, "");
-  s = s.replace(/\bMom\b[^·]*/gi, "");
+  s = FACE_LAW.momFree(FACE_LAW.schoolWord(s)); /* DATA1 P2-8 · whole "for mom" phrase + one school word (was: cut Mom..end) */
   s = s.replace(/\s{2,}/g, " ").replace(/\s·\s*$/g, "").trim();
   if (s.length > 56) s = s.slice(0, 53) + "…";
   return s;
@@ -317,7 +318,14 @@ export function cleanDeep(o, key) {
   return o;
 }
 /* LAW8C1 · colour-day / dress-up rows are dropped at the source (same regex the glass uses) */
-export function dressFree(list) { return (list || []).filter((e) => !FACE_LAW.isDressDay(e && (e.summary || e.what || e.title) || "")); }
+/* ALLDAY1 · start > now is upcoming; an all-day row that began at midnight stays until its (exclusive) end date passes.
+   Before: today's all-day kid items (e.g. a school item due today) vanished at 00:00. */
+export function isUpcomingOrAllDayToday(e, nowMs) {
+  if (!e || !e.startMs) return false;
+  if (e.startMs > nowMs) return true;
+  return !!(e.allDay && e.endMs && e.endMs > nowMs);
+}
+export function dressFree(list) { return (list || []).filter((e) => { const t = e && (e.summary || e.what || e.title) || ""; return !FACE_LAW.isDressDay(t) || FACE_LAW.isColorDay(t); }); }
 
 function writeJson(outPath, payload) {
   assertPrivateOut(outPath, "cal-live"); /* PRIVFEED1 */
@@ -359,12 +367,7 @@ function danTodayFromDayEvents(dayEvents, todayIso, homeWeekThrough) {
     else if (/Large Item|HOA|DRIVE/i.test(sum)) tone = "hot";
     rows.push({ when, what, tone });
   }
-  const through = homeWeekThrough || "Fri Oct 2 · 3:00";
-  rows.push({
-    when: "home week",
-    what: `Kids with Dad at home through ${through}`,
-    tone: "hot",
-  });
+  /* DATA1 P2-11 · no custody row on Dad's glass (was "Kids with Dad at home through …") */
   return rows;
 }
 
@@ -410,7 +413,9 @@ function patchKidsWeek(weekPath, cal, upcoming, slimAll) {
 
   week.asOf = chicagoLong();
   week.asOfIso = todayIso;
-  week.boardStrip = cal.boardStrip;
+  /* DATA1 P2-9 · ONE Next Up builder: calendar-refresh.mjs owns kids-week.boardStrip (queue + nextLeave the glass reads);
+     this script only seeds it when the week has none, and never overwrites it with the queue-less cal-live hero. */
+  if (!week.boardStrip || !Array.isArray(week.boardStrip.queue)) week.boardStrip = cal.boardStrip;
   week.calMeta = {
     fetchedAt: cal.fetchedAt,
     source: cal.source,
@@ -591,18 +596,18 @@ function main() {
     SCHOOL_SPECIALS_RE.test(e.summary || "") && !/No Specials/i.test(e.summary || "") &&
     String(e.start || "").slice(0, 10) === todayIso && ctMin < 8 * 60 + 40 && e.startMs <= now.getTime();
   const upcoming = slimAll
-    .filter((e) => e.startMs > now.getTime() || isPinnedSpecial(e))
+    .filter((e) => isUpcomingOrAllDayToday(e, now.getTime()) || isPinnedSpecial(e))   /* ALLDAY1 · an all-day row runs until its end date */
     .map((e) => (isPinnedSpecial(e) ? { ...e, allDay: true, start: todayIso, end: todayIso, pinnedUntil: "8:40" } : e))
     .filter((e) => !/^GET\s*·/i.test(e.summary || "") && !/^Atlas:/i.test(e.summary || ""))
     .filter((e) => !isSoft(e))
-    .filter((e) => !FACE_LAW.isDressDay(e.summary || ""))   /* LAW8C1 */
+    .filter((e) => !FACE_LAW.isDressDay(e.summary || "") || FACE_LAW.isColorDay(e.summary || ""))   /* LAW8C1 · DRESSOK1: colour days pass as markers */
     .sort((a, b) => a.startMs - b.startMs);
 
   /* nextLeave field = Next Up hero.
      Hallway glance: prefer Busy leave/DRIVE over Free admin (Sign up / ParentSquare).
      Rank within the next 18h window, then earliest start. */
   const ADMIN_HERO_SKIP = /^Sign up\b|ParentSquare|conference sign-?ups?/i;
-  const heroPool = upcoming.filter((e) => !e.pinnedUntil && !ADMIN_HERO_SKIP.test(e.summary || ""));
+  const heroPool = upcoming.filter((e) => !e.pinnedUntil && e.startMs > now.getTime() && !ADMIN_HERO_SKIP.test(e.summary || ""));
   function heroRank(e) {
     const t = String(e.summary || "");
     if (e.busy && /\bDRIVE\b/.test(t)) return 0; // case-sensitive DRIVE token (not "before drive")

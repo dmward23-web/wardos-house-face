@@ -4,6 +4,7 @@
    never reach any board: dropped at the glass (cleanFeed / keepEvent / cleanKidsWeek) and at ingest by the builders
    (scripts/private-dir.mjs externalEvents for cal-from-events + calendar-refresh, scripts/cal-months.py).
    Synthetic stand-ins only (Smith / QXS / Jones); the real lists are never read. */
+import { assertSealed } from "./temp-home.mjs";   // TEMPHOME1
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -14,7 +15,7 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-createRequire(import.meta.url)(path.join(ROOT, "house-face-law.js"));
+assertSealed(); createRequire(import.meta.url)(path.join(ROOT, "house-face-law.js"));
 const L = globalThis.HouseFaceLaw;
 const AIN_BAD = /[\d$%\u2605\u2606\u2b50]/;
 

@@ -159,13 +159,13 @@ test("AINSJAR1 markup: kid-ainsley has no star glyph, no tally or progress count
   const jar = kidAinsleyJar();
   assert.equal(/\d/.test(jar.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, " ")), false, "a digit in her jar");
   assert.match(jar, new RegExp('<div class="bank-title">Tour Jar</div>\\s*' + STATE_EL.source), "TRUSTED right under the Tour Jar label");
-  assert.match(h, /<script src="ains-jar-state\.js\?v=AINSJAR1"><\/script>/);
+  assert.match(h, /<script src="ains-jar-state\.js\?v=AINSJAR2"><\/script>/);
 });
 test("AINSJAR1 markup: sheet-allowance shows TRUSTED under her Tour Jar label", () => {
   const a = bankSection("ainsley");
   assert.match(a, new RegExp('<div class="star-label">Tour Jar</div>\\s*' + STATE_EL.source));
   assert.equal(/data-saves-panel/.test(a), false);
-  assert.match(read("sheet-allowance.html"), /<script src="ains-jar-state\.js\?v=AINSJAR1"><\/script>/);
+  assert.match(read("sheet-allowance.html"), /<script src="ains-jar-state\.js\?v=AINSJAR2"><\/script>/);
 });
 test("AINSJAR1 state (Atlas Oct 20): TRUSTED by default; EMPTY only when kids.ainsley.jarState is set to another value", () => {
   const ctx = vm.createContext({ document: { readyState: "complete", querySelectorAll: () => [] } });

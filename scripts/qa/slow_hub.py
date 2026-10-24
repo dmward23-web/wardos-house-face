@@ -5,6 +5,7 @@ Serves the repo on a random loopback port and plays the hub on the same port (?p
 fixture scripts/qa/fixtures/private/kids-week.synthetic.json is the week. 'full' ticks every must for the kid before the
 hub answers (device-local checks, like a kid who already closed the week); 'empty' ticks nothing. A fake key in a fresh
 browser profile; every non-loopback request is stubbed (204)."""
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from pw_chrome import launch_kw
 import json, os, sys, threading, functools, io, time
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse
@@ -49,7 +50,7 @@ def lit(png):
     px = list(Image.open(io.BytesIO(png)).convert("L").resize((96, 96)).tobytes())
     return round(sum(1 for v in px if v > 24) / len(px), 3)
 with sync_playwright() as p:
-    b = p.chromium.launch(args=["--disable-gpu"])
+    b = p.chromium.launch(**launch_kw(p, args=["--disable-gpu"]))
     pg = b.new_page(); pg.set_viewport_size({"width": w, "height": h})
     errors = []
     pg.on("pageerror", lambda e: errors.append(str(e)))

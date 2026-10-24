@@ -1,0 +1,28 @@
+/* SWAY1 · hanging signs swing in the wind. The tagged element stays still (it is the hit area); an aria-hidden skin
+   inside it swings from the hang point with compositor-only rotate (sway) + rotate on a nested layer (gust). */
+[data-sway] { position: relative; }
+[data-sway].wg-sway-on > :not(.wg-sw) { visibility: hidden; }
+/* Baked art hides live words with "[data-asset-baked] *"; keep the skin (and baked art cloned into it) visible, words still hidden. */
+[data-sway] .wg-sw, [data-sway] .wg-gu, .wg-gu [data-asset-baked] { visibility: visible !important; }
+[data-asset-baked] > .wg-sw .wg-gu > :not([data-asset-baked]), .wg-gu [data-asset-baked] * { visibility: hidden !important; }
+[data-sway].wg-sway-bg { background: transparent !important; box-shadow: none !important; border-color: transparent !important; filter: none !important; }
+.wg-sw, .wg-gu { position: absolute; inset: 0; pointer-events: none; transform-origin: var(--sw-px, 50%) var(--sw-py, -6px);
+  will-change: rotate; backface-visibility: hidden; }
+.wg-sw { animation: wg-sway var(--sw-dur, 4.5s) ease-in-out var(--sw-del, 0s) infinite alternate; rotate: calc(var(--sw-amp, 2deg) * -1); }
+.wg-gu { display: flex; align-items: center; justify-content: center; border-radius: inherit; box-sizing: border-box;
+  filter: drop-shadow(0 calc(6px + var(--sw-amp, 2deg) / 1deg * 1px) 6px rgba(0, 0, 0, .45)); }
+.wg-gu.gust { animation: wg-gust var(--gu-dur, 3.2s) cubic-bezier(.2, .7, .3, 1) 1; }
+@keyframes wg-sway { from { rotate: calc(var(--sw-amp, 2deg) * -1); } to { rotate: var(--sw-amp, 2deg); } }
+@keyframes wg-gust { 0% { rotate: 0deg; } 14% { rotate: var(--gu-amp, 5deg); } 36% { rotate: calc(var(--gu-amp, 5deg) * -.55); }
+  58% { rotate: calc(var(--gu-amp, 5deg) * .28); } 80% { rotate: calc(var(--gu-amp, 5deg) * -.1); } 100% { rotate: 0deg; } }
+[data-sway="post"] .wg-sw { --sw-amp: .4deg; --sw-py: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  .wg-sw { --sw-amp: .25deg !important; animation-duration: 9s; }
+  .wg-gu.gust { animation: none; }
+}
+/* SWAY1 hardware (Prism PIVOTS.md): *-hang art is the sign plus its chain/hook above it. Wall 1600x500, sign from y=100, pivot (800,38);
+   phone@3x 960x300, sign from y=60, pivot (480,22). Both: the art reaches 25% of the sign height above it; the pivot sits at 7.5% of the art height (38/500, 22/300).
+   The hit area stays the sign; only the aria-hidden skin grows upward and swings from the hook. */
+[data-sway][data-asset-on*="-hang"] > .wg-sw { --sw-py: 7.5%; }
+[data-sway][data-asset-on*="-hang"] > .wg-sw, [data-sway][data-asset-on*="-hang"] > .wg-sw > .wg-gu { top: -25%; }
+[data-sway][data-asset-on*="-hang"] > .wg-sw > .wg-gu { top: 0; }

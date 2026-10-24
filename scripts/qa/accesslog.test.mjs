@@ -2,7 +2,7 @@
    (file 600, dir 700). No key value, query string, fragment or hash of a key ever reaches the file, including keys
    sent in the URL, path or User-Agent; rotation at the size cap keeps 3; a broken log never breaks a request.
    node --test scripts/qa/accesslog.test.mjs   (needs the ws module: NODE_PATH=<deps>/node_modules) */
-import { freePortSync } from "./free-port.mjs";
+import { spawnListening } from "./free-port.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -42,17 +42,12 @@ function readLines(file) { return fs.readFileSync(file, "utf8").trim().split("\n
 async function waitLines(file, n) {
   for (let i = 0; i < 50; i++) { try { if (readLines(file).length >= n) return; } catch { /* not yet */ } await new Promise((r) => setTimeout(r, 50)); }
 }
-async function up(base) {
-  for (let i = 0; i < 60; i++) { await new Promise((r) => setTimeout(r, 100)); try { if ((await fetch(base + "/health")).ok) return true; } catch { /* starting */ } }
-  return false;
-}
+async function up(h) { if (!(await h.ready)) return false; try { return (await fetch(h.base + "/health")).ok; } catch { return false; } }   /* LHVID1' · waits on the child's own listening line (port 0), not a timer */
 function launch(script, args, env) {
-  const port = freePortSync();
   const e = { ...process.env, ...env };
   for (const k of ["NEST_PROXY_TOKEN", "NEST_REFRESH_TOKEN", "LIGHTS_PROXY_TOKEN", "WARDOS_ACCESS_LOG_DIR", "WARDOS_ACCESS_LOG_MAX_BYTES"]) if (!(k in env)) delete e[k];
-  const child = spawn("node", [script, "--host", "127.0.0.1", "--port", String(port), ...args], { env: e, stdio: ["ignore", "pipe", "pipe"] });
-  let out = ""; child.stdout.on("data", (d) => (out += d)); child.stderr.on("data", (d) => (out += d));
-  return { child, base: `http://127.0.0.1:${port}`, out: () => out };
+  const h = spawnListening("node", [script, "--host", "127.0.0.1", "--port", "0", ...args], { env: e });
+  h.out = h.log; return h;
 }
 
 /* ---------- loopback Google mock for the cams proxy ---------- */
@@ -89,7 +84,7 @@ test("ACCESSLOG cams: one line per request, right slot/status/ip/ua, no key/quer
   const h = nestHome();
   const p = startNest(h);
   try {
-    assert.ok(await up(p.base), p.out());
+    assert.ok(await up(p), p.out());
     const UA_IOS = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
     const reqs = [
       ["no key", "/api/cameras", {}, 401, "none"],
@@ -158,7 +153,7 @@ test("ACCESSLOG lights: device / pair / none slots, keys in URL or UA never logg
   const h = lightsHome();
   const p = startLights(h);
   try {
-    assert.ok(await up(p.base), p.out());
+    assert.ok(await up(p), p.out());
     const J = { "Content-Type": "application/json" };
     const s = async (url, init = {}) => { const r = await fetch(p.base + url, init); const t = await r.text(); return { status: r.status, t }; };
     assert.equal((await s("/api/lights")).status, 401);
@@ -245,7 +240,7 @@ test("ACCESSLOG: a broken log never breaks a request; a log dir inside the repo 
   const h = nestHome();
   const p = startNest(h, { WARDOS_ACCESS_LOG_DIR: path.join(notDir, "sub") });
   try {
-    assert.ok(await up(p.base), p.out());
+    assert.ok(await up(p), p.out());
     assert.equal((await fetch(p.base + "/api/cameras", { headers: { "X-Nest-Proxy-Token": DEV } })).status, 200);
     assert.equal((await fetch(p.base + "/api/cameras")).status, 401);
     assert.match(p.out(), /access logging degraded; requests unaffected/);
@@ -276,7 +271,7 @@ test("FOLLOWUP1 cams: the retired nest-proxy.token never authorises but logs 're
   /* only the device file is passed, like the live launch */
   const p = launch(NEST, ["--auth-token-file", path.join(h.cfg, "nest-device.token")], { HOME: h.home, NEST_PROXY_TEST_GOOGLE: GOOGLE });
   try {
-    assert.ok(await up(p.base), p.out());
+    assert.ok(await up(p), p.out());
     const reqs = [
       ["/api/cameras", { "X-Nest-Proxy-Token": RETIRED_ONLY }, 401],
       ["/api/cameras", { Authorization: "Bearer " + RETIRED_ONLY }, 401],

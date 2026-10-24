@@ -224,7 +224,11 @@
     root.classList.toggle("pf-stale", state.status === "stale");
     var show = state.status === "offline" || (state.status === "stale" && Date.now() - state.lastOk > STALE_SHOW);
     if (!document.body) { document.addEventListener("DOMContentLoaded", paintFlag, { once: true }); return; }
-    if (!show) { if (chip) chip.style.display = "none"; return; }
+    /* WGQUIET1 · Atlas P1: no offline / pairing / status pill on any board. A missing feed shows the awake board silently;
+       the state stays readable for QA on <html data-feed-status>. */
+    try { document.documentElement.setAttribute("data-feed-status", show ? (!token() && !forceOffline ? "unpaired" : state.status) : "live"); } catch (_) {}
+    if (chip) chip.style.display = "none";
+    return;
     if (!chip) {
       chip = document.createElement("div");
       chip.className = "pf-flag";

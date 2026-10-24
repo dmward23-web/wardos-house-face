@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-sh="lh"><head><meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>The Ward's · Living House</title>
+<script src="../house-hub.js?v=HUBPIN1"></script>
+<script src="../private-feed.js?v=WGQUIET1"></script>
+<script src="../wg-assets.js?v=LIVEWX2B" defer></script>
+<script src="../wg-spook.js" defer></script>
+<link rel="stylesheet" href="../wg-spook.css?v=SPOOK1" />
+<script src="../wg-sway.js" defer></script>
+<script src="../wg-porch.js" defer></script><script src="../wg-mattes.js" defer></script><link rel="stylesheet" href="../wg-mattes.css"><link rel="stylesheet" href="../wg-porch.css">
+<link rel="icon" href="../icon-192.png">
+<link rel="stylesheet" href="../night/night-host.css?v=SH1" />
+<link rel="stylesheet" href="../month-theme/month-overlay.css?v=MONTHFX2" />
+<link rel="stylesheet" href="lh.css?v=LIVEWX2B" />
+<link rel="stylesheet" href="../wg-glass.css?v=WGGLASS1" />
+<link rel="stylesheet" href="../wg-sway.css?v=SWAY1" />
+<link rel="stylesheet" href="amb-fog-soft.css?v=FOGSOFT1" />
+</head>
+<body>
+<!-- LIVING HOUSE · the night scene IS the interface. Every element below is placed on the house plate by lh.js and is
+     filled only from a real feed (see FEEDS.md); no feed = nothing drawn. -->
+<video id="lh-cinema" class="lh-cinema" poster="../night/media/poster/loop-night-rain-calm-wall.webp" muted loop playsinline preload="none" hidden aria-hidden="true" onerror="this.dataset.dead=1;this.removeAttribute('src');this.load()"></video>
+<div id="lh" aria-label="The Ward's house">
+  <!-- LIVEWX2 · Prism step0 moonless phone night plate first (the only moon is the real one, RealMoon); older plates with a painted moon are fallbacks -->
+  <i class="lh-tallbg" aria-hidden="true" data-asset-var="--lh-tall" data-asset="backgrounds/bg-phone-night-v2-nomoon.webp|backgrounds/bg-phone-night-v2-nomoon.png|backgrounds/phone-extension-bg-night-v2-440x956.webp|backgrounds/phone-extension-bg-night-v2-440x956.png|backgrounds/bg-phone-night-v2.png|backgrounds/bg-phone-night-onemoon.webp|backgrounds/bg-phone-night-onemoon.png" data-asset-ph="backgrounds/bg-phone-night-v2-nomoon.webp|backgrounds/bg-phone-night-v2-nomoon.png|backgrounds/phone-extension-bg-night-v2-440x956.webp|backgrounds/phone-extension-bg-night-v2-440x956.png|backgrounds/bg-phone-night-v2.png|backgrounds/bg-phone-night-onemoon.webp|backgrounds/bg-phone-night-onemoon.png" data-asset-lit="backgrounds/phone-extension-bg-lit-440x956.webp|backgrounds/phone-extension-bg-lit-440x956.png|backgrounds/bg-phone-lit.png"></i>
+  <!-- NIGHT2 · Prism night-v2 layers over the tall scene: dim always-on window glow (kid-home windowglow stays the brighter state on top), lit pumpkins -->
+  <i class="lh-tallfx lh-winglow" aria-hidden="true" data-asset-var="--lh-fx" data-asset="backgrounds/phone-extension-bg-night-windowglow-440x956.webp|backgrounds/phone-extension-bg-night-windowglow-440x956.png|backgrounds/bg-phone-night-windowglow.png"></i>
+  <i class="lh-tallfx lh-pumpglow" aria-hidden="true" data-asset-var="--lh-fx" data-asset="backgrounds/phone-extension-bg-night-pumpkinglow-440x956.webp|backgrounds/phone-extension-bg-night-pumpkinglow-440x956.png|backgrounds/bg-phone-night-pumpkinglow.png"></i>
+  <!-- WGART1: the blue moon veil (a code blob in the upper-left sky) is removed, Atlas item 4 -->
+  <svg class="lh-moon" id="lh-moon" viewBox="-120 -120 240 240" role="img" aria-label="Moon clock">
+    <defs>
+      <radialGradient id="mg" cx="40%" cy="38%" r="70%"><stop offset="0" stop-color="#fbf8ee"/><stop offset=".7" stop-color="#e3dfd2"/><stop offset="1" stop-color="#c9c4b5"/></radialGradient>
+      <radialGradient id="ms" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#8f8b80" stop-opacity=".55"/><stop offset="1" stop-color="#8f8b80" stop-opacity="0"/></radialGradient>
+      <filter id="mgl" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter>
+      <clipPath id="lit"><path id="litp" d=""/></clipPath>
+      <clipPath id="dark"><path id="darkp" d=""/></clipPath>
+    </defs>
+    <circle r="118" fill="#cfd8ec" opacity=".18" filter="url(#mgl)" class="lh-moon-halo"/>
+    <circle r="100" fill="#1b2232"/>
+    <g clip-path="url(#dark)"><circle r="100" fill="#2b3346"/></g>
+    <g clip-path="url(#lit)"><circle r="100" fill="url(#mg)"/>
+      <ellipse cx="-30" cy="-26" rx="26" ry="20" fill="url(#ms)"/><ellipse cx="22" cy="-8" rx="30" ry="22" fill="url(#ms)"/><ellipse cx="-10" cy="34" rx="22" ry="16" fill="url(#ms)"/><ellipse cx="40" cy="38" rx="14" ry="11" fill="url(#ms)"/></g>
+    <g class="lh-etch" font-family="LH Display, sans-serif" text-anchor="middle">
+      <g clip-path="url(#lit)" fill="#2a2d33"><text y="-40" font-size="17" font-weight="600" letter-spacing="2" data-lh="ap"></text><text y="14" class="t-time" font-size="58" font-weight="600" data-lh="time"></text><text y="50" class="t-date" font-size="21" font-weight="600" letter-spacing="1.5" data-lh="date"></text></g>
+      <g clip-path="url(#dark)" fill="#e6e9f2"><text y="-40" font-size="17" font-weight="600" letter-spacing="2" data-lh="ap"></text><text y="14" class="t-time" font-size="58" font-weight="600" data-lh="time"></text><text y="50" class="t-date" font-size="21" font-weight="600" letter-spacing="1.5" data-lh="date"></text></g>
+    </g>
+  </svg>
+  <!-- LIVEWX2 · Prism's moonrise treeline occluder: full frame, stacked ABOVE the moon, shown only while the REAL moon is low (RealMoon alt, lh.js); never hard-dated, never placed by hand -->
+  <i class="lh-treeline" id="lh-treeline" aria-hidden="true" data-asset-var="--lh-treeline" data-asset="overlays/moonrise-treeline-fg-wall.webp|overlays/moonrise-treeline-fg-wall.png" data-asset-ph="overlays/moonrise-treeline-fg-phone.webp|overlays/moonrise-treeline-fg-phone.png"></i>
+  <div class="lh-sign" data-sway data-at="700,214" data-at-ph="480,240"><div class="lh-chain l"></div><div class="lh-chain r"></div><div class="lh-board" data-asset="signs/sign-the-wards.png|signs/sign-blank-1600x400.png" data-asset-ph="signs/sign-the-wards-phone@3x.png|signs/sign-blank-phone@3x.png">The Ward's</div></div>
+  <!-- the three kid windows: same size, same frame, same label, side by side on the upper facade (wall and phone) -->
+  <i class="lh-gable" data-rect="800,0,1133.33,133.33" aria-hidden="true"></i><!-- Prism gable band (art/gable-band-500x200): upper-storey siding + eave behind the three windows; the name plaques sit on its eave -->
+  <div class="lh-kidwins" id="lh-kidwins"><!-- art/: one shared window outline, lit and dark, glow and shadow as separate layers (wall); phone uses the 3-window siding strip -->
+    <i class="strip" aria-hidden="true"></i><i class="sglow" aria-hidden="true"></i>
+    <div class="lh-kw"><div class="lh-win" data-kid="ainsley"><i class="sh"></i><i class="gl" data-asset="windows/wall1920/glass-wall1920-ainsley-216x264.webp|windows/wall1920/glass-wall1920-ainsley-108x132.webp|windows/wall1920/glass-wall1920-ainsley.webp|windows/wall1920/glass-wall1920-ainsley.png" data-asset-ph="windows/glass-phone-ainsley@3x.png|windows/glass-phone-ainsley.webp"></i><i class="wb" aria-hidden="true" data-asset="windows/wall1920/glass-wall1920-ainsley-breath-216x264.webp|windows/wall1920/glass-wall1920-ainsley-breath-108x132.webp|windows/wall1920/glass-wall1920-ainsley-breath.png" data-asset-ph="windows/glass-phone-ainsley-breath.png"></i></div><a class="name" data-sway data-kid="ainsley" data-asset="signs/plaque-ainsley-v2-hang.png|signs/plaque-ainsley-v2.png|signs/plaque-ainsley.png" data-asset-ph="signs/plaque-ainsley-v2-hang-phone@3x.png|signs/plaque-ainsley-v2-phone@3x.png|signs/plaque-ainsley-phone@3x.png" href="../kid-ainsley.html" aria-label="Ainsley's room">Ainsley</a></div>
+    <div class="lh-kw"><div class="lh-win" data-kid="hayes"><i class="sh"></i><i class="gl" data-asset="windows/wall1920/glass-wall1920-hayes-216x264.webp|windows/wall1920/glass-wall1920-hayes-108x132.webp|windows/wall1920/glass-wall1920-hayes.webp|windows/wall1920/glass-wall1920-hayes.png" data-asset-ph="windows/glass-phone-hayes@3x.png|windows/glass-phone-hayes.webp"></i><i class="wb" aria-hidden="true" data-asset="windows/wall1920/glass-wall1920-hayes-breath-216x264.webp|windows/wall1920/glass-wall1920-hayes-breath-108x132.webp|windows/wall1920/glass-wall1920-hayes-breath.png" data-asset-ph="windows/glass-phone-hayes-breath.png"></i></div><a class="name" data-sway data-kid="hayes" data-asset="signs/plaque-hayes-v2-hang.png|signs/plaque-hayes-v2.png|signs/plaque-hayes.png" data-asset-ph="signs/plaque-hayes-v2-hang-phone@3x.png|signs/plaque-hayes-v2-phone@3x.png|signs/plaque-hayes-phone@3x.png" href="../kid-hayes.html" aria-label="Hayes's room">Hayes</a></div>
+    <div class="lh-kw"><div class="lh-win" data-kid="harris"><i class="sh"></i><i class="gl" data-asset="windows/wall1920/glass-wall1920-harris-216x264.webp|windows/wall1920/glass-wall1920-harris-108x132.webp|windows/wall1920/glass-wall1920-harris.webp|windows/wall1920/glass-wall1920-harris.png" data-asset-ph="windows/glass-phone-harris@3x.png|windows/glass-phone-harris.webp"></i><i class="wb" aria-hidden="true" data-asset="windows/wall1920/glass-wall1920-harris-breath-216x264.webp|windows/wall1920/glass-wall1920-harris-breath-108x132.webp|windows/wall1920/glass-wall1920-harris-breath.png" data-asset-ph="windows/glass-phone-harris-breath.png"></i></div><a class="name" data-sway data-kid="harris" data-asset="signs/plaque-harris-v2-hang.png|signs/plaque-harris-v2.png|signs/plaque-harris.png" data-asset-ph="signs/plaque-harris-v2-hang-phone@3x.png|signs/plaque-harris-v2-phone@3x.png|signs/plaque-harris-phone@3x.png" href="../kid-harris.html" aria-label="Harris's room">Harris</a></div>
+  </div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="lh-luma" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  1.2 1.2 1.2 0 -.08"/></filter></svg>
+  <a class="lh-dad" href="../sheet-dan.html" data-at="944,300" aria-label="Dad"><span class="lh-dad-glow"></span><span class="lh-plaque" data-sway data-asset="signs/sign-dad-v2-hang.png|signs/sign-dad.png" data-asset-ph="signs/sign-dad-v2-hang-phone@3x.png|signs/sign-dad-phone@3x.png">Dad</span></a>
+  <div class="lh-away" data-lan="1166,322" data-lan-ph="575,566" aria-label="Porch lantern" hidden><!-- the porch lantern kept lit in the away state (art: art/lantern-body, flame: night/media/fire-black.mp4 at the wick) -->
+    <div class="lan"><img src="art/lantern-body-400x560.webp" alt="" draggable="false" /><video class="lan-fire" data-src="../night/media/fire-black.mp4" poster="../night/media/poster/fire-black.webp" muted loop playsinline preload="auto" aria-hidden="true" onerror="this.dataset.dead=1;this.removeAttribute('src');this.load()"></video></div></div>
+  <div class="lh-candle" data-at="640,446" hidden><div class="wax" data-asset="props/candle-lit-256.png" data-matte="overlays/candle-flicker-black"><div class="flame"></div></div><div class="slate"><span class="v" data-lh="cand-v"></span><span class="k" data-lh="cand-k"></span></div></div>
+  <div class="lh-cauldron" data-at="452,486" data-at-ph="170,610"><div class="glow"></div><div class="pot" data-matte="overlays/smoke-black" data-asset="props/cauldron-512-v3.png|props/cauldron-512-v2.png|props/cauldron-512.png"></div><div class="lab" data-sway="post" data-asset="signs/sign-chores.png|signs/sign-blank-1600x400.png" data-asset-ph="signs/sign-chores-phone@3x.png|signs/sign-blank-phone@3x.png">Chores<small data-lh="chores-sub"></small></div></div>
+  <div class="lh-fogfar" aria-hidden="true"></div>
+  <div class="lh-stones far" id="lh-far"></div>
+  <div class="lh-fognear" aria-hidden="true"></div>
+  <div class="lh-stones near" id="lh-near"></div>
+  <div class="lh-callout" id="lh-callout" hidden><i class="thread" aria-hidden="true"></i><span data-lh="c-line"></span></div><!-- Prism P1: no cartoon ghost; the kid's next item hangs from their name plaque as plain glass -->
+  <div class="lh-leaves" id="lh-leaves" aria-hidden="true"></div>
+  <div class="lh-cool" aria-hidden="true"></div>
+  <div class="lh-streetglow" aria-hidden="true"></div>
+  <i class="wg-porch" aria-hidden="true" data-asset="" data-asset-ph="backgrounds/phone-extension-bg-night-porchlight-440x956.webp|backgrounds/phone-extension-bg-night-porchlight-440x956.png|backgrounds/bg-phone-night-porchlight.png" data-at="1082,132" data-at-ph="360,640" style="width:calc(260px * var(--k, 1));height:calc(260px * var(--k, 1))"></i>
+  <div class="lh-pglow" id="lh-pglow" aria-hidden="true"></div>
+  <div class="lh-count" id="lh-count" data-at="800,560" data-days="0" hidden><span class="n" data-lh="count"></span><span class="pumpkins" aria-hidden="true"></span></div>
+  <div class="lh-plate" id="lh-plate" hidden data-feed="missing"><span data-lh="season"></span></div>
+  <button type="button" id="lh-crypt-door" class="lh-crypt-door" data-asset="signs/sign-crypt.png" data-asset-ph="signs/sign-crypt-phone@3x.png" data-at="250,530" data-at-ph="70,620" aria-label="Crypt">Crypt</button>
+  <div id="lh-crypt" class="lh-crypt" hidden>
+    <button type="button" id="lh-crypt-close" aria-label="Close crypt">Close</button>
+    <div id="lh-jars"></div>
+    <div class="lh-crypt-photo" data-feed="missing" data-why="photo index not approved"><span>No photo feed yet</span></div>
+  </div>
+  <div class="lh-smoke" data-at="1010,0" hidden aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="lh-camlamp" data-at="1236,150" hidden aria-hidden="true"></div>
+  <div class="lh-yard" id="lh-yard" aria-hidden="true"></div>
+  <div class="lh-creatures" id="lh-creatures"><!-- MISSING ASSET: photoreal perched loops (owl, cat, raven). Nothing renders until real loops exist; no invented art (Prism P1-3). --></div>
+  <div class="lh-preview" id="lh-preview" hidden>PREVIEW</div>
+  <div class="lh-feedtag" id="lh-feedtag" hidden></div>
+  <div class="lh-wxage" id="lh-wxage" hidden></div>
+</div>
+<script src="clock.js?v=LIVEWX2B"></script>
+<script src="../night/night-host.js?v=BGONCE1" defer></script>
+<script src="../month-theme/month-overlay.js?v=LHV1" defer></script>
+<script src="../school-names.js?v=SCHOOLNAMES1" defer></script>
+<script src="../away-filter.js?v=AWAYLAW1" defer></script>
+<script src="../house-face-law.js?v=PRIVFEED3" defer></script>
+<script src="../phone2/leaveby.js?v=PHONE2" defer></script>
+<script src="lh-rules.js?v=LH4" defer></script>
+<script src="scene-packs.js?v=L4A" defer></script>
+<script src="cinema.js?v=L4A" defer></script>
+<script src="crypt.js?v=L4A" defer></script>
+<script src="rhythm.js?v=L4A" defer></script>
+<script src="../livewx-core.js?v=LIVEWX2B" defer></script><script src="moon-real.js?v=LIVEWX2B" defer></script><script src="lh.js?v=LIVEWX2B" defer></script>
+</body></html>
