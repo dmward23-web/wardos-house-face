@@ -27,7 +27,9 @@ const PRIVNM = path.join(os.userInfo().homedir, ".local/share/wardos-private/nig
 const sha = (b) => crypto.createHash("sha256").update(b).digest("hex");
 const SYNTH = Object.fromEntries(Array.from({ length: 120 }, (_, i) => ["kidboards/zz-synth-" + i + "-wall.webp", sha("synthetic " + i)]));
 const LIST = (() => { try { return JSON.parse(fs.readFileSync(path.join(PRIVNM, "art-halloween-allow.json"), "utf8")).files; } catch { return SYNTH; } })();
-const NAMES = Object.keys(LIST).filter((n) => !/\.(?:mp4|webm|json)$/.test(n));
+/* the shared list also holds the ambient line's names, which this proxy does not serve yet: pick only names its own path rule serves */
+const { HALLOWEEN_ART } = await import(PROXY), LISTMAP = new Map(Object.entries(LIST));
+const NAMES = Object.keys(LIST).filter((n) => !/\.(?:mp4|webm|json)$/.test(n) && HALLOWEEN_ART.has(n, LISTMAP));
 /* the smallest listed still whose private copy has the listed bytes; null off this box */
 function pickReal() {
   let best = null;
