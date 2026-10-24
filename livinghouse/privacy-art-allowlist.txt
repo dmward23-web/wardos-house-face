@@ -1,0 +1,43 @@
+# LHLIST1 · Living House art allow-list (read by the box pre-push wrapper HOOKPIN8 for refs/heads/livinghouse-base and
+# refs/heads/lh-* only, from the pinned origin/livinghouse-base; never for main). One exact repo path per line, no globs.
+# Every entry must be an image tracked on livinghouse-base. Generated scene art and UI pieces only: never a photo,
+# screenshot or camera frame. Adding a line is a privacy decision and this file is guarded (exact-sha Alfred gate).
+# 2026-10-20: the 38 base images from 5073a399 (livinghouse/art 21, night/media/poster 17), no EXIF/XMP, viewed.
+livinghouse/art/facade-strip-dark-dark-dark-576x180.webp
+livinghouse/art/facade-strip-dark-dark-lit-576x180.webp
+livinghouse/art/facade-strip-dark-lit-dark-576x180.webp
+livinghouse/art/facade-strip-dark-lit-lit-576x180.webp
+livinghouse/art/facade-strip-glow-dark-dark-lit-576x180.webp
+livinghouse/art/facade-strip-glow-dark-lit-dark-576x180.webp
+livinghouse/art/facade-strip-glow-dark-lit-lit-576x180.webp
+livinghouse/art/facade-strip-glow-lit-dark-dark-576x180.webp
+livinghouse/art/facade-strip-glow-lit-dark-lit-576x180.webp
+livinghouse/art/facade-strip-glow-lit-lit-dark-576x180.webp
+livinghouse/art/facade-strip-glow-lit-lit-lit-576x180.webp
+livinghouse/art/facade-strip-lit-dark-dark-576x180.webp
+livinghouse/art/facade-strip-lit-dark-lit-576x180.webp
+livinghouse/art/facade-strip-lit-lit-dark-576x180.webp
+livinghouse/art/facade-strip-lit-lit-lit-576x180.webp
+livinghouse/art/gable-band-500x200.webp
+livinghouse/art/lantern-body-400x560.webp
+livinghouse/art/window-dark-108x132.webp
+livinghouse/art/window-glow-108x132-canvas216x264.webp
+livinghouse/art/window-lit-108x132.webp
+livinghouse/art/window-shadow-108x132-canvas216x264.webp
+night/media/poster/fire-black.webp
+night/media/poster/loop-dawn-phone.webp
+night/media/poster/loop-dawn-wall.webp
+night/media/poster/loop-day-phone.webp
+night/media/poster/loop-day-wall.webp
+night/media/poster/loop-dusk-phone.webp
+night/media/poster/loop-dusk-wall.webp
+night/media/poster/loop-golden-phone.webp
+night/media/poster/loop-golden-wall.webp
+night/media/poster/loop-night-rain-calm-phone.webp
+night/media/poster/loop-night-rain-calm-wall.webp
+night/media/poster/loop-night-rain-phone.webp
+night/media/poster/loop-night-rain-wall.webp
+night/media/poster/loop-sunrise-phone.webp
+night/media/poster/loop-sunrise-wall.webp
+night/media/poster/v52-loop-phone.webp
+night/media/poster/v52-loop-wall.webp
