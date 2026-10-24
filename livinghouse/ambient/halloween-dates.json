@@ -1,0 +1,8 @@
+{
+  "_note": "AMBIENT1 dated config. Explicit Central Time dates only; nothing here is computed. countdown = the carved sign target on every board: whole CT calendar days to Thu Oct 29 (trick-or-treat night, so its label is Trick-or-treat); on the day the sign says Tonight. The 5:00 PM start comes from Dan's calendar event (see event) when the board's calendar feed carries it; with no matching event the sign falls back to the date alone and shows no time. halloween = the quiet Oct 31 night; end = the season is over (the ambient layer, costumes and critters do not boot, and a running page takes them down); novEnd = the November scene pack (kid boards wear the Nov plates from end until novEnd, Dec 1 12:00 AM CT).",
+  "countdown": { "civil": "2026-10-29", "label": "Trick-or-treat", "source": "Dan's calendar event Halloween night with the kids, Thu Oct 29 2026 5:00 PM CDT (event-keyed, see event), via Atlas Sat Oct 24 2026" },
+  "halloween": { "civil": "2026-10-31", "hour": 18 },
+  "end": { "civil": "2026-11-01", "hour": 6 },
+  "novEnd": { "civil": "2026-12-01", "hour": 0 },
+  "event": { "title": "Halloween night with the kids", "when": "Thu Oct 29 2026, 5:00-8:00 PM CDT", "start": "2026-10-29T17:00:00-05:00", "end": "2026-10-29T20:00:00-05:00", "idSha16": "c9af6a68179fc01a", "calendar": "Dan's personal calendar", "source": "Atlas, Sat Oct 24 2026 7:53 AM CT, Dan's lock", "use": "HCOUNT1: the Living House count matches this event by id hash first (SHA-256 of the feed id, first 16 hex; the raw id is not kept in the repo), then by exact title, on Oct 29 only; any time shown is the event start (5:00 PM). With no match it falls back to the date (Oct 29). The old half-past-five entry is retired." }
+}

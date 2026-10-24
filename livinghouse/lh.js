@@ -302,8 +302,8 @@
     $$(".lh-cr").forEach(function (c) { var k = c.getAttribute("data-kid"), soon = !cu.away && raw.some(function (e) { var s = C.at(e.start), m = (s - n) / 6e4;
       return !(e.allDay === true || e.allDay === "True") && m > 0 && m <= 60 && LHRules.kidName(k, e.summary || "") && !dress(e.summary); }); c.classList.toggle("pace", soon && !RM.matches); });
   }
-  function season(n) { /* scene pack from clock.now() via LHScenePacks.forDate. Oct 24 starts the count. Oct 31 is street mode. */
-    var pack = window.LHScenePacks.forDate(n), hw = pack.glow || q.get("halloween") === "preview", G = $("#lh-pglow");
+  function season(n) { /* scene pack from clock.now() via LHScenePacks.forDate (plus the loaded cal feed for the Thu show event, HCOUNT1). Oct 24 starts the count to Oct 29. Oct 31 is street mode. */
+    var pack = window.LHScenePacks.forDate(n, D.cal), hw = pack.glow || q.get("halloween") === "preview", G = $("#lh-pglow");
     de.setAttribute("data-season", pack.id); de.setAttribute("data-plate", pack.plate); de.setAttribute("data-art", pack.art);
     de.classList.toggle("lh-halloween", hw); de.classList.toggle("lh-street", !!pack.street);
     if (pack.streetArt) de.setAttribute("data-street-art", pack.streetArt); else de.removeAttribute("data-street-art");
@@ -314,11 +314,16 @@
   }
   function countdown(pack) {
     var el = $("#lh-count"); if (!el) return;
-    if (!pack.countdown || !pack.days) { el.hidden = true; el.setAttribute("data-days", "0"); return; }
-    el.hidden = false; el.setAttribute("data-days", String(pack.days));
-    el.querySelector("[data-lh=count]").textContent = String(pack.days);
+    if (!pack.countdown || (!pack.days && !pack.tonight)) { el.hidden = true; el.setAttribute("data-days", "0"); el.removeAttribute("aria-label"); var w0 = el.querySelector("[data-lh=when]"); if (w0) { w0.textContent = ""; w0.hidden = true; } return; }
+    el.hidden = false; el.setAttribute("data-days", String(pack.days)); el.setAttribute("data-via", pack.via || "date");
+    /* HCOUNT1 · days to Thu Oct 29; the day itself says Tonight (plus the event's own time when the event is in the feed), Time to go! once it starts */
+    var txt = pack.tonight ? (pack.go ? "Time to go!" : "Tonight" + (pack.at ? " " + pack.at : "")) : String(pack.days);
+    el.querySelector("[data-lh=count]").textContent = txt;
+    var when = el.querySelector("[data-lh=when]"); if (when) { when.textContent = !pack.tonight && pack.at ? "Thu " + pack.at : ""; when.hidden = !when.textContent; }
+    el.setAttribute("aria-label", pack.tonight ? txt : pack.days + (pack.days === 1 ? " day" : " days") + " to Halloween night" + (pack.at ? ", Thursday " + pack.at : ""));
+    el.classList.toggle("tonight", !!pack.tonight);
     var host = el.querySelector(".pumpkins"); host.innerHTML = "";
-    for (var i = 0; i < pack.days; i++) { var pump = document.createElement("i"); pump.className = "pumpkin"; host.appendChild(pump); }
+    for (var i = 0; i < (pack.tonight ? 1 : pack.days); i++) { var pump = document.createElement("i"); pump.className = "pumpkin" + (pack.tonight ? " lit" : ""); host.appendChild(pump); }
     if (phone) { el.style.left = "12px"; el.style.top = Math.max(72, VH - 92) + "px"; }
   }
   function emptyPlate(pack) {

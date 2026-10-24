@@ -26,7 +26,18 @@ const STALE = [
   ["night/night-host.css", "MERGE1C"],
   ["private-feed.js", "CAMREST2"],
   ["private-feed.js", "FOLLOWUP6"],
-  ["school-names.js", "SCHOOLNAMES1"]
+  ["school-names.js", "SCHOOLNAMES1"],
+  /* H1P2D3 · wg-assets changed in the range after the kid pages' LIVEWX2B and the hub's HALLOWEEN1; the delta-3 files move off their old tokens */
+  ["wg-assets.js", "LIVEWX2B"],
+  ["wg-assets.js", "HALLOWEEN1"],
+  ["wg-wall-land.css", "WALLFILL1"],
+  ["livinghouse/lh.css", "COLDLOAD1"],
+  ["livinghouse/lh.js", "LIVEWX2B"],
+  ["livinghouse/scene-packs.js", "L4A"],
+  ["livinghouse/scene-packs.js", "KIDWORLD2"],
+  /* H1P2D4 · the wall fit block and the hashed event id move these two off delta-3 */
+  ["wg-wall-land.css", "H1P2D3"],
+  ["livinghouse/scene-packs.js", "H1P2D3"]
 ];
 const SKIP = /^(scripts|tests?|plates|plates-receipt|vendor|node_modules|\.git)$/;
 function pages(dir, out = []) {

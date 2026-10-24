@@ -1,0 +1,50 @@
+{
+ "_note": "H1P2D4 fit fixture. The shape of the live hub tiles on the 1920x1080 wall, Sat Oct 24 2026 (CDT): each shown tile's markup with every letter masked letter-for-letter (same word lengths, same case), digits and times kept, attributes reduced to layout ones, no urls. No names, no places, nothing from the private feed survives but the lengths. The cam deck under the hub was 220 px tall.",
+ "viewport": [
+  1920,
+  1080
+ ],
+ "camDeckH": 220,
+ "tiles": [
+  {
+   "cls": "tile ainsley kid-flip",
+   "html": "<div class=\"tile-top\"><div class=\"tile-icon av g2-av ains\" aria-hidden=\"true\"><svg class=\"g2\" viewBox=\"0 0 32 32\" aria-hidden=\"true\"><use></use></svg></div><div class=\"tile-titles\"><div class=\"tile-label\">Thehous</div><div class=\"tile-sub\">7:25 EF · Acen ig Htti leboard theho</div></div><div class=\"kf-dots\" aria-hidden=\"true\"><i class=\"is-on\"></i><i class=\"\"></i><i class=\"\"></i><i class=\"\"></i></div></div><div class=\"kf-stage\"><div class=\"kf-face kf-day\"><div class=\"kf-kicker\">Usefa</div><div class=\"kf-loud\">CEN</div><div class=\"kf-title\">IGHT TI LEBO ARDTHEH OUSEF</div><div class=\"kf-rows\"><div class=\"kf-row\"><span class=\"kf-mt\">Ace</span><span class=\"kf-md\">Nigh tt Ileb oardthe house</span></div></div></div></div><div class=\"tile-foot\"><span class=\"tile-fact kf-streak-chip\">FA 0/8</span><a class=\"tile-tap kid-flip-go\">CENI</a></div>"
+  },
+  {
+   "cls": "tile hayes kid-flip",
+   "html": "<div class=\"tile-top\"><div class=\"tile-icon av g2-av hayes\" aria-hidden=\"true\"><svg class=\"g2\" viewBox=\"0 0 32 32\" aria-hidden=\"true\"><use></use></svg></div><div class=\"tile-titles\"><div class=\"tile-label\">Ttile</div><div class=\"tile-sub\">3:15 BO · Ardt'h 9eh ouseface night</div></div><div class=\"kf-dots\" aria-hidden=\"true\"><i class=\"is-on\"></i><i class=\"\"></i><i class=\"\"></i><i class=\"\"></i></div></div><div class=\"kf-stage\"><div class=\"kf-face kf-day\"><div class=\"kf-kicker\">Tileb</div><div class=\"kf-loud\">OAR · 3:15</div><div class=\"kf-title\">DTHE'H 9OU SEFACENI GHTTI</div><div class=\"kf-rows\"><div class=\"kf-row\"><span class=\"kf-mt\">Leb · 3:15</span><span class=\"kf-md\">Oard't 9he housefac enigh</span></div></div></div></div><div class=\"tile-foot\"><span class=\"tile-fact kf-streak-chip\">TT 0/10</span><a class=\"tile-tap kid-flip-go\">ILEB</a></div>"
+  },
+  {
+   "cls": "tile harris kid-flip",
+   "html": "<div class=\"tile-top\"><div class=\"tile-icon av g2-av harr\" aria-hidden=\"true\"><svg class=\"g2\" viewBox=\"0 0 32 32\" aria-hidden=\"true\"><use></use></svg></div><div class=\"tile-titles\"><div class=\"tile-label\">Oardth</div><div class=\"tile-sub\">12:40 EH · Ousefa ceni · gh TT Ileboar (dthe) · housef 1:00 · ac…</div></div><div class=\"kf-dots\" aria-hidden=\"true\"><i class=\"is-on\"></i><i class=\"\"></i><i class=\"\"></i><i class=\"\"></i></div></div><div class=\"kf-stage\"><div class=\"kf-face kf-day\"><div class=\"kf-kicker\">Enigh</div><div class=\"kf-loud\">TTI · 12:40</div><div class=\"kf-title\">LEBOAR DTHE · HO US EFACENI (GHTT) · ILEBOA 1:00</div><div class=\"kf-rows\"><div class=\"kf-row\"><span class=\"kf-mt\">Rdt · 12:40</span><span class=\"kf-md\">🏁 Hehous efac · en IG Httileb (oard) · thehou 1:00 · sefa 1:30</span></div></div></div></div><div class=\"tile-foot\"><span class=\"tile-fact kf-streak-chip\">CE 0/10</span><a class=\"tile-tap kid-flip-go\">NIGH</a></div>"
+  },
+  {
+   "cls": "tile dan kid-flip dad-seat",
+   "html": "\n <div class=\"tile-top\">\n <div class=\"tile-icon av g2-av dad\" aria-hidden=\"true\"><svg class=\"g2\" viewBox=\"0 0 32 32\" aria-hidden=\"true\"><use></use></svg></div>\n <div class=\"tile-titles\">\n <div class=\"tile-label\">Til</div>\n <div class=\"tile-sub\">Eboar-dth · ehous · efac</div>\n </div>\n </div>\n <div class=\"kf-stage\"><div class=\"kf-face kf-day\"><div class=\"kf-kicker\">Enig httil</div><div class=\"kf-loud\">EBOAR · 12:40</div><div class=\"kf-title\">Dtheho usef · ac EN Ighttil (eboa) · rdtheh 1:00 · ou…</div><div class=\"kf-rows\"><div class=\"kf-row\"><span class=\"kf-mt\">SEF 8:10</span><span class=\"kf-md\">Acen IGH ttil</span></div><div class=\"kf-row\"><span class=\"kf-mt\">EBO 3:25</span><span class=\"kf-md\">Ardt HEH ousefa</span></div></div></div></div>\n <div class=\"tile-foot\"><span class=\"tile-fact\">Cen ightt</span></div>\n "
+  },
+  {
+   "cls": "tile month",
+   "html": "\n <div class=\"tile-top\">\n <div class=\"tile-icon g2-mark\" aria-hidden=\"true\"><svg class=\"g2\" viewBox=\"0 0 32 32\" aria-hidden=\"true\"><use></use></svg></div>\n <div class=\"tile-titles\">\n <div class=\"tile-label\">Ilebo</div>\n <div class=\"tile-sub\">Ard the Hou</div>\n </div>\n </div>\n <div class=\"tile-micro\">\n <div class=\"tile-mrow\"><span class=\"mt\">SEF</span><span class=\"md\">Acen 4 · ight tileb</span><span class=\"tile-mchip amber\">Oar</span></div>\n <div class=\"tile-mrow\"><span class=\"mt\">DTH</span><span class=\"md\">Ehou sefac</span><span class=\"tile-mchip\">Enig</span></div>\n <div class=\"tile-mrow\"><span class=\"mt\">HTT</span><span class=\"md\">Ileboar · dthe · housef</span></div>\n <div class=\"tile-mrow\"><span class=\"mt\">ACEN</span><span class=\"md\">Ightt · ileboar dtheho</span></div>\n </div>\n <div class=\"tile-foot\"><span class=\"tile-fact\">Usefa cenig</span><span class=\"tile-tap\">HTTI</span></div>\n "
+  },
+  {
+   "cls": "tile chores",
+   "html": "\n <div class=\"tile-top\">\n <div class=\"tile-icon g2-mark\" aria-hidden=\"true\"><svg class=\"g2\" viewBox=\"0 0 32 32\" aria-hidden=\"true\"><use></use></svg></div>\n <div class=\"tile-titles\">\n <div class=\"tile-label\">Leboar</div>\n <div class=\"tile-sub\">Dtheh · ous efac enig</div>\n </div>\n </div>\n <div class=\"tile-micro\">\n <div class=\"tile-mrow\"><span class=\"mt\">HTTI</span><span class=\"md\">Leboa rd theho</span><span class=\"tile-mchip amber\">Use</span></div>\n <div class=\"tile-mrow\"><span class=\"mt\">FACE</span><span class=\"md\">Night · Tileboa · Rdtheh</span></div>\n <div class=\"tile-mrow\"><span class=\"mt\">OUSE</span><span class=\"md\">Fac eni gh ttile</span></div>\n </div>\n <div class=\"tile-foot\"><span class=\"tile-fact\">Boar dthe</span><span class=\"tile-tap\">HOUS</span></div>\n "
+  },
+  {
+   "cls": "tile groceries",
+   "html": "\n <div class=\"tile-top\">\n <div class=\"tile-icon g2-mark\" aria-hidden=\"true\"><svg class=\"g2\" viewBox=\"0 0 32 32\" aria-hidden=\"true\"><use></use></svg></div>\n <div class=\"tile-titles\">\n <div class=\"tile-label\">Efacenigh / Ttileb</div>\n <div class=\"tile-sub\">Oardth ehou</div>\n </div>\n </div>\n <div class=\"tile-micro\">\n <div class=\"tile-mrow\"><span class=\"mt\">SEFA</span><span class=\"md\">Cenigh ttilebo ardt</span></div>\n <div class=\"tile-mrow\"><span class=\"mt\">HEH</span><span class=\"md\">Ousefa · ceni ghtt</span><span class=\"tile-mchip amber\">Ileb</span></div>\n <div class=\"tile-mrow\"><span class=\"mt\">OAR</span><span class=\"md\">Dth eh ousefa</span></div>\n </div>\n <div class=\"tile-foot\"><span class=\"tile-fact\">Cenigh ttil</span><span class=\"tile-tap\">EBOA</span></div>\n "
+  },
+  {
+   "cls": "tile stars",
+   "html": "\n <div class=\"tile-top\">\n <div class=\"tile-icon g2-mark\" aria-hidden=\"true\"><svg class=\"g2\" viewBox=\"0 0 32 32\" aria-hidden=\"true\"><use></use></svg></div>\n <div class=\"tile-titles\">\n <div class=\"tile-label\">Rdth eh ous Eface</div>\n <div class=\"tile-sub\">Nigh · ttileb</div>\n </div>\n </div>\n <div class=\"tile-micro\">\n <div class=\"tile-mrow\"><span class=\"mt\">OARD</span><span class=\"md\">Theh ouse fa cenig</span></div>\n <div class=\"tile-mrow\"><span class=\"mt\">HTT</span><span class=\"md\">Ileboa</span><span class=\"tile-mchip amber\">Rdth</span></div>\n <div class=\"tile-mrow\"><span class=\"mt\">EHOU</span><span class=\"md\">Sefa · ceni · ghtti</span></div>\n </div>\n <div class=\"tile-foot\"><span class=\"tile-fact\">Le boar dt Hehou</span><span class=\"tile-tap\">SEFA</span></div>\n "
+  },
+  {
+   "cls": "tile fun",
+   "html": "\n <div class=\"tile-top\">\n <div class=\"tile-icon g2-mark\" aria-hidden=\"true\"><svg class=\"g2\" viewBox=\"0 0 32 32\" aria-hidden=\"true\"><use></use></svg></div>\n <div class=\"tile-titles\">\n <div class=\"tile-label\">Cen Ightt</div>\n <div class=\"tile-sub\">Ilebo · ardt</div>\n </div>\n </div>\n <div class=\"tile-micro\">\n <div class=\"tile-mrow\"><span class=\"mt\">HEH</span><span class=\"md\">Ouse · face ni ghtti</span></div>\n <div class=\"tile-mrow\"><span class=\"mt\">LEB</span><span class=\"md\">Oardth ehou sefac</span><span class=\"tile-mchip rose\">Enig</span></div>\n <div class=\"tile-mrow\"><span class=\"mt\">HTTI</span><span class=\"md\">Leboa rdthe · hous</span></div>\n </div>\n <div class=\"tile-foot\"><span class=\"tile-fact\">Efac enigh</span><span class=\"tile-tap\">TTIL</span></div>\n "
+  },
+  {
+   "cls": "tile win",
+   "html": "\n <div class=\"tile-top\">\n <div class=\"tile-icon g2-mark\" aria-hidden=\"true\"><svg class=\"g2\" viewBox=\"0 0 32 32\" aria-hidden=\"true\"><use></use></svg></div>\n <div class=\"tile-titles\">\n <div class=\"tile-label\">Eboard theho</div>\n <div class=\"tile-sub\">Usefaceni · ghttil</div>\n </div>\n </div>\n <div class=\"tile-micro\">\n <div class=\"tile-mrow\"><span class=\"mt\">EBOA</span><span class=\"md\">Rdth ehous · efac</span></div>\n <div class=\"tile-mrow\"><span class=\"mt\">ENIG</span><span class=\"md\">Httil · eboar-dth</span></div>\n <div class=\"tile-mrow\"><span class=\"mt\">EHO</span><span class=\"md\">Usefa · cenighttileb</span><span class=\"tile-mchip\">Oard</span></div>\n </div>\n <div class=\"tile-foot\"><span class=\"tile-fact\">Thehou sefac</span><span class=\"tile-tap\">ENIG</span></div>\n "
+  }
+ ]
+}

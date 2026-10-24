@@ -215,7 +215,10 @@ function checkPack(got, iso) {
   assert.equal(got.glow, p.glow, iso);
   assert.equal(got.countHidden, !p.countdown, iso);
   assert.equal(got.days, String(p.days), iso);
-  if (p.countdown) {
+  if (p.countdown && p.tonight) {
+    assert.match(got.countText, /^(Tonight|Time to go!)/, iso);
+    assert.equal(got.pumpkins, 1, iso);
+  } else if (p.countdown) {
     assert.equal(got.countText, String(p.days), iso);
     assert.equal(got.pumpkins, p.days, iso);
   }
@@ -309,7 +312,7 @@ async function main() {
     assert.equal(s.awayHidden, false);
     assert.equal(s.awayText, "");
     assert.match(s.win, /dark/);
-    assert.equal(s.days, "7");
+    assert.equal(s.days, "5");
     words(s.text);
     await shot(cdp, path.join(OUT, "wall-away-oct24.jpg"));
 
@@ -317,7 +320,7 @@ async function main() {
     s = await cdp.eval(stateExpr());
     assert.equal(s.away, false, "return day is the home board, with no words");
     assert.equal(s.season, "october-count");
-    assert.equal(s.days, "4");
+    assert.equal(s.days, "2");
     words(s.text);
     await shot(cdp, path.join(OUT, "wall-return-oct27.jpg"));
 

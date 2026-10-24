@@ -1,0 +1,55 @@
+{
+ "status": "live",
+ "source": "synthetic",
+ "fetchedAt": "2026-10-24T08:00:00-05:00",
+ "tz": "America/Chicago",
+ "windowStart": "2026-10-24",
+ "windowEnd": "2026-10-30",
+ "asOfIso": "2026-10-24",
+ "nextLeave": null,
+ "boardStrip": null,
+ "error": null,
+ "_synthetic": true,
+ "upcomingLeaves": [
+  {
+   "id": "fx-allday",
+   "summary": "Halloween class parties",
+   "start": "2026-10-29",
+   "end": "2026-10-30",
+   "location": "",
+   "busy": false,
+   "allDay": true,
+   "us": false
+  },
+  {
+   "id": "fx-decoy-parade",
+   "summary": "Halloween parade",
+   "start": "2026-10-29T09:30:00-05:00",
+   "end": "2026-10-29T10:30:00-05:00",
+   "location": "",
+   "busy": false,
+   "allDay": false,
+   "us": false
+  },
+  {
+   "id": "fx-soccer",
+   "summary": "Soccer practice",
+   "start": "2026-10-27T17:30:00-05:00",
+   "end": "2026-10-27T18:30:00-05:00",
+   "location": "",
+   "busy": true,
+   "allDay": false,
+   "us": false
+  },
+  {
+   "id": "fx-hcount-show-id",
+   "summary": "Trick or treat walk",
+   "start": "2026-10-29T17:00:00-05:00",
+   "end": "2026-10-29T20:00:00-05:00",
+   "location": "",
+   "busy": true,
+   "allDay": false,
+   "us": false
+  }
+ ]
+}

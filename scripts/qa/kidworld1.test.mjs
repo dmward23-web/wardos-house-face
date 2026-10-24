@@ -50,7 +50,7 @@ test("season window: costume plate Oct 1 00:00 to Oct 31 23:59 CT, plain plate f
   }
 });
 test("kid pages load the shared clock and season gate before wg-assets; no gate = plain plate", () => {
-  for (const k of ["hayes", "harris", "ainsley"]) { const s = R(`kid-${k}.html`), a = s.indexOf("livinghouse/scene-packs.js"), c = s.indexOf("livinghouse/clock.js"), w = s.indexOf('src="wg-assets.js?v=LIVEWX2B"'); assert.ok(c > 0 && a > c && w > a, k); }
+  for (const k of ["hayes", "harris", "ainsley"]) { const s = R(`kid-${k}.html`), a = s.indexOf("livinghouse/scene-packs.js"), c = s.indexOf("livinghouse/clock.js"), w = s.indexOf('src="wg-assets.js?v=H1P2D3"'); assert.ok(c > 0 && a > c && w > a, k); }
   assert.match(R("wg-assets.js"), /if \(!P \|\| !P\.forDate\) return false/);
 });
 /* LIVEWX2 · November plates are the ambient line's (NOVPACK1, livinghouse/ambient): wg-assets never picks a -nov plate even when the art is

@@ -34,13 +34,13 @@ const at = (iso) => new Date(iso);
   const p = Packs.forDate(at("2026-10-24T18:00:00-05:00"));
   assert.equal(p.id, "october-count");
   assert.equal(p.countdown, true);
-  assert.equal(p.days, 7);
+  assert.equal(p.days, 5, "HCOUNT1: the count runs to Thu Oct 29 (date fallback with no feed)");
   assert.equal(p.street, false);
 }
 {
   const p = Packs.forDate(at("2026-10-28T06:30:00-05:00"));
   assert.equal(p.id, "october-count");
-  assert.equal(p.days, 3);
+  assert.equal(p.days, 1);
   assert.equal(p.street, false);
 }
 {
@@ -130,7 +130,7 @@ assert.ok(!/Date\.now\(\)|new Date\(\)/.test(src("rhythm.js")));
 
 // --- page wiring ---
 const js = src("lh.js"), html = src("index.html"), css = src("lh.css");
-assert.match(js, /LHScenePacks\.forDate\(n\)/);
+assert.match(js, /LHScenePacks\.forDate\(n, D\.cal\)/);
 assert.match(js, /LHCinema\.consider/);
 assert.match(js, /LHCrypt\.jars/);
 assert.match(js, /LHCrypt\.photoHook/);

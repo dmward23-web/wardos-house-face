@@ -33,3 +33,30 @@
   html body .tile .tile-titles .tile-sub { white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
   html body .tile .kf-loud { font-size: clamp(18px, 2.3vh, 24px) !important; }
 }
+/* H1P2D3 (Alfred P2, tile clipping at 1920) · the compact wall grid squeezed every tile to an equal quarter (163 px at 1080 tall),
+   so with the 15 px floor a kid's streak chip rode over the tile foot, a long event title lost its tail and Dad's second row
+   fell past the tile. Each row now grows to its tiles' content and still shares the spare height (a 5 px row gap buys the worst-case
+   fill back at 1080 tall); the 14/15 px floors stay. */
+@media (min-width: 1200px) and (min-aspect-ratio: 4/3) {
+  html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams { grid-template-rows: repeat(4, minmax(min-content, 1fr)) !important; grid-auto-rows: minmax(min-content, 1fr) !important; row-gap: 5px !important; }
+  html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile { height: auto !important; max-height: none !important; }
+}
+/* H1P2D4 (Alfred P2, live feed at 1920x1080) · with real-length faces every row sat at its content height and the four rows plus
+   gaps came to ~728 px in a 698 px grid-wrap, so the Family trips tile lost its foot and bottom border (30 px). Rows stay
+   content-sized (a tile never clips its own text); on a wall under 1100 px tall the tile chrome tightens instead: tile padding,
+   the top's margin, the foot's lead, the face gaps, a 4 px row gap and 1.1 line height on the kicker and title. The floors stay.
+   And at any wall size a tile's top row is held to the tile's width: the tile packs its children to the start, so a long
+   one-line sub (Harris's game) sized the top to its text (424 px in a 304 px tile), the sub's ellipsis fell past the tile's
+   edge and the page dots were cut off. */
+@media (min-width: 1200px) and (min-aspect-ratio: 4/3) {
+  html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile > .tile-top { max-width: 100% !important; }
+}
+@media (min-width: 1200px) and (min-aspect-ratio: 4/3) and (max-height: 1100px) {
+  html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams { row-gap: 4px !important; }
+  html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile { padding-top: 6px !important; padding-bottom: 5px !important; }
+  html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile .tile-top { margin-bottom: 4px !important; }
+  html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile .tile-foot { padding-top: 3px !important; }
+  html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile .kf-face { gap: 2px !important; }
+  html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile .kf-kicker,
+  html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile .kf-title { line-height: 1.1 !important; }
+}

@@ -244,7 +244,7 @@ html.lh-phone .lh-gable { display: none; }
 /* (a) name plaques: brass fill + warm dot when the kid has something today; the plaque is the tap into the kid's room */
 .lh-kw .name { position: relative; text-decoration: none; pointer-events: auto; }
 .lh-kw .name::before { content: ""; position: absolute; left: -6px; right: -6px; top: -10px; bottom: -10px; }   /* 44 px tap area */
-.lh-kw .name.today { background: linear-gradient(180deg, #d9b56a, #a77c35 60%, #8a6328) !important; color: #24170a; text-shadow: 0 1px 0 rgba(255, 236, 190, .45); box-shadow: inset 0 1px 0 rgba(255, 240, 200, .5), 0 4px 12px rgba(0, 0, 0, .5); }
+.lh-kw .name.today:not([data-asset-baked]) { background: linear-gradient(180deg, #d9b56a, #a77c35 60%, #8a6328) !important; color: #24170a; text-shadow: 0 1px 0 rgba(255, 236, 190, .45); box-shadow: inset 0 1px 0 rgba(255, 240, 200, .5), 0 4px 12px rgba(0, 0, 0, .5); }
 .lh-kw .name.today::after { content: ""; position: absolute; right: calc(7px * var(--k)); top: 50%; width: calc(7px * var(--k)); height: calc(7px * var(--k)); margin-top: calc(-3.5px * var(--k)); border-radius: 50%; background: #ffb347; box-shadow: 0 0 calc(6px * var(--k)) rgba(255, 170, 60, .9); }
 html.lh-phone .lh-kw .name.today::after { right: 3px; width: 5px; height: 5px; margin-top: -2.5px; }
 html.lh-phone .lh-kw .name.today { padding-right: 10px; }
@@ -279,13 +279,23 @@ html.lh-phone .lh-dad { margin-top: 13px; }
 #lh button { pointer-events: auto; font: inherit; color: inherit; }
 .lh-count { transform: translate(-50%, 0); display: flex; flex-direction: column; align-items: center; gap: calc(6px * var(--k)); pointer-events: none; }
 .lh-count .n { font: 700 calc(32px * var(--k))/1 "LH Display", sans-serif; color: #f6dfae; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); }
+.lh-count .when { font: 600 max(15px, calc(16px * var(--k)))/1.1 "LH Display", sans-serif; color: #f1d39a; letter-spacing: .02em; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); }
+.lh-count .when[hidden] { display: none; }
 .lh-count .pumpkins { display: flex; gap: calc(8px * var(--k)); }
 .lh-count .pumpkin { width: calc(18px * var(--k)); height: calc(14px * var(--k)); border-radius: 50% 50% 46% 46%; background: radial-gradient(circle at 40% 35%, #ffb15a, #d2641a 70%); position: relative; }
 .lh-count .pumpkin::before { content: ""; position: absolute; left: 50%; top: -5px; width: 2px; height: 6px; margin-left: -1px; background: #3d6b32; border-radius: 1px; }
 html.lh-phone .lh-count { transform: none; }
 html.lh-phone .lh-count .n { font-size: 22px; }
+html.lh-phone .lh-count .when { display: none; }   /* the phone keeps its 440 footprint; the time rides the aria-label */
 html.lh-phone .lh-count .pumpkin { width: 12px; height: 10px; }
 html.lh-phone .lh-count .pumpkin::before { top: -4px; height: 4px; }
+/* H1P2D3 · enhancement pass: the count's pumpkins breathe like embers (opacity and glow, 4 s, staggered); show night lights one brighter; static under reduced motion */
+@keyframes lh-ember { from { opacity: .85; filter: drop-shadow(0 0 0 rgba(255, 150, 60, 0)); } to { opacity: 1; filter: drop-shadow(0 0 calc(5px * var(--k)) rgba(255, 150, 60, .55)); } }
+.lh-count .pumpkin { animation: lh-ember 4s ease-in-out infinite alternate; }
+.lh-count .pumpkin:nth-child(2n) { animation-delay: -1.3s; } .lh-count .pumpkin:nth-child(3n) { animation-delay: -2.6s; }
+@keyframes lh-ember-lit { from { filter: drop-shadow(0 0 calc(4px * var(--k)) rgba(255, 170, 70, .6)); } to { filter: drop-shadow(0 0 calc(9px * var(--k)) rgba(255, 170, 70, .9)); } }
+.lh-count .pumpkin.lit { animation-name: lh-ember-lit; filter: drop-shadow(0 0 calc(7px * var(--k)) rgba(255, 170, 70, .8)); }
+@media (prefers-reduced-motion: reduce) { .lh-count .pumpkin { animation: none !important; opacity: 1; } }
 .lh-streetglow { left: 0; right: 0; bottom: 0; height: 16%; opacity: 0; pointer-events: none; background: linear-gradient(rgba(255, 140, 40, 0), rgba(255, 120, 40, .22)); }
 html.lh-street .lh-streetglow { opacity: 1; }
 .lh-plate { left: 50%; top: calc(78px * var(--k)); transform: translateX(-50%); max-width: calc(100% - 24px); pointer-events: none; font: 600 calc(18px * var(--k))/1.2 "LH Display", sans-serif; letter-spacing: .03em; color: #f3d6a8; background: rgba(12, 10, 8, .88); border: 1px solid rgba(243, 214, 168, .3); border-radius: calc(6px * var(--k)); padding: calc(8px * var(--k)) calc(14px * var(--k)); text-align: center; }
