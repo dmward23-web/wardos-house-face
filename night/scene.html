@@ -336,7 +336,7 @@ function fireDark(c){const u=FI.clear>=0?1-FI.clear/3.2:1;for(const f of FI.fire
 function ashDraw(c){for(const a of FI.ash){const u=a.l/a.L;if(a.ember){glow(c,a.x,a.y,1.6,'255,150,60',.8*(1-u));glow(c,a.x,a.y,.6,'255,230,180',.9*(1-u))}else glow(c,a.x,a.y,1.2,'150,150,150',.3*(1-u))}}
 
 // ---------- v5.2 environment: real sun phase + live weather (Open-Meteo), QA overrides ----------
-const QS=new URLSearchParams(location.search),HOME={lat:38.88,lon:-94.67};
+const QS=new URLSearchParams(location.search),HOME={lat:38.9,lon:-94.7}/* coarse 0.1 deg cell only, never the address */;
 const D2R=Math.PI/180;
 function sunAlt(ms,lat=HOME.lat,lon=HOME.lon){const n=ms/864e5+2440587.5-2451545;const L=(280.460+.9856474*n)%360,g=(357.528+.9856003*n)*D2R;
  const lam=(L+1.915*Math.sin(g)+.020*Math.sin(2*g))*D2R,eps=(23.439-4e-7*n)*D2R;const ra=Math.atan2(Math.cos(eps)*Math.sin(lam),Math.cos(lam)),dec=Math.asin(Math.sin(eps)*Math.sin(lam));
