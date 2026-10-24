@@ -1,0 +1,10 @@
+# PIIGUARD1 · pii-guard allow-list: PUBLIC business contacts only (never a person's own phone or email).
+# One per line:  email <address>   |   phone <digits>   (a trailing "# privacy-scan:allow <cat>" keeps the box scanner quiet)
+# The Google OAuth consent page contact (public by design, see privacy.html and scripts/privacy-scan.mjs FOLLOWUP1)
+email atlasward@mail.grokbot.com  # privacy-scan:allow email
+# PIIGUARD2 · reviewed public ids, by sha256/16 only (never the value):
+id sha16:cd372fb85148700f  # scripts/qa/accesslog.test.mjs cleanPath fixture (synthetic 64-hex path segment)
+id sha16:7e771013da36cd5b  # scripts/qa/privfeed.test.mjs content pin (sha256 of about.html)
+id sha16:def6e21acf7fdcb8  # scripts/qa/privfeed.test.mjs content pin (sha256 of privacy.html)
+# PIIGUARD2 · the ONLY files allowed to carry inline pii-guard allow markers (each marker is printed every run):
+marker scripts/qa/pii-guard.test.mjs

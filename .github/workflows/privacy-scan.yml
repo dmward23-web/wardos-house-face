@@ -16,10 +16,11 @@ jobs:
     name: "PRIVACY · no private data in the tree or the new commits"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (= v4.4.0 at pin time)
         with:
+          persist-credentials: false  # PIIGUARD4: no token left in .git/config for later steps
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "20"
       - name: Scan tree
@@ -31,6 +32,54 @@ jobs:
         if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
         run: node scripts/privacy-scan.mjs --range "${{ github.event.before }}..${{ github.sha }}"
 
+  # PIIGUARD1 · PII guard (scripts/qa/pii-guard.mjs). BLOCKING. Coarse rules always run with no secret: coordinates
+  # finer than 0.1 deg, phones/emails outside scripts/qa/pii-guard-allow.txt, token/key and device-id patterns, over
+  # EVERY text file in the tree (html/js/json/css/md..., listed or not). The private HMAC denylist (home/calendar
+  # addresses, hashes only) runs only when BOTH repo secrets PII_GUARD_DENYLIST and PII_GUARD_KEY are set; if absent
+  # the log says so and the coarse hits still fail the job. Output is category + path:line + sha16, never a value.
+  pii-guard:
+    name: "PII · coords / phones / emails / tokens / private denylist"
+    runs-on: ubuntu-latest
+    # PIIGUARD2 · no job-level secrets: the CI-ONLY denylist + key (never the box key) reach the guard steps only.
+    # --require-denylist is OFF until both secrets exist; then set repo variable PII_GUARD_REQUIRE_DENYLIST=1 to make a
+    # missing denylist a hard failure.
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (= v4.4.0 at pin time)
+        with:
+          persist-credentials: false  # PIIGUARD4: no token left in .git/config for later steps
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "20"
+      - name: Denylist secret present?
+        env:
+          HAS_DENYLIST: ${{ secrets.PII_GUARD_DENYLIST != '' && secrets.PII_GUARD_KEY != '' }}
+        run: |
+          if [ "$HAS_DENYLIST" = "true" ]; then echo "pii-guard: private denylist secret PRESENT; denylist check ON"
+          else echo "::warning::pii-guard: secrets PII_GUARD_DENYLIST/PII_GUARD_KEY absent; denylist check SKIPPED, other checks still blocking"; fi
+      - name: Guard tree (every file)
+        env:
+          PII_GUARD_DENYLIST: ${{ secrets.PII_GUARD_DENYLIST }}
+          PII_GUARD_KEY: ${{ secrets.PII_GUARD_KEY }}
+          REQ: ${{ vars.PII_GUARD_REQUIRE_DENYLIST == '1' && '--require-denylist' || '' }}
+        run: node scripts/qa/pii-guard.mjs --tree $REQ
+      - name: Guard new commits (PR)
+        if: github.event_name == 'pull_request'
+        env:
+          PII_GUARD_DENYLIST: ${{ secrets.PII_GUARD_DENYLIST }}
+          PII_GUARD_KEY: ${{ secrets.PII_GUARD_KEY }}
+          REQ: ${{ vars.PII_GUARD_REQUIRE_DENYLIST == '1' && '--require-denylist' || '' }}
+          RANGE: ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
+        run: node scripts/qa/pii-guard.mjs --range "$RANGE" $REQ
+      - name: Guard new commits (push; a force-push range fails closed with a clean FAIL, the tree step covers new refs)
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        env:
+          PII_GUARD_DENYLIST: ${{ secrets.PII_GUARD_DENYLIST }}
+          PII_GUARD_KEY: ${{ secrets.PII_GUARD_KEY }}
+          REQ: ${{ vars.PII_GUARD_REQUIRE_DENYLIST == '1' && '--require-denylist' || '' }}
+          RANGE: ${{ github.event.before }}..${{ github.sha }}
+        run: node scripts/qa/pii-guard.mjs --range "$RANGE" $REQ
+
   # FOLLOWUP1 · the test suite is its own REPORT-ONLY job: the result goes to the job summary and a failure never turns
   # the run red (no failure mail). The privacy job above stays blocking. The box gate (Alfred) runs the full suite,
   # browser tests included, before every push; CI has no browser and no box files, so browser tests skip here.
@@ -38,8 +87,10 @@ jobs:
     name: "TESTS · house-face suite (report-only)"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (= v4.4.0 at pin time)
+        with:
+          persist-credentials: false  # PIIGUARD4: no token left in .git/config for later steps
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "20"
       - name: House-face test suite (QA1 · every scripts/qa/*.test.mjs; browser tests skip without a browser)
