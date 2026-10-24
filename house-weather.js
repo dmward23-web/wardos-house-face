@@ -2,8 +2,8 @@
    Primary: Open-Meteo. Fallback: wttr.in. Kids-safe · no $. */
 (function (global) {
   "use strict";
-  var LAT = 38.88;
-  var LON = -94.67;
+  var LAT = 38.9;   /* coarse 0.1 deg cell only, never the address */
+  var LON = -94.7;
   var PLACE = ""; /* P1FIX · no city name on glass or in aria text */
   var CACHE_KEY = "house-wx:v4";
   var CACHE_MS = 10 * 60 * 1000;
