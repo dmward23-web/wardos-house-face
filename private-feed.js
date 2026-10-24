@@ -252,11 +252,12 @@
   /* HUBPAIR1b · the chip never sits over page text. Normal-flow pages: the chip rides in the flow at the top of the page
      (it pushes content down, so nothing is under it at any scroll). Fixed full-screen pages (wall, scenes): the chip stays
      fixed and takes the first band (bottom, top, then scanning down) that covers no text (no page padding there: it would only add scroll room under a fixed scene). */
-  var placeT = 0, CTRL = "button,a[href],[role=button],[role=link],input,select,textarea,summary", GAP = 8;
+  var placeT = 0, CTRL = "button,a[href],[role=button],[role=link],input,select,textarea,summary,[onclick],[tabindex]:not([tabindex=\"-1\"])", GAP = 8; /* HUBPAIR1d · [onclick] and focusable [tabindex] boxes (the sheet-today header) are tap targets too */
   /* HUBPAIR1c · Alfred D1/D2: visible controls are occupied space too (the mute button and the W logo drew over or touched
      the chip). floatOnly: only controls that are fixed/absolute themselves or inside a fixed/absolute box (they do not move
      with the page flow). Each one is grown by GAP px so the chip keeps an 8 px gap. Returns { n, bottom } of the hits. */
   function floating(el) {
+    /* HUBPAIR1d D2 · position:sticky counts as floating on purpose: a stuck header or bar does not move with the flow either */
     for (var e = el; e && e !== document.body && e.nodeType === 1; e = e.parentElement) {
       var p = g.getComputedStyle(e).position; if (p === "fixed" || p === "absolute" || p === "sticky") return true;
     }
@@ -293,9 +294,16 @@
     if (!on) return;
     var st = pairChip.style, cs = null;
     try { cs = g.getComputedStyle(b); } catch (_) {}
+    /* HUBPAIR1d D1 · wide screens (92vw of 640 px or more): the sub-line stays on one line (chip about 62 px tall, not 79) so it
+       fits the bottom band; if the one-line text would still overflow, it wraps as before. Phones keep the 560 px two-line chip. */
+    try {
+      var wide = (g.innerWidth || 0) * 0.92 >= 640;
+      st.maxWidth = wide ? "min(92vw,720px)" : "min(92vw,560px)";
+      if (pairWhy) { pairWhy.style.whiteSpace = wide ? "nowrap" : "normal"; if (wide && pairChip.scrollWidth > pairChip.clientWidth + 1) pairWhy.style.whiteSpace = "normal"; }
+    } catch (_) {}
     var fixedPage = !cs || cs.overflow === "hidden" || cs.overflowY === "hidden" || (cs.display !== "block");
     if (!fixedPage) {
-      st.position = "relative"; st.left = st.bottom = st.top = "auto"; st.transform = "none"; st.margin = "12px auto"; st.display = "block";
+      st.position = "relative"; st.left = st.right = st.bottom = st.top = "auto"; st.transform = "none"; st.margin = "12px auto"; st.display = "block";
       try { if (b.firstChild !== pairChip) b.insertBefore(pairChip, b.firstChild); } catch (_) {}
       /* HUBPAIR1c · a fixed/absolute control over the in-flow chip: drop the chip below it (plus GAP); the page flows down with it */
       try {
@@ -308,19 +316,32 @@
       } catch (_) {}
       return;
     }
-    st.position = "fixed"; st.left = "50%"; st.transform = "translateX(-50%)"; st.margin = "0";
-    var best = null;
+    st.position = "fixed"; st.margin = "0";
+    var best = null, wideMW = st.maxWidth, wideWS = pairWhy ? pairWhy.style.whiteSpace : "";
+    /* HUBPAIR1d D1 · a spot is [edge, px, side, narrow]. Centered bands first (bottom, top, then scanning down). Wide screens
+       whose middle column runs the full height (sheet-today, sheet-chores at 1920) then try the four corners, first at full
+       width, then as a 400 px two-line chip that fits the side margin beside the page column. */
+    function put(spot) {
+      st.top = st.bottom = st.left = st.right = "auto";
+      if (spot[2] === "c") { st.left = "50%"; st.transform = "translateX(-50%)"; } else { st.transform = "none"; st[spot[2] === "r" ? "right" : "left"] = "18px"; }
+      st.maxWidth = spot[3] ? "400px" : wideMW;
+      if (pairWhy) pairWhy.style.whiteSpace = spot[3] ? "normal" : wideWS;
+      st[spot[0]] = spot[1];
+    }
     try {
-      var spots = [["bottom", "18px"], ["top", "12px"]], vh = g.innerHeight || 0, ch = pairChip.getBoundingClientRect().height || 0;
-      for (var y = 36; y + ch + 18 < vh; y += 24) spots.push(["top", y + "px"]); /* first free band, scanning down */
+      var spots = [["bottom", "18px", "c"], ["top", "12px", "c"]], vh = g.innerHeight || 0;
+      put(spots[0]); var ch = pairChip.getBoundingClientRect().height || 0;
+      for (var y = 36; y + ch + 18 < vh; y += 24) spots.push(["top", y + "px", "c"]); /* first free band, scanning down */
+      if ((g.innerWidth || 0) * 0.92 >= 640) [0, 1].forEach(function (nw) { ["r", "l"].forEach(function (sd) { spots.push(["bottom", "18px", sd, nw]); spots.push(["top", "12px", sd, nw]); }); });
       spots.some(function (spot) {
-        st.top = st.bottom = "auto"; st[spot[0]] = spot[1];
+        put(spot);
         var cr = pairChip.getBoundingClientRect(), gr = { left: cr.left - GAP, right: cr.right + GAP, top: cr.top - GAP, bottom: cr.bottom + GAP };
         var n = textUnder(gr) * 1000 + ctrlUnder(cr, false).n; /* text first (with the same 8 px margin, so a settling plank cannot creep under), then controls */
         if (!best || n < best.n) best = { spot: spot, n: n };
         return n === 0;
       });
-      st.top = st.bottom = "auto"; st[best.spot[0]] = best.spot[1];
+      if (best.n !== 0) best = { spot: spots[0], n: best.n }; /* HUBPAIR1d D1 · no free band at all: fall back to the bottom, never top 12 over the header */
+      put(best.spot);
     } catch (_) {}
   }
   function padForChip(on) {
