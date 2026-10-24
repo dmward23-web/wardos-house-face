@@ -568,6 +568,45 @@
     };
   }
 
+  /* CAMREST1 · a camera that cannot show a real picture (feed 5xx, token or auth failure, offline, a still that failed)
+     rests: the painted grove, dimmed and softened, behind one quiet "Camera resting". No pill, no broken image, no
+     error text. Any real still or LIVE video takes the tile back. */
+  function setHubCamResting(el, label, on) {
+    if (!el) return;
+    var doc = el.ownerDocument || document;
+    var pill = el.querySelector(".hub-cam-pill");
+    var wrap = el.querySelector(".hub-cam-media-wrap");
+    var rest = wrap ? wrap.querySelector(".hub-cam-rest") : null;
+    if (on) {
+      el.classList.add("hub-cam-resting");
+      el.setAttribute("aria-label", (label || "Camera") + " camera · resting");
+      if (pill) { pill.setAttribute("hidden", ""); pill.setAttribute("aria-hidden", "true"); }
+      var img = el.querySelector("img.hub-cam-media");
+      if (img) img.style.display = "none";
+      var voidEl = el.querySelector(".hub-cam-stub-void");
+      if (voidEl) voidEl.style.display = "none";
+      if (wrap && !rest) {
+        rest = doc.createElement("div");
+        rest.className = "hub-cam-media hub-cam-rest";
+        rest.setAttribute("aria-hidden", "true");
+        var word = doc.createElement("span");
+        word.className = "hub-cam-rest-word";
+        word.textContent = "Camera resting";
+        rest.appendChild(word);
+        wrap.insertBefore(rest, wrap.firstChild);
+      }
+      if (rest) rest.style.display = "";
+    } else {
+      el.classList.remove("hub-cam-resting");
+      if (pill) { pill.removeAttribute("hidden"); pill.removeAttribute("aria-hidden"); }
+      if (rest) rest.style.display = "none";
+    }
+  }
+
+  function hubStillFailed(img) {
+    return !!(img && img.getAttribute("data-pf-offline") === "1");
+  }
+
   function paintHubCamDeck(doc) {
     ingestProxyFromLive(cachedData());
     doc = doc || document;
@@ -585,6 +624,7 @@
       var el = tiles[i] || null;
       if (!el) continue;
       var cam = findCamForHub(slot, cams);
+      el._hubLabel = slot.label;
       /* CAMLIVE2 · never clobber a proven LIVE playing tile with STILL on poll */
       if (el._hubLivePlaying && el.classList.contains("hub-cam-live")) {
         if (cam && !String(cam.id || "").startsWith("stub-")) {
@@ -648,27 +688,24 @@
           else if (img.getAttribute("src") !== bust) img.setAttribute("src", bust);
           /* Keep still visible until LIVE video proves frames */
           if (!el._hubLivePlaying) img.style.display = "block";
-          img.onerror = (function (wrap, image) {
+          /* CAMREST1 · a still that will not load (proxy 5xx, auth) rests the tile: never a broken image or an error pill */
+          img.onerror = (function (tile, image) {
             return function () {
               image.style.display = "none";
-              if (wrap && !wrap.querySelector(".hub-cam-stub-void")) {
-                var v = doc.createElement("div");
-                v.className = "hub-cam-media hub-cam-stub-void";
-                v.setAttribute("aria-hidden", "true");
-                wrap.insertBefore(v, wrap.firstChild);
-              }
-              var p = wrap && wrap.parentNode && wrap.parentNode.querySelector(".hub-cam-pill");
-              if (p && !wrap.parentNode._hubLivePlaying) {
-                p.textContent = "NEED PROXY";
-                p.classList.remove("is-live", "is-still", "is-stale", "is-stub");
-                p.classList.add("is-need");
-              }
-              if (wrap && wrap.parentNode && !wrap.parentNode._hubLivePlaying) {
-                wrap.parentNode.classList.remove("hub-cam-live", "hub-cam-still", "hub-cam-stale");
-                wrap.parentNode.classList.add("hub-cam-stub");
-              }
+              if (tile && !tile._hubLivePlaying) setHubCamResting(tile, tile._hubLabel, true);
             };
-          })(mediaWrap, img);
+          })(el, img);
+          /* the private feed marks a still it could not fetch (5xx, 401) with data-pf-offline instead of firing onerror */
+          if (privSnap && !img._hubRestObs && typeof MutationObserver !== "undefined") {
+            img._hubRestObs = new MutationObserver((function (tile, image) {
+              return function () {
+                if (!tile || tile._hubLivePlaying) return;
+                if (hubStillFailed(image)) setHubCamResting(tile, tile._hubLabel, true);
+                else if (tile.classList.contains("hub-cam-resting") && image.getAttribute("src")) { setHubCamResting(tile, tile._hubLabel, false); image.style.display = "block"; }
+              };
+            })(el, img));
+            img._hubRestObs.observe(img, { attributes: true, attributeFilter: ["data-pf-offline", "src"] });
+          }
         }
         if (voidEl) voidEl.style.display = "none";
       } else {
@@ -681,6 +718,8 @@
         }
         if (voidEl && !el._hubLivePlaying) voidEl.style.display = "block";
       }
+      /* CAMREST1 · no real picture to show ⇒ the tile rests (no pill, no void, no error words) */
+      if (!el._hubLivePlaying) setHubCamResting(el, slot.label, !showStill || hubStillFailed(img));
       /* Ensure video element exists for CAMLIVE2 (hidden until playing) */
       if (mediaWrap && !vid) {
         vid = doc.createElement("video");
@@ -732,6 +771,7 @@
   function markHubCamLive(el, slotLabel) {
     if (!el) return;
     el._hubLivePlaying = true;
+    setHubCamResting(el, slotLabel, false);
     el.classList.remove("hub-cam-still", "hub-cam-stale", "hub-cam-stub");
     el.classList.add("hub-cam-live");
     el.setAttribute("aria-label", (slotLabel || "Cam") + " camera · LIVE");
@@ -797,16 +837,16 @@
         if (img && h.snapUrl) img.style.display = "block";
       }
     }
-    /* CAMKEY1: proxy says this screen has no/old camera key — say so, not STALE. */
-    if (reason && /unauthorized|locked|\b401\b/i.test(String(reason))) {
-      var kp = el.querySelector(".hub-cam-pill");
-      if (kp) {
-        kp.textContent = "LOCKED · PAIR";
-        kp.classList.remove("is-live", "is-still", "is-stale", "is-stub");
-        kp.classList.add("is-need");
+    /* CAMREST1 (was CAMKEY1's LOCKED · PAIR pill) · an auth or server failure (401, 403, 5xx) rests the tile unless a
+       real still is on screen; screen readers still hear that the camera needs pairing on a 401 */
+    if (reason && /unauthorized|forbidden|locked|\b40[13]\b|\b5\d\d\b|server error|bad gateway|unavailable/i.test(String(reason))) {
+      var still = el.querySelector("img.hub-cam-media");
+      var stillUp = !!(still && still.style.display !== "none" && still.getAttribute("src") && !hubStillFailed(still));
+      if (!stillUp) setHubCamResting(el, el._hubLabel, true);
+      if (/unauthorized|locked|\b401\b/i.test(String(reason))) {
+        var lbl = el.getAttribute("aria-label") || "";
+        el.setAttribute("aria-label", lbl.replace(/·.*$/, "· camera resting, needs pairing"));
       }
-      var lbl = el.getAttribute("aria-label") || "";
-      el.setAttribute("aria-label", lbl.replace(/·.*$/, "· camera locked, needs pairing"));
     }
     if (reason && typeof console !== "undefined" && console.info) {
       try { console.info("[CAMLIVE2] hub not LIVE:", reason); } catch (_) {}
