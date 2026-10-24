@@ -432,12 +432,16 @@ html.lh-wall .lh-kw .lh-win .gl, html.lh-wall .lh-kw .lh-win .sh {
 html.lh-phone .lh-cauldron .lab, html.lh-phone .lh-cauldron .lab small, html.lh-phone .lh-cauldron .wg-gu, html.lh-phone .lh-cauldron .wg-gu small { font-size: 14px !important; }
 html.lh-phone .lh-stones .lh-stone .d { font-size: max(14px, var(--fd)); }
 html.lh-phone .lh-away .k, html.lh-phone .lh-candle .k, html.lh-phone .lh-preview, html.lh-phone .lh-clocktag { font-size: 14px; }
-/* H1-LHVIS (Alfred P2) · with one or two near stones the phone path below them sat empty (568 to 864 px at 440 x 956).
-   Those stones move down onto the path and grow with the screen (clamp), so the walk reads as the foreground. Three
-   stones keep lh.js rows. No stones keeps the bare path until Prism's phone re-plate (see the H1 delta gate request). */
-html.lh-phone #lh-near .lh-stone:only-child,
-html.lh-phone #lh-near .lh-stone:first-child:nth-last-child(2),
-html.lh-phone #lh-near .lh-stone:nth-child(2):last-child {
-  top: calc(100% - clamp(96px, 12%, 150px)) !important; height: clamp(140px, 20vh, 210px); justify-content: center; padding-top: 0; }
-html.lh-phone #lh-near .lh-stone:only-child { left: 50% !important; width: clamp(196px, 58vw, 280px); }
+/* LHPATH3 proposal (Prism) · phone night: every near-stone state sits in one row on the path, below the steps/house art
+   (art ends at 647 css px on the 440x956 plate). Bottom edge unchanged from H1-LHVIS (100% - clamp(96px,12%,150px)).
+   Height 176 px for all states so the stone tops stay below the architecture. Replaces the H1-LHVIS block. */
+html.lh-phone #lh-near .lh-stone {
+  top: calc(100% - clamp(96px, 12%, 150px)) !important; height: 176px !important; min-height: 120px;
+  justify-content: center; padding-top: 0 !important; }
+html.lh-phone #lh-near .lh-stone:only-child { left: 50% !important; width: clamp(196px, 58vw, 280px) !important; }
 html.lh-phone #lh-near .lh-stone:only-child .w { font-size: clamp(17px, 5.2vw, 24px); }
+html.lh-phone #lh-near .lh-stone:first-child:nth-last-child(2) { left: 25% !important; width: 193.6px !important; }
+html.lh-phone #lh-near .lh-stone:nth-child(2):last-child { left: 75% !important; width: 193.6px !important; }
+html.lh-phone #lh-near .lh-stone:first-child:nth-last-child(3) { left: 17.6% !important; width: 128px !important; min-width: 112px; }
+html.lh-phone #lh-near .lh-stone:nth-child(2):nth-last-child(2) { left: 49.3% !important; width: 128px !important; min-width: 112px; }
+html.lh-phone #lh-near .lh-stone:nth-child(3):last-child { left: 83.6% !important; width: 128px !important; min-width: 112px; }
