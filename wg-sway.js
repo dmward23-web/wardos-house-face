@@ -12,9 +12,12 @@
     if (hasBg) BG.forEach(function (k) { gu.style[k] = cs[k]; });
     ["flexDirection","alignItems","justifyContent","padding","textAlign","lineHeight","borderWidth","borderStyle"].forEach(function (k) { gu.style[k] = cs[k]; }); gu.style.borderColor = "transparent";
     gu.style.color = cs.color; gu.style.font = cs.font; gu.style.letterSpacing = cs.letterSpacing; gu.style.textShadow = cs.textShadow;
-    Array.prototype.forEach.call(el.childNodes, function (n) { gu.appendChild(n.cloneNode(true)); });
+    /* COLDLOAD1 · the skin is the same on every pass: a word span we wrapped on an earlier pass is cloned back as a plain text node.
+       Without this, art that finishes loading after init (a cold cache) re-skins with a <span> child, which the baked-art rule hides,
+       so the phone plaques (live words on a CSS plank) went blank on a first visit only. */
+    Array.prototype.forEach.call(el.childNodes, function (n) { gu.appendChild(n.nodeType === 1 && n.hasAttribute("data-sw-tx") ? document.createTextNode(n.textContent) : n.cloneNode(true)); });
     Array.prototype.forEach.call(gu.querySelectorAll("[id]"), function (n) { n.removeAttribute("id"); });
-    Array.prototype.forEach.call(el.childNodes, function (n) { if (n.nodeType === 3 && n.textContent.trim()) { var s = document.createElement("span"); s.textContent = n.textContent; el.replaceChild(s, n); } });
+    Array.prototype.forEach.call(el.childNodes, function (n) { if (n.nodeType === 3 && n.textContent.trim()) { var s = document.createElement("span"); s.setAttribute("data-sw-tx", ""); s.textContent = n.textContent; el.replaceChild(s, n); } });
     sw.appendChild(gu); el.appendChild(sw);
     if (hasBg) el.classList.add("wg-sway-bg");
     el.classList.add("wg-sway-on");
@@ -47,6 +50,9 @@
       Array.prototype.forEach.call(els, function (el) { mo.observe(el, { attributes: true, subtree: true, childList: true, characterData: true,
         attributeFilter: ["data-asset-on", "data-asset-baked", "style", "class"] }); });
     }
+    /* COLDLOAD1 · the LH Display face can land after init (first visit, cold cache): re-skin once when the fonts are in so the
+       sign clones are laid out and painted with the real glyphs (safe now that skin() is idempotent) */
+    if (document.fonts && document.fonts.ready && document.fonts.status !== "loaded") document.fonts.ready.then(function () { Array.prototype.forEach.call(els, refresh); if (mo) mo.takeRecords(); });
     setTimeout(gust, rnd(4000, 9000));
   }
   /* SWAY1+ · a tap or click nudges that sign (the static parent keeps the hit area and still navigates); reduced motion: no nudge */

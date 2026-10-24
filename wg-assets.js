@@ -15,8 +15,10 @@
     for (var i = 0; i < els.length; i++) (function (el) {
       var pick = function (a) { return (a || "").split("|").filter(function (n) { return have[n] && (/-costume\./.test(n) ? costumeSeason() : true); })[0]; }, name = (phone() && pick(el.getAttribute("data-asset-ph"))) || pick(el.getAttribute("data-asset")), v = el.getAttribute("data-asset-var") || "--wg-art";
       if (!name) { el.style.removeProperty(v); el.removeAttribute("data-asset-on"); el.removeAttribute("data-asset-baked"); return; }
-      var im = new Image(); im.onload = function () { el.style.setProperty(v, "url(\"" + base + name + "\")"); el.setAttribute("data-asset-on", name); if (/-costume\./.test(name)) el.setAttribute("data-costume-baked", ""); else el.removeAttribute("data-costume-baked"); if (el === document.documentElement || /blank|^backgrounds|^kidboards/.test(name)) el.removeAttribute("data-asset-baked"); else el.setAttribute("data-asset-baked", ""); document.documentElement.classList.add("wg-art-on"); };
-      im.src = base + name;
+      /* COLDLOAD1 · data-asset-v is a per-element cache token (?v=) for art that is replaced under the same name; the proxy ignores the query */
+      var q = el.getAttribute("data-asset-v"), src = base + name + (q ? "?v=" + encodeURIComponent(q) : "");
+      var im = new Image(); im.onload = function () { el.style.setProperty(v, "url(\"" + src + "\")"); el.setAttribute("data-asset-on", name); if (/-costume\./.test(name)) el.setAttribute("data-costume-baked", ""); else el.removeAttribute("data-costume-baked"); if (el === document.documentElement || /blank|^backgrounds|^kidboards/.test(name)) el.removeAttribute("data-asset-baked"); else el.setAttribute("data-asset-baked", ""); document.documentElement.classList.add("wg-art-on"); };
+      im.src = src;
     })(els[i]);
   }
   var have = null, cs = null;

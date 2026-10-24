@@ -30,9 +30,9 @@ body[data-asset-on][data-kid-world]::before { content: ""; position: fixed; inse
 /* WGART1 · Prism art with its own carved words: the live text stays for screen readers but is not painted twice */
 [data-asset-baked] { color: transparent !important; text-shadow: none !important; -webkit-text-fill-color: transparent; }
 [data-asset-baked] * { visibility: hidden; }
-/* WGTYPE1 · type floors: 15 px on a wall-size screen (reads across the room), 11.5 px on the phone (crisp at 3x) */
+/* WGTYPE1 · type floors: 15 px on a wall-size screen (reads across the room), 14 px on the phone (COLDLOAD1, Alfred P2 floor) */
 @media (min-width: 1200px) { .live-clock-lab, .bank-title, .primary-foil, .tag, .pf-flag, .kw-path, .tile-mchip, .tile-fact, .md, .kf-kicker { font-size: max(15px, 1em) !important; } }
-@media (max-width: 600px) { .md, .kf-kicker, .tile-mchip, .tile-fact, .tag { font-size: max(11.5px, 1em) !important; } }
+@media (max-width: 600px) { .md, .kf-kicker, .tile-mchip, .tile-fact, .tag { font-size: max(14px, 1em) !important; } }
 /* the kid board's My Week path is a lit glass plaque, not a dark pill */
 .kw-path { background: linear-gradient(180deg, rgba(255, 244, 222, .26), rgba(70, 48, 30, .55)) !important; -webkit-backdrop-filter: blur(10px) saturate(1.3); backdrop-filter: blur(10px) saturate(1.3);
   border: 1px solid rgba(255, 214, 150, .7) !important; color: #fff6e6 !important; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 6px 18px rgba(0, 0, 0, .55) !important; }

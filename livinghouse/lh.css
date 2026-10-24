@@ -1,8 +1,9 @@
 /* LIVING HOUSE · diegetic UI on the v5.2 night plate. Sizes are in screen px (legibility beats scale): wall sizes scale
    with --k (1 at 1920 wide), phone sizes are fixed for 390-440 wide. Calm motion only; reduced motion holds still. */
-@font-face { font-family: "LH Display"; src: url(../fonts/InterDisplay-SemiBold.woff2) format("woff2"); font-weight: 600; font-display: block; }
-@font-face { font-family: "LH Display"; src: url(../fonts/InterDisplay-Bold.woff2) format("woff2"); font-weight: 700; font-display: block; }
-@font-face { font-family: "LH Text"; src: url(../fonts/InterVariable.ttf) format("truetype"); font-weight: 100 900; font-display: block; }
+/* COLDLOAD1 · swap, not block: a cold first visit paints the kid names in the fallback face at once instead of invisible text */
+@font-face { font-family: "LH Display"; src: url(../fonts/InterDisplay-SemiBold.woff2) format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "LH Display"; src: url(../fonts/InterDisplay-Bold.woff2) format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "LH Text"; src: url(../fonts/InterVariable.ttf) format("truetype"); font-weight: 100 900; font-display: swap; }
 html, body { margin: 0; height: 100%; overflow: hidden; background: #04060a; }
 body { font-family: "LH Text", system-ui, sans-serif; color: #eef1f6; -webkit-font-smoothing: antialiased; }
 #lh { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 1.4s ease; --k: 1; }
