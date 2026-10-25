@@ -144,7 +144,7 @@ test("static · spec values in the CSS, outage word unchanged, no LOCKED · PAIR
   assert.ok(js.includes('"Camera resting"'));
   assert.ok(!js.includes("LOCKED · PAIR"));
   const g = read("sheet-google-home.html");
-  assert.ok(g.includes("tokens-hub-cams.css?v=CAMREST4") /* CAMREST4 · tokens-hub-cams.css changed (rest clip) */ && g.includes("house-nest.js?v=CAMREST3") /* CAMREST3 · house-nest.js changed again */ && /private-feed\.js\?v=(?:CAMREST2|HALLOWEEN1|HUBPAIR1|HUBPAIR1B|HUBPAIR1D)"/.test(g)); /* H1-CB: halloween1 changed private-feed.js and re-tokens it */
+  assert.ok(g.includes("tokens-hub-cams.css?v=CAMREST5") /* CAMREST4 · tokens-hub-cams.css changed (rest clip); CAMREST5 · cam label 14px */ && g.includes("house-nest.js?v=CAMREST3") /* CAMREST3 · house-nest.js changed again */ && /private-feed\.js\?v=(?:CAMREST2|HALLOWEEN1|HUBPAIR1|HUBPAIR1B|HUBPAIR1D)"/.test(g)); /* H1-CB: halloween1 changed private-feed.js and re-tokens it */
   /* sheet-index.html keeps its CAMREST1 busters in this commit: its inherited Atlas deep-link id trips PIIGUARD2 on any
      edit; the bump is a separate one-line change once that line is cleared. The page still loads these same files. */
   assert.ok(/tokens-hub-cams\.css\?v=CAMREST\d/.test(read("sheet-index.html")));

@@ -350,3 +350,7 @@ html.ori-phone .hub-cam-rest-word {
 @media (prefers-reduced-motion: reduce) {
   .hub-cam-rest-dot { animation: none; opacity: 1; }
 }
+
+/* CAMREST5 DESK-SMALL: resting cam labels at the 14px floor */
+html body .panel #hub-cam-deck .hub-cam-label.hub-cam-label,
+html body #hub-cam-deck .hub-cam-label.hub-cam-label { font-size: 14px !important; }

@@ -87,9 +87,9 @@ test("PAIRUI1 · source: readyWord has no Ready, the cam word keeps Camera resti
   const N = read("house-nest.js");
   assert.match(N, /restWord = why === "pair" \? "Needs pairing" : "Camera resting"/);
   assert.match(read("sheet-index.html"), /house-board-strip\.js\?v=PAIRUI1/);
-  assert.match(read("sheet-index.html"), /house-lights\.js\?v=CAMREST4"/); /* CAMREST4 · re-tokened */
+  assert.match(read("sheet-index.html"), /house-lights\.js\?v=CAMREST5"/); /* CAMREST4 · re-tokened; CAMREST5 · again */
   assert.match(read("sheet-index.html"), /house-nest\.js\?v=CAMREST3"/); /* CAMREST3 · house-nest.js changed again */
-  assert.match(read("kid-harris.html"), /house-lights\.js\?v=CAMREST4"/); /* CAMREST4 · re-tokened */
+  assert.match(read("kid-harris.html"), /house-lights\.js\?v=CAMREST5"/); /* CAMREST4 · re-tokened; CAMREST5 · again */
 });
 
 test("PAIRUI1b · the lights pair pill is the camera rest pill: same glow, fill, border and word", SKIP, async () => {

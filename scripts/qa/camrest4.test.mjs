@@ -102,6 +102,6 @@ test("CAMREST4 · source: the kid pad is lifted (host node moved, no second writ
   assert.match(L, /\.hub-lights-pairword \.hub-lights-pairword-word\{[^}]*font-weight:500/);
   assert.match(L, /<span class="hub-lights-pairword-word">Needs pairing<\/span>/);
   assert.match(C, /\.hub-cam-rest \{[^}]*overflow: hidden;[^}]*overflow: clip;/);
-  for (const f of ["sheet-index.html", "sheet-google-home.html"]) assert.match(read(f), /tokens-hub-cams\.css\?v=CAMREST4"/, f);
-  for (const f of ["sheet-index.html", "sheet-google-home.html", "sheet-lights.html", "kid-harris.html"]) assert.match(read(f), /house-lights\.js\?v=CAMREST4"/, f);
+  for (const f of ["sheet-index.html", "sheet-google-home.html"]) assert.match(read(f), /tokens-hub-cams\.css\?v=CAMREST5"/, f);
+  for (const f of ["sheet-index.html", "sheet-google-home.html", "sheet-lights.html", "kid-harris.html"]) assert.match(read(f), /house-lights\.js\?v=CAMREST5"/, f);
 });
