@@ -931,11 +931,23 @@
     st.textContent =
       "#hub-lights-panel[data-pair-need] .hub-lights-bulk,#hub-lights-panel[data-pair-need] .hub-lights-more,#hub-lights-panel[data-pair-need] .hub-lights-sub{display:none!important}" +
       "#hub-lights-panel[data-pair-need] .hub-lights-grid{display:flex!important;align-items:center;justify-content:flex-start;min-height:0}" +
-      ".hub-lights-pairword{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;font:700 14px/1.2 Inter,system-ui,sans-serif;" +
-      "letter-spacing:.02em;color:#ffe2b0;background:rgba(28,18,8,.82);border:1.5px solid #e8a33d;white-space:nowrap;animation:pairui1Fade .6s ease-out both}" +
-      ".hub-lights-pairword i{width:6px;height:6px;border-radius:50%;background:#e8a33d;display:inline-block}" +
+      /* PAIRUI1b · the pill is the accepted camera rest pill (tokens-hub-cams.css .hub-cam-rest-pill): same fill, border,
+         glow and word; phone uses the cam row's tight size, desk the full size */
+      ".hub-lights-pairword{display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border-radius:999px;white-space:nowrap;" +
+      "background:rgba(28,18,8,.82);border:1.5px solid #e8a33d;box-shadow:0 0 14px rgba(232,163,61,.45),inset 0 0 8px rgba(232,163,61,.18)!important;" +
+      "font-family:'Inter Display','Inter',system-ui,sans-serif;font-weight:500;font-size:16px;letter-spacing:.02em;line-height:1.2;color:#ffe2b0;" +
+      "animation:pairui1Fade .6s ease-out both}" +
+      ".hub-lights-pairword i{flex:none;width:6px;height:6px;border-radius:50%;background:#e8a33d;display:inline-block;animation:pairui1Pulse 2.4s ease-in-out infinite}" +
       "@keyframes pairui1Fade{from{opacity:0}to{opacity:1}}" +
-      "@media (prefers-reduced-motion: reduce){.hub-lights-pairword{animation:none}}";
+      "@keyframes pairui1Pulse{0%,100%{opacity:.5}50%{opacity:1}}" +
+      "@media (max-width:600px){.hub-lights-pairword{padding:5px 10px;gap:5px;font-size:14px;letter-spacing:.01em}}" +
+      /* PAIRUI1b · desk: the unpaired panel collapses to one compact LIGHTS row sized to the pill, no empty dark box */
+      "@media (min-width:601px){" +
+      "html body .panel.panel.panel.panel #hub-lights-panel[data-pair-need]{height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important;" +
+      "flex:none!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;align-self:flex-start!important;justify-content:flex-start!important;gap:12px!important;width:auto!important;max-width:100%!important;padding:10px 14px!important}" +
+      "html body .panel.panel.panel.panel #hub-lights-panel[data-pair-need] .hub-lights-head{margin:0!important;flex:none!important}" +
+      "html body .panel.panel.panel.panel #hub-lights-panel[data-pair-need] .hub-lights-grid{height:auto!important;min-height:0!important;flex:none!important;margin:0!important;padding:0!important;width:auto!important}}" +
+      "@media (prefers-reduced-motion: reduce){.hub-lights-pairword{animation:none}.hub-lights-pairword i{animation:none;opacity:1}}";
     (doc.head || doc.documentElement).appendChild(st);
   }
   function hubPairHideBits(panel, on) {
@@ -1266,7 +1278,7 @@
     var pillCls = "light-pad-state cmd-pill";
     var pillTxt = "OFFLINE";
     if (g.live) { pillCls += " cmd-pill--live"; pillTxt = "LIVE"; }
-    else if (g.needToken || g.kind === "need_token") { pillCls += " cmd-pill--need"; pillTxt = "Needs pairing"; }
+    else if (g.needToken || g.kind === "need_token") { pillCls += " cmd-pill--need"; pillTxt = "Not connected"; } /* PAIRUI1b · kid boards never ask for pairing; the hub keeps its pairing word */
     else { pillCls += " cmd-pill--off"; pillTxt = hubHonesty(g) || "OFF"; }
     host.innerHTML =
       '<article class="light-pad cmd-panel kid-light-pad' + onCls + '" data-light-id="' + L.id + '">'
