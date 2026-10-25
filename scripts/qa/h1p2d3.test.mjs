@@ -36,7 +36,7 @@ test("H1P2D3 static: plaque gradient scoped off baked art, dot kept; wall grid g
   assert.match(land, /tile-grid--cams \{ grid-template-rows: repeat\(4, minmax\(min-content, 1fr\)\) !important/);
   assert.match(land, /tile-grid--cams > \.tile \{ height: auto !important; max-height: none !important; \}/);
   const LH = R("livinghouse/index.html"), SI = R("sheet-index.html");
-  for (const t of ['href="lh.css?v=H1P2D3"', 'src="scene-packs.js?v=H1P2D4"', 'src="lh.js?v=H1P2D3"']) assert.ok(LH.includes(t), t);
+  for (const t of ['href="lh.css?v=LHPATH3"' /* LHPATH3 (efd454b6) changed lh.css and moved its token on purpose */, 'src="scene-packs.js?v=H1P2D4"', 'src="lh.js?v=H1P2D3"']) assert.ok(LH.includes(t), t);
   for (const t of ['href="wg-wall-land.css?v=H1P2D4"', 'src="wg-assets.js?v=H1P2D3"']) assert.ok(SI.includes(t), t);
   for (const k of ["ainsley", "hayes", "harris"]) { const s = R(`kid-${k}.html`);
     assert.ok(s.includes('src="wg-assets.js?v=H1P2D3"'), k + " wg-assets"); assert.ok(s.includes('src="livinghouse/scene-packs.js?v=H1P2D4"'), k + " scene-packs");
