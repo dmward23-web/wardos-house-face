@@ -27,13 +27,15 @@ STATIC_STILLS = scenario in ("static5xx",)
 def nest_live():
     snap = (lambda s: "qa-stills/" + s + ".jpg") if STATIC_STILLS else (lambda s: "data/nest-snaps/" + s + ".jpg")
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    if scenario == "stateD":   # CAMREST3 · State D: paired, the hub's camera data is hours old (stale) but its old stills still load
+        now = datetime.fromtimestamp(time.time() - 3 * 3600, timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
     return {"status": "live", "source": "synthetic", "fetchedAt": now, "cameraCount": 3,
             "cameras": [{"id": "qa-dev-" + s, "name": n, "where": "Camera", "type": "camera", "online": True,
                          "snapshotUrl": snap(s), "snapCapturedAt": now, "streamUrl": None, "traits": [], "rawName": n,
                          "protocols": ["WEB_RTC"]} for s, n in zip(SLUGS, NAMES)]}
 hits = {"still": 0, "still_ok": 0, "nest_live": 0, "foreign": 0}
 lock = threading.Lock()
-STILL_FAILS = {"still5xx": 10 ** 6, "recover": 2, "static5xx": 10 ** 6, "calbad": 0, "shot": 10 ** 6, "feed401": 0, "feed503": 0, "slow": 0, "motion": 10 ** 6, "onebad": 0}[scenario]
+STILL_FAILS = {"still5xx": 10 ** 6, "recover": 2, "static5xx": 10 ** 6, "calbad": 0, "shot": 10 ** 6, "feed401": 0, "feed503": 0, "slow": 0, "motion": 10 ** 6, "onebad": 0, "stateD": 0}[scenario]
 per = {}
 def send(self, code, body=b"", ctype="application/json"):
     self.send_response(code); self.send_header("Content-Type", ctype); self.send_header("Content-Length", str(len(body)))
@@ -134,7 +136,7 @@ with sync_playwright() as pw:
             out["t_after"] = tiles()
         elif scenario == "slow":
             out["t_loading"] = out["t0"]; pg.wait_for_timeout(6000); out["t_loaded"] = tiles()
-        elif scenario in ("feed401", "feed503"):
+        elif scenario in ("feed401", "feed503", "stateD"):
             pg.clock.run_for(20000); pg.wait_for_timeout(1500); out["t20"] = tiles()
         elif scenario == "motion":
             out["style"] = pg.evaluate(STYLE)

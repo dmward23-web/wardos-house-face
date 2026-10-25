@@ -29,7 +29,7 @@ function run(mode, w = 1920, h = 1080) {
 let runs = null;
 function all() {
   if (!runs) {
-    const list = [["still5xx"], ["static5xx"], ["recover"], ["slow"], ["calbad"], ["feed401"], ["feed503"], ["motion"], ["onebad"], ["still5xx", 440, 956]];
+    const list = [["still5xx"], ["static5xx"], ["recover"], ["slow"], ["calbad"], ["feed401"], ["feed503"], ["motion"], ["onebad"], ["still5xx", 440, 956], ["stateD", 1280, 800], ["stateD", 440, 956]];
     runs = Promise.all(list.map((a) => run(...a))).then((rs) => Object.fromEntries(rs.map((o, i) => [list[i].join("@"), o])));
   }
   return runs;
@@ -107,6 +107,20 @@ test("P3 · whole camera feed 401: tiles rest (deck stays) and say needs pairing
   assert.deepEqual(r.feed401.errors, []); assert.deepEqual(r.feed503.errors, []);
 });
 
+test("CAMREST3 · State D (paired, hub camera data stale, its old stills still load): 3 visible resting tiles, deck stays, at 1280x800 and 440x956", SKIP, async () => {
+  const r = await all();
+  for (const size of ["1280@800", "440@956"]) {
+    const o = r["stateD@" + size];
+    assert.deepEqual(o.errors, [], size);
+    assert.ok(o.hits.still_ok >= 3, size + " the old stills really loaded " + J(o.hits));
+    for (const k of ["t0", "t20"]) {
+      assertRestingPrivate(o[k], "State D " + size + " " + k);
+      for (const t of o[k].tiles) assert.equal(t.why, "", J(t));
+      assert.equal(o[k].tiles.filter((t) => t.visible && t.restPill && t.restWord === "Camera resting").length, 3, size + " " + k);
+    }
+  }
+});
+
 test("Prism spec · computed pill, art and dot (wall), reduced motion stops the pulse, phone dots stay calm", SKIP, async () => {
   const r = await all();
   const s = r.still5xx.style;
@@ -130,7 +144,7 @@ test("static · spec values in the CSS, outage word unchanged, no LOCKED · PAIR
   assert.ok(js.includes('"Camera resting"'));
   assert.ok(!js.includes("LOCKED · PAIR"));
   const g = read("sheet-google-home.html");
-  assert.ok(g.includes("tokens-hub-cams.css?v=CAMREST2") && g.includes("house-nest.js?v=PAIRUI1") /* PAIRUI1 · house-nest.js changed again */ && /private-feed\.js\?v=(?:CAMREST2|HALLOWEEN1|HUBPAIR1|HUBPAIR1B|HUBPAIR1D)"/.test(g)); /* H1-CB: halloween1 changed private-feed.js and re-tokens it */
+  assert.ok(g.includes("tokens-hub-cams.css?v=CAMREST2") && g.includes("house-nest.js?v=CAMREST3") /* CAMREST3 · house-nest.js changed again */ && /private-feed\.js\?v=(?:CAMREST2|HALLOWEEN1|HUBPAIR1|HUBPAIR1B|HUBPAIR1D)"/.test(g)); /* H1-CB: halloween1 changed private-feed.js and re-tokens it */
   /* sheet-index.html keeps its CAMREST1 busters in this commit: its inherited Atlas deep-link id trips PIIGUARD2 on any
      edit; the bump is a separate one-line change once that line is cleared. The page still loads these same files. */
   assert.ok(/tokens-hub-cams\.css\?v=CAMREST\d/.test(read("sheet-index.html")));

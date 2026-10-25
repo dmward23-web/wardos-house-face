@@ -694,6 +694,8 @@
       el._hubRetryMs = 0;
       if (el._hubRetryT) { clearTimeout(el._hubRetryT); el._hubRetryT = null; }
       if (el._hubLivePlaying) return;
+      /* CAMREST3 · an old (STALE) or stub picture is not a real still: the tile keeps resting, so NODATA1 never hides it */
+      if (el._hubNotStill) { img.style.display = "none"; setHubCamResting(el, el._hubLabel, true, el._hubWhy); return; }
       setHubCamResting(el, el._hubLabel, false);
       img.style.display = "block";
     } else {
@@ -756,6 +758,7 @@
         continue;
       }
       var h = hubCamHonesty(slot, cam, g, data);
+      el._hubNotStill = h.kind !== "still";
       el.classList.remove("hub-cam-live", "hub-cam-still", "hub-cam-stale", "hub-cam-stub");
       el.classList.add(h.cls);
       var pill = el.querySelector(".hub-cam-pill");
@@ -812,7 +815,7 @@
             img.setAttribute("src", bust);
           }
           /* CAMREST2 · the still shows only once it has really loaded */
-          if (!el._hubLivePlaying) img.style.display = hubStillOk(img) ? "block" : "none";
+          if (!el._hubLivePlaying) img.style.display = hubStillOk(img) && !el._hubNotStill ? "block" : "none";
           if (hubStillFailed(img)) hubStillRetry(el, img, doc);
         }
         if (voidEl) voidEl.style.display = "none";
@@ -826,8 +829,9 @@
         }
         if (voidEl && !el._hubLivePlaying) voidEl.style.display = "block";
       }
-      /* CAMREST2 · rest unless a real still has loaded; a repaint can rest a tile, never un-rest it */
-      var resting = !showStill || !hubStillOk(img);
+      /* CAMREST2 · rest unless a real still has loaded; a repaint can rest a tile, never un-rest it.
+         CAMREST3 · a STALE or stub tile rests even when an old picture loaded (State D: paired, hub stale or unreachable) */
+      var resting = !showStill || !hubStillOk(img) || el._hubNotStill;
       if (!el._hubLivePlaying) {
         if (resting) setHubCamResting(el, slot.label, true, why);
         else {
@@ -941,6 +945,7 @@
       if (slot) {
         var cam = findCamForHub(slot, cams);
         var h = hubCamHonesty(slot, cam, g, data);
+        el._hubNotStill = h.kind !== "still";
         el.classList.remove("hub-cam-still", "hub-cam-stale", "hub-cam-stub");
         el.classList.add(h.cls);
         el.setAttribute("aria-label", hubLabel(slot, cam) + " camera · " + h.pill);
@@ -951,7 +956,7 @@
           pill.classList.add(h.pillCls);
         }
         var img = el.querySelector("img.hub-cam-media");
-        if (img && h.snapUrl && hubStillOk(img)) img.style.display = "block";
+        if (img && h.snapUrl && hubStillOk(img) && !el._hubNotStill) img.style.display = "block";
         else setHubCamResting(el, el._hubLabel, true, el._hubWhy);
       }
     }

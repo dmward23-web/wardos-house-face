@@ -88,7 +88,7 @@ test("PAIRUI1 · source: readyWord has no Ready, the cam word keeps Camera resti
   assert.match(N, /restWord = why === "pair" \? "Needs pairing" : "Camera resting"/);
   assert.match(read("sheet-index.html"), /house-board-strip\.js\?v=PAIRUI1/);
   assert.match(read("sheet-index.html"), /house-lights\.js\?v=PAIRUI1B"/);
-  assert.match(read("sheet-index.html"), /house-nest\.js\?v=PAIRUI1/);
+  assert.match(read("sheet-index.html"), /house-nest\.js\?v=CAMREST3"/); /* CAMREST3 · house-nest.js changed again */
   assert.match(read("kid-harris.html"), /house-lights\.js\?v=PAIRUI1B"/);
 });
 
