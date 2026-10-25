@@ -62,7 +62,7 @@ test("static: SOFTGL2 both still posters (no GPU, reduced motion) use the live s
     assert.match(s, /if\(k!==mk\|\|pk!==FB\.plate\)\{mk=k;go\(\)\}/, f + ": redraw on the minute tick and on a phase change");
     assert.match(s, /function fbRM\(\)\{if\(RM\.matches\)\{fbPoster\('reduced-motion'\);fbStill\('reduced-motion'\)\}/, f + ": reduced motion uses the same still path");
     assert.ok(!/imOk\(poster\('night'\)\)\)\{try\{step\(0\)\}catch\(e\)\{\}fbDraw\(\)/.test(s), f + ": no night-only wait left");
-    assert.ok(!/function\s+\w*[Mm]oon\w*\s*\(/.test(s), f + ": no second moon to fake (the moon is the plate's own, live and poster alike)"); }
+    assert.equal(s.split("// MOON1 · real moon (begin)").length, 2, f + ": one moon source (MOON1, painted in bgCompose for the live scene and the poster alike)"); }
   assert.match(read("night/scene.html"), /function fbSoft\(\)\{if\(RM\.matches\)return fbRM\(\);FB\.tries=1;fbPoster\('software-gl'\);fbStill\('software-gl'\)\}/);
 });
 

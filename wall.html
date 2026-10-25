@@ -442,12 +442,39 @@ function vidT(v){return v===V?null:(V.currentTime||0)%(v.duration||14.54)}
 // P3WALL1 · LHVID1 still poster per loop (night/media/poster, scenery only, already in git): drawn whenever a loop video is missing (held, 404, not ready)
 var PST;function poster(n){PST=PST||{};const k=n+'-'+mode;if(PST[k])return PST[k];const i=new Image();i.decoding='async';i.src=`night/media/poster/${n==='night'?'v52-loop':'loop-'+n}-${mode}.webp`;PST[k]=i;return i}
 function imOk(i){return !!(i&&i.complete&&i.naturalWidth)}
+// MOON1 · real moon (begin) · phase from the mean synodic month (new moon 2000-01-06 18:14Z, 29.530588853 d), altitude SunCalc-style
+// (low-precision ecliptic lng/lat/distance, equatorial, sidereal time, altitude); up = the standard moonrise test (centre above 0.7275 x parallax - 34').
+// No location in the client (LIVEWX2): the cell is the hub's coarse /wx sky cell (CELL), else the time zone's meridian at a mid latitude. Waxing is lit on the right, waning on the left (northern hemisphere).
+// The mask darkens the dark part of the night plate's baked moon to the sky sampled beside it (darken keeps the branches in front), with a soft limb
+// and a faint earthshine; moon down: no moon.
+const MOON1=(()=>{const R=Math.PI/180,DAY=864e5,J0=Date.UTC(2000,0,1,12),SYN=29.530588853,NM0=Date.UTC(2000,0,6,18,14),E=R*23.4397;
+ const cell=()=>{try{if(typeof CELL!=='undefined'&&CELL&&isFinite(CELL.lat)&&isFinite(CELL.lon))return{lat:+CELL.lat,lon:+CELL.lon}}catch(e){}return{lat:40,lon:-new Date(new Date().getFullYear(),0,1).getTimezoneOffset()/4}};
+ function pos(t,c){c=c||cell();const d=(t-J0)/DAY,L=R*(218.316+13.176396*d),M=R*(134.963+13.064993*d),F=R*(93.272+13.229350*d);
+  const l=L+R*6.289*Math.sin(M),b=R*5.128*Math.sin(F),dist=385001-20905*Math.cos(M);
+  const ra=Math.atan2(Math.sin(l)*Math.cos(E)-Math.tan(b)*Math.sin(E),Math.cos(l)),dec=Math.asin(Math.sin(b)*Math.cos(E)+Math.cos(b)*Math.sin(E)*Math.sin(l));
+  const phi=R*c.lat,H=R*(280.16+360.9856235*d)+R*c.lon-ra,g=Math.asin(Math.sin(phi)*Math.sin(dec)+Math.cos(phi)*Math.cos(dec)*Math.cos(H));
+  const par=Math.asin(6378.14/dist),h0=.7275*par-R*.5667;let h=g-par*Math.cos(g);const hr=Math.max(h,0);h+=.0002967/Math.tan(hr+.00312536/(hr+.08901179));
+  return{alt:h/R,geo:g,h0:h0,up:g>h0}}
+ function at(t,c){const a=(((t-NM0)/DAY)%SYN+SYN)%SYN,p=pos(t,c);return{age:a,fraction:(1-Math.cos(2*Math.PI*a/SYN))/2,waxing:a<SYN/2,alt:p.alt,up:p.up}}
+ function times(t0,t1,c){const r={rise:[],set:[]},st=6e5;let f0=pos(t0,c);for(let t=t0+st;t<=t1;t+=st){const f1=pos(t,c);if(f0.up!==f1.up){let a=t-st,b=t;for(let j=0;j<16;j++){const m=(a+b)/2;if(pos(m,c).up===f0.up)a=m;else b=m}r[f1.up?'rise':'set'].push(Math.round((a+b)/2))}f0=f1}return r}
+ function key(t){const k=at(t);return k.up?Math.round(k.fraction*1e3)+(k.waxing?'+':'-'):'down'}
+ function mask(c,P,sx,sy,w,t){const k=at(t);if(!(w>.01)||!P||!P.moon)return null;const cx=P.moon[0]*sx,cy=P.moon[1]*sy,r=P.moon[2]*sx,ct=Math.cos(2*Math.PI*k.age/SYN);
+  let sky=[6,9,16];try{const g=(x,y)=>c.getImageData(Math.max(0,Math.round(x-2)),Math.max(0,Math.round(y-2)),4,4).data,s=[0,0,0];let n=0;for(let q=0;q<8;q++){const a=g(cx+Math.cos(q*.785)*r*2.6,cy+Math.sin(q*.785)*r*2.6);for(let i=0;i<64;i+=4){for(let j=0;j<3;j++)s[j]+=a[i+j];n++}}sky=s.map(v=>Math.round(v/n))}catch(e){}
+  const info={fraction:k.fraction,waxing:k.waxing,up:k.up,alt:k.alt,cx:cx,cy:cy,r:r,sky:sky,w:w,inFrame:cx+r>0&&cy+r>0&&cx-r<c.canvas.width&&cy-r<c.canvas.height};MOON1.last=info;if(!info.inFrame)return info;
+  c.save();c.globalAlpha=Math.min(1,w);c.globalCompositeOperation='darken';c.fillStyle=`rgb(${sky.join()})`;c.filter=`blur(${Math.max(1,r*.05).toFixed(1)}px)`;
+  if(!k.up){c.filter=`blur(${(r*.2).toFixed(1)}px)`;const g2=c.createRadialGradient(cx,cy,r*1.1,cx,cy,r*2.4);g2.addColorStop(0,`rgba(${sky.join()},1)`);g2.addColorStop(1,`rgba(${sky.join()},0)`);c.fillStyle=g2;c.beginPath();c.arc(cx,cy,r*2.4,0,7);c.fill();
+   c.fillStyle=`rgb(${sky.join()})`;c.beginPath();c.arc(cx,cy,r*1.15,0,7);c.fill();c.restore();return info}
+  if(k.fraction>.995){c.restore();return info}
+  const R2=r*1.08,s=k.waxing?1:-1,path=()=>{c.beginPath();for(let i=0;i<=48;i++){const y=-R2+2*R2*i/48,q=Math.sqrt(Math.max(0,R2*R2-y*y));c.lineTo(cx-s*q,cy+y)}for(let i=48;i>=0;i--){const y=-R2+2*R2*i/48,q=Math.sqrt(Math.max(0,R2*R2-y*y));c.lineTo(cx+s*ct*q,cy+y)}c.closePath()};
+  path();c.fill();c.filter='none';c.globalCompositeOperation='source-over';c.beginPath();c.arc(cx,cy,r*.98,0,7);c.clip();path();c.fillStyle='rgba(150,165,195,.06)';c.fill();c.restore();return info}
+ return{at:at,pos:pos,times:times,key:key,mask:mask,SYN:SYN,last:null}})();
+// MOON1 · real moon (end)
 let BGsig=null,BGsame=false;function bgCompose(){const PN=poster('night'),vR=V.readyState>=2&&V.videoWidth;const W=vR?V.videoWidth:(imOk(PN)?PN.naturalWidth:0),H=vR?V.videoHeight:(imOk(PN)?PN.naturalHeight:0);if(!W)return V;if(!BG){BG=document.createElement('canvas');BGc=BG.getContext('2d')}if(BG.width!==W||BG.height!==H){BG.width=W;BG.height=H;for(const k in SKP)delete SKP[k]}const base=vR?V:PN;const c=BGc,sx=W/P.w,sy=H/P.h;
  const ph=ENV.phase,va=PHK[ph.A].vid,vb=PHK[ph.B].vid;const A=pvGet(va),B=ph.m>0?pvGet(vb):null;
  // preload the next phase once within 3 degrees of a threshold
  const keep=[va,vb];if(!QP){const nx=phaseAt(envNow()+20*6e4);keep.push(PHK[nx.A].vid,PHK[nx.B].vid);for(const n of keep)if(n!=='night')pvGet(n)}pvGC(keep);
  c.globalCompositeOperation='source-over';c.globalAlpha=1;c.filter='none';
- const ok=v=>v&&v.readyState>=2&&v.videoWidth>0;const pick=(v,n)=>ok(v)?v:(n!=='night'&&imOk(poster(n))?poster(n):null);const sA=pick(A,va),sB2=B?pick(B,vb):null;/* BGONCE1 · the plate is re-composited and re-uploaded only when it changes: playing footage or an animated overlay (rain, snow, hail, wet, flash, accumulation) changes every frame; a still poster under steady sky is uploaded once and again only when phase blend, daylight, cloud amount or whole-pixel cloud drift moves (a per-frame full-res upload starved the GPU) */{const vidOn=ok(base)||ok(sA)||ok(sB2)||FSX.L.some(l=>l[2]>0&&ok(FXV[l[0]].v)),fxOn=ENV.flash>.01||ENV.wet>.01||ENV.driz*.3>.01||Math.max(ENV.rain,ENV.driz*.25)>.02||ENV.snow>0||ENV.acc>.01||ENV.hail>.5;const sig=vidOn||fxOn?null:[W,H,sA?sA.src:'-',sB2?sB2.src:'-',imOk(base)?1:0,Math.round(ph.m*255),Math.round(ENV.day*255),ENV.cloud>.02?[Math.round(ENV.cloud*255),Math.round((windOff*ENV.ws*.6*sx)%(W*1.5)),SKY&&SKY.complete?1:0].join():0].join('|');BGsame=sig!==null&&sig===BGsig;BGsig=sig;if(BGsame)return BG}c.drawImage(sA||base,0,0,W,H);if(sB2&&ph.m>0){c.globalAlpha=ph.m;c.drawImage(sB2,0,0,W,H);c.globalAlpha=1}
+ const ok=v=>v&&v.readyState>=2&&v.videoWidth>0;const pick=(v,n)=>ok(v)?v:(n!=='night'&&imOk(poster(n))?poster(n):null);const sA=pick(A,va),sB2=B?pick(B,vb):null;/* BGONCE1 · the plate is re-composited and re-uploaded only when it changes: playing footage or an animated overlay (rain, snow, hail, wet, flash, accumulation) changes every frame; a still poster under steady sky is uploaded once and again only when phase blend, daylight, cloud amount or whole-pixel cloud drift moves (a per-frame full-res upload starved the GPU) */{const vidOn=ok(base)||ok(sA)||ok(sB2)||FSX.L.some(l=>l[2]>0&&ok(FXV[l[0]].v)),fxOn=ENV.flash>.01||ENV.wet>.01||ENV.driz*.3>.01||Math.max(ENV.rain,ENV.driz*.25)>.02||ENV.snow>0||ENV.acc>.01||ENV.hail>.5;const sig=vidOn||fxOn?null:[MOON1.key(envNow()),W,H,sA?sA.src:'-',sB2?sB2.src:'-',imOk(base)?1:0,Math.round(ph.m*255),Math.round(ENV.day*255),ENV.cloud>.02?[Math.round(ENV.cloud*255),Math.round((windOff*ENV.ws*.6*sx)%(W*1.5)),SKY&&SKY.complete?1:0].join():0].join('|');BGsame=sig!==null&&sig===BGsig;BGsig=sig;if(BGsame)return BG}c.drawImage(sA||base,0,0,W,H);if(sB2&&ph.m>0){c.globalAlpha=ph.m;c.drawImage(sB2,0,0,W,H);c.globalAlpha=1}
  // 3) porch skeleton: hold it still (the plate's continuous arm wave read as a stiff prop) -> feathered still patch per source
  {const sp=(v,nm,al,bx)=>{if(!ok(v)||al<=0)return;let P0=SKP[nm+'_'+bx[0]];const r=[bx[0]*sx,bx[1]*sy,bx[2]*sx,bx[3]*sy];
    if(!P0){P0=SKP[nm+'_'+bx[0]]=document.createElement('canvas');P0.width=Math.ceil(r[2]);P0.height=Math.ceil(r[3]);const k=P0.getContext('2d');k.drawImage(v,r[0]*v.videoWidth/W,r[1]*v.videoHeight/H,r[2]*v.videoWidth/W,r[3]*v.videoHeight/H,0,0,r[2],r[3]);
@@ -455,6 +482,8 @@ let BGsig=null,BGsame=false;function bgCompose(){const PN=poster('night'),vR=V.r
     const g2=k.createLinearGradient(0,0,0,r[3]);g2.addColorStop(0,'rgba(0,0,0,0)');g2.addColorStop(f/r[3],'#000');g2.addColorStop(1-f/r[3],'#000');g2.addColorStop(1,'rgba(0,0,0,0)');k.fillStyle=g2;k.fillRect(0,0,r[2],r[3])}
    c.globalAlpha=al;c.drawImage(P0,r[0],r[1]);c.globalAlpha=1};
   for(const bx of(mode==='wall'?[[925,135,165,210],[95,10,310,310]]:[[...PMM(925,135),165*.786,210*.786],[30,65,320,280]])){sp(A,va,1,bx);if(B&&ph.m>0)sp(B,vb,ph.m,bx)}}
+ /* MOON1: the real phase over the night plate's baked moon, weighted by how much of the frame is the night plate */
+ try{MOON1.mask(c,P,sx,sy,(!sA||va==='night'?1:0)*(1-(sB2?ph.m:0))+(sB2&&vb==='night'?ph.m:0),envNow())}catch(e){}
  for(const l of FSX.L){const v=FXV[l[0]].v;if(ok(v)&&l[2]>0){c.globalAlpha=l[2];c.drawImage(v,0,0,W,H);c.globalAlpha=1}}
  const night=1-ENV.day;
  // wet surfaces: the night-rain footage (true footage) in night phases; day phases get a composited sheen
