@@ -14,7 +14,7 @@
   var pass = new URLSearchParams();
   ["phase", "weather", "wind", "dir"].forEach(function (k) { if (q.get(k)) pass.set(k, q.get(k)); });
   pass.set("embed", "1");
-  pass.set("v", "SOFTGL2"); /* cache-bust scene.html (SH1 band mode, LHV1 poster fallback, BGONCE1 plate uploaded only on change, SOFTGL1 poster at once with no GPU, SOFTGL2 that poster follows the real hour) */
+  pass.set("v", "MOON1"); /* cache-bust scene.html (MOON1 real moon phase and horizon, SH1 band mode, LHV1 poster fallback, BGONCE1 plate uploaded only on change, SOFTGL1 poster at once with no GPU, SOFTGL2 that poster follows the real hour) */
   /* SCENEHERO1: pages with a scene-hero hook open the scene in band framing on portrait screens (night/scene-hero.js places the band) */
   if (document.documentElement.hasAttribute("data-sh") && innerWidth / innerHeight < 0.8 && q.get("hero") !== "0") pass.set("band", "1");
   var fr, btn, on = false, ready = false;

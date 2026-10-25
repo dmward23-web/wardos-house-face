@@ -16,7 +16,7 @@ test("static: software WebGL is decided before any GL work, and only ?gl=soft ke
   assert.match(s, /get\('gl'\)==='soft'\)return false/, "?gl=soft is the only way to keep the live scene on software WebGL");
   assert.match(s, /function fbSoft\(\)\{if\(RM\.matches\)return fbRM\(\);FB\.tries=1;fbPoster\('software-gl'\)/, "poster through the governor, no retry");
   assert.match(s, /\nelse if\(SOFTGL\)fbSoft\(\);\nelse fbStart\(\);/);
-  assert.match(read("night/night-host.js"), /pass\.set\("v", "SOFTGL2"\)/, "scene.html cache token bumped");
+  assert.match(read("night/night-host.js"), /pass\.set\("v", "MOON1"\)/, "scene.html cache token bumped");
 });
 
 test("static: Back from a board leaves by 900 ms even when the fade frames are slow", () => {
