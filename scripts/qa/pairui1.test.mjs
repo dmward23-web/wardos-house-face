@@ -45,7 +45,7 @@ test("PAIRUI1 · unpaired: exactly one pairing prompt, no empty Needs pairing ca
       const s = r[k][t];
       assert.equal(s.pairState, "hub-no-key", k + " " + J(s));
       assert.equal(s.leavebyVisible, 0, k + " " + t + " no strip card under the clock " + J(s));
-      const prompts = s.needs.filter((c) => !/^hub-cam-rest-word$|^hub-lights-pairword$/.test(c));
+      const prompts = s.needs.filter((c) => !/^hub-cam-rest-word$|^hub-lights-pairword(-word)?$/.test(c));
       assert.equal(prompts.length, 1, k + " " + t + " one prompt " + J(s));
     }
   }
@@ -87,9 +87,9 @@ test("PAIRUI1 · source: readyWord has no Ready, the cam word keeps Camera resti
   const N = read("house-nest.js");
   assert.match(N, /restWord = why === "pair" \? "Needs pairing" : "Camera resting"/);
   assert.match(read("sheet-index.html"), /house-board-strip\.js\?v=PAIRUI1/);
-  assert.match(read("sheet-index.html"), /house-lights\.js\?v=PAIRUI1B"/);
+  assert.match(read("sheet-index.html"), /house-lights\.js\?v=CAMREST4"/); /* CAMREST4 · re-tokened */
   assert.match(read("sheet-index.html"), /house-nest\.js\?v=CAMREST3"/); /* CAMREST3 · house-nest.js changed again */
-  assert.match(read("kid-harris.html"), /house-lights\.js\?v=PAIRUI1B"/);
+  assert.match(read("kid-harris.html"), /house-lights\.js\?v=CAMREST4"/); /* CAMREST4 · re-tokened */
 });
 
 test("PAIRUI1b · the lights pair pill is the camera rest pill: same glow, fill, border and word", SKIP, async () => {
@@ -98,6 +98,7 @@ test("PAIRUI1b · the lights pair pill is the camera rest pill: same glow, fill,
     const { lights, cam } = r[k].t1.pill;
     assert.ok(lights && cam, k + " both pills visible " + J(r[k].t1.pill));
     assert.match(lights.shadow, /rgba\(232, 163, 61, 0\.45\) 0px 0px 14px/, k + " glow");
+    assert.equal(lights.boxWeight, "400", k + " CAMREST4 · pill box weight 400, as the cam rest pill"); assert.equal(lights.bg, "rgba(28, 18, 8, 0.82)", k + " dark fill");
     assert.deepEqual(lights, cam, k + " lights pill matches cam pill");
   }
 });

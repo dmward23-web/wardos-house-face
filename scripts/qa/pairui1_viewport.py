@@ -44,10 +44,10 @@ SNAP = """() => {
     switches: [...document.querySelectorAll('#hub-lights-grid button, #hub-lights-grid [role=switch]')].filter(vis).length,
     kidPad: [...document.querySelectorAll('.kid-light-pad .light-pad-state')].map(e => e.textContent.trim()),
     pill: (() => { const l = document.querySelector('.hub-lights-pairword'), c = document.querySelector('.hub-cam-rest-pill');
-      const f = e => { if (!e || !vis(e)) return null; const cs = getComputedStyle(e); return { shadow: cs.boxShadow, bg: cs.backgroundColor, border: cs.borderTopColor + ' ' + cs.borderTopWidth, color: getComputedStyle(e.lastChild && e.lastChild.nodeType === 1 ? e.lastChild : e).color, weight: cs.fontWeight }; };
-      const cw = c && c.querySelector('.hub-cam-rest-word'); const cam = f(c); if (cam && cw) { cam.color = getComputedStyle(cw).color; cam.weight = getComputedStyle(cw).fontWeight; }
-      const lt = f(l); if (lt) { lt.color = getComputedStyle(l).color; lt.weight = getComputedStyle(l).fontWeight; }
-      return { lights: lt, cam }; })(),
+      /* CAMREST4 · compare box to box (glow, fill, border, weight 400) and word to word (colour, weight) */
+      const f = (e, wsel) => { if (!e || !vis(e)) return null; const cs = getComputedStyle(e), wd = e.querySelector(wsel) || e, ws = getComputedStyle(wd);
+        return { shadow: cs.boxShadow, bg: cs.backgroundColor, border: cs.borderTopColor + ' ' + cs.borderTopWidth, boxWeight: cs.fontWeight, color: ws.color, weight: ws.fontWeight }; };
+      return { lights: f(l, '.hub-lights-pairword-word'), cam: f(c, '.hub-cam-rest-word') }; })(),
     panel: (() => { const P = document.getElementById('hub-lights-panel'), g = document.querySelector('.hub-lights-pairword');
       if (!P || !vis(P)) return null; const r = P.getBoundingClientRect(); const q = g && vis(g) ? g.getBoundingClientRect() : null;
       return { w: Math.round(r.width), h: Math.round(r.height), pillH: q ? Math.round(q.height) : 0, pillW: q ? Math.round(q.width) : 0 }; })(),

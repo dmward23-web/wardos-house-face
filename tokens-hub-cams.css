@@ -269,6 +269,9 @@ html body .hub-cam.hub-cam-resting img.hub-cam-media {
 .hub-cam-rest {
   position: relative;
   overflow: hidden;
+  /* CAMREST4 · clip, not a scroll box: the grove's 6px blur bleed (::before inset -6px) is painted away as before,
+     but no longer counts as scrollable overflow (Alfred clip 3 on resting tiles); old engines keep hidden */
+  overflow: clip;
   display: flex;
   align-items: center;
   justify-content: center;

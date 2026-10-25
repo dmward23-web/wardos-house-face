@@ -26,6 +26,9 @@ class Q(SimpleHTTPRequestHandler):
             if mode != "nofeed" and f and os.path.isfile(f):
                 hits.append(m.group(1))
                 if mode == "slow": time.sleep(5)
+                # CAMREST4 · AINSJAR1 race: a loopback feed can paint EMPTY before the domcontentloaded sample, so that
+                # "pre-data" sample was not pre-data (failed 1 in 3 on base 239004c8 and on tip). Hold the jarState feed 1.5 s.
+                if mode in ("trusted", "other") and m.group(1) == "kids-week": time.sleep(1.5)
                 body = open(f, "rb").read()
                 if mode in ("trusted", "other") and m.group(1) == "kids-week":
                     d = json.loads(body); d.setdefault("kids", {}).setdefault("ainsley", {})["jarState"] = "trusted" if mode == "trusted" else "empty"; body = json.dumps(d).encode()

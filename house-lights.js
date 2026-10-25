@@ -934,13 +934,15 @@
       /* PAIRUI1b · the pill is the accepted camera rest pill (tokens-hub-cams.css .hub-cam-rest-pill): same fill, border,
          glow and word; phone uses the cam row's tight size, desk the full size */
       ".hub-lights-pairword{display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border-radius:999px;white-space:nowrap;" +
-      "background:rgba(28,18,8,.82);border:1.5px solid #e8a33d;box-shadow:0 0 14px rgba(232,163,61,.45),inset 0 0 8px rgba(232,163,61,.18)!important;" +
-      "font-family:'Inter Display','Inter',system-ui,sans-serif;font-weight:500;font-size:16px;letter-spacing:.02em;line-height:1.2;color:#ffe2b0;" +
-      "animation:pairui1Fade .6s ease-out both}" +
+      "background:rgba(28,18,8,.82)!important;border:1.5px solid #e8a33d;box-shadow:0 0 14px rgba(232,163,61,.45),inset 0 0 8px rgba(232,163,61,.18)!important;" +
+      "font-weight:400!important;font-size:16px;animation:pairui1Fade .6s ease-out both}" +
+      /* CAMREST4 · same build as the cam rest pill: the pill box is weight 400 (as .hub-cam-rest-pill), the word inside
+         is the rest word (.hub-cam-rest-word: Inter Display 500, 16px, warm) */
+      ".hub-lights-pairword .hub-lights-pairword-word{font-family:'Inter Display','Inter',system-ui,sans-serif;font-weight:500;font-size:16px;letter-spacing:.02em;line-height:1.2;color:#ffe2b0}" +
       ".hub-lights-pairword i{flex:none;width:6px;height:6px;border-radius:50%;background:#e8a33d;display:inline-block;animation:pairui1Pulse 2.4s ease-in-out infinite}" +
       "@keyframes pairui1Fade{from{opacity:0}to{opacity:1}}" +
       "@keyframes pairui1Pulse{0%,100%{opacity:.5}50%{opacity:1}}" +
-      "@media (max-width:600px){.hub-lights-pairword{padding:5px 10px;gap:5px;font-size:14px;letter-spacing:.01em}}" +
+      "@media (max-width:600px){.hub-lights-pairword{padding:5px 10px;gap:5px;font-size:14px}.hub-lights-pairword .hub-lights-pairword-word{font-size:14px;letter-spacing:.01em}}" +
       /* PAIRUI1b · desk: the unpaired panel collapses to one compact LIGHTS row sized to the pill, no empty dark box */
       "@media (min-width:601px){" +
       "html body .panel.panel.panel.panel #hub-lights-panel[data-pair-need]{height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important;" +
@@ -968,7 +970,7 @@
     panel.setAttribute("data-pair-need", "");
     hubPairHideBits(panel, true);
     if (!grid.querySelector(".hub-lights-pairword")) {
-      grid.innerHTML = '<span class="hub-lights-pairword" role="status" data-pair-word=""><i aria-hidden="true"></i>Needs pairing</span>';
+      grid.innerHTML = '<span class="hub-lights-pairword" role="status" data-pair-word=""><i aria-hidden="true"></i><span class="hub-lights-pairword-word">Needs pairing</span></span>';
     }
     return true;
   }
@@ -1324,14 +1326,43 @@
     };
   }
 
+  /* CAMREST4 · kid-world hides the legacy panel (opacity 0, clipped) and paints its canvas over the page, so a pad left
+     there is never seen and its taps land on the canvas. Once the world has booted, the SAME host node moves onto the
+     world stage (.kw-light): paintKidPad keeps painting it and its taps stay on setLight, the desk boards' write path.
+     A revoked or missing key says Not connected in plain words (wg-glass hides need pills elsewhere). */
+  var KID_LIGHT_CSS = ".kw-light { position:absolute; left:12px; bottom:74px; z-index:5; pointer-events:auto; width:min(300px, calc(100vw - 150px)); } .kw-light, .kw-light * { pointer-events:auto; } .kw-light .light-pad { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:16px; background:rgba(18, 34, 64, 0.94); border:1px solid rgba(255, 214, 102, 0.7); color:#fff8e6; box-shadow:0 2px 10px rgba(0,0,0,0.45); } .kw-light .light-pad.is-on { border-color:#ffd666; box-shadow:0 0 16px rgba(255, 214, 102, 0.55); } .kw-light .light-pad-top { display:flex; align-items:center; gap:8px; flex:1; min-width:0; } .kw-light .light-pad-ico { font-size:20px; line-height:1; flex:none; } .kw-light .light-pad-name { font:700 15px/1.2 system-ui, sans-serif; color:#fff8e6; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .kw-light .light-pad-where, .kw-light .light-pad-src, .kw-light .kid-light-link { display:none !important; } .kw-light .light-pad-actions { display:flex; align-items:center; gap:8px; flex:none; } .kw-light .light-bright { display:none; } .kw-light .kid-light-miss { font:600 14px/1.2 system-ui, sans-serif; color:#fff8e6; background:rgba(18,34,64,0.94); border-radius:16px; padding:8px 12px; } html body .kid-light-host .light-pad-state.cmd-pill--need { display:inline-flex !important; visibility:visible !important; opacity:1 !important; } html body .kw-light .light-pad-state.cmd-pill { display:inline-flex !important; white-space:nowrap; flex:none; font-size:12px; } html body .kw-light .light-pad-state.cmd-pill--need { background:rgba(255, 244, 220, 0.95) !important; color:#3a2306 !important; border:1px solid #e8a33d !important; }";
+  function kidLightStyle(doc) {
+    if (doc.getElementById("camrest4-kid-light")) return;
+    var st = doc.createElement("style");
+    st.id = "camrest4-kid-light";
+    st.textContent = KID_LIGHT_CSS;
+    (doc.head || doc.documentElement).appendChild(st);
+  }
+  function kidLightLift(host, doc) {
+    var stage = doc.querySelector(".kw-stage");
+    if (!stage || !doc.body || !doc.body.classList.contains("kw-on")) return false;
+    var p = host.parentNode;
+    if (p && p.classList && p.classList.contains("kw-light")) return true;
+    var wrap = doc.createElement("div");
+    wrap.className = "kw-light";
+    wrap.setAttribute("aria-label", "Light");
+    wrap.appendChild(host);
+    stage.appendChild(wrap);
+    return true;
+  }
   function mountKidLight(selector, lightId) {
     var doc = document;
     var host = typeof selector === "string" ? doc.querySelector(selector) : selector;
     if (!host || !lightId) return;
     function repaint() { paintKidPad(host, lightId, doc); }
+    kidLightStyle(doc);
     onChange(repaint);
     startPolling();
     repaint();
+    var tries = 0;
+    function lift() { if (!kidLightLift(host, doc) && ++tries < 40) setTimeout(lift, 250); }
+    if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", function () { setTimeout(lift, 0); });
+    else setTimeout(lift, 0);
   }
 
   global.HouseLights = {
