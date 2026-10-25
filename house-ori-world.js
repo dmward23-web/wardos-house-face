@@ -1210,7 +1210,7 @@
         catch (e) { location.href = "sheet-index.html"; }
       }
       fadeCover(iris, 0, 1, 540, goHome);
-      setTimeout(goHome, 900);
+      setTimeout(goHome, 800); /* BACKCAP1: 800 so a busy main thread still leaves by 900 */
     });
   }
   window.addEventListener("pagehide", function () {

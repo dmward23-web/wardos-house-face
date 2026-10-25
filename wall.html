@@ -623,7 +623,16 @@ function fbIdle(){clearTimeout(FB.it);FB.it=0;if(FB.mode!=='poster'||FB.tries>=1
 function fbRetry(){FB.it=0;if(FB.mode!=='poster'||FB.tries>=1||RM.matches)return;if(document.visibilityState!=='visible'){FB.waitVis=1;return}FB.tries++;fbLive()}
 for(const ev of['pointerdown','keydown','wheel'])addEventListener(ev,()=>{if(FB.mode==='poster'&&FB.it)fbIdle()},{capture:true,passive:true});
 document.addEventListener('visibilitychange',()=>{fbReset();if(!document.hidden&&FB.waitVis){FB.waitVis=0;fbIdle()}});
-function fbRM(){if(RM.matches){fbPoster('reduced-motion');const w=()=>{if(FB.mode!=='poster'||!RM.matches)return;if(ready&&imOk(poster('night'))){try{step(0)}catch(e){}fbDraw()}else setTimeout(w,120)};w()}
+/* SOFTGL2 · a still poster (no GPU, or reduced motion) is the live scene's own plate for the real hour: the same phaseAt over the real KC sun and the
+   same bgCompose (the moon is that plate's own, as in the live scene). It waits for THAT phase's plate, never the night plate standing in, and is
+   redrawn on the clock's minute tick and the moment the phase changes. */
+function fbKey(ph){return PHK[ph.A].vid+(ph.m>0?'+'+PHK[ph.B].vid+'@'+Math.round(ph.m*20):'')}
+function fbPlateOk(){const ph=ENV.phase;return imOk(poster('night'))&&[ph.A,ph.m>0?ph.B:ph.A].every(n=>PHK[n].vid==='night'||imOk(poster(PHK[n].vid)))}
+function fbStillDraw(why){if(FB.why!==why||FB.mode!=='poster')return true;try{envStep(2);step(0)}catch(e){}if(!ready||!fbPlateOk())return false;fbDraw();FB.plate=fbKey(ENV.phase);FB.drawAt=envNow();FB.draws=(FB.draws||0)+1;return true}
+function fbStill(why){try{envStep(2)}catch(e){}if(PO&&!fbPlateOk()){const c=PO.getContext('2d');c.setTransform(1,0,0,1,0,0);c.fillStyle='#04060a';c.fillRect(0,0,PO.width,PO.height)}/* same task as fbPoster's draw: no night stand-in paints */
+ const go=()=>{const w=()=>{if(FB.why===why&&!fbStillDraw(why))setTimeout(w,120)};w()};go();clearInterval(FB.st);let mk=Math.floor(envNow()/6e4);
+ FB.st=setInterval(()=>{if(FB.why!==why||FB.mode!=='poster'){clearInterval(FB.st);FB.st=0;return}const k=Math.floor(envNow()/6e4);let pk=FB.plate;try{pk=fbKey(QP&&PHK[QP]?{A:QP,B:QP,m:0}:phaseAt(envNow()))}catch(e){}if(k!==mk||pk!==FB.plate){mk=k;go()}},1000)}
+function fbRM(){if(RM.matches){fbPoster('reduced-motion');fbStill('reduced-motion')}
  else if(FB.mode==='poster'&&FB.why==='reduced-motion')fbLive()}
 RM.addEventListener&&RM.addEventListener('change',()=>{if(!MANUAL)fbRM()});
 function fbStart(){if(RM.matches)return fbRM();fbMode('live');RAF=requestAnimationFrame(loop)}
