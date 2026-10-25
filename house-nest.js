@@ -592,6 +592,8 @@
   }
   /* "pair" when the camera feed says the device key or the Google consent is refused (401/403 or need_token) */
   function hubFeedWhy(data) {
+    /* PAIRUI1 · an unpaired Dad screen never reaches the feed (no key or no hub), so it is a pairing rest, not an outage */
+    try { var P0 = global.PrivateFeed; if (P0 && typeof P0.needsPairing === "function" && P0.needsPairing()) return "pair"; } catch (_) {}
     if (data && data.status === "need_token") return "pair";
     if (_liveErr === 401 || _liveErr === 403) return "pair";
     var PF = global.PrivateFeed;
@@ -656,7 +658,13 @@
         rest.appendChild(p);
         wrap.insertBefore(rest, wrap.firstChild);
       }
-      if (rest) rest.style.display = "";
+      if (rest) {
+        rest.style.display = "";
+        /* PAIRUI1 · the visible word says plainly when the camera needs pairing; a real outage keeps "Camera resting" */
+        var rw = rest.querySelector(".hub-cam-rest-word");
+        var restWord = why === "pair" ? "Needs pairing" : "Camera resting";
+        if (rw && rw.textContent !== restWord) rw.textContent = restWord;
+      }
       hubRestPrivacy(el, label);
     } else {
       var was = el.classList.contains("hub-cam-resting");

@@ -131,7 +131,9 @@
   /* HUBPAIR1 · halloween1 said "Ready" for a screen that cannot reach the house. On a Dad screen that is not paired
      (no key, or a key with no valid hub) say Needs pairing; kid boards keep the plain word. */
   function pairNeeded() { try { var P = window.PrivateFeed; return !!(P && typeof P.needsPairing === "function" && P.needsPairing()); } catch (e) { return false; } }
-  function readyWord(up) { var n = pairNeeded(); return up ? (n ? "NEEDS PAIRING" : "READY") : (n ? "Needs pairing" : "Ready"); }
+  /* PAIRUI1 · DETAIL LAW: readyWord only runs for a screen that cannot reach the lights (no key, no hub, or the hub refused
+     the key), so it never says Ready. Dad screens say Needs pairing; kid boards and forced-offline previews say Not connected. */
+  function readyWord(up) { var n = pairNeeded(); return up ? (n ? "NEEDS PAIRING" : "NOT CONNECTED") : (n ? "Needs pairing" : "Not connected"); }
   function noKey(g) { g = g || gate(); return !!(g.live && g.writeSupported && !hasKey()); }
   /* Cloud preview has no Kasa key. The wall and phone still follow the main write path. */
   function previewHost() {
@@ -922,6 +924,43 @@
     return { gate: eff.gate, lights: out, canWrite: canWrite() };
   }
 
+  function hubPairStyle(doc) {
+    if (doc.getElementById("pairui1-lights")) return;
+    var st = doc.createElement("style");
+    st.id = "pairui1-lights";
+    st.textContent =
+      "#hub-lights-panel[data-pair-need] .hub-lights-bulk,#hub-lights-panel[data-pair-need] .hub-lights-more,#hub-lights-panel[data-pair-need] .hub-lights-sub{display:none!important}" +
+      "#hub-lights-panel[data-pair-need] .hub-lights-grid{display:flex!important;align-items:center;justify-content:flex-start;min-height:0}" +
+      ".hub-lights-pairword{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;font:700 14px/1.2 Inter,system-ui,sans-serif;" +
+      "letter-spacing:.02em;color:#ffe2b0;background:rgba(28,18,8,.82);border:1.5px solid #e8a33d;white-space:nowrap;animation:pairui1Fade .6s ease-out both}" +
+      ".hub-lights-pairword i{width:6px;height:6px;border-radius:50%;background:#e8a33d;display:inline-block}" +
+      "@keyframes pairui1Fade{from{opacity:0}to{opacity:1}}" +
+      "@media (prefers-reduced-motion: reduce){.hub-lights-pairword{animation:none}}";
+    (doc.head || doc.documentElement).appendChild(st);
+  }
+  function hubPairHideBits(panel, on) {
+    /* inline !important: the hub fit layer pins these with !important rules of its own */
+    var bits = panel.querySelectorAll(".hub-lights-bulk,.hub-lights-more,.hub-lights-sub");
+    for (var i = 0; i < bits.length; i++) {
+      if (on) bits[i].style.setProperty("display", "none", "important");
+      else bits[i].style.removeProperty("display");
+    }
+  }
+  function hubPairStrip(doc, panel, grid) {
+    var need = pairNeeded() && !canWrite();
+    if (!need) {
+      if (panel.hasAttribute("data-pair-need")) { panel.removeAttribute("data-pair-need"); hubPairHideBits(panel, false); }
+      return false;
+    }
+    hubPairStyle(doc);
+    panel.setAttribute("data-pair-need", "");
+    hubPairHideBits(panel, true);
+    if (!grid.querySelector(".hub-lights-pairword")) {
+      grid.innerHTML = '<span class="hub-lights-pairword" role="status" data-pair-word=""><i aria-hidden="true"></i>Needs pairing</span>';
+    }
+    return true;
+  }
+
   function paintHubPanel(doc) {
     doc = doc || document;
     var panel = doc.getElementById("hub-lights-panel");
@@ -958,6 +997,9 @@
     var grid = doc.getElementById("hub-lights-grid");
     if (!grid) return;
     grid.classList.add("hub-lights-grid--deck9");
+    /* PAIRUI1 · an unpaired Dad screen shows one plain "Needs pairing" word in the strip: no ghosted switches, no
+       ALL OFF button that cannot work. Kid boards and paired screens keep the normal strip. */
+    if (hubPairStrip(doc, panel, grid)) return;
     var html = "";
     for (var i = 0; i < deck.lights.length; i++) {
       var L = deck.lights[i];

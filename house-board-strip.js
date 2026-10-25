@@ -1093,6 +1093,7 @@
       detail.innerHTML = "";
     }
     staleChip(!!strip._stale);
+    pairHide(!!strip._stale && pairNeededHere());
 
     _lastStrip = strip;
     _lastClock = clock;
@@ -1108,6 +1109,22 @@
         warn.textContent = "";
       }
     }
+  }
+
+  /* PAIRUI1 · an unpaired Dad screen cannot load the calendar, so the schedule card had nothing to say but a second
+     "Needs pairing" over an empty body. The page's one pairing notice (private-feed.js) already says it: the empty
+     card steps aside until the screen is paired and real schedule data arrives. Paired screens and kid boards keep it. */
+  function pairNeededHere() { try { var P = window.PrivateFeed; return !!(P && typeof P.needsPairing === "function" && P.needsPairing()); } catch (e) { return false; } }
+  function pairHide(on) {
+    try {
+      var els = document.querySelectorAll(".leaveby");
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i];
+        /* inline !important: the page layers pin the card's display with !important rules of their own */
+        if (on) { el.setAttribute("data-pair-hidden", ""); el.setAttribute("aria-hidden", "true"); el.style.setProperty("display", "none", "important"); }
+        else if (el.hasAttribute("data-pair-hidden")) { el.removeAttribute("data-pair-hidden"); el.removeAttribute("aria-hidden"); el.style.removeProperty("display"); }
+      }
+    } catch (e) { /* old browser: the card stays as it was */ }
   }
 
   /* P1FIX B33 · a stale calendar collapses the full-width leave-by banner to one small, untappable chip, so the

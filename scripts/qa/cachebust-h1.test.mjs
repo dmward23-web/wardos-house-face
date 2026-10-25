@@ -37,6 +37,10 @@ const STALE = [
   ["livinghouse/scene-packs.js", "KIDWORLD2"],
   /* H1P2D4 · the wall fit block and the hashed event id move these two off delta-3 */
   ["wg-wall-land.css", "H1P2D3"],
+  /* PAIRUI1 · the three scripts this commit changes move off their previous tokens */
+  ["house-board-strip.js", "HUBPAIR1"],
+  ["house-lights.js", "HUBPAIR1"],
+  ["house-nest.js", "CAMREST2"],
   ["livinghouse/scene-packs.js", "H1P2D3"],
   /* HUBPAIR1 · pairing hotfix: every changed script moves off the token it carried on efd454b6 */
   ["house-hub.js", "HUBPIN1"],
@@ -66,7 +70,7 @@ test("H1-CB · no served page loads a halloween1-changed asset with its pre-rang
   assert.deepEqual(hits, []);
 });
 /* HUBPAIR1 · a script changed again after halloween1 carries the newer token */
-const NEWER = { "house-board-strip.js": "HUBPAIR1", "house-lights.js": "HUBPAIR1" };
+const NEWER = { "house-board-strip.js": "PAIRUI1", "house-lights.js": "PAIRUI1" }; /* PAIRUI1 · both changed again */
 test("H1-CB · the six named scripts are re-tokened on the pages that load them", () => {
   const want = { "house-board-strip.js": "sheet-index.html", "house-lights.js": "sheet-lights.html", "house-ori-calm.js": "sheet-index.html",
     "house-spotify.js": "sheet-spotify.html", "house-trips-bind.js": "sheet-us.html", "school-names.js": "kid-hayes.html" };

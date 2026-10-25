@@ -35,12 +35,12 @@ function all() {
   return runs;
 }
 const J = (o) => JSON.stringify(o).slice(0, 1500);
-function assertRestingPrivate(snap, label, wantPill = true) {
+function assertRestingPrivate(snap, label, wantPill = true, word = "Camera resting") {
   assert.ok(snap.deckVisible, label + " deck stays visible " + J(snap));
   assert.equal(snap.tiles.length, 3, label);
   for (const t of snap.tiles) {
     assert.ok(t.visible && t.resting, label + " tile rests " + J(t));
-    if (wantPill) { assert.ok(t.restPill, label + " pill shows " + J(t)); assert.equal(t.restWord, "Camera resting"); }
+    if (wantPill) { assert.ok(t.restPill, label + " pill shows " + J(t)); assert.equal(t.restWord, word); }
     assert.ok(!t.imgVisible, label + " no broken image " + J(t));
     assert.ok(!t.statusPill, label + " no status pill " + J(t));
     assert.equal(t.names, 0, label + " no camera name while resting");
@@ -99,7 +99,7 @@ test("P2 · one camera's still failing rests only that tile; the other two stay 
 test("P3 · whole camera feed 401: tiles rest (deck stays) and say needs pairing without WebRTC; 503 rests without pairing", SKIP, async () => {
   const r = await all();
   for (const k of ["t0", "t20"]) {
-    assertRestingPrivate(r.feed401[k], "401 " + k);
+    assertRestingPrivate(r.feed401[k], "401 " + k, true, "Needs pairing"); /* PAIRUI1 · a 401 rest says plainly that it needs pairing */
     for (const t of r.feed401[k].tiles) { assert.equal(t.why, "pair", J(t)); assert.match(t.aria, /needs pairing$/); assert.ok(!/LOCKED|PAIR\b/.test(t.aria)); }
     assertRestingPrivate(r.feed503[k], "503 " + k);
     for (const t of r.feed503[k].tiles) assert.equal(t.why, "", J(t));
@@ -121,7 +121,7 @@ test("Prism spec · computed pill, art and dot (wall), reduced motion stops the 
   assertRestingPrivate(r["still5xx@440@956"].t75, "phone", false);
 });
 
-test("static · spec values in the CSS, word unchanged, no LOCKED · PAIR, cache busted", () => {
+test("static · spec values in the CSS, outage word unchanged, no LOCKED · PAIR, cache busted", () => {
   const css = read("tokens-hub-cams.css"), js = read("house-nest.js");
   for (const v of ["rgba(28, 18, 8, 0.82)", "1.5px solid #e8a33d", "999px", "padding: 8px 18px", "padding: 10px 22px", "font-size: 16px", "font-size: 15px",
     "letter-spacing: 0.02em", "#ffe2b0", "0 0 14px rgba(232, 163, 61, 0.45), inset 0 0 8px rgba(232, 163, 61, 0.18)", "2.4s", "prefers-reduced-motion"])
@@ -130,7 +130,7 @@ test("static · spec values in the CSS, word unchanged, no LOCKED · PAIR, cache
   assert.ok(js.includes('"Camera resting"'));
   assert.ok(!js.includes("LOCKED · PAIR"));
   const g = read("sheet-google-home.html");
-  assert.ok(g.includes("tokens-hub-cams.css?v=CAMREST2") && g.includes("house-nest.js?v=CAMREST2") && /private-feed\.js\?v=(?:CAMREST2|HALLOWEEN1|HUBPAIR1|HUBPAIR1B|HUBPAIR1D)"/.test(g)); /* H1-CB: halloween1 changed private-feed.js and re-tokens it */
+  assert.ok(g.includes("tokens-hub-cams.css?v=CAMREST2") && g.includes("house-nest.js?v=PAIRUI1") /* PAIRUI1 · house-nest.js changed again */ && /private-feed\.js\?v=(?:CAMREST2|HALLOWEEN1|HUBPAIR1|HUBPAIR1B|HUBPAIR1D)"/.test(g)); /* H1-CB: halloween1 changed private-feed.js and re-tokens it */
   /* sheet-index.html keeps its CAMREST1 busters in this commit: its inherited Atlas deep-link id trips PIIGUARD2 on any
      edit; the bump is a separate one-line change once that line is cleared. The page still loads these same files. */
   assert.ok(/tokens-hub-cams\.css\?v=CAMREST\d/.test(read("sheet-index.html")));
