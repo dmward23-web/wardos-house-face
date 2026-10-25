@@ -186,7 +186,13 @@ void main(){vec2 css=vec2(gl_FragCoord.x,uRes.y-gl_FragCoord.y)/uD;vec2 p=(css-u
  col+=(h(gl_FragCoord.xy+fract(uT*7.3)*vec2(97.1,57.3))-.5)*.032*(1.-lu*.5);
  gl_FragColor=vec4(col,1.);}`;
 let gl=null,U={};
-try{gl=gl$.getContext('webgl',{preserveDrawingBuffer:true,antialias:false});}catch(e){}
+/* SOFTGL1 · a screen with no GPU (software WebGL: a major performance caveat, or a SwiftShader / llvmpipe renderer) never starts the live scene.
+   (No WebGL at all reads the same way: still poster.)
+   Its first frames (shader compile + plate upload) held the whole board's main thread for seconds, so Back, taps and the
+   veil waited behind them; FRAMEBUDGET1 only judged frames after that freeze. Such a screen gets the still poster at once.
+   ?gl=soft keeps the live scene on software WebGL (QA of the frame-budget governor on a GPU-less runner). */
+const SOFTGL=(()=>{if(new URLSearchParams(location.search).get('gl')==='soft')return false;try{const c=document.createElement('canvas');const g=c.getContext('webgl',{failIfMajorPerformanceCaveat:true});if(!g)return true;const d=g.getExtension('WEBGL_debug_renderer_info'),r=d?String(g.getParameter(d.UNMASKED_RENDERER_WEBGL)||''):'';const x=g.getExtension('WEBGL_lose_context');if(x)x.loseContext();return /swiftshader|llvmpipe|softpipe|software|basic render/i.test(r)}catch(e){return false}})();
+if(!SOFTGL)try{gl=gl$.getContext('webgl',{preserveDrawingBuffer:true,antialias:false});}catch(e){}
 if(gl){const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o};
  try{const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);gl.useProgram(pr);
   const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
@@ -625,11 +631,14 @@ function fbRM(){if(RM.matches){fbPoster('reduced-motion');const w=()=>{if(FB.mod
  else if(FB.mode==='poster'&&FB.why==='reduced-motion')fbLive()}
 RM.addEventListener&&RM.addEventListener('change',()=>{if(!MANUAL)fbRM()});
 function fbStart(){if(RM.matches)return fbRM();fbMode('live');RAF=requestAnimationFrame(loop)}
+/* SOFTGL1 · no GPU: the still poster from the first frame, no render loop and no retry (the governor's own poster path, minus the freeze) */
+function fbSoft(){if(RM.matches)return fbRM();FB.tries=1;fbPoster('software-gl');const w=()=>{if(FB.why!=='software-gl')return;if(ready&&imOk(poster('night'))){try{step(0)}catch(e){}fbDraw()}else setTimeout(w,120)};w()}
 layout();
 window.__fire=n=>n==='crows'?crowLift():fire(n);
 window.__pos=n=>{let p;if(n==='pump'){const q=H.pump.reduce((a,b)=>b.r>a.r?b:a);p=[q.x,q.y]}else if(n==='ghost'){const g=H.ghosts[1];p=[g.cx,g.cy]}else if(n==='cat'){const e=eyesNow();p=[(e[0][0]+e[1][0])/2,(e[0][1]+e[1][1])/2+P.skel[3]*.1]}else if(n==='skel')p=[P.skel[0],P.skel[1]];else if(n==='owl'){const o=P.owl;p=[o[0]+o[2]*.36,o[1]+o[2]*.4]}return[p[0]*S+OX,p[1]*S+OY]};
 // manual (recording): seek footage to the exact frame time, then step
 if(MANUAL){let vt=0;const sk=(v,t)=>new Promise(r=>{if(Math.abs(v.currentTime-t)<1e-4)return r();v.addEventListener('seeked',r,{once:true});v.currentTime=t});window.__frame=async dt=>{vt=(vt+dt)%(V.duration||14.54);const L=[sk(V,vt)];for(const v of[...Object.values(PV),...Object.values(WV),...Object.values(PRV)])if(v.duration)L.push(sk(v,vt%v.duration));for(const k in FXV){const f=FXV[k];if(f.t>=0&&f.v.duration)L.push(sk(f.v,Math.min(f.t,f.v.duration-.01)))}await Promise.all(L);step(dt);tick()};window.__ready=()=>ready&&V.duration>0&&[...Object.values(PV),...Object.values(WV),...Object.values(PRV)].every(v=>v.readyState>=2)&&Object.values(FXV).every(f=>f.v.readyState>=1)}
+else if(SOFTGL)fbSoft();
 else fbStart();
 fxStart('ghost-black');fxStart('owl-packed');
 {const b=document.getElementById('snd');const tg=e=>{e.preventDefault();e.stopPropagation();SND.user=!SND.on;sndSet(!SND.on)};b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('pointerup',e=>e.stopPropagation());b.addEventListener('click',tg)}

@@ -1200,11 +1200,17 @@
       document.body.appendChild(iris);
       void iris.offsetWidth;
       /* Step the fade on painted frames, then load home fresh so the next
-         document's first frame is the same veil. */
-      fadeCover(iris, 0, 1, 540, function () {
+         document's first frame is the same veil. BACKCAP1 · a slow frame never
+         holds Back: home loads by 900 ms even if the fade has not finished. */
+      var gone = false;
+      function goHome() {
+        if (gone) return;
+        gone = true;
         try { location.replace("sheet-index.html"); }
         catch (e) { location.href = "sheet-index.html"; }
-      });
+      }
+      fadeCover(iris, 0, 1, 540, goHome);
+      setTimeout(goHome, 900);
     });
   }
   window.addEventListener("pagehide", function () {

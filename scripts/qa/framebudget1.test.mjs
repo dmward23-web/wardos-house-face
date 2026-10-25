@@ -52,7 +52,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 test("browser: a forced slow frame falls back to the poster and no rAF runs after the fallback", { skip: SKIP, timeout: 120000 }, async () => {
   await withScene(async (b, base) => { for (const f of ["night/scene.html", "wall.html"]) {
     const g = await b.newPage(); await g.setViewport({ width: 440, height: 956 }); await g.evaluateOnNewDocument(HOOK);
-    await g.goto(base + "/" + f, { waitUntil: "load" });
+    /* SOFTGL1 · this runner is software WebGL, where scene.html now shows the poster at once; ?gl=soft keeps its live scene so the governor is still the thing under test */
+    await g.goto(base + "/" + f + (f === "night/scene.html" ? "?gl=soft" : ""), { waitUntil: "load" });
     await g.waitForFunction(() => window.__fb && document.documentElement.getAttribute("data-scene-mode"), { timeout: 30000, polling: 100 });
     await g.evaluate(() => { window.__slow = true; });
     await g.waitForFunction(() => document.documentElement.getAttribute("data-scene-mode") === "poster", { timeout: 30000, polling: 100 });
