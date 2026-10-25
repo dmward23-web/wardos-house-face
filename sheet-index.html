@@ -4467,6 +4467,10 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
     panel.style.transform = "scale(" + s + ")";
     /* center horizontally if leftover width (should be ~0 on true portrait wall) */
     var ox = Math.max(0, (vw - 1080 * s) / 2);
+    /* WIDE2560 · a landscape canvas is as wide as the window, not 1080: at very wide sizes (2560) that offset pushed its right column past the
+       edge. Only then, centre the real scaled width instead; 1280 and 1920 keep the offset they had */
+    var pw = (panel.offsetWidth || 1080) * s;
+    if (ox + pw > vw) ox = Math.max(0, (vw - pw) / 2);
     var oy = Math.max(0, (vh - 1920 * s) / 2);
     /* AUDIT1 · !important so the kit's .panel margin rules can't pin the canvas left on landscape;
        reclaim the unscaled height so a scaled canvas doesn't scroll */
