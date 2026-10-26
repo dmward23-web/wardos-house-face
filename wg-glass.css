@@ -42,8 +42,7 @@ body[data-asset-on][data-kid-world]::before { content: ""; position: fixed; inse
 .house-snd svg { stroke: #3a2408; }
 /* WGQUIET1 · no pairing / offline status pill on any board (the controls stay, the state lives on data attributes) */
 .cmd-pill--need, [data-private-feed-flag], .lh-feedtag { display: none !important; }
-/* KIDZ1 · Halloween plate sits above the kid-world painted scene (canvas z1, wash z0) and below the stage/HUD (z3+); pointer-events none keeps canvas taps alive */
-body[data-asset-on][data-kid-world]::before { z-index: 2 !important; }
+/* HOTFIX1 · KIDZ1 lift removed: the costume plate (body::before, z0 at the base rule above) stays under .kw-canvas (z1) so chores, jar and creature are never covered */
 /* HUBTXT1 · Halloween hub: no status pills or status words (Now/Peek/Due/Plan/Soon/Idea/OPEN/READY); small text stays legible */
 .tile-mchip, .tile-tap, #hub-lights-pill, #hub-lights-sub { display: none !important; }
 .tile-fact, .tile-sub { font-size: max(13px, 0.82rem) !important; color: rgba(246, 230, 200, .88) !important; letter-spacing: .01em; }

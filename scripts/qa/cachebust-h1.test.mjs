@@ -45,6 +45,8 @@ const STALE = [
   ["house-lights.js", "CAMREST4"], /* CAMREST5 · house-lights.js changed again (kid pad CSS) */
   ["house-nest.js", "CAMREST2"],
   ["livinghouse/scene-packs.js", "H1P2D3"],
+  /* HOTFIX1 · wg-glass.css drops the KIDZ1 plate lift; every page moves off COLDLOAD1 */
+  ["wg-glass.css", "COLDLOAD1"],
   /* HUBPAIR1 · pairing hotfix: every changed script moves off the token it carried on efd454b6 */
   ["house-hub.js", "HUBPIN1"],
   ["house-pair.js", "HUBPIN1"],

@@ -19,7 +19,7 @@ test("COLDLOAD1 static: idempotent skin, font swap + fonts.ready re-skin, 14 px 
   assert.doesNotMatch(CSS, /font-display:\s*block/); assert.equal((CSS.match(/font-display: swap/g) || []).length, 3);
   assert.match(GL, /@media \(max-width: 600px\) \{ \.md, \.kf-kicker, \.tile-mchip, \.tile-fact, \.tag \{ font-size: max\(14px, 1em\) !important; \} \}/);
   assert.doesNotMatch(GL, /11\.5px/);
-  for (const t of ['src="../wg-sway.js?v=COLDLOAD1"', 'src="../wg-assets.js?v=COLDLOAD1"', 'href="lh.css?v=LHPATH3"', 'href="../wg-glass.css?v=COLDLOAD1"']) assert.ok(LH.includes(t), t);
+  for (const t of ['src="../wg-sway.js?v=COLDLOAD1"', 'src="../wg-assets.js?v=COLDLOAD1"', 'href="lh.css?v=LHPATH3"', 'href="../wg-glass.css?v=HOTFIX1"']) assert.ok(LH.includes(t), t);
   assert.match(LH, /<i class="lh-tallbg"[^>]* data-asset-v="LHPATH3"[^>]*data-asset="backgrounds\/bg-phone-night-v2-nomoon\.webp\|[^"]*phone-extension-bg-night-v2-440x956\.webp/);
   assert.match(WA, /q = el\.getAttribute\("data-asset-v"\), src = base \+ name \+ \(q \? "\?v=" \+ encodeURIComponent\(q\) : ""\)/);
   for (const f of fs.readdirSync(ROOT).filter((f) => f.endsWith(".html"))) assert.doesNotMatch(R(f), /wg-glass\.css\?v=WGGLASS1/, f);
