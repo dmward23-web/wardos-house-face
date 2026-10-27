@@ -165,7 +165,8 @@ test("MERCNODATA1 (real browser): mercury-run.html paints the world, not a black
     }
   });
 
-test("FOLLOWUP1 (real browser): mercury-run paints before data, and a 5 s hub with a full jar starts play once",
+/* ORI1 (always open): the run plays from the start; data arriving late only grows the blob. Expectations updated, not run here (render-needed). */
+test("FOLLOWUP1 (real browser): mercury-run paints before data and plays at once; a 5 s hub never restarts play (ORI1 always open)",
   { skip: !browser && "QA_NO_BROWSER=1 or python playwright missing" }, () => {
     const run = (mode) => {
       const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/slow_hub.py"), mode, "5"], { encoding: "utf8", timeout: 120000 });
@@ -175,11 +176,11 @@ test("FOLLOWUP1 (real browser): mercury-run paints before data, and a 5 s hub wi
     const full = run("full");
     assert.ok(full.seeded > 0 && full.hub_hits > 0, JSON.stringify(full));
     assert.ok(full.early_lit > 0.3, "canvas black at 1.2 s: " + JSON.stringify(full));
-    assert.deepEqual(full.at_4500, { gather: true, hud: 0 }, "empty start at 4.5 s");
-    assert.deepEqual(full.after_hub, { gather: false, hud: 1 }, "full jar from the slow hub plays once");
+    assert.deepEqual(full.at_4500, { gather: false, hud: 1 }, "ORI1: plays before data at 4.5 s, no gather gate");
+    assert.deepEqual(full.after_hub, { gather: false, hud: 1 }, "full jar from the slow hub: still one HUD (plays once)");
     assert.deepEqual(full.errors, []);
     const empty = run("empty");
-    assert.deepEqual(empty.after_hub, { gather: true, hud: 0 }, "a not-full jar stays on gather");
+    assert.deepEqual(empty.after_hub, { gather: false, hud: 1 }, "ORI1: a not-full jar still plays");
     assert.deepEqual(empty.errors, []);
   });
 
