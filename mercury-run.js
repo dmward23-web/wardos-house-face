@@ -50,12 +50,11 @@
     });
     Promise.all(jobs).then(function () { runPlatesReady = true; skyToJar(); });
   }
-  /* ORI1 · Phase 2 art slots (Prism photoreal). Each slot is null until a Phase 2 manifest names a file
+  /* ORI1 · Phase 2 art slots for the day pebbles (Prism). Each slot is null until a Phase 2 manifest names a file
      (HousePlates.mercury.slots[slot] = url, or ?artslots=1 with the default names below); a null slot keeps the interim
-     procedural art. Slots: blob.<kid> creature sprite, pebble.on / pebble.off day pebbles, finale grove plate. */
-  var ART_SLOTS = { "blob.hayes": null, "blob.harris": null, "blob.ainsley": null, "pebble.on": null, "pebble.off": null, "finale": null };
-  var ART_DEFAULTS = { "blob.hayes": "assets/ori/creature/idle.webp", "blob.harris": "assets/ori/creature/harris.webp", "blob.ainsley": "assets/ori/creature/ainsley.webp",
-    "pebble.on": "art/mercury/pebbles/on.png", "pebble.off": "art/mercury/pebbles/off.png", "finale": "art/mercury/finale/grove.png" };
+     pebbles. The hero and the finale scene come from the monthly skin (SKIN1 below), not from these slots. */
+  var ART_SLOTS = { "pebble.on": null, "pebble.off": null };
+  var ART_DEFAULTS = { "pebble.on": "art/mercury/pebbles/on.png", "pebble.off": "art/mercury/pebbles/off.png" };
   function loadArtSlots() {
     var man = window.HousePlates && HousePlates.mercury && HousePlates.mercury.slots;
     Object.keys(ART_SLOTS).forEach(function (slot) {
@@ -67,6 +66,90 @@
     });
   }
   function art(slot) { var im = ART_SLOTS[slot]; return im && im.complete !== false && im.width ? im : null; }
+
+  /* ORI1 · SKIN1 (Dan via Atlas 10/27): the hero is a monthly skin. Only the hero art and the finale scene change between
+     skins; the mechanics never do (size from filled days, jump, landing, finale unlock are all skin-blind).
+     Registry: one line per month (YYYY-MM). Art lives in a drop-in folder <dir><kid>/ (layout: SKIN_FILES below).
+     The chrome blob is the ONLY fallback: a skin is worn only when its anchors JSON and every required sprite loaded;
+     anything missing (or still loading) shows the blob, never a broken image and never code-drawn art.
+     A missing finale scene falls back to the default grove finale.
+     To add December: drop skins/2026-12/<kid>/ (same layout) and add one line: "2026-12": { id: "...", dir: "skins/2026-12/" }. */
+  var SKINS = {
+    "2026-10": { id: "pumpkin", dir: "skins/2026-10/" },
+    "2026-11": { id: "turkey", dir: "skins/2026-11/", from: { civil: "2026-11-01", hour: 6 } }
+  };
+  /* layout, per kid folder, at 1x / 2x / 3x (Prism p2 drop: fixes/ori-mercury/p2/<month>/early/ with SUMS, copied as is):
+       <state>@<s>x.png for every state (roll has two frames, roll-1 and roll-2, right-facing: mirrored in code)
+       eyes-<open|half|closed|happy>@<s>x.png
+       anchors.json: { "bodyR": px, "states": { "<state>": { "contact": [x, y], "eyes": [x, y] } }, "accessory": [x, y] }
+       finale@<s>x.png (optional; missing = default finale) */
+  var SKIN_STATES = ["idle", "squash", "stretch", "fall", "roll-1", "roll-2", "happy", "sleep", "peek", "full"];
+  var SKIN_EYES = ["open", "half", "closed", "happy"];
+  var SKIN_EXT = ".png";
+  (function () { var o = window.MercurySkinBook; if (o) Object.keys(o).forEach(function (m) { SKINS[m] = o[m]; }); })(); /* Prism / QA overlay */
+  /* cutover: a month's skin starts at 6:00 AM CT on the 1st (the AMBIENT1 boundary). November reads its start from
+     livinghouse/ambient/halloween-dates.json "end" when that loads (same source as AMBIENT1); until then the same value.
+     TODO(Dec+): if AMBIENT grows a per-month dates file, read each month's start from it too. */
+  var SKIN_HOUR = 6;
+  try {
+    fetch("livinghouse/ambient/halloween-dates.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (j && j.end && /^\d{4}-\d{2}-\d{2}$/.test(j.end.civil) && SKINS[j.end.civil.slice(0, 7)]) { SKINS[j.end.civil.slice(0, 7)].from = { civil: j.end.civil, hour: +j.end.hour || 0 }; skinSync(); }
+    }).catch(function () { /* the built-in rule stands */ });
+  } catch (e) { /* no fetch: built-in rule */ }
+  function ctNow() {
+    try {
+      var p = {}; new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", hourCycle: "h23" })
+        .formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; });
+      return { civil: p.year + "-" + p.month + "-" + p.day, hour: +p.hour % 24 };
+    } catch (e) { var d = new Date(); return { civil: d.toISOString().slice(0, 10), hour: d.getHours() }; }
+  }
+  function prevMonth(m) { var y = +m.slice(0, 4), mo = +m.slice(5, 7) - 1; if (mo < 1) { mo = 12; y--; } return y + "-" + (mo < 10 ? "0" : "") + mo; }
+  function before(a, b) { return a.civil < b.civil || (a.civil === b.civil && a.hour < b.hour); }
+  function skinMonthFor(now) {
+    var m = now.civil.slice(0, 7), sk = SKINS[m];
+    var from = (sk && sk.from) || { civil: m + "-01", hour: SKIN_HOUR };
+    return before(now, from) ? prevMonth(m) : m;
+  }
+  function pickSkinMonth() {
+    var o = q.get("month") || q.get("skin");
+    if (o) {
+      if (/^\d{4}-\d{2}$/.test(o)) return o;
+      for (var m in SKINS) if (SKINS[m].id === o) return m;
+      return "default";
+    }
+    return skinMonthFor(ctNow());
+  }
+  var skin = { month: null, id: "blob", def: null, sprites: {}, eyes: {}, anchors: null, finale: null, ready: false, scale: 1, kid: kid };
+  function skinScale() { return Math.max(1, Math.min(3, Math.round((typeof view === "object" && view.dpr) || window.devicePixelRatio || 1))); }
+  function loadSkin(month) {
+    var def = SKINS[month] || null;
+    var s = { month: month, id: def ? def.id : "blob", def: def, sprites: {}, eyes: {}, anchors: null, finale: null, ready: false, scale: skinScale(), kid: kid };
+    skin = s;
+    if (!def || !def.dir) return;
+    var base = def.dir + kid + "/", sx = "@" + s.scale + "x" + SKIN_EXT, need = SKIN_STATES.length + SKIN_EYES.length + 1, got = 0, dead = false;
+    function ok() { if (!dead && ++got === need && skin === s) s.ready = true; }
+    function img(url, put) {
+      var im = new Image();
+      im.onload = function () { if (im.width && im.height) { put(im); ok(); } else dead = true; };
+      im.onerror = function () { dead = true; };
+      im.src = url;
+    }
+    SKIN_STATES.forEach(function (st) { img(base + st + sx, function (im) { s.sprites[st] = im; }); });
+    SKIN_EYES.forEach(function (e) { img(base + "eyes-" + e + sx, function (im) { s.eyes[e] = im; }); });
+    try {
+      fetch(base + "anchors.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+        if (j && j.states && SKIN_STATES.every(function (st) { return j.states[st] && j.states[st].contact; })) { s.anchors = j; ok(); } else dead = true;
+      }).catch(function () { dead = true; });
+    } catch (e) { dead = true; }
+    var fin = new Image(); fin.onload = function () { if (fin.width) s.finale = fin; }; fin.src = base + "finale" + sx; /* optional */
+  }
+  function skinSync() { var m = pickSkinMonth(); if (m !== skin.month) { var old = skin; loadSkin(m); skinTransition(old, skin); } }
+  /* room left (built later, no-ops today): a per-skin month-boundary transition scene, and an accessory layer at the
+     skin's optional accessory anchor (registry: transition: url, accessory: { <kid>: url }). */
+  function skinTransition(from, to) { if (!to.def || !to.def.transition) return; /* TODO(SKIN2): play to.def.transition once */ }
+  function paintAccessory(g, b, st, sc) { if (!skin.def || !skin.def.accessory || !skin.anchors || !skin.anchors.accessory) return; /* TODO(SKIN2): accessory layer */ }
+  function heroArt() { return skin.ready && skin.anchors ? skin : null; }
+  skinSync();
   /* ORI1 · the jar creature in the HUD reflects the run's own sky (it read a 1x1 dark placeholder before: a black ball cluster) */
   var hudJar = null;
   function skyToJar() { try { if (hudJar && hudJar.setEnv && runPlates.sky) hudJar.setEnv(runPlates.sky); } catch (e) { /* cosmetic */ } }
@@ -383,6 +466,7 @@
   var finale = false;
   function refreshPowers() {
     allBlobs().forEach(function (b) { b.pw = powersFor(b.kid); });
+    skinSync(); /* SKIN1 · a run open across the month cutover changes skin; mechanics untouched */
     refreshGrowth();
     var st = jarState(kid);
     if (st.full && !finale && playing) note("Your jar is full. Run the grove!");
@@ -411,6 +495,7 @@
   var shake = 0;
   var won = false;
   var playing = false;
+  var lastTouch = performance.now(); /* SKIN1 · the hero dozes (sleep sprite) after 30 s with no touch */
   var t0 = performance.now();
   var view = { w: 800, h: 600, dpr: 1 };
   var pointers = {};
@@ -900,8 +985,7 @@
     blobs.forEach(function (b, k) {
       if (b.inv > 0 && Math.floor(t * 6) % 2 === 0) return;
       /* ORI1 · Phase 2 art slot: a Prism creature sprite for this kid replaces the procedural liquid when it is loaded */
-      var sp = art("blob." + b.kid);
-      if (sp) { var sw = b.r * 2.6, sh = sw * sp.height / Math.max(1, sp.width); g.drawImage(sp, b.x - cam - sw / 2, b.y + b.r - sh, sw, sh * b.squash); return; }
+      if (b === A && paintHero(g, b, t)) return; /* SKIN1 · the month's hero art (host kid); otherwise the chrome blob */
       balls.push({ x: b.x - cam, y: b.y, r: b.r * 1.05, sq: Math.max(0.6, b.squash), w: t * 2.2 + k * 1.7, fade: b.echo ? 0.82 : 1, tint: b.tint });
     });
     drops.forEach(function (d) { if (d.a > 0.05) balls.push({ x: d.x - cam, y: d.y, r: d.r * 1.6 * Math.min(1, d.a * 1.6), sq: 1, w: 0, fade: 1, tint: A.tint }); });
@@ -920,6 +1004,37 @@
     g.save();
     blobs.forEach(function (b) { if (!b.grounded) return; g.fillStyle = "rgba(0,0,0,0.35)"; g.beginPath(); g.ellipse(b.x - cam, b.y + b.r * 0.95, b.r * 0.8, b.r * 0.16, 0, 0, 7); g.fill(); });
     g.restore();
+  }
+  /* SKIN1 · hero state from motion only (the art never feeds back into the mechanics) */
+  function heroState(b, t) {
+    if (won && finale) return "happy";
+    if (!b.grounded) return b.vy < 0 ? "stretch" : "fall";
+    if (b.squash > 1.1) return "squash";
+    if (Math.abs(b.vx) > 30) return Math.floor(t * 8) % 2 ? "roll-2" : "roll-1";
+    if (b.fillK > 0.3) return "happy";
+    if (t < 0.5) return "peek";
+    if (performance.now() - lastTouch > 30000) return "sleep";
+    return finale ? "full" : "idle";
+  }
+  function heroEyes(st, t) {
+    if (st === "happy") return "happy";
+    if (st === "sleep") return "closed";
+    var ph = (t + 0.7) % 4.2; return ph < 0.06 ? "half" : ph < 0.16 ? "closed" : ph < 0.22 ? "half" : "open";
+  }
+  function paintHero(g, b, t) {
+    var sk = heroArt(); if (!sk) return false;
+    var st = heroState(b, t), im = sk.sprites[st], an = sk.anchors.states[st];
+    if (!im || !an) return false;
+    var sc = (b.r / ((sk.anchors.bodyR || im.width / 2.6 / sk.scale) * sk.scale)), flip = b.vx < -30 && /^roll/.test(st) ? -1 : 1;
+    g.save();
+    g.translate(b.x - cam, b.y + b.r);
+    g.scale(flip * sc, sc);
+    g.drawImage(im, -an.contact[0] * sk.scale, -an.contact[1] * sk.scale);
+    var ey = sk.eyes[heroEyes(st, t)];
+    if (ey && an.eyes) g.drawImage(ey, (an.eyes[0] - an.contact[0]) * sk.scale - ey.width / 2, (an.eyes[1] - an.contact[1]) * sk.scale - ey.height / 2);
+    paintAccessory(g, b, st, sk.scale);
+    g.restore();
+    return true;
   }
   function paintLiquidGroup(g, t, src, dpr, balls) {
     var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
@@ -1070,6 +1185,15 @@
     g.restore();
   }
 
+  /* SKIN1 · the skin's finale scene over the grove once a full-jar run reaches home; no scene = the default finale
+     (gold burst + ring), which plays either way */
+  var finaleAt = 0;
+  function paintFinaleScene(g, W, H) {
+    var im = won && finale && skin.ready && skin.finale; if (!im) return;
+    if (!finaleAt) finaleAt = performance.now();
+    var a = Math.min(1, (performance.now() - finaleAt) / 900), sc = Math.max(W / im.width, H / im.height);
+    g.save(); g.globalAlpha = a; g.drawImage(im, (W - im.width * sc) / 2, (H - im.height * sc) / 2, im.width * sc, im.height * sc); g.restore();
+  }
   function frame() {
     var now = performance.now();
     var t = (now - t0) / 1000;
@@ -1103,7 +1227,7 @@
     ctx.drawImage(off, 0, 0, off.width, off.height, 0, 0, W, H);
     if (LIQUID) paintLiquid(ctx, t, off, view.dpr);
     else {
-      blobs.forEach(function (b) { paintBlob(ctx, b, t); });
+      blobs.forEach(function (b) { if (!(b === A && paintHero(ctx, b, t))) paintBlob(ctx, b, t); });
       if (blobs.length > 1) paintBridge(ctx, t);
       drops.forEach(function (d) {
         ctx.globalAlpha = Math.max(0, d.a);
@@ -1114,6 +1238,7 @@
     }
     paintPowers(ctx, t);
     paintFill(ctx, t);
+    paintFinaleScene(ctx, W, H);
     if (A.auto) pushIn(t, dt);
     if (playing && !document.hidden) requestAnimationFrame(frame);
   }
@@ -1128,6 +1253,7 @@
   }
 
   cv.addEventListener("pointerdown", function (e) {
+    lastTouch = performance.now();
     if (won) return;
     assignPointer(e);
     /* ORI1 · jump on touch-down (Dan): the press itself jumps; sliding the same finger rolls; a flick up later in the
@@ -1228,7 +1354,7 @@
 
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) return;
-    if (playing) requestAnimationFrame(frame);
+    if (playing) { requestAnimationFrame(frame); rereadSoon(); } /* ORI1 · back on the tab: re-read the week (live today) */
     else requestAnimationFrame(ambience);
   });
 
@@ -1372,6 +1498,8 @@
   window.MercuryRun = {
     debug: function () { return { A: [A.x, A.y, A.r], B: [B.x, B.y], cam: cam, drops: drops.length, view: view, pw: allBlobs().map(function (b) { return [b.kid, b.pw]; }), air2: allBlobs().map(function (b) { return !!b.air2; }), gathers: gatherLog.slice(), won: won, xs: allBlobs().map(function (b) { return Math.round(b.x); }), finale: finale, blobs: blobs.length, playing: playing, reveal: reveal.count }; },
     artSlots: function () { return Object.keys(ART_SLOTS); }, /* ORI1 · Phase 2 art hook names */
+    /* SKIN1 · read-only: which month's skin, and whether its art is worn (hero "art") or the blob fallback is showing */
+    skin: function () { return { month: skin.month, id: skin.id, hero: heroArt() ? "art" : "blob", finale: skin.ready && skin.finale ? "art" : "default", scale: skin.scale, kid: skin.kid, dir: skin.def ? skin.def.dir + kid + "/" : null, months: Object.keys(SKINS), state: heroArt() ? heroState(A, (performance.now() - t0) / 1000) : null }; },
     exportFrame: exportFrame,
     platesReady: function () { return runPlatesReady && !!runPlates.sky; }
   };
