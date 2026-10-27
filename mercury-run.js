@@ -1,8 +1,8 @@
-/* mercury-run.js · chrome-liquid run, unlocked when the week's jar is full.
-   One hand rolls a blob. A second hand wakes the sibling blob; until then
-   an echo sibling runs along. A fall or a drip gathers the metal back at
-   the last lantern. No tally, no clock, no shame word.
-   Kid look comes from ?kid= on the query. Original geometry only. */
+/* mercury-run.js · chrome-liquid run. ORI1 (Dan via Atlas 10/27): the run is ALWAYS OPEN. The blob's size shows the
+   week's filled days (a day is filled when every daily must is closed); a full jar unlocks the grove finale.
+   One kid, one blob by default (?coop=2 / ?coop=3 bring back the sibling zones). A touch jumps on touch-down;
+   sliding rolls. A fall or a drip gathers the metal back at the last lantern. No tally, no clock, no shame word.
+   Kid look comes from ?kid= on the query. Original geometry only. Interim art: Phase 2 art drops into ART_SLOTS. */
 (function () {
   "use strict";
 
@@ -14,6 +14,9 @@
     harris: { sky: ["#102018", "#67a85a", "#d7e8b0"], ground: "#1c3a22", metal: "#d5ddd8", accent: "#e2c56a", back: "kid-harris.html" },
     ainsley: { sky: ["#1a1424", "#8a4a48", "#e0a070"], ground: "#241610", metal: "#e4ddd6", accent: "#ffd8b0", back: "kid-ainsley.html" }
   }[kid];
+  /* ORI1 · each kid's blob carries that kid's tint (the liquid shader multiplies by it). Ainsley plays as the blob too,
+     in her rose gold; the boys keep their cool silver and green silver. */
+  var TINT = { hayes: "#d7dde6", harris: "#d5ddd8", ainsley: "#f6c9b4" };
 
   var LIQUID = q.get("liquid") !== "0";
   var reduced = false;
@@ -45,9 +48,30 @@
         next();
       });
     });
-    Promise.all(jobs).then(function () { runPlatesReady = true; });
+    Promise.all(jobs).then(function () { runPlatesReady = true; skyToJar(); });
   }
+  /* ORI1 · Phase 2 art slots (Prism photoreal). Each slot is null until a Phase 2 manifest names a file
+     (HousePlates.mercury.slots[slot] = url, or ?artslots=1 with the default names below); a null slot keeps the interim
+     procedural art. Slots: blob.<kid> creature sprite, pebble.on / pebble.off day pebbles, finale grove plate. */
+  var ART_SLOTS = { "blob.hayes": null, "blob.harris": null, "blob.ainsley": null, "pebble.on": null, "pebble.off": null, "finale": null };
+  var ART_DEFAULTS = { "blob.hayes": "assets/ori/creature/idle.webp", "blob.harris": "assets/ori/creature/harris.webp", "blob.ainsley": "assets/ori/creature/ainsley.webp",
+    "pebble.on": "art/mercury/pebbles/on.png", "pebble.off": "art/mercury/pebbles/off.png", "finale": "art/mercury/finale/grove.png" };
+  function loadArtSlots() {
+    var man = window.HousePlates && HousePlates.mercury && HousePlates.mercury.slots;
+    Object.keys(ART_SLOTS).forEach(function (slot) {
+      var url = (man && man[slot]) || (q.get("artslots") === "1" ? ART_DEFAULTS[slot] : null);
+      if (!url) return;
+      var im = new Image();
+      im.onload = function () { ART_SLOTS[slot] = im; };
+      im.src = url;
+    });
+  }
+  function art(slot) { var im = ART_SLOTS[slot]; return im && im.complete !== false && im.width ? im : null; }
+  /* ORI1 · the jar creature in the HUD reflects the run's own sky (it read a 1x1 dark placeholder before: a black ball cluster) */
+  var hudJar = null;
+  function skyToJar() { try { if (hudJar && hudJar.setEnv && runPlates.sky) hudJar.setEnv(runPlates.sky); } catch (e) { /* cosmetic */ } }
   loadRunPlates();
+  loadArtSlots();
   /* SEAM1 · plates tile forever as mirrored copies (edge meets its own mirror, so no hard cut and no black strip
      at any width or scroll). Opaque sky plates get smeared/stretched edge columns trimmed once on load. */
   var plateTrim = typeof WeakMap === "function" ? new WeakMap() : null;
@@ -128,7 +152,7 @@
   }
 
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
-  function tone(kind) {
+  function tone(kind, step) {
     try {
       if (!window.HouseSfx || (HouseSfx.isMuted && HouseSfx.isMuted())) return;
       var ac = HouseSfx.ensureCtx && HouseSfx.ensureCtx();
@@ -140,8 +164,9 @@
       o.type = kind === "splash" ? "triangle" : "sine";
       var f0 = kind === "jump" ? 320 : kind === "land" ? 140 : kind === "grove" ? 520 : 220;
       var f1 = kind === "jump" ? 640 : kind === "land" ? 70 : kind === "grove" ? 880 : 90;
-      o.frequency.setValueAtTime(f0, t0);
-      o.frequency.exponentialRampToValueAtTime(Math.max(40, f1), t0 + 0.18);
+      var up = Math.pow(1.122, step || 0); /* ORI1 · reveal chimes climb a whole step per filled day */
+      o.frequency.setValueAtTime(f0 * up, t0);
+      o.frequency.exponentialRampToValueAtTime(Math.max(40, f1 * up), t0 + 0.18);
       g.gain.setValueAtTime(0.0001, t0);
       g.gain.exponentialRampToValueAtTime(kind === "splash" ? 0.09 : 0.06, t0 + 0.02);
       g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.28);
@@ -226,6 +251,7 @@
     this.x = x; this.y = y; this.vx = 0; this.vy = 0;
     this.r = this.r0 = q.get("demo") === "1" ? 30 : 26; /* BIG1: reads on a phone */ this.rT = this.r; this.days = -1; this.fillK = 0; this.grounded = false; this.coyote = 0; this.squash = 1;
     this.cp = { x: x, y: y }; this.alive = true; this.echo = echo; this.hold = null;
+    this.tint = TINT.hayes; this.lit = 0; /* ORI1 · tint per kid; lit = day pebbles lit so far by the entry reveal */
     this.inv = 0;
   }
   var spawn = { x: plats[0].x + 40, y: plats[0].y - 30 };
@@ -243,59 +269,104 @@
      (left to right); a zone with no hand runs its blob as a calm echo. ?coop=2 keeps it to two. */
   var C = new Blob(spawn.x + 56, spawn.y, true);
   A.kid = kid; B.kid = SIBS[0]; C.kid = SIBS[1];
-  var blobs = q.get("coop") === "2" ? [A, B] : [A, B, C];
+  [A, B, C].forEach(function (b) { b.tint = TINT[b.kid] || TINT.hayes; });
+  /* ORI1 · single player by default: one kid, one blob, the whole screen is that kid's zone. ?coop=2 / ?coop=3 bring back
+     the sibling zones (COOP1) for a shared wall. */
+  var COOP = q.get("coop");
+  var blobs = COOP === "3" ? [A, B, C] : COOP === "2" ? [A, B] : [A];
+  function zoneFor(x, w, n) { return n <= 1 ? 0 : Math.max(0, Math.min(n - 1, Math.floor(x / (w / n)))); }
   /* DEMO1 · ?demo=1 attract mode: the host blob runs itself too (preview captures / idle wall). */
   if (q.get("demo") === "1") A.auto = true;
   function powersFor(k) {
     if (FIXTURE) return FIX_PW[k];
     try {
-      var st = window.JarEngine && JarEngine.choreState(k);
+      var st = window.JarEngine && JarEngine.choreState(k, { dayIso: liveDayIso() }); /* ORI1 · live today */
       if (!st) return { dbl: false, magnet: false };
       return { dbl: st.todayNeed > 0 && st.todayDone >= st.todayNeed, magnet: (st.fill || 0) >= 0.5 };
     } catch (e) { return { dbl: false, magnet: false }; }
   }
   /* NIGHT52 · GROW1: a day is "filled" when every daily must for that day is closed (same WardKids read as the jar).
      Each filled day this week grows the blob a step; a new filled day lands with an in-world pulse (FILLFX1). */
-  var GROW_STEP = 3, WEEK_N = 7;
+  /* ORI1 · GROW2: a visible step. Each filled day adds GROW_K of the base radius (26 px base: about 3.6 px a day,
+     7 days = about twice the base). On entry the blob starts at its base size and the reveal grows it one day at a time. */
+  var GROW_K = 0.14, WEEK_N = 7;
+  function growR(r0, n) { return r0 * (1 + GROW_K * Math.max(0, n || 0)); }
+  /* ORI1 · today is computed live every read (Chicago date now), never the date frozen when the page loaded,
+     so a run left open across midnight moves to the new day. */
+  function liveDayIso() {
+    try { if (window.HouseClock && HouseClock.iso) return HouseClock.iso(new Date()); } catch (e) { /* fall through */ }
+    try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()); }
+    catch (e2) { var WK = window.WardKids; return WK && WK.DAY_ISO; }
+  }
   function filledDays(k) {
     try {
       var WK = window.WardKids, data = WK && WK._data;
       if (!WK || !data || !data.kids || !data.kids[k] || typeof WK.mustQuests !== "function" || typeof WK.weekDayIsos !== "function") return null;
       var qs = (WK.mustQuests(k, data) || []).filter(function (x) { return x && !x.optional && x.cadence !== "addon" && (x.cadence || "daily") === "daily"; });
       if (!qs.length) return null;
-      var days = WK.weekDayIsos(WK.DAY_ISO) || [], n = 0;
+      var days = WK.weekDayIsos(liveDayIso()) || [], n = 0;
       days.forEach(function (iso) { if (qs.every(function (x) { return !!WK.getCheck(x.id, data, iso); })) n += 1; });
       return { n: n, of: days.length || WEEK_N };
     } catch (e) { return null; }
   }
-  function refreshGrowth(first) {
+  /* ORI1 · entry fill reveal: once the week is known, each filled day lights its pebble, grows the blob one step and
+     chimes (HouseSfx), one day at a time. A day filled later in the run reveals the same way. */
+  var REVEAL_GAP = 0.6;
+  var reveal = { count: 0, queue: [], next: 0, started: false, log: [] };
+  function refreshGrowth() {
     allBlobs().forEach(function (b) {
       var fd = FIXTURE ? { n: b === A ? 4 : b === B ? 2 : 0, of: 7 } : filledDays(b.kid);
       if (!fd) { b.daysOf = 0; return; }
-      var was = b.days; b.days = fd.n; b.daysOf = fd.of;
-      b.rT = b.r0 + GROW_STEP * fd.n;
-      if (first) b.r = b.rT;
-      else if (was >= 0 && fd.n > was) fillPulse(b);
+      b.days = fd.n; b.daysOf = fd.of;
+      if (b.lit > fd.n) { b.lit = fd.n; b.rT = growR(b.r0, fd.n); } /* a day un-ticked (or a new week): shrink back, no fanfare */
+      for (var i = b.lit + reveal.queue.filter(function (s) { return s.b === b; }).length; i < fd.n; i++) reveal.queue.push({ b: b, day: i });
     });
+  }
+  function stepReveal(t) {
+    if (!reveal.queue.length) return;
+    if (!reveal.started) { reveal.started = true; reveal.next = t + 0.5; }
+    if (t < reveal.next) return;
+    var s = reveal.queue.shift();
+    var b = s.b;
+    if (s.day >= b.days) return; /* the day was un-ticked before its turn */
+    b.lit = s.day + 1;
+    b.rT = growR(b.r0, b.lit);
+    reveal.count += 1;
+    reveal.log.push([b.kid, b.lit]);
+    fillPulse(b);
+    chime(s.day);
+    reveal.next = t + (reduced ? 0.3 : REVEAL_GAP);
+  }
+  function chime(i) {
+    try { if (window.HouseSfx && typeof HouseSfx.quest === "function") HouseSfx.quest(); } catch (e) { /* sound is optional */ }
+    tone("grove", i);
   }
   function fillPulse(b) {
     b.fillK = 1; b.squash = 1.25;
     burst(b.x, b.y - b.r * 0.4, reduced ? 6 : 14, "#ffe2a8");
     rings.push({ x: b.x, y: b.y, r: b.r, a: 0.7 });
-    tone("grove");
   }
-  window.__merc = function () { return blobs.map(function (b) { return { kid: b.kid, x: Math.round(b.x), y: Math.round(b.y), vy: Math.round(b.vy), r: +b.r.toFixed(1), rT: b.rT, days: b.days, of: b.daysOf }; }); }; /* read-only QA probe */
-  window.__mercFillTest = function (k) { var b = allBlobs().filter(function (x) { return x.kid === (k || kid); })[0]; if (!b) return null; b.days = Math.max(0, b.days) + 1; b.rT = b.r0 + GROW_STEP * b.days; fillPulse(b); return { days: b.days, rT: b.rT }; };
+  window.__merc = function () { return blobs.map(function (b) { return { kid: b.kid, x: Math.round(b.x), y: Math.round(b.y), vy: Math.round(b.vy), r: +b.r.toFixed(1), rT: b.rT, r0: b.r0, days: b.days, of: b.daysOf, lit: b.lit, grounded: !!b.grounded, tint: b.tint }; }); }; /* read-only QA probe */
+  window.__mercReveal = function () { return { count: reveal.count, pending: reveal.queue.length, log: reveal.log.slice() }; }; /* read-only QA probe */
+  window.__mercFillTest = function (k) { var b = allBlobs().filter(function (x) { return x.kid === (k || kid); })[0]; if (!b) return null; b.days = Math.max(0, b.days) + 1; reveal.queue.push({ b: b, day: b.days - 1 }); return { days: b.days, rT: growR(b.r0, b.days) }; };
   function paintFill(g, t) {
     g.save();
     blobs.forEach(function (b) {
       if (!b.daysOf) return;
-      var x = b.x - cam, y = b.y + b.r + 14, n = b.daysOf, gap = 9, x0 = x - (n - 1) * gap / 2;
+      /* ORI1 · bigger day pebbles (6 px lit, 4.5 px waiting, 18 px apart) under the blob; a newly lit one glows */
+      var x = b.x - cam, y = b.y + b.r + 18, n = b.daysOf, gap = 18, x0 = x - (n - 1) * gap / 2;
+      var pOn = art("pebble.on"), pOff = art("pebble.off");
       for (var i = 0; i < n; i++) {
-        var on = i < b.days;
-        g.beginPath(); g.arc(x0 + i * gap, y, on ? 3 : 2.2, 0, 7);
-        g.fillStyle = on ? "rgba(255,226,168,0.95)" : "rgba(255,255,255,0.22)"; g.fill();
-        if (on) { g.globalCompositeOperation = "lighter"; g.beginPath(); g.arc(x0 + i * gap, y, 6, 0, 7); g.fillStyle = "rgba(255,200,120,0.18)"; g.fill(); g.globalCompositeOperation = "source-over"; }
+        var on = i < b.lit, px = x0 + i * gap, pr = on ? 6 : 4.5;
+        var im = on ? pOn : pOff;
+        if (im) { g.drawImage(im, px - pr * 1.6, y - pr * 1.6, pr * 3.2, pr * 3.2); continue; }
+        g.beginPath(); g.arc(px, y, pr, 0, 7);
+        g.fillStyle = on ? "rgba(255,226,168,0.98)" : "rgba(255,255,255,0.26)"; g.fill();
+        if (on) {
+          var fresh = i === b.lit - 1 ? b.fillK : 0;
+          g.globalCompositeOperation = "lighter"; g.beginPath(); g.arc(px, y, 11 + fresh * 10, 0, 7);
+          g.fillStyle = "rgba(255,200,120," + (0.2 + fresh * 0.45).toFixed(3) + ")"; g.fill(); g.globalCompositeOperation = "source-over";
+        }
       }
       if (b.fillK > 0.01) {
         var k = b.fillK, e = 1 - k;
@@ -308,7 +379,24 @@
     });
     g.restore();
   }
-  function refreshPowers() { allBlobs().forEach(function (b) { b.pw = powersFor(b.kid); }); refreshGrowth(!refreshPowers.done); refreshPowers.done = true; paintPowerHud(); }
+  /* ORI1 · finale: a full jar unlocks the grove finale (the run itself is always open) */
+  var finale = false;
+  function refreshPowers() {
+    allBlobs().forEach(function (b) { b.pw = powersFor(b.kid); });
+    refreshGrowth();
+    var st = jarState(kid);
+    if (st.full && !finale && playing) note("Your jar is full. Run the grove!");
+    finale = !!st.full;
+    paintPowerHud();
+  }
+  function jarState(k) {
+    try { return window.JarEngine ? JarEngine.choreState(k, { dayIso: liveDayIso() }) : { full: false }; } catch (e) { return { full: false }; }
+  }
+  /* ORI1 · re-read the week whenever it can have changed: back to the tab, focus, another tab's tick (storage), a fresh
+     week from the hub, a chore tick on this page; plus a 15 s heartbeat. */
+  function rereadSoon() { if (!playing) return; clearTimeout(rereadSoon.t); rereadSoon.t = setTimeout(refreshPowers, 60); }
+  ["focus", "pageshow", "storage"].forEach(function (ev) { window.addEventListener(ev, rereadSoon); });
+  ["house:kids-data-ready", "house:cleared", "house:goal-hit"].forEach(function (ev) { document.addEventListener(ev, rereadSoon); });
   function allBlobs() { return blobs; }
   function paintPowerHud() {
     var el = ui.querySelector(".hud span"); if (!el) return;
@@ -340,10 +428,10 @@
     if (b.inv > 0) return;
     gatherLog.push([b.kid, why || "fall", Math.round(b.x)]);
     if (why === "drip" && b.pw && b.pw.magnet) { /* drop magnet: the splash pulls straight back in, no trip to the lantern */
-      burst(b.x, b.y, 10, THEME.metal); tone("splash");
+      burst(b.x, b.y, 10, b.tint); tone("splash");
       b.vy = Math.min(b.vy, -260); b.inv = 0.6; b.magnetT = 0.6; return;
     }
-    burst(b.x, Math.min(b.y, view.h * 0.86), 12, THEME.metal);
+    burst(b.x, Math.min(b.y, view.h * 0.86), 12, b.tint);
     tone("splash");
     shake = 0;
     b.ret = { x0: b.x, y0: Math.min(b.y, view.h * 0.86), k: 0 }; b.vx = 0; b.vy = 0; b.inv = 0.45; b.alive = true;
@@ -409,17 +497,24 @@
   function stepReturn(b, dt) {
     var r = b.ret; r.k = Math.min(1, r.k + dt / 0.9);
     var e = r.k * r.k * (3 - 2 * r.k);
+    var cpy = cpY(b);
     b.x = r.x0 + (b.cp.x - r.x0) * e;
-    b.y = r.y0 + (b.cp.y - r.y0) * e - Math.sin(e * Math.PI) * 90;
+    b.y = r.y0 + (cpy - r.y0) * e - Math.sin(e * Math.PI) * 90;
     b.squash = 0.85 + 0.15 * e;
-    if (r.k >= 1) { b.ret = null; b.vx = 0; b.vy = 0; b.inv = 0.3; rings.push({ x: b.x, y: b.y + b.r, r: 8, a: 0.5 }); }
+    if (r.k >= 1) { b.ret = null; b.vx = 0; b.vy = 0; b.inv = 0.3; b.grounded = b.cp.top != null; rings.push({ x: b.x, y: b.y + b.r, r: 8, a: 0.5 }); }
   }
+  /* ORI1 · LAND2: a lantern remembers the platform top, not a centre height, so a blob that grew since is set back ON it
+     (the old centre height put a grown blob's bottom below the top, past the landing check: it fell through and looped). */
+  function cpY(b) { return b.cp.top != null ? b.cp.top - b.r : b.cp.y; }
+  function landTol(r) { return Math.max(12, r * 0.5); }
 
   function stepBlob(b, dt, t, input) {
     if (won) return;
     if (b.ret) { stepReturn(b, dt); return; }
     b.inv = Math.max(0, b.inv - dt);
-    b.r += (b.rT - b.r) * Math.min(1, dt * 2.5); b.fillK = Math.max(0, (b.fillK || 0) - dt / 1.6);
+    var r1 = b.r;
+    b.r += (b.rT - b.r) * Math.min(1, dt * 4); b.fillK = Math.max(0, (b.fillK || 0) - dt / 1.6);
+    if (b.grounded) b.y -= b.r - r1; /* ORI1 · LAND2: grow upward from the platform, the bottom stays on the top */
     b.magnetT = Math.max(0, (b.magnetT || 0) - dt);
     var accel = 0;
     if (input) {
@@ -454,12 +549,12 @@
         var left = platX(pl, t);
         if (b.x > left - b.r * 0.4 && b.x < left + pl.w + b.r * 0.4) {
           var top = GY(pl.y);
-          if (b.y + b.r <= top + 12 && nextY + b.r >= top) {
+          if (b.y + b.r <= top + landTol(b.r) && nextY + b.r >= top) { /* ORI1 · LAND2: tolerance scales with the blob */
             nextY = top - b.r;
-            if (b.vy > 220) { burst(b.x, top, 8, THEME.metal); tone("land"); b.squash = 1.35; }
+            if (b.vy > 220) { burst(b.x, top, 8, b.tint); tone("land"); b.squash = 1.35; }
             b.vy = 0; b.grounded = true;
             if (pl.vx) b.x += platX(pl, t) - platX(pl, t - dt); /* CARRY1: ride moving platforms */
-            if (pl.cp) b.cp = { x: b.x, y: nextY };
+            if (pl.cp) b.cp = { x: b.x, y: nextY, top: top };
           }
         }
       }
@@ -804,9 +899,12 @@
     var balls = [];
     blobs.forEach(function (b, k) {
       if (b.inv > 0 && Math.floor(t * 6) % 2 === 0) return;
-      balls.push({ x: b.x - cam, y: b.y, r: b.r * 1.05, sq: Math.max(0.6, b.squash), w: t * 2.2 + k * 1.7, fade: b.echo ? 0.82 : 1 });
+      /* ORI1 · Phase 2 art slot: a Prism creature sprite for this kid replaces the procedural liquid when it is loaded */
+      var sp = art("blob." + b.kid);
+      if (sp) { var sw = b.r * 2.6, sh = sw * sp.height / Math.max(1, sp.width); g.drawImage(sp, b.x - cam - sw / 2, b.y + b.r - sh, sw, sh * b.squash); return; }
+      balls.push({ x: b.x - cam, y: b.y, r: b.r * 1.05, sq: Math.max(0.6, b.squash), w: t * 2.2 + k * 1.7, fade: b.echo ? 0.82 : 1, tint: b.tint });
     });
-    drops.forEach(function (d) { if (d.a > 0.05) balls.push({ x: d.x - cam, y: d.y, r: d.r * 1.6 * Math.min(1, d.a * 1.6), sq: 1, w: 0, fade: 1 }); });
+    drops.forEach(function (d) { if (d.a > 0.05) balls.push({ x: d.x - cam, y: d.y, r: d.r * 1.6 * Math.min(1, d.a * 1.6), sq: 1, w: 0, fade: 1, tint: A.tint }); });
     if (!balls.length) return;
     /* CHROME2 · cluster balls that can touch and shade each cluster on its own tight grid, so three blobs spread
        across the wall don't share one giant coarse grid (that was the blocky, flat-grey look). */
@@ -840,7 +938,7 @@
     var img = lq.createImageData(cw, ch), o = img.data;
     var em = Math.ceil(M / C);
     var lx = -0.45, ly = -0.7, lz = 0.55, ll = Math.hypot(lx, ly, lz); lx /= ll; ly /= ll; lz /= ll;
-    var tint = THEME.metal, tr = parseInt(tint.substr(1, 2), 16), tg = parseInt(tint.substr(3, 2), 16), tb = parseInt(tint.substr(5, 2), 16);
+    var tint = balls[0].tint || THEME.metal, tr = parseInt(tint.substr(1, 2), 16), tg = parseInt(tint.substr(3, 2), 16), tb = parseInt(tint.substr(5, 2), 16);
     var FA = 1; /* SHARP1 perf: no per-call array; balls beyond 4r add < 0.07 and are skipped */
     balls.forEach(function (b) { b.cut = b.r * b.r * 16; });
     function field(px, py) {
@@ -984,9 +1082,10 @@
     ids.forEach(function (id) { var k = Math.min(blobs.length - 1, pointers[id].blob); ins[k] = pointers[id]; });
     blobs.forEach(function (b, k) { if (k > 0) b.echo = !ins[k]; stepBlob(b, dt, t, ins[k]); });
     stepDrops(dt);
+    if (playing) stepReveal(t);
     var mid = 0, home = !won;
     blobs.forEach(function (b) { mid += b.x / blobs.length; if (!(b.x > goalX + 20 && b.grounded)) home = false; });
-    if (home) { won = true; tone("grove"); burst(mid, A.y, 30, "#fff"); }
+    if (home) { won = true; tone("grove"); burst(mid, A.y, finale ? 60 : 30, finale ? "#ffe2a8" : "#fff"); if (finale) { rings.push({ x: mid, y: A.y, r: 20, a: 1 }); tone("grove", 4); } }
     var aim = (A.x * 0.8 + mid * 0.2) - W * 0.4; /* CAM2: favor the host blob so it never leaves frame */
     cam += (aim - cam) * (reduced ? 1 : 0.05);
     /* CAM2: soft keep-in — never let the host blob drift out of the middle 70% (eased, no snap) */
@@ -1005,7 +1104,7 @@
     if (LIQUID) paintLiquid(ctx, t, off, view.dpr);
     else {
       blobs.forEach(function (b) { paintBlob(ctx, b, t); });
-      paintBridge(ctx, t);
+      if (blobs.length > 1) paintBridge(ctx, t);
       drops.forEach(function (d) {
         ctx.globalAlpha = Math.max(0, d.a);
         ctx.fillStyle = d.c;
@@ -1022,7 +1121,7 @@
   function assignPointer(e) {
     var rec = cv.getBoundingClientRect();
     var x = e.clientX - rec.left, y = e.clientY - rec.top;
-    var blob = Math.max(0, Math.min(blobs.length - 1, Math.floor(x / (view.w / blobs.length)))); /* the kid's own zone */
+    var blob = zoneFor(x, view.w, blobs.length); /* the kid's own zone; single player = the whole screen */
     pointers[e.pointerId] = { x: x, y: y, blob: blob, ly: y, low: y, x0: x, y0: y, t0: performance.now(), jump: false, fired: false };
     try { cv.setPointerCapture(e.pointerId); } catch (err) {}
     if (window.HouseSfx && HouseSfx.unlockAudio) HouseSfx.unlockAudio();
@@ -1031,6 +1130,10 @@
   cv.addEventListener("pointerdown", function (e) {
     if (won) return;
     assignPointer(e);
+    /* ORI1 · jump on touch-down (Dan): the press itself jumps; sliding the same finger rolls; a flick up later in the
+       same touch is the second jump; lifting the finger never jumps again */
+    var p = pointers[e.pointerId];
+    if (p) { p.jump = true; p.fired = true; p.down = true; }
   });
   cv.addEventListener("pointermove", function (e) {
     var p = pointers[e.pointerId];
@@ -1040,7 +1143,7 @@
     /* JUMPFIX1 · the old check needed 28 px of upward travel inside ONE move event; real touch moves arrive in 4-10 px
        steps, so a flick almost never jumped. Measure the upward travel since the lowest point of the gesture instead. */
     if (y > p.low) p.low = y;
-    if (p.low - y > 22 && !p.jump) { p.jump = true; p.fired = true; p.low = y; }
+    if (p.low - y > 22 && !p.flicked) { p.jump = true; p.fired = true; p.flicked = true; p.low = y; }
     p.ly = y;
     p.x = e.clientX - rec.left;
     p.y = y;
@@ -1052,7 +1155,7 @@
       var uy = e.clientY - rec.top, ux = e.clientX - rec.left;
       var tap = performance.now() - p.t0 < 280 && Math.hypot(ux - p.x0, uy - p.y0) < 14; /* JUMPFIX1 · a quick tap jumps too */
       var b = blobs[Math.min(blobs.length - 1, p.blob)];
-      if ((!p.fired && p.low - uy > 16) || tap || p.jump) { b.want = 0.14; b.press = true; }
+      if (!p.down && ((!p.fired && p.low - uy > 16) || tap || p.jump)) { b.want = 0.14; b.press = true; }
     }
     delete pointers[e.pointerId];
   }
@@ -1063,6 +1166,7 @@
     if (e.key === "ArrowRight" || e.key === "d") A.vx += 40;
     if (e.key === "ArrowLeft" || e.key === "a") A.vx -= 40;
     if (e.key === "ArrowUp" || e.key === "w" || e.key === " ") { A.want = 0.12; A.press = true; }
+    if (blobs.length < 2) return; /* ORI1 · single player: no sibling keys */
     if (e.key === "l") B.vx += 40;
     if (e.key === "j") B.vx -= 40;
     if (e.key === "i") { B.echo = false; B.want = 0.12; B.press = true; }
@@ -1076,19 +1180,29 @@
     if (!reduced) requestAnimationFrame(ambience);
   }
 
-  function showGather() {
-    ui.innerHTML = '<div class="gather"><div class="je-host" id="je"></div><a href="' + THEME.back + '">Back to the woods</a></div>';
-    if (window.JarEngine) {
-      JarEngine.mount(document.getElementById("je"), { kid: kid, getState: function () { return JarEngine.choreState(kid); } });
-    }
-    ambience();
+  /* ORI1 · ALWAYS OPEN: no full-jar gate screen. The run starts at once; the jar rides small in the HUD (lit by the run's
+     sky) and the blob shows the week's filled days. */
+  function note(text) {
+    var n = ui.querySelector(".merc-note");
+    if (!n) { n = document.createElement("div"); n.className = "merc-note"; ui.appendChild(n); }
+    n.textContent = text; n.style.opacity = "1";
+    clearTimeout(note.t); note.t = setTimeout(function () { n.style.opacity = "0"; }, 3600);
   }
-
   function showPlay() {
+    if (playing) return;
     playing = true;
     setTimeout(refreshPowers, 0);
-    setInterval(refreshPowers, 30000); /* a chore closed mid-run lights its power-up within half a minute */
-    ui.innerHTML = '<div class="hud"><a href="' + THEME.back + '">Back</a><span></span></div><div class="hint">Each of you has a part of the wall. Slide to roll. Tap or flick up to jump.</div><div class="zones">' + blobs.map(function (b) { return '<div class="zone"><span>' + NAMES[b.kid] + '</span></div>'; }).join("") + '</div>';
+    setInterval(refreshPowers, 15000); /* heartbeat: a chore closed mid-run shows within 15 s even with no event */
+    var coop = blobs.length > 1;
+    var hint = coop ? "Each of you has a part of the wall. Slide to roll. Tap to jump." : "Slide to roll. Tap to jump. Every full day makes you bigger.";
+    ui.innerHTML = '<div class="hud"><a href="' + THEME.back + '">Back</a><span></span><div class="je-mini" id="je" aria-hidden="true"></div></div><div class="hint">' + hint + '</div>' +
+      (coop ? '<div class="zones">' + blobs.map(function (b) { return '<div class="zone"><span>' + NAMES[b.kid] + '</span></div>'; }).join("") + '</div>' : "");
+    if (window.JarEngine) {
+      try {
+        hudJar = JarEngine.mount(document.getElementById("je"), { kid: kid, getState: function () { return jarState(kid); } });
+        skyToJar();
+      } catch (e) { hudJar = null; }
+    }
     resize();
     frame();
     setTimeout(function () {
@@ -1098,10 +1212,11 @@
   }
 
   function winWatch() {
-    var note = document.createElement("div");
-    note.className = "gather";
-    note.innerHTML = '<p style="font-size:28px;font-weight:700;text-shadow:0 0 18px #fff">The grove holds everyone.</p><a href="' + THEME.back + '">Back</a>';
-    ui.appendChild(note);
+    var w = document.createElement("div");
+    w.className = "merc-win" + (finale ? " merc-finale" : "");
+    var msg = finale ? "The grove holds everyone." : "You made it to the grove. Fill your jar to light it up.";
+    w.innerHTML = '<p>' + msg + '</p><a href="' + THEME.back + '">Back</a>';
+    ui.appendChild(w);
   }
 
   var winShown = false;
@@ -1118,18 +1233,10 @@
   });
 
   function start() {
-    var st = window.JarEngine ? JarEngine.choreState(kid) : { full: false };
     resize();
     window.addEventListener("resize", resize);
-    A.x = spawn.x; A.y = GY(plats[0].y) - 40; A.cp = { x: A.x, y: A.y };
-    B.x = spawn.x + 36; B.y = A.y; B.cp = { x: B.x, y: B.y };
-    C.x = spawn.x + 72; C.y = A.y; C.cp = { x: C.x, y: C.y };
-    if (!st.full) {
-      showGather();
-      ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
-      paintWorld(ctx, 0, view.w, view.h);
-      return;
-    }
+    var top0 = GY(plats[0].y);
+    [A, B, C].forEach(function (b, i) { b.x = spawn.x + 36 * i; b.y = top0 - b.r; b.cp = { x: b.x, y: b.y, top: top0 }; b.grounded = true; });
     showPlay();
   }
 
@@ -1137,16 +1244,11 @@
   if (!capMode) {
     if (window.WardKids && WardKids.boot) {
       /* MERCNODATA1 · unpaired / offline: no kids week, so start the world with an empty week instead of a black canvas */
-      var started = false, lateDone = false;
+      var started = false;
       var go = function () { if (started) return; started = true; start(); };
-      /* FOLLOWUP1 · a slow hub (4 to 6 s) answers after the empty start: if the real week fills the jar, play once */
-      document.addEventListener("house:kids-data-ready", function () {
-        if (!started) { go(); return; }
-        if (lateDone || playing) return;
-        lateDone = true;
-        var st = window.JarEngine ? JarEngine.choreState(kid) : { full: false };
-        if (st.full) showPlay();
-      });
+      /* FOLLOWUP1 · ORI1: the run is always open, so a slow hub just starts it (or, once running, re-reads the week:
+         the rereadSoon listener) */
+      document.addEventListener("house:kids-data-ready", function () { if (!started) go(); });
       document.addEventListener("house:kids-data-missing", go);
       setTimeout(go, 4000);
       /* FOLLOWUP1 · paint the world before any data so the canvas is never black at start */
@@ -1268,7 +1370,8 @@
   }
 
   window.MercuryRun = {
-    debug: function () { return { A: [A.x, A.y, A.r], B: [B.x, B.y], cam: cam, drops: drops.length, view: view, pw: allBlobs().map(function (b) { return [b.kid, b.pw]; }), air2: allBlobs().map(function (b) { return !!b.air2; }), gathers: gatherLog.slice(), won: won, xs: allBlobs().map(function (b) { return Math.round(b.x); }) }; },
+    debug: function () { return { A: [A.x, A.y, A.r], B: [B.x, B.y], cam: cam, drops: drops.length, view: view, pw: allBlobs().map(function (b) { return [b.kid, b.pw]; }), air2: allBlobs().map(function (b) { return !!b.air2; }), gathers: gatherLog.slice(), won: won, xs: allBlobs().map(function (b) { return Math.round(b.x); }), finale: finale, blobs: blobs.length, playing: playing, reveal: reveal.count }; },
+    artSlots: function () { return Object.keys(ART_SLOTS); }, /* ORI1 · Phase 2 art hook names */
     exportFrame: exportFrame,
     platesReady: function () { return runPlatesReady && !!runPlates.sky; }
   };

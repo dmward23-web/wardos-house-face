@@ -94,6 +94,6 @@ test("kid pages load the JARTAP1 bytes (cache tokens)", () => {
   for (const k of ["harris", "hayes", "ainsley"]) {
     const h = rd("kid-" + k + ".html");
     for (const f of ["jar-engine.js", "kid-world.js", "kid-world.css", "house-fresh.js", "house-nomoney.js"])
-      assert.match(h, new RegExp(f.replace(".", "\\.") + (f === "kid-world.js" ? "\\?v=HAYESJAR1" : f === "kid-world.css" || f === "house-nomoney.js" ? "\\?v=DAYPKG1" : "\\?v=JARTAP1")), k + " " + f); /* HAYESJAR1 re-bumped kid-world.js; DAYPKG1 re-bumped kid-world.css (token only); DAYPKG1 v2e re-bumps house-nomoney.js on purpose (v2d changed its kid guard) */
+      assert.match(h, new RegExp(f.replace(".", "\\.") + (f === "kid-world.js" || f === "jar-engine.js" ? "\\?v=ORI1" : f === "kid-world.css" || f === "house-nomoney.js" ? "\\?v=DAYPKG1" : "\\?v=JARTAP1")), k + " " + f); /* HAYESJAR1 re-bumped kid-world.js; DAYPKG1 re-bumped kid-world.css; DAYPKG1 v2e re-bumps house-nomoney.js on purpose (v2d changed its kid guard); ORI1 re-bumped jar-engine.js + kid-world.js (token only) */
   }
 });

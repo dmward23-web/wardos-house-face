@@ -1886,7 +1886,7 @@
           html: "<p>The metal rises with the things that got done.</p>",
           paint: vignette("glow"),
           onMount: function (body, actions) {
-            if (!st.full) return;
+            /* ORI1 · the run is always open (Dan via Atlas 10/27): the link shows at any fill; a full jar unlocks its finale */
             var a = document.createElement("a");
             a.className = "kw-go";
             a.setAttribute("data-extra", "1");

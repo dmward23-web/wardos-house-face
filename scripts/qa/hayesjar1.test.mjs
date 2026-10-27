@@ -449,7 +449,7 @@ test("1C 0 '$': no dollar sign in any key or value after every 1C path above, no
 });
 
 test("1D cache tokens: kids-data.js and house-checkoffs.js at ?v=HAYESJAR1D on every page that loads them; kid-world.js stays ?v=HAYESJAR1", () => {
-  const want = { "kids-data": "DAYPKG1", "house-checkoffs": "DAYPKG1", "kid-world": "HAYESJAR1" }; /* DAYPKG1 re-bumped kids-data.js + house-checkoffs.js (token only) */
+  const want = { "kids-data": "DAYPKG1", "house-checkoffs": "DAYPKG1", "kid-world": "ORI1" }; /* DAYPKG1 re-bumped kids-data.js + house-checkoffs.js; ORI1 re-bumped kid-world.js (token only) */
   const n = { "kids-data": 0, "house-checkoffs": 0, "kid-world": 0 };
   for (const p of fs.readdirSync(ROOT).filter((f) => f.endsWith(".html"))) {
     for (const m of rd(p).matchAll(/(kids-data|house-checkoffs|kid-world)\.js\?v=([A-Za-z0-9_-]+)/g)) { n[m[1]]++; assert.equal(m[2], want[m[1]], p + " " + m[1]); }

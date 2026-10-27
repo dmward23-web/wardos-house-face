@@ -42,3 +42,18 @@ html, body { margin: 0; height: 100%; background: #070b10; color: #f4fbff; overf
 .hud .pw { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 /* BACKPILL1 · "Back to the woods" label centred in its pill */
 .gather a { display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1.1 !important; box-sizing: border-box; }
+
+/* ORI1 · always open: the jar rides small in the HUD (it is not a gate), lit by the run's sky via setEnv */
+.hud .je-mini { width: 84px; height: 96px; pointer-events: none; flex: 0 0 auto; }
+.hud .je-mini canvas { width: 100% !important; height: 100% !important; }
+/* ORI1 · one-off notes (a full jar) and the grove ending; no .gather class, there is no gate screen any more */
+.merc-note { position: absolute; left: 0; right: 0; top: 22%; text-align: center; font-size: 26px; font-weight: 700; text-shadow: 0 0 16px rgba(0,0,0,.7), 0 0 22px rgba(255,226,168,.5); transition: opacity .6s; pointer-events: none; }
+.merc-win { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 8vh; pointer-events: none; }
+.merc-win p { font-size: 28px; font-weight: 700; text-align: center; margin: 0 16px 12px; text-shadow: 0 0 18px #fff; }
+.merc-win.merc-finale p { font-size: 34px; text-shadow: 0 0 22px #ffe2a8, 0 0 40px #ffb870; }
+.merc-win a { pointer-events: auto; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1.1 !important; box-sizing: border-box; }
+/* ORI1 · the "Needs pairing" chip (private-feed.js) sat centred at the bottom over the phone's play area and hint.
+   On the run it is a small corner chip, no explanation line, below the world (it stays readable and tappable). */
+.pf-flag.pf-flag--pair { left: 8px !important; right: auto !important; top: auto !important; bottom: max(8px, env(safe-area-inset-bottom)) !important;
+  transform: none !important; max-width: 44vw !important; font-size: 11px !important; padding: 4px 8px !important; opacity: .8; }
+.pf-flag.pf-flag--pair [data-pair-why] { display: none !important; }

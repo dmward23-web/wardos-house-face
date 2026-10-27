@@ -36,16 +36,19 @@
     } catch (e) { return false; }
   }
 
-  function choreState(kidId) {
+  /* ORI1 · optional opts.dayIso: read the week around that day instead of the day frozen at page load (the run passes the
+     live Chicago date so a page left open across midnight moves on). No opts = exactly the old read (kid boards). */
+  function choreState(kidId, opts) {
     kidId = kidIdOf(kidId);
+    var dayIso = opts && opts.dayIso ? String(opts.dayIso) : null;
     var WK = global.WardKids;
     var data = WK && WK._data;
     var out = { kid: kidId, fill: 0, hungry: false, asleep: false, full: false, done: 0, total: 0, todayDone: 0, todayNeed: 0 };
     if (!WK || !data || !data.kids || !data.kids[kidId]) return out;
     out.asleep = asleepWeek(data);
     var quests = typeof WK.mustQuests === "function" ? (WK.mustQuests(kidId, data) || []) : [];
-    var days = typeof WK.weekDayIsos === "function" ? WK.weekDayIsos(WK.DAY_ISO) : [];
-    var today = WK.DAY_ISO;
+    var today = dayIso || WK.DAY_ISO;
+    var days = typeof WK.weekDayIsos === "function" ? WK.weekDayIsos(today) : [];
     quests.forEach(function (q) {
       if (!q || q.optional || q.cadence === "addon") return;
       if ((q.cadence || "daily") === "daily") {
@@ -60,7 +63,7 @@
         });
       } else {
         out.total += 1;
-        if (typeof WK.getCheck === "function" && WK.getCheck(q.id, data)) out.done += 1;
+        if (typeof WK.getCheck === "function" && (dayIso ? WK.getCheck(q.id, data, dayIso) : WK.getCheck(q.id, data))) out.done += 1;
       }
     });
     out.fill = out.total ? clamp(out.done / out.total, 0, 1) : 0;
@@ -129,8 +132,11 @@
   var VERT = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos,0.0,1.0);}";
   /* Raymarched liquid chrome. Five-sphere smooth union, gentle displacement,
      finite-difference normals, sky plate as an equirect. Not a flat disc. */
+  var FILL_LO = 0.86; /* ORI1 · creature scale at an empty jar (1.0 at full = the pre-ORI1 size) */
+  function fillScale(f) { f = Math.max(0, Math.min(1, +f || 0)); return FILL_LO + (1 - FILL_LO) * f; }
   var FRAG = [
     "precision highp float;",
+    "#define FILL_LO " + FILL_LO.toFixed(2),
     "uniform vec2 uRes;",
     "uniform float uTime;",
     "uniform float uFill;",
@@ -148,7 +154,8 @@
     "float map(vec3 p){",
     "  float tm=uTime*(uAsleep>0.5?0.35:1.0);",
     "  float br=1.0+sin(tm*1.15)*0.03;",
-    "  vec3 q=p;",
+    "  float fs=FILL_LO+(1.0-FILL_LO)*clamp(uFill,0.0,1.0);", /* ORI1 · the creature's size follows the fill: FILL_LO at empty, today's size at full */
+    "  vec3 q=p/fs;",
     "  q.y*=1.0-uPoke*0.1;",
     "  float d=length(q-vec3(0.0,-0.20,0.0))-(0.28*br);",
     "  d=smin(d,length(q-vec3(0.0,0.26,0.02))-(0.22*br),0.14);",
@@ -158,7 +165,7 @@
     "  d=smin(d,length(q-vec3(0.10,-0.02,0.38))-boil,0.07);",
     "  float n=sin(q.x*5.2+tm*0.6)*sin(q.y*4.4-tm*0.4)*sin(q.z*4.8+1.1);",
     "  d+=n*0.018;",
-    "  return d;",
+    "  return d*fs;",
     "}",
     "vec3 calcN(vec3 p){",
     "  float e=0.007;",
@@ -602,6 +609,7 @@
     version: "1.0.0",
     COLORS: COLORS,
     choreState: choreState,
+    fillScale: fillScale,
     asleepWeek: asleepWeek,
     mount: mount,
     tone: tone,
