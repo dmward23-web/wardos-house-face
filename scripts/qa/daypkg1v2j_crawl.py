@@ -119,6 +119,14 @@ def page_of(url):
 out = {"size": "%dx%d" % (w, h), "port": PORT, "prefix": PRE, "pages": {}, "edges": {}, "dad_edges": [], "outside": [], "aborted_nonlocal": 0,
        "desk": [], "desk_checks": {"links": 0, "opens": 0, "navs": 0, "requests": 0, "markup_pages": 0}}   # DESKCUT1
 DESK = "wardos-desk-face"
+# ADULTCUT1 (Atlas): dev / admin / billing / account surfaces. The denylist regex lives in daypkg1v2j-crawl.test.mjs and
+# arrives as ADULT_DENY_RE; out.adult_re echoes it so the test proves the crawl applied its regex, not a stale copy.
+import os as _os, re as _re
+ADULT_SRC = _os.environ.get("ADULT_DENY_RE", "")
+ADULT = _re.compile(ADULT_SRC, _re.I) if ADULT_SRC else None
+out["adult"] = []; out["adult_re"] = ADULT_SRC or None
+def adult_hit(page, kind, u):
+    if ADULT is not None and ADULT.search(str(u)): out["adult"].append([page, kind, str(u)[:120]])
 cur = {"page": None}
 t0 = time.time()
 with sync_playwright() as p:
@@ -134,6 +142,7 @@ with sync_playwright() as p:
             out["desk_checks"]["requests"] += 1
             if req.is_navigation_request(): out["desk_checks"]["navs"] += 1
             if DESK in req.url.lower(): out["desk"].append([cur["page"], "nav (location set / tap / form)" if req.is_navigation_request() else "request " + req.resource_type, req.url[:120]])
+            adult_hit(cur["page"], "nav (location set / tap / form)" if req.is_navigation_request() else "request " + req.resource_type, req.url)
             if u.hostname != "127.0.0.1" or u.port != PORT:
                 out["aborted_nonlocal"] += 1
                 if req.is_navigation_request(): out["outside"].append(["nav", req.url[:100]]); return route.abort("aborted")  # a tapped outside link: abort with ERR_ABORTED so no error page commits
@@ -156,6 +165,7 @@ with sync_playwright() as p:
                 for t in targets:
                     out["desk_checks"]["links"] += 1
                     if DESK in t.lower(): out["desk"].append([pgname, "href", t[:120]])
+                    adult_hit(pgname, "href", t)
                 cap["on"] = True; cap["seen"] = []; cap["frame"] = pg.main_frame
                 rec["click"] = pg.evaluate(CLICK); pg.wait_for_timeout(600)
                 cap["on"] = False
@@ -163,8 +173,12 @@ with sync_playwright() as p:
                 for t in opened:
                     out["desk_checks"]["opens"] += 1
                     if DESK in str(t).lower(): out["desk"].append([pgname, "window.open", str(t)[:120]])
+                    adult_hit(pgname, "window.open", t)
                 out["desk_checks"]["markup_pages"] += 1
-                if pg.evaluate("() => document.documentElement.outerHTML.toLowerCase().includes('wardos-desk-face')"): out["desk"].append([pgname, "markup", pg.url])
+                markup = pg.evaluate("() => document.documentElement.outerHTML")
+                if DESK in markup.lower(): out["desk"].append([pgname, "markup", pg.url])
+                if ADULT is not None:
+                    for m in ADULT.finditer(markup): out["adult"].append([pgname, "markup", m.group(0)[:120]])
                 pg.wait_for_timeout(300)
                 st = pg.evaluate(STATE); rec.update(st)
                 rec["errors"] = errors[:4]

@@ -11,7 +11,8 @@
   var LIVE_URL = "data/sensi-live.json";
   var LIVE_FRESH_MS = 30 * 60 * 1000;
   var LIVE_POLL_MS = 60 * 1000;
-  var WEB_LOGIN = "https://manager.sensicomfort.com/";
+  /* ADULTCUT1 (Atlas): the Sensi account-manager login link is cut; web opens go to the public product page */
+  var WEB_LOGIN = "https://sensi.copeland.com/en-us";
   var WEB_PRODUCT = "https://sensi.copeland.com/en-us";
   var APP_IOS = "https://apps.apple.com/us/app/sensi/id792612452";
   var APP_ANDROID = "https://play.google.com/store/apps/details?id=com.asynchrony.emerson.sensi";
