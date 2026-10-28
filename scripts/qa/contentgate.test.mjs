@@ -144,7 +144,7 @@ function money(page, w, h, block) {
 test("NOMONEY1 at 1920x1080 (real browser): sheet-chores shows zero dollar figures (the check catches them when the scrub is off); the Dad money page sheet-allowance keeps them",
   { skip: !browser && "QA_NO_BROWSER=1 or python playwright missing" }, () => {
     const neg = money("sheet-chores.html", 1920, 1080, true);
-    assert.ok(neg.injected && neg.dollars >= 1, "negative control must see the injected figures: " + JSON.stringify(neg));
+    assert.ok(neg.injected && neg.dollars >= 20, "negative control must see the injected figures: " + JSON.stringify(neg));
     const r = money("sheet-chores.html", 1920, 1080, false);
     assert.equal(r.dollars, 0, `sheet-chores.html @ 1920x1080: ${JSON.stringify(r.sample)}`);
     for (const [w, h] of [[1920, 1080], [1080, 1920], [440, 956]]) {

@@ -132,15 +132,19 @@ test("AINSSTAR1 markup: no star glyph, star rate or digit in Ainsley's allowance
 });
 
 test("AINSSTAR1 (real browser): no star glyph or digit in Ainsley's rows before, during or after data", SKIP, () => {
+  const WK = /^\$\d+ wk$/;
   for (const mode of ["nofeed", "slow", "feed"]) {
     const r = run("allowance", mode, 440, 956);
     for (const s of r.samples) {
       assert.ok(s.bank, "her section rendered");
       assert.equal(s.bank.star, false, mode + " star: " + s.bank.text);
       assert.equal(s.bank.digit, false, mode + " digit: " + s.bank.text);
-      /* DAYPKG1 v2i · Dad's weekly figure next to her Paid hold is checked apart (money shape, Dad page only) */
-      assert.ok(s.bank.dadWk === "" || /^\$\d+(?:\.\d+)? wk$/.test(s.bank.dadWk), mode + " Dad weekly figure shape: " + s.bank.dadWk);
+      /* DAYPKG1 v2j (Alfred v2i P3) · Dad's weekly figure next to her Paid hold is checked apart (money shape, Dad page only);
+         before data it may be empty; once the feed read has settled with data (feed, slow) it must be there, never empty */
+      assert.ok(s.bank.dadWk === "" || WK.test(s.bank.dadWk), mode + " Dad weekly figure shape: " + s.bank.dadWk);
     }
+    const last = r.samples[r.samples.length - 1];   // the settled sample (data-jar-settled)
+    if (mode !== "nofeed") assert.match(last.bank.dadWk, WK, mode + " Dad weekly figure must show once data has landed");
     assert.deepEqual(r.errors, []);
   }
 });

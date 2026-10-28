@@ -22,6 +22,8 @@ INJECT = r"""() => new Promise(res => {
   put('[data-money-suffix][data-stars]', '¤7 ea wk');
   put("[data-money='babysit']", '¤12/hr');
   const d = document.createElement('div'); d.className = 'qa-money'; d.textContent = M('Harris earned ¤4 today'); document.body.appendChild(d);
+  /* DAYPKG1 v2j (Alfred v2i P3) · the negative control is back to >=20 on any sheet: twenty more kid rows the live data could paint */
+  for (let i = 1; i <= 20; i++) { const e = document.createElement('div'); e.className = 'qa-money'; e.textContent = M('Week ' + i + ' saved ¤' + i); document.body.appendChild(e); }
   setTimeout(() => res({len: document.body.innerText.length, raw: document.body.textContent.includes(M('¤4')), figs: [...document.body.innerText.matchAll(/\$\s?\d[\d,]*(?:\.\d+)?/g)].map(m => m[0])}), 400);
 })"""
 with sync_playwright() as p:
