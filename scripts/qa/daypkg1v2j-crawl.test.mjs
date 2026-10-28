@@ -310,3 +310,26 @@ test("ADULTCUT2 static: no outbound sign-in, OAuth or off-house target on kid pa
     assert.equal(dad.href, "https://accounts.spotify.com/authorize?client_id=qa", "control: the Dad sheet navigates to the sign-in");
   });
 });
+
+/* ADULTCUT2B · Atlas 2026-10-28 9:59 CT: when music is not set up, no kid surface labels Spotify CONNECT; the hub tile pill reads SETUP like sheet-spotify */
+const SPOTIFY_CONNECT_WORD = /(["'>])\s*CONNECT\s*(["'<])/;
+const spotifyScope = (f, l) => /spotify/i.test(f) || /spotify|\bsp-|need_app|need_auth/i.test(l);
+const notComment = (l) => !/^\s*(?:\/\*|\*|\/\/|<!--)/.test(l);
+test("ADULTCUT2B static: no kid surface shows CONNECT for Spotify; the hub tile pill reads SETUP like sheet-spotify", () => {
+  for (const l of ['need_app: "CONNECT", need_auth: "CONNECT",', "<span class=\"sp-pill\">CONNECT</span>", "pill = 'CONNECT';"])
+    assert.ok(SPOTIFY_CONNECT_WORD.test(l) && spotifyScope("house-spotify.js", l), "bites " + l);
+  for (const l of ["NEED CONNECT", "NOT CONNECTED", "CONNECTING", "CONNECT \u00b7 need Kasa on Atlas", 'need_app: "SETUP"', "Spotify Connect rooms"])
+    assert.ok(!SPOTIFY_CONNECT_WORD.test(l), "spares " + l);
+  const files = kidFiles();
+  assert.ok(files.size > 40, "scanned " + files.size);
+  const hits = [];
+  for (const f of files) fs.readFileSync(path.join(ROOT, f), "utf8").split("\n").forEach((l, i) => {
+    if (notComment(l) && SPOTIFY_CONNECT_WORD.test(l) && spotifyScope(f, l)) hits.push(f + ":" + (i + 1) + " " + l.trim().slice(0, 90));
+  });
+  assert.deepEqual(hits, []);
+  const hs = fs.readFileSync(path.join(ROOT, "house-spotify.js"), "utf8"), ss = fs.readFileSync(path.join(ROOT, "sheet-spotify.js"), "utf8");
+  assert.ok(hs.includes('need_app: "SETUP", need_auth: "SETUP",'), "hub tile pill reads SETUP");
+  assert.ok(ss.includes('need_app: "SETUP", need_auth: "SETUP",'), "sheet-spotify pill reads SETUP (the match)");
+  for (const f of ["sheet-index.html", "sheet-spotify.html", "sheet-spotify-setup.html"])
+    assert.ok(fs.readFileSync(path.join(ROOT, f), "utf8").includes('src="house-spotify.js?v=ADULTCUT2B"'), f + " re-tokened");
+});

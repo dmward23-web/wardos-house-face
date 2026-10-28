@@ -312,7 +312,8 @@
   function paintTile(el) {
     var ph = S.phase, p = player(), it = p && p.item, live = ph === "playing" || ph === "paused" || ph === "idle";
     el.setAttribute("data-sp-phase", ph);
-    var pill = { loading: "READY", playing: "LIVE", paused: "PAUSED", idle: "READY", need_app: "CONNECT", need_auth: "CONNECT", no_key: "PAIR", bad_key: "PAIR", offline: "OFFLINE", error: "CHECK" }[ph] || "Wait";
+    /* ADULTCUT2B · the kid tile pill reads SETUP like sheet-spotify when music is not set up (Spotify sign-in is Dad-only) */
+    var pill = { loading: "READY", playing: "LIVE", paused: "PAUSED", idle: "READY", need_app: "SETUP", need_auth: "SETUP", no_key: "PAIR", bad_key: "PAIR", offline: "OFFLINE", error: "CHECK" }[ph] || "Wait";
     setTxt(el, ".sp-pill", pill);
     var title = "Spotify", artist = "", dev = "", showCtl = false, connectTxt = "";
     if (live && it) {

@@ -21,6 +21,7 @@ const STALE = [
   ["house-lights.js", "FOLLOWUP6"],
   ["house-ori-calm.js", "CALM1"],
   ["house-spotify.js", "MERGE1C"],
+  ["house-spotify.js", "ADULTCUT2"], /* ADULTCUT2B · the tile pill re-labelled SETUP */
   ["house-trips-bind.js", "PRIVFEED1"],
   ["month-theme/month-overlay.js", "MERGE1C"],
   ["night/night-host.css", "MERGE1C"],
@@ -75,7 +76,7 @@ test("H1-CB · no served page loads a halloween1-changed asset with its pre-rang
   assert.deepEqual(hits, []);
 });
 /* HUBPAIR1 · a script changed again after halloween1 carries the newer token */
-const NEWER = { "house-board-strip.js": "PAIRUI1", "house-lights.js": "CAMREST5", "house-spotify.js": "ADULTCUT2" }; /* SPOTCUT1 · the Spotify setup moved Dad-only; ADULTCUT2 · and the Spotify sign-in */ /* PAIRUI1 · both changed again; PAIRUI1b · lights once more; CAMREST4 · and again; CAMREST5 · and again */
+const NEWER = { "house-board-strip.js": "PAIRUI1", "house-lights.js": "CAMREST5", "house-spotify.js": "ADULTCUT2B" }; /* SPOTCUT1 · the Spotify setup moved Dad-only; ADULTCUT2 · and the Spotify sign-in */ /* PAIRUI1 · both changed again; PAIRUI1b · lights once more; CAMREST4 · and again; CAMREST5 · and again */
 test("H1-CB · the six named scripts are re-tokened on the pages that load them", () => {
   const want = { "house-board-strip.js": "sheet-index.html", "house-lights.js": "sheet-lights.html", "house-ori-calm.js": "sheet-index.html",
     "house-spotify.js": "sheet-spotify.html", "house-trips-bind.js": "sheet-us.html", "school-names.js": "kid-hayes.html" };
