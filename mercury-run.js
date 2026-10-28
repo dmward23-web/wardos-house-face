@@ -89,9 +89,11 @@
        <s>x/finale-portrait.png (ORI2, optional, lazy: fetched only when the finale shows on a view taller than wide)
        missing or failed scene = the other orientation's scene, then the default finale; never part of ready
      ORI2 · not wired (carried for a later hook): <month>/text/ caption plates + text.json and fonts/Fredoka-*.woff2; the
-     run's captions stay live DOM text. A Prism extras/ layer (shine, rim, contact shadow, grow FX, pebbles, splash, power
-     marks, idle breathe) is NOT read either: nothing here requests extras/, so an absent or partial extras/ can never
-     block the base set (TODO(SKINX): load it optional, like finale, and never count it toward ready). */
+     run's captions stay live DOM text.
+     ORI3 · a Prism extras layer (shine, rim, contact shadow, idle breathe, grow sweep + ripple, pebbles, splash, power
+     marks) is read only for a month whose registry line names it (extras: "<dir>", see SKINX below), only after the base
+     set is ready, and it never counts toward ready: an absent, partial or broken extras set can never block the base set.
+     No month names one yet (the r2 extras drop is pending). */
   var SKIN_STATES = ["idle", "squash", "stretch", "fall", "roll-1", "roll-2", "happy", "sleep", "peek", "full"];
   var SKIN_EYES = ["open", "half", "closed", "happy"];
   var SKIN_EXT = ".png";
@@ -171,6 +173,211 @@
   function skinTransition(from, to) { if (!to.def || !to.def.transition) return; /* TODO(SKIN2): play to.def.transition once */ }
   function paintAccessory(g, b, st, sc) { if (!skin.def || !skin.def.accessory || !skin.anchors || !skin.anchors.accessory) return; /* TODO(SKIN2): accessory layer */ }
   function heroArt() { return skin.ready && skin.anchors ? skin : null; }
+  /* ORI3 · SKINX extras: an optional Prism layer set on top of a worn skin (registry key extras: "<dir>", same drop-in
+     layout as Prism's extras/: <dir><kid>/<s>x/<name>.png, <dir><kid>/anchors-extras.json, <dir>fx/<s>x/<name>.png,
+     <dir>fx/fx.json). Rules: nothing is requested until the base skin is ready (heroArt), most layers are fetched the
+     first time their moment paints (per state for shadow / shine / rim; sweep + grow on the host's first grow pulse;
+     splash on the first splash; wings / motes when that power is on; pebbles when the row first paints), every file
+     has its own loading / ok / fail state, a missing or failed file is skipped silently and never retried, and no extra
+     ever touches ready, so the base turkey can never fall back to the blob because of extras. Only Prism's layers are
+     composited (tint, scale, fade); nothing here draws art. Reduced motion: no breathe, sweep, grow, splash, motes or
+     pebble pop; the static layers (shadow, shine, rim, pebbles, wings) only. */
+  var EX_BREATHE_MS = 350, EX_GROW_MS = 80, EX_SPLASH_MS = 50, EX_MOTE_MS = 120, EX_POP_MS = 160, EX_WING_MS = 200;
+  var EX_AIR_H = 160; /* css px of height at which the airborne shadow reaches its 0.6 scale / 0.4 opacity floor */
+  /* theme: ?theme=<id>, else <html data-theme="<id>">; fx.json grow.variants[<id>] names that theme's grow frames */
+  function exTheme() {
+    var th = q.get("theme");
+    if (!th) { try { th = document.documentElement && document.documentElement.getAttribute && document.documentElement.getAttribute("data-theme"); } catch (e) { th = null; } }
+    th = String(th || "").toLowerCase();
+    return /^[a-z0-9-]{1,24}$/.test(th) ? th : "";
+  }
+  function exOn(s) {
+    if (!s || !s.ready || !s.def || typeof s.def.extras !== "string" || !s.def.extras) return null;
+    if (s.x) return s.x;
+    var x = s.x = { dir: s.def.extras, scale: s.scale, kid: s.kid, ims: {}, req: [], order: [], anc: { st: "loading", j: null }, fxj: { st: "loading", j: null }, splashes: [], theme: exTheme() };
+    function json(url, slot, okj) {
+      x.req.push(url);
+      try {
+        fetch(url, { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+          if (j && typeof j === "object" && okj(j)) { slot.j = j; slot.st = "ok"; } else slot.st = "fail";
+        }).catch(function () { slot.st = "fail"; });
+      } catch (e) { slot.st = "fail"; }
+    }
+    json(x.dir + x.kid + "/anchors-extras.json", x.anc, function (j) { return j.bodyR > 0; });
+    json(x.dir + "fx/fx.json", x.fxj, function (j) { return !!j.grow; });
+    return x;
+  }
+  /* one file, one state; returns the image only once it loaded */
+  function exIm(x, key, url) {
+    var e = x.ims[key];
+    if (!e) {
+      e = x.ims[key] = { st: "loading", im: null };
+      x.req.push(url);
+      var im = new Image();
+      im.onload = function () { if (im.width && im.height) { e.im = im; e.st = "ok"; } else e.st = "fail"; };
+      im.onerror = function () { e.st = "fail"; };
+      im.src = url;
+    }
+    return e.st === "ok" ? e.im : null;
+  }
+  function exKid(x, name) { return /^[a-z0-9-]+$/.test(name) ? exIm(x, "kid:" + name, x.dir + x.kid + "/" + x.scale + "x/" + name + SKIN_EXT) : null; }
+  function exFx(x, name) { return /^[a-z0-9-]+$/.test(name) ? exIm(x, "fx:" + name, x.dir + "fx/" + x.scale + "x/" + name + SKIN_EXT) : null; }
+  function exFxDef(x, key) { var j = x.fxj.st === "ok" && x.fxj.j[key]; return j && j.pivot3x && j.pivot3x.length === 2 ? j : null; }
+  /* grow frames for the current theme: fx.json grow.variants[theme] = { prefix: "grow-cream", frames: 6 } (prefix
+     defaults to "grow-<theme>"); no variant for the theme = the base grow-1..N */
+  function exGrow(x) {
+    var g = exFxDef(x, "grow"); if (!g) return null;
+    var v = x.theme && g.variants && typeof g.variants === "object" && g.variants[x.theme];
+    var pre = v ? String(v.prefix || ("grow-" + x.theme)) : "grow";
+    return { prefix: /^[a-z0-9-]+$/.test(pre) ? pre : "grow", n: Math.max(1, Math.min(12, +((v && v.frames) || g.frames) || 6)), pivot: (v && v.pivot3x) || g.pivot3x, variant: v ? x.theme : null };
+  }
+  function exLayer(g, x, name, op, alpha, ox, oy, tag) {
+    var im = exKid(x, name); if (!im) return false;
+    g.save(); g.globalCompositeOperation = op; g.globalAlpha = alpha; g.drawImage(im, ox, oy); g.restore();
+    x.order.push(tag || name); return true;
+  }
+  /* the floor under a blob (the highest platform top at or below its bottom), or null over a gap */
+  function exGround(b, t) {
+    var best = null;
+    for (var i = 0; i < plats.length; i++) {
+      var px = platX(plats[i], t), top = GY(plats[i].y);
+      if (b.x > px - b.r * 0.4 && b.x < px + plats[i].w + b.r * 0.4 && top >= b.y + b.r - 1 && (best == null || top < best)) best = top;
+    }
+    return best;
+  }
+  function exShadow(g, x, b, st, an, sc, s, t) {
+    var airborne = !b.grounded, h = 0;
+    if (airborne) {
+      var gy = exGround(b, t), sd = x.anc.st === "ok" && x.anc.j.shadow && x.anc.j.shadow[st];
+      if (gy == null || !sd || !sd.center3x) return false; /* over a gap, or no shadow anchor: no shadow */
+      h = Math.max(0, gy - (b.y + b.r));
+    }
+    var sh = x.anc.st === "ok" && x.anc.j.shadow && x.anc.j.shadow[st];
+    var im = exKid(x, (sh && sh.name) || ("shadow-" + st)); if (!im) return false;
+    var k = Math.min(1, h / EX_AIR_H);
+    g.save(); g.globalCompositeOperation = "multiply"; g.globalAlpha = 1 - 0.6 * k;
+    if (airborne) {
+      var cx = sh.center3x[0] * s / 3 - an.contact[0] * s, cy = sh.center3x[1] * s / 3 - an.contact[1] * s;
+      g.translate(cx, cy + h / sc); g.scale(1 - 0.4 * k, 1 - 0.4 * k);
+      g.drawImage(im, -sh.center3x[0] * s / 3, -sh.center3x[1] * s / 3);
+    } else g.drawImage(im, -an.contact[0] * s, -an.contact[1] * s);
+    g.restore();
+    x.order.push("shadow"); b.exShadow = true; return true;
+  }
+  /* idle breathe: frames 1-2-3-4 at 350 ms; frame 1 is the idle sprite itself (not fetched again) */
+  function exBreathe(x, sk, t) {
+    if (reduced || x.anc.st !== "ok") return null;
+    var br = x.anc.j.breathe; if (!br || !br.length) return null;
+    var i = Math.floor(t * 1000 / EX_BREATHE_MS) % br.length, f = br[i];
+    for (var k = 1; k < br.length; k++) if (br[k] && br[k].name) exKid(x, br[k].name); /* fetch the loop once */
+    if (!f || !f.contact || !f.eyes) return null;
+    var im = i === 0 ? sk.sprites.idle : exKid(x, f.name);
+    return im ? { im: im, name: i === 0 ? "idle" : f.name, contact: f.contact, eyes: f.eyes } : null;
+  }
+  /* the host's grow pulse: sweep (masked to the idle body by Prism, so only over idle / breathe) + the theme's grow ripple */
+  function exPulse(b) {
+    var sk = heroArt(), x = b === A && exOn(sk); if (!x || reduced) return;
+    x.pulseAt = performance.now();
+    for (var i = 1; i <= 6; i++) exKid(x, "sweep-" + i);
+    var gr = exGrow(x); x.growWanted = true;
+    if (gr) for (var j = 1; j <= gr.n; j++) exFx(x, gr.prefix + "-" + j);
+  }
+  function exPulseFrames(x, sk, st, s, ox, oy, g) {
+    if (!x.pulseAt || reduced) return;
+    var ms = performance.now() - x.pulseAt;
+    if (x.growWanted && x.fxj.st !== "loading") { x.growWanted = false; var gw = exGrow(x); if (gw) for (var j = 1; j <= gw.n; j++) exFx(x, gw.prefix + "-" + j); }
+    var sf = Math.floor(ms / EX_GROW_MS) + 1;
+    if (sf <= 6 && (st === "idle")) exLayer(g, x, "sweep-" + sf, "screen", 1, ox, oy);
+    var gr = exGrow(x);
+    if (gr && sf <= gr.n) {
+      var im = exFx(x, gr.prefix + "-" + sf), bodyR = (x.anc.st === "ok" && x.anc.j.bodyR) || sk.anchors.bodyR;
+      if (im && bodyR) {
+        g.save(); g.globalCompositeOperation = "screen";
+        g.drawImage(im, -gr.pivot[0] * s / 3, -bodyR * s - gr.pivot[1] * s / 3);
+        g.restore(); x.order.push(gr.prefix + "-" + sf);
+      }
+    }
+    if (sf > Math.max(6, gr ? gr.n : 0)) x.pulseAt = 0;
+  }
+  /* body-relative scale for fx on any blob (same factor the hero art uses) */
+  function exSc(x, sk, b) { var bodyR = (x.anc.st === "ok" && x.anc.j.bodyR) || sk.anchors.bodyR; return bodyR ? b.r / (bodyR * sk.scale) : 0; }
+  function exAt(g, im, def, cx, cy, sc, op, alpha, z) {
+    var s3 = (heroArt() || skin).scale / 3;
+    g.save(); g.globalCompositeOperation = op; g.globalAlpha = alpha;
+    g.translate(cx, cy); g.scale(sc * (z || 1), sc * (z || 1));
+    g.drawImage(im, -def.pivot3x[0] * s3, -def.pivot3x[1] * s3);
+    g.restore();
+  }
+  /* power marks from the existing power state only: wings while the double jump is ready (scale 1.0 to 1.2 + fade over
+     200 ms when it is used), motes looping while the drop magnet is on. Returns which marks the art covered. */
+  function exPowers(g, b, t) {
+    var sk = heroArt(), x = exOn(sk), out = { wings: false, motes: false };
+    if (!x || x.fxj.st !== "ok") return out;
+    var pw = b.pw || {}, sc = exSc(x, sk, b), cx = b.x - cam, cy = b.y, now = performance.now();
+    if (!sc) return out;
+    if (pw.dbl) {
+      var wd = exFxDef(x, "wings"), wi = wd && exFx(x, "wings");
+      if (!b.air2) b.wingUse = 0; else if (!b.wingUse) b.wingUse = now;
+      if (wi) {
+        var u = b.wingUse ? (now - b.wingUse) / EX_WING_MS : 0;
+        if (u < 1 && !(reduced && b.wingUse)) { exAt(g, wi, wd, cx, cy, sc, "source-over", 1 - u, 1 + 0.2 * u); x.order.push("wings"); }
+        out.wings = true;
+      }
+    }
+    if (pw.magnet && !reduced) {
+      var md = exFxDef(x, "motes"), n = (md && +md.frames) || 4;
+      if (md) for (var i = 1; i <= n; i++) exFx(x, "motes-" + i);
+      var mi = md && exFx(x, "motes-" + (Math.floor(now / EX_MOTE_MS) % n + 1));
+      if (mi) { exAt(g, mi, md, cx, cy, sc, "screen", 1); x.order.push("motes"); out.motes = true; }
+    }
+    return out;
+  }
+  /* splash: six frames at 50 ms, once, at the impact point, neutral silver tinted to the blob's kid in code */
+  var exTintCv = null;
+  function exSplash(b, x0, y0) {
+    var x = exOn(heroArt()); if (!x || reduced) return;
+    var sd = exFxDef(x, "splash"), n = (sd && +sd.frames) || 6;
+    for (var i = 1; i <= n; i++) exFx(x, "splash-" + i);
+    x.splashes.push({ b: b, x: x0, y: y0, at: performance.now(), n: n });
+  }
+  function exTinted(im, tint) {
+    try {
+      exTintCv = exTintCv || document.createElement("canvas");
+      exTintCv.width = im.width; exTintCv.height = im.height;
+      var c = exTintCv.getContext("2d"); c.clearRect(0, 0, im.width, im.height);
+      c.globalCompositeOperation = "source-over"; c.drawImage(im, 0, 0);
+      c.globalCompositeOperation = "multiply"; c.fillStyle = tint; c.fillRect(0, 0, im.width, im.height);
+      c.globalCompositeOperation = "destination-in"; c.drawImage(im, 0, 0);
+      c.globalCompositeOperation = "source-over";
+      return exTintCv;
+    } catch (e) { return im; }
+  }
+  function exSplashes(g) {
+    var sk = heroArt(), x = sk && sk.x; if (!x || !x.splashes.length) return;
+    var sd = exFxDef(x, "splash"), now = performance.now();
+    x.splashes = x.splashes.filter(function (p) {
+      var f = Math.floor((now - p.at) / EX_SPLASH_MS) + 1; if (f > p.n) return false;
+      var im = sd && exFx(x, "splash-" + f), sc = exSc(x, sk, p.b);
+      if (im && sc) { exAt(g, exTinted(im, p.b.tint || THEME.metal), sd, p.x - cam, p.y, sc, "source-over", 1); x.order.push("splash-" + f); }
+      return true;
+    });
+  }
+  /* day pebbles from the existing lit / daysOf state only (no new counts); Ainsley never sees a pebble row (she sees
+     no counts), so her blob shows none, art or interim */
+  function exPebble(g, b, i, px, y, on, t) {
+    var sk = heroArt(), x = exOn(sk), pd = x && exFxDef(x, "pebble");
+    if (!pd) return false;
+    var im = exFx(x, on ? "pebble-filled" : "pebble-empty");
+    exFx(x, on ? "pebble-empty" : "pebble-filled");
+    if (!im) return false;
+    var z = 1;
+    if (on && i === b.lit - 1 && b.litAt && !reduced) z = 0.6 + 0.4 * Math.min(1, (performance.now() - b.litAt) / EX_POP_MS);
+    exAt(g, im, pd, px, y, EX_PEBBLE_PX / (pd.canvas3x || 384) * 3 / sk.scale, "source-over", 1, z);
+    x.order.push(on ? "pebble-filled" : "pebble-empty");
+    return true;
+  }
+  var EX_PEBBLE_PX = 30; /* css px across one pebble canvas (slots are 18 px apart) */
+  function pebblesHiddenFor(b) { return b.kid === "ainsley"; }
   skinSync();
   /* ORI1 · the jar creature in the HUD reflects the run's own sky (it read a 1x1 dark placeholder before: a black ball cluster) */
   var hudJar = null;
@@ -434,7 +641,7 @@
     var s = reveal.queue.shift();
     var b = s.b;
     if (s.day >= b.days) return; /* the day was un-ticked before its turn */
-    b.lit = s.day + 1;
+    b.lit = s.day + 1; b.litAt = performance.now();
     b.rT = growR(b.r0, b.lit);
     reveal.count += 1;
     reveal.log.push([b.kid, b.lit]);
@@ -448,6 +655,7 @@
   }
   function fillPulse(b) {
     b.fillK = 1; b.squash = 1.25;
+    exPulse(b); /* ORI3 · sweep + grow ripple (host, fetched on this first pulse) */
     burst(b.x, b.y - b.r * 0.4, reduced ? 6 : 14, "#ffe2a8");
     rings.push({ x: b.x, y: b.y, r: b.r, a: 0.7 });
   }
@@ -457,13 +665,14 @@
   function paintFill(g, t) {
     g.save();
     blobs.forEach(function (b) {
-      if (!b.daysOf) return;
+      if (!b.daysOf || pebblesHiddenFor(b)) return;
       /* ORI1 · bigger day pebbles (6 px lit, 4.5 px waiting, 18 px apart) under the blob; a newly lit one glows */
       var x = b.x - cam, y = b.y + b.r + 18, n = b.daysOf, gap = 18, x0 = x - (n - 1) * gap / 2;
       var pOn = art("pebble.on"), pOff = art("pebble.off");
       for (var i = 0; i < n; i++) {
         var on = i < b.lit, px = x0 + i * gap, pr = on ? 6 : 4.5;
         var im = on ? pOn : pOff;
+        if (exPebble(g, b, i, px, y, on, t)) continue; /* ORI3 · Prism pebbles when loaded */
         if (im) { g.drawImage(im, px - pr * 1.6, y - pr * 1.6, pr * 3.2, pr * 3.2); continue; }
         g.beginPath(); g.arc(px, y, pr, 0, 7);
         g.fillStyle = on ? "rgba(255,226,168,0.98)" : "rgba(255,255,255,0.26)"; g.fill();
@@ -535,11 +744,11 @@
     if (b.inv > 0) return;
     gatherLog.push([b.kid, why || "fall", Math.round(b.x)]);
     if (why === "drip" && b.pw && b.pw.magnet) { /* drop magnet: the splash pulls straight back in, no trip to the lantern */
-      burst(b.x, b.y, 10, b.tint); tone("splash");
+      burst(b.x, b.y, 10, b.tint); tone("splash"); exSplash(b, b.x, b.y);
       b.vy = Math.min(b.vy, -260); b.inv = 0.6; b.magnetT = 0.6; return;
     }
     burst(b.x, Math.min(b.y, view.h * 0.86), 12, b.tint);
-    tone("splash");
+    tone("splash"); exSplash(b, b.x, Math.min(b.y, view.h * 0.86));
     shake = 0;
     b.ret = { x0: b.x, y0: Math.min(b.y, view.h * 0.86), k: 0 }; b.vx = 0; b.vy = 0; b.inv = 0.45; b.alive = true;
   }
@@ -1004,6 +1213,7 @@
   var env = document.createElement("canvas"), eq = env.getContext("2d", { willReadFrequently: true });
   function paintLiquid(g, t, src, dpr) {
     var balls = [];
+    blobs.forEach(function (b) { b.exShadow = false; });
     blobs.forEach(function (b, k) {
       if (b.inv > 0 && Math.floor(t * 6) % 2 === 0) return;
       /* ORI1 · Phase 2 art slot: a Prism creature sprite for this kid replaces the procedural liquid when it is loaded */
@@ -1024,7 +1234,7 @@
     balls.forEach(function (bb, i) { var r0 = root(i); (groups[r0] = groups[r0] || []).push(bb); });
     Object.keys(groups).forEach(function (key) { paintLiquidGroup(g, t, src, dpr, groups[key]); });
     g.save();
-    blobs.forEach(function (b) { if (!b.grounded) return; g.fillStyle = "rgba(0,0,0,0.35)"; g.beginPath(); g.ellipse(b.x - cam, b.y + b.r * 0.95, b.r * 0.8, b.r * 0.16, 0, 0, 7); g.fill(); });
+    blobs.forEach(function (b) { if (!b.grounded || b.exShadow) return; g.fillStyle = "rgba(0,0,0,0.35)"; g.beginPath(); g.ellipse(b.x - cam, b.y + b.r * 0.95, b.r * 0.8, b.r * 0.16, 0, 0, 7); g.fill(); });
     g.restore();
   }
   /* SKIN1 · hero state from motion only (the art never feeds back into the mechanics) */
@@ -1048,13 +1258,25 @@
     var st = heroState(b, t), im = sk.sprites[st], an = sk.anchors.states[st];
     if (!im || !an) return false;
     var sc = (b.r / ((sk.anchors.bodyR || im.width / 2.6 / sk.scale) * sk.scale)), flip = b.vx < -30 && /^roll/.test(st) ? -1 : 1;
+    /* ORI3 · extras draw order: shadow, body (or breathe frame), eyes, shine, rim, sweep, grow ripple */
+    var x = exOn(sk), s = sk.scale, body = im, ct = an.contact, eyAt = an.eyes;
+    if (x) { var bf = st === "idle" && exBreathe(x, sk, t); if (bf) { body = bf.im; ct = bf.contact; eyAt = bf.eyes; } }
+    var ox = -ct[0] * s, oy = -ct[1] * s;
     g.save();
     g.translate(b.x - cam, b.y + b.r);
     g.scale(flip * sc, sc);
-    g.drawImage(im, -an.contact[0] * sk.scale, -an.contact[1] * sk.scale);
+    if (x) exShadow(g, x, b, st, an, sc, s, t);
+    g.drawImage(body, ox, oy);
+    if (x) x.order.push(bf ? "body:" + bf.name : "body:" + st);
     var ey = sk.eyes[heroEyes(st, t)];
-    if (ey && an.eyes) g.drawImage(ey, (an.eyes[0] - an.contact[0]) * sk.scale - ey.width / 2, (an.eyes[1] - an.contact[1]) * sk.scale - ey.height / 2);
+    if (ey && eyAt) { g.drawImage(ey, (eyAt[0] - ct[0]) * s - ey.width / 2, (eyAt[1] - ct[1]) * s - ey.height / 2); if (x) x.order.push("eyes"); }
     paintAccessory(g, b, st, sk.scale);
+    if (x) {
+      var nm = x.anc.st === "ok" && x.anc.j;
+      exLayer(g, x, (nm && nm.shine && nm.shine[st]) || ("shine-" + st), "screen", 1, ox, oy, "shine");
+      exLayer(g, x, (nm && nm.rim && nm.rim[st]) || ("rim-" + st), "screen", 1, ox, oy, "rim");
+      exPulseFrames(x, sk, st, s, ox, oy, g);
+    }
     g.restore();
     return true;
   }
@@ -1148,7 +1370,9 @@
     blobs.forEach(function (b, k) {
       if (b.inv > 0 && Math.floor(t * 6) % 2 === 0) return;
       var pw = b.pw || {}, x = b.x - cam, y = b.y, r = b.r;
-      if (pw.dbl) {
+      var ex = exPowers(g, b, t); /* ORI3 · Prism's wings / motes replace these marks once loaded */
+      g.globalCompositeOperation = "lighter";
+      if (pw.dbl && !ex.wings) {
         var flare = b.air2 ? 1 : 0.55 + 0.15 * Math.sin(t * 1.6 + k);
         var halo = g.createRadialGradient(x, y, r * 0.6, x, y, r * 2.4);
         halo.addColorStop(0, "rgba(140,230,255," + (0.22 * flare) + ")"); halo.addColorStop(1, "rgba(140,230,255,0)");
@@ -1166,7 +1390,7 @@
           g.fill(); g.restore();
         }
       }
-      if (pw.magnet) {
+      if (pw.magnet && !ex.motes) {
         for (var m = 0; m < 3; m++) {
           var an = t * 0.9 + m * 2.094 + k, ox2 = x + Math.cos(an) * r * 1.7, oy2 = y + Math.sin(an) * r * 0.75 - r * 0.2;
           var mg = g.createRadialGradient(ox2, oy2, 0, ox2, oy2, r * 0.55);
@@ -1234,6 +1458,7 @@
     if (frame.l && playing) adapt(now - frame.l);
     frame.l = now;
     var W = view.w, H = view.h;
+    if (skin.x) skin.x.order = []; /* ORI3 · this frame's extras draw order (QA probe) */
     var ids = Object.keys(pointers);
     var ins = blobs.map(function () { return null; });
     ids.forEach(function (id) { var k = Math.min(blobs.length - 1, pointers[id].blob); ins[k] = pointers[id]; });
@@ -1270,6 +1495,7 @@
       ctx.globalAlpha = 1;
     }
     paintPowers(ctx, t);
+    exSplashes(ctx);
     paintFill(ctx, t);
     paintFinaleScene(ctx, W, H);
     if (A.auto) pushIn(t, dt);
@@ -1533,6 +1759,13 @@
     artSlots: function () { return Object.keys(ART_SLOTS); }, /* ORI1 · Phase 2 art hook names */
     /* SKIN1 · read-only: which month's skin, and whether its art is worn (hero "art") or the blob fallback is showing */
     skin: function () { return { month: skin.month, id: skin.id, hero: heroArt() ? "art" : "blob", finale: finState("land", "default"), finalePortrait: finState("port", "none"), finaleFor: function (w, h) { var im = finaleFor(w, h); return im ? im.src : null; }, scale: skin.scale, kid: skin.kid, dir: skin.def ? skin.def.dir + kid + "/" : null, months: Object.keys(SKINS), state: heroArt() ? heroState(A, (performance.now() - t0) / 1000) : null }; },
+    /* ORI3 · read-only: the extras layer (null until the base set is ready and the month names extras) */
+    extras: function () {
+      var x = heroArt() && skin.x; if (!x) return null;
+      var st = {}; Object.keys(x.ims).forEach(function (k) { st[k] = x.ims[k].st; });
+      var gr = exGrow(x);
+      return { dir: x.dir, scale: x.scale, theme: x.theme, grow: gr ? { prefix: gr.prefix, n: gr.n, variant: gr.variant } : null, anchors: x.anc.st, fx: x.fxj.st, req: x.req.slice(), st: st, order: x.order.slice(), reduced: reduced, pebblesHidden: blobs.filter(pebblesHiddenFor).map(function (b) { return b.kid; }) };
+    },
     exportFrame: exportFrame,
     platesReady: function () { return runPlatesReady && !!runPlates.sky; }
   };

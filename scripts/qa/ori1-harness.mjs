@@ -22,7 +22,7 @@ function ctx2d(log) {
     getImageData: (x, y, w, h) => { const d = img(w, h); d.data.fill(120); return d; },
     createImageData: (w, h) => img(w, h),
     putImageData: (d) => { log.put.push(d); },
-    drawImage: (im) => { if (im && im._src) log.drawn.push(im._src); },
+    drawImage: (im) => { if (im && im._src) { log.drawn.push(im._src); log.ops.push([im._src, store.globalCompositeOperation || "source-over", store.globalAlpha == null ? 1 : store.globalAlpha]); } },
     getTransform: () => ({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }), isPointInPath: () => false
   };
   return new Proxy(store, {
@@ -59,7 +59,7 @@ function makeEl(tag, log) {
 
 export function boot(opts = {}) {
   const o = Object.assign({ kid: "hayes", coop: null, at: FX.clock.wed0700, checks: {}, w: 480, h: 320, root: ROOT, data: FX.data, query: "", liquid: false }, opts);
-  const log = { put: [], chimes: 0, view: { w: o.w, h: o.h }, images: [], fetches: [], drawn: [] };
+  const log = { put: [], chimes: 0, view: { w: o.w, h: o.h }, images: [], fetches: [], drawn: [], ops: [] };
   /* files: a URL resolves against the tree root, then the fixture root (QA skin fixtures live in scripts/qa/fixtures) */
   const fileFor = (url) => { const u = String(url).split("?")[0]; for (const r of [o.root, FXROOT, o.skinRoot].filter(Boolean)) { const f = path.join(r, u); if (fs.existsSync(f) && fs.statSync(f).isFile()) return f; } return null; };
   const pngSize = (f) => { const b = fs.readFileSync(f); return b.slice(1, 4).toString() === "PNG" ? { w: b.readUInt32BE(16), h: b.readUInt32BE(20) } : { w: 0, h: 0 }; };
@@ -107,7 +107,7 @@ export function boot(opts = {}) {
     localStorage: storage, sessionStorage: { getItem: () => null, setItem() {}, removeItem() {} },
     document, location: { search: "?" + params.toString(), hash: "", pathname: "/mercury-run.html", href: "https://house.test/mercury-run.html?" + params.toString(), reload() {} },
     history: { state: null, replaceState() {} }, navigator: { userAgent: "node", hardwareConcurrency: 8, deviceMemory: 8 },
-    matchMedia: () => ({ matches: false, addEventListener() {} }),
+    matchMedia: (mq) => ({ matches: !!o.reduced && /reduced-motion:\s*reduce/.test(String(mq)), addEventListener() {} }), /* ORI3 · reduced: true = prefers-reduced-motion */
     fetch: (url) => { log.fetches.push(url); const f = fileFor(url); return Promise.resolve(f ? { ok: true, status: 200, json: async () => JSON.parse(fs.readFileSync(f, "utf8")) } : { ok: false, status: 404, json: async () => null }); },
     innerWidth: o.w, innerHeight: o.h, devicePixelRatio: o.dpr || 1,
     getComputedStyle: () => ({ getPropertyValue: () => "" }),
