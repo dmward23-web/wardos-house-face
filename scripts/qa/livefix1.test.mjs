@@ -37,7 +37,18 @@ function week() {
   };
 }
 
-test("Ainsley rows: no digit, time, date, star, $ or %; the boys keep their times", () => {
+/* DAYPKG1 item 2 (expectation refresh): the fixture rows are dated Mon 26 / Tue 27 / Thu 29 (October 2026) and were checked
+   against the real wall clock, so from Tue 10-27 the Mon 26 rows count as ended and cleanKidsWeek drops them
+   ("Cannot read properties of undefined (reading 'when')" on the Dentist row): a calendar failure, not a law failure.
+   The test now pins the law clock (house-face-law ctNow / rowEnded read globalThis.LHClock when present) to the
+   day the fixture was written, Sun 2026-10-25 12:00 CT, and restores it after; every assertion is unchanged. */
+const FIXTURE_NOW = Date.parse("2026-10-25T17:00:00Z");
+function atFixtureClock(fn) {
+  const had = Object.prototype.hasOwnProperty.call(globalThis, "LHClock"), prev = globalThis.LHClock;
+  globalThis.LHClock = { now: () => new Date(FIXTURE_NOW), ms: () => FIXTURE_NOW };
+  try { return fn(); } finally { if (had) globalThis.LHClock = prev; else delete globalThis.LHClock; }
+}
+test("Ainsley rows: no digit, time, date, star, $ or %; the boys keep their times", () => atFixtureClock(() => {
   const w = L.cleanKidsWeek(week());
   const a = w.kids.ainsley;
   const strings = JSON.stringify([a.appointments, a.sports, a.rides, a.school, a.hottest, a.missions, a.streakLabel].map((x) => x));
@@ -51,7 +62,7 @@ test("Ainsley rows: no digit, time, date, star, $ or %; the boys keep their time
   assert.equal(a.sports[0].when, "Tue");
   assert.equal(a.appointments.find((r) => /Dentist/.test(r.what)).when, "Mon");
   assert.equal(w.kids.hayes.sports[0].when, "Tue 27 · 4:25", "the boys keep their times");
-});
+}));
 
 test("therapy rows never reach a board (glass law): cal-live, cal-months, kids-week", () => {
   const cal = L.cleanFeed("cal-live", { upcomingLeaves: [

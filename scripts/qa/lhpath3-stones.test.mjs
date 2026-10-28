@@ -24,9 +24,10 @@ test("LHPATH3 static: Prism's one-row stone block replaces H1-LHVIS; LHPATH3 cac
   assert.ok(LH.includes('href="lh.css?v=LHPATH3"'), "lh.css token");
   assert.match(LH, /<i class="lh-tallbg"[^>]* data-asset-v="LHPATH3"[^>]*data-asset="backgrounds\/bg-phone-night-v2-nomoon\.webp\|[^"]*phone-extension-bg-night-v2-440x956\.webp/);
 });
-let pp = null; for (const base of [import.meta.url, (process.env.WARDOS_DEPS || "/nonexistent") + "/", "/tmp/h1-deps/node_modules/"]) { try { pp = createRequire(base)("puppeteer-core"); break; } catch (_) {} }
-const CHROME = process.env.CHROME_PATH || (fs.existsSync("/usr/bin/google-chrome") ? "/usr/bin/google-chrome" : null);
-const SKIP = !(pp && CHROME) && "needs puppeteer-core + chrome";
+const NO_BROWSER = process.env.QA_NO_BROWSER === "1";   /* DAYPKG1 item 3 · QA_NO_BROWSER=1: puppeteer-core is never loaded and no Chrome path is resolved, so nothing below can launch */
+let pp = null; if (!NO_BROWSER) for (const base of [import.meta.url, (process.env.WARDOS_DEPS || "/nonexistent") + "/", "/tmp/h1-deps/node_modules/"]) { try { pp = createRequire(base)("puppeteer-core"); break; } catch (_) {} }
+const CHROME = NO_BROWSER ? null : (process.env.CHROME_PATH || (fs.existsSync("/usr/bin/google-chrome") ? "/usr/bin/google-chrome" : null));
+const SKIP = NO_BROWSER ? "SKIP QA_NO_BROWSER=1 (no Chrome launch)" : (!(pp && CHROME) && "needs puppeteer-core + chrome");
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".webp": "image/webp", ".png": "image/png", ".svg": "image/svg+xml", ".woff2": "font/woff2", ".ttf": "font/ttf" };
 const TOKEN = "test-token-lhpath3-0123456789";
 /* FAKE rows: tomorrow 10 AM and 3 PM ("Tomorrow" wraps on the 128 px stones), then 9 AM the day after */

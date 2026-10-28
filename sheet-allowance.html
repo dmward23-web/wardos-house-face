@@ -2,13 +2,14 @@
 <html lang="en" data-sound="on">
 <head>
 <meta charset="UTF-8" />
+<meta name="ward-money" content="dad" /><!-- DAYPKG1 v2g · the one Dad money sheet: house-money-bind paints '$' and kids-data marks dad-device:v1 only on a page with this tag -->
 <script src="house-hub.js?v=HUBPAIR1"></script>
 <script src="private-feed.js?v=HUBPAIR1D"></script>
 <script src="school-names.js?v=HALLOWEEN1"></script>
-<script src="house-nomoney.js?v=NOMONEY1"></script>
+<script src="house-nomoney.js?v=DAYPKG1"></script>
 <script src="house-face-law.js?v=HALLOWEEN1"></script>
 <script src="house-pair.js?v=HUBPAIR1"></script>
-<script src="house-money-bind.js?v=PRIVFEED2"></script>
+<script src="house-money-bind.js?v=DAYPKG1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
 <script src="away-filter.js?v=HALLOWEEN1" data-away-install></script><!-- AWAYONE1 · the one away source on every page that reads cal-live / kids-week -->
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
@@ -345,6 +346,21 @@
     background: linear-gradient(145deg, rgba(100,160,230,0.25), rgba(255,255,255,0.6));
     border: 1px solid rgba(70,120,200,0.28);
   }
+  /* DAYPKG1 v2d · Dad's Paid tap per kid (moved off the kid boards, Atlas Oct 28 12:15 AM CT) */
+  .dad-paid-row { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-top: 8px; }
+  .dad-paid {
+    min-height: 44px; padding: 10px 18px; border-radius: 12px; border: 1px solid rgba(20,22,28,0.25);
+    background: #fff; color: #1a1e24; font-size: 15px; font-weight: 750; cursor: pointer;
+    /* DAYPKG1 v2e · hold-to-confirm, Atlas 12:40 AM: the button is the top element at its centre (above .panel > * z 2 and
+       every page layer); no scroll, zoom or long-press menu steals the hold on touch */
+    position: relative; z-index: 6; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  }
+  .dad-paid::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: rgba(46,107,58,0.22); pointer-events: none; z-index: -1;
+  }
+  .dad-paid[data-holding]::before { width: 100%; transition: width 2s linear; }
+  .dad-paid-stamp { font-size: 14px; font-weight: 700; color: #2e6b3a; }
+  .dad-paid-wk { font-size: 14px; font-weight: 800; color: #6b4a00; } /* DAYPKG1 v2g · Atlas (a) weekly figure, Dad sheet only */
 
   .desk-note {
     flex-shrink: 0;
@@ -803,6 +819,7 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
   <div class="feed-row">Babysitting hire · Dad handout · never fills jar<div class="when">add-on</div></div>
  </div>
  <div class="cheer-bar">Ask Dad to inspect</div>
+ <div class="dad-paid-row"><button type="button" class="dad-paid" data-dad-paid="ainsley" aria-label="Hold to mark Paid">Hold for Paid</button><span class="dad-paid-wk" data-dad-wk hidden></span><span class="dad-paid-stamp" data-paid-stamp hidden></span></div><!-- DAYPKG1 v2d · Atlas 12:15 AM A: Dad pays here, not on the kid board -->
  </section>
 
  <!-- Hayes bank -->
@@ -826,6 +843,7 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
  <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Garage cubby · bag + sports<div class="when">weekly</div></div>
   </div>
  <div class="cheer-bar">Ask Dad to inspect</div>
+ <div class="dad-paid-row"><button type="button" class="dad-paid" data-dad-paid="hayes" aria-label="Hold to mark Paid">Hold for Paid</button><span class="dad-paid-wk" data-dad-wk hidden></span><span class="dad-paid-stamp" data-paid-stamp hidden></span></div><!-- DAYPKG1 v2d · Atlas 12:15 AM A: Dad pays here, not on the kid board -->
  <div class="saves-host" data-saves-panel data-kid="hayes"></div>
  </section>
 
@@ -850,6 +868,7 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
  <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Garage cubby · bag + sports<div class="when">weekly</div></div>
   </div>
  <div class="cheer-bar">Ask Dad to inspect</div>
+ <div class="dad-paid-row"><button type="button" class="dad-paid" data-dad-paid="harris" aria-label="Hold to mark Paid">Hold for Paid</button><span class="dad-paid-wk" data-dad-wk hidden></span><span class="dad-paid-stamp" data-paid-stamp hidden></span></div><!-- DAYPKG1 v2d · Atlas 12:15 AM A: Dad pays here, not on the kid board -->
  <div class="saves-host" data-saves-panel data-kid="harris"></div>
  </section>
  </div>
@@ -870,12 +889,12 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
 </div>
 <script src="house-clock.js?v=LIVEWX2"></script>
 <script src="house-tapsync.js?v=P1FIX"></script>
-<script src="kids-data.js?v=MERGE1C"></script>
-<script src="house-saves.js?v=JARMATH1"></script>
+<script src="kids-data.js?v=DAYPKG1"></script>
+<script src="house-saves.js?v=DAYPKG1"></script>
 <script src="ains-jar-state.js?v=AINSJAR2"></script>
 <script src="house-zoom.js"></script>
-<script src="house-sfx.js?v=MERGE1C"></script>
-<script src="house-checkoffs.js?v=PRIVFEED3" defer></script>
+<script src="house-sfx.js?v=DAYPKG1"></script>
+<script src="house-checkoffs.js?v=DAYPKG1" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
  if (window.HouseSaves) { HouseSaves.mount("hayes"); HouseSaves.mount("harris"); }
@@ -884,6 +903,7 @@ document.addEventListener("DOMContentLoaded", function () {
  if (!data) return;
  WardKids._data = data;
  WardKids.syncBankFromChecks(data);
+ function paint() {
  ["ainsley","hayes","harris"].forEach(function (id) {
  var v = WardKids.getBankView(id, data);
  var root = document.querySelector('[data-bank-kid="'+id+'"]') || document.querySelector('.bank.'+id);
@@ -900,6 +920,17 @@ document.addEventListener("DOMContentLoaded", function () {
  else if (lab) {
  lab.textContent = "Balance $"+v.balance+" · Week $"+v.weekEarn+" · Jar $"+v.toward+"/$"+v.need;
  }
+ });
+ }
+ paint();
+ /* DAYPKG1 v2d · Atlas ruling (Oct 28 12:15 AM CT) A: Dad pays per kid here. One Paid pays what is owed through the
+    same resetJarCycle; the Paid or Jar reset tick syncs to the kid boards as a chore-tap marker (no amount).
+    DAYPKG1 v2e · Atlas 12:40 AM: hold about 2 s, wired by WardKids.bindHold; an early lift does nothing */
+ document.querySelectorAll("[data-dad-paid]").forEach(function (btn) {
+ WardKids.bindHold(btn, function () {
+ WardKids.dadPaid(btn.getAttribute("data-dad-paid"), data);
+ paint();
+ });
  });
  });
 });
@@ -920,12 +951,16 @@ document.addEventListener("DOMContentLoaded", function () {
   else wire();
 })();
 </script>
-<script src="house-fresh.js?v=FRESH1"></script>
+<script src="house-fresh.js?v=JARTAP1D2"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>
-<script src="house-links.js?v=LINKWEB1"></script>
+<script src="house-links.js?v=DAYPKG1"></script>
+<script>/* DAYPKG1 v2e · this page's tap rules (were in house-links.js): "*" runs only here, because only this page adds them */
+(function () { var L = window.HouseLinks; if (!L || !L.rules || !L.kid) return;
+  L.rules.push(["*", "section.link-banner", "sheet-chores.html"], ["*", "section.bank, .streak-pill, .g2-grow-chip", L.kid(null)], ["*", ".feed-row", "sheet-chores.html"], ["*", ".desk-note, .badge", "sheet-desk-gate.html"]); })();
+</script>
 <script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
-<script src="house-ori-world.js?v=MERGE1C"></script>
+<script src="house-ori-world.js?v=DAYPKG1"></script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/month-overlay.js?v=HALLOWEEN1" defer></script>
 </body>

@@ -5,10 +5,10 @@
 <script src="house-hub.js?v=HUBPAIR1"></script>
 <script src="private-feed.js?v=HUBPAIR1D"></script>
 <script src="school-names.js?v=HALLOWEEN1"></script>
-<script src="house-nomoney.js?v=NOMONEY1"></script>
+<script src="house-nomoney.js?v=KIDCRIT1"></script>
 <script src="house-face-law.js?v=HALLOWEEN1"></script>
 <script src="house-pair.js?v=HUBPAIR1"></script>
-<script src="house-money-bind.js?v=PRIVFEED2"></script>
+<script src="house-money-bind.js?v=DAYPKG1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
 <meta name="viewport" id="hf-viewport" content="width=1080" />
 <script src="away-filter.js?v=HALLOWEEN1" data-away-install data-dan-view></script>
@@ -4090,7 +4090,9 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <div class="float-orbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
  <!-- WALLBACK1 · opened from the wall's Family chip (?from=wall): one plain way back to the wall -->
  <a class="wall-back" href="wall.html" data-wall-back hidden aria-label="Back to the wall">Back to wall</a>
- <style>.wall-back{position:fixed;right:16px;bottom:16px;z-index:2147482000;padding:10px 16px;border-radius:999px;font:700 14px/1.2 Inter,system-ui,sans-serif;color:#fff6dc;background:rgba(20,24,30,.82);border:1px solid rgba(255,255,255,.22);text-decoration:none;backdrop-filter:blur(8px)}.wall-back[hidden]{display:none}</style>
+ <style>.wall-back{position:fixed;right:16px;bottom:16px;z-index:2147482000;padding:10px 16px;border-radius:999px;font:700 14px/1.2 Inter,system-ui,sans-serif;color:#fff6dc;background:rgba(20,24,30,.82);border:1px solid rgba(255,255,255,.22);text-decoration:none;backdrop-filter:blur(8px)}.wall-back[hidden]{display:none}/* DAYPKG1 v2h · Atlas: the Dad tile is gone from the roster (Dad sheets are URL-only). 10 tiles on the 3-column grid: a lone last tile spans its row, so no cell is left empty */
+.tile-grid > .tile:last-child:nth-child(3n+1) { grid-column: 1 / -1 !important; }
+</style>
  <script>(function(){try{var k="wardos-from-wall",q=/[?&]from=wall\b/.test(location.search);if(q)sessionStorage.setItem(k,"1");if(q||sessionStorage.getItem(k)==="1"){var a=document.querySelector("[data-wall-back]");if(a){a.hidden=false;a.addEventListener("click",function(){try{sessionStorage.removeItem(k)}catch(e){}});}}}catch(e){}})();</script>
  <header class="hdr hdr--spread hdr--premium hdr--heat">
  <div class="hdr-date" aria-label="Today · America/Chicago">
@@ -4261,17 +4263,6 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
- <a class="tile dan kid-flip dad-seat" href="sheet-dan.html" data-kid-seed="dad" data-face="day">
- <div class="tile-top">
- <div class="tile-icon av g2-av dad" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-dad"/></svg></div>
- <div class="tile-titles">
- <div class="tile-label">Dad</div>
- <div class="tile-sub" data-dad-sub>Leave-bys · rides · week</div>
- </div>
- </div>
- <div class="kf-stage" data-dad-stage><div class="kf-face kf-day"><div class="kf-kicker">Next leave</div><div class="kf-loud">Today</div><div class="kf-title">Leave-bys · rides</div></div></div>
- <div class="tile-foot"><span class="tile-fact">Dad board</span></div>
- </a>
 
  <!-- TODAYGONE1 · Today tile removed (schedule card + Dad page cover it) -->
 
@@ -4326,7 +4317,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <div class="tile-foot"><span class="tile-fact">Shared list</span><span class="tile-tap">OPEN</span></div>
  </a>
 
- <a class="tile stars" href="sheet-allowance.html">
+ <a class="tile stars" href="sheet-chores.html">
  <div class="tile-top">
  <div class="tile-icon g2-mark" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-jar"/></svg></div>
  <div class="tile-titles">
@@ -4388,10 +4379,10 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 <script src="house-clock.js?v=HALLOWEEN1"></script>
 <script src="house-board-strip.js?v=PAIRUI1"></script>
 <script src="livewx-core.js?v=LIVEWX2B"></script><script src="house-weather.js?v=LIVEWX2"></script>
-<script src="house-sfx.js?v=MERGE1C"></script>
+<script src="house-sfx.js?v=DAYPKG1"></script>
 <script src="house-tapsync.js?v=P1FIX"></script>
-<script src="kids-data.js?v=MERGE1C"></script>
-<script src="house-kid-engage.js?v=MERGE1C"></script>
+<script src="kids-data.js?v=DAYPKG1"></script>
+<script src="house-kid-engage.js?v=DAYPKG1"></script>
 <script src="house-hub-tiles-bind.js?v=MERGE1C"></script>
 <script src="house-sensi.js?v=P1FIX"></script>
 <script src="nest-webrtc-client.js?v=FOLLOWUP6"></script>
@@ -4488,7 +4479,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 })();
 
 </script>
-<script src="house-fresh.js?v=NOOPEN1"></script>
+<script src="house-fresh.js?v=JARTAP1D2"></script>
 <style>
 /* NOOPEN1 · no OPEN buttons anywhere, the whole card is the tap target */
 .tile .tile-tap, .tile .kid-flip-go, .who-up-go { display: none !important; }

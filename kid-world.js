@@ -71,13 +71,13 @@
       /* KIDWEEKLY1 · weekly/once musts carry data-check on the row itself */
       var btn = cadence === "daily" ? q.querySelector('.day-tap[data-day-iso="' + iso + '"]') : (q.matches("[data-check]") ? q : q.querySelector("[data-check]"));
       if (!btn) return;
-      out.push({ label: label, done: btn.classList.contains("done"), btn: btn });
+      out.push({ label: label, done: btn.classList.contains("done"), btn: btn, cadence: cadence });
     });
     /* LAW8C1 · one chest per real job: a chore that is already inside a combined chore ("Backpack" vs
        "Backpack + sports bag in garage cubby") is not drawn twice on the board; the combined one stays */
     return out.filter(function (q) {
       var k = String(shortLabel(q.label) || q.label).toLowerCase();
-      return !out.some(function (o) { return o !== q && String(shortLabel(o.label) || o.label).toLowerCase().indexOf(k + " +") === 0; });
+      return !out.some(function (o) { return o !== q && o.cadence === q.cadence && String(shortLabel(o.label) || o.label).toLowerCase().indexOf(k + " +") === 0; });
     });
   }
 
@@ -1953,6 +1953,13 @@
      UNDO1 · tap a done chest again (after 1s) to un-check it. */
   var lastHit = { q: null, at: 0 }, holdTimer = 0;
   function clearHold() { if (holdTimer) { clearTimeout(holdTimer); holdTimer = 0; } }
+  /* JARTAP1 · the jar host takes no pointer events over the world (kid-world.css); a world tap that is not on a chore
+     and lands inside the jar's painted shape opens the jar. A chore under the jar box always wins. */
+  function onWorldJarClick(ev) {
+    if (!ev.isTrusted || hitQuest(ev)) return;
+    var host = document.querySelector("[data-kw-jar]"), jar = host && host._jar;
+    if (jar && jar.hits && jar.hits(ev.clientX, ev.clientY) && jar._tap) jar._tap(ev);
+  }
   function onWorldDown(ev) {
     if (!ev.isTrusted) return;
     var q = hitQuest(ev);
@@ -2066,6 +2073,7 @@
     });
     cv.addEventListener("pointerdown", function () { var d = document.getElementById("kw-cal"); if (d) d.hidden = true; }, true);
     cv.addEventListener("pointerdown", onWorldDown);
+    cv.addEventListener("click", onWorldJarClick); /* JARTAP1 */
     ["pointerup", "pointercancel", "pointerleave"].forEach(function (n) { cv.addEventListener(n, clearHold); });
     cv.addEventListener("pointermove", function (e) {
       bg.ptr = e.clientX / Math.max(1, innerWidth);

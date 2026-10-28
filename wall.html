@@ -16,7 +16,7 @@ canvas{position:fixed;inset:0;width:100vw;height:100vh;display:block}
 #date{margin-top:10px;font-size:12px;font-weight:500;letter-spacing:3.2px;opacity:.72;text-transform:uppercase}
 #mark{position:absolute;right:62px;top:44px;width:150px;height:150px;pointer-events:auto;cursor:pointer}
 #chips{position:absolute;left:50%;transform:translateX(-50%);display:grid;gap:22px;pointer-events:none}
-.wall #chips{bottom:62px;grid-template-columns:repeat(4,200px)}
+.wall #chips{bottom:62px;grid-template-columns:repeat(2,200px)} /* DAYPKG1 v2h · Atlas: Dad chip gone, 2 chips fill the row */
 .chip{pointer-events:auto;height:104px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
  background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.18);
  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 10px 30px rgba(0,0,0,.35);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);cursor:pointer}
@@ -25,6 +25,8 @@ canvas{position:fixed;inset:0;width:100vw;height:100vh;display:block}
 .phone #clock{left:28px;top:34px}.phone #time{font-size:54px}.phone #date{font-size:11px;letter-spacing:2.6px}
 .phone #mark{right:26px;top:30px;width:104px;height:104px}
 .phone #chips{bottom:44px;grid-template-columns:repeat(2,176px);gap:16px}.phone .chip{height:96px}
+/* DAYPKG1 v2f D5 · 440 px: an odd last chip (the 3rd) spans the row, centred */
+.phone #chips .chip:last-child:nth-child(odd){grid-column:1/-1;justify-self:center;width:calc(50% - 8px)} /* DAYPKG1 v2g · same width as the paired chips */
 #wvig{position:absolute;right:-30px;top:-40px;width:330px;height:330px;background:radial-gradient(closest-side,rgba(2,4,8,.82),rgba(2,4,8,.55) 55%,rgba(2,4,8,0));pointer-events:none}
 #cvig{position:absolute;left:-60px;top:-50px;width:420px;height:240px;background:radial-gradient(closest-side,rgba(2,4,8,.55),rgba(2,4,8,0));pointer-events:none}
 .phone #wvig{right:-40px;top:-50px;width:240px;height:240px}
@@ -64,8 +66,6 @@ canvas{position:fixed;inset:0;width:100vw;height:100vh;display:block}
  <div id="chips">
   <div class="chip" id="chip-family" data-href="sheet-index.html?from=wall" role="link" tabindex="0" data-n="Family"><svg viewBox="0 0 32 32"><circle cx="11" cy="11" r="4.5"/><circle cx="22" cy="12" r="3.6"/><path d="M3 26c1-5 4.5-7.5 8-7.5s7 2.5 8 7.5M17 26c.6-3.6 2.8-5.6 5.2-5.6S27.6 22 28.4 26"/></svg><span>Family</span></div>
   <div class="chip" id="chip-kids" data-href="sheet-chores.html" role="link" tabindex="0" data-n="Kids"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="10.5"/><circle cx="12.3" cy="15" r="1" fill="#e9eef5"/><circle cx="19.7" cy="15" r="1" fill="#e9eef5"/><path d="M12 20c2.4 2 5.6 2 8 0M11 8.5c2 1.5 4.5 1 6-1"/></svg><span>Kids</span></div>
-  <div class="chip" id="chip-money" data-href="sheet-allowance.html" role="link" tabindex="0" data-n="Money"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="11"/><path d="M20 11.5c-1-1.2-2.4-1.7-4-1.7-2.2 0-3.8 1.1-3.8 2.8 0 4 7.8 2.2 7.8 6.4 0 1.8-1.7 3-4 3-1.8 0-3.3-.7-4.2-1.9M16 7.5v17"/></svg><span>Money</span></div>
-  <div class="chip" id="chip-body" data-href="sheet-dan.html" role="link" tabindex="0" data-n="Dad"><svg viewBox="0 0 32 32"><path d="M16 27S4 19.6 4 11.8C4 8 6.8 5.5 10 5.5c2.6 0 4.6 1.6 6 3.6 1.4-2 3.4-3.6 6-3.6 3.2 0 6 2.5 6 6.3C28 19.6 16 27 16 27z"/><path d="M6 16h6l2-3 3 6 2-3h7"/></svg><span>Dad</span></div>
  </div>
 </div><div id="dot"></div>
 <script src="livewx-core.js?v=LIVEWX2B"></script>

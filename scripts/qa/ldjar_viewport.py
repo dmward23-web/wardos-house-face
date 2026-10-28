@@ -51,9 +51,12 @@ LD = "() => { " + VIS + r""" const KID = /\b(Hayes|Harris|Ainsley)\b/, CLK = /\b
 AL = r"""() => { const STAR = /[\u2605\u2606\u272d\u2b50]/, D = /\d/;
   const s = document.querySelector('.bank.ainsley .star-count'), b = s && s.querySelector('.star-big'), k = document.querySelector('.bank.ainsley');
   const pseudo = k ? [...k.querySelectorAll('*')].map(e => [getComputedStyle(e, '::before').content, getComputedStyle(e, '::after').content]).flat().filter(c => c && c !== 'none' && c !== 'normal').join(' ') : '';
-  const t = k ? (k.innerText + ' ' + pseudo).replace(/\s+/g, ' ') : '';
+  /* DAYPKG1 v2i · Dad's weekly figure ([data-dad-wk], Atlas v2g: next to each kid's Paid hold on the ward-money=dad page) is Dad's
+     money, not her jar: it is reported apart as dadWk and checked for its own shape; her rows stay star and digit free */
+  const dwEl = k && k.querySelector('[data-dad-wk]'), dadWk = dwEl && !dwEl.hidden ? dwEl.innerText.trim() : '';
+  const t = k ? ((dadWk ? k.innerText.replace(dadWk, ' ') : k.innerText) + ' ' + pseudo).replace(/\s+/g, ' ') : '';
   return { hero: s ? s.innerText.replace(/\s+/g, ' ').trim() : null, big: b ? b.innerText.trim() : null, digit: s ? D.test(s.innerText) : null,
-    icon: b ? !!b.querySelector('svg,use,.s') : null, state: (() => { const e = k && k.querySelector('.star-count [data-jar-state]'); return e ? e.textContent.trim() : null; })(), bank: k ? { star: STAR.test(t), digit: D.test(t), text: t.slice(0, 300) } : null }; }"""
+    icon: b ? !!b.querySelector('svg,use,.s') : null, state: (() => { const e = k && k.querySelector('.star-count [data-jar-state]'); return e ? e.textContent.trim() : null; })(), bank: k ? { star: STAR.test(t), digit: D.test(t), text: t.slice(0, 300), dadWk } : null }; }"""
 KA = r"""() => { const STAR = /[\u2605\u2606\u272d\u2b50]/, D = /\d/;
   const vis = el => { for (let a = el; a; a = a.parentElement) { const c = getComputedStyle(a); if (c.display === 'none' || c.visibility === 'hidden') return false; } const r = el.getBoundingClientRect(); return r.width >= 1 && r.height >= 1; };
   const texts = (root, skip) => { const o = []; if (!root) return o; const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n;

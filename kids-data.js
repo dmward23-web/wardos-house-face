@@ -26,8 +26,181 @@
   })();
 
   var CHECK_KEY = "house-checkoffs:chores-v2"; /* legacy flat key — migrate-read only */
-  var BANK_KEY = "house-bank:v1";
+  /* DAYPKG1 v2e · Atlas ruling (Oct 28 12:40 AM CT): scope by KEY, not by device. The Dad ledger has its own namespace,
+     dad-ledger:v1. Only the Dad sheets (not a kid board) read or write it. house-bank:v1 is the legacy key, moved once */
+  var BANK_KEY = "dad-ledger:v1";
+  var LEGACY_BANK_KEY = "house-bank:v1";
+  var LEDGER_SIDE = "dad-ledger:v1:legacy:"; /* a raw legacy blob parked by a kid board when dad-ledger:v1 already exists */
+  var LEDGER_LOSER = "dad-ledger:v1:superseded"; /* the older copy kept raw when two ledgers met (nothing is lost) */
   var CHECK_PREFIX = "house-checkoffs:";
+  /* DAYPKG1 v2 · Atlas ruling (Oct 27 11:44 PM CT): no paid amount in kid-board storage. house-bank-paid-amount:<kid> had no
+     reader; it is never written now, and any old copy is removed when kids-data.js boots on any page */
+  (function dropPaidAmount() {
+    try {
+      var drop = [];
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && (k.indexOf("house-bank-paid-amount:") === 0 || k === "house-bank-paid-amount")) drop.push(k); /* DAYPKG1 v2d · exact prefix + bare key only (Alfred nit) */
+      }
+      for (var j = 0; j < drop.length; j++) localStorage.removeItem(drop[j]);
+    } catch (e) { /* */ }
+  })();
+
+  /* DAYPKG1 v2d · a kid board is /kid-<name>.html or the same path without .html (GitHub Pages serves both).
+     DAYPKG1 v2f D2 · mercury-run.html?kid= is opened from a kid board (kid-world.js), so it is a kid page too */
+  var KID_PAGE_RE = /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/;
+  function kidPage() { try { return KID_PAGE_RE.test((global.location && global.location.pathname) || ""); } catch (e) { return false; } }
+  /* DAYPKG1 v2f D2 · the other kid-reachable pages that load this file (a kid board links them one hop away: HOME, CHORES,
+     jar and payday rows) are kid SCOPE for storage: no dad-ledger:v1 read or write, bank in memory. The ledger lives only on
+     the Dad sheets no kid board links to (the Paid sheet and the Dad sheet) */
+  var KID_REACH_RE = /\/(?:sheet-chores|sheet-index)(\.html)?$/;
+  function kidScope() { if (kidPage()) return true; try { return KID_REACH_RE.test((global.location && global.location.pathname) || ""); } catch (e) { return false; } }
+  /* DAYPKG1 v2d · Atlas ruling (Oct 28 12:15 AM CT) B: no balance or lifetime on a kid device. On a kid board the bank root
+     lives in memory only (rebuilt from the chore checks on every load). The kid device keeps only its chore checks and the
+     paid / jar reset state; the ledger lives on the Dad sheets */
+  var MEM_BANK = null;
+  /* DAYPKG1 v2e · presence of a key without reading its value: walk the key names only */
+  function hasKey(k) {
+    try { for (var i = 0; i < localStorage.length; i++) if (localStorage.key(i) === k) return true; } catch (e) { /* */ }
+    return false;
+  }
+  /* DAYPKG1 v2e · Atlas 12:40 AM: a kid board that finds house-bank:v1 does a BLIND move. It reads the legacy string only to
+     copy it raw (never parsed, never used), writes it to dad-ledger:v1 only when that key is absent (else to a unique
+     dad-ledger:v1:legacy:<ms> side key for the Dad sheet to reconcile), checks the copy landed, and only then removes
+     house-bank:v1. It never reads, parses or deletes dad-ledger:v1 */
+  function blindMoveLegacyBank() {
+    try {
+      if (!hasKey(LEGACY_BANK_KEY)) return "none";
+      var raw = localStorage.getItem(LEGACY_BANK_KEY);
+      if (raw == null) return "none";
+      var dest = BANK_KEY;
+      if (hasKey(BANK_KEY)) { dest = LEDGER_SIDE + Date.now(); while (hasKey(dest)) dest += "x"; }
+      localStorage.setItem(dest, raw);
+      if (!hasKey(dest)) return "kept"; /* the copy did not land (quota): house-bank:v1 stays for the next load */
+      localStorage.removeItem(LEGACY_BANK_KEY);
+      return dest === BANK_KEY ? "moved" : "parked";
+    } catch (e) { return "kept"; }
+  }
+  /* DAYPKG1 v2f D1 + D4 · the money sign scrub runs before anything else reads a stamp (expiry and a synced stamp no longer
+     skip it). A stamp with no paid-at (legacy) gets paid-at = now when first seen, so it expires like any other */
+  var PAID_KIDS = ["hayes", "harris", "ainsley"];
+  function scrubPaidStamp(kidId) {
+    try {
+      var k = "house-bank-paid:" + kidId, v = localStorage.getItem(k) || "";
+      if (!v) return "";
+      if (v.indexOf("\u0024") >= 0) { v = /^Paid/.test(v) ? "Paid \u2713" : "Jar reset \u2713"; localStorage.setItem(k, v); }
+      var atK = "house-bank-paid-at:" + kidId;
+      if (isNaN(Date.parse(localStorage.getItem(atK) || ""))) localStorage.setItem(atK, new Date().toISOString());
+      return v;
+    } catch (e) { return ""; }
+  }
+  /* DAYPKG1 v2f D3 · Atlas final ruling (Oct 28 1:47 AM CT), option B with the guards in code. From LEDGER_PURGE_FROM a kid
+     device drops dad-ledger:v1 (and any :legacy: side key) ONLY when BOTH: (a) this device has no dad-device marker (set by
+     the Dad sheet that owns the ledger the first time it opens; checked by key name, never by reading the ledger), and
+     (b) the private kids-week feed, fetched live from the hub just now, says ledger.serverLive === true and
+     ledger.carryHeld === true with a fresh ledger.asOf. Anything else (no feed, fetch error, cached or stale feed, missing
+     or non-true field, old asOf) = no purge. The purge removes by key name and never reads a value */
+  var LEDGER_PURGE_FROM = Date.parse("2026-11-06T00:00:00-06:00"); /* Fri Nov 6 2026 00:00 CT (CST, -06:00) = 06:00 UTC = 1793944800000 */
+  var DAD_DEVICE_KEY = "dad-device:v1";
+  var PURGE_FEED_MAX_AGE = 15 * 60 * 1000, PURGE_ASOF_MAX_AGE = 24 * 3600 * 1000;
+  function ledgerPurgeOk(feed, now) {
+    try {
+      if (!(typeof now === "number" && now >= LEDGER_PURGE_FROM)) return false;
+      if (hasKey(DAD_DEVICE_KEY)) return false;
+      if (!feed || typeof feed !== "object" || feed.status !== "live") return false;
+      if (typeof feed.at !== "number" || !(now - feed.at >= 0 && now - feed.at <= PURGE_FEED_MAX_AGE)) return false;
+      var L = feed.data && typeof feed.data === "object" ? feed.data.ledger : null;
+      if (!L || typeof L !== "object") return false;
+      if (L.serverLive !== true || L.carryHeld !== true) return false;
+      var asOf = Date.parse(typeof L.asOf === "string" ? L.asOf : "");
+      if (isNaN(asOf) || now - asOf > PURGE_ASOF_MAX_AGE || asOf - now > 5 * 60 * 1000) return false;
+      return true;
+    } catch (e) { return false; }
+  }
+  function purgeKidLedger(feed) {
+    if (!kidScope()) return "not-kid";
+    if (!ledgerPurgeOk(feed, Date.now())) return "held";
+    var drop = [];
+    try {
+      for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k === BANK_KEY || (k && k.indexOf(LEDGER_SIDE) === 0)) drop.push(k); }
+      for (var j = 0; j < drop.length; j++) localStorage.removeItem(drop[j]);
+    } catch (e) { return "held"; }
+    if (drop.length && global.console && console.info) console.info("[dad-ledger] kid device purge (Nov 6 rule): " + drop.length + " key(s) removed unread");
+    return drop.length ? "purged" : "none";
+  }
+  function scheduleKidLedgerPurge() {
+    if (!kidScope()) return "not-kid";
+    if (!(Date.now() >= LEDGER_PURGE_FROM)) return "before"; /* no feed call before the date */
+    if (hasKey(DAD_DEVICE_KEY)) return "dad-device";
+    var PF = global.PrivateFeed;
+    if (!PF || typeof PF.get !== "function") return "no-feed";
+    try { return Promise.resolve(PF.get("kids-week")).then(function (res) { return purgeKidLedger(res); }, function () { return "held"; }); } catch (e) { return "held"; }
+  }
+  /* DAYPKG1 v2f D3 (a) · marks this device as Dad's (value = first mark time, no money).
+     DAYPKG1 v2g · Atlas P1-2 ruling: set ONLY by a completed 2 s Paid hold on the Dad Paid sheet (bindHold fire -> dadPaid), never by
+     opening a page. Dad sheets are URL-only (no link from any kid board or kid nav), so a kid device never holds Paid */
+  /* the Dad Paid sheet declares itself in markup (<meta name="ward-money" content="dad">); no page name lives here, so this file
+     carries no route to it. Never true on kid scope */
+  function dadPayPage() {
+    if (kidScope()) return false;
+    try { var m = global.document && global.document.querySelector && global.document.querySelector('meta[name="ward-money"]'); return !!(m && m.getAttribute("content") === "dad"); } catch (e) { return false; }
+  }
+  var HOLD_FIRING = false;
+  function markDadDevice() {
+    if (!HOLD_FIRING || !dadPayPage()) return false;
+    try { if (!hasKey(DAD_DEVICE_KEY)) localStorage.setItem(DAD_DEVICE_KEY, new Date().toISOString()); return true; } catch (e) { return false; }
+  }
+  var PURGE_RUN = null;
+  (function kidBankBoot() {
+    for (var i = 0; i < PAID_KIDS.length; i++) scrubPaidStamp(PAID_KIDS[i]); /* DAYPKG1 v2f D1 · all 3 kids, every page */
+    if (!kidScope()) return; /* DAYPKG1 v2g · no dad-device mark on boot (Atlas P1-2) */
+    MEM_BANK = {};
+    blindMoveLegacyBank();
+    PURGE_RUN = scheduleKidLedgerPurge();
+  })();
+  /* DAYPKG1 v2e · Dad sheet boot: house-bank:v1 (and any blob a kid board parked) moves into dad-ledger:v1, then the old key
+     goes. When both exist the newer wins (write stamp _w, else the latest day in it; unreadable = oldest; a tie keeps
+     dad-ledger:v1), the older is kept raw in dad-ledger:v1:superseded, and the choice is logged */
+  function ledgerAge(raw) {
+    var o; try { o = JSON.parse(raw); } catch (e) { return -1; }
+    if (!o || typeof o !== "object") return -1;
+    var t = typeof o._w === "number" ? o._w : 0;
+    Object.keys(o).forEach(function (k) {
+      var d = o[k] && o[k].days;
+      if (d && typeof d === "object") Object.keys(d).forEach(function (iso) { var ms = Date.parse(iso + "T12:00:00"); if (!isNaN(ms) && ms > t) t = ms; });
+    });
+    return t;
+  }
+  /* the older or unreadable ledger is never lost: kept raw in dad-ledger:v1:superseded (a second one gets its own :<ms> key) */
+  function keepRawLedger(raw) {
+    for (var i = 0; i < localStorage.length; i++) { var o = localStorage.key(i); if (o && o.indexOf(LEDGER_LOSER) === 0 && localStorage.getItem(o) === raw) return o; } /* same bytes already kept */
+    var k = LEDGER_LOSER;
+    if (hasKey(k)) { k = LEDGER_LOSER + ":" + Date.now(); while (hasKey(k)) k += "x"; }
+    localStorage.setItem(k, raw);
+    return k;
+  }
+  function migrateDadLedger() {
+    if (kidScope()) return null;
+    var log = [];
+    try {
+      var srcs = [];
+      if (hasKey(LEGACY_BANK_KEY)) srcs.push(LEGACY_BANK_KEY);
+      for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && k.indexOf(LEDGER_SIDE) === 0) srcs.push(k); }
+      srcs.sort(function (a, b) { return a === LEGACY_BANK_KEY ? -1 : b === LEGACY_BANK_KEY ? 1 : (a < b ? -1 : 1); });
+      for (var j = 0; j < srcs.length; j++) {
+        var raw = localStorage.getItem(srcs[j]);
+        if (raw == null) continue;
+        var cur = localStorage.getItem(BANK_KEY);
+        if (cur == null) { localStorage.setItem(BANK_KEY, raw); log.push(srcs[j] + " moved to " + BANK_KEY); }
+        else if (ledgerAge(raw) > ledgerAge(cur)) { var lk = keepRawLedger(cur); localStorage.setItem(BANK_KEY, raw); log.push(srcs[j] + " is newer: kept it, older " + BANK_KEY + " saved as " + lk); }
+        else { var lk2 = keepRawLedger(raw); log.push(BANK_KEY + " is newer: kept it, older " + srcs[j] + " saved as " + lk2); }
+        if (localStorage.getItem(BANK_KEY) != null) localStorage.removeItem(srcs[j]);
+      }
+    } catch (e) { log.push("migrate failed, nothing removed"); }
+    if (log.length && global.console && console.info) console.info("[dad-ledger] " + log.join("; "));
+    return log;
+  }
+  var LEDGER_LOG = migrateDadLedger();
 
   var KID_FROM_CHECK = {
     "ain-bed": "ainsley", "ain-toys": "ainsley",
@@ -246,6 +419,13 @@
     var days = weekDayIsos(DAY_ISO);
     if (!days.length) return getBankView(kidId, data);
     var ws = days[0];
+    /* DAYPKG1 · a week Dad already paid (Paid before Fri 15:00) is never credited again from the checks, on any boot or sync */
+    if (root[kidId].paidWeek === ws) return getBankView(kidId, data);
+    /* DAYPKG1 v2d · the synced Paid marker (written by the Dad sheet, carried by tapsync) also marks the week paid on a kid
+       board (no ledger there). DAYPKG1 v2e · on another Dad screen the marker is mirrored once (mirrorSyncedPaid) */
+    if (!MEM_BANK && mirrorSyncedPaid(kidId, data)) { root = loadBankRoot(); if (!root[kidId]) root[kidId] = { days: {}, lifetime: 0, balance: 0 }; }
+    if (root[kidId].paidWeek === ws) return getBankView(kidId, data);
+    if (paidMarkerAt(kidId, weekStartIso(DAY_ISO)) === "paid") return getBankView(kidId, data);
     var qs = mustQuests(kidId, data);
     var complete = mustSetComplete(kidId, data);
     var wsBag = ensureDayBag(root, kidId, ws);
@@ -389,11 +569,23 @@
     try { localStorage.setItem(CHECK_KEY, JSON.stringify(state)); } catch (e) { /* */ }
   }
 
+  var MALFORMED_KEPT = "";
   function loadBankRoot() {
-    try { return JSON.parse(localStorage.getItem(BANK_KEY) || "{}") || {}; }
-    catch (e) { return {}; }
+    if (MEM_BANK) return JSON.parse(JSON.stringify(MEM_BANK));
+    if (kidScope()) return {}; /* DAYPKG1 v2e · never dad-ledger:v1 on a kid board */
+    var raw = null;
+    try { raw = localStorage.getItem(BANK_KEY); } catch (e) { raw = null; }
+    if (raw == null) return {};
+    try { var o = JSON.parse(raw); if (o && typeof o === "object") return o; } catch (e) { /* below */ }
+    /* DAYPKG1 v2e · an unreadable ledger is kept raw (dad-ledger:v1:superseded) before the sheet starts a fresh one */
+    try { if (!MALFORMED_KEPT) { MALFORMED_KEPT = keepRawLedger(raw); if (global.console && console.info) console.info("[dad-ledger] unreadable " + BANK_KEY + " kept raw as " + MALFORMED_KEPT); } } catch (e) { /* */ }
+    return {};
   }
   function saveBankRoot(root) {
+    if (MEM_BANK) { MEM_BANK = JSON.parse(JSON.stringify(root || {})); return; }
+    if (kidScope()) return;
+    root = root || {};
+    root._w = Date.now(); /* DAYPKG1 v2e · write stamp: the newer ledger wins a migration meet */
     try { localStorage.setItem(BANK_KEY, JSON.stringify(root)); } catch (e) { /* */ }
   }
 
@@ -442,8 +634,58 @@
     return Math.min(raw, cap);
   }
 
+  /* DAYPKG1 v2e · caveat (c) fix: a second Dad screen keeps its own dad-ledger:v1, so a Paid or Jar reset done on the other
+     Dad screen reaches it only as the synced marker. Each marker (this marker week and the one before) is mirrored ONCE:
+     Paid = everything owed through that week was paid (drop those days, carry to zero; this week also marked paid);
+     Jar reset of a week with stars = that week moves into the carry. Done marker weeks are kept in syncPaid (the screen
+     that paid records its own), so nothing is applied twice and the two Dad screens agree */
+  function mirrorSyncedPaid(kidId, data) {
+    if (MEM_BANK || kidScope() || !PAID_PFX || !PAID_PFX[kidId]) return false;
+    var root = loadBankRoot();
+    var bag = root[kidId];
+    if (!bag) return false;
+    var curM = weekStartIso(DAY_ISO), changed = false;
+    var sp = bag.syncPaid && typeof bag.syncPaid === "object" ? bag.syncPaid : {};
+    /* DAYPKG1 v2f residual · install marker: the first mirror pass on this ledger records its week (bag.mirrorSince). A synced
+       marker for a week before it is never mirrored, so the week before the install cannot zero this device's own carry */
+    if (typeof bag.mirrorSince !== "string") { bag.mirrorSince = curM; changed = true; }
+    var since = bag.mirrorSince;
+    [addDaysIsoLocal(curM, -7), curM].forEach(function (wm) {
+      if (sp[wm]) return;
+      if (wm < since) return;
+      var m = paidMarkerAt(kidId, wm);
+      if (!m) return;
+      var taps = weekDayIsos(addDaysIsoLocal(wm, 1));
+      var last = taps[taps.length - 1];
+      if (!bag.days) bag.days = {};
+      if (m === "paid") {
+        Object.keys(bag.days).forEach(function (iso) { if (iso <= last) bag.days[iso] = { stars: 0, earned: {} }; });
+        bag.balance = 0;
+        if (wm === curM) bag.paidWeek = taps[0];
+      } else if (wm === curM) {
+        var stars = 0;
+        for (var i = 0; i < taps.length; i++) if (bag.days[taps[i]] && bag.days[taps[i]].stars) stars += bag.days[taps[i]].stars;
+        if (stars > 0) {
+          var goal = ((data && data.kids && data.kids[kidId]) || {}).bankGoal || {};
+          var sd = starDollarOf(goal); if (isNaN(sd)) sd = 1;
+          bag.balance = (Number(bag.balance) || 0) + Math.min(stars * sd, allowanceCap(goal));
+          for (var j = 0; j < taps.length; j++) if (bag.days[taps[j]]) bag.days[taps[j]] = { stars: 0, earned: {} };
+          bag.paidWeek = taps[0];
+        }
+      }
+      sp[wm] = 1; changed = true;
+    });
+    if (!changed) return false;
+    var old = addDaysIsoLocal(curM, -35);
+    Object.keys(sp).forEach(function (k) { if (k < old) delete sp[k]; });
+    bag.syncPaid = sp;
+    saveBankRoot(root);
+    return true;
+  }
+
   /** Move prior (completed) weeks' stars into durable balance$ so unpaid carry survives rollover. */
   function settlePriorWeeksIntoBalance(kidId, data) {
+    mirrorSyncedPaid(kidId, data);
     var pack = kidDayBank(kidId);
     var bag = pack.bag;
     if (!bag.days) return;
@@ -460,6 +702,7 @@
       if (curSet[iso]) return; /* current Sat→Fri stays as week stars */
       var taps = weekDayIsos(iso);
       var wk = taps[0] || iso; /* first tap day = week bank key */
+      if (bag.paidWeek && wk === bag.paidWeek) return; /* DAYPKG1 · a paid week never settles again */
       if (!byWeek[wk]) byWeek[wk] = { stars: 0, taps: taps };
       byWeek[wk].stars += (bag.days[iso] && bag.days[iso].stars) ? bag.days[iso].stars : 0;
     });
@@ -484,7 +727,7 @@
     settlePriorWeeksIntoBalance(kidId, data);
     var pack = kidDayBank(kidId);
     var kid = (data && data.kids && data.kids[kidId]) || {};
-    var goal = kid.bankGoal || { need: 10, title: "Goal", blurb: "", reward: "" };
+    var goal = kid.bankGoal || { need: 10, title: "", blurb: "", reward: "" }; /* KIDCRIT AINSGOAL1 · no "Goal" placeholder when the builder drops bankGoal (Ainsley) */
     var cur = kid.currency || { plural: "stars", symbol: "★", label: "Stars" };
     var today = pack.day.stars || 0;
     /* Week star tally → jar / weekly allowance goal (existing need $ amounts) */
@@ -540,18 +783,15 @@
   }
 
   function getCheckRaw(checkId, data, dayIso) {
+    /* HAYESJAR1C · jar-met: Hayes's backpack on the locked days reads done on every device (empty storage too) while the
+       lock holds (HAYESJAR1D: until Mon 11-02 CT). A boolean read, so a real tap on the same day can not count twice. Nothing is written. */
+    if (hayesJar1Locked(checkId, dayIso)) return true;
     var key = checkKeyFor(checkId, data, dayIso);
     var state = loadKeyState(key);
     if (Object.prototype.hasOwnProperty.call(state, checkId)) return !!state[checkId];
-    /* one-shot migrate from legacy flat key into day/week key (today only) */
-    if (!dayIso || dayIso === DAY_ISO) {
-      var legacy = loadChecks();
-      if (Object.prototype.hasOwnProperty.call(legacy, checkId)) {
-        state[checkId] = !!legacy[checkId];
-        saveKeyState(key, state);
-        return !!state[checkId];
-      }
-    }
+    /* KIDCRIT DAYFRESH1 (Atlas R4) · no migrate from the legacy flat blob: it carries no day, was written on every today-check
+       and never cleared, so on a fresh day (Sun to Mon) it copied old checks into the new day key and the chore showed done.
+       A day or week with no key of its own is not done. */
     return false;
   }
 
@@ -561,6 +801,8 @@
 
   function setCheck(checkId, done, data, dayIso) {
     var kidId = KID_FROM_CHECK[checkId];
+    /* HAYESJAR1C · Hayes's backpack on a locked day is a true no-op: no write, so house-tapsync never sees or sends an uncheck. */
+    if (hayesJar1Locked(checkId, dayIso)) return kidId ? getBankView(kidId, data) : null;
     var meta = kidId
       ? questMeta(kidId, checkId, data || (global.WardKids && global.WardKids._data))
       : { cadence: "daily", stars: 1, optional: false };
@@ -572,15 +814,7 @@
     var state = loadKeyState(key);
     state[checkId] = !!done;
     saveKeyState(key, state);
-    /* keep legacy blob in sync for old readers (today / weekly only) */
-    try {
-      if (!dayIso || dayIso === DAY_ISO || meta.cadence === "weekly") {
-        var legacy = loadChecks();
-        if (!!done) legacy[checkId] = true;
-        else delete legacy[checkId];
-        saveChecks(legacy);
-      }
-    } catch (eL) { /* */ }
+    /* KIDCRIT DAYFRESH1 · the legacy flat blob is no longer written (no reader left; it is what made a fresh day show done) */
 
     var bank = null;
     var newlyBanked = false;
@@ -659,11 +893,11 @@
     var earn = "";
     if (optional) {
       if (q.hire && kidId === "ainsley") {
-        var rate = q.rateLabel ? String(q.rateLabel) : ""; /* PRIVFEED2 · rate lives in the private kids-week */
+        var rate = (q.rateLabel && !/\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "")) ? String(q.rateLabel) : ""; /* PRIVFEED2 · rate lives in the private kids-week. DELTA2 · never on a kid page */
         hint = done
           ? "hire logged" + (rate ? " · " + rate : "") + " Dad handout"
           : "hire path" + (rate ? " · " + rate : "") + " · Dad books you · never fills jar";
-        earn = '<span class="star-earn addon-tag">' + esc(rate) + (done ? " ✓" : "") + "</span>";
+        earn = '<span class="star-earn addon-tag">' + esc(/\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "") ? "Hire job" : rate) + (done ? " ✓" : "") + "</span>"; /* DELTA2 · kid row reads Hire job */
       } else {
         hint = done
           ? (q.hire ? "hire logged · booked" : "logged")
@@ -752,7 +986,7 @@
         var earnOpt = el.querySelector(".star-earn");
         if (earnOpt && el.getAttribute("data-check") === "ain-babysit") {
           earnOpt.classList.add("addon-tag");
-          earnOpt.textContent = meta.rateLabel ? String(meta.rateLabel) : ""; /* PRIVFEED2 · private rate */
+          earnOpt.textContent = /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "") ? "Hire job" : (meta.rateLabel ? String(meta.rateLabel) : ""); /* PRIVFEED2 · private rate. DELTA2 · kid page reads Hire job */
           earnOpt.setAttribute("data-money", "babysit");
           if (!meta.rateLabel && global.HouseMoney && global.HouseMoney.ready()) global.HouseMoney.paint();
           earnOpt.setAttribute("data-stars", "0");
@@ -834,8 +1068,52 @@
     return { days: daysUntilFri, label: label, when: "Fri evening CT", rule: "Next Payday = next Friday 6:00p CT" };
   }
 
+  /* DAYPKG1 v2d · Atlas A: the Paid marker rides the existing chore-tap sync (house-tapsync.js, hub /api/taps). It is a
+     boolean id in the kid's week checkoffs key, house-checkoffs:<kid>:week:<week start>, id <hay|har|ain>-paid or
+     -jar-reset: no amount, no number in the value, and the hub already accepts that key and id shape */
+  var PAID_PFX = { hayes: "hay", harris: "har", ainsley: "ain" };
+  var PAID_STAMP_MS = 14 * 24 * 3600 * 1000;
+  function paidMarkerAt(kidId, ws) {
+    var p = PAID_PFX[kidId];
+    if (!p || !ws) return "";
+    var st = loadKeyState(CHECK_PREFIX + kidId + ":week:" + ws);
+    if (st[p + "-paid"] === true) return "paid";
+    if (st[p + "-jar-reset"] === true) return "jar-reset";
+    return "";
+  }
+  /* the marker sits in the week that was paid out: this week when it held stars (Paid before Fri 15:00), else the week that
+     just settled (Paid at or after Fri 15:00), so a fresh week is never marked paid */
+  function writePaidMarker(kidId, paid, thisWeek) {
+    var p = PAID_PFX[kidId];
+    if (!p) return;
+    var ws = weekStartIso(DAY_ISO);
+    if (!thisWeek) ws = addDaysIsoLocal(ws, -7);
+    var key = CHECK_PREFIX + kidId + ":week:" + ws;
+    var st = loadKeyState(key);
+    st[p + "-paid"] = !!paid;
+    st[p + "-jar-reset"] = !paid;
+    saveKeyState(key, st);
+  }
+  function syncedPaidStamp(kidId) {
+    var ws = weekStartIso(DAY_ISO);
+    var m = paidMarkerAt(kidId, ws) || paidMarkerAt(kidId, addDaysIsoLocal(ws, -7));
+    return m === "paid" ? "Paid \u2713" : m === "jar-reset" ? "Jar reset \u2713" : "";
+  }
+
   function getPaidStamp(kidId) {
-    try { return localStorage.getItem("house-bank-paid:" + kidId) || ""; } catch (e) { return ""; }
+    /* DAYPKG1 v2f D1 · the money sign scrub (and the D4 paid-at for a legacy stamp) runs FIRST, before the synced and the
+       expiry returns, so no '$' stamp survives a read on any path */
+    var v = scrubPaidStamp(kidId);
+    var synced = syncedPaidStamp(kidId);
+    if (synced) return synced;
+    try {
+      /* DAYPKG1 v2e · the local stamp fades two weeks after its paid-at, like the synced marker window */
+      if (v) {
+        var at = Date.parse(localStorage.getItem("house-bank-paid-at:" + kidId) || "");
+        if (!isNaN(at) && Date.now() - at > PAID_STAMP_MS) return "";
+      }
+      return v;
+    } catch (e) { return ""; }
   }
 
   /**
@@ -845,6 +1123,7 @@
    * 3) Clear week star buckets. Never zeros lifetime (long save goals stay intact).
    */
   function resetJarCycle(kidId, paidAmount, data) {
+    if (kidScope()) return ""; /* DAYPKG1 v2d · Atlas A: no Paid on a kid board, ever */
     data = data || (global.WardKids && global.WardKids._data) || null;
     settlePriorWeeksIntoBalance(kidId, data);
     var pack = kidDayBank(kidId);
@@ -868,6 +1147,13 @@
     /* DO NOT zero lifetime — personal long saves use lifetime/balance separately */
     /* Clear this week's Sat→Fri tap-day star buckets so jar/week bar resets */
     var taps = weekDayIsos(DAY_ISO);
+    /* DAYPKG1 · mark the week paid only when it held stars (Paid before Fri 15:00); an empty new week stays open */
+    if (week > 0 && taps.length) pack.bag.paidWeek = taps[0];
+    /* DAYPKG1 v2e · this screen's own marker week is done here, never mirrored back onto itself */
+    var ownM = weekStartIso(DAY_ISO);
+    if (!(week > 0)) ownM = addDaysIsoLocal(ownM, -7);
+    if (!pack.bag.syncPaid || typeof pack.bag.syncPaid !== "object") pack.bag.syncPaid = {};
+    pack.bag.syncPaid[ownM] = 1;
     for (var i = 0; i < taps.length; i++) {
       var iso = taps[i];
       if (pack.root[kidId] && pack.root[kidId].days) {
@@ -875,17 +1161,80 @@
       }
     }
     saveBankRoot(pack.root);
-    var bal = pack.bag.balance || 0;
-    var stamp = paid > 0
-      ? ("Paid $" + paid + " · $" + bal + " carry")
-      : ("Jar reset · $" + bal + " carry");
+    /* DAYPKG1 v2 · the stamp is a marker only: no money sign, no amount (Alfred P2, Atlas ruling). Readers test /^Paid/ only */
+    var stamp = paid > 0 ? "Paid \u2713" : "Jar reset \u2713";
     try {
       localStorage.removeItem("house-bank-goal:" + kidId);
       localStorage.setItem("house-bank-paid:" + kidId, stamp);
       localStorage.setItem("house-bank-paid-at:" + kidId, new Date().toISOString());
-      localStorage.setItem("house-bank-paid-amount:" + kidId, String(paid));
     } catch (e) {}
+    writePaidMarker(kidId, paid > 0, week > 0);
     return stamp;
+  }
+
+  /* DAYPKG1 v2d · Atlas ruling (Oct 28 12:15 AM CT) A: Dad taps Paid per kid on the Dad Paid sheet. One tap pays what is owed
+     (carry plus this week) through the same resetJarCycle; the kid boards only show the stamp it leaves */
+  function dadPaid(kidId, data) {
+    data = data || (global.WardKids && global.WardKids._data) || null;
+    if (kidScope() || !data) return "";
+    var v = getBankView(kidId, data);
+    var stamp = resetJarCycle(kidId, String(v.available || 0), data);
+    syncBankFromChecks(data);
+    markDadDevice(); /* DAYPKG1 v2g · only inside a completed hold on the Dad Paid sheet (markDadDevice checks both) */
+    return stamp;
+  }
+
+  /* DAYPKG1 v2e · Atlas 12:40 AM: hold to confirm Paid (about 2 s). Pointer events cover a real mouse and real touch; Space or
+     Enter held works too. Lifting early, leaving the button or a cancel does nothing. One hold fires once (a held or
+     repeating key never fires twice; the press must end before it arms again). A plain click does nothing. The button
+     gets data-holding while held so the sheet can show the fill. Never on a kid board */
+  var HOLD_MS = 2000;
+  function bindHold(btn, fire, ms) {
+    if (!btn || typeof fire !== "function" || kidScope()) return null;
+    ms = typeof ms === "number" && ms > 0 ? ms : HOLD_MS;
+    var timer = null, armed = true, fired = 0;
+    function stop() {
+      if (timer) { clearTimeout(timer); timer = null; }
+      try { btn.removeAttribute("data-holding"); } catch (e) { /* */ }
+    }
+    function start(ev) {
+      if (!armed || timer) return;
+      if (ev && ev.type === "pointerdown" && ev.button != null && ev.button !== 0) return;
+      armed = false;
+      try { btn.setAttribute("data-holding", ""); } catch (e) { /* */ }
+      try { if (ev && ev.pointerId != null && btn.setPointerCapture) btn.setPointerCapture(ev.pointerId); } catch (e) { /* */ }
+      timer = setTimeout(function () { timer = null; try { btn.removeAttribute("data-holding"); } catch (e) { /* */ } fired++; HOLD_FIRING = true; try { fire(btn); } finally { HOLD_FIRING = false; } }, ms);
+    }
+    function end() { stop(); armed = true; }
+    btn.addEventListener("pointerdown", function (ev) { if (ev && ev.preventDefault) ev.preventDefault(); start(ev); });
+    ["pointerup", "pointercancel", "pointerleave", "lostpointercapture"].forEach(function (t) { btn.addEventListener(t, end); });
+    btn.addEventListener("keydown", function (ev) {
+      if (!ev || (ev.key !== " " && ev.key !== "Enter")) return;
+      if (ev.preventDefault) ev.preventDefault();
+      if (ev.repeat) return;
+      start(ev);
+    });
+    btn.addEventListener("keyup", function (ev) { if (ev && (ev.key === " " || ev.key === "Enter")) end(); });
+    btn.addEventListener("blur", end);
+    btn.addEventListener("click", function (ev) { if (ev && ev.preventDefault) ev.preventDefault(); });
+    btn.addEventListener("contextmenu", function (ev) { if (ev && ev.preventDefault) ev.preventDefault(); });
+    return { fired: function () { return fired; }, ms: ms };
+  }
+
+  /* DAYPKG1 v2d · the kid board stamp sits outside the collapsed panel, above the world canvas, read only (kid-world.css) */
+  function renderKidPaidChip(kidId) {
+    if (!kidPage() || typeof document === "undefined" || !document.body) return null;
+    var paid = getPaidStamp(kidId);
+    var chip = document.querySelector("[data-kw-paid]");
+    if (!chip && paid && document.createElement) {
+      chip = document.createElement("div");
+      chip.className = "kw-paid";
+      chip.setAttribute("data-kw-paid", "");
+      chip.setAttribute("aria-live", "polite");
+      document.body.appendChild(chip);
+    }
+    if (chip) { chip.hidden = !paid; chip.textContent = paid || ""; }
+    return chip;
   }
 
   function personalGoalView(kidId, data, bank) {
@@ -913,6 +1262,7 @@
       need = typeof g.need === "number" ? g.need : 0;
       name = (g.name || "").trim();
     }
+    name = kidSafeGoalText(name); /* DAYPKG1 v2i · kid scope: no money in a save name */
     if (!name || need <= 0) {
       return { active: false, placeholder: placeholder, name: name || "", need: need || 0, toward: 0, met: false };
     }
@@ -974,8 +1324,29 @@
     }).slice(0, 5);
   }
 
+  /* DAYPKG1 v2i · Alfred v2h defect 1 (P1 law): the feed's goal title/blurb can carry money (a star rate in dollars, a dollar target).
+     On kid scope it is scrubbed BEFORE any DOM write (no transient '$' for house-nomoney to strip later): currency signs,
+     amounts, money words and every digit go, plus em dashes and arrows (kid copy law); leftover separators are tidied.
+     Adult pages keep the text as is. */
+  function kidSafeGoalText(v) {
+    var t = String(v == null ? "" : v);
+    if (!kidScope()) return t.trim();
+    t = t.replace(/[$\u00a2\u00a3\u00a5\u20ac\u20b9]\s*\d[\d,.]*\s*k?\b/gi, " ")
+         .replace(/\b\d[\d,.]*\s*(?:dollars?|bucks|usd|cents?)\b/gi, " ")
+         .replace(/\b(?:dollars?|bucks|usd|cents?|cash|money)\b/gi, " ")
+         .replace(/[$\u00a2\u00a3\u00a5\u20ac\u20b9]/g, " ")
+         .replace(/\d+(?:[.,]\d+)*%?/g, " ")
+         .replace(/[\u2014\u2013\u2192\u2190\u21d2\u27a1]|->|=>/g, " · ")
+         .replace(/\(\s*\)|\[\s*\]/g, " ")
+         .replace(/(?:\s*[=:+\/]\s*)+(?=\s*(?:·|$))/g, " ")
+         .replace(/\s+/g, " ")
+         .replace(/(?:\s*·\s*){2,}/g, " · ")
+         .replace(/^[\s·:,;=+\/-]+|[\s·:,;=+\/-]+$/g, "");
+    return t.trim();
+  }
   function renderBank(root, bank) {
     if (!root || !bank) return;
+    var goalTitleSafe = kidSafeGoalText(bank.goalTitle), goalBlurbSafe = kidSafeGoalText(bank.goalBlurb);
     var sym = bank.currency.symbol || "★";
     var plural = bank.currency.plural || "stars";
     root.querySelectorAll("[data-bank-today]").forEach(function (el) {
@@ -1001,11 +1372,16 @@
       el.style.width = bank.pct + "%";
       el.classList.toggle("is-full", bank.reached);
     });
+    /* KIDCRIT AINSGOAL1 (Atlas R3) · a goal line with no text is hidden, never an empty label or a placeholder */
     root.querySelectorAll("[data-bank-goal-title]").forEach(function (el) {
-      el.textContent = bank.goalTitle;
+      var tt = goalTitleSafe; /* DAYPKG1 v2i · scrubbed on kid scope before the write */
+      el.textContent = tt;
+      el.hidden = !tt;
     });
     root.querySelectorAll("[data-bank-goal-blurb]").forEach(function (el) {
-      el.textContent = bank.goalBlurb;
+      var tb = goalBlurbSafe; /* DAYPKG1 v2i · scrubbed on kid scope before the write */
+      el.textContent = tb;
+      el.hidden = !tb;
     });
     root.querySelectorAll("[data-bank-reward]").forEach(function (el) {
       el.textContent = bank.reward;
@@ -1041,7 +1417,7 @@
       }
       return "week " + bank.toward + " / " + bank.need + " ★";
     }
-    var metaTxt = bankMetaText();
+    var metaTxt = bankMetaText().replace(/\$\s?\d[\d,]*(?:\.\d+)?(?:\s*\/\s*hr)?/g, "\u2605").replace(/\$/g, ""); /* JARTAP1-DELTA1 · never write '$' into [data-bank-meta] (hidden incl.): same text house-nomoney would leave */
     root.querySelectorAll("[data-bank-meta]").forEach(function (el) {
       el.textContent = metaTxt;
     });
@@ -1059,8 +1435,8 @@
     });
     var left = Math.max(0, bank.need - bank.toward);
     root.querySelectorAll("[data-bank-left]").forEach(function (el) {
-      if (bank.reached) el.textContent = "Jar full · $" + bank.need + " · Balance $" + bal;
-      else if (dollar) el.textContent = "$" + left + " left on jar · Balance $" + bal;
+      if (bank.reached) el.textContent = /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "") ? "Jar full" : ("Jar full · $" + bank.need + " · Balance $" + bal); /* DELTA2 kid guard */
+      else if (dollar) el.textContent = /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "") ? "Jar open" : ("$" + left + " left on jar · Balance $" + bal); /* DELTA2 kid guard */
       else el.textContent = left + " ★ to unlock";
     });
     root.querySelectorAll("[data-payday-chip]").forEach(function (el) {
@@ -1074,8 +1450,8 @@
         : "Payday after honest musts";
     });
     root.querySelectorAll("[data-bank-goal-blurb]").forEach(function (el) {
-      // already set above from goalBlurb — ensure cash blurbs stick
-      if (bank.goalBlurb) el.textContent = bank.goalBlurb;
+      // already set above from goalBlurb; ensure cash blurbs stick (DAYPKG1 v2i · the kid-scope-scrubbed text, never raw)
+      if (goalBlurbSafe) el.textContent = goalBlurbSafe;
     });
     root.querySelectorAll("[data-unlock-cta]").forEach(function (el) {
       var full = !!bank.reached && (Number(bank.toward) > 0 || Number(bank.weekEarn) > 0 || Number(bank.available) > 0);
@@ -1086,7 +1462,7 @@
       full = full && !!bank.reached;
       el.hidden = !full;
       if (full) {
-        el.textContent = "JAR FULL · saved $" + bank.need + " · show Dad";
+        el.textContent = /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "") ? "JAR FULL · show Dad" : "JAR FULL · saved $" + bank.need + " · show Dad"; /* DELTA2 · kid pages: no amount, no star, all 3 kids (Atlas 4:32) */
         el.classList.add("is-loud");
       } else {
         el.textContent = ""; /* never show saved $N at $0 */
@@ -1094,10 +1470,26 @@
       }
     });
     var paid = getPaidStamp(bank.kidId);
+    /* DAYPKG1 v2g · Atlas (a): Dad's weekly figure sits next to each kid's Paid hold, the Dad Paid sheet only (URL-only,
+       never kid glass). Painted here so every renderBank pass (each paint after a Paid hold or a checkoff sync) rewrites it;
+       the sheet-chores '+$N wk' it replaces was wiped by that page's chore row rebuild */
+    root.querySelectorAll("[data-dad-wk]").forEach(function (el) {
+      var okPage = dadPayPage();
+      var wa = bank.weeklyAllowance;
+      el.textContent = okPage && typeof wa === "number" && wa > 0 ? "$" + wa + " wk" : "";
+      el.hidden = !el.textContent;
+    });
     root.querySelectorAll("[data-paid-stamp]").forEach(function (el) {
-      if (paid) { el.hidden = false; el.textContent = paid; }
+      if (paid) { el.hidden = false; el.textContent = paid; } /* DAYPKG1 v2d · Atlas 12:15 AM A: every page shows the stored marker, Paid or Jar reset with a tick (no amount, no star, no digit) */
       else { el.hidden = true; }
     });
+    /* DAYPKG1 v2h · Atlas: a CTA row whose items are all hidden is hidden too, so the jar card has no empty gap */
+    root.querySelectorAll("[data-cta-row]").forEach(function (row) {
+      var kids = row.children || [], on = false;
+      for (var i = 0; i < kids.length; i++) { if (!kids[i].hidden) on = true; }
+      row.hidden = !on;
+    });
+    if (bank.kidId) renderKidPaidChip(bank.kidId);
     root.querySelectorAll("[data-got-it]").forEach(function (el) {
       var full = !!bank.reached && (Number(bank.toward) > 0 || Number(bank.weekEarn) > 0 || Number(bank.available) > 0);
       if (!bank.mustComplete || !(Number(bank.toward) > 0 || Number(bank.weekEarn) >= Number(bank.weeklyAllowance || bank.need || 0))) {
@@ -1120,7 +1512,7 @@
     var kid = data && data.kids && data.kids[kidId];
     var bg = (kid && kid.bankGoal) || {};
     var need = typeof bg.dollarNeed === "number" ? bg.dollarNeed : (typeof bg.need === "number" ? bg.need : 0);
-    var name = String(bg.title || "Jar").split("·")[0].trim() || "Jar";
+    var name = kidSafeGoalText(String(bg.title || "Jar").split("·")[0].trim()) || "Jar"; /* DAYPKG1 v2i · the jar name, aria-label and Saves line are scrubbed on kid scope too (browser observer, v2i) */
     var money = 0;
     if (bank) {
       if (bank.available != null) money = Number(bank.available) || 0;
@@ -1202,19 +1594,19 @@
     });
     root.querySelectorAll("[data-grow-total]").forEach(function (el) {
       /* HTML already prints $ before the span inside .grow-total */
-      el.textContent = (el.closest && el.closest(".grow-total")) ? String(toward) : ("$" + toward);
+      el.textContent = /\/kid-ainsley(\.html)?$/.test(location.pathname || "") ? "" : ((el.closest && el.closest(".grow-total")) || /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "")) ? String(toward) : ("$" + toward); /* DELTA2 kid guard */
     });
     root.querySelectorAll("[data-grow-week-rising]").forEach(function (el) {
-      el.textContent = "week +$" + we + " rising ↑";
+      el.textContent = /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "") ? "" : ("week +$" + we + " rising ↑"); /* DAYPKG1 kid guard: no money sign, no arrow */
     });
     root.querySelectorAll("[data-grow-goal-lab]").forEach(function (el) {
       el.textContent = need > 0 ? ("GOAL " + need) : "GOAL";
     });
     root.querySelectorAll("[data-grow-balance]").forEach(function (el) {
-      el.textContent = "$" + bal;
+      el.textContent = /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "") ? (/\/kid-ainsley(\.html)?$/.test(location.pathname || "") ? "" : "\u2605") : ("$" + bal); /* DELTA2 kid guard */
     });
     root.querySelectorAll("[data-grow-week]").forEach(function (el) {
-      el.textContent = "$" + we;
+      el.textContent = /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "") ? (/\/kid-ainsley(\.html)?$/.test(location.pathname || "") ? "" : "\u2605") : ("$" + we); /* DELTA2 kid guard */
     });
     root.querySelectorAll("[data-grow-save-name]").forEach(function (el) {
       el.textContent = gv.active ? gv.name : (gv.placeholder || "Add a save");
@@ -1229,7 +1621,7 @@
     });
     root.querySelectorAll("[data-grow-save-line]").forEach(function (el) {
       if (!gv.active) el.textContent = gv.placeholder || "Add a save";
-      else el.textContent = gv.name + " · $" + toward + "/$" + need;
+      else el.textContent = /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "") ? gv.name : (gv.name + " · $" + toward + "/$" + need); /* DAYPKG1 kid guard */
     });
 
     /* Stack tokens scale with fill (max 8) */
@@ -1252,10 +1644,10 @@
         el.textContent = gv.placeholder;
         el.classList.add("is-empty");
       } else if (gv.met) {
-        el.textContent = "Tell Dad — goal met · " + gv.name + " ($" + gv.need + ")";
+        el.textContent = /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "") ? ("Goal met · " + gv.name + " · show Dad") : ("Tell Dad — goal met · " + gv.name + " ($" + gv.need + ")"); /* DAYPKG1 kid guard: no money sign, no dash */
         el.classList.add("is-met", "is-active");
       } else {
-        el.textContent = gv.name + " · $" + gv.toward + "/$" + gv.need;
+        el.textContent = /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "") ? gv.name : (gv.name + " · $" + gv.toward + "/$" + gv.need); /* DAYPKG1 kid guard */
         el.classList.add("is-active");
       }
     });
@@ -2080,8 +2472,8 @@
     if (/harris/.test(blob)) return "kid-harris.html";
     if (/hayes/.test(blob)) return "kid-hayes.html";
     if (/ainsley/.test(blob)) return "kid-ainsley.html";
-    if (/jar|allowance|gem|coin|payday/.test(blob)) return "sheet-allowance.html";
-    if (/chore|must/.test(blob)) return "sheet-chores.html";
+    /* DAYPKG1 v2e · Atlas 12:40 AM: the Paid sheet is reachable by URL only, so jar / payday rows open the chores sheet */
+    if (/chore|must|jar|allowance|gem|coin|payday/.test(blob)) return "sheet-chores.html";
     if (/pack/.test(blob)) return "sheet-pack.html";
     return "sheet-today.html";
   }
@@ -2148,6 +2540,50 @@
     renderList(document.querySelector("[data-mount-dan-picks]"), picks, "picks later");
   }
 
+  /* HAYESJAR1C (Atlas 6:54, 6:57, 4:58) · LAW8C1 hid Hayes's daily backpack chore on the board behind the weekly
+     "Backpack + sports bag" chore (fix A in kid-world.js now only folds same-cadence chores), so it could not be tapped from
+     Sat 10-24 through Tue 10-27 of the chore week that starts Fri 2026-10-23. The fix is code, not data, and keeps NO record
+     on the device: hay-backpack (Hayes only) on those four days reads done (getCheckRaw, so the jar rule counts it met on
+     every device, an empty one too) and can not be toggled (setCheck no-op plus a capture-phase tap guard on every surface).
+     HAYESJAR1D (Atlas 5:17) · it holds from that chore week until the start of Mon 2026-11-02 (local CT date, so the DST
+     change on Sun 11-01 does not move it): those days stay done through the Fri 10-30 15:00 settle and the jar payout, then end
+     by themselves. The new week (10-30 on) has no locked day, so its jar and counts are untouched. Other kids, other chores,
+     other days and other weeks are unchanged. The earlier one-time write credit (HAYESJAR1/1B, never live) is gone:
+     the read above makes it redundant, and a leftover house-migrate:hayesjar1 flag is never read. */
+  var HAYESJAR1_WEEK = "2026-10-23";
+  var HAYESJAR1_DAYS = ["2026-10-24", "2026-10-25", "2026-10-26", "2026-10-27"];
+  var HAYESJAR1_UNTIL = "2026-11-02"; /* HAYESJAR1D · first local CT date with no lock (Mon 11-02 00:00 America/Chicago) */
+  /** HAYESJAR1D · true for Hayes's backpack on a locked day from that chore week until the start of Mon 11-02 (CT date). */
+  function hayesJar1Locked(checkId, dayIso) {
+    try {
+      if (checkId !== "hay-backpack" || KID_FROM_CHECK[checkId] !== "hayes") return false;
+      var iso = dayIso || DAY_ISO;
+      if (HAYESJAR1_DAYS.indexOf(iso) < 0) return false;
+      return weekStartIso(DAY_ISO) >= HAYESJAR1_WEEK && DAY_ISO < HAYESJAR1_UNTIL;
+    } catch (e) { return false; }
+  }
+  function hayesJar1Guard(ev) {
+    try {
+      if (ev.type === "keydown" && ev.key !== "Enter" && ev.key !== " ") return;
+      var t = ev.target;
+      var el = t && t.closest ? t.closest("[data-check],[data-claim],[data-hq-claim]") : null;
+      if (!el) return;
+      var id = el.getAttribute("data-check") || el.getAttribute("data-claim") || el.getAttribute("data-hq-claim");
+      if (id !== "hay-backpack") return;
+      var iso = el.getAttribute("data-day-iso") || DAY_ISO;
+      if (!hayesJar1Locked(id, iso)) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+    } catch (e) { /* */ }
+  }
+  try {
+    if (typeof document !== "undefined" && document && typeof document.addEventListener === "function") {
+      document.addEventListener("click", hayesJar1Guard, true);
+      document.addEventListener("keydown", hayesJar1Guard, true);
+    }
+  } catch (eG) { /* */ }
+
   function boot(kidId) {
     loadJSON(function (err, data) {
       if (err || !data) {
@@ -2171,6 +2607,22 @@
     DAY_ISO: DAY_ISO,
     CHECK_KEY: CHECK_KEY,
     BANK_KEY: BANK_KEY,
+    bindHold: bindHold,
+    HOLD_MS: HOLD_MS,
+    LEGACY_BANK_KEY: LEGACY_BANK_KEY,
+    blindMoveLegacyBank: blindMoveLegacyBank,
+    /* DAYPKG1 v2f */
+    kidScope: kidScope,
+    kidSafeGoalText: kidSafeGoalText,
+    scrubPaidStamp: scrubPaidStamp,
+    LEDGER_PURGE_FROM: LEDGER_PURGE_FROM,
+    DAD_DEVICE_KEY: DAD_DEVICE_KEY,
+    ledgerPurgeOk: ledgerPurgeOk,
+    purgeKidLedger: purgeKidLedger,
+    scheduleKidLedgerPurge: scheduleKidLedgerPurge,
+    purgeRun: function () { return PURGE_RUN; },
+    migrateDadLedger: migrateDadLedger,
+    ledgerLog: function () { return LEDGER_LOG; },
     KID_FROM_CHECK: KID_FROM_CHECK,
     checkKeyFor: checkKeyFor,
     weekStartIso: weekStartIso,
@@ -2188,6 +2640,9 @@
     mustProgress: mustProgress,
     mustPayStars: mustPayStars,
     syncMustGateBank: syncMustGateBank,
+    HAYESJAR1_DAYS: HAYESJAR1_DAYS.slice(),
+    HAYESJAR1_UNTIL: HAYESJAR1_UNTIL,
+    hayesJar1Locked: hayesJar1Locked,
     syncDailyWeekBank: syncDailyWeekBank,
     enhanceSharedChores: enhanceSharedChores,
     questMeta: questMeta,
@@ -2208,6 +2663,10 @@
     eventsForIso: consumeEventsForIso,
     nextPaydayInfo: nextPaydayInfo,
     resetJarCycle: resetJarCycle,
+    dadPaid: dadPaid,
+    paidMarkerAt: paidMarkerAt,
+    renderKidPaidChip: renderKidPaidChip,
+    kidPage: kidPage,
     settlePriorWeeksIntoBalance: settlePriorWeeksIntoBalance,
     weekEarnDollars: weekEarnDollars,
     allowanceCap: allowanceCap,

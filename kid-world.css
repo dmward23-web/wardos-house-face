@@ -144,7 +144,6 @@ body.kw-on .bank-blurb,
 body.kw-on .bank-track,
 body.kw-on .jar-flow,
 body.kw-on .paid-stamp,
-body.kw-on [data-got-it],
 body.kw-on [data-streak-label],
 body.kw-on .xp-glass,
 body.theme-hayes.kw-on .quest .star-earn,
@@ -376,6 +375,26 @@ body.kw-on.kw-asleep .cw-lantern { filter: saturate(0.7); }
 }
 @media (prefers-reduced-motion: reduce) {
   .cw-creature, body.kw-on .quest { transition: none !important; }
+}
+
+/* DAYPKG1 v2d · Atlas ruling (Oct 28 12:15 AM CT) A: no Paid button on a kid board (Dad pays on the Dad sheet). The
+   board shows only the stored Paid or Jar reset tick: kids-data adds .kw-paid to body, outside the collapsed panel, above
+   the world canvas, read only (no taps). */
+.kw-paid { display: none; }
+body.kw-on .kw-paid:not([hidden]) {
+  display: block;
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  pointer-events: none;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(10, 14, 22, 0.62);
+  color: #fff;
+  font: 700 15px/1.3 system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.01em;
 }
 
 /* Beat older theme sheets that force money, pills, and vinyl back on. */
@@ -614,3 +633,7 @@ html, body { overflow-x: hidden !important; overscroll-behavior-x: none; }
 body.theme-hayes .kw-path { background: rgba(12, 28, 22, 0.94) !important; border-color: rgba(170, 230, 190, 0.55) !important; color: #f2fff6 !important; }
 body.theme-harris .kw-path { background: rgba(18, 34, 64, 0.94) !important; border-color: rgba(255, 214, 102, 0.7) !important; color: #fff8e6 !important; }
 body.theme-ainsley .kw-path { background: rgba(14, 12, 16, 0.95) !important; border-color: rgba(214, 186, 140, 0.6) !important; color: #f3e6cf !important; font-weight: 700 !important; }
+
+/* JARTAP1 (Atlas 11:51 PM) · over the world the jar box never eats a chore tap: the host and its canvas take no pointer
+   events; the world canvas hit-tests chores first, then the jar's painted shape (kid-world.js onWorldJarClick). */
+body.kw-on .kw-jar-host, body.kw-on .kw-jar-host .je-jar-cv { pointer-events: none; }

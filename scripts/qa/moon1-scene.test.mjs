@@ -55,9 +55,10 @@ test("visibility: Thu Oct 29 2026 the moon is below the horizon 5 to 8 PM CT; ri
   assert.equal(M.at(ms("2026-10-26T04:00:00Z")).up, true, "up at 11 PM Oct 25");
 });
 
-let pp = null; for (const base of [import.meta.url, (process.env.WARDOS_DEPS || "/nonexistent") + "/", "/tmp/h1-deps/node_modules/", "/tmp/ori-qa/node_modules/"]) { try { pp = createRequire(base)("puppeteer-core"); break; } catch (_) {} }
-const CHROME = process.env.CHROME_PATH || ["/usr/local/bin/google-chrome", "/usr/bin/google-chrome"].find((c) => fs.existsSync(c)) || null;
-const SKIP = !(pp && CHROME) && "needs puppeteer-core + chrome";
+const NO_BROWSER = process.env.QA_NO_BROWSER === "1";   /* DAYPKG1 item 3 · QA_NO_BROWSER=1: puppeteer-core is never loaded and no Chrome path is resolved, so nothing below can launch */
+let pp = null; if (!NO_BROWSER) for (const base of [import.meta.url, (process.env.WARDOS_DEPS || "/nonexistent") + "/", "/tmp/h1-deps/node_modules/", "/tmp/ori-qa/node_modules/"]) { try { pp = createRequire(base)("puppeteer-core"); break; } catch (_) {} }
+const CHROME = NO_BROWSER ? null : (process.env.CHROME_PATH || ["/usr/local/bin/google-chrome", "/usr/bin/google-chrome"].find((c) => fs.existsSync(c)) || null);
+const SKIP = NO_BROWSER ? "SKIP QA_NO_BROWSER=1 (no Chrome launch)" : (!(pp && CHROME) && "needs puppeteer-core + chrome");
 const CELLSET = (c) => { try { localStorage.setItem("wxsky", JSON.stringify(c)); } catch (e) {} };   /* what the hub's /wx reply leaves cached */
 const CLOCK = (t0) => { const real = Date.now.bind(Date); window.__realNow = real; window.__clk = t0; window.__clkAt = real(); Date.now = () => window.__clk + (window.__realNow() - window.__clkAt); };
 export const serve = async () => { const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".webp": "image/webp", ".png": "image/png", ".svg": "image/svg+xml" };

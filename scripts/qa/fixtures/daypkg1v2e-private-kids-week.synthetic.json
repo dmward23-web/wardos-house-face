@@ -1,0 +1,206 @@
+{
+ "_synthetic": "DAYPKG1 v2e QA fixture (Alfred D4): a SYNTHETIC private kids-week as the hub serves it at /api/private/kids-week.json to a paired Dad screen. Copied from hayesjar1c-week.json data; not live data, never served from the public tree.",
+ "kids": {
+  "hayes": {
+   "bankGoal": {
+    "need": 52,
+    "weeklyAllowance": 52,
+    "starDollar": 1
+   },
+   "quests": [
+    {
+     "id": "hay-bed",
+     "what": "Chore one · daily",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "hay-backpack",
+     "what": "🎒 Backpack · ready (daily)",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "hay-dishes",
+     "what": "Chore three · daily",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "hay-empty",
+     "what": "Chore four · daily",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "hay-trash",
+     "what": "Chore five · daily",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "hay-postgame",
+     "what": "Chore six · daily",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "hay-shower",
+     "what": "Chore seven · daily",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "hay-room",
+     "what": "Chore eight · weekly",
+     "cadence": "weekly",
+     "stars": 2
+    },
+    {
+     "id": "hay-shoes",
+     "what": "Chore nine · weekly",
+     "cadence": "weekly",
+     "stars": 1
+    },
+    {
+     "id": "hay-cubby",
+     "what": "🎒 Backpack + sports bag in cubby · weekly",
+     "cadence": "weekly",
+     "stars": 1
+    }
+   ]
+  },
+  "harris": {
+   "bankGoal": {
+    "need": 52,
+    "weeklyAllowance": 52,
+    "starDollar": 1
+   },
+   "quests": [
+    {
+     "id": "har-bed",
+     "what": "Chore one · daily",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "har-backpack",
+     "what": "🎒 Pack backpack · daily",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "har-dishes",
+     "what": "Chore three · daily",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "har-empty",
+     "what": "Chore four · daily",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "har-trash",
+     "what": "Chore five · daily",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "har-postgame",
+     "what": "Chore six · daily",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "har-shower",
+     "what": "Chore seven · daily",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "har-toys",
+     "what": "Chore eight · weekly",
+     "cadence": "weekly",
+     "stars": 2
+    },
+    {
+     "id": "har-shoes",
+     "what": "Chore nine · weekly",
+     "cadence": "weekly",
+     "stars": 1
+    },
+    {
+     "id": "har-cubby",
+     "what": "🎒 Backpack + sports bag in cubby · weekly",
+     "cadence": "weekly",
+     "stars": 1
+    }
+   ]
+  },
+  "ainsley": {
+   "bankGoal": {
+    "need": 38,
+    "weeklyAllowance": 38,
+    "starDollar": 1
+   },
+   "quests": [
+    {
+     "id": "ain-bed",
+     "what": "Chore one · morning",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "ain-toys",
+     "what": "Chore two",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "ain-dishwasher",
+     "what": "Chore three",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "ain-empty",
+     "what": "Chore four",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "ain-living",
+     "what": "Chore five",
+     "cadence": "daily",
+     "stars": 1
+    },
+    {
+     "id": "ain-bath",
+     "what": "Chore six · weekly",
+     "cadence": "weekly",
+     "stars": 1
+    },
+    {
+     "id": "ain-laundry",
+     "what": "Chore seven · weekly",
+     "cadence": "weekly",
+     "stars": 1
+    },
+    {
+     "id": "ain-cubby",
+     "what": "🎒 Backpack + sports bag in cubby",
+     "cadence": "weekly",
+     "stars": 1
+    },
+    {
+     "id": "ain-babysit",
+     "what": "Hire job · optional",
+     "cadence": "addon",
+     "optional": true
+    }
+   ]
+  }
+ }
+}

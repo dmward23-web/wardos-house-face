@@ -1,0 +1,33 @@
+{
+  "_note": "HAYESJAR1 synthetic board. Generic chore text with the same shape as the private week: Hayes has a daily 'Backpack' and a weekly 'Backpack + ...' chore; Harris's daily pack chore does not prefix-collide; Ainsley has no daily backpack. Clock points are Chicago wall times, the chore week starts on the Friday named in week.",
+  "week": { "id": "2026-10-23", "taps": ["2026-10-24", "2026-10-25", "2026-10-26", "2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30"], "hidden": ["2026-10-24", "2026-10-25", "2026-10-26"] },
+  "clock": {
+    "sat0700": "2026-10-24T12:00:00Z", "sun2200": "2026-10-26T03:00:00Z", "mon0700": "2026-10-26T12:00:00Z", "mon1430": "2026-10-26T19:30:00Z",
+    "tue0700": "2026-10-27T12:00:00Z", "wed0700": "2026-10-28T12:00:00Z", "thu0700": "2026-10-29T12:00:00Z", "fri0700": "2026-10-30T12:00:00Z",
+    "fri1600": "2026-10-30T21:00:00Z", "sat31": "2026-10-31T12:00:00Z", "nextMon": "2026-11-02T13:00:00Z", "priorWed": "2026-10-21T12:00:00Z"
+  },
+  "data": { "kids": {
+    "hayes": { "bankGoal": { "need": 12, "weeklyAllowance": 12, "starDollar": 1 }, "quests": [
+      { "id": "hay-bed", "what": "Chore one · daily", "cadence": "daily", "stars": 1 },
+      { "id": "hay-backpack", "what": "\ud83c\udf92 Backpack · ready (daily)", "cadence": "daily", "stars": 1 },
+      { "id": "hay-dishes", "what": "Chore three · daily", "cadence": "daily", "stars": 1 },
+      { "id": "hay-trash", "what": "Chore four · daily", "cadence": "daily", "stars": 1 },
+      { "id": "hay-room", "what": "Chore five · weekly", "cadence": "weekly", "stars": 2 },
+      { "id": "hay-cubby", "what": "\ud83c\udf92 Backpack + sports bag in cubby · weekly", "cadence": "weekly", "stars": 1 }
+    ] },
+    "harris": { "bankGoal": { "need": 12, "weeklyAllowance": 12, "starDollar": 1 }, "quests": [
+      { "id": "har-bed", "what": "Chore one · daily", "cadence": "daily", "stars": 1 },
+      { "id": "har-backpack", "what": "\ud83c\udf92 Pack backpack · daily", "cadence": "daily", "stars": 1 },
+      { "id": "har-dishes", "what": "Chore three · daily", "cadence": "daily", "stars": 1 },
+      { "id": "har-toys", "what": "Chore five · weekly", "cadence": "weekly", "stars": 2 },
+      { "id": "har-cubby", "what": "\ud83c\udf92 Backpack + sports bag in cubby · weekly", "cadence": "weekly", "stars": 1 }
+    ] },
+    "ainsley": { "bankGoal": { "need": 10, "weeklyAllowance": 10, "starDollar": 1 }, "quests": [
+      { "id": "ain-bed", "what": "Chore one · morning", "cadence": "daily", "stars": 1 },
+      { "id": "ain-empty", "what": "Chore two", "cadence": "daily", "stars": 1 },
+      { "id": "ain-bath", "what": "Chore five · weekly", "cadence": "weekly", "stars": 1 },
+      { "id": "ain-cubby", "what": "\ud83c\udf92 Backpack + sports bag in cubby", "cadence": "weekly", "stars": 1 },
+      { "id": "ain-babysit", "what": "Hire job · optional", "cadence": "addon", "optional": true }
+    ] }
+  } }
+}

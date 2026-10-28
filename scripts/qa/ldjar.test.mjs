@@ -138,6 +138,8 @@ test("AINSSTAR1 (real browser): no star glyph or digit in Ainsley's rows before,
       assert.ok(s.bank, "her section rendered");
       assert.equal(s.bank.star, false, mode + " star: " + s.bank.text);
       assert.equal(s.bank.digit, false, mode + " digit: " + s.bank.text);
+      /* DAYPKG1 v2i · Dad's weekly figure next to her Paid hold is checked apart (money shape, Dad page only) */
+      assert.ok(s.bank.dadWk === "" || /^\$\d+(?:\.\d+)? wk$/.test(s.bank.dadWk), mode + " Dad weekly figure shape: " + s.bank.dadWk);
     }
     assert.deepEqual(r.errors, []);
   }

@@ -539,21 +539,17 @@
     else if (muteBtn) { muteBtn.textContent = m ? "\uD83D\uDD07" : "\uD83D\uDD0A"; muteBtn.setAttribute("aria-label", m ? "Sound off. Tap for sound" : "Sound on. Tap to mute"); muteBtn.setAttribute("aria-pressed", m ? "true" : "false"); }
     if (ac) { if (m && ac.state === "running") ac.suspend(); }   /* stops the ambient loop and every sting */
   }
-  function busy() {
-    var t = now();
-    if (victoryAt >= 0) return true;
-    for (var i = 0; i < pops.length; i++) if (t - pops[i].t0 < 2.4) return true;
-    return false;
-  }
   var undoArm = null;
-  global.KidUndoGate = function (q) {
-    if (busy()) return false;                         /* never lose a check mid-celebration */
-    var t = now();
-    if (undoArm && undoArm.btn === q.btn && t - undoArm.t > 0.9 && t - undoArm.t < 4) { undoArm = null; return true; }
-    var info = global.KidWorld && KidWorld.hits && KidWorld.hits();
-    var r = info && info.cv ? info.cv.getBoundingClientRect() : { left: 0, top: 0 };
-    undoArm = { btn: q.btn, t: t, x: r.left + q.x, y: r.top + (q.seat || q.y) - (q.ms || 72) * 0.75 };
-    return false;
+  /* KIDCRIT UNDO2 (Dan's walkthrough: Hayes needed a third tap) · a second tap on a done chest undoes it, the same as Harris
+     and Ainsley (kid-world UNDO1 keeps the 1s double-tap guard). GATE1 used to swallow that tap while any loot pop played
+     (2.4s) and then only armed "Tap again to undo", so the undo took a third tap. Only the victory panel still holds an undo
+     (a tap closes it), and only for the panel's own 5.6s life: victoryAt is cleared in the paint loop, so a stalled frame
+     (hidden tab) must not hold undo forever. */
+  var VICTORY_HOLD_S = 5.6;
+  global.KidUndoGate = function () {
+    if (victoryAt >= 0 && now() - victoryAt < VICTORY_HOLD_S) return false;
+    undoArm = null;
+    return true;
   };
   function undoHint(t) {
     if (!undoArm) return;

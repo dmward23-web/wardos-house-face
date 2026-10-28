@@ -1,0 +1,15 @@
+{
+ "note": "JARTAP1-DELTA1 synthetic bankMetaText outputs (not real balances), one per branch plus edge cases",
+ "inputs": [
+  "Balance $0 · This week $0 · Jar $0 / $10",
+  "Musts 1/3 · jar locked · Balance $12",
+  "Balance $-5",
+  "$",
+  "$$ $ 4",
+  "week 3 / 10 ★"
+ ],
+ "expect": {
+  "in": "Balance $0 · This week $0 · Jar $0 / $10",
+  "out": "Balance ★ · This week ★ · Jar ★ / ★"
+ }
+}

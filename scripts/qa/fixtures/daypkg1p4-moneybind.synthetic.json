@@ -1,0 +1,6 @@
+{
+  "_note": "DAYPKG1 P4b · SYNTHETIC money-bind input and the Dad (sheet) page output it must keep. Not real allowance numbers.",
+  "data": { "kids": { "harris": { "bankGoal": { "id": "gem-jar", "starDollar": 2, "weeklyAllowance": 10 }, "quests": [{ "rateLabel": "$15/hr" }] } } },
+  "sheet": { "stars": "$14 wk", "jar": "Gem Jar · $10", "sit": "$15/hr" },
+  "kid": { "stars": "", "jar": "Gem Jar", "sit": "Hire job" }
+}

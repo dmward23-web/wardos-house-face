@@ -23,8 +23,15 @@
     try { localStorage.setItem(KEY, JSON.stringify(root)); } catch (e) { /* */ }
   }
 
+  /* DAYPKG1 v2d · a kid-typed save name never keeps a dollar sign: stripped on save and on read (an old one is rewritten) */
+  function noDollar(name) { return String(name == null ? "" : name).replace(/\$/g, ""); }
+
   function list(kidId) {
     var root = loadRoot();
+    if (root[kidId] && root[kidId].some(function (x) { return x && /\$/.test(String(x.name || "")); })) {
+      root[kidId].forEach(function (x) { if (x && x.name != null) x.name = noDollar(x.name).trim() || "Save"; });
+      saveRoot(root);
+    }
     if (root[kidId] && root[kidId].some(function (x) { return x && /^seed-/.test(String(x.id || "")); })) {
       root[kidId] = root[kidId].filter(function (x) { return x && !/^seed-/.test(String(x.id || "")); });
       saveRoot(root);
@@ -43,7 +50,7 @@
   }
 
   function add(kidId, name, need) {
-    name = String(name || "").trim();
+    name = noDollar(name || "").trim();
     if (!name) return null;
     need = parseInt(need, 10);
     if (isNaN(need) || need < 0) need = 0;
@@ -60,7 +67,7 @@
     var arr = root[kidId] || [];
     for (var i = 0; i < arr.length; i++) {
       if (arr[i].id === id) {
-        if (name != null) arr[i].name = String(name).trim() || arr[i].name;
+        if (name != null) arr[i].name = noDollar(name).trim() || noDollar(arr[i].name).trim() || "Save";
         if (need != null) {
           var n = parseInt(need, 10);
           arr[i].need = isNaN(n) || n < 0 ? 0 : n;
@@ -174,7 +181,7 @@
     } else {
       rows = items.map(function (it) {
         var meta = it.need > 0
-          ? ("$" + Math.min(toward, it.need) + "/$" + it.need)
+          ? ("$" + Math.min(toward, it.need) + "/$" + it.need).replace(/\$\s?\d[\d,]*(?:\.\d+)?(?:\s*\/\s*hr)?/g, "\u2605").replace(/\$/g, "") /* DELTA2 · no '$' write (boys only: no saves host on Ainsley) */
           : "★ later";
         return (
           '<div class="saves-list-row" data-save-id="' + esc(it.id) + '">' +
@@ -232,7 +239,7 @@
       label = "Saves · tap + to add";
     } else if (item.need > 0) {
       var banked = Math.min(toward, item.need);
-      label = "Saves · " + shortName(item.name, 20) + "  $" + banked + "/$" + item.need;
+      label = ("Saves · " + shortName(item.name, 20) + "  $" + banked + "/$" + item.need).replace(/\$\s?\d[\d,]*(?:\.\d+)?(?:\s*\/\s*hr)?/g, "\u2605").replace(/\$/g, ""); /* DELTA2 · no '$' write (boys only) */
       pct = Math.max(0, Math.min(100, Math.round((banked / item.need) * 100)));
     } else {
       label = "Saves · " + shortName(item.name, 24) + "  ★";

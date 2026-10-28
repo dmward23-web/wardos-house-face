@@ -390,6 +390,9 @@
     window.setTimeout(function () { burst.remove(); }, 1500);
   }
 
+  /* GOALCOPY1 (Atlas 8:18 PM) · the goal-hit banner fallback when no reward text is set (Ainsley: no bankGoal). Kid copy law:
+     no em dash, no arrow, no star, no digit, no $. */
+  var GOAL_FALLBACK = "Goal reached. Show Dad.";
   function celebrateGoal(rewardText) {
     sfxGoal();
     if (reducedMotion()) {
@@ -401,7 +404,7 @@
     var banner = document.createElement("div");
     banner.className = "vfx-goal-banner vfx-" + theme();
     banner.innerHTML = "<div class='g-title'>UNLOCKED!!!</div><div class='g-sub'>" +
-      (rewardText || "Ask Dad for your reward") + "</div>";
+      (rewardText || GOAL_FALLBACK) + "</div>";
     layer.appendChild(banner);
     document.body.classList.add("bank-goal-hit");
     window.setTimeout(function () { banner.remove(); }, 2800);
@@ -423,7 +426,7 @@
     }
     return n;
   }
-  function moneyText(stars) { var v = starValue(); return v == null ? "+★" + stars : "+$" + (stars * v); }
+  function moneyText(stars) { var v = starValue(); return /\/kid-ainsley(\.html)?$/.test(location.pathname || "") ? "\u2713" : /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "") ? "+" + stars : v == null ? "+★" + stars : "+$" + (stars * v); } /* DELTA2 · kid pages: Ainsley plain check, boys +N, never $ or star */
   function currencyLabel(el) {
     var n = dollarsFor(el);
     if (n <= 0) return "hire · not jar";
@@ -452,7 +455,7 @@
     var n = dollarsFor(el);
     sfxQuest();
     boomAt(el);
-    if (n > 0) floatDollar(el, n);
+    if (n > 0) { if (/\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "")) floatPopup(el, moneyText(n)); else floatDollar(el, n); } /* DELTA2 · kid pop uses floatPopup (no vfx-dollar class, so nomoney keeps it) */
     else floatPopup(el, currencyLabel(el));
     // light hotbar / era / loadout react
     document.querySelectorAll(".hotbar-slot, .loadout-slot, .track-dot, .era").forEach(function (s, i) {
@@ -664,6 +667,7 @@
     setMuted: setMuted, isMuted: isMuted, wireMute: wireMute,
     setVolume: setVolume, getVolume: getVolume,
     ensureCtx: ensureCtx, unlockAudio: unlockAudio, masterGain: function () { return _master; },
-    startAmbient: startAmbient, stopAmbient: stopAmbient
+    startAmbient: startAmbient, stopAmbient: stopAmbient,
+    questPop: questPop /* DAYPKG1 · exported so a chore tick (house-checkoffs) and a claim tile (house-kid-engage) can pop */
   };
 })(window);

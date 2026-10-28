@@ -12,9 +12,9 @@
   var KIDS = { ainsley: "kid-ainsley.html", hayes: "kid-hayes.html", harris: "kid-harris.html" };
   var ABBR = { ain: "ainsley", hay: "hayes", har: "harris", ains: "ainsley" };
   var TODAY = "sheet-today.html", MONTH = "month.html", CHORES = "sheet-chores.html",
-      JAR = "sheet-allowance.html", STATUS = "sheet-status.html", US = "sheet-us.html",
+      STATUS = "sheet-status.html", US = "sheet-us.html",
       CAMS = "nest-webrtc.html", LIGHTS = "sheet-lights.html", HUBHOME = "sheet-google-home.html",
-      DAN = "sheet-dan.html", DESK = "sheet-desk-gate.html", PACK = "sheet-pack.html",
+      DESK = "sheet-desk-gate.html", PACK = "sheet-pack.html", /* DAYPKG1 v2g · Atlas P1-2: no Dad sheet target in this file; Dad sheets are URL-only */
       GALLERY = "sheet-gallery.html", HERO = "sheet-gallery-hero.html", INDEX = "sheet-index.html";
   var CONTROL = "a[href],button,input,select,textarea,label,summary,[role=button],[contenteditable=true]," +
     /* tap actions other House scripts own (delegated or direct) — never navigate over them */
@@ -83,7 +83,7 @@
     /* Today */
     ["sheet-today.html", "section.gm, .unknown-chips, .gm-badge", MONTH],
     ["sheet-today.html", "section.today-day", MONTH],
-    ["sheet-today.html", "section.today-day .leaveby-row", kid(DAN)],
+    ["sheet-today.html", "section.today-day .leaveby-row", kid(MONTH)],
     ["sheet-today.html", "section.sec[aria-label*='here' i], section.sec[aria-label*='who' i]", US],
 
     /* Kid boards */
@@ -92,7 +92,6 @@
     ["kid-*", ".consume-label:not([data-mount-consume-today-label]), .consume-ahead, .consume-ahead-row, .consume-routine, .day-records .row:not(a)", MONTH],
     ["kid-*", ".harbor-strip", TODAY],
     ["kid-*", ".harbor-strip .card", dayCard],
-    ["kid-*", ".sec-bank.bank-card, .money-row, .money-chip", JAR],
     ["kid-*", ".sec-light", LIGHTS],
 
     /* Dad Seat */
@@ -104,19 +103,15 @@
     ["month.html", ".banner-row > *:not(a)", kid(US)],
     ["month.html", ".day.out", monthOut],
 
-    /* Chores · streak badge → that kid's board; vibe banner → jar path */
+    /* Chores · streak badge → that kid's board (DAYPKG1 v2e: the Paid sheet is URL only, so no jar path) */
     ["sheet-chores.html", ".streak", kid(null)],
-    ["sheet-chores.html", "section.cheer", JAR],
     ["sheet-chores.html", ".cheer-badge", byText([[/3 KIDS/i, INDEX], [/LIVE|TAPS/i, STATUS]])],
 
     /* Groceries · each kid's treat slot → that kid's board */
     ["sheet-groceries.html", ".treat", kid(null)],
 
-    /* Allowance */
-    ["sheet-allowance.html", "section.link-banner", CHORES],
-    ["sheet-allowance.html", "section.bank, .streak-pill, .g2-grow-chip", kid(null)],
-    ["sheet-allowance.html", ".feed-row", CHORES],
-    ["sheet-allowance.html", ".desk-note, .badge", DESK],
+    /* DAYPKG1 v2e · the Paid sheet's own tap rules live on that page (it pushes them into HouseLinks.rules), so this shared
+       nav file names no route to it */
 
     /* Our ideas (weekend) · kid idea cards → kid boards */
     ["sheet-weekend.html", ".vote-card", kid(null)],
@@ -148,7 +143,7 @@
 
     /* Pack */
     ["sheet-pack.html", "section.cheer", US],
-    ["sheet-pack.html", ".tab", byText([[/^\s*Later/i, US]], DAN)],
+    ["sheet-pack.html", ".tab", byText([[/^\s*Later/i, US]], TODAY)],
     ["sheet-pack.html", ".bagcard", "sheet-load-day.html"],
     ["sheet-pack.html", ".cheer-badge", byText([[/FRI|MON|TUE|WED|THU|SAT|SUN/i, MONTH]], "sheet-win.html")],
 
@@ -166,8 +161,7 @@
     ["sheet-desk-gate.html", ".side.house .side-ico, .side.house .side-pill, .side.house .loud, .kids-note", INDEX],
     ["sheet-desk-gate.html", ".side.house .item", byText([[/Calendar/i, MONTH], [/Kids/i, INDEX], [/Chores/i, CHORES], [/Us logistics/i, US]])],
 
-    /* Dinner · suggest → Dad (Dad locks the night) */
-    ["sheet-dinner.html", ".suggest", DAN],
+    /* Dinner · suggest stays put (was → Dad sheet; DAYPKG1 v2g: Dad sheets are URL-only) */
     ["sheet-dinner.html", ".vote-chip:not(a), .kid-chip:not(a)", kid(null)]
   ];
 
@@ -235,5 +229,5 @@
     setTimeout(scan, 1500);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
-  window.HouseLinks = { scan: scan, rules: R, control: CONTROL };
+  window.HouseLinks = { scan: scan, rules: R, control: CONTROL, kid: kid };
 })();

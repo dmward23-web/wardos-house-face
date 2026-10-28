@@ -150,7 +150,11 @@
         if (earn && !earn.classList.contains("addon-tag")) {
           var n = earn.getAttribute("data-stars") || "1";
           var prefix = (earn.textContent || "").indexOf("$") >= 0 ? "$" : "★ ";
-          if (prefix === "$") earn.textContent = done ? "+$" + n : "$" + n;
+          if (/\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "")) { /* DAYPKG1 v2 · kid pages get no amount chip: no money sign, no star, no number; a plain tick when done, nothing when open */
+            earn.textContent = done ? "✓" : "";
+            if (done) earn.removeAttribute("hidden"); else earn.setAttribute("hidden", "");
+          }
+          else if (prefix === "$") earn.textContent = done ? "+$" + n : "$" + n;
           else earn.textContent = done ? "★ +" + n : "★ " + n;
         }
       }
@@ -446,7 +450,10 @@
       var dayIso = el.getAttribute("data-day-iso") || "";
       var key = keyFor(el);
       var state = loadKey(key);
-      if (Object.prototype.hasOwnProperty.call(state, id)) {
+      /* HAYESJAR1C/1D · a locked day (Hayes backpack Sat..Tue of week 10-23, until Mon 11-02 CT) always shows done, even over a stored false */
+      if (window.WardKids && typeof window.WardKids.hayesJar1Locked === "function" && window.WardKids.hayesJar1Locked(id, dayIso || undefined)) {
+        applyDone(el, true, false);
+      } else if (Object.prototype.hasOwnProperty.call(state, id)) {
         applyDone(el, !!state[id], false);
       } else if (el.classList.contains("day-tap") && window.WardKids && typeof window.WardKids.getCheck === "function") {
         applyDone(el, !!window.WardKids.getCheck(id, window.WardKids._data, dayIso), false);
@@ -476,6 +483,10 @@
           : !el.classList.contains("done");
         applyDone(el, nowDone, true);
         if (nowDone && !(window.HouseSfx && usesShared(el))) cheerDing();
+        /* DAYPKG1 · the chore pop: toggle stops the click, so the house-sfx document listener never sees it; pop here (kid pages only, a tick not an untick) */
+        if (nowDone && window.HouseSfx && usesShared(el) && typeof window.HouseSfx.questPop === "function" && /\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "")) {
+          try { window.HouseSfx.questPop(el); } catch (ePop) { /* never break a tap over a pop */ }
+        }
         var iso = el.getAttribute("data-day-iso") || "";
         if (usesShared(el) && window.WardKids && typeof window.WardKids.setCheck === "function") {
           refreshBankUI(id, nowDone, iso || undefined);

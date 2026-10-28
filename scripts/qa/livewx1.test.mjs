@@ -20,10 +20,11 @@ test("static: contract, last-known never default, poll 12 min, no client locatio
   assert.doesNotMatch(sp, /LiveWx|wx52|WX\.|weather=/, "spook never touches weather");
   assert.match(sp, /"spook:scare"/);
 });
-let pp = null; for (const base of [import.meta.url, (process.env.WARDOS_DEPS || "/nonexistent") + "/", "/tmp/h1-deps/node_modules/"]) { try { pp = createRequire(base)("puppeteer-core"); break; } catch (_) {} }   /* box dep dirs; skips cleanly when none */
-const CHROME = process.env.CHROME_PATH || (fs.existsSync("/usr/bin/google-chrome") ? "/usr/bin/google-chrome" : null);
+const NO_BROWSER = process.env.QA_NO_BROWSER === "1";   /* DAYPKG1 item 3 · QA_NO_BROWSER=1: puppeteer-core is never loaded and no Chrome path is resolved, so nothing below can launch */
+let pp = null; if (!NO_BROWSER) for (const base of [import.meta.url, (process.env.WARDOS_DEPS || "/nonexistent") + "/", "/tmp/h1-deps/node_modules/"]) { try { pp = createRequire(base)("puppeteer-core"); break; } catch (_) {} }   /* box dep dirs; skips cleanly when none */
+const CHROME = NO_BROWSER ? null : (process.env.CHROME_PATH || (fs.existsSync("/usr/bin/google-chrome") ? "/usr/bin/google-chrome" : null));
 const STATES = { clear: "clear", cloudy: "cloudy", fog: "fog", drizzle: "drizzle", downpour: "downpour", storm: "storm", snow: "snow", windy: "clear", stale: null };
-test("browser: every faked state publishes LiveWx; spook leaves weather and plate unchanged", { skip: !(pp && CHROME) && "needs puppeteer-core + chrome", timeout: 900000 }, async () => {
+test("browser: every faked state publishes LiveWx; spook leaves weather and plate unchanged", { skip: NO_BROWSER ? "SKIP QA_NO_BROWSER=1 (no Chrome launch)" : (!(pp && CHROME) && "needs puppeteer-core + chrome"), timeout: 900000 }, async () => {
   const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".webp": "image/webp", ".png": "image/png", ".svg": "image/svg+xml" };
   const srv = http.createServer((q, r) => { let rel = decodeURIComponent(new URL(q.url, "http://x").pathname); if (rel.endsWith("/")) rel += "index.html"; const f = path.join(ROOT, path.normalize(rel).replace(/^(\.\.(\/|\\|$))+/, ""));
     fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); r.end(); return; } r.writeHead(200, { "Content-Type": types[path.extname(f)] || "application/octet-stream" }); r.end(b); }); });

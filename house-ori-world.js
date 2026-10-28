@@ -943,8 +943,16 @@
 
   /* House Face never shows money. Stars stay. Kid boards are not this script. */
   var MONEY = /\$\s?[\d,]+(?:\.\d+)?(?:\s*\/\s*hr)?(?:\s*ea\s*wk)?/gi;
+  /* DAYPKG1 v2i · Alfred v2h defect 2: the one Dad money sheet (meta ward-money=dad, never a kid board path) keeps its dollar figures */
+  var DAD_MONEY_PAGE = (function () {
+    try {
+      if (/\/(?:kid-[a-z]+|mercury-run)(\.html)?$/.test(location.pathname || "")) return false;
+      var m = document.querySelector('meta[name="ward-money"]');
+      return !!m && String(m.getAttribute("content") || "").trim() === "dad";
+    } catch (e) { return false; }
+  })();
   function scrub(node) {
-    if (!node) return;
+    if (!node || DAD_MONEY_PAGE) return;
     if (node.nodeType === 3) {
       if (node.nodeValue && node.nodeValue.indexOf("$") !== -1 && /\$\s?\d/.test(node.nodeValue)) {
         var next = node.nodeValue.replace(MONEY, "\u2605");

@@ -947,8 +947,9 @@
             if (!id) return;
             var next = !getCheck(id);
             setCheck(id, next);
-            sfxQuest(btn);
-            try { if (next && global.HouseSfx && HouseSfx.questPop) HouseSfx.questPop(btn); } catch (e) {}
+            /* DAYPKG1 · questPop is exported now and plays the quest sound itself: one sound per claim, not two */
+            if (next && global.HouseSfx && typeof HouseSfx.questPop === "function") { try { HouseSfx.questPop(btn); } catch (e) { sfxQuest(btn); } }
+            else sfxQuest(btn);
             paintDailyQuest();
             refreshAll();
             try { document.dispatchEvent(new CustomEvent("house:earn", { detail: { id: id, done: next } })); } catch (e2) {}

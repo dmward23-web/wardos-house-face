@@ -309,6 +309,8 @@
       self.look.y = ((e.clientY - r.top) / Math.max(1, r.height) - 0.5) * 2;
     };
     this._tap = function (e) {
+      /* JARTAP1 · the jar only answers a tap inside its own painted shape, never its whole box */
+      if (e && e.clientX != null && e.isTrusted !== false && !self.hits(e.clientX, e.clientY)) return;
       if (e) { e.preventDefault(); e.stopPropagation(); }
       self.poke();
       if (self.onTap) self.onTap(self, e);
@@ -320,6 +322,24 @@
     this.resize();
     this.loop();
   }
+
+  /* JARTAP1 · the painted jar in client px: the record disc for Ainsley (VINYLJAR1), the sprite box otherwise
+     (paintFallback draws at 8-92% x 2-88% of the canvas). Chores under the rest of the box stay tappable. */
+  Jar.prototype.visibleRect = function () {
+    var r = this.cv.getBoundingClientRect();
+    if (!r || !r.width || !r.height) return null;
+    if (this.kid === "ainsley") {
+      var R = Math.min(r.width, r.height) * 0.44, cx = r.left + r.width / 2, cy = r.top + r.height * 0.5;
+      return { left: cx - R, top: cy - R, right: cx + R, bottom: cy + R, round: true, cx: cx, cy: cy, R: R };
+    }
+    return { left: r.left + r.width * 0.08, top: r.top + r.height * 0.02, right: r.left + r.width * 0.92, bottom: r.top + r.height * 0.88 };
+  };
+  Jar.prototype.hits = function (x, y) {
+    var v = this.visibleRect();
+    if (!v) return false;
+    if (v.round) { var dx = x - v.cx, dy = y - v.cy; return dx * dx + dy * dy <= v.R * v.R; }
+    return x >= v.left && x <= v.right && y >= v.top && y <= v.bottom;
+  };
 
   Jar.prototype.initGL = function () {
     var gl = this.gl;

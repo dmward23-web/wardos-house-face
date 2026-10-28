@@ -121,8 +121,15 @@ test("NOMONEY1: dollar text becomes stars; every kid-money page loads house-nomo
   assert.equal(t("Harris earned ¤4.50 today"), "Harris earned ★ today");
   assert.equal(t("no money here"), "no money here");
   assert.doesNotMatch(rd("house-nomoney.js"), /innerWidth|matchMedia|min-width|max-width/);
-  for (const f of ["sheet-allowance.html", "sheet-chores.html", "kid-hayes.html", "kid-harris.html", "kid-ainsley.html", "sheet-index.html", "sheet-weekend.html"])
-    assert.match(rd(f), /<script src="house-nomoney\.js\?v=NOMONEY1"><\/script>/, f);
+  for (const f of ["sheet-chores.html", "sheet-index.html", "sheet-weekend.html"])
+    assert.match(rd(f), /<script src="house-nomoney\.js\?v=KIDCRIT1"><\/script>/, f);
+  /* DAYPKG1 v2i · the Dad money sheet loads the build that exempts ward-money=dad pages (new stamp so a cached copy cannot linger) */
+  assert.match(rd("sheet-allowance.html"), /<script src="house-nomoney\.js\?v=DAYPKG1"><\/script>/, "sheet-allowance.html");
+  /* JARTAP1 re-tokened the kid pages; DAYPKG1 v2e (Alfred 12:47 AM item 6) bumps them on purpose to DAYPKG1: v2d changed
+     house-nomoney.js (the kid guard takes /kid-x with or without .html), so a cached JARTAP1 copy would miss the guard on a
+     clean URL. The Dad pages keep KIDCRIT1: that one-line change is a no-op off a kid page */
+  for (const f of ["kid-hayes.html", "kid-harris.html", "kid-ainsley.html"])
+    assert.match(rd(f), /<script src="house-nomoney\.js\?v=DAYPKG1"><\/script>/, f);
 });
 
 const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
@@ -132,13 +139,17 @@ function money(page, w, h, block) {
   assert.equal(r.status, 0, r.stderr);
   return JSON.parse(r.stdout.trim().split("\n").pop());
 }
-test("NOMONEY1 at 1920x1080 (real browser): sheet-allowance and sheet-chores show zero dollar figures; the check catches them when the scrub is off",
+/* DAYPKG1 v2i (Alfred v2h FAIL, P1) · sheet-allowance is the Dad money page (meta ward-money=dad): house-nomoney leaves it alone so
+   the weekly figure reads as money there. Every other sheet still sweeps; the negative control runs on sheet-chores. */
+test("NOMONEY1 at 1920x1080 (real browser): sheet-chores shows zero dollar figures (the check catches them when the scrub is off); the Dad money page sheet-allowance keeps them",
   { skip: !browser && "QA_NO_BROWSER=1 or python playwright missing" }, () => {
-    const neg = money("sheet-allowance.html", 1920, 1080, true);
-    assert.ok(neg.injected && neg.dollars >= 20, "negative control must see the injected figures: " + JSON.stringify(neg));
-    for (const [p, w, h] of [["sheet-allowance.html", 1920, 1080], ["sheet-chores.html", 1920, 1080], ["sheet-allowance.html", 1080, 1920], ["sheet-allowance.html", 440, 956]]) {
-      const r = money(p, w, h, false);
-      assert.equal(r.dollars, 0, `${p} @ ${w}x${h}: ${JSON.stringify(r.sample)}`);
+    const neg = money("sheet-chores.html", 1920, 1080, true);
+    assert.ok(neg.injected && neg.dollars >= 1, "negative control must see the injected figures: " + JSON.stringify(neg));
+    const r = money("sheet-chores.html", 1920, 1080, false);
+    assert.equal(r.dollars, 0, `sheet-chores.html @ 1920x1080: ${JSON.stringify(r.sample)}`);
+    for (const [w, h] of [[1920, 1080], [1080, 1920], [440, 956]]) {
+      const a = money("sheet-allowance.html", w, h, false);
+      assert.ok(a.dollars >= 1, `sheet-allowance.html @ ${w}x${h} is the ward-money=dad page and keeps money: ${JSON.stringify(a)}`);
     }
   });
 
