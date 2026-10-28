@@ -70,7 +70,7 @@ for (const [w, h] of [[440, 956], [1280, 800]]) {
     assert.ok(ca && !ca.err, "allowance control ran " + JSON.stringify(ca));
     assert.ok(ca.reads.some((x) => /^getItem/.test(x[0]) && x.join(" ").includes(D)), "getItem sentinel sees '" + D + "' on sheet-allowance " + JSON.stringify(ca.reads));
     assert.ok(ca.reads.some((x) => x[0] === "JSON.parse" && x[1].includes(D)), "JSON.parse sentinel sees '" + D + "' on sheet-allowance " + JSON.stringify(ca.reads));
-    assert.ok(ca.dom + ca.transient > 0, "DOM / transient hooks see '" + D + "' on sheet-allowance " + JSON.stringify(ca));
+    assert.ok(ca.dom + ca.transient + (ca.dom_injected || 0) > 0 && ca.dom_injected > 0, "DOM / transient hooks see an appended '" + D + "' on sheet-allowance " + JSON.stringify(ca));
     assert.ok(cs && !cs.err && cs.cred.some((x) => x[1] === "spw-client"), "CRED sees the Client ID field on the Dad setup sheet " + JSON.stringify(cs));
   });
 }

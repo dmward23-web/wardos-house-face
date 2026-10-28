@@ -277,6 +277,10 @@ with sync_playwright() as p:
                 cp.goto(base + PRE + cname + "?pfBase=" + base, wait_until="load", timeout=60000); cp.wait_for_timeout(2500)
                 cst = cp.evaluate(STATE)
                 crec = {"reads": cst["reads"], "dom": len(cst["dom"]), "transient": len(cst["transient"]), "cred": cp.evaluate(CRED)}
+                # offline the Dad page paints no figure, so one '$' text node is appended and the same STATE scan must see it
+                cp.evaluate("() => { const s = document.createElement('span'); s.textContent = 'QA ' + String.fromCharCode(36) + '7'; document.body.appendChild(s); }")
+                cp.wait_for_timeout(400); cst2 = cp.evaluate(STATE)
+                crec["dom_injected"] = len(cst2["dom"]) + len(cst2["transient"])
             except Exception as e:
                 crec["err"] = str(e)[:200]
             finally:
