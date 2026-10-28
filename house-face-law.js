@@ -205,31 +205,30 @@
   function schoolWord(t) { return String(t == null ? "" : t).replace(new RegExp(SCHOOL_WORD[0].source, "g"), SCHOOL_WORD[1]); }
   var MOM_PHRASE = /\s*\b(?:for|with|at|to|from) (?:their )?mom(?:['\u2019]?s)?\b|\s*\bmom(?:['\u2019]?s)?\b/gi;
   function momFree(t) { return String(t == null ? "" : t).replace(MOM_PHRASE, "").replace(/\(\s*\)/g, "").replace(/\s{2,}/g, " ").trim(); }
-  /* FACESTRIP1 (Atlas 2026-10-28 10:09) · money never reaches the face from ANY calendar feed, not only Ainsley's: faceText drops
-     the whole amount ('(bring \x2445)' reads '(bring)'), then any sign left. MONEY_SRC and SIGN_SRC are CALLIVE-NODOLLAR r3's
-     shared money / moneysign rules copied byte for byte from scripts/text-law.json r3 (scripts/qa/facestrip1.test.mjs keeps them
-     equal). Engines without lookbehind (old Safari) get the same pattern with the lookbehind as a kept capture. */
-  var MONEY_SRC = "(?:-?[\\x24\\uFF04\\uFE69]\\s*(?:[0-9](?:[0-9,]*[0-9])?(?:\\.[0-9]+)?|\\.[0-9]+)(?:\\s*[-\\u2013]\\s*[\\x24\\uFF04\\uFE69]?\\s*(?:[0-9](?:[0-9,]*[0-9])?(?:\\.[0-9]+)?|\\.[0-9]+)(?![0-9:]))?(?:[km]\\b)?|(?<![0-9A-Za-z_.,])-?(?:[0-9](?:[0-9,]*[0-9])?(?:\\.[0-9]+)?|\\.[0-9]+)[\\x24\\uFF04\\uFE69])(?:\\s*(?:/|\\bper\\b)\\s*(?:hr|hour|h|wk|week|day|mo|month)\\b)?";
-  var SIGN_SRC = "[\\x24\\uFF04\\uFE69]";
-  var MONEY_LB = "(?<![0-9A-Za-z_.,])";
-  var MONEY_RE, MONEY_LB_OK = true;
-  try { MONEY_RE = new RegExp(MONEY_SRC, "gi"); } catch (e) { MONEY_LB_OK = false; MONEY_RE = new RegExp(MONEY_SRC.split(MONEY_LB).join("(^|[^0-9A-Za-z_.,])"), "gi"); }
-  var SIGN_RE = new RegExp(SIGN_SRC, "g");
-  /* FACESTRIP1 local edge (Alfred 10:10), run BEFORE the r3 rule and kept OUT of MONEY_SRC so r3 stays byte-identical:
-     a trailing sign after a space ('613 \x24' reads '') and a sign between two numbers ('613\x245' reads ''). r3 alone leaves
-     '613' and '5'. Proposed for r3 r4 (open item); facestrip1.test.mjs lists these two forms as the only intended extras. */
-  var EDGE_SRC = "(?<![0-9A-Za-z_.,])-?(?:[0-9](?:[0-9,]*[0-9])?(?:\\.[0-9]+)?|\\.[0-9]+)(?:\\s+[\\x24\\uFF04\\uFE69](?![0-9.])|[\\x24\\uFF04\\uFE69]\\s*(?:[0-9](?:[0-9,]*[0-9])?(?:\\.[0-9]+)?|\\.[0-9]+))", EDGE_RE, EDGE_LB_OK = true;
-  try { EDGE_RE = new RegExp(EDGE_SRC, "gi"); } catch (e) { EDGE_LB_OK = false; EDGE_RE = new RegExp(EDGE_SRC.split(MONEY_LB).join("(^|[^0-9A-Za-z_.,])"), "gi"); }
+  /* FACESTRIP1 r2 (Alfred 10:26 + 10:28 CT FAIL of CALLIVE r3) · money never reaches the face from ANY calendar feed: faceText drops
+     the whole amount ('(bring \x2445)' reads '(bring)'), then any sign left. MONEY_SRC and SIGN_SRC are CALLIVE-NODOLLAR r3b's
+     shared money / moneysign rules copied byte for byte from scripts/text-law.json r3b (flags "", no \b, no \s), so this reads
+     every string exactly as calendar-refresh.mjs, cal-from-events.mjs and cal-months-window.py do (scripts/qa/facestrip1.test.mjs
+     keeps them equal and checks the output byte for byte). There is NO separate pre-rule any more: the r2 trailing-sign, USD and
+     k/m forms live in the one shared rule. The tidy after the strip is the calendar writers' tidy, step for step.
+     Engines without lookbehind (old Safari): every lookbehind sits at the start of a top-level alternative, so each one is
+     swapped for a capture of the character(s) before the match and that capture is put back (MONEY_LB_FALLBACK). */
+  var MONEY_SRC = "(?:-?[\\x24\\uFF04\\uFE69][\\t\\n\\x0B\\f\\r \\x1C-\\x1F\\x85\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]*(?:[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9](?:[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9,]*[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9])?(?:\\.[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9]+)?|\\.[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9]+)(?:[\\t\\n\\x0B\\f\\r \\x1C-\\x1F\\x85\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]*[-\\u2013][\\t\\n\\x0B\\f\\r \\x1C-\\x1F\\x85\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]*(?:[\\x24\\uFF04\\uFE69]|(?:[uU][sS][dD]?[\\x24\\uFF04\\uFE69]|[uU][sS][dD](?![A-Za-z0-9_])))?[\\t\\n\\x0B\\f\\r \\x1C-\\x1F\\x85\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]*(?:[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9](?:[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9,]*[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9])?(?:\\.[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9]+)?|\\.[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9]+)(?![0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9:]))?(?:[kKmM\\u212A](?![A-Za-z0-9_]))?|(?<![A-Za-z0-9_])-?(?:[uU][sS][dD]?[\\x24\\uFF04\\uFE69]|[uU][sS][dD](?![A-Za-z0-9_]))[\\t\\n\\x0B\\f\\r \\x1C-\\x1F\\x85\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]*(?:[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9](?:[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9,]*[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9])?(?:\\.[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9]+)?|\\.[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9]+)(?:[\\t\\n\\x0B\\f\\r \\x1C-\\x1F\\x85\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]*[-\\u2013][\\t\\n\\x0B\\f\\r \\x1C-\\x1F\\x85\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]*(?:[\\x24\\uFF04\\uFE69]|(?:[uU][sS][dD]?[\\x24\\uFF04\\uFE69]|[uU][sS][dD](?![A-Za-z0-9_])))?[\\t\\n\\x0B\\f\\r \\x1C-\\x1F\\x85\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]*(?:[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9](?:[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9,]*[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9])?(?:\\.[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9]+)?|\\.[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9]+)(?![0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9:]))?(?:[kKmM\\u212A](?![A-Za-z0-9_]))?|(?<![0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9.,])(?<![0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9][:/\\-\\u2013])-?(?:[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9](?:[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9,]*[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9])?(?:\\.[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9]+)?|\\.[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9]+)(?:[kKmM\\u212A](?![A-Za-z0-9_]))?[\\t\\n\\x0B\\f\\r \\x1C-\\x1F\\x85\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]*(?:[\\x24\\uFF04\\uFE69]|(?:[uU][sS][dD]?[\\x24\\uFF04\\uFE69]|[uU][sS][dD](?![A-Za-z0-9_])))(?:[\\t\\n\\x0B\\f\\r \\x1C-\\x1F\\x85\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]*(?:[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9](?:[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9,]*[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9])?(?:\\.[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9]+)?|\\.[0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9]+)(?:[kKmM\\u212A](?![A-Za-z0-9_]))?)?)(?:(?:[\\t\\n\\x0B\\f\\r \\x1C-\\x1F\\x85\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]*/|[\\t\\n\\x0B\\f\\r \\x1C-\\x1F\\x85\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]+[pP][eE][rR](?![A-Za-z0-9_]))[\\t\\n\\x0B\\f\\r \\x1C-\\x1F\\x85\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]*(?:[hH][oO][uU][rR]|[hH][rR]|[hH]|[wW][eE][eE][kK]|[wW][kK]|[dD][aA][yY]|[mM][oO][nN][tT][hH]|[mM][oO])(?![A-Za-z0-9_]))?";
+  var SIGN_SRC = "(?<![A-Za-z_])(?:[uU][sS][dD]?[\\x24\\uFF04\\uFE69]|[uU][sS][dD](?![A-Za-z0-9_]))|[\\x24\\uFF04\\uFE69]";
+  var MONEY_LB_FALLBACK = [["(?<![A-Za-z0-9_])", "(^|[^A-Za-z0-9_])"], ["(?<![0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9.,])(?<![0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9][:/\\-\\u2013])", "(^|^[:/\\-\\u2013]|[^0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9.,:/\\-\\u2013]|[^0-9\\uFF10-\\uFF19\\u0660-\\u0669\\u06F0-\\u06F9][:/\\-\\u2013])"], ["(?<![A-Za-z_])", "(^|[^A-Za-z_])"]];
+  function lbFree(src) { for (var i = 0; i < MONEY_LB_FALLBACK.length; i++) src = src.split(MONEY_LB_FALLBACK[i][0]).join(MONEY_LB_FALLBACK[i][1]); return src; }
+  function keepLead(m) { var p = ""; for (var i = 1; i < arguments.length - 2; i++) if (typeof arguments[i] === "string") p += arguments[i]; return p; }
+  var MONEY_RE, SIGN_RE, MONEY_LB_OK = true;
+  try { MONEY_RE = new RegExp(MONEY_SRC, "g"); SIGN_RE = new RegExp(SIGN_SRC, "g"); } catch (e) { MONEY_LB_OK = false; MONEY_RE = new RegExp(lbFree(MONEY_SRC), "g"); SIGN_RE = new RegExp(lbFree(SIGN_SRC), "g"); }
   function moneyFree(t) {
     if (typeof t !== "string" || !t) return t;
-    MONEY_RE.lastIndex = 0;
-    EDGE_RE.lastIndex = 0;
-    var u = EDGE_LB_OK ? t.replace(EDGE_RE, "") : t.replace(EDGE_RE, function (m, p) { return p || ""; });
-    MONEY_RE.lastIndex = 0;
-    u = MONEY_LB_OK ? u.replace(MONEY_RE, "") : u.replace(MONEY_RE, function (m, p) { return p || ""; });
-    if (u === t && !SIGN_RE.test(t)) return t;
-    SIGN_RE.lastIndex = 0;
-    return u.replace(SIGN_RE, "").replace(/\(\s+/g, "(").replace(/\s+\)/g, ")").replace(/\s*\(\s*\)/g, "").replace(/\s+,/g, ",").replace(/\s{2,}/g, " ").trim();
+    MONEY_RE.lastIndex = 0; SIGN_RE.lastIndex = 0;
+    var hasSign = SIGN_RE.test(t);
+    MONEY_RE.lastIndex = 0; SIGN_RE.lastIndex = 0;
+    if (!hasSign) return t;   /* same guard as the calendar writers: no sign (sign char, USD, US-sign) = untouched */
+    var u = MONEY_LB_OK ? t.replace(MONEY_RE, "") : t.replace(MONEY_RE, keepLead);
+    u = MONEY_LB_OK ? u.replace(SIGN_RE, "") : u.replace(SIGN_RE, keepLead);
+    return u.replace(/\(\s+/g, "(").replace(/\s+\)/g, ")").replace(/\s*\(\)/g, "").replace(/\s{2,}/g, " ").trim();
   }
   function renderRules(t) { for (var i = 0; i < RENDER_RULES.length; i++) t = t.replace(RENDER_RULES[i][0], RENDER_RULES[i][1]); return t; }
   function faceText(s) {
@@ -268,5 +267,5 @@
     try { return data && typeof data === "object" ? feedAinsley(name, walk(data, "")) : data; } catch (e) { return data; }
   }
 
-  g.HouseFaceLaw = { moneyFree: moneyFree, MONEY_SRC: MONEY_SRC, SIGN_SRC: SIGN_SRC, MONEY_RE: MONEY_RE, MONEY_LB_OK: MONEY_LB_OK, EDGE_SRC: EDGE_SRC, isCustody: isCustody, cleanFeed: cleanFeed, faceText: faceText, isDressDay: isDressDay, isColorDay: isColorDay, faceDash: faceDash, rowEnded: rowEnded, keepRow: keepRow, keepEvent: keepEvent, isTherapy: isTherapy, rowTherapy: rowTherapy, ainsleyText: ainsleyText, THERAPY: THERAPY, cleanKidsWeek: cleanKidsWeek, cleanKid: cleanKid, ctNow: ctNow, DRESS: DRESS, RENDER_RULES: RENDER_RULES, schoolWord: schoolWord, momFree: momFree, cleanAinsley: cleanAinsley };
+  g.HouseFaceLaw = { moneyFree: moneyFree, MONEY_SRC: MONEY_SRC, SIGN_SRC: SIGN_SRC, MONEY_RE: MONEY_RE, MONEY_LB_OK: MONEY_LB_OK, MONEY_LB_FALLBACK: MONEY_LB_FALLBACK, SIGN_RE: SIGN_RE, isCustody: isCustody, cleanFeed: cleanFeed, faceText: faceText, isDressDay: isDressDay, isColorDay: isColorDay, faceDash: faceDash, rowEnded: rowEnded, keepRow: keepRow, keepEvent: keepEvent, isTherapy: isTherapy, rowTherapy: rowTherapy, ainsleyText: ainsleyText, THERAPY: THERAPY, cleanKidsWeek: cleanKidsWeek, cleanKid: cleanKid, ctNow: ctNow, DRESS: DRESS, RENDER_RULES: RENDER_RULES, schoolWord: schoolWord, momFree: momFree, cleanAinsley: cleanAinsley };
 })(typeof window !== "undefined" ? window : globalThis);

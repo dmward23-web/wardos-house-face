@@ -1,6 +1,9 @@
 """DAYPKG1 v2j (Alfred v2i FAIL, P2) · kid-reachable closure crawl with a zero-'$' assertion on every page.
 Usage: python3 scripts/qa/daypkg1v2j_crawl.py <width> <height>   -> prints one JSON line
        python3 scripts/qa/daypkg1v2j_crawl.py <width> <height> facestrip   -> FACESTRIP1 pass only (see FS_ below), one JSON line
+       python3 scripts/qa/daypkg1v2j_crawl.py <width> <height> facestrip-nolb   -> the same pass on an emulated old Safari (< 16.4,
+         no lookbehind): FS_NOLB makes the page's RegExp constructor throw on any lookbehind source, so HouseFaceLaw takes its
+         capture fallback. Test-only: it exists only as this harness's Playwright init script, nothing a page or a kid can reach.
 Seeds: kid-hayes, kid-harris, kid-ainsley, mercury-run (?kid=hayes) and sheet-index. On every page it collects the static
 links (a/area href, data-href, form action) and then dispatches up to 140 clicks (links, buttons, role=button/link,
 tabindex, onclick, the header and its Home tap target [data-kw-home], anything with a pointer cursor); every document
@@ -39,10 +42,14 @@ MODE = sys.argv[3] if len(sys.argv) > 3 else ""
 # controls ('5km run', 'Room 5m') that must still render (they prove the rows painted, so 0 hits is not vacuous).
 # Signs are built from code points so this file stays sign-free in its fixtures: S = ASCII, FW = fullwidth, SM = small.
 S, FW, SM = chr(36), chr(0xFF04), chr(0xFE69)
+# FACESTRIP1 r2 (r3b law, 10:30 defects 1-2): trailing signs ('1,256 <sign>', '613 <sign>5', '613 <FW>') and USD / US forms
+# with distinctive amounts 7,471-7,474 (a residue can only come from these rows), plus the USB / BUS / Focus control.
 FS_MONEY = ["Field trip (bring " + S + "5)", "Book fair " + S + "1,256", "Snack " + S + ".77 each", "Fee " + S + " 193 due",
             "Cards 613" + S + "5 swap", "Gift jar 613 " + S, "Fair " + FW + "5 ride", "Bake " + SM + "5 sale", "Bus " + S + "5k raffle",
-            "Gala " + S + "2.5m goal", "5km run", "Room 5m"]
-FS_CONTROLS = ["5km run", "Room 5m"]
+            "Gala " + S + "2.5m goal", "5km run", "Room 5m",
+            "Fee USD 7,471 due", "Trip 7,472 USD", "Club US" + S + "7,473 now", "Gate USD" + S + "7,474", "Jar 1,256 " + S + " goal",
+            "Cards 613 " + S + "5 swap", "Gift box 613 " + FW, "Focus 5 USB 50 BUS 5"]
+FS_CONTROLS = ["5km run", "Room 5m", "Focus 5 USB 50 BUS 5"]
 def fs_days():
     import datetime as _dt
     ct = _dt.timezone(_dt.timedelta(hours=-5))  # CDT/CST offset only matters for the date key; rows sit at 09:00-14:30
@@ -60,7 +67,7 @@ def fs_inject(name, d):
         d["upcomingLeaves"] = ev + list(d.get("upcomingLeaves") or [])
     if name == "cal-months":
         days = d.setdefault("days", {})
-        # wall cells show 3 items, so the 12 rows go 3 a day on days 1-4 of the current month (always in the grid)
+        # wall cells show 3 items, so the 20 rows go 3 a day on days 1-7 of the current month (always in the grid)
         for i in range(0, len(FS_MONEY), 3):
             k = t0.replace(day=1 + i // 3).isoformat(); day = days.setdefault(k, {"withDan": True, "items": []})
             day["items"] = [{"c": "shr", "l": txt} for txt in FS_MONEY[i:i + 3]] + list(day.get("items") or [])
@@ -70,7 +77,7 @@ def feed(name):
     f = os.path.join(FIX, name + ".synthetic.json")
     if not os.path.isfile(f): return None
     d = json.load(open(f))
-    if MODE == "facestrip" and name in ("cal-live", "cal-months"): d = fs_inject(name, d)
+    if MODE in ("facestrip", "facestrip-nolb") and name in ("cal-live", "cal-months"): d = fs_inject(name, d)
     if name == "kids-week":
         for k, kid in (d.get("kids") or {}).items():
             g = kid.setdefault("bankGoal", {}); g["title"] = "Lego set " + D + "45"; g["blurb"] = "1 \u2605 = " + D + "1 \u00b7 " + D + "45 goal"; g.setdefault("need", 45)
@@ -248,7 +255,7 @@ LINKS2 = r"""() => { const o = []; for (const e of document.querySelectorAll('a[
 #   sign is dropped ('1,256' ',256' '.77' '193' '613' '2.5m' '5k'). innerHTML values are tag-stripped first so markup
 #   numbers never count. Controls: FS_CONTROLS must appear in the page text (rows rendered), else the pass is vacuous.
 FS_SIGN = r"[\x24\uFF04\uFE69]"
-FS_BARE = r"(?:^|[^0-9.,])(?:1,256|,256|\.77|193|613|2\.5m|5k)(?![0-9A-Za-z])"
+FS_BARE = r"(?:^|[^0-9.,])(?:1,256|,256|\.77|193|613|2\.5m|5k|7,47[1-4]|,47[1-4])(?![0-9A-Za-z])|(?:^|[^A-Za-z0-9_])(?:USD|Club US|Gate US)(?![A-Za-z0-9_])"
 FS_OBS = r"""(() => { const SG = new RegExp(%s), BR = new RegExp(%s); const hits = []; window.__fsHits = hits; let n = 0;
   const txt = (k, v) => /^(set:innerHTML|set:outerHTML|insertAdjacentHTML|document.write)$/.test(k) ? String(v).replace(/<[^>]*>/g, ' ') : String(v);
   const note = (k, v, where) => { try { if (v == null) return; n++; const t = txt(k, v); const sg = SG.test(t), br = BR.test(t); if ((sg || br) && hits.length < 80) hits.push([sg ? 'sign' : 'bare', k, t.slice(0, 120), where || '']); } catch (e) {} };
@@ -278,10 +285,21 @@ FS_SCAN = r"""(ctl) => { const SG = new RegExp(%s), BR = new RegExp(%s); const d
     for (const a of e.attributes) if (!/^(src|href|srcset|style|class|d|viewBox)$/i.test(a.name) && (SG.test(a.value) || BR.test(a.value)) && dom.length < 30) dom.push([SG.test(a.value) ? 'sign' : 'bare', 'attr:' + a.name, a.value.slice(0, 100)]);
     if ('value' in e && typeof e.value === 'string' && (SG.test(e.value) || BR.test(e.value)) && dom.length < 30) dom.push(['value', e.tagName, e.value.slice(0, 100)]); }
   for (const [nm, s] of [['local', localStorage], ['session', sessionStorage]]) for (let i = 0; i < s.length; i++) { const k = s.key(i), v = s.getItem(k) || ''; if (SG.test(k + v) || BR.test(v)) store.push([nm, k, v.slice(0, 100)]); }
-  return { dom, store, transient: (window.__fsHits || []).slice(0, 60), writes: window.__fsCount ? window.__fsCount() : 0, controls: ctl.filter((c) => all.indexOf(c) >= 0), law: !!(window.HouseFaceLaw && window.HouseFaceLaw.moneyFree) }; }""" % (json.dumps(FS_SIGN), json.dumps(FS_BARE))
+  return { dom, store, transient: (window.__fsHits || []).slice(0, 60), writes: window.__fsCount ? window.__fsCount() : 0, controls: ctl.filter((c) => all.indexOf(c) >= 0), law: !!(window.HouseFaceLaw && window.HouseFaceLaw.moneyFree),
+    lb: window.HouseFaceLaw ? window.HouseFaceLaw.MONEY_LB_OK : null, nolb: !!window.__fsNolb, lbThrows: window.__fsLbThrows || 0 }; }""" % (json.dumps(FS_SIGN), json.dumps(FS_BARE))
+# FACESTRIP1 r2 · FS_NOLB (facestrip-nolb only): an old-Safari engine has no lookbehind, so new RegExp('(?<!..)') throws. This
+# init script runs before any page script and swaps window.RegExp for a wrapper that throws the same SyntaxError on any source
+# holding '(?<!' or '(?<=' and otherwise builds the native RegExp (prototype, instanceof and flags unchanged). house-face-law.js
+# then takes MONEY_LB_FALLBACK (MONEY_LB_OK false, asserted). Regex literals are not swapped: the static test proves the four
+# glass files hold no lookbehind literal (a literal would be a parse error on that engine).
+FS_NOLB = r"""(() => { const R = window.RegExp, LB = /\(\?<[!=]/; window.__fsLbThrows = 0;
+  const W = function RegExp(src, fl) { const s = src instanceof R ? src.source : String(src);
+    if (LB.test(s)) { window.__fsLbThrows++; throw new SyntaxError("Invalid regular expression: invalid group specifier name"); }
+    return new R(src, fl); };
+  W.prototype = R.prototype; Object.setPrototypeOf(W, R); window.RegExp = W; window.__fsNolb = true; })();"""
 FS_PAGES = ["month.html", "sheet-load-day.html"]
-if MODE == "facestrip":
-    fso = {"mode": "facestrip", "size": "%dx%d" % (w, h), "port": PORT, "root": ROOT, "sign_re": FS_SIGN, "bare_re": FS_BARE, "fixtures": FS_MONEY, "pages": {}}
+if MODE in ("facestrip", "facestrip-nolb"):
+    fso = {"mode": MODE, "size": "%dx%d" % (w, h), "port": PORT, "root": ROOT, "sign_re": FS_SIGN, "bare_re": FS_BARE, "fixtures": FS_MONEY, "controls": FS_CONTROLS, "pages": {}}
     with sync_playwright() as p:
         b = p.chromium.launch(**launch_kw(p, args=["--disable-gpu"]))
         try:
@@ -289,6 +307,7 @@ if MODE == "facestrip":
                 mob = w < 600
                 ctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=2 if mob else 1, is_mobile=mob, has_touch=mob, reduced_motion="reduce")
                 ctx.add_init_script("try { localStorage.setItem('wardos-private-feed-token', 'qaSyntheticDeviceKey0000'); } catch (e) {}")
+                if MODE == "facestrip-nolb": ctx.add_init_script(FS_NOLB)
                 ctx.add_init_script(FS_OBS)
                 ctx.route("**/*", lambda route: route.continue_() if (urlparse(route.request.url).hostname == "127.0.0.1" and urlparse(route.request.url).port == PORT) else route.abort())
                 pg = ctx.new_page(); errs = []; pg.on("pageerror", lambda e: errs.append(str(e)[:120]))

@@ -340,21 +340,23 @@ test("ADULTCUT2B static: no kid surface shows CONNECT for Spotify; the hub tile 
    setter / MutationObserver write, and storage (writes and the final dump). GREEN = 0 on both pages at 440 and 1280, the
    controls painted (not vacuous) and HouseFaceLaw.moneyFree loaded. RED control = the same pass served from a c5295884 (or
    f81262ee) tree via V2J_FS_RED_ROOT: sign hits on both pages. */
-const fsRun = (w, h, root) => {
-  const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), String(w), String(h), "facestrip"], { encoding: "utf8", timeout: 600000,
+const fsRun = (w, h, root, mode = "facestrip") => {
+  const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), String(w), String(h), mode], { encoding: "utf8", timeout: 600000,
     env: { ...process.env, ...(root ? { V2J_CRAWL_ROOT: root } : {}) } });
-  if (process.env.V2J_DRIVER_LOG) { try { fs.appendFileSync(process.env.V2J_DRIVER_LOG, JSON.stringify({ facestrip: root ? "red" : "tip", w, h, pid: r.pid, status: r.status, signal: r.signal }) + "\n"); } catch (e) {} }
+  if (process.env.V2J_DRIVER_LOG) { try { fs.appendFileSync(process.env.V2J_DRIVER_LOG, JSON.stringify({ facestrip: root ? "red" : "tip", mode, w, h, pid: r.pid, status: r.status, signal: r.signal }) + "\n"); } catch (e) {} }
   assert.equal(r.status, 0, "facestrip pass exit " + r.status + " " + String(r.stderr).slice(-600));
   const o = JSON.parse(r.stdout.trim().split("\n").pop());
-  if (process.env.V2J_CRAWL_OUT_DIR) { try { fs.writeFileSync(path.join(process.env.V2J_CRAWL_OUT_DIR, "facestrip-" + (root ? "red-" : "") + w + ".json"), JSON.stringify(o)); } catch (e) {} }
+  if (process.env.V2J_CRAWL_OUT_DIR) { try { fs.writeFileSync(path.join(process.env.V2J_CRAWL_OUT_DIR, mode + "-" + (root ? "red-" : "") + w + ".json"), JSON.stringify(o)); } catch (e) {} }
   return o;
 };
 const FS_PAGES = ["month.html", "sheet-load-day.html"];
-function facestripAsserts(o, tag) {
-  assert.equal(o.mode, "facestrip", tag + ": facestrip pass");
+const FS_CONTROLS = ["5km run", "Room 5m", "Focus 5 USB 50 BUS 5"];
+function facestripAsserts(o, tag, mode = "facestrip") {
+  assert.equal(o.mode, mode, tag + ": " + mode + " pass");
+  assert.deepEqual(o.controls, FS_CONTROLS, tag + ": the crawl's control list");
   for (const p of FS_PAGES) {
     const r = o.pages[p]; assert.ok(r && r.loaded, tag + " " + p + " loaded " + JSON.stringify(r).slice(0, 300));
-    assert.deepEqual(r.controls.sort(), ["5km run", "Room 5m"], tag + " " + p + ": the no-strip control rows painted (pass is not vacuous)");
+    assert.deepEqual(r.controls.slice().sort(), FS_CONTROLS.slice().sort(), tag + " " + p + ": the no-strip control rows painted (pass is not vacuous)");
     assert.ok(r.writes > 0, tag + " " + p + ": writes were observed");
     assert.deepEqual(r.transient, [], tag + " " + p + ": 0 money in transient writes");
     assert.deepEqual(r.dom, [], tag + " " + p + ": 0 money in DOM text (hidden included), attributes, values");
@@ -365,7 +367,22 @@ for (const [w, h] of [[440, 956], [1280, 800]]) {
   test("FACESTRIP1 in-render @" + w + ": month.html and sheet-load-day write no money sign or bare amount from either calendar feed", { ...SKIP, timeout: 620000 }, () => {
     const o = fsRun(w, h, null);
     facestripAsserts(o, "tip@" + w);
-    for (const p of FS_PAGES) assert.equal(o.pages[p].law, true, p + " loads HouseFaceLaw.moneyFree");
+    for (const p of FS_PAGES) { assert.equal(o.pages[p].law, true, p + " loads HouseFaceLaw.moneyFree"); assert.equal(o.pages[p].lb, true, p + " native lookbehind"); }
+  });
+}
+/* FACESTRIP1 r2 · old Safari (< 16.4, no lookbehind). BUILT, NOT RUN by Wright (Alfred holds the render slot). Opt-in only: needs a
+   browser AND V2J_FS_NOLB=1, so a default browser run never takes it. The crawl's facestrip-nolb mode adds FS_NOLB (a Playwright
+   init script, test-only, unreachable from any page or kid) that makes RegExp throw on lookbehind sources, so the law runs its
+   capture fallback. GREEN = fallback taken on both pages (lb false, lbThrows > 0) and 0 money in DOM, storage and transient writes. */
+const NOLB = browser && process.env.V2J_FS_NOLB === "1" ? {} : { skip: "SKIP needs a browser and V2J_FS_NOLB=1 (old-Safari no-lookbehind pass, opt-in)" };
+for (const [w, h] of [[440, 956], [1280, 800]]) {
+  test("FACESTRIP1 r2 old-Safari no-lookbehind @" + w + ": the law's capture fallback writes no money on month.html or sheet-load-day", { ...NOLB, timeout: 620000 }, () => {
+    const o = fsRun(w, h, null, "facestrip-nolb");
+    facestripAsserts(o, "nolb@" + w, "facestrip-nolb");
+    for (const p of FS_PAGES) { const r = o.pages[p];
+      assert.equal(r.law, true, p + " loads HouseFaceLaw.moneyFree"); assert.equal(r.nolb, true, p + " ran under FS_NOLB");
+      assert.equal(r.lb, false, p + ": HouseFaceLaw.MONEY_LB_OK false (fallback taken)"); assert.ok(r.lbThrows > 0, p + ": the law's lookbehind compile threw " + r.lbThrows);
+      assert.deepEqual(r.errors, [], p + ": no page errors under the no-lookbehind engine"); }
   });
 }
 test("FACESTRIP1 RED control @1280: the same pass on V2J_FS_RED_ROOT (c5295884 / f81262ee) writes money on both pages",
@@ -380,13 +397,42 @@ test("FACESTRIP1 RED control @1280: the same pass on V2J_FS_RED_ROOT (c5295884 /
 });
 test("FACESTRIP1 static: the facestrip pass covers every money form, its bare regex bites each residue and spares the controls", () => {
   const src = fs.readFileSync(path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), "utf8");
-  for (const k of ["FS_MONEY", "FS_OBS", "FS_SCAN", "FS_SIGN", "FS_BARE", 'MODE == "facestrip"', '"month.html", "sheet-load-day.html"', "fs_inject(name, d)"]) assert.ok(src.includes(k), "crawl has " + k);
+  for (const k of ["FS_MONEY", "FS_OBS", "FS_SCAN", "FS_SIGN", "FS_BARE", "FS_NOLB", 'MODE in ("facestrip", "facestrip-nolb")', 'if MODE == "facestrip-nolb": ctx.add_init_script(FS_NOLB)', '"month.html", "sheet-load-day.html"', "fs_inject(name, d)"]) assert.ok(src.includes(k), "crawl has " + k);
   const raw = (n) => { const m = src.match(new RegExp("^" + n + ' = r"([^"]*)"', "m")); assert.ok(m, n); return m[1]; };
   const SG = new RegExp(raw("FS_SIGN")), BR = new RegExp(raw("FS_BARE"));
   const S = String.fromCharCode(36), FW = "\uFF04", SM = "\uFE69";
   for (const t of [S, FW, SM]) assert.ok(SG.test("a " + t + "5"), "sign regex bites U+" + t.codePointAt(0).toString(16));
-  for (const t of ["Book fair 1,256", "fair ,256", "Snack .77 each", "Fee  193 due", "Cards 6135 swap".replace("6135", "613"), "Gala 2.5m goal", "Bus 5k raffle", "Gift jar 613"]) assert.ok(BR.test(t), "bare regex bites " + t);
-  for (const t of ["5km run", "Room 5m", "Grade 2nd", "3:15 pm", "Room 213", "2026-10-28", "Age 7"]) assert.ok(!BR.test(t) && !SG.test(t), "spares " + t);
+  for (const t of ["Book fair 1,256", "fair ,256", "Snack .77 each", "Fee  193 due", "Cards 6135 swap".replace("6135", "613"), "Gala 2.5m goal", "Bus 5k raffle", "Gift jar 613",
+    "Fee USD due", "Fee 7,471 due", "Trip 7,472", "Trip USD", "Club US now", "Club 7,473 now", "Gate USD", "Gate US", "Gate 7,474", "Jar 1,256 goal", "Cards 613 5 swap", "Gift box 613"]) assert.ok(BR.test(t), "bare regex bites " + t);
+  for (const t of ["5km run", "Room 5m", "Grade 2nd", "3:15 pm", "Room 213", "2026-10-28", "Age 7", "Focus 5 USB 50 BUS 5", "USB 50", "BUS 5", "Focus 5", "Join us", "Fee due", "Club now", "Gate"]) assert.ok(!BR.test(t) && !SG.test(t), "spares " + t);
   for (const t of ["(bring ", "1,256", ".77", " 193", "613", "5k", "2.5m", "5km run", "Room 5m"]) assert.ok(src.includes(t), "fixture form " + t);
   assert.ok(/FW \+ "5/.test(src) && /SM \+ "5/.test(src) && /"Gift jar 613 " \+ S/.test(src) && /"Cards 613" \+ S \+ "5/.test(src), "fullwidth, small, '613 sign', '613 sign 5' rows");
+  for (const t of ['"Fee USD 7,471 due"', '"Trip 7,472 USD"', '"Club US" + S + "7,473 now"', '"Gate USD" + S + "7,474"', '"Jar 1,256 " + S + " goal"', '"Cards 613 " + S + "5 swap"', '"Gift box 613 " + FW', '"Focus 5 USB 50 BUS 5"'])
+    assert.ok(src.includes(t), "r2 row " + t);
+  assert.ok(src.includes('FS_CONTROLS = ["5km run", "Room 5m", "Focus 5 USB 50 BUS 5"]'), "r2 controls");
+});
+test("FACESTRIP1 r2 static: the old-Safari pass forces the fallback only through the harness, and the glass has no lookbehind literal", () => {
+  const src = fs.readFileSync(path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), "utf8");
+  const nolb = src.match(/^FS_NOLB = r"""([\s\S]*?)"""/m); assert.ok(nolb, "FS_NOLB defined");
+  /* run FS_NOLB in a vm window: lookbehind sources throw SyntaxError, everything else is a native RegExp */
+  const win = { RegExp }; win.window = win; vm.createContext(win); vm.runInContext(nolb[1], win);
+  assert.equal(win.__fsNolb, true); assert.notEqual(win.RegExp, RegExp);
+  assert.throws(() => new win.RegExp("(?<![A-Za-z_])x", "g"), { name: "SyntaxError" }); assert.throws(() => new win.RegExp("(?<=a)b"), { name: "SyntaxError" });
+  const ok = new win.RegExp("(^|[^A-Za-z_])x", "g"); assert.ok(ok instanceof RegExp && ok.flags === "g" && ok.test(" x"), "lookbehind-free source builds a native RegExp");
+  assert.equal(win.__fsLbThrows, 2);
+  /* the law under FS_NOLB takes the fallback and still strips */
+  const law = fs.readFileSync(path.join(ROOT, "house-face-law.js"), "utf8");
+  const box = { window: null }; box.window = box; vm.createContext(box); vm.runInContext(nolb[1], box); vm.runInContext(law, box);
+  assert.equal(box.HouseFaceLaw.MONEY_LB_OK, false, "fallback taken under FS_NOLB"); assert.ok(box.__fsLbThrows >= 1);
+  const S = String.fromCharCode(36);
+  for (const [x, want] of [["Field trip (bring " + S + "5)", "Field trip (bring)"], ["Fee USD 7,471 due", "Fee due"], ["Club US" + S + "7,473 now", "Club now"], ["Gift jar 613 " + S, "Gift jar"], ["Focus 5 USB 50 BUS 5", "Focus 5 USB 50 BUS 5"]])
+    assert.equal(box.HouseFaceLaw.faceText(x), want, x);
+  /* no kid path: the law and the glass read no switch for it, and the only RegExp swap lives in scripts/qa */
+  for (const f of ["house-face-law.js", "private-feed.js", "month.html", "sheet-load-day.html"]) {
+    const t = fs.readFileSync(path.join(ROOT, f), "utf8");
+    assert.doesNotMatch(t, /__fsNolb|__fsLbThrows|FS_NOLB|nolb/i, f + " holds no no-lookbehind switch");
+    const code = t.replace(/"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'/g, '""');
+    assert.doesNotMatch(code, /\(\?<[!=]/, f + " holds no lookbehind outside a string (a literal would be a parse error on old Safari)");
+  }
+  assert.doesNotMatch(law, /location|URLSearchParams|localStorage|sessionStorage|document\.cookie/, "the law reads no URL, storage or cookie switch");
 });
