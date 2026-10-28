@@ -76,7 +76,7 @@ const SC={
 
  phone:null};{const w=SC.wall,Q=PM,qa=a=>a.map(p=>Q(p[0],p[1]));SC.phone={...w,w:440,h:956,vid:'media/loop-phone',moon:[...Q(w.moon[0],w.moon[1]),w.moon[2]*1.33],grass:Q(0,w.grass)[1],
   pump:w.pump.map(p=>[...Q(p[0],p[1]),p[2]*1.33]),lamps:qa(w.lamps),skel:[...Q(w.skel[0],w.skel[1]),w.skel[2]*1.33,w.skel[3]*1.33],win:[...Q(w.win[0],w.win[1]),w.win[2]*1.33,w.win[3]*1.33],winG:[...Q(w.winG[0],w.winG[1]),w.winG[2]*1.33,w.winG[3]*1.33],
-  eyes:w.eyes.map(e=>qa(e)),ghosts:w.ghosts.map(g=>({x0:Q(g.x0,0)[0],x1:Q(g.x1,0)[0],y:Q(0,g.y)[1],s:g.s*1.33})),owl:[...Q(w.owl[0],w.owl[1]),w.owl[2]*1.33],gh:w.gh.map(g=>[...Q(g[0],g[1]),g[2]*1.33]),emb:110,bs:1,
+  eyes:w.eyes.map(e=>qa(e)),ghosts:w.ghosts.map(g=>({x0:Q(g.x0,0)[0],x1:Q(g.x1,0)[0],y:Q(0,g.y)[1],s:g.s*1.33})),owl:[...Q(w.owl[0],w.owl[1]),w.owl[2]*1.33],gh:w.gh.map(g=>[...Q(g[0],g[1]),g[2]*1.33]),emb:110,bs:1,moonIn:[368,30,20],moonArt:[260.4,95.6,44.5],
   fog:w.fog.map(f=>[Q(0,f[0])[1],f[1]*1.33,f[2]])}}
 const SC_DEAD={phone:{w:440,h:956,vid:'media/loop-phone',moon:[180,161,32],grass:860,
   pump:[[35,699,16],[304,668,16],[226,764,19],[288,734,19]],
@@ -450,6 +450,8 @@ function imOk(i){return !!(i&&i.complete&&i.naturalWidth)}
 // No location in the client (LIVEWX2): the cell is the hub's coarse /wx sky cell (CELL), else the time zone's meridian at a mid latitude. Waxing is lit on the right, waning on the left (northern hemisphere).
 // The mask darkens the dark part of the night plate's baked moon to the sky sampled beside it (darken keeps the branches in front), with a soft limb
 // and a faint earthshine; moon down: no moon.
+// MOON2 · a plate with no baked moon in frame (the 440 phone porch crop: Alfred noon-final 10/25, inFrame false on every night slot) carries P.moonIn [x,y,r]:
+// the wall plate's own moon disc (P.moonArt [x,y,r] on that plate, handed in as src) is painted there first (lighten, feathered halo), then masked to the real phase. Moon down: nothing painted.
 const MOON1=(()=>{const R=Math.PI/180,DAY=864e5,J0=Date.UTC(2000,0,1,12),SYN=29.530588853,NM0=Date.UTC(2000,0,6,18,14),E=R*23.4397;
  const cell=()=>{try{if(typeof CELL!=='undefined'&&CELL&&isFinite(CELL.lat)&&isFinite(CELL.lon))return{lat:+CELL.lat,lon:+CELL.lon}}catch(e){}return{lat:40,lon:-new Date(new Date().getFullYear(),0,1).getTimezoneOffset()/4}};
  function pos(t,c){c=c||cell();const d=(t-J0)/DAY,L=R*(218.316+13.176396*d),M=R*(134.963+13.064993*d),F=R*(93.272+13.229350*d);
@@ -461,9 +463,14 @@ const MOON1=(()=>{const R=Math.PI/180,DAY=864e5,J0=Date.UTC(2000,0,1,12),SYN=29.
  function at(t,c){const a=(((t-NM0)/DAY)%SYN+SYN)%SYN,p=pos(t,c);return{age:a,fraction:(1-Math.cos(2*Math.PI*a/SYN))/2,waxing:a<SYN/2,alt:p.alt,up:p.up}}
  function times(t0,t1,c){const r={rise:[],set:[]},st=6e5;let f0=pos(t0,c);for(let t=t0+st;t<=t1;t+=st){const f1=pos(t,c);if(f0.up!==f1.up){let a=t-st,b=t;for(let j=0;j<16;j++){const m=(a+b)/2;if(pos(m,c).up===f0.up)a=m;else b=m}r[f1.up?'rise':'set'].push(Math.round((a+b)/2))}f0=f1}return r}
  function key(t){const k=at(t);return k.up?Math.round(k.fraction*1e3)+(k.waxing?'+':'-'):'down'}
- function mask(c,P,sx,sy,w,t){const k=at(t);if(!(w>.01)||!P||!P.moon)return null;const cx=P.moon[0]*sx,cy=P.moon[1]*sy,r=P.moon[2]*sx,ct=Math.cos(2*Math.PI*k.age/SYN);
+ let PC=null;function paint(c,img,a,cx,cy,r,w){const s=r/a[2],R=a[2]*1.9,d=Math.ceil(2*R*s);if(!(d>2)||!(img&&img.naturalWidth))return false;const key=img.src+'|'+d;
+  if(!PC||PC.key!==key){const o=document.createElement('canvas');o.width=o.height=d;const k=o.getContext('2d');k.drawImage(img,a[0]-R,a[1]-R,2*R,2*R,0,0,d,d);k.globalCompositeOperation='destination-in';
+   const g=k.createRadialGradient(d/2,d/2,a[2]*1.15*s,d/2,d/2,d/2);g.addColorStop(0,'#000');g.addColorStop(1,'rgba(0,0,0,0)');k.fillStyle=g;k.fillRect(0,0,d,d);PC={key:key,o:o}}
+  c.save();c.globalAlpha=Math.min(1,w);c.globalCompositeOperation='lighten';c.drawImage(PC.o,cx-d/2,cy-d/2);c.restore();return true}
+ function mask(c,P,sx,sy,w,t,src){const k=at(t);if(!(w>.01)||!P||!P.moon)return null;const M=P.moonIn||P.moon,cx=M[0]*sx,cy=M[1]*sy,r=M[2]*sx,ct=Math.cos(2*Math.PI*k.age/SYN);
   let sky=[6,9,16];try{const g=(x,y)=>c.getImageData(Math.max(0,Math.round(x-2)),Math.max(0,Math.round(y-2)),4,4).data,s=[0,0,0];let n=0;for(let q=0;q<8;q++){const a=g(cx+Math.cos(q*.785)*r*2.6,cy+Math.sin(q*.785)*r*2.6);for(let i=0;i<64;i+=4){for(let j=0;j<3;j++)s[j]+=a[i+j];n++}}sky=s.map(v=>Math.round(v/n))}catch(e){}
-  const info={fraction:k.fraction,waxing:k.waxing,up:k.up,alt:k.alt,cx:cx,cy:cy,r:r,sky:sky,w:w,inFrame:cx+r>0&&cy+r>0&&cx-r<c.canvas.width&&cy-r<c.canvas.height};MOON1.last=info;if(!info.inFrame)return info;
+  const info={fraction:k.fraction,waxing:k.waxing,up:k.up,alt:k.alt,cx:cx,cy:cy,r:r,sky:sky,w:w,inFrame:cx+r>0&&cy+r>0&&cx-r<c.canvas.width&&cy-r<c.canvas.height,painted:false};MOON1.last=info;if(!info.inFrame)return info;
+  if(P.moonIn){if(!k.up)return info;let img=null;try{img=typeof src==='function'?src():src}catch(e){}if(!paint(c,img,P.moonArt||[260.4,95.6,44.5],cx,cy,r,w))return info;info.painted=true}
   c.save();c.globalAlpha=Math.min(1,w);c.globalCompositeOperation='darken';c.fillStyle=`rgb(${sky.join()})`;c.filter=`blur(${Math.max(1,r*.05).toFixed(1)}px)`;
   if(!k.up){c.filter=`blur(${(r*.2).toFixed(1)}px)`;const g2=c.createRadialGradient(cx,cy,r*1.1,cx,cy,r*2.4);g2.addColorStop(0,`rgba(${sky.join()},1)`);g2.addColorStop(1,`rgba(${sky.join()},0)`);c.fillStyle=g2;c.beginPath();c.arc(cx,cy,r*2.4,0,7);c.fill();
    c.fillStyle=`rgb(${sky.join()})`;c.beginPath();c.arc(cx,cy,r*1.15,0,7);c.fill();c.restore();return info}
@@ -472,6 +479,8 @@ const MOON1=(()=>{const R=Math.PI/180,DAY=864e5,J0=Date.UTC(2000,0,1,12),SYN=29.
   path();c.fill();c.filter='none';c.globalCompositeOperation='source-over';c.beginPath();c.arc(cx,cy,r*.98,0,7);c.clip();path();c.fillStyle='rgba(150,165,195,.06)';c.fill();c.restore();return info}
  return{at:at,pos:pos,times:times,key:key,mask:mask,SYN:SYN,last:null}})();
 // MOON1 · real moon (end)
+/* MOON2 · the phone's moon art is the wall night poster's own disc, fetched only when a phone night plate has the moon up; a late load re-composites the plate */
+let MART=null;function moonArt(){if(!MART){MART=new Image();MART.decoding='async';MART.onload=()=>{BGsig=null;try{if(window.__fb&&__fb.mode==='poster')fbDraw()}catch(e){}};MART.src='media/poster/v52-loop-wall.webp'}return imOk(MART)?MART:null}
 let BGsig=null,BGsame=false;function bgCompose(){const PN=poster('night'),vR=V.readyState>=2&&V.videoWidth;const W=vR?V.videoWidth:(imOk(PN)?PN.naturalWidth:0),H=vR?V.videoHeight:(imOk(PN)?PN.naturalHeight:0);if(!W)return V;if(!BG){BG=document.createElement('canvas');BGc=BG.getContext('2d')}if(BG.width!==W||BG.height!==H){BG.width=W;BG.height=H;for(const k in SKP)delete SKP[k]}const base=vR?V:PN;const c=BGc,sx=W/P.w,sy=H/P.h;
  const ph=ENV.phase,va=PHK[ph.A].vid,vb=PHK[ph.B].vid;const A=pvGet(va),B=ph.m>0?pvGet(vb):null;
  // preload the next phase once within 3 degrees of a threshold
@@ -486,7 +495,7 @@ let BGsig=null,BGsame=false;function bgCompose(){const PN=poster('night'),vR=V.r
    c.globalAlpha=al;c.drawImage(P0,r[0],r[1]);c.globalAlpha=1};
   for(const bx of(mode==='wall'?[[925,135,165,210],[95,10,310,310]]:[[...PMM(925,135),165*.786,210*.786],[30,65,320,280]])){sp(A,va,1,bx);if(B&&ph.m>0)sp(B,vb,ph.m,bx)}}
  /* MOON1: the real phase over the night plate's baked moon, weighted by how much of the frame is the night plate */
- try{MOON1.mask(c,P,sx,sy,(!sA||va==='night'?1:0)*(1-(sB2?ph.m:0))+(sB2&&vb==='night'?ph.m:0),envNow())}catch(e){}
+ try{MOON1.mask(c,P,sx,sy,(!sA||va==='night'?1:0)*(1-(sB2?ph.m:0))+(sB2&&vb==='night'?ph.m:0),envNow(),mode==='phone'?moonArt:null)}catch(e){}
  for(const l of FSX.L){const v=FXV[l[0]].v;if(ok(v)&&l[2]>0){c.globalAlpha=l[2];c.drawImage(v,0,0,W,H);c.globalAlpha=1}}
  const night=1-ENV.day;
  // wet surfaces: the night-rain footage (true footage) in night phases; day phases get a composited sheen

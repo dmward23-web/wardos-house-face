@@ -18,7 +18,7 @@ test("static: one MOON1 block, byte-identical in the scene and the wall, called 
   for (const f of ["night/scene.html", "wall.html"]) { const s = read(f);
     assert.equal(s.split(BEGIN).length, 2, f + ": one block");
     assert.match(s, /const sig=vidOn\|\|fxOn\?null:\[MOON1\.key\(envNow\(\)\),W,H,/, f + ": a still plate is re-composited when the moon changes (minute tick)");
-    assert.match(s, /try\{MOON1\.mask\(c,P,sx,sy,\(!sA\|\|va==='night'\?1:0\)\*\(1-\(sB2\?ph\.m:0\)\)\+\(sB2&&vb==='night'\?ph\.m:0\),envNow\(\)\)\}catch\(e\)\{\}/, f + ": masked by the night plate's weight only");
+    assert.match(s, /try\{MOON1\.mask\(c,P,sx,sy,\(!sA\|\|va==='night'\?1:0\)\*\(1-\(sB2\?ph\.m:0\)\)\+\(sB2&&vb==='night'\?ph\.m:0\),envNow\(\),mode==='phone'\?moonArt:null\)\}catch\(e\)\{\}/, f + ": masked by the night plate's weight only (MOON2: the phone hands in the wall disc)");
     assert.ok(!/gl=soft/.test(s.slice(s.indexOf(BEGIN), s.indexOf(END))), f + ": nothing about ?gl=soft in the moon"); }
 });
 
