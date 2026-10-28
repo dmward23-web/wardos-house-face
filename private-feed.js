@@ -27,6 +27,36 @@
   var origFetch = g.fetch ? g.fetch.bind(g) : null;
   function qs(n) { var m = String(g.location && g.location.search || "").match(new RegExp("[?&]" + n + "=([^&]+)")); return m ? decodeURIComponent(m[1]) : ""; }
 
+  /* PFCACHE1 v3 · NO path-based caching. The money-bearing feeds (kids-week, cal-live, cal-months: the raw hub payload
+     carries money fields) are NEVER written to storage and NEVER read back, on EVERY page (adult boards included:
+     no hub = offline/empty state, never a cached copy). Every page purges at boot, at DOMContentLoaded and after each
+     live fetch: those raw keys plus any other wardos-private:* value holding '$' or a money key. Protected and never
+     touched: token keys (not under wardos-private:), device feeds (lights/sensi/nest, still cached) and private-names.
+     kid scope (kid-<name> / mercury-run path, legacy kid-*.html, or body[data-kid-world]) is used for pairing ONLY. */
+  var KID_PAGE_RE = /\/(?:kid-[a-z]+|mercury-run)(?:\.html|\/)?$/i, KID_LEGACY_RE = /(^|\/)kid-[^/]*\.html$/;
+  var MONEY_FEEDS = { "kids-week": 1, "cal-live": 1, "cal-months": 1 };
+  var MONEY_RE = /\$|"(?:bankGoal|reward|weeklyAllowance|need|currency)"\s*:/;
+  var PROTECTED = { "private-names": 1 };
+  function kidPath() { try { var p = String(g.location.pathname || ""); return KID_PAGE_RE.test(p) || KID_LEGACY_RE.test(p); } catch (e) { return false; } }
+  function kidBoard() {
+    if (kidPath()) return true;
+    try { return !!(document.body && document.body.hasAttribute && document.body.hasAttribute("data-kid-world")); } catch (e) { return false; }
+  }
+  function noCache(name) { return !!MONEY_FEEDS[name]; }
+  function purgeMoneyCache() {
+    if (!ls) return 0;
+    var keys = [], n = 0;
+    try { for (var i = 0; i < ls.length; i++) { var k = ls.key(i); if (k && k.indexOf(CACHE) === 0) keys.push(k); } } catch (e) { return 0; }
+    keys.forEach(function (k) {
+      var name = k.slice(CACHE.length);
+      if (DEVICE[name] || PROTECTED[name]) return;
+      if (MONEY_FEEDS[name] || MONEY_RE.test(lsGet(k) || "")) { try { ls.removeItem(k); n++; } catch (e) { /* */ } }
+    });
+    return n;
+  }
+  purgeMoneyCache();
+  try { if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", purgeMoneyCache, { once: true }); } catch (e) { /* */ }
+
   /* PRIVFEED3 · a pairing seed is stored once (16+ chars, same rule as the server), then stripped from the address bar */
   /* SEEDGUARD1 · a legacy ?lightsProxyToken= / ?nestProxyToken= seed is saved ONLY when this screen holds no device key yet, so a crafted link can never replace (unpair) a paired screen's key. The param is still stripped. */
   function noDeviceKey() { var ks = ["wardos-lights-proxy-token", "wardosNestProxyToken", "wardos-private-feed-token"]; for (var i = 0; i < ks.length; i++) { if (lsGet(ks[i])) return false; } return true; }
@@ -124,7 +154,7 @@
   function getFeed(name) {
     var cacheKey = CACHE + name;
     function fromCache(why) {
-      var c = null; try { c = JSON.parse(lsGet(cacheKey) || "null"); } catch (e) { c = null; }
+      var c = null; if (!noCache(name)) { try { c = JSON.parse(lsGet(cacheKey) || "null"); } catch (e) { c = null; } } /* PFCACHE1 v3 · money feeds are never read from storage, any page */
       if (c && c.data && Date.now() - c.at < (DEVICE[name] ? DEVICE_MAX_AGE : MAX_AGE)) { note(name, "stale", c.at, why); return { data: c.data, status: "stale", at: c.at, why: why }; }
       note(name, "offline", 0, why);
       return { data: null, status: "offline", at: 0, why: why };
@@ -138,7 +168,8 @@
         .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
         .then(function (d) {
           var at = Date.now();
-          lsSet(cacheKey, JSON.stringify({ at: at, data: d }));
+          if (!noCache(name)) lsSet(cacheKey, JSON.stringify({ at: at, data: d })); /* PFCACHE1 v3 · money feeds never stored */
+          purgeMoneyCache();
           note(name, "live", at);
           return { data: d, status: "live", at: at };
         })
@@ -218,10 +249,7 @@
   function hm(t) { var d = new Date(t); var h = d.getHours() % 12 || 12; return h + ":" + String(d.getMinutes()).padStart(2, "0") + (d.getHours() < 12 ? " AM" : " PM"); }
   var chip = null;
   /* HUBPAIR1 · a screen is paired only with BOTH a device key and a valid hub. Kid boards stay plain (no notice). */
-  function kidBoard() {
-    try { if (/(^|\/)kid-[^/]*\.html$/.test(String(g.location.pathname || ""))) return true; } catch (e) { /* */ }
-    return !!(document.body && document.body.hasAttribute && document.body.hasAttribute("data-kid-world"));
-  }
+  /* PFCACHE1 · kidBoard() lives at the top (pairing only) */
   function hubNow() { var H = g.HouseHub, o = qs("pfBase"); if (!H) return ""; if (o && /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/?$/.test(o) && H.okForKey(o)) return o; return H.lights() || ""; }
   function pairState() { var k = !!token(), h = !!hubNow(); return k && h ? "paired" : (k ? "key-no-hub" : (h ? "hub-no-key" : "none")); }
   function needsPairing() { return !forceOffline && pairState() !== "paired" && !kidBoard(); }
