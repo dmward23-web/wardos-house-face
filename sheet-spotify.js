@@ -93,19 +93,18 @@
     pill.classList.toggle("live", ph === "playing");
     glowT = ph === "playing" ? 1.06 : live ? 0.86 : 0.8;
 
-    /* gate / setup */
-    var gate = $("spw-gate"), setup = $("spw-setup"), liveBox = $("spw-live");
-    var showSetup = ph === "need_app";
-    setup.hidden = !showSetup; if (showSetup) setup.classList.add("spw-in");
+    /* gate (SPOTCUT: the setup panel moved to the Dad-only sheet-spotify-setup.html; need_app is one plain line here) */
+    var gate = $("spw-gate"), liveBox = $("spw-live");
     body.classList.toggle("spw-gated", !live);
-    gate.hidden = live || showSetup || ph === "loading";
+    gate.hidden = live || ph === "loading";
     liveBox.hidden = !live;
     $("spw-hub").hidden = !live; $("spw-rooms").hidden = !live;
     var gb = $("spw-gate-btn"), msg = "", sub = "", btn = "";
-    if (ph === "need_auth") { msg = "Connect your Spotify once. Then the wall, your phone and every House screen can play, skip and switch speakers."; btn = "Connect Spotify"; sub = "Opens Spotify sign-in, then comes right back here."; }
+    if (ph === "need_app") { msg = "Music isn't set up yet. Ask Dad."; }
+    else if (ph === "need_auth") { msg = "Connect your Spotify once. Then the wall, your phone and every House screen can play, skip and switch speakers."; btn = "Connect Spotify"; sub = "Opens Spotify sign-in, then comes right back here."; }
     else if (ph === "no_key" || ph === "bad_key") { msg = "This screen needs pairing."; btn = "How to pair"; sub = "On Dad's page, tap Pair a screen and scan the code with this screen."; }
-    else if (ph === "offline") { msg = "The house box isn't answering right now."; btn = "Try again"; sub = "It comes back on its own — no need to do anything."; }
-    else if (ph === "error") { msg = S.msg || "Spotify had a hiccup."; btn = "Try again"; sub = S.err === "not_allowlisted" ? "Spotify dashboard → your app → Settings → User Management → add your Spotify email." : S.err === "premium_required" ? "Playback control needs Spotify Premium on this account." : ""; }
+    else if (ph === "offline") { msg = "The house box isn't answering right now."; btn = "Try again"; sub = "It comes back on its own. No need to do anything."; }
+    else if (ph === "error") { msg = S.msg || "Spotify had a hiccup."; btn = "Try again"; sub = S.err === "not_allowlisted" ? "Music needs Dad to finish setup. Ask Dad." : S.err === "premium_required" ? "Playback control needs Spotify Premium on this account." : ""; }
     setText("spw-gate-msg", msg); setText("spw-gate-sub", sub); gb.textContent = btn; gb.hidden = !btn;
     gb.classList.toggle("warm", ph !== "need_auth");
 
@@ -238,24 +237,7 @@
     SP.refresh();
   });
 
-  /* one-time setup */
-  $("spw-copy-btn").addEventListener("click", function () {
-    var t = $("spw-redirect").textContent, b = this;
-    function ok() { b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy"; }, 1600); }
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, function () { selectCode(); });
-    else selectCode();
-    function selectCode() { var r = document.createRange(); r.selectNodeContents($("spw-redirect")); var s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected"; }
-  });
-  $("spw-setup-go").addEventListener("click", function () {
-    var v = ($("spw-client").value || "").trim().replace(/\s+/g, ""), err = $("spw-setup-err");
-    var m = /[0-9a-f]{32}/i.exec(v);
-    if (!m) { err.textContent = "That doesn't look like a Client ID — it's 32 letters and numbers on the app's page."; return; }
-    err.textContent = "Saving on the house box…";
-    SP.setup(m[0], "sheet-spotify.html").then(function (j) {
-      if (j && j.url) { err.textContent = "Opening Spotify sign-in…"; return; }
-      err.textContent = (j && j.message) || (j && j.error === "offline" ? "House box didn't answer — try again in a minute." : "Couldn't save that. Try again.");
-    });
-  });
+  /* SPOTCUT (Alfred, ADULTCUT1): no Client ID field or save handler on this kid-reachable page; see sheet-spotify-setup.js (Dad-only) */
 
   /* ---------- device sheet ---------- */
   function openSheet() {

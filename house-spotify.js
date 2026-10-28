@@ -165,7 +165,13 @@
       S.flash = (j && j.message) || "Couldn't start the Spotify sign-in."; S.flashAt = Date.now(); emit(); return j;
     });
   }
+  /* SPOTCUT (Alfred, ADULTCUT1): the Client ID save path answers only on the Dad-only setup sheet (html[data-dad-only] on
+     sheet-spotify-setup.html). On any other page, every kid-reachable one included, it sends nothing and resolves dad_only. */
+  function setupAllowed() {
+    try { return document.documentElement.hasAttribute("data-dad-only") && /(^|\/)sheet-spotify-setup\.html$/.test(location.pathname); } catch (e) { return false; }
+  }
   function setup(clientId, returnTo) {
+    if (!setupAllowed()) return Promise.resolve({ ok: false, error: "dad_only" });
     return req("POST", "/api/spotify/setup", { clientId: String(clientId || "").trim(), connect: true, returnTo: returnTo || PLAYER }).then(function (j) {
       if (j && j.url) { location.href = j.url; }
       return j;
@@ -264,7 +270,7 @@
       if (a === "rooms") { openPlayer(el, ev, "#rooms"); return; }
       if (a === "connect") {
         if (S.phase === "no_key" || S.phase === "bad_key") { if (window.WardHubKeyEntry) WardHubKeyEntry.open(); return; }
-        if (S.phase === "need_app") { openPlayer(el, ev, "#setup"); return; }
+        if (S.phase === "need_app") { openPlayer(el, ev, ""); return; } /* SPOTCUT: no setup card on kid pages */
         if (S.phase === "offline") { schedule(0); return; }
         connect("sheet-index.html"); return;
       }
@@ -314,7 +320,9 @@
       showCtl = true;
     } else if (live) {
       title = "Nothing playing"; artist = "Start Spotify on any speaker or phone"; dev = "Then control it right here"; showCtl = true;
-    } else if (ph === "need_app" || ph === "need_auth") {
+    } else if (ph === "need_app") {
+      title = "Spotify"; artist = "Music isn't set up yet. Ask Dad."; connectTxt = ""; /* SPOTCUT */
+    } else if (ph === "need_auth") {
       title = "Connect Spotify"; artist = "One tap, once · then every screen"; connectTxt = "Connect Spotify";
     } else if (ph === "no_key" || ph === "bad_key") {
       /* Key-less screens stay quiet: the NEED KEY pill only. No sentence, no Add key button. */

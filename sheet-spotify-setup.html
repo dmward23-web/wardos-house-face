@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en" data-dad-only>
+<head>
+<meta charset="utf-8">
+<script src="house-hub.js?v=HUBPAIR1"></script>
+<script src="private-feed.js?v=HUBPAIR1D"></script>
+<script src="house-pair.js?v=HUBPAIR1"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#02050a">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<title>Spotify setup · Dad · House</title>
+<!-- SPOTCUT (Alfred, ADULTCUT1) · Dad-only. The one-time Spotify setup (redirect URI, Client ID field, save) moved here
+     from sheet-spotify.html. Reached only from sheet-dan.html (Dad-only); no kid-reachable page links it, and
+     HouseSpotify.setup() refuses on any page that is not this one. The Client ID goes to the house box only; nothing is
+     written to browser storage. -->
+<link rel="stylesheet" href="sheet-spotify.css?v=SPOTIFY2" />
+<style>
+  html,body{min-height:100%;background:#02050a;color:#eef8ff}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;display:flex;flex-direction:column;align-items:center;padding:24px 16px 48px;box-sizing:border-box}
+  .sss-top{width:100%;max-width:440px;display:flex;justify-content:space-between;align-items:center}
+  .sss-top a{color:#7fe9ff;font-weight:700;text-decoration:none}
+  .sss-top b{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:rgba(214,232,246,.72)}
+</style>
+</head>
+<body>
+<header class="sss-top"><a href="sheet-dan.html">&lsaquo; Dad</a><b>Dad only</b></header>
+    <section class="spw-setup" id="spw-setup" aria-label="One-time Spotify setup">
+      <h2>One-time Spotify setup</h2>
+      <p class="spw-setup-lead">Spotify only lets a home board in through your own free developer app. About 3 minutes, once. Then every House screen just works.</p>
+      <ol>
+        <li>A grown-up creates the House board app once (steps in SPOTIFY-LIVE.md).<br><span class="spw-dim">Name: WardOS House · Description: House board</span></li>
+        <li>Redirect URI (paste exactly, tap Add):
+          <div class="spw-copy"><code id="spw-redirect">https://dmward23-web.github.io/wardos-house-face/spotify-callback.html</code><button type="button" id="spw-copy-btn">Copy</button></div>
+          Tick <b>Web API</b>, agree, tap <b>Save</b>.</li>
+        <li>Copy the <b>Client ID</b> from the app page and paste it here:
+          <input id="spw-client" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="32-character Client ID" maxlength="64">
+        </li>
+      </ol>
+      <button type="button" class="spw-orb-btn" id="spw-setup-go">Save &amp; connect Spotify</button>
+      <div class="spw-setup-err" id="spw-setup-err" role="alert"></div>
+    </section>
+<script src="house-spotify.js?v=SPOTCUT1"></script>
+<script src="sheet-spotify-setup.js?v=SPOTCUT1"></script>
+</body>
+</html>

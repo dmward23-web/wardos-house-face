@@ -96,22 +96,8 @@ html body.spw-paused .spw-title::before,html body .spw-paused .spw-title::before
       <div class="spw-gate-sub" id="spw-gate-sub"></div>
     </div>
 
-    <section class="spw-setup" id="spw-setup" hidden aria-label="One-time Spotify setup">
-      <h2>One-time Spotify setup</h2>
-      <p class="spw-setup-lead">Spotify only lets a home board in through your own free developer app. About 3 minutes, once. Then every House screen just works.</p>
-      <ol>
-        <!-- ADULTCUT1 (Atlas): the developer-console link is cut; no kid-reachable page links a dev, admin or billing surface -->
-        <li>A grown-up creates the House board app once (steps in SPOTIFY-LIVE.md).<br><span class="spw-dim">Name: WardOS House · Description: House board</span></li>
-        <li>Redirect URI (paste exactly, tap Add):
-          <div class="spw-copy"><code id="spw-redirect">https://dmward23-web.github.io/wardos-house-face/spotify-callback.html</code><button type="button" id="spw-copy-btn">Copy</button></div>
-          Tick <b>Web API</b>, agree, tap <b>Save</b>.</li>
-        <li>Copy the <b>Client ID</b> from the app page and paste it here:
-          <input id="spw-client" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="32-character Client ID" maxlength="64">
-        </li>
-      </ol>
-      <button type="button" class="spw-orb-btn" id="spw-setup-go">Save &amp; connect Spotify</button>
-      <div class="spw-setup-err" id="spw-setup-err" role="alert"></div>
-    </section>
+    <!-- SPOTCUT (Alfred, ADULTCUT1): the one-time Spotify setup (Client ID field, save, steps) lives on the Dad-only
+         sheet-spotify-setup.html. This kid-reachable page has no credential field and no save path; need_app shows one plain line. -->
   </section>
 
   <!-- SPOTIFY2 · HOME AUDIO: the house speakers (Google/Nest cast speakers + groups, TVs) as Spotify Connect rooms -->
@@ -152,8 +138,8 @@ html body.spw-paused .spw-title::before,html body .spw-paused .spw-title::before
 
 <script src="ori/plates/painted/manifest.js?v=SPOTIFY2"></script>
 <script src="ori/ori-scene.js?v=SPOTIFY2"></script>
-<script src="house-spotify.js?v=HALLOWEEN1"></script>
-<script src="sheet-spotify.js?v=FOLLOWUP6"></script>
+<script src="house-spotify.js?v=SPOTCUT1"></script>
+<script src="sheet-spotify.js?v=SPOTCUT1"></script>
 <script src="sheet-spotify-lib.js?v=SPOTIFY2"></script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/month-overlay.js?v=HALLOWEEN1" defer></script>

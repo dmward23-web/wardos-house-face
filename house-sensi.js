@@ -11,12 +11,8 @@
   var LIVE_URL = "data/sensi-live.json";
   var LIVE_FRESH_MS = 30 * 60 * 1000;
   var LIVE_POLL_MS = 60 * 1000;
-  /* ADULTCUT1 (Atlas): the Sensi account-manager login link is cut; web opens go to the public product page */
-  var WEB_LOGIN = "https://sensi.copeland.com/en-us";
-  var WEB_PRODUCT = "https://sensi.copeland.com/en-us";
-  var APP_IOS = "https://apps.apple.com/us/app/sensi/id792612452";
-  var APP_ANDROID = "https://play.google.com/store/apps/details?id=com.asynchrony.emerson.sensi";
-  var APP_SCHEME = "sensi://";
+  /* ADULTCUT1 (Atlas ruling 7:56): the Sensi connect helper is deleted from this kid-loaded script: no web login, no
+     product page, no app-store link and no app deep link. No page called it; nothing moved. */
   var DOCS = "SENSI-LIVE.md";
 
   var MODES = ["Heat", "Cool", "Auto", "Off"];
@@ -236,31 +232,6 @@
     _pollTimer = setInterval(function () { fetchLive(); }, LIVE_POLL_MS);
   }
 
-  function openUrl(url) {
-    try { window.open(url, "_blank", "noopener,noreferrer"); } catch (e) {
-      try { location.href = url; } catch (e2) { /* */ }
-    }
-  }
-
-  function connectOpenWeb() { openUrl(WEB_LOGIN); }
-  function connectOpenProduct() { openUrl(WEB_PRODUCT); }
-  function connectOpenIos() { openUrl(APP_IOS); }
-  function connectOpenAndroid() { openUrl(APP_ANDROID); }
-  function connectTryApp() {
-    try {
-      var iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.src = APP_SCHEME;
-      document.body.appendChild(iframe);
-      setTimeout(function () {
-        try { document.body.removeChild(iframe); } catch (e) { /* */ }
-        openUrl(WEB_LOGIN);
-      }, 700);
-    } catch (e) {
-      openUrl(WEB_LOGIN);
-    }
-  }
-
   /* SENSIAUTO1 · Auto runs a range (heat to cool), not one number. Not live → no invented temp. */
   function setLabel(st) {
     if (st.source !== "live") return "";
@@ -371,10 +342,6 @@
     CONNECTED_KEY: CONNECTED_KEY,
     STATE_KEY: STATE_KEY,
     LIVE_URL: LIVE_URL,
-    WEB_LOGIN: WEB_LOGIN,
-    WEB_PRODUCT: WEB_PRODUCT,
-    APP_IOS: APP_IOS,
-    APP_ANDROID: APP_ANDROID,
     DOCS: DOCS,
     MODES: MODES,
     FANS: FANS,
@@ -385,11 +352,6 @@
     clampSet: clampSet,
     modeColor: modeColor,
     chicagoDayKey: chicagoDayKey,
-    connectOpenWeb: connectOpenWeb,
-    connectOpenProduct: connectOpenProduct,
-    connectOpenIos: connectOpenIos,
-    connectOpenAndroid: connectOpenAndroid,
-    connectTryApp: connectTryApp,
     paintChip: paintChip,
     mountChip: mountChip,
     paintHero: paintHero,

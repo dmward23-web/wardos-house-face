@@ -24,14 +24,14 @@ import json, os, sys, threading, functools, re, time
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse, urljoin
 from playwright.sync_api import sync_playwright
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+ROOT = os.path.abspath(os.environ.get("V2J_CRAWL_ROOT") or os.path.join(os.path.dirname(__file__), "..", ".."))  # ADULTCUT1: the positive control serves 4557b0d2
 FIX = os.path.join(ROOT, "scripts", "qa", "fixtures", "private")
 PRE = "/wardos-house-face/"
 w, h = int(sys.argv[1]), int(sys.argv[2])
 FORBID = {38787, 38788, 39517, 40251, 40252, 41787, 41788, 47810, 47811, 47812, 8787, 8788}
 D = chr(36)
 SEEDS = ["kid-hayes.html", "kid-harris.html", "kid-ainsley.html", "mercury-run.html", "sheet-index.html"]
-DAD = {"sheet-dan.html", "sheet-allowance.html"}
+DAD = {"sheet-dan.html", "sheet-allowance.html", "sheet-spotify-setup.html"}  # SPOTCUT: the Spotify setup sheet is Dad-only
 api = {"pair200": 0, "mint403": 0, "private": 0, "other404": 0}
 def feed(name):
     f = os.path.join(FIX, name + ".synthetic.json")
@@ -78,6 +78,10 @@ OBS = r"""(() => { const D = String.fromCharCode(36); const hits = []; window.__
   const ins = Element.prototype.insertAdjacentHTML; Element.prototype.insertAdjacentHTML = function (p, v) { note('insertAdjacentHTML', v, who(this)); return ins.call(this, p, v); };
   const dw = Document.prototype.write; Document.prototype.write = function (...a) { note('document.write', a.join(''), 'document'); return dw.apply(this, a); };
   try { const cd = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie'); Object.defineProperty(Document.prototype, 'cookie', { configurable: true, get: cd.get, set: function (v) { if (String(v).indexOf(D) >= 0) st.push(['cookie', String(v).slice(0, 80)]); return cd.set.call(this, v); } }); } catch (e) {}
+  /* ADULTCUT1 P3 (Alfred) · read sentinels: a '$' that comes back out of storage (getItem) or through JSON.parse */
+  const rd = []; window.__v2jReads = rd;
+  const gi = Storage.prototype.getItem; Storage.prototype.getItem = function (k) { const v = gi.call(this, k); try { if (v != null && (String(k) + String(v)).indexOf(D) >= 0 && rd.length < 40) rd.push(['getItem:' + (this === window.sessionStorage ? 'session' : 'local'), String(k), String(v).slice(0, 80)]); } catch (e) {} return v; };
+  const jp = JSON.parse; JSON.parse = function (t, r) { try { if (typeof t === 'string' && t.indexOf(D) >= 0 && rd.length < 40) rd.push(['JSON.parse', t.slice(0, 80)]); } catch (e) {} return jp.call(JSON, t, r); };
   const si = Storage.prototype.setItem; Storage.prototype.setItem = function (k, v) { if ((String(k) + String(v)).indexOf(D) >= 0 && st.length < 40) st.push([this === window.sessionStorage ? 'session' : 'local', String(k), String(v).slice(0, 80)]); return si.call(this, k, v); };
   try { window.open = function (u) { (window.__v2jOpen = window.__v2jOpen || []).push(String(u)); return null; }; history.back = function () {}; history.go = function () {}; window.close = function () {}; } catch (e) {}
   const scan = (n) => { if (!n || skip(n)) return; if (n.nodeType === 3) note('mo:added-text', n.nodeValue, who(n)); else if (n.nodeType === 1) { for (const a of n.attributes || []) if (!/^(src|href|srcset|style|class|d|viewBox)$/i.test(a.name)) note('mo:added-attr:' + a.name, a.value, who(n)); for (let c = n.firstChild; c; c = c.nextSibling) scan(c); } };
@@ -107,8 +111,50 @@ STATE = r"""() => { const D = String.fromCharCode(36); const dom = [];
   doc(document, ''); const frames = [];
   for (const f of document.querySelectorAll('iframe')) { try { if (f.contentDocument && f.contentDocument.documentElement) { doc(f.contentDocument, 'iframe:'); frames.push(f.getAttribute('src') || ''); } } catch (x) { frames.push('opaque:' + (f.getAttribute('src') || '')); } }
   const store = []; for (const [nm, s] of [['local', localStorage], ['session', sessionStorage]]) for (let i = 0; i < s.length; i++) { const k = s.key(i), v = s.getItem(k) || ''; if ((k + v).indexOf(D) >= 0) store.push([nm, k, v.slice(0, 80)]); }
-  let fh = []; for (const f of document.querySelectorAll('iframe')) { try { fh = fh.concat(f.contentWindow.__v2jHits || []); } catch (x) {} }
-  return { dom, transient: (window.__v2jHits || []).concat(fh).slice(0, 30), storageWrites: (window.__v2jStore || []).slice(0, 20), storage: store, frames, opened: window.__v2jOpen || [], hdr: !!document.querySelector('header'), kwHome: !!document.querySelector('[data-kw-home]') }; }"""
+  let fh = [], fr = []; for (const f of document.querySelectorAll('iframe')) { try { fh = fh.concat(f.contentWindow.__v2jHits || []); fr = fr.concat(f.contentWindow.__v2jReads || []); } catch (x) {} }
+  return { dom, transient: (window.__v2jHits || []).concat(fh).slice(0, 30), reads: (window.__v2jReads || []).concat(fr).slice(0, 20), storageWrites: (window.__v2jStore || []).slice(0, 20), storage: store, frames, opened: window.__v2jOpen || [], hdr: !!document.querySelector('header'), kwHome: !!document.querySelector('[data-kw-home]') }; }"""
+# SPOTCUT (Alfred, ADULTCUT1) · no kid-reachable page may carry a Spotify credential field or a Client ID save path.
+# CRED lists any input/textarea/contenteditable naming a client id / secret / Spotify, the old setup ids, and any save
+# button that names Spotify or a Client ID (main document and same-origin iframes).
+CRED = r"""() => { const out = []; const ID = /client[\s_-]*(id|secret)|redirect[\s_-]*uri|api[\s_-]*key|access[\s_-]*token|refresh[\s_-]*token/i, SP = /spotify/i;
+  const doc = (d, tag) => { for (const e of d.querySelectorAll('input,textarea,[contenteditable=""],[contenteditable=true]')) {
+      if (e.tagName === 'INPUT' && !/^(|text|password|url|email|tel|number)$/i.test(e.getAttribute('type') || '')) continue;
+      const own = [e.id, e.name, e.placeholder, e.getAttribute('aria-label'), e.getAttribute('autocomplete'), [...(e.labels || [])].map(l => l.textContent).join(' ')].join(' ');
+      const li = e.closest('li,label'); const near = li ? li.textContent.slice(0, 200) : '';
+      if (ID.test(own) || SP.test(own) || ID.test(near)) out.push([tag + 'input', (e.id || e.name || e.placeholder || e.tagName).slice(0, 60)]); }
+    for (const id of ['spw-client', 'spw-setup', 'spw-setup-go', 'spw-copy-btn', 'spw-redirect']) if (d.getElementById(id)) out.push([tag + 'id', id]);
+    for (const e of d.querySelectorAll('button,[role=button],input[type=submit]')) { const t = (e.textContent || e.value || '') + ' ' + (e.getAttribute('aria-label') || ''); if (/save/i.test(t) && (SP.test(t) || ID.test(t))) out.push([tag + 'save', t.trim().slice(0, 60)]); } };
+  doc(document, ''); for (const f of document.querySelectorAll('iframe')) { try { if (f.contentDocument) doc(f.contentDocument, 'iframe:'); } catch (x) {} }
+  return out; }"""
+PROBE_ID = "0123456789abcdef0123456789abcdef"
+PROBE = r"""async (cid) => { const S = window.HouseSpotify; if (!S) return { has: false };
+  const of = window.fetch, sent = []; window.fetch = function (u, o) { sent.push([String(u).slice(0, 120), (o && o.method) || 'GET']); return Promise.resolve(new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } })); };
+  let r = null; try { r = typeof S.setup === 'function' ? await S.setup(cid, 'sheet-spotify.html') : { ok: false, error: 'no_setup' }; } catch (e) { r = { threw: String(e).slice(0, 80) }; } finally { window.fetch = of; }
+  const st = []; for (const [nm, s] of [['local', localStorage], ['session', sessionStorage]]) for (let i = 0; i < s.length; i++) { const k = s.key(i), v = s.getItem(k) || ''; if ((k + v).toLowerCase().indexOf(cid) >= 0) st.push([nm, k]); }
+  return { has: true, r, sent, stored: st }; }"""
+# ADULTCUT1 (Atlas 7:56) · every same-origin script / stylesheet a kid page actually loaded (static tags and anything injected
+# later, from the Performance resource list) is read from disk and run through the denylist, so a helper that is never
+# invoked (an exported App Store link, a deep link) is still caught.
+LOADED = r"""() => { const o = new Set(); for (const e of document.querySelectorAll('script[src],link[rel=stylesheet][href]')) o.add(e.src || e.href);
+  try { for (const r of performance.getEntriesByType('resource')) if (/^(script|link|css|other|fetch|xmlhttprequest)$/.test(r.initiatorType)) o.add(r.name); } catch (x) {}
+  return [...o]; }"""
+_scan_cache = {}
+def scan_loaded(pgname, urls):
+    n = 0
+    for u in urls:
+        uu = urlparse(u)
+        if uu.hostname != "127.0.0.1" or uu.port != PORT or not uu.path.startswith(PRE): continue
+        rel = uu.path[len(PRE):]
+        if not re.search(r"\.(js|mjs|css)$", rel): continue
+        fp = os.path.join(ROOT, rel)
+        if not os.path.isfile(fp): continue
+        if rel not in _scan_cache:
+            txt = open(fp, encoding="utf-8", errors="replace").read()
+            _scan_cache[rel] = [m.group(0)[:120] for m in ADULT.finditer(txt)] if ADULT is not None else []
+        n += 1
+        for m in _scan_cache[rel]: out["adult"].append([pgname, "script:" + rel, m])
+    return n
+
 def page_of(url):
     u = urlparse(url)
     if u.hostname != "127.0.0.1" or u.port != PORT or not u.path.startswith(PRE): return None
@@ -118,7 +164,8 @@ def page_of(url):
     return p if p.endswith(".html") else None
 out = {"size": "%dx%d" % (w, h), "port": PORT, "prefix": PRE, "pages": {}, "edges": {}, "dad_edges": [], "outside": [], "aborted_nonlocal": 0,
        "desk": [], "desk_checks": {"links": 0, "opens": 0, "navs": 0, "requests": 0, "markup_pages": 0}}   # DESKCUT1
-DESK = "wardos-desk-face"
+DESK_RE = re.compile(r"wardos-desk-face|desk-face|desk-index", re.I)  # ADULTCUT1 P3: widened with the static grep
+out["spotify_cred"] = []; out["spotify_checks"] = {"pages": 0, "probes": 0}; out["spotify_setup_requests"] = []
 # ADULTCUT1 (Atlas): dev / admin / billing / account surfaces. The denylist regex lives in daypkg1v2j-crawl.test.mjs and
 # arrives as ADULT_DENY_RE; out.adult_re echoes it so the test proves the crawl applied its regex, not a stale copy.
 import os as _os, re as _re
@@ -141,8 +188,9 @@ with sync_playwright() as p:
             req = route.request; u = urlparse(req.url)
             out["desk_checks"]["requests"] += 1
             if req.is_navigation_request(): out["desk_checks"]["navs"] += 1
-            if DESK in req.url.lower(): out["desk"].append([cur["page"], "nav (location set / tap / form)" if req.is_navigation_request() else "request " + req.resource_type, req.url[:120]])
+            if DESK_RE.search(req.url): out["desk"].append([cur["page"], "nav (location set / tap / form)" if req.is_navigation_request() else "request " + req.resource_type, req.url[:120]])
             adult_hit(cur["page"], "nav (location set / tap / form)" if req.is_navigation_request() else "request " + req.resource_type, req.url)
+            if "/api/spotify/setup" in req.url: out["spotify_setup_requests"].append([cur["page"], req.method, req.url[:120]])
             if u.hostname != "127.0.0.1" or u.port != PORT:
                 out["aborted_nonlocal"] += 1
                 if req.is_navigation_request(): out["outside"].append(["nav", req.url[:100]]); return route.abort("aborted")  # a tapped outside link: abort with ERR_ABORTED so no error page commits
@@ -164,7 +212,7 @@ with sync_playwright() as p:
                 targets = set(pg.evaluate(LINKS))
                 for t in targets:
                     out["desk_checks"]["links"] += 1
-                    if DESK in t.lower(): out["desk"].append([pgname, "href", t[:120]])
+                    if DESK_RE.search(t): out["desk"].append([pgname, "href", t[:120]])
                     adult_hit(pgname, "href", t)
                 cap["on"] = True; cap["seen"] = []; cap["frame"] = pg.main_frame
                 rec["click"] = pg.evaluate(CLICK); pg.wait_for_timeout(600)
@@ -172,13 +220,20 @@ with sync_playwright() as p:
                 targets |= set(cap["seen"]); opened = pg.evaluate("() => window.__v2jOpen || []"); targets |= set(opened)
                 for t in opened:
                     out["desk_checks"]["opens"] += 1
-                    if DESK in str(t).lower(): out["desk"].append([pgname, "window.open", str(t)[:120]])
+                    if DESK_RE.search(str(t)): out["desk"].append([pgname, "window.open", str(t)[:120]])
                     adult_hit(pgname, "window.open", t)
                 out["desk_checks"]["markup_pages"] += 1
                 markup = pg.evaluate("() => document.documentElement.outerHTML")
-                if DESK in markup.lower(): out["desk"].append([pgname, "markup", pg.url])
+                if DESK_RE.search(markup): out["desk"].append([pgname, "markup", pg.url])
                 if ADULT is not None:
                     for m in ADULT.finditer(markup): out["adult"].append([pgname, "markup", m.group(0)[:120]])
+                out["desk_checks"]["scripts"] = out["desk_checks"].get("scripts", 0) + scan_loaded(pgname, pg.evaluate(LOADED))
+                out["spotify_checks"]["pages"] += 1
+                for c in pg.evaluate(CRED): out["spotify_cred"].append([pgname] + c)
+                pr = pg.evaluate(PROBE, PROBE_ID)
+                if pr.get("has"):
+                    out["spotify_checks"]["probes"] += 1; rec["spotify_probe"] = pr
+                    if (pr.get("r") or {}).get("error") != "dad_only" or pr.get("stored") or pr.get("sent"): out["spotify_cred"].append([pgname, "save-path", json.dumps(pr)[:160]])
                 pg.wait_for_timeout(300)
                 st = pg.evaluate(STATE); rec.update(st)
                 rec["errors"] = errors[:4]
@@ -205,6 +260,28 @@ with sync_playwright() as p:
                 except Exception: pass
             out["pages"][pgname] = rec
         ctx.close()
+        # ADULTCUT1 P3 (Alfred) · positive controls on Dad pages, in their own context (own storage, nothing counted as kid):
+        # sheet-allowance with a '$' ledger seeded must light the getItem and JSON.parse sentinels (and the DOM / transient
+        # hooks); sheet-spotify-setup must show the credential field CRED looks for. Non-local requests are aborted.
+        cctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=2 if mob else 1, is_mobile=mob, has_touch=mob, reduced_motion="reduce")
+        cctx.add_init_script("try { if (!localStorage.getItem('dad-ledger:v1')) localStorage.setItem('dad-ledger:v1', JSON.stringify({ _w: 1, _qa: 'Lego ' + String.fromCharCode(36) + '45' })); } catch (e) {}")
+        cctx.add_init_script(OBS)
+        cctx.route("**/*", lambda route: route.abort() if (urlparse(route.request.url).hostname != "127.0.0.1" or urlparse(route.request.url).port != PORT) else route.continue_())
+        out["control"] = {}
+        for cname in ("sheet-allowance.html", "sheet-spotify-setup.html"):
+            cp = cctx.new_page(); cp.on("dialog", lambda d: d.dismiss()); crec = {}
+            try:
+                cur["page"] = "control:" + cname
+                cp.goto(base + PRE + cname + "?pfBase=" + base, wait_until="load", timeout=60000); cp.wait_for_timeout(2500)
+                cst = cp.evaluate(STATE)
+                crec = {"reads": cst["reads"], "dom": len(cst["dom"]), "transient": len(cst["transient"]), "cred": cp.evaluate(CRED)}
+            except Exception as e:
+                crec["err"] = str(e)[:200]
+            finally:
+                try: cp.close()
+                except Exception: pass
+            out["control"][cname] = crec
+        cctx.close()
     finally:
         b.close()
 srv.shutdown(); srv.server_close()
