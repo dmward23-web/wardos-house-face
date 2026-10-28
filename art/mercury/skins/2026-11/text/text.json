@@ -1,0 +1,49 @@
+{
+ "font": "Fredoka SemiBold (OFL 1.1), plates are light text with a warm soft glow on transparent, for dark backgrounds",
+ "plates": {
+  "controls": {
+   "text": "Slide to roll. Tap to jump.",
+   "wall1x": [
+    690,
+    136
+   ],
+   "phone1x": [
+    203,
+    110
+   ]
+  },
+  "grow": {
+   "text": "Every full day makes you bigger.",
+   "wall1x": [
+    880,
+    136
+   ],
+   "phone1x": [
+    279,
+    110
+   ]
+  },
+  "jar-full": {
+   "text": "Your jar is full. Run the grove!",
+   "wall1x": [
+    808,
+    136
+   ],
+   "phone1x": [
+    234,
+    110
+   ]
+  },
+  "finale": {
+   "text": "The grove holds everyone.",
+   "wall1x": [
+    734,
+    136
+   ],
+   "phone1x": [
+    253,
+    110
+   ]
+  }
+ }
+}

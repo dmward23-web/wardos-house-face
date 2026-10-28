@@ -79,13 +79,18 @@
     "2026-10": { id: "pumpkin", dir: "art/mercury/skins/2026-10/" },
     "2026-11": { id: "turkey", dir: "art/mercury/skins/2026-11/", from: { civil: "2026-11-01", hour: 6 } }
   };
-  /* layout, per kid folder, at 1x / 2x / 3x (Prism p2 drop: fixes/ori-mercury/p2/<month>/early/ with SUMS; bytes copied
-     as is, and each <name>@<s>x.png lands as <s>x/<name>.png, the art/mercury/platforms/<s>x/ convention, because the
-     repo's art allow-list holds plain [A-Za-z0-9_./-] paths only):
+  /* layout, per kid folder, at 1x / 2x / 3x (Prism p2 drop with SUMS, bytes copied as is; ORI2: photoreal-r2 ships this
+     exact <s>x/<name>.png layout, the art/mercury/platforms/<s>x/ convention; the repo's art allow-list holds plain
+     [A-Za-z0-9_./-] paths only, so an older <name>@<s>x.png drop is filed as <s>x/<name>.png):
        <s>x/<state>.png for every state (roll has two frames, roll-1 and roll-2, right-facing: mirrored in code)
        <s>x/eyes-<open|half|closed|happy>.png
        anchors.json (1x px): { "bodyR": px, "states": { "<state>": { "contact": [x, y], "eyes": [x, y] } } }; extra keys ignored
-       <s>x/finale.png (optional; missing = default finale) */
+       <s>x/finale.png (optional; missing = default finale)
+       <s>x/finale-portrait.png (ORI2, optional; used when the view is taller than wide; missing = finale.png)
+     ORI2 · not wired (carried for a later hook): <month>/text/ caption plates + text.json and fonts/Fredoka-*.woff2; the
+     run's captions stay live DOM text. A Prism extras/ layer (shine, rim, contact shadow, grow FX, pebbles, splash, power
+     marks, idle breathe) is NOT read either: nothing here requests extras/, so an absent or partial extras/ can never
+     block the base set (TODO(SKINX): load it optional, like finale, and never count it toward ready). */
   var SKIN_STATES = ["idle", "squash", "stretch", "fall", "roll-1", "roll-2", "happy", "sleep", "peek", "full"];
   var SKIN_EYES = ["open", "half", "closed", "happy"];
   var SKIN_EXT = ".png";
@@ -122,11 +127,11 @@
     }
     return skinMonthFor(ctNow());
   }
-  var skin = { month: null, id: "blob", def: null, sprites: {}, eyes: {}, anchors: null, finale: null, ready: false, scale: 1, kid: kid };
+  var skin = { month: null, id: "blob", def: null, sprites: {}, eyes: {}, anchors: null, finale: null, finaleP: null, ready: false, scale: 1, kid: kid };
   function skinScale() { return Math.max(1, Math.min(3, Math.round((typeof view === "object" && view.dpr) || window.devicePixelRatio || 1))); }
   function loadSkin(month) {
     var def = SKINS[month] || null;
-    var s = { month: month, id: def ? def.id : "blob", def: def, sprites: {}, eyes: {}, anchors: null, finale: null, ready: false, scale: skinScale(), kid: kid };
+    var s = { month: month, id: def ? def.id : "blob", def: def, sprites: {}, eyes: {}, anchors: null, finale: null, finaleP: null, ready: false, scale: skinScale(), kid: kid };
     skin = s;
     if (!def || !def.dir) return;
     var base = def.dir + kid + "/", sx = s.scale + "x/", need = SKIN_STATES.length + SKIN_EYES.length + 1, got = 0, dead = false;
@@ -145,6 +150,7 @@
       }).catch(function () { dead = true; });
     } catch (e) { dead = true; }
     var fin = new Image(); fin.onload = function () { if (fin.width) s.finale = fin; }; fin.src = base + sx + "finale" + SKIN_EXT; /* optional */
+    var finP = new Image(); finP.onload = function () { if (finP.width) s.finaleP = finP; }; finP.src = base + sx + "finale-portrait" + SKIN_EXT; /* ORI2 · optional */
   }
   function skinSync() { var m = pickSkinMonth(); if (m !== skin.month) { var old = skin; loadSkin(m); skinTransition(old, skin); } }
   /* room left (built later, no-ops today): a per-skin month-boundary transition scene, and an accessory layer at the
@@ -1191,8 +1197,9 @@
   /* SKIN1 · the skin's finale scene over the grove once a full-jar run reaches home; no scene = the default finale
      (gold burst + ring), which plays either way */
   var finaleAt = 0;
+  function finaleFor(W, H) { return (H > W && skin.finaleP) || skin.finale || null; } /* ORI2 · portrait scene on a tall view */
   function paintFinaleScene(g, W, H) {
-    var im = won && finale && skin.ready && skin.finale; if (!im) return;
+    var im = won && finale && skin.ready && finaleFor(W, H); if (!im) return;
     if (!finaleAt) finaleAt = performance.now();
     var a = Math.min(1, (performance.now() - finaleAt) / 900), sc = Math.max(W / im.width, H / im.height);
     g.save(); g.globalAlpha = a; g.drawImage(im, (W - im.width * sc) / 2, (H - im.height * sc) / 2, im.width * sc, im.height * sc); g.restore();
@@ -1502,7 +1509,7 @@
     debug: function () { return { A: [A.x, A.y, A.r], B: [B.x, B.y], cam: cam, drops: drops.length, view: view, pw: allBlobs().map(function (b) { return [b.kid, b.pw]; }), air2: allBlobs().map(function (b) { return !!b.air2; }), gathers: gatherLog.slice(), won: won, xs: allBlobs().map(function (b) { return Math.round(b.x); }), finale: finale, blobs: blobs.length, playing: playing, reveal: reveal.count }; },
     artSlots: function () { return Object.keys(ART_SLOTS); }, /* ORI1 · Phase 2 art hook names */
     /* SKIN1 · read-only: which month's skin, and whether its art is worn (hero "art") or the blob fallback is showing */
-    skin: function () { return { month: skin.month, id: skin.id, hero: heroArt() ? "art" : "blob", finale: skin.ready && skin.finale ? "art" : "default", scale: skin.scale, kid: skin.kid, dir: skin.def ? skin.def.dir + kid + "/" : null, months: Object.keys(SKINS), state: heroArt() ? heroState(A, (performance.now() - t0) / 1000) : null }; },
+    skin: function () { return { month: skin.month, id: skin.id, hero: heroArt() ? "art" : "blob", finale: skin.ready && skin.finale ? "art" : "default", finalePortrait: skin.ready && skin.finaleP ? "art" : "none", finaleFor: function (w, h) { var im = skin.ready && finaleFor(w, h); return im ? im.src : null; }, scale: skin.scale, kid: skin.kid, dir: skin.def ? skin.def.dir + kid + "/" : null, months: Object.keys(SKINS), state: heroArt() ? heroState(A, (performance.now() - t0) / 1000) : null }; },
     exportFrame: exportFrame,
     platesReady: function () { return runPlatesReady && !!runPlates.sky; }
   };
