@@ -225,12 +225,15 @@ test("missing art fails closed to the blob: the pumpkin (no art in the tree yet)
 
 test("skin loader: the Prism p2 layout (fixture PNGs) is worn; per-kid variant; finale optional", async () => {
   const hy = await skinAt("2026-11-02T13:00:00Z", { skinBook: FIXBOOK }); hy.advance(300);
-  assert.deepEqual([hy.skin().hero, hy.skin().finale, hy.skin().dir], ["art", "art", FIXDIR + "hayes/"]);
+  assert.deepEqual([hy.skin().hero, hy.skin().finale, hy.skin().dir], ["art", "lazy", FIXDIR + "hayes/"], "ORI2: finale not preloaded");
+  hy.skin().finaleFor(640, 360); hy.advance(40); await hy.flush();
+  assert.deepEqual([hy.skin().finale, hy.skin().finaleFor(640, 360)], ["art", FIXDIR + "hayes/1x/finale.png"], "finale fetched when it shows");
   assert.ok(hy.log.drawn.some((u) => u.startsWith(FIXDIR + "hayes/") && /\/1x\/[a-z0-9-]+\.png$/.test(u)), "hayes sprite drawn");
   assert.ok(hy.log.drawn.some((u) => /\/1x\/eyes-(open|half|closed|happy)\.png$/.test(u)), "eyes layer drawn");
   assert.ok(hy.log.images.every((u) => !/\/(harris|ainsley)\//.test(u)), "only the host kid's variant loads");
   const hr = await skinAt("2026-11-02T13:00:00Z", { kid: "harris", skinBook: FIXBOOK }); hr.advance(300);
-  assert.deepEqual([hr.skin().hero, hr.skin().finale], ["art", "default"], "harris: no finale scene = default finale");
+  for (let i = 0; i < 3; i++) { hr.skin().finaleFor(640, 360); hr.advance(40); await hr.flush(); }
+  assert.deepEqual([hr.skin().hero, hr.skin().finale, hr.skin().finaleFor(640, 360)], ["art", "default", null], "harris: no finale scene = default finale, turkey kept");
   assert.ok(hr.log.drawn.some((u) => u.startsWith(FIXDIR + "harris/")));
   const ai = await skinAt("2026-11-02T13:00:00Z", { kid: "ainsley", skinBook: FIXBOOK }); ai.advance(300);
   assert.equal(ai.skin().hero, "blob", "ainsley's fixture set is missing sleep: the blob, never half a skin");

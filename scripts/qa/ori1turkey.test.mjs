@@ -3,7 +3,8 @@
    art/mercury/skins/2026-11/<kid>/<s>x/<name>.png (r2 ships that layout, no at-sign names): every file the loader asks for
    is present at 1x/2x/3x, every anchor parses (Ainsley's redrawn roll-2 anchors pinned), the real skin is worn per kid,
    paintHero scales the sprite by bodyR (body radius in 1x px) so the art body matches the blob radius at every scale,
-   the portrait finale is picked on a tall view, and the carried-but-unwired text plates + Fredoka font and the future
+   the finale scenes are lazy (never preloaded, one fetched per orientation when the finale shows, with fallback to the other
+   orientation and then the default finale, never part of ready), and the carried-but-unwired text plates + Fredoka font and the future
    extras/ layer never gate the base set. The fixture-based SKIN1 tests stay in ori1.test.mjs. */
 import fs from "node:fs";
 import os from "node:os";
@@ -64,18 +65,33 @@ for (const kid of KIDS) {
   });
 
   for (const dpr of [1, 2, 3]) {
-    test(`real turkey r2 ${kid} @${dpr}x: worn on Nov 2 with both finales; paintHero scale = blob r / (bodyR x ${dpr})`, async () => {
+    test(`real turkey r2 ${kid} @${dpr}x: worn on Nov 2, no finale preloaded, finale fetched per orientation; paintHero scale = blob r / (bodyR x ${dpr})`, async () => {
       const h = boot({ kid, at: NOV2, dpr });
       const g = h.els.run.getContext("2d"), ev = [];
       g.scale = (x, y) => ev.push({ x, y, at: h.log.drawn.length });
       await h.flush(); h.ready().advance(300); await h.flush(); h.advance(400);
       const sk = h.skin();
-      assert.deepEqual([sk.id, sk.month, sk.hero, sk.finale, sk.finalePortrait, sk.dir, sk.scale], ["turkey", "2026-11", "art", "art", "art", DIR + kid + "/", dpr]);
+      assert.deepEqual([sk.id, sk.month, sk.hero, sk.finale, sk.finalePortrait, sk.dir, sk.scale], ["turkey", "2026-11", "art", "lazy", "lazy", DIR + kid + "/", dpr]);
       assert.ok(h.log.images.every((u) => !/^art\/mercury\/skins\//.test(u) || u.startsWith(DIR + kid + "/")), "only the host kid's variant loads");
-      assert.ok(h.log.images.includes(`${DIR}${kid}/${dpr}x/finale.png`) && h.log.images.includes(`${DIR}${kid}/${dpr}x/finale-portrait.png`));
-      assert.equal(sk.finaleFor(390, 844), `${DIR}${kid}/${dpr}x/finale-portrait.png`, "tall phone view: portrait finale");
-      assert.equal(sk.finaleFor(1280, 720), `${DIR}${kid}/${dpr}x/finale.png`, "wall / landscape: landscape finale");
-      assert.equal(sk.finaleFor(800, 800), `${DIR}${kid}/${dpr}x/finale.png`, "square: landscape finale");
+      assert.equal(h.log.images.filter((u) => /finale/.test(u)).length, 0, "the base preload requests neither finale.png nor finale-portrait.png");
+      assert.equal(h.log.images.filter((u) => u.startsWith(DIR)).length, 14, "first load = 10 states + 4 eyes only");
+      const drawnBefore = h.log.drawn.length;
+      const P = `${DIR}${kid}/${dpr}x/finale-portrait.png`, L = `${DIR}${kid}/${dpr}x/finale.png`;
+      const fins = () => h.log.images.filter((u) => /finale/.test(u));
+      assert.equal(sk.finaleFor(390, 844), null, "tall view: portrait scene requested, default finale until it arrives");
+      assert.deepEqual(fins(), [P], "tall view requests only finale-portrait.png");
+      h.advance(40); await h.flush();
+      assert.equal(h.skin().finaleFor(390, 844), P, "tall phone view: portrait finale");
+      assert.deepEqual(fins(), [P], "no landscape fetch while portrait works");
+      assert.deepEqual([h.skin().finale, h.skin().finalePortrait], ["lazy", "art"]);
+      assert.equal(h.skin().finaleFor(1280, 720), null, "rotate to wide: landscape scene requested");
+      assert.deepEqual(fins(), [P, L]);
+      h.advance(40); await h.flush();
+      assert.equal(h.skin().finaleFor(1280, 720), L, "wall / landscape: landscape finale");
+      assert.equal(h.skin().finaleFor(800, 800), L, "square: landscape finale");
+      assert.equal(h.skin().finaleFor(390, 844), P, "back to tall: portrait, no refetch");
+      assert.deepEqual(fins(), [P, L], "each scene fetched once");
+      assert.ok(drawnBefore > 0);
       const i = h.log.drawn.findIndex((u) => u.startsWith(DIR + kid + "/") && !/eyes-|finale/.test(u));
       assert.ok(i >= 0, "a real turkey sprite was painted");
       assert.ok(h.log.drawn[i].startsWith(`${DIR}${kid}/${dpr}x/`), h.log.drawn[i]);
@@ -89,6 +105,51 @@ for (const kid of KIDS) {
     });
   }
 }
+
+function finBook(tag, drop) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ori2-fin-")), d = path.join(root, `art/mercury/skins/qa-${tag}/hayes`);
+  fs.mkdirSync(path.join(d, "1x"), { recursive: true });
+  fs.copyFileSync(path.join(ROOT, DIR, "hayes", "anchors.json"), path.join(d, "anchors.json"));
+  for (const f of fs.readdirSync(path.join(ROOT, DIR, "hayes", "1x"))) if (!drop.includes(f)) fs.copyFileSync(path.join(ROOT, DIR, "hayes", "1x", f), path.join(d, "1x", f));
+  return { root, dir: `art/mercury/skins/qa-${tag}/`, book: { "2026-11": { id: "turkey", dir: `art/mercury/skins/qa-${tag}/`, from: { civil: "2026-11-01", hour: 6 } } } };
+}
+async function finaleAfterLoad(h, w, hh) { for (let i = 0; i < 3; i++) { h.skin().finaleFor(w, hh); h.advance(40); await h.flush(); } return h.skin().finaleFor(w, hh); }
+
+test("lazy finale fallback: wanted scene missing = the other orientation's scene, both missing = default finale; turkey stays worn", async () => {
+  const cases = [
+    ["noport", ["finale-portrait.png"], [390, 844], "finale.png", ["finale-portrait.png", "finale.png"]],
+    ["noland", ["finale.png"], [1280, 720], "finale-portrait.png", ["finale.png", "finale-portrait.png"]],
+    ["nofin", ["finale.png", "finale-portrait.png"], [390, 844], null, ["finale-portrait.png", "finale.png"]],
+    ["nofin2", ["finale.png", "finale-portrait.png"], [1280, 720], null, ["finale.png", "finale-portrait.png"]]
+  ];
+  for (const [tag, drop, [w, hh], want, order] of cases) {
+    const b = finBook(tag, drop);
+    try {
+      const h = await worn("hayes", 1, { skinRoot: b.root, skinBook: b.book });
+      assert.equal(h.skin().hero, "art", `${tag}: a missing finale never knocks the turkey back to the blob`);
+      assert.equal(h.log.images.filter((u) => /finale/.test(u)).length, 0, `${tag}: nothing finale preloaded`);
+      const got = await finaleAfterLoad(h, w, hh);
+      assert.equal(got, want ? b.dir + "hayes/1x/" + want : null, `${tag} at ${w}x${hh}`);
+      assert.deepEqual(h.log.images.filter((u) => /finale/.test(u)).map((u) => u.split("/").pop()), order, `${tag}: wanted orientation first, then the other, each once`);
+      assert.equal(h.skin().hero, "art");
+      if (!want) assert.deepEqual([h.skin().finale, h.skin().finalePortrait], ["default", "none"], `${tag}: default finale`);
+    } finally { fs.rmSync(b.root, { recursive: true, force: true }); }
+  }
+});
+
+test("lazy finale: only the finale paint asks for a scene (won + full jar + ready); ordinary play never fetches one", async () => {
+  const src = fs.readFileSync(path.join(ROOT, "mercury-run.js"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  assert.match(src, /var im = won && finale && skin\.ready && finaleFor\(W, H\); if \(!im\) return;/, "paintFinaleScene gates the request on the finale showing");
+  assert.equal((src.match(/finaleFor\(/g) || []).length, 3, "finaleFor: defined once, called by paintFinaleScene and the debug probe only");
+  assert.equal((src.match(/finLoad\(/g) || []).length, 3, "finLoad: defined once, called only from finaleFor (wanted, then the other orientation)");
+  assert.doesNotMatch(src, /"finale" \+ SKIN_EXT|"finale-portrait" \+ SKIN_EXT/, "no eager finale URL in loadSkin");
+  for (const [w, hh] of [[390, 844], [1280, 720]]) {
+    const h = await worn("harris", 2, { w, h: hh });
+    h.pointer("pointerdown", 200, 200).advance(200).pointer("pointermove", 300, 200).advance(2000).pointer("pointerup", 300, 200).advance(3000);
+    assert.equal(h.debug().won, false);
+    assert.equal(h.log.images.filter((u) => /finale/.test(u)).length, 0, `${w}x${hh}: 5 s of play without a finale = no finale fetch`);
+  }
+});
 
 test("real turkey r2 ainsley: roll-2 is the redrawn frame; its anchors moved (eyes, accessory, feather), contact and bodyR kept", () => {
   const j = anchors("ainsley"), r1 = j.states["roll-1"], r2 = j.states["roll-2"];
@@ -114,7 +175,7 @@ test("extras layer (Prism follow-on, not wired): absent, partial or broken extra
     for (const kid of KIDS) {
       for (const skinRoot of [undefined, tmp]) {
         const h = await worn(kid, 1, skinRoot ? { skinRoot } : {});
-        assert.deepEqual([h.skin().hero, h.skin().finale], ["art", "art"], `${kid}: base set worn (${skinRoot ? "broken extras/ present" : "no extras/"})`);
+        assert.deepEqual([h.skin().hero, h.skin().finale], ["art", "lazy"], `${kid}: base set worn (${skinRoot ? "broken extras/ present" : "no extras/"})`);
         assert.ok(![...h.log.images, ...h.log.fetches].some((u) => /extras\//.test(String(u))), "nothing requests extras/");
       }
     }
