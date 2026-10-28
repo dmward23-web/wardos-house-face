@@ -89,7 +89,7 @@
     body.classList.toggle("spw-playing", ph === "playing");
     body.classList.toggle("spw-paused", ph !== "playing");
     var pill = $("spw-pill");
-    pill.textContent = { loading: "…", playing: "LIVE", paused: "PAUSED", idle: "READY", need_app: "SETUP", need_auth: "CONNECT", no_key: "PAIR", bad_key: "PAIR", offline: "OFFLINE", error: "CHECK" }[ph] || "…";
+    pill.textContent = { loading: "…", playing: "LIVE", paused: "PAUSED", idle: "READY", need_app: "SETUP", need_auth: "SETUP", no_key: "PAIR", bad_key: "PAIR", offline: "OFFLINE", error: "CHECK" }[ph] || "…";
     pill.classList.toggle("live", ph === "playing");
     glowT = ph === "playing" ? 1.06 : live ? 0.86 : 0.8;
 
@@ -100,13 +100,12 @@
     liveBox.hidden = !live;
     $("spw-hub").hidden = !live; $("spw-rooms").hidden = !live;
     var gb = $("spw-gate-btn"), msg = "", sub = "", btn = "";
-    if (ph === "need_app") { msg = "Music isn't set up yet. Ask Dad."; }
-    else if (ph === "need_auth") { msg = "Connect your Spotify once. Then the wall, your phone and every House screen can play, skip and switch speakers."; btn = "Connect Spotify"; sub = "Opens Spotify sign-in, then comes right back here."; }
+    if (ph === "need_app" || ph === "need_auth") { msg = "Music isn't set up yet. Ask Dad."; } /* ADULTCUT2: the Spotify sign-in is Dad-only (sheet-spotify-setup.html) */
     else if (ph === "no_key" || ph === "bad_key") { msg = "This screen needs pairing."; btn = "How to pair"; sub = "On Dad's page, tap Pair a screen and scan the code with this screen."; }
     else if (ph === "offline") { msg = "The house box isn't answering right now."; btn = "Try again"; sub = "It comes back on its own. No need to do anything."; }
     else if (ph === "error") { msg = S.msg || "Spotify had a hiccup."; btn = "Try again"; sub = S.err === "not_allowlisted" ? "Music needs Dad to finish setup. Ask Dad." : S.err === "premium_required" ? "Playback control needs Spotify Premium on this account." : ""; }
     setText("spw-gate-msg", msg); setText("spw-gate-sub", sub); gb.textContent = btn; gb.hidden = !btn;
-    gb.classList.toggle("warm", ph !== "need_auth");
+    gb.classList.add("warm");
 
     /* titles */
     if (live && it) {
@@ -229,7 +228,7 @@
   /* gate button */
   $("spw-gate-btn").addEventListener("click", function () {
     var ph = SP.get().phase;
-    if (ph === "need_auth") return SP.connect("sheet-spotify.html");
+    /* ADULTCUT2: no need_auth branch; this kid-reachable page never starts the Spotify sign-in */
     if (ph === "no_key" || ph === "bad_key") {
       if (window.WardHubKeyEntry) return WardHubKeyEntry.open();
       var s = document.createElement("script"); s.src = "hub-key-entry.js?v=FOLLOWUP6"; s.onload = function () { if (window.WardHubKeyEntry) WardHubKeyEntry.open(); }; document.body.appendChild(s); return;

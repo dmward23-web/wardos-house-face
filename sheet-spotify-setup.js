@@ -23,4 +23,15 @@
       err.textContent = (j && j.message) || (j && j.error === "offline" ? "House box didn't answer. Try again in a minute." : j && j.error === "dad_only" ? "Setup only runs on Dad's setup sheet." : "Couldn't save that. Try again.");
     });
   });
+  /* ADULTCUT2 (Atlas 9:07) · Connect Spotify is Dad-only: HouseSpotify.connect() answers only on this sheet. The box accepts
+     returnTo sheet-spotify.html or sheet-index.html only (scripts/spotify-control.mjs RETURN_OK), so the sign-in lands on the player. */
+  $("sss-connect").addEventListener("click", function () {
+    var err = $("sss-connect-err");
+    if (!SP || !SP.connect) { err.textContent = "The Spotify helper didn't load. Reload this page."; return; }
+    err.textContent = "Asking the house box for the Spotify sign-in...";
+    SP.connect("sheet-spotify.html").then(function (j) {
+      if (j && j.url) { err.textContent = "Opening Spotify sign-in..."; return; }
+      err.textContent = (j && j.message) || (j && j.error === "offline" ? "House box didn't answer. Try again in a minute." : j && j.error === "no_key" ? "This screen needs pairing first." : "Couldn't start the Spotify sign-in. Try again.");
+    });
+  });
 })();

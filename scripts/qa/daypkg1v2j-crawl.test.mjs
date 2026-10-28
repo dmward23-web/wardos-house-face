@@ -30,13 +30,29 @@ const ADULT_DENY_RE = new RegExp([
   /* ADULTCUT1 (Atlas ruling 7:56): app stores and app deep links are adult surfaces on kid pages too */
   String.raw`(?:apps|itunes)\.apple\.com|play\.google\.com|itms-apps?:|market://|sensi://`,
 ].join("|"), "i");
+/* ADULTCUT2 (Atlas 9:07) · outbound sign-in / OAuth / authorize targets. Same JS / Python common subset; handed to the crawl as
+   OUTBOUND_AUTH_RE and applied to every TAPPABLE target on kid-reachable pages (a/area href, data-href, form action,
+   formaction, window.open, every navigation a tap or a location set starts), and statically to the 27 pages and their js/css.
+   Hosts: accounts.* / account.* / login.* / signin.* / auth.* / oauth.* / sso.* / id.* / identity.* / idp.*;
+   absolute-URL paths ending /authorize, /oauth, /oauth2, /login, /log-in, /signin, /sign-in, /sso, /auth;
+   OAuth query markers response_type= client_id= redirect_uri= code_challenge=; well-known sign-in hosts. */
+const OUTBOUND_AUTH_RE = new RegExp([
+  String.raw`(?:https?:)?//(?:[a-z0-9-]+\.)*(?:accounts?|logins?|signin|sign-in|auth|oauth2?|sso|id|identity|idp)\.[a-z0-9-]+\.[a-z]{2,}`,
+  String.raw`//[^\s"'<>]*?/(?:o?authori[sz]e|oauth2?|login|log-in|signin|sign-in|sso|auth)(?:[/?#"'\s<>]|\.html?|$)`,
+  String.raw`[?&](?:response_type|client_id|redirect_uri|code_challenge)=`,
+  String.raw`(?:appleid\.apple\.com|login\.microsoftonline\.com|github\.com/login|facebook\.com/(?:v[0-9.]+/)?dialog/oauth)`,
+].join("|"), "i");
+/* ADULTCUT2 (Atlas) · the off-house allowlist: ONLY the house origin and prefix the crawl serves (http://127.0.0.1:PORT/wardos-house-face/,
+   the loopback stand-in for https://dmward23-web.github.io/wardos-house-face/). Non-house targets that must stay: none. */
+const OFFSITE_ALLOW = [];
 
 for (const [w, h] of [[440, 956], [1280, 800]]) {
   test("DAYPKG1 v2j browser crawl @" + w + ": all kid-reachable pages, 0 '" + D + "' in DOM, transient writes and storage", { ...SKIP, timeout: 900000 }, () => {
-    const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), String(w), String(h)], { encoding: "utf8", timeout: 880000, env: { ...process.env, ADULT_DENY_RE: ADULT_DENY_RE.source } });
+    const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), String(w), String(h)], { encoding: "utf8", timeout: 880000, env: { ...process.env, ADULT_DENY_RE: ADULT_DENY_RE.source, OUTBOUND_AUTH_RE: OUTBOUND_AUTH_RE.source, OFFSITE_ALLOW: JSON.stringify(OFFSITE_ALLOW) } });
     if (process.env.V2J_DRIVER_LOG) { try { fs.appendFileSync(process.env.V2J_DRIVER_LOG, JSON.stringify({ w, h, pid: r.pid, status: r.status, signal: r.signal }) + "\n"); } catch (e) {} }
     assert.equal(r.status, 0, "crawl exit " + r.status + " " + String(r.stderr).slice(-600));
     const o = JSON.parse(r.stdout.trim().split("\n").pop());
+    if (process.env.V2J_CRAWL_OUT_DIR) { try { fs.writeFileSync(path.join(process.env.V2J_CRAWL_OUT_DIR, "crawl-" + w + ".json"), JSON.stringify(o)); } catch (e) {} } /* ADULTCUT2: crawl tables for the gate request */
     const names = Object.keys(o.pages);
     assert.ok(o.count >= 27, "closure " + o.count + ": " + names.join(","));
     assert.ok(names.includes("sheet-groceries.html"), "groceries reached");
@@ -72,7 +88,29 @@ for (const [w, h] of [[440, 956], [1280, 800]]) {
     assert.ok(ca.reads.some((x) => x[0] === "JSON.parse" && x[1].includes(D)), "JSON.parse sentinel sees '" + D + "' on sheet-allowance " + JSON.stringify(ca.reads));
     assert.ok(ca.dom + ca.transient + (ca.dom_injected || 0) > 0 && ca.dom_injected > 0, "DOM / transient hooks see an appended '" + D + "' on sheet-allowance " + JSON.stringify(ca));
     assert.ok(cs && !cs.err && cs.cred.some((x) => x[1] === "spw-client"), "CRED sees the Client ID field on the Dad setup sheet " + JSON.stringify(cs));
+    adultcut2Asserts(o, "tip");
   });
+}
+
+/* ADULTCUT2 (Atlas 9:07) · the two new crawl asserts, shared by the crawl tests above and the c5295884 RED control below:
+   0 outbound sign-in / OAuth links and 0 tappable targets off the house origin, in the main crawl AND in the AUTHPROBE pass
+   (Spotify mocked at need_auth so its sign-in would show), with the Dad-only control proving the probe sees an authorize nav. */
+function adultcut2Asserts(o, tag) {
+  assert.equal(o.auth_re, OUTBOUND_AUTH_RE.source, tag + ": crawl applied the test's outbound-auth regex");
+  assert.ok(o.tap_checks.targets > 100, tag + ": tappable targets checked " + JSON.stringify(o.tap_checks));
+  assert.deepEqual(o.outbound_auth, [], tag + ": outbound sign-in / OAuth targets on kid pages " + JSON.stringify(o.outbound_auth));
+  assert.deepEqual(o.offsite, [], tag + ": tappable targets off the house origin " + JSON.stringify(o.offsite));
+  const ap = o.authprobe;
+  assert.ok(ap && Object.keys(ap.pages).length >= 27, tag + ": authprobe ran on the closure " + (ap && Object.keys(ap.pages).length));
+  for (const [n, p] of Object.entries(ap.pages)) assert.ok(!p.err, tag + ": authprobe " + n + " " + p.err);
+  assert.ok(ap.need_auth_pages.includes("sheet-spotify.html") && ap.need_auth_pages.includes("sheet-index.html"), tag + ": Spotify reached need_auth on the player and the hub " + JSON.stringify(ap.need_auth_pages));
+  assert.ok(ap.tap_checks.targets > 100, tag + ": authprobe tappables checked " + JSON.stringify(ap.tap_checks));
+  assert.deepEqual(ap.outbound_auth, [], tag + ": authprobe outbound sign-in / OAuth targets on kid pages " + JSON.stringify(ap.outbound_auth));
+  assert.deepEqual(ap.offsite, [], tag + ": authprobe tappable targets off the house origin " + JSON.stringify(ap.offsite));
+  assert.equal(ap.hub_mock.auth_start, 1, tag + ": only the Dad control asked the hub for a sign-in URL " + JSON.stringify(ap.hub_mock));
+  const dc = ap.dad_control;
+  assert.ok(dc && !dc.page.err && dc.outbound_auth.some((x) => /accounts\.spotify\.com\/authorize/.test(x[2]) && /Connect Spotify/.test(x[1])),
+    tag + ": Dad control, Connect Spotify on sheet-spotify-setup reaches accounts.spotify.com/authorize " + JSON.stringify(dc));
 }
 
 test("DAYPKG1 v2j static: groceries footer chip reads GROCERIES (no '" + D + "'), its links carry ?v=DAYPKG1V2J", () => {
@@ -182,7 +220,7 @@ test("SPOTCUT static: no Spotify credential field or save path on any kid-reacha
   assert.ok(/href="sheet-spotify-setup\.html"/.test(fs.readFileSync(path.join(ROOT, "sheet-dan.html"), "utf8")), "Dad reaches it from sheet-dan");
   const js = fs.readFileSync(path.join(ROOT, "sheet-spotify.js"), "utf8");
   const line = "Music isn't set up yet. Ask Dad.";
-  assert.ok(js.includes('if (ph === "need_app") { msg = "' + line + '"; }'), "need_app shows the plain line, no button");
+  assert.ok(js.includes('if (ph === "need_app" || ph === "need_auth") { msg = "' + line + '"; }'), "need_app and need_auth show the plain line, no button (ADULTCUT2)");
   for (const m of js.matchAll(/(?:msg|sub|btn) = "([^"]*)"/g)) assert.ok(!/[\u2014\u2192]/.test(m[1]) && !m[1].includes(D), "kid copy: " + m[1]);
   const hs = fs.readFileSync(path.join(ROOT, "house-spotify.js"), "utf8");
   for (const m of hs.matchAll(/(?:title|artist|dev|connectTxt) = "([^"]*)"/g)) if (/set up|Ask Dad/.test(m[1])) assert.ok(!/[\u2014\u2192]/.test(m[1]) && !m[1].includes(D), "tile copy: " + m[1]);
@@ -203,5 +241,72 @@ test("SPOTCUT static: no Spotify credential field or save path on any kid-reacha
     for (const r of [kid, kidAttr, idx]) { assert.equal(r.j.error, "dad_only"); assert.deepEqual(r.calls, []); assert.ok(!JSON.stringify(r.store).includes("0123456789abcdef")); }
     assert.deepEqual(dad.calls.map((c) => c[1] + " " + c[0]), ["POST http://hub.invalid/api/spotify/setup"], "control: the Dad sheet does POST");
     assert.ok(!JSON.stringify(dad.store).includes("0123456789abcdef"), "the Client ID is never stored in the browser");
+  });
+});
+
+/* ADULTCUT2 RED control (Atlas 9:07): the SAME crawl and the SAME two asserts, pointed at a c5295884 tree (V2J_AC1_ROOT, made with
+   git archive), must go RED, from the kid Connect Spotify button (the sheet-index tile and the sheet-spotify gate). */
+test("ADULTCUT2 RED control @1280: the same crawl on c5295884 fails the outbound sign-in assert from the kid Connect Spotify button",
+  { ...(browser && process.env.V2J_AC1_ROOT ? {} : { skip: "SKIP needs a browser and V2J_AC1_ROOT (a c5295884 tree)" }), timeout: 900000 }, () => {
+  const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), "1280", "800"], { encoding: "utf8", timeout: 880000,
+    env: { ...process.env, ADULT_DENY_RE: ADULT_DENY_RE.source, OUTBOUND_AUTH_RE: OUTBOUND_AUTH_RE.source, OFFSITE_ALLOW: JSON.stringify(OFFSITE_ALLOW), V2J_CRAWL_ROOT: process.env.V2J_AC1_ROOT } });
+  if (process.env.V2J_DRIVER_LOG) { try { fs.appendFileSync(process.env.V2J_DRIVER_LOG, JSON.stringify({ control: "c5295884", w: 1280, h: 800, pid: r.pid, status: r.status, signal: r.signal }) + "\n"); } catch (e) {} }
+  assert.equal(r.status, 0, "control crawl exit " + r.status + " " + String(r.stderr).slice(-600));
+  const o = JSON.parse(r.stdout.trim().split("\n").pop());
+  if (process.env.V2J_CONTROL_OUT) { try { fs.writeFileSync(process.env.V2J_CONTROL_OUT, JSON.stringify({ count: o.count, outbound_auth: o.outbound_auth, offsite: o.offsite, authprobe: o.authprobe })); } catch (e) {} }
+  let red = null; try { adultcut2Asserts(o, "c5295884"); } catch (e) { red = e; }
+  assert.ok(red && /outbound sign-in/.test(red.message), "c5295884 goes RED on the outbound sign-in assert: " + (red ? red.message.slice(0, 300) : "it passed"));
+  const hits = o.authprobe.outbound_auth;
+  assert.ok(hits.some((x) => x[0] === "sheet-spotify.html" && /Connect Spotify/.test(x[1]) && /accounts\.spotify\.com\/authorize/.test(x[2])), "RED from the sheet-spotify Connect Spotify button " + JSON.stringify(hits).slice(0, 600));
+  assert.ok(hits.some((x) => x[0] === "sheet-index.html" && /sp-connect|Connect Spotify/.test(x[1]) && /accounts\.spotify\.com/.test(x[2])), "RED from the sheet-index tile Connect Spotify button " + JSON.stringify(hits).slice(0, 600));
+});
+
+/* ADULTCUT2 (Atlas 9:07) · static: no kid-reachable page or the local js/css it loads names an outbound sign-in / OAuth /
+   authorize URL; none of them carries a "Connect Spotify" control or calls the Spotify sign-in; need_auth reads the plain line on
+   the player and the tile; HouseSpotify.connect() sends nothing and never navigates off the Dad-only sheet; that sheet has it. */
+test("ADULTCUT2 static: no outbound sign-in, OAuth or off-house target on kid pages; Connect Spotify is Dad-only", () => {
+  for (const u of ["https://accounts.spotify.com/authorize?client_id=x&response_type=code", "https://accounts.google.com/o/oauth2/v2/auth", "//login.microsoftonline.com/common/oauth2/v2.0/authorize",
+    "https://auth.example.com/", "https://example.com/oauth/authorize", "https://example.com/login", "https://example.com/sign-in?next=/", "https://github.com/login/oauth/authorize",
+    "https://appleid.apple.com/auth/authorize", "https://sso.example.org/x", "https://id.example.com/", "https://www.facebook.com/v19.0/dialog/oauth", "?client_id=abc", "&redirect_uri=https%3A"])
+    assert.ok(OUTBOUND_AUTH_RE.test(u), "auth regex bites " + u);
+  for (const u of ["https://api.weather.gov/stations/KOJC/observations/latest", "https://open.spotify.com/track/x", "https://dmward23-web.github.io/wardos-house-face/spotify-callback.html",
+    "/api/spotify/auth-start", "https://hub.qa.invalid/api/spotify/auth-start", "http://127.0.0.1:8787/api/pair", "Music isn't set up yet. Ask Dad.", "the login streak", "authorized",
+    "sheet-index.html?kid=hayes", "https://www.google.com/", "data-sp-act=\"connect\""]) assert.ok(!OUTBOUND_AUTH_RE.test(u), "auth regex spares " + u);
+  assert.deepEqual(OFFSITE_ALLOW, [], "the off-house allowlist is the house origin only");
+  const files = kidFiles();
+  assert.ok(files.size > 40, "scanned " + files.size);
+  const hits = [];
+  for (const f of files) fs.readFileSync(path.join(ROOT, f), "utf8").split("\n").forEach((l, i) => {
+    const m = l.match(OUTBOUND_AUTH_RE); if (m) hits.push(f + ":" + (i + 1) + " " + m[0]);
+    if (/connect\s*spotify/i.test(l) && !/^\s*(?:\/\*|\*|\/\/|<!--)/.test(l) && !/\/\*[^*]*connect\s*spotify/i.test(l)) hits.push(f + ":" + (i + 1) + " Connect Spotify");
+    if (/(?:SP|HouseSpotify)\.connect\(|(?:^|[^.\w])connect\(\s*["']|api\/spotify\/auth-start/.test(l) && f !== "house-spotify.js") hits.push(f + ":" + (i + 1) + " sign-in call");
+    if (f === "house-spotify.js" && /(?:^|[^.\w])connect\(\s*["']/.test(l)) hits.push(f + ":" + (i + 1) + " tile sign-in call");
+    for (const t of l.matchAll(/(?:href|action|formaction|data-href)\s*=\s*["']([^"']+)["']/gi)) if (/^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(t[1]) && !/^javascript:/i.test(t[1])) hits.push(f + ":" + (i + 1) + " off-house " + t[1].slice(0, 60));
+    for (const t of l.matchAll(/window\.open\(\s*["']([^"']+)["']/g)) if (/^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(t[1])) hits.push(f + ":" + (i + 1) + " off-house open " + t[1].slice(0, 60));
+  });
+  assert.deepEqual(hits, []);
+  const line = "Music isn't set up yet. Ask Dad.";
+  const hs = fs.readFileSync(path.join(ROOT, "house-spotify.js"), "utf8");
+  assert.ok(hs.includes('} else if (ph === "need_auth") {\n      title = "Spotify"; artist = "' + line + '"; connectTxt = "";'), "need_auth tile shows the plain line, no button");
+  const setupHtml = fs.readFileSync(path.join(ROOT, "sheet-spotify-setup.html"), "utf8"), setupJs = fs.readFileSync(path.join(ROOT, "sheet-spotify-setup.js"), "utf8");
+  assert.ok(/<html[^>]*\bdata-dad-only\b/.test(setupHtml) && /id="sss-connect"[^>]*>Connect Spotify</.test(setupHtml), "the Dad-only setup sheet carries Connect Spotify");
+  assert.ok(setupJs.includes('SP.connect("sheet-spotify.html")'), "the Dad sheet starts the sign-in, returning to the player (box RETURN_OK)");
+  /* behaviour: connect() in a sandbox with a hub, a key and an auth-start that answers an authorize URL */
+  const run = (pathname, dad) => {
+    const calls = []; const store = { "wardos-lights-proxy-token": "qa-key" };
+    const loc = { pathname, href: "https://x.invalid" + pathname, hostname: "x.invalid", search: "", hash: "" };
+    const win = { HouseHub: { lights: () => "http://hub.invalid", okForKey: () => true },
+      localStorage: { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } },
+      location: loc, document: { documentElement: { hasAttribute: (a) => dad && a === "data-dad-only" }, addEventListener() {}, querySelectorAll: () => [], visibilityState: "visible" },
+      addEventListener() {}, setTimeout, clearTimeout, setInterval: () => 0, clearInterval() {}, Promise, URL, JSON, Math, Date, console,
+      fetch: (u, o) => { calls.push([u, o && o.method]); return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ ok: true, url: "https://accounts.spotify.com/authorize?client_id=qa" }) }); } };
+    win.window = win; vm.createContext(win); vm.runInContext(hs, win);
+    return win.HouseSpotify.connect("sheet-spotify.html").then((j) => ({ j, calls, href: loc.href }));
+  };
+  return Promise.all([run("/wardos-house-face/sheet-spotify.html", false), run("/wardos-house-face/sheet-index.html", false), run("/wardos-house-face/sheet-spotify.html", true),
+    run("/wardos-house-face/sheet-spotify-setup.html", false), run("/wardos-house-face/sheet-spotify-setup.html", true)]).then(([kid, idx, kidAttr, setupNoAttr, dad]) => {
+    for (const r of [kid, idx, kidAttr, setupNoAttr]) { assert.equal(r.j.error, "dad_only"); assert.deepEqual(r.calls, []); assert.ok(!/accounts\.spotify/.test(r.href), "no navigation " + r.href); }
+    assert.deepEqual(dad.calls.map((c) => c[1] + " " + c[0]), ["POST http://hub.invalid/api/spotify/auth-start"], "control: the Dad sheet does ask for the sign-in");
+    assert.equal(dad.href, "https://accounts.spotify.com/authorize?client_id=qa", "control: the Dad sheet navigates to the sign-in");
   });
 });

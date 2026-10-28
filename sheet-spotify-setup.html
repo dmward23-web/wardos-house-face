@@ -40,7 +40,16 @@
       <button type="button" class="spw-orb-btn" id="spw-setup-go">Save &amp; connect Spotify</button>
       <div class="spw-setup-err" id="spw-setup-err" role="alert"></div>
     </section>
-<script src="house-spotify.js?v=SPOTCUT1"></script>
-<script src="sheet-spotify-setup.js?v=SPOTCUT1"></script>
+    <!-- ADULTCUT2 (Atlas 9:07) · the Spotify sign-in (Connect Spotify: box auth-start, then accounts.spotify.com/authorize)
+         is Dad-only and lives here. Kid pages show only "Music isn't set up yet. Ask Dad." and HouseSpotify.connect()
+         refuses on any page that is not this one. -->
+    <section class="spw-setup" id="sss-connect-box" aria-label="Spotify sign-in">
+      <h2>Spotify sign-in</h2>
+      <p class="spw-setup-lead">Use this when the Client ID is already saved and the player says music isn't set up. It opens Spotify sign-in, then comes back to the player.</p>
+      <button type="button" class="spw-orb-btn" id="sss-connect">Connect Spotify</button>
+      <div class="spw-setup-err" id="sss-connect-err" role="alert"></div>
+    </section>
+<script src="house-spotify.js?v=ADULTCUT2"></script>
+<script src="sheet-spotify-setup.js?v=ADULTCUT2"></script>
 </body>
 </html>

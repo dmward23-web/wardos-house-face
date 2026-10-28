@@ -47,7 +47,7 @@
     go.hidden = false; if (href) go.href = href; go.textContent = ok ? "Open the player" : "Back to the player";
   }
   if (err || !code || !state) {
-    done(false, err === "access_denied" ? "Spotify sign-in was cancelled" : "Spotify didn't finish the sign-in", "Nothing changed. Tap Connect Spotify to try again.");
+    done(false, err === "access_denied" ? "Spotify sign-in was cancelled" : "Spotify didn't finish the sign-in", "Nothing changed. Try again from Dad's Spotify setup page.");
     return;
   }
   var pages = /\.github\.io$/i.test(location.hostname);
@@ -70,10 +70,10 @@
         done(true, "Spotify connected", (j.user && j.user.name ? j.user.name + " · " : "") + "Every House screen can play and skip now.", back);
         setTimeout(function () { location.replace(back); }, 1400);
       } else {
-        done(false, "Spotify didn't connect", (j && j.message) || "The house box couldn't finish the sign-in. Tap Connect Spotify again.");
+        done(false, "Spotify didn't connect", (j && j.message) || "The house box couldn't finish the sign-in. Try again from Dad's Spotify setup page.");
       }
     });
-  }).catch(function () { done(false, "House box isn't answering", "Try Connect Spotify again in a minute."); });
+  }).catch(function () { done(false, "House box isn't answering", "Try again from Dad's Spotify setup page in a minute."); });
 })();
 </script>
 </body>

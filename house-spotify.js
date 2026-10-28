@@ -159,7 +159,11 @@
       return j;
     });
   }
+  /* ADULTCUT2 (Atlas 9:07): the Spotify sign-in (box auth-start -> accounts.spotify.com/authorize) is Dad-only, like setup.
+     Off the Dad-only sheet-spotify-setup.html, every kid-reachable page included, connect() sends nothing, never navigates
+     and resolves dad_only, so no kid tap can leave the house domain for a sign-in page. */
   function connect(returnTo) {
+    if (!dadSheet()) return Promise.resolve({ ok: false, error: "dad_only" });
     return req("POST", "/api/spotify/auth-start", { returnTo: returnTo || PLAYER }).then(function (j) {
       if (j && j.url) { location.href = j.url; return j; }
       S.flash = (j && j.message) || "Couldn't start the Spotify sign-in."; S.flashAt = Date.now(); emit(); return j;
@@ -167,11 +171,11 @@
   }
   /* SPOTCUT (Alfred, ADULTCUT1): the Client ID save path answers only on the Dad-only setup sheet (html[data-dad-only] on
      sheet-spotify-setup.html). On any other page, every kid-reachable one included, it sends nothing and resolves dad_only. */
-  function setupAllowed() {
+  function dadSheet() {
     try { return document.documentElement.hasAttribute("data-dad-only") && /(^|\/)sheet-spotify-setup\.html$/.test(location.pathname); } catch (e) { return false; }
   }
   function setup(clientId, returnTo) {
-    if (!setupAllowed()) return Promise.resolve({ ok: false, error: "dad_only" });
+    if (!dadSheet()) return Promise.resolve({ ok: false, error: "dad_only" });
     return req("POST", "/api/spotify/setup", { clientId: String(clientId || "").trim(), connect: true, returnTo: returnTo || PLAYER }).then(function (j) {
       if (j && j.url) { location.href = j.url; }
       return j;
@@ -236,7 +240,7 @@
       '<button type="button" class="sp-btn" data-sp-act="next" aria-label="Next track">' + ICONS.next + '</button>' +
     '</div>' +
     '<div class="sp-rooms" role="group" aria-label="Home audio rooms" hidden></div>' +
-    '<button type="button" class="sp-connect" data-sp-act="connect" hidden>Connect Spotify</button>' +
+    '<button type="button" class="sp-connect" data-sp-act="connect" hidden>Retry</button>' +
     '<div class="sp-flash" role="status" aria-live="polite"></div>';
 
   var tiles = [];
@@ -270,9 +274,8 @@
       if (a === "rooms") { openPlayer(el, ev, "#rooms"); return; }
       if (a === "connect") {
         if (S.phase === "no_key" || S.phase === "bad_key") { if (window.WardHubKeyEntry) WardHubKeyEntry.open(); return; }
-        if (S.phase === "need_app") { openPlayer(el, ev, ""); return; } /* SPOTCUT: no setup card on kid pages */
-        if (S.phase === "offline") { schedule(0); return; }
-        connect("sheet-index.html"); return;
+        if (S.phase === "need_app" || S.phase === "need_auth") { openPlayer(el, ev, ""); return; } /* SPOTCUT, ADULTCUT2: no setup or sign-in on kid pages */
+        schedule(0); return; /* ADULTCUT2: a tile never starts the Spotify sign-in (Dad-only, sheet-spotify-setup.html) */
       }
       act(a); return;
     }
@@ -323,7 +326,7 @@
     } else if (ph === "need_app") {
       title = "Spotify"; artist = "Music isn't set up yet. Ask Dad."; connectTxt = ""; /* SPOTCUT */
     } else if (ph === "need_auth") {
-      title = "Connect Spotify"; artist = "One tap, once · then every screen"; connectTxt = "Connect Spotify";
+      title = "Spotify"; artist = "Music isn't set up yet. Ask Dad."; connectTxt = ""; /* ADULTCUT2: sign-in is Dad-only */
     } else if (ph === "no_key" || ph === "bad_key") {
       /* Key-less screens stay quiet: the NEED KEY pill only. No sentence, no Add key button. */
       title = "Spotify"; artist = ""; dev = ""; connectTxt = "";
