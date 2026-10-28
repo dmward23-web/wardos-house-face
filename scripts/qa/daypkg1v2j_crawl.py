@@ -116,7 +116,10 @@ def page_of(url):
     if p.endswith("/"): p += "index.html"
     if not p.endswith(".html") and "." not in p.rsplit("/", 1)[-1]: p += ".html"
     return p if p.endswith(".html") else None
-out = {"size": "%dx%d" % (w, h), "port": PORT, "prefix": PRE, "pages": {}, "edges": {}, "dad_edges": [], "outside": [], "aborted_nonlocal": 0}
+out = {"size": "%dx%d" % (w, h), "port": PORT, "prefix": PRE, "pages": {}, "edges": {}, "dad_edges": [], "outside": [], "aborted_nonlocal": 0,
+       "desk": [], "desk_checks": {"links": 0, "opens": 0, "navs": 0, "requests": 0, "markup_pages": 0}}   # DESKCUT1
+DESK = "wardos-desk-face"
+cur = {"page": None}
 t0 = time.time()
 with sync_playwright() as p:
     b = p.chromium.launch(**launch_kw(p, args=["--disable-gpu"]))
@@ -128,6 +131,9 @@ with sync_playwright() as p:
         cap = {"on": False, "seen": []}
         def gate(route):
             req = route.request; u = urlparse(req.url)
+            out["desk_checks"]["requests"] += 1
+            if req.is_navigation_request(): out["desk_checks"]["navs"] += 1
+            if DESK in req.url.lower(): out["desk"].append([cur["page"], "nav (location set / tap / form)" if req.is_navigation_request() else "request " + req.resource_type, req.url[:120]])
             if u.hostname != "127.0.0.1" or u.port != PORT:
                 out["aborted_nonlocal"] += 1
                 if req.is_navigation_request(): out["outside"].append(["nav", req.url[:100]]); return route.abort("aborted")  # a tapped outside link: abort with ERR_ABORTED so no error page commits
@@ -142,15 +148,23 @@ with sync_playwright() as p:
             pg = ctx.new_page(); errors = []; pg.on("pageerror", lambda e: errors.append(str(e)[:120])); pg.on("dialog", lambda d: d.dismiss())
             rec = {"loaded": False}
             try:
-                cap["on"] = False
+                cap["on"] = False; cur["page"] = pgname
                 pg.goto(base + PRE + pgname + "?pfBase=" + base + qs.get(pgname, ""), wait_until="load", timeout=60000)
                 pg.wait_for_timeout(2500)
                 landed = page_of(pg.url); rec["landed"] = landed; rec["loaded"] = True
                 targets = set(pg.evaluate(LINKS))
+                for t in targets:
+                    out["desk_checks"]["links"] += 1
+                    if DESK in t.lower(): out["desk"].append([pgname, "href", t[:120]])
                 cap["on"] = True; cap["seen"] = []; cap["frame"] = pg.main_frame
                 rec["click"] = pg.evaluate(CLICK); pg.wait_for_timeout(600)
                 cap["on"] = False
-                targets |= set(cap["seen"]); targets |= set(pg.evaluate("() => window.__v2jOpen || []"))
+                targets |= set(cap["seen"]); opened = pg.evaluate("() => window.__v2jOpen || []"); targets |= set(opened)
+                for t in opened:
+                    out["desk_checks"]["opens"] += 1
+                    if DESK in str(t).lower(): out["desk"].append([pgname, "window.open", str(t)[:120]])
+                out["desk_checks"]["markup_pages"] += 1
+                if pg.evaluate("() => document.documentElement.outerHTML.toLowerCase().includes('wardos-desk-face')"): out["desk"].append([pgname, "markup", pg.url])
                 pg.wait_for_timeout(300)
                 st = pg.evaluate(STATE); rec.update(st)
                 rec["errors"] = errors[:4]

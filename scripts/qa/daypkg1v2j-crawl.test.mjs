@@ -30,6 +30,9 @@ for (const [w, h] of [[440, 956], [1280, 800]]) {
     assert.deepEqual(o.dad_edges, [], "no kid page links a Dad page");
     for (const b of BOARDS) assert.ok((o.edges[b] || []).includes("sheet-index.html"), b + " reaches sheet-index: " + JSON.stringify(o.edges[b]));
     assert.ok(!("mint200" in o.api), "mint never 200");
+    /* DESKCUT1 (Atlas): no kid-reachable page links to, opens, navigates or sets location to any wardos-desk-face host */
+    assert.deepEqual(o.desk, [], "wardos-desk-face hits " + JSON.stringify(o.desk));
+    assert.ok(o.desk_checks.links > 0 && o.desk_checks.navs > 0 && o.desk_checks.markup_pages >= 27, "desk checks ran: " + JSON.stringify(o.desk_checks));
     for (const [n, p] of Object.entries(o.pages)) {
       assert.ok(p.loaded && !p.err, n + " crawled: " + (p.err || "not loaded"));
       assert.deepEqual(p.dom, [], n + " DOM '" + D + "' " + JSON.stringify(p.dom));
@@ -49,4 +52,26 @@ test("DAYPKG1 v2j static: groceries footer chip reads GROCERIES (no '" + D + "')
     assert.ok(s.includes('href="sheet-groceries.html?v=DAYPKG1V2J"'), f + " bumps the groceries token");
     assert.ok(!/href="sheet-groceries\.html"/.test(s), f + " has no unversioned groceries link");
   }
+});
+
+/* DESKCUT1 (Atlas) · static: the kid-reachable page set (Alfred's 27-page closure) and every local script / style it loads
+   never name a wardos-desk-face host; the sheet-desk-gate House to Desk bridge is gone. */
+const KID_REACHABLE = ["kid-hayes", "kid-harris", "kid-ainsley", "mercury-run", "sheet-index", "index", "month", "month-chat", "sheet-chores",
+  "sheet-today", "sheet-lights", "sheet-google-home", "sheet-groceries", "sheet-spotify", "sheet-weekend", "sheet-win", "wall", "sheet-status",
+  "sheet-us", "sheet-load-day", "sheet-pack", "nest-webrtc", "sheet-desk-gate", "sheet-dinner", "sheet-gallery-hero", "sheet-gallery",
+  "sheet-countdowns"].map((n) => n + ".html");
+test("DESKCUT1 static: no kid-reachable page or the local js/css it loads names wardos-desk-face", () => {
+  assert.equal(KID_REACHABLE.length, 27);
+  const files = new Set();
+  for (const f of KID_REACHABLE) {
+    files.add(f);
+    const h = fs.readFileSync(path.join(ROOT, f), "utf8");
+    for (const m of h.matchAll(/(?:src|href)="([^"#?:]+\.(?:js|css|mjs))(?:\?[^"]*)?"/g)) if (fs.existsSync(path.join(ROOT, m[1]))) files.add(m[1]);
+  }
+  assert.ok(files.size > 40, "scanned " + files.size);
+  const hits = [];
+  for (const f of files) fs.readFileSync(path.join(ROOT, f), "utf8").split("\n").forEach((l, i) => { if (/wardos-desk-face/i.test(l)) hits.push(f + ":" + (i + 1)); });
+  assert.deepEqual(hits, []);
+  const g = fs.readFileSync(path.join(ROOT, "sheet-desk-gate.html"), "utf8");
+  assert.ok(!/class="bridge(?:-row)?"/.test(g), "the bridge is cut");
 });
