@@ -25,10 +25,11 @@ const S = String.fromCharCode(36), FW = "\uFF04", SM = "\uFE69";
 assertSealed();
 
 /* r3b text-law: pinned by the sha256 of each rule source (the file sha moves when r3b lands with other rules) */
-const R3B_STAGE = "/workspace/wright-scratch/callive-nodollar-r3b/text-law.json.new";   /* sha256 12501e33... */
-const R3B_TREE = process.env.FS_R3B_TREE || "/workspace/wright-scratch/callive-nodollar-r3b/sbx/trees/b79-r3b";
-const MONEY_SHA16 = "f911c7285f994465";   /* sha256 of the rule source, first 16 */
-const SIGN_SHA16 = "d292513f4549b1ed";
+/* FACESTRIP1 r3 (Alfred 11:21 CT FAIL 0cb4c11b): the law is CALLIVE-NODOLLAR r3c (text-law 03d916de); names below keep their r2 spelling */
+const R3B_STAGE = "/workspace/wright-scratch/callive-nodollar-r3c/text-law.json.new";   /* sha256 03d916de... (r3c) */
+const R3B_TREE = process.env.FS_R3C_TREE || process.env.FS_R3B_TREE || "/workspace/wright-scratch/callive-nodollar-r3c/sbx/trees/b79-r3c";
+const MONEY_SHA16 = "b18bbaa30dd4eac3";   /* sha256 of the rule source, first 16 */
+const SIGN_SHA16 = "d75796359943f86a";
 function r3bLaw() {
   const cands = [process.env.FS_R3B_TEXT_LAW, path.join(ROOT, "scripts/text-law.json"), R3B_STAGE].filter(Boolean);
   for (const f of cands) {
@@ -52,7 +53,7 @@ test("FACESTRIP1 r2 parity: house-face-law.js money + sign sources are r3b's tex
   assert.ok(R3, "r3b text-law.json with the r3b money / moneysign rules is readable");
   assert.equal(sha(R3.money.re).slice(0, 16), MONEY_SHA16, "r3b money rule");
   assert.equal(sha(R3.sign.re).slice(0, 16), SIGN_SHA16, "r3b moneysign rule");
-  if (R3.file === R3B_STAGE) assert.equal(R3.fileSha.slice(0, 16), "12501e337d4ac298", "staging copy is r3b 12501e33");
+  if (R3.file === R3B_STAGE) assert.equal(R3.fileSha.slice(0, 16), "03d916def7ed8572", "staging copy is r3c 03d916de");
   assert.equal(typeof L.MONEY_SRC, "string", "HouseFaceLaw.MONEY_SRC exported");
   assert.equal(L.MONEY_SRC, R3.money.re, "money source identical");
   assert.equal(L.SIGN_SRC, R3.sign.re, "moneysign source identical");
@@ -87,9 +88,15 @@ const MONEY = [
   ["Bake " + SM + "5 sale", "Bake sale"], ["Bus " + S + "5k raffle", "Bus raffle"], ["Gala " + S + "2.5m goal", "Gala goal"], ["Fees " + S + "1,256.50 due", "Fees due"],
   ["Lego set " + S + "45", "Lego set"], ["Lunch (" + S + "3.25)", "Lunch"], ["Photo day, " + S + "12", "Photo day"], ["Dues " + FW + "1,256", "Dues"],
   ["Jar 1,256 " + S + " goal", "Jar goal"], ["Cards 613 " + S + "5 swap", "Cards swap"],
+  /* r3c (Alfred 0cb4c11b): D2k USD glued to digits, A16 sign-minus, A4/A5 zero-width spacing, D2i 'US <sign>50' */
+  ["USD50", ""], ["usd50", ""], ["USD5.00", ""], ["Fee USD50 due", "Fee due"], ["Fees usd1,256.50 now", "Fees now"],
+  [S + "-5", ""], ["USD-50", ""], [S + "\u22125", ""], ["Fee USD \u2212 50 due", "Fee due"], [FW + "-5", ""],
+  [S + "\u200b5", ""], ["5\u200b" + S, ""], [S + "\u20605", ""], [S + "\u00ad5", ""], [S + "\u200c5", ""], [S + "\u200d5", ""], ["Fee " + S + "\u200b1,256 due", "Fee due"], ["Jar 613\u2060" + S + " goal", "Jar goal"],
+  ["US " + S + "50", ""], ["Fee US " + S + "50 due", "Fee due"],
 ];
 const KEEP = ["5km run", "Room 5m", "3:15 pm", "Leave 7:40", "2026-10-28", "Oct 28", "10/28", "Grade 2", "2nd grade", "Hayes 2nd", "Room 213", "Age 7",
-  "Ages 5-7", "1-2 pm", "Gate B12", "Bus 14", "Game 2 of 3", "Swim 4:30-5:15", "USB 50", "BUS 5", "Focus 5", "Focus 5 USB 50 BUS 5", "Join us 5", "US 5"];
+  "Ages 5-7", "1-2 pm", "Gate B12", "Bus 14", "Game 2 of 3", "Swim 4:30-5:15", "USB 50", "BUS 5", "Focus 5", "Focus 5 USB 50 BUS 5", "Join us 5", "US 5",
+  /* r3c controls */ "USDT 50", "USDT50", "USDA 5 lunch", "US History", "BUSD 5", "a - 5"];
 /* accent rows (defect 3: no \b): letters after k / m and before US / USD; JS and Python must be byte-equal */
 const ACCENT = [S + "5k\u00e9", S + "5k\u00f6", S + "5m\u00f1", S + "5km", S + "5kid", S + "5 km", S + "5k_", S + "5k1", "\u00e9USD 50", "caf\u00e9 " + S + "5 \u00e0 midi",
   "Na\u00efve USD 9", "R\u00e9sum\u00e9 50 USD", "\u00fcber US" + S + "5k", "Fee " + S + "5M\u00e9", S + "5\u212A"];
@@ -101,6 +108,7 @@ for (const [x, want] of MONEY) test("FACESTRIP1 fixture money: " + JSON.stringif
   const got = L.faceText(x);
   assert.equal(got, want);
   assert.doesNotMatch(String(got), /[\x24\uFF04\uFE69]|(?<![A-Za-z])[uU][sS][dD]?(?![A-Za-z])/, "no sign, no US / USD left");
+  assert.doesNotMatch(String(got), /[0-9\u200b-\u200d\u2060\u00ad\u2212]/, "r3c: no digit, minus or zero-width char left");
 });
 for (const x of KEEP) test("FACESTRIP1 fixture near-miss kept: " + JSON.stringify(x), () => {
   assert.equal(L.moneyFree(x), x, "moneyFree leaves it alone");
@@ -157,7 +165,7 @@ function writers(xs) {
 }
 test("FACESTRIP1 r2 parity: browser moneyFree === python3 cal-months-window _nodollar === cal-from-events noDollarDeep, byte for byte", { skip: TREE_OK ? false : "SKIP no r3b tree / python3 (" + R3B_TREE + ")" }, () => {
   const W = writers(ALL), diff = [];
-  assert.equal(W.lawSha.slice(0, 16), "12501e337d4ac298", "the writers' tree carries r3b text-law.json 12501e33");
+  assert.equal(W.lawSha.slice(0, 16), "03d916def7ed8572", "the writers' tree carries r3c text-law.json 03d916de");
   assert.equal(W.cfeSrc, L.MONEY_SRC, "cfe MONEY_SRC is the browser source"); assert.equal(W.cfeSign, L.SIGN_SRC, "cfe MONEY_SIGN_SRC is the browser source");
   ALL.forEach((x, i) => { const b = L.moneyFree(x);
     if (Buffer.compare(Buffer.from(b), Buffer.from(W.cmw[i])) || Buffer.compare(Buffer.from(b), Buffer.from(W.cfe[i]))) diff.push({ x, browser: b, cmw: W.cmw[i], cfe: W.cfe[i] }); });
@@ -260,4 +268,16 @@ test("FACESTRIP1 static: house-face-law.js is re-tokened FACESTRIP1 on every pag
   (function walk(d) { for (const e of fs.readdirSync(path.join(ROOT, d), { withFileTypes: true })) { const p = d ? d + "/" + e.name : e.name; if (e.isDirectory()) { if (!SKIPD.test(e.name)) walk(p); }
     else if (e.name.endsWith(".html")) for (const m of read(p).matchAll(/house-face-law\.js(\?v=[A-Za-z0-9_.-]+)?["']/g)) { n++; if (m[1] !== "?v=FACESTRIP1") old.push(p + " " + (m[1] || "(no token)")); } } })("");
   assert.ok(n >= 47, "tags found " + n); assert.deepEqual(old, []);
+});
+
+/* FACESTRIP1 r3 · collision rule (Alfred 0cb4c11b): SPECIALSLAW1 lands first and moves house-face-law.js f5fccfc5 -> 9a84948c on the
+   same tracked path, so this second lander carries SPECIALSLAW1's three hunks (isSpecialText / isSpecialRow at :83, cleanKid skip, exports). */
+test("FACESTRIP1 r3: house-face-law.js carries SPECIALSLAW1's isSpecialText / isSpecialRow (second lander keeps both)", () => {
+  const src = read("house-face-law.js");
+  assert.equal((src.match(/function isSpecialRow\(r\)/g) || []).length, 1, "isSpecialRow defined once");
+  assert.equal((src.match(/function isSpecialText\(s, schoolAlt\)/g) || []).length, 1, "isSpecialText defined once");
+  assert.match(src, /r\.kind !== "note" && !isSpecialRow\(r\) &&/, "cleanKid skips special rows");
+  assert.equal(L.isSpecialText("Hayes \u2014 ZZS specials: Art"), true); assert.equal(L.isSpecialText("ZZS No Specials"), false);
+  assert.equal(L.isSpecialText("Hayes \u2014 ZZS specials: Art", "ZZS"), true); assert.equal(L.isSpecialRow({ kind: "special" }), true);
+  assert.equal(L.isSpecialRow({ what: "Hayes swim" }), false);
 });
