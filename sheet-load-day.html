@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPAIR1"></script>
 <script src="private-feed.js?v=HUBPAIR1D"></script>
-<script src="house-face-law.js?v=HALLOWEEN1"></script>
+<script src="house-face-law.js?v=FACESTRIP1"></script>
 <script src="house-pair.js?v=HUBPAIR1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
@@ -507,7 +507,7 @@ html body .pack-item .box{flex-shrink:0}
 <script>/* LOADLIVE1 · load day reads data/cal-live.json (today, or the next day with leaves), no hardcoded date */
 (function(){function q(k){return document.querySelector('[data-ld="'+k+'"]')}
 function faceDash(s) { return String(s == null ? "" : s).replace(/\bMOVED\s*[\u2192\u21d2\u27a1]\s*/gi, "moved to ").replace(/\s*[\u2192\u21d2\u27a1]\s*/g, " to ").replace(/\s*\u2014\s*/g, " \u00b7 ").replace(/(\s*\u00b7\s*){2,}/g, " \u00b7 ").replace(/^\s*\u00b7\s*|\s*\u00b7\s*$/g, ""); }/* NODATA3 · no em dashes or arrows on the face */
-function e(t){return faceDash(window.AwayFilter?window.AwayFilter.glass(t):t).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+function e(t){var L=window.HouseFaceLaw;if(L&&L.moneyFree)t=L.moneyFree(String(t==null?"":t));/* FACESTRIP1 */return faceDash(window.AwayFilter?window.AwayFilter.glass(t):t).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
 function day(iso){var d=new Date(iso+"T12:00:00");return d}
 function hm(s){var m=/T(\d\d):(\d\d)/.exec(s);if(!m)return"";var h=+m[1]%12||12;return h+":"+m[2]}
 /* LDAWAY1 (QAFIX2, ported from main) · the pack strip is the shown load day's kid list: its [data-away-kid] items follow away-filter.js on that day.

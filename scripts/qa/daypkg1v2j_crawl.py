@@ -1,5 +1,6 @@
 """DAYPKG1 v2j (Alfred v2i FAIL, P2) · kid-reachable closure crawl with a zero-'$' assertion on every page.
 Usage: python3 scripts/qa/daypkg1v2j_crawl.py <width> <height>   -> prints one JSON line
+       python3 scripts/qa/daypkg1v2j_crawl.py <width> <height> facestrip   -> FACESTRIP1 pass only (see FS_ below), one JSON line
 Seeds: kid-hayes, kid-harris, kid-ainsley, mercury-run (?kid=hayes) and sheet-index. On every page it collects the static
 links (a/area href, data-href, form action) and then dispatches up to 140 clicks (links, buttons, role=button/link,
 tabindex, onclick, the header and its Home tap target [data-kw-home], anything with a pointer cursor); every document
@@ -33,10 +34,43 @@ D = chr(36)
 SEEDS = ["kid-hayes.html", "kid-harris.html", "kid-ainsley.html", "mercury-run.html", "sheet-index.html"]
 DAD = {"sheet-dan.html", "sheet-allowance.html", "sheet-spotify-setup.html"}  # SPOTCUT: the Spotify setup sheet is Dad-only
 api = {"pair200": 0, "mint403": 0, "private": 0, "other404": 0}
+MODE = sys.argv[3] if len(sys.argv) > 3 else ""
+# FACESTRIP1 (Alfred D2 + 10:10) · money rows in BOTH calendar feeds. Every sign form and amount shape, plus two no-strip
+# controls ('5km run', 'Room 5m') that must still render (they prove the rows painted, so 0 hits is not vacuous).
+# Signs are built from code points so this file stays sign-free in its fixtures: S = ASCII, FW = fullwidth, SM = small.
+S, FW, SM = chr(36), chr(0xFF04), chr(0xFE69)
+FS_MONEY = ["Field trip (bring " + S + "5)", "Book fair " + S + "1,256", "Snack " + S + ".77 each", "Fee " + S + " 193 due",
+            "Cards 613" + S + "5 swap", "Gift jar 613 " + S, "Fair " + FW + "5 ride", "Bake " + SM + "5 sale", "Bus " + S + "5k raffle",
+            "Gala " + S + "2.5m goal", "5km run", "Room 5m"]
+FS_CONTROLS = ["5km run", "Room 5m"]
+def fs_days():
+    import datetime as _dt
+    ct = _dt.timezone(_dt.timedelta(hours=-5))  # CDT/CST offset only matters for the date key; rows sit at 09:00-14:30
+    t = _dt.datetime.now(ct).date(); return [t, t + _dt.timedelta(days=1)]
+def fs_inject(name, d):
+    t0, t1 = fs_days()
+    if name == "cal-live":
+        ev = []
+        for i, txt in enumerate(FS_MONEY):  # tomorrow: timed rows (sheet-load-day shows the first future day with leaves)
+            hh, mm = 9 + i // 2, 30 * (i % 2)
+            ev.append({"id": "fs-%d" % i, "summary": txt, "start": "%sT%02d:%02d:00-05:00" % (t1.isoformat(), hh, mm), "end": "%sT%02d:%02d:00-05:00" % (t1.isoformat(), hh, mm + 20),
+                       "location": txt + ", Sample St", "busy": False, "allDay": False})
+        for i, txt in enumerate(FS_MONEY):  # today: all-day rows (month phone view of today; sheet-load-day skips all-day)
+            ev.append({"id": "fs-d%d" % i, "summary": txt, "start": "%sT00:00:00-05:00" % t0.isoformat(), "end": "%sT00:00:00-05:00" % t1.isoformat(), "location": "", "busy": False, "allDay": True})
+        d["upcomingLeaves"] = ev + list(d.get("upcomingLeaves") or [])
+    if name == "cal-months":
+        days = d.setdefault("days", {})
+        # wall cells show 3 items, so the 12 rows go 3 a day on days 1-4 of the current month (always in the grid)
+        for i in range(0, len(FS_MONEY), 3):
+            k = t0.replace(day=1 + i // 3).isoformat(); day = days.setdefault(k, {"withDan": True, "items": []})
+            day["items"] = [{"c": "shr", "l": txt} for txt in FS_MONEY[i:i + 3]] + list(day.get("items") or [])
+        lo, hi = min(days), max(days); d["rangeStart"] = min(d.get("rangeStart") or lo, lo); d["rangeEnd"] = max(d.get("rangeEnd") or hi, hi)
+    return d
 def feed(name):
     f = os.path.join(FIX, name + ".synthetic.json")
     if not os.path.isfile(f): return None
     d = json.load(open(f))
+    if MODE == "facestrip" and name in ("cal-live", "cal-months"): d = fs_inject(name, d)
     if name == "kids-week":
         for k, kid in (d.get("kids") or {}).items():
             g = kid.setdefault("bankGoal", {}); g["title"] = "Lego set " + D + "45"; g["blurb"] = "1 \u2605 = " + D + "1 \u00b7 " + D + "45 goal"; g.setdefault("need", 45)
@@ -204,6 +238,68 @@ LINKS2 = r"""() => { const o = []; for (const e of document.querySelectorAll('a[
   for (const e of document.querySelectorAll('[formaction]')) o.push(['formaction', e.formAction || e.getAttribute('formaction')]);
   for (const f of document.querySelectorAll('iframe')) { try { const d = f.contentDocument; if (!d) continue; for (const e of d.querySelectorAll('a[href],area[href]')) o.push(['iframe href', e.href]); for (const e of d.querySelectorAll('form[action]')) o.push(['iframe form action', e.action]); } catch (x) {} }
   return o; }"""
+# FACESTRIP1 · in-render write assert for month.html and sheet-load-day.html (Alfred D2 + 10:10 item 3). FS_OBS runs before any
+# page script and records every write that carries a money sign (ASCII, fullwidth, small) or a bare money residue of the
+# fixtures: textContent / nodeValue / data / innerHTML / outerHTML / innerText / insertAdjacentHTML / setAttribute /
+# document.write, a MutationObserver (added nodes, attrs, char data old+new) and localStorage / sessionStorage setItem
+# (the raw feed body in memory is not a write: private-feed.js cleans it before any page sees it). FS_SCAN then reads every text node (hidden included), every attribute but
+# src/href/srcset/style/class/d/viewBox, form values and both stores after the page settles.
+#   bare money = FS_BARE: the amount shapes r3's rule and the FACESTRIP1 edge rule remove, as left behind when only the
+#   sign is dropped ('1,256' ',256' '.77' '193' '613' '2.5m' '5k'). innerHTML values are tag-stripped first so markup
+#   numbers never count. Controls: FS_CONTROLS must appear in the page text (rows rendered), else the pass is vacuous.
+FS_SIGN = r"[\x24\uFF04\uFE69]"
+FS_BARE = r"(?:^|[^0-9.,])(?:1,256|,256|\.77|193|613|2\.5m|5k)(?![0-9A-Za-z])"
+FS_OBS = r"""(() => { const SG = new RegExp(%s), BR = new RegExp(%s); const hits = []; window.__fsHits = hits; let n = 0;
+  const txt = (k, v) => /^(set:innerHTML|set:outerHTML|insertAdjacentHTML|document.write)$/.test(k) ? String(v).replace(/<[^>]*>/g, ' ') : String(v);
+  const note = (k, v, where) => { try { if (v == null) return; n++; const t = txt(k, v); const sg = SG.test(t), br = BR.test(t); if ((sg || br) && hits.length < 80) hits.push([sg ? 'sign' : 'bare', k, t.slice(0, 120), where || '']); } catch (e) {} };
+  window.__fsCount = () => n;
+  const skip = (x) => { try { const e = x && (x.nodeType === 1 ? x : x.parentElement); return !!(e && e.closest && e.closest('script,style,noscript,template')); } catch (e) { return false; } };
+  const who = (x) => { try { const e = x && (x.nodeType === 1 ? x : x.parentElement); return e ? e.tagName + (e.className && typeof e.className === 'string' ? '.' + e.className.split(' ')[0] : '') : ''; } catch (e) { return ''; } };
+  const AT = /^(src|href|srcset|style|class|d|viewBox)$/i;
+  const hook = (proto, prop) => { const d = Object.getOwnPropertyDescriptor(proto, prop); if (!d || !d.set) return;
+    Object.defineProperty(proto, prop, { configurable: true, enumerable: d.enumerable, get: d.get, set: function (v) { if (!(this.tagName === 'SCRIPT' || this.tagName === 'STYLE') && !skip(this)) note('set:' + prop, v, who(this)); return d.set.call(this, v); } }); };
+  hook(Node.prototype, 'textContent'); hook(Node.prototype, 'nodeValue'); hook(CharacterData.prototype, 'data'); hook(Element.prototype, 'innerHTML'); hook(HTMLElement.prototype, 'innerText'); hook(Element.prototype, 'outerHTML');
+  const sa = Element.prototype.setAttribute; Element.prototype.setAttribute = function (a, v) { if (!AT.test(a)) note('attr:' + a, v, who(this)); return sa.call(this, a, v); };
+  const ins = Element.prototype.insertAdjacentHTML; Element.prototype.insertAdjacentHTML = function (p, v) { note('insertAdjacentHTML', v, who(this)); return ins.call(this, p, v); };
+  const dw = Document.prototype.write; Document.prototype.write = function (...a) { note('document.write', a.join(''), 'document'); return dw.apply(this, a); };
+  const si = Storage.prototype.setItem; Storage.prototype.setItem = function (k, v) { note('storage:' + (this === window.sessionStorage ? 'session' : 'local'), String(k) + ' ' + String(v), String(k)); return si.call(this, k, v); };
+  const scan = (x) => { if (!x || skip(x)) return; if (x.nodeType === 3) note('mo:added-text', x.nodeValue, who(x)); else if (x.nodeType === 1) { for (const a of x.attributes || []) if (!AT.test(a.name)) note('mo:added-attr:' + a.name, a.value, who(x)); for (let c = x.firstChild; c; c = c.nextSibling) scan(c); } };
+  new MutationObserver((list) => { for (const m of list) {
+      if (m.type === 'characterData') { if (!skip(m.target)) { note('mo:char-old', m.oldValue, who(m.target)); note('mo:char-now', m.target.nodeValue, who(m.target)); } }
+      else if (m.type === 'attributes') { if (!AT.test(m.attributeName)) { note('mo:attr-old:' + m.attributeName, m.oldValue, who(m.target)); note('mo:attr-now:' + m.attributeName, m.target.getAttribute(m.attributeName), who(m.target)); } }
+      else for (const x of m.addedNodes) scan(x); } })
+    .observe(document, { subtree: true, childList: true, characterData: true, characterDataOldValue: true, attributes: true, attributeOldValue: true });
+})();""" % (json.dumps(FS_SIGN), json.dumps(FS_BARE))
+FS_SCAN = r"""(ctl) => { const SG = new RegExp(%s), BR = new RegExp(%s); const dom = [], store = []; let all = '';
+  const w = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_TEXT); let x;
+  while ((x = w.nextNode())) { const e = x.parentElement; if (e && e.closest('script,style,noscript,template')) continue; all += ' ' + x.nodeValue;
+    if ((SG.test(x.nodeValue) || BR.test(x.nodeValue)) && dom.length < 30) dom.push([SG.test(x.nodeValue) ? 'sign' : 'bare', 'text' + (e && e.offsetParent === null ? ':hidden' : ''), x.nodeValue.trim().slice(0, 100)]); }
+  for (const e of document.querySelectorAll('*')) { if (e.tagName === 'SCRIPT' || e.tagName === 'STYLE') continue;
+    for (const a of e.attributes) if (!/^(src|href|srcset|style|class|d|viewBox)$/i.test(a.name) && (SG.test(a.value) || BR.test(a.value)) && dom.length < 30) dom.push([SG.test(a.value) ? 'sign' : 'bare', 'attr:' + a.name, a.value.slice(0, 100)]);
+    if ('value' in e && typeof e.value === 'string' && (SG.test(e.value) || BR.test(e.value)) && dom.length < 30) dom.push(['value', e.tagName, e.value.slice(0, 100)]); }
+  for (const [nm, s] of [['local', localStorage], ['session', sessionStorage]]) for (let i = 0; i < s.length; i++) { const k = s.key(i), v = s.getItem(k) || ''; if (SG.test(k + v) || BR.test(v)) store.push([nm, k, v.slice(0, 100)]); }
+  return { dom, store, transient: (window.__fsHits || []).slice(0, 60), writes: window.__fsCount ? window.__fsCount() : 0, controls: ctl.filter((c) => all.indexOf(c) >= 0), law: !!(window.HouseFaceLaw && window.HouseFaceLaw.moneyFree) }; }""" % (json.dumps(FS_SIGN), json.dumps(FS_BARE))
+FS_PAGES = ["month.html", "sheet-load-day.html"]
+if MODE == "facestrip":
+    fso = {"mode": "facestrip", "size": "%dx%d" % (w, h), "port": PORT, "root": ROOT, "sign_re": FS_SIGN, "bare_re": FS_BARE, "fixtures": FS_MONEY, "pages": {}}
+    with sync_playwright() as p:
+        b = p.chromium.launch(**launch_kw(p, args=["--disable-gpu"]))
+        try:
+            for pgname in FS_PAGES:
+                mob = w < 600
+                ctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=2 if mob else 1, is_mobile=mob, has_touch=mob, reduced_motion="reduce")
+                ctx.add_init_script("try { localStorage.setItem('wardos-private-feed-token', 'qaSyntheticDeviceKey0000'); } catch (e) {}")
+                ctx.add_init_script(FS_OBS)
+                ctx.route("**/*", lambda route: route.continue_() if (urlparse(route.request.url).hostname == "127.0.0.1" and urlparse(route.request.url).port == PORT) else route.abort())
+                pg = ctx.new_page(); errs = []; pg.on("pageerror", lambda e: errs.append(str(e)[:120]))
+                rec = {"loaded": False}
+                try:
+                    pg.goto(base + PRE + pgname + "?pfBase=" + base, wait_until="load", timeout=60000); pg.wait_for_timeout(3500)
+                    rec.update(pg.evaluate(FS_SCAN, FS_CONTROLS)); rec["loaded"] = True
+                except Exception as e: rec["error"] = str(e)[:160]
+                rec["errors"] = errs[:5]; fso["pages"][pgname] = rec; ctx.close()
+        finally: b.close()
+    fso["api"] = api; srv.shutdown(); print(json.dumps(fso)); sys.exit(0)
 cur = {"page": None}
 t0 = time.time()
 with sync_playwright() as p:

@@ -18,6 +18,7 @@ const STALE = [
   ["house-clock.js", "PRIVFEED3"],
   ["house-face-law.js", "LIVEFIX1"],
   ["house-face-law.js", "LIVEFIX3"],
+  ["house-face-law.js", "HALLOWEEN1"], ["house-face-law.js", "PRIVFEED3"], /* FACESTRIP1 · faceText strips money on every feed */
   ["house-lights.js", "FOLLOWUP6"],
   ["house-ori-calm.js", "CALM1"],
   ["house-spotify.js", "MERGE1C"],
@@ -85,4 +86,8 @@ test("H1-CB · the six named scripts are re-tokened on the pages that load them"
 });
 test("H1-CB · the check is not a blanket pass", () => {
   assert.ok(STALE.some(([a, t]) => a === "house-lights.js" && t === "FOLLOWUP6"));
+});
+test("H1-CB · FACESTRIP1 · house-face-law.js carries FACESTRIP1 on the month, load-day and livinghouse pages", () => {
+  for (const [f, src] of [["month.html", "house-face-law.js"], ["sheet-load-day.html", "house-face-law.js"], ["sheet-index.html", "house-face-law.js"], ["livinghouse/index.html", "../house-face-law.js"]])
+    assert.match(fs.readFileSync(path.join(ROOT, f), "utf8"), new RegExp('src="' + src.replace(/[.]/g, "\\.") + '\\?v=FACESTRIP1"'), src + " in " + f);
 });

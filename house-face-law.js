@@ -205,9 +205,36 @@
   function schoolWord(t) { return String(t == null ? "" : t).replace(new RegExp(SCHOOL_WORD[0].source, "g"), SCHOOL_WORD[1]); }
   var MOM_PHRASE = /\s*\b(?:for|with|at|to|from) (?:their )?mom(?:['\u2019]?s)?\b|\s*\bmom(?:['\u2019]?s)?\b/gi;
   function momFree(t) { return String(t == null ? "" : t).replace(MOM_PHRASE, "").replace(/\(\s*\)/g, "").replace(/\s{2,}/g, " ").trim(); }
+  /* FACESTRIP1 (Atlas 2026-10-28 10:09) · money never reaches the face from ANY calendar feed, not only Ainsley's: faceText drops
+     the whole amount ('(bring \x2445)' reads '(bring)'), then any sign left. MONEY_SRC and SIGN_SRC are CALLIVE-NODOLLAR r3's
+     shared money / moneysign rules copied byte for byte from scripts/text-law.json r3 (scripts/qa/facestrip1.test.mjs keeps them
+     equal). Engines without lookbehind (old Safari) get the same pattern with the lookbehind as a kept capture. */
+  var MONEY_SRC = "(?:-?[\\x24\\uFF04\\uFE69]\\s*(?:[0-9](?:[0-9,]*[0-9])?(?:\\.[0-9]+)?|\\.[0-9]+)(?:\\s*[-\\u2013]\\s*[\\x24\\uFF04\\uFE69]?\\s*(?:[0-9](?:[0-9,]*[0-9])?(?:\\.[0-9]+)?|\\.[0-9]+)(?![0-9:]))?(?:[km]\\b)?|(?<![0-9A-Za-z_.,])-?(?:[0-9](?:[0-9,]*[0-9])?(?:\\.[0-9]+)?|\\.[0-9]+)[\\x24\\uFF04\\uFE69])(?:\\s*(?:/|\\bper\\b)\\s*(?:hr|hour|h|wk|week|day|mo|month)\\b)?";
+  var SIGN_SRC = "[\\x24\\uFF04\\uFE69]";
+  var MONEY_LB = "(?<![0-9A-Za-z_.,])";
+  var MONEY_RE, MONEY_LB_OK = true;
+  try { MONEY_RE = new RegExp(MONEY_SRC, "gi"); } catch (e) { MONEY_LB_OK = false; MONEY_RE = new RegExp(MONEY_SRC.split(MONEY_LB).join("(^|[^0-9A-Za-z_.,])"), "gi"); }
+  var SIGN_RE = new RegExp(SIGN_SRC, "g");
+  /* FACESTRIP1 local edge (Alfred 10:10), run BEFORE the r3 rule and kept OUT of MONEY_SRC so r3 stays byte-identical:
+     a trailing sign after a space ('613 \x24' reads '') and a sign between two numbers ('613\x245' reads ''). r3 alone leaves
+     '613' and '5'. Proposed for r3 r4 (open item); facestrip1.test.mjs lists these two forms as the only intended extras. */
+  var EDGE_SRC = "(?<![0-9A-Za-z_.,])-?(?:[0-9](?:[0-9,]*[0-9])?(?:\\.[0-9]+)?|\\.[0-9]+)(?:\\s+[\\x24\\uFF04\\uFE69](?![0-9.])|[\\x24\\uFF04\\uFE69]\\s*(?:[0-9](?:[0-9,]*[0-9])?(?:\\.[0-9]+)?|\\.[0-9]+))", EDGE_RE, EDGE_LB_OK = true;
+  try { EDGE_RE = new RegExp(EDGE_SRC, "gi"); } catch (e) { EDGE_LB_OK = false; EDGE_RE = new RegExp(EDGE_SRC.split(MONEY_LB).join("(^|[^0-9A-Za-z_.,])"), "gi"); }
+  function moneyFree(t) {
+    if (typeof t !== "string" || !t) return t;
+    MONEY_RE.lastIndex = 0;
+    EDGE_RE.lastIndex = 0;
+    var u = EDGE_LB_OK ? t.replace(EDGE_RE, "") : t.replace(EDGE_RE, function (m, p) { return p || ""; });
+    MONEY_RE.lastIndex = 0;
+    u = MONEY_LB_OK ? u.replace(MONEY_RE, "") : u.replace(MONEY_RE, function (m, p) { return p || ""; });
+    if (u === t && !SIGN_RE.test(t)) return t;
+    SIGN_RE.lastIndex = 0;
+    return u.replace(SIGN_RE, "").replace(/\(\s+/g, "(").replace(/\s+\)/g, ")").replace(/\s*\(\s*\)/g, "").replace(/\s+,/g, ",").replace(/\s{2,}/g, " ").trim();
+  }
   function renderRules(t) { for (var i = 0; i < RENDER_RULES.length; i++) t = t.replace(RENDER_RULES[i][0], RENDER_RULES[i][1]); return t; }
   function faceText(s) {
     if (typeof s !== "string" || !s || /^(https?:|data:|\d{4}-\d\d-\d\d|#[0-9a-f]{3,8}$)/i.test(s)) return s;
+    s = moneyFree(s); if (!s) return s;   /* FACESTRIP1 */
     var t = faceDash(renderRules(s)).replace(/\s*#[A-Za-z0-9_]+(\/#[A-Za-z0-9_]+)*/g, "")
       .replace(/\s*\((?:tennis shoes|sneakers|wear [^)]*)\)/gi, "").replace(/\s*[-\u2013\u2014\u00b7,:;]?\s*\bwear\b[^()]*$/i, "") /* LAW8C1 · no what-to-wear hints on glass */.replace(/\s{2,}/g, " ").replace(/\s*,\s*(?=,|$)/g, "").replace(/(\s\u00b7\s*)+$/, "").trim();
     return t || s.replace(/[\u2014\u2192]/g, " ").trim();
@@ -241,5 +268,5 @@
     try { return data && typeof data === "object" ? feedAinsley(name, walk(data, "")) : data; } catch (e) { return data; }
   }
 
-  g.HouseFaceLaw = { isCustody: isCustody, cleanFeed: cleanFeed, faceText: faceText, isDressDay: isDressDay, isColorDay: isColorDay, faceDash: faceDash, rowEnded: rowEnded, keepRow: keepRow, keepEvent: keepEvent, isTherapy: isTherapy, rowTherapy: rowTherapy, ainsleyText: ainsleyText, THERAPY: THERAPY, cleanKidsWeek: cleanKidsWeek, cleanKid: cleanKid, ctNow: ctNow, DRESS: DRESS, RENDER_RULES: RENDER_RULES, schoolWord: schoolWord, momFree: momFree, cleanAinsley: cleanAinsley };
+  g.HouseFaceLaw = { moneyFree: moneyFree, MONEY_SRC: MONEY_SRC, SIGN_SRC: SIGN_SRC, MONEY_RE: MONEY_RE, MONEY_LB_OK: MONEY_LB_OK, EDGE_SRC: EDGE_SRC, isCustody: isCustody, cleanFeed: cleanFeed, faceText: faceText, isDressDay: isDressDay, isColorDay: isColorDay, faceDash: faceDash, rowEnded: rowEnded, keepRow: keepRow, keepEvent: keepEvent, isTherapy: isTherapy, rowTherapy: rowTherapy, ainsleyText: ainsleyText, THERAPY: THERAPY, cleanKidsWeek: cleanKidsWeek, cleanKid: cleanKid, ctNow: ctNow, DRESS: DRESS, RENDER_RULES: RENDER_RULES, schoolWord: schoolWord, momFree: momFree, cleanAinsley: cleanAinsley };
 })(typeof window !== "undefined" ? window : globalThis);

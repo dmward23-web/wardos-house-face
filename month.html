@@ -5,7 +5,7 @@
 <script src="house-hub.js?v=HUBPAIR1"></script>
 <script src="private-feed.js?v=HUBPAIR1D"></script>
 <script src="school-names.js?v=HALLOWEEN1"></script>
-<script src="house-face-law.js?v=HALLOWEEN1"></script>
+<script src="house-face-law.js?v=FACESTRIP1"></script>
 <script src="house-pair.js?v=HUBPAIR1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
@@ -394,7 +394,7 @@
 <link rel="stylesheet" href="house-ori.css?v=HIRES1" />
 <link rel="stylesheet" href="night/night-host.css?v=HALLOWEEN1" />
 <link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
-<script src="house-face-law.js?v=HALLOWEEN1"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
+<script src="house-face-law.js?v=FACESTRIP1"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
 <style id="p1fix-month-wall">
 /* P1FIX B32 · wall cells: 15 px items, max 3 lines each, "+N more" in a quiet line */
 @media (min-width:601px){
@@ -730,10 +730,11 @@
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function key(y, m, d) { return y + "-" + pad(m) + "-" + pad(d); }
   function faceDash(s) { return String(s == null ? "" : s).replace(/\bMOVED\s*[\u2192\u21d2\u27a1]\s*/gi, "moved to ").replace(/\s*[\u2192\u21d2\u27a1]\s*/g, " to ").replace(/\s*\u2014\s*/g, " \u00b7 ").replace(/(\s*\u00b7\s*){2,}/g, " \u00b7 ").replace(/^\s*\u00b7\s*|\s*\u00b7\s*$/g, ""); } /* NODATA3 · no em dashes or arrows on the face */
-  function esc(s) { return faceDash((typeof window !== "undefined" && window.AwayFilter ? window.AwayFilter.glass(s) : s)).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function money(s) { var L = typeof window !== "undefined" && window.HouseFaceLaw; return L && L.moneyFree ? L.moneyFree(String(s == null ? "" : s)) : s; } /* FACESTRIP1 · no amount or sign is ever written, even mid-render */
+  function esc(s) { s = money(s); return faceDash((typeof window !== "undefined" && window.AwayFilter ? window.AwayFilter.glass(s) : s)).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   var LIVE = null;
   function cleanCal(s) {
-    s = String(s || "");
+    s = String(money(s) || "");
     s = s.replace(/\[[^\]]*\]/g, " ");
     s = s.replace(/#[A-Za-z0-9_-]+/g, " ");
     s = s.replace(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{5,}\b/g, " ");

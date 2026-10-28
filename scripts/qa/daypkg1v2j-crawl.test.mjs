@@ -333,3 +333,60 @@ test("ADULTCUT2B static: no kid surface shows CONNECT for Spotify; the hub tile 
   for (const f of ["sheet-index.html", "sheet-spotify.html", "sheet-spotify-setup.html"])
     assert.ok(fs.readFileSync(path.join(ROOT, f), "utf8").includes('src="house-spotify.js?v=ADULTCUT2B"'), f + " re-tokened");
 });
+
+/* FACESTRIP1 (Alfred D2 P2 + 10:10 item 3) · in-render write assert on month.html and sheet-load-day.html. The crawl's facestrip
+   pass feeds BOTH calendar feeds money rows (every sign form, whole amounts, k/m edges, two no-strip controls) and records any
+   write that carries a money sign or a bare amount: DOM text (hidden included), attributes, form values, every transient
+   setter / MutationObserver write, and storage (writes and the final dump). GREEN = 0 on both pages at 440 and 1280, the
+   controls painted (not vacuous) and HouseFaceLaw.moneyFree loaded. RED control = the same pass served from a c5295884 (or
+   f81262ee) tree via V2J_FS_RED_ROOT: sign hits on both pages. */
+const fsRun = (w, h, root) => {
+  const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), String(w), String(h), "facestrip"], { encoding: "utf8", timeout: 600000,
+    env: { ...process.env, ...(root ? { V2J_CRAWL_ROOT: root } : {}) } });
+  if (process.env.V2J_DRIVER_LOG) { try { fs.appendFileSync(process.env.V2J_DRIVER_LOG, JSON.stringify({ facestrip: root ? "red" : "tip", w, h, pid: r.pid, status: r.status, signal: r.signal }) + "\n"); } catch (e) {} }
+  assert.equal(r.status, 0, "facestrip pass exit " + r.status + " " + String(r.stderr).slice(-600));
+  const o = JSON.parse(r.stdout.trim().split("\n").pop());
+  if (process.env.V2J_CRAWL_OUT_DIR) { try { fs.writeFileSync(path.join(process.env.V2J_CRAWL_OUT_DIR, "facestrip-" + (root ? "red-" : "") + w + ".json"), JSON.stringify(o)); } catch (e) {} }
+  return o;
+};
+const FS_PAGES = ["month.html", "sheet-load-day.html"];
+function facestripAsserts(o, tag) {
+  assert.equal(o.mode, "facestrip", tag + ": facestrip pass");
+  for (const p of FS_PAGES) {
+    const r = o.pages[p]; assert.ok(r && r.loaded, tag + " " + p + " loaded " + JSON.stringify(r).slice(0, 300));
+    assert.deepEqual(r.controls.sort(), ["5km run", "Room 5m"], tag + " " + p + ": the no-strip control rows painted (pass is not vacuous)");
+    assert.ok(r.writes > 0, tag + " " + p + ": writes were observed");
+    assert.deepEqual(r.transient, [], tag + " " + p + ": 0 money in transient writes");
+    assert.deepEqual(r.dom, [], tag + " " + p + ": 0 money in DOM text (hidden included), attributes, values");
+    assert.deepEqual(r.store, [], tag + " " + p + ": 0 money in storage");
+  }
+}
+for (const [w, h] of [[440, 956], [1280, 800]]) {
+  test("FACESTRIP1 in-render @" + w + ": month.html and sheet-load-day write no money sign or bare amount from either calendar feed", { ...SKIP, timeout: 620000 }, () => {
+    const o = fsRun(w, h, null);
+    facestripAsserts(o, "tip@" + w);
+    for (const p of FS_PAGES) assert.equal(o.pages[p].law, true, p + " loads HouseFaceLaw.moneyFree");
+  });
+}
+test("FACESTRIP1 RED control @1280: the same pass on V2J_FS_RED_ROOT (c5295884 / f81262ee) writes money on both pages",
+  { ...(browser && process.env.V2J_FS_RED_ROOT ? {} : { skip: "SKIP needs a browser and V2J_FS_RED_ROOT (a c5295884 or f81262ee tree)" }), timeout: 620000 }, () => {
+  const o = fsRun(1280, 800, process.env.V2J_FS_RED_ROOT);
+  let red = null; try { facestripAsserts(o, "red"); } catch (e) { red = e; }
+  assert.ok(red && /0 money/.test(red.message), "the RED tree fails a 0-money assert: " + (red ? red.message.slice(0, 300) : "it passed"));
+  for (const p of FS_PAGES) {
+    const r = o.pages[p], all = [].concat(r.transient || [], r.dom || []);
+    assert.ok(all.some((x) => x[0] === "sign"), "RED " + p + " has sign hits " + JSON.stringify(all).slice(0, 400));
+  }
+});
+test("FACESTRIP1 static: the facestrip pass covers every money form, its bare regex bites each residue and spares the controls", () => {
+  const src = fs.readFileSync(path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), "utf8");
+  for (const k of ["FS_MONEY", "FS_OBS", "FS_SCAN", "FS_SIGN", "FS_BARE", 'MODE == "facestrip"', '"month.html", "sheet-load-day.html"', "fs_inject(name, d)"]) assert.ok(src.includes(k), "crawl has " + k);
+  const raw = (n) => { const m = src.match(new RegExp("^" + n + ' = r"([^"]*)"', "m")); assert.ok(m, n); return m[1]; };
+  const SG = new RegExp(raw("FS_SIGN")), BR = new RegExp(raw("FS_BARE"));
+  const S = String.fromCharCode(36), FW = "\uFF04", SM = "\uFE69";
+  for (const t of [S, FW, SM]) assert.ok(SG.test("a " + t + "5"), "sign regex bites U+" + t.codePointAt(0).toString(16));
+  for (const t of ["Book fair 1,256", "fair ,256", "Snack .77 each", "Fee  193 due", "Cards 6135 swap".replace("6135", "613"), "Gala 2.5m goal", "Bus 5k raffle", "Gift jar 613"]) assert.ok(BR.test(t), "bare regex bites " + t);
+  for (const t of ["5km run", "Room 5m", "Grade 2nd", "3:15 pm", "Room 213", "2026-10-28", "Age 7"]) assert.ok(!BR.test(t) && !SG.test(t), "spares " + t);
+  for (const t of ["(bring ", "1,256", ".77", " 193", "613", "5k", "2.5m", "5km run", "Room 5m"]) assert.ok(src.includes(t), "fixture form " + t);
+  assert.ok(/FW \+ "5/.test(src) && /SM \+ "5/.test(src) && /"Gift jar 613 " \+ S/.test(src) && /"Cards 613" \+ S \+ "5/.test(src), "fullwidth, small, '613 sign', '613 sign 5' rows");
+});
