@@ -264,7 +264,9 @@ with sync_playwright() as p:
         # sheet-allowance with a '$' ledger seeded must light the getItem and JSON.parse sentinels (and the DOM / transient
         # hooks); sheet-spotify-setup must show the credential field CRED looks for. Non-local requests are aborted.
         cctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=2 if mob else 1, is_mobile=mob, has_touch=mob, reduced_motion="reduce")
-        cctx.add_init_script("try { if (!localStorage.getItem('dad-ledger:v1')) localStorage.setItem('dad-ledger:v1', JSON.stringify({ _w: 1, _qa: 'Lego ' + String.fromCharCode(36) + '45' })); } catch (e) {}")
+        # the seeded legacy house-bank:v1 makes kids-data's own Dad-sheet boot (migrateDadLedger -> ledgerAge) getItem and
+        # JSON.parse both '$' ledgers: real page code, not the probe, lights the read sentinels
+        cctx.add_init_script("try { var q = 'Lego ' + String.fromCharCode(36) + '45'; if (!localStorage.getItem('dad-ledger:v1')) localStorage.setItem('dad-ledger:v1', JSON.stringify({ _w: 2, _qa: q })); if (!sessionStorage.getItem('qa-seeded')) { sessionStorage.setItem('qa-seeded', '1'); localStorage.setItem('house-bank:v1', JSON.stringify({ _w: 1, _qa: q })); } } catch (e) {}")
         cctx.add_init_script(OBS)
         cctx.route("**/*", lambda route: route.abort() if (urlparse(route.request.url).hostname != "127.0.0.1" or urlparse(route.request.url).port != PORT) else route.continue_())
         out["control"] = {}
