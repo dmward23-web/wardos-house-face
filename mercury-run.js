@@ -73,16 +73,19 @@
      The chrome blob is the ONLY fallback: a skin is worn only when its anchors JSON and every required sprite loaded;
      anything missing (or still loading) shows the blob, never a broken image and never code-drawn art.
      A missing finale scene falls back to the default grove finale.
-     To add December: drop skins/2026-12/<kid>/ (same layout) and add one line: "2026-12": { id: "...", dir: "skins/2026-12/" }. */
+     To add December: drop art/mercury/skins/2026-12/<kid>/ (same layout), list its PNGs in scripts/privacy-art-allowlist.txt,
+     and add one line: "2026-12": { id: "...", dir: "art/mercury/skins/2026-12/" }. */
   var SKINS = {
-    "2026-10": { id: "pumpkin", dir: "skins/2026-10/" },
-    "2026-11": { id: "turkey", dir: "skins/2026-11/", from: { civil: "2026-11-01", hour: 6 } }
+    "2026-10": { id: "pumpkin", dir: "art/mercury/skins/2026-10/" },
+    "2026-11": { id: "turkey", dir: "art/mercury/skins/2026-11/", from: { civil: "2026-11-01", hour: 6 } }
   };
-  /* layout, per kid folder, at 1x / 2x / 3x (Prism p2 drop: fixes/ori-mercury/p2/<month>/early/ with SUMS, copied as is):
-       <state>@<s>x.png for every state (roll has two frames, roll-1 and roll-2, right-facing: mirrored in code)
-       eyes-<open|half|closed|happy>@<s>x.png
-       anchors.json: { "bodyR": px, "states": { "<state>": { "contact": [x, y], "eyes": [x, y] } }, "accessory": [x, y] }
-       finale@<s>x.png (optional; missing = default finale) */
+  /* layout, per kid folder, at 1x / 2x / 3x (Prism p2 drop: fixes/ori-mercury/p2/<month>/early/ with SUMS; bytes copied
+     as is, and each <name>@<s>x.png lands as <s>x/<name>.png, the art/mercury/platforms/<s>x/ convention, because the
+     repo's art allow-list holds plain [A-Za-z0-9_./-] paths only):
+       <s>x/<state>.png for every state (roll has two frames, roll-1 and roll-2, right-facing: mirrored in code)
+       <s>x/eyes-<open|half|closed|happy>.png
+       anchors.json (1x px): { "bodyR": px, "states": { "<state>": { "contact": [x, y], "eyes": [x, y] } } }; extra keys ignored
+       <s>x/finale.png (optional; missing = default finale) */
   var SKIN_STATES = ["idle", "squash", "stretch", "fall", "roll-1", "roll-2", "happy", "sleep", "peek", "full"];
   var SKIN_EYES = ["open", "half", "closed", "happy"];
   var SKIN_EXT = ".png";
@@ -126,7 +129,7 @@
     var s = { month: month, id: def ? def.id : "blob", def: def, sprites: {}, eyes: {}, anchors: null, finale: null, ready: false, scale: skinScale(), kid: kid };
     skin = s;
     if (!def || !def.dir) return;
-    var base = def.dir + kid + "/", sx = "@" + s.scale + "x" + SKIN_EXT, need = SKIN_STATES.length + SKIN_EYES.length + 1, got = 0, dead = false;
+    var base = def.dir + kid + "/", sx = s.scale + "x/", need = SKIN_STATES.length + SKIN_EYES.length + 1, got = 0, dead = false;
     function ok() { if (!dead && ++got === need && skin === s) s.ready = true; }
     function img(url, put) {
       var im = new Image();
@@ -134,14 +137,14 @@
       im.onerror = function () { dead = true; };
       im.src = url;
     }
-    SKIN_STATES.forEach(function (st) { img(base + st + sx, function (im) { s.sprites[st] = im; }); });
-    SKIN_EYES.forEach(function (e) { img(base + "eyes-" + e + sx, function (im) { s.eyes[e] = im; }); });
+    SKIN_STATES.forEach(function (st) { img(base + sx + st + SKIN_EXT, function (im) { s.sprites[st] = im; }); });
+    SKIN_EYES.forEach(function (e) { img(base + sx + "eyes-" + e + SKIN_EXT, function (im) { s.eyes[e] = im; }); });
     try {
       fetch(base + "anchors.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
         if (j && j.states && SKIN_STATES.every(function (st) { return j.states[st] && j.states[st].contact; })) { s.anchors = j; ok(); } else dead = true;
       }).catch(function () { dead = true; });
     } catch (e) { dead = true; }
-    var fin = new Image(); fin.onload = function () { if (fin.width) s.finale = fin; }; fin.src = base + "finale" + sx; /* optional */
+    var fin = new Image(); fin.onload = function () { if (fin.width) s.finale = fin; }; fin.src = base + sx + "finale" + SKIN_EXT; /* optional */
   }
   function skinSync() { var m = pickSkinMonth(); if (m !== skin.month) { var old = skin; loadSkin(m); skinTransition(old, skin); } }
   /* room left (built later, no-ops today): a per-skin month-boundary transition scene, and an accessory layer at the

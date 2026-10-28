@@ -1,6 +1,6 @@
 /* ORI1 · SKIN1 QA fixtures, generated at test time into a temp dir (no image files in the repo; the privacy hook
    rightly refuses unlisted images). Solid-colour stand-in PNGs in the Prism p2 skin layout:
-     <dir><kid>/<state>@<s>x.png, eyes-<e>@<s>x.png, anchors.json, optional finale@<s>x.png
+     <dir><kid>/<s>x/<state>.png, <s>x/eyes-<e>.png, anchors.json, optional <s>x/finale.png
    hayes = complete with finale; harris = complete, no finale; ainsley = missing "sleep" (must fall back to the blob).
    Never served to kids: the harness resolves these only inside the vm. */
 import fs from "node:fs";
@@ -25,9 +25,10 @@ export function makeSkinFixtures() {
   for (const kid of Object.keys(col)) {
     const d = path.join(root, FIXDIR, kid); fs.mkdirSync(d, { recursive: true });
     for (const s of [1, 2, 3]) {
-      for (const st of SKIN_STATES) if (!(kid === "ainsley" && st === "sleep")) fs.writeFileSync(path.join(d, `${st}@${s}x.png`), png(20 * s, 24 * s, col[kid]));
-      for (const e of SKIN_EYES) fs.writeFileSync(path.join(d, `eyes-${e}@${s}x.png`), png(6 * s, 3 * s, [20, 20, 20, 255]));
-      if (kid === "hayes") fs.writeFileSync(path.join(d, `finale@${s}x.png`), png(64 * s, 36 * s, [250, 220, 150, 255]));
+      const ds = path.join(d, `${s}x`); fs.mkdirSync(ds, { recursive: true });
+      for (const st of SKIN_STATES) if (!(kid === "ainsley" && st === "sleep")) fs.writeFileSync(path.join(ds, `${st}.png`), png(20 * s, 24 * s, col[kid]));
+      for (const e of SKIN_EYES) fs.writeFileSync(path.join(ds, `eyes-${e}.png`), png(6 * s, 3 * s, [20, 20, 20, 255]));
+      if (kid === "hayes") fs.writeFileSync(path.join(ds, `finale.png`), png(64 * s, 36 * s, [250, 220, 150, 255]));
     }
     fs.writeFileSync(path.join(d, "anchors.json"), JSON.stringify({ bodyR: 8, states: Object.fromEntries(SKIN_STATES.map((st) => [st, { contact: [10, 24], eyes: [13, 8] }])) }));
   }

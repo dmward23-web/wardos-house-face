@@ -213,20 +213,21 @@ test("skin override: ?skin= and ?month= win over the date; unknown = the blob", 
   assert.deepEqual([dec.id, dec.hero], ["blob", "blob"], "a month with no registry line shows the blob");
 });
 
-test("missing art fails closed to the blob: pumpkin + turkey in the tree today (no art yet), no sprite drawn", async () => {
-  for (const at of [FX.clock.wed0700, "2026-11-02T13:00:00Z"]) {
-    const h = await skinAt(at); h.advance(300);
+const MISSBOOK = { "2026-11": { id: "turkey", dir: "art/mercury/skins/qa-missing/", from: { civil: "2026-11-01", hour: 6 } } };
+test("missing art fails closed to the blob: the pumpkin (no art in the tree yet) and a turkey dir with no files, no sprite drawn", async () => {
+  for (const [at, extra] of [[FX.clock.wed0700, {}], ["2026-11-02T13:00:00Z", { skinBook: MISSBOOK }]]) {
+    const h = await skinAt(at, extra); h.advance(300);
     const sk = h.skin();
     assert.deepEqual([sk.hero, sk.finale], ["blob", "default"], sk.id);
-    assert.equal(h.log.drawn.filter((u) => /^skins\//.test(u)).length, 0, "no broken skin image painted");
+    assert.equal(h.log.drawn.filter((u) => /^art\/mercury\/skins\//.test(u)).length, 0, "no broken skin image painted");
   }
 });
 
 test("skin loader: the Prism p2 layout (fixture PNGs) is worn; per-kid variant; finale optional", async () => {
   const hy = await skinAt("2026-11-02T13:00:00Z", { skinBook: FIXBOOK }); hy.advance(300);
   assert.deepEqual([hy.skin().hero, hy.skin().finale, hy.skin().dir], ["art", "art", FIXDIR + "hayes/"]);
-  assert.ok(hy.log.drawn.some((u) => u.startsWith(FIXDIR + "hayes/") && /@1x\.png$/.test(u)), "hayes sprite drawn");
-  assert.ok(hy.log.drawn.some((u) => /eyes-(open|half|closed|happy)@1x\.png$/.test(u)), "eyes layer drawn");
+  assert.ok(hy.log.drawn.some((u) => u.startsWith(FIXDIR + "hayes/") && /\/1x\/[a-z0-9-]+\.png$/.test(u)), "hayes sprite drawn");
+  assert.ok(hy.log.drawn.some((u) => /\/1x\/eyes-(open|half|closed|happy)\.png$/.test(u)), "eyes layer drawn");
   assert.ok(hy.log.images.every((u) => !/\/(harris|ainsley)\//.test(u)), "only the host kid's variant loads");
   const hr = await skinAt("2026-11-02T13:00:00Z", { kid: "harris", skinBook: FIXBOOK }); hr.advance(300);
   assert.deepEqual([hr.skin().hero, hr.skin().finale], ["art", "default"], "harris: no finale scene = default finale");
@@ -235,7 +236,7 @@ test("skin loader: the Prism p2 layout (fixture PNGs) is worn; per-kid variant; 
   assert.equal(ai.skin().hero, "blob", "ainsley's fixture set is missing sleep: the blob, never half a skin");
   assert.equal(ai.log.drawn.filter((u) => u.startsWith(FIXDIR)).length, 0);
   const x2 = await skinAt("2026-11-02T13:00:00Z", { skinBook: FIXBOOK, dpr: 2 }); x2.advance(300);
-  assert.ok(x2.log.images.some((u) => /idle@2x\.png$/.test(u)) && x2.skin().scale === 2, "2x sprites on a 2x screen");
+  assert.ok(x2.log.images.some((u) => /\/2x\/idle\.png$/.test(u)) && x2.skin().scale === 2, "2x sprites on a 2x screen");
 });
 
 test("mechanics are identical across skins: same size-from-days, same moves, same finale unlock", async () => {
@@ -247,10 +248,11 @@ test("mechanics are identical across skins: same size-from-days, same moves, sam
     return { m: J(h.merc()).map((b) => Object.assign({}, b, { tint: 0 })), fin: h.debug().finale, hero: h.skin().hero };
   };
   const require0 = (h, d) => { [...FX.data.kids.hayes.quests].forEach((q) => h.tick(q.id, d)); };
-  const blob = await run({ query: "skin=blob" }), art = await run({ skinBook: FIXBOOK }), miss = await run({});
-  assert.deepEqual([blob.hero, art.hero, miss.hero], ["blob", "art", "blob"]);
+  const blob = await run({ query: "skin=blob" }), art = await run({ skinBook: FIXBOOK }), miss = await run({ skinBook: MISSBOOK }), real = await run({});
+  assert.deepEqual([blob.hero, art.hero, miss.hero, real.hero], ["blob", "art", "blob", "art"], "real = the committed Prism turkey");
   assert.deepEqual(art.m, blob.m, "turkey art vs blob: same x / y / r / days");
   assert.deepEqual(miss.m, blob.m);
+  assert.deepEqual(real.m, blob.m, "real turkey art vs blob: same x / y / r / days");
   assert.ok(blob.m[0].days === 3 && blob.m[0].r > 26 * 1.4);
   const fb = await run({ query: "skin=blob" }, true), fa = await run({ skinBook: FIXBOOK }, true);
   assert.equal(fb.fin, true); assert.equal(fa.fin, true, "a full jar unlocks the finale in every skin");
