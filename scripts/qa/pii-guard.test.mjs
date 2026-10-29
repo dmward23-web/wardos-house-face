@@ -88,7 +88,7 @@ test("denylist set but key missing is a config failure (exit 2), --require-denyl
   const f = process.env.PII_GUARD_DENYLIST_FILE; delete process.env.PII_GUARD_DENYLIST_FILE;
   try {
     const r = run(["--staged", "--require-denylist"], repo({ "a.md": "x\n" }));
-    assert.equal(r.code, 2); assert.match(r.out, /WARN: no private pii-guard denylist/);
+    assert.equal(r.code, 2); assert.match(r.out, /^(?:WARN: |::warning::)no private pii-guard denylist/m); /* TESTFIX1: pii-guard.mjs:366 prints ::warning:: on the runner; exit 2 unchanged */
   } finally { process.env.PII_GUARD_DENYLIST_FILE = f; }
 });
 test("the repo allow-list holds only email/phone/id-hash/marker lines (ids by sha16, never the value)", () => {

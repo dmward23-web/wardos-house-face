@@ -9,6 +9,7 @@
    r3b writers: FS_R3B_TREE (a tree whose scripts/ hold r3b cal-months-window.py, cal-from-events.mjs, text-law.json), else the
    r3b sandbox b79 tree. node --test scripts/qa/facestrip1.test.mjs (no browser). Signs are written as code points. */
 import { assertSealed } from "./temp-home.mjs";
+import { ciOnlySkip } from "./ci-only-skip.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -40,6 +41,9 @@ function r3bLaw() {
   return null;
 }
 const R3 = r3bLaw();
+/* TESTFIX1 · the r3c law lives only in the box staging copy (private); the GitHub runner has none, so these 3 parity tests
+   skip THERE only. On the box a missing law still fails them (ciOnlySkip returns false off the runner). */
+const R3_CI_SKIP = ciOnlySkip("FACESTRIP1", !R3, "private r3c text-law.json (box staging copy) is not on the runner; the box gate runs these 3 parity tests");
 
 function loadLaw(opts = {}) {
   const box = {}; box.window = box;
@@ -49,7 +53,7 @@ function loadLaw(opts = {}) {
 }
 const L = loadLaw();
 
-test("FACESTRIP1 r2 parity: house-face-law.js money + sign sources are r3b's text-law.json strings, byte for byte, flags \"\"", () => {
+test("FACESTRIP1 r2 parity: house-face-law.js money + sign sources are r3b's text-law.json strings, byte for byte, flags \"\"", { skip: R3_CI_SKIP }, () => {
   assert.ok(R3, "r3b text-law.json with the r3b money / moneysign rules is readable");
   assert.equal(sha(R3.money.re).slice(0, 16), MONEY_SHA16, "r3b money rule");
   assert.equal(sha(R3.sign.re).slice(0, 16), SIGN_SHA16, "r3b moneysign rule");
@@ -124,7 +128,7 @@ test("FACESTRIP1 accent rows: amount, sign and US / USD gone; pinned output on a
   ACCENT.forEach((x, i) => { assert.equal(L.moneyFree(x), ACCENT_WANT[i], x); assert.doesNotMatch(L.moneyFree(x), /[\x24\uFF04\uFE69]|USD?/, x); });
 });
 
-test("FACESTRIP1 parity: the browser pattern and r3b's pattern give identical matches on all " + ALL.length + " fixtures", () => {
+test("FACESTRIP1 parity: the browser pattern and r3b's pattern give identical matches on all " + ALL.length + " fixtures", { skip: R3_CI_SKIP }, () => {
   assert.ok(R3);
   const r3 = new RegExp(R3.money.re, "g"), sg = new RegExp(R3.sign.re, "g");
   assert.ok(ALL.length >= 80, "80+ fixtures: " + ALL.length);
@@ -137,7 +141,7 @@ test("FACESTRIP1 parity: the browser pattern and r3b's pattern give identical ma
 
 /* defect 3: no \b, so JS and Python agree byte for byte on every fixture, accent rows included (r3's JS/Python k/m split is gone) */
 const PY = spawnSync("python3", ["-c", "1"]).status === 0;
-test("FACESTRIP1 r2: r3b law is byte-equal in JS and Python on every fixture (accent rows included)", { skip: PY ? false : "SKIP no python3" }, () => {
+test("FACESTRIP1 r2: r3b law is byte-equal in JS and Python on every fixture (accent rows included)", { skip: R3_CI_SKIP || (PY ? false : "SKIP no python3") }, () => {
   const py = spawnSync("python3", ["-c", "import json,re,sys\nd=json.load(sys.stdin)\nm=re.compile(d['m']);g=re.compile(d['g'])\nprint(json.dumps([g.sub('',m.sub('',x)) for x in d['xs']]))"],
     { input: JSON.stringify({ m: R3.money.re, g: R3.sign.re, xs: ALL }), encoding: "utf8" });
   assert.equal(py.status, 0, py.stderr);

@@ -9,7 +9,9 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 process.env.WARDOS_NAMES = "partner=Partnerly;coparent=Coparentia";
-const scan = (...extra) => spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--tree", ...extra], { cwd: ROOT, encoding: "utf8" });
+/* TESTFIX1 · --generic-only (as the CI privacy job runs it): it only lifts the 0-pattern fail-closed exit 2 (privacy-scan.mjs:242);
+   a loaded box denylist still runs, and every generic / unlisted_image hit still exits 1 (testfix1-guard pins both). */
+const scan = (...extra) => spawnSync("node", [path.join(ROOT, "scripts/privacy-scan.mjs"), "--tree", "--generic-only", ...extra], { cwd: ROOT, encoding: "utf8" });
 
 test("SCANMEDIA1 · unlisted .ico / .jxl / .mkv / .avi (any case) each fail the scan as unlisted_image", () => {
   const plants = ["zz-media/fav.ico", "zz-media/art.jxl", "zz-media/clip.mkv", "zz-media/clip.AVI"].map((f) => path.join(ROOT, f));

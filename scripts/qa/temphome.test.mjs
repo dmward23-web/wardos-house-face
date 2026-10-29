@@ -7,6 +7,8 @@ import os from "node:os";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
+import { spawnSync as spawnSyncTop } from "node:child_process";
+import { ciOnlySkip } from "./ci-only-skip.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
 test("HOME is a fresh temp folder, WARDOS_* unset, no names file at any reader path", () => {
@@ -78,7 +80,12 @@ test("seal: reader and private-list paths never sit under PYTHONPATH / PYTHONUSE
     const tgt = path.join(link, "wardos-private"); fs.symlinkSync(path.dirname(REAL_PRIVATE[1]), tgt);
     try { assert.throws(() => { try { fs.realpathSync(tgt); } catch { throw new Error("TEMPHOME1: a private-list path is reachable from the sealed HOME"); } assertSealed(); }, /reachable from the sealed HOME/, "a link from the temp HOME to the real private folder fails the seal"); }
     finally { fs.unlinkSync(tgt); } }
-  const { spawnSync } = await import("node:child_process");
-  const r = spawnSync("python3", ["-c", "import playwright, sys; sys.stdout.write('ok')"], { encoding: "utf8" });
+});
+/* TESTFIX1 · split out of the seal test so the seal asserts above run on CI too; only this python-playwright import check skips,
+   and only on the runner when python playwright is really not installed there (CI has no browser stack). */
+const PW_IMPORT = () => spawnSyncTop("python3", ["-c", "import playwright, sys; sys.stdout.write('ok')"], { encoding: "utf8" });
+const PW_CI_SKIP = ciOnlySkip("TEMPHOME1", PW_IMPORT().stdout !== "ok", "python playwright is not installed on the runner; the box gate runs this import check");
+test("seal: python playwright still importable under the sealed HOME (PYTHONPATH = site-packages only)", { skip: PW_CI_SKIP }, () => {
+  const r = PW_IMPORT();
   assert.equal(r.stdout, "ok", "python playwright still importable with PYTHONPATH = site-packages only");
 });

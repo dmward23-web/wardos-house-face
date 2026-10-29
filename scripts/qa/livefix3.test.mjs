@@ -9,6 +9,7 @@ import path from "node:path";
 import fs from "node:fs";
 import { spawnSync, execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { ciOnlySkip } from "./ci-only-skip.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
@@ -90,9 +91,16 @@ const V2H_FOLD = (t) => t
   .replace(' <div class="bank-links" data-cta-row hidden>\n <span class="unlock-cta" data-unlock-cta hidden>Jar full · show Dad</span>\n',
     ' <div class="bank-links">\n <a class="primary-foil" href="#sec-jar">Jar</a>\n <a class="unlock-cta" data-unlock-cta hidden href="#sec-jar">Jar full · show Dad</a>\n')
   .replace(/^( <span>the (?:island|block woods)<\/span>\n)(?! \n)/m, '$1 \n \n <a class="ftr-chip" href="#sec-jar">Jar</a>\n');
-test("the boys' pages are byte-identical to main 442eb257 apart from the Halloween theme layer", () => {
+/* TESTFIX1 · the baseline stays 442eb257: it holds all four pages (git cat-file -e 442eb257:<page> is 0 for each), and a later
+   baseline would stop checking drift since LIVEFIX2. CI fails only because the TESTS job checks out at depth 1, where no older
+   commit exists ("exists on disk, but not in"). Skip ONLY on the runner, ONLY when the clone is shallow AND the commit is absent. */
+const KID_BASE = "442eb25762967d4a1e7de1de70cd0991e15e0426";
+const gitOk = (a) => spawnSync("git", a, { cwd: ROOT, encoding: "utf8" });
+const KID_BASE_CI_SKIP = ciOnlySkip("LIVEFIX3", gitOk(["rev-parse", "--is-shallow-repository"]).stdout.trim() === "true" && gitOk(["cat-file", "-e", KID_BASE + "^{commit}"]).status !== 0,
+  "baseline 442eb257 is not in the depth-1 CI checkout (it does hold all 4 kid pages); the box gate runs this drift check");
+test("the boys' pages are byte-identical to main 442eb257 apart from the Halloween theme layer", { skip: KID_BASE_CI_SKIP }, () => {
   for (const f of ["kid-hayes.html", "kid-harris.html", "kid-hayes-pre-theme.html", "kid-harris-pre-theme.html"]) {
-    const base = execFileSync("git", ["show", "442eb25762967d4a1e7de1de70cd0991e15e0426:" + f], { cwd: ROOT }).toString();
+    const base = execFileSync("git", ["show", KID_BASE + ":" + f], { cwd: ROOT }).toString();
     const now = fs.readFileSync(path.join(ROOT, f), "utf8");
     assert.equal(THEME_STRIP(V2D_STRIP(V2H_FOLD(now))), THEME_STRIP(V2D_STRIP(base)), f + " drifted beyond the theme layer");
   }
