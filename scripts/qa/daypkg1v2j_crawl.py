@@ -50,26 +50,51 @@ FS_MONEY = ["Field trip (bring " + S + "5)", "Book fair " + S + "1,256", "Snack 
             "Fee USD 7,471 due", "Trip 7,472 USD", "Club US" + S + "7,473 now", "Gate USD" + S + "7,474", "Jar 1,256 " + S + " goal",
             "Cards 613 " + S + "5 swap", "Gift box 613 " + FW, "Focus 5 USB 50 BUS 5"]
 FS_CONTROLS = ["5km run", "Room 5m", "Focus 5 USB 50 BUS 5"]
+def fs_ct_now():
+    """FACESTRIP1DATE1 · ctNow: the CT wall clock the page sees. FS_NOW (ISO with offset or Z) fakes it for the date
+    sweep; the browser clock is pinned to the same instant, so the feed rows and the page always agree on 'today'."""
+    import datetime as _dt
+    from zoneinfo import ZoneInfo
+    ct = ZoneInfo("America/Chicago"); v = os.environ.get("FS_NOW")
+    t = _dt.datetime.fromisoformat(v.replace("Z", "+00:00")) if v else _dt.datetime.now(_dt.timezone.utc)
+    return t.astimezone(ct)
+def fs_off(day):  # the real CT offset on that date (CDT -05:00 / CST -06:00), not a fixed -05:00
+    import datetime as _dt
+    from zoneinfo import ZoneInfo
+    o = _dt.datetime(day.year, day.month, day.day, 12, tzinfo=ZoneInfo("America/Chicago")).strftime("%z"); return o[:3] + ":" + o[3:]
 def fs_days():
     import datetime as _dt
-    ct = _dt.timezone(_dt.timedelta(hours=-5))  # CDT/CST offset only matters for the date key; rows sit at 09:00-14:30
-    t = _dt.datetime.now(ct).date(); return [t, t + _dt.timedelta(days=1)]
+    t = fs_ct_now().date(); return [t, t + _dt.timedelta(days=1)]
+def fs_month_days(t0, n):
+    """n consecutive days of t0's month that include t0 (the wall grid shows only the current month, and hides weeks
+    that ended before today's week), so the rows always land in a painted, non-past week whatever ctNow is."""
+    import calendar
+    last = calendar.monthrange(t0.year, t0.month)[1]; start = max(1, min(t0.day, last - n + 1))
+    return [t0.replace(day=d) for d in range(start, start + n)]
 def fs_inject(name, d):
     t0, t1 = fs_days()
     if name == "cal-live":
         ev = []
         for i, txt in enumerate(FS_MONEY):  # tomorrow: timed rows (sheet-load-day shows the first future day with leaves)
             hh, mm = 9 + i // 2, 30 * (i % 2)
-            ev.append({"id": "fs-%d" % i, "summary": txt, "start": "%sT%02d:%02d:00-05:00" % (t1.isoformat(), hh, mm), "end": "%sT%02d:%02d:00-05:00" % (t1.isoformat(), hh, mm + 20),
+            ev.append({"id": "fs-%d" % i, "summary": txt, "start": "%sT%02d:%02d:00%s" % (t1.isoformat(), hh, mm, fs_off(t1)), "end": "%sT%02d:%02d:00%s" % (t1.isoformat(), hh, mm + 20, fs_off(t1)),
                        "location": txt + ", Sample St", "busy": False, "allDay": False})
         for i, txt in enumerate(FS_MONEY):  # today: all-day rows (month phone view of today; sheet-load-day skips all-day)
-            ev.append({"id": "fs-d%d" % i, "summary": txt, "start": "%sT00:00:00-05:00" % t0.isoformat(), "end": "%sT00:00:00-05:00" % t1.isoformat(), "location": "", "busy": False, "allDay": True})
+            ev.append({"id": "fs-d%d" % i, "summary": txt, "start": "%sT00:00:00%s" % (t0.isoformat(), fs_off(t0)), "end": "%sT00:00:00%s" % (t1.isoformat(), fs_off(t1)), "location": "", "busy": False, "allDay": True})
         d["upcomingLeaves"] = ev + list(d.get("upcomingLeaves") or [])
     if name == "cal-months":
         days = d.setdefault("days", {})
-        # wall cells show 3 items, so the 20 rows go 3 a day on days 1-7 of the current month (always in the grid)
-        for i in range(0, len(FS_MONEY), 3):
-            k = t0.replace(day=1 + i // 3).isoformat(); day = days.setdefault(k, {"withDan": True, "items": []})
+        # wall cells show 3 items, so the 20 rows go 3 a day on 7 days of the current month around ctNow (FACESTRIP1DATE1:
+        # was days 1-7, which late in the month sit in hidden past weeks and on the fixture's away days, so nothing painted).
+        # The injected days are with-Dan days AND so are the day before and after, so none of them is an away day or a hidden
+        # switch day (away-filter.js isSwitchDay compares the neighbours): this pass tests money stripping, not the away law
+        # (AWAYLAW1 owns that). Without it the fixture's alternating weeks hid rows on e.g. 10-04..07 and 11-30.
+        import datetime as _dt
+        md = fs_month_days(t0, 7)
+        for dd in [md[0] - _dt.timedelta(days=1)] + md + [md[-1] + _dt.timedelta(days=1)]:
+            days.setdefault(dd.isoformat(), {"withDan": True, "items": []})["withDan"] = True
+        for i, dd in zip(range(0, len(FS_MONEY), 3), md):
+            k = dd.isoformat(); day = days[k]
             day["items"] = [{"c": "shr", "l": txt} for txt in FS_MONEY[i:i + 3]] + list(day.get("items") or [])
         lo, hi = min(days), max(days); d["rangeStart"] = min(d.get("rangeStart") or lo, lo); d["rangeEnd"] = max(d.get("rangeEnd") or hi, hi)
     return d
@@ -299,7 +324,7 @@ FS_NOLB = r"""(() => { const R = window.RegExp, LB = /\(\?<[!=]/; window.__fsLbT
   W.prototype = R.prototype; Object.setPrototypeOf(W, R); window.RegExp = W; window.__fsNolb = true; })();"""
 FS_PAGES = ["month.html", "sheet-load-day.html"]
 if MODE in ("facestrip", "facestrip-nolb"):
-    fso = {"mode": MODE, "size": "%dx%d" % (w, h), "port": PORT, "root": ROOT, "sign_re": FS_SIGN, "bare_re": FS_BARE, "fixtures": FS_MONEY, "controls": FS_CONTROLS, "pages": {}}
+    fso = {"ct_now": fs_ct_now().isoformat(), "mode": MODE, "size": "%dx%d" % (w, h), "port": PORT, "root": ROOT, "sign_re": FS_SIGN, "bare_re": FS_BARE, "fixtures": FS_MONEY, "controls": FS_CONTROLS, "pages": {}}
     with sync_playwright() as p:
         b = p.chromium.launch(**launch_kw(p, args=["--disable-gpu"]))
         try:
@@ -311,6 +336,7 @@ if MODE in ("facestrip", "facestrip-nolb"):
                 ctx.add_init_script(FS_OBS)
                 ctx.route("**/*", lambda route: route.continue_() if (urlparse(route.request.url).hostname == "127.0.0.1" and urlparse(route.request.url).port == PORT) else route.abort())
                 pg = ctx.new_page(); errs = []; pg.on("pageerror", lambda e: errs.append(str(e)[:120]))
+                if os.environ.get("FS_NOW"): pg.clock.install(time=fs_ct_now().timestamp())  # FACESTRIP1DATE1 · page 'today' = ctNow
                 rec = {"loaded": False}
                 try:
                     pg.goto(base + PRE + pgname + "?pfBase=" + base, wait_until="load", timeout=60000); pg.wait_for_timeout(3500)

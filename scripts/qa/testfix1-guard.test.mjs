@@ -127,3 +127,34 @@ test("RUNTESTS1 guard · the TESTS job checks out full history (fetch-depth: 0) 
   const job = wf.slice(wf.indexOf("House-face test suite") - 1200, wf.indexOf("House-face test suite"));
   assert.match(job, /fetch-depth: 0/, "house-face-tests checkout has fetch-depth: 0");
 });
+
+/* FACESTRIP1DATE1 P3a · only ci-only-skip.mjs may produce a "CI-ONLY" skip reason. Every other suite source must not carry the
+   text at all (so no test can hand-write "# SKIP CI-ONLY ..." and slip past run-tests.sh). Exempt: ci-only-skip.mjs itself, this
+   guard (its fake suites are synthetic), and run-tests.sh (it only counts). */
+const CI_ONLY_EXEMPT = new Set(["ci-only-skip.mjs", "testfix1-guard.test.mjs", "run-tests.sh"]);
+test("FACESTRIP1DATE1 guard · only scripts/qa/ci-only-skip.mjs emits a CI-ONLY skip reason", () => {
+  const hits = [];
+  for (const f of fs.readdirSync(path.join(ROOT, "scripts/qa")).filter((f) => /\.(mjs|js|cjs|py|sh)$/.test(f) && !CI_ONLY_EXEMPT.has(f)))
+    if (/CI-ONLY/.test(read("scripts/qa/" + f))) hits.push(f);
+  assert.deepEqual(hits, [], "CI-ONLY text outside ci-only-skip.mjs");
+  assert.match(read("scripts/qa/ci-only-skip.mjs"), /const reason = "CI-ONLY " \+ id \+ ": " \+ why;/, "the one emitter");
+});
+/* FACESTRIP1DATE1 P3b · the CI-ONLY skip budget. Each ciOnlySkip call site (by its id expression) is listed with how many skips it
+   yields on the runner with fetch-depth: 0. The total may not exceed 11; a new or unlisted id fails until it is added here
+   on purpose (with its reason in the call). */
+const CI_ONLY_ALLOW = {
+  '"ARTALLOW1-real-bytes"': 1, '"ADULTCUT1-crawl"': 1, '"ADULTCUT2-crawl"': 1, '"FACESTRIP1-nolb@" + w': 2, '"FACESTRIP1-red"': 1,
+  '"FACESTRIP1"': 3, '"FACESTRIP1-r2-parity"': 1, '"TEMPHOME1"': 1,
+  '"LIVEFIX3"': 0, /* shallow-checkout only; the TESTS job has fetch-depth: 0, so on CI it runs */
+};
+test("FACESTRIP1DATE1 guard · at most 11 CI-ONLY skips, and every ciOnlySkip id is on the explicit allow list", () => {
+  const found = {};
+  for (const f of fs.readdirSync(path.join(ROOT, "scripts/qa")).filter((f) => /\.(mjs|js|cjs)$/.test(f) && !CI_ONLY_EXEMPT.has(f)))
+    for (const m of read("scripts/qa/" + f).matchAll(/ciOnlySkip\(([^,]+),/g)) found[m[1].trim()] = (found[m[1].trim()] || 0) + 1;
+  const unlisted = Object.keys(found).filter((k) => !(k in CI_ONLY_ALLOW));
+  assert.deepEqual(unlisted, [], "ciOnlySkip id not on CI_ONLY_ALLOW: add it here on purpose");
+  for (const k of Object.keys(found)) assert.equal(found[k], 1, k + " is used at exactly one call site");
+  const total = Object.keys(found).reduce((n, k) => n + CI_ONLY_ALLOW[k], 0);
+  assert.ok(total <= 11, "CI-ONLY skip budget: " + total + " > 11");
+  assert.ok(Object.values(CI_ONLY_ALLOW).reduce((a, b) => a + b, 0) <= 11, "the allow list itself stays within 11");
+});

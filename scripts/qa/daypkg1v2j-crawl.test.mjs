@@ -341,9 +341,9 @@ test("ADULTCUT2B static: no kid surface shows CONNECT for Spotify; the hub tile 
    setter / MutationObserver write, and storage (writes and the final dump). GREEN = 0 on both pages at 440 and 1280, the
    controls painted (not vacuous) and HouseFaceLaw.moneyFree loaded. RED control = the same pass served from a c5295884 (or
    f81262ee) tree via V2J_FS_RED_ROOT: sign hits on both pages. */
-const fsRun = (w, h, root, mode = "facestrip") => {
+const fsRun = (w, h, root, mode = "facestrip", now = null) => {
   const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), String(w), String(h), mode], { encoding: "utf8", timeout: 600000,
-    env: { ...process.env, ...(root ? { V2J_CRAWL_ROOT: root } : {}) } });
+    env: { ...process.env, ...(root ? { V2J_CRAWL_ROOT: root } : {}), ...(now ? { FS_NOW: now } : {}) } });
   if (process.env.V2J_DRIVER_LOG) { try { fs.appendFileSync(process.env.V2J_DRIVER_LOG, JSON.stringify({ facestrip: root ? "red" : "tip", mode, w, h, pid: r.pid, status: r.status, signal: r.signal }) + "\n"); } catch (e) {} }
   assert.equal(r.status, 0, "facestrip pass exit " + r.status + " " + String(r.stderr).slice(-600));
   const o = JSON.parse(r.stdout.trim().split("\n").pop());
@@ -395,6 +395,50 @@ test("FACESTRIP1 RED control @1280: the same pass on V2J_FS_RED_ROOT (c5295884 /
     const r = o.pages[p], all = [].concat(r.transient || [], r.dom || []);
     assert.ok(all.some((x) => x[0] === "sign"), "RED " + p + " has sign hits " + JSON.stringify(all).slice(0, 400));
   }
+});
+/* FACESTRIP1DATE1 · the facestrip rows are relative to ctNow (CT wall clock), never hard-dated. The 10-28 22:00 CT box FAIL:
+   the wall rows sat on days 1-7, which late in the month are hidden past weeks and fixture away days, so @1280 painted no
+   control. FS_NOW fakes ctNow for the driver AND pins the page clock to the same instant. */
+const FS_NOWS = [
+  ["today", "2026-10-28T12:00:00-05:00"], ["+1", "2026-10-29T12:00:00-05:00"], ["+7", "2026-11-04T12:00:00-06:00"],
+  ["+30", "2026-11-27T12:00:00-06:00"], ["CT 10-28, UTC already 10-29", "2026-10-28T23:30:00-05:00"],
+  ["just past CT midnight", "2026-10-29T00:30:00-05:00"], ["month end", "2026-10-31T23:59:00-05:00"], ["DST end day", "2026-11-01T01:30:00-06:00"]];
+test("FACESTRIP1DATE1 date sweep @1280: controls paint and 0 money on both pages for every fake ctNow", { ...SKIP, timeout: 900000 }, () => {
+  for (const [tag, now] of FS_NOWS) {
+    const o = fsRun(1280, 800, null, "facestrip", now);
+    assert.equal(Date.parse(o.ct_now), Date.parse(now), tag + ": driver ctNow is the fake now");
+    facestripAsserts(o, "sweep " + tag + " " + now);
+  }
+});
+test("FACESTRIP1DATE1 static: injected days follow ctNow in CT (real offset), inside its month, including today", () => {
+  const py = String.raw`
+import ast, os, json, datetime as dt
+src = open(os.path.join(${JSON.stringify(ROOT)}, "scripts/qa/daypkg1v2j_crawl.py")).read()
+ns = {"os": os}
+for n in ast.parse(src).body:
+    if isinstance(n, ast.FunctionDef) and n.name in ("fs_ct_now", "fs_off", "fs_days", "fs_month_days"): exec(compile(ast.Module([n], []), "x", "exec"), ns)
+out = []
+for now in ${JSON.stringify(FS_NOWS.map((x) => x[1]))}:
+    os.environ["FS_NOW"] = now
+    t0, t1 = ns["fs_days"](); m = ns["fs_month_days"](t0, 7)
+    out.append([now, t0.isoformat(), t1.isoformat(), [d.isoformat() for d in m], ns["fs_off"](t0)])
+print(json.dumps(out))`;
+  const r = spawnSync("python3", ["-c", py], { encoding: "utf8" });
+  assert.equal(r.status, 0, r.stderr);
+  const want = { "2026-10-28T12:00:00-05:00": "2026-10-28", "2026-10-29T12:00:00-05:00": "2026-10-29", "2026-11-04T12:00:00-06:00": "2026-11-04",
+    "2026-11-27T12:00:00-06:00": "2026-11-27", "2026-10-28T23:30:00-05:00": "2026-10-28", "2026-10-29T00:30:00-05:00": "2026-10-29",
+    "2026-10-31T23:59:00-05:00": "2026-10-31", "2026-11-01T01:30:00-06:00": "2026-11-01" };
+  for (const [now, t0, t1, days, off] of JSON.parse(r.stdout.trim())) {
+    assert.equal(t0, want[now], now + ": CT today (not the UTC date)");
+    assert.equal(Date.parse(t1 + "T12:00:00Z") - Date.parse(t0 + "T12:00:00Z"), 86400000, now + ": tomorrow");
+    assert.equal(days.length, 7, now + ": 7 wall days"); assert.ok(days.includes(t0), now + ": today's week holds the rows");
+    assert.ok(days.every((d) => d.slice(0, 7) === t0.slice(0, 7)), now + ": all in the shown month " + days);
+    assert.equal(off, t0 < "2026-11-01" ? "-05:00" : "-06:00", now + ": real CT offset");
+  }
+  const src = fs.readFileSync(path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), "utf8");
+  assert.doesNotMatch(src, /replace\(day=1 \+ i \/\/ 3\)/, "no fixed days 1-7");
+  assert.match(src, /for dd in \[md\[0\] - _dt\.timedelta\(days=1\)\] \+ md \+ \[md\[-1\] \+ _dt\.timedelta\(days=1\)\]:/, "neighbours are with-Dan too (no switch day)");
+  assert.match(src, /pg\.clock\.install\(time=fs_ct_now\(\)\.timestamp\(\)\)/, "page clock pinned to ctNow under FS_NOW");
 });
 test("FACESTRIP1 static: the facestrip pass covers every money form, its bare regex bites each residue and spares the controls", () => {
   const src = fs.readFileSync(path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), "utf8");
