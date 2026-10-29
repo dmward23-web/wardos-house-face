@@ -89,6 +89,7 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (= v4.4.0 at pin time)
         with:
+          fetch-depth: 0  # RUNTESTS1: full history, so LIVEFIX3 (needs git history) runs on the runner instead of skipping
           persist-credentials: false  # PIIGUARD4: no token left in .git/config for later steps
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:

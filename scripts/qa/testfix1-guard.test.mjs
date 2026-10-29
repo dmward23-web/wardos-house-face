@@ -91,3 +91,39 @@ test("TESTFIX1 guard · no privacy or pii test file skips through ciOnlySkip", (
     assert.doesNotMatch(read("scripts/qa/" + f), /ciOnlySkip/, f + " must not skip via ciOnlySkip");
   assert.doesNotMatch(read("scripts/qa/scanmedia1.test.mjs"), /ciOnlySkip|skip:/, "scanmedia1 never skips");
 });
+
+/* RUNTESTS1 guard · run-tests.sh allows a "CI-ONLY <id>:" skip ONLY on the runner; a plain skip or a failing test still fails it. */
+function fakeSuite(body) {
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), "runtests1-guard-"));
+  fs.mkdirSync(path.join(d, "scripts/qa"), { recursive: true });
+  fs.copyFileSync(path.join(ROOT, "scripts/qa/run-tests.sh"), path.join(d, "scripts/qa/run-tests.sh"));
+  fs.writeFileSync(path.join(d, "scripts/qa/a.test.mjs"), 'import test from "node:test";\nimport assert from "node:assert/strict";\n' + body);
+  fs.mkdirSync(path.join(d, "deps/ws"), { recursive: true });
+  fs.writeFileSync(path.join(d, "deps/ws/package.json"), "{}"); /* stub: run-tests.sh only checks that ws is present */
+  return d;
+}
+function runSuite(d, ci) {
+  const env = { PATH: process.env.PATH, HOME: d, WARDOS_DEPS: path.join(d, "deps"), QA_NO_BROWSER: "1" };
+  if (ci) env.GITHUB_ACTIONS = "true";
+  return spawnSync("bash", [path.join(d, "scripts/qa/run-tests.sh")], { cwd: d, env, encoding: "utf8" }).status;
+}
+test("RUNTESTS1 guard · a CI-ONLY skip passes on the runner, fails off it; plain skips and failures still fail on the runner", () => {
+  const cases = [
+    ['test("x", { skip: "CI-ONLY X: box-only file" }, () => {});\ntest("y", () => {});', true, 0],
+    ['test("x", { skip: "CI-ONLY X: box-only file" }, () => {});\ntest("y", () => {});', false, 3],
+    ['test("x", { skip: "no file here" }, () => {});', true, 3],
+    ['test("x", { skip: "CI-ONLY X: a" }, () => {});\ntest("y", { skip: "CI-ONLY Y: b" }, () => {});\ntest("z", { skip: "plain" }, () => {});', true, 3],
+    ['test("x", { skip: "CI-ONLY X: a" }, () => {});\ntest("y", () => { assert.equal(1, 2); });', true, 1],
+  ];
+  for (const [body, ci, want] of cases) {
+    const d = fakeSuite(body);
+    try { assert.equal(runSuite(d, ci), want, (ci ? "runner" : "box") + ": " + body.replace(/\n/g, " | ")); }
+    finally { fs.rmSync(d, { recursive: true, force: true }); }
+  }
+  assert.match(read("scripts/qa/run-tests.sh"), /if \[ "\$\{GITHUB_ACTIONS:-\}" = "true" \]; then\n  cionly=/, "CI-ONLY counting is gated on the runner");
+});
+test("RUNTESTS1 guard · the TESTS job checks out full history (fetch-depth: 0) so LIVEFIX3 runs", () => {
+  const wf = read(".github/workflows/privacy-scan.yml");
+  const job = wf.slice(wf.indexOf("House-face test suite") - 1200, wf.indexOf("House-face test suite"));
+  assert.match(job, /fetch-depth: 0/, "house-face-tests checkout has fetch-depth: 0");
+});

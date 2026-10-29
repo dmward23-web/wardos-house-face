@@ -4,6 +4,7 @@
    Temp HOME and a temp media folder: one listed file copied with its real bytes when the private art folder is on this box
    (else a synthetic list covers the same cases). The list is written into the temp media folder, as on the hub. Failure messages carry case labels, never file names. */
 import { spawnListening } from "./free-port.mjs";
+import { ciOnlySkip } from "./ci-only-skip.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -76,7 +77,7 @@ test("the allowlist is exact and private: every entry a plain relative path with
   assert.ok(Object.keys(LIST).length > 100, "list loaded");
   for (const [n, h] of Object.entries(LIST)) { assert.match(h, /^[0-9a-f]{64}$/, "sha shape"); assert.ok(!n.includes("..") && !n.startsWith("/") && !n.includes("\\"), "plain path"); }
 });
-test("a listed file with its listed bytes serves (only when the private art is on this box)", { skip: !REAL && "no private art on this box" }, async () => {
+test("a listed file with its listed bytes serves (only when the private art is on this box)", { skip: ciOnlySkip("ARTALLOW1-real-bytes", !REAL, "the private art files are box-only and never in git, so the runner cannot hold them; the box still runs this test") || (!REAL && "no private art on this box") }, async () => {
   const [s, b] = await get(A + REAL.n); assert.equal(s, 200, "listed+sha"); assert.equal(sha(b), LIST[REAL.n], "same bytes");
 });
 test("HTTP negatives: unlisted, wrong sha, symlink and traversal are 404", async () => {

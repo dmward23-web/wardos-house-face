@@ -25,6 +25,14 @@ set -e
 skipped="$(sed -n 's/^# skipped \([0-9]*\)$/\1/p' "$out" | tail -1)"
 allowed=0
 [ "${QA_NO_BROWSER:-}" = "1" ] && allowed="$(grep -c 'SKIP.*QA_NO_BROWSER' "$out" || true)"
+# RUNTESTS1 · on the GitHub runner only, a skip whose TAP reason starts "CI-ONLY <id>:" is allowed too. Those reasons come only
+# from ci-only-skip.mjs, which returns one only when GITHUB_ACTIONS=true AND the box-only precondition is absent; each id carries
+# its justification in the reason. Off the runner nothing is added, so on the box every such skip still fails the run.
+if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+  cionly="$(grep -cE '^ *(ok|not ok) [0-9]+ .*# SKIP CI-ONLY [A-Za-z0-9@_.-]+: ' "$out" || true)"
+  allowed=$(( allowed + ${cionly:-0} ))
+  echo "QA1: CI-ONLY skips allowed on the runner: ${cionly:-0}"
+fi
 if [ "$rc" -ne 0 ]; then echo "QA1: FAIL (node --test exit $rc)" >&2; exit "$rc"; fi
 if [ "${skipped:-0}" -gt "$allowed" ]; then echo "QA1: FAIL: $skipped skipped test(s); a skip is not a pass" >&2; exit 3; fi
 echo "QA1: PASS"

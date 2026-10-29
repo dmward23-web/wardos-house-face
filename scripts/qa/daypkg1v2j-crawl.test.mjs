@@ -5,6 +5,7 @@
    Seeds: the three kid boards, mercury-run and sheet-index; links, header, Home and taps are followed; Dad pages are never entered.
    Every page: 0 '$' in the rendered DOM (hidden included), 0 transient '$' writes (MutationObserver + setter hooks installed
    before any script) and 0 '$' in localStorage / sessionStorage. */
+import { ciOnlySkip } from "./ci-only-skip.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -130,7 +131,7 @@ test("DAYPKG1 v2j static: groceries footer chip reads GROCERIES (no '" + D + "')
    must catch the Spotify setup panel / Client ID field, the Sensi helper links and the App Store / Google Play links. The two
    tests above are the same crawl on this tree and must come back clean. Runs only when V2J_BASE_ROOT is set. */
 test("ADULTCUT1 positive control @1280: the same crawl on 4557b0d2 catches the Spotify setup panel, the Sensi helper and app-store links",
-  { ...(browser && process.env.V2J_BASE_ROOT ? {} : { skip: "SKIP needs a browser and V2J_BASE_ROOT (a 4557b0d2 tree)" }), timeout: 900000 }, () => {
+  { ...(browser && process.env.V2J_BASE_ROOT ? {} : { skip: ciOnlySkip("ADULTCUT1-crawl", true, "needs a browser and V2J_BASE_ROOT (a 4557b0d2 tree): " + "browser + baseline tree are box-only (runner has QA_NO_BROWSER=1 and no second checkout)") || "SKIP needs a browser and V2J_BASE_ROOT (a 4557b0d2 tree)" }), timeout: 900000 }, () => {
   const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), "1280", "800"], { encoding: "utf8", timeout: 880000,
     env: { ...process.env, ADULT_DENY_RE: ADULT_DENY_RE.source, V2J_CRAWL_ROOT: process.env.V2J_BASE_ROOT } });
   if (process.env.V2J_DRIVER_LOG) { try { fs.appendFileSync(process.env.V2J_DRIVER_LOG, JSON.stringify({ control: "4557b0d2", w: 1280, h: 800, pid: r.pid, status: r.status, signal: r.signal }) + "\n"); } catch (e) {} }
@@ -247,7 +248,7 @@ test("SPOTCUT static: no Spotify credential field or save path on any kid-reacha
 /* ADULTCUT2 RED control (Atlas 9:07): the SAME crawl and the SAME two asserts, pointed at a c5295884 tree (V2J_AC1_ROOT, made with
    git archive), must go RED, from the kid Connect Spotify button (the sheet-index tile and the sheet-spotify gate). */
 test("ADULTCUT2 RED control @1280: the same crawl on c5295884 fails the outbound sign-in assert from the kid Connect Spotify button",
-  { ...(browser && process.env.V2J_AC1_ROOT ? {} : { skip: "SKIP needs a browser and V2J_AC1_ROOT (a c5295884 tree)" }), timeout: 900000 }, () => {
+  { ...(browser && process.env.V2J_AC1_ROOT ? {} : { skip: ciOnlySkip("ADULTCUT2-crawl", true, "needs a browser and V2J_AC1_ROOT (a c5295884 tree): " + "browser + baseline tree are box-only (runner has QA_NO_BROWSER=1 and no second checkout)") || "SKIP needs a browser and V2J_AC1_ROOT (a c5295884 tree)" }), timeout: 900000 }, () => {
   const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), "1280", "800"], { encoding: "utf8", timeout: 880000,
     env: { ...process.env, ADULT_DENY_RE: ADULT_DENY_RE.source, OUTBOUND_AUTH_RE: OUTBOUND_AUTH_RE.source, OFFSITE_ALLOW: JSON.stringify(OFFSITE_ALLOW), V2J_CRAWL_ROOT: process.env.V2J_AC1_ROOT } });
   if (process.env.V2J_DRIVER_LOG) { try { fs.appendFileSync(process.env.V2J_DRIVER_LOG, JSON.stringify({ control: "c5295884", w: 1280, h: 800, pid: r.pid, status: r.status, signal: r.signal }) + "\n"); } catch (e) {} }
@@ -376,7 +377,7 @@ for (const [w, h] of [[440, 956], [1280, 800]]) {
    capture fallback. GREEN = fallback taken on both pages (lb false, lbThrows > 0) and 0 money in DOM, storage and transient writes. */
 const NOLB = browser && process.env.V2J_FS_NOLB === "1" ? {} : { skip: "SKIP needs a browser and V2J_FS_NOLB=1 (old-Safari no-lookbehind pass, opt-in)" };
 for (const [w, h] of [[440, 956], [1280, 800]]) {
-  test("FACESTRIP1 r2 old-Safari no-lookbehind @" + w + ": the law's capture fallback writes no money on month.html or sheet-load-day", { ...NOLB, timeout: 620000 }, () => {
+  test("FACESTRIP1 r2 old-Safari no-lookbehind @" + w + ": the law's capture fallback writes no money on month.html or sheet-load-day", { ...(NOLB.skip ? { skip: ciOnlySkip("FACESTRIP1-nolb@" + w, true, "opt-in old-Safari pass needs a browser and V2J_FS_NOLB=1, box-only (runner has QA_NO_BROWSER=1)") || NOLB.skip } : NOLB), timeout: 620000 }, () => {
     const o = fsRun(w, h, null, "facestrip-nolb");
     facestripAsserts(o, "nolb@" + w, "facestrip-nolb");
     for (const p of FS_PAGES) { const r = o.pages[p];
@@ -386,7 +387,7 @@ for (const [w, h] of [[440, 956], [1280, 800]]) {
   });
 }
 test("FACESTRIP1 RED control @1280: the same pass on V2J_FS_RED_ROOT (c5295884 / f81262ee) writes money on both pages",
-  { ...(browser && process.env.V2J_FS_RED_ROOT ? {} : { skip: "SKIP needs a browser and V2J_FS_RED_ROOT (a c5295884 or f81262ee tree)" }), timeout: 620000 }, () => {
+  { ...(browser && process.env.V2J_FS_RED_ROOT ? {} : { skip: ciOnlySkip("FACESTRIP1-red", true, "RED control needs a browser and V2J_FS_RED_ROOT (a c5295884 or f81262ee tree): " + "browser + baseline tree are box-only (runner has QA_NO_BROWSER=1 and no second checkout)") || "SKIP needs a browser and V2J_FS_RED_ROOT (a c5295884 or f81262ee tree)" }), timeout: 620000 }, () => {
   const o = fsRun(1280, 800, process.env.V2J_FS_RED_ROOT);
   let red = null; try { facestripAsserts(o, "red"); } catch (e) { red = e; }
   assert.ok(red && /0 money/.test(red.message), "the RED tree fails a 0-money assert: " + (red ? red.message.slice(0, 300) : "it passed"));

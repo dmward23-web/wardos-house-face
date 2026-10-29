@@ -167,7 +167,7 @@ function writers(xs) {
   const p = JSON.parse(py.stdout), j = JSON.parse(js.stdout);
   return { lawSha: sha(Buffer.from(p.law, "hex")), cmw: p.out, cfe: j.out, cfeSrc: j.src, cfeSign: j.sign };
 }
-test("FACESTRIP1 r2 parity: browser moneyFree === python3 cal-months-window _nodollar === cal-from-events noDollarDeep, byte for byte", { skip: TREE_OK ? false : "SKIP no r3b tree / python3 (" + R3B_TREE + ")" }, () => {
+test("FACESTRIP1 r2 parity: browser moneyFree === python3 cal-months-window _nodollar === cal-from-events noDollarDeep, byte for byte", { skip: TREE_OK ? false : (ciOnlySkip("FACESTRIP1-r2-parity", true, "the r3b worktree is a box-only scratch tree, never on the runner") || "SKIP no r3b tree / python3 (" + R3B_TREE + ")") }, () => {
   const W = writers(ALL), diff = [];
   assert.equal(W.lawSha.slice(0, 16), "03d916def7ed8572", "the writers' tree carries r3c text-law.json 03d916de");
   assert.equal(W.cfeSrc, L.MONEY_SRC, "cfe MONEY_SRC is the browser source"); assert.equal(W.cfeSign, L.SIGN_SRC, "cfe MONEY_SIGN_SRC is the browser source");
