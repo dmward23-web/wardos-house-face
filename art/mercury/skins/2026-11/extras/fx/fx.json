@@ -1,0 +1,88 @@
+{
+  "grow": {
+    "frames": 6,
+    "canvas3x": 1024,
+    "pivot3x": [
+      512,
+      512
+    ],
+    "sheet": "grow-sheet (6 frames left to right)",
+    "variants": {
+      "cream": {
+        "prefix": "grow-cream-",
+        "frames": 6,
+        "pivot3x": [
+          512,
+          512
+        ],
+        "sheet": "grow-cream-sheet",
+        "blend": "normal"
+      }
+    }
+  },
+  "pebble": {
+    "canvas3x": 384,
+    "pivot3x": [
+      192,
+      200
+    ],
+    "look": "matte warm amber river stone, no rim or edge ring",
+    "states": [
+      "pebble-empty",
+      "pebble-filled",
+      "pebble-today-1..3"
+    ],
+    "blend": "normal"
+  },
+  "drop": {
+    "canvas3x": 768,
+    "pivot3x": [
+      384,
+      640
+    ],
+    "frames": 4,
+    "note": "neutral silver, tint in code"
+  },
+  "splash": {
+    "canvas3x": 768,
+    "pivot3x": [
+      384,
+      560
+    ],
+    "frames": 6,
+    "note": "neutral silver, tint in code; pivot is the impact point"
+  },
+  "wings": {
+    "canvas3x": 768,
+    "pivot3x": [
+      384,
+      430
+    ],
+    "note": "double-jump mark; centre between wings"
+  },
+  "motes": {
+    "canvas3x": 768,
+    "pivot3x": [
+      384,
+      384
+    ],
+    "frames": 4,
+    "note": "magnet motes; 6 motes, 15 degree step per frame, seamless loop"
+  },
+  "notWired": [
+    "pebble-today-1",
+    "pebble-today-2",
+    "pebble-today-3",
+    "drop-1",
+    "drop-2",
+    "drop-3",
+    "drop-4",
+    "grow-cream-1",
+    "grow-cream-2",
+    "grow-cream-3",
+    "grow-cream-4",
+    "grow-cream-5",
+    "grow-cream-6",
+    "grow-cream-sheet"
+  ]
+}

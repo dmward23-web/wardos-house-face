@@ -1,0 +1,1145 @@
+{
+ "units": "anchor coords are 1x px in the 341 body canvas, same as photoreal-r2 anchors.json",
+ "bodyR": 108.0,
+ "shine": {
+  "idle": {
+   "name": "shine-idle",
+   "offset1x": [
+    50,
+    77
+   ],
+   "size1x": [
+    152,
+    237
+   ]
+  },
+  "squash": {
+   "name": "shine-squash",
+   "offset1x": [
+    59,
+    117
+   ],
+   "size1x": [
+    170,
+    200
+   ]
+  },
+  "stretch": {
+   "name": "shine-stretch",
+   "offset1x": [
+    92,
+    67
+   ],
+   "size1x": [
+    216,
+    249
+   ]
+  },
+  "fall": {
+   "name": "shine-fall",
+   "offset1x": [
+    63,
+    81
+   ],
+   "size1x": [
+    265,
+    236
+   ]
+  },
+  "roll-1": {
+   "name": "shine-roll-1",
+   "offset1x": [
+    66,
+    131
+   ],
+   "size1x": [
+    134,
+    110
+   ]
+  },
+  "roll-2": {
+   "name": "shine-roll-2",
+   "offset1x": [
+    63,
+    124
+   ],
+   "size1x": [
+    160,
+    94
+   ]
+  },
+  "happy": {
+   "name": "shine-happy",
+   "offset1x": [
+    64,
+    93
+   ],
+   "size1x": [
+    217,
+    219
+   ]
+  },
+  "sleep": {
+   "name": "shine-sleep",
+   "offset1x": [
+    81,
+    112
+   ],
+   "size1x": [
+    145,
+    194
+   ]
+  },
+  "peek": {
+   "name": "shine-peek",
+   "offset1x": [
+    44,
+    85
+   ],
+   "size1x": [
+    227,
+    227
+   ]
+  },
+  "full": {
+   "name": "shine-full",
+   "offset1x": [
+    50,
+    62
+   ],
+   "size1x": [
+    223,
+    253
+   ]
+  }
+ },
+ "rim": {
+  "idle": {
+   "name": "rim-idle",
+   "offset1x": [
+    48,
+    76
+   ],
+   "size1x": [
+    172,
+    244
+   ]
+  },
+  "squash": {
+   "name": "rim-squash",
+   "offset1x": [
+    57,
+    116
+   ],
+   "size1x": [
+    180,
+    204
+   ]
+  },
+  "stretch": {
+   "name": "rim-stretch",
+   "offset1x": [
+    89,
+    67
+   ],
+   "size1x": [
+    222,
+    255
+   ]
+  },
+  "fall": {
+   "name": "rim-fall",
+   "offset1x": [
+    62,
+    80
+   ],
+   "size1x": [
+    268,
+    242
+   ]
+  },
+  "roll-1": {
+   "name": "rim-roll-1",
+   "offset1x": [
+    64,
+    131
+   ],
+   "size1x": [
+    173,
+    170
+   ]
+  },
+  "roll-2": {
+   "name": "rim-roll-2",
+   "offset1x": [
+    61,
+    123
+   ],
+   "size1x": [
+    176,
+    182
+   ]
+  },
+  "happy": {
+   "name": "rim-happy",
+   "offset1x": [
+    62,
+    92
+   ],
+   "size1x": [
+    222,
+    229
+   ]
+  },
+  "sleep": {
+   "name": "rim-sleep",
+   "offset1x": [
+    78,
+    111
+   ],
+   "size1x": [
+    186,
+    201
+   ]
+  },
+  "peek": {
+   "name": "rim-peek",
+   "offset1x": [
+    42,
+    84
+   ],
+   "size1x": [
+    232,
+    235
+   ]
+  },
+  "full": {
+   "name": "rim-full",
+   "offset1x": [
+    48,
+    61
+   ],
+   "size1x": [
+    247,
+    259
+   ]
+  }
+ },
+ "shadow": {
+  "idle": {
+   "name": "shadow-idle",
+   "center3x": [
+    521.7,
+    960.8
+   ],
+   "radius3x": [
+    138.6,
+    23.6
+   ],
+   "offset1x": [
+    126,
+    309
+   ],
+   "size1x": [
+    96,
+    23
+   ]
+  },
+  "squash": {
+   "name": "shadow-squash",
+   "center3x": [
+    528.3,
+    964.2
+   ],
+   "radius3x": [
+    218.4,
+    37.1
+   ],
+   "offset1x": [
+    102,
+    306
+   ],
+   "size1x": [
+    148,
+    31
+   ]
+  },
+  "stretch": {
+   "name": "shadow-stretch",
+   "center3x": [
+    536.9,
+    962.5
+   ],
+   "radius3x": [
+    177.7,
+    30.2
+   ],
+   "offset1x": [
+    118,
+    307
+   ],
+   "size1x": [
+    122,
+    28
+   ]
+  },
+  "fall": {
+   "name": "shadow-fall",
+   "center3x": [
+    480.5,
+    964.0
+   ],
+   "radius3x": [
+    214.8,
+    36.5
+   ],
+   "offset1x": [
+    87,
+    306
+   ],
+   "size1x": [
+    146,
+    31
+   ]
+  },
+  "roll-1": {
+   "name": "shadow-roll-1",
+   "center3x": [
+    523.6,
+    962.8
+   ],
+   "radius3x": [
+    186.6,
+    31.7
+   ],
+   "offset1x": [
+    111,
+    307
+   ],
+   "size1x": [
+    127,
+    28
+   ]
+  },
+  "roll-2": {
+   "name": "shadow-roll-2",
+   "center3x": [
+    514.1,
+    963.7
+   ],
+   "radius3x": [
+    208.2,
+    35.4
+   ],
+   "offset1x": [
+    101,
+    306
+   ],
+   "size1x": [
+    141,
+    31
+   ]
+  },
+  "happy": {
+   "name": "shadow-happy",
+   "center3x": [
+    546.1,
+    966.8
+   ],
+   "radius3x": [
+    280.2,
+    47.6
+   ],
+   "offset1x": [
+    88,
+    303
+   ],
+   "size1x": [
+    189,
+    38
+   ]
+  },
+  "sleep": {
+   "name": "shadow-sleep",
+   "center3x": [
+    537.7,
+    968.7
+   ],
+   "radius3x": [
+    324.0,
+    55.1
+   ],
+   "offset1x": [
+    71,
+    302
+   ],
+   "size1x": [
+    217,
+    39
+   ]
+  },
+  "peek": {
+   "name": "shadow-peek",
+   "center3x": [
+    453.5,
+    962.8
+   ],
+   "radius3x": [
+    185.9,
+    31.6
+   ],
+   "offset1x": [
+    88,
+    307
+   ],
+   "size1x": [
+    127,
+    28
+   ]
+  },
+  "full": {
+   "name": "shadow-full",
+   "center3x": [
+    528.4,
+    963.4
+   ],
+   "radius3x": [
+    199.1,
+    33.8
+   ],
+   "offset1x": [
+    109,
+    307
+   ],
+   "size1x": [
+    135,
+    29
+   ]
+  }
+ },
+ "breathe": [
+  {
+   "name": "breathe-1",
+   "scaleY": 1.0,
+   "contact": [
+    170.7,
+    318.3
+   ],
+   "eyes": [
+    187.2,
+    123.0
+   ],
+   "accessory": [
+    181.5,
+    93.8
+   ],
+   "feather": [
+    165.5,
+    95.9
+   ],
+   "offset1x": [
+    46,
+    75
+   ],
+   "size1x": [
+    178,
+    247
+   ]
+  },
+  {
+   "name": "breathe-2",
+   "scaleY": 1.012,
+   "contact": [
+    170.7,
+    318.3
+   ],
+   "eyes": [
+    187.1,
+    120.7
+   ],
+   "accessory": [
+    181.4,
+    91.1
+   ],
+   "feather": [
+    165.5,
+    93.2
+   ],
+   "offset1x": [
+    47,
+    72
+   ],
+   "size1x": [
+    177,
+    250
+   ]
+  },
+  {
+   "name": "breathe-3",
+   "scaleY": 1.022,
+   "contact": [
+    170.7,
+    318.3
+   ],
+   "eyes": [
+    187.0,
+    118.7
+   ],
+   "accessory": [
+    181.4,
+    88.9
+   ],
+   "feather": [
+    165.6,
+    91.0
+   ],
+   "offset1x": [
+    47,
+    69
+   ],
+   "size1x": [
+    176,
+    253
+   ]
+  },
+  {
+   "name": "breathe-4",
+   "scaleY": 1.012,
+   "contact": [
+    170.7,
+    318.3
+   ],
+   "eyes": [
+    187.1,
+    120.7
+   ],
+   "accessory": [
+    181.4,
+    91.1
+   ],
+   "feather": [
+    165.5,
+    93.2
+   ],
+   "offset1x": [
+    47,
+    72
+   ],
+   "size1x": [
+    177,
+    250
+   ]
+  }
+ ],
+ "sweep": {
+  "idle": {
+   "prefix": "sweep-",
+   "frames": 6,
+   "pose": "idle",
+   "layers": [
+    {
+     "name": "sweep-1",
+     "offset1x": [
+      51,
+      125
+     ],
+     "size1x": [
+      53,
+      54
+     ]
+    },
+    {
+     "name": "sweep-2",
+     "offset1x": [
+      48,
+      76
+     ],
+     "size1x": [
+      154,
+      158
+     ]
+    },
+    {
+     "name": "sweep-3",
+     "offset1x": [
+      51,
+      79
+     ],
+     "size1x": [
+      164,
+      183
+     ]
+    },
+    {
+     "name": "sweep-4",
+     "offset1x": [
+      75,
+      112
+     ],
+     "size1x": [
+      146,
+      169
+     ]
+    },
+    {
+     "name": "sweep-5",
+     "offset1x": [
+      105,
+      176
+     ],
+     "size1x": [
+      118,
+      145
+     ]
+    },
+    {
+     "name": "sweep-6",
+     "offset1x": [
+      135,
+      224
+     ],
+     "size1x": [
+      86,
+      98
+     ]
+    }
+   ]
+  },
+  "happy": {
+   "prefix": "sweep-happy-",
+   "frames": 6,
+   "pose": "happy",
+   "layers": [
+    {
+     "name": "sweep-happy-1",
+     "offset1x": [
+      62,
+      138
+     ],
+     "size1x": [
+      72,
+      72
+     ]
+    },
+    {
+     "name": "sweep-happy-2",
+     "offset1x": [
+      62,
+      92
+     ],
+     "size1x": [
+      155,
+      162
+     ]
+    },
+    {
+     "name": "sweep-happy-3",
+     "offset1x": [
+      69,
+      103
+     ],
+     "size1x": [
+      159,
+      200
+     ]
+    },
+    {
+     "name": "sweep-happy-4",
+     "offset1x": [
+      95,
+      142
+     ],
+     "size1x": [
+      189,
+      173
+     ]
+    },
+    {
+     "name": "sweep-happy-5",
+     "offset1x": [
+      138,
+      156
+     ],
+     "size1x": [
+      146,
+      156
+     ]
+    },
+    {
+     "name": "sweep-happy-6",
+     "offset1x": [
+      207,
+      274
+     ],
+     "size1x": [
+      56,
+      48
+     ]
+    }
+   ]
+  }
+ },
+ "crop": "every layer here is cropped to its alpha bounding box plus a 2 px pad at 1x. Draw it at offset1x (times the scale for 2x and 3x) inside the 341 px body canvas. shadow center3x and radius3x stay in full body canvas coords.",
+ "layers": {
+  "breathe-1": {
+   "offset1x": [
+    46,
+    75
+   ],
+   "size1x": [
+    178,
+    247
+   ]
+  },
+  "breathe-2": {
+   "offset1x": [
+    47,
+    72
+   ],
+   "size1x": [
+    177,
+    250
+   ]
+  },
+  "breathe-3": {
+   "offset1x": [
+    47,
+    69
+   ],
+   "size1x": [
+    176,
+    253
+   ]
+  },
+  "breathe-4": {
+   "offset1x": [
+    47,
+    72
+   ],
+   "size1x": [
+    177,
+    250
+   ]
+  },
+  "rim-fall": {
+   "offset1x": [
+    62,
+    80
+   ],
+   "size1x": [
+    268,
+    242
+   ]
+  },
+  "rim-full": {
+   "offset1x": [
+    48,
+    61
+   ],
+   "size1x": [
+    247,
+    259
+   ]
+  },
+  "rim-happy": {
+   "offset1x": [
+    62,
+    92
+   ],
+   "size1x": [
+    222,
+    229
+   ]
+  },
+  "rim-idle": {
+   "offset1x": [
+    48,
+    76
+   ],
+   "size1x": [
+    172,
+    244
+   ]
+  },
+  "rim-peek": {
+   "offset1x": [
+    42,
+    84
+   ],
+   "size1x": [
+    232,
+    235
+   ]
+  },
+  "rim-roll-1": {
+   "offset1x": [
+    64,
+    131
+   ],
+   "size1x": [
+    173,
+    170
+   ]
+  },
+  "rim-roll-2": {
+   "offset1x": [
+    61,
+    123
+   ],
+   "size1x": [
+    176,
+    182
+   ]
+  },
+  "rim-sleep": {
+   "offset1x": [
+    78,
+    111
+   ],
+   "size1x": [
+    186,
+    201
+   ]
+  },
+  "rim-squash": {
+   "offset1x": [
+    57,
+    116
+   ],
+   "size1x": [
+    180,
+    204
+   ]
+  },
+  "rim-stretch": {
+   "offset1x": [
+    89,
+    67
+   ],
+   "size1x": [
+    222,
+    255
+   ]
+  },
+  "shadow-fall": {
+   "offset1x": [
+    87,
+    306
+   ],
+   "size1x": [
+    146,
+    31
+   ]
+  },
+  "shadow-full": {
+   "offset1x": [
+    109,
+    307
+   ],
+   "size1x": [
+    135,
+    29
+   ]
+  },
+  "shadow-happy": {
+   "offset1x": [
+    88,
+    303
+   ],
+   "size1x": [
+    189,
+    38
+   ]
+  },
+  "shadow-idle": {
+   "offset1x": [
+    126,
+    309
+   ],
+   "size1x": [
+    96,
+    23
+   ]
+  },
+  "shadow-peek": {
+   "offset1x": [
+    88,
+    307
+   ],
+   "size1x": [
+    127,
+    28
+   ]
+  },
+  "shadow-roll-1": {
+   "offset1x": [
+    111,
+    307
+   ],
+   "size1x": [
+    127,
+    28
+   ]
+  },
+  "shadow-roll-2": {
+   "offset1x": [
+    101,
+    306
+   ],
+   "size1x": [
+    141,
+    31
+   ]
+  },
+  "shadow-sleep": {
+   "offset1x": [
+    71,
+    302
+   ],
+   "size1x": [
+    217,
+    39
+   ]
+  },
+  "shadow-squash": {
+   "offset1x": [
+    102,
+    306
+   ],
+   "size1x": [
+    148,
+    31
+   ]
+  },
+  "shadow-stretch": {
+   "offset1x": [
+    118,
+    307
+   ],
+   "size1x": [
+    122,
+    28
+   ]
+  },
+  "shine-fall": {
+   "offset1x": [
+    63,
+    81
+   ],
+   "size1x": [
+    265,
+    236
+   ]
+  },
+  "shine-full": {
+   "offset1x": [
+    50,
+    62
+   ],
+   "size1x": [
+    223,
+    253
+   ]
+  },
+  "shine-happy": {
+   "offset1x": [
+    64,
+    93
+   ],
+   "size1x": [
+    217,
+    219
+   ]
+  },
+  "shine-idle": {
+   "offset1x": [
+    50,
+    77
+   ],
+   "size1x": [
+    152,
+    237
+   ]
+  },
+  "shine-peek": {
+   "offset1x": [
+    44,
+    85
+   ],
+   "size1x": [
+    227,
+    227
+   ]
+  },
+  "shine-roll-1": {
+   "offset1x": [
+    66,
+    131
+   ],
+   "size1x": [
+    134,
+    110
+   ]
+  },
+  "shine-roll-2": {
+   "offset1x": [
+    63,
+    124
+   ],
+   "size1x": [
+    160,
+    94
+   ]
+  },
+  "shine-sleep": {
+   "offset1x": [
+    81,
+    112
+   ],
+   "size1x": [
+    145,
+    194
+   ]
+  },
+  "shine-squash": {
+   "offset1x": [
+    59,
+    117
+   ],
+   "size1x": [
+    170,
+    200
+   ]
+  },
+  "shine-stretch": {
+   "offset1x": [
+    92,
+    67
+   ],
+   "size1x": [
+    216,
+    249
+   ]
+  },
+  "sweep-1": {
+   "offset1x": [
+    51,
+    125
+   ],
+   "size1x": [
+    53,
+    54
+   ]
+  },
+  "sweep-2": {
+   "offset1x": [
+    48,
+    76
+   ],
+   "size1x": [
+    154,
+    158
+   ]
+  },
+  "sweep-3": {
+   "offset1x": [
+    51,
+    79
+   ],
+   "size1x": [
+    164,
+    183
+   ]
+  },
+  "sweep-4": {
+   "offset1x": [
+    75,
+    112
+   ],
+   "size1x": [
+    146,
+    169
+   ]
+  },
+  "sweep-5": {
+   "offset1x": [
+    105,
+    176
+   ],
+   "size1x": [
+    118,
+    145
+   ]
+  },
+  "sweep-6": {
+   "offset1x": [
+    135,
+    224
+   ],
+   "size1x": [
+    86,
+    98
+   ]
+  },
+  "sweep-happy-1": {
+   "offset1x": [
+    62,
+    138
+   ],
+   "size1x": [
+    72,
+    72
+   ]
+  },
+  "sweep-happy-2": {
+   "offset1x": [
+    62,
+    92
+   ],
+   "size1x": [
+    155,
+    162
+   ]
+  },
+  "sweep-happy-3": {
+   "offset1x": [
+    69,
+    103
+   ],
+   "size1x": [
+    159,
+    200
+   ]
+  },
+  "sweep-happy-4": {
+   "offset1x": [
+    95,
+    142
+   ],
+   "size1x": [
+    189,
+    173
+   ]
+  },
+  "sweep-happy-5": {
+   "offset1x": [
+    138,
+    156
+   ],
+   "size1x": [
+    146,
+    156
+   ]
+  },
+  "sweep-happy-6": {
+   "offset1x": [
+    207,
+    274
+   ],
+   "size1x": [
+    56,
+    48
+   ]
+  }
+ }
+}

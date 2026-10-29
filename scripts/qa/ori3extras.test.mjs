@@ -3,14 +3,14 @@
    copied: the extras/ drop 5c0b3990 is on hold for extras-r2). Pins: nothing extra is requested before the base set is
    ready; per-layer failure isolation (any missing or broken file is skipped, never retried, the turkey stays worn);
    lazy requests (sweep / grow on the first grow pulse, splash on the first splash, motes / wings with their power);
-   reduced motion (static layers only); the README draw order and blends; the cream grow variant picked from fx.json by
-   the theme; pebbles mapped to the existing lit / daysOf state with no new counts or text, and none for Ainsley. */
+   reduced motion (static layers only); the README draw order and blends; ORIX2: the grove grow ripple on every board
+   (no theme pick); pebbles mapped to the existing lit / daysOf state with no new counts or text, and none for Ainsley. */
 import fs from "node:fs";
 import path from "node:path";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { boot, ROOT, fullDays } from "./ori1-harness.mjs";
-import { makeExtras, EXTRAS, FXJSON } from "./ori3-extras-fixtures.mjs";
+import { makeExtras, EXTRAS, OFF, ANX } from "./ori3-extras-fixtures.mjs";
 
 const NOV2 = "2026-11-02T13:00:00Z"; /* Mon Nov 2, 7:00 AM CT */
 const NOV4 = "2026-11-04T13:00:00Z"; /* Wed Nov 4: Mon + Tue can be filled days */
@@ -54,10 +54,12 @@ test("load order: a base set that never becomes ready never requests extras (blo
   } finally { fx.rm(); }
 });
 
-test("real tree: no month names an extras dir yet (r2 pending), so the live run requests nothing from extras", () => {
+test("real tree (ORIX2): only November names an extras dir, the r3 drop, and that dir is in the tree", () => {
   const src = fs.readFileSync(path.join(ROOT, "mercury-run.js"), "utf8");
   const reg = src.slice(src.indexOf("var SKINS = {"), src.indexOf("};", src.indexOf("var SKINS = {")));
-  assert.doesNotMatch(reg, /extras/, "registry lines carry no extras key until the r2 drop is filed");
+  const hits = reg.match(/extras: "[^"]*"/g) || [];
+  assert.deepEqual(hits, ['extras: "art/mercury/skins/2026-11/extras/"']);
+  assert.ok(fs.existsSync(path.join(ROOT, "art/mercury/skins/2026-11/extras/fx/fx.json")));
 });
 
 test("first load is lean: only the anchors, fx.json, the states painted so far and the breathe loop; no sweep, grow, splash, drop, motes, wings or pebble-today", async () => {
@@ -151,12 +153,15 @@ test("draw order: the grow ripple draws after rim; sweep is skipped unless the b
     const g = frames.find((o) => o.some((x) => /^grow-/.test(x)));
     assert.ok(g, "a frame with the ripple");
     assert.ok(g.indexOf("rim") < g.findIndex((x) => /^grow-/.test(x)), `${g}`);
-    for (const o of frames) if (o.some((x) => /^sweep-/.test(x))) assert.ok(o.some((x) => /^body:(idle|breathe-)/.test(x)), `sweep only over idle: ${o}`);
+    for (const o of frames) if (o.some((x) => /^sweep-\d/.test(x))) assert.ok(o.some((x) => /^body:(idle|breathe-)/.test(x)), `sweep only over idle: ${o}`);
+    for (const o of frames) if (o.some((x) => /^sweep-happy-/.test(x))) assert.ok(o.includes("body:happy"), `sweep-happy only over happy: ${o}`);
   } finally { fx.rm(); }
 });
 
 const LAYER_FAILS = [
-  ["anchors-extras.json broken", { bad: ["hayes/anchors-extras.json"] }, "breathe-2.png", ["shine", "rim", "shadow"]],
+  /* ORIX2 · r3 layers are cropped: with no anchors there is no offset, so the body layers are skipped (never drawn
+     misregistered); the turkey still wears and fx still load */
+  ["anchors-extras.json broken", { bad: ["hayes/anchors-extras.json"] }, "breathe-2.png", []],
   ["fx.json missing", { drop: ["fx/fx.json"] }, "fx.json", ["shine", "rim", "shadow"]],
   ["shine-idle missing", { drop: ["hayes/1x/shine-idle.png"] }, "shine-idle.png", ["rim", "shadow"]],
   ["rim-idle not a PNG", { bad: ["hayes/1x/rim-idle.png"] }, "rim-idle.png", ["shine", "shadow"]],
@@ -215,31 +220,52 @@ test("reduced motion: no breathe, sweep, grow, splash or motes requested or draw
   } finally { fx.rm(); }
 });
 
-test("cream theme: fx.json grow.variants.cream picks grow-cream-1..6 (data-theme or ?theme=); other themes keep grow-1..6", async () => {
+test("ORIX2 · no theme pick: data-theme=cream or ?theme=cream still plays the grove grow-1..6; grow-cream is never requested", async () => {
   const fx = makeExtras();
   try {
-    for (const how of [{ theme: "cream" }, { query: "theme=cream" }]) {
+    for (const how of [{ theme: "cream" }, { query: "theme=cream" }, {}]) {
       const h = await run(fx, how);
-      assert.deepEqual(J(h.ctx.MercuryRun.extras().grow), { prefix: "grow-cream", n: 6, variant: "cream" });
+      assert.deepEqual(J(h.ctx.MercuryRun.extras().grow), { prefix: "grow", n: 6 });
       h.ctx.__mercFillTest("hayes");
       const seen = new Set();
       for (let i = 0; i < 60; i++) { h.advance(16); await h.flush(1); order(h).forEach((o) => seen.add(o)); }
       const got = xReqs(h).map(base);
-      for (let i = 1; i <= 6; i++) assert.ok(got.includes(`grow-cream-${i}.png`));
-      assert.ok(!got.some((n) => /^grow-\d\.png$/.test(n)), "base grow not fetched under cream");
-      assert.ok([...seen].some((o) => /^grow-cream-\d$/.test(o)));
+      for (let i = 1; i <= 6; i++) assert.ok(got.includes(`grow-${i}.png`), `grow-${i}`);
+      assert.ok(!got.some((n) => /cream/.test(n)) && ![...seen].some((o) => /cream/.test(o)), `${JSON.stringify(how)}: ${got}`);
     }
-    const other = await run(fx, { theme: "night" });
-    assert.deepEqual(J(other.ctx.MercuryRun.extras().grow), { prefix: "grow", n: 6, variant: null });
   } finally { fx.rm(); }
 });
 
-test("cream theme: an fx.json with no variants (the extras/ shape) falls back to the base grow frames", async () => {
-  const fj = JSON.parse(JSON.stringify(FXJSON)); delete fj.grow.variants;
-  const fx = makeExtras({ fxjson: fj });
+test("ORIX2 · cropped layers draw at offset1x times the scale inside the body canvas (shine / rim / shadow / breathe)", async () => {
+  const fx = makeExtras();
   try {
-    const h = await run(fx, { theme: "cream" });
-    assert.deepEqual(J(h.ctx.MercuryRun.extras().grow), { prefix: "grow", n: 6, variant: null });
+    for (const dpr of [1, 2]) {
+      const h = await run(fx, { dpr, reduced: true }); /* reduced: no breathe, so the body is the full-canvas base sprite */
+      await settle(h, 2);
+      h.log.ops.length = 0; h.advance(16);
+      const s = h.ctx.MercuryRun.extras().scale;
+      const bodyOp = h.log.ops.find(([u]) => /qa-x3\/hayes\/\dx\/(idle|peek|sleep|happy)\.png$/.test(u));
+      const sh = h.log.ops.find(([u]) => /\/shine-/.test(u)), rm = h.log.ops.find(([u]) => /\/rim-/.test(u));
+      assert.ok(bodyOp && sh && rm, `ops ${h.log.ops.map((o) => base(o[0]))}`);
+      assert.equal(sh[3] - bodyOp[3], OFF[0] * s); assert.equal(sh[4] - bodyOp[4], OFF[1] * s);
+      assert.equal(rm[3] - bodyOp[3], OFF[0] * s); assert.equal(rm[4] - bodyOp[4], OFF[1] * s);
+      const m = await run(fx, { dpr }); await settle(m, 2); /* breathing: a cropped breathe frame lands where the shine does */
+      let br, sn;
+      for (let i = 0; i < 40 && !br; i++) { m.log.ops.length = 0; m.advance(16); br = m.log.ops.find(([u]) => /breathe-[234]\.png$/.test(u)); sn = m.log.ops.find(([u]) => /\/shine-idle/.test(u)); }
+      assert.ok(br && sn, "a breathe frame drew");
+      assert.deepEqual([br[3], br[4]], [sn[3], sn[4]], "breathe frame and shine share offset1x");
+    }
+  } finally { fx.rm(); }
+});
+
+test("ORIX2 · a layer with no offset1x in anchors is skipped, the others still draw", async () => {
+  const anx = JSON.parse(JSON.stringify(ANX)); for (const st of Object.keys(anx.shine)) delete anx.layers[`shine-${st}`];
+  const fx = makeExtras({ anx });
+  try {
+    const h = await run(fx); await settle(h, 3);
+    const seen = new Set(); for (let i = 0; i < 20; i++) { h.advance(16); order(h).forEach((o) => seen.add(o.replace(/:.*/, ""))); }
+    assert.ok(!seen.has("shine") && seen.has("rim") && seen.has("shadow") && seen.has("body"), `${[...seen]}`);
+    assert.equal(h.skin().hero, "art");
   } finally { fx.rm(); }
 });
 

@@ -19,10 +19,11 @@ function ctx2d(log) {
   const special = {
     createLinearGradient: () => ({ addColorStop: noop }), createRadialGradient: () => ({ addColorStop: noop }),
     createPattern: () => ({}), measureText: (s) => ({ width: String(s).length * 7 }),
+    fillText: (t) => { log.writes.push(["fillText", String(t)]); }, strokeText: (t) => { log.writes.push(["strokeText", String(t)]); }, /* ORIX2 · transient text log */
     getImageData: (x, y, w, h) => { const d = img(w, h); d.data.fill(120); return d; },
     createImageData: (w, h) => img(w, h),
     putImageData: (d) => { log.put.push(d); },
-    drawImage: (im) => { if (im && im._src) { log.drawn.push(im._src); log.ops.push([im._src, store.globalCompositeOperation || "source-over", store.globalAlpha == null ? 1 : store.globalAlpha]); } },
+    drawImage: (im, x, y) => { if (im && im._src) { log.drawn.push(im._src); log.ops.push([im._src, store.globalCompositeOperation || "source-over", store.globalAlpha == null ? 1 : store.globalAlpha, x, y]); } }, /* ORIX2 · + x, y */
     getTransform: () => ({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }), isPointInPath: () => false
   };
   return new Proxy(store, {
@@ -34,11 +35,12 @@ function ctx2d(log) {
 function makeEl(tag, log) {
   const attrs = {}; const cls = new Set(); const kids = [];
   const e = {
-    tagName: String(tag).toUpperCase(), style: {}, children: kids, textContent: "", _html: "", width: 300, height: 150,
-    get innerHTML() { return this._html; }, set innerHTML(v) { this._html = String(v); kids.length = 0; this._q = {}; },
+    tagName: String(tag).toUpperCase(), style: {}, children: kids, _text: "", _html: "", width: 300, height: 150,
+    get textContent() { return this._text; }, set textContent(v) { this._text = String(v); log.writes.push(["textContent", this._text]); }, /* ORIX2 · every write logged */
+    get innerHTML() { return this._html; }, set innerHTML(v) { this._html = String(v); log.writes.push(["innerHTML", this._html]); kids.length = 0; this._q = {}; },
     get className() { return [...cls].join(" "); }, set className(v) { cls.clear(); String(v).split(/\s+/).filter(Boolean).forEach((c) => cls.add(c)); },
     classList: { add: (...a) => a.forEach((c) => cls.add(c)), remove: (...a) => a.forEach((c) => cls.delete(c)), contains: (c) => cls.has(c), toggle: (c, on) => { if (on === undefined ? !cls.has(c) : on) cls.add(c); else cls.delete(c); } },
-    setAttribute: (k, v) => { attrs[k] = String(v); }, getAttribute: (k) => (k in attrs ? attrs[k] : null), removeAttribute: (k) => { delete attrs[k]; },
+    setAttribute: (k, v) => { attrs[k] = String(v); log.writes.push(["attr:" + k, String(v)]); }, getAttribute: (k) => (k in attrs ? attrs[k] : null), removeAttribute: (k) => { delete attrs[k]; },
     appendChild: (c) => { kids.push(c); c.parentNode = e; return c; }, removeChild: (c) => { const i = kids.indexOf(c); if (i >= 0) kids.splice(i, 1); return c; },
     remove() { if (e.parentNode) e.parentNode.removeChild(e); },
     addEventListener: (t, f) => { (e._ev[t] = e._ev[t] || []).push(f); }, removeEventListener() {}, _ev: {}, _q: {},
@@ -59,7 +61,7 @@ function makeEl(tag, log) {
 
 export function boot(opts = {}) {
   const o = Object.assign({ kid: "hayes", coop: null, at: FX.clock.wed0700, checks: {}, w: 480, h: 320, root: ROOT, data: FX.data, query: "", liquid: false }, opts);
-  const log = { put: [], chimes: 0, view: { w: o.w, h: o.h }, images: [], fetches: [], drawn: [], ops: [] };
+  const log = { put: [], chimes: 0, view: { w: o.w, h: o.h }, images: [], fetches: [], drawn: [], ops: [], writes: [] };
   /* files: a URL resolves against the tree root, then the fixture root (QA skin fixtures live in scripts/qa/fixtures) */
   const fileFor = (url) => { const u = String(url).split("?")[0]; for (const r of [o.root, FXROOT, o.skinRoot].filter(Boolean)) { const f = path.join(r, u); if (fs.existsSync(f) && fs.statSync(f).isFile()) return f; } return null; };
   const pngSize = (f) => { const b = fs.readFileSync(f); return b.slice(1, 4).toString() === "PNG" ? { w: b.readUInt32BE(16), h: b.readUInt32BE(20) } : { w: 0, h: 0 }; };
@@ -72,7 +74,7 @@ export function boot(opts = {}) {
   const timers = []; let tid = 1; let rafs = [];
   const win = {}, docEv = {};
   const map = {};
-  const storage = { getItem: (k) => (k in map ? map[k] : null), setItem: (k, v) => { map[k] = String(v); }, removeItem: (k) => { delete map[k]; }, key: (i) => Object.keys(map)[i] ?? null, get length() { return Object.keys(map).length; } };
+  const storage = { getItem: (k) => (k in map ? map[k] : null), setItem: (k, v) => { map[k] = String(v); log.writes.push(["localStorage", String(k) + "=" + String(v)]); }, removeItem: (k) => { delete map[k]; }, key: (i) => Object.keys(map)[i] ?? null, get length() { return Object.keys(map).length; } };
   const els = { run: makeEl("canvas", log), "run-ui": makeEl("div", log) };
   const body = makeEl("body", log);
   const document = {
@@ -104,7 +106,7 @@ export function boot(opts = {}) {
         ctx.setTimeout(() => { if (f) { const d = pngSize(f); im.width = d.w; im.height = d.h; im.complete = true; im.onload && im.onload(); } else { im.complete = true; im.onerror && im.onerror(); } }, 5);
       }
     },
-    localStorage: storage, sessionStorage: { getItem: () => null, setItem() {}, removeItem() {} },
+    localStorage: storage, sessionStorage: { getItem: () => null, setItem: (k, v) => { log.writes.push(["sessionStorage", String(k) + "=" + String(v)]); }, removeItem() {} },
     document, location: { search: "?" + params.toString(), hash: "", pathname: "/mercury-run.html", href: "https://house.test/mercury-run.html?" + params.toString(), reload() {} },
     history: { state: null, replaceState() {} }, navigator: { userAgent: "node", hardwareConcurrency: 8, deviceMemory: 8 },
     matchMedia: (mq) => ({ matches: !!o.reduced && /reduced-motion:\s*reduce/.test(String(mq)), addEventListener() {} }), /* ORI3 · reduced: true = prefers-reduced-motion */

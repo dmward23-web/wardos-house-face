@@ -77,7 +77,7 @@
      and add one line: "2026-12": { id: "...", dir: "art/mercury/skins/2026-12/" }. */
   var SKINS = {
     "2026-10": { id: "pumpkin", dir: "art/mercury/skins/2026-10/" },
-    "2026-11": { id: "turkey", dir: "art/mercury/skins/2026-11/", from: { civil: "2026-11-01", hour: 6 } }
+    "2026-11": { id: "turkey", dir: "art/mercury/skins/2026-11/", extras: "art/mercury/skins/2026-11/extras/", from: { civil: "2026-11-01", hour: 6 } }
   };
   /* layout, per kid folder, at 1x / 2x / 3x (Prism p2 drop with SUMS, bytes copied as is; ORI2: photoreal-r2 ships this
      exact <s>x/<name>.png layout, the art/mercury/platforms/<s>x/ convention; the repo's art allow-list holds plain
@@ -93,7 +93,7 @@
      ORI3 · a Prism extras layer (shine, rim, contact shadow, idle breathe, grow sweep + ripple, pebbles, splash, power
      marks) is read only for a month whose registry line names it (extras: "<dir>", see SKINX below), only after the base
      set is ready, and it never counts toward ready: an absent, partial or broken extras set can never block the base set.
-     No month names one yet (the r2 extras drop is pending). */
+     ORIX2 · November names the Prism r3 extras drop (art/mercury/skins/2026-11/extras/, SUMS sha16 0453f60fc620bf4b). */
   var SKIN_STATES = ["idle", "squash", "stretch", "fall", "roll-1", "roll-2", "happy", "sleep", "peek", "full"];
   var SKIN_EYES = ["open", "half", "closed", "happy"];
   var SKIN_EXT = ".png";
@@ -184,17 +184,10 @@
      pebble pop; the static layers (shadow, shine, rim, pebbles, wings) only. */
   var EX_BREATHE_MS = 350, EX_GROW_MS = 80, EX_SPLASH_MS = 50, EX_MOTE_MS = 120, EX_POP_MS = 160, EX_WING_MS = 200;
   var EX_AIR_H = 160; /* css px of height at which the airborne shadow reaches its 0.6 scale / 0.4 opacity floor */
-  /* theme: ?theme=<id>, else <html data-theme="<id>">; fx.json grow.variants[<id>] names that theme's grow frames */
-  function exTheme() {
-    var th = q.get("theme");
-    if (!th) { try { th = document.documentElement && document.documentElement.getAttribute && document.documentElement.getAttribute("data-theme"); } catch (e) { th = null; } }
-    th = String(th || "").toLowerCase();
-    return /^[a-z0-9-]{1,24}$/.test(th) ? th : "";
-  }
   function exOn(s) {
     if (!s || !s.ready || !s.def || typeof s.def.extras !== "string" || !s.def.extras) return null;
     if (s.x) return s.x;
-    var x = s.x = { dir: s.def.extras, scale: s.scale, kid: s.kid, ims: {}, req: [], order: [], anc: { st: "loading", j: null }, fxj: { st: "loading", j: null }, splashes: [], theme: exTheme() };
+    var x = s.x = { dir: s.def.extras, scale: s.scale, kid: s.kid, ims: {}, req: [], order: [], anc: { st: "loading", j: null }, fxj: { st: "loading", j: null }, splashes: [] };
     function json(url, slot, okj) {
       x.req.push(url);
       try {
@@ -223,17 +216,23 @@
   function exKid(x, name) { return /^[a-z0-9-]+$/.test(name) ? exIm(x, "kid:" + name, x.dir + x.kid + "/" + x.scale + "x/" + name + SKIN_EXT) : null; }
   function exFx(x, name) { return /^[a-z0-9-]+$/.test(name) ? exIm(x, "fx:" + name, x.dir + "fx/" + x.scale + "x/" + name + SKIN_EXT) : null; }
   function exFxDef(x, key) { var j = x.fxj.st === "ok" && x.fxj.j[key]; return j && j.pivot3x && j.pivot3x.length === 2 ? j : null; }
-  /* grow frames for the current theme: fx.json grow.variants[theme] = { prefix: "grow-cream", frames: 6 } (prefix
-     defaults to "grow-<theme>"); no variant for the theme = the base grow-1..N */
+  /* ORIX2 · the grow ripple is the grove ripple, grow-1..N, on every board. fx.json other grow entries are never read
+     (Prism ships them unwired; its notWired list is pinned by orix2.test.mjs). */
   function exGrow(x) {
     var g = exFxDef(x, "grow"); if (!g) return null;
-    var v = x.theme && g.variants && typeof g.variants === "object" && g.variants[x.theme];
-    var pre = v ? String(v.prefix || ("grow-" + x.theme)) : "grow";
-    return { prefix: /^[a-z0-9-]+$/.test(pre) ? pre : "grow", n: Math.max(1, Math.min(12, +((v && v.frames) || g.frames) || 6)), pivot: (v && v.pivot3x) || g.pivot3x, variant: v ? x.theme : null };
+    return { prefix: "grow", n: Math.max(1, Math.min(12, +g.frames || 6)), pivot: g.pivot3x };
+  }
+  /* ORIX2 · r3 body layers are cropped to their alpha box: anchors-extras.json layers.<name>.offset1x puts the layer's
+     top left inside the body canvas (times the scale). No anchors, or no offset for a layer = that layer is skipped,
+     never drawn misregistered. */
+  function exOff(x, name) {
+    var L = x.anc.st === "ok" && x.anc.j.layers, e = L && L[name];
+    return e && e.offset1x && e.offset1x.length === 2 && isFinite(e.offset1x[0]) && isFinite(e.offset1x[1]) ? e.offset1x : null;
   }
   function exLayer(g, x, name, op, alpha, ox, oy, tag) {
+    var off = exOff(x, name); if (!off) return false;
     var im = exKid(x, name); if (!im) return false;
-    g.save(); g.globalCompositeOperation = op; g.globalAlpha = alpha; g.drawImage(im, ox, oy); g.restore();
+    g.save(); g.globalCompositeOperation = op; g.globalAlpha = alpha; g.drawImage(im, ox + off[0] * x.scale, oy + off[1] * x.scale); g.restore();
     x.order.push(tag || name); return true;
   }
   /* the floor under a blob (the highest platform top at or below its bottom), or null over a gap */
@@ -252,15 +251,16 @@
       if (gy == null || !sd || !sd.center3x) return false; /* over a gap, or no shadow anchor: no shadow */
       h = Math.max(0, gy - (b.y + b.r));
     }
-    var sh = x.anc.st === "ok" && x.anc.j.shadow && x.anc.j.shadow[st];
-    var im = exKid(x, (sh && sh.name) || ("shadow-" + st)); if (!im) return false;
+    var sh = x.anc.st === "ok" && x.anc.j.shadow && x.anc.j.shadow[st], shn = (sh && sh.name) || ("shadow-" + st), so = exOff(x, shn);
+    if (!so) return false;
+    var im = exKid(x, shn); if (!im) return false;
     var k = Math.min(1, h / EX_AIR_H);
     g.save(); g.globalCompositeOperation = "multiply"; g.globalAlpha = 1 - 0.6 * k;
     if (airborne) {
       var cx = sh.center3x[0] * s / 3 - an.contact[0] * s, cy = sh.center3x[1] * s / 3 - an.contact[1] * s;
       g.translate(cx, cy + h / sc); g.scale(1 - 0.4 * k, 1 - 0.4 * k);
-      g.drawImage(im, -sh.center3x[0] * s / 3, -sh.center3x[1] * s / 3);
-    } else g.drawImage(im, -an.contact[0] * s, -an.contact[1] * s);
+      g.drawImage(im, -sh.center3x[0] * s / 3 + so[0] * s, -sh.center3x[1] * s / 3 + so[1] * s);
+    } else g.drawImage(im, (so[0] - an.contact[0]) * s, (so[1] - an.contact[1]) * s);
     g.restore();
     x.order.push("shadow"); b.exShadow = true; return true;
   }
@@ -271,14 +271,16 @@
     var i = Math.floor(t * 1000 / EX_BREATHE_MS) % br.length, f = br[i];
     for (var k = 1; k < br.length; k++) if (br[k] && br[k].name) exKid(x, br[k].name); /* fetch the loop once */
     if (!f || !f.contact || !f.eyes) return null;
-    var im = i === 0 ? sk.sprites.idle : exKid(x, f.name);
-    return im ? { im: im, name: i === 0 ? "idle" : f.name, contact: f.contact, eyes: f.eyes } : null;
+    var off = i === 0 ? [0, 0] : exOff(x, f.name); /* frame 1 is the full-canvas idle sprite; 2-4 are cropped */
+    var im = !off ? null : i === 0 ? sk.sprites.idle : exKid(x, f.name);
+    return im ? { im: im, name: i === 0 ? "idle" : f.name, contact: f.contact, eyes: f.eyes, off: off } : null;
   }
-  /* the host's grow pulse: sweep (masked to the idle body by Prism, so only over idle / breathe) + the theme's grow ripple */
+  /* the host's grow pulse: sweep (Prism masked sweep-1..6 to the idle body and sweep-happy-1..6 to the happy pose, so
+     each plays only over its own pose) + the grove grow ripple */
   function exPulse(b) {
     var sk = heroArt(), x = b === A && exOn(sk); if (!x || reduced) return;
     x.pulseAt = performance.now();
-    for (var i = 1; i <= 6; i++) exKid(x, "sweep-" + i);
+    for (var i = 1; i <= 6; i++) { exKid(x, "sweep-" + i); exKid(x, "sweep-happy-" + i); }
     var gr = exGrow(x); x.growWanted = true;
     if (gr) for (var j = 1; j <= gr.n; j++) exFx(x, gr.prefix + "-" + j);
   }
@@ -287,7 +289,8 @@
     var ms = performance.now() - x.pulseAt;
     if (x.growWanted && x.fxj.st !== "loading") { x.growWanted = false; var gw = exGrow(x); if (gw) for (var j = 1; j <= gw.n; j++) exFx(x, gw.prefix + "-" + j); }
     var sf = Math.floor(ms / EX_GROW_MS) + 1;
-    if (sf <= 6 && (st === "idle")) exLayer(g, x, "sweep-" + sf, "screen", 1, ox, oy);
+    if (sf <= 6 && st === "idle") exLayer(g, x, "sweep-" + sf, "screen", 1, ox, oy);
+    else if (sf <= 6 && st === "happy") exLayer(g, x, "sweep-happy-" + sf, "screen", 1, ox, oy);
     var gr = exGrow(x);
     if (gr && sf <= gr.n) {
       var im = exFx(x, gr.prefix + "-" + sf), bodyR = (x.anc.st === "ok" && x.anc.j.bodyR) || sk.anchors.bodyR;
@@ -365,6 +368,7 @@
   /* day pebbles from the existing lit / daysOf state only (no new counts); Ainsley never sees a pebble row (she sees
      no counts), so her blob shows none, art or interim */
   function exPebble(g, b, i, px, y, on, t) {
+    if (pebblesHiddenFor(b)) return false; /* ORIX2 · belt and braces: never a pebble for Ainsley, even if a caller forgets */
     var sk = heroArt(), x = exOn(sk), pd = x && exFxDef(x, "pebble");
     if (!pd) return false;
     var im = exFx(x, on ? "pebble-filled" : "pebble-empty");
@@ -662,8 +666,11 @@
   window.__merc = function () { return blobs.map(function (b) { return { kid: b.kid, x: Math.round(b.x), y: Math.round(b.y), vy: Math.round(b.vy), r: +b.r.toFixed(1), rT: b.rT, r0: b.r0, days: b.days, of: b.daysOf, lit: b.lit, grounded: !!b.grounded, tint: b.tint }; }); }; /* read-only QA probe */
   window.__mercReveal = function () { return { count: reveal.count, pending: reveal.queue.length, log: reveal.log.slice() }; }; /* read-only QA probe */
   window.__mercFillTest = function (k) { var b = allBlobs().filter(function (x) { return x.kid === (k || kid); })[0]; if (!b) return null; b.days = Math.max(0, b.days) + 1; reveal.queue.push({ b: b, day: b.days - 1 }); return { days: b.days, rT: growR(b.r0, b.days) }; };
+  var pebRects = []; /* ORIX2 · read-only QA probe: css px boxes of the pebbles painted in the last frame */
+  window.__mercPebbles = function () { return pebRects.map(function (p) { return { kid: p.kid, x: p.x, y: p.y, w: p.w, h: p.h }; }); };
   function paintFill(g, t) {
     g.save();
+    pebRects = [];
     blobs.forEach(function (b) {
       if (!b.daysOf || pebblesHiddenFor(b)) return;
       /* ORI1 · bigger day pebbles (6 px lit, 4.5 px waiting, 18 px apart) under the blob; a newly lit one glows */
@@ -671,6 +678,7 @@
       var pOn = art("pebble.on"), pOff = art("pebble.off");
       for (var i = 0; i < n; i++) {
         var on = i < b.lit, px = x0 + i * gap, pr = on ? 6 : 4.5;
+        pebRects.push({ kid: b.kid, x: px - EX_PEBBLE_PX / 2, y: y - EX_PEBBLE_PX / 2, w: EX_PEBBLE_PX, h: EX_PEBBLE_PX });
         var im = on ? pOn : pOff;
         if (exPebble(g, b, i, px, y, on, t)) continue; /* ORI3 · Prism pebbles when loaded */
         if (im) { g.drawImage(im, px - pr * 1.6, y - pr * 1.6, pr * 3.2, pr * 3.2); continue; }
@@ -1261,20 +1269,22 @@
     /* ORI3 · extras draw order: shadow, body (or breathe frame), eyes, shine, rim, sweep, grow ripple */
     var x = exOn(sk), s = sk.scale, body = im, ct = an.contact, eyAt = an.eyes;
     if (x) { var bf = st === "idle" && exBreathe(x, sk, t); if (bf) { body = bf.im; ct = bf.contact; eyAt = bf.eyes; } }
-    var ox = -ct[0] * s, oy = -ct[1] * s;
+    var ox = -ct[0] * s, oy = -ct[1] * s, bo = bf ? bf.off : [0, 0];
     g.save();
     g.translate(b.x - cam, b.y + b.r);
     g.scale(flip * sc, sc);
     if (x) exShadow(g, x, b, st, an, sc, s, t);
-    g.drawImage(body, ox, oy);
+    g.drawImage(body, ox + bo[0] * s, oy + bo[1] * s);
     if (x) x.order.push(bf ? "body:" + bf.name : "body:" + st);
     var ey = sk.eyes[heroEyes(st, t)];
     if (ey && eyAt) { g.drawImage(ey, (eyAt[0] - ct[0]) * s - ey.width / 2, (eyAt[1] - ct[1]) * s - ey.height / 2); if (x) x.order.push("eyes"); }
     paintAccessory(g, b, st, sk.scale);
     if (x) {
       var nm = x.anc.st === "ok" && x.anc.j;
-      exLayer(g, x, (nm && nm.shine && nm.shine[st]) || ("shine-" + st), "screen", 1, ox, oy, "shine");
-      exLayer(g, x, (nm && nm.rim && nm.rim[st]) || ("rim-" + st), "screen", 1, ox, oy, "rim");
+      /* ORIX2 · r3 anchors give shine / rim per state as { name, offset1x, size1x } (ORI3 read a bare name) */
+      var lnm = function (k) { var v = nm && nm[k] && nm[k][st]; v = v && typeof v === "object" ? v.name : v; return typeof v === "string" && /^[a-z0-9-]+$/.test(v) ? v : k + "-" + st; };
+      exLayer(g, x, lnm("shine"), "screen", 1, ox, oy, "shine");
+      exLayer(g, x, lnm("rim"), "screen", 1, ox, oy, "rim");
       exPulseFrames(x, sk, st, s, ox, oy, g);
     }
     g.restore();
@@ -1764,7 +1774,7 @@
       var x = heroArt() && skin.x; if (!x) return null;
       var st = {}; Object.keys(x.ims).forEach(function (k) { st[k] = x.ims[k].st; });
       var gr = exGrow(x);
-      return { dir: x.dir, scale: x.scale, theme: x.theme, grow: gr ? { prefix: gr.prefix, n: gr.n, variant: gr.variant } : null, anchors: x.anc.st, fx: x.fxj.st, req: x.req.slice(), st: st, order: x.order.slice(), reduced: reduced, pebblesHidden: blobs.filter(pebblesHiddenFor).map(function (b) { return b.kid; }) };
+      return { dir: x.dir, scale: x.scale, grow: gr ? { prefix: gr.prefix, n: gr.n } : null, anchors: x.anc.st, fx: x.fxj.st, req: x.req.slice(), st: st, order: x.order.slice(), reduced: reduced, pebblesHidden: blobs.filter(pebblesHiddenFor).map(function (b) { return b.kid; }) };
     },
     exportFrame: exportFrame,
     platesReady: function () { return runPlatesReady && !!runPlates.sky; }

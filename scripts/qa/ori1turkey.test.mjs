@@ -30,7 +30,7 @@ async function worn(kid, dpr, extra = {}) {
 test("real turkey: the registry's 2026-11 entry points at art/mercury/skins/2026-11/", () => {
   const src = fs.readFileSync(path.join(ROOT, "mercury-run.js"), "utf8");
   assert.match(src, /"2026-11": \{ id: "turkey", dir: "art\/mercury\/skins\/2026-11\/"/);
-  assert.deepEqual(fs.readdirSync(path.join(ROOT, DIR)).sort(), ["ainsley", "harris", "hayes", "text"], "three kids + the carried text plates; no extras/ yet");
+  assert.deepEqual(fs.readdirSync(path.join(ROOT, DIR)).sort(), ["ainsley", "extras", "harris", "hayes", "text"], "three kids + the carried text plates + ORIX2 extras/ (r3)");
 });
 
 for (const kid of KIDS) {
@@ -72,9 +72,10 @@ for (const kid of KIDS) {
       await h.flush(); h.ready().advance(300); await h.flush(); h.advance(400);
       const sk = h.skin();
       assert.deepEqual([sk.id, sk.month, sk.hero, sk.finale, sk.finalePortrait, sk.dir, sk.scale], ["turkey", "2026-11", "art", "lazy", "lazy", DIR + kid + "/", dpr]);
-      assert.ok(h.log.images.every((u) => !/^art\/mercury\/skins\//.test(u) || u.startsWith(DIR + kid + "/")), "only the host kid's variant loads");
+      const X = DIR + "extras/"; /* ORIX2 · the r3 extras layer loads after the base set (ori3extras / orix2 pin it) */
+      assert.ok(h.log.images.every((u) => !/^art\/mercury\/skins\//.test(u) || u.startsWith(DIR + kid + "/") || u.startsWith(X + kid + "/") || u.startsWith(X + "fx/")), "only the host kid's variant loads (base and extras)");
       assert.equal(h.log.images.filter((u) => /finale/.test(u)).length, 0, "the base preload requests neither finale.png nor finale-portrait.png");
-      assert.equal(h.log.images.filter((u) => u.startsWith(DIR)).length, 14, "first load = 10 states + 4 eyes only");
+      assert.equal(h.log.images.filter((u) => u.startsWith(DIR) && !u.startsWith(X)).length, 14, "first load = 10 states + 4 eyes only");
       const drawnBefore = h.log.drawn.length;
       const P = `${DIR}${kid}/${dpr}x/finale-portrait.png`, L = `${DIR}${kid}/${dpr}x/finale.png`;
       const fins = () => h.log.images.filter((u) => /finale/.test(u));
@@ -166,20 +167,17 @@ test("real turkey r2 ainsley: roll-2 is the redrawn frame; its anchors moved (ey
   }
 });
 
-test("extras layer (Prism follow-on, not wired): absent, partial or broken extras/ never blocks the base set and is never requested", async () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ori2-extras-"));
-  try {
-    for (const kid of KIDS) fs.mkdirSync(path.join(tmp, DIR, "extras", kid, "1x"), { recursive: true });
-    fs.writeFileSync(path.join(tmp, DIR, "extras", "hayes", "1x", "shine.png"), "not a png");
-    fs.writeFileSync(path.join(tmp, DIR, "extras", "anchors.json"), "{ broken");
-    for (const kid of KIDS) {
-      for (const skinRoot of [undefined, tmp]) {
-        const h = await worn(kid, 1, skinRoot ? { skinRoot } : {});
-        assert.deepEqual([h.skin().hero, h.skin().finale], ["art", "lazy"], `${kid}: base set worn (${skinRoot ? "broken extras/ present" : "no extras/"})`);
-        assert.ok(![...h.log.images, ...h.log.fetches].some((u) => /extras\//.test(String(u))), "nothing requests extras/");
-      }
-    }
-  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+test("extras layer (ORIX2: wired to the r3 drop): requested only after the 14 base images, only the host kid + fx, and a missing extras dir never blocks the base set", async () => {
+  for (const kid of KIDS) {
+    const h = await worn(kid, 1);
+    assert.deepEqual([h.skin().hero, h.skin().finale], ["art", "lazy"], `${kid}: base set worn with extras/ present`);
+    const imgs = h.log.images.map(String), first = imgs.findIndex((u) => /extras\//.test(u));
+    assert.ok(first < 0 || imgs.slice(0, first).filter((u) => u.startsWith(DIR)).length >= 14, `${kid}: extras after the base set`);
+    assert.ok([...imgs, ...h.log.fetches.map(String)].filter((u) => /extras\//.test(u)).every((u) => u.startsWith(DIR + "extras/" + kid + "/") || u.startsWith(DIR + "extras/fx/")), `${kid}: own extras + fx only`);
+    const book = { "2026-11": { id: "turkey", dir: DIR, extras: "art/mercury/skins/qa-none/extras/", from: { civil: "2026-11-01", hour: 6 } } };
+    const g = await worn(kid, 1, { skinBook: book });
+    assert.deepEqual([g.skin().hero, g.skin().finale], ["art", "lazy"], `${kid}: base set worn when extras/ is missing`);
+  }
 });
 
 test("carried text plates + Fredoka: present, kid-copy clean, same words as the live captions, and not wired", () => {
