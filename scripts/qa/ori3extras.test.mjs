@@ -19,6 +19,7 @@ const xReqs = (h) => [...h.log.images, ...h.log.fetches].map(String).filter(isX)
 const base = (u) => String(u).slice(String(u).lastIndexOf("/") + 1);
 async function settle(h, n = 4) { for (let i = 0; i < n; i++) { h.advance(120); await h.flush(); } return h; }
 async function run(fx, opts = {}) {
+  opts = Object.assign({}, opts, { query: "orix=1" + (opts.query ? "&" + opts.query : "") }); /* ORIX2 · extras are preview-only: ?orix=1 */
   const h = boot(Object.assign({ kid: "hayes", at: NOV2, dpr: 1, skinRoot: fx.root, skinBook: fx.book }, opts));
   if (opts.theme) h.ctx.document.documentElement.setAttribute("data-theme", opts.theme);
   await h.flush(); h.ready(); await settle(h);
@@ -30,7 +31,7 @@ const order = (h) => J(h.ctx.MercuryRun.extras().order);
 test("load order: no extras request before the base set is ready; extras start only once the hero is worn", async () => {
   const fx = makeExtras();
   try {
-    const h = boot({ kid: "hayes", at: NOV2, dpr: 1, skinRoot: fx.root, skinBook: fx.book });
+    const h = boot({ kid: "hayes", at: NOV2, dpr: 1, skinRoot: fx.root, skinBook: fx.book, query: "orix=1" });
     await h.flush(); h.ready(); await h.flush();
     assert.equal(h.skin().hero, "blob", "base images still loading");
     assert.deepEqual(xReqs(h), [], "nothing from extras/ while the base set loads");

@@ -61,7 +61,7 @@ function makeEl(tag, log) {
 
 export function boot(opts = {}) {
   const o = Object.assign({ kid: "hayes", coop: null, at: FX.clock.wed0700, checks: {}, w: 480, h: 320, root: ROOT, data: FX.data, query: "", liquid: false }, opts);
-  const log = { put: [], chimes: 0, view: { w: o.w, h: o.h }, images: [], fetches: [], drawn: [], ops: [], writes: [] };
+  const log = { put: [], chimes: 0, view: { w: o.w, h: o.h }, images: [], fetches: [], drawn: [], ops: [], writes: [], nav: [] };
   /* files: a URL resolves against the tree root, then the fixture root (QA skin fixtures live in scripts/qa/fixtures) */
   const fileFor = (url) => { const u = String(url).split("?")[0]; for (const r of [o.root, FXROOT, o.skinRoot].filter(Boolean)) { const f = path.join(r, u); if (fs.existsSync(f) && fs.statSync(f).isFile()) return f; } return null; };
   const pngSize = (f) => { const b = fs.readFileSync(f); return b.slice(1, 4).toString() === "PNG" ? { w: b.readUInt32BE(16), h: b.readUInt32BE(20) } : { w: 0, h: 0 }; };
@@ -78,7 +78,8 @@ export function boot(opts = {}) {
   const els = { run: makeEl("canvas", log), "run-ui": makeEl("div", log) };
   const body = makeEl("body", log);
   const document = {
-    readyState: "complete", hidden: false, visibilityState: "visible", body, documentElement: makeEl("html", log), head: makeEl("head", log),
+    readyState: "complete", hidden: false, visibilityState: "visible", body,
+    get cookie() { return log.cookie || ""; }, set cookie(v) { log.cookie = String(v); log.writes.push(["cookie", String(v)]); }, /* ORIX2 · cookie writes are logged */ documentElement: makeEl("html", log), head: makeEl("head", log),
     getElementById: (id) => els[id] || (id === "je" && els["run-ui"]._html.includes('id="je"') ? (els.je = els.je || makeEl("div", log)) : null),
     createElement: (t) => makeEl(t, log), querySelector: () => null, querySelectorAll: () => [],
     addEventListener: (t, f) => { (docEv[t] = docEv[t] || []).push(f); }, removeEventListener() {},
@@ -108,7 +109,8 @@ export function boot(opts = {}) {
     },
     localStorage: storage, sessionStorage: { getItem: () => null, setItem: (k, v) => { log.writes.push(["sessionStorage", String(k) + "=" + String(v)]); }, removeItem() {} },
     document, location: { search: "?" + params.toString(), hash: "", pathname: "/mercury-run.html", href: "https://house.test/mercury-run.html?" + params.toString(), reload() {} },
-    history: { state: null, replaceState() {} }, navigator: { userAgent: "node", hardwareConcurrency: 8, deviceMemory: 8 },
+    indexedDB: { open: (n) => { log.writes.push(["indexedDB", "open " + String(n)]); return { set onsuccess(f) {}, set onerror(f) {}, set onupgradeneeded(f) {} }; }, deleteDatabase: (n) => { log.writes.push(["indexedDB", "delete " + String(n)]); return {}; } }, /* ORIX2 · IndexedDB opens are logged as writes */
+    history: { state: null, replaceState(st, t, u) { log.nav.push(["replaceState", String(u == null ? "" : u)]); }, pushState(st, t, u) { log.nav.push(["pushState", String(u == null ? "" : u)]); } }, /* ORIX2 · URL rewrites are logged */ navigator: { userAgent: "node", hardwareConcurrency: 8, deviceMemory: 8 },
     matchMedia: (mq) => ({ matches: !!o.reduced && /reduced-motion:\s*reduce/.test(String(mq)), addEventListener() {} }), /* ORI3 · reduced: true = prefers-reduced-motion */
     fetch: (url) => { log.fetches.push(url); const f = fileFor(url); return Promise.resolve(f ? { ok: true, status: 200, json: async () => JSON.parse(fs.readFileSync(f, "utf8")) } : { ok: false, status: 404, json: async () => null }); },
     innerWidth: o.w, innerHeight: o.h, devicePixelRatio: o.dpr || 1,

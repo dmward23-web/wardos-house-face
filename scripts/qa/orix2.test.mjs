@@ -29,7 +29,7 @@ const stripTags = (s) => String(s).replace(/<style[\s\S]*?<\/style>/gi, " ").rep
 
 async function play(kid, opts = {}) {
   const checks = Object.assign({}, fullDays(kid, ["2026-11-02", "2026-11-03"]));
-  const h = boot(Object.assign({ kid, at: NOV4, dpr: 1, checks }, opts));
+  const h = boot(Object.assign({ kid, at: NOV4, dpr: 1, checks }, opts, { query: "orix=1" + (opts.query ? "&" + opts.query : "") })); /* switch ON */
   if (opts.theme) h.ctx.document.documentElement.setAttribute("data-theme", opts.theme);
   await h.flush(); h.ready();
   const seen = new Set(), peb = [];
@@ -140,7 +140,7 @@ test("pebbles keep away from the jar and money copy: canvas only (no DOM node), 
 });
 
 test("sweep-happy-1..6 play over the happy pose only; sweep-1..6 over idle only; draw order shadow, body, eyes, shine, rim, then sweep / grow", async () => {
-  const h = boot({ kid: "hayes", at: NOV4, dpr: 1, checks: fullDays("hayes", ["2026-11-02", "2026-11-03"]) });
+  const h = boot({ kid: "hayes", at: NOV4, dpr: 1, checks: fullDays("hayes", ["2026-11-02", "2026-11-03"]), query: "orix=1" });
   await h.flush(); h.ready(); for (let i = 0; i < 40; i++) { h.advance(16); await h.flush(1); }
   h.ctx.__mercFillTest("hayes");
   const frames = [];

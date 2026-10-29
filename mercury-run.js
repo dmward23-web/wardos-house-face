@@ -79,6 +79,12 @@
     "2026-10": { id: "pumpkin", dir: "art/mercury/skins/2026-10/" },
     "2026-11": { id: "turkey", dir: "art/mercury/skins/2026-11/", extras: "art/mercury/skins/2026-11/extras/", from: { civil: "2026-11-01", hour: 6 } }
   };
+  /* ORIX2 · PREVIEW ONLY until Dan's own yes (Atlas ruling 2026-10-28 7:38 PM CT). The r3 extras layer (shine, rim, shadow,
+     breathe, sweep, grow, splash, wings, motes, pebbles) draws only when this load's URL carries ?orix=1. It is read from
+     the URL on every load and never stored (no storage, no cookie). Without it every date renders the month skin alone,
+     exactly as before ORIX2; the November turkey still flips on its own date. Dan's yes = set ORIX_EXTRAS_LIVE to true. */
+  var ORIX_EXTRAS_LIVE = false;
+  var ORIX_ON = ORIX_EXTRAS_LIVE || q.get("orix") === "1";
   /* layout, per kid folder, at 1x / 2x / 3x (Prism p2 drop with SUMS, bytes copied as is; ORI2: photoreal-r2 ships this
      exact <s>x/<name>.png layout, the art/mercury/platforms/<s>x/ convention; the repo's art allow-list holds plain
      [A-Za-z0-9_./-] paths only, so an older <name>@<s>x.png drop is filed as <s>x/<name>.png):
@@ -185,6 +191,7 @@
   var EX_BREATHE_MS = 350, EX_GROW_MS = 80, EX_SPLASH_MS = 50, EX_MOTE_MS = 120, EX_POP_MS = 160, EX_WING_MS = 200;
   var EX_AIR_H = 160; /* css px of height at which the airborne shadow reaches its 0.6 scale / 0.4 opacity floor */
   function exOn(s) {
+    if (!ORIX_ON) return null; /* ORIX2 · preview switch (see ORIX_EXTRAS_LIVE) */
     if (!s || !s.ready || !s.def || typeof s.def.extras !== "string" || !s.def.extras) return null;
     if (s.x) return s.x;
     var x = s.x = { dir: s.def.extras, scale: s.scale, kid: s.kid, ims: {}, req: [], order: [], anc: { st: "loading", j: null }, fxj: { st: "loading", j: null }, splashes: [] };

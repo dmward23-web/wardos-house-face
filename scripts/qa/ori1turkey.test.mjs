@@ -169,13 +169,13 @@ test("real turkey r2 ainsley: roll-2 is the redrawn frame; its anchors moved (ey
 
 test("extras layer (ORIX2: wired to the r3 drop): requested only after the 14 base images, only the host kid + fx, and a missing extras dir never blocks the base set", async () => {
   for (const kid of KIDS) {
-    const h = await worn(kid, 1);
+    const h = await worn(kid, 1, { query: "orix=1" }); /* ORIX2 · preview switch on */
     assert.deepEqual([h.skin().hero, h.skin().finale], ["art", "lazy"], `${kid}: base set worn with extras/ present`);
     const imgs = h.log.images.map(String), first = imgs.findIndex((u) => /extras\//.test(u));
     assert.ok(first < 0 || imgs.slice(0, first).filter((u) => u.startsWith(DIR)).length >= 14, `${kid}: extras after the base set`);
     assert.ok([...imgs, ...h.log.fetches.map(String)].filter((u) => /extras\//.test(u)).every((u) => u.startsWith(DIR + "extras/" + kid + "/") || u.startsWith(DIR + "extras/fx/")), `${kid}: own extras + fx only`);
     const book = { "2026-11": { id: "turkey", dir: DIR, extras: "art/mercury/skins/qa-none/extras/", from: { civil: "2026-11-01", hour: 6 } } };
-    const g = await worn(kid, 1, { skinBook: book });
+    const g = await worn(kid, 1, { skinBook: book, query: "orix=1" });
     assert.deepEqual([g.skin().hero, g.skin().finale], ["art", "lazy"], `${kid}: base set worn when extras/ is missing`);
   }
 });
