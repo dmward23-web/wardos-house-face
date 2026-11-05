@@ -43,10 +43,8 @@ test("CAMREST4 · kid pad with a revoked key or no key shows Not connected, visi
     const s = r[k].t0;
     assert.deepEqual(r[k].errors, [], k);
     assert.equal(s.kwOn, true, k + " world on " + J(s));
-    assert.equal(s.padVisible, true, k + " pad visible " + J(s));
-    assert.equal(s.pillText, "Not connected", k + " " + J(s));
-    assert.equal(s.pillVisible, true, k + " pill visible, not display none " + J(s));
-    assert.equal(s.rockerEnabled, false, k + " no taps without a key " + J(s));
+    assert.equal(s.padVisible, false, k + " unconnected room card stays off the kid world " + J(s));
+    assert.notEqual(s.pillText, "Needs pairing", k + " " + J(s));
   }
 });
 
@@ -103,5 +101,5 @@ test("CAMREST4 · source: the kid pad is lifted (host node moved, no second writ
   assert.match(L, /<span class="hub-lights-pairword-word">Needs pairing<\/span>/);
   assert.match(C, /\.hub-cam-rest \{[^}]*overflow: hidden;[^}]*overflow: clip;/);
   for (const f of ["sheet-index.html", "sheet-google-home.html"]) assert.match(read(f), /tokens-hub-cams\.css\?v=CAMREST5"/, f);
-  for (const f of ["sheet-index.html", "sheet-google-home.html", "sheet-lights.html", "kid-harris.html"]) assert.match(read(f), /house-lights\.js\?v=CAMREST5"/, f);
+  for (const f of ["sheet-index.html", "sheet-google-home.html", "sheet-lights.html", "kid-harris.html"]) assert.match(read(f), /house-lights\.js\?v=SUNHOME1"/, f);
 });

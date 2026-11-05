@@ -70,7 +70,7 @@ test("SUNHOME1 chrome: no baked kid schedule, no money tile, no fake LIVE, clima
   const hub = rd("sheet-index.html");
   assert.doesNotMatch(hub, /Show me the Money|payday|School hearing|Flag practice/);
   assert.doesNotMatch(hub, /data-who-meta>LIVE/);
-  assert.match(hub, /List resting/);
+  assert.match(hub, /Quiet for now\./);
   assert.match(hub, /tile-label">Jars</);
   const home = rd("sheet-google-home.html");
   assert.doesNotMatch(home, /Climate LIVE|LIVE · NO STILL|5 cams · LIVE/);
@@ -80,8 +80,9 @@ test("SUNHOME1 chrome: no baked kid schedule, no money tile, no fake LIVE, clima
   assert.match(rd("house-sensi-ctl.js"), /preventDefault\(\)/);
   assert.match(rd("house-sensi-ctl.js"), /has not reported that setpoint/);
   assert.doesNotMatch(rd("sheet-chores.html"), /LIVE taps/);
-  assert.match(rd("kid-world.js"), /List resting · try again/);
-  assert.match(rd("kid-world.js"), /No key box, no made-up chores/);
+  assert.match(rd("kid-world.js"), /Resting — your list comes back soon\./);
+  assert.doesNotMatch(rd("kid-world.js"), /data-pebble[\s\S]{0,80}ainsley|ainsley[\s\S]{0,40}kid-pebble/);
+  assert.match(rd("kid-world.css"), /body\.theme-ainsley \.kid-pebble \{ display: none/);
 });
 
 function bootKids(map) {

@@ -4092,11 +4092,17 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <a class="wall-back" href="wall.html" data-wall-back hidden aria-label="Back to the wall">Back to wall</a>
  <style>.wall-back{position:fixed;right:16px;bottom:16px;z-index:2147482000;padding:10px 16px;border-radius:999px;font:700 14px/1.2 Inter,system-ui,sans-serif;color:#fff6dc;background:rgba(20,24,30,.82);border:1px solid rgba(255,255,255,.22);text-decoration:none;backdrop-filter:blur(8px)}.wall-back[hidden]{display:none}/* DAYPKG1 v2h · Atlas: the Dad tile is gone from the roster (Dad sheets are URL-only). 10 tiles on the 3-column grid: a lone last tile spans its row, so no cell is left empty */
 .tile-grid > .tile:last-child:nth-child(3n+1) { grid-column: 1 / -1 !important; }
+@media (orientation: portrait) and (min-height: 1500px) {
+  html, body { height: 100dvh; overflow: hidden; }
+  body .panel { height: 100dvh; max-height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
+  body .panel > .grid-wrap { margin-top: auto; min-height: 0; overflow: auto; }
+  .tile { box-shadow: none !important; }
+}
 </style>
  <script>(function(){try{var k="wardos-from-wall",q=/[?&]from=wall\b/.test(location.search);if(q)sessionStorage.setItem(k,"1");if(q||sessionStorage.getItem(k)==="1"){var a=document.querySelector("[data-wall-back]");if(a){a.hidden=false;a.addEventListener("click",function(){try{sessionStorage.removeItem(k)}catch(e){}});}}}catch(e){}})();</script>
  <header class="hdr hdr--spread hdr--premium hdr--heat">
  <div class="hdr-date" aria-label="Today · America/Chicago">
- <div class="hdr-date-kicker">CT · LIVE</div>
+ <div class="hdr-date-kicker">CT</div>
  <div class="hdr-date-time" data-live="time"></div>
  <div class="hdr-date-dow" data-live="dow">Mon</div>
  <div class="hdr-date-long" data-live="date-long">Sep 28, 2026</div>
@@ -4224,7 +4230,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  </div>
  </div>
  <div class="tile-micro">
- <div class="tile-mrow"><span class="mt">LIST</span><span class="md">List resting</span></div>
+ <div class="tile-mrow"><span class="mt">LIST</span><span class="md">Quiet for now.</span></div>
  </div>
  <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
@@ -4238,7 +4244,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  </div>
  </div>
  <div class="tile-micro">
- <div class="tile-mrow"><span class="mt">LIST</span><span class="md">List resting</span></div>
+ <div class="tile-mrow"><span class="mt">LIST</span><span class="md">Quiet for now.</span></div>
  </div>
  <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
@@ -4252,7 +4258,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  </div>
  </div>
  <div class="tile-micro">
- <div class="tile-mrow"><span class="mt">LIST</span><span class="md">List resting</span></div>
+ <div class="tile-mrow"><span class="mt">LIST</span><span class="md">Quiet for now.</span></div>
  </div>
  <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
@@ -4382,7 +4388,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 <script src="nest-webrtc-client.js?v=FOLLOWUP6"></script>
 <script src="house-nest.js?v=CAMREST3"></script>
 <script src="hub-key-entry.js?v=FOLLOWUP6"></script>
-<script src="house-lights.js?v=CAMREST5"></script>
+<script src="house-lights.js?v=SUNHOME1"></script>
 <script src="house-sensi-ctl.js?v=SUNHOME1"></script>
 <script src="hub-led-ring.js?v=LEDPHONE1"></script>
 <script>

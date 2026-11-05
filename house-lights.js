@@ -1267,10 +1267,12 @@
     for (var i = 0; i < eff.lights.length; i++) {
       if (eff.lights[i].id === lightId) { L = eff.lights[i]; break; }
     }
-    if (!L) {
-      host.innerHTML = '<div class="kid-light-miss">Light not in roster</div>';
+    if (!g.live || !L) {
+      host.hidden = true;
+      host.innerHTML = "";
       return;
     }
+    host.hidden = false;
     var onCls = L.on ? " is-on" : "";
     var dim = (L.kind === "dimmer" || L.kind === "switch/dimmer");
     var rockerCls = L.on ? " is-on" : " is-off";

@@ -1832,7 +1832,11 @@
   var bg = null;
   function paintClock() {
     var el = document.querySelector("[data-kw-clock]");
-    if (el) el.textContent = clockLine();
+    if (!el) return;
+    if (kid() === "ainsley") {
+      var h = chicagoHour();
+      el.textContent = h < 5 || h >= 21 ? "Night" : h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening";
+    } else el.textContent = clockLine();
   }
   function paintWeek() {
     var host = document.querySelector("[data-kw-week]");
@@ -2072,13 +2076,12 @@
         n.addEventListener("click", function (ev) {
           ev.preventDefault();
           ev.stopPropagation();
-          n.textContent = "Trying";
           if (global.WardKids && WardKids.boot) WardKids.boot(kid());
         });
         stage.appendChild(n);
       }
       n.hidden = false;
-      n.textContent = "List resting · try again";
+      n.textContent = "Resting — your list comes back soon.";
     }
     function hideRest() {
       var n = document.querySelector("[data-kw-feed]");
@@ -2092,6 +2095,34 @@
       if (!data && !(host && host.querySelector("[data-check], .quest"))) showRest();
     }, 700);
 
+    if (kid() === "ainsley") {
+      var mist = document.createElement("div");
+      mist.className = "ains-mist";
+      mist.setAttribute("aria-hidden", "true");
+      stage.appendChild(mist);
+      document.addEventListener("click", function (ev) {
+        var t = ev.target && ev.target.closest ? ev.target.closest("[data-check].is-today, .quest.done, .quest.open") : null;
+        if (!t) return;
+        document.documentElement.setAttribute("data-ains-quiet", "1");
+        setTimeout(function () { document.documentElement.removeAttribute("data-ains-quiet"); }, 400);
+      });
+    } else if (kid() === "hayes" || kid() === "harris") {
+      var peb = document.createElement("div");
+      peb.className = "kid-pebble";
+      peb.setAttribute("data-pebble", "");
+      peb.setAttribute("data-state", "empty");
+      peb.setAttribute("aria-hidden", "true");
+      stage.appendChild(peb);
+      document.addEventListener("click", function (ev) {
+        var t = ev.target && ev.target.closest ? ev.target.closest("[data-check]") : null;
+        if (!t || !t.classList.contains("is-today")) return;
+        peb.classList.remove("settle");
+        void peb.offsetWidth;
+        peb.classList.add("settle");
+        document.documentElement.setAttribute("data-ains-quiet", "1");
+        setTimeout(function () { document.documentElement.removeAttribute("data-ains-quiet"); peb.classList.remove("settle"); }, 1200);
+      });
+    }
     stage.querySelector("[data-kw-home]").addEventListener("click", function (ev) {
       ev.preventDefault();
       ev.stopPropagation();

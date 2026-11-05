@@ -45,6 +45,7 @@ const STALE = [
   ["house-lights.js", "PAIRUI1"], /* PAIRUI1b · house-lights.js changed again */
   ["house-lights.js", "PAIRUI1B"], /* CAMREST4 · house-lights.js changed again (pair pill build) */
   ["house-lights.js", "CAMREST4"], /* CAMREST5 · house-lights.js changed again (kid pad CSS) */
+  ["house-lights.js", "CAMREST5"], /* SUNHOME1 · hide an unconnected kid room card */
   ["house-nest.js", "CAMREST2"],
   ["livinghouse/scene-packs.js", "H1P2D3"],
   /* HOTFIX1 · wg-glass.css drops the KIDZ1 plate lift; every page moves off COLDLOAD1 */
@@ -91,7 +92,7 @@ test("H1-CB · no served page loads a halloween1-changed asset with its pre-rang
   assert.deepEqual(hits, []);
 });
 /* HUBPAIR1 · a script changed again after halloween1 carries the newer token */
-const NEWER = { "house-board-strip.js": "PAIRUI1", "house-lights.js": "CAMREST5", "house-spotify.js": "ADULTCUT2B" }; /* SPOTCUT1 · the Spotify setup moved Dad-only; ADULTCUT2 · and the Spotify sign-in */ /* PAIRUI1 · both changed again; PAIRUI1b · lights once more; CAMREST4 · and again; CAMREST5 · and again */
+const NEWER = { "house-board-strip.js": "PAIRUI1", "house-lights.js": "SUNHOME1", "house-spotify.js": "ADULTCUT2B" }; /* SPOTCUT1 · the Spotify setup moved Dad-only; ADULTCUT2 · and the Spotify sign-in */ /* PAIRUI1 · both changed again; PAIRUI1b · lights once more; CAMREST4 · and again; CAMREST5 · and again */
 test("H1-CB · the six named scripts are re-tokened on the pages that load them", () => {
   const want = { "house-board-strip.js": "sheet-index.html", "house-lights.js": "sheet-lights.html", "house-ori-calm.js": "sheet-index.html",
     "house-spotify.js": "sheet-spotify.html", "house-trips-bind.js": "sheet-us.html", "school-names.js": "kid-hayes.html" };

@@ -22,13 +22,13 @@
       var d = get(K); if (Array.isArray(d)) d = {}; d.ideas = d.ideas || []; d.kids = d.kids || {};
       slots.forEach(function (s, i) {
         var t = s.querySelector(".title"), sub = s.querySelector(".sub"), v = d.ideas[i];
-        t.textContent = v || "Tap to add an idea"; t.style.color = v ? "" : "#8a8e96";
+        t.textContent = v || ""; t.style.color = v ? "" : "#8a8e96";
         if (sub) sub.textContent = v ? "Tap to change" : "Empty brainstorm";
-        s.setAttribute("aria-label", v ? "Idea: " + v : "Tap to add an idea");
+        s.setAttribute("aria-label", v ? "Idea: " + v : "Ideas live here.");
       });
       chips.forEach(function (c) {
         var kid = (c.querySelector(".q") || {}).textContent || "", a = c.querySelector(".a"), v = d.kids[kid];
-        a.textContent = v || "Tap to add an idea"; a.style.color = v ? "" : "#8a8e96";
+        a.textContent = v || ""; a.style.color = v ? "" : "#8a8e96";
       });
       return d;
     };
@@ -51,7 +51,7 @@
         favWrap.insertBefore(b, favAdd);
       });
       if (favEmpty) favEmpty.style.display = favs.length ? "none" : "";
-      list.innerHTML = items.length ? "" : '<div class="list-empty">List empty · tap + add</div>';
+      list.innerHTML = items.length ? "" : '<div class="list-empty">List is clear.</div>';
       items.forEach(function (it, i) {
         var r = document.createElement("div"); r.className = "groc-item" + (it.d ? " done" : "");
         r.style.cssText = "display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.08)";

@@ -47,7 +47,7 @@ test("CAMREST5 · every kid board at 440: the kid pad and My week overlap no oth
     const r = await run(m, 440, 956), c = r.cr5;
     assert.deepEqual(r.errors, [], m + " " + J(r.errors));
     assert.deepEqual(c.tapOverlap, [], m + " overlaps " + J(c.tapOverlap));
-    if (m === "ctl-hayes" || m === "ctl-ainsley") { assert.equal(c.padStateFont, null, m + " has no light pad"); continue; }
+    if (m === "ctl-hayes" || m === "ctl-ainsley" || m === "kid0" || m === "kid401") { assert.equal(c.padStateFont, null, m + " has no visible light pad"); continue; }
     assert.ok(c.padPathGap >= 8, m + " pad to My week gap " + c.padPathGap);
     assert.ok(c.padStateFont >= 14, m + " pad state " + c.padStateFont + "px");
     if (m === "kidC") assert.equal(r.writes, 1, "kidC tap still writes once " + J(r));
@@ -71,5 +71,5 @@ test("CAMREST5 · source: CSS only fixes and CAMREST5 tokens", () => {
   assert.match(S, /@media \(min-width: 1920px\) \{[^@]*article\.light-pad\.cmd-panel \{ flex-wrap: wrap !important;[^@]*\.light-pad-src \{ min-width: 0 !important;[^}]*white-space: normal !important;/);
   assert.match(C, /#hub-cam-deck \.hub-cam-label\.hub-cam-label \{ font-size: 14px !important; \}/);
   for (const f of ["sheet-index.html", "sheet-google-home.html"]) assert.match(read(f), /tokens-hub-cams\.css\?v=CAMREST5"/, f);
-  for (const f of ["sheet-index.html", "sheet-google-home.html", "sheet-lights.html", "kid-harris.html"]) assert.match(read(f), /house-lights\.js\?v=CAMREST5"/, f);
+  for (const f of ["sheet-index.html", "sheet-google-home.html", "sheet-lights.html", "kid-harris.html"]) assert.match(read(f), /house-lights\.js\?v=SUNHOME1"/, f);
 });

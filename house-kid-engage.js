@@ -492,7 +492,7 @@
         });
         html += "</div>";
       }
-      if (!hot.what && !todayBits.length && !kidObj(kidId)) html += '<div class="kf-title">List resting</div>';
+      if (!hot.what && !todayBits.length && !kidObj(kidId)) html += '<div class="kf-title">Quiet for now.</div>';
       html += "</div>";
       return html;
     }
@@ -515,7 +515,7 @@
       html += "</div>";
       html += '<div class="kf-meta">' +
         (!kidObj(kidId)
-          ? "List resting"
+          ? "Quiet for now."
           : locked
             ? ("Musts " + gate.done + "/" + gate.need)
             : "Jar open") +
@@ -605,11 +605,13 @@
     var streak = streakDays(kidId);
     var tp = todayMustProgress(kidId);
     if (streakEl) {
-      streakEl.textContent = !tp.need
-        ? "Resting"
-        : streak > 0
+      if (!tp.need || kidId === "ainsley") { streakEl.hidden = true; streakEl.textContent = ""; }
+      else {
+        streakEl.hidden = false;
+        streakEl.textContent = streak > 0
           ? (streak + "d · " + tp.done + "/" + tp.need)
           : (tp.done + "/" + tp.need);
+      }
     }
     if (sub) {
       var leave = nextLeaveFor(kidId);
@@ -828,13 +830,13 @@
       iconHTML +
       '<div class="tile-titles">' +
       '<div class="tile-label">' + esc(label) + "</div>" +
-      '<div class="tile-sub" data-kf-sub>List resting</div>' +
+      '<div class="tile-sub" data-kf-sub>Quiet for now.</div>' +
       "</div>" +
       '<div class="kf-dots" data-kf-dots aria-hidden="true"></div>' +
       "</div>" +
       '<div class="kf-stage" data-kf-stage></div>' +
       '<div class="tile-foot">' +
-      '<span class="tile-fact kf-streak-chip" data-kf-streak>Resting</span>' +
+      '<span class="tile-fact kf-streak-chip" data-kf-streak hidden> </span>' +
       '<a class="tile-tap kid-flip-go" href="' + esc(href) + '">OPEN</a>' +
       "</div>";
 

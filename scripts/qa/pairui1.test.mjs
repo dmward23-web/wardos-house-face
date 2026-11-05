@@ -87,9 +87,9 @@ test("PAIRUI1 · source: readyWord has no Ready, the cam word keeps Camera resti
   const N = read("house-nest.js");
   assert.match(N, /restWord = why === "pair" \? "Needs pairing" : "Camera resting"/);
   assert.match(read("sheet-index.html"), /house-board-strip\.js\?v=PAIRUI1/);
-  assert.match(read("sheet-index.html"), /house-lights\.js\?v=CAMREST5"/); /* CAMREST4 · re-tokened; CAMREST5 · again */
+  assert.match(read("sheet-index.html"), /house-lights\.js\?v=SUNHOME1"/); /* CAMREST5 · re-tokened; SUNHOME1 · kid pad hides when not connected */
   assert.match(read("sheet-index.html"), /house-nest\.js\?v=CAMREST3"/); /* CAMREST3 · house-nest.js changed again */
-  assert.match(read("kid-harris.html"), /house-lights\.js\?v=CAMREST5"/); /* CAMREST4 · re-tokened; CAMREST5 · again */
+  assert.match(read("kid-harris.html"), /house-lights\.js\?v=SUNHOME1"/); /* CAMREST5 · re-tokened; SUNHOME1 · again */
 });
 
 test("PAIRUI1b · the lights pair pill is the camera rest pill: same glow, fill, border and word", SKIP, async () => {
@@ -121,7 +121,7 @@ test("PAIRUI1b · kid board light pad says Not connected, never Needs pairing or
   const r = await all();
   const k = r.kid.t1;
   assert.deepEqual(r.kid.errors, []);
-  assert.deepEqual(k.kidPad, ["Not connected"], J(k));
+  assert.deepEqual(k.kidPad, [], J(k)); /* SUNHOME1 · an unconnected room card is not shown */
   assert.equal(k.needs.length, 0, J(k));
   assert.equal(r.unpaired.t1.pairWord, 1);
 });

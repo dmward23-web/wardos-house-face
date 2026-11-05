@@ -164,7 +164,7 @@ test("AINSJAR1 markup: kid-ainsley has no star glyph, no tally or progress count
   assert.equal(/data-bank-(?:life|symbol|today|balance|week-earn)|data-grow-(?:total|save-need|pct)|data-progress-meta|data-left-count|data-saves-panel/.test(visible), false, "a count, tally or saves binding");
   const jar = kidAinsleyJar();
   assert.equal(/\d/.test(jar.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, " ")), false, "a digit in her jar");
-  assert.match(jar, new RegExp('<div class="bank-title">Tour Jar</div>\\s*' + STATE_EL.source), "TRUSTED right under the Tour Jar label");
+  assert.match(jar, new RegExp('<div class="bank-title">Jar</div>\\s*' + STATE_EL.source), "TRUSTED under Jar; the Tour demo word is off her board");
   assert.match(h, /<script src="ains-jar-state\.js\?v=AINSJAR2"><\/script>/);
 });
 test("AINSJAR1 markup: sheet-allowance shows TRUSTED under her Tour Jar label", () => {
