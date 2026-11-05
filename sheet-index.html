@@ -4092,10 +4092,20 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <a class="wall-back" href="wall.html" data-wall-back hidden aria-label="Back to the wall">Back to wall</a>
  <style>.wall-back{position:fixed;right:16px;bottom:16px;z-index:2147482000;padding:10px 16px;border-radius:999px;font:700 14px/1.2 Inter,system-ui,sans-serif;color:#fff6dc;background:rgba(20,24,30,.82);border:1px solid rgba(255,255,255,.22);text-decoration:none;backdrop-filter:blur(8px)}.wall-back[hidden]{display:none}/* DAYPKG1 v2h · Atlas: the Dad tile is gone from the roster (Dad sheets are URL-only). 10 tiles on the 3-column grid: a lone last tile spans its row, so no cell is left empty */
 .tile-grid > .tile:last-child:nth-child(3n+1) { grid-column: 1 / -1 !important; }
+.hub-window { margin: 8px 12px; height: min(42vw, 280px); overflow: hidden; border-radius: 16px; }
+.hub-window img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (max-width: 600px) {
+  .panel > .hub-window { order: -6 !important; }
+  .panel > .grid-wrap { order: -5 !important; }
+}
+.tile.ainsley, .kid-flip.ainsley { background-image: url("month-theme/hub/kidtile-ainsley.webp"); background-size: cover; background-position: center; }
+.tile.hayes, .kid-flip.hayes { background-image: url("month-theme/hub/kidtile-hayes.webp"); background-size: cover; background-position: center; }
+.tile.harris, .kid-flip.harris { background-image: url("month-theme/hub/kidtile-harris.webp"); background-size: cover; background-position: center; }
 @media (orientation: portrait) and (min-height: 1500px) {
   html, body { height: 100dvh; overflow: hidden; }
   body .panel { height: 100dvh; max-height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
-  body .panel > .grid-wrap { margin-top: auto; min-height: 0; overflow: auto; }
+  body .hub-window { flex: 1 1 auto; height: auto; min-height: 180px; margin: 8px 12px; }
+  body .panel > .grid-wrap { margin-top: 0; min-height: 0; overflow: auto; }
   .tile { box-shadow: none !important; }
 }
 </style>
@@ -4203,7 +4213,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <section class="sp-tile sp-strip" id="hub-spotify-strip" data-sp-tile aria-label="Spotify"></section>
  </div>
 
-
+ <figure class="hub-window" aria-hidden="true"><img src="month-theme/november/hub-window-night.webp" alt=""></figure>
 
  <section class="who-up" data-who-up="1" aria-label="Who's up next">
  <div class="who-up-accent" aria-hidden="true"></div>

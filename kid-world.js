@@ -2036,7 +2036,7 @@
     var stage = document.createElement("div");
     stage.className = "kw-stage";
     stage.innerHTML =
-      '<header class="kw-hud"><button type="button" class="kw-home" data-kw-home>' + name + '</button><div class="kw-clock" data-kw-clock></div></header>' +
+      '<header class="kw-hud"><button type="button" class="kw-home" data-kw-home aria-label="Back to the House board"><img src="assets/icons/home-key-light.svg" alt=""></button><div class="kw-id"><span class="kw-name">' + name + '</span></div><div class="kw-clock" data-kw-clock></div></header>' +
       '<div class="kw-jar-host" data-kw-jar></div>' +
       '<div class="kw-week" data-kw-week></div>' +
       '<button type="button" class="kw-path" data-kw-path aria-label="My Week">My Week</button>' +
@@ -2082,10 +2082,12 @@
       }
       n.hidden = false;
       n.textContent = "Resting — your list comes back soon.";
+      document.body.classList.add("kw-rest");
     }
     function hideRest() {
       var n = document.querySelector("[data-kw-feed]");
       if (n) n.hidden = true;
+      document.body.classList.remove("kw-rest");
     }
     document.addEventListener("house:kids-data-missing", showRest);
     document.addEventListener("house:kids-data-ready", hideRest);
@@ -2111,8 +2113,29 @@
       peb.className = "kid-pebble";
       peb.setAttribute("data-pebble", "");
       peb.setAttribute("data-state", "empty");
-      peb.setAttribute("aria-hidden", "true");
-      stage.appendChild(peb);
+      peb.setAttribute("aria-label", "This week's pebble");
+      var idSlot = stage.querySelector(".kw-id");
+      (idSlot || stage).appendChild(peb);
+      function pebbleState() {
+        var W = global.WardKids, data = W && W._data;
+        if (!W || !data || typeof W.mustQuests !== "function") return "empty";
+        var qs = (W.mustQuests(kid(), data) || []).filter(function (q) { return q && !q.optional && q.cadence !== "addon"; });
+        var n = qs.length, done = 0, i;
+        if (!n) return "empty";
+        for (i = 0; i < n; i++) {
+          var q = qs[i], daily = (q.cadence || "daily") === "daily";
+          var ok = daily && W.dailyWeekComplete ? W.dailyWeekComplete(q.id, data) : W.getCheck(q.id, data, daily ? W.DAY_ISO : undefined);
+          if (ok) done++;
+        }
+        if (done >= n) return "filled";
+        if (done === n - 1 && done > 0) return "today-3";
+        if (done >= (2 * n) / 3) return "today-2";
+        if (done >= n / 3) return "today-1";
+        return "empty";
+      }
+      function paintPebble() { peb.setAttribute("data-state", pebbleState()); }
+      document.addEventListener("house:kids-data-ready", paintPebble);
+      paintPebble();
       document.addEventListener("click", function (ev) {
         var t = ev.target && ev.target.closest ? ev.target.closest("[data-check]") : null;
         if (!t || !t.classList.contains("is-today")) return;
@@ -2120,7 +2143,8 @@
         void peb.offsetWidth;
         peb.classList.add("settle");
         document.documentElement.setAttribute("data-ains-quiet", "1");
-        setTimeout(function () { document.documentElement.removeAttribute("data-ains-quiet"); peb.classList.remove("settle"); }, 1200);
+        setTimeout(function () { document.documentElement.removeAttribute("data-ains-quiet"); }, 400);
+        setTimeout(function () { peb.classList.remove("settle"); paintPebble(); }, 1200);
       });
     }
     stage.querySelector("[data-kw-home]").addEventListener("click", function (ev) {

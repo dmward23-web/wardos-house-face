@@ -30,7 +30,64 @@
     return (S && S.decide) ? S.decide(seasonDate()) : { id: "other", cold: 0, flakes: 0, snow: 0, lit: 0, windows: 0 };
   }
   var spec = specNow();
-  if (spec.id === "november" || spec.id === "december") { mountCoat(spec); return; }
+  if (spec.id === "november") { mountNovember(); return; }
+  function ctHour(d) {
+    try {
+      var p = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", hour: "numeric", hourCycle: "h23" }).formatToParts(d);
+      for (var i = 0; i < p.length; i++) if (p[i].type === "hour") return Number(p[i].value) % 24;
+    } catch (e) { /* local hour */ }
+    return d.getHours();
+  }
+  function novPhase(d) {
+    var h = ctHour(d);
+    if (h >= 6 && h < 16) return "morning";
+    if (h >= 16 && h < 19) return "dusk";
+    return "night";
+  }
+  function mountNovember() {
+    function go() {
+      var when = seasonDate();
+      var phase = novPhase(when);
+      var phone = (window.innerWidth || 0) < 700;
+      var plate = "month-theme/november/" + (phone ? "phone-" : "wall-") + phase + ".webp";
+      var kidPage = /\/kid-[a-z]+/.test(location.pathname || "") || !!(document.body && document.body.hasAttribute("data-kid-world"));
+      document.documentElement.setAttribute("data-month-theme", "11");
+      document.documentElement.setAttribute("data-nov-phase", phase);
+      if (!kidPage) document.documentElement.style.setProperty("--km-bg", "url(\"" + plate + "\")");
+      if (!document.getElementById("km-nov")) {
+        var L = document.createElement("div");
+        L.id = "km-nov";
+        L.className = "km-layer km-nov" + (document.querySelector(".kw-canvas") ? " km-kid" : "");
+        L.setAttribute("aria-hidden", "true");
+        L.style.zIndex = "1";
+        var fall = document.createElement("div");
+        fall.className = "km-fall";
+        L.appendChild(fall);
+        var glow = document.createElement("div");
+        glow.className = "km-glow r";
+        L.appendChild(glow);
+        if (!RM.matches) {
+          for (var i = 0; i < 14; i++) {
+            var leaf = document.createElement("i");
+            leaf.className = "km-leaf b0";
+            leaf.style.left = ((i * 7.1) % 100) + "%";
+            leaf.style.animationDelay = (-i * 2.4) + "s";
+            leaf.style.backgroundImage = "url(\"" + base + "month-theme/november/leaves/leaf-nov-" + (i % 8) + "-64x64.webp\")";
+            L.appendChild(leaf);
+          }
+        }
+        if (document.body) document.body.insertBefore(L, document.body.firstChild);
+      }
+      var fig = document.querySelector(".hub-window");
+      if (fig) {
+        var winPhase = (ctHour(when) >= 16 && ctHour(when) < 19) ? "dusk" : "night";
+        var img = fig.querySelector("img");
+        if (!img) { img = document.createElement("img"); img.alt = ""; fig.appendChild(img); }
+        img.src = "month-theme/november/hub-window-" + winPhase + ".webp";
+      }
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
+  }
   var m = q.has("month") ? parseInt(q.get("month"), 10) : new Date().getMonth() + 1;
   var t = THEMES[m]; if (!t) return;
   function mount() {

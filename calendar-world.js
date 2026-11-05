@@ -131,7 +131,7 @@
     if (!path) return;
     path.innerHTML = "";
     var days = stripDays();
-    if (!days.length) { path.innerHTML = "<p>A free week.</p>"; return; }
+    if (!days.length) { path.innerHTML = kid() === "ainsley" ? "<p>Nothing on your week yet.</p>" : "<p>A free week.</p>"; return; }
     days.forEach(function (iso) {
       var diff = dayDiff(today, iso);
       var b = document.createElement("button");

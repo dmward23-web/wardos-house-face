@@ -150,7 +150,7 @@ test("AINSSTAR1 (real browser): no star glyph or digit in Ainsley's rows before,
 });
 
 /* ---------- 4. AINSJAR1 (Alfred FOLD Oct 20): her jar is a state under the Tour Jar label, on both of her pages ---------- */
-const STATE_EL = /<div class="jar-state" data-jar-state="trusted">TRUSTED<\/div>/;
+const STATE_EL = /<div class="jar-state" data-jar-state="trusted">TRUSTED<\/div>/; /* allowance still carries the Dad-side state word */
 function kidAinsleyJar() {
   const h = read("kid-ainsley.html"), i = h.indexOf('id="sec-jar"');
   assert.ok(i > 0, "kid-ainsley jar section");
@@ -164,7 +164,7 @@ test("AINSJAR1 markup: kid-ainsley has no star glyph, no tally or progress count
   assert.equal(/data-bank-(?:life|symbol|today|balance|week-earn)|data-grow-(?:total|save-need|pct)|data-progress-meta|data-left-count|data-saves-panel/.test(visible), false, "a count, tally or saves binding");
   const jar = kidAinsleyJar();
   assert.equal(/\d/.test(jar.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, " ")), false, "a digit in her jar");
-  assert.match(jar, new RegExp('<div class="bank-title">Jar</div>\\s*' + STATE_EL.source), "TRUSTED under Jar; the Tour demo word is off her board");
+  assert.match(jar, /<div class="bank-title">Jar<\/div>\s*<div class="jar-state" data-jar-state="unset">Nothing trusted yet\.<\/div>/, "no Tour word; empty jar is not a counter");
   assert.match(h, /<script src="ains-jar-state\.js\?v=AINSJAR2"><\/script>/);
 });
 test("AINSJAR1 markup: sheet-allowance shows TRUSTED under her Tour Jar label", () => {

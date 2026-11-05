@@ -13,11 +13,17 @@
 .km-oct .km-grade{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,transparent 55%,rgba(20,8,0,.30));mix-blend-mode:multiply}
 @keyframes km-flick{0%{opacity:.78}35%{opacity:.92}60%{opacity:.84}100%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.km-glow{animation:none}}
-/* SUNHOME1 · November harvest-into-cold and December living snow. The canvas is a coat, never a control. */
-.km-nov .km-paint,.km-dec .km-paint{position:absolute;inset:0;width:100%;height:100%;display:block}
-.km-kid .km-paint{opacity:.9}
-.km-scene .km-paint{opacity:.55}
-@media (prefers-reduced-motion:reduce){.km-paint{opacity:.8}}
+/* SUNHOME1 · November plates replace the Halloween porch. Glow stays on the porch side. Leaves are the far band only. */
+html[data-month-theme="11"] body:not([data-kid-world]){background-image:var(--km-bg)!important;background-size:cover!important;background-position:center!important;background-color:#1a120c}
+html[data-month-theme="11"] iframe.night52-scene{visibility:hidden!important}
+.km-nov .km-glow.l{display:none}
+.km-nov .km-glow.r{background:radial-gradient(circle,rgba(255,180,90,.22),transparent 60%)}
+.km-nov .km-fall{position:absolute;inset:0;background:url("november/leaves/leaves-fall-nov-wall-1920x1080.webp") center/cover no-repeat;opacity:.35;pointer-events:none}
+.km-leaf{position:absolute;top:-8%;background-size:contain;background-repeat:no-repeat;pointer-events:none;will-change:transform}
+.km-leaf.b0{width:24px;height:24px;opacity:.5;filter:blur(1px);animation:kmLeaf 34s linear infinite}
+@keyframes kmLeaf{0%{transform:translate(0,-8vh) rotate(0)}100%{transform:translate(-3vw,110vh) rotate(220deg)}}
+html[data-ains-quiet="1"] .km-leaf{animation-duration:80s}
+@media (prefers-reduced-motion:reduce){.km-leaf{display:none}.km-nov .km-fall{opacity:.2}}
 /* kid boards: the overlay never crosses chore art (Alfred 4:24). No bats; fog and embers stay in a thin floor band under the week strip. */
 .km-kid .km-bats{display:none}
 .km-kid .km-fog{height:14%;bottom:-3%}
