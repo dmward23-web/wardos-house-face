@@ -2061,6 +2061,37 @@
       var hud = stage.querySelector(".kw-hud"), clk = hud.querySelector("[data-kw-clock]");
       hud.insertBefore(mb, clk);
     }
+    /* SUNHOME1 · a missing kids week is said out loud on the world, with a retry. No key box, no made-up chores. */
+    function showRest() {
+      var n = document.querySelector("[data-kw-feed]");
+      if (!n) {
+        n = document.createElement("button");
+        n.type = "button";
+        n.className = "kw-feed";
+        n.setAttribute("data-kw-feed", "resting");
+        n.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          n.textContent = "Trying";
+          if (global.WardKids && WardKids.boot) WardKids.boot(kid());
+        });
+        stage.appendChild(n);
+      }
+      n.hidden = false;
+      n.textContent = "List resting · try again";
+    }
+    function hideRest() {
+      var n = document.querySelector("[data-kw-feed]");
+      if (n) n.hidden = true;
+    }
+    document.addEventListener("house:kids-data-missing", showRest);
+    document.addEventListener("house:kids-data-ready", hideRest);
+    setTimeout(function () {
+      var data = global.WardKids && WardKids._data;
+      var host = document.querySelector("[data-mount-quests]");
+      if (!data && !(host && host.querySelector("[data-check], .quest"))) showRest();
+    }, 700);
+
     stage.querySelector("[data-kw-home]").addEventListener("click", function (ev) {
       ev.preventDefault();
       ev.stopPropagation();

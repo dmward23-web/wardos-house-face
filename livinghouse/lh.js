@@ -328,7 +328,7 @@
   }
   function emptyPlate(pack) {
     var el = $("#lh-plate"); if (!el) return;
-    if (pack.art !== "missing") { el.hidden = true; return; }
+    if (pack.art !== "missing") { el.hidden = true; el.setAttribute("data-feed", pack.art === "layered" ? "layered" : "present"); return; }
     el.hidden = false; el.setAttribute("data-feed", "missing"); el.setAttribute("data-plate", pack.plate); el.setAttribute("data-why", pack.why);
     $("[data-lh=season]").textContent = pack.id === "december" ? "No snow yet" : "No harvest yet";
   }

@@ -499,6 +499,22 @@ body.kw-on #tapsync-badge { display: none !important; }
   color: #fff8f0;
   text-shadow: 0 0 10px rgba(8, 6, 4, 0.72);
 }
+.kw-feed {
+  position: absolute;
+  left: 12px;
+  top: calc(max(10px, env(safe-area-inset-top)) + 56px);
+  z-index: 6;
+  pointer-events: auto;
+  min-height: 44px;
+  max-width: calc(100vw - 24px);
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 214, 160, 0.45);
+  background: rgba(16, 12, 8, 0.78);
+  color: #fff6e4;
+  font: 700 15px/1.2 system-ui, sans-serif;
+  text-align: left;
+}
 .kw-jar-host {
   position: absolute;
   left: 36%;

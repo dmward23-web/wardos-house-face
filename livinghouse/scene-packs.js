@@ -6,7 +6,8 @@
    event "Halloween night with the kids" (id first, exact title second, never an all-day row, never the broad halloween
    regex) gives the start, shown only as 5:00 PM style text from the event itself, and ends the count at the event's end.
    No event in the feed = the date-only count to Oct 29: days, then "Tonight" on the day, never a clock time.
-   November harvest and December snow have no art in this repo: those packs are missing plates. */
+   November and December are a code-drawn coat (month-theme/season-math.js): late harvest into cold,
+   then living snow with one more window lit each day through the 25th. No photo plate is claimed. */
 (function (root) {
   "use strict";
   var TZ = "America/Chicago";
@@ -14,8 +15,8 @@
     october: { id: "october", plate: "october-night", art: "present", leaves: true, countdown: false, days: 0, street: false, glow: false, streetArt: "", why: "" },
     "october-count": { id: "october-count", plate: "october-night", art: "present", leaves: true, countdown: true, days: 0, street: false, glow: false, streetArt: "", why: "" },
     "october-street": { id: "october-street", plate: "october-night", art: "present", leaves: true, countdown: false, days: 0, street: true, glow: true, streetArt: "missing", why: "no street art yet" },
-    november: { id: "november", plate: "november-harvest", art: "missing", leaves: false, countdown: false, days: 0, street: false, glow: false, streetArt: "", why: "no november harvest art" },
-    december: { id: "december", plate: "december-snow", art: "missing", leaves: false, countdown: false, days: 0, street: false, glow: false, streetArt: "", why: "no december snow art" },
+    november: { id: "november", plate: "november-harvest", art: "layered", leaves: false, countdown: false, days: 0, street: false, glow: false, streetArt: "", why: "", cold: 0, flakes: 0, snow: 0, lit: 0, windows: 2 },
+    december: { id: "december", plate: "december-snow", art: "layered", leaves: false, countdown: false, days: 0, street: false, glow: false, streetArt: "", why: "", cold: 1, flakes: 1, snow: 1, lit: 1, windows: 25 },
     base: { id: "base", plate: "october-night", art: "present", leaves: false, countdown: false, days: 0, street: false, glow: false, streetArt: "", why: "" }
   };
   function copy(id, extra) {
@@ -86,8 +87,19 @@
     }
     if (x.m === 10 && x.d === 31) return copy("october-street");
     if (x.m === 10) return copy("october");
-    if (x.m === 11) return copy("november");
-    if (x.m === 12) return copy("december");
+    if (x.m === 11 || x.m === 12) {
+      var id = x.m === 11 ? "november" : "december";
+      var extra = { art: "layered", why: "" };
+      var Season = null;
+      if (typeof module === "object" && module.exports && typeof require === "function") {
+        try { Season = require("../month-theme/season-math.js"); } catch (eS) { Season = null; }
+      } else if (typeof window !== "undefined") Season = window.MonthSeason || null;
+      var s = Season && Season.decide ? Season.decide(d) : null;
+      if (s && s.id === id) {
+        extra.cold = s.cold; extra.flakes = s.flakes; extra.snow = s.snow; extra.lit = s.lit; extra.windows = s.windows;
+      }
+      return copy(id, extra);
+    }
     return copy("base");
   }
   var api = { forDate: forDate, parts: parts, showTarget: showTarget, shown: shown, sha16: sha16, SHOW: SHOW, PACKS: PACKS, TZ: TZ };

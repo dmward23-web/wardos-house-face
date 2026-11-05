@@ -335,8 +335,9 @@ async function main() {
     mode = "missing";
     await open(cdp, origin + "/livinghouse/index.html?now=2026-11-01T18:00:00-06:00&freeze=1", 1920, 1080);
     s = await cdp.eval(stateExpr());
-    assert.equal(s.art, "missing");
-    assert.equal(s.plateText, "No harvest yet");
+    assert.equal(s.art, "layered");
+    assert.equal(s.plateHidden, true);
+    assert.equal(s.plateText, "");
     assert.equal(s.away, false, "a missing away feed is the awake board");
     assert.equal(s.jarsFeed, "missing");
     assert.match(s.jars, /No moments yet/);

@@ -55,7 +55,21 @@ const STALE = [
   ["private-feed.js", "HALLOWEEN1"],
   ["private-feed.js", "WGQUIET1"],
   ["house-lights.js", "HALLOWEEN1"],
-  ["house-board-strip.js", "HALLOWEEN1"]
+  ["house-board-strip.js", "HALLOWEEN1"],
+  /* SUNHOME1 · cold-month coat, kid feed honesty, climate hero, run lamps */
+  ["month-theme/month-overlay.js", "HALLOWEEN1"],
+  ["month-theme/month-overlay.js", "LHV1"],
+  ["month-theme/month-overlay.css", "MERGE1C"],
+  ["month-theme/month-overlay.css", "MONTHFX2"],
+  ["livinghouse/scene-packs.js", "H1P2D4"],
+  ["livinghouse/lh.js", "H1P2D3"],
+  ["kid-world.js", "ORI1"],
+  ["kid-world.css", "DAYPKG1"],
+  ["house-kid-engage.js", "DAYPKG1"],
+  ["house-hub-tiles-bind.js", "MERGE1C"],
+  ["house-sensi-ctl.js", "HUBPIN1"],
+  ["house-sensi.js", "ADULTCUT1"],
+  ["mercury-run.js", "ORI2"]
 ];
 const SKIP = /^(scripts|tests?|plates|plates-receipt|vendor|node_modules|\.git)$/;
 function pages(dir, out = []) {

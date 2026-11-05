@@ -492,6 +492,7 @@
         });
         html += "</div>";
       }
+      if (!hot.what && !todayBits.length && !kidObj(kidId)) html += '<div class="kf-title">List resting</div>';
       html += "</div>";
       return html;
     }
@@ -513,9 +514,11 @@
       html += '<div class="kf-xp-fill" style="width:' + Math.max(0, Math.min(100, pct)) + '%"></div>';
       html += "</div>";
       html += '<div class="kf-meta">' +
-        (locked
-          ? ("Musts " + gate.done + "/" + gate.need + " · jar locked")
-          : ("Jar open · " + (bank && bank.weekEarn != null ? ("$" + bank.weekEarn) : "LIVE"))) +
+        (!kidObj(kidId)
+          ? "List resting"
+          : locked
+            ? ("Musts " + gate.done + "/" + gate.need)
+            : "Jar open") +
         "</div>";
       html += '<div class="kf-streak streak-sparks" data-streak>' +
         (streak > 0 ? ("🔥 " + streak + "-day streak") : "🔥 Streak · tap musts") +
@@ -602,9 +605,11 @@
     var streak = streakDays(kidId);
     var tp = todayMustProgress(kidId);
     if (streakEl) {
-      streakEl.textContent = streak > 0
-        ? ("🔥 " + streak + "d · " + tp.done + "/" + tp.need)
-        : ("XP " + tp.done + "/" + tp.need);
+      streakEl.textContent = !tp.need
+        ? "Resting"
+        : streak > 0
+          ? (streak + "d · " + tp.done + "/" + tp.need)
+          : (tp.done + "/" + tp.need);
     }
     if (sub) {
       var leave = nextLeaveFor(kidId);
@@ -618,6 +623,7 @@
       if (leave && !leave.start && leave.badge && /^(SUN|MON|TUE|WED|THU|FRI|SAT)$/i.test(leave.badge) && leave.badge.toUpperCase() !== ctDowShort(Date.now())) ldow = leave.badge.toUpperCase() + " ";
       if (face === "day" && leave) sub.textContent = ldow + (leave.time || "") + " · " + leave.title;
       else if (kidObj(kidId) && kidObj(kidId).themeLabel) sub.textContent = kidObj(kidId).themeLabel;
+      else if (!kidObj(kidId)) sub.textContent = "";
       else if (sub.getAttribute("data-kf-leave") === "1") sub.textContent = ""; /* LIVELAW1 · an ended leave never lingers on the sub-line */
       sub.setAttribute("data-kf-leave", face === "day" && leave ? "1" : "0");
     }
@@ -822,13 +828,13 @@
       iconHTML +
       '<div class="tile-titles">' +
       '<div class="tile-label">' + esc(label) + "</div>" +
-      '<div class="tile-sub" data-kf-sub>Live board</div>' +
+      '<div class="tile-sub" data-kf-sub>List resting</div>' +
       "</div>" +
       '<div class="kf-dots" data-kf-dots aria-hidden="true"></div>' +
       "</div>" +
       '<div class="kf-stage" data-kf-stage></div>' +
       '<div class="tile-foot">' +
-      '<span class="tile-fact kf-streak-chip" data-kf-streak>XP</span>' +
+      '<span class="tile-fact kf-streak-chip" data-kf-streak>Resting</span>' +
       '<a class="tile-tap kid-flip-go" href="' + esc(href) + '">OPEN</a>' +
       "</div>";
 
@@ -981,6 +987,16 @@
     });
   }
 
+  /* SUNHOME1 · LIVE only when the private feed says the house answered just now. A quiet or stale board does not wear it. */
+  function feedMark() {
+    try {
+      var pf = global.PrivateFeed && typeof global.PrivateFeed.state === "function" ? global.PrivateFeed.state() : null;
+      if (pf && pf.status === "live") return " · LIVE";
+      if (pf && pf.status === "stale") return " · earlier";
+    } catch (e) { /* no mark */ }
+    return "";
+  }
+
   function paintWhoUp() {
     var host = ensureWhoUpHost();
     if (!host) return;
@@ -994,7 +1010,7 @@
       host.removeAttribute("data-kids");
       host.classList.add("is-quiet");
       if (main) main.innerHTML = '<span class="who-up-name">Quiet</span><span class="who-up-what">No leave window</span>';
-      if (meta) meta.textContent = "LIVE cal";
+      if (meta) meta.textContent = "";
       if (go) { go.setAttribute("href", "sheet-today.html"); go.hidden = true; }
       host.style.setProperty("display", "none", "important"); /* LAW8C1 · nothing up = no hollow "Quiet · No leave window" card */
       return;
@@ -1014,7 +1030,7 @@
         '<span class="who-up-time">' + esc(leave.time || leave.badge || "") + "</span>" +
         '<span class="who-up-what">' + esc(leave.title) + "</span>";
     }
-    if (meta) meta.textContent = fmtLeave(mins) + " · LIVE";
+    if (meta) meta.textContent = fmtLeave(mins) + feedMark();
     if (go) {
       go.hidden = false;
       go.setAttribute("href", HREF[id]);
