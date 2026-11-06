@@ -80,7 +80,8 @@ test("SUNHOME1 chrome: no baked kid schedule, no money tile, no fake LIVE, clima
   assert.match(rd("house-sensi-ctl.js"), /preventDefault\(\)/);
   assert.match(rd("house-sensi-ctl.js"), /has not reported that setpoint/);
   assert.doesNotMatch(rd("sheet-chores.html"), /LIVE taps/);
-  assert.match(rd("kid-world.js"), /Resting — your list comes back soon\./);
+  assert.match(rd("kid-world.js"), /Resting\. Your list comes back soon\./);
+  assert.doesNotMatch(rd("kid-world.js"), /Resting \u2014/);
   assert.doesNotMatch(rd("kid-world.js"), /data-pebble[\s\S]{0,80}ainsley|ainsley[\s\S]{0,40}kid-pebble/);
   assert.match(rd("kid-world.css"), /body\.theme-ainsley \.kid-pebble \{ display: none/);
 });

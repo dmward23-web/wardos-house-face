@@ -479,8 +479,6 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on.kw-rest .panel { opacity: .6 !important; }
   html.kw-root body.kw-on .panel::before,
   html.kw-root body.kw-on .panel::after { background: none !important; background-image: none !important; }
-  html.kw-root body.kw-on .kw-week,
-  html.kw-root body.kw-on .kw-path,
   html.kw-root body.kw-on .jump-rail,
   html.kw-root body.kw-on .hot-banner,
   html.kw-root body.kw-on .ftr,
@@ -489,8 +487,7 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on #sec-musts { order: 1; }
   html.kw-root body.kw-on #sec-jar { order: 2; }
   html.kw-root body.kw-on #sec-days { order: 3; }
-  html.kw-root body.kw-on .day-tap:not(.is-today) { display: none !important; }
-  html.kw-root body.kw-on .day-tap.is-today { min-width: 44px; min-height: 44px; }
+  html.kw-root body.kw-on .day-tap { min-width: 44px; min-height: 44px; }
 }
 @media (orientation: landscape) and (min-width: 1200px) and (max-height: 900px) {
   html.kw-root body.kw-on .kw-canvas { right: 34vw !important; width: auto !important; height: 100% !important; }
@@ -505,8 +502,13 @@ body.kw-on #tapsync-badge { display: none !important; }
     -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
   }
   html.kw-root body.kw-on.kw-rest .panel { opacity: .6 !important; }
-  html.kw-root body.kw-on .day-tap:not(.is-today) { display: none !important; }
   html.kw-root body.kw-on .panel .sec:not(#sec-musts):not(#sec-jar):not(#sec-days) { display: none !important; }
+  /* World controls stay in the world column so the dock does not take their taps. */
+  html.kw-root body.kw-on .kw-hud,
+  html.kw-root body.kw-on .kw-path,
+  html.kw-root body.kw-on .kw-week,
+  html.kw-root body.kw-on .kw-light,
+  html.kw-root body.kw-on .house-snd { right: calc(34vw + 12px) !important; z-index: 7 !important; }
 }
 body.theme-hayes.kw-on .kw-canvas { pointer-events: none; }
 body.theme-ainsley .ains-mist {

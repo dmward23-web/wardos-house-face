@@ -234,7 +234,8 @@ async function moneyPage(pathname, meta = pageHasMeta(pathname)) {
 }
 test("DAYPKG1 v2g P2: house-money-bind.js writes no '$' (not even transiently) and fetches no money feed on every kid-reachable page, recursive set; '$' only on the Dad money sheet (meta ward-money=dad, never a kid page)", async () => {
   const loaders = [...REACH.keys()].filter((p) => /house-money-bind\.js/.test(rd(p)));
-  assert.ok(loaders.includes("sheet-chores.html") && loaders.includes("kid-hayes.html"), "sheet-chores and kid boards load it");
+  assert.ok(loaders.includes("sheet-chores.html"), "a family sheet that still loads the money script stays covered");
+  for (const kid of ["kid-hayes.html", "kid-harris.html", "kid-ainsley.html"]) assert.ok(!loaders.includes(kid), kid + " must not load the money script");
   for (const p of [...REACH.keys()]) {
     assert.ok(!rd(p).includes(META_DAD), p + " is kid-reachable and must not declare itself the Dad money sheet");
     for (const pn of ["/" + p, "/" + p.replace(/\.html$/, "")]) {

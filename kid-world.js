@@ -14,6 +14,58 @@
   function nightOn() { return kid() !== "ainsley" /* Ainsley keeps her concert venue (Alfred 10/16) */ && !/[?&]night=0(&|$)/.test(location.search) && !!document.querySelector('script[src*="night/night-host.js"]'); }
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function kid() { return (document.body && document.body.getAttribute("data-kid")) || "hayes"; }
+  var REST_LINE = "Resting. Your list comes back soon.";
+  function bindFeedRest(stage) {
+    function showRest() {
+      var n = document.querySelector("[data-kw-feed]");
+      if (!n) {
+        n = document.createElement("button");
+        n.type = "button";
+        n.className = "kw-feed";
+        n.setAttribute("data-kw-feed", "resting");
+        n.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          if (global.WardKids && WardKids.boot) WardKids.boot(kid());
+        });
+        stage.appendChild(n);
+      }
+      n.hidden = false;
+      n.textContent = REST_LINE;
+      if (document.body) document.body.classList.add("kw-rest");
+    }
+    function hideRest() {
+      var n = document.querySelector("[data-kw-feed]");
+      if (n) n.hidden = true;
+      if (document.body) document.body.classList.remove("kw-rest");
+    }
+    document.addEventListener("house:kids-data-missing", showRest);
+    document.addEventListener("house:kids-data-ready", hideRest);
+    return { show: showRest, hide: hideRest };
+  }
+  function pebbleFromCounts(done, n) {
+    done = done | 0;
+    n = n | 0;
+    if (n <= 0 || done <= 0) return "empty";
+    if (done >= n) return "filled";
+    if (done === n - 1) return "today-3";
+    if (done * 3 >= n * 2) return "today-2";
+    if (done * 3 >= n) return "today-1";
+    return "empty";
+  }
+  function pebbleStateFor(kidId) {
+    var W = global.WardKids, data = W && W._data;
+    if (!W || !data || typeof W.mustQuests !== "function") return "empty";
+    var qs = (W.mustQuests(kidId, data) || []).filter(function (q) { return q && !q.optional && q.cadence !== "addon"; });
+    var n = qs.length, done = 0, i;
+    if (!n) return "empty";
+    for (i = 0; i < n; i++) {
+      var q = qs[i], daily = (q.cadence || "daily") === "daily";
+      var ok = daily && W.dailyWeekComplete ? W.dailyWeekComplete(q.id, data) : W.getCheck(q.id, data, daily ? W.DAY_ISO : undefined);
+      if (ok) done++;
+    }
+    return pebbleFromCounts(done, n);
+  }
   function rnd(i) { var x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.floor(x); }
   function chicagoHour() {
     try {
@@ -2066,36 +2118,7 @@
       hud.insertBefore(mb, clk);
     }
     /* SUNHOME1 · a missing kids week is said out loud on the world, with a retry. No key box, no made-up chores. */
-    function showRest() {
-      var n = document.querySelector("[data-kw-feed]");
-      if (!n) {
-        n = document.createElement("button");
-        n.type = "button";
-        n.className = "kw-feed";
-        n.setAttribute("data-kw-feed", "resting");
-        n.addEventListener("click", function (ev) {
-          ev.preventDefault();
-          ev.stopPropagation();
-          if (global.WardKids && WardKids.boot) WardKids.boot(kid());
-        });
-        stage.appendChild(n);
-      }
-      n.hidden = false;
-      n.textContent = "Resting — your list comes back soon.";
-      document.body.classList.add("kw-rest");
-    }
-    function hideRest() {
-      var n = document.querySelector("[data-kw-feed]");
-      if (n) n.hidden = true;
-      document.body.classList.remove("kw-rest");
-    }
-    document.addEventListener("house:kids-data-missing", showRest);
-    document.addEventListener("house:kids-data-ready", hideRest);
-    setTimeout(function () {
-      var data = global.WardKids && WardKids._data;
-      var host = document.querySelector("[data-mount-quests]");
-      if (!data && !(host && host.querySelector("[data-check], .quest"))) showRest();
-    }, 700);
+    bindFeedRest(stage);
 
     if (kid() === "ainsley") {
       var mist = document.createElement("div");
@@ -2116,23 +2139,7 @@
       peb.setAttribute("aria-label", "This week's pebble");
       var idSlot = stage.querySelector(".kw-id");
       (idSlot || stage).appendChild(peb);
-      function pebbleState() {
-        var W = global.WardKids, data = W && W._data;
-        if (!W || !data || typeof W.mustQuests !== "function") return "empty";
-        var qs = (W.mustQuests(kid(), data) || []).filter(function (q) { return q && !q.optional && q.cadence !== "addon"; });
-        var n = qs.length, done = 0, i;
-        if (!n) return "empty";
-        for (i = 0; i < n; i++) {
-          var q = qs[i], daily = (q.cadence || "daily") === "daily";
-          var ok = daily && W.dailyWeekComplete ? W.dailyWeekComplete(q.id, data) : W.getCheck(q.id, data, daily ? W.DAY_ISO : undefined);
-          if (ok) done++;
-        }
-        if (done >= n) return "filled";
-        if (done === n - 1 && done > 0) return "today-3";
-        if (done >= (2 * n) / 3) return "today-2";
-        if (done >= n / 3) return "today-1";
-        return "empty";
-      }
+      function pebbleState() { return pebbleStateFor(kid()); }
       function paintPebble() { peb.setAttribute("data-state", pebbleState()); }
       document.addEventListener("house:kids-data-ready", paintPebble);
       paintPebble();
@@ -2142,8 +2149,8 @@
         peb.classList.remove("settle");
         void peb.offsetWidth;
         peb.classList.add("settle");
-        document.documentElement.setAttribute("data-ains-quiet", "1");
-        setTimeout(function () { document.documentElement.removeAttribute("data-ains-quiet"); }, 400);
+        document.documentElement.setAttribute("data-leaf-quiet", "1");
+        setTimeout(function () { document.documentElement.removeAttribute("data-leaf-quiet"); }, 400);
         setTimeout(function () { peb.classList.remove("settle"); paintPebble(); }, 1200);
       });
     }
@@ -2392,6 +2399,8 @@
     return canvas;
   }
 
+  global.KidPebble = { fromCounts: pebbleFromCounts, forKid: pebbleStateFor };
+  global.KidFeedRest = { line: REST_LINE, bind: bindFeedRest };
   global.KidWorld = {
     openScene: openScene,
     back: back,

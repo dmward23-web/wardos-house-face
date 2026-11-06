@@ -65,7 +65,12 @@ const JARTAP1_LINES = new Map([
   [" \"Dad paid how many $?\\nThis week earn $\" + weekEarn + \" \u2192 balance becomes $\" + after + \" \u2212 paid.\\n0 = keep all as carry into next week.\",", " \"Dad paid how many dollars?\\nThis week earn \" + weekEarn + \" \u2192 balance becomes \" + after + \" \u2212 paid.\\n0 = keep all as carry into next week.\","],
 ]);
 const THEME_TAGS = /(?:<script src="livinghouse\/clock\.js\?v=[A-Z0-9]+"><\/script><script src="livinghouse\/scene-packs\.js\?v=[A-Z0-9]+"><\/script>)?<script src="wg-assets\.js(?:\?v=[A-Z0-9]+)?" defer><\/script>\n?/g;
-const THEME_STRIP = (t) => t.replace(/<link rel="stylesheet" href="wg-glass\.css[^"]*" \/>\n?/g, "").replace(THEME_TAGS, "").split("\n")
+const THEME_STRIP = (t) => t
+  .replace(/<script src="house-money-bind\.js\?v=[^"]+"><\/script>\n?/g, "")
+  .replace(/<script src="month-theme\/season-math\.js\?v=[A-Z0-9]+"><\/script>/g, "")
+  .replace(/(month-theme\/month-overlay\.css)\?v=[A-Z0-9]+/g, "$1?v=V")
+  .replace(/<script src="livinghouse\/clock\.js\?v=[A-Z0-9]+"><\/script><script src="livinghouse\/scene-packs\.js\?v=[A-Z0-9]+"><\/script>/g, "")
+  .replace(/<link rel="stylesheet" href="wg-glass\.css[^"]*" \/>\n?/g, "").replace(THEME_TAGS, "").split("\n")
   .filter((l) => !/^<link rel="stylesheet" href="wg-glass\.css[^"]*" \/>$/.test(l))
   .map((l) => JARTAP1_LINES.get(l) ?? l)
   .map((l) => l.replace(/^(<link rel="stylesheet" href="kid-world\.css)\?v=[A-Z0-9]+"/, '$1?v=V"').replace(/(<script src="(?:kid-world|jar-engine)\.js)\?v=[A-Z0-9]+"/g, '$1?v=V"'))   /* JARTAP1 re-tokens kid-world.css/js + jar-engine (token only) */

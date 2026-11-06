@@ -22,7 +22,7 @@ html[data-month-theme="11"] iframe.night52-scene{visibility:hidden!important}
 .km-leaf{position:absolute;top:-8%;background-size:contain;background-repeat:no-repeat;pointer-events:none;will-change:transform}
 .km-leaf.b0{width:24px;height:24px;opacity:.5;filter:blur(1px);animation:kmLeaf 34s linear infinite}
 @keyframes kmLeaf{0%{transform:translate(0,-8vh) rotate(0)}100%{transform:translate(-3vw,110vh) rotate(220deg)}}
-html[data-ains-quiet="1"] .km-leaf{animation-duration:80s}
+html[data-ains-quiet="1"] .km-leaf, html[data-leaf-quiet="1"] .km-leaf{animation-duration:80s}
 @media (prefers-reduced-motion:reduce){.km-leaf{display:none}.km-nov .km-fall{opacity:.2}}
 /* kid boards: the overlay never crosses chore art (Alfred 4:24). No bats; fog and embers stay in a thin floor band under the week strip. */
 .km-kid .km-bats{display:none}

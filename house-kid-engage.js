@@ -16,6 +16,13 @@
   var KIDS = ["ainsley", "hayes", "harris"];
   var FACES = ["day", "stars", "chores", "leave"];
   var FACE_LABEL = { day: "Day", stars: "Stars", chores: "Chores", leave: "Leave" };
+  /* Atlas Nov 5: Ainsley has no stars, XP, currency or streak face. The other three faces stay. */
+  function facesFor(kidId) {
+    return kidId === "ainsley" ? ["day", "chores", "leave"] : FACES.slice();
+  }
+  function scrubGlass(html) {
+    return String(html == null ? "" : html).replace(/\$/g, "");
+  }
   var HREF = {
     ainsley: "kid-ainsley.html",
     hayes: "kid-hayes.html",
@@ -448,8 +455,9 @@
     return best;
   }
 
-  function faceIndex(face) {
-    var i = FACES.indexOf(face);
+  function faceIndex(face, kidId) {
+    var faces = facesFor(kidId);
+    var i = faces.indexOf(face);
     return i < 0 ? 0 : i;
   }
 
@@ -494,14 +502,16 @@
       }
       if (!hot.what && !todayBits.length && !kidObj(kidId)) html += '<div class="kf-title">Quiet for now.</div>';
       html += "</div>";
-      return html;
+      return scrubGlass(html);
     }
 
     if (face === "stars") {
+      if (kidId === "ainsley") return paintFace(kidId, "day");
       var bank = bankView(kidId);
       var gate = mustProgress(kidId);
       var streak = streakDays(kidId);
-      var sym = (bank && bank.currency && bank.currency.symbol) || "★";
+      var sym = (bank && bank.currency && bank.currency.symbol) || "";
+      if (!sym || /\$/.test(sym)) sym = "";
       var week = bank ? bank.week : 0;
       var need = bank ? bank.need : 0;
       var pct = bank ? bank.pct : 0;
@@ -524,7 +534,7 @@
         (streak > 0 ? ("🔥 " + streak + "-day streak") : "🔥 Streak · tap musts") +
         "</div>";
       html += "</div>";
-      return html;
+      return scrubGlass(html);
     }
 
     if (face === "chores") {
@@ -532,8 +542,9 @@
       var iso = dayIso();
       var tp = todayMustProgress(kidId);
       html += '<div class="kf-face kf-chores">';
-      html += '<div class="kf-kicker">Chores · claim <span class="kf-chip">' +
-        tp.done + "/" + tp.need + "</span></div>";
+      html += kidId === "ainsley"
+        ? '<div class="kf-kicker">Chores</div>'
+        : ('<div class="kf-kicker">Chores · claim <span class="kf-chip">' + tp.done + "/" + tp.need + "</span></div>");
       html += '<div class="kf-claim-list" role="list">';
       var shown = 0;
       for (var i = 0; i < qs.length && shown < 5; i++) {
@@ -552,7 +563,7 @@
       }
       if (!shown) html += '<div class="kf-empty">No musts on board</div>';
       html += "</div></div>";
-      return html;
+      return scrubGlass(html);
     }
 
     /* leave */
@@ -571,14 +582,15 @@
       }
     }
     html += "</div>";
-    return html;
+    return scrubGlass(html);
   }
 
   function paintTile(root) {
     var kidId = root.getAttribute("data-kid-flip");
     if (KIDS.indexOf(kidId) < 0) return;
+    var faces = facesFor(kidId);
     var face = root.getAttribute("data-face") || "day";
-    if (FACES.indexOf(face) < 0) face = "day";
+    if (faces.indexOf(face) < 0) face = "day";
     var stage = root.querySelector("[data-kf-stage]");
     var dots = root.querySelector("[data-kf-dots]");
     var streakEl = root.querySelector("[data-kf-streak]");
@@ -598,7 +610,7 @@
       if (!document.documentElement.classList.contains("ori-phone")) fit();
     }
     if (dots) {
-      dots.innerHTML = FACES.map(function (f) {
+      dots.innerHTML = faces.map(function (f) {
         return '<i class="' + (f === face ? "is-on" : "") + '" data-face-dot="' + f + '"></i>';
       }).join("");
     }
@@ -634,7 +646,7 @@
   }
 
   function setFace(root, face, playSound) {
-    if (FACES.indexOf(face) < 0) return;
+    if (facesFor(root && root.getAttribute("data-kid-flip")).indexOf(face) < 0) return;
     var prev = root.getAttribute("data-face");
     root.setAttribute("data-face", face);
     paintTile(root);
@@ -645,9 +657,11 @@
   }
 
   function cycleFace(root, dir) {
+    var kidId = root && root.getAttribute("data-kid-flip");
+    var faces = facesFor(kidId);
     var face = root.getAttribute("data-face") || "day";
-    var i = faceIndex(face);
-    var next = FACES[(i + dir + FACES.length) % FACES.length];
+    var i = faceIndex(face, kidId);
+    var next = faces[(i + dir + faces.length) % faces.length];
     setFace(root, next, true);
   }
 
@@ -1051,6 +1065,13 @@
     if (!bodyKid) return;
     if (kidId && kidId !== bodyKid) return;
     kidId = bodyKid;
+    if (kidId === "ainsley") {
+      document.querySelectorAll("[data-streak-label], [data-streak], .xp-glass, [data-xp-glass], .xp-row").forEach(function (n) {
+        n.textContent = "";
+        n.hidden = true;
+      });
+      return;
+    }
     var streak = streakDays(kidId);
     var tp = todayMustProgress(kidId);
     var gate = mustProgress(kidId);
@@ -1218,6 +1239,9 @@
     isPrepItem: isPrepItem,
     inLeaveWindow: inLeaveWindow,
     paintDailyQuest: paintDailyQuest,
-    FACES: FACES
+    FACES: FACES,
+    facesFor: facesFor,
+    paintFace: paintFace,
+    paintTile: paintTile
   };
 })(window);

@@ -20,11 +20,22 @@
     var chips = [].slice.call(document.querySelectorAll(".vote-card"));
     var render = function () {
       var d = get(K); if (Array.isArray(d)) d = {}; d.ideas = d.ideas || []; d.kids = d.kids || {};
+      var heldEmpty = false;
       slots.forEach(function (s, i) {
         var t = s.querySelector(".title"), sub = s.querySelector(".sub"), v = d.ideas[i];
-        t.textContent = v || ""; t.style.color = v ? "" : "#8a8e96";
-        if (sub) sub.textContent = v ? "Tap to change" : "Empty brainstorm";
-        s.setAttribute("aria-label", v ? "Idea: " + v : "Ideas live here.");
+        if (!v && heldEmpty) { s.hidden = true; return; }
+        s.hidden = false;
+        if (!v) {
+          heldEmpty = true;
+          t.textContent = "Ideas live here.";
+          t.style.color = "";
+          if (sub) sub.textContent = "Tap to add";
+          s.setAttribute("aria-label", "Ideas live here.");
+          return;
+        }
+        t.textContent = v; t.style.color = "";
+        if (sub) sub.textContent = "Tap to change";
+        s.setAttribute("aria-label", "Idea: " + v);
       });
       chips.forEach(function (c) {
         var kid = (c.querySelector(".q") || {}).textContent || "", a = c.querySelector(".a"), v = d.kids[kid];
