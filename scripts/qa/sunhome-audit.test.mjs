@@ -339,3 +339,60 @@ test("kid pages do not load the money script, and a $ feed does not reach hub gl
   assert.doesNotMatch(css, /art\/mercury\/skins\/2026-11\/extras\/fx\/2x\/pebble/);
   assert.doesNotMatch(css, /day-tap:not\(\.is-today\)\s*\{[^}]*display:\s*none/);
 });
+
+const SPOOK_LINES = ["Boo. Did I spook you?", "Happy haunting.", "The pumpkins are whispering."];
+
+test("November hub does not request the Halloween spook layer or the porch scene", () => {
+  function walk(dir, out = []) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (e.name === "node_modules" || e.name === "plates") continue;
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walk(p, out);
+      else if (e.name.endsWith(".html")) out.push(path.relative(ROOT, p));
+    }
+    return out;
+  }
+  for (const rel of walk(ROOT)) {
+    assert.doesNotMatch(rd(rel), /wg-spook\.(?:js|css)/, rel + " still loads the scare");
+  }
+  const hub = rd("sheet-index.html");
+  for (const line of SPOOK_LINES) assert.equal(hub.includes(line), false, line);
+  assert.match(rd("month-theme/month-overlay.css"), /iframe\.night52-scene\{[^}]*display:\s*none/);
+
+  function bootNight(iso, search) {
+    const made = [];
+    const body = { getAttribute: () => null, insertBefore() {}, appendChild() {} };
+    const document = {
+      body,
+      documentElement: { classList: { add() {} }, hasAttribute: () => false },
+      createElement(tag) {
+        const el = { tag, src: "", className: "", attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, addEventListener() {}, classList: { toggle() {} } };
+        made.push(el);
+        return el;
+      },
+      addEventListener() {}
+    };
+    const fixed = Date.parse(iso);
+    class FakeDate extends Date {
+      constructor(...a) { super(...(a.length ? a : [fixed])); }
+      static now() { return fixed; }
+    }
+    const ctx = vm.createContext({
+      document, Date: FakeDate, Intl, URLSearchParams, console,
+      location: { search: search || "", pathname: "/sheet-index.html", origin: "http://hub.local" },
+      innerWidth: 1080, innerHeight: 1920,
+      localStorage: { getItem: () => null, setItem() {} }
+    });
+    ctx.window = ctx;
+    vm.runInContext(rd("night/night-host.js"), ctx, { filename: "night/night-host.js" });
+    return { made, night: ctx.HouseNight };
+  }
+  const nov = bootNight("2026-11-08T17:30:00-06:00");
+  assert.equal(nov.night.on, false);
+  assert.equal(nov.made.some((el) => /scene\.html/.test(el.src)), false, "November must not request the Halloween scene");
+  const oct = bootNight("2026-10-20T20:00:00-05:00");
+  assert.equal(oct.night.on, true);
+  assert.ok(oct.made.some((el) => /scene\.html/.test(el.src)), "other months still have the night scene");
+  const pinned = bootNight("2026-10-20T20:00:00-05:00", "?month=11");
+  assert.equal(pinned.made.some((el) => /scene\.html/.test(el.src)), false, "a pinned November does not load the scene");
+});

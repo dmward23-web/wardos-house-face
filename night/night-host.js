@@ -5,6 +5,28 @@
 (function () {
   var q = new URLSearchParams(location.search);
   if (q.get("night") === "0") return;
+  /* SUNHOME · November ships the harvest plates. Do not load the Halloween scene (pumpkins, skeleton) under them. */
+  function chicagoMonth(d) {
+    try {
+      var parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", month: "numeric" }).formatToParts(d);
+      for (var i = 0; i < parts.length; i++) if (parts[i].type === "month") return Number(parts[i].value);
+    } catch (e) { /* local month */ }
+    return d.getMonth() + 1;
+  }
+  function novemberNow() {
+    if (q.get("month") === "0") return false;
+    if (q.get("month") === "11") return true;
+    var when = new Date();
+    if (q.get("now")) { var pinned = new Date(q.get("now")); if (!isNaN(+pinned)) when = pinned; }
+    if (window.MonthSeason && typeof MonthSeason.decide === "function") {
+      try { return MonthSeason.decide(when).id === "november"; } catch (eM) { /* fall through */ }
+    }
+    return chicagoMonth(when) === 11;
+  }
+  if (novemberNow()) {
+    window.HouseNight = { on: false, sound: function () { return false; }, set: function () {} };
+    return;
+  }
   /* Ainsley keeps her concert venue: no night scene behind her board (Alfred 10/16, kid-world.js nightOn) */
   var KEY = "night52:snd"; /* legacy key, only used when house-sound.js is missing */
   var HS = window.HouseSound || null;

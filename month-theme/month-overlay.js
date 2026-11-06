@@ -53,6 +53,10 @@
       var kidPage = /\/kid-[a-z]+/.test(location.pathname || "") || !!(document.body && document.body.hasAttribute("data-kid-world"));
       document.documentElement.setAttribute("data-month-theme", "11");
       document.documentElement.setAttribute("data-nov-phase", phase);
+      document.querySelectorAll("iframe.night52-scene").forEach(function (fr) {
+        fr.removeAttribute("src");
+        fr.style.display = "none";
+      });
       if (!kidPage) document.documentElement.style.setProperty("--km-bg", "url(\"" + plate + "\")");
       if (!document.getElementById("km-nov")) {
         var L = document.createElement("div");
