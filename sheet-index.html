@@ -4117,8 +4117,31 @@ header.hdr { position: relative; }
 @media (orientation: portrait) and (min-height: 1500px) {
   html, body { height: 100dvh; overflow: hidden; }
   body .panel { height: 100dvh; max-height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
-  body .hub-window { flex: 1 1 auto; height: auto; min-height: 180px; margin: 8px 12px; }
-  body .panel > .grid-wrap { margin-top: 0; min-height: 0; overflow: auto; }
+  /* The window is a band. flex-grow here used to eat the portrait panel and collapse the roster to 24px rows. */
+  body .panel > .hub-window {
+    flex: 0 0 auto !important;
+    height: min(38vh, 420px) !important;
+    min-height: 0 !important;
+    max-height: min(38vh, 420px) !important;
+    margin: 8px 12px;
+  }
+  html body .panel > .grid-wrap {
+    flex: 1 1 auto !important;
+    margin-top: 0;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  html body .tile-grid.tile-grid--cams {
+    height: auto !important;
+    min-height: 0 !important;
+    grid-template-rows: repeat(4, minmax(228px, auto)) !important;
+    grid-auto-rows: minmax(228px, auto) !important;
+  }
+  html body .tile-grid.tile-grid--cams > .tile {
+    min-height: 228px !important;
+    height: auto !important;
+    max-height: none !important;
+  }
   .tile { box-shadow: none !important; }
 }
 </style>

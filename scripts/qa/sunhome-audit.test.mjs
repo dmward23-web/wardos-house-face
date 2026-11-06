@@ -349,6 +349,12 @@ test("hub kid tiles keep their world art over the shorthand backgrounds", () => 
   assert.match(hub, /background-image:\s*url\("month-theme\/hub\/kidtile-hayes\.webp"\)\s*!important/);
   assert.match(hub, /background-image:\s*url\("month-theme\/hub\/kidtile-harris\.webp"\)\s*!important/);
   assert.match(hub, /background-size:\s*cover\s*!important/);
+  const portrait = hub.slice(hub.indexOf("(orientation: portrait) and (min-height: 1500px)"));
+  assert.match(portrait, /hub-window \{[^}]*flex:\s*0 0 auto !important/);
+  assert.match(portrait, /height:\s*min\(38vh, 420px\) !important/);
+  assert.match(portrait, /minmax\(228px, auto\) !important/);
+  assert.match(portrait, /min-height:\s*228px !important/);
+  assert.doesNotMatch(portrait.slice(0, 900), /hub-window \{[^}]*flex:\s*1 1 auto/);
 });
 
 test("hub home control is the house glyph, and Jars stays on the adult chores board", () => {
