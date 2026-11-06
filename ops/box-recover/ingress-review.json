@@ -1,0 +1,31 @@
+{
+  "schema": "wardos.hub.ingress-review/1",
+  "reviewed": "2026-11-06",
+  "source": "sanitized local cloudflared ingress only",
+  "remote_cloudflare_policy": "not-verified",
+  "other_hosts_or_connectors": "not-proven-absent",
+  "credential_values": "not-read",
+  "credential_file": "exists regular file mode 0400; path withheld",
+  "config_file": "exists mode 0644",
+  "rules": [
+    {
+      "hostname": "cams.wardhousehub.com",
+      "service": "http://127.0.0.1:8787",
+      "match_path": "all"
+    },
+    {
+      "hostname": "lights.wardhousehub.com",
+      "service": "http://127.0.0.1:8788",
+      "match_path": "all"
+    },
+    {
+      "hostname": null,
+      "service": "http_status:404",
+      "match_path": "unmatched"
+    }
+  ],
+  "private_feed_ingress": "none of its own; /api/private/ is served by the :8788 process",
+  "shared_tunnel_restores_cams_hostname": true,
+  "cams_process_started_by_this_package": false,
+  "public_cams_health_failure_is_not_a_start_signal": true
+}

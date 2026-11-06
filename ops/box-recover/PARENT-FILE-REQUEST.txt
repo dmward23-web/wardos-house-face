@@ -1,0 +1,22 @@
+Runtime bytes still needed before this package can pass its own execute check.
+No secret files. Do not send token files, cloudflared credentials, tunnel config
+bodies, logs, .own files, venvs, private-feed JSON, or camera stills.
+
+Hashes already pinned from the gate inspection (do not replace them with repo main):
+  scripts/private-feed.mjs  9b98af043a9c8a3159a686b4076f8715e49272c75bffa1d862cb49601161b0aa
+  scripts/kasa-daemon.py   385e7ccb1776f5fe4ff66edba3e2d52e42555acd4a940b7d4473794d3320d00a
+Send those two files anyway. Their working-tree bytes differ from repo main, and
+the cached-still and daemon load paths have to be read from the runtime bytes.
+
+Runtime hash was not supplied. Send the file and its sha256:
+  scripts/spotify-control.mjs
+  scripts/access-log.mjs
+  scripts/lights-fetch.mjs
+  scripts/kasa-probe.py
+
+Also send any other non-secret script under the run tree that those files import
+or spawn, if it is not already listed with a sha256 in ops/box-recover/MANIFEST.json.
+Repo main hashes in that manifest are comparison notes, not pins.
+
+Do not send scripts/private-feed.mjs.bak-ratekey1-20261029 unless a runtime file
+imports it. It is an untracked backup, not a start dependency identified here.

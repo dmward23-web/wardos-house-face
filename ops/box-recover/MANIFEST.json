@@ -1,0 +1,136 @@
+{
+  "schema": "wardos.lights-recover.manifest/1",
+  "compared_to_repo_main": "551a70f6b9dcf46fb088337cea42eb4e47a0a2e0",
+  "run_tree_basename": "wt-house-run-b79bf227",
+  "run_tree_head": "b79bf2270b47294b8e75f76d9b227df924fa3941",
+  "head_is_full_pin": false,
+  "head_commit_in_origin_main": false,
+  "pr14_is_not_this_runtime": {
+    "number": 14,
+    "title": "Sunday Home: November plates, hub tiles, no gold coin",
+    "head": "cursor/sunday-home-launch-e09b"
+  },
+  "worktree": {
+    "tracked_modifications": 54,
+    "untracked": 3,
+    "pre_reboot_b71": "uncertain"
+  },
+  "other_hub_host": "not-proven-and-not-disproven",
+  "supervisor_sha256": "8a5b4d5549cefc0a9da714870574151c353e2c29c13239feecb0e3f1a96ef13c",
+  "kasa_lock": {
+    "sha256": "a49495c3c4d6a601859ec85034bbaee4f73197fb0510f68d02b23a49ab6d1b1a",
+    "package_declarations": 21,
+    "hash_entries": 21,
+    "platform": "the file's own comment says linux x86_64 cp313; arm64 coverage is not proven",
+    "rebuild_on_recovery": false,
+    "current_venv": "venv-261024.115754.179986"
+  },
+  "node_deps": {
+    "package_json_sha256": "0b49cf6abc69a65dfb800ddd33a0b270af1172c060fe440a1f416b86fbea0ace",
+    "package_lock_sha256": "fb0547d376d865380cbbbe8dbe619d202d466038e3fd0c9edc0b8653342ff457",
+    "ws_version": "8.22.0",
+    "ws_integrity": "sha512-Ydggc987+RO0AnWtZ/7Wq9FtNvcrL1b/RO0ud9mWjUPgDrsAAwQSF51sm2hm1XofbU/4jkpGEsLFsZZxU+1DOg==",
+    "install_argv": ["npm", "ci", "--ignore-scripts", "--no-audit", "--no-fund", "--prefix", "<DEPS>"],
+    "installed_now": false
+  },
+  "files": [
+    {
+      "path": "scripts/house-proc.sh",
+      "sha256": "c4f3475e8812018f94c026b2921fe1a49946261c00e3265073acdad2cdd17ff7",
+      "required_before_execute": true,
+      "bytes_match_repo_main": true,
+      "role": "launcher"
+    },
+    {
+      "path": "scripts/lights-write-proxy.mjs",
+      "sha256": "ad862b3c58941eeb4764e31c02b6b81e47069cd6b8cbaf74f72fd2a30564800f",
+      "required_before_execute": true,
+      "bytes_match_repo_main": true,
+      "role": "process that binds 127.0.0.1:8788 and mounts the private feed"
+    },
+    {
+      "path": "scripts/sensi-control.mjs",
+      "sha256": "54f8715454d1e4e851ffd2ead6d87ddbaed204368b63c7d74e2b4c4fe0c58ffc",
+      "required_before_execute": true,
+      "bytes_match_repo_main": true,
+      "role": "imported by the lights process"
+    },
+    {
+      "path": "scripts/private-dir.mjs",
+      "sha256": "15bfac225ff35cec179aa35e90d5148020d2e72996c05d35d8b31288fc90b2d0",
+      "required_before_execute": true,
+      "bytes_match_repo_main": true,
+      "role": "imported by the lights process"
+    },
+    {
+      "path": "scripts/kasa-write.py",
+      "sha256": "bb96a8a904a3cf866a33021c679edbf886a86588b9e977ca32145cc1c1d782f4",
+      "required_before_execute": true,
+      "bytes_match_repo_main": true,
+      "role": "spawned by the lights process and loaded by the kasa daemon"
+    },
+    {
+      "path": "scripts/private-feed.mjs",
+      "sha256": "9b98af043a9c8a3159a686b4076f8715e49272c75bffa1d862cb49601161b0aa",
+      "required_before_execute": true,
+      "bytes_match_repo_main": false,
+      "repo_main_sha256_not_a_pin": "6991e4a8a13e0be04e912677dc381f563426cb2b5771ff353459539391545d60",
+      "role": "imported by the lights process; dirty working tree; serves private JSON and cached stills"
+    },
+    {
+      "path": "scripts/kasa-daemon.py",
+      "sha256": "385e7ccb1776f5fe4ff66edba3e2d52e42555acd4a940b7d4473794d3320d00a",
+      "required_before_execute": true,
+      "bytes_match_repo_main": false,
+      "repo_main_sha256_not_a_pin": "732ee43e9f5e55e7ee01636870dd0b8c4f507cb8045eb939357942ec837296e1",
+      "role": "spawned when the lights process starts; dirty working tree"
+    },
+    {
+      "path": "scripts/spotify-control.mjs",
+      "sha256": null,
+      "required_before_execute": true,
+      "bytes_match_repo_main": null,
+      "repo_main_sha256_not_a_pin": "9da9a337802c786a35559e94d6cff28ba33791d2275e441ff33358ae2a26b907",
+      "role": "imported by the runtime lights process; runtime hash was not supplied"
+    },
+    {
+      "path": "scripts/access-log.mjs",
+      "sha256": null,
+      "required_before_execute": true,
+      "bytes_match_repo_main": null,
+      "repo_main_sha256_not_a_pin": "589b6677d880dd6552e69c4ee9e3178e05ed1c467e6a80579d55669e9204644f",
+      "role": "imported by the runtime lights process; runtime hash was not supplied"
+    },
+    {
+      "path": "scripts/lights-fetch.mjs",
+      "sha256": null,
+      "required_before_execute": true,
+      "bytes_match_repo_main": null,
+      "repo_main_sha256_not_a_pin": "d6b84c89f86e2dffa8d633ff29a4958c4394e585e1dc7cf0b2d064c204c726eb",
+      "role": "existing refresh path of the lights process; can write private lights-live.json after an authenticated lights change; runtime hash was not supplied"
+    },
+    {
+      "path": "scripts/kasa-probe.py",
+      "sha256": null,
+      "required_before_execute": true,
+      "bytes_match_repo_main": null,
+      "repo_main_sha256_not_a_pin": "985ccc2d50ebbf1d9f30b2f7166b9cd644b1890f52459473ea0a46d2724e394b",
+      "role": "referenced by lights-fetch; runtime hash was not supplied"
+    },
+    {
+      "path": "scripts/nest-webrtc-proxy.mjs",
+      "sha256": "b859fdd7a9c721c4212fe0b4389b7d8f4cb01c6cd9abfc2728436d5dd296d40e",
+      "required_before_execute": false,
+      "bytes_match_repo_main": true,
+      "role": "informational only; this package does not start it"
+    }
+  ],
+  "startup_imports_from_matching_lights_proxy": [
+    "scripts/sensi-control.mjs",
+    "scripts/spotify-control.mjs",
+    "scripts/private-feed.mjs",
+    "scripts/access-log.mjs",
+    "scripts/private-dir.mjs"
+  ],
+  "execute_refuses_while_any_required_sha256_is_null": true
+}
