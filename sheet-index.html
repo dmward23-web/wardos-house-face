@@ -4096,9 +4096,24 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
   .panel > .hub-window { order: -6 !important; }
   .panel > .grid-wrap { order: -5 !important; }
 }
-.tile.ainsley, .kid-flip.ainsley { background-image: url("month-theme/hub/kidtile-ainsley.webp"); background-size: cover; background-position: center; }
-.tile.hayes, .kid-flip.hayes { background-image: url("month-theme/hub/kidtile-hayes.webp"); background-size: cover; background-position: center; }
-.tile.harris, .kid-flip.harris { background-image: url("month-theme/hub/kidtile-harris.webp"); background-size: cover; background-position: center; }
+.tile.ainsley, .kid-flip.ainsley, .tile.hayes, .kid-flip.hayes, .tile.harris, .kid-flip.harris {
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+.tile.ainsley, .kid-flip.ainsley { background-image: url("month-theme/hub/kidtile-ainsley.webp") !important; }
+.tile.hayes, .kid-flip.hayes { background-image: url("month-theme/hub/kidtile-hayes.webp") !important; }
+.tile.harris, .kid-flip.harris { background-image: url("month-theme/hub/kidtile-harris.webp") !important; }
+.hub-home {
+  position: absolute; z-index: 30; left: 14px; top: calc(12px + env(safe-area-inset-top));
+  width: 44px; height: 44px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(250, 246, 238, .16); border: 1px solid rgba(243, 230, 207, .35);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.hub-home img { width: 22px; height: 22px; display: block; }
+header.hdr { position: relative; }
 @media (orientation: portrait) and (min-height: 1500px) {
   html, body { height: 100dvh; overflow: hidden; }
   body .panel { height: 100dvh; max-height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
@@ -4109,6 +4124,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 </style>
  <script>(function(){try{var k="wardos-from-wall",q=/[?&]from=wall\b/.test(location.search);if(q)sessionStorage.setItem(k,"1");if(q||sessionStorage.getItem(k)==="1"){var a=document.querySelector("[data-wall-back]");if(a){a.hidden=false;a.addEventListener("click",function(){try{sessionStorage.removeItem(k)}catch(e){}});}}}catch(e){}})();</script>
  <header class="hdr hdr--spread hdr--premium hdr--heat">
+ <a class="hub-home" href="sheet-index.html" aria-label="Back to the House board"><img src="assets/icons/home-key-light.svg" alt=""></a>
  <div class="hdr-date" aria-label="Today · America/Chicago">
  <div class="hdr-date-kicker">CT</div>
  <div class="hdr-date-time" data-live="time"></div>

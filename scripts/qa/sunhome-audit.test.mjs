@@ -340,6 +340,38 @@ test("kid pages do not load the money script, and a $ feed does not reach hub gl
   assert.doesNotMatch(css, /day-tap:not\(\.is-today\)\s*\{[^}]*display:\s*none/);
 });
 
+test("hub kid tiles keep their world art over the shorthand backgrounds", () => {
+  const hub = rd("sheet-index.html");
+  const shorthand = hub.lastIndexOf("background: linear-gradient(165deg, rgba(16,18,24,0.98)");
+  const art = hub.lastIndexOf("kidtile-ainsley.webp");
+  assert.ok(art > shorthand, "kidtile rule must follow the !important shorthand");
+  assert.match(hub, /background-image:\s*url\("month-theme\/hub\/kidtile-ainsley\.webp"\)\s*!important/);
+  assert.match(hub, /background-image:\s*url\("month-theme\/hub\/kidtile-hayes\.webp"\)\s*!important/);
+  assert.match(hub, /background-image:\s*url\("month-theme\/hub\/kidtile-harris\.webp"\)\s*!important/);
+  assert.match(hub, /background-size:\s*cover\s*!important/);
+});
+
+test("hub home control is the house glyph, and Jars stays on the adult chores board", () => {
+  const hub = rd("sheet-index.html");
+  assert.match(hub, /class="hub-home" href="sheet-index\.html" aria-label="Back to the House board"/);
+  assert.match(hub, /assets\/icons\/home-key-light\.svg/);
+  const jars = hub.slice(hub.indexOf('class="tile stars"'), hub.indexOf('class="tile fun"'));
+  assert.match(jars, /href="sheet-chores\.html"/);
+  assert.doesNotMatch(jars, /sheet-allowance/);
+  for (const f of ["kid-ainsley.html", "kid-hayes.html", "kid-harris.html"]) {
+    assert.doesNotMatch(rd(f), /sheet-allowance/, f);
+  }
+});
+
+test("mute is a speaker, and Ainsley's jar hides empty progress bars", () => {
+  const snd = rd("house-sound.js");
+  assert.match(snd, /\.house-snd \.x\{display:none\}/);
+  assert.doesNotMatch(snd, /html:not\(\[data-sound=on\]\) \.house-snd \.x\{display:inline\}/);
+  const css = rd("kid-world.css");
+  assert.match(css, /body\.theme-ainsley \.bank-track,\s*body\.theme-ainsley \.grow-meter/);
+  assert.match(css, /display:\s*none\s*!important/);
+});
+
 const SPOOK_LINES = ["Boo. Did I spook you?", "Happy haunting.", "The pumpkins are whispering."];
 
 test("November hub does not request the Halloween spook layer or the porch scene", () => {

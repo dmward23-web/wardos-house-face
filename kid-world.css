@@ -535,6 +535,15 @@ html[data-ains-quiet="1"] .ains-mist { animation-duration: 28s; }
 @keyframes pebSettle { 0% { transform: translateY(-3px); } 60% { transform: translateY(2px); } 100% { transform: none; } }
 @keyframes pebSheen { from { opacity: 0; } 40% { opacity: 1; } to { opacity: 0; } }
 body.theme-ainsley .kid-pebble { display: none !important; }
+body.theme-ainsley #sec-jar .bank-track,
+body.theme-ainsley #sec-jar .grow-meter,
+body.theme-ainsley #sec-jar .xp-stage,
+body.theme-ainsley #sec-jar .prog,
+body.theme-ainsley #sec-jar .meter,
+body.theme-ainsley .xp-stage,
+body.theme-ainsley .bank-track,
+body.theme-ainsley .grow-meter,
+body.theme-ainsley .consume-label .line { display: none !important; }
 @media (max-width: 700px) { .kid-pebble { width: 44px; height: 44px; } }
 .kw-canvas { z-index: 1; pointer-events: auto; touch-action: none; }
 .kw-stage {
