@@ -132,8 +132,11 @@
     "scripts/private-dir.mjs"
   ],
   "execute_refuses_while_any_required_sha256_is_null": true,
-  "execute_refuses_while_security_review_open": true,
-  "pin_complete": false,
+  "execute_refuses_while_security_review_open": false,
+  "sensi_opaque_gate_option": "accept-existing-hash",
+  "security_review_lifted": false,
+  "parent_files_missing": false,
+  "pin_complete_for_independent_review": true,
   "not_gate_ready_for_execute": true,
   "runtime_bundle_sha256": "46bc87d451344e3c0c1c66748236bea0a36946175ed5df58558acef03752b4d1",
   "runtime_bundle_replaces_sha256": "e72743c81c4ea2cfce6fe6be5bf1dcf17b1491e0d08981ed51b9918e6b47e91d",

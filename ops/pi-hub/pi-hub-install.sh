@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Pi hub kit for Raspberry Pi OS Trixie arm64 Desktop on Ward Wi-Fi.
-# Modes are separate: plan, offline-verify, install, rollback, activate.
-# Activate is refused. This script does not enable SSH, join a tunnel,
-# copy tokens, or import aarch64 wheels.
+# Pi hub install for Raspberry Pi OS Trixie arm64 Desktop.
+# Default is a plan. Install writes /opt/wardos (or --prefix) and does not
+# enable units. Activation is a separate command with a gate at the boundary.
 set -euo pipefail
 umask 077
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO="$(cd "$HERE/../.." && pwd)"
 MODE="plan"
-DEST=""
+PREFIX=""
+GATE=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --plan) MODE="plan" ;;
@@ -16,16 +16,17 @@ while [ $# -gt 0 ]; do
     --install|--stage) MODE="install" ;;
     --rollback) MODE="rollback" ;;
     --activate) MODE="activate" ;;
-    --dest) DEST="${2:-}"; shift ;;
+    --prefix|--dest) PREFIX="${2:-}"; shift ;;
+    --gate) GATE="${2:-}"; shift ;;
     *) echo "REFUSE unknown argument"; exit 2 ;;
   esac
   shift
 done
 
-allow_dest() {
+allow_prefix() {
   case "$1" in
-    /tmp/*|/var/tmp/*|/opt/cursor/artifacts/*) ;;
-    *) echo "REFUSE dest is not a staging path"; exit 2 ;;
+    /opt/wardos|/opt/wardos/*|/tmp/*|/var/tmp/*|/opt/cursor/artifacts/*) ;;
+    *) echo "REFUSE dest is not the Pi install root or a test prefix"; exit 2 ;;
   esac
   case "$1" in
     /|/etc|/etc/*|/usr|/usr/*|/lib|/lib/*|/bin|/bin/*|/home|/home/dan|/home/dan/*|/workspace|/workspace/*|"$REPO"|"$REPO"/*)
@@ -38,11 +39,10 @@ allow_dest() {
 if [ "$MODE" = "plan" ]; then
   cat <<'EOF'
 PLAN pi-hub: NOT AN INSTALL AND NOT AN ACTIVATION
-Target reported for a later install: Raspberry Pi OS Trixie arm64 Desktop, hostname wardos-pi, user dan, Ward Wi-Fi, SSH off. This plan does not enable SSH and does not join a tunnel.
+Default install root is /opt/wardos. Units are installed disabled until a separate activation gate. This plan does not enable SSH and does not join a tunnel.
 The Pi is the intended always-on hub host. The Elo/Beelink is the wall client. A separate Pi is not required by the code if the Beelink is kept always on and is an approved hub host. That choice is not made here.
-The box Kasa lock has 21 package declarations and 21 hashes, not 22. ARM import: NOT TESTED. The wheels were not imported on aarch64. Wheel hashes are not a successful install.
-Sensi: excluded. The current lights process imports it, and that file has an open security review. This kit does not carry it. A Pi install needs a secret-free Sensi integration or it leaves Sensi out. Either choice needs an independent gate.
-Cached stills and camera capture are out of this plan.
+The box Kasa lock has 21 package declarations and 21 hashes, not 22. ARM import: NOT TESTED. The wheels were not imported on aarch64. Wheel hashes are not a successful install. The venv command exists and refuses on this side of that hardware gate.
+Sensi is not copied. A Pi install needs a secret-free Sensi integration or it leaves Sensi out. Either choice needs an independent gate.
 EOF
   exit 0
 fi
@@ -72,68 +72,104 @@ PY
   echo "ARM_IMPORT: NOT TESTED"
   echo "WHEEL_HASH_IS_NOT_INSTALL: true"
   echo "SENSI: excluded"
-  echo "ACTIVATION: refused"
+  echo "ACTIVATION: gated"
   echo "TOKENS: absent"
   exit 0
 fi
 
 if [ "$MODE" = "activate" ]; then
-  echo "REFUSE activation. ARM import is not tested. Wheel hashes are not an install. Sensi is excluded. No tunnel. No SSH. No tokens."
+  python3 "$HERE/lib/pi_gate.py" "${GATE:-}"
+  [ -n "$PREFIX" ] || PREFIX=/opt/wardos
+  allow_prefix "$PREFIX"
+  [ -x "$PREFIX/bin/wardos-pi-lights.sh" ] || { echo "REFUSE lights startup is not installed"; exit 78; }
+  echo "REFUSE installer does not activate in this checkout; run the installed startup with the gate on the Pi"
   exit 78
 fi
 
-[ -n "$DEST" ] || { echo "REFUSE dest required"; exit 2; }
-allow_dest "$DEST"
-receipt="$DEST/receipt.tsv"
+[ -n "$PREFIX" ] || { echo "REFUSE dest required"; exit 2; }
+allow_prefix "$PREFIX"
+receipt="$PREFIX/receipt.tsv"
 
 if [ "$MODE" = "rollback" ]; then
   [ -f "$receipt" ] || { echo "REFUSE no receipt"; exit 2; }
-  while IFS=$'\t' read -r rel digest; do
-    [ -n "$rel" ] || continue
+  while IFS=$'\t' read -r kind rel extra; do
+    [ -n "${rel:-}" ] || continue
     case "$rel" in
       /*|*..*) echo "REFUSE receipt path escapes"; exit 2 ;;
     esac
-    target="$DEST/$rel"
-    if [ ! -f "$target" ]; then echo "REFUSE missing $rel"; exit 2; fi
-    have="$(sha256sum "$target" | cut -c1-64)"
-    if [ "$have" != "$digest" ]; then echo "REFUSE hash changed $rel"; exit 2; fi
-    rm -f "$target"
+    target="$PREFIX/$rel"
+    case "$kind" in
+      link)
+        [ -L "$target" ] || { echo "REFUSE missing link $rel"; exit 2; }
+        [ "$(readlink "$target")" = "$extra" ] || { echo "REFUSE link changed $rel"; exit 2; }
+        rm -f "$target"
+        ;;
+      file)
+        [ -f "$target" ] || { echo "REFUSE missing $rel"; exit 2; }
+        have="$(sha256sum "$target" | cut -c1-64)"
+        [ "$have" = "$extra" ] || { echo "REFUSE hash changed $rel"; exit 2; }
+        rm -f "$target"
+        ;;
+      *) echo "REFUSE receipt kind"; exit 2 ;;
+    esac
   done <"$receipt"
   rm -f "$receipt"
   echo "OK rollback"
   exit 0
 fi
 
-mkdir -p "$DEST/bin" "$DEST/units" "$DEST/deps" "$DEST/runbook"
-cat >"$DEST/bin/wardos-pi-lights.sh" <<'EOF'
-#!/bin/sh
-# Startup entry for a later Pi host. Activation is a separate refused step.
-echo "REFUSE activation. ARM import is not tested. Wheel hashes are not an install. Sensi is excluded. No tunnel. No SSH. No tokens."
-exit 78
+mkdir -p "$PREFIX/bin" "$PREFIX/lib" "$PREFIX/lib/systemd/system" "$PREFIX/etc" "$PREFIX/deps" "$PREFIX/runbook" "$PREFIX/secrets"
+install -m 0755 "$HERE/bin/wardos-pi-lights.sh" "$PREFIX/bin/wardos-pi-lights.sh"
+install -m 0755 "$HERE/bin/wardos-pi-tunnel.sh" "$PREFIX/bin/wardos-pi-tunnel.sh"
+install -m 0755 "$HERE/bin/wardos-pi-venv.sh" "$PREFIX/bin/wardos-pi-venv.sh"
+install -m 0644 "$HERE/lib/pi_gate.py" "$PREFIX/lib/pi_gate.py"
+sed "s#@PREFIX@#$PREFIX#g" "$HERE/units/wardos-pi-lights.service" >"$PREFIX/lib/systemd/system/wardos-pi-lights.service"
+sed "s#@PREFIX@#$PREFIX#g" "$HERE/units/wardos-pi-tunnel@.service" >"$PREFIX/lib/systemd/system/wardos-pi-tunnel@.service"
+cp "$HERE/deps/kasa-aarch64-cp313.lock.txt" "$PREFIX/deps/kasa-aarch64-cp313.lock.txt"
+cp "$HERE/deps/kasa-aarch64-cp313.wheelhouse.txt" "$PREFIX/deps/kasa-aarch64-cp313.wheelhouse.txt"
+cp "$HERE/RUNBOOK.md" "$PREFIX/runbook/RUNBOOK.md"
+cat >"$PREFIX/etc/hub.env" <<EOF
+WARDOS_PREFIX=$PREFIX
+LIGHTS_HOST=127.0.0.1
+LIGHTS_PORT=8788
+METRICS_R1=20241
+METRICS_R2=20242
+TUNNEL_NAME=wardos-hub
+TUNNEL_CONFIG=$PREFIX/etc/tunnel.yml
+RUN_TREE=$PREFIX/run
+KASA_VENV=$PREFIX/venv
+KASA_LOCK=$PREFIX/deps/kasa-aarch64-cp313.lock.txt
+LIGHTS_TOKEN_FILE=$PREFIX/secrets/lights-proxy.token
+HOUSE_ORIGINS=https://dmward23-web.github.io,https://cams.wardhousehub.com
 EOF
-chmod 755 "$DEST/bin/wardos-pi-lights.sh"
-cat >"$DEST/units/wardos-pi-lights.service" <<EOF
-[Unit]
-Description=WardOS Pi lights template. Not enabled. Activation is refused by the startup script.
-[Service]
-Type=oneshot
-ExecStart=$DEST/bin/wardos-pi-lights.sh
+cat >"$PREFIX/etc/secrets.refs" <<EOF
+# path mode. Install does not create these files and does not read values.
+$PREFIX/secrets/lights-proxy.token 0600
+$PREFIX/secrets/kasa.user 0600
+$PREFIX/secrets/kasa.password 0600
+$PREFIX/etc/tunnel.yml 0640
 EOF
-cp "$HERE/deps/kasa-aarch64-cp313.lock.txt" "$DEST/deps/kasa-aarch64-cp313.lock.txt"
-cp "$HERE/deps/kasa-aarch64-cp313.wheelhouse.txt" "$DEST/deps/kasa-aarch64-cp313.wheelhouse.txt"
-cp "$HERE/RUNBOOK.md" "$DEST/runbook/RUNBOOK.md"
-printf '%s\n' "ARM_IMPORT: NOT TESTED" "WHEEL_HASH_IS_NOT_INSTALL: true" >"$DEST/deps/ARM-IMPORT-NOT-TESTED"
-printf '%s\n' "Installed files only. No service enabled. No tokens. Sensi file not included." >"$DEST/NOT-ACTIVATED.txt"
+printf '%s\n' "no" >"$PREFIX/etc/units-enabled"
+printf '%s\n' "ARM_IMPORT: NOT TESTED" "WHEEL_HASH_IS_NOT_INSTALL: true" >"$PREFIX/deps/ARM-IMPORT-NOT-TESTED"
+ln -sfn wardos-pi-lights.sh "$PREFIX/bin/hub"
+ln -sfn . "$PREFIX/current"
 : >"$receipt"
-while IFS= read -r f; do
-  printf '%s\t%s\n' "$f" "$(sha256sum "$DEST/$f" | cut -c1-64)" >>"$receipt"
-done <<'EOF'
-bin/wardos-pi-lights.sh
-units/wardos-pi-lights.service
-deps/kasa-aarch64-cp313.lock.txt
-deps/kasa-aarch64-cp313.wheelhouse.txt
-deps/ARM-IMPORT-NOT-TESTED
-runbook/RUNBOOK.md
-NOT-ACTIVATED.txt
-EOF
+record_file() {
+  printf 'file\t%s\t%s\n' "$1" "$(sha256sum "$PREFIX/$1" | cut -c1-64)" >>"$receipt"
+}
+record_file bin/wardos-pi-lights.sh
+record_file bin/wardos-pi-tunnel.sh
+record_file bin/wardos-pi-venv.sh
+record_file lib/pi_gate.py
+record_file lib/systemd/system/wardos-pi-lights.service
+record_file lib/systemd/system/wardos-pi-tunnel@.service
+record_file deps/kasa-aarch64-cp313.lock.txt
+record_file deps/kasa-aarch64-cp313.wheelhouse.txt
+record_file deps/ARM-IMPORT-NOT-TESTED
+record_file runbook/RUNBOOK.md
+record_file etc/hub.env
+record_file etc/secrets.refs
+record_file etc/units-enabled
+printf 'link\t%s\t%s\n' bin/hub wardos-pi-lights.sh >>"$receipt"
+printf 'link\t%s\t%s\n' current . >>"$receipt"
 echo "OK install"

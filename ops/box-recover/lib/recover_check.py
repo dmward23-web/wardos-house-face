@@ -169,15 +169,15 @@ def cmd_transitive(args: argparse.Namespace) -> None:
     ]
     if missing:
         fail("runtime-hash-required " + ",".join(missing), 11)
-    # Refuse before opening any excluded file. The hash stays a pin of the
-    # existing box bytes; this package does not read or copy them.
+    # The security review stays open. An independent gate may accept the
+    # existing opaque hash; this package never rewrites that field to closed.
     blocked = [
         row["path"]
         for row in rows
         if row.get("required_before_execute") and row.get("security_review") == "open"
     ]
-    if blocked:
-        fail("security-review-open " + ",".join(blocked), 11)
+    if blocked and not args.accept_sensi_opaque:
+        fail("sensi-opaque-approval-required " + ",".join(blocked), 11)
     for row in rows:
         pin = row.get("sha256")
         if not pin:
@@ -208,6 +208,8 @@ def cmd_transitive(args: argparse.Namespace) -> None:
             fail(f"runtime-hash-required {key}", 11)
         if sha256(current) != pin:
             fail(f"hash mismatch {key}", 11)
+        if by_path[key].get("security_review") == "open":
+            continue
         for spec in refs_of(current):
             if not spec.startswith("./"):
                 continue
@@ -222,6 +224,24 @@ def cmd_transitive(args: argparse.Namespace) -> None:
                 fail(f"missing transitive {spec}", 11)
             queue.append(nxt)
     print(f"OK transitive {len(seen)}")
+
+
+EQUALITY = (
+    ("node", "/usr/local/bin/node", "b755e7fbd1457051b90413cb082268efe8dbaab3c008b11ddf9745edf8c8cdfa"),
+    ("cloudflared", "/home/box/.local/bin/cloudflared", "77e26d8d900e0b8469f416239d14b5f296525fdf79fee6f511ef55609e3fbac2"),
+    ("python", "/usr/bin/python3.13", "889c603f0d17cb54060951bcf4c4f9b8c9ebd9e52b392c70209bbb9755d797d9"),
+)
+
+
+def cmd_equality(_args: argparse.Namespace) -> None:
+    """Point-in-time box binary pin from 2026-11-06 17:43 CST. Not hermetic."""
+    for label, path, digest in EQUALITY:
+        target = Path(path)
+        if not target.is_file():
+            fail(f"equality missing {label}", 21)
+        if sha256(target) != digest:
+            fail(f"equality hash {label}", 21)
+    print("OK equality point-in-time binaries")
 
 
 def main() -> None:
@@ -241,7 +261,10 @@ def main() -> None:
     trans = sub.add_parser("transitive")
     trans.add_argument("--root", required=True)
     trans.add_argument("--manifest", required=True)
+    trans.add_argument("--accept-sensi-opaque", action="store_true")
     trans.set_defaults(func=cmd_transitive)
+    eq = sub.add_parser("equality")
+    eq.set_defaults(func=cmd_equality)
     args = parser.parse_args()
     args.func(args)
 

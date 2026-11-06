@@ -1,6 +1,8 @@
 # Lights recovery review
 
-This package is not gate-ready to execute. The runtime pin is incomplete, and cached stills are undecided. Atlas's 17:11 hold still stands. Nothing here asks Dan to approve an unready action.
+The ten runtime source pins are filled. This recovery package is ready for independent review. It is not cleared to execute. Cached stills are undecided. Atlas's 17:11 hold still stands. This document does not ask for a user step.
+
+`scripts/sensi-control.mjs` is not a missing parent file. Its sha256 `54f8715454d1e4e851ffd2ead6d87ddbaed204368b63c7d74e2b4c4fe0c58ffc` is the opaque pin of the existing box file. An independent gate may accept that hash. This package does not lift the security review, and it does not rewrite the file. `--execute` refuses until the gate says `sensi_opaque` is `accept-existing-hash`.
 
 `scripts/sensi-control.mjs` is pinned only by sha256 `54f8715454d1e4e851ffd2ead6d87ddbaed204368b63c7d74e2b4c4fe0c58ffc`. Line 32 is an embedded CLIENT_SECRET string literal. The file is not in this artifact, and this recovery does not rewrite or rotate the existing box file. That security review stays open.
 
@@ -8,18 +10,20 @@ This package is not gate-ready to execute. The runtime pin is incomplete, and ca
 
 Starting the existing `lights-write-proxy.mjs` on `127.0.0.1:8788` is not a lights-only or calendar-only start, and it does not start camera capture.
 
-The runtime file `ad862b3c58941eeb4764e31c02b6b81e47069cd6b8cbaf74f72fd2a30564800f` already mounts `/api/private/` before other routes. Under the existing device-token rules it also serves pairing (`/api/pair`, `/api/pair/mint`), taps, Sensi read and set, Spotify auth, setup, library, control, and disconnect, and lights read, set, and refresh. CORS origins are not a key. This package does not add or remove routes.
+The runtime file `ad862b3c58941eeb4764e31c02b6b81e47069cd6b8cbaf74f72fd2a30564800f` already mounts `/api/private/` before other routes. The same device key covers pair mint, taps, Sensi read and set, Spotify routes other than the PKCE exchange, and lights read, set, and refresh. A comment that mint is Dad-only is not a separate role. CORS origins are not a key. This package does not add or remove routes.
 
-Private feed can serve cached camera stills that are already on disk at `/api/private/nest/<slug>.jpg` to a holder of that same device token. That is separate from starting `nest-webrtc-proxy.mjs`. The gate decision is still open:
+Unauthenticated exceptions on that same process: `GET /health` and `GET /api/health` return only ok and the service name; OPTIONS is public; `POST /api/pair` redeems a rate-limited single-use code and returns the shared key; `POST /api/spotify/exchange` uses the pending PKCE state before the general key check.
 
-- `cached_stills: allow-existing` means the independent gate accepts that existing behavior.
+Private feed can serve cached camera stills that are already on disk at `/api/private/nest/<slug>.jpg` to a holder of that same device token. Parked camera capture is not a privacy boundary for those files. No still inventory was inspected. The gate decision is still open:
+
+- `cached_stills: allow-existing` accepts this existing sharing model.
 - `cached_stills: hold`, or no value, makes `--execute` refuse. Routes stay as they are.
 
-An authenticated lights write or `POST /api/lights/refresh` can run the existing `lights-fetch.mjs` path and write private `lights-live.json`. The start itself does not call that path. `--execute` still refuses until that file's runtime hash is pinned, because the process contains the path.
+An authenticated lights write or `POST /api/lights/refresh` can run the existing `lights-fetch.mjs` path and write private `lights-live.json`. The start itself does not call that path. That file's runtime hash is now pinned.
 
 ## Ingress
 
-`ingress-review.json` records the sanitized local config check: `cams.wardhousehub.com` to `127.0.0.1:8787`, `lights.wardhousehub.com` to `127.0.0.1:8788`, then `http_status:404`. Credential values were not read. The credential file was reported as mode `0400`. This does not prove remote Cloudflare policy, and it does not prove that no other host exists.
+`ingress-review.json` records the sanitized local config check: `cams.wardhousehub.com` to `127.0.0.1:8787`, `lights.wardhousehub.com` to `127.0.0.1:8788`, then `http_status:404`. Execute validates that shape on the resolved file cloudflared is launched with. `--ingress-config` must be that same path, and the gate must bind that file's sha256. A different file is refused. Credential values were not read. This is not remote Cloudflare policy, and it does not prove that no other host exists. A 17:43 CST read-only snapshot matched the eleven runtime hashes and four reference files, and recorded node, cloudflared, and Python binary hashes. Prod execute refuses if those three binaries differ. That check is not hermetic, not an independent review, and it does not close the Sensi review. Installed package versions matched the 21 lock pins plus extraneous pip 25.1.1. Version names are not proof the installed files match wheel hashes. ws was absent. No install was done.
 
 Starting the two existing connectors would restore both hostnames. The cams hostname would point at an empty `:8787`. A public cams health failure is not a reason to start the camera proxy.
 

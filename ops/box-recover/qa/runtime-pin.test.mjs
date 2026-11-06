@@ -15,8 +15,9 @@ function sha(file) {
 }
 
 test("clean runtime sources match the manifest and do not include Sensi", () => {
-  assert.equal(MANIFEST.pin_complete, false);
+  assert.equal(MANIFEST.pin_complete_for_independent_review, true);
   assert.equal(MANIFEST.not_gate_ready_for_execute, true);
+  assert.equal(MANIFEST.security_review_lifted, false);
   assert.equal(MANIFEST.runtime_bundle_sha256, "46bc87d451344e3c0c1c66748236bea0a36946175ed5df58558acef03752b4d1");
   const bundled = fs.readdirSync(SRC).filter((n) => n.endsWith(".mjs") || n.endsWith(".py") || n.endsWith(".sh"));
   assert.equal(bundled.includes("sensi-control.mjs"), false);

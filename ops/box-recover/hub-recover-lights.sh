@@ -56,22 +56,25 @@ fi
 print_exposure() {
   cat <<'EOF'
 EXPOSURE: starting the existing :8788 process is not a lights-only or calendar-only start and does not start camera capture.
-The pinned lights-write-proxy.mjs already mounts /api/private/ and, under its existing auth, also serves pairing (/api/pair, /api/pair/mint), taps, Sensi read/set, Spotify auth/setup/library/control/disconnect, and lights read/set/refresh.
-Private feed can serve existing cached camera stills at /api/private/nest/<slug>.jpg to a holder of the same device token. This package does not add a route block and does not delete stills.
-POST /api/lights/refresh and a successful lights write can run the existing lights-fetch path, which writes private lights-live.json. This start does not call that path itself.
+Unauthenticated on that process: GET /health and /api/health return only ok and the service name; OPTIONS is public.
+POST /api/pair is the pairing redeem: a rate-limited single-use code returns the shared device key. POST /api/spotify/exchange runs on the pending PKCE state before the general key check. Neither exception is a separate role.
+The same device key then covers pair mint, taps, Sensi read/set, the other Spotify routes, and lights read/set/refresh. A comment that mint is Dad-only is not a second authorization check.
+Private feed, same key, serves calendar, months, kids-week, device JSON, school-filtered names, and cached camera stills at nest/<slug>.jpg. Parked capture does not stop that. Cached stills stay a privacy hold: allow-existing would accept this sharing model; hold or an absent decision refuses execute. This package does not add a route block.
+POST /api/lights/refresh and a successful lights write can run the existing lights-fetch path and write private lights-live.json. The start itself does not call that path.
 :8787 stays empty. Public cams health failure is not a reason to start the camera proxy.
-Starting the two existing named-tunnel connectors restores both reviewed hostnames. cams.wardhousehub.com will route to the empty :8787 origin. The local ingress check does not prove there is no other host.
+Starting the two connectors restores both hostnames. The lights hostname exposes this whole :8788 surface. The local ingress check is not remote Cloudflare policy, and it does not prove there is no other host.
 EOF
 }
 
 print_plan() {
   cat <<'EOF'
 PLAN lights-recover: NOT AN EXECUTION
-NOT GATE-READY. The runtime pin is incomplete: scripts/sensi-control.mjs is hash-only because of an embedded credential, and cached stills are undecided.
+READY FOR INDEPENDENT REVIEW. NOT GATE-READY TO EXECUTE.
+Ten runtime source pins are filled. scripts/sensi-control.mjs remains an opaque hash an independent gate may accept. This package does not lift that security review. Cached stills are undecided.
 NOT APPROVED. This package contains no hold release and does not ask for one.
 Cached stills: UNDECIDED. Execute stays refused until a gate file sets cached_stills to allow-existing. hold also refuses. Routes are left as they are.
 Dirty run tree: 54 tracked modifications and 3 untracked files. HEAD b79bf2270b47294b8e75f76d9b227df924fa3941 is not a full pin and is not in origin/main. Pre-reboot b71 source is uncertain.
-Execute refuses while any required runtime sha256 is null. See PARENT-FILE-REQUEST.txt.
+No required source hash is null. Execute still refuses without opaque Sensi acceptance and a cached-stills decision. The 17:43 binary pin is a fail-closed box check, not a hermetic proof. ws was absent at that capture.
 Kasa lock: 21 package declarations and 21 hash entries. It is not an arm64 lock. Recovery reuses the current venv and does not rebuild it.
 Node dependency install is a separate explicit mode and is not run by plan or by service start. The command is npm ci --ignore-scripts --no-audit --no-fund --prefix <DEPS>.
 No healer loop, boot enable, cron, or feed rewrite is part of this package.
@@ -151,6 +154,11 @@ trace() {
 }
 
 scope_file() { echo "$ST/lights-recover.scope"; }
+live_identity() { # pid start cmdsha cwd: 0 only when /proc is still that recorded process
+  local p="$1"
+  [ -d "/proc/$p" ] || return 1
+  [ "$(p_start "$p")" = "$2" ] && [ "$(p_cmdsha "$p")" = "$3" ] && [ "$(p_cwd "$p")" = "$4" ]
+}
 
 append_scope() {
   local svc="$1" line
@@ -306,7 +314,7 @@ rollback() {
   while read -r line; do
     [ -n "$line" ] || continue
     case "$line" in
-      schema\ *) continue ;;
+      schema\ *|run\ *) continue ;;
     esac
     read -r svc pid start hash how cwd <<<"$line"
     case "$svc" in
@@ -324,7 +332,21 @@ rollback() {
       rc=20
       continue
     fi
-    stop_ours "$svc" || true
+    if ! stop_ours "$svc"; then
+      echo "REFUSE $svc: recorded identity was not confirmed stopped; not signalling a replacement"
+      if live_identity "$pid" "$start" "$hash" "$cwd"; then
+        echo "REFUSE $svc: intended identity is still live"
+      else
+        echo "ROLLBACK $svc: intended identity is not the live process"
+      fi
+      rc=20
+      continue
+    fi
+    if live_identity "$pid" "$start" "$hash" "$cwd"; then
+      echo "REFUSE $svc: intended identity still live after stop"
+      rc=20
+      continue
+    fi
     trace "rollback $svc"
   done <"$scope"
   drop_lock || true
@@ -351,7 +373,11 @@ fi
 
 # Refuse on provenance, venv, deps, ingress, token, or a taken port
 # before creating state or starting anything.
-python3 "$CHECK" transitive --root "$RT" --manifest "$MANIFEST"
+sensi_flag=()
+if python3 -c 'import json,sys; g=json.load(open(sys.argv[1])); raise SystemExit(0 if g.get("sensi_opaque")=="accept-existing-hash" else 1)' "$GATE"; then
+  sensi_flag=(--accept-sensi-opaque)
+fi
+python3 "$CHECK" transitive --root "$RT" --manifest "$MANIFEST" "${sensi_flag[@]}"
 trace "provenance"
 if ! venv_ok; then
   echo "REFUSE current Kasa venv is not importable; not rebuilding"
@@ -363,18 +389,33 @@ if ! deps_ok; then
   exit 14
 fi
 trace "deps-ok"
-cfg="${INGRESS_CONFIG:-$CFG}"
-python3 "$CHECK" ingress --config "$cfg" --review "$REVIEW"
+launch="$(readlink -f "$CFG" 2>/dev/null || true)"
+if [ -z "$launch" ] || [ ! -f "$launch" ]; then echo "REFUSE launched tunnel config is missing"; exit 15; fi
+if [ -n "$INGRESS_CONFIG" ]; then
+  other="$(readlink -f "$INGRESS_CONFIG" 2>/dev/null || true)"
+  if [ "$other" != "$launch" ]; then echo "REFUSE ingress-config is not the launched CFG"; exit 15; fi
+fi
+launch_sha="$(sha256sum "$launch" | cut -c1-64)"
+gate_sha="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("ingress_config_sha256") or "")' "$GATE")"
+if [ "$gate_sha" != "$launch_sha" ]; then echo "REFUSE gate does not bind the launched CFG bytes"; exit 15; fi
+python3 "$CHECK" ingress --config "$launch" --review "$REVIEW"
 trace "ingress-ok"
+if [ "$PROFILE" = prod ]; then python3 "$CHECK" equality || exit 21; fi
 token_meta
 trace "token-meta"
 prove_empty
 lock_free
 trace "ports-empty"
 prep_dirs
-printf 'schema wardos.lights-recover.scope/1\n' >"$(scope_file)"
+if [ "$PROFILE" = test ] && [ -n "${WARDOS_RECOVERY_LOCK_PAUSE:-}" ]; then
+  sleep "$WARDOS_RECOVERY_LOCK_PAUSE"
+fi
 if ! take_lock; then echo "REFUSE healer lock is held"; exit 19; fi
 trace "lock"
+run_id="$$-$(date +%s%N)"
+scope_tmp="$ST/lights-recover.scope.$run_id"
+printf 'schema wardos.lights-recover.scope/1\nrun %s\n' "$run_id" >"$scope_tmp"
+mv -f "$scope_tmp" "$(scope_file)"
 set +e
 (
   set -e

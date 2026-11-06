@@ -1,9 +1,13 @@
-The clean runtime bundle 46bc87d451344e3c0c1c66748236bea0a36946175ed5df58558acef03752b4d1
-replaced e72743c81c4ea2cfce6fe6be5bf1dcf17b1491e0d08981ed51b9918e6b47e91d.
-Its ten source files are pinned. No further copy of those files is needed.
+No further source files are requested.
 
-Do not send scripts/sensi-control.mjs. Its bytes stay on the box.
-The manifest pin is sha256 54f8715454d1e4e851ffd2ead6d87ddbaed204368b63c7d74e2b4c4fe0c58ffc only.
-Line 32 is an embedded CLIENT_SECRET string literal. This recovery does not rewrite that file.
+The ten files in runtime bundle 46bc87d451344e3c0c1c66748236bea0a36946175ed5df58558acef03752b4d1
+are pinned. Static imports and spawns from those files stay in that set, plus
+scripts/sensi-control.mjs.
 
-No secret files. No token files, tunnel credentials, logs, or private feeds.
+scripts/sensi-control.mjs is not a missing file. Do not send it.
+Its opaque pin is sha256 54f8715454d1e4e851ffd2ead6d87ddbaed204368b63c7d74e2b4c4fe0c58ffc.
+An independent gate may accept that existing hash. This recovery does not
+rewrite the box file and does not lift the security review.
+
+scripts/text_law.py is named only in a comment in private-dir.mjs. The lights
+process does not load it.

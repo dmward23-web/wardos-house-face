@@ -32,8 +32,8 @@ A secret-free Sensi integration, or an independent gate that accepts the existin
 
 ## What a person still has to do later, and why
 
-Nothing tonight. The cloud checkout cannot see the box or the Pi.
+No user step is being asked for with this update. That is because the package is not ready for the ask, not a decision that no step will be needed.
 
-After an independent gate and a hold release that names this artifact, a person or a gated bot with a route onto the box can run the reviewed command. This VM cannot. For a later Pi install, SSH is off, so a person at the Pi desktop, or another approved path, has to open a route. A password, if one is used, stays on that machine. That step is not part of this package and is not being asked for.
+The box is still down. After an independent review accepts the opaque Sensi hash and the cached-stills choice, a hold release still has to name the recovery command before anyone runs it on the box. This checkout cannot see the box. For a later Pi install, SSH is off, so a person at the Pi, or another approved path, has to open a route before the install root `/opt/wardos` can be written there. A password, if one is used, stays on that machine. The Pi service code is in this pull request and is not yet activated. The aarch64 import has not been run.
 
 No finish time is implied.

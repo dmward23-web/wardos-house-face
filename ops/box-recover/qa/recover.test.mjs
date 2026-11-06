@@ -50,7 +50,7 @@ function run(args, env = {}, cwd = OPS) {
   });
 }
 function writeGate(file, extra) {
-  fs.writeFileSync(file, JSON.stringify({
+  const gate = {
     schema: "wardos.lights-recover.gate/1",
     artifact_sha256: sha(SH),
     hold_release: "lights-recover-1",
@@ -58,7 +58,9 @@ function writeGate(file, extra) {
     manifest_sha256: extra.manifest_sha256,
     ingress_review_sha256: extra.ingress_review_sha256,
     cached_stills: extra.cached_stills,
-  }));
+  };
+  if (extra.ingress_config_sha256) gate.ingress_config_sha256 = extra.ingress_config_sha256;
+  fs.writeFileSync(file, JSON.stringify(gate));
 }
 function pidsOn(port) {
   const r = spawnSync("ss", ["-ltnpH", `sport = :${port}`], { encoding: "utf8" });
@@ -119,19 +121,26 @@ http.createServer((q, s) => { s.end(JSON.stringify({ ok: true, service: 'lights-
   fs.writeFileSync(path.join(scripts, "nest-webrtc-proxy.mjs"), `import fs from 'node:fs';
 fs.writeFileSync(process.env.CAM_SENTINEL, 'started\\n');
 `);
-  fs.writeFileSync(path.join(t, "cloudflared/test-hub.yml"), "tunnel: wardos-test-hub\ningress:\n  - service: http_status:404\n");
-  const ingress = path.join(root, "ingress.yml");
-  fs.writeFileSync(ingress, [
-    "tunnel: not-emitted",
-    "credentials-file: /withheld/creds.json",
+  const cfg = path.join(t, "cloudflared/test-hub.yml");
+  fs.writeFileSync(cfg, [
+    "tunnel: wardos-test-hub",
     "ingress:",
-    "  - hostname: cams.wardhousehub.com",
-    "    service: http://127.0.0.1:8787",
-    "  - hostname: lights.wardhousehub.com",
-    "    service: http://127.0.0.1:8788",
+    "  - hostname: cams.fixture.example",
+    "    service: http://127.0.0.1:18787",
+    "  - hostname: lights.fixture.example",
+    "    service: http://127.0.0.1:18788",
     "  - service: http_status:404",
     "",
   ].join("\n"));
+  const reviewPath = path.join(root, "review.json");
+  fs.writeFileSync(reviewPath, JSON.stringify({
+    schema: "wardos.hub.ingress-review/1",
+    rules: [
+      { hostname: "cams.fixture.example", service: "http://127.0.0.1:18787" },
+      { hostname: "lights.fixture.example", service: "http://127.0.0.1:18788" },
+      { hostname: null, service: "http_status:404" },
+    ],
+  }));
   const token = path.join(root, "device.token");
   fs.writeFileSync(token, SECRET + "\n", { mode: 0o600 });
   const manifest = {
@@ -147,17 +156,18 @@ fs.writeFileSync(process.env.CAM_SENTINEL, 'started\\n');
   const gate = path.join(root, "gate.json");
   writeGate(gate, {
     manifest_sha256: sha(manifestPath),
-    ingress_review_sha256: sha(REVIEW),
+    ingress_review_sha256: sha(reviewPath),
+    ingress_config_sha256: sha(cfg),
     cached_stills: "allow-existing",
   });
   const sentinel = path.join(root, "cam-started");
   const trace = path.join(root, "trace");
   const pylog = path.join(root, "python.log");
-  return { root, t, rt, ports: portList, ingress, token, manifestPath, gate, sentinel, trace, pylog };
+  return { root, t, rt, ports: portList, cfg, review: reviewPath, token, manifestPath, gate, sentinel, trace, pylog };
 }
 function argsOf(fx, mode) {
   return [mode, "--fixture", fx.root, "--gate", fx.gate, "--manifest", fx.manifestPath,
-    "--ingress-review", REVIEW, "--ingress-config", fx.ingress, "--ports", fx.ports.join(" "),
+    "--ingress-review", fx.review, "--ingress-config", fx.cfg, "--ports", fx.ports.join(" "),
     "--token-file", fx.token];
 }
 function envOf(fx, extra = {}) {
@@ -229,8 +239,11 @@ test("shipped manifest still refuses execute because runtime hashes are missing"
   writeGate(gate, { manifest_sha256: sha(MANIFEST), ingress_review_sha256: sha(REVIEW), cached_stills: "allow-existing" });
   const r = run(["--execute", "--fixture", root, "--gate", gate, "--ports", "18787 18788 20251 20252"]);
   assert.notEqual(r.status, 0, r.stdout);
-  assert.match(r.stdout + r.stderr, /security-review-open/);
+  assert.match(r.stdout + r.stderr, /sensi-opaque-approval-required/);
   assert.match(r.stdout, /sensi-control\.mjs/);
+  const shipped = JSON.parse(fs.readFileSync(MANIFEST, "utf8"));
+  const sensi = shipped.files.find((row) => row.path === "scripts/sensi-control.mjs");
+  assert.equal(sensi.security_review, "open");
   assert.doesNotMatch(r.stdout + r.stderr, /CLIENT_SECRET\s*[:=]\s*['"]/);
   assert.equal(fs.existsSync(path.join(root, "test/state")), false);
   fs.rmSync(root, { recursive: true, force: true });
@@ -384,6 +397,72 @@ test("rollback will not signal a replaced identity", async () => {
   }
 });
 
+test("an ingress file that is not the launched config is refused", async () => {
+  const fx = fixture(await ports());
+  try {
+    const other = path.join(fx.root, "other.yml");
+    fs.copyFileSync(fx.cfg, other);
+    const args = argsOf(fx, "--execute").flatMap((a) => a === fx.cfg ? [other] : [a]);
+    const r = run(args, envOf(fx));
+    assert.equal(r.status, 15, r.stdout + r.stderr);
+    assert.match(r.stdout, /not the launched CFG/);
+    assert.equal(pidsOn(fx.ports[1]).length, 0);
+    assert.equal(pidsOn(fx.ports[2]).length, 0);
+  } finally {
+    cleanup(fx);
+  }
+});
+
+test("a lock taken during the pre-lock pause does not replace scope provenance", async () => {
+  const fx = fixture(await ports());
+  const state = path.join(fx.t, "state");
+  fs.mkdirSync(state, { recursive: true });
+  const scope = path.join(state, "lights-recover.scope");
+  const sentinel = "schema sentinel-do-not-replace\n";
+  fs.writeFileSync(scope, sentinel);
+  const lock = path.join(state, "healer.lock");
+  const child = spawn("bash", [SH, ...argsOf(fx, "--execute")], {
+    env: envOf(fx, { WARDOS_RECOVERY_LOCK_PAUSE: "2" }),
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  let out = "";
+  child.stdout.on("data", (b) => { out += b; });
+  child.stderr.on("data", (b) => { out += b; });
+  await new Promise((r) => setTimeout(r, 400));
+  const holder = spawn("bash", ["-c", "exec 9>>\"$1\"; flock 9; sleep 3", "hold", lock], { stdio: "ignore" });
+  const code = await new Promise((resolve) => child.on("close", resolve));
+  try { holder.kill("SIGKILL"); } catch { /* gone */ }
+  assert.equal(code, 19, out);
+  assert.equal(fs.readFileSync(scope, "utf8"), sentinel);
+  cleanup(fx);
+});
+
+test("rollback refuses when the own record matches scope but the live identity does not", async () => {
+  const fx = fixture(await ports());
+  const bystander = spawn(process.execPath, ["-e", "setInterval(()=>{},1000)"], { stdio: "ignore", cwd: "/tmp" });
+  try {
+    const started = run(argsOf(fx, "--execute"), envOf(fx));
+    assert.equal(started.status, 0, started.stdout + started.stderr);
+    const stat = fs.readFileSync(`/proc/${bystander.pid}/stat`, "utf8");
+    const start = stat.replace(/^.*\) /, "").split(" ")[19];
+    const cwd = fs.readlinkSync(`/proc/${bystander.pid}/cwd`);
+    const fake = "f".repeat(64);
+    const record = `${bystander.pid} ${start} ${fake} started ${cwd}`;
+    fs.writeFileSync(path.join(fx.t, "state/lights.own"), record + "\n");
+    const scope = path.join(fx.t, "state/lights-recover.scope");
+    const lines = fs.readFileSync(scope, "utf8").split("\n").map((line) => line.startsWith("lights ") ? "lights " + record : line);
+    fs.writeFileSync(scope, lines.join("\n"));
+    const rolled = run(argsOf(fx, "--rollback"), envOf(fx));
+    assert.notEqual(rolled.status, 0, rolled.stdout + rolled.stderr);
+    assert.match(rolled.stdout, /not signalling a replacement/);
+    assert.match(rolled.stdout, /intended identity is not the live process/);
+    assert.equal(alive(bystander.pid), true);
+  } finally {
+    killPid(bystander.pid);
+    cleanup(fx);
+  }
+});
+
 test("a tampered run-tree file refuses before any listener", async () => {
   const fx = fixture(await ports());
   try {
@@ -396,6 +475,15 @@ test("a tampered run-tree file refuses before any listener", async () => {
   } finally {
     cleanup(fx);
   }
+});
+
+test("point-in-time binary equality fail-closes off the box and does not close Sensi", () => {
+  const r = spawnSync("python3", [path.join(OPS, "lib/recover_check.py"), "equality"], { encoding: "utf8" });
+  assert.notEqual(r.status, 0);
+  assert.match(r.stdout, /REFUSE equality/);
+  assert.doesNotMatch(r.stdout + r.stderr, /hermetic|security review closed|independent review pass/i);
+  const shipped = JSON.parse(fs.readFileSync(MANIFEST, "utf8"));
+  assert.equal(shipped.files.find((row) => row.path === "scripts/sensi-control.mjs").security_review, "open");
 });
 
 test("dependency mode is explicit npm ci and does not start listeners", async () => {

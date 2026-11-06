@@ -21,6 +21,9 @@ tar --sort=name --mtime='2026-11-06 00:00:00' --owner=0 --group=0 --numeric-owne
   REVIEW.md \
   EOD-ACCOUNT.md \
   PARENT-FILE-REQUEST.txt \
+  PARENT-READONLY-CHECKS.md \
+  CORRECTION-MAP.md \
+  live-equality.json \
   qa/recover.test.mjs \
   qa/runtime-pin.test.mjs \
   qa/fake-cloudflared.c \
