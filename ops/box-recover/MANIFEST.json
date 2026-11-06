@@ -52,8 +52,11 @@
       "path": "scripts/sensi-control.mjs",
       "sha256": "54f8715454d1e4e851ffd2ead6d87ddbaed204368b63c7d74e2b4c4fe0c58ffc",
       "required_before_execute": true,
-      "bytes_match_repo_main": true,
-      "role": "imported by the lights process"
+      "security_review": "open",
+      "distribution": "hash-only",
+      "bytes_in_this_artifact": false,
+      "do_not_rewrite_runtime": true,
+      "role": "imported by the lights process; line 32 is an embedded CLIENT_SECRET string literal and the file is excluded from this artifact; the hash identifies the existing box file and is not a request to copy or rotate it"
     },
     {
       "path": "scripts/private-dir.mjs",
@@ -87,35 +90,31 @@
     },
     {
       "path": "scripts/spotify-control.mjs",
-      "sha256": null,
+      "sha256": "9da9a337802c786a35559e94d6cff28ba33791d2275e441ff33358ae2a26b907",
       "required_before_execute": true,
-      "bytes_match_repo_main": null,
-      "repo_main_sha256_not_a_pin": "9da9a337802c786a35559e94d6cff28ba33791d2275e441ff33358ae2a26b907",
-      "role": "imported by the runtime lights process; runtime hash was not supplied"
+      "bytes_match_repo_main": true,
+      "role": "imported by the runtime lights process; hash confirmed from the clean runtime bundle"
     },
     {
       "path": "scripts/access-log.mjs",
-      "sha256": null,
+      "sha256": "589b6677d880dd6552e69c4ee9e3178e05ed1c467e6a80579d55669e9204644f",
       "required_before_execute": true,
-      "bytes_match_repo_main": null,
-      "repo_main_sha256_not_a_pin": "589b6677d880dd6552e69c4ee9e3178e05ed1c467e6a80579d55669e9204644f",
-      "role": "imported by the runtime lights process; runtime hash was not supplied"
+      "bytes_match_repo_main": true,
+      "role": "imported by the runtime lights process; hash confirmed from the clean runtime bundle"
     },
     {
       "path": "scripts/lights-fetch.mjs",
-      "sha256": null,
+      "sha256": "d6b84c89f86e2dffa8d633ff29a4958c4394e585e1dc7cf0b2d064c204c726eb",
       "required_before_execute": true,
-      "bytes_match_repo_main": null,
-      "repo_main_sha256_not_a_pin": "d6b84c89f86e2dffa8d633ff29a4958c4394e585e1dc7cf0b2d064c204c726eb",
-      "role": "existing refresh path of the lights process; can write private lights-live.json after an authenticated lights change; runtime hash was not supplied"
+      "bytes_match_repo_main": true,
+      "role": "existing refresh path of the lights process; can write private lights-live.json after an authenticated lights change; hash confirmed from the clean runtime bundle"
     },
     {
       "path": "scripts/kasa-probe.py",
-      "sha256": null,
+      "sha256": "985ccc2d50ebbf1d9f30b2f7166b9cd644b1890f52459473ea0a46d2724e394b",
       "required_before_execute": true,
-      "bytes_match_repo_main": null,
-      "repo_main_sha256_not_a_pin": "985ccc2d50ebbf1d9f30b2f7166b9cd644b1890f52459473ea0a46d2724e394b",
-      "role": "referenced by lights-fetch; runtime hash was not supplied"
+      "bytes_match_repo_main": true,
+      "role": "referenced by lights-fetch; hash confirmed from the clean runtime bundle"
     },
     {
       "path": "scripts/nest-webrtc-proxy.mjs",
@@ -132,5 +131,11 @@
     "scripts/access-log.mjs",
     "scripts/private-dir.mjs"
   ],
-  "execute_refuses_while_any_required_sha256_is_null": true
+  "execute_refuses_while_any_required_sha256_is_null": true,
+  "execute_refuses_while_security_review_open": true,
+  "pin_complete": false,
+  "not_gate_ready_for_execute": true,
+  "runtime_bundle_sha256": "46bc87d451344e3c0c1c66748236bea0a36946175ed5df58558acef03752b4d1",
+  "runtime_bundle_replaces_sha256": "e72743c81c4ea2cfce6fe6be5bf1dcf17b1491e0d08981ed51b9918e6b47e91d",
+  "sensi_security_review": "open"
 }

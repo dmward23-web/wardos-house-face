@@ -169,6 +169,15 @@ def cmd_transitive(args: argparse.Namespace) -> None:
     ]
     if missing:
         fail("runtime-hash-required " + ",".join(missing), 11)
+    # Refuse before opening any excluded file. The hash stays a pin of the
+    # existing box bytes; this package does not read or copy them.
+    blocked = [
+        row["path"]
+        for row in rows
+        if row.get("required_before_execute") and row.get("security_review") == "open"
+    ]
+    if blocked:
+        fail("security-review-open " + ",".join(blocked), 11)
     for row in rows:
         pin = row.get("sha256")
         if not pin:

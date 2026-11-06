@@ -205,6 +205,7 @@ test("plan is not an execution and names the real exposure", () => {
   assert.equal(r.status, 0, r.stderr);
   const text = r.stdout;
   assert.match(text, /NOT AN EXECUTION/);
+  assert.match(text, /NOT GATE-READY/);
   assert.match(text, /NOT APPROVED/);
   assert.match(text, /not a lights-only or calendar-only/);
   assert.match(text, /does not start camera capture/);
@@ -228,8 +229,9 @@ test("shipped manifest still refuses execute because runtime hashes are missing"
   writeGate(gate, { manifest_sha256: sha(MANIFEST), ingress_review_sha256: sha(REVIEW), cached_stills: "allow-existing" });
   const r = run(["--execute", "--fixture", root, "--gate", gate, "--ports", "18787 18788 20251 20252"]);
   assert.notEqual(r.status, 0, r.stdout);
-  assert.match(r.stdout + r.stderr, /runtime-hash-required/);
-  assert.match(r.stdout, /spotify-control\.mjs/);
+  assert.match(r.stdout + r.stderr, /security-review-open/);
+  assert.match(r.stdout, /sensi-control\.mjs/);
+  assert.doesNotMatch(r.stdout + r.stderr, /CLIENT_SECRET\s*[:=]\s*['"]/);
   assert.equal(fs.existsSync(path.join(root, "test/state")), false);
   fs.rmSync(root, { recursive: true, force: true });
 });

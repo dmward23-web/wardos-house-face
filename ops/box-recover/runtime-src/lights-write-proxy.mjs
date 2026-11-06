@@ -1,0 +1,763 @@
+#!/usr/bin/env node
+/**
+ * WardOS House Face · Kasa lights WRITE proxy (box / LAN / tunnel)
+ *
+ * Holds Kasa password off GitHub Pages. Browser POSTs here → spawns
+ * scripts/kasa-write.py (tplink-cloud-api) → JSON back. Creds never leave box.
+ *
+ * Secrets (mode 600, never git):
+ *   ~/.config/wardos/kasa.user + kasa.password
+ *   ~/.config/wardos/lights-proxy.token  (REQUIRED · CAMLOCK1: no token, no start)
+ *
+ * CAMLOCK1 auth rules (the tunnel forwards from 127.0.0.1, so loopback proves nothing):
+ *   - no token configured  -> refuse to start (exit 3); there is no open or ephemeral mode
+ *   - every /api/* call needs the X-Lights-Proxy-Token header (or Bearer); no ?proxyToken
+ *   - Origin is NOT a key (any non-browser client can send it). The old NOKEY1 origin
+ *     shortcut is gone for good (PRIVFEED3, Atlas): there is no keyless mode at all.
+ *   - constant-time compare; X-Forwarded-For is never trusted
+ *   - public /health says only {ok, service}; details need the key
+ *
+ * Usage:
+ *   node scripts/lights-write-proxy.mjs --host 127.0.0.1 --port 8788   (token from the file)
+ *
+ * Default bind: 127.0.0.1:8788
+ * See ../LIGHTS-LIVE.md
+ */
+import fs from "node:fs";
+import path from "node:path";
+import os from "node:os";
+import http from "node:http";
+import crypto from "node:crypto";
+import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import * as sensi from "./sensi-control.mjs"; /* SENSICTL1 */
+import * as spotify from "./spotify-control.mjs"; /* SPOTIFY1 */
+import { handlePrivate, readTokens } from "./private-feed.mjs"; /* PRIVFEED1 */
+import { createAccessLog } from "./access-log.mjs"; /* ACCESSLOG */
+import { privPath, assertPrivateOut } from "./private-dir.mjs"; /* PRIVFEED2 */
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, "..");
+
+const DEFAULT_TOKEN = path.join(os.homedir(), ".config", "wardos", "lights-proxy.token");
+const DEFAULT_PYTHON =
+  process.env.KASA_VENV_PYTHON ||
+  "/workspace/plates/2026-09-28/kasa-live/.venv/bin/python";
+const DEFAULT_WRITE = path.join(ROOT, "scripts", "kasa-write.py");
+const DEFAULT_DAEMON = path.join(ROOT, "scripts", "kasa-daemon.py");
+const LIVE_JSON = privPath("lights-live.json"); /* PRIVFEED2 · private folder, served via /api/private/lights-live.json */
+
+const ROSTER_IDS = new Set(["dining-room", "harris-room", "kitchen"]);
+
+function parseArgs(argv) {
+  const out = {
+    host: "127.0.0.1",
+    port: 8788,
+    lan: false,
+    authToken: process.env.LIGHTS_PROXY_TOKEN || "",
+    tokenFile: DEFAULT_TOKEN,
+    python: DEFAULT_PYTHON,
+    writeScript: DEFAULT_WRITE,
+    help: false,
+  };
+  for (let i = 2; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === "--host" && argv[i + 1]) out.host = argv[++i];
+    else if (a === "--port" && argv[i + 1]) out.port = Number(argv[++i]);
+    else if (a === "--lan") {
+      out.lan = true;
+      if (out.host === "127.0.0.1") out.host = "0.0.0.0";
+    } else if (a === "--auth-token" && argv[i + 1]) out.authToken = argv[++i];
+    else if (a === "--token-file" && argv[i + 1]) out.tokenFile = path.resolve(argv[++i]);
+    else if (a === "--python" && argv[i + 1]) out.python = argv[++i];
+    else if (a === "--write" && argv[i + 1]) out.writeScript = path.resolve(argv[++i]);
+    else if (a === "--help" || a === "-h") out.help = true;
+  }
+  return out;
+}
+
+function readText(filePath) {
+  try {
+    return fs.readFileSync(filePath, "utf8").trim();
+  } catch {
+    return null;
+  }
+}
+
+function json(res, status, obj) {
+  const body = JSON.stringify(obj);
+  res.writeHead(status, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers":
+      "Content-Type, Authorization, X-Lights-Proxy-Token, X-Nest-Proxy-Token",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  });
+  res.end(body);
+}
+
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on("data", (c) => chunks.push(c));
+    req.on("end", () => {
+      const raw = Buffer.concat(chunks).toString("utf8");
+      if (!raw) return resolve({});
+      try {
+        resolve(JSON.parse(raw));
+      } catch {
+        reject(new Error("invalid JSON body"));
+      }
+    });
+    req.on("error", reject);
+  });
+}
+
+/* TAPSYNC1 · shared kid taps store (box only, never git) */
+const TAPS_FILE = path.join(os.homedir(), ".config", "wardos", "kid-taps.json");
+const TAP_KEY_RE = /^house-checkoffs:(hayes|harris|ainsley):(week:)?\d{4}-\d{2}-\d{2}$/;
+const TAP_ID_RE = /^(hay|har|ain)-[a-z0-9-]{2,24}$/;
+function loadTaps() {
+  try { return JSON.parse(fs.readFileSync(TAPS_FILE, "utf8")) || {}; } catch { return {}; }
+}
+function saveTaps(taps) {
+  const tmp = TAPS_FILE + ".tmp";
+  fs.writeFileSync(tmp, JSON.stringify(taps), { mode: 0o600 });
+  fs.renameSync(tmp, TAPS_FILE);
+}
+
+/* PRIVFEED3 · HOUSE_ORIGINS is used ONLY for CORS on the private feed. It is never a key (NOKEY1 removed). */
+const HOUSE_ORIGINS = new Set(
+  (process.env.HOUSE_ORIGINS || "https://dmward23-web.github.io").split(",").map((s) => s.trim()).filter(Boolean)
+);
+/* LOCK2 · rate limit no-key traffic (Origin is forgeable outside a browser). */
+const RL = new Map();
+function rateOk(bucket, limit, windowMs) {
+  const now = Date.now();
+  const arr = (RL.get(bucket) || []).filter((t) => now - t < windowMs);
+  if (arr.length >= limit) { RL.set(bucket, arr); return false; }
+  arr.push(now); RL.set(bucket, arr);
+  if (RL.size > 5000) RL.clear();
+  return true;
+}
+function clientIp(req) {
+  /* CAMLOCK1 · cf-connecting-ip is set by Cloudflare at the edge; X-Forwarded-For is client-controlled */
+  const ip = String(req.headers["cf-connecting-ip"] || req.socket.remoteAddress || "?").split(",")[0].trim();
+  /* IPv6 clients rotate inside their /48 — bucket by prefix */
+  return ip.includes(":") ? ip.split(":").slice(0, 3).join(":") + "::/48" : ip;
+}
+/** returns "" when allowed, else reason. Only called for no-key requests. */
+function houseRateCheck(req, pathname) {
+  const ip = clientIp(req);
+  if (req.method !== "POST") return rateOk("r:" + ip, 240, 60000) ? "" : "rate";
+  if (pathname.startsWith("/api/lights")) {
+    if (!rateOk("lw:" + ip, 20, 60000) || !rateOk("lw:all", 30, 60000)) return "rate"; /* whole house: 30 no-key light writes/min */
+    return "";
+  }
+  return rateOk("tw:" + ip, 120, 60000) && rateOk("tw:all", 300, 60000) ? "" : "rate";
+}
+function safeEq(a, b) {
+  const x = crypto.createHash("sha256").update(String(a)).digest();
+  const y = crypto.createHash("sha256").update(String(b)).digest();
+  return crypto.timingSafeEqual(x, y);
+}
+export function hasKeyHeader(req, args) {
+  if (!args.authToken) return false;
+  const h = String(req.headers["x-lights-proxy-token"] || req.headers["x-nest-proxy-token"] ||
+    (req.headers.authorization || "").replace(/^Bearer\s+/i, ""));
+  if (!h) return false;
+  return safeEq(h, args.authToken);
+}
+/** ACCESSLOG · slot label for the access log: "device" | "pair" | "none" (never the value) */
+export function accessSlot(req, args, privTokens = []) {
+  const p = String(req.url || "/").split(/[?#]/)[0];
+  if (req.method === "POST" && p === "/api/pair") return "pair";
+  if (hasKeyHeader(req, args)) return "device";
+  if (p.startsWith("/api/private/") && privTokens.length) {
+    const h = String(req.headers["x-private-feed-token"] || req.headers["x-lights-proxy-token"] || req.headers["x-nest-proxy-token"] || (req.headers.authorization || "").replace(/^Bearer\s+/i, ""));
+    if (h) { let ok = false; for (const t of privTokens) ok = safeEq(h, t) || ok; if (ok) return "device"; }
+  }
+  return "none";
+}
+export function houseOrigin(req) {
+  return HOUSE_ORIGINS.has(String(req.headers.origin || ""));
+}
+
+/* CAMLOCK1 + PRIVFEED3 · device key header ONLY. No token configured means deny (main() refuses to start anyway).
+   Never trusts Origin, loopback, X-Forwarded-For or a ?proxyToken query. There is no keyless mode. */
+export function checkAuth(req, args) {
+  if (!args || !args.authToken) return false;
+  return hasKeyHeader(req, args);
+}
+
+/* PRIVFEED3 · QR pairing (Atlas-approved design b). A paired Dad screen asks (with the key) for a one-time code;
+   the new screen trades the code for the device key. Codes: 128-bit random, single use, 5-minute expiry, held in
+   memory only (sha256 of the code; a restart forgets them all). /api/pair is rate limited per client and house-wide. */
+export const PAIR_TTL_MS = 5 * 60 * 1000;
+const PAIR = new Map(); /* sha256(code) -> { exp } */
+const pairHash = (c) => crypto.createHash("sha256").update(String(c)).digest("hex");
+export function pairMint(now = Date.now()) {
+  for (const [h, v] of PAIR) if (v.exp <= now) PAIR.delete(h);
+  if (PAIR.size >= 10) { const oldest = [...PAIR.entries()].sort((a, b) => a[1].exp - b[1].exp)[0]; if (oldest) PAIR.delete(oldest[0]); }
+  const code = crypto.randomBytes(16).toString("base64url");
+  PAIR.set(pairHash(code), { exp: now + PAIR_TTL_MS });
+  return { code, expiresAt: new Date(now + PAIR_TTL_MS).toISOString(), ttlSec: Math.round(PAIR_TTL_MS / 1000) };
+}
+/** "ok" | "invalid" (wrong, used or expired all look the same to the caller) */
+export function pairCodeShape(code) { return typeof code === "string" && /^[A-Za-z0-9_-]{22}$/.test(code); } /* 16 random bytes, base64url */
+export function pairRedeem(code, now = Date.now()) {
+  if (!pairCodeShape(code)) return "invalid";
+  const h = pairHash(code), v = PAIR.get(h);
+  if (!v) return "invalid";
+  PAIR.delete(h); /* single use: gone on first try, even if expired */
+  return v.exp > now ? "ok" : "invalid";
+}
+function pairRateOk(req) {
+  const ip = clientIp(req);
+  return rateOk("pair:" + ip, 5, 60000) && rateOk("pair:all", 20, 60000);
+}
+
+function hasKasaCreds() {
+  // KASACREDS1: cred files win over env (as a pair); env user must be an email.
+  // kasa-write.py / kasa-daemon.py apply the same rule when they log in.
+  const home = os.homedir();
+  const fUser = (readText(path.join(home, ".config", "wardos", "kasa.user")) || "").trim();
+  const fPass = (readText(path.join(home, ".config", "wardos", "kasa.password")) || "").trim();
+  if (fUser && fPass) return true;
+  let eUser = (process.env.KASA_USER || process.env.KASA_USERNAME || "").trim();
+  if (!eUser.includes("@")) eUser = "";
+  const user = eUser || fUser;
+  const pass = (process.env.KASA_PASSWORD || "").trim() || fPass;
+  return Boolean(user && pass);
+}
+
+function runWrite(argsList, args) {
+  return new Promise((resolve) => {
+    const child = spawn(args.python, [args.writeScript, ...argsList], {
+      env: process.env,
+      timeout: 120000,
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (d) => {
+      stdout += d.toString("utf8");
+    });
+    child.stderr.on("data", (d) => {
+      stderr += d.toString("utf8");
+    });
+    child.on("error", (err) => {
+      resolve({ ok: false, error: err.message, code: 127, stdout, stderr });
+    });
+    child.on("close", (code) => {
+      let parsed = null;
+      const start = stdout.indexOf("{");
+      const end = stdout.lastIndexOf("}");
+      if (start >= 0 && end > start) {
+        try {
+          parsed = JSON.parse(stdout.slice(start, end + 1));
+        } catch {
+          parsed = null;
+        }
+      }
+      resolve({
+        ok: code === 0 && parsed && parsed.ok,
+        code: code ?? 1,
+        parsed,
+        stdout,
+        stderr,
+        error: parsed?.error || (code !== 0 ? `write exit ${code}` : null),
+      });
+    });
+  });
+}
+
+/* LIGHTSFAST1 · warm Kasa session: one long-lived python child keeps the
+ * TP-Link cloud login + device handles, so a tap is one passthrough (~0.5 s).
+ * Falls back to one-shot kasa-write.py if the daemon is down. */
+const warm = {
+  child: null,
+  ready: false,
+  nextRid: 1,
+  pending: new Map(),
+  lights: null,
+  at: null,
+  buf: "",
+  restarts: 0,
+};
+
+function startDaemon(args) {
+  if (!fs.existsSync(DEFAULT_DAEMON)) return;
+  const child = spawn(args.python, [DEFAULT_DAEMON], {
+    env: process.env,
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+  warm.child = child;
+  warm.ready = false;
+  warm.buf = "";
+  child.stdout.on("data", (d) => {
+    warm.buf += d.toString("utf8");
+    let i;
+    while ((i = warm.buf.indexOf("\n")) >= 0) {
+      const line = warm.buf.slice(0, i);
+      warm.buf = warm.buf.slice(i + 1);
+      let msg;
+      try {
+        msg = JSON.parse(line);
+      } catch {
+        continue;
+      }
+      if (Array.isArray(msg.lights)) {
+        warm.lights = msg.lights;
+        warm.at = new Date().toISOString();
+      }
+      if (msg.event === "ready") {
+        warm.ready = !!msg.ok;
+        console.log(`[lights-write-proxy] warm kasa ${msg.ok ? "ready" : "failed"}`);
+      }
+      if (msg.rid != null && warm.pending.has(msg.rid)) {
+        const p = warm.pending.get(msg.rid);
+        warm.pending.delete(msg.rid);
+        clearTimeout(p.timer);
+        p.resolve(msg);
+      }
+    }
+  });
+  child.stderr.on("data", () => {});
+  child.on("close", (code) => {
+    console.warn(`[lights-write-proxy] warm kasa exited ${code}; restarting`);
+    warm.child = null;
+    warm.ready = false;
+    for (const [, p] of warm.pending) {
+      clearTimeout(p.timer);
+      p.resolve({ ok: false, error: "daemon exited" });
+    }
+    warm.pending.clear();
+    const delay = Math.min(60000, 2000 * 2 ** Math.min(warm.restarts++, 5));
+    setTimeout(() => startDaemon(args), delay);
+  });
+  child.on("spawn", () => {
+    setTimeout(() => {
+      if (warm.child === child) warm.restarts = 0;
+    }, 120000);
+  });
+}
+
+function daemonCall(msg, timeoutMs = 12000) {
+  return new Promise((resolve) => {
+    if (!warm.child || !warm.ready) return resolve(null);
+    const rid = warm.nextRid++;
+    const timer = setTimeout(() => {
+      warm.pending.delete(rid);
+      resolve({ ok: false, error: "warm kasa timeout" });
+    }, timeoutMs);
+    warm.pending.set(rid, { resolve, timer });
+    warm.child.stdin.write(JSON.stringify({ rid, ...msg }) + "\n");
+  });
+}
+
+function liveWithWarm() {
+  let live = null;
+  try {
+    live = JSON.parse(fs.readFileSync(LIVE_JSON, "utf8"));
+  } catch {
+    live = null;
+  }
+  if (!warm.lights) return live;
+  return {
+    ...(live || {}),
+    status: "live",
+    writeSupported: true,
+    source: "lights-write-proxy-warm",
+    fetchedAt: warm.at || new Date().toISOString(),
+    lights: warm.lights,
+    error: null,
+  };
+}
+
+let refreshTimer = null;
+function scheduleSnapshotRefresh() {
+  // Debounced, non-blocking: keep data/lights-live.json honest for Pages pollers.
+  if (refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(() => {
+    refreshTimer = null;
+    refreshLiveSnapshot().catch(() => {});
+  }, 20000);
+}
+
+function refreshLiveSnapshot() {
+  return new Promise((resolve) => {
+    const fetchScript = path.join(ROOT, "scripts", "lights-fetch.mjs");
+    if (!fs.existsSync(fetchScript)) return resolve({ ok: false, error: "no lights-fetch" });
+    const child = spawn(process.execPath, [fetchScript], {
+      cwd: ROOT,
+      env: process.env,
+      timeout: 120000,
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (d) => (stdout += d));
+    child.stderr.on("data", (d) => (stderr += d));
+    child.on("close", (code) => {
+      let live = null;
+      try {
+        if (fs.existsSync(LIVE_JSON)) {
+          live = JSON.parse(fs.readFileSync(LIVE_JSON, "utf8"));
+        }
+      } catch {
+        live = null;
+      }
+      resolve({ ok: code === 0, code, live, stdout, stderr });
+    });
+    child.on("error", (err) => resolve({ ok: false, error: err.message }));
+  });
+}
+
+async function main() {
+  const args = parseArgs(process.argv);
+  if (args.help) {
+    console.log(`Usage: node scripts/lights-write-proxy.mjs [--host 127.0.0.1] [--port 8788] [--lan]
+  --lan           bind 0.0.0.0 (requires LIGHTS_PROXY_TOKEN)
+  Secrets: ~/.config/wardos/kasa.user + kasa.password (+ lights-proxy.token)`);
+    process.exit(0);
+  }
+
+  if (!args.authToken) {
+    args.authToken = readText(args.tokenFile) || "";
+  }
+  /* CAMLOCK1 · no token, no start. No ephemeral token, no open localhost mode. */
+  if (!args.authToken || args.authToken.length < 16) {
+    console.error("FATAL: CAMLOCK1 · no auth token (need LIGHTS_PROXY_TOKEN or " + args.tokenFile + ", 16+ chars). Refusing to start.");
+    process.exit(3);
+  }
+
+  if (!fs.existsSync(args.python)) {
+    console.error("FATAL: kasa venv python missing: " + args.python);
+    process.exit(2);
+  }
+  if (!fs.existsSync(args.writeScript)) {
+    console.error("FATAL: kasa-write.py missing: " + args.writeScript);
+    process.exit(2);
+  }
+  if (!hasKasaCreds()) {
+    console.error("FATAL: kasa.user + kasa.password missing under ~/.config/wardos/");
+    process.exit(2);
+  }
+
+  /* PRIVFEED1 · private calendar / kids-week / cam stills: token ALWAYS required (never the no-key house origin) */
+  const privTokens = readTokens([args.tokenFile, path.join(os.homedir(), ".config", "wardos", "private-feed.token")]);
+  if (args.authToken && !privTokens.includes(args.authToken)) privTokens.push(args.authToken);
+
+  /* ACCESSLOG · one JSON line per request (route, status, slot, cf-connecting-ip, UA); keys are scrubbed, never logged.
+     slot: "device" = device key header (or a private-feed token on /api/private/), "pair" = a pairing-code redeem
+     (POST /api/pair, authorised by the one-time code), else "none". */
+  const access = createAccessLog({ name: "lights-write-proxy", secrets: () => [args.authToken, ...privTokens] });
+
+  const server = http.createServer(async (req, res) => {
+    try { access.setSlot(req, accessSlot(req, args, privTokens)); access.attach(req, res); } catch { /* logging never breaks a request */ }
+    /* PRIVFEED3 · never build a URL from the Host header; a bad request line is a 400, never a crash */
+    let u;
+    try { u = new URL(req.url || "/", "http://proxy.invalid"); } catch { return json(res, 400, { error: "bad request" }); }
+    const pathname = u.pathname;
+
+    if (pathname.startsWith("/api/private/")) {
+      handlePrivate(req, res, { tokens: privTokens, origins: HOUSE_ORIGINS });
+      return;
+    }
+
+    if (req.method === "OPTIONS") {
+      res.writeHead(204, {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers":
+          "Content-Type, Authorization, X-Lights-Proxy-Token, X-Nest-Proxy-Token",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      });
+      return res.end();
+    }
+
+    try {
+      if (pathname === "/health" || pathname === "/api/health") {
+        /* CAMLOCK1 · public health says nothing beyond ok + service name (the wall's probe needs it) */
+        if (!hasKeyHeader(req, args)) return json(res, 200, { ok: true, service: "lights-write-proxy" });
+        return json(res, 200, {
+          ok: true,
+          service: "lights-write-proxy",
+          bind: `${args.host}:${args.port}`,
+          lan: args.lan,
+          authRequired: Boolean(args.authToken),
+          houseOrigin: houseOrigin(req),
+          writeSupported: true,
+          warm: warm.ready,
+          kasaCreds: hasKasaCreds(),
+          sensi: true,
+          spotify: (() => { try { const s = spotify.status(); return { app: s.clientId, connected: s.connected }; } catch { return null; } })(),
+          ts: new Date().toISOString(),
+        });
+      }
+
+      /* SPOTIFY1 · finish a Spotify login from spotify-callback.html. Authorised by the single-use
+         state the box minted for an authed screen (the callback can land in a storage context with
+         no hub key, e.g. the iOS home-screen icon's sign-in sheet). */
+      if (pathname === "/api/spotify/exchange" && req.method === "POST") {
+        const body = await readBody(req);
+        try {
+          const r = await spotify.authExchange(String(body.code || ""), String(body.state || ""));
+          console.log(`[spotify] ${new Date().toISOString()} connected ${r.user ? r.user.name : ""}`);
+          return json(res, 200, r);
+        } catch (e) {
+          return json(res, e.status || 502, { ok: false, error: e.code || "error", message: String(e.message || e) });
+        }
+      }
+
+      /* PRIVFEED3 · trade a one-time pairing code for the device key (no key needed; rate limited; single use) */
+      if (pathname === "/api/pair" && req.method === "POST") {
+        /* HUBPIN1 · junk never touches the house-wide pairing bucket: a malformed code gets 400 and only counts in its
+           own per-IP junk bucket, so nobody can block real pairing by spraying garbage */
+        const body = await readBody(req).catch(() => ({}));
+        const code = body && body.code;
+        if (!pairCodeShape(code)) {
+          if (!rateOk("pairjunk:" + clientIp(req), 30, 60000)) return json(res, 429, { ok: false, error: "slow down" });
+          return json(res, 400, { ok: false, error: "pair_malformed", message: "That is not a pairing code." });
+        }
+        if (!pairRateOk(req)) return json(res, 429, { ok: false, error: "slow down" });
+        const r = pairRedeem(code);
+        if (r !== "ok") { console.log(`[pair] ${new Date().toISOString()} refused`); return json(res, 401, { ok: false, error: "pair_invalid", message: "Code expired, used or wrong. Ask Dad for a new code." }); }
+        console.log(`[pair] ${new Date().toISOString()} screen paired`);
+        return json(res, 200, { ok: true, key: args.authToken });
+      }
+
+      if (!checkAuth(req, args)) {
+        return json(res, 401, {
+          error: "unauthorized", locked: true,
+        });
+      }
+
+      /* PRIVFEED3 · mint a pairing code: device key required (checked above), Dad page only */
+      if (pathname === "/api/pair/mint" && req.method === "POST") {
+        const m = pairMint();
+        console.log(`[pair] ${new Date().toISOString()} code minted (expires ${m.expiresAt})`);
+        return json(res, 200, { ok: true, ...m });
+      }
+
+      /* TAPSYNC1 · kids chore taps shared across every device (same key + tunnel) */
+      if (pathname === "/api/taps" && (req.method === "GET" || req.method === "POST")) {
+        const taps = loadTaps();
+        if (req.method === "POST") {
+          const body = await readBody(req);
+          const changes = Array.isArray(body.changes) ? body.changes.slice(0, 2000) : [];
+          let applied = 0;
+          for (const c of changes) {
+            if (!c || !TAP_KEY_RE.test(String(c.key)) || !TAP_ID_RE.test(String(c.id)) || typeof c.v !== "boolean") continue;
+            /* TAPSTICK1 · stamp with the hub clock: device sends how long ago it tapped */
+            const age = Number(c.age);
+            const t = Number.isFinite(age) && age >= 0 && age < 864e5 ? Date.now() - age : (Number(c.t) || 0);
+            const k = (taps[c.key] = taps[c.key] || {});
+            const cur = k[c.id];
+            if (!cur || t > cur.t) { k[c.id] = { v: c.v, t }; applied++; }
+            else if (t === cur.t && c.v && !cur.v) { k[c.id] = { v: true, t }; applied++; }
+          }
+          if (applied) saveTaps(taps);
+          return json(res, 200, { ok: true, applied, taps, now: Date.now(), ts: new Date().toISOString() });
+        }
+        return json(res, 200, { ok: true, taps, now: Date.now(), ts: new Date().toISOString() });
+      }
+
+      /* SENSICTL1 · live Sensi thermostat read + control (same key + tunnel as lights) */
+      if (pathname === "/api/sensi" && req.method === "GET") {
+        try {
+          return json(res, 200, { ok: true, service: "sensi", thermostat: await sensi.readState(), ts: new Date().toISOString() });
+        } catch (e) {
+          return json(res, 502, { ok: false, error: String(e.message || e) });
+        }
+      }
+      if (pathname === "/api/sensi/set" && req.method === "POST") {
+        const body = await readBody(req);
+        try {
+          let t;
+          if (body.kind === "mode") t = await sensi.setMode(body.mode);
+          else if (body.kind === "temp") t = await sensi.setTemp(body.mode, body.temp);
+          else return json(res, 400, { ok: false, error: "kind must be temp or mode" });
+          console.log(`[sensi] ${new Date().toISOString()} ${body.kind} ${body.mode || ""} ${body.temp || ""} -> heat ${t.heatSetpoint} cool ${t.coolSetpoint} mode ${t.mode}`);
+          return json(res, 200, { ok: true, thermostat: t, ts: new Date().toISOString() });
+        } catch (e) {
+          return json(res, 502, { ok: false, error: String(e.message || e) });
+        }
+      }
+
+      /* SPOTIFY1 · Spotify Connect now-playing + control (same key + tunnel as lights) */
+      if (pathname.startsWith("/api/spotify")) {
+        const fail = (e) => json(res, e.status && e.status >= 400 && e.status < 600 ? e.status : 502, { ok: false, error: e.code || "error", message: String(e.message || e), retryAfter: e.retryAfter || 0 });
+        try {
+          if (pathname === "/api/spotify" && req.method === "GET") {
+            return json(res, 200, { ...(await spotify.snapshot({ devices: u.searchParams.get("devices") === "1" })), ts: new Date().toISOString() });
+          }
+          if (pathname === "/api/spotify/devices" && req.method === "GET") {
+            return json(res, 200, { ok: true, devices: await spotify.devices() });
+          }
+          if (pathname === "/api/spotify/library" && req.method === "GET") {
+            const [recent, playlists] = await Promise.allSettled([spotify.recent(), spotify.playlists()]);
+            return json(res, 200, { ok: true, recent: recent.status === "fulfilled" ? recent.value : [], playlists: playlists.status === "fulfilled" ? playlists.value : [],
+              errors: [recent, playlists].filter((x) => x.status === "rejected").map((x) => x.reason && (x.reason.code || x.reason.message)) });
+          }
+          if (pathname === "/api/spotify/browse" && req.method === "GET") { /* SPOTIFY2 · search / library / queue / detail pages */
+            const sp = u.searchParams;
+            const kind = String(sp.get("kind") || "");
+            const arg = sp.get("q") || sp.get("id") || "";
+            return json(res, 200, { ok: true, ...(await spotify.browse(kind, arg, { offset: sp.get("offset"), types: sp.get("types") || undefined })) });
+          }
+          if (pathname === "/api/spotify/control" && req.method === "POST") {
+            const body = await readBody(req);
+            const snap = await spotify.control(body);
+            console.log(`[spotify] ${new Date().toISOString()} ${body.action} -> ${snap.state}`);
+            return json(res, 200, { ...snap, ok: snap.ok !== false, ts: new Date().toISOString() });
+          }
+          if (pathname === "/api/spotify/auth-start" && req.method === "POST") {
+            const body = await readBody(req);
+            return json(res, 200, { ok: true, ...spotify.authStart(body.returnTo) });
+          }
+          if (pathname === "/api/spotify/setup" && req.method === "POST") {
+            const body = await readBody(req);
+            spotify.setClientId(body.clientId);
+            console.log(`[spotify] ${new Date().toISOString()} client id set`);
+            return json(res, 200, { ok: true, clientId: true, setup: spotify.status(), ...(body.connect ? spotify.authStart(body.returnTo) : {}) });
+          }
+          if (pathname === "/api/spotify/disconnect" && req.method === "POST") {
+            return json(res, 200, spotify.disconnect());
+          }
+          return json(res, 404, { ok: false, error: "not found" });
+        } catch (e) {
+          return fail(e);
+        }
+      }
+
+      if (pathname === "/api/lights" && req.method === "GET") {
+        const live = liveWithWarm();
+        return json(res, 200, {
+          ...(live || {}),
+          status: live?.status || "unknown",
+          writeSupported: true,
+          source: live?.source || "lights-write-proxy",
+          lights: live?.lights || [],
+          fetchedAt: live?.fetchedAt || null,
+          proxy: { write: true, warm: warm.ready },
+        });
+      }
+
+      if (pathname === "/api/lights/refresh" && req.method === "POST") {
+        const snap = await refreshLiveSnapshot();
+        return json(res, snap.ok ? 200 : 500, {
+          ok: snap.ok,
+          live: snap.live,
+          error: snap.error || null,
+        });
+      }
+
+      if (
+        (pathname === "/api/lights/set" || pathname === "/api/lights") &&
+        req.method === "POST"
+      ) {
+        const body = await readBody(req);
+        const id = String(body.id || body.lightId || "").trim();
+        const allOn = body.all === true || body.allOn === true;
+        const allOff = body.all === false || body.allOff === true;
+
+        let argv = [];
+        if (allOn) argv = ["--all-on"];
+        else if (allOff) argv = ["--all-off"];
+        else {
+          if (!ROSTER_IDS.has(id)) {
+            return json(res, 400, {
+              error: "id required: dining-room|harris-room|kitchen",
+            });
+          }
+          argv = ["--id", id];
+          if (typeof body.on === "boolean") argv.push("--on", body.on ? "true" : "false");
+          if (body.brightness != null && !(typeof body.brightness === "number" && body.brightness >= 0 && body.brightness <= 100)) {
+            return json(res, 400, { error: "brightness 0-100" });
+          }
+          if (typeof body.brightness === "number") {
+            argv.push("--brightness", String(Math.round(body.brightness)));
+          }
+          if (argv.length === 2) {
+            return json(res, 400, { error: "need on and/or brightness" });
+          }
+        }
+
+        const t0 = Date.now();
+        let msg;
+        if (allOn || allOff) msg = { op: "all", on: !!allOn };
+        else {
+          msg = { op: "set", id };
+          if (typeof body.on === "boolean") msg.on = body.on;
+          if (typeof body.brightness === "number") msg.brightness = Math.round(body.brightness);
+        }
+        const fast = await daemonCall(msg);
+        if (fast && fast.ok) {
+          scheduleSnapshotRefresh();
+          console.log(`[lights-write-proxy] warm ${JSON.stringify(msg)} ${Date.now() - t0}ms`);
+          return json(res, 200, {
+            ok: true,
+            warm: true,
+            ms: Date.now() - t0,
+            write: { ok: true, lights: fast.lights },
+            live: liveWithWarm(),
+          });
+        }
+        if (fast && !fast.ok && /unknown id|need on/.test(fast.error || "")) {
+          return json(res, 400, { ok: false, error: fast.error });
+        }
+
+        // Fallback: one-shot cold write (full login) if warm session is down.
+        const result = await runWrite(argv, args);
+        if (!result.ok) {
+          return json(res, 502, {
+            ok: false,
+            error: result.error || "kasa write failed",
+            detail: result.parsed || null,
+          });
+        }
+        scheduleSnapshotRefresh();
+        console.log(`[lights-write-proxy] cold ${argv.join(" ")} ${Date.now() - t0}ms`);
+        return json(res, 200, {
+          ok: true,
+          warm: false,
+          ms: Date.now() - t0,
+          write: result.parsed,
+          live: liveWithWarm(),
+        });
+      }
+
+      return json(res, 404, { error: "not found" });
+    } catch (err) {
+      const msg = err && err.message ? err.message : String(err);
+      console.error("[lights-write-proxy]", msg);
+      return json(res, 500, { error: msg });
+    }
+  });
+
+  startDaemon(args);
+  process.on("exit", () => {
+    try {
+      if (warm.child) warm.child.kill();
+    } catch {}
+  });
+  for (const sig of ["SIGTERM", "SIGINT"]) process.on(sig, () => process.exit(0));
+
+  server.listen(args.port, args.host, () => {
+    args.port = server.address().port;   /* LHVID1' · --port 0 (tests): the kernel picks the port and we print the real one */
+    const shown = args.host === "0.0.0.0" ? "0.0.0.0 (all interfaces)" : args.host;
+    console.log(`lights-write-proxy listening http://${shown}:${args.port}`);
+    console.log(`  health:  http://127.0.0.1:${args.port}/health`);
+    console.log(`  set:     POST http://127.0.0.1:${args.port}/api/lights/set`);
+    if (args.authToken) console.log(`  auth:    X-Lights-Proxy-Token (set)`);
+    console.log(`  secrets: ~/.config/wardos/kasa.* (mode 600) — never on Pages`);
+  });
+}
+
+/* CAMLOCK1 · run only when invoked directly so tests can import checkAuth */
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}

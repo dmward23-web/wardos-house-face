@@ -19,11 +19,16 @@ The local tunnel config maps the two hostnames above and a 404 fallback. That ch
 ## What this checkout now contains
 
 - `ops/box-recover/`: the lights recovery script, the pinned manifest, the ingress review, the vendored supervisor and lock files, and mock tests.
-- `ops/pi-hub/`: a plan/stage/rollback kit and an aarch64 wheel hash lock for the same 21 Kasa versions. The wheels were downloaded and hashed on x86_64. They were not imported on aarch64. The kit does not enable a service or join a tunnel.
+- `ops/pi-hub/`: plan, offline-verify, install, and rollback are separate from activation. Activation exits 78. The aarch64 wheel hashes were downloaded on x86_64 and were not imported. Sensi is not in the Pi kit.
+- `ops/box-recover/runtime-src/`: ten clean runtime sources from bundle `46bc87d4…`. The Sensi file is not among them.
+
+## Ready and not ready
+
+Ready for review: the recovery plan, mock tests, ingress review, rollback behavior, the ten-file runtime pin, and the Pi verify/install tree. Not ready to execute on the box. Not a complete pin. The Sensi hash is an opaque pin of the existing file, the security review is open, and cached stills are undecided. ARM import is not tested. Wheel hashes are not an install. No SSH, token transfer, or tunnel join is included.
 
 ## What is still missing
 
-Runtime hashes and dirty-tree bytes listed in `PARENT-FILE-REQUEST.txt`. A cached-stills decision. An independent gate. The hold release. A Pi-local import of the aarch64 wheels. Any SSH, secret transfer, tunnel join, camera start, or box retirement. None of those are requested now.
+A secret-free Sensi integration, or an independent gate that accepts the existing opaque hash without copying the file. A cached-stills decision. The hold release. A Pi-local import of the aarch64 wheels. Camera start and box retirement stay out. None of those are requested now.
 
 ## What a person still has to do later, and why
 

@@ -47,6 +47,33 @@ test("aarch64 lock matches the box versions and splits pure hashes from compiled
   }
 });
 
+test("offline verify does not install and refuses activation", () => {
+  const r = spawnSync("bash", [SH, "--offline-verify"], { encoding: "utf8" });
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  assert.match(r.stdout, /ARM_IMPORT: NOT TESTED/);
+  assert.match(r.stdout, /WHEEL_HASH_IS_NOT_INSTALL: true/);
+  assert.match(r.stdout, /SENSI: excluded/);
+  const act = spawnSync("bash", [SH, "--activate"], { encoding: "utf8" });
+  assert.equal(act.status, 78);
+  assert.match(act.stdout, /REFUSE activation/);
+});
+
+test("install refuses live paths and the startup script does not listen", () => {
+  for (const dest of ["/etc/systemd/system", "/home/dan/wardos", "/workspace/wardos-ops"]) {
+    const r = spawnSync("bash", [SH, "--install", "--dest", dest], { encoding: "utf8" });
+    assert.notEqual(r.status, 0, dest);
+    assert.match(r.stdout + r.stderr, /REFUSE dest/);
+  }
+  const dest = fs.mkdtempSync(path.join(os.tmpdir(), "pi-hub-install-"));
+  const staged = spawnSync("bash", [SH, "--install", "--dest", dest], { encoding: "utf8" });
+  assert.equal(staged.status, 0, staged.stderr + staged.stdout);
+  assert.equal(fs.existsSync(path.join(dest, "bin/sensi-control.mjs")), false);
+  const start = spawnSync(path.join(dest, "bin/wardos-pi-lights.sh"), { encoding: "utf8" });
+  assert.equal(start.status, 78);
+  assert.equal(fs.existsSync(path.join(dest, "deps/ARM-IMPORT-NOT-TESTED")), true);
+  fs.rmSync(dest, { recursive: true, force: true });
+});
+
 test("stage and rollback stay inside the dest and do not define a camera or tunnel start", () => {
   const dest = fs.mkdtempSync(path.join(os.tmpdir(), "pi-hub-"));
   const neighbor = path.join(path.dirname(dest), "live-feed.json");

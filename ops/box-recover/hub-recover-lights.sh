@@ -67,6 +67,7 @@ EOF
 print_plan() {
   cat <<'EOF'
 PLAN lights-recover: NOT AN EXECUTION
+NOT GATE-READY. The runtime pin is incomplete: scripts/sensi-control.mjs is hash-only because of an embedded credential, and cached stills are undecided.
 NOT APPROVED. This package contains no hold release and does not ask for one.
 Cached stills: UNDECIDED. Execute stays refused until a gate file sets cached_stills to allow-existing. hold also refuses. Routes are left as they are.
 Dirty run tree: 54 tracked modifications and 3 untracked files. HEAD b79bf2270b47294b8e75f76d9b227df924fa3941 is not a full pin and is not in origin/main. Pre-reboot b71 source is uncertain.

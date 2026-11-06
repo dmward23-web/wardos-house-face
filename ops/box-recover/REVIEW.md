@@ -1,6 +1,8 @@
 # Lights recovery review
 
-This package is not approval to run it. Atlas's 17:11 hold still stands: box execution waits for this finished artifact, the sanitized ingress and provenance checks below, a rollback scope, an independent gate, and one narrow hold release. Nothing here asks Dan to approve an unready action.
+This package is not gate-ready to execute. The runtime pin is incomplete, and cached stills are undecided. Atlas's 17:11 hold still stands. Nothing here asks Dan to approve an unready action.
+
+`scripts/sensi-control.mjs` is pinned only by sha256 `54f8715454d1e4e851ffd2ead6d87ddbaed204368b63c7d74e2b4c4fe0c58ffc`. Line 32 is an embedded CLIENT_SECRET string literal. The file is not in this artifact, and this recovery does not rewrite or rotate the existing box file. That security review stays open.
 
 ## What a start would expose
 
@@ -25,7 +27,7 @@ Starting the two existing connectors would restore both hostnames. The cams host
 
 Run tree `/workspace/wt-house-run-b79bf227`, HEAD `b79bf2270b47294b8e75f76d9b227df924fa3941`. That commit is not in `origin/main`. The worktree is dirty: 54 tracked modifications and 3 untracked files. HEAD is not a full pin. Pre-reboot `b71` is a historical report, not proof of what the reboot stopped. PR 14 is the open Sunday Home branch, not this runtime.
 
-`MANIFEST.json` pins the runtime hashes that were supplied. It refuses `--execute` while any required hash is null. Repo main hashes in that file are labeled as not pins. Files whose bytes differ from repo main, or whose runtime hash was never supplied, are listed in `PARENT-FILE-REQUEST.txt`. No secret files are requested.
+The clean runtime bundle `46bc87d451344e3c0c1c66748236bea0a36946175ed5df58558acef03752b4d1` replaced `e72743c81c4ea2cfce6fe6be5bf1dcf17b1491e0d08981ed51b9918e6b47e91d`. Its ten source files are under `runtime-src/` and match `MANIFEST.json`. `--execute` still refuses while the Sensi security review is open, before it opens that file.
 
 The box Kasa lock has 21 package declarations and 21 `--hash` entries. An earlier note that said 22 hashes was wrong. Recovery does not rebuild that venv.
 

@@ -1,0 +1,24 @@
+{
+  "schema": "wardos.pi-hub.manifest/1",
+  "not_gate_ready_for_activation": true,
+  "target": {
+    "os": "Raspberry Pi OS Trixie arm64 Desktop",
+    "hostname": "wardos-pi",
+    "user": "dan",
+    "network": "Ward Wi-Fi",
+    "ssh": "off",
+    "inspected_by_this_checkout": false
+  },
+  "modes": ["plan", "offline-verify", "install", "rollback", "activate"],
+  "activate_exit": 78,
+  "arm_import": "NOT TESTED",
+  "wheel_hash_is_not_an_install": true,
+  "kasa_lock_packages": 21,
+  "kasa_lock_hashes": 21,
+  "sensi": "excluded; security review open; file not carried",
+  "tokens": "absent",
+  "tunnel_join": false,
+  "ssh_enable": false,
+  "install_dest_allow": ["/tmp", "/var/tmp", "/opt/cursor/artifacts"],
+  "install_dest_refuse": ["/etc", "/home/dan", "/workspace", "this git checkout"]
+}
