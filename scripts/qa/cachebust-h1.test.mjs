@@ -95,7 +95,7 @@ test("H1-CB · no served page loads a halloween1-changed asset with its pre-rang
   assert.deepEqual(hits, []);
 });
 /* HUBPAIR1 · a script changed again after halloween1 carries the newer token */
-const NEWER = { "house-board-strip.js": "PAIRUI1", "house-lights.js": "SUNHOME1", "house-spotify.js": "ADULTCUT2B", "school-names.js": "SUNHOME1", "house-ori-calm.js": "SUNHOME1" }; /* SPOTCUT1 · the Spotify setup moved Dad-only; ADULTCUT2 · and the Spotify sign-in */ /* PAIRUI1 · both changed again; PAIRUI1b · lights once more; CAMREST4 · and again; CAMREST5 · and again */ /* SUNHOME2 · school-names and ori-calm leave the Halloween stamp */
+const NEWER = { "house-board-strip.js": "PAIRUI1", "house-lights.js": "SUNHOME1", "house-spotify.js": "ADULTCUT2B", "school-names.js": "SUNHOME1", "house-ori-calm.js": "SUNHOME1", "house-trips-bind.js": "SUNHOME2" }; /* SPOTCUT1 · the Spotify setup moved Dad-only; ADULTCUT2 · and the Spotify sign-in */ /* PAIRUI1 · both changed again; PAIRUI1b · lights once more; CAMREST4 · and again; CAMREST5 · and again */ /* SUNHOME2 · school-names and ori-calm leave the Halloween stamp */
 test("H1-CB · the six named scripts are re-tokened on the pages that load them", () => {
   const want = { "house-board-strip.js": "sheet-index.html", "house-lights.js": "sheet-lights.html", "house-ori-calm.js": "sheet-index.html",
     "house-spotify.js": "sheet-spotify.html", "house-trips-bind.js": "sheet-us.html", "school-names.js": "kid-hayes.html" };

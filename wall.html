@@ -96,7 +96,7 @@ const Q=new URLSearchParams(location.search),DPR3=Q.get('dpr')==='3',TAPDOT=Q.ha
 const RM=matchMedia('(prefers-reduced-motion: reduce)');
 const $=s=>document.querySelector(s);
 const gl$=$('#gl'),fx=$('#fx'),c2=fx.getContext('2d'),dot=$('#dot'),V=$('#bg');
-// HALLOWEEN1 WALLVID (LHVID1 port) · no video or source src until night/media/caps.json says video:true (Pages serves false, so 0 mp4 404s); a load error drops the src quietly and the poster/still shows.
+// WALLVID (LHVID1 port) · no video or source src until night/media/caps.json says video:true (Pages serves false, so 0 mp4 404s); a load error drops the src quietly and the poster/still shows.
 let WOK=false;const WQ=[];function wsrc(el,u){WQ.push([el,u]);el.addEventListener('error',function(){const m=el.tagName==='SOURCE'?el.parentNode:el;el.removeAttribute('src');if(m&&m.load)try{m.load()}catch(_){}},{once:true});if(WOK)wgo(el,u);return u}function wgo(el,u){el.src=u;const m=el.tagName==='SOURCE'?el.parentNode:el;if(m&&m.load&&m.preload!=='none')try{m.load()}catch(_){}}
 fetch('night/media/caps.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.video===true){WOK=true;for(const [el,u] of WQ)wgo(el,u)}}).catch(()=>{});
 let P,mode,dpr,vw,vh,S,OX,OY,ready=0;
