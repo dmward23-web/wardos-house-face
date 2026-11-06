@@ -69,6 +69,7 @@ const THEME_STRIP = (t) => t
   .replace(/<script src="house-money-bind\.js\?v=[^"]+"><\/script>\n?/g, "")
   .replace(/<script src="month-theme\/season-math\.js\?v=[A-Z0-9]+"><\/script>/g, "")
   .replace(/(month-theme\/month-overlay\.css)\?v=[A-Z0-9]+/g, "$1?v=V")
+  .replace(/(kid-world\.css)\?v=[A-Z0-9]+/g, "$1?v=V")
   .replace(/<script src="livinghouse\/clock\.js\?v=[A-Z0-9]+"><\/script><script src="livinghouse\/scene-packs\.js\?v=[A-Z0-9]+"><\/script>/g, "")
   .replace(/<link rel="stylesheet" href="wg-glass\.css[^"]*" \/>\n?/g, "").replace(THEME_TAGS, "").split("\n")
   .filter((l) => !/^<link rel="stylesheet" href="wg-glass\.css[^"]*" \/>$/.test(l))

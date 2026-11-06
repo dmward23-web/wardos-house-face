@@ -357,6 +357,9 @@ test("hub home control is the house glyph, and Jars stays on the adult chores bo
   assert.match(hub, /assets\/icons\/home-key-light\.svg/);
   const jars = hub.slice(hub.indexOf('class="tile stars"'), hub.indexOf('class="tile fun"'));
   assert.match(jars, /href="sheet-chores\.html"/);
+  assert.match(jars, /On the chores board/);
+  assert.match(jars, /No score on this tile/);
+  assert.doesNotMatch(jars, /Stars fill the jar|Stars only|Tap musts, then the jar/);
   assert.doesNotMatch(jars, /sheet-allowance/);
   for (const f of ["kid-ainsley.html", "kid-hayes.html", "kid-harris.html"]) {
     assert.doesNotMatch(rd(f), /sheet-allowance/, f);
@@ -370,6 +373,7 @@ test("mute is a speaker, and Ainsley's jar hides empty progress bars", () => {
   const css = rd("kid-world.css");
   assert.match(css, /body\.theme-ainsley \.bank-track,\s*body\.theme-ainsley \.grow-meter/);
   assert.match(css, /display:\s*none\s*!important/);
+  assert.match(css, /body\.theme-ainsley #sec-days \.harbor-strip:not\(:has\(\.card\)\) \{ display: none !important; \}/);
 });
 
 const SPOOK_LINES = ["Boo. Did I spook you?", "Happy haunting.", "The pumpkins are whispering."];
@@ -427,4 +431,104 @@ test("November hub does not request the Halloween spook layer or the porch scene
   assert.ok(oct.made.some((el) => /scene\.html/.test(el.src)), "other months still have the night scene");
   const pinned = bootNight("2026-10-20T20:00:00-05:00", "?month=11");
   assert.equal(pinned.made.some((el) => /scene\.html/.test(el.src)), false, "a pinned November does not load the scene");
+});
+
+function bootOverlay(iso, width, scriptSrc) {
+  const props = {};
+  const attrs = {};
+  const html = {
+    attrs,
+    style: { setProperty(k, v) { props[k] = v; } },
+    setAttribute(k, v) { this.attrs[k] = String(v); },
+    getAttribute(k) { return Object.prototype.hasOwnProperty.call(this.attrs, k) ? this.attrs[k] : null; }
+  };
+  const body = { hasAttribute: () => false, firstChild: null, kids: [], insertBefore(c) { this.kids.push(c); }, appendChild(c) { this.kids.push(c); } };
+  const fx = { id: "fx", parentNode: body, nextSibling: null };
+  function fakeCtx() {
+    const c = new Proxy(function () {}, {
+      get() { return () => c; },
+      apply() { return c; },
+      set() { return true; }
+    });
+    return c;
+  }
+  const document = {
+    documentElement: html,
+    body,
+    readyState: "complete",
+    currentScript: { src: scriptSrc },
+    createElement(tag) {
+      const el = {
+        tag, id: "", className: "", style: {}, attrs: {}, kids: [],
+        classList: { add() {} },
+        setAttribute(k, v) { this.attrs[k] = v; if (k === "id") this.id = v; },
+        getAttribute(k) { return this.attrs[k]; },
+        appendChild(c) { this.kids.push(c); return c; },
+        getContext() { return fakeCtx(); }
+      };
+      return el;
+    },
+    querySelector(sel) { return String(sel).indexOf("#fx") >= 0 ? fx : null; },
+    querySelectorAll() { return []; },
+    getElementById(id) { return id === "fx" ? fx : null; },
+    addEventListener() {}
+  };
+  const fixed = Date.parse(iso);
+  class FakeDate extends Date {
+    constructor(...a) { super(...(a.length ? a : [fixed])); }
+    static now() { return fixed; }
+  }
+  const ctx = vm.createContext({
+    document, Date: FakeDate, Intl, URLSearchParams, console,
+    location: { search: "", pathname: "/sheet-index.html", href: "http://hub.local/sheet-index.html", origin: "http://hub.local" },
+    innerWidth: width, innerHeight: 900,
+    matchMedia: () => ({ matches: true, addEventListener() {} }),
+    requestAnimationFrame() { return 1; },
+    cancelAnimationFrame() {},
+    performance: { now: () => 0 },
+    addEventListener() {}
+  });
+  ctx.window = ctx;
+  vm.runInContext(rd("month-theme/season-math.js") + "\n" + rd("month-theme/month-overlay.js"), ctx, { filename: "month-overlay.js" });
+  return { props, attrs };
+}
+
+test("November hub plate URL is absolute from the script, so CSS does not double month-theme", () => {
+  const src = "http://hub.local/month-theme/month-overlay.js";
+  const wall = bootOverlay("2026-11-08T17:30:00-06:00", 1080, src);
+  assert.equal(wall.props["--km-bg"], 'url("http://hub.local/month-theme/november/wall-dusk.webp")');
+  const phone = bootOverlay("2026-11-08T17:30:00-06:00", 390, src);
+  assert.equal(phone.props["--km-bg"], 'url("http://hub.local/month-theme/november/phone-dusk.webp")');
+  const night = bootOverlay("2026-11-08T21:00:00-06:00", 1080, src);
+  assert.equal(night.props["--km-bg"], 'url("http://hub.local/month-theme/november/wall-night.webp")');
+  for (const bg of [wall.props["--km-bg"], phone.props["--km-bg"], night.props["--km-bg"]]) {
+    assert.equal(bg.includes("month-theme/month-theme"), false);
+  }
+  const living = bootOverlay("2026-11-08T17:30:00-06:00", 390, "http://hub.local/month-theme/month-overlay.js?v=SUNHOME1");
+  assert.equal(living.props["--km-bg"], 'url("http://hub.local/month-theme/november/phone-dusk.webp")');
+});
+
+test("December mounts the shared winter coat and lights one window a day through the 25th", () => {
+  const eve = bootOverlay("2026-11-30T18:00:00-06:00", 1080, "http://hub.local/month-theme/month-overlay.js");
+  assert.equal(eve.attrs["data-month-theme"], "11");
+  assert.equal(eve.attrs["data-season-id"], undefined);
+  const dec1 = bootOverlay("2026-12-01T18:00:00-06:00", 1080, "http://hub.local/month-theme/month-overlay.js");
+  assert.equal(dec1.attrs["data-month-theme"], "12");
+  assert.equal(dec1.attrs["data-season-id"], "december");
+  assert.equal(dec1.attrs["data-season-lit"], "1");
+  const dec25 = bootOverlay("2026-12-25T18:00:00-06:00", 1080, "http://hub.local/month-theme/month-overlay.js");
+  assert.equal(dec25.attrs["data-season-lit"], "25");
+  assert.equal(dec25.attrs["data-month-theme"], "12");
+  const dec31 = bootOverlay("2026-12-31T18:00:00-06:00", 1080, "http://hub.local/month-theme/month-overlay.js");
+  assert.equal(dec31.attrs["data-season-lit"], "25");
+});
+
+test("living house does not load the Halloween porch or mattes", () => {
+  const lh = rd("livinghouse/index.html");
+  assert.doesNotMatch(lh, /wg-porch\.js/);
+  assert.doesNotMatch(lh, /wg-mattes\.(?:js|css)/);
+  assert.doesNotMatch(lh, /wg-porch\.css/);
+  assert.match(lh, /class="wg-porch"/);
+  assert.doesNotMatch(rd("sheet-index.html"), /school-names\.js\?v=HALLOWEEN1|away-filter\.js\?v=HALLOWEEN1|night-host\.css\?v=HALLOWEEN1|house-clock\.js\?v=HALLOWEEN1/);
+  assert.doesNotMatch(lh, /school-names\.js\?v=HALLOWEEN1/);
 });

@@ -544,6 +544,7 @@ body.theme-ainsley .xp-stage,
 body.theme-ainsley .bank-track,
 body.theme-ainsley .grow-meter,
 body.theme-ainsley .consume-label .line { display: none !important; }
+body.theme-ainsley #sec-days .harbor-strip:not(:has(.card)) { display: none !important; }
 @media (max-width: 700px) { .kid-pebble { width: 44px; height: 44px; } }
 .kw-canvas { z-index: 1; pointer-events: auto; touch-action: none; }
 .kw-stage {

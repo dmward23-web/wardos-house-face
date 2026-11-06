@@ -31,6 +31,7 @@
   }
   var spec = specNow();
   if (spec.id === "november") { mountNovember(); return; }
+  if (spec.id === "december") { mountCoat(spec); return; }
   function ctHour(d) {
     try {
       var p = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", hour: "numeric", hourCycle: "h23" }).formatToParts(d);
@@ -49,7 +50,8 @@
       var when = seasonDate();
       var phase = novPhase(when);
       var phone = (window.innerWidth || 0) < 700;
-      var plate = "month-theme/november/" + (phone ? "phone-" : "wall-") + phase + ".webp";
+      /* CSS consumes --km-bg from month-overlay.css, so a page-relative url doubles month-theme/. Leaves already use base. */
+      var plate = base + "month-theme/november/" + (phone ? "phone-" : "wall-") + phase + ".webp";
       var kidPage = /\/kid-[a-z]+/.test(location.pathname || "") || !!(document.body && document.body.hasAttribute("data-kid-world"));
       document.documentElement.setAttribute("data-month-theme", "11");
       document.documentElement.setAttribute("data-nov-phase", phase);
