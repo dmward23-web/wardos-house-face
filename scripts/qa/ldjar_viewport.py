@@ -102,7 +102,14 @@ with sync_playwright() as p:
         samples.append(pg.evaluate(Jx))
         for t in [300, 2000]:
             pg.wait_for_timeout(t); samples.append(pg.evaluate(Jx))
-        if page in ("allowance", "kid-ainsley"):   # deterministic final sample: wait for the jar's one feed read to finish, not a guess
+        if page == "allowance" and mode not in ("nofeed", "bad"):
+            # dadWk is kids-data.js renderBank, a different fetch from ains-jar-state's data-jar-settled. Wait for the figure itself.
+            pg.wait_for_function(r"""() => {
+              const el = document.querySelector('.bank.ainsley [data-dad-wk]');
+              const settled = document.documentElement.hasAttribute('data-jar-settled');
+              return !!(settled && el && !el.hidden && /^\$\d+ wk$/.test((el.innerText || '').trim()));
+            }""", timeout=90000)
+        elif page in ("allowance", "kid-ainsley"):
             pg.wait_for_function("() => document.documentElement.hasAttribute('data-jar-settled')", timeout=90000)
         else:
             pg.wait_for_timeout(7000 if mode == "slow" else 4000)

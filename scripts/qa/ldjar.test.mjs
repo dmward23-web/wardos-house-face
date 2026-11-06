@@ -143,7 +143,7 @@ test("AINSSTAR1 (real browser): no star glyph or digit in Ainsley's rows before,
          before data it may be empty; once the feed read has settled with data (feed, slow) it must be there, never empty */
       assert.ok(s.bank.dadWk === "" || WK.test(s.bank.dadWk), mode + " Dad weekly figure shape: " + s.bank.dadWk);
     }
-    const last = r.samples[r.samples.length - 1];   // the settled sample (data-jar-settled)
+    const last = r.samples[r.samples.length - 1];   // allowance feed/slow: harness waits until visible [data-dad-wk] is $N wk
     if (mode !== "nofeed") assert.match(last.bank.dadWk, WK, mode + " Dad weekly figure must show once data has landed");
     assert.deepEqual(r.errors, []);
   }

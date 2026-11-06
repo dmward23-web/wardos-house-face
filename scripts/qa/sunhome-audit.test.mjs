@@ -4,8 +4,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import http from "node:http";
 import path from "node:path";
 import vm from "node:vm";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -350,11 +352,11 @@ test("hub kid tiles keep their world art over the shorthand backgrounds", () => 
   assert.match(hub, /background-image:\s*url\("month-theme\/hub\/kidtile-harris\.webp"\)\s*!important/);
   assert.match(hub, /background-size:\s*cover\s*!important/);
   const portrait = hub.slice(hub.indexOf("(orientation: portrait) and (min-height: 1500px)"));
-  assert.match(portrait, /hub-window \{[^}]*flex:\s*0 0 auto !important/);
-  assert.match(portrait, /height:\s*min\(38vh, 420px\) !important/);
-  assert.match(portrait, /minmax\(228px, auto\) !important/);
-  assert.match(portrait, /min-height:\s*228px !important/);
-  assert.doesNotMatch(portrait.slice(0, 900), /hub-window \{[^}]*flex:\s*1 1 auto/);
+  assert.match(portrait, /height:\s*280px !important/);
+  assert.match(portrait, /minmax\(190px, auto\) !important/);
+  assert.match(portrait, /min-height:\s*190px !important/);
+  assert.match(portrait, /overflow:\s*visible !important/);
+  assert.doesNotMatch(portrait, /grid-wrap \{[^}]*overflow:\s*hidden/);
 });
 
 test("hub home control is the house glyph, and Jars stays on the adult chores board", () => {
@@ -537,4 +539,80 @@ test("living house does not load the Halloween porch or mattes", () => {
   assert.match(lh, /class="wg-porch"/);
   assert.doesNotMatch(rd("sheet-index.html"), /school-names\.js\?v=HALLOWEEN1|away-filter\.js\?v=HALLOWEEN1|night-host\.css\?v=HALLOWEEN1|house-clock\.js\?v=HALLOWEEN1/);
   assert.doesNotMatch(lh, /school-names\.js\?v=HALLOWEEN1/);
+});
+
+test("portrait wall hub fits 1080x1920 with the roster on screen", { skip: process.env.QA_NO_BROWSER === "1" ? "SKIP QA_NO_BROWSER=1" : false }, async () => {
+  const pp = createRequire(import.meta.url)("puppeteer-core");
+  const chrome = process.env.CHROME_PATH || process.env.WARDOS_CHROME || "/usr/local/bin/google-chrome";
+  const srv = http.createServer((req, res) => {
+    const rel = decodeURIComponent(new URL(req.url, "http://x").pathname).replace(/^\/+/, "") || "sheet-index.html";
+    const f = path.join(ROOT, path.normalize(rel).replace(/^(\.\.(\/|\\|$))+/, ""));
+    fs.readFile(f, (err, buf) => {
+      if (err) { res.writeHead(404); res.end(); return; }
+      res.writeHead(200); res.end(buf);
+    });
+  });
+  await new Promise((ok) => srv.listen(0, "127.0.0.1", ok));
+  const base = "http://127.0.0.1:" + srv.address().port;
+  const b = await pp.launch({ executablePath: chrome, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
+  try {
+    const measure = async (w, h) => {
+      const g = await b.newPage();
+      await g.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
+      await g.goto(base + "/sheet-index.html?pfOffline=1&now=2026-11-08T17:30:00-06:00", { waitUntil: "domcontentloaded", timeout: 60000 });
+      await g.waitForFunction(() => document.querySelector(".tile.ainsley") && getComputedStyle(document.querySelector(".tile.ainsley")).backgroundImage.includes("kidtile-ainsley"), { timeout: 20000 });
+      const r = await g.evaluate(() => {
+        const tiles = [...document.querySelectorAll(".tile-grid > .tile, .tile-grid > .kid-flip")];
+        const box = (el) => { const b = el.getBoundingClientRect(); return { h: b.height, top: b.top, bottom: b.bottom, bg: getComputedStyle(el).backgroundImage }; };
+        const kids = ["ainsley", "hayes", "harris"].map((k) => box(document.querySelector(".tile." + k)));
+        return {
+          scroll: document.documentElement.scrollHeight,
+          inner: innerHeight,
+          tiles: tiles.map(box),
+          kids,
+          wrapOverflow: getComputedStyle(document.querySelector(".grid-wrap")).overflowY
+        };
+      });
+      await g.close();
+      return r;
+    };
+    const wall = await measure(1080, 1920);
+    assert.ok(wall.scroll <= wall.inner, "wall scrolls " + wall.scroll + " > " + wall.inner);
+    assert.equal(wall.tiles.length, 10, "ten roster slots");
+    const shown = wall.tiles.filter((t) => t.h >= 1);
+    assert.ok(shown.length >= 9, "roster tiles on screen " + shown.length);
+    for (const t of shown) {
+      assert.ok(t.h >= 120, "tile collapsed to " + t.h);
+      assert.ok(t.bottom <= wall.inner + 1, "tile cut at " + t.bottom);
+      assert.ok(t.top >= 0, "tile above the viewport");
+    }
+    for (const k of wall.kids) {
+      assert.ok(k.h >= 180, "kid tile " + k.h);
+      assert.match(k.bg, /kidtile-/);
+    }
+    assert.notEqual(wall.wrapOverflow, "hidden");
+    const phone = await measure(390, 844);
+    assert.ok(phone.scroll > phone.inner, "phone keeps its scroll");
+    const house = await b.newPage();
+    await house.setViewport({ width: 1080, height: 1920, deviceScaleFactor: 1 });
+    await house.goto(base + "/livinghouse/index.html?now=2026-11-08T17:30:00-06:00", { waitUntil: "domcontentloaded", timeout: 60000 });
+    await house.waitForFunction(() => document.documentElement.getAttribute("data-season") === "november" && document.getElementById("lh-crypt-door").hidden, { timeout: 20000 });
+    const lh = await house.evaluate(() => {
+      const sub = document.querySelector("[data-lh=chores-sub]");
+      const lab = document.querySelector(".lh-cauldron .lab");
+      return {
+        door: document.getElementById("lh-crypt-door").hidden,
+        crypt: document.getElementById("lh-crypt").hidden,
+        pot: document.querySelector(".lh-cauldron .pot").hidden,
+        sub: sub.textContent,
+        chores: (lab.textContent || "").replace(/\s+/g, " ").trim()
+      };
+    });
+    await house.close();
+    assert.equal(lh.door, true, "crypt door hidden in November");
+    assert.equal(lh.crypt, true, "crypt panel stays shut");
+    assert.equal(lh.pot, true, "cauldron pot hidden in November");
+    assert.equal(lh.sub, "", "no brewing line");
+    assert.match(lh.chores, /^Chores/);
+  } finally { await b.close(); srv.close(); }
 });

@@ -4115,32 +4115,47 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 .hub-home img { width: 22px; height: 22px; display: block; }
 header.hdr { position: relative; }
 @media (orientation: portrait) and (min-height: 1500px) {
-  html, body { height: 100dvh; overflow: hidden; }
-  body .panel { height: 100dvh; max-height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
-  /* The window is a band. flex-grow here used to eat the portrait panel and collapse the roster to 24px rows. */
-  body .panel > .hub-window {
+  /* Wall portrait fits in the viewport. SCROLL5's +240px runway would keep scrollHeight at 2160 even when the roster fits.
+     Nothing here clips the roster: overflow stays visible and every tile is in normal flow. */
+  html:not(#hf-scroll-off) { height: auto !important; max-height: none !important; }
+  html:not(#hf-scroll-off) > body { min-height: 0 !important; height: auto !important; max-height: none !important; }
+  html body .panel {
+    height: auto !important; max-height: none !important; min-height: 0 !important;
+    overflow: visible !important; display: flex; flex-direction: column;
+  }
+  html body .panel > .hub-cam-deck,
+  html body #hub-cam-deck.hub-cam-deck {
+    flex: 0 0 auto !important; height: 150px !important; min-height: 0 !important; max-height: 150px !important;
+  }
+  html body .hub-upper,
+  html body .hub-upper.hub-upper--cams {
+    flex: 0 0 auto !important; align-items: stretch !important; min-height: 0 !important; height: auto !important; max-height: none !important;
+  }
+  html body .hub-upper .leaveby {
+    min-height: 0 !important; height: auto !important; max-height: none !important; flex: 1 1 auto !important;
+  }
+  html body #hub-lights-panel,
+  html body .hub-lights.hub-lights--cams {
+    height: auto !important; min-height: 0 !important; max-height: none !important; align-self: stretch !important;
+  }
+  html body .hub-upper .hub-sw { min-height: 56px !important; }
+  html body .panel > .hub-window {
     flex: 0 0 auto !important;
-    height: min(38vh, 420px) !important;
-    min-height: 0 !important;
-    max-height: min(38vh, 420px) !important;
-    margin: 8px 12px;
+    height: 280px !important; min-height: 0 !important; max-height: 280px !important;
+    margin: 6px 12px !important;
   }
   html body .panel > .grid-wrap {
-    flex: 1 1 auto !important;
-    margin-top: 0;
-    min-height: 0 !important;
-    overflow: hidden !important;
+    flex: 0 0 auto !important; height: auto !important; min-height: 0 !important;
+    margin-top: 0; overflow: visible !important;
   }
   html body .tile-grid.tile-grid--cams {
-    height: auto !important;
-    min-height: 0 !important;
-    grid-template-rows: repeat(4, minmax(228px, auto)) !important;
-    grid-auto-rows: minmax(228px, auto) !important;
+    height: auto !important; min-height: 0 !important; overflow: visible !important;
+    grid-template-rows: repeat(4, minmax(190px, auto)) !important;
+    grid-auto-rows: minmax(190px, auto) !important;
+    gap: 6px !important;
   }
   html body .tile-grid.tile-grid--cams > .tile {
-    min-height: 228px !important;
-    height: auto !important;
-    max-height: none !important;
+    min-height: 190px !important; height: auto !important; max-height: none !important;
   }
   .tile { box-shadow: none !important; }
 }

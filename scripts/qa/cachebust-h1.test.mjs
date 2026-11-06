@@ -64,6 +64,7 @@ const STALE = [
   ["month-theme/month-overlay.css", "MONTHFX2"],
   ["livinghouse/scene-packs.js", "H1P2D4"],
   ["livinghouse/lh.js", "H1P2D3"],
+  ["livinghouse/lh.js", "SUNHOME1"],
   ["kid-world.js", "ORI1"],
   ["kid-world.css", "DAYPKG1"],
   ["kid-world.css", "SUNHOME1"],
