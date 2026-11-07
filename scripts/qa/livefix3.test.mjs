@@ -95,7 +95,8 @@ const V2D_STRIP = (t) => {
 /* SUNHOME3 · kid templates no longer ship Bal/Week, Paid, or the show-Dad jar CTA. Fold those lines out of both sides. */
 const MONEY_FOLD = (t) => t
   .replace(/ <div class="money-row" aria-label="Money">\n <div class="money-chip"><span class="lab">Bal<\/span> \$?<span data-bank-balance>0<\/span><\/div>\n <div class="money-chip"><span class="lab">Week<\/span> \+\$?<span data-bank-week-earn>0<\/span><\/div>\n <\/div>\n\n/g, "")
-  .replace(/ <div class="paid-stamp" data-paid-stamp hidden>Paid<\/div>\n/g, "");
+  .replace(/ <div class="paid-stamp" data-paid-stamp hidden>Paid<\/div>\n/g, "")
+  .replace(/ <span hidden data-nocust>\.<\/span>\n/g, "");
 const V2H_FOLD = (t) => t
   .replace("  /* DAYPKG1 v2h · Atlas: nothing dead on kid glass. The jar-full line is plain text (no link, no button look); an empty CTA row is hidden so it leaves no gap */\n  .bank-links .unlock-cta { display:inline-block; font-size:13px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; cursor:default; }\n  .bank-links[hidden] { display:none !important; }\n", "")
   .replace(' <div class="bank-links" data-cta-row hidden>\n <span class="unlock-cta" data-unlock-cta hidden>Jar full · show Dad</span>\n',
