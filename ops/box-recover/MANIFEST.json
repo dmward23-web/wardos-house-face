@@ -141,6 +141,14 @@
   "runtime_bundle_sha256": "46bc87d451344e3c0c1c66748236bea0a36946175ed5df58558acef03752b4d1",
   "runtime_bundle_replaces_sha256": "e72743c81c4ea2cfce6fe6be5bf1dcf17b1491e0d08981ed51b9918e6b47e91d",
   "sensi_security_review": "open",
+  "v5_corrections": {
+    "npm_selection": "final PATH is set before resolution; npm ci runs the checked absolute node and the checked absolute npm",
+    "bootstrap_python3": "trusted prerequisite captured once before first use; not a pinned interpreter",
+    "sensi_acceptance": "residual-risk-not-closure",
+    "cached_stills": "open",
+    "remote_ingress_policy": "open",
+    "installed_code": "open"
+  },
   "v4_corrections": {
     "executable_bind": "hash and real path of the node, cloudflared, venv python, and npm the run would use; a metadata version list is not installed-code proof",
     "rollback_requires_matching_run_id": true,

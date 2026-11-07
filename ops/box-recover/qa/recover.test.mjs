@@ -586,6 +586,61 @@ test("point-in-time binary equality fail-closes off the box and does not close S
   assert.equal(shipped.files.find((row) => row.path === "scripts/sensi-control.mjs").security_review, "open");
 });
 
+test("inherited PATH and final PATH selecting different npm is refused before install", async () => {
+  const fx = fixture(await ports());
+  const hit = path.join(fx.root, "npm-hit");
+  const inherited = fs.mkdtempSync(path.join(os.tmpdir(), "npm-inherited-"));
+  const finalDecoy = fs.mkdtempSync(path.join(os.tmpdir(), "npm-final-"));
+  const body = (label) => "#!/bin/sh\necho " + label + " >> " + JSON.stringify(hit) + "\nexit 0\n";
+  fs.writeFileSync(path.join(inherited, "npm"), body("inherited"), { mode: 0o755 });
+  fs.writeFileSync(path.join(finalDecoy, "npm"), body("final"), { mode: 0o755 });
+  const nodeCmd = spawnSync("bash", ["-lc", "command -v node"], { encoding: "utf8" }).stdout.trim();
+  const npmCmd = spawnSync("bash", ["-lc", "command -v npm"], { encoding: "utf8" }).stdout.trim();
+  const nodeReal = fs.realpathSync(nodeCmd);
+  const npmReal = fs.realpathSync(npmCmd);
+  const finalGood = path.dirname(npmCmd) + ":" + path.dirname(nodeCmd) + ":/usr/bin:/bin";
+  const finalBad = finalDecoy + ":" + path.dirname(nodeCmd) + ":/usr/bin:/bin";
+  const script = fs.readFileSync(SH, "utf8");
+  assert.ok(script.indexOf('PATH="$(final_bind_path)"') < script.indexOf('"$BOOTSTRAP_PYTHON" "$CHECK" "${args[@]}"'));
+  assert.match(script, /"\$BOUND_NODE" "\$BOUND_NPM" ci --ignore-scripts/);
+  assert.doesNotMatch(script, /^npm ci /m);
+  assert.match(script, /trusted prerequisite, not a pinned interpreter/);
+  try {
+    const refused = run(["--execute-deps", "--fixture", fx.root, "--gate", fx.gate, "--manifest", fx.manifestPath, "--ports", fx.ports.join(" "), "--token-file", fx.token, "--ingress-review", fx.review, "--ingress-config", fx.cfg], envOf(fx, {
+      PATH: inherited + ":" + process.env.PATH,
+      WARDOS_RECOVERY_TEST_FINAL_PATH: finalBad,
+      WARDOS_EXPECT_NPM_SHA: sha(npmReal),
+    }));
+    assert.equal(refused.status, 21, refused.stdout + refused.stderr);
+    assert.match(refused.stdout + refused.stderr, /REFUSE bind/);
+    assert.equal(fs.existsSync(hit), false);
+    assert.equal(fs.existsSync(path.join(fx.t, "deps/node_modules/ws/package.json")), true);
+    const kept = JSON.parse(fs.readFileSync(path.join(fx.t, "deps/node_modules/ws/package.json"), "utf8"));
+    assert.equal(kept.version, "8.22.0");
+    fs.rmSync(path.join(fx.t, "deps/node_modules"), { recursive: true, force: true });
+    fs.copyFileSync(path.join(OPS, "reference/deps/package.json"), path.join(fx.t, "deps/package.json"));
+    fs.copyFileSync(path.join(OPS, "reference/deps/package-lock.json"), path.join(fx.t, "deps/package-lock.json"));
+    const gate = JSON.parse(fs.readFileSync(fx.gate, "utf8"));
+    gate.manifest_sha256 = sha(MANIFEST);
+    fs.writeFileSync(fx.gate, JSON.stringify(gate));
+    const selected = run(["--execute-deps", "--fixture", fx.root, "--gate", fx.gate, "--manifest", MANIFEST, "--ports", fx.ports.join(" "), "--token-file", fx.token, "--ingress-review", fx.review, "--ingress-config", fx.cfg], envOf(fx, {
+      PATH: inherited + ":" + process.env.PATH,
+      WARDOS_RECOVERY_TEST_FINAL_PATH: finalGood,
+      WARDOS_EXPECT_NPM_SHA: sha(npmReal),
+    }));
+    assert.equal(selected.status, 0, selected.stdout + selected.stderr);
+    assert.match(selected.stdout, /NODE /);
+    assert.match(selected.stdout, new RegExp("NPM " + npmReal.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    assert.equal(fs.existsSync(hit), false);
+    const installed = JSON.parse(fs.readFileSync(path.join(fx.t, "deps/node_modules/ws/package.json"), "utf8"));
+    assert.equal(installed.version, "8.22.0");
+  } finally {
+    cleanup(fx);
+    fs.rmSync(inherited, { recursive: true, force: true });
+    fs.rmSync(finalDecoy, { recursive: true, force: true });
+  }
+});
+
 test("dependency mode is explicit npm ci and does not start listeners", async () => {
   const fx = fixture(await ports());
   try {

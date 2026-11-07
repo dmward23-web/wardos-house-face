@@ -78,7 +78,8 @@ Cached stills: UNDECIDED. Execute stays refused until a gate file sets cached_st
 Dirty run tree: 54 tracked modifications and 3 untracked files. HEAD b79bf2270b47294b8e75f76d9b227df924fa3941 is not a full pin and is not in origin/main. Pre-reboot b71 source is uncertain.
 No required source hash is null. Execute still refuses without opaque Sensi acceptance and a cached-stills decision. The 17:43 binary pin is a fail-closed box check, not a hermetic proof. ws was absent at that capture.
 Kasa lock: 21 package declarations and 21 hash entries. It is not an arm64 lock. Recovery reuses the current venv and does not rebuild it.
-Node dependency install is a separate explicit mode and is not run by plan or by service start. The command is npm ci --ignore-scripts --no-audit --no-fund --prefix <DEPS>.
+Node dependency install is a separate explicit mode and is not run by plan or by service start. It runs the checked absolute node on the checked absolute npm: npm ci --ignore-scripts --no-audit --no-fund --prefix <DEPS>.
+Bootstrap python3 is a trusted prerequisite for the gate and checker. It is captured once before that use and is not a pinned interpreter.
 No healer loop, boot enable, cron, or feed rewrite is part of this package.
 No other hub host is proven or disproven.
 EOF
@@ -122,7 +123,17 @@ if [ "$MODE" = "execute" ]; then
   NEED_STILLS=(--need-stills)
   INGRESS_ARG=(--ingress "$REVIEW")
 fi
-python3 "$CHECK" gate --gate "$GATE" --script "$0" --manifest "$MANIFEST" "${INGRESS_ARG[@]}" "${NEED_STILLS[@]}"
+BOOTSTRAP_PYTHON="$(command -v python3 || true)"
+if [ -z "$BOOTSTRAP_PYTHON" ]; then
+  echo "REFUSE bootstrap python3 is absent. It is a trusted prerequisite, not a pinned interpreter."
+  exit 10
+fi
+BOOTSTRAP_PYTHON="$(readlink -f "$BOOTSTRAP_PYTHON")"
+if [ ! -x "$BOOTSTRAP_PYTHON" ]; then
+  echo "REFUSE bootstrap python3 is not executable. It is a trusted prerequisite, not a pinned interpreter."
+  exit 10
+fi
+"$BOOTSTRAP_PYTHON" "$CHECK" gate --gate "$GATE" --script "$0" --manifest "$MANIFEST" "${INGRESS_ARG[@]}" "${NEED_STILLS[@]}"
 
 if [ -z "$SUPERVISOR" ]; then
   if [ -n "$FIXTURE" ]; then SUPERVISOR="$DEFAULT_SUPERVISOR"; else SUPERVISOR="$LIVE_SUPERVISOR"; fi
@@ -150,9 +161,28 @@ if [ "$PROFILE" = "prod" ] && [ -n "$FIXTURE" ]; then
   exit 10
 fi
 
+PROD_PATH="/usr/local/bin:/usr/bin:/bin:/home/box/.local/bin"
+BOUND_NODE=""
+BOUND_CF=""
+BOUND_NPM=""
+
+final_bind_path() {
+  if [ "$PROFILE" = prod ]; then
+    printf '%s\n' "$PROD_PATH"
+  elif [ -n "${WARDOS_RECOVERY_TEST_FINAL_PATH:-}" ]; then
+    printf '%s\n' "$WARDOS_RECOVERY_TEST_FINAL_PATH"
+  else
+    printf '%s\n' "$PATH"
+  fi
+}
+
 bind_exec() {
-  local role="$1"
+  local role="$1" out rc line
   local -a args
+  # The PATH used for name lookup is the PATH that stays in effect. Production
+  # replaces the inherited PATH before any which(). It is not rewritten after.
+  export PATH
+  PATH="$(final_bind_path)"
   args=(bind-exec --profile "$PROFILE" --role "$role" --gate "$GATE")
   if [ "$PROFILE" = prod ]; then
     args+=(--venv-python "$VENV/bin/python")
@@ -163,11 +193,31 @@ bind_exec() {
     [ -n "${WARDOS_EXPECT_PYTHON_SHA:-}" ] && args+=(--expect-python-sha "$WARDOS_EXPECT_PYTHON_SHA")
     [ -n "${WARDOS_EXPECT_NPM_SHA:-}" ] && args+=(--expect-npm-sha "$WARDOS_EXPECT_NPM_SHA")
   fi
-  python3 "$CHECK" "${args[@]}" || return 21
-  if [ "$PROFILE" = prod ]; then
-    export PATH="/usr/local/bin:/usr/bin:/bin:/home/box/.local/bin"
-    export CF="/home/box/.local/bin/cloudflared"
+  set +e
+  out="$("$BOOTSTRAP_PYTHON" "$CHECK" "${args[@]}")"
+  rc=$?
+  set -e
+  printf '%s\n' "$out"
+  [ "$rc" -eq 0 ] || return 21
+  BOUND_NODE=""
+  BOUND_CF=""
+  if [ "$role" = deps ]; then BOUND_NPM=""; fi
+  while IFS= read -r line; do
+    case "$line" in
+      NODE\ *) BOUND_NODE="${line#NODE }" ;;
+      CF\ *) BOUND_CF="${line#CF }" ;;
+      NPM\ *) BOUND_NPM="${line#NPM }" ;;
+    esac
+  done <<<"$out"
+  if [ -z "$BOUND_NODE" ] || [ -z "$BOUND_CF" ]; then
+    echo "REFUSE bind did not return the checked executables"
+    return 21
   fi
+  if [ "$role" = deps ] && [ -z "$BOUND_NPM" ]; then
+    echo "REFUSE bind did not return the checked npm"
+    return 21
+  fi
+  export CF="$BOUND_CF"
   return 0
 }
 
@@ -302,7 +352,7 @@ run_deps() {
   pj="$DEPS/package.json"
   pl="$DEPS/package-lock.json"
   [ -f "$pj" ] && [ -f "$pl" ] || { echo "REFUSE deps manifest missing"; return 14; }
-  python3 - "$MANIFEST" "$pj" "$pl" <<'PY'
+  "$BOOTSTRAP_PYTHON" - "$MANIFEST" "$pj" "$pl" <<'PY'
 import hashlib, json, sys
 man, pj, pl = sys.argv[1:]
 m = json.load(open(man))
@@ -313,8 +363,13 @@ if sha(pj) != d["package_json_sha256"] or sha(pl) != d["package_lock_sha256"]:
     raise SystemExit("REFUSE deps hash mismatch")
 print("OK deps hashes")
 PY
+  if [ -z "${BOUND_NODE:-}" ] || [ -z "${BOUND_NPM:-}" ]; then
+    echo "REFUSE npm invoke has no checked absolute path"
+    return 21
+  fi
   trace "npm-ci"
-  npm ci --ignore-scripts --no-audit --no-fund --prefix "$DEPS"
+  # The shebang is not consulted. A later PATH lookup cannot select another npm or node.
+  "$BOUND_NODE" "$BOUND_NPM" ci --ignore-scripts --no-audit --no-fund --prefix "$DEPS"
   if ! deps_ok; then
     echo "REFUSE ws@$WS_VERSION not present after npm ci"
     return 14
@@ -336,7 +391,7 @@ rollback() {
   fi
   local file_run gate_run
   file_run="$(awk '/^run / { print $2; exit }' "$scope")"
-  gate_run="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("rollback_run_id") or "")' "$GATE")"
+  gate_run="$("$BOOTSTRAP_PYTHON" -c 'import json,sys; print(json.load(open(sys.argv[1])).get("rollback_run_id") or "")' "$GATE")"
   if [ -z "$RUN_ID_ARG" ] || [ -z "$gate_run" ] || [ -z "$file_run" ] || [ "$RUN_ID_ARG" != "$file_run" ] || [ "$gate_run" != "$file_run" ]; then
     echo "REFUSE rollback run id does not match this scope; not signalling"
     drop_lock || true
@@ -406,10 +461,10 @@ fi
 # Refuse on provenance, venv, deps, ingress, token, or a taken port
 # before creating state or starting anything.
 sensi_flag=()
-if python3 -c 'import json,sys; g=json.load(open(sys.argv[1])); raise SystemExit(0 if g.get("sensi_opaque")=="accept-existing-hash" else 1)' "$GATE"; then
+if "$BOOTSTRAP_PYTHON" -c 'import json,sys; g=json.load(open(sys.argv[1])); raise SystemExit(0 if g.get("sensi_opaque")=="accept-existing-hash" else 1)' "$GATE"; then
   sensi_flag=(--accept-sensi-opaque)
 fi
-python3 "$CHECK" transitive --root "$RT" --manifest "$MANIFEST" "${sensi_flag[@]}"
+"$BOOTSTRAP_PYTHON" "$CHECK" transitive --root "$RT" --manifest "$MANIFEST" "${sensi_flag[@]}"
 trace "provenance"
 bind_exec execute || exit 21
 if ! venv_ok; then
@@ -429,9 +484,9 @@ if [ -n "$INGRESS_CONFIG" ]; then
   if [ "$other" != "$launch" ]; then echo "REFUSE ingress-config is not the launched CFG"; exit 15; fi
 fi
 launch_sha="$(sha256sum "$launch" | cut -c1-64)"
-gate_sha="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("ingress_config_sha256") or "")' "$GATE")"
+gate_sha="$("$BOOTSTRAP_PYTHON" -c 'import json,sys; print(json.load(open(sys.argv[1])).get("ingress_config_sha256") or "")' "$GATE")"
 if [ "$gate_sha" != "$launch_sha" ]; then echo "REFUSE gate does not bind the launched CFG bytes"; exit 15; fi
-python3 "$CHECK" ingress --config "$launch" --review "$REVIEW"
+"$BOOTSTRAP_PYTHON" "$CHECK" ingress --config "$launch" --review "$REVIEW"
 trace "ingress-ok"
 token_meta
 trace "token-meta"

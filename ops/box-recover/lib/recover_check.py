@@ -268,6 +268,7 @@ def _real_hash(found: str, label: str, expect_path: str, expect_hash: str) -> Pa
 
 
 def _shebang_uses_node(path: Path, node_real: Path) -> None:
+    """The file must be a node CLI. The shebang is not how it is launched."""
     try:
         line = path.open("rb").readline(240)
     except OSError:
@@ -287,12 +288,12 @@ def _shebang_uses_node(path: Path, node_real: Path) -> None:
 
 
 def cmd_bind(args: argparse.Namespace) -> None:
-    """Resolve the executables the run would actually launch. Does not execute them."""
+    """Resolve executables on the PATH the caller already made final. Does not execute them."""
     node = _which("node")
     if args.profile == "prod":
         node_real = _real_hash(node, "node", EQUALITY[0][1], EQUALITY[0][2])
         cf = _which("cloudflared")
-        _real_hash(cf, "cloudflared", EQUALITY[1][1], EQUALITY[1][2])
+        cf_real = _real_hash(cf, "cloudflared", EQUALITY[1][1], EQUALITY[1][2])
         if not args.venv_python:
             fail("bind missing venv python", 21)
         _real_hash(args.venv_python, "python", EQUALITY[2][1], EQUALITY[2][2])
@@ -310,6 +311,7 @@ def cmd_bind(args: argparse.Namespace) -> None:
         if args.test_root and not str(py_real).startswith(str(Path(args.test_root).resolve()) + "/"):
             fail("bind path python", 21)
         _real_hash(args.venv_python, "python", "", args.expect_python_sha or "")
+    npm_real = None
     if args.role == "deps":
         npm = _which("npm")
         npm_real = Path(npm).resolve()
@@ -323,10 +325,12 @@ def cmd_bind(args: argparse.Namespace) -> None:
         if expect and digest != expect:
             fail("bind hash npm", 21)
         _shebang_uses_node(npm_real, node_real)
-    if args.profile == "prod":
-        print("OK bind prod; not installed-code proof")
-    else:
-        print("OK bind test; not installed-code proof")
+    print(f"NODE {node_real}")
+    print(f"CF {cf_real}")
+    if npm_real is not None:
+        print(f"NPM {npm_real}")
+    kind = "prod" if args.profile == "prod" else "test"
+    print(f"OK bind {kind}; bootstrap python3 is a trusted prerequisite, not a pinned interpreter; not installed-code proof")
 
 
 def main() -> None:
