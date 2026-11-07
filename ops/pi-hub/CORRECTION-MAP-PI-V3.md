@@ -11,7 +11,7 @@ Mock tests of these corrections ran in this checkout. They are not an independen
 
 ## 1. Self-contained runtime
 
-The ten clean runtime sources are in `runtime/` with `SHA256SUMS`. Install hashes each file before it copies, from that directory, not from another checkout. `vendor/ws` is the `ws@8.22.0` tree from `npm ci --ignore-scripts`, also hashed before copy. `sensi-control.mjs` is not included. `hub.env` records `SERVICE_USER`, `SERVICE_HOME`, `LIGHTS_TOKEN_FILE`, `KASA_VENV_PYTHON`, and the Kasa credential paths. It does not create those secret files. The lights command passes `--token-file` and exports `HOME` and `KASA_VENV_PYTHON`.
+The ten clean runtime sources are in `runtime/` with `SHA256SUMS`. Install hashes each file before it copies, from that directory, not from another checkout. `vendor/ws` is the `ws@8.22.0` tree from `npm ci --ignore-scripts`, also hashed before copy. `sensi-control.mjs` is not included. `hub.env` records `SERVICE_USER`, `SERVICE_HOME`, `LIGHTS_TOKEN_FILE`, `KASA_VENV_PYTHON`, and the Kasa credential paths. It does not create those secret files. The lights command passes `--token-file` and exports `HOME` and `KASA_VENV_PYTHON`. When `WARDOS_PI_PAYLOAD` points at the frozen payload, install checks the Node archive and the cloudflared binary against `OFFLINE-MANIFEST.json` and copies them to `bin/node` and `bin/cloudflared` as mode 0755. It does not run them. The `.deb` stays in the payload as the other packaging of the same binary.
 
 ## 2. Preflight
 

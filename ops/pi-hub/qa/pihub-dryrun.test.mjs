@@ -371,3 +371,22 @@ test("a forged ARM result and a pip failure with a successful import are refused
   assert.match(both.stdout, /both be 0/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
+
+test("payload binaries are hash-checked and copied without being run", () => {
+  const payload = "/opt/cursor/artifacts/pi-offline";
+  if (!fs.existsSync(path.join(payload, "node-v24.22.1-linux-arm64.tar.xz"))) return;
+  const dest = fs.mkdtempSync(path.join(os.tmpdir(), "pi-payload-"));
+  try {
+    const staged = spawnSync("bash", [SH, "--install", "--prefix", dest], { encoding: "utf8", env: { ...process.env, WARDOS_PI_PAYLOAD: payload } });
+    assert.equal(staged.status, 0, staged.stdout + staged.stderr);
+    assert.match(staged.stdout, /OK payload hashes/);
+    for (const name of ["node", "cloudflared"]) {
+      const file = path.join(dest, "bin", name);
+      assert.equal(fs.statSync(file).mode & 0o777, 0o755, name);
+    }
+    assert.match(fs.readFileSync(path.join(dest, "etc/hub.env"), "utf8"), /WARDOS_NODE=/);
+    assert.equal(fs.existsSync(path.join(dest, "run/scripts/sensi-control.mjs")), false);
+  } finally {
+    fs.rmSync(dest, { recursive: true, force: true });
+  }
+});

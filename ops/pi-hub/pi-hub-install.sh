@@ -204,6 +204,35 @@ $SERVICE_HOME/.config/wardos/kasa.user 0600
 $SERVICE_HOME/.config/wardos/kasa.password 0600
 $PREFIX/etc/tunnel.yml 0640
 EOF
+if [ -n "${WARDOS_PI_PAYLOAD:-}" ]; then
+  python3 - "$HERE/OFFLINE-MANIFEST.json" "$WARDOS_PI_PAYLOAD" <<'PY'
+import hashlib, json, sys
+from pathlib import Path
+manifest, root = sys.argv[1:]
+doc = json.load(open(manifest))
+need = {"node-v24.22.1-linux-arm64.tar.xz", "cloudflared-linux-arm64"}
+seen = set()
+for row in doc["files"]:
+    if row["name"] not in need:
+        continue
+    target = Path(root) / row["name"]
+    data = target.read_bytes()
+    if len(data) != row["bytes"] or hashlib.sha256(data).hexdigest() != row["sha256"]:
+        raise SystemExit("REFUSE payload hash " + row["name"])
+    seen.add(row["name"])
+if seen != need:
+    raise SystemExit("REFUSE payload missing node or cloudflared")
+print("OK payload hashes")
+PY
+  install -m 0755 "$WARDOS_PI_PAYLOAD/cloudflared-linux-arm64" "$PREFIX/bin/cloudflared"
+  payload_tmp="$(mktemp -d)"
+  tar -xJf "$WARDOS_PI_PAYLOAD/node-v24.22.1-linux-arm64.tar.xz" -C "$payload_tmp" --wildcards '*/bin/node'
+  payload_node="$(find "$payload_tmp" -type f -name node -print -quit)"
+  [ -n "$payload_node" ] || { echo "REFUSE payload node member missing"; exit 2; }
+  install -m 0755 "$payload_node" "$PREFIX/bin/node"
+  rm -rf "$payload_tmp"
+  printf 'WARDOS_NODE=%s\nWARDOS_CLOUDFLARED=%s\n' "$PREFIX/bin/node" "$PREFIX/bin/cloudflared" >>"$PREFIX/etc/hub.env"
+fi
 printf '%s\n' "no" >"$PREFIX/etc/units-enabled"
 printf '%s\n' "ARM_IMPORT: NOT TESTED" "WHEEL_HASH_IS_NOT_INSTALL: true" >"$PREFIX/deps/ARM-IMPORT-NOT-TESTED"
 ln -sfn wardos-pi-lights.sh "$PREFIX/bin/hub"
@@ -212,6 +241,8 @@ ln -sfn . "$PREFIX/current"
 record_file() {
   printf 'file\t%s\t%s\n' "$1" "$(sha256sum "$PREFIX/$1" | cut -c1-64)" >>"$receipt"
 }
+if [ -f "$PREFIX/bin/node" ]; then record_file bin/node; fi
+if [ -f "$PREFIX/bin/cloudflared" ]; then record_file bin/cloudflared; fi
 record_file bin/wardos-pi-lights.sh
 record_file bin/wardos-pi-tunnel.sh
 record_file bin/wardos-pi-venv.sh
