@@ -1,6 +1,6 @@
 # Pi hub kit
 
-Held. This does not enable SSH, join a tunnel, or activate a service. Pi v6 is a static candidate. It does not release any hold.
+Held. This does not enable SSH, join a tunnel, or activate a service. Pi v7 is a static candidate. It does not release any hold. A mock controller that prints INVOCATION= is not systemd.
 
 Target for a later install: Raspberry Pi OS Trixie arm64 Desktop, hostname wardos-pi, user dan, Ward Wi-Fi. SSH is off. The kit was not run on that machine.
 

@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import platform
+import re
 import shlex
 import subprocess
 import sys
@@ -24,6 +25,21 @@ SENSI_PIN = "54f8715454d1e4e851ffd2ead6d87ddbaed204368b63c7d74e2b4c4fe0c58ffc"
 def fail(msg: str) -> None:
     print("REFUSE " + msg)
     raise SystemExit(78)
+
+
+class TransactionError(Exception):
+    """A service transaction failed after the decision to mutate, or during reversal.
+
+    This is not SystemExit. Callers catch it per row so one observation failure
+    cannot skip the other rows. Pre-mutation refusals still use fail().
+    """
+
+    def __init__(self, reason: str) -> None:
+        super().__init__(reason)
+        self.reason = reason
+
+
+INVOCATION_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{7,80}$")
 
 
 def load(path: str, label: str):
@@ -265,55 +281,66 @@ def proc_root(prefix: str) -> str:
     return override
 
 
-def run_identity_ok(pid: str, owned: dict, root: str) -> bool:
+def observe_enabled(ctl: str, name: str, *, bound: bool) -> bool:
     try:
-        start, argv = proc_identity(pid, root)
-    except (OSError, IndexError):
-        return False
-    return (
-        str(owned.get("pid") or "") == str(pid)
-        and str(owned.get("start") or "") == start
-        and list(owned.get("argv") or []) == argv
-    )
-
-
-def observe_enabled(ctl: str, name: str) -> bool:
-    run = subprocess.run([ctl, "is-enabled", name], text=True, capture_output=True)
-    text = (run.stdout or "").strip()
-    if text == "enabled" and run.returncode == 0:
+        run = subprocess.run([ctl, "is-enabled", name], text=True, capture_output=True)
+    except OSError:
+        run = None
+    text = "" if run is None else (run.stdout or "").strip()
+    if run is not None and text == "enabled" and run.returncode == 0:
         return True
-    if text == "disabled" and run.returncode == 1:
+    if run is not None and text == "disabled" and run.returncode == 1:
         return False
+    if bound:
+        raise TransactionError("systemd enabled state")
     fail("systemd enabled state")
     return False
 
 
-def observe_active(ctl: str, name: str) -> bool:
-    run = subprocess.run([ctl, "is-active", name], text=True, capture_output=True)
-    text = (run.stdout or "").strip()
-    if text == "active" and run.returncode == 0:
+def observe_active(ctl: str, name: str, *, bound: bool) -> bool:
+    try:
+        run = subprocess.run([ctl, "is-active", name], text=True, capture_output=True)
+    except OSError:
+        run = None
+    text = "" if run is None else (run.stdout or "").strip()
+    if run is not None and text == "active" and run.returncode == 0:
         return True
-    if text == "inactive" and run.returncode == 3:
+    if run is not None and text == "inactive" and run.returncode == 3:
         return False
-    if text in ("activating", "deactivating", "reloading", "maintenance"):
-        fail("systemd transitional state")
-    fail("systemd active state")
+    reason = "systemd transitional state" if text in ("activating", "deactivating", "reloading", "maintenance") else "systemd active state"
+    if bound:
+        raise TransactionError(reason)
+    fail(reason)
     return False
 
 
 def systemd_apply(gate_path: str, prefix: str, ctl: str, mode: str) -> None:
+    """Apply a staged unit change and account every attempted row.
+
+    A start is owned only when that start command prints INVOCATION=<id> and a
+    later show of the same unit still has that id, the staged fragment, user,
+    and argv, and the same pid/start/argv. A pid first seen on a show is not
+    provenance. The fresh show and the following stop or disable --now are
+    still two calls: a change in that gap is not atomic, so a mismatch refuses
+    the destructive call and leaves the row as residue. This is not systemd proof.
+    """
     proc = proc_root(prefix)
     gate = load(gate_path, "systemd gate")
     systemd(gate_path, prefix)
     units = gate["units"]
 
-    def show(name: str) -> dict:
-        run = subprocess.run(
-            [ctl, "show", "-p", "FragmentPath", "-p", "DropInPaths", "-p", "User", "-p", "ExecStart", "-p", "MainPID", name],
-            text=True,
-            capture_output=True,
-        )
-        if run.returncode != 0:
+    def show(name: str, *, bound: bool) -> dict:
+        try:
+            run = subprocess.run(
+                [ctl, "show", "-p", "FragmentPath", "-p", "DropInPaths", "-p", "User", "-p", "ExecStart", "-p", "MainPID", "-p", "InvocationID", name],
+                text=True,
+                capture_output=True,
+            )
+        except OSError:
+            run = None
+        if run is None or run.returncode != 0:
+            if bound:
+                raise TransactionError("systemd show")
             fail("systemd show")
         info = {}
         for line in (run.stdout or "").splitlines():
@@ -322,14 +349,37 @@ def systemd_apply(gate_path: str, prefix: str, ctl: str, mode: str) -> None:
                 info[key] = val.strip()
         return info
 
-    def call(*args: str) -> int:
-        return subprocess.run([ctl, *args]).returncode
+    def controller(*args: str) -> subprocess.CompletedProcess:
+        try:
+            return subprocess.run([ctl, *args], text=True, capture_output=True)
+        except OSError as exc:
+            raise TransactionError("systemd controller") from exc
 
+    def identity_matches(info: dict, owned: dict, fragment: str, user: str, file_exec: str, unit_name: str) -> bool:
+        invocation = str(owned.get("invocation") or "")
+        if not INVOCATION_RE.fullmatch(invocation) or info.get("InvocationID", "") != invocation:
+            return False
+        if info.get("FragmentPath", "") != fragment or info.get("User", "") != user:
+            return False
+        if argv_from_show(info.get("ExecStart", "")) != normalized_exec(unit_name, file_exec):
+            return False
+        pid = info.get("MainPID", "0") or "0"
+        if str(owned.get("pid") or "") != str(pid):
+            return False
+        if pid in ("0", ""):
+            return True
+        try:
+            start, argv = proc_identity(pid, proc)
+        except (OSError, IndexError):
+            return False
+        return str(owned.get("start") or "") == start and list(owned.get("argv") or []) == argv
+
+    meta = {}
     checked = []
     for unit in units:
         name = unit["name"]
         frag = unit["fragment_path"]
-        info = show(name)
+        info = show(name, bound=False)
         if info.get("FragmentPath") != frag or not frag.startswith(prefix + "/"):
             fail("systemd name is not the staged unit")
         if info.get("DropInPaths", "") not in ("", "-"):
@@ -342,56 +392,77 @@ def systemd_apply(gate_path: str, prefix: str, ctl: str, mode: str) -> None:
         if argv_from_show(info.get("ExecStart", "")) != normalized_exec(name, file_exec):
             fail("systemd effective argv")
         pid = info.get("MainPID", "0") or "0"
+        owned = unit.get("owned_run") or {}
         if pid not in ("0", ""):
-            if mode != "rollback-services" or not run_identity_ok(pid, unit.get("owned_run") or {}, proc):
+            if mode != "rollback-services" or not identity_matches(info, owned, frag, file_user, file_exec, name):
                 fail("systemd foreign run")
+        meta[name] = {"fragment": frag, "user": file_user, "exec": file_exec, "owned": owned}
         checked.append(name)
     prior = {
-        name: {"enabled": observe_enabled(ctl, name), "active": observe_active(ctl, name)}
+        name: {"enabled": observe_enabled(ctl, name, bound=False), "active": observe_active(ctl, name, bound=False)}
         for name in checked
     }
     started = {}
+    start_fault = {}
 
-    def capture_start(name: str) -> None:
-        info = show(name)
+    def bind_start(name: str, token: str) -> dict:
+        if not INVOCATION_RE.fullmatch(token or ""):
+            raise TransactionError("systemd ownership unproven")
+        info = show(name, bound=True)
         pid = info.get("MainPID", "0") or "0"
-        if pid in ("0", ""):
-            started[name] = {"pid": "0", "start": "", "argv": []}
-            return
-        try:
-            start, argv = proc_identity(pid, proc)
-        except (OSError, IndexError):
-            fail("systemd run identity")
-        started[name] = {"pid": pid, "start": start, "argv": argv}
+        owned = {"invocation": token, "pid": pid, "start": "", "argv": []}
+        if pid not in ("0", ""):
+            try:
+                start, argv = proc_identity(pid, proc)
+            except (OSError, IndexError):
+                raise TransactionError("systemd run identity")
+        else:
+            start, argv = "", []
+        owned["start"] = start
+        owned["argv"] = argv
+        row = meta[name]
+        if not identity_matches(info, owned, row["fragment"], row["user"], row["exec"], name):
+            raise TransactionError("systemd ownership unproven")
+        return owned
 
-    def reverse(name: str, action: str) -> int:
+    def reverse_row(name: str, step: str) -> None:
         state = prior[name]
-        if action == "enable":
-            if not state["enabled"] and call("disable", name) != 0:
-                return 1
-            return 0 if observe_enabled(ctl, name) == state["enabled"] else 1
-        if action == "start":
-            info = show(name)
+        row = meta[name]
+        if step == "enable":
+            if not state["enabled"] and controller("disable", name).returncode != 0:
+                raise TransactionError("systemd disable")
+            if observe_enabled(ctl, name, bound=True) != state["enabled"]:
+                raise TransactionError("systemd poststate")
+            return
+        if step == "start":
+            owned = started.get(name)
+            if not owned:
+                raise TransactionError(start_fault.get(name) or "systemd ownership unproven")
+            info = show(name, bound=True)
+            if not identity_matches(info, owned, row["fragment"], row["user"], row["exec"], name):
+                raise TransactionError("systemd ownership unproven")
             pid = info.get("MainPID", "0") or "0"
             if pid not in ("0", ""):
-                captured = started.get(name) or {}
-                if not run_identity_ok(pid, captured, proc):
-                    fail("systemd replacement")
-                if call("stop", name) != 0:
-                    return 1
-            return 0 if observe_active(ctl, name) is False else 1
-        if action == "disable-now":
+                if controller("stop", name).returncode != 0:
+                    raise TransactionError("systemd stop")
+            if observe_active(ctl, name, bound=True) is not False:
+                raise TransactionError("systemd poststate")
+            return
+        if step == "disable-now":
             rc = 0
             if state["enabled"]:
-                rc = call("enable", name)
+                rc = controller("enable", name).returncode
             if rc == 0 and state["active"]:
-                rc = call("start", name)
+                rc = controller("start", name).returncode
             if rc != 0:
-                return 1
-            return 0 if observe_enabled(ctl, name) == state["enabled"] and observe_active(ctl, name) == state["active"] else 1
-        return 1
+                raise TransactionError("systemd disable")
+            if observe_enabled(ctl, name, bound=True) != state["enabled"] or observe_active(ctl, name, bound=True) != state["active"]:
+                raise TransactionError("systemd poststate")
+            return
+        raise TransactionError("systemd reversal")
 
     attempted = []
+    residues = []
     try:
         for name in checked:
             if mode == "rollback-services":
@@ -403,20 +474,55 @@ def systemd_apply(gate_path: str, prefix: str, ctl: str, mode: str) -> None:
             else:
                 steps = ["enable", "start"]
             for step in steps:
-                attempted.append((name, step))
-                args = ["disable", "--now", name] if step == "disable-now" else [step, name]
-                rc = call(*args)
+                if step == "disable-now":
+                    info = show(name, bound=True)
+                    pid = info.get("MainPID", "0") or "0"
+                    row = meta[name]
+                    if pid not in ("0", "") and not identity_matches(info, row["owned"], row["fragment"], row["user"], row["exec"], name):
+                        residues.append(name + ":disable-now")
+                        print("RESIDUE " + name + ":disable-now systemd ownership unproven")
+                        raise TransactionError("systemd ownership unproven")
+                    attempted.append((name, step))
+                    if controller("disable", "--now", name).returncode != 0:
+                        raise TransactionError("systemd disable")
+                    continue
                 if step == "start":
-                    capture_start(name)
-                if rc != 0:
-                    raise RuntimeError(name)
-    except RuntimeError:
-        failed = []
+                    run = controller("start", name)
+                    token = ""
+                    for line in (run.stdout or "").splitlines():
+                        if line.startswith("INVOCATION="):
+                            token = line.split("=", 1)[1].strip()
+                    attempted.append((name, step))
+                    try:
+                        started[name] = bind_start(name, token)
+                    except TransactionError as exc:
+                        started[name] = None
+                        start_fault[name] = exc.reason
+                        raise
+                    if run.returncode != 0:
+                        raise TransactionError("systemd start")
+                    continue
+                attempted.append((name, step))
+                if controller(step, name).returncode != 0:
+                    raise TransactionError("systemd " + step)
+    except TransactionError as exc:
+        failed_cmd = False
+        if not attempted and not residues:
+            residues.append("transaction")
+            print("RESIDUE transaction " + exc.reason)
         for name, step in reversed(attempted):
-            if reverse(name, step) != 0:
-                failed.append(name + ":" + step)
-        if failed:
+            try:
+                reverse_row(name, step)
+                print("REVERSED " + name + ":" + step)
+            except TransactionError as exc:
+                residues.append(name + ":" + step)
+                print("RESIDUE " + name + ":" + step + " " + exc.reason)
+                if exc.reason in ("systemd disable", "systemd stop", "systemd enable", "systemd start"):
+                    failed_cmd = True
+        if failed_cmd:
             fail("systemd reversal failed")
+        if residues:
+            fail("systemd reversal incomplete")
         fail("systemd partial action reversed")
     print("OK systemd " + mode)
 

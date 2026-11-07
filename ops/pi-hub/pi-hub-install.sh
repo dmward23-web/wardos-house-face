@@ -6,6 +6,8 @@ set -euo pipefail
 umask 077
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO="$(cd "$HERE/../.." && pwd)"
+# shellcheck disable=SC1091
+. "$HERE/lib/pi-cleanup.sh"
 MODE="plan"
 PREFIX=""
 GATE=""
@@ -138,6 +140,19 @@ if [ "$MODE" = "rollback" ]; then
   exit 0
 fi
 
+if [ -n "${WARDOS_PI_TAMPER_REL:-}" ]; then
+  echo "REFUSE tamper hook is not part of install"
+  exit 78
+fi
+if [ -n "${WARDOS_PI_INSTALL_FAIL_POINT:-}" ]; then
+  case "$PREFIX" in
+    /opt/wardos|/opt/wardos/*) echo "REFUSE fixture hook is not available in production"; exit 78 ;;
+  esac
+  if [ "$INSTALL_PROFILE" != "fixture" ] || [ "${WARDOS_PI_FIXTURE:-}" != "isolated" ]; then
+    echo "REFUSE fixture hook is not available in production"
+    exit 78
+  fi
+fi
 if [ -n "$(find "$PREFIX" -mindepth 1 -print -quit 2>/dev/null)" ]; then
   echo "REFUSE prefix is not a fresh empty directory"
   exit 78
@@ -166,45 +181,6 @@ chmod 0755 "$PREFIX" "$PREFIX/bin" "$PREFIX/lib" "$PREFIX/lib/systemd" "$PREFIX/
 : >"$receipt"
 printf 'schema\twardos.pi-install.receipt/1\tplan\n' >>"$receipt"
 CLEANUP_ON_EXIT=1
-cleanup_partial() {
-  [ "${CLEANUP_ON_EXIT:-0}" = "1" ] || return 0
-  [ -f "$receipt" ] || return 0
-  set +e
-  local failed=0 kind rel extra target have
-  while IFS=$'\t' read -r kind rel extra; do
-    [ "$kind" = file ] || [ "$kind" = link ] || continue
-    target="$PREFIX/$rel"
-    if [ "$kind" = link ]; then
-      python3 "$HERE/lib/pi_gate.py" --contained "$PREFIX" "$(dirname "$target")" || { failed=1; continue; }
-      if [ ! -L "$target" ] || [ "$(readlink "$target")" != "$extra" ]; then
-        if [ -e "$target" ] || [ -L "$target" ]; then echo "RESIDUE $rel" >&2; fi
-        failed=1
-        continue
-      fi
-    else
-      python3 "$HERE/lib/pi_gate.py" --contained "$PREFIX" "$target" || { failed=1; continue; }
-      if [ -L "$target" ] || [ ! -f "$target" ]; then
-        if [ -e "$target" ]; then echo "RESIDUE $rel" >&2; fi
-        failed=1
-        continue
-      fi
-      have="$(sha256sum "$target" | cut -c1-64)"
-      if [ "$have" != "$extra" ]; then
-        echo "RESIDUE $rel" >&2
-        failed=1
-        continue
-      fi
-    fi
-    rm -f "$target" || failed=1
-    if [ -e "$target" ]; then
-      echo "RESIDUE $rel" >&2
-      failed=1
-    fi
-  done <"$receipt"
-  if [ -n "${env_tmp:-}" ]; then rm -f "$env_tmp"; fi
-  if [ -n "${payload_tmp:-}" ]; then rm -rf "$payload_tmp"; fi
-  if [ "$failed" = 1 ]; then echo "REFUSE cleanup incomplete" >&2; fi
-}
 trap cleanup_partial EXIT
 own_file() {
   chmod "$2" "$PREFIX/$1"
@@ -337,7 +313,6 @@ own_link bin/hub
 ln -sfn . "$PREFIX/current"
 own_link current
 if [ "${WARDOS_PI_INSTALL_FAIL_POINT:-}" = "after-links" ]; then
-  if [ -n "${WARDOS_PI_TAMPER_REL:-}" ]; then printf '\n' >>"$PREFIX/$WARDOS_PI_TAMPER_REL"; fi
   echo "REFUSE install fail point after links"
   exit 2
 fi

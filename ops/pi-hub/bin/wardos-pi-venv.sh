@@ -57,8 +57,16 @@ set -e
 result_dir="$(dirname "$RESULT")"
 mkdir -p "$result_dir"
 chmod 0755 "$result_dir"
-result_tmp="$(mktemp)"
-python3 - "$result_tmp" "$pip_rc" "$imp_rc" "$LOCK" "$WHEELHOUSE" "$venv/env" <<'PY'
+python3 "$GATE_PY" --contained "$PREFIX" "$RESULT"
+stage="$(mktemp "$result_dir/.preflight-result.XXXXXXXX")"
+cleanup_stage() {
+  if [ -n "${stage:-}" ] && [ -e "$stage" ]; then
+    rm -f "$stage" || echo "RESIDUE preflight stage" >&2
+    if [ -e "$stage" ]; then echo "RESIDUE preflight stage" >&2; fi
+  fi
+}
+trap cleanup_stage EXIT
+python3 - "$stage" "$pip_rc" "$imp_rc" "$LOCK" "$WHEELHOUSE" "$venv/env" <<'PY'
 import hashlib, json, os, platform, sys
 from pathlib import Path
 out, pip_rc, imp_rc, lock, house, venv = sys.argv[1:]
@@ -85,11 +93,27 @@ doc = {
     "venv_python": py,
     "base_interpreter": os.path.realpath(py) if Path(py).exists() else "",
 }
-Path(out).write_text(json.dumps(doc), encoding="utf-8")
+text = json.dumps(doc)
+if not text.endswith("}"):
+    raise SystemExit("REFUSE preflight result incomplete")
+Path(out).write_text(text, encoding="utf-8")
 print("PREFLIGHT pip %s import %s arch %s proven %s" % (pip_rc, imp_rc, arch, str(doc["aarch64_import_proven"]).lower()))
 PY
-install -m 0644 "$result_tmp" "$RESULT"
-rm -f "$result_tmp"
+chmod 0644 "$stage"
+if [ -L "$stage" ] || [ ! -f "$stage" ]; then
+  echo "RESIDUE preflight stage" >&2
+  exit 78
+fi
+python3 "$GATE_PY" --contained "$PREFIX" "$stage"
+if [ "$(dirname "$stage")" != "$result_dir" ]; then
+  echo "REFUSE preflight stage directory"
+  exit 78
+fi
+if ! mv -f "$stage" "$RESULT"; then
+  echo "RESIDUE preflight stage" >&2
+  exit 78
+fi
+stage=""
 chmod -R u+rX "$venv/env"
 find "$venv/env" -type d -exec chmod 0755 {} +
 find "$venv/env" -type f -exec chmod 0644 {} +

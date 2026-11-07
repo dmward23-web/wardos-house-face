@@ -1,3 +1,7 @@
+# Pi packet note, 2026-11-07, v7
+
+Pi v7 is a static candidate only. Pi v6 `eca2d0528b1fecb044ba4c97eeab759d4949d100dd6f442e40f6fcf02ed7430f` stays frozen. Recovery v5 stays frozen. The payload stays frozen. No systemctl, box, or Pi action was run. Twenty-one cloud mock tests passed in this checkout. They are not an independent verification, not native systemd proof, and not ARM approval.
+
 # Pi packet note, 2026-11-07
 
 Pi v6 is a static candidate only. Pi v5 `8fb6a233bf982c7721b869fcc52881c3dad6e0175c2cd49303830252804be915` stays frozen. Recovery v5 stays frozen. The payload stays frozen. No systemctl, box, or Pi action was run. Twenty cloud mock tests passed in this checkout. They are not an independent verification and they are not ARM approval.
