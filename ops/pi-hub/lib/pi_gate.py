@@ -8,6 +8,8 @@ import hashlib
 import json
 import os
 import platform
+import shlex
+import subprocess
 import sys
 from pathlib import Path
 
@@ -96,6 +98,29 @@ def wheelhouse_digest(house: Path) -> str:
     return hashlib.sha256(blob).hexdigest()
 
 
+def bind_venv(doc: dict, prefix: str) -> str:
+    """The exported interpreter is the venv launcher, not an external realpath.
+
+    python -m venv --copies makes bin/python a real file inside the venv.
+    A symlink launcher, or a record that stores only the base interpreter, is refused.
+    """
+    venv = str(doc.get("venv_path") or "")
+    py = str(doc.get("venv_python") or "")
+    base = str(doc.get("base_interpreter") or "")
+    launcher = os.path.normpath(str(Path(venv) / "bin" / "python")) if venv else ""
+    if not launcher or os.path.normpath(py) != launcher:
+        fail("tested venv mismatch")
+    contained(prefix, venv)
+    contained(prefix, py)
+    path = Path(py)
+    if path.is_symlink() or not path.is_file():
+        fail("tested venv python")
+    real = os.path.realpath(py)
+    if real != launcher or (base and os.path.realpath(base) != real):
+        fail("tested venv mismatch")
+    return launcher
+
+
 def preflight_target(result: str, prefix: str, lock: str, house: str) -> None:
     """Target binding. The JSON file is not an authenticated record and is not ARM approval."""
     doc = load(result, "preflight")
@@ -116,15 +141,7 @@ def preflight_target(result: str, prefix: str, lock: str, house: str) -> None:
         fail("preflight lock")
     if wheelhouse_digest(house_path) != doc.get("wheelhouse_sha256"):
         fail("preflight wheelhouse")
-    venv = str(doc.get("venv_path") or "")
-    py = str(doc.get("venv_python") or "")
-    contained(prefix, venv)
-    contained(prefix, py)
-    if Path(py).is_symlink() or not Path(py).is_file():
-        fail("tested venv python")
-    if os.path.realpath(py) != str(Path(venv) / "bin" / "python"):
-        fail("tested venv mismatch")
-    print(os.path.realpath(py))
+    print(bind_venv(doc, prefix))
 
 
 def preflight_ok(path: str) -> None:
@@ -190,6 +207,157 @@ def systemd(path: str, prefix: str) -> None:
     print("OK systemd gate")
 
 
+def expand_specifiers(text: str, unit: str) -> str:
+    name = unit[:-8] if unit.endswith(".service") else unit
+    if "@" in name:
+        head, inst = name.split("@", 1)
+    else:
+        head, inst = name, ""
+    out = []
+    i = 0
+    while i < len(text):
+        if text[i] == "%" and i + 1 < len(text):
+            spec = text[i + 1]
+            i += 2
+            if spec == "%":
+                out.append("%")
+            elif spec in ("i", "I"):
+                out.append(inst)
+            elif spec == "p":
+                out.append(head)
+            elif spec == "n":
+                out.append(name)
+            else:
+                out.append("%" + spec)
+        else:
+            out.append(text[i])
+            i += 1
+    return "".join(out)
+
+
+def argv_from_show(value: str) -> list:
+    if "argv[]=" in value:
+        value = value.split("argv[]=", 1)[1].split(" ;", 1)[0].strip()
+    return shlex.split(value)
+
+
+def normalized_exec(unit_name: str, file_exec: str) -> list:
+    return shlex.split(expand_specifiers(file_exec, unit_name))
+
+
+def proc_identity(pid: str, root: str) -> tuple:
+    base = Path(root) / str(pid)
+    raw = (base / "stat").read_text(encoding="utf-8")
+    fields = raw[raw.rfind(")") + 2 :].split()
+    start = fields[19]
+    argv = [part.decode() for part in (base / "cmdline").read_bytes().split(b"\0") if part]
+    return start, argv
+
+
+def run_identity_ok(pid: str, owned: dict) -> bool:
+    root = os.environ.get("WARDOS_PROC_ROOT", "/proc")
+    try:
+        start, argv = proc_identity(pid, root)
+    except (OSError, IndexError):
+        return False
+    return (
+        str(owned.get("pid") or "") == str(pid)
+        and str(owned.get("start") or "") == start
+        and list(owned.get("argv") or []) == argv
+    )
+
+
+def systemd_apply(gate_path: str, prefix: str, ctl: str, mode: str) -> None:
+    gate = load(gate_path, "systemd gate")
+    systemd(gate_path, prefix)
+    units = gate["units"]
+
+    def show(name: str) -> dict:
+        run = subprocess.run(
+            [ctl, "show", "-p", "FragmentPath", "-p", "DropInPaths", "-p", "User", "-p", "ExecStart", "-p", "MainPID", name],
+            text=True,
+            capture_output=True,
+        )
+        if run.returncode != 0:
+            fail("systemd show")
+        info = {}
+        for line in (run.stdout or "").splitlines():
+            if "=" in line:
+                key, val = line.split("=", 1)
+                info[key] = val.strip()
+        return info
+
+    def truthy(*args: str) -> bool:
+        return subprocess.run([ctl, *args], text=True, capture_output=True).returncode == 0
+
+    def call(*args: str) -> int:
+        return subprocess.run([ctl, *args]).returncode
+
+    checked = []
+    for unit in units:
+        name = unit["name"]
+        frag = unit["fragment_path"]
+        info = show(name)
+        if info.get("FragmentPath") != frag or not frag.startswith(prefix + "/"):
+            fail("systemd name is not the staged unit")
+        if info.get("DropInPaths", "") not in ("", "-"):
+            fail("systemd drop-in")
+        text = Path(frag).read_text(encoding="utf-8").splitlines()
+        file_user = next(line.split("=", 1)[1].strip() for line in text if line.startswith("User="))
+        file_exec = next(line.split("=", 1)[1].strip() for line in text if line.startswith("ExecStart="))
+        if info.get("User", "") != file_user:
+            fail("systemd effective unit")
+        if argv_from_show(info.get("ExecStart", "")) != normalized_exec(name, file_exec):
+            fail("systemd effective argv")
+        pid = info.get("MainPID", "0") or "0"
+        if pid not in ("0", ""):
+            if mode != "rollback-services" or not run_identity_ok(pid, unit.get("owned_run") or {}):
+                fail("systemd foreign run")
+        checked.append(name)
+    prior = {name: {"enabled": truthy("is-enabled", name), "active": truthy("is-active", name)} for name in checked}
+
+    def reverse(name: str, action: str) -> int:
+        state = prior[name]
+        if action == "enable":
+            return 0 if state["enabled"] else call("disable", name)
+        if action == "start":
+            return 0 if state["active"] else call("stop", name)
+        if action == "disable-now":
+            rc = 0
+            if state["enabled"]:
+                rc = call("enable", name)
+            if rc == 0 and state["active"]:
+                rc = call("start", name)
+            return rc
+        return 1
+
+    attempted = []
+    try:
+        for name in checked:
+            if mode == "rollback-services":
+                steps = ["disable-now"]
+            elif mode == "start":
+                steps = ["start"]
+            elif mode == "enable":
+                steps = ["enable"]
+            else:
+                steps = ["enable", "start"]
+            for step in steps:
+                attempted.append((name, step))
+                args = ["disable", "--now", name] if step == "disable-now" else [step, name]
+                if call(*args) != 0:
+                    raise RuntimeError(name)
+    except RuntimeError:
+        failed = []
+        for name, step in reversed(attempted):
+            if reverse(name, step) != 0:
+                failed.append(name + ":" + step)
+        if failed:
+            fail("systemd reversal failed")
+        fail("systemd partial action reversed")
+    print("OK systemd " + mode)
+
+
 def install_root(path: str, prefix: str) -> None:
     gate = load(path, "install gate")
     if gate.get("schema") != "wardos.pi-install.gate/1":
@@ -248,10 +416,20 @@ def main() -> None:
             fail("preflight target arguments")
         preflight_target(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         return
+    if len(sys.argv) >= 2 and sys.argv[1] == "--bind-venv":
+        if len(sys.argv) != 4:
+            fail("bind venv arguments")
+        print(bind_venv(load(sys.argv[2], "preflight"), sys.argv[3]))
+        return
     if len(sys.argv) >= 2 and sys.argv[1] == "--systemd":
         if len(sys.argv) != 4 or not sys.argv[2]:
             fail("systemd gate absent")
         systemd(sys.argv[2], sys.argv[3])
+        return
+    if len(sys.argv) >= 2 and sys.argv[1] == "--systemd-apply":
+        if len(sys.argv) != 6:
+            fail("systemd apply arguments")
+        systemd_apply(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         return
     if len(sys.argv) >= 2 and sys.argv[1] == "--install":
         if len(sys.argv) != 4 or not sys.argv[2]:

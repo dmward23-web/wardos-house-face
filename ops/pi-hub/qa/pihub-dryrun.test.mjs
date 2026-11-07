@@ -122,7 +122,9 @@ test("gated startup binds lights and both connectors and never cameras", async (
     const refused = spawnSync(path.join(dest, "bin/wardos-pi-lights.sh"), ["--activate", "--gate", gate], { encoding: "utf8", env: { ...process.env, WARDOS_PREFIX: dest } });
     assert.equal(refused.status, 78, refused.stdout + refused.stderr);
     const cfgSha = crypto.createHash("sha256").update(fs.readFileSync(path.join(dest, "etc/tunnel.yml"))).digest("hex");
-    fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-activate.gate/1", activate: "lights-and-tunnel", cams: "parked", ssh: "leave-off", secrets: "paths-only", cached_stills: "allow-existing", privacy_consent: "full-8788-accepted", provisioning: "not-performed", exec_profile: "fixture-stub", cutover: "approved", tunnel_name: "wardos-test-hub", tunnel_config_sha256: cfgSha, arm_import: "unmet" }));
+    const stub = path.join(dest, "run/scripts/lights-write-proxy.mjs");
+    const standin = crypto.createHash("sha256").update(fs.readFileSync(stub)).digest("hex");
+    fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-activate.gate/1", activate: "lights-and-tunnel", cams: "parked", ssh: "leave-off", secrets: "paths-only", cached_stills: "allow-existing", privacy_consent: "full-8788-accepted", provisioning: "not-performed", exec_profile: "fixture-stub", fixture_root: dest, standin_sha256: standin, cutover: "approved", tunnel_name: "wardos-test-hub", tunnel_config_sha256: cfgSha, arm_import: "unmet" }));
     const spawnOne = (args) => {
       const child = spawn(args[0], args.slice(1), { env: { ...process.env, WARDOS_PREFIX: dest }, stdio: "ignore" });
       kids.push(child);
@@ -209,7 +211,7 @@ test("systemd modes stay off until a gate and refuse a camera unit", () => {
   const gate = path.join(os.tmpdir(), "pi-sd-" + process.pid + ".json");
   try {
     const ctl = path.join(os.tmpdir(), "pi-systemctl-" + process.pid);
-    fs.writeFileSync(ctl, "#!/bin/sh\nif [ \"$1\" = show ]; then\n  unit=\n  for arg in \"$@\"; do unit=\"$arg\"; done\n  frag=\"$WARDOS_FAKE_FRAGMENT\"\n  if [ \"$unit\" = wardos-pi-tunnel@r1.service ]; then frag=\"\${WARDOS_FAKE_FRAGMENT2:-$frag}\"; fi\n  user=$(sed -n 's/^User=//p' \"$frag\" | head -1)\n  execs=$(sed -n 's/^ExecStart=//p' \"$frag\" | head -1)\n  printf 'FragmentPath=%s\\nDropInPaths=%s\\nUser=%s\\nExecStart=%s\\nMainPID=%s\\n' \"$frag\" \"${WARDOS_FAKE_DROPIN:-}\" \"${WARDOS_FAKE_USER:-$user}\" \"${WARDOS_FAKE_EXEC:-$execs}\" \"${WARDOS_FAKE_MAINPID:-0}\"\n  exit 0\nfi\nif [ \"$1\" = enable ] && [ \"$2\" = \"${WARDOS_FAIL_ENABLE:-}\" ]; then printf '%s\\n' \"$*\" >> \"$WARDOS_SD_LOG\"; exit 1; fi\nprintf '%s\\n' \"$*\" >> \"$WARDOS_SD_LOG\"\nexit 0\n", { mode: 0o755 });
+    fs.writeFileSync(ctl, "#!/bin/sh\nif [ \"$1\" = is-enabled ] || [ \"$1\" = is-active ]; then exit 1; fi\nif [ \"$1\" = show ]; then\n  unit=\n  for arg in \"$@\"; do unit=\"$arg\"; done\n  frag=\"$WARDOS_FAKE_FRAGMENT\"\n  if [ \"$unit\" = wardos-pi-tunnel@r1.service ]; then frag=\"\${WARDOS_FAKE_FRAGMENT2:-$frag}\"; fi\n  user=$(sed -n 's/^User=//p' \"$frag\" | head -1)\n  execs=$(sed -n 's/^ExecStart=//p' \"$frag\" | head -1)\n  case \"$unit\" in *@*) inst=\"\${unit#*@}\"; inst=\"\${inst%.service}\"; execs=$(printf '%s' \"$execs\" | sed \"s/%i/\$inst/g\");; esac\n  printf 'FragmentPath=%s\\nDropInPaths=%s\\nUser=%s\\nExecStart=%s\\nMainPID=%s\\n' \"$frag\" \"${WARDOS_FAKE_DROPIN:-}\" \"${WARDOS_FAKE_USER:-$user}\" \"${WARDOS_FAKE_EXEC:-$execs}\" \"${WARDOS_FAKE_MAINPID:-0}\"\n  exit 0\nfi\nif [ \"$1\" = enable ] && [ \"$2\" = \"${WARDOS_FAIL_ENABLE:-}\" ]; then printf '%s\\n' \"$*\" >> \"$WARDOS_SD_LOG\"; exit 1; fi\nif [ \"$1\" = disable ] && [ \"$2\" = \"${WARDOS_FAIL_DISABLE:-}\" ]; then printf '%s\\n' \"$*\" >> \"$WARDOS_SD_LOG\"; exit 1; fi\nprintf '%s\\n' \"$*\" >> \"$WARDOS_SD_LOG\"\nexit 0\n", { mode: 0o755 });
     const installed = spawnSync("bash", [SH, "--fixture-install", "--prefix", dest], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: "/bin/false" } });
     assert.equal(installed.status, 0, installed.stdout + installed.stderr);
     assert.equal(fs.existsSync(log), false);
@@ -243,7 +245,7 @@ test("/opt/wardos is refused without an install gate", () => {
   fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-install.gate/1", root: "/opt/wardos", service_user: "fixture", service_home: "/opt/wardos/service-home" }));
   const denied = spawnSync("bash", [SH, "--fixture-install", "--prefix", "/opt/wardos"], { encoding: "utf8" });
   assert.notEqual(denied.status, 0);
-  assert.match(denied.stdout + denied.stderr, /REFUSE install/);
+  assert.match(denied.stdout + denied.stderr, /REFUSE install|not the production prefix/);
   if (existed) return;
   const made = spawnSync("sudo", ["mkdir", "-p", "/opt/wardos"]);
   const owned = spawnSync("sudo", ["chown", process.getuid() + ":" + process.getgid(), "/opt/wardos"]);
@@ -251,11 +253,8 @@ test("/opt/wardos is refused without an install gate", () => {
   assert.equal(owned.status, 0, String(owned.stderr));
   try {
     const staged = spawnSync("bash", [SH, "--fixture-install", "--prefix", "/opt/wardos", "--gate", gate], { encoding: "utf8" });
-    assert.equal(staged.status, 0, staged.stdout + staged.stderr);
-    assert.equal(fs.existsSync("/opt/wardos/run/scripts/lights-write-proxy.mjs"), true);
-    assert.equal(fs.existsSync("/opt/wardos/run/scripts/sensi-control.mjs"), false);
-    const rolled = spawnSync("bash", [SH, "--rollback", "--prefix", "/opt/wardos", "--gate", gate], { encoding: "utf8" });
-    assert.equal(rolled.status, 0, rolled.stdout + rolled.stderr);
+    assert.equal(staged.status, 78, staged.stdout + staged.stderr);
+    assert.match(staged.stdout + staged.stderr, /not the production prefix/);
     assert.equal(fs.existsSync("/opt/wardos/bin/hub"), false);
   } finally {
     spawnSync("sudo", ["rm", "-rf", "/opt/wardos"]);
@@ -309,6 +308,19 @@ for dist, version, top in specs:
   assert.equal(recorded.imported, true);
   assert.equal(recorded.aarch64_import_proven, false);
   assert.equal(recorded.phrase_is_proof, false);
+  assert.equal(recorded.record_is_authentication, false);
+  assert.equal(recorded.venv_python, recorded.venv_path + "/bin/python");
+  assert.equal(fs.lstatSync(recorded.venv_python).isSymbolicLink(), false);
+  const external = JSON.parse(JSON.stringify(recorded));
+  external.venv_python = "/usr/bin/python3";
+  const externalPath = path.join(dest, "external.json");
+  fs.writeFileSync(externalPath, JSON.stringify(external));
+  const bound = spawnSync("python3", [path.join(ROOT, "ops/pi-hub/lib/pi_gate.py"), "--bind-venv", externalPath, dest], { encoding: "utf8" });
+  assert.equal(bound.status, 78, bound.stdout + bound.stderr);
+  assert.match(bound.stdout, /tested venv mismatch/);
+  const kept = spawnSync("python3", [path.join(ROOT, "ops/pi-hub/lib/pi_gate.py"), "--bind-venv", path.join(dest, "result.json"), dest], { encoding: "utf8" });
+  assert.equal(kept.status, 0, kept.stdout + kept.stderr);
+  assert.equal(kept.stdout.trim(), recorded.venv_python);
   const wheels = "/opt/cursor/artifacts/pi-offline/wheels";
   if (fs.existsSync(wheels)) {
     const real = spawnSync("bash", [path.join(ROOT, "ops/pi-hub/bin/wardos-pi-venv.sh"), "--preflight"], {
@@ -445,7 +457,7 @@ test("drop-in, foreign run, and a later unit are refused before the first unit c
   const ctl = path.join(os.tmpdir(), "pi-units-ctl-" + process.pid);
   const log = ctl + ".log";
   const gate = ctl + ".json";
-  fs.writeFileSync(ctl, "#!/bin/sh\nif [ \"$1\" = show ]; then\n  unit=\n  for arg in \"$@\"; do unit=\"$arg\"; done\n  frag=\"$WARDOS_FAKE_FRAGMENT\"\n  if [ \"$unit\" = wardos-pi-tunnel@r1.service ]; then frag=\"\${WARDOS_FAKE_FRAGMENT2:-$frag}\"; fi\n  user=$(sed -n 's/^User=//p' \"$frag\" | head -1)\n  execs=$(sed -n 's/^ExecStart=//p' \"$frag\" | head -1)\n  printf 'FragmentPath=%s\\nDropInPaths=%s\\nUser=%s\\nExecStart=%s\\nMainPID=%s\\n' \"$frag\" \"${WARDOS_FAKE_DROPIN:-}\" \"${WARDOS_FAKE_USER:-$user}\" \"${WARDOS_FAKE_EXEC:-$execs}\" \"${WARDOS_FAKE_MAINPID:-0}\"\n  exit 0\nfi\nif [ \"$1\" = enable ] && [ \"$2\" = \"${WARDOS_FAIL_ENABLE:-}\" ]; then printf '%s\\n' \"$*\" >> \"$WARDOS_SD_LOG\"; exit 1; fi\nprintf '%s\\n' \"$*\" >> \"$WARDOS_SD_LOG\"\nexit 0\n", { mode: 0o755 });
+  fs.writeFileSync(ctl, "#!/bin/sh\nif [ \"$1\" = is-enabled ] || [ \"$1\" = is-active ]; then exit 1; fi\nif [ \"$1\" = show ]; then\n  unit=\n  for arg in \"$@\"; do unit=\"$arg\"; done\n  frag=\"$WARDOS_FAKE_FRAGMENT\"\n  if [ \"$unit\" = wardos-pi-tunnel@r1.service ]; then frag=\"\${WARDOS_FAKE_FRAGMENT2:-$frag}\"; fi\n  user=$(sed -n 's/^User=//p' \"$frag\" | head -1)\n  execs=$(sed -n 's/^ExecStart=//p' \"$frag\" | head -1)\n  case \"$unit\" in *@*) inst=\"\${unit#*@}\"; inst=\"\${inst%.service}\"; execs=$(printf '%s' \"$execs\" | sed \"s/%i/\$inst/g\");; esac\n  printf 'FragmentPath=%s\\nDropInPaths=%s\\nUser=%s\\nExecStart=%s\\nMainPID=%s\\n' \"$frag\" \"${WARDOS_FAKE_DROPIN:-}\" \"${WARDOS_FAKE_USER:-$user}\" \"${WARDOS_FAKE_EXEC:-$execs}\" \"${WARDOS_FAKE_MAINPID:-0}\"\n  exit 0\nfi\nif [ \"$1\" = enable ] && [ \"$2\" = \"${WARDOS_FAIL_ENABLE:-}\" ]; then printf '%s\\n' \"$*\" >> \"$WARDOS_SD_LOG\"; exit 1; fi\nif [ \"$1\" = disable ] && [ \"$2\" = \"${WARDOS_FAIL_DISABLE:-}\" ]; then printf '%s\\n' \"$*\" >> \"$WARDOS_SD_LOG\"; exit 1; fi\nprintf '%s\\n' \"$*\" >> \"$WARDOS_SD_LOG\"\nexit 0\n", { mode: 0o755 });
   try {
     assert.equal(spawnSync("bash", [SH, "--fixture-install", "--prefix", dest], { encoding: "utf8" }).status, 0);
     const lights = path.join(dest, "lib/systemd/system/wardos-pi-lights.service");
@@ -476,11 +488,78 @@ test("drop-in, foreign run, and a later unit are refused before the first unit c
     assert.equal(reversed.status, 78, reversed.stdout + reversed.stderr);
     assert.match(reversed.stdout + reversed.stderr, /partial action reversed/);
     assert.match(fs.readFileSync(log, "utf8"), /enable wardos-pi-lights.service/);
+    assert.match(fs.readFileSync(log, "utf8"), /^disable wardos-pi-lights.service$/m);
+    fs.writeFileSync(log, "");
+    const broke = spawnSync("bash", [SH, "--enable", "--prefix", dest, "--gate", gate], { encoding: "utf8", env: { ...env, WARDOS_FAKE_FRAGMENT2: tunnel, WARDOS_FAIL_ENABLE: "wardos-pi-tunnel@r1.service", WARDOS_FAIL_DISABLE: "wardos-pi-lights.service" } });
+    assert.equal(broke.status, 78, broke.stdout + broke.stderr);
+    assert.match(broke.stdout + broke.stderr, /reversal failed/);
+    assert.doesNotMatch(broke.stdout + broke.stderr, /partial action reversed/);
+    const proc = fs.mkdtempSync(path.join(os.tmpdir(), "pi-proc-"));
+    fs.mkdirSync(path.join(proc, "77"));
+    fs.writeFileSync(path.join(proc, "77/stat"), "77 (wardos) S 1 1 1 0 -1 0 0 0 0 0 0 0 0 0 20 0 1 0 999 0 0\n");
+    const argv = [path.join(dest, "bin/wardos-pi-lights.sh"), "--activate"];
+    fs.writeFileSync(path.join(proc, "77/cmdline"), argv.join("\0") + "\0");
+    const ownedGate = JSON.parse(fs.readFileSync(gate, "utf8"));
+    ownedGate.units = [ownedGate.units[0]];
+    ownedGate.units[0].owned_run = { pid: "77", start: "999", argv };
+    const ownedPath = gate + ".owned";
+    fs.writeFileSync(ownedPath, JSON.stringify(ownedGate));
+    fs.writeFileSync(log, "");
+    const own = spawnSync("bash", [SH, "--rollback-services", "--prefix", dest, "--gate", ownedPath], { encoding: "utf8", env: { ...env, WARDOS_FAKE_MAINPID: "77", WARDOS_PROC_ROOT: proc } });
+    assert.equal(own.status, 0, own.stdout + own.stderr);
     assert.match(fs.readFileSync(log, "utf8"), /disable --now wardos-pi-lights.service/);
+    fs.writeFileSync(log, "");
+    const foreignLive = spawnSync("bash", [SH, "--rollback-services", "--prefix", dest, "--gate", ownedPath], { encoding: "utf8", env: { ...env, WARDOS_FAKE_MAINPID: "77", WARDOS_PROC_ROOT: proc, WARDOS_FAKE_MAINPID: "88" } });
+    assert.equal(foreignLive.status, 78, foreignLive.stdout + foreignLive.stderr);
+    assert.match(foreignLive.stdout + foreignLive.stderr, /foreign run/);
+    assert.equal(fs.readFileSync(log, "utf8"), "");
+    fs.rmSync(proc, { recursive: true, force: true });
+    fs.rmSync(ownedPath, { force: true });
   } finally {
     fs.rmSync(dest, { recursive: true, force: true });
     fs.rmSync(ctl, { force: true });
     fs.rmSync(log, { force: true });
     fs.rmSync(gate, { force: true });
   }
+});
+
+test("nonroot can read the staged tree and an early exit removes owned links", () => {
+  const dest = fs.mkdtempSync(path.join(os.tmpdir(), "pi-mode-"));
+  try {
+    assert.equal(spawnSync("bash", [SH, "--fixture-install", "--prefix", dest], { encoding: "utf8" }).status, 0);
+    assert.equal(fs.statSync(path.join(dest, "etc/hub.env")).mode & 0o777, 0o644);
+    assert.equal(fs.statSync(path.join(dest, "run/scripts")).mode & 0o777, 0o755);
+    assert.equal(fs.statSync(path.join(dest, "vendor/ws")).mode & 0o777, 0o755);
+    fs.writeFileSync(path.join(dest, "secrets/lights-proxy.token"), "fixture-token-value-0123456789\n", { mode: 0o600 });
+    const nobody = (args) => spawnSync("sudo", ["-n", "-u", "nobody", ...args], { encoding: "utf8" });
+    assert.equal(nobody(["test", "-r", path.join(dest, "etc/hub.env")]).status, 0, nobody(["test", "-r", path.join(dest, "etc/hub.env")]).stderr);
+    assert.equal(nobody(["test", "-r", path.join(dest, "run/scripts/lights-write-proxy.mjs")]).status, 0);
+    assert.equal(nobody(["test", "-x", path.join(dest, "vendor/ws")]).status, 0);
+    assert.notEqual(nobody(["test", "-r", path.join(dest, "secrets/lights-proxy.token")]).status, 0);
+    fs.rmSync(dest, { recursive: true, force: true });
+    fs.mkdirSync(dest);
+    const failed = spawnSync("bash", [SH, "--fixture-install", "--prefix", dest], { encoding: "utf8", env: { ...process.env, WARDOS_PI_INSTALL_FAIL_POINT: "after-links" } });
+    assert.equal(failed.status, 2, failed.stdout + failed.stderr);
+    assert.equal(fs.existsSync(path.join(dest, "bin/hub")), false);
+    assert.equal(fs.existsSync(path.join(dest, "bin/wardos-pi-lights.sh")), false);
+  } finally {
+    fs.rmSync(dest, { recursive: true, force: true });
+  }
+});
+
+test("tunnel instance argv is compared after percent-i expansion", () => {
+  const gatePy = path.join(ROOT, "ops/pi-hub/lib/pi_gate.py");
+  const fileExec = "/opt/wardos/bin/wardos-pi-tunnel.sh --activate --connector %i --gate /opt/wardos/etc/activate.gate";
+  const show = "{ path=/opt/wardos/bin/wardos-pi-tunnel.sh ; argv[]=/opt/wardos/bin/wardos-pi-tunnel.sh --activate --connector r1 --gate /opt/wardos/etc/activate.gate ; ignore_errors=no ; }";
+  const r = spawnSync("python3", ["-c", `
+import importlib.util, sys
+spec = importlib.util.spec_from_file_location("g", sys.argv[1])
+g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
+file_exec, show = sys.argv[2], sys.argv[3]
+assert file_exec not in show
+assert g.argv_from_show(show) == g.normalized_exec("wardos-pi-tunnel@r1.service", file_exec)
+print("OK argv")
+`, gatePy, fileExec, show], { encoding: "utf8" });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /OK argv/);
 });

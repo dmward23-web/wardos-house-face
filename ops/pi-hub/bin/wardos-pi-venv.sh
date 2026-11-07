@@ -43,7 +43,11 @@ if [ -e "$venv" ]; then echo "REFUSE preflight venv path already exists"; exit 7
 python3 "$GATE_PY" --contained "$PREFIX" "$venv"
 mkdir "$venv"
 chmod 0755 "$venv"
-python3 -m venv "$venv/env"
+python3 -m venv --copies "$venv/env"
+if [ -L "$venv/env/bin/python" ]; then
+  echo "REFUSE venv launcher is a symlink; the copied interpreter is not contained"
+  exit 78
+fi
 set +e
 "$venv/env/bin/python" -m pip install --require-hashes --no-index --find-links "$WHEELHOUSE" --only-binary=:all: --disable-pip-version-check --no-input -r "$LOCK"
 pip_rc=$?
@@ -75,11 +79,16 @@ doc = {
     "lock_sha256": hashlib.sha256(Path(lock).read_bytes()).hexdigest() if Path(lock).is_file() else "",
     "wheelhouse_sha256": hashlib.sha256(blob.encode()).hexdigest(),
     "venv_path": os.path.realpath(venv),
-    "venv_python": os.path.realpath(py) if Path(py).exists() else py,
+    "venv_python": py,
+    "base_interpreter": os.path.realpath(py) if Path(py).exists() else "",
 }
 Path(out).write_text(json.dumps(doc), encoding="utf-8")
 print("PREFLIGHT pip %s import %s arch %s proven %s" % (pip_rc, imp_rc, arch, str(doc["aarch64_import_proven"]).lower()))
 PY
+chmod -R u+rX "$venv/env"
+find "$venv/env" -type d -exec chmod 0755 {} +
+find "$venv/env" -type f -exec chmod 0644 {} +
+find "$venv/env/bin" -type f -exec chmod 0755 {} +
 if [ "$pip_rc" -ne 0 ] || [ "$imp_rc" -ne 0 ]; then
   echo "REFUSE preflight pip and import must both succeed"
   exit 78

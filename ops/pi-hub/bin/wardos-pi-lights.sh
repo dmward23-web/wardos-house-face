@@ -85,4 +85,16 @@ if [ "$profile" = "fixture-stub" ] && grep -q 'sensi-control.mjs' "$proxy"; then
   echo "REFUSE fixture profile cannot start the real proxy"
   exit 78
 fi
+if [ "$profile" = "fixture-stub" ]; then
+  case "$PREFIX" in
+    /opt/wardos|/opt/wardos/*) echo "REFUSE fixture profile is not the production prefix"; exit 78 ;;
+  esac
+  fixture_root="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("fixture_root") or "")' "$GATE")"
+  standin="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("standin_sha256") or "")' "$GATE")"
+  have="$(sha256sum "$proxy" | cut -c1-64)"
+  if [ "$fixture_root" != "$PREFIX" ] || [ "$standin" != "$have" ]; then
+    echo "REFUSE fixture stand-in"
+    exit 78
+  fi
+fi
 lights_exec

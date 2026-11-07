@@ -1,6 +1,6 @@
-# Pi hub packet v4, ready for static review, not installed
+# Pi hub packet v5, ready for static review, not installed
 
-Pi v3 `fe9798daff4e40776440339060baba3565ea18148759a4abb08fd52023f5e9b2` is frozen. Recovery v5 `d9a5b52eb6d43f412f838c01b4e15f88751d4ba2bca63e2353c6a234438c5ac5` is frozen. The payload `c06f47bbaf05b92034eedcedd07b97444437ad4e6a96e441b27286c1fb928bed` is frozen. A preflight JSON file is not an authenticated record and is not ARM approval. `aarch64_import_proven` on this x86_64 host stays false. Privacy consent, provisioning, remote policy, and the Sensi review stay open.
+Pi v4 `e9d1ec8b866f10febf43d5cf2bf443328bc621190d3eb614239d48d50544952d` is frozen. Recovery v5 `d9a5b52eb6d43f412f838c01b4e15f88751d4ba2bca63e2353c6a234438c5ac5` is frozen. The payload `c06f47bbaf05b92034eedcedd07b97444437ad4e6a96e441b27286c1fb928bed` is frozen. A preflight JSON file is not an authenticated record and is not ARM approval. `aarch64_import_proven` on this x86_64 host stays false. Privacy consent, provisioning, remote policy, and the Sensi review stay open. Nothing here starts the wall or the phone, and nothing bypasses a gate.
 
 This is not the recovery archive. Recovery v3 `989df41936b209963c0ddeb92603a4705261b556cf09afe8abb26d69be559463` and v4 `a53f8462d1f696c65d49249e80cf36bdec201ad2ac13f71ef27f295929f11696` are unchanged. The previous Pi packet `0c2b88f7a5a8b2484a01a52d1d1bcf8c257a8b18aacd62825490e0361003da3d` and payload `c06f47bbaf05b92034eedcedd07b97444437ad4e6a96e441b27286c1fb928bed` are unchanged.
 

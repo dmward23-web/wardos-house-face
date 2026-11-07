@@ -1,8 +1,10 @@
-# Pi v4 mock tests. Not an independent verification and not ARM approval.
+# Pi v5 mock tests. Not an independent verification and not ARM approval.
 # node --test --test-concurrency=1 ops/pi-hub/qa/pihub-dryrun.test.mjs
-# 16 tests, exit 0, on this x86_64 checkout
+# 18 tests, exit 0, on this x86_64 checkout
 # qemu-aarch64 was not run and systemctl was not invoked
-# unknown exec profile, x86 target record, symlink result, symlink rollback parent,
-# missing target payload, drop-in, foreign MainPID, later unit mapping, and
-# partial enable reversal were refused or reversed in fixtures
-# aarch64 wheels recorded pip failure and aarch64_import_proven false
+# copied venv launcher is a regular file inside the venv; an external interpreter path is refused
+# nobody, not the installing user, can read hub.env and the runtime tree and cannot read a mode 0600 secret
+# an explicit install failure removes the owned script and the owned link
+# an owned MainPID can be rolled back; a foreign MainPID cannot
+# tunnel %i is compared as expanded argv
+# a failed reversal is reported as failed and is not called reversed
