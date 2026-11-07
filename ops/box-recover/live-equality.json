@@ -1,0 +1,21 @@
+{
+  "schema": "wardos.live-equality/1",
+  "captured_cst": "2026-11-06T17:43:05-06:00",
+  "hermetic": false,
+  "independent_review": false,
+  "sensi_security_review": "open",
+  "snapshot_sha256": "c7d70301fe0f165bc0764cffb7d128a33e95df3b118439ebc1161850925fd5d3",
+  "venv_metadata_snapshot_sha256": "b16e48a405ec21680ad11e4f514dc970e39e13aa72abc6fc15c30baa96a7b441",
+  "metadata_files_hashed": 160,
+  "metadata_contents_not_copied": true,
+  "ws_absent_at_capture": true,
+  "extraneous_distribution": "pip 25.1.1",
+  "version_equality_is_not_wheel_hash_proof": true,
+  "binaries": {
+    "node": "b755e7fbd1457051b90413cb082268efe8dbaab3c008b11ddf9745edf8c8cdfa",
+    "cloudflared": "77e26d8d900e0b8469f416239d14b5f296525fdf79fee6f511ef55609e3fbac2",
+    "python": "889c603f0d17cb54060951bcf4c4f9b8c9ebd9e52b392c70209bbb9755d797d9"
+  },
+  "locked_distributions_present": 21,
+  "note": "Point-in-time box evidence. Prod execute refuses if the three binary hashes differ. That refusal is not a hermetic environment and does not close the Sensi review."
+}
