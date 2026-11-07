@@ -178,6 +178,8 @@ def cmd_transitive(args: argparse.Namespace) -> None:
     ]
     if blocked and not args.accept_sensi_opaque:
         fail("sensi-opaque-approval-required " + ",".join(blocked), 11)
+    if args.accept_sensi_opaque and blocked:
+        print("sensi security_review remains open; acceptance is residual risk not closure")
     for row in rows:
         pin = row.get("sha256")
         if not pin:
@@ -234,14 +236,97 @@ EQUALITY = (
 
 
 def cmd_equality(_args: argparse.Namespace) -> None:
-    """Point-in-time box binary pin from 2026-11-06 17:43 CST. Not hermetic."""
+    """Fixed-path metadata check only. Not the launch binding and not installed-code proof."""
     for label, path, digest in EQUALITY:
         target = Path(path)
         if not target.is_file():
             fail(f"equality missing {label}", 21)
         if sha256(target) != digest:
             fail(f"equality hash {label}", 21)
-    print("OK equality point-in-time binaries")
+    print("OK equality fixed paths only; not installed-code proof")
+
+
+def _which(name: str) -> str:
+    import shutil
+    found = shutil.which(name)
+    if not found:
+        fail(f"bind missing {name}", 21)
+    return found
+
+
+def _real_hash(found: str, label: str, expect_path: str, expect_hash: str) -> Path:
+    path = Path(found)
+    real = path.resolve()
+    if expect_path and str(real) != expect_path:
+        fail(f"bind path {label}", 21)
+    if path.is_symlink() and expect_path and str(real) != expect_path:
+        fail(f"bind symlink {label}", 21)
+    digest = sha256(real)
+    if expect_hash and digest != expect_hash:
+        fail(f"bind hash {label}", 21)
+    return real
+
+
+def _shebang_uses_node(path: Path, node_real: Path) -> None:
+    try:
+        line = path.open("rb").readline(240)
+    except OSError:
+        fail("bind npm unreadable", 21)
+    if not line.startswith(b"#!"):
+        fail("bind npm shebang", 21)
+    text = line[2:].decode("utf-8", "replace").strip()
+    parts = text.split()
+    if len(parts) >= 2 and parts[0].endswith("env") and parts[1] == "node":
+        return
+    if parts and Path(parts[0]).name == "node":
+        target = Path(parts[0]).resolve()
+        if target != node_real:
+            fail("bind npm shebang node", 21)
+        return
+    fail("bind npm shebang", 21)
+
+
+def cmd_bind(args: argparse.Namespace) -> None:
+    """Resolve the executables the run would actually launch. Does not execute them."""
+    node = _which("node")
+    if args.profile == "prod":
+        node_real = _real_hash(node, "node", EQUALITY[0][1], EQUALITY[0][2])
+        cf = _which("cloudflared")
+        _real_hash(cf, "cloudflared", EQUALITY[1][1], EQUALITY[1][2])
+        if not args.venv_python:
+            fail("bind missing venv python", 21)
+        _real_hash(args.venv_python, "python", EQUALITY[2][1], EQUALITY[2][2])
+    else:
+        node_real = _real_hash(node, "node", "", args.expect_node_sha or "")
+        if not args.cf:
+            fail("bind missing cloudflared", 21)
+        cf_real = Path(args.cf).resolve()
+        if args.test_root and not str(cf_real).startswith(str(Path(args.test_root).resolve()) + "/"):
+            fail("bind path cloudflared", 21)
+        _real_hash(args.cf, "cloudflared", "", args.expect_cf_sha or "")
+        if not args.venv_python:
+            fail("bind missing venv python", 21)
+        py_real = Path(args.venv_python).resolve()
+        if args.test_root and not str(py_real).startswith(str(Path(args.test_root).resolve()) + "/"):
+            fail("bind path python", 21)
+        _real_hash(args.venv_python, "python", "", args.expect_python_sha or "")
+    if args.role == "deps":
+        npm = _which("npm")
+        npm_real = Path(npm).resolve()
+        digest = sha256(npm_real)
+        expect = args.expect_npm_sha or ""
+        if args.profile == "prod":
+            gate = load_json(Path(args.gate)) if args.gate else {}
+            expect = str(gate.get("npm_sha256") or "")
+            if not expect:
+                fail("bind npm hash not pinned", 21)
+        if expect and digest != expect:
+            fail("bind hash npm", 21)
+        _shebang_uses_node(npm_real, node_real)
+    if args.profile == "prod":
+        print("OK bind prod; not installed-code proof")
+    else:
+        print("OK bind test; not installed-code proof")
 
 
 def main() -> None:
@@ -265,6 +350,18 @@ def main() -> None:
     trans.set_defaults(func=cmd_transitive)
     eq = sub.add_parser("equality")
     eq.set_defaults(func=cmd_equality)
+    bind = sub.add_parser("bind-exec")
+    bind.add_argument("--profile", required=True)
+    bind.add_argument("--role", required=True)
+    bind.add_argument("--cf", default="")
+    bind.add_argument("--venv-python", default="")
+    bind.add_argument("--test-root", default="")
+    bind.add_argument("--expect-node-sha", default="")
+    bind.add_argument("--expect-cf-sha", default="")
+    bind.add_argument("--expect-python-sha", default="")
+    bind.add_argument("--expect-npm-sha", default="")
+    bind.add_argument("--gate", default="")
+    bind.set_defaults(func=cmd_bind)
     args = parser.parse_args()
     args.func(args)
 

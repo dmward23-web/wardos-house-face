@@ -27,6 +27,7 @@ SUPERVISOR=""
 INGRESS_CONFIG=""
 PORTS=""
 TOKEN_FILE=""
+RUN_ID_ARG=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -42,6 +43,7 @@ while [ $# -gt 0 ]; do
     --supervisor) SUPERVISOR="${2:-}"; shift ;;
     --ports) PORTS="${2:-}"; shift ;;
     --token-file) TOKEN_FILE="${2:-}"; shift ;;
+    --run-id) RUN_ID_ARG="${2:-}"; shift ;;
     -h|--help) MODE="help" ;;
     *) echo "REFUSE unknown argument"; exit 2 ;;
   esac
@@ -147,6 +149,27 @@ if [ "$PROFILE" = "prod" ] && [ -n "$FIXTURE" ]; then
   echo "REFUSE fixture did not select the test profile"
   exit 10
 fi
+
+bind_exec() {
+  local role="$1"
+  local -a args
+  args=(bind-exec --profile "$PROFILE" --role "$role" --gate "$GATE")
+  if [ "$PROFILE" = prod ]; then
+    args+=(--venv-python "$VENV/bin/python")
+  else
+    args+=(--cf "$CF" --venv-python "$VENV/bin/python" --test-root "$T")
+    [ -n "${WARDOS_EXPECT_NODE_SHA:-}" ] && args+=(--expect-node-sha "$WARDOS_EXPECT_NODE_SHA")
+    [ -n "${WARDOS_EXPECT_CF_SHA:-}" ] && args+=(--expect-cf-sha "$WARDOS_EXPECT_CF_SHA")
+    [ -n "${WARDOS_EXPECT_PYTHON_SHA:-}" ] && args+=(--expect-python-sha "$WARDOS_EXPECT_PYTHON_SHA")
+    [ -n "${WARDOS_EXPECT_NPM_SHA:-}" ] && args+=(--expect-npm-sha "$WARDOS_EXPECT_NPM_SHA")
+  fi
+  python3 "$CHECK" "${args[@]}" || return 21
+  if [ "$PROFILE" = prod ]; then
+    export PATH="/usr/local/bin:/usr/bin:/bin:/home/box/.local/bin"
+    export CF="/home/box/.local/bin/cloudflared"
+  fi
+  return 0
+}
 
 trace() {
   [ -n "${WARDOS_RECOVERY_TRACE:-}" ] && printf '%s\n' "$1" >>"$WARDOS_RECOVERY_TRACE"
@@ -311,6 +334,14 @@ rollback() {
     echo "REFUSE healer lock is held; rollback not signalling"
     return 19
   fi
+  local file_run gate_run
+  file_run="$(awk '/^run / { print $2; exit }' "$scope")"
+  gate_run="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("rollback_run_id") or "")' "$GATE")"
+  if [ -z "$RUN_ID_ARG" ] || [ -z "$gate_run" ] || [ -z "$file_run" ] || [ "$RUN_ID_ARG" != "$file_run" ] || [ "$gate_run" != "$file_run" ]; then
+    echo "REFUSE rollback run id does not match this scope; not signalling"
+    drop_lock || true
+    return 20
+  fi
   while read -r line; do
     [ -n "$line" ] || continue
     case "$line" in
@@ -361,6 +392,7 @@ fi
 print_exposure
 
 if [ "$MODE" = "deps" ]; then
+  bind_exec deps || exit 21
   prep_dirs
   if ! take_lock; then echo "REFUSE healer lock is held"; exit 19; fi
   set +e
@@ -379,6 +411,7 @@ if python3 -c 'import json,sys; g=json.load(open(sys.argv[1])); raise SystemExit
 fi
 python3 "$CHECK" transitive --root "$RT" --manifest "$MANIFEST" "${sensi_flag[@]}"
 trace "provenance"
+bind_exec execute || exit 21
 if ! venv_ok; then
   echo "REFUSE current Kasa venv is not importable; not rebuilding"
   exit 13
@@ -400,7 +433,6 @@ gate_sha="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get(
 if [ "$gate_sha" != "$launch_sha" ]; then echo "REFUSE gate does not bind the launched CFG bytes"; exit 15; fi
 python3 "$CHECK" ingress --config "$launch" --review "$REVIEW"
 trace "ingress-ok"
-if [ "$PROFILE" = prod ]; then python3 "$CHECK" equality || exit 21; fi
 token_meta
 trace "token-meta"
 prove_empty

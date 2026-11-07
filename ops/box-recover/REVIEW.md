@@ -1,6 +1,6 @@
 # Lights recovery review
 
-The ten runtime source pins are filled. This recovery package is ready for independent review. It is not cleared to execute. Cached stills are undecided. Atlas's 17:11 hold still stands. This document does not ask for a user step.
+The ten runtime source pins are filled. This recovery package is a v4 candidate after Alfred's 17:53 NO-GO on archive `989df41936b209963c0ddeb92603a4705261b556cf09afe8abb26d69be559463`, which is unchanged. Targeted mock tests of the two new gaps were run here. They are not an independent verification. Do not treat them as a request to execute the suite or npm under a static-only review. The package is not cleared to execute. Cached stills, remote ingress policy, and the opaque Sensi review stay open. Accepting the opaque hash is residual risk, not closure. Atlas's 17:11 hold still stands. This document does not ask for a user step.
 
 `scripts/sensi-control.mjs` is not a missing parent file. Its sha256 `54f8715454d1e4e851ffd2ead6d87ddbaed204368b63c7d74e2b4c4fe0c58ffc` is the opaque pin of the existing box file. An independent gate may accept that hash. This package does not lift the security review, and it does not rewrite the file. `--execute` refuses until the gate says `sensi_opaque` is `accept-existing-hash`.
 

@@ -165,6 +165,18 @@ fs.writeFileSync(process.env.CAM_SENTINEL, 'started\\n');
   const pylog = path.join(root, "python.log");
   return { root, t, rt, ports: portList, cfg, review: reviewPath, token, manifestPath, gate, sentinel, trace, pylog };
 }
+function scopeRun(fx) {
+  const text = fs.readFileSync(path.join(fx.t, "state/lights-recover.scope"), "utf8");
+  const m = text.match(/^run (\S+)/m);
+  if (!m) throw new Error("no run id\n" + text);
+  return m[1];
+}
+function rollbackOf(fx, id) {
+  const gate = JSON.parse(fs.readFileSync(fx.gate, "utf8"));
+  gate.rollback_run_id = id;
+  fs.writeFileSync(fx.gate, JSON.stringify(gate));
+  return [...argsOf(fx, "--rollback"), "--run-id", id];
+}
 function argsOf(fx, mode) {
   return [mode, "--fixture", fx.root, "--gate", fx.gate, "--manifest", fx.manifestPath,
     "--ingress-review", fx.review, "--ingress-config", fx.cfg, "--ports", fx.ports.join(" "),
@@ -299,7 +311,7 @@ test("full mock start, scrub, rollback, and a foreign process left alive", async
     assert.equal(fs.existsSync(fx.pylog) && fs.readFileSync(fx.pylog, "utf8").includes("REBUILD"), false);
     assert.match(fs.readFileSync(path.join(fx.t, "state/loop.own"), "utf8"), /2812139/);
     assert.equal(alive(bystander.pid), true);
-    const rolled = run(argsOf(fx, "--rollback"), envOf(fx));
+    const rolled = run(rollbackOf(fx, scopeRun(fx)), envOf(fx));
     assert.equal(rolled.status, 0, rolled.stdout + rolled.stderr);
     assert.equal(pidsOn(fx.ports[1]).length, 0);
     assert.equal(pidsOn(fx.ports[2]).length, 0);
@@ -362,7 +374,7 @@ test("connector partial failure is reversible without pattern kills", async () =
     assert.match(scope, /^lights /m);
     assert.match(scope, /^t1 /m);
     assert.doesNotMatch(scope, /^t2 /m);
-    const rolled = run(argsOf(fx, "--rollback"), envOf(fx));
+    const rolled = run(rollbackOf(fx, scopeRun(fx)), envOf(fx));
     assert.equal(rolled.status, 0, rolled.stdout + rolled.stderr);
     assert.equal(pidsOn(fx.ports[1]).length, 0);
     assert.equal(pidsOn(fx.ports[2]).length, 0);
@@ -386,7 +398,7 @@ test("rollback will not signal a replaced identity", async () => {
     const cmdsha = crypto.createHash("sha256").update(fs.readFileSync(`/proc/${bystander.pid}/cmdline`)).digest("hex");
     const cwd = fs.readlinkSync(`/proc/${bystander.pid}/cwd`);
     fs.writeFileSync(path.join(fx.t, "state/lights.own"), `${bystander.pid} ${start} ${cmdsha} started ${cwd}\n`);
-    const rolled = run(argsOf(fx, "--rollback"), envOf(fx));
+    const rolled = run(rollbackOf(fx, scopeRun(fx)), envOf(fx));
     assert.notEqual(rolled.status, 0);
     assert.match(rolled.stdout, /does not match scope; not signalling/);
     assert.equal(alive(bystander.pid), true);
@@ -422,15 +434,16 @@ test("a lock taken during the pre-lock pause does not replace scope provenance",
   fs.writeFileSync(scope, sentinel);
   const lock = path.join(state, "healer.lock");
   const child = spawn("bash", [SH, ...argsOf(fx, "--execute")], {
-    env: envOf(fx, { WARDOS_RECOVERY_LOCK_PAUSE: "2" }),
+    env: { ...process.env, ...envOf(fx, { WARDOS_RECOVERY_LOCK_PAUSE: "2" }) },
     stdio: ["ignore", "pipe", "pipe"],
   });
   let out = "";
   child.stdout.on("data", (b) => { out += b; });
   child.stderr.on("data", (b) => { out += b; });
+  const closed = new Promise((resolve) => child.on("close", resolve));
   await new Promise((r) => setTimeout(r, 400));
   const holder = spawn("bash", ["-c", "exec 9>>\"$1\"; flock 9; sleep 3", "hold", lock], { stdio: "ignore" });
-  const code = await new Promise((resolve) => child.on("close", resolve));
+  const code = await closed;
   try { holder.kill("SIGKILL"); } catch { /* gone */ }
   assert.equal(code, 19, out);
   assert.equal(fs.readFileSync(scope, "utf8"), sentinel);
@@ -452,7 +465,7 @@ test("rollback refuses when the own record matches scope but the live identity d
     const scope = path.join(fx.t, "state/lights-recover.scope");
     const lines = fs.readFileSync(scope, "utf8").split("\n").map((line) => line.startsWith("lights ") ? "lights " + record : line);
     fs.writeFileSync(scope, lines.join("\n"));
-    const rolled = run(argsOf(fx, "--rollback"), envOf(fx));
+    const rolled = run(rollbackOf(fx, scopeRun(fx)), envOf(fx));
     assert.notEqual(rolled.status, 0, rolled.stdout + rolled.stderr);
     assert.match(rolled.stdout, /not signalling a replacement/);
     assert.match(rolled.stdout, /intended identity is not the live process/);
@@ -475,6 +488,93 @@ test("a tampered run-tree file refuses before any listener", async () => {
   } finally {
     cleanup(fx);
   }
+});
+
+test("approval for run A does not stop run B", async () => {
+  const fx = fixture(await ports());
+  try {
+    const started = run(argsOf(fx, "--execute"), envOf(fx));
+    assert.equal(started.status, 0, started.stdout + started.stderr);
+    const live = scopeRun(fx);
+    const rolled = run(rollbackOf(fx, "run-a-not-" + live), envOf(fx));
+    assert.notEqual(rolled.status, 0, rolled.stdout + rolled.stderr);
+    assert.match(rolled.stdout, /run id does not match this scope/);
+    assert.ok(pidsOn(fx.ports[1]).length > 0, "run B lights still listening");
+    assert.equal(scopeRun(fx), live);
+  } finally {
+    cleanup(fx);
+  }
+});
+
+test("shadow node, venv python, cloudflared, and npm are refused before they run", async () => {
+  const fx = fixture(await ports());
+  const hit = path.join(fx.root, "shadow-hit");
+  const shadow = fs.mkdtempSync(path.join(os.tmpdir(), "shadow-bin-"));
+  const body = "#!/bin/sh\necho ran >> " + JSON.stringify(hit) + "\nexit 99\n";
+  for (const name of ["node", "npm", "cloudflared"]) fs.writeFileSync(path.join(shadow, name), body, { mode: 0o755 });
+  const nodeReal = fs.realpathSync(spawnSync("bash", ["-lc", "command -v node"], { encoding: "utf8" }).stdout.trim());
+  const npmReal = fs.realpathSync(spawnSync("bash", ["-lc", "command -v npm"], { encoding: "utf8" }).stdout.trim());
+  const py = path.join(fx.t, "kasa-venvs/venv-fixture/bin/python");
+  const pySha = sha(py);
+  const cfSha = sha(path.join(fx.t, "bin/cloudflared"));
+  try {
+    const shadowed = run(argsOf(fx, "--execute"), envOf(fx, {
+      PATH: shadow + ":" + process.env.PATH,
+      WARDOS_EXPECT_NODE_SHA: sha(nodeReal),
+      WARDOS_EXPECT_CF_SHA: cfSha,
+      WARDOS_EXPECT_PYTHON_SHA: pySha,
+    }));
+    assert.equal(shadowed.status, 21, shadowed.stdout + shadowed.stderr);
+    assert.match(shadowed.stdout + shadowed.stderr, /REFUSE bind/);
+    assert.equal(fs.existsSync(hit), false);
+    assert.equal(pidsOn(fx.ports[1]).length, 0);
+    const cf = path.join(fx.t, "bin/cloudflared");
+    const cfBytes = fs.readFileSync(cf);
+    fs.writeFileSync(cf, body, { mode: 0o755 });
+    const cfShadow = run(argsOf(fx, "--execute"), envOf(fx, { WARDOS_EXPECT_CF_SHA: cfSha }));
+    assert.equal(cfShadow.status, 21, cfShadow.stdout + cfShadow.stderr);
+    assert.match(cfShadow.stdout + cfShadow.stderr, /REFUSE bind/);
+    assert.equal(fs.existsSync(hit), false);
+    fs.writeFileSync(cf, cfBytes, { mode: 0o755 });
+    fs.writeFileSync(py, body, { mode: 0o755 });
+    const pyShadow = run(argsOf(fx, "--execute"), envOf(fx, { WARDOS_EXPECT_PYTHON_SHA: pySha }));
+    assert.equal(pyShadow.status, 21, pyShadow.stdout + pyShadow.stderr);
+    assert.equal(fs.existsSync(hit), false);
+    const deps = run(["--execute-deps", "--fixture", fx.root, "--gate", fx.gate, "--manifest", fx.manifestPath, "--ports", fx.ports.join(" "), "--token-file", fx.token, "--ingress-review", fx.review, "--ingress-config", fx.cfg], envOf(fx, {
+      PATH: shadow + ":" + process.env.PATH,
+      WARDOS_EXPECT_NPM_SHA: sha(npmReal),
+      WARDOS_EXPECT_NODE_SHA: sha(nodeReal),
+    }));
+    assert.equal(deps.status, 21, deps.stdout + deps.stderr);
+    assert.equal(fs.existsSync(hit), false);
+    assert.doesNotMatch(shadowed.stdout + cfShadow.stdout + pyShadow.stdout + deps.stdout, /installed-code proof|security review closed/i);
+  } finally {
+    cleanup(fx);
+    fs.rmSync(shadow, { recursive: true, force: true });
+  }
+});
+
+test("opaque Sensi acceptance is residual risk and does not close the review", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "lights-recover-sensi-"));
+  const scripts = path.join(root, "scripts");
+  fs.mkdirSync(scripts);
+  const lights = path.join(scripts, "lights-write-proxy.mjs");
+  fs.writeFileSync(lights, "export {};\n");
+  const manifest = {
+    schema: "wardos.lights-recover.manifest/1",
+    files: [
+      { path: "scripts/lights-write-proxy.mjs", sha256: sha(lights), required_before_execute: true, security_review: "open" },
+    ],
+  };
+  const manifestPath = path.join(root, "manifest.json");
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest));
+  const r = spawnSync("python3", [path.join(OPS, "lib/recover_check.py"), "transitive", "--root", root, "--manifest", manifestPath, "--accept-sensi-opaque"], { encoding: "utf8" });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /residual risk not closure/);
+  assert.doesNotMatch(r.stdout + r.stderr, /security_review.: .closed|security review closed/i);
+  const after = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  assert.equal(after.files[0].security_review, "open");
+  fs.rmSync(root, { recursive: true, force: true });
 });
 
 test("point-in-time binary equality fail-closes off the box and does not close Sensi", () => {
