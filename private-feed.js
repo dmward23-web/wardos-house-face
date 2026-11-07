@@ -252,10 +252,7 @@
   /* PFCACHE1 · kidBoard() lives at the top (pairing only) */
   function hubNow() { var H = g.HouseHub, o = qs("pfBase"); if (!H) return ""; if (o && /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/?$/.test(o) && H.okForKey(o)) return o; return H.lights() || ""; }
   function pairState() { var k = !!token(), h = !!hubNow(); return k && h ? "paired" : (k ? "key-no-hub" : (h ? "hub-no-key" : "none")); }
-  function dadRecovery() {
-    return !!document.querySelector("[data-dad-only]") || /sheet-(dan|lights|allowance|google-home)\.html$/.test(location.pathname || "");
-  }
-  function needsPairing() { return !forceOffline && pairState() !== "paired" && !kidBoard() && dadRecovery(); }
+  function needsPairing() { return !forceOffline && pairState() !== "paired" && !kidBoard(); }
   var pairChip = null, pairWhy = null;
   function paintPairing() {
     var root = document.documentElement, ps = pairState();

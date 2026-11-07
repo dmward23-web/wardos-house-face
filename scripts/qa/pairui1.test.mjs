@@ -37,25 +37,27 @@ function all() {
   return runs;
 }
 
-test("PAIRUI1 · unpaired: exactly one pairing prompt, no empty Needs pairing card (phone and desk)", SKIP, async () => {
+test("PAIRUI1 · unpaired hub hides cameras, lights, and the pairing chip; the schedule stays", SKIP, async () => {
+  /* Prism: unavailable device UI is not shown on the shared hub. The old assert wanted one visible Needs pairing prompt and a hidden schedule. */
   const r = await all();
-  for (const k of ["unpaired", "unpaired@1280@800", "unpaired@1920@1080"]) {
+  for (const k of ["unpaired", "unpaired@1280@800", "unpaired@1920@1080", "offline"]) {
     assert.deepEqual(r[k].errors, [], k);
     for (const t of ["t0", "t1"]) {
       const s = r[k][t];
       assert.equal(s.pairState, "hub-no-key", k + " " + J(s));
-      assert.equal(s.leavebyVisible, 0, k + " " + t + " no strip card under the clock " + J(s));
-      const prompts = s.needs.filter((c) => !/^hub-cam-rest-word$|^hub-lights-pairword(-word)?$/.test(c));
-      assert.equal(prompts.length, 1, k + " " + t + " one prompt " + J(s));
+      assert.equal(s.needs.length, 0, k + " " + t + " no visible pairing prompt " + J(s));
+      assert.deepEqual(s.camWords, [], k + " " + t + " cameras stay unmounted " + J(s));
+      assert.equal(s.pairWord, 0, k + " " + t);
+      assert.equal(s.panel, null, k + " " + t);
     }
   }
 });
 
-test("PAIRUI1 · unpaired cams say Needs pairing; the lights strip says Needs pairing with no switches or ALL OFF", SKIP, async () => {
+test("PAIRUI1 · unpaired cams and lights are not mounted; no switches and no ALL OFF", SKIP, async () => {
   const s = (await all())["unpaired"].t1;
-  assert.deepEqual(s.camWords, ["Needs pairing", "Needs pairing", "Needs pairing"], J(s));
+  assert.deepEqual(s.camWords, [], J(s));
   assert.equal(s.resting, 0, J(s));
-  assert.equal(s.pairWord, 1, J(s));
+  assert.equal(s.pairWord, 0, J(s));
   assert.equal(s.bulkVisible, 0, "no ALL OFF " + J(s));
   assert.equal(s.switches, 0, J(s));
 });
@@ -67,7 +69,8 @@ test("PAIRUI1 · lights never say Ready: unpaired, paired, forced offline, kid b
 
 test("PAIRUI1 · paired state unchanged: strip card shows, cams keep Camera resting on an outage, no pairing words", SKIP, async () => {
   const r = await all();
-  for (const k of ["paired", "paired@1280@800", "paired@1920@1080", "offline"]) {
+  /* offline is pfOffline with no key. That is not a paired outage. paired sets a fake key and this loopback hub, then the feed 503s. */
+  for (const k of ["paired", "paired@1280@800", "paired@1920@1080"]) {
     const s = r[k].t1;
     assert.deepEqual(r[k].errors, [], k);
     assert.equal(s.needs.length, 0, k + " " + J(s));
@@ -92,24 +95,21 @@ test("PAIRUI1 · source: readyWord has no Ready, the cam word keeps Camera resti
   assert.match(read("kid-harris.html"), /house-lights\.js\?v=SUNHOME1"/); /* CAMREST5 · re-tokened; SUNHOME1 · again */
 });
 
-test("PAIRUI1b · the lights pair pill is the camera rest pill: same glow, fill, border and word", SKIP, async () => {
+test("PAIRUI1b · unpaired hub paints neither pair pill; the shared styles stay in the source", SKIP, async () => {
   const r = await all();
   for (const k of ["unpaired", "unpaired@1280@800", "unpaired@1920@1080"]) {
-    const { lights, cam } = r[k].t1.pill;
-    assert.ok(lights && cam, k + " both pills visible " + J(r[k].t1.pill));
-    assert.match(lights.shadow, /rgba\(232, 163, 61, 0\.45\) 0px 0px 14px/, k + " glow");
-    assert.equal(lights.boxWeight, "400", k + " CAMREST4 · pill box weight 400, as the cam rest pill"); assert.equal(lights.bg, "rgba(28, 18, 8, 0.82)", k + " dark fill");
-    assert.deepEqual(lights, cam, k + " lights pill matches cam pill");
+    const pill = r[k].t1.pill;
+    assert.equal(pill.lights, null, k + " no lights pill " + J(pill));
+    assert.equal(pill.cam, null, k + " no cam pill " + J(pill));
   }
+  const L = read("house-lights.js");
+  assert.match(L, /\.hub-lights-pairword\{[^}]*font-weight:400!important/);
 });
 
 test("PAIRUI1b · desk: the unpaired lights panel is one compact row sized to the pill; paired desk panel unchanged", SKIP, async () => {
   const r = await all();
   for (const k of ["unpaired@1280@800", "unpaired@1920@1080"]) {
-    const p = r[k].t1.panel;
-    assert.ok(p && p.pillH > 0, k + " " + J(p));
-    assert.ok(p.h <= p.pillH * 2 + 8, k + " panel hugs the pill, no empty dark box " + J(p));
-    assert.ok(p.w >= p.pillW, k + " " + J(p));
+    assert.equal(r[k].t1.panel, null, k + " unpaired lights panel stays hidden " + J(r[k].t1));
   }
   for (const k of ["paired@1280@800", "paired@1920@1080"]) {
     const p = r[k].t1.panel;
@@ -123,7 +123,7 @@ test("PAIRUI1b · kid board light pad says Not connected, never Needs pairing or
   assert.deepEqual(r.kid.errors, []);
   assert.deepEqual(k.kidPad, [], J(k)); /* SUNHOME1 · an unconnected room card is not shown */
   assert.equal(k.needs.length, 0, J(k));
-  assert.equal(r.unpaired.t1.pairWord, 1);
+  assert.equal(r.unpaired.t1.pairWord, 0, "unpaired hub does not show the pairing word");
 });
 
 test("PAIRUI1b · source: paintKidPad has no Needs pairing; only kid-harris of the kid boards loads the lights pad", () => {

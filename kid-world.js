@@ -1917,14 +1917,16 @@
   var bg = null;
   function paintClock() {
     var el = document.querySelector("[data-kw-clock]");
-    if (!el) return;
-    if (kid() === "ainsley") {
+    var live = document.querySelectorAll ? document.querySelectorAll("[data-live-clock]") : [];
+    if (kid() === "ainsley" && ((el && el.parentNode) || (live && live.length))) {
       var h = chicagoHour();
       var word = h < 5 || h >= 21 ? "Night" : h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening";
-      el.textContent = word;
-      var live = document.querySelectorAll("[data-live-clock]");
-      for (var li = 0; li < live.length; li++) if (/\d/.test(live[li].textContent || "")) live[li].textContent = word;
-    } else el.textContent = clockLine();
+      if (el) el.textContent = word;
+      for (var li = 0; li < live.length; li++) if ((live[li].textContent || "") !== word) live[li].textContent = word;
+      return;
+    }
+    if (!el) return;
+    el.textContent = clockLine();
   }
   function paintWeek() {
     var host = document.querySelector("[data-kw-week]");

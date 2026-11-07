@@ -194,8 +194,8 @@ test("AINSJAR1 state: no grant, a bad feed, or the word trusted stays unset; onl
     { kids: { ainsley: { jarState: true } } }, { kids: { ainsley: { jarState: "trusted" } } }, { kids: { ainsley: { jarState: "TRUSTED" } } }, { kids: { ainsley: { jarState: " Trusted " } } },
     { kids: { ainsley: { jarState: "empty" } } }, { kids: { hayes: { jarState: "She walks to the library" } } }, { offline: true, status: "offline" }])
     assert.equal(S(d), "unset", JSON.stringify(d));
-  assert.equal(G({ kids: { ainsley: { jarState: "She walks to the library" } } }), "She walks to the library");
-  assert.equal(S({ kids: { ainsley: { jarState: "She walks to the library" } } }), "grant");
+  assert.equal(G({ kids: { ainsley: { jarState: "She walks to the library" } } }), "");
+  assert.equal(S({ kids: { ainsley: { jarState: "She walks to the library" } } }), "unset");
   assert.equal(G({ kids: { ainsley: { jarState: "Jar $5" } } }), "");
   const el = { attrs: {}, textContent: "TRUSTED", setAttribute(k, v) { this.attrs[k] = v; } };
   ctx.document.querySelectorAll = () => [el];
@@ -203,7 +203,7 @@ test("AINSJAR1 state: no grant, a bad feed, or the word trusted stays unset; onl
   assert.equal(el.textContent, EMPTY_JAR);
   assert.equal(el.attrs["data-jar-state"], "unset");
   ctx.AinsJarState.paint({ kids: { ainsley: { jarState: "She walks to the library" } } });
-  assert.equal(el.textContent, "She walks to the library");
+  assert.equal(el.textContent, EMPTY_JAR);
   seen.push(el.textContent);
   const src = read("ains-jar-state.js").replace(/\/\*[\s\S]*?\*\//g, "");
   assert.equal(/\d/.test(src), false, "the painter writes no digit");

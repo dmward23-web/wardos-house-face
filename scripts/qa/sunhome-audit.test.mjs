@@ -203,8 +203,8 @@ test("Ainsley jar: offline, bad JSON, and the word trusted paint the empty line;
   ctx.AinsJarState.paint("{not json");
   assert.equal(el.textContent, "Nothing trusted yet.");
   ctx.AinsJarState.paint({ kids: { ainsley: { jarState: "She walks to the library" } } });
-  assert.equal(el.textContent, "She walks to the library");
-  assert.equal(el.getAttribute("data-jar-state"), "grant");
+  assert.equal(el.textContent, "Nothing trusted yet.");
+  assert.equal(el.getAttribute("data-jar-state"), "unset");
 });
 
 test("boys pebble reaches filled only when every must is actually done", () => {

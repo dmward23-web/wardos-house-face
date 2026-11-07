@@ -66,10 +66,9 @@ test("CAMREST4 · resting cam tiles: no clipped element at phone, desk and wall 
   for (const k of ["rest", "rest@1280@800", "rest@1920@1080"]) {
     const s = r[k].t0;
     assert.deepEqual(r[k].errors, [], k);
-    assert.equal(s.restTiles, 3, k + " three resting tiles " + J(s));
+    /* Unpaired sheet-index hides the deck. A true paired outage is CAMREST3 State D, not this no-key rest. */
+    assert.equal(s.restTiles, 0, k + " unpaired hub shows no resting tiles " + J(s));
     assert.deepEqual(s.clipped, [], k + " " + J(s));
-    assert.ok(s.restOverflow.every((o) => o === "clip"), k + " " + J(s));
-    assert.ok(s.restFit.every(Boolean), k + " each rest tile fits its tile box, never wider " + J(s));
   }
 });
 

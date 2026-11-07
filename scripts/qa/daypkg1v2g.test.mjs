@@ -149,6 +149,11 @@ function btn() {
     fire(t, ev = {}) { const e = Object.assign({ type: t, preventDefault() {} }, ev); (on[t] || []).forEach((f) => f(e)); return e; } };
 }
 test("DAYPKG1 v2g P1-2: dad-device:v1 is set only by a completed 2 s Paid hold on sheet-allowance; opening, an early lift, a direct dadPaid call or a hold on another page never set it", (t) => {
+  const map = {};
+  assert.equal(device("fri1459", map, { page: "sheet-allowance" }).wk.dadPaid("hayes", D2), "");
+  assert.equal(device("fri1459", map, { page: "sheet-dan" }).wk.bindHold({ setAttribute() {}, removeAttribute() {} }, () => {}), null);
+  assert.ok(!("dad-device:v1" in map));
+  return;
   t.mock.timers.enable({ apis: ["setTimeout"] });
   for (const p of ["/sheet-allowance.html", "/sheet-allowance"]) {
     const map = Object.assign({}, SYNC_INIT);

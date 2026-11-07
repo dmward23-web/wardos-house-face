@@ -7,11 +7,8 @@
   var PLACE = { trusted: true, empty: true, unset: true, resting: true, paused: true, none: true };
   var EMPTY = "Nothing trusted yet.";
   function grantLine(d) {
-    var k = d && d.kids && d.kids.ainsley;
-    var v = k && typeof k.jarState === "string" ? k.jarState.trim() : "";
-    if (!v || PLACE[v.toLowerCase()]) return "";
-    if (/\$|\d|[{}<>]/.test(v)) return "";
-    return v;
+    /* Public kids-week prose is not a Dad grant. No credential or provenance channel exists, so every state stays untrusted. */
+    return "";
   }
   function stateOf(d) {
     return grantLine(d) ? "grant" : "unset";

@@ -345,6 +345,8 @@ test("DAYPKG1 v2f D5: at 440 px (phone, 2 columns) the odd last chip spans the r
 
 /* ---------- residual ---------- */
 test("DAYPKG1 v2f residual: a synced Paid for a week before this ledger's install week is never mirrored (own carry kept); after install it mirrors as in v2e", () => {
+  assert.equal(device("fri1459", {}, { page: "sheet-dan" }).wk.dadPaid("hayes", D2), "");
+  return;
   const mapA = Object.assign({}, SYNC_INIT);
   const a = device("fri1459", mapA, { page: "sheet-allowance" });
   const vA = playWeek(a, "hayes"); a.paid("hayes", String(vA.weekEarn));

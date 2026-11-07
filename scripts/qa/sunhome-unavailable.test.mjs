@@ -36,12 +36,12 @@ test("unpaired family hub starts with cameras and lights unavailable", () => {
   assert.ok(panel.includes("panel.hidden = false"));
 });
 
-test("pairing notice is limited to recovery routes; the shared hub is not one of them", () => {
+test("pinned private-feed keeps needsPairing; the hub hides the chip in its own stylesheet", () => {
   const pf = read("private-feed.js");
-  const fn = pf.slice(pf.indexOf("function dadRecovery"), pf.indexOf("function needsPairing"));
-  assert.ok(fn.includes("dan|lights|allowance|google-home"));
-  assert.equal(fn.includes("sheet-index"), false);
-  assert.ok(pf.includes("!kidBoard() && dadRecovery()"));
+  assert.ok(pf.includes('function needsPairing() { return !forceOffline && pairState() !== "paired" && !kidBoard(); }'));
+  assert.equal(pf.includes("function dadRecovery"), false);
+  const hub = read("sheet-index.html");
+  assert.ok(hub.includes(".pf-flag--pair { display: none !important; }"));
 });
 
 test("public allowance page has no Paid control; the pay functions remain and are not a role", () => {
