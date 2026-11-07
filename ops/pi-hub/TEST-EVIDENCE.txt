@@ -1,8 +1,8 @@
-# Pi mock tests after review v2. Not an independent verification.
+# Pi v4 mock tests. Not an independent verification and not ARM approval.
 # node --test --test-concurrency=1 ops/pi-hub/qa/pihub-dryrun.test.mjs
-# 14 tests, exit 0, on this x86_64 checkout
-# qemu-aarch64 was not run
-# aarch64 wheels recorded pip_exit nonzero and aarch64_import_proven false
-# a pure-Python fixture recorded both exits 0 and aarch64_import_proven false
-# a forged aarch64 result and pip_exit 1 with import_exit 0 were refused
-# /opt/wardos was created for one gated install and removed afterward
+# 16 tests, exit 0, on this x86_64 checkout
+# qemu-aarch64 was not run and systemctl was not invoked
+# unknown exec profile, x86 target record, symlink result, symlink rollback parent,
+# missing target payload, drop-in, foreign MainPID, later unit mapping, and
+# partial enable reversal were refused or reversed in fixtures
+# aarch64 wheels recorded pip failure and aarch64_import_proven false

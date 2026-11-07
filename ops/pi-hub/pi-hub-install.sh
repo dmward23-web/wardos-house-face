@@ -9,11 +9,13 @@ REPO="$(cd "$HERE/../.." && pwd)"
 MODE="plan"
 PREFIX=""
 GATE=""
+INSTALL_PROFILE="target"
 while [ $# -gt 0 ]; do
   case "$1" in
     --plan) MODE="plan" ;;
     --offline-verify) MODE="verify" ;;
-    --install|--stage) MODE="install" ;;
+    --install) MODE="install"; INSTALL_PROFILE="target" ;;
+    --stage|--fixture-install) MODE="install"; INSTALL_PROFILE="fixture" ;;
     --rollback) MODE="rollback" ;;
     --rollback-services) MODE="rollback-services" ;;
     --enable) MODE="enable" ;;
@@ -79,33 +81,69 @@ fi
 
 if [ "$MODE" = "enable" ] || [ "$MODE" = "start" ] || [ "$MODE" = "activate" ] || [ "$MODE" = "rollback-services" ]; then
   [ -n "$GATE" ] || { echo "REFUSE activation gate absent"; exit 78; }
-  python3 "$HERE/lib/pi_gate.py" --systemd "$GATE"
   [ -n "$PREFIX" ] || PREFIX=/opt/wardos
   allow_prefix "$PREFIX" || exit 78
+  python3 "$HERE/lib/pi_gate.py" --systemd "$GATE" "$PREFIX"
   ctl="${SYSTEMCTL:-systemctl}"
-  python3 - "$GATE" "$ctl" "$MODE" <<'PY'
+  python3 - "$GATE" "$ctl" "$MODE" "$PREFIX" <<'PY'
 import json, subprocess, sys
-gate, ctl, mode = sys.argv[1:]
+gate, ctl, mode, prefix = sys.argv[1:]
 doc = json.load(open(gate))
+
+def show(name):
+    run = subprocess.run([ctl, "show", "-p", "FragmentPath", "-p", "DropInPaths", "-p", "User", "-p", "ExecStart", "-p", "MainPID", name], text=True, capture_output=True)
+    if run.returncode != 0:
+        print("REFUSE systemd show")
+        raise SystemExit(78)
+    info = {}
+    for line in (run.stdout or "").splitlines():
+        if "=" in line:
+            key, val = line.split("=", 1)
+            info[key] = val.strip()
+    return info
+
+checked = []
 for unit in doc["units"]:
     name = unit["name"]
     frag = unit["fragment_path"]
-    show = subprocess.run([ctl, "show", "-p", "FragmentPath", "--value", name], text=True, capture_output=True)
-    got = (show.stdout or "").strip()
-    if show.returncode != 0 or got != frag:
+    info = show(name)
+    if info.get("FragmentPath") != frag or not frag.startswith(prefix + "/"):
         print("REFUSE systemd name is not the staged unit")
         raise SystemExit(78)
-    if mode == "rollback-services":
-        stop = subprocess.run([ctl, "disable", "--now", name])
-        if stop.returncode != 0:
-            raise SystemExit(stop.returncode)
-    elif mode == "start":
-        subprocess.run([ctl, "start", name], check=True)
-    elif mode == "enable":
-        subprocess.run([ctl, "enable", name], check=True)
-    else:
-        subprocess.run([ctl, "enable", name], check=True)
-        subprocess.run([ctl, "start", name], check=True)
+    if info.get("DropInPaths", "") not in ("", "-"):
+        print("REFUSE systemd drop-in")
+        raise SystemExit(78)
+    if info.get("MainPID", "0") not in ("0", ""):
+        print("REFUSE systemd foreign run")
+        raise SystemExit(78)
+    text = open(frag, encoding="utf-8").read().splitlines()
+    file_user = next(line.split("=", 1)[1].strip() for line in text if line.startswith("User="))
+    file_exec = next(line.split("=", 1)[1].strip() for line in text if line.startswith("ExecStart="))
+    if info.get("User", "") != file_user or file_exec not in info.get("ExecStart", ""):
+        print("REFUSE systemd effective unit")
+        raise SystemExit(78)
+    checked.append(name)
+done = []
+try:
+    for name in checked:
+        if mode == "rollback-services":
+            args = ["disable", "--now", name]
+        elif mode == "start":
+            args = ["start", name]
+        elif mode == "enable":
+            args = ["enable", name]
+        else:
+            subprocess.run([ctl, "enable", name], check=True)
+            done.append(name)
+            args = ["start", name]
+        subprocess.run([ctl, *args], check=True)
+        if mode != "activate":
+            done.append(name)
+except subprocess.CalledProcessError:
+    for name in reversed(done):
+        subprocess.run([ctl, "disable", "--now", name])
+    print("REFUSE systemd partial action reversed")
+    raise SystemExit(78)
 print("OK systemd " + mode)
 PY
   exit 0
@@ -124,10 +162,16 @@ if [ "$MODE" = "rollback" ]; then
   [ -f "$receipt" ] || { echo "REFUSE no receipt"; exit 2; }
   while IFS=$'\t' read -r kind rel extra; do
     [ -n "${rel:-}" ] || continue
+    [ "$kind" = schema ] && continue
     case "$rel" in
       /*|*..*) echo "REFUSE receipt path escapes"; exit 2 ;;
     esac
     target="$PREFIX/$rel"
+    if [ "$kind" = link ]; then
+      python3 "$HERE/lib/pi_gate.py" --contained "$PREFIX" "$(dirname "$target")"
+    else
+      python3 "$HERE/lib/pi_gate.py" --contained "$PREFIX" "$target"
+    fi
     case "$kind" in
       link)
         [ -L "$target" ] || { echo "REFUSE missing link $rel"; exit 2; }
@@ -142,7 +186,7 @@ if [ "$MODE" = "rollback" ]; then
     esac
   done <"$receipt"
   while IFS=$'\t' read -r kind rel extra; do
-    [ -n "${rel:-}" ] || continue
+    [ "$kind" = file ] || [ "$kind" = link ] || continue
     rm -f "$PREFIX/$rel"
   done <"$receipt"
   rm -f "$receipt"
@@ -166,7 +210,26 @@ PY
 )"
 fi
 if [ -z "$SERVICE_HOME" ]; then SERVICE_HOME="$PREFIX/service-home"; fi
-mkdir -p "$PREFIX/bin" "$PREFIX/lib" "$PREFIX/lib/systemd/system" "$PREFIX/etc" "$PREFIX/deps" "$PREFIX/runbook" "$PREFIX/secrets"
+if [ "$INSTALL_PROFILE" = "target" ]; then
+  [ -n "${WARDOS_PI_PAYLOAD:-}" ] || { echo "REFUSE target payload required"; exit 78; }
+  if ! id -u "$SERVICE_USER" >/dev/null 2>&1 || [ "$(id -u "$SERVICE_USER")" = "0" ]; then
+    echo "REFUSE service account is absent or root"
+    exit 78
+  fi
+fi
+mkdir -p "$PREFIX/bin" "$PREFIX/lib" "$PREFIX/lib/systemd/system" "$PREFIX/etc" "$PREFIX/deps/wheelhouse" "$PREFIX/runbook" "$PREFIX/secrets" "$PREFIX/vendor"
+chmod 0755 "$PREFIX" "$PREFIX/bin" "$PREFIX/lib" "$PREFIX/lib/systemd" "$PREFIX/lib/systemd/system" "$PREFIX/etc" "$PREFIX/deps" "$PREFIX/deps/wheelhouse" "$PREFIX/runbook" "$PREFIX/secrets" "$PREFIX/vendor"
+: >"$receipt"
+printf 'schema\twardos.pi-install.receipt/1\tplan\n' >>"$receipt"
+cleanup_partial() {
+  [ -f "$receipt" ] || return 0
+  while IFS=$'\t' read -r kind rel extra; do
+    [ "$kind" = file ] || [ "$kind" = link ] || continue
+    python3 "$HERE/lib/pi_gate.py" --contained "$PREFIX" "$PREFIX/$rel" || continue
+    rm -f "$PREFIX/$rel"
+  done <"$receipt"
+}
+trap cleanup_partial ERR
 install -m 0755 "$HERE/bin/wardos-pi-lights.sh" "$PREFIX/bin/wardos-pi-lights.sh"
 install -m 0755 "$HERE/bin/wardos-pi-tunnel.sh" "$PREFIX/bin/wardos-pi-tunnel.sh"
 install -m 0755 "$HERE/bin/wardos-pi-venv.sh" "$PREFIX/bin/wardos-pi-venv.sh"
@@ -189,9 +252,9 @@ METRICS_R2=20242
 TUNNEL_NAME=wardos-hub
 TUNNEL_CONFIG=$PREFIX/etc/tunnel.yml
 RUN_TREE=$PREFIX/run
-KASA_VENV=$PREFIX/venv
-KASA_VENV_PYTHON=$PREFIX/venv/bin/python
+NODE_PATH=$PREFIX/vendor
 KASA_LOCK=$PREFIX/deps/kasa-aarch64-cp313.lock.txt
+KASA_WHEELHOUSE=$PREFIX/deps/wheelhouse
 LIGHTS_TOKEN_FILE=$PREFIX/secrets/lights-proxy.token
 KASA_USER_FILE=$SERVICE_HOME/.config/wardos/kasa.user
 KASA_PASSWORD_FILE=$SERVICE_HOME/.config/wardos/kasa.password
@@ -212,16 +275,25 @@ manifest, root = sys.argv[1:]
 doc = json.load(open(manifest))
 need = {"node-v24.22.1-linux-arm64.tar.xz", "cloudflared-linux-arm64"}
 seen = set()
+rootp = Path(root)
 for row in doc["files"]:
     if row["name"] not in need:
         continue
-    target = Path(root) / row["name"]
+    target = rootp / row["name"]
     data = target.read_bytes()
     if len(data) != row["bytes"] or hashlib.sha256(data).hexdigest() != row["sha256"]:
         raise SystemExit("REFUSE payload hash " + row["name"])
     seen.add(row["name"])
 if seen != need:
     raise SystemExit("REFUSE payload missing node or cloudflared")
+wheels = doc.get("wheels") or []
+if len(wheels) != 21:
+    raise SystemExit("REFUSE payload wheel count")
+for row in wheels:
+    target = rootp / "wheels" / row["name"]
+    data = target.read_bytes()
+    if len(data) != row["bytes"] or hashlib.sha256(data).hexdigest() != row["sha256"]:
+        raise SystemExit("REFUSE payload wheel " + row["name"])
 print("OK payload hashes")
 PY
   install -m 0755 "$WARDOS_PI_PAYLOAD/cloudflared-linux-arm64" "$PREFIX/bin/cloudflared"
@@ -232,17 +304,26 @@ PY
   install -m 0755 "$payload_node" "$PREFIX/bin/node"
   rm -rf "$payload_tmp"
   printf 'WARDOS_NODE=%s\nWARDOS_CLOUDFLARED=%s\n' "$PREFIX/bin/node" "$PREFIX/bin/cloudflared" >>"$PREFIX/etc/hub.env"
+  while IFS= read -r wheel; do
+    [ -n "$wheel" ] || continue
+    install -m 0644 "$WARDOS_PI_PAYLOAD/wheels/$wheel" "$PREFIX/deps/wheelhouse/$wheel"
+  done < <(python3 -c 'import json,sys; print("\n".join(r["name"] for r in json.load(open(sys.argv[1]))["wheels"]))' "$HERE/OFFLINE-MANIFEST.json")
 fi
 printf '%s\n' "no" >"$PREFIX/etc/units-enabled"
 printf '%s\n' "ARM_IMPORT: NOT TESTED" "WHEEL_HASH_IS_NOT_INSTALL: true" >"$PREFIX/deps/ARM-IMPORT-NOT-TESTED"
 ln -sfn wardos-pi-lights.sh "$PREFIX/bin/hub"
 ln -sfn . "$PREFIX/current"
-: >"$receipt"
 record_file() {
   printf 'file\t%s\t%s\n' "$1" "$(sha256sum "$PREFIX/$1" | cut -c1-64)" >>"$receipt"
 }
 if [ -f "$PREFIX/bin/node" ]; then record_file bin/node; fi
 if [ -f "$PREFIX/bin/cloudflared" ]; then record_file bin/cloudflared; fi
+if [ -d "$PREFIX/deps/wheelhouse" ]; then
+  for wheel in "$PREFIX/deps/wheelhouse"/*.whl; do
+    [ -f "$wheel" ] || continue
+    record_file "deps/wheelhouse/$(basename "$wheel")"
+  done
+fi
 record_file bin/wardos-pi-lights.sh
 record_file bin/wardos-pi-tunnel.sh
 record_file bin/wardos-pi-venv.sh
@@ -289,4 +370,5 @@ while read -r digest name; do
   install -m 0644 "$src" "$PREFIX/vendor/ws/$name"
   record_file "vendor/ws/$name"
 done <"$HERE/vendor/ws.SHA256SUMS"
+trap - ERR
 echo "OK install"

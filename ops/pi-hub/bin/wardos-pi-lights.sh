@@ -33,7 +33,10 @@ else GATE_PY="$PREFIX/lib/pi_gate.py"; fi
 
 lights_exec() {
   export HOME="${SERVICE_HOME:-$HOME}"
-  export KASA_VENV_PYTHON="${KASA_VENV_PYTHON:-$PREFIX/venv/bin/python}"
+  export NODE_PATH="${NODE_PATH:-$PREFIX/vendor}"
+  if [ -n "${KASA_VENV_PYTHON_BOUND:-}" ]; then
+    export KASA_VENV_PYTHON="$KASA_VENV_PYTHON_BOUND"
+  fi
   exec "$NODE" "$RUN_TREE/scripts/lights-write-proxy.mjs" --host "$LIGHTS_HOST" --port "$LIGHTS_PORT" --token-file "$TOKEN"
 }
 
@@ -44,8 +47,16 @@ if [ "$MODE" = "plan" ]; then
 fi
 python3 "$GATE_PY" "$GATE"
 profile="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("exec_profile") or "target")' "$GATE")"
+case "$profile" in
+  target|fixture-stub) ;;
+  *) echo "REFUSE exec profile"; exit 78 ;;
+esac
 if [ "$profile" = "target" ]; then
-  python3 "$GATE_PY" --preflight-ok "${PREFLIGHT_RESULT:-$PREFIX/deps/preflight-result.json}"
+  if ! KASA_VENV_PYTHON_BOUND="$(python3 "$GATE_PY" --preflight-target "${PREFLIGHT_RESULT:-$PREFIX/deps/preflight-result.json}" "$PREFIX" "${KASA_LOCK:-$PREFIX/deps/kasa-aarch64-cp313.lock.txt}" "${KASA_WHEELHOUSE:-$PREFIX/deps/wheelhouse}")"; then
+    printf '%s\n' "$KASA_VENV_PYTHON_BOUND" >&2
+    exit 78
+  fi
+  export KASA_VENV_PYTHON_BOUND
 fi
 if [ -L "$TOKEN" ] || [ ! -f "$TOKEN" ]; then echo "REFUSE device token path"; exit 78; fi
 if [ "$(stat -c %a "$TOKEN")" != "600" ]; then echo "REFUSE device token mode"; exit 78; fi

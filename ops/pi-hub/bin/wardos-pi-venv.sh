@@ -34,10 +34,15 @@ fi
 canon="$(python3 "$GATE_PY" --canonical "$PREFIX")" || { echo "$canon"; exit 78; }
 PREFIX="$canon"
 parent="$PREFIX/preflight-venvs"
+python3 "$GATE_PY" --contained "$PREFIX" "$parent"
+python3 "$GATE_PY" --contained "$PREFIX" "$RESULT"
 mkdir -p "$parent"
+chmod 0755 "$PREFIX" "$parent"
 venv="$parent/venv-$$"
 if [ -e "$venv" ]; then echo "REFUSE preflight venv path already exists"; exit 78; fi
+python3 "$GATE_PY" --contained "$PREFIX" "$venv"
 mkdir "$venv"
+chmod 0755 "$venv"
 python3 -m venv "$venv/env"
 set +e
 "$venv/env/bin/python" -m pip install --require-hashes --no-index --find-links "$WHEELHOUSE" --only-binary=:all: --disable-pip-version-check --no-input -r "$LOCK"
@@ -46,15 +51,16 @@ pip_rc=$?
 imp_rc=$?
 set -e
 mkdir -p "$(dirname "$RESULT")"
-python3 - "$RESULT" "$pip_rc" "$imp_rc" "$LOCK" "$WHEELHOUSE" <<'PY'
-import hashlib, json, platform, sys
+python3 - "$RESULT" "$pip_rc" "$imp_rc" "$LOCK" "$WHEELHOUSE" "$venv/env" <<'PY'
+import hashlib, json, os, platform, sys
 from pathlib import Path
-out, pip_rc, imp_rc, lock, house = sys.argv[1:]
+out, pip_rc, imp_rc, lock, house, venv = sys.argv[1:]
 pip_rc = int(pip_rc)
 imp_rc = int(imp_rc)
 arch = platform.machine()
 files = sorted(p for p in Path(house).glob("*.whl")) if Path(house).is_dir() else []
-blob = b"".join(hashlib.sha256(p.read_bytes()).digest() for p in files)
+blob = "".join(hashlib.sha256(p.read_bytes()).hexdigest() for p in files)
+py = str(Path(venv) / "bin" / "python")
 doc = {
     "schema": "wardos.pi-preflight.result/1",
     "host_arch": arch,
@@ -63,9 +69,13 @@ doc = {
     "import_exit": imp_rc,
     "imported": pip_rc == 0 and imp_rc == 0,
     "phrase_is_proof": False,
+    "record_is_authentication": False,
+    "arm_execution_approved": False,
     "aarch64_import_proven": arch == "aarch64" and pip_rc == 0 and imp_rc == 0,
     "lock_sha256": hashlib.sha256(Path(lock).read_bytes()).hexdigest() if Path(lock).is_file() else "",
-    "wheelhouse_sha256": hashlib.sha256(blob).hexdigest(),
+    "wheelhouse_sha256": hashlib.sha256(blob.encode()).hexdigest(),
+    "venv_path": os.path.realpath(venv),
+    "venv_python": os.path.realpath(py) if Path(py).exists() else py,
 }
 Path(out).write_text(json.dumps(doc), encoding="utf-8")
 print("PREFLIGHT pip %s import %s arch %s proven %s" % (pip_rc, imp_rc, arch, str(doc["aarch64_import_proven"]).lower()))
