@@ -64,8 +64,8 @@ test("a goal title/blurb line with no text is hidden (no empty label); one with 
 test("kid-ainsley.html: the Tour Jar has its title and state word, and no goal-line hook that could paint blank", () => {
   const h = read("kid-ainsley.html");
   const jar = h.slice(h.indexOf('id="sec-jar"'), h.indexOf("</section>", h.indexOf('id="sec-jar"')));
-  assert.match(jar, /class="bank-title">Tour Jar</);
-  assert.match(jar, /data-jar-state="trusted">TRUSTED</);
+  assert.match(jar, /class="bank-title">Jar</); /* Nov 5 Atlas: the Tour demo word is off her board; TRUSTED/EMPTY stays */
+  assert.match(jar, /data-jar-state="unset">Nothing trusted yet\.</);
   assert.doesNotMatch(h, /data-bank-goal-(title|blurb)|data-goal-chip|data-grow-(title|jar-name|meter)|data-bank-reward/);
   assert.doesNotMatch(jar, />\s*Goal\s*</, "no bare 'Goal' placeholder text in the jar");
 });

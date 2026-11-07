@@ -8,7 +8,7 @@ def launch_kw(p, **kw):
             return kw
     except Exception:
         pass
-    for c in (os.environ.get("WARDOS_CHROME"), "/usr/bin/google-chrome", shutil.which("chromium") or ""):
+    for c in (os.environ.get("WARDOS_CHROME"), "/usr/bin/google-chrome", "/usr/local/bin/google-chrome", shutil.which("google-chrome") or "", shutil.which("chromium") or ""):
         if c and os.path.exists(c):
             kw["executable_path"] = c
             break

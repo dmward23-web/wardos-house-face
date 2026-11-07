@@ -55,7 +55,20 @@ test("H1P2D4 browser FIT: real-length tiles fit the wall (bottom borders in view
       const g = await b.newPage(); await g.setViewport({ width: w, height: h, deviceScaleFactor: 1 }); await g.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
       await g.evaluateOnNewDocument((t) => { try { localStorage.setItem("wardos-private-feed-token", t); } catch (e) {} }, TOKEN);
       await g.goto(`${base}/${pg}?spook=0&pfBase=${encodeURIComponent(base)}`, { waitUntil: "domcontentloaded", timeout: 120000 });
-      await g.waitForFunction(() => document.querySelectorAll(".tile .kf-stage").length >= 4, { timeout: 60000 }); await new Promise((ok) => setTimeout(ok, 4000));
+      /* DAYPKG1 v2i removed the Dan kid-flip. Three kf-stages. Dad's live seat, when present, is .tile.dan [data-dad-stage], not a fourth stage. */
+      await g.waitForFunction(() => ["ainsley", "hayes", "harris"].every((k) => document.querySelector(".tile." + k + " .kf-stage")) && document.querySelectorAll(".tile .kf-stage").length === 3, { timeout: 60000 });
+      const seat = await g.evaluate(() => ({
+        stages: document.querySelectorAll(".tile .kf-stage").length,
+        flips: ["ainsley", "hayes", "harris"].filter((k) => document.querySelector(".tile." + k + "[data-kid-flip], .tile." + k + ".kid-flip")).length,
+        dad: !!document.querySelector(".tile.dan [data-dad-stage]"),
+        dadKf: !!document.querySelector(".tile.dan .kf-stage")
+      }));
+      assert.equal(seat.stages, 3, "three kid kf-stages");
+      assert.equal(seat.flips, 3, "three kid flips");
+      assert.equal(seat.dadKf, false, "Dad is not a fourth kf-stage");
+      if (seat.dad) assert.equal(seat.dadKf, false, "Dad seat is [data-dad-stage]");
+      else assert.equal(seat.flips, 3, "hub has exactly the three kid flips");
+      await new Promise((ok) => setTimeout(ok, 4000));
       const r = await g.evaluate((S) => {
         const deck = document.querySelector(".panel > .hub-cam-deck"); if (deck) { deck.hidden = false; deck.style.setProperty("display", getComputedStyle(deck).display === "none" ? "block" : getComputedStyle(deck).display, "important"); for (const p of ["height", "min-height", "max-height"]) deck.style.setProperty(p, S.camDeckH + "px", "important"); }
         const grid = document.querySelector(".grid-wrap .tile-grid"), painted = [];

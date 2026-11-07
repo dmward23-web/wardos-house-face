@@ -309,10 +309,16 @@
       else { hum.textContent = ""; hum.hidden = true; hum.style.setProperty("display", "none", "important"); }
     }
     if (mode) {
-      mode.textContent = mc.label;
-      mode.style.background = mc.soft;
-      mode.style.color = "#121418";
-      mode.style.borderColor = mc.accent;
+      if (st.source !== "live") {
+        mode.textContent = "";
+        mode.hidden = true;
+      } else {
+        mode.hidden = false;
+        mode.textContent = mc.label;
+        mode.style.background = mc.soft;
+        mode.style.color = "#121418";
+        mode.style.borderColor = mc.accent;
+      }
     }
     if (pill) {
       pill.textContent = st.gate.label;
@@ -327,8 +333,9 @@
       ambLab.textContent = st.gate.live ? "Indoor live" : "Indoor · not live";
     }
     if (sub) {
-      var src = st.gate.live ? "LIVE" : (st.gate.kind === "need_token" ? "Needs pairing" : (st.gate.kind === "error" || st.gate.kind === "stale" ? "OFF" : "LOCAL"));
-      sub.textContent = src + " · " + st.mode + " · fan " + st.fan + " · not Nest";
+      /* SUNHOME1 · a missing thermostat does not borrow the local demo mode or fan. */
+      if (st.source !== "live") sub.textContent = st.gate && st.gate.label ? st.gate.label : "Thermostat offline";
+      else sub.textContent = "LIVE · " + st.mode + " · fan " + st.fan;
     }
   }
 

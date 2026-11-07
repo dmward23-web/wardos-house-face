@@ -726,10 +726,17 @@
   }
 
   function paintHubCamDeck(doc) {
-    ingestProxyFromLive(cachedData());
     doc = doc || document;
     var deck = doc.getElementById("hub-cam-deck");
     if (!deck) return;
+    var paired = false;
+    try { paired = !!(global.PrivateFeed && PrivateFeed.pairState && PrivateFeed.pairState() === "paired"); } catch (eP) {}
+    if (!paired && /sheet-index\.html$/.test((doc.defaultView || window).location.pathname || "")) {
+      deck.hidden = true;
+      return;
+    }
+    deck.hidden = false;
+    ingestProxyFromLive(cachedData());
     /* NODATA1 · never show broken copy: stale/stub camera tiles hide; the deck hides when none is left.
        CAMREST2 · a resting tile is calm, not broken, so it stays: a whole-feed 5xx/401/offline rests the deck, never hides it */
     if (!doc.getElementById("nodata1-cams")) { var st = doc.createElement("style"); st.id = "nodata1-cams"; st.textContent = ".hub-cam.hub-cam-stale:not(.hub-cam-resting),.hub-cam.hub-cam-stub:not(.hub-cam-resting){display:none!important}#hub-cam-deck.nodata1-empty{display:none!important}"; (doc.head || doc.documentElement).appendChild(st); }

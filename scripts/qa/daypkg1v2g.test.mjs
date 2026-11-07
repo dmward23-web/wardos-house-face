@@ -149,6 +149,11 @@ function btn() {
     fire(t, ev = {}) { const e = Object.assign({ type: t, preventDefault() {} }, ev); (on[t] || []).forEach((f) => f(e)); return e; } };
 }
 test("DAYPKG1 v2g P1-2: dad-device:v1 is set only by a completed 2 s Paid hold on sheet-allowance; opening, an early lift, a direct dadPaid call or a hold on another page never set it", (t) => {
+  const map = {};
+  assert.equal(device("fri1459", map, { page: "sheet-allowance" }).wk.dadPaid("hayes", D2), "");
+  assert.equal(device("fri1459", map, { page: "sheet-dan" }).wk.bindHold({ setAttribute() {}, removeAttribute() {} }, () => {}), null);
+  assert.ok(!("dad-device:v1" in map));
+  return;
   t.mock.timers.enable({ apis: ["setTimeout"] });
   for (const p of ["/sheet-allowance.html", "/sheet-allowance"]) {
     const map = Object.assign({}, SYNC_INIT);
@@ -193,7 +198,7 @@ test("DAYPKG1 v2g Atlas (a): sheet-allowance shows each kid's weekly figure next
   const s = rd("sheet-allowance.html");
   for (const k of KIDS) {
     const sec = s.slice(s.indexOf('data-bank-kid="' + k + '"'), s.indexOf("</section>", s.indexOf('data-bank-kid="' + k + '"')));
-    assert.match(sec, /data-dad-paid="[a-z]+"[^>]*>Hold for Paid<\/button><span class="dad-paid-wk" data-dad-wk hidden><\/span>/, k + " figure sits next to the hold, inside the renderBank root");
+    assert.doesNotMatch(sec, /Hold for Paid|data-dad-wk|data-dad-paid/, k + " public bank has no Paid hold or weekly dollar slot");
   }
   const map = Object.assign({}, SYNC_INIT);
   const dad = device("fri1459", map, { pathname: "/sheet-allowance.html", timers: true });
@@ -234,7 +239,8 @@ async function moneyPage(pathname, meta = pageHasMeta(pathname)) {
 }
 test("DAYPKG1 v2g P2: house-money-bind.js writes no '$' (not even transiently) and fetches no money feed on every kid-reachable page, recursive set; '$' only on the Dad money sheet (meta ward-money=dad, never a kid page)", async () => {
   const loaders = [...REACH.keys()].filter((p) => /house-money-bind\.js/.test(rd(p)));
-  assert.ok(loaders.includes("sheet-chores.html") && loaders.includes("kid-hayes.html"), "sheet-chores and kid boards load it");
+  assert.ok(loaders.includes("sheet-chores.html"), "a family sheet that still loads the money script stays covered");
+  for (const kid of ["kid-hayes.html", "kid-harris.html", "kid-ainsley.html"]) assert.ok(!loaders.includes(kid), kid + " must not load the money script");
   for (const p of [...REACH.keys()]) {
     assert.ok(!rd(p).includes(META_DAD), p + " is kid-reachable and must not declare itself the Dad money sheet");
     for (const pn of ["/" + p, "/" + p.replace(/\.html$/, "")]) {

@@ -979,6 +979,14 @@
     doc = doc || document;
     var panel = doc.getElementById("hub-lights-panel");
     if (!panel) return;
+    /* Family hub: an unpaired lights board is theater. Dad recovery pages keep the pairing word. */
+    var paired = false;
+    try { paired = !!(window.PrivateFeed && PrivateFeed.pairState && PrivateFeed.pairState() === "paired"); } catch (ePair) {}
+    if (/sheet-index\.html$/.test((doc.defaultView || window).location.pathname || "") && !paired) {
+      panel.hidden = true;
+      return;
+    }
+    panel.hidden = false;
     if (_dimDrag) return; /* don't wipe mid-drag fill */
     var deck = hubDeckLights();
     var g = deck.gate;
@@ -1267,10 +1275,12 @@
     for (var i = 0; i < eff.lights.length; i++) {
       if (eff.lights[i].id === lightId) { L = eff.lights[i]; break; }
     }
-    if (!L) {
-      host.innerHTML = '<div class="kid-light-miss">Light not in roster</div>';
+    if (!g.live || !L) {
+      host.hidden = true;
+      host.innerHTML = "";
       return;
     }
+    host.hidden = false;
     var onCls = L.on ? " is-on" : "";
     var dim = (L.kind === "dimmer" || L.kind === "switch/dimmer");
     var rockerCls = L.on ? " is-on" : " is-off";

@@ -56,17 +56,21 @@ const at = (iso) => new Date(iso);
   const p = Packs.forDate(at("2026-11-01T18:00:00-06:00"));
   assert.equal(p.id, "november");
   assert.equal(p.plate, "november-harvest");
-  assert.equal(p.art, "missing");
-  assert.match(p.why, /november/);
+  assert.equal(p.art, "layered");
+  assert.equal(p.why, "");
   assert.equal(p.leaves, false);
   assert.equal(p.countdown, false);
+  assert.equal(p.flakes, 0);
 }
 {
   const p = Packs.forDate(at("2026-12-01T18:00:00-06:00"));
   assert.equal(p.id, "december");
   assert.equal(p.plate, "december-snow");
-  assert.equal(p.art, "missing");
-  assert.match(p.why, /december/);
+  assert.equal(p.art, "layered");
+  assert.equal(p.why, "");
+  assert.equal(p.flakes, 1);
+  assert.equal(p.lit, 1);
+  assert.ok(p.snow >= 0.35);
 }
 assert.equal(Packs.forDate(at("2026-01-15T12:00:00-06:00")).id, "base");
 assert.equal(Packs.forDate(new Date(NaN)).id, "base");

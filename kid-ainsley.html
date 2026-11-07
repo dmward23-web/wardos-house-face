@@ -4,11 +4,10 @@
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPAIR1"></script>
 <script src="private-feed.js?v=HUBPAIR1D"></script>
-<script src="school-names.js?v=HALLOWEEN1"></script>
+<script src="school-names.js?v=SUNHOME1"></script>
 <script src="house-nomoney.js?v=DAYPKG1"></script>
 <script src="house-face-law.js?v=FACESTRIP1"></script>
 <script src="house-pair.js?v=HUBPAIR1"></script>
-<script src="house-money-bind.js?v=DAYPKG1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -402,7 +401,7 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
   .sec{border-radius:8px}
   .card{border-radius:6px}
   .quest{border-radius:6px}
-  /* Tour Jar, woodsmoke poster · honey amber foil */
+  /* Jar, woodsmoke poster · honey amber foil */
   body.theme-ainsley .bank-card{
     border-radius:8px;color:#e8e4d4;
     border:2px solid #c87840;
@@ -473,7 +472,6 @@ font-family:"Inter Display",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",He
     padding:9px 12px; min-height:40px; border-radius:8px;
     background:rgba(255,255,255,0.08); border:2px solid rgba(184,90,40,0.4); color:#e8e4d4;
   }
-  .ledger-chip.payday { background:linear-gradient(180deg,#3a4a38,#1a1c16); border-color:#b85a28; color:#e8e4d4; }
   .ledger-chip.unlock-left { color:#d4a860; }
   .ledger-chip.goal-chip.is-empty { opacity:0.75; border-style:dashed; }
   .ledger-chip.goal-chip.is-met {
@@ -816,12 +814,12 @@ body.theme-ainsley .jar-state{display:inline-block;margin-top:6px;padding:4px 10
 <link rel="stylesheet" href="tokens-ainsley-midnight2.css?v=MIDNIGHT2" />
 <link rel="stylesheet" href="icons-g2.css?v=GRAPHICS2" />
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
-<link rel="stylesheet" href="kid-world.css?v=DAYPKG1" />
-<link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
-<script src="away-filter.js?v=HALLOWEEN1" data-away-install></script>
+<link rel="stylesheet" href="kid-world.css?v=SUNHOME4" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=SUNHOME2" />
+<script src="away-filter.js?v=SUNHOME1" data-away-install></script>
 <script src="house-face-law.js?v=FACESTRIP1"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
 <link rel="stylesheet" href="wg-glass.css?v=HOTFIX1" />
-<script src="livinghouse/clock.js?v=LIVEWX2"></script><script src="livinghouse/scene-packs.js?v=H1P2D4"></script><script src="wg-assets.js?v=H1P2D3" defer></script>
+<script src="livinghouse/clock.js?v=LIVEWX2"></script><script src="month-theme/season-math.js?v=SUNHOME1"></script><script src="livinghouse/scene-packs.js?v=SUNHOME1"></script><script src="wg-assets.js?v=H1P2D3" defer></script>
 </head>
 <body data-kid-world="1" data-clear-label="ALL CLEAR" data-kid="ainsley" data-theme="ainsley" data-chores-shared="1" class="theme-ainsley stick-season" data-asset="kidboards/ainsley-wall-costume.webp|kidboards/ainsley-wall.png" data-asset-ph="kidboards/ainsley-phone-costume.webp|kidboards/ainsley-phone-v2.png|kidboards/ainsley-phone.png" data-asset-var="--wg-kidbg">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -1108,17 +1106,15 @@ body.theme-ainsley .jar-state{display:inline-block;margin-top:6px;padding:4px 10
  <div class="sec-hdr"><div class="sec-title">Musts</div></div>
  <div class="sec-list" data-mount-quests></div>
  </section>
- <section class="sec sec-bank bank-card tour-jar" id="sec-jar" aria-label="Tour Jar">
+ <section class="sec sec-bank bank-card" id="sec-jar" aria-label="Jar">
  <div class="bank-top">
  <div>
- <div class="bank-title">Tour Jar</div>
- <div class="jar-state" data-jar-state="trusted">TRUSTED</div><!-- AINSJAR1 · a state, never a number or star -->
+ <div class="bank-title">Jar</div>
+ <div class="jar-state" data-jar-state="unset">Nothing trusted yet.</div><!-- AINSJAR1 · a state, never a number or star. Nov 5: no grant yet is not TRUSTED -->
  </div>
  </div>
  <div class="bank-links" data-cta-row hidden>
- <span class="unlock-cta" data-unlock-cta hidden>Jar full · show Dad</span>
  </div>
- <div class="paid-stamp" data-paid-stamp hidden>Paid</div>
  </section>
  <section class="sec sec-schedule consume-sched" id="sec-days" aria-label="Week" data-consume-sel="">
  <div class="sec-hdr"><div class="sec-title">Week</div></div>
@@ -1153,8 +1149,8 @@ document.addEventListener("house:kid-rendered", function(){
 <script src="ains-jar-state.js?v=AINSJAR2"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=DAYPKG1"></script>
-<script src="house-kid-engage.js?v=DAYPKG1"></script>
-<script src="house-checkoffs.js?v=DAYPKG1" defer></script>
+<script src="house-kid-engage.js?v=SUNHOME1"></script>
+<script src="house-checkoffs.js?v=CHECKDONE1" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
  /* AINSJAR1 · no saves panel for Ainsley (saves carry star targets) */
@@ -1175,8 +1171,8 @@ document.addEventListener("DOMContentLoaded", function(){
 <script>/* AINSCLOCK1 (Atlas 1:09 AM CT) · Ainsley pages show no digits: the kid-world HUD clock line (day + time) is taken out of the DOM as soon as it is built, so it never renders */
 (function () { function drop() { var c = document.querySelectorAll("[data-kw-clock]"); for (var i = 0; i < c.length; i++) c[i].remove(); }
   new MutationObserver(drop).observe(document.documentElement, { childList: true, subtree: true }); })();</script>
-<script src="kid-world.js?v=ORI1"></script>
+<script src="kid-world.js?v=SUNHOME3"></script>
 <script src="calendar-world.js?v=LIVEFIX3"></script>
-<script src="month-theme/month-overlay.js?v=HALLOWEEN1" defer></script>
+<script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
 </body>
 </html>

@@ -36,10 +36,11 @@ body[data-asset-on][data-kid-world]::before { content: ""; position: fixed; inse
 /* the kid board's My Week path is a lit glass plaque, not a dark pill */
 .kw-path { background: linear-gradient(180deg, rgba(255, 244, 222, .26), rgba(70, 48, 30, .55)) !important; -webkit-backdrop-filter: blur(10px) saturate(1.3); backdrop-filter: blur(10px) saturate(1.3);
   border: 1px solid rgba(255, 214, 150, .7) !important; color: #fff6e6 !important; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 6px 18px rgba(0, 0, 0, .55) !important; }
-/* WGQUIET1 · the sound control is a small polished brass button in the scene, not a dark UI circle */
-.house-snd, .mute-btn { background: radial-gradient(circle at 34% 28%, #fff3c4 0%, #e2b85a 22%, #a97a2a 55%, #5a3d12 100%) !important; border: 1px solid rgba(255, 226, 160, .8) !important;
-  color: #3a2408 !important; box-shadow: inset 0 1px 1px rgba(255, 255, 255, .7), inset 0 -2px 3px rgba(60, 35, 5, .6), 0 3px 8px rgba(0, 0, 0, .55) !important; opacity: .82; }
-.house-snd svg { stroke: #3a2408; }
+/* WGQUIET1 · sound is a matte glass speaker, not a gold coin and not an X */
+.house-snd, .mute-btn { background: rgba(250, 246, 238, .16) !important; border: 1px solid rgba(243, 230, 207, .35) !important;
+  color: #f3e6cf !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.28) !important; opacity: 1; }
+.house-snd svg { stroke: #f3e6cf; }
+.house-snd .x, .mute-btn .x { display: none !important; }
 /* WGQUIET1 · no pairing / offline status pill on any board (the controls stay, the state lives on data attributes) */
 .cmd-pill--need, [data-private-feed-flag], .lh-feedtag { display: none !important; }
 /* HOTFIX1 · KIDZ1 lift removed: the costume plate (body::before, z0 at the base rule above) stays under .kw-canvas (z1) so chores, jar and creature are never covered */

@@ -1122,7 +1122,11 @@
    * 2) Subtract what Dad paid (optional paidAmount; default 0 = full carry).
    * 3) Clear week star buckets. Never zeros lifetime (long save goals stay intact).
    */
+  /* No sanctioned Dad credential exists on this public tree. A meta tag, a path, a data-dad-only
+     attribute, or a localStorage flag is not one. These three writes stay refused on every route. */
+  function payWriteRefused() { return true; }
   function resetJarCycle(kidId, paidAmount, data) {
+    if (payWriteRefused()) return "";
     if (kidScope()) return ""; /* DAYPKG1 v2d · Atlas A: no Paid on a kid board, ever */
     data = data || (global.WardKids && global.WardKids._data) || null;
     settlePriorWeeksIntoBalance(kidId, data);
@@ -1175,6 +1179,7 @@
   /* DAYPKG1 v2d · Atlas ruling (Oct 28 12:15 AM CT) A: Dad taps Paid per kid on the Dad Paid sheet. One tap pays what is owed
      (carry plus this week) through the same resetJarCycle; the kid boards only show the stamp it leaves */
   function dadPaid(kidId, data) {
+    if (payWriteRefused()) return "";
     data = data || (global.WardKids && global.WardKids._data) || null;
     if (kidScope() || !data) return "";
     var v = getBankView(kidId, data);
@@ -1190,6 +1195,7 @@
      gets data-holding while held so the sheet can show the fill. Never on a kid board */
   var HOLD_MS = 2000;
   function bindHold(btn, fire, ms) {
+    if (payWriteRefused()) return null;
     if (!btn || typeof fire !== "function" || kidScope()) return null;
     ms = typeof ms === "number" && ms > 0 ? ms : HOLD_MS;
     var timer = null, armed = true, fired = 0;

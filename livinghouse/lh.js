@@ -277,7 +277,12 @@
     var c = $(".lh-cauldron"), r = cu.away ? null : LHRules.choreFill(D.taps, D.kw, key(n)), f = r ? Math.max(0, Math.min(1, r.done / r.total)) : null;
     c.setAttribute("data-feed", cu.away ? "rest" : f == null ? "missing" : "live"); c.style.setProperty("--fill", f == null ? "0" : String(f));
     if (f == null && !cu.away) c.setAttribute("data-why", D.tapsWhy || "no chore feed"); else c.removeAttribute("data-why");
-    $("[data-lh=chores-sub]").textContent = cu.away ? "Resting" : f == null ? "Nothing brewing yet" : ""; }
+    var nov = seasonPack(n).id === "november";
+    $("[data-lh=chores-sub]").textContent = cu.away ? "Resting" : f == null ? (nov ? "" : "Nothing brewing yet") : ""; }
+  function seasonPack(n) {
+    var P = window.LHScenePacks;
+    return (P && P.forDate) ? P.forDate(n, D.cal) : { id: "" };
+  }
   /* LIVEWX1/2: fog and leaves read the real reading (window.LiveWx from the scene, fed by the hub's /wx); no reading = no data-wx = no weather motion (CSS) */
   function weatherFog() { var o = window.LiveWx, h = $("#lh"), ag = $("#lh-wxage");
     if (!o) { h.removeAttribute("data-wx"); h.removeAttribute("data-wx-age"); ["--fognear", "--fogfar", "--wind-gust"].forEach(function (k) { h.style.removeProperty(k); }); if (ag) ag.hidden = true; return; }
@@ -305,6 +310,12 @@
   function season(n) { /* scene pack from clock.now() via LHScenePacks.forDate (plus the loaded cal feed for the Thu show event, HCOUNT1). Oct 24 starts the count to Oct 29. Oct 31 is street mode. */
     var pack = window.LHScenePacks.forDate(n, D.cal), hw = pack.glow || q.get("halloween") === "preview", G = $("#lh-pglow");
     de.setAttribute("data-season", pack.id); de.setAttribute("data-plate", pack.plate); de.setAttribute("data-art", pack.art);
+    /* November is harvest. The crypt sign and the cauldron pot are Halloween. The chores label stays; it is the list, not a brew. */
+    var nov = pack.id === "november", door = $("#lh-crypt-door"), crypt = $("#lh-crypt"), pot = $(".lh-cauldron .pot"), glow = $(".lh-cauldron .glow");
+    if (door) door.hidden = nov;
+    if (nov && crypt) crypt.hidden = true;
+    if (pot) pot.hidden = nov;
+    if (glow) glow.hidden = nov;
     de.classList.toggle("lh-halloween", hw); de.classList.toggle("lh-street", !!pack.street);
     if (pack.streetArt) de.setAttribute("data-street-art", pack.streetArt); else de.removeAttribute("data-street-art");
     G.innerHTML = "";
@@ -328,7 +339,7 @@
   }
   function emptyPlate(pack) {
     var el = $("#lh-plate"); if (!el) return;
-    if (pack.art !== "missing") { el.hidden = true; return; }
+    if (pack.art !== "missing") { el.hidden = true; el.setAttribute("data-feed", pack.art === "layered" ? "layered" : "present"); return; }
     el.hidden = false; el.setAttribute("data-feed", "missing"); el.setAttribute("data-plate", pack.plate); el.setAttribute("data-why", pack.why);
     $("[data-lh=season]").textContent = pack.id === "december" ? "No snow yet" : "No harvest yet";
   }
@@ -383,7 +394,7 @@
     if (!VW) return; var n = now(), cu = homeState(n);
     moon(n); windows(n, cu); var ev = events(n, cu), ce = candleEvent(ev, n); stones(n, ev, ce); candle(n, ce); signFit(); callout(n, cu); fitPhone(); cauldron(n, cu); weatherFog(); leaves();
     de.classList.toggle("lh-state-away", cu.away); de.classList.toggle("lh-state-home", !cu.away);
-    creatures(n, cu); season(n); mirror(); cryptFill(ev); rhythm(ce);
+    creatures(n, cu); season(n); mirror(); if (de.getAttribute("data-season") !== "november") cryptFill(ev); rhythm(ce);
     if (phone) { var door = $("#lh-crypt-door"); door.style.left = "8px"; door.style.top = (bandY + 8) + "px"; door.style.transform = "none"; }
     var pv = $("#lh-preview"); pv.hidden = !cu.preview; if (cu.preview) pv.textContent = "PREVIEW · sample look · not live data";
     if (q.get("halloween") === "preview") { pv.hidden = false; pv.textContent = "PREVIEW · Halloween night look"; }

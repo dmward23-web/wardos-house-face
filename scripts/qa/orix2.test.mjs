@@ -116,7 +116,8 @@ test("ASSERT 3 · 0 notWired references: code, requests (every kid, data-theme=c
   assert.deepEqual(files.filter((f) => NOTWIRED.test(path.basename(f))), [], "no notWired art committed");
   assert.deepEqual(files.filter((f) => /sheet|\.webp$/.test(f)), [], "no sheets, no webp");
   const allow = fs.readFileSync(path.join(ROOT, "scripts/privacy-art-allowlist.txt"), "utf8").split("\n").filter((l) => !l.startsWith("#"));
-  assert.deepEqual(allow.filter((l) => NOTWIRED.test(l)), [], "allow-list lists none");
+  /* pebble-today-* under month-theme/november/pebble is the wired S4 set, not the unwired mercury extras. */
+  assert.deepEqual(allow.filter((l) => l.startsWith(X) && NOTWIRED.test(l)), [], "allow-list lists none of the unwired mercury extras");
   for (const kid of KIDS) for (const opts of [{}, { theme: "cream" }, { query: "theme=cream" }, { query: "fixture=1" }]) {
     const { h, seen } = await get(kid, opts);
     assert.deepEqual(allReqs(h).filter((u) => NOTWIRED.test(u)), [], `${kid} ${JSON.stringify(opts)}: requests`);

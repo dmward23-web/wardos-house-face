@@ -56,8 +56,9 @@
   var CSS = ".house-snd{position:relative;box-sizing:border-box;width:36px;height:36px;min-width:36px;min-height:36px;border-radius:18px;padding:0;border:1px solid rgba(255,255,255,.28);background:rgba(8,12,18,.72);color:#e9eef5;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.45);cursor:pointer;font-size:0;line-height:0;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}" +
     ".house-snd::after{content:'';position:absolute;inset:-4px}" +
     ".house-snd svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}" +
-    "html[data-sound=on] .house-snd .x,html:not([data-sound=on]) .house-snd .w{display:none}" +
-    "html[data-sound=on] .house-snd .w,html:not([data-sound=on]) .house-snd .x{display:inline}" +
+    ".house-snd .x{display:none}" +
+    "html[data-sound=on] .house-snd .w{display:inline}" +
+    "html:not([data-sound=on]) .house-snd .w{display:none}" +
     "[data-mute-toggle]:not(.house-snd),[data-sound-toggle]:not(.house-snd){visibility:hidden}";  /* no old-label flash before the icon is wired */
   try { var st0 = document.createElement("style"); st0.id = "house-snd-css"; st0.textContent = CSS; (document.head || html).appendChild(st0); } catch (e) {}
   function icon(btn) {

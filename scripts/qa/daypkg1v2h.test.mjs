@@ -47,7 +47,7 @@ test("DAYPKG1 v2h: 'Jar full · show Dad' is plain text with no href, not focusa
   for (const kid of KIDS) {
     const f = "kid-" + kid + ".html", h = rd(f);
     const m = h.match(/<span class="unlock-cta" data-unlock-cta hidden>Jar full · show Dad<\/span>/g) || [];
-    assert.equal(m.length, 1, f + " one plain CTA");
+    assert.equal(m.length, kid === "ainsley" ? 0 : 1, f + (kid === "ainsley" ? " no show-Dad line" : " one plain CTA"));
     assert.doesNotMatch(h, /<a\b[^>]*data-unlock-cta|data-unlock-cta[^>]*\b(?:href|tabindex|role)=/, f + " CTA not a link / focusable");
     assert.match(h, /\[data-unlock-cta\]\[hidden\][\s\S]*?display:\s*none !important/, f + " [hidden] still beats the CTA display");
     assert.match(h, /\.bank-links \.unlock-cta \{[^}]*cursor:default/, f + " no pointer, no button look");

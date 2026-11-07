@@ -36,10 +36,10 @@ test("H1P2D3 static: plaque gradient scoped off baked art, dot kept; wall grid g
   assert.match(land, /tile-grid--cams \{ grid-template-rows: repeat\(4, minmax\(min-content, 1fr\)\) !important/);
   assert.match(land, /tile-grid--cams > \.tile \{ height: auto !important; max-height: none !important; \}/);
   const LH = R("livinghouse/index.html"), SI = R("sheet-index.html");
-  for (const t of ['href="lh.css?v=LHPATH3"' /* LHPATH3 (efd454b6) changed lh.css and moved its token on purpose */, 'src="scene-packs.js?v=H1P2D4"', 'src="lh.js?v=H1P2D3"']) assert.ok(LH.includes(t), t);
+  for (const t of ['href="lh.css?v=LHPATH3"' /* LHPATH3 (efd454b6) changed lh.css and moved its token on purpose */, 'src="scene-packs.js?v=SUNHOME1"', 'src="lh.js?v=SUNHOME2"']) assert.ok(LH.includes(t), t);
   for (const t of ['href="wg-wall-land.css?v=H1P2D4"', 'src="wg-assets.js?v=H1P2D3"']) assert.ok(SI.includes(t), t);
   for (const k of ["ainsley", "hayes", "harris"]) { const s = R(`kid-${k}.html`);
-    assert.ok(s.includes('src="wg-assets.js?v=H1P2D3"'), k + " wg-assets"); assert.ok(s.includes('src="livinghouse/scene-packs.js?v=H1P2D4"'), k + " scene-packs");
+    assert.ok(s.includes('src="wg-assets.js?v=H1P2D3"'), k + " wg-assets"); assert.ok(s.includes('src="livinghouse/scene-packs.js?v=SUNHOME1"'), k + " scene-packs");
     assert.doesNotMatch(s, /\?v=LIVEWX2B"/, k); }
 });
 
@@ -206,14 +206,35 @@ test("H1P2D3 browser P2 OVERFLOW: 0 clipped or covered tile text at 1920 and 256
       const g = await b.newPage(); await g.setViewport({ width: w, height: Math.round(w * 9 / 16), deviceScaleFactor: 1 }); await g.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
       await g.evaluateOnNewDocument((t) => { try { localStorage.setItem("wardos-private-feed-token", t); } catch (e) {} }, TOKEN);
       await g.goto(`${base}/${pg}?spook=0&pfBase=${encodeURIComponent(base)}`, { waitUntil: "domcontentloaded", timeout: 120000 });
-      await g.waitForFunction(() => document.querySelectorAll(".tile .kf-stage").length >= 4, { timeout: 60000 }); await new Promise((ok) => setTimeout(ok, 4000));
+      /* DAYPKG1 v2i removed the Dan kid-flip. The hub mounts three kf-stages. Dad, when the seat is on the hub, is .tile.dan [data-dad-stage]. */
+      await g.waitForFunction(() => ["ainsley", "hayes", "harris"].every((k) => document.querySelector(".tile." + k + " .kf-stage")) && document.querySelectorAll(".tile .kf-stage").length === 3, { timeout: 60000 });
+      const seat = await g.evaluate(() => {
+        const dad = document.querySelector(".tile.dan [data-dad-stage]");
+        return {
+          stages: document.querySelectorAll(".tile .kf-stage").length,
+          flips: ["ainsley", "hayes", "harris"].filter((k) => document.querySelector(".tile." + k + "[data-kid-flip], .tile." + k + ".kid-flip")).length,
+          dad: !!dad,
+          dadKf: !!document.querySelector(".tile.dan .kf-stage")
+        };
+      });
+      assert.equal(seat.stages, 3, "three kid kf-stages");
+      assert.equal(seat.flips, 3, "three kid flips");
+      assert.equal(seat.dadKf, false, "Dad is not a fourth kf-stage");
+      if (seat.dad) assert.equal(seat.dadKf, false, "Dad seat is [data-dad-stage]");
+      else assert.equal(seat.flips, 3, "hub has exactly the three kid flips");
+      await new Promise((ok) => setTimeout(ok, 4000));
       await g.evaluate(() => {
         const rows = (a) => '<div class="kf-rows">' + a.map(([m, t]) => '<div class="kf-row"><span class="kf-mt">' + m + '</span><span class="kf-md">' + t + "</span></div>").join("") + "</div>";
         const face = (k, l, t, r) => '<div class="kf-face kf-day"><div class="kf-kicker">' + k + '</div><div class="kf-loud">' + l + '</div><div class="kf-title">' + t + "</div>" + (r ? rows(r) : "") + "</div>";
         const F = { ainsley: face("Next", "TUE", "Library day with the class", [["3:00", "Art club"]]), hayes: face("Today", "SAT · 3:15", "Jones 9th birthday party · 4:00", [["5:30", "Pumpkin patch"]]),
           harris: face("Today", "SAT · 12:40", "Harris flag · vs Smith (home) · arrive 1:00 · game 1:30", [["4:00", "Costume parade"]]),
           dan: face("Next leave", "TODAY · 12:40", "Harris flag · vs Smith (home) · arrive 1:00", [["3:15", "Hayes · Jones 9th birthday party · 4:00"], ["5:30", "Pumpkin patch"]]) };
-        for (const k in F) { const s = document.querySelector(".tile." + k + " .kf-stage"); if (s) s.innerHTML = F[k]; }
+        for (const k in F) {
+          const s = k === "dan"
+            ? (document.querySelector(".tile.dan [data-dad-stage]") || document.querySelector(".tile.dan .kf-stage"))
+            : document.querySelector(".tile." + k + " .kf-stage");
+          if (s) s.innerHTML = F[k];
+        }
         document.querySelectorAll(".kf-streak-chip").forEach((c) => { c.textContent = "3 day streak"; });
       });
       await new Promise((ok) => setTimeout(ok, 800));

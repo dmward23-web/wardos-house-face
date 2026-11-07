@@ -5,13 +5,13 @@
 <meta name="ward-money" content="dad" /><!-- DAYPKG1 v2g · the one Dad money sheet: house-money-bind paints '$' and kids-data marks dad-device:v1 only on a page with this tag -->
 <script src="house-hub.js?v=HUBPAIR1"></script>
 <script src="private-feed.js?v=HUBPAIR1D"></script>
-<script src="school-names.js?v=HALLOWEEN1"></script>
+<script src="school-names.js?v=SUNHOME1"></script>
 <script src="house-nomoney.js?v=DAYPKG1"></script>
 <script src="house-face-law.js?v=FACESTRIP1"></script>
 <script src="house-pair.js?v=HUBPAIR1"></script>
 <script src="house-money-bind.js?v=DAYPKG1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
-<script src="away-filter.js?v=HALLOWEEN1" data-away-install></script><!-- AWAYONE1 · the one away source on every page that reads cal-live / kids-week -->
+<script src="away-filter.js?v=SUNHOME1" data-away-install></script><!-- AWAYONE1 · the one away source on every page that reads cal-live / kids-week -->
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -505,8 +505,8 @@
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
-<link rel="stylesheet" href="night/night-host.css?v=HALLOWEEN1" />
-<link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<link rel="stylesheet" href="night/night-host.css?v=SUNHOME1" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=SUNHOME2" />
 <script src="house-face-law.js?v=FACESTRIP1"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
 <style id="p1fix-money-rows">
 /* P1FIX B40 · jar chore rows readable on the dark glass. Selectors carry html.ori-on + body.allow-shell and the fill colour is
@@ -789,8 +789,8 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
  <div class="link-body">
  <div class="link-main">
  <div class="link-label">Path · clear &amp; calm</div>
- <div class="link-title">All musts, then the jar unlocks, then <span class="hl">Dad checks · payday</span></div>
- <div class="link-sub">Stars only · Home is up top</div>
+ <div class="link-title">Musts live on each kid's board</div>
+ <div class="link-sub">Nothing is paid here</div>
  </div>
  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
  <a class="link-cta" href="sheet-chores.html" style="text-decoration:none;color:inherit;">Chores</a>
@@ -803,12 +803,12 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
  <section class="bank ainsley" data-bank-kid="ainsley" aria-label="Ainsley star bank">
  <div class="bank-hdr">
  <a class="kid-chip ainsley" href="kid-ainsley.html"><span class="dot g2-av ains"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-ainsley"/></svg></span> Ainsley</a>
- <div class="streak-pill">Tour Jar</div>
+ <div class="streak-pill">Jar</div>
  </div>
  <div class="star-count">
- <div class="star-big" data-noscore="1">Tour Jar</div><!-- AINSNOSCORE2 · her jar is EMPTY/TRUSTED only: no icon tally, no number, before or after data -->
- <div class="star-label">Tour Jar</div>
- <div class="jar-state" data-jar-state="trusted">TRUSTED</div><!-- AINSJAR1 · a state, never a number or star -->
+ <div class="star-big" data-noscore="1">Jar</div><!-- AINSNOSCORE2 · her jar is EMPTY/TRUSTED only: no icon tally, no number, before or after data -->
+ <div class="star-label">Nothing trusted yet.</div>
+ <div class="jar-state" data-jar-state="unset">Nothing trusted yet.</div><!-- AINSJAR1 · a grant sentence or this empty line, never a counter -->
  </div>
  <div class="feed">
  <div class="feed-title">Musts that fill the jar</div>
@@ -819,7 +819,6 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
   <div class="feed-row">Babysitting hire · Dad handout · never fills jar<div class="when">add-on</div></div>
  </div>
  <div class="cheer-bar">Ask Dad to inspect</div>
- <div class="dad-paid-row"><button type="button" class="dad-paid" data-dad-paid="ainsley" aria-label="Hold to mark Paid">Hold for Paid</button><span class="dad-paid-wk" data-dad-wk hidden></span><span class="dad-paid-stamp" data-paid-stamp hidden></span></div><!-- DAYPKG1 v2d · Atlas 12:15 AM A: Dad pays here, not on the kid board -->
  </section>
 
  <!-- Hayes bank -->
@@ -829,8 +828,8 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
  <div class="streak-pill" data-jar-goal="victory-jar">Victory Jar</div>
  </div>
  <div class="star-count">
- <div class="star-big"><span class="s g2-inline"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-victory"/></svg></span>0</div>
- <div class="star-label">Victory Coins</div>
+ <div class="star-big" data-noscore="1">Jar</div>
+ <div class="star-label">Victory Jar</div>
  <div class="star-row" hidden>
  <span class="tap-star dim" data-check="hayes-star-1" aria-label="Star 1" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-2" aria-label="Star 2" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-3" aria-label="Star 3" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-4" aria-label="Star 4" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-5" aria-label="Star 5" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-6" aria-label="Star 6" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-7" aria-label="Star 7" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-8" aria-label="Star 8" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-9" aria-label="Star 9" aria-pressed="false">★</span><span class="tap-star dim" data-check="hayes-star-10" aria-label="Star 10" aria-pressed="false">★</span>
  </div>
@@ -843,7 +842,6 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
  <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Garage cubby · bag + sports<div class="when">weekly</div></div>
   </div>
  <div class="cheer-bar">Ask Dad to inspect</div>
- <div class="dad-paid-row"><button type="button" class="dad-paid" data-dad-paid="hayes" aria-label="Hold to mark Paid">Hold for Paid</button><span class="dad-paid-wk" data-dad-wk hidden></span><span class="dad-paid-stamp" data-paid-stamp hidden></span></div><!-- DAYPKG1 v2d · Atlas 12:15 AM A: Dad pays here, not on the kid board -->
  <div class="saves-host" data-saves-panel data-kid="hayes"></div>
  </section>
 
@@ -854,8 +852,8 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
  <div class="streak-pill" data-jar-goal="gem-jar">Gem Jar</div>
  </div>
  <div class="star-count">
- <div class="star-big"><span class="s g2-inline"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-gem"/></svg></span>0</div>
- <div class="star-label">Gems</div>
+ <div class="star-big" data-noscore="1">Jar</div>
+ <div class="star-label">Gem Jar</div>
  <div class="star-row" hidden>
  <span class="tap-star dim" data-check="harris-star-1" aria-label="Star 1" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-2" aria-label="Star 2" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-3" aria-label="Star 3" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-4" aria-label="Star 4" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-5" aria-label="Star 5" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-6" aria-label="Star 6" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-7" aria-label="Star 7" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-8" aria-label="Star 8" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-9" aria-label="Star 9" aria-pressed="false">★</span><span class="tap-star dim" data-check="harris-star-10" aria-label="Star 10" aria-pressed="false">★</span>
  </div>
@@ -868,14 +866,12 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
  <div class="feed-row"><span class="plus" data-stars="1" data-money-suffix=""></span> Garage cubby · bag + sports<div class="when">weekly</div></div>
   </div>
  <div class="cheer-bar">Ask Dad to inspect</div>
- <div class="dad-paid-row"><button type="button" class="dad-paid" data-dad-paid="harris" aria-label="Hold to mark Paid">Hold for Paid</button><span class="dad-paid-wk" data-dad-wk hidden></span><span class="dad-paid-stamp" data-paid-stamp hidden></span></div><!-- DAYPKG1 v2d · Atlas 12:15 AM A: Dad pays here, not on the kid board -->
  <div class="saves-host" data-saves-panel data-kid="harris"></div>
  </section>
  </div>
 
  <div class="desk-note">
- <div class="msg"><strong>Rates above.</strong> Stars fill the jar · payday turns the week's stars into the balance (carry survives) · Dad subtracts what he paid.</div>
- <div class="badge">Adults · Dad only</div>
+ <div class="msg">This public page does not pay anyone and does not show a balance. A real adult role has not been added.</div>
  </div>
 
  
@@ -894,44 +890,15 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
 <script src="ains-jar-state.js?v=AINSJAR2"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=DAYPKG1"></script>
-<script src="house-checkoffs.js?v=DAYPKG1" defer></script>
+<script src="house-checkoffs.js?v=CHECKDONE1" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
  if (window.HouseSaves) { HouseSaves.mount("hayes"); HouseSaves.mount("harris"); }
  if (!window.WardKids) return;
- WardKids.loadJSON(function (err, data) {
- if (!data) return;
- WardKids._data = data;
- WardKids.syncBankFromChecks(data);
- function paint() {
+ /* Public page: no balance and no Paid control. dadPaid stays in kids-data.js and is not called from here. */
  ["ainsley","hayes","harris"].forEach(function (id) {
- var v = WardKids.getBankView(id, data);
- var root = document.querySelector('[data-bank-kid="'+id+'"]') || document.querySelector('.bank.'+id);
- if (root) WardKids.renderBank(root, v);
  var big = document.querySelector('.bank.'+id+' .star-big');
- if (big) {
- var sym = (v.currency && v.currency.symbol) || "★";
- /* AINSNOSCORE1 · Ainsley gets no star tally, show her jar in dollars */
- if (id === "ainsley") { big.textContent = "Tour Jar"; big.setAttribute("data-noscore","1"); }
- else big.innerHTML = '<span class="s">'+sym+'</span>'+(v.week != null ? v.week : v.lifetime);
- }
- var lab = document.querySelector('.bank.'+id+' .star-label');
- if (lab && id === "ainsley") lab.textContent = "Musts fill it · payday";
- else if (lab) {
- lab.textContent = "Balance $"+v.balance+" · Week $"+v.weekEarn+" · Jar $"+v.toward+"/$"+v.need;
- }
- });
- }
- paint();
- /* DAYPKG1 v2d · Atlas ruling (Oct 28 12:15 AM CT) A: Dad pays per kid here. One Paid pays what is owed through the
-    same resetJarCycle; the Paid or Jar reset tick syncs to the kid boards as a chore-tap marker (no amount).
-    DAYPKG1 v2e · Atlas 12:40 AM: hold about 2 s, wired by WardKids.bindHold; an early lift does nothing */
- document.querySelectorAll("[data-dad-paid]").forEach(function (btn) {
- WardKids.bindHold(btn, function () {
- WardKids.dadPaid(btn.getAttribute("data-dad-paid"), data);
- paint();
- });
- });
+ if (big) { big.textContent = "Jar"; big.setAttribute("data-noscore","1"); }
  });
 });
 </script>
@@ -962,6 +929,6 @@ document.addEventListener("DOMContentLoaded", function () {
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
 <script src="house-ori-world.js?v=DAYPKG1"></script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
-<script src="month-theme/month-overlay.js?v=HALLOWEEN1" defer></script>
+<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
 </body>
 </html>

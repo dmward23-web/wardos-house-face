@@ -79,8 +79,9 @@ test("saves face/list route through money->star and strip '$'", () => {
 test("cache tokens: kid pages load all 5 changed files at ?v=JARTAP1D2", () => {
   for (const k of ["hayes", "harris", "ainsley"]) {
     const h = rd("kid-" + k + ".html");
-    for (const f of ["house-fresh", "kids-data", "house-saves", "house-sfx", "house-money-bind"])
-      assert.match(h, new RegExp(f + (["kids-data", "house-sfx", "house-money-bind", "house-saves"].includes(f) ? "\\.js\\?v=DAYPKG1" : "\\.js\\?v=JARTAP1D2")), k + " " + f); /* DAYPKG1 re-bumped kids-data.js (was HAYESJAR1D, 1C, 1B), house-sfx.js and house-money-bind.js (token only); DAYPKG1 v2d re-bumped house-saves.js */
+    for (const f of ["house-fresh", "kids-data", "house-saves", "house-sfx"])
+      assert.match(h, new RegExp(f + (["kids-data", "house-sfx", "house-saves"].includes(f) ? "\\.js\\?v=DAYPKG1" : "\\.js\\?v=JARTAP1D2")), k + " " + f);
+    assert.doesNotMatch(h, /house-money-bind\.js/, k + " does not load the money script");
   }
 });
 

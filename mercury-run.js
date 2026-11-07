@@ -568,6 +568,44 @@
     plats.push({ x: goalX, y: 300, w: 180, h: 26, cp: true, vx: 0, phase: 0, grove: true });
   })();
 
+  /* SUNHOME1 · warm lamps along the run. Collecting one lights it for this sitting.
+     Chores done today make the grove burn brighter. December snow drags the roll a little. No menu. */
+  var lamps = [];
+  for (var li = 2; li < plats.length - 1; li += 4) lamps.push({ i: li, dx: plats[li].w * 0.55, got: false, id: "p" + li });
+  function runSeason() {
+    var S = window.MonthSeason;
+    try { return (S && S.decide) ? S.decide(new Date()) : { id: "other", cold: 0, flakes: 0, snow: 0, lit: 0 }; }
+    catch (e) { return { id: "other", cold: 0, flakes: 0, snow: 0, lit: 0 }; }
+  }
+  function lampStoreKey() {
+    var iso = "";
+    try { iso = (window.HouseClock && HouseClock.iso && HouseClock.iso()) || ""; } catch (e) { iso = ""; }
+    return "ward-run-lamps:" + kid + ":" + iso;
+  }
+  function loadLamps() {
+    try {
+      var raw = sessionStorage.getItem(lampStoreKey());
+      var got = raw ? JSON.parse(raw) : [];
+      if (!got || !got.length) return;
+      lamps.forEach(function (L) { if (got.indexOf(L.id) >= 0) L.got = true; });
+    } catch (e) { /* a full or blocked store just starts the lamps dark */ }
+  }
+  function saveLamps() {
+    try { sessionStorage.setItem(lampStoreKey(), JSON.stringify(lamps.filter(function (L) { return L.got; }).map(function (L) { return L.id; }))); } catch (e) { /* */ }
+  }
+  function warmth() {
+    var W = window.WardKids, data = W && W._data;
+    if (!W || !data || typeof W.mustQuests !== "function" || typeof W.getCheck !== "function") return 0;
+    var qs = W.mustQuests(kid, data) || [], n = 0;
+    if (!qs.length) return 0;
+    qs.forEach(function (item) {
+      var daily = (item.cadence || "daily") === "daily";
+      if (W.getCheck(item.id, data, daily ? W.DAY_ISO : undefined)) n++;
+    });
+    return n / qs.length;
+  }
+  loadLamps();
+
   var gatherLog = [];
   function lowestTop() { var m = -1e9; for (var i = 0; i < plats.length; i++) m = Math.max(m, GY(plats[i].y)); return m; }
   function platX(p, t) { return p.x + (p.vx ? Math.sin(t * 0.8 + p.phase) * 46 : 0); }
@@ -896,8 +934,19 @@
     b.y = nextY;
     if (b.grounded) b.vx *= Math.pow(0.15, dt);
     else b.vx *= Math.pow(0.55, dt);
+    if (b.grounded && runSeason().id === "december") b.vx *= Math.pow(0.55, dt); /* living snow: a heavier roll, December only */
     b.squash += (1 - b.squash) * Math.min(1, dt * 8);
     if (b.y > lowestTop() + 70) gather(b); /* SOFT1: below every platform = gentle return, before it reaches the painted ground */
+    if (!b.echo) {
+      for (var lp = 0; lp < lamps.length; lp++) {
+        var lamp = lamps[lp];
+        if (lamp.got) continue;
+        var plamp = plats[lamp.i];
+        var lx = platX(plamp, t) + lamp.dx;
+        var ly = GY(plamp.y) - 28;
+        if (Math.hypot(b.x - lx, b.y - ly) < b.r + 16) { lamp.got = true; saveLamps(); tone("land"); rings.push({ x: lx, y: ly, r: 10, a: 0.7 }); }
+      }
+    }
     for (var d = 0; d < drips.length; d++) {
       var dr = drips[d];
       var dy = GY(dr.y) + ((t * 90 + dr.p * 40) % 180);
@@ -991,15 +1040,40 @@
       g.beginPath(); g.arc(ring.x, ring.y, ring.r, 0, 7); g.stroke();
       g.globalAlpha = 1;
     });
+    for (var lp = 0; lp < lamps.length; lp++) {
+      var lamp = lamps[lp];
+      var plamp = plats[lamp.i];
+      var lx = platX(plamp, t) + lamp.dx;
+      var ly = GY(plamp.y) - 28;
+      var hot = lamp.got ? 1 : 0.35 + warmth() * 0.4;
+      var lg2 = g.createRadialGradient(lx, ly, 1, lx, ly, 18);
+      lg2.addColorStop(0, lamp.got ? "#fff6d8" : "rgba(255,220,160," + hot + ")");
+      lg2.addColorStop(1, "rgba(255,160,60,0)");
+      g.fillStyle = lg2;
+      g.beginPath(); g.arc(lx, ly, 18, 0, 7); g.fill();
+    }
     var grove = plats[plats.length - 1];
     var gy = GY(grove.y) - 36;
-    var glow = g.createRadialGradient(goalX + 90, gy, 8, goalX + 90, gy, 130);
+    var warm = warmth();
+    var glow = g.createRadialGradient(goalX + 90, gy, 8, goalX + 90, gy, 130 + warm * 40);
     glow.addColorStop(0, "rgba(255,255,255,0.95)");
     glow.addColorStop(0.35, THEME.accent);
     glow.addColorStop(1, "rgba(255,255,255,0)");
     g.fillStyle = glow;
-    g.beginPath(); g.arc(goalX + 90, gy, 130, 0, 7); g.fill();
+    g.beginPath(); g.arc(goalX + 90, gy, 130 + warm * 40, 0, 7); g.fill();
     g.restore();
+    var season = runSeason();
+    if (season.flakes > 0.02 || season.id === "december") {
+      var flakes = season.id === "december" ? 28 : Math.round(season.flakes * 16);
+      g.fillStyle = "rgba(244,247,251,0.8)";
+      for (var sf = 0; sf < flakes; sf++) {
+        var sx = ((sf * 97 + t * (14 + sf % 4)) % (W + 20)) - 10;
+        var sy = ((sf * 53 + t * (22 + sf % 3)) % (H + 16)) - 8;
+        g.globalAlpha = 0.35 + (sf % 4) * 0.12;
+        g.beginPath(); g.arc(sx, sy, 1 + (sf % 3) * 0.4, 0, 7); g.fill();
+      }
+      g.globalAlpha = 1;
+    }
   }
 
   /* PLATFORMS1 · painted root + stone platforms, Ori-style (layered, soft-lit, organic; never flat watercolor).
