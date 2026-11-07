@@ -92,6 +92,11 @@ const V2D_STRIP = (t) => {
 };
 /* DAYPKG1 v2h · Atlas (Oct 28 3:48 AM CT): the Jar buttons (primary-foil, footer ftr-chip) are removed, the show Dad CTA is plain
    text in a hidden-when-empty row, plus its 3-rule CSS block. Exactly those are folded back to the v2g markup; anything else fails */
+/* SUNHOME3 · kid templates no longer ship Bal/Week, Paid, or the show-Dad jar CTA. Fold those lines out of both sides. */
+const MONEY_FOLD = (t) => t
+  .replace(/ <div class="money-row" aria-label="Money">\n <div class="money-chip"><span class="lab">Bal<\/span> \$?<span data-bank-balance>0<\/span><\/div>\n <div class="money-chip"><span class="lab">Week<\/span> \+\$?<span data-bank-week-earn>0<\/span><\/div>\n <\/div>\n\n/g, "")
+  .replace(/ <span class="unlock-cta" data-unlock-cta hidden>Jar full · show Dad<\/span>\n/g, "")
+  .replace(/ <div class="paid-stamp" data-paid-stamp hidden>Paid<\/div>\n/g, "");
 const V2H_FOLD = (t) => t
   .replace("  /* DAYPKG1 v2h · Atlas: nothing dead on kid glass. The jar-full line is plain text (no link, no button look); an empty CTA row is hidden so it leaves no gap */\n  .bank-links .unlock-cta { display:inline-block; font-size:13px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; cursor:default; }\n  .bank-links[hidden] { display:none !important; }\n", "")
   .replace(' <div class="bank-links" data-cta-row hidden>\n <span class="unlock-cta" data-unlock-cta hidden>Jar full · show Dad</span>\n',
@@ -108,7 +113,7 @@ test("the boys' pages are byte-identical to main 442eb257 apart from the Hallowe
   for (const f of ["kid-hayes.html", "kid-harris.html", "kid-hayes-pre-theme.html", "kid-harris-pre-theme.html"]) {
     const base = execFileSync("git", ["show", KID_BASE + ":" + f], { cwd: ROOT }).toString();
     const now = fs.readFileSync(path.join(ROOT, f), "utf8");
-    assert.equal(THEME_STRIP(V2D_STRIP(V2H_FOLD(now))), THEME_STRIP(V2D_STRIP(base)), f + " drifted beyond the theme layer");
+    assert.equal(THEME_STRIP(V2D_STRIP(V2H_FOLD(MONEY_FOLD(now)))), THEME_STRIP(V2D_STRIP(V2H_FOLD(MONEY_FOLD(base)))), f + " drifted beyond the theme layer");
   }
 });
 test("the theme strip is not a blanket pass: a copy change still fails", () => {

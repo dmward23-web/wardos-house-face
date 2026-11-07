@@ -256,10 +256,8 @@ test("rest pill follows the missing-feed event and does not use an em dash or a 
   const stage = node("div");
   document.body.appendChild(stage);
   ctx.KidFeedRest.bind(stage);
-  assert.equal(document.querySelector("[data-kw-feed]"), null);
-  document.dispatchEvent({ type: "house:kids-data-missing" });
   const pill = stage.querySelector("[data-kw-feed]");
-  assert.ok(pill, "the missing event paints the pill");
+  assert.ok(pill, "a missing feed paints the pill at mount, not only after a later event");
   assert.equal(pill.textContent, "Resting. Your list comes back soon.");
   assert.equal(pill.hidden, false);
   assert.ok(document.body.classList.contains("kw-rest"));
@@ -365,8 +363,9 @@ test("hub home control is the house glyph, and Jars stays on the adult chores bo
   assert.match(hub, /class="hub-home" href="sheet-index\.html" aria-label="Back to the House board"/);
   assert.match(hub, /assets\/icons\/home-key-light\.svg/);
   const jars = hub.slice(hub.indexOf('class="tile stars"'), hub.indexOf('class="tile fun"'));
-  assert.match(jars, /href="sheet-chores\.html"/);
-  assert.match(jars, /On the chores board/);
+  assert.match(jars, /href="sheet-chores\.html#kid-jars"/);
+  assert.match(jars, /On each kid's board/);
+  assert.match(jars, /href="sheet-chores\.html#kid-jars"/);
   assert.match(jars, /No score on this tile/);
   assert.doesNotMatch(jars, /Stars fill the jar|Stars only|Tap musts, then the jar/);
   assert.doesNotMatch(jars, /sheet-allowance/);

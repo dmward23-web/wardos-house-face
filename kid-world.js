@@ -41,6 +41,9 @@
     }
     document.addEventListener("house:kids-data-missing", showRest);
     document.addEventListener("house:kids-data-ready", hideRest);
+    var W = global.WardKids;
+    if (!W || !W._data) showRest();
+    else hideRest();
     return { show: showRest, hide: hideRest };
   }
   function pebbleFromCounts(done, n) {
@@ -2126,10 +2129,18 @@
       mist.setAttribute("aria-hidden", "true");
       stage.appendChild(mist);
       document.addEventListener("click", function (ev) {
-        var t = ev.target && ev.target.closest ? ev.target.closest("[data-check].is-today, .quest.done, .quest.open") : null;
+        var t = ev.target && ev.target.closest ? ev.target.closest("[data-check].is-today") : null;
         if (!t) return;
-        document.documentElement.setAttribute("data-ains-quiet", "1");
-        setTimeout(function () { document.documentElement.removeAttribute("data-ains-quiet"); }, 400);
+        var was = t.classList.contains("done");
+        setTimeout(function () {
+          if (was || !t.classList.contains("done")) return;
+          document.documentElement.setAttribute("data-ains-quiet", "1");
+          document.documentElement.setAttribute("data-leaf-quiet", "1");
+          setTimeout(function () {
+            document.documentElement.removeAttribute("data-ains-quiet");
+            document.documentElement.removeAttribute("data-leaf-quiet");
+          }, 400);
+        }, 0);
       });
     } else if (kid() === "hayes" || kid() === "harris") {
       var peb = document.createElement("div");
@@ -2146,12 +2157,16 @@
       document.addEventListener("click", function (ev) {
         var t = ev.target && ev.target.closest ? ev.target.closest("[data-check]") : null;
         if (!t || !t.classList.contains("is-today")) return;
-        peb.classList.remove("settle");
-        void peb.offsetWidth;
-        peb.classList.add("settle");
-        document.documentElement.setAttribute("data-leaf-quiet", "1");
-        setTimeout(function () { document.documentElement.removeAttribute("data-leaf-quiet"); }, 400);
-        setTimeout(function () { peb.classList.remove("settle"); paintPebble(); }, 1200);
+        var was = t.classList.contains("done");
+        setTimeout(function () {
+          if (was || !t.classList.contains("done")) return;
+          peb.classList.remove("settle");
+          void peb.offsetWidth;
+          peb.classList.add("settle");
+          document.documentElement.setAttribute("data-leaf-quiet", "1");
+          setTimeout(function () { document.documentElement.removeAttribute("data-leaf-quiet"); }, 400);
+          setTimeout(function () { peb.classList.remove("settle"); paintPebble(); }, 1200);
+        }, 0);
       });
     }
     stage.querySelector("[data-kw-home]").addEventListener("click", function (ev) {

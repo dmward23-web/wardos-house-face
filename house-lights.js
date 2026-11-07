@@ -979,6 +979,14 @@
     doc = doc || document;
     var panel = doc.getElementById("hub-lights-panel");
     if (!panel) return;
+    /* Family hub: an unpaired lights board is theater. Dad recovery pages keep the pairing word. */
+    var paired = false;
+    try { paired = !!(window.PrivateFeed && PrivateFeed.pairState && PrivateFeed.pairState() === "paired"); } catch (ePair) {}
+    if (/sheet-index\.html$/.test((doc.defaultView || window).location.pathname || "") && !paired) {
+      panel.hidden = true;
+      return;
+    }
+    panel.hidden = false;
     if (_dimDrag) return; /* don't wipe mid-drag fill */
     var deck = hubDeckLights();
     var g = deck.gate;
