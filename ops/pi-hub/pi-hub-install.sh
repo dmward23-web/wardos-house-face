@@ -15,6 +15,7 @@ while [ $# -gt 0 ]; do
     --offline-verify) MODE="verify" ;;
     --install|--stage) MODE="install" ;;
     --rollback) MODE="rollback" ;;
+    --rollback-services) MODE="rollback-services" ;;
     --enable) MODE="enable" ;;
     --start) MODE="start" ;;
     --activate) MODE="activate" ;;
@@ -26,16 +27,12 @@ while [ $# -gt 0 ]; do
 done
 
 allow_prefix() {
-  case "$1" in
-    /opt/wardos|/opt/wardos/*|/tmp/*|/var/tmp/*|/opt/cursor/artifacts/*) ;;
-    *) echo "REFUSE dest is not the Pi install root or a test prefix"; exit 2 ;;
-  esac
-  case "$1" in
-    /|/etc|/etc/*|/usr|/usr/*|/lib|/lib/*|/bin|/bin/*|/home|/home/dan|/home/dan/*|/workspace|/workspace/*|"$REPO"|"$REPO"/*)
-      echo "REFUSE dest is a live or checkout path"
-      exit 2
-      ;;
-  esac
+  local resolved
+  if ! resolved="$(python3 "$HERE/lib/pi_gate.py" --canonical "$1")"; then
+    printf '%s\n' "$resolved" >&2
+    return 78
+  fi
+  PREFIX="$resolved"
 }
 
 if [ "$MODE" = "plan" ]; then
@@ -80,34 +77,42 @@ PY
   exit 0
 fi
 
-if [ "$MODE" = "enable" ] || [ "$MODE" = "start" ] || [ "$MODE" = "activate" ]; then
+if [ "$MODE" = "enable" ] || [ "$MODE" = "start" ] || [ "$MODE" = "activate" ] || [ "$MODE" = "rollback-services" ]; then
   [ -n "$GATE" ] || { echo "REFUSE activation gate absent"; exit 78; }
   python3 "$HERE/lib/pi_gate.py" --systemd "$GATE"
   [ -n "$PREFIX" ] || PREFIX=/opt/wardos
-  allow_prefix "$PREFIX"
+  allow_prefix "$PREFIX" || exit 78
   ctl="${SYSTEMCTL:-systemctl}"
-  mapfile -t units < <(python3 -c 'import json,sys; print("\n".join(json.load(open(sys.argv[1]))["units"]))' "$GATE")
-  for unit in "${units[@]}"; do
-    [ -n "$unit" ] || continue
-    case "$unit" in
-      wardos-pi-lights.service|wardos-pi-tunnel@r1.service|wardos-pi-tunnel@r2.service) ;;
-      *) echo "REFUSE systemd unit"; exit 78 ;;
-    esac
-    if [ "$MODE" = "start" ]; then
-      "$ctl" start "$unit"
-    elif [ "$MODE" = "enable" ]; then
-      "$ctl" enable "$unit"
-    else
-      "$ctl" enable "$unit"
-      "$ctl" start "$unit"
-    fi
-  done
-  echo "OK systemd $MODE"
+  python3 - "$GATE" "$ctl" "$MODE" <<'PY'
+import json, subprocess, sys
+gate, ctl, mode = sys.argv[1:]
+doc = json.load(open(gate))
+for unit in doc["units"]:
+    name = unit["name"]
+    frag = unit["fragment_path"]
+    show = subprocess.run([ctl, "show", "-p", "FragmentPath", "--value", name], text=True, capture_output=True)
+    got = (show.stdout or "").strip()
+    if show.returncode != 0 or got != frag:
+        print("REFUSE systemd name is not the staged unit")
+        raise SystemExit(78)
+    if mode == "rollback-services":
+        stop = subprocess.run([ctl, "disable", "--now", name])
+        if stop.returncode != 0:
+            raise SystemExit(stop.returncode)
+    elif mode == "start":
+        subprocess.run([ctl, "start", name], check=True)
+    elif mode == "enable":
+        subprocess.run([ctl, "enable", name], check=True)
+    else:
+        subprocess.run([ctl, "enable", name], check=True)
+        subprocess.run([ctl, "start", name], check=True)
+print("OK systemd " + mode)
+PY
   exit 0
 fi
 
 [ -n "$PREFIX" ] || { echo "REFUSE dest required"; exit 2; }
-allow_prefix "$PREFIX"
+allow_prefix "$PREFIX" || exit 78
 case "$PREFIX" in
   /opt/wardos|/opt/wardos/*)
     python3 "$HERE/lib/pi_gate.py" --install "${GATE:-}" "$PREFIX"
@@ -127,34 +132,56 @@ if [ "$MODE" = "rollback" ]; then
       link)
         [ -L "$target" ] || { echo "REFUSE missing link $rel"; exit 2; }
         [ "$(readlink "$target")" = "$extra" ] || { echo "REFUSE link changed $rel"; exit 2; }
-        rm -f "$target"
         ;;
       file)
-        [ -f "$target" ] || { echo "REFUSE missing $rel"; exit 2; }
+        [ -f "$target" ] && [ ! -L "$target" ] || { echo "REFUSE missing $rel"; exit 2; }
         have="$(sha256sum "$target" | cut -c1-64)"
         [ "$have" = "$extra" ] || { echo "REFUSE hash changed $rel"; exit 2; }
-        rm -f "$target"
         ;;
       *) echo "REFUSE receipt kind"; exit 2 ;;
     esac
+  done <"$receipt"
+  while IFS=$'\t' read -r kind rel extra; do
+    [ -n "${rel:-}" ] || continue
+    rm -f "$PREFIX/$rel"
   done <"$receipt"
   rm -f "$receipt"
   echo "OK rollback"
   exit 0
 fi
 
+if [ -n "$(find "$PREFIX" -mindepth 1 -print -quit 2>/dev/null)" ]; then
+  echo "REFUSE prefix is not a fresh empty directory"
+  exit 78
+fi
+SERVICE_USER="${WARDOS_SERVICE_USER:-fixture}"
+SERVICE_HOME="${WARDOS_SERVICE_HOME:-$PREFIX/service-home}"
+if [ -n "$GATE" ]; then
+  eval "$(python3 - "$GATE" <<'PY'
+import json, shlex, sys
+g = json.load(open(sys.argv[1]))
+print("SERVICE_USER=" + shlex.quote(str(g.get("service_user") or "fixture")))
+print("SERVICE_HOME=" + shlex.quote(str(g.get("service_home") or "")))
+PY
+)"
+fi
+if [ -z "$SERVICE_HOME" ]; then SERVICE_HOME="$PREFIX/service-home"; fi
 mkdir -p "$PREFIX/bin" "$PREFIX/lib" "$PREFIX/lib/systemd/system" "$PREFIX/etc" "$PREFIX/deps" "$PREFIX/runbook" "$PREFIX/secrets"
 install -m 0755 "$HERE/bin/wardos-pi-lights.sh" "$PREFIX/bin/wardos-pi-lights.sh"
 install -m 0755 "$HERE/bin/wardos-pi-tunnel.sh" "$PREFIX/bin/wardos-pi-tunnel.sh"
 install -m 0755 "$HERE/bin/wardos-pi-venv.sh" "$PREFIX/bin/wardos-pi-venv.sh"
 install -m 0644 "$HERE/lib/pi_gate.py" "$PREFIX/lib/pi_gate.py"
-sed "s#@PREFIX@#$PREFIX#g" "$HERE/units/wardos-pi-lights.service" >"$PREFIX/lib/systemd/system/wardos-pi-lights.service"
-sed "s#@PREFIX@#$PREFIX#g" "$HERE/units/wardos-pi-tunnel@.service" >"$PREFIX/lib/systemd/system/wardos-pi-tunnel@.service"
+sed -e "s#@PREFIX@#$PREFIX#g" -e "s#@USER@#$SERVICE_USER#g" -e "s#@HOME@#$SERVICE_HOME#g" "$HERE/units/wardos-pi-lights.service" >"$PREFIX/lib/systemd/system/wardos-pi-lights.service"
+sed -e "s#@PREFIX@#$PREFIX#g" -e "s#@USER@#$SERVICE_USER#g" -e "s#@HOME@#$SERVICE_HOME#g" "$HERE/units/wardos-pi-tunnel@.service" >"$PREFIX/lib/systemd/system/wardos-pi-tunnel@.service"
+chmod 0644 "$PREFIX/lib/systemd/system/wardos-pi-lights.service" "$PREFIX/lib/systemd/system/wardos-pi-tunnel@.service"
 cp "$HERE/deps/kasa-aarch64-cp313.lock.txt" "$PREFIX/deps/kasa-aarch64-cp313.lock.txt"
 cp "$HERE/deps/kasa-aarch64-cp313.wheelhouse.txt" "$PREFIX/deps/kasa-aarch64-cp313.wheelhouse.txt"
 cp "$HERE/RUNBOOK.md" "$PREFIX/runbook/RUNBOOK.md"
+chmod 0644 "$PREFIX/runbook/RUNBOOK.md" "$PREFIX/deps/kasa-aarch64-cp313.lock.txt" "$PREFIX/deps/kasa-aarch64-cp313.wheelhouse.txt"
 cat >"$PREFIX/etc/hub.env" <<EOF
 WARDOS_PREFIX=$PREFIX
+SERVICE_USER=$SERVICE_USER
+SERVICE_HOME=$SERVICE_HOME
 LIGHTS_HOST=127.0.0.1
 LIGHTS_PORT=8788
 METRICS_R1=20241
@@ -163,15 +190,18 @@ TUNNEL_NAME=wardos-hub
 TUNNEL_CONFIG=$PREFIX/etc/tunnel.yml
 RUN_TREE=$PREFIX/run
 KASA_VENV=$PREFIX/venv
+KASA_VENV_PYTHON=$PREFIX/venv/bin/python
 KASA_LOCK=$PREFIX/deps/kasa-aarch64-cp313.lock.txt
 LIGHTS_TOKEN_FILE=$PREFIX/secrets/lights-proxy.token
+KASA_USER_FILE=$SERVICE_HOME/.config/wardos/kasa.user
+KASA_PASSWORD_FILE=$SERVICE_HOME/.config/wardos/kasa.password
 HOUSE_ORIGINS=https://dmward23-web.github.io,https://cams.wardhousehub.com
 EOF
 cat >"$PREFIX/etc/secrets.refs" <<EOF
 # path mode. Install does not create these files and does not read values.
 $PREFIX/secrets/lights-proxy.token 0600
-$PREFIX/secrets/kasa.user 0600
-$PREFIX/secrets/kasa.password 0600
+$SERVICE_HOME/.config/wardos/kasa.user 0600
+$SERVICE_HOME/.config/wardos/kasa.password 0600
 $PREFIX/etc/tunnel.yml 0640
 EOF
 printf '%s\n' "no" >"$PREFIX/etc/units-enabled"
@@ -197,18 +227,35 @@ record_file etc/secrets.refs
 record_file etc/units-enabled
 printf 'link\t%s\t%s\n' bin/hub wardos-pi-lights.sh >>"$receipt"
 printf 'link\t%s\t%s\n' current . >>"$receipt"
-runtime="$REPO/ops/box-recover/runtime-src"
-mkdir -p "$PREFIX/run/scripts"
-for name in house-proc.sh lights-write-proxy.mjs private-dir.mjs kasa-write.py private-feed.mjs kasa-daemon.py spotify-control.mjs access-log.mjs lights-fetch.mjs kasa-probe.py; do
+runtime="$HERE/runtime"
+mkdir -p "$PREFIX/run/scripts" "$PREFIX/vendor"
+while read -r digest name; do
+  [ -n "${name:-}" ] || continue
   case "$name" in
     *sensi*) echo "REFUSE Sensi is not staged"; exit 2 ;;
+    */*|*..*) echo "REFUSE runtime name escapes"; exit 2 ;;
   esac
-  [ -f "$runtime/$name" ] || { echo "REFUSE runtime source missing"; exit 2; }
-  install -m 0644 "$runtime/$name" "$PREFIX/run/scripts/$name"
+  src="$runtime/$name"
+  have="$(sha256sum "$src" | cut -c1-64)"
+  [ "$have" = "$digest" ] || { echo "REFUSE runtime hash before copy $name"; exit 2; }
+  install -m 0644 "$src" "$PREFIX/run/scripts/$name"
   record_file "run/scripts/$name"
-done
+done <"$runtime/SHA256SUMS"
 if [ -e "$PREFIX/run/scripts/sensi-control.mjs" ]; then
   echo "REFUSE Sensi file was staged"
   exit 2
 fi
+mkdir -p "$PREFIX/vendor/ws"
+while read -r digest name; do
+  [ -n "${name:-}" ] || continue
+  case "$name" in
+    /*|*..*) echo "REFUSE ws path escapes"; exit 2 ;;
+  esac
+  src="$HERE/vendor/ws/$name"
+  have="$(sha256sum "$src" | cut -c1-64)"
+  [ "$have" = "$digest" ] || { echo "REFUSE ws hash before copy $name"; exit 2; }
+  mkdir -p "$PREFIX/vendor/ws/$(dirname "$name")"
+  install -m 0644 "$src" "$PREFIX/vendor/ws/$name"
+  record_file "vendor/ws/$name"
+done <"$HERE/vendor/ws.SHA256SUMS"
 echo "OK install"

@@ -1,7 +1,8 @@
-# Pi mock tests, not an independent verification
+# Pi mock tests after review v2. Not an independent verification.
 # node --test --test-concurrency=1 ops/pi-hub/qa/pihub-dryrun.test.mjs
-# 11 tests, exit 0, on this x86_64 checkout
+# 13 tests, exit 0, on this x86_64 checkout
 # qemu-aarch64 was not run
+# aarch64 wheels recorded pip_exit nonzero and aarch64_import_proven false
+# a pure-Python fixture recorded both exits 0 and aarch64_import_proven false
+# a forged aarch64 result and pip_exit 1 with import_exit 0 were refused
 # /opt/wardos was created for one gated install and removed afterward
-# the aarch64 wheel preflight recorded imported=false
-# a pure-Python fixture recorded imported=true and aarch64_import_proven=false

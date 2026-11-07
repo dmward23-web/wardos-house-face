@@ -2,7 +2,10 @@
 Description=WardOS Pi tunnel connector %i
 [Service]
 Type=simple
+User=@USER@
 Environment=WARDOS_PREFIX=@PREFIX@
+Environment=HOME=@HOME@
+Environment=WARDOS_CLOUDFLARED=@PREFIX@/bin/cloudflared
 ExecStart=@PREFIX@/bin/wardos-pi-tunnel.sh --activate --connector %i --gate @PREFIX@/etc/activate.gate
 Restart=on-failure
 [Install]

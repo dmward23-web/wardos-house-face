@@ -1,6 +1,6 @@
 # Pi hub packet, ready for review, not installed
 
-This is not the recovery archive. Recovery tar `989df41936b209963c0ddeb92603a4705261b556cf09afe8abb26d69be559463` is unchanged.
+This is not the recovery archive. Recovery v3 `989df41936b209963c0ddeb92603a4705261b556cf09afe8abb26d69be559463` and v4 `a53f8462d1f696c65d49249e80cf36bdec201ad2ac13f71ef27f295929f11696` are unchanged. The previous Pi packet `0c2b88f7a5a8b2484a01a52d1d1bcf8c257a8b18aacd62825490e0361003da3d` and payload `c06f47bbaf05b92034eedcedd07b97444437ad4e6a96e441b27286c1fb928bed` are unchanged.
 
 The earlier Pi tar `88515c6c2960cef0a999a9678e750b99f20c97472f9a9e6416f0a6009a0dbbba` was a staging stub. It is obsolete. Do not use it.
 
@@ -16,7 +16,7 @@ No SSH change, no tunnel join, no secret transfer, and no install on wardos-pi w
 
 `--rollback --prefix` removes only receipt files and those two symlinks, and only when the recorded hash or link text still matches.
 
-`--enable`, `--start`, and `--activate` on the installer call `SYSTEMCTL` (default `systemctl`) only when a `wardos.pi-systemd.gate/1` file lists `wardos-pi-lights.service` and the r1/r2 tunnel units. A name containing nest, cams, or 8787 is refused. With no gate they exit 78. Install itself does not call systemctl. The installed scripts remain the process boundary: with no activation gate they exit 78; with `cams` other than `parked` they exit 78; with `activate=lights-and-tunnel`, `cams=parked`, `ssh=leave-off`, and `secrets=paths-only` they can exec.
+`--enable`, `--start`, and `--activate` call `SYSTEMCTL` only when the gate names a staged unit file, its sha256, and `systemctl show -p FragmentPath` returns that same file. A global unit name is not treated as the staged file. A name containing nest, cams, or 8787 is refused. With no gate they exit 78. Install itself does not call systemctl. `--rollback` checks every receipt entry before deleting any file. `--rollback-services` disables and stops only a unit whose FragmentPath is the staged file. The unit files have `[Install]` and `Restart=on-failure`. Those lines do not mean a unit is enabled.
 
 `wardos-pi-lights.sh --activate` then requires a mode-600 token file. `cached_stills` must be `allow-existing`. If the staged proxy imports `sensi-control.mjs` and that file is absent, it refuses before exec. A stub that does not import Sensi can bind. The real staged proxy is copied from the clean runtime bundle and Sensi is not copied.
 

@@ -2,7 +2,11 @@
 Description=WardOS Pi lights and private feed
 [Service]
 Type=simple
+User=@USER@
 Environment=WARDOS_PREFIX=@PREFIX@
+Environment=HOME=@HOME@
+Environment=KASA_VENV_PYTHON=@PREFIX@/venv/bin/python
+Environment=LIGHTS_TOKEN_FILE=@PREFIX@/secrets/lights-proxy.token
 ExecStart=@PREFIX@/bin/wardos-pi-lights.sh --activate --gate @PREFIX@/etc/activate.gate
 Restart=on-failure
 [Install]

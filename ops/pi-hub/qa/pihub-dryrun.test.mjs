@@ -121,7 +121,8 @@ test("gated startup binds lights and both connectors and never cameras", async (
     fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-activate.gate/1", activate: "lights-and-tunnel", cams: "start", ssh: "leave-off", secrets: "paths-only" }));
     const refused = spawnSync(path.join(dest, "bin/wardos-pi-lights.sh"), ["--activate", "--gate", gate], { encoding: "utf8", env: { ...process.env, WARDOS_PREFIX: dest } });
     assert.equal(refused.status, 78, refused.stdout + refused.stderr);
-    fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-activate.gate/1", activate: "lights-and-tunnel", cams: "parked", ssh: "leave-off", secrets: "paths-only", cached_stills: "allow-existing", arm_import: "unmet" }));
+    const cfgSha = crypto.createHash("sha256").update(fs.readFileSync(path.join(dest, "etc/tunnel.yml"))).digest("hex");
+    fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-activate.gate/1", activate: "lights-and-tunnel", cams: "parked", ssh: "leave-off", secrets: "paths-only", cached_stills: "allow-existing", privacy_consent: "full-8788-accepted", provisioning: "not-performed", exec_profile: "fixture-stub", cutover: "approved", tunnel_name: "wardos-test-hub", tunnel_config_sha256: cfgSha, arm_import: "unmet" }));
     const spawnOne = (args) => {
       const child = spawn(args[0], args.slice(1), { env: { ...process.env, WARDOS_PREFIX: dest }, stdio: "ignore" });
       kids.push(child);
@@ -158,6 +159,9 @@ function gateFile(dir, extra) {
     cams: "parked",
     ssh: "leave-off",
     secrets: "paths-only",
+    privacy_consent: "full-8788-accepted",
+    provisioning: "not-performed",
+    exec_profile: "fixture-stub",
     ...extra,
   }));
   return gate;
@@ -174,7 +178,7 @@ test("staged real proxy refuses while Sensi is absent and a hold refuses a stub"
     fs.appendFileSync(path.join(dest, "etc/hub.env"), `LIGHTS_PORT=${port}\n`);
     const missing = spawnSync(path.join(dest, "bin/wardos-pi-lights.sh"), ["--activate", "--gate", gateFile(dest, { cached_stills: "allow-existing" })], { encoding: "utf8", env: { ...process.env, WARDOS_PREFIX: dest } });
     assert.equal(missing.status, 78, missing.stdout + missing.stderr);
-    assert.match(missing.stdout, /Sensi source is absent/);
+    assert.match(missing.stdout, /presence is not approval/);
     assert.equal(listeners(port).length, 0);
     fs.writeFileSync(path.join(dest, "run/scripts/lights-write-proxy.mjs"), "import http from 'node:http';\n");
     const held = spawnSync(path.join(dest, "bin/wardos-pi-lights.sh"), ["--activate", "--gate", gateFile(dest, { cached_stills: "hold" })], { encoding: "utf8", env: { ...process.env, WARDOS_PREFIX: dest } });
@@ -201,28 +205,33 @@ test("default tunnel name refuses without a separate cutover approval", () => {
 
 test("systemd modes stay off until a gate and refuse a camera unit", () => {
   const dest = fs.mkdtempSync(path.join(os.tmpdir(), "pi-hub-sd-"));
-  const log = path.join(dest, "systemctl.log");
-  const ctl = path.join(dest, "systemctl");
-  const gate = path.join(dest, "sd.json");
+  const log = path.join(os.tmpdir(), "pi-systemctl-" + process.pid + ".log");
+  const gate = path.join(os.tmpdir(), "pi-sd-" + process.pid + ".json");
   try {
-    fs.writeFileSync(ctl, "#!/bin/sh\nprintf '%s\\n' \"$*\" >> \"$WARDOS_SD_LOG\"\n", { mode: 0o755 });
+    const ctl = path.join(os.tmpdir(), "pi-systemctl-" + process.pid);
+    fs.writeFileSync(ctl, "#!/bin/sh\nif [ \"$1\" = show ]; then printf '%s\\n' \"$WARDOS_FAKE_FRAGMENT\"; exit 0; fi\nprintf '%s\\n' \"$*\" >> \"$WARDOS_SD_LOG\"\nexit 0\n", { mode: 0o755 });
     const installed = spawnSync("bash", [SH, "--install", "--prefix", dest], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: "/bin/false" } });
     assert.equal(installed.status, 0, installed.stdout + installed.stderr);
     assert.equal(fs.existsSync(log), false);
-    fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-systemd.gate/1", units: ["wardos-pi-nest.service"] }));
-    const bad = spawnSync("bash", [SH, "--enable", "--prefix", dest, "--gate", gate], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: ctl, WARDOS_SD_LOG: log } });
+    const unit = path.join(dest, "lib/systemd/system/wardos-pi-lights.service");
+    const digest = crypto.createHash("sha256").update(fs.readFileSync(unit)).digest("hex");
+    fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-systemd.gate/1", units: [{ name: "wardos-pi-nest.service", fragment_path: unit, fragment_sha256: digest }] }));
+    const bad = spawnSync("bash", [SH, "--enable", "--prefix", dest, "--gate", gate], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: ctl, WARDOS_SD_LOG: log, WARDOS_FAKE_FRAGMENT: unit } });
     assert.equal(bad.status, 78, bad.stdout + bad.stderr);
     assert.equal(fs.existsSync(log), false);
-    fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-systemd.gate/1", units: ["wardos-pi-lights.service", "wardos-pi-tunnel@r1.service"] }));
-    const enabled = spawnSync("bash", [SH, "--enable", "--prefix", dest, "--gate", gate], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: ctl, WARDOS_SD_LOG: log } });
+    fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-systemd.gate/1", units: [{ name: "wardos-pi-lights.service", fragment_path: "/lib/systemd/system/wardos-pi-lights.service", fragment_sha256: digest }] }));
+    const globalName = spawnSync("bash", [SH, "--enable", "--prefix", dest, "--gate", gate], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: ctl, WARDOS_SD_LOG: log, WARDOS_FAKE_FRAGMENT: "/lib/systemd/system/wardos-pi-lights.service" } });
+    assert.equal(globalName.status, 78, globalName.stdout + globalName.stderr);
+    assert.equal(fs.existsSync(log), false);
+    fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-systemd.gate/1", units: [{ name: "wardos-pi-lights.service", fragment_path: unit, fragment_sha256: digest }] }));
+    const enabled = spawnSync("bash", [SH, "--enable", "--prefix", dest, "--gate", gate], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: ctl, WARDOS_SD_LOG: log, WARDOS_FAKE_FRAGMENT: unit } });
     assert.equal(enabled.status, 0, enabled.stdout + enabled.stderr);
     assert.match(fs.readFileSync(log, "utf8"), /enable wardos-pi-lights.service/);
     assert.doesNotMatch(fs.readFileSync(log, "utf8"), /start /);
-    fs.writeFileSync(log, "");
-    const started = spawnSync("bash", [SH, "--start", "--prefix", dest, "--gate", gate], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: ctl, WARDOS_SD_LOG: log } });
-    assert.equal(started.status, 0, started.stdout + started.stderr);
-    assert.match(fs.readFileSync(log, "utf8"), /start wardos-pi-lights.service/);
-    assert.doesNotMatch(fs.readFileSync(log, "utf8"), /enable /);
+    fs.appendFileSync(unit, "\n# changed\n");
+    const changed = spawnSync("bash", [SH, "--start", "--prefix", dest, "--gate", gate], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: ctl, WARDOS_SD_LOG: log, WARDOS_FAKE_FRAGMENT: unit } });
+    assert.equal(changed.status, 78, changed.stdout + changed.stderr);
+    assert.doesNotMatch(fs.readFileSync(log, "utf8"), /start /);
   } finally {
     fs.rmSync(dest, { recursive: true, force: true });
   }
@@ -231,7 +240,7 @@ test("systemd modes stay off until a gate and refuse a camera unit", () => {
 test("/opt/wardos is refused without an install gate", () => {
   const existed = fs.existsSync("/opt/wardos");
   const gate = path.join(os.tmpdir(), "pi-opt-gate.json");
-  fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-install.gate/1", root: "/opt/wardos" }));
+  fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-install.gate/1", root: "/opt/wardos", service_user: "fixture", service_home: "/opt/wardos/service-home" }));
   const denied = spawnSync("bash", [SH, "--install", "--prefix", "/opt/wardos"], { encoding: "utf8" });
   assert.notEqual(denied.status, 0);
   assert.match(denied.stdout + denied.stderr, /REFUSE install/);
@@ -321,4 +330,44 @@ for dist, version, top in specs:
     assert.doesNotMatch(JSON.stringify(arm), /passed-on-trixie/);
   }
   fs.rmSync(dest, { recursive: true, force: true });
+});
+
+test("traversal, symlink ancestors, and a changed receipt file do not delete", () => {
+  const escaped = spawnSync("bash", [SH, "--install", "--prefix", "/opt/wardos/../../etc"], { encoding: "utf8" });
+  assert.notEqual(escaped.status, 0);
+  assert.match(escaped.stdout + escaped.stderr, /REFUSE dest/);
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), "pi-link-"));
+  const real = path.join(parent, "real");
+  const link = path.join(parent, "link");
+  fs.mkdirSync(real);
+  fs.symlinkSync(real, link);
+  const via = spawnSync("bash", [SH, "--install", "--prefix", path.join(link, "prefix")], { encoding: "utf8" });
+  assert.notEqual(via.status, 0, via.stdout + via.stderr);
+  assert.match(via.stdout + via.stderr, /symlink/);
+  const dest = fs.mkdtempSync(path.join(os.tmpdir(), "pi-roll-"));
+  assert.equal(spawnSync("bash", [SH, "--install", "--prefix", dest], { encoding: "utf8" }).status, 0);
+  const marker = path.join(dest, "bin/wardos-pi-lights.sh");
+  fs.appendFileSync(marker, "\n# changed\n");
+  const rolled = spawnSync("bash", [SH, "--rollback", "--prefix", dest], { encoding: "utf8" });
+  assert.notEqual(rolled.status, 0, rolled.stdout + rolled.stderr);
+  assert.match(rolled.stdout, /hash changed/);
+  assert.equal(fs.existsSync(path.join(dest, "bin/wardos-pi-venv.sh")), true);
+  fs.rmSync(parent, { recursive: true, force: true });
+  fs.rmSync(dest, { recursive: true, force: true });
+});
+
+test("a forged ARM result and a pip failure with a successful import are refused", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "pi-arm-"));
+  const forged = path.join(dir, "forged.json");
+  fs.writeFileSync(forged, JSON.stringify({ schema: "wardos.pi-preflight.result/1", host_arch: "aarch64", python: "3.13.0", pip_exit: 0, import_exit: 0, imported: true, phrase_is_proof: false, aarch64_import_proven: true }));
+  const arm = spawnSync("python3", [path.join(ROOT, "ops/pi-hub/lib/pi_gate.py"), "--preflight-ok", forged], { encoding: "utf8" });
+  assert.equal(arm.status, 78, arm.stdout + arm.stderr);
+  assert.match(arm.stdout, /not this machine|ARM flag/);
+  const split = path.join(dir, "split.json");
+  const arch = spawnSync("uname", ["-m"], { encoding: "utf8" }).stdout.trim();
+  fs.writeFileSync(split, JSON.stringify({ schema: "wardos.pi-preflight.result/1", host_arch: arch, pip_exit: 1, import_exit: 0, imported: true, phrase_is_proof: false, aarch64_import_proven: false }));
+  const both = spawnSync("python3", [path.join(ROOT, "ops/pi-hub/lib/pi_gate.py"), "--preflight-ok", split], { encoding: "utf8" });
+  assert.equal(both.status, 78, both.stdout + both.stderr);
+  assert.match(both.stdout, /both be 0/);
+  fs.rmSync(dir, { recursive: true, force: true });
 });

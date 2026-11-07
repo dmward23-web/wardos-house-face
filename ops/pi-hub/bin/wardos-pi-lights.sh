@@ -32,7 +32,9 @@ elif [ -f "$(dirname "$0")/../lib/pi_gate.py" ]; then GATE_PY="$(dirname "$0")/.
 else GATE_PY="$PREFIX/lib/pi_gate.py"; fi
 
 lights_exec() {
-  exec "$NODE" "$RUN_TREE/scripts/lights-write-proxy.mjs" --host "$LIGHTS_HOST" --port "$LIGHTS_PORT"
+  export HOME="${SERVICE_HOME:-$HOME}"
+  export KASA_VENV_PYTHON="${KASA_VENV_PYTHON:-$PREFIX/venv/bin/python}"
+  exec "$NODE" "$RUN_TREE/scripts/lights-write-proxy.mjs" --host "$LIGHTS_HOST" --port "$LIGHTS_PORT" --token-file "$TOKEN"
 }
 
 if [ "$MODE" = "plan" ]; then
@@ -41,6 +43,10 @@ if [ "$MODE" = "plan" ]; then
   exit 0
 fi
 python3 "$GATE_PY" "$GATE"
+profile="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("exec_profile") or "target")' "$GATE")"
+if [ "$profile" = "target" ]; then
+  python3 "$GATE_PY" --preflight-ok "${PREFLIGHT_RESULT:-$PREFIX/deps/preflight-result.json}"
+fi
 if [ -L "$TOKEN" ] || [ ! -f "$TOKEN" ]; then echo "REFUSE device token path"; exit 78; fi
 if [ "$(stat -c %a "$TOKEN")" != "600" ]; then echo "REFUSE device token mode"; exit 78; fi
 if [ "$(stat -c %s "$TOKEN")" -le 0 ]; then echo "REFUSE device token empty"; exit 78; fi
@@ -51,9 +57,21 @@ if [ "$stills" != "allow-existing" ]; then
 fi
 proxy="$RUN_TREE/scripts/lights-write-proxy.mjs"
 if [ -f "$proxy" ] && grep -q 'sensi-control.mjs' "$proxy"; then
-  if [ ! -f "$RUN_TREE/scripts/sensi-control.mjs" ]; then
-    echo "REFUSE Sensi source is absent; not starting the real proxy"
+  sensi="$RUN_TREE/scripts/sensi-control.mjs"
+  accept="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("sensi_opaque") or "")' "$GATE")"
+  if [ "$accept" != "accept-existing-hash" ] || [ ! -f "$sensi" ]; then
+    echo "REFUSE Sensi presence is not approval and the review stays open"
     exit 78
   fi
+  have="$(sha256sum "$sensi" | cut -c1-64)"
+  if [ "$have" != "54f8715454d1e4e851ffd2ead6d87ddbaed204368b63c7d74e2b4c4fe0c58ffc" ]; then
+    echo "REFUSE Sensi hash is not the opaque pin"
+    exit 78
+  fi
+  echo "Sensi hash matches the opaque pin; security_review stays open"
+fi
+if [ "$profile" = "fixture-stub" ] && grep -q 'sensi-control.mjs' "$proxy"; then
+  echo "REFUSE fixture profile cannot start the real proxy"
+  exit 78
 fi
 lights_exec

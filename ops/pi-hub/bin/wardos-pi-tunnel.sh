@@ -44,12 +44,15 @@ if [ "$MODE" = "plan" ]; then
   exit 0
 fi
 python3 "$GATE_PY" "$GATE"
-if [ ! -f "$CFG" ]; then echo "REFUSE tunnel config path"; exit 78; fi
-if [ "$NAME" = "wardos-hub" ]; then
-  cut="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("cutover") or "")' "$GATE")"
-  if [ "$cut" != "approved" ]; then
-    echo "REFUSE tunnel name wardos-hub needs a separate cutover approval"
-    exit 78
-  fi
+if [ -L "$CFG" ] || [ ! -f "$CFG" ]; then echo "REFUSE tunnel config path"; exit 78; fi
+actual="$(awk '/^tunnel:/ { print $2; exit }' "$CFG")"
+approved="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("tunnel_name") or "")' "$GATE")"
+cut="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("cutover") or "")' "$GATE")"
+want="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("tunnel_config_sha256") or "")' "$GATE")"
+have="$(sha256sum "$CFG" | cut -c1-64)"
+if [ -z "$actual" ] || [ "$cut" != "approved" ] || [ "$approved" != "$actual" ] || [ "$have" != "$want" ]; then
+  echo "REFUSE named tunnel $actual needs cutover approval bound to this config"
+  exit 78
 fi
+NAME="$actual"
 tunnel_exec
