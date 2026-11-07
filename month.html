@@ -680,7 +680,13 @@
  <div class="month-hdr">
  <div class="mnav">
  <button class="mbtn" type="button" data-mnav="-1" aria-label="Previous month">‹</button>
- <style>.month-title,[data-month-title]{color:#f7f1e4!important;filter:none!important;-webkit-filter:none!important;opacity:1!important;text-shadow:0 1px 2px rgba(0,0,0,.72);font-size:22px!important}</style>
+ <style>.month-title,[data-month-title]{color:#f7f1e4!important;filter:none!important;-webkit-filter:none!important;opacity:1!important;text-shadow:0 1px 2px rgba(0,0,0,.72);font-size:22px!important}
+@media (max-width:1200px) and (min-height:1500px){
+ html:not(#hf-scroll-off),html:not(#hf-scroll-off)>body{width:100%!important;min-height:0!important;height:100dvh!important;max-height:100dvh!important;overflow:hidden!important}
+ html body .panel{width:100%!important;min-height:0!important;height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+ html body .month-wrap{flex:1 1 auto!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+ html body .month-grid{flex:1 1 auto!important;min-height:0!important;overflow:auto!important}
+}</style>
  <div class="month-title" data-month-title></div>
  <button class="mbtn" type="button" data-mnav="1" aria-label="Next month">›</button>
  </div>

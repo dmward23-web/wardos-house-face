@@ -104,7 +104,7 @@ test("AINSNOSCORE2 (real browser): no digit in her jar hero with no data, slow d
       for (const s of r.samples) {
         assert.equal(s.digit, false, mode + " " + JSON.stringify(s));
         assert.equal(s.icon, false, mode + " " + JSON.stringify(s));
-        assert.equal(s.big, "Tour Jar");
+        assert.equal(s.big, "Jar");
       }
       assert.deepEqual(r.errors, []);
       if (mode !== "nofeed") assert.ok(r.hub_hits > 0);
@@ -141,10 +141,10 @@ test("AINSSTAR1 (real browser): no star glyph or digit in Ainsley's rows before,
       assert.equal(s.bank.digit, false, mode + " digit: " + s.bank.text);
       /* DAYPKG1 v2j (Alfred v2i P3) · Dad's weekly figure next to her Paid hold is checked apart (money shape, Dad page only);
          before data it may be empty; once the feed read has settled with data (feed, slow) it must be there, never empty */
-      assert.ok(s.bank.dadWk === "" || WK.test(s.bank.dadWk), mode + " Dad weekly figure shape: " + s.bank.dadWk);
+      assert.equal(s.bank.dadWk, "", mode + " public allowance shows no weekly dollar figure: " + s.bank.dadWk);
     }
     const last = r.samples[r.samples.length - 1];   // allowance feed/slow: harness waits until visible [data-dad-wk] is $N wk
-    if (mode !== "nofeed") assert.match(last.bank.dadWk, WK, mode + " Dad weekly figure must show once data has landed");
+    if (mode !== "nofeed") assert.equal(last.bank.dadWk, "", mode + " a landed feed still must not paint a public dollar week");
     assert.deepEqual(r.errors, []);
   }
 });

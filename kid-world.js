@@ -42,6 +42,36 @@
     document.addEventListener("house:kids-data-missing", showRest);
     document.addEventListener("house:kids-data-ready", hideRest);
     var W = global.WardKids;
+    function weekNote(on) {
+      var btn = document.querySelector("[data-kw-path]");
+      var note = document.querySelector("[data-kw-week-empty]");
+      var must = document.querySelector("[data-kw-must-empty]");
+      if (!on) {
+        if (note) note.remove();
+        if (must) must.remove();
+        return;
+      }
+      var line = kid() === "ainsley" ? "Nothing on your week yet." : "A free week.";
+      if (!note && btn) {
+        note = document.createElement("p");
+        note.className = "kw-week-empty";
+        note.setAttribute("data-kw-week-empty", "");
+        note.textContent = line;
+        btn.insertAdjacentElement("afterend", note);
+      }
+      var host = document.querySelector ? document.querySelector("#sec-musts") : null;
+      if (host && !must) {
+        must = document.createElement("p");
+        must.className = "kw-must-empty";
+        must.setAttribute("data-kw-must-empty", "");
+        must.textContent = "Nothing on the list yet.";
+        host.appendChild(must);
+      }
+    }
+    var showRestBound = showRest;
+    showRest = function () { showRestBound(); weekNote(true); };
+    var hideRestBound = hideRest;
+    hideRest = function () { hideRestBound(); weekNote(false); };
     if (!W || !W._data) showRest();
     else hideRest();
     return { show: showRest, hide: hideRest };
@@ -1890,7 +1920,10 @@
     if (!el) return;
     if (kid() === "ainsley") {
       var h = chicagoHour();
-      el.textContent = h < 5 || h >= 21 ? "Night" : h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening";
+      var word = h < 5 || h >= 21 ? "Night" : h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening";
+      el.textContent = word;
+      var live = document.querySelectorAll("[data-live-clock]");
+      for (var li = 0; li < live.length; li++) if (/\d/.test(live[li].textContent || "")) live[li].textContent = word;
     } else el.textContent = clockLine();
   }
   function paintWeek() {
@@ -2128,19 +2161,13 @@
       mist.className = "ains-mist";
       mist.setAttribute("aria-hidden", "true");
       stage.appendChild(mist);
-      document.addEventListener("click", function (ev) {
-        var t = ev.target && ev.target.closest ? ev.target.closest("[data-check].is-today") : null;
-        if (!t) return;
-        var was = t.classList.contains("done");
+      document.addEventListener("house:must-done", function () {
+        document.documentElement.setAttribute("data-ains-quiet", "1");
+        document.documentElement.setAttribute("data-leaf-quiet", "1");
         setTimeout(function () {
-          if (was || !t.classList.contains("done")) return;
-          document.documentElement.setAttribute("data-ains-quiet", "1");
-          document.documentElement.setAttribute("data-leaf-quiet", "1");
-          setTimeout(function () {
-            document.documentElement.removeAttribute("data-ains-quiet");
-            document.documentElement.removeAttribute("data-leaf-quiet");
-          }, 400);
-        }, 0);
+          document.documentElement.removeAttribute("data-ains-quiet");
+          document.documentElement.removeAttribute("data-leaf-quiet");
+        }, 400);
       });
     } else if (kid() === "hayes" || kid() === "harris") {
       var peb = document.createElement("div");
@@ -2154,19 +2181,13 @@
       function paintPebble() { peb.setAttribute("data-state", pebbleState()); }
       document.addEventListener("house:kids-data-ready", paintPebble);
       paintPebble();
-      document.addEventListener("click", function (ev) {
-        var t = ev.target && ev.target.closest ? ev.target.closest("[data-check]") : null;
-        if (!t || !t.classList.contains("is-today")) return;
-        var was = t.classList.contains("done");
-        setTimeout(function () {
-          if (was || !t.classList.contains("done")) return;
-          peb.classList.remove("settle");
-          void peb.offsetWidth;
-          peb.classList.add("settle");
-          document.documentElement.setAttribute("data-leaf-quiet", "1");
-          setTimeout(function () { document.documentElement.removeAttribute("data-leaf-quiet"); }, 400);
-          setTimeout(function () { peb.classList.remove("settle"); paintPebble(); }, 1200);
-        }, 0);
+      document.addEventListener("house:must-done", function () {
+        peb.classList.remove("settle");
+        void peb.offsetWidth;
+        peb.classList.add("settle");
+        document.documentElement.setAttribute("data-leaf-quiet", "1");
+        setTimeout(function () { document.documentElement.removeAttribute("data-leaf-quiet"); }, 400);
+        setTimeout(function () { peb.classList.remove("settle"); paintPebble(); }, 1200);
       });
     }
     stage.querySelector("[data-kw-home]").addEventListener("click", function (ev) {

@@ -4155,6 +4155,9 @@ header.hdr { position: relative; }
   }
   .tile { box-shadow: none !important; }
 }
+html body .tile,
+html body .tile::before { box-shadow: none !important; }
+html body .tile::after { box-shadow: none !important; background-image: none !important; animation: none !important; }
 </style>
  <script>(function(){try{var k="wardos-from-wall",q=/[?&]from=wall\b/.test(location.search);if(q)sessionStorage.setItem(k,"1");if(q||sessionStorage.getItem(k)==="1"){var a=document.querySelector("[data-wall-back]");if(a){a.hidden=false;a.addEventListener("click",function(){try{sessionStorage.removeItem(k)}catch(e){}});}}}catch(e){}})();</script>
  <header class="hdr hdr--spread hdr--premium hdr--heat">

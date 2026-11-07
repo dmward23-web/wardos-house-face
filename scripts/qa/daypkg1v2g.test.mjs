@@ -193,7 +193,7 @@ test("DAYPKG1 v2g Atlas (a): sheet-allowance shows each kid's weekly figure next
   const s = rd("sheet-allowance.html");
   for (const k of KIDS) {
     const sec = s.slice(s.indexOf('data-bank-kid="' + k + '"'), s.indexOf("</section>", s.indexOf('data-bank-kid="' + k + '"')));
-    assert.match(sec, /data-dad-paid="[a-z]+"[^>]*>Hold for Paid<\/button><span class="dad-paid-wk" data-dad-wk hidden><\/span>/, k + " figure sits next to the hold, inside the renderBank root");
+    assert.doesNotMatch(sec, /Hold for Paid|data-dad-wk|data-dad-paid/, k + " public bank has no Paid hold or weekly dollar slot");
   }
   const map = Object.assign({}, SYNC_INIT);
   const dad = device("fri1459", map, { pathname: "/sheet-allowance.html", timers: true });

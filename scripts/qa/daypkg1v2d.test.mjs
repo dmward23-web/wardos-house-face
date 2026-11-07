@@ -132,15 +132,12 @@ test("DAYPKG1 v2d (Atlas A): the 3 kid pages have no Paid control and no prompt 
   }
 });
 
-test("DAYPKG1 v2d (Atlas A): sheet-allowance carries one Dad Paid button per kid, wired to WardKids.dadPaid then a repaint; no prompt", () => {
+test("DAYPKG1 v2d (Atlas A): the public allowance page has no Paid control and does not call dadPaid", () => {
   const h = rd("sheet-allowance.html");
-  for (const kid of KIDS) {
-    /* DAYPKG1 v2e · Atlas 12:40 AM (2): the button is hold-to-confirm (about 2 s), no number in the control */
-    const btn = h.match(new RegExp('<button type="button" class="dad-paid" data-dad-paid="' + kid + '" aria-label="Hold to mark Paid">Hold for Paid</button><span class="dad-paid-wk" data-dad-wk hidden></span><span class="dad-paid-stamp" data-paid-stamp hidden></span>', "g")); /* DAYPKG1 v2g · Atlas (a): + Dad's weekly figure slot */
-    assert.equal(btn && btn.length, 1, kid + " one Paid button with its stamp");
-  }
-  assert.match(h, /\[data-dad-paid\]/); assert.match(h, /WardKids\.dadPaid\(/); assert.match(h, /paint\(\);/);
-  assert.ok(!/\b(window\.)?(prompt|confirm)\s*\(/.test(h), "the Dad sheet pays without a prompt");
+  assert.equal((h.match(/data-dad-paid/g) || []).length, 0, "no public Paid control");
+  assert.ok(!/Hold for Paid|Tour Jar|payday/i.test(h), "no public payday copy");
+  assert.ok(!/WardKids\.dadPaid\(/.test(h), "the public page does not call dadPaid");
+  assert.ok(!/\b(window\.)?(prompt|confirm)\s*\(/.test(h), "no prompt");
   assert.match(h, /<script src="kids-data\.js\?v=DAYPKG1"><\/script>/);
 });
 
