@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>SYNTHETIC FEED · not a private feed</title></head>
+<body data-kid="hayes" data-chores-shared="1" data-fixture="synthetic-must">
+<p data-fixture-label>SYNTHETIC FEED · isolated test only · no private feed</p>
+<button type="button" data-check="hay-bed" data-kid-quest="1">Bed</button>
+<button type="button" data-check="hay-room" data-kid-quest="1">Room</button>
+<script>
+window.__done = [];
+window.__fail = false;
+window.WardKids = {
+  DAY_ISO: "2026-11-07",
+  _data: { kids: { hayes: { quests: [{ id: "hay-bed" }, { id: "hay-room" }] } } },
+  KID_FROM_CHECK: { "hay-bed": "hayes", "hay-room": "hayes" },
+  getCheck: function (id) { return localStorage.getItem("syn-" + id) === "1"; },
+  setCheck: function (id, done) {
+    if (window.__fail) throw new Error("synthetic failure");
+    localStorage.setItem("syn-" + id, done ? "1" : "0");
+    return { kidId: "hayes" };
+  },
+  renderBank: function () {},
+  getBankView: function () { return {}; }
+};
+document.addEventListener("house:must-done", function (ev) { window.__done.push(ev.detail && ev.detail.id); });
+</script>
+<script src="/house-checkoffs.js?v=DAYPKG1"></script>
+</body></html>
