@@ -254,8 +254,18 @@ def proc_identity(pid: str, root: str) -> tuple:
     return start, argv
 
 
-def run_identity_ok(pid: str, owned: dict) -> bool:
-    root = os.environ.get("WARDOS_PROC_ROOT", "/proc")
+def proc_root(prefix: str) -> str:
+    override = os.environ.get("WARDOS_PROC_ROOT")
+    if not override:
+        return "/proc"
+    if os.environ.get("WARDOS_SYSTEMD_FIXTURE") != "isolated":
+        fail("proc root is not available in production")
+    if prefix == "/opt/wardos" or prefix.startswith("/opt/wardos/"):
+        fail("proc root is not available in production")
+    return override
+
+
+def run_identity_ok(pid: str, owned: dict, root: str) -> bool:
     try:
         start, argv = proc_identity(pid, root)
     except (OSError, IndexError):
@@ -267,7 +277,32 @@ def run_identity_ok(pid: str, owned: dict) -> bool:
     )
 
 
+def observe_enabled(ctl: str, name: str) -> bool:
+    run = subprocess.run([ctl, "is-enabled", name], text=True, capture_output=True)
+    text = (run.stdout or "").strip()
+    if text == "enabled" and run.returncode == 0:
+        return True
+    if text == "disabled" and run.returncode == 1:
+        return False
+    fail("systemd enabled state")
+    return False
+
+
+def observe_active(ctl: str, name: str) -> bool:
+    run = subprocess.run([ctl, "is-active", name], text=True, capture_output=True)
+    text = (run.stdout or "").strip()
+    if text == "active" and run.returncode == 0:
+        return True
+    if text == "inactive" and run.returncode == 3:
+        return False
+    if text in ("activating", "deactivating", "reloading", "maintenance"):
+        fail("systemd transitional state")
+    fail("systemd active state")
+    return False
+
+
 def systemd_apply(gate_path: str, prefix: str, ctl: str, mode: str) -> None:
+    proc = proc_root(prefix)
     gate = load(gate_path, "systemd gate")
     systemd(gate_path, prefix)
     units = gate["units"]
@@ -286,9 +321,6 @@ def systemd_apply(gate_path: str, prefix: str, ctl: str, mode: str) -> None:
                 key, val = line.split("=", 1)
                 info[key] = val.strip()
         return info
-
-    def truthy(*args: str) -> bool:
-        return subprocess.run([ctl, *args], text=True, capture_output=True).returncode == 0
 
     def call(*args: str) -> int:
         return subprocess.run([ctl, *args]).returncode
@@ -311,24 +343,52 @@ def systemd_apply(gate_path: str, prefix: str, ctl: str, mode: str) -> None:
             fail("systemd effective argv")
         pid = info.get("MainPID", "0") or "0"
         if pid not in ("0", ""):
-            if mode != "rollback-services" or not run_identity_ok(pid, unit.get("owned_run") or {}):
+            if mode != "rollback-services" or not run_identity_ok(pid, unit.get("owned_run") or {}, proc):
                 fail("systemd foreign run")
         checked.append(name)
-    prior = {name: {"enabled": truthy("is-enabled", name), "active": truthy("is-active", name)} for name in checked}
+    prior = {
+        name: {"enabled": observe_enabled(ctl, name), "active": observe_active(ctl, name)}
+        for name in checked
+    }
+    started = {}
+
+    def capture_start(name: str) -> None:
+        info = show(name)
+        pid = info.get("MainPID", "0") or "0"
+        if pid in ("0", ""):
+            started[name] = {"pid": "0", "start": "", "argv": []}
+            return
+        try:
+            start, argv = proc_identity(pid, proc)
+        except (OSError, IndexError):
+            fail("systemd run identity")
+        started[name] = {"pid": pid, "start": start, "argv": argv}
 
     def reverse(name: str, action: str) -> int:
         state = prior[name]
         if action == "enable":
-            return 0 if state["enabled"] else call("disable", name)
+            if not state["enabled"] and call("disable", name) != 0:
+                return 1
+            return 0 if observe_enabled(ctl, name) == state["enabled"] else 1
         if action == "start":
-            return 0 if state["active"] else call("stop", name)
+            info = show(name)
+            pid = info.get("MainPID", "0") or "0"
+            if pid not in ("0", ""):
+                captured = started.get(name) or {}
+                if not run_identity_ok(pid, captured, proc):
+                    fail("systemd replacement")
+                if call("stop", name) != 0:
+                    return 1
+            return 0 if observe_active(ctl, name) is False else 1
         if action == "disable-now":
             rc = 0
             if state["enabled"]:
                 rc = call("enable", name)
             if rc == 0 and state["active"]:
                 rc = call("start", name)
-            return rc
+            if rc != 0:
+                return 1
+            return 0 if observe_enabled(ctl, name) == state["enabled"] and observe_active(ctl, name) == state["active"] else 1
         return 1
 
     attempted = []
@@ -345,7 +405,10 @@ def systemd_apply(gate_path: str, prefix: str, ctl: str, mode: str) -> None:
             for step in steps:
                 attempted.append((name, step))
                 args = ["disable", "--now", name] if step == "disable-now" else [step, name]
-                if call(*args) != 0:
+                rc = call(*args)
+                if step == "start":
+                    capture_start(name)
+                if rc != 0:
                     raise RuntimeError(name)
     except RuntimeError:
         failed = []

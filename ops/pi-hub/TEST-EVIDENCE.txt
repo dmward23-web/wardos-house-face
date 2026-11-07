@@ -1,3 +1,12 @@
+# Pi v6 mock tests. Not an independent verification and not ARM approval.
+# node --test --test-concurrency=1 ops/pi-hub/qa/pihub-dryrun.test.mjs
+# 20 tests, exit 0, on this x86_64 checkout
+# a bad payload hash leaves no hub.env; a failure after hub.env and cloudflared are registered removes both and leaves the receipt and directories
+# a tampered owned file is named as RESIDUE and is not deleted; the matching link is removed
+# is-enabled masked and is-active activating are refused before any unit command is logged
+# WARDOS_PROC_ROOT is refused without WARDOS_SYSTEMD_FIXTURE=isolated and on /opt/wardos even with that flag
+# a replaced MainPID is not stopped; a start whose poststate stays active is reversal failed
+# preflight result is mode 0644 and readable by nobody after umask 077; a mode 0600 secret stays unreadable
 # Pi v5 mock tests. Not an independent verification and not ARM approval.
 # node --test --test-concurrency=1 ops/pi-hub/qa/pihub-dryrun.test.mjs
 # 18 tests, exit 0, on this x86_64 checkout

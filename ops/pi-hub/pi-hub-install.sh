@@ -177,22 +177,32 @@ cleanup_partial() {
     if [ "$kind" = link ]; then
       python3 "$HERE/lib/pi_gate.py" --contained "$PREFIX" "$(dirname "$target")" || { failed=1; continue; }
       if [ ! -L "$target" ] || [ "$(readlink "$target")" != "$extra" ]; then
-        echo "REFUSE cleanup link $rel" >&2
+        if [ -e "$target" ] || [ -L "$target" ]; then echo "RESIDUE $rel" >&2; fi
         failed=1
         continue
       fi
     else
       python3 "$HERE/lib/pi_gate.py" --contained "$PREFIX" "$target" || { failed=1; continue; }
-      if [ -L "$target" ] || [ ! -f "$target" ]; then failed=1; continue; fi
+      if [ -L "$target" ] || [ ! -f "$target" ]; then
+        if [ -e "$target" ]; then echo "RESIDUE $rel" >&2; fi
+        failed=1
+        continue
+      fi
       have="$(sha256sum "$target" | cut -c1-64)"
       if [ "$have" != "$extra" ]; then
-        echo "REFUSE cleanup bytes $rel" >&2
+        echo "RESIDUE $rel" >&2
         failed=1
         continue
       fi
     fi
     rm -f "$target" || failed=1
+    if [ -e "$target" ]; then
+      echo "RESIDUE $rel" >&2
+      failed=1
+    fi
   done <"$receipt"
+  if [ -n "${env_tmp:-}" ]; then rm -f "$env_tmp"; fi
+  if [ -n "${payload_tmp:-}" ]; then rm -rf "$payload_tmp"; fi
   if [ "$failed" = 1 ]; then echo "REFUSE cleanup incomplete" >&2; fi
 }
 trap cleanup_partial EXIT
@@ -232,7 +242,8 @@ cp "$HERE/deps/kasa-aarch64-cp313.wheelhouse.txt" "$PREFIX/deps/kasa-aarch64-cp3
 own_file deps/kasa-aarch64-cp313.wheelhouse.txt 0644
 cp "$HERE/RUNBOOK.md" "$PREFIX/runbook/RUNBOOK.md"
 own_file runbook/RUNBOOK.md 0644
-cat >"$PREFIX/etc/hub.env" <<EOF
+env_tmp="$(mktemp)"
+cat >"$env_tmp" <<EOF
 WARDOS_PREFIX=$PREFIX
 SERVICE_USER=$SERVICE_USER
 SERVICE_HOME=$SERVICE_HOME
@@ -259,6 +270,8 @@ $SERVICE_HOME/.config/wardos/kasa.password 0600
 $PREFIX/etc/tunnel.yml 0640
 EOF
 own_file etc/secrets.refs 0644
+payload_tmp=""
+payload_node=""
 if [ -n "${WARDOS_PI_PAYLOAD:-}" ]; then
   python3 - "$HERE/OFFLINE-MANIFEST.json" "$WARDOS_PI_PAYLOAD" <<'PY'
 import hashlib, json, sys
@@ -288,23 +301,33 @@ for row in wheels:
         raise SystemExit("REFUSE payload wheel " + row["name"])
 print("OK payload hashes")
 PY
-  install -m 0755 "$WARDOS_PI_PAYLOAD/cloudflared-linux-arm64" "$PREFIX/bin/cloudflared"
-  own_file bin/cloudflared 0755
   payload_tmp="$(mktemp -d)"
   tar -xJf "$WARDOS_PI_PAYLOAD/node-v24.22.1-linux-arm64.tar.xz" -C "$payload_tmp" --wildcards '*/bin/node'
   payload_node="$(find "$payload_tmp" -type f -name node -print -quit)"
   if [ -z "$payload_node" ]; then echo "REFUSE payload node member missing"; exit 2; fi
+  printf 'WARDOS_NODE=%s\nWARDOS_CLOUDFLARED=%s\n' "$PREFIX/bin/node" "$PREFIX/bin/cloudflared" >>"$env_tmp"
+fi
+install -m 0644 "$env_tmp" "$PREFIX/etc/hub.env"
+own_file etc/hub.env 0644
+rm -f "$env_tmp"
+env_tmp=""
+if [ -n "${payload_node}" ]; then
+  install -m 0755 "$WARDOS_PI_PAYLOAD/cloudflared-linux-arm64" "$PREFIX/bin/cloudflared"
+  own_file bin/cloudflared 0755
+  if [ "${WARDOS_PI_INSTALL_FAIL_POINT:-}" = "during-payload" ]; then
+    echo "REFUSE install fail point during payload"
+    exit 2
+  fi
   install -m 0755 "$payload_node" "$PREFIX/bin/node"
   own_file bin/node 0755
   rm -rf "$payload_tmp"
-  printf 'WARDOS_NODE=%s\nWARDOS_CLOUDFLARED=%s\n' "$PREFIX/bin/node" "$PREFIX/bin/cloudflared" >>"$PREFIX/etc/hub.env"
+  payload_tmp=""
   while IFS= read -r wheel; do
     [ -n "$wheel" ] || continue
     install -m 0644 "$WARDOS_PI_PAYLOAD/wheels/$wheel" "$PREFIX/deps/wheelhouse/$wheel"
     own_file "deps/wheelhouse/$wheel" 0644
   done < <(python3 -c 'import json,sys; print("\n".join(r["name"] for r in json.load(open(sys.argv[1]))["wheels"]))' "$HERE/OFFLINE-MANIFEST.json")
 fi
-own_file etc/hub.env 0644
 printf '%s\n' "no" >"$PREFIX/etc/units-enabled"
 own_file etc/units-enabled 0644
 printf '%s\n' "ARM_IMPORT: NOT TESTED" "WHEEL_HASH_IS_NOT_INSTALL: true" >"$PREFIX/deps/ARM-IMPORT-NOT-TESTED"
@@ -314,6 +337,7 @@ own_link bin/hub
 ln -sfn . "$PREFIX/current"
 own_link current
 if [ "${WARDOS_PI_INSTALL_FAIL_POINT:-}" = "after-links" ]; then
+  if [ -n "${WARDOS_PI_TAMPER_REL:-}" ]; then printf '\n' >>"$PREFIX/$WARDOS_PI_TAMPER_REL"; fi
   echo "REFUSE install fail point after links"
   exit 2
 fi

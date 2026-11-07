@@ -1,3 +1,7 @@
+# Pi packet note, 2026-11-07
+
+Pi v6 is a static candidate only. Pi v5 `8fb6a233bf982c7721b869fcc52881c3dad6e0175c2cd49303830252804be915` stays frozen. Recovery v5 stays frozen. The payload stays frozen. No systemctl, box, or Pi action was run. Twenty cloud mock tests passed in this checkout. They are not an independent verification and they are not ARM approval.
+
 # Pi packet note, 2026-11-06
 
 The recovery archive `989df41936b209963c0ddeb92603a4705261b556cf09afe8abb26d69be559463` was left unchanged for Alfred's re-review.

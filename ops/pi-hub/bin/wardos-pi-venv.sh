@@ -54,8 +54,11 @@ pip_rc=$?
 "$venv/env/bin/python" -I -c 'import kasa, tplinkcloud'
 imp_rc=$?
 set -e
-mkdir -p "$(dirname "$RESULT")"
-python3 - "$RESULT" "$pip_rc" "$imp_rc" "$LOCK" "$WHEELHOUSE" "$venv/env" <<'PY'
+result_dir="$(dirname "$RESULT")"
+mkdir -p "$result_dir"
+chmod 0755 "$result_dir"
+result_tmp="$(mktemp)"
+python3 - "$result_tmp" "$pip_rc" "$imp_rc" "$LOCK" "$WHEELHOUSE" "$venv/env" <<'PY'
 import hashlib, json, os, platform, sys
 from pathlib import Path
 out, pip_rc, imp_rc, lock, house, venv = sys.argv[1:]
@@ -85,6 +88,8 @@ doc = {
 Path(out).write_text(json.dumps(doc), encoding="utf-8")
 print("PREFLIGHT pip %s import %s arch %s proven %s" % (pip_rc, imp_rc, arch, str(doc["aarch64_import_proven"]).lower()))
 PY
+install -m 0644 "$result_tmp" "$RESULT"
+rm -f "$result_tmp"
 chmod -R u+rX "$venv/env"
 find "$venv/env" -type d -exec chmod 0755 {} +
 find "$venv/env" -type f -exec chmod 0644 {} +
