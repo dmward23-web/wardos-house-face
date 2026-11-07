@@ -16,13 +16,13 @@ No SSH change, no tunnel join, no secret transfer, and no install on wardos-pi w
 
 `--rollback --prefix` removes only receipt files and those two symlinks, and only when the recorded hash or link text still matches.
 
-`--activate` on the installer exits 78 even after a well-formed gate. It does not start processes. The installed scripts are the activation boundary: with no gate they exit 78; with a gate whose `cams` is not `parked` they exit 78; with `activate=lights-and-tunnel`, `cams=parked`, `ssh=leave-off`, and `secrets=paths-only` they exec.
+`--enable`, `--start`, and `--activate` on the installer call `SYSTEMCTL` (default `systemctl`) only when a `wardos.pi-systemd.gate/1` file lists `wardos-pi-lights.service` and the r1/r2 tunnel units. A name containing nest, cams, or 8787 is refused. With no gate they exit 78. Install itself does not call systemctl. The installed scripts remain the process boundary: with no activation gate they exit 78; with `cams` other than `parked` they exit 78; with `activate=lights-and-tunnel`, `cams=parked`, `ssh=leave-off`, and `secrets=paths-only` they can exec.
 
-`wardos-pi-lights.sh --activate` then requires a mode-600 token file and execs `node $RUN_TREE/scripts/lights-write-proxy.mjs --host 127.0.0.1 --port 8788`.
+`wardos-pi-lights.sh --activate` then requires a mode-600 token file. `cached_stills` must be `allow-existing`. If the staged proxy imports `sensi-control.mjs` and that file is absent, it refuses before exec. A stub that does not import Sensi can bind. The real staged proxy is copied from the clean runtime bundle and Sensi is not copied.
 
-`wardos-pi-tunnel.sh --activate --connector r1|r2` requires a tunnel config file and execs cloudflared for that connector only. The default name in `hub.env` is `wardos-hub`. This packet did not run that against a real binary.
+`wardos-pi-tunnel.sh --activate --connector r1|r2` requires a tunnel config file and execs cloudflared for that connector only. The default name in `hub.env` is `wardos-hub`, and that name refuses unless the gate sets `cutover` to `approved`. This packet did not run that against a real binary.
 
-`wardos-pi-venv.sh` contains `pip install --require-hashes` and `import kasa, tplinkcloud`. Both stay behind `uname -m` = `aarch64` and `WARDOS_ARM_IMPORT=passed-on-trixie-aarch64`. On this machine it exits 78 before pip. Wheel hashes are not an install. The wheel bytes are not in this packet.
+`wardos-pi-venv.sh --preflight` creates a venv, runs `pip install --require-hashes --no-index --find-links --only-binary=:all:`, then `import kasa, tplinkcloud`, and writes the pip exit, import exit, and imported flag. It does not read an environment phrase. On this x86_64 host the aarch64 wheels fail that attempt. A pure-Python fixture wheel can make the same command record a successful import. That success is not an aarch64 result. qemu-aarch64 was not run. Wheel bytes are in `/opt/cursor/artifacts/pi-offline`, not in git. `OFFLINE-MANIFEST.json` records their hashes.
 
 Mocks on this machine showed the installed lights and both connector commands bind listeners only after that gate, and that a gate asking to start cameras is refused. The lights listener in the mock is a stand-in script, not the pinned proxy.
 
@@ -34,13 +34,10 @@ The opaque Sensi hash is `54f8715454d1e4e851ffd2ead6d87ddbaed204368b63c7d74e2b4c
 
 ## Still missing
 
-- No copy of the hub run tree into `/opt/wardos/run`.
-- No arm64 node binary, no arm64 cloudflared binary, and no Pi package versions.
-- No wheel files, so the venv command cannot run offline.
 - No token, Kasa password, or tunnel credential. Those paths are named only.
-- Installer `--activate` never starts the installed scripts.
-- Units are not installed into `/etc/systemd` and are not enabled.
-- ARM import has not been run. `import kasa, tplinkcloud` on Trixie arm64 is still unmet.
-- The box binary hashes are not Pi pins.
+- Units are written under the prefix, not into `/etc/systemd`, and install does not enable them.
+- The aarch64 wheels, Node v24.22.1 linux-arm64, and cloudflared 2026.9.3 arm64 were checksum-checked on this x86_64 host. They were not imported or executed under qemu or on the Pi. `import kasa, tplinkcloud` on Trixie arm64 is still unmet.
+- The real proxy still cannot start until Sensi is supplied in a reviewed form or an independent gate accepts the existing file. Cached stills stay an open decision. `wardos-hub` stays behind a separate cutover gate.
+- No SSH change and no tunnel join.
 
-Ready for review means this packet can be read. It does not mean the Pi is installed.
+Ready for review means this packet can be read. It does not mean the Pi is installed. The mock tests in this checkout are not an independent verification.

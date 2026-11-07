@@ -1,52 +1,7 @@
-Pi mock tests, 2026-11-06. Host was not wardos-pi. No SSH, tunnel join, or secret transfer.
-Packet tar sha256 798665badf09412fac3db82fbde18abeb0294e5e513716e76f8b5ea127852d39
-Obsolete stub tar 88515c6c2960cef0a999a9678e750b99f20c97472f9a9e6416f0a6009a0dbbba is not this run.
-Recovery tar left at 989df41936b209963c0ddeb92603a4705261b556cf09afe8abb26d69be559463
-
-TAP version 13
-# Subtest: plan does not write and corrects the lock count
-ok 1 - plan does not write and corrects the lock count
-  ---
-  duration_ms: 6.176433
-  type: 'test'
-  ...
-# Subtest: aarch64 lock matches the box versions and splits pure hashes from compiled hashes
-ok 2 - aarch64 lock matches the box versions and splits pure hashes from compiled hashes
-  ---
-  duration_ms: 1.132188
-  type: 'test'
-  ...
-# Subtest: offline verify does not install and refuses activation
-ok 3 - offline verify does not install and refuses activation
-  ---
-  duration_ms: 32.295504
-  type: 'test'
-  ...
-# Subtest: install refuses live paths and the startup script does not listen
-ok 4 - install refuses live paths and the startup script does not listen
-  ---
-  duration_ms: 68.410338
-  type: 'test'
-  ...
-# Subtest: stage and rollback stay inside the dest and do not define a camera or tunnel start
-ok 5 - stage and rollback stay inside the dest and do not define a camera or tunnel start
-  ---
-  duration_ms: 69.405762
-  type: 'test'
-  ...
-# Subtest: gated startup binds lights and both connectors and never cameras
-ok 6 - gated startup binds lights and both connectors and never cameras
-  ---
-  duration_ms: 153.362949
-  type: 'test'
-  ...
-1..6
-# tests 6
-# suites 0
-# pass 6
-# fail 0
-# cancelled 0
-# skipped 0
-# todo 0
-# duration_ms 385.150591
-EXIT:0
+# Pi mock tests, not an independent verification
+# node --test --test-concurrency=1 ops/pi-hub/qa/pihub-dryrun.test.mjs
+# 11 tests, exit 0, on this x86_64 checkout
+# qemu-aarch64 was not run
+# /opt/wardos was created for one gated install and removed afterward
+# the aarch64 wheel preflight recorded imported=false
+# a pure-Python fixture recorded imported=true and aarch64_import_proven=false

@@ -121,7 +121,7 @@ test("gated startup binds lights and both connectors and never cameras", async (
     fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-activate.gate/1", activate: "lights-and-tunnel", cams: "start", ssh: "leave-off", secrets: "paths-only" }));
     const refused = spawnSync(path.join(dest, "bin/wardos-pi-lights.sh"), ["--activate", "--gate", gate], { encoding: "utf8", env: { ...process.env, WARDOS_PREFIX: dest } });
     assert.equal(refused.status, 78, refused.stdout + refused.stderr);
-    fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-activate.gate/1", activate: "lights-and-tunnel", cams: "parked", ssh: "leave-off", secrets: "paths-only", arm_import: "unmet" }));
+    fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-activate.gate/1", activate: "lights-and-tunnel", cams: "parked", ssh: "leave-off", secrets: "paths-only", cached_stills: "allow-existing", arm_import: "unmet" }));
     const spawnOne = (args) => {
       const child = spawn(args[0], args.slice(1), { env: { ...process.env, WARDOS_PREFIX: dest }, stdio: "ignore" });
       kids.push(child);
@@ -137,12 +137,188 @@ test("gated startup binds lights and both connectors and never cameras", async (
     assert.ok(listeners(ports[1]).length > 0, "r1");
     assert.ok(listeners(ports[2]).length > 0, "r2");
     assert.equal(listeners(8787).length, 0);
-    const venv = spawnSync(path.join(dest, "bin/wardos-pi-venv.sh"), { encoding: "utf8", env: { ...process.env, WARDOS_PREFIX: dest, PATH: "/no/such:" + process.env.PATH } });
-    assert.equal(venv.status, 78);
-    assert.match(fs.readFileSync(path.join(dest, "bin/wardos-pi-venv.sh"), "utf8"), /--require-hashes/);
+    const venv = spawnSync(path.join(dest, "bin/wardos-pi-venv.sh"), ["--plan"], { encoding: "utf8", env: { ...process.env, WARDOS_PREFIX: dest, PATH: "/no/such:" + process.env.PATH } });
+    assert.equal(venv.status, 0, venv.stdout + venv.stderr);
+    assert.match(venv.stdout, /not proof/);
+    const venvText = fs.readFileSync(path.join(dest, "bin/wardos-pi-venv.sh"), "utf8");
+    assert.match(venvText, /--require-hashes/);
+    assert.doesNotMatch(venvText, /WARDOS_ARM_IMPORT/);
   } finally {
     for (const child of kids) { try { child.kill("SIGKILL"); } catch { /* gone */ } }
     for (const port of ports) for (const pid of listeners(port)) { try { process.kill(pid, "SIGKILL"); } catch { /* gone */ } }
     fs.rmSync(dest, { recursive: true, force: true });
   }
+});
+
+function gateFile(dir, extra) {
+  const gate = path.join(dir, "gate.json");
+  fs.writeFileSync(gate, JSON.stringify({
+    schema: "wardos.pi-activate.gate/1",
+    activate: "lights-and-tunnel",
+    cams: "parked",
+    ssh: "leave-off",
+    secrets: "paths-only",
+    ...extra,
+  }));
+  return gate;
+}
+
+test("staged real proxy refuses while Sensi is absent and a hold refuses a stub", () => {
+  const dest = fs.mkdtempSync(path.join(os.tmpdir(), "pi-hub-sensi-"));
+  const port = 40131;
+  try {
+    assert.equal(spawnSync("bash", [SH, "--install", "--prefix", dest], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: "/bin/false" } }).status, 0);
+    assert.equal(fs.existsSync(path.join(dest, "run/scripts/sensi-control.mjs")), false);
+    assert.equal(fs.existsSync(path.join(dest, "run/scripts/lights-write-proxy.mjs")), true);
+    fs.writeFileSync(path.join(dest, "secrets/lights-proxy.token"), "fixture-token-value-0123456789\n", { mode: 0o600 });
+    fs.appendFileSync(path.join(dest, "etc/hub.env"), `LIGHTS_PORT=${port}\n`);
+    const missing = spawnSync(path.join(dest, "bin/wardos-pi-lights.sh"), ["--activate", "--gate", gateFile(dest, { cached_stills: "allow-existing" })], { encoding: "utf8", env: { ...process.env, WARDOS_PREFIX: dest } });
+    assert.equal(missing.status, 78, missing.stdout + missing.stderr);
+    assert.match(missing.stdout, /Sensi source is absent/);
+    assert.equal(listeners(port).length, 0);
+    fs.writeFileSync(path.join(dest, "run/scripts/lights-write-proxy.mjs"), "import http from 'node:http';\n");
+    const held = spawnSync(path.join(dest, "bin/wardos-pi-lights.sh"), ["--activate", "--gate", gateFile(dest, { cached_stills: "hold" })], { encoding: "utf8", env: { ...process.env, WARDOS_PREFIX: dest } });
+    assert.equal(held.status, 78, held.stdout + held.stderr);
+    assert.match(held.stdout, /cached stills/);
+    assert.equal(listeners(port).length, 0);
+  } finally {
+    fs.rmSync(dest, { recursive: true, force: true });
+  }
+});
+
+test("default tunnel name refuses without a separate cutover approval", () => {
+  const dest = fs.mkdtempSync(path.join(os.tmpdir(), "pi-hub-cut-"));
+  try {
+    assert.equal(spawnSync("bash", [SH, "--install", "--prefix", dest], { encoding: "utf8" }).status, 0);
+    fs.writeFileSync(path.join(dest, "etc/tunnel.yml"), "tunnel: wardos-hub\ningress:\n  - service: http_status:404\n");
+    const refused = spawnSync(path.join(dest, "bin/wardos-pi-tunnel.sh"), ["--activate", "--connector", "r1", "--gate", gateFile(dest, {})], { encoding: "utf8", env: { ...process.env, WARDOS_PREFIX: dest, WARDOS_CLOUDFLARED: "/bin/false" } });
+    assert.equal(refused.status, 78, refused.stdout + refused.stderr);
+    assert.match(refused.stdout, /cutover/);
+  } finally {
+    fs.rmSync(dest, { recursive: true, force: true });
+  }
+});
+
+test("systemd modes stay off until a gate and refuse a camera unit", () => {
+  const dest = fs.mkdtempSync(path.join(os.tmpdir(), "pi-hub-sd-"));
+  const log = path.join(dest, "systemctl.log");
+  const ctl = path.join(dest, "systemctl");
+  const gate = path.join(dest, "sd.json");
+  try {
+    fs.writeFileSync(ctl, "#!/bin/sh\nprintf '%s\\n' \"$*\" >> \"$WARDOS_SD_LOG\"\n", { mode: 0o755 });
+    const installed = spawnSync("bash", [SH, "--install", "--prefix", dest], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: "/bin/false" } });
+    assert.equal(installed.status, 0, installed.stdout + installed.stderr);
+    assert.equal(fs.existsSync(log), false);
+    fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-systemd.gate/1", units: ["wardos-pi-nest.service"] }));
+    const bad = spawnSync("bash", [SH, "--enable", "--prefix", dest, "--gate", gate], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: ctl, WARDOS_SD_LOG: log } });
+    assert.equal(bad.status, 78, bad.stdout + bad.stderr);
+    assert.equal(fs.existsSync(log), false);
+    fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-systemd.gate/1", units: ["wardos-pi-lights.service", "wardos-pi-tunnel@r1.service"] }));
+    const enabled = spawnSync("bash", [SH, "--enable", "--prefix", dest, "--gate", gate], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: ctl, WARDOS_SD_LOG: log } });
+    assert.equal(enabled.status, 0, enabled.stdout + enabled.stderr);
+    assert.match(fs.readFileSync(log, "utf8"), /enable wardos-pi-lights.service/);
+    assert.doesNotMatch(fs.readFileSync(log, "utf8"), /start /);
+    fs.writeFileSync(log, "");
+    const started = spawnSync("bash", [SH, "--start", "--prefix", dest, "--gate", gate], { encoding: "utf8", env: { ...process.env, SYSTEMCTL: ctl, WARDOS_SD_LOG: log } });
+    assert.equal(started.status, 0, started.stdout + started.stderr);
+    assert.match(fs.readFileSync(log, "utf8"), /start wardos-pi-lights.service/);
+    assert.doesNotMatch(fs.readFileSync(log, "utf8"), /enable /);
+  } finally {
+    fs.rmSync(dest, { recursive: true, force: true });
+  }
+});
+
+test("/opt/wardos is refused without an install gate", () => {
+  const existed = fs.existsSync("/opt/wardos");
+  const gate = path.join(os.tmpdir(), "pi-opt-gate.json");
+  fs.writeFileSync(gate, JSON.stringify({ schema: "wardos.pi-install.gate/1", root: "/opt/wardos" }));
+  const denied = spawnSync("bash", [SH, "--install", "--prefix", "/opt/wardos"], { encoding: "utf8" });
+  assert.notEqual(denied.status, 0);
+  assert.match(denied.stdout + denied.stderr, /REFUSE install/);
+  if (existed) return;
+  const made = spawnSync("sudo", ["mkdir", "-p", "/opt/wardos"]);
+  const owned = spawnSync("sudo", ["chown", process.getuid() + ":" + process.getgid(), "/opt/wardos"]);
+  assert.equal(made.status, 0, String(made.stderr));
+  assert.equal(owned.status, 0, String(owned.stderr));
+  try {
+    const staged = spawnSync("bash", [SH, "--install", "--prefix", "/opt/wardos", "--gate", gate], { encoding: "utf8" });
+    assert.equal(staged.status, 0, staged.stdout + staged.stderr);
+    assert.equal(fs.existsSync("/opt/wardos/run/scripts/lights-write-proxy.mjs"), true);
+    assert.equal(fs.existsSync("/opt/wardos/run/scripts/sensi-control.mjs"), false);
+    const rolled = spawnSync("bash", [SH, "--rollback", "--prefix", "/opt/wardos", "--gate", gate], { encoding: "utf8" });
+    assert.equal(rolled.status, 0, rolled.stdout + rolled.stderr);
+    assert.equal(fs.existsSync("/opt/wardos/bin/hub"), false);
+  } finally {
+    spawnSync("sudo", ["rm", "-rf", "/opt/wardos"]);
+    fs.rmSync(gate, { force: true });
+  }
+});
+
+test("preflight records a pure-python import and the real aarch64 failure", () => {
+  const dest = fs.mkdtempSync(path.join(os.tmpdir(), "pi-hub-pre-"));
+  const house = path.join(dest, "wheels");
+  fs.mkdirSync(house);
+  const built = spawnSync("python3", ["-c", `
+import hashlib, pathlib, sys, zipfile
+root = pathlib.Path(sys.argv[1])
+specs = [("python-kasa", "0.0.0", "kasa"), ("tplink-cloud-api", "0.0.0", "tplinkcloud")]
+for dist, version, top in specs:
+    info = dist.replace("-", "_") + "-" + version + ".dist-info"
+    payload = {
+        top + "/__init__.py": b"",
+        info + "/METADATA": ("Metadata-Version: 2.1\\nName: " + dist + "\\nVersion: " + version + "\\n").encode(),
+        info + "/WHEEL": b"Wheel-Version: 1.0\\nGenerator: wardos-fixture\\nRoot-Is-Purelib: true\\nTag: py3-none-any\\n",
+    }
+    lines = [name + ",sha256=" + hashlib.sha256(data).hexdigest() + "," + str(len(data)) for name, data in payload.items()]
+    payload[info + "/RECORD"] = ("\\n".join(lines) + "\\n" + info + "/RECORD,,\\n").encode()
+    whl = root / (dist.replace("-", "_") + "-" + version + "-py3-none-any.whl")
+    with zipfile.ZipFile(whl, "w") as z:
+        for name, data in payload.items():
+            z.writestr(name, data)
+    print(whl.name, hashlib.sha256(whl.read_bytes()).hexdigest())
+`, house], { encoding: "utf8" });
+  assert.equal(built.status, 0, built.stderr + built.stdout);
+  const lock = ["# fixture"];
+  for (const line of built.stdout.trim().split("\n")) {
+    const [name, digest] = line.split(" ");
+    const dist = name.startsWith("python_kasa") ? "python-kasa" : "tplink-cloud-api";
+    lock.push(dist + "==0.0.0 \\", "    --hash=sha256:" + digest);
+  }
+  const lockPath = path.join(dest, "lock.txt");
+  fs.writeFileSync(lockPath, lock.join("\n") + "\n");
+  const env = {
+    ...process.env,
+    WARDOS_PREFIX: dest,
+    KASA_LOCK: lockPath,
+    KASA_WHEELHOUSE: house,
+    KASA_VENV: path.join(dest, "venv"),
+    KASA_PREFLIGHT_RESULT: path.join(dest, "result.json"),
+  };
+  const ok = spawnSync("bash", [path.join(ROOT, "ops/pi-hub/bin/wardos-pi-venv.sh"), "--preflight"], { encoding: "utf8", env });
+  assert.equal(ok.status, 0, ok.stdout + ok.stderr);
+  const recorded = JSON.parse(fs.readFileSync(path.join(dest, "result.json"), "utf8"));
+  assert.equal(recorded.imported, true);
+  assert.equal(recorded.aarch64_import_proven, false);
+  assert.equal(recorded.phrase_is_proof, false);
+  const wheels = "/opt/cursor/artifacts/pi-offline/wheels";
+  if (fs.existsSync(wheels)) {
+    const real = spawnSync("bash", [path.join(ROOT, "ops/pi-hub/bin/wardos-pi-venv.sh"), "--preflight"], {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        WARDOS_PREFIX: dest,
+        KASA_LOCK: ARM,
+        KASA_WHEELHOUSE: wheels,
+        KASA_VENV: path.join(dest, "venv-arm"),
+        KASA_PREFLIGHT_RESULT: path.join(dest, "arm.json"),
+      },
+    });
+    assert.equal(real.status, 78, real.stdout + real.stderr);
+    const arm = JSON.parse(fs.readFileSync(path.join(dest, "arm.json"), "utf8"));
+    assert.equal(arm.imported, false);
+    assert.notEqual(arm.pip_exit, 0);
+    assert.equal(arm.aarch64_import_proven, false);
+    assert.doesNotMatch(JSON.stringify(arm), /passed-on-trixie/);
+  }
+  fs.rmSync(dest, { recursive: true, force: true });
 });

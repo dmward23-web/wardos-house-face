@@ -45,4 +45,11 @@ if [ "$MODE" = "plan" ]; then
 fi
 python3 "$GATE_PY" "$GATE"
 if [ ! -f "$CFG" ]; then echo "REFUSE tunnel config path"; exit 78; fi
+if [ "$NAME" = "wardos-hub" ]; then
+  cut="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("cutover") or "")' "$GATE")"
+  if [ "$cut" != "approved" ]; then
+    echo "REFUSE tunnel name wardos-hub needs a separate cutover approval"
+    exit 78
+  fi
+fi
 tunnel_exec

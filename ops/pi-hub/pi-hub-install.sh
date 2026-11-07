@@ -15,6 +15,8 @@ while [ $# -gt 0 ]; do
     --offline-verify) MODE="verify" ;;
     --install|--stage) MODE="install" ;;
     --rollback) MODE="rollback" ;;
+    --enable) MODE="enable" ;;
+    --start) MODE="start" ;;
     --activate) MODE="activate" ;;
     --prefix|--dest) PREFIX="${2:-}"; shift ;;
     --gate) GATE="${2:-}"; shift ;;
@@ -43,6 +45,7 @@ Default install root is /opt/wardos. Units are installed disabled until a separa
 The Pi is the intended always-on hub host. The Elo/Beelink is the wall client. A separate Pi is not required by the code if the Beelink is kept always on and is an approved hub host. That choice is not made here.
 The box Kasa lock has 21 package declarations and 21 hashes, not 22. ARM import: NOT TESTED. The wheels were not imported on aarch64. Wheel hashes are not a successful install. The venv command exists and refuses on this side of that hardware gate.
 Sensi is not copied. A Pi install needs a secret-free Sensi integration or it leaves Sensi out. Either choice needs an independent gate.
+Preflight runs pip and the import and records the result. An environment phrase is not that result. This host has not imported the aarch64 wheels.
 EOF
   exit 0
 fi
@@ -77,17 +80,39 @@ PY
   exit 0
 fi
 
-if [ "$MODE" = "activate" ]; then
-  python3 "$HERE/lib/pi_gate.py" "${GATE:-}"
+if [ "$MODE" = "enable" ] || [ "$MODE" = "start" ] || [ "$MODE" = "activate" ]; then
+  [ -n "$GATE" ] || { echo "REFUSE activation gate absent"; exit 78; }
+  python3 "$HERE/lib/pi_gate.py" --systemd "$GATE"
   [ -n "$PREFIX" ] || PREFIX=/opt/wardos
   allow_prefix "$PREFIX"
-  [ -x "$PREFIX/bin/wardos-pi-lights.sh" ] || { echo "REFUSE lights startup is not installed"; exit 78; }
-  echo "REFUSE installer does not activate in this checkout; run the installed startup with the gate on the Pi"
-  exit 78
+  ctl="${SYSTEMCTL:-systemctl}"
+  mapfile -t units < <(python3 -c 'import json,sys; print("\n".join(json.load(open(sys.argv[1]))["units"]))' "$GATE")
+  for unit in "${units[@]}"; do
+    [ -n "$unit" ] || continue
+    case "$unit" in
+      wardos-pi-lights.service|wardos-pi-tunnel@r1.service|wardos-pi-tunnel@r2.service) ;;
+      *) echo "REFUSE systemd unit"; exit 78 ;;
+    esac
+    if [ "$MODE" = "start" ]; then
+      "$ctl" start "$unit"
+    elif [ "$MODE" = "enable" ]; then
+      "$ctl" enable "$unit"
+    else
+      "$ctl" enable "$unit"
+      "$ctl" start "$unit"
+    fi
+  done
+  echo "OK systemd $MODE"
+  exit 0
 fi
 
 [ -n "$PREFIX" ] || { echo "REFUSE dest required"; exit 2; }
 allow_prefix "$PREFIX"
+case "$PREFIX" in
+  /opt/wardos|/opt/wardos/*)
+    python3 "$HERE/lib/pi_gate.py" --install "${GATE:-}" "$PREFIX"
+    ;;
+esac
 receipt="$PREFIX/receipt.tsv"
 
 if [ "$MODE" = "rollback" ]; then
@@ -172,4 +197,18 @@ record_file etc/secrets.refs
 record_file etc/units-enabled
 printf 'link\t%s\t%s\n' bin/hub wardos-pi-lights.sh >>"$receipt"
 printf 'link\t%s\t%s\n' current . >>"$receipt"
+runtime="$REPO/ops/box-recover/runtime-src"
+mkdir -p "$PREFIX/run/scripts"
+for name in house-proc.sh lights-write-proxy.mjs private-dir.mjs kasa-write.py private-feed.mjs kasa-daemon.py spotify-control.mjs access-log.mjs lights-fetch.mjs kasa-probe.py; do
+  case "$name" in
+    *sensi*) echo "REFUSE Sensi is not staged"; exit 2 ;;
+  esac
+  [ -f "$runtime/$name" ] || { echo "REFUSE runtime source missing"; exit 2; }
+  install -m 0644 "$runtime/$name" "$PREFIX/run/scripts/$name"
+  record_file "run/scripts/$name"
+done
+if [ -e "$PREFIX/run/scripts/sensi-control.mjs" ]; then
+  echo "REFUSE Sensi file was staged"
+  exit 2
+fi
 echo "OK install"

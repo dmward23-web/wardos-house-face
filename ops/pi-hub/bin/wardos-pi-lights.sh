@@ -44,4 +44,16 @@ python3 "$GATE_PY" "$GATE"
 if [ -L "$TOKEN" ] || [ ! -f "$TOKEN" ]; then echo "REFUSE device token path"; exit 78; fi
 if [ "$(stat -c %a "$TOKEN")" != "600" ]; then echo "REFUSE device token mode"; exit 78; fi
 if [ "$(stat -c %s "$TOKEN")" -le 0 ]; then echo "REFUSE device token empty"; exit 78; fi
+stills="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("cached_stills") or "")' "$GATE")"
+if [ "$stills" != "allow-existing" ]; then
+  echo "REFUSE cached stills decision is not allow-existing"
+  exit 78
+fi
+proxy="$RUN_TREE/scripts/lights-write-proxy.mjs"
+if [ -f "$proxy" ] && grep -q 'sensi-control.mjs' "$proxy"; then
+  if [ ! -f "$RUN_TREE/scripts/sensi-control.mjs" ]; then
+    echo "REFUSE Sensi source is absent; not starting the real proxy"
+    exit 78
+  fi
+fi
 lights_exec
