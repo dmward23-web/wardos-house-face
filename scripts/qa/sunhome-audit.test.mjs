@@ -541,7 +541,7 @@ test("living house does not load the Halloween porch or mattes", () => {
   assert.doesNotMatch(lh, /school-names\.js\?v=HALLOWEEN1/);
 });
 
-test("portrait wall hub fits 1080x1920 with the roster on screen", { skip: process.env.QA_NO_BROWSER === "1" ? "SKIP QA_NO_BROWSER=1" : false }, async () => {
+test("wall board stays one 1920x1080 canvas at portrait and phone viewports", { skip: process.env.QA_NO_BROWSER === "1" ? "SKIP QA_NO_BROWSER=1" : false }, async () => {
   const pp = createRequire(import.meta.url)("puppeteer-core");
   const chrome = process.env.CHROME_PATH || process.env.WARDOS_CHROME || "/usr/local/bin/google-chrome";
   const srv = http.createServer((req, res) => {
@@ -580,32 +580,28 @@ test("portrait wall hub fits 1080x1920 with the roster on screen", { skip: proce
           gap: wt - ub,
           leaveH,
           pair: pair ? getComputedStyle(pair).display : "missing",
-          wrapOverflow: getComputedStyle(document.querySelector(".grid-wrap")).overflowY
+          wrapOverflow: getComputedStyle(document.querySelector(".grid-wrap")).overflowY,
+          bodyW: Math.round(document.body.getBoundingClientRect().width),
+          bodyH: Math.round(document.body.getBoundingClientRect().height)
         };
       });
       await g.close();
       return r;
     };
     const wall = await measure(1080, 1920);
-    assert.ok(wall.scroll <= wall.inner + 1, "wall scrolls " + wall.scroll + " > " + wall.inner);
-    assert.ok(wall.winH >= 400 && wall.winH <= 430, "porch " + wall.winH);
-    assert.ok(wall.gap < 40, "blank band " + wall.gap);
-    assert.ok(wall.leaveH < 360, "schedule floor " + wall.leaveH);
-    assert.equal(wall.tiles.length, 10, "ten roster slots");
+    assert.equal(wall.bodyW, 1920, "portrait viewport does not reflow the canvas");
+    assert.equal(wall.bodyH, 1080);
+    assert.ok(wall.pair === "none" || wall.pair === "missing", wall.pair);
     const shown = wall.tiles.filter((t) => t.h >= 1);
-    assert.ok(shown.length >= 9, "roster tiles on screen " + shown.length);
-    for (const t of shown) {
-      assert.ok(t.bottom <= wall.inner + 1, "tile cut at " + t.bottom);
-      assert.ok(t.top >= -1, "tile above the viewport");
-    }
+    assert.ok(shown.length >= 9, "roster tiles " + shown.length);
     for (const k of wall.kids) {
-      assert.ok(k.h >= 220 && k.w >= 300, "kid tile " + k.w + "x" + k.h);
+      assert.equal(Math.round(k.w), 592);
+      assert.equal(Math.round(k.h), 192);
       assert.match(k.bg, /kidtile-/);
     }
-    assert.notEqual(wall.wrapOverflow, "hidden");
     const phone = await measure(390, 844);
-    assert.ok(phone.scroll > phone.inner, "phone keeps its scroll");
-    assert.ok(phone.kids[0].h >= 160 && phone.kids[0].h <= 190 && phone.kids[0].top < 844, "phone Ainsley " + phone.kids[0].h + " at " + phone.kids[0].top);
+    assert.equal(phone.bodyW, 1920, "phone viewport does not reflow the wall");
+    assert.equal(Math.round(phone.kids[0].h), 192);
     const house = await b.newPage();
     await house.setViewport({ width: 1080, height: 1920, deviceScaleFactor: 1 });
     await house.goto(base + "/livinghouse/index.html?now=2026-11-08T17:30:00-06:00", { waitUntil: "domcontentloaded", timeout: 60000 });

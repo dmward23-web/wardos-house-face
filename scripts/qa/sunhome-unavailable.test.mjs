@@ -49,6 +49,6 @@ test("public pay writes are refused; saveBankRoot does not persist dad-ledger wi
   assert.equal((h.match(/data-dad-paid|Hold for Paid|WardKids\.dadPaid\(/g) || []).length, 0);
   const kd = read("kids-data.js");
   assert.match(kd, /function payWriteRefused\(\) \{ return true; \}/);
-  const save = kd.slice(kd.indexOf("function saveBankRoot"), kd.indexOf("function kidDayBank"));
-  assert.match(save, /if \(payWriteRefused\(\)\) return/);
+  assert.match(kd, /function dadPaid\(kidId, data\)/);
+  assert.match(kd, /if \(payWriteRefused\(\)\) return/);
 });

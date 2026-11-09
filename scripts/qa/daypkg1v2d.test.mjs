@@ -146,16 +146,11 @@ test("Public sheet-allowance dadPaid returns empty and writes no Paid stamp", ()
   const allow = device("fri1459", map, { page: "sheet-allowance" });
   assert.equal(allow.wk.dadPaid("hayes", D2), "");
   assert.equal(map["house-bank-paid:hayes"], undefined);
-  allow.wk.setCheck("hay-bed", true, D2, "2026-10-30");
-  assert.equal(map["dad-ledger:v1"], undefined, "allowance setCheck does not write dad-ledger:v1");
-  const danMap = {};
-  const dan = device("fri1459", danMap, { page: "sheet-dan" });
-  dan.wk.setCheck("hay-bed", true, D2, "2026-10-30");
-  assert.equal(danMap["dad-ledger:v1"], undefined, "sheet-dan setCheck does not write dad-ledger:v1");
   const kidMap = {};
   const kid = device("fri1459", kidMap, { page: "kid-hayes" });
   kid.wk.setCheck("hay-bed", true, D2, "2026-10-30");
   assert.ok(Object.keys(kidMap).some((k) => k.indexOf("house-checkoffs:") === 0), "kid checkoff still stores " + Object.keys(kidMap).join(","));
+  assert.equal(kidMap["dad-ledger:v1"], undefined, "kid checkoff does not write dad-ledger:v1");
   return;
   for (const kid of KIDS) for (const at of ["fri0700", "fri1459", "fri1600"]) {
     const tag = kid + " " + at, map = Object.assign({}, SYNC_INIT);

@@ -92,7 +92,7 @@ test("Acer wall spec report lists asset dimensions and does not resize them", { 
   assert.equal(layout.icon.w, 64);
   assert.equal(layout.icon.h, 64);
   assert.ok(layout.tiles.length >= 9);
-  assert.ok(layout.tiles.every((t) => t.w === 592 && t.h === 120 && t.font >= 24), JSON.stringify(layout.tiles));
+  assert.ok(layout.tiles.every((t) => t.w === 592 && t.h === 192 && t.font >= 24), JSON.stringify(layout.tiles));
   assert.deepEqual(layout.smallText, []);
   assert.deepEqual(layout.safe, []);
   assert.deepEqual(layout.smallHit, []);

@@ -30,7 +30,7 @@ html body .panel.panel {
   box-sizing: border-box !important;
   display: grid !important;
   grid-template-columns: repeat(12, 130px) !important;
-  grid-template-rows: 72px 336px minmax(0, 1fr) !important;
+  grid-template-rows: 72px 200px minmax(0, 1fr) !important;
   column-gap: 24px !important;
   row-gap: 24px !important;
   overflow: hidden !important;
@@ -70,19 +70,19 @@ html body .panel.panel > .hub-upper {
   grid-row: 2;
   align-self: end;
   width: 100%;
-  height: 216px !important;
-  max-height: 216px !important;
+  height: 200px !important;
+  max-height: 200px !important;
   min-height: 0 !important;
   margin: 0 !important;
   overflow: hidden !important;
 }
-html body .panel.panel:has(#hub-cam-deck:not([hidden])) > .hub-upper { height: 216px !important; }
+html body .panel.panel:has(#hub-cam-deck:not([hidden])) > .hub-upper { height: 88px !important; }
 html body .panel.panel > .hub-window {
   grid-column: 6 / -1;
   grid-row: 2;
   width: auto !important;
-  height: 336px !important;
-  max-height: 336px !important;
+  height: 200px !important;
+  max-height: 200px !important;
   margin: 0 !important;
   overflow: hidden !important;
 }
@@ -108,23 +108,25 @@ html body .panel.panel > .grid-wrap {
   margin: 0 !important;
   overflow: hidden !important;
 }
-html body .grid-hdr { display: none !important; }
+html body .grid-hdr,
+html body .tile-grid.tile-grid--cams > .tile .tile-foot { display: none !important; }
 html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams {
   display: grid !important;
   grid-template-columns: repeat(12, 130px) !important;
   grid-template-rows: none !important;
   column-gap: 24px !important;
   row-gap: 16px !important;
-  grid-auto-rows: 120px !important;
+  grid-auto-rows: 192px !important;
   height: auto !important;
   min-height: 0 !important;
 }
 html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile {
   min-width: 64px !important;
   min-height: 64px !important;
-  max-height: 120px !important;
+  max-height: none !important;
   grid-column: span 4;
-  height: 120px !important;
+  height: 192px !important;
+  overflow: hidden !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
 }
