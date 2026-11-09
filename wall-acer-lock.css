@@ -76,7 +76,10 @@ html body .panel.panel > .hub-upper {
   margin: 0 !important;
   overflow: hidden !important;
 }
-html body .panel.panel:has(#hub-cam-deck:not([hidden])) > .hub-upper { height: 88px !important; }
+html body .panel.panel:has(#hub-cam-deck:not([hidden])) > .hub-upper {
+  height: 104px !important;
+  max-height: 104px !important;
+}
 html body .panel.panel > .hub-window {
   grid-column: 6 / -1;
   grid-row: 2;
