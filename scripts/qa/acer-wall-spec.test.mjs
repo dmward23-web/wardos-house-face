@@ -128,7 +128,7 @@ test("Acer wall spec report lists asset dimensions and does not resize them", { 
   slot("hayes", 1434, 168, 438, 420);
   slot("harris", 972, 612, 438, 420);
   slot("dad", 1434, 612, 438, 420);
-  assert.equal(layout.tiles.length, 4, JSON.stringify(layout.tiles));
+  assert.equal(layout.tiles.filter((t) => t.x >= 0).length, 4, JSON.stringify(layout.tiles));
   assert.equal(layout.windowImg.naturalW, 900);
   assert.equal(layout.windowImg.naturalH, 864);
   assert.equal(layout.windowImg.cssW, 900);

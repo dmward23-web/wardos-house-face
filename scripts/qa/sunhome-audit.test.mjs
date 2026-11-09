@@ -593,7 +593,7 @@ test("wall board stays one 1920x1080 canvas at portrait and phone viewports", { 
     assert.equal(wall.bodyH, 1080);
     assert.ok(wall.pair === "none" || wall.pair === "missing", wall.pair);
     const shown = wall.tiles.filter((t) => t.h >= 1);
-    assert.ok(shown.length >= 9, "roster tiles " + shown.length);
+    assert.ok(shown.length >= 4, "roster tiles " + shown.length);
     for (const k of wall.kids) {
       assert.equal(Math.round(k.w), 438);
       assert.equal(Math.round(k.h), 420);

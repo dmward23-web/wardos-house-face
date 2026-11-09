@@ -88,7 +88,25 @@ html body .panel.panel > .grid-wrap {
 }
 html body .grid-hdr { display: none !important; }
 html body .tile-grid.tile-grid--cams { display: block !important; height: auto !important; }
-html body .tile-grid.tile-grid--cams > .tile { display: none !important; pointer-events: auto; }
+html body .tile-grid.tile-grid--cams > .tile:not(.ainsley):not(.hayes):not(.harris):not(.dan) {
+  display: block !important;
+  position: absolute !important;
+  left: -2400px !important;
+  top: 0 !important;
+  width: 320px !important;
+  height: 80px !important;
+  pointer-events: none !important;
+}
+html body .tile-micro span.md { font-size: 14px !important; }
+html body .tile.ainsley .tile-micro,
+html body .tile.hayes .tile-micro,
+html body .tile.harris .tile-micro,
+html body .tile.ainsley .tile-micro span.md,
+html body .tile.hayes .tile-micro span.md,
+html body .tile.harris .tile-micro span.md {
+  display: block !important;
+  font-size: 14px !important;
+}
 html body .tile-grid.tile-grid--cams > .tile.ainsley,
 html body .tile-grid.tile-grid--cams > .tile.hayes,
 html body .tile-grid.tile-grid--cams > .tile.harris,
@@ -104,6 +122,15 @@ html body .tile-grid.tile-grid--cams > .tile.dan {
   box-sizing: border-box !important;
   overflow: hidden !important;
   grid-column: auto !important;
+}
+html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.ainsley,
+html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.hayes,
+html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.harris,
+html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.dan {
+  width: 438px !important;
+  height: 420px !important;
+  min-height: 420px !important;
+  max-height: none !important;
 }
 html body .tile.ainsley { left: 972px !important; top: 168px !important; }
 html body .tile.hayes { left: 1434px !important; top: 168px !important; }
