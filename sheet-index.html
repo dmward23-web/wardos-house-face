@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-asset="backgrounds/bg-wall-night-v2.webp|backgrounds/bg-wall-night-v2.png|backgrounds/bg-wall-night-onemoon.webp|backgrounds/bg-wall-night-onemoon.png" data-asset-var="--wg-hubbg">
+<html lang="en" data-hub-fit="acer-1920">
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPAIR1"></script>
@@ -4086,9 +4086,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 
 <div class="panel">
  <div class="float-orbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
- <!-- WALLBACK1 · opened from the wall's Family chip (?from=wall): one plain way back to the wall -->
- <a class="wall-back" href="wall.html" data-wall-back hidden aria-label="Back to the wall">Back to wall</a>
- <style>.wall-back{position:fixed;right:16px;bottom:16px;z-index:2147482000;padding:10px 16px;border-radius:999px;font:700 14px/1.2 Inter,system-ui,sans-serif;color:#fff6dc;background:rgba(20,24,30,.82);border:1px solid rgba(255,255,255,.22);text-decoration:none;backdrop-filter:blur(8px)}.wall-back[hidden]{display:none}/* DAYPKG1 v2h · Atlas: the Dad tile is gone from the roster (Dad sheets are URL-only). 10 tiles on the 3-column grid: a lone last tile spans its row, so no cell is left empty */
+ <style>/* DAYPKG1 v2h · Atlas: the Dad tile is gone from the roster (Dad sheets are URL-only). 10 tiles on the 3-column grid: a lone last tile spans its row, so no cell is left empty */
 .tile-grid > .tile:last-child:nth-child(3n+1) { grid-column: 1 / -1 !important; }
 .hub-window { margin: 8px 12px; height: min(42vw, 280px); overflow: hidden; border-radius: 16px; }
 .hub-window img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -4164,7 +4162,6 @@ html body #hub-lights-panel[hidden] { display: none !important; }
 /* Presentation only. private-feed.js stays the pinned bytes. The shared hub does not show its pairing chip. */
 html body .pf-flag--pair { display: none !important; }
 </style>
- <script>(function(){try{var k="wardos-from-wall",q=/[?&]from=wall\b/.test(location.search);if(q)sessionStorage.setItem(k,"1");if(q||sessionStorage.getItem(k)==="1"){var a=document.querySelector("[data-wall-back]");if(a){a.hidden=false;a.addEventListener("click",function(){try{sessionStorage.removeItem(k)}catch(e){}});}}}catch(e){}})();</script>
  <header class="hdr hdr--spread hdr--premium hdr--heat">
  <a class="hub-home" href="sheet-index.html" aria-label="Back to the House board"><picture><source srcset="assets/icons/home-key-light.svg" type="image/svg+xml"><img src="assets/icons/home-key-light-64.png" width="64" height="64" alt=""></picture></a>
  <div class="hdr-date" aria-label="Today · America/Chicago">
@@ -4175,7 +4172,7 @@ html body .pf-flag--pair { display: none !important; }
  </div>
  <div class="hdr-brand">
  <div class="id-text">
- <h1 class="name"><span class="name-accent">The Ward's</span></h1>
+ <h1 class="name"><span class="name-accent">The Wards</span></h1>
  </div>
  </div>
  <div class="hdr-ovals" aria-label="Live house status">
@@ -4286,7 +4283,7 @@ html body .pf-flag--pair { display: none !important; }
  <div class="grid-title">Sheet roster</div>
  </div>
 
- <nav class="tile-grid tile-grid--cams" aria-label="The Ward's sheet index">
+ <nav class="tile-grid tile-grid--cams" aria-label="The Wards sheet index">
  <a class="tile ainsley" href="kid-ainsley.html" data-kid-seed="ainsley">
  <div class="tile-top">
  <div class="tile-icon av g2-av ains" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-ainsley"/></svg></div>

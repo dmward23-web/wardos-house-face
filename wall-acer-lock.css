@@ -14,7 +14,7 @@ html[data-month-theme] body:not([data-kid-world]) {
   margin: 0 !important;
   overflow: hidden !important;
   background-color: #07080b !important;
-  background-image: var(--wg-hubbg, url("night/media/poster/loop-dusk-wall.webp")) !important;
+  background-image: var(--wg-hubbg, url("month-theme/november/wall-dusk.webp")) !important;
   background-repeat: no-repeat !important;
   background-position: left top !important;
   background-size: auto !important;
@@ -42,15 +42,53 @@ html body .panel.panel > header.hdr {
   min-height: 0 !important;
   margin: 0 !important;
   z-index: 5;
+  display: grid !important;
+  grid-template-columns: 284px 438px minmax(0, 1fr) 284px !important;
+  column-gap: 24px !important;
+  align-items: center !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
 }
 html body .hub-home {
-  position: absolute !important;
-  left: 0 !important;
-  top: 16px !important;
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  grid-column: 1 !important;
+  justify-self: start !important;
   width: 64px !important;
   height: 64px !important;
   min-width: 64px !important;
   min-height: 64px !important;
+}
+html body .panel.panel > header.hdr .hdr-date {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  grid-column: 2 !important;
+  width: 438px !important;
+  max-width: 438px !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  z-index: 2;
+}
+html body .panel.panel > header.hdr .hdr-brand,
+html body .panel.panel > header.hdr h1.name {
+  position: relative !important;
+  grid-column: 3 !important;
+  margin: 0 !important;
+  text-align: center !important;
+  justify-self: center !important;
+}
+html body .panel.panel > header.hdr .hdr-ovals {
+  position: relative !important;
+  grid-column: 4 !important;
+  justify-self: end !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  min-height: 64px !important;
+  margin: 0 !important;
 }
 html body .hub-home img {
   width: 64px !important;
@@ -202,12 +240,95 @@ html body .panel.panel > .who-up,
 html body .float-orbs { display: none !important; }
 html body .name,
 html body .name-accent { font-size: 48px !important; line-height: 1 !important; }
-html body .panel .hdr-date-kicker,
-html body .panel .hdr-date-time,
-html body .panel .hdr-date-dow,
-html body .panel .hdr-date-long,
+html body .panel header.hdr .hdr-date-kicker,
+html body .panel header.hdr .hdr-date-time,
+html body .panel header.hdr .hdr-date-dow,
+html body .panel header.hdr.hdr--spread .hdr-date-long,
 html body .tile-label,
 html body .tile-sub { font-size: 24px !important; line-height: 1.15 !important; }
 html body .hub-home,
 html body a.tile { touch-action: manipulation; }
 html body .pf-flag--pair { display: none !important; }
+/* Roster sublines sit on the art and do not read. The name stays on a scrim. Off-canvas tiles keep their micro line for the cold-load check. */
+html body .tile.ainsley .tile-sub,
+html body .tile.hayes .tile-sub,
+html body .tile.harris .tile-sub,
+html body .tile.dan .tile-sub,
+html body .tile.ainsley .tile-micro,
+html body .tile.hayes .tile-micro,
+html body .tile.harris .tile-micro,
+html body .tile.dan .tile-micro,
+html body .tile.ainsley .kf-title,
+html body .tile.hayes .kf-title,
+html body .tile.harris .kf-title { display: none !important; }
+html body .tile.ainsley .tile-label,
+html body .tile.hayes .tile-label,
+html body .tile.harris .tile-label,
+html body .tile.dan .tile-label {
+  font-size: 28px !important;
+  line-height: 1.15 !important;
+  color: #f4efe6 !important;
+  background: rgba(8, 10, 14, 0.78) !important;
+  padding: 8px 14px !important;
+  border-radius: 12px !important;
+}
+html body .tile.dan [data-dad-stage] .kf-kicker,
+html body .tile.dan [data-dad-stage] .kf-loud,
+html body .tile.dan [data-dad-stage] .kf-title,
+html body .tile.dan [data-dad-stage] .tile-label {
+  font-size: 24px !important;
+  line-height: 1.15 !important;
+  color: #f4efe6 !important;
+}
+/* Sound sits beside the home key, in the home cell, so it does not cover the clock. */
+html.night52 body > .night52-snd {
+  position: absolute !important;
+  left: 128px !important;
+  right: auto !important;
+  top: 64px !important;
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  border-radius: 32px !important;
+  z-index: 6 !important;
+}
+html.night52 body > .night52-snd svg {
+  width: 32px !important;
+  height: 32px !important;
+}
+html.night52 body > .night52-snd::before {
+  content: "Sound";
+  position: absolute;
+  left: 72px;
+  top: 16px;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  color: #f4efe6;
+  white-space: nowrap;
+  pointer-events: none;
+}
+html body #house-wx,
+html body #index-sensi-chip {
+  min-width: 64px !important;
+  min-height: 64px !important;
+  width: auto !important;
+  height: 64px !important;
+  font-size: 24px !important;
+  line-height: 64px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 16px !important;
+  box-sizing: border-box !important;
+  color: #f4efe6 !important;
+  background: rgba(8, 10, 14, 0.78) !important;
+  border-radius: 32px !important;
+}
+html body #index-sensi-chip::before {
+  content: "Sensi";
+  font-size: 24px !important;
+  font-weight: 700;
+  color: #f4efe6;
+}

@@ -121,7 +121,8 @@ test("DAYPKG1 v2g P1-2: no Dad sheet (sheet-allowance, sheet-dan) is reachable f
   for (const s of DAD_SHEETS) assert.ok(fs.existsSync(path.join(ROOT, s)), s + " exists (URL-only, not deleted)");
   for (const s of DAD_SHEETS) assert.ok(!REACH.has(s), s + " reachable: " + pathTo(REACH, s));
   /* the crawl really follows: the hops Alfred took are still walked, and the Dad pages themselves are found from a page that links them */
-  for (const p of ["sheet-chores.html", "sheet-index.html", "sheet-today.html", "wall.html", "month.html"]) assert.ok(REACH.has(p), "crawl reaches " + p);
+  for (const p of ["sheet-chores.html", "sheet-index.html", "sheet-today.html", "month.html"]) assert.ok(REACH.has(p), "crawl reaches " + p);
+  assert.ok(!REACH.has("wall.html"), "wall.html is not a tap from a kid board: " + pathTo(REACH, "wall.html"));
   assert.ok(REACH.size >= 20, "crawl size " + REACH.size);
   assert.ok(linksOf("livinghouse/index.html").has("sheet-dan.html"), "control: a ../ link is extracted (livinghouse is not kid-reachable)");
   assert.ok(!REACH.has("livinghouse/index.html"));

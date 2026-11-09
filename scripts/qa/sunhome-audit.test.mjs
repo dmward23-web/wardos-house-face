@@ -403,7 +403,7 @@ test("November hub does not request the Halloween spook layer or the porch scene
   for (const line of SPOOK_LINES) assert.equal(hub.includes(line), false, line);
   assert.match(rd("month-theme/month-overlay.css"), /iframe\.night52-scene\{[^}]*display:\s*none/);
 
-  function bootNight(iso, search) {
+  function bootNight(iso, search, size) {
     const made = [];
     const body = { getAttribute: () => null, insertBefore() {}, appendChild() {} };
     const document = {
@@ -424,7 +424,7 @@ test("November hub does not request the Halloween spook layer or the porch scene
     const ctx = vm.createContext({
       document, Date: FakeDate, Intl, URLSearchParams, console,
       location: { search: search || "", pathname: "/sheet-index.html", origin: "http://hub.local" },
-      innerWidth: 1080, innerHeight: 1920,
+      innerWidth: size ? size.w : 1080, innerHeight: size ? size.h : 1920,
       localStorage: { getItem: () => null, setItem() {} }
     });
     ctx.window = ctx;
@@ -436,7 +436,10 @@ test("November hub does not request the Halloween spook layer or the porch scene
   assert.equal(nov.made.some((el) => /scene\.html/.test(el.src)), false, "November must not request the Halloween scene");
   const oct = bootNight("2026-10-20T20:00:00-05:00");
   assert.equal(oct.night.on, true);
-  assert.ok(oct.made.some((el) => /scene\.html/.test(el.src)), "other months still have the night scene");
+  assert.ok(oct.made.some((el) => /scene\.html/.test(el.src)), "a portrait month still has the night scene");
+  const wall = bootNight("2026-10-20T20:00:00-05:00", "", { w: 1920, h: 1080 });
+  assert.equal(wall.night.on, false);
+  assert.equal(wall.made.some((el) => /scene\.html/.test(el.src)), false, "the 1920x1080 wall does not load the poster scene");
   const pinned = bootNight("2026-10-20T20:00:00-05:00", "?month=11");
   assert.equal(pinned.made.some((el) => /scene\.html/.test(el.src)), false, "a pinned November does not load the scene");
 });

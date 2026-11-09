@@ -21,10 +21,9 @@
   .grid-title, .tile-sub, .tile-fact, .kf-kicker, .md, .tile-mchip, .pf-flag, .tile-hint, .tile-kicker, [class*="-meta"], [class*="-sub"], [class*="chip"] { font-size: max(15px, 1em) !important; }
   .hub-panel *, .grid-wrap * { min-width: 0; }
 }
-/* WGBG1 · the Halloween night scene behind the landscape hub instead of black: Prism's backgrounds/bg-wall-night.png when the
-   private folder has it (wg-assets.js sets --wg-hubbg on <html>), else the committed photoreal dusk still; a soft scrim keeps tiles readable */
+/* WGBG1 · landscape fallback is the November full-bleed dusk plate (1920x1080). The 1280x720 loop posters are not used on this board. */
 @media (min-width: 1200px) and (min-aspect-ratio: 4/3) {
-  html, body { background: #07080b var(--wg-hubbg, url("night/media/poster/loop-dusk-wall.webp")) center / cover no-repeat fixed !important; }
+  html, body { background: #07080b var(--wg-hubbg, url("month-theme/november/wall-dusk.webp")) left top / auto no-repeat fixed !important; }
   html body .panel.panel { background: linear-gradient(180deg, rgba(6, 7, 10, .42), rgba(6, 7, 10, .62)) !important; }
 }
 /* H1-LHVIS (Alfred P2) · wall kicker overlap: a kid or Dad stage taller than its tile was centred, so it spilled up under the

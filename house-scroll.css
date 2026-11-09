@@ -35,3 +35,5 @@ html:not(#hf-scroll-off) > body {
 html:not(#hf-scroll-off) > body * {
   overscroll-behavior: auto !important;
 }
+/* Public wall surfaces do not show the pairing chip. The feed script stays pinned. */
+html body .pf-flag--pair { display: none !important; }

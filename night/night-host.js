@@ -27,6 +27,11 @@
     window.HouseNight = { on: false, sound: function () { return false; }, set: function () {} };
     return;
   }
+  /* The landscape wall is 1920x1080. scene.html wall mode paints 1280x720 posters, so it does not mount on that canvas. */
+  if (innerWidth >= 1200 && innerWidth > innerHeight) {
+    window.HouseNight = { on: false, sound: function () { return false; }, set: function () {} };
+    return;
+  }
   /* Ainsley keeps her concert venue: no night scene behind her board (Alfred 10/16, kid-world.js nightOn) */
   var KEY = "night52:snd"; /* legacy key, only used when house-sound.js is missing */
   var HS = window.HouseSound || null;
