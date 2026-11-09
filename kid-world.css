@@ -653,6 +653,20 @@ body.kw-on #tapsync-badge { display: none !important; }
   }
   html.kw-root body.kw-on #sec-jar { grid-column: 1 !important; grid-row: 2 !important; overflow: hidden !important; }
   html.kw-root body.kw-on #sec-days { grid-column: 2 !important; grid-row: 2 !important; overflow: hidden !important; }
+  /* No next item: drop the card and let Musts keep the list. A real next item stays, at 24px. */
+  html.kw-root body.kw-on #sec-days:has(.consume-hero.empty),
+  html.kw-root body.kw-on #sec-days:not(:has(.consume-hero-title)) { display: none !important; }
+  html.kw-root body.kw-on .panel .body:has(.consume-hero.empty) #sec-jar { grid-column: 1 / -1 !important; }
+  html.kw-root body.kw-on #sec-days:not(:has(.consume-hero.empty)) > :not(.sec-hdr):not(.consume-hero) { display: none !important; }
+  html.kw-root body.kw-on #sec-days .consume-hero,
+  html.kw-root body.kw-on #sec-days .consume-hero-title,
+  html.kw-root body.kw-on #sec-days .consume-hero-meta,
+  html.kw-root body.kw-on #sec-days .consume-hero-when,
+  html.kw-root body.kw-on #sec-days .sec-title {
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+  }
+  html.kw-root body.kw-on #sec-days .consume-hero { min-height: 64px !important; }
   html.kw-root body.kw-on #sec-musts .kw-must-empty {
     flex: 1 1 auto !important;
     display: flex !important;

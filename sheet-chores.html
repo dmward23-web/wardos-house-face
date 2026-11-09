@@ -1051,5 +1051,6 @@ function pick(i){cols.forEach(function(c,k){c.classList.toggle("wf-hide",k!==i)}
 cols.forEach(function(c,i){var chip=c.querySelector(".kid-chip");var name=chip?chip.textContent.replace(/^\s*\S\s+/,"").trim():"Kid "+(i+1);var id=(chip&&chip.className.match(/ainsley|hayes|harris/)||[""])[0];
 var b=document.createElement("button");b.type="button";b.className=cls[id]||"";b.textContent=name;b.addEventListener("click",function(){pick(i)});bar.appendChild(b)});
 body.parentNode.insertBefore(bar,body);pick(0);})();</script>
+<link rel="stylesheet" href="wall-board-sheets.css?v=WALLSHEET1" />
 </body>
 </html>
