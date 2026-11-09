@@ -28,7 +28,7 @@
     return;
   }
   /* The landscape wall is 1920x1080. scene.html wall mode paints 1280x720 posters, so it does not mount on that canvas. */
-  if (innerWidth >= 1200 && innerWidth > innerHeight) {
+  if (innerWidth >= 1800 && innerHeight >= 1000 && innerWidth > innerHeight) {
     window.HouseNight = { on: false, sound: function () { return false; }, set: function () {} };
     return;
   }

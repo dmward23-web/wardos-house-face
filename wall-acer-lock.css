@@ -272,9 +272,6 @@ html body .tile.dan .tile-label {
   padding: 8px 14px !important;
   border-radius: 12px !important;
 }
-html body .tile.dan [data-dad-stage] .kf-kicker,
-html body .tile.dan [data-dad-stage] .kf-loud,
-html body .tile.dan [data-dad-stage] .kf-title,
 html body .tile.dan [data-dad-stage] .tile-label {
   font-size: 24px !important;
   line-height: 1.15 !important;

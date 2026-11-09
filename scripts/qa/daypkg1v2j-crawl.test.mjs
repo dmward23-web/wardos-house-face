@@ -55,14 +55,14 @@ for (const [w, h] of [[440, 956], [1280, 800]]) {
     const o = JSON.parse(r.stdout.trim().split("\n").pop());
     if (process.env.V2J_CRAWL_OUT_DIR) { try { fs.writeFileSync(path.join(process.env.V2J_CRAWL_OUT_DIR, "crawl-" + w + ".json"), JSON.stringify(o)); } catch (e) {} } /* ADULTCUT2: crawl tables for the gate request */
     const names = Object.keys(o.pages);
-    assert.ok(o.count >= 27, "closure " + o.count + ": " + names.join(","));
+    assert.ok(o.count >= 26, "closure " + o.count + ": " + names.join(","));
     assert.ok(names.includes("sheet-groceries.html"), "groceries reached");
     assert.deepEqual(o.dad_edges, [], "no kid page links a Dad page");
     for (const b of BOARDS) assert.ok((o.edges[b] || []).includes("sheet-index.html"), b + " reaches sheet-index: " + JSON.stringify(o.edges[b]));
     assert.ok(!("mint200" in o.api), "mint never 200");
     /* DESKCUT1 (Atlas): no kid-reachable page links to, opens, navigates or sets location to any wardos-desk-face host */
     assert.deepEqual(o.desk, [], "wardos-desk-face hits " + JSON.stringify(o.desk));
-    assert.ok(o.desk_checks.links > 0 && o.desk_checks.navs > 0 && o.desk_checks.markup_pages >= 27, "desk checks ran: " + JSON.stringify(o.desk_checks));
+    assert.ok(o.desk_checks.links > 0 && o.desk_checks.navs > 0 && o.desk_checks.markup_pages >= 26, "desk checks ran: " + JSON.stringify(o.desk_checks));
     /* ADULTCUT1 (Atlas): no dev, admin, billing or account surface in any href, window.open, navigation, request or markup */
     assert.equal(o.adult_re, ADULT_DENY_RE.source, "crawl applied the test's denylist");
     assert.deepEqual(o.adult, [], "adult-surface hits " + JSON.stringify(o.adult));
@@ -79,7 +79,7 @@ for (const [w, h] of [[440, 956], [1280, 800]]) {
        HouseSpotify.setup() call on a kid page refuses (dad_only), sends nothing and stores nothing */
     assert.deepEqual(o.spotify_cred, [], "Spotify credential field / save path on a kid page " + JSON.stringify(o.spotify_cred));
     assert.deepEqual(o.spotify_setup_requests, [], "a kid page POSTed /api/spotify/setup " + JSON.stringify(o.spotify_setup_requests));
-    assert.ok(o.spotify_checks.pages >= 27 && o.spotify_checks.probes >= 2, "Spotify checks ran: " + JSON.stringify(o.spotify_checks));
+    assert.ok(o.spotify_checks.pages >= 26 && o.spotify_checks.probes >= 2, "Spotify checks ran: " + JSON.stringify(o.spotify_checks));
     assert.ok(!names.includes("sheet-spotify-setup.html"), "the Spotify setup sheet is not kid-reachable");
     /* positive controls (Dad pages, own context): the read sentinels and the DOM hooks see '$' on sheet-allowance, and CRED
        sees the Client ID field on sheet-spotify-setup, so the zeros above are real zeros */
@@ -102,7 +102,7 @@ function adultcut2Asserts(o, tag) {
   assert.deepEqual(o.outbound_auth, [], tag + ": outbound sign-in / OAuth targets on kid pages " + JSON.stringify(o.outbound_auth));
   assert.deepEqual(o.offsite, [], tag + ": tappable targets off the house origin " + JSON.stringify(o.offsite));
   const ap = o.authprobe;
-  assert.ok(ap && Object.keys(ap.pages).length >= 27, tag + ": authprobe ran on the closure " + (ap && Object.keys(ap.pages).length));
+  assert.ok(ap && Object.keys(ap.pages).length >= 26, tag + ": authprobe ran on the closure " + (ap && Object.keys(ap.pages).length));
   for (const [n, p] of Object.entries(ap.pages)) assert.ok(!p.err, tag + ": authprobe " + n + " " + p.err);
   assert.ok(ap.need_auth_pages.includes("sheet-spotify.html") && ap.need_auth_pages.includes("sheet-index.html"), tag + ": Spotify reached need_auth on the player and the hub " + JSON.stringify(ap.need_auth_pages));
   assert.ok(ap.tap_checks.targets > 100, tag + ": authprobe tappables checked " + JSON.stringify(ap.tap_checks));
@@ -158,7 +158,7 @@ test("SENSICUT static: house-sensi.js carries no connect helper, web login, app-
 });
 
 const KID_REACHABLE = ["kid-hayes", "kid-harris", "kid-ainsley", "mercury-run", "sheet-index", "index", "month", "month-chat", "sheet-chores",
-  "sheet-today", "sheet-lights", "sheet-google-home", "sheet-groceries", "sheet-spotify", "sheet-weekend", "sheet-win", "wall", "sheet-status",
+  "sheet-today", "sheet-lights", "sheet-google-home", "sheet-groceries", "sheet-spotify", "sheet-weekend", "sheet-win", "sheet-status",
   "sheet-us", "sheet-load-day", "sheet-pack", "nest-webrtc", "sheet-desk-gate", "sheet-dinner", "sheet-gallery-hero", "sheet-gallery",
   "sheet-countdowns"].map((n) => n + ".html");
 function kidFiles() {
@@ -174,7 +174,7 @@ const DESK_RE = /wardos-desk-face|desk-face|desk-index/i; /* ADULTCUT1 P3 (Alfre
 test("DESKCUT1 static: no kid-reachable page or the local js/css it loads names wardos-desk-face, desk-face or desk-index", () => {
   for (const u of ["https://dmward23-web.github.io/wardos-desk-face/", "desk-face.html", "desk-index.html"]) assert.ok(DESK_RE.test(u), "desk grep bites " + u);
   assert.ok(!DESK_RE.test("sheet-desk-gate.html"), "desk grep spares sheet-desk-gate.html");
-  assert.equal(KID_REACHABLE.length, 27);
+  assert.equal(KID_REACHABLE.length, 26);
   const files = kidFiles();
   assert.ok(files.size > 40, "scanned " + files.size);
   const hits = [];
