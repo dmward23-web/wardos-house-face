@@ -36,7 +36,7 @@
     display: flex !important;
     align-items: center !important;
     gap: 16px !important;
-    z-index: 6;
+    z-index: 5;
     box-sizing: border-box !important;
     background: rgba(8, 10, 14, 0.82) !important;
     border-radius: 16px !important;
@@ -73,7 +73,7 @@
     align-items: center !important;
     background: transparent !important;
     box-shadow: none !important;
-    z-index: 7;
+    z-index: 5;
     pointer-events: none;
   }
   html body .cheer-label,
@@ -119,7 +119,7 @@
     position: fixed !important;
     top: 64px !important;
     height: 64px !important;
-    z-index: 8;
+    z-index: 5;
   }
   html body .body > .col:nth-of-type(1) .col-hdr { left: 300px !important; }
   html body .body > .col:nth-of-type(2) .col-hdr { left: -140px !important; }
@@ -183,7 +183,7 @@
     align-items: center !important;
     background: transparent !important;
     box-shadow: none !important;
-    z-index: 7;
+    z-index: 5;
     pointer-events: none;
   }
   html body .link-label,
@@ -516,18 +516,24 @@
     height: 96px !important;
     max-height: 96px !important;
     overflow: hidden !important;
-    z-index: 7 !important;
+    z-index: 5 !important;
   }
   html:not(#hf-wall-off) body > .panel .col-hdr {
     position: absolute !important;
     top: -104px !important;
     right: auto !important;
     height: 64px !important;
-    z-index: 9 !important;
+    z-index: 5 !important;
   }
-  html:not(#hf-wall-off) body > .panel section.col[aria-label="Ainsley chores"] .col-hdr { left: 322px !important; }
-  html:not(#hf-wall-off) body > .panel section.col[aria-label="Hayes chores"] .col-hdr { left: -118px !important; }
-  html:not(#hf-wall-off) body > .panel section.col[aria-label="Harris chores"] .col-hdr { left: -568px !important; }
+  html:not(#hf-wall-off) body > .panel section.col[aria-label="Ainsley chores"] .col-hdr { left: 433px !important; }
+  html:not(#hf-wall-off) body > .panel section.col[aria-label="Hayes chores"] .col-hdr { left: -12px !important; }
+  html:not(#hf-wall-off) body > .panel section.col[aria-label="Harris chores"] .col-hdr { left: -471px !important; }
+  html:not(#hf-wall-off) body > .panel > header.hdr { z-index: 1 !important; }
+  html:not(#hf-wall-off) body > .panel .col { z-index: 2 !important; overflow: visible !important; }
+  html:not(#hf-wall-off) body > .panel > .body:has(> .col) { overflow: visible !important; }
+  html:not(#hf-wall-off) body > .panel .cheer,
+  html:not(#hf-wall-off) body > .panel .link-banner { z-index: 2 !important; }
+  html:not(#hf-wall-off) body > .panel .col-hdr { z-index: 3 !important; }
   html:not(#hf-wall-off) body > .panel .bank.hayes,
   html:not(#hf-wall-off) body > .panel .bank.harris,
   html:not(#hf-wall-off) body > .panel .bank.ainsley {
