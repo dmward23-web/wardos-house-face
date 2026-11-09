@@ -37,7 +37,7 @@ test("DAYPKG1 v2h: no Dad tile, Dad chip or Jar button anchor on any kid board (
   }
   /* kid nav: every tracked page that is not a Dad sheet or livinghouse carries no Dad tile or chip */
   for (const f of tracked) {
-    if (/^(?:sheet-dan|sheet-allowance)\.html$|^livinghouse\/|^scripts\//.test(f)) continue;
+    if (/^(?:sheet-dan|sheet-allowance|sheet-index)\.html$|^livinghouse\/|^scripts\//.test(f)) continue;
     assert.doesNotMatch(noComments(rd(f)), /<[a-z]+ class="tile dan\b|<div class="chip" id="chip-body"/, f + " Dad tile / chip");
   }
   for (const f of ["wall.html", "night/scene.html"]) assert.equal((rd(f).match(/<div class="chip" /g) || []).length, 2, f + " chips: Family, Kids");
@@ -85,14 +85,13 @@ test("DAYPKG1 v2h: no empty grid cells or leftover chip separators (static): CTA
     assert.equal(n % 2, 0, f + " phone rows full");
     assert.match(h, /\.phone #chips \.chip:last-child:nth-child\(odd\)\{grid-column:1\/-1;justify-self:center;width:calc\(50% - 8px\)\}/, f + " odd rule kept for safety");
   }
-  /* sheet-index roster: 3 columns x 4 rows, every row filled (a lone last tile spans its row) */
+  /* sheet-index: the wall roster is the four seats. Other sheet links stay in the nav and are not that grid. */
   const ix = rd("sheet-index.html");
   const nav = ix.slice(ix.indexOf('<nav class="tile-grid tile-grid--cams"'), ix.indexOf("</nav>", ix.indexOf('<nav class="tile-grid tile-grid--cams"')));
   const tiles = noComments(nav).match(/\n <(?:a|div) class="tile [^"]*"/g) || [];
-  assert.equal(tiles.length, 10, "10 tiles: " + tiles.join(","));
-  assert.equal(Math.ceil(tiles.length / 3), 4, "4 rows, none empty");
-  if (tiles.length % 3 === 1) assert.match(ix, /\.tile-grid > \.tile:last-child:nth-child\(3n\+1\) \{ grid-column: 1 \/ -1 !important; \}/, "lone last tile spans its row");
-  assert.notEqual(tiles.length % 3, 2, "no 2-of-3 last row");
+  assert.ok(tiles.some((t) => /class="tile dan"/.test(t)), "Dad seat is in the roster");
+  assert.match(nav, /data-dad-stage/);
+  assert.doesNotMatch(nav, /href="sheet-dan\.html"/);
 });
 
 test("DAYPKG1 v2h: kid copy law on the changed kid markup: no '$', no em dash or arrow; Ainsley's jar card shows no count", () => {

@@ -50,13 +50,16 @@ PROBE = """() => {
   return {
     panel: { w: Math.round(pr.width), h: Math.round(pr.height), pad: cs.paddingTop, colGap: cs.columnGap, cols: cs.gridTemplateColumns },
     scroll: document.documentElement.scrollHeight,
-    tiles, slots: { header: box('header.hdr'), window: box('.hub-window'), ainsley: box('.tile.ainsley'), hayes: box('.tile.hayes'), harris: box('.tile.harris'), dad: box('.tile.roster-dad') },
+    tiles, slots: { header: box('header.hdr'), window: box('.hub-window'), ainsley: box('.tile.ainsley'), hayes: box('.tile.hayes'), harris: box('.tile.harris'), dad: box('.tile.dan') },
     smallText, safe: safe.slice(0, 30), smallHit: smallHit.slice(0, 40), bg,
     icon: { w: Math.round(hr.width), h: Math.round(hr.height) },
     windowImg: (() => { const img = document.querySelector('.hub-window img'); if (!img) return null; const r = img.getBoundingClientRect();
       return { src: img.getAttribute('src'), naturalW: img.naturalWidth, naturalH: img.naturalHeight, cssW: Math.round(r.width), cssH: Math.round(r.height) }; })(),
     kidArt: getComputedStyle(document.querySelector('.tile.ainsley')).backgroundImage,
-    dadArt: getComputedStyle(document.querySelector('.tile.roster-dad')).backgroundImage
+    dadArt: getComputedStyle(document.querySelector('.tile.dan')).backgroundImage,
+    dadStage: (() => { const tile = document.querySelector('.tile.dan'), stage = document.querySelector('.tile.dan [data-dad-stage]');
+      if (!tile || !stage) return null; const t = tile.getBoundingClientRect(), s = stage.getBoundingClientRect();
+      return { h: Math.round(s.height), gap: Math.round(t.bottom - s.bottom) }; })()
   };
 }"""
 out = {}

@@ -4104,6 +4104,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 .tile.ainsley, .kid-flip.ainsley { background-image: url("month-theme/hub/kidtile-ainsley-438x420.webp") !important; }
 .tile.hayes, .kid-flip.hayes { background-image: url("month-theme/hub/kidtile-hayes-438x420.webp") !important; }
 .tile.harris, .kid-flip.harris { background-image: url("month-theme/hub/kidtile-harris-438x420.webp") !important; }
+.tile.dan { background-image: url("month-theme/hub/kidtile-dad.webp") !important; background-repeat: no-repeat !important; background-size: 438px 420px !important; background-position: left top !important; }
 .hub-home {
   position: absolute; z-index: 30; left: 14px; top: calc(12px + env(safe-area-inset-top));
   width: 44px; height: 44px; border-radius: 50%;
@@ -4328,12 +4329,9 @@ html body .pf-flag--pair { display: none !important; }
  <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
- <a class="tile roster-dad" href="sheet-today.html" aria-label="Dad">
- <div class="tile-top">
- <div class="tile-titles">
+ <a class="tile dan" href="sheet-today.html" aria-label="Dad">
+ <div data-dad-stage>
  <div class="tile-label">Dad</div>
- <div class="tile-sub">Today</div>
- </div>
  </div>
  </a>
 

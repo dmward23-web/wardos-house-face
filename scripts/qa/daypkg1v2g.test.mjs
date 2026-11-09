@@ -129,8 +129,10 @@ test("DAYPKG1 v2g P1-2: no Dad sheet (sheet-allowance, sheet-dan) is reachable f
 test("DAYPKG1 v2g P1-2: the four known hops are cut (Today where-card, Index Dad tile, wall/night Dad chip, house-links.js targets)", () => {
   assert.doesNotMatch(stripHtml(rd("sheet-today.html")), /href="sheet-dan\.html"/);
   assert.doesNotMatch(stripHtml(rd("sheet-index.html")), /href="sheet-dan\.html"/);
-  /* DAYPKG1 v2h (Atlas: nothing dead on kid glass): the Dad tile and the Dad chip are removed, not just unlinked */
-  assert.doesNotMatch(rd("sheet-index.html"), /class="tile dan\b|data-kid-seed="dad"/, "Dad tile removed (v2h)");
+  /* The hub roster seat is .tile.dan [data-dad-stage]. It does not link to a Dad sheet. */
+  assert.match(rd("sheet-index.html"), /class="tile dan"/);
+  assert.match(rd("sheet-index.html"), /data-dad-stage/);
+  assert.doesNotMatch(rd("sheet-index.html"), /data-kid-seed="dad"/);
   for (const f of ["wall.html", "night/scene.html"]) {
     assert.doesNotMatch(rd(f), /data-href="(?:\.\.\/)?sheet-(?:dan|allowance)\.html"/, f);
     assert.doesNotMatch(rd(f), /id="chip-body"|data-n="Dad"/, f + " Dad chip removed (v2h)");

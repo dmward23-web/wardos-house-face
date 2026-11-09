@@ -92,7 +92,7 @@ html body .tile-grid.tile-grid--cams > .tile { display: none !important; pointer
 html body .tile-grid.tile-grid--cams > .tile.ainsley,
 html body .tile-grid.tile-grid--cams > .tile.hayes,
 html body .tile-grid.tile-grid--cams > .tile.harris,
-html body .tile-grid.tile-grid--cams > .tile.roster-dad {
+html body .tile-grid.tile-grid--cams > .tile.dan {
   display: block !important;
   position: absolute !important;
   width: 438px !important;
@@ -108,7 +108,7 @@ html body .tile-grid.tile-grid--cams > .tile.roster-dad {
 html body .tile.ainsley { left: 972px !important; top: 168px !important; }
 html body .tile.hayes { left: 1434px !important; top: 168px !important; }
 html body .tile.harris { left: 972px !important; top: 612px !important; }
-html body .tile.roster-dad { left: 1434px !important; top: 612px !important; }
+html body .tile.dan { left: 1434px !important; top: 612px !important; }
 html body .tile.ainsley,
 html body .tile.hayes,
 html body .tile.harris {
@@ -116,9 +116,30 @@ html body .tile.harris {
   background-size: 438px 420px !important;
   background-position: left top !important;
 }
-html body .tile.roster-dad {
-  background-color: #161410 !important;
-  background-image: none !important;
+html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile.dan {
+  border-width: 0 !important;
+  padding: 0 !important;
+}
+html body .tile.dan {
+  background-image: url("month-theme/hub/kidtile-dad.webp") !important;
+  background-repeat: no-repeat !important;
+  background-size: 438px 420px !important;
+  background-position: left top !important;
+}
+html body .tile.dan [data-dad-stage] {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  height: 140px !important;
+  margin: 0 !important;
+  padding: 16px 20px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  color: #f4efe6 !important;
+  overflow: hidden !important;
 }
 html body .panel.panel > .hub-upper {
   position: absolute !important;

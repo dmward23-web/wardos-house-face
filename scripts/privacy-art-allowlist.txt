@@ -1060,6 +1060,7 @@ assets/icons/home-key-light.svg
 assets/icons/home-key.svg
 kid-glass-light@2x.png
 month-theme/hub/kidtile-ainsley-438x420.webp
+month-theme/hub/kidtile-dad.webp
 month-theme/hub/kidtile-ainsley.webp
 month-theme/hub/kidtile-harris-438x420.webp
 month-theme/hub/kidtile-harris.webp
