@@ -242,7 +242,7 @@ test("boys pebble reaches filled only when every must is actually done", () => {
   assert.equal(P.forKid("ainsley"), "empty");
 });
 
-test("rest pill follows the missing-feed event and does not use an em dash or a timer", () => {
+test("a missing feed does not paint a resting promise on the kid board", () => {
   const document = makeDocument({ "data-kid": "hayes" });
   const ctx = vm.createContext({
     document, location: { search: "" }, matchMedia: () => ({ matches: false }),
@@ -257,10 +257,10 @@ test("rest pill follows the missing-feed event and does not use an em dash or a 
   document.body.appendChild(stage);
   ctx.KidFeedRest.bind(stage);
   const pill = stage.querySelector("[data-kw-feed]");
-  assert.ok(pill, "a missing feed paints the pill at mount, not only after a later event");
-  assert.equal(pill.textContent, "Resting. Your list comes back soon.");
-  assert.equal(pill.hidden, false);
-  assert.ok(document.body.classList.contains("kw-rest"));
+  assert.ok(pill, "the feed node exists");
+  assert.equal(pill.textContent, "");
+  assert.equal(pill.hidden, true);
+  assert.ok(!document.body.classList.contains("kw-rest"));
   document.dispatchEvent({ type: "house:kids-data-ready" });
   assert.equal(pill.hidden, true);
   assert.ok(!document.body.classList.contains("kw-rest"));

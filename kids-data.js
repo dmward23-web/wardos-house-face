@@ -584,6 +584,8 @@
   function saveBankRoot(root) {
     if (MEM_BANK) { MEM_BANK = JSON.parse(JSON.stringify(root || {})); return; }
     if (kidScope()) return;
+    /* No credential exists. A public page keeps the bank in memory and does not write the ledger key. */
+    if (payWriteRefused()) { MEM_BANK = JSON.parse(JSON.stringify(root || {})); return; }
     root = root || {};
     root._w = Date.now(); /* DAYPKG1 v2e · write stamp: the newer ledger wins a migration meet */
     try { localStorage.setItem(BANK_KEY, JSON.stringify(root)); } catch (e) { /* */ }
@@ -2659,6 +2661,7 @@
     getCheck: getCheck,
     setCheck: setCheck,
     getBankView: getBankView,
+    peekBank: function () { return loadBankRoot(); },
     applyCheckToBank: applyCheckToBank,
     syncBankFromChecks: syncBankFromChecks,
     renderBank: renderBank,

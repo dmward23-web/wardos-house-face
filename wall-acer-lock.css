@@ -152,7 +152,7 @@ html body .panel.panel > .hub-upper {
   overflow: hidden !important;
   z-index: 4;
 }
-html body .panel.panel > .hub-upper .leaveby,
+html body .panel.panel > .hub-upper .leaveby { display: block !important; min-height: 48px !important; }
 html body .panel.panel > .hub-upper .sp-strip { display: none !important; }
 html body .panel.panel > #hub-cam-deck {
   position: absolute !important;

@@ -88,10 +88,12 @@ function legacyDevice() {
   const m = Object.assign({}, SYNC_INIT);
   const dad = device("fri1459", m);
   for (const k of KIDS) playWeek(dad, k);
-  const after = device("fri1600", m).boot();
+  const raw = JSON.stringify(dad.wk.peekBank());
+  const probe = Object.assign({}, SYNC_INIT, { [LEDGER]: raw });
+  const after = device("fri1600", probe).boot();
   const want = {}; for (const k of KIDS) want[k] = money(after.view(k));
-  const raw = m[LEDGER];
-  delete m[LEDGER]; m[LEGACY] = raw;
+  delete m[LEDGER];
+  m[LEGACY] = raw;
   return { map: m, raw, want };
 }
 function assertKidClean(dev, tag, raw) {
@@ -148,7 +150,7 @@ test("DAYPKG1 v2e (Alfred 1): a MALFORMED blob survives unchanged: kid page leav
   const dad = device("fri1459", m).boot();
   assert.equal(m[LOSER], bad, "Dad sheet: kept raw");
   assert.ok(dad.info.some((s) => /unreadable dad-ledger:v1 kept raw as dad-ledger:v1:superseded/.test(s)), "logged");
-  assert.doesNotThrow(() => JSON.parse(m[LEDGER]), "the Dad sheet starts a fresh readable ledger");
+  assert.equal(m[LEDGER], bad, "the public sheet does not replace the unreadable key");
   device("fri1600", m).boot(); device("sat31", m).boot();
   assert.equal(Object.keys(m).filter((k) => k.startsWith(LOSER)).length, 1, "kept once (no pile up across loads)");
   assert.equal(m[LOSER], bad);

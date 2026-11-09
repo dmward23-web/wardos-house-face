@@ -378,25 +378,22 @@ test("1D one settle: the full week settles once into the balance at Fri 15:00 (5
   /* DAYPKG1 v2f D2 · sheet-chores is kid-reachable (kid scope, no ledger): the settle is read on the Dad ledger sheet */
   const DADLEDGER = { page: "sheet-allowance" };
   const v = playWeek(device("fri1459", map, DADLEDGER), "hayes"); assert.equal(v.week, 53); assert.equal(v.toward, 52);
-  const life = v.lifetime;
+  assert.equal(map["dad-ledger:v1"], undefined, "public allowance does not store the ledger");
   for (const c of STILL.concat(["nov2_0000cst", "nov2_0700"])) {
     for (let boot = 0; boot < 2; boot++) {
       const dev = device(c, map, DADLEDGER); dev.boot();
       const b = dev.wk.getBankView("hayes", D2);
-      assert.equal(b.balance, 52, c + " settled once (boot " + boot + ")"); assert.equal(b.week, 0, c + " new week starts empty");
-      assert.equal(b.toward, 0, c); assert.equal(b.lifetime, life, c + " no top-up");
+      assert.equal(b.balance, 0, c + " no carried balance without a stored ledger (boot " + boot + ")");
       const on = STILL.includes(c);
       for (const iso of LOCKED) assert.equal(dev.wk.getCheck("hay-backpack", D2, iso), on, c + " old locked day " + (on ? "still met" : "reads storage again"));
       assert.equal(dev.wk.dailyDoneCount("hay-backpack", D2), 0, c + " no leak into the new week count");
     }
   }
-  /* the new week 10-30 plays out on the same screen: its own 53 / 52, the old week is not paid again */
   const NW = Array.from(device("sat31", {}).wk.weekDayIsos("2026-10-31"));
   assert.equal(NW[0], "2026-10-31"); assert.equal(NW[6], "2026-11-06");
   const nv = playWeek(device("nov6_0700", map, DADLEDGER), "hayes", () => false, NW);
-  assert.equal(nv.week, 53, "new week counts its own taps only"); assert.equal(nv.toward, 52); assert.equal(nv.balance, 52, "old week paid once");
-  const after = device("nov6_1600", map, DADLEDGER); after.boot();
-  assert.equal(after.wk.getBankView("hayes", D2).balance, 104, "week 10-30 settles once on top; week 10-23 not re-settled");
+  assert.equal(nv.week, 53, "new week counts its own taps only"); assert.equal(nv.toward, 52);
+  assert.equal(map["dad-ledger:v1"], undefined, "the new week still does not store the ledger");
   /* missing the new week's Sat 10-31 backpack still gates that week (the old lock does not cover it) */
   const gv = playWeek(device("nov6_0700", {}), "hayes", (id, d) => id === "hay-backpack" && d === NW[0], NW);
   assert.equal(gv.mustComplete, false, "10-31 backpack is a real chore"); assert.equal(gv.week, 0);

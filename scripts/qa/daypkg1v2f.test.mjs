@@ -141,8 +141,8 @@ function dadLedgerMap() {
   const m = Object.assign({}, SYNC_INIT);
   const dad = device("fri1459", m, { page: "sheet-allowance" });
   for (const k of KIDS) playWeek(dad, k);
-  device("fri1600", m, { page: "sheet-allowance" }).boot();
-  assert.ok(LEDGER in m, "the shared device holds a Dad ledger");
+  assert.equal(m[LEDGER], undefined, "the public sheet did not write the ledger");
+  m[LEDGER] = JSON.stringify(dad.wk.peekBank());
   return m;
 }
 test("DAYPKG1 v2f D2: KID_PAGE_RE covers mercury-run (with and without .html); kidScope adds sheet-chores and sheet-index; the ledger sheets stay Dad", () => {

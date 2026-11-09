@@ -30,9 +30,9 @@
         });
         stage.appendChild(n);
       }
-      n.hidden = false;
-      n.textContent = REST_LINE;
-      if (document.body) document.body.classList.add("kw-rest");
+      n.hidden = true;
+      n.textContent = "";
+      if (document.body) document.body.classList.remove("kw-rest");
     }
     function hideRest() {
       var n = document.querySelector("[data-kw-feed]");

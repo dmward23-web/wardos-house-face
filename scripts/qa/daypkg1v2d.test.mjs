@@ -141,6 +141,14 @@ test("DAYPKG1 v2d (Atlas A): the public allowance page has no Paid control and d
   assert.match(h, /<script src="kids-data\.js\?v=DAYPKG1"><\/script>/);
 });
 
+test("public setCheck does not write dad-ledger:v1", () => {
+  for (const page of ["sheet-allowance", "sheet-dan"]) {
+    const map = {};
+    device("fri1459", map, { page: page }).wk.setCheck("hay-bed", true, D2, "2026-10-30");
+    assert.equal(map["dad-ledger:v1"], undefined, page + " setCheck wrote the ledger");
+  }
+});
+
 test("Public sheet-allowance dadPaid returns empty and writes no Paid stamp", () => {
   const map = {};
   const allow = device("fri1459", map, { page: "sheet-allowance" });

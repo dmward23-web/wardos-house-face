@@ -185,10 +185,10 @@ test("DAYPKG1 P1 HAYESJAR1D unchanged: Hayes full week 53 / jar 52/52 with the l
   const v = playWeek(device("fri1459", map), "hayes");
   assert.equal(v.week, 53); assert.equal(v.toward, 52); assert.equal(v.need, 52); assert.equal(v.reached, true);
   for (const iso of W2.locked) assert.equal(device("fri1459", map).wk.getCheck("hay-backpack", D2, iso), true, iso);
-  const b = device("sat31", map).boot().view("hayes"); assert.equal(b.balance, v.weekEarn); assert.equal(b.week, 0);
-  const nv = playWeek(device("nov6_0700", map), "hayes", NW); assert.equal(nv.week, 53);
-  assert.equal(device("nov6_1600", map).boot().view("hayes").balance, 2 * v.weekEarn);
-  assert.ok(!/paidWeek/.test(map["dad-ledger:v1"]), "no paid marker without a Paid");
+  assert.equal(map["dad-ledger:v1"], undefined, "the public sheet does not store the ledger");
+  const b = device("sat31", map).boot().view("hayes");
+  assert.equal(b.balance, 0, "a later load has no carried balance without the ledger");
+  assert.ok(!/paidWeek/.test(String(map["dad-ledger:v1"] || "")), "no paid marker without a Paid");
 });
 
 test("DAYPKG1 P1 code: the marker and the Paid stamp carry no '$'; resetJarCycle writes no '$' key or value; a legacy '$' stamp is rewritten on read", () => {
