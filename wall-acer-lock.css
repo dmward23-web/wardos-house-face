@@ -56,7 +56,8 @@ html body .panel.panel > #hub-cam-deck {
   gap: 16px;
   overflow: hidden;
 }
-html body #hub-cam-deck[hidden] { display: none !important; }
+html body .panel.panel > #hub-cam-deck[hidden],
+html body .panel.panel > #hub-lights-panel[hidden] { display: none !important; }
 html body .hub-cam {
   min-width: 64px;
   min-height: 64px;
