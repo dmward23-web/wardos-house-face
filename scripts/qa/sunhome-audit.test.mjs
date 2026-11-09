@@ -176,7 +176,7 @@ test("Ainsley hub faces: stars, XP, streak and $ never render, offline or with a
   assert.match(boy, /kf-xp/);
 });
 
-test("Ainsley jar: offline, bad JSON, and the word trusted paint the empty line; a real sentence is the grant", async () => {
+test("Ainsley jar: offline, bad JSON, the word trusted, and a prose sentence all stay Nothing trusted yet", async () => {
   const document = makeDocument();
   const el = node("div");
   el.attrs["data-jar-state"] = "trusted";

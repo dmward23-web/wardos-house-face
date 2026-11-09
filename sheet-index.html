@@ -10,9 +10,9 @@
 <script src="house-pair.js?v=HUBPAIR1"></script>
 <script src="house-money-bind.js?v=DAYPKG1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
-<meta name="viewport" id="hf-viewport" content="width=1080" />
+<meta name="viewport" id="hf-viewport" content="width=1920, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <script src="away-filter.js?v=SUNHOME1" data-away-install data-dan-view></script>
-<script>/* HUBFIT1 · phones get their own layout; the wall keeps 1080 */(function(){try{var w=Math.min(screen.width,screen.height);if(w&&w<=600){document.getElementById("hf-viewport").setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
+<script>/* ACER1 · the wall board is one 1920x1080 canvas. No phone viewport. */</script>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon-20260926c.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -4496,51 +4496,22 @@ html body .pf-flag--pair { display: none !important; }
 })();
 </script>
 <script>
-/* HUBOVAL1 · Asus 32" wall portrait · scale 1080×1920 canvas to fill viewport · no letterbox */
+/* ACER1 · one 1920x1080 canvas. Do not scale it to the window. */
 (function () {
   function fitPortrait() {
     var panel = document.querySelector(".panel");
     if (!panel) return;
-    /* HUBFIT1 · phones use their own responsive layout (tokens-hub-fit.css), never shrink the wall canvas */
-    try {
-      if (Math.min(screen.width, screen.height) <= 600) {
-        panel.style.transform = ""; panel.style.transformOrigin = "";
-        panel.style.marginLeft = "0"; panel.style.marginTop = "0"; panel.style.removeProperty("margin-bottom"); document.body.style.removeProperty("height");
-        document.documentElement.setAttribute("data-hub-fit", "phone");
-        document.documentElement.style.setProperty("--hub-fit-scale", "1");
-        return;
-      }
-    } catch (e) {}
-    var vw = window.innerWidth || document.documentElement.clientWidth || 1080;
-    var vh = window.innerHeight || document.documentElement.clientHeight || 1920;
-    var sx = vw / 1080;
-    var sy = vh / 1920;
-    /* contain: full 1080×1920 image visible · on Elo 32" 9:16 portrait = exact fill, no letterbox */
-    var portrait = vh >= vw;
-    var s = Math.min(sx, sy);
-    if (!isFinite(s) || s <= 0) s = 1;
+    panel.style.transform = "none";
     panel.style.transformOrigin = "top left";
-    panel.style.transform = "scale(" + s + ")";
-    /* center horizontally if leftover width (should be ~0 on true portrait wall) */
-    var ox = Math.max(0, (vw - 1080 * s) / 2);
-    /* WIDE2560 · a landscape canvas is as wide as the window, not 1080: at very wide sizes (2560) that offset pushed its right column past the
-       edge. Only then, centre the real scaled width instead; 1280 and 1920 keep the offset they had */
-    var pw = (panel.offsetWidth || 1080) * s;
-    if (ox + pw > vw) ox = Math.max(0, (vw - pw) / 2);
-    var oy = Math.max(0, (vh - 1920 * s) / 2);
-    /* AUDIT1 · !important so the kit's .panel margin rules can't pin the canvas left on landscape;
-       reclaim the unscaled height so a scaled canvas doesn't scroll */
-    panel.style.setProperty("margin-left", ox ? (ox + "px") : "0", "important");
-    panel.style.setProperty("margin-top", oy ? (oy + "px") : "0", "important");
-    panel.style.setProperty("margin-bottom", s < 1 ? (Math.round(-panel.offsetHeight * (1 - s)) + "px") : "0", "important");
-    if (s < 1) document.body.style.setProperty("height", Math.ceil(1920 * s + 2 * oy) + "px", "important");
-    else document.body.style.removeProperty("height");
-    document.documentElement.setAttribute("data-hub-fit", portrait ? "portrait-contain" : "landscape-contain");
-    document.documentElement.style.setProperty("--hub-fit-scale", String(s));
+    panel.style.setProperty("margin-left", "0", "important");
+    panel.style.setProperty("margin-top", "0", "important");
+    panel.style.setProperty("margin-bottom", "0", "important");
+    document.body.style.removeProperty("height");
+    document.documentElement.setAttribute("data-hub-fit", "acer-1920");
+    document.documentElement.style.setProperty("--hub-fit-scale", "1");
   }
   fitPortrait();
   window.addEventListener("resize", fitPortrait, { passive: true });
-  window.addEventListener("orientationchange", function () { setTimeout(fitPortrait, 50); });
 })();
 
 </script>
@@ -4575,5 +4546,6 @@ function s(k,v){var e=document.querySelector('[data-mtile="'+k+'"]');if(e)e.text
 s("m0",M[m]);s("m1",M[(m+1)%12]);s("w0","Week "+Math.ceil((d+new Date(y,m,1).getDay())/7)+" · this month");s("sub",N[m]+" and "+N[(m+1)%12])}catch(e){}})();</script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
+<link rel="stylesheet" href="wall-acer-lock.css?v=ACER1" />
 </body>
 </html>

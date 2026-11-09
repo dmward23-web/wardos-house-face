@@ -175,7 +175,7 @@ test("AINSJAR1 markup: sheet-allowance starts on the empty line, not a hardcoded
   assert.equal(/data-saves-panel/.test(a), false);
   assert.match(read("sheet-allowance.html"), /<script src="ains-jar-state\.js\?v=AINSJAR2"><\/script>/);
 });
-test("AINSJAR1 state: no grant, a bad feed, or the word trusted stays unset; only a real sentence is a grant", () => {
+test("AINSJAR1 state: public kids-week prose is not a grant; empty, bad, trusted, and a sentence all stay unset", () => {
   const seen = [];
   const ctx = vm.createContext({
     document: {

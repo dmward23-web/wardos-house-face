@@ -584,6 +584,8 @@
   function saveBankRoot(root) {
     if (MEM_BANK) { MEM_BANK = JSON.parse(JSON.stringify(root || {})); return; }
     if (kidScope()) return;
+    /* No Dad credential exists. sheet-allowance and sheet-dan must not gain dad-ledger:v1 from setCheck. */
+    if (payWriteRefused()) return;
     root = root || {};
     root._w = Date.now(); /* DAYPKG1 v2e · write stamp: the newer ledger wins a migration meet */
     try { localStorage.setItem(BANK_KEY, JSON.stringify(root)); } catch (e) { /* */ }

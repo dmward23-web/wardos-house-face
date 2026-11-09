@@ -148,7 +148,7 @@ function btn() {
     getAttribute(k) { return k in attrs ? attrs[k] : null; }, setPointerCapture() {},
     fire(t, ev = {}) { const e = Object.assign({ type: t, preventDefault() {} }, ev); (on[t] || []).forEach((f) => f(e)); return e; } };
 }
-test("DAYPKG1 v2g P1-2: dad-device:v1 is set only by a completed 2 s Paid hold on sheet-allowance; opening, an early lift, a direct dadPaid call or a hold on another page never set it", (t) => {
+test("Public allowance and sheet-dan refuse dadPaid and bindHold and do not set dad-device:v1", (t) => {
   const map = {};
   assert.equal(device("fri1459", map, { page: "sheet-allowance" }).wk.dadPaid("hayes", D2), "");
   assert.equal(device("fri1459", map, { page: "sheet-dan" }).wk.bindHold({ setAttribute() {}, removeAttribute() {} }, () => {}), null);

@@ -77,7 +77,7 @@ function playWeek(wk, kid) {
   return wk.getBankView(kid, D2);
 }
 
-test("DAYPKG1 v2: Dad's Paid tap (full / part / zero, before and after Fri 15:00, 3 kids) writes 0 '$' to storage; the stamp is the marker only, no amount", () => {
+test("Public sheet-allowance dadPaid and resetJarCycle write no house-bank-paid stamp", () => {
   const map = {}, log = [];
   const wk = kidsPage("fri1459", map, log, "sheet-allowance");
   assert.equal(wk.dadPaid("hayes", D2), "");

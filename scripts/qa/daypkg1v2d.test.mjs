@@ -141,10 +141,21 @@ test("DAYPKG1 v2d (Atlas A): the public allowance page has no Paid control and d
   assert.match(h, /<script src="kids-data\.js\?v=DAYPKG1"><\/script>/);
 });
 
-test("DAYPKG1 v2d (Atlas A): Dad's Paid flow on sheet-allowance pays what is owed (before Fri 15:00 and after), stamps 'Paid ✓', writes the synced marker, never re-credits; nothing owed gives 'Jar reset ✓'", () => {
+test("Public sheet-allowance dadPaid returns empty and writes no Paid stamp", () => {
   const map = {};
-  assert.equal(device("fri1459", map, { page: "sheet-allowance" }).wk.dadPaid("hayes", D2), "");
+  const allow = device("fri1459", map, { page: "sheet-allowance" });
+  assert.equal(allow.wk.dadPaid("hayes", D2), "");
   assert.equal(map["house-bank-paid:hayes"], undefined);
+  allow.wk.setCheck("hay-bed", true, D2, "2026-10-30");
+  assert.equal(map["dad-ledger:v1"], undefined, "allowance setCheck does not write dad-ledger:v1");
+  const danMap = {};
+  const dan = device("fri1459", danMap, { page: "sheet-dan" });
+  dan.wk.setCheck("hay-bed", true, D2, "2026-10-30");
+  assert.equal(danMap["dad-ledger:v1"], undefined, "sheet-dan setCheck does not write dad-ledger:v1");
+  const kidMap = {};
+  const kid = device("fri1459", kidMap, { page: "kid-hayes" });
+  kid.wk.setCheck("hay-bed", true, D2, "2026-10-30");
+  assert.ok(Object.keys(kidMap).some((k) => k.indexOf("house-checkoffs:") === 0), "kid checkoff still stores " + Object.keys(kidMap).join(","));
   return;
   for (const kid of KIDS) for (const at of ["fri0700", "fri1459", "fri1600"]) {
     const tag = kid + " " + at, map = Object.assign({}, SYNC_INIT);
@@ -169,7 +180,7 @@ test("DAYPKG1 v2d (Atlas A): Dad's Paid flow on sheet-allowance pays what is owe
   }
 });
 
-test("DAYPKG1 v2d (Atlas A): the stamp shows on all 3 kid boards: same device (localStorage) and another device (tapsync hub pull of the marker key)", async () => {
+test("Public sheet-allowance resetJarCycle returns empty and queues no kid-board stamp", async () => {
   assert.equal(device("fri1459", {}, { page: "sheet-allowance" }).wk.resetJarCycle("hayes", "0", D2), "");
   return;
   const proxy = rd("scripts/lights-write-proxy.mjs");

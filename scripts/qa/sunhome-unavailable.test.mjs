@@ -44,13 +44,11 @@ test("pinned private-feed keeps needsPairing; the hub hides the chip in its own 
   assert.ok(hub.includes(".pf-flag--pair { display: none !important; }"));
 });
 
-test("public allowance page has no Paid control; the pay functions remain and are not a role", () => {
+test("public pay writes are refused; saveBankRoot does not persist dad-ledger without a credential", () => {
   const h = read("sheet-allowance.html");
   assert.equal((h.match(/data-dad-paid|Hold for Paid|WardKids\.dadPaid\(/g) || []).length, 0);
-  assert.match(h, /name="ward-money" content="dad"/);
   const kd = read("kids-data.js");
-  assert.match(kd, /function dadPaid\(kidId, data\)/);
-  assert.match(kd, /function resetJarCycle\(kidId, paidAmount, data\)/);
-  assert.match(kd, /function bindHold\(btn, fire, ms\)/);
-  assert.match(kd, /if \(kidScope\(\)\) return ""/);
+  assert.match(kd, /function payWriteRefused\(\) \{ return true; \}/);
+  const save = kd.slice(kd.indexOf("function saveBankRoot"), kd.indexOf("function kidDayBank"));
+  assert.match(save, /if \(payWriteRefused\(\)\) return/);
 });

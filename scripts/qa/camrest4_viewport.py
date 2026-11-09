@@ -113,10 +113,12 @@ with sync_playwright() as p:
     ctx.route("**/*", route)
     if scenario in ("kid401", "lights401"):
         ctx.add_init_script("try{localStorage.setItem('wardos-lights-proxy-token',%s)}catch(e){}" % json.dumps(REVOKED))
+    if scenario == "restPair":
+        ctx.add_init_script("try{localStorage.setItem('wardos-lights-proxy-token','qa-fake-key-0123456789abcdef');localStorage.setItem('wardos-lights-proxy',%s);}catch(e){}" % json.dumps(O))
     pg = ctx.new_page()
     pg.on("pageerror", lambda e: out["errors"].append(str(e)[:200]))
     pg.clock.install(time=datetime.now(timezone.utc))
-    page = "sheet-lights.html" if scenario.startswith("lights") else "sheet-index.html" if scenario == "rest" else ("kid-" + scenario[4:] + ".html" if scenario.startswith("ctl-") else "kid-harris.html")
+    page = "sheet-lights.html" if scenario.startswith("lights") else "sheet-index.html" if scenario in ("rest", "restPair") else ("kid-" + scenario[4:] + ".html" if scenario.startswith("ctl-") else "kid-harris.html")
     if scenario == "kidC":
         pg.goto(O + "/" + page + "?pfBase=" + PF + "#pair=" + CODE, wait_until="load")
         try:

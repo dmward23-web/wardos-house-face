@@ -214,7 +214,7 @@ test("DAYPKG1 v2e (Alfred 2): never delete before the move. A copy that fails (q
   }
 });
 
-test("DAYPKG1 v2e (Alfred 6, caveat c): two Dad screens converge. A pays (or resets), B mirrors the synced marker once, no week is re-credited or dropped", async () => {
+test("Public sheet-allowance dadPaid does not start a two-screen pay", async () => {
   assert.equal(device("fri1459", {}, { page: "sheet-allowance" }).wk.dadPaid("hayes", D2), "");
   return;
   for (const mode of ["paid", "jar-reset"]) {
@@ -245,7 +245,7 @@ function btn() {
     getAttribute(k) { return k in attrs ? attrs[k] : null }, setPointerCapture() {},
     fire(t, ev = {}) { const e = Object.assign({ type: t, defaultPrevented: false, preventDefault() { this.defaultPrevented = true; } }, ev); (on[t] || []).forEach((f) => f(e)); return e; } };
 }
-test("DAYPKG1 v2e (Atlas 2, Alfred 3): hold to confirm with fake timers: under 2 s, an early lift, leave or cancel does nothing; 2 s fires exactly once (mouse and touch); repeat key or held key never double-fires; click does nothing; refused on a kid page", (t) => {
+test("Public sheet-allowance and a kid page both refuse bindHold", (t) => {
   assert.equal(device("fri1459", {}, { page: "sheet-allowance" }).wk.bindHold({ setAttribute() {}, removeAttribute() {} }, () => {}), null);
   assert.equal(device("fri1459", {}, { page: "kid-hayes" }).wk.bindHold({ setAttribute() {}, removeAttribute() {} }, () => {}), null);
   return;

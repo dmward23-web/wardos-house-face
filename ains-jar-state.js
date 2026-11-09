@@ -1,7 +1,6 @@
-/* AINSJAR1 · Ainsley's jar is a trusted-with line only when Dad's feed actually grants one.
- * Missing, offline, unreadable, or the placeholder words trusted/empty are not a grant.
- * Those states read "Nothing trusted yet." A real grant is the feed's own sentence, with no
- * dollar sign and no digit, painted as itself. Never a counter, never an invented TRUSTED. */
+/* AINSJAR1 · Ainsley's jar stays "Nothing trusted yet."
+ * A sentence in public kids-week.json is not a Dad grant. No credential or provenance
+ * channel exists, so grantLine ignores its argument. Never a counter, never an invented TRUSTED. */
 (function (g) {
   "use strict";
   var PLACE = { trusted: true, empty: true, unset: true, resting: true, paused: true, none: true };
