@@ -91,10 +91,13 @@ html body .tile-grid.tile-grid--cams { display: block !important; height: auto !
 html body .tile-grid.tile-grid--cams > .tile:not(.ainsley):not(.hayes):not(.harris):not(.dan) {
   display: block !important;
   position: absolute !important;
-  left: -2400px !important;
+  left: -3200px !important;
   top: 0 !important;
-  width: 320px !important;
-  height: 80px !important;
+  width: 720px !important;
+  height: auto !important;
+  min-height: 640px !important;
+  max-height: none !important;
+  overflow: visible !important;
   pointer-events: none !important;
 }
 html body .tile-micro span.md { font-size: 14px !important; }
