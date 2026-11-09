@@ -343,11 +343,11 @@ test("kid pages do not load the money script, and a $ feed does not reach hub gl
 test("hub kid tiles keep their world art over the shorthand backgrounds", () => {
   const hub = rd("sheet-index.html");
   const shorthand = hub.lastIndexOf("background: linear-gradient(165deg, rgba(16,18,24,0.98)");
-  const art = hub.lastIndexOf("kidtile-ainsley.webp");
+  const art = hub.lastIndexOf("kidtile-ainsley-438x420.webp");
   assert.ok(art > shorthand, "kidtile rule must follow the !important shorthand");
-  assert.match(hub, /background-image:\s*url\("month-theme\/hub\/kidtile-ainsley\.webp"\)\s*!important/);
-  assert.match(hub, /background-image:\s*url\("month-theme\/hub\/kidtile-hayes\.webp"\)\s*!important/);
-  assert.match(hub, /background-image:\s*url\("month-theme\/hub\/kidtile-harris\.webp"\)\s*!important/);
+  assert.match(hub, /background-image:\s*url\("month-theme\/hub\/kidtile-ainsley-438x420\.webp"\)\s*!important/);
+  assert.match(hub, /background-image:\s*url\("month-theme\/hub\/kidtile-hayes-438x420\.webp"\)\s*!important/);
+  assert.match(hub, /background-image:\s*url\("month-theme\/hub\/kidtile-harris-438x420\.webp"\)\s*!important/);
   assert.match(hub, /background-size:\s*cover\s*!important/);
   const portrait = hub.slice(hub.indexOf("(orientation: portrait) and (min-height: 1500px)"));
   assert.match(portrait, /height:\s*420px !important/);
@@ -595,13 +595,14 @@ test("wall board stays one 1920x1080 canvas at portrait and phone viewports", { 
     const shown = wall.tiles.filter((t) => t.h >= 1);
     assert.ok(shown.length >= 9, "roster tiles " + shown.length);
     for (const k of wall.kids) {
-      assert.equal(Math.round(k.w), 592);
-      assert.equal(Math.round(k.h), 192);
+      assert.equal(Math.round(k.w), 438);
+      assert.equal(Math.round(k.h), 420);
       assert.match(k.bg, /kidtile-/);
     }
     const phone = await measure(390, 844);
     assert.equal(phone.bodyW, 1920, "phone viewport does not reflow the wall");
-    assert.equal(Math.round(phone.kids[0].h), 192);
+    assert.equal(Math.round(phone.kids[0].w), 438);
+    assert.equal(Math.round(phone.kids[0].h), 420);
     const house = await b.newPage();
     await house.setViewport({ width: 1080, height: 1920, deviceScaleFactor: 1 });
     await house.goto(base + "/livinghouse/index.html?now=2026-11-08T17:30:00-06:00", { waitUntil: "domcontentloaded", timeout: 60000 });

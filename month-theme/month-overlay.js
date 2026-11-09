@@ -89,7 +89,7 @@
         var winPhase = (ctHour(when) >= 16 && ctHour(when) < 19) ? "dusk" : "night";
         var img = fig.querySelector("img");
         if (!img) { img = document.createElement("img"); img.alt = ""; fig.appendChild(img); }
-        img.src = "month-theme/november/hub-window-" + winPhase + ".webp";
+        img.src = "month-theme/november/hub-window-" + winPhase + "-900x864.webp";
       }
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();

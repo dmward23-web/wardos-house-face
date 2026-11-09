@@ -17,10 +17,12 @@ PROBE = """() => {
   const cs = getComputedStyle(panel);
   const vis = e => { const r = e.getBoundingClientRect(); const c = getComputedStyle(e);
     return r.width > 0 && r.height > 0 && c.display !== 'none' && c.visibility !== 'hidden' && !e.closest('[hidden]'); };
+  const box = (sel) => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect();
+    return { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) }; };
   const tiles = [...document.querySelectorAll('.tile')].filter(vis).map(el => {
     const r = el.getBoundingClientRect();
     const label = el.querySelector('.tile-label');
-    return { w: Math.round(r.width), h: Math.round(r.height), font: label ? parseFloat(getComputedStyle(label).fontSize) : null };
+    return { cls: el.className, x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height), font: label ? parseFloat(getComputedStyle(label).fontSize) : null };
   });
   const smallText = [];
   for (const el of document.querySelectorAll('.tile-label, .tile-sub, .name-accent, .leaveby-main, .hdr-date-time')) {
@@ -42,14 +44,19 @@ PROBE = """() => {
     const r = el.getBoundingClientRect();
     if (r.width < 64 || r.height < 64) smallHit.push({ t: (el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 40), w: Math.round(r.width), h: Math.round(r.height) });
   }
-  const icon = document.querySelector('.tile-icon');
-  const ir = icon ? icon.getBoundingClientRect() : { width: 0, height: 0 };
+  const home = document.querySelector('.hub-home img');
+  const hr = home ? home.getBoundingClientRect() : { width: 0, height: 0 };
   const bg = getComputedStyle(document.body).backgroundSize;
   return {
     panel: { w: Math.round(pr.width), h: Math.round(pr.height), pad: cs.paddingTop, colGap: cs.columnGap, cols: cs.gridTemplateColumns },
     scroll: document.documentElement.scrollHeight,
-    tiles, smallText, safe: safe.slice(0, 30), smallHit: smallHit.slice(0, 40), bg,
-    icon: { w: Math.round(ir.width), h: Math.round(ir.height) }
+    tiles, slots: { header: box('header.hdr'), window: box('.hub-window'), ainsley: box('.tile.ainsley'), hayes: box('.tile.hayes'), harris: box('.tile.harris'), dad: box('.tile.roster-dad') },
+    smallText, safe: safe.slice(0, 30), smallHit: smallHit.slice(0, 40), bg,
+    icon: { w: Math.round(hr.width), h: Math.round(hr.height) },
+    windowImg: (() => { const img = document.querySelector('.hub-window img'); if (!img) return null; const r = img.getBoundingClientRect();
+      return { src: img.getAttribute('src'), naturalW: img.naturalWidth, naturalH: img.naturalHeight, cssW: Math.round(r.width), cssH: Math.round(r.height) }; })(),
+    kidArt: getComputedStyle(document.querySelector('.tile.ainsley')).backgroundImage,
+    dadArt: getComputedStyle(document.querySelector('.tile.roster-dad')).backgroundImage
   };
 }"""
 out = {}

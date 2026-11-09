@@ -1,7 +1,8 @@
-/* Acer UT272. One canvas, 1920 x 1080 CSS px. No portrait or phone reflow.
-   12 columns, 48 px margin, 24 px gutter.
-   Column width is 130 px because 12*130 + 11*24 + 2*48 = 1920.
-   The spec sentence "column = 133" does not fit that margin and gutter. */
+/* Acer UT272 home board. One canvas, 1920 x 1080.
+   Margin 48. 12 columns x 130. Gutter 24. Usable 1824 x 984.
+   Spans: 2 = 284, 3 = 438, 4 = 592, 6 = 900.
+   Header 1824x96 at 48,48. Body from y168, height 864.
+   Hub window 900x864 at 48,168. Roster 438x420 at 972/1434, 168/612. */
 html, body,
 html[data-month-theme] body:not([data-kid-world]) {
   width: 1920px !important;
@@ -20,170 +21,142 @@ html[data-month-theme] body:not([data-kid-world]) {
 }
 html:not(#hf-scroll-off) > body { min-height: 0 !important; }
 html body .panel.panel {
+  position: relative !important;
   width: 1920px !important;
   height: 1080px !important;
   min-height: 0 !important;
   max-width: 1920px !important;
   max-height: 1080px !important;
   margin: 0 !important;
-  padding: 48px !important;
+  padding: 0 !important;
   box-sizing: border-box !important;
-  display: grid !important;
-  grid-template-columns: repeat(12, 130px) !important;
-  grid-template-rows: 72px 200px minmax(0, 1fr) !important;
-  column-gap: 24px !important;
-  row-gap: 24px !important;
+  display: block !important;
   overflow: hidden !important;
-  align-content: start !important;
 }
 html body .panel.panel > header.hdr {
-  grid-column: 1 / -1;
-  grid-row: 1;
-  height: 72px !important;
-  min-height: 64px;
-  margin: 0 !important;
-  overflow: hidden;
-}
-html body .panel.panel > #hub-cam-deck {
-  grid-column: 1 / 6;
-  grid-row: 2;
-  align-self: start;
-  width: 100%;
-  height: 96px;
-  margin: 0 !important;
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(64px, 1fr));
-  gap: 16px;
-  overflow: hidden;
-}
-html body .panel.panel > #hub-cam-deck[hidden],
-html body .panel.panel > #hub-lights-panel[hidden] { display: none !important; }
-html body .hub-cam {
-  min-width: 64px;
-  min-height: 64px;
-  height: 100%;
-  overflow: clip;
-  box-sizing: border-box;
-}
-html body .panel.panel > .hub-upper {
-  grid-column: 1 / 6;
-  grid-row: 2;
-  align-self: end;
-  width: 100%;
-  height: 200px !important;
-  max-height: 200px !important;
+  position: absolute !important;
+  left: 48px !important;
+  top: 48px !important;
+  width: 1824px !important;
+  height: 96px !important;
   min-height: 0 !important;
   margin: 0 !important;
-  overflow: hidden !important;
+  z-index: 5;
 }
-html body .panel.panel:has(#hub-cam-deck:not([hidden])) > .hub-upper {
-  height: 104px !important;
-  max-height: 104px !important;
-}
-html body .panel.panel > .hub-window {
-  grid-column: 6 / -1;
-  grid-row: 2;
-  width: auto !important;
-  height: 200px !important;
-  max-height: 200px !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-}
-html body .hub-window img {
-  width: auto;
-  height: auto;
-  max-width: none;
-  object-fit: none;
-}
-html body .panel.panel > .who-up {
-  grid-column: 6 / -1;
-  grid-row: 2;
-  align-self: end;
-  height: 72px;
-  min-height: 64px;
-  z-index: 2;
-}
-html body .panel.panel > .grid-wrap {
-  grid-column: 1 / -1;
-  grid-row: 3;
-  min-height: 0 !important;
-  height: 100% !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-}
-html body .grid-hdr,
-html body .tile-grid.tile-grid--cams > .tile .tile-foot { display: none !important; }
-html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams {
-  display: grid !important;
-  grid-template-columns: repeat(12, 130px) !important;
-  grid-template-rows: none !important;
-  column-gap: 24px !important;
-  row-gap: 16px !important;
-  grid-auto-rows: 192px !important;
-  height: auto !important;
-  min-height: 0 !important;
-}
-html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile {
-  min-width: 64px !important;
-  min-height: 64px !important;
-  max-height: none !important;
-  grid-column: span 4;
-  height: 192px !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-  overflow: hidden !important;
-}
-html body .panel .name,
-html body .panel .name-accent { font-size: 48px !important; line-height: 1 !important; }
-html body .panel .hdr-date-kicker,
-html body .panel .hdr-date-time,
-html body .panel .hdr-date-dow,
-html body .panel .hdr-date-long,
-html body .tile-grid.tile-grid--cams .tile-label,
-html body .tile-grid.tile-grid--cams .tile-sub,
-html body .tile-grid.tile-grid--cams .tile-fact,
-html body .tile-grid.tile-grid--cams .md,
-html body .panel .leaveby-main,
-html body .panel .leaveby-mode-label,
-html body .panel .leaveby-chip,
-html body .panel .hub-lights-title,
-html body .panel .hub-lights-bulk-btn,
-html body .panel .hub-sw-name,
-html body .panel .hub-sw-meta,
-html body .panel #hub-lights-pill,
-html body .panel #lights-all-on,
-html body .panel #lights-all-off,
-html body .panel .who-up-kicker,
-html body .panel .who-up-main { font-size: 24px !important; line-height: 1.15 !important; }
-html body .panel .leaveby-chip,
-html body .panel .hub-lights-bulk-btn,
-html body .panel #lights-all-on,
-html body .panel #lights-all-off {
-  min-width: 64px !important;
-  min-height: 64px !important;
-}
-html body a,
-html body button,
-html body .hub-home,
-html body .mute-btn,
-html body .who-up-go {
-  min-width: 64px;
-  min-height: 64px;
-  touch-action: manipulation;
-}
-html body .hub-home img { width: 64px; height: 64px; }
-html body .tile .tile-icon,
-html body .tile .av,
-html body .tile .tile-icon svg,
-html body .tile svg.g2 {
+html body .hub-home {
+  position: absolute !important;
+  left: 0 !important;
+  top: 16px !important;
   width: 64px !important;
   height: 64px !important;
   min-width: 64px !important;
   min-height: 64px !important;
 }
-html body .pf-flag--pair { display: none !important; }
-html body #hub-lights-panel #lights-all-on.hub-lights-bulk-btn,
-html body #hub-lights-panel #lights-all-off.hub-lights-bulk-btn,
-html body #hub-lights-panel .hub-sw-name {
-  font-size: 24px !important;
+html body .hub-home img {
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
 }
+html body .panel.panel > .hub-window {
+  position: absolute !important;
+  left: 48px !important;
+  top: 168px !important;
+  width: 900px !important;
+  height: 864px !important;
+  max-height: none !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  z-index: 1;
+}
+html body .hub-window img {
+  width: 900px !important;
+  height: 864px !important;
+  max-width: none !important;
+  object-fit: none !important;
+}
+html body .panel.panel > .grid-wrap {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 1920px !important;
+  height: 1080px !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  z-index: 3;
+  pointer-events: none;
+}
+html body .grid-hdr { display: none !important; }
+html body .tile-grid.tile-grid--cams { display: block !important; height: auto !important; }
+html body .tile-grid.tile-grid--cams > .tile { display: none !important; pointer-events: auto; }
+html body .tile-grid.tile-grid--cams > .tile.ainsley,
+html body .tile-grid.tile-grid--cams > .tile.hayes,
+html body .tile-grid.tile-grid--cams > .tile.harris,
+html body .tile-grid.tile-grid--cams > .tile.roster-dad {
+  display: block !important;
+  position: absolute !important;
+  width: 438px !important;
+  height: 420px !important;
+  min-width: 438px !important;
+  min-height: 420px !important;
+  max-height: none !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  grid-column: auto !important;
+}
+html body .tile.ainsley { left: 972px !important; top: 168px !important; }
+html body .tile.hayes { left: 1434px !important; top: 168px !important; }
+html body .tile.harris { left: 972px !important; top: 612px !important; }
+html body .tile.roster-dad { left: 1434px !important; top: 612px !important; }
+html body .tile.ainsley,
+html body .tile.hayes,
+html body .tile.harris {
+  background-repeat: no-repeat !important;
+  background-size: 438px 420px !important;
+  background-position: left top !important;
+}
+html body .tile.roster-dad {
+  background-color: #161410 !important;
+  background-image: none !important;
+}
+html body .panel.panel > .hub-upper {
+  position: absolute !important;
+  left: 48px !important;
+  top: 928px !important;
+  width: 900px !important;
+  height: 104px !important;
+  max-height: 104px !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  z-index: 4;
+}
+html body .panel.panel > .hub-upper .leaveby,
+html body .panel.panel > .hub-upper .sp-strip { display: none !important; }
+html body .panel.panel > #hub-cam-deck {
+  position: absolute !important;
+  left: 48px !important;
+  top: 168px !important;
+  width: 900px !important;
+  height: 128px !important;
+  margin: 0 !important;
+  z-index: 4;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(64px, 1fr));
+  gap: 16px;
+}
+html body .panel.panel > #hub-cam-deck[hidden],
+html body .panel.panel > #hub-lights-panel[hidden] { display: none !important; }
+html body .panel.panel > .who-up,
+html body .float-orbs { display: none !important; }
+html body .name,
+html body .name-accent { font-size: 48px !important; line-height: 1 !important; }
+html body .panel .hdr-date-kicker,
+html body .panel .hdr-date-time,
+html body .panel .hdr-date-dow,
+html body .panel .hdr-date-long,
+html body .tile-label,
+html body .tile-sub { font-size: 24px !important; line-height: 1.15 !important; }
+html body .hub-home,
+html body a.tile { touch-action: manipulation; }
+html body .pf-flag--pair { display: none !important; }
