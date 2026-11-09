@@ -14,6 +14,58 @@
   function nightOn() { return kid() !== "ainsley" /* Ainsley keeps her concert venue (Alfred 10/16) */ && !/[?&]night=0(&|$)/.test(location.search) && !!document.querySelector('script[src*="night/night-host.js"]'); }
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function kid() { return (document.body && document.body.getAttribute("data-kid")) || "hayes"; }
+  /* Public musts match sheet-chores.html. Same data-check ids, same words, same tap. */
+  var PUBLIC_MUSTS = {
+    ainsley: [
+      ["ain-bed", "Make bed · stage reset", "daily must · morning"],
+      ["ain-toys", "Room reset", "daily must · morning clean pass"],
+      ["ain-dishwasher", "Clean up · rinse · dishwasher", "daily must · after you eat"],
+      ["ain-empty", "Empty dishwasher", "daily must · when clean"],
+      ["ain-living", "Shoes & coats · closet / cubby / room", "daily must · never hallway"],
+      ["ain-bath", "Bathroom wipe", "weekly must · ask Dad to inspect"],
+      ["ain-laundry", "Laundry full cycle · her clothes", "weekly must · wash, dry, put away"],
+      ["ain-cubby", "Backpack + sports bag in garage cubby", "weekly must · ask Dad to inspect"],
+      ["ain-babysit", "Babysitting · optional add-on", "when Dad books you · not for jar", 1]
+    ],
+    hayes: [
+      ["hay-bed", "Make bed", "daily must · morning · pre-game"],
+      ["hay-backpack", "Backpack ready", "daily must · morning · loadout"],
+      ["hay-dishes", "Clean up · rinse · dishwasher", "daily must · after you eat"],
+      ["hay-empty", "Empty dishwasher", "daily must · when clean"],
+      ["hay-trash", "Trash out", "daily must · school-day"],
+      ["hay-postgame", "Post-game · gear rinsed · bag set", "daily must · after practice/game"],
+      ["hay-shower", "Shower · brush · ready for bed", "daily must · evening bedtime"],
+      ["hay-room", "Room reset", "weekly must · clear the drop zone"],
+      ["hay-shoes", "Shoes · closet / cubby / room", "weekly must · never hallway"],
+      ["hay-cubby", "Backpack + sports bag in garage cubby", "weekly must · ask Dad to inspect"]
+    ],
+    harris: [
+      ["har-bed", "Make bed", "daily must · morning · pre-game"],
+      ["har-backpack", "Backpack ready", "daily must · morning · loot ready"],
+      ["har-dishes", "Clean up · rinse · dishwasher", "daily must · after you eat"],
+      ["har-empty", "Empty dishwasher", "daily must · when clean"],
+      ["har-trash", "Trash out", "daily must · school-day"],
+      ["har-postgame", "Post-game · gear rinsed · bag set", "daily must · after practice/game"],
+      ["har-shower", "Shower · brush · ready for bed", "daily must · evening bedtime"],
+      ["har-toys", "Toys reset", "weekly must · ask Dad to inspect"],
+      ["har-shoes", "Shoes · closet / cubby / room", "weekly must · never hallway"],
+      ["har-cubby", "Backpack + sports bag in garage cubby", "weekly must · ask Dad to inspect"]
+    ]
+  };
+  function escMust(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function paintPublicMusts() {
+    var host = document.querySelector("[data-mount-quests]");
+    var rows = PUBLIC_MUSTS[kid()];
+    if (!host || !rows) return;
+    host.innerHTML = rows.map(function (row) {
+      var opt = row[3] ? ' data-optional="1"' : "";
+      return '<div class="chore open ' + kid() + '" data-check="' + escMust(row[0]) + '"' + opt + ' role="button" tabindex="0">' +
+        '<span class="ring"></span><div class="txt"><div class="what">' + escMust(row[1]) + '</div><div class="hint">' + escMust(row[2]) + "</div></div></div>";
+    }).join("");
+    var empty = document.querySelector("[data-kw-must-empty]");
+    if (empty) empty.remove();
+    if (global.HouseCheckoffs && HouseCheckoffs.rewire) { try { HouseCheckoffs.rewire(); } catch (e) {} }
+  }
   var REST_LINE = "Resting. Your list comes back soon.";
   function bindFeedRest(stage) {
     function showRest() {
@@ -60,7 +112,7 @@
         btn.insertAdjacentElement("afterend", note);
       }
       var host = document.querySelector ? document.querySelector("#sec-musts") : null;
-      if (host && !must) {
+      if (host && !must && !host.querySelector("[data-check]")) {
         must = document.createElement("p");
         must.className = "kw-must-empty";
         must.setAttribute("data-kw-must-empty", "");
@@ -72,6 +124,9 @@
     showRest = function () { showRestBound(); weekNote(true); };
     var hideRestBound = hideRest;
     hideRest = function () { hideRestBound(); weekNote(false); };
+    paintPublicMusts();
+    document.addEventListener("house:kids-data-missing", paintPublicMusts);
+    document.addEventListener("house:kids-data-ready", paintPublicMusts);
     if (!W || !W._data) showRest();
     else hideRest();
     return { show: showRest, hide: hideRest };

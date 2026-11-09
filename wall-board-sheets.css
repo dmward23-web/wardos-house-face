@@ -545,7 +545,64 @@
     background: rgba(8, 10, 14, 0.88) !important;
   }
   html:not(#hf-wall-off) body > .panel > .body:has(> .sec[aria-label="Quick taps"]) {
-    grid-template-rows: auto minmax(80px, auto) minmax(0, 1fr) !important;
+    grid-template-columns: 900px 900px !important;
+    grid-template-rows: 200px minmax(0, 1fr) 240px !important;
+    align-items: stretch !important;
+  }
+  html:not(#hf-wall-off) body > .panel > .body > .sec[aria-label="Boards"] { grid-column: 1 !important; grid-row: 1 !important; }
+  html:not(#hf-wall-off) body > .panel > .body > .today-day { grid-column: 1 !important; grid-row: 2 !important; }
+  html:not(#hf-wall-off) body > .panel > .body > .kids-col { grid-column: 2 !important; grid-row: 3 !important; }
+  html:not(#hf-wall-off) body > .panel > .body > .tap-rail {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 16px !important;
+  }
+  html:not(#hf-wall-off) body > .panel > .body > .sec[aria-label="Quick taps"] {
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-self: stretch !important;
+  }
+  html:not(#hf-wall-off) body > .panel .sec[aria-label="Quick taps"] .quick {
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    overflow: hidden !important;
+  }
+  html:not(#hf-wall-off) body > .panel .sec[aria-label="Quick taps"] .qtile {
+    flex: 1 1 0 !important;
+    min-height: 64px !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+  html:not(#hf-wall-off) body > .panel .tap-rail a {
+    background: #141820 !important;
+    color: #f4efe6 !important;
+    -webkit-text-fill-color: #f4efe6 !important;
+    opacity: 1 !important;
+    min-height: 64px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    font-size: 24px !important;
+    text-decoration: none !important;
+  }
+  html:not(#hf-wall-off) body > .panel .tap-rail a::after {
+    content: "Open";
+    font-size: 24px !important;
+    font-weight: 700;
   }
   html:not(#hf-wall-off) body > .panel .today-day:not(:has(li))::after {
     content: "Nothing on the calendar.";
@@ -554,4 +611,28 @@
     color: #f4efe6;
     padding: 16px;
   }
+  html:not(#hf-wall-off) body > .panel .kids-col {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .kids-col .kid-card {
+    flex: 1 1 0 !important;
+    min-height: 64px !important;
+    background: #141820 !important;
+    opacity: 1 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .where-card.dad .sub,
+  html:not(#hf-wall-off) body > .panel .where-card.dad .big {
+    color: #f4efe6 !important;
+    -webkit-text-fill-color: #f4efe6 !important;
+    opacity: 1 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .nav-us,
+  html:not(#hf-wall-off) body > .panel .mpills,
+  html:not(#hf-wall-off) body > .panel .mpill,
+  html:not(#hf-wall-off) body > .panel .streak-pill,
+  html:not(#hf-wall-off) body > .panel .bank.ainsley .star-label { display: none !important; }
 }
