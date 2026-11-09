@@ -656,7 +656,8 @@ body.kw-on #tapsync-badge { display: none !important; }
   /* No next item: drop the card and let Musts keep the list. A real next item stays, at 24px. */
   html.kw-root body.kw-on #sec-days:has(.consume-hero.empty),
   html.kw-root body.kw-on #sec-days:not(:has(.consume-hero-title)) { display: none !important; }
-  html.kw-root body.kw-on .panel .body:has(.consume-hero.empty) #sec-jar { grid-column: 1 / -1 !important; }
+  html.kw-root body.kw-on.kw-next-off #sec-days { display: none !important; }
+  html.kw-root body.kw-on.kw-next-off #sec-jar { grid-column: 1 / -1 !important; }
   html.kw-root body.kw-on #sec-days:not(:has(.consume-hero.empty)) > :not(.sec-hdr):not(.consume-hero) { display: none !important; }
   html.kw-root body.kw-on #sec-days .consume-hero,
   html.kw-root body.kw-on #sec-days .consume-hero-title,

@@ -2192,6 +2192,16 @@
         setTimeout(function () { peb.classList.remove("settle"); paintPebble(); }, 1200);
       });
     }
+    function fitNext() {
+      var hero = document.querySelector("[data-mount-consume-next]");
+      var title = hero && hero.querySelector(".consume-hero-title");
+      var words = title ? title.textContent.replace(/\s+/g, " ").trim() : "";
+      var live = !!(hero && !hero.classList.contains("empty") && words && words !== "Nothing timed next");
+      document.body.classList.toggle("kw-next-off", !live);
+    }
+    fitNext();
+    document.addEventListener("house:kids-data-ready", fitNext);
+    document.addEventListener("house:kid-rendered", fitNext);
     stage.querySelector("[data-kw-home]").addEventListener("click", function (ev) {
       ev.preventDefault();
       ev.stopPropagation();
