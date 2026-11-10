@@ -82,6 +82,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     document.documentElement.setAttribute("data-wardos-stage", "1");
     ensureHome(node);
     document.documentElement.style.setProperty("--wardos-s", String(s));
+    liftType();
     if (!document.getElementById("acer-type-floor")) {
       var floor = document.createElement("style");
       floor.id = "acer-type-floor";
@@ -143,6 +144,18 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
       stageScale: s,
       ct: stamp
     };
+  }
+
+  function liftType() {
+    var root = document.querySelector(".wardos-stage") || document.body;
+    var nodes = root.querySelectorAll("p, span, a, button, li, label, h1, h2, h3, h4, small, b, strong, div");
+    var i, el, px;
+    for (i = 0; i < nodes.length; i++) {
+      el = nodes[i];
+      if (el.closest && el.closest("canvas, script, style, svg")) continue;
+      px = parseFloat(getComputedStyle(el).fontSize) || 0;
+      if (px > 0 && px < 24) el.style.setProperty("font-size", "24px", "important");
+    }
   }
 
   function ensureHome(node) {

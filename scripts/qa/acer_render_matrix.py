@@ -73,7 +73,7 @@ PROBE = """() => {
     return true;
   };
   const small = [];
-  const hubish = /sheet-index|kid-ainsley|kid-hayes|kid-harris|sheet-chores|month[.]html/.test(location.pathname);
+  const hubish = true;
   if (hubish) {
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     let node;
@@ -92,6 +92,9 @@ PROBE = """() => {
   for (let i = 0; i < hits.length; i++) {
     for (let j = i + 1; j < hits.length; j++) {
       if (hits[i].contains(hits[j]) || hits[j].contains(hits[i])) continue;
+      const ta = (hits[i].textContent || '').replace(/\s+/g, '').trim();
+      const tb = (hits[j].textContent || '').replace(/\s+/g, '').trim();
+      if (!ta || !tb) continue;
       const a = hits[i].getBoundingClientRect();
       const b = hits[j].getBoundingClientRect();
       const x = Math.min(a.right, b.right) - Math.max(a.left, b.left);
@@ -119,8 +122,17 @@ PROBE = """() => {
       const scrollY = oy === 'auto' || oy === 'scroll';
       const cutX = ox === 'hidden' || ox === 'clip';
       const cutY = oy === 'hidden' || oy === 'clip';
-      if (scrollX && scrollY) return null;
-      if ((scrollY && !cutX) || (scrollX && !cutY)) return null;
+      if (scrollY || scrollX) {
+        const b = n.getBoundingClientRect();
+        const dy = scrollY ? Math.max(0, b.top - r.top, r.bottom - b.bottom) : 0;
+        const dx = scrollX ? Math.max(0, b.left - r.left, r.right - b.right) : 0;
+        const visibleY = Math.min(r.bottom, b.bottom) - Math.max(r.top, b.top);
+        const visibleX = Math.min(r.right, b.right) - Math.max(r.left, b.left);
+        if ((dy > 2 && visibleY > 2) || (dx > 2 && visibleX > 2)) {
+          return { t: (node.textContent || node.className || '').toString().trim().slice(0, 24), dx: Math.round(dx), dy: Math.round(dy) };
+        }
+        return null;
+      }
       if (cutX || cutY) {
         const b = n.getBoundingClientRect();
         const dx = cutX ? Math.max(0, b.left - r.left, r.right - b.right) : 0;
@@ -193,6 +205,12 @@ PROBE = """() => {
     const pos = getComputedStyle(item.el).position;
     if (!home && (pos === 'fixed' || pos === 'absolute' || /CLOCK OVERRIDE/.test(item.t))) stray.push(item.t);
   }
+  const homeEl = document.querySelector('a.wardos-home, button.kw-home.wardos-home, button.kw-home, a.hub-home');
+  let home = null;
+  if (homeEl && vis(homeEl)) {
+    const hr = homeEl.getBoundingClientRect();
+    home = { w: Math.round(hr.width), h: Math.round(hr.height), x: Math.round(hr.left), y: Math.round(hr.top), label: homeEl.getAttribute('aria-label') || '' };
+  }
   const touchSmall = [];
   for (const el of document.querySelectorAll('a.wardos-home, button.kw-home, a.hub-home, .day-tap, .kid-chip, .hub-launch a, .kw-offline')) {
     if (!vis(el) || touchSmall.length > 8) continue;
@@ -212,7 +230,7 @@ PROBE = """() => {
       if (x > 1 && y > 1) diagOverlap = true;
     }
   }
-  return { stageW: stage ? stage.offsetWidth : 0, stageH: stage ? stage.offsetHeight : 0, scale: Math.round(s * 1000) / 1000, innerWidth, innerHeight, dpr: devicePixelRatio, scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, scrollH: document.documentElement.scrollHeight, clientH: document.documentElement.clientHeight, banned, phase, pickup: text.indexOf('School pickup') >= 0, soccer: text.indexOf('Leave for soccer') >= 0, swim: text.indexOf('4:25 PM') >= 0, outdoor: text.indexOf('62') >= 0, indoor: text.indexOf('65') >= 0, hub: img ? img.getAttribute('src') : '', diag: !!diagEl, small: small.slice(0, 8), smallN: small.length, overlaps: overlaps.slice(0, 8), overlapN: overlaps.length, diagOverlap, lightsLaunch, clips: clips.slice(0, 8), clipN: clips.length, blanks, blankN: blanks.length, debugLeak, textHits: textHits.slice(0, 8), textN: textHits.length, overflow: overflow.slice(0, 8), overflowN: overflow.length, stray: stray.slice(0, 6), strayN: stray.length, touch: touchSmall.slice(0, 8), touchN: touchSmall.length };
+  return { stageW: stage ? stage.offsetWidth : 0, stageH: stage ? stage.offsetHeight : 0, scale: Math.round(s * 1000) / 1000, innerWidth, innerHeight, dpr: devicePixelRatio, scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, scrollH: document.documentElement.scrollHeight, clientH: document.documentElement.clientHeight, banned, phase, pickup: text.indexOf('School pickup') >= 0, soccer: text.indexOf('Leave for soccer') >= 0, swim: text.indexOf('4:25 PM') >= 0, outdoor: text.indexOf('62') >= 0, indoor: text.indexOf('65') >= 0, hub: img ? img.getAttribute('src') : '', diag: !!diagEl, small: small.slice(0, 8), smallN: small.length, overlaps: overlaps.slice(0, 8), overlapN: overlaps.length, diagOverlap, lightsLaunch, clips: clips.slice(0, 8), clipN: clips.length, blanks, blankN: blanks.length, debugLeak, textHits: textHits.slice(0, 8), textN: textHits.length, overflow: overflow.slice(0, 8), overflowN: overflow.length, stray: stray.slice(0, 6), strayN: stray.length, touch: touchSmall.slice(0, 8), touchN: touchSmall.length, home };
 }"""
 
 
@@ -225,6 +243,7 @@ def parse_viewport(raw):
 def with_query(url, clock, diag):
     parts = urlparse(url)
     q = dict(parse_qsl(parts.query, keep_blank_values=True))
+    q["audit"] = "1"
     if clock and clock != "real":
         q["now"] = clock
         q["freeze"] = "1"
@@ -370,12 +389,15 @@ def main():
                                 fails.append(name + " lights-launch")
                             if diag and info.get("diagOverlap"):
                                 fails.append(name + " diag-overlap")
-                        watch = ("sheet-index.html", "kid-ainsley.html", "kid-hayes.html", "kid-harris.html", "sheet-chores.html", "month.html", "sheet-lights.html", "sheet-google-home.html")
-                        if args.assert_layout and route_name in ("sheet-index.html", "kid-ainsley.html", "kid-hayes.html", "kid-harris.html", "sheet-chores.html", "month.html"):
+                        watch = tuple(routes)
+                        if args.assert_layout:
                             if info.get("smallN"):
                                 fails.append(name + " small-text")
                             if info.get("overlapN"):
                                 fails.append(name + " overlap")
+                            home = info.get("home") or {}
+                            if not home or home.get("w", 0) < 64 or home.get("h", 0) < 64:
+                                fails.append(name + " home")
                         if args.assert_layout and route_name in watch:
                             if info.get("clipN"):
                                 fails.append(name + " clipped")

@@ -38,7 +38,11 @@
     var q = location.search.replace(/[?&]fresh=\d+/, "").replace(/^\?/, "");
     location.replace(location.pathname + "?" + (q ? q + "&" : "") + "fresh=" + Date.now() + location.hash);
   }
+  function auditOn() {
+    try { return /(?:\?|&)audit=1(?:&|$)/.test(location.search || ""); } catch (e) { return false; }
+  }
   function check() {
+    if (auditOn()) return;
     var d = today();
     if (loadDay && d && d !== loadDay) { reloadFresh(); return; }
     if (running === null) running = mine();
@@ -93,13 +97,14 @@
     return Math.max(1000, Math.min(ms, 25 * 3600 * 1000));
   }
   function armMidnight() {
+    if (auditOn()) return;
     if (midT) clearTimeout(midT);
     midT = setTimeout(function () { midT = 0; check(); armMidnight(); }, msToMidnight());
   }
   armMidnight();
   document.addEventListener("visibilitychange", function () { if (!document.hidden) armMidnight(); });
   window.addEventListener("pageshow", function () { armMidnight(); });
-  setInterval(check, 30 * 1000); /* DAYROLL1 · 30 s (JARTAP1, Atlas 11:51 PM) so the day flips well inside a minute of midnight; the stamp fetch is one no-store GET */
+  if (!auditOn()) setInterval(check, 30 * 1000); /* DAYROLL1 · 30 s so the day flips inside a minute of Chicago midnight */
   var root = typeof globalThis !== "undefined" ? globalThis : window;
   root.HouseFresh = { msToMidnight: msToMidnight, ctMidnightMs: ctMidnightMs };
 })();

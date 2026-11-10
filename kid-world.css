@@ -766,8 +766,8 @@ body.kw-on #tapsync-badge { display: none !important; }
     display: flex !important;
     flex-direction: column !important;
     gap: 0 !important;
-    height: round(down, 100%, 104px) !important;
-    max-height: round(down, 100%, 104px) !important;
+    height: 416px !important;
+    max-height: 416px !important;
     overflow-x: hidden !important;
     overflow-y: scroll !important;
     scroll-snap-type: y mandatory;
@@ -804,6 +804,7 @@ body.kw-on #tapsync-badge { display: none !important; }
     display: flex !important;
     align-items: center !important;
     min-height: 88px !important;
+    height: 88px !important;
     width: 100% !important;
     margin: 0 0 12px !important;
     padding: 8px 12px !important;
