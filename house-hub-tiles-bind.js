@@ -214,6 +214,15 @@
     else { grid.setAttribute("hidden", ""); grid.style.setProperty("display", "none", "important"); }
   }
 
+  /* SUNHOME1 · a kid tile with no live week must not keep a baked Tuesday. Resting is honest. A row already bound to today's feed stays. */
+  function restKidTiles() {
+    ["ainsley", "hayes", "harris"].forEach(function (id) {
+      var el = micro(".tile[data-kid-seed='" + id + "']");
+      if (!el || el.getAttribute("data-bound") === "QARELAY1") return;
+      setMicro(el, row("LIST", "List resting", "", ""));
+    });
+  }
+
   function load() {
     if (typeof fetch !== "function") return;
     fetch("data/cal-live.json?t=" + Date.now(), { cache: "no-store" })
@@ -225,8 +234,8 @@
     (typeof window !== "undefined" && window.AwayFilter && window.AwayFilter.ready ? window.AwayFilter.ready() : Promise.resolve()).then(function () {   /* AWAYONE1 · away state known before the first paint */
     fetch("kids-week.json?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (w) { var law = typeof window !== "undefined" && window.HouseFaceLaw; if (w && law) law.cleanKidsWeek(w); if (w) paint(w); }) /* LIVELAW1 */
-      .catch(function () { /* keep static rows */ });
+      .then(function (w) { var law = typeof window !== "undefined" && window.HouseFaceLaw; if (w && law) law.cleanKidsWeek(w); if (w) paint(w); else restKidTiles(); }) /* LIVELAW1 */
+      .catch(function () { restKidTiles(); });
     });
       });
   }

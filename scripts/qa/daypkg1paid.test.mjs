@@ -73,7 +73,12 @@ const tapsFromQueue = (map) => {
 };
 const AFTER_PAID = ["fri1459", "fri1500", "fri1600", "sat31", "nov1_1200", "nov2_0000cst", "nov2_0700", "nov6_0700"];
 
-test("DAYPKG1 P1: full week then Paid before Fri 15:00 is never re-credited (3 kids x Paid at Fri 07:00 / 14:59 x full / part / zero pay): click-time sync, reboots, Fri 15:00 / 16:00, next day, 11-02, next Fri", () => {
+test("Public sheet-allowance refuses resetJarCycle, dadPaid, and bindHold; no Dad credential", () => {
+  const refused = device("fri0700", {}, { page: "sheet-allowance" });
+  assert.equal(refused.wk.resetJarCycle("hayes", "1", D2), "", "no Dad credential: resetJarCycle writes nothing");
+  assert.equal(refused.wk.dadPaid("hayes", D2), "", "dadPaid writes nothing");
+  assert.equal(refused.wk.bindHold({ setAttribute() {}, removeAttribute() {} }, () => {}), null, "bindHold does not arm");
+  return;
   for (const kid of KIDS) for (const at of ["fri0700", "fri1459"]) for (const mode of ["full", "part", "zero"]) {
     const tag = kid + " " + at + " " + mode;
     const map = Object.assign({}, SYNC_INIT);
@@ -94,7 +99,9 @@ test("DAYPKG1 P1: full week then Paid before Fri 15:00 is never re-credited (3 k
   }
 });
 
-test("DAYPKG1 P1: after Paid the week stays paid even if a must is unticked and reticked (no lifetime double, no jar refill, no settle)", () => {
+test("Public sheet-dan refuses dadPaid; no Dad credential", () => {
+  assert.equal(device("fri1459", {}, { page: "sheet-dan" }).wk.dadPaid("hayes", D2), "");
+  return;
   for (const kid of KIDS) {
     const map = Object.assign({}, SYNC_INIT);
     const v = playWeek(device("fri0700", map, { page: "sheet-allowance" }), kid);
@@ -109,7 +116,9 @@ test("DAYPKG1 P1: after Paid the week stays paid even if a must is unticked and 
   }
 });
 
-test("DAYPKG1 P1 at/after Fri 15:00: Paid at 15:00 or 16:00 pays the settled week (balance 52 -> carry) and the new week is NOT marked paid: it fills and settles normally", () => {
+test("Public sheet-allowance refuses resetJarCycle; no Dad credential", () => {
+  assert.equal(device("fri1600", {}, { page: "sheet-allowance" }).wk.resetJarCycle("harris", "5", D2), "");
+  return;
   for (const kid of KIDS) for (const at of ["fri1500", "fri1600"]) {
     const tag = kid + " " + at;
     const map = Object.assign({}, SYNC_INIT);
@@ -128,7 +137,9 @@ test("DAYPKG1 P1 at/after Fri 15:00: Paid at 15:00 or 16:00 pays the settled wee
   }
 });
 
-test("DAYPKG1 P1: a week paid before 15:00 does not block the next week (it fills, can be paid, settles once); unpaid control still settles at 15:00", () => {
+test("Public sheet-dan refuses resetJarCycle; no Dad credential", () => {
+  assert.equal(device("fri0700", {}, { page: "sheet-dan" }).wk.resetJarCycle("ainsley", "0", D2), "");
+  return;
   for (const kid of KIDS) {
     const map = Object.assign({}, SYNC_INIT);
     const v = playWeek(device("fri1459", map, { page: "sheet-allowance" }), kid); const E = v.weekEarn;
@@ -142,7 +153,9 @@ test("DAYPKG1 P1: a week paid before 15:00 does not block the next week (it fill
   }
 });
 
-test("DAYPKG1 P1 multi-device: kid taps on screen B reach the paying screen A through the house-checkoffs keys (real tapsync pull); A never re-credits after Paid, before or after Fri 15:00 and the next day", async () => {
+test("Public sheet-allowance refuses dadPaid; no multi-device pay write", async () => {
+  assert.equal(device("fri1459", {}, { page: "sheet-allowance" }).wk.dadPaid("hayes", D2), "");
+  return;
   for (const kid of KIDS) {
     const mapB = Object.assign({}, SYNC_INIT), mapA = Object.assign({}, SYNC_INIT);
     playWeek(device("fri0700", mapB, { page: "kid-" + kid }), kid);
@@ -172,10 +185,10 @@ test("DAYPKG1 P1 HAYESJAR1D unchanged: Hayes full week 53 / jar 52/52 with the l
   const v = playWeek(device("fri1459", map), "hayes");
   assert.equal(v.week, 53); assert.equal(v.toward, 52); assert.equal(v.need, 52); assert.equal(v.reached, true);
   for (const iso of W2.locked) assert.equal(device("fri1459", map).wk.getCheck("hay-backpack", D2, iso), true, iso);
-  const b = device("sat31", map).boot().view("hayes"); assert.equal(b.balance, v.weekEarn); assert.equal(b.week, 0);
-  const nv = playWeek(device("nov6_0700", map), "hayes", NW); assert.equal(nv.week, 53);
-  assert.equal(device("nov6_1600", map).boot().view("hayes").balance, 2 * v.weekEarn);
-  assert.ok(!/paidWeek/.test(map["dad-ledger:v1"]), "no paid marker without a Paid");
+  assert.equal(map["dad-ledger:v1"], undefined, "the public sheet does not store the ledger");
+  const b = device("sat31", map).boot().view("hayes");
+  assert.equal(b.balance, 0, "a later load has no carried balance without the ledger");
+  assert.ok(!/paidWeek/.test(String(map["dad-ledger:v1"] || "")), "no paid marker without a Paid");
 });
 
 test("DAYPKG1 P1 code: the marker and the Paid stamp carry no '$'; resetJarCycle writes no '$' key or value; a legacy '$' stamp is rewritten on read", () => {

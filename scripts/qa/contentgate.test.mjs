@@ -98,7 +98,7 @@ test("SEATLAW1: render-time rule strips section / row / seat from every string o
 
 test("SEATLAW1 + SCHOOLWORD1: the Python writer (text_law.py) gives the same words", () => {
   const strs = FIX.events.map((e) => e.summary);
-  const r = spawnSync("python3", [path.join(ROOT, "scripts/text_law.py")], { input: JSON.stringify(strs), encoding: "utf8", env: { ...process.env, WARDOS_NAMES: "partner=Zedna;coparent=Yolanthe" } });
+  const r = spawnSync("python3", [path.join(ROOT, "scripts/text_law.py")], { input: JSON.stringify(strs), encoding: "utf8", timeout: 20000, env: { ...process.env, WARDOS_NAMES: "partner=Zedna;coparent=Yolanthe" } });
   assert.equal(r.status, 0, r.stderr);
   assert.deepEqual(JSON.parse(r.stdout), ["Mudcats @ Riverhawks, Game 2", "Concert", "Titans game · 3:25", "Ainsley · school picture day", "Row your boat sing-along"]);
 });

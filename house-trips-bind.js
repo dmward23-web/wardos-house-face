@@ -28,7 +28,7 @@
     if (hero) {
       var t = hero.querySelector(".hero-title"), s = hero.querySelector(".hero-sub");
       if (r[0]) { t.textContent = dayLab(r[0].iso) + " \u00b7 " + r[0].l; s.textContent = ""; }
-      else { t.textContent = "No trips on the calendar"; /* WGQUIET1 */ s.textContent = ""; }
+      else { t.textContent = "Nothing planned yet."; /* WGQUIET1 */ s.textContent = ""; }
     }
     if (list) {
       list.innerHTML = r.map(function (x, i) {

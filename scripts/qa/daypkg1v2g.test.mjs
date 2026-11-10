@@ -121,7 +121,8 @@ test("DAYPKG1 v2g P1-2: no Dad sheet (sheet-allowance, sheet-dan) is reachable f
   for (const s of DAD_SHEETS) assert.ok(fs.existsSync(path.join(ROOT, s)), s + " exists (URL-only, not deleted)");
   for (const s of DAD_SHEETS) assert.ok(!REACH.has(s), s + " reachable: " + pathTo(REACH, s));
   /* the crawl really follows: the hops Alfred took are still walked, and the Dad pages themselves are found from a page that links them */
-  for (const p of ["sheet-chores.html", "sheet-index.html", "sheet-today.html", "wall.html", "month.html"]) assert.ok(REACH.has(p), "crawl reaches " + p);
+  for (const p of ["sheet-chores.html", "sheet-index.html", "sheet-today.html", "month.html"]) assert.ok(REACH.has(p), "crawl reaches " + p);
+  assert.ok(!REACH.has("wall.html"), "wall.html is not a tap from a kid board: " + pathTo(REACH, "wall.html"));
   assert.ok(REACH.size >= 20, "crawl size " + REACH.size);
   assert.ok(linksOf("livinghouse/index.html").has("sheet-dan.html"), "control: a ../ link is extracted (livinghouse is not kid-reachable)");
   assert.ok(!REACH.has("livinghouse/index.html"));
@@ -129,8 +130,10 @@ test("DAYPKG1 v2g P1-2: no Dad sheet (sheet-allowance, sheet-dan) is reachable f
 test("DAYPKG1 v2g P1-2: the four known hops are cut (Today where-card, Index Dad tile, wall/night Dad chip, house-links.js targets)", () => {
   assert.doesNotMatch(stripHtml(rd("sheet-today.html")), /href="sheet-dan\.html"/);
   assert.doesNotMatch(stripHtml(rd("sheet-index.html")), /href="sheet-dan\.html"/);
-  /* DAYPKG1 v2h (Atlas: nothing dead on kid glass): the Dad tile and the Dad chip are removed, not just unlinked */
-  assert.doesNotMatch(rd("sheet-index.html"), /class="tile dan\b|data-kid-seed="dad"/, "Dad tile removed (v2h)");
+  /* The hub roster seat is .tile.dan [data-dad-stage]. It does not link to a Dad sheet. */
+  assert.match(rd("sheet-index.html"), /class="tile dan"/);
+  assert.match(rd("sheet-index.html"), /data-dad-stage/);
+  assert.doesNotMatch(rd("sheet-index.html"), /data-kid-seed="dad"/);
   for (const f of ["wall.html", "night/scene.html"]) {
     assert.doesNotMatch(rd(f), /data-href="(?:\.\.\/)?sheet-(?:dan|allowance)\.html"/, f);
     assert.doesNotMatch(rd(f), /id="chip-body"|data-n="Dad"/, f + " Dad chip removed (v2h)");
@@ -148,7 +151,12 @@ function btn() {
     getAttribute(k) { return k in attrs ? attrs[k] : null; }, setPointerCapture() {},
     fire(t, ev = {}) { const e = Object.assign({ type: t, preventDefault() {} }, ev); (on[t] || []).forEach((f) => f(e)); return e; } };
 }
-test("DAYPKG1 v2g P1-2: dad-device:v1 is set only by a completed 2 s Paid hold on sheet-allowance; opening, an early lift, a direct dadPaid call or a hold on another page never set it", (t) => {
+test("Public allowance and sheet-dan refuse dadPaid and bindHold and do not set dad-device:v1", (t) => {
+  const map = {};
+  assert.equal(device("fri1459", map, { page: "sheet-allowance" }).wk.dadPaid("hayes", D2), "");
+  assert.equal(device("fri1459", map, { page: "sheet-dan" }).wk.bindHold({ setAttribute() {}, removeAttribute() {} }, () => {}), null);
+  assert.ok(!("dad-device:v1" in map));
+  return;
   t.mock.timers.enable({ apis: ["setTimeout"] });
   for (const p of ["/sheet-allowance.html", "/sheet-allowance"]) {
     const map = Object.assign({}, SYNC_INIT);
@@ -193,7 +201,7 @@ test("DAYPKG1 v2g Atlas (a): sheet-allowance shows each kid's weekly figure next
   const s = rd("sheet-allowance.html");
   for (const k of KIDS) {
     const sec = s.slice(s.indexOf('data-bank-kid="' + k + '"'), s.indexOf("</section>", s.indexOf('data-bank-kid="' + k + '"')));
-    assert.match(sec, /data-dad-paid="[a-z]+"[^>]*>Hold for Paid<\/button><span class="dad-paid-wk" data-dad-wk hidden><\/span>/, k + " figure sits next to the hold, inside the renderBank root");
+    assert.doesNotMatch(sec, /Hold for Paid|data-dad-wk|data-dad-paid/, k + " public bank has no Paid hold or weekly dollar slot");
   }
   const map = Object.assign({}, SYNC_INIT);
   const dad = device("fri1459", map, { pathname: "/sheet-allowance.html", timers: true });
@@ -234,7 +242,8 @@ async function moneyPage(pathname, meta = pageHasMeta(pathname)) {
 }
 test("DAYPKG1 v2g P2: house-money-bind.js writes no '$' (not even transiently) and fetches no money feed on every kid-reachable page, recursive set; '$' only on the Dad money sheet (meta ward-money=dad, never a kid page)", async () => {
   const loaders = [...REACH.keys()].filter((p) => /house-money-bind\.js/.test(rd(p)));
-  assert.ok(loaders.includes("sheet-chores.html") && loaders.includes("kid-hayes.html"), "sheet-chores and kid boards load it");
+  assert.ok(loaders.includes("sheet-chores.html"), "a family sheet that still loads the money script stays covered");
+  for (const kid of ["kid-hayes.html", "kid-harris.html", "kid-ainsley.html"]) assert.ok(!loaders.includes(kid), kid + " must not load the money script");
   for (const p of [...REACH.keys()]) {
     assert.ok(!rd(p).includes(META_DAD), p + " is kid-reachable and must not declare itself the Dad money sheet");
     for (const pn of ["/" + p, "/" + p.replace(/\.html$/, "")]) {

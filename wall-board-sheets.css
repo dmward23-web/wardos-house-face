@@ -1,0 +1,892 @@
+/* 1920x1080 wall only. Chores, allowance, month, and Today.
+   Margin 48. 12 columns of 130. Gutter 24. Header 1824x96 at 48,48.
+   Body 1824x864 from y168. Type at least 24px. Targets at least 64px, 16px apart.
+   A desk or phone viewport does not match this query. */
+@media (width: 1920px) and (height: 1080px) {
+  html:not(#hf-scroll-off):not(#hf-scroll-off),
+  html:not(#hf-scroll-off):not(#hf-scroll-off) > body {
+    width: 1920px !important;
+    height: 1080px !important;
+    min-height: 0 !important;
+    max-height: 1080px !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+  }
+  html body .panel {
+    position: relative !important;
+    width: 1920px !important;
+    height: 1080px !important;
+    min-height: 0 !important;
+    max-height: 1080px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: block !important;
+    box-sizing: border-box !important;
+  }
+  html body .panel > header.hdr {
+    position: absolute !important;
+    left: 48px !important;
+    top: 48px !important;
+    width: 1824px !important;
+    height: 96px !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    z-index: 5;
+    box-sizing: border-box !important;
+    background: rgba(8, 10, 14, 0.82) !important;
+    border-radius: 16px !important;
+    color: #f4efe6 !important;
+  }
+  html body header .live-clock,
+  html body header .mute-btn,
+  html body header .nav-us,
+  html body header .hdr-right-tools,
+  html body header button,
+  html body header a {
+    font-size: 24px !important;
+    line-height: 1.15 !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+    color: #f4efe6 !important;
+  }
+  html body footer.ftr,
+  html body .wf-kidtabs,
+  html body .tap-hint,
+  html body .desk-note,
+  html body .g2-grow-row { display: none !important; }
+
+  /* Chores: three columns, kid chips in the header, rows share the 864. */
+  html body .cheer {
+    position: absolute !important;
+    left: 280px !important;
+    top: 48px !important;
+    width: 860px !important;
+    height: 96px !important;
+    margin: 0 !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    z-index: 5;
+    pointer-events: none;
+  }
+  html body .cheer-label,
+  html body .cheer-title,
+  html body .cheer-sub,
+  html body .cheer-badge {
+    font-size: 24px !important;
+    line-height: 1.15 !important;
+    color: #f4efe6 !important;
+  }
+  html body .panel > .body:has(> .col),
+  html body .panel > .body:has(> .bank) {
+    position: absolute !important;
+    left: 48px !important;
+    top: 168px !important;
+    width: 1824px !important;
+    height: 864px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    grid-template-columns: 592px 592px 592px !important;
+    column-gap: 24px !important;
+    row-gap: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+  html body #kid-jars { display: none !important; }
+  html body .col {
+    position: relative !important;
+    width: 592px !important;
+    height: 864px !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    background: rgba(12, 14, 18, 0.9) !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+  }
+  html body .col-hdr {
+    position: fixed !important;
+    top: 64px !important;
+    height: 64px !important;
+    z-index: 5;
+  }
+  html body .body > .col:nth-of-type(1) .col-hdr { left: 300px !important; }
+  html body .body > .col:nth-of-type(2) .col-hdr { left: -140px !important; }
+  html body .body > .col:nth-of-type(3) .col-hdr { left: -560px !important; }
+  html body .kid-chip,
+  html body .kchip,
+  html body .link-cta,
+  html body .ftr-chip,
+  html body .mbtn,
+  html body .nav-us {
+    min-width: 64px !important;
+    min-height: 64px !important;
+    font-size: 24px !important;
+    line-height: 1.15 !important;
+    box-sizing: border-box !important;
+  }
+  html body .chore-list {
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  html body .chore {
+    flex: 1 1 0 !important;
+    min-height: 64px !important;
+    margin: 0 !important;
+    padding: 4px 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+  html body .chore .what,
+  html body .chore .hint,
+  html body .chore .txt {
+    font-size: 24px !important;
+    line-height: 1.05 !important;
+    color: #f4efe6 !important;
+  }
+  html body .chore .ring {
+    width: 40px !important;
+    height: 40px !important;
+    flex: none !important;
+  }
+
+  /* Allowance: three jars across the body, text stays 24px. */
+  html body .link-banner {
+    position: absolute !important;
+    left: 360px !important;
+    top: 48px !important;
+    width: 1000px !important;
+    height: 96px !important;
+    margin: 0 !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    z-index: 5;
+    pointer-events: none;
+  }
+  html body .link-label,
+  html body .link-title,
+  html body .link-sub {
+    font-size: 24px !important;
+    line-height: 1.15 !important;
+    color: #f4efe6 !important;
+  }
+  html body .link-cta { pointer-events: auto !important; }
+  html body .bank {
+    width: 592px !important;
+    height: 864px !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 16px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    overflow: hidden !important;
+    background: rgba(12, 14, 18, 0.9) !important;
+    color: #f4efe6 !important;
+    border-radius: 16px !important;
+  }
+  html body .bank .star-big,
+  html body .bank .star-label,
+  html body .bank .jar-state,
+  html body .bank .feed-title,
+  html body .bank .feed-row,
+  html body .bank .when,
+  html body .bank .cheer-bar,
+  html body .bank .streak-pill,
+  html body .saves-bar,
+  html body .saves-bar-text {
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+    color: #f4efe6 !important;
+  }
+  html body .feed { display: flex !important; flex-direction: column !important; gap: 16px !important; min-height: 0 !important; }
+  html body .feed-row { min-height: 64px !important; display: flex !important; align-items: center !important; }
+  html body .saves-plus {
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    font-size: 28px !important;
+  }
+  html body .saves-host { margin: 0 !important; }
+  html body .saves-face {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    margin: 0 !important;
+  }
+  html body .saves-bar {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    flex: 1 1 auto !important;
+  }
+
+  /* Month: the calendar fills the body. */
+  html body .leaveby { display: none !important; }
+  html body .month-wrap {
+    position: absolute !important;
+    left: 48px !important;
+    top: 168px !important;
+    width: 1824px !important;
+    height: 864px !important;
+    margin: 0 !important;
+    padding: 16px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    overflow: hidden !important;
+    background: rgba(12, 14, 18, 0.9) !important;
+    border-radius: 16px !important;
+    color: #f4efe6 !important;
+  }
+  html body .month-title,
+  html body [data-month-title],
+  html body .month-range,
+  html body .dow-h,
+  html body .legend,
+  html body .leg,
+  html body .banner,
+  html body .day .dom,
+  html body .day-tag,
+  html body .mpills {
+    font-size: 24px !important;
+    line-height: 1.15 !important;
+    color: #f4efe6 !important;
+  }
+  html body .day-empty { display: none !important; }
+  html body .mbtn {
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+    font-size: 28px !important;
+  }
+  html body .month-grid {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+    overflow: hidden !important;
+  }
+  html body .month-grid .day {
+    min-height: 64px !important;
+    min-width: 64px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  /* Today: two columns of the usable grid. */
+  html body .gm,
+  html body .wx-card {
+    display: none !important;
+  }
+  html body .panel > .body:has(> .sec[aria-label="Quick taps"]) {
+    position: absolute !important;
+    left: 48px !important;
+    top: 168px !important;
+    width: 1824px !important;
+    height: 864px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    grid-template-columns: 900px 900px !important;
+    grid-template-rows: 200px minmax(0, 1fr) 240px !important;
+    row-gap: 16px !important;
+    column-gap: 24px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+  html body .panel > .body > .sec[aria-label="Boards"] {
+    grid-column: 1; grid-row: 1;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+  }
+  html body .where-card {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 12px 16px !important;
+  }
+  html body .chip-row {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 16px !important;
+    margin: 0 !important;
+  }
+  html body .where-card .sub,
+  html body .where-card .big,
+  html body .where-card .lbl {
+    overflow: hidden !important;
+    white-space: normal !important;
+    max-width: 100% !important;
+  }
+  html body header .hub-home,
+  html body header .hub-home img {
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+    flex: none !important;
+  }
+  html body .panel > .body > .today-day { grid-column: 1; grid-row: 2; }
+  html body .panel > .body > .kids-col { grid-column: 1; grid-row: 3; display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 16px !important; }
+  html body .panel > .body > .tap-rail { grid-column: 2; grid-row: 3; display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 16px !important; }
+  html body .panel > .body > .sec[aria-label="Quick taps"] { grid-column: 2; grid-row: 1 / span 2; }
+  html body .where-card,
+  html body .kid-card,
+  html body .qtile,
+  html body .tap-rail a,
+  html body .today-day {
+    min-height: 64px !important;
+    font-size: 24px !important;
+    box-sizing: border-box !important;
+  }
+  html body .where-card .lbl,
+  html body .where-card .big,
+  html body .where-card .sub,
+  html body .kid-name,
+  html body .kid-hint,
+  html body .kid-tap,
+  html body .qtile-label,
+  html body .qtile-sub,
+  html body .qtile-tap,
+  html body .sec-title,
+  html body .sec-meta,
+  html body .gm-label,
+  html body .gm-title,
+  html body .tap-rail a {
+    font-size: 24px !important;
+    line-height: 1.15 !important;
+    color: #f4efe6 !important;
+  }
+  html body .sec,
+  html body .where-card,
+  html body .kid-card,
+  html body .qtile,
+  html body .today-day,
+  html body .tap-rail a {
+    background: rgba(12, 14, 18, 0.9) !important;
+    border-radius: 16px !important;
+    color: #f4efe6 !important;
+  }
+  html body .quick {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    height: 100% !important;
+  }
+  html body .qtile { flex: 1 1 0 !important; min-height: 64px !important; display: flex !important; align-items: center !important; gap: 16px !important; padding: 12px 16px !important; }
+  html body .kid-card { min-height: 64px !important; display: flex !important; align-items: center !important; padding: 8px 12px !important; }
+
+  /* Beat house-wall-frame's 17/22px floor and its display:contents columns. */
+  html:not(#hf-wall-off) body > .panel > .body:has(> .col),
+  html:not(#hf-wall-off) body > .panel > .body:has(> .bank),
+  html:not(#hf-wall-off) body > .panel > .body:has(> .sec[aria-label="Quick taps"]) {
+    display: grid !important;
+    height: 864px !important;
+    width: 1824px !important;
+  }
+  html:not(#hf-wall-off) body > .panel > .body:has(> .col),
+  html:not(#hf-wall-off) body > .panel > .body:has(> .bank) {
+    grid-template-columns: 592px 592px 592px !important;
+    column-gap: 24px !important;
+  }
+  html:not(#hf-wall-off) body > .panel .col,
+  html:not(#hf-wall-off) body > .panel .bank,
+  html:not(#hf-wall-off) body > .panel .chore-list,
+  html:not(#hf-wall-off) body > .panel .month-wrap {
+    display: flex !important;
+    height: 864px !important;
+    width: 592px !important;
+    max-width: none !important;
+  }
+  html:not(#hf-wall-off) body > .panel .month-wrap { width: 1824px !important; }
+  html:not(#hf-wall-off) body > .panel :is(.cheer-label, .cheer-title, .cheer-sub, .cheer-badge, .link-label, .link-title, .link-sub,
+    .what, .hint, .feed-row, .feed-title, .star-label, .star-big, .jar-state, .when, .cheer-bar, .streak-pill,
+    .nav-us, .kid-chip, .kchip, .kid-tap, .kid-name, .kid-hint, .lbl, .big, .sub, .qtile-label, .qtile-sub, .qtile-tap,
+    .sec-title, .sec-meta, .dow-h, .legend, .leg, .month-range, .banner, .mpill, .day .dom, .day-tag, .day .blk,
+    .mute-btn, .saves-bar, .saves-bar-text, .gm-label, .gm-title) {
+    font-size: 24px !important;
+    line-height: 1.15 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .hdr.hdr--clockfirst .mute-btn,
+  html:not(#hf-wall-off) body > .panel .kid-chip,
+  html:not(#hf-wall-off) body > .panel .kchip,
+  html:not(#hf-wall-off) body > .panel .mbtn,
+  html:not(#hf-wall-off) body > .panel .nav-us,
+  html:not(#hf-wall-off) body > .panel .chore,
+  html:not(#hf-wall-off) body > .panel .feed-row,
+  html:not(#hf-wall-off) body > .panel .day,
+  html:not(#hf-wall-off) body > .panel .qtile,
+  html:not(#hf-wall-off) body > .panel .kid-card,
+  html:not(#hf-wall-off) body > .panel .saves-plus {
+    min-width: 64px !important;
+    min-height: 64px !important;
+  }
+  html:not(#hf-wall-off) body > .panel .hdr.hdr--clockfirst .mute-btn {
+    min-height: 64px !important;
+    height: 64px !important;
+    font-size: 24px !important;
+  }
+  html:not(#hf-wall-off) body > .panel .col > .chore-list {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 864px !important;
+    flex: 1 1 auto !important;
+    gap: 16px !important;
+  }
+  html:not(#hf-wall-off) body > .panel .chore-list > .chore {
+    flex: 1 1 0 !important;
+    min-height: 64px !important;
+    height: auto !important;
+  }
+  html:not(#hf-wall-off) body > .panel .wf-kidtabs { display: none !important; }
+  html:not(#hf-wall-off):not(#hf-scroll-off) body > .panel {
+    width: 1920px !important;
+    max-width: none !important;
+    margin: 0 !important;
+    column-count: 1 !important;
+    column-gap: 0 !important;
+    height: 1080px !important;
+    min-height: 0 !important;
+    max-height: 1080px !important;
+    padding: 0 !important;
+    left: 0 !important;
+    overflow: hidden !important;
+  }
+  html:not(#hf-wall-off):not(#hf-scroll-off) body > .panel :is(a, button, .kid-chip, .kchip, .nav-us, .mpill, .mute-btn, .what, .hint, .dot, .ring, .dom, .dow-h, .day-tag, .blk, .feed-row, .feed-title, .star-label, .star-big, .jar-state, .when, .cheer-bar, .saves-bar, .saves-bar-text, .lbl, .big, .sub, .d, .kid-name, .kid-hint, .kid-tap, .qtile-label, .qtile-sub, .qtile-tap, .sec-title, .legend, .leg, .month-range, .banner, .cheer-label, .cheer-title, .cheer-badge, .link-label, .link-title, .link-sub) {
+    font-size: 24px !important;
+    line-height: 1.15 !important;
+  }
+  html:not(#hf-wall-off):not(#hf-scroll-off) body > .panel :is(a, button, .mpill, .saves-bar, .saves-plus, .chore, .day, .feed-row, .kid-card, .qtile, .kid-chip, .kchip) {
+    min-width: 64px !important;
+    min-height: 64px !important;
+  }
+  html:not(#hf-wall-off) body > .panel :is(.body, .col) {
+    display: flex !important;
+  }
+  html:not(#hf-wall-off) body > .panel > .body:has(> .col),
+  html:not(#hf-wall-off) body > .panel > .body:has(> .bank),
+  html:not(#hf-wall-off) body > .panel > .body:has(> .sec[aria-label="Quick taps"]) {
+    display: grid !important;
+  }
+  html:not(#hf-wall-off) body > .panel .body > section.col.wf-hide {
+    display: flex !important;
+  }
+  html:not(#hf-wall-off) body > .panel .body > section.col .chore-list {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 863px !important;
+    width: 591px !important;
+    max-width: 591px !important;
+    gap: 16px !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .body > section.col .chore {
+    width: 591px !important;
+    max-width: 591px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    box-sizing: border-box !important;
+  }
+  html:not(#hf-wall-off) body > .panel .live-clock-host {
+    flex: 0 0 auto !important;
+    min-width: 300px !important;
+    overflow: visible !important;
+  }
+  html:not(#hf-wall-off) body > .panel .hdr.hdr--clockfirst .live-clock,
+  html:not(#hf-wall-off) body > .panel .hdr.hdr--clockfirst [data-live-clock] {
+    font-size: 40px !important;
+    line-height: 48px !important;
+    padding-top: 12px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+  }
+  html:not(#hf-wall-off) body > .panel .cheer {
+    left: 990px !important;
+    width: 630px !important;
+  }
+  html:not(#hf-wall-off) body > .panel .sec[aria-label="Quick taps"],
+  html:not(#hf-wall-off) body > .panel .quick {
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  html:not(#hf-wall-off) body > .panel .quick > .qtile {
+    flex: 1 1 0 !important;
+    height: auto !important;
+    min-height: 64px !important;
+  }
+  html:not(#hf-wall-off) body > .panel .today-day {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  html:not(#hf-wall-off) body > .panel .today-day-list:empty::before {
+    content: "Nothing on the calendar.";
+    font-size: 24px !important;
+    color: #f4efe6;
+  }
+  html:not(#hf-wall-off) body > .panel .where-card .big,
+  html:not(#hf-wall-off) body > .panel .where-card .sub,
+  html:not(#hf-wall-off) body > .panel .where-card .lbl {
+    color: #f4efe6 !important;
+    -webkit-text-fill-color: #f4efe6 !important;
+    opacity: 1 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .cheer {
+    top: 48px !important;
+    height: 96px !important;
+    max-height: 96px !important;
+    overflow: hidden !important;
+    z-index: 5 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .col-hdr {
+    position: absolute !important;
+    top: -104px !important;
+    right: auto !important;
+    height: 64px !important;
+    z-index: 5 !important;
+  }
+  html:not(#hf-wall-off) body > .panel section.col[aria-label="Ainsley chores"] .col-hdr { left: 433px !important; }
+  html:not(#hf-wall-off) body > .panel section.col[aria-label="Hayes chores"] .col-hdr { left: -12px !important; }
+  html:not(#hf-wall-off) body > .panel section.col[aria-label="Harris chores"] .col-hdr { left: -471px !important; }
+  html:not(#hf-wall-off) body > .panel > header.hdr { z-index: 1 !important; }
+  html:not(#hf-wall-off) body > .panel .col { z-index: 2 !important; overflow: visible !important; width: 592px !important; max-width: 592px !important; }
+  html:not(#hf-wall-off) body > .panel .chore { max-width: 100% !important; box-sizing: border-box !important; }
+  html:not(#hf-wall-off) body > .panel > .body:has(> .col) { overflow: visible !important; }
+  html:not(#hf-wall-off) body > .panel .cheer,
+  html:not(#hf-wall-off) body > .panel .link-banner { z-index: 2 !important; }
+  html:not(#hf-wall-off) body > .panel .col-hdr { z-index: 3 !important; }
+  html:not(#hf-wall-off) body > .panel .bank.hayes,
+  html:not(#hf-wall-off) body > .panel .bank.harris,
+  html:not(#hf-wall-off) body > .panel .bank.ainsley {
+    background: rgba(12, 14, 18, 0.94) !important;
+  }
+  html:not(#hf-wall-off) body > .panel .cheer-bar {
+    color: #f4efe6 !important;
+    -webkit-text-fill-color: #f4efe6 !important;
+    background: rgba(8, 10, 14, 0.88) !important;
+  }
+  html:not(#hf-wall-off) body > .panel > .body:has(> .sec[aria-label="Quick taps"]) {
+    grid-template-columns: 900px 900px !important;
+    grid-template-rows: 200px minmax(0, 1fr) 240px !important;
+    align-items: stretch !important;
+  }
+  html:not(#hf-wall-off) body > .panel > .body > .sec[aria-label="Boards"] { grid-column: 1 !important; grid-row: 1 !important; }
+  html:not(#hf-wall-off) body > .panel > .body > .today-day { grid-column: 1 !important; grid-row: 2 !important; }
+  html:not(#hf-wall-off) body > .panel > .body > .kids-col { grid-column: 2 !important; grid-row: 3 !important; }
+  html:not(#hf-wall-off) body > .panel > .body > .tap-rail {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 16px !important;
+  }
+  html:not(#hf-wall-off) body > .panel > .body > .sec[aria-label="Quick taps"] {
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-self: stretch !important;
+  }
+  html:not(#hf-wall-off) body > .panel .sec[aria-label="Quick taps"] .quick {
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    overflow: hidden !important;
+  }
+  html:not(#hf-wall-off) body > .panel .sec[aria-label="Quick taps"] .qtile {
+    flex: 1 1 0 !important;
+    min-height: 64px !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+  html:not(#hf-wall-off) body > .panel .tap-rail a {
+    background: #141820 !important;
+    color: #f4efe6 !important;
+    -webkit-text-fill-color: #f4efe6 !important;
+    opacity: 1 !important;
+    min-height: 64px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    font-size: 24px !important;
+    text-decoration: none !important;
+  }
+  html:not(#hf-wall-off) body > .panel .tap-rail a::after {
+    content: "Open";
+    font-size: 24px !important;
+    font-weight: 700;
+  }
+  html:not(#hf-wall-off) body > .panel .today-day:not(:has(li))::after {
+    content: "Nothing on the calendar.";
+    display: block;
+    font-size: 24px !important;
+    color: #f4efe6;
+    padding: 16px;
+  }
+  html:not(#hf-wall-off) body > .panel .kids-col {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .kids-col .kid-card {
+    flex: 1 1 0 !important;
+    min-height: 64px !important;
+    background: #141820 !important;
+    opacity: 1 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .where-card.dad .sub,
+  html:not(#hf-wall-off) body > .panel .where-card.dad .big {
+    color: #f4efe6 !important;
+    -webkit-text-fill-color: #f4efe6 !important;
+    opacity: 1 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .nav-us,
+  html:not(#hf-wall-off) body > .panel .mpills,
+  html:not(#hf-wall-off) body > .panel .mpill,
+  html:not(#hf-wall-off) body > .panel .streak-pill,
+  html:not(#hf-wall-off) body > .panel .bank.ainsley .star-label { display: none !important; }
+  html.ori-on,
+  html.ori-on body {
+    background-image: url("month-theme/november/wall-dusk.webp") !important;
+    background-size: 1920px 1080px !important;
+    background-position: 0 0 !important;
+    background-repeat: no-repeat !important;
+  }
+  html body .live-clock {
+    font-size: 40px !important;
+    line-height: 40px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  html body .panel > .cheer,
+  html body .panel > section.cheer {
+    position: absolute !important;
+    top: 64px !important;
+    height: 64px !important;
+    left: 990px !important;
+    width: 630px !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+  html body .cheer-body,
+  html body .cheer-main {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 64px !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+  html body .panel .cheer .cheer-label,
+  html body .panel .cheer .cheer-title,
+  html body .panel .cheer .cheer-sub {
+    position: static !important;
+    top: auto !important;
+    margin: 8px 0 0 !important;
+    line-height: 28px !important;
+    transform: none !important;
+  }
+  html body section.col { padding: 0 !important; }
+  html body section.col { border: 0 !important; }
+  html body section.col .chore-list {
+    width: calc(100% - 1px) !important;
+    max-width: calc(100% - 1px) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    box-sizing: border-box !important;
+  }
+  html body section.col .chore {
+    margin: 0 !important;
+    border: 0 !important;
+    outline: none !important;
+    width: auto !important;
+    max-width: 100% !important;
+    align-self: stretch !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+  }
+  html:not(#hf-wall-off) body > .panel .body > section.kids-col {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin: 0 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .body > section.kids-col > .kid-card {
+    margin: 0 !important;
+    flex: 1 1 0 !important;
+    min-height: 64px !important;
+    height: auto !important;
+    overflow: hidden !important;
+  }
+  html body .panel .chore.vfx-boom,
+  html body.vfx-shake .panel,
+  html body.vfx-shake-hard .panel {
+    animation: none !important;
+    transform: none !important;
+  }
+  html body .panel .chore.vfx-boom {
+    filter: none !important;
+    opacity: 0.82;
+    outline: 3px solid rgba(244, 239, 230, 0.85);
+    outline-offset: -3px;
+    box-shadow: inset 0 0 0 4px rgba(244, 239, 230, 0.28);
+  }
+  /* Header row lives on body, outside every filtered column. */
+  body > .chore-shortcuts {
+    position: fixed !important;
+    top: 66px !important;
+    left: 486px !important;
+    z-index: 5 !important;
+    display: flex !important;
+    gap: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+  }
+  body > .chore-shortcuts .kid-chip {
+    position: static !important;
+    height: 64px !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+    box-sizing: border-box !important;
+    transform: none !important;
+  }
+  body > .chore-shortcuts .kid-chip .dot { font-size: 24px !important; }
+  body > .chore-shortcuts .kid-chip.ainsley { width: 160px !important; }
+  body > .chore-shortcuts .kid-chip.hayes,
+  body > .chore-shortcuts .kid-chip.harris { width: 148px !important; }
+  /* Chores header card: title, subline, date, then the two pills on their own row. */
+  html:not(#hf-wall-off) body > .panel > section.cheer {
+    top: 48px !important;
+    left: 990px !important;
+    width: 830px !important;
+    height: 108px !important;
+    max-height: 108px !important;
+    margin: 0 !important;
+    padding: 8px 16px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+    z-index: 4 !important;
+  }
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-accent { display: none !important; }
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-body,
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-main {
+    position: static !important;
+    inset: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-body {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    flex: 1 1 auto !important;
+    padding: 0 !important;
+  }
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-main {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  html:not(#hf-wall-off) body > .panel > section.cheer :is(.cheer-label, .cheer-title, .cheer-sub, .cheer-sub span, .cheer-badge) {
+    position: static !important;
+    margin: 0 !important;
+    font-size: 24px !important;
+    line-height: 28px !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-badges {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 16px !important;
+    flex: none !important;
+  }
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-badge {
+    padding: 0 12px !important;
+  }
+}

@@ -14,6 +14,145 @@
   function nightOn() { return kid() !== "ainsley" /* Ainsley keeps her concert venue (Alfred 10/16) */ && !/[?&]night=0(&|$)/.test(location.search) && !!document.querySelector('script[src*="night/night-host.js"]'); }
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function kid() { return (document.body && document.body.getAttribute("data-kid")) || "hayes"; }
+  /* Public musts match sheet-chores.html. Same data-check ids, same words, same tap. */
+  var PUBLIC_MUSTS = {
+    ainsley: [
+      ["ain-bed", "Make bed · stage reset", "daily must · morning"],
+      ["ain-toys", "Room reset", "daily must · morning clean pass"],
+      ["ain-dishwasher", "Clean up · rinse · dishwasher", "daily must · after you eat"],
+      ["ain-empty", "Empty dishwasher", "daily must · when clean"],
+      ["ain-living", "Shoes & coats · closet / cubby / room", "daily must · never hallway"],
+      ["ain-bath", "Bathroom wipe", "weekly must · ask Dad to inspect"],
+      ["ain-laundry", "Laundry full cycle · her clothes", "weekly must · wash, dry, put away"],
+      ["ain-cubby", "Backpack + sports bag in garage cubby", "weekly must · ask Dad to inspect"],
+      ["ain-babysit", "Babysitting · optional add-on", "when Dad books you · not for jar", 1]
+    ],
+    hayes: [
+      ["hay-bed", "Make bed", "daily must · morning · pre-game"],
+      ["hay-backpack", "Backpack ready", "daily must · morning · loadout"],
+      ["hay-dishes", "Clean up · rinse · dishwasher", "daily must · after you eat"],
+      ["hay-empty", "Empty dishwasher", "daily must · when clean"],
+      ["hay-trash", "Trash out", "daily must · school-day"],
+      ["hay-postgame", "Post-game · gear rinsed · bag set", "daily must · after practice/game"],
+      ["hay-shower", "Shower · brush · ready for bed", "daily must · evening bedtime"],
+      ["hay-room", "Room reset", "weekly must · clear the drop zone"],
+      ["hay-shoes", "Shoes · closet / cubby / room", "weekly must · never hallway"],
+      ["hay-cubby", "Backpack + sports bag in garage cubby", "weekly must · ask Dad to inspect"]
+    ],
+    harris: [
+      ["har-bed", "Make bed", "daily must · morning · pre-game"],
+      ["har-backpack", "Backpack ready", "daily must · morning · loot ready"],
+      ["har-dishes", "Clean up · rinse · dishwasher", "daily must · after you eat"],
+      ["har-empty", "Empty dishwasher", "daily must · when clean"],
+      ["har-trash", "Trash out", "daily must · school-day"],
+      ["har-postgame", "Post-game · gear rinsed · bag set", "daily must · after practice/game"],
+      ["har-shower", "Shower · brush · ready for bed", "daily must · evening bedtime"],
+      ["har-toys", "Toys reset", "weekly must · ask Dad to inspect"],
+      ["har-shoes", "Shoes · closet / cubby / room", "weekly must · never hallway"],
+      ["har-cubby", "Backpack + sports bag in garage cubby", "weekly must · ask Dad to inspect"]
+    ]
+  };
+  function escMust(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function paintPublicMusts() {
+    var host = document.querySelector("[data-mount-quests]");
+    var rows = PUBLIC_MUSTS[kid()];
+    if (!host || !rows) return;
+    host.innerHTML = rows.map(function (row) {
+      var opt = row[3] ? ' data-optional="1"' : "";
+      return '<div class="chore open ' + kid() + '" data-check="' + escMust(row[0]) + '"' + opt + ' role="button" tabindex="0">' +
+        '<span class="ring"></span><div class="txt"><div class="what">' + escMust(row[1]) + '</div><div class="hint">' + escMust(row[2]) + "</div></div></div>";
+    }).join("");
+    var empty = document.querySelector("[data-kw-must-empty]");
+    if (empty) empty.remove();
+    if (global.HouseCheckoffs && HouseCheckoffs.rewire) { try { HouseCheckoffs.rewire(); } catch (e) {} }
+  }
+  var REST_LINE = "Resting. Your list comes back soon.";
+  function bindFeedRest(stage) {
+    function showRest() {
+      var n = document.querySelector("[data-kw-feed]");
+      if (!n) {
+        n = document.createElement("button");
+        n.type = "button";
+        n.className = "kw-feed";
+        n.setAttribute("data-kw-feed", "resting");
+        n.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          if (global.WardKids && WardKids.boot) WardKids.boot(kid());
+        });
+        stage.appendChild(n);
+      }
+      n.hidden = true;
+      n.textContent = "";
+      if (document.body) document.body.classList.remove("kw-rest");
+    }
+    function hideRest() {
+      var n = document.querySelector("[data-kw-feed]");
+      if (n) n.hidden = true;
+      if (document.body) document.body.classList.remove("kw-rest");
+    }
+    document.addEventListener("house:kids-data-missing", showRest);
+    document.addEventListener("house:kids-data-ready", hideRest);
+    var W = global.WardKids;
+    function weekNote(on) {
+      var btn = document.querySelector("[data-kw-path]");
+      var note = document.querySelector("[data-kw-week-empty]");
+      var must = document.querySelector("[data-kw-must-empty]");
+      if (!on) {
+        if (note) note.remove();
+        if (must) must.remove();
+        return;
+      }
+      var line = kid() === "ainsley" ? "Nothing on your week yet." : "A free week.";
+      if (!note && btn) {
+        note = document.createElement("p");
+        note.className = "kw-week-empty";
+        note.setAttribute("data-kw-week-empty", "");
+        note.textContent = line;
+        btn.insertAdjacentElement("afterend", note);
+      }
+      var host = document.querySelector ? document.querySelector("#sec-musts") : null;
+      if (host && !must && !host.querySelector("[data-check]")) {
+        must = document.createElement("p");
+        must.className = "kw-must-empty";
+        must.setAttribute("data-kw-must-empty", "");
+        must.textContent = "Nothing on the list yet.";
+        host.appendChild(must);
+      }
+    }
+    var showRestBound = showRest;
+    showRest = function () { showRestBound(); weekNote(true); };
+    var hideRestBound = hideRest;
+    hideRest = function () { hideRestBound(); weekNote(false); };
+    paintPublicMusts();
+    document.addEventListener("house:kids-data-missing", paintPublicMusts);
+    if (!W || !W._data) showRest();
+    else hideRest();
+    return { show: showRest, hide: hideRest };
+  }
+  function pebbleFromCounts(done, n) {
+    done = done | 0;
+    n = n | 0;
+    if (n <= 0 || done <= 0) return "empty";
+    if (done >= n) return "filled";
+    if (done === n - 1) return "today-3";
+    if (done * 3 >= n * 2) return "today-2";
+    if (done * 3 >= n) return "today-1";
+    return "empty";
+  }
+  function pebbleStateFor(kidId) {
+    var W = global.WardKids, data = W && W._data;
+    if (!W || !data || typeof W.mustQuests !== "function") return "empty";
+    var qs = (W.mustQuests(kidId, data) || []).filter(function (q) { return q && !q.optional && q.cadence !== "addon"; });
+    var n = qs.length, done = 0, i;
+    if (!n) return "empty";
+    for (i = 0; i < n; i++) {
+      var q = qs[i], daily = (q.cadence || "daily") === "daily";
+      var ok = daily && W.dailyWeekComplete ? W.dailyWeekComplete(q.id, data) : W.getCheck(q.id, data, daily ? W.DAY_ISO : undefined);
+      if (ok) done++;
+    }
+    return pebbleFromCounts(done, n);
+  }
   function rnd(i) { var x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.floor(x); }
   function chicagoHour() {
     try {
@@ -235,6 +374,9 @@
   function orientFor(w, h) {
     return w > h * 1.15 ? "landscape" : "portrait";
   }
+  function wallView() {
+    return global.innerWidth === 1920 && global.innerHeight === 1080;
+  }
   /* LEANLOAD1 · a board with data-lean-plates="1" loads only its own kid's world, creature and
      items, in the current orientation; the other orientation loads on first rotate. */
   function lean() { return !!(document.body && document.body.getAttribute("data-lean-plates") === "1"); }
@@ -251,11 +393,10 @@
       leanLoaded[orients[0]] = true;
     }
     var jobs = [];
-    [
-      ["hayes", "assets/ori/creature/idle.webp"],
-      ["harris", "assets/ori/creature/harris.webp"],
-      ["ainsley", "assets/ori/creature/ainsley.webp"]
-    ].forEach(function (row) {
+    var creatures = wallView()
+      ? [["hayes", "assets/ori/creature/idle-226.webp"], ["harris", "assets/ori/creature/harris-226.webp"], ["ainsley", "assets/ori/creature/ainsley.webp"]]
+      : [["hayes", "assets/ori/creature/idle.webp"], ["harris", "assets/ori/creature/harris.webp"], ["ainsley", "assets/ori/creature/ainsley.webp"]];
+    creatures.forEach(function (row) {
       if (lean() && (row[0] !== me || oriCreature[me])) return;
       jobs.push(loadImg(row[1]).then(function (im) {
         oriCreature[row[0]] = im;
@@ -279,6 +420,7 @@
       (man.layers || []).forEach(function (layer) {
         orients.forEach(function (orient) {
           var urls = book.urlFor ? book.urlFor(world, layer.id, orient, layer.standin) : [layer.standin];
+          if (wallView() && orient === "landscape") urls = ["assets/ori/" + world + "/wall-900x864/" + layer.id + ".webp"].concat(urls);
           jobs.push(loadFirst(urls).then(function (im) {
             plates[world][orient][layer.id] = im;
             if (orient === "portrait" || (lean() && !plates[world][layer.id])) plates[world][layer.id] = im;
@@ -294,6 +436,14 @@
   }
   function drawPlate(ctx, img, W, H, ox, oy, zoom, alpha, blur, world) {
     if (!img) return;
+    /* Wall slot files are already 900x864. Draw them 1:1. Never cover-scale a plate that already matches. */
+    if (img.width === W && img.height === H) {
+      ctx.save();
+      if (alpha != null) ctx.globalAlpha = alpha;
+      ctx.drawImage(img, 0, 0);
+      ctx.restore();
+      return;
+    }
     var z = zoom || 1;
     var scale = Math.max(W / img.width, H / img.height) * z;
     var dw = img.width * scale;
@@ -1266,7 +1416,7 @@
   function oriBook(world, W, H) {
     var pack = plates[world];
     if (!pack) return null;
-    var orient = orientFor(W, H);
+    var orient = (W === 900 && H === 864) ? "landscape" : orientFor(W, H);
     var book = pack[orient];
     var skyPlate = book && book.sky;
     if (skyPlate && /assets\/ori\//.test(skyPlate.src || "")) return book;
@@ -1468,11 +1618,15 @@
     if (mot.glow > 0.05) {
       softBloom(ctx, box.cx, bottom - draw * 0.45, draw * 0.55, "rgba(255, 220, 150, " + (0.55 * mot.glow).toFixed(3) + ")");
     }
-    ctx.save();
-    ctx.translate(box.cx, bottom);
-    ctx.scale(sx, sy);
-    ctx.drawImage(img, -draw / 2, -draw, draw, draw);
-    ctx.restore();
+    if (img.width === draw && img.height === draw) {
+      ctx.drawImage(img, Math.round(box.cx - draw / 2), Math.round(bottom - draw));
+    } else {
+      ctx.save();
+      ctx.translate(box.cx, bottom);
+      ctx.scale(sx, sy);
+      ctx.drawImage(img, -draw / 2, -draw, draw, draw);
+      ctx.restore();
+    }
     return true;
   }
   function markerAge(i, t) {
@@ -1600,6 +1754,11 @@
     if (world === "ainsley") { drawRecordMarker(ctx, q.x, q.seat, ms, age, done, popping, t, i); return; }
     var img = oriItems[world];
     if (!img) return;
+    /* The wall draws a vector marker. The chest and ore sheets are not the marker's size, so they are not scaled here. */
+    if (ctx.canvas && ctx.canvas.width === 900 && ctx.canvas.height === 864) {
+      drawRecordMarker(ctx, q.x, q.seat, ms, age, done, popping, t, i);
+      return;
+    }
     var sc = ms / Math.max(img.width, img.height);
     var dw = img.width * sc;
     var dh = img.height * sc;
@@ -1652,14 +1811,18 @@
     };
     var fg = book && book.fg;
     if (fg && fg.width >= 64 && !night) {
-      var fp = layerShift("fg", man);
-      var sway = reduced ? 0 : Math.sin(t * 0.9) * 0.016;
-      ctx.save();
-      ctx.translate(W / 2, H);
-      ctx.transform(1, 0, sway, 1, 0, 0);
-      ctx.translate(-W / 2, -H);
-      drawPlate(ctx, fg, W, H, pan.x * fp, pan.y * fp * 0.35, PLATE_ZOOM, 1, 0, world);
-      ctx.restore();
+      if (fg.width === W && fg.height === H) {
+        drawPlate(ctx, fg, W, H, 0, 0, 1, 1, 0, world);
+      } else {
+        var fp = layerShift("fg", man);
+        var sway = reduced ? 0 : Math.sin(t * 0.9) * 0.016;
+        ctx.save();
+        ctx.translate(W / 2, H);
+        ctx.transform(1, 0, sway, 1, 0, 0);
+        ctx.translate(-W / 2, -H);
+        drawPlate(ctx, fg, W, H, pan.x * fp, pan.y * fp * 0.35, PLATE_ZOOM, 1, 0, world);
+        ctx.restore();
+      }
     }
     if (venue && !night) drawCrowd(ctx, W, H, t, pan);
     paintLabels();
@@ -1694,6 +1857,12 @@
     this.resize();
   }
   World.prototype.resize = function () {
+    if (wallView() && this.cv.classList.contains("kw-canvas")) {
+      this.dpr = 1;
+      this.cv.width = 900;
+      this.cv.height = 864;
+      return;
+    }
     var dpr = Math.min(2, global.devicePixelRatio || 1);
     var w = global.innerWidth || 440;
     var h = global.innerHeight || 800;
@@ -1715,7 +1884,7 @@
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };
     this.hits = paintWorld(this.ctx, W, H, t, which || kid(), quests, st.fill || 0, parallaxNow(t, false));
     var jhost = document.querySelector("[data-kw-jar]");
-    if (jhost && jhost._jar && jhost._jar.setEnv) {
+    if (!wallView() && jhost && jhost._jar && jhost._jar.setEnv) {
       var skyPlate = plates[which || kid()] && plates[which || kid()].sky;
       jhost._jar.setEnv(skyPlate || this.cv);
     }
@@ -1832,7 +2001,16 @@
   var bg = null;
   function paintClock() {
     var el = document.querySelector("[data-kw-clock]");
-    if (el) el.textContent = clockLine();
+    var live = document.querySelectorAll ? document.querySelectorAll("[data-live-clock]") : [];
+    if (kid() === "ainsley" && ((el && el.parentNode) || (live && live.length))) {
+      var h = chicagoHour();
+      var word = h < 5 || h >= 21 ? "Night" : h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening";
+      if (el) el.textContent = word;
+      for (var li = 0; li < live.length; li++) if ((live[li].textContent || "") !== word) live[li].textContent = word;
+      return;
+    }
+    if (!el) return;
+    el.textContent = clockLine();
   }
   function paintWeek() {
     var host = document.querySelector("[data-kw-week]");
@@ -2032,7 +2210,7 @@
     var stage = document.createElement("div");
     stage.className = "kw-stage";
     stage.innerHTML =
-      '<header class="kw-hud"><button type="button" class="kw-home" data-kw-home>' + name + '</button><div class="kw-clock" data-kw-clock></div></header>' +
+      '<header class="kw-hud"><button type="button" class="kw-home" data-kw-home aria-label="Back to the House board"><img src="assets/icons/home-key-light.svg" alt=""></button><div class="kw-id"><span class="kw-name">' + name + '</span></div><div class="kw-clock" data-kw-clock></div></header>' +
       '<div class="kw-jar-host" data-kw-jar></div>' +
       '<div class="kw-week" data-kw-week></div>' +
       '<button type="button" class="kw-path" data-kw-path aria-label="My Week">My Week</button>' +
@@ -2061,6 +2239,53 @@
       var hud = stage.querySelector(".kw-hud"), clk = hud.querySelector("[data-kw-clock]");
       hud.insertBefore(mb, clk);
     }
+    /* SUNHOME1 · a missing kids week is said out loud on the world, with a retry. No key box, no made-up chores. */
+    bindFeedRest(stage);
+
+    if (kid() === "ainsley") {
+      var mist = document.createElement("div");
+      mist.className = "ains-mist";
+      mist.setAttribute("aria-hidden", "true");
+      stage.appendChild(mist);
+      document.addEventListener("house:must-done", function () {
+        document.documentElement.setAttribute("data-ains-quiet", "1");
+        document.documentElement.setAttribute("data-leaf-quiet", "1");
+        setTimeout(function () {
+          document.documentElement.removeAttribute("data-ains-quiet");
+          document.documentElement.removeAttribute("data-leaf-quiet");
+        }, 400);
+      });
+    } else if (kid() === "hayes" || kid() === "harris") {
+      var peb = document.createElement("div");
+      peb.className = "kid-pebble";
+      peb.setAttribute("data-pebble", "");
+      peb.setAttribute("data-state", "empty");
+      peb.setAttribute("aria-label", "This week's pebble");
+      var idSlot = stage.querySelector(".kw-id");
+      (idSlot || stage).appendChild(peb);
+      function pebbleState() { return pebbleStateFor(kid()); }
+      function paintPebble() { peb.setAttribute("data-state", pebbleState()); }
+      document.addEventListener("house:kids-data-ready", paintPebble);
+      paintPebble();
+      document.addEventListener("house:must-done", function () {
+        peb.classList.remove("settle");
+        void peb.offsetWidth;
+        peb.classList.add("settle");
+        document.documentElement.setAttribute("data-leaf-quiet", "1");
+        setTimeout(function () { document.documentElement.removeAttribute("data-leaf-quiet"); }, 400);
+        setTimeout(function () { peb.classList.remove("settle"); paintPebble(); }, 1200);
+      });
+    }
+    function fitNext() {
+      var hero = document.querySelector("[data-mount-consume-next]");
+      var title = hero && hero.querySelector(".consume-hero-title");
+      var words = title ? title.textContent.replace(/\s+/g, " ").trim() : "";
+      var live = !!(hero && !hero.classList.contains("empty") && words && words !== "Nothing timed next");
+      document.body.classList.toggle("kw-next-off", !live);
+    }
+    fitNext();
+    document.addEventListener("house:kids-data-ready", fitNext);
+    document.addEventListener("house:kid-rendered", fitNext);
     stage.querySelector("[data-kw-home]").addEventListener("click", function (ev) {
       ev.preventDefault();
       ev.stopPropagation();
@@ -2306,6 +2531,8 @@
     return canvas;
   }
 
+  global.KidPebble = { fromCounts: pebbleFromCounts, forKid: pebbleStateFor };
+  global.KidFeedRest = { line: REST_LINE, bind: bindFeedRest };
   global.KidWorld = {
     openScene: openScene,
     back: back,

@@ -30,7 +30,7 @@ function run(mode, w = 440, h = 956) {
 let runs = null;
 function all() {
   if (!runs) {
-    const list = [["kid401"], ["kid401", 1280, 800], ["kid0"], ["kid0", 1280, 800], ["kidC"], ["kidC", 1280, 800], ["rest"], ["rest", 1280, 800], ["rest", 1920, 1080]];
+    const list = [["kid401"], ["kid401", 1280, 800], ["kid0"], ["kid0", 1280, 800], ["kidC"], ["kidC", 1280, 800], ["rest"], ["rest", 1280, 800], ["rest", 1920, 1080], ["restPair", 1920, 1080]];
     for (const k of ["hayes", "harris", "ainsley"]) list.push(["ctl-" + k], ["ctl-" + k, 1280, 800]);
     runs = (async () => { const o = {}; for (const a of list) o[a.join("@")] = await run(...a); return o; })();
   }
@@ -43,10 +43,8 @@ test("CAMREST4 · kid pad with a revoked key or no key shows Not connected, visi
     const s = r[k].t0;
     assert.deepEqual(r[k].errors, [], k);
     assert.equal(s.kwOn, true, k + " world on " + J(s));
-    assert.equal(s.padVisible, true, k + " pad visible " + J(s));
-    assert.equal(s.pillText, "Not connected", k + " " + J(s));
-    assert.equal(s.pillVisible, true, k + " pill visible, not display none " + J(s));
-    assert.equal(s.rockerEnabled, false, k + " no taps without a key " + J(s));
+    assert.equal(s.padVisible, false, k + " unconnected room card stays off the kid world " + J(s));
+    assert.notEqual(s.pillText, "Needs pairing", k + " " + J(s));
   }
 });
 
@@ -68,10 +66,17 @@ test("CAMREST4 · resting cam tiles: no clipped element at phone, desk and wall 
   for (const k of ["rest", "rest@1280@800", "rest@1920@1080"]) {
     const s = r[k].t0;
     assert.deepEqual(r[k].errors, [], k);
-    assert.equal(s.restTiles, 3, k + " three resting tiles " + J(s));
+    /* Unpaired sheet-index hides the deck. A true paired outage is CAMREST3 State D, not this no-key rest. */
+    assert.equal(s.restTiles, 0, k + " unpaired hub shows no resting tiles " + J(s));
     assert.deepEqual(s.clipped, [], k + " " + J(s));
-    assert.ok(s.restOverflow.every((o) => o === "clip"), k + " " + J(s));
-    assert.ok(s.restFit.every(Boolean), k + " each rest tile fits its tile box, never wider " + J(s));
+  }
+  for (const k of ["restPair@1920@1080"]) {
+    const s = r[k].t0;
+    assert.deepEqual(r[k].errors, [], k);
+    assert.equal(s.restTiles, 3, k + " paired outage shows three resting tiles " + J(s));
+    assert.deepEqual(s.clipped, [], k + " no clipped rest text " + J(s));
+    assert.ok(s.restOverflow.every((o) => o === "clip"), k + " rest overflow " + J(s));
+    assert.ok(s.restFit.every(Boolean), k + " each rest tile fits its box " + J(s));
   }
 });
 
@@ -103,5 +108,5 @@ test("CAMREST4 · source: the kid pad is lifted (host node moved, no second writ
   assert.match(L, /<span class="hub-lights-pairword-word">Needs pairing<\/span>/);
   assert.match(C, /\.hub-cam-rest \{[^}]*overflow: hidden;[^}]*overflow: clip;/);
   for (const f of ["sheet-index.html", "sheet-google-home.html"]) assert.match(read(f), /tokens-hub-cams\.css\?v=CAMREST5"/, f);
-  for (const f of ["sheet-index.html", "sheet-google-home.html", "sheet-lights.html", "kid-harris.html"]) assert.match(read(f), /house-lights\.js\?v=CAMREST5"/, f);
+  for (const f of ["sheet-index.html", "sheet-google-home.html", "sheet-lights.html", "kid-harris.html"]) assert.match(read(f), /house-lights\.js\?v=SUNHOME1"/, f);
 });

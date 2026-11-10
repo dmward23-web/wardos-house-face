@@ -417,16 +417,19 @@
 
   function refreshBankUI(checkId, done, dayIso) {
     try {
-      if (!window.WardKids) return;
+      if (!window.WardKids || typeof window.WardKids.setCheck !== "function") return false;
       var data = window.WardKids._data;
+      var before = typeof window.WardKids.getCheck === "function" ? window.WardKids.getCheck(checkId, data, dayIso || undefined) : false;
       var bank = window.WardKids.setCheck(checkId, done, data, dayIso || undefined);
+      var after = typeof window.WardKids.getCheck === "function" ? window.WardKids.getCheck(checkId, data, dayIso || undefined) : !!done;
       if (bank) window.WardKids.renderBank(document, bank);
       var kidId = (window.WardKids.KID_FROM_CHECK || {})[checkId];
       if (kidId && data) {
         var view = window.WardKids.getBankView(kidId, data);
         window.WardKids.renderBank(document, view);
       }
-    } catch (e) { /* */ }
+      return !before && !!after && !!done;
+    } catch (e) { return false; }
   }
 
   function wireChecks() {
@@ -488,13 +491,17 @@
           try { window.HouseSfx.questPop(el); } catch (ePop) { /* never break a tap over a pop */ }
         }
         var iso = el.getAttribute("data-day-iso") || "";
+        var sourced = false;
         if (usesShared(el) && window.WardKids && typeof window.WardKids.setCheck === "function") {
-          refreshBankUI(id, nowDone, iso || undefined);
+          sourced = refreshBankUI(id, nowDone, iso || undefined) === true;
         } else {
           var k = keyFor(el);
           var st = loadKey(k);
           st[id] = nowDone;
           saveKey(k, st);
+        }
+        if (sourced) {
+          try { document.dispatchEvent(new CustomEvent("house:must-done", { detail: { id: id } })); } catch (eDone) { /* */ }
         }
         evaluateClear(true);
       }

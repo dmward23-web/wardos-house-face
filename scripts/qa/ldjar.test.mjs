@@ -104,7 +104,7 @@ test("AINSNOSCORE2 (real browser): no digit in her jar hero with no data, slow d
       for (const s of r.samples) {
         assert.equal(s.digit, false, mode + " " + JSON.stringify(s));
         assert.equal(s.icon, false, mode + " " + JSON.stringify(s));
-        assert.equal(s.big, "Tour Jar");
+        assert.equal(s.big, "Jar");
       }
       assert.deepEqual(r.errors, []);
       if (mode !== "nofeed") assert.ok(r.hub_hits > 0);
@@ -141,22 +141,22 @@ test("AINSSTAR1 (real browser): no star glyph or digit in Ainsley's rows before,
       assert.equal(s.bank.digit, false, mode + " digit: " + s.bank.text);
       /* DAYPKG1 v2j (Alfred v2i P3) · Dad's weekly figure next to her Paid hold is checked apart (money shape, Dad page only);
          before data it may be empty; once the feed read has settled with data (feed, slow) it must be there, never empty */
-      assert.ok(s.bank.dadWk === "" || WK.test(s.bank.dadWk), mode + " Dad weekly figure shape: " + s.bank.dadWk);
+      assert.equal(s.bank.dadWk, "", mode + " public allowance shows no weekly dollar figure: " + s.bank.dadWk);
     }
-    const last = r.samples[r.samples.length - 1];   // the settled sample (data-jar-settled)
-    if (mode !== "nofeed") assert.match(last.bank.dadWk, WK, mode + " Dad weekly figure must show once data has landed");
+    const last = r.samples[r.samples.length - 1];   // allowance feed/slow: harness waits until visible [data-dad-wk] is $N wk
+    if (mode !== "nofeed") assert.equal(last.bank.dadWk, "", mode + " a landed feed still must not paint a public dollar week");
     assert.deepEqual(r.errors, []);
   }
 });
 
 /* ---------- 4. AINSJAR1 (Alfred FOLD Oct 20): her jar is a state under the Tour Jar label, on both of her pages ---------- */
-const STATE_EL = /<div class="jar-state" data-jar-state="trusted">TRUSTED<\/div>/;
+const EMPTY_JAR = "Nothing trusted yet.";
 function kidAinsleyJar() {
   const h = read("kid-ainsley.html"), i = h.indexOf('id="sec-jar"');
   assert.ok(i > 0, "kid-ainsley jar section");
   return h.slice(h.lastIndexOf("<section", i), h.indexOf("</section>", i));
 }
-test("AINSJAR1 markup: kid-ainsley has no star glyph, no tally or progress count, and her jar shows TRUSTED under Tour Jar", () => {
+test("AINSJAR1 markup: kid-ainsley has no star glyph, no tally or progress count, and her jar is the empty line", () => {
   const h = read("kid-ainsley.html");
   const body = h.slice(h.indexOf("<body"));
   const visible = body.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<style[\s\S]*?<\/style>/g, "").replace(/<!--[\s\S]*?-->/g, "");
@@ -164,32 +164,52 @@ test("AINSJAR1 markup: kid-ainsley has no star glyph, no tally or progress count
   assert.equal(/data-bank-(?:life|symbol|today|balance|week-earn)|data-grow-(?:total|save-need|pct)|data-progress-meta|data-left-count|data-saves-panel/.test(visible), false, "a count, tally or saves binding");
   const jar = kidAinsleyJar();
   assert.equal(/\d/.test(jar.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, " ")), false, "a digit in her jar");
-  assert.match(jar, new RegExp('<div class="bank-title">Tour Jar</div>\\s*' + STATE_EL.source), "TRUSTED right under the Tour Jar label");
+  assert.match(jar, /<div class="bank-title">Jar<\/div>\s*<div class="jar-state" data-jar-state="unset">Nothing trusted yet\.<\/div>/, "empty jar is not a counter");
+  assert.doesNotMatch(jar, /Tour Jar|tour-jar|payday/);
   assert.match(h, /<script src="ains-jar-state\.js\?v=AINSJAR2"><\/script>/);
 });
-test("AINSJAR1 markup: sheet-allowance shows TRUSTED under her Tour Jar label", () => {
+test("AINSJAR1 markup: sheet-allowance starts on the empty line, not a hardcoded TRUSTED", () => {
   const a = bankSection("ainsley");
-  assert.match(a, new RegExp('<div class="star-label">Tour Jar</div>\\s*' + STATE_EL.source));
+  assert.match(a, /data-jar-state="unset">Nothing trusted yet\.<\/div>/);
+  assert.doesNotMatch(a, /data-jar-state="trusted">TRUSTED</);
   assert.equal(/data-saves-panel/.test(a), false);
   assert.match(read("sheet-allowance.html"), /<script src="ains-jar-state\.js\?v=AINSJAR2"><\/script>/);
 });
-test("AINSJAR1 state (Atlas Oct 20): TRUSTED by default; EMPTY only when kids.ainsley.jarState is set to another value", () => {
-  const ctx = vm.createContext({ document: { readyState: "complete", querySelectorAll: () => [] } });
+test("AINSJAR1 state: public kids-week prose is not a grant; empty, bad, trusted, and a sentence all stay unset", () => {
+  const seen = [];
+  const ctx = vm.createContext({
+    document: {
+      readyState: "loading",
+      documentElement: { setAttribute() {} },
+      addEventListener() {},
+      querySelectorAll: () => []
+    }
+  });
   ctx.window = ctx;
   vm.runInContext(read("ains-jar-state.js"), ctx);
   const S = ctx.AinsJarState.stateOf;
+  const G = ctx.AinsJarState.grantLine;
   for (const d of [null, undefined, {}, "x", "{not json", 7, [], { kids: null }, { kids: {} }, { kids: { ainsley: null } }, { kids: { ainsley: {} } },
     { kids: { ainsley: { jarState: "" } } }, { kids: { ainsley: { jarState: "  " } } }, { kids: { ainsley: { jarState: null } } }, { kids: { ainsley: { jarState: 3 } } },
     { kids: { ainsley: { jarState: true } } }, { kids: { ainsley: { jarState: "trusted" } } }, { kids: { ainsley: { jarState: "TRUSTED" } } }, { kids: { ainsley: { jarState: " Trusted " } } },
-    { kids: { hayes: { jarState: "empty" } } }, { offline: true, status: "offline" }])
-    assert.equal(S(d), "trusted", JSON.stringify(d));
-  for (const v of ["empty", "EMPTY", "resting", "paused", "x"]) assert.equal(S({ kids: { ainsley: { jarState: v } } }), "empty", v);
+    { kids: { ainsley: { jarState: "empty" } } }, { kids: { hayes: { jarState: "She walks to the library" } } }, { offline: true, status: "offline" }])
+    assert.equal(S(d), "unset", JSON.stringify(d));
+  assert.equal(G({ kids: { ainsley: { jarState: "She walks to the library" } } }), "");
+  assert.equal(S({ kids: { ainsley: { jarState: "She walks to the library" } } }), "unset");
+  assert.equal(G({ kids: { ainsley: { jarState: "Jar $5" } } }), "");
+  const el = { attrs: {}, textContent: "TRUSTED", setAttribute(k, v) { this.attrs[k] = v; } };
+  ctx.document.querySelectorAll = () => [el];
+  ctx.AinsJarState.paint(null);
+  assert.equal(el.textContent, EMPTY_JAR);
+  assert.equal(el.attrs["data-jar-state"], "unset");
+  ctx.AinsJarState.paint({ kids: { ainsley: { jarState: "She walks to the library" } } });
+  assert.equal(el.textContent, EMPTY_JAR);
+  seen.push(el.textContent);
   const src = read("ains-jar-state.js").replace(/\/\*[\s\S]*?\*\//g, "");
   assert.equal(/\d/.test(src), false, "the painter writes no digit");
-  assert.equal(/paint\("empty"\)/.test(src), false, "never paints EMPTY without an explicit feed value");
 });
-const JAR_MODES = { nofeed: "TRUSTED", slow: "TRUSTED", bad: "TRUSTED", feed: "TRUSTED", trusted: "TRUSTED", other: "EMPTY" };
-test("AINSJAR1 (real browser): kid-ainsley has no star or count; TRUSTED before data and unless the feed says otherwise, at 440, 390 and wall", SKIP, () => {
+const JAR_MODES = { nofeed: EMPTY_JAR, slow: EMPTY_JAR, bad: EMPTY_JAR, feed: EMPTY_JAR, trusted: EMPTY_JAR, other: EMPTY_JAR };
+test("AINSJAR1 (real browser): kid-ainsley has no star or count; the empty line before data and on a bad feed, at 440, 390 and wall", SKIP, () => {
   for (const [w, h] of [[440, 956], [390, 844], [1080, 1920]]) {
     for (const [mode, want] of Object.entries(JAR_MODES)) {
       const r = run("kid-ainsley", mode, w, h, { LDNOW: "2026-10-17T10:00:00-05:00" });
@@ -198,23 +218,23 @@ test("AINSJAR1 (real browser): kid-ainsley has no star or count; TRUSTED before 
         const tag = mode + " " + w + " " + JSON.stringify(s);
         assert.deepEqual(s.stars, [], tag); assert.deepEqual(s.jarDigits, [], tag); assert.deepEqual(s.mustsDigits, [], tag);
         assert.equal(s.progress, 0, tag); assert.equal(s.stateUnderLabel, true, tag);
-        assert.ok(s.state === "TRUSTED" || s.state === want, tag);
+        assert.equal(s.state, want, tag);
       }
-      assert.equal(r.samples[0].state, "TRUSTED", mode + " " + w + " pre-data");
+      assert.equal(r.samples[0].state, want, mode + " " + w + " pre-data");
       assert.equal(r.samples[r.samples.length - 1].state, want, mode + " " + w);
       assert.deepEqual(r.errors, []);
     }
   }
 });
-test("AINSJAR1 (real browser): sheet-allowance shows her TRUSTED or EMPTY state with no star or digit, at 440, 390 and wall", SKIP, () => {
+test("AINSJAR1 (real browser): sheet-allowance shows the empty line, not TRUSTED, with no star or digit, at 440, 390 and wall", SKIP, () => {
   for (const [w, h] of [[440, 956], [390, 844], [1080, 1920]]) {
     for (const [mode, want] of Object.entries(JAR_MODES)) {
       const r = run("allowance", mode, w, h);
       for (const s of r.samples) {
         assert.equal(s.bank.star, false, mode + " " + s.bank.text); assert.equal(s.bank.digit, false, mode + " " + s.bank.text);
-        assert.ok(s.state === "TRUSTED" || s.state === want, JSON.stringify(s));
+        assert.equal(s.state, want, JSON.stringify(s));
       }
-      assert.equal(r.samples[0].state, "TRUSTED", mode + " " + w + " pre-data");
+      assert.equal(r.samples[0].state, want, mode + " " + w + " pre-data");
       assert.equal(r.samples[r.samples.length - 1].state, want, mode + " " + w);
       assert.deepEqual(r.errors, []);
     }

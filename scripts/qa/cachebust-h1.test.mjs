@@ -45,6 +45,7 @@ const STALE = [
   ["house-lights.js", "PAIRUI1"], /* PAIRUI1b · house-lights.js changed again */
   ["house-lights.js", "PAIRUI1B"], /* CAMREST4 · house-lights.js changed again (pair pill build) */
   ["house-lights.js", "CAMREST4"], /* CAMREST5 · house-lights.js changed again (kid pad CSS) */
+  ["house-lights.js", "CAMREST5"], /* SUNHOME1 · hide an unconnected kid room card */
   ["house-nest.js", "CAMREST2"],
   ["livinghouse/scene-packs.js", "H1P2D3"],
   /* HOTFIX1 · wg-glass.css drops the KIDZ1 plate lift; every page moves off COLDLOAD1 */
@@ -55,7 +56,30 @@ const STALE = [
   ["private-feed.js", "HALLOWEEN1"],
   ["private-feed.js", "WGQUIET1"],
   ["house-lights.js", "HALLOWEEN1"],
-  ["house-board-strip.js", "HALLOWEEN1"]
+  ["house-board-strip.js", "HALLOWEEN1"],
+  /* SUNHOME1 · cold-month coat, kid feed honesty, climate hero, run lamps */
+  ["month-theme/month-overlay.js", "HALLOWEEN1"],
+  ["month-theme/month-overlay.js", "LHV1"],
+  ["month-theme/month-overlay.css", "MERGE1C"],
+  ["month-theme/month-overlay.css", "MONTHFX2"],
+  ["livinghouse/scene-packs.js", "H1P2D4"],
+  ["livinghouse/lh.js", "H1P2D3"],
+  ["livinghouse/lh.js", "SUNHOME1"],
+  ["kid-world.js", "ORI1"],
+  ["kid-world.css", "DAYPKG1"],
+  ["kid-world.css", "SUNHOME1"],
+  ["kid-world.css", "SUNHOME2"],
+  ["kid-world.js", "SUNHOME1"],
+  ["kid-world.js", "SUNHOME2"],
+  ["kid-world.css", "SUNHOME3"],
+  ["house-checkoffs.js", "DAYPKG1"],
+  ["month-theme/month-overlay.css", "SUNHOME1"],
+  ["month-theme/month-overlay.js", "SUNHOME1"],
+  ["house-kid-engage.js", "DAYPKG1"],
+  ["house-hub-tiles-bind.js", "MERGE1C"],
+  ["house-sensi-ctl.js", "HUBPIN1"],
+  ["house-sensi.js", "ADULTCUT1"],
+  ["mercury-run.js", "ORI2"]
 ];
 const SKIP = /^(scripts|tests?|plates|plates-receipt|vendor|node_modules|\.git)$/;
 function pages(dir, out = []) {
@@ -77,7 +101,7 @@ test("H1-CB · no served page loads a halloween1-changed asset with its pre-rang
   assert.deepEqual(hits, []);
 });
 /* HUBPAIR1 · a script changed again after halloween1 carries the newer token */
-const NEWER = { "house-board-strip.js": "PAIRUI1", "house-lights.js": "CAMREST5", "house-spotify.js": "ADULTCUT2B" }; /* SPOTCUT1 · the Spotify setup moved Dad-only; ADULTCUT2 · and the Spotify sign-in */ /* PAIRUI1 · both changed again; PAIRUI1b · lights once more; CAMREST4 · and again; CAMREST5 · and again */
+const NEWER = { "house-board-strip.js": "PAIRUI1", "house-lights.js": "SUNHOME1", "house-spotify.js": "ADULTCUT2B", "school-names.js": "SUNHOME1", "house-ori-calm.js": "SUNHOME1", "house-trips-bind.js": "SUNHOME2" }; /* SPOTCUT1 · the Spotify setup moved Dad-only; ADULTCUT2 · and the Spotify sign-in */ /* PAIRUI1 · both changed again; PAIRUI1b · lights once more; CAMREST4 · and again; CAMREST5 · and again */ /* SUNHOME2 · school-names and ori-calm leave the Halloween stamp */
 test("H1-CB · the six named scripts are re-tokened on the pages that load them", () => {
   const want = { "house-board-strip.js": "sheet-index.html", "house-lights.js": "sheet-lights.html", "house-ori-calm.js": "sheet-index.html",
     "house-spotify.js": "sheet-spotify.html", "house-trips-bind.js": "sheet-us.html", "school-names.js": "kid-hayes.html" };

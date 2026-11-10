@@ -1,0 +1,339 @@
+/* Acer UT272 home board. One canvas, 1920 x 1080.
+   Margin 48. 12 columns x 130. Gutter 24. Usable 1824 x 984.
+   Spans: 2 = 284, 3 = 438, 4 = 592, 6 = 900.
+   Header 1824x96 at 48,48. Body from y168, height 864.
+   Hub window 900x864 at 48,168. Roster 438x420 at 972/1434, 168/612. */
+html, body,
+html[data-month-theme] body:not([data-kid-world]) {
+  width: 1920px !important;
+  height: 1080px !important;
+  min-width: 1920px !important;
+  min-height: 0 !important;
+  max-width: 1920px !important;
+  max-height: 1080px !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  background-color: #07080b !important;
+  background-image: var(--wg-hubbg, url("month-theme/november/wall-dusk.webp")) !important;
+  background-repeat: no-repeat !important;
+  background-position: left top !important;
+  background-size: auto !important;
+}
+html:not(#hf-scroll-off) > body { min-height: 0 !important; }
+html body .panel.panel {
+  position: relative !important;
+  width: 1920px !important;
+  height: 1080px !important;
+  min-height: 0 !important;
+  max-width: 1920px !important;
+  max-height: 1080px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  display: block !important;
+  overflow: hidden !important;
+}
+html body .panel.panel > header.hdr {
+  position: absolute !important;
+  left: 48px !important;
+  top: 48px !important;
+  width: 1824px !important;
+  height: 96px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  z-index: 5;
+  display: grid !important;
+  grid-template-columns: 284px 438px minmax(0, 1fr) 284px !important;
+  column-gap: 24px !important;
+  align-items: center !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+html body .hub-home {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  grid-column: 1 !important;
+  justify-self: start !important;
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+}
+html body .panel.panel > header.hdr .hdr-date {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  grid-column: 2 !important;
+  width: 438px !important;
+  max-width: 438px !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  z-index: 2;
+}
+html body .panel.panel > header.hdr .hdr-brand,
+html body .panel.panel > header.hdr h1.name {
+  position: relative !important;
+  grid-column: 3 !important;
+  margin: 0 !important;
+  text-align: center !important;
+  justify-self: center !important;
+}
+html body .panel.panel > header.hdr .hdr-ovals {
+  position: relative !important;
+  grid-column: 4 !important;
+  justify-self: end !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  min-height: 64px !important;
+  margin: 0 !important;
+}
+html body .hub-home img {
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+}
+html body .panel.panel > .hub-window {
+  position: absolute !important;
+  left: 48px !important;
+  top: 168px !important;
+  width: 900px !important;
+  height: 864px !important;
+  max-height: none !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  z-index: 1;
+}
+html body .hub-window img {
+  width: 900px !important;
+  height: 864px !important;
+  max-width: none !important;
+  object-fit: none !important;
+}
+html body .panel.panel > .grid-wrap {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 1920px !important;
+  height: 1080px !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  z-index: 3;
+  pointer-events: none;
+}
+/* The four doors take taps. The wrap stays inert so the porch does not. */
+html body .tile.ainsley,
+html body .tile.hayes,
+html body .tile.harris,
+html body .tile.dan {
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+html body .grid-hdr { display: none !important; }
+html body .tile-grid.tile-grid--cams { display: block !important; height: auto !important; }
+html body .tile-grid.tile-grid--cams > .tile:not(.ainsley):not(.hayes):not(.harris):not(.dan) {
+  display: block !important;
+  position: absolute !important;
+  left: -3200px !important;
+  top: 0 !important;
+  width: 720px !important;
+  height: auto !important;
+  min-height: 640px !important;
+  max-height: none !important;
+  overflow: visible !important;
+  pointer-events: none !important;
+}
+html body .tile-micro span.md { font-size: 14px !important; }
+html body .tile.ainsley .tile-micro,
+html body .tile.hayes .tile-micro,
+html body .tile.harris .tile-micro,
+html body .tile.ainsley .tile-micro span.md,
+html body .tile.hayes .tile-micro span.md,
+html body .tile.harris .tile-micro span.md {
+  display: block !important;
+  font-size: 14px !important;
+}
+html body .tile-grid.tile-grid--cams > .tile.ainsley,
+html body .tile-grid.tile-grid--cams > .tile.hayes,
+html body .tile-grid.tile-grid--cams > .tile.harris,
+html body .tile-grid.tile-grid--cams > .tile.dan {
+  display: block !important;
+  position: absolute !important;
+  width: 438px !important;
+  height: 420px !important;
+  min-width: 438px !important;
+  min-height: 420px !important;
+  max-height: none !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  grid-column: auto !important;
+}
+html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.ainsley,
+html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.hayes,
+html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.harris,
+html body .panel.panel.panel .tile-grid.tile-grid--cams > .tile.dan {
+  width: 438px !important;
+  height: 420px !important;
+  min-height: 420px !important;
+  max-height: none !important;
+}
+html body .tile.ainsley { left: 972px !important; top: 168px !important; }
+html body .tile.hayes { left: 1434px !important; top: 168px !important; }
+html body .tile.harris { left: 972px !important; top: 612px !important; }
+html body .tile.dan { left: 1434px !important; top: 612px !important; }
+html body .tile.ainsley,
+html body .tile.hayes,
+html body .tile.harris {
+  background-repeat: no-repeat !important;
+  background-size: 438px 420px !important;
+  background-position: left top !important;
+}
+html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile.dan {
+  border-width: 0 !important;
+  padding: 0 !important;
+}
+html body .tile.dan {
+  background-image: url("month-theme/hub/kidtile-dad.webp") !important;
+  background-repeat: no-repeat !important;
+  background-size: 438px 420px !important;
+  background-position: left top !important;
+}
+html body .tile.dan [data-dad-stage] {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  height: 140px !important;
+  margin: 0 !important;
+  padding: 16px 20px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  color: #f4efe6 !important;
+  overflow: hidden !important;
+}
+html body .panel.panel > .hub-upper {
+  position: absolute !important;
+  left: 48px !important;
+  top: 928px !important;
+  width: 900px !important;
+  height: 104px !important;
+  max-height: 104px !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  z-index: 4;
+}
+html body .panel.panel > .hub-upper .leaveby { display: block !important; min-height: 48px !important; }
+html body .panel.panel > .hub-upper .sp-strip { display: none !important; }
+html body .panel.panel > #hub-cam-deck {
+  position: absolute !important;
+  left: 48px !important;
+  top: 168px !important;
+  width: 900px !important;
+  height: 128px !important;
+  margin: 0 !important;
+  z-index: 4;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(64px, 1fr));
+  gap: 16px;
+}
+html body .panel.panel > #hub-cam-deck[hidden],
+html body .panel.panel > #hub-lights-panel[hidden] { display: none !important; }
+html body .panel.panel > .who-up,
+html body .float-orbs { display: none !important; }
+html body .name,
+html body .name-accent { font-size: 48px !important; line-height: 1 !important; }
+html body .panel header.hdr .hdr-date-kicker,
+html body .panel header.hdr .hdr-date-time,
+html body .panel header.hdr .hdr-date-dow,
+html body .panel header.hdr.hdr--spread .hdr-date-long,
+html body .tile-label,
+html body .tile-sub { font-size: 24px !important; line-height: 1.15 !important; }
+html body .hub-home,
+html body a.tile { touch-action: manipulation; }
+html body .pf-flag--pair { display: none !important; }
+/* Roster sublines sit on the art and do not read. The name stays on a scrim. Off-canvas tiles keep their micro line for the cold-load check. */
+html body .tile.ainsley .tile-sub,
+html body .tile.hayes .tile-sub,
+html body .tile.harris .tile-sub,
+html body .tile.dan .tile-sub,
+html body .tile.ainsley .tile-micro,
+html body .tile.hayes .tile-micro,
+html body .tile.harris .tile-micro,
+html body .tile.dan .tile-micro,
+html body .tile.ainsley .kf-title,
+html body .tile.hayes .kf-title,
+html body .tile.harris .kf-title { display: none !important; }
+html body .tile.ainsley .tile-label,
+html body .tile.hayes .tile-label,
+html body .tile.harris .tile-label,
+html body .tile.dan .tile-label {
+  font-size: 28px !important;
+  line-height: 1.15 !important;
+  color: #f4efe6 !important;
+  background: rgba(8, 10, 14, 0.78) !important;
+  padding: 8px 14px !important;
+  border-radius: 12px !important;
+}
+html body .tile.dan [data-dad-stage] .tile-label {
+  font-size: 24px !important;
+  line-height: 1.15 !important;
+  color: #f4efe6 !important;
+}
+/* Sound sits beside the home key, in the home cell, so it does not cover the clock. */
+html.night52 body > .night52-snd {
+  position: absolute !important;
+  left: 128px !important;
+  right: auto !important;
+  top: 64px !important;
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  border-radius: 32px !important;
+  z-index: 6 !important;
+}
+html.night52 body > .night52-snd svg {
+  width: 32px !important;
+  height: 32px !important;
+}
+html.night52 body > .night52-snd::before {
+  content: "Sound";
+  position: absolute;
+  left: 72px;
+  top: 16px;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  color: #f4efe6;
+  white-space: nowrap;
+  pointer-events: none;
+}
+html body #house-wx,
+html body #index-sensi-chip {
+  min-width: 64px !important;
+  min-height: 64px !important;
+  width: auto !important;
+  height: 64px !important;
+  font-size: 24px !important;
+  line-height: 64px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 16px !important;
+  box-sizing: border-box !important;
+  color: #f4efe6 !important;
+  background: rgba(8, 10, 14, 0.78) !important;
+  border-radius: 32px !important;
+}
+html body #index-sensi-chip::before {
+  content: "Sensi";
+  font-size: 24px !important;
+  font-weight: 700;
+  color: #f4efe6;
+}

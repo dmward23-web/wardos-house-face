@@ -36,8 +36,7 @@ test("DAYPKG1 v2i browser: sheet-allowance weekly figure reads '" + D + "N wk' (
   for (const [w, h] of [[440, 956], [1280, 800]]) {
     const o = run("allowance", "sheet-allowance", w, h);
     const shown = o.state.filter((x) => x.text);
-    assert.ok(shown.length >= 1, JSON.stringify(o.state));
-    for (const x of shown) { assert.match(x.text, /^\$\d+(?:\.\d+)? wk$/, JSON.stringify(x)); assert.ok(!x.text.includes("\u2605")); }
+    assert.equal(shown.length, 0, "public allowance shows no weekly dollar figure " + JSON.stringify(o.state));
   }
 });
 for (const page of ["kid-hayes", "sheet-chores"]) test("DAYPKG1 v2i browser: midnight rollover on " + page + " within 30 s (fake clock 23:59:40 CT)", SKIP, () => {

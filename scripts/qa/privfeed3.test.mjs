@@ -24,7 +24,7 @@ test("P1 · no camera stills or page screenshots anywhere; every tracked image i
     assert.ok(allow.has(f), "image not on the art allow-list: " + f);
   }
   for (const f of allow) assert.ok(files.includes(f), "allow-list names a file that is not tracked: " + f);
-  for (const f of allow) assert.match(f, /^[A-Za-z0-9_./-]+\.(png|jpe?g|webp|gif|svg)$/, "allow-list holds art file paths only");
+  for (const f of allow) assert.match(f, /^[A-Za-z0-9_./@-]+\.(png|jpe?g|webp|gif|svg)$/, "allow-list holds art file paths only");
 });
 
 test("P1 · privacy-scan flags ANY image or video outside the allow-list (tree, and --images --rev for pre-push)", () => {

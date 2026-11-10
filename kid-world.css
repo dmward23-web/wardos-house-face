@@ -18,11 +18,16 @@ html.kw-root body.kw-on .panel::after {
   box-shadow: none !important;
 }
 html.kw-root body.kw-on .panel {
-  width: 100% !important;
-  max-width: 1080px;
-  margin: 0 auto;
-  min-height: 100vh !important;
-  position: relative;
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
   z-index: 1;
 }
 .kw-canvas, .kw-wash {
@@ -146,6 +151,7 @@ body.kw-on .jar-flow,
 body.kw-on .paid-stamp,
 body.kw-on [data-streak-label],
 body.kw-on .xp-glass,
+body.kw-on .xp-row,
 body.theme-hayes.kw-on .quest .star-earn,
 body.theme-harris.kw-on .quest .star-earn,
 body.theme-ainsley.kw-on .quest .star-earn,
@@ -454,16 +460,501 @@ html.kw-root, html.kw-root body.kw-on {
   height: 100% !important;
   overflow: hidden !important;
 }
-body.kw-on .panel {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
 body.kw-on #tapsync-badge { display: none !important; }
+/* SUNHOME · wall portrait: world on top, musts then jar then days in a light dock. Same height for every kid. */
+@media (orientation: portrait) and (min-height: 1500px) {
+  html.kw-root, html.kw-root body.kw-on { height: 100dvh !important; min-height: 0 !important; overflow: hidden !important; }
+  html.kw-root body.kw-on .kw-canvas { top: 0 !important; bottom: auto !important; height: 55dvh !important; width: 100% !important; }
+  html.kw-root body.kw-on .panel {
+    position: fixed !important; inset: auto 0 0 0 !important;
+    width: 100% !important; height: 45dvh !important; min-height: 0 !important; max-width: none !important;
+    margin: 0 !important;
+    overflow: auto !important; opacity: 1 !important; clip: auto !important;
+    pointer-events: auto !important; z-index: 6 !important;
+    background: rgba(250, 246, 238, .72) url("kid-glass-light@2x.png") 0 0 / 512px 512px repeat !important;
+    background-blend-mode: screen !important;
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    color: #1a1814 !important;
+  }
+  html.kw-root body.kw-on.kw-rest .panel { opacity: .6 !important; }
+  html.kw-root body.kw-on .panel::before,
+  html.kw-root body.kw-on .panel::after { background: none !important; background-image: none !important; }
+  html.kw-root body.kw-on .jump-rail,
+  html.kw-root body.kw-on .hot-banner,
+  html.kw-root body.kw-on .ftr,
+  html.kw-root body.kw-on .panel .sec:not(#sec-musts):not(#sec-jar):not(#sec-days) { display: none !important; }
+  html.kw-root body.kw-on .body { display: flex !important; flex-direction: column !important; gap: 8px !important; }
+  html.kw-root body.kw-on #sec-musts { order: 1; }
+  html.kw-root body.kw-on #sec-jar { order: 2; }
+  html.kw-root body.kw-on #sec-days { order: 3; }
+  html.kw-root body.kw-on .day-tap { min-width: 44px; min-height: 44px; }
+}
+@media (orientation: landscape) and (min-width: 1200px) and (min-height: 700px) {
+  html.kw-root:not(#hf-scroll-off),
+  html.kw-root:not(#hf-scroll-off) > body {
+    width: 1920px !important;
+    height: 1080px !important;
+    min-height: 0 !important;
+    max-height: 1080px !important;
+    overflow: hidden !important;
+  }
+  html.kw-root body.kw-on .panel > header.hdr { display: none !important; }
+  html.kw-root body.kw-on .kw-canvas { right: 34vw !important; width: auto !important; height: 100% !important; top: 0 !important; }
+  html.kw-root body.kw-on .panel {
+    position: fixed !important; top: 0 !important; right: 0 !important; bottom: 0 !important; left: auto !important;
+    width: 34vw !important; height: 100dvh !important; min-height: 0 !important; max-width: none !important;
+    margin: 0 !important;
+    overflow: hidden !important; opacity: 1 !important; clip: auto !important;
+    pointer-events: auto !important; z-index: 6 !important;
+    background: rgba(250, 246, 238, .72) url("kid-glass-light@2x.png") 0 0 / 512px 512px repeat !important;
+    background-blend-mode: screen !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  html.kw-root body.kw-on.kw-rest .panel { opacity: .6 !important; }
+  html.kw-root body.kw-on .panel .sec:not(#sec-musts):not(#sec-jar):not(#sec-days) { display: none !important; }
+  html.kw-root body.kw-on .kw-hud,
+  html.kw-root body.kw-on .kw-path,
+  html.kw-root body.kw-on .kw-week,
+  html.kw-root body.kw-on .kw-light,
+  html.kw-root body.kw-on .house-snd { right: calc(34vw + 12px) !important; z-index: 7 !important; }
+  html.kw-root body.kw-on .kw-hud { top: 12px !important; height: 64px !important; }
+  html.kw-root body.kw-on .kw-feed { top: 88px !important; }
+}
+@media (width: 1920px) and (height: 1080px) {
+  /* 1920×1080 wall: 12 columns of 130, 48 margin, 24 gutter.
+     Header band 1824×96. Stage 900×864 at 48,168. List 900×864 at 972,168. */
+  html.kw-root:not(#hf-scroll-off),
+  html.kw-root:not(#hf-scroll-off) > body,
+  html.kw-root,
+  html.kw-root > body {
+    width: 1920px !important;
+    height: 1080px !important;
+    min-height: 0 !important;
+    max-height: 1080px !important;
+    overflow: hidden !important;
+    background: #0c0e12 !important;
+  }
+  html.kw-root body.kw-on .panel > header.hdr,
+  html.kw-root body.kw-on .jump-rail,
+  html.kw-root body.kw-on .kw-path,
+  html.kw-root body.kw-on .kw-drawer,
+  html.kw-root body.kw-on .kw-week-empty,
+  html.kw-root body.kw-on .kw-feed { display: none !important; }
+  body.theme-ainsley .sec-schedule::after { content: none !important; display: none !important; }
+  html.kw-root body.kw-on .kw-canvas {
+    position: fixed !important;
+    left: 48px !important;
+    top: 168px !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 900px !important;
+    height: 864px !important;
+    transform: none !important;
+  }
+  html.kw-root body.kw-on .blocks-float,
+  html.kw-root body.kw-on .forge-float {
+    display: none !important;
+    background-image: none !important;
+  }
+  /* Wall taps stay the same size. No ancestor of a card may scale or shift. */
+  html.kw-root,
+  html.kw-root body.kw-on,
+  html.kw-root body.kw-on:active,
+  html.kw-root body.kw-on .panel,
+  html.kw-root body.kw-on .panel:active,
+  html.kw-root body.kw-on .body,
+  html.kw-root body.kw-on .body:active,
+  html.kw-root body.kw-on .sec,
+  html.kw-root body.kw-on .sec:active,
+  html.kw-root body.kw-on .card,
+  html.kw-root body.kw-on .card:active,
+  html.kw-root body.kw-on #sec-musts,
+  html.kw-root body.kw-on #sec-musts:active,
+  html.kw-root body.kw-on .chore-list,
+  html.kw-root body.kw-on .chore-list:active,
+  html.kw-root body.kw-on [data-mount-quests],
+  html.kw-root body.kw-on [data-mount-quests]:active,
+  html.kw-root body.kw-on .chore,
+  html.kw-root body.kw-on .chore:active,
+  html.kw-root body.kw-on #sec-jar,
+  html.kw-root body.kw-on #sec-jar:active,
+  html.kw-root body.kw-on #sec-jar .grow-meter,
+  html.kw-root body.kw-on #sec-jar .grow-stage,
+  html.kw-root body.kw-on .vfx-boom,
+  html.kw-root body.kw-on .is-bump,
+  html.kw-root body.kw-on .juice-ping,
+  html.kw-root body.vfx-shake .panel,
+  html.kw-root body.vfx-shake-hard .panel {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  html.kw-root body.kw-on .chore.vfx-boom {
+    filter: none !important;
+    opacity: 0.82;
+    outline: 3px solid rgba(26, 24, 20, 0.55);
+    outline-offset: -3px;
+    box-shadow: inset 0 0 0 4px rgba(26, 24, 20, 0.22);
+  }
+  html.kw-root body.kw-on .kw-hud {
+    position: fixed !important;
+    left: 48px !important;
+    top: 48px !important;
+    right: auto !important;
+    width: 1824px !important;
+    height: 96px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 24px !important;
+    z-index: 8 !important;
+    background: transparent !important;
+  }
+  html.kw-root body.kw-on .kw-home,
+  html.kw-root body.kw-on .kw-home img,
+  html.kw-root body.kw-on .kw-mute,
+  html.kw-root body.kw-on .house-snd {
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+  }
+  html.kw-root body.kw-on .kw-mute.house-snd,
+  html.kw-root body.kw-on .kw-mute {
+    position: relative !important;
+    width: auto !important;
+    min-width: 148px !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    padding: 0 20px !important;
+    gap: 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 24px !important;
+    color: #f4efe6 !important;
+    background: rgba(8, 10, 14, 0.88) !important;
+    border-radius: 32px !important;
+    box-sizing: border-box !important;
+  }
+  html.kw-root body.kw-on .kw-mute::after {
+    content: "Sound";
+    position: static !important;
+    font-size: 24px !important;
+    font-weight: 700;
+    line-height: 1;
+    color: #f4efe6;
+  }
+  html.kw-root body.kw-on .kw-name,
+  html.kw-root body.kw-on .kw-clock {
+    font-size: 40px !important;
+    line-height: 44px !important;
+    color: #f4efe6 !important;
+    background: rgba(8, 10, 14, 0.72);
+    padding: 8px 16px !important;
+    margin: 0 !important;
+    position: relative !important;
+    top: 16px !important;
+    transform: none !important;
+    border-radius: 12px;
+  }
+  html.kw-root body.kw-on .panel {
+    position: fixed !important;
+    left: 972px !important;
+    top: 168px !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 900px !important;
+    height: 864px !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: 864px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    opacity: 1 !important;
+    clip: auto !important;
+    pointer-events: auto !important;
+    z-index: 6 !important;
+    background: rgba(12, 14, 18, 0.92) !important;
+    background-image: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border-radius: 16px !important;
+  }
+  html.kw-root body.kw-on.kw-rest .panel { opacity: 1 !important; }
+  html.kw-root body.kw-on .panel .body {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: minmax(0, 1fr) 240px !important;
+    gap: 16px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+  html.kw-root body.kw-on .panel .sec:not(#sec-musts):not(#sec-jar):not(#sec-days) { display: none !important; }
+  html.kw-root body.kw-on #sec-musts,
+  html.kw-root body.kw-on #sec-jar,
+  html.kw-root body.kw-on #sec-days {
+    align-self: stretch !important;
+    height: auto !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+  }
+  html.kw-root body.kw-on #sec-musts {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  html.kw-root body.kw-on #sec-jar { grid-column: 1 !important; grid-row: 2 !important; overflow: hidden !important; }
+  html.kw-root body.kw-on #sec-days { grid-column: 2 !important; grid-row: 2 !important; overflow: hidden !important; }
+  /* No next item: drop the card and let Musts keep the list. A real next item stays, at 24px. */
+  html.kw-root body.kw-on #sec-days:has(.consume-hero.empty),
+  html.kw-root body.kw-on #sec-days:not(:has(.consume-hero-title)) { display: none !important; }
+  html.kw-root body.kw-on.kw-next-off #sec-days { display: none !important; }
+  html.kw-root body.kw-on.kw-next-off #sec-jar { grid-column: 1 / -1 !important; }
+  html.kw-root body.kw-on.kw-next-off .panel .body {
+    grid-template-rows: 784px 64px !important;
+    height: 864px !important;
+    padding: 0 !important;
+    row-gap: 16px !important;
+  }
+  html.kw-root body.kw-on #sec-musts,
+  html.kw-root body.kw-on #sec-jar {
+    border: 0 !important;
+  }
+  html.kw-root body.kw-on #sec-musts { padding: 0 !important; }
+  html.kw-root body.kw-on #sec-jar {
+    min-height: 64px !important;
+    height: 64px !important;
+    max-height: 64px !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 16px !important;
+    overflow: hidden !important;
+  }
+  html.kw-root body.kw-on #sec-jar > :not(.saves-host):not(.bank-top) { display: none !important; }
+  html.kw-root body.kw-on #sec-musts .sec-hdr { display: none !important; }
+  html.kw-root body.kw-on #sec-musts .chore-list,
+  html.kw-root body.kw-on #sec-musts [data-mount-quests] {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    overflow: hidden !important;
+  }
+  html.kw-root body.kw-on #sec-musts .chore {
+    flex: 0 0 64px !important;
+    width: 900px !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    margin: 0 !important;
+    padding: 4px 12px !important;
+    box-sizing: border-box !important;
+    background: rgba(255, 252, 247, 0.96) !important;
+    border-radius: 12px !important;
+    color: #1a1814 !important;
+  }
+  html.kw-root body.kw-on #sec-musts .chore .what,
+  html.kw-root body.kw-on #sec-musts .chore .hint {
+    font-size: 24px !important;
+    line-height: 1.1 !important;
+    color: #1a1814 !important;
+  }
+  html.kw-root body.kw-on #sec-jar .saves-host,
+  html.kw-root body.kw-on #sec-jar .bank-top {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  html.kw-root body.kw-on #sec-jar .saves-face {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    width: 100% !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    margin: 0 !important;
+  }
+  html.kw-root body.kw-on #sec-jar .saves-bar {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    flex: 1 1 auto !important;
+  }
+  html.kw-root body.kw-on #sec-jar .saves-bar-text {
+    white-space: nowrap !important;
+    font-size: 24px !important;
+    color: #1a1814 !important;
+  }
+  html.kw-root body.kw-on #sec-jar .jar-state {
+    display: block !important;
+    border: 0 !important;
+    background: transparent !important;
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+    color: #1a1814 !important;
+    padding: 0 !important;
+    letter-spacing: 0 !important;
+  }
+  html.kw-root body.kw-on #sec-days:not(:has(.consume-hero.empty)) > :not(.sec-hdr):not(.consume-hero) { display: none !important; }
+  html.kw-root body.kw-on #sec-days .consume-hero,
+  html.kw-root body.kw-on #sec-days .consume-hero-title,
+  html.kw-root body.kw-on #sec-days .consume-hero-meta,
+  html.kw-root body.kw-on #sec-days .consume-hero-when,
+  html.kw-root body.kw-on #sec-days .sec-title {
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+  }
+  html.kw-root body.kw-on #sec-days .consume-hero { min-height: 64px !important; }
+  html.kw-root body.kw-on #sec-musts .kw-must-empty {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    min-height: 64px !important;
+    font-size: 28px !important;
+    text-align: center !important;
+    background: transparent !important;
+    color: #1a1814 !important;
+  }
+  html.kw-root body.kw-on .panel .jar-state,
+  html.kw-root body.kw-on .panel .saves-bar,
+  html.kw-root body.kw-on .panel .saves-bar-text {
+    font-size: 24px !important;
+    line-height: 1.25 !important;
+  }
+  html.kw-root body.kw-on .panel .saves-plus {
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+    font-size: 28px !important;
+  }
+  html.kw-root body.kw-on .panel .quest,
+  html.kw-root body.kw-on .panel .card,
+  html.kw-root body.kw-on .panel .row,
+  html.kw-root body.kw-on .panel button,
+  html.kw-root body.kw-on .panel a.row {
+    min-height: 64px !important;
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+  }
+  html.kw-root body.kw-on .panel .sec-title,
+  html.kw-root body.kw-on .panel .what,
+  html.kw-root body.kw-on .panel .bank-title,
+  html.kw-root body.kw-on .panel .bank-goal-title,
+  html.kw-root body.kw-on .panel .bank-count,
+  html.kw-root body.kw-on .panel .bank-blurb,
+  html.kw-root body.kw-on .panel .kw-must-empty,
+  html.kw-root body.kw-on .panel .sec-empty,
+  html.kw-root body.kw-on .panel p,
+  html.kw-root body.kw-on .panel li,
+  html.kw-root body.kw-on .panel span {
+    font-size: 24px !important;
+    line-height: 1.25 !important;
+  }
+  html.kw-root body.kw-on .kw-week {
+    position: fixed !important;
+    left: 48px !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 48px !important;
+    width: 900px !important;
+    height: 72px !important;
+    z-index: 7 !important;
+  }
+  html.kw-root body.kw-on .kw-day,
+  html.kw-root body.kw-on .kw-day b,
+  html.kw-root body.kw-on .kw-day small {
+    min-height: 64px !important;
+    font-size: 24px !important;
+  }
+}
+html.kw-root body.kw-on .panel #sec-musts,
+html.kw-root body.kw-on .panel #sec-jar,
+html.kw-root body.kw-on .panel #sec-days,
+html.kw-root body.kw-on .panel .sec,
+html.kw-root body.kw-on .panel .bank-card {
+  background: rgba(255, 252, 247, .9) !important;
+  color: #1a1814 !important;
+  border-color: rgba(26, 24, 20, .2) !important;
+}
+html.kw-root body.kw-on .panel .sec-title,
+html.kw-root body.kw-on .panel .bank-title,
+html.kw-root body.kw-on .panel .what,
+html.kw-root body.kw-on .panel .quest,
+html.kw-root body.kw-on .panel .hint {
+  color: #1a1814 !important;
+}
+html.kw-root body.kw-on .panel .quest,
+html.kw-root body.kw-on .panel .day-tap { min-height: 56px; }
+.kw-week-empty, .kw-must-empty {
+  margin: 8px 12px; color: #1a1814; background: rgba(255,252,247,.92);
+  font: 600 16px/1.3 system-ui, sans-serif; padding: 8px 12px; border-radius: 12px;
+}
+@media (orientation: portrait) and (min-height: 1500px),
+       (orientation: landscape) and (min-width: 1200px) and (min-height: 700px) {
+  html.kw-root body.kw-on > header.hdr,
+  html.kw-root body.kw-on .ftr,
+  html.kw-root body.kw-on .jump-rail,
+  html.kw-root body.kw-on .hot-banner { display: none !important; }
+}
+body.theme-hayes.kw-on .kw-canvas { pointer-events: none; }
+body.theme-ainsley .ains-mist {
+  position: absolute; inset: 0 0 45% 0; pointer-events: none; z-index: 2;
+  background: radial-gradient(120% 80% at 70% 20%, rgba(255, 214, 160, .16), transparent 55%),
+    linear-gradient(180deg, rgba(255,255,255,.05), transparent 40%);
+  animation: ainsDrift 18s ease-in-out infinite alternate;
+}
+html[data-ains-quiet="1"] .ains-mist { animation-duration: 28s; }
+@keyframes ainsDrift { from { opacity: .55; transform: translate3d(0,0,0); } to { opacity: .85; transform: translate3d(-1.2%, .4%, 0); } }
+@media (prefers-reduced-motion: reduce) { body.theme-ainsley .ains-mist { animation: none; } }
+.kid-pebble { position: relative; width: 56px; height: 56px; pointer-events: none; background-repeat: no-repeat; background-size: 56px 56px; background-position: 0 0; }
+.kid-pebble[data-state="empty"] { background-image: url("month-theme/november/pebble/pebble-empty-56.webp"); }
+.kid-pebble[data-state="today-1"] { background-image: url("month-theme/november/pebble/pebble-today-1-56.webp"); }
+.kid-pebble[data-state="today-2"] { background-image: url("month-theme/november/pebble/pebble-today-2-56.webp"); }
+.kid-pebble[data-state="today-3"] { background-image: url("month-theme/november/pebble/pebble-today-3-56.webp"); }
+.kid-pebble[data-state="filled"] { background-image: url("month-theme/november/pebble/pebble-filled-56.webp"); }
+.kid-pebble.settle { animation: pebSettle 1.2s cubic-bezier(.2,.7,.2,1); }
+.kid-pebble.settle::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,.18), transparent 70%);
+  animation: pebSheen 1.2s ease-out;
+}
+@keyframes pebSettle { 0% { transform: translateY(-3px); } 60% { transform: translateY(2px); } 100% { transform: none; } }
+@keyframes pebSheen { from { opacity: 0; } 40% { opacity: 1; } to { opacity: 0; } }
+body.theme-ainsley .kid-pebble { display: none !important; }
+body.theme-ainsley #sec-jar .bank-track,
+body.theme-ainsley #sec-jar .grow-meter,
+body.theme-ainsley #sec-jar .xp-stage,
+body.theme-ainsley #sec-jar .prog,
+body.theme-ainsley #sec-jar .meter,
+body.theme-ainsley .xp-stage,
+body.theme-ainsley .bank-track,
+body.theme-ainsley .grow-meter,
+body.theme-ainsley .consume-label .line { display: none !important; }
+body.theme-ainsley #sec-days .harbor-strip:not(:has(.card)) { display: none !important; }
+@media (max-width: 700px) { .kid-pebble { width: 56px; height: 56px; background-size: 56px 56px; } }
 .kw-canvas { z-index: 1; pointer-events: auto; touch-action: none; }
 .kw-stage {
   position: fixed;
@@ -483,7 +974,21 @@ body.kw-on #tapsync-badge { display: none !important; }
   justify-content: space-between;
   gap: 12px;
 }
-.kw-home, .kw-path {
+.kw-home {
+  appearance: none !important;
+  width: 44px; height: 44px; min-width: 44px; min-height: 44px;
+  padding: 0 !important; border-radius: 50% !important;
+  border: 1px solid rgba(243, 230, 207, .35) !important;
+  background: rgba(250, 246, 238, .16) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28) !important;
+  color: #f3e6cf !important;
+  text-shadow: none !important;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.kw-home img { width: 22px; height: 22px; display: block; }
+.kw-id { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.kw-name { font: 800 22px/1 system-ui, sans-serif; letter-spacing: .08em; color: #fff8f0; text-shadow: 0 0 12px rgba(8,6,4,.72); }
+.kw-path {
   appearance: none;
   border: 0;
   background: transparent;
@@ -498,6 +1003,24 @@ body.kw-on #tapsync-badge { display: none !important; }
   font: 600 15px/1.2 system-ui, sans-serif;
   color: #fff8f0;
   text-shadow: 0 0 10px rgba(8, 6, 4, 0.72);
+}
+body.theme-hayes .kw-feed,
+body.theme-harris .kw-feed { top: calc(max(10px, env(safe-area-inset-top)) + 124px); }
+.kw-feed {
+  position: absolute;
+  left: 12px;
+  top: calc(max(10px, env(safe-area-inset-top)) + 56px);
+  z-index: 6;
+  pointer-events: auto;
+  min-height: 44px;
+  max-width: calc(100vw - 24px);
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 214, 160, 0.45);
+  background: rgba(16, 12, 8, 0.78);
+  color: #fff6e4;
+  font: 700 15px/1.2 system-ui, sans-serif;
+  text-align: left;
 }
 .kw-jar-host {
   position: absolute;

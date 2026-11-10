@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" data-asset="backgrounds/bg-wall-night-v2.webp|backgrounds/bg-wall-night-v2.png|backgrounds/bg-wall-night-onemoon.webp|backgrounds/bg-wall-night-onemoon.png" data-asset-var="--wg-hubbg">
+<html lang="en" data-hub-fit="acer-1920">
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPAIR1"></script>
 <script src="private-feed.js?v=HUBPAIR1D"></script>
-<script src="school-names.js?v=HALLOWEEN1"></script>
+<script src="school-names.js?v=SUNHOME1"></script>
 <script src="house-nomoney.js?v=KIDCRIT1"></script>
 <script src="house-face-law.js?v=FACESTRIP1"></script>
 <script src="house-pair.js?v=HUBPAIR1"></script>
 <script src="house-money-bind.js?v=DAYPKG1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
-<meta name="viewport" id="hf-viewport" content="width=1080" />
-<script src="away-filter.js?v=HALLOWEEN1" data-away-install data-dan-view></script>
-<script>/* HUBFIT1 · phones get their own layout; the wall keeps 1080 */(function(){try{var w=Math.min(screen.width,screen.height);if(w&&w<=600){document.getElementById("hf-viewport").setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
+<meta name="viewport" id="hf-viewport" content="width=1920, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<script src="away-filter.js?v=SUNHOME1" data-away-install data-dan-view></script>
+<script>/* ACER1 · the wall board is one 1920x1080 canvas. No phone viewport. */</script>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon-20260926c.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -3835,14 +3835,12 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
   .led-ring path { animation: none !important; }
 }
 </style>
-<link rel="stylesheet" href="night/night-host.css?v=HALLOWEEN1" />
-<link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<link rel="stylesheet" href="night/night-host.css?v=SUNHOME1" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=SUNHOME2" />
 <script src="house-face-law.js?v=FACESTRIP1"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
 <link rel="stylesheet" href="wg-glass.css?v=HOTFIX1" />
 <link rel="stylesheet" href="wg-wall-land.css?v=H1P2D4" />
 <script src="wg-assets.js?v=H1P2D3" defer></script>
-<script src="wg-spook.js?v=HALLOWEEN1" defer></script>
-<link rel="stylesheet" href="wg-spook.css?v=SPOOK1" />
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -4088,22 +4086,93 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 
 <div class="panel">
  <div class="float-orbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
- <!-- WALLBACK1 · opened from the wall's Family chip (?from=wall): one plain way back to the wall -->
- <a class="wall-back" href="wall.html" data-wall-back hidden aria-label="Back to the wall">Back to wall</a>
- <style>.wall-back{position:fixed;right:16px;bottom:16px;z-index:2147482000;padding:10px 16px;border-radius:999px;font:700 14px/1.2 Inter,system-ui,sans-serif;color:#fff6dc;background:rgba(20,24,30,.82);border:1px solid rgba(255,255,255,.22);text-decoration:none;backdrop-filter:blur(8px)}.wall-back[hidden]{display:none}/* DAYPKG1 v2h · Atlas: the Dad tile is gone from the roster (Dad sheets are URL-only). 10 tiles on the 3-column grid: a lone last tile spans its row, so no cell is left empty */
+ <style>/* DAYPKG1 v2h · Atlas: the Dad tile is gone from the roster (Dad sheets are URL-only). 10 tiles on the 3-column grid: a lone last tile spans its row, so no cell is left empty */
 .tile-grid > .tile:last-child:nth-child(3n+1) { grid-column: 1 / -1 !important; }
+.hub-window { margin: 8px 12px; height: min(42vw, 280px); overflow: hidden; border-radius: 16px; }
+.hub-window img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (max-width: 600px) {
+  .panel > .hub-window { order: -6 !important; }
+  .panel > .grid-wrap { order: -5 !important; }
+}
+.tile.ainsley, .kid-flip.ainsley, .tile.hayes, .kid-flip.hayes, .tile.harris, .kid-flip.harris {
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+.tile.ainsley, .kid-flip.ainsley { background-image: url("month-theme/hub/kidtile-ainsley-438x420.webp") !important; }
+.tile.hayes, .kid-flip.hayes { background-image: url("month-theme/hub/kidtile-hayes-438x420.webp") !important; }
+.tile.harris, .kid-flip.harris { background-image: url("month-theme/hub/kidtile-harris-438x420.webp") !important; }
+.tile.dan { background-image: url("month-theme/hub/kidtile-dad.webp") !important; background-repeat: no-repeat !important; background-size: 438px 420px !important; background-position: left top !important; }
+.hub-home {
+  position: absolute; z-index: 30; left: 14px; top: calc(12px + env(safe-area-inset-top));
+  width: 44px; height: 44px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(250, 246, 238, .16); border: 1px solid rgba(243, 230, 207, .35);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.hub-home img { width: 22px; height: 22px; display: block; }
+header.hdr { position: relative; }
+@media (orientation: portrait) and (min-height: 1500px) {
+  /* Wall portrait fits in the viewport. SCROLL5's +240px runway would keep scrollHeight at 2160 even when the roster fits.
+     Nothing here clips the roster: overflow stays visible and every tile is in normal flow. */
+  html:not(#hf-scroll-off) { height: auto !important; max-height: none !important; }
+  html:not(#hf-scroll-off) > body { min-height: 0 !important; height: auto !important; max-height: none !important; }
+  html body .panel {
+    height: auto !important; max-height: none !important; min-height: 0 !important;
+    overflow: visible !important; display: flex; flex-direction: column;
+  }
+  html body .hub-upper,
+  html body .hub-upper.hub-upper--cams {
+    flex: 0 0 auto !important; align-items: start !important; min-height: 0 !important; height: auto !important; max-height: none !important;
+  }
+  html body .hub-upper .leaveby,
+  html body .leaveby {
+    min-height: 0 !important; height: auto !important; max-height: none !important; flex: 1 1 auto !important; align-self: start !important;
+  }
+  html body #hub-lights-panel,
+  html body .hub-lights.hub-lights--cams {
+    height: auto !important; min-height: 0 !important; max-height: none !important; align-self: start !important;
+  }
+  html body .panel > .hub-window {
+    flex: 0 0 auto !important;
+    height: 420px !important; min-height: 0 !important; max-height: 420px !important;
+    margin: 8px 12px !important;
+  }
+  html body .panel > .grid-wrap {
+    flex: 0 0 auto !important; height: auto !important; min-height: 0 !important;
+    margin-top: 0; overflow: visible !important;
+  }
+  html body .tile-grid.tile-grid--cams {
+    height: auto !important; min-height: 0 !important; overflow: visible !important;
+    grid-template-rows: none !important;
+    grid-auto-rows: minmax(228px, auto) !important;
+    gap: 8px !important;
+  }
+  html body .tile-grid.tile-grid--cams > .tile {
+    min-height: 228px !important; height: auto !important; max-height: none !important;
+  }
+  .tile { box-shadow: none !important; }
+}
+html body .tile,
+html body .tile::before { box-shadow: none !important; }
+html body .tile::after { box-shadow: none !important; background-image: none !important; animation: none !important; }
+html body #hub-cam-deck[hidden],
+html body #hub-lights-panel[hidden] { display: none !important; }
+/* Presentation only. private-feed.js stays the pinned bytes. The shared hub does not show its pairing chip. */
+html body .pf-flag--pair { display: none !important; }
 </style>
- <script>(function(){try{var k="wardos-from-wall",q=/[?&]from=wall\b/.test(location.search);if(q)sessionStorage.setItem(k,"1");if(q||sessionStorage.getItem(k)==="1"){var a=document.querySelector("[data-wall-back]");if(a){a.hidden=false;a.addEventListener("click",function(){try{sessionStorage.removeItem(k)}catch(e){}});}}}catch(e){}})();</script>
  <header class="hdr hdr--spread hdr--premium hdr--heat">
+ <a class="hub-home" href="sheet-index.html" aria-label="Back to the House board"><picture><source srcset="assets/icons/home-key-light.svg" type="image/svg+xml"><img src="assets/icons/home-key-light-64.png" width="64" height="64" alt=""></picture></a>
  <div class="hdr-date" aria-label="Today · America/Chicago">
- <div class="hdr-date-kicker">CT · LIVE</div>
+ <div class="hdr-date-kicker">CT</div>
  <div class="hdr-date-time" data-live="time"></div>
  <div class="hdr-date-dow" data-live="dow">Mon</div>
  <div class="hdr-date-long" data-live="date-long">Sep 28, 2026</div>
  </div>
  <div class="hdr-brand">
  <div class="id-text">
- <h1 class="name"><span class="name-accent">The Ward's</span></h1>
+ <h1 class="name"><span class="name-accent">The Wards</span></h1>
  </div>
  </div>
  <div class="hdr-ovals" aria-label="Live house status">
@@ -4112,7 +4181,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  </div>
  </header>
 
- <div class="hub-cam-deck" id="hub-cam-deck" aria-label="Nest cameras · live when stream plays">
+ <div class="hub-cam-deck" id="hub-cam-deck" hidden aria-label="Nest cameras · live when stream plays">
  <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Camera 1 · STILL">
  <div class="hub-cam-media-wrap">
  <img class="hub-cam-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Camera 1 still"/>
@@ -4180,7 +4249,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <div data-live="asof-warn" hidden style="margin-top:4px;font-size:11px;font-weight:700;letter-spacing:0.04em;color:#b06010;"></div>
  </div>
  </section>
- <section class="hub-lights hub-lights--cams hub-lights--cmd hub-lights--hot" id="hub-lights-panel" aria-label="Lights · house switches">
+ <section class="hub-lights hub-lights--cams hub-lights--cmd hub-lights--hot" id="hub-lights-panel" hidden aria-label="Lights · house switches">
  <div class="hub-lights-head">
  <div class="hub-lights-title">Lights</div>
  <div class="hub-lights-pill off" id="hub-lights-pill">Wait</div>
@@ -4197,14 +4266,14 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <section class="sp-tile sp-strip" id="hub-spotify-strip" data-sp-tile aria-label="Spotify"></section>
  </div>
 
-
+ <figure class="hub-window" aria-hidden="true"><img src="month-theme/november/hub-window-night-900x864.webp" width="900" height="864" alt=""></figure>
 
  <section class="who-up" data-who-up="1" aria-label="Who's up next">
  <div class="who-up-accent" aria-hidden="true"></div>
  <div class="who-up-body">
  <div class="who-up-kicker">Who's up</div>
  <div class="who-up-main" data-who-main><span class="who-up-name">Quiet</span></div>
- <div class="who-up-meta" data-who-meta>LIVE</div>
+ <div class="who-up-meta" data-who-meta></div>
  </div>
  <a class="who-up-go" data-who-go href="sheet-today.html">OPEN</a>
  </section>
@@ -4214,7 +4283,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <div class="grid-title">Sheet roster</div>
  </div>
 
- <nav class="tile-grid tile-grid--cams" aria-label="The Ward's sheet index">
+ <nav class="tile-grid tile-grid--cams" aria-label="The Wards sheet index">
  <a class="tile ainsley" href="kid-ainsley.html" data-kid-seed="ainsley">
  <div class="tile-top">
  <div class="tile-icon av g2-av ains" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-ainsley"/></svg></div>
@@ -4224,9 +4293,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  </div>
  </div>
  <div class="tile-micro">
- <div class="tile-mrow"><span class="mt">TUE</span><span class="md">School hearing/vision</span><span class="tile-mchip rose">Day</span></div>
- <div class="tile-mrow"><span class="mt">4:25</span><span class="md">Swim · Coach Ann</span></div>
- <div class="tile-mrow"><span class="mt">JAR</span><span class="md">Tour jar · payday w/ Dad</span></div>
+ <div class="tile-mrow"><span class="mt">LIST</span><span class="md">Quiet for now.</span></div>
  </div>
  <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
@@ -4240,9 +4307,7 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  </div>
  </div>
  <div class="tile-micro">
- <div class="tile-mrow"><span class="mt">6:00</span><span class="md">Flag practice</span><span class="tile-mchip amber">Today</span></div>
- <div class="tile-mrow"><span class="mt">TUE</span><span class="md">School · practice</span></div>
- <div class="tile-mrow"><span class="mt">·</span><span class="md">Appointment</span></div>
+ <div class="tile-mrow"><span class="mt">LIST</span><span class="md">Quiet for now.</span></div>
  </div>
  <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
@@ -4256,13 +4321,16 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  </div>
  </div>
  <div class="tile-micro">
- <div class="tile-mrow"><span class="mt">TUE</span><span class="md">School drop 8:10 · pickup 3:15</span></div>
- <div class="tile-mrow"><span class="mt">MUST</span><span class="md">Chores</span><span class="tile-mchip green">Due</span></div>
- <div class="tile-mrow"><span class="mt">EVE</span><span class="md">Open after pickup</span></div>
+ <div class="tile-mrow"><span class="mt">LIST</span><span class="md">Quiet for now.</span></div>
  </div>
  <div class="tile-foot"><span class="tile-fact">Kid board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
+ <a class="tile dan" href="sheet-today.html" aria-label="Dad">
+ <div data-dad-stage>
+ <div class="tile-label">Dad</div>
+ </div>
+ </a>
 
  <!-- TODAYGONE1 · Today tile removed (schedule card + Dad page cover it) -->
 
@@ -4317,20 +4385,20 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  <div class="tile-foot"><span class="tile-fact">Shared list</span><span class="tile-tap">OPEN</span></div>
  </a>
 
- <a class="tile stars" href="sheet-chores.html">
+ <a class="tile stars" href="sheet-chores.html#kid-jars">
  <div class="tile-top">
  <div class="tile-icon g2-mark" aria-hidden="true"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-jar"/></svg></div>
  <div class="tile-titles">
- <div class="tile-label">Show me the Money</div>
- <div class="tile-sub">Jars · payday</div>
+ <div class="tile-label">Jars</div>
+ <div class="tile-sub">On each kid's board</div>
  </div>
  </div>
  <div class="tile-micro">
- <div class="tile-mrow"><span class="mt">JARS</span><span class="md">Kids jars on board</span></div>
- <div class="tile-mrow"><span class="mt">PAY</span><span class="md">Payday</span><span class="tile-mchip amber">Soon</span></div>
- <div class="tile-mrow"><span class="mt">RULE</span><span class="md">Earn · bank · spend</span></div>
+ <div class="tile-mrow"><span class="mt">JARS</span><span class="md">Each kid's jar</span></div>
+ <div class="tile-mrow"><span class="mt">MUST</span><span class="md">Musts live on their board</span></div>
+ <div class="tile-mrow"><span class="mt">RULE</span><span class="md">No score on this tile</span></div>
  </div>
- <div class="tile-foot"><span class="tile-fact">No cash on House</span><span class="tile-tap">OPEN</span></div>
+ <div class="tile-foot"><span class="tile-fact">Jar board</span><span class="tile-tap">OPEN</span></div>
  </a>
 
  <a class="tile fun" href="sheet-weekend.html">
@@ -4376,20 +4444,20 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
  </div>
  </footer>
 </div>
-<script src="house-clock.js?v=HALLOWEEN1"></script>
+<script src="house-clock.js?v=SUNHOME1"></script>
 <script src="house-board-strip.js?v=PAIRUI1"></script>
 <script src="livewx-core.js?v=LIVEWX2B"></script><script src="house-weather.js?v=LIVEWX2"></script>
 <script src="house-sfx.js?v=DAYPKG1"></script>
 <script src="house-tapsync.js?v=P1FIX"></script>
 <script src="kids-data.js?v=DAYPKG1"></script>
-<script src="house-kid-engage.js?v=DAYPKG1"></script>
-<script src="house-hub-tiles-bind.js?v=MERGE1C"></script>
-<script src="house-sensi.js?v=ADULTCUT1"></script>
+<script src="house-kid-engage.js?v=SUNHOME1"></script>
+<script src="house-hub-tiles-bind.js?v=SUNHOME1"></script>
+<script src="house-sensi.js?v=SUNHOME1"></script>
 <script src="nest-webrtc-client.js?v=FOLLOWUP6"></script>
 <script src="house-nest.js?v=CAMREST3"></script>
 <script src="hub-key-entry.js?v=FOLLOWUP6"></script>
-<script src="house-lights.js?v=CAMREST5"></script>
-<script src="house-sensi-ctl.js?v=HUBPIN1"></script>
+<script src="house-lights.js?v=SUNHOME1"></script>
+<script src="house-sensi-ctl.js?v=SUNHOME1"></script>
 <script src="hub-led-ring.js?v=LEDPHONE1"></script>
 <script>
 (function () {
@@ -4431,51 +4499,22 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 })();
 </script>
 <script>
-/* HUBOVAL1 · Asus 32" wall portrait · scale 1080×1920 canvas to fill viewport · no letterbox */
+/* ACER1 · one 1920x1080 canvas. Do not scale it to the window. */
 (function () {
   function fitPortrait() {
     var panel = document.querySelector(".panel");
     if (!panel) return;
-    /* HUBFIT1 · phones use their own responsive layout (tokens-hub-fit.css), never shrink the wall canvas */
-    try {
-      if (Math.min(screen.width, screen.height) <= 600) {
-        panel.style.transform = ""; panel.style.transformOrigin = "";
-        panel.style.marginLeft = "0"; panel.style.marginTop = "0"; panel.style.removeProperty("margin-bottom"); document.body.style.removeProperty("height");
-        document.documentElement.setAttribute("data-hub-fit", "phone");
-        document.documentElement.style.setProperty("--hub-fit-scale", "1");
-        return;
-      }
-    } catch (e) {}
-    var vw = window.innerWidth || document.documentElement.clientWidth || 1080;
-    var vh = window.innerHeight || document.documentElement.clientHeight || 1920;
-    var sx = vw / 1080;
-    var sy = vh / 1920;
-    /* contain: full 1080×1920 image visible · on Elo 32" 9:16 portrait = exact fill, no letterbox */
-    var portrait = vh >= vw;
-    var s = Math.min(sx, sy);
-    if (!isFinite(s) || s <= 0) s = 1;
+    panel.style.transform = "none";
     panel.style.transformOrigin = "top left";
-    panel.style.transform = "scale(" + s + ")";
-    /* center horizontally if leftover width (should be ~0 on true portrait wall) */
-    var ox = Math.max(0, (vw - 1080 * s) / 2);
-    /* WIDE2560 · a landscape canvas is as wide as the window, not 1080: at very wide sizes (2560) that offset pushed its right column past the
-       edge. Only then, centre the real scaled width instead; 1280 and 1920 keep the offset they had */
-    var pw = (panel.offsetWidth || 1080) * s;
-    if (ox + pw > vw) ox = Math.max(0, (vw - pw) / 2);
-    var oy = Math.max(0, (vh - 1920 * s) / 2);
-    /* AUDIT1 · !important so the kit's .panel margin rules can't pin the canvas left on landscape;
-       reclaim the unscaled height so a scaled canvas doesn't scroll */
-    panel.style.setProperty("margin-left", ox ? (ox + "px") : "0", "important");
-    panel.style.setProperty("margin-top", oy ? (oy + "px") : "0", "important");
-    panel.style.setProperty("margin-bottom", s < 1 ? (Math.round(-panel.offsetHeight * (1 - s)) + "px") : "0", "important");
-    if (s < 1) document.body.style.setProperty("height", Math.ceil(1920 * s + 2 * oy) + "px", "important");
-    else document.body.style.removeProperty("height");
-    document.documentElement.setAttribute("data-hub-fit", portrait ? "portrait-contain" : "landscape-contain");
-    document.documentElement.style.setProperty("--hub-fit-scale", String(s));
+    panel.style.setProperty("margin-left", "0", "important");
+    panel.style.setProperty("margin-top", "0", "important");
+    panel.style.setProperty("margin-bottom", "0", "important");
+    document.body.style.removeProperty("height");
+    document.documentElement.setAttribute("data-hub-fit", "acer-1920");
+    document.documentElement.style.setProperty("--hub-fit-scale", "1");
   }
   fitPortrait();
   window.addEventListener("resize", fitPortrait, { passive: true });
-  window.addEventListener("orientationchange", function () { setTimeout(fitPortrait, 50); });
 })();
 
 </script>
@@ -4502,13 +4541,14 @@ document.addEventListener("click", function (ev) {
 <script src="house-links.js?v=LINKWEB1"></script>
 <script src="house-spotify.js?v=ADULTCUT2B"></script>
 <script>/* SPOTIFY1 */ try { HouseSpotify.mountTiles(document).start(); } catch (e) {}</script>
-<script src="house-ori-calm.js?v=HALLOWEEN1"></script>
+<script src="house-ori-calm.js?v=SUNHOME1"></script>
 <script>/* MONTHNOW1 · month tile follows the real date (Chicago) */
 (function(){try{var p=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Chicago"}).format(new Date()).split("-");var y=+p[0],m=+p[1]-1,d=+p[2];
 var M=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"],N=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 function s(k,v){var e=document.querySelector('[data-mtile="'+k+'"]');if(e)e.textContent=v}
 s("m0",M[m]);s("m1",M[(m+1)%12]);s("w0","Week "+Math.ceil((d+new Date(y,m,1).getDay())/7)+" · this month");s("sub",N[m]+" and "+N[(m+1)%12])}catch(e){}})();</script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
-<script src="month-theme/month-overlay.js?v=HALLOWEEN1" defer></script>
+<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
+<link rel="stylesheet" href="wall-acer-lock.css?v=ACER1" />
 </body>
 </html>

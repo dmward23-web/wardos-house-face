@@ -4,13 +4,13 @@
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPAIR1"></script>
 <script src="private-feed.js?v=HUBPAIR1D"></script>
-<script src="school-names.js?v=HALLOWEEN1"></script>
+<script src="school-names.js?v=SUNHOME1"></script>
 <script src="house-nomoney.js?v=KIDCRIT1"></script>
 <script src="house-face-law.js?v=FACESTRIP1"></script>
 <script src="house-pair.js?v=HUBPAIR1"></script>
 <script src="house-money-bind.js?v=DAYPKG1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
-<script src="away-filter.js?v=HALLOWEEN1" data-away-install></script><!-- AWAYONE1 · the one away source on every page that reads cal-live / kids-week -->
+<script src="away-filter.js?v=SUNHOME1" data-away-install></script><!-- AWAYONE1 · the one away source on every page that reads cal-live / kids-week -->
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="viewport" content="width=1080" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -431,8 +431,8 @@
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
-<link rel="stylesheet" href="night/night-host.css?v=HALLOWEEN1" />
-<link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<link rel="stylesheet" href="night/night-host.css?v=SUNHOME1" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=SUNHOME2" />
 <script src="house-face-law.js?v=FACESTRIP1"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
 <style id="p1fix-chores-kidtabs">
 /* P1FIX B45 + N1 · Chores on the 1920x1080 wall: one kid at a time (three kids x ten chores cannot fit one screen at
@@ -471,6 +471,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 </style>
 <link rel="stylesheet" href="house-wall-frame.css?v=P1FIX" />
 <link rel="stylesheet" href="wg-glass.css?v=HOTFIX1" />
+<style>html body .pf-flag--pair { display: none !important; }</style>
 </head>
 <body data-clear-label="ALL CLEAR" data-chores-shared="1" data-theme="house">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -714,6 +715,11 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 </svg>
 
 
+<nav class="chore-shortcuts" aria-label="Kid boards">
+ <a class="kid-chip ainsley" href="kid-ainsley.html"><span class="dot">A</span> Ainsley</a>
+ <a class="kid-chip hayes" href="kid-hayes.html"><span class="dot">H</span> Hayes</a>
+ <a class="kid-chip harris" href="kid-harris.html"><span class="dot">H</span> Harris</a>
+</nav>
 <div class="panel">
  <header class="hdr hdr--clockfirst">
  <div class="hdr-left-col">
@@ -735,22 +741,23 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  <div class="cheer-body">
  <div class="cheer-main">
  <div class="cheer-label">Today’s vibe</div>
- <div class="cheer-title">Tap musts · <span class="hl"><span class="g2-inline"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-star"/></svg></span> into the jar</span> · Dad checks</div>
+ <div class="cheer-title">Tap musts · Dad checks</div>
  <div class="cheer-sub"><span data-live="date-short">…</span></div>
  </div>
  <div class="cheer-badges">
  <div class="cheer-badge">3 kids</div>
- <div class="cheer-badge">LIVE taps</div>
+ <div class="cheer-badge">On this screen</div>
  </div>
  </div>
  </section>
 
  <div class="body">
+ <section id="kid-jars" aria-label="Jars">
+ <p>Each jar lives on that kid's board. Nothing here is a score.</p>
+ <p><a href="kid-ainsley.html#sec-jar">Ainsley</a> · <a href="kid-hayes.html#sec-jar">Hayes</a> · <a href="kid-harris.html#sec-jar">Harris</a></p>
+ </section>
  <!-- Ainsley -->
  <section class="col" aria-label="Ainsley chores">
- <div class="col-hdr">
- <a class="kid-chip ainsley" href="kid-ainsley.html"><span class="dot">A</span> Ainsley</a>
- </div>
   <div class="chore-list">
  <div class="chore open ainsley" data-check="ain-bed">
  <span class="ring"></span>
@@ -821,10 +828,6 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 
  <!-- Hayes -->
  <section class="col" aria-label="Hayes chores">
- <div class="col-hdr">
- <a class="kid-chip hayes" href="kid-hayes.html"><span class="dot">H</span> Hayes</a>
- <div class="streak"><span class="star g2-inline"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-star"/></svg></span> 6-day</div>
- </div>
   <div class="chore-list">
  <div class="chore open hayes" data-check="hay-bed">
  <span class="ring"></span>
@@ -907,15 +910,10 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  <span class="star-earn" data-stars="1" data-money-suffix=""></span>
  </div>
  </div>
-<div class="tap-hint"><span class="ring">✓</span> Green streak king</div>
  </section>
 
  <!-- Harris -->
  <section class="col" aria-label="Harris chores">
- <div class="col-hdr">
- <a class="kid-chip harris" href="kid-harris.html"><span class="dot">H</span> Harris</a>
- <div class="streak"><span class="star g2-inline"><svg class="g2" viewBox="0 0 32 32" aria-hidden="true"><use href="#g2-star"/></svg></span> 3-day</div>
- </div>
   <div class="chore-list">
  <div class="chore open harris" data-check="har-bed">
  <span class="ring"></span>
@@ -1015,7 +1013,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 <script src="kids-data.js?v=DAYPKG1"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=DAYPKG1"></script>
-<script src="house-checkoffs.js?v=DAYPKG1" defer></script>
+<script src="house-checkoffs.js?v=CHECKDONE1" defer></script>
 <script>document.addEventListener("DOMContentLoaded",function(){if(window.WardKids){WardKids.loadJSON(function(e,d){if(d){WardKids._data=d;WardKids.syncBankFromChecks(d);if(WardKids.enhanceSharedChores)WardKids.enhanceSharedChores(document,d);try{document.dispatchEvent(new CustomEvent("house:kids-data-ready",{detail:{data:d}}));}catch(err){}if(window.HouseCheckoffs&&HouseCheckoffs.rewire)HouseCheckoffs.rewire();}});}})</script>
 
 
@@ -1040,14 +1038,16 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
 <script src="house-ori-world.js?v=MERGE1C"></script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
-<script src="month-theme/month-overlay.js?v=HALLOWEEN1" defer></script>
+<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
 <script>/* P1FIX B45 + N1 · wall kid tabs (only shown at 1600+ landscape; phone untouched) */
 (function(){var body=document.querySelector(".panel .body");if(!body)return;var cols=[].slice.call(body.querySelectorAll(":scope > section.col"));if(cols.length<2)return;
 var bar=document.createElement("div");bar.className="wf-kidtabs";bar.setAttribute("role","group");bar.setAttribute("aria-label","Pick a kid");
 var cls={ainsley:"ain",hayes:"hay",harris:"har"};
 function pick(i){cols.forEach(function(c,k){c.classList.toggle("wf-hide",k!==i)});[].forEach.call(bar.children,function(b,k){b.setAttribute("aria-pressed",k===i?"true":"false")})}
-cols.forEach(function(c,i){var chip=c.querySelector(".kid-chip");var name=chip?chip.textContent.replace(/^\s*\S\s+/,"").trim():"Kid "+(i+1);var id=(chip&&chip.className.match(/ainsley|hayes|harris/)||[""])[0];
+var shorts=[].slice.call(document.querySelectorAll(".chore-shortcuts .kid-chip"));
+cols.forEach(function(c,i){var chip=c.querySelector(".kid-chip")||shorts[i];var name=chip?chip.textContent.replace(/^\s*\S\s+/,"").trim():"Kid "+(i+1);var id=(chip&&chip.className.match(/ainsley|hayes|harris/)||[""])[0];
 var b=document.createElement("button");b.type="button";b.className=cls[id]||"";b.textContent=name;b.addEventListener("click",function(){pick(i)});bar.appendChild(b)});
 body.parentNode.insertBefore(bar,body);pick(0);})();</script>
+<link rel="stylesheet" href="wall-board-sheets.css?v=WALLSHEET1" />
 </body>
 </html>

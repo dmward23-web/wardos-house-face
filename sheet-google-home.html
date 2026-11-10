@@ -245,8 +245,8 @@
 <link rel="stylesheet" href="house-scroll.css?v=SCROLL5" />
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
-<link rel="stylesheet" href="night/night-host.css?v=HALLOWEEN1" />
-<link rel="stylesheet" href="month-theme/month-overlay.css?v=MERGE1C" />
+<link rel="stylesheet" href="night/night-host.css?v=SUNHOME1" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=SUNHOME2" />
 <style>
 /* P1FIX B63 · header pill was white text on a white pill: amber outline pill on dark glass, like the other sheets */
 html body .hot-pill.gh-title-pill{background:rgba(18,14,8,.62)!important;background-image:none!important;color:#ffe894!important;-webkit-text-fill-color:#ffe894!important;border:1.5px solid rgba(240,197,106,.8)!important;text-shadow:none!important;box-shadow:none!important}
@@ -280,7 +280,7 @@ html body .cam-path,html body #cam-next-step{display:none!important}
  <div class="cmd-title">Google Home · climate + cameras</div>
  <div class="cmd-meta">Elo · Nest</div>
  </div>
- <div class="banner-title">Climate LIVE · Nest · tap for video</div>
+ <div class="banner-title">Waiting on the house</div>
  <div class="banner-sub">Sensi live · Nest · tap a pad for video · Elo 3202L</div>
  </section>
 
@@ -291,7 +291,7 @@ html body .cam-path,html body #cam-next-step{display:none!important}
  <div class="climate-left">
  <div class="climate-lab">Sensi · Emerson · Home</div>
  <div class="climate-title">Sensi · Home</div>
- <div class="climate-sub" id="sensi-hero-sub">Waiting for live JSON · not Nest</div>
+ <div class="climate-sub" id="sensi-hero-sub">Waiting on the thermostat</div>
  </div>
  <div class="climate-temps">
  <div class="climate-amb">
@@ -302,7 +302,7 @@ html body .cam-path,html body #cam-next-step{display:none!important}
  <div class="lab">Set</div>
  <div class="val" id="sensi-hero-set"></div>
  </div>
- <div class="climate-mode" id="sensi-hero-mode">HEAT</div>
+ <div class="climate-mode" id="sensi-hero-mode"></div>
  <div class="climate-humid" id="sensi-hero-humid" hidden style="display:none"></div>
  </div>
  <div class="climate-cta">
@@ -314,13 +314,13 @@ html body .cam-path,html body #cam-next-step{display:none!important}
  <section class="cam-zone" aria-label="Nest and Google Home cameras">
  <div class="zone-hdr">
  <div class="zone-title">Cameras · Nest / Google Home</div>
- <div class="zone-meta">5 cams · LIVE · tap for video</div>
+ <div class="zone-meta">Cameras offline</div>
  </div>
  <div class="cam-path">Cameras offline</div>
  <div class="cam-grid">
  <article class="cam cmd-bezel" aria-label="Camera 1">
  <div class="cam-feed">
- <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
+ <span class="cam-live stub"><i></i>Offline</span>
  <span class="cam-glyph" aria-hidden="true">📷</span>
  <span class="cam-stub">Cameras offline</span>
  </div>
@@ -331,7 +331,7 @@ html body .cam-path,html body #cam-next-step{display:none!important}
  </article>
  <article class="cam cmd-bezel" aria-label="Camera 2">
  <div class="cam-feed">
- <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
+ <span class="cam-live stub"><i></i>Offline</span>
  <span class="cam-glyph" aria-hidden="true">📷</span>
  <span class="cam-stub">Cameras offline</span>
  </div>
@@ -342,7 +342,7 @@ html body .cam-path,html body #cam-next-step{display:none!important}
  </article>
  <article class="cam cmd-bezel" aria-label="Camera 3">
  <div class="cam-feed">
- <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
+ <span class="cam-live stub"><i></i>Offline</span>
  <span class="cam-glyph" aria-hidden="true">📷</span>
  <span class="cam-stub">Cameras offline</span>
  </div>
@@ -353,7 +353,7 @@ html body .cam-path,html body #cam-next-step{display:none!important}
  </article>
  <article class="cam cmd-bezel" aria-label="Camera 4">
  <div class="cam-feed">
- <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
+ <span class="cam-live stub"><i></i>Offline</span>
  <span class="cam-glyph" aria-hidden="true">📷</span>
  <span class="cam-stub">Cameras offline</span>
  </div>
@@ -364,7 +364,7 @@ html body .cam-path,html body #cam-next-step{display:none!important}
  </article>
  <article class="cam cmd-bezel" aria-label="Camera 5">
  <div class="cam-feed">
- <span class="cam-live on dim"><i></i>LIVE · NO STILL</span>
+ <span class="cam-live stub"><i></i>Offline</span>
  <span class="cam-glyph" aria-hidden="true">📷</span>
  <span class="cam-stub">Cameras offline</span>
  </div>
@@ -442,10 +442,11 @@ html body .cam-path,html body #cam-next-step{display:none!important}
 <script src="house-clock.js?v=LIVEWX2"></script>
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=DAYPKG1"></script>
-<script src="house-sensi.js?v=ADULTCUT1"></script>
+<script src="house-sensi.js?v=SUNHOME1"></script>
 <script src="nest-webrtc-client.js?v=FOLLOWUP6"></script>
 <script src="house-nest.js?v=CAMREST3"></script>
-<script src="house-lights.js?v=CAMREST5"></script>
+<script src="house-lights.js?v=SUNHOME1"></script>
+<script src="house-sensi-ctl.js?v=SUNHOME1"></script>
 <script>
 (function () {
   document.querySelectorAll(".cam").forEach(function (el) {
@@ -495,6 +496,6 @@ html body .cam-path,html body #cam-next-step{display:none!important}
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
 <script src="house-ori-world.js?v=MERGE1C"></script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
-<script src="month-theme/month-overlay.js?v=HALLOWEEN1" defer></script>
+<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
 </body>
 </html>

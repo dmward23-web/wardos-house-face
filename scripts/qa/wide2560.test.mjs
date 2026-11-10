@@ -1,13 +1,14 @@
-/* WIDE2560 · at 2560x1440 the hub canvas (index.html redirects to sheet-index.html) is centred by its real scaled width, so no text block
-   runs past the right edge; 1280 and 1920 keep the offset they had. Static half always runs; the browser half needs puppeteer-core + chrome. */
+/* WIDE2560 · the wall canvas stays 1920x1080 and scale 1. It is not shrunk to fit a narrower window. */
 import test from "node:test"; import assert from "node:assert/strict"; import fs from "node:fs"; import path from "node:path"; import http from "node:http";
 import { fileURLToPath } from "node:url"; import { createRequire } from "node:module";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const read = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 
-test("static: the fit centres the real scaled width only when the old offset would overflow", () => {
+test("static: the wall canvas is not scaled to the window", () => {
   const s = read("sheet-index.html");
-  assert.match(s, /var ox = Math\.max\(0, \(vw - 1080 \* s\) \/ 2\);\n[^\n]*WIDE2560[^\n]*\n[^\n]*\n\s+var pw = \(panel\.offsetWidth \|\| 1080\) \* s;\n\s+if \(ox \+ pw > vw\) ox = Math\.max\(0, \(vw - pw\) \/ 2\);/);
+  assert.match(s, /data-hub-fit", "acer-1920"/);
+  assert.match(s, /--hub-fit-scale", "1"/);
+  assert.doesNotMatch(s, /panel\.style\.transform = "scale\("/);
   assert.match(read("index.html"), /location\.replace\("sheet-index\.html"/, "index.html is the same page");
 });
 
@@ -16,7 +17,7 @@ let pp = null; if (!NO_BROWSER) for (const base of [import.meta.url, (process.en
 const CHROME = NO_BROWSER ? null : (process.env.CHROME_PATH || ["/usr/local/bin/google-chrome", "/usr/bin/google-chrome"].find((c) => fs.existsSync(c)) || null);
 const SKIP = NO_BROWSER ? "SKIP QA_NO_BROWSER=1 (no Chrome launch)" : (!(pp && CHROME) && "needs puppeteer-core + chrome");
 
-test("browser: no text block past the right edge at 2560x1440 on index.html and sheet-index.html; 1280 and 1920 offsets unchanged", { skip: SKIP, timeout: 180000 }, async () => {
+test("browser: wall scale stays 1 at 2560, 1920, and 1280", { skip: SKIP, timeout: 180000 }, async () => {
   const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".webp": "image/webp", ".png": "image/png", ".svg": "image/svg+xml" };
   const srv = http.createServer((q, r) => { const rel = decodeURIComponent(new URL(q.url, "http://x").pathname); if (rel === "/wx") { r.writeHead(404); r.end(); return; }
     const f = path.join(ROOT, path.normalize(rel).replace(/^(\.\.(\/|\\|$))+/, ""));
@@ -34,9 +35,9 @@ test("browser: no text block past the right edge at 2560x1440 on index.html and 
         for (const e of document.querySelectorAll("body *")) { const cs = getComputedStyle(e); if (cs.display === "none" || cs.visibility === "hidden") continue;
           if (![...e.childNodes].some((c) => c.nodeType === 3 && c.textContent.trim())) continue; const r = e.getBoundingClientRect(); if (r.width && r.right > W + 0.5) out.push(e.className + " " + Math.round(r.right)); }
         return { out, ml: parseFloat(getComputedStyle(document.querySelector(".panel")).marginLeft), s: +getComputedStyle(document.documentElement).getPropertyValue("--hub-fit-scale") }; });
-      assert.ok(o.s > 0 && o.s < 1, pg + " at " + w + ": the scaled desk canvas, not the phone layout (" + o.s + ")");
-      assert.deepEqual(o.out, [], pg + " at " + w + "x" + h + ": text past the right edge " + o.out.slice(0, 5).join(", "));
-      if (w < 2560) assert.ok(Math.abs(o.ml - (w - 1080 * o.s) / 2) < 1, pg + " at " + w + ": the offset it always had (" + o.ml + ")");
+      assert.equal(o.s, 1, pg + " at " + w + ": the canvas is not scaled (" + o.s + ")");
+      if (w >= 1920) assert.deepEqual(o.out, [], pg + " at " + w + "x" + h + ": text past the right edge " + o.out.slice(0, 5).join(", "));
+      assert.equal(o.ml, 0, pg + " at " + w + ": no centering offset (" + o.ml + ")");
       await g.close();
     }
   } finally { await b.close(); srv.close(); }

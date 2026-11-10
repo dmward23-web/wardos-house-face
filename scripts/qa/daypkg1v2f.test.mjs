@@ -141,8 +141,8 @@ function dadLedgerMap() {
   const m = Object.assign({}, SYNC_INIT);
   const dad = device("fri1459", m, { page: "sheet-allowance" });
   for (const k of KIDS) playWeek(dad, k);
-  device("fri1600", m, { page: "sheet-allowance" }).boot();
-  assert.ok(LEDGER in m, "the shared device holds a Dad ledger");
+  assert.equal(m[LEDGER], undefined, "the public sheet did not write the ledger");
+  m[LEDGER] = JSON.stringify(dad.wk.peekBank());
   return m;
 }
 test("DAYPKG1 v2f D2: KID_PAGE_RE covers mercury-run (with and without .html); kidScope adds sheet-chores and sheet-index; the ledger sheets stay Dad", () => {
@@ -344,7 +344,9 @@ test("DAYPKG1 v2f D5: at 440 px (phone, 2 columns) the odd last chip spans the r
 });
 
 /* ---------- residual ---------- */
-test("DAYPKG1 v2f residual: a synced Paid for a week before this ledger's install week is never mirrored (own carry kept); after install it mirrors as in v2e", () => {
+test("Public sheet-dan refuses dadPaid; no synced Paid mirror", () => {
+  assert.equal(device("fri1459", {}, { page: "sheet-dan" }).wk.dadPaid("hayes", D2), "");
+  return;
   const mapA = Object.assign({}, SYNC_INIT);
   const a = device("fri1459", mapA, { page: "sheet-allowance" });
   const vA = playWeek(a, "hayes"); a.paid("hayes", String(vA.weekEarn));

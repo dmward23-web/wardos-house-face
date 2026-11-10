@@ -126,7 +126,9 @@
 
   function bump(k, d) {
     if (!st || busy) return;
-    var v = view(), n = (v[k] == null ? (k === "heat" ? 68 : 74) : v[k]) + d;
+    var v = view();
+    if (v[k] == null) { msg("The thermostat has not reported that setpoint.", "err"); return; }
+    var n = v[k] + d;
     n = Math.max(MIN_F, Math.min(MAX_F, n));
     if (st.mode === "auto") {
       if (k === "heat" && v.cool != null && n > v.cool - DEADBAND) { msg("Heat has to stay " + DEADBAND + "° below cool.", "err"); return; }
@@ -171,11 +173,19 @@
     load();
   }
 
-  function wire() {
-    var el = document.getElementById("index-sensi-chip");
+  function bind(el) {
     if (!el || el.__sctl) return;
     el.__sctl = true;
-    el.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); open(); }, true);
+    el.addEventListener("click", function (e) {
+      if (e.target && e.target.closest && e.target.closest("button, .sctl, a.ftr-chip")) return;
+      e.preventDefault();
+      e.stopPropagation();
+      open();
+    }, true);
+  }
+  function wire() {
+    bind(document.getElementById("index-sensi-chip"));
+    bind(document.getElementById("sensi-hero")); /* SUNHOME1 · the climate hero used to link to itself */
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wire); else wire();

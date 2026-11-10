@@ -1,6 +1,8 @@
 /* HALLOWEEN1 WALLFILL · a landscape wall (wider than tall, 1200 px and up) fills the whole screen: the portrait
    1080 x 1920 column becomes two fluid columns (scene-side upper deck | kid grid) under a full-width header. */
 @media (min-width: 1200px) and (min-aspect-ratio: 4/3) {
+  html:not(#hf-scroll-off),
+  html:not(#hf-scroll-off) > body { height: 100vh !important; min-height: 0 !important; max-height: 100vh !important; overflow: hidden !important; }
   html body .panel.panel {
     width: 100vw !important; max-width: none !important; height: 100vh !important; min-height: 0 !important; max-height: 100vh !important;
     display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr);
@@ -10,6 +12,7 @@
   html body .panel.panel > .hub-upper { grid-column: 1; grid-row: 2; height: auto !important; min-height: 0 !important; max-height: none !important; flex-direction: column !important; }
   html body .panel.panel > .hub-upper > * { flex: 1 1 0 !important; min-height: 0 !important; width: 100% !important; align-self: stretch !important; max-width: none !important; }
   html body .panel.panel > .grid-wrap { grid-column: 2; grid-row: 2; min-height: 0 !important; height: auto !important; overflow: hidden auto; }
+  html body .panel.panel > .hub-window { grid-column: 1; grid-row: 2; align-self: end; height: 120px; margin: 0 12px 8px; z-index: 2; pointer-events: none; }
   html body .panel.panel > .who-up, html body .panel.panel > .hub-cam-deck, html body .panel.panel > footer.ftr { grid-column: 1 / -1; }
 }
 /* WGTYPE1 · across-the-room floor on the landscape wall: no hub text under 15 px (chips, tile facts, lights, roster) */
@@ -18,10 +21,9 @@
   .grid-title, .tile-sub, .tile-fact, .kf-kicker, .md, .tile-mchip, .pf-flag, .tile-hint, .tile-kicker, [class*="-meta"], [class*="-sub"], [class*="chip"] { font-size: max(15px, 1em) !important; }
   .hub-panel *, .grid-wrap * { min-width: 0; }
 }
-/* WGBG1 · the Halloween night scene behind the landscape hub instead of black: Prism's backgrounds/bg-wall-night.png when the
-   private folder has it (wg-assets.js sets --wg-hubbg on <html>), else the committed photoreal dusk still; a soft scrim keeps tiles readable */
+/* WGBG1 · landscape fallback is the November full-bleed dusk plate (1920x1080). The 1280x720 loop posters are not used on this board. */
 @media (min-width: 1200px) and (min-aspect-ratio: 4/3) {
-  html, body { background: #07080b var(--wg-hubbg, url("night/media/poster/loop-dusk-wall.webp")) center / cover no-repeat fixed !important; }
+  html, body { background: #07080b var(--wg-hubbg, url("month-theme/november/wall-dusk.webp")) left top / auto no-repeat fixed !important; }
   html body .panel.panel { background: linear-gradient(180deg, rgba(6, 7, 10, .42), rgba(6, 7, 10, .62)) !important; }
 }
 /* H1-LHVIS (Alfred P2) · wall kicker overlap: a kid or Dad stage taller than its tile was centred, so it spilled up under the
@@ -59,4 +61,13 @@
   html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile .kf-face { gap: 2px !important; }
   html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile .kf-kicker,
   html body .panel.panel .grid-wrap .tile-grid.tile-grid--cams > .tile .kf-title { line-height: 1.1 !important; }
+}
+@media (min-width: 1200px) and (min-aspect-ratio: 4/3) {
+  html body .panel.panel .tile-label { font-size: 28px !important; line-height: 1.1 !important; }
+}
+@media (min-width: 1200px) and (min-aspect-ratio: 4/3) {
+  html body .panel.panel .tile,
+  html body .panel.panel .tile::before,
+  html body .panel.panel .tile::after { box-shadow: none !important; }
+  html body .panel.panel .tile::after { background: none !important; animation: none !important; opacity: 0 !important; }
 }
