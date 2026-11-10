@@ -1,0 +1,30 @@
+# Pi v7 mock tests. Not an independent verification, not native systemd proof, and not ARM approval.
+# node --test --test-concurrency=1 ops/pi-hub/qa/pihub-dryrun.test.mjs
+# 21 tests, exit 0, on this x86_64 checkout
+# WARDOS_PI_TAMPER_REL is refused before any install write. The installer does not append through that variable.
+# A separate cleanup harness, refused without WARDOS_PI_FIXTURE=isolated, checks changed bytes, a symlink, and a ../ receipt path.
+# WARDOS_PI_INSTALL_FAIL_POINT is refused on a target install and on /opt/wardos.
+# A post-start show failure and a missing proc entry do not stop. A different invocation before capture is not adopted and is not stopped.
+# A rollback whose fresh show differs from the approved invocation does not run disable --now.
+# A reversal query failure on a later unit still reverses an earlier enable.
+# A proven stop whose active state stays active is reversal residue, not a claim that the unit was restored.
+# The preflight result is replaced by rename inside its directory. A failed write leaves the previous file. A symlink result is refused. Mode 0644 after umask 077. A mode 0600 secret is unchanged.
+# Pi v6 mock tests. Not an independent verification and not ARM approval.
+# node --test --test-concurrency=1 ops/pi-hub/qa/pihub-dryrun.test.mjs
+# 20 tests, exit 0, on this x86_64 checkout
+# a bad payload hash leaves no hub.env; a failure after hub.env and cloudflared are registered removes both and leaves the receipt and directories
+# a tampered owned file is named as RESIDUE and is not deleted; the matching link is removed
+# is-enabled masked and is-active activating are refused before any unit command is logged
+# WARDOS_PROC_ROOT is refused without WARDOS_SYSTEMD_FIXTURE=isolated and on /opt/wardos even with that flag
+# a replaced MainPID is not stopped; a start whose poststate stays active is reversal failed
+# preflight result is mode 0644 and readable by nobody after umask 077; a mode 0600 secret stays unreadable
+# Pi v5 mock tests. Not an independent verification and not ARM approval.
+# node --test --test-concurrency=1 ops/pi-hub/qa/pihub-dryrun.test.mjs
+# 18 tests, exit 0, on this x86_64 checkout
+# qemu-aarch64 was not run and systemctl was not invoked
+# copied venv launcher is a regular file inside the venv; an external interpreter path is refused
+# nobody, not the installing user, can read hub.env and the runtime tree and cannot read a mode 0600 secret
+# an explicit install failure removes the owned script and the owned link
+# an owned MainPID can be rolled back; a foreign MainPID cannot
+# tunnel %i is compared as expanded argv
+# a failed reversal is reported as failed and is not called reversed

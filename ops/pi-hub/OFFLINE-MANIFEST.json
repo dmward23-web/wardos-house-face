@@ -1,0 +1,137 @@
+{
+  "schema": "wardos.pi-offline.manifest/1",
+  "host_that_downloaded": "x86_64",
+  "imported_on_aarch64": false,
+  "qemu_aarch64_ran": false,
+  "blobs_in_git": false,
+  "artifact_dir": "/opt/cursor/artifacts/pi-offline",
+  "files": [
+    {
+      "name": "cloudflared-linux-arm64",
+      "bytes": 37685657,
+      "sha256": "aaeb2d7d0da3614634c7e03ab13487a1522c2e79165ed2929cfe23d5e95b326d"
+    },
+    {
+      "name": "cloudflared-linux-arm64.deb",
+      "bytes": 17809408,
+      "sha256": "bcce0111878f13d26e66b1d2ea7f270c8bde4bd549e32ce74d32474521583ca3"
+    },
+    {
+      "name": "node-v24.22.1-linux-arm64.tar.xz",
+      "bytes": 30978868,
+      "sha256": "dbabf7a1cbf947e6059ffad2c27b80041db97dea1e553b62afdee7f13fca336e"
+    }
+  ],
+  "wheels": [
+    {
+      "name": "aiohappyeyeballs-2.7.1-py3-none-any.whl",
+      "bytes": 15038,
+      "sha256": "9243213661e29250eb41368e5daa826fc017156c3b8a11440826b2e3ed376472"
+    },
+    {
+      "name": "aiohttp-3.14.5-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl",
+      "bytes": 1886492,
+      "sha256": "74efb69332b85675b1eabd760a8cfc2e2cf42c60607c66f88014c1bdfb40942d"
+    },
+    {
+      "name": "aiosignal-1.4.0-py3-none-any.whl",
+      "bytes": 7490,
+      "sha256": "053243f8b92b990551949e63930a839ff0cf0b0ebbe0597b0f3fb19e1a0fe82e"
+    },
+    {
+      "name": "asyncclick-8.4.2.1-py3-none-any.whl",
+      "bytes": 121917,
+      "sha256": "dbd533769c4e3ce831c05394027ea1cd606c09688e18abab13dbcfbf7dc5a142"
+    },
+    {
+      "name": "attrs-26.1.0-py3-none-any.whl",
+      "bytes": 67548,
+      "sha256": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309"
+    },
+    {
+      "name": "certifi-2026.10.23-py3-none-any.whl",
+      "bytes": 135082,
+      "sha256": "e9b54de76e530bb6cf0ccd036787103acb58fd42ba930ea8bf948ddbaa2f61d1"
+    },
+    {
+      "name": "cffi-2.1.1-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.whl",
+      "bytes": 222369,
+      "sha256": "f16c709686a78c727bbbf059f92b0bf41c6fc60deec706d2dc19f529175a6125"
+    },
+    {
+      "name": "charset_normalizer-3.5.2-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl",
+      "bytes": 244624,
+      "sha256": "849df64e889b2e17230d58410a03dba311a65b163508fd33679b2b737d4b7858"
+    },
+    {
+      "name": "cryptography-50.0.2-cp311-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl",
+      "bytes": 4731146,
+      "sha256": "79def8d059362e7831389ed3be0ecdf58a89386e1271e35dd9f5af84e81bffd0"
+    },
+    {
+      "name": "frozenlist-1.8.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl",
+      "bytes": 233048,
+      "sha256": "eaa352d7047a31d87dafcacbabe89df0aa506abb5b1b85a2fb91bc3faa02d822"
+    },
+    {
+      "name": "idna-3.20-py3-none-any.whl",
+      "bytes": 69583,
+      "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c"
+    },
+    {
+      "name": "mashumaro-3.23-py3-none-any.whl",
+      "bytes": 78621,
+      "sha256": "a671279ce93119d41c54adcd767753ae68adb32b9473de2f9d5d1720d2376231"
+    },
+    {
+      "name": "multidict-7.1.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl",
+      "bytes": 477779,
+      "sha256": "df03e392cae1e05462918abbae06d6100f1e53f67db971ff0ac6c07d9edf7321"
+    },
+    {
+      "name": "propcache-0.5.4-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl",
+      "bytes": 233595,
+      "sha256": "dbab5f5ff6897c81f355d079010cdae85b02e5a0b518b5251523b8ad8ae9ac3c"
+    },
+    {
+      "name": "pycparser-3.12-py3-none-any.whl",
+      "bytes": 62600,
+      "sha256": "a076f3f489b39b43ed13563a1dafe42447445bec2e294154ec5c57fcdda4c85e"
+    },
+    {
+      "name": "python_kasa-0.10.2-py3-none-any.whl",
+      "bytes": 261905,
+      "sha256": "b57af2ce84b8da7c1d5f296e4a18be4246b500b5633acd5a85200612f81a38ea"
+    },
+    {
+      "name": "requests-2.34.2-py3-none-any.whl",
+      "bytes": 73075,
+      "sha256": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0"
+    },
+    {
+      "name": "tplink_cloud_api-5.2.1-py3-none-any.whl",
+      "bytes": 53188,
+      "sha256": "ba43e171959865d1898230b002e25d3ba609a2375f6144bf81eaa4ad4c982fe3"
+    },
+    {
+      "name": "typing_extensions-4.16.0-py3-none-any.whl",
+      "bytes": 45571,
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"
+    },
+    {
+      "name": "urllib3-2.8.0-py3-none-any.whl",
+      "bytes": 135717,
+      "sha256": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3"
+    },
+    {
+      "name": "yarl-1.25.1-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl",
+      "bytes": 115392,
+      "sha256": "14b79a30a93a3ce2e8832603fd0ab780ada281b0ba5110b519a634f2d7d7d1fc"
+    }
+  ],
+  "sources": {
+    "node": "https://nodejs.org/dist/v24.22.1/node-v24.22.1-linux-arm64.tar.xz",
+    "cloudflared": "https://github.com/cloudflare/cloudflared/releases/download/2026.9.3/cloudflared-linux-arm64",
+    "cloudflared_deb": "https://github.com/cloudflare/cloudflared/releases/download/2026.9.3/cloudflared-linux-arm64.deb"
+  }
+}
