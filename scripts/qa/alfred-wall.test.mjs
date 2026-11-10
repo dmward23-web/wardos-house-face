@@ -65,5 +65,15 @@ test("controls and text stay inside x48-1872 y48-1032 with 16px between sibling 
   for (const page of r.pages) {
     assert.equal(page.outsideN, 0, page.route + " " + JSON.stringify(page.outside));
     assert.equal(page.gapN, 0, page.route + " " + JSON.stringify(page.gaps));
+    assert.equal(page.adjacentN, 0, page.route + " " + JSON.stringify(page.adjacent));
+  }
+});
+
+test("wall taps do not scale cards, shrink gaps, or move the jar", SKIP, async () => {
+  const r = await run("press");
+  for (const kid of ["hayes", "harris"]) {
+    const info = r.kids[kid];
+    assert.ok(info.frames > 10, kid + " frames " + info.frames);
+    assert.equal(info.badN, 0, kid + " " + JSON.stringify(info.bad));
   }
 });

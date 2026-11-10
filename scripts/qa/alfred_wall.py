@@ -147,6 +147,7 @@ BOUNDS = r"""() => {
   const SAFE = { l: 48, t: 48, r: 1872, b: 1032 };
   const outside = [];
   const gaps = [];
+  const adjacent = [];
   const vis = (el) => {
     const r = el.getBoundingClientRect();
     if (r.width < 1 || r.height < 1) return false;
@@ -187,6 +188,20 @@ BOUNDS = r"""() => {
       }
     }
   }
+  for (let i = 0; i < targets.length; i++) {
+    for (let j = i + 1; j < targets.length; j++) {
+      const A = targets[i], B = targets[j];
+      if (A.contains(B) || B.contains(A)) continue;
+      const a = A.getBoundingClientRect();
+      const b = B.getBoundingClientRect();
+      const xOverlap = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+      const yOverlap = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+      let gap = null;
+      if (yOverlap > 8 && xOverlap <= 0) gap = Math.max(a.left, b.left) - Math.min(a.right, b.right);
+      else if (xOverlap > 8 && yOverlap <= 0) gap = Math.max(a.top, b.top) - Math.min(a.bottom, b.bottom);
+      if (gap != null && gap < 15.99) adjacent.push({ gap: Math.round(gap * 100) / 100, a: (A.getAttribute("aria-label") || A.className || A.tagName).toString().slice(0, 40), b: (B.getAttribute("aria-label") || B.className || B.tagName).toString().slice(0, 40) });
+    }
+  }
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   let node;
   while ((node = walker.nextNode())) {
@@ -202,7 +217,36 @@ BOUNDS = r"""() => {
       if (!inSafe(r)) outside.push({ kind: "text", t: text.slice(0, 40), l: Math.round(r.left), t0: Math.round(r.top), r: Math.round(r.right), b: Math.round(r.bottom) });
     }
   }
-  return { outside: outside.slice(0, 24), gaps: gaps.slice(0, 24), outsideN: outside.length, gapN: gaps.length };
+  return { outside: outside.slice(0, 24), gaps: gaps.slice(0, 24), adjacent: adjacent.slice(0, 24), outsideN: outside.length, gapN: gaps.length, adjacentN: adjacent.length };
+}"""
+
+PRESS = r"""() => {
+  window.__pressDone = false;
+  window.__pressSamples = [];
+  const t0 = performance.now();
+  const ident = (t) => !t || t === "none" || t === "matrix(1, 0, 0, 1, 0, 0)";
+  function frame() {
+    const cards = [...document.querySelectorAll("#sec-musts .chore")];
+    const panel = document.querySelector(".panel");
+    const jar = document.querySelector("#sec-jar");
+    const bad = [];
+    for (const el of cards) {
+      const t = getComputedStyle(el).transform;
+      if (!ident(t)) bad.push({ what: "card", t });
+    }
+    if (panel && !ident(getComputedStyle(panel).transform)) bad.push({ what: "panel", t: getComputedStyle(panel).transform });
+    if (jar && !ident(getComputedStyle(jar).transform)) bad.push({ what: "jar", t: getComputedStyle(jar).transform });
+    const rects = cards.map((el) => el.getBoundingClientRect()).sort((a, b) => a.top - b.top);
+    let minGap = 999;
+    for (let i = 1; i < rects.length; i++) minGap = Math.min(minGap, rects[i].top - rects[i - 1].bottom);
+    window.__pressSamples.push({ bad, minGap, jarBottom: jar ? jar.getBoundingClientRect().bottom : 0 });
+    if (performance.now() - t0 < 1000) requestAnimationFrame(frame);
+    else window.__pressDone = true;
+  }
+  requestAnimationFrame(frame);
+  const row = document.querySelector("#sec-musts .chore");
+  const r = row.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 }"""
 
 def launch():
@@ -291,6 +335,21 @@ try:
             pages.append({"route": route, **info})
             pg.close()
         out["pages"] = pages
+    elif MODE == "press":
+        kids = {}
+        for kid in ("hayes", "harris"):
+            pg = page_of(ctx, "kid-%s.html" % kid)
+            pg.wait_for_timeout(400)
+            spot = pg.evaluate(PRESS)
+            pg.mouse.click(spot["x"], spot["y"])
+            for _ in range(8):
+                pg.mouse.click(spot["x"], spot["y"])
+            pg.wait_for_function("() => window.__pressDone", timeout=4000)
+            samples = pg.evaluate("() => window.__pressSamples")
+            bad = [s for s in samples if s["bad"] or s["minGap"] < 16 or s["jarBottom"] > 1032]
+            kids[kid] = {"frames": len(samples), "bad": bad[:6], "badN": len(bad), "spot": spot}
+            pg.close()
+        out["kids"] = kids
     else:
         out["error"] = "unknown mode"
 finally:

@@ -557,6 +557,25 @@ body.kw-on #tapsync-badge { display: none !important; }
     display: none !important;
     background-image: none !important;
   }
+  /* Wall taps stay the same size. Color and an inset edge carry the press. */
+  html.kw-root body.kw-on .chore,
+  html.kw-root body.kw-on .panel,
+  html.kw-root body.kw-on #sec-jar,
+  html.kw-root body.kw-on #sec-jar .grow-meter,
+  html.kw-root body.kw-on #sec-jar .grow-stage,
+  html.kw-root body.kw-on .vfx-boom,
+  html.kw-root body.vfx-shake .panel,
+  html.kw-root body.vfx-shake-hard .panel {
+    animation: none !important;
+    transform: none !important;
+  }
+  html.kw-root body.kw-on .chore.vfx-boom {
+    filter: none !important;
+    opacity: 0.82;
+    outline: 3px solid rgba(26, 24, 20, 0.55);
+    outline-offset: -3px;
+    box-shadow: inset 0 0 0 4px rgba(26, 24, 20, 0.22);
+  }
   html.kw-root body.kw-on .kw-hud {
     position: fixed !important;
     left: 48px !important;
