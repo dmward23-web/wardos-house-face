@@ -214,14 +214,23 @@
 
   function pad2(n) { return String(n).padStart(2, "0"); }
 
-  /** Chicago hour 0 to 23 (for the chore week change). */
+  function clockNow() {
+    try {
+      if (global.HouseScene && typeof HouseScene.now === "function") return HouseScene.now();
+      if (global.LHClock && typeof LHClock.now === "function") return LHClock.now();
+      if (global.HouseClock && typeof HouseClock.now === "function") return HouseClock.now();
+    } catch (e) { /* live clock */ }
+    return new Date();
+  }
+
+  /** Chicago hour 0 to 23 (for the chore week change). Follows ?now= when the clock is pinned. */
   function chicagoHourNow() {
     try {
       var parts = new Intl.DateTimeFormat("en-US", {
         timeZone: "America/Chicago",
         hour: "numeric",
         hourCycle: "h23"
-      }).formatToParts(new Date());
+      }).formatToParts(clockNow());
       for (var i = 0; i < parts.length; i++) {
         if (parts[i].type === "hour") return Number(parts[i].value) % 24;
       }

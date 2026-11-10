@@ -1475,17 +1475,45 @@
     }
     ctx.restore();
   }
+  var jump = null;
   function reactMotion(t) {
     var breath = Math.sin(t * 1.7);
-    if (!feed) return { squash: breath, hop: 0, glow: 0 };
-    var age = t - feed.t0;
-    if (age < 0 || age > 1.2) return { squash: breath * 0.6, hop: 0, glow: 0 };
-    var u = age / 1.05;
-    return {
-      squash: Math.sin(Math.min(1, u) * Math.PI * 2) * 1.1,
-      hop: Math.sin(Math.min(1, u) * Math.PI) * 16,
-      glow: Math.sin(Math.min(1, u) * Math.PI)
-    };
+    var hop = 0;
+    var squash = breath;
+    var glow = 0;
+    if (jump) {
+      var ja = t - jump.t0;
+      if (ja >= 0 && ja <= 0.9) {
+        var u = ja / 0.9;
+        hop = Math.sin(u * Math.PI) * 72;
+        squash = Math.sin(u * Math.PI * 2) * 0.9;
+      } else if (ja > 0.9) {
+        jump = null;
+      }
+    }
+    if (feed) {
+      var age = t - feed.t0;
+      if (age >= 0 && age <= 1.2) glow = Math.sin(Math.min(1, age / 1.05) * Math.PI);
+    }
+    return { squash: squash, hop: hop, glow: glow };
+  }
+  function startJump() {
+    if (!bg) return false;
+    var t = reduced ? 2.4 : (performance.now() - bg.t0) / 1000;
+    if (jump && t - jump.t0 < 0.9) return false;
+    jump = { t0: t };
+    if (bg.cv) bg.cv.setAttribute("data-jump", jump ? "air" : "ground");
+    return true;
+  }
+  function creatureHit(ev) {
+    if (!bg || !bg.cv) return false;
+    var rect = bg.cv.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+    var W = bg.cv.width / bg.dpr;
+    var H = bg.cv.height / bg.dpr;
+    var x = (ev.clientX - rect.left) * (W / rect.width);
+    var y = (ev.clientY - rect.top) * (H / rect.height);
+    return x > W * 0.28 && x < W * 0.72 && y > H * 0.58 && y < H * 0.96;
   }
   /* STAGE1 · venue scene for Ainsley: dark room, truss + moving-head beams, haze, stage deck, crowd silhouettes.
      Poster palette: oxblood, amber, bone, ink. Beams brighten as her musts fill the jar. */
@@ -1575,7 +1603,7 @@
   function drawVinylJar(ctx, W, H, t) {
     var box = creatureAnchor(W, H);
     var st = global.JarEngine ? JarEngine.choreState("ainsley") : { fill: 0 };
-    var f = clamp(st.fill || 0, 0, 1), R = box.jw * 0.42, cx = box.cx, cy = box.foot - R - 4;
+    var f = clamp(st.shown != null ? st.shown : (st.fill || 0), 0, 1), R = box.jw * (0.30 + 0.24 * f), cx = box.cx, cy = box.foot - R - 4;
     var spin = st.asleep || (global.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) ? 0 : t * (0.5 + f * 1.4);
     ctx.save();
     ctx.fillStyle = "rgba(0,0,0,0.4)"; ctx.beginPath(); ctx.ellipse(cx, box.foot, R * 0.9, R * 0.14, 0, 0, 7); ctx.fill();
@@ -1602,7 +1630,9 @@
     var mot = reactMotion(t);
     var sx = 1 + mot.squash * 0.07;
     var sy = 1 - mot.squash * 0.09;
-    var draw = box.draw;
+    var shown = 0;
+    try { var gst = global.JarEngine ? JarEngine.choreState(id) : null; shown = gst && gst.shown != null ? gst.shown : (gst && gst.fill) || 0; } catch (eGrow) { shown = 0; }
+    var draw = box.draw * (0.82 + 0.36 * clamp(shown, 0, 1));
     var bottom = box.foot + draw * 0.04 - mot.hop;
     ctx.save();
     ctx.translate(box.cx, box.groundY + 3);
@@ -1912,7 +1942,9 @@
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };
     var who = which || kid();
     this.cv.setAttribute("data-marker", who === "ainsley" ? "record" : who === "harris" ? "ore" : "chest");
-    this.hits = paintWorld(this.ctx, W, H, t, who, quests, st.fill || 0, parallaxNow(t, false));
+    this.cv.setAttribute("data-fill", String(Math.round((st.shown != null ? st.shown : st.fill || 0) * 100)));
+    this.cv.setAttribute("data-jump", jump && t - jump.t0 < 0.9 ? "air" : "ground");
+    this.hits = paintWorld(this.ctx, W, H, t, who, quests, st.shown != null ? st.shown : (st.fill || 0), parallaxNow(t, false));
     var jhost = document.querySelector("[data-kw-jar]");
     if (!wallView() && jhost && jhost._jar && jhost._jar.setEnv) {
       var skyPlate = plates[which || kid()] && plates[which || kid()].sky;
@@ -2171,7 +2203,10 @@
   function onWorldDown(ev) {
     if (!ev.isTrusted) return;
     var q = hitQuest(ev);
-    if (!q || !q.btn) return;
+    if (!q || !q.btn) {
+      if (creatureHit(ev)) startJump();
+      return;
+    }
     var now = performance.now();
     if (lastHit.q && lastHit.q.btn === q.btn && now - lastHit.at < 1000) return; /* UNDO1 · double-tap guard: a fumble can't undo what was just checked */
     lastHit = { q: q, at: now };
@@ -2577,6 +2612,7 @@
     day: function () { return dayIso; },
     setDay: setDay,
     hits: function () { return bg ? { hits: bg.hits || [], cv: bg.cv } : null; }, /* LOOT1 · read-only */
+    jump: startJump,
     platesReady: function () {
       var id = (document.body && document.body.getAttribute("data-kid")) || "hayes";
       return platesReady && !!(plates[id] && plates[id].sky);

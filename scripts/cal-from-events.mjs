@@ -36,6 +36,7 @@ function parseArgs(argv) {
     eventsPath: null,
     outPath: privPath("cal-live.json"), /* PRIVFEED1 · box-only, served by the hub with a token */
     patchWeek: null,
+    now: null,
     help: false,
   };
   for (let i = 2; i < argv.length; i++) {
@@ -47,7 +48,8 @@ function parseArgs(argv) {
         argv[i + 1] && !argv[i + 1].startsWith("-")
           ? path.resolve(argv[++i])
           : privPath("kids-week.json");
-    } else if (a === "--help" || a === "-h") out.help = true;
+    } else if (a === "--now" && argv[i + 1]) out.now = argv[++i];
+    else if (a === "--help" || a === "-h") out.help = true;
   }
   return out;
 }
@@ -546,7 +548,7 @@ function main() {
     process.exit(args.help ? 0 : 1);
   }
 
-  const now = new Date();
+  const now = args.now ? new Date(args.now) : new Date();
   const todayIso = chicagoIso(now);
   const fetchedAt = now.toISOString();
 

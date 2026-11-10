@@ -56,9 +56,9 @@ a.wardos-home {
 #wardos-diag {
   position: absolute;
   left: 48px;
-  top: 1036px;
+  top: 1040px;
   width: 1824px;
-  height: 48px;
+  height: 40px;
   z-index: 80;
   box-sizing: border-box;
   margin: 0;
@@ -88,9 +88,9 @@ html body .lh-clocktag.lh-clocktag {
 }
 .wardos-diag-close {
   width: 88px;
-  height: 40px;
+  height: 32px;
   min-width: 88px;
-  min-height: 40px;
+  min-height: 32px;
   flex: none;
   font-size: 18px;
   color: #f4efe6;

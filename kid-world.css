@@ -727,7 +727,15 @@ body.kw-on #tapsync-badge { display: none !important; }
     flex-direction: column !important;
   }
   html.kw-root body.kw-on #sec-jar { grid-column: 1 !important; grid-row: 2 !important; overflow: hidden !important; }
-  html.kw-root body.kw-on #sec-days { grid-column: 2 !important; grid-row: 2 !important; overflow: hidden !important; }
+  html.kw-root body.kw-on #sec-days { grid-column: 2 !important; grid-row: 2 !important; overflow: auto !important; color: #1a1814 !important; font-size: 24px !important; }
+  html.kw-root body.kw-on #sec-days:not(:has(.consume-hero, .kw-offline))::before {
+    content: "Nothing timed next";
+    display: block;
+    font-size: 24px;
+    line-height: 1.2;
+    padding: 16px;
+    color: #1a1814;
+  }
   /* Every kid keeps the jar and the Next card. An empty next says so; it does not vanish. */
   html.kw-root body.kw-on #sec-days,
   html.kw-root body.kw-on.kw-next-off #sec-days,
@@ -757,24 +765,28 @@ body.kw-on #tapsync-badge { display: none !important; }
     min-height: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 20px !important;
-    height: 100% !important;
-    max-height: 100% !important;
+    gap: 0 !important;
+    height: round(down, 100%, 104px) !important;
+    max-height: round(down, 100%, 104px) !important;
     overflow-x: hidden !important;
-    overflow-y: auto !important;
+    overflow-y: scroll !important;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: auto;
     scrollbar-gutter: stable;
     scrollbar-color: #1a1814 rgba(255, 252, 247, 0.4);
   }
   html.kw-root body.kw-on #sec-musts .chore {
-    flex: 0 0 auto !important;
+    flex: 0 0 96px !important;
     width: 100% !important;
-    height: auto !important;
-    min-height: 88px !important;
-    max-height: none !important;
+    height: 96px !important;
+    min-height: 96px !important;
+    max-height: 96px !important;
+    margin: 0 0 8px !important;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
     display: flex !important;
     align-items: center !important;
     gap: 20px !important;
-    margin: 0 !important;
     padding: 8px 12px !important;
     box-sizing: border-box !important;
     overflow: visible !important;

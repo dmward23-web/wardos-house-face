@@ -457,8 +457,8 @@
 /* P1FIX B45 · Chores wall: day toggles 48 px with 17 px letters (27in wall minimums); today carries a gold outline */
 @media (min-width:601px){
   html body .chore .quest-days{gap:20px!important;flex-wrap:wrap!important}
-  html body .chore.daily-week{overflow:visible!important;height:auto!important;max-height:none!important;flex:0 0 auto!important}
-  html body .panel .body > section.col .chore-list{overflow-y:auto!important;max-height:760px!important}
+  html body .panel .body > section.col .chore{height:248px!important;min-height:248px!important;max-height:248px!important;overflow:hidden!important;margin:0!important;flex:0 0 248px!important;scroll-snap-align:start;scroll-snap-stop:always}
+  html body .panel .body > section.col .chore-list{overflow-y:scroll!important;height:round(down,100%,248px)!important;max-height:round(down,100%,248px)!important;gap:0!important;scroll-snap-type:y mandatory;scrollbar-width:auto}
   html body .chore .day-tap{width:88px!important;height:88px!important;min-width:88px!important;min-height:88px!important;font-size:24px!important;border-radius:12px!important}
 }
 html body .chore .day-tap.is-today{border-color:#f0b440!important;outline:3px solid #f0b440!important;outline-offset:2px}

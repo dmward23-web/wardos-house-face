@@ -61,9 +61,35 @@
      next local midnight + 1 s (DST-safe: new Date(y, m, d + 1, 0, 0, 1)), re-armed after each fire and on return to the page.
      It runs the same check(): the day compare plus the 45 s reloadFresh guard keep it idempotent with the poll. */
   var midT = 0;
+  function ctCivil(d) {
+    try {
+      return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+    } catch (e) { return ""; }
+  }
+  function addCivil(iso) {
+    var p = String(iso).split("-");
+    var d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2]));
+    d.setUTCDate(d.getUTCDate() + 1);
+    return d.toISOString().slice(0, 10);
+  }
+  function ctMidnightMs(civil) {
+    var guess = new Date(civil + "T12:00:00Z");
+    var name = "GMT-6";
+    try {
+      var parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", timeZoneName: "shortOffset" }).formatToParts(guess);
+      for (var i = 0; i < parts.length; i++) if (parts[i].type === "timeZoneName") name = parts[i].value;
+    } catch (e) { /* CST */ }
+    var m = /GMT([+-])(\d{1,2})(?::(\d{2}))?/.exec(name);
+    var mins = m ? (m[1] === "-" ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3] || 0)) : -360;
+    return new Date(civil + "T00:00:00Z").getTime() - mins * 60000;
+  }
+  /* Next America/Chicago midnight, not the machine's local midnight. */
   function msToMidnight(now) {
     var n = now || new Date();
-    var ms = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1, 0, 0, 1).getTime() - n.getTime();
+    var iso = ctCivil(n) || "1970-01-01";
+    var target = ctMidnightMs(addCivil(iso)) + 1000;
+    var ms = target - Date.now();
+    if (ms < 1000) ms = ctMidnightMs(addCivil(addCivil(iso))) + 1000 - Date.now();
     return Math.max(1000, Math.min(ms, 25 * 3600 * 1000));
   }
   function armMidnight() {
@@ -74,4 +100,6 @@
   document.addEventListener("visibilitychange", function () { if (!document.hidden) armMidnight(); });
   window.addEventListener("pageshow", function () { armMidnight(); });
   setInterval(check, 30 * 1000); /* DAYROLL1 · 30 s (JARTAP1, Atlas 11:51 PM) so the day flips well inside a minute of midnight; the stamp fetch is one no-store GET */
+  var root = typeof globalThis !== "undefined" ? globalThis : window;
+  root.HouseFresh = { msToMidnight: msToMidnight, ctMidnightMs: ctMidnightMs };
 })();

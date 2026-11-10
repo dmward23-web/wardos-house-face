@@ -82,6 +82,20 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     document.documentElement.setAttribute("data-wardos-stage", "1");
     ensureHome(node);
     document.documentElement.style.setProperty("--wardos-s", String(s));
+    if (!document.getElementById("acer-type-floor")) {
+      var floor = document.createElement("style");
+      floor.id = "acer-type-floor";
+      floor.textContent = "@media (min-width:1400px) and (min-height:700px){"
+        + "html body .roster-abbr,html body .status-kicker,html body .status-note,html body .status-temp,"
+        + "html body .panel .banner,html body .panel .mpill,html body .panel .legend,html body .panel .leg,"
+        + "html body .panel .dow-h,html body .panel .day .dom,html body .panel .day-tag,html body .panel .month-range,"
+        + "html body .panel .cheer-sub,html body .panel .cheer-label,html body .kw-clock,html body .consume-hero-meta{"
+        + "font-size:24px !important;line-height:1.2 !important;}"
+        + "html body .panel .chore,html body .roster-plate,html body .hub-launch a,html body #sec-jar,html body #sec-days,html body .day{"
+        + "border-radius:16px !important;box-shadow:0 8px 0 #101820 !important;}"
+        + "}";
+      document.head.appendChild(floor);
+    }
     var bar = document.querySelector("body > .chore-shortcuts");
     if (bar) {
       bar.style.setProperty("left", Math.round(left + 160 * s) + "px", "important");
