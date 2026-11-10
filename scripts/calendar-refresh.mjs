@@ -27,7 +27,9 @@ createRequire(import.meta.url)("../house-face-law.js");   /* sets globalThis.Hou
 const FACE_LAW = globalThis.HouseFaceLaw;
 import { spawnSync } from "node:child_process";
 import { ctMidnight } from "./ct-midnight.mjs"; /* DATA1 P1-5 · one all-day clock for both feeds */
-import { privPath, assertPrivateOut, namesRe, privateNames, externalEvents, EXT_ROLES } from "./private-dir.mjs"; /* PRIVFEED1 · EXTFILTER1 */
+import { privPath, assertPrivateOut, namesRe, privateNames, externalEvents, therapyDrop, EXT_ROLES } from "./private-dir.mjs"; /* PRIVFEED1 · EXTFILTER1 */
+createRequire(import.meta.url)("../house-event-display.js"); /* KID-FEED-SAFETY · same allowlist as the glass */
+const DISPLAY = globalThis.HouseEventDisplay;
 /* EXTNAMES1 · private-names.tsv role "external" names people outside the household (never in git). A kid's first name
    followed by one of them is not our kid, so it is cut out before the kid tests. ONLY "external" is filtered, plus the
    old key "otherfamily" during the transition (a later commit drops it). partner, coparent, household, school and every
@@ -257,6 +259,10 @@ function danWhat(it) {
 function classify(ev) {
   const summary = summaryOf(ev);
   if (!summary || isAdminNoise(summary)) return null;
+  /* KID-FEED-SAFETY · provider/therapy is denied before school/other classification. Opt-in is an explicit boolean, never a title. */
+  if (therapyDrop(summary) || (DISPLAY && DISPLAY.isDenied({ summary, title: summary, providerOptIn: ev.providerOptIn === true }))) {
+    return null;
+  }
   if (/^Kids with Dan/i.test(summary)) return { kind: "custody", summary };
   if (/^Leave\s*·/i.test(summary) || /^Leave\b/i.test(summary)) {
     return { kind: "leave", summary, busy: !isFree(ev) };
@@ -400,6 +406,7 @@ function stripDollars(s) {
 }
 
 function kidsSafeWhat(summary, kind) {
+  if (DISPLAY && DISPLAY.CLINICAL.test(String(summary || ""))) return "School visit";
   let s = summary
     .replace(/^Leave\s*·\s*/i, "")
     .replace(/^Ainsley\s*—\s*/i, "")
@@ -420,6 +427,7 @@ function kidsSafeWhat(summary, kind) {
   }
   // Drop trailing "· 3:00" / "· 5:00 practice" clock echo when strip already shows time
   s = s.replace(/\s*·\s*\d{1,2}:\d{2}(\s*(am|pm|a|p|practice|game))?\s*$/i, "").trim();
+  s = s.replace(/\b\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?\s*[-–—]\s*\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?/gi, " ").replace(/\s{2,}/g, " ").trim();
   s = s.replace(/\s*·\s*leave\s+\d{1,2}:\d{2}.*$/i, "").trim();
   return s;
 }
