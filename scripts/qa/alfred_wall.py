@@ -232,26 +232,60 @@ PRESS = r"""() => {
   window.__pressStop = false;
   window.__pressDone = false;
   window.__pressSamples = [];
-  const ident = (t) => !t || t === "none" || t === "matrix(1, 0, 0, 1, 0, 0)";
-  function frame() {
+  const identT = (t) => !t || t === "none" || t === "matrix(1, 0, 0, 1, 0, 0)";
+  const plain = (v, ok) => !v || ok.indexOf(v) >= 0;
+  function geomOk(c) {
+    return identT(c.transform)
+      && plain(c.scale, ["none", "1", "1 1"])
+      && plain(c.translate, ["none", "0px", "0px 0px"])
+      && plain(c.rotate, ["none", "0deg"])
+      && plain(c.zoom, ["1", "normal"]);
+  }
+  function walk(el, bad) {
+    let n = el;
+    while (n) {
+      const c = getComputedStyle(n);
+      if (!geomOk(c)) bad.push({ tag: n.tagName, id: n.id || "", cls: String(n.className || "").slice(0, 48), transform: c.transform, scale: c.scale, translate: c.translate, rotate: c.rotate, zoom: c.zoom });
+      n = n.parentElement;
+    }
+  }
+  const jar0 = document.querySelector("#sec-jar");
+  const rest = jar0 ? jar0.getBoundingClientRect() : null;
+  window.__jarRest = rest ? { l: rest.left, t: rest.top, r: rest.right, b: rest.bottom, w: rest.width, h: rest.height } : null;
+  window.__pressFrame = function () {
     const cards = [...document.querySelectorAll("#sec-musts .chore")];
     const bad = [];
     const sizes = [];
     for (const el of cards) {
       const r = el.getBoundingClientRect();
       sizes.push([Math.round(r.width * 100) / 100, Math.round(r.height * 100) / 100]);
-      let n = el;
-      while (n) {
-        const t = getComputedStyle(n).transform;
-        if (!ident(t)) bad.push({ tag: n.tagName, id: n.id || "", cls: String(n.className || "").slice(0, 48), t });
-        n = n.parentElement;
+      walk(el, bad);
+    }
+    const jar = document.querySelector("#sec-jar");
+    let jarBottom = 0;
+    if (jar) {
+      walk(jar, bad);
+      const r = jar.getBoundingClientRect();
+      jarBottom = r.bottom;
+      const g = window.__jarRest;
+      if (g && (Math.abs(r.left - g.l) > 0.5 || Math.abs(r.top - g.t) > 0.5 || Math.abs(r.right - g.r) > 0.5 || Math.abs(r.bottom - g.b) > 0.5 || Math.abs(r.width - g.w) > 0.5 || Math.abs(r.height - g.h) > 0.5)) {
+        bad.push({ id: "sec-jar", what: "rect", l: r.left, t: r.top, r: r.right, b: r.bottom, w: r.width, h: r.height });
       }
     }
     const rects = cards.map((el) => el.getBoundingClientRect()).sort((a, b) => a.top - b.top);
     let minGap = 999;
     for (let i = 1; i < rects.length; i++) minGap = Math.min(minGap, rects[i].top - rects[i - 1].bottom);
+    return { bad, minGap, jarBottom, sizes };
+  };
+  window.__pressMutate = function () {
     const jar = document.querySelector("#sec-jar");
-    window.__pressSamples.push({ bad, minGap, jarBottom: jar ? jar.getBoundingClientRect().bottom : 0, sizes });
+    jar.style.setProperty("transform", "matrix(0.99, 0, 0, 0.99, 0, 0)", "important");
+    const sample = window.__pressFrame();
+    jar.style.removeProperty("transform");
+    return { flagged: sample.bad.some((row) => row.id === "sec-jar" && String(row.transform || "").indexOf("0.99") >= 0), bad: sample.bad.filter((row) => row.id === "sec-jar").slice(0, 2) };
+  };
+  function frame() {
+    window.__pressSamples.push(window.__pressFrame());
     if (!window.__pressStop) requestAnimationFrame(frame);
     else window.__pressDone = true;
   }
@@ -259,6 +293,46 @@ PRESS = r"""() => {
   const row = document.querySelector("#sec-musts .chore");
   const r = row.getBoundingClientRect();
   return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+}"""
+
+CHEER = r"""() => {
+  const card = document.querySelector("section.cheer");
+  if (!card) return { missing: true };
+  const cr = card.getBoundingClientRect();
+  const texts = [];
+  for (const el of card.querySelectorAll("*")) {
+    const direct = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+    if (!direct) continue;
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    for (const r of range.getClientRects()) {
+      if (r.width < 1 || r.height < 1) continue;
+      texts.push({ t: (el.textContent || "").replace(/\s+/g, " ").trim().slice(0, 40), l: r.left, t0: r.top, r: r.right, b: r.bottom, cls: String(el.className || el.tagName).slice(0, 40) });
+    }
+  }
+  const controls = [...document.querySelectorAll("a, button, .kid-chip")].filter((el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 1 && r.height > 1;
+  }).map((el) => {
+    const r = el.getBoundingClientRect();
+    return { l: r.left, t0: r.top, r: r.right, b: r.bottom };
+  });
+  const inside = [];
+  const hits = [];
+  const overlaps = (a, b) => a.l < b.r - 0.5 && b.l < a.r - 0.5 && a.t0 < b.b - 0.5 && b.t0 < a.b - 0.5;
+  for (const t of texts) {
+    if (t.l < cr.left - 0.5 || t.t0 < cr.top - 0.5 || t.r > cr.right + 0.5 || t.b > cr.bottom + 0.5) inside.push(t);
+  }
+  for (let i = 0; i < texts.length; i++) {
+    for (let j = i + 1; j < texts.length; j++) if (overlaps(texts[i], texts[j])) hits.push({ a: texts[i].t, b: texts[j].t });
+    for (const c of controls) if (overlaps(texts[i], c)) hits.push({ a: texts[i].t, b: "control" });
+  }
+  return {
+    card: { l: Math.round(cr.left), t: Math.round(cr.top), r: Math.round(cr.right), b: Math.round(cr.bottom) },
+    texts: texts.map((t) => ({ t: t.t, l: Math.round(t.l), t0: Math.round(t.t0), r: Math.round(t.r), b: Math.round(t.b) })),
+    outside: inside.map((t) => t.t),
+    overlaps: hits
+  };
 }"""
 
 SHORTCUTS = r"""() => {
@@ -384,7 +458,8 @@ try:
             def bad_size(s):
                 return any(abs(w - 900) > 0.51 or abs(h - 64) > 0.51 for w, h in s.get("sizes") or [])
             bad = [s for s in samples if s["bad"] or s["minGap"] < 16 or s["jarBottom"] > 1032 or bad_size(s)]
-            kids[kid] = {"frames": len(samples), "bad": [{k: v for k, v in s.items() if k != "sizes"} | {"sizes": (s.get("sizes") or [])[:2]} for s in bad[:4]], "badN": len(bad), "spot": spot}
+            mut = pg.evaluate("() => window.__pressMutate()")
+            kids[kid] = {"frames": len(samples), "bad": [{k: v for k, v in s.items() if k != "sizes"} | {"sizes": (s.get("sizes") or [])[:2]} for s in bad[:4]], "badN": len(bad), "spot": spot, "mutation": mut}
             pg.close()
         out["kids"] = kids
     elif MODE == "shortcuts":
@@ -395,6 +470,11 @@ try:
             pages[route] = pg.evaluate(SHORTCUTS)
             pg.close()
         out["pages"] = pages
+    elif MODE == "cheer":
+        pg = page_of(ctx, "sheet-chores.html")
+        pg.wait_for_timeout(400)
+        out["cheer"] = pg.evaluate(CHEER)
+        pg.close()
     else:
         out["error"] = "unknown mode"
 finally:

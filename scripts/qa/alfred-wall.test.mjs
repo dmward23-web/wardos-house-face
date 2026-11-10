@@ -75,7 +75,17 @@ test("wall taps do not scale cards, shrink gaps, or move the jar", SKIP, async (
     const info = r.kids[kid];
     assert.ok(info.frames > 10, kid + " frames " + info.frames);
     assert.equal(info.badN, 0, kid + " " + JSON.stringify(info.bad));
+    assert.equal(info.mutation.flagged, true, kid + " mutation " + JSON.stringify(info.mutation));
   }
+});
+
+test("chores header card keeps every line inside the card and clear of other text", SKIP, async () => {
+  const r = await run("cheer");
+  const c = r.cheer;
+  assert.ok(c.texts.length >= 4, JSON.stringify(c));
+  assert.deepEqual(c.outside, [], JSON.stringify(c));
+  assert.deepEqual(c.overlaps, [], JSON.stringify(c));
+  assert.ok(c.card.b <= 1032 && c.card.t >= 48 && c.card.r <= 1872, JSON.stringify(c.card));
 });
 
 test("chores header shortcuts are one on-screen row and each center hits that shortcut", SKIP, async () => {

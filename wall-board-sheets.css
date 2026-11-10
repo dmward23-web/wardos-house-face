@@ -823,4 +823,70 @@
   body > .chore-shortcuts .kid-chip.ainsley { width: 160px !important; }
   body > .chore-shortcuts .kid-chip.hayes,
   body > .chore-shortcuts .kid-chip.harris { width: 148px !important; }
+  /* Chores header card: title, subline, date, then the two pills on their own row. */
+  html:not(#hf-wall-off) body > .panel > section.cheer {
+    top: 48px !important;
+    left: 990px !important;
+    width: 830px !important;
+    height: 108px !important;
+    max-height: 108px !important;
+    margin: 0 !important;
+    padding: 8px 16px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+    z-index: 4 !important;
+  }
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-accent { display: none !important; }
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-body,
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-main {
+    position: static !important;
+    inset: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-body {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    flex: 1 1 auto !important;
+    padding: 0 !important;
+  }
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-main {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  html:not(#hf-wall-off) body > .panel > section.cheer :is(.cheer-label, .cheer-title, .cheer-sub, .cheer-sub span, .cheer-badge) {
+    position: static !important;
+    margin: 0 !important;
+    font-size: 24px !important;
+    line-height: 28px !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-badges {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 16px !important;
+    flex: none !important;
+  }
+  html:not(#hf-wall-off) body > .panel > section.cheer .cheer-badge {
+    padding: 0 12px !important;
+  }
 }
