@@ -819,6 +819,7 @@
     box-sizing: border-box !important;
     transform: none !important;
   }
+  body > .chore-shortcuts .kid-chip .dot { font-size: 24px !important; }
   body > .chore-shortcuts .kid-chip.ainsley { width: 160px !important; }
   body > .chore-shortcuts .kid-chip.hayes,
   body > .chore-shortcuts .kid-chip.harris { width: 148px !important; }
