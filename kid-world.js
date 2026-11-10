@@ -126,7 +126,6 @@
     hideRest = function () { hideRestBound(); weekNote(false); };
     paintPublicMusts();
     document.addEventListener("house:kids-data-missing", paintPublicMusts);
-    document.addEventListener("house:kids-data-ready", paintPublicMusts);
     if (!W || !W._data) showRest();
     else hideRest();
     return { show: showRest, hide: hideRest };
