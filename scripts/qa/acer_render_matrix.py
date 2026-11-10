@@ -152,7 +152,9 @@ PROBE = """() => {
         const b = n.getBoundingClientRect();
         const dx = cutX ? Math.max(0, b.left - r.left, r.right - b.right) : 0;
         const dy = cutY ? Math.max(0, b.top - r.top, r.bottom - b.bottom) : 0;
-        if (dx > 2 || dy > 2) return { t: (node.textContent || node.className || '').toString().trim().slice(0, 24), dx: Math.round(dx), dy: Math.round(dy) };
+        const visY = Math.min(r.bottom, b.bottom) - Math.max(r.top, b.top);
+        const visX = Math.min(r.right, b.right) - Math.max(r.left, b.left);
+        if ((dx > 2 || dy > 2) && visX > 8 && visY > 8) return { t: (node.textContent || node.className || '').toString().trim().slice(0, 24), dx: Math.round(dx), dy: Math.round(dy) };
       }
       n = n.parentElement;
     }

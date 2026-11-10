@@ -546,6 +546,7 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on [data-mount-consume-ahead],
   html.kw-root body.kw-on .consume-ahead-empty,
   html.kw-root body.kw-on .consume-hero-meta { display: none !important; }
+  html.kw-root body.kw-on #sec-days > :not(.consume-hero):not(.sec-hdr):not(.kw-offline) { display: none !important; }
   body.theme-ainsley .sec-schedule::after { content: none !important; display: none !important; }
   html.kw-root body.kw-on .kw-canvas {
     position: fixed !important;

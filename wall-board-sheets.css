@@ -926,4 +926,20 @@
     max-height: none !important;
     font-size: 24px !important;
   }
+  html:not(#hf-wall-off) body .panel .body > section.col .chore-list {
+    height: 560px !important;
+    max-height: 560px !important;
+    overflow-x: hidden !important;
+    overflow-y: scroll !important;
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+  html:not(#hf-wall-off) body .panel .body > section.col .chore {
+    height: 280px !important;
+    min-height: 280px !important;
+    max-height: 280px !important;
+    margin: 0 !important;
+    flex: 0 0 280px !important;
+    overflow: hidden !important;
+  }
 }

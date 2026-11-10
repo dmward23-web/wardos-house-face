@@ -53,8 +53,8 @@ a.wardos-home {
   text-decoration: none;
 }
 .wardos-home img { width: 64px; height: 64px; display: block; }
-html body .wardos-stage header .live-clock-host,
-html body .wardos-stage .hdr-date {
+html body .wardos-stage:has(> .chore-shortcuts) header .live-clock-host,
+html body .wardos-stage:has(.chore-shortcuts) header .live-clock-host {
   position: relative !important;
   left: 640px !important;
   margin-left: 0 !important;
