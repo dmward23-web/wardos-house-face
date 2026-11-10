@@ -449,15 +449,17 @@
   .wf-kidtabs button{flex:1;min-height:56px;border-radius:14px;border:2px solid rgba(255,255,255,.3);color:#fff;font-family:inherit;font-size:20px;font-weight:800;line-height:1;cursor:pointer;opacity:.6}
   .wf-kidtabs button.ain{background:#9b55b8}.wf-kidtabs button.hay{background:#1f7a60}.wf-kidtabs button.har{background:#2a5aa8}
   .wf-kidtabs button[aria-pressed="true"]{opacity:1;border-color:#f0b440;box-shadow:0 0 0 3px rgba(240,180,64,.45)}
-  html body .chore .txt .what{font-size:22px!important;line-height:1.25!important}
-  html body .chore .txt .hint{font-size:17px!important}
+  html body .chore .txt .what{font-size:24px!important;line-height:1.2!important}
+  html body .chore .txt .hint{font-size:24px!important}
 }
 </style>
 <style id="p1fix-chores-wall">
 /* P1FIX B45 · Chores wall: day toggles 48 px with 17 px letters (27in wall minimums); today carries a gold outline */
 @media (min-width:601px){
-  html body .chore .quest-days{gap:8px!important;flex-wrap:wrap!important}
-  html body .chore .day-tap{width:48px!important;height:48px!important;min-width:48px!important;font-size:17px!important;border-radius:10px!important}
+  html body .chore .quest-days{gap:20px!important;flex-wrap:wrap!important}
+  html body .chore.daily-week{overflow:visible!important;height:auto!important;max-height:none!important;flex:0 0 auto!important}
+  html body .panel .body > section.col .chore-list{overflow-y:auto!important;max-height:760px!important}
+  html body .chore .day-tap{width:88px!important;height:88px!important;min-width:88px!important;min-height:88px!important;font-size:24px!important;border-radius:12px!important}
 }
 html body .chore .day-tap.is-today{border-color:#f0b440!important;outline:3px solid #f0b440!important;outline-offset:2px}
 </style>
@@ -721,8 +723,8 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 
 <nav class="chore-shortcuts" aria-label="Kid boards">
  <a class="kid-chip ainsley" href="kid-ainsley.html"><span class="dot">A</span> Ainsley</a>
- <a class="kid-chip hayes" href="kid-hayes.html"><span class="dot">H</span> Hayes</a>
- <a class="kid-chip harris" href="kid-harris.html"><span class="dot">H</span> Harris</a>
+ <a class="kid-chip hayes" href="kid-hayes.html"><span class="dot">Hy</span> Hayes</a>
+ <a class="kid-chip harris" href="kid-harris.html"><span class="dot">Hr</span> Harris</a>
 </nav>
 <div class="panel">
  <header class="hdr hdr--clockfirst">
@@ -762,64 +764,65 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </section>
  <!-- Ainsley -->
  <section class="col" aria-label="Ainsley chores">
+ <h2 class="col-name">Ainsley</h2>
   <div class="chore-list">
- <div class="chore open ainsley" data-check="ain-bed">
+ <div class="chore open ainsley" data-check="ain-bed" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Make bed · stage reset</div>
  <div class="hint">daily must · morning</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-toys">
+ <div class="chore open ainsley" data-check="ain-toys" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Room reset</div>
  <div class="hint">daily must · morning clean pass</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-dishwasher">
+ <div class="chore open ainsley" data-check="ain-dishwasher" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Clean up · rinse · dishwasher</div>
  <div class="hint">daily must · after you eat</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-empty">
+ <div class="chore open ainsley" data-check="ain-empty" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Empty dishwasher</div>
  <div class="hint">daily must · when clean</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-living">
+ <div class="chore open ainsley" data-check="ain-living" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Shoes & coats · closet / cubby / room</div>
  <div class="hint">daily must · never hallway</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-bath">
+ <div class="chore open ainsley" data-check="ain-bath" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Bathroom wipe</div>
  <div class="hint">weekly must · ask Dad to inspect</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-laundry">
+ <div class="chore open ainsley" data-check="ain-laundry" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Laundry full cycle · her clothes</div>
  <div class="hint">weekly must · wash, dry, put away</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-cubby">
+ <div class="chore open ainsley" data-check="ain-cubby" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Backpack + sports bag in garage cubby</div>
  <div class="hint">weekly must · ask Dad to inspect</div>
  </div>
  </div>
- <div class="chore open ainsley addon" data-check="ain-babysit" data-optional="1">
+ <div class="chore open ainsley addon" data-check="ain-babysit" data-optional="1" data-cadence="addon">
  <span class="ring">＋</span>
  <div class="txt">
  <div class="what">Babysitting · optional add-on</div>
@@ -832,8 +835,9 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 
  <!-- Hayes -->
  <section class="col" aria-label="Hayes chores">
+ <h2 class="col-name">Hayes</h2>
   <div class="chore-list">
- <div class="chore open hayes" data-check="hay-bed">
+ <div class="chore open hayes" data-check="hay-bed" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Make bed</div>
@@ -841,7 +845,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-backpack">
+ <div class="chore open hayes" data-check="hay-backpack" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Backpack ready</div>
@@ -849,7 +853,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-dishes">
+ <div class="chore open hayes" data-check="hay-dishes" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Clean up · rinse · dishwasher</div>
@@ -857,7 +861,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-empty">
+ <div class="chore open hayes" data-check="hay-empty" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Empty dishwasher</div>
@@ -865,7 +869,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-trash">
+ <div class="chore open hayes" data-check="hay-trash" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Trash out</div>
@@ -873,7 +877,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-postgame">
+ <div class="chore open hayes" data-check="hay-postgame" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Post-game · gear rinsed · bag set</div>
@@ -881,7 +885,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-shower">
+ <div class="chore open hayes" data-check="hay-shower" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Shower · brush · ready for bed</div>
@@ -889,7 +893,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-room">
+ <div class="chore open hayes" data-check="hay-room" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Room reset</div>
@@ -897,7 +901,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="2" data-money-suffix=""></span>
  </div>
- <div class="chore open hayes" data-check="hay-shoes">
+ <div class="chore open hayes" data-check="hay-shoes" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Shoes · closet / cubby / room</div>
@@ -905,7 +909,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="1" data-money-suffix=""></span>
  </div>
- <div class="chore open hayes" data-check="hay-cubby">
+ <div class="chore open hayes" data-check="hay-cubby" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Backpack + sports bag in garage cubby</div>
@@ -918,8 +922,9 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 
  <!-- Harris -->
  <section class="col" aria-label="Harris chores">
+ <h2 class="col-name">Harris</h2>
   <div class="chore-list">
- <div class="chore open harris" data-check="har-bed">
+ <div class="chore open harris" data-check="har-bed" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Make bed</div>
@@ -927,7 +932,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-backpack">
+ <div class="chore open harris" data-check="har-backpack" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Backpack ready</div>
@@ -935,7 +940,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-dishes">
+ <div class="chore open harris" data-check="har-dishes" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Clean up · rinse · dishwasher</div>
@@ -943,7 +948,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-empty">
+ <div class="chore open harris" data-check="har-empty" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Empty dishwasher</div>
@@ -951,7 +956,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-trash">
+ <div class="chore open harris" data-check="har-trash" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Trash out</div>
@@ -959,7 +964,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-postgame">
+ <div class="chore open harris" data-check="har-postgame" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Post-game · gear rinsed · bag set</div>
@@ -967,7 +972,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-shower">
+ <div class="chore open harris" data-check="har-shower" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Shower · brush · ready for bed</div>
@@ -975,7 +980,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-toys">
+ <div class="chore open harris" data-check="har-toys" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Toys reset</div>
@@ -983,7 +988,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="2" data-money-suffix=""></span>
  </div>
- <div class="chore open harris" data-check="har-shoes">
+ <div class="chore open harris" data-check="har-shoes" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Shoes · closet / cubby / room</div>
@@ -991,7 +996,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="1" data-money-suffix=""></span>
  </div>
- <div class="chore open harris" data-check="har-cubby">
+ <div class="chore open harris" data-check="har-cubby" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Backpack + sports bag in garage cubby</div>

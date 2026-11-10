@@ -73,7 +73,7 @@ PROBE = """() => {
     return true;
   };
   const small = [];
-  const hubish = /sheet-index|kid-ainsley|kid-hayes|kid-harris/.test(location.pathname);
+  const hubish = /sheet-index|kid-ainsley|kid-hayes|kid-harris|sheet-chores|month[.]html/.test(location.pathname);
   if (hubish) {
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     let node;
@@ -81,9 +81,10 @@ PROBE = """() => {
       const t = node.textContent.replace(/\\s+/g, ' ').trim();
       if (!t) continue;
       const el = node.parentElement;
-      if (!el || !vis(el) || el.closest('.hub-cam-rest')) continue;
+      if (!el || !vis(el)) continue;
       const px = parseFloat(getComputedStyle(el).fontSize) || 0;
-      if (px < 18) small.push({ t: t.slice(0, 24), px: px });
+      const eff = px * (s || 1);
+      if (eff < 17.5) small.push({ t: t.slice(0, 24), px: Math.round(eff * 10) / 10 });
     }
   }
   const hits = [...document.querySelectorAll('a, button')].filter(vis);
@@ -107,6 +108,98 @@ PROBE = """() => {
   const lights = document.getElementById('hub-lights-panel');
   const launch = document.querySelector('.hub-launch');
   const lightsLaunch = !!(lights && launch && vis(lights) && vis(launch) && boxHit(lights.getBoundingClientRect(), launch.getBoundingClientRect()));
+  const clips = [];
+  const clipOf = (node) => {
+    let n = node.parentElement;
+    const r = node.getBoundingClientRect();
+    while (n && n !== document.body) {
+      const c = getComputedStyle(n);
+      const ox = c.overflowX, oy = c.overflowY;
+      const scrollX = ox === 'auto' || ox === 'scroll';
+      const scrollY = oy === 'auto' || oy === 'scroll';
+      const cutX = ox === 'hidden' || ox === 'clip';
+      const cutY = oy === 'hidden' || oy === 'clip';
+      if (scrollX && scrollY) return null;
+      if ((scrollY && !cutX) || (scrollX && !cutY)) return null;
+      if (cutX || cutY) {
+        const b = n.getBoundingClientRect();
+        const dx = cutX ? Math.max(0, b.left - r.left, r.right - b.right) : 0;
+        const dy = cutY ? Math.max(0, b.top - r.top, r.bottom - b.bottom) : 0;
+        if (dx > 2 || dy > 2) return { t: (node.textContent || node.className || '').toString().trim().slice(0, 24), dx: Math.round(dx), dy: Math.round(dy) };
+      }
+      n = n.parentElement;
+    }
+    return null;
+  };
+  for (const el of [...document.querySelectorAll('button, a, .day-tap, .chore, .what')]) {
+    if (!vis(el) || clips.length > 8) continue;
+    const hit = clipOf(el);
+    if (hit) clips.push(hit);
+  }
+  const blanks = [];
+  for (const el of document.querySelectorAll('.panel, .sec, #sec-musts, .card')) {
+    if (!vis(el) || blanks.length > 6) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < 200 || r.height < 200) continue;
+    const words = (el.innerText || '').replace(/\s+/g, ' ').trim();
+    const pic = el.querySelector('img, canvas, video, svg');
+    const bg = getComputedStyle(el).backgroundImage;
+    if (!words && !pic && (!bg || bg === 'none')) blanks.push((el.id || el.className || '').toString().slice(0, 40));
+  }
+  const textBoxes = [];
+  const twalk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let tn;
+  while ((tn = twalk.nextNode())) {
+    const raw = tn.textContent.replace(/\s+/g, ' ').trim();
+    if (!raw) continue;
+    const el = tn.parentElement;
+    if (!el || !vis(el)) continue;
+    const range = document.createRange();
+    range.selectNodeContents(tn);
+    for (const r of range.getClientRects()) {
+      if (r.width > 1 && r.height > 1) textBoxes.push({ t: raw.slice(0, 28), r, el });
+    }
+  }
+  const textHits = [];
+  for (let i = 0; i < textBoxes.length && textHits.length < 8; i++) {
+    for (let j = i + 1; j < textBoxes.length && textHits.length < 8; j++) {
+      const A = textBoxes[i], B = textBoxes[j];
+      if (A.el === B.el || A.el.contains(B.el) || B.el.contains(A.el)) continue;
+      if (boxHit(A.r, B.r)) textHits.push({ a: A.t, b: B.t });
+    }
+  }
+  const overflow = [];
+  for (const item of textBoxes) {
+    if (overflow.length > 8) break;
+    let n = item.el.parentElement;
+    while (n && n !== document.body) {
+      const c = getComputedStyle(n);
+      const cuts = c.overflowX === 'hidden' || c.overflowX === 'clip' || c.overflowY === 'hidden' || c.overflowY === 'clip';
+      if (cuts) {
+        const b = n.getBoundingClientRect();
+        const ix = Math.min(item.r.right, b.right) - Math.max(item.r.left, b.left);
+        const iy = Math.min(item.r.bottom, b.bottom) - Math.max(item.r.top, b.top);
+        const outside = item.r.left < b.left - 2 || item.r.right > b.right + 2 || item.r.top < b.top - 2 || item.r.bottom > b.bottom + 2;
+        if (ix > 1 && iy > 1 && outside) overflow.push(item.t);
+        break;
+      }
+      n = n.parentElement;
+    }
+  }
+  const stray = [];
+  for (const item of textBoxes) {
+    if (stray.length > 6) break;
+    const home = item.el.closest('.panel, .kw-hud, header, .chore-shortcuts, #wardos-diag, .hub-launch, .hub-upper');
+    const pos = getComputedStyle(item.el).position;
+    if (!home && (pos === 'fixed' || pos === 'absolute' || /CLOCK OVERRIDE/.test(item.t))) stray.push(item.t);
+  }
+  const touchSmall = [];
+  for (const el of document.querySelectorAll('a.wardos-home, button.kw-home, a.hub-home, .day-tap, .kid-chip, .hub-launch a, .kw-offline')) {
+    if (!vis(el) || touchSmall.length > 8) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < 63.5 || r.height < 63.5) touchSmall.push({ t: (el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 24), w: Math.round(r.width), h: Math.round(r.height) });
+  }
+  const debugLeak = /CLOCK OVERRIDE/.test(text) && !/[?&]diag=1(?:&|$)/.test(location.search);
   const diagEl = document.getElementById('wardos-diag');
   let diagOverlap = false;
   if (diagEl) {
@@ -119,7 +212,7 @@ PROBE = """() => {
       if (x > 1 && y > 1) diagOverlap = true;
     }
   }
-  return { stageW: stage ? stage.offsetWidth : 0, stageH: stage ? stage.offsetHeight : 0, scale: Math.round(s * 1000) / 1000, innerWidth, innerHeight, dpr: devicePixelRatio, scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, scrollH: document.documentElement.scrollHeight, clientH: document.documentElement.clientHeight, banned, phase, pickup: text.indexOf('School pickup') >= 0, soccer: text.indexOf('Leave for soccer') >= 0, swim: text.indexOf('4:25 PM') >= 0, outdoor: text.indexOf('62') >= 0, indoor: text.indexOf('65') >= 0, hub: img ? img.getAttribute('src') : '', diag: !!diagEl, small: small.slice(0, 8), smallN: small.length, overlaps: overlaps.slice(0, 8), overlapN: overlaps.length, diagOverlap, lightsLaunch };
+  return { stageW: stage ? stage.offsetWidth : 0, stageH: stage ? stage.offsetHeight : 0, scale: Math.round(s * 1000) / 1000, innerWidth, innerHeight, dpr: devicePixelRatio, scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, scrollH: document.documentElement.scrollHeight, clientH: document.documentElement.clientHeight, banned, phase, pickup: text.indexOf('School pickup') >= 0, soccer: text.indexOf('Leave for soccer') >= 0, swim: text.indexOf('4:25 PM') >= 0, outdoor: text.indexOf('62') >= 0, indoor: text.indexOf('65') >= 0, hub: img ? img.getAttribute('src') : '', diag: !!diagEl, small: small.slice(0, 8), smallN: small.length, overlaps: overlaps.slice(0, 8), overlapN: overlaps.length, diagOverlap, lightsLaunch, clips: clips.slice(0, 8), clipN: clips.length, blanks, blankN: blanks.length, debugLeak, textHits: textHits.slice(0, 8), textN: textHits.length, overflow: overflow.slice(0, 8), overflowN: overflow.length, stray: stray.slice(0, 6), strayN: stray.length, touch: touchSmall.slice(0, 8), touchN: touchSmall.length };
 }"""
 
 
@@ -250,7 +343,7 @@ def main():
                             except Exception:
                                 pass
                         else:
-                            page.wait_for_timeout(500)
+                            page.wait_for_timeout(1600)
                         info = page.evaluate(PROBE)
                         shot = page.screenshot(full_page=False)
                         (out / name).write_bytes(shot)
@@ -277,11 +370,27 @@ def main():
                                 fails.append(name + " lights-launch")
                             if diag and info.get("diagOverlap"):
                                 fails.append(name + " diag-overlap")
-                        if args.assert_layout and route_name in ("sheet-index.html", "kid-ainsley.html", "kid-hayes.html", "kid-harris.html"):
+                        watch = ("sheet-index.html", "kid-ainsley.html", "kid-hayes.html", "kid-harris.html", "sheet-chores.html", "month.html", "sheet-lights.html", "sheet-google-home.html")
+                        if args.assert_layout and route_name in ("sheet-index.html", "kid-ainsley.html", "kid-hayes.html", "kid-harris.html", "sheet-chores.html", "month.html"):
                             if info.get("smallN"):
                                 fails.append(name + " small-text")
                             if info.get("overlapN"):
                                 fails.append(name + " overlap")
+                        if args.assert_layout and route_name in watch:
+                            if info.get("clipN"):
+                                fails.append(name + " clipped")
+                            if info.get("debugLeak"):
+                                fails.append(name + " debug")
+                            if info.get("blankN"):
+                                fails.append(name + " blank")
+                            if info.get("textN"):
+                                fails.append(name + " text-overlap")
+                            if info.get("overflowN"):
+                                fails.append(name + " text-overflow")
+                            if info.get("strayN"):
+                                fails.append(name + " stray")
+                            if info.get("touchN"):
+                                fails.append(name + " touch")
                     except Exception as exc:
                         rec["error"] = str(exc)[:180]
                         fails.append(name + " " + rec["error"])

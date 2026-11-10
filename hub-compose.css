@@ -52,6 +52,13 @@ html body .roster-abbr {
   letter-spacing: 0.08em !important;
   color: #f4efe6 !important;
 }
+html body .tile.dan .roster-plate[data-dad-stage] {
+  justify-content: center !important;
+  align-items: flex-start !important;
+  top: auto !important;
+  bottom: 16px !important;
+  height: 160px !important;
+}
 html body .roster-plate {
   position: absolute !important;
   left: 16px !important;
@@ -217,11 +224,11 @@ html body .hub-launch {
   left: auto !important;
   top: auto !important;
   width: 900px !important;
-  height: 200px !important;
+  height: 196px !important;
   z-index: 2 !important;
   display: grid !important;
   grid-template-columns: repeat(4, 1fr) !important;
-  grid-template-rows: 80px 80px !important;
+  grid-template-rows: 88px 88px !important;
   gap: 20px !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -230,7 +237,7 @@ html body .hub-launch a {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  min-height: 80px !important;
+  min-height: 88px !important;
   padding: 0 12px !important;
   box-sizing: border-box !important;
   background: #101820 !important;
@@ -279,7 +286,22 @@ html body .hub-cam-label {
   color: #f4efe6 !important;
   text-transform: none !important;
 }
-html body .hub-cam-foot { min-height: 64px !important; padding: 4px 8px !important; }
+html body .hub-cam-foot { min-height: 88px !important; padding: 8px 12px !important; }
+html body .hub-cam-rest-word.hub-cam-rest-word { font-size: 24px !important; }
+html body .tile.ainsley .tile-sub,
+html body .tile.hayes .tile-sub,
+html body .tile.harris .tile-sub,
+html body .tile.dan .tile-sub,
+html body .tile.ainsley .tile-micro,
+html body .tile.hayes .tile-micro,
+html body .tile.harris .tile-micro,
+html body .tile.dan .tile-micro,
+html body .tile.ainsley .kf-title,
+html body .tile.hayes .kf-title,
+html body .tile.harris .kf-title { display: none !important; }
+html body .tile-grid.tile-grid--cams > .tile:not(.ainsley):not(.hayes):not(.harris):not(.dan) {
+  display: none !important;
+}
 html body .tile.ainsley,
 html body .tile.hayes,
 html body .tile.harris,

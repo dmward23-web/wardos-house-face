@@ -260,7 +260,7 @@ function classify(ev) {
   const summary = summaryOf(ev);
   if (!summary || isAdminNoise(summary)) return null;
   /* KID-FEED-SAFETY · provider/therapy is denied before school/other classification. Opt-in is an explicit boolean, never a title. */
-  if (therapyDrop(summary) || (DISPLAY && DISPLAY.isDenied({ summary, title: summary, providerOptIn: ev.providerOptIn === true }))) {
+  if (therapyDrop(summary) || (DISPLAY && DISPLAY.isDenied({ summary, title: summary, description: ev.description || "", kind: ev.kind || "" }))) {
     return null;
   }
   if (/^Kids with Dan/i.test(summary)) return { kind: "custody", summary };
@@ -406,7 +406,7 @@ function stripDollars(s) {
 }
 
 function kidsSafeWhat(summary, kind) {
-  if (DISPLAY && DISPLAY.CLINICAL.test(String(summary || ""))) return "School visit";
+  if (DISPLAY && DISPLAY.CLINICAL.test(String(summary || ""))) return "";
   let s = summary
     .replace(/^Leave\s*·\s*/i, "")
     .replace(/^Ainsley\s*—\s*/i, "")

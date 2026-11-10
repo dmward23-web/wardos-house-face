@@ -15,7 +15,7 @@
     override: base === null ? null : raw,
     frozen: freeze
   };
-  if (base !== null) document.addEventListener("DOMContentLoaded", function () {
+  if (base !== null && /(?:\?|&)diag=1(?:&|$)/.test(location.search)) document.addEventListener("DOMContentLoaded", function () {
     if (document.body.getAttribute("data-kid") === "ainsley") return;   /* LIVEWX2 · Ainsley's board stays digit-free: no override tag there (QA reads LHClock.override) */
     var t = document.createElement("div"); t.className = "lh-clocktag"; t.textContent = "CLOCK OVERRIDE " + raw; document.body.appendChild(t);
   });

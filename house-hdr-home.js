@@ -1,13 +1,10 @@
-/* House Face · HDRHOME1 · the page header IS the Home button (Dan 10/1).
- * Tap / click anywhere in the top title bar → sheet-index.html (main board).
- * Real controls inside the header (sound toggle, Us, weather/thermostat ovals,
- * Cams, cam start/stop) keep doing their own job. Live bits (clock, pills)
- * are plain text, so tapping them goes home too.
- * Also strips any leftover header link to sheet-index.html (old Home button).
- * Works with touch: header gets touch-action:manipulation (no 300ms delay,
- * page pan still allowed) and we listen to plain click, which taps fire. */
+/* HOME17 · the header is not a Home control. One .wardos-home button
+   (house icon, top-left, 96px stage) is the only way back to the hub.
+   This file stays so existing script tags still resolve. It does not
+   wire the header and it does not remove the Home button. */
 (function () {
   "use strict";
+  return;
   var HOME = "sheet-index.html";
   var HOME_RE = /(^|\/)sheet-index\.html(?:[?#]|$)/;
   var CONTROL = "a[href],button,input,select,textarea,label,summary,[role=button],[data-mute-toggle],[contenteditable=true]";

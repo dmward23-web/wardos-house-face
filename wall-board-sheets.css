@@ -798,31 +798,31 @@
     box-shadow: inset 0 0 0 4px rgba(244, 239, 230, 0.28);
   }
   /* Header row lives on body, outside every filtered column. */
-  body > .chore-shortcuts {
+  html body .chore-shortcuts {
     position: fixed !important;
     top: 66px !important;
-    left: 486px !important;
+    left: 160px !important;
     z-index: 5 !important;
     display: flex !important;
-    gap: 16px !important;
+    gap: 20px !important;
     margin: 0 !important;
     padding: 0 !important;
     transform: none !important;
     filter: none !important;
     backdrop-filter: none !important;
   }
-  body > .chore-shortcuts .kid-chip {
+  html body .chore-shortcuts .kid-chip {
     position: static !important;
-    height: 64px !important;
-    min-width: 64px !important;
-    min-height: 64px !important;
+    height: 88px !important;
+    min-width: 88px !important;
+    min-height: 88px !important;
     box-sizing: border-box !important;
     transform: none !important;
   }
-  body > .chore-shortcuts .kid-chip .dot { font-size: 24px !important; }
-  body > .chore-shortcuts .kid-chip.ainsley { width: 160px !important; }
-  body > .chore-shortcuts .kid-chip.hayes,
-  body > .chore-shortcuts .kid-chip.harris { width: 148px !important; }
+  html body .chore-shortcuts .kid-chip .dot { font-size: 24px !important; }
+  html body .chore-shortcuts .kid-chip.ainsley { width: 160px !important; }
+  html body .chore-shortcuts .kid-chip.hayes,
+  html body .chore-shortcuts .kid-chip.harris { width: 168px !important; }
   /* Chores header card: title, subline, date, then the two pills on their own row. */
   html:not(#hf-wall-off) body .panel > section.cheer {
     top: 48px !important;
@@ -888,5 +888,42 @@
   }
   html:not(#hf-wall-off) body .panel > section.cheer .cheer-badge {
     padding: 0 12px !important;
+  }
+  /* Day buttons stay a full 64px. Extra rows scroll inside the column. */
+  html:not(#hf-wall-off) body .panel .body > section.col .chore-list {
+    overflow-x: hidden !important;
+    overflow-y: scroll !important;
+    scrollbar-gutter: stable;
+    scrollbar-color: #f4efe6 #101820;
+  }
+  html:not(#hf-wall-off) body .panel .chore-list > .chore,
+  html body .chore {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: 88px !important;
+    max-height: none !important;
+    overflow: visible !important;
+    align-items: flex-start !important;
+  }
+  html body .panel > header.hdr { padding-left: 120px !important; }
+  html body .col-name {
+    margin: 0 0 12px !important;
+    font-size: 32px !important;
+    line-height: 40px !important;
+    min-height: 40px !important;
+  }
+  html body .quest-days {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 20px !important;
+    margin-top: 8px !important;
+  }
+  html body .day-tap {
+    width: 88px !important;
+    height: 88px !important;
+    min-width: 88px !important;
+    min-height: 88px !important;
+    max-height: none !important;
+    font-size: 24px !important;
   }
 }

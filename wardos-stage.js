@@ -1,6 +1,12 @@
 /* ACERFIX · one 1920x1080 stage. Smaller viewports get a single scale-to-fit.
    s = min(1, innerWidth/1920, innerHeight/1080), origin 0 0, letterboxed.
-   Internal coordinates stay 1920x1080. ?diag=1 is a local overlay only: no network, no storage, no secrets. */
+   Gate scales: 1920x1080 → 1, 1536x864 → 0.8, 1536x816 → min(1536/1920, 816/1080) = 0.7556.
+   Scale is not clamped. A 0.8 floor would paint 864px into an 816px work area and clip.
+   Touch targets are 88 stage px (66.5 CSS px at 0.7556) and type is 24 stage px (18.1 CSS px).
+   Home is 96 stage px (72.5 CSS px at 0.7556). ?diag=1 is a local overlay only. */
+if (typeof document !== "undefined" && typeof document.write === "function" && !window.HouseAudit && document.readyState === "loading") {
+  document.write('<script src="house-audit.js?v=AUDIT1"><\/script>');
+}
 (function (global) {
   "use strict";
   var STAGE_W = 1920;
@@ -74,7 +80,15 @@
     node.style.transformOrigin = "0 0";
     node.style.transform = "scale(" + s + ")";
     document.documentElement.setAttribute("data-wardos-stage", "1");
+    ensureHome(node);
     document.documentElement.style.setProperty("--wardos-s", String(s));
+    var bar = document.querySelector("body > .chore-shortcuts");
+    if (bar) {
+      bar.style.setProperty("left", Math.round(left + 160 * s) + "px", "important");
+      bar.style.setProperty("top", Math.round(top + 66 * s) + "px", "important");
+      bar.style.setProperty("transform", "scale(" + s + ")", "important");
+      bar.style.setProperty("transform-origin", "0 0", "important");
+    }
     var link = document.querySelector('link[data-wardos-stage-css="1"]');
     if (link && link.parentNode) link.parentNode.appendChild(link);
     return { s: s, left: left, top: top, box: box };
@@ -117,6 +131,28 @@
     };
   }
 
+  function ensureHome(node) {
+    var path = (global.location && global.location.pathname) || "";
+    var existing = document.querySelector(".kw-home, .hub-home, .wardos-home");
+    if (existing) {
+      existing.classList.add("wardos-home");
+      if (!existing.getAttribute("aria-label")) existing.setAttribute("aria-label", "Home");
+      var icon = existing.querySelector("img");
+      if (icon && !icon.getAttribute("src")) icon.setAttribute("src", "assets/icons/home-key-light.svg");
+      return;
+    }
+    if (/sheet-index\.html$/.test(path)) return;
+    var btn = document.createElement("a");
+    btn.className = "wardos-home";
+    btn.href = "sheet-index.html";
+    btn.setAttribute("aria-label", "Home");
+    var img = document.createElement("img");
+    img.src = "assets/icons/home-key-light.svg";
+    img.alt = "";
+    btn.appendChild(img);
+    node.appendChild(btn);
+  }
+
   function paintDiag() {
     var old = document.getElementById("wardos-diag");
     if (!diagWanted()) {
@@ -129,27 +165,15 @@
     host.setAttribute("role", "status");
     host.setAttribute("aria-label", "Display diagnostics");
     while (host.firstChild) host.removeChild(host.firstChild);
-    var title = document.createElement("p");
-    title.className = "wardos-diag-title";
-    title.textContent = "Display";
-    host.appendChild(title);
-    var lines = [
-      ["inner", snap.innerWidth + " x " + snap.innerHeight],
-      ["dpr", String(snap.devicePixelRatio)],
-      ["screen", snap.screenWidth + " x " + snap.screenHeight],
-      ["avail", snap.availWidth + " x " + snap.availHeight],
-      ["visual", (snap.visualWidth == null ? "none" : snap.visualWidth + " x " + snap.visualHeight + " @" + snap.visualScale)],
-      ["stage", String(snap.stageScale)],
-      ["ct", snap.ct || ""]
-    ];
-    for (var i = 0; i < lines.length; i++) {
-      var row = document.createElement("p");
-      var k = document.createElement("b");
-      k.textContent = lines[i][0];
-      row.appendChild(k);
-      row.appendChild(document.createTextNode(" " + lines[i][1]));
-      host.appendChild(row);
-    }
+    var line = document.createElement("p");
+    line.textContent = "inner " + snap.innerWidth + "x" + snap.innerHeight
+      + "  dpr " + snap.devicePixelRatio
+      + "  screen " + snap.screenWidth + "x" + snap.screenHeight
+      + "  avail " + snap.availWidth + "x" + snap.availHeight
+      + "  stage " + snap.stageScale
+      + (snap.ct ? "  " + snap.ct : "")
+      + (global.HouseAudit && HouseAudit.active() ? "  audit on" : "");
+    host.appendChild(line);
     var close = document.createElement("button");
     close.type = "button";
     close.className = "wardos-diag-close";

@@ -107,7 +107,7 @@
   /* LIVEFIX1 · therapy law (every board): a therapy / counseling row never shows. Generic words here; provider and person
      names live only on the box (~/.config/wardos/privacy-block.txt, read by scripts/private-dir.mjs and cal-months.py),
      so the builders drop those rows before any data file is written. */
-  var THERAPY = /\btherap|\bcounsel(?:or|ors|ing|ling|ling)?\b|\bpsycholog|\bpsychiatr|\banxiety\b/i;
+  var THERAPY = /\btherap|\bcounsel(?:or|ors|ing|ling|ling)?\b|\bpsycholog|\bpsychiatr|\banxiety\b|\bprovider\b|\bclinical\b/i;
   function isTherapy(s) { return THERAPY.test(String(s == null ? "" : s)); }
   function rowTherapy(o) {
     if (typeof o === "string") return isTherapy(o);

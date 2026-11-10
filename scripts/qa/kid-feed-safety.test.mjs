@@ -54,10 +54,10 @@ test("client allowlist fails closed for boys", () => {
   const bad = { summary: "provider school visit", description: "therapy", kind: "school", startIso: "2026-11-10T14:50:00-06:00" };
   assert.equal(D.summarize(bad, "hayes"), null);
   assert.equal(D.summarize(bad, "harris"), null);
-  const opt = D.summarize({ ...bad, providerOptIn: true }, "hayes");
-  assert.equal(opt.title, "School visit");
-  assert.equal(JSON.stringify(opt).includes("therapy"), false);
-  assert.equal(JSON.stringify(opt).includes("onerror"), false);
+  assert.equal(D.summarize({ ...bad, providerOptIn: true }, "hayes"), null);
+  assert.equal(D.summarize({ summary: "Harris — clinical school visit", providerOptIn: true }, "harris"), null);
+  assert.equal(D.summarize({ summary: "Hayes — provider school visit · confirmed Tue 8:50 (Hayes attending; Dan", providerOptIn: true }, "hayes"), null);
+  assert.equal(D.isDenied({ summary: "clinical school visit", providerOptIn: true }), true);
 });
 
 test("generator drops provider rows and keeps pickup, swim, and one soccer time", (t) => {

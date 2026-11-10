@@ -100,8 +100,9 @@ body.kw-on .quest.done .what {
   opacity: 1 !important;
 }
 body.kw-on .day-tap {
-  min-width: 46px;
-  min-height: 46px;
+  min-width: 88px;
+  min-height: 88px;
+  font-size: 24px;
   border-radius: 14px !important;
   font-weight: 800;
   color: #f4fbff !important;
@@ -114,7 +115,7 @@ body.kw-on .day-tap.is-today {
   outline: 2px solid rgba(255, 230, 170, 0.8);
   outline-offset: 1px;
 }
-body.theme-harris.kw-on .day-tap { min-width: 54px; min-height: 54px; font-size: 18px; }
+body.theme-harris.kw-on .day-tap { min-width: 88px; min-height: 88px; font-size: 24px; }
 body.theme-harris.kw-on .quest .what { font-size: 22px !important; }
 body.theme-ainsley.kw-on .sec,
 body.theme-ainsley.kw-on .quest,
@@ -604,14 +605,27 @@ body.kw-on #tapsync-badge { display: none !important; }
     right: auto !important;
     width: 1824px !important;
     height: 96px !important;
-    display: flex !important;
+    display: grid !important;
+    grid-template-columns: 96px minmax(180px, 1fr) 160px 320px !important;
     align-items: center !important;
-    gap: 24px !important;
+    column-gap: 24px !important;
     z-index: 8 !important;
     background: transparent !important;
   }
-  html.kw-root body.kw-on .kw-home,
-  html.kw-root body.kw-on .kw-home img,
+  html.kw-root body.kw-on .kw-home { grid-column: 1 !important; }
+  html.kw-root body.kw-on .kw-id { grid-column: 2 !important; justify-self: start !important; }
+  html.kw-root body.kw-on .kw-mute { grid-column: 3 !important; justify-self: end !important; margin: 0 !important; }
+  html.kw-root body.kw-on .kw-clock { grid-column: 4 !important; justify-self: end !important; }
+  html.kw-root body.kw-on .kw-home {
+    width: 96px !important;
+    height: 96px !important;
+    min-width: 96px !important;
+    min-height: 96px !important;
+  }
+  html.kw-root body.kw-on .kw-home img {
+    width: 64px !important;
+    height: 64px !important;
+  }
   html.kw-root body.kw-on .kw-mute,
   html.kw-root body.kw-on .house-snd {
     width: 64px !important;
@@ -654,7 +668,7 @@ body.kw-on #tapsync-badge { display: none !important; }
     padding: 8px 16px !important;
     margin: 0 !important;
     position: relative !important;
-    top: 16px !important;
+    top: 0 !important;
     transform: none !important;
     border-radius: 12px;
   }
@@ -714,17 +728,10 @@ body.kw-on #tapsync-badge { display: none !important; }
   }
   html.kw-root body.kw-on #sec-jar { grid-column: 1 !important; grid-row: 2 !important; overflow: hidden !important; }
   html.kw-root body.kw-on #sec-days { grid-column: 2 !important; grid-row: 2 !important; overflow: hidden !important; }
-  /* No next item: drop the card and let Musts keep the list. A real next item stays, at 24px. */
-  html.kw-root body.kw-on #sec-days:has(.consume-hero.empty),
-  html.kw-root body.kw-on #sec-days:not(:has(.consume-hero-title)) { display: none !important; }
-  html.kw-root body.kw-on.kw-next-off #sec-days { display: none !important; }
-  html.kw-root body.kw-on.kw-next-off #sec-jar { grid-column: 1 / -1 !important; }
-  html.kw-root body.kw-on.kw-next-off .panel .body {
-    grid-template-rows: 784px 64px !important;
-    height: 864px !important;
-    padding: 0 !important;
-    row-gap: 16px !important;
-  }
+  /* Every kid keeps the jar and the Next card. An empty next says so; it does not vanish. */
+  html.kw-root body.kw-on #sec-days,
+  html.kw-root body.kw-on.kw-next-off #sec-days,
+  html.kw-root body.kw-on #sec-days:has(.consume-hero.empty) { display: flex !important; }
   html.kw-root body.kw-on #sec-musts,
   html.kw-root body.kw-on #sec-jar {
     border: 0 !important;
@@ -750,24 +757,47 @@ body.kw-on #tapsync-badge { display: none !important; }
     min-height: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 16px !important;
-    overflow: hidden !important;
+    gap: 20px !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-gutter: stable;
+    scrollbar-color: #1a1814 rgba(255, 252, 247, 0.4);
   }
   html.kw-root body.kw-on #sec-musts .chore {
-    flex: 0 0 64px !important;
-    width: 900px !important;
-    height: 64px !important;
-    min-height: 64px !important;
-    max-height: 64px !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 88px !important;
+    max-height: none !important;
     display: flex !important;
     align-items: center !important;
-    gap: 16px !important;
+    gap: 20px !important;
     margin: 0 !important;
-    padding: 4px 12px !important;
+    padding: 8px 12px !important;
     box-sizing: border-box !important;
+    overflow: visible !important;
     background: rgba(255, 252, 247, 0.96) !important;
     border-radius: 12px !important;
     color: #1a1814 !important;
+  }
+  html.kw-root body.kw-on #sec-musts .chore .txt {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    min-width: 0 !important;
+  }
+  html.kw-root body.kw-on .kw-offline {
+    display: flex !important;
+    align-items: center !important;
+    min-height: 88px !important;
+    width: 100% !important;
+    margin: 0 0 12px !important;
+    padding: 8px 12px !important;
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+    text-align: left !important;
   }
   html.kw-root body.kw-on #sec-musts .chore .what,
   html.kw-root body.kw-on #sec-musts .chore .hint {
@@ -976,7 +1006,7 @@ body.theme-ainsley #sec-days .harbor-strip:not(:has(.card)) { display: none !imp
 }
 .kw-home {
   appearance: none !important;
-  width: 44px; height: 44px; min-width: 44px; min-height: 44px;
+  width: 96px; height: 96px; min-width: 96px; min-height: 96px;
   padding: 0 !important; border-radius: 50% !important;
   border: 1px solid rgba(243, 230, 207, .35) !important;
   background: rgba(250, 246, 238, .16) !important;
@@ -985,7 +1015,7 @@ body.theme-ainsley #sec-days .harbor-strip:not(:has(.card)) { display: none !imp
   text-shadow: none !important;
   display: inline-flex; align-items: center; justify-content: center;
 }
-.kw-home img { width: 22px; height: 22px; display: block; }
+.kw-home img { width: 64px; height: 64px; display: block; }
 .kw-id { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
 .kw-name { font: 800 22px/1 system-ui, sans-serif; letter-spacing: .08em; color: #fff8f0; text-shadow: 0 0 12px rgba(8,6,4,.72); }
 .kw-path {

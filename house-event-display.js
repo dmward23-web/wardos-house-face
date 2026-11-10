@@ -1,5 +1,5 @@
 /* ACERFIX · one fail-closed display adapter for calendar glass.
-   Child rows render an allowlisted title only. Provider and therapy items are omitted unless providerOptIn is exactly true.
+   Child rows render an allowlisted title only. Provider, clinical, and therapy items are always omitted. There is no opt-in.
    Titles never come from description, hint, location, notes, or a sliced raw sentence.
    Ainsley's own audience keeps the no-digit rule. The shared hub reads canonical startIso instead. */
 (function (global) {
@@ -21,11 +21,7 @@
     if (!ev || typeof ev !== "object") return "";
     return [ev.kind, ev.category, ev.safeCategory, ev.type].map(textOf).filter(Boolean).join("\n");
   }
-  function optedIn(ev) {
-    return !!(ev && typeof ev === "object" && ev.providerOptIn === true);
-  }
   function isDenied(ev) {
-    if (optedIn(ev)) return false;
     if (!ev) return false;
     if (typeof ev === "string") return CLINICAL.test(ev) || CANCEL.test(ev);
     if (ev.status === "cancelled" || ev.status === "canceled") return true;
@@ -113,7 +109,6 @@
   function allowTitle(ev) {
     var text = titleBlob(ev);
     var kind = kindBlob(ev);
-    if (optedIn(ev) && (CLINICAL.test(text) || CLINICAL.test(kind))) return "School visit";
     if (CLINICAL.test(text) || CLINICAL.test(kind) || CANCEL.test(text)) return null;
     var leave = isLeave(ev, text);
     if (/school[_\s-]*pickup|\bpick\s*-?\s*up\b/i.test(text) || /school_pickup/.test(kind)) return "School pickup";

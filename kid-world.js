@@ -59,7 +59,8 @@
     if (!host || !rows) return;
     host.innerHTML = rows.map(function (row) {
       var opt = row[3] ? ' data-optional="1"' : "";
-      return '<div class="chore open ' + kid() + '" data-check="' + escMust(row[0]) + '"' + opt + ' role="button" tabindex="0">' +
+      var cadence = row[3] ? "addon" : (/weekly/.test(row[2]) ? "weekly" : "daily");
+      return '<div class="chore open ' + kid() + '" data-check="' + escMust(row[0]) + '" data-cadence="' + cadence + '"' + opt + ' role="button" tabindex="0">' +
         '<span class="ring"></span><div class="txt"><div class="what">' + escMust(row[1]) + '</div><div class="hint">' + escMust(row[2]) + "</div></div></div>";
     }).join("");
     var empty = document.querySelector("[data-kw-must-empty]");
@@ -82,9 +83,9 @@
         });
         stage.appendChild(n);
       }
-      n.hidden = true;
-      n.textContent = "";
-      if (document.body) document.body.classList.remove("kw-rest");
+      n.hidden = false;
+      n.textContent = "Schedule unavailable. Tap to try again.";
+      if (document.body) document.body.classList.add("kw-rest");
     }
     function hideRest() {
       var n = document.querySelector("[data-kw-feed]");
@@ -95,29 +96,22 @@
     document.addEventListener("house:kids-data-ready", hideRest);
     var W = global.WardKids;
     function weekNote(on) {
-      var btn = document.querySelector("[data-kw-path]");
-      var note = document.querySelector("[data-kw-week-empty]");
-      var must = document.querySelector("[data-kw-must-empty]");
+      var host = document.querySelector("#sec-days") || document.querySelector(".panel");
+      var note = document.querySelector("[data-kw-offline]");
       if (!on) {
         if (note) note.remove();
-        if (must) must.remove();
         return;
       }
-      var line = kid() === "ainsley" ? "Nothing on your week yet." : "A free week.";
-      if (!note && btn) {
-        note = document.createElement("p");
-        note.className = "kw-week-empty";
-        note.setAttribute("data-kw-week-empty", "");
-        note.textContent = line;
-        btn.insertAdjacentElement("afterend", note);
-      }
-      var host = document.querySelector ? document.querySelector("#sec-musts") : null;
-      if (host && !must && !host.querySelector("[data-check]")) {
-        must = document.createElement("p");
-        must.className = "kw-must-empty";
-        must.setAttribute("data-kw-must-empty", "");
-        must.textContent = "Nothing on the list yet.";
-        host.appendChild(must);
+      if (!note && host) {
+        note = document.createElement("button");
+        note.type = "button";
+        note.className = "kw-offline";
+        note.setAttribute("data-kw-offline", "");
+        note.textContent = "Schedule unavailable. Tap to try again.";
+        note.addEventListener("click", function () {
+          if (global.WardKids && WardKids.boot) WardKids.boot(kid());
+        });
+        host.insertBefore(note, host.firstChild);
       }
     }
     var showRestBound = showRest;
@@ -1561,6 +1555,7 @@
   }
   /* STAGE1 · each must is a record: black vinyl, oxblood label; done = gold label + groove shine */
   function drawRecordMarker(ctx, x, y, ms, age, done, popping, t, i) {
+    if (ctx.canvas) ctx.canvas.setAttribute("data-marker", kid() === "ainsley" ? "record" : "record-leak");
     var R = ms * 0.42 * (popping ? 1 + 0.12 * Math.sin(Math.min(1, age / 1.15) * Math.PI) : 1);
     var spin = reduced ? 0 : t * (done ? 1.6 : 0.25) + i;
     ctx.save(); ctx.translate(x, y);
@@ -1743,6 +1738,33 @@
     ctx.stroke();
     ctx.restore();
   }
+  function markKind(ctx, kind) {
+    if (ctx.canvas) ctx.canvas.setAttribute("data-marker", kind);
+  }
+  function drawKidVector(ctx, x, y, ms, world, done) {
+    ctx.save();
+    ctx.translate(x, y);
+    if (world === "harris") {
+      ctx.fillStyle = done ? "#9dffe0" : "#2f6a58";
+      ctx.beginPath();
+      for (var i = 0; i < 6; i++) {
+        var a = -Math.PI / 2 + i * Math.PI / 3;
+        var px = Math.cos(a) * ms * 0.36;
+        var py = Math.sin(a) * ms * 0.36;
+        if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      var w = ms * 0.72;
+      var h = ms * 0.46;
+      ctx.fillStyle = done ? "#e6c27a" : "#6b4a28";
+      ctx.fillRect(-w / 2, -h * 0.2, w, h * 0.7);
+      ctx.fillStyle = done ? "#f4e2b0" : "#3a2414";
+      ctx.fillRect(-w / 2, -h * 0.45, w, h * 0.28);
+    }
+    ctx.restore();
+  }
   function drawMarker(ctx, q, world, i, open, t) {
     var age = markerAge(i, t);
     var popping = age >= 0 && age < 1.15;
@@ -1753,12 +1775,12 @@
     var pulse = 0.35 + 0.2 * Math.sin(t * 1.3 + i);
     var bloomA = popping ? 0.95 : done ? 0.72 : pulse;
     softBloom(ctx, q.x, q.seat, popping ? ms * 1.45 : done ? ms * 1.15 : ms * 0.95, "rgba(" + glow + "," + bloomA.toFixed(3) + ")");
-    if (world === "ainsley") { drawRecordMarker(ctx, q.x, q.seat, ms, age, done, popping, t, i); return; }
+    if (world === "ainsley") { drawRecordMarker(ctx, q.x, q.seat, ms, age, done, popping, t, i); markKind(ctx, "record"); return; }
     var img = oriItems[world];
-    if (!img) return;
-    /* The wall draws a vector marker. The chest and ore sheets are not the marker's size, so they are not scaled here. */
-    if (ctx.canvas && ctx.canvas.width === 900 && ctx.canvas.height === 864) {
-      drawRecordMarker(ctx, q.x, q.seat, ms, age, done, popping, t, i);
+    /* Wall buffer is 900×864 times the device pixel ratio. Records belong only to Ainsley, so the other kids get their own vector. */
+    if (!img || (ctx.canvas && ctx.canvas.classList && ctx.canvas.classList.contains("kw-canvas") && wallView())) {
+      drawKidVector(ctx, q.x, q.seat, ms, world, done);
+      markKind(ctx, world === "harris" ? "ore" : "chest");
       return;
     }
     var sc = ms / Math.max(img.width, img.height);
@@ -1808,6 +1830,8 @@
     });
     /* LANDFIT2 · labels paint after the foreground fern so it never hides a must */
     var paintLabels = function () {
+      /* The wall list already names every must. Painting the same words on the art is the floating text. */
+      if (ctx.canvas && ctx.canvas.classList && ctx.canvas.classList.contains("kw-canvas") && wallView()) return;
       if (global.KidCallouts) { spaceCallouts(ctx, shown, W); shown.forEach(function (q) { drawLight(ctx, q); }); }
       else shown.forEach(function (q) { drawLight(ctx, q); });
     };
@@ -1886,7 +1910,9 @@
     var iso = dayIso || todayIso();
     var quests = readQuests(iso);
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };
-    this.hits = paintWorld(this.ctx, W, H, t, which || kid(), quests, st.fill || 0, parallaxNow(t, false));
+    var who = which || kid();
+    this.cv.setAttribute("data-marker", who === "ainsley" ? "record" : who === "harris" ? "ore" : "chest");
+    this.hits = paintWorld(this.ctx, W, H, t, who, quests, st.fill || 0, parallaxNow(t, false));
     var jhost = document.querySelector("[data-kw-jar]");
     if (!wallView() && jhost && jhost._jar && jhost._jar.setEnv) {
       var skyPlate = plates[which || kid()] && plates[which || kid()].sky;
@@ -2214,7 +2240,7 @@
     var stage = document.createElement("div");
     stage.className = "kw-stage";
     stage.innerHTML =
-      '<header class="kw-hud"><button type="button" class="kw-home" data-kw-home aria-label="Back to the House board"><img src="assets/icons/home-key-light.svg" alt=""></button><div class="kw-id"><span class="kw-name">' + name + '</span></div><div class="kw-clock" data-kw-clock></div></header>' +
+      '<header class="kw-hud"><button type="button" class="kw-home wardos-home" data-kw-home aria-label="Home"><img src="assets/icons/home-key-light.svg" alt=""></button><div class="kw-id"><span class="kw-name">' + name + '</span></div><div class="kw-clock" data-kw-clock></div></header>' +
       '<div class="kw-jar-host" data-kw-jar></div>' +
       '<div class="kw-week" data-kw-week></div>' +
       '<button type="button" class="kw-path" data-kw-path aria-label="My Week">My Week</button>' +
@@ -2226,7 +2252,7 @@
     document.body.insertBefore(cv, document.body.firstChild);
     bg = new World(cv);
     /* MUTEHUD1 · a visible sound toggle in the world HUD (the old header one sits under the canvas). Hayes has his own. */
-    if (kid() !== "hayes" && global.HouseSfx && HouseSfx.setMuted) {
+    if (global.HouseSfx && HouseSfx.setMuted) {
       var mb = document.createElement("button");
       mb.type = "button"; mb.className = "kw-mute"; mb.setAttribute("data-mute-toggle", ""); mb.setAttribute("data-mute-wired", "1");
       if (global.HouseSound) { mb.style.cssText = "pointer-events:auto;margin-left:auto;margin-right:8px;flex:none"; HouseSound.icon(mb); }   /* LAW8C3 · same icon as the hub */

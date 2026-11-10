@@ -29,24 +29,49 @@ html[data-wardos-stage] .km-fall,
 html[data-wardos-stage] .float-orbs {
   display: none !important;
 }
+.wardos-home,
+a.hub-home.wardos-home,
+button.kw-home.wardos-home {
+  z-index: 40;
+  width: 96px;
+  height: 96px;
+  min-width: 96px;
+  min-height: 96px;
+  box-sizing: border-box;
+}
+a.wardos-home {
+  position: absolute;
+  left: 48px;
+  top: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background: #101820;
+  border: 2px solid #f4efe6;
+  border-radius: 16px;
+  text-decoration: none;
+}
+.wardos-home img { width: 64px; height: 64px; display: block; }
 #wardos-diag {
   position: absolute;
   left: 48px;
-  top: 904px;
-  width: 900px;
-  height: 112px;
+  top: 1036px;
+  width: 1824px;
+  height: 48px;
   z-index: 80;
   box-sizing: border-box;
   margin: 0;
-  padding: 8px 16px 8px 16px;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
-  column-gap: 16px;
-  align-content: center;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
   background: #101820;
   color: #f4efe6;
   border-radius: 12px;
   font: 18px/1.2 system-ui, sans-serif;
+  overflow: hidden;
+  white-space: nowrap;
 }
 #wardos-diag p { margin: 0; white-space: nowrap; }
 #wardos-diag .wardos-diag-title { font-size: 18px; }
@@ -62,8 +87,11 @@ html body .lh-clocktag.lh-clocktag {
   max-width: 720px !important;
 }
 .wardos-diag-close {
-  width: 80px;
-  height: 64px;
+  width: 88px;
+  height: 40px;
+  min-width: 88px;
+  min-height: 40px;
+  flex: none;
   font-size: 18px;
   color: #f4efe6;
   background: #1c2430;

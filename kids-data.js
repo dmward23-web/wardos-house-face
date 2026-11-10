@@ -273,6 +273,11 @@
         return { cadence: cadence, stars: stars, optional: optional };
       }
     }
+    return staticCadence(checkId);
+  }
+  function staticCadence(checkId) {
+    if (checkId === "ain-babysit") return { cadence: "addon", stars: 0, optional: true };
+    if (WEEKLY_IDS[checkId]) return { cadence: "weekly", stars: 1, optional: false };
     return { cadence: "daily", stars: 1, optional: false };
   }
 
@@ -974,6 +979,8 @@
     if (!data) return;
     var nodes = root.querySelectorAll(".chore[data-check], .quest[data-check]");
     Array.prototype.forEach.call(nodes, function (el) {
+      /* The kid wall list is one 64px row per chore. The seven day buttons live on the chores sheet, where the row is tall enough. */
+      if (el.closest && el.closest("#sec-musts")) return;
       if (el.classList.contains("day-tap")) return;
       if (el.querySelector(".quest-days")) return;
       var id = el.getAttribute("data-check");
@@ -1958,7 +1965,6 @@
       if ((kidId === "hayes" || kidId === "harris") && SCHRX(String.raw`hayes \+ harris|boys §|§ (drop|pickup|hearing)`, "i").test(blob)) mine = true;
       /* SCHOOLKEY2 · a generator-tagged school run is the boys' (or the named boy's) with or without the private names */
       if ((kidId === "hayes" || kidId === "harris") && /^school_(drop|pickup)$/.test(String(item.kind || "")) && (blob.indexOf(kidId) >= 0 || !/\bhayes\b|\bharris\b/.test(blob))) mine = true;
-      if (kidId === "hayes" && /madi|provider collab/i.test(blob)) mine = true;
       if (!mine && kidId === "ainsley" && /appointment/i.test(blob)) mine = true;
       if (!mine) continue;
       /* QARELAY1 · RIDES law: Dad logistics (kind leave/ride, "Pick up …"/"Drop …") never kid NEXT UP */
@@ -2004,9 +2010,9 @@
       };
     }
     /* Fallback: kid hottest / first unique timed event */
-    var events = consumeCollectEvents(kid).filter(function (e) {
-      return !consumeIsHq(e) && !consumeIsRoutine(e);
-    });
+    var events = consumeCollectEvents(kid).filter(function (e) { return !consumeIsHq(e); });
+    var unique = events.filter(function (e) { return !consumeIsRoutine(e); });
+    if (unique.length) events = unique;
     if (events.length) {
       var e0 = events[0];
       var p = consumeParseWhen(e0.when);
@@ -2412,7 +2418,8 @@
       }).join("") || '<div class="hot-badge">…</div>';
     }
 
-    renderQuests(document.querySelector("[data-mount-quests]"), kid.quests, data, kidId);
+    /* A feed with no quest list must not erase the public musts already on the board. */
+    if (kid.quests && kid.quests.length) renderQuests(document.querySelector("[data-mount-quests]"), kid.quests, data, kidId);
     if (document.querySelector(".sec-schedule.consume-sched")) {
       renderConsumeSchedule(kidId, data);
     } else {

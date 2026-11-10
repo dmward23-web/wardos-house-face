@@ -24,12 +24,18 @@
   }
 
   /* DAYPKG1 v2d · a kid-typed save name never keeps a dollar sign: stripped on save and on read (an old one is rewritten) */
-  function noDollar(name) { return String(name == null ? "" : name).replace(/\$/g, ""); }
+  function noDollar(name) {
+    var s = String(name == null ? "" : name).replace(/\$/g, "");
+    s = s.replace(/\b(?:cash|usd|dollars?|bucks|money|cents?|euros?|pounds|gbp|eur)\b/gi, "");
+    s = s.replace(/\b\d[\d,]*(?:\.\d+)?\b/g, "");
+    s = s.replace(/[★☆]/g, "");
+    return s.replace(/\s+/g, " ").replace(/^[\s·\-]+|[\s·\-]+$/g, "").trim();
+  }
 
   function list(kidId) {
     var root = loadRoot();
-    if (root[kidId] && root[kidId].some(function (x) { return x && /\$/.test(String(x.name || "")); })) {
-      root[kidId].forEach(function (x) { if (x && x.name != null) x.name = noDollar(x.name).trim() || "Save"; });
+    if (root[kidId] && root[kidId].some(function (x) { return x && noDollar(x.name) !== String(x.name || "").trim(); })) {
+      root[kidId].forEach(function (x) { if (x && x.name != null) x.name = noDollar(x.name) || "Save"; });
       saveRoot(root);
     }
     if (root[kidId] && root[kidId].some(function (x) { return x && /^seed-/.test(String(x.id || "")); })) {
