@@ -124,6 +124,14 @@ html body .panel.panel > .grid-wrap {
   z-index: 3;
   pointer-events: none;
 }
+/* The four doors take taps. The wrap stays inert so the porch does not. */
+html body .tile.ainsley,
+html body .tile.hayes,
+html body .tile.harris,
+html body .tile.dan {
+  pointer-events: auto !important;
+  cursor: pointer;
+}
 html body .grid-hdr { display: none !important; }
 html body .tile-grid.tile-grid--cams { display: block !important; height: auto !important; }
 html body .tile-grid.tile-grid--cams > .tile:not(.ainsley):not(.hayes):not(.harris):not(.dan) {

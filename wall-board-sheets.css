@@ -230,7 +230,24 @@
     height: 64px !important;
     min-width: 64px !important;
     min-height: 64px !important;
+    max-height: 64px !important;
     font-size: 28px !important;
+  }
+  html body .saves-host { margin: 0 !important; }
+  html body .saves-face {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    margin: 0 !important;
+  }
+  html body .saves-bar {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    flex: 1 1 auto !important;
   }
 
   /* Month: the calendar fills the body. */
@@ -314,7 +331,45 @@
     overflow: hidden !important;
     box-sizing: border-box !important;
   }
-  html body .panel > .body > .sec[aria-label="Boards"] { grid-column: 1; grid-row: 1; }
+  html body .panel > .body > .sec[aria-label="Boards"] {
+    grid-column: 1; grid-row: 1;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+  }
+  html body .where-card {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 12px 16px !important;
+  }
+  html body .chip-row {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 16px !important;
+    margin: 0 !important;
+  }
+  html body .where-card .sub,
+  html body .where-card .big,
+  html body .where-card .lbl {
+    overflow: hidden !important;
+    white-space: normal !important;
+    max-width: 100% !important;
+  }
+  html body header .hub-home,
+  html body header .hub-home img {
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+    flex: none !important;
+  }
   html body .panel > .body > .today-day { grid-column: 1; grid-row: 2; }
   html body .panel > .body > .kids-col { grid-column: 1; grid-row: 3; display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 16px !important; }
   html body .panel > .body > .tap-rail { grid-column: 2; grid-row: 3; display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 16px !important; }
@@ -463,19 +518,34 @@
   html:not(#hf-wall-off) body > .panel .body > section.col .chore-list {
     display: flex !important;
     flex-direction: column !important;
-    height: 864px !important;
+    height: 863px !important;
+    width: 591px !important;
+    max-width: 591px !important;
     gap: 16px !important;
     overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .body > section.col .chore {
+    width: 591px !important;
+    max-width: 591px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    box-sizing: border-box !important;
   }
   html:not(#hf-wall-off) body > .panel .live-clock-host {
     flex: 0 0 auto !important;
     min-width: 300px !important;
     overflow: visible !important;
   }
-  html:not(#hf-wall-off) body > .panel .live-clock {
-    font-size: 48px !important;
+  html:not(#hf-wall-off) body > .panel .hdr.hdr--clockfirst .live-clock,
+  html:not(#hf-wall-off) body > .panel .hdr.hdr--clockfirst [data-live-clock] {
+    font-size: 40px !important;
+    line-height: 48px !important;
+    padding-top: 12px !important;
     white-space: nowrap !important;
-    overflow: visible !important;
+    overflow: hidden !important;
   }
   html:not(#hf-wall-off) body > .panel .cheer {
     left: 980px !important;
@@ -529,7 +599,8 @@
   html:not(#hf-wall-off) body > .panel section.col[aria-label="Hayes chores"] .col-hdr { left: -12px !important; }
   html:not(#hf-wall-off) body > .panel section.col[aria-label="Harris chores"] .col-hdr { left: -471px !important; }
   html:not(#hf-wall-off) body > .panel > header.hdr { z-index: 1 !important; }
-  html:not(#hf-wall-off) body > .panel .col { z-index: 2 !important; overflow: visible !important; }
+  html:not(#hf-wall-off) body > .panel .col { z-index: 2 !important; overflow: visible !important; width: 592px !important; max-width: 592px !important; }
+  html:not(#hf-wall-off) body > .panel .chore { max-width: 100% !important; box-sizing: border-box !important; }
   html:not(#hf-wall-off) body > .panel > .body:has(> .col) { overflow: visible !important; }
   html:not(#hf-wall-off) body > .panel .cheer,
   html:not(#hf-wall-off) body > .panel .link-banner { z-index: 2 !important; }
@@ -635,4 +706,82 @@
   html:not(#hf-wall-off) body > .panel .mpill,
   html:not(#hf-wall-off) body > .panel .streak-pill,
   html:not(#hf-wall-off) body > .panel .bank.ainsley .star-label { display: none !important; }
+  html.ori-on,
+  html.ori-on body {
+    background-image: url("month-theme/november/wall-dusk.webp") !important;
+    background-size: 1920px 1080px !important;
+    background-position: 0 0 !important;
+    background-repeat: no-repeat !important;
+  }
+  html body .live-clock {
+    font-size: 40px !important;
+    line-height: 40px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  html body .panel > .cheer,
+  html body .panel > section.cheer {
+    position: absolute !important;
+    top: 64px !important;
+    height: 64px !important;
+    left: 980px !important;
+    width: 640px !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+  html body .cheer-body,
+  html body .cheer-main {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 64px !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+  html body .panel .cheer .cheer-label,
+  html body .panel .cheer .cheer-title,
+  html body .panel .cheer .cheer-sub {
+    position: static !important;
+    top: auto !important;
+    margin: 8px 0 0 !important;
+    line-height: 28px !important;
+    transform: none !important;
+  }
+  html body section.col { padding: 0 !important; }
+  html body section.col { border: 0 !important; }
+  html body section.col .chore-list {
+    width: calc(100% - 1px) !important;
+    max-width: calc(100% - 1px) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    box-sizing: border-box !important;
+  }
+  html body section.col .chore {
+    margin: 0 !important;
+    border: 0 !important;
+    outline: none !important;
+    width: auto !important;
+    max-width: 100% !important;
+    align-self: stretch !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+  }
+  html:not(#hf-wall-off) body > .panel .body > section.kids-col {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin: 0 !important;
+  }
+  html:not(#hf-wall-off) body > .panel .body > section.kids-col > .kid-card {
+    margin: 0 !important;
+    flex: 1 1 0 !important;
+    min-height: 64px !important;
+    height: auto !important;
+    overflow: hidden !important;
+  }
 }

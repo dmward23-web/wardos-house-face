@@ -374,6 +374,9 @@
   function orientFor(w, h) {
     return w > h * 1.15 ? "landscape" : "portrait";
   }
+  function wallView() {
+    return global.innerWidth === 1920 && global.innerHeight === 1080;
+  }
   /* LEANLOAD1 · a board with data-lean-plates="1" loads only its own kid's world, creature and
      items, in the current orientation; the other orientation loads on first rotate. */
   function lean() { return !!(document.body && document.body.getAttribute("data-lean-plates") === "1"); }
@@ -390,11 +393,10 @@
       leanLoaded[orients[0]] = true;
     }
     var jobs = [];
-    [
-      ["hayes", "assets/ori/creature/idle.webp"],
-      ["harris", "assets/ori/creature/harris.webp"],
-      ["ainsley", "assets/ori/creature/ainsley.webp"]
-    ].forEach(function (row) {
+    var creatures = wallView()
+      ? [["hayes", "assets/ori/creature/idle-226.webp"], ["harris", "assets/ori/creature/harris-226.webp"], ["ainsley", "assets/ori/creature/ainsley.webp"]]
+      : [["hayes", "assets/ori/creature/idle.webp"], ["harris", "assets/ori/creature/harris.webp"], ["ainsley", "assets/ori/creature/ainsley.webp"]];
+    creatures.forEach(function (row) {
       if (lean() && (row[0] !== me || oriCreature[me])) return;
       jobs.push(loadImg(row[1]).then(function (im) {
         oriCreature[row[0]] = im;
@@ -418,6 +420,7 @@
       (man.layers || []).forEach(function (layer) {
         orients.forEach(function (orient) {
           var urls = book.urlFor ? book.urlFor(world, layer.id, orient, layer.standin) : [layer.standin];
+          if (wallView() && orient === "landscape") urls = ["assets/ori/" + world + "/wall-900x864/" + layer.id + ".webp"].concat(urls);
           jobs.push(loadFirst(urls).then(function (im) {
             plates[world][orient][layer.id] = im;
             if (orient === "portrait" || (lean() && !plates[world][layer.id])) plates[world][layer.id] = im;
@@ -433,6 +436,14 @@
   }
   function drawPlate(ctx, img, W, H, ox, oy, zoom, alpha, blur, world) {
     if (!img) return;
+    /* Wall slot files are already 900x864. Draw them 1:1. Never cover-scale a plate that already matches. */
+    if (img.width === W && img.height === H) {
+      ctx.save();
+      if (alpha != null) ctx.globalAlpha = alpha;
+      ctx.drawImage(img, 0, 0);
+      ctx.restore();
+      return;
+    }
     var z = zoom || 1;
     var scale = Math.max(W / img.width, H / img.height) * z;
     var dw = img.width * scale;
@@ -1405,7 +1416,7 @@
   function oriBook(world, W, H) {
     var pack = plates[world];
     if (!pack) return null;
-    var orient = orientFor(W, H);
+    var orient = (W === 900 && H === 864) ? "landscape" : orientFor(W, H);
     var book = pack[orient];
     var skyPlate = book && book.sky;
     if (skyPlate && /assets\/ori\//.test(skyPlate.src || "")) return book;
@@ -1607,11 +1618,15 @@
     if (mot.glow > 0.05) {
       softBloom(ctx, box.cx, bottom - draw * 0.45, draw * 0.55, "rgba(255, 220, 150, " + (0.55 * mot.glow).toFixed(3) + ")");
     }
-    ctx.save();
-    ctx.translate(box.cx, bottom);
-    ctx.scale(sx, sy);
-    ctx.drawImage(img, -draw / 2, -draw, draw, draw);
-    ctx.restore();
+    if (img.width === draw && img.height === draw) {
+      ctx.drawImage(img, Math.round(box.cx - draw / 2), Math.round(bottom - draw));
+    } else {
+      ctx.save();
+      ctx.translate(box.cx, bottom);
+      ctx.scale(sx, sy);
+      ctx.drawImage(img, -draw / 2, -draw, draw, draw);
+      ctx.restore();
+    }
     return true;
   }
   function markerAge(i, t) {
@@ -1739,6 +1754,11 @@
     if (world === "ainsley") { drawRecordMarker(ctx, q.x, q.seat, ms, age, done, popping, t, i); return; }
     var img = oriItems[world];
     if (!img) return;
+    /* The wall draws a vector marker. The chest and ore sheets are not the marker's size, so they are not scaled here. */
+    if (ctx.canvas && ctx.canvas.width === 900 && ctx.canvas.height === 864) {
+      drawRecordMarker(ctx, q.x, q.seat, ms, age, done, popping, t, i);
+      return;
+    }
     var sc = ms / Math.max(img.width, img.height);
     var dw = img.width * sc;
     var dh = img.height * sc;
@@ -1791,14 +1811,18 @@
     };
     var fg = book && book.fg;
     if (fg && fg.width >= 64 && !night) {
-      var fp = layerShift("fg", man);
-      var sway = reduced ? 0 : Math.sin(t * 0.9) * 0.016;
-      ctx.save();
-      ctx.translate(W / 2, H);
-      ctx.transform(1, 0, sway, 1, 0, 0);
-      ctx.translate(-W / 2, -H);
-      drawPlate(ctx, fg, W, H, pan.x * fp, pan.y * fp * 0.35, PLATE_ZOOM, 1, 0, world);
-      ctx.restore();
+      if (fg.width === W && fg.height === H) {
+        drawPlate(ctx, fg, W, H, 0, 0, 1, 1, 0, world);
+      } else {
+        var fp = layerShift("fg", man);
+        var sway = reduced ? 0 : Math.sin(t * 0.9) * 0.016;
+        ctx.save();
+        ctx.translate(W / 2, H);
+        ctx.transform(1, 0, sway, 1, 0, 0);
+        ctx.translate(-W / 2, -H);
+        drawPlate(ctx, fg, W, H, pan.x * fp, pan.y * fp * 0.35, PLATE_ZOOM, 1, 0, world);
+        ctx.restore();
+      }
     }
     if (venue && !night) drawCrowd(ctx, W, H, t, pan);
     paintLabels();
@@ -1833,6 +1857,12 @@
     this.resize();
   }
   World.prototype.resize = function () {
+    if (wallView() && this.cv.classList.contains("kw-canvas")) {
+      this.dpr = 1;
+      this.cv.width = 900;
+      this.cv.height = 864;
+      return;
+    }
     var dpr = Math.min(2, global.devicePixelRatio || 1);
     var w = global.innerWidth || 440;
     var h = global.innerHeight || 800;
@@ -1854,7 +1884,7 @@
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };
     this.hits = paintWorld(this.ctx, W, H, t, which || kid(), quests, st.fill || 0, parallaxNow(t, false));
     var jhost = document.querySelector("[data-kw-jar]");
-    if (jhost && jhost._jar && jhost._jar.setEnv) {
+    if (!wallView() && jhost && jhost._jar && jhost._jar.setEnv) {
       var skyPlate = plates[which || kid()] && plates[which || kid()].sky;
       jhost._jar.setEnv(skyPlate || this.cv);
     }

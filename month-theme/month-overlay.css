@@ -21,11 +21,15 @@ html[data-month-theme="11"] body:not([data-kid-world]) #ori-world{display:none!i
 .km-nov .km-glow.r{background:radial-gradient(circle,rgba(255,180,90,.22),transparent 60%)}
 .km-nov .km-fall{position:absolute;inset:0;background:url("november/leaves/leaves-fall-nov-wall-1920x1080.webp") center/cover no-repeat;opacity:.35;pointer-events:none;animation:kmFallDrift 48s ease-in-out infinite alternate}
 @keyframes kmFallDrift{from{transform:translate3d(0,0,0)}to{transform:translate3d(-1.5%,.6%,0)}}
-.km-leaf{position:absolute;top:-8%;background-size:contain;background-repeat:no-repeat;pointer-events:none;will-change:transform}
-.km-leaf.b0{width:24px;height:24px;opacity:.5;filter:blur(1px);animation:kmLeaf 34s linear infinite}
+.km-leaf{position:absolute;top:8%;width:24px;height:24px;background-size:24px 24px;background-repeat:no-repeat;pointer-events:none}
+.km-leaf.b0{opacity:.5}
 @keyframes kmLeaf{0%{transform:translate(0,-8vh) rotate(0)}100%{transform:translate(-3vw,110vh) rotate(220deg)}}
 html[data-ains-quiet="1"] .km-leaf, html[data-leaf-quiet="1"] .km-leaf{animation-duration:80s}
 @media (prefers-reduced-motion:reduce){.km-leaf{display:none}.km-nov .km-fall{opacity:.2;animation:none}}
+@media (width: 1920px) and (height: 1080px) {
+  html[data-month-theme="11"] body:not([data-kid-world]) { background-size: 1920px 1080px !important; background-position: 0 0 !important; }
+  .km-nov .km-fall { background-size: 1920px 1080px; background-position: 0 0; animation: none; }
+}
 /* kid boards: the overlay never crosses chore art (Alfred 4:24). No bats; fog and embers stay in a thin floor band under the week strip. */
 .km-kid .km-bats{display:none}
 .km-kid .km-fog{height:14%;bottom:-3%}

@@ -78,7 +78,7 @@
             leaf.className = "km-leaf b0";
             leaf.style.left = ((i * 7.1) % 100) + "%";
             leaf.style.animationDelay = (-i * 2.4) + "s";
-            leaf.style.backgroundImage = "url(\"" + base + "month-theme/november/leaves/leaf-nov-" + (i % 8) + "-64x64.webp\")";
+            leaf.style.backgroundImage = "url(\"" + base + "month-theme/november/leaves/leaf-nov-" + (i % 8) + "-24x24.webp\")";
             L.appendChild(leaf);
           }
         }

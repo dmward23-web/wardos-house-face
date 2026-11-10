@@ -6,6 +6,8 @@
 (function (global) {
   "use strict";
   if (!document.body || document.body.getAttribute("data-kid") !== "hayes") return;
+  /* The wall paints the 900x864 plates 1:1. This overlay scales 1280 art and breathes the canvas, so it stays off that screen. */
+  if (global.innerWidth === 1920 && global.innerHeight === 1080) return;
   var reduced = false;
   try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
 
