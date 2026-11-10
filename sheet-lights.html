@@ -284,12 +284,17 @@
 <script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
 <style>
 @media (min-width: 1400px) and (min-height: 700px) {
-  html body .cmd-pill, html body .hub-sw-stub-pill, html body .light-pad .sub, html body .pad-sub {
+  html:not(#hf-wall-off) body .panel .cmd-pill,
+  html:not(#hf-wall-off) body .panel .hub-sw-stub-pill,
+  html:not(#hf-wall-off) body .panel .sub {
     height: auto !important;
     max-height: none !important;
     white-space: normal !important;
     overflow: visible !important;
     line-height: 1.2 !important;
+  }
+  html:not(#hf-wall-off) body .panel {
+    overflow: visible !important;
   }
 }
 </style>
