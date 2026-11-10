@@ -722,8 +722,8 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on .panel .body {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    grid-template-rows: minmax(0, 1fr) 200px !important;
-    gap: 16px !important;
+    grid-template-rows: minmax(0, 1fr) 140px !important;
+    gap: 12px !important;
     height: 100% !important;
     min-height: 0 !important;
     width: 100% !important;
@@ -821,20 +821,20 @@ body.kw-on #tapsync-badge { display: none !important; }
     scrollbar-color: #1a1814 rgba(255, 252, 247, 0.4);
   }
   html.kw-root body.kw-on #sec-musts .chore {
-    flex: 0 0 96px !important;
+    flex: 0 0 64px !important;
     width: 100% !important;
-    height: 96px !important;
-    min-height: 96px !important;
-    max-height: 96px !important;
-    margin: 0 0 8px !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: none !important;
+    margin: 0 !important;
     scroll-snap-align: start;
     scroll-snap-stop: always;
     display: flex !important;
     align-items: center !important;
-    gap: 20px !important;
-    padding: 8px 12px !important;
+    gap: 12px !important;
+    padding: 2px 12px !important;
     box-sizing: border-box !important;
-    overflow: visible !important;
+    overflow: hidden !important;
     background: rgba(255, 252, 247, 0.96) !important;
     border-radius: 12px !important;
     color: #1a1814 !important;
@@ -870,7 +870,7 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on #sec-musts .chore .what,
   html.kw-root body.kw-on #sec-musts .chore .hint {
     font-size: 24px !important;
-    line-height: 28px !important;
+    line-height: 24px !important;
     color: #1a1814 !important;
   }
   html.kw-root body.kw-on #sec-jar .saves-host {

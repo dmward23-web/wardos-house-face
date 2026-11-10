@@ -79,9 +79,8 @@
     });
     var H = list.clientHeight;
     if (H < 96) return;
-    var gap = 8;
-    var minH = 96;
-    var n = Math.max(1, Math.min(rows.length, Math.floor((H + gap) / (minH + gap))));
+    var gap = 0;
+    var n = rows.length;
     var h = (H - (n - 1) * gap) / n;
     rows.forEach(function (row) {
       row.style.setProperty("height", h + "px", "important");

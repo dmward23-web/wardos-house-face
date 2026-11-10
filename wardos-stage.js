@@ -103,7 +103,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     var bar = document.querySelector("body > .chore-shortcuts");
     if (bar) {
       bar.style.setProperty("left", Math.round(left + 120 * s) + "px", "important");
-      bar.style.setProperty("top", Math.round(top + 52 * s) + "px", "important");
+      bar.style.setProperty("top", Math.round(top + 64 * s) + "px", "important");
       bar.style.setProperty("transform", "scale(" + s + ")", "important");
       bar.style.setProperty("transform-origin", "0 0", "important");
     }

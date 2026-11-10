@@ -801,7 +801,7 @@
   /* Header row lives on body, outside every filtered column. */
   html body .chore-shortcuts {
     position: fixed !important;
-    top: 52px !important;
+    top: 64px !important;
     left: 120px !important;
     z-index: 5 !important;
     display: flex !important;
