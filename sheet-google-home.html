@@ -501,5 +501,21 @@ html body .cam-path,html body #cam-next-step{display:none!important}
 <script src="house-ori-world.js?v=MERGE1C"></script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
+<style>
+@media (min-width: 1400px) and (min-height: 700px) {
+  html body .climate-amb, html body .climate-hero .row, html body #sensi-hero .climate-read {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+  }
+  html body .climate-amb .lab, html body #sensi-hero .lab {
+    position: static !important;
+    display: block !important;
+    line-height: 1.2 !important;
+  }
+  html body #sensi-hero-amb { position: static !important; }
+}
+</style>
 </body>
 </html>
