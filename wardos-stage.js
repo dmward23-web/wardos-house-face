@@ -83,8 +83,9 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     ensureHome(node);
     document.documentElement.style.setProperty("--wardos-s", String(s));
     liftType();
-    setTimeout(liftType, 400);
-    setTimeout(liftType, 1200);
+    unclip();
+    setTimeout(function () { liftType(); unclip(); }, 400);
+    setTimeout(function () { liftType(); unclip(); }, 1200);
     if (!document.getElementById("acer-type-floor")) {
       var floor = document.createElement("style");
       floor.id = "acer-type-floor";
@@ -146,6 +147,30 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
       stageScale: s,
       ct: stamp
     };
+  }
+
+  function unclip() {
+    var nodes = document.querySelectorAll("span, a, button, p, div, li");
+    var i, el, n, c, r, b;
+    for (i = 0; i < nodes.length; i++) {
+      el = nodes[i];
+      if (!el.childNodes || el.childNodes.length !== 1 || el.childNodes[0].nodeType !== 3) continue;
+      if (!el.textContent.replace(/\s+/g, "").trim()) continue;
+      n = el.parentElement;
+      while (n && n !== document.body) {
+        c = getComputedStyle(n);
+        if (c.overflowX === "hidden" || c.overflowY === "hidden" || c.overflowX === "clip" || c.overflowY === "clip") {
+          r = el.getBoundingClientRect();
+          b = n.getBoundingClientRect();
+          if (r.right > b.right + 2 || r.bottom > b.bottom + 2 || r.left < b.left - 2 || r.top < b.top - 2) {
+            n.style.setProperty("overflow", "visible", "important");
+            n.style.setProperty("height", "auto", "important");
+            n.style.setProperty("max-height", "none", "important");
+          }
+        }
+        n = n.parentElement;
+      }
+    }
   }
 
   function liftType() {
