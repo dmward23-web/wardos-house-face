@@ -335,7 +335,7 @@ test("kid pages do not load the money script, and a $ feed does not reach hub gl
     "month-theme/november/hub-window-dusk.webp", "month-theme/november/hub-window-night.webp"
   ]) assert.ok(fs.existsSync(path.join(ROOT, rel)), rel);
   const css = rd("kid-world.css");
-  assert.match(css, /month-theme\/november\/pebble\/pebble-filled\.webp/);
+  assert.match(css, /month-theme\/november\/pebble\/pebble-filled-56\.webp/);
   assert.doesNotMatch(css, /art\/mercury\/skins\/2026-11\/extras\/fx\/2x\/pebble/);
   assert.doesNotMatch(css, /day-tap:not\(\.is-today\)\s*\{[^}]*display:\s*none/);
 });
