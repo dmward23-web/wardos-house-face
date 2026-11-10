@@ -87,7 +87,7 @@ test("calendar-refresh and cal-from-events agree on the Thursday breakfast event
 
 test("a missing feed says the schedule is unavailable", () => {
   const src = fs.readFileSync(path.join(ROOT, "kid-world.js"), "utf8");
-  assert.match(src, /Schedule unavailable\. Tap to try again\./);
+  assert.match(src, /Schedule didn't load\. Tap to try again\./);
   assert.doesNotMatch(src, /A free week/);
   assert.doesNotMatch(src, /Nothing on your week yet/);
 });

@@ -626,6 +626,11 @@ body.kw-on #tapsync-badge { display: none !important; }
     height: 96px !important;
     min-width: 96px !important;
     min-height: 96px !important;
+    opacity: 1 !important;
+    filter: none !important;
+    background: #1c2430 !important;
+    border: 2px solid #c4b49a !important;
+    box-shadow: none !important;
   }
   html.kw-root body.kw-on .kw-home img {
     width: 64px !important;
@@ -669,13 +674,23 @@ body.kw-on #tapsync-badge { display: none !important; }
     font-size: 40px !important;
     line-height: 44px !important;
     color: #f4efe6 !important;
-    background: rgba(8, 10, 14, 0.72);
+    background: #101820 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
     padding: 8px 16px !important;
     margin: 0 !important;
     position: relative !important;
     top: 0 !important;
     transform: none !important;
     border-radius: 12px;
+  }
+  html.kw-root body.kw-on .kw-name::before,
+  html.kw-root body.kw-on .kw-name::after,
+  html.kw-root body.kw-on .kw-id::before,
+  html.kw-root body.kw-on .kw-id::after { content: none !important; display: none !important; }
+  html.kw-root body.kw-on #sec-musts .chore .hint {
+    font-size: 24px !important;
+    line-height: 28px !important;
   }
   html.kw-root body.kw-on .panel {
     position: fixed !important;
@@ -706,7 +721,7 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on .panel .body {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    grid-template-rows: minmax(0, 1fr) 240px !important;
+    grid-template-rows: minmax(0, 1fr) 180px !important;
     gap: 16px !important;
     height: 100% !important;
     min-height: 0 !important;
@@ -751,9 +766,9 @@ body.kw-on #tapsync-badge { display: none !important; }
   }
   html.kw-root body.kw-on #sec-musts { padding: 0 !important; }
   html.kw-root body.kw-on #sec-jar {
-    min-height: 64px !important;
-    height: 64px !important;
-    max-height: 64px !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: none !important;
     padding: 0 16px !important;
     display: flex !important;
     flex-direction: row !important;
@@ -771,8 +786,8 @@ body.kw-on #tapsync-badge { display: none !important; }
     display: flex !important;
     flex-direction: column !important;
     gap: 0 !important;
-    height: 416px !important;
-    max-height: 416px !important;
+    height: 100% !important;
+    max-height: 100% !important;
     overflow-x: hidden !important;
     overflow-y: scroll !important;
     scroll-snap-type: y mandatory;
@@ -817,10 +832,16 @@ body.kw-on #tapsync-badge { display: none !important; }
     line-height: 1.2 !important;
     text-align: left !important;
   }
+  html.kw-root body.kw-on #sec-musts .chore-ico {
+    flex: none !important;
+    width: 40px !important;
+    font-size: 28px !important;
+    line-height: 40px !important;
+  }
   html.kw-root body.kw-on #sec-musts .chore .what,
   html.kw-root body.kw-on #sec-musts .chore .hint {
     font-size: 24px !important;
-    line-height: 1.1 !important;
+    line-height: 28px !important;
     color: #1a1814 !important;
   }
   html.kw-root body.kw-on #sec-jar .saves-host,
@@ -1025,6 +1046,9 @@ body.theme-ainsley #sec-days .harbor-strip:not(:has(.card)) { display: none !imp
 .kw-home {
   appearance: none !important;
   width: 96px; height: 96px; min-width: 96px; min-height: 96px;
+  opacity: 1 !important;
+  background: #1c2430 !important;
+  border: 2px solid #c4b49a !important;
   padding: 0 !important; border-radius: 50% !important;
   border: 1px solid rgba(243, 230, 207, .35) !important;
   background: rgba(250, 246, 238, .16) !important;

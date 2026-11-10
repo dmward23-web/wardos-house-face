@@ -53,6 +53,19 @@
     ]
   };
   function escMust(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function choreIcon(id) {
+    var k = String(id || "");
+    if (/bed/.test(k)) return "🛏";
+    if (/backpack|cubby/.test(k)) return "🎒";
+    if (/dish|empty/.test(k)) return "🍽";
+    if (/trash/.test(k)) return "🗑";
+    if (/shower|bath/.test(k)) return "🚿";
+    if (/shoe|living/.test(k)) return "👟";
+    if (/laundry/.test(k)) return "👕";
+    if (/toy|room/.test(k)) return "🧹";
+    if (/postgame/.test(k)) return "⚽";
+    return "★";
+  }
   function paintPublicMusts() {
     var host = document.querySelector("[data-mount-quests]");
     var rows = PUBLIC_MUSTS[kid()];
@@ -61,7 +74,7 @@
       var opt = row[3] ? ' data-optional="1"' : "";
       var cadence = row[3] ? "addon" : (/weekly/.test(row[2]) ? "weekly" : "daily");
       return '<div class="chore open ' + kid() + '" data-check="' + escMust(row[0]) + '" data-cadence="' + cadence + '"' + opt + ' role="button" tabindex="0">' +
-        '<span class="ring"></span><div class="txt"><div class="what">' + escMust(row[1]) + '</div><div class="hint">' + escMust(row[2]) + "</div></div></div>";
+        '<span class="chore-ico" aria-hidden="true">' + choreIcon(row[0]) + '</span><span class="ring"></span><div class="txt"><div class="what">' + escMust(row[1]) + '</div><div class="hint">' + escMust(row[2]) + "</div></div></div>";
     }).join("");
     var empty = document.querySelector("[data-kw-must-empty]");
     if (empty) empty.remove();
@@ -84,7 +97,7 @@
         stage.appendChild(n);
       }
       n.hidden = false;
-      n.textContent = "Schedule unavailable. Tap to try again.";
+      n.textContent = "Schedule didn't load. Tap to try again.";
       if (document.body) document.body.classList.add("kw-rest");
     }
     function hideRest() {
@@ -92,8 +105,6 @@
       if (n) n.hidden = true;
       if (document.body) document.body.classList.remove("kw-rest");
     }
-    document.addEventListener("house:kids-data-missing", showRest);
-    document.addEventListener("house:kids-data-ready", hideRest);
     var W = global.WardKids;
     function weekNote(on) {
       var host = document.querySelector("#sec-days") || document.querySelector(".panel");
@@ -110,7 +121,7 @@
         note.style.setProperty("min-height", "88px", "important");
         note.style.setProperty("height", "88px", "important");
         note.style.setProperty("font-size", "24px", "important");
-        note.textContent = "Schedule unavailable. Tap to try again.";
+        note.textContent = "Schedule didn't load. Tap to try again.";
         note.addEventListener("click", function () {
           if (global.WardKids && WardKids.boot) WardKids.boot(kid());
         });
@@ -121,6 +132,8 @@
     showRest = function () { showRestBound(); weekNote(true); };
     var hideRestBound = hideRest;
     hideRest = function () { hideRestBound(); weekNote(false); };
+    document.addEventListener("house:kids-data-missing", showRest);
+    document.addEventListener("house:kids-data-ready", hideRest);
     paintPublicMusts();
     document.addEventListener("house:kids-data-missing", paintPublicMusts);
     if (!W || !W._data) showRest();

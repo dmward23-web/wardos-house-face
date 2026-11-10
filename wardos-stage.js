@@ -102,8 +102,8 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     }
     var bar = document.querySelector("body > .chore-shortcuts");
     if (bar) {
-      bar.style.setProperty("left", Math.round(left + 160 * s) + "px", "important");
-      bar.style.setProperty("top", Math.round(top + 66 * s) + "px", "important");
+      bar.style.setProperty("left", Math.round(left + 120 * s) + "px", "important");
+      bar.style.setProperty("top", Math.round(top + 52 * s) + "px", "important");
       bar.style.setProperty("transform", "scale(" + s + ")", "important");
       bar.style.setProperty("transform-origin", "0 0", "important");
     }
@@ -162,6 +162,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
         if (c.overflowX === "hidden" || c.overflowY === "hidden" || c.overflowX === "clip" || c.overflowY === "clip") {
           r = el.getBoundingClientRect();
           b = n.getBoundingClientRect();
+          if (b.height > 96 || b.width > 420) break;
           if (r.right > b.right + 2 || r.bottom > b.bottom + 2 || r.left < b.left - 2 || r.top < b.top - 2) {
             n.style.setProperty("overflow", "visible", "important");
             n.style.setProperty("height", "auto", "important");

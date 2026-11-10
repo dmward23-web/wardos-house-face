@@ -44,6 +44,30 @@ def main():
         httpd, base = serve(p)
         browser = p.chromium.launch(**launch_kw(p, args=["--no-sandbox", "--disable-dev-shm-usage"]))
         ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+        week = {"asOfIso": "2026-11-10", "kids": {
+            "hayes": {"today": [{"id": "pick", "kind": "school_pickup", "what": "School pickup", "startIso": "2026-11-10T15:15:00-06:00"}]},
+            "harris": {"today": [{"id": "soc", "kind": "leave", "what": "soccer", "startIso": "2026-11-10T18:00:00-06:00"}]},
+            "ainsley": {"today": [{"id": "swim", "kind": "sport", "what": "Ainsley swim", "startIso": "2026-11-10T16:25:00-06:00"}]},
+            "dan": {"today": [{"id": "pick", "kind": "school_pickup", "what": "School pickup", "startIso": "2026-11-10T15:15:00-06:00"}]}
+        }}
+        def handle(route):
+            url = route.request.url
+            if route.request.method != "GET":
+                route.fulfill(status=403, body="{}")
+                return
+            if "kids-week" in url:
+                route.fulfill(status=200, content_type="application/json", body=json.dumps(week))
+            elif "/wx" in url:
+                route.fulfill(status=200, content_type="application/json", body=json.dumps({"tempC": 16.7, "wind": "calm"}))
+            elif "sensi-live" in url:
+                route.fulfill(status=200, content_type="application/json", body=json.dumps({"ambient": 65, "mode": "heat"}))
+            elif "api.weather.gov" in url:
+                route.fulfill(status=404, body="{}")
+            elif "nest-live" in url:
+                route.fulfill(status=200, content_type="application/json", body=json.dumps({"cams": []}))
+            else:
+                route.continue_()
+        ctx.route("**/*", handle)
         page = ctx.new_page()
 
         def on_req(req):

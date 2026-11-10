@@ -994,6 +994,13 @@
       if (el.querySelector(".quest-days")) return;
       var id = el.getAttribute("data-check");
       if (!id || !KID_FROM_CHECK[id]) return;
+      if (!el.querySelector(".chore-ico")) {
+        var ico = document.createElement("span");
+        ico.className = "chore-ico";
+        ico.setAttribute("aria-hidden", "true");
+        ico.textContent = /bed/.test(id) ? "🛏" : /backpack|cubby/.test(id) ? "🎒" : /dish|empty/.test(id) ? "🍽" : /trash/.test(id) ? "🗑" : /shower|bath/.test(id) ? "🚿" : /shoe|living/.test(id) ? "👟" : /laundry/.test(id) ? "👕" : /toy|room/.test(id) ? "🧹" : /postgame/.test(id) ? "⚽" : "★";
+        el.insertBefore(ico, el.firstChild);
+      }
       var kidId = KID_FROM_CHECK[id];
       var meta = questMeta(kidId, id, data);
       el.setAttribute("data-cadence", meta.cadence);
@@ -1686,7 +1693,7 @@
       var items = buildNoSurprise(kid, data);
       ns.innerHTML = items.length
         ? items.map(cardHTML).join("")
-        : quietHTML(kidId === "ainsley" ? "side quiet · drop the needle on musts" : "quiet board · check musts");
+        : "";
     }
     var rides = document.querySelector("[data-mount-rides]");
     if (rides) {
