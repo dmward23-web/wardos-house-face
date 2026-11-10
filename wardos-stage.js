@@ -83,6 +83,8 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     ensureHome(node);
     document.documentElement.style.setProperty("--wardos-s", String(s));
     liftType();
+    setTimeout(liftType, 400);
+    setTimeout(liftType, 1200);
     if (!document.getElementById("acer-type-floor")) {
       var floor = document.createElement("style");
       floor.id = "acer-type-floor";
