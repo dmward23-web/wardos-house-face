@@ -55,7 +55,10 @@ a.wardos-home {
 .wardos-home img { width: 64px; height: 64px; display: block; }
 html body .wardos-stage header .live-clock-host,
 html body .wardos-stage .hdr-date {
-  margin-left: 112px !important;
+  position: relative !important;
+  left: 640px !important;
+  margin-left: 0 !important;
+  z-index: 6 !important;
 }
 @media (min-width: 1400px) and (min-height: 700px) {
   html body .wardos-stage > .panel {
