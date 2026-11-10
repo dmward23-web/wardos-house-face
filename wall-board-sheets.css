@@ -805,7 +805,7 @@
     min-width: 64px !important;
     min-height: 64px !important;
     box-sizing: border-box !important;
-    z-index: 6 !important;
+    z-index: 5 !important;
   }
   html body section.col[aria-label="Ainsley chores"] .kid-chip { left: 486px !important; width: 160px !important; }
   html body section.col[aria-label="Hayes chores"] .kid-chip { left: 662px !important; width: 148px !important; }
