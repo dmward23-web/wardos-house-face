@@ -55,16 +55,42 @@
   function escMust(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function choreIcon(id) {
     var k = String(id || "");
-    if (/bed/.test(k)) return "🛏";
-    if (/backpack|cubby/.test(k)) return "🎒";
-    if (/dish|empty/.test(k)) return "🍽";
-    if (/trash/.test(k)) return "🗑";
-    if (/shower|bath/.test(k)) return "🚿";
-    if (/shoe|living/.test(k)) return "👟";
-    if (/laundry/.test(k)) return "👕";
-    if (/toy|room/.test(k)) return "🧹";
-    if (/postgame/.test(k)) return "⚽";
-    return "★";
+    var body = '<path d="M16 6 L18.5 13 H26 L20 17.5 L22.5 25 L16 20.5 L9.5 25 L12 17.5 L6 13 H13.5 Z"/>';
+    if (/bed/.test(k)) body = '<path d="M6 22 V12 H10 V8 H22 V12 H26 V22"/><path d="M6 18 H26"/>';
+    else if (/backpack|cubby/.test(k)) body = '<path d="M11 12 V9 a5 5 0 0 1 10 0 V12"/><rect x="7" y="12" width="18" height="14" rx="3"/>';
+    else if (/dish|empty/.test(k)) body = '<ellipse cx="16" cy="18" rx="10" ry="4"/><path d="M8 18 c2 6 14 6 16 0"/>';
+    else if (/trash/.test(k)) body = '<path d="M8 10 H24"/><path d="M12 10 V8 H20 V10"/><path d="M10 12 L12 26 H20 L22 12"/>';
+    else if (/shower|bath/.test(k)) body = '<path d="M10 8 H22"/><path d="M12 8 V20 a4 4 0 0 0 8 0 V8"/>';
+    else if (/shoe|living/.test(k)) body = '<path d="M6 20 C8 12 14 12 16 14 C20 10 26 14 26 20 Z"/>';
+    else if (/laundry/.test(k)) body = '<path d="M10 8 H22 L24 26 H8 Z"/><path d="M13 8 V14 M19 8 V14"/>';
+    else if (/toy|room/.test(k)) body = '<path d="M8 26 L14 8 L16 14 L22 8 L18 26"/>';
+    else if (/postgame/.test(k)) body = '<circle cx="16" cy="16" r="8"/><path d="M16 8 V24 M8 16 H24"/>';
+    return '<svg viewBox="0 0 32 32" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">' + body + "</svg>";
+  }
+  function fitMustRows() {
+    var list = document.querySelector("#sec-musts .chore-list, #sec-musts [data-mount-quests]");
+    if (!list) return;
+    var rows = [].slice.call(list.children).filter(function (el) { return el.classList && el.classList.contains("chore"); });
+    if (!rows.length) return;
+    rows.forEach(function (row) {
+      row.style.removeProperty("height");
+      row.style.removeProperty("min-height");
+      row.style.removeProperty("max-height");
+    });
+    var H = list.clientHeight;
+    if (H < 96) return;
+    var gap = 8;
+    var minH = 96;
+    var n = Math.max(1, Math.min(rows.length, Math.floor((H + gap) / (minH + gap))));
+    var h = (H - (n - 1) * gap) / n;
+    rows.forEach(function (row) {
+      row.style.setProperty("height", h + "px", "important");
+      row.style.setProperty("min-height", h + "px", "important");
+      row.style.setProperty("max-height", h + "px", "important");
+      row.style.setProperty("margin", "0 0 " + gap + "px", "important");
+      row.style.setProperty("overflow", "hidden", "important");
+      row.style.setProperty("flex", "0 0 " + h + "px", "important");
+    });
   }
   function paintPublicMusts() {
     var host = document.querySelector("[data-mount-quests]");
@@ -79,6 +105,8 @@
     var empty = document.querySelector("[data-kw-must-empty]");
     if (empty) empty.remove();
     if (global.HouseCheckoffs && HouseCheckoffs.rewire) { try { HouseCheckoffs.rewire(); } catch (e) {} }
+    fitMustRows();
+    setTimeout(fitMustRows, 400);
   }
   var REST_LINE = "Resting. Your list comes back soon.";
   function bindFeedRest(stage) {
@@ -2396,6 +2424,7 @@
       paintWeek();
       mountJar();
       soften();
+      fitMustRows();
       if (global.JarEngine && JarEngine.choreState(kid()).asleep) document.body.classList.add("kw-asleep");
     });
     loadPlates();

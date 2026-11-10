@@ -688,6 +688,7 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on .kw-name::after,
   html.kw-root body.kw-on .kw-id::before,
   html.kw-root body.kw-on .kw-id::after { content: none !important; display: none !important; }
+  html.kw-root body.kw-on .kid-pebble { display: none !important; }
   html.kw-root body.kw-on #sec-musts .chore .hint {
     font-size: 24px !important;
     line-height: 28px !important;
@@ -721,7 +722,7 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on .panel .body {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    grid-template-rows: minmax(0, 1fr) 180px !important;
+    grid-template-rows: minmax(0, 1fr) 200px !important;
     gap: 16px !important;
     height: 100% !important;
     min-height: 0 !important;
@@ -746,7 +747,31 @@ body.kw-on #tapsync-badge { display: none !important; }
     display: flex !important;
     flex-direction: column !important;
   }
-  html.kw-root body.kw-on #sec-jar { grid-column: 1 !important; grid-row: 2 !important; overflow: hidden !important; }
+  html.kw-root body.kw-on #sec-jar {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    overflow: hidden !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: stretch !important;
+  }
+  html.kw-root body.kw-on:not(.theme-ainsley) #sec-jar > .bank-top { display: none !important; }
+  html.kw-root body.theme-ainsley.kw-on #sec-jar > .bank-top {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  html.kw-root body.kw-on #sec-jar > .saves-host {
+    position: relative !important;
+    inset: auto !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+  }
   html.kw-root body.kw-on #sec-days { grid-column: 2 !important; grid-row: 2 !important; overflow: auto !important; color: #1a1814 !important; font-size: 24px !important; }
   html.kw-root body.kw-on #sec-days:not(:has(.consume-hero, .kw-offline))::before {
     content: "Nothing timed next";
@@ -835,33 +860,49 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on #sec-musts .chore-ico {
     flex: none !important;
     width: 40px !important;
-    font-size: 28px !important;
-    line-height: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #1a1814 !important;
   }
+  html.kw-root body.kw-on #sec-musts .chore-ico svg { width: 36px !important; height: 36px !important; display: block !important; }
   html.kw-root body.kw-on #sec-musts .chore .what,
   html.kw-root body.kw-on #sec-musts .chore .hint {
     font-size: 24px !important;
     line-height: 28px !important;
     color: #1a1814 !important;
   }
-  html.kw-root body.kw-on #sec-jar .saves-host,
-  html.kw-root body.kw-on #sec-jar .bank-top {
+  html.kw-root body.kw-on #sec-jar .saves-host {
     display: flex !important;
-    align-items: center !important;
+    align-items: stretch !important;
     gap: 16px !important;
-    min-height: 0 !important;
+    min-height: 100% !important;
     margin: 0 !important;
     width: 100% !important;
+    height: 100% !important;
   }
   html.kw-root body.kw-on #sec-jar .saves-face {
     display: flex !important;
     align-items: center !important;
     gap: 16px !important;
     width: 100% !important;
-    height: 64px !important;
-    min-height: 64px !important;
-    max-height: 64px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
     margin: 0 !important;
+    background: rgba(255, 252, 247, 0.96) !important;
+    border-radius: 16px !important;
+    padding: 0 16px !important;
+    box-sizing: border-box !important;
+  }
+  html.kw-root body.kw-on #sec-days > .consume-hero,
+  html.kw-root body.kw-on #sec-days > .kw-offline {
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   html.kw-root body.kw-on #sec-jar .saves-bar {
     height: 64px !important;

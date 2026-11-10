@@ -456,10 +456,10 @@
 <style id="p1fix-chores-wall">
 /* P1FIX B45 · Chores wall: day toggles 48 px with 17 px letters (27in wall minimums); today carries a gold outline */
 @media (min-width:601px){
-  html body .chore .quest-days{gap:20px!important;flex-wrap:wrap!important}
-  html body .panel .body > section.col .chore{height:280px!important;min-height:280px!important;max-height:280px!important;overflow:hidden!important;margin:0!important;flex:0 0 280px!important;scroll-snap-align:start;scroll-snap-stop:always}
-  html body .panel .body > section.col .chore-list{overflow-y:scroll!important;overflow-x:hidden!important;height:560px!important;max-height:560px!important;gap:0!important;scroll-snap-type:y mandatory;scrollbar-width:auto}
-  html body .chore .day-tap{width:88px!important;height:88px!important;min-width:88px!important;min-height:88px!important;font-size:24px!important;border-radius:12px!important}
+  html body .chore .quest-days{display:flex!important;width:100%!important;gap:2px!important;flex-wrap:nowrap!important}
+  html body .panel .body > section.col .chore{height:auto!important;min-height:0!important;max-height:none!important;overflow:hidden!important;margin:0!important;flex:0 0 auto!important;flex-direction:column!important;align-items:stretch!important}
+  html body .panel .body > section.col .chore-list{overflow-y:hidden!important;overflow-x:hidden!important;height:auto!important;max-height:none!important;flex:1 1 auto!important}
+  html body .chore .day-tap{width:85px!important;height:88px!important;min-width:85px!important;min-height:88px!important;max-width:85px!important;flex:0 0 85px!important;font-size:24px!important;border-radius:12px!important}
 }
 html body .chore .day-tap.is-today{border-color:#f0b440!important;outline:3px solid #f0b440!important;outline-offset:2px}
 </style>
@@ -1071,21 +1071,109 @@ html body .panel > header.hdr .live-clock-host {
   padding: 8px 16px !important;
   min-height: 72px !important;
 }
+html:not(#hf-wall-off) body .panel .body > section.col .chore {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  padding: 6px 0 !important;
+  overflow: hidden !important;
+}
+html:not(#hf-wall-off):not(#hf-scroll-off) body .panel > .body:has(> .col) {
+  left: 0 !important;
+  width: 1920px !important;
+  column-gap: 0 !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+html:not(#hf-wall-off) body .panel .body > section.col .chore-list {
+  padding: 4px 0 0 !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+  scrollbar-gutter: auto !important;
+}
+html body .chore .quest-days {
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  flex-wrap: nowrap !important;
+}
+html body .chore .day-tap {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 88px !important;
+  box-sizing: border-box !important;
+}
+html:not(#hf-wall-off) body .panel .body > section.col .chore {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+html body .more-chip { top: 12px !important; bottom: auto !important; }
 </style>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  window.setTimeout(function () {
+  function fitChoreColumns() {
     document.querySelectorAll("section.col").forEach(function (col) {
       var list = col.querySelector(".chore-list");
-      if (!list || list.scrollHeight <= list.clientHeight + 24) return;
-      col.classList.add("has-more");
-      if (col.querySelector(".more-chip")) return;
-      var chip = document.createElement("div");
-      chip.className = "more-chip";
-      chip.textContent = "More";
-      col.appendChild(chip);
+      if (!list) return;
+      var cards = [].slice.call(list.querySelectorAll(":scope > .chore"));
+      cards.forEach(function (card) {
+        card.style.removeProperty("height");
+        card.style.removeProperty("min-height");
+        card.style.removeProperty("max-height");
+      });
+      var cs = getComputedStyle(list);
+      var gap = parseFloat(cs.rowGap);
+      if (!isFinite(gap)) gap = parseFloat(cs.gap) || 0;
+      var pad = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+      var H = list.clientHeight - pad;
+      var stage = document.querySelector(".wardos-stage");
+      var scale = stage && stage.offsetWidth ? stage.getBoundingClientRect().width / stage.offsetWidth : 1;
+      var room = (col.getBoundingClientRect().bottom - list.getBoundingClientRect().top) / (scale || 1) - (parseFloat(cs.paddingTop) || 0);
+      if (isFinite(room)) H = Math.min(H, room);
+      if (!cards.length || H < 80) return;
+      var natural = cards[0].offsetHeight || 140;
+      var n = Math.max(1, Math.min(cards.length, Math.floor((H + gap) / (natural + gap))));
+      var h = (H - (n - 1) * gap) / n;
+      if (h < natural) {
+        n = Math.max(1, n - 1);
+        h = (H - (n - 1) * gap) / n;
+      }
+      list.style.setProperty("scrollbar-gutter", "auto", "important");
+      list.style.setProperty("padding-left", "0", "important");
+      list.style.setProperty("padding-right", "0", "important");
+      cards.forEach(function (card, i) {
+        if (i >= n) {
+          card.style.setProperty("display", "none", "important");
+          return;
+        }
+        card.style.removeProperty("display");
+        card.style.setProperty("position", "relative", "important");
+        card.style.setProperty("opacity", "1", "important");
+        card.style.setProperty("height", h + "px", "important");
+        card.style.setProperty("min-height", h + "px", "important");
+        card.style.setProperty("max-height", h + "px", "important");
+        card.style.setProperty("overflow", "hidden", "important");
+        card.style.setProperty("flex", "0 0 auto", "important");
+      });
+      var more = cards.length > n;
+      col.classList.toggle("has-more", more);
+      var chip = col.querySelector(".more-chip");
+      if (more && !chip) {
+        chip = document.createElement("div");
+        chip.className = "more-chip";
+        chip.textContent = "More";
+        col.appendChild(chip);
+      }
+      if (chip && !more) chip.remove();
     });
-  }, 700);
+  }
+  window.setTimeout(fitChoreColumns, 400);
+  window.setTimeout(fitChoreColumns, 1000);
+  window.setTimeout(fitChoreColumns, 1500);
 });
 </script>
 </body>

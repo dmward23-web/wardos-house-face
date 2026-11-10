@@ -162,7 +162,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
         if (c.overflowX === "hidden" || c.overflowY === "hidden" || c.overflowX === "clip" || c.overflowY === "clip") {
           r = el.getBoundingClientRect();
           b = n.getBoundingClientRect();
-          if (b.height > 96 || b.width > 420) break;
+          if (n.offsetHeight > 96 || n.offsetWidth > 420) break;
           if (r.right > b.right + 2 || r.bottom > b.bottom + 2 || r.left < b.left - 2 || r.top < b.top - 2) {
             n.style.setProperty("overflow", "visible", "important");
             n.style.setProperty("height", "auto", "important");

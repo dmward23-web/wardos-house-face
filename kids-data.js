@@ -998,7 +998,8 @@
         var ico = document.createElement("span");
         ico.className = "chore-ico";
         ico.setAttribute("aria-hidden", "true");
-        ico.textContent = /bed/.test(id) ? "🛏" : /backpack|cubby/.test(id) ? "🎒" : /dish|empty/.test(id) ? "🍽" : /trash/.test(id) ? "🗑" : /shower|bath/.test(id) ? "🚿" : /shoe|living/.test(id) ? "👟" : /laundry/.test(id) ? "👕" : /toy|room/.test(id) ? "🧹" : /postgame/.test(id) ? "⚽" : "★";
+        var mark = /bed/.test(id) ? '<path d="M6 22 V12 H10 V8 H22 V12 H26 V22"/><path d="M6 18 H26"/>' : /backpack|cubby/.test(id) ? '<path d="M11 12 V9 a5 5 0 0 1 10 0 V12"/><rect x="7" y="12" width="18" height="14" rx="3"/>' : /dish|empty/.test(id) ? '<ellipse cx="16" cy="18" rx="10" ry="4"/><path d="M8 18 c2 6 14 6 16 0"/>' : /trash/.test(id) ? '<path d="M8 10 H24"/><path d="M12 10 V8 H20 V10"/><path d="M10 12 L12 26 H20 L22 12"/>' : /shower|bath/.test(id) ? '<path d="M10 8 H22"/><path d="M12 8 V20 a4 4 0 0 0 8 0 V8"/>' : /shoe|living/.test(id) ? '<path d="M6 20 C8 12 14 12 16 14 C20 10 26 14 26 20 Z"/>' : /laundry/.test(id) ? '<path d="M10 8 H22 L24 26 H8 Z"/><path d="M13 8 V14 M19 8 V14"/>' : /toy|room/.test(id) ? '<path d="M8 26 L14 8 L16 14 L22 8 L18 26"/>' : /postgame/.test(id) ? '<circle cx="16" cy="16" r="8"/><path d="M16 8 V24 M8 16 H24"/>' : '<path d="M16 6 L18.5 13 H26 L20 17.5 L22.5 25 L16 20.5 L9.5 25 L12 17.5 L6 13 H13.5 Z"/>';
+        ico.innerHTML = '<svg viewBox="0 0 32 32" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">' + mark + "</svg>";
         el.insertBefore(ico, el.firstChild);
       }
       var kidId = KID_FROM_CHECK[id];

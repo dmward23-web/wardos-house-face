@@ -236,7 +236,8 @@ PROBE = """() => {
       used += ix * iy;
     }
     const area = b.width * b.height;
-    if (area > 0 && used / area < 0.5 && (area - used) > 300 * 200) dead.push((el.id || el.className || '').toString().slice(0, 40));
+    const slack = 300 * 200 * s * s;
+    if (area > 0 && (used / area < 0.5 || (area - used) > slack)) dead.push((el.id || el.className || '').toString().slice(0, 40));
   }
   const wrappedDays = [...document.querySelectorAll('.quest-days')].filter(group => {
     const taps = [...group.querySelectorAll('.day-tap')].filter(vis);

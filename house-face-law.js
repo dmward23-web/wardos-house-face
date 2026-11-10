@@ -81,13 +81,25 @@
   function isSpecialText(s, schoolAlt) { var t = String(s == null ? "" : s); if (/No Specials/i.test(t)) return false; return (schoolAlt == null ? /\bspecials?\b/i : new RegExp("(?:" + schoolAlt + ") specials?", "i")).test(t); }
   /* a specials row (any day, incl. the "Today · Special" chip) is a day chip only, never a re-picked NEXT / hottest card */
   function isSpecialRow(r) { return !!r && (r.kind === "special" || isSpecialText(rowText(r) + " " + String(r.when || ""))); }
+  function faceNowMs() {
+    try {
+      if (g.HouseScene && typeof g.HouseScene.now === "function") {
+        var d = g.HouseScene.now();
+        if (d && isFinite(+d)) return +d;
+      }
+    } catch (e) { /* pinned clock */ }
+    try {
+      if (g.LHClock && typeof g.LHClock.ms === "function") return g.LHClock.ms();
+    } catch (e2) { /* live clock */ }
+    return Date.now();
+  }
   function rowEnded(r, now) {
     if (!r) return false;
     now = now || ctNow();
     var iso = r.startIso || r.start || "";
     if (iso && /T\d{2}:/.test(String(iso))) {
       var end = Date.parse(r.endIso || r.end || "") || (Date.parse(iso) + 90 * 60000);
-      return Number.isFinite(end) && end < (g.LHClock ? g.LHClock.ms() : Date.now());
+      return Number.isFinite(end) && end < faceNowMs();
     }
     var off = dayOffset(r.when, now);
     if (off === null) return false;

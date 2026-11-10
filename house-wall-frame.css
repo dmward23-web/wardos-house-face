@@ -20,8 +20,8 @@
     --wf-band: 880px;
     position: relative !important;
     width: var(--wf-band) !important; max-width: var(--wf-band) !important;
-    margin: 0 0 0 calc(50vw - (var(--wf-band) / 2)) !important;
-    height: 100vh !important; min-height: 0 !important; max-height: 100vh !important;
+    margin: 0 0 0 520px !important;
+    height: 1080px !important; min-height: 0 !important; max-height: 1080px !important;
     overflow: hidden !important;
     padding: 14px 0 14px !important;
     display: block !important;

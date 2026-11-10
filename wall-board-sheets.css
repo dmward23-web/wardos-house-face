@@ -952,10 +952,13 @@
   html body .chore-ico {
     flex: none !important;
     width: 40px !important;
-    font-size: 28px !important;
-    line-height: 40px !important;
-    text-align: center !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #f4efe6 !important;
   }
+  html body .chore-ico svg { width: 36px !important; height: 36px !important; display: block !important; }
   html body .more-chip {
     position: absolute !important;
     right: 12px !important;
