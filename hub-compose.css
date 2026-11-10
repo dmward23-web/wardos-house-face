@@ -1,0 +1,209 @@
+/* ACERFIX hub composition. One card style, readable plates, a real launch bar. */
+html body .panel.panel > header.hdr { overflow: hidden !important; }
+html body .hdr-ovals {
+  width: 592px !important;
+  display: grid !important;
+  grid-template-columns: 284px 284px !important;
+  column-gap: 24px !important;
+  justify-content: end !important;
+}
+html body .name,
+html body .name-accent {
+  font-size: 48px !important;
+  line-height: 1 !important;
+  color: #f4efe6 !important;
+  text-align: center !important;
+}
+html body .tile.ainsley .tile-sub,
+html body .tile.hayes .tile-sub,
+html body .tile.harris .tile-sub,
+html body .tile.dan .tile-sub,
+html body .tile.ainsley .tile-micro,
+html body .tile.hayes .tile-micro,
+html body .tile.harris .tile-micro,
+html body .tile.dan .tile-micro,
+html body .kf-dots,
+html body .tile .tile-foot { display: none !important; }
+html body .roster-name {
+  position: absolute !important;
+  left: 16px !important;
+  top: 16px !important;
+  min-height: 80px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  padding: 8px 14px !important;
+  background: #101820 !important;
+  color: #f4efe6 !important;
+  border-radius: 12px !important;
+}
+html body .roster-full,
+html body .tile-label.roster-full {
+  font-size: 32px !important;
+  line-height: 1.15 !important;
+  color: #f4efe6 !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+html body .roster-abbr {
+  font-size: 18px !important;
+  letter-spacing: 0.08em !important;
+  color: #f4efe6 !important;
+}
+html body .roster-plate {
+  position: absolute !important;
+  left: 16px !important;
+  bottom: 16px !important;
+  width: 406px !important;
+  height: 160px !important;
+  box-sizing: border-box !important;
+  padding: 12px !important;
+  background: #101820 !important;
+  color: #f4efe6 !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+html body .roster-time {
+  font-size: 36px !important;
+  line-height: 1.1 !important;
+  white-space: nowrap !important;
+  color: #f4efe6 !important;
+}
+html body .roster-title {
+  font-size: 30px !important;
+  line-height: 1.2 !important;
+  color: #f4efe6 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+html body .hub-next {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 900px !important;
+  height: 120px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 24px !important;
+  padding: 16px 24px !important;
+  background: #101820 !important;
+  color: #f4efe6 !important;
+  text-decoration: none !important;
+  border-radius: 16px !important;
+}
+html body .hub-next-time {
+  font-size: 40px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  min-width: 180px !important;
+}
+html body .hub-next-title {
+  font-size: 30px !important;
+  line-height: 1.2 !important;
+}
+html body .panel.panel > .hub-upper .leaveby,
+html body .panel.panel > .hub-upper .sp-strip { display: none !important; }
+html body #hub-lights-panel {
+  position: absolute !important;
+  left: 0 !important;
+  top: 144px !important;
+  width: 900px !important;
+  height: 160px !important;
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  box-sizing: border-box !important;
+  background: #101820 !important;
+  color: #f4efe6 !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+}
+html body .hub-lights-title { font-size: 30px !important; color: #f4efe6 !important; }
+html body .hub-lights-grid {
+  display: flex !important;
+  gap: 20px !important;
+  align-items: center !important;
+}
+html body .hub-sw { min-width: 80px !important; min-height: 80px !important; }
+html body .hub-sw-rocker { min-width: 80px !important; min-height: 80px !important; }
+html body .hub-lights-more { font-size: 30px !important; color: #f4efe6 !important; min-height: 80px !important; display: inline-flex !important; align-items: center !important; }
+html body .hub-launch {
+  position: absolute !important;
+  left: 48px !important;
+  top: 720px !important;
+  width: 900px !important;
+  height: 200px !important;
+  z-index: 5 !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  grid-template-rows: 80px 80px !important;
+  gap: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+html body .hub-launch a {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 80px !important;
+  padding: 0 12px !important;
+  box-sizing: border-box !important;
+  background: #101820 !important;
+  color: #f4efe6 !important;
+  font-size: 30px !important;
+  line-height: 1.1 !important;
+  text-decoration: none !important;
+  border-radius: 16px !important;
+  text-align: center !important;
+}
+html body .hub-launch a:focus-visible,
+html body .hub-home:focus-visible,
+html body .hub-next:focus-visible,
+html body .tile:focus-visible {
+  outline: 3px solid #f4efe6 !important;
+  outline-offset: -6px !important;
+}
+html body .panel.panel > #hub-cam-deck {
+  gap: 20px !important;
+  overflow: hidden !important;
+}
+html body #hub-cam-deck .hub-cam {
+  height: 200px !important;
+  max-height: 200px !important;
+  overflow: hidden !important;
+}
+html body #hub-cam-deck .hub-cam-rest::before {
+  background-image: none !important;
+}
+html body .hub-cam {
+  min-height: 80px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: #101820 !important;
+  color: #f4efe6 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  text-decoration: none !important;
+}
+html body #hub-cam-deck .hub-cam-label.hub-cam-label,
+html body .hub-cam-label,
+html body .hub-cam-pill,
+html body .hub-cam-rest-word {
+  font-size: 30px !important;
+  line-height: 1.15 !important;
+  color: #f4efe6 !important;
+  text-transform: none !important;
+}
+html body .hub-cam-foot { min-height: 64px !important; padding: 4px 8px !important; }
+html body .tile.ainsley,
+html body .tile.hayes,
+html body .tile.harris,
+html body .tile.dan {
+  border: 2px solid #c4b49a !important;
+  border-radius: 16px !important;
+}

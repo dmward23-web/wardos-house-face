@@ -14,7 +14,7 @@
 @keyframes km-flick{0%{opacity:.78}35%{opacity:.92}60%{opacity:.84}100%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.km-glow{animation:none}}
 /* SUNHOME1 · November plates replace the Halloween porch. Glow stays on the porch side. Leaves are the far band only. */
-html[data-month-theme="11"] body:not([data-kid-world]){background-image:var(--km-bg)!important;background-size:cover!important;background-position:center!important;background-color:#1a120c}
+html[data-month-theme="11"] body:not([data-kid-world]){background-image:none!important;background-size:auto!important;background-color:#07080b}
 html[data-month-theme="11"] iframe.night52-scene{visibility:hidden!important;display:none!important;pointer-events:none!important}
 html[data-month-theme="11"] body:not([data-kid-world]) #ori-world{display:none!important}
 .km-nov .km-glow.l{display:none}
@@ -27,7 +27,7 @@ html[data-month-theme="11"] body:not([data-kid-world]) #ori-world{display:none!i
 html[data-ains-quiet="1"] .km-leaf, html[data-leaf-quiet="1"] .km-leaf{animation-duration:80s}
 @media (prefers-reduced-motion:reduce){.km-leaf{display:none}.km-nov .km-fall{opacity:.2;animation:none}}
 @media (width: 1920px) and (height: 1080px) {
-  html[data-month-theme="11"] body:not([data-kid-world]) { background-size: 1920px 1080px !important; background-position: 0 0 !important; }
+  html[data-month-theme="11"] body:not([data-kid-world]) { background-size: auto !important; background-position: 0 0 !important; }
   .km-nov .km-fall { background-size: 1920px 1080px; background-position: 0 0; animation: none; }
 }
 /* kid boards: the overlay never crosses chore art (Alfred 4:24). No bats; fog and embers stay in a thin floor band under the week strip. */

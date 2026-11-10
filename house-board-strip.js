@@ -136,6 +136,11 @@
   }
 
   function shortPlace(summary, cap) {
+    var D = global.HouseEventDisplay;
+    if (D && typeof D.summarize === "function") {
+      var view = D.summarize({ summary: summary, title: summary, what: summary }, "adult");
+      return view && view.title ? view.title : "";
+    }
     var s = kidsSafe(String(summary || "").trim());
     s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
     s = s.replace(/\(\s*Mom[^)]*\)/gi, "");
@@ -209,9 +214,19 @@
     if (AF && AF.hasMonths && AF.hasMonths() && !AF.keepItem(e, AF.now())) return false;
     return true;
   }
+  function wallMs() {
+    try { if (global.HouseScene && HouseScene.now) return HouseScene.now().getTime(); } catch (e) { /* real clock */ }
+    return Date.now();
+  }
   function listEvents(cal) {
     var l = (cal && (cal.upcomingLeaves || cal.events)) || [];
-    return l.filter(function (e) { return !(e && SOFT_TITLE.test(String(e.summary || e.title || ""))) && lawOk(e); }); /* LAW8C1 + LIVELAW1 + AWAYLAW1 · AWAYONE1 */
+    return l.filter(function (e) {
+      if (!e || SOFT_TITLE.test(String(e.summary || e.title || ""))) return false;
+      if (!lawOk(e)) return false;
+      var D = global.HouseEventDisplay;
+      if (D && D.isDenied && D.isDenied(e)) return false;
+      return true;
+    }); /* LAW8C1 + LIVELAW1 + AWAYLAW1 · AWAYONE1 · ACERFIX clinical rows never reach glass */
   }
 
   /** First future event by start (> now). */
@@ -321,16 +336,15 @@
       }).format(new Date(startMs));
     } catch (e2) { /* keep */ }
     var place = shortPlace(ev.summary || ev.place || "", ev._merged ? 120 : 64);
-    var time = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
+    var time = ev.allDay ? "All day" : (clockTimeFromIso(ev.start) || "");
+    if (!place) place = "Calendar item";
     return {
       label: isToday ? "Schedule · today" : ("Schedule · " + dow),
       _dayIso: startIsoDay,
       _dow: dow,
-      time: time === "day" ? "" : time,
+      time: time === "All day" ? "" : time,
       place: place,
-      detailHtml: "<strong>" + esc(time) + "</strong> " +
-        esc(place) +
-        (ev.location ? (" · " + esc(String(ev.location).split(",")[0])) : ""),
+      detailHtml: "<strong>" + esc(time) + "</strong> " + esc(place),
       badge: isToday ? clock.dow : dow
     };
   }
@@ -412,7 +426,7 @@
   }
 
   function pickStripFromCal(cal, clock) {
-    var next = mergeSameStart(cal, pickNextFuture(cal, Date.now()));
+    var next = mergeSameStart(cal, pickNextFuture(cal, wallMs()));
     var strip = next
       ? stripFromEvent(next, clock)
       : {
@@ -422,9 +436,9 @@
           detailHtml: "No upcoming events in cal-live window",
           badge: clock.dow
         };
-    strip.today = remainingToday(cal, clock, Date.now());
+    strip.today = remainingToday(cal, clock, wallMs());
     strip.tomorrow = tomorrowPeek(cal, clock);
-    strip.future = futureLeaves(cal, Date.now(), 10);
+    strip.future = futureLeaves(cal, wallMs(), 10);
     return strip;
   }
 

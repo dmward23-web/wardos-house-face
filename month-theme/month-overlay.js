@@ -39,60 +39,45 @@
     } catch (e) { /* local hour */ }
     return d.getHours();
   }
-  function novPhase(d) {
-    var h = ctHour(d);
-    if (h >= 6 && h < 16) return "morning";
-    if (h >= 16 && h < 19) return "dusk";
-    return "night";
+  function scenePack(when) {
+    var S = window.HouseScene;
+    if (S && S.plates) return S.plates(when);
+    return { phase: "night", wall: "month-theme/november/wall-night.webp", phone: "month-theme/november/phone-night.webp", hub: "month-theme/november/hub-window-night-900x864.webp" };
   }
   function mountNovember() {
     function go() {
       var when = seasonDate();
-      var phase = novPhase(when);
-      var phone = (window.innerWidth || 0) < 700;
-      /* CSS consumes --km-bg from month-overlay.css, so a page-relative url doubles month-theme/. Leaves already use base. */
-      var plate = base + "month-theme/november/" + (phone ? "phone-" : "wall-") + phase + ".webp";
+      var pack = scenePack(when);
+      var phase = pack.phase === "day" ? "morning" : pack.phase;
+      var phone = document.documentElement.getAttribute("data-wardos-stage") !== "1" && (window.innerWidth || 0) < 700;
+      /* CSS consumes --km-bg from month-overlay.css, so a page-relative url doubles month-theme/. */
+      var plate = base + (phone ? pack.phone : pack.wall);
       var kidPage = /\/kid-[a-z]+/.test(location.pathname || "") || !!(document.body && document.body.hasAttribute("data-kid-world"));
       document.documentElement.setAttribute("data-month-theme", "11");
-      document.documentElement.setAttribute("data-nov-phase", phase);
+      document.documentElement.setAttribute("data-nov-phase", pack.phase);
+      document.documentElement.setAttribute("data-scene-phase", pack.phase);
       document.querySelectorAll("iframe.night52-scene").forEach(function (fr) {
         fr.removeAttribute("src");
         fr.style.display = "none";
       });
-      if (!kidPage) document.documentElement.style.setProperty("--km-bg", "url(\"" + plate + "\")");
-      if (!document.getElementById("km-nov")) {
-        var L = document.createElement("div");
-        L.id = "km-nov";
-        L.className = "km-layer km-nov" + (document.querySelector(".kw-canvas") ? " km-kid" : "");
-        L.setAttribute("aria-hidden", "true");
-        L.style.zIndex = "1";
-        var fall = document.createElement("div");
-        fall.className = "km-fall";
-        L.appendChild(fall);
-        var glow = document.createElement("div");
-        glow.className = "km-glow r";
-        L.appendChild(glow);
-        if (!RM.matches) {
-          for (var i = 0; i < 14; i++) {
-            var leaf = document.createElement("i");
-            leaf.className = "km-leaf b0";
-            leaf.style.left = ((i * 7.1) % 100) + "%";
-            leaf.style.animationDelay = (-i * 2.4) + "s";
-            leaf.style.backgroundImage = "url(\"" + base + "month-theme/november/leaves/leaf-nov-" + (i % 8) + "-24x24.webp\")";
-            L.appendChild(leaf);
-          }
-        }
-        if (document.body) document.body.insertBefore(L, document.body.firstChild);
+      if (!kidPage) {
+        var url = "url(\"" + plate + "\")";
+        document.documentElement.style.setProperty("--km-bg", url);
+        document.documentElement.style.setProperty("--wg-hubbg", url);
       }
       var fig = document.querySelector(".hub-window");
       if (fig) {
-        var winPhase = (ctHour(when) >= 16 && ctHour(when) < 19) ? "dusk" : "night";
         var img = fig.querySelector("img");
-        if (!img) { img = document.createElement("img"); img.alt = ""; fig.appendChild(img); }
-        img.src = "month-theme/november/hub-window-" + winPhase + "-900x864.webp";
+        if (!img) { img = document.createElement("img"); img.alt = ""; img.width = 900; img.height = 864; fig.appendChild(img); }
+        if (img.getAttribute("src") !== pack.hub) img.src = pack.hub;
       }
     }
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
+    function arm() {
+      go();
+      var S = window.HouseScene;
+      if (S && S.subscribe && !arm.done) { arm.done = true; S.subscribe(go); if (S.start) S.start(); }
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", arm); else arm();
   }
   var m = q.has("month") ? parseInt(q.get("month"), 10) : new Date().getMonth() + 1;
   var t = THEMES[m]; if (!t) return;

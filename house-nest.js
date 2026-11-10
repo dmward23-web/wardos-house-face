@@ -535,7 +535,14 @@
     var list = hubCamOrder(cams);
     return i >= 0 && list[i] ? list[i] : null;
   }
-  function hubLabel(slot, cam) { return String((cam && cam.name) || slot.label).slice(0, 40); }
+  function approvedPlace(cam) {
+    var place = String((cam && (cam.place || cam.room || cam.name)) || "").trim();
+    if (!place) return "";
+    if (/enterprises\/|devices\/|^[A-Za-z0-9:_-]{16,}$/.test(place)) return "";
+    if (place.length > 24) return "";
+    return place;
+  }
+  function hubLabel(slot, cam) { return approvedPlace(cam) || "Camera unavailable"; }
 
   /**
    * Honest ONE status for a hub tile (HUBFMT1 / CAMLIVE2).
@@ -731,15 +738,11 @@
     if (!deck) return;
     var paired = false;
     try { paired = !!(global.PrivateFeed && PrivateFeed.pairState && PrivateFeed.pairState() === "paired"); } catch (eP) {}
-    if (!paired && /sheet-index\.html$/.test((doc.defaultView || window).location.pathname || "")) {
-      deck.hidden = true;
-      return;
-    }
     deck.hidden = false;
     ingestProxyFromLive(cachedData());
     /* NODATA1 · never show broken copy: stale/stub camera tiles hide; the deck hides when none is left.
        CAMREST2 · a resting tile is calm, not broken, so it stays: a whole-feed 5xx/401/offline rests the deck, never hides it */
-    if (!doc.getElementById("nodata1-cams")) { var st = doc.createElement("style"); st.id = "nodata1-cams"; st.textContent = ".hub-cam.hub-cam-stale:not(.hub-cam-resting),.hub-cam.hub-cam-stub:not(.hub-cam-resting){display:none!important}#hub-cam-deck.nodata1-empty{display:none!important}"; (doc.head || doc.documentElement).appendChild(st); }
+    if (!doc.getElementById("nodata1-cams") && !/sheet-index\.html$/.test((doc.defaultView || window).location.pathname || "")) { var st = doc.createElement("style"); st.id = "nodata1-cams"; st.textContent = ".hub-cam.hub-cam-stale:not(.hub-cam-resting),.hub-cam.hub-cam-stub:not(.hub-cam-resting){display:none!important}#hub-cam-deck.nodata1-empty{display:none!important}"; (doc.head || doc.documentElement).appendChild(st); }
     setTimeout(function () { var vis = [].some.call(deck.querySelectorAll(".hub-cam"), function (t) { return getComputedStyle(t).display !== "none"; }); deck.classList.toggle("nodata1-empty", !vis); }, 0);
     var data = cachedData();
     var g = gate(data);
@@ -752,7 +755,7 @@
       if (!el) continue;
       var cam = findCamForHub(slot, cams);
       var realCam = !!(cam && !String(cam.id || "").startsWith("stub-"));
-      el._hubLabel = slot.label;
+      el._hubLabel = hubLabel(slot, cam);
       el._hubWhy = why;
       el._hubIdentity = { name: hubLabel(slot, cam), camId: realCam ? cam.id : "", href: realCam ? viewerHref(cam) : "sheet-google-home.html" };
       /* CAMLIVE2 · never clobber a proven LIVE playing tile with STILL on poll */
@@ -840,9 +843,9 @@
          CAMREST3 · a STALE or stub tile rests even when an old picture loaded (State D: paired, hub stale or unreachable) */
       var resting = !showStill || !hubStillOk(img) || el._hubNotStill;
       if (!el._hubLivePlaying) {
-        if (resting) setHubCamResting(el, slot.label, true, why);
+        if (resting) setHubCamResting(el, el._hubLabel, true, why);
         else {
-          setHubCamResting(el, slot.label, false);
+          setHubCamResting(el, el._hubLabel, false);
           el.setAttribute("aria-label", hubLabel(slot, cam) + " camera · " + h.pill);
           hubUnrestIdentity(el);
         }

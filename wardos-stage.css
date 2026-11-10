@@ -1,0 +1,65 @@
+/* ACERFIX · the viewport letterboxes one 1920x1080 stage. No min-width on the document. */
+html[data-wardos-stage],
+html[data-wardos-stage] > body {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  max-height: none !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  background-image: none !important;
+  background-color: #07080b !important;
+  background-size: auto !important;
+}
+html[data-wardos-stage] .wardos-stage {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background-color: #07080b;
+  background-image: var(--wg-hubbg, var(--km-bg, none));
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+}
+html[data-wardos-stage] .km-leaf,
+html[data-wardos-stage] .km-glow,
+html[data-wardos-stage] .km-fall,
+html[data-wardos-stage] .float-orbs {
+  display: none !important;
+}
+#wardos-diag {
+  position: absolute;
+  left: 48px;
+  top: 944px;
+  width: 900px;
+  height: 88px;
+  z-index: 40;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 8px 16px 8px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  column-gap: 16px;
+  align-content: center;
+  background: #101820;
+  color: #f4efe6;
+  border-radius: 12px;
+  font: 18px/1.2 system-ui, sans-serif;
+}
+#wardos-diag p { margin: 0; white-space: nowrap; }
+#wardos-diag .wardos-diag-title { font-size: 18px; }
+.wardos-diag-close {
+  width: 80px;
+  height: 64px;
+  font-size: 18px;
+  color: #f4efe6;
+  background: #1c2430;
+  border: 2px solid #c4b49a;
+  border-radius: 12px;
+}
+.wardos-diag-close:focus-visible {
+  outline: 3px solid #f4efe6;
+  outline-offset: -6px;
+}

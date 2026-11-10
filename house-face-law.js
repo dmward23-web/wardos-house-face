@@ -187,6 +187,8 @@
       if (Array.isArray(data.leaveBys)) data.leaveBys = data.leaveBys.filter(function (it) { return !rowTherapy(it); });   /* LIVEFIX1 */
       var q = data.boardStrip && data.boardStrip.queue;
       if (Array.isArray(q)) data.boardStrip.queue = q.filter(function (it) { return !isDressDay(rowText(it)) && !rowTherapy(it); });
+      if (g.HouseEventDisplay && typeof HouseEventDisplay.scrubPayload === "function") HouseEventDisplay.scrubPayload(data);
+      Object.keys(kids).forEach(function (id) { if (kids[id] && isAinsley(kids[id], id)) cleanAinsley(kids[id]); });
     } catch (e) { /* never break a board over a filter */ }
     return data;
   }

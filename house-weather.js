@@ -153,6 +153,9 @@
   /* P1FIX B73 (wall re-judge) · dark = the sun is below the horizon at the house (solar elevation under -0.833 deg,
      NOAA low-precision formula), so 6:41 AM in October (before sunrise) gets a moon, not a sun. */
   function sunDown(now) {
+    if (global.HouseScene && typeof HouseScene.sunDown === "function") {
+      return HouseScene.sunDown(now || (HouseScene.now ? HouseScene.now() : new Date()));
+    }
     var rad = Math.PI / 180, ms = now.getTime();
     var n = ms / 86400000 + 2440587.5 - 2451545.0;            /* days since J2000 */
     var L = (280.460 + 0.9856474 * n) % 360, g = ((357.528 + 0.9856003 * n) % 360) * rad;
@@ -168,7 +171,7 @@
      Night = sunDown() (solar elevation under -0.833 deg at the house); sun and sun-cloud icons read as moon and cloud. */
   function nightIcon(d) {
     if (!d || !d.icon) return d;
-    var dn = sunDown(new Date()); if (dn === null ? d.isDay !== 0 : !dn) return d;
+    var dn = sunDown(global.HouseScene && HouseScene.now ? HouseScene.now() : new Date()); if (dn === null ? d.isDay !== 0 : !dn) return d;
     var map = { "\u2600": "\ud83c\udf19", "\u2600\ufe0f": "\ud83c\udf19", "\u26c5": "\u2601", "\ud83c\udf24": "\u2601", "\ud83c\udf24\ufe0f": "\u2601", "\ud83c\udf25": "\u2601" };
     if (!map[d.icon]) return d;
     var o = {}; for (var k in d) o[k] = d[k];
@@ -233,7 +236,7 @@
     el.classList.add("wx-card", "wx-live");
     /* LAW8C1 · no empty pill while loading: the chip stays hidden until a real reading lands; a failed load stays hidden and is
        flagged on the element (data-wx-state="down") for the health checks, never drawn as a dash */
-    if (!el.classList.contains("is-live")) { el.style.setProperty("display", "none", "important"); el.setAttribute("data-wx-state", "loading"); }
+    if (el.id !== "house-wx" && !el.classList.contains("is-live")) { el.style.setProperty("display", "none", "important"); el.setAttribute("data-wx-state", "loading"); }
     el.innerHTML =
       '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
       + '<div class="wx-hdr-text wx-text">'
@@ -245,15 +248,16 @@
       if (!(err || !data)) { el.style.removeProperty("display"); el.setAttribute("data-wx-state", "live"); }
       if (err || !data) {
         el.classList.remove("is-live");
-        el.setAttribute("data-wx-state", "down"); el.style.setProperty("display", "none", "important"); /* P1FIX · offline: no icon-only row */
+        el.setAttribute("data-wx-state", "down");
         el.innerHTML =
           '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
           + '<div class="wx-hdr-text wx-text">'
           + '<div class="wx-kicker">Weather</div>'
-          + '<div class="wx-line"><span class="wx-temp"></span><span class="wx-cond">Weather later</span></div>'
-          + '<div class="wx-sub">retry</div>'
+          + '<div class="wx-line"><span class="wx-temp"></span><span class="wx-cond">Unavailable</span></div>'
+          + '<div class="wx-sub"></div>'
           + "</div>";
-        el.style.setProperty("display", "none", "important"); /* NODATA1 · no reading = no chip (never show a dash); comes back on the next good load. NODATA3 · !important so the phone header's display:flex !important can't show a bare dash */
+        if (el.id === "house-wx") el.style.removeProperty("display");
+        else el.style.setProperty("display", "none", "important");
         return;
       }
       paint(el, data);

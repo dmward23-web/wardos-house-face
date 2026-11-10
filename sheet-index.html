@@ -7,10 +7,13 @@
 <script src="school-names.js?v=SUNHOME1"></script>
 <script src="house-nomoney.js?v=KIDCRIT1"></script>
 <script src="house-face-law.js?v=FACESTRIP1"></script>
+<script src="house-scene.js?v=ACERFIX1"></script>
+<script src="house-event-display.js?v=ACERFIX1"></script>
+<script src="wardos-stage.js?v=ACERFIX1"></script>
 <script src="house-pair.js?v=HUBPAIR1"></script>
 <script src="house-money-bind.js?v=DAYPKG1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
-<meta name="viewport" id="hf-viewport" content="width=1920, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="viewport" id="hf-viewport" content="width=device-width, initial-scale=1" />
 <script src="away-filter.js?v=SUNHOME1" data-away-install data-dan-view></script>
 <script>/* ACER1 · the wall board is one 1920x1080 canvas. No phone viewport. */</script>
 <link rel="manifest" href="manifest.webmanifest" />
@@ -4181,40 +4184,44 @@ html body .pf-flag--pair { display: none !important; }
  </div>
  </header>
 
- <div class="hub-cam-deck" id="hub-cam-deck" hidden aria-label="Nest cameras · live when stream plays">
- <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Camera 1 · STILL">
+ <div class="hub-cam-deck" id="hub-cam-deck" aria-label="Cameras">
+ <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Camera unavailable">
  <div class="hub-cam-media-wrap">
- <img class="hub-cam-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Camera 1 still"/>
+ <img class="hub-cam-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Camera unavailable"/>
  <span class="hub-cam-pill hub-cam-pill--corner is-still">STILL</span>
  </div>
  <div class="hub-cam-foot">
- <span class="hub-cam-label">Camera 1</span>
+ <span class="hub-cam-label">Camera unavailable</span>
  <span class="hub-cam-kind" hidden aria-hidden="true">STILL</span>
  </div>
  </a>
- <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Camera 2 · STILL">
+ <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Camera unavailable">
  <div class="hub-cam-media-wrap">
- <img class="hub-cam-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Camera 2 still"/>
+ <img class="hub-cam-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Camera unavailable"/>
  <span class="hub-cam-pill hub-cam-pill--corner is-still">STILL</span>
  </div>
  <div class="hub-cam-foot">
- <span class="hub-cam-label">Camera 2</span>
+ <span class="hub-cam-label">Camera unavailable</span>
  <span class="hub-cam-kind" hidden aria-hidden="true">STILL</span>
  </div>
  </a>
- <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Camera 3 · STILL">
+ <a class="hub-cam hub-cam-still" href="sheet-google-home.html" aria-label="Camera unavailable">
  <div class="hub-cam-media-wrap">
- <img class="hub-cam-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Camera 3 still"/>
+ <img class="hub-cam-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Camera unavailable"/>
  <span class="hub-cam-pill hub-cam-pill--corner is-still">STILL</span>
  </div>
  <div class="hub-cam-foot">
- <span class="hub-cam-label">Camera 3</span>
+ <span class="hub-cam-label">Camera unavailable</span>
  <span class="hub-cam-kind" hidden aria-hidden="true">STILL</span>
  </div>
  </a>
  </div>
 
  <div class="hub-upper hub-upper--cams hub-upper--cmd hub-upper--hot">
+ <a class="hub-next" id="hub-next-leave" href="sheet-today.html">
+  <span class="hub-next-time"></span>
+  <span class="hub-next-title">Calendar unavailable</span>
+ </a>
  <section class="leaveby leaveby--cmd leaveby--hot" data-layout="day" aria-label="Schedule · today and tomorrow">
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
@@ -4260,7 +4267,8 @@ html body .pf-flag--pair { display: none !important; }
  <button type="button" class="hub-lights-bulk-btn" id="lights-all-off">All Off</button>
  </div>
  <div class="hub-lights-grid" id="hub-lights-grid" aria-label="Per-room switches"></div>
- <a class="hub-lights-more" href="sheet-lights.html">Full lights board</a>
+ <a class="hub-lights-more" href="sheet-lights.html">Full lights</a>
+ <span id="hub-lights-more-count"></span>
  </section>
  <!-- SPOTIFY1 · phone control strip (under lights) · painted by house-spotify.js -->
  <section class="sp-tile sp-strip" id="hub-spotify-strip" data-sp-tile aria-label="Spotify"></section>
@@ -4278,6 +4286,16 @@ html body .pf-flag--pair { display: none !important; }
  <a class="who-up-go" data-who-go href="sheet-today.html">OPEN</a>
  </section>
 
+ <nav class="hub-launch" aria-label="Boards">
+ <a href="sheet-today.html">Today</a>
+ <a href="month.html">Month</a>
+ <a href="sheet-lights.html">Lights</a>
+ <a href="sheet-google-home.html">Cameras</a>
+ <a href="sheet-chores.html">Chores</a>
+ <a href="sheet-groceries.html">Groceries</a>
+ <a href="sheet-weekend.html">Weekend</a>
+ <a href="sheet-win.html">Trips</a>
+ </nav>
  <div class="grid-wrap">
  <div class="grid-hdr grid-hdr--cams">
  <div class="grid-title">Sheet roster</div>
@@ -4453,7 +4471,7 @@ html body .pf-flag--pair { display: none !important; }
 <script src="house-kid-engage.js?v=SUNHOME1"></script>
 <script src="house-hub-tiles-bind.js?v=SUNHOME1"></script>
 <script src="house-sensi.js?v=SUNHOME1"></script>
-<script src="nest-webrtc-client.js?v=FOLLOWUP6"></script>
+<script src="nest-webrtc-client.js?v=ACERFIX-CAM1"></script>
 <script src="house-nest.js?v=CAMREST3"></script>
 <script src="hub-key-entry.js?v=FOLLOWUP6"></script>
 <script src="house-lights.js?v=SUNHOME1"></script>
@@ -4498,26 +4516,6 @@ html body .pf-flag--pair { display: none !important; }
  paintHubLive();
 })();
 </script>
-<script>
-/* ACER1 · one 1920x1080 canvas. Do not scale it to the window. */
-(function () {
-  function fitPortrait() {
-    var panel = document.querySelector(".panel");
-    if (!panel) return;
-    panel.style.transform = "none";
-    panel.style.transformOrigin = "top left";
-    panel.style.setProperty("margin-left", "0", "important");
-    panel.style.setProperty("margin-top", "0", "important");
-    panel.style.setProperty("margin-bottom", "0", "important");
-    document.body.style.removeProperty("height");
-    document.documentElement.setAttribute("data-hub-fit", "acer-1920");
-    document.documentElement.style.setProperty("--hub-fit-scale", "1");
-  }
-  fitPortrait();
-  window.addEventListener("resize", fitPortrait, { passive: true });
-})();
-
-</script>
 <script src="house-fresh.js?v=JARTAP1D2"></script>
 <style>
 /* NOOPEN1 · no OPEN buttons anywhere, the whole card is the tap target */
@@ -4550,5 +4548,8 @@ s("m0",M[m]);s("m1",M[(m+1)%12]);s("w0","Week "+Math.ceil((d+new Date(y,m,1).get
 <script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
 <link rel="stylesheet" href="wall-acer-lock.css?v=ACER1" />
+<link rel="stylesheet" href="hub-compose.css?v=ACERFIX1" />
+<link rel="stylesheet" href="wardos-stage.css?v=ACERFIX1" data-wardos-stage-css="1" />
+<script src="hub-compose.js?v=ACERFIX1"></script>
 </body>
 </html>

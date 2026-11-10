@@ -983,8 +983,7 @@
     var paired = false;
     try { paired = !!(window.PrivateFeed && PrivateFeed.pairState && PrivateFeed.pairState() === "paired"); } catch (ePair) {}
     if (/sheet-index\.html$/.test((doc.defaultView || window).location.pathname || "") && !paired) {
-      panel.hidden = true;
-      return;
+      panel.hidden = false;
     }
     panel.hidden = false;
     if (_dimDrag) return; /* don't wipe mid-drag fill */

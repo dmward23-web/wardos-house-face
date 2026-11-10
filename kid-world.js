@@ -375,7 +375,9 @@
     return w > h * 1.15 ? "landscape" : "portrait";
   }
   function wallView() {
-    return global.innerWidth === 1920 && global.innerHeight === 1080;
+    var w = global.innerWidth || 0, h = global.innerHeight || 0;
+    if (w >= 1400 && h >= 700) return true;
+    return w === 1920 && h === 1080;
   }
   /* LEANLOAD1 · a board with data-lean-plates="1" loads only its own kid's world, creature and
      items, in the current orientation; the other orientation loads on first rotate. */
@@ -1858,9 +1860,11 @@
   }
   World.prototype.resize = function () {
     if (wallView() && this.cv.classList.contains("kw-canvas")) {
-      this.dpr = 1;
-      this.cv.width = 900;
-      this.cv.height = 864;
+      this.dpr = Math.min(2, global.devicePixelRatio || 1);
+      this.cv.width = Math.round(900 * this.dpr);
+      this.cv.height = Math.round(864 * this.dpr);
+      this.cv.style.width = "900px";
+      this.cv.style.height = "864px";
       return;
     }
     var dpr = Math.min(2, global.devicePixelRatio || 1);
@@ -2301,7 +2305,8 @@
     cv.addEventListener("click", onWorldJarClick); /* JARTAP1 */
     ["pointerup", "pointercancel", "pointerleave"].forEach(function (n) { cv.addEventListener(n, clearHold); });
     cv.addEventListener("pointermove", function (e) {
-      bg.ptr = e.clientX / Math.max(1, innerWidth);
+      var sp = global.WardosStage && WardosStage.point ? WardosStage.point(e) : null;
+      bg.ptr = sp ? sp.x / 1920 : e.clientX / Math.max(1, innerWidth);
     }, { passive: true });
     global.addEventListener("deviceorientation", function (ev) {
       if (ev.gamma == null) return;

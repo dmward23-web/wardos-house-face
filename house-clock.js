@@ -5,7 +5,12 @@
   var TZ = "America/Chicago";
   /* LIVEWX2 · one clock per page: when livinghouse/clock.js is loaded the header follows LHClock (so a ?now= still never shows two
      different times); absent = real time */
-  function cur() { var L = global.LHClock; return L && typeof L.now === "function" ? L.now() : new Date(); }
+  function cur() {
+    var S = global.HouseScene;
+    if (S && typeof S.now === "function") return S.now();
+    var L = global.LHClock;
+    return L && typeof L.now === "function" ? L.now() : new Date();
+  }
 
   function parts(date) {
     var d = date || cur();
@@ -134,7 +139,7 @@
     });
     root.querySelectorAll("[data-live='date-long']").forEach(function (el) {
       if (!el.closest || !el.closest(".hdr-date, .live-clock-host, header, footer, .ftr, .sec-hdr, .sec-meta")) return;
-      el.textContent = s.long || s.dateLine;
+      el.textContent = (el.closest(".hdr-date") && s.dateLine) ? s.dateLine : (s.long || s.dateLine);
     });
     /* DADFIX1 · always refresh date-short (Dad Today meta was stuck on Sun Sep 27) */
     root.querySelectorAll("[data-live='date-short']").forEach(function (el) {

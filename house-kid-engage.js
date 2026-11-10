@@ -816,6 +816,7 @@
   }
 
   function enhanceTile(anchor) {
+    if (isMainHubFace()) return null;
     var kidId = null;
     if (anchor.classList.contains("ainsley")) kidId = "ainsley";
     else if (anchor.classList.contains("hayes")) kidId = "hayes";
@@ -1186,6 +1187,7 @@
       w.loadJSON(function (err, d) {
         if (!err && d) {
           try { w._data = d; } catch (e) { /* */ }
+          try { document.dispatchEvent(new CustomEvent("house:kids-data-ready", { detail: { data: d } })); } catch (e2) { /* */ }
         }
         onDataReady();
       });
