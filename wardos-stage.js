@@ -81,6 +81,19 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     node.style.transform = "scale(" + s + ")";
     document.documentElement.setAttribute("data-wardos-stage", "1");
     ensureHome(node);
+    if (!document.getElementById("prism-face-css")) {
+      var face = document.createElement("link");
+      face.id = "prism-face-css";
+      face.rel = "stylesheet";
+      face.href = "prism-face.css?v=PRISM1";
+      document.head.appendChild(face);
+    }
+    if (!document.getElementById("prism-face-js")) {
+      var faceJs = document.createElement("script");
+      faceJs.id = "prism-face-js";
+      faceJs.src = "prism-face.js?v=PRISM1";
+      document.body.appendChild(faceJs);
+    }
     document.documentElement.style.setProperty("--wardos-s", String(s));
     liftType();
     unclip();
@@ -182,7 +195,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
       el = nodes[i];
       if (el.closest && el.closest("canvas, script, style, svg")) continue;
       px = parseFloat(getComputedStyle(el).fontSize) || 0;
-      if (px > 0 && px < 24) el.style.setProperty("font-size", "24px", "important");
+      if (px > 0 && px < 20) el.style.setProperty("font-size", "20px", "important");
     }
   }
 

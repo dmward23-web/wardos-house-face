@@ -1135,29 +1135,18 @@ document.addEventListener("DOMContentLoaded", function () {
       var room = (col.getBoundingClientRect().bottom - list.getBoundingClientRect().top) / (scale || 1) - (parseFloat(cs.paddingTop) || 0);
       if (isFinite(room)) H = Math.min(H, room);
       if (!cards.length || H < 80) return;
-      var natural = cards[0].offsetHeight || 140;
-      var n = Math.max(1, Math.min(cards.length, Math.floor((H + gap) / (natural + gap))));
-      var h = (H - (n - 1) * gap) / n;
-      if (h < natural) {
-        n = Math.max(1, n - 1);
-        h = (H - (n - 1) * gap) / n;
-      }
+      var n = Math.max(1, Math.min(cards.length, Math.floor(H / 136)));
       list.style.setProperty("scrollbar-gutter", "auto", "important");
       list.style.setProperty("padding-left", "0", "important");
       list.style.setProperty("padding-right", "0", "important");
       cards.forEach(function (card, i) {
-        if (i >= n) {
-          card.style.setProperty("display", "none", "important");
-          return;
-        }
-        card.style.removeProperty("display");
-        card.style.setProperty("position", "relative", "important");
-        card.style.setProperty("opacity", "1", "important");
-        card.style.setProperty("height", h + "px", "important");
-        card.style.setProperty("min-height", h + "px", "important");
-        card.style.setProperty("max-height", h + "px", "important");
+        card.style.setProperty("height", "128px", "important");
+        card.style.setProperty("min-height", "128px", "important");
+        card.style.setProperty("max-height", "128px", "important");
+        card.style.setProperty("flex", "0 0 128px", "important");
         card.style.setProperty("overflow", "hidden", "important");
-        card.style.setProperty("flex", "0 0 auto", "important");
+        if (i >= n) card.style.setProperty("display", "none", "important");
+        else card.style.removeProperty("display");
       });
       var more = cards.length > n;
       col.classList.toggle("has-more", more);

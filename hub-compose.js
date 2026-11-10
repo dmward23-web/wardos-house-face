@@ -88,10 +88,19 @@
     if (id === "dan") plate.setAttribute("data-dad-stage", "");
     var time = document.createElement("span");
     time.className = "roster-time";
-    time.textContent = view && view.time ? view.time : "";
+    time.textContent = view && view.time ? String(view.time).replace(/\b([ap])m\b/i, function (_, ap) { return ap.toUpperCase() + "M"; }) : "";
     var title = document.createElement("span");
     title.className = "roster-title";
-    title.textContent = view && view.title ? view.title : (data() ? "Quiet for now" : "Calendar unavailable");
+    if (view && view.title) {
+      title.textContent = view.title;
+      plate.classList.remove("roster-empty");
+    } else if (data()) {
+      title.textContent = "All done";
+      plate.classList.add("roster-empty");
+    } else {
+      title.textContent = "Calendar unavailable";
+      plate.classList.remove("roster-empty");
+    }
     plate.appendChild(time);
     plate.appendChild(title);
     anchor.appendChild(name);
@@ -136,15 +145,26 @@
     var time = card.querySelector(".hub-next-time");
     var title = card.querySelector(".hub-next-title");
     if (!week) {
+      card.hidden = false;
       if (time) time.textContent = "";
       if (title) title.textContent = "Calendar unavailable";
       return;
     }
-    if (!best) {
+    var shown = false;
+    if (best) {
+      Object.keys(NAMES).forEach(function (id) {
+        var kid = week.kids[id] || week.kids[id === "dan" ? "dad" : id];
+        var view = soonest(kid, id === "ainsley" || id === "dan" ? "shared" : id, false);
+        if (view && view.title === best.title) shown = true;
+      });
+    }
+    if (!best || shown) {
+      card.hidden = true;
       if (time) time.textContent = "";
-      if (title) title.textContent = "Nothing else today";
+      if (title) title.textContent = "";
       return;
     }
+    card.hidden = false;
     if (time) time.textContent = best.time || "All day";
     if (title) title.textContent = best.title;
   }

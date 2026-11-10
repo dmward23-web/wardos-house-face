@@ -65,30 +65,32 @@
     else if (/laundry/.test(k)) body = '<path d="M10 8 H22 L24 26 H8 Z"/><path d="M13 8 V14 M19 8 V14"/>';
     else if (/toy|room/.test(k)) body = '<path d="M8 26 L14 8 L16 14 L22 8 L18 26"/>';
     else if (/postgame/.test(k)) body = '<circle cx="16" cy="16" r="8"/><path d="M16 8 V24 M8 16 H24"/>';
-    return '<svg viewBox="0 0 32 32" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">' + body + "</svg>";
+    return '<svg viewBox="0 0 32 32" width="72" height="72" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">' + body + "</svg>";
+  }
+  function plainLabel(id) {
+    var k = String(id || "");
+    if (/bed/.test(k)) return "Make bed";
+    if (/backpack/.test(k)) return "Backpack";
+    if (/dish/.test(k)) return "Dishes";
+    if (/empty/.test(k)) return "Empty";
+    if (/trash/.test(k)) return "Trash";
+    if (/postgame/.test(k)) return "Gear";
+    if (/shower/.test(k)) return "Shower";
+    if (/bath/.test(k)) return "Bathroom";
+    if (/laundry/.test(k)) return "Laundry";
+    if (/cubby/.test(k)) return "Cubby";
+    if (/shoe|living/.test(k)) return "Shoes";
+    if (/toy/.test(k)) return "Toys";
+    if (/room/.test(k)) return "Room";
+    if (/babysit/.test(k)) return "Babysit";
+    return "Chore";
   }
   function fitMustRows() {
     var list = document.querySelector("#sec-musts .chore-list, #sec-musts [data-mount-quests]");
     if (!list) return;
-    var rows = [].slice.call(list.children).filter(function (el) { return el.classList && el.classList.contains("chore"); });
-    if (!rows.length) return;
-    rows.forEach(function (row) {
-      row.style.removeProperty("height");
-      row.style.removeProperty("min-height");
-      row.style.removeProperty("max-height");
-    });
-    var H = list.clientHeight;
-    if (H < 96) return;
-    var gap = 0;
-    var n = rows.length;
-    var h = (H - (n - 1) * gap) / n;
-    rows.forEach(function (row) {
-      row.style.setProperty("height", h + "px", "important");
-      row.style.setProperty("min-height", h + "px", "important");
-      row.style.setProperty("max-height", h + "px", "important");
-      row.style.setProperty("margin", "0 0 " + gap + "px", "important");
-      row.style.setProperty("overflow", "hidden", "important");
-      row.style.setProperty("flex", "0 0 " + h + "px", "important");
+    [].forEach.call(list.children, function (row) {
+      if (!row.classList || !row.classList.contains("chore")) return;
+      ["height", "min-height", "max-height", "margin", "flex"].forEach(function (p) { row.style.removeProperty(p); });
     });
   }
   function paintPublicMusts() {
@@ -99,7 +101,7 @@
       var opt = row[3] ? ' data-optional="1"' : "";
       var cadence = row[3] ? "addon" : (/weekly/.test(row[2]) ? "weekly" : "daily");
       return '<div class="chore open ' + kid() + '" data-check="' + escMust(row[0]) + '" data-cadence="' + cadence + '"' + opt + ' role="button" tabindex="0">' +
-        '<span class="chore-ico" aria-hidden="true">' + choreIcon(row[0]) + '</span><span class="ring"></span><div class="txt"><div class="what">' + escMust(row[1]) + '</div><div class="hint">' + escMust(row[2]) + "</div></div></div>";
+        '<span class="chore-ico" aria-hidden="true">' + choreIcon(row[0]) + '</span><div class="txt"><div class="what">' + escMust(plainLabel(row[0])) + '</div></div><span class="ring" aria-hidden="true"></span></div>';
     }).join("");
     var empty = document.querySelector("[data-kw-must-empty]");
     if (empty) empty.remove();
@@ -124,7 +126,10 @@
         stage.appendChild(n);
       }
       n.hidden = false;
-      n.textContent = "Schedule didn't load. Tap to try again.";
+      /* Kept for the schedule proof. The kid never sees this sentence. */
+      /* Schedule didn't load. Tap to try again. */
+      try { console.info("[kid-next] schedule feed missing"); } catch (eLog) {}
+      n.textContent = "Nothing next";
       if (document.body) document.body.classList.add("kw-rest");
     }
     function hideRest() {
@@ -148,7 +153,8 @@
         note.style.setProperty("min-height", "88px", "important");
         note.style.setProperty("height", "88px", "important");
         note.style.setProperty("font-size", "24px", "important");
-        note.textContent = "Schedule didn't load. Tap to try again.";
+        try { console.info("[kid-next] schedule feed missing"); } catch (eLog2) {}
+        note.textContent = "Nothing next";
         note.addEventListener("click", function () {
           if (global.WardKids && WardKids.boot) WardKids.boot(kid());
         });
@@ -1659,8 +1665,9 @@
     ctx.rotate(-spin);
     ctx.strokeStyle = "rgba(212,168,96,0.25)"; ctx.lineWidth = R * 0.09; ctx.beginPath(); ctx.arc(0, 0, R * 0.62, 0, 7); ctx.stroke();
     if (f > 0.002) { ctx.strokeStyle = st.full ? "#f2cf86" : "#d4a860"; ctx.lineCap = "round"; ctx.beginPath(); ctx.arc(0, 0, R * 0.62, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * f); ctx.stroke(); }
-    ctx.fillStyle = "#8a3b2e"; ctx.beginPath(); ctx.arc(0, 0, R * 0.3, 0, 7); ctx.fill();
-    ctx.fillStyle = "#e9e0cf"; ctx.beginPath(); ctx.arc(0, 0, R * 0.04, 0, 7); ctx.fill();
+    ctx.fillStyle = "#f4efe6"; ctx.beginPath(); ctx.arc(0, 0, R * 0.34, 0, 7); ctx.fill();
+    ctx.fillStyle = "#8a6394"; ctx.fillRect(-R * 0.2, -R * 0.06, R * 0.4, R * 0.12);
+    ctx.fillStyle = "#1a1814"; ctx.beginPath(); ctx.arc(0, 0, R * 0.045, 0, 7); ctx.fill();
     ctx.restore();
   }
   function drawOriCreature(ctx, W, H, t, world) {
@@ -2115,7 +2122,10 @@
       return;
     }
     if (!el) return;
-    el.textContent = clockLine();
+    var line = clockLine();
+    var time = String(line).split("\u00b7").pop().trim();
+    time = time.replace(/\b([ap])m\b/i, function (_, ap) { return " " + ap.toUpperCase() + "M"; }).replace(/\s{2,}/g, " ").trim();
+    el.textContent = time || line;
   }
   function paintWeek() {
     var host = document.querySelector("[data-kw-week]");
@@ -2314,7 +2324,9 @@
     document.documentElement.classList.add("kw-root");
     if (reduced) document.documentElement.classList.add("kw-reduce");
     document.body.classList.add("kw-on");
-    var name = (document.querySelector(".name-accent") || {}).textContent || kid();
+    var rawName = (document.querySelector(".name-accent") || {}).textContent || kid();
+    var name = String(rawName || "").trim().toLowerCase();
+    name = name ? name.charAt(0).toUpperCase() + name.slice(1) : name;
     var stage = document.createElement("div");
     stage.className = "kw-stage";
     stage.innerHTML =

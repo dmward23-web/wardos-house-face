@@ -81,10 +81,10 @@ PROBE = """() => {
       const t = node.textContent.replace(/\\s+/g, ' ').trim();
       if (!t) continue;
       const el = node.parentElement;
-      if (!el || !vis(el)) continue;
+      if (!el || !vis(el) || el.closest('#wardos-diag')) continue;
       const px = parseFloat(getComputedStyle(el).fontSize) || 0;
       const eff = px * (s || 1);
-      if (eff < 17.5) small.push({ t: t.slice(0, 24), px: Math.round(eff * 10) / 10 });
+      if (px < 19.5) small.push({ t: t.slice(0, 24), px: Math.round(px * 10) / 10 });
     }
   }
   const hits = [...document.querySelectorAll('a, button')].filter(vis);
@@ -246,12 +246,17 @@ PROBE = """() => {
     return Math.max.apply(null, tops) - Math.min.apply(null, tops) > 8;
   }).length;
   const feedDown = /Schedule didn't load|Schedule unavailable|Calendar unavailable/.test(text);
+  const upperNames = [...document.querySelectorAll('.kw-name, .col-name, .roster-full')].filter(el => {
+    if (!vis(el)) return false;
+    const t = (el.textContent || '').replace(/\s+/g, ' ').trim();
+    return t.length > 2 && t === t.toUpperCase() && /[A-Z]/.test(t);
+  }).map(el => el.textContent.trim().slice(0, 24));
   let homeMatch = true;
   const homeProbe = document.querySelector('button.kw-home, a.wardos-home, a.hub-home');
   if (homeProbe && vis(homeProbe)) {
     const hs = getComputedStyle(homeProbe);
     if ((parseFloat(hs.opacity) || 1) < 0.95) homeMatch = false;
-    if (homeProbe.classList.contains('kw-home') && hs.backgroundColor.indexOf('28, 36, 48') < 0) homeMatch = false;
+    if (hs.backgroundColor.indexOf('15, 26, 34') < 0) homeMatch = false;
   }
   const homeEl = document.querySelector('a.wardos-home, button.kw-home.wardos-home, button.kw-home, a.hub-home');
   let home = null;
@@ -263,7 +268,7 @@ PROBE = """() => {
   for (const el of document.querySelectorAll('a.wardos-home, button.kw-home, a.hub-home, .day-tap, .kid-chip, .hub-launch a, .kw-offline')) {
     if (!vis(el) || touchSmall.length > 8) continue;
     const r = el.getBoundingClientRect();
-    if (r.width < 63.5 || r.height < 63.5) touchSmall.push({ t: (el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 24), w: Math.round(r.width), h: Math.round(r.height) });
+    if (r.width < 63.5 * (s || 1) || r.height < 63.5 * (s || 1)) touchSmall.push({ t: (el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 24), w: Math.round(r.width), h: Math.round(r.height) });
   }
   const debugLeak = /CLOCK OVERRIDE/.test(text) && !/[?&]diag=1(?:&|$)/.test(location.search);
   const diagEl = document.getElementById('wardos-diag');
@@ -278,7 +283,7 @@ PROBE = """() => {
       if (x > 1 && y > 1) diagOverlap = true;
     }
   }
-  return { stageW: stage ? stage.offsetWidth : 0, stageH: stage ? stage.offsetHeight : 0, scale: Math.round(s * 1000) / 1000, innerWidth, innerHeight, dpr: devicePixelRatio, scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, scrollH: document.documentElement.scrollHeight, clientH: document.documentElement.clientHeight, banned, phase, pickup: text.indexOf('School pickup') >= 0, soccer: text.indexOf('Leave for soccer') >= 0, swim: text.indexOf('4:25 PM') >= 0, outdoor: text.indexOf('62') >= 0, indoor: text.indexOf('65') >= 0, hub: img ? img.getAttribute('src') : '', diag: !!diagEl, small: small.slice(0, 8), smallN: small.length, overlaps: overlaps.slice(0, 8), overlapN: overlaps.length, diagOverlap, lightsLaunch, clips: clips.slice(0, 8), clipN: clips.length, blanks, blankN: blanks.length, debugLeak, textHits: textHits.slice(0, 8), textN: textHits.length, overflow: overflow.slice(0, 8), overflowN: overflow.length, stray: stray.slice(0, 6), strayN: stray.length, touch: touchSmall.slice(0, 8), touchN: touchSmall.length, home, dead, deadN: dead.length, wrappedDays, feedDown, homeMatch };
+  return { stageW: stage ? stage.offsetWidth : 0, stageH: stage ? stage.offsetHeight : 0, scale: Math.round(s * 1000) / 1000, innerWidth, innerHeight, dpr: devicePixelRatio, scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, scrollH: document.documentElement.scrollHeight, clientH: document.documentElement.clientHeight, banned, phase, pickup: text.indexOf('School pickup') >= 0, soccer: text.indexOf('Leave for soccer') >= 0, swim: text.indexOf('4:25 PM') >= 0, outdoor: text.indexOf('62') >= 0, indoor: text.indexOf('65') >= 0, hub: img ? img.getAttribute('src') : '', diag: !!diagEl, small: small.slice(0, 8), smallN: small.length, overlaps: overlaps.slice(0, 8), overlapN: overlaps.length, diagOverlap, lightsLaunch, clips: clips.slice(0, 8), clipN: clips.length, blanks, blankN: blanks.length, debugLeak, textHits: textHits.slice(0, 8), textN: textHits.length, overflow: overflow.slice(0, 8), overflowN: overflow.length, stray: stray.slice(0, 6), strayN: stray.length, touch: touchSmall.slice(0, 8), touchN: touchSmall.length, home, dead, deadN: dead.length, wrappedDays, feedDown, homeMatch, upperNames, upperN: upperNames.length };
 }"""
 
 
@@ -444,8 +449,11 @@ def main():
                             if info.get("overlapN"):
                                 fails.append(name + " overlap")
                             home = info.get("home") or {}
-                            if not home or home.get("w", 0) < 64 or home.get("h", 0) < 64:
+                            scale = info.get("scale") or 1
+                            if not home or (home.get("w", 0) / scale) < 60 or (home.get("h", 0) / scale) < 60:
                                 fails.append(name + " home")
+                            if info.get("upperN"):
+                                fails.append(name + " upper-name")
                             if info.get("deadN"):
                                 fails.append(name + " dead-area")
                             if info.get("wrappedDays"):

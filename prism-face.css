@@ -1,0 +1,386 @@
+/* Prism · one surface, one border, one radius, one type scale, one Home, one clock. */
+:root {
+  --prism-ink: #f4efe6;
+  --prism-surface: rgba(15, 26, 34, 0.88);
+  --prism-solid: #0f1a22;
+  --prism-line: rgba(224, 195, 106, 0.4);
+  --prism-gold: #e0c36a;
+  --prism-radius: 16px;
+  --prism-name: 40px;
+  --prism-item: 32px;
+  --prism-meta: 20px;
+  --prism-ain: #8a6394;
+  --prism-hay: #3f8b71;
+  --prism-har: #42679a;
+}
+
+html[data-wardos-stage],
+html[data-wardos-stage] > body {
+  background-color: #07080b !important;
+  background-image: var(--wg-hubbg, url("month-theme/november/wall-dusk.webp")) !important;
+  background-size: cover !important;
+  background-position: center top !important;
+  scrollbar-width: none !important;
+}
+
+/* A1 · one Home. 64 square, dark, at 48,48. */
+html body .panel > header.hdr .hub-home {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+}
+html.kw-root body.kw-on .kw-home,
+html body .hub-home,
+html body .kw-home,
+html body a.wardos-home,
+html body button.kw-home.wardos-home {
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  max-width: 64px !important;
+  max-height: 64px !important;
+  border-radius: 16px !important;
+  background: #0f1a22 !important;
+  background-color: #0f1a22 !important;
+  border: 1px solid rgba(224, 195, 106, 0.4) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  color: #f4efe6 !important;
+}
+html body .hub-home img,
+html body .kw-home img,
+html body .wardos-home img {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+}
+
+/* A2 · one clock chip. */
+html body .kw-clock,
+html body .live-clock-host,
+html body header .hdr-date {
+  background: rgba(15, 26, 34, 0.88) !important;
+  border: 1px solid rgba(224, 195, 106, 0.4) !important;
+  border-radius: 16px !important;
+  color: #f4efe6 !important;
+  font-family: system-ui, sans-serif !important;
+  font-variant-numeric: tabular-nums !important;
+  box-shadow: none !important;
+}
+html body .kw-clock,
+html body .live-clock,
+html body .hdr-date-time {
+  font-family: system-ui, sans-serif !important;
+  font-size: 32px !important;
+  letter-spacing: 0 !important;
+  text-shadow: none !important;
+}
+html body .panel.panel > header.hdr .hdr-date-long,
+html body .panel.panel > header.hdr .hdr-date-dow,
+html body .panel.panel > header.hdr .hdr-date-kicker { display: none !important; }
+html body .roster-plate.roster-empty .roster-title {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  font-size: 20px !important;
+  line-height: 32px !important;
+  white-space: nowrap !important;
+}
+html body .roster-plate.roster-empty { overflow: visible !important; }
+
+/* A3 · kid color on the name and the tile edge. */
+html body .tile.ainsley { border: 1px solid #8a6394 !important; }
+html body .tile.hayes { border: 1px solid #3f8b71 !important; }
+html body .tile.harris { border: 1px solid #42679a !important; }
+html body .tile.dan { border: 1px solid rgba(224, 195, 106, 0.4) !important; }
+html body .kw-name,
+html body .col-name,
+html body .kid-chip {
+  font-size: 40px !important;
+  line-height: 1.1 !important;
+  font-weight: 800 !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  border-radius: 16px !important;
+  border: 0 !important;
+}
+body.theme-ainsley .kw-name,
+html body[data-kid="ainsley"] .kw-name,
+.col[aria-label="Ainsley chores"] .col-name,
+html body .kid-chip.ainsley { background: #8a6394 !important; }
+body.theme-hayes .kw-name,
+html body[data-kid="hayes"] .kw-name,
+.col[aria-label="Hayes chores"] .col-name,
+html body .kid-chip.hayes { background: #3f8b71 !important; }
+body.theme-harris .kw-name,
+html body[data-kid="harris"] .kw-name,
+.col[aria-label="Harris chores"] .col-name,
+html body .kid-chip.harris { background: #42679a !important; }
+html.kw-root body.kw-on #sec-musts,
+html.kw-root body.kw-on #sec-musts .chore-list,
+html.kw-root body.kw-on #sec-musts [data-mount-quests],
+html.kw-root body.kw-on #sec-jar,
+html.kw-root body.kw-on #sec-days {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html body .kid-chip .dot,
+html body .roster-abbr { display: none !important; }
+
+/* B · hub tiles, cameras, lights, nav. */
+html body .roster-plate,
+html body .tile [data-dad-stage] {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 140px !important;
+  max-height: 140px !important;
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  box-sizing: border-box !important;
+  border-radius: 0 0 16px 16px !important;
+  background: rgba(15, 26, 34, 0.88) !important;
+  color: #f4efe6 !important;
+}
+html body .roster-plate.roster-empty {
+  left: 12px !important;
+  right: 12px !important;
+  width: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  bottom: 12px !important;
+  padding: 0 12px !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+html body .roster-empty .roster-time { display: none !important; }
+html body .roster-title,
+html body .roster-time,
+html body .roster-full {
+  font-size: 32px !important;
+  line-height: 1.15 !important;
+  text-transform: none !important;
+}
+html body .roster-empty .roster-title { font-size: 20px !important; }
+html body .hub-next[hidden] { display: none !important; }
+html body #hub-cam-deck.cams-resting {
+  height: 56px !important;
+  max-height: 56px !important;
+  grid-template-columns: 1fr !important;
+}
+html body #hub-cam-deck.cams-resting .hub-cam:not(:first-child) { display: none !important; }
+html body #hub-cam-deck.cams-resting .hub-cam,
+html body #hub-cam-deck.cams-resting .hub-cam-foot {
+  height: 56px !important;
+  min-height: 56px !important;
+  max-height: 56px !important;
+}
+html body .hub-lights-bulk {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+html body .hub-lights-bulk-btn {
+  flex: 1 1 0 !important;
+  white-space: nowrap !important;
+  min-height: 64px !important;
+  height: 64px !important;
+  border-radius: 16px !important;
+}
+html body .hub-lights-link { display: none !important; }
+html body .hub-launch {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+html body .hub-launch a {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  min-height: 88px !important;
+  font-size: 20px !important;
+  background: rgba(15, 26, 34, 0.88) !important;
+  border: 1px solid rgba(224, 195, 106, 0.4) !important;
+  border-radius: 16px !important;
+  color: #f4efe6 !important;
+}
+html body .hub-launch a::before {
+  content: "";
+  width: 48px;
+  height: 48px;
+  background: center / 28px 28px no-repeat;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke='%23f4efe6' stroke-width='2'><rect x='6' y='6' width='20' height='20' rx='4'/></svg>");
+}
+html body .hub-launch a[href*="chores"] {
+  border-color: #3f8b71 !important;
+  color: #d7f3e8 !important;
+}
+html body header .hdr-ovals .oval,
+html body header .oval {
+  background: #0f1a22 !important;
+  opacity: 1 !important;
+}
+
+/* C · kid rows, jar, next, sound. */
+html.kw-root body.kw-on .kw-hud {
+  grid-template-columns: 64px minmax(160px, 1fr) auto 64px !important;
+}
+html.kw-root body.kw-on .kw-clock { grid-column: 3 !important; justify-self: end !important; padding: 8px 16px !important; }
+html.kw-root body.kw-on .kw-mute { grid-column: 4 !important; justify-self: end !important; }
+html.kw-root body.kw-on .kw-mute,
+html.kw-root body.kw-on .kw-mute.house-snd {
+  width: 64px !important;
+  min-width: 64px !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  padding: 0 !important;
+  border-radius: 16px !important;
+  background: #0f1a22 !important;
+  border: 1px solid rgba(224, 195, 106, 0.4) !important;
+  font-size: 0 !important;
+  color: transparent !important;
+}
+html.kw-root body.kw-on .kw-mute::after {
+  content: "" !important;
+  width: 28px;
+  height: 28px;
+  background: center / contain no-repeat url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke='%23f4efe6' stroke-width='2'><path d='M6 13h5l7-6v18l-7-6H6z'/><path d='M22 12a6 6 0 0 1 0 8'/></svg>");
+}
+html.kw-root body.kw-on #sec-musts .chore {
+  height: 120px !important;
+  min-height: 120px !important;
+  max-height: 120px !important;
+  margin: 0 0 8px !important;
+  padding: 12px 16px !important;
+  background: rgba(15, 26, 34, 0.88) !important;
+  color: #f4efe6 !important;
+  border: 1px solid rgba(224, 195, 106, 0.4) !important;
+  border-radius: 16px !important;
+}
+html.kw-root body.kw-on #sec-musts .hint { display: none !important; }
+html.kw-root body.kw-on #sec-musts .what {
+  font-size: 32px !important;
+  line-height: 1.15 !important;
+  color: #f4efe6 !important;
+}
+html.kw-root body.kw-on #sec-musts .chore-ico {
+  width: 72px !important;
+  height: 72px !important;
+  color: #f4efe6 !important;
+}
+html.kw-root body.kw-on #sec-musts .chore-ico svg { width: 72px !important; height: 72px !important; }
+html.kw-root body.kw-on #sec-musts .ring {
+  margin-left: auto !important;
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  border-radius: 50% !important;
+  border: 2px solid rgba(244, 239, 230, 0.7) !important;
+  background: transparent !important;
+  flex: none !important;
+}
+body.theme-ainsley #sec-musts .chore.done .ring { background: #8a6394 !important; border-color: #8a6394 !important; }
+body.theme-hayes #sec-musts .chore.done .ring { background: #3f8b71 !important; border-color: #3f8b71 !important; }
+body.theme-harris #sec-musts .chore.done .ring { background: #42679a !important; border-color: #42679a !important; }
+html.kw-root body.kw-on #sec-days,
+html.kw-root body.kw-on #sec-days .consume-hero {
+  background: rgba(15, 26, 34, 0.88) !important;
+  color: #f4efe6 !important;
+  border: 1px solid rgba(224, 195, 106, 0.4) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+  font-family: system-ui, sans-serif !important;
+}
+html.kw-root body.kw-on #sec-days .consume-hero-when,
+html.kw-root body.kw-on #sec-days .when {
+  font-family: system-ui, sans-serif !important;
+  font-size: 40px !important;
+  letter-spacing: 0 !important;
+}
+body.theme-ainsley #sec-days .consume-hero-when,
+body.theme-ainsley #sec-days .when {
+  font-size: 0 !important;
+  color: transparent !important;
+}
+body.theme-ainsley #sec-days .consume-hero::before {
+  content: "";
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+  margin-right: 12px;
+  vertical-align: middle;
+  background: center / contain no-repeat url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='26' fill='none' stroke='%23f4efe6' stroke-width='3'/><path d='M32 32 L32 16 M32 32 L44 38' fill='none' stroke='%23e0c36a' stroke-width='3' stroke-linecap='round'/></svg>");
+}
+html.kw-root body.kw-on #sec-jar .saves-bar-text,
+html.kw-root body.kw-on #sec-jar .jar-state,
+html.kw-root body.kw-on #sec-jar .bank-blurb { display: none !important; }
+html.kw-root body.kw-on #sec-jar .saves-plus,
+html.kw-root body.kw-on #sec-jar button.saves-plus {
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  border-radius: 16px !important;
+}
+html.kw-root body.kw-on .kid-pebble { display: none !important; }
+
+/* D · chores. */
+html body .panel > header.hdr {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html body .cheer-badge,
+html body .cheer-label,
+html body .wf-kidtabs { display: none !important; }
+html body .col { padding: 24px !important; box-sizing: border-box !important; }
+html body .panel .body > section.col .chore {
+  height: 128px !important;
+  min-height: 128px !important;
+  background: rgba(15, 26, 34, 0.88) !important;
+  border: 1px solid rgba(224, 195, 106, 0.4) !important;
+  border-radius: 16px !important;
+  color: #f4efe6 !important;
+}
+html body .chore .hint { display: none !important; }
+html body .chore .what { font-size: 32px !important; line-height: 1.15 !important; color: #f4efe6 !important; }
+html body .chore .quest-days {
+  display: grid !important;
+  grid-template-columns: repeat(7, 72px) !important;
+  gap: 10px !important;
+  width: auto !important;
+  justify-content: start !important;
+}
+html body .chore .day-tap {
+  width: 72px !important;
+  min-width: 72px !important;
+  max-width: 72px !important;
+  height: 72px !important;
+  min-height: 72px !important;
+  max-height: 72px !important;
+  flex: 0 0 72px !important;
+  border-radius: 16px !important;
+  font-size: 20px !important;
+  background: rgba(15, 26, 34, 0.55) !important;
+  color: #f4efe6 !important;
+  border: 1px solid rgba(224, 195, 106, 0.25) !important;
+}
+html body .day-tap.is-past { opacity: 0.45 !important; }
+html body .day-tap.is-today {
+  outline: 3px solid #e0c36a !important;
+  outline-offset: 2px !important;
+  opacity: 1 !important;
+}
+.chore.ainsley .day-tap.done { background: #8a6394 !important; color: #fff !important; opacity: 1 !important; }
+.chore.hayes .day-tap.done { background: #3f8b71 !important; color: #fff !important; opacity: 1 !important; }
+.chore.harris .day-tap.done { background: #42679a !important; color: #fff !important; opacity: 1 !important; }

@@ -263,6 +263,25 @@
     return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
   }
 
+  function plainChoreLabel(id, fallback) {
+    var k = String(id || "");
+    if (/bed/.test(k)) return "Make bed";
+    if (/backpack/.test(k)) return "Backpack";
+    if (/dish/.test(k)) return "Dishes";
+    if (/empty/.test(k)) return "Empty";
+    if (/trash/.test(k)) return "Trash";
+    if (/postgame/.test(k)) return "Gear";
+    if (/shower/.test(k)) return "Shower";
+    if (/bath/.test(k)) return "Bathroom";
+    if (/laundry/.test(k)) return "Laundry";
+    if (/cubby/.test(k)) return "Cubby";
+    if (/shoe|living/.test(k)) return "Shoes";
+    if (/toy/.test(k)) return "Toys";
+    if (/room/.test(k)) return "Room";
+    if (/babysit/.test(k)) return "Babysit";
+    var head = String(fallback || "").split("\u00b7")[0].trim().split(/\s+/).slice(0, 2).join(" ");
+    return head || "Chore";
+  }
   function dowIndexFromIso(iso) {
     var parts = String(iso).split("-");
     if (parts.length !== 3) return 0;
@@ -295,7 +314,12 @@
     "hay-room": 1, "hay-shoes": 1, "hay-cubby": 1,
     "har-toys": 1, "har-shoes": 1, "har-cubby": 1
   };
-  var DOW_SHORT = ["S", "M", "T", "W", "T", "F", "S"];
+  var DOW_SHORT = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  function displayDays(days) {
+    return days.slice().sort(function (a, b) {
+      return ((dowIndexFromIso(a) + 6) % 7) - ((dowIndexFromIso(b) + 6) % 7);
+    });
+  }
   var DOW_LONG = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   function checkKeyFor(checkId, data, dayIso) {
@@ -929,13 +953,13 @@
     var starsAttr = ' data-stars="' + (cadence === "daily" && !optional ? weekPay : stars) + '"';
 
     if (cadence === "daily" && !optional) {
-      var days = weekDayIsos(DAY_ISO);
+      var days = displayDays(weekDayIsos(DAY_ISO));
       var taps = "";
       for (var di = 0; di < days.length; di++) {
         var iso = days[di];
         var dayOn = getCheck(q.id, data, iso);
         var isToday = iso === DAY_ISO;
-        var cls = "day-tap" + (dayOn ? " done" : "") + (isToday ? " is-today" : "");
+        var cls = "day-tap" + (dayOn ? " done" : "") + (isToday ? " is-today" : "") + (!isToday && iso < DAY_ISO ? " is-past" : "");
         taps += '<button type="button" class="' + cls + '" data-check="' + esc(q.id) + '" data-day-iso="' + esc(iso) +
           '" data-kid-quest="1" data-cadence="daily"' + starsAttr +
           ' aria-label="' + DOW_LONG[dowIndexFromIso(iso)] + " · " + esc(q.what) + '" aria-pressed="' + (dayOn ? "true" : "false") + '">' +
@@ -1034,16 +1058,17 @@
       var weekDone = dayCount >= weekDayIsos(DAY_ISO).length;
       var whatEl = el.querySelector(".what");
       var what = whatEl ? whatEl.textContent : id;
-      var days = weekDayIsos(DAY_ISO);
+      var days = displayDays(weekDayIsos(DAY_ISO));
       var taps = document.createElement("div");
       taps.className = "quest-days";
       taps.setAttribute("role", "group");
       taps.setAttribute("aria-label", "Days this week");
+      if (whatEl) whatEl.textContent = plainChoreLabel(id, whatEl.textContent);
       for (var di = 0; di < days.length; di++) {
         var iso = days[di];
         var btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "day-tap" + (getCheck(id, data, iso) ? " done" : "") + (iso === DAY_ISO ? " is-today" : "");
+        btn.className = "day-tap" + (getCheck(id, data, iso) ? " done" : "") + (iso === DAY_ISO ? " is-today" : "") + (iso !== DAY_ISO && iso < DAY_ISO ? " is-past" : "");
         btn.setAttribute("data-check", id);
         btn.setAttribute("data-day-iso", iso);
         btn.setAttribute("data-kid-quest", "1");
