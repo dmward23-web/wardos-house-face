@@ -71,9 +71,27 @@ test("controls and text stay inside x48-1872 y48-1032 with 16px between sibling 
 
 test("wall taps do not scale cards, shrink gaps, or move the jar", SKIP, async () => {
   const r = await run("press");
-  for (const kid of ["hayes", "harris"]) {
+  for (const kid of ["ainsley", "hayes", "harris"]) {
     const info = r.kids[kid];
     assert.ok(info.frames > 10, kid + " frames " + info.frames);
     assert.equal(info.badN, 0, kid + " " + JSON.stringify(info.bad));
+  }
+});
+
+test("chores header shortcuts are one on-screen row and each center hits that shortcut", SKIP, async () => {
+  const r = await run("shortcuts");
+  const chips = r.pages["sheet-chores.html"];
+  assert.equal(chips.length, 3, JSON.stringify(chips));
+  let prev = null;
+  for (const chip of chips) {
+    assert.ok(chip.w >= 64 && chip.h >= 64, JSON.stringify(chip));
+    assert.ok(chip.l >= 48 && chip.r <= 1872 && chip.t >= 48 && chip.b <= 1032, JSON.stringify(chip));
+    assert.ok(chip.t >= 60 && chip.t <= 72, JSON.stringify(chip));
+    assert.equal(chip.own, true, JSON.stringify(chip));
+    if (prev) assert.ok(chip.l - prev.r >= 16, JSON.stringify([prev, chip]));
+    prev = chip;
+  }
+  for (const route of ["kid-ainsley.html", "kid-hayes.html", "kid-harris.html"]) {
+    for (const chip of r.pages[route]) assert.equal(chip.own, true, route + " " + JSON.stringify(chip));
   }
 });

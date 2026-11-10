@@ -161,7 +161,14 @@ BOUNDS = r"""() => {
     return true;
   };
   const inSafe = (r) => r.left >= SAFE.l - 0.5 && r.top >= SAFE.t - 0.5 && r.right <= SAFE.r + 0.5 && r.bottom <= SAFE.b + 0.5;
-  const targets = [...document.querySelectorAll("a, button, [role=button], .chore, .kchip, .saves-bar, .saves-plus, .day, .qtile, .kid-card, .where-card, .tile")].filter(vis);
+  const seen = new Set();
+  const targets = [];
+  const add = (el) => { if (el && !seen.has(el)) { seen.add(el); targets.push(el); } };
+  for (const el of document.querySelectorAll("a, button, [role=button], .chore, .kchip, .saves-bar, .saves-plus, .day, .qtile, .kid-card, .where-card, .tile")) if (vis(el)) add(el);
+  for (const el of document.querySelectorAll(".chore-shortcuts .kid-chip")) {
+    const c = getComputedStyle(el);
+    if (c.display !== "none" && c.visibility !== "hidden") add(el);
+  }
   for (const el of targets) {
     const r = el.getBoundingClientRect();
     if (!inSafe(r)) outside.push({ kind: "control", t: (el.getAttribute("aria-label") || el.className || el.textContent || "").toString().trim().slice(0, 40), l: Math.round(r.left), t0: Math.round(r.top), r: Math.round(r.right), b: Math.round(r.bottom) });
@@ -197,7 +204,8 @@ BOUNDS = r"""() => {
       const xOverlap = Math.min(a.right, b.right) - Math.max(a.left, b.left);
       const yOverlap = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
       let gap = null;
-      if (yOverlap > 8 && xOverlap <= 0) gap = Math.max(a.left, b.left) - Math.min(a.right, b.right);
+      if (xOverlap > 1 && yOverlap > 1) gap = -Math.min(xOverlap, yOverlap);
+      else if (yOverlap > 8 && xOverlap <= 0) gap = Math.max(a.left, b.left) - Math.min(a.right, b.right);
       else if (xOverlap > 8 && yOverlap <= 0) gap = Math.max(a.top, b.top) - Math.min(a.bottom, b.bottom);
       if (gap != null && gap < 15.99) adjacent.push({ gap: Math.round(gap * 100) / 100, a: (A.getAttribute("aria-label") || A.className || A.tagName).toString().slice(0, 40), b: (B.getAttribute("aria-label") || B.className || B.tagName).toString().slice(0, 40) });
     }
@@ -221,32 +229,51 @@ BOUNDS = r"""() => {
 }"""
 
 PRESS = r"""() => {
+  window.__pressStop = false;
   window.__pressDone = false;
   window.__pressSamples = [];
-  const t0 = performance.now();
   const ident = (t) => !t || t === "none" || t === "matrix(1, 0, 0, 1, 0, 0)";
   function frame() {
     const cards = [...document.querySelectorAll("#sec-musts .chore")];
-    const panel = document.querySelector(".panel");
-    const jar = document.querySelector("#sec-jar");
     const bad = [];
+    const sizes = [];
     for (const el of cards) {
-      const t = getComputedStyle(el).transform;
-      if (!ident(t)) bad.push({ what: "card", t });
+      const r = el.getBoundingClientRect();
+      sizes.push([Math.round(r.width * 100) / 100, Math.round(r.height * 100) / 100]);
+      let n = el;
+      while (n) {
+        const t = getComputedStyle(n).transform;
+        if (!ident(t)) bad.push({ tag: n.tagName, id: n.id || "", cls: String(n.className || "").slice(0, 48), t });
+        n = n.parentElement;
+      }
     }
-    if (panel && !ident(getComputedStyle(panel).transform)) bad.push({ what: "panel", t: getComputedStyle(panel).transform });
-    if (jar && !ident(getComputedStyle(jar).transform)) bad.push({ what: "jar", t: getComputedStyle(jar).transform });
     const rects = cards.map((el) => el.getBoundingClientRect()).sort((a, b) => a.top - b.top);
     let minGap = 999;
     for (let i = 1; i < rects.length; i++) minGap = Math.min(minGap, rects[i].top - rects[i - 1].bottom);
-    window.__pressSamples.push({ bad, minGap, jarBottom: jar ? jar.getBoundingClientRect().bottom : 0 });
-    if (performance.now() - t0 < 1000) requestAnimationFrame(frame);
+    const jar = document.querySelector("#sec-jar");
+    window.__pressSamples.push({ bad, minGap, jarBottom: jar ? jar.getBoundingClientRect().bottom : 0, sizes });
+    if (!window.__pressStop) requestAnimationFrame(frame);
     else window.__pressDone = true;
   }
   requestAnimationFrame(frame);
   const row = document.querySelector("#sec-musts .chore");
   const r = row.getBoundingClientRect();
   return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+}"""
+
+SHORTCUTS = r"""() => {
+  const els = [...document.querySelectorAll("body > .chore-shortcuts .kid-chip, header .kid-chip")];
+  return els.map((el) => {
+    const r = el.getBoundingClientRect();
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return {
+      name: (el.textContent || "").replace(/\s+/g, " ").trim(),
+      l: Math.round(r.left), t: Math.round(r.top), r: Math.round(r.right), b: Math.round(r.bottom),
+      w: Math.round(r.width), h: Math.round(r.height),
+      own: !!(hit && (hit === el || el.contains(hit))),
+      hit: hit ? String(hit.className || hit.tagName).slice(0, 60) : null
+    };
+  });
 }"""
 
 def launch():
@@ -337,19 +364,37 @@ try:
         out["pages"] = pages
     elif MODE == "press":
         kids = {}
-        for kid in ("hayes", "harris"):
+        for kid in ("ainsley", "hayes", "harris"):
             pg = page_of(ctx, "kid-%s.html" % kid)
             pg.wait_for_timeout(400)
             spot = pg.evaluate(PRESS)
-            pg.mouse.click(spot["x"], spot["y"])
+            pg.mouse.move(spot["x"], spot["y"])
+            pg.mouse.down()
+            pg.wait_for_timeout(150)
+            pg.mouse.up()
+            pg.mouse.down()
+            pg.wait_for_timeout(400)
+            pg.mouse.up()
             for _ in range(8):
                 pg.mouse.click(spot["x"], spot["y"])
-            pg.wait_for_function("() => window.__pressDone", timeout=4000)
+            pg.wait_for_timeout(1100)
+            pg.evaluate("() => { window.__pressStop = true }")
+            pg.wait_for_function("() => window.__pressDone", timeout=3000)
             samples = pg.evaluate("() => window.__pressSamples")
-            bad = [s for s in samples if s["bad"] or s["minGap"] < 16 or s["jarBottom"] > 1032]
-            kids[kid] = {"frames": len(samples), "bad": bad[:6], "badN": len(bad), "spot": spot}
+            def bad_size(s):
+                return any(abs(w - 900) > 0.51 or abs(h - 64) > 0.51 for w, h in s.get("sizes") or [])
+            bad = [s for s in samples if s["bad"] or s["minGap"] < 16 or s["jarBottom"] > 1032 or bad_size(s)]
+            kids[kid] = {"frames": len(samples), "bad": [{k: v for k, v in s.items() if k != "sizes"} | {"sizes": (s.get("sizes") or [])[:2]} for s in bad[:4]], "badN": len(bad), "spot": spot}
             pg.close()
         out["kids"] = kids
+    elif MODE == "shortcuts":
+        pages = {}
+        for route in ("sheet-chores.html", "kid-ainsley.html", "kid-hayes.html", "kid-harris.html"):
+            pg = page_of(ctx, route)
+            pg.wait_for_timeout(300)
+            pages[route] = pg.evaluate(SHORTCUTS)
+            pg.close()
+        out["pages"] = pages
     else:
         out["error"] = "unknown mode"
 finally:

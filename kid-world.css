@@ -557,17 +557,38 @@ body.kw-on #tapsync-badge { display: none !important; }
     display: none !important;
     background-image: none !important;
   }
-  /* Wall taps stay the same size. Color and an inset edge carry the press. */
-  html.kw-root body.kw-on .chore,
+  /* Wall taps stay the same size. No ancestor of a card may scale or shift. */
+  html.kw-root,
+  html.kw-root body.kw-on,
+  html.kw-root body.kw-on:active,
   html.kw-root body.kw-on .panel,
+  html.kw-root body.kw-on .panel:active,
+  html.kw-root body.kw-on .body,
+  html.kw-root body.kw-on .body:active,
+  html.kw-root body.kw-on .sec,
+  html.kw-root body.kw-on .sec:active,
+  html.kw-root body.kw-on .card,
+  html.kw-root body.kw-on .card:active,
+  html.kw-root body.kw-on #sec-musts,
+  html.kw-root body.kw-on #sec-musts:active,
+  html.kw-root body.kw-on .chore-list,
+  html.kw-root body.kw-on .chore-list:active,
+  html.kw-root body.kw-on [data-mount-quests],
+  html.kw-root body.kw-on [data-mount-quests]:active,
+  html.kw-root body.kw-on .chore,
+  html.kw-root body.kw-on .chore:active,
   html.kw-root body.kw-on #sec-jar,
+  html.kw-root body.kw-on #sec-jar:active,
   html.kw-root body.kw-on #sec-jar .grow-meter,
   html.kw-root body.kw-on #sec-jar .grow-stage,
   html.kw-root body.kw-on .vfx-boom,
+  html.kw-root body.kw-on .is-bump,
+  html.kw-root body.kw-on .juice-ping,
   html.kw-root body.vfx-shake .panel,
   html.kw-root body.vfx-shake-hard .panel {
     animation: none !important;
     transform: none !important;
+    transition: none !important;
   }
   html.kw-root body.kw-on .chore.vfx-boom {
     filter: none !important;
@@ -733,8 +754,11 @@ body.kw-on #tapsync-badge { display: none !important; }
     overflow: hidden !important;
   }
   html.kw-root body.kw-on #sec-musts .chore {
-    flex: 1 1 0 !important;
+    flex: 0 0 64px !important;
+    width: 900px !important;
+    height: 64px !important;
     min-height: 64px !important;
+    max-height: 64px !important;
     display: flex !important;
     align-items: center !important;
     gap: 16px !important;

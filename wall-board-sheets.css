@@ -548,8 +548,8 @@
     overflow: hidden !important;
   }
   html:not(#hf-wall-off) body > .panel .cheer {
-    left: 980px !important;
-    width: 640px !important;
+    left: 990px !important;
+    width: 630px !important;
   }
   html:not(#hf-wall-off) body > .panel .sec[aria-label="Quick taps"],
   html:not(#hf-wall-off) body > .panel .quick {
@@ -724,8 +724,8 @@
     position: absolute !important;
     top: 64px !important;
     height: 64px !important;
-    left: 980px !important;
-    width: 640px !important;
+    left: 990px !important;
+    width: 630px !important;
     margin: 0 !important;
     overflow: hidden !important;
   }
@@ -797,17 +797,29 @@
     outline-offset: -3px;
     box-shadow: inset 0 0 0 4px rgba(244, 239, 230, 0.28);
   }
-  /* One header row. Integer lefts and integer widths, 16px between chips. */
-  html body section.col .kid-chip {
+  /* Header row lives on body, outside every filtered column. */
+  body > .chore-shortcuts {
     position: fixed !important;
     top: 66px !important;
+    left: 486px !important;
+    z-index: 5 !important;
+    display: flex !important;
+    gap: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+  }
+  body > .chore-shortcuts .kid-chip {
+    position: static !important;
     height: 64px !important;
     min-width: 64px !important;
     min-height: 64px !important;
     box-sizing: border-box !important;
-    z-index: 5 !important;
+    transform: none !important;
   }
-  html body section.col[aria-label="Ainsley chores"] .kid-chip { left: 486px !important; width: 160px !important; }
-  html body section.col[aria-label="Hayes chores"] .kid-chip { left: 662px !important; width: 148px !important; }
-  html body section.col[aria-label="Harris chores"] .kid-chip { left: 826px !important; width: 148px !important; }
+  body > .chore-shortcuts .kid-chip.ainsley { width: 160px !important; }
+  body > .chore-shortcuts .kid-chip.hayes,
+  body > .chore-shortcuts .kid-chip.harris { width: 148px !important; }
 }

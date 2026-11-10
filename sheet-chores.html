@@ -715,6 +715,11 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 </svg>
 
 
+<nav class="chore-shortcuts" aria-label="Kid boards">
+ <a class="kid-chip ainsley" href="kid-ainsley.html"><span class="dot">A</span> Ainsley</a>
+ <a class="kid-chip hayes" href="kid-hayes.html"><span class="dot">H</span> Hayes</a>
+ <a class="kid-chip harris" href="kid-harris.html"><span class="dot">H</span> Harris</a>
+</nav>
 <div class="panel">
  <header class="hdr hdr--clockfirst">
  <div class="hdr-left-col">
@@ -753,9 +758,6 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </section>
  <!-- Ainsley -->
  <section class="col" aria-label="Ainsley chores">
- <div class="col-hdr">
- <a class="kid-chip ainsley" href="kid-ainsley.html"><span class="dot">A</span> Ainsley</a>
- </div>
   <div class="chore-list">
  <div class="chore open ainsley" data-check="ain-bed">
  <span class="ring"></span>
@@ -826,9 +828,6 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 
  <!-- Hayes -->
  <section class="col" aria-label="Hayes chores">
- <div class="col-hdr">
- <a class="kid-chip hayes" href="kid-hayes.html"><span class="dot">H</span> Hayes</a>
- </div>
   <div class="chore-list">
  <div class="chore open hayes" data-check="hay-bed">
  <span class="ring"></span>
@@ -915,9 +914,6 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 
  <!-- Harris -->
  <section class="col" aria-label="Harris chores">
- <div class="col-hdr">
- <a class="kid-chip harris" href="kid-harris.html"><span class="dot">H</span> Harris</a>
- </div>
   <div class="chore-list">
  <div class="chore open harris" data-check="har-bed">
  <span class="ring"></span>
@@ -1048,7 +1044,8 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 var bar=document.createElement("div");bar.className="wf-kidtabs";bar.setAttribute("role","group");bar.setAttribute("aria-label","Pick a kid");
 var cls={ainsley:"ain",hayes:"hay",harris:"har"};
 function pick(i){cols.forEach(function(c,k){c.classList.toggle("wf-hide",k!==i)});[].forEach.call(bar.children,function(b,k){b.setAttribute("aria-pressed",k===i?"true":"false")})}
-cols.forEach(function(c,i){var chip=c.querySelector(".kid-chip");var name=chip?chip.textContent.replace(/^\s*\S\s+/,"").trim():"Kid "+(i+1);var id=(chip&&chip.className.match(/ainsley|hayes|harris/)||[""])[0];
+var shorts=[].slice.call(document.querySelectorAll(".chore-shortcuts .kid-chip"));
+cols.forEach(function(c,i){var chip=c.querySelector(".kid-chip")||shorts[i];var name=chip?chip.textContent.replace(/^\s*\S\s+/,"").trim():"Kid "+(i+1);var id=(chip&&chip.className.match(/ainsley|hayes|harris/)||[""])[0];
 var b=document.createElement("button");b.type="button";b.className=cls[id]||"";b.textContent=name;b.addEventListener("click",function(){pick(i)});bar.appendChild(b)});
 body.parentNode.insertBefore(bar,body);pick(0);})();</script>
 <link rel="stylesheet" href="wall-board-sheets.css?v=WALLSHEET1" />
