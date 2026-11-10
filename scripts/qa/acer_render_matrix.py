@@ -44,6 +44,19 @@ NEST = {
         {"id": "slot-c", "place": "Yard", "name": "Yard", "snapshotUrl": "", "snapCapturedAt": "2026-11-06T21:46:00.000Z"}
     ]
 }
+WX = {
+    "stale": False,
+    "ts": 1762800000000,
+    "raw": {
+        "current": {"temperature_2m": 16.7, "weather_code": 1, "is_day": 1, "time": "2026-11-10T12:00", "wind_speed_10m": 8},
+        "daily": {"temperature_2m_max": [18.3], "temperature_2m_min": [4.4]},
+        "hourly": {"time": [], "precipitation_probability": [], "precipitation": []}
+    }
+}
+SENSI = {
+    "status": "live", "updatedAt": "2026-11-10T18:00:00.000Z", "source": "synthetic", "writeSupported": False,
+    "thermostat": {"name": "Thermostat", "online": True, "ambient": 65, "ambientRaw": 65, "setpoint": 68, "heatSetpoint": 68, "coolSetpoint": 74, "mode": "Heat", "fan": "Auto", "humidity": 40, "hold": False, "scale": "f"}
+}
 
 PROBE = """() => {
   const stage = document.querySelector('.wardos-stage');
@@ -52,22 +65,61 @@ PROBE = """() => {
   const banned = /provider|therap|counsel|onerror|6:30/.test(text);
   const img = document.querySelector('.hub-window img');
   const phase = document.documentElement.getAttribute('data-scene-phase') || '';
-  return {
-    stageW: stage ? stage.offsetWidth : 0,
-    stageH: stage ? stage.offsetHeight : 0,
-    scale: Math.round(s * 1000) / 1000,
-    innerWidth, innerHeight, dpr: devicePixelRatio,
-    scrollW: document.documentElement.scrollWidth,
-    clientW: document.documentElement.clientWidth,
-    scrollH: document.documentElement.scrollHeight,
-    clientH: document.documentElement.clientHeight,
-    banned, phase,
-    pickup: text.indexOf('School pickup') >= 0,
-    soccer: text.indexOf('Leave for soccer') >= 0,
-    swim: text.indexOf('4:25 PM') >= 0,
-    hub: img ? img.getAttribute('src') : '',
-    diag: !!document.getElementById('wardos-diag')
+  const vis = (el) => {
+    const r = el.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) return false;
+    const c = getComputedStyle(el);
+    if (c.display === 'none' || c.visibility === 'hidden' || Number(c.opacity) === 0) return false;
+    return true;
   };
+  const small = [];
+  const hubish = /sheet-index|kid-ainsley|kid-hayes|kid-harris/.test(location.pathname);
+  if (hubish) {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      const t = node.textContent.replace(/\\s+/g, ' ').trim();
+      if (!t) continue;
+      const el = node.parentElement;
+      if (!el || !vis(el) || el.closest('.hub-cam-rest')) continue;
+      const px = parseFloat(getComputedStyle(el).fontSize) || 0;
+      if (px < 18) small.push({ t: t.slice(0, 24), px: px });
+    }
+  }
+  const hits = [...document.querySelectorAll('a, button')].filter(vis);
+  const overlaps = [];
+  for (let i = 0; i < hits.length; i++) {
+    for (let j = i + 1; j < hits.length; j++) {
+      if (hits[i].contains(hits[j]) || hits[j].contains(hits[i])) continue;
+      const a = hits[i].getBoundingClientRect();
+      const b = hits[j].getBoundingClientRect();
+      const x = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+      const y = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+      if (x > 1 && y > 1) overlaps.push({ a: (hits[i].textContent || '').trim().slice(0, 20), b: (hits[j].textContent || '').trim().slice(0, 20), x: Math.round(x), y: Math.round(y) });
+    }
+  }
+  const boxHit = (a, b) => {
+    if (!a || !b) return false;
+    const x = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+    const y = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+    return x > 1 && y > 1;
+  };
+  const lights = document.getElementById('hub-lights-panel');
+  const launch = document.querySelector('.hub-launch');
+  const lightsLaunch = !!(lights && launch && vis(lights) && vis(launch) && boxHit(lights.getBoundingClientRect(), launch.getBoundingClientRect()));
+  const diagEl = document.getElementById('wardos-diag');
+  let diagOverlap = false;
+  if (diagEl) {
+    const d = diagEl.getBoundingClientRect();
+    for (const el of hits) {
+      if (diagEl.contains(el)) continue;
+      const r = el.getBoundingClientRect();
+      const x = Math.min(d.right, r.right) - Math.max(d.left, r.left);
+      const y = Math.min(d.bottom, r.bottom) - Math.max(d.top, r.top);
+      if (x > 1 && y > 1) diagOverlap = true;
+    }
+  }
+  return { stageW: stage ? stage.offsetWidth : 0, stageH: stage ? stage.offsetHeight : 0, scale: Math.round(s * 1000) / 1000, innerWidth, innerHeight, dpr: devicePixelRatio, scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, scrollH: document.documentElement.scrollHeight, clientH: document.documentElement.clientHeight, banned, phase, pickup: text.indexOf('School pickup') >= 0, soccer: text.indexOf('Leave for soccer') >= 0, swim: text.indexOf('4:25 PM') >= 0, outdoor: text.indexOf('62') >= 0, indoor: text.indexOf('65') >= 0, hub: img ? img.getAttribute('src') : '', diag: !!diagEl, small: small.slice(0, 8), smallN: small.length, overlaps: overlaps.slice(0, 8), overlapN: overlaps.length, diagOverlap, lightsLaunch };
 }"""
 
 
@@ -162,6 +214,12 @@ def main():
                             route.fulfill(status=200, content_type="application/json", body=json.dumps(WEEK))
                         elif "nest-live" in url:
                             route.fulfill(status=200, content_type="application/json", body=json.dumps(NEST))
+                        elif "/wx" in url:
+                            route.fulfill(status=200, content_type="application/json", body=json.dumps(WX))
+                        elif "api.weather.gov" in url:
+                            route.fulfill(status=404, content_type="application/json", body="{}")
+                        elif "sensi-live" in url:
+                            route.fulfill(status=200, content_type="application/json", body=json.dumps(SENSI))
                         elif "cal-live" in url or "cal-months" in url:
                             route.fulfill(status=200, content_type="application/json", body='{"status":"live","asOfIso":"2026-11-10","events":[]}')
                         else:
@@ -179,7 +237,8 @@ def main():
                     diag = route_name == "sheet-index.html" and clock.endswith("12:30:00-06:00") and css_w == 1920
                     url = with_query(base + route_name, clock, diag)
                     tag = "real" if clock == "real" else ("day" if "12:30" in clock else "night")
-                    name = "%s__%dx%d_dpr%s__%s.png" % (route_name.replace(".html", ""), css_w, css_h, str(dpr).replace(".", ""), tag)
+                    dpr_tag = str(int(dpr)) if float(dpr).is_integer() else str(dpr).replace(".", "p")
+                    name = "%s__%dx%d_dpr%s__%s.png" % (route_name.replace(".html", ""), css_w, css_h, dpr_tag, tag)
                     if diag:
                         name = name.replace(".png", "__diag.png")
                     rec = {"route": route_name, "css": [css_w, css_h], "dpr": dpr, "clock": clock, "file": name}
@@ -212,6 +271,17 @@ def main():
                                 fails.append(name + " expected-night")
                             if diag and not info["diag"]:
                                 fails.append(name + " diag")
+                            if clock.endswith("12:30:00-06:00") and (not info.get("outdoor") or not info.get("indoor")):
+                                fails.append(name + " temps")
+                            if info.get("lightsLaunch"):
+                                fails.append(name + " lights-launch")
+                            if diag and info.get("diagOverlap"):
+                                fails.append(name + " diag-overlap")
+                        if args.assert_layout and route_name in ("sheet-index.html", "kid-ainsley.html", "kid-hayes.html", "kid-harris.html"):
+                            if info.get("smallN"):
+                                fails.append(name + " small-text")
+                            if info.get("overlapN"):
+                                fails.append(name + " overlap")
                     except Exception as exc:
                         rec["error"] = str(exc)[:180]
                         fails.append(name + " " + rec["error"])

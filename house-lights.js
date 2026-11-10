@@ -961,6 +961,11 @@
     }
   }
   function hubPairStrip(doc, panel, grid) {
+    var onHub = /sheet-index\.html$/.test(((doc.defaultView || window).location.pathname) || "");
+    if (onHub) {
+      panel.removeAttribute("data-pair-need");
+      return false;
+    }
     var need = pairNeeded() && !canWrite();
     if (!need) {
       if (panel.hasAttribute("data-pair-need")) { panel.removeAttribute("data-pair-need"); hubPairHideBits(panel, false); }
@@ -983,7 +988,8 @@
     var paired = false;
     try { paired = !!(window.PrivateFeed && PrivateFeed.pairState && PrivateFeed.pairState() === "paired"); } catch (ePair) {}
     if (/sheet-index\.html$/.test((doc.defaultView || window).location.pathname || "") && !paired) {
-      panel.hidden = false;
+      panel.hidden = true;
+      return;
     }
     panel.hidden = false;
     if (_dimDrag) return; /* don't wipe mid-drag fill */

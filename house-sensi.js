@@ -252,6 +252,13 @@
     el.classList.toggle("is-need", st.gate.kind === "need_token");
     el.setAttribute("data-mode", st.mode || "Auto");
     el.setAttribute("href", el.getAttribute("href") || "sheet-google-home.html");
+    if (el.id === "index-sensi-chip") {
+      var liveTemp = st.source === "live" && st.ambient != null && st.ambient !== "";
+      el.innerHTML = liveTemp
+        ? '<span class="status-kicker">Indoor</span><span class="status-temp">' + ambLabel(st) + "°</span>"
+        : '<span class="status-kicker">Indoor</span><span class="status-temp">—°</span><span class="status-note">offline</span>';
+      return;
+    }
     if (hdr) {
       /* HUBOVAL1 · matched oval pill — big ambient, quiet set/mode, honest LIVE/NEED */
       var thermoIco = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3.2v9.4a3.6 3.6 0 1 0 4 0V3.2a2 2 0 1 0-4 0z"/><path d="M12 14.8v2.4"/></svg>';

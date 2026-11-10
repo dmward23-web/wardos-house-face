@@ -32,10 +32,10 @@ html[data-wardos-stage] .float-orbs {
 #wardos-diag {
   position: absolute;
   left: 48px;
-  top: 944px;
+  top: 904px;
   width: 900px;
-  height: 88px;
-  z-index: 40;
+  height: 112px;
+  z-index: 80;
   box-sizing: border-box;
   margin: 0;
   padding: 8px 16px 8px 16px;
@@ -50,6 +50,17 @@ html[data-wardos-stage] .float-orbs {
 }
 #wardos-diag p { margin: 0; white-space: nowrap; }
 #wardos-diag .wardos-diag-title { font-size: 18px; }
+html body .lh-clocktag.lh-clocktag {
+  position: fixed !important;
+  left: 48px !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: 48px !important;
+  font-size: 18px !important;
+  line-height: 1.2 !important;
+  z-index: 70 !important;
+  max-width: 720px !important;
+}
 .wardos-diag-close {
   width: 80px;
   height: 64px;

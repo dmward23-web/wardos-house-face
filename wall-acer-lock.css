@@ -162,8 +162,10 @@ html body .tile.dan {
 }
 html body .grid-hdr { display: none !important; }
 html body .tile-grid.tile-grid--cams { display: block !important; height: auto !important; }
+@media (min-width: 1400px) and (min-height: 700px), (min-height: 1400px) and (min-width: 700px) {
 html body .tile-grid.tile-grid--cams > .tile:not(.ainsley):not(.hayes):not(.harris):not(.dan) {
   display: none !important;
+}
 }
 html body .tile-micro span.md { font-size: 14px !important; }
 html body .tile.ainsley .tile-micro,
@@ -280,6 +282,7 @@ html body .hub-home,
 html body a.tile { touch-action: manipulation; }
 html body .pf-flag--pair { display: none !important; }
 /* Roster sublines sit on the art and do not read. The name stays on a scrim. Off-canvas tiles keep their micro line for the cold-load check. */
+@media (min-width: 1400px) and (min-height: 700px) {
 html body .tile.ainsley .tile-sub,
 html body .tile.hayes .tile-sub,
 html body .tile.harris .tile-sub,
@@ -291,6 +294,7 @@ html body .tile.dan .tile-micro,
 html body .tile.ainsley .kf-title,
 html body .tile.hayes .kf-title,
 html body .tile.harris .kf-title { display: none !important; }
+}
 html body .tile.ainsley .tile-label,
 html body .tile.hayes .tile-label,
 html body .tile.harris .tile-label,
@@ -360,20 +364,37 @@ html body #house-wx .wx-sub,
 html body #house-wx .wx-rain,
 html body #house-wx .wx-hdr-ico,
 html body #house-wx .wx-kicker,
-html body #house-wx .wx-mode { display: none !important; }
-html body #house-wx .wx-temp,
-html body #house-wx .wx-cond,
-html body #index-sensi-chip { color: #f4efe6 !important; font-size: 30px !important; }
-html body #house-wx::before {
-  content: "Outdoor";
-  font-size: 30px !important;
-  font-weight: 700;
-  color: #f4efe6;
-  line-height: 1.15;
+html body #house-wx .wx-mode,
+html body #index-sensi-chip .sensi-hdr-ico,
+html body #index-sensi-chip svg { display: none !important; }
+html body #house-wx,
+html body #index-sensi-chip {
+  display: grid !important;
+  grid-template-rows: 22px 34px !important;
+  align-content: center !important;
+  align-items: start !important;
+  justify-content: start !important;
 }
-html body #index-sensi-chip::before {
-  content: "Indoor";
+html body .status-kicker {
+  grid-row: 1 !important;
+  font-size: 18px !important;
+  line-height: 22px !important;
+  font-weight: 700 !important;
+  color: #f4efe6 !important;
+}
+html body .status-temp {
+  grid-row: 2 !important;
   font-size: 30px !important;
-  font-weight: 700;
-  color: #f4efe6;
+  line-height: 34px !important;
+  font-weight: 700 !important;
+  color: #f4efe6 !important;
+  white-space: nowrap !important;
+}
+html body .status-note {
+  grid-row: 2 !important;
+  justify-self: end !important;
+  align-self: center !important;
+  font-size: 18px !important;
+  line-height: 22px !important;
+  color: #f4efe6 !important;
 }

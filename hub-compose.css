@@ -1,4 +1,6 @@
-/* ACERFIX hub composition. One card style, readable plates, a real launch bar. */
+/* ACERFIX hub composition. One card style, readable plates, a real launch bar.
+   Phone and desk keep the layout the boards already shipped. */
+@media (min-width: 1400px) and (min-height: 700px) {
 html body .panel.panel > header.hdr { overflow: hidden !important; }
 html body .hdr-ovals {
   width: 592px !important;
@@ -107,38 +109,116 @@ html body .hub-next-title {
   font-size: 30px !important;
   line-height: 1.2 !important;
 }
-html body .panel.panel > .hub-upper .leaveby,
+html body .panel.panel > .hub-upper {
+  top: 392px !important;
+  height: 488px !important;
+  display: grid !important;
+  grid-template-rows: 120px 120px 200px !important;
+  row-gap: 24px !important;
+  align-content: start !important;
+  overflow: hidden !important;
+}
 html body .panel.panel > .hub-upper .sp-strip { display: none !important; }
-html body #hub-lights-panel {
+html body .panel.panel > .hub-upper > section.leaveby.leaveby--hot {
   position: absolute !important;
   left: 0 !important;
-  top: 144px !important;
+  top: 0 !important;
   width: 900px !important;
-  height: 160px !important;
+  height: 120px !important;
   margin: 0 !important;
-  padding: 12px 16px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  opacity: 1 !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+html body .panel.panel > .hub-upper .leaveby > * { display: none !important; }
+html body #hub-lights-panel > :not(.hub-lights-link):not(.hub-lights-bulk) { display: none !important; }
+html body .hub-next {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  width: 900px !important;
+  height: 120px !important;
+  z-index: 2 !important;
+}
+html body #hub-lights-panel.hub-lights.hub-lights--hot,
+html body #hub-lights-panel.hub-lights.hub-lights--cmd,
+html body #hub-lights-panel.hub-lights {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  width: 900px !important;
+  max-width: 900px !important;
+  min-width: 0 !important;
+  height: 120px !important;
+  min-height: 120px !important;
+  max-height: 120px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex: none !important;
+  align-self: stretch !important;
   box-sizing: border-box !important;
   background: #101820 !important;
   color: #f4efe6 !important;
   border-radius: 16px !important;
   overflow: hidden !important;
-}
-html body .hub-lights-title { font-size: 30px !important; color: #f4efe6 !important; }
-html body .hub-lights-grid {
   display: flex !important;
-  gap: 20px !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 16px !important;
+  border: 0 !important;
+}
+html body #hub-lights-panel.hub-lights--hot > :not(.hub-lights-link):not(.hub-lights-bulk),
+html body #hub-lights-panel.hub-lights--cmd > :not(.hub-lights-link):not(.hub-lights-bulk),
+html body #hub-lights-panel.hub-lights > :not(.hub-lights-link):not(.hub-lights-bulk) {
+  display: none !important;
+}
+html body #hub-lights-panel .hub-lights-bulk {
+  display: flex !important;
+  gap: 16px !important;
+  height: 64px !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
   align-items: center !important;
 }
-html body .hub-sw { min-width: 80px !important; min-height: 80px !important; }
-html body .hub-sw-rocker { min-width: 80px !important; min-height: 80px !important; }
-html body .hub-lights-more { font-size: 30px !important; color: #f4efe6 !important; min-height: 80px !important; display: inline-flex !important; align-items: center !important; }
+html body #hub-lights-panel.hub-lights--hot .hub-lights-bulk-btn.hub-lights-bulk-btn,
+html body #hub-lights-panel.hub-lights--cmd .hub-lights-bulk-btn.hub-lights-bulk-btn,
+html body #hub-lights-panel .hub-lights-bulk-btn.hub-lights-bulk-btn {
+  min-width: 64px !important;
+  min-height: 64px !important;
+  height: 64px !important;
+  padding: 0 16px !important;
+  font-size: 24px !important;
+  line-height: 1.1 !important;
+}
+html body .hub-lights-link {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  flex: 1 1 auto !important;
+  width: auto !important;
+  height: 80px !important;
+  min-height: 80px !important;
+  padding: 0 24px !important;
+  box-sizing: border-box !important;
+  font-size: 30px !important;
+  line-height: 1.1 !important;
+  font-weight: 700 !important;
+  color: #f4efe6 !important;
+  text-decoration: none !important;
+}
 html body .hub-launch {
-  position: absolute !important;
-  left: 48px !important;
-  top: 720px !important;
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
   width: 900px !important;
   height: 200px !important;
-  z-index: 5 !important;
+  z-index: 2 !important;
   display: grid !important;
   grid-template-columns: repeat(4, 1fr) !important;
   grid-template-rows: 80px 80px !important;
@@ -190,12 +270,12 @@ html body .hub-cam {
   overflow: hidden !important;
   text-decoration: none !important;
 }
+html body .panel.panel #hub-cam-deck .hub-cam-label.hub-cam-label,
+html body .panel #hub-cam-deck .hub-cam-label.hub-cam-label,
 html body #hub-cam-deck .hub-cam-label.hub-cam-label,
-html body .hub-cam-label,
-html body .hub-cam-pill,
-html body .hub-cam-rest-word {
-  font-size: 30px !important;
-  line-height: 1.15 !important;
+html body .hub-cam-label {
+  font-size: 24px !important;
+  line-height: 1.2 !important;
   color: #f4efe6 !important;
   text-transform: none !important;
 }
@@ -206,4 +286,5 @@ html body .tile.harris,
 html body .tile.dan {
   border: 2px solid #c4b49a !important;
   border-radius: 16px !important;
+}
 }

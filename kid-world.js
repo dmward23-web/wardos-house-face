@@ -2556,4 +2556,16 @@
       return platesReady && !!(plates[id] && plates[id].sky);
     }
   };
+  /* The wall stage loads from the script the kid pages already have, so the pinned page bytes stay put. */
+  if (document.head && !document.querySelector("script[src^='wardos-stage.js']")) {
+    var stageCss = document.createElement("link");
+    stageCss.rel = "stylesheet";
+    stageCss.href = "wardos-stage.css?v=ACERFIX1";
+    document.head.appendChild(stageCss);
+    ["house-scene.js?v=ACERFIX1", "house-event-display.js?v=ACERFIX1", "wardos-stage.js?v=ACERFIX1"].forEach(function (src) {
+      var s = document.createElement("script");
+      s.src = src;
+      document.head.appendChild(s);
+    });
+  }
 })(window);

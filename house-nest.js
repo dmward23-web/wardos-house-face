@@ -536,7 +536,7 @@
     return i >= 0 && list[i] ? list[i] : null;
   }
   function approvedPlace(cam) {
-    var place = String((cam && (cam.place || cam.room || cam.name)) || "").trim();
+    var place = String((cam && (cam.place || cam.room)) || "").trim();
     if (!place) return "";
     if (/enterprises\/|devices\/|^[A-Za-z0-9:_-]{16,}$/.test(place)) return "";
     if (place.length > 24) return "";
@@ -636,7 +636,9 @@
   function setHubCamResting(el, label, on, why) {
     if (!el) return;
     var doc = el.ownerDocument || document;
-    label = label || el._hubLabel || "Camera";
+    var slotLabel = el._hubSlotLabel || "Camera";
+    var caption = el._hubPlace || slotLabel;
+    label = slotLabel;
     var pill = el.querySelector(".hub-cam-pill");
     var wrap = el.querySelector(".hub-cam-media-wrap");
     var rest = wrap ? wrap.querySelector(".hub-cam-rest") : null;
@@ -672,7 +674,7 @@
         var restWord = why === "pair" ? "Needs pairing" : "Camera resting";
         if (rw && rw.textContent !== restWord) rw.textContent = restWord;
       }
-      hubRestPrivacy(el, label);
+      hubRestPrivacy(el, caption);
     } else {
       var was = el.classList.contains("hub-cam-resting");
       el.classList.remove("hub-cam-resting");
@@ -738,7 +740,8 @@
     if (!deck) return;
     var paired = false;
     try { paired = !!(global.PrivateFeed && PrivateFeed.pairState && PrivateFeed.pairState() === "paired"); } catch (eP) {}
-    deck.hidden = false;
+    if (!paired && /sheet-index\.html$/.test((doc.defaultView || window).location.pathname || "")) deck.hidden = true;
+    else deck.hidden = false;
     ingestProxyFromLive(cachedData());
     /* NODATA1 · never show broken copy: stale/stub camera tiles hide; the deck hides when none is left.
        CAMREST2 · a resting tile is calm, not broken, so it stays: a whole-feed 5xx/401/offline rests the deck, never hides it */
@@ -755,9 +758,11 @@
       if (!el) continue;
       var cam = findCamForHub(slot, cams);
       var realCam = !!(cam && !String(cam.id || "").startsWith("stub-"));
+      el._hubSlotLabel = slot.label;
+      el._hubPlace = approvedPlace(cam);
       el._hubLabel = hubLabel(slot, cam);
       el._hubWhy = why;
-      el._hubIdentity = { name: hubLabel(slot, cam), camId: realCam ? cam.id : "", href: realCam ? viewerHref(cam) : "sheet-google-home.html" };
+      el._hubIdentity = { name: (cam && cam.name) || hubLabel(slot, cam), camId: realCam ? cam.id : "", href: realCam ? viewerHref(cam) : "sheet-google-home.html" };
       /* CAMLIVE2 · never clobber a proven LIVE playing tile with STILL on poll */
       if (el._hubLivePlaying && el.classList.contains("hub-cam-live")) {
         if (realCam) {

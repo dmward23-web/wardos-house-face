@@ -70,7 +70,7 @@
     var spec = NAMES[id];
     if (!anchor || !spec) return;
     var kid = data() && data().kids ? data().kids[id] || data().kids[id === "dan" ? "dad" : id] : null;
-    var audience = id === "dan" ? "adult" : (id === "ainsley" ? "shared" : id);
+    var audience = id === "ainsley" || id === "dan" ? "shared" : id;
     var view = soonest(kid, audience, false);
     while (anchor.firstChild) anchor.removeChild(anchor.firstChild);
     var name = document.createElement("span");
@@ -96,6 +96,13 @@
     plate.appendChild(title);
     anchor.appendChild(name);
     anchor.appendChild(plate);
+    if (id !== "dan") {
+      var keep = document.createElement("span");
+      keep.className = "kf-stage";
+      keep.hidden = true;
+      anchor.appendChild(keep);
+    }
+    if (id !== "dan") anchor.classList.add("kid-flip");
     anchor.setAttribute("href", spec[2]);
     var label = spec[0] + " " + spec[1];
     if (view && view.title) label += " " + (view.time ? view.time + " " : "") + view.title;

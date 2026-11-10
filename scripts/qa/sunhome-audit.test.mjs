@@ -613,10 +613,8 @@ test("wall board stays one 1920x1080 canvas at portrait and phone viewports", { 
       assert.match(k.bg, /kidtile-/);
     }
     const phone = await measure(390, 844);
-    assert.equal(phone.stageW, 1920, "phone viewport does not reflow the wall");
-    assert.equal(phone.stageH, 1080);
-    assert.equal(Math.round(phone.kids[0].w), 438);
-    assert.equal(Math.round(phone.kids[0].h), 420);
+    assert.equal(phone.stageW, 0, "a phone keeps its own layout");
+    assert.equal(phone.stageH, 0);
     const house = await b.newPage();
     await house.setViewport({ width: 1080, height: 1920, deviceScaleFactor: 1 });
     await house.goto(base + "/livinghouse/index.html?now=2026-11-08T17:30:00-06:00", { waitUntil: "domcontentloaded", timeout: 60000 });

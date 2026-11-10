@@ -44,7 +44,7 @@
     for (i = 0; i < kids.length; i++) {
       var n = kids[i];
       if (n === stage) continue;
-      if (n.nodeType === 1 && (n.id === "wardos-diag" || n.classList.contains("pair-screen"))) continue;
+      if (n.nodeType === 1 && (n.id === "wardos-diag" || n.classList.contains("pair-screen") || n.classList.contains("chore-shortcuts"))) continue;
       stage.appendChild(n);
     }
     return stage;
@@ -52,7 +52,7 @@
 
   function wanted() {
     var w = global.innerWidth || 0, h = global.innerHeight || 0;
-    return w >= 1400 && h >= 700;
+    return (w >= 1400 && h >= 700) || (h >= 1400 && w >= 700);
   }
 
   function place() {

@@ -1083,6 +1083,7 @@ month-theme/hub/kidtile-harris-438x420.webp
 month-theme/hub/kidtile-harris.webp
 month-theme/hub/kidtile-hayes-438x420.webp
 month-theme/hub/kidtile-hayes.webp
+month-theme/november/hub-window-day-900x864.webp
 month-theme/november/hub-window-dusk-900x864.webp
 month-theme/november/hub-window-dusk.webp
 month-theme/november/hub-window-night-900x864.webp

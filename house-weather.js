@@ -204,6 +204,12 @@
     var ico = data.icon || "🌤";
     el.classList.add("wx-card", "wx-live", "is-live");
     el.hidden = false; el.style.removeProperty("display");
+    if (el.id === "house-wx") {
+      el.innerHTML =
+        '<span class="status-kicker">Outdoor</span>'
+        + '<span class="status-temp">' + data.temp + "°</span>";
+      return;
+    }
     el.innerHTML =
       '<div class="wx-hdr-ico" aria-hidden="true">' + ico + "</div>"
       + '<div class="wx-hdr-text wx-text">'
@@ -237,8 +243,9 @@
     /* LAW8C1 · no empty pill while loading: the chip stays hidden until a real reading lands; a failed load stays hidden and is
        flagged on the element (data-wx-state="down") for the health checks, never drawn as a dash */
     if (el.id !== "house-wx" && !el.classList.contains("is-live")) { el.style.setProperty("display", "none", "important"); el.setAttribute("data-wx-state", "loading"); }
-    el.innerHTML =
-      '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
+    el.innerHTML = el.id === "house-wx"
+      ? '<span class="status-kicker">Outdoor</span><span class="status-temp">—°</span><span class="status-note">offline</span>'
+      : '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
       + '<div class="wx-hdr-text wx-text">'
       + '<div class="wx-kicker">Weather</div>'
       + '<div class="wx-line"><span class="wx-temp"></span><span class="wx-cond"></span></div>'
@@ -249,8 +256,9 @@
       if (err || !data) {
         el.classList.remove("is-live");
         el.setAttribute("data-wx-state", "down");
-        el.innerHTML =
-          '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
+        el.innerHTML = el.id === "house-wx"
+          ? '<span class="status-kicker">Outdoor</span><span class="status-temp">—°</span><span class="status-note">offline</span>'
+          : '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
           + '<div class="wx-hdr-text wx-text">'
           + '<div class="wx-kicker">Weather</div>'
           + '<div class="wx-line"><span class="wx-temp"></span><span class="wx-cond">Unavailable</span></div>'
