@@ -102,6 +102,21 @@ PROBE = """() => {
       if (x > 1 && y > 1) overlaps.push({ a: (hits[i].textContent || '').trim().slice(0, 20), b: (hits[j].textContent || '').trim().slice(0, 20), x: Math.round(x), y: Math.round(y) });
     }
   }
+  const seen = (r, el) => {
+    let n = el && el.parentElement;
+    while (n && n !== document.body) {
+      const c = getComputedStyle(n);
+      const cuts = /hidden|clip|auto|scroll/.test(c.overflowY) || /hidden|clip|auto|scroll/.test(c.overflowX);
+      if (cuts) {
+        const b = n.getBoundingClientRect();
+        const ix = Math.min(r.right, b.right) - Math.max(r.left, b.left);
+        const iy = Math.min(r.bottom, b.bottom) - Math.max(r.top, b.top);
+        if (ix < 2 || iy < 2) return false;
+      }
+      n = n.parentElement;
+    }
+    return true;
+  };
   const boxHit = (a, b) => {
     if (!a || !b) return false;
     const x = Math.min(a.right, b.right) - Math.max(a.left, b.left);
@@ -169,7 +184,7 @@ PROBE = """() => {
     const range = document.createRange();
     range.selectNodeContents(tn);
     for (const r of range.getClientRects()) {
-      if (r.width > 1 && r.height > 1) textBoxes.push({ t: raw.slice(0, 28), r, el });
+      if (r.width > 1 && r.height > 1 && seen(r, el)) textBoxes.push({ t: raw.slice(0, 28), r, el });
     }
   }
   const textHits = [];

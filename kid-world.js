@@ -107,6 +107,7 @@
         note.type = "button";
         note.className = "kw-offline";
         note.setAttribute("data-kw-offline", "");
+        note.style.cssText = "min-height:88px;height:88px;font-size:24px;box-sizing:border-box;";
         note.textContent = "Schedule unavailable. Tap to try again.";
         note.addEventListener("click", function () {
           if (global.WardKids && WardKids.boot) WardKids.boot(kid());

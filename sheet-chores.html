@@ -1058,5 +1058,25 @@ cols.forEach(function(c,i){var chip=c.querySelector(".kid-chip")||shorts[i];var 
 var b=document.createElement("button");b.type="button";b.className=cls[id]||"";b.textContent=name;b.addEventListener("click",function(){pick(i)});bar.appendChild(b)});
 body.parentNode.insertBefore(bar,body);pick(0);})();</script>
 <link rel="stylesheet" href="wall-board-sheets.css?v=WALLSHEET1" />
+<style id="acer-chore-window">
+@media (min-width: 1400px) and (min-height: 700px) {
+  html body .panel .body > section.col .chore-list {
+    height: 560px !important;
+    max-height: 560px !important;
+    overflow-x: hidden !important;
+    overflow-y: scroll !important;
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+  html body .panel .body > section.col .chore {
+    height: 280px !important;
+    min-height: 280px !important;
+    max-height: 280px !important;
+    margin: 0 !important;
+    flex: 0 0 280px !important;
+    overflow: hidden !important;
+  }
+}
+</style>
 </body>
 </html>

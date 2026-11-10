@@ -541,7 +541,8 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on .kw-path,
   html.kw-root body.kw-on .kw-drawer,
   html.kw-root body.kw-on .kw-week-empty,
-  html.kw-root body.kw-on .kw-feed { display: none !important; }
+  html.kw-root body.kw-on .kw-feed,
+  html.kw-root body.kw-on .kw-week { display: none !important; }
   body.theme-ainsley .sec-schedule::after { content: none !important; display: none !important; }
   html.kw-root body.kw-on .kw-canvas {
     position: fixed !important;

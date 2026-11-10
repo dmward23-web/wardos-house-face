@@ -53,6 +53,16 @@ a.wardos-home {
   text-decoration: none;
 }
 .wardos-home img { width: 64px; height: 64px; display: block; }
+html body .wardos-stage header .live-clock-host,
+html body .wardos-stage .hdr-date {
+  margin-left: 112px !important;
+}
+@media (min-width: 1400px) and (min-height: 700px) {
+  html body .wardos-stage > .panel {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+}
 #wardos-diag {
   position: absolute;
   left: 48px;
