@@ -435,7 +435,7 @@
       "html body .wx-card, html body a.sensi-hdr, html body .sensi-hdr { border:2px solid #c4b49a !important; box-shadow:none !important; }",
       "html.kw-root body.kw-on .kw-hud .kw-mute { position:absolute !important; grid-column:1 / -1 !important; justify-self:start !important; align-self:start !important; right:auto !important; bottom:auto !important; left:1460px !important; top:4px !important; width:88px !important; height:88px !important; margin:0 !important; }",
       "html:not(#hf-wall-off) body .panel > section.cheer, html:not(#hf-wall-off) body .panel .cheer { left:820px !important; width:640px !important; top:48px !important; }",
-      "html body #hub-lights-panel .hub-lights-offline { display:none; margin:0 0 8px; font-size:24px; line-height:1.2; color:#f4efe6; -webkit-text-fill-color:#f4efe6; }",
+      "html body #hub-lights-panel .hub-lights-offline { display:none; flex:0 0 auto; align-self:center; white-space:nowrap; margin:0; font-size:20px; line-height:1.2; color:#f4efe6; -webkit-text-fill-color:#f4efe6; }",
       "html body #hub-lights-panel.is-disabled:not(.is-live) .hub-lights-offline { display:block !important; }",
       "html body #hub-lights-panel.is-disabled:not(.is-live) .hub-lights-bulk-btn { opacity:0.5 !important; pointer-events:none !important; }"
     ].join("");
