@@ -185,8 +185,9 @@ test("r30 a kid subscene Home is not the hud rule at the origin", () => {
 
 test("r30 expanded chores keep the option D day strip", () => {
   const html = read("sheet-chores.html");
+  assert.match(html, /var iconW = 64/);
   assert.match(html, /var dayGap = 16/);
-  assert.match(html, /daysW = zone \* 7 \+ dayGap \* 6/);
+  assert.match(html, /daysW = circle \* 7 \+ dayGap \* 6/);
   assert.match(html, /overflow-y", "scroll"/);
   assert.match(read("prism-face.js"), /window\.fitChoreColumns/);
 });
