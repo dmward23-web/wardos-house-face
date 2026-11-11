@@ -498,8 +498,17 @@ body.theme-ainsley.stick-season .saves-plus {
   left: 48px !important;
   top: 48px !important;
   z-index: 3 !important;
-  width: 88px !important;
-  height: 88px !important;
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  max-width: 64px !important;
+  max-height: 64px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  color: transparent !important;
 }
 .saves-overlay .saves-sheet {
   margin-top: 104px !important;
@@ -510,16 +519,23 @@ body.theme-ainsley.stick-season .saves-plus {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 88px;
-  height: 88px;
+  width: 64px;
+  height: 64px;
   min-width: 64px;
   min-height: 64px;
-  font-size: 24px;
-  font-weight: 800;
-  color: #f4efe6;
+  padding: 0;
+  overflow: hidden;
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
   background: #0f1a22;
   border-radius: 16px;
   text-decoration: none;
+}
+.saves-overlay .saves-home img {
+  width: 64px;
+  height: 64px;
+  display: block;
 }
 .saves-backdrop {
   position: absolute;

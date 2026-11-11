@@ -1263,3 +1263,64 @@ html.kw-root body.kw-on #sec-days .consume-hero-name {
   text-overflow: clip !important;
   white-space: nowrap !important;
 }
+
+/* Today and Month: one clock chip, no host tail, no header hairline. Calendar card stays in the 48px inset. */
+html:not(#hf-wall-off) body .panel:has(.today-day) > header.hdr,
+html:not(#hf-wall-off) body .panel:has(.month-grid) > header.hdr {
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+html:not(#hf-wall-off) body .panel:has(.today-day) .hdr.hdr--clockfirst .live-clock-host,
+html:not(#hf-wall-off) body .panel:has(.month-grid) .hdr.hdr--clockfirst .live-clock-host {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+html:not(#hf-wall-off) body .panel:has(.today-day) .hdr.hdr--clockfirst .live-clock,
+html:not(#hf-wall-off) body .panel:has(.today-day) .hdr.hdr--clockfirst [data-live-clock],
+html:not(#hf-wall-off) body .panel:has(.month-grid) .hdr.hdr--clockfirst .live-clock,
+html:not(#hf-wall-off) body .panel:has(.month-grid) .hdr.hdr--clockfirst [data-live-clock] {
+  font-size: 32px !important;
+  line-height: 60px !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  padding: 0 16px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  width: max-content !important;
+  max-width: none !important;
+  background: #101820 !important;
+  color: #f4efe6 !important;
+  -webkit-text-fill-color: #f4efe6 !important;
+  border: 2px solid #c4b49a !important;
+  border-radius: 16px !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+html:not(#hf-wall-off) body .panel:has(.today-day) section.today-day {
+  margin-left: 40px !important;
+  width: 860px !important;
+  max-width: 860px !important;
+}
+html body section.col .chore .chore-ico svg {
+  width: 100% !important;
+  height: 32px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: 32px !important;
+}

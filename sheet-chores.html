@@ -1356,7 +1356,7 @@ document.addEventListener("DOMContentLoaded", function () {
       var dayGap = 16;
       var daysW = zone * 7 + dayGap * 6;
       var iconW = 32;
-      var left = 4;
+      var left = 12;
       var mid = inner - left - iconW - daysW;
       if (mid < 0) { left = Math.max(0, left + mid); mid = inner - left - iconW - daysW; }
       if (mid < 0) { iconW = Math.max(24, iconW + mid); mid = inner - left - iconW - daysW; }
@@ -1397,6 +1397,17 @@ document.addEventListener("DOMContentLoaded", function () {
           ico.style.setProperty("min-height", zone + "px", "important");
           ico.style.setProperty("justify-self", "center", "important");
           ico.style.setProperty("align-self", "center", "important");
+          ico.style.setProperty("overflow", "hidden", "important");
+          var svg = ico.querySelector("svg");
+          if (svg) {
+            svg.setAttribute("width", String(iconW));
+            svg.setAttribute("height", String(iconW));
+            svg.style.setProperty("width", "100%", "important");
+            svg.style.setProperty("height", iconW + "px", "important");
+            svg.style.setProperty("max-width", "100%", "important");
+            svg.style.setProperty("max-height", iconW + "px", "important");
+            svg.style.setProperty("display", "block", "important");
+          }
         }
         var txt = card.querySelector(".txt");
         if (txt) txt.style.setProperty("display", "contents", "important");
