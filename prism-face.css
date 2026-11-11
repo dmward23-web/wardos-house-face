@@ -729,9 +729,11 @@ html.kw-root body.kw-on #sec-days .consume-hero-title {
 html.kw-root body.kw-on #sec-days .consume-hero-name {
   display: block !important;
   min-width: 0 !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
   white-space: nowrap !important;
+  font-size: 24px !important;
+  line-height: 1.2 !important;
 }
 html.kw-root body.kw-on #sec-jar .prism-jar-label,
 html.kw-root body.kw-on #sec-jar .bank-title,
@@ -1211,14 +1213,18 @@ html.kw-root body.kw-on #sec-days .kw-offline {
   display: flex !important;
   align-items: center !important;
 }
+html.kw-root body.kw-on #sec-days .consume-hero-when,
 html.kw-root body.kw-on #sec-days .consume-hero-title,
 html.kw-root body.kw-on #sec-days .consume-hero-name {
   height: auto !important;
   max-height: none !important;
   min-height: 0 !important;
+  max-width: none !important;
   font-size: 24px !important;
   line-height: 32px !important;
   padding: 0 !important;
   margin: 0 !important;
   overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
 }

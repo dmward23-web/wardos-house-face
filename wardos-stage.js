@@ -87,27 +87,14 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
       var ctx = c.getContext("2d");
       if (!ctx) return;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      var r = node.getBoundingClientRect();
-      var x = r.left, y = r.top, dw = r.width, dh = r.height;
-      ctx.drawImage(img, x, y, dw, dh);
-      /* Letterbox gets a soft slice of the real edge, not a one-pixel streak. */
-      var bleed = function (sx, sy, sw, sh, dx, dy, bw, bh) {
-        if (bw < 0.5 || bh < 0.5 || sw < 1 || sh < 1) return;
-        ctx.save();
-        ctx.filter = "blur(14px)";
-        ctx.drawImage(img, sx, sy, sw, sh, dx, dy, bw, bh);
-        ctx.restore();
-      };
-      var sxW = Math.max(1, Math.round(img.width * 48 / 1920));
-      var syH = Math.max(1, Math.round(img.height * 48 / 1080));
-      if (x > 0.5) bleed(0, 0, sxW, img.height, 0, y, x, dh);
-      if (x + dw < w - 0.5) bleed(img.width - sxW, 0, sxW, img.height, x + dw, y, w - (x + dw), dh);
-      if (y > 0.5) bleed(0, 0, img.width, syH, x, 0, dw, y);
-      if (y + dh < h - 0.5) bleed(0, img.height - syH, img.width, syH, x, y + dh, dw, h - (y + dh));
-      if (x > 0.5 && y > 0.5) bleed(0, 0, sxW, syH, 0, 0, x, y);
-      if (x + dw < w - 0.5 && y > 0.5) bleed(img.width - sxW, 0, sxW, syH, x + dw, 0, w - (x + dw), y);
-      if (x > 0.5 && y + dh < h - 0.5) bleed(0, img.height - syH, sxW, syH, 0, y + dh, x, h - (y + dh));
-      if (x + dw < w - 0.5 && y + dh < h - 0.5) bleed(img.width - sxW, img.height - syH, sxW, syH, x + dw, y + dh, w - (x + dw), h - (y + dh));
+      ctx.clearRect(0, 0, w, h);
+      /* Cover-fit the plate to the viewport. The stage stays scaled and centered on top. */
+      var cover = Math.max(w / img.width, h / img.height);
+      var dw = img.width * cover;
+      var dh = img.height * cover;
+      ctx.imageSmoothingEnabled = true;
+      ctx.filter = "none";
+      ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
     };
     if (coverUrl === url && extendCover.img && extendCover.img.complete) { paint(extendCover.img); return; }
     coverUrl = url;

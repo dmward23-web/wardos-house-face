@@ -271,7 +271,7 @@
     }
     var banner = document.querySelector(".banner-title");
     if (banner) {
-      banner.textContent = offline ? "Lights offline \u00b7 tap to retry" : "Tap a room to switch it";
+      banner.textContent = offline ? "Lights offline \u00b7 tap to retry" : "Lights";
       if (!banner._lightsRetry) {
         banner._lightsRetry = true;
         banner.addEventListener("click", function () {
@@ -378,6 +378,17 @@
     min-height: 64px !important;
     height: 64px !important;
     min-width: 64px !important;
+    color: #f4efe6 !important;
+    -webkit-text-fill-color: #f4efe6 !important;
+  }
+  html body .panel.lights-cmd .cmd-title,
+  html body .panel.lights-cmd .cmd-meta { display: none !important; }
+  html body .panel.lights-cmd .banner-title {
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+    font-weight: 700 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
     color: #f4efe6 !important;
     -webkit-text-fill-color: #f4efe6 !important;
   }

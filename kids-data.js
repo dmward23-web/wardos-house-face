@@ -2269,8 +2269,8 @@
       } else {
         var cd = consumeCountdown(next);
         var title = consumeStripKidName(next.title, kid);
-        var shown = shortNextLabel(title);
-        var ico = consumeEventIcon(shown === "Pickup" ? "pickup" : title);
+        var shown = title;
+        var ico = consumeEventIcon(title);
         var clock = faceClock(next.startIso) || "";
         nextMount.className = "consume-hero";
         nextMount.innerHTML =
