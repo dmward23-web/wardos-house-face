@@ -433,13 +433,10 @@ def main():
                       localStorage.setItem('wardos-lights-proxy', location.origin);
                     }""")
                 for route_name in routes:
-                    diag = route_name == "sheet-index.html" and clock.endswith("12:30:00-06:00") and css_w == 1920
-                    url = with_query(base + route_name, clock, diag)
+                    url = with_query(base + route_name, clock, False)
                     tag = "real" if clock == "real" else ("day" if "12:30" in clock else "night")
                     dpr_tag = str(int(dpr)) if float(dpr).is_integer() else str(dpr).replace(".", "p")
                     name = "%s__%dx%d_dpr%s__%s.png" % (route_name.replace(".html", ""), css_w, css_h, dpr_tag, tag)
-                    if diag:
-                        name = name.replace(".png", "__diag.png")
                     rec = {"route": route_name, "css": [css_w, css_h], "dpr": dpr, "clock": clock, "file": name}
                     try:
                         page.goto(url, wait_until="domcontentloaded", timeout=30000)

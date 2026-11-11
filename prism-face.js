@@ -136,7 +136,7 @@
       "sheet-google-home": "<path d='M7 12h4l2-3h6l2 3h4v12H7z'/><circle cx='16' cy='18' r='3'/>",
       "sheet-chores": "<path d='M13 8h12M13 16h12M13 24h12'/><path d='M5 8l2 2 4-4M5 16l2 2 4-4M5 24l2 2 4-4'/>",
       "sheet-groceries": "<path d='M6 8h4l2 12h12l2-8H11'/><circle cx='13' cy='24' r='1.6'/><circle cx='22' cy='24' r='1.6'/>",
-      "sheet-weekend": "<circle cx='9' cy='9' r='3'/><path d='M9 4v2M4 9h2'/><path d='M22 27V15'/><path d='M16 27h12'/><path d='M17 20c2-6 8-6 10 0'/>",
+      "sheet-weekend": "<circle cx='16' cy='7' r='3'/><path d='M16 2v1.2M11.2 7H9.6M12.2 3.4l.9.9M19.8 3.4l-.9.9M20.8 7H22.4'/><path d='M8 27V17l8-6 8 6v10'/><path d='M14 27v-6h4v6'/>",
       "sheet-win": "<rect x='7' y='11' width='18' height='14' rx='2'/><path d='M12 11V8h8v3M12 18h8'/>"
     };
     document.querySelectorAll(".hub-launch a").forEach(function (a) {
@@ -175,6 +175,99 @@
     if (lightsTitle && lightsBulk && lightsTitle.parentNode !== lightsBulk) lightsBulk.insertBefore(lightsTitle, lightsBulk.firstChild);
     else if (lightsTitle && lightsTitle.parentNode) lightsTitle.parentNode.insertBefore(lightsTitle, lightsTitle.parentNode.firstChild);
     document.body.style.setProperty("background-size", "auto", "important");
+    var stageNode = document.querySelector(".wardos-stage") || document.body;
+    document.querySelectorAll(".kw-clock, .live-clock, .hdr-date-time").forEach(function (el) {
+      if (el.parentNode !== stageNode) stageNode.appendChild(el);
+      el.style.setProperty("position", "absolute", "important");
+      el.style.setProperty("top", "64px", "important");
+      el.style.setProperty("left", "1500px", "important");
+      el.style.setProperty("right", "auto", "important");
+      el.style.setProperty("width", "260px", "important");
+      el.style.setProperty("min-width", "260px", "important");
+      el.style.setProperty("max-width", "260px", "important");
+      el.style.setProperty("height", "64px", "important");
+      el.style.setProperty("min-height", "64px", "important");
+      el.style.setProperty("max-height", "64px", "important");
+      el.style.setProperty("margin", "0", "important");
+      el.style.setProperty("border", "2px solid #c4b49a", "important");
+      el.style.setProperty("box-shadow", "none", "important");
+      el.style.setProperty("z-index", "45", "important");
+    });
+    var tileInk = { ainsley: "#8a6394", hayes: "#3f8b71", harris: "#42679a", dan: "#c4b49a" };
+    Object.keys(tileInk).forEach(function (kid) {
+      document.querySelectorAll(".tile." + kid).forEach(function (tile) {
+        tile.style.setProperty("border", "2px solid " + tileInk[kid], "important");
+        tile.style.setProperty("box-shadow", "none", "important");
+        tile.style.setProperty("outline", "none", "important");
+      });
+    });
+    document.querySelectorAll(".roster-plate.roster-empty").forEach(function (plate) {
+      plate.style.setProperty("height", "32px", "important");
+      plate.style.setProperty("min-height", "32px", "important");
+      plate.style.setProperty("max-height", "32px", "important");
+      plate.style.setProperty("left", "0", "important");
+      plate.style.setProperty("right", "0", "important");
+      plate.style.setProperty("width", "100%", "important");
+      plate.style.setProperty("bottom", "0", "important");
+      plate.style.setProperty("box-shadow", "none", "important");
+    });
+    document.querySelectorAll(".roster-plate:not(.roster-empty)").forEach(function (plate) {
+      plate.style.setProperty("height", "140px", "important");
+      plate.style.setProperty("max-height", "140px", "important");
+      plate.style.setProperty("left", "0", "important");
+      plate.style.setProperty("right", "0", "important");
+      plate.style.setProperty("width", "100%", "important");
+      plate.style.setProperty("bottom", "0", "important");
+      plate.style.setProperty("box-shadow", "none", "important");
+    });
+    var panel = document.querySelector(".panel");
+    if (panel) panel.style.setProperty("box-shadow", "none", "important");
+    function stripGoldFrame() {
+      document.querySelectorAll("svg, svg *").forEach(function (el) {
+        var r = el.getBoundingClientRect ? el.getBoundingClientRect() : null;
+        if (r && r.width > 800) el.style.setProperty("filter", "none", "important");
+      });
+      var frame = document.querySelector(".panel");
+      if (frame) frame.style.setProperty("box-shadow", "none", "important");
+    }
+    stripGoldFrame();
+    setTimeout(stripGoldFrame, 600);
+    setTimeout(stripGoldFrame, 1400);
+    var r16 = document.getElementById("acer-r16");
+    if (!r16) {
+      r16 = document.createElement("style");
+      r16.id = "acer-r16";
+      document.body.appendChild(r16);
+    }
+    r16.textContent = [
+      "html body .hdr-date-time, html body .live-clock, html body .kw-clock, html body [data-kw-clock], html body [data-live-clock] {",
+      "position:fixed !important; top:64px !important; left:1500px !important; right:auto !important;",
+      "width:260px !important; min-width:260px !important; max-width:260px !important;",
+      "height:64px !important; min-height:64px !important; max-height:64px !important;",
+      "padding:0 16px !important; box-sizing:border-box !important; display:inline-flex !important;",
+      "align-items:center !important; justify-content:center !important;",
+      "font-size:32px !important; line-height:1 !important; font-weight:700 !important; letter-spacing:0 !important;",
+      "border:2px solid #c4b49a !important; border-radius:16px !important;",
+      "background:#101820 !important; color:#f4efe6 !important; -webkit-text-fill-color:#f4efe6 !important;",
+      "box-shadow:none !important; text-shadow:none !important; z-index:45 !important; overflow:hidden !important;",
+      "}",
+      "html body .live-clock-host, html body header .hdr-date, html body .panel > header.hdr { overflow:visible !important; }",
+      "html body .panel.panel > header.hdr .hdr-ovals { margin-right:400px !important; }",
+      "html body .panel.panel, html body .wardos-stage > .panel { box-shadow:none !important; border-top-width:0 !important; }",
+      "html body .tile.ainsley { border:2px solid #8a6394 !important; box-shadow:none !important; }",
+      "html body .tile.hayes { border:2px solid #3f8b71 !important; box-shadow:none !important; }",
+      "html body .tile.harris { border:2px solid #42679a !important; box-shadow:none !important; }",
+      "html body .tile.dan { border:2px solid #c4b49a !important; box-shadow:none !important; }",
+      "html body .roster-plate { left:0 !important; right:0 !important; width:100% !important; bottom:0 !important; height:140px !important; max-height:140px !important; margin:0 !important; box-shadow:none !important; }",
+      "html body .roster-plate.roster-empty { height:32px !important; min-height:32px !important; max-height:32px !important; padding:0 16px !important; background:transparent !important; }",
+      "html body .roster-plate.roster-empty .roster-title { height:32px !important; line-height:32px !important; font-size:24px !important; padding:0 14px !important; }",
+      "html body .chore .day-tap.is-past { opacity:0.45 !important; text-decoration:line-through !important; }",
+      "html body .chore .day-tap.is-off:not(.done) { opacity:1 !important; text-decoration:none !important; background:transparent !important; border:2px solid rgba(196,180,154,0.75) !important; color:#f4efe6 !important; }",
+      "html body section.col:not([data-show-all]) .chore-list > .chore:nth-child(n+5) { display:none !important; }",
+      "html body section.col .chore { height:auto !important; min-height:0 !important; max-height:none !important; overflow:visible !important; }",
+      "html body section.col .chore-list { overflow:visible !important; }",
+      "html body .panel > section.cheer, html body .cheer { left:480px !important; width:980px !important; right:auto !important; }"
+    ].join("");
     document.querySelectorAll(".more-chip").forEach(function (chip) {
       if (chip.getAttribute("data-wired") === "1") return;
       chip.setAttribute("data-wired", "1");

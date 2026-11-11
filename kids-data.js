@@ -1073,7 +1073,8 @@
         var iso = days[di];
         var btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "day-tap" + (getCheck(id, data, iso) ? " done" : "") + (iso === DAY_ISO ? " is-today" : "") + (iso !== DAY_ISO && iso < DAY_ISO ? " is-past" : "");
+        var offDay = dowIndexFromIso(iso) === 0 || dowIndexFromIso(iso) === 6;
+        btn.className = "day-tap" + (getCheck(id, data, iso) ? " done" : "") + (iso === DAY_ISO ? " is-today" : "") + (iso !== DAY_ISO && iso < DAY_ISO ? " is-past" : "") + (offDay ? " is-off" : "");
         btn.setAttribute("data-check", id);
         btn.setAttribute("data-day-iso", iso);
         btn.setAttribute("data-kid-quest", "1");
