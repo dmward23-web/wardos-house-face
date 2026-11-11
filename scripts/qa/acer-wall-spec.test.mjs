@@ -136,9 +136,9 @@ test("Acer wall spec report lists asset dimensions and does not resize them", { 
   assert.match(layout.kidArt, /kidtile-ainsley-438x420\.webp/);
   assert.match(layout.dadArt, /kidtile-dad\.webp/);
   assert.deepEqual(report.pendingArt, []);
-  /* Prism B2: the event slab is a bottom band at most 140px tall. */
+  /* The event band is 140px and sits on the tile's bottom border. */
   assert.equal(layout.dadStage.h, 140);
-  assert.equal(layout.dadStage.gap, 16);
+  assert.equal(layout.dadStage.gap, 2);
   assert.ok(sha256.some((line) => line.startsWith("b02d87273eaf09ecd755a27d8ccd9e0986a7bdd0bc25b73b5839f4952f2c8105  month-theme/hub/kidtile-dad.webp")));
   assert.doesNotMatch(fs.readFileSync(path.join(ROOT, "month-theme/month-overlay.js"), "utf8"), /40x40|leaf-[^"']*-40/);
   assert.deepEqual(report.offSpecAssets, []);

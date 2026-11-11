@@ -175,7 +175,9 @@
     if (lightsTitle && lightsBulk && lightsTitle.parentNode !== lightsBulk) lightsBulk.insertBefore(lightsTitle, lightsBulk.firstChild);
     else if (lightsTitle && lightsTitle.parentNode) lightsTitle.parentNode.insertBefore(lightsTitle, lightsTitle.parentNode.firstChild);
     document.body.style.setProperty("background-size", "auto", "important");
+    var wall = /\/(sheet-index|sheet-chores|sheet-lights|kid-ainsley|kid-hayes|kid-harris)\.html$/.test(location.pathname || "");
     var stageNode = document.querySelector(".wardos-stage") || document.body;
+    if (wall) {
     document.querySelectorAll(".kw-clock, .live-clock, .hdr-date-time").forEach(function (el) {
       if (el.parentNode !== stageNode) stageNode.appendChild(el);
       el.style.setProperty("position", "absolute", "important");
@@ -191,41 +193,26 @@
       el.style.setProperty("margin", "0", "important");
       el.style.setProperty("border", "2px solid #c4b49a", "important");
       el.style.setProperty("box-shadow", "none", "important");
+      el.style.setProperty("overflow", "hidden", "important");
+      el.style.setProperty("font-size", "32px", "important");
+      el.style.setProperty("line-height", "64px", "important");
       el.style.setProperty("z-index", "45", "important");
     });
+    var onHub = /sheet-index\.html/.test(location.pathname || "");
     var tileInk = { ainsley: "#8a6394", hayes: "#3f8b71", harris: "#42679a", dan: "#c4b49a" };
-    Object.keys(tileInk).forEach(function (kid) {
+    if (onHub) Object.keys(tileInk).forEach(function (kid) {
       document.querySelectorAll(".tile." + kid).forEach(function (tile) {
         tile.style.setProperty("border", "2px solid " + tileInk[kid], "important");
         tile.style.setProperty("box-shadow", "none", "important");
         tile.style.setProperty("outline", "none", "important");
       });
     });
-    document.querySelectorAll(".roster-plate.roster-empty").forEach(function (plate) {
-      plate.style.setProperty("height", "32px", "important");
-      plate.style.setProperty("min-height", "32px", "important");
-      plate.style.setProperty("max-height", "32px", "important");
-      plate.style.setProperty("left", "0", "important");
-      plate.style.setProperty("right", "0", "important");
-      plate.style.setProperty("width", "100%", "important");
-      plate.style.setProperty("bottom", "0", "important");
-      plate.style.setProperty("box-shadow", "none", "important");
-    });
-    document.querySelectorAll(".roster-plate:not(.roster-empty)").forEach(function (plate) {
-      plate.style.setProperty("height", "140px", "important");
-      plate.style.setProperty("max-height", "140px", "important");
-      plate.style.setProperty("left", "0", "important");
-      plate.style.setProperty("right", "0", "important");
-      plate.style.setProperty("width", "100%", "important");
-      plate.style.setProperty("bottom", "0", "important");
-      plate.style.setProperty("box-shadow", "none", "important");
-    });
     var panel = document.querySelector(".panel");
     if (panel) panel.style.setProperty("box-shadow", "none", "important");
     function stripGoldFrame() {
-      document.querySelectorAll("svg, svg *").forEach(function (el) {
-        var r = el.getBoundingClientRect ? el.getBoundingClientRect() : null;
-        if (r && r.width > 800) el.style.setProperty("filter", "none", "important");
+      document.querySelectorAll("body > svg").forEach(function (svg) {
+        var r = svg.getBoundingClientRect();
+        if (r.width > 800) svg.style.setProperty("display", "none", "important");
       });
       var frame = document.querySelector(".panel");
       if (frame) frame.style.setProperty("box-shadow", "none", "important");
@@ -254,20 +241,17 @@
       "html body .live-clock-host, html body header .hdr-date, html body .panel > header.hdr { overflow:visible !important; }",
       "html body .panel.panel > header.hdr .hdr-ovals { margin-right:400px !important; }",
       "html body .panel.panel, html body .wardos-stage > .panel { box-shadow:none !important; border-top-width:0 !important; }",
-      "html body .tile.ainsley { border:2px solid #8a6394 !important; box-shadow:none !important; }",
-      "html body .tile.hayes { border:2px solid #3f8b71 !important; box-shadow:none !important; }",
-      "html body .tile.harris { border:2px solid #42679a !important; box-shadow:none !important; }",
-      "html body .tile.dan { border:2px solid #c4b49a !important; box-shadow:none !important; }",
-      "html body .roster-plate { left:0 !important; right:0 !important; width:100% !important; bottom:0 !important; height:140px !important; max-height:140px !important; margin:0 !important; box-shadow:none !important; }",
-      "html body .roster-plate.roster-empty { height:32px !important; min-height:32px !important; max-height:32px !important; padding:0 16px !important; background:transparent !important; }",
-      "html body .roster-plate.roster-empty .roster-title { height:32px !important; line-height:32px !important; font-size:24px !important; padding:0 14px !important; }",
+      "html body .roster-plate, html body .roster-plate.roster-empty { box-shadow:none !important; background:transparent !important; }",
+      "html body .roster-plate:not(.roster-empty) { background:rgba(15,26,34,0.88) !important; height:140px !important; max-height:140px !important; left:0 !important; right:0 !important; width:100% !important; bottom:0 !important; }",
+      "html body .roster-plate.roster-empty .roster-title { display:inline-block !important; height:32px !important; line-height:32px !important; font-size:24px !important; padding:0 14px !important; background:#101820 !important; }",
       "html body .chore .day-tap.is-past { opacity:0.45 !important; text-decoration:line-through !important; }",
       "html body .chore .day-tap.is-off:not(.done) { opacity:1 !important; text-decoration:none !important; background:transparent !important; border:2px solid rgba(196,180,154,0.75) !important; color:#f4efe6 !important; }",
       "html body section.col:not([data-show-all]) .chore-list > .chore:nth-child(n+5) { display:none !important; }",
       "html body section.col .chore { height:auto !important; min-height:0 !important; max-height:none !important; overflow:visible !important; }",
       "html body section.col .chore-list { overflow:visible !important; }",
-      "html body .panel > section.cheer, html body .cheer { left:480px !important; width:980px !important; right:auto !important; }"
+      "html:not(#hf-wall-off) body .panel > section.cheer, html:not(#hf-wall-off) body .panel .cheer { left:820px !important; width:640px !important; top:48px !important; }"
     ].join("");
+    }
     document.querySelectorAll(".more-chip").forEach(function (chip) {
       if (chip.getAttribute("data-wired") === "1") return;
       chip.setAttribute("data-wired", "1");
