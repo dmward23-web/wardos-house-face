@@ -1275,9 +1275,19 @@ html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock-host {
   left: 760px !important;
   top: 8px !important;
   width: auto !important;
-  min-width: 280px !important;
-  max-width: 420px !important;
+  min-width: 0 !important;
+  max-width: none !important;
   overflow: visible !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  outline: 0 !important;
+}
+html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock {
+  border: 2px solid #c4b49a !important;
+  border-radius: 16px !important;
+  padding: 0 16px !important;
 }
 html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock,
 html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst [data-live-clock] {

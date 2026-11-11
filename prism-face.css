@@ -906,24 +906,35 @@ html body [data-live-clock] {
 @media (min-width: 1400px) and (min-height: 700px) {
 html.kw-root body.kw-on .kw-hud {
   display: grid !important;
-  grid-template-columns: 96px minmax(180px, 1fr) 160px 360px !important;
+  grid-template-columns: 96px minmax(180px, 1fr) max-content 88px !important;
   column-gap: 24px !important;
   left: 48px !important;
   top: 48px !important;
   width: 1824px !important;
   height: 96px !important;
   position: fixed !important;
+  overflow: visible !important;
 }
 html.kw-root body.kw-on .kw-mute,
 html.kw-root body.kw-on .house-snd.kw-mute {
-  position: absolute !important;
-  top: 0 !important;
-  right: 0 !important;
-  height: 64px !important;
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  grid-column: 4 !important;
+  justify-self: end !important;
+  align-self: center !important;
+  width: 88px !important;
+  min-width: 88px !important;
+  max-width: 88px !important;
+  height: 88px !important;
+  min-height: 88px !important;
+  max-height: 88px !important;
   margin: 0 !important;
+  z-index: 4 !important;
 }
 html.kw-root body.kw-on .kw-clock {
-  grid-column: 4 !important;
+  grid-column: 3 !important;
   justify-self: end !important;
   align-self: center !important;
   width: max-content !important;

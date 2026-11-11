@@ -326,7 +326,19 @@
   html:not(#hf-wall-off) body #lights-status-pill {
     position: static !important;
   }
-  html body .panel.lights-cmd .light-pad-src { display: none !important; }
+  html body .panel.lights-cmd .light-pad-src,
+  html body .panel.lights-cmd #lights-stub-grid,
+  html body .panel.lights-cmd #lights-note,
+  html body .panel.lights-cmd footer.ftr { display: none !important; }
+  html body .panel.lights-cmd .light-pad-ico {
+    background: none !important;
+    background-image: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: #f4efe6 !important;
+  }
+  html body .panel.lights-cmd .light-pad.is-on .light-pad-ico { color: #c4b49a !important; }
   html:not(#hf-wall-off) body .panel.lights-cmd .cmd-chip.cmd-chip,
   html:not(#hf-wall-off) body .panel.lights-cmd #lights-all-on,
   html:not(#hf-wall-off) body .panel.lights-cmd #lights-all-off {
