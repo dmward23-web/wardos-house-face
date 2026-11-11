@@ -63,7 +63,7 @@
       '<path d="M58 16 h44 v18 c16 8 26 24 26 42 v70 c0 20 -18 32 -48 32 s-48 -12 -48 -32 v-70 c0 -18 10 -34 26 -42 v-18 z" fill="rgba(15,26,34,0.35)" stroke="#f4efe6" stroke-width="3"/>' +
       '<path d="M62 16 h36" stroke="#f4efe6" stroke-width="3"/>' +
       '<g clip-path="url(#prism-jar-clip)">' + dots + "</g></svg>" +
-      '<span class="prism-jar-label">Jar</span><span class="prism-jar-count">' + stones.filter(function (s) { return s[1] >= top; }).length + '</span><button type="button" class="prism-jar-plus" aria-label="Add">+</button>';
+      '<span class="prism-jar-label">Jar</span>' + (document.body && document.body.getAttribute("data-kid") === "ainsley" ? "" : '<span class="prism-jar-count">' + stones.filter(function (s) { return s[1] >= top; }).length + '</span>') + '<button type="button" class="prism-jar-plus" aria-label="Add">+</button>';
     var plus = el.querySelector(".prism-jar-plus");
     if (plus) plus.onclick = function () {
       var old = host.querySelector(".saves-plus");
@@ -79,7 +79,7 @@
         return /rest|unavailable/i.test((cam.className || "") + " " + (cam.textContent || ""));
       });
       var wall = (global.innerWidth || 0) >= 1400 && (global.innerHeight || 0) >= 700;
-      deck.classList.toggle("cams-resting", resting && wall);
+      deck.classList.toggle("cams-resting", false);
       if (resting) {
         var label = deck.querySelector(".hub-cam-label");
         if (label) label.textContent = "Cameras resting";

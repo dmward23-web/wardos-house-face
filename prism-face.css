@@ -49,10 +49,10 @@ html body button.kw-home.wardos-home {
 html body .hub-home img,
 html body .kw-home img,
 html body .wardos-home img {
-  width: 40px !important;
-  height: 40px !important;
-  min-width: 40px !important;
-  min-height: 40px !important;
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
 }
 
 /* A2 · one clock chip. */
@@ -173,7 +173,7 @@ html body #hub-cam-deck.cams-resting {
   max-height: 56px !important;
   grid-template-columns: 1fr !important;
 }
-html body #hub-cam-deck.cams-resting .hub-cam:not(:first-child) { display: none !important; }
+html body #hub-cam-deck.cams-resting .hub-cam:not(:first-child) { display: flex !important; }
 html body #hub-cam-deck.cams-resting .hub-cam,
 html body #hub-cam-deck.cams-resting .hub-cam-foot {
   height: 56px !important;
@@ -644,6 +644,8 @@ html.kw-root body.kw-on #sec-jar .prism-jar-count {
 }
 html body #hub-cam-deck.cams-resting { margin: 0 0 8px !important; }
 html body .hub-lights-bulk { margin-top: 0 !important; }
+html body .panel .body { padding: 48px !important; box-sizing: border-box !important; }
+html body .more-chip { right: 24px !important; }
 html body #hub-cam-deck { margin-bottom: 0 !important; }
 html body .hub-lights,
 html body #hub-lights-panel { margin-top: 8px !important; }

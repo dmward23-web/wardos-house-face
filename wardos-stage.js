@@ -65,6 +65,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     if (!document.body) return null;
     if (!wanted()) {
       document.documentElement.removeAttribute("data-wardos-stage");
+      ensureHome(document.body);
       return null;
     }
     var node = ensureStage();
@@ -207,6 +208,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     if (existing) {
       existing.classList.add("wardos-home");
       if (existing.tagName === "A") existing.setAttribute("href", "sheet-index.html");
+      existing.setAttribute("data-kw-home", "");
       if (!existing.getAttribute("aria-label")) existing.setAttribute("aria-label", "Home");
       var icon = existing.querySelector("img");
       if (icon && !icon.getAttribute("src")) icon.setAttribute("src", "assets/icons/home-key-light.svg");
@@ -216,6 +218,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     var btn = document.createElement("a");
     btn.className = "wardos-home";
     btn.href = "sheet-index.html";
+    btn.setAttribute("data-kw-home", "");
     btn.setAttribute("aria-label", "Home");
     var img = document.createElement("img");
     img.src = "assets/icons/home-key-light.svg";

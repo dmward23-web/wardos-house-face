@@ -2455,9 +2455,7 @@
     fitNext();
     document.addEventListener("house:kids-data-ready", fitNext);
     document.addEventListener("house:kid-rendered", fitNext);
-    stage.querySelector("[data-kw-home]").addEventListener("click", function () {
-      try { sessionStorage.setItem("ori-from", "1"); } catch (eHome) {}
-    });
+    stage.querySelector("[data-kw-home]").setAttribute("href", "sheet-index.html");
     stage.querySelector("[data-kw-path]").addEventListener("click", function () {
       var d = document.getElementById("kw-cal");
       if (!d) return;
