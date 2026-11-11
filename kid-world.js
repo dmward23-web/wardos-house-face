@@ -96,6 +96,9 @@
     if (!list || !panel) return;
     var body = panel.parentElement;
     if (body && body.classList.contains("body")) {
+      /* 24px above the old top, so 10 rows of 64 keep a 16px pitch and 12px of list padding. The jar stays at 1032. */
+      body.style.setProperty("top", "144px", "important");
+      body.style.setProperty("height", "888px", "important");
       body.style.setProperty("grid-template-rows", "1fr 64px", "important");
       body.style.setProperty("gap", "16px", "important");
       body.style.setProperty("align-content", "stretch", "important");
@@ -132,12 +135,7 @@
     var n = rows.length;
     var show = n;
     var gap = n > 1 ? (inner - n * 64) / (n - 1) : 0;
-    if (!(gap >= 0) || inner < n * 64) {
-      var moreH = 48;
-      show = Math.max(1, Math.floor((inner - moreH) / 64));
-      gap = show > 1 ? (inner - moreH - show * 64) / show : 0;
-      if (!(gap >= 0)) gap = 0;
-    }
+    if (!(gap >= 16)) gap = 16;
     rows.forEach(function (row, i) {
       var on = i < show;
       row.style.setProperty("display", on ? "flex" : "none", "important");
