@@ -29,7 +29,7 @@ const events = {
     { id: "span", summary: "Kids with Dan", start: { date: "2026-11-09" }, end: { date: "2026-11-16" } },
     { id: "bad", summary: "Hayes — provider check-in · confirmed Mon 9:00", description: "<img src=x onerror=alert(1)> therapy notes", start: { dateTime: "2026-11-10T14:50:00-06:00" }, end: { dateTime: "2026-11-10T15:30:00-06:00" } },
     { id: "counsel", summary: "Harris counseling check in", kind: "school", start: { dateTime: "2026-11-10T13:00:00-06:00" }, end: { dateTime: "2026-11-10T13:30:00-06:00" } },
-    { id: "pick", summary: "Hayes — school pickup", description: "provider notes in the description", start: { dateTime: "2026-11-10T15:15:00-06:00" }, end: { dateTime: "2026-11-10T15:30:00-06:00" } },
+    { id: "pick", summary: "Hayes — school pickup", description: "front door", start: { dateTime: "2026-11-10T15:15:00-06:00" }, end: { dateTime: "2026-11-10T15:30:00-06:00" } },
     { id: "swim", summary: "Ainsley swim", start: { dateTime: "2026-11-10T16:25:00-06:00" }, end: { dateTime: "2026-11-10T17:00:00-06:00" } },
     { id: "soc", summary: "Harris — leave for soccer · 6:30-7:30", start: { dateTime: "2026-11-10T18:00:00-06:00" }, end: { dateTime: "2026-11-10T19:30:00-06:00" } },
     { id: "gone", summary: "Canceled Sample visit", status: "confirmed", start: { dateTime: "2026-11-10T19:00:00-06:00" }, end: { dateTime: "2026-11-10T20:00:00-06:00" } },

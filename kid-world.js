@@ -130,7 +130,7 @@
     list.style.setProperty("overflow", "hidden", "important");
     list.style.setProperty("scrollbar-width", "none", "important");
     list.style.setProperty("background", "#0f1a22", "important");
-    list.style.setProperty("padding", "12px 0", "important");
+    list.style.setProperty("padding", "0", "important");
     list.style.setProperty("margin", "0", "important");
     list.style.setProperty("border", "0", "important");
     list.style.setProperty("display", "flex", "important");
@@ -140,11 +140,14 @@
     var oldMore = list.querySelector(".more-chip");
     if (oldMore) oldMore.style.setProperty("display", "none", "important");
     var H = list.clientHeight;
-    var inner = H - 24;
     var n = rows.length;
     var show = n;
-    var gap = n > 1 ? (inner - n * 64) / (n - 1) : 0;
-    if (!(gap >= 8)) gap = 8;
+    var gap = 16;
+    var need = n * 64 + Math.max(0, n - 1) * gap;
+    if (H > 0 && need > H) {
+      list.style.setProperty("overflow-y", "auto", "important");
+      list.style.setProperty("scrollbar-width", "thin", "important");
+    }
     rows.forEach(function (row, i) {
       var on = i < show;
       row.style.setProperty("display", on ? "flex" : "none", "important");
@@ -234,7 +237,7 @@
       }
       n.hidden = false;
       try { console.info("[kid-next] schedule feed missing"); } catch (eLog) {}
-      n.textContent = "Nothing next";
+      n.textContent = "Schedule not loaded · tap to retry";
       if (document.body) document.body.classList.add("kw-rest");
     }
     function hideRest() {
@@ -266,7 +269,7 @@
         note.style.setProperty("box-sizing", "border-box", "important");
         note.style.setProperty("overflow", "visible", "important");
         try { console.info("[kid-next] schedule feed missing"); } catch (eLog2) {}
-        note.textContent = "Nothing next";
+        note.textContent = "Schedule not loaded · tap to retry";
         note.addEventListener("click", function () {
           if (global.WardKids && WardKids.boot) WardKids.boot(kid());
         });

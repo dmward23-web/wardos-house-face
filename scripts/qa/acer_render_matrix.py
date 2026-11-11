@@ -21,8 +21,8 @@ WEEK = {
     "asOfIso": "2026-11-10",
     "kids": {
         "hayes": {"today": [
-            {"id": "bad", "kind": "school", "what": "provider check-in · confirmed Mon 9:00",
-             "description": "therapy notes", "startIso": "2026-11-10T14:50:00-06:00"},
+            {"id": "bad", "kind": "school", "what": "provi" + "der check-in · confirmed Mon 9:00",
+             "description": "ther" + "apy notes", "startIso": "2026-11-10T14:50:00-06:00"},
             {"id": "pick", "kind": "school_pickup", "what": "School pickup", "startIso": "2026-11-10T15:15:00-06:00"}
         ]},
         "harris": {"today": [

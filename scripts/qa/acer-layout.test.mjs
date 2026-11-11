@@ -147,12 +147,18 @@ test("boys glass drops provider and therapy text and keeps one canonical time", 
     id: "pick",
     kind: "school_pickup",
     summary: "Hayes — school pickup",
-    description: "therapy in the description only",
+    description: "front door",
     startIso: "2026-11-10T21:15:00.000Z"
   }, "hayes");
   assert.equal(pickup.title, "School pickup");
   assert.equal(pickup.time, "3:15 PM");
-  assert.equal(pickup.title.includes("therapy"), false);
+  assert.equal(D.summarize({
+    id: "pick-hidden",
+    kind: "school_pickup",
+    summary: "Hayes — school pickup",
+    description: raw.description,
+    startIso: "2026-11-10T21:15:00.000Z"
+  }, "hayes"), null);
   const soccer = D.summarize({
     id: "soc",
     kind: "leave",
@@ -180,7 +186,7 @@ test("boys glass drops provider and therapy text and keeps one canonical time", 
   assert.equal(/\d/.test(swimKid.title), false);
   const week = {
     kids: {
-      hayes: { today: [raw, { id: "pick", kind: "school_pickup", what: "Hayes — school pickup", startIso: "2026-11-10T21:15:00.000Z", hint: "therapy notes" }] },
+      hayes: { today: [raw, { id: "pick", kind: "school_pickup", what: "Hayes — school pickup", startIso: "2026-11-10T21:15:00.000Z", hint: "front door" }] },
       ainsley: { today: [{ summary: "Swim leave", startIso: "2026-11-10T22:25:00.000Z", what: "4:25 swim" }] }
     }
   };

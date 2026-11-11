@@ -31,6 +31,13 @@ html[data-wardos-stage] .wardos-stage {
   background-position: 0 0;
   background-size: auto;
 }
+html[data-wardos-stage] body .panel::before,
+html[data-wardos-stage] body .panel::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  box-shadow: none !important;
+}
 html[data-wardos-stage] .km-leaf,
 html[data-wardos-stage] .km-glow,
 html[data-wardos-stage] .km-fall,

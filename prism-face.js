@@ -66,7 +66,8 @@
       '<path d="M58 16 h44 v18 c16 8 26 24 26 42 v70 c0 20 -18 32 -48 32 s-48 -12 -48 -32 v-70 c0 -18 10 -34 26 -42 v-18 z" fill="rgba(15,26,34,0.35)" stroke="#f4efe6" stroke-width="3"/>' +
       '<path d="M62 16 h36" stroke="#f4efe6" stroke-width="3"/>' +
       '<g clip-path="url(#prism-jar-clip)">' + dots + "</g></svg>" +
-      '<span class="prism-jar-label">Jar</span><span class="prism-jar-count">' + (empty ? 0 : stones.filter(function (s) { return s[1] >= top; }).length) + '</span><button type="button" class="prism-jar-plus" aria-label="Add">+</button>';
+      '<span class="prism-jar-label">Jar</span><span class="prism-jar-count">' + (empty ? 0 : stones.filter(function (s) { return s[1] >= top; }).length) + "</span>" +
+      ((document.body && document.body.getAttribute("data-kid") === "ainsley") ? "" : '<button type="button" class="prism-jar-plus" aria-label="Add">+</button>');
     var plus = el.querySelector(".prism-jar-plus");
     if (plus) plus.onclick = function () {
       var old = host.querySelector(".saves-plus");
@@ -469,8 +470,7 @@
       chip.addEventListener("click", function () {
         var col = chip.closest("section") || chip.parentElement;
         if (col) col.setAttribute("data-show-all", "1");
-        if (col) col.querySelectorAll(".chore").forEach(function (card) { card.style.removeProperty("display"); });
-        chip.remove();
+        if (window.fitChoreColumns) window.fitChoreColumns();
       });
     });
     if (!document.documentElement.getAttribute("data-prism-nav")) {

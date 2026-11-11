@@ -16,7 +16,7 @@ const events = {
     { id: "span", summary: "Kids with Dan", start: { date: "2026-11-09" }, end: { date: "2026-11-16" } },
     { id: "bad", summary: "Hayes — provider check-in · confirmed Mon 9:00", description: "therapy notes", start: { dateTime: "2026-11-10T14:50:00-06:00" }, end: { dateTime: "2026-11-10T15:30:00-06:00" } },
     { id: "clin", summary: "Harris — clinical check-in", start: { dateTime: "2026-11-10T11:00:00-06:00" }, end: { dateTime: "2026-11-10T11:30:00-06:00" } },
-    { id: "pick", summary: "Hayes — school pickup", description: "provider notes in the description", start: { dateTime: "2026-11-10T15:15:00-06:00" }, end: { dateTime: "2026-11-10T15:30:00-06:00" } },
+    { id: "pick", summary: "Hayes — school pickup", description: "front door", start: { dateTime: "2026-11-10T15:15:00-06:00" }, end: { dateTime: "2026-11-10T15:30:00-06:00" } },
     { id: "dad", summary: "Dan — school pickup", start: { dateTime: "2026-11-10T15:15:00-06:00" }, end: { dateTime: "2026-11-10T15:30:00-06:00" } },
     { id: "swim", summary: "Ainsley swim", start: { dateTime: "2026-11-10T16:25:00-06:00" }, end: { dateTime: "2026-11-10T17:00:00-06:00" } },
     { id: "soc", summary: "Harris — leave for soccer · 6:30-7:30", start: { dateTime: "2026-11-10T18:00:00-06:00" }, end: { dateTime: "2026-11-10T19:30:00-06:00" } }
@@ -86,10 +86,10 @@ test("calendar-refresh and cal-from-events agree on the Thursday breakfast event
   assert.match(calBlob, /pickup|Pickup|swim|Swim|soccer|Soccer/i);
 });
 
-test("a missing feed shows Nothing next and logs it", () => {
+test("a missing feed shows the unavailable line and logs it", () => {
   const src = fs.readFileSync(path.join(ROOT, "kid-world.js"), "utf8");
-  /* The kid sees Nothing next. The miss is a log, not a sentence kept in a comment for this check. */
-  assert.match(src, /n\.textContent = "Nothing next"/);
+  assert.match(src, /n\.textContent = "Schedule not loaded · tap to retry"/);
+  assert.match(src, /note\.textContent = "Schedule not loaded · tap to retry"/);
   assert.match(src, /console\.info\("\[kid-next\] schedule feed missing"\)/);
   assert.doesNotMatch(src, /Schedule didn't load/);
   assert.doesNotMatch(src, /Schedule unavailable/);

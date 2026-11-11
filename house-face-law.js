@@ -128,10 +128,26 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     try { t = t.normalize("NFKC"); } catch (e) { /* */ }
     return THERAPY.test(t);
   }
-  function rowTherapy(o) {
-    if (typeof o === "string") return isTherapy(o);
-    if (!o || typeof o !== "object" || Array.isArray(o)) return false;
-    return isTherapy([o.summary, o.title, o.what, o.l, o.label, o.text, o.kind, o.category, o.hint, o.place].filter(function (x) { return typeof x === "string"; }).join(" "));
+  var SOFT_SESSION = /\b(?:appointments?|sessions?)\b/i;
+  function sourceOf(o) {
+    if (typeof o === "string") return o;
+    if (!o || typeof o !== "object" || Array.isArray(o)) return "";
+    var parts = [];
+    Object.keys(o).forEach(function (k) {
+      if (/^(id|href|url|link|status|providerOptIn)$/i.test(k) || /iso$/i.test(k)) return;
+      if (typeof o[k] === "string") parts.push(o[k]);
+    });
+    return parts.join("\n");
+  }
+  function rowTherapy(o, kidId) {
+    var raw = sourceOf(o);
+    var t = raw;
+    try { t = raw.normalize("NFKC"); } catch (e) { /* */ }
+    if (isTherapy(t) && !SOFT_SESSION.test(t)) return true;
+    if (isTherapy(t) && /therap|provider|clinical|speech|counsel|psycholog|psychiatr|telehealth|anxiety|\bdoctors?\b|\bdrs?\b|\bot\b/i.test(t)) return true;
+    var who = String(kidId || (o && (o.kid || o.owner || o.kidId)) || "");
+    if (/^hayes$|^harris$/i.test(who) && (isTherapy(t) || SOFT_SESSION.test(t))) return true;
+    return false;
   }
   /* LIVEFIX1 · Dan, Nov 10 2026, 6:08 PM CT: her board shows real clock times. $ % stars and quest counts still come off.
      when/time/hours/whenLabel keep the clock ("4:25"); other strings still drop digits, so "Mon 26 · 2:20" keeps "2:20". */
@@ -172,20 +188,20 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     if (typeof kid.streakLabel === "string") kid.streakLabel = ainsleyText(kid.streakLabel);
   }
   var ROW_LISTS = ["today", "school", "sports", "appointments", "week", "events", "ahead", "upcoming"];
-  function cleanKid(kid, now) {
+  function cleanKid(kid, now, id) {
     if (!kid || typeof kid !== "object") return;
     var colorRows = kid._lawColorRows || [];
     ROW_LISTS.forEach(function (k) {
       if (!Array.isArray(kid[k])) return;
       kid[k] = kid[k].filter(function (r) {
-        if (r && rowTherapy(r)) return false;   /* LIVEFIX1 */
+        if (r && rowTherapy(r, id)) return false;   /* LIVEFIX1 */
         if (r && isDressDay(rowText(r))) { if (/\b(orange|yellow|green|red)\s+day\b/i.test(rowText(r))) colorRows.push(r); return false; }
         return !rowEnded(r, now);
       });
     });
     kid._lawColorRows = colorRows;
     var hot = kid.hottest;
-    if (hot && (isDressDay(rowText(hot)) || rowTherapy(hot) || rowEnded(hot, now))) {
+    if (hot && (isDressDay(rowText(hot)) || rowTherapy(hot, id) || rowEnded(hot, now))) {
       var pool = [];
       ["today", "appointments", "sports", "school", "week"].forEach(function (k) { (kid[k] || []).forEach(function (r) { if (r && r.what && keepRow(r, now) && r.kind !== "note" && !isSpecialRow(r) && !/\bwith Dad\b|\bDad week\b|\bat home\b/i.test(r.what) && !(dayOffset(r.when, now) === 0 && /\bAll day\b/i.test(String(r.when || "")))) pool.push(r); /* NEXT = the next thing coming up; today's all-day notes stay in their own rows */ }); }); /* custody-law:allow (matcher that skips these rows) */
       pool.sort(function (a, b) { return rowKey(a, now) - rowKey(b, now); });
@@ -206,7 +222,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     var now = ctNow();
     try {
       var kids = data.kids || {};
-      Object.keys(kids).forEach(function (id) { cleanKid(kids[id], now); if (kids[id] && isAinsley(kids[id], id)) cleanAinsley(kids[id]); });
+      Object.keys(kids).forEach(function (id) { cleanKid(kids[id], now, id); if (kids[id] && isAinsley(kids[id], id)) cleanAinsley(kids[id]); });
       if (Array.isArray(data.leaveBys)) data.leaveBys = data.leaveBys.filter(function (it) { return !rowTherapy(it); });   /* LIVEFIX1 */
       var q = data.boardStrip && data.boardStrip.queue;
       if (Array.isArray(q)) data.boardStrip.queue = q.filter(function (it) { return !isDressDay(rowText(it)) && !rowTherapy(it); });

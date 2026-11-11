@@ -669,7 +669,8 @@
  </div>
  </header>
 
- <a class="leaveby" href="sheet-today.html" aria-label="Next leave-by">
+ <style>html body a.leaveby { display: none !important; } html body .live-clock, html body [data-live-clock] { text-shadow: none !important; box-shadow: none !important; filter: none !important; background: #101820 !important; border: 2px solid #c4b49a !important; }</style>
+ <a class="leaveby" href="sheet-today.html" aria-label="Next leave-by" hidden>
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
  <div class="leaveby-label" data-live="leaveby-label"></div>
@@ -734,8 +735,21 @@
   var MS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   var grid = document.querySelector(".month-grid");
   var DATA = null, cur = null;
+  function pinnedNow() {
+    try {
+      if (window.HouseScene && typeof HouseScene.now === "function") return HouseScene.now();
+    } catch (e) { /* */ }
+    try {
+      var q = new URLSearchParams(location.search).get("now");
+      if (q) {
+        var d = new Date(q);
+        if (!isNaN(+d)) return d;
+      }
+    } catch (e2) { /* */ }
+    return new Date();
+  }
   function ctToday() {
-    var p = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+    var p = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" }).format(pinnedNow());
     return { y: +p.slice(0, 4), m: +p.slice(5, 7), d: +p.slice(8, 10), iso: p };
   }
   function pad(n) { return (n < 10 ? "0" : "") + n; }

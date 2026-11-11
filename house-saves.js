@@ -29,20 +29,37 @@
     var widened = false;
     var s = raw;
     try { s = raw.normalize("NFKC"); widened = s !== raw; } catch (e) { s = raw; }
+    var moneyLabel = /\b(?:allowance|income|salary|balance|budget|payment|pennies|cash|usd|dollars?|bucks|money|cents?|euros?|pounds|gbp|eur|jar)\b/gi;
+    if (moneyLabel.test(s) && /\d/.test(s)) {
+      moneyLabel.lastIndex = 0;
+      s = s.replace(moneyLabel, " ").replace(/\d[\d,.]*/g, " ");
+    }
     s = s.replace(/[€£¥₩₹]\s*\d[\d,.]*/g, "");
     s = s.replace(/\b(?:usd|eur|gbp)\s*\d[\d,.]*/gi, "");
     s = s.replace(/\$/g, "");
     if (widened) s = s.replace(/\d[\d,.]*/g, "");
     s = s.replace(/\b(?:salary|balance|budget|payment|pennies|cash|usd|dollars?|bucks|money|cents?|euros?|pounds|gbp|eur)\b/gi, "");
     s = s.replace(/[★☆]/g, "");
-    return s.replace(/\s+/g, " ").replace(/^[\s·\-]+|[\s·\-]+$/g, "").trim();
+    s = s.replace(/\b(\d[\d,.]*)\s+(toy)\b/gi, "$2").replace(/\b(toy)\s+(\d[\d,.]*)\b/gi, "$1");
+    s = s.replace(/\s+/g, " ").replace(/^[\s·\-]+|[\s·\-]+$/g, "").trim();
+    if (/\b(?:allowance|income|jar)\b/i.test(s) && /\d/.test(s)) return "";
+    if (/^\d[\d,.]*\s+toy$/i.test(s)) return "";
+    return s;
   }
 
   function list(kidId) {
     var root = loadRoot();
-    if (root[kidId] && root[kidId].some(function (x) { return x && noDollar(x.name) !== String(x.name || "").trim(); })) {
-      root[kidId].forEach(function (x) { if (x && x.name != null) x.name = noDollar(x.name) || "Save"; });
-      saveRoot(root);
+    if (root[kidId]) {
+      var next = [];
+      var dirty = false;
+      root[kidId].forEach(function (x) {
+        if (!x) { dirty = true; return; }
+        var cleaned = noDollar(x.name);
+        if (!cleaned) { dirty = true; return; }
+        if (cleaned !== String(x.name || "").trim()) { x.name = cleaned; dirty = true; }
+        next.push(x);
+      });
+      if (dirty) { root[kidId] = next; saveRoot(root); }
     }
     if (root[kidId] && root[kidId].some(function (x) { return x && /^seed-/.test(String(x.id || "")); })) {
       root[kidId] = root[kidId].filter(function (x) { return x && !/^seed-/.test(String(x.id || "")); });
@@ -79,7 +96,10 @@
     var arr = root[kidId] || [];
     for (var i = 0; i < arr.length; i++) {
       if (arr[i].id === id) {
-        if (name != null) arr[i].name = noDollar(name).trim() || noDollar(arr[i].name).trim() || "Save";
+        if (name != null) {
+          var cleaned = noDollar(name).trim();
+          if (cleaned) arr[i].name = cleaned;
+        }
         if (need != null) {
           var n = parseInt(need, 10);
           arr[i].need = isNaN(n) || n < 0 ? 0 : n;
@@ -140,6 +160,7 @@
     var ov = document.createElement("div");
     ov.className = "saves-overlay";
     ov.innerHTML =
+      '<a class="saves-home wardos-home" href="sheet-index.html">Home</a>' +
       '<button type="button" class="saves-backdrop" data-saves-backdrop aria-label="Close"></button>' +
       '<div class="saves-sheet" role="dialog" aria-modal="true">' + innerHTML + "</div>";
     document.body.appendChild(ov);

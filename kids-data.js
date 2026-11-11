@@ -2329,7 +2329,7 @@
           routine.hidden = false;
           routine.innerHTML =
             '<span class="consume-routine-ico g2-inline">' + g2Ico("g2-routine") + "</span>" +
-            '<div class="consume-routine-txt"><b>Swim</b> · leave 4:25 · Coach Ann</div>' +
+            '<div class="consume-routine-txt"><b>Swim</b> · leave 4:25</div>' +
             '<span class="consume-routine-badge">Tue/Thu</span>';
         } else if (swimDays.length === 1) {
           routine.hidden = true;

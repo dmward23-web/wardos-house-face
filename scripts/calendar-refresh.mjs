@@ -295,7 +295,7 @@ function classify(ev) {
     if (kr && !RX(String.raw`§ (drop|pickup)`, "i").test(summary)) {
       return { kind: "leave", summary, busy: !isFree(ev), ride: true, kidRide: true, kid: kr[1].toLowerCase() };
     } }
-  if (/swim|Swim|Coach Ann/i.test(summary)) return { kind: "sport", sport: "swim", summary, kid: "ainsley" };
+  if (/swim|Swim/i.test(summary)) return { kind: "sport", sport: "swim", summary, kid: "ainsley" };
   if (/baseball|BASEBALL|Falcons/i.test(summary) && /hayes/i.test(summary)) {
     return { kind: "sport", sport: "baseball", summary, kid: "hayes" };
   }

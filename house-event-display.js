@@ -7,7 +7,12 @@
   var TZ = "America/Chicago";
   /* Stems stay open at the end: "therapy" / "psychology" / "psychiatry" are denied, not only the bare stem.
      A clinical word anywhere in the source drops the whole item. It is never renamed to Homework. */
-  var CLINICAL = /(?:\b(?:ot|speech|drs?|doctors?|appointments?|telehealth|sessions?|counsel(?:or|ing|ling)?|anxiety|provider|clinical)\b|\btherap|\bpsycholog|\bpsychiatr)/i;
+  /* Hard clinical words drop an item for every audience. Appointment and session
+     are a boys-only ban so Ainsley's and Dan's own sessions can stay. */
+  var HARD = /(?:\b(?:ot|speech|drs?|doctors?|telehealth|counsel(?:or|ing|ling)?|anxiety|provider|clinical)\b|\btherap|\bpsycholog|\bpsychiatr)/i;
+  var SOFT = /\b(?:appointments?|sessions?)\b/i;
+  var CLINICAL = new RegExp(HARD.source + "|" + SOFT.source, "i");
+  var SKIP_KEY = /^(id|icdId|href|url|link|htmlLink|source|tz|status|tone|cadence|theme|color|colour|cls|class|kid|owner|audience|kidId|providerOptIn|allDay|leaveBy|timeRole)$/i;
   var CANCEL = /(?:^|\b)(?:cancel+ed|cxl)\b/i;
   var RANGE = /\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?\s*[-–—to]{1,3}\s*\d{1,2}(?::\d{2})?/i;
   var LISTS = ["today", "school", "sports", "appointments", "week", "events", "ahead", "upcoming", "hottest"];
@@ -27,13 +32,39 @@
     if (!ev || typeof ev !== "object") return "";
     return nfkc([ev.kind, ev.category, ev.safeCategory, ev.type].map(textOf).filter(Boolean).join("\n"));
   }
-  function isDenied(ev) {
+  /* Every prose field, before any title is rewritten or cleared. */
+  function sourceBlob(ev) {
+    if (ev == null) return "";
+    if (typeof ev !== "object") return nfkc(textOf(ev));
+    var parts = [];
+    Object.keys(ev).forEach(function (k) {
+      if (SKIP_KEY.test(k) || /iso$/i.test(k)) return;
+      var v = ev[k];
+      if (typeof v === "string") parts.push(v);
+    });
+    return nfkc(parts.join("\n"));
+  }
+  function isBoy(audience) {
+    var a = String(audience || "").toLowerCase();
+    return a === "hayes" || a === "harris";
+  }
+  function isDenied(ev, audience) {
     if (!ev) return false;
-    if (typeof ev === "string") return CLINICAL.test(nfkc(ev)) || CANCEL.test(ev);
+    if (typeof ev === "string") {
+      var s = nfkc(ev);
+      if (CANCEL.test(s)) return true;
+      if (isBoy(audience)) return HARD.test(s) || SOFT.test(s);
+      return HARD.test(s);
+    }
     if (ev.status === "cancelled" || ev.status === "canceled") return true;
-    var title = titleBlob(ev);
-    var kind = kindBlob(ev);
-    return CLINICAL.test(title) || CLINICAL.test(kind) || CANCEL.test(title);
+    var blob = sourceBlob(ev);
+    if (CANCEL.test(titleBlob(ev))) return true;
+    var who = audience != null ? String(audience) : "";
+    var boy = isBoy(who) || isBoy(ev.kid) || isBoy(ev.owner) || isBoy(ev.kidId);
+    var trusted = /^(ainsley|adult|dan|dad|shared|hub)$/i.test(who);
+    if (HARD.test(blob)) return true;
+    if (boy || !trusted) return SOFT.test(blob);
+    return false;
   }
 
   function audienceOf(audience) {
@@ -112,10 +143,11 @@
     return rs != null && sm != null && rs !== sm;
   }
 
-  function allowTitle(ev) {
+  function allowTitle(ev, audience) {
+    if (isDenied(ev, audience)) return null;
     var text = titleBlob(ev);
     var kind = kindBlob(ev);
-    if (CLINICAL.test(text) || CLINICAL.test(kind) || CANCEL.test(text)) return null;
+    if (CANCEL.test(text)) return null;
     var leave = isLeave(ev, text);
     if (/school[_\s-]*pickup|\bpick\s*-?\s*up\b/i.test(text) || /school_pickup/.test(kind)) return "School pickup";
     if (/school[_\s-]*drop|\bdrop(?:\s*-?\s*off)?\b/i.test(text) || /school_drop/.test(kind)) return "School drop";
@@ -165,8 +197,8 @@
     var who = audienceOf(audience);
     if (typeof ev === "string") ev = { summary: ev, what: ev };
     if (!ev || typeof ev !== "object") return null;
-    if (isDenied(ev)) return null;
-    var title = allowTitle(ev);
+    if (isDenied(ev, audience)) return null;
+    var title = allowTitle(ev, audience);
     if (!title) {
       if (who === "adult") title = "Calendar item";
       else return null;

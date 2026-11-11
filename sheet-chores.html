@@ -1325,31 +1325,38 @@ document.addEventListener("DOMContentLoaded", function () {
         card.style.removeProperty("display");
       });
       var showAll = col.getAttribute("data-show-all") === "1";
-      var n = showAll ? cards.length : Math.min(5, cards.length);
+      var n = Math.min(5, cards.length);
       if (!cards.length) return;
       list.style.setProperty("gap", "16px", "important");
       list.style.setProperty("scrollbar-gutter", "auto", "important");
       list.style.setProperty("padding-left", "0", "important");
       list.style.setProperty("padding-right", "0", "important");
-      list.style.setProperty("overflow", "hidden", "important");
+      if (showAll && cards.length > n) {
+        list.style.setProperty("overflow-y", "auto", "important");
+        list.style.setProperty("scrollbar-width", "thin", "important");
+      } else {
+        list.style.setProperty("overflow", "hidden", "important");
+      }
       var gap = 16;
       var cs = getComputedStyle(list);
       var padY = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
       var H = list.clientHeight - padY;
       var rowH = Math.floor((H - gap * Math.max(0, n - 1)) / n);
       if (!isFinite(rowH) || rowH < 96) rowH = 96;
-      /* Option D. 589 inner: 32 inset, 64 icon, 13 gap, seven touching 64 zones, 32 inset. */
+      /* Option D. Seven 64 zones with 16px gaps (544) inside the 589 column. */
       col.style.setProperty("padding-left", "0", "important");
       col.style.setProperty("padding-right", "0", "important");
-      var inner = col.clientWidth;
-      var scale = inner / 589;
-      var left = inner === 589 ? 32 : Math.round(32 * scale);
-      var iconW = inner === 589 ? 64 : Math.round(64 * scale);
-      var mid = inner === 589 ? 13 : Math.round(13 * scale);
-      var zone = inner === 589 ? 64 : Math.round(64 * scale);
-      var right = inner - left - iconW - mid - zone * 7;
-      if (right < 0) { mid += right; right = 0; }
-      var dot = inner === 589 ? 52 : Math.max(1, Math.round(52 * zone / 64));
+      var inner = col.clientWidth || 589;
+      var zone = 64;
+      var dayGap = 16;
+      var daysW = zone * 7 + dayGap * 6;
+      var iconW = 32;
+      var left = 4;
+      var mid = inner - left - iconW - daysW;
+      if (mid < 0) { left = Math.max(0, left + mid); mid = inner - left - iconW - daysW; }
+      if (mid < 0) { iconW = Math.max(24, iconW + mid); mid = inner - left - iconW - daysW; }
+      var right = Math.max(0, inner - left - iconW - mid - daysW);
+      var dot = 52;
       var inset = Math.round((zone - dot) / 2);
       col.style.setProperty("--d-zone", zone + "px");
       col.style.setProperty("--d-dot", dot + "px");
@@ -1360,7 +1367,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
         card.style.setProperty("display", "grid", "important");
-        card.style.setProperty("grid-template-columns", left + "px " + iconW + "px " + mid + "px " + (zone * 7) + "px " + right + "px", "important");
+        card.style.setProperty("grid-template-columns", left + "px " + iconW + "px " + mid + "px " + daysW + "px " + right + "px", "important");
         card.style.setProperty("grid-template-rows", "24px " + zone + "px", "important");
         card.style.setProperty("column-gap", "0", "important");
         card.style.setProperty("row-gap", "4px", "important");
@@ -1399,7 +1406,8 @@ document.addEventListener("DOMContentLoaded", function () {
           what.style.setProperty("line-height", "24px", "important");
           what.style.setProperty("height", "24px", "important");
           what.style.setProperty("margin", "0", "important");
-          what.style.setProperty("overflow", "hidden", "important");
+          what.style.setProperty("overflow", "visible", "important");
+          what.style.setProperty("white-space", "nowrap", "important");
         }
         var taps = card.querySelector(".quest-days");
         if (taps) {
@@ -1407,9 +1415,9 @@ document.addEventListener("DOMContentLoaded", function () {
           taps.style.setProperty("grid-row", "2", "important");
           taps.style.setProperty("display", "grid", "important");
           taps.style.setProperty("grid-template-columns", "repeat(7, " + zone + "px)", "important");
-          taps.style.setProperty("gap", "0", "important");
+          taps.style.setProperty("gap", dayGap + "px", "important");
           taps.style.setProperty("justify-content", "start", "important");
-          taps.style.setProperty("width", (zone * 7) + "px", "important");
+          taps.style.setProperty("width", daysW + "px", "important");
           taps.style.setProperty("height", zone + "px", "important");
           taps.style.setProperty("min-height", zone + "px", "important");
           taps.style.setProperty("margin", "0", "important");
@@ -1432,6 +1440,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (chip && !more) chip.remove();
     });
   }
+  window.fitChoreColumns = fitChoreColumns;
   window.setTimeout(fitChoreColumns, 400);
   window.setTimeout(fitChoreColumns, 1000);
   window.setTimeout(fitChoreColumns, 1500);

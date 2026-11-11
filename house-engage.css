@@ -486,10 +486,29 @@ body.theme-ainsley.stick-season .saves-plus {
   inset: 0;
   z-index: 10000;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 24px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 48px;
   box-sizing: border-box;
+  gap: 16px;
+}
+.saves-home {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  min-width: 64px;
+  min-height: 64px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #f4efe6;
+  background: #0f1a22;
+  border-radius: 16px;
+  text-decoration: none;
 }
 .saves-backdrop {
   position: absolute;
@@ -503,13 +522,13 @@ body.theme-ainsley.stick-season .saves-plus {
 .saves-sheet {
   position: relative;
   z-index: 1;
-  width: min(420px, 100%);
-  max-height: 200px;
-  overflow: hidden;
+  width: min(720px, 100%);
+  max-height: none;
+  overflow: visible;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px 14px;
+  gap: 16px;
+  padding: 24px;
   border-radius: 12px;
   background: #1a1c16;
   color: #e8e4d4;
@@ -518,23 +537,23 @@ body.theme-ainsley.stick-season .saves-plus {
   box-sizing: border-box;
 }
 .saves-sheet-title {
-  font-size: 12px;
+  font-size: 24px;
   font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #d4a05a;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #f4efe6;
   flex-shrink: 0;
 }
 .saves-add-form {
   display: grid;
-  grid-template-columns: 1fr 72px auto;
-  gap: 6px;
+  grid-template-columns: 1fr 140px auto;
+  gap: 16px;
   align-items: center;
 }
 .saves-add-name {
-  height: 36px;
-  min-height: 36px;
-  font-size: 14px;
+  height: 64px;
+  min-height: 64px;
+  font-size: 24px;
   font-weight: 700;
   font-family: inherit;
   padding: 0 10px;
@@ -545,11 +564,11 @@ body.theme-ainsley.stick-season .saves-plus {
   box-sizing: border-box;
 }
 .saves-add-need {
-  width: 72px;
-  height: 36px;
-  min-height: 36px;
+  width: 140px;
+  height: 64px;
+  min-height: 64px;
   text-align: center;
-  font-size: 14px;
+  font-size: 24px;
   font-weight: 800;
   font-family: inherit;
   border-radius: 8px;
@@ -559,10 +578,10 @@ body.theme-ainsley.stick-season .saves-plus {
   box-sizing: border-box;
 }
 .saves-add-save {
-  height: 36px;
-  min-height: 36px;
-  padding: 0 14px;
-  font-size: 13px;
+  height: 64px;
+  min-height: 64px;
+  padding: 0 20px;
+  font-size: 24px;
   font-weight: 800;
   font-family: inherit;
   border-radius: 8px;
@@ -573,20 +592,20 @@ body.theme-ainsley.stick-season .saves-plus {
 }
 .saves-list-scroll {
   overflow: auto;
-  max-height: 96px; /* ~3 × 32px */
+  max-height: 420px;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 16px;
   flex: 1;
   min-height: 0;
 }
 .saves-list-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 32px;
-  min-height: 32px;
-  max-height: 32px;
+  gap: 16px;
+  height: 64px;
+  min-height: 64px;
+  max-height: none;
   padding: 0 4px;
   border-bottom: 1px solid rgba(138,112,64,0.35);
   box-sizing: border-box;
@@ -594,7 +613,7 @@ body.theme-ainsley.stick-season .saves-plus {
 .saves-list-name {
   flex: 1;
   min-width: 0;
-  font-size: 13px;
+  font-size: 24px;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -602,32 +621,33 @@ body.theme-ainsley.stick-season .saves-plus {
 }
 .saves-list-meta {
   flex-shrink: 0;
-  font-size: 11px;
+  font-size: 20px;
   font-weight: 800;
   color: #d4a05a;
 }
 .saves-list-del {
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 64px;
+  height: 64px;
   border: 0;
   background: transparent;
   color: #e8e4d4;
-  font-size: 16px;
+  font-size: 24px;
   font-weight: 800;
   cursor: pointer;
   opacity: 0.75;
 }
 .saves-list-empty {
-  font-size: 13px;
+  font-size: 24px;
   font-weight: 650;
   opacity: 0.8;
   padding: 8px 4px;
 }
 .saves-list-add {
   flex-shrink: 0;
-  height: 32px;
-  font-size: 12px;
+  height: 64px;
+  min-height: 64px;
+  font-size: 24px;
   font-weight: 800;
   font-family: inherit;
   border-radius: 8px;
