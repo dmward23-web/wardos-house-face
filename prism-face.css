@@ -375,7 +375,7 @@ body.theme-ainsley #sec-days .when {
   -webkit-text-fill-color: #f4efe6 !important;
 }
 html.kw-root body.kw-on #sec-jar .saves-bar-text,
-html.kw-root body.kw-on #sec-jar .jar-state,
+html.kw-root body.kw-on:not(.theme-ainsley) #sec-jar .jar-state,
 html.kw-root body.kw-on #sec-jar .bank-blurb { display: none !important; }
 html.kw-root body.kw-on #sec-jar .saves-plus,
 html.kw-root body.kw-on #sec-jar button.saves-plus {
@@ -447,7 +447,9 @@ html.kw-root.kw-root body.kw-on #sec-jar .prism-jar-plus {
   line-height: 64px !important;
   flex: none !important;
 }
-html.kw-root.kw-root body.theme-ainsley.kw-on #sec-jar > .bank-top { display: none !important; }
+html.kw-root.kw-root body.theme-ainsley.kw-on #sec-jar > .bank-top { display: flex !important; align-items: center !important; height: 100% !important; min-height: 0 !important; overflow: hidden !important; }
+html.kw-root body.theme-ainsley.kw-on #sec-jar .bank-top > div { display: flex !important; align-items: center !important; gap: 12px !important; min-width: 0 !important; }
+html.kw-root body.theme-ainsley.kw-on #sec-jar .jar-state { display: block !important; font-size: 24px !important; line-height: 1.2 !important; margin: 0 !important; }
 html body .chore .quest-days {
   display: grid !important;
   grid-template-columns: repeat(7, 72px) !important;
