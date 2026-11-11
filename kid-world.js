@@ -92,9 +92,20 @@
   function fitMustRows() {
     var list = document.querySelector("#sec-musts .chore-list, #sec-musts [data-mount-quests]");
     if (!list) return;
+    list.style.setProperty("gap", "16px", "important");
+    list.style.setProperty("height", "auto", "important");
+    list.style.setProperty("max-height", "none", "important");
+    list.style.setProperty("overflow", "visible", "important");
     [].forEach.call(list.children, function (row) {
       if (!row.classList || !row.classList.contains("chore")) return;
-      ["height", "min-height", "max-height", "margin", "flex"].forEach(function (p) { row.style.removeProperty(p); });
+      row.style.setProperty("box-sizing", "border-box", "important");
+      row.style.setProperty("height", "64px", "important");
+      row.style.setProperty("min-height", "64px", "important");
+      row.style.setProperty("max-height", "64px", "important");
+      row.style.setProperty("flex", "0 0 64px", "important");
+      row.style.setProperty("margin", "0", "important");
+      row.style.setProperty("overflow", "hidden", "important");
+      row.style.setProperty("transform", "none", "important");
     });
   }
   function paintPublicMusts() {
@@ -454,7 +465,7 @@
     }
     var jobs = [];
     var creatures = wallView()
-      ? [["hayes", "assets/ori/creature/idle-226.webp"], ["harris", "assets/ori/creature/harris-226.webp"], ["ainsley", "assets/ori/creature/ainsley.webp"]]
+      ? [["hayes", "assets/ori/creature/idle-226.webp"], ["harris", "assets/ori/creature/harris-226.webp"], ["ainsley", "assets/ori/creature/ainsley-226.webp"]]
       : [["hayes", "assets/ori/creature/idle.webp"], ["harris", "assets/ori/creature/harris.webp"], ["ainsley", "assets/ori/creature/ainsley.webp"]];
     creatures.forEach(function (row) {
       if (lean() && (row[0] !== me || oriCreature[me])) return;
@@ -1734,8 +1745,7 @@
     var sy = 1 - mot.squash * 0.09;
     var shown = 0;
     try { var gst = global.JarEngine ? JarEngine.choreState(id) : null; shown = gst && gst.shown != null ? gst.shown : (gst && gst.fill) || 0; } catch (eGrow) { shown = 0; }
-    var draw = box.draw * (0.82 + 0.36 * clamp(shown, 0, 1));
-    if ((world || kid()) === "ainsley") draw *= 1.45;
+    var draw = (img.width && img.height && img.width === img.height) ? img.width : box.draw;
     var bottom = box.foot + draw * 0.04 - mot.hop;
     ctx.save();
     ctx.translate(box.cx, box.groundY + 3);

@@ -722,8 +722,8 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on .panel .body {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    grid-template-rows: minmax(0, 1fr) 140px !important;
-    gap: 12px !important;
+    grid-template-rows: minmax(0, 1fr) 64px !important;
+    gap: 16px !important;
     height: 100% !important;
     min-height: 0 !important;
     width: 100% !important;
@@ -1120,10 +1120,10 @@ body.theme-ainsley #sec-days .harbor-strip:not(:has(.card)) { display: none !imp
 body.theme-hayes .kw-feed,
 body.theme-harris .kw-feed { top: calc(max(10px, env(safe-area-inset-top)) + 124px); }
 .kw-feed {
-  position: absolute;
+  position: fixed;
   left: 12px;
   top: calc(max(10px, env(safe-area-inset-top)) + 56px);
-  z-index: 6;
+  z-index: 40;
   pointer-events: auto;
   min-height: 44px;
   max-width: calc(100vw - 24px);

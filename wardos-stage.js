@@ -118,7 +118,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     }
     var bar = document.querySelector("body > .chore-shortcuts");
     if (bar) {
-      bar.style.setProperty("left", Math.round(left + 120 * s) + "px", "important");
+      bar.style.setProperty("left", Math.round(left + 300 * s) + "px", "important");
       bar.style.setProperty("top", Math.round(top + 64 * s) + "px", "important");
       bar.style.setProperty("transform", "scale(" + s + ")", "important");
       bar.style.setProperty("transform-origin", "0 0", "important");
@@ -203,6 +203,14 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
   }
 
   function ensureHome(node) {
+    var hdr = document.querySelector("header.hdr");
+    if (hdr) {
+      hdr.style.setProperty("pointer-events", "none", "important");
+      var bits = hdr.querySelectorAll("a, button, input");
+      for (var hi = 0; hi < bits.length; hi++) bits[hi].style.setProperty("pointer-events", "auto", "important");
+    }
+    var clocks = document.querySelectorAll(".live-clock, .live-clock-host");
+    for (var ci = 0; ci < clocks.length; ci++) clocks[ci].style.setProperty("pointer-events", "none", "important");
     var path = (global.location && global.location.pathname) || "";
     var existing = document.querySelector(".kw-home, .hub-home, .wardos-home");
     if (existing) {
@@ -220,11 +228,28 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     btn.href = "sheet-index.html";
     btn.setAttribute("data-kw-home", "");
     btn.setAttribute("aria-label", "Home");
+    btn.style.position = "fixed";
+    btn.style.left = "48px";
+    btn.style.top = "48px";
+    btn.style.width = "64px";
+    btn.style.height = "64px";
+    btn.style.zIndex = "5";
+    btn.style.display = "flex";
+    btn.style.alignItems = "center";
+    btn.style.justifyContent = "center";
+    btn.style.boxSizing = "border-box";
     var img = document.createElement("img");
     img.src = "assets/icons/home-key-light.svg";
     img.alt = "";
+    img.width = 64;
+    img.height = 64;
+    img.style.width = "64px";
+    img.style.height = "64px";
     btn.appendChild(img);
     node.appendChild(btn);
+    document.querySelectorAll(".live-clock, .live-clock-host").forEach(function (el) {
+      el.style.setProperty("pointer-events", "none", "important");
+    });
   }
 
   function paintDiag() {

@@ -1078,14 +1078,30 @@ html:not(#hf-wall-off) body .panel .body > section.col .chore {
   overflow: hidden !important;
 }
 html:not(#hf-wall-off):not(#hf-scroll-off) body .panel > .body:has(> .col) {
-  left: 0 !important;
-  width: 1920px !important;
-  column-gap: 0 !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  position: absolute !important;
+  left: 48px !important;
+  top: 176px !important;
+  width: 1824px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  column-gap: 25px !important;
+  grid-template-columns: 591px 591px 591px !important;
+  justify-content: start !important;
+}
+html:not(#hf-wall-off):not(#hf-scroll-off) body .panel > .body > section.col {
+  position: relative !important;
+  width: 591px !important;
+  max-width: 591px !important;
+  padding: 8px 12px 8px 24px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 html:not(#hf-wall-off) body .panel .body > section.col .chore-list {
   padding: 4px 0 0 !important;
-  gap: 8px !important;
+  gap: 16px !important;
+  width: 100% !important;
+  max-width: 100% !important;
   overflow: hidden !important;
   scrollbar-gutter: auto !important;
 }
@@ -1111,7 +1127,33 @@ html:not(#hf-wall-off) body .panel .body > section.col .chore {
   min-width: 0 !important;
   box-sizing: border-box !important;
 }
-html body .more-chip { top: 12px !important; bottom: auto !important; }
+html body .panel > header.hdr {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+html body section.col .chore-ico,
+html body section.col .chore-ico svg {
+  width: 48px !important;
+  height: 48px !important;
+}
+html body section.col .what { padding-left: 24px !important; }
+html body section.col .more-chip {
+  position: absolute !important;
+  right: 16px !important;
+  top: 8px !important;
+  left: auto !important;
+}
+html body .chore-shortcuts {
+  top: 128px !important;
+  left: 48px !important;
+}
+html body .chore-shortcuts .kid-chip {
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
+}
+html body .house-snd { margin-left: 4px !important; }
 </style>
 <script>
 document.addEventListener("DOMContentLoaded", function () {

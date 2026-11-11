@@ -173,12 +173,20 @@ html body #hub-cam-deck.cams-resting {
   max-height: 56px !important;
   grid-template-columns: 1fr !important;
 }
-html body #hub-cam-deck.cams-resting .hub-cam:not(:first-child) { display: flex !important; }
+html body #hub-cam-deck.cams-resting .hub-cam ~ .hub-cam { display: none !important; }
 html body #hub-cam-deck.cams-resting .hub-cam,
 html body #hub-cam-deck.cams-resting .hub-cam-foot {
   height: 56px !important;
   min-height: 56px !important;
   max-height: 56px !important;
+}
+html body #hub-cam-deck.cams-resting .hub-cam-rest {
+  display: flex !important;
+  align-items: center !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  overflow: clip !important;
 }
 html body .hub-lights-bulk {
   display: flex !important;
@@ -271,17 +279,24 @@ html.kw-root body.kw-on .kw-mute.house-snd {
   font-size: 0 !important;
   color: transparent !important;
 }
-html.kw-root body.kw-on .kw-mute::after {
-  content: "" !important;
-  width: 28px;
-  height: 28px;
-  background: center / 28px 28px no-repeat url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 32 32' fill='none' stroke='%23f4efe6' stroke-width='2'><path d='M6 13h5l7-6v18l-7-6H6z'/><path d='M22 12a6 6 0 0 1 0 8'/></svg>");
+html.kw-root body.kw-on .kw-mute::after,
+html.kw-root body.kw-on .house-snd::after {
+  content: none !important;
+  background: none !important;
+  background-image: none !important;
+}
+html.kw-root body.kw-on .kw-mute svg,
+html.kw-root body.kw-on .house-snd svg {
+  width: 36px !important;
+  height: 36px !important;
+  display: block !important;
 }
 html.kw-root body.kw-on #sec-musts .chore {
-  height: 120px !important;
-  min-height: 120px !important;
-  max-height: 120px !important;
-  margin: 0 0 8px !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
+  flex: 0 0 64px !important;
+  margin: 0 0 16px !important;
   padding: 12px 16px !important;
   background: rgba(15, 26, 34, 0.88) !important;
   color: #f4efe6 !important;
@@ -298,11 +313,13 @@ html.kw-root body.kw-on #sec-musts .chore .what {
   opacity: 1 !important;
 }
 html.kw-root body.kw-on #sec-musts .chore-ico {
-  width: 72px !important;
-  height: 72px !important;
+  width: 40px !important;
+  height: 40px !important;
+  min-height: 0 !important;
   color: #f4efe6 !important;
+  flex: none !important;
 }
-html.kw-root body.kw-on #sec-musts .chore-ico svg { width: 72px !important; height: 72px !important; }
+html.kw-root body.kw-on #sec-musts .chore-ico svg { width: 40px !important; height: 40px !important; }
 html.kw-root body.kw-on #sec-musts .ring {
   margin-left: auto !important;
   width: 64px !important;
@@ -415,6 +432,7 @@ html.kw-root.kw-root body.kw-on #sec-jar .prism-jar-plus {
   height: 64px !important;
   min-width: 64px !important;
   min-height: 64px !important;
+  margin-top: 0 !important;
   border-radius: 16px !important;
   border: 0 !important;
   background: #e0c36a !important;
@@ -481,7 +499,7 @@ html.kw-root body.kw-on .kw-hud {
   position: absolute !important;
   z-index: 40 !important;
   left: 48px !important;
-  top: 28px !important;
+  top: 48px !important;
   right: auto !important;
   width: 860px !important;
   height: 64px !important;
@@ -644,8 +662,37 @@ html.kw-root body.kw-on #sec-jar .prism-jar-count {
 }
 html body #hub-cam-deck.cams-resting { margin: 0 0 8px !important; }
 html body .hub-lights-bulk { margin-top: 0 !important; }
-html body .panel .body { padding: 48px !important; box-sizing: border-box !important; }
-html body .more-chip { right: 24px !important; }
+@media (min-width: 1400px) and (min-height: 700px) {
+  html.kw-root:not(#hf-scroll-off),
+  html.kw-root:not(#hf-scroll-off) > body,
+  html.kw-root,
+  html.kw-root > body {
+    background-color: #07080b !important;
+    background-image: url("month-theme/november/wall-dusk.webp") !important;
+    background-size: 1920px 1080px !important;
+    background-position: center top !important;
+    background-repeat: no-repeat !important;
+  }
+}
+html body .more-chip { right: 16px !important; }
+body.allow-shell .panel {
+  left: 48px !important;
+  width: 1824px !important;
+  max-width: 1824px !important;
+  box-sizing: border-box !important;
+}
+body.allow-shell .panel .body {
+  padding-left: 22px !important;
+  padding-right: 32px !important;
+  box-sizing: border-box !important;
+}
+html body nav.family-rail.tap-rail {
+  margin-left: 40px !important;
+}
+html body .where-card,
+html body .panel .where-card {
+  margin-left: 48px !important;
+}
 html body #hub-cam-deck { margin-bottom: 0 !important; }
 html body .hub-lights,
 html body #hub-lights-panel { margin-top: 8px !important; }

@@ -23,8 +23,8 @@
   function settled() { var r = document.documentElement; if (r && r.setAttribute) r.setAttribute("data-jar-settled", "settled"); }
   function load() {
     paint(null);
-    if (typeof fetch !== "function") return settled();
-    if (typeof setTimeout === "function") setTimeout(settled, 1200);
+    settled();
+    if (typeof fetch !== "function") return;
     fetch("kids-week.json", { cache: "no-store" })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(function (d) { paint(d); })

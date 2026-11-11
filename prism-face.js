@@ -79,7 +79,7 @@
         return /rest|unavailable/i.test((cam.className || "") + " " + (cam.textContent || ""));
       });
       var wall = (global.innerWidth || 0) >= 1400 && (global.innerHeight || 0) >= 700;
-      deck.classList.toggle("cams-resting", false);
+      deck.classList.toggle("cams-resting", !!(resting && wall));
       if (resting) {
         var label = deck.querySelector(".hub-cam-label");
         if (label) label.textContent = "Cameras resting";
@@ -152,12 +152,22 @@
       ico.innerHTML = choreSvg(row.getAttribute("data-check"));
       row.insertBefore(ico, row.firstChild);
     });
+    if (document.body && document.body.classList.contains("allow-shell")) {
+      var allowBody = document.querySelector(".panel > .body");
+      if (allowBody) {
+        allowBody.style.setProperty("padding-left", "40px", "important");
+        allowBody.style.setProperty("padding-right", "48px", "important");
+        allowBody.style.setProperty("box-sizing", "border-box", "important");
+      }
+    }
+    var rail = document.querySelector("nav.family-rail");
+    if (rail) rail.style.setProperty("margin-left", "40px", "important");
     var lightsTitle = document.querySelector(".hub-lights-title");
     var lightsBulk = document.querySelector(".hub-lights-bulk");
     if (lightsTitle && lightsBulk && lightsTitle.parentNode !== lightsBulk) lightsBulk.insertBefore(lightsTitle, lightsBulk.firstChild);
     else if (lightsTitle && lightsTitle.parentNode) lightsTitle.parentNode.insertBefore(lightsTitle, lightsTitle.parentNode.firstChild);
     document.documentElement.style.setProperty("background-image", "url(\"month-theme/november/wall-dusk.webp\")", "important");
-    document.documentElement.style.setProperty("background-size", "cover", "important");
+    document.documentElement.style.setProperty("background-size", "1920px 1080px", "important");
     document.documentElement.style.setProperty("background-position", "center", "important");
     document.documentElement.style.setProperty("background-repeat", "no-repeat", "important");
     document.body.style.setProperty("background", "transparent", "important");
