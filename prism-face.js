@@ -89,8 +89,11 @@
           var label = labels[li];
           var text = String(label.textContent || "").replace(/\s+/g, " ").trim();
           if (/pair/i.test(text)) continue;
-          if (li === 0) { if (text !== "Cameras resting") label.textContent = "Cameras resting"; continue; }
-          if (!/resting/i.test(text)) label.textContent = text + " \u00b7 resting";
+          var cam = label.closest ? label.closest(".hub-cam") : null;
+          var place = cam && cam._hubPlace ? String(cam._hubPlace).trim() : text.replace(/\s*·\s*resting$/i, "").trim();
+          if (!place || /^cameras?(\s+resting)?$/i.test(place)) continue;
+          var next = place + " \u00b7 resting";
+          if (text !== next) label.textContent = next;
         }
       }
     }
@@ -182,7 +185,7 @@
       if (el.parentNode !== stageNode) stageNode.appendChild(el);
       el.style.setProperty("position", "absolute", "important");
       el.style.setProperty("top", "64px", "important");
-      el.style.setProperty("left", "1500px", "important");
+      el.style.setProperty("left", "1612px", "important");
       el.style.setProperty("right", "auto", "important");
       el.style.setProperty("width", "260px", "important");
       el.style.setProperty("min-width", "260px", "important");
@@ -200,6 +203,22 @@
       el.style.setProperty("letter-spacing", "0", "important");
       el.style.setProperty("white-space", "nowrap", "important");
       el.style.setProperty("z-index", "45", "important");
+    });
+    document.querySelectorAll(".kw-mute").forEach(function (btn) {
+      btn.style.setProperty("position", "absolute", "important");
+      btn.style.setProperty("grid-column", "1 / -1", "important");
+      btn.style.setProperty("justify-self", "start", "important");
+      btn.style.setProperty("align-self", "start", "important");
+      btn.style.setProperty("right", "auto", "important");
+      btn.style.setProperty("bottom", "auto", "important");
+      btn.style.setProperty("left", "1460px", "important");
+      btn.style.setProperty("top", "4px", "important");
+      btn.style.setProperty("width", "88px", "important");
+      btn.style.setProperty("height", "88px", "important");
+      btn.style.setProperty("min-width", "88px", "important");
+      btn.style.setProperty("min-height", "88px", "important");
+      btn.style.setProperty("margin", "0", "important");
+      btn.style.setProperty("z-index", "46", "important");
     });
     var onHub = /sheet-index\.html/.test(location.pathname || "");
     var tileInk = { ainsley: "#8a6394", hayes: "#3f8b71", harris: "#42679a", dan: "#c4b49a" };
@@ -266,12 +285,14 @@
         x = Math.round((br.right - sr2.left) / scale2) + 16;
       }
       var chips = [outdoor, indoor].filter(Boolean);
-      var room = 1500 - 16 - x;
+      var room = 1612 - 16 - x;
       var chipW = chips.length ? Math.floor((room - 16 * Math.max(0, chips.length - 1)) / chips.length) : 0;
       if (chipW > 280) chipW = 280;
       if (chipW < 160) chipW = 160;
       chips.forEach(function (chip) {
         pin(chip, x, 56, chipW, 64);
+        chip.style.setProperty("border", "2px solid #c4b49a", "important");
+        chip.style.setProperty("box-shadow", "none", "important");
         var rr = chip.getBoundingClientRect();
         var srr = stage.getBoundingClientRect();
         var sc = srr.width / 1920 || 1;
@@ -317,7 +338,7 @@
     }
     r16.textContent = [
       "html body .hdr-date-time, html body .live-clock, html body .kw-clock, html body [data-kw-clock], html body [data-live-clock] {",
-      "position:fixed !important; top:64px !important; left:1500px !important; right:auto !important;",
+      "position:fixed !important; top:64px !important; left:1612px !important; right:auto !important;",
       "width:260px !important; min-width:260px !important; max-width:260px !important;",
       "height:64px !important; min-height:64px !important; max-height:64px !important;",
       "padding:0 !important; box-sizing:border-box !important; display:inline-flex !important;",
@@ -345,6 +366,10 @@
       "html body section.col .chore .what { font-size:24px !important; line-height:24px !important; height:24px !important; margin:0 !important; }",
       "html body section.col .chore .day-tap { width:64px !important; height:64px !important; min-width:64px !important; min-height:64px !important; font-size:24px !important; }",
       "html body section.col .chore-list { gap:16px !important; }",
+      "html body .panel.panel > #hub-cam-deck.cams-resting { height:auto !important; max-height:none !important; overflow:visible !important; display:flex !important; flex-direction:column !important; gap:20px !important; }",
+      "html body .panel.panel > .hub-upper { top:416px !important; }",
+      "html body .wx-card, html body a.sensi-hdr, html body .sensi-hdr { border:2px solid #c4b49a !important; box-shadow:none !important; }",
+      "html.kw-root body.kw-on .kw-hud .kw-mute { position:absolute !important; grid-column:1 / -1 !important; justify-self:start !important; align-self:start !important; right:auto !important; bottom:auto !important; left:1460px !important; top:4px !important; width:88px !important; height:88px !important; margin:0 !important; }",
       "html:not(#hf-wall-off) body .panel > section.cheer, html:not(#hf-wall-off) body .panel .cheer { left:820px !important; width:640px !important; top:48px !important; }"
     ].join("");
     }

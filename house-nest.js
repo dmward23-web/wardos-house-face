@@ -612,7 +612,7 @@
   }
   function hubRestPrivacy(el, label) {
     var lab = el.querySelector(".hub-cam-label");
-    if (lab) lab.textContent = label;
+    if (lab) lab.textContent = label && !/resting/i.test(label) ? label + " \u00b7 resting" : label;
     el.removeAttribute("data-cam-id");
     el.setAttribute("href", "sheet-google-home.html");
     var img = el.querySelector("img.hub-cam-media");
