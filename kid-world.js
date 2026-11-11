@@ -57,7 +57,8 @@
     var k = String(id || "");
     var body = '<path d="M16 6 L18.5 13 H26 L20 17.5 L22.5 25 L16 20.5 L9.5 25 L12 17.5 L6 13 H13.5 Z"/>';
     if (/bed/.test(k)) body = '<path d="M5 22 V13 H10 V8 H22 V13 H27 V22"/><path d="M5 17 H27"/>';
-    else if (/backpack|cubby/.test(k)) body = '<path d="M12 11 V8 a4 4 0 0 1 8 0 v3"/><path d="M8 12 h16 v13 a2 2 0 0 1-2 2 H10 a2 2 0 0 1-2-2 z"/><path d="M8 18 h16"/><path d="M14 12 v5 h4 v-5"/><path d="M11 14 h-2 M21 14 h2"/>';
+    else if (/cubby/.test(k)) body = '<path d="M6 6 H26 V26 H6 Z"/><path d="M6 16 H26"/><path d="M16 6 V26"/>';
+    else if (/backpack/.test(k)) body = '<path d="M12 11 V8 a4 4 0 0 1 8 0 v3"/><path d="M8 12 h16 v13 a2 2 0 0 1-2 2 H10 a2 2 0 0 1-2-2 z"/><path d="M8 18 h16"/><path d="M14 12 v5 h4 v-5"/><path d="M11 14 h-2 M21 14 h2"/>';
     else if (/empty/.test(k)) body = '<path d="M7 12 h18 v12 H7 z"/><path d="M7 12 L5 7 h22 l-2 5"/><path d="M10 16 h12 M10 19 h12"/>';
     else if (/dish/.test(k)) body = '<circle cx="23" cy="17" r="7"/><circle cx="23" cy="17" r="3.5"/><ellipse cx="7.2" cy="10.5" rx="3" ry="4"/><path d="M7.2 14.6 L11 27"/>';
     else if (/trash/.test(k)) body = '<path d="M8 10 H24"/><path d="M12 10 V7 H20 V10"/><path d="M10 12 L12 26 H20 L22 12"/>';
@@ -90,27 +91,106 @@
     return "Chore";
   }
   function fitMustRows() {
+    var panel = document.getElementById("sec-musts");
     var list = document.querySelector("#sec-musts .chore-list, #sec-musts [data-mount-quests]");
-    if (!list) return;
-    list.style.setProperty("gap", "16px", "important");
+    if (!list || !panel) return;
+    var body = panel.parentElement;
+    if (body && body.classList.contains("body")) {
+      body.style.setProperty("grid-template-rows", "1fr 64px", "important");
+      body.style.setProperty("gap", "16px", "important");
+      body.style.setProperty("align-content", "stretch", "important");
+    }
+    panel.style.setProperty("padding", "0", "important");
+    panel.style.setProperty("margin", "0", "important");
+    panel.style.setProperty("border", "0", "important");
+    panel.style.setProperty("box-shadow", "none", "important");
+    panel.style.setProperty("height", "100%", "important");
+    panel.style.setProperty("align-self", "stretch", "important");
+    panel.style.setProperty("background", "#0f1a22", "important");
+    panel.style.setProperty("overflow", "hidden", "important");
+    var rows = [].filter.call(list.children, function (row) {
+      return row.classList && row.classList.contains("chore");
+    });
+    list.style.setProperty("box-sizing", "border-box", "important");
+    list.style.setProperty("height", "100%", "important");
+    list.style.setProperty("min-height", "0", "important");
+    list.style.setProperty("max-height", "100%", "important");
+    list.style.setProperty("overflow", "hidden", "important");
+    list.style.setProperty("scrollbar-width", "none", "important");
     list.style.setProperty("background", "#0f1a22", "important");
-    list.style.setProperty("height", "auto", "important");
-    list.style.setProperty("max-height", "none", "important");
-    list.style.setProperty("overflow", "visible", "important");
-    [].forEach.call(list.children, function (row) {
-      if (!row.classList || !row.classList.contains("chore")) return;
+    list.style.setProperty("padding", "12px 0", "important");
+    list.style.setProperty("margin", "0", "important");
+    list.style.setProperty("border", "0", "important");
+    list.style.setProperty("display", "flex", "important");
+    list.style.setProperty("flex-direction", "column", "important");
+    list.style.setProperty("justify-content", "flex-start", "important");
+    rows.forEach(function (row) { row.style.setProperty("display", "flex", "important"); });
+    var oldMore = list.querySelector(".more-chip");
+    if (oldMore) oldMore.style.setProperty("display", "none", "important");
+    var H = list.clientHeight;
+    var inner = H - 24;
+    var n = rows.length;
+    var show = n;
+    var gap = n > 1 ? (inner - n * 64) / (n - 1) : 0;
+    if (!(gap >= 0) || inner < n * 64) {
+      var moreH = 48;
+      show = Math.max(1, Math.floor((inner - moreH) / 64));
+      gap = show > 1 ? (inner - moreH - show * 64) / show : 0;
+      if (!(gap >= 0)) gap = 0;
+    }
+    rows.forEach(function (row, i) {
+      var on = i < show;
+      row.style.setProperty("display", on ? "flex" : "none", "important");
+      if (!on) return;
       row.style.setProperty("box-sizing", "border-box", "important");
       row.style.setProperty("height", "64px", "important");
       row.style.setProperty("min-height", "64px", "important");
       row.style.setProperty("max-height", "64px", "important");
       row.style.setProperty("flex", "0 0 64px", "important");
       row.style.setProperty("margin", "0", "important");
+      row.style.setProperty("padding", "0 12px", "important");
+      row.style.setProperty("border", "0", "important");
       row.style.setProperty("border-radius", "0", "important");
-      row.style.setProperty("border-width", "0", "important");
       row.style.setProperty("background", "#0f1a22", "important");
-      row.style.setProperty("overflow", "hidden", "important");
+      row.style.setProperty("overflow", "visible", "important");
+      row.style.setProperty("align-items", "center", "important");
       row.style.setProperty("transform", "none", "important");
+      var ring = row.querySelector(".ring");
+      if (ring) {
+        ring.style.setProperty("width", "64px", "important");
+        ring.style.setProperty("height", "64px", "important");
+        ring.style.setProperty("min-width", "64px", "important");
+        ring.style.setProperty("min-height", "64px", "important");
+        ring.style.setProperty("flex", "none", "important");
+        ring.style.setProperty("margin", "0 0 0 auto", "important");
+      }
     });
+    list.style.setProperty("gap", (gap < 0 ? 0 : gap) + "px", "important");
+    if (show < n) {
+      var chip = oldMore;
+      if (!chip) {
+        chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "more-chip";
+        chip.textContent = "More";
+        list.appendChild(chip);
+      }
+      chip.style.setProperty("display", "flex", "important");
+      chip.style.setProperty("align-items", "center", "important");
+      chip.style.setProperty("justify-content", "center", "important");
+      chip.style.setProperty("height", "40px", "important");
+      chip.style.setProperty("flex", "0 0 40px", "important");
+      chip.style.setProperty("margin", "0", "important");
+      chip.style.setProperty("border", "0", "important");
+      chip.style.setProperty("background", "transparent", "important");
+      chip.style.setProperty("color", "#f4efe6", "important");
+      chip.style.setProperty("font-size", "24px", "important");
+      var hidden = rows.slice(show);
+      chip.onclick = function () {
+        hidden.forEach(function (row) { row.style.setProperty("display", "flex", "important"); });
+        chip.style.setProperty("display", "none", "important");
+      };
+    }
   }
   function paintPublicMusts() {
     var host = document.querySelector("[data-mount-quests]");
@@ -127,6 +207,7 @@
     if (global.HouseCheckoffs && HouseCheckoffs.rewire) { try { HouseCheckoffs.rewire(); } catch (e) {} }
     fitMustRows();
     setTimeout(fitMustRows, 400);
+    setTimeout(fitMustRows, 1200);
   }
   var REST_LINE = "Resting. Your list comes back soon.";
   function bindFeedRest(stage) {
@@ -2474,7 +2555,7 @@
       if (ev.beta != null) gyro.beta = ev.beta;
       gyro.on = true;
     }, true);
-    global.addEventListener("resize", function () { if (bg) bg.resize(); if (lean()) loadPlates(); });
+    global.addEventListener("resize", function () { if (bg) bg.resize(); if (lean()) loadPlates(); fitMustRows(); });
     document.addEventListener("house:kid-rendered", function () {
       paintWeek();
       mountJar();

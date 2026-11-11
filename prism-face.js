@@ -380,7 +380,7 @@
       "html body section.col .chore.harris .day-tap.is-today::before { border:0 !important; background:transparent !important; opacity:1 !important; box-shadow:0 0 0 3px #42679a !important; width:var(--d-dot,52px) !important; height:var(--d-dot,52px) !important; }",
       "html body section.col .chore .day-tap.is-today { color:#f4efe6 !important; -webkit-text-fill-color:#f4efe6 !important; outline:0 !important; box-shadow:none !important; border:0 !important; background:transparent !important; }",
       "html body section.col .chore-list { gap:16px !important; }",
-      "html.kw-root body.kw-on #sec-musts { padding-bottom:12px !important; box-sizing:border-box !important; height:auto !important; align-self:start !important; }",
+      "html.kw-root body.kw-on #sec-musts { padding:0 !important; margin:0 !important; border:0 !important; box-shadow:none !important; box-sizing:border-box !important; height:100% !important; align-self:stretch !important; background:#0f1a22 !important; overflow:hidden !important; }",
       "html body .panel.panel > #hub-cam-deck.cams-resting:not([hidden]) { height:auto !important; max-height:none !important; overflow:visible !important; display:flex !important; flex-direction:column !important; gap:20px !important; }",
       "html body .panel.panel > #hub-cam-deck[hidden] { display:none !important; }",
       "html body .panel.panel > .hub-upper { top:416px !important; }",
