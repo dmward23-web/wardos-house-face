@@ -465,8 +465,8 @@
     }
     var jobs = [];
     var creatures = wallView()
-      ? [["hayes", "assets/ori/creature/idle-226.webp"], ["harris", "assets/ori/creature/harris-226.webp"], ["ainsley", "assets/ori/creature/ainsley-226.webp"]]
-      : [["hayes", "assets/ori/creature/idle.webp"], ["harris", "assets/ori/creature/harris.webp"], ["ainsley", "assets/ori/creature/ainsley.webp"]];
+      ? [["hayes", "assets/ori/creature/idle-226.webp"], ["harris", "assets/ori/creature/harris-226.webp"], ["ainsley", "assets/ori/creature/ainsley-hero.webp"]]
+      : [["hayes", "assets/ori/creature/idle.webp"], ["harris", "assets/ori/creature/harris.webp"], ["ainsley", "assets/ori/creature/ainsley-hero.webp"]];
     creatures.forEach(function (row) {
       if (lean() && (row[0] !== me || oriCreature[me])) return;
       jobs.push(loadImg(row[1]).then(function (im) {
@@ -1636,9 +1636,6 @@
     ctx.fillStyle = "rgba(255,190,120," + (0.35 + f * 0.4).toFixed(3) + ")"; ctx.fillRect(0, deck - 1, W, 2);
     ctx.fillStyle = "#050304";
     [0.18, 0.5, 0.82].forEach(function (mx) { ctx.beginPath(); ctx.moveTo(W * mx - 26, deck + 1); ctx.lineTo(W * mx + 26, deck + 1); ctx.lineTo(W * mx + 20, deck - 16); ctx.lineTo(W * mx - 20, deck - 16); ctx.closePath(); ctx.fill(); });
-    /* mic stand, centre stage */
-    ctx.strokeStyle = "rgba(20,14,16,0.95)"; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(W * 0.5, deck - 2); ctx.lineTo(W * 0.5, deck - H * 0.11); ctx.lineTo(W * 0.5 + 16, deck - H * 0.125); ctx.stroke();
   }
   function drawCrowd(ctx, W, H, t, pan) {
     var base = H + 4, rows = [[0.875, 14, "#0a0507"], [0.915, 18, "#030203"]];
@@ -1675,63 +1672,26 @@
     ctx.fillStyle = "#e9e0cf"; ctx.beginPath(); ctx.arc(0, 0, R * 0.045, 0, 7); ctx.fill();
     ctx.restore();
   }
-  function drawVinylJar(ctx, W, H, t) {
-    /* C10 · a performer at the same scale as the boys' heroes. The crowd coin is painted out; the disc on stage is a record. */
-    var box = creatureAnchor(W, H);
+  function drawAinsleyHero(ctx, img, W, H, t) {
+    /* The bitmap is the @2x sprite Lanczos-downscaled to a 113px box (about 110px of paint). Drawn 1:1, never upscaled.
+       Feet (32,157) in the 1x file land near 1920-frame (515,809), which is canvas (467,641) on the 900×864 wall. */
+    var mot = reactMotion(t);
+    var bob = reduced ? 0 : mot.squash * 1.5;
+    var hop = mot.hop;
+    var footX = 64 * (img.width / 128);
+    var footY = 314 * (img.height / 320);
+    var fx = (515 - 48) * (W / 900);
+    var fy = (809 - 168) * (H / 864) - hop - bob;
     ctx.save();
-    ctx.fillStyle = "#14080c";
+    ctx.translate(fx, fy + 4);
+    ctx.scale(1, 0.22);
+    ctx.fillStyle = "rgba(0,0,0,0.28)";
     ctx.beginPath();
-    ctx.ellipse(box.cx, box.foot - 6, Math.max(70, box.jw * 0.55), Math.max(28, box.jw * 0.28), 0, 0, 7);
+    ctx.ellipse(0, 0, 16, 16, 0, 0, 7);
     ctx.fill();
     ctx.restore();
-    var draw = clamp(Math.round(Math.min(W, H) * 0.318), 140, 226);
-    var u = draw / 220;
-    var cx = W * 0.5;
-    var foot = H * 0.74;
-    var R = draw * 0.34;
-    var spin = (global.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) ? 0 : t * 0.4;
-    ctx.save();
-    ctx.translate(cx - draw * 0.62, foot - R * 0.15);
-    ctx.rotate(spin);
-    ctx.fillStyle = "#121014";
-    ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.fill();
-    ctx.strokeStyle = "rgba(244,239,230,0.45)";
-    ctx.lineWidth = Math.max(1.5, R * 0.025);
-    var groove;
-    for (groove = 0.22; groove < 0.9; groove += 0.07) { ctx.beginPath(); ctx.arc(0, 0, R * groove, 0, 7); ctx.stroke(); }
-    ctx.restore();
-    ctx.save();
-    ctx.translate(cx - draw * 0.62, foot - R * 0.15);
-    ctx.fillStyle = "#f4efe6";
-    ctx.beginPath(); ctx.arc(0, 0, R * 0.36, 0, 7); ctx.fill();
-    ctx.fillStyle = "#8a6394";
-    ctx.fillRect(-R * 0.24, -R * 0.08, R * 0.48, R * 0.16);
-    ctx.fillStyle = "#1a1814";
-    ctx.beginPath(); ctx.arc(0, 0, R * 0.06, 0, 7); ctx.fill();
-    ctx.restore();
-    ctx.save();
-    ctx.translate(cx + draw * 0.08, foot);
-    ctx.fillStyle = "rgba(0,0,0,0.35)";
-    ctx.beginPath(); ctx.ellipse(0, 2, 50 * u, 12 * u, 0, 0, 7); ctx.fill();
-    ctx.strokeStyle = "#2c2430"; ctx.lineWidth = 11 * u; ctx.lineCap = "round";
-    ctx.beginPath(); ctx.moveTo(-12 * u, -48 * u); ctx.lineTo(-18 * u, -2); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(10 * u, -48 * u); ctx.lineTo(20 * u, -2); ctx.stroke();
-    ctx.fillStyle = "#8a6394";
-    ctx.beginPath(); ctx.rect(-30 * u, -118 * u, 60 * u, 74 * u); ctx.fill();
-    ctx.fillStyle = "#f4efe6";
-    ctx.fillRect(-9 * u, -108 * u, 18 * u, 42 * u);
-    ctx.fillStyle = "#f0d2b8";
-    ctx.beginPath(); ctx.arc(0, -140 * u, 24 * u, 0, 7); ctx.fill();
-    ctx.fillStyle = "#241c2a";
-    ctx.beginPath(); ctx.arc(0, -148 * u, 24 * u, Math.PI, 0); ctx.fill();
-    ctx.fillRect(-24 * u, -148 * u, 48 * u, 14 * u);
-    ctx.strokeStyle = "#e7e1d6"; ctx.lineWidth = 4 * u;
-    ctx.beginPath(); ctx.moveTo(22 * u, -86 * u); ctx.lineTo(54 * u, -74 * u); ctx.stroke();
-    ctx.fillStyle = "#1a1814";
-    ctx.beginPath(); ctx.arc(58 * u, -74 * u, 7 * u, 0, 7); ctx.fill();
-    ctx.strokeStyle = "#d9d3c8"; ctx.lineWidth = 3 * u;
-    ctx.beginPath(); ctx.moveTo(40 * u, -4); ctx.lineTo(40 * u, -86 * u); ctx.stroke();
-    ctx.restore();
+    ctx.drawImage(img, Math.round(fx - footX), Math.round(fy - footY));
+    return true;
   }
   function drawOriCreature(ctx, W, H, t, world) {
     var id = world || kid();
@@ -1739,6 +1699,7 @@
     if (global.KidLayout && KidLayout.creatureSprite) id = KidLayout.creatureSprite(id);
     var img = oriCreature[id];
     if (!img) return false;
+    if (id === "ainsley") return drawAinsleyHero(ctx, img, W, H, t);
     var box = creatureAnchor(W, H);
     var mot = reactMotion(t);
     var sx = 1 + mot.squash * 0.07;

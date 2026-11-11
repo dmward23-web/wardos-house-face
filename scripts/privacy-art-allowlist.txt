@@ -243,6 +243,9 @@ assets/ori/ainsley/wall-900x864/near.webp
 assets/ori/ainsley/wall-900x864/sky.webp
 assets/ori/creature/ainsley.webp
 assets/ori/creature/ainsley-226.webp
+assets/ori/creature/ainsley-hero.png
+assets/ori/creature/ainsley-hero.webp
+assets/ori/creature/ainsley-hero@2x.png
 assets/ori/creature/fed_splash.webp
 assets/ori/creature/fed_splash_shadow.webp
 assets/ori/creature/happy_squish.webp

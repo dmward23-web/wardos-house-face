@@ -707,3 +707,5 @@ html body .hub-lights-title { order: -1 !important; margin-right: 12px !importan
 html body .hub-launch a[href*="sheet-weekend"]::before {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 32 32' fill='none' stroke='%23f4efe6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='8' r='3'/><path d='M8 3v2M3 8h2M5.2 5.2l1.4 1.4'/><path d='M22 26 V16'/><path d='M16 26 h12'/><path d='M17 20 c2-6 8-6 10 0'/></svg>");
 }
+html.kw-root body.kw-on .kw-home { flex: 0 0 64px !important; position: relative !important; z-index: 2 !important; }
+html.kw-root body.kw-on .kw-id { margin-left: 36px !important; position: relative !important; z-index: 3 !important; }
