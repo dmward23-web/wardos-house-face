@@ -236,6 +236,13 @@
         stage.appendChild(n);
       }
       n.hidden = false;
+      n.style.setProperty("height", "64px", "important");
+      n.style.setProperty("min-height", "64px", "important");
+      n.style.setProperty("min-width", "64px", "important");
+      n.style.setProperty("font-size", "24px", "important");
+      n.style.setProperty("box-sizing", "border-box", "important");
+      n.style.setProperty("display", "flex", "important");
+      n.style.setProperty("align-items", "center", "important");
       try { console.info("[kid-next] schedule feed missing"); } catch (eLog) {}
       n.textContent = "Schedule not loaded · tap to retry";
       if (document.body) document.body.classList.add("kw-rest");
@@ -252,9 +259,13 @@
       var hero = document.querySelector("#sec-days .consume-hero:not(.empty)");
       if (hero && /[0-9]|Swim|Pickup|soccer|Next/i.test(hero.textContent || "")) on = false;
       if (!on) {
+        var held = document.querySelector("#sec-days .consume-hero");
+        if (held) held.hidden = false;
         if (note) note.remove();
         return;
       }
+      var blank = document.querySelector("#sec-days .consume-hero");
+      if (blank && !String(blank.textContent || "").trim()) blank.hidden = true;
       if (!note && host) {
         note = document.createElement("button");
         note.type = "button";
@@ -266,6 +277,7 @@
         note.style.setProperty("font-size", "24px", "important");
         note.style.setProperty("line-height", "1", "important");
         note.style.setProperty("padding", "0 16px", "important");
+        note.style.setProperty("min-width", "64px", "important");
         note.style.setProperty("box-sizing", "border-box", "important");
         note.style.setProperty("overflow", "visible", "important");
         try { console.info("[kid-next] schedule feed missing"); } catch (eLog2) {}
@@ -299,6 +311,9 @@
       stage.appendChild(seed);
     }
     if (W && W._data) hideRest();
+    try {
+      if (/[?&]pfOffline=1(?:&|$)/.test(location.search || "")) showRest();
+    } catch (eOff) { /* the feed event still calls showRest */ }
     return { show: showRest, hide: hideRest };
   }
   function pebbleFromCounts(done, n) {

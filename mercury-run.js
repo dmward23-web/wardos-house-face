@@ -33,8 +33,13 @@
     var book = window.HousePlates;
     var man = book && book.mercury;
     if (!man) { runPlatesReady = true; return; }
+    var nativeWall = innerWidth >= 1920 && innerHeight >= 1080;
     var jobs = (man.layers || []).map(function (layer) {
-      var urls = book.urlFor(kid, layer.id, "landscape", layer.standin).concat(book.urlFor("mercury", layer.id, "landscape", layer.standin));
+      var urls = [];
+      if (nativeWall) {
+        urls = book.urlFor(kid, layer.id, "wall-1920x1080", layer.standin).concat(book.urlFor("mercury", layer.id, "wall-1920x1080", layer.standin));
+      }
+      urls = urls.concat(book.urlFor(kid, layer.id, "landscape", layer.standin)).concat(book.urlFor("mercury", layer.id, "landscape", layer.standin));
       return new Promise(function (res) {
         var i = 0;
         function next() {
@@ -456,6 +461,14 @@
   }
   function drawRunPlate(g, img, W, H, oxOff, parallax) {
     if (!img) return;
+    /* 1920 plates are already the stage size. Draw them 1:1. A shifted copy stays at the same size. */
+    if (img.width === W && img.height === H) {
+      var x0 = Math.round(-cam * parallax + (oxOff || 0));
+      g.drawImage(img, x0, 0);
+      if (x0 > 0) g.drawImage(img, x0 - img.width, 0);
+      if (x0 < 0) g.drawImage(img, x0 + img.width, 0);
+      return;
+    }
     var tr = trimFor(img);
     if (!tr.opaque) {
       var fi = feathered(img), sc = Math.max(W / img.width, H / img.height) * 1.08;

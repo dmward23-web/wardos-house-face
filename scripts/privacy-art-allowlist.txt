@@ -1125,3 +1125,20 @@ month-theme/november/phone-night.webp
 month-theme/november/wall-dusk.webp
 month-theme/november/wall-morning.webp
 month-theme/november/wall-night.webp
+
+# r35 · 1920x1080 Mercury plates, exact 0.75 Lanczos of the 2560 landscape layers
+assets/ori/hayes/wall-1920x1080/sky.webp
+assets/ori/hayes/wall-1920x1080/far.webp
+assets/ori/hayes/wall-1920x1080/mid.webp
+assets/ori/hayes/wall-1920x1080/near.webp
+assets/ori/hayes/wall-1920x1080/fg.webp
+assets/ori/harris/wall-1920x1080/sky.webp
+assets/ori/harris/wall-1920x1080/far.webp
+assets/ori/harris/wall-1920x1080/mid.webp
+assets/ori/harris/wall-1920x1080/near.webp
+assets/ori/harris/wall-1920x1080/fg.webp
+assets/ori/ainsley/wall-1920x1080/sky.webp
+assets/ori/ainsley/wall-1920x1080/far.webp
+assets/ori/ainsley/wall-1920x1080/mid.webp
+assets/ori/ainsley/wall-1920x1080/near.webp
+assets/ori/ainsley/wall-1920x1080/fg.webp

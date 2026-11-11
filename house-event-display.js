@@ -167,6 +167,8 @@
     if (/\bbook order\b/i.test(text)) return "Book order";
     if (/\bdonation\b/i.test(text)) return "Donation";
     if (/\bHOA\b/.test(text)) return "HOA";
+    /* Ainsley, Dan, and the shared hub. Boys stay on the soft ban above. */
+    if (audienceOf(audience) !== "child" && /\b(?:appointments?|sessions?|dentists?)\b/i.test(text)) return "Appointment";
     if (/^Nothing else on the calendar today$/i.test(text.trim())) return "Nothing else today";
     if (/^More on the month calendar$/i.test(text.trim())) return "More on the month calendar";
     return null;
