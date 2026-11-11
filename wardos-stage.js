@@ -69,8 +69,8 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
       try { src = getComputedStyle(node).backgroundImage || ""; } catch (e1) { src = ""; }
     }
     var m = /url\(["']?([^"')]+)/.exec(src);
-    if (!m) return;
-    var url = m[1];
+    var url = m ? m[1] : coverUrl;
+    if (!url) return;
     var paint = function (img) {
       var c = document.getElementById("acer-cover");
       if (!c) {
@@ -95,6 +95,8 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
       ctx.imageSmoothingEnabled = true;
       ctx.filter = "none";
       ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+      node.style.setProperty("background-image", "none", "important");
+      node.style.setProperty("background-color", "transparent", "important");
     };
     if (coverUrl === url && extendCover.img && extendCover.img.complete) { paint(extendCover.img); return; }
     coverUrl = url;
