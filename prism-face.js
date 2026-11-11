@@ -207,7 +207,23 @@
         tile.style.setProperty("outline", "none", "important");
       });
     });
+    function settlePlates() {
+      if (!onHub) return;
+      document.querySelectorAll(".roster-plate.roster-empty").forEach(function (plate) {
+        plate.style.setProperty("background", "transparent", "important");
+        plate.style.setProperty("background-color", "transparent", "important");
+        plate.style.setProperty("box-shadow", "none", "important");
+        var title = plate.querySelector(".roster-title");
+        if (!title) return;
+        title.style.setProperty("height", "32px", "important");
+        title.style.setProperty("line-height", "32px", "important");
+        title.style.setProperty("background", "#101820", "important");
+      });
+    }
     if (onHub) {
+      settlePlates();
+      setTimeout(settlePlates, 400);
+      setTimeout(settlePlates, 1200);
       document.querySelectorAll(".tile.ainsley, .tile.hayes, .tile.harris, .tile.dan").forEach(function (tile) {
         tile.style.setProperty("padding-bottom", "0", "important");
       });
