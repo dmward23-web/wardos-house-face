@@ -169,9 +169,14 @@
         note.type = "button";
         note.className = "kw-offline";
         note.setAttribute("data-kw-offline", "");
-        note.style.setProperty("min-height", "88px", "important");
-        note.style.setProperty("height", "88px", "important");
+        note.style.setProperty("min-height", "0", "important");
+        note.style.setProperty("height", "64px", "important");
+        note.style.setProperty("max-height", "64px", "important");
         note.style.setProperty("font-size", "24px", "important");
+        note.style.setProperty("line-height", "1", "important");
+        note.style.setProperty("padding", "0 16px", "important");
+        note.style.setProperty("box-sizing", "border-box", "important");
+        note.style.setProperty("overflow", "visible", "important");
         try { console.info("[kid-next] schedule feed missing"); } catch (eLog2) {}
         note.textContent = "Nothing next";
         note.addEventListener("click", function () {

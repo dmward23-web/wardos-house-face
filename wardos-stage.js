@@ -50,7 +50,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     for (i = 0; i < kids.length; i++) {
       var n = kids[i];
       if (n === stage) continue;
-      if (n.nodeType === 1 && (n.id === "wardos-diag" || n.classList.contains("pair-screen") || n.classList.contains("chore-shortcuts"))) continue;
+      if (n.nodeType === 1 && (n.id === "wardos-diag" || n.id === "acer-cover" || n.classList.contains("pair-screen") || n.classList.contains("chore-shortcuts"))) continue;
       stage.appendChild(n);
     }
     return stage;
@@ -59,6 +59,52 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
   function wanted() {
     var w = global.innerWidth || 0, h = global.innerHeight || 0;
     return (w >= 1400 && h >= 700) || (h >= 1400 && w >= 700);
+  }
+
+  var coverUrl = "";
+  function extendCover(node, box) {
+    var src = "";
+    try { src = getComputedStyle(document.documentElement).getPropertyValue("--wg-hubbg") || ""; } catch (e0) { src = ""; }
+    if (!src) {
+      try { src = getComputedStyle(node).backgroundImage || ""; } catch (e1) { src = ""; }
+    }
+    var m = /url\(["']?([^"')]+)/.exec(src);
+    if (!m) return;
+    var url = m[1];
+    var paint = function (img) {
+      var c = document.getElementById("acer-cover");
+      if (!c) {
+        c = document.createElement("canvas");
+        c.id = "acer-cover";
+        c.setAttribute("aria-hidden", "true");
+        c.style.cssText = "position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:0;pointer-events:none";
+        document.body.insertBefore(c, document.body.firstChild);
+      }
+      var dpr = box.dpr || global.devicePixelRatio || 1;
+      var w = box.innerWidth, h = box.innerHeight;
+      c.width = Math.max(1, Math.round(w * dpr));
+      c.height = Math.max(1, Math.round(h * dpr));
+      var ctx = c.getContext("2d");
+      if (!ctx) return;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var r = node.getBoundingClientRect();
+      var x = r.left, y = r.top, dw = r.width, dh = r.height;
+      ctx.drawImage(img, x, y, dw, dh);
+      if (x > 0.5) ctx.drawImage(img, 0, 0, 1, img.height, 0, y, x, dh);
+      if (x + dw < w - 0.5) ctx.drawImage(img, img.width - 1, 0, 1, img.height, x + dw, y, w - (x + dw), dh);
+      if (y > 0.5) ctx.drawImage(img, 0, 0, img.width, 1, x, 0, dw, y);
+      if (y + dh < h - 0.5) ctx.drawImage(img, 0, img.height - 1, img.width, 1, x, y + dh, dw, h - (y + dh));
+      if (x > 0.5 && y > 0.5) ctx.drawImage(img, 0, 0, 1, 1, 0, 0, x, y);
+      if (x + dw < w - 0.5 && y > 0.5) ctx.drawImage(img, img.width - 1, 0, 1, 1, x + dw, 0, w - (x + dw), y);
+      if (x > 0.5 && y + dh < h - 0.5) ctx.drawImage(img, 0, img.height - 1, 1, 1, 0, y + dh, x, h - (y + dh));
+      if (x + dw < w - 0.5 && y + dh < h - 0.5) ctx.drawImage(img, img.width - 1, img.height - 1, 1, 1, x + dw, y + dh, w - (x + dw), h - (y + dh));
+    };
+    if (coverUrl === url && extendCover.img && extendCover.img.complete) { paint(extendCover.img); return; }
+    coverUrl = url;
+    var img = new Image();
+    extendCover.img = img;
+    img.onload = function () { if (coverUrl === url) paint(img); };
+    img.src = url;
   }
 
   function place() {
@@ -98,10 +144,13 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
       document.body.appendChild(faceJs);
     }
     document.documentElement.style.setProperty("--wardos-s", String(s));
+    node.style.zIndex = "1";
+    extendCover(node, box);
+    document.body.style.setProperty("background-size", "auto", "important");
     liftType();
     unclip();
-    setTimeout(function () { liftType(); unclip(); }, 400);
-    setTimeout(function () { liftType(); unclip(); }, 1200);
+    setTimeout(function () { liftType(); unclip(); extendCover(node, viewport()); }, 400);
+    setTimeout(function () { liftType(); unclip(); extendCover(node, viewport()); }, 1200);
     if (!document.getElementById("acer-type-floor")) {
       var floor = document.createElement("style");
       floor.id = "acer-type-floor";

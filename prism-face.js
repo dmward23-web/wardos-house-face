@@ -39,22 +39,25 @@
     if (!host) return;
     var kid = (document.body && document.body.getAttribute("data-kid")) || "hayes";
     var color = kid === "ainsley" ? "#8a6394" : kid === "harris" ? "#42679a" : "#3f8b71";
-    var fill = 0.55;
+    var real = 0;
     try {
       if (global.JarEngine && JarEngine.choreState) {
         var st = JarEngine.choreState(kid);
-        var n = st && (st.shown != null ? st.shown : st.fill);
-        if (typeof n === "number" && isFinite(n)) fill = Math.max(0.55, Math.min(1, n));
+        var n = st && (st.todayDone != null ? st.todayDone : (st.shown != null ? st.shown : st.fill));
+        if (typeof n === "number" && isFinite(n)) real = n;
       }
-    } catch (eJ) { /* a visible fill still draws */ }
+    } catch (eJ) { /* an empty jar still draws */ }
+    var empty = !(real > 0);
+    var fill = empty ? 0 : Math.max(0.12, Math.min(1, real > 1 ? real / 8 : real));
     var el = host.querySelector(".prism-jar");
     if (!el) {
       el = document.createElement("div");
       el.className = "prism-jar";
       host.appendChild(el);
     }
-    var f = Math.max(0.12, Math.min(1, fill));
-    var top = Math.round(168 - 118 * f);
+    var empty = !(fill > 0);
+    var f = empty ? 0 : Math.max(0.12, Math.min(1, fill));
+    var top = empty ? 176 : Math.round(168 - 118 * f);
     var stones = [[48, 168, 18], [78, 172, 20], [108, 166, 17], [64, 146, 16], [96, 150, 18], [78, 128, 15], [108, 130, 14], [58, 112, 13]];
     var dots = stones.map(function (s, i) {
       return '<ellipse cx="' + s[0] + '" cy="' + s[1] + '" rx="' + s[2] + '" ry="' + Math.round(s[2] * 0.78) + '" fill="' + color + '" opacity="' + (0.62 + (i % 3) * 0.12) + '"/>';
@@ -63,7 +66,7 @@
       '<path d="M58 16 h44 v18 c16 8 26 24 26 42 v70 c0 20 -18 32 -48 32 s-48 -12 -48 -32 v-70 c0 -18 10 -34 26 -42 v-18 z" fill="rgba(15,26,34,0.35)" stroke="#f4efe6" stroke-width="3"/>' +
       '<path d="M62 16 h36" stroke="#f4efe6" stroke-width="3"/>' +
       '<g clip-path="url(#prism-jar-clip)">' + dots + "</g></svg>" +
-      '<span class="prism-jar-label">Jar</span>' + (document.body && document.body.getAttribute("data-kid") === "ainsley" ? "" : '<span class="prism-jar-count">' + stones.filter(function (s) { return s[1] >= top; }).length + '</span>') + '<button type="button" class="prism-jar-plus" aria-label="Add">+</button>';
+      '<span class="prism-jar-label">Jar</span><span class="prism-jar-count">' + (empty ? 0 : stones.filter(function (s) { return s[1] >= top; }).length) + '</span><button type="button" class="prism-jar-plus" aria-label="Add">+</button>';
     var plus = el.querySelector(".prism-jar-plus");
     if (plus) plus.onclick = function () {
       var old = host.querySelector(".saves-plus");
@@ -171,11 +174,7 @@
     var lightsBulk = document.querySelector(".hub-lights-bulk");
     if (lightsTitle && lightsBulk && lightsTitle.parentNode !== lightsBulk) lightsBulk.insertBefore(lightsTitle, lightsBulk.firstChild);
     else if (lightsTitle && lightsTitle.parentNode) lightsTitle.parentNode.insertBefore(lightsTitle, lightsTitle.parentNode.firstChild);
-    document.documentElement.style.setProperty("background-image", "url(\"month-theme/november/wall-dusk.webp\")", "important");
-    document.documentElement.style.setProperty("background-size", "1920px 1080px", "important");
-    document.documentElement.style.setProperty("background-position", "center", "important");
-    document.documentElement.style.setProperty("background-repeat", "no-repeat", "important");
-    document.body.style.setProperty("background", "transparent", "important");
+    document.body.style.setProperty("background-size", "auto", "important");
     document.querySelectorAll(".more-chip").forEach(function (chip) {
       if (chip.getAttribute("data-wired") === "1") return;
       chip.setAttribute("data-wired", "1");
