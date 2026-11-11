@@ -371,9 +371,24 @@ try:
     if MODE == "doors":
         hits = []
         pg = page_of(ctx, "sheet-index.html")
-        for x, y, dest in DOORS:
+        spots = pg.evaluate("""() => {
+          const out = [];
+          for (const tile of document.querySelectorAll('a.tile.ainsley, a.tile.hayes, a.tile.harris, a.tile.dan')) {
+            const r = tile.getBoundingClientRect();
+            const dest = tile.getAttribute('href') || '';
+            const pts = [
+              ['center', r.left + r.width / 2, r.top + r.height / 2],
+              ['corner', r.left + 18, r.top + 18],
+              ['band', r.left + r.width / 2, r.bottom - 24]
+            ];
+            for (const [kind, x, y] of pts) out.push({ kind, x, y, dest });
+          }
+          return out;
+        }""")
+        for spot in spots:
+            x, y, dest = spot["x"], spot["y"], spot["dest"]
             pg.goto(BASE + "sheet-index.html", wait_until="load")
-            pg.wait_for_timeout(900)
+            pg.wait_for_timeout(700)
             hit = pg.evaluate("""([x, y]) => {
               const el = document.elementFromPoint(x, y);
               const door = el && el.closest && el.closest('.tile.ainsley, .tile.hayes, .tile.harris, .tile.dan');
