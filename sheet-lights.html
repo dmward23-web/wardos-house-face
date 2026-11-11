@@ -259,8 +259,28 @@
     else pill.classList.add("cmd-pill--off");
     var box = document.getElementById("lights-connect");
     box.classList.toggle("ok", !!g.live);
+    var offline = !(g.live && !needsKey);
+    document.body.classList.toggle("lights-offline", offline);
+    var hdr = document.querySelector(".panel.lights-cmd > header.hdr");
+    if (hdr) {
+      hdr.style.setProperty("display", "none", "important");
+      hdr.style.setProperty("border", "0", "important");
+      hdr.style.setProperty("height", "0", "important");
+      hdr.style.setProperty("padding", "0", "important");
+      hdr.style.setProperty("margin", "0", "important");
+    }
     var banner = document.querySelector(".banner-title");
-    if (banner) banner.textContent = (g.live && !needsKey) ? "Tap a room to switch it" : "Lights offline \u00b7 tap to retry";
+    if (banner) {
+      banner.textContent = offline ? "Lights offline \u00b7 tap to retry" : "Tap a room to switch it";
+      if (!banner._lightsRetry) {
+        banner._lightsRetry = true;
+        banner.addEventListener("click", function () {
+          if (!document.body.classList.contains("lights-offline")) return;
+          try { if (L.fetchLive) L.fetchLive(); } catch (e1) {}
+          try { if (L.probeProxy) L.probeProxy(); } catch (e2) {}
+        });
+      }
+    }
     var title = document.getElementById("lights-connect-title");
     var sub = document.getElementById("lights-connect-sub");
     if (needsKey) {
@@ -281,6 +301,8 @@
     var note = document.getElementById("lights-note");
     if (note) { note.textContent = ""; note.hidden = true; }
     L.paintPads(document);
+    var pads = document.querySelectorAll("#lights-pad-grid .light-pad");
+    for (var pi = 0; pi < pads.length; pi++) pads[pi].style.setProperty("border-width", "0", "important");
   }
   function parkClock() {
     var host = document.querySelector(".live-clock-host");
@@ -293,6 +315,16 @@
   L.onChange(paint);
   L.startPolling();
   paint();
+  var padGrid = document.getElementById("lights-pad-grid");
+  if (padGrid) padGrid.addEventListener("click", function (ev) {
+    if (document.body.classList.contains("lights-offline")) return;
+    var pad = ev.target.closest && ev.target.closest(".light-pad");
+    if (!pad || pad.hasAttribute("data-unconnected-summary")) return;
+    if (ev.target.closest && ev.target.closest(".cmd-rocker, .light-bright")) return;
+    var rocker = pad.querySelector(".cmd-rocker");
+    if (!rocker || rocker.disabled) return;
+    rocker.click();
+  });
 })();
 </script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>
@@ -367,6 +399,73 @@
     min-height: 64px !important;
   }
   html body .panel.lights-cmd .light-pad-ico { width: 48px !important; height: 48px !important; font-size: 0 !important; }
+  html body .panel.lights-cmd > header.hdr {
+    display: none !important;
+    border: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+  html body .panel.lights-cmd #lights-pad-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  html body .panel.lights-cmd article.light-pad.cmd-panel:not([data-unconnected-summary]) {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    position: relative !important;
+    padding: 0 112px 0 24px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    gap: 12px !important;
+  }
+  html body .panel.lights-cmd .light-pad-top {
+    display: flex !important;
+    align-items: center !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    gap: 12px !important;
+  }
+  html body .panel.lights-cmd .light-pad-name { text-align: left !important; }
+  html body .panel.lights-cmd .light-pad-actions {
+    position: absolute !important;
+    right: 24px !important;
+    top: 0 !important;
+    height: 64px !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  html body .panel.lights-cmd .cmd-rocker {
+    width: 64px !important;
+    min-width: 64px !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    flex: 0 0 64px !important;
+  }
+  html body.lights-offline .panel.lights-cmd #lights-all-on,
+  html body.lights-offline .panel.lights-cmd #lights-all-off,
+  html body.lights-offline .panel.lights-cmd .cmd-rocker,
+  html body.lights-offline .panel.lights-cmd .light-bright {
+    opacity: 0.5 !important;
+    pointer-events: none !important;
+  }
+  html body.lights-offline .panel.lights-cmd .banner-title {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+  }
 }
 </style>
 </body>
