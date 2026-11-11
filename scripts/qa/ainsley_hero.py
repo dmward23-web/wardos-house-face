@@ -9,7 +9,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 WEEK = json.dumps({
     "asOfIso": "2026-11-10",
     "kids": {"ainsley": {"today": [
-        {"id": "swim", "kind": "sport", "what": "Ainsley swim Coach Ann", "startIso": "2026-11-10T16:25:00-06:00"}
+        {"id": "swim", "kind": "sport", "what": "Ainsley swim", "startIso": "2026-11-10T16:25:00-06:00"}
     ]}}
 })
 

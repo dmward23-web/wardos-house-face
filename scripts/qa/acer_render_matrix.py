@@ -21,7 +21,7 @@ WEEK = {
     "asOfIso": "2026-11-10",
     "kids": {
         "hayes": {"today": [
-            {"id": "bad", "kind": "school", "what": "provider school visit confirmed Tue 8:50 (Hayes attending",
+            {"id": "bad", "kind": "school", "what": "provider check-in · confirmed Mon 9:00",
              "description": "therapy notes", "startIso": "2026-11-10T14:50:00-06:00"},
             {"id": "pick", "kind": "school_pickup", "what": "School pickup", "startIso": "2026-11-10T15:15:00-06:00"}
         ]},
@@ -29,7 +29,7 @@ WEEK = {
             {"id": "soc", "kind": "leave", "what": "soccer 6:30-7:30", "startIso": "2026-11-10T18:00:00-06:00"}
         ]},
         "ainsley": {"today": [
-            {"id": "swim", "kind": "sport", "what": "Ainsley swim Coach Ann", "startIso": "2026-11-10T16:25:00-06:00"}
+            {"id": "swim", "kind": "sport", "what": "Ainsley swim", "startIso": "2026-11-10T16:25:00-06:00"}
         ]},
         "dan": {"today": [
             {"id": "pick", "kind": "school_pickup", "what": "School pickup", "startIso": "2026-11-10T15:15:00-06:00"}

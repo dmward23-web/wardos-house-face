@@ -14,11 +14,11 @@ const NOW = "2026-11-10T12:30:00-06:00";
 const events = {
   events: [
     { id: "span", summary: "Kids with Dan", start: { date: "2026-11-09" }, end: { date: "2026-11-16" } },
-    { id: "bad", summary: "Hayes — provider school visit confirmed", description: "therapy notes", start: { dateTime: "2026-11-10T14:50:00-06:00" }, end: { dateTime: "2026-11-10T15:30:00-06:00" } },
-    { id: "clin", summary: "Harris — clinical school visit", start: { dateTime: "2026-11-10T11:00:00-06:00" }, end: { dateTime: "2026-11-10T11:30:00-06:00" } },
+    { id: "bad", summary: "Hayes — provider check-in · confirmed Mon 9:00", description: "therapy notes", start: { dateTime: "2026-11-10T14:50:00-06:00" }, end: { dateTime: "2026-11-10T15:30:00-06:00" } },
+    { id: "clin", summary: "Harris — clinical check-in", start: { dateTime: "2026-11-10T11:00:00-06:00" }, end: { dateTime: "2026-11-10T11:30:00-06:00" } },
     { id: "pick", summary: "Hayes — school pickup", description: "provider notes in the description", start: { dateTime: "2026-11-10T15:15:00-06:00" }, end: { dateTime: "2026-11-10T15:30:00-06:00" } },
     { id: "dad", summary: "Dan — school pickup", start: { dateTime: "2026-11-10T15:15:00-06:00" }, end: { dateTime: "2026-11-10T15:30:00-06:00" } },
-    { id: "swim", summary: "Ainsley swim · Coach Ann", start: { dateTime: "2026-11-10T16:25:00-06:00" }, end: { dateTime: "2026-11-10T17:00:00-06:00" } },
+    { id: "swim", summary: "Ainsley swim", start: { dateTime: "2026-11-10T16:25:00-06:00" }, end: { dateTime: "2026-11-10T17:00:00-06:00" } },
     { id: "soc", summary: "Harris — leave for soccer · 6:30-7:30", start: { dateTime: "2026-11-10T18:00:00-06:00" }, end: { dateTime: "2026-11-10T19:30:00-06:00" } }
   ]
 };
@@ -67,7 +67,7 @@ test("calendar-refresh and cal-from-events agree on the Thursday breakfast event
   }
   const hayes = D.summarize({ summary: "Hayes — school pickup", kind: "school_pickup", startIso: "2026-11-10T15:15:00-06:00" }, "hayes");
   const dad = D.summarize({ summary: "Dan — school pickup", kind: "school_pickup", startIso: "2026-11-10T15:15:00-06:00" }, "shared");
-  const swim = D.summarize({ summary: "Ainsley swim · Coach Ann", startIso: "2026-11-10T16:25:00-06:00" }, "ainsley");
+  const swim = D.summarize({ summary: "Ainsley swim", startIso: "2026-11-10T16:25:00-06:00" }, "ainsley");
   const soccer = D.summarize({ summary: "Harris — leave for soccer · 6:30-7:30", kind: "leave", startIso: "2026-11-10T18:00:00-06:00" }, "harris");
   assert.equal(hayes.title, "School pickup");
   assert.equal(hayes.time, "3:15 PM");

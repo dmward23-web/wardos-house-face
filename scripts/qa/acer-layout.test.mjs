@@ -134,15 +134,15 @@ test("boys glass drops provider and therapy text and keeps one canonical time", 
   const raw = {
     id: "prov",
     kind: "school",
-    summary: "provider SRE school visit · confirmed Tue 8:50 (Hayes attending",
+    summary: "provider check-in · confirmed Mon 9:00",
     description: "therapy notes stay off glass",
     startIso: "2026-11-10T14:50:00.000Z"
   };
   assert.equal(D.summarize(raw, "hayes"), null);
   assert.equal(D.summarize(raw, "harris"), null);
   assert.equal(D.summarize({ summary: raw.summary, providerOptIn: true }, "hayes"), null);
-  assert.equal(D.summarize({ summary: "Harris — clinical school visit" }, "harris"), null);
-  assert.equal(D.summarize({ summary: "Hayes — provider school visit · confirmed Tue 8:50 (Hayes attending; Dan" }, "hayes"), null);
+  assert.equal(D.summarize({ summary: "Harris — clinical check-in" }, "harris"), null);
+  assert.equal(D.summarize({ summary: "Hayes — provider check-in · confirmed Mon 9:00" }, "hayes"), null);
   const pickup = D.summarize({
     id: "pick",
     kind: "school_pickup",
@@ -165,13 +165,13 @@ test("boys glass drops provider and therapy text and keeps one canonical time", 
   const swimShared = D.summarize({
     id: "swim",
     kind: "sport",
-    summary: "Ainsley swim · Coach Ann",
+    summary: "Ainsley swim",
     startIso: "2026-11-10T22:25:00.000Z"
   }, "shared");
   assert.equal(swimShared.title, "Swim");
   assert.equal(swimShared.time, "4:25 PM");
   const swimKid = D.summarize({
-    summary: "Ainsley swim · Coach Ann",
+    summary: "Ainsley swim",
     startIso: "2026-11-10T22:25:00.000Z"
   }, "ainsley");
   assert.equal(swimKid.title, "Swim");
