@@ -317,27 +317,46 @@
       if (!onHub) return;
       var panel = document.getElementById("hub-lights-panel");
       if (!panel) return;
-      var note = panel.querySelector(".hub-lights-offline");
-      if (!note) {
-        note = document.createElement("div");
-        note.className = "hub-lights-offline";
-        note.textContent = "Lights offline";
-        var bulk = panel.querySelector(".hub-lights-bulk");
-        if (bulk && bulk.parentNode) bulk.parentNode.insertBefore(note, bulk);
-        else panel.appendChild(note);
+      var stray = panel.querySelector(".hub-lights-offline");
+      if (stray && stray.parentNode) stray.parentNode.removeChild(stray);
+      var bulk = panel.querySelector(".hub-lights-bulk");
+      if (!bulk) return;
+      var label = bulk.querySelector(".hub-lights-label");
+      if (!label) {
+        label = document.createElement("div");
+        label.className = "hub-lights-label";
+        label.innerHTML = '<i class="hub-lights-dot" aria-hidden="true"></i><span class="hub-lights-word"></span>';
+        bulk.insertBefore(label, bulk.firstChild);
       }
       var offline = true;
       try { offline = !(global.HouseLights && HouseLights.gate && HouseLights.gate().live); } catch (eG) {}
+      var word = label.querySelector(".hub-lights-word");
+      if (word) word.textContent = offline ? "Lights offline" : "Lights";
+      label.classList.toggle("is-offline", offline);
       ["lights-all-on", "lights-all-off"].forEach(function (id) {
         var btn = document.getElementById(id);
         if (!btn || !panel.contains(btn)) return;
         if (offline) {
           btn.disabled = true;
+          btn.setAttribute("data-prism-offline", "1");
           btn.style.setProperty("opacity", "0.5", "important");
           btn.style.setProperty("pointer-events", "none", "important");
-        } else {
+          btn.style.setProperty("background", "rgba(244,239,230,0.14)", "important");
+          btn.style.setProperty("background-image", "none", "important");
+          btn.style.setProperty("color", "#f4efe6", "important");
+          btn.style.setProperty("-webkit-text-fill-color", "#f4efe6", "important");
+          btn.style.setProperty("border", "1px solid rgba(244,239,230,0.28)", "important");
+          btn.style.setProperty("box-shadow", "none", "important");
+        } else if (btn.getAttribute("data-prism-offline") === "1") {
+          btn.removeAttribute("data-prism-offline");
           btn.style.removeProperty("opacity");
           btn.style.removeProperty("pointer-events");
+          btn.style.removeProperty("background");
+          btn.style.removeProperty("background-image");
+          btn.style.removeProperty("color");
+          btn.style.removeProperty("-webkit-text-fill-color");
+          btn.style.removeProperty("border");
+          btn.style.removeProperty("box-shadow");
         }
       });
     }
@@ -435,9 +454,13 @@
       "html body .wx-card, html body a.sensi-hdr, html body .sensi-hdr { border:2px solid #c4b49a !important; box-shadow:none !important; }",
       "html.kw-root body.kw-on .kw-hud .kw-mute { position:absolute !important; grid-column:1 / -1 !important; justify-self:start !important; align-self:start !important; right:auto !important; bottom:auto !important; left:1460px !important; top:4px !important; width:88px !important; height:88px !important; margin:0 !important; }",
       "html:not(#hf-wall-off) body .panel > section.cheer, html:not(#hf-wall-off) body .panel .cheer { left:820px !important; width:640px !important; top:48px !important; }",
-      "html body #hub-lights-panel .hub-lights-offline { display:none; flex:0 0 auto; align-self:center; white-space:nowrap; margin:0; font-size:20px; line-height:1.2; color:#f4efe6; -webkit-text-fill-color:#f4efe6; }",
-      "html body #hub-lights-panel.is-disabled:not(.is-live) .hub-lights-offline { display:block !important; }",
-      "html body #hub-lights-panel.is-disabled:not(.is-live) .hub-lights-bulk-btn { opacity:0.5 !important; pointer-events:none !important; }"
+      "html body .panel.panel.panel #hub-lights-panel .hub-lights-head, html body #hub-lights-panel .hub-lights-title { display:none !important; }",
+      "html body #hub-lights-panel .hub-lights-bulk { padding:0 24px !important; gap:16px !important; box-sizing:border-box !important; }",
+      "html body #hub-lights-panel .hub-lights-label { display:flex !important; align-items:center !important; gap:10px !important; flex:0 0 auto !important; margin:0 !important; font-size:24px !important; line-height:1.2 !important; font-weight:700 !important; color:#f4efe6 !important; -webkit-text-fill-color:#f4efe6 !important; white-space:nowrap !important; }",
+      "html body #hub-lights-panel .hub-lights-label.is-offline { color:#c4b49a !important; -webkit-text-fill-color:#c4b49a !important; }",
+      "html body #hub-lights-panel .hub-lights-dot { display:none; width:10px; height:10px; border-radius:50%; background:#c4b49a; flex:none; }",
+      "html body #hub-lights-panel .hub-lights-label.is-offline .hub-lights-dot { display:block !important; }",
+      "html body #hub-lights-panel .hub-lights-bulk-btn { height:64px !important; min-height:64px !important; max-height:64px !important; }"
     ].join("");
     }
     document.querySelectorAll(".more-chip").forEach(function (chip) {
