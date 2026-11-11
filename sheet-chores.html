@@ -1348,8 +1348,9 @@ document.addEventListener("DOMContentLoaded", function () {
         list.style.setProperty("scrollbar-color", "#c4b49a #0f1a22", "important");
         list.classList.add("is-scroll");
       }
-      /* r33. Icon stays 64. One gap plus seven equal circles and six gaps
-         fill the card content box. Gap stays 16; leftover px sit on the right. */
+      /* r34. Icon stays 64 and every gap stays 16. Circles shrink so the
+         icon and the last circle share the same clearance inside the card
+         border box, at least 12px on each side. */
       col.style.setProperty("padding-left", "0", "important");
       col.style.setProperty("padding-right", "0", "important");
       cards.forEach(function (card, i) {
@@ -1364,18 +1365,19 @@ document.addEventListener("DOMContentLoaded", function () {
         if (showAll || pi < n) { probe = cards[pi]; break; }
       }
       var pcs = probe ? getComputedStyle(probe) : null;
-      var content = probe
-        ? Math.floor(probe.clientWidth - (parseFloat(pcs.paddingLeft) || 0) - (parseFloat(pcs.paddingRight) || 0))
-        : (col.clientWidth || 589);
+      var borderBox = probe ? probe.getBoundingClientRect().width : (col.clientWidth || 589);
+      var content = Math.floor(borderBox);
       var iconW = 64;
       var dayGap = 16;
-      var circle = Math.floor((content - iconW - dayGap * 7) / 7);
+      var side = 12;
+      var circle = Math.floor((content - side * 2 - iconW - dayGap * 7) / 7);
       if (!(circle > 0)) circle = 1;
       var daysW = circle * 7 + dayGap * 6;
-      var left = 0;
+      var spare = content - iconW - dayGap - daysW;
+      if (spare < side * 2) spare = side * 2;
+      var left = Math.floor(spare / 2);
       var mid = dayGap;
-      var right = content - left - iconW - mid - daysW;
-      if (right < 0) right = 0;
+      var right = spare - left;
       var row2 = 64;
       col.style.setProperty("--d-zone", circle + "px");
       col.style.setProperty("--d-dot", circle + "px");

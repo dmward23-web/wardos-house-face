@@ -99,6 +99,10 @@ test("r33 chore icons are 64 and day circles stay inside the card", SKIP, () => 
       assert.ok(Math.abs(row.icon.w - 64) <= 1 && Math.abs(row.icon.h - 64) <= 1, name + " icon " + JSON.stringify(row.icon));
       assert.ok(inside(row.icon, row.card), name + " icon outside " + JSON.stringify(row));
       assert.ok(row.days.length === 7, name + " days " + row.days.length);
+      const leftClear = row.icon.x - row.card.x;
+      const rightClear = row.card.r - row.days[row.days.length - 1].r;
+      assert.ok(rightClear >= 12, name + " right " + rightClear);
+      assert.ok(Math.abs(leftClear - rightClear) <= 4, name + " clearance " + leftClear + " / " + rightClear);
       const size = row.days[0].w;
       for (const day of row.days) {
         assert.ok(inside(day, row.card), name + " circle outside " + JSON.stringify({ day, card: row.card }));
