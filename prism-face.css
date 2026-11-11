@@ -1278,6 +1278,7 @@ html:not(#hf-wall-off) body .panel:has(.month-grid) > header.hdr {
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
+  justify-content: flex-start !important;
   gap: 16px !important;
   padding: 0 0 0 80px !important;
   margin: 0 !important;
@@ -1298,14 +1299,18 @@ html:not(#hf-wall-off) body .panel:has(.month-grid) .hdr-left-col {
   border: 0 !important;
   box-shadow: none !important;
 }
-html:not(#hf-wall-off) body .panel:has(.today-day) .hdr-ovals,
-html:not(#hf-wall-off) body .panel:has(.month-grid) .hdr-ovals {
-  position: relative !important;
-  left: auto !important;
-  top: auto !important;
+html:not(#hf-wall-off) body .panel.panel:has(.today-day) > header.hdr .hdr-ovals,
+html:not(#hf-wall-off) body .panel.panel:has(.month-grid) > header.hdr .hdr-ovals {
+  position: absolute !important;
+  left: 80px !important;
+  top: 0 !important;
+  grid-column: auto !important;
+  justify-self: start !important;
   display: flex !important;
   align-items: center !important;
+  justify-content: flex-start !important;
   gap: 16px !important;
+  width: max-content !important;
   height: 64px !important;
   margin: 0 !important;
   zoom: 1 !important;

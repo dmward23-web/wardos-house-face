@@ -41,6 +41,8 @@ test("r32 Today and Month temp chips sit beside Home inside the safe area", SKIP
     for (const chip of row.ovals) {
       assert.ok(chip.y >= 48, route + " top " + chip.y);
       assert.ok(chip.x >= row.home.x + row.home.w + 16, route + " gap " + JSON.stringify({ chip, home: row.home }));
+    const first = row.ovals.slice().sort((a, b) => a.x - b.x)[0];
+    assert.ok(first.x <= row.home.x + row.home.w + 32, route + " not beside Home " + JSON.stringify({ first, home: row.home }));
     }
   }
 });
