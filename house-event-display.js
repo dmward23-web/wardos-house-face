@@ -27,21 +27,13 @@
     if (!ev || typeof ev !== "object") return "";
     return nfkc([ev.kind, ev.category, ev.safeCategory, ev.type].map(textOf).filter(Boolean).join("\n"));
   }
-  function sourceBlob(ev) {
-    if (typeof ev === "string") return nfkc(ev);
-    if (!ev || typeof ev !== "object") return "";
-    var parts = [];
-    Object.keys(ev).forEach(function (k) {
-      if (typeof ev[k] === "string") parts.push(ev[k]);
-    });
-    return nfkc(parts.join("\n"));
-  }
   function isDenied(ev) {
     if (!ev) return false;
     if (typeof ev === "string") return CLINICAL.test(nfkc(ev)) || CANCEL.test(ev);
     if (ev.status === "cancelled" || ev.status === "canceled") return true;
-    var all = sourceBlob(ev);
-    return CLINICAL.test(all) || CANCEL.test(all);
+    var title = titleBlob(ev);
+    var kind = kindBlob(ev);
+    return CLINICAL.test(title) || CLINICAL.test(kind) || CANCEL.test(title);
   }
 
   function audienceOf(audience) {

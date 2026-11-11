@@ -120,6 +120,7 @@ test("audit flag is appended to hub, home, and HouseLinks targets", () => {
   for (const f of ["house-audit.js", "hub-compose.js", "kid-world.js", "wardos-stage.js", "house-links.js"]) {
     assert.match(read(f), /HouseAudit\.href|function href/, f);
   }
-  assert.match(read("mercury-run.html"), /house-audit\.js\?v=AUDIT1/);
+  assert.match(read("house-hub.js"), /house-audit\.js\?v=AUDIT1/);
+  assert.match(read("mercury-run.html"), /house-hub\.js/);
   assert.match(read("house-face-law.js"), /house-event-display\.js\?v=ACERFIX1/);
 });

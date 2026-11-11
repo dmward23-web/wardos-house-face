@@ -131,9 +131,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
   function rowTherapy(o) {
     if (typeof o === "string") return isTherapy(o);
     if (!o || typeof o !== "object" || Array.isArray(o)) return false;
-    var parts = [];
-    Object.keys(o).forEach(function (k) { if (typeof o[k] === "string") parts.push(o[k]); });
-    return isTherapy(parts.join(" "));
+    return isTherapy([o.summary, o.title, o.what, o.l, o.label, o.text, o.kind, o.category, o.hint, o.place].filter(function (x) { return typeof x === "string"; }).join(" "));
   }
   /* LIVEFIX1 · Dan, Nov 10 2026, 6:08 PM CT: her board shows real clock times. $ % stars and quest counts still come off.
      when/time/hours/whenLabel keep the clock ("4:25"); other strings still drop digits, so "Mon 26 · 2:20" keeps "2:20". */

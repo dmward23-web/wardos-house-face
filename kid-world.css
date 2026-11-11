@@ -534,7 +534,8 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on .kw-light,
   html.kw-root body.kw-on .house-snd { right: calc(34vw + 12px) !important; z-index: 7 !important; }
   html.kw-root body.kw-on .kw-hud { top: 12px !important; height: 64px !important; }
-  html.kw-root body.kw-on .kw-feed { top: 88px !important; }
+  html.kw-root body.kw-on .kw-feed { top: 160px !important; left: 64px !important; z-index: 20 !important; }
+  html.kw-root body.kw-on .kw-home { position: relative !important; z-index: 50 !important; }
 }
 @media (min-width: 1400px) and (min-height: 700px) {
   /* 1920×1080 wall: 12 columns of 130, 48 margin, 24 gutter.
