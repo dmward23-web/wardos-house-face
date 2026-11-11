@@ -1066,7 +1066,10 @@
     dowNodes.forEach(function (n) { n.textContent = clock.dow; });
     var timeNodes = document.querySelectorAll("[data-live='time'], [data-live-clock], [data-live='clock-time']");
     timeNodes.forEach(function (n) {
-      n.textContent = clock.time || (global.HouseClock && HouseClock.timeLabel ? HouseClock.timeLabel() : "");
+      var time = clock.time || (global.HouseClock && HouseClock.timeLabel ? HouseClock.timeLabel() : "");
+      var dow = String((clock && clock.dow) || "").replace(/\./g, "");
+      if (dow) dow = dow.charAt(0).toUpperCase() + dow.slice(1, 3).toLowerCase();
+      n.textContent = dow && time ? dow + " \u00b7 " + time : time;
     });
 
     /* AUDIT1 · hero names its day when the next item is not today ("Next up · Wed" / "Wed") */
