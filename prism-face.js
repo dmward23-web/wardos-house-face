@@ -207,6 +207,18 @@
         tile.style.setProperty("outline", "none", "important");
       });
     });
+    if (onHub) {
+      document.querySelectorAll(".tile.ainsley, .tile.hayes, .tile.harris, .tile.dan").forEach(function (tile) {
+        tile.style.setProperty("padding-bottom", "0", "important");
+      });
+      document.querySelectorAll(".roster-plate, [data-dad-stage]").forEach(function (plate) {
+        plate.style.setProperty("bottom", "0", "important");
+        plate.style.setProperty("left", "0", "important");
+        plate.style.setProperty("right", "0", "important");
+        plate.style.setProperty("width", "100%", "important");
+        plate.style.setProperty("box-shadow", "none", "important");
+      });
+    }
     var panel = document.querySelector(".panel");
     if (panel) panel.style.setProperty("box-shadow", "none", "important");
     function stripGoldFrame() {
@@ -241,7 +253,9 @@
       "html body .live-clock-host, html body header .hdr-date, html body .panel > header.hdr { overflow:visible !important; }",
       "html body .panel.panel > header.hdr .hdr-ovals { margin-right:400px !important; }",
       "html body .panel.panel, html body .wardos-stage > .panel { box-shadow:none !important; border-top-width:0 !important; }",
-      "html body .roster-plate, html body .roster-plate.roster-empty { box-shadow:none !important; background:transparent !important; }",
+      "html body .tile.ainsley, html body .tile.hayes, html body .tile.harris, html body .tile.dan { padding-bottom:0 !important; }",
+      "html body .roster-plate, html body .roster-plate.roster-empty { left:0 !important; right:0 !important; width:100% !important; bottom:0 !important; margin:0 !important; box-shadow:none !important; }",
+      "html body .roster-plate.roster-empty { background:transparent !important; }",
       "html body .roster-plate:not(.roster-empty) { background:rgba(15,26,34,0.88) !important; height:140px !important; max-height:140px !important; left:0 !important; right:0 !important; width:100% !important; bottom:0 !important; }",
       "html body .roster-plate.roster-empty .roster-title { display:inline-block !important; height:32px !important; line-height:32px !important; font-size:24px !important; padding:0 14px !important; background:#101820 !important; }",
       "html body .chore .day-tap.is-past { opacity:0.45 !important; text-decoration:line-through !important; }",
