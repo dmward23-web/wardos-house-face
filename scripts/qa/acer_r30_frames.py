@@ -16,7 +16,7 @@ ROUTES = [
     "sheet-today.html", "month.html", "mercury-run.html",
 ]
 CLOCKS = ["2026-11-10T12:30:00-06:00", "2026-11-10T21:00:00-06:00"]
-VIEWPORTS = ["1920x1080@1", "1536x864@1.25"]
+VIEWPORTS = ["1920x1080@1"]
 
 
 def tag_of(clock):

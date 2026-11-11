@@ -525,10 +525,13 @@
     return d;
   }
   function floorDpr(w) { return Math.min(1.35, devicePixelRatio || 1, 1400 / w); }
+  function wallNative(w, h) { return w >= 1920 && h >= 1080; }
   function adapt(dtMs) {
     if (!ADAPT) return;
+    var w0 = innerWidth, h0 = innerHeight;
+    if (wallNative(w0, h0)) return;
     adaptT += dtMs; adaptN++; adaptSum += dtMs;
-    var avg = adaptSum / adaptN, w = innerWidth, h = innerHeight;
+    var avg = adaptSum / adaptN, w = w0, h = h0;
     var lo = floorDpr(w) / targetDpr(w, h);
     if (adaptT > 2000 && avg > 20 && dprScale > lo + 0.001) { dprScale = Math.max(lo, dprScale * 0.85); resize(); }
     else if (adaptT > 4000 && avg < 13 && dprScale < 1) { dprScale = Math.min(1, dprScale / 0.85); resize(); }
@@ -537,7 +540,7 @@
   }
   function resize() {
     var w = innerWidth, h = innerHeight;
-    var dpr = Math.max(floorDpr(w), targetDpr(w, h) * dprScale);
+    var dpr = wallNative(w, h) ? 1 : Math.max(floorDpr(w), targetDpr(w, h) * dprScale);
     cv.width = off.width = Math.round(w * dpr);
     cv.height = off.height = Math.round(h * dpr);
     cv.style.width = w + "px";

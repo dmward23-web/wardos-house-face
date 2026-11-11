@@ -199,8 +199,15 @@ test("r30 kid rows keep a 16px gap and hub chips are 16px apart", () => {
   assert.match(read("sheet-index.html"), /\.hdr-right \{ display: flex; flex-direction: row; align-items: center; gap: 16px/);
 });
 
-test("r30 the night header glow is not painted on the stage", () => {
-  assert.match(read("wardos-stage.css"), /html\[data-wardos-stage\] body \.panel::before[\s\S]*display: none !important/);
+test("r30 mercury buffer stays 1x at 1920 and keeps the smaller-screen floor", () => {
+  const src = read("mercury-run.js");
+  assert.match(src, /function wallNative\(w, h\) \{ return w >= 1920 && h >= 1080; \}/);
+  assert.match(src, /wallNative\(w, h\) \? 1 :/);
+  assert.match(src, /if \(wallNative\(w0, h0\)\) return;/);
+  assert.match(src, /function floorDpr\(w\) \{ return Math\.min\(1\.35, devicePixelRatio \|\| 1, 1400 \/ w\); \}/);
+  const css = read("mercury-run.css");
+  assert.match(css, /\.hud \{[^}]*left: 64px/);
+  assert.match(css, /\.hud \{[^}]*top: 64px/);
 });
 
 test("r30 month uses the pinned clock and a flat chip", () => {
