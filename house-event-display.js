@@ -11,6 +11,8 @@
      are a boys-only ban so Ainsley's and Dan's own sessions can stay. */
   var HARD = /(?:\b(?:ot|speech|drs?|doctors?|telehealth|counsel(?:or|ing|ling)?|anxiety|provider|clinical)\b|\btherap|\bpsycholog|\bpsychiatr)/i;
   var SOFT = /\b(?:appointments?|sessions?)\b/i;
+  var APPT_WORD = /\b(?:appointments?|sessions?|dentists?)\b/i;
+  var BOY_NAME = /\b(?:hayes|harris)\b/i;
   var CLINICAL = new RegExp(HARD.source + "|" + SOFT.source, "i");
   var SKIP_KEY = /^(id|icdId|href|url|link|htmlLink|source|tz|status|tone|cadence|theme|color|colour|cls|class|kid|owner|audience|kidId|providerOptIn|allDay|leaveBy|timeRole)$/i;
   var CANCEL = /(?:^|\b)(?:cancel+ed|cxl)\b/i;
@@ -53,6 +55,7 @@
     if (typeof ev === "string") {
       var s = nfkc(ev);
       if (CANCEL.test(s)) return true;
+      if (BOY_NAME.test(s) && APPT_WORD.test(s)) return true;
       if (isBoy(audience)) return HARD.test(s) || SOFT.test(s);
       return HARD.test(s);
     }
@@ -64,6 +67,9 @@
     var trusted = /^(ainsley|adult|dan|dad|shared|hub)$/i.test(who);
     if (HARD.test(blob)) return true;
     if (boy || !trusted) return SOFT.test(blob);
+    /* A boy named in the title, description, or location is dropped before it can become "Appointment". */
+    var named = nfkc([titleBlob(ev), textOf(ev.description), textOf(ev.location)].join("\n"));
+    if (BOY_NAME.test(named) && APPT_WORD.test(named)) return true;
     return false;
   }
 

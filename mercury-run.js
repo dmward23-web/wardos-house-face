@@ -465,8 +465,21 @@
     if (img.width === W && img.height === H) {
       var x0 = Math.round(-cam * parallax + (oxOff || 0));
       g.drawImage(img, x0, 0);
-      if (x0 > 0) g.drawImage(img, x0 - img.width, 0);
-      if (x0 < 0) g.drawImage(img, x0 + img.width, 0);
+      /* Mirror the wrap so the edge meets itself. A straight repeat jumps by the left/right column delta. */
+      if (x0 > 0) {
+        g.save();
+        g.translate(x0, 0);
+        g.scale(-1, 1);
+        g.drawImage(img, 0, 0);
+        g.restore();
+      }
+      if (x0 < 0) {
+        g.save();
+        g.translate(x0 + img.width, 0);
+        g.scale(-1, 1);
+        g.drawImage(img, -img.width, 0);
+        g.restore();
+      }
       return;
     }
     var tr = trimFor(img);

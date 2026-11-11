@@ -43,17 +43,12 @@
     el.className = "ori-iris";
     el.setAttribute("data-calm", "1");
     el.setAttribute("aria-hidden", "true");
-    el.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#062018;opacity:0;pointer-events:none;transition:opacity .2s ease";
+    el.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#062018;opacity:1;pointer-events:none";
     try { document.getAnimations().forEach(function (an) { if (an.playState === "running") { an.pause(); held.push(an); } }); } catch (e) {}
     root.appendChild(el);
-    void getComputedStyle(el).opacity;
-    el.style.opacity = "1";
-    if (root.classList.contains("ori-reduced") || (RMQ && RMQ.matches)) { setTimeout(function () { leave(u.href); }, 0); return; }
-    /* VEILPAUSE1 · leave on the frame after the veil was drawn at opacity >= .9 (and >= 320ms), never later than 1.5s. */
-    var t0 = Date.now(), gone = false, shown = false;
-    function go() { if (gone) return; gone = true; leave(u.href); }
-    function tick() { if (gone) return; if (shown) return go(); if (Date.now() - t0 >= 320 && (parseFloat(getComputedStyle(el).opacity) || 0) >= 0.9) shown = true; requestAnimationFrame(tick); }
-    requestAnimationFrame(tick);
-    setTimeout(go, 1500);
+    void el.offsetWidth;
+    /* Leave in this click. Waiting for a transition to reach opacity .9 drops the
+       user activation, and a paused transition never gets there, so the tap dies. */
+    leave(u.href);
   }, false);
 })();

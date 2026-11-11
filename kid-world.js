@@ -235,16 +235,10 @@
         });
         stage.appendChild(n);
       }
-      n.hidden = false;
-      n.style.setProperty("height", "64px", "important");
-      n.style.setProperty("min-height", "64px", "important");
-      n.style.setProperty("min-width", "64px", "important");
-      n.style.setProperty("font-size", "24px", "important");
-      n.style.setProperty("box-sizing", "border-box", "important");
-      n.style.setProperty("display", "flex", "important");
-      n.style.setProperty("align-items", "center", "important");
-      try { console.info("[kid-next] schedule feed missing"); } catch (eLog) {}
-      n.textContent = "Schedule not loaded · tap to retry";
+      /* The retry lives on the NEXT card only. This toast stays hidden. */
+      n.hidden = true;
+      n.textContent = "";
+      n.style.setProperty("display", "none", "important");
       if (document.body) document.body.classList.add("kw-rest");
     }
     function hideRest() {
@@ -271,9 +265,10 @@
         note.type = "button";
         note.className = "kw-offline";
         note.setAttribute("data-kw-offline", "");
-        note.style.setProperty("min-height", "0", "important");
+        note.style.setProperty("min-height", "64px", "important");
         note.style.setProperty("height", "64px", "important");
         note.style.setProperty("max-height", "64px", "important");
+        note.style.setProperty("flex", "0 0 64px", "important");
         note.style.setProperty("font-size", "24px", "important");
         note.style.setProperty("line-height", "1", "important");
         note.style.setProperty("padding", "0 16px", "important");
