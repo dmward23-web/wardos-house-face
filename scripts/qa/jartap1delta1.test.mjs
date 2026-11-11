@@ -50,7 +50,9 @@ function page(startUtc, pathname = "/kid-hayes.html") {
 }
 
 test("source: midnight + 1 s timer built DST-safe, re-armed, 30 s poll kept", () => {
-  assert.match(SRC, /new Date\(n\.getFullYear\(\), n\.getMonth\(\), n\.getDate\(\) \+ 1, 0, 0, 1\)/);
+  /* Chicago civil midnight via ctMidnightMs, measured from the clock argument, not the machine's local Date or Date.now(). */
+  assert.match(SRC, /ctMidnightMs\(addCivil\(iso\)\) \+ 1000/);
+  assert.match(SRC, /var at = n\.getTime\(\)/);
   assert.match(SRC, /midT = setTimeout\(function \(\) \{ midT = 0; check\(\); armMidnight\(\); \}, msToMidnight\(\)\)/);
   assert.match(SRC, /setInterval\(check, 30 \* 1000\)/);
   assert.match(SRC, /Math\.max\(1000, Math\.min\(ms, 25 \* 3600 \* 1000\)\)/);

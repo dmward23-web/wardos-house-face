@@ -152,6 +152,10 @@
   html body .lights-cmd .light-bright::-webkit-slider-runnable-track { height: 6px; background: rgba(198,230,255,0.35); border-radius: 999px; }
   html body .lights-cmd .light-bright::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; margin-top: -8px; border-radius: 50%; background: #ffe6b0; box-shadow: 0 0 12px rgba(255,214,140,0.8); }
 }
+@media (min-width: 1920px) {
+  article.light-pad.cmd-panel { flex-wrap: wrap !important; height: auto !important; }
+  .light-pad-src { min-width: 0 !important; white-space: normal !important; }
+}
 @media (min-width: 1400px) and (min-height: 700px) {
   /* The source line stays inside the pad at every wall width, including 1536. */
   html body .lights-cmd article.light-pad.cmd-panel {

@@ -127,8 +127,10 @@
     root = root || (typeof document !== "undefined" ? document : null);
     if (!root || !root.querySelectorAll) return stamp(cur());
     var s = stamp(cur());
-    root.querySelectorAll("[data-live-clock], [data-live='time'], [data-live='clock-time']").forEach(function (el) {
+    root.querySelectorAll("[data-live-clock], [data-live='time'], [data-live='clock-time'], [data-kw-clock]").forEach(function (el) {
       el.textContent = s.time || "";
+      el.setAttribute("data-dow", s.dow || "");
+      el.setAttribute("data-date", s.dateLine || s.iso || "");
       if (el.tagName === "TIME") el.setAttribute("datetime", s.iso + "T" + (s.time || "").replace(" ", ""));
       el.setAttribute("title", "America/Chicago · " + s.long + " · " + (s.time || ""));
     });
@@ -153,9 +155,20 @@
     return s;
   }
 
+  function wakeLive() {
+    if (typeof document === "undefined") return;
+    paintLive(document);
+  }
+
   function startLive(ms) {
     if (typeof document === "undefined") return;
     paintLive(document);
+    if (typeof window !== "undefined" && !startLive.armed) {
+      startLive.armed = true;
+      document.addEventListener("visibilitychange", function () { if (!document.hidden) wakeLive(); });
+      window.addEventListener("focus", wakeLive);
+      window.addEventListener("pageshow", wakeLive);
+    }
     if (_liveTimer) return;
     _liveTimer = setInterval(function () { paintLive(document); }, ms || 1000);
   }

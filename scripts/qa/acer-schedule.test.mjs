@@ -75,7 +75,8 @@ test("calendar-refresh and cal-from-events agree on the Thursday breakfast event
   assert.equal(dad.time, "3:15 PM");
   assert.equal(JSON.stringify(week.kids.dan).includes("School pickup") || rowText(week.kids.dan.today).includes("pickup"), true);
   assert.equal(swim.title, "Swim");
-  assert.equal(swim.time, "");
+  /* Dan, Nov 10 2026, 6:08 PM CT: Ainsley's schedule shows the real time. The title stays word-only. */
+  assert.equal(swim.time, "4:25 PM");
   assert.equal(/\d/.test(swim.title), false);
   assert.equal(soccer.title, "Leave for soccer");
   assert.equal(soccer.time, "6:00 PM");
@@ -85,9 +86,13 @@ test("calendar-refresh and cal-from-events agree on the Thursday breakfast event
   assert.match(calBlob, /pickup|Pickup|swim|Swim|soccer|Soccer/i);
 });
 
-test("a missing feed says the schedule is unavailable", () => {
+test("a missing feed shows Nothing next and logs it", () => {
   const src = fs.readFileSync(path.join(ROOT, "kid-world.js"), "utf8");
-  assert.match(src, /Schedule didn't load\. Tap to try again\./);
+  /* The kid sees Nothing next. The miss is a log, not a sentence kept in a comment for this check. */
+  assert.match(src, /n\.textContent = "Nothing next"/);
+  assert.match(src, /console\.info\("\[kid-next\] schedule feed missing"\)/);
+  assert.doesNotMatch(src, /Schedule didn't load/);
+  assert.doesNotMatch(src, /Schedule unavailable/);
   assert.doesNotMatch(src, /A free week/);
   assert.doesNotMatch(src, /Nothing on your week yet/);
 });

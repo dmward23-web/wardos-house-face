@@ -1,9 +1,7 @@
-/* KIDCRIT AINSCLOCK1 (Atlas 1:09 AM CT, amendment to JARTAP1) · node --test scripts/qa/ainsclock1.test.mjs
-   The JARTAP1 re-walk found the kid-world HUD clock line ([data-kw-clock], painted by clockLine()) on Ainsley's page showing a
-   stale day and time ("Sun · 9:00 PM"). Atlas 1:14 AM CT: the clock comes off because it is stale day/time; there is no no-digits law
-   (the law is no "$" on kid boards, hidden DOM included). kid-ainsley.html (and only it) takes that node out of the DOM as soon as
-   kid-world builds it, so the text never renders and never sits in the DOM (a CSS hide would leave it there).
-   Real kid-world.js clockLine/paintClock + the real AINSCLOCK1 script in a vm with a small DOM; the browser half is the Ainsley re-walk. */
+/* KIDCRIT AINSCLOCK1 · node --test scripts/qa/ainsclock1.test.mjs
+   Dan, Nov 10 2026, 6:08 PM CT: Ainsley gets the same live clock chip as the boys ("9:00 PM"), not a removed node.
+   The old script took the chip out because it showed a stale day and time. The chip now stays and paintClock writes the time only.
+   Real kid-world.js clockLine/paintClock + the real AINSCLOCK1 script in a vm with a small DOM. */
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -45,18 +43,16 @@ test("the bug is real: kid-world's clock line reads a stale weekday and clock ti
   assert.match(KW, /<div class="kw-clock" data-kw-clock><\/div>/, "the HUD clock node AINSCLOCK1 removes still exists under this name");
 });
 
-test("Ainsley: the clock node is gone from the DOM as soon as it is built, and paintClock then writes nothing", () => {
+test("Ainsley: the clock node stays, and paintClock writes the same time chip as the boys", () => {
   const D = dom(); const g = { document: D.doc, MutationObserver: D.MO, Intl, String, Math, Date: sunday9pm() }; g.global = g;
   vm.runInNewContext(inline(), g);
-  const hud = D.root.append(D.mk("HEADER", { class: "kw-hud" }));          /* kid-world builds the HUD */
+  const hud = D.root.append(D.mk("HEADER", { class: "kw-hud" }));
   hud.append(D.mk("BUTTON", { "data-kw-home": "" }));
-  hud.append(D.mk("DIV", { class: "kw-clock", "data-kw-clock": "" }));
+  const clock = hud.append(D.mk("DIV", { class: "kw-clock", "data-kw-clock": "" }));
   vm.runInNewContext(fnSrc("kid") + fnSrc("clockLine") + fnSrc("paintClock") + ";paintClock();", g);
-  assert.equal(D.doc.querySelectorAll("[data-kw-clock]").length, 0, "clock node removed");
-  const text = D.walk(D.root).map((n) => n.textContent).join(" ");
-  assert.doesNotMatch(text, STALE, "no stale day/time text rendered: " + text);
-  hud.append(D.mk("DIV", { "data-kw-clock": "" }));                         /* a rebuilt HUD is caught too */
-  assert.equal(D.doc.querySelectorAll("[data-kw-clock]").length, 0);
+  assert.equal(D.doc.querySelectorAll("[data-kw-clock]").length, 1, "clock node stays");
+  assert.equal(clock.textContent, "9:00 PM");
+  assert.doesNotMatch(inline(), /\.remove\s*\(/, "AINSCLOCK1 no longer removes the chip");
 });
 
 test("kid-ainsley.html: no stale day/time in its rendered strings (markup text, title, alt, aria-label, placeholder) and the new script writes none", () => {

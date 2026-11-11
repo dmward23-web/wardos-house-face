@@ -1965,8 +1965,25 @@
     return list;
   }
 
+  function schoolIcon() {
+    return '<svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M4 14 L16 6 L28 14"/><path d="M8 13 V26 H24 V13"/><path d="M14 26 V18 H18 V26"/></svg>';
+  }
+  function faceClock(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    try {
+      var p = {};
+      new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", hour: "numeric", minute: "2-digit", hour12: true }).formatToParts(d).forEach(function (x) {
+        if (x.type !== "literal") p[x.type] = x.value;
+      });
+      if (!p.hour) return "";
+      return p.hour + ":" + p.minute + (p.dayPeriod ? " " + p.dayPeriod : "");
+    } catch (eFc) { return ""; }
+  }
   function consumeEventIcon(what) {
     var w = String(what || "").toLowerCase();
+    if (/^pickup$|school pickup/.test(w)) return { html: '<span class="g2-lead">' + schoolIcon() + "</span>", text: "" };
     if (/baseball|ball/.test(w)) return { html: '<span class="g2-lead">' + g2Ico("g2-baseball") + "</span>", text: "" };
     if (/flag/.test(w)) return { html: '<span class="g2-lead">' + g2Ico("g2-flag") + "</span>", text: "" };
     if (/swim/.test(w)) return { html: '<span class="g2-lead">' + g2Ico("g2-swim") + "</span>", text: "" };
@@ -2232,19 +2249,21 @@
     if (nextMount) {
       if (!next) {
         nextMount.className = "consume-hero empty";
-        nextMount.innerHTML = '<div class="consume-hero-inner"><div class="consume-hero-title">Nothing timed next</div><div class="consume-hero-meta">Quests still on</div></div>';
+        nextMount.innerHTML = '<div class="consume-hero-inner"><div class="consume-hero-title">Nothing next</div><div class="consume-hero-meta">Quests still on</div></div>';
       } else {
         var cd = consumeCountdown(next);
         var title = consumeStripKidName(next.title, kid);
-        var ico = consumeEventIcon(title);
+        var shown = /^school pickup$/i.test(String(title).replace(/\s+/g, " ").trim()) ? "Pickup" : title;
+        var ico = consumeEventIcon(shown === "Pickup" ? "pickup" : title);
+        var clock = faceClock(next.startIso) || "";
         nextMount.className = "consume-hero";
         nextMount.innerHTML =
           '<div class="consume-hero-inner">' +
           '<div class="consume-hero-top">' +
-          '<div class="consume-hero-when">' + esc(next.whenLabel || "NEXT") + "</div>" +
+          '<div class="consume-hero-when">' + esc(clock || next.whenLabel || "NEXT") + "</div>" +
           '<div class="consume-countdown"><span class="pulse"></span><span>' + esc(cd) + "</span></div>" +
           "</div>" +
-          '<div class="consume-hero-title">' + (ico.html || "") + esc(((ico.text ? ico.text + " " : "") + title)) + "</div>" +
+          '<div class="consume-hero-title">' + (ico.html || "") + esc(((ico.text ? ico.text + " " : "") + shown)) + "</div>" +
           '<div class="consume-hero-meta">YOUR board · <b>' + esc(meta.loadout) + "</b></div>" +
           "</div>";
       }

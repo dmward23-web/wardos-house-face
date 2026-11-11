@@ -126,20 +126,24 @@
     if (!o || typeof o !== "object" || Array.isArray(o)) return false;
     return isTherapy([o.summary, o.title, o.what, o.l, o.label, o.text, o.hint, o.place].filter(function (x) { return typeof x === "string"; }).join(" "));
   }
-  /* LIVEFIX1 · Ainsley law: her rows carry no digit, time, date, star, $ or %. The time is read for ordering and ended
-     rows first (cleanKid), then dropped from every string she sees, so "Mon 26 · 2:20" reads "Mon". */
+  /* LIVEFIX1 · Dan, Nov 10 2026, 6:08 PM CT: her board shows real clock times. $ % stars and quest counts still come off.
+     when/time/hours/whenLabel keep the clock ("4:25"); other strings still drop digits, so "Mon 26 · 2:20" keeps "2:20". */
   var AP = "(?:a\\.?m\\.?|p\\.?m\\.?|a\\b|p\\b)";
   var AIN_RANGE = new RegExp("\\d{1,2}(?::\\d{2})?\\s*" + AP + "?\\s*(?:[-\\u2013]|\\bto\\b)\\s*\\d{1,2}(?::\\d{2})?\\s*" + AP + "?", "gi");
   var AIN_CLOCK = new RegExp("\\d{1,2}:\\d{2}\\s*" + AP + "?|\\b\\d{1,2}\\s*(?:am|pm)\\b", "gi");
-  function ainsleyText(s) {
+  var CLOCK_KEYS = { when: 1, time: 1, hours: 1, whenLabel: 1 };
+  function ainsleyText(s, keepClock) {
     if (typeof s !== "string") return s;
-    var t = s.replace(/\b(?:leave|leaves|at|by|from|until|til|till|@)\s*(?=\$?\d)/gi, "")
-      .replace(AIN_RANGE, "").replace(AIN_CLOCK, "")
-      .replace(/\b\d+\s*(?:x|times|min|mins|minutes|hr|hrs|hours|pages?)\b/gi, "")   /* LIVEFIX3d · quest counts ("20 min", "3x") */
+    var clocks = [];
+    var t = s.replace(/\b(?:leave|leaves|at|by|from|until|til|till|@)\s*(?=\$?\d)/gi, "");
+    if (keepClock) t = t.replace(AIN_CLOCK, function (m) { clocks.push(m); return "\u0001"; });
+    else t = t.replace(AIN_RANGE, "").replace(AIN_CLOCK, "");
+    t = t.replace(/\b\d+\s*(?:x|times|min|mins|minutes|hr|hrs|hours|pages?)\b/gi, "")   /* LIVEFIX3d · quest counts ("20 min", "3x") */
       .replace(/\$\s*\d[\d,.]*(?:\s*\/\s*[a-z]+)?/gi, "")
       .replace(/\d+(?:\.\d+)?\s*%/g, "")
       .replace(/\b\d+\s*-\s*(?=[a-z])/gi, "")
       .replace(/[\d$%\u2605\u2606\u272a-\u2730\u2b50]/g, "");
+    if (keepClock) { var ci = 0; t = t.replace(/\u0001/g, function () { return clocks[ci++] || ""; }); }
     return t.split(/\s*\u00b7\s*/).map(function (x) { return x.replace(/\s{2,}/g, " ").replace(/^[\s,:+/-]+|[\s,:+/-]+$/g, ""); })
       .filter(Boolean).join(" \u00b7 ");
   }
@@ -149,7 +153,7 @@
     if (Array.isArray(r)) return r.map(ainsleyRow).filter(function (x) { return x !== ""; });
     if (!r || typeof r !== "object") return r;
     for (var k in r) if (Object.prototype.hasOwnProperty.call(r, k)) {
-      if (AIN_KEYS[k] && typeof r[k] === "string") r[k] = ainsleyText(r[k]);
+      if (AIN_KEYS[k] && typeof r[k] === "string") r[k] = ainsleyText(r[k], !!CLOCK_KEYS[k]);
       else if (k === "badges" && Array.isArray(r[k])) r[k] = ainsleyRow(r[k]);
     }
     return r;

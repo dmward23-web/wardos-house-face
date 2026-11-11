@@ -92,8 +92,9 @@
     var n = now || new Date();
     var iso = ctCivil(n) || "1970-01-01";
     var target = ctMidnightMs(addCivil(iso)) + 1000;
-    var ms = target - Date.now();
-    if (ms < 1000) ms = ctMidnightMs(addCivil(addCivil(iso))) + 1000 - Date.now();
+    var at = n.getTime();
+    var ms = target - at;
+    if (ms < 1000) ms = ctMidnightMs(addCivil(addCivil(iso))) + 1000 - at;
     return Math.max(1000, Math.min(ms, 25 * 3600 * 1000));
   }
   function armMidnight() {

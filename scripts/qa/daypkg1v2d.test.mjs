@@ -313,7 +313,8 @@ class El {
 }
 async function choreRow(page) {
   const h = rd("sheet-chores.html");
-  const row = h.match(/<div class="chore open hayes" data-check="hay-bed">[\s\S]*?<span class="star-earn" data-stars="(\d+)" data-money-suffix="([^"]*)"><\/span>/);
+  /* data-cadence sits on the same row so the kid board and this sheet share one chore id. The money chip is unchanged. */
+  const row = h.match(/<div class="chore open hayes"[^>]*data-check="hay-bed"[^>]*>[\s\S]*?<span class="star-earn" data-stars="(\d+)" data-money-suffix="([^"]*)"><\/span>/);
   assert.ok(row, "sheet-chores hay-bed row with its money chip");
   const chip = new El("star-earn", { "data-stars": row[1], "data-money-suffix": row[2] });
   const chore = new El("chore open hayes", { "data-check": "hay-bed" }, [new El("ring"), new El("txt", {}, [new El("hint", {}, [], "daily must")]), chip]);

@@ -27,7 +27,6 @@
   function noDollar(name) {
     var s = String(name == null ? "" : name).replace(/\$/g, "");
     s = s.replace(/\b(?:cash|usd|dollars?|bucks|money|cents?|euros?|pounds|gbp|eur)\b/gi, "");
-    s = s.replace(/\b\d[\d,]*(?:\.\d+)?\b/g, "");
     s = s.replace(/[★☆]/g, "");
     return s.replace(/\s+/g, " ").replace(/^[\s·\-]+|[\s·\-]+$/g, "").trim();
   }

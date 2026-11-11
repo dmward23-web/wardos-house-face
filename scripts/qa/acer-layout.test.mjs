@@ -175,7 +175,8 @@ test("boys glass drops provider and therapy text and keeps one canonical time", 
     startIso: "2026-11-10T22:25:00.000Z"
   }, "ainsley");
   assert.equal(swimKid.title, "Swim");
-  assert.equal(swimKid.time, "");
+  /* Dan, Nov 10 2026, 6:08 PM CT: Ainsley's schedule shows the real time. */
+  assert.equal(swimKid.time, "4:25 PM");
   assert.equal(/\d/.test(swimKid.title), false);
   const week = {
     kids: {

@@ -126,8 +126,6 @@
         stage.appendChild(n);
       }
       n.hidden = false;
-      /* Kept for the schedule proof. The kid never sees this sentence. */
-      /* Schedule didn't load. Tap to try again. */
       try { console.info("[kid-next] schedule feed missing"); } catch (eLog) {}
       n.textContent = "Nothing next";
       if (document.body) document.body.classList.add("kw-rest");
@@ -169,8 +167,21 @@
     document.addEventListener("house:kids-data-ready", hideRest);
     paintPublicMusts();
     document.addEventListener("house:kids-data-missing", paintPublicMusts);
-    if (!W || !W._data) showRest();
-    else hideRest();
+    if (!document.querySelector("[data-kw-feed]")) {
+      var seed = document.createElement("button");
+      seed.type = "button";
+      seed.className = "kw-feed";
+      seed.setAttribute("data-kw-feed", "resting");
+      seed.hidden = true;
+      seed.textContent = "";
+      seed.addEventListener("click", function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (global.WardKids && WardKids.boot) WardKids.boot(kid());
+      });
+      stage.appendChild(seed);
+    }
+    if (W && W._data) hideRest();
     return { show: showRest, hide: hideRest };
   }
   function pebbleFromCounts(done, n) {
@@ -1650,29 +1661,66 @@
     ctx.restore();
   }
   function drawVinylJar(ctx, W, H, t) {
+    /* C10 · a performer at the same scale as the boys' heroes. The crowd coin is painted out; the disc on stage is a record. */
     var box = creatureAnchor(W, H);
-    var st = global.JarEngine ? JarEngine.choreState("ainsley") : { fill: 0 };
-    var f = clamp(st.shown != null ? st.shown : (st.fill || 0), 0, 1), R = box.jw * (0.30 + 0.24 * f), cx = box.cx, cy = box.foot - R - 4;
-    var spin = st.asleep || (global.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) ? 0 : t * (0.5 + f * 1.4);
     ctx.save();
-    ctx.fillStyle = "rgba(0,0,0,0.4)"; ctx.beginPath(); ctx.ellipse(cx, box.foot, R * 0.9, R * 0.14, 0, 0, 7); ctx.fill();
-    ctx.translate(cx, cy); ctx.rotate(spin);
-    var g = ctx.createRadialGradient(0, 0, R * 0.1, 0, 0, R); g.addColorStop(0, "#1c1b1d"); g.addColorStop(1, "#060607");
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = 1;
-    for (var k = 0.42; k < 0.98; k += 0.08) { ctx.beginPath(); ctx.arc(0, 0, R * k, 0, 7); ctx.stroke(); }
-    ctx.strokeStyle = "rgba(255,255,255,0.2)"; ctx.lineWidth = R * 0.05; ctx.beginPath(); ctx.arc(0, 0, R * 0.8, -0.9, -0.3); ctx.stroke();
-    ctx.rotate(-spin);
-    ctx.strokeStyle = "rgba(212,168,96,0.25)"; ctx.lineWidth = R * 0.09; ctx.beginPath(); ctx.arc(0, 0, R * 0.62, 0, 7); ctx.stroke();
-    if (f > 0.002) { ctx.strokeStyle = st.full ? "#f2cf86" : "#d4a860"; ctx.lineCap = "round"; ctx.beginPath(); ctx.arc(0, 0, R * 0.62, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * f); ctx.stroke(); }
-    ctx.fillStyle = "#f4efe6"; ctx.beginPath(); ctx.arc(0, 0, R * 0.34, 0, 7); ctx.fill();
-    ctx.fillStyle = "#8a6394"; ctx.fillRect(-R * 0.2, -R * 0.06, R * 0.4, R * 0.12);
-    ctx.fillStyle = "#1a1814"; ctx.beginPath(); ctx.arc(0, 0, R * 0.045, 0, 7); ctx.fill();
+    ctx.fillStyle = "#14080c";
+    ctx.beginPath();
+    ctx.ellipse(box.cx, box.foot - 6, Math.max(70, box.jw * 0.55), Math.max(28, box.jw * 0.28), 0, 0, 7);
+    ctx.fill();
+    ctx.restore();
+    var draw = clamp(Math.round(Math.min(W, H) * 0.318), 140, 226);
+    var u = draw / 220;
+    var cx = W * 0.5;
+    var foot = H * 0.74;
+    var R = draw * 0.34;
+    var spin = (global.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) ? 0 : t * 0.4;
+    ctx.save();
+    ctx.translate(cx - draw * 0.62, foot - R * 0.15);
+    ctx.rotate(spin);
+    ctx.fillStyle = "#121014";
+    ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.fill();
+    ctx.strokeStyle = "rgba(244,239,230,0.45)";
+    ctx.lineWidth = Math.max(1.5, R * 0.025);
+    var groove;
+    for (groove = 0.22; groove < 0.9; groove += 0.07) { ctx.beginPath(); ctx.arc(0, 0, R * groove, 0, 7); ctx.stroke(); }
+    ctx.restore();
+    ctx.save();
+    ctx.translate(cx - draw * 0.62, foot - R * 0.15);
+    ctx.fillStyle = "#f4efe6";
+    ctx.beginPath(); ctx.arc(0, 0, R * 0.36, 0, 7); ctx.fill();
+    ctx.fillStyle = "#8a6394";
+    ctx.fillRect(-R * 0.24, -R * 0.08, R * 0.48, R * 0.16);
+    ctx.fillStyle = "#1a1814";
+    ctx.beginPath(); ctx.arc(0, 0, R * 0.06, 0, 7); ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.translate(cx + draw * 0.08, foot);
+    ctx.fillStyle = "rgba(0,0,0,0.35)";
+    ctx.beginPath(); ctx.ellipse(0, 2, 50 * u, 12 * u, 0, 0, 7); ctx.fill();
+    ctx.strokeStyle = "#2c2430"; ctx.lineWidth = 11 * u; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(-12 * u, -48 * u); ctx.lineTo(-18 * u, -2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(10 * u, -48 * u); ctx.lineTo(20 * u, -2); ctx.stroke();
+    ctx.fillStyle = "#8a6394";
+    ctx.beginPath(); ctx.rect(-30 * u, -118 * u, 60 * u, 74 * u); ctx.fill();
+    ctx.fillStyle = "#f4efe6";
+    ctx.fillRect(-9 * u, -108 * u, 18 * u, 42 * u);
+    ctx.fillStyle = "#f0d2b8";
+    ctx.beginPath(); ctx.arc(0, -140 * u, 24 * u, 0, 7); ctx.fill();
+    ctx.fillStyle = "#241c2a";
+    ctx.beginPath(); ctx.arc(0, -148 * u, 24 * u, Math.PI, 0); ctx.fill();
+    ctx.fillRect(-24 * u, -148 * u, 48 * u, 14 * u);
+    ctx.strokeStyle = "#e7e1d6"; ctx.lineWidth = 4 * u;
+    ctx.beginPath(); ctx.moveTo(22 * u, -86 * u); ctx.lineTo(54 * u, -74 * u); ctx.stroke();
+    ctx.fillStyle = "#1a1814";
+    ctx.beginPath(); ctx.arc(58 * u, -74 * u, 7 * u, 0, 7); ctx.fill();
+    ctx.strokeStyle = "#d9d3c8"; ctx.lineWidth = 3 * u;
+    ctx.beginPath(); ctx.moveTo(40 * u, -4); ctx.lineTo(40 * u, -86 * u); ctx.stroke();
     ctx.restore();
   }
   function drawOriCreature(ctx, W, H, t, world) {
     var id = world || kid();
-    if (id === "ainsley" || kid() === "ainsley") { drawVinylJar(ctx, W, H, t); return true; } /* VINYLJAR1 · no cartoon mascot on Ainsley's board (she's 14): a record that fills */
+    if (id === "ainsley" || kid() === "ainsley") { drawVinylJar(ctx, W, H, t); return true; } /* C10 · performer on the stage, record with grooves and a label */
     if (global.KidLayout && KidLayout.creatureSprite) id = KidLayout.creatureSprite(id);
     var img = oriCreature[id];
     if (!img) return false;
@@ -2112,15 +2160,10 @@
   /* ---------- hud ---------- */
   var bg = null;
   function paintClock() {
-    var el = document.querySelector("[data-kw-clock]");
-    var live = document.querySelectorAll ? document.querySelectorAll("[data-live-clock]") : [];
-    if (kid() === "ainsley" && ((el && el.parentNode) || (live && live.length))) {
-      var h = chicagoHour();
-      var word = h < 5 || h >= 21 ? "Night" : h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening";
-      if (el) el.textContent = word;
-      for (var li = 0; li < live.length; li++) if ((live[li].textContent || "") !== word) live[li].textContent = word;
-      return;
+    if (global.HouseClock && HouseClock.paintLive) {
+      try { HouseClock.paintLive(document); return; } catch (eC) { /* fall through to the same format */ }
     }
+    var el = document.querySelector("[data-kw-clock]");
     if (!el) return;
     var line = clockLine();
     var time = String(line).split("\u00b7").pop().trim();
@@ -2400,7 +2443,7 @@
       var hero = document.querySelector("[data-mount-consume-next]");
       var title = hero && hero.querySelector(".consume-hero-title");
       var words = title ? title.textContent.replace(/\s+/g, " ").trim() : "";
-      var live = !!(hero && !hero.classList.contains("empty") && words && words !== "Nothing timed next");
+      var live = !!(hero && !hero.classList.contains("empty") && words && words !== "Nothing next");
       document.body.classList.toggle("kw-next-off", !live);
     }
     fitNext();
@@ -2441,6 +2484,9 @@
     loadPlates();
     paintClock();
     setInterval(paintClock, 1000);
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) paintClock(); });
+    window.addEventListener("focus", paintClock);
+    window.addEventListener("pageshow", paintClock);
     paintWeek();
     mountJar();
     soften();

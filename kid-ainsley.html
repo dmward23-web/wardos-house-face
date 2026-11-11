@@ -1168,9 +1168,8 @@ document.addEventListener("DOMContentLoaded", function(){
 <script src="jar-engine.js?v=ORI1"></script>
 <script src="art/world-manifest.js?v=KIDWEEKLY1"></script>
 <script src="art/kid-layout.js?v=LANDFIT2"></script>
-<script>/* AINSCLOCK1 (Atlas 1:09 AM CT) · Ainsley pages show no digits: the kid-world HUD clock line (day + time) is taken out of the DOM as soon as it is built, so it never renders */
-(function () { function drop() { var c = document.querySelectorAll("[data-kw-clock]"); for (var i = 0; i < c.length; i++) c[i].remove(); }
-  new MutationObserver(drop).observe(document.documentElement, { childList: true, subtree: true }); })();</script>
+<script>/* AINSCLOCK1 · Dan, Nov 10 2026, 6:08 PM CT: Ainsley keeps the same live clock chip as the boys. This script no longer removes it. */
+</script>
 <script src="kid-world.js?v=SUNHOME3"></script>
 <script src="calendar-world.js?v=LIVEFIX3"></script>
 <script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>

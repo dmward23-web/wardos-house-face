@@ -141,8 +141,7 @@
   }
 
   function timeLabel(ev, audience) {
-    var who = audienceOf(audience);
-    if (who === "ainsley") return "";
+    audienceOf(audience); /* Dan, Nov 10 2026, 6:08 PM CT: Ainsley gets the same clock time as every other board. */
     if (allDay(ev)) return "All day";
     var iso = ev && (ev.startIso || (typeof ev.start === "string" && /T\d{2}:/.test(ev.start) ? ev.start : ""));
     var fromIso = clockFromIso(iso);
@@ -194,10 +193,7 @@
     row.text = view.title;
     if (typeof row.l === "string") row.l = view.title;
     clearProse(row);
-    if (audienceOf(audience) === "ainsley") {
-      if (typeof row.when === "string") row.when = row.when.replace(/[0-9$%]/g, " ").replace(/\s+/g, " ").trim();
-      if (typeof row.time === "string") row.time = "";
-    } else if (view.time) {
+    if (view.time) {
       row.when = view.time;
       row.time = view.time;
     }

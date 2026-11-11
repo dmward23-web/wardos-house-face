@@ -48,7 +48,8 @@ function atFixtureClock(fn) {
   globalThis.LHClock = { now: () => new Date(FIXTURE_NOW), ms: () => FIXTURE_NOW };
   try { return fn(); } finally { if (had) globalThis.LHClock = prev; else delete globalThis.LHClock; }
 }
-test("Ainsley rows: no digit, time, date, star, $ or %; the boys keep their times", () => atFixtureClock(() => {
+test("Ainsley rows keep clock times and still drop other digits, stars, $ and %; the boys keep their times", () => atFixtureClock(() => {
+  /* Dan, Nov 10 2026, 6:08 PM CT: her board shows real times. $ % stars and non-clock digits still come off. */
   const w = L.cleanKidsWeek(week());
   const a = w.kids.ainsley;
   const strings = JSON.stringify([a.appointments, a.sports, a.rides, a.school, a.hottest, a.missions, a.streakLabel].map((x) => x));
@@ -58,9 +59,13 @@ test("Ainsley rows: no digit, time, date, star, $ or %; the boys keep their time
     else if (v && typeof v === "object") for (const kk of Object.keys(v)) { if (kk !== "id" && kk !== "_law") walk(v[kk], kk); }
     else if (typeof v === "string") vis.push(v);
   })([a.appointments, a.sports, a.rides, a.school, a.hottest, a.missions, a.streakLabel], "");
-  for (const s of vis) assert.doesNotMatch(s, AIN_BAD, "Ainsley row shows a digit/mark: " + s + " in " + strings);
-  assert.equal(a.sports[0].when, "Tue");
-  assert.equal(a.appointments.find((r) => /Dentist/.test(r.what)).when, "Mon");
+  for (const s of vis) {
+    const bare = s.replace(/\d{1,2}:\d{2}(?:\s*[AP]M)?/gi, "");
+    assert.doesNotMatch(bare, AIN_BAD, "Ainsley row shows a non-clock digit or mark: " + s + " in " + strings);
+  }
+  assert.match(a.sports[0].when, /4:25/);
+  assert.match(a.appointments.find((r) => /Dentist/.test(r.what)).when, /9:00/);
+  assert.match(a.appointments.find((r) => /Smith/.test(r.what)).when, /2:20/);
   assert.equal(w.kids.hayes.sports[0].when, "Tue 27 · 4:25", "the boys keep their times");
 }));
 

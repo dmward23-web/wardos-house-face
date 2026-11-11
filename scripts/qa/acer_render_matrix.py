@@ -270,6 +270,40 @@ PROBE = """() => {
     const r = el.getBoundingClientRect();
     if (r.width < 63.5 * (s || 1) || r.height < 63.5 * (s || 1)) touchSmall.push({ t: (el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 24), w: Math.round(r.width), h: Math.round(r.height) });
   }
+  function parseRgb(c) {
+    const m = /rgba?\(([^)]+)\)/.exec(c || '');
+    if (!m) return null;
+    const p = m[1].split(',').map((x) => parseFloat(x));
+    if (p.length < 3 || p.some((n) => !isFinite(n))) return null;
+    return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+  }
+  function lin(v) { v = v / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }
+  function lum(rgb) { return 0.2126 * lin(rgb.r) + 0.7152 * lin(rgb.g) + 0.0722 * lin(rgb.b); }
+  function contrast(a, b) {
+    const L1 = lum(a), L2 = lum(b);
+    return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+  }
+  function bgOf(el) {
+    let n = el;
+    while (n && n !== document.documentElement) {
+      const p = parseRgb(getComputedStyle(n).backgroundColor);
+      if (p && p.a >= 0.85) return p;
+      n = n.parentElement;
+    }
+    return { r: 15, g: 26, b: 34, a: 1 };
+  }
+  const labelMeasure = [];
+  document.querySelectorAll('#sec-musts .what').forEach((el) => {
+    if (!vis(el)) return;
+    const cs = getComputedStyle(el);
+    const px = parseFloat(cs.fontSize) || 0;
+    const fill = parseRgb(cs.webkitTextFillColor);
+    const ink = parseRgb(cs.color);
+    const fg = (fill && fill.a > 0.4) ? fill : ink;
+    const ratio = fg ? Math.round(contrast(fg, bgOf(el)) * 100) / 100 : 0;
+    labelMeasure.push({ t: (el.textContent || '').trim().slice(0, 16), px: Math.round(px * 10) / 10, ratio });
+  });
+  const labelBad = labelMeasure.filter((x) => x.px < 31.5 || x.ratio < 4.5);
   const debugLeak = /CLOCK OVERRIDE/.test(text) && !/[?&]diag=1(?:&|$)/.test(location.search);
   const diagEl = document.getElementById('wardos-diag');
   let diagOverlap = false;
@@ -283,7 +317,7 @@ PROBE = """() => {
       if (x > 1 && y > 1) diagOverlap = true;
     }
   }
-  return { stageW: stage ? stage.offsetWidth : 0, stageH: stage ? stage.offsetHeight : 0, scale: Math.round(s * 1000) / 1000, innerWidth, innerHeight, dpr: devicePixelRatio, scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, scrollH: document.documentElement.scrollHeight, clientH: document.documentElement.clientHeight, banned, phase, pickup: text.indexOf('School pickup') >= 0, soccer: text.indexOf('Leave for soccer') >= 0, swim: text.indexOf('4:25 PM') >= 0, outdoor: text.indexOf('62') >= 0, indoor: text.indexOf('65') >= 0, hub: img ? img.getAttribute('src') : '', diag: !!diagEl, small: small.slice(0, 8), smallN: small.length, overlaps: overlaps.slice(0, 8), overlapN: overlaps.length, diagOverlap, lightsLaunch, clips: clips.slice(0, 8), clipN: clips.length, blanks, blankN: blanks.length, debugLeak, textHits: textHits.slice(0, 8), textN: textHits.length, overflow: overflow.slice(0, 8), overflowN: overflow.length, stray: stray.slice(0, 6), strayN: stray.length, touch: touchSmall.slice(0, 8), touchN: touchSmall.length, home, dead, deadN: dead.length, wrappedDays, feedDown, homeMatch, upperNames, upperN: upperNames.length };
+  return { stageW: stage ? stage.offsetWidth : 0, stageH: stage ? stage.offsetHeight : 0, scale: Math.round(s * 1000) / 1000, innerWidth, innerHeight, dpr: devicePixelRatio, scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, scrollH: document.documentElement.scrollHeight, clientH: document.documentElement.clientHeight, banned, phase, pickup: text.indexOf('School pickup') >= 0, soccer: text.indexOf('Leave for soccer') >= 0, swim: text.indexOf('4:25 PM') >= 0, outdoor: text.indexOf('62') >= 0, indoor: text.indexOf('65') >= 0, hub: img ? img.getAttribute('src') : '', diag: !!diagEl, small: small.slice(0, 8), smallN: small.length, overlaps: overlaps.slice(0, 8), overlapN: overlaps.length, diagOverlap, lightsLaunch, clips: clips.slice(0, 8), clipN: clips.length, blanks, blankN: blanks.length, debugLeak, textHits: textHits.slice(0, 8), textN: textHits.length, overflow: overflow.slice(0, 8), overflowN: overflow.length, stray: stray.slice(0, 6), strayN: stray.length, touch: touchSmall.slice(0, 8), touchN: touchSmall.length, home, dead, deadN: dead.length, wrappedDays, feedDown, homeMatch, upperNames, upperN: upperNames.length, labelMeasure: labelMeasure.slice(0, 8), labelN: labelBad.length };
 }"""
 
 
@@ -462,6 +496,8 @@ def main():
                                 fails.append(name + " feed-down")
                             if info.get("homeMatch") is False:
                                 fails.append(name + " home-contrast")
+                            if info.get("labelN"):
+                                fails.append(name + " chore-label")
                         if args.assert_layout and route_name in watch:
                             if info.get("clipN"):
                                 fails.append(name + " clipped")

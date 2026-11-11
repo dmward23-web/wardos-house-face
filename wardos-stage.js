@@ -85,13 +85,13 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
       var face = document.createElement("link");
       face.id = "prism-face-css";
       face.rel = "stylesheet";
-      face.href = "prism-face.css?v=PRISM1";
+      face.href = "prism-face.css";
       document.head.appendChild(face);
     }
     if (!document.getElementById("prism-face-js")) {
       var faceJs = document.createElement("script");
       faceJs.id = "prism-face-js";
-      faceJs.src = "prism-face.js?v=PRISM1";
+      faceJs.src = "prism-face.js";
       document.body.appendChild(faceJs);
     }
     document.documentElement.style.setProperty("--wardos-s", String(s));
