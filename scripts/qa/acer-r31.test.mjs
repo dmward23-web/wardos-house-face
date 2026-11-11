@@ -78,3 +78,35 @@ test("D4 chore icons sit inside their cards, including More", SKIP, () => {
     }
   }
 });
+
+test("r33 Today day header has no empty frosted backdrop over the roof", SKIP, () => {
+  assert.equal(data.r33.today.hits.length, 0, JSON.stringify(data.r33.today));
+  assert.equal(data.r33.today.hdr.bf, "none");
+});
+
+test("r33 Month night header has no hairline across the band", SKIP, () => {
+  assert.equal(data.r33.month.lines.length, 0, JSON.stringify(data.r33.month));
+  const clock = data.r33.month.clock;
+  assert.ok(clock.y >= 48 && clock.b <= clock.y + clock.h + 0.5);
+  assert.ok(clock.h >= 64, "clock " + clock.h);
+});
+
+test("r33 chore icons are 64 and day circles stay inside the card", SKIP, () => {
+  for (const [name, set] of [["folded", data.r33.chores.folded], ["more", data.r33.chores.more]]) {
+    assert.ok(set.rows.length >= 3, name + " " + JSON.stringify(set.cols));
+    for (const row of set.rows) {
+      assert.ok(row.icon, name + " missing icon");
+      assert.ok(Math.abs(row.icon.w - 64) <= 1 && Math.abs(row.icon.h - 64) <= 1, name + " icon " + JSON.stringify(row.icon));
+      assert.ok(inside(row.icon, row.card), name + " icon outside " + JSON.stringify(row));
+      assert.ok(row.days.length === 7, name + " days " + row.days.length);
+      const size = row.days[0].w;
+      for (const day of row.days) {
+        assert.ok(inside(day, row.card), name + " circle outside " + JSON.stringify({ day, card: row.card }));
+        assert.ok(Math.abs(day.w - day.h) <= 1, name + " not round " + JSON.stringify(day));
+        assert.ok(Math.abs(day.w - size) <= 1, name + " unequal " + JSON.stringify(day));
+        assert.ok(day.w >= 40, name + " circle too small " + day.w);
+        assert.ok(parseFloat(day.rad) >= day.w / 2 - 1, name + " radius " + day.rad);
+      }
+    }
+  }
+});

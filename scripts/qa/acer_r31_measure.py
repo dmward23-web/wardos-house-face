@@ -79,6 +79,8 @@ def main():
                     body = '{"raw":{"current":{"temperature_2m":16.7,"weather_code":1,"is_day":1,"time":"2026-11-10T12:00","wind_speed_10m":8},"daily":{"temperature_2m_max":[18.3],"temperature_2m_min":[4.4]},"hourly":{"time":[],"precipitation_probability":[],"precipitation":[]}}}'
                     if "sensi-live" in url:
                         body = '{"status":"live","updatedAt":"2026-11-10T18:00:00.000Z","writeSupported":false,"thermostat":{"name":"Thermostat","online":true,"ambient":65,"setpoint":68,"heatSetpoint":68,"coolSetpoint":74,"mode":"Heat","fan":"Auto","humidity":40,"hold":false}}'
+                    elif "/api/private/kids-week" in url:
+                        body = '{"asOfIso":"2026-11-10","kids":{"hayes":{"today":[]},"harris":{"today":[]},"ainsley":{"today":[]},"dan":{"today":[]}}}'
                     elif "kids-week" in url:
                         body = '{"kids":{}}'
                     elif "weather.gov" in url:
@@ -179,6 +181,91 @@ def main():
             }""")
             page.wait_for_timeout(300)
             out["d4"] = {"folded": folded, "more": icons()}
+            def chores(label):
+                return page.evaluate("""() => {
+                  const r = (el) => { const b = el.getBoundingClientRect(); return {x:b.x,y:b.y,r:b.right,b:b.bottom,w:b.width,h:b.height}; };
+                  const cols = [...document.querySelectorAll('section.col')].map(col => ({
+                    circle: col.getAttribute('data-r33-circle'),
+                    gap: col.getAttribute('data-r33-gap'),
+                    content: col.getAttribute('data-r33-content')
+                  }));
+                  const rows = [...document.querySelectorAll('section.col .chore')].filter(el => {
+                    const b = el.getBoundingClientRect();
+                    return b.width > 8 && b.height > 8 && getComputedStyle(el).display !== 'none';
+                  }).map(card => {
+                    const svg = card.querySelector('.chore-ico svg');
+                    const ico = card.querySelector('.chore-ico');
+                    const icon = svg || ico;
+                    const days = [...card.querySelectorAll('.day-tap')].map(el => {
+                      const b = r(el);
+                      const cs = getComputedStyle(el);
+                      const dot = getComputedStyle(el, '::before');
+                      return {x:b.x,y:b.y,w:b.w,h:b.h,r:b.r,b:b.b, rad: cs.borderRadius, dot: dot.width, t:(el.textContent||'').trim()};
+                    });
+                    return {card: r(card), icon: icon && r(icon), days};
+                  });
+                  return {cols, rows};
+                }""")
+            page.evaluate("""() => {
+              localStorage.setItem('wardos-lights-proxy-token', 'paired-test-key-value');
+              localStorage.setItem('wardos-lights-proxy', location.origin);
+            }""")
+            page.goto(base + "sheet-chores.html?audit=1&now=%s&freeze=1" % DAY, wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_timeout(2200)
+            ch_fold = chores("fold")
+            page.evaluate("""() => {
+              document.querySelectorAll('section.col').forEach(function (col) { col.setAttribute('data-show-all', '1'); });
+              if (window.fitChoreColumns) window.fitChoreColumns();
+            }""")
+            page.wait_for_timeout(400)
+            ch_more = chores("more")
+            page.evaluate("""() => {
+              localStorage.removeItem('wardos-lights-proxy-token');
+              localStorage.removeItem('wardos-lights-proxy');
+            }""")
+            page.goto(base + "sheet-today.html?now=%s&freeze=1" % DAY, wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_timeout(1200)
+            today_hdr = page.evaluate("""() => {
+              const hits = [];
+              for (const el of document.querySelectorAll('body *')) {
+                const b = el.getBoundingClientRect();
+                if (b.width < 200 || b.height < 8 || b.height > 120) continue;
+                if (b.top < 30 || b.top > 90) continue;
+                if (b.left > 1500 || b.right < 1450) continue;
+                const cs = getComputedStyle(el);
+                const bf = cs.backdropFilter || 'none';
+                if (bf && bf !== 'none') hits.push({c:(el.className||'').toString().slice(0,60), x:Math.round(b.x), y:Math.round(b.y), w:Math.round(b.width), h:Math.round(b.height), bf});
+              }
+              const hdr = document.querySelector('header.hdr');
+              const hb = hdr.getBoundingClientRect();
+              const hcs = getComputedStyle(hdr);
+              return {hits, hdr: {x:hb.x,y:hb.y,w:hb.width,h:hb.height, bf:hcs.backdropFilter, bd:hcs.borderBottomWidth, sh:hcs.boxShadow}};
+            }""")
+            page.goto(base + "month.html?now=%s&freeze=1" % NIGHT, wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_timeout(1200)
+            month_line = page.evaluate("""() => {
+              const lines = [];
+              const clock = document.querySelector('[data-live-clock]');
+              const cb = clock.getBoundingClientRect();
+              for (const el of document.querySelectorAll('header.hdr, header.hdr *')) {
+                const b = el.getBoundingClientRect();
+                if (b.width < 400 || b.top > 140 || b.bottom < 40) continue;
+                const cs = getComputedStyle(el);
+                const bf = cs.backdropFilter || 'none';
+                const bt = parseFloat(cs.borderTopWidth) || 0;
+                const bb = parseFloat(cs.borderBottomWidth) || 0;
+                const sh = cs.boxShadow && cs.boxShadow !== 'none';
+                const thin = b.height >= 1 && b.height <= 4;
+                const after = getComputedStyle(el, '::after');
+                const ah = parseFloat(after.height) || 0;
+                const rule = after.content && after.content !== 'none' && ah >= 1 && ah <= 6;
+                if ((bf && bf !== 'none') || bt > 0 || bb > 0 || sh || thin || rule) {
+                  lines.push({c:(el.className||el.tagName).toString().slice(0,40), x:Math.round(b.x), y:Math.round(b.y), w:Math.round(b.width), h:Math.round(b.height), bf, bt, bb, sh, thin, rule, ah});
+                }
+              }
+              return {lines, clock: {x:cb.x,y:cb.y,w:cb.width,h:cb.height,b:cb.bottom}};
+            }""")
+            out["r33"] = {"chores": {"folded": ch_fold, "more": ch_more}, "today": today_hdr, "month": month_line}
             browser.close()
     finally:
         httpd.shutdown()

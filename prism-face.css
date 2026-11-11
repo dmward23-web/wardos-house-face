@@ -1283,9 +1283,23 @@ html:not(#hf-wall-off) body .panel:has(.month-grid) > header.hdr {
   padding: 0 0 0 80px !important;
   margin: 0 !important;
   border: 0 !important;
+  outline: 0 !important;
   background: transparent !important;
+  background-image: none !important;
   box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
   overflow: visible !important;
+}
+html:not(#hf-wall-off) body .panel:has(.today-day) > header.hdr::before,
+html:not(#hf-wall-off) body .panel:has(.today-day) > header.hdr::after,
+html:not(#hf-wall-off) body .panel:has(.month-grid) > header.hdr::before,
+html:not(#hf-wall-off) body .panel:has(.month-grid) > header.hdr::after {
+  content: none !important;
+  display: none !important;
+  height: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
 }
 html:not(#hf-wall-off) body .panel:has(.today-day) .hdr-left-col,
 html:not(#hf-wall-off) body .panel:has(.month-grid) .hdr-left-col {
@@ -1369,10 +1383,10 @@ html:not(#hf-wall-off) body .panel:has(.today-day) > .body > section.sec[aria-la
   max-width: 860px !important;
 }
 html body section.col .chore .chore-ico svg {
-  width: 100% !important;
-  height: 32px !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  max-width: 100% !important;
-  max-height: 32px !important;
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  max-width: 64px !important;
+  max-height: 64px !important;
 }
