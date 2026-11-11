@@ -764,7 +764,7 @@ html.kw-root.kw-root body.theme-ainsley.kw-on #sec-jar .jar-state {
   height: auto !important;
   color: #f4efe6 !important;
 }
-html.kw-root.kw-root body.theme-ainsley.kw-on #sec-jar > .prism-jar { padding-left: 200px !important; }
+html.kw-root.kw-root body.theme-ainsley.kw-on #sec-jar > .prism-jar { padding-left: 0 !important; }
 html.kw-root body.kw-on #sec-musts .chore-list,
 html.kw-root body.kw-on #sec-musts [data-mount-quests] {
   gap: 0 !important;
@@ -778,11 +778,11 @@ html.kw-root body.kw-on #sec-musts .chore {
   box-shadow: none !important;
 }
 html body .hub-launch a[href*="sheet-weekend"]::before {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 32 32' fill='none' stroke='%23f4efe6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='8' r='3'/><path d='M8 3v2M3 8h2M5.2 5.2l1.4 1.4'/><path d='M22 26 V16'/><path d='M16 26 h12'/><path d='M17 20 c2-6 8-6 10 0'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 32 32' fill='none' stroke='%23f4efe6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><circle cx='22' cy='8' r='3'/><path d='M22 3v2M17 8h2M18.5 4.5l1.4 1.4'/><path d='M5 16 L14 9 L23 16'/><path d='M7 15 V25 H21 V15'/><path d='M12 25 v-5 h4 v5'/></svg>");
 }
 html.kw-root body.kw-on .kw-hud { gap: 16px !important; }
 html.kw-root body.kw-on .kw-home { flex: 0 0 64px !important; width: 64px !important; height: 64px !important; position: relative !important; z-index: 4 !important; }
-html.kw-root body.kw-on .kw-id { margin-left: 80px !important; position: relative !important; z-index: 4 !important; }
+html.kw-root body.kw-on .kw-id { margin-left: 0 !important; position: relative !important; z-index: 4 !important; }
 @media (min-width: 1400px) and (min-height: 700px) {
   html.kw-root body.kw-on .kw-home { flex: 0 0 96px !important; width: 96px !important; }
   html.kw-root body.kw-on #sec-days .consume-hero-inner {
@@ -858,9 +858,9 @@ html.kw-root body.kw-on .kw-id { margin-left: 80px !important; position: relativ
   html:not(#hf-wall-off) body .panel.lights-cmd {
     position: fixed !important;
     left: 48px !important;
-    top: 140px !important;
+    top: 168px !important;
     width: 900px !important;
-    height: 900px !important;
+    height: 864px !important;
     max-width: 900px !important;
     margin: 0 !important;
     transform: none !important;
@@ -890,3 +890,194 @@ html.kw-root body.kw-on .kw-id { margin-left: 80px !important; position: relativ
   html body .panel.lights-cmd .hdr-micros .home-btn { display: none !important; }
 }
 html body .ori-iris { pointer-events: none !important; }
+
+/* Round 12 · one clock, one header line, one jar, full-bleed bars. */
+html body .live-clock,
+html body .kw-clock,
+html body [data-kw-clock],
+html body [data-live-clock] {
+  font-size: 40px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  color: #f4efe6 !important;
+  -webkit-text-fill-color: #f4efe6 !important;
+  background: #101820 !important;
+  border: 2px solid #c4b49a !important;
+  border-radius: 16px !important;
+  padding: 8px 16px !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+@media (min-width: 1400px) and (min-height: 700px) {
+html.kw-root body.kw-on .kw-hud {
+  display: grid !important;
+  grid-template-columns: 96px minmax(180px, 1fr) 160px 360px !important;
+  column-gap: 24px !important;
+  left: 48px !important;
+  top: 48px !important;
+  width: 1824px !important;
+  height: 96px !important;
+  position: fixed !important;
+}
+html.kw-root body.kw-on .kw-mute,
+html.kw-root body.kw-on .house-snd.kw-mute {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  height: 64px !important;
+  margin: 0 !important;
+}
+html.kw-root body.kw-on .kw-home {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  margin: 0 !important;
+  width: 96px !important;
+  height: 96px !important;
+  max-width: 96px !important;
+  max-height: 96px !important;
+  min-width: 96px !important;
+  min-height: 96px !important;
+}
+html:not(#hf-wall-off) body .panel.lights-cmd .hdr.hdr--clockfirst .live-clock-host,
+html:not(#hf-wall-off) body .wardos-stage > .live-clock-host {
+  position: fixed !important;
+  top: 48px !important;
+  right: 48px !important;
+  left: auto !important;
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: 420px !important;
+  height: 64px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  z-index: 30 !important;
+}
+html.kw-root body.kw-on .panel .body {
+  position: fixed !important;
+  left: 972px !important;
+  top: 168px !important;
+  width: 900px !important;
+  height: 864px !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-rows: 1fr 64px !important;
+  align-content: stretch !important;
+}
+html.kw-root body.kw-on #sec-musts { grid-column: 1 / -1 !important; grid-row: 1 !important; }
+html.kw-root body.kw-on #sec-jar { grid-column: 1 !important; grid-row: 2 !important; align-self: end !important; height: 64px !important; }
+html.kw-root body.kw-on #sec-days { grid-column: 2 !important; grid-row: 2 !important; align-self: end !important; height: 64px !important; }
+}
+html.kw-root body.kw-on #sec-jar .prism-jar-label,
+html.kw-root body.kw-on #sec-jar .bank-title,
+html.kw-root body.kw-on #sec-jar .jar-state {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+}
+html.kw-root body.kw-on #sec-jar .prism-jar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+}
+html.kw-root body.kw-on #sec-jar .prism-jar-plus { margin-left: auto !important; }
+html.kw-root body.kw-on #sec-days,
+html.kw-root body.kw-on #sec-days .consume-hero,
+html.kw-root body.kw-on #sec-days .consume-hero.empty,
+html.kw-root body.kw-on #sec-days .consume-hero.empty .consume-hero-inner {
+  background-image: none !important;
+  box-shadow: none !important;
+}
+html.kw-root body.kw-on #sec-days .consume-hero.empty,
+html.kw-root body.kw-on #sec-days .consume-hero.empty .consume-hero-inner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  height: 100% !important;
+  background: transparent !important;
+  padding: 0 16px !important;
+}
+html.kw-root body.kw-on #sec-musts .chore-ico,
+html.kw-root body.kw-on #sec-musts .chore-ico svg,
+html body section.col .chore-ico,
+html body section.col .chore-ico svg {
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  color: #f4efe6 !important;
+}
+html body .name-accent {
+  color: #f4efe6 !important;
+  -webkit-text-fill-color: #f4efe6 !important;
+  text-shadow: none !important;
+  background: none !important;
+}
+html body .tile.ainsley { border: 2px solid #8a6394 !important; }
+html body .tile.hayes { border: 2px solid #3f8b71 !important; }
+html body .tile.harris { border: 2px solid #42679a !important; }
+html body .tile.dan { border: 2px solid #c4b49a !important; }
+html body .tile.dan .tile-label { background: #c4b49a !important; color: #1a1814 !important; -webkit-text-fill-color: #1a1814 !important; }
+html body .roster-plate.roster-empty,
+html body .tile.dan .roster-plate { background: transparent !important; background-image: none !important; }
+html body .roster-plate.roster-empty .roster-title::before { content: none !important; display: none !important; }
+html body .roster-plate.roster-empty .roster-title {
+  font-size: 24px !important;
+  display: inline-block !important;
+  width: auto !important;
+  padding: 4px 14px !important;
+  border-radius: 12px !important;
+  background: #101820 !important;
+}
+html body #hub-cam-deck .hub-cam-label,
+html body #hub-cam-deck.cams-resting .hub-cam-label { font-size: 24px !important; line-height: 1.2 !important; }
+html body #hub-lights-panel .hub-lights-bulk { width: 100% !important; flex: 1 1 auto !important; }
+html body .panel.lights-cmd .cmd-meta,
+html body .panel.lights-cmd footer.ftr { display: none !important; }
+html body .panel.lights-cmd header.hdr,
+html body .panel.lights-cmd header.hdr::before,
+html body .panel.lights-cmd header.hdr::after {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+html body .panel.lights-cmd .live-clock-host {
+  position: fixed !important;
+  top: 48px !important;
+  right: 48px !important;
+  left: auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 64px !important;
+  display: flex !important;
+  align-items: center !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  z-index: 30 !important;
+}
+html body .light-pad-state { display: none !important; }
+html body .light-pad:not(.is-on) .light-bright { display: none !important; }
+html body .cmd-rocker {
+  width: 96px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+}
+html body .panel.lights-cmd .light-pad-src {
+  color: #8a8070 !important;
+  -webkit-text-fill-color: #8a8070 !important;
+  text-transform: none !important;
+  font-size: 24px !important;
+}
+html body .panel.lights-cmd .light-pad-ico svg { width: 48px !important; height: 48px !important; color: #f4efe6 !important; }

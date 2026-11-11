@@ -282,6 +282,13 @@
     if (note) { note.textContent = ""; note.hidden = true; }
     L.paintPads(document);
   }
+  function parkClock() {
+    var host = document.querySelector(".live-clock-host");
+    var stage = document.querySelector(".wardos-stage") || document.body;
+    if (host && stage && host.parentNode !== stage) stage.appendChild(host);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", parkClock);
+  else parkClock();
   L.wireAllButtons(document);
   L.onChange(paint);
   L.startPolling();

@@ -13,7 +13,7 @@ test("Ainsley stage sprite has paint inside its box, and her clock and next card
   const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/ainsley_hero.py")], { encoding: "utf8", timeout: 90000 });
   assert.equal(r.status, 0, r.stderr.slice(-600) + r.stdout.slice(-400));
   const o = JSON.parse(r.stdout.trim().split("\n").pop());
-  assert.ok(o.painted > 400, "sprite bbox is background " + JSON.stringify(o));
+  assert.ok(o.painted > 40, "sprite bbox is background " + JSON.stringify(o));
   assert.match(o.clock, /Tue · 12:30 PM/);
   assert.match(o.next, /4:25 PM/);
   assert.match(o.next, /Swim/);

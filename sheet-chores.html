@@ -1146,6 +1146,17 @@ html body .chore .day-tap {
   max-width: 64px !important;
   flex: 0 0 64px !important;
   font-size: 24px !important;
+  line-height: 64px !important;
+}
+html body .chore .day-tap.is-past {
+  opacity: 0.6 !important;
+  text-decoration: line-through !important;
+  background: transparent !important;
+}
+html body .chore .day-tap.is-off:not(.is-today):not(.done) {
+  background: transparent !important;
+  border: 2px solid #c4b49a !important;
+  color: #f4efe6 !important;
 }
 html body .chore .quest-days {
   display: grid !important;
@@ -1156,25 +1167,28 @@ html body .chore .quest-days {
   overflow: visible !important;
 }
 html body section.col .more-chip {
-  position: absolute !important;
-  right: 12px !important;
-  bottom: 12px !important;
+  position: relative !important;
+  right: auto !important;
+  bottom: auto !important;
   top: auto !important;
   left: auto !important;
-  width: 88px !important;
+  width: 100% !important;
   height: 64px !important;
+  min-width: 64px !important;
   min-height: 64px !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  margin: 8px 0 0 !important;
+  padding: 0 16px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   background: #1c2430 !important;
   color: #f4efe6 !important;
   border-radius: 16px !important;
-  font-size: 20px !important;
+  font-size: 24px !important;
+  line-height: 1.2 !important;
   z-index: 2 !important;
 }
+html body section.col .more-chip::after { content: "  \203A"; }
 html body .chore-shortcuts {
   top: 128px !important;
   left: 48px !important;
@@ -1184,7 +1198,46 @@ html body .chore-shortcuts .kid-chip {
   min-height: 64px !important;
   max-height: 64px !important;
 }
-html body .house-snd { margin-left: 4px !important; }
+html body .house-snd { display: none !important; }
+html:not(#hf-wall-off) body .panel .mute-btn,
+html:not(#hf-wall-off) body .panel .hdr-right-tools {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+html:not(#hf-wall-off) body .chore-shortcuts {
+  left: 168px !important;
+  top: 52px !important;
+  width: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+}
+html:not(#hf-wall-off) body .chore-shortcuts .kid-chip {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 160px !important;
+  min-width: 148px !important;
+  height: 64px !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+html body .cheer,
+html body .panel > section.cheer {
+  background: #101820 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+html body .cheer-accent { display: none !important; }
 html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock-host {
   left: 760px !important;
   top: 8px !important;

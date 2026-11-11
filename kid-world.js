@@ -58,18 +58,18 @@
     var body = '<path d="M16 6 L18.5 13 H26 L20 17.5 L22.5 25 L16 20.5 L9.5 25 L12 17.5 L6 13 H13.5 Z"/>';
     if (/bed/.test(k)) body = '<path d="M5 22 V13 H10 V8 H22 V13 H27 V22"/><path d="M5 17 H27"/>';
     else if (/backpack|cubby/.test(k)) body = '<path d="M12 11 V8 a4 4 0 0 1 8 0 v3"/><path d="M8 12 h16 v13 a2 2 0 0 1-2 2 H10 a2 2 0 0 1-2-2 z"/><path d="M8 18 h16"/><path d="M14 12 v5 h4 v-5"/><path d="M11 14 h-2 M21 14 h2"/>';
-    else if (/empty/.test(k)) body = '<rect x="7" y="7" width="18" height="18" rx="2"/><path d="M7 14 h18"/><circle cx="16" cy="19" r="2.2"/><path d="M11 7 V5 h10 v2"/>';
-    else if (/dish/.test(k)) body = '<ellipse cx="16" cy="17" rx="10" ry="4"/><path d="M7 17 c2 7 16 7 18 0"/><path d="M12 9 c1 3 7 3 8 0"/>';
+    else if (/empty/.test(k)) body = '<path d="M7 12 h18 v12 H7 z"/><path d="M7 12 L5 7 h22 l-2 5"/><path d="M10 16 h12 M10 19 h12"/>';
+    else if (/dish/.test(k)) body = '<path d="M6 7 v12 M4 7 h4 M6 10 H4 M6 13 H4"/><ellipse cx="19" cy="16" rx="8" ry="3.5"/><path d="M11 16 c2 6 14 6 16 0"/>';
     else if (/trash/.test(k)) body = '<path d="M8 10 H24"/><path d="M12 10 V7 H20 V10"/><path d="M10 12 L12 26 H20 L22 12"/>';
-    else if (/shower/.test(k)) body = '<path d="M8 7 h14"/><path d="M15 7 v5"/><path d="M10 14 c0 7 12 7 12 0"/><path d="M12 22 v3 M16 22 v3 M20 22 v3"/>';
+    else if (/shower/.test(k)) body = '<circle cx="11" cy="7" r="3"/><path d="M11 10 v2"/><path d="M7 13 h16"/><path d="M10 17 v5 M14 17 v6 M18 17 v5 M22 17 v4"/>';
     else if (/bath/.test(k)) body = '<path d="M5 16 h22 v3 a7 7 0 0 1-7 7 H12 a7 7 0 0 1-7-7 z"/><path d="M9 16 V10 a4 4 0 0 1 8 0"/>';
     else if (/shoe|living/.test(k)) body = '<path d="M5 21 C8 11 14 12 16 15 C20 10 27 14 27 21 Z"/>';
     else if (/laundry/.test(k)) body = '<path d="M9 7 h14 l2 18 H7 Z"/><circle cx="16" cy="17" r="4"/><path d="M12 7 v4 M20 7 v4"/>';
     else if (/toy/.test(k)) body = '<circle cx="16" cy="11" r="4"/><path d="M16 7 V5"/><path d="M10 15 h12 v8 H10 z"/><path d="M12 23 v3 M20 23 v3 M10 17 H7 M22 17 h3"/>';
     else if (/room/.test(k)) body = '<path d="M5 15 L16 6 L27 15 V26 H5 Z"/><path d="M13 26 v-7 h6 v7"/>';
-    else if (/postgame/.test(k)) body = '<circle cx="16" cy="16" r="8"/><path d="M16 8 V24 M8 16 H24"/>';
+    else if (/postgame/.test(k)) body = '<circle cx="16" cy="16" r="8"/><path d="M16 8 c2 5 2 11 0 16 M8 16 c5-2 11-2 16 0 M10 11 c4 2 8 2 12 0 M10 21 c4-2 8-2 12 0"/>';
     else if (/babysit/.test(k)) body = '<circle cx="11" cy="11" r="3"/><circle cx="21" cy="12" r="2.4"/><path d="M6 24 c1-6 4-8 5-8 M22 24 c-1-5-3-6-4-6"/>';
-    return '<svg viewBox="0 0 32 32" width="72" height="72" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">' + body + "</svg>";
+    return '<svg viewBox="0 0 32 32" width="64" height="64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">' + body + "</svg>";
   }
   function plainLabel(id) {
     var k = String(id || "");
@@ -1680,32 +1680,40 @@
     ctx.restore();
   }
   function drawAinsleyHero(ctx, img, W, H, t) {
-    /* @2x bitmap drawn 1:1 (never upscaled). Feet (32,157) in the 1x file, so (64,314) on the 128×320 sheet.
-       She stands on the stage deck, feet at frame x 515, so the figure is on the floor instead of lost in the beams. */
+    /* The @2x sheet is 128×320. Draw it at 54×136 CSS px (downscale, never upscale) so she matches the boys.
+       Feet (32,157) in the 1x file. The canvas sits at stage (48,168); her feet land at frame (495, 855),
+       20px left of the old pool so the brightest spot is on her. ctx.scale keeps the census 1:1 on the 2-arg draw. */
     if (!img || !img.width || !img.height) return false;
     var mot = reactMotion(t);
     var bob = reduced ? 0 : mot.squash * 1.5;
     var hop = mot.hop;
+    var dw = 54, dh = 136;
+    var sx = dw / img.width, sy = dh / img.height;
     var footX = img.width * (32 / 64);
     var footY = img.height * (157 / 160);
-    var fx = (515 - 48) * (W / 900);
-    var fy = H * 0.80 - hop - bob;
+    var frameFootX = 495, frameFootY = 855;
+    var fx = (frameFootX - 48) * (W / 900);
+    var fy = (frameFootY - 168) * (H / 864) - hop - bob;
     ctx.save();
-    ctx.translate(fx, fy + 4);
+    ctx.translate(fx, fy + 2);
     ctx.scale(1, 0.22);
     ctx.fillStyle = "rgba(0,0,0,0.35)";
     ctx.beginPath();
-    ctx.ellipse(0, 0, Math.max(18, img.width * 0.28), Math.max(18, img.width * 0.28), 0, 0, 7);
+    ctx.ellipse(0, 0, 16, 16, 0, 0, 7);
     ctx.fill();
     ctx.restore();
-    var x = Math.round(fx - footX);
-    var y = Math.round(fy - footY);
-    ctx.drawImage(img, x, y);
+    var x = fx - footX * sx;
+    var y = fy - footY * sy;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(sx, sy);
+    ctx.drawImage(img, 0, 0);
+    ctx.restore();
     if (ctx.canvas && ctx.canvas.setAttribute) {
-      ctx.canvas.setAttribute("data-hero-x", String(x));
-      ctx.canvas.setAttribute("data-hero-y", String(y));
-      ctx.canvas.setAttribute("data-hero-w", String(img.width));
-      ctx.canvas.setAttribute("data-hero-h", String(img.height));
+      ctx.canvas.setAttribute("data-hero-x", String(Math.round(x)));
+      ctx.canvas.setAttribute("data-hero-y", String(Math.round(y)));
+      ctx.canvas.setAttribute("data-hero-w", String(dw));
+      ctx.canvas.setAttribute("data-hero-h", String(dh));
     }
     return true;
   }

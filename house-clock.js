@@ -130,8 +130,7 @@
     root.querySelectorAll("[data-live-clock], [data-live='time'], [data-live='clock-time'], [data-kw-clock]").forEach(function (el) {
       var dow = String(s.dow || "").replace(/\./g, "");
       if (dow) dow = dow.charAt(0).toUpperCase() + dow.slice(1, 3).toLowerCase();
-      var kidChip = el.getAttribute && el.getAttribute("data-kw-clock") != null;
-      el.textContent = kidChip && dow && s.time ? dow + " \u00b7 " + s.time : (s.time || "");
+      el.textContent = dow && s.time ? dow + " \u00b7 " + s.time : (s.time || "");
       el.setAttribute("data-dow", s.dow || "");
       el.setAttribute("data-date", s.dateLine || s.iso || "");
       if (el.tagName === "TIME") el.setAttribute("datetime", s.iso + "T" + (s.time || "").replace(" ", ""));

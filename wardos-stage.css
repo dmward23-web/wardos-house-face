@@ -9,9 +9,11 @@ html[data-wardos-stage] > body {
   max-height: none !important;
   margin: 0 !important;
   overflow: hidden !important;
-  background-image: none !important;
-  background-color: #07080b !important;
-  background-size: auto !important;
+  background-color: #1a140f !important;
+  background-image: url("month-theme/november/wall-dusk.webp") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
 }
 html[data-wardos-stage] .wardos-stage {
   width: 1920px;
