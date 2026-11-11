@@ -1264,18 +1264,60 @@ html.kw-root body.kw-on #sec-days .consume-hero-name {
   white-space: nowrap !important;
 }
 
-/* Today and Month: one clock chip, no host tail, no header hairline. Calendar card stays in the 48px inset. */
+/* Today and Month: the header row holds the temp chips beside Home. No hairline, no host tail. */
 html:not(#hf-wall-off) body .panel:has(.today-day) > header.hdr,
 html:not(#hf-wall-off) body .panel:has(.month-grid) > header.hdr {
-  height: 0 !important;
-  min-height: 0 !important;
-  max-height: 0 !important;
-  padding: 0 !important;
+  position: absolute !important;
+  left: 48px !important;
+  top: 48px !important;
+  right: 48px !important;
+  width: auto !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 0 0 0 80px !important;
   margin: 0 !important;
   border: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
   overflow: visible !important;
+}
+html:not(#hf-wall-off) body .panel:has(.today-day) .hdr-left-col,
+html:not(#hf-wall-off) body .panel:has(.month-grid) .hdr-left-col {
+  width: 0 !important;
+  min-width: 0 !important;
+  flex: 0 0 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html:not(#hf-wall-off) body .panel:has(.today-day) .hdr-ovals,
+html:not(#hf-wall-off) body .panel:has(.month-grid) .hdr-ovals {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  height: 64px !important;
+  margin: 0 !important;
+  zoom: 1 !important;
+}
+html:not(#hf-wall-off) body .panel:has(.today-day) .hdr-ovals .oval,
+html:not(#hf-wall-off) body .panel:has(.month-grid) .hdr-ovals .oval {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  margin: 0 !important;
 }
 html:not(#hf-wall-off) body .panel:has(.today-day) .hdr.hdr--clockfirst .live-clock-host,
 html:not(#hf-wall-off) body .panel:has(.month-grid) .hdr.hdr--clockfirst .live-clock-host {
@@ -1312,6 +1354,11 @@ html:not(#hf-wall-off) body .panel:has(.month-grid) .hdr.hdr--clockfirst [data-l
   box-shadow: none !important;
 }
 html:not(#hf-wall-off) body .panel:has(.today-day) section.today-day {
+  margin-left: 40px !important;
+  width: 860px !important;
+  max-width: 860px !important;
+}
+html:not(#hf-wall-off) body .panel:has(.today-day) > .body > section.sec[aria-label="Boards"] {
   margin-left: 40px !important;
   width: 860px !important;
   max-width: 860px !important;

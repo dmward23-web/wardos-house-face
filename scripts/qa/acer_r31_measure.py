@@ -72,13 +72,41 @@ def main():
         with sync_playwright() as p:
             browser = p.chromium.launch(**launch_kw(p, args=["--no-sandbox", "--disable-dev-shm-usage"]))
             ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+
+            def handle(route, _request=None):
+                url = route.request.url
+                if "sensi-live" in url or url.endswith("/wx") or "/wx?" in url or "kids-week" in url or "weather.gov" in url:
+                    body = '{"raw":{"current":{"temperature_2m":16.7,"weather_code":1,"is_day":1,"time":"2026-11-10T12:00","wind_speed_10m":8},"daily":{"temperature_2m_max":[18.3],"temperature_2m_min":[4.4]},"hourly":{"time":[],"precipitation_probability":[],"precipitation":[]}}}'
+                    if "sensi-live" in url:
+                        body = '{"status":"live","updatedAt":"2026-11-10T18:00:00.000Z","writeSupported":false,"thermostat":{"name":"Thermostat","online":true,"ambient":65,"setpoint":68,"heatSetpoint":68,"coolSetpoint":74,"mode":"Heat","fan":"Auto","humidity":40,"hold":false}}'
+                    elif "kids-week" in url:
+                        body = '{"kids":{}}'
+                    elif "weather.gov" in url:
+                        body = "{}"
+                    route.fulfill(status=200, content_type="application/json", body=body)
+                    return
+                if route.request.method != "GET":
+                    route.fulfill(status=403, content_type="application/json", body="{}")
+                    return
+                route.continue_()
+
+            ctx.route("**/*", handle)
             page = ctx.new_page()
             page.goto(base + "kid-hayes.html?now=%s&freeze=1" % DAY, wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(1000)
+            page_home = page.evaluate("""() => {
+              const el = document.querySelector('.kw-hud > .kw-home');
+              const b = el.getBoundingClientRect();
+              const img = el.querySelector('img');
+              const ib = img.getBoundingClientRect();
+              return {x:b.x,y:b.y,w:b.width,h:b.height, imgs: el.querySelectorAll('img').length, ix:ib.x, iy:ib.y, iw:ib.width, ih:ib.height};
+            }""")
             page.evaluate("""() => { var b = document.querySelector('.prism-jar-plus, .saves-plus, [data-saves-plus]'); if (b) b.click(); }""")
             page.wait_for_timeout(300)
-            out["d1"] = page.evaluate("""() => {
-              const r = (el) => { if (!el) return null; const b = el.getBoundingClientRect(); return {x:b.x,y:b.y,w:b.width,h:b.height,r:b.right,b:b.bottom}; };
+            out["d1"] = page.evaluate("""(pageHome) => {
+              const r = (el) => { if (!el) return null; const b = el.getBoundingClientRect(); const cs = getComputedStyle(el); return {x:b.x,y:b.y,w:b.width,h:b.height,r:b.right,b:b.bottom, vis:cs.visibility, disp:cs.display}; };
+              const homes = [...document.querySelectorAll('.kw-home, .saves-home, .wardos-home')].map(el => Object.assign({c: el.className.toString()}, r(el), {imgs: el.querySelectorAll('img').length}));
+              const visible = homes.filter(h => h.vis !== 'hidden' && h.disp !== 'none' && h.w > 1 && h.h > 1);
               const home = document.querySelector('.saves-home');
               const img = home && home.querySelector('img');
               let text = null;
@@ -91,8 +119,8 @@ def main():
               const name = r(document.querySelector('.saves-add-name'));
               const need = r(document.querySelector('.saves-add-need'));
               const save = r(document.querySelector('.saves-add-save'));
-              return {home: r(home), img: r(img), text, name, need, save};
-            }""")
+              return {pageHome, visible, home: r(home), img: r(img), text, name, need, save};
+            }""", page_home)
             clocks = {}
             for label, now in (("day", DAY), ("night", NIGHT)):
                 for route in ("sheet-today.html", "month.html"):
@@ -100,14 +128,29 @@ def main():
                     page.wait_for_timeout(900)
                     clocks["%s-%s" % (route.replace(".html", ""), label)] = clock(page)
             out["d2"] = clocks
+            chips = {}
+            for route in ("sheet-today.html", "month.html"):
+                page.goto(base + route + "?now=%s&freeze=1" % DAY, wait_until="domcontentloaded", timeout=30000)
+                page.wait_for_timeout(1500)
+                chips[route] = page.evaluate("""() => {
+                  const r = (el) => { const b = el.getBoundingClientRect(); return {x:b.x,y:b.y,w:b.width,h:b.height,r:b.right}; };
+                  const home = document.querySelector('.wardos-home');
+                  const ovals = [...document.querySelectorAll('.hdr-ovals .oval')].filter(el => {
+                    const b = el.getBoundingClientRect();
+                    return b.width > 8 && b.height > 8 && getComputedStyle(el).display !== 'none';
+                  }).map(r);
+                  return {home: home && r(home), ovals};
+                }""")
+            out["chips"] = chips
             page.goto(base + "sheet-today.html?now=%s&freeze=1" % DAY, wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(900)
             out["d3"] = page.evaluate("""() => {
               const r = (el) => { const b = el.getBoundingClientRect(); return {x:b.x,y:b.y,w:b.width,h:b.height}; };
-              const boxes = [...document.querySelectorAll('.where-card, section.today-day, .qtile, .kid-card, nav.tap-rail a')].filter(el => {
+              const boards = document.querySelector('section.sec[aria-label="Boards"]');
+              const boxes = [...document.querySelectorAll('section.sec[aria-label="Boards"], section.today-day, .qtile, .kid-card, nav.tap-rail a')].filter(el => {
                 const b = el.getBoundingClientRect();
                 return b.width > 8 && b.height > 8;
-              }).map(el => ({c: (el.className||'').toString().slice(0,48), ...r(el)}));
+              }).map(el => ({c: (el.getAttribute('aria-label') || el.className || '').toString().slice(0,48), ...r(el)}));
               const pills = [...document.querySelectorAll('.qtile-tap, .kid-tap')].map(el => {
                 const b = el.getBoundingClientRect();
                 const row = el.closest('a, button');
@@ -115,7 +158,7 @@ def main():
                 const inside = rb && b.left >= rb.left - 1 && b.right <= rb.right + 1 && b.top >= rb.top - 1 && b.bottom <= rb.bottom + 1;
                 return {t: (el.textContent||'').trim(), h: b.height, rowH: rb ? rb.height : 0, own: el.matches('a, button'), inside};
               });
-              return {boxes, pills};
+              return {boards: boards && r(boards), boxes, pills};
             }""")
             page.goto(base + "sheet-chores.html?now=%s&freeze=1" % DAY, wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(1400)

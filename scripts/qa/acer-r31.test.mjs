@@ -21,17 +21,28 @@ function inside(inner, outer) {
   return inner.x >= outer.x - 0.5 && inner.y >= outer.y - 0.5 && inner.r <= outer.r + 0.5 && inner.b <= outer.b + 0.5;
 }
 
-test("D1 saves Home is an icon tile and the add controls are 64px with 16px gaps", SKIP, () => {
+test("r32 saves modal shows one Home tile matching kid-hayes", SKIP, () => {
   const d = data.d1;
-  assert.ok(d.img && d.img.w >= 32 && d.img.h >= 32, "icon " + JSON.stringify(d.img));
+  assert.equal(d.visible.length, 1, JSON.stringify(d.visible));
+  const tile = d.visible[0];
+  assert.equal(tile.imgs, 1);
   assert.equal(d.text.t, "");
-  assert.ok(d.home.x >= 48 && d.home.y >= 48, JSON.stringify(d.home));
-  assert.ok(d.home.w >= 64 && d.home.h >= 64, JSON.stringify(d.home));
-  const textOverlapsIcon = d.text.w > 1 && d.text.h > 1 && d.text.x < d.img.r && d.text.r > d.img.x && d.text.y < d.img.b && d.text.b > d.img.y;
-  assert.equal(textOverlapsIcon, false);
+  assert.ok(Math.abs(tile.x - d.pageHome.x) <= 1 && Math.abs(tile.y - d.pageHome.y) <= 1, JSON.stringify({ tile, pageHome: d.pageHome }));
+  assert.ok(Math.abs(tile.w - d.pageHome.w) <= 1 && Math.abs(tile.h - d.pageHome.h) <= 1, JSON.stringify({ tile, pageHome: d.pageHome }));
+  assert.ok(d.img && Math.abs(d.img.w - d.pageHome.iw) <= 1 && Math.abs(d.img.h - d.pageHome.ih) <= 1);
   for (const key of ["name", "need", "save"]) assert.ok(d[key].h >= 64, key + " " + d[key].h);
   assert.ok(d.need.x - (d.name.x + d.name.w) >= 16, "name to star");
   assert.ok(d.save.x - (d.need.x + d.need.w) >= 16, "star to save");
+});
+
+test("r32 Today and Month temp chips sit beside Home inside the safe area", SKIP, () => {
+  for (const [route, row] of Object.entries(data.chips)) {
+    assert.ok(row.home && row.ovals.length >= 1, route + " " + JSON.stringify(row));
+    for (const chip of row.ovals) {
+      assert.ok(chip.y >= 48, route + " top " + chip.y);
+      assert.ok(chip.x >= row.home.x + row.home.w + 16, route + " gap " + JSON.stringify({ chip, home: row.home }));
+    }
+  }
 });
 
 test("D2 Today and Month clock text sits inside one chip with no tail or hairline", SKIP, () => {
@@ -43,9 +54,10 @@ test("D2 Today and Month clock text sits inside one chip with no tail or hairlin
   }
 });
 
-test("D3 Today content starts at x 48 and Tap and Board rows are at least 64px", SKIP, () => {
+test("D3 Today boards container starts at x 48 and Tap and Board rows are at least 64px", SKIP, () => {
+  assert.ok(data.d3.boards, "boards container missing");
+  assert.ok(data.d3.boards.x >= 48, "boards left " + data.d3.boards.x);
   const xs = data.d3.boxes.map((b) => b.x);
-  assert.ok(xs.length > 0);
   assert.ok(Math.min(...xs) >= 48, JSON.stringify(data.d3.boxes.filter((b) => b.x < 48)));
   for (const pill of data.d3.pills) {
     if (pill.own) assert.ok(pill.h >= 64, pill.t);
