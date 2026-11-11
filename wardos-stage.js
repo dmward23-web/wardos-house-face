@@ -50,7 +50,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     for (i = 0; i < kids.length; i++) {
       var n = kids[i];
       if (n === stage) continue;
-      if (n.nodeType === 1 && (n.id === "wardos-diag" || n.id === "acer-cover" || n.classList.contains("pair-screen") || n.classList.contains("chore-shortcuts"))) continue;
+      if (n.nodeType === 1 && (n.id === "wardos-diag" || n.id === "acer-cover" || n.classList.contains("pair-screen") || n.classList.contains("chore-shortcuts") || n.classList.contains("hl-layer") || n.classList.contains("kw-clip"))) continue;
       stage.appendChild(n);
     }
     return stage;
@@ -63,6 +63,8 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
 
   var coverUrl = "";
   function extendCover(node, box) {
+    /* One plate, painted once. A CSS cover on the document shifts under the
+       transformed stage, so the letterbox and the stage were two copies. */
     var src = "";
     try { src = getComputedStyle(document.documentElement).getPropertyValue("--wg-hubbg") || ""; } catch (e0) { src = ""; }
     if (!src) {
@@ -70,7 +72,18 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     }
     var m = /url\(["']?([^"')]+)/.exec(src);
     var url = m ? m[1] : coverUrl;
-    if (!url) return;
+    [document.documentElement, document.body].forEach(function (el) {
+      el.style.setProperty("background-image", "none", "important");
+      el.style.setProperty("background-color", "#07080b", "important");
+    });
+    node.style.setProperty("background-image", "none", "important");
+    node.style.setProperty("background-color", "transparent", "important");
+    var panels = node.querySelectorAll(":scope > .panel");
+    for (var i = 0; i < panels.length; i++) {
+      panels[i].style.setProperty("background-image", "none", "important");
+      panels[i].style.setProperty("background-color", "transparent", "important");
+    }
+    if (!url || !box) return;
     var paint = function (img) {
       var c = document.getElementById("acer-cover");
       if (!c) {
@@ -88,17 +101,17 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
       if (!ctx) return;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
-      /* Cover-fit the plate to the viewport. The stage stays scaled and centered on top. */
       var cover = Math.max(w / img.width, h / img.height);
       var dw = img.width * cover;
       var dh = img.height * cover;
       ctx.imageSmoothingEnabled = true;
       ctx.filter = "none";
       ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
-      node.style.setProperty("background-image", "none", "important");
-      node.style.setProperty("background-color", "transparent", "important");
     };
-    if (coverUrl === url && extendCover.img && extendCover.img.complete) { paint(extendCover.img); return; }
+    if (coverUrl === url && extendCover.img && extendCover.img.complete && extendCover.img.naturalWidth) {
+      paint(extendCover.img);
+      return;
+    }
     coverUrl = url;
     var img = new Image();
     extendCover.img = img;
@@ -145,7 +158,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     document.documentElement.style.setProperty("--wardos-s", String(s));
     node.style.zIndex = "1";
     extendCover(node, box);
-    document.body.style.setProperty("background-size", "auto", "important");
+    document.body.style.setProperty("background-image", "none", "important");
     liftType();
     unclip();
     setTimeout(function () { liftType(); unclip(); extendCover(node, viewport()); }, 400);

@@ -1035,14 +1035,38 @@ html.kw-root body.kw-on #sec-days .consume-hero.empty .consume-hero-inner {
   background-image: none !important;
   box-shadow: none !important;
 }
+html.kw-root body.kw-on #sec-days:has(.consume-hero.empty) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
 html.kw-root body.kw-on #sec-days .consume-hero.empty,
 html.kw-root body.kw-on #sec-days .consume-hero.empty .consume-hero-inner {
   display: flex !important;
   align-items: center !important;
-  justify-content: flex-start !important;
-  height: 100% !important;
-  background: transparent !important;
-  padding: 0 16px !important;
+  justify-content: center !important;
+  flex: 1 1 auto !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
+  background: #101820 !important;
+  background-image: none !important;
+  padding: 0 24px !important;
+  text-align: center !important;
+}
+html.kw-root body.kw-on #sec-days .consume-hero.empty::before,
+html.kw-root body.kw-on #sec-days .consume-hero.empty .consume-hero-meta {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  background-image: none !important;
+}
+html.kw-root body.kw-on #sec-days .consume-hero.empty .consume-hero-title {
+  font-size: 24px !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  flex: none !important;
+  text-align: center !important;
 }
 html.kw-root body.kw-on #sec-musts .chore-ico,
 html.kw-root body.kw-on #sec-musts .chore-ico svg,

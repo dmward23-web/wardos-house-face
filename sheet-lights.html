@@ -477,6 +477,24 @@
     pointer-events: auto !important;
     cursor: pointer !important;
   }
+  html:not(#hf-wall-off) body .panel.lights-cmd > .banner.cmd-panel {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    box-sizing: border-box !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    flex: 0 0 64px !important;
+    padding: 0 24px !important;
+    border-width: 0 !important;
+    margin: 0 0 16px !important;
+    gap: 0 !important;
+  }
+  html body .panel.lights-cmd .banner.cmd-panel .cmd-hdr { display: none !important; }
+  html body .panel.lights-cmd .banner-title { margin: 0 !important; }
+  html:not(#hf-wall-off) body .panel.lights-cmd > .bulk.cmd-panel { margin-top: 0 !important; }
 }
 </style>
 </body>

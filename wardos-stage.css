@@ -14,6 +14,12 @@ html[data-wardos-stage] > body {
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
+html[data-wardos-stage] body .panel.panel.panel,
+html[data-wardos-stage] .wardos-stage.wardos-stage {
+  background-image: none !important;
+  background-color: transparent !important;
 }
 html[data-wardos-stage] .wardos-stage {
   width: 1920px;

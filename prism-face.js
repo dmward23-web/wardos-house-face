@@ -177,7 +177,7 @@
     var lightsBulk = document.querySelector(".hub-lights-bulk");
     if (lightsTitle && lightsBulk && lightsTitle.parentNode !== lightsBulk) lightsBulk.insertBefore(lightsTitle, lightsBulk.firstChild);
     else if (lightsTitle && lightsTitle.parentNode) lightsTitle.parentNode.insertBefore(lightsTitle, lightsTitle.parentNode.firstChild);
-    document.body.style.setProperty("background-size", "auto", "important");
+    document.body.style.setProperty("background-image", "none", "important");
     var wall = /\/(sheet-index|sheet-chores|sheet-lights|kid-ainsley|kid-hayes|kid-harris)\.html$/.test(location.pathname || "");
     var stageNode = document.querySelector(".wardos-stage") || document.body;
     if (wall) {

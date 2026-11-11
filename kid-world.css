@@ -795,13 +795,18 @@ body.kw-on #tapsync-badge { display: none !important; }
     margin: 0 !important;
   }
   html.kw-root body.kw-on #sec-days { grid-column: 2 !important; grid-row: 2 !important; overflow: auto !important; color: #1a1814 !important; font-size: 24px !important; }
+  html.kw-root body.kw-on #sec-days:not(:has(.consume-hero, .kw-offline)) {
+    align-items: center !important;
+    justify-content: center !important;
+  }
   html.kw-root body.kw-on #sec-days:not(:has(.consume-hero, .kw-offline))::before {
     content: "Nothing next";
     display: block;
-    font-size: 24px;
+    font-size: 24px !important;
     line-height: 1.2;
-    padding: 16px;
-    color: #1a1814;
+    padding: 0;
+    color: #f4efe6;
+    -webkit-text-fill-color: #f4efe6;
   }
   /* Every kid keeps the jar and the Next card. An empty next says so; it does not vanish. */
   html.kw-root body.kw-on #sec-days,
