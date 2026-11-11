@@ -154,6 +154,8 @@
     function weekNote(on) {
       var host = document.querySelector("#sec-days") || document.querySelector(".panel");
       var note = document.querySelector("[data-kw-offline]");
+      var hero = document.querySelector("#sec-days .consume-hero:not(.empty)");
+      if (hero && /[0-9]|Swim|Pickup|soccer|Next/i.test(hero.textContent || "")) on = false;
       if (!on) {
         if (note) note.remove();
         return;
@@ -465,8 +467,8 @@
     }
     var jobs = [];
     var creatures = wallView()
-      ? [["hayes", "assets/ori/creature/idle-226.webp"], ["harris", "assets/ori/creature/harris-226.webp"], ["ainsley", "assets/ori/creature/ainsley-hero.webp"]]
-      : [["hayes", "assets/ori/creature/idle.webp"], ["harris", "assets/ori/creature/harris.webp"], ["ainsley", "assets/ori/creature/ainsley-hero.webp"]];
+      ? [["hayes", "assets/ori/creature/idle-226.webp"], ["harris", "assets/ori/creature/harris-226.webp"], ["ainsley", "assets/ori/creature/ainsley-hero@2x.png"]]
+      : [["hayes", "assets/ori/creature/idle.webp"], ["harris", "assets/ori/creature/harris.webp"], ["ainsley", "assets/ori/creature/ainsley-hero@2x.png"]];
     creatures.forEach(function (row) {
       if (lean() && (row[0] !== me || oriCreature[me])) return;
       jobs.push(loadImg(row[1]).then(function (im) {
@@ -1635,7 +1637,8 @@
     ctx.fillStyle = dg; ctx.fillRect(0, deck, W, H - deck);
     ctx.fillStyle = "rgba(255,190,120," + (0.35 + f * 0.4).toFixed(3) + ")"; ctx.fillRect(0, deck - 1, W, 2);
     ctx.fillStyle = "#050304";
-    [0.18, 0.5, 0.82].forEach(function (mx) { ctx.beginPath(); ctx.moveTo(W * mx - 26, deck + 1); ctx.lineTo(W * mx + 26, deck + 1); ctx.lineTo(W * mx + 20, deck - 16); ctx.lineTo(W * mx - 20, deck - 16); ctx.closePath(); ctx.fill(); });
+    /* Side wedges only. The center wedge sat under her feet and read as a mic stand. */
+    [0.18, 0.82].forEach(function (mx) { ctx.beginPath(); ctx.moveTo(W * mx - 26, deck + 1); ctx.lineTo(W * mx + 26, deck + 1); ctx.lineTo(W * mx + 20, deck - 16); ctx.lineTo(W * mx - 20, deck - 16); ctx.closePath(); ctx.fill(); });
   }
   function drawCrowd(ctx, W, H, t, pan) {
     var base = H + 4, rows = [[0.875, 14, "#0a0507"], [0.915, 18, "#030203"]];
@@ -1673,24 +1676,33 @@
     ctx.restore();
   }
   function drawAinsleyHero(ctx, img, W, H, t) {
-    /* The bitmap is the @2x sprite Lanczos-downscaled to a 113px box (about 110px of paint). Drawn 1:1, never upscaled.
-       Feet (32,157) in the 1x file land near 1920-frame (515,809), which is canvas (467,641) on the 900×864 wall. */
+    /* @2x bitmap drawn 1:1 (never upscaled). Feet (32,157) in the 1x file, so (64,314) on the 128×320 sheet.
+       She stands on the stage deck, feet at frame x 515, so the figure is on the floor instead of lost in the beams. */
+    if (!img || !img.width || !img.height) return false;
     var mot = reactMotion(t);
     var bob = reduced ? 0 : mot.squash * 1.5;
     var hop = mot.hop;
-    var footX = 64 * (img.width / 128);
-    var footY = 314 * (img.height / 320);
+    var footX = img.width * (32 / 64);
+    var footY = img.height * (157 / 160);
     var fx = (515 - 48) * (W / 900);
-    var fy = (809 - 168) * (H / 864) - hop - bob;
+    var fy = H * 0.80 - hop - bob;
     ctx.save();
     ctx.translate(fx, fy + 4);
     ctx.scale(1, 0.22);
-    ctx.fillStyle = "rgba(0,0,0,0.28)";
+    ctx.fillStyle = "rgba(0,0,0,0.35)";
     ctx.beginPath();
-    ctx.ellipse(0, 0, 16, 16, 0, 0, 7);
+    ctx.ellipse(0, 0, Math.max(18, img.width * 0.28), Math.max(18, img.width * 0.28), 0, 0, 7);
     ctx.fill();
     ctx.restore();
-    ctx.drawImage(img, Math.round(fx - footX), Math.round(fy - footY));
+    var x = Math.round(fx - footX);
+    var y = Math.round(fy - footY);
+    ctx.drawImage(img, x, y);
+    if (ctx.canvas && ctx.canvas.setAttribute) {
+      ctx.canvas.setAttribute("data-hero-x", String(x));
+      ctx.canvas.setAttribute("data-hero-y", String(y));
+      ctx.canvas.setAttribute("data-hero-w", String(img.width));
+      ctx.canvas.setAttribute("data-hero-h", String(img.height));
+    }
     return true;
   }
   function drawOriCreature(ctx, W, H, t, world) {
@@ -2142,10 +2154,7 @@
     }
     var el = document.querySelector("[data-kw-clock]");
     if (!el) return;
-    var line = clockLine();
-    var time = String(line).split("\u00b7").pop().trim();
-    time = time.replace(/\b([ap])m\b/i, function (_, ap) { return " " + ap.toUpperCase() + "M"; }).replace(/\s{2,}/g, " ").trim();
-    el.textContent = time || line;
+    el.textContent = clockLine();
   }
   function paintWeek() {
     var host = document.querySelector("[data-kw-week]");

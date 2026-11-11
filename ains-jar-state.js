@@ -1,10 +1,10 @@
-/* AINSJAR1 · Ainsley's jar stays "Nothing trusted yet."
+/* AINSJAR1 · Ainsley's jar stays "Jar is empty"
  * A sentence in public kids-week.json is not a Dad grant. No credential or provenance
  * channel exists, so grantLine ignores its argument. Never a counter, never an invented TRUSTED. */
 (function (g) {
   "use strict";
   var PLACE = { trusted: true, empty: true, unset: true, resting: true, paused: true, none: true };
-  var EMPTY = "Nothing trusted yet.";
+  var EMPTY = "Jar is empty";
   function grantLine(d) {
     /* Public kids-week prose is not a Dad grant. No credential or provenance channel exists, so every state stays untrusted. */
     return "";

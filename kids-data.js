@@ -1758,10 +1758,10 @@
       (kid.quests || []).forEach(function (q) {
         if (q.id === "ain-toys" || /room reset/i.test(q.what || "")) {
           var done = getCheck(q.id);
-          space.push({ when: "Room", what: done ? "Room reset · clear" : "Room reset · still open", hint: "your space · your pace", tone: done ? "fun" : "act" });
+          space.push({ when: "Room", what: done ? "Room is clear" : "Room still open", hint: "Your room", tone: done ? "fun" : "act" });
         }
       });
-      her.innerHTML = space.length ? space.map(cardHTML).join("") : quietHTML(kidId === "ainsley" ? "her space · needle up" : "your space · quiet");
+      her.innerHTML = space.length ? space.map(cardHTML).join("") : quietHTML("Nothing else today");
     }
   }
 
@@ -2267,7 +2267,7 @@
           '<div class="consume-countdown"><span class="pulse"></span><span>' + esc(cd) + "</span></div>" +
           "</div>" +
           '<div class="consume-hero-title">' + (ico.html || "") + esc(((ico.text ? ico.text + " " : "") + shown)) + "</div>" +
-          '<div class="consume-hero-meta">YOUR board · <b>' + esc(meta.loadout) + "</b></div>" +
+          (kidId === "ainsley" ? "" : '<div class="consume-hero-meta">YOUR board · <b>' + esc(meta.loadout) + "</b></div>") +
           "</div>";
       }
     }
@@ -2433,6 +2433,7 @@
       var w = document.createTreeWalker(root, 4 /* NodeFilter.SHOW_TEXT */), n, list = [];
       while ((n = w.nextNode())) { if (!(n.parentElement && n.parentElement.closest("[data-mount-consume-hdr]"))) list.push(n); }   /* the header clock is chrome */
       list.forEach(function (tn) {
+        if (tn.parentElement && tn.parentElement.closest && tn.parentElement.closest(".consume-hero-when")) return; /* option C · the next card keeps its clock time */
         if (/[\d$%\u2605\u2606\u2b50]/.test(tn.nodeValue)) {
           var lead = /^\s/.test(tn.nodeValue) ? " " : "", trail = /\s$/.test(tn.nodeValue) ? " " : "";
           var v = strip(tn.nodeValue);
@@ -2498,7 +2499,7 @@
         }
         renderList(document.querySelector("[data-mount-school]"), schoolRows, "school bits show up when known");
       })();
-      renderList(document.querySelector("[data-mount-appointments]"), kid.appointments, kid.appointmentsEmpty || "none on your board · quiet is good");
+      renderList(document.querySelector("[data-mount-appointments]"), kid.appointments, kid.appointmentsEmpty || "Nothing on the board");
     }
     renderList(document.querySelector("[data-mount-fun]"), kid.fun, "fun picks land here");
     renderList(document.querySelector("[data-mount-missions]"), kid.missions || kid.fun, "bonus missions land here");

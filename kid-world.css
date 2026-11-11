@@ -733,10 +733,18 @@ body.kw-on #tapsync-badge { display: none !important; }
     border-radius: 16px !important;
   }
   html.kw-root body.kw-on.kw-rest .panel { opacity: 1 !important; }
+  html.kw-root body.kw-on .panel,
+  html.kw-root body.kw-on #sec-musts,
+  html.kw-root body.kw-on #sec-musts .chore-list,
+  html.kw-root body.kw-on #sec-musts [data-mount-quests] {
+    background: transparent !important;
+    background-image: none !important;
+  }
   html.kw-root body.kw-on .panel .body {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    grid-template-rows: minmax(0, 1fr) 64px !important;
+    grid-template-rows: auto 64px !important;
+    align-content: start !important;
     gap: 16px !important;
     height: 100% !important;
     min-height: 0 !important;
@@ -883,8 +891,8 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on #sec-musts .chore-ico svg { width: 36px !important; height: 36px !important; display: block !important; }
   html.kw-root body.kw-on #sec-musts .chore .what,
   html.kw-root body.kw-on #sec-musts .chore .hint {
-    font-size: 24px !important;
-    line-height: 24px !important;
+    font-size: 28px !important;
+    line-height: 32px !important;
     color: #1a1814 !important;
   }
   html.kw-root body.kw-on #sec-jar .saves-host {

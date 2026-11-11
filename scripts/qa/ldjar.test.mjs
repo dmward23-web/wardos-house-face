@@ -182,7 +182,7 @@ test("AINSSTAR1 (real browser): no star glyph or digit in Ainsley's rows before,
 });
 
 /* ---------- 4. AINSJAR1 (Alfred FOLD Oct 20): her jar is a state under the Tour Jar label, on both of her pages ---------- */
-const EMPTY_JAR = "Nothing trusted yet.";
+const EMPTY_JAR = "Jar is empty";
 function kidAinsleyJar() {
   const h = read("kid-ainsley.html"), i = h.indexOf('id="sec-jar"');
   assert.ok(i > 0, "kid-ainsley jar section");
@@ -196,13 +196,13 @@ test("AINSJAR1 markup: kid-ainsley has no star glyph, no tally or progress count
   assert.equal(/data-bank-(?:life|symbol|today|balance|week-earn)|data-grow-(?:total|save-need|pct)|data-progress-meta|data-left-count|data-saves-panel/.test(visible), false, "a count, tally or saves binding");
   const jar = kidAinsleyJar();
   assert.equal(/\d/.test(jar.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, " ")), false, "a digit in her jar");
-  assert.match(jar, /<div class="bank-title">Jar<\/div>\s*<div class="jar-state" data-jar-state="unset">Nothing trusted yet\.<\/div>/, "empty jar is not a counter");
+  assert.match(jar, /<div class="bank-title">Jar<\/div>\s*<div class="jar-state" data-jar-state="unset">Jar is empty<\/div>/, "empty jar is not a counter");
   assert.doesNotMatch(jar, /Tour Jar|tour-jar|payday/);
   assert.match(h, /<script src="ains-jar-state\.js\?v=AINSJAR2"><\/script>/);
 });
 test("AINSJAR1 markup: sheet-allowance starts on the empty line, not a hardcoded TRUSTED", () => {
   const a = bankSection("ainsley");
-  assert.match(a, /data-jar-state="unset">Nothing trusted yet\.<\/div>/);
+  assert.match(a, /data-jar-state="unset">Jar is empty<\/div>/);
   assert.doesNotMatch(a, /data-jar-state="trusted">TRUSTED</);
   assert.equal(/data-saves-panel/.test(a), false);
   assert.match(read("sheet-allowance.html"), /<script src="ains-jar-state\.js\?v=AINSJAR2"><\/script>/);

@@ -51,7 +51,7 @@ test("Ainsley: the clock node stays, and paintClock writes the same time chip as
   const clock = hud.append(D.mk("DIV", { class: "kw-clock", "data-kw-clock": "" }));
   vm.runInNewContext(fnSrc("kid") + fnSrc("clockLine") + fnSrc("paintClock") + ";paintClock();", g);
   assert.equal(D.doc.querySelectorAll("[data-kw-clock]").length, 1, "clock node stays");
-  assert.equal(clock.textContent, "9:00 PM");
+  assert.equal(clock.textContent, "Sun \u00b7 9:00 PM"); /* option C · the chip is the weekday and the time, on her board and the boys' */
   assert.doesNotMatch(inline(), /\.remove\s*\(/, "AINSCLOCK1 no longer removes the chip");
 });
 

@@ -100,18 +100,19 @@ function boot(start) {
 test("clock chips follow Chicago time across a minute, midnight, and a hidden 10-minute suspend", () => {
   const noon = Date.parse("2026-11-10T18:30:00Z"); /* 12:30 PM CST */
   const page = boot(noon);
+  const face = (el, stamp) => el.getAttribute("data-kw-clock") != null ? stamp.dow + " \u00b7 " + stamp.time : stamp.time;
   const read = () => page.chips.map((c) => c.textContent);
-  assert.deepEqual(read(), Array(5).fill(expectAt(noon).time));
+  assert.deepEqual(read(), page.chips.map((c) => face(c, expectAt(noon))));
   assert.equal(page.dow.textContent, "Tue");
 
   page.advance(61 * 1000);
   const min = noon + 61 * 1000;
-  assert.deepEqual(read(), Array(5).fill(expectAt(min).time));
+  assert.deepEqual(read(), page.chips.map((c) => face(c, expectAt(min))));
   assert.equal(read()[0], "12:31 PM");
 
   const before = Date.parse("2026-11-11T05:59:30Z"); /* 11:59 PM CST Nov 10 */
   const night = boot(before);
-  assert.equal(night.chips[2].textContent, "11:59 PM");
+  assert.equal(night.chips[2].textContent, "Tue \u00b7 11:59 PM");
   assert.equal(night.dow.textContent, "Tue");
   night.advance(40 * 1000);
   const after = before + 40 * 1000;
@@ -119,7 +120,7 @@ test("clock chips follow Chicago time across a minute, midnight, and a hidden 10
   assert.equal(want.time, "12:00 AM");
   assert.equal(want.dow, "Wed");
   night.chips.forEach((c) => {
-    assert.equal(c.textContent, want.time);
+    assert.equal(c.textContent, c.getAttribute("data-kw-clock") != null ? "Wed \u00b7 " + want.time : want.time);
     assert.equal(c.getAttribute("data-dow"), "Wed");
   });
   assert.equal(night.dow.textContent, "Wed");
@@ -128,5 +129,5 @@ test("clock chips follow Chicago time across a minute, midnight, and a hidden 10
   held.suspend(10 * 60 * 1000);
   const later = expectAt(noon + 10 * 60 * 1000);
   assert.equal(later.time, "12:40 PM");
-  held.chips.forEach((c) => assert.equal(c.textContent, later.time));
+  held.chips.forEach((c) => assert.equal(c.textContent, c.getAttribute("data-kw-clock") != null ? "Tue \u00b7 " + later.time : later.time));
 });

@@ -176,7 +176,7 @@ test("Ainsley hub faces: stars, XP, streak and $ never render, offline or with a
   assert.match(boy, /kf-xp/);
 });
 
-test("Ainsley jar: offline, bad JSON, the word trusted, and a prose sentence all stay Nothing trusted yet", async () => {
+test("Ainsley jar: offline, bad JSON, the word trusted, and a prose sentence all stay Jar is empty", async () => {
   const document = makeDocument();
   const el = node("div");
   el.attrs["data-jar-state"] = "trusted";
@@ -196,14 +196,14 @@ test("Ainsley jar: offline, bad JSON, the word trusted, and a prose sentence all
   document.readyState = "complete";
   load("ains-jar-state.js", ctx);
   await new Promise((r) => setTimeout(r, 20));
-  assert.equal(el.textContent, "Nothing trusted yet.");
+  assert.equal(el.textContent, "Jar is empty");
   assert.equal(el.getAttribute("data-jar-state"), "unset");
   ctx.AinsJarState.paint({ kids: { ainsley: { jarState: "trusted" } } });
-  assert.equal(el.textContent, "Nothing trusted yet.");
+  assert.equal(el.textContent, "Jar is empty");
   ctx.AinsJarState.paint("{not json");
-  assert.equal(el.textContent, "Nothing trusted yet.");
+  assert.equal(el.textContent, "Jar is empty");
   ctx.AinsJarState.paint({ kids: { ainsley: { jarState: "She walks to the library" } } });
-  assert.equal(el.textContent, "Nothing trusted yet.");
+  assert.equal(el.textContent, "Jar is empty");
   assert.equal(el.getAttribute("data-jar-state"), "unset");
 });
 
