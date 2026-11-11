@@ -1097,6 +1097,8 @@ html:not(#hf-wall-off):not(#hf-scroll-off) body .panel > .body > section.col {
   box-sizing: border-box !important;
   overflow: hidden !important;
 }
+html:not(#hf-wall-off) body .panel .chore-list.is-scroll::-webkit-scrollbar { width: 18px; }
+html:not(#hf-wall-off) body .panel .chore-list.is-scroll::-webkit-scrollbar-thumb { background: #c4b49a; border-radius: 8px; }
 html:not(#hf-wall-off) body .panel .body > section.col .chore-list {
   padding: 4px 0 0 !important;
   gap: 16px !important;
@@ -1344,6 +1346,7 @@ document.addEventListener("DOMContentLoaded", function () {
         list.style.setProperty("overflow-y", "scroll", "important");
         list.style.setProperty("scrollbar-width", "auto", "important");
         list.style.setProperty("scrollbar-color", "#c4b49a #0f1a22", "important");
+        list.classList.add("is-scroll");
       }
       /* Option D. Seven 64 zones with 16px gaps (544) inside the 589 column. */
       col.style.setProperty("padding-left", "0", "important");
