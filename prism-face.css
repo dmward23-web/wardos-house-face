@@ -426,7 +426,7 @@ html.kw-root.kw-root body.kw-on #sec-jar .prism-jar-svg {
   flex: 1 1 auto !important;
 }
 html.kw-root.kw-root body.kw-on #sec-jar .prism-jar-label {
-  font-size: 20px !important;
+  font-size: 24px !important;
   line-height: 1.1 !important;
   font-weight: 700 !important;
   color: #f4efe6 !important;
@@ -706,6 +706,77 @@ html body .hub-lights,
 html body #hub-lights-panel { margin-top: 8px !important; }
 html body .hub-lights-bulk { display: flex !important; align-items: center !important; gap: 12px !important; }
 html body .hub-lights-title { order: -1 !important; margin-right: 12px !important; }
+html body .hub-lights-link { display: none !important; }
+html body .roster-plate,
+html body .tile.dan .roster-plate {
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+}
+html body .roster-plate.roster-empty .roster-title {
+  font-size: 28px !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+html body .roster-plate.roster-empty .roster-title::before {
+  content: "\2713";
+  display: block;
+  font-size: 48px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+html.kw-root body.kw-on #sec-days .consume-hero-title {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: hidden !important;
+}
+html.kw-root body.kw-on #sec-days .consume-hero-name {
+  display: block !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+html.kw-root body.kw-on #sec-jar .prism-jar-label,
+html.kw-root body.kw-on #sec-jar .bank-title,
+html.kw-root body.kw-on #sec-jar .jar-state {
+  font-size: 24px !important;
+  line-height: 1.2 !important;
+}
+html.kw-root.kw-root body.theme-ainsley.kw-on #sec-jar > .bank-top {
+  position: absolute !important;
+  left: 12px !important;
+  top: 0 !important;
+  width: auto !important;
+  max-width: 240px !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  background: transparent !important;
+  z-index: 4 !important;
+  pointer-events: none !important;
+  overflow: visible !important;
+}
+html.kw-root.kw-root body.theme-ainsley.kw-on #sec-jar > .bank-top .bank-title { display: none !important; }
+html.kw-root.kw-root body.theme-ainsley.kw-on #sec-jar .jar-state {
+  white-space: nowrap !important;
+  width: auto !important;
+  height: auto !important;
+  color: #f4efe6 !important;
+}
+html.kw-root.kw-root body.theme-ainsley.kw-on #sec-jar > .prism-jar { padding-left: 200px !important; }
+html.kw-root body.kw-on #sec-musts .chore-list,
+html.kw-root body.kw-on #sec-musts [data-mount-quests] {
+  gap: 0 !important;
+  scrollbar-gutter: auto !important;
+  background: transparent !important;
+}
+html.kw-root body.kw-on #sec-musts .chore {
+  margin: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
 html body .hub-launch a[href*="sheet-weekend"]::before {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 32 32' fill='none' stroke='%23f4efe6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='8' r='3'/><path d='M8 3v2M3 8h2M5.2 5.2l1.4 1.4'/><path d='M22 26 V16'/><path d='M16 26 h12'/><path d='M17 20 c2-6 8-6 10 0'/></svg>");
 }
@@ -725,4 +796,97 @@ html.kw-root body.kw-on .kw-id { margin-left: 80px !important; position: relativ
   html.kw-root body.kw-on #sec-days .consume-hero-top { display: flex !important; align-items: center !important; gap: 8px !important; flex: none !important; }
   html.kw-root body.kw-on #sec-days .consume-hero-when { display: block !important; font-size: 28px !important; }
   html.kw-root body.kw-on #sec-days .consume-hero-title { font-size: 28px !important; }
+  html:not(#hf-wall-off) body .chore-shortcuts {
+    position: absolute !important;
+    left: 280px !important;
+    top: 52px !important;
+    width: 520px !important;
+    z-index: 6 !important;
+    gap: 16px !important;
+  }
+  html:not(#hf-wall-off) body .chore-shortcuts .kid-chip,
+  html:not(#hf-wall-off) body .chore-shortcuts .kid-chip.ainsley,
+  html:not(#hf-wall-off) body .chore-shortcuts .kid-chip.hayes,
+  html:not(#hf-wall-off) body .chore-shortcuts .kid-chip.harris {
+    width: auto !important;
+    min-width: 148px !important;
+    max-width: 176px !important;
+    height: 64px !important;
+    padding: 0 18px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+  }
+  html:not(#hf-wall-off) body .panel > header.hdr,
+  html:not(#hf-wall-off) body .panel > header.hdr .hdr-left-col {
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+  html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock-host {
+    position: absolute !important;
+    left: 820px !important;
+    top: 8px !important;
+    width: 420px !important;
+    min-width: 420px !important;
+    z-index: 8 !important;
+    overflow: visible !important;
+  }
+  html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock,
+  html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst [data-live-clock] {
+    overflow: visible !important;
+    text-overflow: clip !important;
+    font-size: 40px !important;
+    white-space: nowrap !important;
+  }
+  html:not(#hf-wall-off) body .panel > section.cheer {
+    left: 1420px !important;
+    width: 452px !important;
+    top: 48px !important;
+    z-index: 5 !important;
+  }
+  html body .mute-btn {
+    position: absolute !important;
+    left: 168px !important;
+    top: 16px !important;
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 16px !important;
+    z-index: 6 !important;
+  }
+  html:not(#hf-wall-off) body:has(.chore-shortcuts) .mute-btn { display: none !important; }
+  html:not(#hf-wall-off) body .panel.lights-cmd {
+    position: fixed !important;
+    left: 48px !important;
+    top: 140px !important;
+    width: 900px !important;
+    height: 900px !important;
+    max-width: 900px !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+  html:not(#hf-wall-off) body .panel.lights-cmd .banner,
+  html:not(#hf-wall-off) body .panel.lights-cmd .bulk,
+  html:not(#hf-wall-off) body .panel.lights-cmd .pad-grid,
+  html:not(#hf-wall-off) body .panel.lights-cmd .connect,
+  html:not(#hf-wall-off) body .panel.lights-cmd .light-pad {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  html:not(#hf-wall-off) body .panel.lights-cmd #lights-connect,
+  html:not(#hf-wall-off) body .panel.lights-cmd #lights-status-pill { display: none !important; }
+  html body .light-pad-name,
+  html body .cmd-title,
+  html body .banner-title,
+  html body .connect-title,
+  html body .light-pad-state,
+  html body .light-pad-src,
+  html body .connect-sub {
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+  }
+  html body .panel.lights-cmd .hdr-micros .home-btn { display: none !important; }
 }
+html body .ori-iris { pointer-events: none !important; }

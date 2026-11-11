@@ -93,6 +93,7 @@
     var list = document.querySelector("#sec-musts .chore-list, #sec-musts [data-mount-quests]");
     if (!list) return;
     list.style.setProperty("gap", "16px", "important");
+    list.style.setProperty("background", "#0f1a22", "important");
     list.style.setProperty("height", "auto", "important");
     list.style.setProperty("max-height", "none", "important");
     list.style.setProperty("overflow", "visible", "important");
@@ -104,6 +105,9 @@
       row.style.setProperty("max-height", "64px", "important");
       row.style.setProperty("flex", "0 0 64px", "important");
       row.style.setProperty("margin", "0", "important");
+      row.style.setProperty("border-radius", "0", "important");
+      row.style.setProperty("border-width", "0", "important");
+      row.style.setProperty("background", "#0f1a22", "important");
       row.style.setProperty("overflow", "hidden", "important");
       row.style.setProperty("transform", "none", "important");
     });

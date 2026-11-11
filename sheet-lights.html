@@ -193,7 +193,7 @@
  <div class="live-clock" data-live-clock></div>
  </div>
  <div class="hdr-micros">
- <a class="home-btn" href="sheet-google-home.html" aria-label="Back to cams">Cams</a>
+ <a class="home-btn" href="sheet-index.html" aria-label="Home">Home</a>
  </div>
  </div>
  <div class="hdr-spacer" aria-hidden="true"></div>
@@ -204,10 +204,10 @@
 
  <section class="banner cmd-panel cmd-panel--hot" aria-label="Lights mission">
  <div class="cmd-hdr">
- <div class="cmd-title">Lights · not Nest</div>
- <div class="cmd-meta">Elo · Kasa</div>
+ <div class="cmd-title">Lights</div>
+ <div class="cmd-meta">House</div>
  </div>
- <div class="banner-title">Kasa lights · tap to switch</div>
+ <div class="banner-title">Tap a room to switch it</div>
  </section>
 
  <section class="bulk cmd-panel" aria-label="All lights">
@@ -224,9 +224,7 @@
  <div class="connect-sub" id="lights-connect-sub"></div>
  </div>
  <div class="connect-actions">
- <a class="cbtn loud" href="sheet-google-home.html">Cams + climate hub</a>
- <a class="cbtn" href="sheet-index.html">Sheets hub</a>
- <a class="cbtn" href="sheet-status.html">Status</a>
+ <a class="cbtn" href="sheet-index.html">Home</a>
  </div>
  </section>
 
@@ -235,10 +233,7 @@
  <footer class="ftr">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
  <span>House · Lights</span>
- <a class="ftr-chip" href="sheet-google-home.html">Cams hub</a>
- <a class="ftr-chip" href="sheet-google-home.html#sensi-hero">Sensi</a>
- <a class="ftr-chip" href="sheet-index.html">Sheets</a>
- <a class="ftr-chip" href="sheet-status.html">Status</a>
+ <a class="ftr-chip" href="sheet-index.html">Home</a>
  </div>
  <span id="lights-ftr-status">Needs pairing</span>
  </footer>
@@ -264,6 +259,8 @@
     else pill.classList.add("cmd-pill--off");
     var box = document.getElementById("lights-connect");
     box.classList.toggle("ok", !!g.live);
+    var banner = document.querySelector(".banner-title");
+    if (banner) banner.textContent = (g.live && !needsKey) ? "Tap a room to switch it" : "Lights offline \u00b7 tap to retry";
     var title = document.getElementById("lights-connect-title");
     var sub = document.getElementById("lights-connect-sub");
     if (needsKey) {
@@ -273,11 +270,11 @@
       title.textContent = "Lights · Live";
       sub.textContent = "";
     } else if (g.needToken || g.kind === "need_token") {
-      title.textContent = "CONNECT · need Kasa on Atlas";
-      sub.textContent = "Controls dark"; /* FOLLOWUP2 · one empty-state line: the pad card already says Not connected yet */
+      title.textContent = "Lights offline";
+      sub.textContent = "Tap to retry";
     } else {
-      title.textContent = "Lights · " + g.label;
-      sub.textContent = g.label + " · controls dark";
+      title.textContent = "Lights offline";
+      sub.textContent = "Tap to retry";
     }
     var ftr = document.getElementById("lights-ftr-status");
     if (ftr) ftr.textContent = g.label;

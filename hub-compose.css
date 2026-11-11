@@ -204,7 +204,7 @@ html body #hub-lights-panel .hub-lights-bulk-btn.hub-lights-bulk-btn {
   line-height: 1.1 !important;
 }
 html body .hub-lights-link {
-  display: flex !important;
+  display: none !important;
   align-items: center !important;
   justify-content: flex-start !important;
   flex: 1 1 auto !important;

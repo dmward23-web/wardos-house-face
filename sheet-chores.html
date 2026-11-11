@@ -1138,11 +1138,42 @@ html body section.col .chore-ico svg {
   height: 48px !important;
 }
 html body section.col .what { padding-left: 24px !important; }
+html body .chore .day-tap {
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  max-width: 64px !important;
+  flex: 0 0 64px !important;
+  font-size: 24px !important;
+}
+html body .chore .quest-days {
+  display: grid !important;
+  grid-template-columns: repeat(7, 64px) !important;
+  gap: 6px !important;
+  width: max-content !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
 html body section.col .more-chip {
   position: absolute !important;
-  right: 16px !important;
-  top: 8px !important;
+  right: 12px !important;
+  bottom: 12px !important;
+  top: auto !important;
   left: auto !important;
+  width: 88px !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #1c2430 !important;
+  color: #f4efe6 !important;
+  border-radius: 16px !important;
+  font-size: 20px !important;
+  z-index: 2 !important;
 }
 html body .chore-shortcuts {
   top: 128px !important;
@@ -1154,6 +1185,29 @@ html body .chore-shortcuts .kid-chip {
   max-height: 64px !important;
 }
 html body .house-snd { margin-left: 4px !important; }
+html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock-host {
+  left: 760px !important;
+  top: 8px !important;
+  width: auto !important;
+  min-width: 280px !important;
+  max-width: 420px !important;
+  overflow: visible !important;
+}
+html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock,
+html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst [data-live-clock] {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 240px !important;
+}
+html:not(#hf-wall-off) body .panel > section.cheer,
+html:not(#hf-wall-off) body .panel .cheer {
+  left: 1180px !important;
+  width: 680px !important;
+  top: 48px !important;
+}
 </style>
 <script>
 document.addEventListener("DOMContentLoaded", function () {

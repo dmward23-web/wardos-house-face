@@ -732,7 +732,13 @@
           + '<div class="light-pad-top">'
           + '<div class="light-pad-ico" aria-hidden="true">💡</div>'
           + '<div><div class="light-pad-name">' + escapeHtml(L.name) + "</div>"
-          + '<div class="light-pad-where">' + escapeHtml(L.where || L.kind) + "</div></div>"
+          + (function () {
+              var whereTxt = String(L.where || "").replace(/\s+/g, " ").trim();
+              var nameTxt = String(L.name || "").replace(/\s+/g, " ").trim();
+              if (!whereTxt || whereTxt.toLowerCase() === nameTxt.toLowerCase()) return "";
+              return '<div class="light-pad-where">' + escapeHtml(whereTxt) + "</div>";
+            })()
+          + "</div>"
           + '<div class="light-pad-state">' + (L.on ? "ON" : "OFF") + "</div>"
           + "</div>"
           + '<div class="light-pad-actions">'

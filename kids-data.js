@@ -1025,7 +1025,7 @@
         var ico = document.createElement("span");
         ico.className = "chore-ico";
         ico.setAttribute("aria-hidden", "true");
-        var mark = /bed/.test(id) ? '<path d="M6 22 V12 H10 V8 H22 V12 H26 V22"/><path d="M6 18 H26"/>' : /backpack|cubby/.test(id) ? '<path d="M11 12 V9 a5 5 0 0 1 10 0 V12"/><rect x="7" y="12" width="18" height="14" rx="3"/>' : /dish|empty/.test(id) ? '<ellipse cx="16" cy="18" rx="10" ry="4"/><path d="M8 18 c2 6 14 6 16 0"/>' : /trash/.test(id) ? '<path d="M8 10 H24"/><path d="M12 10 V8 H20 V10"/><path d="M10 12 L12 26 H20 L22 12"/>' : /shower|bath/.test(id) ? '<path d="M10 8 H22"/><path d="M12 8 V20 a4 4 0 0 0 8 0 V8"/>' : /shoe|living/.test(id) ? '<path d="M6 20 C8 12 14 12 16 14 C20 10 26 14 26 20 Z"/>' : /laundry/.test(id) ? '<path d="M10 8 H22 L24 26 H8 Z"/><path d="M13 8 V14 M19 8 V14"/>' : /toy|room/.test(id) ? '<path d="M8 26 L14 8 L16 14 L22 8 L18 26"/>' : /postgame/.test(id) ? '<circle cx="16" cy="16" r="8"/><path d="M16 8 V24 M8 16 H24"/>' : '<path d="M16 6 L18.5 13 H26 L20 17.5 L22.5 25 L16 20.5 L9.5 25 L12 17.5 L6 13 H13.5 Z"/>';
+        var mark = /bed/.test(id) ? '<path d="M5 22 V13 H10 V8 H22 V13 H27 V22"/><path d="M5 17 H27"/>' : /backpack|cubby/.test(id) ? '<path d="M12 11 V8 a4 4 0 0 1 8 0 v3"/><path d="M8 12 h16 v13 a2 2 0 0 1-2 2 H10 a2 2 0 0 1-2-2 z"/><path d="M8 18 h16"/>' : /empty/.test(id) ? '<rect x="7" y="7" width="18" height="18" rx="2"/><path d="M7 14 h18"/><circle cx="16" cy="19" r="2.2"/>' : /dish/.test(id) ? '<ellipse cx="16" cy="17" rx="10" ry="4"/><path d="M7 17 c2 7 16 7 18 0"/><path d="M12 9 c1 3 7 3 8 0"/>' : /trash/.test(id) ? '<path d="M8 10 H24"/><path d="M12 10 V7 H20 V10"/><path d="M10 12 L12 26 H20 L22 12"/>' : /shower/.test(id) ? '<path d="M8 7 h14"/><path d="M15 7 v5"/><path d="M10 14 c0 7 12 7 12 0"/>' : /bath/.test(id) ? '<path d="M5 16 h22 v3 a7 7 0 0 1-7 7 H12 a7 7 0 0 1-7-7 z"/>' : /shoe|living/.test(id) ? '<path d="M5 21 C8 11 14 12 16 15 C20 10 27 14 27 21 Z"/>' : /laundry/.test(id) ? '<path d="M9 7 h14 l2 18 H7 Z"/><circle cx="16" cy="17" r="4"/>' : /toy/.test(id) ? '<circle cx="16" cy="11" r="4"/><path d="M10 15 h12 v8 H10 z"/><path d="M10 17 H7 M22 17 h3"/>' : /room/.test(id) ? '<path d="M5 15 L16 6 L27 15 V26 H5 Z"/><path d="M13 26 v-7 h6 v7"/>' : /postgame/.test(id) ? '<circle cx="16" cy="16" r="8"/><path d="M16 8 V24 M8 16 H24"/>' : /babysit/.test(id) ? '<circle cx="11" cy="11" r="3"/><circle cx="21" cy="12" r="2.4"/><path d="M6 24 c1-6 4-8 5-8 M22 24 c-1-5-3-6-4-6"/>' : '<rect x="8" y="8" width="16" height="16" rx="2"/>';
         ico.innerHTML = '<svg viewBox="0 0 32 32" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">' + mark + "</svg>";
         el.insertBefore(ico, el.firstChild);
       }
@@ -2266,7 +2266,7 @@
           '<div class="consume-hero-when">' + esc(clock || next.whenLabel || "NEXT") + "</div>" +
           '<div class="consume-countdown"><span class="pulse"></span><span>' + esc(cd) + "</span></div>" +
           "</div>" +
-          '<div class="consume-hero-title">' + (ico.html || "") + esc(((ico.text ? ico.text + " " : "") + shown)) + "</div>" +
+          '<div class="consume-hero-title">' + (ico.html || "") + '<span class="consume-hero-name">' + esc(((ico.text ? ico.text + " " : "") + shown)) + "</span></div>" +
           (kidId === "ainsley" ? "" : '<div class="consume-hero-meta">YOUR board · <b>' + esc(meta.loadout) + "</b></div>") +
           "</div>";
       }
