@@ -1327,8 +1327,6 @@ document.addEventListener("DOMContentLoaded", function () {
       var showAll = col.getAttribute("data-show-all") === "1";
       var n = showAll ? cards.length : Math.min(5, cards.length);
       if (!cards.length) return;
-      col.style.setProperty("padding-left", "12px", "important");
-      col.style.setProperty("padding-right", "12px", "important");
       list.style.setProperty("gap", "16px", "important");
       list.style.setProperty("scrollbar-gutter", "auto", "important");
       list.style.setProperty("padding-left", "0", "important");
@@ -1336,19 +1334,39 @@ document.addEventListener("DOMContentLoaded", function () {
       list.style.setProperty("overflow", "hidden", "important");
       var gap = 16;
       var cs = getComputedStyle(list);
-      var pad = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
-      var H = list.clientHeight - pad;
+      var padY = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+      var H = list.clientHeight - padY;
       var rowH = Math.floor((H - gap * Math.max(0, n - 1)) / n);
       if (!isFinite(rowH) || rowH < 96) rowH = 96;
+      /* 64px icon column, then the label and the 64px taps. 16px tap gaps when they fit, otherwise 12. */
+      col.style.setProperty("padding-left", "0", "important");
+      col.style.setProperty("padding-right", "0", "important");
+      var inner = col.clientWidth;
+      var iconW = 64;
+      var tapW = 64;
+      var tapGap = 16;
+      var colGap = 8;
+      function rowNeed(g, cg) { return iconW + cg + tapW * 7 + g * 6; }
+      var side = Math.floor((inner - rowNeed(tapGap, colGap)) / 2);
+      if (side < 24) { tapGap = 12; side = Math.floor((inner - rowNeed(tapGap, colGap)) / 2); }
+      if (side < 0) {
+        colGap = 0;
+        var spare = inner - rowNeed(tapGap, 0);
+        if (spare < 0) spare = 0;
+        side = Math.floor(spare / 2);
+        colGap = spare - side * 2;
+      }
+      col.style.setProperty("padding-left", side + "px", "important");
+      col.style.setProperty("padding-right", side + "px", "important");
       cards.forEach(function (card, i) {
         if (!showAll && i >= n) {
           card.style.setProperty("display", "none", "important");
           return;
         }
         card.style.setProperty("display", "grid", "important");
-        card.style.setProperty("grid-template-columns", "minmax(0, 1fr)", "important");
+        card.style.setProperty("grid-template-columns", iconW + "px minmax(0, 1fr)", "important");
         card.style.setProperty("grid-template-rows", "24px 64px", "important");
-        card.style.setProperty("column-gap", "0", "important");
+        card.style.setProperty("column-gap", colGap + "px", "important");
         card.style.setProperty("row-gap", "4px", "important");
         card.style.setProperty("position", "relative", "important");
         card.style.setProperty("align-items", "center", "important");
@@ -1362,18 +1380,21 @@ document.addEventListener("DOMContentLoaded", function () {
         var ico = card.querySelector(".chore-ico");
         if (ico) {
           ico.style.setProperty("grid-column", "1", "important");
-          ico.style.setProperty("grid-row", "1", "important");
-          ico.style.setProperty("width", "32px", "important");
-          ico.style.setProperty("height", "24px", "important");
-          ico.style.setProperty("justify-self", "start", "important");
+          ico.style.setProperty("grid-row", "1 / span 2", "important");
+          ico.style.setProperty("width", "64px", "important");
+          ico.style.setProperty("height", "64px", "important");
+          ico.style.setProperty("min-width", "64px", "important");
+          ico.style.setProperty("min-height", "64px", "important");
+          ico.style.setProperty("justify-self", "center", "important");
+          ico.style.setProperty("align-self", "center", "important");
         }
         var txt = card.querySelector(".txt");
         if (txt) txt.style.setProperty("display", "contents", "important");
         var what = card.querySelector(".what");
         if (what) {
-          what.style.setProperty("grid-column", "1", "important");
+          what.style.setProperty("grid-column", "2", "important");
           what.style.setProperty("grid-row", "1", "important");
-          what.style.setProperty("padding-left", "40px", "important");
+          what.style.setProperty("padding-left", "0", "important");
           what.style.setProperty("font-size", "24px", "important");
           what.style.setProperty("line-height", "24px", "important");
           what.style.setProperty("height", "24px", "important");
@@ -1382,13 +1403,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         var taps = card.querySelector(".quest-days");
         if (taps) {
-          taps.style.setProperty("grid-column", "1", "important");
+          taps.style.setProperty("grid-column", "2", "important");
           taps.style.setProperty("grid-row", "2", "important");
           taps.style.setProperty("display", "grid", "important");
           taps.style.setProperty("grid-template-columns", "repeat(7, 64px)", "important");
-          taps.style.setProperty("gap", "16px", "important");
-          taps.style.setProperty("justify-content", "center", "important");
-          taps.style.setProperty("width", "100%", "important");
+          taps.style.setProperty("gap", tapGap + "px", "important");
+          taps.style.setProperty("justify-content", "start", "important");
+          taps.style.setProperty("width", (tapW * 7 + tapGap * 6) + "px", "important");
           taps.style.setProperty("height", "64px", "important");
           taps.style.setProperty("min-height", "64px", "important");
           taps.style.setProperty("margin", "0", "important");

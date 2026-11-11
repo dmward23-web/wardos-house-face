@@ -366,6 +366,7 @@
       "html body section.col .chore .what { font-size:24px !important; line-height:24px !important; height:24px !important; margin:0 !important; }",
       "html body section.col .chore .day-tap { width:64px !important; height:64px !important; min-width:64px !important; min-height:64px !important; font-size:24px !important; }",
       "html body section.col .chore-list { gap:16px !important; }",
+      "html.kw-root body.kw-on #sec-musts { padding-bottom:12px !important; box-sizing:border-box !important; height:auto !important; align-self:start !important; }",
       "html body .panel.panel > #hub-cam-deck.cams-resting:not([hidden]) { height:auto !important; max-height:none !important; overflow:visible !important; display:flex !important; flex-direction:column !important; gap:20px !important; }",
       "html body .panel.panel > #hub-cam-deck[hidden] { display:none !important; }",
       "html body .panel.panel > .hub-upper { top:416px !important; }",
