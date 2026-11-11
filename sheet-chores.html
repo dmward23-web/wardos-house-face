@@ -1148,6 +1148,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (i >= n) card.style.setProperty("display", "none", "important");
         else card.style.removeProperty("display");
       });
+      if (col.getAttribute("data-show-all") === "1") n = cards.length;
       var more = cards.length > n;
       col.classList.toggle("has-more", more);
       var chip = col.querySelector(".more-chip");

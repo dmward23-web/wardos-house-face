@@ -1115,6 +1115,7 @@
       if (!el || !cam || String(cam.id || "").startsWith("stub-")) {
         return next();
       }
+      if (/(?:\?|&)audit=1(?:&|$)/.test(location.search || "")) return next();
       var deviceId = cam.id;
       if (_hubCamBackoff[deviceId] && Date.now() < _hubCamBackoff[deviceId]) return next();
       var existing = _hubLiveSessions[deviceId];

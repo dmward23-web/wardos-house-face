@@ -15,6 +15,7 @@
   function mine() {
     var bits = [];
     document.querySelectorAll("script[src],link[rel=stylesheet][href]").forEach(function (el) {
+      if (el.getAttribute("data-house-injected") === "1") return;
       bits.push(el.getAttribute("src") || el.getAttribute("href") || "");
     });
     return stamps(bits.join(" "));

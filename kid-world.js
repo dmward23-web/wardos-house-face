@@ -56,15 +56,19 @@
   function choreIcon(id) {
     var k = String(id || "");
     var body = '<path d="M16 6 L18.5 13 H26 L20 17.5 L22.5 25 L16 20.5 L9.5 25 L12 17.5 L6 13 H13.5 Z"/>';
-    if (/bed/.test(k)) body = '<path d="M6 22 V12 H10 V8 H22 V12 H26 V22"/><path d="M6 18 H26"/>';
-    else if (/backpack|cubby/.test(k)) body = '<path d="M11 12 V9 a5 5 0 0 1 10 0 V12"/><rect x="7" y="12" width="18" height="14" rx="3"/>';
-    else if (/dish|empty/.test(k)) body = '<ellipse cx="16" cy="18" rx="10" ry="4"/><path d="M8 18 c2 6 14 6 16 0"/>';
-    else if (/trash/.test(k)) body = '<path d="M8 10 H24"/><path d="M12 10 V8 H20 V10"/><path d="M10 12 L12 26 H20 L22 12"/>';
-    else if (/shower|bath/.test(k)) body = '<path d="M10 8 H22"/><path d="M12 8 V20 a4 4 0 0 0 8 0 V8"/>';
-    else if (/shoe|living/.test(k)) body = '<path d="M6 20 C8 12 14 12 16 14 C20 10 26 14 26 20 Z"/>';
-    else if (/laundry/.test(k)) body = '<path d="M10 8 H22 L24 26 H8 Z"/><path d="M13 8 V14 M19 8 V14"/>';
-    else if (/toy|room/.test(k)) body = '<path d="M8 26 L14 8 L16 14 L22 8 L18 26"/>';
+    if (/bed/.test(k)) body = '<path d="M5 22 V13 H10 V8 H22 V13 H27 V22"/><path d="M5 17 H27"/>';
+    else if (/backpack|cubby/.test(k)) body = '<path d="M12 11 V8 a4 4 0 0 1 8 0 v3"/><path d="M8 12 h16 v13 a2 2 0 0 1-2 2 H10 a2 2 0 0 1-2-2 z"/><path d="M8 18 h16"/><path d="M14 12 v5 h4 v-5"/><path d="M11 14 h-2 M21 14 h2"/>';
+    else if (/empty/.test(k)) body = '<rect x="7" y="7" width="18" height="18" rx="2"/><path d="M7 14 h18"/><circle cx="16" cy="19" r="2.2"/><path d="M11 7 V5 h10 v2"/>';
+    else if (/dish/.test(k)) body = '<ellipse cx="16" cy="17" rx="10" ry="4"/><path d="M7 17 c2 7 16 7 18 0"/><path d="M12 9 c1 3 7 3 8 0"/>';
+    else if (/trash/.test(k)) body = '<path d="M8 10 H24"/><path d="M12 10 V7 H20 V10"/><path d="M10 12 L12 26 H20 L22 12"/>';
+    else if (/shower/.test(k)) body = '<path d="M8 7 h14"/><path d="M15 7 v5"/><path d="M10 14 c0 7 12 7 12 0"/><path d="M12 22 v3 M16 22 v3 M20 22 v3"/>';
+    else if (/bath/.test(k)) body = '<path d="M5 16 h22 v3 a7 7 0 0 1-7 7 H12 a7 7 0 0 1-7-7 z"/><path d="M9 16 V10 a4 4 0 0 1 8 0"/>';
+    else if (/shoe|living/.test(k)) body = '<path d="M5 21 C8 11 14 12 16 15 C20 10 27 14 27 21 Z"/>';
+    else if (/laundry/.test(k)) body = '<path d="M9 7 h14 l2 18 H7 Z"/><circle cx="16" cy="17" r="4"/><path d="M12 7 v4 M20 7 v4"/>';
+    else if (/toy/.test(k)) body = '<circle cx="16" cy="11" r="4"/><path d="M16 7 V5"/><path d="M10 15 h12 v8 H10 z"/><path d="M12 23 v3 M20 23 v3 M10 17 H7 M22 17 h3"/>';
+    else if (/room/.test(k)) body = '<path d="M5 15 L16 6 L27 15 V26 H5 Z"/><path d="M13 26 v-7 h6 v7"/>';
     else if (/postgame/.test(k)) body = '<circle cx="16" cy="16" r="8"/><path d="M16 8 V24 M8 16 H24"/>';
+    else if (/babysit/.test(k)) body = '<circle cx="11" cy="11" r="3"/><circle cx="21" cy="12" r="2.4"/><path d="M6 24 c1-6 4-8 5-8 M22 24 c-1-5-3-6-4-6"/>';
     return '<svg viewBox="0 0 32 32" width="72" height="72" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">' + body + "</svg>";
   }
   function plainLabel(id) {
@@ -383,7 +387,7 @@
   var GROUND = {
     hayes: { portrait: { x: 0.36, y: 0.865 }, landscape: { x: 0.36, y: 0.808 } },
     harris: { portrait: { x: 0.32, y: 0.820 }, landscape: { x: 0.32, y: 0.902 } },
-    ainsley: { portrait: { x: 0.30, y: 0.942 }, landscape: { x: 0.48, y: 0.855 } }
+    ainsley: { portrait: { x: 0.34, y: 0.78 }, landscape: { x: 0.42, y: 0.70 } }
   };
 
   function parallaxNow(t, drift) {
@@ -558,7 +562,7 @@
     return clamp(Math.round(W * 72 / 440), 64, cap);
   }
   function creatureAnchor(W, H) {
-    if (global.KidLayout && KidLayout.creatureAnchor) return KidLayout.creatureAnchor(kid(), W, H);
+    if (kid() !== "ainsley" && global.KidLayout && KidLayout.creatureAnchor) return KidLayout.creatureAnchor(kid(), W, H);
     var draw = clamp(Math.round(Math.min(W, H) * 0.318), 140, 226);
     var book = (GROUND[kid()] || GROUND.hayes);
     var g = book[orientFor(W, H)] || book.portrait;
@@ -1720,7 +1724,7 @@
   }
   function drawOriCreature(ctx, W, H, t, world) {
     var id = world || kid();
-    if (id === "ainsley" || kid() === "ainsley") { drawVinylJar(ctx, W, H, t); return true; } /* C10 · performer on the stage, record with grooves and a label */
+    /* Ainsley uses the same painted creature sprite as the boys. The flat figure and the cover ellipse are gone. */
     if (global.KidLayout && KidLayout.creatureSprite) id = KidLayout.creatureSprite(id);
     var img = oriCreature[id];
     if (!img) return false;
@@ -1731,6 +1735,7 @@
     var shown = 0;
     try { var gst = global.JarEngine ? JarEngine.choreState(id) : null; shown = gst && gst.shown != null ? gst.shown : (gst && gst.fill) || 0; } catch (eGrow) { shown = 0; }
     var draw = box.draw * (0.82 + 0.36 * clamp(shown, 0, 1));
+    if ((world || kid()) === "ainsley") draw *= 1.45;
     var bottom = box.foot + draw * 0.04 - mot.hop;
     ctx.save();
     ctx.translate(box.cx, box.groundY + 3);
@@ -2338,9 +2343,8 @@
     iris.style.setProperty("--y", y + "px");
     document.body.appendChild(iris);
     if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap();
-    var href = "index.html#from=" + fx + "," + fy;
-    if (reduced) { location.href = href; return; }
-    setTimeout(function () { location.href = href; }, 680);
+    var href = "sheet-index.html#from=" + fx + "," + fy;
+    location.href = href;
   }
 
   function soften() {
@@ -2724,10 +2728,12 @@
   if (document.head && !document.querySelector("script[src^='wardos-stage.js']")) {
     var stageCss = document.createElement("link");
     stageCss.rel = "stylesheet";
-    stageCss.href = "wardos-stage.css?v=ACERFIX1";
+    stageCss.href = "wardos-stage.css";
+    stageCss.setAttribute("data-house-injected", "1");
     document.head.appendChild(stageCss);
-    ["house-scene.js?v=ACERFIX1", "house-event-display.js?v=ACERFIX1", "wardos-stage.js?v=ACERFIX1"].forEach(function (src) {
+    ["house-scene.js", "house-event-display.js", "wardos-stage.js"].forEach(function (src) {
       var s = document.createElement("script");
+      s.setAttribute("data-house-injected", "1");
       s.src = src;
       document.head.appendChild(s);
     });

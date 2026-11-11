@@ -403,12 +403,25 @@ html.kw-root.kw-root body.kw-on #sec-jar .prism-jar-svg {
   flex: 1 1 auto !important;
 }
 html.kw-root.kw-root body.kw-on #sec-jar .prism-jar-label {
-  font-size: 64px !important;
-  line-height: 1 !important;
-  font-weight: 800 !important;
+  font-size: 20px !important;
+  line-height: 1.1 !important;
+  font-weight: 700 !important;
   color: #f4efe6 !important;
   -webkit-text-fill-color: #f4efe6 !important;
   white-space: nowrap !important;
+}
+html.kw-root.kw-root body.kw-on #sec-jar .prism-jar-plus {
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  border-radius: 16px !important;
+  border: 0 !important;
+  background: #e0c36a !important;
+  color: #1a1814 !important;
+  font-size: 40px !important;
+  line-height: 64px !important;
+  flex: none !important;
 }
 html.kw-root.kw-root body.theme-ainsley.kw-on #sec-jar > .bank-top { display: none !important; }
 html body .chore .quest-days {
@@ -441,3 +454,168 @@ html body .day-tap.is-today {
 .chore.ainsley .day-tap.done { background: #8a6394 !important; color: #fff !important; opacity: 1 !important; }
 .chore.hayes .day-tap.done { background: #3f8b71 !important; color: #fff !important; opacity: 1 !important; }
 .chore.harris .day-tap.done { background: #42679a !important; color: #fff !important; opacity: 1 !important; }
+
+/* Round 8 · clock in the top bar, one jar card, no cream slabs, name chips. */
+html.kw-root[data-wardos-stage],
+html[data-wardos-stage] {
+  background-color: #07080b !important;
+  background-image: url("month-theme/november/wall-dusk.webp") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 1920px 1080px !important;
+}
+html.kw-root.kw-root body.kw-on #sec-days,
+html.kw-root.kw-root body.kw-on #sec-days .consume-hero,
+html.kw-root.kw-root body.kw-on #sec-days .consume-hero-inner,
+html.kw-root.kw-root body.kw-on #sec-days .consume-hero-title {
+  background: rgba(15, 26, 34, 0.94) !important;
+  color: #f4efe6 !important;
+  -webkit-text-fill-color: #f4efe6 !important;
+  border-color: transparent !important;
+}
+html body .panel .chore::before { content: none !important; }
+html body .chore > .chore-ico { display: flex !important; width: 48px !important; height: 48px !important; }
+html body .hub-launch a::before { background-image: none !important; display: none !important; }
+html body .hub-launch a .hub-ico { width: 48px; height: 48px; display: block; }
+html.kw-root body.kw-on .kw-hud {
+  position: absolute !important;
+  z-index: 40 !important;
+  left: 48px !important;
+  top: 28px !important;
+  right: auto !important;
+  width: 860px !important;
+  height: 64px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  grid-template-columns: none !important;
+  pointer-events: none !important;
+  background: transparent !important;
+}
+html.kw-root body.kw-on .kw-home,
+html.kw-root body.kw-on .kw-id,
+html.kw-root body.kw-on .kw-clock,
+html.kw-root body.kw-on .kw-mute {
+  position: relative !important;
+  pointer-events: auto !important;
+  right: auto !important;
+  top: auto !important;
+}
+html.kw-root body.kw-on .kw-clock {
+  margin-left: auto !important;
+  z-index: 41 !important;
+}
+html.kw-root body.kw-on .kw-mute,
+html.kw-root body.kw-on .kw-mute.house-snd {
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  z-index: 41 !important;
+}
+html.kw-root body.kw-on .panel {
+  background: transparent !important;
+  background-image: none !important;
+}
+html.kw-root body.kw-on #sec-musts,
+html.kw-root body.kw-on #sec-musts .chore-list,
+html.kw-root body.kw-on #sec-musts [data-mount-quests] {
+  background: transparent !important;
+}
+html.kw-root body.kw-on #sec-musts .chore {
+  flex: 1 1 0 !important;
+  height: auto !important;
+  min-height: 64px !important;
+  max-height: none !important;
+}
+html.kw-root body.kw-on #sec-jar .saves-bar,
+html.kw-root body.kw-on #sec-jar .saves-plus,
+html.kw-root body.kw-on #sec-jar .saves-face,
+html.kw-root body.kw-on #sec-jar > .bank-top {
+  display: none !important;
+}
+html.kw-root body.kw-on #sec-days {
+  background: rgba(15, 26, 34, 0.88) !important;
+  border: 1px solid rgba(224, 195, 106, 0.4) !important;
+  overflow: hidden !important;
+  color: #f4efe6 !important;
+}
+html.kw-root body.kw-on #sec-days .consume-hero {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  height: 100% !important;
+  color: #f4efe6 !important;
+}
+html body .tile .tile-label,
+html body .kw-name,
+html body .col-name {
+  text-transform: none !important;
+}
+html body .tile.ainsley .tile-label,
+html body[data-kid="ainsley"] .kw-name,
+.col[aria-label="Ainsley chores"] .col-name { background: #8a6394 !important; color: #fff !important; -webkit-text-fill-color: #fff !important; }
+html body .tile.hayes .tile-label,
+html body[data-kid="hayes"] .kw-name,
+.col[aria-label="Hayes chores"] .col-name { background: #3f8b71 !important; color: #fff !important; -webkit-text-fill-color: #fff !important; }
+html body .tile.harris .tile-label,
+html body[data-kid="harris"] .kw-name,
+.col[aria-label="Harris chores"] .col-name { background: #42679a !important; color: #fff !important; -webkit-text-fill-color: #fff !important; }
+html body .tile.dan .tile-label { background: #0f1a22 !important; color: #f4efe6 !important; }
+html body .tile .tile-label,
+html body .kid-chip {
+  display: inline-block !important;
+  padding: 4px 12px !important;
+  border-radius: 12px !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+html body .kid-chip.ainsley,
+html body a.kid-chip.ainsley { background: #8a6394 !important; color: #fff !important; -webkit-text-fill-color: #fff !important; }
+html body .kid-chip.hayes,
+html body a.kid-chip.hayes { background: #3f8b71 !important; color: #fff !important; -webkit-text-fill-color: #fff !important; }
+html body .kid-chip.harris,
+html body a.kid-chip.harris { background: #42679a !important; color: #fff !important; -webkit-text-fill-color: #fff !important; }
+html body .panel > header.hdr,
+html body .panel > header.hdr .hdr-card,
+html body .cheer {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+html body .col { padding: 24px !important; }
+html body .col-name { padding-left: 0 !important; margin-left: 0 !important; }
+html body .panel .body > section.col .chore-ico,
+html body .chore .chore-ico {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  color: #f4efe6 !important;
+}
+html body .chore .chore-ico svg { width: 48px !important; height: 48px !important; }
+html body .tile.harris,
+html body .tile.dan,
+html body .tile.ainsley,
+html body .tile.hayes {
+  border-top-color: transparent !important;
+  box-shadow: none !important;
+}
+html body .tile.harris { border: 1px solid #42679a !important; }
+html body .tile.dan { border: 1px solid rgba(224, 195, 106, 0.4) !important; }
+html body .roster-plate,
+html body .tile .roster-plate,
+html body .tile.dan .roster-plate,
+html body .roster-plate.roster-empty {
+  height: 72px !important;
+  max-height: 72px !important;
+  min-height: 72px !important;
+}
+html body #hub-cam-deck { margin-bottom: 0 !important; }
+html body .hub-lights,
+html body #hub-lights-panel { margin-top: 8px !important; }
+html body .hub-lights-bulk { display: flex !important; align-items: center !important; gap: 12px !important; }
+html body .hub-lights-title { order: -1 !important; margin-right: 12px !important; }
+html body .hub-launch a[href*="sheet-weekend"]::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 32 32' fill='none' stroke='%23f4efe6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='8' r='3'/><path d='M8 3v2M3 8h2M5.2 5.2l1.4 1.4'/><path d='M22 26 V16'/><path d='M16 26 h12'/><path d='M17 20 c2-6 8-6 10 0'/></svg>");
+}

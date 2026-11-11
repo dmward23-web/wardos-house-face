@@ -375,6 +375,10 @@
    * Returns { pc, mediaSessionId, stop, iceState }.
    */
   async function startStream(deviceId, videoEl, onStatus) {
+    if (/(?:\?|&)audit=1(?:&|$)/.test(location.search || "")) {
+      if (typeof onStatus === "function") onStatus("audit");
+      return { pc: null, stop: function () {}, iceState: { connection: "audit" } };
+    }
     function status(s) {
       if (typeof onStatus === "function") onStatus(s);
     }

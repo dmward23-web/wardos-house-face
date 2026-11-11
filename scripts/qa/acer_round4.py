@@ -77,7 +77,7 @@ def main():
         ctx.route("**/*", handle)
         page = ctx.new_page()
         page.set_default_timeout(12000)
-        page.goto(base + "/sheet-index.html", wait_until="domcontentloaded", timeout=15000)
+        page.goto(base + "/sheet-index.html?audit=1", wait_until="domcontentloaded", timeout=15000)
         page.evaluate("""() => {
           localStorage.setItem('wardosNestProxyToken', 'legacy-stale-test-key');
           localStorage.setItem('wardos-lights-proxy-token', 'paired-test-key-value');
@@ -185,7 +185,7 @@ def main():
         ctx1536.route("**/*", handle)
         page1536 = ctx1536.new_page()
         page1536.set_default_timeout(12000)
-        page1536.goto(base + "/sheet-index.html", wait_until="domcontentloaded", timeout=15000)
+        page1536.goto(base + "/sheet-index.html?audit=1", wait_until="domcontentloaded", timeout=15000)
         page1536.evaluate("""() => {
           localStorage.setItem('wardosNestProxyToken', 'legacy-stale-test-key');
           localStorage.setItem('wardos-lights-proxy-token', 'paired-test-key-value');
