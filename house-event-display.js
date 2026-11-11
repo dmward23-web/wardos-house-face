@@ -5,7 +5,9 @@
 (function (global) {
   "use strict";
   var TZ = "America/Chicago";
-  var CLINICAL = /\b(?:therap|counsel(?:or|ing|ling)?|psycholog|psychiatr|anxiety|provider|clinical)\b/i;
+  /* Stems stay open at the end: "therapy" / "psychology" / "psychiatry" are denied, not only the bare stem.
+     A clinical word anywhere in the source drops the whole item. It is never renamed to Homework. */
+  var CLINICAL = /(?:\b(?:ot|speech|drs?|doctors?|appointments?|telehealth|sessions?|counsel(?:or|ing|ling)?|anxiety|provider|clinical)\b|\btherap|\bpsycholog|\bpsychiatr)/i;
   var CANCEL = /(?:^|\b)(?:cancel+ed|cxl)\b/i;
   var RANGE = /\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?\s*[-–—to]{1,3}\s*\d{1,2}(?::\d{2})?/i;
   var LISTS = ["today", "school", "sports", "appointments", "week", "events", "ahead", "upcoming", "hottest"];
@@ -13,21 +15,33 @@
   function textOf(v) {
     return typeof v === "string" ? v : "";
   }
+  function nfkc(s) {
+    try { return String(s == null ? "" : s).normalize("NFKC"); }
+    catch (e) { return String(s == null ? "" : s); }
+  }
   function titleBlob(ev) {
-    if (!ev || typeof ev !== "object") return textOf(ev);
-    return [ev.summary, ev.title, ev.what, ev.label, ev.text, ev.l].map(textOf).filter(Boolean).join("\n");
+    if (!ev || typeof ev !== "object") return nfkc(textOf(ev));
+    return nfkc([ev.summary, ev.title, ev.what, ev.label, ev.text, ev.l].map(textOf).filter(Boolean).join("\n"));
   }
   function kindBlob(ev) {
     if (!ev || typeof ev !== "object") return "";
-    return [ev.kind, ev.category, ev.safeCategory, ev.type].map(textOf).filter(Boolean).join("\n");
+    return nfkc([ev.kind, ev.category, ev.safeCategory, ev.type].map(textOf).filter(Boolean).join("\n"));
+  }
+  function sourceBlob(ev) {
+    if (typeof ev === "string") return nfkc(ev);
+    if (!ev || typeof ev !== "object") return "";
+    var parts = [];
+    Object.keys(ev).forEach(function (k) {
+      if (typeof ev[k] === "string") parts.push(ev[k]);
+    });
+    return nfkc(parts.join("\n"));
   }
   function isDenied(ev) {
     if (!ev) return false;
-    if (typeof ev === "string") return CLINICAL.test(ev) || CANCEL.test(ev);
+    if (typeof ev === "string") return CLINICAL.test(nfkc(ev)) || CANCEL.test(ev);
     if (ev.status === "cancelled" || ev.status === "canceled") return true;
-    var title = titleBlob(ev);
-    var kind = kindBlob(ev);
-    return CLINICAL.test(title) || CLINICAL.test(kind) || CANCEL.test(title);
+    var all = sourceBlob(ev);
+    return CLINICAL.test(all) || CANCEL.test(all);
   }
 
   function audienceOf(audience) {

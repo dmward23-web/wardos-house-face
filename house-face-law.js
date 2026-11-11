@@ -1,3 +1,6 @@
+if (typeof document !== "undefined" && typeof document.write === "function" && document.readyState === "loading" && !window.HouseEventDisplay) {
+  document.write('<script src="house-event-display.js?v=ACERFIX1"><\/script>');
+}
 /* LIVELAW1 · Dan's face laws applied at render time to calendar-fed rows (never by editing data/*-live.json or kids-week.json).
  *  1. School colour days ("<school> Orange Day", "Red Day") and dress-up / spirit / pajama / costume days never show as kid rows or
  *     clothing prompts. The colour still drives the quiet school specials indicator (kids-data.js SPECIALS-COLOR1) through
@@ -119,12 +122,18 @@
   /* LIVEFIX1 · therapy law (every board): a therapy / counseling row never shows. Generic words here; provider and person
      names live only on the box (~/.config/wardos/privacy-block.txt, read by scripts/private-dir.mjs and cal-months.py),
      so the builders drop those rows before any data file is written. */
-  var THERAPY = /\btherap|\bcounsel(?:or|ors|ing|ling|ling)?\b|\bpsycholog|\bpsychiatr|\banxiety\b|\bprovider\b|\bclinical\b/i;
-  function isTherapy(s) { return THERAPY.test(String(s == null ? "" : s)); }
+  var THERAPY = /(?:\b(?:ot|speech|drs?|doctors?|appointments?|telehealth|sessions?|counsel(?:or|ors|ing|ling|ling)?|anxiety|provider|clinical)\b|\btherap|\bpsycholog|\bpsychiatr)/i;
+  function isTherapy(s) {
+    var t = String(s == null ? "" : s);
+    try { t = t.normalize("NFKC"); } catch (e) { /* */ }
+    return THERAPY.test(t);
+  }
   function rowTherapy(o) {
     if (typeof o === "string") return isTherapy(o);
     if (!o || typeof o !== "object" || Array.isArray(o)) return false;
-    return isTherapy([o.summary, o.title, o.what, o.l, o.label, o.text, o.hint, o.place].filter(function (x) { return typeof x === "string"; }).join(" "));
+    var parts = [];
+    Object.keys(o).forEach(function (k) { if (typeof o[k] === "string") parts.push(o[k]); });
+    return isTherapy(parts.join(" "));
   }
   /* LIVEFIX1 · Dan, Nov 10 2026, 6:08 PM CT: her board shows real clock times. $ % stars and quest counts still come off.
      when/time/hours/whenLabel keep the clock ("4:25"); other strings still drop digits, so "Mon 26 · 2:20" keeps "2:20". */

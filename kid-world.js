@@ -716,7 +716,7 @@
   /* CALLOUT1 · a board page may define window.KidCallouts { short label: [title, plain subtitle] }.
      Big playful title, small plain chore underneath. Boards without it are unchanged. */
   function drawCallout(ctx, q, co, measureOnly) {
-    var maxW = 150, TF = "800 17px " + SANS, SF = "600 16px " + SANS, TL = 20, SL = 19;
+    var maxW = 150, TF = "800 24px " + SANS, SF = "600 24px " + SANS, TL = 28, SL = 28;
     ctx.font = TF;
     var lines = wrapLines(ctx, co[0], maxW);
     if (lines.length > 2) lines = [lines[0], lines.slice(1).join(" ")];
@@ -2082,7 +2082,8 @@
     if (sceneEl) return;
     sceneEl = document.createElement("div");
     sceneEl.className = "kw-scene";
-    sceneEl.innerHTML = '<canvas class="kw-scene-cv" aria-hidden="true"></canvas><div class="kw-scene-ui"><div class="kw-kicker" data-kicker></div><h2 class="kw-scene-title" data-title></h2><div class="kw-scene-body" data-body></div><div class="kw-scene-actions"><button type="button" class="kw-back" data-back>Back</button></div></div>';
+    var sceneHome = global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html";
+    sceneEl.innerHTML = '<canvas class="kw-scene-cv" aria-hidden="true"></canvas><div class="kw-scene-ui"><a class="kw-home wardos-home kw-scene-home" data-kw-home href="' + sceneHome + '" aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a><div class="kw-kicker" data-kicker></div><h2 class="kw-scene-title" data-title></h2><div class="kw-scene-body" data-body></div><div class="kw-scene-actions"><button type="button" class="kw-back" data-back>Back</button></div></div>';
     document.body.appendChild(sceneEl);
     sceneCv = sceneEl.querySelector("canvas");
     sceneEl.querySelector("[data-back]").addEventListener("click", function () { back(); });
@@ -2354,6 +2355,7 @@
     document.body.appendChild(iris);
     if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap();
     var href = "sheet-index.html#from=" + fx + "," + fy;
+    if (global.HouseAudit && HouseAudit.href) href = HouseAudit.href(href);
     location.href = href;
   }
 
@@ -2387,7 +2389,7 @@
     var stage = document.createElement("div");
     stage.className = "kw-stage";
     stage.innerHTML =
-      '<header class="kw-hud"><a class="kw-home wardos-home" data-kw-home href="sheet-index.html" aria-label="Home"><img src="assets/icons/home-key-light.svg" alt=""></a><div class="kw-id"><span class="kw-name">' + name + '</span></div><div class="kw-clock" data-kw-clock></div></header>' +
+      '<header class="kw-hud"><a class="kw-home wardos-home" data-kw-home href="' + (global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html") + '" aria-label="Home"><img src="assets/icons/home-key-light.svg" alt=""></a><div class="kw-id"><span class="kw-name">' + name + '</span></div><div class="kw-clock" data-kw-clock></div></header>' +
       '<div class="kw-jar-host" data-kw-jar></div>' +
       '<div class="kw-week" data-kw-week></div>' +
       '<button type="button" class="kw-path" data-kw-path aria-label="My Week">My Week</button>' +
@@ -2465,7 +2467,7 @@
     fitNext();
     document.addEventListener("house:kids-data-ready", fitNext);
     document.addEventListener("house:kid-rendered", fitNext);
-    stage.querySelector("[data-kw-home]").setAttribute("href", "sheet-index.html");
+    stage.querySelector("[data-kw-home]").setAttribute("href", global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html");
     stage.querySelector("[data-kw-path]").addEventListener("click", function () {
       var d = document.getElementById("kw-cal");
       if (!d) return;

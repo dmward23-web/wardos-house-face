@@ -19,7 +19,7 @@
   },
   "behavior": [
     "Provider and therapy titles are dropped before school or other classification.",
-    "An explicit providerOptIn boolean is the only opt-in, and the glass title is then School visit.",
+    "There is no provider opt-in. A clinical source item is dropped whole, never renamed.",
     "Embedded clock ranges are removed from child titles. The row clock stays the source start.",
     "cal-from-events shortPlace returns empty for a denied title and does not keep the raw sentence."
   ]

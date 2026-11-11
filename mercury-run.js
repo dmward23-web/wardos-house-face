@@ -1674,7 +1674,9 @@
     setInterval(refreshPowers, 15000); /* heartbeat: a chore closed mid-run shows within 15 s even with no event */
     var coop = blobs.length > 1;
     var hint = coop ? "Each of you has a part of the wall. Slide to roll. Tap to jump." : "Slide to roll. Tap to jump. Every full day makes you bigger.";
-    ui.innerHTML = '<div class="hud"><a href="' + THEME.back + '">Back</a><span></span><div class="je-mini" id="je" aria-hidden="true"></div></div><div class="hint">' + hint + '</div>' +
+    var home = (window.HouseAudit && HouseAudit.href) ? HouseAudit.href("sheet-index.html") : "sheet-index.html";
+    var homeBtn = '<a class="wardos-home merc-home" data-kw-home href="' + home + '" aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a>';
+    ui.innerHTML = '<div class="hud">' + homeBtn + '<span></span><div class="je-mini" id="je" aria-hidden="true"></div></div><div class="hint">' + hint + '</div>' +
       (coop ? '<div class="zones">' + blobs.map(function (b) { return '<div class="zone"><span>' + NAMES[b.kid] + '</span></div>'; }).join("") + '</div>' : "");
     if (window.JarEngine) {
       try {
@@ -1694,7 +1696,8 @@
     var w = document.createElement("div");
     w.className = "merc-win" + (finale ? " merc-finale" : "");
     var msg = finale ? "The grove holds everyone." : "You made it to the grove. Fill your jar to light it up.";
-    w.innerHTML = '<p>' + msg + '</p><a href="' + THEME.back + '">Back</a>';
+    var winHome = (window.HouseAudit && HouseAudit.href) ? HouseAudit.href("sheet-index.html") : "sheet-index.html";
+    w.innerHTML = '<p>' + msg + '</p><a class="wardos-home merc-home" data-kw-home href="' + winHome + '" aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a>';
     ui.appendChild(w);
   }
 

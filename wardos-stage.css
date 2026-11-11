@@ -41,8 +41,8 @@ button.kw-home.wardos-home {
 }
 a.wardos-home {
   position: absolute;
-  left: 48px;
-  top: 48px;
+  left: 64px;
+  top: 64px;
   display: flex;
   align-items: center;
   justify-content: center;

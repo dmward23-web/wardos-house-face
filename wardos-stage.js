@@ -215,7 +215,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     var existing = document.querySelector(".kw-home, .hub-home, .wardos-home");
     if (existing) {
       existing.classList.add("wardos-home");
-      if (existing.tagName === "A") existing.setAttribute("href", "sheet-index.html");
+      if (existing.tagName === "A") existing.setAttribute("href", global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html");
       existing.setAttribute("data-kw-home", "");
       if (!existing.getAttribute("aria-label")) existing.setAttribute("aria-label", "Home");
       var icon = existing.querySelector("img");
@@ -225,7 +225,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     if (/sheet-index\.html$/.test(path)) return;
     var btn = document.createElement("a");
     btn.className = "wardos-home";
-    btn.href = "sheet-index.html";
+    btn.href = global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html";
     btn.setAttribute("data-kw-home", "");
     btn.setAttribute("aria-label", "Home");
     btn.style.position = "fixed";

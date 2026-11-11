@@ -5,14 +5,35 @@
   "use strict";
   if (global.HouseAudit) return;
 
+  function queryOn() {
+    try { return /(?:\?|&)audit=1(?:&|$)/.test((global.location && global.location.search) || ""); }
+    catch (e) { return false; }
+  }
+  function stored() {
+    try { return !!(global.sessionStorage && global.sessionStorage.getItem("wardos-audit") === "1"); }
+    catch (e) { return false; }
+  }
+  function remember() {
+    if (!queryOn()) return;
+    try { if (global.sessionStorage) global.sessionStorage.setItem("wardos-audit", "1"); } catch (e) { /* */ }
+  }
   function active() {
     if (global.WARDOS_AUDIT === true) return true;
     try {
       if (global.document && global.document.documentElement.getAttribute("data-audit") === "1") return true;
-      return /(?:\?|&)audit=1(?:&|$)/.test((global.location && global.location.search) || "");
-    } catch (e) {
-      return false;
-    }
+    } catch (e) { /* */ }
+    return queryOn() || stored();
+  }
+  function href(url) {
+    if (!active() || url == null) return url;
+    var s = String(url);
+    if (!s || s.charAt(0) === "#" || /^(?:mailto|tel|javascript):/i.test(s)) return s;
+    if (/^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(s)) return s;
+    if (/[?&]audit=1(?:&|$)/.test(s)) return s;
+    var hash = "";
+    var hi = s.indexOf("#");
+    if (hi >= 0) { hash = s.slice(hi); s = s.slice(0, hi); }
+    return s + (s.indexOf("?") >= 0 ? "&" : "?") + "audit=1" + hash;
   }
 
   function deny(method) {
@@ -87,6 +108,17 @@
     }
   }
 
+  remember();
   install();
-  global.HouseAudit = { active: active, install: install, deny: deny };
+  if (global.document && global.document.addEventListener) {
+    global.document.addEventListener("click", function (ev) {
+      if (!active()) return;
+      var t = ev.target;
+      var a = t && t.closest ? t.closest("a[href]") : null;
+      if (!a) return;
+      var next = href(a.getAttribute("href"));
+      if (next && next !== a.getAttribute("href")) a.setAttribute("href", next);
+    }, true);
+  }
+  global.HouseAudit = { active: active, install: install, deny: deny, href: href };
 })(typeof window !== "undefined" ? window : globalThis);

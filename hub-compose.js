@@ -112,7 +112,9 @@
       anchor.appendChild(keep);
     }
     if (id !== "dan") anchor.classList.add("kid-flip");
-    anchor.setAttribute("href", spec[2]);
+    var dest = spec[2];
+    if (global.HouseAudit && HouseAudit.href) dest = HouseAudit.href(dest);
+    anchor.setAttribute("href", dest);
     var label = spec[0] + " " + spec[1];
     if (view && view.title) label += " " + (view.time ? view.time + " " : "") + view.title;
     anchor.setAttribute("aria-label", label);

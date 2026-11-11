@@ -220,6 +220,18 @@ body.kw-on .ftr { opacity: 0.8; padding: 12px 4px 28px; }
   color: #f4fbff;
 }
 .kw-scene.is-on { display: block; }
+.kw-scene-home {
+  position: absolute !important;
+  z-index: 8 !important;
+  left: 64px !important;
+  top: 64px !important;
+  width: 88px !important;
+  height: 88px !important;
+  min-width: 88px !important;
+  min-height: 88px !important;
+  pointer-events: auto !important;
+}
+.kw-scene-home img { width: 64px !important; height: 64px !important; display: block; }
 .kw-scene-cv { position: absolute; inset: 0; width: 100%; height: 100%; }
 .kw-scene-ui {
   position: relative;
@@ -227,14 +239,14 @@ body.kw-on .ftr { opacity: 0.8; padding: 12px 4px 28px; }
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: max(18px, env(safe-area-inset-top)) 18px 22px;
+  padding: 64px 64px 64px;
   pointer-events: none;
 }
 .kw-scene-ui > * { pointer-events: auto; }
 .kw-kicker {
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: 24px;
   font-weight: 700;
   opacity: 0.75;
 }
@@ -247,7 +259,7 @@ body.kw-on .ftr { opacity: 0.8; padding: 12px 4px 28px; }
   margin: 6px 0 10px;
 }
 .kw-scene-body {
-  font-size: clamp(16px, 2.4vw, 20px);
+  font-size: 24px;
   line-height: 1.4;
   max-width: 38rem;
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
@@ -259,8 +271,10 @@ body.kw-on .ftr { opacity: 0.8; padding: 12px 4px 28px; }
   color: #f6fcff;
   border-radius: 999px;
   padding: 12px 16px;
-  min-height: 48px;
-  font: inherit;
+  min-height: 88px;
+  min-width: 88px;
+  font-size: 24px;
+  font-family: inherit;
   font-weight: 700;
   margin: 6px 6px 0 0;
   cursor: pointer;
@@ -541,7 +555,6 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on .kw-path,
   html.kw-root body.kw-on .kw-drawer,
   html.kw-root body.kw-on .kw-week-empty,
-  html.kw-root body.kw-on .kw-feed,
   html.kw-root body.kw-on .kw-week,
   html.kw-root body.kw-on [data-mount-consume-ahead],
   html.kw-root body.kw-on .consume-ahead-empty,
@@ -1120,10 +1133,10 @@ body.theme-ainsley #sec-days .harbor-strip:not(:has(.card)) { display: none !imp
 body.theme-hayes .kw-feed,
 body.theme-harris .kw-feed { top: calc(max(10px, env(safe-area-inset-top)) + 124px); }
 .kw-feed {
-  position: fixed;
-  left: 12px;
-  top: calc(max(10px, env(safe-area-inset-top)) + 56px);
-  z-index: 40;
+  position: absolute;
+  left: 48px;
+  top: 140px;
+  z-index: 20;
   pointer-events: auto;
   min-height: 44px;
   max-width: calc(100vw - 24px);
@@ -1132,7 +1145,8 @@ body.theme-harris .kw-feed { top: calc(max(10px, env(safe-area-inset-top)) + 124
   border: 1px solid rgba(255, 214, 160, 0.45);
   background: rgba(16, 12, 8, 0.78);
   color: #fff6e4;
-  font: 700 15px/1.2 system-ui, sans-serif;
+  font: 700 24px/1.2 system-ui, sans-serif;
+  min-height: 88px;
   text-align: left;
 }
 .kw-jar-host {
@@ -1255,7 +1269,8 @@ html.kw-reduce .kw-iris::before { animation: none; transform: scale(1); }
 /* FITW1 · nothing wider than the phone: chore day taps share the row, world layers never pan sideways */
 html, body { overflow-x: hidden !important; overscroll-behavior-x: none; }
 .quest-days { min-width: 0; }
-.quest-days .day-tap { flex: 1 1 0 !important; min-width: 0 !important; width: auto !important; }
+html.kw-root body.kw-on .quest-days .day-tap,
+html body .quest-days .day-tap { flex: 0 0 88px !important; min-width: 88px !important; width: 88px !important; min-height: 88px !important; height: 88px !important; font-size: 24px !important; }
 .kw-stage, .kw-canvas, .hl-layer { max-width: 100vw !important; }
 /* LANDFIT1 · landscape: PATH moves up out of the label field; HUD clock stays on screen */
 @media (orientation: landscape) and (max-height: 600px) {

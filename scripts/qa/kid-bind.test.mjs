@@ -40,4 +40,11 @@ test("each kid board stays that kid in a fresh profile and after the others", SK
     check("fresh " + kid, kid, r.fresh[kid]);
     check("after the others " + kid, kid, r.stale[kid]);
   }
+  const px = r.pixels || {};
+  const orange = (p) => p && p.n > 20 && p.r > p.g + 12 && p.r > p.b + 12;
+  assert.ok(px.hayesFirst && px.hayesFirst.n > 20, "Hayes-only canvas sample " + JSON.stringify(px.hayesFirst));
+  assert.ok(px.ainsley && px.ainsley.n > 20, "Ainsley canvas sample " + JSON.stringify(px.ainsley));
+  assert.ok(px.hayesAfter && px.hayesAfter.n > 20, "Hayes after Ainsley canvas sample " + JSON.stringify(px.hayesAfter));
+  assert.equal(orange(px.hayesAfter), false, "Hayes canvas still carries the lantern " + JSON.stringify(px));
+  assert.ok(Math.abs(px.hayesAfter.r - px.hayesFirst.r) < 40 && Math.abs(px.hayesAfter.g - px.hayesFirst.g) < 40, "Hayes pixels changed after Ainsley " + JSON.stringify(px));
 });

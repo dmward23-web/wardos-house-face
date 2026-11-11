@@ -19,7 +19,8 @@ const ROUTES = [
   "sheet-win.html",
   "sheet-today.html",
   "sheet-spotify.html",
-  "nest-webrtc.html"
+  "nest-webrtc.html",
+  "mercury-run.html"
 ];
 
 test("every non-hub route loads the stage or the kid world that paints .wardos-home", () => {
@@ -34,9 +35,13 @@ test("every non-hub route loads the stage or the kid world that paints .wardos-h
   assert.match(css, /min-height: 96px/);
   for (const route of ROUTES) {
     const html = fs.readFileSync(path.join(ROOT, route), "utf8");
-    const loads = html.includes("wardos-stage.js") || html.includes("kid-world.js");
+    const loads = html.includes("wardos-stage.js") || html.includes("kid-world.js") || html.includes("mercury-run.js");
     assert.equal(loads, true, route + " has no Home installer");
   }
+  const game = fs.readFileSync(path.join(ROOT, "mercury-run.js"), "utf8");
+  assert.match(game, /home-key-light\.svg/);
+  assert.match(game, /aria-label="Home"/);
+  assert.match(game, /merc-home/);
 });
 
 test("the header is not a second Home control", () => {

@@ -25,8 +25,15 @@
 
   /* DAYPKG1 v2d · a kid-typed save name never keeps a dollar sign: stripped on save and on read (an old one is rewritten) */
   function noDollar(name) {
-    var s = String(name == null ? "" : name).replace(/\$/g, "");
-    s = s.replace(/\b(?:cash|usd|dollars?|bucks|money|cents?|euros?|pounds|gbp|eur)\b/gi, "");
+    var raw = String(name == null ? "" : name);
+    var widened = false;
+    var s = raw;
+    try { s = raw.normalize("NFKC"); widened = s !== raw; } catch (e) { s = raw; }
+    s = s.replace(/[€£¥₩₹]\s*\d[\d,.]*/g, "");
+    s = s.replace(/\b(?:usd|eur|gbp)\s*\d[\d,.]*/gi, "");
+    s = s.replace(/\$/g, "");
+    if (widened) s = s.replace(/\d[\d,.]*/g, "");
+    s = s.replace(/\b(?:salary|balance|budget|payment|pennies|cash|usd|dollars?|bucks|money|cents?|euros?|pounds|gbp|eur)\b/gi, "");
     s = s.replace(/[★☆]/g, "");
     return s.replace(/\s+/g, " ").replace(/^[\s·\-]+|[\s·\-]+$/g, "").trim();
   }
