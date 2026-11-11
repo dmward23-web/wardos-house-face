@@ -63,7 +63,7 @@
       '<path d="M58 16 h44 v18 c16 8 26 24 26 42 v70 c0 20 -18 32 -48 32 s-48 -12 -48 -32 v-70 c0 -18 10 -34 26 -42 v-18 z" fill="rgba(15,26,34,0.35)" stroke="#f4efe6" stroke-width="3"/>' +
       '<path d="M62 16 h36" stroke="#f4efe6" stroke-width="3"/>' +
       '<g clip-path="url(#prism-jar-clip)">' + dots + "</g></svg>" +
-      '<span class="prism-jar-label">Jar</span><button type="button" class="prism-jar-plus" aria-label="Add">+</button>';
+      '<span class="prism-jar-label">Jar</span><span class="prism-jar-count">' + stones.filter(function (s) { return s[1] >= top; }).length + '</span><button type="button" class="prism-jar-plus" aria-label="Add">+</button>';
     var plus = el.querySelector(".prism-jar-plus");
     if (plus) plus.onclick = function () {
       var old = host.querySelector(".saves-plus");
@@ -152,6 +152,15 @@
       ico.innerHTML = choreSvg(row.getAttribute("data-check"));
       row.insertBefore(ico, row.firstChild);
     });
+    var lightsTitle = document.querySelector(".hub-lights-title");
+    var lightsBulk = document.querySelector(".hub-lights-bulk");
+    if (lightsTitle && lightsBulk && lightsTitle.parentNode !== lightsBulk) lightsBulk.insertBefore(lightsTitle, lightsBulk.firstChild);
+    else if (lightsTitle && lightsTitle.parentNode) lightsTitle.parentNode.insertBefore(lightsTitle, lightsTitle.parentNode.firstChild);
+    document.documentElement.style.setProperty("background-image", "url(\"month-theme/november/wall-dusk.webp\")", "important");
+    document.documentElement.style.setProperty("background-size", "cover", "important");
+    document.documentElement.style.setProperty("background-position", "center", "important");
+    document.documentElement.style.setProperty("background-repeat", "no-repeat", "important");
+    document.body.style.setProperty("background", "transparent", "important");
     document.querySelectorAll(".more-chip").forEach(function (chip) {
       if (chip.getAttribute("data-wired") === "1") return;
       chip.setAttribute("data-wired", "1");

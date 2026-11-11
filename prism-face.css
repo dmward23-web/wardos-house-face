@@ -506,11 +506,14 @@ html.kw-root body.kw-on .kw-clock {
   z-index: 41 !important;
 }
 html.kw-root body.kw-on .kw-mute,
-html.kw-root body.kw-on .kw-mute.house-snd {
+html.kw-root body.kw-on .kw-mute.house-snd,
+html.kw-root body.kw-on .house-snd.kw-mute {
   width: 64px !important;
   height: 64px !important;
   min-width: 64px !important;
   min-height: 64px !important;
+  max-width: 64px !important;
+  max-height: 64px !important;
   z-index: 41 !important;
 }
 html.kw-root body.kw-on .panel {
@@ -607,10 +610,40 @@ html body .roster-plate,
 html body .tile .roster-plate,
 html body .tile.dan .roster-plate,
 html body .roster-plate.roster-empty {
-  height: 72px !important;
-  max-height: 72px !important;
+  height: 140px !important;
+  max-height: 140px !important;
   min-height: 72px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
 }
+html body .tile { overflow: hidden !important; }
+html body .roster-title,
+html body .kf-title,
+html body .kf-loud,
+html body .kf-md,
+html body .kf-mt {
+  white-space: normal !important;
+  max-width: 100% !important;
+}
+html body .panel > header.hdr {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+html body .col-name {
+  display: inline-block !important;
+  margin: 0 0 12px 24px !important;
+  padding: 6px 16px !important;
+}
+html.kw-root body.kw-on #sec-jar .prism-jar-svg { max-height: 96px !important; width: auto !important; }
+html.kw-root body.kw-on #sec-jar .prism-jar-count {
+  font-size: 32px !important;
+  color: #f4efe6 !important;
+  -webkit-text-fill-color: #f4efe6 !important;
+  font-weight: 800 !important;
+}
+html body #hub-cam-deck.cams-resting { margin: 0 0 8px !important; }
+html body .hub-lights-bulk { margin-top: 0 !important; }
 html body #hub-cam-deck { margin-bottom: 0 !important; }
 html body .hub-lights,
 html body #hub-lights-panel { margin-top: 8px !important; }

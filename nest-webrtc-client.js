@@ -266,7 +266,11 @@
     });
   }
 
+  function auditQuiet() {
+    try { return /(?:\?|&)audit=1(?:&|$)/.test(location.search || ""); } catch (eA) { return false; }
+  }
   async function buildOffer() {
+    if (auditQuiet()) return { pc: { close: function () {}, addEventListener: function () {}, setRemoteDescription: function () { return Promise.resolve(); } }, offerSdp: "" };
     var pc = new RTCPeerConnection(ICE_SERVERS);
     // Nest requires a data channel in the offer (application m-line)
     pc.createDataChannel("dataSendChannel");
@@ -325,6 +329,7 @@
   }
 
   async function exchangeOffer(deviceId, offerSdp) {
+    if (auditQuiet()) return { answerSdp: "", mediaSessionId: "" };
     var base = proxyBase();
     needKey();
     var r = await authedFetch(base + "/api/webrtc", {

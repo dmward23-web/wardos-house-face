@@ -24,6 +24,7 @@
   function load() {
     paint(null);
     if (typeof fetch !== "function") return settled();
+    setTimeout(settled, 1200);
     fetch("kids-week.json", { cache: "no-store" })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(function (d) { paint(d); })

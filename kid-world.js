@@ -2377,7 +2377,7 @@
     var stage = document.createElement("div");
     stage.className = "kw-stage";
     stage.innerHTML =
-      '<header class="kw-hud"><button type="button" class="kw-home wardos-home" data-kw-home aria-label="Home"><img src="assets/icons/home-key-light.svg" alt=""></button><div class="kw-id"><span class="kw-name">' + name + '</span></div><div class="kw-clock" data-kw-clock></div></header>' +
+      '<header class="kw-hud"><a class="kw-home wardos-home" data-kw-home href="sheet-index.html" aria-label="Home"><img src="assets/icons/home-key-light.svg" alt=""></a><div class="kw-id"><span class="kw-name">' + name + '</span></div><div class="kw-clock" data-kw-clock></div></header>' +
       '<div class="kw-jar-host" data-kw-jar></div>' +
       '<div class="kw-week" data-kw-week></div>' +
       '<button type="button" class="kw-path" data-kw-path aria-label="My Week">My Week</button>' +
@@ -2392,7 +2392,7 @@
     if (global.HouseSfx && HouseSfx.setMuted) {
       var mb = document.createElement("button");
       mb.type = "button"; mb.className = "kw-mute"; mb.setAttribute("data-mute-toggle", ""); mb.setAttribute("data-mute-wired", "1");
-      if (global.HouseSound) { mb.style.cssText = "pointer-events:auto;margin-left:auto;margin-right:8px;flex:none"; HouseSound.icon(mb); }   /* LAW8C3 · same icon as the hub */
+      if (global.HouseSound) { mb.style.cssText = "pointer-events:auto;width:64px;height:64px;min-width:64px;min-height:64px;flex:none;margin:0 0 0 12px"; HouseSound.icon(mb); }   /* same 64px control as Home, beside the clock */
       else {
         mb.style.cssText = "pointer-events:auto;min-width:44px;min-height:44px;margin-left:auto;margin-right:8px;border:0;border-radius:22px;background:rgba(14,22,26,.6);color:#fff6e4;font:700 15px/1 system-ui,sans-serif;padding:0 12px";
         mb.textContent = HouseSfx.isMuted() ? "🔇 OFF" : "🔊 ON";
@@ -2404,7 +2404,9 @@
         if (!next && HouseSfx.unlockAudio) HouseSfx.unlockAudio().then(go, go); else go();
       });
       var hud = stage.querySelector(".kw-hud"), clk = hud.querySelector("[data-kw-clock]");
-      hud.insertBefore(mb, clk);
+      if (clk) clk.style.setProperty("margin-left", "auto", "important");
+      if (clk && clk.nextSibling) hud.insertBefore(mb, clk.nextSibling);
+      else hud.appendChild(mb);
     }
     /* SUNHOME1 · a missing kids week is said out loud on the world, with a retry. No key box, no made-up chores. */
     bindFeedRest(stage);
@@ -2453,10 +2455,8 @@
     fitNext();
     document.addEventListener("house:kids-data-ready", fitNext);
     document.addEventListener("house:kid-rendered", fitNext);
-    stage.querySelector("[data-kw-home]").addEventListener("click", function (ev) {
-      ev.preventDefault();
-      ev.stopPropagation();
-      goHome(ev.clientX || innerWidth * 0.2, ev.clientY || 40);
+    stage.querySelector("[data-kw-home]").addEventListener("click", function () {
+      try { sessionStorage.setItem("ori-from", "1"); } catch (eHome) {}
     });
     stage.querySelector("[data-kw-path]").addEventListener("click", function () {
       var d = document.getElementById("kw-cal");

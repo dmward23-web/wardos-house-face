@@ -214,11 +214,14 @@
 
   function pad2(n) { return String(n).padStart(2, "0"); }
 
+  function asDate(v) {
+    if (v instanceof Date && !isNaN(v.getTime())) return v;
+    return new Date();
+  }
   function clockNow() {
     try {
-      if (global.HouseScene && typeof HouseScene.now === "function") return HouseScene.now();
-      if (global.LHClock && typeof LHClock.now === "function") return LHClock.now();
-      if (global.HouseClock && typeof HouseClock.now === "function") return HouseClock.now();
+      if (global.HouseScene && typeof HouseScene.now === "function") return asDate(HouseScene.now());
+      if (global.LHClock && typeof LHClock.now === "function") return asDate(LHClock.now());
     } catch (e) { /* live clock */ }
     return new Date();
   }

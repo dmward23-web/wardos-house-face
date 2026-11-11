@@ -1016,8 +1016,12 @@
     });
   }
 
+  function auditQuiet() {
+    try { return /(?:\?|&)audit=1(?:&|$)/.test(location.search || ""); } catch (eA) { return false; }
+  }
   function startHubLiveStreams(doc) {
     doc = doc || document;
+    if (auditQuiet()) return;
     if (typeof global.NestWebRtc === "undefined" || !global.NestWebRtc.startStream) {
       return; /* client not loaded — stay STILL honestly */
     }

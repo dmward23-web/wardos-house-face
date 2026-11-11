@@ -1126,14 +1126,10 @@ document.addEventListener("DOMContentLoaded", function () {
         card.style.removeProperty("max-height");
       });
       var cs = getComputedStyle(list);
-      var gap = parseFloat(cs.rowGap);
-      if (!isFinite(gap)) gap = parseFloat(cs.gap) || 0;
-      var pad = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
-      var H = list.clientHeight - pad;
       var stage = document.querySelector(".wardos-stage");
       var scale = stage && stage.offsetWidth ? stage.getBoundingClientRect().width / stage.offsetWidth : 1;
       var room = (col.getBoundingClientRect().bottom - list.getBoundingClientRect().top) / (scale || 1) - (parseFloat(cs.paddingTop) || 0);
-      if (isFinite(room)) H = Math.min(H, room);
+      var H = isFinite(room) && room > 80 ? room : list.clientHeight;
       if (!cards.length || H < 80) return;
       var n = Math.max(1, Math.min(cards.length, Math.floor(H / 136)));
       list.style.setProperty("scrollbar-gutter", "auto", "important");

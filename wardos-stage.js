@@ -206,6 +206,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     var existing = document.querySelector(".kw-home, .hub-home, .wardos-home");
     if (existing) {
       existing.classList.add("wardos-home");
+      if (existing.tagName === "A") existing.setAttribute("href", "sheet-index.html");
       if (!existing.getAttribute("aria-label")) existing.setAttribute("aria-label", "Home");
       var icon = existing.querySelector("img");
       if (icon && !icon.getAttribute("src")) icon.setAttribute("src", "assets/icons/home-key-light.svg");

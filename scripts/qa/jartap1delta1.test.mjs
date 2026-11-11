@@ -53,7 +53,8 @@ test("source: midnight + 1 s timer built DST-safe, re-armed, 30 s poll kept", ()
   /* Chicago civil midnight via ctMidnightMs, measured from the clock argument, not the machine's local Date or Date.now(). */
   assert.match(SRC, /ctMidnightMs\(addCivil\(iso\)\) \+ 1000/);
   assert.match(SRC, /var at = n\.getTime\(\)/);
-  assert.match(SRC, /midT = setTimeout\(function \(\) \{ midT = 0; check\(\); armMidnight\(\); \}, msToMidnight\(\)\)/);
+  /* The midnight timer re-checks the Chicago wall clock and re-arms if a throttled timeout fires early. */
+  assert.match(SRC, /if \(Date\.now\(\) \+ 250 < target\) \{ armMidnight\(\); return; \}/);
   assert.match(SRC, /setInterval\(check, 30 \* 1000\)/);
   assert.match(SRC, /Math\.max\(1000, Math\.min\(ms, 25 \* 3600 \* 1000\)\)/);
 });
