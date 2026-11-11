@@ -1331,18 +1331,20 @@ document.addEventListener("DOMContentLoaded", function () {
       list.style.setProperty("scrollbar-gutter", "auto", "important");
       list.style.setProperty("padding-left", "0", "important");
       list.style.setProperty("padding-right", "0", "important");
-      if (showAll && cards.length > n) {
-        list.style.setProperty("overflow-y", "auto", "important");
-        list.style.setProperty("scrollbar-width", "thin", "important");
-      } else {
-        list.style.setProperty("overflow", "hidden", "important");
-      }
+      list.style.setProperty("overflow", "hidden", "important");
       var gap = 16;
       var cs = getComputedStyle(list);
       var padY = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
       var H = list.clientHeight - padY;
       var rowH = Math.floor((H - gap * Math.max(0, n - 1)) / n);
       if (!isFinite(rowH) || rowH < 96) rowH = 96;
+      if (showAll && cards.length > n) {
+        var windowH = rowH * n + gap * Math.max(0, n - 1);
+        list.style.setProperty("max-height", windowH + "px", "important");
+        list.style.setProperty("overflow-y", "scroll", "important");
+        list.style.setProperty("scrollbar-width", "auto", "important");
+        list.style.setProperty("scrollbar-color", "#c4b49a #0f1a22", "important");
+      }
       /* Option D. Seven 64 zones with 16px gaps (544) inside the 589 column. */
       col.style.setProperty("padding-left", "0", "important");
       col.style.setProperty("padding-right", "0", "important");

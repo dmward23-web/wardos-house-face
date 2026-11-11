@@ -493,6 +493,17 @@ body.theme-ainsley.stick-season .saves-plus {
   box-sizing: border-box;
   gap: 16px;
 }
+.saves-overlay .saves-home {
+  position: absolute !important;
+  left: 48px !important;
+  top: 48px !important;
+  z-index: 3 !important;
+  width: 88px !important;
+  height: 88px !important;
+}
+.saves-overlay .saves-sheet {
+  margin-top: 104px !important;
+}
 .saves-home {
   position: relative;
   z-index: 2;
