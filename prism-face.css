@@ -169,29 +169,23 @@ html body .roster-full {
 html body .roster-empty .roster-title { font-size: 20px !important; }
 html body .hub-next[hidden] { display: none !important; }
 html body #hub-cam-deck.cams-resting {
-  height: 56px !important;
-  max-height: 56px !important;
+  height: auto !important;
+  max-height: none !important;
   grid-template-columns: 1fr !important;
 }
-html body #hub-cam-deck.cams-resting { overflow: hidden !important; }
-html body #hub-cam-deck.cams-resting .hub-cam ~ .hub-cam .hub-cam-rest {
-  height: 0 !important;
-  min-height: 0 !important;
-  max-height: 0 !important;
-  overflow: hidden !important;
-}
+html body #hub-cam-deck.cams-resting { overflow: visible !important; }
 html body #hub-cam-deck.cams-resting .hub-cam,
 html body #hub-cam-deck.cams-resting .hub-cam-foot {
-  height: 56px !important;
-  min-height: 56px !important;
-  max-height: 56px !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: none !important;
 }
 html body #hub-cam-deck.cams-resting .hub-cam-rest {
   display: flex !important;
   align-items: center !important;
-  height: 48px !important;
-  min-height: 48px !important;
-  max-height: 48px !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: none !important;
   overflow: clip !important;
 }
 html body .hub-lights-bulk {
@@ -420,10 +414,11 @@ html.kw-root.kw-root body.kw-on #sec-jar > .prism-jar {
   z-index: 3 !important;
 }
 html.kw-root.kw-root body.kw-on #sec-jar .prism-jar-svg {
-  height: 100% !important;
+  height: 56px !important;
   width: auto !important;
-  max-width: 46% !important;
-  flex: 1 1 auto !important;
+  max-width: none !important;
+  max-height: 56px !important;
+  flex: 0 0 auto !important;
 }
 html.kw-root.kw-root body.kw-on #sec-jar .prism-jar-label {
   font-size: 24px !important;
@@ -927,6 +922,22 @@ html.kw-root body.kw-on .house-snd.kw-mute {
   height: 64px !important;
   margin: 0 !important;
 }
+html.kw-root body.kw-on .kw-clock {
+  grid-column: 4 !important;
+  justify-self: end !important;
+  align-self: center !important;
+  width: max-content !important;
+  min-width: 340px !important;
+  max-width: none !important;
+  height: 64px !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  z-index: 50 !important;
+  line-height: 1 !important;
+  font-size: 32px !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
 html.kw-root body.kw-on .kw-home {
   position: absolute !important;
   left: 0 !important;
@@ -938,6 +949,20 @@ html.kw-root body.kw-on .kw-home {
   max-height: 96px !important;
   min-width: 96px !important;
   min-height: 96px !important;
+}
+html:not(#hf-wall-off) body .wardos-stage > .live-clock-host .live-clock {
+  font-size: 32px !important;
+  line-height: 1 !important;
+  height: 64px !important;
+  color: #f4efe6 !important;
+  -webkit-text-fill-color: #f4efe6 !important;
+  background: #101820 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  white-space: nowrap !important;
+  border: 2px solid #c4b49a !important;
+  border-radius: 16px !important;
+  padding: 0 16px !important;
 }
 html:not(#hf-wall-off) body .panel.lights-cmd .hdr.hdr--clockfirst .live-clock-host,
 html:not(#hf-wall-off) body .wardos-stage > .live-clock-host {

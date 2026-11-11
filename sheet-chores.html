@@ -1237,7 +1237,40 @@ html body .panel > section.cheer {
   background-image: none !important;
   box-shadow: none !important;
 }
+html body .cheer::before,
+html body .panel > section.cheer::before { content: none !important; display: none !important; background: none !important; }
 html body .cheer-accent { display: none !important; }
+html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock,
+html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst [data-live-clock],
+html body .panel .live-clock {
+  color: #f4efe6 !important;
+  -webkit-text-fill-color: #f4efe6 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  background: #101820 !important;
+  white-space: nowrap !important;
+  font-size: 32px !important;
+  line-height: 1 !important;
+  height: 64px !important;
+}
+html:not(#hf-wall-off) body .chore-shortcuts .kid-chip,
+html:not(#hf-wall-off) body .chore-shortcuts .kid-chip.ainsley,
+html:not(#hf-wall-off) body .chore-shortcuts .kid-chip.hayes,
+html:not(#hf-wall-off) body .chore-shortcuts .kid-chip.harris {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  font-size: 24px !important;
+  text-shadow: none !important;
+}
+html body section.col .more-chip.more-chip {
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
+  font-size: 24px !important;
+  line-height: 64px !important;
+  color: #f4efe6 !important;
+  -webkit-text-fill-color: #f4efe6 !important;
+}
 html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock-host {
   left: 760px !important;
   top: 8px !important;

@@ -81,8 +81,14 @@
       var wall = (global.innerWidth || 0) >= 1400 && (global.innerHeight || 0) >= 700;
       deck.classList.toggle("cams-resting", !!(resting && wall));
       if (resting) {
-        var label = deck.querySelector(".hub-cam-label");
-        if (label) label.textContent = "Cameras resting";
+        var labels = deck.querySelectorAll(".hub-cam-label");
+        for (var li = 0; li < labels.length; li++) {
+          var label = labels[li];
+          var text = String(label.textContent || "").replace(/\s+/g, " ").trim();
+          if (/pair/i.test(text)) continue;
+          if (li === 0) { if (text !== "Cameras resting") label.textContent = "Cameras resting"; continue; }
+          if (!/resting/i.test(text)) label.textContent = text + " \u00b7 resting";
+        }
       }
     }
     var kidColor = { ainsley: "#8a6394", hayes: "#3f8b71", harris: "#42679a" };
@@ -202,4 +208,5 @@
   document.addEventListener("house:kids-data-ready", run);
   setTimeout(run, 400);
   setTimeout(run, 1200);
+  setTimeout(run, 2200);
 })(typeof window !== "undefined" ? window : globalThis);

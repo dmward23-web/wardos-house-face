@@ -73,8 +73,8 @@ test("CAMREST4 · resting cam tiles: no clipped element at phone, desk and wall 
   for (const k of ["restPair@1920@1080"]) {
     const s = r[k].t0;
     assert.deepEqual(r[k].errors, [], k);
-    /* Prism B7: at wall width the three resting tiles collapse to one Cameras resting strip. */
-    assert.equal(s.restTiles, 1, k + " paired outage shows one resting strip " + J(s));
+    /* Round 13: each camera row keeps its own resting state. An empty bar is not a state. */
+    assert.equal(s.restTiles, 3, k + " paired outage shows a resting state on every row " + J(s));
     assert.deepEqual(s.clipped, [], k + " no clipped rest text " + J(s));
     assert.ok(s.restOverflow.every((o) => o === "clip"), k + " rest overflow " + J(s));
     assert.ok(s.restFit.every(Boolean), k + " each rest tile fits its box " + J(s));
