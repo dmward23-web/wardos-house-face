@@ -1322,25 +1322,71 @@ document.addEventListener("DOMContentLoaded", function () {
         card.style.removeProperty("height");
         card.style.removeProperty("min-height");
         card.style.removeProperty("max-height");
+        card.style.removeProperty("display");
       });
-      var cs = getComputedStyle(list);
-      var stage = document.querySelector(".wardos-stage");
-      var scale = stage && stage.offsetWidth ? stage.getBoundingClientRect().width / stage.offsetWidth : 1;
-      var room = (col.getBoundingClientRect().bottom - list.getBoundingClientRect().top) / (scale || 1) - (parseFloat(cs.paddingTop) || 0);
-      var H = isFinite(room) && room > 80 ? room : list.clientHeight;
-      if (!cards.length || H < 80) return;
-      var n = Math.max(1, Math.min(cards.length, Math.floor(H / 136)));
+      var showAll = col.getAttribute("data-show-all") === "1";
+      var n = showAll ? cards.length : Math.min(5, cards.length);
+      if (!cards.length) return;
+      list.style.setProperty("gap", "16px", "important");
       list.style.setProperty("scrollbar-gutter", "auto", "important");
       list.style.setProperty("padding-left", "0", "important");
       list.style.setProperty("padding-right", "0", "important");
+      list.style.setProperty("overflow", "hidden", "important");
+      var gap = 16;
+      var cs = getComputedStyle(list);
+      var pad = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+      var H = list.clientHeight - pad;
+      var rowH = Math.floor((H - gap * Math.max(0, n - 1)) / n);
+      if (!isFinite(rowH) || rowH < 96) rowH = 96;
       cards.forEach(function (card, i) {
-        card.style.setProperty("height", "128px", "important");
-        card.style.setProperty("min-height", "128px", "important");
-        card.style.setProperty("max-height", "128px", "important");
-        card.style.setProperty("flex", "0 0 128px", "important");
-        card.style.setProperty("overflow", "hidden", "important");
-        if (i >= n) card.style.setProperty("display", "none", "important");
-        else card.style.removeProperty("display");
+        if (!showAll && i >= n) {
+          card.style.setProperty("display", "none", "important");
+          return;
+        }
+        card.style.setProperty("display", "grid", "important");
+        card.style.setProperty("grid-template-columns", "64px minmax(0, 1fr)", "important");
+        card.style.setProperty("grid-template-rows", "24px 64px", "important");
+        card.style.setProperty("column-gap", "8px", "important");
+        card.style.setProperty("row-gap", "4px", "important");
+        card.style.setProperty("align-items", "center", "important");
+        card.style.setProperty("box-sizing", "border-box", "important");
+        card.style.setProperty("height", rowH + "px", "important");
+        card.style.setProperty("min-height", "0", "important");
+        card.style.setProperty("max-height", "none", "important");
+        card.style.setProperty("overflow", "visible", "important");
+        card.style.setProperty("padding", "0", "important");
+        card.style.setProperty("margin", "0", "important");
+        var ico = card.querySelector(".chore-ico");
+        if (ico) {
+          ico.style.setProperty("grid-column", "1", "important");
+          ico.style.setProperty("grid-row", "1 / span 2", "important");
+          ico.style.setProperty("width", "64px", "important");
+          ico.style.setProperty("height", "64px", "important");
+        }
+        var txt = card.querySelector(".txt");
+        if (txt) txt.style.setProperty("display", "contents", "important");
+        var what = card.querySelector(".what");
+        if (what) {
+          what.style.setProperty("grid-column", "2", "important");
+          what.style.setProperty("grid-row", "1", "important");
+          what.style.setProperty("font-size", "24px", "important");
+          what.style.setProperty("line-height", "24px", "important");
+          what.style.setProperty("height", "24px", "important");
+          what.style.setProperty("margin", "0", "important");
+          what.style.setProperty("overflow", "hidden", "important");
+        }
+        var taps = card.querySelector(".quest-days");
+        if (taps) {
+          taps.style.setProperty("grid-column", "2", "important");
+          taps.style.setProperty("grid-row", "2", "important");
+          taps.style.setProperty("height", "64px", "important");
+          taps.style.setProperty("min-height", "64px", "important");
+          taps.style.setProperty("margin", "0", "important");
+        }
+        var ring = card.querySelector(".ring");
+        if (ring) ring.style.setProperty("display", "none", "important");
+        var hint = card.querySelector(".hint");
+        if (hint) hint.style.setProperty("display", "none", "important");
       });
       if (col.getAttribute("data-show-all") === "1") n = cards.length;
       var more = cards.length > n;

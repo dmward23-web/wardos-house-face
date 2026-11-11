@@ -191,11 +191,14 @@
       el.style.setProperty("min-height", "64px", "important");
       el.style.setProperty("max-height", "64px", "important");
       el.style.setProperty("margin", "0", "important");
+      el.style.setProperty("padding", "0", "important");
       el.style.setProperty("border", "2px solid #c4b49a", "important");
       el.style.setProperty("box-shadow", "none", "important");
-      el.style.setProperty("overflow", "hidden", "important");
+      el.style.setProperty("overflow", "visible", "important");
       el.style.setProperty("font-size", "32px", "important");
       el.style.setProperty("line-height", "64px", "important");
+      el.style.setProperty("letter-spacing", "0", "important");
+      el.style.setProperty("white-space", "nowrap", "important");
       el.style.setProperty("z-index", "45", "important");
     });
     var onHub = /sheet-index\.html/.test(location.pathname || "");
@@ -220,7 +223,65 @@
         title.style.setProperty("background", "#101820", "important");
       });
     }
+    function placeHubHeader() {
+      if (!onHub) return;
+      var stage = document.querySelector(".wardos-stage") || document.body;
+      var header = document.querySelector("header.hdr");
+      if (header) {
+        header.style.setProperty("border", "0", "important");
+        header.style.setProperty("outline", "0", "important");
+        header.style.setProperty("box-shadow", "none", "important");
+        header.style.setProperty("background", "transparent", "important");
+        header.style.setProperty("background-image", "none", "important");
+      }
+      var home = document.querySelector(".hub-home");
+      var brand = document.querySelector(".hdr-brand") || document.querySelector("h1.name");
+      var outdoor = document.querySelector(".wx-card");
+      var indoor = document.querySelector("a.sensi-hdr, .sensi-hdr, #index-sensi-chip");
+      function park(el) { if (el && el.parentNode !== stage) stage.appendChild(el); }
+      function pin(el, left, top, w, h) {
+        park(el);
+        el.style.setProperty("position", "absolute", "important");
+        el.style.setProperty("left", left + "px", "important");
+        el.style.setProperty("top", top + "px", "important");
+        el.style.setProperty("right", "auto", "important");
+        el.style.setProperty("margin", "0", "important");
+        el.style.setProperty("z-index", "6", "important");
+        if (w) el.style.setProperty("width", w + "px", "important");
+        else el.style.setProperty("width", "max-content", "important");
+        if (h) el.style.setProperty("height", h + "px", "important");
+      }
+      var x = 144;
+      if (home) {
+        var hr = home.getBoundingClientRect();
+        var sr = stage.getBoundingClientRect();
+        var scale = sr.width / 1920 || 1;
+        x = Math.round((hr.right - sr.left) / scale) + 16;
+      }
+      if (brand) {
+        pin(brand, x, 56, null, 64);
+        var br = brand.getBoundingClientRect();
+        var sr2 = stage.getBoundingClientRect();
+        var scale2 = sr2.width / 1920 || 1;
+        x = Math.round((br.right - sr2.left) / scale2) + 16;
+      }
+      var chips = [outdoor, indoor].filter(Boolean);
+      var room = 1500 - 16 - x;
+      var chipW = chips.length ? Math.floor((room - 16 * Math.max(0, chips.length - 1)) / chips.length) : 0;
+      if (chipW > 280) chipW = 280;
+      if (chipW < 160) chipW = 160;
+      chips.forEach(function (chip) {
+        pin(chip, x, 56, chipW, 64);
+        var rr = chip.getBoundingClientRect();
+        var srr = stage.getBoundingClientRect();
+        var sc = srr.width / 1920 || 1;
+        x = Math.round((rr.right - srr.left) / sc) + 16;
+      });
+    }
     if (onHub) {
+      placeHubHeader();
+      setTimeout(placeHubHeader, 400);
+      setTimeout(placeHubHeader, 1200);
       settlePlates();
       setTimeout(settlePlates, 400);
       setTimeout(settlePlates, 1200);
@@ -259,15 +320,20 @@
       "position:fixed !important; top:64px !important; left:1500px !important; right:auto !important;",
       "width:260px !important; min-width:260px !important; max-width:260px !important;",
       "height:64px !important; min-height:64px !important; max-height:64px !important;",
-      "padding:0 16px !important; box-sizing:border-box !important; display:inline-flex !important;",
+      "padding:0 !important; box-sizing:border-box !important; display:inline-flex !important;",
       "align-items:center !important; justify-content:center !important;",
       "font-size:32px !important; line-height:1 !important; font-weight:700 !important; letter-spacing:0 !important;",
       "border:2px solid #c4b49a !important; border-radius:16px !important;",
       "background:#101820 !important; color:#f4efe6 !important; -webkit-text-fill-color:#f4efe6 !important;",
-      "box-shadow:none !important; text-shadow:none !important; z-index:45 !important; overflow:hidden !important;",
+      "box-shadow:none !important; text-shadow:none !important; z-index:45 !important; overflow:visible !important;",
       "}",
-      "html body .live-clock-host, html body header .hdr-date, html body .panel > header.hdr { overflow:visible !important; }",
-      "html body .panel.panel > header.hdr .hdr-ovals { margin-right:400px !important; }",
+      "html body .live-clock-host, html body header .hdr-date, html body .panel > header.hdr { overflow:visible !important; border:0 !important; box-shadow:none !important; background:transparent !important; outline:0 !important; }",
+      "html body header.hdr::before, html body header.hdr::after, html body .panel > header.hdr::before, html body .panel > header.hdr::after { content:none !important; display:none !important; border:0 !important; box-shadow:none !important; }",
+      "html body .tile.hayes::before, html body .tile.hayes::after, html body .tile.harris::before, html body .tile.harris::after, html body .tile.ainsley::before, html body .tile.ainsley::after, html body .tile.dan::before, html body .tile.dan::after { content:none !important; display:none !important; border:0 !important; box-shadow:none !important; background:none !important; }",
+      "html body .tile.ainsley { border:2px solid #8a6394 !important; border-image:none !important; box-shadow:none !important; outline:0 !important; }",
+      "html body .tile.hayes { border:2px solid #3f8b71 !important; border-image:none !important; box-shadow:none !important; outline:0 !important; }",
+      "html body .tile.harris { border:2px solid #42679a !important; border-image:none !important; box-shadow:none !important; outline:0 !important; }",
+      "html body .tile.dan { border:2px solid #c4b49a !important; border-image:none !important; box-shadow:none !important; outline:0 !important; }",
       "html body .panel.panel, html body .wardos-stage > .panel { box-shadow:none !important; border-top-width:0 !important; }",
       "html body .tile.ainsley, html body .tile.hayes, html body .tile.harris, html body .tile.dan { padding-bottom:0 !important; }",
       "html body .roster-plate, html body .roster-plate.roster-empty { left:0 !important; right:0 !important; width:100% !important; bottom:0 !important; margin:0 !important; box-shadow:none !important; }",
@@ -276,9 +342,9 @@
       "html body .roster-plate.roster-empty .roster-title { display:inline-block !important; height:32px !important; line-height:32px !important; font-size:24px !important; padding:0 14px !important; background:#101820 !important; }",
       "html body .chore .day-tap.is-past { opacity:0.45 !important; text-decoration:line-through !important; }",
       "html body .chore .day-tap.is-off:not(.done) { opacity:1 !important; text-decoration:none !important; background:transparent !important; border:2px solid rgba(196,180,154,0.75) !important; color:#f4efe6 !important; }",
-      "html body section.col:not([data-show-all]) .chore-list > .chore:nth-child(n+5) { display:none !important; }",
-      "html body section.col .chore { height:auto !important; min-height:0 !important; max-height:none !important; overflow:visible !important; }",
-      "html body section.col .chore-list { overflow:visible !important; }",
+      "html body section.col .chore .what { font-size:24px !important; line-height:24px !important; height:24px !important; margin:0 !important; }",
+      "html body section.col .chore .day-tap { width:64px !important; height:64px !important; min-width:64px !important; min-height:64px !important; font-size:24px !important; }",
+      "html body section.col .chore-list { gap:16px !important; }",
       "html:not(#hf-wall-off) body .panel > section.cheer, html:not(#hf-wall-off) body .panel .cheer { left:820px !important; width:640px !important; top:48px !important; }"
     ].join("");
     }
