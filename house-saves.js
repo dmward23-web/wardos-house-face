@@ -47,19 +47,37 @@
     return s;
   }
 
+  function wholeMoney(name) {
+    var s = String(name == null ? "" : name);
+    try { s = s.normalize("NFKC"); } catch (e) { /* */ }
+    return /\b(?:allowance|income|salary|balance|budget|payment|pennies|cash|usd|dollars?|bucks|money|cents?|euros?|pounds|gbp|eur|jar)\b/i.test(s) && /\d/.test(s);
+  }
+
   function list(kidId) {
     var root = loadRoot();
     if (root[kidId]) {
-      var next = [];
+      var src = root[kidId];
+      var keep = [];
       var dirty = false;
-      root[kidId].forEach(function (x) {
-        if (!x) { dirty = true; return; }
+      for (var i = 0; i < src.length; i++) {
+        var x = src[i];
+        if (!x) { dirty = true; continue; }
         var cleaned = noDollar(x.name);
-        if (!cleaned) { dirty = true; return; }
-        if (cleaned !== String(x.name || "").trim()) { x.name = cleaned; dirty = true; }
-        next.push(x);
-      });
-      if (dirty) { root[kidId] = next; saveRoot(root); }
+        if (!cleaned) {
+          dirty = true;
+          if (wholeMoney(x.name)) continue;
+          x.name = "Save";
+        } else if (cleaned !== String(x.name || "").trim()) {
+          x.name = cleaned;
+          dirty = true;
+        }
+        keep.push(x);
+      }
+      if (dirty || keep.length !== src.length) {
+        src.length = 0;
+        for (var j = 0; j < keep.length; j++) src.push(keep[j]);
+        saveRoot(root);
+      }
     }
     if (root[kidId] && root[kidId].some(function (x) { return x && /^seed-/.test(String(x.id || "")); })) {
       root[kidId] = root[kidId].filter(function (x) { return x && !/^seed-/.test(String(x.id || "")); });
