@@ -1150,8 +1150,9 @@
   function paintPlatArt(g, set, w, grove) {
     var cap = 40, tile = 128, y0 = -PLAT_ART.walk;
     function strip(pre, y, h) {
-      var mw = Math.max(0, w - cap * 2);
-      for (var x = 0; x < mw; x += tile) { var tw = Math.min(tile, mw - x); var im = set[pre + "mid"]; g.drawImage(im, 0, 0, im.width * (tw / tile), im.height, cap + x, y, tw, h); }
+      var lap = 3;
+      var mw = Math.max(0, w - cap * 2 + lap * 2);
+      for (var x = 0; x < mw; x += tile) { var tw = Math.min(tile, mw - x); var im = set[pre + "mid"]; g.drawImage(im, 0, 0, im.width * (tw / tile), im.height, cap - lap + x, y, tw, h); }
       g.drawImage(set[pre + "capL"], 0, y, cap, h);
       g.drawImage(set[pre + "capR"], w - cap, y, cap, h);
     }

@@ -26,6 +26,27 @@
     try { return String(s == null ? "" : s).normalize("NFKC"); }
     catch (e) { return String(s == null ? "" : s); }
   }
+  /* NFKC, then format characters (Cf, including zero-width), then case-fold. */
+  function fold(s) {
+    var t = nfkc(s);
+    try { t = t.replace(/\p{Cf}/gu, ""); }
+    catch (e) { t = t.replace(/[\u00AD\u180E\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u206F\uFEFF]/g, ""); }
+    try { t = t.toLowerCase(); } catch (e2) { /* already a string */ }
+    return t;
+  }
+  function flatFold(v) {
+    var parts = [];
+    function walk(x) {
+      if (typeof x === "string") parts.push(fold(x));
+      else if (Array.isArray(x)) { for (var i = 0; i < x.length; i++) walk(x[i]); }
+      else if (x && typeof x === "object") {
+        var keys = Object.keys(x);
+        for (var k = 0; k < keys.length; k++) walk(x[keys[k]]);
+      }
+    }
+    walk(v);
+    return parts.join("\n");
+  }
   function titleBlob(ev) {
     if (!ev || typeof ev !== "object") return nfkc(textOf(ev));
     return nfkc([ev.summary, ev.title, ev.what, ev.label, ev.text, ev.l].map(textOf).filter(Boolean).join("\n"));
@@ -53,7 +74,7 @@
   function isDenied(ev, audience) {
     if (!ev) return false;
     if (typeof ev === "string") {
-      var s = nfkc(ev);
+      var s = fold(ev);
       if (CANCEL.test(s)) return true;
       if (BOY_NAME.test(s) && APPT_WORD.test(s)) return true;
       if (isBoy(audience)) return HARD.test(s) || SOFT.test(s);
@@ -67,8 +88,8 @@
     var trusted = /^(ainsley|adult|dan|dad|shared|hub)$/i.test(who);
     if (HARD.test(blob)) return true;
     if (boy || !trusted) return SOFT.test(blob);
-    /* A boy named in the title, description, or location is dropped before it can become "Appointment". */
-    var named = nfkc([titleBlob(ev), textOf(ev.description), textOf(ev.location)].join("\n"));
+    /* Appointment, session, or dentist, and a boy name in any string field: drop the row. */
+    var named = flatFold(ev);
     if (BOY_NAME.test(named) && APPT_WORD.test(named)) return true;
     return false;
   }
