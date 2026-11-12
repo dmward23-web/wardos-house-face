@@ -53,6 +53,10 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
       if (n.nodeType === 1 && (n.id === "wardos-diag" || n.id === "acer-cover" || n.classList.contains("pair-screen") || n.classList.contains("chore-shortcuts") || n.classList.contains("hl-layer") || n.classList.contains("kw-clip"))) continue;
       stage.appendChild(n);
     }
+    /* The kid world canvas is created after the first place(). Fixed to the
+       viewport it ignores the stage scale and hangs off a short window. */
+    var cv = document.querySelector(".kw-canvas");
+    if (cv && !stage.contains(cv)) stage.insertBefore(cv, stage.firstChild);
     return stage;
   }
 

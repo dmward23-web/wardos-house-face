@@ -2486,7 +2486,8 @@
     var cv = document.createElement("canvas");
     cv.className = "kw-canvas";
     cv.setAttribute("aria-hidden", "true");
-    document.body.insertBefore(cv, document.body.firstChild);
+    var host = document.querySelector(".wardos-stage") || document.body;
+    host.insertBefore(cv, host.firstChild);
     bg = new World(cv);
     /* MUTEHUD1 · a visible sound toggle in the world HUD (the old header one sits under the canvas). Hayes has his own. */
     if (global.HouseSfx && HouseSfx.setMuted) {
@@ -2598,6 +2599,7 @@
       loop();
       if (reduced && bg) bg.frame(kid());
     }
+    if (global.WardosStage && WardosStage.place) WardosStage.place();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
