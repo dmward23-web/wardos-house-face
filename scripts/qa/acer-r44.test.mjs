@@ -17,11 +17,9 @@ test("r44 a boy name plus a health word is Appointment everywhere, and a hidden 
   const D = boot();
   const folded = [bit("H4", " yes", " check", "up"), bit("H@", "yes", " allerg", "ist"), bit("Harr", "i$") + " " + bit("dent", "al")];
   for (const what of folded) {
-    for (const who of LOCKED.concat(["dan"])) {
-      const view = D.summarize({ what, startIso: WHEN }, who);
-      assert.equal(view && view.title, "Appointment", who + " " + what);
-      assert.equal(/hayes|harris|check|allerg|dent/i.test(view.title), false);
-    }
+    for (const who of LOCKED) assert.equal(D.summarize({ what, startIso: WHEN }, who), null, who + " " + what);
+    const dad = D.summarize({ what, startIso: WHEN }, "dan");
+    assert.equal(dad && dad.title, "Appointment", "dan " + what);
   }
   assert.equal(D.summarize({ what: bit("Mort", "gage", " due"), startIso: WHEN }, "dan").title, bit("Mort", "gage", " due"));
   assert.equal(D.summarize({ what: bit("Mort", "gage", " due"), startIso: WHEN }, "ainsley"), null);
@@ -57,7 +55,7 @@ test("r44 locked views keep only allowlisted text and every field probe drops", 
   const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/acer_r44_views.py")], { encoding: "utf8", timeout: 240000 });
   assert.equal(r.status, 0, (r.stderr || "").slice(-800) + (r.stdout || "").slice(-400));
   const o = JSON.parse(r.stdout.trim().split("\n").pop());
-  const labels = ["Soccer", "Swim", "School pickup", "School drop", "Baseball", "Flag", "School specials", "No school", "Field trip", "Art club", "Conference", "Picture day", "Homework", "Choir", "Raffle", "Book order", "Donation", "HOA", "Appointment"];
+  const labels = ["Soccer", "Swim", "School pickup", "School drop", "Baseball", "Flag", "School specials", "No school", "Field trip", "Art club", "Conference", "Picture day", "Homework", "Choir", "Raffle", "Book order", "Donation", "HOA"];
   const month = o.pages.month;
   assert.equal(month.ok, true, JSON.stringify(month).slice(0, 500));
   for (const label of labels) assert.equal(month.has[label], true, "month missing " + label);

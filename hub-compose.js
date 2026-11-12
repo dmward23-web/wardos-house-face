@@ -42,7 +42,7 @@
 
   function viewOf(row, audience) {
     var D = global.HouseEventDisplay;
-    if (!D) return null;
+    if (!D || (row && row.dadOnly)) return null;
     return D.summarize(row, audience);
   }
 

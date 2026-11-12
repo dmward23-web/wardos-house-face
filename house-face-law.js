@@ -317,14 +317,61 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     }
     return false;
   }
+  var SIGNAL_KEY = /^(organizer|creator|attendees|conferenceData|extendedProperties|location|eventType)$/i;
+  /* An event row, not the week/month document that contains rows. */
+  function eventSignal(v) {
+    return !!(v && typeof v === "object" && !Array.isArray(v) && !v.kids && !v.days && !v.upcomingLeaves && (v.what || v.summary || v.title || v.l || v.organizer || v.attendees || v.conferenceData || v.extendedProperties || v.eventType));
+  }
+  /* Classify while organizer and the other signal fields are still on the row.
+     A therapy object used to be deleted first, and the canned title (Raffle) survived. */
+  function classifyFetched(v) {
+    var D = g.HouseEventDisplay;
+    if (!eventSignal(v) || !D || typeof D.isAppointment !== "function" || typeof D.summarize !== "function") return v;
+    if (!D.isAppointment(v)) return v;
+    var shared = D.summarize(v, "shared");
+    var dad = D.summarize(v, "adult");
+    if (!shared && !dad) return null;
+    var time = (dad && dad.time) || (shared && shared.time) || "";
+    var when = v.when || time;
+    var start = v.start || v.startIso || "";
+    var end = v.end || v.endIso || "";
+    if (!shared && dad) {
+      return { what: "Appointment", title: "Appointment", summary: "Appointment", label: "Appointment", text: "Appointment", when: when, time: time, start: start, startIso: v.startIso || start, end: end, dadOnly: true, wardosShow: true };
+    }
+    return { what: shared.title, title: shared.title, summary: shared.title, label: shared.title, text: shared.title, when: when, time: shared.time || "", start: start, startIso: v.startIso || start, end: end, wardosShow: shared.title === "Appointment" };
+  }
   function cleanFeed(name, data) {
     function walk(v, key) {
-      if (Array.isArray(v)) { var out = []; for (var i = 0; i < v.length; i++) { if (!rowDress(v[i]) && !rowCustody(v[i]) && !rowTherapy(v[i]) && !(typeof v[i] === "string" && isCustody(v[i]))) out.push(walk(v[i], key)); } return out; }
+      if (Array.isArray(v)) {
+        var out = [];
+        for (var i = 0; i < v.length; i++) {
+          if (typeof v[i] === "string") { if (!isCustody(v[i])) out.push(walk(v[i], key)); continue; }
+          if (rowDress(v[i]) || rowCustody(v[i])) continue;
+          if (eventSignal(v[i])) {
+            var classified = classifyFetched(v[i]);
+            if (classified == null) continue;
+            if (classified !== v[i]) { out.push(classified); continue; }
+          }
+          if (rowTherapy(v[i])) continue;
+          out.push(walk(v[i], key));
+        }
+        return out;
+      }
       if (v && typeof v === "object") {
         if (typeof v.description === "string" && showMarker(v.description)) { v.wardosShow = true; v.description = ""; }
         var priv = v.extendedProperties && v.extendedProperties.private;
         if (priv && priv["wardos.show"] === "1") v.wardosShow = true;
-        var r = {}; for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k)) { if ((rowDress(v[k]) || rowCustody(v[k]) || (rowTherapy(v[k]) && typeof v[k] === "object")) && k !== "kids") continue; r[k] = walk(v[k], k); } return r;
+        var r = {};
+        for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k)) {
+          if (eventSignal(v[k])) {
+            var child = classifyFetched(v[k]);
+            if (child == null) continue;
+            if (child !== v[k]) { r[k] = child; continue; }
+          }
+          if ((rowDress(v[k]) || rowCustody(v[k]) || (rowTherapy(v[k]) && typeof v[k] === "object")) && k !== "kids" && !SIGNAL_KEY.test(k)) continue;
+          r[k] = walk(v[k], k);
+        }
+        return r;
       }
       if (typeof v === "string" && !(key && SKIP_KEY.test(key))) return isCustody(v) ? "" : faceText(v);
       return v;

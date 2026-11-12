@@ -142,11 +142,13 @@
     s = s.replace(/[^a-z0-9]/g, "");
     return /hayes|harris/.test(foldDigits(s, "i")) || /hayes|harris/.test(foldDigits(s, "l"));
   }
-  /* A contiguous "Hayes" or "Harris" stays on the marker rule. A folded disguise
-     (digits, @, $, separators, zero-width) plus a health word is Appointment. */
+  /* A contiguous spelling stays on the marker rule. A zero-width-only spelling
+     drops (r37). Digits, @, $, and separators are the folded form Dad may show. */
   function titleHasBoy(ev) {
     var raw = titleBlob(ev);
     if (/hayes|harris/i.test(raw)) return false;
+    var bare = String(raw).replace(/[\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\u061C\uFEFF\u180E]/g, "");
+    if (/hayes|harris/i.test(bare)) return false;
     return boyFold(raw);
   }
   function nameHit(text) {
@@ -335,7 +337,10 @@
     if (typeof ev === "string") ev = { summary: ev, what: ev };
     if (ev.status === "cancelled" || ev.status === "canceled") return true;
     if (CANCEL.test(titleBlob(ev))) return true;
-    if (isAppointment(ev)) return !(wardosShow(ev) || titleHasBoy(ev));
+    if (isAppointment(ev)) {
+      if (titleHasBoy(ev)) return false;
+      return !wardosShow(ev);
+    }
     var blob = sourceBlob(ev);
     if (HARD.test(prepText(blob)) || HARD.test(blob)) return true;
     if (isBoy(audience) || isBoy(ev.kid) || isBoy(ev.owner) || isBoy(ev.kidId)) {
@@ -481,11 +486,15 @@
     if (!ev || typeof ev !== "object") return null;
     if (ev.status === "cancelled" || ev.status === "canceled") return null;
     if (CANCEL.test(titleBlob(ev))) return null;
+    if (ev.dadOnly && who !== "adult") return null;
     var title = "";
     if (isAppointment(ev)) {
-      /* A boy name plus a health word is Appointment everywhere, including Dad's own board. */
-      if (!wardosShow(ev) && !titleHasBoy(ev)) return null;
-      title = "Appointment";
+      /* Locked views drop a boy-name row even when it is marked. Dad's own board
+         shows Appointment for a folded name plus a health word. A zero-width
+         spelling is not that folded form. An unmarked row with no folded name drops. */
+      if (who === "adult" && titleHasBoy(ev)) title = "Appointment";
+      else if (titleHasBoy(ev) || !wardosShow(ev)) return null;
+      else title = "Appointment";
     } else {
       if (HARD.test(prepText(sourceBlob(ev)))) return null;
       title = cannedTitle(ev);
@@ -516,6 +525,7 @@
   }
 
   function applyRow(row, audience) {
+    if (row && row.dadOnly && audienceOf(audience) !== "adult") return null;
     var view = summarize(row, audience);
     if (!view) return null;
     /* Allowlist by construction: the row that reaches a board is the label, the clock, and the show flag. */

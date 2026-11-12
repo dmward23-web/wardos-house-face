@@ -3,21 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <script>
-(function () {
-  var gone = false;
-  function go(ev) {
-    var t = ev.target;
-    var a = t && t.closest ? t.closest("a.wardos-home, a[data-kw-home]") : null;
-    if (!a || gone) return;
-    gone = true;
-    if (ev.cancelable) ev.preventDefault();
-    ev.stopPropagation();
-    location.href = a.href;
-  }
-  document.addEventListener("pointerdown", go, true);
-  document.addEventListener("touchstart", go, true);
-  document.addEventListener("click", go, true);
-})();
+/* The Home control is a real link in the first paint. Do not preventDefault:
+   cancelling pointerdown aborted the browser navigation and the retry was the
+   one ~1.8s press-to-request outlier. One native navigation, no second assign. */
 </script>
 <script src="house-hub.js?v=HUBPAIR1"></script>
 <script src="private-feed.js?v=HUBPAIR1D"></script>
@@ -294,9 +282,9 @@ html body .cam-path,html body #cam-next-step{display:none!important}
 <script src="wardos-stage.js?v=ACERFIX1"></script>
 </head>
 <body>
-<a class="wardos-home" href="sheet-index.html" data-kw-home aria-label="Home" style="position:fixed;left:48px;top:48px;width:64px;height:64px;z-index:80;display:flex;align-items:center;justify-content:center;pointer-events:auto"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64" style="width:64px;height:64px;pointer-events:none"></a>
 <div class="panel cams-cmd">
- <header class="hdr hdr--clockfirst">
+ <header class="hdr hdr--clockfirst gh-top">
+ <a class="wardos-home" href="sheet-index.html" data-kw-home aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a>
  <div class="hdr-left-col">
  <div class="live-clock-host" aria-label="America/Chicago time">
  <div class="live-clock" data-live-clock></div>
@@ -551,46 +539,50 @@ html body .cam-path,html body #cam-next-step{display:none!important}
   }
 }
 </style>
+<style id="gh-wall-fit">
+@media (min-width: 1400px) and (min-height: 700px) {
+  html body .panel.cams-cmd {
+    width: 1824px !important; max-width: 1824px !important; height: 984px !important; min-height: 0 !important;
+    margin: 48px !important; box-sizing: border-box !important; overflow: hidden !important;
+    display: flex !important; flex-direction: column !important;
+  }
+  html body .panel.cams-cmd > .hdr.gh-top {
+    display: grid !important; grid-template-columns: 64px minmax(0, auto) minmax(0, 1fr) auto !important;
+    align-items: center !important; column-gap: 16px !important; position: relative !important; overflow: visible !important;
+  }
+  html body .panel.cams-cmd > .hdr.gh-top > a.wardos-home {
+    position: relative !important; left: auto !important; top: auto !important; grid-column: 1 !important; grid-row: 1 !important;
+    width: 64px !important; height: 64px !important; z-index: 2 !important; display: flex !important; align-items: center !important; justify-content: center !important;
+  }
+  html body .panel.cams-cmd > .hdr.gh-top > .hdr-left-col { grid-column: 2 !important; grid-row: 1 !important; min-width: 0 !important; position: relative !important; }
+  html body .panel.cams-cmd > .hdr.gh-top > .hdr-spacer { grid-column: 3 !important; }
+  html body .panel.cams-cmd > .hdr.gh-top > .hdr-right-tools { grid-column: 4 !important; }
+  html body .panel.cams-cmd .live-clock-host { position: relative !important; left: auto !important; top: auto !important; width: auto !important; max-width: none !important; overflow: visible !important; }
+  html body .panel.cams-cmd .live-clock, html body .panel.cams-cmd [data-live-clock] {
+    font-size: 36px !important; line-height: 1.1 !important; white-space: nowrap !important; overflow: visible !important; max-width: none !important; width: auto !important;
+  }
+  html body .panel.cams-cmd > .cam-zone { flex: 1 1 auto !important; min-height: 0 !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; }
+  html body .panel.cams-cmd .cam-grid {
+    flex: 1 1 auto !important; min-height: 0 !important; height: auto !important;
+    grid-template-columns: 1fr 1fr 1fr !important; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) !important;
+  }
+  html body .panel.cams-cmd article.cam { min-height: 0 !important; height: 100% !important; overflow: hidden !important; }
+}
+</style>
 <script>
-/* 1920x1080 wall only: 12-column panel inside the 48px safe area, clock fully visible. */
 (function () {
   function fit() {
     if ((window.innerWidth || 0) < 1400 || (window.innerHeight || 0) < 700) return;
-    var panel = document.querySelector(".panel.cams-cmd");
-    if (panel) {
-      panel.style.setProperty("width", "1824px", "important");
-      panel.style.setProperty("max-width", "1824px", "important");
-      panel.style.setProperty("height", "984px", "important");
-      panel.style.setProperty("min-height", "0", "important");
-      panel.style.setProperty("margin", "48px", "important");
-      panel.style.setProperty("box-sizing", "border-box", "important");
-      panel.style.setProperty("overflow", "visible", "important");
+    var home = document.querySelector("a.wardos-home");
+    if (home) {
+      home.style.setProperty("position", "relative", "important");
+      home.style.setProperty("left", "auto", "important");
+      home.style.setProperty("top", "auto", "important");
     }
-    var host = document.querySelector(".hdr.hdr--clockfirst .live-clock-host");
-    if (host) {
-      host.style.setProperty("position", "relative", "important");
-      host.style.setProperty("left", "auto", "important");
-      host.style.setProperty("top", "auto", "important");
-      host.style.setProperty("width", "auto", "important");
-      host.style.setProperty("min-width", "0", "important");
-      host.style.setProperty("max-width", "none", "important");
-      host.style.setProperty("overflow", "visible", "important");
-      host.style.setProperty("flex", "0 0 auto", "important");
-    }
-    document.querySelectorAll(".hdr.hdr--clockfirst .live-clock, .hdr.hdr--clockfirst [data-live-clock]").forEach(function (el) {
-      el.style.setProperty("font-size", "36px", "important");
-      el.style.setProperty("line-height", "1.1", "important");
-      el.style.setProperty("white-space", "nowrap", "important");
-      el.style.setProperty("overflow", "visible", "important");
-      el.style.setProperty("text-overflow", "clip", "important");
-      el.style.setProperty("max-width", "none", "important");
-      el.style.setProperty("width", "auto", "important");
-    });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fit);
   else fit();
   window.addEventListener("load", fit);
-  setTimeout(fit, 300);
 })();
 </script>
 </body>
