@@ -164,7 +164,7 @@
   }
   /* Appointment words, including a digit-folded or separator-stripped disguise.
      ot and pt match a whole token only, so "photo" and "soccer" stay activities. */
-  var APPT_LONG = ["appointment", "session", "dentist", "doctor", "therapy", "therapist", "appt", "speech", "ortho", "orthodontist", "pediatric", "pediatrician", "checkup", "physical", "clinic", "evaluation", "tutoring", "urgentcare", "eyeexam", "flushot", "psycheval", "allergist", "dental"];
+  var APPT_LONG = ["appointment", "session", "dentist", "doctor", "therapy", "therapist", "appt", "speech", "ortho", "orthodontist", "pediatric", "pediatrician", "checkup", "physical", "clinic", "evaluation", "tutoring", "urgentcare", "eyeexam", "flushot", "psycheval", "allergist", "dental", "telehealth", "counsel", "anxiety", "provider"];
   var APPT_SHORT = { ot: 1, pt: 1, appt: 1, aba: 1, er: 1, mtg: 1, labs: 1, exam: 1, eval: 1, shot: 1 };
   function apptForms(s) {
     var p = prepText(s);
@@ -185,18 +185,44 @@
     return false;
   }
   var SKIP_SCAN = /^(id|kind|startIso|endIso|start|end|when|time|tz|status|tone|wardosShow|allDay|leaveBy|timeRole)$/i;
-  var KEY_BAGS = /^(attendees|organizer|creator|extendedProperties|conferenceData|location)$/i;
-  function walkValues(v, fn, seen, keysToo) {
+  /* Every string, at every depth. No named-field list: attachments, source, gadget, and unknown keys count. */
+  function walkValues(v, fn, seen) {
     if (typeof v === "string") { fn(v); return; }
     if (!v || typeof v !== "object") return;
     if (seen) { if (seen.has(v)) return; seen.add(v); }
-    if (Array.isArray(v)) { for (var i = 0; i < v.length; i++) walkValues(v[i], fn, seen, keysToo); return; }
+    if (Array.isArray(v)) { for (var i = 0; i < v.length; i++) walkValues(v[i], fn, seen); return; }
     var keys = Object.keys(v);
     for (var k = 0; k < keys.length; k++) {
-      if (SKIP_SCAN.test(keys[k])) continue;
-      if (keysToo || KEY_BAGS.test(keys[k])) fn(keys[k]);
-      walkValues(v[keys[k]], fn, seen, keysToo || KEY_BAGS.test(keys[k]));
+      if (SKIP_SCAN.test(keys[k]) || keys[k] === "_feed") continue;
+      walkValues(v[keys[k]], fn, seen);
     }
+  }
+  function boyAnywhere(ev) {
+    var hit = false;
+    walkValues(ev, function (s) {
+      if (hit) return;
+      var bare = String(s).replace(/[\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\u061C\uFEFF\u180E]/g, "");
+      try { bare = bare.normalize("NFKC"); } catch (e) { /* already folded */ }
+      if (/hayes|harris/i.test(bare) || boyFold(bare)) hit = true;
+    }, typeof WeakSet === "function" ? new WeakSet() : null);
+    return hit;
+  }
+  function zwBoyTitle(ev) {
+    var raw = titleBlob(ev);
+    if (/hayes|harris/i.test(raw)) return false;
+    var bare = String(raw).replace(/[\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\u061C\uFEFF\u180E]/g, "");
+    return /hayes|harris/i.test(bare);
+  }
+  function feedSlot(ev, audience) {
+    var a = String(audience || "").toLowerCase();
+    if (a === "hayes" || a === "harris") return "boy";
+    if (a === "ainsley") return "ainsley";
+    if (a === "adult" || a === "dan" || a === "dad") return "dad";
+    var bag = "";
+    if (ev && typeof ev === "object") bag = [ev.kid, ev.owner, ev.kidId, ev._feed, ev.c].map(function (x) { return textOf(x); }).join(" ").toLowerCase();
+    if (/\b(hayes|harris)\b/.test(bag) || /\b(hay|har)\b/.test(bag)) return "boy";
+    if (/\bainsley\b/.test(bag) || /\bain\b/.test(bag)) return "ainsley";
+    return "none";
   }
   /* Any appointment or health word, in any field, wins over a sport or school label. */
   function isAppointment(ev) {
@@ -487,21 +513,29 @@
     if (ev.status === "cancelled" || ev.status === "canceled") return null;
     if (CANCEL.test(titleBlob(ev))) return null;
     if (ev.dadOnly && who !== "adult") return null;
+    var slot = feedSlot(ev, audience);
     var title = "";
     if (isAppointment(ev)) {
-      /* Locked views drop a boy-name row even when it is marked. Dad's own board
-         shows Appointment for a folded name plus a health word. A zero-width
-         spelling is not that folded form. An unmarked row with no folded name drops. */
-      if (who === "adult" && titleHasBoy(ev)) title = "Appointment";
-      else if (titleHasBoy(ev) || !wardosShow(ev)) return null;
-      else title = "Appointment";
+      /* Locked views: Appointment only with the show marker, an Ainsley/Dad/no-kid slot,
+         and no boy name or boy health term in any string. A Hayes or Harris slot drops.
+         Dad's own board keeps the r45 drops: a zero-width boy name, or an unmarked
+         plain checkup, is not Appointment. A folded name plus a health word is. */
+      if (who === "adult") {
+        if (zwBoyTitle(ev)) return null;
+        if (titleHasBoy(ev)) title = "Appointment";
+        else if (!wardosShow(ev)) return null;
+        else if (boyAnywhere(ev) && !/hayes|harris/i.test(titleBlob(ev))) return null;
+        else title = "Appointment";
+      } else {
+        if (slot === "boy" || boyAnywhere(ev) || !wardosShow(ev)) return null;
+        title = "Appointment";
+      }
     } else {
       if (HARD.test(prepText(sourceBlob(ev)))) return null;
       title = cannedTitle(ev);
       if (!title) {
-        /* Kid boards, the shared hub (including the Dad tile) and the calendar views never show free text. */
         if (who !== "adult") return null;
-        if (boyNamed(ev)) return null;
+        if (titleHasBoy(ev) || boyNamed(ev)) return null;
         title = plainTitle(ev);
       }
       if (!title) return null;

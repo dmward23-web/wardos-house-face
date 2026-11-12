@@ -36,7 +36,7 @@ with sync_playwright() as p:
             except Exception:
                 pass
             try:
-                page.wait_for_url("**sheet-index.html**", timeout=20000)
+                page.wait_for_url("**sheet-index.html**", timeout=8000)
             except Exception:
                 pass
             dt = (time.perf_counter() - t0) * 1000

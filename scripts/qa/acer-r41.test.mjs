@@ -124,7 +124,7 @@ test("r41 a name no longer shows an appointment; the private flag still does", (
   assert.match(flagged.time, /10:30/);
   assert.equal(D.summarize({ what: "Hayes appointment", startIso: WHEN }, "ainsley"), null);
   assert.equal(D.summarize({ what: "Ainsley Hayes dentist", startIso: WHEN }, "ainsley"), null);
-  assert.equal(D.summarize(Object.assign({ what: "Hayes dentist", startIso: WHEN }, show), "hub").title, "Appointment");
+  assert.equal(D.summarize(Object.assign({ what: "Hayes dentist", startIso: WHEN }, show), "hub"), null);
   assert.equal(D.summarize({ what: "Dan dentist", startIso: WHEN }, "dan"), null);
   assert.equal(D.summarize({ what: "Dad session", startIso: WHEN }, "dad"), null);
   assert.equal(D.summarize({ what: "Dan dentist", startIso: WHEN }, "ainsley"), null);

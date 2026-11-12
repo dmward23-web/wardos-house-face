@@ -779,7 +779,8 @@
     if (!D || typeof D.summarize !== "function") return "";
     var ev = { summary: s, title: s, what: s };
     if (extra && typeof extra === "object") {
-      ["location", "description", "notes", "attendees", "organizer", "extendedProperties", "conferenceData", "eventType"].forEach(function (k) {
+      Object.keys(extra).forEach(function (k) {
+        if (k === "l") return;
         if (extra[k] != null) ev[k] = extra[k];
       });
     }

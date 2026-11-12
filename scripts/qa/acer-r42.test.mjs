@@ -107,7 +107,10 @@ test("r42 the 301-probe matrix leaks nothing", () => {
 test("r42 marker, near-miss, soccer, and literal controls", () => {
   const D = boot();
   const boy = { what: "Hayes dentist", notes: "Harris", startIso: WHEN };
-  for (const who of ["hub", "shared", "ainsley", "dan", "dad"]) {
+  for (const who of ["hub", "shared", "ainsley"]) {
+    assert.equal(D.summarize(Object.assign({}, boy, MARK), who), null, who);
+  }
+  for (const who of ["dan", "dad"]) {
     const view = D.summarize(Object.assign({}, boy, MARK), who);
     assert.equal(view && view.title, "Appointment", who);
     assert.equal(/hayes|harris|dentist|ainsley/i.test(view.title), false, who);

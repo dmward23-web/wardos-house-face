@@ -324,36 +324,66 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
   }
   /* Classify while organizer and the other signal fields are still on the row.
      A therapy object used to be deleted first, and the canned title (Raffle) survived. */
-  function classifyFetched(v) {
+  function dadPage() {
+    try { return /sheet-dan\.html/i.test(String(g.location && g.location.pathname || "")); } catch (e) { return false; }
+  }
+  function slotFromKey(key) {
+    var k = String(key || "").toLowerCase();
+    if (k === "hayes" || k === "harris" || k === "hay" || k === "har") return "boy";
+    if (k === "ainsley" || k === "ain") return "ainsley";
+    if (k === "dan" || k === "dad") return "dad";
+    return "";
+  }
+  function slotOfRow(v, slot) {
+    if (slot === "boy" || slot === "ainsley") return slot;
+    var c = String(v && v.c || "").toLowerCase();
+    if (c === "hay" || c === "har") return "boy";
+    if (c === "ain") return "ainsley";
+    var kid = String(v && (v.kid || v.owner || v.kidId) || "").toLowerCase();
+    if (kid === "hayes" || kid === "harris") return "boy";
+    if (kid === "ainsley") return "ainsley";
+    return slot || "";
+  }
+  /* Rebuild the row to the allowlist label only, before any page holds the raw strings. */
+  function classifyFetched(v, slot) {
     var D = g.HouseEventDisplay;
-    if (!eventSignal(v) || !D || typeof D.isAppointment !== "function" || typeof D.summarize !== "function") return v;
-    if (!D.isAppointment(v)) return v;
-    var shared = D.summarize(v, "shared");
-    var dad = D.summarize(v, "adult");
-    if (!shared && !dad) return null;
-    var time = (dad && dad.time) || (shared && shared.time) || "";
-    var when = v.when || time;
-    var start = v.start || v.startIso || "";
-    var end = v.end || v.endIso || "";
-    if (!shared && dad) {
-      return { what: "Appointment", title: "Appointment", summary: "Appointment", label: "Appointment", text: "Appointment", when: when, time: time, start: start, startIso: v.startIso || start, end: end, dadOnly: true, wardosShow: true };
-    }
-    return { what: shared.title, title: shared.title, summary: shared.title, label: shared.title, text: shared.title, when: when, time: shared.time || "", start: start, startIso: v.startIso || start, end: end, wardosShow: shared.title === "Appointment" };
+    if (!eventSignal(v) || !D || typeof D.summarize !== "function") return v;
+    var row = {};
+    var ks = Object.keys(v);
+    for (var i = 0; i < ks.length; i++) row[ks[i]] = v[ks[i]];
+    var use = slotOfRow(v, slot);
+    if (use) row._feed = use === "boy" ? "hayes" : use;
+    var aud = dadPage() ? "adult" : (use === "boy" ? "hayes" : (use === "ainsley" ? "ainsley" : "shared"));
+    var view = D.summarize(row, aud);
+    if (!view || !view.title) return null;
+    var label = view.title;
+    var next = {
+      what: label, title: label, summary: label, label: label, text: label, l: label,
+      when: view.time || "", time: view.time || "",
+      start: v.start || v.startIso || "",
+      startIso: v.startIso || (typeof v.start === "string" ? v.start : "") || "",
+      end: v.end || v.endIso || "",
+      id: v.id || ""
+    };
+    if (v.c === "hay" || v.c === "har" || v.c === "ain" || v.c === "shr" || v.c === "aware") next.c = v.c;
+    if (label === "Appointment") next.wardosShow = true;
+    return next;
   }
   function cleanFeed(name, data) {
-    function walk(v, key) {
+    function walk(v, key, slot) {
       if (Array.isArray(v)) {
         var out = [];
         for (var i = 0; i < v.length; i++) {
-          if (typeof v[i] === "string") { if (!isCustody(v[i])) out.push(walk(v[i], key)); continue; }
+          if (typeof v[i] === "string") { if (!isCustody(v[i])) out.push(walk(v[i], key, slot)); continue; }
           if (rowDress(v[i]) || rowCustody(v[i])) continue;
           if (eventSignal(v[i])) {
-            var classified = classifyFetched(v[i]);
+            var classified = classifyFetched(v[i], slot);
             if (classified == null) continue;
-            if (classified !== v[i]) { out.push(classified); continue; }
+            out.push(classified);
+            continue;
           }
           if (rowTherapy(v[i])) continue;
-          out.push(walk(v[i], key));
+          out.push(walk(v[i], key, slot));
         }
         return out;
       }
@@ -361,22 +391,31 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
         if (typeof v.description === "string" && showMarker(v.description)) { v.wardosShow = true; v.description = ""; }
         var priv = v.extendedProperties && v.extendedProperties.private;
         if (priv && priv["wardos.show"] === "1") v.wardosShow = true;
+        if (eventSignal(v) && key) {
+          var self = classifyFetched(v, slot);
+          if (self == null) return null;
+          if (self !== v) return self;
+        }
         var r = {};
         for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k)) {
+          var childSlot = slotFromKey(k) || slot;
           if (eventSignal(v[k])) {
-            var child = classifyFetched(v[k]);
+            var child = classifyFetched(v[k], childSlot);
             if (child == null) continue;
-            if (child !== v[k]) { r[k] = child; continue; }
+            r[k] = child;
+            continue;
           }
           if ((rowDress(v[k]) || rowCustody(v[k]) || (rowTherapy(v[k]) && typeof v[k] === "object")) && k !== "kids" && !SIGNAL_KEY.test(k)) continue;
-          r[k] = walk(v[k], k);
+          var walked = walk(v[k], k, childSlot);
+          if (walked == null) continue;
+          r[k] = walked;
         }
         return r;
       }
       if (typeof v === "string" && !(key && SKIP_KEY.test(key))) return isCustody(v) ? "" : faceText(v);
       return v;
     }
-    try { return data && typeof data === "object" ? feedAinsley(name, walk(data, "")) : data; } catch (e) { return data; }
+    try { return data && typeof data === "object" ? feedAinsley(name, walk(data, "", "")) : data; } catch (e) { return data; }
   }
 
   g.HouseFaceLaw = { moneyFree: moneyFree, MONEY_SRC: MONEY_SRC, SIGN_SRC: SIGN_SRC, MONEY_RE: MONEY_RE, MONEY_LB_OK: MONEY_LB_OK, MONEY_LB_FALLBACK: MONEY_LB_FALLBACK, SIGN_RE: SIGN_RE, isCustody: isCustody, cleanFeed: cleanFeed, faceText: faceText, isDressDay: isDressDay, isColorDay: isColorDay, faceDash: faceDash, rowEnded: rowEnded, keepRow: keepRow, keepEvent: keepEvent, isTherapy: isTherapy, rowTherapy: rowTherapy, ainsleyText: ainsleyText, THERAPY: THERAPY, cleanKidsWeek: cleanKidsWeek, cleanKid: cleanKid, ctNow: ctNow, DRESS: DRESS, RENDER_RULES: RENDER_RULES, schoolWord: schoolWord, momFree: momFree, cleanAinsley: cleanAinsley, isSpecialText: isSpecialText, isSpecialRow: isSpecialRow }; /* SPECIALSLAW1 r2 · node: scripts/specials-law.mjs */

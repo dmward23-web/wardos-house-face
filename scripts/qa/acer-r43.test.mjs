@@ -59,7 +59,7 @@ test("r43 health, money, and adult titles stay off the locked views", () => {
     assert.equal(D.summarize(row, "ainsley"), null, field);
   }
   const marked = D.summarize({ what: "Hayes dentist", notes: "Harris", description: "#wardos-show", startIso: WHEN }, "hub");
-  assert.equal(marked && marked.title, "Appointment");
+  assert.equal(marked, null);
   assert.equal(D.summarize({ what: "Hayes soccer", startIso: WHEN }, "ainsley").title, "Soccer");
   for (const label of ["Swim", "Homework", "Conference", "Field trip", "Art club", "Choir", "Raffle", "Book order", "Donation", "HOA", "Picture day", "No school"]) {
     assert.equal(D.summarize({ what: label, startIso: WHEN }, "shared").title, label);
@@ -77,6 +77,7 @@ test("r43 a scrubbed payload keeps only allowlisted labels", () => {
         { what: bit("H4", " yes", " check", "up"), who: bit("Hay", "es", " Wa", "rd"), kidName: bit("Harr", "is", " Wa", "rd"), htmlLink: "https://example.test/secret-link-token", startIso: WHEN },
         { what: bit("Ven", "mo", " Er", "in"), startIso: WHEN },
         { what: bit("Hay", "es", " soccer"), startIso: WHEN },
+        { what: "Dentist", description: "#wardos-show", startIso: WHEN },
         { what: bit("Hay", "es", " ther", "apy"), description: "#wardos-show", who: bit("Hay", "es", " Wa", "rd"), startIso: WHEN }
       ] },
       dan: { today: [{ what: bit("Pay", " child", " sup", "port"), startIso: WHEN }, { what: bit("Mort", "gage", " due"), startIso: WHEN }] }

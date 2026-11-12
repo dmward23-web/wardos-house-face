@@ -53,7 +53,7 @@ days["2026-11-12"] = {"items": [
 field_items = []
 for key, value in FIELDS:
     field_items.append({"c": "shr", "l": "Homework", key: value})
-days["2026-11-12"]["items"] = [{"c": "hay", "l": SOCCER}, {"c": "hay", "l": BOY}] + field_items
+days["2026-11-12"]["items"] = [{"c": "hay", "l": SOCCER}, {"c": "hay", "l": BOY}, {"c": "ain", "l": "Dentist", "description": "#wardos-show"}] + field_items
 for n, label in enumerate(LABELS):
     iso = "2026-11-%02d" % (13 + n)
     days[iso] = {"items": [{"c": "shr", "l": label}]}
