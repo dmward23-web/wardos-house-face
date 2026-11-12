@@ -190,11 +190,22 @@
     for (i = 0; i < rest.length; i++) if (apptKeyword(rest[i])) return true;
     return false;
   }
+  /* A show line is the whole line, case-sensitive, after ASCII trim. A zero-width or bidi mark keeps it from matching. */
+  function exactShowLine(text) {
+    var lines = String(text || "").split(/\r\n|\n|\r/);
+    var i;
+    for (i = 0; i < lines.length; i++) {
+      var line = lines[i].replace(/^[ \t\f\v]+|[ \t\f\v]+$/g, "");
+      if (line === "#wardos-show") return true;
+    }
+    return false;
+  }
   function wardosShow(ev) {
     if (!ev || typeof ev !== "object") return false;
+    if (ev.wardosShow === true) return true;
     var priv = ev.extendedProperties && ev.extendedProperties.private;
     if (priv && priv["wardos.show"] === "1") return true;
-    if (ev["wardos.show"] === "1") return true;
+    if (exactShowLine(ev.description)) return true;
     return false;
   }
   function pushStrings(v, out, seen) {
@@ -243,24 +254,9 @@
     for (var i = 0; i < bits.length; i++) if (re.test(prepText(bits[i]))) return true;
     return false;
   }
-  function dadTile(audience) {
-    var a = String(audience || "").toLowerCase();
-    return a === "dan" || a === "dad" || a === "adult";
-  }
-  /* Ainsley is the allow token on her board and the hub. Dan and Dad count only on the Dad tile. */
-  function allowedName(ev, audience) {
-    if (hasWord(ev, "ainsley")) return true;
-    if (dadTile(audience) && (hasWord(ev, "dan") || hasWord(ev, "dad"))) return true;
-    return false;
-  }
-  /* Show an appointment row. Boy name denies even when Ainsley is present, unless wardos.show is 1. */
-  function keepAppointment(ev, audience) {
-    if (!ev) return false;
-    if (wardosShow(ev)) return true;
-    if (!isAppointment(ev)) return false;
-    if (boyNamed(ev)) return false;
-    if (audience == null) return allowedName(ev, "ainsley") || allowedName(ev, "adult");
-    return allowedName(ev, audience);
+  /* No name allow. An appointment renders only when the show marker is present. */
+  function keepAppointment(ev) {
+    return !!(ev && isAppointment(ev) && wardosShow(ev));
   }
   function skeletonOf(s) { return prepText(s).replace(/[^a-z]/g, ""); }
   function foreignLetter(s) {
@@ -325,8 +321,7 @@
     if (typeof ev === "string") ev = { summary: ev, what: ev };
     if (ev.status === "cancelled" || ev.status === "canceled") return true;
     if (CANCEL.test(titleBlob(ev))) return true;
-    if (wardosShow(ev)) return false;
-    if (isAppointment(ev)) return !keepAppointment(ev, audience);
+    if (isAppointment(ev)) return !wardosShow(ev);
     var blob = sourceBlob(ev);
     if (HARD.test(prepText(blob)) || HARD.test(blob)) return true;
     if (isBoy(audience) || isBoy(ev.kid) || isBoy(ev.owner) || isBoy(ev.kidId)) {
@@ -473,8 +468,8 @@
     if (ev.status === "cancelled" || ev.status === "canceled") return null;
     if (CANCEL.test(titleBlob(ev))) return null;
     var title = "";
-    if (wardosShow(ev) || isAppointment(ev)) {
-      if (!keepAppointment(ev, audience)) return null;
+    if (isAppointment(ev)) {
+      if (!wardosShow(ev)) return null;
       title = "Appointment";
     } else {
       if (HARD.test(prepText(sourceBlob(ev)))) return null;
@@ -509,12 +504,12 @@
   function applyRow(row, audience) {
     var view = summarize(row, audience);
     if (!view) return null;
-    /* The allow decision is made once. Later paints only see the fixed label, so the flag has to stay. */
-    if (view.title === "Appointment") {
-      var priv = { "wardos.show": "1" };
-      var prev = row.extendedProperties && row.extendedProperties.private;
-      row.extendedProperties = { private: Object.assign({}, prev || {}, priv) };
-    }
+    /* The marker decision is made once. Later paints only see the fixed label, so the boolean has to stay.
+       Description, links, and nested bags do not stay on the row. */
+    if (view.title === "Appointment") row.wardosShow = true;
+    delete row.description;
+    delete row.htmlLink;
+    delete row.extendedProperties;
     row.what = view.title;
     row.title = view.title;
     row.summary = view.title;

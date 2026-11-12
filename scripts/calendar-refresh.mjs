@@ -272,9 +272,9 @@ function eventProbe(ev, summary) {
 function classify(ev) {
   const summary = summaryOf(ev);
   const probe = eventProbe(ev, summary);
-  /* An allowed appointment is kept as Appointment before the therapy drop, so the private show flag and the Ainsley token survive. */
+  /* A marked appointment is kept as the fixed label. The description itself is not copied onto the row. */
   if (DISPLAY && DISPLAY.keepAppointment && DISPLAY.keepAppointment(probe)) {
-    return { kind: "appointment", summary: summary || "Appointment", extendedProperties: ev.extendedProperties };
+    return { kind: "appointment", summary: "Appointment", wardosShow: true };
   }
   if (!summary || isAdminNoise(summary)) return null;
   /* KID-FEED-SAFETY · provider/therapy is denied before school/other classification. Opt-in is an explicit boolean, never a title. */
@@ -456,7 +456,8 @@ function buildBoardItems(events, now) {
   const items = [];
   for (const ev of events) {
     if (DRESS_RE.test(String(ev.summary || ""))) continue; /* LAW8C1 · colour days stay calendar markers (cal-live), never board rows */
-    if (FACE_LAW.isTherapy(String(ev.summary || ""))) continue; /* LIVEFIX1 · therapy never reaches a board */
+    const marked = DISPLAY && DISPLAY.keepAppointment && DISPLAY.keepAppointment(eventProbe(ev, summaryOf(ev)));
+    if (!marked && FACE_LAW.isTherapy(String(ev.summary || ""))) continue; /* LIVEFIX1 · therapy never reaches a board unless the show marker keeps it as Appointment */
     if (ev.status === "cancelled" || ev.status === "canceled") continue;
     /* CANCELGONE1 · title marked canceled = gone from board */
     if (/^\s*[\[(]?\s*(cancel+ed|cxl)\b/i.test(String(ev.summary || ""))) continue;
@@ -474,11 +475,11 @@ function buildBoardItems(events, now) {
       end,
       startIso: start.toISOString(),
       endIso: end.toISOString(),
-      location: ev.location || "",
+      location: cls.kind === "appointment" ? "" : (ev.location || ""),
       free: isFree(ev),
       raw: summaryOf(ev),
       allDay: isAllDay(ev),
-      extendedProperties: ev.extendedProperties,
+      wardosShow: cls.wardosShow === true
     });
   }
   items.sort((a, b) => a.start - b.start);
@@ -669,8 +670,8 @@ function buildKidToday(kidId, items, now, homeWeek) {
       tone,
     };
     if (it.kind === "appointment") {
-      row.summary = it.raw || it.summary || "";
-      if (it.extendedProperties) row.extendedProperties = it.extendedProperties;
+      row.summary = "Appointment";
+      if (it.wardosShow === true) row.wardosShow = true;
     }
     rows.push(row);
   }
@@ -729,11 +730,11 @@ function buildKidAppointments(kidId, items, now) {
     const row = {
       when: `${fmtDayLabel(it.start)} · ${whenTime(it)}`,
       what: "Appointment",
-      summary: it.raw || it.summary || "",
-      hint: "with Dad",
+      summary: "Appointment",
+      hint: "",
       tone: "hot",
     };
-    if (it.extendedProperties) row.extendedProperties = it.extendedProperties;
+    if (it.wardosShow === true) row.wardosShow = true;
     if (it.herSpace) row.herSpace = true;
     out.push(row);
   }
@@ -814,8 +815,8 @@ function buildDanToday(items, now, homeWeek) {
       tone: it.kind === "leave" || it.kind === "sport" || it.kind === "appointment" || it.kind === "dad" ? "hot" : "act",
     };
     if (it.kind === "appointment") {
-      dadRow.summary = it.raw || it.summary || "";
-      if (it.extendedProperties) dadRow.extendedProperties = it.extendedProperties;
+      dadRow.summary = "Appointment";
+      if (it.wardosShow === true) dadRow.wardosShow = true;
     }
     rows.push(dadRow);
   }

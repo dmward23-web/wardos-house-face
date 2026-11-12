@@ -308,10 +308,24 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     try { if (name === "kids-week" && d && d.kids && d.kids.ainsley) cleanAinsley(d.kids.ainsley); } catch (e) { /* never break a board */ }
     return d;
   }
+  function showMarker(text) {
+    var lines = String(text || "").split(/\r\n|\n|\r/);
+    var i;
+    for (i = 0; i < lines.length; i++) {
+      var line = lines[i].replace(/^[ \t\f\v]+|[ \t\f\v]+$/g, "");
+      if (line === "#wardos-show") return true;
+    }
+    return false;
+  }
   function cleanFeed(name, data) {
     function walk(v, key) {
       if (Array.isArray(v)) { var out = []; for (var i = 0; i < v.length; i++) { if (!rowDress(v[i]) && !rowCustody(v[i]) && !rowTherapy(v[i]) && !(typeof v[i] === "string" && isCustody(v[i]))) out.push(walk(v[i], key)); } return out; }
-      if (v && typeof v === "object") { var r = {}; for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k)) { if ((rowDress(v[k]) || rowCustody(v[k]) || (rowTherapy(v[k]) && typeof v[k] === "object")) && k !== "kids") continue; r[k] = walk(v[k], k); } return r; }
+      if (v && typeof v === "object") {
+        if (typeof v.description === "string" && showMarker(v.description)) { v.wardosShow = true; v.description = ""; }
+        var priv = v.extendedProperties && v.extendedProperties.private;
+        if (priv && priv["wardos.show"] === "1") v.wardosShow = true;
+        var r = {}; for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k)) { if ((rowDress(v[k]) || rowCustody(v[k]) || (rowTherapy(v[k]) && typeof v[k] === "object")) && k !== "kids") continue; r[k] = walk(v[k], k); } return r;
+      }
       if (typeof v === "string" && !(key && SKIP_KEY.test(key))) return isCustody(v) ? "" : faceText(v);
       return v;
     }

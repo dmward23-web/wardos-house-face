@@ -112,25 +112,24 @@ test("r41 benign ampersand rows show and separator swaps stay on normal rows", (
   }
 });
 
-test("r41 appointment allow-list controls", () => {
+test("r41 a name no longer shows an appointment; the private flag still does", () => {
   const D = boot().HouseEventDisplay;
   const show = { extendedProperties: { private: { "wardos.show": "1" } } };
   assert.equal(D.summarize({ what: "Hayes soccer", startIso: "2026-11-12T18:00:00-06:00" }, "ainsley").title, "Soccer");
-  const hers = D.summarize({ what: "Ainsley dentist", startIso: WHEN }, "ainsley");
-  assert.equal(hers.title, "Appointment");
-  assert.match(hers.time, /10:30/);
+  assert.equal(D.summarize({ what: "Ainsley dentist", startIso: WHEN }, "ainsley"), null);
   assert.equal(D.summarize({ what: "Dentist", startIso: WHEN }, "ainsley"), null);
   assert.equal(D.summarize({ what: "Appointment", startIso: WHEN }, "ainsley"), null);
   assert.equal(D.summarize({ what: "Appointment", startIso: WHEN }, "hub"), null);
   const flagged = D.summarize(Object.assign({ what: "Appointment", startIso: WHEN }, show), "ainsley");
   assert.equal(flagged.title, "Appointment");
+  assert.match(flagged.time, /10:30/);
   assert.equal(D.summarize({ what: "Hayes appointment", startIso: WHEN }, "ainsley"), null);
   assert.equal(D.summarize({ what: "Ainsley Hayes dentist", startIso: WHEN }, "ainsley"), null);
   assert.equal(D.summarize(Object.assign({ what: "Hayes dentist", startIso: WHEN }, show), "hub").title, "Appointment");
-  assert.equal(D.summarize({ what: "Dan dentist", startIso: WHEN }, "dan").title, "Appointment");
-  assert.equal(D.summarize({ what: "Dad session", startIso: WHEN }, "dad").title, "Appointment");
+  assert.equal(D.summarize({ what: "Dan dentist", startIso: WHEN }, "dan"), null);
+  assert.equal(D.summarize({ what: "Dad session", startIso: WHEN }, "dad"), null);
   assert.equal(D.summarize({ what: "Dan dentist", startIso: WHEN }, "ainsley"), null);
   assert.equal(D.summarize({ what: "appoint ment", startIso: WHEN }, "shared"), null);
-  assert.equal(D.summarize({ what: "Ainsley OT", notes: "speech", startIso: WHEN }, "ainsley").title, "Appointment");
-  assert.equal(/dentist|Ainsley|speech/i.test(D.summarize({ what: "Ainsley dentist", notes: "room 2", startIso: WHEN }, "hub").title), false);
+  assert.equal(D.summarize({ what: "Ainsley OT", notes: "speech", startIso: WHEN }, "ainsley"), null);
+  assert.equal(D.summarize({ what: "Ainsley dentist", notes: "room 2", startIso: WHEN }, "hub"), null);
 });
