@@ -41,8 +41,7 @@ test("r36 an Ainsley row that names Hayes does not become Appointment", () => {
   assert.equal(D.summarize(row, "ainsley"), null);
   assert.equal(D.summarize(row, "shared"), null);
   const own = D.summarize({ summary: "Appointment", startIso: WHEN }, "ainsley");
-  assert.equal(own.title, "Appointment");
-  assert.match(own.time, /10:30/);
+  assert.equal(own, null);
 });
 
 test("r36 Mercury plates have no smeared left edge and the wrap is mirrored", () => {

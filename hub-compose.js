@@ -70,7 +70,7 @@
     var spec = NAMES[id];
     if (!anchor || !spec) return;
     var kid = data() && data().kids ? data().kids[id] || data().kids[id === "dan" ? "dad" : id] : null;
-    var audience = id === "ainsley" || id === "dan" ? "shared" : id;
+    var audience = id === "dan" ? "adult" : (id === "ainsley" ? "shared" : id);
     var view = soonest(kid, audience, false);
     while (anchor.firstChild) anchor.removeChild(anchor.firstChild);
     var name = document.createElement("span");

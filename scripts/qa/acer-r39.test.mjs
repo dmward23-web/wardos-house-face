@@ -74,15 +74,15 @@ test("r39 disguised appointment names are dropped", () => {
   }
 });
 
-test("r39 soccer, a plain appointment, and ordinary digits still render", () => {
+test("r39 soccer still renders and a nameless appointment drops", () => {
   const D = boot().HouseEventDisplay;
   for (const who of WHO) {
-    assert.equal(D.summarize({ what: "Appointment", startIso: WHEN }, who).title, "Appointment", who);
-    assert.equal(D.summarize({ what: "Appointment", notes: "4:30 PM", room: "4", startIso: WHEN }, who).title, "Appointment", who);
-    assert.equal(D.summarize({ what: "Dentist", notes: "room 15", startIso: WHEN }, who).title, "Appointment", who);
+    assert.equal(D.summarize({ what: "Appointment", startIso: WHEN }, who), null, who);
+    assert.equal(D.summarize({ what: "Appointment", notes: "4:30 PM", room: "4", startIso: WHEN }, who), null, who);
+    assert.equal(D.summarize({ what: "Dentist", notes: "room 15", startIso: WHEN }, who), null, who);
   }
   const soccer = D.summarize({ what: "Hayes soccer", startIso: "2026-11-10T18:00:00-06:00" }, "ainsley");
   assert.equal(soccer.title, "Soccer");
   const dated = D.summarize({ what: "Appointment", notes: "2026-11-10", startIso: WHEN }, "dan");
-  assert.equal(dated.title, "Appointment");
+  assert.equal(dated, null);
 });

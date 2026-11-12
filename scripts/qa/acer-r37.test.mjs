@@ -49,5 +49,5 @@ test("r37 Hayes soccer still renders", () => {
   const row = { what: "Hayes soccer", startIso: "2026-11-10T18:00:00-06:00" };
   const view = D.summarize(row, "ainsley");
   assert.equal(view.title, "Soccer");
-  assert.equal(D.summarize({ what: "Appointment", startIso: WHEN }, "ainsley").title, "Appointment");
+  assert.equal(D.summarize({ what: "Appointment", startIso: WHEN }, "ainsley"), null);
 });

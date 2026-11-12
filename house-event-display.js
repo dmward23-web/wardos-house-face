@@ -83,12 +83,14 @@
       t = t.replace(/<[^>]*>/g, "");
       n++;
     } while (t !== prev && n < 8);
-    var bad = t !== prev || /&[a-zA-Z][a-zA-Z0-9]*;/.test(t);
+    /* An unknown &name; stays literal text. It is not a reason to drop the row. */
+    var bad = t !== prev;
     t = nfkd(t);
     try { t = t.replace(/\p{M}/gu, ""); }
     catch (e) { t = t.replace(/[\u0300-\u036F]/g, ""); }
     try { t = t.replace(/\p{Cf}/gu, ""); }
-    catch (e2) { t = t.replace(/[\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\uFEFF]/g, ""); }
+    catch (e2) { t = t.replace(/[\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\u061C\uFEFF]/g, ""); }
+    t = t.replace(/[\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, "");
     t = t.replace(/\u00AD/g, "");
     return { text: t, bad: bad };
   }
@@ -144,6 +146,121 @@
       if (/hayes|harris/.test(foldDigits(tok, "i")) || /hayes|harris/.test(foldDigits(tok, "l"))) return true;
     }
     return false;
+  }
+  /* Appointment words, including a digit-folded or separator-stripped disguise.
+     ot and pt match a whole token only, so "photo" and "soccer" stay activities. */
+  var APPT_LONG = ["appointment", "session", "dentist", "doctor", "therapy", "therapist", "appt", "speech", "ortho", "orthodontist", "pediatric", "pediatrician"];
+  var APPT_SHORT = { ot: 1, pt: 1, appt: 1 };
+  function apptForms(s) {
+    var p = prepText(s);
+    var flat = p.replace(/[^a-z0-9]/g, "");
+    return [flat, foldDigits(flat, "i"), foldDigits(flat, "l")];
+  }
+  function apptKeyword(s) {
+    var forms = apptForms(s);
+    var w, f, i;
+    for (w = 0; w < APPT_LONG.length; w++) {
+      for (f = 0; f < forms.length; f++) if (forms[f].indexOf(APPT_LONG[w]) >= 0) return true;
+    }
+    var tokens = prepText(s).split(/[^a-z0-9]+/);
+    for (i = 0; i < tokens.length; i++) {
+      var a = tokens[i], b = foldDigits(a, "i"), c = foldDigits(a, "l");
+      if (APPT_SHORT[a] || APPT_SHORT[b] || APPT_SHORT[c]) return true;
+    }
+    return false;
+  }
+  function apptFieldList(ev) {
+    if (ev == null) return [];
+    if (typeof ev !== "object") return [String(ev)];
+    var keys = ["summary", "title", "what", "label", "text", "l", "notes", "description", "hint", "comment", "details", "detail", "type", "category", "safeCategory"];
+    var out = [];
+    for (var i = 0; i < keys.length; i++) if (typeof ev[keys[i]] === "string") out.push(ev[keys[i]]);
+    return out;
+  }
+  /* Soccer and practice are activities. A real appointment word elsewhere still wins. */
+  function isAppointment(ev) {
+    var fields = apptFieldList(ev);
+    var title = titleBlob(ev);
+    var rest = [];
+    var i;
+    for (i = 0; i < fields.length; i++) if (fields[i] !== title) rest.push(fields[i]);
+    var stripped = prepText(title).replace(/\b(?:soccer|practices?)\b/g, " ");
+    var titleHit = apptKeyword(stripped);
+    if (titleHit) return true;
+    for (i = 0; i < rest.length; i++) if (apptKeyword(rest[i])) return true;
+    return false;
+  }
+  function wardosShow(ev) {
+    if (!ev || typeof ev !== "object") return false;
+    var priv = ev.extendedProperties && ev.extendedProperties.private;
+    if (priv && priv["wardos.show"] === "1") return true;
+    if (ev["wardos.show"] === "1") return true;
+    return false;
+  }
+  function pushStrings(v, out, seen) {
+    if (typeof v === "string") { out.push(v); return; }
+    if (!v || typeof v !== "object") return;
+    if (seen) { if (seen.has(v)) return; seen.add(v); }
+    if (Array.isArray(v)) { for (var i = 0; i < v.length; i++) pushStrings(v[i], out, seen); return; }
+    var keys = Object.keys(v);
+    for (var k = 0; k < keys.length; k++) {
+      if (SKIP_KEY.test(keys[k]) || /iso$/i.test(keys[k])) continue;
+      pushStrings(v[keys[k]], out, seen);
+    }
+  }
+  function rowStrings(ev) {
+    var out = [];
+    pushStrings(ev, out, typeof WeakSet === "function" ? new WeakSet() : null);
+    if (ev && typeof ev === "object") {
+      ["owner", "who", "with", "kidName"].forEach(function (k) {
+        if (typeof ev[k] === "string") out.push(ev[k]);
+      });
+      pushNamed(ev.attendees, out);
+      pushNamed(ev.organizer, out);
+      pushNamed(ev.creator, out);
+    }
+    return out;
+  }
+  function pushNamed(v, out) {
+    if (typeof v === "string") { out.push(v); return; }
+    if (!v || typeof v !== "object") return;
+    if (Array.isArray(v)) { for (var i = 0; i < v.length; i++) pushNamed(v[i], out); return; }
+    var keys = Object.keys(v);
+    for (var k = 0; k < keys.length; k++) { out.push(keys[k]); pushNamed(v[keys[k]], out); }
+  }
+  function boyNamed(ev) {
+    var bits = rowStrings(ev);
+    for (var i = 0; i < bits.length; i++) {
+      var p = prepText(bits[i]);
+      if (nameHit(p)) return true;
+      if (/hayes|harris/.test(p.replace(/[^a-z]/g, ""))) return true;
+    }
+    return false;
+  }
+  function hasWord(ev, word) {
+    var bits = rowStrings(ev);
+    var re = new RegExp("\\b" + word + "\\b");
+    for (var i = 0; i < bits.length; i++) if (re.test(prepText(bits[i]))) return true;
+    return false;
+  }
+  function dadTile(audience) {
+    var a = String(audience || "").toLowerCase();
+    return a === "dan" || a === "dad" || a === "adult";
+  }
+  /* Ainsley is the allow token on her board and the hub. Dan and Dad count only on the Dad tile. */
+  function allowedName(ev, audience) {
+    if (hasWord(ev, "ainsley")) return true;
+    if (dadTile(audience) && (hasWord(ev, "dan") || hasWord(ev, "dad"))) return true;
+    return false;
+  }
+  /* Show an appointment row. Boy name denies even when Ainsley is present, unless wardos.show is 1. */
+  function keepAppointment(ev, audience) {
+    if (!ev) return false;
+    if (wardosShow(ev)) return true;
+    if (!isAppointment(ev)) return false;
+    if (boyNamed(ev)) return false;
+    if (audience == null) return allowedName(ev, "ainsley") || allowedName(ev, "adult");
+    return allowedName(ev, audience);
   }
   function skeletonOf(s) { return prepText(s).replace(/[^a-z]/g, ""); }
   function foreignLetter(s) {
@@ -205,22 +322,17 @@
   }
   function isDenied(ev, audience) {
     if (!ev) return false;
-    if (typeof ev === "string") {
-      var s = prepText(ev);
-      if (CANCEL.test(s)) return true;
-      if (boyAppt(ev)) return true;
-      if (isBoy(audience)) return HARD.test(s) || SOFT.test(s);
-      return HARD.test(s);
-    }
+    if (typeof ev === "string") ev = { summary: ev, what: ev };
     if (ev.status === "cancelled" || ev.status === "canceled") return true;
-    var blob = sourceBlob(ev);
     if (CANCEL.test(titleBlob(ev))) return true;
-    var who = audience != null ? String(audience) : "";
-    var boy = isBoy(who) || isBoy(ev.kid) || isBoy(ev.owner) || isBoy(ev.kidId);
-    var trusted = /^(ainsley|adult|dan|dad|shared|hub)$/i.test(who);
-    if (HARD.test(blob)) return true;
-    if (boy || !trusted) return SOFT.test(blob);
-    if (boyAppt(ev)) return true;
+    if (wardosShow(ev)) return false;
+    if (isAppointment(ev)) return !keepAppointment(ev, audience);
+    var blob = sourceBlob(ev);
+    if (HARD.test(prepText(blob)) || HARD.test(blob)) return true;
+    if (isBoy(audience) || isBoy(ev.kid) || isBoy(ev.owner) || isBoy(ev.kidId)) {
+      if (SOFT.test(blob) || SOFT.test(prepText(blob))) return true;
+    }
+    if (boyNamed(ev) && !cannedTitle(ev)) return true;
     return false;
   }
 
@@ -300,8 +412,7 @@
     return rs != null && sm != null && rs !== sm;
   }
 
-  function allowTitle(ev, audience) {
-    if (isDenied(ev, audience)) return null;
+  function cannedTitle(ev) {
     var text = titleBlob(ev);
     var kind = kindBlob(ev);
     if (CANCEL.test(text)) return null;
@@ -324,8 +435,6 @@
     if (/\bbook order\b/i.test(text)) return "Book order";
     if (/\bdonation\b/i.test(text)) return "Donation";
     if (/\bHOA\b/.test(text)) return "HOA";
-    /* Ainsley, Dan, and the shared hub. Boys stay on the soft ban above. */
-    if (audienceOf(audience) !== "child" && /\b(?:appointments?|sessions?|dentists?)\b/i.test(text)) return "Appointment";
     if (/^Nothing else on the calendar today$/i.test(text.trim())) return "Nothing else today";
     if (/^More on the month calendar$/i.test(text.trim())) return "More on the month calendar";
     return null;
@@ -352,15 +461,32 @@
     return clock;
   }
 
+  function plainTitle(ev) {
+    var ing = normalizeIngest(titleBlob(ev));
+    return ing.text.replace(/\s+/g, " ").trim();
+  }
+
   function summarize(ev, audience) {
     var who = audienceOf(audience);
     if (typeof ev === "string") ev = { summary: ev, what: ev };
     if (!ev || typeof ev !== "object") return null;
-    if (isDenied(ev, audience)) return null;
-    var title = allowTitle(ev, audience);
-    if (!title) {
-      if (who === "adult") title = "Calendar item";
-      else return null;
+    if (ev.status === "cancelled" || ev.status === "canceled") return null;
+    if (CANCEL.test(titleBlob(ev))) return null;
+    var title = "";
+    if (wardosShow(ev) || isAppointment(ev)) {
+      if (!keepAppointment(ev, audience)) return null;
+      title = "Appointment";
+    } else {
+      if (HARD.test(prepText(sourceBlob(ev)))) return null;
+      title = cannedTitle(ev);
+      if (!title) {
+        if (boyNamed(ev)) return null;
+        title = plainTitle(ev);
+      }
+      if (!title) {
+        if (who === "adult") title = "Calendar item";
+        else return null;
+      }
     }
     var time = timeLabel(ev, who);
     return {
@@ -383,6 +509,12 @@
   function applyRow(row, audience) {
     var view = summarize(row, audience);
     if (!view) return null;
+    /* The allow decision is made once. Later paints only see the fixed label, so the flag has to stay. */
+    if (view.title === "Appointment") {
+      var priv = { "wardos.show": "1" };
+      var prev = row.extendedProperties && row.extendedProperties.private;
+      row.extendedProperties = { private: Object.assign({}, prev || {}, priv) };
+    }
     row.what = view.title;
     row.title = view.title;
     row.summary = view.title;
@@ -450,7 +582,9 @@
   global.HouseEventDisplay = {
     CLINICAL: CLINICAL,
     isDenied: isDenied,
-    allowTitle: allowTitle,
+    allowTitle: cannedTitle,
+    isAppointment: isAppointment,
+    keepAppointment: keepAppointment,
     timeLabel: timeLabel,
     summarize: summarize,
     scrubPayload: scrubPayload,

@@ -61,19 +61,22 @@ test("r40 in-scope disguised appointment names are dropped", () => {
   }
 });
 
-test("r40 Hay 3S stays visible and the two controls hold", () => {
+test("r40 Hay 3S stays visible on a normal row and a nameless appointment drops", () => {
   const D = boot().HouseEventDisplay;
   for (const what of ["Appointment", "Session", "Dentist"]) {
     for (const field of ["notes", "where"]) {
       for (const who of WHO) {
         const row = { what: what, [field]: "Hay 3S", startIso: WHEN };
-        const view = D.summarize(row, who);
-        assert.ok(view && view.title, who + " " + what + " " + field);
-        assert.equal(/hayes|harris/i.test(view.title), false);
+        assert.equal(D.summarize(row, who), null, who + " " + what + " " + field);
       }
     }
   }
+  for (const who of WHO) {
+    const view = D.summarize({ what: "Pack snacks", notes: "Hay 3S", startIso: WHEN }, who);
+    assert.ok(view && view.title, who);
+    assert.equal(/hayes|harris/i.test(view.title), false);
+  }
   assert.equal(D.summarize({ what: "Hayes soccer", startIso: "2026-11-12T18:00:00-06:00" }, "ainsley").title, "Soccer");
-  assert.equal(D.summarize({ what: "Appointment", startIso: WHEN }, "dan").title, "Appointment");
-  assert.equal(D.summarize({ what: "Appointment", notes: "4:30 PM", startIso: WHEN }, "hub").title, "Appointment");
+  assert.equal(D.summarize({ what: "Appointment", startIso: WHEN }, "dan"), null);
+  assert.equal(D.summarize({ what: "Appointment", notes: "4:30 PM", startIso: WHEN }, "hub"), null);
 });

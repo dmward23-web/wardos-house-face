@@ -33,11 +33,9 @@ test("r35 Ainsley and Dan appointments render as Appointment, and the boys still
   const session = { summary: "Session", startIso: WHEN };
   const typed = { summary: bit("den", "tist") + " appointment", startIso: WHEN };
   for (const who of ["ainsley", "shared", "dan", "dad"]) {
-    const view = D.summarize(appt, who);
-    assert.equal(view.title, "Appointment", who);
-    assert.match(view.time, /10:30/);
-    assert.equal(D.summarize(session, who).title, "Appointment", who + " session");
-    assert.equal(D.summarize(typed, who).title, "Appointment", who + " typed");
+    assert.equal(D.summarize(appt, who), null, who);
+    assert.equal(D.summarize(session, who), null, who + " session");
+    assert.equal(D.summarize(typed, who), null, who + " typed");
   }
   assert.equal(D.summarize(appt, "hayes"), null);
   assert.equal(D.summarize(session, "harris"), null);

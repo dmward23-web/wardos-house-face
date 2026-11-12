@@ -15,8 +15,8 @@ WHEN = "2026-11-10T22:30:00-06:00"
 WEEK = {
     "asOfIso": "2026-11-10",
     "kids": {
-        "ainsley": {"today": [{"summary": "Appointment", "what": "Appointment", "kind": "appointment", "startIso": WHEN, "when": "Tue 10 · 10:30 PM"}]},
-        "dan": {"today": [{"summary": "Appointment", "what": "Appointment", "kind": "appointment", "startIso": WHEN, "when": "Tue 10 · 10:30 PM"}]},
+        "ainsley": {"today": [{"summary": "Ainsley dentist", "what": "Ainsley dentist", "kind": "appointment", "startIso": WHEN, "when": "Tue 10 · 10:30 PM"}]},
+        "dan": {"today": [{"summary": "Dad dentist", "what": "Dad dentist", "kind": "appointment", "startIso": WHEN, "when": "Tue 10 · 10:30 PM"}]},
         "hayes": {"today": [{"summary": "Appointment", "what": "Appointment", "kind": "appointment", "startIso": WHEN, "when": "Tue 10 · 10:30 PM"}]},
         "harris": {"today": [{"summary": "Session", "what": "Session", "kind": "session", "startIso": WHEN, "when": "Tue 10 · 10:30 PM"}]},
     },

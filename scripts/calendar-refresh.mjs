@@ -256,11 +256,29 @@ function danWhat(it) {
   return `${KID_NAME[it.kid]} ${what}`;
 }
 
+function eventProbe(ev, summary) {
+  return {
+    summary,
+    title: summary,
+    description: ev.description || "",
+    notes: ev.description || "",
+    location: ev.location || "",
+    type: ev.eventType || ev.type || "",
+    attendees: ev.attendees,
+    organizer: ev.organizer,
+    extendedProperties: ev.extendedProperties
+  };
+}
 function classify(ev) {
   const summary = summaryOf(ev);
+  const probe = eventProbe(ev, summary);
+  /* An allowed appointment is kept as Appointment before the therapy drop, so the private show flag and the Ainsley token survive. */
+  if (DISPLAY && DISPLAY.keepAppointment && DISPLAY.keepAppointment(probe)) {
+    return { kind: "appointment", summary: summary || "Appointment", extendedProperties: ev.extendedProperties };
+  }
   if (!summary || isAdminNoise(summary)) return null;
   /* KID-FEED-SAFETY · provider/therapy is denied before school/other classification. Opt-in is an explicit boolean, never a title. */
-  if (therapyDrop(summary) || (DISPLAY && DISPLAY.isDenied({ summary, title: summary, description: ev.description || "", kind: ev.kind || "" }))) {
+  if (therapyDrop(summary) || (DISPLAY && DISPLAY.isDenied(probe, "shared"))) {
     return null;
   }
   if (/^Kids with Dan/i.test(summary)) return { kind: "custody", summary };
@@ -460,6 +478,7 @@ function buildBoardItems(events, now) {
       free: isFree(ev),
       raw: summaryOf(ev),
       allDay: isAllDay(ev),
+      extendedProperties: ev.extendedProperties,
     });
   }
   items.sort((a, b) => a.start - b.start);
@@ -636,16 +655,24 @@ function buildKidToday(kidId, items, now, homeWeek) {
     let tone = "act";
     let kind = "event";
     if (it.kind === "sport") { tone = "hot"; what = (kidId === "hayes" && /baseball/i.test(it.raw) ? "⚾ " : kidId === "harris" && /flag/i.test(it.raw) ? "🏁 " : kidId === "ainsley" && /swim/i.test(it.raw) ? "" : "") + what; }
-    if (it.kind === "appointment") tone = "hot";
+    if (it.kind === "appointment") {
+      tone = "hot";
+      what = "Appointment";
+    }
     if (it.kind === "leave" && !isKidRide(it, kidId)) continue; // leaves are Dad strip / dan box, not kid glass (KIDRIDE1: own ride stays)
     if (isKidRide(it, kidId) && !rows.some((r) => r.ride)) { rows.unshift({ kind, when: rowWhen(it, now), what, hint: "", tone: "hot", ride: true }); continue; }
-    rows.push({
+    const row = {
       kind,
       when: rowWhen(it, now),
       what,
       hint: it.kind === "sport" ? "YOUR board" : "",
       tone,
-    });
+    };
+    if (it.kind === "appointment") {
+      row.summary = it.raw || it.summary || "";
+      if (it.extendedProperties) row.extendedProperties = it.extendedProperties;
+    }
+    rows.push(row);
   }
   /* DATA1 P2-11 · no custody note row on a kid's today (was "YOUR BASE with Dad" / "Kids away") */
   if (!rows.length) rows.push({ kind: "note", when: "Today", what: "Nothing else on the calendar today", hint: "", tone: "act" });
@@ -701,10 +728,12 @@ function buildKidAppointments(kidId, items, now) {
     if (it.kid && it.kid !== kidId) continue;
     const row = {
       when: `${fmtDayLabel(it.start)} · ${whenTime(it)}`,
-      what: kidsSafeWhat(it.raw, "appointment"),
+      what: "Appointment",
+      summary: it.raw || it.summary || "",
       hint: "with Dad",
       tone: "hot",
     };
+    if (it.extendedProperties) row.extendedProperties = it.extendedProperties;
     if (it.herSpace) row.herSpace = true;
     out.push(row);
   }
@@ -779,11 +808,16 @@ function buildDanToday(items, now, homeWeek) {
     const key = `${when}|${what}`.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
-    rows.push({
+    const dadRow = {
       when,
-      what,
+      what: it.kind === "appointment" ? "Appointment" : what,
       tone: it.kind === "leave" || it.kind === "sport" || it.kind === "appointment" || it.kind === "dad" ? "hot" : "act",
-    });
+    };
+    if (it.kind === "appointment") {
+      dadRow.summary = it.raw || it.summary || "";
+      if (it.extendedProperties) dadRow.extendedProperties = it.extendedProperties;
+    }
+    rows.push(dadRow);
   }
   /* DATA1 P2-11 · no custody closing row (was "Kids with Dad at home through …") */
   if (!rows.length) rows.push({ when: partsInTZ(now).weekday.slice(0, 3), what: "Nothing else on the calendar today", tone: "act" });

@@ -140,6 +140,9 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     return parts.join("\n");
   }
   function rowTherapy(o, kidId) {
+    try {
+      if (g.HouseEventDisplay && HouseEventDisplay.keepAppointment && HouseEventDisplay.keepAppointment(o, kidId || (o && (o.kid || o.owner)))) return false;
+    } catch (e0) { /* display adapter decides */ }
     var raw = sourceOf(o);
     var t = raw;
     try { t = raw.normalize("NFKC"); } catch (e) { /* */ }

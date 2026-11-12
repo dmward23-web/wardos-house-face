@@ -51,10 +51,10 @@ test("r38 appointment rows with a disguised boy name are dropped", () => {
   }
 });
 
-test("r38 a nameless appointment and Hayes soccer still render", () => {
+test("r38 a nameless appointment drops and Hayes soccer still renders", () => {
   const D = boot().HouseEventDisplay;
   for (const who of WHO) {
-    assert.equal(D.summarize({ what: "Appointment", startIso: WHEN }, who).title, "Appointment", who);
+    assert.equal(D.summarize({ what: "Appointment", startIso: WHEN }, who), null, who);
   }
   const soccer = D.summarize({ what: "Hayes soccer", startIso: "2026-11-10T18:00:00-06:00" }, "ainsley");
   assert.equal(soccer.title, "Soccer");
