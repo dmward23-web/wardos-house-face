@@ -80,7 +80,7 @@ const TYPES=["Appointment","Session","Dentist","Therapy","Ainsley dentist","Ains
 const fields=["what","notes","hint","where","detail","who","with","kidName","location","description","summary","htmlLink"];
 function rowsFor(nm){ const r=[]; for(const w of TYPES){
  for(const f of fields) r.push(f==="what"?{what:w+" "+nm}:f==="htmlLink"?{what:w,htmlLink:"https://www.google.com/calendar/event?eid=x&text="+nm}:{what:w,[f]:nm});
- r.push({what:w,attendees:[nm]}); r.push({what:w,attendees:[{email:"x@example.test",displayName:nm}]}); r.push({what:w,x:{y:[{z:nm}]}});
+ r.push({what:w,attendees:[nm]}); r.push({what:w,attendees:[{email:"attendee-token-hayes",displayName:nm}]}); r.push({what:w,x:{y:[{z:nm}]}});
  r.push({what:w,meta:{[nm]:true}}); r.push({what:w,tags:{nested:{[nm+"_id"]:1}}}); r.push({what:w,notes:"see "+nm+" at 4:30 PM"}); r.push({what:nm+" "+w}); }
  return r.map(x=>Object.assign({startIso:W},x)); }
 const out={classes:{},leakProbes:[],controls:[],benign:[],bidi:[],sepInfo:[]};
