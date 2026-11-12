@@ -584,7 +584,7 @@
     var x = 40;
     var y = 420;
     for (var i = 0; i < 16; i++) {
-      var w = 150 + (i % 3) * 40;
+      var w = 80 + Math.max(1, Math.round((150 + (i % 3) * 40 - 80) / 128)) * 128;
       var gap = 70 + (i % 4) * 28;
       if (i === 0) gap = 0;
       x += gap;
@@ -594,7 +594,7 @@
       x += w;
     }
     goalX = x + 40;
-    plats.push({ x: goalX, y: 300, w: 180, h: 26, cp: true, vx: 0, phase: 0, grove: true });
+    plats.push({ x: goalX, y: 300, w: 80 + Math.max(1, Math.round((180 - 80) / 128)) * 128, h: 26, cp: true, vx: 0, phase: 0, grove: true });
   })();
 
   /* SUNHOME1 · warm lamps along the run. Collecting one lights it for this sitting.
@@ -1162,16 +1162,11 @@
     function strip(pre, y, h) {
       var span = Math.max(0, w - cap * 2);
       var im = set[pre + "mid"];
-      var ratio = im.width / tile;
-      var left = span;
-      var x = cap;
-      while (left > 0) {
-        var dw = Math.min(tile, left);
-        var sw = dw * ratio;
-        g.drawImage(im, 0, 0, sw, im.height, x, y, dw, h);
-        noteDraw(sw, im.height, dw, h);
-        x += dw;
-        left -= dw;
+      var n = Math.max(1, Math.round(span / tile));
+      var i;
+      for (i = 0; i < n; i++) {
+        g.drawImage(im, 0, 0, im.width, im.height, cap + i * tile, y, tile, h);
+        noteDraw(im.width, im.height, tile, h);
       }
       var cl = set[pre + "capL"];
       var cr = set[pre + "capR"];
