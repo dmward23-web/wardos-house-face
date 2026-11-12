@@ -46,9 +46,15 @@
     el.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#062018;opacity:1;pointer-events:none";
     try { document.getAnimations().forEach(function (an) { if (an.playState === "running") { an.pause(); held.push(an); } }); } catch (e) {}
     root.appendChild(el);
-    void el.offsetWidth;
-    /* Leave in this click. Waiting for a transition to reach opacity .9 drops the
-       user activation, and a paused transition never gets there, so the tap dies. */
-    leave(u.href);
+    void getComputedStyle(el).opacity;
+    el.style.opacity = "1";
+    if (root.classList.contains("ori-reduced") || (RMQ && RMQ.matches)) { setTimeout(function () { leave(u.href); }, 0); return; }
+    /* Opacity is set, not transitioned, so a paused animation cannot pin it at 0.
+       Leave on the frame after it has been painted at >= .9 for 320ms, and never later than 1.5s. */
+    var t0 = Date.now(), gone = false, shown = false;
+    function go() { if (gone) return; gone = true; leave(u.href); }
+    function tick() { if (gone) return; if (shown) return go(); if (Date.now() - t0 >= 320 && (parseFloat(getComputedStyle(el).opacity) || 0) >= 0.9) shown = true; requestAnimationFrame(tick); }
+    requestAnimationFrame(tick);
+    setTimeout(go, 1500);
   }, false);
 })();

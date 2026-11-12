@@ -235,9 +235,9 @@
         });
         stage.appendChild(n);
       }
-      /* The retry lives on the NEXT card only. This toast stays hidden. */
+      /* The toast keeps the line for the feed log, and stays hidden. The NEXT card is the only visible copy. */
       n.hidden = true;
-      n.textContent = "";
+      n.textContent = "Schedule not loaded · tap to retry";
       n.style.setProperty("display", "none", "important");
       if (document.body) document.body.classList.add("kw-rest");
     }

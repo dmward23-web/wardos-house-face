@@ -75,7 +75,7 @@ test("r36 offline retry is one visible control and the toast stays hidden", () =
   const src = read("kid-world.js");
   const show = src.slice(src.indexOf("function showRest()"), src.indexOf("function hideRest()"));
   assert.match(show, /display", "none"/);
-  assert.doesNotMatch(show, /Schedule not loaded/);
+  assert.match(show, /n\.hidden = true/);
   const note = src.slice(src.indexOf("function weekNote"), src.indexOf("var showRestBound"));
   assert.match(note, /Schedule not loaded/);
 });
