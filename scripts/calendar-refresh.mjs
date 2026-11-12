@@ -270,8 +270,11 @@ function eventProbe(ev, summary) {
 function classify(ev) {
   const summary = summaryOf(ev);
   const probe = eventProbe(ev, summary);
-  /* A marked appointment is kept as the fixed label. The description itself is not copied onto the row. */
-  if (DISPLAY && DISPLAY.keepAppointment && DISPLAY.keepAppointment(probe)) {
+  /* Classify the whole event before any field is dropped. A health word in any
+     field, with no show marker and no disguised boy name in the title, is not a row. */
+  if (DISPLAY && DISPLAY.isAppointment && DISPLAY.isAppointment(probe)) {
+    const view = DISPLAY.summarize ? DISPLAY.summarize(probe, "shared") : null;
+    if (!view || view.title !== "Appointment") return null;
     return { kind: "appointment", summary: "Appointment", wardosShow: true };
   }
   if (!summary || isAdminNoise(summary)) return null;
@@ -476,6 +479,7 @@ function buildBoardItems(events, now) {
       location: cls.kind === "appointment" ? "" : (ev.location || ""),
       free: isFree(ev),
       raw: summaryOf(ev),
+      source: eventProbe(ev, summaryOf(ev)),
       allDay: isAllDay(ev),
       wardosShow: cls.wardosShow === true
     });
@@ -652,7 +656,7 @@ function buildKidToday(kidId, items, now, homeWeek) {
     if (isAdminNoise(it.raw)) continue;
     let what = "";
     if (DISPLAY && DISPLAY.summarize) {
-      const view = DISPLAY.summarize({ summary: it.raw, title: it.raw, what: it.raw, wardosShow: it.wardosShow === true, description: it.wardosShow ? "#wardos-show" : "" }, "shared");
+      const view = DISPLAY.summarize(Object.assign({}, it.source || {}, { summary: it.raw, title: it.raw, what: it.raw, wardosShow: it.wardosShow === true }), "shared");
       what = view && view.title ? view.title : "";
     }
     if (!what) continue;
@@ -803,7 +807,7 @@ function buildDanToday(items, now, homeWeek) {
     // Dad box: leaves, school logistics, sports, appointments, notable dad
     if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school", "dad", "generic", "other"].includes(it.kind)) continue; /* DATA1 P1-4 */
     const when = `${partsInTZ(now).weekday.slice(0, 3)} · ${whenTime(it)}`;
-    const view = DISPLAY && DISPLAY.summarize ? DISPLAY.summarize({ summary: it.raw, title: it.raw, what: it.raw, wardosShow: it.wardosShow === true, description: it.wardosShow ? "#wardos-show" : "" }, "shared") : null;
+    const view = DISPLAY && DISPLAY.summarize ? DISPLAY.summarize(Object.assign({}, it.source || {}, { summary: it.raw, title: it.raw, what: it.raw, wardosShow: it.wardosShow === true }), "shared") : null;
     const what = view && view.title ? view.title : "";
     if (!what) continue;
     const key = `${when}|${what}`.toLowerCase();

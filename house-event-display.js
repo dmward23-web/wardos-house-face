@@ -136,6 +136,19 @@
       return d === "0" ? "o" : d === "1" ? one : d === "3" ? "e" : d === "4" ? "a" : d === "5" ? "s" : "t";
     });
   }
+  /* Digits, @, $, separators and zero-width marks can still spell a boy name. */
+  function boyFold(text) {
+    var s = prepText(text).replace(/[@$]/g, function (c) { return c === "@" ? "a" : "s"; });
+    s = s.replace(/[^a-z0-9]/g, "");
+    return /hayes|harris/.test(foldDigits(s, "i")) || /hayes|harris/.test(foldDigits(s, "l"));
+  }
+  /* A contiguous "Hayes" or "Harris" stays on the marker rule. A folded disguise
+     (digits, @, $, separators, zero-width) plus a health word is Appointment. */
+  function titleHasBoy(ev) {
+    var raw = titleBlob(ev);
+    if (/hayes|harris/i.test(raw)) return false;
+    return boyFold(raw);
+  }
   function nameHit(text) {
     var s = String(text || "");
     if (/hayes|harris/.test(s.replace(/[^a-z]/g, ""))) return true;
@@ -149,7 +162,7 @@
   }
   /* Appointment words, including a digit-folded or separator-stripped disguise.
      ot and pt match a whole token only, so "photo" and "soccer" stay activities. */
-  var APPT_LONG = ["appointment", "session", "dentist", "doctor", "therapy", "therapist", "appt", "speech", "ortho", "orthodontist", "pediatric", "pediatrician", "checkup", "physical", "clinic", "evaluation", "tutoring", "urgentcare", "eyeexam", "flushot", "psycheval"];
+  var APPT_LONG = ["appointment", "session", "dentist", "doctor", "therapy", "therapist", "appt", "speech", "ortho", "orthodontist", "pediatric", "pediatrician", "checkup", "physical", "clinic", "evaluation", "tutoring", "urgentcare", "eyeexam", "flushot", "psycheval", "allergist", "dental"];
   var APPT_SHORT = { ot: 1, pt: 1, appt: 1, aba: 1, er: 1, mtg: 1, labs: 1, exam: 1, eval: 1, shot: 1 };
   function apptForms(s) {
     var p = prepText(s);
@@ -322,7 +335,7 @@
     if (typeof ev === "string") ev = { summary: ev, what: ev };
     if (ev.status === "cancelled" || ev.status === "canceled") return true;
     if (CANCEL.test(titleBlob(ev))) return true;
-    if (isAppointment(ev)) return !wardosShow(ev);
+    if (isAppointment(ev)) return !(wardosShow(ev) || titleHasBoy(ev));
     var blob = sourceBlob(ev);
     if (HARD.test(prepText(blob)) || HARD.test(blob)) return true;
     if (isBoy(audience) || isBoy(ev.kid) || isBoy(ev.owner) || isBoy(ev.kidId)) {
@@ -470,7 +483,8 @@
     if (CANCEL.test(titleBlob(ev))) return null;
     var title = "";
     if (isAppointment(ev)) {
-      if (!wardosShow(ev)) return null;
+      /* A boy name plus a health word is Appointment everywhere, including Dad's own board. */
+      if (!wardosShow(ev) && !titleHasBoy(ev)) return null;
       title = "Appointment";
     } else {
       if (HARD.test(prepText(sourceBlob(ev)))) return null;

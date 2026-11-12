@@ -135,13 +135,16 @@
     }
   }
 
-  function shortPlace(summary, cap) {
+  function shortPlace(ev, cap) {
+    var summary = typeof ev === "string" ? ev : String((ev && (ev.summary || ev.place || ev.what)) || "");
     var D = global.HouseEventDisplay;
     if (D && typeof D.summarize === "function") {
       var path = "";
       try { path = String(global.location && global.location.pathname || ""); } catch (ePath) { path = ""; }
       var who = /sheet-dan\.html/.test(path) ? "adult" : "shared";
-      var view = D.summarize({ summary: summary, title: summary, what: summary }, who);
+      var event = typeof ev === "string" ? { summary: ev, title: ev, what: ev } : ev;
+      if (event && !event.summary && summary) { event.summary = summary; event.title = event.title || summary; event.what = event.what || summary; }
+      var view = D.summarize(event, who);
       return view && view.title ? view.title : "";
     }
     var s = kidsSafe(String(summary || "").trim());
@@ -228,6 +231,7 @@
       if (!lawOk(e)) return false;
       var D = global.HouseEventDisplay;
       if (D && D.isDenied && D.isDenied(e)) return false;
+      if (D && typeof D.summarize === "function" && !shortPlace(e)) return false;
       return true;
     }); /* LAW8C1 + LIVELAW1 + AWAYLAW1 · AWAYONE1 · ACERFIX clinical rows never reach glass */
   }
@@ -338,7 +342,7 @@
         timeZone: "America/Chicago", weekday: "short"
       }).format(new Date(startMs));
     } catch (e2) { /* keep */ }
-    var place = shortPlace(ev.summary || ev.place || "", ev._merged ? 120 : 64);
+    var place = shortPlace(ev, ev._merged ? 120 : 64);
     var time = ev.allDay ? "All day" : (clockTimeFromIso(ev.start) || "");
     if (!place) place = "Calendar item";
     return {
@@ -644,7 +648,7 @@
   }
 
   function rowHtml(ev, isNext) {
-    var title = shortPlace(ev.summary || ev.place || "");
+    var title = shortPlace(ev);
     var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
     var cls = "leaveby-row" + (isNext ? " is-next" : "") + (ev.allDay ? " is-allday" : "");
     return '<li class="' + cls + '">' +
@@ -707,7 +711,7 @@
     for (var i = 0; i < items.length; i++) {
       var ev = items[i].ev;
       var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
-      var title = shortPlace(ev.summary || ev.place || "");
+      var title = shortPlace(ev);
       var cls = "lb-rail-item" + (i === 0 ? " is-next" : "") +
         (items[i].when === "tmr" ? " is-tmr" : "");
       html += '<div class="' + cls + '">' +
@@ -748,7 +752,7 @@
       for (var j = 0; j < list.length; j++) {
         var ev2 = list[j].ev;
         var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "");
-        var title2 = shortPlace(ev2.summary || ev2.place || "");
+        var title2 = shortPlace(ev2);
         html += '<div class="lb-who-row' + (j === 0 ? " is-next" : "") + '">' +
           '<span class="lb-who-time">' + esc(t2) + "</span>" +
           '<span class="lb-who-title">' + esc(title2) + "</span>" +
@@ -775,7 +779,7 @@
       '<div class="lb-peek-hero">' +
       '<span class="lb-peek-kicker">Next</span>' +
       '<span class="lb-peek-time">' + esc(t0) + "</span>" +
-      '<span class="lb-peek-title">' + esc(shortPlace(first.summary || first.place || "")) + "</span>" +
+      '<span class="lb-peek-title">' + esc(shortPlace(first)) + "</span>" +
       "</div>";
     if (items.length > 1) {
       html += '<div class="lb-peek-quiet">';
@@ -784,7 +788,7 @@
         var t = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
         html += '<div class="lb-peek-row">' +
           '<span class="lb-peek-row-time">' + esc(t) + "</span>" +
-          '<span class="lb-peek-row-title">' + esc(shortPlace(ev.summary || ev.place || "")) + "</span>" +
+          '<span class="lb-peek-row-title">' + esc(shortPlace(ev)) + "</span>" +
           "</div>";
       }
       html += "</div>";
@@ -803,7 +807,7 @@
     }
     var ev = items[0].ev;
     var mins = minsUntil(ev);
-    var title = shortPlace(ev.summary || ev.place || "");
+    var title = shortPlace(ev);
     var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
     var windowM = 180;
     var pct = mins == null ? 0 : Math.max(0, Math.min(1, 1 - (mins / windowM)));
@@ -843,7 +847,7 @@
         var t = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
         html += '<li class="lb-list-row' + (i === 0 && !ev.allDay ? " is-next" : "") + '">' +
           '<span class="lb-list-time">' + esc(t) + "</span>" +
-          '<span class="lb-list-title">' + esc(shortPlace(ev.summary || ev.place || "")) + "</span>" +
+          '<span class="lb-list-title">' + esc(shortPlace(ev)) + "</span>" +
           "</li>";
       }
     }
@@ -861,7 +865,7 @@
         var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "");
         html += '<li class="lb-list-row">' +
           '<span class="lb-list-time">' + esc(t2) + "</span>" +
-          '<span class="lb-list-title">' + esc(shortPlace(ev2.summary || ev2.place || "")) + "</span>" +
+          '<span class="lb-list-title">' + esc(shortPlace(ev2)) + "</span>" +
           "</li>";
       }
     }
@@ -925,7 +929,7 @@
   }
 
   function dayTitle(ev) {
-    var s = shortPlace(ev.summary || ev.place || "");
+    var s = shortPlace(ev);
     /* drop leading kid names — the tags carry who */
     var out = s.replace(/^(?:(?:Hayes|Harris|Ainsley|Boys|Dan)\s*(?:\+\s*)?)+\s*[—-]\s*/i, "") || s;
     /* time is already big on the left · drop echoed "leave 5:40 · 6:00" / "· 8:25" tails and Free/HOLD chrome */

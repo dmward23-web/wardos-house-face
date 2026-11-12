@@ -553,6 +553,13 @@
       if (!d || !AF) { go(); return; }
       AF.ready().then(function () { try { AF.filterKidsWeek(d); } catch (e) { /* */ } go(); }, go);
     };
+    try {
+      var q = String(global.location && global.location.search || "");
+      if (/[?&]wardos-test=1(?:&|$)/.test(q) && global.__wardosFixture && global.__wardosFixture.kids) {
+        cb(null, global.__wardosFixture);
+        return;
+      }
+    } catch (eFx) { /* production load */ }
     var urls = ["kids-week.json", "data/kids-week.json"];
     var i = 0;
     function tryNext() {

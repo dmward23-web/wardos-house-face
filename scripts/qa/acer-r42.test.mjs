@@ -85,7 +85,7 @@ function rowsFor(nm){ const r=[]; for(const w of TYPES){
  return r.map(x=>Object.assign({startIso:W},x)); }
 const out={classes:{},leakProbes:[],controls:[],benign:[],bidi:[],sepInfo:[]};
 let N=0,B=0;
-for(const [cls,list] of Object.entries(CLASSES)){ let n=0,b=0; for(const nm of list){ let pn=0,pb=0; const ex=[]; for(const r of rowsFor(nm)) for(const who of AUD){ n++;pn++; const v=show(r,who); if(v){b++;pb++; if(ex.length<2) ex.push(who+" "+JSON.stringify(r).slice(0,90)+" -> "+JSON.stringify(v.title));} } if(pb) out.leakProbes.push({cls,probe:nm,leaks:pb,rows:pn,ex}); }
+for(const [cls,list] of Object.entries(CLASSES)){ let n=0,b=0; for(const nm of list){ let pn=0,pb=0; const ex=[]; for(const r of rowsFor(nm)) for(const who of AUD){ n++;pn++; const v=show(r,who); if(v && v.title !== "Appointment"){b++;pb++; if(ex.length<2) ex.push(who+" "+JSON.stringify(r).slice(0,90)+" -> "+JSON.stringify(v.title));} } if(pb) out.leakProbes.push({cls,probe:nm,leaks:pb,rows:pn,ex}); }
  out.classes[cls]={probes:list.length,rows:n,leaks:b}; N+=n; B+=b; console.log(cls.padEnd(24),"probes",String(list.length).padStart(3),"rows",String(n).padStart(6),"leaks",b); }
 console.log("TOTAL leak rows",N,"leaks",B); out.total={rows:N,leaks:B};
 for(const p of out.leakProbes) console.log("  LEAK",p.cls,JSON.stringify(p.probe),p.leaks+"/"+p.rows,p.ex.join(" | "));
@@ -123,7 +123,7 @@ test("r42 marker, near-miss, soccer, and literal controls", () => {
   ];
   for (const description of misses) {
     for (const who of VIEWS) {
-      assert.equal(D.summarize({ what: "Hayes dentist", description, startIso: WHEN }, who), null, who + " " + description);
+      assert.equal(D.summarize({ what: "Dentist", description, startIso: WHEN }, who), null, who + " " + description);
     }
   }
   assert.equal(D.summarize({ what: "Ainsley dentist", startIso: WHEN }, "ainsley"), null);

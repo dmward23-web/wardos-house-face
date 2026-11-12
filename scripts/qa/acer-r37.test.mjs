@@ -34,13 +34,17 @@ test("r37 an appointment is dropped when a boy name is in any field", () => {
     { what: "Session", attendees: ["Harris"], startIso: WHEN },
     { what: "Appointment", attendees: [{ name: "Hayes" }], startIso: WHEN },
     { what: "Dentist", kidName: "Harris", startIso: WHEN },
-    { what: "Session", extra: { place: { label: "Hayes" } }, startIso: WHEN },
-    { what: "Har\u200Bris appointment", startIso: WHEN }
+    { what: "Session", extra: { place: { label: "Hayes" } }, startIso: WHEN }
   ];
   for (const row of cases) {
     for (const who of ["dan", "shared", "ainsley"]) {
       assert.equal(D.summarize(row, who), null, who + " " + JSON.stringify(row));
     }
+  }
+  /* r44 · a zero-width boy name in the title plus a health word is Appointment, including Dad. */
+  const zw = { what: "Har\u200Bris appointment", startIso: WHEN };
+  for (const who of ["dan", "shared", "ainsley"]) {
+    assert.equal(D.summarize(zw, who) && D.summarize(zw, who).title, "Appointment", who);
   }
 });
 

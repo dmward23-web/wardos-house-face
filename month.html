@@ -766,10 +766,18 @@
     s = s.replace(/\(\s*\)/g, " ");
     return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
   }
-  function glassLabel(text, extra) {
+  function testMode() {
+    try { return /[?&]wardos-test=1(?:&|$)/.test(String(location.search || "")); } catch (e) { return false; }
+  }
+  function plainWords(s) {
+    s = cleanCal(s);
+    var extra = arguments.length > 1 ? arguments[1] : null;
+    s = faceDash(s.replace(/\bMOVED\s*(?:→|->|➔|➜)\s*/gi, "moved to ").replace(/\s*(?:→|->|➔|➜)\s*/g, " to "));
+    s = s.replace(/\bDRIVE\b/g, "drives");
+    s = s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
     var D = window.HouseEventDisplay;
     if (!D || typeof D.summarize !== "function") return "";
-    var ev = { summary: text || "", title: text || "", what: text || "" };
+    var ev = { summary: s, title: s, what: s };
     if (extra && typeof extra === "object") {
       ["location", "description", "notes", "attendees", "organizer", "extendedProperties", "conferenceData", "eventType"].forEach(function (k) {
         if (extra[k] != null) ev[k] = extra[k];
@@ -777,15 +785,6 @@
     }
     var view = D.summarize(ev, "shared");
     return view && view.title ? view.title : "";
-  }
-  function testMode() {
-    try { return /[?&]wardos-test=1(?:&|$)/.test(String(location.search || "")); } catch (e) { return false; }
-  }
-  function plainWords(s) {
-    s = cleanCal(s);
-    s = faceDash(s.replace(/\bMOVED\s*(?:→|->|➔|➜)\s*/gi, "moved to ").replace(/\s*(?:→|->|➔|➜)\s*/g, " to "));
-    s = s.replace(/\bDRIVE\b/g, "drives");
-    return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
   }
   /* P1FIX B29 · Month is shared glass: a row whose title names a household split never paints here (the shared
      house-face-law.js phrase list, the same one the board test sweeps for); nothing is put in its place. */
@@ -853,7 +852,7 @@
     if (!DATA || !DATA.days) return counts;
     Object.keys(DATA.days).forEach(function (k) {
       (DATA.days[k].items || []).forEach(function (it) {
-        var label = glassLabel(it.l, it);
+        var label = plainWords(it.l, it);
         if (clockMinutes(label) != null) return;
         var key = chipKey(label) || label.toLowerCase();
         if (!key) return;
@@ -867,7 +866,7 @@
     var monthDay = DATA && DATA.days && DATA.days[iso];
     ((LIVE && LIVE.upcomingLeaves) || []).forEach(function (ev) {
       if (!eventCovers(ev, iso)) return;
-      var label = glassLabel(ev.summary, ev);
+      var label = plainWords(ev.summary, ev);
       if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label)) || ownerRow(label)) return; /* LIVELAW1 · P1FIX B29 · colour / dress-up days are never rows */
       if (eventSpans(ev)) {
         chips[chipKey(label) || label.toLowerCase()] = label;
@@ -879,7 +878,7 @@
     var inLive = !!(LIVE && LIVE.windowStart && iso >= LIVE.windowStart && iso <= (LIVE.windowEnd || LIVE.windowStart));
     if (monthDay && (!inLive || !rows.length)) {
       (monthDay.items || []).forEach(function (it) {
-        var label = glassLabel(it.l, it);
+        var label = plainWords(it.l, it);
         if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label)) || ownerRow(label)) return; /* LIVELAW1 · P1FIX B29 */
         var key = chipKey(label);
         if (key && chips[key]) return;
@@ -967,8 +966,12 @@
         html += '<a class="day' + (isToday2 ? " today" : "") + (wkPast ? " wf-past" : "") + '" data-away-day="' + k2 + '" href="sheet-today.html' + (isToday2 ? "" : "?d=" + k2) + '">' + '<div class="day-top"><span class="dom">' + dn + "</span>" + (isToday2 ? '<span class="day-tag">today</span>' : "") + "</div>";
         html += '<div class="blocks">';
         /* P1FIX B32 · wall cells show at most 3 items at 15 px, then one "+N" line (the day opens Today for the rest) */
-        var shown2 = (day2 ? day2.items : []).filter(function (it) { return !((window.HouseFaceLaw && HouseFaceLaw.isDressDay(it.l)) || ownerRow(it.l)); /* LIVELAW1 · P1FIX B29 */ });
-        shown2.slice(0, 3).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '">' + esc(cleanCal(it.l)) + "</div>"; });
+        var shown2 = (day2 ? day2.items : []).map(function (it) {
+          var label = plainWords(it.l, it);
+          if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label)) || ownerRow(label)) return null;
+          return { c: it.c, l: label };
+        }).filter(Boolean);
+        shown2.slice(0, 3).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '">' + esc(it.l) + "</div>"; });
         if (shown2.length > 3) html += '<div class="blk more">+' + (shown2.length - 3) + " more</div>";
         html += "</div></a>";
       }

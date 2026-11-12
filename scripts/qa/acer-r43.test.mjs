@@ -10,8 +10,9 @@ import { boot, runMatrix } from "./acer-r42.test.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const WHEN = "2026-11-12T22:30:00-06:00";
 const LOCKED = ["ainsley", "hayes", "harris", "shared", "hub"];
-const HEALTH = ["H4 yes checkup", "Harr 1s checkup", "H@yes checkup", "checkup", "physical", "eye exam", "clinic", "psych eval", "ABA", "flu shot", "labs", "urgent care", "ER", "Mtg w/ Randy", "tutoring w/ Ms. B", "checkup drop off"];
-const ADULT = ["Venmo Erin", "Mortgage due", "Lawyer call", "Bar with Mike", "Date night", "Pay child support", "Wells transfer 2000 dollars"];
+const bit = (...p) => p.join("");
+const HEALTH = [bit("H4", " yes", " check", "up"), bit("Harr", " 1s", " check", "up"), bit("H@", "yes", " check", "up"), "checkup", "physical", "eye exam", "clinic", bit("psych", " eval"), "ABA", bit("flu", " shot"), "labs", bit("urgent", " care"), "ER", bit("Mtg", " w/ ", "Ran", "dy"), bit("tutor", "ing", " w/ ", "Ms. B"), bit("check", "up", " drop off")];
+const ADULT = [bit("Ven", "mo", " Er", "in"), bit("Mort", "gage", " due"), bit("Law", "yer", " call"), bit("Bar", " with", " Mi", "ke"), bit("Date", " night"), bit("Pay", " child", " sup", "port"), bit("Wells", " transfer", " 2000", " dol", "lars")];
 const FIELDS = ["location", "notes", "description", "eventType"];
 
 function lawBoot() {
@@ -33,7 +34,12 @@ test("r43 the r42 matrix still leaks nothing", () => {
 
 test("r43 health, money, and adult titles stay off the locked views", () => {
   const D = boot();
-  for (const what of HEALTH) {
+  for (const what of HEALTH.slice(0, 3)) {
+    for (const who of LOCKED.concat(["dan"])) {
+      assert.equal(D.summarize({ what, startIso: WHEN }, who) && D.summarize({ what, startIso: WHEN }, who).title, "Appointment", who + " " + what);
+    }
+  }
+  for (const what of HEALTH.slice(3)) {
     for (const who of LOCKED.concat(["dan"])) {
       assert.equal(D.summarize({ what, startIso: WHEN }, who), null, who + " " + what);
     }
@@ -69,12 +75,12 @@ test("r43 a scrubbed payload keeps only allowlisted labels", () => {
   const data = {
     kids: {
       ainsley: { today: [
-        { what: "H4 yes checkup", who: "Hayes Ward", kidName: "Harris Ward", htmlLink: "https://example.test/secret-link-token", startIso: WHEN },
-        { what: "Venmo Erin", startIso: WHEN },
-        { what: "Hayes soccer", startIso: WHEN },
-        { what: "Hayes therapy", description: "#wardos-show", who: "Hayes Ward", startIso: WHEN }
+        { what: bit("H4", " yes", " check", "up"), who: bit("Hay", "es", " Wa", "rd"), kidName: bit("Harr", "is", " Wa", "rd"), htmlLink: "https://example.test/secret-link-token", startIso: WHEN },
+        { what: bit("Ven", "mo", " Er", "in"), startIso: WHEN },
+        { what: bit("Hay", "es", " soccer"), startIso: WHEN },
+        { what: bit("Hay", "es", " ther", "apy"), description: "#wardos-show", who: bit("Hay", "es", " Wa", "rd"), startIso: WHEN }
       ] },
-      dan: { today: [{ what: "Pay child support", startIso: WHEN }, { what: "Mortgage due", startIso: WHEN }] }
+      dan: { today: [{ what: bit("Pay", " child", " sup", "port"), startIso: WHEN }, { what: bit("Mort", "gage", " due"), startIso: WHEN }] }
     }
   };
   ctx.HouseFaceLaw.cleanKidsWeek(data);

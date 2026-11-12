@@ -240,6 +240,20 @@
   /* HUBKIT1 · command-panel kit chrome on camo */
   html,body{overflow-x:hidden}
   .panel{--cmd-tap-min:44px;--cmd-bulk-min:48px;--cmd-rocker-w:72px;--cmd-knob:32px}
+  /* 1920x1080 wall: one 12-column panel inside the 48px safe area, clock fully visible. */
+  @media (min-width: 1400px) and (min-height: 700px) {
+    html, html body { width: 1920px !important; min-width: 0 !important; height: 1080px !important; min-height: 1080px !important; overflow: hidden !important; }
+    html body .panel.cams-cmd {
+      width: 1824px !important; max-width: 1824px !important; height: 984px !important; min-height: 0 !important;
+      margin: 48px !important; padding: 16px 22px 12px !important; box-sizing: border-box !important; overflow: visible !important;
+    }
+    html body .hdr.hdr--clockfirst { min-height: 0 !important; overflow: visible !important; }
+    html body .hdr.hdr--clockfirst .live-clock-host { overflow: visible !important; max-width: none !important; flex: 0 0 auto !important; }
+    html body .hdr.hdr--clockfirst .live-clock,
+    html body .hdr.hdr--clockfirst [data-live-clock] {
+      font-size: 36px !important; line-height: 1 !important; overflow: visible !important; white-space: nowrap !important; max-width: none !important;
+    }
+  }
   .banner.cmd-panel{padding:14px 16px;gap:6px}
   .banner .banner-title{font-size:24px;font-weight:850;color:var(--cmd-ink);margin-top:2px}
   .banner .banner-sub{font-size:13px;color:var(--cmd-mute);margin-top:2px}
@@ -280,6 +294,7 @@ html body .cam-path,html body #cam-next-step{display:none!important}
 <script src="wardos-stage.js?v=ACERFIX1"></script>
 </head>
 <body>
+<a class="wardos-home" href="sheet-index.html" data-kw-home aria-label="Home" style="position:fixed;left:48px;top:48px;width:64px;height:64px;z-index:80;display:flex;align-items:center;justify-content:center;pointer-events:auto"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64" style="width:64px;height:64px;pointer-events:none"></a>
 <div class="panel cams-cmd">
  <header class="hdr hdr--clockfirst">
  <div class="hdr-left-col">
@@ -536,5 +551,47 @@ html body .cam-path,html body #cam-next-step{display:none!important}
   }
 }
 </style>
+<script>
+/* 1920x1080 wall only: 12-column panel inside the 48px safe area, clock fully visible. */
+(function () {
+  function fit() {
+    if ((window.innerWidth || 0) < 1400 || (window.innerHeight || 0) < 700) return;
+    var panel = document.querySelector(".panel.cams-cmd");
+    if (panel) {
+      panel.style.setProperty("width", "1824px", "important");
+      panel.style.setProperty("max-width", "1824px", "important");
+      panel.style.setProperty("height", "984px", "important");
+      panel.style.setProperty("min-height", "0", "important");
+      panel.style.setProperty("margin", "48px", "important");
+      panel.style.setProperty("box-sizing", "border-box", "important");
+      panel.style.setProperty("overflow", "visible", "important");
+    }
+    var host = document.querySelector(".hdr.hdr--clockfirst .live-clock-host");
+    if (host) {
+      host.style.setProperty("position", "relative", "important");
+      host.style.setProperty("left", "auto", "important");
+      host.style.setProperty("top", "auto", "important");
+      host.style.setProperty("width", "auto", "important");
+      host.style.setProperty("min-width", "0", "important");
+      host.style.setProperty("max-width", "none", "important");
+      host.style.setProperty("overflow", "visible", "important");
+      host.style.setProperty("flex", "0 0 auto", "important");
+    }
+    document.querySelectorAll(".hdr.hdr--clockfirst .live-clock, .hdr.hdr--clockfirst [data-live-clock]").forEach(function (el) {
+      el.style.setProperty("font-size", "36px", "important");
+      el.style.setProperty("line-height", "1.1", "important");
+      el.style.setProperty("white-space", "nowrap", "important");
+      el.style.setProperty("overflow", "visible", "important");
+      el.style.setProperty("text-overflow", "clip", "important");
+      el.style.setProperty("max-width", "none", "important");
+      el.style.setProperty("width", "auto", "important");
+    });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fit);
+  else fit();
+  window.addEventListener("load", fit);
+  setTimeout(fit, 300);
+})();
+</script>
 </body>
 </html>
