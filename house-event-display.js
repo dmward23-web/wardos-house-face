@@ -36,13 +36,14 @@
   }
   function flatFold(v) {
     var parts = [];
+    var seen = typeof WeakSet === "function" ? new WeakSet() : null;
     function walk(x) {
-      if (typeof x === "string") parts.push(fold(x));
-      else if (Array.isArray(x)) { for (var i = 0; i < x.length; i++) walk(x[i]); }
-      else if (x && typeof x === "object") {
-        var keys = Object.keys(x);
-        for (var k = 0; k < keys.length; k++) walk(x[keys[k]]);
-      }
+      if (typeof x === "string") { parts.push(fold(x)); return; }
+      if (!x || typeof x !== "object") return;
+      if (seen) { if (seen.has(x)) return; seen.add(x); }
+      if (Array.isArray(x)) { for (var i = 0; i < x.length; i++) walk(x[i]); return; }
+      var keys = Object.keys(x);
+      for (var k = 0; k < keys.length; k++) walk(x[keys[k]]);
     }
     walk(v);
     return parts.join("\n");
