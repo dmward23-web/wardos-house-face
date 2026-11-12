@@ -152,11 +152,19 @@ with sync_playwright() as p:
             ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
             page = ctx.new_page()
             page.goto(BASE + "sheet-google-home.html?now=2026-11-12T12:30:00-06:00&freeze=1", wait_until="commit", timeout=30000)
-            page.wait_for_selector("#gh-home", state="attached", timeout=8000)
+            page.wait_for_function("""() => {
+              const a = document.querySelector("#gh-home, a.wardos-home");
+              if (!a) return false;
+              const r = a.getBoundingClientRect();
+              if (r.width < 32 || r.height < 32) return false;
+              const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+              return !!(hit && hit.closest && hit.closest("a.wardos-home"));
+            }""", timeout=8000)
+            box = page.locator("a.wardos-home").bounding_box()
             t0 = time.perf_counter()
             try:
                 with page.expect_request("**/sheet-index.html**", timeout=4000):
-                    page.mouse.click(80, 80, delay=0)
+                    page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2, delay=0)
                 times.append(round((time.perf_counter() - t0) * 1000, 1))
             except Exception:
                 times.append(-1)

@@ -225,11 +225,34 @@
     return "none";
   }
   /* Any appointment or health word, in any field, wins over a sport or school label. */
+  function normType(s) {
+    var t = String(s || "");
+    try { t = t.normalize("NFKC"); } catch (e) { /* already folded */ }
+    return t.replace(/[\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\u061C\uFEFF\u180E]/g, "");
+  }
+  /* kind, type, category, and eventType are the row type. "appointment" wins over a pickup title.
+     A title that is itself Swim or Conference stays that activity (r30, r35). */
+  function typeSaysAppointment(ev) {
+    if (!ev || typeof ev !== "object") return false;
+    var keys = ["kind", "type", "category", "eventType"];
+    var i;
+    for (i = 0; i < keys.length; i++) {
+      if (typeof ev[keys[i]] !== "string") continue;
+      if (/\bappointments?\b/i.test(normType(ev[keys[i]]))) return true;
+    }
+    return false;
+  }
+  function titleKeepsActivity(ev) {
+    var text = titleBlob(ev);
+    if (/\bpick\s*-?\s*up\b|\bdrop(?:\s*-?\s*off)?\b/i.test(text)) return false;
+    return /\b(swim|soccer|baseball|flag|conference|homework|choir|raffle|art club|field trip|picture day|specials?|no school|book order|donation|hoa)\b/i.test(text);
+  }
   function isAppointment(ev) {
     if (ev == null) return false;
     if (typeof ev !== "object") return apptKeyword(String(ev));
+    if (typeSaysAppointment(ev) && !titleKeepsActivity(ev)) return true;
     var hit = false;
-    walkValues(ev, function (s) { if (!hit && apptKeyword(s)) hit = true; }, typeof WeakSet === "function" ? new WeakSet() : null, false);
+    walkValues(ev, function (s) { if (!hit && apptKeyword(s)) hit = true; }, typeof WeakSet === "function" ? new WeakSet() : null);
     return hit;
   }
   /* A show line is the whole line, case-sensitive, after ASCII trim. A zero-width or bidi mark keeps it from matching. */

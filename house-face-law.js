@@ -347,7 +347,9 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
   /* Rebuild the row to the allowlist label only, before any page holds the raw strings. */
   function classifyFetched(v, slot) {
     var D = g.HouseEventDisplay;
-    if (!eventSignal(v) || !D || typeof D.summarize !== "function") return v;
+    if (!eventSignal(v)) return v;
+    /* No display script: undefined means walk the strings so moneyFree still runs. */
+    if (!D || typeof D.summarize !== "function") return undefined;
     var row = {};
     var ks = Object.keys(v);
     for (var i = 0; i < ks.length; i++) row[ks[i]] = v[ks[i]];
@@ -378,6 +380,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
           if (rowDress(v[i]) || rowCustody(v[i])) continue;
           if (eventSignal(v[i])) {
             var classified = classifyFetched(v[i], slot);
+            if (classified === undefined) { out.push(walk(v[i], key, slot)); continue; }
             if (classified == null) continue;
             out.push(classified);
             continue;
@@ -393,14 +396,17 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
         if (priv && priv["wardos.show"] === "1") v.wardosShow = true;
         if (eventSignal(v) && key) {
           var self = classifyFetched(v, slot);
-          if (self == null) return null;
-          if (self !== v) return self;
+          if (self !== undefined) {
+            if (self == null) return null;
+            if (self !== v) return self;
+          }
         }
         var r = {};
         for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k)) {
           var childSlot = slotFromKey(k) || slot;
           if (eventSignal(v[k])) {
             var child = classifyFetched(v[k], childSlot);
+            if (child === undefined) { r[k] = walk(v[k], k, childSlot); continue; }
             if (child == null) continue;
             r[k] = child;
             continue;
