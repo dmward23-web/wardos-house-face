@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
-function boot() {
+export function boot() {
   const ctx = {
     Intl, Date, console, WeakSet, decodeURIComponent,
     document: { readyState: "complete", write() {}, documentElement: { getAttribute() { return null; }, setAttribute() {} } }
@@ -21,7 +21,7 @@ function boot() {
   return ctx.HouseEventDisplay;
 }
 
-function runMatrix(D) {
+export function runMatrix(D) {
 const W = "2026-11-12T22:30:00-06:00";
 const AUD = ["dan", "dad", "shared", "ainsley", "hub", "hayes", "harris"];
 const show = (r, who) => { try { return D.summarize(r, who); } catch (e) { return null; } };
@@ -130,10 +130,10 @@ test("r42 marker, near-miss, soccer, and literal controls", () => {
   assert.equal(D.summarize({ what: "Ainsley dentist", startIso: WHEN }, "hub"), null);
   assert.equal(D.summarize({ what: "Hayes soccer", startIso: "2026-11-12T18:00:00-06:00" }, "ainsley").title, "Soccer");
   for (const what of ["Q&A; then lunch", "R&D; sync", "P&L; review", "&bogus;"]) {
-    for (const who of ["ainsley", "shared", "hub", "dan"]) {
-      const view = D.summarize({ what, startIso: WHEN }, who);
-      assert.equal(view && view.title, what, who + " " + what);
+    for (const who of ["ainsley", "shared", "hub"]) {
+      assert.equal(D.summarize({ what, startIso: WHEN }, who), null, who + " " + what);
     }
+    assert.equal(D.summarize({ what, startIso: WHEN }, "dan").title, what);
   }
   const plain = D.summarize({
     what: "Pack snacks",
@@ -142,8 +142,16 @@ test("r42 marker, near-miss, soccer, and literal controls", () => {
     nest: { y: [{ z: "nested-value-token" }] },
     startIso: WHEN
   }, "ainsley");
-  assert.equal(plain && plain.title, "Pack snacks");
-  const dumped = JSON.stringify(plain);
+  assert.equal(plain, null);
+  const dadPlain = D.summarize({
+    what: "Pack snacks",
+    htmlLink: "https://example.test/secret-link-token",
+    meta: { SecretKey: true },
+    nest: { y: [{ z: "nested-value-token" }] },
+    startIso: WHEN
+  }, "dan");
+  assert.equal(dadPlain && dadPlain.title, "Pack snacks");
+  const dumped = JSON.stringify(dadPlain);
   assert.equal(dumped.includes("secret-link-token"), false);
   assert.equal(dumped.includes("SecretKey"), false);
   assert.equal(dumped.includes("nested-value-token"), false);

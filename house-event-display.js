@@ -149,8 +149,8 @@
   }
   /* Appointment words, including a digit-folded or separator-stripped disguise.
      ot and pt match a whole token only, so "photo" and "soccer" stay activities. */
-  var APPT_LONG = ["appointment", "session", "dentist", "doctor", "therapy", "therapist", "appt", "speech", "ortho", "orthodontist", "pediatric", "pediatrician"];
-  var APPT_SHORT = { ot: 1, pt: 1, appt: 1 };
+  var APPT_LONG = ["appointment", "session", "dentist", "doctor", "therapy", "therapist", "appt", "speech", "ortho", "orthodontist", "pediatric", "pediatrician", "checkup", "physical", "clinic", "evaluation", "tutoring", "urgentcare", "eyeexam", "flushot", "psycheval"];
+  var APPT_SHORT = { ot: 1, pt: 1, appt: 1, aba: 1, er: 1, mtg: 1, labs: 1, exam: 1, eval: 1, shot: 1 };
   function apptForms(s) {
     var p = prepText(s);
     var flat = p.replace(/[^a-z0-9]/g, "");
@@ -169,26 +169,27 @@
     }
     return false;
   }
-  function apptFieldList(ev) {
-    if (ev == null) return [];
-    if (typeof ev !== "object") return [String(ev)];
-    var keys = ["summary", "title", "what", "label", "text", "l", "notes", "description", "hint", "comment", "details", "detail", "type", "category", "safeCategory"];
-    var out = [];
-    for (var i = 0; i < keys.length; i++) if (typeof ev[keys[i]] === "string") out.push(ev[keys[i]]);
-    return out;
+  var SKIP_SCAN = /^(id|kind|startIso|endIso|start|end|when|time|tz|status|tone|wardosShow|allDay|leaveBy|timeRole)$/i;
+  var KEY_BAGS = /^(attendees|organizer|creator|extendedProperties|conferenceData|location)$/i;
+  function walkValues(v, fn, seen, keysToo) {
+    if (typeof v === "string") { fn(v); return; }
+    if (!v || typeof v !== "object") return;
+    if (seen) { if (seen.has(v)) return; seen.add(v); }
+    if (Array.isArray(v)) { for (var i = 0; i < v.length; i++) walkValues(v[i], fn, seen, keysToo); return; }
+    var keys = Object.keys(v);
+    for (var k = 0; k < keys.length; k++) {
+      if (SKIP_SCAN.test(keys[k])) continue;
+      if (keysToo || KEY_BAGS.test(keys[k])) fn(keys[k]);
+      walkValues(v[keys[k]], fn, seen, keysToo || KEY_BAGS.test(keys[k]));
+    }
   }
-  /* Soccer and practice are activities. A real appointment word elsewhere still wins. */
+  /* Any appointment or health word, in any field, wins over a sport or school label. */
   function isAppointment(ev) {
-    var fields = apptFieldList(ev);
-    var title = titleBlob(ev);
-    var rest = [];
-    var i;
-    for (i = 0; i < fields.length; i++) if (fields[i] !== title) rest.push(fields[i]);
-    var stripped = prepText(title).replace(/\b(?:soccer|practices?)\b/g, " ");
-    var titleHit = apptKeyword(stripped);
-    if (titleHit) return true;
-    for (i = 0; i < rest.length; i++) if (apptKeyword(rest[i])) return true;
-    return false;
+    if (ev == null) return false;
+    if (typeof ev !== "object") return apptKeyword(String(ev));
+    var hit = false;
+    walkValues(ev, function (s) { if (!hit && apptKeyword(s)) hit = true; }, typeof WeakSet === "function" ? new WeakSet() : null, false);
+    return hit;
   }
   /* A show line is the whole line, case-sensitive, after ASCII trim. A zero-width or bidi mark keeps it from matching. */
   function exactShowLine(text) {
@@ -475,13 +476,12 @@
       if (HARD.test(prepText(sourceBlob(ev)))) return null;
       title = cannedTitle(ev);
       if (!title) {
+        /* Kid boards, the shared hub (including the Dad tile) and the calendar views never show free text. */
+        if (who !== "adult") return null;
         if (boyNamed(ev)) return null;
         title = plainTitle(ev);
       }
-      if (!title) {
-        if (who === "adult") title = "Calendar item";
-        else return null;
-      }
+      if (!title) return null;
     }
     var time = timeLabel(ev, who);
     return {
@@ -504,12 +504,28 @@
   function applyRow(row, audience) {
     var view = summarize(row, audience);
     if (!view) return null;
-    /* The marker decision is made once. Later paints only see the fixed label, so the boolean has to stay.
-       Description, links, and nested bags do not stay on the row. */
-    if (view.title === "Appointment") row.wardosShow = true;
-    delete row.description;
-    delete row.htmlLink;
-    delete row.extendedProperties;
+    /* Allowlist by construction: the row that reaches a board is the label, the clock, and the show flag. */
+    var label = view.title;
+    var kid = /^(ainsley|hayes|harris|dan)$/i.test(String(row.kid || "")) ? String(row.kid).toLowerCase() : "";
+    var next = {
+      id: row.id || "",
+      what: label,
+      title: label,
+      summary: label,
+      label: label,
+      text: label,
+      when: view.time || "",
+      time: view.time || "",
+      startIso: textOf(row.startIso || (typeof row.start === "string" ? row.start : "")),
+      endIso: textOf(row.endIso || "")
+    };
+    if (view.allDay) next.allDay = true;
+    if (label === "Appointment") next.wardosShow = true;
+    if (kid) next.kid = kid;
+    var oldKeys = Object.keys(row);
+    for (var i = 0; i < oldKeys.length; i++) delete row[oldKeys[i]];
+    var keepKeys = Object.keys(next);
+    for (var j = 0; j < keepKeys.length; j++) row[keepKeys[j]] = next[keepKeys[j]];
     row.what = view.title;
     row.title = view.title;
     row.summary = view.title;
@@ -553,10 +569,9 @@
     if (!data || typeof data !== "object") return data;
     var kids = data.kids || {};
     Object.keys(kids).forEach(function (id) {
-      var who = id === "dan" || id === "dad" ? "adult" : id;
-      scrubKid(kids[id], who);
+      scrubKid(kids[id], "shared");
     });
-    if (Array.isArray(data.leaveBys)) data.leaveBys = scrubList(data.leaveBys, "adult");
+    if (Array.isArray(data.leaveBys)) data.leaveBys = scrubList(data.leaveBys, "shared");
     if (data.boardStrip && typeof data.boardStrip === "object") {
       if (Array.isArray(data.boardStrip.queue)) data.boardStrip.queue = scrubList(data.boardStrip.queue, "shared");
       if (data.boardStrip.nextLeave && typeof data.boardStrip.nextLeave === "object") {
@@ -582,6 +597,7 @@
     keepAppointment: keepAppointment,
     timeLabel: timeLabel,
     summarize: summarize,
+    LABELS: ["School pickup", "School drop", "Leave for swim", "Swim", "Leave for soccer", "Soccer", "Leave for baseball", "Baseball", "Leave for flag", "Flag", "School specials", "No school", "Field trip", "Art club", "Conference", "Picture day", "Homework", "Choir", "Raffle", "Book order", "Donation", "HOA", "Nothing else today", "More on the month calendar", "Appointment"],
     scrubPayload: scrubPayload,
     scrubKid: scrubKid,
     escapeText: escapeText,

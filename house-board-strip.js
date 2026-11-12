@@ -138,7 +138,10 @@
   function shortPlace(summary, cap) {
     var D = global.HouseEventDisplay;
     if (D && typeof D.summarize === "function") {
-      var view = D.summarize({ summary: summary, title: summary, what: summary }, "adult");
+      var path = "";
+      try { path = String(global.location && global.location.pathname || ""); } catch (ePath) { path = ""; }
+      var who = /sheet-dan\.html/.test(path) ? "adult" : "shared";
+      var view = D.summarize({ summary: summary, title: summary, what: summary }, who);
       return view && view.title ? view.title : "";
     }
     var s = kidsSafe(String(summary || "").trim());
@@ -1173,7 +1176,15 @@
     });
   }
 
+  function testCal() {
+    try {
+      if (!/[?&]wardos-test=1(?:&|$)/.test(String(global.location && global.location.search || ""))) return null;
+      return global.__wardosFixture || null;
+    } catch (e) { return null; }
+  }
   function loadCal(cb) {
+    var fx = testCal();
+    if (fx) { cb(null, fx.cal || fx); return; }
     var urls = [
       "data/cal-live.json?v=" + Date.now(),
       "data/cal-live.json"

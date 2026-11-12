@@ -257,17 +257,15 @@ function danWhat(it) {
 }
 
 function eventProbe(ev, summary) {
-  return {
-    summary,
-    title: summary,
-    description: ev.description || "",
-    notes: ev.description || "",
-    location: ev.location || "",
-    type: ev.eventType || ev.type || "",
-    attendees: ev.attendees,
-    organizer: ev.organizer,
-    extendedProperties: ev.extendedProperties
-  };
+  var probe = {};
+  if (ev && typeof ev === "object") {
+    Object.keys(ev).forEach(function (k) { probe[k] = ev[k]; });
+  }
+  probe.summary = summary;
+  probe.title = summary;
+  probe.what = summary;
+  if (ev && ev.eventType && !probe.eventType) probe.eventType = ev.eventType;
+  return probe;
 }
 function classify(ev) {
   const summary = summaryOf(ev);
@@ -652,14 +650,15 @@ function buildKidToday(kidId, items, now, homeWeek) {
     if (!mine && it.kind !== "custody") continue;
     if (it.kind === "custody") continue;
     if (isAdminNoise(it.raw)) continue;
-    let what = kidsSafeWhat(it.raw, it.kind);
+    let what = "";
+    if (DISPLAY && DISPLAY.summarize) {
+      const view = DISPLAY.summarize({ summary: it.raw, title: it.raw, what: it.raw, wardosShow: it.wardosShow === true, description: it.wardosShow ? "#wardos-show" : "" }, "shared");
+      what = view && view.title ? view.title : "";
+    }
+    if (!what) continue;
     let tone = "act";
     let kind = "event";
-    if (it.kind === "sport") { tone = "hot"; what = (kidId === "hayes" && /baseball/i.test(it.raw) ? "⚾ " : kidId === "harris" && /flag/i.test(it.raw) ? "🏁 " : kidId === "ainsley" && /swim/i.test(it.raw) ? "" : "") + what; }
-    if (it.kind === "appointment") {
-      tone = "hot";
-      what = "Appointment";
-    }
+    if (it.kind === "sport" || it.kind === "appointment") tone = "hot";
     if (it.kind === "leave" && !isKidRide(it, kidId)) continue; // leaves are Dad strip / dan box, not kid glass (KIDRIDE1: own ride stays)
     if (isKidRide(it, kidId) && !rows.some((r) => r.ride)) { rows.unshift({ kind, when: rowWhen(it, now), what, hint: "", tone: "hot", ride: true }); continue; }
     const row = {
@@ -669,10 +668,9 @@ function buildKidToday(kidId, items, now, homeWeek) {
       hint: it.kind === "sport" ? "YOUR board" : "",
       tone,
     };
-    if (it.kind === "appointment") {
-      row.summary = "Appointment";
-      if (it.wardosShow === true) row.wardosShow = true;
-    }
+    row.summary = what;
+    row.title = what;
+    if (it.wardosShow === true && what === "Appointment") row.wardosShow = true;
     rows.push(row);
   }
   /* DATA1 P2-11 · no custody note row on a kid's today (was "YOUR BASE with Dad" / "Kids away") */
@@ -724,7 +722,7 @@ function buildKidSchool(kidId, items, now) {
 function buildKidAppointments(kidId, items, now) {
   const out = [];
   for (const it of items) {
-    if (it.kind !== "appointment") continue;
+    if (it.kind !== "appointment" || it.wardosShow !== true) continue;
     if (!stillRelevant(it, now)) continue;
     if (it.kid && it.kid !== kidId) continue;
     const row = {
@@ -805,19 +803,20 @@ function buildDanToday(items, now, homeWeek) {
     // Dad box: leaves, school logistics, sports, appointments, notable dad
     if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school", "dad", "generic", "other"].includes(it.kind)) continue; /* DATA1 P1-4 */
     const when = `${partsInTZ(now).weekday.slice(0, 3)} · ${whenTime(it)}`;
-    const what = danWhat(it);
+    const view = DISPLAY && DISPLAY.summarize ? DISPLAY.summarize({ summary: it.raw, title: it.raw, what: it.raw, wardosShow: it.wardosShow === true, description: it.wardosShow ? "#wardos-show" : "" }, "shared") : null;
+    const what = view && view.title ? view.title : "";
+    if (!what) continue;
     const key = `${when}|${what}`.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
     const dadRow = {
       when,
-      what: it.kind === "appointment" ? "Appointment" : what,
+      what,
+      summary: what,
+      title: what,
       tone: it.kind === "leave" || it.kind === "sport" || it.kind === "appointment" || it.kind === "dad" ? "hot" : "act",
     };
-    if (it.kind === "appointment") {
-      dadRow.summary = "Appointment";
-      if (it.wardosShow === true) dadRow.wardosShow = true;
-    }
+    if (what === "Appointment" && it.wardosShow === true) dadRow.wardosShow = true;
     rows.push(dadRow);
   }
   /* DATA1 P2-11 · no custody closing row (was "Kids with Dad at home through …") */

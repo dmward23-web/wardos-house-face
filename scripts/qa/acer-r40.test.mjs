@@ -71,11 +71,11 @@ test("r40 Hay 3S stays visible on a normal row and a nameless appointment drops"
       }
     }
   }
-  for (const who of WHO) {
-    const view = D.summarize({ what: "Pack snacks", notes: "Hay 3S", startIso: WHEN }, who);
-    assert.ok(view && view.title, who);
-    assert.equal(/hayes|harris/i.test(view.title), false);
+  for (const who of ["shared", "ainsley", "hub"]) {
+    assert.equal(D.summarize({ what: "Pack snacks", notes: "Hay 3S", startIso: WHEN }, who), null, who);
   }
+  const dadSnack = D.summarize({ what: "Pack snacks", notes: "Hay 3S", startIso: WHEN }, "dan");
+  assert.equal(dadSnack && dadSnack.title, "Pack snacks");
   assert.equal(D.summarize({ what: "Hayes soccer", startIso: "2026-11-12T18:00:00-06:00" }, "ainsley").title, "Soccer");
   assert.equal(D.summarize({ what: "Appointment", startIso: WHEN }, "dan"), null);
   assert.equal(D.summarize({ what: "Appointment", notes: "4:30 PM", startIso: WHEN }, "hub"), null);

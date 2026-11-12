@@ -766,6 +766,21 @@
     s = s.replace(/\(\s*\)/g, " ");
     return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
   }
+  function glassLabel(text, extra) {
+    var D = window.HouseEventDisplay;
+    if (!D || typeof D.summarize !== "function") return "";
+    var ev = { summary: text || "", title: text || "", what: text || "" };
+    if (extra && typeof extra === "object") {
+      ["location", "description", "notes", "attendees", "organizer", "extendedProperties", "conferenceData", "eventType"].forEach(function (k) {
+        if (extra[k] != null) ev[k] = extra[k];
+      });
+    }
+    var view = D.summarize(ev, "shared");
+    return view && view.title ? view.title : "";
+  }
+  function testMode() {
+    try { return /[?&]wardos-test=1(?:&|$)/.test(String(location.search || "")); } catch (e) { return false; }
+  }
   function plainWords(s) {
     s = cleanCal(s);
     s = faceDash(s.replace(/\bMOVED\s*(?:→|->|➔|➜)\s*/gi, "moved to ").replace(/\s*(?:→|->|➔|➜)\s*/g, " to "));
@@ -838,7 +853,7 @@
     if (!DATA || !DATA.days) return counts;
     Object.keys(DATA.days).forEach(function (k) {
       (DATA.days[k].items || []).forEach(function (it) {
-        var label = plainWords(it.l);
+        var label = glassLabel(it.l, it);
         if (clockMinutes(label) != null) return;
         var key = chipKey(label) || label.toLowerCase();
         if (!key) return;
@@ -852,7 +867,7 @@
     var monthDay = DATA && DATA.days && DATA.days[iso];
     ((LIVE && LIVE.upcomingLeaves) || []).forEach(function (ev) {
       if (!eventCovers(ev, iso)) return;
-      var label = plainWords(ev.summary);
+      var label = glassLabel(ev.summary, ev);
       if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label)) || ownerRow(label)) return; /* LIVELAW1 · P1FIX B29 · colour / dress-up days are never rows */
       if (eventSpans(ev)) {
         chips[chipKey(label) || label.toLowerCase()] = label;
@@ -864,7 +879,7 @@
     var inLive = !!(LIVE && LIVE.windowStart && iso >= LIVE.windowStart && iso <= (LIVE.windowEnd || LIVE.windowStart));
     if (monthDay && (!inLive || !rows.length)) {
       (monthDay.items || []).forEach(function (it) {
-        var label = plainWords(it.l);
+        var label = glassLabel(it.l, it);
         if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label)) || ownerRow(label)) return; /* LIVELAW1 · P1FIX B29 */
         var key = chipKey(label);
         if (key && chips[key]) return;
@@ -982,7 +997,13 @@
     return h ? { y: +h[1], m: +h[2] } : { y: t.y, m: t.m };
   }
   var s0 = initial(); render(s0.y, s0.m);
-  Promise.all([
+  if (testMode() && window.__wardosFixture) {
+    var fx = window.__wardosFixture;
+    if (fx.days) DATA = fx;
+    if (fx.upcomingLeaves) LIVE = fx;
+    else if (fx.cal && fx.cal.upcomingLeaves) LIVE = fx.cal;
+    render(cur.y, cur.m);
+  } else Promise.all([
     fetch("data/cal-months.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
     fetch("data/cal-live.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
   ]).then(function (pair) {

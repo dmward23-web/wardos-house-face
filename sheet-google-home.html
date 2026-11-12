@@ -2,6 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<script>
+(function () {
+  var gone = false;
+  function go(ev) {
+    var t = ev.target;
+    var a = t && t.closest ? t.closest("a.wardos-home, a[data-kw-home]") : null;
+    if (!a || gone) return;
+    gone = true;
+    if (ev.cancelable) ev.preventDefault();
+    ev.stopPropagation();
+    location.href = a.href;
+  }
+  document.addEventListener("pointerdown", go, true);
+  document.addEventListener("touchstart", go, true);
+  document.addEventListener("click", go, true);
+})();
+</script>
 <script src="house-hub.js?v=HUBPAIR1"></script>
 <script src="private-feed.js?v=HUBPAIR1D"></script>
 <script src="house-face-law.js?v=FACESTRIP1"></script>
