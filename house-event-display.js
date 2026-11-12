@@ -26,27 +26,66 @@
     try { return String(s == null ? "" : s).normalize("NFKC"); }
     catch (e) { return String(s == null ? "" : s); }
   }
-  /* NFKC, then format characters (Cf, including zero-width), then case-fold. */
-  function fold(s) {
-    var t = nfkc(s);
-    try { t = t.replace(/\p{Cf}/gu, ""); }
-    catch (e) { t = t.replace(/[\u00AD\u180E\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u206F\uFEFF]/g, ""); }
-    try { t = t.toLowerCase(); } catch (e2) { /* already a string */ }
-    return t;
+  /* Look-alikes that can spell hayes or harris, mapped to Latin. */
+  var LOOK = {
+    "\u0410": "a", "\u0430": "a", "\u0415": "e", "\u0435": "e", "\u041E": "o", "\u043E": "o",
+    "\u0420": "p", "\u0440": "p", "\u0421": "c", "\u0441": "c", "\u0423": "y", "\u0443": "y",
+    "\u0425": "x", "\u0445": "x", "\u0406": "i", "\u0456": "i", "\u0408": "j", "\u0458": "j",
+    "\u0405": "s", "\u0455": "s", "\u041D": "h", "\u043D": "h", "\u0412": "b", "\u0432": "b",
+    "\u041A": "k", "\u043A": "k", "\u041C": "m", "\u043C": "m", "\u0422": "t", "\u0442": "t",
+    "\u0391": "a", "\u03B1": "a", "\u0392": "b", "\u03B2": "b", "\u0395": "e", "\u03B5": "e",
+    "\u0397": "h", "\u03B7": "h", "\u0399": "i", "\u03B9": "i", "\u039A": "k", "\u03BA": "k",
+    "\u039C": "m", "\u03BC": "m", "\u039D": "n", "\u03BD": "n", "\u039F": "o", "\u03BF": "o",
+    "\u03A1": "p", "\u03C1": "p", "\u03A4": "t", "\u03C4": "t", "\u03A5": "y", "\u03C5": "y",
+    "\u03A7": "x", "\u03C7": "x", "\u0396": "z", "\u03B6": "z"
+  };
+  function nfkd(s) {
+    try { return String(s == null ? "" : s).normalize("NFKD"); }
+    catch (e) { return String(s == null ? "" : s); }
   }
-  function flatFold(v) {
-    var parts = [];
-    var seen = typeof WeakSet === "function" ? new WeakSet() : null;
-    function walk(x) {
-      if (typeof x === "string") { parts.push(fold(x)); return; }
-      if (!x || typeof x !== "object") return;
-      if (seen) { if (seen.has(x)) return; seen.add(x); }
-      if (Array.isArray(x)) { for (var i = 0; i < x.length; i++) walk(x[i]); return; }
-      var keys = Object.keys(x);
-      for (var k = 0; k < keys.length; k++) walk(x[keys[k]]);
+  /* NFKD, strip combining marks, map look-alikes, then case-fold. */
+  function prepText(s) {
+    var t = nfkd(s);
+    try { t = t.replace(/\p{M}/gu, ""); }
+    catch (e) { t = t.replace(/[\u0300-\u036F]/g, ""); }
+    var out = "";
+    for (var i = 0; i < t.length; i++) out += LOOK[t.charAt(i)] || t.charAt(i);
+    try { out = out.toLowerCase(); } catch (e2) { /* already folded */ }
+    return out;
+  }
+  function skeletonOf(s) { return prepText(s).replace(/[^a-z]/g, ""); }
+  function foreignLetter(s) {
+    var t = prepText(s).replace(/[a-z]/g, "");
+    try { return /\p{L}/u.test(t); }
+    catch (e) { return /[^\u0000-\u007F]/.test(t); }
+  }
+  function walkRow(v, bag, seen) {
+    if (typeof v === "string") { bag.push(v); return; }
+    if (!v || typeof v !== "object") return;
+    if (seen) { if (seen.has(v)) return; seen.add(v); }
+    if (Array.isArray(v)) { for (var i = 0; i < v.length; i++) walkRow(v[i], bag, seen); return; }
+    var keys = Object.keys(v);
+    for (var k = 0; k < keys.length; k++) { bag.push(keys[k]); walkRow(v[keys[k]], bag, seen); }
+  }
+  /* Appointment rows only. A boy-name skeleton, or any letter still outside Latin a-z, drops the row. */
+  function boyAppt(ev) {
+    var bag = [];
+    walkRow(ev, bag, typeof WeakSet === "function" ? new WeakSet() : null);
+    var preps = [], skels = [], foreign = false, appt = false;
+    for (var i = 0; i < bag.length; i++) {
+      var p = prepText(bag[i]);
+      preps.push(p);
+      skels.push(p.replace(/[^a-z]/g, ""));
+      if (!foreign && foreignLetter(bag[i])) foreign = true;
+      if (!appt && APPT_WORD.test(p)) appt = true;
     }
-    walk(v);
-    return parts.join("\n");
+    if (!appt && /appointment|session|dentist/.test(skels.join(""))) appt = true;
+    if (!appt) return false;
+    if (foreign) return true;
+    var joined = skels.join("");
+    if (/hayes|harris/.test(joined)) return true;
+    for (var j = 0; j < skels.length; j++) if (/hayes|harris/.test(skels[j])) return true;
+    return false;
   }
   function titleBlob(ev) {
     if (!ev || typeof ev !== "object") return nfkc(textOf(ev));
@@ -75,9 +114,9 @@
   function isDenied(ev, audience) {
     if (!ev) return false;
     if (typeof ev === "string") {
-      var s = fold(ev);
+      var s = prepText(ev);
       if (CANCEL.test(s)) return true;
-      if (BOY_NAME.test(s) && APPT_WORD.test(s)) return true;
+      if (boyAppt(ev)) return true;
       if (isBoy(audience)) return HARD.test(s) || SOFT.test(s);
       return HARD.test(s);
     }
@@ -89,9 +128,7 @@
     var trusted = /^(ainsley|adult|dan|dad|shared|hub)$/i.test(who);
     if (HARD.test(blob)) return true;
     if (boy || !trusted) return SOFT.test(blob);
-    /* Appointment, session, or dentist, and a boy name in any string field: drop the row. */
-    var named = flatFold(ev);
-    if (BOY_NAME.test(named) && APPT_WORD.test(named)) return true;
+    if (boyAppt(ev)) return true;
     return false;
   }
 
