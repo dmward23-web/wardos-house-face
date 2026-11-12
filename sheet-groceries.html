@@ -47,7 +47,7 @@
   }
   .panel {
     width: 1080px; min-height: 1920px; height: auto;
-    padding: 18px 28px 12px;
+    padding: 48px 32px 12px;
     display: flex; flex-direction: column; gap: 12px;
     position: relative; overflow: visible;
     background-color: #d8dadf;
@@ -759,16 +759,19 @@ html body .favs-empty{color:rgba(255,255,255,.6)!important;-webkit-text-fill-col
 <script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
 <style id="r38-groceries-clock">
+html:not(#hf-wall-off) body .panel {
+  padding-top: 48px !important;
+}
 html:not(#hf-wall-off) body .panel #groceries-hdr.hdr.hdr--clockfirst {
   display: flex !important;
   flex-direction: row !important;
-  align-items: center !important;
+  align-items: flex-start !important;
   justify-content: flex-end !important;
-  gap: 16px !important;
+  gap: 17px !important;
   overflow: visible !important;
   width: 100% !important;
   box-sizing: border-box !important;
-  padding: 12px 48px !important;
+  padding: 0 48px 12px !important;
   min-height: 80px !important;
 }
 html:not(#hf-wall-off) body .panel #groceries-hdr.hdr.hdr--clockfirst .hdr-left-col,

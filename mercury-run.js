@@ -1149,15 +1149,36 @@
   }
   function paintPlatArt(g, set, w, grove) {
     var cap = 40, tile = 128, y0 = -PLAT_ART.walk;
+    function noteDraw(sw, sh, dw, dh) {
+      var log = window.__platDrawLog;
+      if (!log || typeof log.push !== "function") return;
+      var dpr = view.dpr || 1;
+      log.push({
+        sw: sw, sh: sh, dw: dw, dh: dh,
+        scaleX: Math.round((dw * dpr) / sw * 1000) / 1000,
+        scaleY: Math.round((dh * dpr) / sh * 1000) / 1000
+      });
+    }
     function strip(pre, y, h) {
       var span = Math.max(0, w - cap * 2);
-      var n = Math.max(1, Math.round(span / tile));
-      var share = span / n;
       var im = set[pre + "mid"];
-      var i;
-      for (i = 0; i < n; i++) g.drawImage(im, 0, 0, im.width, im.height, cap + i * share, y, share, h);
-      g.drawImage(set[pre + "capL"], 0, y, cap, h);
-      g.drawImage(set[pre + "capR"], w - cap, y, cap, h);
+      var ratio = im.width / tile;
+      var left = span;
+      var x = cap;
+      while (left > 0) {
+        var dw = Math.min(tile, left);
+        var sw = dw * ratio;
+        g.drawImage(im, 0, 0, sw, im.height, x, y, dw, h);
+        noteDraw(sw, im.height, dw, h);
+        x += dw;
+        left -= dw;
+      }
+      var cl = set[pre + "capL"];
+      var cr = set[pre + "capR"];
+      g.drawImage(cl, 0, 0, cl.width, cl.height, 0, y, cap, h);
+      g.drawImage(cr, 0, 0, cr.width, cr.height, w - cap, y, cap, h);
+      noteDraw(cl.width, cl.height, cap, h);
+      noteDraw(cr.width, cr.height, cap, h);
     }
     strip("shadow-", PLAT_ART.shY, PLAT_ART.sh);
     strip("", y0, PLAT_ART.h);

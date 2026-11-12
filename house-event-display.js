@@ -43,15 +43,77 @@
     try { return String(s == null ? "" : s).normalize("NFKD"); }
     catch (e) { return String(s == null ? "" : s); }
   }
-  /* NFKD, strip combining marks, map look-alikes, then case-fold. */
-  function prepText(s) {
-    var t = nfkd(s);
+  var ENT = { amp: "&", lt: "<", gt: ">", quot: "\"", apos: "'", nbsp: " ", shy: "\u00AD" };
+  /* One ingest normalize, before any name match. Display strings are not rewritten. */
+  function normalizeIngest(s) {
+    var t = String(s == null ? "" : s);
+    var prev, n = 0;
+    do {
+      prev = t;
+      t = t.replace(/&(#x[0-9a-f]+|#\d+|[a-z][a-z0-9]*);/gi, function (all, body) {
+        if (body.charAt(0) === "#") {
+          var hex = body.charAt(1) === "x" || body.charAt(1) === "X";
+          var cp = parseInt(hex ? body.slice(2) : body.slice(1), hex ? 16 : 10);
+          if (!isFinite(cp) || cp < 0 || cp > 0x10FFFF) return all;
+          try { return String.fromCodePoint(cp); } catch (e) { return all; }
+        }
+        var v = ENT[body.toLowerCase()];
+        return v == null ? all : v;
+      });
+    } while (t !== prev && ++n < 8);
+    t = t.replace(/<[^>]*>/g, "");
+    n = 0;
+    do {
+      prev = t;
+      t = t.replace(/%([0-9A-Fa-f]{2})/g, function (_, h) {
+        var c = parseInt(h, 16);
+        return (c >= 0 && c <= 255) ? String.fromCharCode(c) : _;
+      });
+    } while (t !== prev && ++n < 6);
+    t = nfkd(t);
     try { t = t.replace(/\p{M}/gu, ""); }
     catch (e) { t = t.replace(/[\u0300-\u036F]/g, ""); }
+    try { t = t.replace(/\p{Cf}/gu, ""); }
+    catch (e2) { t = t.replace(/[\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\uFEFF]/g, ""); }
+    t = t.replace(/\u00AD/g, "");
+    return t;
+  }
+  function enclosedLetter(cp) {
+    if (cp >= 0x1F1E6 && cp <= 0x1F1FF) return String.fromCharCode(97 + (cp - 0x1F1E6));
+    if (cp >= 0x1F130 && cp <= 0x1F149) return String.fromCharCode(97 + (cp - 0x1F130));
+    if (cp >= 0x1F170 && cp <= 0x1F189) return String.fromCharCode(97 + (cp - 0x1F170));
+    if (cp >= 0x24B6 && cp <= 0x24CF) return String.fromCharCode(97 + (cp - 0x24B6));
+    if (cp >= 0x24D0 && cp <= 0x24E9) return String.fromCharCode(97 + (cp - 0x24D0));
+    if (cp >= 0x1F110 && cp <= 0x1F129) return String.fromCharCode(97 + (cp - 0x1F110));
+    return "";
+  }
+  /* Normalize, map enclosed letters and look-alikes, then case-fold. */
+  function prepText(s) {
+    var t = normalizeIngest(s);
     var out = "";
-    for (var i = 0; i < t.length; i++) out += LOOK[t.charAt(i)] || t.charAt(i);
+    var i = 0;
+    while (i < t.length) {
+      var cp = t.codePointAt(i);
+      var ch = String.fromCodePoint(cp);
+      i += cp > 0xFFFF ? 2 : 1;
+      out += enclosedLetter(cp) || LOOK[ch] || ch;
+    }
     try { out = out.toLowerCase(); } catch (e2) { /* already folded */ }
     return out;
+  }
+  /* Digit-for-letter is only for the name comparison, never for displayed text. */
+  function foldDigits(s, one) {
+    return s.replace(/[013457]/g, function (d) {
+      return d === "0" ? "o" : d === "1" ? one : d === "3" ? "e" : d === "4" ? "a" : d === "5" ? "s" : "t";
+    });
+  }
+  function nameHit(text) {
+    var raw = String(text || "").replace(/[^a-z0-9]/g, "");
+    var forms = [raw.replace(/[0-9]/g, ""), foldDigits(raw, "i"), foldDigits(raw, "l")];
+    for (var i = 0; i < forms.length; i++) {
+      if (/hayes|harris/.test(forms[i].replace(/[^a-z]/g, ""))) return true;
+    }
+    return false;
   }
   function skeletonOf(s) { return prepText(s).replace(/[^a-z]/g, ""); }
   function foreignLetter(s) {
@@ -71,20 +133,20 @@
   function boyAppt(ev) {
     var bag = [];
     walkRow(ev, bag, typeof WeakSet === "function" ? new WeakSet() : null);
-    var preps = [], skels = [], foreign = false, appt = false;
+    var preps = [], skels = [], raws = [], foreign = false, appt = false;
     for (var i = 0; i < bag.length; i++) {
       var p = prepText(bag[i]);
       preps.push(p);
       skels.push(p.replace(/[^a-z]/g, ""));
+      raws.push(p.replace(/[^a-z0-9]/g, ""));
       if (!foreign && foreignLetter(bag[i])) foreign = true;
       if (!appt && APPT_WORD.test(p)) appt = true;
     }
     if (!appt && /appointment|session|dentist/.test(skels.join(""))) appt = true;
     if (!appt) return false;
     if (foreign) return true;
-    var joined = skels.join("");
-    if (/hayes|harris/.test(joined)) return true;
-    for (var j = 0; j < skels.length; j++) if (/hayes|harris/.test(skels[j])) return true;
+    if (nameHit(raws.join(""))) return true;
+    for (var j = 0; j < raws.length; j++) if (nameHit(raws[j])) return true;
     return false;
   }
   function titleBlob(ev) {
