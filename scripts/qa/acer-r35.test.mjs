@@ -43,7 +43,7 @@ test("r35 Ainsley and Dan appointments render as Appointment, and the boys still
   assert.equal(D.summarize({ summary: hard, startIso: WHEN }, "ainsley"), null);
   assert.equal(D.summarize({ summary: hard, startIso: WHEN }, "dan"), null);
   assert.equal(D.summarize({ summary: hard, startIso: WHEN }, "shared"), null);
-  assert.equal(D.summarize({ what: "Swim", kind: "appointment", startIso: "2026-11-10T16:25:00-06:00" }, "ainsley").title, "Swim");
+  assert.equal(D.summarize({ what: "Swim", kind: "appointment", startIso: "2026-11-10T16:25:00-06:00" }, "ainsley"), null);
 });
 
 const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";

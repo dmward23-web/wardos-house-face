@@ -75,8 +75,8 @@ test("r30 Ainsley and Dan keep their own future sessions", () => {
   const Law = ctx.HouseFaceLaw;
   const swim = { what: "Swim", kind: "appointment", when: "Fri 20 · 4:25 PM", startIso: "2026-11-20T16:25:00-06:00" };
   const dad = { what: "Conference", kind: "session", when: "Fri 20 · 2:00 PM", startIso: "2026-11-20T14:00:00-06:00" };
-  assert.equal(D.summarize(swim, "ainsley").title, "Swim");
-  assert.equal(D.summarize(dad, "dan").title, "Conference");
+  assert.equal(D.summarize(swim, "ainsley"), null);
+  assert.equal(D.summarize(dad, "dan"), null);
   const data = {
     kids: {
       ainsley: { today: [Object.assign({}, swim)], hottest: Object.assign({}, swim) },
@@ -85,11 +85,11 @@ test("r30 Ainsley and Dan keep their own future sessions", () => {
     boardStrip: { queue: [Object.assign({ kid: "ainsley" }, swim), Object.assign({ kid: "dan" }, dad)] }
   };
   Law.cleanKidsWeek(data);
-  assert.equal(data.kids.ainsley.today[0].what, "Swim");
-  assert.ok(data.kids.dan.today.length === 1 && /Conference|Calendar item/.test(data.kids.dan.today[0].what || data.kids.dan.today[0].summary || ""));
+  assert.equal(data.kids.ainsley.today.length, 0);
+  assert.equal(data.kids.dan.today.length, 0);
   const hub = JSON.stringify(data.boardStrip.queue);
-  assert.match(hub, /Swim/);
-  assert.match(hub, /Conference/);
+  assert.equal(/Swim|Conference|School pickup/.test(hub), false);
+  assert.equal(hub.includes("Appointment"), false);
 });
 
 test("r30 money names lose the whole money expression on add, read, and update", () => {

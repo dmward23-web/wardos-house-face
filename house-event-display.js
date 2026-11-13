@@ -184,17 +184,20 @@
     }
     return false;
   }
+  /* Name and health walks still skip kind. The type check uses SKIP_TYPE so kind is a type signal. */
   var SKIP_SCAN = /^(id|kind|startIso|endIso|start|end|when|time|tz|status|tone|wardosShow|allDay|leaveBy|timeRole)$/i;
+  var SKIP_TYPE = /^(id|startIso|endIso|start|end|when|time|tz|status|tone|wardosShow|allDay|leaveBy|timeRole)$/i;
   /* Every string, at every depth. No named-field list: attachments, source, gadget, and unknown keys count. */
-  function walkValues(v, fn, seen) {
+  function walkValues(v, fn, seen, typeCheck) {
     if (typeof v === "string") { fn(v); return; }
     if (!v || typeof v !== "object") return;
     if (seen) { if (seen.has(v)) return; seen.add(v); }
-    if (Array.isArray(v)) { for (var i = 0; i < v.length; i++) walkValues(v[i], fn, seen); return; }
+    if (Array.isArray(v)) { for (var i = 0; i < v.length; i++) walkValues(v[i], fn, seen, typeCheck); return; }
+    var skip = typeCheck ? SKIP_TYPE : SKIP_SCAN;
     var keys = Object.keys(v);
     for (var k = 0; k < keys.length; k++) {
-      if (SKIP_SCAN.test(keys[k]) || keys[k] === "_feed") continue;
-      walkValues(v[keys[k]], fn, seen);
+      if (skip.test(keys[k]) || keys[k] === "_feed") continue;
+      walkValues(v[keys[k]], fn, seen, typeCheck);
     }
   }
   function boyAnywhere(ev) {
@@ -230,29 +233,28 @@
     try { t = t.normalize("NFKC"); } catch (e) { /* already folded */ }
     return t.replace(/[\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\u061C\uFEFF\u180E]/g, "");
   }
-  /* kind, type, category, and eventType are the row type. "appointment" wins over a pickup title.
-     A title that is itself Swim or Conference stays that activity (r30, r35). */
+  /* kind, type, category, eventType, and a classifier class are the row type.
+     appointment, session, and appointment_medical are appointment. A sport title does not override that. */
+  var TYPE_FIELDS = ["kind", "type", "category", "eventType", "class", "cls", "safeCategory"];
+  function typeValueIsAppointment(raw) {
+    var t = normType(raw).replace(/^\s+|\s+$/g, "").toLowerCase();
+    return t === "appointment" || t === "session" || t === "appointment_medical";
+  }
   function typeSaysAppointment(ev) {
     if (!ev || typeof ev !== "object") return false;
-    var keys = ["kind", "type", "category", "eventType"];
     var i;
-    for (i = 0; i < keys.length; i++) {
-      if (typeof ev[keys[i]] !== "string") continue;
-      if (/\bappointments?\b/i.test(normType(ev[keys[i]]))) return true;
+    for (i = 0; i < TYPE_FIELDS.length; i++) {
+      if (typeof ev[TYPE_FIELDS[i]] !== "string") continue;
+      if (typeValueIsAppointment(ev[TYPE_FIELDS[i]])) return true;
     }
     return false;
-  }
-  function titleKeepsActivity(ev) {
-    var text = titleBlob(ev);
-    if (/\bpick\s*-?\s*up\b|\bdrop(?:\s*-?\s*off)?\b/i.test(text)) return false;
-    return /\b(swim|soccer|baseball|flag|conference|homework|choir|raffle|art club|field trip|picture day|specials?|no school|book order|donation|hoa)\b/i.test(text);
   }
   function isAppointment(ev) {
     if (ev == null) return false;
     if (typeof ev !== "object") return apptKeyword(String(ev));
-    if (typeSaysAppointment(ev) && !titleKeepsActivity(ev)) return true;
+    if (typeSaysAppointment(ev)) return true;
     var hit = false;
-    walkValues(ev, function (s) { if (!hit && apptKeyword(s)) hit = true; }, typeof WeakSet === "function" ? new WeakSet() : null);
+    walkValues(ev, function (s) { if (!hit && apptKeyword(s)) hit = true; }, typeof WeakSet === "function" ? new WeakSet() : null, true);
     return hit;
   }
   /* A show line is the whole line, case-sensitive, after ASCII trim. A zero-width or bidi mark keeps it from matching. */

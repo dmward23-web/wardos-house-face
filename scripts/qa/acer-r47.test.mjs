@@ -79,5 +79,5 @@ test("r47 a type signal is the row type, so Pickup does not become School pickup
       }
     }
   }
-  assert.equal(D.summarize({ what: "Swim", kind: word, startIso: WHEN }, "ainsley").title, "Swim");
+  assert.equal(D.summarize({ what: "Swim", kind: word, startIso: WHEN }, "ainsley"), null);
 });
