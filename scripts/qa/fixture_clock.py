@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import calendar
 import os
 import sys
+import threading
 from zoneinfo import ZoneInfo
 
 CT = ZoneInfo("America/Chicago")
@@ -78,6 +79,71 @@ def pin_at(p, minutes):
 def log_step(msg):
     sys.stderr.write("qa " + str(msg) + "\n")
     sys.stderr.flush()
+
+
+def bound_step(name, fn, seconds=8, tap=None):
+    """Wall-clock cap for close/open. A hit exits non-zero and does not retry."""
+    label = name if tap is None else "%s tap %s" % (name, tap)
+    log_step(label)
+    cancel = threading.Event()
+
+    def killer():
+        if not cancel.wait(seconds):
+            sys.stderr.write("FAIL %s exceeded %ss\n" % (label, seconds))
+            sys.stderr.flush()
+            os._exit(1)
+
+    threading.Thread(target=killer, daemon=True).start()
+    try:
+        return fn()
+    finally:
+        cancel.set()
+
+
+def release_context(page, ctx, tap=None):
+    """Drop routes and listeners, then close the page and context. Close waits on an
+    in-flight navigation, so this step has its own 8s cap."""
+    def _do():
+        if page is not None:
+            try:
+                page.unroute_all(behavior="ignoreErrors")
+            except Exception:
+                pass
+            page.close(run_before_unload=False)
+        if ctx is not None:
+            ctx.close()
+    bound_step("close-context", _do, 8, tap)
+
+
+def open_context(browser, tap=None, init=None, **kwargs):
+    ctx = bound_step("new-context", lambda: browser.new_context(**kwargs), 8, tap)
+    try:
+        ctx.set_default_timeout(8000)
+        ctx.set_default_navigation_timeout(15000)
+        if init:
+            ctx.add_init_script(init)
+        page = bound_step("new-page", lambda: ctx.new_page(), 8, tap)
+        return ctx, page
+    except BaseException:
+        release_context(None, ctx, tap)
+        raise
+
+
+def arm_navigation_cutoff(page):
+    """The tap only needs the sheet-index request to start. Fulfill that document
+    immediately and abort the rest so context.close is not left waiting on the load."""
+    def handle(route):
+        try:
+            if route.request.resource_type == "document":
+                route.fulfill(status=200, content_type="text/html", body="<html></html>")
+            else:
+                route.abort()
+        except Exception:
+            try:
+                route.abort()
+            except Exception:
+                pass
+    page.route("**/*", handle)
 
 
 def stop_httpd(httpd):

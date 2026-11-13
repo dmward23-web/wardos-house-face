@@ -6,7 +6,7 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from fixture_clock import at, clock_init, day_key, log_step, pin_at, plan, stop_httpd
+from fixture_clock import arm_navigation_cutoff, at, clock_init, day_key, log_step, open_context, pin_at, plan, release_context, stop_httpd
 from pw_chrome import launch_kw
 from playwright.sync_api import sync_playwright
 
@@ -138,11 +138,7 @@ with sync_playwright() as p:
     browser = p.chromium.launch(**launch_kw(p, headless=True))
     for href in PAGES:
         log_step("r45 page " + href)
-        ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
-        ctx.set_default_timeout(8000)
-        ctx.set_default_navigation_timeout(15000)
-        ctx.add_init_script(INIT)
-        page = ctx.new_page()
+        ctx, page = open_context(browser, init=INIT, viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
         try:
             page.goto(BASE + href + "?" + QS, wait_until="domcontentloaded", timeout=15000)
             page.wait_for_timeout(1800)
@@ -159,15 +155,14 @@ with sync_playwright() as p:
         except Exception as e:
             out["pages"][href] = {"ok": False, "rows": 0, "titles": [], "error": "r45 page " + href + ": " + str(e)[:240]}
             log_step("r45 page " + href + " FAIL " + str(e)[:160])
-        ctx.close()
+        finally:
+            release_context(page, ctx)
     log_step("r45 page google-home")
-    ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
-    ctx.set_default_timeout(8000)
-    ctx.set_default_navigation_timeout(15000)
-    page = ctx.new_page()
-    page.goto(BASE + "sheet-google-home.html?" + QS, wait_until="domcontentloaded", timeout=15000)
-    page.wait_for_timeout(700)
-    out["home"] = page.evaluate("""() => {
+    ctx, page = open_context(browser, viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+    try:
+        page.goto(BASE + "sheet-google-home.html?" + QS, wait_until="domcontentloaded", timeout=15000)
+        page.wait_for_timeout(700)
+        out["home"] = page.evaluate("""() => {
       function box(el) {
         if (!el) return null;
         const r = el.getBoundingClientRect();
@@ -181,17 +176,16 @@ with sync_playwright() as p:
       const hit = home ? document.elementFromPoint(home.getBoundingClientRect().x + 8, home.getBoundingClientRect().y + 8) : null;
       return { nodes, clock: clock ? clock.textContent : "", hit: !!(hit && (hit.closest && hit.closest("a.wardos-home"))) };
     }""")
-    ctx.close()
+    finally:
+        release_context(page, ctx)
     times = []
     tap_n = 0 if os.environ.get("WARDOS_SKIP_TAPS") == "1" else 15
     if tap_n == 0:
         log_step("r45 taps skipped")
     for i in range(tap_n):
-        log_step("r45 tap %d" % (i + 1))
-        ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
-        ctx.set_default_timeout(8000)
-        ctx.set_default_navigation_timeout(15000)
-        page = ctx.new_page()
+        n = i + 1
+        log_step("r45 tap %d" % n)
+        ctx, page = open_context(browser, tap=n, viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
         try:
             page.goto(BASE + "sheet-google-home.html?now=" + P["pin"] + "&freeze=1", wait_until="commit", timeout=15000)
             page.wait_for_selector("a.wardos-home", state="visible", timeout=8000)
@@ -206,19 +200,20 @@ with sync_playwright() as p:
             }""")
             if not ready:
                 times.append(-1)
-                log_step("r45 tap %d not-ready" % (i + 1))
-                ctx.close()
-                continue
-            t0 = time.perf_counter()
-            with page.expect_request("**/sheet-index.html**", timeout=4000):
-                page.mouse.click(ready["x"], ready["y"], delay=0)
-            ms = round((time.perf_counter() - t0) * 1000, 1)
-            times.append(ms)
-            log_step("r45 tap %d %sms" % (i + 1, ms))
+                log_step("r45 tap %d not-ready" % n)
+            else:
+                arm_navigation_cutoff(page)
+                t0 = time.perf_counter()
+                with page.expect_request("**/sheet-index.html**", timeout=4000):
+                    page.mouse.click(ready["x"], ready["y"], delay=0)
+                ms = round((time.perf_counter() - t0) * 1000, 1)
+                times.append(ms)
+                log_step("r45 tap %d %sms" % (n, ms))
         except Exception as e:
             times.append(-1)
-            log_step("r45 tap %d FAIL %s" % (i + 1, str(e)[:120]))
-        ctx.close()
+            log_step("r45 tap %d FAIL %s" % (n, str(e)[:120]))
+        finally:
+            release_context(page, ctx, tap=n)
     out["taps"] = times
     ok = [t for t in out["taps"] if 0 <= t <= 300]
     ordered = sorted(t for t in out["taps"] if t >= 0)

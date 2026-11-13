@@ -6,7 +6,7 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from fixture_clock import log_step, stop_httpd
+from fixture_clock import arm_navigation_cutoff, log_step, open_context, release_context, stop_httpd
 from pw_chrome import launch_kw
 from playwright.sync_api import sync_playwright
 
@@ -125,11 +125,7 @@ with sync_playwright() as p:
     browser = p.chromium.launch(**launch_kw(p, headless=True))
     for href in PAGES:
         log_step("r46 page " + href)
-        ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
-        ctx.set_default_timeout(8000)
-        ctx.set_default_navigation_timeout(15000)
-        ctx.add_init_script(INIT)
-        page = ctx.new_page()
+        ctx, page = open_context(browser, init=INIT, viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
         try:
             page.goto(BASE + href + "?" + QS, wait_until="domcontentloaded", timeout=15000)
             page.wait_for_timeout(1600)
@@ -163,15 +159,14 @@ with sync_playwright() as p:
         except Exception as e:
             out["pages"][href] = {"error": "r46 page " + href + ": " + str(e)[:200], "banned": 1, "off": 1, "boyRows": 1, "appointment": False}
             log_step("r46 page " + href + " FAIL " + str(e)[:120])
-        ctx.close()
+        finally:
+            release_context(page, ctx)
     log_step("r46 page google-home")
-    ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
-    ctx.set_default_timeout(8000)
-    ctx.set_default_navigation_timeout(15000)
-    page = ctx.new_page()
-    page.goto(BASE + "sheet-google-home.html?now=2026-11-12T12:30:00-06:00&freeze=1", wait_until="domcontentloaded", timeout=15000)
-    page.wait_for_timeout(500)
-    out["home"] = page.evaluate("""() => {
+    ctx, page = open_context(browser, viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+    try:
+        page.goto(BASE + "sheet-google-home.html?now=2026-11-12T12:30:00-06:00&freeze=1", wait_until="domcontentloaded", timeout=15000)
+        page.wait_for_timeout(500)
+        out["home"] = page.evaluate("""() => {
       function box(el) {
         if (!el) return null;
         const r = el.getBoundingClientRect();
@@ -185,30 +180,31 @@ with sync_playwright() as p:
       ].concat([...document.querySelectorAll("article.cam")].map((el, i) => ({ name: "cam" + i, box: box(el) })));
       return { nodes, clock: (document.querySelector("[data-live-clock]") || {}).textContent || "" };
     }""")
-    ctx.close()
+    finally:
+        release_context(page, ctx)
     for run in range(3):
         times = []
         for i in range(15):
-            log_step("r46 tap %d run %d" % (i + 1, run + 1))
-            ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
-            ctx.set_default_timeout(8000)
-            ctx.set_default_navigation_timeout(15000)
-            page = ctx.new_page()
-            page.goto(BASE + "sheet-google-home.html?now=2026-11-12T12:30:00-06:00&freeze=1", wait_until="commit", timeout=15000)
-            box = wait_home(page)
-            t0 = time.perf_counter()
+            n = i + 1
+            log_step("r46 tap %d run %d" % (n, run + 1))
+            ctx, page = open_context(browser, tap=n, viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
             try:
+                page.goto(BASE + "sheet-google-home.html?now=2026-11-12T12:30:00-06:00&freeze=1", wait_until="commit", timeout=15000)
+                box = wait_home(page)
                 if not box:
                     raise RuntimeError("home not hit-testable")
+                arm_navigation_cutoff(page)
+                t0 = time.perf_counter()
                 with page.expect_request("**/sheet-index.html**", timeout=4000):
                     page.mouse.click(box["cx"], box["cy"], delay=0)
                 ms = round((time.perf_counter() - t0) * 1000, 1)
                 times.append(ms)
-                log_step("r46 tap %d run %d %sms" % (i + 1, run + 1, ms))
+                log_step("r46 tap %d run %d %sms" % (n, run + 1, ms))
             except Exception as e:
                 times.append(-1)
-                log_step("r46 tap %d run %d FAIL %s" % (i + 1, run + 1, str(e)[:120]))
-            ctx.close()
+                log_step("r46 tap %d run %d FAIL %s" % (n, run + 1, str(e)[:120]))
+            finally:
+                release_context(page, ctx, tap=n)
         ordered = sorted(t for t in times if t >= 0)
         p95 = ordered[max(0, math.ceil(0.95 * len(ordered)) - 1)] if ordered else -1
         out["tap"]["runs"].append({"ok": sum(1 for t in times if 0 <= t <= 300), "values": times, "p95": p95, "median": round(statistics.median(ordered), 1) if ordered else -1})
