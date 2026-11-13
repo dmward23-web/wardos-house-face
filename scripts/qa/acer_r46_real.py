@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Real /api/private fetch, page-data counts, early taps, clock pill boxes."""
-import json, math, statistics, threading, time
+import json, math, os, statistics, sys, threading, time
 from datetime import datetime, timezone
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from fixture_clock import log_step, stop_httpd
 from pw_chrome import launch_kw
 from playwright.sync_api import sync_playwright
 
@@ -123,11 +124,14 @@ out = {"pages": {}, "home": {}, "tap": {"runs": []}}
 with sync_playwright() as p:
     browser = p.chromium.launch(**launch_kw(p, headless=True))
     for href in PAGES:
+        log_step("r46 page " + href)
         ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+        ctx.set_default_timeout(8000)
+        ctx.set_default_navigation_timeout(15000)
         ctx.add_init_script(INIT)
         page = ctx.new_page()
         try:
-            page.goto(BASE + href + "?" + QS, wait_until="domcontentloaded", timeout=40000)
+            page.goto(BASE + href + "?" + QS, wait_until="domcontentloaded", timeout=15000)
             page.wait_for_timeout(1600)
             out["pages"][href] = page.evaluate("""(arg) => {
               const W = window.WardKids && WardKids._data ? WardKids._data : null;
@@ -155,12 +159,17 @@ with sync_playwright() as p:
                 soccer: text.indexOf("Soccer") >= 0 || blob.indexOf("Soccer") >= 0
               };
             }""", {"labels": sorted(LABELS)})
+            log_step("r46 page " + href + " ok")
         except Exception as e:
-            out["pages"][href] = {"error": str(e)[:200], "banned": 1, "off": 1, "boyRows": 1, "appointment": False}
+            out["pages"][href] = {"error": "r46 page " + href + ": " + str(e)[:200], "banned": 1, "off": 1, "boyRows": 1, "appointment": False}
+            log_step("r46 page " + href + " FAIL " + str(e)[:120])
         ctx.close()
+    log_step("r46 page google-home")
     ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+    ctx.set_default_timeout(8000)
+    ctx.set_default_navigation_timeout(15000)
     page = ctx.new_page()
-    page.goto(BASE + "sheet-google-home.html?now=2026-11-12T12:30:00-06:00&freeze=1", wait_until="domcontentloaded", timeout=30000)
+    page.goto(BASE + "sheet-google-home.html?now=2026-11-12T12:30:00-06:00&freeze=1", wait_until="domcontentloaded", timeout=15000)
     page.wait_for_timeout(500)
     out["home"] = page.evaluate("""() => {
       function box(el) {
@@ -180,9 +189,12 @@ with sync_playwright() as p:
     for run in range(3):
         times = []
         for i in range(15):
+            log_step("r46 tap %d run %d" % (i + 1, run + 1))
             ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+            ctx.set_default_timeout(8000)
+            ctx.set_default_navigation_timeout(15000)
             page = ctx.new_page()
-            page.goto(BASE + "sheet-google-home.html?now=2026-11-12T12:30:00-06:00&freeze=1", wait_until="commit", timeout=30000)
+            page.goto(BASE + "sheet-google-home.html?now=2026-11-12T12:30:00-06:00&freeze=1", wait_until="commit", timeout=15000)
             box = wait_home(page)
             t0 = time.perf_counter()
             try:
@@ -190,32 +202,37 @@ with sync_playwright() as p:
                     raise RuntimeError("home not hit-testable")
                 with page.expect_request("**/sheet-index.html**", timeout=4000):
                     page.mouse.click(box["cx"], box["cy"], delay=0)
-                times.append(round((time.perf_counter() - t0) * 1000, 1))
-            except Exception:
+                ms = round((time.perf_counter() - t0) * 1000, 1)
+                times.append(ms)
+                log_step("r46 tap %d run %d %sms" % (i + 1, run + 1, ms))
+            except Exception as e:
                 times.append(-1)
+                log_step("r46 tap %d run %d FAIL %s" % (i + 1, run + 1, str(e)[:120]))
             ctx.close()
         ordered = sorted(t for t in times if t >= 0)
         p95 = ordered[max(0, math.ceil(0.95 * len(ordered)) - 1)] if ordered else -1
         out["tap"]["runs"].append({"ok": sum(1 for t in times if 0 <= t <= 300), "values": times, "p95": p95, "median": round(statistics.median(ordered), 1) if ordered else -1})
-    browser.close()
-nodes = {n["name"]: n["box"] for n in (out["home"].get("nodes") or []) if n.get("box")}
-bad = []
-for name, box in nodes.items():
-    if box["bottom"] > 1032:
-        bad.append(name + " bottom " + str(box["bottom"]))
-pill, header = nodes.get("pill"), nodes.get("header")
-if pill and header:
-    if not (pill["x"] >= header["x"] - 1 and pill["right"] <= header["right"] + 1 and pill["y"] >= header["y"] - 1 and pill["bottom"] <= header["bottom"] + 1):
-        bad.append("pill outside header")
-for a, b in (("pill", "banner"), ("pill", "home"), ("home", "banner"), ("home", "header")):
-    if a in nodes and b in nodes and overlap(nodes[a], nodes[b]):
-        bad.append(a + "/" + b)
-for name, box in nodes.items():
-    if not name.startswith("cam"):
-        continue
-    for other in ("pill", "home", "banner", "header"):
-        if other in nodes and overlap(box, nodes[other]):
-            bad.append(name + "/" + other)
-out["home"]["overlap"] = bad
-httpd.shutdown()
-print(json.dumps(out))
+    nodes = {n["name"]: n["box"] for n in (out["home"].get("nodes") or []) if n.get("box")}
+    bad = []
+    for name, box in nodes.items():
+        if box["bottom"] > 1032:
+            bad.append(name + " bottom " + str(box["bottom"]))
+    pill, header = nodes.get("pill"), nodes.get("header")
+    if pill and header:
+        if not (pill["x"] >= header["x"] - 1 and pill["right"] <= header["right"] + 1 and pill["y"] >= header["y"] - 1 and pill["bottom"] <= header["bottom"] + 1):
+            bad.append("pill outside header")
+    for a, b in (("pill", "banner"), ("pill", "home"), ("home", "banner"), ("home", "header")):
+        if a in nodes and b in nodes and overlap(nodes[a], nodes[b]):
+            bad.append(a + "/" + b)
+    for name, box in nodes.items():
+        if not name.startswith("cam"):
+            continue
+        for other in ("pill", "home", "banner", "header"):
+            if other in nodes and overlap(box, nodes[other]):
+                bad.append(name + "/" + other)
+    out["home"]["overlap"] = bad
+    log_step("r46 close")
+    print(json.dumps(out), flush=True)
+    sys.stdout.flush()
+    stop_httpd(httpd)
+    os._exit(0)

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Real fetch path (no wardos-test hook) plus Google Home boxes and 1x taps."""
-import json, os, statistics, threading, time
+import json, os, statistics, sys, threading, time
 from datetime import datetime, timezone
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from fixture_clock import at, clock_init, day_key, plan
+from fixture_clock import at, clock_init, day_key, log_step, pin_at, plan, stop_httpd
 from pw_chrome import launch_kw
 from playwright.sync_api import sync_playwright
 
@@ -16,8 +16,8 @@ BOY = "H4" + " yes " + HEALTH
 MONEY = "Mort" + "gage due"
 SOCCER = "Hay" + "es soccer"
 P = plan(os.environ.get("WARDOS_DAY_SHIFT", "0"))
-WHEN = P["soon"]
-RAFFLE = {"what": "Raffle", "summary": "Raffle", "title": "Raffle", "when": "Thu · 1:00 PM", "startIso": at(P, 15), "start": at(P, 15), "end": P["soon_end"]}
+WHEN = pin_at(P, 0)
+RAFFLE = {"what": "Raffle", "summary": "Raffle", "title": "Raffle", "when": "Thu · 1:00 PM", "startIso": pin_at(P, 20), "start": pin_at(P, 20), "end": P["end"]}
 
 def probe(field, value):
     row = dict(RAFFLE)
@@ -33,19 +33,26 @@ PROBES = [
     probe("extendedProperties", {"shared": {"note": HEALTH}}),
     probe("extendedProperties", {"private": {"note": HEALTH}}),
 ]
-BOY_ROW = {"what": BOY, "summary": BOY, "title": BOY, "when": "Thu · 6:45 PM", "startIso": WHEN, "start": WHEN, "end": P["soon_end"]}
-SOCCER_ROW = {"what": SOCCER, "summary": SOCCER, "title": SOCCER, "when": "Thu · 6:00 PM", "startIso": at(P, 0), "start": at(P, 0), "end": P["soon_end"]}
-TODAY = [SOCCER_ROW] + PROBES + [BOY_ROW]
+BOY_ROW = {"what": BOY, "summary": BOY, "title": BOY, "when": "Thu · 6:45 PM", "startIso": at(P, 0), "start": at(P, 0), "end": P["soon_end"]}
+SOCCER_ROW = {"what": SOCCER, "summary": SOCCER, "title": SOCCER, "when": "Thu · 6:00 PM", "startIso": pin_at(P, 0), "start": pin_at(P, 0), "end": P["end"]}
+MONEY_ROW = {"summary": MONEY, "what": MONEY, "title": MONEY, "start": at(P, 5), "startIso": at(P, 5), "end": P["soon_end"]}
+PIN_ROWS = [SOCCER_ROW] + PROBES
+DAD_ROWS = [BOY_ROW, MONEY_ROW]
 WEEK = {
     "asOfIso": P["day"],
-    "kids": {kid: {"today": TODAY} for kid in ("ainsley", "hayes", "harris", "dan")},
+    "kids": {
+        "ainsley": {"today": PIN_ROWS},
+        "hayes": {"today": PIN_ROWS},
+        "harris": {"today": PIN_ROWS},
+        "dan": {"today": DAD_ROWS},
+    },
 }
 NOW = datetime.now(timezone.utc).isoformat()
 CAL = {
     "status": "live",
     "fetchedAt": NOW,
     "asOfIso": P["day"],
-    "upcomingLeaves": TODAY + [{"summary": MONEY, "what": MONEY, "title": MONEY, "start": at(P, 5), "end": P["soon_end"]}],
+    "upcomingLeaves": PIN_ROWS + DAD_ROWS,
 }
 MONTHS = {
     "rangeStart": P["month_start"],
@@ -108,11 +115,14 @@ out = {"pages": {}, "home": {}, "taps": []}
 with sync_playwright() as p:
     browser = p.chromium.launch(**launch_kw(p, headless=True))
     for href in PAGES:
+        log_step("r45 page " + href)
         ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+        ctx.set_default_timeout(8000)
+        ctx.set_default_navigation_timeout(15000)
         ctx.add_init_script(INIT)
         page = ctx.new_page()
         try:
-            page.goto(BASE + href + "?" + QS, wait_until="domcontentloaded", timeout=40000)
+            page.goto(BASE + href + "?" + QS, wait_until="domcontentloaded", timeout=15000)
             page.wait_for_timeout(1800)
             out["pages"][href] = page.evaluate("""(arg) => {
               const text = (document.body && document.body.innerText) || "";
@@ -120,14 +130,20 @@ with sync_playwright() as p:
               const blob = text + "\\n" + kids;
               const hits = {};
               arg.banned.forEach((b) => { hits[b] = blob.indexOf(b) >= 0; });
-              return { ok: true, hits, soccer: text.indexOf("Soccer") >= 0 || kids.indexOf("Soccer") >= 0, appointment: text.indexOf("Appointment") >= 0, money: text.indexOf(arg.money) >= 0 };
+              const titles = [...document.querySelectorAll("[data-live='leaveby-today'] .leaveby-row-title")].map((el) => (el.textContent || "").trim()).filter(Boolean);
+              return { ok: true, hits, titles, rows: titles.length, soccer: text.indexOf("Soccer") >= 0 || kids.indexOf("Soccer") >= 0, todaySoccer: titles.indexOf("Soccer") >= 0, appointment: text.indexOf("Appointment") >= 0, money: text.indexOf(arg.money) >= 0 };
             }""", {"banned": [HEALTH, "H4", "Raffle", MONEY], "money": MONEY})
+            log_step("r45 page " + href + " rows " + str(out["pages"][href].get("rows")))
         except Exception as e:
-            out["pages"][href] = {"ok": False, "error": str(e)[:240]}
+            out["pages"][href] = {"ok": False, "rows": 0, "titles": [], "error": "r45 page " + href + ": " + str(e)[:240]}
+            log_step("r45 page " + href + " FAIL " + str(e)[:160])
         ctx.close()
+    log_step("r45 page google-home")
     ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+    ctx.set_default_timeout(8000)
+    ctx.set_default_navigation_timeout(15000)
     page = ctx.new_page()
-    page.goto(BASE + "sheet-google-home.html?" + QS, wait_until="domcontentloaded", timeout=40000)
+    page.goto(BASE + "sheet-google-home.html?" + QS, wait_until="domcontentloaded", timeout=15000)
     page.wait_for_timeout(700)
     out["home"] = page.evaluate("""() => {
       function box(el) {
@@ -145,49 +161,58 @@ with sync_playwright() as p:
     }""")
     ctx.close()
     times = []
-    for i in range(15):
+    tap_n = 0 if os.environ.get("WARDOS_SKIP_TAPS") == "1" else 15
+    if tap_n == 0:
+        log_step("r45 taps skipped")
+    for i in range(tap_n):
+        log_step("r45 tap %d" % (i + 1))
         ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+        ctx.set_default_timeout(8000)
+        ctx.set_default_navigation_timeout(15000)
         page = ctx.new_page()
-        page.goto(BASE + "sheet-google-home.html?now=" + P["pin"] + "&freeze=1", wait_until="commit", timeout=30000)
-        page.wait_for_selector("a.wardos-home", state="visible", timeout=20000)
-        ready = page.evaluate("""() => {
-          const a = document.querySelector("a.wardos-home");
-          if (!a) return false;
-          const r = a.getBoundingClientRect();
-          if (r.width < 32 || r.height < 32) return false;
-          const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-          return !!(hit && hit.closest && hit.closest("a.wardos-home"));
-        }""")
-        if not ready:
-            times.append(-1)
-            ctx.close()
-            continue
-        box = page.locator("a.wardos-home").bounding_box()
-        x = box["x"] + box["width"] / 2
-        y = box["y"] + box["height"] / 2
-        t0 = time.perf_counter()
         try:
+            page.goto(BASE + "sheet-google-home.html?now=" + P["pin"] + "&freeze=1", wait_until="commit", timeout=15000)
+            page.wait_for_selector("a.wardos-home", state="visible", timeout=8000)
+            ready = page.evaluate("""() => {
+              const a = document.querySelector("a.wardos-home");
+              if (!a) return null;
+              const r = a.getBoundingClientRect();
+              if (r.width < 32 || r.height < 32) return null;
+              const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+              if (!(hit && hit.closest && hit.closest("a.wardos-home"))) return null;
+              return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+            }""")
+            if not ready:
+                times.append(-1)
+                log_step("r45 tap %d not-ready" % (i + 1))
+                ctx.close()
+                continue
+            t0 = time.perf_counter()
             with page.expect_request("**/sheet-index.html**", timeout=4000):
-                page.mouse.click(x, y, delay=0)
-            times.append(round((time.perf_counter() - t0) * 1000, 1))
-        except Exception:
+                page.mouse.click(ready["x"], ready["y"], delay=0)
+            ms = round((time.perf_counter() - t0) * 1000, 1)
+            times.append(ms)
+            log_step("r45 tap %d %sms" % (i + 1, ms))
+        except Exception as e:
             times.append(-1)
+            log_step("r45 tap %d FAIL %s" % (i + 1, str(e)[:120]))
         ctx.close()
     out["taps"] = times
-    browser.close()
-httpd.shutdown()
-ok = [t for t in out["taps"] if 0 <= t <= 300]
-ordered = sorted(t for t in out["taps"] if t >= 0)
-p95 = ordered[max(0, int(__import__("math").ceil(0.95 * len(ordered))) - 1)] if ordered else -1
-out["tap"] = {"n": 15, "ok": len(ok), "values": out["taps"], "p95": p95, "median": round(statistics.median(ordered), 1) if ordered else -1}
-# overlaps
-nodes = [n for n in (out["home"].get("nodes") or []) if n.get("box")]
-bad = []
-for i in range(len(nodes)):
-    for j in range(i + 1, len(nodes)):
-        if overlap(nodes[i]["box"], nodes[j]["box"]):
-            bad.append(nodes[i]["name"] + "/" + nodes[j]["name"])
-    if nodes[i]["box"]["bottom"] > 1032:
-        bad.append(nodes[i]["name"] + " bottom " + str(nodes[i]["box"]["bottom"]))
-out["home"]["overlap"] = bad
-print(json.dumps(out))
+    ok = [t for t in out["taps"] if 0 <= t <= 300]
+    ordered = sorted(t for t in out["taps"] if t >= 0)
+    p95 = ordered[max(0, int(__import__("math").ceil(0.95 * len(ordered))) - 1)] if ordered else -1
+    out["tap"] = {"n": 15, "ok": len(ok), "values": out["taps"], "p95": p95, "median": round(statistics.median(ordered), 1) if ordered else -1}
+    nodes = [n for n in (out["home"].get("nodes") or []) if n.get("box")]
+    bad = []
+    for i in range(len(nodes)):
+        for j in range(i + 1, len(nodes)):
+            if overlap(nodes[i]["box"], nodes[j]["box"]):
+                bad.append(nodes[i]["name"] + "/" + nodes[j]["name"])
+        if nodes[i]["box"]["bottom"] > 1032:
+            bad.append(nodes[i]["name"] + " bottom " + str(nodes[i]["box"]["bottom"]))
+    out["home"]["overlap"] = bad
+    log_step("r45 close")
+    print(json.dumps(out), flush=True)
+    sys.stdout.flush()
+    stop_httpd(httpd)
+    os._exit(0)

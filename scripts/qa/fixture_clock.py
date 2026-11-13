@@ -1,17 +1,30 @@
 """Chicago stamps for QA fixtures. The pin is 12:30 so a frozen clock still reads 12:30 PM.
-Events start at 18:00 and end at 21:00 that same day, after the pin, on any calendar date."""
+Sheet-today rows are 18:00 on that pinned day. Dad rows stay ahead of the wall clock."""
 from datetime import datetime, timedelta
 import calendar
+import os
+import sys
 from zoneinfo import ZoneInfo
 
 CT = ZoneInfo("America/Chicago")
 
 
+def wall_now():
+    raw = os.environ.get("WARDOS_WALL")
+    if not raw:
+        return datetime.now(CT)
+    dt = datetime.fromisoformat(raw)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=CT)
+    return dt.astimezone(CT)
+
+
 def plan(day_shift=0):
     # Month grid is pinned to the 1st at 12:30 so every label day is in that month
-    # and not in a past week. Live rows are ahead of the wall clock: dad-seat.js
-    # compares them to Date.now(), which the harness cannot replace.
-    wall = datetime.now(CT)
+    # and not in a past week. Sheet-today uses that same pin, so its rows are 18:00
+    # on the pinned day. dad-seat.js compares to Date.now(), so Dad rows are later
+    # than the wall clock and not on the pinned day.
+    wall = wall_now()
     anchor = (wall + timedelta(days=int(day_shift))).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     pin = anchor.replace(hour=12, minute=30)
     start = anchor.replace(hour=18)
@@ -50,7 +63,32 @@ def shift_day(p, days):
 
 
 def at(p, minutes):
-    return (p["soon_dt"] + timedelta(minutes=int(minutes))).isoformat(timespec="seconds")
+    """Dad row, ahead of the wall clock and off the pinned day."""
+    dt = p["soon_dt"] + timedelta(minutes=int(minutes))
+    if dt.date() == p["start_dt"].date():
+        dt = (p["start_dt"] + timedelta(days=1)).replace(hour=18, minute=0, second=0) + timedelta(minutes=int(minutes))
+    return dt.isoformat(timespec="seconds")
+
+
+def pin_at(p, minutes):
+    """Sheet-today row: on the pinned day, after 12:30."""
+    return (p["start_dt"] + timedelta(minutes=int(minutes))).isoformat(timespec="seconds")
+
+
+def log_step(msg):
+    sys.stderr.write("qa " + str(msg) + "\n")
+    sys.stderr.flush()
+
+
+def stop_httpd(httpd):
+    """shutdown() waits for the serve loop. A stuck handler must not hold the process."""
+    t = __import__("threading").Thread(target=httpd.shutdown, daemon=True)
+    t.start()
+    t.join(2)
+    try:
+        httpd.server_close()
+    except Exception:
+        pass
 
 
 def clock_init(pin_ms):

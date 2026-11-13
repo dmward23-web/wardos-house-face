@@ -51,6 +51,13 @@ test("r45 the real kids-week fetch drops every single-field probe", SKIP, () => 
   }
   assert.equal(o.pages["kid-hayes.html"].soccer, true, "soccer");
   assert.equal(o.pages["sheet-today.html"].hits.Raffle, false);
+  assert.ok(o.pages["sheet-today.html"].rows > 0, "sheet-today empty");
+  assert.equal(o.pages["sheet-today.html"].todaySoccer, true, "sheet-today soccer " + JSON.stringify(o.pages["sheet-today.html"].titles));
+  for (const name of ["kid-hayes.html", "sheet-today.html", "sheet-dan.html"]) {
+    const page = o.pages[name];
+    const populated = name === "sheet-today.html" ? page.rows : (name === "sheet-dan.html" ? (page.appointment ? 1 : 0) : (page.soccer ? 1 : 0));
+    assert.ok(populated > 0, name + " rendered 0 fixture rows");
+  }
   assert.equal(o.pages["sheet-dan.html"].appointment, true, "dad appointment");
   assert.equal(o.pages["sheet-dan.html"].money, true, "dad raw");
   assert.equal(o.pages["sheet-index.html"].appointment, false, "dad tile");

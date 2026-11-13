@@ -66,6 +66,15 @@ test("r44 locked views keep only allowlisted text and every field probe drops", 
     assert.equal(page.ok, true, name + " " + JSON.stringify(page).slice(0, 300));
     for (const [token, hit] of Object.entries(page.hits)) assert.equal(hit, false, name + " " + token);
   }
+  const sheet = o.pages["sheet-today"];
+  const shown = ["Soccer", "Swim", "School pickup", "School drop", "Baseball", "Flag", "Homework", "Choir", "Raffle", "Conference", "Donation", "HOA"];
+  assert.ok(sheet.rows > 0, "sheet-today empty " + JSON.stringify(sheet.titles));
+  for (const label of shown) assert.equal((sheet.titles || []).includes(label), true, "sheet-today " + label + " " + JSON.stringify(sheet.titles));
+  for (const name of ["sheet-today", "month", "dad"]) {
+    const page = o.pages[name];
+    const populated = name === "sheet-today" ? page.rows : (name === "dad" ? (page.has.Appointment ? 1 : 0) : labels.filter((label) => page.has[label]).length);
+    assert.ok(populated > 0, name + " rendered 0 fixture rows");
+  }
   const dad = o.pages.dad;
   assert.equal(dad.ok, true, JSON.stringify(dad).slice(0, 300));
   assert.equal(dad.has.Appointment, true, "dad appointment");

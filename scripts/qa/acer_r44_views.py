@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """Real pages, ?wardos-test=1. Prints one JSON object."""
-import json, os, threading
+import json, os, sys, threading
 from datetime import datetime, timezone
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from fixture_clock import at, clock_init, plan, shift_day
+from fixture_clock import at, clock_init, log_step, pin_at, plan, shift_day, stop_httpd
 from pw_chrome import launch_kw
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[2]
 P = plan(os.environ.get("WARDOS_DAY_SHIFT", "0"))
-WHEN = P["soon"]
+WHEN = P["start"]
+SHEET = ["Soccer", "Swim", "School pickup", "School drop", "Baseball", "Flag", "Homework", "Choir", "Raffle", "Conference", "Donation", "HOA"]
 BOY = "H4" + " yes " + "check" + "up"
 HEALTH = "clin" + "ic"
 MONEY = "Mort" + "gage due"
@@ -33,19 +34,21 @@ def row(what, **extra):
     item.update(extra)
     return item
 
-today = []
-today.append(row(SOCCER, startIso=at(P, 0), start=at(P, 0)))
-today.append(row(BOY, startIso=at(P, 10), start=at(P, 10)))
-for key, value in FIELDS:
-    probe = row("Homework", startIso=at(P, 20), start=at(P, 20))
-    probe[key] = value
-    today.append(probe)
-for i, label in enumerate(LABELS):
-    if label == "Homework":
+sheet = []
+sheet.append(row(SOCCER, startIso=pin_at(P, 0), start=pin_at(P, 0), end=P["end"]))
+for i, label in enumerate(SHEET):
+    if label == "Soccer":
         continue
-    stamp = at(P, 30 + i)
-    today.append(row(label, startIso=stamp, start=stamp))
-today.append(row("Homework", startIso=at(P, 50), start=at(P, 50)))
+    stamp = pin_at(P, 5 + i)
+    sheet.append(row(label, startIso=stamp, start=stamp, end=P["end"]))
+for key, value in FIELDS:
+    probe = row("Homework", startIso=pin_at(P, 40), start=pin_at(P, 40), end=P["end"])
+    probe[key] = value
+    sheet.append(probe)
+dad_rows = [
+    row(BOY, startIso=at(P, 0), start=at(P, 0), end=P["soon_end"]),
+    row(MONEY, startIso=at(P, 5), start=at(P, 5), end=P["soon_end"]),
+]
 
 days = {}
 field_items = []
@@ -58,19 +61,18 @@ for n, label in enumerate(LABELS):
 
 now = datetime.now(timezone.utc).isoformat()
 leaves = []
-for item in today:
+for item in sheet + dad_rows:
     ev = dict(item)
     ev["summary"] = item["what"]
     ev["start"] = item["start"]
-    ev["end"] = P["soon_end"]
+    ev["end"] = item.get("end") or P["end"]
     leaves.append(ev)
-leaves.append({"summary": MONEY, "what": MONEY, "title": MONEY, "start": at(P, 5), "end": P["soon_end"]})
 FIX = {
     "kids": {
-        "ainsley": {"today": today},
-        "hayes": {"today": today},
-        "harris": {"today": today},
-        "dan": {"today": today + [row(MONEY, startIso=at(P, 5), start=at(P, 5))]},
+        "ainsley": {"today": sheet},
+        "hayes": {"today": sheet},
+        "harris": {"today": sheet},
+        "dan": {"today": dad_rows},
     },
     "cal": {"status": "live", "fetchedAt": now, "asOfIso": P["day"], "upcomingLeaves": leaves},
     "days": days,
@@ -102,12 +104,14 @@ out = {"pages": {}, "home": {}}
 with sync_playwright() as p:
     browser = p.chromium.launch(**launch_kw(p, headless=True))
     for name, href in PAGES:
+        log_step("r44 page " + name)
         ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+        ctx.set_default_timeout(8000)
         page = ctx.new_page()
         page.add_init_script(clock_init(P["pin_ms"]) + "window.__wardosFixture = %s;" % json.dumps(FIX))
-        rec = {"ok": False}
+        rec = {"ok": False, "rows": 0, "titles": []}
         try:
-            page.goto(base + href + "?" + QS, wait_until="domcontentloaded", timeout=40000)
+            page.goto(base + href + "?" + QS, wait_until="domcontentloaded", timeout=15000)
             page.wait_for_timeout(1500)
             rec = page.evaluate("""(arg) => {
               const text = (document.body && document.body.innerText) || "";
@@ -118,16 +122,20 @@ with sync_playwright() as p:
               arg.banned.forEach((b) => { hits[b] = blob.indexOf(b) >= 0; });
               const has = {};
               arg.labels.forEach((b) => { has[b] = text.indexOf(b) >= 0; });
-              return { ok: true, hits, has };
+              const titles = [...document.querySelectorAll("[data-live='leaveby-today'] .leaveby-row-title")].map((el) => (el.textContent || "").trim()).filter(Boolean);
+              return { ok: true, hits, has, titles, rows: titles.length };
             }""", {"banned": BANNED, "labels": ["Soccer", "Appointment", MONEY] + LABELS})
         except Exception as e:
-            rec = {"ok": False, "error": str(e)[:300]}
+            rec = {"ok": False, "rows": 0, "titles": [], "error": str(e)[:300]}
         out["pages"][name] = rec
+        log_step("r44 page " + name + " rows " + str(rec.get("rows")))
         ctx.close()
+    log_step("r44 page google-home")
     ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+    ctx.set_default_timeout(8000)
     page = ctx.new_page()
     try:
-        page.goto(base + "sheet-google-home.html?" + QS, wait_until="domcontentloaded", timeout=40000)
+        page.goto(base + "sheet-google-home.html?" + QS, wait_until="domcontentloaded", timeout=15000)
         page.wait_for_timeout(800)
         out["home"] = page.evaluate("""() => {
           const panel = document.querySelector('.panel.cams-cmd');
@@ -147,6 +155,8 @@ with sync_playwright() as p:
     except Exception as e:
         out["home"] = {"error": str(e)[:300]}
     ctx.close()
-    browser.close()
-httpd.shutdown()
-print(json.dumps(out))
+    log_step("r44 close")
+    print(json.dumps(out), flush=True)
+    sys.stdout.flush()
+    stop_httpd(httpd)
+    os._exit(0)
