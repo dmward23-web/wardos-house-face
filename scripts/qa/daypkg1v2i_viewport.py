@@ -122,6 +122,11 @@ with sync_playwright() as p:
                 out["hdrHome"] = pg.evaluate("() => { const h = document.querySelector('header.hdr') || document.querySelector('body header'); return h ? h.classList.contains('hdr-home-tap') : null; }")
                 spot = pg.evaluate("""() => { const h = document.querySelector('header.hdr') || document.querySelector('body header'); if (!h) return null; const r = h.getBoundingClientRect();
                   const C = 'a[href],button,input,select,textarea,label,summary,[role=button],[data-mute-toggle],[contenteditable=true]';
+                  /* Prism: the header is not a Home control. The 64px Home button is. */
+                  if (!h.classList.contains('hdr-home-tap')) {
+                    const home = document.querySelector('[data-kw-home], a.hub-home, a.wardos-home, button.wardos-home');
+                    if (home) { const q = home.getBoundingClientRect(); if (q.width && q.height) return [q.left + q.width / 2, q.top + q.height / 2, 'home-btn']; }
+                  }
                   for (let y = r.top + 6; y < r.bottom - 2; y += 6) for (let x = r.left + 8; x < r.right - 8; x += 10) { const e = document.elementFromPoint(x, y); if (e && h.contains(e) && !e.closest(C)) return [x, y, 'hdr']; }
                   const k = document.querySelector('[data-kw-home]'); if (k) { const q = k.getBoundingClientRect(); if (q.width && q.height) return [q.left + q.width / 2, q.top + q.height / 2, 'kw-home']; }
                   for (let y = r.top + 6; y < r.bottom - 2; y += 6) for (let x = r.left + 8; x < r.right - 8; x += 10) { const e = document.elementFromPoint(x, y); if (e && !e.closest(C)) return [x, y, 'hdr-overlay']; } return null; }""")

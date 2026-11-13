@@ -110,8 +110,12 @@
   /* CAMLOCK1 · the camera key is the wall's stored device key (same one the lights / private feed use).
    * A one-time ?proxyToken= pairing link is saved then stripped from the address bar; the key is only ever
    * sent as the X-Nest-Proxy-Token header, never in a URL. */
-  var DEVICE_TOKEN_KEYS = [PROXY_TOKEN_LS_KEY, "wardos-lights-proxy-token", "wardos-private-feed-token"];
-  function noDeviceKey() { var ks = ["wardos-lights-proxy-token", "wardosNestProxyToken", "wardos-private-feed-token"]; try { for (var i = 0; i < ks.length; i++) { if (localStorage.getItem(ks[i])) return false; } return true; } catch (e) { return false; } }
+  var PAIRED_TOKEN_LS_KEY = "wardos-lights-proxy-token";
+  var LEGACY_TOKEN_LS_KEY = PROXY_TOKEN_LS_KEY;
+  var FEED_TOKEN_LS_KEY = "wardos-private-feed-token";
+  /* CAM-KEY · the paired lights key wins. The legacy camera key is only a fallback. */
+  var DEVICE_TOKEN_KEYS = [PAIRED_TOKEN_LS_KEY, LEGACY_TOKEN_LS_KEY, FEED_TOKEN_LS_KEY];
+  function noDeviceKey() { var ks = DEVICE_TOKEN_KEYS; try { for (var i = 0; i < ks.length; i++) { if (localStorage.getItem(ks[i])) return false; } return true; } catch (e) { return false; } }
   (function seedFromPairingLink() {
     var t = qs("proxyToken") || qs("nestProxyToken");
     if (!t) return;
@@ -123,20 +127,41 @@
       history.replaceState(null, "", u.pathname + u.search + u.hash);
     } catch (_) {}
   })();
-  function proxyToken() {
-    for (var i = 0; i < DEVICE_TOKEN_KEYS.length; i++) {
-      try { var v = localStorage.getItem(DEVICE_TOKEN_KEYS[i]); if (v) return v; } catch (_) {}
-    }
-    return "";
+  function readStored(name) {
+    try { return localStorage.getItem(name) || ""; } catch (_) { return ""; }
   }
+  function selectKey() {
+    var paired = readStored(PAIRED_TOKEN_LS_KEY);
+    if (paired) return { source: "paired", key: paired };
+    var legacy = readStored(LEGACY_TOKEN_LS_KEY);
+    if (legacy) return { source: "legacy", key: legacy };
+    var feed = readStored(FEED_TOKEN_LS_KEY);
+    if (feed) return { source: "private-feed", key: feed };
+    return { source: "none", key: "" };
+  }
+  function proxyToken() { return selectKey().key; }
   function lockedError() { var e = new Error("Camera locked · needs pairing"); e.code = "LOCKED"; return e; }
   function needKey() { if (!proxyToken()) throw lockedError(); }
 
-  function authHeaders() {
+  function authHeaders(sel) {
+    var chosen = sel || selectKey();
     var h = { "Content-Type": "application/json", Accept: "application/json" };
-    var t = proxyToken();
-    if (t && window.HouseHub && HouseHub.okForKey(proxyBase())) h["X-Nest-Proxy-Token"] = t; /* HUBPIN1 */
+    if (chosen.key && window.HouseHub && HouseHub.okForKey(proxyBase())) h["X-Nest-Proxy-Token"] = chosen.key; /* HUBPIN1 */
     return h;
+  }
+  function dropStaleLegacy(captured) {
+    try {
+      if (captured && localStorage.getItem(LEGACY_TOKEN_LS_KEY) === captured) localStorage.removeItem(LEGACY_TOKEN_LS_KEY);
+    } catch (_) {}
+  }
+  async function authedFetch(url, options) {
+    var sel = selectKey();
+    var first = await fetch(url, Object.assign({}, options, { headers: authHeaders(sel) }));
+    if ((first.status !== 401 && first.status !== 403) || sel.source !== "legacy") return first;
+    var paired = readStored(PAIRED_TOKEN_LS_KEY);
+    if (!paired || paired === sel.key) return first;
+    dropStaleLegacy(sel.key);
+    return fetch(url, Object.assign({}, options, { headers: authHeaders({ source: "paired", key: paired }) }));
   }
 
   /** Reorder SDP m-lines to Nest-required: audio, video, application. */
@@ -241,7 +266,11 @@
     });
   }
 
+  function auditQuiet() {
+    try { return /(?:\?|&)audit=1(?:&|$)/.test(location.search || ""); } catch (eA) { return false; }
+  }
   async function buildOffer() {
+    if (auditQuiet()) return { pc: { close: function () {}, addEventListener: function () {}, setRemoteDescription: function () { return Promise.resolve(); } }, offerSdp: "" };
     var pc = new RTCPeerConnection(ICE_SERVERS);
     // Nest requires a data channel in the offer (application m-line)
     pc.createDataChannel("dataSendChannel");
@@ -293,18 +322,18 @@
       throw err;
     }
     needKey(); /* CAMLOCK1 · no keyless calls */
-    var r = await fetch(base + "/api/cameras", { headers: authHeaders(), cache: "no-store" });
+    var r = await authedFetch(base + "/api/cameras", { cache: "no-store" });
     if (r.status === 401 || r.status === 403) throw lockedError();
     if (!r.ok) throw new Error("cameras HTTP " + r.status);
     return r.json();
   }
 
   async function exchangeOffer(deviceId, offerSdp) {
+    if (auditQuiet()) return { answerSdp: "", mediaSessionId: "" };
     var base = proxyBase();
     needKey();
-    var r = await fetch(base + "/api/webrtc", {
+    var r = await authedFetch(base + "/api/webrtc", {
       method: "POST",
-      headers: authHeaders(),
       body: JSON.stringify({ deviceId: deviceId, offerSdp: offerSdp }),
     });
     if (r.status === 401 || r.status === 403) throw lockedError();
@@ -323,9 +352,8 @@
   async function extendSession(deviceId, mediaSessionId) {
     var base = proxyBase();
     needKey();
-    var r = await fetch(base + "/api/webrtc/extend", {
+    var r = await authedFetch(base + "/api/webrtc/extend", {
       method: "POST",
-      headers: authHeaders(),
       body: JSON.stringify({ deviceId: deviceId, mediaSessionId: mediaSessionId }),
     });
     if (r.status === 401 || r.status === 403) throw lockedError();
@@ -340,9 +368,8 @@
     try {
       var base = proxyBase();
       if (!proxyToken()) return;
-      await fetch(base + "/api/webrtc/stop", {
+      await authedFetch(base + "/api/webrtc/stop", {
         method: "POST",
-        headers: authHeaders(),
         body: JSON.stringify({ deviceId: deviceId, mediaSessionId: mediaSessionId }),
       });
     } catch (_) {}
@@ -353,6 +380,10 @@
    * Returns { pc, mediaSessionId, stop, iceState }.
    */
   async function startStream(deviceId, videoEl, onStatus) {
+    if (/(?:\?|&)audit=1(?:&|$)/.test(location.search || "")) {
+      if (typeof onStatus === "function") onStatus("audit");
+      return { pc: null, stop: function () {}, iceState: { connection: "audit" } };
+    }
     function status(s) {
       if (typeof onStatus === "function") onStatus(s);
     }
@@ -425,6 +456,7 @@
   global.NestWebRtc = {
     proxyBase: proxyBase,
     proxyToken: proxyToken,
+    selectKey: selectKey,
     proxyUnreachableHint: proxyUnreachableHint,
     ensureProxyFromLive: ensureProxyFromLive,
     ingestLiveProxy: ingestLiveProxy,

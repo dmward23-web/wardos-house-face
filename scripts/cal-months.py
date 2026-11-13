@@ -46,6 +46,41 @@ _CP = "|".join(re.escape(n) for n in _names_early("coparent"))
 COPARENT_RULES = [(re.compile(rf"pickup at (?:{_CP})'s", re.I), "pickup at their mom's"), (re.compile(rf"\bto (?:{_CP})\b", re.I), "to their mom"),
                   (re.compile(rf"\b(?:{_CP})'s", re.I), "their mom's"), (re.compile(rf"\b(?:{_CP})\b", re.I), "their mom")] if _CP else []
 
+def allow_labels(pairs):
+    """Same allowlist as house-event-display.js. Classify each whole event before a label is stored."""
+    import subprocess
+    from pathlib import Path
+    if not pairs:
+        return []
+    root = Path(__file__).resolve().parents[1]
+    payload = json.dumps([{"event": ev, "summary": summ} for ev, summ in pairs])
+    script = (
+        "import fs from 'node:fs'; import vm from 'node:vm';"
+        "const body = JSON.parse(fs.readFileSync(0,'utf8'));"
+        "const ctx = { Intl, Date, decodeURIComponent, WeakSet, document: { readyState: 'complete', write(){}, documentElement: { getAttribute(){return null}, setAttribute(){} } } };"
+        "ctx.window = ctx; vm.createContext(ctx);"
+        "vm.runInContext(fs.readFileSync('house-event-display.js','utf8'), ctx);"
+        "const out = body.map((row) => {"
+        "  const ev = Object.assign({}, row.event || {}, { summary: row.summary, title: row.summary, what: row.summary });"
+        "  const view = ctx.HouseEventDisplay.summarize(ev, 'shared');"
+        "  return view && view.title ? view.title : '';"
+        "});"
+        "process.stdout.write(JSON.stringify(out));"
+    )
+    try:
+        proc = subprocess.run(["node", "--input-type=module", "-e", script], input=payload, text=True, capture_output=True, cwd=str(root), timeout=60)
+    except Exception:
+        return [""] * len(pairs)
+    if proc.returncode != 0:
+        return [""] * len(pairs)
+    try:
+        out = json.loads(proc.stdout or "[]")
+    except Exception:
+        return [""] * len(pairs)
+    if not isinstance(out, list) or len(out) != len(pairs):
+        return [""] * len(pairs)
+    return [str(x or "") for x in out]
+
 def scrub(s):
     for rx, rep in RULES + COPARENT_RULES: s = rx.sub(rep, s)
     return re.sub(r"\s{2,}", " ", s).strip()
@@ -75,7 +110,7 @@ for p in pages:
     for x in items:
         if x.get("status") == "cancelled": continue
         i, summ, s, e, allday = norm(x)
-        ev[i] = (summ, s, e, allday)
+        ev[i] = (x, summ, s, e, allday)
 
 SKIP = re.compile(r"^(atlas:|get\b|buy\b|backup\b|free\b|kids — pack)", re.I)
 def _names(role):
@@ -122,7 +157,12 @@ def hm(t):
     return f"{h}:{t.minute:02d}"
 
 days, withdan = {}, {}
-for i, (summ, s, e, allday) in ev.items():
+_label_of = {}
+_label_keys = list(ev.keys())
+_label_out = allow_labels([(ev[i][0], scrub(ev[i][1])) for i in _label_keys])
+for _k, _lab in zip(_label_keys, _label_out):
+    _label_of[_k] = _lab
+for i, (raw, summ, s, e, allday) in ev.items():
     if not summ or SKIP.search(summ): continue
     if allday:
         d0 = dt.date.fromisoformat(s[:10]); d1 = dt.date.fromisoformat(e[:10])
@@ -137,7 +177,8 @@ for i, (summ, s, e, allday) in ev.items():
         continue
     if summ.startswith("Dan") and not DAN_KEEP.search(summ): continue
     if BLOCK.search(summ): continue   # LIVEFIX1 · therapy / provider rows never reach the month board (drop, not fail)
-    label = scrub(summ)
+    label = _label_of.get(i) or ""
+    if not label: continue
     if BLOCK.search(label): sys.exit(f"HARD FAIL: private term survived scrub in: {label!r}")
     if external_drop(summ) or external_drop(label): continue   # EXTFILTER1: filtered rows never reach the month board
     c = kid(label)

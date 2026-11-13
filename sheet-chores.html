@@ -12,7 +12,7 @@
 <script src="house-sound.js?v=MERGE1C"></script>
 <script src="away-filter.js?v=SUNHOME1" data-away-install></script><!-- AWAYONE1 · the one away source on every page that reads cal-live / kids-week -->
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-<meta name="viewport" content="width=1080" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -449,15 +449,17 @@
   .wf-kidtabs button{flex:1;min-height:56px;border-radius:14px;border:2px solid rgba(255,255,255,.3);color:#fff;font-family:inherit;font-size:20px;font-weight:800;line-height:1;cursor:pointer;opacity:.6}
   .wf-kidtabs button.ain{background:#9b55b8}.wf-kidtabs button.hay{background:#1f7a60}.wf-kidtabs button.har{background:#2a5aa8}
   .wf-kidtabs button[aria-pressed="true"]{opacity:1;border-color:#f0b440;box-shadow:0 0 0 3px rgba(240,180,64,.45)}
-  html body .chore .txt .what{font-size:22px!important;line-height:1.25!important}
-  html body .chore .txt .hint{font-size:17px!important}
+  html body .chore .txt .what{font-size:24px!important;line-height:1.2!important}
+  html body .chore .txt .hint{font-size:24px!important}
 }
 </style>
 <style id="p1fix-chores-wall">
 /* P1FIX B45 · Chores wall: day toggles 48 px with 17 px letters (27in wall minimums); today carries a gold outline */
 @media (min-width:601px){
-  html body .chore .quest-days{gap:8px!important;flex-wrap:wrap!important}
-  html body .chore .day-tap{width:48px!important;height:48px!important;min-width:48px!important;font-size:17px!important;border-radius:10px!important}
+  html body .chore .quest-days{display:flex!important;width:100%!important;gap:2px!important;flex-wrap:nowrap!important}
+  html body .panel .body > section.col .chore{height:auto!important;min-height:0!important;max-height:none!important;overflow:hidden!important;margin:0!important;flex:0 0 auto!important;flex-direction:column!important;align-items:stretch!important}
+  html body .panel .body > section.col .chore-list{overflow-y:hidden!important;overflow-x:hidden!important;height:auto!important;max-height:none!important;flex:1 1 auto!important}
+  html body .chore .day-tap{width:85px!important;height:88px!important;min-width:85px!important;min-height:88px!important;max-width:85px!important;flex:0 0 85px!important;font-size:24px!important;border-radius:12px!important}
 }
 html body .chore .day-tap.is-today{border-color:#f0b440!important;outline:3px solid #f0b440!important;outline-offset:2px}
 </style>
@@ -472,6 +474,10 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 <link rel="stylesheet" href="house-wall-frame.css?v=P1FIX" />
 <link rel="stylesheet" href="wg-glass.css?v=HOTFIX1" />
 <style>html body .pf-flag--pair { display: none !important; }</style>
+<link rel="stylesheet" href="wardos-stage.css?v=ACERFIX1" data-wardos-stage-css="1" />
+<script src="house-scene.js?v=ACERFIX1"></script>
+<script src="house-event-display.js?v=ACERFIX1"></script>
+<script src="wardos-stage.js?v=ACERFIX1"></script>
 </head>
 <body data-clear-label="ALL CLEAR" data-chores-shared="1" data-theme="house">
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
@@ -717,8 +723,8 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 
 <nav class="chore-shortcuts" aria-label="Kid boards">
  <a class="kid-chip ainsley" href="kid-ainsley.html"><span class="dot">A</span> Ainsley</a>
- <a class="kid-chip hayes" href="kid-hayes.html"><span class="dot">H</span> Hayes</a>
- <a class="kid-chip harris" href="kid-harris.html"><span class="dot">H</span> Harris</a>
+ <a class="kid-chip hayes" href="kid-hayes.html"><span class="dot">Hy</span> Hayes</a>
+ <a class="kid-chip harris" href="kid-harris.html"><span class="dot">Hr</span> Harris</a>
 </nav>
 <div class="panel">
  <header class="hdr hdr--clockfirst">
@@ -758,64 +764,65 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </section>
  <!-- Ainsley -->
  <section class="col" aria-label="Ainsley chores">
+ <h2 class="col-name">Ainsley</h2>
   <div class="chore-list">
- <div class="chore open ainsley" data-check="ain-bed">
+ <div class="chore open ainsley" data-check="ain-bed" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Make bed · stage reset</div>
  <div class="hint">daily must · morning</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-toys">
+ <div class="chore open ainsley" data-check="ain-toys" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Room reset</div>
  <div class="hint">daily must · morning clean pass</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-dishwasher">
+ <div class="chore open ainsley" data-check="ain-dishwasher" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Clean up · rinse · dishwasher</div>
  <div class="hint">daily must · after you eat</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-empty">
+ <div class="chore open ainsley" data-check="ain-empty" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Empty dishwasher</div>
  <div class="hint">daily must · when clean</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-living">
+ <div class="chore open ainsley" data-check="ain-living" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Shoes & coats · closet / cubby / room</div>
  <div class="hint">daily must · never hallway</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-bath">
+ <div class="chore open ainsley" data-check="ain-bath" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Bathroom wipe</div>
  <div class="hint">weekly must · ask Dad to inspect</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-laundry">
+ <div class="chore open ainsley" data-check="ain-laundry" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Laundry full cycle · her clothes</div>
  <div class="hint">weekly must · wash, dry, put away</div>
  </div>
  </div>
- <div class="chore open ainsley" data-check="ain-cubby">
+ <div class="chore open ainsley" data-check="ain-cubby" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Backpack + sports bag in garage cubby</div>
  <div class="hint">weekly must · ask Dad to inspect</div>
  </div>
  </div>
- <div class="chore open ainsley addon" data-check="ain-babysit" data-optional="1">
+ <div class="chore open ainsley addon" data-check="ain-babysit" data-optional="1" data-cadence="addon">
  <span class="ring">＋</span>
  <div class="txt">
  <div class="what">Babysitting · optional add-on</div>
@@ -828,8 +835,9 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 
  <!-- Hayes -->
  <section class="col" aria-label="Hayes chores">
+ <h2 class="col-name">Hayes</h2>
   <div class="chore-list">
- <div class="chore open hayes" data-check="hay-bed">
+ <div class="chore open hayes" data-cadence="daily" data-check="hay-bed">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Make bed</div>
@@ -837,7 +845,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-backpack">
+ <div class="chore open hayes" data-check="hay-backpack" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Backpack ready</div>
@@ -845,7 +853,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-dishes">
+ <div class="chore open hayes" data-check="hay-dishes" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Clean up · rinse · dishwasher</div>
@@ -853,7 +861,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-empty">
+ <div class="chore open hayes" data-check="hay-empty" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Empty dishwasher</div>
@@ -861,7 +869,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-trash">
+ <div class="chore open hayes" data-check="hay-trash" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Trash out</div>
@@ -869,7 +877,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-postgame">
+ <div class="chore open hayes" data-check="hay-postgame" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Post-game · gear rinsed · bag set</div>
@@ -877,7 +885,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-shower">
+ <div class="chore open hayes" data-check="hay-shower" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Shower · brush · ready for bed</div>
@@ -885,7 +893,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open hayes" data-check="hay-room">
+ <div class="chore open hayes" data-check="hay-room" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Room reset</div>
@@ -893,7 +901,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="2" data-money-suffix=""></span>
  </div>
- <div class="chore open hayes" data-check="hay-shoes">
+ <div class="chore open hayes" data-check="hay-shoes" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Shoes · closet / cubby / room</div>
@@ -901,7 +909,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="1" data-money-suffix=""></span>
  </div>
- <div class="chore open hayes" data-check="hay-cubby">
+ <div class="chore open hayes" data-check="hay-cubby" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Backpack + sports bag in garage cubby</div>
@@ -914,8 +922,9 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
 
  <!-- Harris -->
  <section class="col" aria-label="Harris chores">
+ <h2 class="col-name">Harris</h2>
   <div class="chore-list">
- <div class="chore open harris" data-check="har-bed">
+ <div class="chore open harris" data-check="har-bed" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Make bed</div>
@@ -923,7 +932,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-backpack">
+ <div class="chore open harris" data-check="har-backpack" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Backpack ready</div>
@@ -931,7 +940,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-dishes">
+ <div class="chore open harris" data-check="har-dishes" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Clean up · rinse · dishwasher</div>
@@ -939,7 +948,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-empty">
+ <div class="chore open harris" data-check="har-empty" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Empty dishwasher</div>
@@ -947,7 +956,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-trash">
+ <div class="chore open harris" data-check="har-trash" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Trash out</div>
@@ -955,7 +964,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-postgame">
+ <div class="chore open harris" data-check="har-postgame" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Post-game · gear rinsed · bag set</div>
@@ -963,7 +972,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-shower">
+ <div class="chore open harris" data-check="har-shower" data-cadence="daily">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Shower · brush · ready for bed</div>
@@ -971,7 +980,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="7" data-money-suffix=" wk"></span>
  </div>
- <div class="chore open harris" data-check="har-toys">
+ <div class="chore open harris" data-check="har-toys" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Toys reset</div>
@@ -979,7 +988,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="2" data-money-suffix=""></span>
  </div>
- <div class="chore open harris" data-check="har-shoes">
+ <div class="chore open harris" data-check="har-shoes" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Shoes · closet / cubby / room</div>
@@ -987,7 +996,7 @@ html.ori-on body .kid-chip .dot{background:rgba(255,255,255,.22)!important;color
  </div>
  <span class="star-earn" data-stars="1" data-money-suffix=""></span>
  </div>
- <div class="chore open harris" data-check="har-cubby">
+ <div class="chore open harris" data-check="har-cubby" data-cadence="weekly">
  <span class="ring"></span>
  <div class="txt">
  <div class="what">Backpack + sports bag in garage cubby</div>
@@ -1049,5 +1058,452 @@ cols.forEach(function(c,i){var chip=c.querySelector(".kid-chip")||shorts[i];var 
 var b=document.createElement("button");b.type="button";b.className=cls[id]||"";b.textContent=name;b.addEventListener("click",function(){pick(i)});bar.appendChild(b)});
 body.parentNode.insertBefore(bar,body);pick(0);})();</script>
 <link rel="stylesheet" href="wall-board-sheets.css?v=WALLSHEET1" />
+<style id="acer-chore-window">
+html body .panel > header.hdr { background: transparent !important; box-shadow: none !important; }
+html body .panel > header.hdr .live-clock-host {
+  position: absolute !important;
+  left: 700px !important;
+  top: 4px !important;
+  z-index: 6 !important;
+  background: #101820 !important;
+  border: 2px solid #c4b49a !important;
+  border-radius: 16px !important;
+  padding: 8px 16px !important;
+  min-height: 72px !important;
+}
+html:not(#hf-wall-off) body .panel .body > section.col .chore {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  padding: 6px 0 !important;
+  overflow: hidden !important;
+}
+html:not(#hf-wall-off):not(#hf-scroll-off) body .panel > .body:has(> .col) {
+  position: absolute !important;
+  left: 48px !important;
+  top: 176px !important;
+  width: 1824px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  column-gap: 25px !important;
+  grid-template-columns: 591px 591px 591px !important;
+  justify-content: start !important;
+}
+html:not(#hf-wall-off):not(#hf-scroll-off) body .panel > .body > section.col {
+  position: relative !important;
+  width: 591px !important;
+  max-width: 591px !important;
+  padding: 8px 12px 8px 24px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+html:not(#hf-wall-off) body .panel .chore-list.is-scroll::-webkit-scrollbar { width: 18px; }
+html:not(#hf-wall-off) body .panel .chore-list.is-scroll::-webkit-scrollbar-thumb { background: #c4b49a; border-radius: 8px; }
+html:not(#hf-wall-off) body .panel .body > section.col .chore-list {
+  padding: 4px 0 0 !important;
+  gap: 16px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  scrollbar-gutter: auto !important;
+}
+html body .chore .quest-days {
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  flex-wrap: nowrap !important;
+}
+html body .chore .day-tap {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 88px !important;
+  box-sizing: border-box !important;
+}
+html:not(#hf-wall-off) body .panel .body > section.col .chore {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+html body .panel > header.hdr {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+html body section.col .chore-ico,
+html body section.col .chore-ico svg {
+  width: 48px !important;
+  height: 48px !important;
+}
+html body section.col .what { padding-left: 24px !important; }
+html body .chore .day-tap {
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  max-width: 64px !important;
+  flex: 0 0 64px !important;
+  font-size: 24px !important;
+  line-height: 64px !important;
+}
+html body .chore .day-tap.is-past {
+  opacity: 0.6 !important;
+  text-decoration: line-through !important;
+  background: transparent !important;
+}
+html body .chore .day-tap.is-off:not(.is-today):not(.done) {
+  background: transparent !important;
+  border: 2px solid #c4b49a !important;
+  color: #f4efe6 !important;
+}
+html body .chore .quest-days {
+  display: grid !important;
+  grid-template-columns: repeat(7, 64px) !important;
+  gap: 6px !important;
+  width: max-content !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+html body section.col .more-chip {
+  position: relative !important;
+  right: auto !important;
+  bottom: auto !important;
+  top: auto !important;
+  left: auto !important;
+  width: 100% !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  margin: 8px 0 0 !important;
+  padding: 0 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #1c2430 !important;
+  color: #f4efe6 !important;
+  border-radius: 16px !important;
+  font-size: 24px !important;
+  line-height: 1.2 !important;
+  z-index: 2 !important;
+}
+html body section.col .more-chip::after { content: "  \203A"; }
+html body .chore-shortcuts {
+  top: 128px !important;
+  left: 48px !important;
+}
+html body .chore-shortcuts .kid-chip {
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
+}
+html body .house-snd { display: none !important; }
+html:not(#hf-wall-off) body .panel .mute-btn,
+html:not(#hf-wall-off) body .panel .hdr-right-tools {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+html:not(#hf-wall-off) body .chore-shortcuts {
+  left: 168px !important;
+  top: 52px !important;
+  width: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+}
+html:not(#hf-wall-off) body .chore-shortcuts .kid-chip {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 160px !important;
+  min-width: 148px !important;
+  height: 64px !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+html body .cheer,
+html body .panel > section.cheer {
+  background: #101820 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+html body .cheer::before,
+html body .panel > section.cheer::before { content: none !important; display: none !important; background: none !important; }
+html body .cheer-accent { display: none !important; }
+html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock,
+html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst [data-live-clock],
+html body .panel .live-clock {
+  color: #f4efe6 !important;
+  -webkit-text-fill-color: #f4efe6 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  background: #101820 !important;
+  white-space: nowrap !important;
+  font-size: 32px !important;
+  line-height: 1 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  height: 64px !important;
+  padding: 0 16px !important;
+  box-sizing: border-box !important;
+}
+html:not(#hf-wall-off) body .chore-shortcuts .kid-chip,
+html:not(#hf-wall-off) body .chore-shortcuts .kid-chip.ainsley,
+html:not(#hf-wall-off) body .chore-shortcuts .kid-chip.hayes,
+html:not(#hf-wall-off) body .chore-shortcuts .kid-chip.harris {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  font-size: 24px !important;
+  text-shadow: none !important;
+}
+html body section.col .more-chip.more-chip {
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
+  font-size: 24px !important;
+  line-height: 64px !important;
+  color: #f4efe6 !important;
+  -webkit-text-fill-color: #f4efe6 !important;
+}
+html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock-host {
+  left: 760px !important;
+  top: 8px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  outline: 0 !important;
+}
+html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock {
+  border: 2px solid #c4b49a !important;
+  border-radius: 16px !important;
+  padding: 0 16px !important;
+}
+html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst .live-clock,
+html:not(#hf-wall-off) body .panel .hdr.hdr--clockfirst [data-live-clock] {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  border: 2px solid #c4b49a !important;
+  border-radius: 16px !important;
+}
+html:not(#hf-wall-off) body .panel > section.cheer,
+html:not(#hf-wall-off) body .panel .cheer {
+  left: 820px !important;
+  width: 640px !important;
+  top: 48px !important;
+}
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  function fitChoreColumns() {
+    document.querySelectorAll("section.col").forEach(function (col) {
+      var list = col.querySelector(".chore-list");
+      if (!list) return;
+      var cards = [].slice.call(list.querySelectorAll(":scope > .chore"));
+      cards.forEach(function (card) {
+        card.style.removeProperty("height");
+        card.style.removeProperty("min-height");
+        card.style.removeProperty("max-height");
+        card.style.removeProperty("display");
+      });
+      var showAll = col.getAttribute("data-show-all") === "1";
+      var n = Math.min(5, cards.length);
+      if (!cards.length) return;
+      list.style.setProperty("gap", "16px", "important");
+      list.style.setProperty("scrollbar-gutter", "auto", "important");
+      list.style.setProperty("padding-left", "0", "important");
+      list.style.setProperty("padding-right", "0", "important");
+      list.style.setProperty("overflow", "hidden", "important");
+      var gap = 16;
+      var cs = getComputedStyle(list);
+      var padY = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+      var H = list.clientHeight - padY;
+      var rowH = Math.floor((H - gap * Math.max(0, n - 1)) / n);
+      if (!isFinite(rowH) || rowH < 96) rowH = 96;
+      if (showAll && cards.length > n) {
+        var windowH = rowH * n + gap * Math.max(0, n - 1);
+        list.style.setProperty("max-height", windowH + "px", "important");
+        list.style.setProperty("overflow-y", "scroll", "important");
+        list.style.setProperty("scrollbar-width", "auto", "important");
+        list.style.setProperty("scrollbar-color", "#c4b49a #0f1a22", "important");
+        list.classList.add("is-scroll");
+      }
+      /* r34. Icon stays 64 and every gap stays 16. Circles shrink so the
+         icon and the last circle share the same clearance inside the card
+         border box, at least 12px on each side. */
+      col.style.setProperty("padding-left", "0", "important");
+      col.style.setProperty("padding-right", "0", "important");
+      cards.forEach(function (card, i) {
+        var show = showAll || i < n;
+        card.style.setProperty("display", show ? "grid" : "none", "important");
+        card.style.setProperty("width", "100%", "important");
+        card.style.setProperty("box-sizing", "border-box", "important");
+        card.style.setProperty("padding", "0", "important");
+      });
+      var probe = null;
+      for (var pi = 0; pi < cards.length; pi++) {
+        if (showAll || pi < n) { probe = cards[pi]; break; }
+      }
+      var pcs = probe ? getComputedStyle(probe) : null;
+      var borderBox = probe ? probe.getBoundingClientRect().width : (col.clientWidth || 589);
+      var content = Math.floor(borderBox);
+      var iconW = 64;
+      var dayGap = 16;
+      var side = 12;
+      var circle = Math.floor((content - side * 2 - iconW - dayGap * 7) / 7);
+      if (!(circle > 0)) circle = 1;
+      var daysW = circle * 7 + dayGap * 6;
+      var spare = content - iconW - dayGap - daysW;
+      if (spare < side * 2) spare = side * 2;
+      var left = Math.floor(spare / 2);
+      var mid = dayGap;
+      var right = spare - left;
+      var row2 = 64;
+      col.style.setProperty("--d-zone", circle + "px");
+      col.style.setProperty("--d-dot", circle + "px");
+      col.style.setProperty("--d-inset", "0px");
+      col.setAttribute("data-r33-circle", String(circle));
+      col.setAttribute("data-r33-gap", String(dayGap));
+      col.setAttribute("data-r33-content", String(content));
+      cards.forEach(function (card, i) {
+        if (!showAll && i >= n) {
+          card.style.setProperty("display", "none", "important");
+          return;
+        }
+        card.style.setProperty("display", "grid", "important");
+        card.style.setProperty("grid-template-columns", left + "px " + iconW + "px " + mid + "px " + daysW + "px " + right + "px", "important");
+        card.style.setProperty("grid-template-rows", "24px " + row2 + "px", "important");
+        card.style.setProperty("column-gap", "0", "important");
+        card.style.setProperty("row-gap", "4px", "important");
+        card.style.setProperty("align-content", "center", "important");
+        card.style.setProperty("width", "100%", "important");
+        card.style.setProperty("position", "relative", "important");
+        card.style.setProperty("align-items", "center", "important");
+        card.style.setProperty("box-sizing", "border-box", "important");
+          card.style.setProperty("height", rowH + "px", "important");
+          card.style.setProperty("min-height", "0", "important");
+          card.style.setProperty("max-height", "none", "important");
+          card.style.setProperty("overflow", "visible", "important");
+        card.style.setProperty("padding", "0", "important");
+        card.style.setProperty("margin", "0", "important");
+        var ico = card.querySelector(".chore-ico");
+        if (ico) {
+          ico.style.setProperty("grid-column", "2", "important");
+          ico.style.setProperty("grid-row", "2", "important");
+          ico.style.setProperty("width", iconW + "px", "important");
+          ico.style.setProperty("height", iconW + "px", "important");
+          ico.style.setProperty("min-width", iconW + "px", "important");
+          ico.style.setProperty("min-height", iconW + "px", "important");
+          ico.style.setProperty("max-width", iconW + "px", "important");
+          ico.style.setProperty("max-height", iconW + "px", "important");
+          ico.style.setProperty("justify-self", "center", "important");
+          ico.style.setProperty("align-self", "center", "important");
+          ico.style.setProperty("overflow", "visible", "important");
+          var svg = ico.querySelector("svg");
+          if (svg) {
+            svg.setAttribute("width", String(iconW));
+            svg.setAttribute("height", String(iconW));
+            svg.style.setProperty("width", iconW + "px", "important");
+            svg.style.setProperty("height", iconW + "px", "important");
+            svg.style.setProperty("min-width", iconW + "px", "important");
+            svg.style.setProperty("min-height", iconW + "px", "important");
+            svg.style.setProperty("max-width", iconW + "px", "important");
+            svg.style.setProperty("max-height", iconW + "px", "important");
+            svg.style.setProperty("display", "block", "important");
+          }
+        }
+        var txt = card.querySelector(".txt");
+        if (txt) txt.style.setProperty("display", "contents", "important");
+        var what = card.querySelector(".what");
+        if (what) {
+          what.style.setProperty("grid-column", "4", "important");
+          what.style.setProperty("grid-row", "1", "important");
+          what.style.setProperty("justify-self", "start", "important");
+          what.style.setProperty("width", "100%", "important");
+          what.style.setProperty("padding-left", "0", "important");
+          what.style.setProperty("font-size", "24px", "important");
+          what.style.setProperty("line-height", "24px", "important");
+          what.style.setProperty("height", "24px", "important");
+          what.style.setProperty("margin", "0", "important");
+          what.style.setProperty("overflow", "visible", "important");
+          what.style.setProperty("white-space", "nowrap", "important");
+        }
+        var taps = card.querySelector(".quest-days");
+        if (taps) {
+          taps.style.setProperty("grid-column", "4", "important");
+          taps.style.setProperty("grid-row", "2", "important");
+          taps.style.setProperty("display", "grid", "important");
+          taps.style.setProperty("grid-template-columns", "repeat(7, " + circle + "px)", "important");
+          taps.style.setProperty("gap", dayGap + "px", "important");
+          taps.style.setProperty("justify-content", "start", "important");
+          taps.style.setProperty("align-self", "center", "important");
+          taps.style.setProperty("width", daysW + "px", "important");
+          taps.style.setProperty("height", circle + "px", "important");
+          taps.style.setProperty("min-height", circle + "px", "important");
+          taps.style.setProperty("margin", "0", "important");
+          var buttons = taps.querySelectorAll(".day-tap");
+          for (var bi = 0; bi < buttons.length; bi++) {
+            var tap = buttons[bi];
+            tap.style.setProperty("width", circle + "px", "important");
+            tap.style.setProperty("height", circle + "px", "important");
+            tap.style.setProperty("min-width", circle + "px", "important");
+            tap.style.setProperty("min-height", circle + "px", "important");
+            tap.style.setProperty("max-width", circle + "px", "important");
+            tap.style.setProperty("max-height", circle + "px", "important");
+            tap.style.setProperty("flex", "0 0 " + circle + "px", "important");
+            tap.style.setProperty("border-radius", "50%", "important");
+            tap.style.setProperty("padding", "0", "important");
+            tap.style.setProperty("font-size", "24px", "important");
+            tap.style.setProperty("line-height", "1", "important");
+            tap.style.setProperty("overflow", "visible", "important");
+          }
+        }
+        var ring = card.querySelector(".ring");
+        if (ring) ring.style.setProperty("display", "none", "important");
+        var hint = card.querySelector(".hint");
+        if (hint) hint.style.setProperty("display", "none", "important");
+      });
+      if (col.getAttribute("data-show-all") === "1") n = cards.length;
+      var more = cards.length > n;
+      col.classList.toggle("has-more", more);
+      var chip = col.querySelector(".more-chip");
+      if (more && !chip) {
+        chip = document.createElement("div");
+        chip.className = "more-chip";
+        chip.textContent = "More";
+        col.appendChild(chip);
+      }
+      if (chip && !more) chip.remove();
+    });
+  }
+  window.fitChoreColumns = fitChoreColumns;
+  window.setTimeout(fitChoreColumns, 400);
+  window.setTimeout(fitChoreColumns, 1000);
+  window.setTimeout(fitChoreColumns, 1500);
+  document.addEventListener("house:kids-data-ready", function () {
+    window.setTimeout(fitChoreColumns, 0);
+  });
+});
+</script>
 </body>
 </html>

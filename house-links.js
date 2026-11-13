@@ -197,7 +197,9 @@
       t = MONTH;
     }
     try { if (window.HouseSfx && window.HouseSfx.tap) window.HouseSfx.tap(); } catch (e) {}
-    window.location.assign(t);
+    var dest = t;
+    try { if (window.HouseAudit && HouseAudit.href) dest = HouseAudit.href(t); } catch (eH) { dest = t; }
+    window.location.assign(dest);
   }
   document.addEventListener("click", function (ev) {
     if (ev.defaultPrevented || ev.button > 0) return;

@@ -176,7 +176,7 @@ test("Ainsley hub faces: stars, XP, streak and $ never render, offline or with a
   assert.match(boy, /kf-xp/);
 });
 
-test("Ainsley jar: offline, bad JSON, the word trusted, and a prose sentence all stay Nothing trusted yet", async () => {
+test("Ainsley jar: offline, bad JSON, the word trusted, and a prose sentence all stay Jar is empty", async () => {
   const document = makeDocument();
   const el = node("div");
   el.attrs["data-jar-state"] = "trusted";
@@ -196,14 +196,14 @@ test("Ainsley jar: offline, bad JSON, the word trusted, and a prose sentence all
   document.readyState = "complete";
   load("ains-jar-state.js", ctx);
   await new Promise((r) => setTimeout(r, 20));
-  assert.equal(el.textContent, "Nothing trusted yet.");
+  assert.equal(el.textContent, "Jar is empty");
   assert.equal(el.getAttribute("data-jar-state"), "unset");
   ctx.AinsJarState.paint({ kids: { ainsley: { jarState: "trusted" } } });
-  assert.equal(el.textContent, "Nothing trusted yet.");
+  assert.equal(el.textContent, "Jar is empty");
   ctx.AinsJarState.paint("{not json");
-  assert.equal(el.textContent, "Nothing trusted yet.");
+  assert.equal(el.textContent, "Jar is empty");
   ctx.AinsJarState.paint({ kids: { ainsley: { jarState: "She walks to the library" } } });
-  assert.equal(el.textContent, "Nothing trusted yet.");
+  assert.equal(el.textContent, "Jar is empty");
   assert.equal(el.getAttribute("data-jar-state"), "unset");
 });
 
@@ -500,7 +500,7 @@ function bootOverlay(iso, width, scriptSrc) {
     addEventListener() {}
   });
   ctx.window = ctx;
-  vm.runInContext(rd("month-theme/season-math.js") + "\n" + rd("month-theme/month-overlay.js"), ctx, { filename: "month-overlay.js" });
+  vm.runInContext(rd("house-scene.js") + "\n" + rd("month-theme/season-math.js") + "\n" + rd("month-theme/month-overlay.js"), ctx, { filename: "month-overlay.js" });
   return { props, attrs };
 }
 
@@ -567,13 +567,20 @@ test("wall board stays one 1920x1080 canvas at portrait and phone viewports", { 
       const r = await g.evaluate(() => {
         const tiles = [...document.querySelectorAll(".tile-grid > .tile, .tile-grid > .kid-flip")];
         const box = (el) => { const b = el.getBoundingClientRect(); return { h: b.height, w: b.width, top: b.top, bottom: b.bottom, bg: getComputedStyle(el).backgroundImage }; };
-        const kids = ["ainsley", "hayes", "harris"].map((k) => box(document.querySelector(".tile." + k)));
+        const kids = ["ainsley", "hayes", "harris"].map((k) => {
+          const el = document.querySelector(".tile." + k);
+          const b = box(el);
+          b.w = el.offsetWidth;
+          b.h = el.offsetHeight;
+          return b;
+        });
         const upper = document.querySelector(".hub-upper");
         const win = document.querySelector(".hub-window");
         const ub = upper ? upper.getBoundingClientRect().bottom : 0;
         const wt = win ? win.getBoundingClientRect().top : 0;
         const leaveH = document.querySelector(".leaveby").getBoundingClientRect().height;
         const pair = document.querySelector(".pf-flag--pair");
+        const stage = document.querySelector(".wardos-stage");
         return {
           scroll: document.documentElement.scrollHeight,
           inner: innerHeight,
@@ -585,15 +592,18 @@ test("wall board stays one 1920x1080 canvas at portrait and phone viewports", { 
           pair: pair ? getComputedStyle(pair).display : "missing",
           wrapOverflow: getComputedStyle(document.querySelector(".grid-wrap")).overflowY,
           bodyW: Math.round(document.body.getBoundingClientRect().width),
-          bodyH: Math.round(document.body.getBoundingClientRect().height)
+          bodyH: Math.round(document.body.getBoundingClientRect().height),
+          stageW: stage ? stage.offsetWidth : 0,
+          stageH: stage ? stage.offsetHeight : 0
         };
       });
       await g.close();
       return r;
     };
     const wall = await measure(1080, 1920);
-    assert.equal(wall.bodyW, 1920, "portrait viewport does not reflow the canvas");
-    assert.equal(wall.bodyH, 1080);
+    assert.equal(wall.stageW, 1920, "portrait viewport does not reflow the canvas");
+    assert.equal(wall.stageH, 1080);
+    assert.ok(wall.bodyW <= 1080 + 1, "portrait body is the viewport, stage scales");
     assert.ok(wall.pair === "none" || wall.pair === "missing", wall.pair);
     const shown = wall.tiles.filter((t) => t.h >= 1);
     assert.ok(shown.length >= 4, "roster tiles " + shown.length);
@@ -603,9 +613,8 @@ test("wall board stays one 1920x1080 canvas at portrait and phone viewports", { 
       assert.match(k.bg, /kidtile-/);
     }
     const phone = await measure(390, 844);
-    assert.equal(phone.bodyW, 1920, "phone viewport does not reflow the wall");
-    assert.equal(Math.round(phone.kids[0].w), 438);
-    assert.equal(Math.round(phone.kids[0].h), 420);
+    assert.equal(phone.stageW, 0, "a phone keeps its own layout");
+    assert.equal(phone.stageH, 0);
     const house = await b.newPage();
     await house.setViewport({ width: 1080, height: 1920, deviceScaleFactor: 1 });
     await house.goto(base + "/livinghouse/index.html?now=2026-11-08T17:30:00-06:00", { waitUntil: "domcontentloaded", timeout: 60000 });

@@ -242,6 +242,10 @@ assets/ori/ainsley/wall-900x864/mid.webp
 assets/ori/ainsley/wall-900x864/near.webp
 assets/ori/ainsley/wall-900x864/sky.webp
 assets/ori/creature/ainsley.webp
+assets/ori/creature/ainsley-226.webp
+assets/ori/creature/ainsley-hero.png
+assets/ori/creature/ainsley-hero.webp
+assets/ori/creature/ainsley-hero@2x.png
 assets/ori/creature/fed_splash.webp
 assets/ori/creature/fed_splash_shadow.webp
 assets/ori/creature/happy_squish.webp
@@ -1083,6 +1087,7 @@ month-theme/hub/kidtile-harris-438x420.webp
 month-theme/hub/kidtile-harris.webp
 month-theme/hub/kidtile-hayes-438x420.webp
 month-theme/hub/kidtile-hayes.webp
+month-theme/november/hub-window-day-900x864.webp
 month-theme/november/hub-window-dusk-900x864.webp
 month-theme/november/hub-window-dusk.webp
 month-theme/november/hub-window-night-900x864.webp
@@ -1120,3 +1125,20 @@ month-theme/november/phone-night.webp
 month-theme/november/wall-dusk.webp
 month-theme/november/wall-morning.webp
 month-theme/november/wall-night.webp
+
+# r35 · 1920x1080 Mercury plates, exact 0.75 Lanczos of the 2560 landscape layers
+assets/ori/hayes/wall-1920x1080/sky.webp
+assets/ori/hayes/wall-1920x1080/far.webp
+assets/ori/hayes/wall-1920x1080/mid.webp
+assets/ori/hayes/wall-1920x1080/near.webp
+assets/ori/hayes/wall-1920x1080/fg.webp
+assets/ori/harris/wall-1920x1080/sky.webp
+assets/ori/harris/wall-1920x1080/far.webp
+assets/ori/harris/wall-1920x1080/mid.webp
+assets/ori/harris/wall-1920x1080/near.webp
+assets/ori/harris/wall-1920x1080/fg.webp
+assets/ori/ainsley/wall-1920x1080/sky.webp
+assets/ori/ainsley/wall-1920x1080/far.webp
+assets/ori/ainsley/wall-1920x1080/mid.webp
+assets/ori/ainsley/wall-1920x1080/near.webp
+assets/ori/ainsley/wall-1920x1080/fg.webp

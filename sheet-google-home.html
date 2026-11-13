@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<script>
+/* The Home control is a real link in the first paint. Do not preventDefault:
+   cancelling pointerdown aborted the browser navigation and the retry was the
+   one ~1.8s press-to-request outlier. One native navigation, no second assign. */
+</script>
 <script src="house-hub.js?v=HUBPAIR1"></script>
 <script src="private-feed.js?v=HUBPAIR1D"></script>
 <script src="house-face-law.js?v=FACESTRIP1"></script>
@@ -9,7 +14,7 @@
 <script src="house-money-bind.js?v=DAYPKG1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-<meta name="viewport" content="width=1080" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon-20260926c.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -223,6 +228,20 @@
   /* HUBKIT1 · command-panel kit chrome on camo */
   html,body{overflow-x:hidden}
   .panel{--cmd-tap-min:44px;--cmd-bulk-min:48px;--cmd-rocker-w:72px;--cmd-knob:32px}
+  /* 1920x1080 wall: one 12-column panel inside the 48px safe area, clock fully visible. */
+  @media (min-width: 1400px) and (min-height: 700px) {
+    html, html body { width: 1920px !important; min-width: 0 !important; height: 1080px !important; min-height: 1080px !important; overflow: hidden !important; }
+    html body .panel.cams-cmd {
+      width: 1824px !important; max-width: 1824px !important; height: 984px !important; min-height: 0 !important;
+      margin: 48px !important; padding: 16px 22px 12px !important; box-sizing: border-box !important; overflow: visible !important;
+    }
+    html body .hdr.hdr--clockfirst { min-height: 0 !important; overflow: visible !important; }
+    html body .hdr.hdr--clockfirst .live-clock-host { overflow: visible !important; max-width: none !important; flex: 0 0 auto !important; }
+    html body .hdr.hdr--clockfirst .live-clock,
+    html body .hdr.hdr--clockfirst [data-live-clock] {
+      font-size: 36px !important; line-height: 1 !important; overflow: visible !important; white-space: nowrap !important; max-width: none !important;
+    }
+  }
   .banner.cmd-panel{padding:14px 16px;gap:6px}
   .banner .banner-title{font-size:24px;font-weight:850;color:var(--cmd-ink);margin-top:2px}
   .banner .banner-sub{font-size:13px;color:var(--cmd-mute);margin-top:2px}
@@ -257,13 +276,31 @@ html body .hot-pill.gh-title-pill::before,html body .hot-pill.gh-title-pill::aft
 html body .cam-path,html body #cam-next-step{display:none!important}
 </style>
 <link rel="stylesheet" href="wg-glass.css?v=HOTFIX1" />
+<link rel="stylesheet" href="wardos-stage.css?v=ACERFIX1" data-wardos-stage-css="1" />
+<script src="house-scene.js?v=ACERFIX1"></script>
+<script src="house-event-display.js?v=ACERFIX1"></script>
+<script src="wardos-stage.js?v=ACERFIX1"></script>
 </head>
 <body>
+<a class="wardos-home" href="sheet-index.html" id="gh-home" data-kw-home aria-label="Home" style="position:fixed;left:48px;top:48px;width:64px;height:64px;z-index:80;display:flex;align-items:center;justify-content:center;pointer-events:auto"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64" style="width:64px;height:64px;pointer-events:none"></a>
+<script>
+(function (a) {
+  if (!a || !a.style) return;
+  a.style.setProperty("position", "fixed", "important");
+  a.style.setProperty("left", "48px", "important");
+  a.style.setProperty("top", "48px", "important");
+  a.style.setProperty("width", "64px", "important");
+  a.style.setProperty("height", "64px", "important");
+  a.style.setProperty("z-index", "80", "important");
+  a.style.setProperty("display", "flex", "important");
+  a.style.setProperty("pointer-events", "auto", "important");
+})(document.getElementById("gh-home"));
+</script>
 <div class="panel cams-cmd">
- <header class="hdr hdr--clockfirst">
+ <header class="hdr hdr--clockfirst gh-top" style="min-height:72px;margin-left:80px;width:calc(100% - 80px);box-sizing:border-box;overflow:hidden;position:relative">
  <div class="hdr-left-col">
- <div class="live-clock-host" aria-label="America/Chicago time">
- <div class="live-clock" data-live-clock></div>
+ <div class="live-clock-host" aria-label="America/Chicago time" style="position:relative;left:auto;top:auto;width:auto;height:64px;max-height:64px;overflow:hidden">
+ <div class="live-clock" data-live-clock style="height:64px;max-height:64px;line-height:64px;padding:0 14px;box-sizing:border-box"></div>
  </div>
  <div class="hdr-micros">
  
@@ -443,7 +480,7 @@ html body .cam-path,html body #cam-next-step{display:none!important}
 <script src="house-zoom.js"></script>
 <script src="house-sfx.js?v=DAYPKG1"></script>
 <script src="house-sensi.js?v=SUNHOME1"></script>
-<script src="nest-webrtc-client.js?v=FOLLOWUP6"></script>
+<script src="nest-webrtc-client.js?v=ACERFIX-CAM1"></script>
 <script src="house-nest.js?v=CAMREST3"></script>
 <script src="house-lights.js?v=SUNHOME1"></script>
 <script src="house-sensi-ctl.js?v=SUNHOME1"></script>
@@ -497,5 +534,80 @@ html body .cam-path,html body #cam-next-step{display:none!important}
 <script src="house-ori-world.js?v=MERGE1C"></script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
+<style>
+@media (min-width: 1400px) and (min-height: 700px) {
+  html:not(#hf-wall-off) body #sensi-hero .climate-amb {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+    position: static !important;
+  }
+  html:not(#hf-wall-off) body #sensi-hero .climate-amb .lab,
+  html:not(#hf-wall-off) body #sensi-hero .climate-amb .big {
+    position: static !important;
+    inset: auto !important;
+    display: block !important;
+    line-height: 1.15 !important;
+  }
+}
+</style>
+<style id="gh-wall-fit">
+@media (min-width: 1400px) and (min-height: 700px) {
+  html body .panel.cams-cmd {
+    width: 1824px !important; max-width: 1824px !important; height: 984px !important; min-height: 0 !important;
+    margin: 48px !important; box-sizing: border-box !important; overflow: hidden !important;
+    display: flex !important; flex-direction: column !important;
+  }
+  html body .panel.cams-cmd > .hdr.gh-top {
+    display: grid !important; grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto !important;
+    align-items: center !important; column-gap: 16px !important; position: relative !important; overflow: visible !important;
+  }
+  html body a#gh-home.wardos-home {
+    position: fixed !important; left: 48px !important; top: 48px !important; width: 64px !important; height: 64px !important;
+    z-index: 80 !important; display: flex !important; pointer-events: auto !important;
+  }
+  html body .panel.cams-cmd > .hdr.gh-top > .hdr-left-col { grid-column: 1 !important; grid-row: 1 !important; min-width: 0 !important; position: relative !important; }
+  html body .panel.cams-cmd > .hdr.gh-top > .hdr-spacer { grid-column: 2 !important; }
+  html body .panel.cams-cmd > .hdr.gh-top > .hdr-right-tools { grid-column: 3 !important; }
+  html body .panel.cams-cmd .live-clock-host { position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: 64px !important; max-height: 64px !important; overflow: hidden !important; }
+  html body .panel.cams-cmd .live-clock, html body .panel.cams-cmd [data-live-clock] {
+    font-size: 32px !important; line-height: 64px !important; height: 64px !important; max-height: 64px !important; padding: 0 14px !important;
+    white-space: nowrap !important; overflow: hidden !important; box-sizing: border-box !important; width: auto !important;
+  }
+  html body .panel.cams-cmd > .cam-zone { flex: 1 1 auto !important; min-height: 0 !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; }
+  html body .panel.cams-cmd .cam-grid {
+    flex: 1 1 auto !important; min-height: 0 !important; height: auto !important;
+    grid-template-columns: 1fr 1fr 1fr !important; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) !important;
+  }
+  html body .panel.cams-cmd article.cam { min-height: 0 !important; height: 100% !important; overflow: hidden !important; }
+}
+</style>
+<script>
+(function () {
+  function lock() {
+    var home = document.getElementById("gh-home");
+    if (home) {
+      home.style.setProperty("position", "fixed", "important");
+      home.style.setProperty("left", "48px", "important");
+      home.style.setProperty("top", "48px", "important");
+      home.style.setProperty("width", "64px", "important");
+      home.style.setProperty("height", "64px", "important");
+      home.style.setProperty("z-index", "80", "important");
+    }
+    var host = document.querySelector(".panel.cams-cmd .live-clock-host");
+    if (host) {
+      host.style.setProperty("position", "relative", "important");
+      host.style.setProperty("left", "auto", "important");
+      host.style.setProperty("top", "auto", "important");
+      host.style.setProperty("height", "64px", "important");
+      host.style.setProperty("max-height", "64px", "important");
+      host.style.setProperty("overflow", "hidden", "important");
+    }
+  }
+  lock();
+  window.addEventListener("load", lock);
+})();
+</script>
 </body>
 </html>

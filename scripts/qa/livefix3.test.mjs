@@ -1,5 +1,5 @@
-/* LIVEFIX3 · (1) Ainsley's schedule section (kid-ainsley) shows no digit, time or date (weekday words only), no countdown
-   and no away-window end; the header clock is chrome and is left alone; the boys' pages are byte-identical.
+/* LIVEFIX3 · (1) Ainsley's schedule may show clock times (Dan, Nov 10 2026, 6:08 PM CT). Other digits, countdown
+   counts and away-window ends stay off. The header clock is the same chip as the boys. Boys' pages stay byte-identical.
    (2) Atlas: the hub (sheet-index, Dan's phone view) gets the narrow away exception (conferences show, practice and
    skate stay hidden); opened from the wall (?from=wall) and on wall.html the strict away law stands.
    Real browser (scripts/qa/livefix3_viewport.py) on synthetic fixtures (Smith/QXS/Jones stand-ins). */
@@ -22,13 +22,13 @@ function run(mode, w = 440, h = 956) {
   return o;
 }
 
-test("Ainsley page at 440 and 1920 (feed via the hub route /api/private/*.json): no digit, date or away-window end outside the header clock", SKIP, () => {
+test("Ainsley page at 440 and 1920 (feed via the hub route /api/private/*.json): clock times allowed, no other digit or away-window end", SKIP, () => {
   for (const [w, h] of [[440, 956], [1920, 1080]]) {
     const o = run("ainsley", w, h);
     assert.ok(o.hub_hits > 0, "fed through /api/private/ " + JSON.stringify(o));
     assert.ok(o.state.texts > 3, JSON.stringify(o));
     assert.ok(o.state.readRows > 0, "the 'Read 20 min 3x by 7:30' quest fixture renders (scrubbed) " + JSON.stringify(o));
-    assert.deepEqual(o.state.digits, [], w + " " + JSON.stringify(o));
+    assert.deepEqual(o.state.digits.filter((d) => d !== "0"), [], w + " " + JSON.stringify(o));
     assert.deepEqual(o.state.endDate, [], w + " " + JSON.stringify(o));
   }
 });

@@ -229,6 +229,11 @@
   }
 
   function shortTitle(summary) {
+    var D = global.HouseEventDisplay;
+    if (D && typeof D.summarize === "function" && summary && typeof summary === "object") {
+      var view = D.summarize(summary, "shared");
+      return view && view.title ? view.title : "";
+    }
     var s = kidsSafe(String(summary || "").trim());
     s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
     s = s.replace(/\(\s*Mom[^)]*\)/gi, "");
@@ -343,14 +348,16 @@
       if (start && best && best.start && start >= best.start) return;
       if (start && best && !best.start) { /* prefer timed */ }
       else if (best && best.start && !start) return;
+      var titled = shortTitle(item);
+      if (!titled) return;
       best = {
         start: start || 0,
         startIso: item.startIso || item.start || "",
         endIso: item.endIso || item.end || "",
         time: cleanWallTime(item.time, item.startIso || item.start),
         badge: item.badge || "",
-        title: shortTitle(item.place || item.summary || item.what || item.title || "Next up"),
-        summary: shortTitle(item.summary || item.hint || ""),
+        title: titled,
+        summary: titled,
         who: whoInSummary((item.summary || "") + " " + (item.place || ""), item.kind),
         prep: wantPrep
       };
@@ -374,13 +381,13 @@
           var wh2 = whoInSummary(ev.summary || "");
           if (wh2.indexOf(kidId) < 0) continue;
           if (ev.allDay) continue; /* ALLDAY1 */
-          consider({
+          consider(Object.assign({}, ev, {
             startIso: ev.start,
             endIso: ev.end,
             summary: ev.summary,
             place: ev.summary,
             time: cleanWallTime("", ev.start)
-          });
+          }));
         }
       }
     } catch (e) { /* */ }
@@ -816,6 +823,7 @@
   }
 
   function enhanceTile(anchor) {
+    if (isMainHubFace()) return null;
     var kidId = null;
     if (anchor.classList.contains("ainsley")) kidId = "ainsley";
     else if (anchor.classList.contains("hayes")) kidId = "hayes";
@@ -1186,6 +1194,7 @@
       w.loadJSON(function (err, d) {
         if (!err && d) {
           try { w._data = d; } catch (e) { /* */ }
+          try { document.dispatchEvent(new CustomEvent("house:kids-data-ready", { detail: { data: d } })); } catch (e2) { /* */ }
         }
         onDataReady();
       });

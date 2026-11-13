@@ -53,10 +53,10 @@ base = f"http://127.0.0.1:{srv.server_address[1]}"
 AIN = r"""() => { const D = /[\d$%\u2605\u2606\u2b50]/;
   const vis = el => { for (let a = el; a; a = a.parentElement) { const c = getComputedStyle(a); if (c.display === 'none' || c.visibility === 'hidden') return false; } return true; };
   const sec = document.body; if (!document.querySelector('.sec-schedule.consume-sched')) return { missing: 1 };
-  const CLK = /^(?:[A-Z][a-z]{2}\s*·\s*)?\d{1,2}:\d{2}\s*[AP]M$/;   /* the header clock is chrome */
+  const CLK = /^(?:[A-Z][a-z]{2}\s*·\s*)?\d{1,2}:\d{2}\s*[AP]M$/;   /* header clock and schedule times are allowed (Dan, Nov 10 2026, 6:08 PM CT) */
   const o = []; const tw = document.createTreeWalker(sec, NodeFilter.SHOW_TEXT); let n;
   while ((n = tw.nextNode())) { const el = n.parentElement, t = n.nodeValue.trim(); if (!t || !el || !vis(el) || el.closest('script,style,[data-mount-consume-hdr]') || CLK.test(t)) continue; o.push(t); }
-  return { digits: o.filter(t => D.test(t)).slice(0, 8), texts: o.length, readRows: o.filter(t => /^Read\b/.test(t)).length, endDate: o.filter(t => /\bOct\b|\bthrough\b|Multi-day/i.test(t)).slice(0, 4) }; }"""
+  return { digits: o.filter(t => D.test(t.replace(/\d{1,2}:\d{2}(?:\s*[AP]M)?/gi, ''))).slice(0, 8), texts: o.length, readRows: o.filter(t => /^Read\b/.test(t)).length, endDate: o.filter(t => /\bOct\b|\bthrough\b|Multi-day/i.test(t)).slice(0, 4) }; }"""
 TMR = r"""() => [...document.querySelectorAll('.lb-day-tmr, .lb-list-sec--tmr, [data-live="leaveby-tomorrow"], .leaveby-sec--tmr')].map(e => e.innerText.replace(/\s+/g, ' ')).join(' || ')"""
 out = {"mode": mode, "size": f"{w}x{h}"}
 with sync_playwright() as p:

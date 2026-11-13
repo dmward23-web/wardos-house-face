@@ -134,7 +134,11 @@
 
     /* SEATS1 · Dad card = kid card face: big next leave-by + next two after it */
     var stage = document.querySelector(".tile.dan [data-dad-stage]");
-    if (stage) {
+    var pagePath = "";
+    try { pagePath = (location && location.pathname) || ""; } catch (ePath) { pagePath = ""; }
+    if (stage && /sheet-index\.html$/.test(pagePath)) {
+      /* The hub plate is painted by hub-compose. This binder must not put "Dad / Calendar" back. */
+    } else if (stage) {
       /* NEXTLEAVE1 · "Next leave" is the first REAL leave/drop (generator flag leaveBy), never queue[0]:
          the 7:00 school specials note and all-day notes are not leaves. Older data without the flag: same rule by kind. */
       var isLeave = function (it) {

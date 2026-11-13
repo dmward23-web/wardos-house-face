@@ -124,7 +124,7 @@ test("CAMREST3 · State D (paired, hub camera data stale, its old stills still l
 test("Prism spec · computed pill, art and dot (wall), reduced motion stops the pulse, phone dots stay calm", SKIP, async () => {
   const r = await all();
   const s = r.still5xx.style;
-  assert.equal(s.fontPx, 16); assert.equal(s.color, "rgb(255, 226, 176)"); assert.equal(s.radius, "999px");
+  assert.equal(s.fontPx, 24); assert.equal(s.color, "rgb(255, 226, 176)"); assert.equal(s.radius, "999px");
   assert.match(s.border, /^rgb\(232, 163, 61\)/); assert.equal(s.bg, "rgba(28, 18, 8, 0.82)");
   assert.ok(s.contrastWorst >= 4.5, "AA even over white art " + s.contrastWorst);
   assert.equal(s.artFilter, "brightness(0.8) saturate(1.05) blur(2px)");

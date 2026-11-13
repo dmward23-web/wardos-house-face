@@ -32,10 +32,24 @@
     var timed = ((live && live.upcomingLeaves) || []).filter(function (x) { return x && x.start && x.start.slice(0, 10) === iso && !x.allDay; });
     var law = typeof window !== "undefined" && window.HouseFaceLaw; /* LIVELAW1 · colour / dress-up days are never rows */
     if (law) timed = timed.filter(function (x) { return !law.isDressDay(x.summary); });
-    timed.forEach(function (x) { rows.push({ t: hm(x.start), l: clean(x.summary), w: clean((x.location || "").split(",")[0]) }); });
+    function labelOf(ev, text) {
+      var D = window.HouseEventDisplay;
+      if (D && typeof D.summarize === "function") {
+        var row = ev && typeof ev === "object" ? Object.assign({}, ev) : {};
+        row.summary = text; row.title = text; row.what = text;
+        var view = D.summarize(row, "shared");
+        return view && view.title ? view.title : "";
+      }
+      return clean(text);
+    }
+    timed.forEach(function (x) {
+      var l = labelOf(x, x.summary);
+      if (!l) return;
+      rows.push({ t: hm(x.start), l: l, w: "" });
+    });
     var seen = rows.map(function (r) { return r.l.toLowerCase().slice(0, 18); });
     ((day && day.items) || []).forEach(function (it) {
-      var l = clean(it.l); if (!l || (law && law.isDressDay(l))) return;
+      var l = labelOf(it, it.l); if (!l || (law && law.isDressDay(l))) return;
       if (seen.indexOf(l.toLowerCase().slice(0, 18)) >= 0) return;
       rows.push({ t: "", l: l, w: "", c: it.c });
     });

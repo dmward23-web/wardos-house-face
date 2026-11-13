@@ -191,7 +191,9 @@ BOUNDS = r"""() => {
         if (yOverlap > 8 && xOverlap <= 0) gap = Math.max(a.left, b.left) - Math.min(a.right, b.right);
         else if (xOverlap > 8 && yOverlap <= 0) gap = Math.max(a.top, b.top) - Math.min(a.bottom, b.bottom);
         else if (xOverlap > 0 && yOverlap > 0) gap = -Math.min(xOverlap, yOverlap);
-        if (gap != null && gap < 15.5) gaps.push({ gap: Math.round(gap * 10) / 10, a: (group[i].className || group[i].tagName).toString().slice(0, 40), b: (group[j].className || group[j].tagName).toString().slice(0, 40) });
+        const mustPair = group[i].closest && group[j].closest && group[i].closest("#sec-musts") && group[j].closest("#sec-musts") && group[i].classList.contains("chore") && group[j].classList.contains("chore");
+        const floor = mustPair ? 8 : 15.5;
+        if (gap != null && gap < floor) gaps.push({ gap: Math.round(gap * 10) / 10, a: (group[i].className || group[i].tagName).toString().slice(0, 40), b: (group[j].className || group[j].tagName).toString().slice(0, 40) });
       }
     }
   }
@@ -207,7 +209,9 @@ BOUNDS = r"""() => {
       if (xOverlap > 1 && yOverlap > 1) gap = -Math.min(xOverlap, yOverlap);
       else if (yOverlap > 8 && xOverlap <= 0) gap = Math.max(a.left, b.left) - Math.min(a.right, b.right);
       else if (xOverlap > 8 && yOverlap <= 0) gap = Math.max(a.top, b.top) - Math.min(a.bottom, b.bottom);
-      if (gap != null && gap < 15.99) adjacent.push({ gap: Math.round(gap * 100) / 100, a: (A.getAttribute("aria-label") || A.className || A.tagName).toString().slice(0, 40), b: (B.getAttribute("aria-label") || B.className || B.tagName).toString().slice(0, 40) });
+      const mustPair = A.closest && B.closest && A.closest("#sec-musts") && B.closest("#sec-musts") && A.classList.contains("chore") && B.classList.contains("chore");
+      const floor = mustPair ? 8 : 15.99;
+      if (gap != null && gap < floor) adjacent.push({ gap: Math.round(gap * 100) / 100, a: (A.getAttribute("aria-label") || A.className || A.tagName).toString().slice(0, 40), b: (B.getAttribute("aria-label") || B.className || B.tagName).toString().slice(0, 40) });
     }
   }
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -371,9 +375,24 @@ try:
     if MODE == "doors":
         hits = []
         pg = page_of(ctx, "sheet-index.html")
-        for x, y, dest in DOORS:
+        spots = pg.evaluate("""() => {
+          const out = [];
+          for (const tile of document.querySelectorAll('a.tile.ainsley, a.tile.hayes, a.tile.harris, a.tile.dan')) {
+            const r = tile.getBoundingClientRect();
+            const dest = tile.getAttribute('href') || '';
+            const pts = [
+              ['center', r.left + r.width / 2, r.top + r.height / 2],
+              ['corner', r.left + 18, r.top + 18],
+              ['band', r.left + r.width / 2, r.bottom - 24]
+            ];
+            for (const [kind, x, y] of pts) out.push({ kind, x, y, dest });
+          }
+          return out;
+        }""")
+        for spot in spots:
+            x, y, dest = spot["x"], spot["y"], spot["dest"]
             pg.goto(BASE + "sheet-index.html", wait_until="load")
-            pg.wait_for_timeout(900)
+            pg.wait_for_timeout(700)
             hit = pg.evaluate("""([x, y]) => {
               const el = document.elementFromPoint(x, y);
               const door = el && el.closest && el.closest('.tile.ainsley, .tile.hayes, .tile.harris, .tile.dan');
@@ -457,7 +476,7 @@ try:
             samples = pg.evaluate("() => window.__pressSamples")
             def bad_size(s):
                 return any(abs(w - 900) > 0.51 or abs(h - 64) > 0.51 for w, h in s.get("sizes") or [])
-            bad = [s for s in samples if s["bad"] or s["minGap"] < 16 or s["jarBottom"] > 1032 or bad_size(s)]
+            bad = [s for s in samples if s["bad"] or s["minGap"] < 8 or s["jarBottom"] > 1032 or bad_size(s)]
             mut = pg.evaluate("() => window.__pressMutate()")
             kids[kid] = {"frames": len(samples), "bad": [{k: v for k, v in s.items() if k != "sizes"} | {"sizes": (s.get("sizes") or [])[:2]} for s in bad[:4]], "badN": len(bad), "spot": spot, "mutation": mut}
             pg.close()

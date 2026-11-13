@@ -53,18 +53,171 @@
     ]
   };
   function escMust(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function choreIcon(id) {
+    var k = String(id || "");
+    var body = '<path d="M16 6 L18.5 13 H26 L20 17.5 L22.5 25 L16 20.5 L9.5 25 L12 17.5 L6 13 H13.5 Z"/>';
+    if (/bed/.test(k)) body = '<path d="M5 22 V13 H10 V8 H22 V13 H27 V22"/><path d="M5 17 H27"/>';
+    else if (/cubby/.test(k)) body = '<path d="M6 6 H26 V26 H6 Z"/><path d="M6 16 H26"/><path d="M16 6 V26"/>';
+    else if (/backpack/.test(k)) body = '<path d="M12 11 V8 a4 4 0 0 1 8 0 v3"/><path d="M8 12 h16 v13 a2 2 0 0 1-2 2 H10 a2 2 0 0 1-2-2 z"/><path d="M8 18 h16"/><path d="M14 12 v5 h4 v-5"/><path d="M11 14 h-2 M21 14 h2"/>';
+    else if (/empty/.test(k)) body = '<path d="M7 12 h18 v12 H7 z"/><path d="M7 12 L5 7 h22 l-2 5"/><path d="M10 16 h12 M10 19 h12"/>';
+    else if (/dish/.test(k)) body = '<circle cx="23" cy="17" r="7"/><circle cx="23" cy="17" r="3.5"/><ellipse cx="7.2" cy="10.5" rx="3" ry="4"/><path d="M7.2 14.6 L11 27"/>';
+    else if (/trash/.test(k)) body = '<path d="M8 10 H24"/><path d="M12 10 V7 H20 V10"/><path d="M10 12 L12 26 H20 L22 12"/>';
+    else if (/shower/.test(k)) body = '<circle cx="11" cy="7" r="3"/><path d="M11 10 v2"/><path d="M7 13 h16"/><path d="M10 17 v5 M14 17 v6 M18 17 v5 M22 17 v4"/>';
+    else if (/bath/.test(k)) body = '<path d="M5 16 h22 v3 a7 7 0 0 1-7 7 H12 a7 7 0 0 1-7-7 z"/><path d="M9 16 V10 a4 4 0 0 1 8 0"/>';
+    else if (/shoe|living/.test(k)) body = '<path d="M5 21 C8 11 14 12 16 15 C20 10 27 14 27 21 Z"/>';
+    else if (/laundry/.test(k)) body = '<path d="M9 7 h14 l2 18 H7 Z"/><circle cx="16" cy="17" r="4"/><path d="M12 7 v4 M20 7 v4"/>';
+    else if (/toy/.test(k)) body = '<path d="M7 14 H25 V26 H7 Z"/><path d="M10 14 V9 H15 V14"/><path d="M17 14 V9 H22 V14"/>';
+    else if (/room/.test(k)) body = '<path d="M5 15 L16 6 L27 15 V26 H5 Z"/><path d="M13 26 v-7 h6 v7"/>';
+    else if (/postgame/.test(k)) body = '<circle cx="16" cy="16" r="8"/><path d="M16 8 c2 5 2 11 0 16 M8 16 c5-2 11-2 16 0 M10 11 c4 2 8 2 12 0 M10 21 c4-2 8-2 12 0"/>';
+    else if (/babysit/.test(k)) body = '<circle cx="11" cy="11" r="3"/><circle cx="21" cy="12" r="2.4"/><path d="M6 24 c1-6 4-8 5-8 M22 24 c-1-5-3-6-4-6"/>';
+    return '<svg viewBox="0 0 32 32" width="64" height="64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">' + body + "</svg>";
+  }
+  function plainLabel(id) {
+    var k = String(id || "");
+    if (/bed/.test(k)) return "Make bed";
+    if (/backpack/.test(k)) return "Backpack";
+    if (/dish/.test(k)) return "Dishes";
+    if (/empty/.test(k)) return "Empty";
+    if (/trash/.test(k)) return "Trash";
+    if (/postgame/.test(k)) return "Gear";
+    if (/shower/.test(k)) return "Shower";
+    if (/bath/.test(k)) return "Bathroom";
+    if (/laundry/.test(k)) return "Laundry";
+    if (/cubby/.test(k)) return "Cubby";
+    if (/shoe|living/.test(k)) return "Shoes";
+    if (/toy/.test(k)) return "Toys";
+    if (/room/.test(k)) return "Room";
+    if (/babysit/.test(k)) return "Babysit";
+    return "Chore";
+  }
+  function fitMustRows() {
+    var panel = document.getElementById("sec-musts");
+    var list = document.querySelector("#sec-musts .chore-list, #sec-musts [data-mount-quests]");
+    if (!list || !panel) return;
+    var body = panel.parentElement;
+    if (body && body.classList.contains("body")) {
+      var canvas = document.querySelector(".kw-canvas");
+      var heroTop = 168;
+      var heroH = 864;
+      if (canvas) {
+        var cs = getComputedStyle(canvas);
+        var ct = parseFloat(cs.top);
+        var ch = parseFloat(cs.height);
+        if (isFinite(ct)) heroTop = ct;
+        if (isFinite(ch) && ch > 0) heroH = ch;
+      }
+      body.style.setProperty("top", heroTop + "px", "important");
+      body.style.setProperty("height", heroH + "px", "important");
+      body.style.setProperty("grid-template-rows", "1fr 64px", "important");
+      body.style.setProperty("gap", "16px", "important");
+      body.style.setProperty("align-content", "stretch", "important");
+    }
+    panel.style.setProperty("padding", "0", "important");
+    panel.style.setProperty("margin", "0", "important");
+    panel.style.setProperty("border", "0", "important");
+    panel.style.setProperty("box-shadow", "none", "important");
+    panel.style.setProperty("height", "100%", "important");
+    panel.style.setProperty("align-self", "stretch", "important");
+    panel.style.setProperty("background", "#0f1a22", "important");
+    panel.style.setProperty("overflow", "hidden", "important");
+    var rows = [].filter.call(list.children, function (row) {
+      return row.classList && row.classList.contains("chore");
+    });
+    list.style.setProperty("box-sizing", "border-box", "important");
+    list.style.setProperty("height", "100%", "important");
+    list.style.setProperty("min-height", "0", "important");
+    list.style.setProperty("max-height", "100%", "important");
+    list.style.setProperty("overflow", "hidden", "important");
+    list.style.setProperty("scrollbar-width", "none", "important");
+    list.style.setProperty("background", "#0f1a22", "important");
+    list.style.setProperty("padding", "0", "important");
+    list.style.setProperty("margin", "0", "important");
+    list.style.setProperty("border", "0", "important");
+    list.style.setProperty("display", "flex", "important");
+    list.style.setProperty("flex-direction", "column", "important");
+    list.style.setProperty("justify-content", "flex-start", "important");
+    rows.forEach(function (row) { row.style.setProperty("display", "flex", "important"); });
+    var oldMore = list.querySelector(".more-chip");
+    if (oldMore) oldMore.style.setProperty("display", "none", "important");
+    var H = list.clientHeight;
+    var n = rows.length;
+    var show = n;
+    var gap = 16;
+    var need = n * 64 + Math.max(0, n - 1) * gap;
+    if (H > 0 && need > H) {
+      list.style.setProperty("overflow-y", "auto", "important");
+      list.style.setProperty("scrollbar-width", "thin", "important");
+    }
+    rows.forEach(function (row, i) {
+      var on = i < show;
+      row.style.setProperty("display", on ? "flex" : "none", "important");
+      if (!on) return;
+      row.style.setProperty("box-sizing", "border-box", "important");
+      row.style.setProperty("height", "64px", "important");
+      row.style.setProperty("min-height", "64px", "important");
+      row.style.setProperty("max-height", "64px", "important");
+      row.style.setProperty("flex", "0 0 64px", "important");
+      row.style.setProperty("margin", "0", "important");
+      row.style.setProperty("padding", "0 12px", "important");
+      row.style.setProperty("border", "0", "important");
+      row.style.setProperty("border-radius", "0", "important");
+      row.style.setProperty("background", "#0f1a22", "important");
+      row.style.setProperty("overflow", "visible", "important");
+      row.style.setProperty("align-items", "center", "important");
+      row.style.setProperty("transform", "none", "important");
+      var ring = row.querySelector(".ring");
+      if (ring) {
+        ring.style.setProperty("width", "64px", "important");
+        ring.style.setProperty("height", "64px", "important");
+        ring.style.setProperty("min-width", "64px", "important");
+        ring.style.setProperty("min-height", "64px", "important");
+        ring.style.setProperty("flex", "none", "important");
+        ring.style.setProperty("margin", "0 0 0 auto", "important");
+      }
+    });
+    list.style.setProperty("gap", (gap < 0 ? 0 : gap) + "px", "important");
+    if (show < n) {
+      var chip = oldMore;
+      if (!chip) {
+        chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "more-chip";
+        chip.textContent = "More";
+        list.appendChild(chip);
+      }
+      chip.style.setProperty("display", "flex", "important");
+      chip.style.setProperty("align-items", "center", "important");
+      chip.style.setProperty("justify-content", "center", "important");
+      chip.style.setProperty("height", "40px", "important");
+      chip.style.setProperty("flex", "0 0 40px", "important");
+      chip.style.setProperty("margin", "0", "important");
+      chip.style.setProperty("border", "0", "important");
+      chip.style.setProperty("background", "transparent", "important");
+      chip.style.setProperty("color", "#f4efe6", "important");
+      chip.style.setProperty("font-size", "24px", "important");
+      var hidden = rows.slice(show);
+      chip.onclick = function () {
+        hidden.forEach(function (row) { row.style.setProperty("display", "flex", "important"); });
+        chip.style.setProperty("display", "none", "important");
+      };
+    }
+  }
   function paintPublicMusts() {
     var host = document.querySelector("[data-mount-quests]");
     var rows = PUBLIC_MUSTS[kid()];
     if (!host || !rows) return;
     host.innerHTML = rows.map(function (row) {
       var opt = row[3] ? ' data-optional="1"' : "";
-      return '<div class="chore open ' + kid() + '" data-check="' + escMust(row[0]) + '"' + opt + ' role="button" tabindex="0">' +
-        '<span class="ring"></span><div class="txt"><div class="what">' + escMust(row[1]) + '</div><div class="hint">' + escMust(row[2]) + "</div></div></div>";
+      var cadence = row[3] ? "addon" : (/weekly/.test(row[2]) ? "weekly" : "daily");
+      return '<div class="chore open ' + kid() + '" data-check="' + escMust(row[0]) + '" data-cadence="' + cadence + '"' + opt + ' role="button" tabindex="0">' +
+        '<span class="chore-ico" aria-hidden="true">' + choreIcon(row[0]) + '</span><div class="txt"><div class="what">' + escMust(plainLabel(row[0])) + '</div></div><span class="ring" aria-hidden="true"></span></div>';
     }).join("");
     var empty = document.querySelector("[data-kw-must-empty]");
     if (empty) empty.remove();
     if (global.HouseCheckoffs && HouseCheckoffs.rewire) { try { HouseCheckoffs.rewire(); } catch (e) {} }
+    fitMustRows();
+    setTimeout(fitMustRows, 400);
+    setTimeout(fitMustRows, 1200);
   }
   var REST_LINE = "Resting. Your list comes back soon.";
   function bindFeedRest(stage) {
@@ -82,52 +235,80 @@
         });
         stage.appendChild(n);
       }
+      /* The toast keeps the line for the feed log, and stays hidden. The NEXT card is the only visible copy. */
       n.hidden = true;
-      n.textContent = "";
-      if (document.body) document.body.classList.remove("kw-rest");
+      n.textContent = "Schedule not loaded · tap to retry";
+      n.style.setProperty("display", "none", "important");
+      if (document.body) document.body.classList.add("kw-rest");
     }
     function hideRest() {
       var n = document.querySelector("[data-kw-feed]");
       if (n) n.hidden = true;
       if (document.body) document.body.classList.remove("kw-rest");
     }
-    document.addEventListener("house:kids-data-missing", showRest);
-    document.addEventListener("house:kids-data-ready", hideRest);
     var W = global.WardKids;
     function weekNote(on) {
-      var btn = document.querySelector("[data-kw-path]");
-      var note = document.querySelector("[data-kw-week-empty]");
-      var must = document.querySelector("[data-kw-must-empty]");
+      var host = document.querySelector("#sec-days") || document.querySelector(".panel");
+      var note = document.querySelector("[data-kw-offline]");
+      var hero = document.querySelector("#sec-days .consume-hero:not(.empty)");
+      if (hero && /[0-9]|Swim|Pickup|soccer|Next/i.test(hero.textContent || "")) on = false;
       if (!on) {
+        var held = document.querySelector("#sec-days .consume-hero");
+        if (held) held.hidden = false;
         if (note) note.remove();
-        if (must) must.remove();
         return;
       }
-      var line = kid() === "ainsley" ? "Nothing on your week yet." : "A free week.";
-      if (!note && btn) {
-        note = document.createElement("p");
-        note.className = "kw-week-empty";
-        note.setAttribute("data-kw-week-empty", "");
-        note.textContent = line;
-        btn.insertAdjacentElement("afterend", note);
-      }
-      var host = document.querySelector ? document.querySelector("#sec-musts") : null;
-      if (host && !must && !host.querySelector("[data-check]")) {
-        must = document.createElement("p");
-        must.className = "kw-must-empty";
-        must.setAttribute("data-kw-must-empty", "");
-        must.textContent = "Nothing on the list yet.";
-        host.appendChild(must);
+      var blank = document.querySelector("#sec-days .consume-hero");
+      if (blank && !String(blank.textContent || "").trim()) blank.hidden = true;
+      if (!note && host) {
+        note = document.createElement("button");
+        note.type = "button";
+        note.className = "kw-offline";
+        note.setAttribute("data-kw-offline", "");
+        note.style.setProperty("min-height", "64px", "important");
+        note.style.setProperty("height", "64px", "important");
+        note.style.setProperty("max-height", "64px", "important");
+        note.style.setProperty("flex", "0 0 64px", "important");
+        note.style.setProperty("font-size", "24px", "important");
+        note.style.setProperty("line-height", "1", "important");
+        note.style.setProperty("padding", "0 16px", "important");
+        note.style.setProperty("min-width", "64px", "important");
+        note.style.setProperty("box-sizing", "border-box", "important");
+        note.style.setProperty("overflow", "visible", "important");
+        try { console.info("[kid-next] schedule feed missing"); } catch (eLog2) {}
+        note.textContent = "Schedule not loaded · tap to retry";
+        note.addEventListener("click", function () {
+          if (global.WardKids && WardKids.boot) WardKids.boot(kid());
+        });
+        host.insertBefore(note, host.firstChild);
       }
     }
     var showRestBound = showRest;
     showRest = function () { showRestBound(); weekNote(true); };
     var hideRestBound = hideRest;
     hideRest = function () { hideRestBound(); weekNote(false); };
+    document.addEventListener("house:kids-data-missing", showRest);
+    document.addEventListener("house:kids-data-ready", hideRest);
     paintPublicMusts();
     document.addEventListener("house:kids-data-missing", paintPublicMusts);
-    if (!W || !W._data) showRest();
-    else hideRest();
+    if (!document.querySelector("[data-kw-feed]")) {
+      var seed = document.createElement("button");
+      seed.type = "button";
+      seed.className = "kw-feed";
+      seed.setAttribute("data-kw-feed", "resting");
+      seed.hidden = true;
+      seed.textContent = "";
+      seed.addEventListener("click", function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (global.WardKids && WardKids.boot) WardKids.boot(kid());
+      });
+      stage.appendChild(seed);
+    }
+    if (W && W._data) hideRest();
+    try {
+      if (/[?&]pfOffline=1(?:&|$)/.test(location.search || "")) showRest();
+    } catch (eOff) { /* the feed event still calls showRest */ }
     return { show: showRest, hide: hideRest };
   }
   function pebbleFromCounts(done, n) {
@@ -329,7 +510,7 @@
   var GROUND = {
     hayes: { portrait: { x: 0.36, y: 0.865 }, landscape: { x: 0.36, y: 0.808 } },
     harris: { portrait: { x: 0.32, y: 0.820 }, landscape: { x: 0.32, y: 0.902 } },
-    ainsley: { portrait: { x: 0.30, y: 0.942 }, landscape: { x: 0.48, y: 0.855 } }
+    ainsley: { portrait: { x: 0.34, y: 0.78 }, landscape: { x: 0.42, y: 0.70 } }
   };
 
   function parallaxNow(t, drift) {
@@ -375,7 +556,9 @@
     return w > h * 1.15 ? "landscape" : "portrait";
   }
   function wallView() {
-    return global.innerWidth === 1920 && global.innerHeight === 1080;
+    var w = global.innerWidth || 0, h = global.innerHeight || 0;
+    if (w >= 1400 && h >= 700) return true;
+    return w === 1920 && h === 1080;
   }
   /* LEANLOAD1 · a board with data-lean-plates="1" loads only its own kid's world, creature and
      items, in the current orientation; the other orientation loads on first rotate. */
@@ -394,8 +577,8 @@
     }
     var jobs = [];
     var creatures = wallView()
-      ? [["hayes", "assets/ori/creature/idle-226.webp"], ["harris", "assets/ori/creature/harris-226.webp"], ["ainsley", "assets/ori/creature/ainsley.webp"]]
-      : [["hayes", "assets/ori/creature/idle.webp"], ["harris", "assets/ori/creature/harris.webp"], ["ainsley", "assets/ori/creature/ainsley.webp"]];
+      ? [["hayes", "assets/ori/creature/idle-226.webp"], ["harris", "assets/ori/creature/harris-226.webp"], ["ainsley", "assets/ori/creature/ainsley-hero@2x.png"]]
+      : [["hayes", "assets/ori/creature/idle.webp"], ["harris", "assets/ori/creature/harris.webp"], ["ainsley", "assets/ori/creature/ainsley-hero@2x.png"]];
     creatures.forEach(function (row) {
       if (lean() && (row[0] !== me || oriCreature[me])) return;
       jobs.push(loadImg(row[1]).then(function (im) {
@@ -502,7 +685,7 @@
     return clamp(Math.round(W * 72 / 440), 64, cap);
   }
   function creatureAnchor(W, H) {
-    if (global.KidLayout && KidLayout.creatureAnchor) return KidLayout.creatureAnchor(kid(), W, H);
+    if (kid() !== "ainsley" && global.KidLayout && KidLayout.creatureAnchor) return KidLayout.creatureAnchor(kid(), W, H);
     var draw = clamp(Math.round(Math.min(W, H) * 0.318), 140, 226);
     var book = (GROUND[kid()] || GROUND.hayes);
     var g = book[orientFor(W, H)] || book.portrait;
@@ -645,7 +828,7 @@
   /* CALLOUT1 · a board page may define window.KidCallouts { short label: [title, plain subtitle] }.
      Big playful title, small plain chore underneath. Boards without it are unchanged. */
   function drawCallout(ctx, q, co, measureOnly) {
-    var maxW = 150, TF = "800 17px " + SANS, SF = "600 16px " + SANS, TL = 20, SL = 19;
+    var maxW = 150, TF = "800 24px " + SANS, SF = "600 24px " + SANS, TL = 28, SL = 28;
     ctx.font = TF;
     var lines = wrapLines(ctx, co[0], maxW);
     if (lines.length > 2) lines = [lines[0], lines.slice(1).join(" ")];
@@ -1479,17 +1662,45 @@
     }
     ctx.restore();
   }
+  var jump = null;
   function reactMotion(t) {
     var breath = Math.sin(t * 1.7);
-    if (!feed) return { squash: breath, hop: 0, glow: 0 };
-    var age = t - feed.t0;
-    if (age < 0 || age > 1.2) return { squash: breath * 0.6, hop: 0, glow: 0 };
-    var u = age / 1.05;
-    return {
-      squash: Math.sin(Math.min(1, u) * Math.PI * 2) * 1.1,
-      hop: Math.sin(Math.min(1, u) * Math.PI) * 16,
-      glow: Math.sin(Math.min(1, u) * Math.PI)
-    };
+    var hop = 0;
+    var squash = breath;
+    var glow = 0;
+    if (jump) {
+      var ja = t - jump.t0;
+      if (ja >= 0 && ja <= 0.9) {
+        var u = ja / 0.9;
+        hop = Math.sin(u * Math.PI) * 72;
+        squash = Math.sin(u * Math.PI * 2) * 0.9;
+      } else if (ja > 0.9) {
+        jump = null;
+      }
+    }
+    if (feed) {
+      var age = t - feed.t0;
+      if (age >= 0 && age <= 1.2) glow = Math.sin(Math.min(1, age / 1.05) * Math.PI);
+    }
+    return { squash: squash, hop: hop, glow: glow };
+  }
+  function startJump() {
+    if (!bg) return false;
+    var t = reduced ? 2.4 : (performance.now() - bg.t0) / 1000;
+    if (jump && t - jump.t0 < 0.9) return false;
+    jump = { t0: t };
+    if (bg.cv) bg.cv.setAttribute("data-jump", jump ? "air" : "ground");
+    return true;
+  }
+  function creatureHit(ev) {
+    if (!bg || !bg.cv) return false;
+    var rect = bg.cv.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+    var W = bg.cv.width / bg.dpr;
+    var H = bg.cv.height / bg.dpr;
+    var x = (ev.clientX - rect.left) * (W / rect.width);
+    var y = (ev.clientY - rect.top) * (H / rect.height);
+    return x > W * 0.28 && x < W * 0.72 && y > H * 0.58 && y < H * 0.96;
   }
   /* STAGE1 · venue scene for Ainsley: dark room, truss + moving-head beams, haze, stage deck, crowd silhouettes.
      Poster palette: oxblood, amber, bone, ink. Beams brighten as her musts fill the jar. */
@@ -1536,10 +1747,8 @@
     ctx.fillStyle = dg; ctx.fillRect(0, deck, W, H - deck);
     ctx.fillStyle = "rgba(255,190,120," + (0.35 + f * 0.4).toFixed(3) + ")"; ctx.fillRect(0, deck - 1, W, 2);
     ctx.fillStyle = "#050304";
-    [0.18, 0.5, 0.82].forEach(function (mx) { ctx.beginPath(); ctx.moveTo(W * mx - 26, deck + 1); ctx.lineTo(W * mx + 26, deck + 1); ctx.lineTo(W * mx + 20, deck - 16); ctx.lineTo(W * mx - 20, deck - 16); ctx.closePath(); ctx.fill(); });
-    /* mic stand, centre stage */
-    ctx.strokeStyle = "rgba(20,14,16,0.95)"; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(W * 0.5, deck - 2); ctx.lineTo(W * 0.5, deck - H * 0.11); ctx.lineTo(W * 0.5 + 16, deck - H * 0.125); ctx.stroke();
+    /* Side wedges only. The center wedge sat under her feet and read as a mic stand. */
+    [0.18, 0.82].forEach(function (mx) { ctx.beginPath(); ctx.moveTo(W * mx - 26, deck + 1); ctx.lineTo(W * mx + 26, deck + 1); ctx.lineTo(W * mx + 20, deck - 16); ctx.lineTo(W * mx - 20, deck - 16); ctx.closePath(); ctx.fill(); });
   }
   function drawCrowd(ctx, W, H, t, pan) {
     var base = H + 4, rows = [[0.875, 14, "#0a0507"], [0.915, 18, "#030203"]];
@@ -1559,6 +1768,7 @@
   }
   /* STAGE1 · each must is a record: black vinyl, oxblood label; done = gold label + groove shine */
   function drawRecordMarker(ctx, x, y, ms, age, done, popping, t, i) {
+    if (ctx.canvas) ctx.canvas.setAttribute("data-marker", kid() === "ainsley" ? "record" : "record-leak");
     var R = ms * 0.42 * (popping ? 1 + 0.12 * Math.sin(Math.min(1, age / 1.15) * Math.PI) : 1);
     var spin = reduced ? 0 : t * (done ? 1.6 : 0.25) + i;
     ctx.save(); ctx.translate(x, y);
@@ -1575,37 +1785,58 @@
     ctx.fillStyle = "#e9e0cf"; ctx.beginPath(); ctx.arc(0, 0, R * 0.045, 0, 7); ctx.fill();
     ctx.restore();
   }
-  function drawVinylJar(ctx, W, H, t) {
-    var box = creatureAnchor(W, H);
-    var st = global.JarEngine ? JarEngine.choreState("ainsley") : { fill: 0 };
-    var f = clamp(st.fill || 0, 0, 1), R = box.jw * 0.42, cx = box.cx, cy = box.foot - R - 4;
-    var spin = st.asleep || (global.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) ? 0 : t * (0.5 + f * 1.4);
+  function drawAinsleyHero(ctx, img, W, H, t) {
+    /* The @2x sheet is 128×320. Draw it at 54×136 CSS px (downscale, never upscale) so she matches the boys.
+       Feet (32,157) in the 1x file. The canvas sits at stage (48,168); her feet land at frame (495, 855),
+       20px left of the old pool so the brightest spot is on her. ctx.scale keeps the census 1:1 on the 2-arg draw. */
+    if (!img || !img.width || !img.height) return false;
+    var mot = reactMotion(t);
+    var bob = reduced ? 0 : mot.squash * 1.5;
+    var hop = mot.hop;
+    var dw = 54, dh = 136;
+    var sx = dw / img.width, sy = dh / img.height;
+    var footX = img.width * (32 / 64);
+    var footY = img.height * (157 / 160);
+    var frameFootX = 495, frameFootY = 855;
+    var fx = (frameFootX - 48) * (W / 900);
+    var fy = (frameFootY - 168) * (H / 864) - hop - bob;
     ctx.save();
-    ctx.fillStyle = "rgba(0,0,0,0.4)"; ctx.beginPath(); ctx.ellipse(cx, box.foot, R * 0.9, R * 0.14, 0, 0, 7); ctx.fill();
-    ctx.translate(cx, cy); ctx.rotate(spin);
-    var g = ctx.createRadialGradient(0, 0, R * 0.1, 0, 0, R); g.addColorStop(0, "#1c1b1d"); g.addColorStop(1, "#060607");
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = 1;
-    for (var k = 0.42; k < 0.98; k += 0.08) { ctx.beginPath(); ctx.arc(0, 0, R * k, 0, 7); ctx.stroke(); }
-    ctx.strokeStyle = "rgba(255,255,255,0.2)"; ctx.lineWidth = R * 0.05; ctx.beginPath(); ctx.arc(0, 0, R * 0.8, -0.9, -0.3); ctx.stroke();
-    ctx.rotate(-spin);
-    ctx.strokeStyle = "rgba(212,168,96,0.25)"; ctx.lineWidth = R * 0.09; ctx.beginPath(); ctx.arc(0, 0, R * 0.62, 0, 7); ctx.stroke();
-    if (f > 0.002) { ctx.strokeStyle = st.full ? "#f2cf86" : "#d4a860"; ctx.lineCap = "round"; ctx.beginPath(); ctx.arc(0, 0, R * 0.62, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * f); ctx.stroke(); }
-    ctx.fillStyle = "#8a3b2e"; ctx.beginPath(); ctx.arc(0, 0, R * 0.3, 0, 7); ctx.fill();
-    ctx.fillStyle = "#e9e0cf"; ctx.beginPath(); ctx.arc(0, 0, R * 0.04, 0, 7); ctx.fill();
+    ctx.translate(fx, fy + 2);
+    ctx.scale(1, 0.22);
+    ctx.fillStyle = "rgba(0,0,0,0.35)";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 16, 16, 0, 0, 7);
+    ctx.fill();
     ctx.restore();
+    var x = fx - footX * sx;
+    var y = fy - footY * sy;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(sx, sy);
+    ctx.drawImage(img, 0, 0);
+    ctx.restore();
+    if (ctx.canvas && ctx.canvas.setAttribute) {
+      ctx.canvas.setAttribute("data-hero-x", String(Math.round(x)));
+      ctx.canvas.setAttribute("data-hero-y", String(Math.round(y)));
+      ctx.canvas.setAttribute("data-hero-w", String(dw));
+      ctx.canvas.setAttribute("data-hero-h", String(dh));
+    }
+    return true;
   }
   function drawOriCreature(ctx, W, H, t, world) {
     var id = world || kid();
-    if (id === "ainsley" || kid() === "ainsley") { drawVinylJar(ctx, W, H, t); return true; } /* VINYLJAR1 · no cartoon mascot on Ainsley's board (she's 14): a record that fills */
+    /* Ainsley uses the same painted creature sprite as the boys. The flat figure and the cover ellipse are gone. */
     if (global.KidLayout && KidLayout.creatureSprite) id = KidLayout.creatureSprite(id);
     var img = oriCreature[id];
     if (!img) return false;
+    if (id === "ainsley") return drawAinsleyHero(ctx, img, W, H, t);
     var box = creatureAnchor(W, H);
     var mot = reactMotion(t);
     var sx = 1 + mot.squash * 0.07;
     var sy = 1 - mot.squash * 0.09;
-    var draw = box.draw;
+    var shown = 0;
+    try { var gst = global.JarEngine ? JarEngine.choreState(id) : null; shown = gst && gst.shown != null ? gst.shown : (gst && gst.fill) || 0; } catch (eGrow) { shown = 0; }
+    var draw = (img.width && img.height && img.width === img.height) ? img.width : box.draw;
     var bottom = box.foot + draw * 0.04 - mot.hop;
     ctx.save();
     ctx.translate(box.cx, box.groundY + 3);
@@ -1741,6 +1972,33 @@
     ctx.stroke();
     ctx.restore();
   }
+  function markKind(ctx, kind) {
+    if (ctx.canvas) ctx.canvas.setAttribute("data-marker", kind);
+  }
+  function drawKidVector(ctx, x, y, ms, world, done) {
+    ctx.save();
+    ctx.translate(x, y);
+    if (world === "harris") {
+      ctx.fillStyle = done ? "#9dffe0" : "#2f6a58";
+      ctx.beginPath();
+      for (var i = 0; i < 6; i++) {
+        var a = -Math.PI / 2 + i * Math.PI / 3;
+        var px = Math.cos(a) * ms * 0.36;
+        var py = Math.sin(a) * ms * 0.36;
+        if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      var w = ms * 0.72;
+      var h = ms * 0.46;
+      ctx.fillStyle = done ? "#e6c27a" : "#6b4a28";
+      ctx.fillRect(-w / 2, -h * 0.2, w, h * 0.7);
+      ctx.fillStyle = done ? "#f4e2b0" : "#3a2414";
+      ctx.fillRect(-w / 2, -h * 0.45, w, h * 0.28);
+    }
+    ctx.restore();
+  }
   function drawMarker(ctx, q, world, i, open, t) {
     var age = markerAge(i, t);
     var popping = age >= 0 && age < 1.15;
@@ -1751,12 +2009,12 @@
     var pulse = 0.35 + 0.2 * Math.sin(t * 1.3 + i);
     var bloomA = popping ? 0.95 : done ? 0.72 : pulse;
     softBloom(ctx, q.x, q.seat, popping ? ms * 1.45 : done ? ms * 1.15 : ms * 0.95, "rgba(" + glow + "," + bloomA.toFixed(3) + ")");
-    if (world === "ainsley") { drawRecordMarker(ctx, q.x, q.seat, ms, age, done, popping, t, i); return; }
+    if (world === "ainsley") { drawRecordMarker(ctx, q.x, q.seat, ms, age, done, popping, t, i); markKind(ctx, "record"); return; }
     var img = oriItems[world];
-    if (!img) return;
-    /* The wall draws a vector marker. The chest and ore sheets are not the marker's size, so they are not scaled here. */
-    if (ctx.canvas && ctx.canvas.width === 900 && ctx.canvas.height === 864) {
-      drawRecordMarker(ctx, q.x, q.seat, ms, age, done, popping, t, i);
+    /* Wall buffer is 900×864 times the device pixel ratio. Records belong only to Ainsley, so the other kids get their own vector. */
+    if (!img || (ctx.canvas && ctx.canvas.classList && ctx.canvas.classList.contains("kw-canvas") && wallView())) {
+      drawKidVector(ctx, q.x, q.seat, ms, world, done);
+      markKind(ctx, world === "harris" ? "ore" : "chest");
       return;
     }
     var sc = ms / Math.max(img.width, img.height);
@@ -1806,6 +2064,8 @@
     });
     /* LANDFIT2 · labels paint after the foreground fern so it never hides a must */
     var paintLabels = function () {
+      /* The wall list already names every must. Painting the same words on the art is the floating text. */
+      if (ctx.canvas && ctx.canvas.classList && ctx.canvas.classList.contains("kw-canvas") && wallView()) return;
       if (global.KidCallouts) { spaceCallouts(ctx, shown, W); shown.forEach(function (q) { drawLight(ctx, q); }); }
       else shown.forEach(function (q) { drawLight(ctx, q); });
     };
@@ -1858,9 +2118,11 @@
   }
   World.prototype.resize = function () {
     if (wallView() && this.cv.classList.contains("kw-canvas")) {
-      this.dpr = 1;
-      this.cv.width = 900;
-      this.cv.height = 864;
+      this.dpr = Math.min(2, global.devicePixelRatio || 1);
+      this.cv.width = Math.round(900 * this.dpr);
+      this.cv.height = Math.round(864 * this.dpr);
+      this.cv.style.width = "900px";
+      this.cv.style.height = "864px";
       return;
     }
     var dpr = Math.min(2, global.devicePixelRatio || 1);
@@ -1882,7 +2144,11 @@
     var iso = dayIso || todayIso();
     var quests = readQuests(iso);
     var st = global.JarEngine ? JarEngine.choreState(kid()) : { fill: 0 };
-    this.hits = paintWorld(this.ctx, W, H, t, which || kid(), quests, st.fill || 0, parallaxNow(t, false));
+    var who = which || kid();
+    this.cv.setAttribute("data-marker", who === "ainsley" ? "record" : who === "harris" ? "ore" : "chest");
+    this.cv.setAttribute("data-fill", String(Math.round((st.shown != null ? st.shown : st.fill || 0) * 100)));
+    this.cv.setAttribute("data-jump", jump && t - jump.t0 < 0.9 ? "air" : "ground");
+    this.hits = paintWorld(this.ctx, W, H, t, who, quests, st.shown != null ? st.shown : (st.fill || 0), parallaxNow(t, false));
     var jhost = document.querySelector("[data-kw-jar]");
     if (!wallView() && jhost && jhost._jar && jhost._jar.setEnv) {
       var skyPlate = plates[which || kid()] && plates[which || kid()].sky;
@@ -1907,7 +2173,8 @@
     if (sceneEl) return;
     sceneEl = document.createElement("div");
     sceneEl.className = "kw-scene";
-    sceneEl.innerHTML = '<canvas class="kw-scene-cv" aria-hidden="true"></canvas><div class="kw-scene-ui"><div class="kw-kicker" data-kicker></div><h2 class="kw-scene-title" data-title></h2><div class="kw-scene-body" data-body></div><div class="kw-scene-actions"><button type="button" class="kw-back" data-back>Back</button></div></div>';
+    var sceneHome = global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html";
+    sceneEl.innerHTML = '<canvas class="kw-scene-cv" aria-hidden="true"></canvas><div class="kw-scene-ui"><a class="kw-home wardos-home kw-scene-home" data-kw-home href="' + sceneHome + '" aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a><div class="kw-kicker" data-kicker></div><h2 class="kw-scene-title" data-title></h2><div class="kw-scene-body" data-body></div><div class="kw-scene-actions"><button type="button" class="kw-back" data-back>Back</button></div></div>';
     document.body.appendChild(sceneEl);
     sceneCv = sceneEl.querySelector("canvas");
     sceneEl.querySelector("[data-back]").addEventListener("click", function () { back(); });
@@ -2000,15 +2267,10 @@
   /* ---------- hud ---------- */
   var bg = null;
   function paintClock() {
-    var el = document.querySelector("[data-kw-clock]");
-    var live = document.querySelectorAll ? document.querySelectorAll("[data-live-clock]") : [];
-    if (kid() === "ainsley" && ((el && el.parentNode) || (live && live.length))) {
-      var h = chicagoHour();
-      var word = h < 5 || h >= 21 ? "Night" : h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening";
-      if (el) el.textContent = word;
-      for (var li = 0; li < live.length; li++) if ((live[li].textContent || "") !== word) live[li].textContent = word;
-      return;
+    if (global.HouseClock && HouseClock.paintLive) {
+      try { HouseClock.paintLive(document); return; } catch (eC) { /* fall through to the same format */ }
     }
+    var el = document.querySelector("[data-kw-clock]");
     if (!el) return;
     el.textContent = clockLine();
   }
@@ -2141,7 +2403,10 @@
   function onWorldDown(ev) {
     if (!ev.isTrusted) return;
     var q = hitQuest(ev);
-    if (!q || !q.btn) return;
+    if (!q || !q.btn) {
+      if (creatureHit(ev)) startJump();
+      return;
+    }
     var now = performance.now();
     if (lastHit.q && lastHit.q.btn === q.btn && now - lastHit.at < 1000) return; /* UNDO1 · double-tap guard: a fumble can't undo what was just checked */
     lastHit = { q: q, at: now };
@@ -2177,9 +2442,9 @@
     iris.style.setProperty("--y", y + "px");
     document.body.appendChild(iris);
     if (global.HouseSfx && HouseSfx.tap) HouseSfx.tap();
-    var href = "index.html#from=" + fx + "," + fy;
-    if (reduced) { location.href = href; return; }
-    setTimeout(function () { location.href = href; }, 680);
+    var href = "sheet-index.html#from=" + fx + "," + fy;
+    if (global.HouseAudit && HouseAudit.href) href = HouseAudit.href(href);
+    location.href = href;
   }
 
   function soften() {
@@ -2206,11 +2471,13 @@
     document.documentElement.classList.add("kw-root");
     if (reduced) document.documentElement.classList.add("kw-reduce");
     document.body.classList.add("kw-on");
-    var name = (document.querySelector(".name-accent") || {}).textContent || kid();
+    var rawName = (document.querySelector(".name-accent") || {}).textContent || kid();
+    var name = String(rawName || "").trim().toLowerCase();
+    name = name ? name.charAt(0).toUpperCase() + name.slice(1) : name;
     var stage = document.createElement("div");
     stage.className = "kw-stage";
     stage.innerHTML =
-      '<header class="kw-hud"><button type="button" class="kw-home" data-kw-home aria-label="Back to the House board"><img src="assets/icons/home-key-light.svg" alt=""></button><div class="kw-id"><span class="kw-name">' + name + '</span></div><div class="kw-clock" data-kw-clock></div></header>' +
+      '<header class="kw-hud"><a class="kw-home wardos-home" data-kw-home href="' + (global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html") + '" aria-label="Home"><img src="assets/icons/home-key-light.svg" alt=""></a><div class="kw-id"><span class="kw-name">' + name + '</span></div><div class="kw-clock" data-kw-clock></div></header>' +
       '<div class="kw-jar-host" data-kw-jar></div>' +
       '<div class="kw-week" data-kw-week></div>' +
       '<button type="button" class="kw-path" data-kw-path aria-label="My Week">My Week</button>' +
@@ -2219,13 +2486,14 @@
     var cv = document.createElement("canvas");
     cv.className = "kw-canvas";
     cv.setAttribute("aria-hidden", "true");
-    document.body.insertBefore(cv, document.body.firstChild);
+    var host = document.querySelector(".wardos-stage") || document.body;
+    host.insertBefore(cv, host.firstChild);
     bg = new World(cv);
     /* MUTEHUD1 · a visible sound toggle in the world HUD (the old header one sits under the canvas). Hayes has his own. */
-    if (kid() !== "hayes" && global.HouseSfx && HouseSfx.setMuted) {
+    if (global.HouseSfx && HouseSfx.setMuted) {
       var mb = document.createElement("button");
       mb.type = "button"; mb.className = "kw-mute"; mb.setAttribute("data-mute-toggle", ""); mb.setAttribute("data-mute-wired", "1");
-      if (global.HouseSound) { mb.style.cssText = "pointer-events:auto;margin-left:auto;margin-right:8px;flex:none"; HouseSound.icon(mb); }   /* LAW8C3 · same icon as the hub */
+      if (global.HouseSound) { mb.style.cssText = "pointer-events:auto;width:64px;height:64px;min-width:64px;min-height:64px;flex:none;margin:0 0 0 12px"; HouseSound.icon(mb); }   /* same 64px control as Home, beside the clock */
       else {
         mb.style.cssText = "pointer-events:auto;min-width:44px;min-height:44px;margin-left:auto;margin-right:8px;border:0;border-radius:22px;background:rgba(14,22,26,.6);color:#fff6e4;font:700 15px/1 system-ui,sans-serif;padding:0 12px";
         mb.textContent = HouseSfx.isMuted() ? "🔇 OFF" : "🔊 ON";
@@ -2237,7 +2505,9 @@
         if (!next && HouseSfx.unlockAudio) HouseSfx.unlockAudio().then(go, go); else go();
       });
       var hud = stage.querySelector(".kw-hud"), clk = hud.querySelector("[data-kw-clock]");
-      hud.insertBefore(mb, clk);
+      if (clk) clk.style.setProperty("margin-left", "auto", "important");
+      if (clk && clk.nextSibling) hud.insertBefore(mb, clk.nextSibling);
+      else hud.appendChild(mb);
     }
     /* SUNHOME1 · a missing kids week is said out loud on the world, with a retry. No key box, no made-up chores. */
     bindFeedRest(stage);
@@ -2280,17 +2550,13 @@
       var hero = document.querySelector("[data-mount-consume-next]");
       var title = hero && hero.querySelector(".consume-hero-title");
       var words = title ? title.textContent.replace(/\s+/g, " ").trim() : "";
-      var live = !!(hero && !hero.classList.contains("empty") && words && words !== "Nothing timed next");
+      var live = !!(hero && !hero.classList.contains("empty") && words && words !== "Nothing next");
       document.body.classList.toggle("kw-next-off", !live);
     }
     fitNext();
     document.addEventListener("house:kids-data-ready", fitNext);
     document.addEventListener("house:kid-rendered", fitNext);
-    stage.querySelector("[data-kw-home]").addEventListener("click", function (ev) {
-      ev.preventDefault();
-      ev.stopPropagation();
-      goHome(ev.clientX || innerWidth * 0.2, ev.clientY || 40);
-    });
+    stage.querySelector("[data-kw-home]").setAttribute("href", global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html");
     stage.querySelector("[data-kw-path]").addEventListener("click", function () {
       var d = document.getElementById("kw-cal");
       if (!d) return;
@@ -2301,7 +2567,8 @@
     cv.addEventListener("click", onWorldJarClick); /* JARTAP1 */
     ["pointerup", "pointercancel", "pointerleave"].forEach(function (n) { cv.addEventListener(n, clearHold); });
     cv.addEventListener("pointermove", function (e) {
-      bg.ptr = e.clientX / Math.max(1, innerWidth);
+      var sp = global.WardosStage && WardosStage.point ? WardosStage.point(e) : null;
+      bg.ptr = sp ? sp.x / 1920 : e.clientX / Math.max(1, innerWidth);
     }, { passive: true });
     global.addEventListener("deviceorientation", function (ev) {
       if (ev.gamma == null) return;
@@ -2309,16 +2576,20 @@
       if (ev.beta != null) gyro.beta = ev.beta;
       gyro.on = true;
     }, true);
-    global.addEventListener("resize", function () { if (bg) bg.resize(); if (lean()) loadPlates(); });
+    global.addEventListener("resize", function () { if (bg) bg.resize(); if (lean()) loadPlates(); fitMustRows(); });
     document.addEventListener("house:kid-rendered", function () {
       paintWeek();
       mountJar();
       soften();
+      fitMustRows();
       if (global.JarEngine && JarEngine.choreState(kid()).asleep) document.body.classList.add("kw-asleep");
     });
     loadPlates();
     paintClock();
     setInterval(paintClock, 1000);
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) paintClock(); });
+    window.addEventListener("focus", paintClock);
+    window.addEventListener("pageshow", paintClock);
     paintWeek();
     mountJar();
     soften();
@@ -2328,6 +2599,7 @@
       loop();
       if (reduced && bg) bg.frame(kid());
     }
+    if (global.WardosStage && WardosStage.place) WardosStage.place();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
@@ -2546,9 +2818,24 @@
     day: function () { return dayIso; },
     setDay: setDay,
     hits: function () { return bg ? { hits: bg.hits || [], cv: bg.cv } : null; }, /* LOOT1 · read-only */
+    jump: startJump,
     platesReady: function () {
       var id = (document.body && document.body.getAttribute("data-kid")) || "hayes";
       return platesReady && !!(plates[id] && plates[id].sky);
     }
   };
+  /* The wall stage loads from the script the kid pages already have, so the pinned page bytes stay put. */
+  if (document.head && !document.querySelector("script[src^='wardos-stage.js']")) {
+    var stageCss = document.createElement("link");
+    stageCss.rel = "stylesheet";
+    stageCss.href = "wardos-stage.css";
+    stageCss.setAttribute("data-house-injected", "1");
+    document.head.appendChild(stageCss);
+    ["house-scene.js", "house-event-display.js", "wardos-stage.js"].forEach(function (src) {
+      var s = document.createElement("script");
+      s.setAttribute("data-house-injected", "1");
+      s.src = src;
+      document.head.appendChild(s);
+    });
+  }
 })(window);

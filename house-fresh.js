@@ -15,6 +15,7 @@
   function mine() {
     var bits = [];
     document.querySelectorAll("script[src],link[rel=stylesheet][href]").forEach(function (el) {
+      if (el.getAttribute("data-house-injected") === "1") return;
       bits.push(el.getAttribute("src") || el.getAttribute("href") || "");
     });
     return stamps(bits.join(" "));
@@ -38,7 +39,11 @@
     var q = location.search.replace(/[?&]fresh=\d+/, "").replace(/^\?/, "");
     location.replace(location.pathname + "?" + (q ? q + "&" : "") + "fresh=" + Date.now() + location.hash);
   }
+  function auditOn() {
+    try { return /(?:\?|&)audit=1(?:&|$)/.test(location.search || ""); } catch (e) { return false; }
+  }
   function check() {
+    if (auditOn()) return;
     var d = today();
     if (loadDay && d && d !== loadDay) { reloadFresh(); return; }
     if (running === null) running = mine();
@@ -50,7 +55,11 @@
       if (!html) return;
       var live = stamps(html);
       if (!live || live === running) return;
-      reloadFresh();
+      /* A token only the live DOM has (an injected sheet) is not a new build. Reload only when the file has a token the DOM lacks. */
+      var have = {};
+      String(running).split(",").forEach(function (t) { if (t) have[t] = 1; });
+      var newer = String(live).split(",").some(function (t) { return t && !have[t]; });
+      if (newer) reloadFresh();
     }).catch(function () {});
   }
   if (document.readyState === "complete") setTimeout(check, 1500);
@@ -61,17 +70,62 @@
      next local midnight + 1 s (DST-safe: new Date(y, m, d + 1, 0, 0, 1)), re-armed after each fire and on return to the page.
      It runs the same check(): the day compare plus the 45 s reloadFresh guard keep it idempotent with the poll. */
   var midT = 0;
+  function ctCivil(d) {
+    try {
+      return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+    } catch (e) { return ""; }
+  }
+  function addCivil(iso) {
+    var p = String(iso).split("-");
+    var d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2]));
+    d.setUTCDate(d.getUTCDate() + 1);
+    return d.toISOString().slice(0, 10);
+  }
+  function ctMidnightMs(civil) {
+    var guess = new Date(civil + "T12:00:00Z");
+    var name = "GMT-6";
+    try {
+      var parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", timeZoneName: "shortOffset" }).formatToParts(guess);
+      for (var i = 0; i < parts.length; i++) if (parts[i].type === "timeZoneName") name = parts[i].value;
+    } catch (e) { /* CST */ }
+    var m = /GMT([+-])(\d{1,2})(?::(\d{2}))?/.exec(name);
+    var mins = m ? (m[1] === "-" ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3] || 0)) : -360;
+    return new Date(civil + "T00:00:00Z").getTime() - mins * 60000;
+  }
+  /* Next America/Chicago midnight, not the machine's local midnight. */
   function msToMidnight(now) {
     var n = now || new Date();
-    var ms = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1, 0, 0, 1).getTime() - n.getTime();
+    var iso = ctCivil(n) || "1970-01-01";
+    var target = ctMidnightMs(addCivil(iso)) + 1000;
+    var at = n.getTime();
+    var ms = target - at;
+    if (ms < 1000) ms = ctMidnightMs(addCivil(addCivil(iso))) + 1000 - at;
     return Math.max(1000, Math.min(ms, 25 * 3600 * 1000));
   }
+  function nextMidnightMs(now) {
+    var n = now || new Date();
+    var iso = ctCivil(n) || "1970-01-01";
+    var target = ctMidnightMs(addCivil(iso)) + 1000;
+    if (target - n.getTime() < 1000) target = ctMidnightMs(addCivil(addCivil(iso))) + 1000;
+    return target;
+  }
   function armMidnight() {
+    if (auditOn()) return;
     if (midT) clearTimeout(midT);
-    midT = setTimeout(function () { midT = 0; check(); armMidnight(); }, msToMidnight());
+    var target = nextMidnightMs(new Date());
+    var wait = Math.max(1000, target - Date.now());
+    midT = setTimeout(function () {
+      midT = 0;
+      /* A throttled timer can fire early. Re-check the wall clock and arm again. */
+      if (Date.now() + 250 < target) { armMidnight(); return; }
+      check();
+      armMidnight();
+    }, wait);
   }
   armMidnight();
   document.addEventListener("visibilitychange", function () { if (!document.hidden) armMidnight(); });
   window.addEventListener("pageshow", function () { armMidnight(); });
-  setInterval(check, 30 * 1000); /* DAYROLL1 · 30 s (JARTAP1, Atlas 11:51 PM) so the day flips well inside a minute of midnight; the stamp fetch is one no-store GET */
+  if (!auditOn()) setInterval(check, 30 * 1000); /* DAYROLL1 · 30 s so the day flips inside a minute of Chicago midnight */
+  var root = typeof globalThis !== "undefined" ? globalThis : window;
+  root.HouseFresh = { msToMidnight: msToMidnight, ctMidnightMs: ctMidnightMs };
 })();

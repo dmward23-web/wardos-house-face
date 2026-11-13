@@ -730,9 +730,15 @@
         html +=
           '<article class="light-pad cmd-panel' + onCls + '" data-light-id="' + L.id + '">'
           + '<div class="light-pad-top">'
-          + '<div class="light-pad-ico" aria-hidden="true">💡</div>'
+          + '<div class="light-pad-ico" aria-hidden="true"><svg viewBox="0 0 32 32" width="64" height="64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6a7 7 0 0 1 4 12c-1 1-1.5 2-1.5 4h-5c0-2-.5-3-1.5-4A7 7 0 0 1 16 6z"/><path d="M13 26h6"/></svg></div>'
           + '<div><div class="light-pad-name">' + escapeHtml(L.name) + "</div>"
-          + '<div class="light-pad-where">' + escapeHtml(L.where || L.kind) + "</div></div>"
+          + (function () {
+              var whereTxt = String(L.where || "").replace(/\s+/g, " ").trim();
+              var nameTxt = String(L.name || "").replace(/\s+/g, " ").trim();
+              if (!whereTxt || whereTxt.toLowerCase() === nameTxt.toLowerCase()) return "";
+              return '<div class="light-pad-where">' + escapeHtml(whereTxt) + "</div>";
+            })()
+          + "</div>"
           + '<div class="light-pad-state">' + (L.on ? "ON" : "OFF") + "</div>"
           + "</div>"
           + '<div class="light-pad-actions">'
@@ -961,6 +967,11 @@
     }
   }
   function hubPairStrip(doc, panel, grid) {
+    var onHub = /sheet-index\.html$/.test(((doc.defaultView || window).location.pathname) || "");
+    if (onHub) {
+      panel.removeAttribute("data-pair-need");
+      return false;
+    }
     var need = pairNeeded() && !canWrite();
     if (!need) {
       if (panel.hasAttribute("data-pair-need")) { panel.removeAttribute("data-pair-need"); hubPairHideBits(panel, false); }

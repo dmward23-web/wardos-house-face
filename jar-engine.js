@@ -44,9 +44,12 @@
     var WK = global.WardKids;
     var data = WK && WK._data;
     var out = { kid: kidId, fill: 0, hungry: false, asleep: false, full: false, done: 0, total: 0, todayDone: 0, todayNeed: 0 };
-    if (!WK || !data || !data.kids || !data.kids[kidId]) return out;
-    out.asleep = asleepWeek(data);
-    var quests = typeof WK.mustQuests === "function" ? (WK.mustQuests(kidId, data) || []) : [];
+    if (!WK || typeof WK.getCheck !== "function") return out;
+    var quests = [];
+    if (data && data.kids && data.kids[kidId]) {
+      out.asleep = asleepWeek(data);
+      quests = typeof WK.mustQuests === "function" ? (WK.mustQuests(kidId, data) || []) : [];
+    }
     var today = dayIso || WK.DAY_ISO;
     var days = typeof WK.weekDayIsos === "function" ? WK.weekDayIsos(today) : [];
     quests.forEach(function (q) {
@@ -66,7 +69,20 @@
         if (typeof WK.getCheck === "function" && (dayIso ? WK.getCheck(q.id, data, dayIso) : WK.getCheck(q.id, data))) out.done += 1;
       }
     });
+    if (!quests.length && WK && typeof WK.getCheck === "function") {
+      var fallback = {
+        ainsley: ["ain-bed", "ain-toys", "ain-dishwasher", "ain-empty", "ain-living"],
+        hayes: ["hay-bed", "hay-backpack", "hay-dishes", "hay-empty", "hay-trash", "hay-postgame", "hay-shower"],
+        harris: ["har-bed", "har-backpack", "har-dishes", "har-empty", "har-trash", "har-postgame", "har-shower"]
+      };
+      (fallback[kidId] || []).forEach(function (id) {
+        out.total += 1;
+        out.todayNeed += 1;
+        if (WK.getCheck(id, data, today)) { out.done += 1; out.todayDone += 1; }
+      });
+    }
     out.fill = out.total ? clamp(out.done / out.total, 0, 1) : 0;
+    out.shown = out.todayNeed ? clamp(out.todayDone / out.todayNeed, 0, 1) : out.fill;
     out.full = out.total > 0 && out.done >= out.total;
     out.hungry = !out.asleep && out.todayNeed > 0 && out.todayDone < out.todayNeed;
     return out;

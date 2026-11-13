@@ -1,5 +1,9 @@
 /* TAPSYNC1 · kids chore taps shared across every device via the house hub (same key + tunnel as lights).
-   Load BEFORE kids-data.js. Local taps still work offline; they push when the hub answers. */
+   Load BEFORE kids-data.js. Local taps still work offline; they push when the hub answers.
+   ?audit=1 installs house-audit.js first, which refuses every non-GET. */
+if (typeof document !== "undefined" && typeof document.write === "function" && !window.HouseAudit && document.readyState === "loading") {
+  document.write('<script src="house-audit.js?v=AUDIT1"><\/script>');
+}
 (function () {
   "use strict";
   var PREFIX = "house-checkoffs:";

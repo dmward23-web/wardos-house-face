@@ -40,6 +40,14 @@ function catalogMusts(src) {
   return out;
 }
 
+test("each chore icon path is distinct", () => {
+  const src = rd("kid-world.js");
+  const fn = src.slice(src.indexOf("function choreIcon"), src.indexOf("function plainLabel"));
+  const bodies = [...fn.matchAll(/body = '([^']+)'/g)].map((m) => m[1]);
+  assert.ok(bodies.length >= 8, "icon branches");
+  assert.equal(new Set(bodies).size, bodies.length, "two chores share an icon path");
+});
+
 test("kid-board public musts match the chores board per kid", () => {
   const chores = choresMusts(rd("sheet-chores.html"));
   const board = catalogMusts(rd("kid-world.js"));
@@ -83,7 +91,8 @@ test("kid board renders the chores musts and a tap checks that same id", { skip:
         what: (el.querySelector(".what") || {}).textContent || "",
         hint: (el.querySelector(".hint") || {}).textContent || ""
       })));
-      assert.deepEqual(got, chores[kid], kid + " board");
+      /* Prism C2: the kid board shows the short label and no subline. The ids stay the chores sheet's ids. */
+      assert.deepEqual(got.map((r) => r.id), chores[kid].map((r) => r.id), kid + " board");
       const empty = await g.evaluate(() => document.body.innerText.includes("Nothing on the list yet."));
       assert.equal(empty, false, kid + " still says the list is empty");
     }

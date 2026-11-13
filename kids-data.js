@@ -214,14 +214,26 @@
 
   function pad2(n) { return String(n).padStart(2, "0"); }
 
-  /** Chicago hour 0 to 23 (for the chore week change). */
+  function asDate(v) {
+    if (v instanceof Date && !isNaN(v.getTime())) return v;
+    return new Date();
+  }
+  function clockNow() {
+    try {
+      if (global.HouseScene && typeof HouseScene.now === "function") return asDate(HouseScene.now());
+      if (global.LHClock && typeof LHClock.now === "function") return asDate(LHClock.now());
+    } catch (e) { /* live clock */ }
+    return new Date();
+  }
+
+  /** Chicago hour 0 to 23 (for the chore week change). Follows ?now= when the clock is pinned. */
   function chicagoHourNow() {
     try {
       var parts = new Intl.DateTimeFormat("en-US", {
         timeZone: "America/Chicago",
         hour: "numeric",
         hourCycle: "h23"
-      }).formatToParts(new Date());
+      }).formatToParts(clockNow());
       for (var i = 0; i < parts.length; i++) {
         if (parts[i].type === "hour") return Number(parts[i].value) % 24;
       }
@@ -254,6 +266,25 @@
     return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
   }
 
+  function plainChoreLabel(id, fallback) {
+    var k = String(id || "");
+    if (/bed/.test(k)) return "Make bed";
+    if (/backpack/.test(k)) return "Backpack";
+    if (/dish/.test(k)) return "Dishes";
+    if (/empty/.test(k)) return "Empty";
+    if (/trash/.test(k)) return "Trash";
+    if (/postgame/.test(k)) return "Gear";
+    if (/shower/.test(k)) return "Shower";
+    if (/bath/.test(k)) return "Bathroom";
+    if (/laundry/.test(k)) return "Laundry";
+    if (/cubby/.test(k)) return "Cubby";
+    if (/shoe|living/.test(k)) return "Shoes";
+    if (/toy/.test(k)) return "Toys";
+    if (/room/.test(k)) return "Room";
+    if (/babysit/.test(k)) return "Babysit";
+    var head = String(fallback || "").split("\u00b7")[0].trim().split(/\s+/).slice(0, 2).join(" ");
+    return head || "Chore";
+  }
   function dowIndexFromIso(iso) {
     var parts = String(iso).split("-");
     if (parts.length !== 3) return 0;
@@ -273,6 +304,11 @@
         return { cadence: cadence, stars: stars, optional: optional };
       }
     }
+    return staticCadence(checkId);
+  }
+  function staticCadence(checkId) {
+    if (checkId === "ain-babysit") return { cadence: "addon", stars: 0, optional: true };
+    if (WEEKLY_IDS[checkId]) return { cadence: "weekly", stars: 1, optional: false };
     return { cadence: "daily", stars: 1, optional: false };
   }
 
@@ -281,7 +317,12 @@
     "hay-room": 1, "hay-shoes": 1, "hay-cubby": 1,
     "har-toys": 1, "har-shoes": 1, "har-cubby": 1
   };
-  var DOW_SHORT = ["S", "M", "T", "W", "T", "F", "S"];
+  var DOW_SHORT = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  function displayDays(days) {
+    return days.slice().sort(function (a, b) {
+      return ((dowIndexFromIso(a) + 6) % 7) - ((dowIndexFromIso(b) + 6) % 7);
+    });
+  }
   var DOW_LONG = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   function checkKeyFor(checkId, data, dayIso) {
@@ -512,6 +553,13 @@
       if (!d || !AF) { go(); return; }
       AF.ready().then(function () { try { AF.filterKidsWeek(d); } catch (e) { /* */ } go(); }, go);
     };
+    try {
+      var q = String(global.location && global.location.search || "");
+      if (/[?&]wardos-test=1(?:&|$)/.test(q) && global.__wardosFixture && global.__wardosFixture.kids) {
+        cb(null, global.__wardosFixture);
+        return;
+      }
+    } catch (eFx) { /* production load */ }
     var urls = ["kids-week.json", "data/kids-week.json"];
     var i = 0;
     function tryNext() {
@@ -915,13 +963,15 @@
     var starsAttr = ' data-stars="' + (cadence === "daily" && !optional ? weekPay : stars) + '"';
 
     if (cadence === "daily" && !optional) {
-      var days = weekDayIsos(DAY_ISO);
+      var days = displayDays(weekDayIsos(DAY_ISO));
       var taps = "";
       for (var di = 0; di < days.length; di++) {
         var iso = days[di];
         var dayOn = getCheck(q.id, data, iso);
         var isToday = iso === DAY_ISO;
-        var cls = "day-tap" + (dayOn ? " done" : "") + (isToday ? " is-today" : "");
+        var dowi = dowIndexFromIso(iso);
+        var isOff = dowi === 0 || dowi === 6;
+        var cls = "day-tap" + (dayOn ? " done" : "") + (isToday ? " is-today" : "") + (!isToday && iso < DAY_ISO ? " is-past" : "") + (isOff ? " is-off" : "");
         taps += '<button type="button" class="' + cls + '" data-check="' + esc(q.id) + '" data-day-iso="' + esc(iso) +
           '" data-kid-quest="1" data-cadence="daily"' + starsAttr +
           ' aria-label="' + DOW_LONG[dowIndexFromIso(iso)] + " · " + esc(q.what) + '" aria-pressed="' + (dayOn ? "true" : "false") + '">' +
@@ -974,10 +1024,20 @@
     if (!data) return;
     var nodes = root.querySelectorAll(".chore[data-check], .quest[data-check]");
     Array.prototype.forEach.call(nodes, function (el) {
+      /* The kid wall list is one 64px row per chore. The seven day buttons live on the chores sheet, where the row is tall enough. */
+      if (el.closest && el.closest("#sec-musts")) return;
       if (el.classList.contains("day-tap")) return;
       if (el.querySelector(".quest-days")) return;
       var id = el.getAttribute("data-check");
       if (!id || !KID_FROM_CHECK[id]) return;
+      if (!el.querySelector(".chore-ico")) {
+        var ico = document.createElement("span");
+        ico.className = "chore-ico";
+        ico.setAttribute("aria-hidden", "true");
+        var mark = /bed/.test(id) ? '<path d="M5 22 V13 H10 V8 H22 V13 H27 V22"/><path d="M5 17 H27"/>' : /backpack|cubby/.test(id) ? '<path d="M12 11 V8 a4 4 0 0 1 8 0 v3"/><path d="M8 12 h16 v13 a2 2 0 0 1-2 2 H10 a2 2 0 0 1-2-2 z"/><path d="M8 18 h16"/>' : /empty/.test(id) ? '<path d="M7 12 h18 v12 H7 z"/><path d="M7 12 L5 7 h22 l-2 5"/><path d="M10 16 h12 M10 19 h12"/>' : /dish/.test(id) ? '<circle cx="23" cy="17" r="7"/><circle cx="23" cy="17" r="3.5"/><ellipse cx="7.2" cy="10.5" rx="3" ry="4"/><path d="M7.2 14.6 L11 27"/>' : /trash/.test(id) ? '<path d="M8 10 H24"/><path d="M12 10 V7 H20 V10"/><path d="M10 12 L12 26 H20 L22 12"/>' : /shower/.test(id) ? '<circle cx="11" cy="7" r="3"/><path d="M11 10 v2"/><path d="M7 13 h16"/><path d="M10 17 v5 M14 17 v6 M18 17 v5 M22 17 v4"/>' : /bath/.test(id) ? '<path d="M5 16 h22 v3 a7 7 0 0 1-7 7 H12 a7 7 0 0 1-7-7 z"/>' : /shoe|living/.test(id) ? '<path d="M5 21 C8 11 14 12 16 15 C20 10 27 14 27 21 Z"/>' : /laundry/.test(id) ? '<path d="M9 7 h14 l2 18 H7 Z"/><circle cx="16" cy="17" r="4"/>' : /toy/.test(id) ? '<path d="M7 14 H25 V26 H7 Z"/><path d="M10 14 V9 H15 V14"/><path d="M17 14 V9 H22 V14"/>' : /room/.test(id) ? '<path d="M5 15 L16 6 L27 15 V26 H5 Z"/><path d="M13 26 v-7 h6 v7"/>' : /postgame/.test(id) ? '<circle cx="16" cy="16" r="8"/><path d="M16 8 c2 5 2 11 0 16 M8 16 c5-2 11-2 16 0 M10 11 c4 2 8 2 12 0 M10 21 c4-2 8-2 12 0"/>' : /babysit/.test(id) ? '<circle cx="11" cy="11" r="3"/><circle cx="21" cy="12" r="2.4"/><path d="M6 24 c1-6 4-8 5-8 M22 24 c-1-5-3-6-4-6"/>' : '<rect x="8" y="8" width="16" height="16" rx="2"/>';
+        ico.innerHTML = '<svg viewBox="0 0 32 32" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">' + mark + "</svg>";
+        el.insertBefore(ico, el.firstChild);
+      }
       var kidId = KID_FROM_CHECK[id];
       var meta = questMeta(kidId, id, data);
       el.setAttribute("data-cadence", meta.cadence);
@@ -1010,16 +1070,18 @@
       var weekDone = dayCount >= weekDayIsos(DAY_ISO).length;
       var whatEl = el.querySelector(".what");
       var what = whatEl ? whatEl.textContent : id;
-      var days = weekDayIsos(DAY_ISO);
+      var days = displayDays(weekDayIsos(DAY_ISO));
       var taps = document.createElement("div");
       taps.className = "quest-days";
       taps.setAttribute("role", "group");
       taps.setAttribute("aria-label", "Days this week");
+      if (whatEl) whatEl.textContent = plainChoreLabel(id, whatEl.textContent);
       for (var di = 0; di < days.length; di++) {
         var iso = days[di];
         var btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "day-tap" + (getCheck(id, data, iso) ? " done" : "") + (iso === DAY_ISO ? " is-today" : "");
+        var offDay = dowIndexFromIso(iso) === 0 || dowIndexFromIso(iso) === 6;
+        btn.className = "day-tap" + (getCheck(id, data, iso) ? " done" : "") + (iso === DAY_ISO ? " is-today" : "") + (iso !== DAY_ISO && iso < DAY_ISO ? " is-past" : "") + (offDay ? " is-off" : "");
         btn.setAttribute("data-check", id);
         btn.setAttribute("data-day-iso", iso);
         btn.setAttribute("data-kid-quest", "1");
@@ -1670,7 +1732,7 @@
       var items = buildNoSurprise(kid, data);
       ns.innerHTML = items.length
         ? items.map(cardHTML).join("")
-        : quietHTML(kidId === "ainsley" ? "side quiet · drop the needle on musts" : "quiet board · check musts");
+        : "";
     }
     var rides = document.querySelector("[data-mount-rides]");
     if (rides) {
@@ -1706,10 +1768,10 @@
       (kid.quests || []).forEach(function (q) {
         if (q.id === "ain-toys" || /room reset/i.test(q.what || "")) {
           var done = getCheck(q.id);
-          space.push({ when: "Room", what: done ? "Room reset · clear" : "Room reset · still open", hint: "your space · your pace", tone: done ? "fun" : "act" });
+          space.push({ when: "Room", what: done ? "Room is clear" : "Room still open", hint: "Your room", tone: done ? "fun" : "act" });
         }
       });
-      her.innerHTML = space.length ? space.map(cardHTML).join("") : quietHTML(kidId === "ainsley" ? "her space · needle up" : "your space · quiet");
+      her.innerHTML = space.length ? space.map(cardHTML).join("") : quietHTML("Nothing else today");
     }
   }
 
@@ -1916,8 +1978,35 @@
     return list;
   }
 
+  function schoolIcon() {
+    return '<svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M4 14 L16 6 L28 14"/><path d="M8 13 V26 H24 V13"/><path d="M14 26 V18 H18 V26"/></svg>';
+  }
+  function faceClock(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    try {
+      var p = {};
+      new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", hour: "numeric", minute: "2-digit", hour12: true }).formatToParts(d).forEach(function (x) {
+        if (x.type !== "literal") p[x.type] = x.value;
+      });
+      if (!p.hour) return "";
+      return p.hour + ":" + p.minute + (p.dayPeriod ? " " + p.dayPeriod : "");
+    } catch (eFc) { return ""; }
+  }
+  function shortNextLabel(title) {
+    var t = String(title || "").replace(/\s+/g, " ").trim();
+    if (/^school pickup$/i.test(t)) return "Pickup";
+    var leave = t.match(/^leave for\s+(.+)$/i);
+    if (leave) {
+      var name = leave[1].replace(/\s+\d.*$/, "").trim();
+      return name ? name.charAt(0).toUpperCase() + name.slice(1) : t;
+    }
+    return t;
+  }
   function consumeEventIcon(what) {
     var w = String(what || "").toLowerCase();
+    if (/^pickup$|school pickup/.test(w)) return { html: '<span class="g2-lead">' + schoolIcon() + "</span>", text: "" };
     if (/baseball|ball/.test(w)) return { html: '<span class="g2-lead">' + g2Ico("g2-baseball") + "</span>", text: "" };
     if (/flag/.test(w)) return { html: '<span class="g2-lead">' + g2Ico("g2-flag") + "</span>", text: "" };
     if (/swim/.test(w)) return { html: '<span class="g2-lead">' + g2Ico("g2-swim") + "</span>", text: "" };
@@ -1958,7 +2047,6 @@
       if ((kidId === "hayes" || kidId === "harris") && SCHRX(String.raw`hayes \+ harris|boys §|§ (drop|pickup|hearing)`, "i").test(blob)) mine = true;
       /* SCHOOLKEY2 · a generator-tagged school run is the boys' (or the named boy's) with or without the private names */
       if ((kidId === "hayes" || kidId === "harris") && /^school_(drop|pickup)$/.test(String(item.kind || "")) && (blob.indexOf(kidId) >= 0 || !/\bhayes\b|\bharris\b/.test(blob))) mine = true;
-      if (kidId === "hayes" && /madi|provider collab/i.test(blob)) mine = true;
       if (!mine && kidId === "ainsley" && /appointment/i.test(blob)) mine = true;
       if (!mine) continue;
       /* QARELAY1 · RIDES law: Dad logistics (kind leave/ride, "Pick up …"/"Drop …") never kid NEXT UP */
@@ -2004,9 +2092,9 @@
       };
     }
     /* Fallback: kid hottest / first unique timed event */
-    var events = consumeCollectEvents(kid).filter(function (e) {
-      return !consumeIsHq(e) && !consumeIsRoutine(e);
-    });
+    var events = consumeCollectEvents(kid).filter(function (e) { return !consumeIsHq(e); });
+    var unique = events.filter(function (e) { return !consumeIsRoutine(e); });
+    if (unique.length) events = unique;
     if (events.length) {
       var e0 = events[0];
       var p = consumeParseWhen(e0.when);
@@ -2184,20 +2272,22 @@
     if (nextMount) {
       if (!next) {
         nextMount.className = "consume-hero empty";
-        nextMount.innerHTML = '<div class="consume-hero-inner"><div class="consume-hero-title">Nothing timed next</div><div class="consume-hero-meta">Quests still on</div></div>';
+        nextMount.innerHTML = '<div class="consume-hero-inner"><div class="consume-hero-title">Nothing next</div><div class="consume-hero-meta">Quests still on</div></div>';
       } else {
         var cd = consumeCountdown(next);
         var title = consumeStripKidName(next.title, kid);
+        var shown = title;
         var ico = consumeEventIcon(title);
+        var clock = faceClock(next.startIso) || "";
         nextMount.className = "consume-hero";
         nextMount.innerHTML =
           '<div class="consume-hero-inner">' +
           '<div class="consume-hero-top">' +
-          '<div class="consume-hero-when">' + esc(next.whenLabel || "NEXT") + "</div>" +
+          '<div class="consume-hero-when">' + esc(clock || next.whenLabel || "NEXT") + "</div>" +
           '<div class="consume-countdown"><span class="pulse"></span><span>' + esc(cd) + "</span></div>" +
           "</div>" +
-          '<div class="consume-hero-title">' + (ico.html || "") + esc(((ico.text ? ico.text + " " : "") + title)) + "</div>" +
-          '<div class="consume-hero-meta">YOUR board · <b>' + esc(meta.loadout) + "</b></div>" +
+          '<div class="consume-hero-title">' + (ico.html || "") + '<span class="consume-hero-name">' + esc(((ico.text ? ico.text + " " : "") + shown)) + "</span></div>" +
+          (kidId === "ainsley" ? "" : '<div class="consume-hero-meta">YOUR board · <b>' + esc(meta.loadout) + "</b></div>") +
           "</div>";
       }
     }
@@ -2246,7 +2336,7 @@
           routine.hidden = false;
           routine.innerHTML =
             '<span class="consume-routine-ico g2-inline">' + g2Ico("g2-routine") + "</span>" +
-            '<div class="consume-routine-txt"><b>Swim</b> · leave 4:25 · Coach Ann</div>' +
+            '<div class="consume-routine-txt"><b>Swim</b> · leave 4:25</div>' +
             '<span class="consume-routine-badge">Tue/Thu</span>';
         } else if (swimDays.length === 1) {
           routine.hidden = true;
@@ -2363,6 +2453,7 @@
       var w = document.createTreeWalker(root, 4 /* NodeFilter.SHOW_TEXT */), n, list = [];
       while ((n = w.nextNode())) { if (!(n.parentElement && n.parentElement.closest("[data-mount-consume-hdr]"))) list.push(n); }   /* the header clock is chrome */
       list.forEach(function (tn) {
+        if (tn.parentElement && tn.parentElement.closest && tn.parentElement.closest(".consume-hero-when")) return; /* option C · the next card keeps its clock time */
         if (/[\d$%\u2605\u2606\u2b50]/.test(tn.nodeValue)) {
           var lead = /^\s/.test(tn.nodeValue) ? " " : "", trail = /\s$/.test(tn.nodeValue) ? " " : "";
           var v = strip(tn.nodeValue);
@@ -2412,7 +2503,8 @@
       }).join("") || '<div class="hot-badge">…</div>';
     }
 
-    renderQuests(document.querySelector("[data-mount-quests]"), kid.quests, data, kidId);
+    /* A feed with no quest list must not erase the public musts already on the board. */
+    if (kid.quests && kid.quests.length) renderQuests(document.querySelector("[data-mount-quests]"), kid.quests, data, kidId);
     if (document.querySelector(".sec-schedule.consume-sched")) {
       renderConsumeSchedule(kidId, data);
     } else {
@@ -2427,7 +2519,7 @@
         }
         renderList(document.querySelector("[data-mount-school]"), schoolRows, "school bits show up when known");
       })();
-      renderList(document.querySelector("[data-mount-appointments]"), kid.appointments, kid.appointmentsEmpty || "none on your board · quiet is good");
+      renderList(document.querySelector("[data-mount-appointments]"), kid.appointments, kid.appointmentsEmpty || "Nothing on the board");
     }
     renderList(document.querySelector("[data-mount-fun]"), kid.fun, "fun picks land here");
     renderList(document.querySelector("[data-mount-missions]"), kid.missions || kid.fun, "bonus missions land here");

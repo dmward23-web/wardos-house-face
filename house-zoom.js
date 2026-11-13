@@ -6,7 +6,8 @@
     try { localStorage.removeItem(KEY); } catch (e) {}
     document.querySelectorAll("[data-house-zoom-ctl], .house-zoom").forEach(function (el) { el.remove(); });
     var panel = document.querySelector(".panel");
-    if (panel) { panel.style.zoom = ""; panel.style.transform = ""; panel.style.transformOrigin = ""; panel.style.marginBottom = ""; }
+    if (panel && !panel.closest(".wardos-stage")) { panel.style.zoom = ""; panel.style.transform = ""; panel.style.transformOrigin = ""; panel.style.marginBottom = ""; }
+    else if (panel) { panel.style.zoom = ""; panel.style.marginBottom = ""; }
     document.documentElement.style.removeProperty("--house-zoom");
     document.documentElement.removeAttribute("data-house-zoom");
     if (!document.getElementById("hz-kill")) {

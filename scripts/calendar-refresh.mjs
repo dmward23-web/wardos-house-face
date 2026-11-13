@@ -27,7 +27,9 @@ createRequire(import.meta.url)("../house-face-law.js");   /* sets globalThis.Hou
 const FACE_LAW = globalThis.HouseFaceLaw;
 import { spawnSync } from "node:child_process";
 import { ctMidnight } from "./ct-midnight.mjs"; /* DATA1 P1-5 · one all-day clock for both feeds */
-import { privPath, assertPrivateOut, namesRe, privateNames, externalEvents, EXT_ROLES } from "./private-dir.mjs"; /* PRIVFEED1 · EXTFILTER1 */
+import { privPath, assertPrivateOut, namesRe, privateNames, externalEvents, therapyDrop, EXT_ROLES } from "./private-dir.mjs"; /* PRIVFEED1 · EXTFILTER1 */
+createRequire(import.meta.url)("../house-event-display.js"); /* KID-FEED-SAFETY · same allowlist as the glass */
+const DISPLAY = globalThis.HouseEventDisplay;
 /* EXTNAMES1 · private-names.tsv role "external" names people outside the household (never in git). A kid's first name
    followed by one of them is not our kid, so it is cut out before the kid tests. ONLY "external" is filtered, plus the
    old key "otherfamily" during the transition (a later commit drops it). partner, coparent, household, school and every
@@ -254,9 +256,32 @@ function danWhat(it) {
   return `${KID_NAME[it.kid]} ${what}`;
 }
 
+function eventProbe(ev, summary) {
+  var probe = {};
+  if (ev && typeof ev === "object") {
+    Object.keys(ev).forEach(function (k) { probe[k] = ev[k]; });
+  }
+  probe.summary = summary;
+  probe.title = summary;
+  probe.what = summary;
+  if (ev && ev.eventType && !probe.eventType) probe.eventType = ev.eventType;
+  return probe;
+}
 function classify(ev) {
   const summary = summaryOf(ev);
+  const probe = eventProbe(ev, summary);
+  /* Classify the whole event before any field is dropped. A health word in any
+     field, with no show marker and no disguised boy name in the title, is not a row. */
+  if (DISPLAY && DISPLAY.isAppointment && DISPLAY.isAppointment(probe)) {
+    const view = DISPLAY.summarize ? DISPLAY.summarize(probe, "shared") : null;
+    if (!view || view.title !== "Appointment") return null;
+    return { kind: "appointment", summary: "Appointment", wardosShow: true };
+  }
   if (!summary || isAdminNoise(summary)) return null;
+  /* KID-FEED-SAFETY · provider/therapy is denied before school/other classification. Opt-in is an explicit boolean, never a title. */
+  if (therapyDrop(summary) || (DISPLAY && DISPLAY.isDenied(probe, "shared"))) {
+    return null;
+  }
   if (/^Kids with Dan/i.test(summary)) return { kind: "custody", summary };
   if (/^Leave\s*·/i.test(summary) || /^Leave\b/i.test(summary)) {
     return { kind: "leave", summary, busy: !isFree(ev) };
@@ -289,7 +314,7 @@ function classify(ev) {
     if (kr && !RX(String.raw`§ (drop|pickup)`, "i").test(summary)) {
       return { kind: "leave", summary, busy: !isFree(ev), ride: true, kidRide: true, kid: kr[1].toLowerCase() };
     } }
-  if (/swim|Swim|Coach Ann/i.test(summary)) return { kind: "sport", sport: "swim", summary, kid: "ainsley" };
+  if (/swim|Swim/i.test(summary)) return { kind: "sport", sport: "swim", summary, kid: "ainsley" };
   if (/baseball|BASEBALL|Falcons/i.test(summary) && /hayes/i.test(summary)) {
     return { kind: "sport", sport: "baseball", summary, kid: "hayes" };
   }
@@ -400,6 +425,7 @@ function stripDollars(s) {
 }
 
 function kidsSafeWhat(summary, kind) {
+  if (DISPLAY && DISPLAY.CLINICAL.test(String(summary || ""))) return "";
   let s = summary
     .replace(/^Leave\s*·\s*/i, "")
     .replace(/^Ainsley\s*—\s*/i, "")
@@ -420,6 +446,7 @@ function kidsSafeWhat(summary, kind) {
   }
   // Drop trailing "· 3:00" / "· 5:00 practice" clock echo when strip already shows time
   s = s.replace(/\s*·\s*\d{1,2}:\d{2}(\s*(am|pm|a|p|practice|game))?\s*$/i, "").trim();
+  s = s.replace(/\b\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?\s*[-–—]\s*\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?/gi, " ").replace(/\s{2,}/g, " ").trim();
   s = s.replace(/\s*·\s*leave\s+\d{1,2}:\d{2}.*$/i, "").trim();
   return s;
 }
@@ -430,7 +457,8 @@ function buildBoardItems(events, now) {
   const items = [];
   for (const ev of events) {
     if (DRESS_RE.test(String(ev.summary || ""))) continue; /* LAW8C1 · colour days stay calendar markers (cal-live), never board rows */
-    if (FACE_LAW.isTherapy(String(ev.summary || ""))) continue; /* LIVEFIX1 · therapy never reaches a board */
+    const marked = DISPLAY && DISPLAY.keepAppointment && DISPLAY.keepAppointment(eventProbe(ev, summaryOf(ev)));
+    if (!marked && FACE_LAW.isTherapy(String(ev.summary || ""))) continue; /* LIVEFIX1 · therapy never reaches a board unless the show marker keeps it as Appointment */
     if (ev.status === "cancelled" || ev.status === "canceled") continue;
     /* CANCELGONE1 · title marked canceled = gone from board */
     if (/^\s*[\[(]?\s*(cancel+ed|cxl)\b/i.test(String(ev.summary || ""))) continue;
@@ -448,10 +476,12 @@ function buildBoardItems(events, now) {
       end,
       startIso: start.toISOString(),
       endIso: end.toISOString(),
-      location: ev.location || "",
+      location: cls.kind === "appointment" ? "" : (ev.location || ""),
       free: isFree(ev),
       raw: summaryOf(ev),
+      source: eventProbe(ev, summaryOf(ev)),
       allDay: isAllDay(ev),
+      wardosShow: cls.wardosShow === true
     });
   }
   items.sort((a, b) => a.start - b.start);
@@ -624,20 +654,28 @@ function buildKidToday(kidId, items, now, homeWeek) {
     if (!mine && it.kind !== "custody") continue;
     if (it.kind === "custody") continue;
     if (isAdminNoise(it.raw)) continue;
-    let what = kidsSafeWhat(it.raw, it.kind);
+    let what = "";
+    if (DISPLAY && DISPLAY.summarize) {
+      const view = DISPLAY.summarize(Object.assign({}, it.source || {}, { summary: it.raw, title: it.raw, what: it.raw, wardosShow: it.wardosShow === true }), "shared");
+      what = view && view.title ? view.title : "";
+    }
+    if (!what) continue;
     let tone = "act";
     let kind = "event";
-    if (it.kind === "sport") { tone = "hot"; what = (kidId === "hayes" && /baseball/i.test(it.raw) ? "⚾ " : kidId === "harris" && /flag/i.test(it.raw) ? "🏁 " : kidId === "ainsley" && /swim/i.test(it.raw) ? "" : "") + what; }
-    if (it.kind === "appointment") tone = "hot";
+    if (it.kind === "sport" || it.kind === "appointment") tone = "hot";
     if (it.kind === "leave" && !isKidRide(it, kidId)) continue; // leaves are Dad strip / dan box, not kid glass (KIDRIDE1: own ride stays)
     if (isKidRide(it, kidId) && !rows.some((r) => r.ride)) { rows.unshift({ kind, when: rowWhen(it, now), what, hint: "", tone: "hot", ride: true }); continue; }
-    rows.push({
+    const row = {
       kind,
       when: rowWhen(it, now),
       what,
       hint: it.kind === "sport" ? "YOUR board" : "",
       tone,
-    });
+    };
+    row.summary = what;
+    row.title = what;
+    if (it.wardosShow === true && what === "Appointment") row.wardosShow = true;
+    rows.push(row);
   }
   /* DATA1 P2-11 · no custody note row on a kid's today (was "YOUR BASE with Dad" / "Kids away") */
   if (!rows.length) rows.push({ kind: "note", when: "Today", what: "Nothing else on the calendar today", hint: "", tone: "act" });
@@ -688,15 +726,17 @@ function buildKidSchool(kidId, items, now) {
 function buildKidAppointments(kidId, items, now) {
   const out = [];
   for (const it of items) {
-    if (it.kind !== "appointment") continue;
+    if (it.kind !== "appointment" || it.wardosShow !== true) continue;
     if (!stillRelevant(it, now)) continue;
     if (it.kid && it.kid !== kidId) continue;
     const row = {
       when: `${fmtDayLabel(it.start)} · ${whenTime(it)}`,
-      what: kidsSafeWhat(it.raw, "appointment"),
-      hint: "with Dad",
+      what: "Appointment",
+      summary: "Appointment",
+      hint: "",
       tone: "hot",
     };
+    if (it.wardosShow === true) row.wardosShow = true;
     if (it.herSpace) row.herSpace = true;
     out.push(row);
   }
@@ -767,15 +807,21 @@ function buildDanToday(items, now, homeWeek) {
     // Dad box: leaves, school logistics, sports, appointments, notable dad
     if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school", "dad", "generic", "other"].includes(it.kind)) continue; /* DATA1 P1-4 */
     const when = `${partsInTZ(now).weekday.slice(0, 3)} · ${whenTime(it)}`;
-    const what = danWhat(it);
+    const view = DISPLAY && DISPLAY.summarize ? DISPLAY.summarize(Object.assign({}, it.source || {}, { summary: it.raw, title: it.raw, what: it.raw, wardosShow: it.wardosShow === true }), "shared") : null;
+    const what = view && view.title ? view.title : "";
+    if (!what) continue;
     const key = `${when}|${what}`.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
-    rows.push({
+    const dadRow = {
       when,
       what,
+      summary: what,
+      title: what,
       tone: it.kind === "leave" || it.kind === "sport" || it.kind === "appointment" || it.kind === "dad" ? "hot" : "act",
-    });
+    };
+    if (what === "Appointment" && it.wardosShow === true) dadRow.wardosShow = true;
+    rows.push(dadRow);
   }
   /* DATA1 P2-11 · no custody closing row (was "Kids with Dad at home through …") */
   if (!rows.length) rows.push({ when: partsInTZ(now).weekday.slice(0, 3), what: "Nothing else on the calendar today", tone: "act" });

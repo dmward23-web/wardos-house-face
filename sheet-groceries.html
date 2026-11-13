@@ -8,7 +8,7 @@
 <script src="house-pair.js?v=HUBPAIR1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-<meta name="viewport" content="width=1080" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -47,7 +47,7 @@
   }
   .panel {
     width: 1080px; min-height: 1920px; height: auto;
-    padding: 18px 28px 12px;
+    padding: 48px 32px 12px;
     display: flex; flex-direction: column; gap: 12px;
     position: relative; overflow: visible;
     background-color: #d8dadf;
@@ -401,8 +401,30 @@ html body .add-btn,html body .fav.add{background:rgba(12,10,6,.55)!important;bor
 html body .favs-empty{color:rgba(255,255,255,.6)!important;-webkit-text-fill-color:rgba(255,255,255,.6)!important}
 </style>
 <link rel="stylesheet" href="wg-glass.css?v=HOTFIX1" />
+<link rel="stylesheet" href="wardos-stage.css?v=ACERFIX1" data-wardos-stage-css="1" />
+<script src="house-scene.js?v=ACERFIX1"></script>
+<script src="house-event-display.js?v=ACERFIX1"></script>
+<script src="wardos-stage.js?v=ACERFIX1"></script>
 </head>
 <body data-clear-label="CLEARED">
+<a class="wardos-home" href="sheet-index.html" data-kw-home aria-label="Home" style="position:fixed;left:48px;top:48px;width:64px;height:64px;z-index:40;display:flex;align-items:center;justify-content:center;pointer-events:auto"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64" style="width:64px;height:64px;pointer-events:none"></a>
+<script>
+(function () {
+  var gone = false;
+  function go(ev) {
+    var t = ev.target;
+    var a = t && t.closest ? t.closest("a.wardos-home, a[data-kw-home]") : null;
+    if (!a || gone) return;
+    gone = true;
+    if (ev.cancelable) ev.preventDefault();
+    ev.stopPropagation();
+    location.href = a.href;
+  }
+  document.addEventListener("pointerdown", go, true);
+  document.addEventListener("touchstart", go, true);
+  document.addEventListener("click", go, true);
+})();
+</script>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
   <defs>
     <!-- Shared paints · HEAT v3 cyan+gold -->
@@ -645,7 +667,7 @@ html body .favs-empty{color:rgba(255,255,255,.6)!important;-webkit-text-fill-col
 
 
 <div class="panel">
- <header class="hdr hdr--clockfirst">
+ <header class="hdr hdr--clockfirst" id="groceries-hdr">
  <div class="hdr-left-col">
  <div class="live-clock-host" aria-label="America/Chicago time">
  <div class="board-clock live-clock" data-live="time" data-live-clock></div>
@@ -732,9 +754,49 @@ html body .favs-empty{color:rgba(255,255,255,.6)!important;-webkit-text-fill-col
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>
 <script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
-<script src="ori/ori-scene.js?v=ORIHOME18"></script>
-<script src="house-ori-world.js?v=MERGE1C"></script>
+<script src="ori/ori-scene.js?v=ORIHOME18" defer></script>
+<script src="house-ori-world.js?v=MERGE1C" defer></script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
+<style id="r38-groceries-clock">
+html:not(#hf-wall-off) body .panel {
+  padding-top: 48px !important;
+}
+html:not(#hf-wall-off) body .panel #groceries-hdr.hdr.hdr--clockfirst {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  justify-content: flex-end !important;
+  gap: 17px !important;
+  overflow: visible !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 0 48px 12px !important;
+  min-height: 80px !important;
+}
+html:not(#hf-wall-off) body .panel #groceries-hdr.hdr.hdr--clockfirst .hdr-left-col,
+html:not(#hf-wall-off) body .panel #groceries-hdr.hdr.hdr--clockfirst .live-clock-host,
+html:not(#hf-wall-off) body .panel #groceries-hdr.hdr.hdr--clockfirst .sheet-chip {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+  overflow: visible !important;
+  margin: 0 !important;
+}
+html:not(#hf-wall-off) body .panel #groceries-hdr.hdr.hdr--clockfirst .hdr-spacer { display: none !important; }
+html:not(#hf-wall-off) body .panel #groceries-hdr.hdr.hdr--clockfirst .live-clock,
+html:not(#hf-wall-off) body .panel #groceries-hdr.hdr.hdr--clockfirst [data-live-clock] {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  width: auto !important;
+  max-width: none !important;
+}
+</style>
 </body>
 </html>

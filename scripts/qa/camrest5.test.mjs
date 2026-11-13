@@ -37,8 +37,8 @@ test("CAMREST5 · sheet-lights at 1920 and 2560, no key and revoked key: no pad 
     assert.deepEqual(r.errors, [], k + " " + J(r.errors));
     assert.ok(c.lightPads >= 3, k + " pads " + J(c));
     assert.deepEqual(c.lightClip, [], k + " clipped " + J(c.lightClip));
-    const want = m === "lights0" ? "Needs pairing" : "Not connected";
-    assert.ok(c.lightSrc.filter((s) => s === want).length >= 3, k + " src words " + J(c.lightSrc));
+    /* Round 13: the offline line is the banner once. The per-room src is hidden, so it must not repeat. */
+    assert.equal(c.lightSrc.length, 0, k + " room lines do not repeat the offline words " + J(c.lightSrc));
   }
 });
 

@@ -1,3 +1,6 @@
+if (typeof document !== "undefined" && typeof document.write === "function" && document.readyState === "loading" && !window.HouseEventDisplay) {
+  document.write('<script src="house-event-display.js?v=ACERFIX1"><\/script>');
+}
 /* LIVELAW1 · Dan's face laws applied at render time to calendar-fed rows (never by editing data/*-live.json or kids-week.json).
  *  1. School colour days ("<school> Orange Day", "Red Day") and dress-up / spirit / pajama / costume days never show as kid rows or
  *     clothing prompts. The colour still drives the quiet school specials indicator (kids-data.js SPECIALS-COLOR1) through
@@ -81,13 +84,25 @@
   function isSpecialText(s, schoolAlt) { var t = String(s == null ? "" : s); if (/No Specials/i.test(t)) return false; return (schoolAlt == null ? /\bspecials?\b/i : new RegExp("(?:" + schoolAlt + ") specials?", "i")).test(t); }
   /* a specials row (any day, incl. the "Today · Special" chip) is a day chip only, never a re-picked NEXT / hottest card */
   function isSpecialRow(r) { return !!r && (r.kind === "special" || isSpecialText(rowText(r) + " " + String(r.when || ""))); }
+  function faceNowMs() {
+    try {
+      if (g.HouseScene && typeof g.HouseScene.now === "function") {
+        var d = g.HouseScene.now();
+        if (d && isFinite(+d)) return +d;
+      }
+    } catch (e) { /* pinned clock */ }
+    try {
+      if (g.LHClock && typeof g.LHClock.ms === "function") return g.LHClock.ms();
+    } catch (e2) { /* live clock */ }
+    return Date.now();
+  }
   function rowEnded(r, now) {
     if (!r) return false;
     now = now || ctNow();
     var iso = r.startIso || r.start || "";
     if (iso && /T\d{2}:/.test(String(iso))) {
       var end = Date.parse(r.endIso || r.end || "") || (Date.parse(iso) + 90 * 60000);
-      return Number.isFinite(end) && end < (g.LHClock ? g.LHClock.ms() : Date.now());
+      return Number.isFinite(end) && end < faceNowMs();
     }
     var off = dayOffset(r.when, now);
     if (off === null) return false;
@@ -107,27 +122,54 @@
   /* LIVEFIX1 · therapy law (every board): a therapy / counseling row never shows. Generic words here; provider and person
      names live only on the box (~/.config/wardos/privacy-block.txt, read by scripts/private-dir.mjs and cal-months.py),
      so the builders drop those rows before any data file is written. */
-  var THERAPY = /\btherap|\bcounsel(?:or|ors|ing|ling|ling)?\b|\bpsycholog|\bpsychiatr|\banxiety\b/i;
-  function isTherapy(s) { return THERAPY.test(String(s == null ? "" : s)); }
-  function rowTherapy(o) {
-    if (typeof o === "string") return isTherapy(o);
-    if (!o || typeof o !== "object" || Array.isArray(o)) return false;
-    return isTherapy([o.summary, o.title, o.what, o.l, o.label, o.text, o.hint, o.place].filter(function (x) { return typeof x === "string"; }).join(" "));
+  var THERAPY = /(?:\b(?:ot|speech|drs?|doctors?|appointments?|telehealth|sessions?|counsel(?:or|ors|ing|ling|ling)?|anxiety|provider|clinical)\b|\btherap|\bpsycholog|\bpsychiatr)/i;
+  function isTherapy(s) {
+    var t = String(s == null ? "" : s);
+    try { t = t.normalize("NFKC"); } catch (e) { /* */ }
+    return THERAPY.test(t);
   }
-  /* LIVEFIX1 · Ainsley law: her rows carry no digit, time, date, star, $ or %. The time is read for ordering and ended
-     rows first (cleanKid), then dropped from every string she sees, so "Mon 26 · 2:20" reads "Mon". */
+  var SOFT_SESSION = /\b(?:appointments?|sessions?)\b/i;
+  function sourceOf(o) {
+    if (typeof o === "string") return o;
+    if (!o || typeof o !== "object" || Array.isArray(o)) return "";
+    var parts = [];
+    Object.keys(o).forEach(function (k) {
+      if (/^(id|href|url|link|status|providerOptIn)$/i.test(k) || /iso$/i.test(k)) return;
+      if (typeof o[k] === "string") parts.push(o[k]);
+    });
+    return parts.join("\n");
+  }
+  function rowTherapy(o, kidId) {
+    try {
+      if (g.HouseEventDisplay && HouseEventDisplay.keepAppointment && HouseEventDisplay.keepAppointment(o, kidId || (o && (o.kid || o.owner)))) return false;
+    } catch (e0) { /* display adapter decides */ }
+    var raw = sourceOf(o);
+    var t = raw;
+    try { t = raw.normalize("NFKC"); } catch (e) { /* */ }
+    if (isTherapy(t) && !SOFT_SESSION.test(t)) return true;
+    if (isTherapy(t) && /therap|provider|clinical|speech|counsel|psycholog|psychiatr|telehealth|anxiety|\bdoctors?\b|\bdrs?\b|\bot\b/i.test(t)) return true;
+    var who = String(kidId || (o && (o.kid || o.owner || o.kidId)) || "");
+    if (/^hayes$|^harris$/i.test(who) && (isTherapy(t) || SOFT_SESSION.test(t))) return true;
+    return false;
+  }
+  /* LIVEFIX1 · Dan, Nov 10 2026, 6:08 PM CT: her board shows real clock times. $ % stars and quest counts still come off.
+     when/time/hours/whenLabel keep the clock ("4:25"); other strings still drop digits, so "Mon 26 · 2:20" keeps "2:20". */
   var AP = "(?:a\\.?m\\.?|p\\.?m\\.?|a\\b|p\\b)";
   var AIN_RANGE = new RegExp("\\d{1,2}(?::\\d{2})?\\s*" + AP + "?\\s*(?:[-\\u2013]|\\bto\\b)\\s*\\d{1,2}(?::\\d{2})?\\s*" + AP + "?", "gi");
   var AIN_CLOCK = new RegExp("\\d{1,2}:\\d{2}\\s*" + AP + "?|\\b\\d{1,2}\\s*(?:am|pm)\\b", "gi");
-  function ainsleyText(s) {
+  var CLOCK_KEYS = { when: 1, time: 1, hours: 1, whenLabel: 1 };
+  function ainsleyText(s, keepClock) {
     if (typeof s !== "string") return s;
-    var t = s.replace(/\b(?:leave|leaves|at|by|from|until|til|till|@)\s*(?=\$?\d)/gi, "")
-      .replace(AIN_RANGE, "").replace(AIN_CLOCK, "")
-      .replace(/\b\d+\s*(?:x|times|min|mins|minutes|hr|hrs|hours|pages?)\b/gi, "")   /* LIVEFIX3d · quest counts ("20 min", "3x") */
+    var clocks = [];
+    var t = s.replace(/\b(?:leave|leaves|at|by|from|until|til|till|@)\s*(?=\$?\d)/gi, "");
+    if (keepClock) t = t.replace(AIN_CLOCK, function (m) { clocks.push(m); return "\u0001"; });
+    else t = t.replace(AIN_RANGE, "").replace(AIN_CLOCK, "");
+    t = t.replace(/\b\d+\s*(?:x|times|min|mins|minutes|hr|hrs|hours|pages?)\b/gi, "")   /* LIVEFIX3d · quest counts ("20 min", "3x") */
       .replace(/\$\s*\d[\d,.]*(?:\s*\/\s*[a-z]+)?/gi, "")
       .replace(/\d+(?:\.\d+)?\s*%/g, "")
       .replace(/\b\d+\s*-\s*(?=[a-z])/gi, "")
       .replace(/[\d$%\u2605\u2606\u272a-\u2730\u2b50]/g, "");
+    if (keepClock) { var ci = 0; t = t.replace(/\u0001/g, function () { return clocks[ci++] || ""; }); }
     return t.split(/\s*\u00b7\s*/).map(function (x) { return x.replace(/\s{2,}/g, " ").replace(/^[\s,:+/-]+|[\s,:+/-]+$/g, ""); })
       .filter(Boolean).join(" \u00b7 ");
   }
@@ -137,7 +179,7 @@
     if (Array.isArray(r)) return r.map(ainsleyRow).filter(function (x) { return x !== ""; });
     if (!r || typeof r !== "object") return r;
     for (var k in r) if (Object.prototype.hasOwnProperty.call(r, k)) {
-      if (AIN_KEYS[k] && typeof r[k] === "string") r[k] = ainsleyText(r[k]);
+      if (AIN_KEYS[k] && typeof r[k] === "string") r[k] = ainsleyText(r[k], !!CLOCK_KEYS[k]);
       else if (k === "badges" && Array.isArray(r[k])) r[k] = ainsleyRow(r[k]);
     }
     return r;
@@ -149,20 +191,20 @@
     if (typeof kid.streakLabel === "string") kid.streakLabel = ainsleyText(kid.streakLabel);
   }
   var ROW_LISTS = ["today", "school", "sports", "appointments", "week", "events", "ahead", "upcoming"];
-  function cleanKid(kid, now) {
+  function cleanKid(kid, now, id) {
     if (!kid || typeof kid !== "object") return;
     var colorRows = kid._lawColorRows || [];
     ROW_LISTS.forEach(function (k) {
       if (!Array.isArray(kid[k])) return;
       kid[k] = kid[k].filter(function (r) {
-        if (r && rowTherapy(r)) return false;   /* LIVEFIX1 */
+        if (r && rowTherapy(r, id)) return false;   /* LIVEFIX1 */
         if (r && isDressDay(rowText(r))) { if (/\b(orange|yellow|green|red)\s+day\b/i.test(rowText(r))) colorRows.push(r); return false; }
         return !rowEnded(r, now);
       });
     });
     kid._lawColorRows = colorRows;
     var hot = kid.hottest;
-    if (hot && (isDressDay(rowText(hot)) || rowTherapy(hot) || rowEnded(hot, now))) {
+    if (hot && (isDressDay(rowText(hot)) || rowTherapy(hot, id) || rowEnded(hot, now))) {
       var pool = [];
       ["today", "appointments", "sports", "school", "week"].forEach(function (k) { (kid[k] || []).forEach(function (r) { if (r && r.what && keepRow(r, now) && r.kind !== "note" && !isSpecialRow(r) && !/\bwith Dad\b|\bDad week\b|\bat home\b/i.test(r.what) && !(dayOffset(r.when, now) === 0 && /\bAll day\b/i.test(String(r.when || "")))) pool.push(r); /* NEXT = the next thing coming up; today's all-day notes stay in their own rows */ }); }); /* custody-law:allow (matcher that skips these rows) */
       pool.sort(function (a, b) { return rowKey(a, now) - rowKey(b, now); });
@@ -183,10 +225,12 @@
     var now = ctNow();
     try {
       var kids = data.kids || {};
-      Object.keys(kids).forEach(function (id) { cleanKid(kids[id], now); if (kids[id] && isAinsley(kids[id], id)) cleanAinsley(kids[id]); });
+      Object.keys(kids).forEach(function (id) { cleanKid(kids[id], now, id); if (kids[id] && isAinsley(kids[id], id)) cleanAinsley(kids[id]); });
       if (Array.isArray(data.leaveBys)) data.leaveBys = data.leaveBys.filter(function (it) { return !rowTherapy(it); });   /* LIVEFIX1 */
       var q = data.boardStrip && data.boardStrip.queue;
       if (Array.isArray(q)) data.boardStrip.queue = q.filter(function (it) { return !isDressDay(rowText(it)) && !rowTherapy(it); });
+      if (g.HouseEventDisplay && typeof HouseEventDisplay.scrubPayload === "function") HouseEventDisplay.scrubPayload(data);
+      Object.keys(kids).forEach(function (id) { if (kids[id] && isAinsley(kids[id], id)) cleanAinsley(kids[id]); });
     } catch (e) { /* never break a board over a filter */ }
     return data;
   }
@@ -264,14 +308,120 @@
     try { if (name === "kids-week" && d && d.kids && d.kids.ainsley) cleanAinsley(d.kids.ainsley); } catch (e) { /* never break a board */ }
     return d;
   }
+  function showMarker(text) {
+    var lines = String(text || "").split(/\r\n|\n|\r/);
+    var i;
+    for (i = 0; i < lines.length; i++) {
+      var line = lines[i].replace(/^[ \t\f\v]+|[ \t\f\v]+$/g, "");
+      if (line === "#wardos-show") return true;
+    }
+    return false;
+  }
+  var SIGNAL_KEY = /^(organizer|creator|attendees|conferenceData|extendedProperties|location|eventType)$/i;
+  /* An event row, not the week/month document that contains rows. */
+  function eventSignal(v) {
+    return !!(v && typeof v === "object" && !Array.isArray(v) && !v.kids && !v.days && !v.upcomingLeaves && (v.what || v.summary || v.title || v.l || v.organizer || v.attendees || v.conferenceData || v.extendedProperties || v.eventType));
+  }
+  /* Classify while organizer and the other signal fields are still on the row.
+     A therapy object used to be deleted first, and the canned title (Raffle) survived. */
+  function dadPage() {
+    try { return /sheet-dan\.html/i.test(String(g.location && g.location.pathname || "")); } catch (e) { return false; }
+  }
+  function slotFromKey(key) {
+    var k = String(key || "").toLowerCase();
+    if (k === "hayes" || k === "harris" || k === "hay" || k === "har") return "boy";
+    if (k === "ainsley" || k === "ain") return "ainsley";
+    if (k === "dan" || k === "dad") return "dad";
+    return "";
+  }
+  function slotOfRow(v, slot) {
+    if (slot === "boy" || slot === "ainsley") return slot;
+    var c = String(v && v.c || "").toLowerCase();
+    if (c === "hay" || c === "har") return "boy";
+    if (c === "ain") return "ainsley";
+    var kid = String(v && (v.kid || v.owner || v.kidId) || "").toLowerCase();
+    if (kid === "hayes" || kid === "harris") return "boy";
+    if (kid === "ainsley") return "ainsley";
+    return slot || "";
+  }
+  /* Rebuild the row to the allowlist label only, before any page holds the raw strings. */
+  function classifyFetched(v, slot) {
+    var D = g.HouseEventDisplay;
+    if (!eventSignal(v)) return v;
+    /* No display script: undefined means walk the strings so moneyFree still runs. */
+    if (!D || typeof D.summarize !== "function") return undefined;
+    var row = {};
+    var ks = Object.keys(v);
+    for (var i = 0; i < ks.length; i++) row[ks[i]] = v[ks[i]];
+    var use = slotOfRow(v, slot);
+    if (use) row._feed = use === "boy" ? "hayes" : use;
+    var aud = dadPage() ? "adult" : (use === "boy" ? "hayes" : (use === "ainsley" ? "ainsley" : "shared"));
+    var view = D.summarize(row, aud);
+    if (!view || !view.title) return null;
+    var label = view.title;
+    var next = {
+      what: label, title: label, summary: label, label: label, text: label, l: label,
+      when: view.time || "", time: view.time || "",
+      start: v.start || v.startIso || "",
+      startIso: v.startIso || (typeof v.start === "string" ? v.start : "") || "",
+      end: v.end || v.endIso || "",
+      id: v.id || ""
+    };
+    if (v.c === "hay" || v.c === "har" || v.c === "ain" || v.c === "shr" || v.c === "aware") next.c = v.c;
+    if (label === "Appointment") next.wardosShow = true;
+    return next;
+  }
   function cleanFeed(name, data) {
-    function walk(v, key) {
-      if (Array.isArray(v)) { var out = []; for (var i = 0; i < v.length; i++) { if (!rowDress(v[i]) && !rowCustody(v[i]) && !rowTherapy(v[i]) && !(typeof v[i] === "string" && isCustody(v[i]))) out.push(walk(v[i], key)); } return out; }
-      if (v && typeof v === "object") { var r = {}; for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k)) { if ((rowDress(v[k]) || rowCustody(v[k]) || (rowTherapy(v[k]) && typeof v[k] === "object")) && k !== "kids") continue; r[k] = walk(v[k], k); } return r; }
+    function walk(v, key, slot) {
+      if (Array.isArray(v)) {
+        var out = [];
+        for (var i = 0; i < v.length; i++) {
+          if (typeof v[i] === "string") { if (!isCustody(v[i])) out.push(walk(v[i], key, slot)); continue; }
+          if (rowDress(v[i]) || rowCustody(v[i])) continue;
+          if (eventSignal(v[i])) {
+            var classified = classifyFetched(v[i], slot);
+            if (classified === undefined) { out.push(walk(v[i], key, slot)); continue; }
+            if (classified == null) continue;
+            out.push(classified);
+            continue;
+          }
+          if (rowTherapy(v[i])) continue;
+          out.push(walk(v[i], key, slot));
+        }
+        return out;
+      }
+      if (v && typeof v === "object") {
+        if (typeof v.description === "string" && showMarker(v.description)) { v.wardosShow = true; v.description = ""; }
+        var priv = v.extendedProperties && v.extendedProperties.private;
+        if (priv && priv["wardos.show"] === "1") v.wardosShow = true;
+        if (eventSignal(v) && key) {
+          var self = classifyFetched(v, slot);
+          if (self !== undefined) {
+            if (self == null) return null;
+            if (self !== v) return self;
+          }
+        }
+        var r = {};
+        for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k)) {
+          var childSlot = slotFromKey(k) || slot;
+          if (eventSignal(v[k])) {
+            var child = classifyFetched(v[k], childSlot);
+            if (child === undefined) { r[k] = walk(v[k], k, childSlot); continue; }
+            if (child == null) continue;
+            r[k] = child;
+            continue;
+          }
+          if ((rowDress(v[k]) || rowCustody(v[k]) || (rowTherapy(v[k]) && typeof v[k] === "object")) && k !== "kids" && !SIGNAL_KEY.test(k)) continue;
+          var walked = walk(v[k], k, childSlot);
+          if (walked == null) continue;
+          r[k] = walked;
+        }
+        return r;
+      }
       if (typeof v === "string" && !(key && SKIP_KEY.test(key))) return isCustody(v) ? "" : faceText(v);
       return v;
     }
-    try { return data && typeof data === "object" ? feedAinsley(name, walk(data, "")) : data; } catch (e) { return data; }
+    try { return data && typeof data === "object" ? feedAinsley(name, walk(data, "", "")) : data; } catch (e) { return data; }
   }
 
   g.HouseFaceLaw = { moneyFree: moneyFree, MONEY_SRC: MONEY_SRC, SIGN_SRC: SIGN_SRC, MONEY_RE: MONEY_RE, MONEY_LB_OK: MONEY_LB_OK, MONEY_LB_FALLBACK: MONEY_LB_FALLBACK, SIGN_RE: SIGN_RE, isCustody: isCustody, cleanFeed: cleanFeed, faceText: faceText, isDressDay: isDressDay, isColorDay: isColorDay, faceDash: faceDash, rowEnded: rowEnded, keepRow: keepRow, keepEvent: keepEvent, isTherapy: isTherapy, rowTherapy: rowTherapy, ainsleyText: ainsleyText, THERAPY: THERAPY, cleanKidsWeek: cleanKidsWeek, cleanKid: cleanKid, ctNow: ctNow, DRESS: DRESS, RENDER_RULES: RENDER_RULES, schoolWord: schoolWord, momFree: momFree, cleanAinsley: cleanAinsley, isSpecialText: isSpecialText, isSpecialRow: isSpecialRow }; /* SPECIALSLAW1 r2 · node: scripts/specials-law.mjs */

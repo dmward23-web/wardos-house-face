@@ -135,7 +135,18 @@
     }
   }
 
-  function shortPlace(summary, cap) {
+  function shortPlace(ev, cap) {
+    var summary = typeof ev === "string" ? ev : String((ev && (ev.summary || ev.place || ev.what)) || "");
+    var D = global.HouseEventDisplay;
+    if (D && typeof D.summarize === "function") {
+      var path = "";
+      try { path = String(global.location && global.location.pathname || ""); } catch (ePath) { path = ""; }
+      var who = /sheet-dan\.html/.test(path) ? "adult" : "shared";
+      var event = typeof ev === "string" ? { summary: ev, title: ev, what: ev } : ev;
+      if (event && !event.summary && summary) { event.summary = summary; event.title = event.title || summary; event.what = event.what || summary; }
+      var view = D.summarize(event, who);
+      return view && view.title ? view.title : "";
+    }
     var s = kidsSafe(String(summary || "").trim());
     s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
     s = s.replace(/\(\s*Mom[^)]*\)/gi, "");
@@ -209,9 +220,20 @@
     if (AF && AF.hasMonths && AF.hasMonths() && !AF.keepItem(e, AF.now())) return false;
     return true;
   }
+  function wallMs() {
+    try { if (global.HouseScene && HouseScene.now) return HouseScene.now().getTime(); } catch (e) { /* real clock */ }
+    return Date.now();
+  }
   function listEvents(cal) {
     var l = (cal && (cal.upcomingLeaves || cal.events)) || [];
-    return l.filter(function (e) { return !(e && SOFT_TITLE.test(String(e.summary || e.title || ""))) && lawOk(e); }); /* LAW8C1 + LIVELAW1 + AWAYLAW1 · AWAYONE1 */
+    return l.filter(function (e) {
+      if (!e || SOFT_TITLE.test(String(e.summary || e.title || ""))) return false;
+      if (!lawOk(e)) return false;
+      var D = global.HouseEventDisplay;
+      if (D && D.isDenied && D.isDenied(e)) return false;
+      if (D && typeof D.summarize === "function" && !shortPlace(e)) return false;
+      return true;
+    }); /* LAW8C1 + LIVELAW1 + AWAYLAW1 · AWAYONE1 · ACERFIX clinical rows never reach glass */
   }
 
   /** First future event by start (> now). */
@@ -320,17 +342,16 @@
         timeZone: "America/Chicago", weekday: "short"
       }).format(new Date(startMs));
     } catch (e2) { /* keep */ }
-    var place = shortPlace(ev.summary || ev.place || "", ev._merged ? 120 : 64);
-    var time = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
+    var place = shortPlace(ev, ev._merged ? 120 : 64);
+    var time = ev.allDay ? "All day" : (clockTimeFromIso(ev.start) || "");
+    if (!place) place = "Calendar item";
     return {
       label: isToday ? "Schedule · today" : ("Schedule · " + dow),
       _dayIso: startIsoDay,
       _dow: dow,
-      time: time === "day" ? "" : time,
+      time: time === "All day" ? "" : time,
       place: place,
-      detailHtml: "<strong>" + esc(time) + "</strong> " +
-        esc(place) +
-        (ev.location ? (" · " + esc(String(ev.location).split(",")[0])) : ""),
+      detailHtml: "<strong>" + esc(time) + "</strong> " + esc(place),
       badge: isToday ? clock.dow : dow
     };
   }
@@ -412,7 +433,7 @@
   }
 
   function pickStripFromCal(cal, clock) {
-    var next = mergeSameStart(cal, pickNextFuture(cal, Date.now()));
+    var next = mergeSameStart(cal, pickNextFuture(cal, wallMs()));
     var strip = next
       ? stripFromEvent(next, clock)
       : {
@@ -422,9 +443,9 @@
           detailHtml: "No upcoming events in cal-live window",
           badge: clock.dow
         };
-    strip.today = remainingToday(cal, clock, Date.now());
+    strip.today = remainingToday(cal, clock, wallMs());
     strip.tomorrow = tomorrowPeek(cal, clock);
-    strip.future = futureLeaves(cal, Date.now(), 10);
+    strip.future = futureLeaves(cal, wallMs(), 10);
     return strip;
   }
 
@@ -627,7 +648,7 @@
   }
 
   function rowHtml(ev, isNext) {
-    var title = shortPlace(ev.summary || ev.place || "");
+    var title = shortPlace(ev);
     var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
     var cls = "leaveby-row" + (isNext ? " is-next" : "") + (ev.allDay ? " is-allday" : "");
     return '<li class="' + cls + '">' +
@@ -690,7 +711,7 @@
     for (var i = 0; i < items.length; i++) {
       var ev = items[i].ev;
       var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
-      var title = shortPlace(ev.summary || ev.place || "");
+      var title = shortPlace(ev);
       var cls = "lb-rail-item" + (i === 0 ? " is-next" : "") +
         (items[i].when === "tmr" ? " is-tmr" : "");
       html += '<div class="' + cls + '">' +
@@ -731,7 +752,7 @@
       for (var j = 0; j < list.length; j++) {
         var ev2 = list[j].ev;
         var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "");
-        var title2 = shortPlace(ev2.summary || ev2.place || "");
+        var title2 = shortPlace(ev2);
         html += '<div class="lb-who-row' + (j === 0 ? " is-next" : "") + '">' +
           '<span class="lb-who-time">' + esc(t2) + "</span>" +
           '<span class="lb-who-title">' + esc(title2) + "</span>" +
@@ -758,7 +779,7 @@
       '<div class="lb-peek-hero">' +
       '<span class="lb-peek-kicker">Next</span>' +
       '<span class="lb-peek-time">' + esc(t0) + "</span>" +
-      '<span class="lb-peek-title">' + esc(shortPlace(first.summary || first.place || "")) + "</span>" +
+      '<span class="lb-peek-title">' + esc(shortPlace(first)) + "</span>" +
       "</div>";
     if (items.length > 1) {
       html += '<div class="lb-peek-quiet">';
@@ -767,7 +788,7 @@
         var t = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
         html += '<div class="lb-peek-row">' +
           '<span class="lb-peek-row-time">' + esc(t) + "</span>" +
-          '<span class="lb-peek-row-title">' + esc(shortPlace(ev.summary || ev.place || "")) + "</span>" +
+          '<span class="lb-peek-row-title">' + esc(shortPlace(ev)) + "</span>" +
           "</div>";
       }
       html += "</div>";
@@ -786,7 +807,7 @@
     }
     var ev = items[0].ev;
     var mins = minsUntil(ev);
-    var title = shortPlace(ev.summary || ev.place || "");
+    var title = shortPlace(ev);
     var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
     var windowM = 180;
     var pct = mins == null ? 0 : Math.max(0, Math.min(1, 1 - (mins / windowM)));
@@ -826,7 +847,7 @@
         var t = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
         html += '<li class="lb-list-row' + (i === 0 && !ev.allDay ? " is-next" : "") + '">' +
           '<span class="lb-list-time">' + esc(t) + "</span>" +
-          '<span class="lb-list-title">' + esc(shortPlace(ev.summary || ev.place || "")) + "</span>" +
+          '<span class="lb-list-title">' + esc(shortPlace(ev)) + "</span>" +
           "</li>";
       }
     }
@@ -844,7 +865,7 @@
         var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "");
         html += '<li class="lb-list-row">' +
           '<span class="lb-list-time">' + esc(t2) + "</span>" +
-          '<span class="lb-list-title">' + esc(shortPlace(ev2.summary || ev2.place || "")) + "</span>" +
+          '<span class="lb-list-title">' + esc(shortPlace(ev2)) + "</span>" +
           "</li>";
       }
     }
@@ -908,7 +929,7 @@
   }
 
   function dayTitle(ev) {
-    var s = shortPlace(ev.summary || ev.place || "");
+    var s = shortPlace(ev);
     /* drop leading kid names — the tags carry who */
     var out = s.replace(/^(?:(?:Hayes|Harris|Ainsley|Boys|Dan)\s*(?:\+\s*)?)+\s*[—-]\s*/i, "") || s;
     /* time is already big on the left · drop echoed "leave 5:40 · 6:00" / "· 8:25" tails and Free/HOLD chrome */
@@ -1052,7 +1073,10 @@
     dowNodes.forEach(function (n) { n.textContent = clock.dow; });
     var timeNodes = document.querySelectorAll("[data-live='time'], [data-live-clock], [data-live='clock-time']");
     timeNodes.forEach(function (n) {
-      n.textContent = clock.time || (global.HouseClock && HouseClock.timeLabel ? HouseClock.timeLabel() : "");
+      var time = clock.time || (global.HouseClock && HouseClock.timeLabel ? HouseClock.timeLabel() : "");
+      var dow = String((clock && clock.dow) || "").replace(/\./g, "");
+      if (dow) dow = dow.charAt(0).toUpperCase() + dow.slice(1, 3).toLowerCase();
+      n.textContent = dow && time ? dow + " \u00b7 " + time : time;
     });
 
     /* AUDIT1 · hero names its day when the next item is not today ("Next up · Wed" / "Wed") */
@@ -1156,7 +1180,15 @@
     });
   }
 
+  function testCal() {
+    try {
+      if (!/[?&]wardos-test=1(?:&|$)/.test(String(global.location && global.location.search || ""))) return null;
+      return global.__wardosFixture || null;
+    } catch (e) { return null; }
+  }
   function loadCal(cb) {
+    var fx = testCal();
+    if (fx) { cb(null, fx.cal || fx); return; }
     var urls = [
       "data/cal-live.json?v=" + Date.now(),
       "data/cal-live.json"
