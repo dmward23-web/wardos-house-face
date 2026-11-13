@@ -45,10 +45,24 @@ for key, value in FIELDS:
     probe = row("Homework", startIso=pin_at(P, 40), start=pin_at(P, 40), end=P["end"])
     probe[key] = value
     sheet.append(probe)
-dad_rows = [
-    row(BOY, startIso=at(P, 0), start=at(P, 0), end=P["soon_end"]),
-    row(MONEY, startIso=at(P, 5), start=at(P, 5), end=P["soon_end"]),
-]
+sheet.append(row(BOY, startIso=pin_at(P, 80), start=pin_at(P, 80), end=P["end"]))
+dad_today = []
+dad_today.append(row(SOCCER, startIso=at(P, 0), start=at(P, 0), end=P["soon_end"]))
+dad_today.append(row(BOY, startIso=at(P, 10), start=at(P, 10), end=P["soon_end"]))
+for key, value in FIELDS:
+    probe = row("Homework", startIso=at(P, 20), start=at(P, 20), end=P["soon_end"])
+    probe[key] = value
+    dad_today.append(probe)
+for i, label in enumerate(LABELS):
+    if label == "Homework":
+        continue
+    stamp = at(P, 30 + i)
+    dad_today.append(row(label, startIso=stamp, start=stamp, end=P["soon_end"]))
+dad_today.append(row("Homework", startIso=at(P, 50), start=at(P, 50), end=P["soon_end"]))
+dad_today.append(row(MONEY, startIso=at(P, 5), start=at(P, 5), end=P["soon_end"]))
+assert [sum(1 for r in FIX_KID if r.get("what") == BOY) for FIX_KID in (sheet, sheet, sheet)] == [1, 1, 1]
+assert len(dad_today) == 27
+assert sum(1 for r in dad_today if any(k in r for k, _v in FIELDS)) == len(FIELDS)
 
 days = {}
 field_items = []
@@ -61,7 +75,7 @@ for n, label in enumerate(LABELS):
 
 now = datetime.now(timezone.utc).isoformat()
 leaves = []
-for item in sheet + dad_rows:
+for item in sheet + dad_today:
     ev = dict(item)
     ev["summary"] = item["what"]
     ev["start"] = item["start"]
@@ -72,7 +86,7 @@ FIX = {
         "ainsley": {"today": sheet},
         "hayes": {"today": sheet},
         "harris": {"today": sheet},
-        "dan": {"today": dad_rows},
+        "dan": {"today": dad_today},
     },
     "cal": {"status": "live", "fetchedAt": now, "asOfIso": P["day"], "upcomingLeaves": leaves},
     "days": days,
@@ -100,7 +114,10 @@ PAGES = [
     ("dad", "sheet-dan.html"),
 ]
 BANNED = [HEALTH, "H4", "check" + "up", "allerg", MONEY]
-out = {"pages": {}, "home": {}}
+out = {"pages": {}, "home": {}, "inputs": {
+    "boy": [sum(1 for r in FIX["kids"][k]["today"] if r.get("what") == BOY) for k in ("ainsley", "hayes", "harris")],
+    "dad": len(FIX["kids"]["dan"]["today"]),
+}}
 with sync_playwright() as p:
     browser = p.chromium.launch(**launch_kw(p, headless=True))
     for name, href in PAGES:

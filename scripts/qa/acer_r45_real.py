@@ -33,18 +33,37 @@ PROBES = [
     probe("extendedProperties", {"shared": {"note": HEALTH}}),
     probe("extendedProperties", {"private": {"note": HEALTH}}),
 ]
-BOY_ROW = {"what": BOY, "summary": BOY, "title": BOY, "when": "Thu · 6:45 PM", "startIso": at(P, 0), "start": at(P, 0), "end": P["soon_end"]}
+BOY_PIN = {"what": BOY, "summary": BOY, "title": BOY, "when": "Thu · 6:45 PM", "startIso": pin_at(P, 40), "start": pin_at(P, 40), "end": P["end"]}
+BOY_ROW = {"what": BOY, "summary": BOY, "title": BOY, "when": "Thu · 6:45 PM", "startIso": at(P, 10), "start": at(P, 10), "end": P["soon_end"]}
 SOCCER_ROW = {"what": SOCCER, "summary": SOCCER, "title": SOCCER, "when": "Thu · 6:00 PM", "startIso": pin_at(P, 0), "start": pin_at(P, 0), "end": P["end"]}
+SOCCER_DAD = {"what": SOCCER, "summary": SOCCER, "title": SOCCER, "when": "Thu · 6:00 PM", "startIso": at(P, 0), "start": at(P, 0), "end": P["soon_end"]}
 MONEY_ROW = {"summary": MONEY, "what": MONEY, "title": MONEY, "start": at(P, 5), "startIso": at(P, 5), "end": P["soon_end"]}
-PIN_ROWS = [SOCCER_ROW] + PROBES
-DAD_ROWS = [BOY_ROW, MONEY_ROW]
+RAFFLE_DAD = {"what": "Raffle", "summary": "Raffle", "title": "Raffle", "when": "Thu · 1:00 PM", "startIso": at(P, 15), "start": at(P, 15), "end": P["soon_end"]}
+DAD_PROBES = []
+for field, value in (
+    ("organizer", {"displayName": HEALTH}),
+    ("location", HEALTH),
+    ("attendees", [{"displayName": HEALTH}]),
+    ("conferenceData", {"notes": HEALTH}),
+    ("eventType", HEALTH),
+    ("extendedProperties", {"shared": {"note": HEALTH}}),
+    ("extendedProperties", {"private": {"note": HEALTH}}),
+):
+    item = dict(RAFFLE_DAD)
+    item[field] = value
+    DAD_PROBES.append(item)
+PIN_ROWS = [SOCCER_ROW] + PROBES + [BOY_PIN]
+DAD_NINE = [SOCCER_DAD] + DAD_PROBES + [BOY_ROW]
+assert [sum(1 for r in rows if r.get("what") == BOY) for rows in (PIN_ROWS, PIN_ROWS, PIN_ROWS)] == [1, 1, 1]
+assert len(DAD_NINE) == 9
+assert len(DAD_PROBES) == 7
 WEEK = {
     "asOfIso": P["day"],
     "kids": {
         "ainsley": {"today": PIN_ROWS},
         "hayes": {"today": PIN_ROWS},
         "harris": {"today": PIN_ROWS},
-        "dan": {"today": DAD_ROWS},
+        "dan": {"today": DAD_NINE},
     },
 }
 NOW = datetime.now(timezone.utc).isoformat()
@@ -52,7 +71,7 @@ CAL = {
     "status": "live",
     "fetchedAt": NOW,
     "asOfIso": P["day"],
-    "upcomingLeaves": PIN_ROWS + DAD_ROWS,
+    "upcomingLeaves": PIN_ROWS + DAD_NINE + [MONEY_ROW],
 }
 MONTHS = {
     "rangeStart": P["month_start"],
@@ -111,7 +130,10 @@ def overlap(a, b):
     return a["x"] < b["right"] - 1 and b["x"] < a["right"] - 1 and a["y"] < b["bottom"] - 1 and b["y"] < a["bottom"] - 1
 
 PAGES = ["kid-ainsley.html", "kid-hayes.html", "kid-harris.html", "sheet-index.html", "index.html", "sheet-today.html", "sheet-allowance.html", "sheet-dan.html", "month.html"]
-out = {"pages": {}, "home": {}, "taps": []}
+out = {"pages": {}, "home": {}, "taps": [], "inputs": {
+    "boy": [sum(1 for r in WEEK["kids"][k]["today"] if r.get("what") == BOY) for k in ("ainsley", "hayes", "harris")],
+    "dad": len(WEEK["kids"]["dan"]["today"]),
+}}
 with sync_playwright() as p:
     browser = p.chromium.launch(**launch_kw(p, headless=True))
     for href in PAGES:

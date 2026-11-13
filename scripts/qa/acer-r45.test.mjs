@@ -49,6 +49,8 @@ test("r45 the real kids-week fetch drops every single-field probe", SKIP, () => 
     assert.equal(page.hits.Raffle, false, name + " raffle");
     if (name !== "sheet-dan.html") assert.equal(page.hits[money], false, name + " money");
   }
+  assert.deepEqual(o.inputs.boy, [1, 1, 1], "kid boy-health rows");
+  assert.equal(o.inputs.dad, 9, "dad feed rows");
   assert.equal(o.pages["kid-hayes.html"].soccer, true, "soccer");
   assert.equal(o.pages["sheet-today.html"].hits.Raffle, false);
   assert.ok(o.pages["sheet-today.html"].rows > 0, "sheet-today empty");
