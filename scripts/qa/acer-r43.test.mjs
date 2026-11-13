@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { boot, runMatrix } from "./acer-r42.test.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const WHEN = "2026-11-12T22:30:00-06:00";
+const WHEN = new Date(Date.now() + 3 * 3600000).toISOString();
 const LOCKED = ["ainsley", "hayes", "harris", "shared", "hub"];
 const bit = (...p) => p.join("");
 const HEALTH = [bit("H4", " yes", " check", "up"), bit("Harr", " 1s", " check", "up"), bit("H@", "yes", " check", "up"), "checkup", "physical", "eye exam", "clinic", bit("psych", " eval"), "ABA", bit("flu", " shot"), "labs", bit("urgent", " care"), "ER", bit("Mtg", " w/ ", "Ran", "dy"), bit("tutor", "ing", " w/ ", "Ms. B"), bit("check", "up", " drop off")];

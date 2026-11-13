@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """Real pages, ?wardos-test=1. Prints one JSON object."""
-import json, threading
+import json, os, threading
 from datetime import datetime, timezone
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from fixture_clock import at, clock_init, plan, shift_day
 from pw_chrome import launch_kw
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[2]
-WHEN = "2026-11-12T23:00:00-06:00"
+P = plan(os.environ.get("WARDOS_DAY_SHIFT", "0"))
+WHEN = P["soon"]
 BOY = "H4" + " yes " + "check" + "up"
 HEALTH = "clin" + "ic"
 MONEY = "Mort" + "gage due"
@@ -32,31 +34,27 @@ def row(what, **extra):
     return item
 
 today = []
-today.append(row(SOCCER, startIso="2026-11-12T18:00:00-06:00", start="2026-11-12T18:00:00-06:00"))
-today.append(row(BOY, startIso="2026-11-12T18:30:00-06:00", start="2026-11-12T18:30:00-06:00"))
+today.append(row(SOCCER, startIso=at(P, 0), start=at(P, 0)))
+today.append(row(BOY, startIso=at(P, 10), start=at(P, 10)))
 for key, value in FIELDS:
-    probe = row("Homework", startIso="2026-11-12T19:00:00-06:00", start="2026-11-12T19:00:00-06:00")
+    probe = row("Homework", startIso=at(P, 20), start=at(P, 20))
     probe[key] = value
     today.append(probe)
 for i, label in enumerate(LABELS):
     if label == "Homework":
         continue
-    today.append(row(label, startIso="2026-11-12T20:%02d:00-06:00" % (i % 60), start="2026-11-12T20:%02d:00-06:00" % (i % 60)))
-today.append(row("Homework", startIso="2026-11-12T21:00:00-06:00", start="2026-11-12T21:00:00-06:00"))
+    stamp = at(P, 30 + i)
+    today.append(row(label, startIso=stamp, start=stamp))
+today.append(row("Homework", startIso=at(P, 50), start=at(P, 50)))
 
 days = {}
-days["2026-11-12"] = {"items": [
-    {"c": "hay", "l": SOCCER},
-    {"c": "hay", "l": BOY},
-] + [{"c": "shr", "l": "Homework", key: value} if False else {"c": "shr", "l": "Homework", **({key: value} if not isinstance(value, dict) or key != "extendedProperties" else {key: value})} for key, value in FIELDS]}
-# rebuild field items explicitly so both extendedProperties bags survive
 field_items = []
 for key, value in FIELDS:
     field_items.append({"c": "shr", "l": "Homework", key: value})
-days["2026-11-12"]["items"] = [{"c": "hay", "l": SOCCER}, {"c": "hay", "l": BOY}, {"c": "ain", "l": "Dentist", "description": "#wardos-show"}] + field_items
+# Today and later only. Earlier weeks are wf-past and their text is not on the wall.
+days[P["day"]] = {"items": [{"c": "hay", "l": SOCCER}, {"c": "hay", "l": BOY}, {"c": "ain", "l": "Dentist", "description": "#wardos-show"}] + field_items}
 for n, label in enumerate(LABELS):
-    iso = "2026-11-%02d" % (13 + n)
-    days[iso] = {"items": [{"c": "shr", "l": label}]}
+    days[shift_day(P, 1 + n)] = {"items": [{"c": "shr", "l": label}]}
 
 now = datetime.now(timezone.utc).isoformat()
 leaves = []
@@ -64,20 +62,20 @@ for item in today:
     ev = dict(item)
     ev["summary"] = item["what"]
     ev["start"] = item["start"]
-    ev["end"] = "2026-11-12T23:30:00-06:00"
+    ev["end"] = P["soon_end"]
     leaves.append(ev)
-leaves.append({"summary": MONEY, "what": MONEY, "title": MONEY, "start": "2026-11-12T18:10:00-06:00", "end": "2026-11-12T19:00:00-06:00"})
+leaves.append({"summary": MONEY, "what": MONEY, "title": MONEY, "start": at(P, 5), "end": P["soon_end"]})
 FIX = {
     "kids": {
         "ainsley": {"today": today},
         "hayes": {"today": today},
         "harris": {"today": today},
-        "dan": {"today": today + [row(MONEY, startIso="2026-11-12T18:10:00-06:00", start="2026-11-12T18:10:00-06:00")]},
+        "dan": {"today": today + [row(MONEY, startIso=at(P, 5), start=at(P, 5))]},
     },
-    "cal": {"status": "live", "fetchedAt": now, "asOfIso": "2026-11-12", "upcomingLeaves": leaves},
+    "cal": {"status": "live", "fetchedAt": now, "asOfIso": P["day"], "upcomingLeaves": leaves},
     "days": days,
-    "rangeStart": "2026-11-01",
-    "rangeEnd": "2026-11-30",
+    "rangeStart": P["month_start"],
+    "rangeEnd": shift_day(P, 1 + len(LABELS)),
 }
 
 class Q(SimpleHTTPRequestHandler):
@@ -87,7 +85,7 @@ class Q(SimpleHTTPRequestHandler):
 httpd = ThreadingHTTPServer(("127.0.0.1", 0), lambda *a, **k: Q(*a, directory=str(ROOT), **k))
 threading.Thread(target=httpd.serve_forever, daemon=True).start()
 base = "http://127.0.0.1:%d/" % httpd.server_address[1]
-QS = "wardos-test=1&now=2026-11-12T12:30:00-06:00&freeze=1"
+QS = "wardos-test=1&now=" + P["pin"] + "&freeze=1"
 PAGES = [
     ("kid-ainsley", "kid-ainsley.html"),
     ("kid-hayes", "kid-hayes.html"),
@@ -106,7 +104,7 @@ with sync_playwright() as p:
     for name, href in PAGES:
         ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
         page = ctx.new_page()
-        page.add_init_script("window.__wardosFixture = %s;" % json.dumps(FIX))
+        page.add_init_script(clock_init(P["pin_ms"]) + "window.__wardosFixture = %s;" % json.dumps(FIX))
         rec = {"ok": False}
         try:
             page.goto(base + href + "?" + QS, wait_until="domcontentloaded", timeout=40000)

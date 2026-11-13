@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Real fetch path (no wardos-test hook) plus Google Home boxes and 1x taps."""
-import json, statistics, threading, time
+import json, os, statistics, threading, time
 from datetime import datetime, timezone
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from fixture_clock import at, clock_init, day_key, plan
 from pw_chrome import launch_kw
 from playwright.sync_api import sync_playwright
 
@@ -14,8 +15,9 @@ HEALTH = "clin" + "ical"
 BOY = "H4" + " yes " + HEALTH
 MONEY = "Mort" + "gage due"
 SOCCER = "Hay" + "es soccer"
-WHEN = "2026-11-12T19:00:00-06:00"
-RAFFLE = {"what": "Raffle", "summary": "Raffle", "title": "Raffle", "when": "Thu · 1:00 PM", "startIso": "2026-11-12T13:00:00-06:00", "start": "2026-11-12T13:00:00-06:00"}
+P = plan(os.environ.get("WARDOS_DAY_SHIFT", "0"))
+WHEN = P["soon"]
+RAFFLE = {"what": "Raffle", "summary": "Raffle", "title": "Raffle", "when": "Thu · 1:00 PM", "startIso": at(P, 15), "start": at(P, 15), "end": P["soon_end"]}
 
 def probe(field, value):
     row = dict(RAFFLE)
@@ -31,24 +33,24 @@ PROBES = [
     probe("extendedProperties", {"shared": {"note": HEALTH}}),
     probe("extendedProperties", {"private": {"note": HEALTH}}),
 ]
-BOY_ROW = {"what": BOY, "summary": BOY, "title": BOY, "when": "Thu · 6:45 PM", "startIso": WHEN, "start": WHEN}
-SOCCER_ROW = {"what": SOCCER, "summary": SOCCER, "title": SOCCER, "when": "Thu · 6:00 PM", "startIso": "2026-11-12T18:00:00-06:00", "start": "2026-11-12T18:00:00-06:00"}
+BOY_ROW = {"what": BOY, "summary": BOY, "title": BOY, "when": "Thu · 6:45 PM", "startIso": WHEN, "start": WHEN, "end": P["soon_end"]}
+SOCCER_ROW = {"what": SOCCER, "summary": SOCCER, "title": SOCCER, "when": "Thu · 6:00 PM", "startIso": at(P, 0), "start": at(P, 0), "end": P["soon_end"]}
 TODAY = [SOCCER_ROW] + PROBES + [BOY_ROW]
 WEEK = {
-    "asOfIso": "2026-11-12",
+    "asOfIso": P["day"],
     "kids": {kid: {"today": TODAY} for kid in ("ainsley", "hayes", "harris", "dan")},
 }
 NOW = datetime.now(timezone.utc).isoformat()
 CAL = {
     "status": "live",
     "fetchedAt": NOW,
-    "asOfIso": "2026-11-12",
-    "upcomingLeaves": TODAY + [{"summary": MONEY, "what": MONEY, "title": MONEY, "start": "2026-11-12T18:10:00-06:00", "end": "2026-11-12T19:00:00-06:00"}],
+    "asOfIso": P["day"],
+    "upcomingLeaves": TODAY + [{"summary": MONEY, "what": MONEY, "title": MONEY, "start": at(P, 5), "end": P["soon_end"]}],
 }
 MONTHS = {
-    "rangeStart": "2026-11-01",
-    "rangeEnd": "2026-11-30",
-    "days": {"2026-11-12": {"items": [
+    "rangeStart": P["month_start"],
+    "rangeEnd": P["month_end"],
+    "days": {day_key(P, 1): {"items": [
         {"c": "hay", "l": SOCCER},
         {"c": "shr", "l": "Raffle", "organizer": {"displayName": HEALTH}},
         {"c": "hay", "l": BOY},
@@ -95,8 +97,8 @@ httpd = ThreadingHTTPServer(("127.0.0.1", 0), H)
 threading.Thread(target=httpd.serve_forever, daemon=True).start()
 PORT = httpd.server_address[1]
 BASE = "http://127.0.0.1:%d/" % PORT
-QS = "pfBase=http://127.0.0.1:%d&now=2026-11-12T12:30:00-06:00&freeze=1" % PORT
-INIT = "localStorage.setItem('wardos-private-feed-token','r45-fixture-token-key');"
+QS = "pfBase=http://127.0.0.1:%d&now=%s&freeze=1" % (PORT, P["pin"])
+INIT = clock_init(P["pin_ms"]) + "localStorage.setItem('wardos-private-feed-token','r45-fixture-token-key');"
 
 def overlap(a, b):
     return a["x"] < b["right"] - 1 and b["x"] < a["right"] - 1 and a["y"] < b["bottom"] - 1 and b["y"] < a["bottom"] - 1
@@ -146,7 +148,7 @@ with sync_playwright() as p:
     for i in range(15):
         ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
         page = ctx.new_page()
-        page.goto(BASE + "sheet-google-home.html?now=2026-11-12T12:30:00-06:00&freeze=1", wait_until="commit", timeout=30000)
+        page.goto(BASE + "sheet-google-home.html?now=" + P["pin"] + "&freeze=1", wait_until="commit", timeout=30000)
         page.wait_for_selector("a.wardos-home", state="visible", timeout=20000)
         ready = page.evaluate("""() => {
           const a = document.querySelector("a.wardos-home");

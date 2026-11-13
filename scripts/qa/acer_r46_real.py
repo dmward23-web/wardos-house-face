@@ -88,6 +88,37 @@ PAGES = ["kid-ainsley.html", "kid-hayes.html", "kid-harris.html", "sheet-index.h
 def overlap(a, b):
     return a["x"] < b["right"] - 1 and b["x"] < a["right"] - 1 and a["y"] < b["bottom"] - 1 and b["y"] < a["bottom"] - 1
 
+HIT_JS = """() => {
+  const a = document.querySelector("#gh-home, a.wardos-home");
+  if (!a) return null;
+  const r = a.getBoundingClientRect();
+  if (r.width < 32 || r.height < 32) return null;
+  const cx = r.x + r.width / 2, cy = r.y + r.height / 2;
+  const hit = document.elementFromPoint(cx, cy);
+  if (!hit || !hit.closest || !hit.closest("a.wardos-home")) return null;
+  return { cx: cx, cy: cy, x: r.x, y: r.y, w: r.width, h: r.height };
+}"""
+
+def wait_home(page):
+    """Stable box and a center hit. The loop itself stops at 8s.
+    Each probe is one evaluate, so it does not wait on animation frames or a locator."""
+    deadline = time.perf_counter() + 8.0
+    prev = None
+    while time.perf_counter() < deadline:
+        try:
+            page.wait_for_selector("#gh-home, a.wardos-home", state="attached", timeout=500)
+            box = page.evaluate(HIT_JS)
+        except Exception:
+            box = None
+        if box and prev and abs(box["x"] - prev["x"]) < 1 and abs(box["y"] - prev["y"]) < 1 and abs(box["w"] - prev["w"]) < 1 and abs(box["h"] - prev["h"]) < 1:
+            return box
+        prev = box or None
+        left = deadline - time.perf_counter()
+        if left <= 0:
+            break
+        time.sleep(min(0.02, left))
+    return None
+
 out = {"pages": {}, "home": {}, "tap": {"runs": []}}
 with sync_playwright() as p:
     browser = p.chromium.launch(**launch_kw(p, headless=True))
@@ -152,19 +183,13 @@ with sync_playwright() as p:
             ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
             page = ctx.new_page()
             page.goto(BASE + "sheet-google-home.html?now=2026-11-12T12:30:00-06:00&freeze=1", wait_until="commit", timeout=30000)
-            page.wait_for_function("""() => {
-              const a = document.querySelector("#gh-home, a.wardos-home");
-              if (!a) return false;
-              const r = a.getBoundingClientRect();
-              if (r.width < 32 || r.height < 32) return false;
-              const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-              return !!(hit && hit.closest && hit.closest("a.wardos-home"));
-            }""", timeout=8000)
-            box = page.locator("a.wardos-home").bounding_box()
+            box = wait_home(page)
             t0 = time.perf_counter()
             try:
+                if not box:
+                    raise RuntimeError("home not hit-testable")
                 with page.expect_request("**/sheet-index.html**", timeout=4000):
-                    page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2, delay=0)
+                    page.mouse.click(box["cx"], box["cy"], delay=0)
                 times.append(round((time.perf_counter() - t0) * 1000, 1))
             except Exception:
                 times.append(-1)
