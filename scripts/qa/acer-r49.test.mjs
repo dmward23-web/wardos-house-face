@@ -70,7 +70,7 @@ test("r49 the r44 views pass on this month and two others", SKIP, () => {
     });
     assert.equal(r.status, 0, shift + " " + (r.stderr || "").slice(-400) + (r.stdout || "").slice(-250));
     const o = JSON.parse(r.stdout.trim().split("\n").pop());
-    assert.equal(o.pages.dad.has.Appointment, true, "dad " + shift);
+    assert.equal(o.pages.dad.has.Appointment, false, "dad " + shift);
     assert.equal(o.pages.dad.has["Mortgage due"], true, "dad raw " + shift);
     assert.equal(o.pages.month.has.Soccer, true, "month " + shift);
     assert.equal(o.pages.month.has.Appointment, true, "month appt " + shift);

@@ -111,7 +111,15 @@
   /* name: cal-live | cal-months | kids-week → Promise<{data, status:"live"|"stale"|"offline", at}> */
   /* PRIVFEED3 · face law (house-face-law.js, loaded right after this file) on every calendar payload, live or cached */
   var LAW_FEEDS = { "cal-live": 1, "cal-months": 1, "kids-week": 1 };
-  function law(name, d) { try { return (LAW_FEEDS[name] && g.HouseFaceLaw && g.HouseFaceLaw.cleanFeed) ? g.HouseFaceLaw.cleanFeed(name, d) : d; } catch (e) { return d; } }
+  function law(name, d) {
+    try {
+      if (LAW_FEEDS[name]) {
+        if (!(g.HouseFaceLaw && typeof g.HouseFaceLaw.cleanFeed === "function")) return null;
+        return g.HouseFaceLaw.cleanFeed(name, d);
+      }
+    } catch (e) { return LAW_FEEDS[name] ? null : d; }
+    return d;
+  }
   function getJSON(name) {
     /* PRIVFEED3 · a #pair= link is redeemed first (house-pair.js), so the first fetch already carries the new key */
     var wait = (g.HousePairing && g.HousePairing.ready) || Promise.resolve();

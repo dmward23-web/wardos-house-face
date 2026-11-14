@@ -14,11 +14,11 @@ const LOCKED = ["ainsley", "hayes", "harris", "shared", "hub"];
 const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
 const SKIP = browser ? {} : { skip: "SKIP no playwright (QA_NO_BROWSER)" };
 
-test("r45 a marked folded boy row drops on locked views and shows Appointment only on Dad", () => {
+test("r45 a marked folded boy row drops on locked views and on Dad", () => {
   const D = boot();
   const marked = { what: bit("H4", " yes ", "check", "up"), description: "\n#wardos-show\n", startIso: WHEN };
   for (const who of LOCKED) assert.equal(D.summarize(marked, who), null, who);
-  assert.equal(D.summarize(marked, "dan").title, "Appointment");
+  assert.equal(D.summarize(marked, "dan"), null);
   const zw = { what: "Har\u200Bris appointment", startIso: WHEN };
   for (const who of LOCKED.concat(["dan"])) assert.equal(D.summarize(zw, who), null, "zw " + who);
   assert.equal(D.summarize({ what: bit("Mort", "gage due"), startIso: WHEN }, "dan").title, bit("Mort", "gage due"));
@@ -57,10 +57,10 @@ test("r45 the real kids-week fetch drops every single-field probe", SKIP, () => 
   assert.equal(o.pages["sheet-today.html"].todaySoccer, true, "sheet-today soccer " + JSON.stringify(o.pages["sheet-today.html"].titles));
   for (const name of ["kid-hayes.html", "sheet-today.html", "sheet-dan.html"]) {
     const page = o.pages[name];
-    const populated = name === "sheet-today.html" ? page.rows : (name === "sheet-dan.html" ? (page.appointment ? 1 : 0) : (page.soccer ? 1 : 0));
+    const populated = name === "sheet-today.html" ? page.rows : (name === "sheet-dan.html" ? (page.money ? 1 : 0) : (page.soccer ? 1 : 0));
     assert.ok(populated > 0, name + " rendered 0 fixture rows");
   }
-  assert.equal(o.pages["sheet-dan.html"].appointment, true, "dad appointment");
+  assert.equal(o.pages["sheet-dan.html"].appointment, false, "dad appointment");
   assert.equal(o.pages["sheet-dan.html"].money, true, "dad raw");
   assert.equal(o.pages["sheet-index.html"].appointment, false, "dad tile");
   assert.equal(o.home.hit, true, JSON.stringify(o.home.nodes));

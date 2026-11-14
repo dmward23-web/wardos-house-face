@@ -33,11 +33,11 @@ test("r50 sheet-today shows its rows at today, 11:30 PM, and Nov 30 11:30 PM", S
     const sheet = r44.pages["sheet-today"];
     assert.ok(sheet.rows > 0, wall + " r44 empty " + JSON.stringify(sheet.titles));
     for (const label of SHOWN) assert.equal((sheet.titles || []).includes(label), true, wall + " r44 " + label);
-    assert.equal(r44.pages.dad.has.Appointment, true, wall + " dad");
+    assert.equal(r44.pages.dad.has.Appointment, false, wall + " dad");
     const r45 = run("acer_r45_real.py", wall);
     const today = r45.pages["sheet-today.html"];
     assert.ok(today.rows > 0, wall + " r45 empty");
     assert.equal(today.todaySoccer, true, wall + " r45 soccer " + JSON.stringify(today.titles));
-    assert.equal(r45.pages["sheet-dan.html"].appointment, true, wall + " r45 dad");
+    assert.equal(r45.pages["sheet-dan.html"].appointment, false, wall + " r45 dad");
   }
 });

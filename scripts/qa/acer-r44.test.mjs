@@ -13,13 +13,11 @@ const LOCKED = ["ainsley", "hayes", "harris", "shared", "hub"];
 const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
 const SKIP = browser ? {} : { skip: "SKIP no playwright (QA_NO_BROWSER)" };
 
-test("r44 a boy name plus a health word is Appointment everywhere, and a hidden field drops Homework", () => {
+test("r44 a boy name plus a health word drops on every board, and a hidden field drops Homework", () => {
   const D = boot();
   const folded = [bit("H4", " yes", " check", "up"), bit("H@", "yes", " allerg", "ist"), bit("Harr", "i$") + " " + bit("dent", "al")];
   for (const what of folded) {
-    for (const who of LOCKED) assert.equal(D.summarize({ what, startIso: WHEN }, who), null, who + " " + what);
-    const dad = D.summarize({ what, startIso: WHEN }, "dan");
-    assert.equal(dad && dad.title, "Appointment", "dan " + what);
+    for (const who of LOCKED.concat(["dan"])) assert.equal(D.summarize({ what, startIso: WHEN }, who), null, who + " " + what);
   }
   assert.equal(D.summarize({ what: bit("Mort", "gage", " due"), startIso: WHEN }, "dan").title, bit("Mort", "gage", " due"));
   assert.equal(D.summarize({ what: bit("Mort", "gage", " due"), startIso: WHEN }, "ainsley"), null);
@@ -74,12 +72,12 @@ test("r44 locked views keep only allowlisted text and every field probe drops", 
   assert.equal(o.inputs.dad, 27, "dad feed rows");
   for (const name of ["sheet-today", "month", "dad"]) {
     const page = o.pages[name];
-    const populated = name === "sheet-today" ? page.rows : (name === "dad" ? (page.has.Appointment ? 1 : 0) : labels.filter((label) => page.has[label]).length);
+    const populated = name === "sheet-today" ? page.rows : (name === "dad" ? (page.has[bit("Mort", "gage due")] ? 1 : 0) : labels.filter((label) => page.has[label]).length);
     assert.ok(populated > 0, name + " rendered 0 fixture rows");
   }
   const dad = o.pages.dad;
   assert.equal(dad.ok, true, JSON.stringify(dad).slice(0, 300));
-  assert.equal(dad.has.Appointment, true, "dad appointment");
+  assert.equal(dad.has.Appointment, false, "dad appointment");
   assert.equal(dad.hits[bit("clin", "ic")], false, "dad health");
   assert.equal(dad.has[bit("Mort", "gage due")], true, "dad raw title " + JSON.stringify(dad.has));
   const home = o.home;

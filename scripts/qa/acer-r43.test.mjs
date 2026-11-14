@@ -36,7 +36,7 @@ test("r43 health, money, and adult titles stay off the locked views", () => {
   const D = boot();
   for (const what of HEALTH.slice(0, 3)) {
     for (const who of LOCKED) assert.equal(D.summarize({ what, startIso: WHEN }, who), null, who + " " + what);
-    assert.equal(D.summarize({ what, startIso: WHEN }, "dan").title, "Appointment", "dan " + what);
+    assert.equal(D.summarize({ what, startIso: WHEN }, "dan"), null, "dan " + what);
   }
   for (const what of HEALTH.slice(3)) {
     for (const who of LOCKED.concat(["dan"])) {

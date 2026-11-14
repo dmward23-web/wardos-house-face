@@ -521,6 +521,7 @@ fetch("data/cal-live.json?t="+Date.now(),{cache:"no-store"}).then(function(r){if
 var now=new Date(),today=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Chicago"}).format(now);
 var L=(d.upcomingLeaves||[]).filter(function(x){return x&&x.start&&!x.allDay&&new Date(x.end||x.start)>now});
 var iso=L.length?L[0].start.slice(0,10):today;var rows=L.filter(function(x){return x.start.slice(0,10)===iso});
+var Disp=window.HouseEventDisplay;if(Disp&&Disp.summarize)rows=rows.map(function(x){var v=Disp.summarize(x,"shared");if(!v||!v.title)return null;x.summary=v.title;x.location="";return x}).filter(Boolean);
 packDay(iso);var dd=day(iso),lab=dd.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
 q("label").textContent=lab+" · load day";q("ftr").textContent="LOAD DAY · "+lab.toUpperCase();
 q("stamp").textContent=dd.toLocaleDateString("en-US",{weekday:"short"})+" "+dd.getDate();

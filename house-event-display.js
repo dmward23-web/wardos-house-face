@@ -164,8 +164,8 @@
   }
   /* Appointment words, including a digit-folded or separator-stripped disguise.
      ot and pt match a whole token only, so "photo" and "soccer" stay activities. */
-  var APPT_LONG = ["appointment", "session", "dentist", "doctor", "therapy", "therapist", "appt", "speech", "ortho", "orthodontist", "pediatric", "pediatrician", "checkup", "physical", "clinic", "evaluation", "tutoring", "urgentcare", "eyeexam", "flushot", "psycheval", "allergist", "dental", "telehealth", "counsel", "anxiety", "provider"];
-  var APPT_SHORT = { ot: 1, pt: 1, appt: 1, aba: 1, er: 1, mtg: 1, labs: 1, exam: 1, eval: 1, shot: 1 };
+  var APPT_LONG = ["appointment", "session", "dentist", "doctor", "therapy", "therapist", "appt", "speech", "ortho", "orthodontist", "pediatric", "pediatrician", "checkup", "physical", "clinic", "evaluation", "tutoring", "urgentcare", "eyeexam", "flushot", "psycheval", "allergist", "dental", "telehealth", "counsel", "anxiety", "provider", "vaccine", "vaccines", "xray", "optometrist", "chiropractor", "chiro", "wellvisit", "socialskills"];
+  var APPT_SHORT = { ot: 1, pt: 1, appt: 1, aba: 1, er: 1, mtg: 1, labs: 1, exam: 1, eval: 1, shot: 1, md: 1 };
   function apptForms(s) {
     var p = prepText(s);
     var flat = p.replace(/[^a-z0-9]/g, "");
@@ -543,14 +543,13 @@
     if (isAppointment(ev)) {
       /* Locked views: Appointment only with the show marker, an Ainsley/Dad/no-kid slot,
          and no boy name or boy health term in any string. A Hayes or Harris slot drops.
-         Dad's own board keeps the r45 drops: a zero-width boy name, or an unmarked
-         plain checkup, is not Appointment. A folded name plus a health word is. */
+         Dad's own board uses the same marker. A folded or disguised boy name plus a
+         health word drops unless the title itself still contains Hayes or Harris. */
       if (who === "adult") {
         if (zwBoyTitle(ev)) return null;
-        if (titleHasBoy(ev)) title = "Appointment";
-        else if (!wardosShow(ev)) return null;
-        else if (boyAnywhere(ev) && !/hayes|harris/i.test(titleBlob(ev))) return null;
-        else title = "Appointment";
+        if (!wardosShow(ev)) return null;
+        if (boyAnywhere(ev) && !/hayes|harris/i.test(titleBlob(ev))) return null;
+        title = "Appointment";
       } else {
         if (slot === "boy" || boyAnywhere(ev) || !wardosShow(ev)) return null;
         title = "Appointment";

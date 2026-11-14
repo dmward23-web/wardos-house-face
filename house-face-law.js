@@ -318,9 +318,28 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     return false;
   }
   var SIGNAL_KEY = /^(organizer|creator|attendees|conferenceData|extendedProperties|location|eventType)$/i;
-  /* An event row, not the week/month document that contains rows. */
+  /* A title-like string makes a row even if the object also has kids, days or upcomingLeaves. */
+  function titleLike(v) {
+    if (!v) return false;
+    var keys = ["what", "summary", "title", "l", "name", "subject"];
+    var i;
+    for (i = 0; i < keys.length; i++) if (typeof v[keys[i]] === "string" && v[keys[i]]) return true;
+    return false;
+  }
   function eventSignal(v) {
-    return !!(v && typeof v === "object" && !Array.isArray(v) && !v.kids && !v.days && !v.upcomingLeaves && (v.what || v.summary || v.title || v.l || v.organizer || v.attendees || v.conferenceData || v.extendedProperties || v.eventType));
+    if (!v || typeof v !== "object" || Array.isArray(v)) return false;
+    if (titleLike(v)) return true;
+    if (v.kids || v.days || v.upcomingLeaves) return false;
+    return !!(v.organizer || v.attendees || v.conferenceData || v.extendedProperties || v.eventType);
+  }
+  function isoOnly(s) {
+    return typeof s === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})?$/.test(s) ? s : "";
+  }
+  function opaqueId(s) {
+    if (typeof s !== "string" || !/^[A-Za-z0-9_-]{1,80}$/.test(s)) return "";
+    var flat = s.toLowerCase().replace(/[^a-z]/g, "");
+    if (/hayes|harris|therap|clinic|dentist|doctor|checkup|vaccin/.test(flat)) return "";
+    return s;
   }
   /* Classify while organizer and the other signal fields are still on the row.
      A therapy object used to be deleted first, and the canned title (Raffle) survived. */
@@ -344,6 +363,17 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     if (kid === "ainsley") return "ainsley";
     return slot || "";
   }
+  var KEEP_FIELD = { what: 1, title: 1, summary: 1, label: 1, text: 1, l: 1, when: 1, time: 1, c: 1, kid: 1, wardosShow: 1 };
+  function scrubMember(v) {
+    var o = {};
+    var k;
+    for (k in KEEP_FIELD) if (KEEP_FIELD[k] && v[k] != null) o[k] = typeof v[k] === "string" ? faceText(v[k]) : v[k];
+    o.startIso = isoOnly(v.startIso) || isoOnly(typeof v.start === "string" ? v.start : "");
+    o.start = o.startIso;
+    o.id = opaqueId(v.id);
+    if (!o.what && !o.summary && !o.title && !o.l) return null;
+    return o;
+  }
   /* Rebuild the row to the allowlist label only, before any page holds the raw strings. */
   function classifyFetched(v, slot) {
     var D = g.HouseEventDisplay;
@@ -362,10 +392,10 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     var next = {
       what: label, title: label, summary: label, label: label, text: label, l: label,
       when: view.time || "", time: view.time || "",
-      start: v.start || v.startIso || "",
-      startIso: v.startIso || (typeof v.start === "string" ? v.start : "") || "",
-      end: v.end || v.endIso || "",
-      id: v.id || ""
+      start: isoOnly(typeof v.start === "string" ? v.start : "") || isoOnly(v.startIso) || "",
+      startIso: isoOnly(v.startIso) || isoOnly(typeof v.start === "string" ? v.start : "") || "",
+      end: isoOnly(typeof v.end === "string" ? v.end : "") || "",
+      id: opaqueId(v.id)
     };
     if (v.c === "hay" || v.c === "har" || v.c === "ain" || v.c === "shr" || v.c === "aware") next.c = v.c;
     if (label === "Appointment") next.wardosShow = true;
@@ -378,9 +408,11 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
         for (var i = 0; i < v.length; i++) {
           if (typeof v[i] === "string") { if (!isCustody(v[i])) out.push(walk(v[i], key, slot)); continue; }
           if (rowDress(v[i]) || rowCustody(v[i])) continue;
-          if (eventSignal(v[i])) {
+          if (eventSignal(v[i]) || (/^(today|upcomingLeaves|items|queue)$/.test(key) && v[i] && typeof v[i] === "object")) {
             var classified = classifyFetched(v[i], slot);
             if (classified === undefined) { out.push(walk(v[i], key, slot)); continue; }
+            if (classified == null) continue;
+            if (classified === v[i]) classified = scrubMember(v[i]);
             if (classified == null) continue;
             out.push(classified);
             continue;
