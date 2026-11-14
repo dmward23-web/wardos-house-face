@@ -1,5 +1,6 @@
 """Sixty loads of each stage sheet. Prism-face assets must not be cancelled, and Home must be present."""
 import json
+import os
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -46,12 +47,19 @@ base = "http://127.0.0.1:%d/" % httpd.server_address[1]
 out = {}
 with sync_playwright() as p:
     browser = p.chromium.launch(**launch_kw(p, headless=True))
+    ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+    page = ctx.new_page()
+    def allow(route):
+        url = route.request.url
+        if route.request.resource_type == "document" or any(bit in url for bit in ASSETS):
+            route.continue_()
+        else:
+            route.abort()
+    page.route("**/*", allow)
     for name in SHEETS:
         missing = 0
         home = 0
         for i in range(60):
-            ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
-            page = ctx.new_page()
             bad = []
             def on_fail(req, bag=bad):
                 url = req.url
@@ -59,19 +67,19 @@ with sync_playwright() as p:
                     bag.append(url)
             page.on("requestfailed", on_fail)
             page.goto(base + name, wait_until="commit", timeout=15000)
-            page.wait_for_selector("link#prism-face-css, img[src*='home-key-light']", timeout=8000)
+            page.wait_for_selector("link#prism-face-css", state="attached", timeout=8000)
+            page.wait_for_selector("img[src*='home-key-light'], img[srcset*='home-key-light']", state="attached", timeout=8000)
             icon = page.evaluate("""() => {
               const img = document.querySelector("img[src*='home-key-light'], img[srcset*='home-key-light']");
               const link = document.getElementById("prism-face-css");
               const js = document.getElementById("prism-face-js");
-              return !!(img && (img.getAttribute("src") || img.currentSrc)) && !!link && !!js;
+              return !!(img && (img.getAttribute("src") || img.currentSrc || (img.srcset || ""))) && !!link && !!js;
             }""")
+            page.remove_listener("requestfailed", on_fail)
             if bad:
                 missing += 1
             if icon:
                 home += 1
-            ctx.close()
         out[name] = {"loads": 60, "missing": missing, "home": home}
-    browser.close()
-httpd.shutdown()
-print(json.dumps(out))
+print(json.dumps(out), flush=True)
+os._exit(0)
