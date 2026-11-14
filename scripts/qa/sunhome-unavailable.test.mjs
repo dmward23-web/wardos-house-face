@@ -34,6 +34,7 @@ test("unpaired family hub starts with cameras and lights unavailable", () => {
   assert.ok(panel.includes("sheet-index"));
   assert.ok(panel.includes("panel.hidden = true"));
   assert.ok(panel.includes("panel.hidden = false"));
+  assert.match(panel, /sheet-index[\s\S]*panel\.hidden = true[\s\S]*return/);
 });
 
 test("pinned private-feed keeps needsPairing; the hub hides the chip in its own stylesheet", () => {

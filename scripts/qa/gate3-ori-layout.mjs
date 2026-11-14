@@ -224,7 +224,9 @@ const SCAN = `(() => {
   scrollTo(0, 0);
   if (document.documentElement.classList.contains("ori-phone") && document.getElementById("hub-cam-deck")) {
     const marks = [];
-    ["header.hdr", "#hub-cam-deck", ".leaveby", "#hub-lights-panel", "#hub-spotify-strip", ".who-up"].forEach((sel) => {
+    const lightsBar = document.getElementById("hub-lights-panel");
+    if (lightsBar && shown(lightsBar)) hits.push("lights bar visible");
+    ["header.hdr", "#hub-cam-deck", ".leaveby", "#hub-spotify-strip", ".who-up"].forEach((sel) => {
       const el = document.querySelector(sel);
       if (!el || !shown(el)) return;
       const r = el.getBoundingClientRect();
@@ -247,7 +249,7 @@ const SCAN = `(() => {
     if (canvas) {
       const ctx = canvas.getContext("2d");
       const pr = canvas.getBoundingClientRect();
-      document.querySelectorAll("header.hdr, #hub-cam-deck, .leaveby, #hub-lights-panel, #hub-spotify-strip, .who-up, .tile-grid > .tile").forEach((el) => {
+      document.querySelectorAll("header.hdr, #hub-cam-deck, .leaveby, #hub-spotify-strip, .who-up, .tile-grid > .tile").forEach((el) => {
         if (!shown(el)) return;
         const r = el.getBoundingClientRect();
         const samples = [

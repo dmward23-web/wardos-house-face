@@ -125,7 +125,8 @@ PROBE = """() => {
   };
   const lights = document.getElementById('hub-lights-panel');
   const launch = document.querySelector('.hub-launch');
-  const lightsLaunch = !!(lights && launch && vis(lights) && vis(launch) && boxHit(lights.getBoundingClientRect(), launch.getBoundingClientRect()));
+  const lightsVisible = !!(lights && vis(lights));
+  const lightsLaunch = !!(lightsVisible && launch && vis(launch) && boxHit(lights.getBoundingClientRect(), launch.getBoundingClientRect()));
   const clips = [];
   const clipOf = (node) => {
     let n = node.parentElement;
@@ -317,7 +318,7 @@ PROBE = """() => {
       if (x > 1 && y > 1) diagOverlap = true;
     }
   }
-  return { stageW: stage ? stage.offsetWidth : 0, stageH: stage ? stage.offsetHeight : 0, scale: Math.round(s * 1000) / 1000, innerWidth, innerHeight, dpr: devicePixelRatio, scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, scrollH: document.documentElement.scrollHeight, clientH: document.documentElement.clientHeight, banned, phase, pickup: text.indexOf('School pickup') >= 0, soccer: text.indexOf('Leave for soccer') >= 0, swim: text.indexOf('4:25 PM') >= 0, outdoor: text.indexOf('62') >= 0, indoor: text.indexOf('65') >= 0, hub: img ? img.getAttribute('src') : '', diag: !!diagEl, small: small.slice(0, 8), smallN: small.length, overlaps: overlaps.slice(0, 8), overlapN: overlaps.length, diagOverlap, lightsLaunch, clips: clips.slice(0, 8), clipN: clips.length, blanks, blankN: blanks.length, debugLeak, textHits: textHits.slice(0, 8), textN: textHits.length, overflow: overflow.slice(0, 8), overflowN: overflow.length, stray: stray.slice(0, 6), strayN: stray.length, touch: touchSmall.slice(0, 8), touchN: touchSmall.length, home, dead, deadN: dead.length, wrappedDays, feedDown, homeMatch, upperNames, upperN: upperNames.length, labelMeasure: labelMeasure.slice(0, 8), labelN: labelBad.length };
+  return { stageW: stage ? stage.offsetWidth : 0, stageH: stage ? stage.offsetHeight : 0, scale: Math.round(s * 1000) / 1000, innerWidth, innerHeight, dpr: devicePixelRatio, scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, scrollH: document.documentElement.scrollHeight, clientH: document.documentElement.clientHeight, banned, phase, pickup: text.indexOf('School pickup') >= 0, soccer: text.indexOf('Leave for soccer') >= 0, swim: text.indexOf('4:25 PM') >= 0, outdoor: text.indexOf('62') >= 0, indoor: text.indexOf('65') >= 0, hub: img ? img.getAttribute('src') : '', diag: !!diagEl, small: small.slice(0, 8), smallN: small.length, overlaps: overlaps.slice(0, 8), overlapN: overlaps.length, diagOverlap, lightsLaunch, lightsVisible, clips: clips.slice(0, 8), clipN: clips.length, blanks, blankN: blanks.length, debugLeak, textHits: textHits.slice(0, 8), textN: textHits.length, overflow: overflow.slice(0, 8), overflowN: overflow.length, stray: stray.slice(0, 6), strayN: stray.length, touch: touchSmall.slice(0, 8), touchN: touchSmall.length, home, dead, deadN: dead.length, wrappedDays, feedDown, homeMatch, upperNames, upperN: upperNames.length, labelMeasure: labelMeasure.slice(0, 8), labelN: labelBad.length };
 }"""
 
 
@@ -471,6 +472,8 @@ def main():
                                 fails.append(name + " temps")
                             if info.get("lightsLaunch"):
                                 fails.append(name + " lights-launch")
+                            if info.get("lightsVisible"):
+                                fails.append(name + " lights-bar")
                             if diag and info.get("diagOverlap"):
                                 fails.append(name + " diag-overlap")
                         watch = tuple(routes)

@@ -1195,6 +1195,8 @@
         if (!err && d) {
           try { w._data = d; } catch (e) { /* */ }
           try { document.dispatchEvent(new CustomEvent("house:kids-data-ready", { detail: { data: d } })); } catch (e2) { /* */ }
+        } else {
+          try { document.dispatchEvent(new CustomEvent("house:kids-data-missing", { detail: {} })); } catch (e3) { /* */ }
         }
         onDataReady();
       });
@@ -1208,6 +1210,8 @@
           try {
             document.dispatchEvent(new CustomEvent("house:kids-data-ready", { detail: { data: d } }));
           } catch (e2) { /* */ }
+        } else {
+          try { document.dispatchEvent(new CustomEvent("house:kids-data-missing", { detail: {} })); } catch (e3) { /* */ }
         }
         onDataReady();
       });

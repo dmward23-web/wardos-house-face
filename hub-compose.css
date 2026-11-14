@@ -144,7 +144,6 @@ html body .panel.panel > .hub-upper > section.leaveby.leaveby--hot {
   z-index: 0 !important;
 }
 html body .panel.panel > .hub-upper .leaveby > * { display: none !important; }
-html body #hub-lights-panel > :not(.hub-lights-link):not(.hub-lights-bulk) { display: none !important; }
 html body .hub-next {
   position: relative !important;
   left: auto !important;
@@ -153,83 +152,85 @@ html body .hub-next {
   height: 120px !important;
   z-index: 2 !important;
 }
-html body #hub-lights-panel.hub-lights.hub-lights--hot,
-html body #hub-lights-panel.hub-lights.hub-lights--cmd,
-html body #hub-lights-panel.hub-lights {
-  position: relative !important;
-  left: auto !important;
-  top: auto !important;
-  width: 900px !important;
-  max-width: 900px !important;
-  min-width: 0 !important;
-  height: 120px !important;
-  min-height: 120px !important;
-  max-height: 120px !important;
+html body #hub-lights-panel { display: none !important; }
+html body #hub-spotify-tile {
+  position: absolute !important;
+  left: 48px !important;
+  top: 616px !important;
+  width: 588px !important;
+  height: 192px !important;
   margin: 0 !important;
-  padding: 0 !important;
-  flex: none !important;
-  align-self: stretch !important;
+  z-index: 6 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 16px !important;
   box-sizing: border-box !important;
   background: #101820 !important;
   color: #f4efe6 !important;
   border-radius: 16px !important;
   overflow: hidden !important;
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 16px !important;
-  border: 0 !important;
+  pointer-events: auto !important;
 }
-html body #hub-lights-panel.hub-lights--hot > :not(.hub-lights-link):not(.hub-lights-bulk),
-html body #hub-lights-panel.hub-lights--cmd > :not(.hub-lights-link):not(.hub-lights-bulk),
-html body #hub-lights-panel.hub-lights > :not(.hub-lights-link):not(.hub-lights-bulk) {
-  display: none !important;
+html body #hub-spotify-tile .sp-art-wrap,
+html body #hub-spotify-tile .sp-art,
+html body #hub-spotify-tile .sp-art-ph {
+  width: 120px !important;
+  height: 120px !important;
+  flex: 0 0 120px !important;
 }
-html body #hub-lights-panel .hub-lights-bulk {
-  display: flex !important;
-  gap: 16px !important;
+html body #hub-spotify-tile .sp-title { font-size: 30px !important; line-height: 1.15 !important; }
+html body #hub-spotify-tile .sp-ctrls { display: flex !important; gap: 12px !important; margin-left: auto !important; }
+html body #hub-spotify-tile [data-sp-act="previous"] { display: none !important; }
+html body #hub-spotify-tile[data-sp-phase="offline"] .sp-kick,
+html body #hub-spotify-tile[data-sp-phase="no_key"] .sp-kick,
+html body #hub-spotify-tile[data-sp-phase="bad_key"] .sp-kick,
+html body #hub-spotify-tile[data-sp-phase="error"] .sp-kick,
+html body #hub-spotify-tile[data-sp-phase="offline"] .sp-connect,
+html body #hub-spotify-tile[data-sp-phase="no_key"] .sp-connect,
+html body #hub-spotify-tile[data-sp-phase="bad_key"] .sp-connect,
+html body #hub-spotify-tile[data-sp-phase="error"] .sp-connect,
+html body #hub-spotify-tile[data-sp-phase="offline"] .sp-artist,
+html body #hub-spotify-tile[data-sp-phase="no_key"] .sp-artist,
+html body #hub-spotify-tile[data-sp-phase="offline"] .sp-dev,
+html body #hub-spotify-tile[data-sp-phase="no_key"] .sp-dev,
+html body #hub-spotify-tile[data-sp-phase="offline"] .sp-pill,
+html body #hub-spotify-tile[data-sp-phase="no_key"] .sp-pill { display: none !important; }
+html body #hub-spotify-tile .sp-btn {
+  width: 72px !important;
+  min-width: 72px !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  box-sizing: border-box !important;
+}
+html body #hub-offline-line {
+  position: absolute !important;
+  left: 48px !important;
+  top: 416px !important;
+  width: 900px !important;
   height: 64px !important;
   margin: 0 !important;
-  padding: 0 16px !important;
+  z-index: 6 !important;
+  display: flex !important;
   align-items: center !important;
-}
-html body #hub-lights-panel.hub-lights--hot .hub-lights-bulk-btn.hub-lights-bulk-btn,
-html body #hub-lights-panel.hub-lights--cmd .hub-lights-bulk-btn.hub-lights-bulk-btn,
-html body #hub-lights-panel .hub-lights-bulk-btn.hub-lights-bulk-btn {
-  min-width: 64px !important;
-  min-height: 64px !important;
-  height: 64px !important;
-  padding: 0 16px !important;
-  font-size: 24px !important;
-  line-height: 1.1 !important;
-}
-html body .hub-lights-link {
-  display: none !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  flex: 1 1 auto !important;
-  width: auto !important;
-  height: 80px !important;
-  min-height: 80px !important;
-  padding: 0 24px !important;
-  box-sizing: border-box !important;
   font-size: 30px !important;
-  line-height: 1.1 !important;
-  font-weight: 700 !important;
+  line-height: 1.2 !important;
   color: #f4efe6 !important;
-  text-decoration: none !important;
 }
+html body #hub-offline-line[hidden] { display: none !important; }
 html body .hub-launch {
-  position: relative !important;
-  left: auto !important;
-  top: auto !important;
+  position: absolute !important;
+  left: 48px !important;
+  top: 832px !important;
   width: 900px !important;
-  height: 196px !important;
-  z-index: 2 !important;
+  height: 200px !important;
+  z-index: 6 !important;
   display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
+  grid-template-columns: repeat(4, 210px) !important;
   grid-template-rows: 88px 88px !important;
-  gap: 20px !important;
+  column-gap: 20px !important;
+  row-gap: 24px !important;
   margin: 0 !important;
   padding: 0 !important;
 }

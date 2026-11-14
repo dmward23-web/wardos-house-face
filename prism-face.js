@@ -314,63 +314,10 @@
         x = Math.round((rr.right - srr.left) / sc) + 16;
       });
     }
-    function settleHubLights() {
-      if (!onHub) return;
-      var panel = document.getElementById("hub-lights-panel");
-      if (!panel) return;
-      var stray = panel.querySelector(".hub-lights-offline");
-      if (stray && stray.parentNode) stray.parentNode.removeChild(stray);
-      var bulk = panel.querySelector(".hub-lights-bulk");
-      if (!bulk) return;
-      var label = bulk.querySelector(".hub-lights-label");
-      if (!label) {
-        label = document.createElement("div");
-        label.className = "hub-lights-label";
-        label.innerHTML = '<i class="hub-lights-dot" aria-hidden="true"></i><span class="hub-lights-word"></span>';
-        bulk.insertBefore(label, bulk.firstChild);
-      }
-      var offline = true;
-      try { offline = !(global.HouseLights && HouseLights.gate && HouseLights.gate().live); } catch (eG) {}
-      var word = label.querySelector(".hub-lights-word");
-      if (word) word.textContent = offline ? "Lights offline" : "Lights";
-      label.classList.toggle("is-offline", offline);
-      ["lights-all-on", "lights-all-off"].forEach(function (id) {
-        var btn = document.getElementById(id);
-        if (!btn || !panel.contains(btn)) return;
-        if (offline) {
-          btn.disabled = true;
-          btn.setAttribute("data-prism-offline", "1");
-          btn.style.setProperty("opacity", "0.5", "important");
-          btn.style.setProperty("pointer-events", "none", "important");
-          btn.style.setProperty("background", "rgba(244,239,230,0.14)", "important");
-          btn.style.setProperty("background-image", "none", "important");
-          btn.style.setProperty("color", "#f4efe6", "important");
-          btn.style.setProperty("-webkit-text-fill-color", "#f4efe6", "important");
-          btn.style.setProperty("border", "1px solid rgba(244,239,230,0.28)", "important");
-          btn.style.setProperty("box-shadow", "none", "important");
-        } else if (btn.getAttribute("data-prism-offline") === "1") {
-          btn.removeAttribute("data-prism-offline");
-          btn.style.removeProperty("opacity");
-          btn.style.removeProperty("pointer-events");
-          btn.style.removeProperty("background");
-          btn.style.removeProperty("background-image");
-          btn.style.removeProperty("color");
-          btn.style.removeProperty("-webkit-text-fill-color");
-          btn.style.removeProperty("border");
-          btn.style.removeProperty("box-shadow");
-        }
-      });
-    }
     if (onHub) {
       placeHubHeader();
       setTimeout(placeHubHeader, 400);
       setTimeout(placeHubHeader, 1200);
-      settleHubLights();
-      setTimeout(settleHubLights, 400);
-      setTimeout(settleHubLights, 1200);
-      try {
-        if (global.HouseLights && HouseLights.onChange) HouseLights.onChange(settleHubLights);
-      } catch (eL) {}
       settlePlates();
       setTimeout(settlePlates, 400);
       setTimeout(settlePlates, 1200);

@@ -97,6 +97,9 @@
     } else if (data()) {
       title.textContent = "All done";
       plate.classList.add("roster-empty");
+    } else if (hubDown) {
+      title.textContent = "";
+      plate.classList.add("roster-empty");
     } else {
       title.textContent = "Calendar unavailable";
       plate.classList.remove("roster-empty");
@@ -147,9 +150,9 @@
     var time = card.querySelector(".hub-next-time");
     var title = card.querySelector(".hub-next-title");
     if (!week) {
-      card.hidden = false;
+      card.hidden = !!hubDown;
       if (time) time.textContent = "";
-      if (title) title.textContent = "Calendar unavailable";
+      if (title) title.textContent = hubDown ? "" : "Calendar unavailable";
       return;
     }
     var shown = false;
@@ -184,12 +187,64 @@
     if (note) note.textContent = extra ? extra + " more on the full board" : "";
   }
 
+  var hubDown = false;
+  var retryTimer = 0;
+  var OFFLINE_LINE = "House box offline · calendar back when it reconnects";
+  function offlineNode() {
+    var line = document.getElementById("hub-offline-line");
+    if (line || !document.body) return line;
+    line = document.createElement("p");
+    line.id = "hub-offline-line";
+    line.setAttribute("role", "status");
+    line.hidden = true;
+    var panel = document.querySelector(".panel");
+    if (panel) panel.appendChild(line);
+    return line;
+  }
+  function paintOffline() {
+    var line = offlineNode();
+    if (!line) return;
+    line.hidden = !hubDown;
+    line.textContent = hubDown ? OFFLINE_LINE : "";
+  }
+  function retryFeeds() {
+    if (retryTimer) return;
+    var w = global.WardKids;
+    if (!w || typeof w.loadJSON !== "function") return;
+    retryTimer = setInterval(function () {
+      w.loadJSON(function (err, d) {
+        if (err || !d) return;
+        try { w._data = d; } catch (e) { /* */ }
+        clearInterval(retryTimer);
+        retryTimer = 0;
+        hubDown = false;
+        paintOffline();
+        paintRoster();
+        paintNext();
+        try { document.dispatchEvent(new CustomEvent("house:kids-data-ready", { detail: { data: d } })); } catch (e2) { /* */ }
+      });
+    }, 8000);
+  }
   function boot() {
+    if (!data()) { hubDown = true; retryFeeds(); }
+    paintOffline();
     paintRoster();
     paintNext();
     trimLights();
-    document.addEventListener("house:kids-data-ready", function () { paintRoster(); paintNext(); });
-    document.addEventListener("house:kids-data-missing", function () { paintRoster(); paintNext(); });
+    document.addEventListener("house:kids-data-ready", function () {
+      hubDown = false;
+      if (retryTimer) { clearInterval(retryTimer); retryTimer = 0; }
+      paintOffline();
+      paintRoster();
+      paintNext();
+    });
+    document.addEventListener("house:kids-data-missing", function () {
+      hubDown = true;
+      paintOffline();
+      paintRoster();
+      paintNext();
+      retryFeeds();
+    });
     var grid = document.getElementById("hub-lights-grid");
     if (grid && global.MutationObserver) {
       new MutationObserver(trimLights).observe(grid, { childList: true });
