@@ -335,6 +335,12 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
   function isoOnly(s) {
     return typeof s === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})?$/.test(s) ? s : "";
   }
+  function safeWhen(v, time) {
+    var w = typeof v.when === "string" ? v.when : "";
+    var flat = w.toLowerCase().replace(/[^a-z]/g, "");
+    if (w && !/hayes|harris|therap|clinic|dentist|doctor|checkup|vaccin|appoint/.test(flat)) return w;
+    return time || "";
+  }
   function opaqueId(s) {
     if (typeof s !== "string" || !/^[A-Za-z0-9_-]{1,80}$/.test(s)) return "";
     var flat = s.toLowerCase().replace(/[^a-z]/g, "");
@@ -391,7 +397,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     var label = view.title;
     var next = {
       what: label, title: label, summary: label, label: label, text: label, l: label,
-      when: view.time || "", time: view.time || "",
+      when: safeWhen(v, view.time), time: view.time || "",
       start: isoOnly(typeof v.start === "string" ? v.start : "") || isoOnly(v.startIso) || "",
       startIso: isoOnly(v.startIso) || isoOnly(typeof v.start === "string" ? v.start : "") || "",
       end: isoOnly(typeof v.end === "string" ? v.end : "") || "",

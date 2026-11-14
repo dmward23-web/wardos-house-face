@@ -974,6 +974,7 @@ body.kw-on #tapsync-badge { display: none !important; }
     line-height: 1.2 !important;
   }
   html.kw-root body.kw-on #sec-days .consume-hero { min-height: 64px !important; }
+  html.pf-offline body.kw-on #sec-days .consume-hero:not(.empty) { display: flex !important; }
   html.kw-root body.kw-on #sec-musts .kw-must-empty {
     flex: 1 1 auto !important;
     display: flex !important;
