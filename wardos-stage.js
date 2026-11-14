@@ -144,21 +144,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     node.style.transform = "scale(" + s + ")";
     document.documentElement.setAttribute("data-wardos-stage", "1");
     ensureHome(node);
-    if (!document.getElementById("prism-face-css")) {
-      var face = document.createElement("link");
-      face.id = "prism-face-css";
-      face.rel = "stylesheet";
-      face.href = "prism-face.css";
-      face.setAttribute("data-house-injected", "1");
-      document.head.appendChild(face);
-    }
-    if (!document.getElementById("prism-face-js")) {
-      var faceJs = document.createElement("script");
-      faceJs.id = "prism-face-js";
-      faceJs.src = "prism-face.js";
-      faceJs.setAttribute("data-house-injected", "1");
-      document.body.appendChild(faceJs);
-    }
+    /* prism-face.css, prism-face.js and the Home icon are static tags in each sheet. */
     document.documentElement.style.setProperty("--wardos-s", String(s));
     node.style.zIndex = "1";
     extendCover(node, box);

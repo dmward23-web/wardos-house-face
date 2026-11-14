@@ -334,8 +334,10 @@ html body .kid-chips-sec .vote-card .a{font-size:14px}
 <script src="house-scene.js?v=ACERFIX1"></script>
 <script src="house-event-display.js?v=ACERFIX1"></script>
 <script src="wardos-stage.js?v=ACERFIX1"></script>
+<link id="prism-face-css" rel="stylesheet" href="prism-face.css">
 </head>
 <body>
+<a class="wardos-home" href="sheet-index.html" data-kw-home aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
   <defs>
     <!-- Shared paints · HEAT v3 cyan+gold -->
@@ -698,5 +700,6 @@ s.txt.style.display="none";s.txt.parentNode.insertBefore(i,s.txt.nextSibling);i.
 function fin(keep){if(done)return;done=true;var o=load(),v=i.value.trim();if(keep){if(v)o[s.key]=v;else delete o[s.key];save(o)}i.remove();s.txt.style.display="";show(s,load()[s.key])}
 i.addEventListener("keydown",function(e){e.stopPropagation();if(e.key==="Enter")fin(true);if(e.key==="Escape")fin(false)});i.addEventListener("blur",function(){fin(true)});i.addEventListener("click",function(e){e.stopPropagation()})}
 slots.forEach(function(s){s.el.style.cursor="pointer";s.el.addEventListener("click",function(e){e.preventDefault();e.stopImmediatePropagation();edit(s)},true);s.el.addEventListener("keydown",function(e){if(e.target!==s.el)return;if(e.key==="Enter"||e.key===" "){e.preventDefault();edit(s)}})});})();</script>
+<script id="prism-face-js" src="prism-face.js"></script>
 </body>
 </html>
