@@ -295,6 +295,26 @@ html body .cam-path,html body #cam-next-step{display:none!important}
   a.style.setProperty("z-index", "80", "important");
   a.style.setProperty("display", "flex", "important");
   a.style.setProperty("pointer-events", "auto", "important");
+  a.addEventListener("pointerdown", function () {
+    var vids = document.querySelectorAll("video");
+    for (var i = 0; i < vids.length; i++) {
+      try { vids[i].pause(); } catch (e) {}
+      try {
+        var so = vids[i].srcObject;
+        if (so && so.getTracks) so.getTracks().forEach(function (t) { try { t.stop(); } catch (err) {} });
+        vids[i].srcObject = null;
+      } catch (e2) {}
+    }
+    var canvases = document.querySelectorAll("canvas");
+    for (var c = 0; c < canvases.length; c++) {
+      try { canvases[c].width = 1; canvases[c].height = 1; } catch (e3) {}
+      try {
+        var gl = canvases[c].getContext("webgl2") || canvases[c].getContext("webgl");
+        var ext = gl && gl.getExtension && gl.getExtension("WEBGL_lose_context");
+        if (ext) ext.loseContext();
+      } catch (e4) {}
+    }
+  }, { passive: true, capture: true });
 })(document.getElementById("gh-home"));
 </script>
 <div class="panel cams-cmd">

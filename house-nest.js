@@ -1075,6 +1075,13 @@
         }
       }
       if (!any) return;
+      /* A resting tile has no playable video. Leave the click alone so the link opens. */
+      var playable = false;
+      for (var n = 0; n < waiting.length; n++) {
+        var pv = waiting[n].querySelector("video.hub-cam-video");
+        if (pv && (hubVideoHasTrack(pv) || pv.videoWidth > 0)) playable = true;
+      }
+      if (!playable) return;
       /* this tap only starts video; the next tap opens the camera */
       if (ev && deck && deck.contains(ev.target)) {
         ev.preventDefault();

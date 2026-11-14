@@ -73,6 +73,13 @@
     try { noKey = !localStorage.getItem(NEST_LS) && !localStorage.getItem(LIGHTS_LS); } catch (_) {}
     var need = tile.hasAttribute("data-hub-key-entry") || noKey || (pill && /NEED KEY|PAIR/i.test(pill.textContent || ""));
     if (!need) return;
+    var vid = tile.querySelector ? tile.querySelector("video.hub-cam-video") : null;
+    var playable = false;
+    try {
+      var tracks = vid && vid.srcObject && vid.srcObject.getVideoTracks ? vid.srcObject.getVideoTracks() : [];
+      playable = !!(vid && ((tracks.length && tracks[0].readyState === "live") || vid.videoWidth > 0));
+    } catch (_) {}
+    if (!playable && tile.tagName === "A" && tile.getAttribute("href")) return;
     e.preventDefault();
     e.stopPropagation();
     openBox();

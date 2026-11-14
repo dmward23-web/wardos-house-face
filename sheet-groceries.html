@@ -759,6 +759,33 @@ html body .favs-empty{color:rgba(255,255,255,.6)!important;-webkit-text-fill-col
 <script src="house-ori-world.js?v=MERGE1C" defer></script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
+<style id="r53-groceries-wall">
+@media (min-width: 1400px) and (min-height: 700px) {
+  html body { height: 1080px !important; overflow: hidden !important; }
+  html body .panel {
+    position: absolute !important; left: 48px !important; top: 48px !important;
+    width: 1824px !important; max-width: 1824px !important;
+    height: 984px !important; min-height: 0 !important; max-height: 984px !important;
+    margin: 0 !important; padding: 16px !important; box-sizing: border-box !important;
+    overflow: hidden !important; display: flex !important; flex-direction: column !important; gap: 16px !important;
+  }
+  html body .fav, html body .add-btn, html body a.treat-kid, html body .ftr-chip, html body .wardos-home {
+    min-width: 64px !important; min-height: 64px !important; box-sizing: border-box !important;
+  }
+  html body a.wardos-home {
+    position: fixed !important; left: 48px !important; top: 48px !important;
+    width: 64px !important; height: 64px !important; z-index: 80 !important; display: flex !important;
+  }
+  html body .fav-chips, html body .favs, html body .sec-hdr, html body .treats, html body .ftr-left, html body .body {
+    gap: 16px !important;
+  }
+  html body .body {
+    display: grid !important; grid-template-columns: 1fr 1fr 1fr !important;
+    flex: 1 1 auto !important; min-height: 0 !important; overflow: hidden !important;
+  }
+  html body .sec, html body .treats, html body .item-list { min-height: 0 !important; overflow: hidden !important; }
+}
+</style>
 <style id="r38-groceries-clock">
 html:not(#hf-wall-off) body .panel {
   padding-top: 48px !important;
@@ -800,5 +827,15 @@ html:not(#hf-wall-off) body .panel #groceries-hdr.hdr.hdr--clockfirst [data-live
 }
 </style>
 <script id="prism-face-js" src="prism-face.js"></script>
+<script>
+(function () {
+  if (!window.matchMedia || !matchMedia("(min-width: 1400px) and (min-height: 700px)").matches) return;
+  var panel = document.querySelector(".panel");
+  if (!panel) return;
+  panel.style.setProperty("min-height", "0", "important");
+  panel.style.setProperty("height", "984px", "important");
+  panel.style.setProperty("max-height", "984px", "important");
+})();
+</script>
 </body>
 </html>
