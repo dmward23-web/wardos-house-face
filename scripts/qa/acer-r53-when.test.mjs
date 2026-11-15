@@ -81,3 +81,9 @@ test("r53 N1 when is only a time on every locked route and on the kid cards", ()
   assert.ok(whens.some((w) => w === "10:30 PM"), JSON.stringify(whens));
   assert.ok(whens.some((w) => /3:00/.test(w) && /4:00/.test(w)), JSON.stringify(whens));
 });
+
+test("r53 N9 load day hides rows when the display script is missing", () => {
+  const html = read("sheet-load-day.html");
+  assert.match(html, /if\(!\(Disp&&Disp\.summarize\)\)rows=\[\]/);
+  assert.equal(html.includes("if(Disp&&Disp.summarize)rows=rows.map"), false);
+});
