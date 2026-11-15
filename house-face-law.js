@@ -335,11 +335,41 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
   function isoOnly(s) {
     return typeof s === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})?$/.test(s) ? s : "";
   }
-  function safeWhen(v, time) {
-    var w = typeof v.when === "string" ? v.when : "";
-    var flat = w.toLowerCase().replace(/[^a-z]/g, "");
-    if (w && !/hayes|harris|therap|clinic|dentist|doctor|checkup|vaccin|appoint/.test(flat)) return w;
-    return time || "";
+  function normClock(piece) {
+    var clock = String(piece || "").replace(/\./g, "").replace(/\s+/g, " ").trim();
+    var m = clock.match(/^(\d{1,2})(?::(\d{2}))?\s*([ap]m)?$/i);
+    if (!m) return "";
+    if (!m[2] && !m[3]) return "";
+    return m[1] + ":" + (m[2] || "00") + (m[3] ? " " + m[3].charAt(0).toUpperCase() + "M" : "");
+  }
+  /* when is a time allowlist. A bare clock or a clock range stays. Any other words are dropped. */
+  function timeOnly(s) {
+    var raw = String(s || "");
+    var trimmed = raw.replace(/^\s+|\s+$/g, "");
+    if (/^all day$/i.test(trimmed)) return "All day";
+    var whole = trimmed.match(/^(\d{1,2}(?::\d{2})?\s*(?:[ap]\.?m\.?)?)\s*(?:-|–|—|to)\s*(\d{1,2}(?::\d{2})?\s*(?:[ap]\.?m\.?)?)$/i);
+    if (whole) {
+      var left = normClock(whole[1]);
+      var right = normClock(whole[2]);
+      if (left && right) return left + "–" + right;
+    }
+    var only = trimmed.match(/^(\d{1,2}(?::\d{2})?\s*(?:[ap]\.?m\.?)?)$/i);
+    if (only) {
+      var one = normClock(only[1]);
+      if (one) return one;
+    }
+    var range = raw.match(/(\d{1,2}(?::\d{2})?\s*(?:[ap]\.?m\.?)?)\s*(?:-|–|—|to)\s*(\d{1,2}(?::\d{2})?\s*(?:[ap]\.?m\.?)?)/i);
+    if (range) {
+      var a = normClock(range[1]);
+      var b = normClock(range[2]);
+      if (a && b) return a + "–" + b;
+    }
+    var clock = raw.match(/(\d{1,2}:\d{2}\s*(?:[ap]\.?m\.?)?|\d{1,2}\s*[ap]\.?m\.?)/i);
+    if (clock) {
+      var c = normClock(clock[1]);
+      if (c) return c;
+    }
+    return "";
   }
   function opaqueId(s) {
     if (typeof s !== "string" || !/^[A-Za-z0-9_-]{1,80}$/.test(s)) return "";
@@ -373,7 +403,9 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
   function scrubMember(v) {
     var o = {};
     var k;
-    for (k in KEEP_FIELD) if (KEEP_FIELD[k] && v[k] != null) o[k] = typeof v[k] === "string" ? faceText(v[k]) : v[k];
+    for (k in KEEP_FIELD) if (KEEP_FIELD[k] && k !== "when" && k !== "time" && v[k] != null) o[k] = typeof v[k] === "string" ? faceText(v[k]) : v[k];
+    o.when = timeOnly(v.when);
+    o.time = timeOnly(v.time) || o.when;
     o.startIso = isoOnly(v.startIso) || isoOnly(typeof v.start === "string" ? v.start : "");
     o.start = o.startIso;
     o.id = opaqueId(v.id);
@@ -397,7 +429,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     var label = view.title;
     var next = {
       what: label, title: label, summary: label, label: label, text: label, l: label,
-      when: safeWhen(v, view.time), time: view.time || "",
+      when: timeOnly(view.time) || timeOnly(v.when), time: timeOnly(view.time) || timeOnly(v.time),
       start: isoOnly(typeof v.start === "string" ? v.start : "") || isoOnly(v.startIso) || "",
       startIso: isoOnly(v.startIso) || isoOnly(typeof v.start === "string" ? v.start : "") || "",
       end: isoOnly(typeof v.end === "string" ? v.end : "") || "",
@@ -456,6 +488,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
         }
         return r;
       }
+      if (typeof v === "string" && (key === "when" || key === "time")) return timeOnly(v);
       if (typeof v === "string" && !(key && SKIP_KEY.test(key))) return isCustody(v) ? "" : faceText(v);
       return v;
     }
