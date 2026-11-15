@@ -296,8 +296,10 @@ html body .cam-path,html body #cam-next-step{display:none!important}
   a.style.setProperty("display", "flex", "important");
   a.style.setProperty("pointer-events", "auto", "important");
   a.addEventListener("pointerdown", function () {
-    var vids = document.querySelectorAll("video");
+    var vids = document.getElementsByTagName("video");
+    if (!vids.length) return;
     for (var i = 0; i < vids.length; i++) {
+      if (!vids[i].srcObject) continue;
       try { vids[i].pause(); } catch (e) {}
       try {
         var so = vids[i].srcObject;

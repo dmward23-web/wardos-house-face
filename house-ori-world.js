@@ -1112,12 +1112,10 @@
   }
   function onActivate(ev, fromKey) {
     if (diving) return;
+    /* Home is a real link. Cancelling the click and assigning location again
+       was the ~1.8s press-to-request outlier. Leave this tap to the browser. */
     var home = ev.target && ev.target.closest && ev.target.closest("a.wardos-home, a.hub-home, a[data-kw-home]");
-    if (home && home.getAttribute("href")) {
-      ev.preventDefault();
-      try { location.href = home.href; } catch (eHome) { /* the link still has its href */ }
-      return;
-    }
+    if (home && home.getAttribute("href")) return;
     /* Earlier capture listeners own this tap (NEED KEY opens the paste box, never a modal from us). */
     if (ev.defaultPrevented) return;
     if (!fromKey && (ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey)) return;
