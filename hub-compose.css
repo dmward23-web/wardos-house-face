@@ -181,7 +181,7 @@ html body #hub-spotify-tile .sp-art-ph {
   flex: 0 0 120px !important;
 }
 html body #hub-spotify-tile .sp-title { font-size: 30px !important; line-height: 1.15 !important; }
-html body #hub-spotify-tile .sp-ctrls { display: flex !important; gap: 12px !important; margin-left: auto !important; }
+html body #hub-spotify-tile .sp-ctrls { display: flex !important; gap: 16px !important; margin-left: auto !important; }
 html body #hub-spotify-tile [data-sp-act="previous"] { display: none !important; }
 html body #hub-spotify-tile[data-sp-phase="offline"] .sp-kick,
 html body #hub-spotify-tile[data-sp-phase="no_key"] .sp-kick,
