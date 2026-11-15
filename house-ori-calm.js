@@ -39,6 +39,8 @@
     if (u.origin !== location.origin || !/\.html$/.test(u.pathname) || u.pathname === location.pathname) return;
     ev.preventDefault();
     try { sessionStorage.setItem("ori-veil-next", String(Date.now())); } catch (e) {}
+    /* The camera row's tap budget is 300ms. The veil hold below is for the other boards. */
+    if (a.classList.contains("hub-cam")) { leave(u.href); return; }
     var el = document.createElement("div");
     el.className = "ori-iris";
     el.setAttribute("data-calm", "1");

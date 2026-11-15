@@ -1064,24 +1064,22 @@
     function onFirstTap(ev) {
       var deck = doc.getElementById("hub-cam-deck");
       var waiting = deck ? deck.querySelectorAll(".hub-cam") : [];
+      var playable = false;
       var any = false;
       for (var k = 0; k < waiting.length; k++) {
         if (!waiting[k]._hubNeedsTap) continue;
         any = true;
         var v = waiting[k].querySelector("video.hub-cam-video");
-        if (v) {
-          v.muted = true;
-          try { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (_) {}
-        }
+        if (v && (hubVideoHasTrack(v) || v.videoWidth > 0)) playable = true;
       }
-      if (!any) return;
-      /* A resting tile has no playable video. Leave the click alone so the link opens. */
-      var playable = false;
+      /* A resting tile has no playable video. Do not call play(), and do not swallow the link. */
+      if (!any || !playable) return;
       for (var n = 0; n < waiting.length; n++) {
         var pv = waiting[n].querySelector("video.hub-cam-video");
-        if (pv && (hubVideoHasTrack(pv) || pv.videoWidth > 0)) playable = true;
+        if (!pv || !(hubVideoHasTrack(pv) || pv.videoWidth > 0)) continue;
+        pv.muted = true;
+        try { var pr = pv.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (_) {}
       }
-      if (!playable) return;
       /* this tap only starts video; the next tap opens the camera */
       if (ev && deck && deck.contains(ev.target)) {
         ev.preventDefault();

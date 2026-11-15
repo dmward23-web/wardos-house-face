@@ -68,6 +68,7 @@
     var t = e.target;
     var tile = t && t.closest ? t.closest("#hub-cam-deck .hub-cam, [data-hub-key-entry]") : null;
     if (!tile) return;
+    if (tile.tagName === "A" && tile.getAttribute("href") && !tile.querySelector("video")) return;
     var pill = tile.querySelector ? tile.querySelector(".hub-cam-pill") : null;
     var noKey = false;
     try { noKey = !localStorage.getItem(NEST_LS) && !localStorage.getItem(LIGHTS_LS); } catch (_) {}
