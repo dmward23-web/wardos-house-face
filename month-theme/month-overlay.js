@@ -60,6 +60,28 @@
         fr.style.display = "none";
       });
       if (!kidPage) document.documentElement.style.setProperty("--km-bg", "url(\"" + plate + "\")");
+      /* NIGHTHUB1 · the hub wall plate (--wg-hubbg in wg-wall-land.css / wall-acer-lock.css) follows this same novPhase clock as the
+         hero window below: night swaps in wall-night. Morning and dusk keep the dusk fallback, so the day board is unchanged. */
+      if (!kidPage && !phone && phase === "night") document.documentElement.style.setProperty("--wg-hubbg", "url(\"" + base + "month-theme/november/wall-night.webp\")");
+      /* NIGHTHUB3 · go() runs once per load, so a board left on kept its load-time phase (18:50 never flipped at 19:00; the 00:0x
+         house-fresh reload kept night all day). Same novPhase clock, checked each minute: reload once when it changes. Not when
+         ?now= or ?month= pins the date, not on kid pages; phones on sheet-index see the wall board and follow the same clock. Shares house-fresh's 45 s session guard, so no reload loop.
+         Idle guard (Atlas): only after 60 s with no touch/pointer/key and with no dialog/sheet open; otherwise retry next minute. */
+      if (!kidPage && !phone && !q.get("now") && !q.has("month") && typeof setInterval === "function") {
+        var lastTouch = Date.now();
+        ["pointerdown", "touchstart", "keydown"].forEach(function (t) { document.addEventListener(t, function () { lastTouch = Date.now(); }, { capture: true, passive: true }); });
+        setInterval(function () {
+          if (novPhase(new Date()) === document.documentElement.getAttribute("data-nov-phase")) return;
+          if (Date.now() - lastTouch < 60000) return;
+          var open = [].some.call(document.querySelectorAll('dialog, [aria-modal="true"], [role="dialog"]'), function (el) { return el.getClientRects().length > 0; });
+          if (open) return;
+          var G = "house-fresh:last", last = 0;
+          try { last = Number(sessionStorage.getItem(G)) || 0; } catch (eG) { /* no storage */ }
+          if (Date.now() - last < 45000) return;
+          try { sessionStorage.setItem(G, String(Date.now())); } catch (eS) { /* no storage */ }
+          location.reload();
+        }, 60000);
+      }
       if (!document.getElementById("km-nov")) {
         var L = document.createElement("div");
         L.id = "km-nov";

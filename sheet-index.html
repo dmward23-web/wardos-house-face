@@ -4103,6 +4103,11 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 .tile.hayes, .kid-flip.hayes { background-image: url("month-theme/hub/kidtile-hayes-438x420.webp") !important; }
 .tile.harris, .kid-flip.harris { background-image: url("month-theme/hub/kidtile-harris-438x420.webp") !important; }
 .tile.dan { background-image: url("month-theme/hub/kidtile-dad.webp") !important; background-repeat: no-repeat !important; background-size: 438px 420px !important; background-position: left top !important; }
+/* NIGHTHUB2 · night person tiles follow the same novPhase clock as the hero (month-overlay sets html[data-nov-phase]). Image swap only; size/position unchanged. Not on kid pages; phones on sheet-index see the wall board and follow the same clock. */
+[data-nov-phase="night"] .tile.ainsley, [data-nov-phase="night"] .kid-flip.ainsley { background-image: url("month-theme/hub/kidtile-ainsley-night-438x420.webp") !important; }
+[data-nov-phase="night"] .tile.hayes, [data-nov-phase="night"] .kid-flip.hayes { background-image: url("month-theme/hub/kidtile-hayes-night-438x420.webp") !important; }
+[data-nov-phase="night"] .tile.harris, [data-nov-phase="night"] .kid-flip.harris { background-image: url("month-theme/hub/kidtile-harris-night-438x420.webp") !important; }
+[data-nov-phase="night"] .tile.dan { background-image: url("month-theme/hub/kidtile-dad-night-438x420.webp") !important; background-repeat: no-repeat !important; background-size: 438px 420px !important; background-position: left top !important; }
 .hub-home {
   position: absolute; z-index: 30; left: 14px; top: calc(12px + env(safe-area-inset-top));
   width: 44px; height: 44px; border-radius: 50%;
@@ -4548,7 +4553,7 @@ var M=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"],
 function s(k,v){var e=document.querySelector('[data-mtile="'+k+'"]');if(e)e.textContent=v}
 s("m0",M[m]);s("m1",M[(m+1)%12]);s("w0","Week "+Math.ceil((d+new Date(y,m,1).getDay())/7)+" · this month");s("sub",N[m]+" and "+N[(m+1)%12])}catch(e){}})();</script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
-<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
+<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=NIGHTHUB3" defer></script>
 <link rel="stylesheet" href="wall-acer-lock.css?v=ACER1" />
 </body>
 </html>
