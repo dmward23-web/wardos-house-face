@@ -64,8 +64,10 @@ with sync_playwright() as p:
       music.offline = (musicEl.querySelector(".sp-title") || {}).textContent || "";
       music.buttons = Array.from(musicEl.querySelectorAll(".sp-btn")).filter(b => getComputedStyle(b).display !== "none").map(b => {
         const r = b.getBoundingClientRect();
-        return { label: b.getAttribute("aria-label"), w: Math.round(r.width), h: Math.round(r.height), disabled: b.disabled || b.getAttribute("aria-disabled") === "true" };
-      });
+        return { label: b.getAttribute("aria-label"), x: Math.round(r.left), right: Math.round(r.right), w: Math.round(r.width), h: Math.round(r.height), disabled: b.disabled || b.getAttribute("aria-disabled") === "true" };
+      }).sort((a, b) => a.x - b.x);
+      music.gaps = [];
+      for (var gi = 1; gi < music.buttons.length; gi++) music.gaps.push(music.buttons[gi].x - music.buttons[gi - 1].right);
       const lights = document.getElementById("hub-lights-panel");
       const line = document.getElementById("hub-offline-line");
       return {
@@ -77,9 +79,20 @@ with sync_playwright() as p:
       };
     }"""))
     page.evaluate("""() => { const deck = document.getElementById("hub-cam-deck"); if (deck) deck.hidden = false; }""")
+    cam_box = page.evaluate("""() => {
+      const a = document.querySelector("a.hub-cam");
+      const r = a.getBoundingClientRect();
+      return { cx: r.left + r.width / 2, cy: r.top + Math.min(24, r.height / 2) };
+    }""")
+    t_cam = time.perf_counter()
     with page.expect_request("**/sheet-google-home.html", timeout=8000):
-        page.click("a.hub-cam", timeout=8000, no_wait_after=True)
-    out["cam"] = {"navigated": True}
+        page.mouse.click(cam_box["cx"], cam_box["cy"], delay=0)
+    out["cam"] = {"navigated": True, "ms": round((time.perf_counter() - t_cam) * 1000)}
+    try:
+        page.goto("about:blank", wait_until="commit", timeout=2000)
+    except Exception:
+        pass
+    ctx.close()
 
     ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
     page = ctx.new_page()
@@ -91,9 +104,16 @@ with sync_playwright() as p:
       const hit = document.elementFromPoint(r.left + 8, r.top + 8);
       return !!(hit && (hit === a || a.contains(hit)));
     }""", timeout=8000)
+    home_box = page.evaluate("""() => {
+      const a = document.getElementById("gh-home");
+      const r = a.getBoundingClientRect();
+      return { cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
+    }""")
     t0 = time.perf_counter()
     with page.expect_request("**/sheet-index.html", timeout=8000):
-        page.click("#gh-home", timeout=8000, no_wait_after=True, force=True)
-    out["home"] = {"ms": round((time.perf_counter() - t0) * 1000)}
+        page.mouse.click(home_box["cx"], home_box["cy"], delay=0)
+    request_ms = round((time.perf_counter() - t0) * 1000)
+    page.wait_for_url("**/sheet-index.html", wait_until="commit", timeout=8000)
+    out["home"] = {"request": request_ms, "ms": round((time.perf_counter() - t0) * 1000)}
     print(json.dumps(out), flush=True)
     os._exit(0)

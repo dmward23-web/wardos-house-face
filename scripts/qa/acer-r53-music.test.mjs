@@ -83,7 +83,9 @@ test("r53 the wall shows Music, one offline line, and no lights bar", { skip: br
     assert.ok(node.y <= 1032 && node.x >= 48, JSON.stringify(node));
   }
   assert.equal(o.cam.navigated, true, JSON.stringify(o.cam));
-  assert.ok(o.home.ms <= 2500, JSON.stringify(o.home));
+  assert.ok(o.cam.ms <= 300, "cam request " + JSON.stringify(o.cam));
+  assert.ok(o.home.request <= 300, "home request " + JSON.stringify(o.home));
+  assert.ok(o.home.ms <= 1500, JSON.stringify(o.home));
   const m = o.music;
   assert.equal(m.visible, true, JSON.stringify(m));
   assert.ok(m.h >= 64 && m.x >= 48 && m.y >= 48 && m.bottom <= 1032 && m.right <= 1872, JSON.stringify(m));
@@ -94,6 +96,7 @@ test("r53 the wall shows Music, one offline line, and no lights bar", { skip: br
     assert.ok(b.w >= 64 && b.h >= 64, JSON.stringify(b));
     assert.equal(b.disabled, true, JSON.stringify(b));
   }
+  for (const gap of m.gaps) assert.ok(gap >= 16, "music gap " + JSON.stringify(m.gaps));
   assert.equal(o.lights, false, "lights bar");
   assert.equal(o.offline, "House box offline · calendar back when it reconnects");
   assert.equal(o.calendarPlates, 0, "calendar plates " + o.calendarPlates);
