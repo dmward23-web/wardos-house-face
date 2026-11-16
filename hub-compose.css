@@ -179,6 +179,8 @@ html body #hub-spotify-tile .sp-art-ph {
   height: 120px !important;
   flex: 0 0 120px !important;
 }
+html body #hub-spotify-tile .sp-title,
+html body #hub-spotify-tile .sp-art-wrap { display: block !important; }
 html body #hub-spotify-tile .sp-title { font-size: 30px !important; line-height: 1.15 !important; }
 html body #hub-spotify-tile .sp-ctrls { display: flex !important; gap: 16px !important; margin-left: auto !important; }
 html body #hub-spotify-tile [data-sp-act="previous"] { display: none !important; }
@@ -205,19 +207,26 @@ html body #hub-spotify-tile .sp-btn {
 }
 html body #hub-offline-line {
   position: absolute !important;
-  left: 48px !important;
-  top: 416px !important;
-  width: 900px !important;
-  height: 64px !important;
+  left: 72px !important;
+  top: 424px !important;
+  width: auto !important;
+  max-width: 852px !important;
+  height: auto !important;
+  min-height: 64px !important;
   margin: 0 !important;
+  padding: 16px 28px !important;
+  box-sizing: border-box !important;
   z-index: 6 !important;
   display: flex !important;
   align-items: center !important;
   font-size: 30px !important;
   line-height: 1.2 !important;
   color: #f4efe6 !important;
+  background: #101820 !important;
+  border-radius: 16px !important;
 }
 html body #hub-offline-line[hidden] { display: none !important; }
+html[data-pair-banner="1"] body #hub-offline-line { display: none !important; }
 html body .hub-launch {
   position: absolute !important;
   left: 48px !important;

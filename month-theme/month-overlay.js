@@ -124,7 +124,7 @@
       }
       var fig = document.querySelector(".hub-window");
       if (fig) {
-        var winPhase = phase === "night" ? "night" : "dusk";
+        var winPhase = phase === "night" ? "night" : phase === "dusk" ? "dusk" : "day";
         if (fig.setAttribute) fig.setAttribute("data-sun-phase", phase);
         var img = fig.querySelector("img");
         if (!img) { img = document.createElement("img"); img.alt = ""; img.width = 900; img.height = 864; fig.appendChild(img); }

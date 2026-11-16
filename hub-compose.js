@@ -201,11 +201,22 @@
     if (panel) panel.appendChild(line);
     return line;
   }
+  function offlineText(line) {
+    var text = line.querySelector("[data-offline-text]");
+    if (text) return text;
+    line.textContent = "";
+    text = document.createElement("span");
+    text.setAttribute("data-offline-text", "");
+    line.appendChild(text);
+    return text;
+  }
   function paintOffline() {
     var line = offlineNode();
     if (!line) return;
-    line.hidden = !hubDown;
-    line.textContent = hubDown ? OFFLINE_LINE : "";
+    var unpaired = document.documentElement.getAttribute("data-pair-banner") === "1";
+    var show = hubDown && !unpaired;
+    line.hidden = !show;
+    offlineText(line).textContent = show ? OFFLINE_LINE : "";
   }
   function retryFeeds() {
     if (retryTimer) return;
@@ -248,6 +259,9 @@
     var grid = document.getElementById("hub-lights-grid");
     if (grid && global.MutationObserver) {
       new MutationObserver(trimLights).observe(grid, { childList: true });
+    }
+    if (global.MutationObserver) {
+      new MutationObserver(paintOffline).observe(document.documentElement, { attributes: true, attributeFilter: ["data-pair-banner"] });
     }
   }
 

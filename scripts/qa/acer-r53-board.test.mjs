@@ -25,6 +25,27 @@ test("r53b the unpaired banner is one plain line and the board scales with the v
   assert.doesNotMatch(stage, /Math\.min\(1, b\.innerWidth/);
 });
 
+test("r53b2 one offline message, a labeled music card, the day hero plate, and bar viewports", () => {
+  const html = read("sheet-index.html");
+  const css = read("hub-compose.css");
+  const js = read("hub-compose.js");
+  const overlay = read("month-theme/month-overlay.js");
+  const proof = read("scripts/qa/acer_r53_board.py");
+  const version = read("version.json");
+  assert.match(version, /"token":"r53b2"/);
+  assert.match(html, /<meta name="wardos-build" content="r53b2"\s*\/?>/);
+  assert.match(html, /id="hub-offline-line"[^>]*>\s*<span data-offline-text>/);
+  assert.match(css, /html\[data-pair-banner="1"\] body #hub-offline-line \{ display: none !important; \}/);
+  assert.match(css, /#hub-offline-line \{[\s\S]*background: #101820 !important;/);
+  assert.match(css, /html body #hub-spotify-tile \.sp-title,\s*html body #hub-spotify-tile \.sp-art-wrap \{ display: block !important; \}/);
+  assert.match(js, /data-pair-banner/);
+  assert.match(js, /show \? OFFLINE_LINE : ""/);
+  assert.match(overlay, /phase === "night" \? "night" : phase === "dusk" \? "dusk" : "day"/);
+  assert.match(proof, /\(1024, 768\), \(1280, 1024\)/);
+  assert.match(proof, /OFFLINE not in body/);
+  assert.match(proof, /Music offline/);
+});
+
 const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
 
 test("r53b banner, letterbox and Home tap", { skip: browser ? false : "SKIP no playwright" }, () => {

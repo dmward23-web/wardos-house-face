@@ -48,7 +48,7 @@ function boot(iso) {
   const phase = attrs["data-nov-phase"];
   return {
     phase,
-    hero: /hub-window-night-/.test(img.src) ? "night" : /hub-window-dusk-/.test(img.src) ? "day" : "none:" + img.src,
+    hero: /hub-window-night-/.test(img.src) ? "night" : /hub-window-(?:day|dusk)-/.test(img.src) ? "day" : "none:" + img.src,
     bg: /wall-night\.webp/.test(props["--wg-hubbg"] || "") ? "night" : "day",
     tiles: phase === "night" ? "night" : "day"
   };

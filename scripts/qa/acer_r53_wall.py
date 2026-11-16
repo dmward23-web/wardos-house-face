@@ -47,6 +47,7 @@ with sync_playwright() as p:
 
     ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
     page = ctx.new_page()
+    page.add_init_script("localStorage.setItem('wardos-lights-proxy-token','wall-key-wall-key-01');")
     page.goto(base + "sheet-index.html", wait_until="domcontentloaded", timeout=15000)
     page.wait_for_function("""() => {
       const line = document.getElementById("hub-offline-line");

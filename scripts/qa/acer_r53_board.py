@@ -73,18 +73,41 @@ def banner_state(page):
       return { text: b ? b.textContent : '', shown: !!(cs && cs.display !== 'none' && cs.visibility !== 'hidden') };
     }""")
 
+def visible_text(page):
+    return page.evaluate("() => document.body.innerText || ''")
+
+OFFLINE = "House box offline · calendar back when it reconnects"
+
 with sync_playwright() as p:
     browser = p.chromium.launch(**launch_kw(p, headless=True))
     ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
     page = ctx.new_page()
     page.goto(base + "sheet-index.html?now=2026-11-15T12:30:00-06:00", wait_until="domcontentloaded", timeout=20000)
     page.wait_for_timeout(1500)
+    page.wait_for_function("""() => {
+      const t = document.querySelector('#hub-spotify-tile .sp-title');
+      if (!t) return false;
+      const s = getComputedStyle(t);
+      return t.textContent.indexOf('Music') >= 0 && t.textContent.indexOf('offline') >= 0 && s.display !== 'none' && s.visibility !== 'hidden';
+    }""", timeout=8000)
     bare = banner_state(page)
     assert bare["shown"] and "isn't paired" in bare["text"], bare
-    body = page.inner_text("body")
+    body = visible_text(page)
     assert "Calendar unavailable" not in body, body[:500]
+    assert OFFLINE not in body, "offline line still visible while unpaired"
+    music = page.evaluate("""() => {
+      const t = document.querySelector('#hub-spotify-tile .sp-title');
+      const s = getComputedStyle(t);
+      const r = t.getBoundingClientRect();
+      return { text: t.textContent, display: s.display, w: r.width, h: r.height };
+    }""")
+    assert music["text"] == "Music offline", music
+    assert music["display"] != "none" and music["w"] > 8 and music["h"] > 8, music
+    hero = page.evaluate("() => document.querySelector('.hub-window img').getAttribute('src')")
+    assert "hub-window-day-900x864" in hero, hero
     ref = page.evaluate(BOXES, SEL)
     page.screenshot(path=str(OUT / "day-1920.png"))
+    page.screenshot(path=str(OUT / "unpaired-1920.png"))
     ctx.close()
 
     for iso, name in (("2026-11-15T16:55:00-06:00", "dusk-1920.png"), ("2026-11-15T19:30:00-06:00", "night-1920.png")):
@@ -93,7 +116,42 @@ with sync_playwright() as p:
         page.goto(base + "sheet-index.html?now=" + iso, wait_until="domcontentloaded", timeout=20000)
         page.wait_for_timeout(1200)
         page.screenshot(path=str(OUT / name))
+        if name == "night-1920.png":
+            assert OFFLINE not in visible_text(page), "night unpaired still shows the offline line"
         ctx.close()
+
+    ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+    page = ctx.new_page()
+    page.add_init_script("localStorage.setItem('wardos-lights-proxy-token','wall-key-wall-key-01');")
+    page.goto(base + "sheet-index.html?now=2026-11-15T12:30:00-06:00", wait_until="domcontentloaded", timeout=20000)
+    page.wait_for_function("""() => {
+      const line = document.getElementById('hub-offline-line');
+      const text = line && line.querySelector('[data-offline-text]');
+      return line && !line.hidden && text && text.textContent.indexOf('House box offline') >= 0;
+    }""", timeout=8000)
+    paired_off = banner_state(page)
+    assert not paired_off["shown"], paired_off
+    card = page.evaluate("""() => {
+      const line = document.getElementById('hub-offline-line');
+      const text = line.querySelector('[data-offline-text]');
+      const hero = document.querySelector('.hub-window').getBoundingClientRect();
+      const cr = line.getBoundingClientRect();
+      const tr = text.getBoundingClientRect();
+      const bg = getComputedStyle(line).backgroundColor;
+      return {
+        cx: cr.x, cy: cr.y, cw: cr.width, ch: cr.height, cright: cr.right, cbottom: cr.bottom,
+        tx: tr.x, ty: tr.y, tw: tr.width, th: tr.height, tright: tr.right, tbottom: tr.bottom,
+        hx: hero.x, bg
+      };
+    }""")
+    assert card["tx"] >= card["cx"] + 8 and card["tright"] <= card["cright"] - 8, card
+    assert card["ty"] >= card["cy"] and card["tbottom"] <= card["cbottom"] + 0.5, card
+    assert card["cx"] >= 48 and card["cy"] >= 48 and card["cright"] <= 1872 and card["cbottom"] <= 1032, card
+    assert card["tx"] >= 48 and card["ty"] >= 48 and card["tright"] <= 1872 and card["tbottom"] <= 1032, card
+    assert card["tx"] > card["hx"] + 8, card
+    assert card["bg"] not in ("rgba(0, 0, 0, 0)", "transparent"), card
+    page.screenshot(path=str(OUT / "paired-offline-1920.png"))
+    ctx.close()
 
     ctx = browser.new_context(viewport={"width": 1366, "height": 768}, device_scale_factor=1)
     page = ctx.new_page()
@@ -115,7 +173,7 @@ with sync_playwright() as p:
     ctx.close()
 
     bad = []
-    for w, h in ((1024, 576), (1366, 768), (1536, 864), (2560, 1440)):
+    for w, h in ((1024, 576), (1024, 768), (1280, 1024), (1366, 768), (1536, 864), (2560, 1440)):
         s = min(w / 1920, h / 1080)
         ox = (w - 1920 * s) / 2
         oy = (h - 1080 * s) / 2
@@ -130,6 +188,8 @@ with sync_playwright() as p:
         })""")
         if scroll["sw"] > scroll["cw"] + 1 or scroll["sh"] > scroll["ch"] + 1:
             bad.append("scroll %dx%d %s" % (w, h, json.dumps(scroll)))
+        if (w, h) in ((1280, 1024), (1024, 768)):
+            page.screenshot(path=str(OUT / ("letterbox-%dx%d.png" % (w, h))))
         for key, b0 in ref.items():
             b = got.get(key)
             if not b:
