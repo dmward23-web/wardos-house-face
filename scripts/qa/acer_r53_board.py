@@ -81,7 +81,8 @@ with sync_playwright() as p:
     page.wait_for_timeout(1500)
     bare = banner_state(page)
     assert bare["shown"] and "isn't paired" in bare["text"], bare
-    assert "Calendar unavailable" not in page.inner_text("body") or True
+    body = page.inner_text("body")
+    assert "Calendar unavailable" not in body, body[:500]
     ref = page.evaluate(BOXES, SEL)
     page.screenshot(path=str(OUT / "day-1920.png"))
     ctx.close()
