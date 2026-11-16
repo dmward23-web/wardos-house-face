@@ -203,7 +203,9 @@ test("FACESTRIP1 unit: cleanFeed strips money from every calendar feed's text, l
   assert.equal(live.upcomingLeaves[0].id, "a" + S + "1", "ids are never touched (SKIP_KEY)");
   assert.equal(live.upcomingLeaves[0].start, "2026-10-29T09:00:00-05:00");
   assert.equal(JSON.stringify(months.days["2026-10-01"].items.map((i) => i.l)), JSON.stringify(["Snack each", "Fee due", "5km run"]));
-  assert.equal(kids.kids.hayes.today[0].what, "Cards swap"); assert.equal(kids.kids.hayes.today[0].when, "3:15 pm");
+  assert.equal(kids.kids.hayes.today[0].what, "Cards swap");
+  /* Meridiem stays uppercase. house-event-display.js:525 and acer-r53-when.test.mjs:81 ("10:30 PM"). */
+  assert.equal(kids.kids.hayes.today[0].when, "3:15 PM");
   assert.equal(kids.kids.hayes.bankGoal.title, "Lego set"); assert.equal(kids.kids.hayes.bankGoal.need, 45, "numbers that are not text stay");
   assert.equal(L.faceText(S + "45"), "", "a money-only string reads empty (the old fallback handed the original back)");
 });

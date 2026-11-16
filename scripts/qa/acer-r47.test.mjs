@@ -46,7 +46,8 @@ test("r47 cleanFeed strips every money form with the law alone", () => {
   assert.equal(live.upcomingLeaves[0].id, "row-1");
   assert.equal(live.upcomingLeaves[0].start, "2026-10-29T09:00:00-05:00");
   assert.equal(months.days["2026-10-01"].items[2].l, "5km run");
-  assert.equal(kids.kids.ainsley.today[0].when, "3:15 pm");
+  /* Meridiem stays uppercase. house-event-display.js timeLabel (ap.toUpperCase()+"M") and acer-r53-when.test.mjs ("10:30 PM"). */
+  assert.equal(kids.kids.ainsley.today[0].when, "3:15 PM");
   assert.equal(kids.kids.ainsley.today[0].what, "Bus raffle");
 });
 

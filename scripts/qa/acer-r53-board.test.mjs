@@ -32,8 +32,8 @@ test("r53b2 one offline message, a labeled music card, the day hero plate, and b
   const overlay = read("month-theme/month-overlay.js");
   const proof = read("scripts/qa/acer_r53_board.py");
   const version = read("version.json");
-  assert.match(version, /"token":"r53b4"/);
-  assert.match(html, /<meta name="wardos-build" content="r53b4"\s*\/?>/);
+  assert.match(version, /"token":"r53b5"/);
+  assert.match(html, /<meta name="wardos-build" content="r53b5"\s*\/?>/);
   assert.match(html, /id="hub-offline-line"[^>]*>\s*<span data-offline-text>/);
   assert.match(css, /html\[data-pair-banner="1"\] body #hub-offline-line \{ display: none !important; \}/);
   assert.match(css, /#hub-offline-line \{[\s\S]*background: #101820 !important;/);

@@ -1226,6 +1226,11 @@
     });
   }
   window.addEventListener("pagehide", function () {
+    /* Release the WebGL context before the next board commits. Leaving it for GC stalls SwiftShader past the Home commit budget. Not on the press: that held the request. */
+    if (world) {
+      try { world.destroy(); } catch (eGl) {}
+      world = null;
+    }
     stampVeil();
     var iris = document.querySelector(".ori-iris");
     if (iris) {
