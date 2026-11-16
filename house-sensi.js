@@ -376,4 +376,14 @@
     effectiveState: effectiveState,
     onChange: onChange
   };
+  try {
+    document.addEventListener("wardos:feed", function (ev) {
+      var d = ev.detail || {};
+      if (d.name !== "sensi-live" || !d.data) return;
+      applyLivePayload(d.data);
+      var chip = document.getElementById("index-sensi-chip");
+      if (chip) paintChip(chip);
+      if (document.getElementById("sensi-hero")) paintHero();
+    });
+  } catch (e) {}
 })(typeof window !== "undefined" ? window : globalThis);

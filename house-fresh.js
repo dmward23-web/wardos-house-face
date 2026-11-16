@@ -39,6 +39,79 @@
     var q = location.search.replace(/[?&]fresh=\d+/, "").replace(/^\?/, "");
     location.replace(location.pathname + "?" + (q ? q + "&" : "") + "fresh=" + Date.now() + location.hash);
   }
+  /* R53AR · one build token in version.json. The same 30 s loop asks for it every 5 min.
+     A new token reloads only while the wall is idle, and only once for that token. */
+  var VER_KEY = "house-fresh:build";
+  var VER_STEPS = [5, 10, 20, 30];
+  var verFails = 0, verBusy = false, nextVerAt = 0, pendingTok = "", lastInput = Date.now();
+  function markInput() { lastInput = Date.now(); }
+  try {
+    ["pointerdown", "touchstart", "keydown"].forEach(function (ev) {
+      document.addEventListener(ev, markInput, true);
+    });
+  } catch (_) {}
+  function overlayOpen() {
+    try {
+      if (document.getElementById && document.getElementById("hub-key-entry")) return true;
+      if (!document.querySelector) return false;
+      var q = document.querySelector("[role='dialog']:not([hidden]), .ori-iris, [data-ori-veil='1']");
+      if (!q) return false;
+      if (typeof getComputedStyle !== "function") return true;
+      var s = getComputedStyle(q);
+      return s.display !== "none" && s.visibility !== "hidden";
+    } catch (e) { return false; }
+  }
+  function wallIdle() { return Date.now() - lastInput >= 60000 && !overlayOpen(); }
+  function runningToken() {
+    try {
+      var meta = document.querySelector && document.querySelector('meta[name="wardos-build"]');
+      return meta ? String(meta.getAttribute("content") || "") : "";
+    } catch (e) { return ""; }
+  }
+  function reloadForToken(live) {
+    var seen = "";
+    try { seen = sessionStorage.getItem(VER_KEY) || ""; } catch (e) {}
+    if (!live || seen === live) return;
+    var last = 0;
+    try { last = Number(sessionStorage.getItem(GUARD)) || 0; } catch (e2) {}
+    if (Date.now() - last < 45000) return;
+    try {
+      sessionStorage.setItem(VER_KEY, live);
+      sessionStorage.setItem(GUARD, String(Date.now()));
+    } catch (e3) {}
+    pendingTok = "";
+    var q = location.search.replace(/[?&]fresh=\d+/, "").replace(/^\?/, "");
+    location.replace(location.pathname + "?" + (q ? q + "&" : "") + "fresh=" + Date.now() + location.hash);
+  }
+  function pollVersion() {
+    if (!document.querySelector) return;
+    if (pendingTok) { if (wallIdle()) reloadForToken(pendingTok); return; }
+    if (verBusy || Date.now() < nextVerAt) return;
+    var mine = runningToken();
+    if (!mine) return;
+    verBusy = true;
+    nextVerAt = Date.now() + 5 * 60 * 1000;
+    fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) {
+      if (!r.ok) throw new Error("ver " + r.status);
+      return r.json();
+    }).then(function (j) {
+      verBusy = false;
+      verFails = 0;
+      nextVerAt = Date.now() + 5 * 60 * 1000;
+      var live = j && j.token ? String(j.token) : "";
+      if (!live || live === mine) { pendingTok = ""; return; }
+      var seen = "";
+      try { seen = sessionStorage.getItem(VER_KEY) || ""; } catch (e) {}
+      if (seen === live) return;
+      pendingTok = live;
+      if (wallIdle()) reloadForToken(live);
+    }).catch(function () {
+      verBusy = false;
+      verFails += 1;
+      var mins = VER_STEPS[Math.min(verFails - 1, VER_STEPS.length - 1)];
+      nextVerAt = Date.now() + mins * 60 * 1000;
+    });
+  }
   function auditOn() {
     try { return /(?:\?|&)audit=1(?:&|$)/.test(location.search || ""); } catch (e) { return false; }
   }
@@ -46,6 +119,7 @@
     if (auditOn()) return;
     var d = today();
     if (loadDay && d && d !== loadDay) { reloadFresh(); return; }
+    pollVersion();
     if (running === null) running = mine();
     if (!running) return;
     var url = location.pathname + "?freshcheck=" + Date.now();

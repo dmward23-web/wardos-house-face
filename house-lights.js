@@ -1416,4 +1416,12 @@
     clampBright: clampBright,
     hubHonesty: hubHonesty
   };
+  try {
+    document.addEventListener("wardos:feed", function (ev) {
+      var d = ev.detail || {};
+      if (d.name !== "lights-live" || !d.data) return;
+      applyLivePayload(d.data);
+      paintHubPanel(document);
+    });
+  } catch (e) {}
 })(typeof window !== "undefined" ? window : globalThis);

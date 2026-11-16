@@ -178,17 +178,53 @@
     o.icon = map[d.icon];
     return o;
   }
+  var WX_STEPS = [15000, 30000, 60000, 120000, 300000];
+  var wxStep = 0, wxTimer = 0, wxMounted = [];
+  function wxWait(step) {
+    var base = WX_STEPS[Math.min(step, WX_STEPS.length - 1)];
+    var jitter = Math.round((Math.random() - 0.5) * 0.2 * base);
+    return Math.max(1000, base + jitter);
+  }
+  function wxRetryable(err) {
+    var code = err && err.status ? err.status : 0;
+    if (code === 401) return false;
+    if (code && code < 500) return false;
+    return code >= 500 || code === 0;
+  }
+  function redrawWx(data) {
+    for (var i = 0; i < wxMounted.length; i++) {
+      var el = wxMounted[i];
+      try { el.style.removeProperty("display"); paint(el, data); } catch (e) {}
+    }
+  }
+  function scheduleWx() {
+    if (wxTimer) return;
+    var wait = wxWait(wxStep);
+    wxStep += 1;
+    wxTimer = setTimeout(function () {
+      wxTimer = 0;
+      load(function (err, data) {
+        if (err || !data) return;
+        wxStep = 0;
+        redrawWx(data);
+      });
+    }, wait);
+    if (wxTimer && wxTimer.unref) wxTimer.unref();
+  }
   function load(cb0) {
     var cb = function (err, d) { cb0(err, nightIcon(d)); };
     var cached = readCache();
     if (cached) { cb(null, cached); return; }
     Promise.all([within(9000, fromWx()), fromObs()]).then(function (res) {
       var d = mergeObs(res[0], res[1], res[0].code);
+      wxStep = 0;
+      if (wxTimer) { clearTimeout(wxTimer); wxTimer = 0; }
       if (d.stale) { cb(null, d); return; }   /* the hub's last-known reading: shown with its age, never cached as fresh */
       writeCache(d); cb(null, d);
     }).catch(function (err) {
       /* LIVEWX1 · feed down: the last known reading (any age, marked stale), never a default; nothing only when no reading ever */
       var last = null; try { var o = JSON.parse(localStorage.getItem(CACHE_KEY) || "null"); if (o && o.data) { last = {}; for (var k in o.data) last[k] = o.data[k]; last.stale = true; last.at = o.at; } } catch (e) {}
+      if (wxRetryable(err)) scheduleWx();
       if (last) cb(null, last); else cb(err || new Error("wx fail"), null);
     });
   }
@@ -238,6 +274,7 @@
   function mount(selector) {
     var el = typeof selector === "string" ? document.querySelector(selector) : selector;
     if (!el) return;
+    if (wxMounted.indexOf(el) < 0) wxMounted.push(el);
     el.setAttribute("aria-label", "Weather");
     el.classList.add("wx-card", "wx-live");
     /* LAW8C1 · no empty pill while loading: the chip stays hidden until a real reading lands; a failed load stays hidden and is
@@ -278,5 +315,5 @@
     }
   }
 
-  global.HouseWeather = { load: load, paint: paint, mount: mount, PLACE: PLACE };
+  global.HouseWeather = { load: load, paint: paint, mount: mount, PLACE: PLACE, retrySteps: WX_STEPS };
 })(typeof window !== "undefined" ? window : globalThis);
