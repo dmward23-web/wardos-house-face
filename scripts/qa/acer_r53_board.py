@@ -11,8 +11,26 @@ from pw_chrome import launch_kw
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = Path("/opt/cursor/artifacts/r53b-board")
-OUT.mkdir(parents=True, exist_ok=True)
+
+def choose_artifact_dir():
+    import tempfile
+    env = os.environ.get("WARDOS_ARTIFACT_DIR", "").strip()
+    candidates = []
+    if env:
+        candidates.append(Path(env))
+    candidates.append(Path("/opt/cursor/artifacts/r53b-board"))
+    for path in candidates:
+        try:
+            path.mkdir(parents=True, exist_ok=True)
+            probe = path / ".wardos-write-probe"
+            probe.write_text("ok", encoding="utf-8")
+            probe.unlink()
+            return path
+        except OSError:
+            continue
+    return Path(tempfile.mkdtemp(prefix="wardos-r53b-board-"))
+
+OUT = choose_artifact_dir()
 
 class H(BaseHTTPRequestHandler):
     def log_message(self, *a):

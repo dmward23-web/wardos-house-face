@@ -685,6 +685,15 @@ body.allow-shell .panel {
   max-width: 1824px !important;
   box-sizing: border-box !important;
 }
+body.allow-shell a.wardos-home {
+  position: absolute !important;
+  left: 48px !important;
+  top: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 40 !important;
+}
 body.allow-shell .panel .body {
   padding-left: 22px !important;
   padding-right: 32px !important;
@@ -1316,7 +1325,7 @@ html:not(#hf-wall-off) body .panel:has(.month-grid) .hdr-left-col {
 html:not(#hf-wall-off) body .panel.panel:has(.today-day) > header.hdr .hdr-ovals,
 html:not(#hf-wall-off) body .panel.panel:has(.month-grid) > header.hdr .hdr-ovals {
   position: absolute !important;
-  left: 80px !important;
+  left: 96px !important;
   top: 0 !important;
   grid-column: auto !important;
   justify-self: start !important;

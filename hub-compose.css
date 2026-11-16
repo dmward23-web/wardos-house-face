@@ -321,17 +321,19 @@ html body .tile.dan {
 #wardos-pair-banner {
   display: none;
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 1920px;
-  height: 48px;
+  left: 64px;
+  top: 160px;
+  width: max-content;
+  max-width: 880px;
+  height: auto;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   background: #14110e;
   color: #f4efe6;
-  font: 600 22px/48px system-ui, sans-serif;
-  text-align: center;
+  font: 600 22px/30px system-ui, sans-serif;
+  text-align: left;
+  white-space: nowrap;
   z-index: 30;
   pointer-events: none;
 }
