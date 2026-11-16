@@ -1082,6 +1082,10 @@ assets/icons/home-key.svg
 kid-glass-light@2x.png
 month-theme/hub/kidtile-ainsley-438x420.webp
 month-theme/hub/kidtile-dad.webp
+month-theme/hub/kidtile-ainsley-day-438x420.webp
+month-theme/hub/kidtile-dad-day-438x420.webp
+month-theme/hub/kidtile-harris-day-438x420.webp
+month-theme/hub/kidtile-hayes-day-438x420.webp
 month-theme/hub/kidtile-ainsley-night-438x420.webp
 month-theme/hub/kidtile-dad-night-438x420.webp
 month-theme/hub/kidtile-harris-night-438x420.webp
@@ -1126,6 +1130,7 @@ month-theme/november/pebble/pebble-today-3.webp
 month-theme/november/phone-dusk.webp
 month-theme/november/phone-morning.webp
 month-theme/november/phone-night.webp
+month-theme/november/wall-day.webp
 month-theme/november/wall-dusk.webp
 month-theme/november/wall-morning.webp
 month-theme/november/wall-night.webp

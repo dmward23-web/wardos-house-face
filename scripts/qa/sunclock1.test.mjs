@@ -8,7 +8,9 @@ import path from "node:path";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const ROOT = process.env.WARDOS_ROOT
+  ? path.resolve(process.env.WARDOS_ROOT)
+  : path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const rd = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 const OVERLAY = rd("month-theme/season-math.js") + "\n" + rd("month-theme/month-overlay.js");
 const SHEET = rd("sheet-index.html");
@@ -27,8 +29,8 @@ const TILE_RULES = [];
 function tileUrl(phase, id) {
   const hits = TILE_RULES.filter((r) => {
     if (!new RegExp("\\.tile\\." + id + "\\b").test(r.sel)) return false;
-    const night = r.sel.includes('[data-nov-phase="night"]');
-    return night ? phase === "night" : true;
+    const attr = r.sel.match(/\[data-nov-phase="([^"]+)"\]/);
+    return attr ? attr[1] === phase : true;
   });
   return hits.length ? hits[hits.length - 1].url : "";
 }
@@ -82,6 +84,7 @@ function boot(iso) {
     phase,
     heroSrc: img.src,
     hero: heroKind(img.src),
+    bgSrc: props["--wg-hubbg"] || "",
     bg: /wall-night\.webp/.test(props["--wg-hubbg"] || "") ? "night" : "day",
     tiles,
     tileSrcs
@@ -128,12 +131,46 @@ test("every layer agrees at every 5 min of Nov 15 and Nov 29 (one clock)", () =>
       assert.equal(r.bg, wantRest, ct(t) + " " + JSON.stringify(r));
       assert.equal(r.tiles, wantRest, ct(t) + " " + JSON.stringify(r));
       assert.equal(r.tileSrcs.length, 4, ct(t));
+      if (r.phase === "night") assert.match(r.bgSrc, /wall-night\.webp/, ct(t) + " " + r.bgSrc);
+      else if (r.phase === "dusk") assert.match(r.bgSrc, /wall-dusk\.webp/, ct(t) + " " + r.bgSrc);
+      else assert.match(r.bgSrc, /wall-day\.webp/, ct(t) + " " + r.bgSrc);
       for (const src of r.tileSrcs) {
         if (r.phase === "night") assert.match(src, /-night/, ct(t) + " " + src);
-        else assert.doesNotMatch(src, /-night/, ct(t) + " " + src);
+        else if (r.phase === "dusk") {
+          assert.doesNotMatch(src, /-night/, ct(t) + " " + src);
+          assert.doesNotMatch(src, /-day-/, ct(t) + " " + src);
+        } else assert.match(src, /-day-438x420\.webp$/, ct(t) + " " + src);
       }
     }
   }
+});
+
+test("r53b4 noon and 7:05 AM use day plates, 4:55 PM dusk plates, 7:30 PM night plates", () => {
+  const dayTiles = (r) => {
+    assert.equal(r.tileSrcs.length, 4, JSON.stringify(r.tileSrcs));
+    for (const src of r.tileSrcs) assert.match(src, /-day-438x420\.webp$/, src);
+    assert.match(r.bgSrc, /wall-day\.webp/, r.bgSrc);
+    assert.match(r.heroSrc, /hub-window-day-/);
+  };
+  const noon = boot("2026-11-15T12:30:00-06:00");
+  assert.equal(noon.phase, "morning");
+  dayTiles(noon);
+  const am = boot("2026-11-16T07:05:00-06:00");
+  assert.equal(am.phase, "morning");
+  dayTiles(am);
+  const dusk = boot("2026-11-15T16:55:00-06:00");
+  assert.equal(dusk.phase, "dusk");
+  assert.match(dusk.heroSrc, /hub-window-dusk-/);
+  assert.match(dusk.bgSrc, /wall-dusk\.webp/);
+  assert.match(dusk.tileSrcs[0], /kidtile-ainsley-438x420\.webp$/);
+  assert.match(dusk.tileSrcs[1], /kidtile-hayes-438x420\.webp$/);
+  assert.match(dusk.tileSrcs[2], /kidtile-harris-438x420\.webp$/);
+  assert.match(dusk.tileSrcs[3], /kidtile-dad\.webp$/);
+  const night = boot("2026-11-15T19:30:00-06:00");
+  assert.equal(night.phase, "night");
+  assert.match(night.heroSrc, /hub-window-night-/);
+  assert.match(night.bgSrc, /wall-night\.webp/);
+  for (const src of night.tileSrcs) assert.match(src, /-night/, src);
 });
 
 test("noon uses the day hero file and 4:55 PM uses the dusk hero file", () => {

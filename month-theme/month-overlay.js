@@ -69,7 +69,8 @@
       var phase = novPhase(when);
       var phone = document.documentElement.getAttribute("data-wardos-stage") !== "1" && (window.innerWidth || 0) < 700;
       var art = phase === "night" ? "night" : phase === "dusk" ? "dusk" : "morning";
-      var plate = base + "month-theme/november/" + (phone ? "phone-" : "wall-") + art + ".webp";
+      var wallArt = phase === "night" ? "night" : phase === "dusk" ? "dusk" : "day";
+      var plate = base + "month-theme/november/" + (phone ? "phone-" + art : "wall-" + wallArt) + ".webp";
       var kidPage = /\/kid-[a-z]+/.test(location.pathname || "") || !!(document.body && document.body.hasAttribute("data-kid-world"));
       var wall = /sheet-index\.html$/.test(location.pathname || "");
       document.documentElement.setAttribute("data-month-theme", "11");
@@ -81,8 +82,8 @@
         fr.style.display = "none";
       });
       if (wall && !kidPage) document.documentElement.style.setProperty("--km-bg", "url(\"" + plate + "\")");
-      /* Night plate follows novPhase. Morning and dusk keep the day plate, so sunclock1 still reads them as day. */
-      if (wall && !kidPage && !phone && phase === "night") document.documentElement.style.setProperty("--wg-hubbg", "url(\"" + base + "month-theme/november/wall-night.webp\")");
+      /* Wall plate follows novPhase: morning is wall-day, dusk is wall-dusk, night is wall-night. */
+      if (wall && !kidPage && !phone) document.documentElement.style.setProperty("--wg-hubbg", "url(\"" + base + "month-theme/november/wall-" + wallArt + ".webp\")");
       if (wall && !kidPage && !phone && !q.get("now") && !q.has("month") && typeof setInterval === "function") {
         var lastTouch = Date.now();
         ["pointerdown", "touchstart", "keydown"].forEach(function (t) { document.addEventListener(t, function () { lastTouch = Date.now(); }, { capture: true, passive: true }); });

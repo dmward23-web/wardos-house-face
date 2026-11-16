@@ -25,7 +25,7 @@
 <meta name="apple-mobile-web-app-title" content="WardOS House" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#041018" />
-<meta name="wardos-build" content="r53b3" />
+<meta name="wardos-build" content="r53b4" />
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <meta name="description" content="Board-OS House face · The Ward's mission hub · family home" />
 <title>BOARD-OS · HOUSE FACE · SHEETS INDEX</title>
@@ -4111,6 +4111,11 @@ animation:atlasPulse 2.4s ease-in-out infinite;}
 .tile.hayes, .kid-flip.hayes { background-image: url("month-theme/hub/kidtile-hayes-438x420.webp") !important; }
 .tile.harris, .kid-flip.harris { background-image: url("month-theme/hub/kidtile-harris-438x420.webp") !important; }
 .tile.dan { background-image: url("month-theme/hub/kidtile-dad.webp") !important; background-repeat: no-repeat !important; background-size: 438px 420px !important; background-position: left top !important; }
+/* Day plates follow novPhase morning (sunrise until the dusk band). Dusk keeps the files above. */
+[data-nov-phase="morning"] .tile.ainsley, [data-nov-phase="morning"] .kid-flip.ainsley { background-image: url("month-theme/hub/kidtile-ainsley-day-438x420.webp") !important; }
+[data-nov-phase="morning"] .tile.hayes, [data-nov-phase="morning"] .kid-flip.hayes { background-image: url("month-theme/hub/kidtile-hayes-day-438x420.webp") !important; }
+[data-nov-phase="morning"] .tile.harris, [data-nov-phase="morning"] .kid-flip.harris { background-image: url("month-theme/hub/kidtile-harris-day-438x420.webp") !important; }
+[data-nov-phase="morning"] .tile.dan { background-image: url("month-theme/hub/kidtile-dad-day-438x420.webp") !important; background-repeat: no-repeat !important; background-size: 438px 420px !important; background-position: left top !important; }
 /* NIGHTHUB2 · night person tiles follow the same novPhase clock as the hero (month-overlay sets html[data-nov-phase]). Image swap only; size/position unchanged. Not on kid pages; phones on sheet-index see the wall board and follow the same clock. */
 [data-nov-phase="night"] .tile.ainsley, [data-nov-phase="night"] .kid-flip.ainsley { background-image: url("month-theme/hub/kidtile-ainsley-night-438x420.webp") !important; }
 [data-nov-phase="night"] .tile.hayes, [data-nov-phase="night"] .kid-flip.hayes { background-image: url("month-theme/hub/kidtile-hayes-night-438x420.webp") !important; }
