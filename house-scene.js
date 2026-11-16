@@ -135,6 +135,8 @@
 
   function apply() {
     if (typeof document === "undefined") return plates(now());
+    /* The hub hero, plate and tiles take their phase from WardSunPhase. This clock stays for elevation questions. */
+    if (global.WardSunPhase) return plates(now());
     var pack = plates(now());
     var root = document.documentElement;
     var narrow = root.getAttribute("data-wardos-stage") !== "1" && (global.innerWidth || 0) < 700;

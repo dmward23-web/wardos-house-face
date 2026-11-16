@@ -171,7 +171,9 @@
      Night = sunDown() (solar elevation under -0.833 deg at the house); sun and sun-cloud icons read as moon and cloud. */
   function nightIcon(d) {
     if (!d || !d.icon) return d;
-    var dn = sunDown(global.HouseScene && HouseScene.now ? HouseScene.now() : new Date()); if (dn === null ? d.isDay !== 0 : !dn) return d;
+    var now = global.HouseScene && HouseScene.now ? HouseScene.now() : new Date();
+    var night = global.WardSunPhase ? global.WardSunPhase(now) === "night" : (function () { var dn = sunDown(now); return dn === null ? d.isDay === 0 : dn; })();
+    if (!night) return d;
     var map = { "\u2600": "\ud83c\udf19", "\u2600\ufe0f": "\ud83c\udf19", "\u26c5": "\u2601", "\ud83c\udf24": "\u2601", "\ud83c\udf24\ufe0f": "\u2601", "\ud83c\udf25": "\u2601" };
     if (!map[d.icon]) return d;
     var o = {}; for (var k in d) o[k] = d[k];

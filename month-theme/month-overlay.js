@@ -30,53 +30,112 @@
     return (S && S.decide) ? S.decide(seasonDate()) : { id: "other", cold: 0, flakes: 0, snow: 0, lit: 0, windows: 0 };
   }
   var spec = specNow();
+  window.WardSunPhase = novPhase;   /* SUNCLOCK1 · the one clock, readable by tests and other layers */
   if (spec.id === "november") { mountNovember(); return; }
   if (spec.id === "december") { mountCoat(spec); return; }
-  function ctHour(d) {
+  /* SUNCLOCK1 · ONE day/night clock for every art layer (hero window, hub wall plate --wg-hubbg, data-nov-phase -> 4 person tiles):
+     Overland Park sunrise/sunset (city center to 0.1 deg: 38.9 N, 94.7 W) for the America/Chicago date, computed here with the standard sunrise equation
+     (NOAA/Meeus low-precision, -0.833 deg horizon; no network). Night = sunset to the next sunrise. Dusk = the last 20 min before
+     sunset (kept short so mid-afternoon stays day); there is no dawn band: at sunrise the board goes straight to morning. */
+  function ctDate(d) {
     try {
-      var p = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", hour: "numeric", hourCycle: "h23" }).formatToParts(d);
-      for (var i = 0; i < p.length; i++) if (p[i].type === "hour") return Number(p[i].value) % 24;
-    } catch (e) { /* local hour */ }
-    return d.getHours();
+      var p = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", year: "numeric", month: "numeric", day: "numeric" }).formatToParts(d), o = {};
+      for (var i = 0; i < p.length; i++) o[p[i].type] = Number(p[i].value);
+      if (o.year && o.month && o.day) return [o.year, o.month, o.day];
+    } catch (e) { /* local date */ }
+    return [d.getFullYear(), d.getMonth() + 1, d.getDate()];
   }
-  function scenePack(when) {
-    var S = window.HouseScene;
-    if (S && S.plates) return S.plates(when);
-    return { phase: "night", wall: "month-theme/november/wall-night.webp", phone: "month-theme/november/phone-night.webp", hub: "month-theme/november/hub-window-night-900x864.webp" };
+  function sunTimes(y, m, day) {
+    var R = Math.PI / 180, lat = 38.9, lon = -94.7;
+    var n = Math.round(Date.UTC(y, m - 1, day, 12) / 864e5 + 2440587.5 - 2451545);
+    var J = n - lon / 360, M = (357.5291 + 0.98560028 * J) % 360;
+    var C = 1.9148 * Math.sin(M * R) + 0.02 * Math.sin(2 * M * R) + 0.0003 * Math.sin(3 * M * R);
+    var lam = (M + C + 180 + 102.9372) % 360;
+    var tr = 2451545 + J + 0.0053 * Math.sin(M * R) - 0.0069 * Math.sin(2 * lam * R);
+    var dec = Math.asin(Math.sin(lam * R) * Math.sin(23.4397 * R));
+    var w = Math.acos((Math.sin(-0.833 * R) - Math.sin(lat * R) * Math.sin(dec)) / (Math.cos(lat * R) * Math.cos(dec))) / R;
+    var ms = function (jd) { return (jd - 2440587.5) * 864e5; };
+    return { rise: ms(tr - w / 360), set: ms(tr + w / 360) };
+  }
+  function novPhase(d) {
+    var c = ctDate(d), s = sunTimes(c[0], c[1], c[2]), t = d.getTime();
+    if (t < s.rise || t >= s.set) return "night";
+    if (t >= s.set - 20 * 60000) return "dusk";
+    return "morning";
   }
   function mountNovember() {
     function go() {
       var when = seasonDate();
-      var pack = scenePack(when);
-      var phase = pack.phase === "day" ? "morning" : pack.phase;
+      var phase = novPhase(when);
       var phone = document.documentElement.getAttribute("data-wardos-stage") !== "1" && (window.innerWidth || 0) < 700;
-      /* CSS consumes --km-bg from month-overlay.css, so a page-relative url doubles month-theme/. */
-      var plate = base + (phone ? pack.phone : pack.wall);
+      var art = phase === "night" ? "night" : phase === "dusk" ? "dusk" : "morning";
+      var plate = base + "month-theme/november/" + (phone ? "phone-" : "wall-") + art + ".webp";
       var kidPage = /\/kid-[a-z]+/.test(location.pathname || "") || !!(document.body && document.body.hasAttribute("data-kid-world"));
       document.documentElement.setAttribute("data-month-theme", "11");
-      document.documentElement.setAttribute("data-nov-phase", pack.phase);
-      document.documentElement.setAttribute("data-scene-phase", pack.phase);
+      document.documentElement.setAttribute("data-nov-phase", phase);
+      document.documentElement.setAttribute("data-scene-phase", phase);
+      document.documentElement.setAttribute("data-sun-phase", phase);
       document.querySelectorAll("iframe.night52-scene").forEach(function (fr) {
         fr.removeAttribute("src");
         fr.style.display = "none";
       });
-      if (!kidPage) {
-        var url = "url(\"" + plate + "\")";
-        document.documentElement.style.setProperty("--km-bg", url);
-        document.documentElement.style.setProperty("--wg-hubbg", url);
+      if (!kidPage) document.documentElement.style.setProperty("--km-bg", "url(\"" + plate + "\")");
+      /* Night plate follows novPhase. Morning and dusk keep the day plate, so sunclock1 still reads them as day. */
+      if (!kidPage && !phone && phase === "night") document.documentElement.style.setProperty("--wg-hubbg", "url(\"" + base + "month-theme/november/wall-night.webp\")");
+      if (!kidPage && !phone && !q.get("now") && !q.has("month") && typeof setInterval === "function") {
+        var lastTouch = Date.now();
+        ["pointerdown", "touchstart", "keydown"].forEach(function (t) { document.addEventListener(t, function () { lastTouch = Date.now(); }, { capture: true, passive: true }); });
+        setInterval(function () {
+          if (novPhase(new Date()) === document.documentElement.getAttribute("data-nov-phase")) return;
+          if (Date.now() - lastTouch < 60000) return;
+          var open = [].some.call(document.querySelectorAll('dialog, [aria-modal="true"], [role="dialog"]'), function (el) { return el.getClientRects().length > 0; });
+          if (open) return;
+          var G = "house-fresh:last", last = 0;
+          try { last = Number(sessionStorage.getItem(G)) || 0; } catch (eG) { /* no storage */ }
+          if (Date.now() - last < 45000) return;
+          try { sessionStorage.setItem(G, String(Date.now())); } catch (eS) { /* no storage */ }
+          location.reload();
+        }, 60000);
+      }
+      if (!document.getElementById("km-nov")) {
+        var L = document.createElement("div");
+        L.id = "km-nov";
+        L.className = "km-layer km-nov" + (document.querySelector(".kw-canvas") ? " km-kid" : "");
+        L.setAttribute("aria-hidden", "true");
+        L.style.zIndex = "1";
+        var fall = document.createElement("div");
+        fall.className = "km-fall";
+        L.appendChild(fall);
+        var glow = document.createElement("div");
+        glow.className = "km-glow r";
+        L.appendChild(glow);
+        if (!RM.matches) {
+          for (var i = 0; i < 14; i++) {
+            var leaf = document.createElement("i");
+            leaf.className = "km-leaf b0";
+            leaf.style.left = ((i * 7.1) % 100) + "%";
+            leaf.style.animationDelay = (-i * 2.4) + "s";
+            leaf.style.backgroundImage = "url(\"" + base + "month-theme/november/leaves/leaf-nov-" + (i % 8) + "-24x24.webp\")";
+            L.appendChild(leaf);
+          }
+        }
+        if (document.body) document.body.insertBefore(L, document.body.firstChild);
       }
       var fig = document.querySelector(".hub-window");
       if (fig) {
+        var winPhase = phase === "night" ? "night" : "dusk";
+        if (fig.setAttribute) fig.setAttribute("data-sun-phase", phase);
         var img = fig.querySelector("img");
         if (!img) { img = document.createElement("img"); img.alt = ""; img.width = 900; img.height = 864; fig.appendChild(img); }
-        if (img.getAttribute("src") !== pack.hub) img.src = pack.hub;
+        var hub = "month-theme/november/hub-window-" + winPhase + "-900x864.webp";
+        var cur = img.getAttribute ? img.getAttribute("src") : img.src;
+        if (cur !== hub) img.src = hub;
       }
+      document.querySelectorAll(".tile, #house-wx, #hub-spotify-tile, #index-sensi-chip, .hub-cam, #hub-offline-line").forEach(function (el) {
+        if (el && el.setAttribute) el.setAttribute("data-sun-phase", phase);
+      });
     }
-    function arm() {
-      go();
-      var S = window.HouseScene;
-      if (S && S.subscribe && !arm.done) { arm.done = true; S.subscribe(go); if (S.start) S.start(); }
-    }
+    function arm() { go(); }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", arm); else arm();
   }
   var m = q.has("month") ? parseInt(q.get("month"), 10) : new Date().getMonth() + 1;
