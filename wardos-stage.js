@@ -1,5 +1,5 @@
-/* ACERFIX · one 1920x1080 stage. Smaller viewports get a single scale-to-fit.
-   s = min(1, innerWidth/1920, innerHeight/1080), origin 0 0, letterboxed.
+/* ACERFIX · one 1920x1080 stage. Every viewport gets one uniform scale.
+   s = min(innerWidth/1920, innerHeight/1080), origin 0 0, centered and letterboxed.
    Gate scales: 1920x1080 → 1, 1536x864 → 0.8, 1536x816 → min(1536/1920, 816/1080) = 0.7556.
    Scale is not clamped. A 0.8 floor would paint 864px into an 816px work area and clip.
    Touch targets are 88 stage px (66.5 CSS px at 0.7556) and type is 24 stage px (18.1 CSS px).
@@ -31,7 +31,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
 
   function scaleOf(box) {
     var b = box || viewport();
-    var s = Math.min(1, b.innerWidth / STAGE_W, b.innerHeight / STAGE_H);
+    var s = Math.min(b.innerWidth / STAGE_W, b.innerHeight / STAGE_H);
     if (!isFinite(s) || s <= 0) s = 1;
     return s;
   }
@@ -61,8 +61,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
   }
 
   function wanted() {
-    var w = global.innerWidth || 0, h = global.innerHeight || 0;
-    return (w >= 1400 && h >= 700) || (h >= 1400 && w >= 700);
+    return true;
   }
 
   var coverUrl = "";
@@ -143,6 +142,10 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     node.style.transformOrigin = "0 0";
     node.style.transform = "scale(" + s + ")";
     document.documentElement.setAttribute("data-wardos-stage", "1");
+    document.documentElement.style.setProperty("overflow", "hidden", "important");
+    document.body.style.setProperty("overflow", "hidden", "important");
+    document.body.style.setProperty("margin", "0", "important");
+    document.body.style.setProperty("background-color", "#07080b", "important");
     ensureHome(node);
     /* prism-face.css, prism-face.js and the Home icon are static tags in each sheet. */
     document.documentElement.style.setProperty("--wardos-s", String(s));

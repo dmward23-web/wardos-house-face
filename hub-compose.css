@@ -1,6 +1,5 @@
 /* ACERFIX hub composition. One card style, readable plates, a real launch bar.
-   Phone and desk keep the layout the boards already shipped. */
-@media (min-width: 1400px) and (min-height: 700px) {
+   The board is always the 1920 canvas. The stage scales it. These rules do not wait for a wide viewport. */
 html body .panel.panel > header.hdr { overflow: hidden !important; }
 html body .hdr-ovals {
   width: 592px !important;
@@ -310,4 +309,23 @@ html body .tile.dan {
   border: 2px solid #c4b49a !important;
   border-radius: 16px !important;
 }
+#wardos-pair-banner {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 48px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background: #14110e;
+  color: #f4efe6;
+  font: 600 22px/48px system-ui, sans-serif;
+  text-align: center;
+  z-index: 30;
+  pointer-events: none;
 }
+html[data-pair-banner="1"] #wardos-pair-banner { display: block; }
+html[data-pair-banner="1"] .hub-next-title,
+html[data-pair-banner="1"] .roster-title { color: transparent; }

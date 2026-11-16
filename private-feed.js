@@ -309,6 +309,11 @@
   function paintPairing() {
     var root = document.documentElement, ps = pairState();
     try { root.setAttribute("data-pair-state", ps); } catch (_) {}
+    try {
+      var denied = false;
+      for (var fk in state.feeds) if (/401/.test((state.feeds[fk] && state.feeds[fk].why) || "")) denied = true;
+      root.setAttribute("data-pair-banner", (!kidBoard() && (needsPairing() || denied)) ? "1" : "0");
+    } catch (eB) {}
     var on = needsPairing();
     if (!on) { if (pairChip) { pairChip.style.display = "none"; padForChip(false); } return; }
     if (!pairChip) {

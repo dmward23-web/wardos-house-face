@@ -71,18 +71,19 @@
       var art = phase === "night" ? "night" : phase === "dusk" ? "dusk" : "morning";
       var plate = base + "month-theme/november/" + (phone ? "phone-" : "wall-") + art + ".webp";
       var kidPage = /\/kid-[a-z]+/.test(location.pathname || "") || !!(document.body && document.body.hasAttribute("data-kid-world"));
+      var wall = /sheet-index\.html$/.test(location.pathname || "");
       document.documentElement.setAttribute("data-month-theme", "11");
       document.documentElement.setAttribute("data-nov-phase", phase);
       document.documentElement.setAttribute("data-scene-phase", phase);
       document.documentElement.setAttribute("data-sun-phase", phase);
-      document.querySelectorAll("iframe.night52-scene").forEach(function (fr) {
+      if (wall) document.querySelectorAll("iframe.night52-scene").forEach(function (fr) {
         fr.removeAttribute("src");
         fr.style.display = "none";
       });
-      if (!kidPage) document.documentElement.style.setProperty("--km-bg", "url(\"" + plate + "\")");
+      if (wall && !kidPage) document.documentElement.style.setProperty("--km-bg", "url(\"" + plate + "\")");
       /* Night plate follows novPhase. Morning and dusk keep the day plate, so sunclock1 still reads them as day. */
-      if (!kidPage && !phone && phase === "night") document.documentElement.style.setProperty("--wg-hubbg", "url(\"" + base + "month-theme/november/wall-night.webp\")");
-      if (!kidPage && !phone && !q.get("now") && !q.has("month") && typeof setInterval === "function") {
+      if (wall && !kidPage && !phone && phase === "night") document.documentElement.style.setProperty("--wg-hubbg", "url(\"" + base + "month-theme/november/wall-night.webp\")");
+      if (wall && !kidPage && !phone && !q.get("now") && !q.has("month") && typeof setInterval === "function") {
         var lastTouch = Date.now();
         ["pointerdown", "touchstart", "keydown"].forEach(function (t) { document.addEventListener(t, function () { lastTouch = Date.now(); }, { capture: true, passive: true }); });
         setInterval(function () {
@@ -97,7 +98,7 @@
           location.reload();
         }, 60000);
       }
-      if (!document.getElementById("km-nov")) {
+      if (wall && !document.getElementById("km-nov")) {
         var L = document.createElement("div");
         L.id = "km-nov";
         L.className = "km-layer km-nov" + (document.querySelector(".kw-canvas") ? " km-kid" : "");
