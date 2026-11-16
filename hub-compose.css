@@ -338,3 +338,9 @@ html body .tile.dan {
 html[data-pair-banner="1"] #wardos-pair-banner { display: block; }
 html[data-pair-banner="1"] .hub-next-title,
 html[data-pair-banner="1"] .roster-title { color: transparent; }
+html body .roster-plate.roster-empty .roster-title:empty {
+  display: none !important;
+  padding: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}

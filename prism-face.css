@@ -169,23 +169,23 @@ html body .roster-full {
 html body .roster-empty .roster-title { font-size: 20px !important; }
 html body .hub-next[hidden] { display: none !important; }
 html body #hub-cam-deck.cams-resting {
-  height: auto !important;
-  max-height: none !important;
-  grid-template-columns: 1fr !important;
+  height: 200px !important;
+  max-height: 200px !important;
+  grid-template-columns: repeat(3, minmax(80px, 1fr)) !important;
 }
 html body #hub-cam-deck.cams-resting { overflow: visible !important; }
 html body #hub-cam-deck.cams-resting .hub-cam,
 html body #hub-cam-deck.cams-resting .hub-cam-foot {
-  height: 64px !important;
-  min-height: 64px !important;
-  max-height: none !important;
+  height: 200px !important;
+  min-height: 0 !important;
+  max-height: 200px !important;
 }
 html body #hub-cam-deck.cams-resting .hub-cam-rest {
   display: flex !important;
   align-items: center !important;
-  height: 64px !important;
-  min-height: 64px !important;
-  max-height: none !important;
+  height: 200px !important;
+  min-height: 0 !important;
+  max-height: 200px !important;
   overflow: clip !important;
 }
 html body .hub-lights-bulk {

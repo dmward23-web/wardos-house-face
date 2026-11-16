@@ -103,6 +103,12 @@ with sync_playwright() as p:
     }""")
     assert music["text"] == "Music offline", music
     assert music["display"] != "none" and music["w"] > 8 and music["h"] > 8, music
+    empty = page.evaluate("""() => Array.from(document.querySelectorAll('.roster-title')).filter(el => {
+      const s = getComputedStyle(el);
+      const r = el.getBoundingClientRect();
+      return !(el.textContent || '').trim() && s.display !== 'none' && r.width > 2 && r.height > 2;
+    }).length""")
+    assert empty == 0, "empty roster chips still showing: %s" % empty
     hero = page.evaluate("() => document.querySelector('.hub-window img').getAttribute('src')")
     assert "hub-window-day-900x864" in hero, hero
     ref = page.evaluate(BOXES, SEL)
@@ -150,6 +156,19 @@ with sync_playwright() as p:
     assert card["tx"] >= 48 and card["ty"] >= 48 and card["tright"] <= 1872 and card["tbottom"] <= 1032, card
     assert card["tx"] > card["hx"] + 8, card
     assert card["bg"] not in ("rgba(0, 0, 0, 0)", "transparent"), card
+    cams = page.evaluate("""() => {
+      const line = document.getElementById('hub-offline-line').getBoundingClientRect();
+      return Array.from(document.querySelectorAll('#hub-cam-deck .hub-cam')).map(el => {
+        const r = el.getBoundingClientRect();
+        const overlap = !(r.right <= line.left || line.right <= r.left || r.bottom <= line.top || line.bottom <= r.top);
+        return { x: r.x, y: r.y, w: r.width, h: r.height, overlap };
+      });
+    }""")
+    assert len(cams) == 3, cams
+    assert max(c["y"] for c in cams) - min(c["y"] for c in cams) <= 1, cams  # same top
+    lefts = sorted(c["x"] for c in cams)
+    assert lefts[1] - lefts[0] > 40 and lefts[2] - lefts[1] > 40, cams
+    assert not any(c["overlap"] for c in cams), cams
     page.screenshot(path=str(OUT / "paired-offline-1920.png"))
     ctx.close()
 
