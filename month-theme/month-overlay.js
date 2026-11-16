@@ -30,20 +30,38 @@
     return (S && S.decide) ? S.decide(seasonDate()) : { id: "other", cold: 0, flakes: 0, snow: 0, lit: 0, windows: 0 };
   }
   var spec = specNow();
+  window.WardSunPhase = novPhase;   /* SUNCLOCK1 · the one clock, readable by tests and other layers */
   if (spec.id === "november") { mountNovember(); return; }
   if (spec.id === "december") { mountCoat(spec); return; }
-  function ctHour(d) {
+  /* SUNCLOCK1 · ONE day/night clock for every art layer (hero window, hub wall plate --wg-hubbg, data-nov-phase -> 4 person tiles):
+     Overland Park sunrise/sunset (city center to 0.1 deg: 38.9 N, 94.7 W) for the America/Chicago date, computed here with the standard sunrise equation
+     (NOAA/Meeus low-precision, -0.833 deg horizon; no network). Night = sunset to the next sunrise. Dusk = the last 20 min before
+     sunset (kept short so mid-afternoon stays day); there is no dawn band: at sunrise the board goes straight to morning. */
+  function ctDate(d) {
     try {
-      var p = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", hour: "numeric", hourCycle: "h23" }).formatToParts(d);
-      for (var i = 0; i < p.length; i++) if (p[i].type === "hour") return Number(p[i].value) % 24;
-    } catch (e) { /* local hour */ }
-    return d.getHours();
+      var p = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", year: "numeric", month: "numeric", day: "numeric" }).formatToParts(d), o = {};
+      for (var i = 0; i < p.length; i++) o[p[i].type] = Number(p[i].value);
+      if (o.year && o.month && o.day) return [o.year, o.month, o.day];
+    } catch (e) { /* local date */ }
+    return [d.getFullYear(), d.getMonth() + 1, d.getDate()];
+  }
+  function sunTimes(y, m, day) {
+    var R = Math.PI / 180, lat = 38.9, lon = -94.7;
+    var n = Math.round(Date.UTC(y, m - 1, day, 12) / 864e5 + 2440587.5 - 2451545);
+    var J = n - lon / 360, M = (357.5291 + 0.98560028 * J) % 360;
+    var C = 1.9148 * Math.sin(M * R) + 0.02 * Math.sin(2 * M * R) + 0.0003 * Math.sin(3 * M * R);
+    var lam = (M + C + 180 + 102.9372) % 360;
+    var tr = 2451545 + J + 0.0053 * Math.sin(M * R) - 0.0069 * Math.sin(2 * lam * R);
+    var dec = Math.asin(Math.sin(lam * R) * Math.sin(23.4397 * R));
+    var w = Math.acos((Math.sin(-0.833 * R) - Math.sin(lat * R) * Math.sin(dec)) / (Math.cos(lat * R) * Math.cos(dec))) / R;
+    var ms = function (jd) { return (jd - 2440587.5) * 864e5; };
+    return { rise: ms(tr - w / 360), set: ms(tr + w / 360) };
   }
   function novPhase(d) {
-    var h = ctHour(d);
-    if (h >= 6 && h < 16) return "morning";
-    if (h >= 16 && h < 19) return "dusk";
-    return "night";
+    var c = ctDate(d), s = sunTimes(c[0], c[1], c[2]), t = d.getTime();
+    if (t < s.rise || t >= s.set) return "night";
+    if (t >= s.set - 20 * 60000) return "dusk";
+    return "morning";
   }
   function mountNovember() {
     function go() {
@@ -108,7 +126,7 @@
       }
       var fig = document.querySelector(".hub-window");
       if (fig) {
-        var winPhase = (ctHour(when) >= 16 && ctHour(when) < 19) ? "dusk" : "night";
+        var winPhase = phase === "night" ? "night" : "dusk";   /* SUNCLOCK1 · same clock; the hero has no morning plate, so day shows its dusk plate */
         var img = fig.querySelector("img");
         if (!img) { img = document.createElement("img"); img.alt = ""; fig.appendChild(img); }
         img.src = "month-theme/november/hub-window-" + winPhase + "-900x864.webp";

@@ -506,16 +506,17 @@ function bootOverlay(iso, width, scriptSrc) {
 
 test("November hub plate URL is absolute from the script, so CSS does not double month-theme", () => {
   const src = "http://hub.local/month-theme/month-overlay.js";
-  const wall = bootOverlay("2026-11-08T17:30:00-06:00", 1080, src);
+  /* SUNCLOCK1 · dusk is now the 20 min before the real sunset (Nov 8: 5:11 PM CST), so the dusk probe moved from 5:30 PM (now night) to 5:00 PM; same assertions */
+  const wall = bootOverlay("2026-11-08T17:00:00-06:00", 1080, src);
   assert.equal(wall.props["--km-bg"], 'url("http://hub.local/month-theme/november/wall-dusk.webp")');
-  const phone = bootOverlay("2026-11-08T17:30:00-06:00", 390, src);
+  const phone = bootOverlay("2026-11-08T17:00:00-06:00", 390, src);
   assert.equal(phone.props["--km-bg"], 'url("http://hub.local/month-theme/november/phone-dusk.webp")');
   const night = bootOverlay("2026-11-08T21:00:00-06:00", 1080, src);
   assert.equal(night.props["--km-bg"], 'url("http://hub.local/month-theme/november/wall-night.webp")');
   for (const bg of [wall.props["--km-bg"], phone.props["--km-bg"], night.props["--km-bg"]]) {
     assert.equal(bg.includes("month-theme/month-theme"), false);
   }
-  const living = bootOverlay("2026-11-08T17:30:00-06:00", 390, "http://hub.local/month-theme/month-overlay.js?v=SUNHOME1");
+  const living = bootOverlay("2026-11-08T17:00:00-06:00", 390, "http://hub.local/month-theme/month-overlay.js?v=SUNHOME1");
   assert.equal(living.props["--km-bg"], 'url("http://hub.local/month-theme/november/phone-dusk.webp")');
 });
 
