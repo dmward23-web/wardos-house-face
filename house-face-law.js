@@ -318,9 +318,14 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     return false;
   }
   var SIGNAL_KEY = new RegExp("^(organizer|creator|attendees|conferenceData|extendedProperties|" + "loca" + "tion|eventType)$", "i");
-  /* A title-like string makes a row even if the object also has kids, days or upcomingLeaves. */
+  /* A kid record is a container (today, school, quests, missions, hottest), not an event.
+     Its name field is the child, never an event title. An event row may still title itself with name. */
+  function kidContainer(v) {
+    return !!(v && typeof v === "object" && !Array.isArray(v) && ("today" in v || "school" in v || "quests" in v || "missions" in v || "hottest" in v));
+  }
   function titleLike(v) {
-    if (!v) return false;
+    if (!v || typeof v !== "object" || Array.isArray(v)) return false;
+    if (kidContainer(v)) return false;
     var keys = ["what", "summary", "title", "l", "name", "subject"];
     var i;
     for (i = 0; i < keys.length; i++) if (typeof v[keys[i]] === "string" && v[keys[i]]) return true;
@@ -329,7 +334,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
   function eventSignal(v) {
     if (!v || typeof v !== "object" || Array.isArray(v)) return false;
     if (titleLike(v)) return true;
-    if (v.kids || v.days || v.upcomingLeaves) return false;
+    if (v.kids || v.days || v.upcomingLeaves || kidContainer(v)) return false;
     return !!(v.organizer || v.attendees || v.conferenceData || v.extendedProperties || v.eventType);
   }
   function isoOnly(s) {
@@ -432,6 +437,8 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
   /* Rebuild the row to the allowlist label only, before any page holds the raw strings. */
   function classifyFetched(v, slot) {
     var D = g.HouseEventDisplay;
+    /* A kid container is walked, never classified, even when display is loaded. */
+    if (kidContainer(v)) return undefined;
     if (!eventSignal(v)) return v;
     /* Drop hidden rows, then leave a label-only chip (c + l) for walk so its shape stays. */
     if (rowTherapy(v) || rowCustody(v) || rowDress(v) || boyApptText(sourceOf(v))) return null;
@@ -445,11 +452,19 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     if (use) row._feed = use === "boy" ? "hayes" : use;
     var aud = dadPage() ? "adult" : (use === "boy" ? "hayes" : (use === "ainsley" ? "ainsley" : "shared"));
     var view = D.summarize(row, aud);
-    if (rowTherapy(row) || rowCustody(row) || rowDress(row) || boyApptText(sourceOf(row))) return null;
-    if ((!view || !view.title) && typedAppointment(row)) return null;
-    if ((!view || !view.title) && D.isAppointment && D.isAppointment(row) && (boyApptText(sourceOf(row)) || slotOfRow(row, slot) === "boy")) return null;
-    var raw = faceText(row.summary || row.title || row.what || row.l || row.label || "");
-    var label = (view && view.title === "Appointment") ? "Appointment" : (raw || (view && view.title) || "");
+    var plain = String(row.summary || row.title || row.what || row.l || row.label || "");
+    var faced = faceText(plain);
+    var label = "";
+    if (!view || !view.title) {
+      /* A rejected signal or appointment renders nothing. A glass rewrite still applies.
+         A plain activity the display did not classify (a quest row with its own fields) keeps its cleaned title. */
+      if (typeof D.lockedHide === "function" && D.lockedHide(row, aud)) return null;
+      if (!faced) return null;
+      if (faced === plain && typeof D.isAppointment === "function" && D.isAppointment(row)) return null;
+      label = faced;
+    } else {
+      label = view.title === "Appointment" ? "Appointment" : (faced || view.title);
+    }
     if (!label) return null;
     var next = {
       what: label, title: label, summary: label, label: label, text: label, l: label,

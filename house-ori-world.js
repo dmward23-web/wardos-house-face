@@ -129,7 +129,6 @@
       document.documentElement.classList.add("ori-nogl");
     }
   }
-  mountWorld();
 
   function readFrom() {
     var o = null;
@@ -317,6 +316,7 @@
     };
   }
 
+  function bindWorld() {
   if (world && world.S) {
     document.documentElement.classList.add("ori-gl");
     world.exposure = HOME ? 2.05 : 1.45;
@@ -404,6 +404,17 @@
   } else {
     document.documentElement.classList.add("ori-nogl");
   }
+  }
+  function bootWorld() {
+    mountWorld();
+    bindWorld();
+  }
+  function deferWorld() {
+    function go() { requestAnimationFrame(function () { setTimeout(bootWorld, 0); }); }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go, { once: true });
+    else go();
+  }
+  deferWorld();
 
   /* CSS forest travels with the page even when the painted world is down. */
   if (HOME) {
@@ -1258,10 +1269,7 @@
       document.documentElement.classList.remove("ori-held");
     }
     if (ev.persisted && world) { world.trans = null; try { world.kick(true); } catch (e) {} }
-    if (ev.persisted && !world) {
-      mountWorld();
-      if (!world) document.documentElement.classList.add("ori-nogl");
-    }
+    if (ev.persisted && !world) bootWorld();
   });
 
   function mountMonthAgenda() {

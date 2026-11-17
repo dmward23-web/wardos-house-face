@@ -1261,7 +1261,7 @@ body.theme-ainsley.kw-on .kw-jar-host { left: 30%; bottom: 4%; }
 .cw-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .cw-x { appearance: none; border: 0; background: rgba(255,255,255,0.14); color: inherit; border-radius: 999px; min-width: 40px; min-height: 40px; font-size: 20px; }
 .cw-day { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
-.cw-day li { display: flex; gap: 10px; font-size: 16px; }
+.cw-day li { display: flex; gap: 10px; font-size: 24px; }
 .cw-day li b { min-width: 64px; opacity: 0.85; }
 .cw-lantern.is-sel .cw-orb { width: 46px; height: 46px; box-shadow: 0 0 18px #fff; }
 .cw-lantern.is-sel small { opacity: 1; }

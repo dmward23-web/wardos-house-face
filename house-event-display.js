@@ -529,6 +529,59 @@
     var ing = normalizeIngest(titleBlob(ev));
     return ing.text.replace(/\s+/g, " ").trim();
   }
+  /* Nested strings except id and clock fields. An id may carry a token the title does not. */
+  function signalBlob(ev) {
+    var bag = [];
+    var seen = typeof WeakSet === "function" ? new WeakSet() : null;
+    function walk(v) {
+      if (v == null) return;
+      if (typeof v === "string" || typeof v === "number") { bag.push(String(v)); return; }
+      if (typeof v !== "object") return;
+      if (seen) { if (seen.has(v)) return; seen.add(v); }
+      if (Array.isArray(v)) { for (var i = 0; i < v.length; i++) walk(v[i]); return; }
+      var keys = Object.keys(v);
+      for (var k = 0; k < keys.length; k++) {
+        if (keys[k] === "id" || keys[k].charAt(0) === "_" || /iso$/i.test(keys[k])) continue;
+        walk(v[keys[k]]);
+      }
+    }
+    walk(ev);
+    return bag.join("\n");
+  }
+  function lockedHide(ev, who) {
+    var raw = signalBlob(ev);
+    var prep = prepText(raw);
+    if (HARD.test(prep) || HARD.test(raw)) return true;
+    if (/\b(?:check-?ups?|allerg(?:y|ist)?|dental|ortho|clinic|physical)\b/i.test(prep)) return true;
+    if (who === "adult") return false;
+    if (/\b(?:legal|mediation|attorney|lawyer)\b/i.test(prep) || /\bcourt\b/i.test(prep)) return true;
+    if (new RegExp("\\b" + "cus" + "tody\\b", "i").test(prep)) return true;
+    if (/\b(?:venmo|mortgage|dollars?|bucks|usd)\b/i.test(prep)) return true;
+    if (/\bchild\s+support\b/i.test(prep)) return true;
+    if (/\bdate\s+night\b/i.test(prep) || /\bbar\s+with\b/i.test(prep)) return true;
+    try {
+      if (global.HouseFaceLaw && global.HouseFaceLaw.isCustody && global.HouseFaceLaw.isCustody(raw)) return true;
+    } catch (eSig) { /* law not loaded */ }
+    return false;
+  }
+  /* A shared or kid view may keep a plain activity title. Entity near-misses and extra fields stay hidden. */
+  function plainShow(ev) {
+    var title = plainTitle(ev);
+    if (!title || /[&<>#]/.test(title)) return false;
+    var skip = { what: 1, summary: 1, title: 1, label: 1, text: 1, l: 1, when: 1, time: 1, start: 1, end: 1, startIso: 1, endIso: 1, id: 1, c: 1, kid: 1, allDay: 1 };
+    var extra = false;
+    function walk(v, key, seen) {
+      if (extra || v == null) return;
+      if (typeof v === "string") { if (key && key.charAt(0) !== "_" && !skip[key]) extra = true; return; }
+      if (typeof v !== "object") return;
+      if (seen) { if (seen.has(v)) return; seen.add(v); }
+      if (Array.isArray(v)) { for (var i = 0; i < v.length; i++) walk(v[i], key, seen); return; }
+      var keys = Object.keys(v);
+      for (var k = 0; k < keys.length; k++) walk(v[keys[k]], keys[k], seen);
+    }
+    walk(ev, "", typeof WeakSet === "function" ? new WeakSet() : null);
+    return !extra;
+  }
 
   function summarize(ev, audience) {
     var who = audienceOf(audience);
@@ -554,12 +607,15 @@
         title = "Appointment";
       }
     } else {
-      if (HARD.test(prepText(sourceBlob(ev)))) return null;
+      if (lockedHide(ev, who)) return null;
       title = cannedTitle(ev);
       if (!title) {
-        if (who !== "adult") return null;
-        if (titleHasBoy(ev) || boyNamed(ev)) return null;
-        title = plainTitle(ev);
+        if (who === "adult") {
+          if (titleHasBoy(ev) || boyNamed(ev)) return null;
+          title = plainTitle(ev);
+        } else if (plainShow(ev) && !lockedHide(ev, who)) {
+          title = plainTitle(ev);
+        } else return null;
       }
       if (!title) return null;
     }
@@ -678,6 +734,7 @@
     keepAppointment: keepAppointment,
     timeLabel: timeLabel,
     summarize: summarize,
+    lockedHide: lockedHide,
     LABELS: ["School pickup", "School drop", "Leave for swim", "Swim", "Leave for soccer", "Soccer", "Leave for baseball", "Baseball", "Leave for flag", "Flag", "School specials", "No school", "Field trip", "Art club", "Conference", "Picture day", "Homework", "Choir", "Raffle", "Book order", "Donation", "HOA", "Nothing else today", "More on the month calendar", "Appointment"],
     scrubPayload: scrubPayload,
     scrubKid: scrubKid,

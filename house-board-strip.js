@@ -139,9 +139,8 @@
     var summary = typeof ev === "string" ? ev : String((ev && (ev.summary || ev.place || ev.what)) || "");
     var D = global.HouseEventDisplay;
     if (D && typeof D.summarize === "function") {
-      var path = "";
-      try { path = String(global.location && global.location.pathname || ""); } catch (ePath) { path = ""; }
-      var who = /sheet-dan\.html/.test(path) ? "adult" : "shared";
+      /* The page sets WardosAudience (sheet-dan.html sets "adult"). The strip does not read the URL. */
+      var who = global.WardosAudience || "shared";
       var event = typeof ev === "string" ? { summary: ev, title: ev, what: ev } : ev;
       if (event && !event.summary && summary) { event.summary = summary; event.title = event.title || summary; event.what = event.what || summary; }
       var view = D.summarize(event, who);
@@ -886,7 +885,7 @@
     ".lb-day-stop:first-of-type{border-top:0}",
     ".lb-day-t{font-size:20px;font-weight:900;letter-spacing:-.04em;line-height:1;color:#f2eee6}",
     ".lb-day-stop.is-next .lb-day-t{color:#ffe080;text-shadow:0 0 16px rgba(255,180,30,.5)}",
-    ".lb-day-what{font-size:12px;font-weight:700;color:#e8e2d6;line-height:1.2;margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}",
+    ".lb-day-what{font-size:24px;font-weight:700;color:#e8e2d6;line-height:1.2;margin-top:2px;overflow:hidden;display:block}",
     ".lb-day-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}",
     ".lb-day-tag{font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:1px 5px;border-radius:6px;background:rgba(255,255,255,.1);color:#f2eee6}",
     ".lb-day-tag[data-who=Ainsley]{background:rgba(236,72,153,.28);color:#ffd1e8}",
@@ -895,9 +894,9 @@
     ".lb-day-tag[data-who=Dan]{background:rgba(255,224,128,.18);color:#ffe9a8}",
     ".lb-day-prep{font-size:10px;color:#bdb6a8;margin-top:2px}",
     ".lb-day-none{font-size:11px;color:#8d877c;padding:4px 0}",
-    ".lb-day-tmr{display:flex;flex-wrap:wrap;align-items:center;gap:5px;font-size:11px;color:#d8d2c6}",
-    ".lb-day-tmr b{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#ffe080;margin-right:2px}",
-    ".lb-day-tchip{background:rgba(255,255,255,.06);border-radius:8px;padding:2px 7px;white-space:nowrap}",
+    ".lb-day-tmr{display:flex;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:8px;font-size:24px;color:#d8d2c6}",
+    ".lb-day-tmr b{font-size:24px;letter-spacing:.12em;text-transform:uppercase;color:#ffe080;margin-right:2px}",
+    ".lb-day-tchip{display:block;background:rgba(255,255,255,.06);border-radius:8px;padding:2px 7px;font-size:24px;line-height:1.2}",
     ".lb-day-tchip strong{color:#f2eee6;margin-right:4px}"
   ].join("\n");
 

@@ -89,7 +89,8 @@ PROBE = """() => {
     schedule: !!(days && vis(days) && dr && dr.height >= 32 && dr.bottom <= 1080),
     scheduleText: days ? (days.innerText || "").replace(/\\s+/g, " ").trim().slice(0, 80) : "",
     contrast: Math.round(ratio * 100) / 100,
-    prism: !!(link && link.sheet)
+    prism: !!(link && link.sheet),
+    rows: [...document.querySelectorAll("[data-mount-quests] > *, [data-mount-today-events] > *, [data-mount-school] > *, [data-mount-consume-ahead] > *, .kf-row, .cw-day li")].filter(vis).length
   };
 }"""
 out = {}

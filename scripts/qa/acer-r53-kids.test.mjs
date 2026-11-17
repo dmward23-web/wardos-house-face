@@ -20,5 +20,6 @@ test("r53 kid boards render inside the wall with prism", { skip: browser ? false
     assert.equal(row.saves, true, name + " saves");
     assert.equal(row.schedule, true, name + " schedule " + row.scheduleText);
     assert.ok(row.contrast >= 4.5, name + " contrast " + row.contrast);
+    assert.ok(row.rows > 0, name + " rendered no activity rows");
   }
 });

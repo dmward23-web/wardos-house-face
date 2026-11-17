@@ -34,5 +34,6 @@ test("r54 a restored page remounts the world or marks ori-nogl", () => {
   const src = fs.readFileSync(path.join(ROOT, "house-ori-world.js"), "utf8");
   assert.match(src, /function mountWorld\(\)/);
   assert.match(src, /pagehide[\s\S]{0,500}world\.destroy\(\)/);
-  assert.match(src, /if \(ev\.persisted && !world\) \{\s*mountWorld\(\);\s*if \(!world\) document\.documentElement\.classList\.add\("ori-nogl"\);/);
+  assert.match(src, /if \(ev\.persisted && !world\) bootWorld\(\);/);
+  assert.match(src, /function bootWorld\(\) \{\s*mountWorld\(\);\s*bindWorld\(\);/);
 });

@@ -647,6 +647,12 @@ html body .kf-mt {
   white-space: normal !important;
   max-width: 100% !important;
 }
+html body .kf-md,
+html body .lb-day-what,
+html body .lb-day-tchip,
+html body .cw-day li { font-size: 24px !important; }
+html body .lb-day-tmr { display: flex !important; flex-direction: column !important; flex-wrap: nowrap !important; align-items: stretch !important; }
+html body .lb-day-tchip { display: block !important; }
 html body .panel > header.hdr {
   background: transparent !important;
   background-image: none !important;
