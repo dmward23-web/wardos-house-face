@@ -51,6 +51,55 @@
       show(document.querySelector("[data-today-kid-when='" + id + "']"), times.join(" · "));
       showLines(document.querySelector("[data-today-kid-what='" + id + "']"), whats);
     });
+    fitKidLines();
+    setTimeout(fitKidLines, 60);
+    setTimeout(fitKidLines, 400);
+  }
+  function fitKidLines() {
+    document.querySelectorAll(".kid-card").forEach(function (card) {
+      var host = card.querySelector(".kid-what");
+      if (!host) return;
+      var old = host.querySelector(".kid-more");
+      if (old) old.remove();
+      var lines = [].slice.call(host.querySelectorAll(".kid-what-line"));
+      lines.forEach(function (line) { line.style.removeProperty("display"); });
+      var limit = card.getBoundingClientRect().bottom - 4;
+      function past(el) {
+        var r = el.getBoundingClientRect();
+        return r.height > 1 && r.bottom > limit + 0.5;
+      }
+      var hidden = 0;
+      var guard = 0;
+      while (guard < 40) {
+        guard += 1;
+        var bad = null;
+        for (var i = 0; i < lines.length; i++) {
+          if (lines[i].style.display === "none") continue;
+          if (past(lines[i])) bad = lines[i];
+        }
+        if (!bad) break;
+        bad.style.setProperty("display", "none", "important");
+        hidden += 1;
+      }
+      if (!hidden) return;
+      var cue = document.createElement("div");
+      cue.className = "kid-what-line kid-more";
+      cue.textContent = "+" + hidden + " more";
+      host.appendChild(cue);
+      guard = 0;
+      while (past(cue) && guard < 20) {
+        guard += 1;
+        var last = null;
+        for (var j = lines.length - 1; j >= 0; j--) {
+          if (lines[j].style.display !== "none") { last = lines[j]; break; }
+        }
+        if (!last) { cue.style.setProperty("display", "none", "important"); break; }
+        last.style.setProperty("display", "none", "important");
+        hidden += 1;
+        cue.textContent = "+" + hidden + " more";
+        cue.style.removeProperty("display");
+      }
+    });
   }
   function load() {
     if (typeof fetch !== "function") return;

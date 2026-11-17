@@ -32,5 +32,13 @@ test("r59 hub, Today and kid strips are 24px, one line each, inside the safe are
     assert.equal(raw.day.gridHidden, true, JSON.stringify(raw.day));
     assert.equal(raw.day.hit, true, JSON.stringify(raw.day));
     assert.ok(raw.day.bottom <= 1032 && raw.day.top >= 48, JSON.stringify(raw.day));
+    const tiles = raw.tiles || {};
+    const clockOf = (text) => {
+      const m = String(text || "").match(/\d{1,2}:\d{2}/g) || [];
+      return m[0] || "";
+    };
+    const times = ["hayes", "ainsley", "harris"].map((id) => clockOf(tiles[id]));
+    assert.ok(times.every((t) => t), "tile times " + JSON.stringify(tiles));
+    assert.equal(new Set(times).size, 3, JSON.stringify(times));
   }
 });
