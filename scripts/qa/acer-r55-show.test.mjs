@@ -73,13 +73,26 @@ test("r55 the hub shows allowed rows and hides dentist, doctor, therapy, legal a
 
 const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
 
-test("r55 hub and kid strips are at least 24px with one event per line", { skip: browser ? false : "SKIP no playwright" }, () => {
+function assertStrip() {
   const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/acer_r55_type.py")], { encoding: "utf8", timeout: 120000 });
   assert.equal(r.status, 0, (r.stderr || "").slice(-600) + (r.stdout || "").slice(-400));
   const o = JSON.parse(r.stdout.trim().split("\n").pop());
+  assert.ok(o["sheet-today.html"], "Today page was not measured");
   for (const name of Object.keys(o)) {
     const row = o[name];
     for (const sample of row.fonts) assert.ok(sample.px >= 24, name + " " + sample.sel + " " + sample.px);
     assert.equal(row.sharedLine, false, name + " two events share a line " + JSON.stringify(row.lines));
   }
+  return o;
+}
+
+test("r55 hub and kid strips are at least 24px with one event per line", { skip: browser ? false : "SKIP no playwright" }, () => {
+  assertStrip();
+});
+
+test("r57 the Today page is 24px with one event per line", { skip: browser ? false : "SKIP no playwright" }, () => {
+  const o = assertStrip();
+  const today = o["sheet-today.html"];
+  assert.ok(today.fonts.some((sample) => sample.sel === "#r55-today .kid-what-line" && sample.px >= 24));
+  assert.equal(today.sharedLine, false);
 });

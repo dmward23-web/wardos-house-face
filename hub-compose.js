@@ -52,6 +52,7 @@
     rowsOf(kid).forEach(function (row) {
       var view = viewOf(row, audience);
       if (!view || !view.title) return;
+      if (/nothing next|nothing else/i.test(view.title)) return;
       if (leaveOnly && !LEAVE[view.title]) return;
       var ms = Date.parse(row.startIso || row.start || "");
       if (!isFinite(ms) || ms < now - 60 * 1000) return;

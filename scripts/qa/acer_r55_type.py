@@ -42,13 +42,14 @@ PROBE = r"""() => {
     '<div class="lb-day-tmr" id="r55-tmr"><span class="lb-day-tchip">9:00 Soccer</span><span class="lb-day-tchip">10:00 Art club</span></div>' +
     '<div class="lb-day-what" id="r55-what">Skate City Night</div>' +
     '<div class="kf-row"><span class="kf-md" id="r55-md">Friends Club</span></div>' +
-    '<ul class="cw-day" id="r55-day"><li>6:00 Skate City Night</li><li>7:00 basketball</li></ul>');
+    '<ul class="cw-day" id="r55-day"><li>6:00 Skate City Night</li><li>7:00 basketball</li></ul>' +
+    '<div class="kid-what" id="r55-today"><div class="kid-what-line">Picture day</div><div class="kid-what-line">Soccer</div></div>');
   const px = (sel) => {
     const el = document.querySelector(sel);
     if (!el) return null;
     return { sel: sel, px: parseFloat(getComputedStyle(el).fontSize) };
   };
-  const fonts = ["#r55-what", "#r55-md", "#r55-tmr .lb-day-tchip", "#r55-day li"].map(px).filter(Boolean);
+  const fonts = ["#r55-what", "#r55-md", "#r55-tmr .lb-day-tchip", "#r55-day li", "#r55-today .kid-what-line"].map(px).filter(Boolean);
   const chips = [...document.querySelectorAll("#r55-tmr .lb-day-tchip")].map((el) => {
     const r = el.getClientRects();
     return { n: r.length, top: r.length ? r[0].top : 0, bottom: r.length ? r[r.length - 1].bottom : 0 };
@@ -58,12 +59,21 @@ PROBE = r"""() => {
     const overlap = Math.min(chips[0].bottom, chips[1].bottom) - Math.max(chips[0].top, chips[1].top);
     shared = overlap > 4;
   } else shared = true;
-  return { fonts: fonts, sharedLine: shared, lines: chips };
+  const todays = [...document.querySelectorAll("#r55-today .kid-what-line")].map((el) => {
+    const r = el.getClientRects();
+    return { n: r.length, top: r.length ? r[0].top : 0, bottom: r.length ? r[r.length - 1].bottom : 0 };
+  });
+  let todayShared = todays.length !== 2;
+  if (todays.length === 2) {
+    const overlap = Math.min(todays[0].bottom, todays[1].bottom) - Math.max(todays[0].top, todays[1].top);
+    todayShared = overlap > 4;
+  }
+  return { fonts: fonts, sharedLine: shared || todayShared, lines: chips, today: todays };
 }"""
 out = {}
 with sync_playwright() as p:
     browser = p.chromium.launch(**launch_kw(p, headless=True))
-    for name in ["sheet-index.html", "kid-hayes.html", "kid-harris.html", "kid-ainsley.html"]:
+    for name in ["sheet-index.html", "sheet-today.html", "kid-hayes.html", "kid-harris.html", "kid-ainsley.html"]:
         ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
         page = ctx.new_page()
         page.goto(base + name, wait_until="domcontentloaded", timeout=20000)

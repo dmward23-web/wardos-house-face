@@ -434,6 +434,31 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     if (!o.what && !o.summary && !o.title && !o.l) return null;
     return o;
   }
+  /* Display missing or throwing: appointment, legal, mediation, and probe rows render nothing. */
+  function lawSignal(v) {
+    var bag = [];
+    var seen = typeof WeakSet === "function" ? new WeakSet() : null;
+    function walk(o) {
+      if (o == null) return;
+      if (typeof o === "string" || typeof o === "number") { bag.push(String(o)); return; }
+      if (typeof o !== "object") return;
+      if (seen) { if (seen.has(o)) return; seen.add(o); }
+      if (Array.isArray(o)) { for (var i = 0; i < o.length; i++) walk(o[i]); return; }
+      var ks = Object.keys(o);
+      for (var n = 0; n < ks.length; n++) {
+        if (ks[n] === "id" || ks[n].charAt(0) === "_" || /iso$/i.test(ks[n])) continue;
+        walk(o[ks[n]]);
+      }
+    }
+    walk(v);
+    var raw = bag.join("\n");
+    if (isTherapy(raw) || rowTherapy(v)) return true;
+    if (/\b(?:legal|mediation|attorney|lawyer)\b/i.test(raw) || /\bcourt\b/i.test(raw)) return true;
+    if (/\b(?:appointments?|sessions?|check-?ups?)\b/i.test(raw)) return true;
+    if (/\bH4\b/i.test(raw) && /\bcheck/i.test(raw)) return true;
+    if (new RegExp("\\b" + "cus" + "tody\\b", "i").test(raw)) return true;
+    return false;
+  }
   /* Rebuild the row to the allowlist label only, before any page holds the raw strings. */
   function classifyFetched(v, slot) {
     var D = g.HouseEventDisplay;
@@ -443,15 +468,17 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     /* Drop hidden rows, then leave a label-only chip (c + l) for walk so its shape stays. */
     if (rowTherapy(v) || rowCustody(v) || rowDress(v) || boyApptText(sourceOf(v))) return null;
     if (!v.summary && !v.title && !v.what && !v.name && !v.subject) return undefined;
-    /* No display script: undefined means walk the strings so moneyFree still runs. */
-    if (!D || typeof D.summarize !== "function") return undefined;
+    /* No display script: a signal row fails closed. Ordinary titles still walk so face text runs. */
+    if (!D || typeof D.summarize !== "function") return lawSignal(v) ? null : undefined;
     var row = {};
     var ks = Object.keys(v);
     for (var i = 0; i < ks.length; i++) row[ks[i]] = v[ks[i]];
     var use = slotOfRow(v, slot);
     if (use) row._feed = use === "boy" ? "hayes" : use;
     var aud = dadPage() ? "adult" : (use === "boy" ? "hayes" : (use === "ainsley" ? "ainsley" : "shared"));
-    var view = D.summarize(row, aud);
+    var view = null;
+    try { view = D.summarize(row, aud); }
+    catch (eSum) { return lawSignal(row) ? null : undefined; }
     var plain = String(row.summary || row.title || row.what || row.l || row.label || "");
     var faced = faceText(plain);
     var label = "";

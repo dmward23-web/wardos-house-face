@@ -476,8 +476,19 @@
     return rs != null && sm != null && rs !== sm;
   }
 
+  /* One title. Real rows fill summary, title, and what with the same words; joining them paints the line three times. */
+  function firstTitle(ev) {
+    if (!ev || typeof ev !== "object") return nfkc(textOf(ev));
+    var keys = ["summary", "title", "what", "label", "text", "l"];
+    var i, raw;
+    for (i = 0; i < keys.length; i++) {
+      raw = ev[keys[i]];
+      if (typeof raw === "string" && raw.replace(/^\s+|\s+$/g, "")) return nfkc(raw);
+    }
+    return "";
+  }
   function cannedTitle(ev) {
-    var text = titleBlob(ev);
+    var text = firstTitle(ev);
     var kind = kindBlob(ev);
     if (CANCEL.test(text)) return null;
     var leave = isLeave(ev, text);
@@ -526,7 +537,7 @@
   }
 
   function plainTitle(ev) {
-    var ing = normalizeIngest(titleBlob(ev));
+    var ing = normalizeIngest(firstTitle(ev));
     return ing.text.replace(/\s+/g, " ").trim();
   }
   /* Nested strings except id and clock fields. An id may carry a token the title does not. */
@@ -568,7 +579,7 @@
   function plainShow(ev) {
     var title = plainTitle(ev);
     if (!title || /[&<>#]/.test(title)) return false;
-    var skip = { what: 1, summary: 1, title: 1, label: 1, text: 1, l: 1, when: 1, time: 1, start: 1, end: 1, startIso: 1, endIso: 1, id: 1, c: 1, kid: 1, allDay: 1 };
+    var skip = { what: 1, summary: 1, title: 1, label: 1, text: 1, l: 1, when: 1, time: 1, start: 1, end: 1, startIso: 1, endIso: 1, id: 1, c: 1, kid: 1, allDay: 1, location: 1, description: 1, place: 1, hint: 1, detail: 1, blurb: 1, kind: 1, tone: 1, status: 1, color: 1, colour: 1, theme: 1, badge: 1, whenLabel: 1, type: 1, category: 1, eventType: 1, cadence: 1 };
     var extra = false;
     function walk(v, key, seen) {
       if (extra || v == null) return;

@@ -558,10 +558,11 @@ body.kw-on #tapsync-badge { display: none !important; }
   html.kw-root body.kw-on .kw-drawer,
   html.kw-root body.kw-on .kw-week-empty,
   html.kw-root body.kw-on .kw-week,
-  html.kw-root body.kw-on [data-mount-consume-ahead],
   html.kw-root body.kw-on .consume-ahead-empty,
   html.kw-root body.kw-on .consume-hero-meta { display: none !important; }
-  html.kw-root body.kw-on #sec-days > :not(.consume-hero):not(.sec-hdr):not(.kw-offline) { display: none !important; }
+  html.kw-root body.kw-on #sec-days > :not(.consume-hero):not(.sec-hdr):not(.kw-offline):not(.consume-ahead) { display: none !important; }
+  html.kw-root body.kw-on #sec-days > .consume-ahead,
+  html.kw-root body.kw-on .consume-ahead-what { display: block !important; font-size: 24px !important; line-height: 1.2 !important; }
   body.theme-ainsley .sec-schedule::after { content: none !important; display: none !important; }
   html.kw-root body.kw-on .kw-canvas {
     position: fixed !important;
@@ -953,7 +954,7 @@ body.kw-on #tapsync-badge { display: none !important; }
     padding: 0 !important;
     letter-spacing: 0 !important;
   }
-  html.kw-root body.kw-on #sec-days:not(:has(.consume-hero.empty)) > :not(.sec-hdr):not(.consume-hero):not(.kw-offline) { display: none !important; }
+  html.kw-root body.kw-on #sec-days:not(:has(.consume-hero.empty)) > :not(.sec-hdr):not(.consume-hero):not(.kw-offline):not(.consume-ahead) { display: none !important; }
   html.kw-root body.kw-on #sec-days > .kw-offline {
     display: flex !important;
     align-items: center !important;

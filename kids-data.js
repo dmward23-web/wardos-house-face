@@ -2057,6 +2057,9 @@
     return out;
   }
 
+  function emptyNext(title) {
+    return /nothing next|nothing else/i.test(String(title || ""));
+  }
   function consumePickNext(data, kidId, kid) {
     var now = Date.now();
     var queue = consumeQueueForKid(data, kidId);
@@ -2079,11 +2082,13 @@
         }
         if (hasUniqueLater && start && start > now + 45 * 60 * 1000) continue;
       }
+      var qTitle = kidsSafeGlass(it.place || shortConsumeTitle(it.summary) || "Next up");
+      if (emptyNext(qTitle)) continue;
       return {
         whenLabel: (it.badge ? String(it.badge).toUpperCase() : "") + (it.time ? (" · " + it.time) : ""),
         time: it.time || "",
         badge: it.badge || "",
-        title: kidsSafeGlass(it.place || shortConsumeTitle(it.summary) || "Next up"),
+        title: qTitle,
         summary: kidsSafeGlass(it.summary || ""),
         startIso: it.startIso || "",
         endIso: it.endIso || "",
@@ -2095,6 +2100,7 @@
     var events = consumeCollectEvents(kid).filter(function (e) { return !consumeIsHq(e); });
     var unique = events.filter(function (e) { return !consumeIsRoutine(e); });
     if (unique.length) events = unique;
+    events = events.filter(function (e) { return !emptyNext(e.what); });
     if (events.length) {
       var e0 = events[0];
       var p = consumeParseWhen(e0.when);
@@ -2110,7 +2116,7 @@
         source: "kid"
       };
     }
-    if (kid.hottest) {
+    if (kid.hottest && !emptyNext(kid.hottest.what)) {
       return {
         whenLabel: String(kid.hottest.when || ""),
         time: "",
