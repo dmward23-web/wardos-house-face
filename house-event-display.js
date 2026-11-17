@@ -397,7 +397,6 @@
     if (isBoy(audience) || isBoy(ev.kid) || isBoy(ev.owner) || isBoy(ev.kidId)) {
       if (SOFT.test(blob) || SOFT.test(prepText(blob))) return true;
     }
-    if (boyNamed(ev) && !cannedTitle(ev)) return true;
     return false;
   }
 

@@ -73,14 +73,6 @@ async def once(browser, url):
         if any(bit in req.url for bit in ASSETS):
             failed.append(req.url.split("/")[-1])
     page.on("requestfailed", on_fail)
-    async def route(route):
-        req = route.request
-        u = req.url
-        if req.resource_type == "document" or any(bit in u for bit in ASSETS):
-            await route.continue_()
-        else:
-            await route.abort()
-    await page.route("**/*", route)
     ok = False
     err = ""
     try:
@@ -105,9 +97,6 @@ async def once(browser, url):
     return (ok and not failed), err, failed[:2]
 
 async def one(browser, url):
-    ok, err, failed = await once(browser, url)
-    if ok:
-        return True
     ok, err, failed = await once(browser, url)
     if not ok:
         print("miss %s %s %s" % (url.rsplit("/", 1)[-1], err, failed), flush=True)

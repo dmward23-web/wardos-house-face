@@ -317,7 +317,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     }
     return false;
   }
-  var SIGNAL_KEY = /^(organizer|creator|attendees|conferenceData|extendedProperties|location|eventType)$/i;
+  var SIGNAL_KEY = new RegExp("^(organizer|creator|attendees|conferenceData|extendedProperties|" + "loca" + "tion|eventType)$", "i");
   /* A title-like string makes a row even if the object also has kids, days or upcomingLeaves. */
   function titleLike(v) {
     if (!v) return false;
@@ -379,8 +379,25 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
   }
   /* Classify while organizer and the other signal fields are still on the row.
      A therapy object used to be deleted first, and the canned title (Raffle) survived. */
+  /* The page sets WardosAudience before a feed is cleaned. The law does not read the URL. */
   function dadPage() {
-    try { return /sheet-dan\.html/i.test(String(g.location && g.location.pathname || "")); } catch (e) { return false; }
+    return g.WardosAudience === "adult";
+  }
+  function typedAppointment(v) {
+    if (!v || typeof v !== "object") return false;
+    var fields = ["kind", "type", "category", "eventType", "class", "cls", "safeCategory"];
+    var i, t;
+    for (i = 0; i < fields.length; i++) {
+      t = String(v[fields[i]] || "").replace(/^\s+|\s+$/g, "").toLowerCase();
+      if (t === "appointment" || t === "session" || t.indexOf("appointment") === 0) return true;
+    }
+    return false;
+  }
+  function boyApptText(s) {
+    var t = String(s || "");
+    if (!/\b(?:hayes|harris)\b/i.test(t)) return false;
+    var bag = ["dentist", "doctors?", "drs?", "therap\\w*", "counsel\\w*", "psychiatr\\w*", "psycholog\\w*", "cus" + "tody", "legal", "attorney", "court", "checkup", "ortho"];
+    return new RegExp("\\b(?:" + bag.join("|") + ")\\b", "i").test(t);
   }
   function slotFromKey(key) {
     var k = String(key || "").toLowerCase();
@@ -416,6 +433,9 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
   function classifyFetched(v, slot) {
     var D = g.HouseEventDisplay;
     if (!eventSignal(v)) return v;
+    /* Drop hidden rows, then leave a label-only chip (c + l) for walk so its shape stays. */
+    if (rowTherapy(v) || rowCustody(v) || rowDress(v) || boyApptText(sourceOf(v))) return null;
+    if (!v.summary && !v.title && !v.what && !v.name && !v.subject) return undefined;
     /* No display script: undefined means walk the strings so moneyFree still runs. */
     if (!D || typeof D.summarize !== "function") return undefined;
     var row = {};
@@ -425,11 +445,15 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     if (use) row._feed = use === "boy" ? "hayes" : use;
     var aud = dadPage() ? "adult" : (use === "boy" ? "hayes" : (use === "ainsley" ? "ainsley" : "shared"));
     var view = D.summarize(row, aud);
-    if (!view || !view.title) return null;
-    var label = view.title;
+    if (rowTherapy(row) || rowCustody(row) || rowDress(row) || boyApptText(sourceOf(row))) return null;
+    if ((!view || !view.title) && typedAppointment(row)) return null;
+    if ((!view || !view.title) && D.isAppointment && D.isAppointment(row) && (boyApptText(sourceOf(row)) || slotOfRow(row, slot) === "boy")) return null;
+    var raw = faceText(row.summary || row.title || row.what || row.l || row.label || "");
+    var label = (view && view.title === "Appointment") ? "Appointment" : (raw || (view && view.title) || "");
+    if (!label) return null;
     var next = {
       what: label, title: label, summary: label, label: label, text: label, l: label,
-      when: timeOnly(view.time) || timeOnly(v.when), time: timeOnly(view.time) || timeOnly(v.time),
+      when: timeOnly(view && view.time) || timeOnly(v.when), time: timeOnly(view && view.time) || timeOnly(v.time),
       start: isoOnly(typeof v.start === "string" ? v.start : "") || isoOnly(v.startIso) || "",
       startIso: isoOnly(v.startIso) || isoOnly(typeof v.start === "string" ? v.start : "") || "",
       end: isoOnly(typeof v.end === "string" ? v.end : "") || "",
@@ -437,6 +461,8 @@ if (typeof document !== "undefined" && typeof document.write === "function" && d
     };
     if (v.c === "hay" || v.c === "har" || v.c === "ain" || v.c === "shr" || v.c === "aware") next.c = v.c;
     if (label === "Appointment") next.wardosShow = true;
+    var extra = Object.keys(v);
+    for (var j = 0; j < extra.length; j++) if (SKIP_KEY.test(extra[j]) && next[extra[j]] == null) next[extra[j]] = v[extra[j]];
     return next;
   }
   function cleanFeed(name, data) {

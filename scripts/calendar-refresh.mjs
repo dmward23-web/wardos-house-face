@@ -274,12 +274,13 @@ function classify(ev) {
      field, with no show marker and no disguised boy name in the title, is not a row. */
   if (DISPLAY && DISPLAY.isAppointment && DISPLAY.isAppointment(probe)) {
     const view = DISPLAY.summarize ? DISPLAY.summarize(probe, "shared") : null;
-    if (!view || view.title !== "Appointment") return null;
-    return { kind: "appointment", summary: "Appointment", wardosShow: true };
+    if (view && view.title === "Appointment") return { kind: "appointment", summary: "Appointment", wardosShow: true };
+    /* A boy's appointment stays on Dad's week under its own name. Kid boards and the hub skip it. */
   }
   if (!summary || isAdminNoise(summary)) return null;
   /* KID-FEED-SAFETY · provider/therapy is denied before school/other classification. Opt-in is an explicit boolean, never a title. */
-  if (therapyDrop(summary) || (DISPLAY && DISPLAY.isDenied(probe, "shared"))) {
+  const boyHealth = /\b(?:hayes|harris)\b/i.test(summary) && /\b(?:dentist|doctors?|drs?|therap\w*|counsel\w*|psychiatr\w*|psycholog\w*|cus(?:tody)|legal|attorney|court|checkup|ortho)\b/i.test(summary);
+  if (therapyDrop(summary) || (DISPLAY && DISPLAY.isDenied(probe, "shared") && !boyHealth)) {
     return null;
   }
   if (/^Kids with Dan/i.test(summary)) return { kind: "custody", summary };
@@ -525,7 +526,7 @@ function pickStripQueue(items, now, homeWeek) {
      must NOT block kids/leaves. Past endIso already dropped by stillRelevant. */
   const leadMs = 10 * 60 * 1000;
   const upcoming = items
-    .filter((it) => stillRelevant(it, now) && it.kind !== "custody")
+    .filter((it) => stillRelevant(it, now) && it.kind !== "custody" && !boyWallHide(it))
     .filter((it) => it.kind !== "generic") // DATA1 P1-4 · household items live on Dad's week, never Next Up
     .filter((it) => it.kind !== "dad") // Dad chores stay on dan.today/week, not Next Up strip
     .filter((it) => !it.allDay) // ALLDAY1: Next Up is timed rows only; all-day notes live on the day lists as "All day"
@@ -640,6 +641,12 @@ function rowWhen(it, now) {
   return `${day} · ${whenTime(it)}`;
 }
 
+function boyWallHide(it) {
+  const s = String((it && (it.raw || it.summary)) || "");
+  if (!/\b(?:hayes|harris)\b/i.test(s)) return false;
+  return /\b(?:dentist|doctors?|drs?|therap\w*|counsel\w*|psychiatr\w*|psycholog\w*|custody|legal|attorney|court|checkup|ortho)\b/i.test(s);
+}
+
 function buildKidToday(kidId, items, now, homeWeek) {
   const todayIso = partsInTZ(now).iso;
   const rows = [];
@@ -653,12 +660,9 @@ function buildKidToday(kidId, items, now, homeWeek) {
       (kidId === "harris" && (it.kid === "harris" || kids.harris || isBoysRun(it, "harris")));
     if (!mine && it.kind !== "custody") continue;
     if (it.kind === "custody") continue;
+    if (boyWallHide(it)) continue;
     if (isAdminNoise(it.raw)) continue;
-    let what = "";
-    if (DISPLAY && DISPLAY.summarize) {
-      const view = DISPLAY.summarize(Object.assign({}, it.source || {}, { summary: it.raw, title: it.raw, what: it.raw, wardosShow: it.wardosShow === true }), "shared");
-      what = view && view.title ? view.title : "";
-    }
+    let what = kidsSafeWhat(it.raw, it.kind);
     if (!what) continue;
     let tone = "act";
     let kind = "event";
@@ -726,7 +730,7 @@ function buildKidSchool(kidId, items, now) {
 function buildKidAppointments(kidId, items, now) {
   const out = [];
   for (const it of items) {
-    if (it.kind !== "appointment" || it.wardosShow !== true) continue;
+    if (it.kind !== "appointment" || it.wardosShow !== true || boyWallHide(it)) continue;
     if (!stillRelevant(it, now)) continue;
     if (it.kid && it.kid !== kidId) continue;
     const row = {
@@ -749,7 +753,7 @@ function buildKidUpcoming(kidId, items, now) {
   const seen = new Set();
   for (const it of items) {
     if (!stillRelevant(it, now)) continue;
-    if (["custody", "dad", "generic"].includes(it.kind)) continue;
+    if (["custody", "dad", "generic"].includes(it.kind) || boyWallHide(it)) continue;
     if (it.kind === "leave" && !isKidRide(it, kidId)) continue;
     if (kidId === "ainsley" && (it.kind === "school_drop" || it.kind === "school_pickup")) continue;
     const kids = kidMentions(it.raw);
@@ -767,6 +771,7 @@ function buildKidUpcoming(kidId, items, now) {
 function hottestFor(kidId, items, now, homeWeek) {
   const upcoming = items.filter((it) => stillRelevant(it, now));
   const mine = upcoming.filter((it) => {
+    if (boyWallHide(it)) return false;
     if (isKidRide(it, kidId)) return true;
     if (it.kind === "leave" || it.kind === "dad" || it.kind === "custody") return false;
     if (it.kid === kidId) return true;

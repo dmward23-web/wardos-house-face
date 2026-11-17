@@ -787,7 +787,10 @@
       });
     }
     var view = D.summarize(ev, "shared");
-    return view && view.title ? view.title : "";
+    if (view && view.title) return view.title;
+    if (window.HouseFaceLaw && (HouseFaceLaw.isCustody(s) || HouseFaceLaw.isTherapy(s))) return "";
+    if (/\b(?:hayes|harris)\b/i.test(s) && /\b(?:dentist|doctor|therap|counsel|psychiatr|psycholog|checkup|ortho)\b/i.test(s)) return "";
+    return s;
   }
   /* P1FIX B29 · Month is shared glass: a row whose title names a household split never paints here (the shared
      house-face-law.js phrase list, the same one the board test sweeps for); nothing is put in its place. */

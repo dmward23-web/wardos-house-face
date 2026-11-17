@@ -91,7 +91,8 @@
   var world = null;
   var O = window.OriScene;
   /* The phone shows cover-fit painted plates. WebGL's tall crop left a black edge. */
-  if (!phoneLayout && !FORCE_CSS && O && O.World) {
+  function mountWorld() {
+    if (phoneLayout || FORCE_CSS || !O || !O.World) return;
     try {
       world = new O.World(host, {
         plates: "ori/plates/",
@@ -125,8 +126,10 @@
     } catch (err) {
       try { console.info("[house-ori] world failed", err); } catch (e2) {}
       world = null;
+      document.documentElement.classList.add("ori-nogl");
     }
   }
+  mountWorld();
 
   function readFrom() {
     var o = null;
@@ -1255,6 +1258,10 @@
       document.documentElement.classList.remove("ori-held");
     }
     if (ev.persisted && world) { world.trans = null; try { world.kick(true); } catch (e) {} }
+    if (ev.persisted && !world) {
+      mountWorld();
+      if (!world) document.documentElement.classList.add("ori-nogl");
+    }
   });
 
   function mountMonthAgenda() {

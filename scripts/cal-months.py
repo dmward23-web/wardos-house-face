@@ -62,8 +62,11 @@ def allow_labels(pairs):
         "vm.runInContext(fs.readFileSync('house-event-display.js','utf8'), ctx);"
         "const out = body.map((row) => {"
         "  const ev = Object.assign({}, row.event || {}, { summary: row.summary, title: row.summary, what: row.summary });"
-        "  const view = ctx.HouseEventDisplay.summarize(ev, 'shared');"
-        "  return view && view.title ? view.title : '';"
+        "  const s = String(row.summary || '');"
+        "  const boy = /\\b(?:hayes|harris)\\b/i.test(s) && /\\b(?:dentist|doctors?|drs?|therap\\w*|counsel\\w*|psychiatr\\w*|psycholog\\w*|custody|legal|attorney|court|checkup|ortho)\\b/i.test(s);"
+        "  if (boy || /\\b(?:therap\\w*|psychiatr\\w*|psycholog\\w*|counsel\\w*|custody)\\b/i.test(s)) return '';"
+        "  if (ctx.HouseEventDisplay.isDenied && ctx.HouseEventDisplay.isDenied(ev, 'shared') && /\\b(?:therap|psych|counsel|clinic|dentist|doctor)\\b/i.test(s)) return '';"
+        "  return s;"
         "});"
         "process.stdout.write(JSON.stringify(out));"
     )
@@ -178,7 +181,12 @@ for i, (raw, summ, s, e, allday) in ev.items():
     if summ.startswith("Dan") and not DAN_KEEP.search(summ): continue
     if BLOCK.search(summ): continue   # LIVEFIX1 · therapy / provider rows never reach the month board (drop, not fail)
     label = _label_of.get(i) or ""
-    if not label: continue
+    boy_health = bool(re.search(r"\b(?:hayes|harris)\b", summ, re.I) and re.search(r"\b(?:dentist|doctors?|drs?|therap\w*|counsel\w*|psychiatr\w*|psycholog\w*|legal|attorney|court|checkup|ortho)\b", summ, re.I))
+    if not label:
+        if boy_health and not allday and "T" in str(s):
+            d0 = dt.datetime.fromisoformat(s).astimezone(TZ).date()
+            days.setdefault(d0.isoformat(), [])
+        continue
     if BLOCK.search(label): sys.exit(f"HARD FAIL: private term survived scrub in: {label!r}")
     if external_drop(summ) or external_drop(label): continue   # EXTFILTER1: filtered rows never reach the month board
     c = kid(label)

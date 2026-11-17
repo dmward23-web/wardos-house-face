@@ -38,7 +38,10 @@
         var row = ev && typeof ev === "object" ? Object.assign({}, ev) : {};
         row.summary = text; row.title = text; row.what = text;
         var view = D.summarize(row, "shared");
-        return view && view.title ? view.title : "";
+        if (view && view.title) return view.title;
+        if (window.HouseFaceLaw && (HouseFaceLaw.isCustody(text) || HouseFaceLaw.isTherapy(text))) return "";
+        if (/\b(?:hayes|harris)\b/i.test(text) && /\b(?:dentist|doctor|therap|counsel|psychiatr|psycholog|checkup|ortho)\b/i.test(text)) return "";
+        return text;
       }
       return clean(text);
     }
