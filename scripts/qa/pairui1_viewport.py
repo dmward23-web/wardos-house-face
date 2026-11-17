@@ -48,6 +48,7 @@ SNAP = """() => {
       const f = (e, wsel) => { if (!e || !vis(e)) return null; const cs = getComputedStyle(e), wd = e.querySelector(wsel) || e, ws = getComputedStyle(wd);
         return { shadow: cs.boxShadow, bg: cs.backgroundColor, border: cs.borderTopColor + ' ' + cs.borderTopWidth, boxWeight: cs.fontWeight, color: ws.color, weight: ws.fontWeight }; };
       return { lights: f(l, '.hub-lights-pairword-word'), cam: f(c, '.hub-cam-rest-word') }; })(),
+    barAbsent: (() => { const P = document.getElementById('hub-lights-panel'); return !(P && vis(P)); })(),
     panel: (() => { const P = document.getElementById('hub-lights-panel'), g = document.querySelector('.hub-lights-pairword');
       if (!P || !vis(P)) return null; const r = P.getBoundingClientRect(); const q = g && vis(g) ? g.getBoundingClientRect() : null;
       return { w: Math.round(r.width), h: Math.round(r.height), pillH: q ? Math.round(q.height) : 0, pillW: q ? Math.round(q.width) : 0 }; })(),

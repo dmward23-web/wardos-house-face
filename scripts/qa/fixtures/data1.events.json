@@ -135,8 +135,8 @@
 }
 },
 {
-"id": "therapy",
-"summary": "Hayes — therapy session",
+"id": "reading",
+"summary": "Hayes — reading block",
 "start": {
 "dateTime": "2026-10-26T16:00:00-05:00"
 },
@@ -146,7 +146,7 @@
 },
 {
 "id": "ainswim",
-"summary": "Ainsley swim · Coach Ann $15/hr",
+"summary": "Ainsley swim",
 "start": {
 "dateTime": "2026-10-27T16:25:00-05:00"
 },

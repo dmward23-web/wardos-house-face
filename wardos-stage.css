@@ -1,0 +1,125 @@
+/* ACERFIX · the viewport letterboxes one 1920x1080 stage. No min-width on the document. */
+html[data-wardos-stage],
+html[data-wardos-stage] > body {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  max-height: none !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  background-color: #1a140f !important;
+  background-image: url("month-theme/november/wall-dusk.webp") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
+html[data-wardos-stage] body .panel.panel.panel,
+html[data-wardos-stage] .wardos-stage.wardos-stage {
+  background-image: none !important;
+  background-color: transparent !important;
+}
+html[data-wardos-stage] .wardos-stage {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background-color: transparent;
+  background-image: none;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+}
+html[data-wardos-stage] .km-leaf,
+html[data-wardos-stage] .km-glow,
+html[data-wardos-stage] .km-fall,
+html[data-wardos-stage] .float-orbs {
+  display: none !important;
+}
+.wardos-home,
+a.hub-home.wardos-home,
+button.kw-home.wardos-home {
+  z-index: 40;
+  width: 96px;
+  height: 96px;
+  min-width: 96px;
+  min-height: 96px;
+  box-sizing: border-box;
+}
+a.wardos-home {
+  position: absolute;
+  left: 64px;
+  top: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background: #101820;
+  border: 2px solid #f4efe6;
+  border-radius: 16px;
+  text-decoration: none;
+}
+.wardos-home img { width: 64px; height: 64px; display: block; }
+html body .wardos-stage:has(> .chore-shortcuts) header .live-clock-host,
+html body .wardos-stage:has(.chore-shortcuts) header .live-clock-host {
+  position: relative !important;
+  left: 640px !important;
+  margin-left: 0 !important;
+  z-index: 6 !important;
+}
+@media (min-width: 1400px) and (min-height: 700px) {
+  html body .wardos-stage > .panel {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+}
+#wardos-diag {
+  position: absolute;
+  left: 48px;
+  top: 1040px;
+  width: 1824px;
+  height: 40px;
+  z-index: 80;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #101820;
+  color: #f4efe6;
+  border-radius: 12px;
+  font: 18px/1.2 system-ui, sans-serif;
+  overflow: hidden;
+  white-space: nowrap;
+}
+#wardos-diag p { margin: 0; white-space: nowrap; }
+#wardos-diag .wardos-diag-title { font-size: 18px; }
+html body .lh-clocktag.lh-clocktag {
+  position: fixed !important;
+  left: 48px !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: 48px !important;
+  font-size: 18px !important;
+  line-height: 1.2 !important;
+  z-index: 70 !important;
+  max-width: 720px !important;
+}
+.wardos-diag-close {
+  width: 88px;
+  height: 32px;
+  min-width: 88px;
+  min-height: 32px;
+  flex: none;
+  font-size: 18px;
+  color: #f4efe6;
+  background: #1c2430;
+  border: 2px solid #c4b49a;
+  border-radius: 12px;
+}
+.wardos-diag-close:focus-visible {
+  outline: 3px solid #f4efe6;
+  outline-offset: -6px;
+}

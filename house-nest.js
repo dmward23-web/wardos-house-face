@@ -390,12 +390,9 @@
 
     if (bannerSub) {
       if (g.live && g.hasSnaps) {
-        bannerSub.textContent = "Sensi + Nest stills · Elo 3202L";
+        bannerSub.textContent = "Cameras are on";
       } else if (g.live) {
-        bannerSub.textContent =
-          "Sensi live · Nest · " +
-          g.deviceCount +
-          " cameras · tap a pad for video";
+        bannerSub.textContent = "Tap a camera to watch";
       } else {
         bannerSub.textContent =
           "Cameras offline";
@@ -480,12 +477,18 @@
     var proxy = proxyBaseGuess();
     var token = proxyTokenGuess();
     // Pages + loopback/missing proxy → NEED PROXY + still (not silent black).
-    var url = "nest-webrtc.html?cam=" + id + "&v=NESTVID1";
-    /* HUBPIN1 · the viewer finds the camera host itself (HouseHub); no proxy address in the URL */
+    /* The wall stays on this page. A missed camera is one calm line, with no address and no status code. */
+    var note = document.querySelector("[data-cam-calm]");
+    if (!note) {
+      note = document.createElement("div");
+      note.setAttribute("data-cam-calm", "1");
+      note.textContent = "Cameras aren't connected yet.";
+      note.style.cssText = "position:fixed;left:160px;top:176px;right:64px;z-index:30;background:#101820;color:#f4efe6;font-size:32px;line-height:1.3;padding:28px 32px;border-radius:16px";
+      document.body.appendChild(note);
+    }
     try {
       if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap();
     } catch (e) {}
-    location.href = url;
   }
 
   function wirePadClicks(root) {
@@ -535,7 +538,14 @@
     var list = hubCamOrder(cams);
     return i >= 0 && list[i] ? list[i] : null;
   }
-  function hubLabel(slot, cam) { return String((cam && cam.name) || slot.label).slice(0, 40); }
+  function approvedPlace(cam) {
+    var place = String((cam && (cam.place || cam.room)) || "").trim();
+    if (!place) return "";
+    if (/enterprises\/|devices\/|^[A-Za-z0-9:_-]{16,}$/.test(place)) return "";
+    if (place.length > 24) return "";
+    return place;
+  }
+  function hubLabel(slot, cam) { return approvedPlace(cam) || "Camera unavailable"; }
 
   /**
    * Honest ONE status for a hub tile (HUBFMT1 / CAMLIVE2).
@@ -605,7 +615,7 @@
   }
   function hubRestPrivacy(el, label) {
     var lab = el.querySelector(".hub-cam-label");
-    if (lab) lab.textContent = label;
+    if (lab) lab.textContent = label && !/resting/i.test(label) ? label + " \u00b7 resting" : label;
     el.removeAttribute("data-cam-id");
     el.setAttribute("href", "sheet-google-home.html");
     var img = el.querySelector("img.hub-cam-media");
@@ -629,7 +639,9 @@
   function setHubCamResting(el, label, on, why) {
     if (!el) return;
     var doc = el.ownerDocument || document;
-    label = label || el._hubLabel || "Camera";
+    var slotLabel = el._hubSlotLabel || "Camera";
+    var caption = el._hubPlace || slotLabel;
+    label = slotLabel;
     var pill = el.querySelector(".hub-cam-pill");
     var wrap = el.querySelector(".hub-cam-media-wrap");
     var rest = wrap ? wrap.querySelector(".hub-cam-rest") : null;
@@ -665,7 +677,7 @@
         var restWord = why === "pair" ? "Needs pairing" : "Camera resting";
         if (rw && rw.textContent !== restWord) rw.textContent = restWord;
       }
-      hubRestPrivacy(el, label);
+      hubRestPrivacy(el, caption);
     } else {
       var was = el.classList.contains("hub-cam-resting");
       el.classList.remove("hub-cam-resting");
@@ -731,15 +743,12 @@
     if (!deck) return;
     var paired = false;
     try { paired = !!(global.PrivateFeed && PrivateFeed.pairState && PrivateFeed.pairState() === "paired"); } catch (eP) {}
-    if (!paired && /sheet-index\.html$/.test((doc.defaultView || window).location.pathname || "")) {
-      deck.hidden = true;
-      return;
-    }
-    deck.hidden = false;
+    if (!paired && /sheet-index\.html$/.test((doc.defaultView || window).location.pathname || "")) deck.hidden = true;
+    else deck.hidden = false;
     ingestProxyFromLive(cachedData());
     /* NODATA1 · never show broken copy: stale/stub camera tiles hide; the deck hides when none is left.
        CAMREST2 · a resting tile is calm, not broken, so it stays: a whole-feed 5xx/401/offline rests the deck, never hides it */
-    if (!doc.getElementById("nodata1-cams")) { var st = doc.createElement("style"); st.id = "nodata1-cams"; st.textContent = ".hub-cam.hub-cam-stale:not(.hub-cam-resting),.hub-cam.hub-cam-stub:not(.hub-cam-resting){display:none!important}#hub-cam-deck.nodata1-empty{display:none!important}"; (doc.head || doc.documentElement).appendChild(st); }
+    if (!doc.getElementById("nodata1-cams") && !/sheet-index\.html$/.test((doc.defaultView || window).location.pathname || "")) { var st = doc.createElement("style"); st.id = "nodata1-cams"; st.textContent = ".hub-cam.hub-cam-stale:not(.hub-cam-resting),.hub-cam.hub-cam-stub:not(.hub-cam-resting){display:none!important}#hub-cam-deck.nodata1-empty{display:none!important}"; (doc.head || doc.documentElement).appendChild(st); }
     setTimeout(function () { var vis = [].some.call(deck.querySelectorAll(".hub-cam"), function (t) { return getComputedStyle(t).display !== "none"; }); deck.classList.toggle("nodata1-empty", !vis); }, 0);
     var data = cachedData();
     var g = gate(data);
@@ -752,9 +761,11 @@
       if (!el) continue;
       var cam = findCamForHub(slot, cams);
       var realCam = !!(cam && !String(cam.id || "").startsWith("stub-"));
-      el._hubLabel = slot.label;
+      el._hubSlotLabel = slot.label;
+      el._hubPlace = approvedPlace(cam);
+      el._hubLabel = hubLabel(slot, cam);
       el._hubWhy = why;
-      el._hubIdentity = { name: hubLabel(slot, cam), camId: realCam ? cam.id : "", href: realCam ? viewerHref(cam) : "sheet-google-home.html" };
+      el._hubIdentity = { name: (cam && cam.name) || hubLabel(slot, cam), camId: realCam ? cam.id : "", href: realCam ? viewerHref(cam) : "sheet-google-home.html" };
       /* CAMLIVE2 · never clobber a proven LIVE playing tile with STILL on poll */
       if (el._hubLivePlaying && el.classList.contains("hub-cam-live")) {
         if (realCam) {
@@ -840,9 +851,9 @@
          CAMREST3 · a STALE or stub tile rests even when an old picture loaded (State D: paired, hub stale or unreachable) */
       var resting = !showStill || !hubStillOk(img) || el._hubNotStill;
       if (!el._hubLivePlaying) {
-        if (resting) setHubCamResting(el, slot.label, true, why);
+        if (resting) setHubCamResting(el, el._hubLabel, true, why);
         else {
-          setHubCamResting(el, slot.label, false);
+          setHubCamResting(el, el._hubLabel, false);
           el.setAttribute("aria-label", hubLabel(slot, cam) + " camera · " + h.pill);
           hubUnrestIdentity(el);
         }
@@ -868,11 +879,7 @@
   function viewerHref(cam) {
     ingestProxyFromLive(cachedData());
     var id = cam && (cam.id || cam.name) ? encodeURIComponent(cam.id || cam.name) : "";
-    var url = "nest-webrtc.html?cam=" + id + "&v=CAMLIVE2";
-    var proxy = proxyBaseGuess();
-    var token = proxyTokenGuess();
-    /* HUBPIN1 · the viewer finds the camera host itself (HouseHub); no proxy address in the URL */
-    return url;
+    return "sheet-google-home.html";
   }
 
   /* CAMLIVE2 · sessions keyed by cam id — never restart a healthy stream on poll */
@@ -1008,8 +1015,12 @@
     });
   }
 
+  function auditQuiet() {
+    try { return /(?:\?|&)audit=1(?:&|$)/.test(location.search || ""); } catch (eA) { return false; }
+  }
   function startHubLiveStreams(doc) {
     doc = doc || document;
+    if (auditQuiet()) return;
     if (typeof global.NestWebRtc === "undefined" || !global.NestWebRtc.startStream) {
       return; /* client not loaded — stay STILL honestly */
     }
@@ -1052,17 +1063,22 @@
     function onFirstTap(ev) {
       var deck = doc.getElementById("hub-cam-deck");
       var waiting = deck ? deck.querySelectorAll(".hub-cam") : [];
+      var playable = false;
       var any = false;
       for (var k = 0; k < waiting.length; k++) {
         if (!waiting[k]._hubNeedsTap) continue;
         any = true;
         var v = waiting[k].querySelector("video.hub-cam-video");
-        if (v) {
-          v.muted = true;
-          try { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (_) {}
-        }
+        if (v && (hubVideoHasTrack(v) || v.videoWidth > 0)) playable = true;
       }
-      if (!any) return;
+      /* A resting tile has no playable video. Do not call play(), and do not swallow the link. */
+      if (!any || !playable) return;
+      for (var n = 0; n < waiting.length; n++) {
+        var pv = waiting[n].querySelector("video.hub-cam-video");
+        if (!pv || !(hubVideoHasTrack(pv) || pv.videoWidth > 0)) continue;
+        pv.muted = true;
+        try { var pr = pv.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (_) {}
+      }
       /* this tap only starts video; the next tap opens the camera */
       if (ev && deck && deck.contains(ev.target)) {
         ev.preventDefault();
@@ -1107,6 +1123,7 @@
       if (!el || !cam || String(cam.id || "").startsWith("stub-")) {
         return next();
       }
+      if (/(?:\?|&)audit=1(?:&|$)/.test(location.search || "")) return next();
       var deviceId = cam.id;
       if (_hubCamBackoff[deviceId] && Date.now() < _hubCamBackoff[deviceId]) return next();
       var existing = _hubLiveSessions[deviceId];

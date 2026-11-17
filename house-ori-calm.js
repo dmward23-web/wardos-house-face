@@ -39,17 +39,20 @@
     if (u.origin !== location.origin || !/\.html$/.test(u.pathname) || u.pathname === location.pathname) return;
     ev.preventDefault();
     try { sessionStorage.setItem("ori-veil-next", String(Date.now())); } catch (e) {}
+    /* The camera row's tap budget is 300ms. The veil hold below is for the other boards. */
+    if (a.classList.contains("hub-cam")) { leave(u.href); return; }
     var el = document.createElement("div");
     el.className = "ori-iris";
     el.setAttribute("data-calm", "1");
     el.setAttribute("aria-hidden", "true");
-    el.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#062018;opacity:0;pointer-events:none;transition:opacity .2s ease";
+    el.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#062018;opacity:1;pointer-events:none";
     try { document.getAnimations().forEach(function (an) { if (an.playState === "running") { an.pause(); held.push(an); } }); } catch (e) {}
     root.appendChild(el);
     void getComputedStyle(el).opacity;
     el.style.opacity = "1";
     if (root.classList.contains("ori-reduced") || (RMQ && RMQ.matches)) { setTimeout(function () { leave(u.href); }, 0); return; }
-    /* VEILPAUSE1 · leave on the frame after the veil was drawn at opacity >= .9 (and >= 320ms), never later than 1.5s. */
+    /* Opacity is set, not transitioned, so a paused animation cannot pin it at 0.
+       Leave on the frame after it has been painted at >= .9 for 320ms, and never later than 1.5s. */
     var t0 = Date.now(), gone = false, shown = false;
     function go() { if (gone) return; gone = true; leave(u.href); }
     function tick() { if (gone) return; if (shown) return go(); if (Date.now() - t0 >= 320 && (parseFloat(getComputedStyle(el).opacity) || 0) >= 0.9) shown = true; requestAnimationFrame(tick); }

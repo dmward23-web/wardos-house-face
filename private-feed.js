@@ -111,7 +111,15 @@
   /* name: cal-live | cal-months | kids-week → Promise<{data, status:"live"|"stale"|"offline", at}> */
   /* PRIVFEED3 · face law (house-face-law.js, loaded right after this file) on every calendar payload, live or cached */
   var LAW_FEEDS = { "cal-live": 1, "cal-months": 1, "kids-week": 1 };
-  function law(name, d) { try { return (LAW_FEEDS[name] && g.HouseFaceLaw && g.HouseFaceLaw.cleanFeed) ? g.HouseFaceLaw.cleanFeed(name, d) : d; } catch (e) { return d; } }
+  function law(name, d) {
+    try {
+      if (LAW_FEEDS[name]) {
+        if (!(g.HouseFaceLaw && typeof g.HouseFaceLaw.cleanFeed === "function")) return null;
+        return g.HouseFaceLaw.cleanFeed(name, d);
+      }
+    } catch (e) { return LAW_FEEDS[name] ? null : d; }
+    return d;
+  }
   function getJSON(name) {
     /* PRIVFEED3 · a #pair= link is redeemed first (house-pair.js), so the first fetch already carries the new key */
     var wait = (g.HousePairing && g.HousePairing.ready) || Promise.resolve();
@@ -151,6 +159,46 @@
     });
     return namesP;
   }
+  /* R53AR · calendar, lights, and thermostat retry a failed or 5xx/530 read.
+     15s, 30s, 60s, 120s, then 5 min, with a little jitter. A 401 is the pairing
+     state: show it once, do not loop, and do not touch the saved key. */
+  var RETRY_FEEDS = { "cal-live": 1, "lights-live": 1, "sensi-live": 1 };
+  var RETRY_STEPS = [15000, 30000, 60000, 120000, 300000];
+  var retryN = {}, retryT = {};
+  function retryWait(step) {
+    var base = RETRY_STEPS[Math.min(step, RETRY_STEPS.length - 1)];
+    var jitter = Math.round((Math.random() - 0.5) * 0.2 * base);
+    return Math.max(1000, base + jitter);
+  }
+  function deliverFeed(name, data) {
+    retryN[name] = 0;
+    if (retryT[name]) { clearTimeout(retryT[name]); retryT[name] = 0; }
+    try {
+      if (document.querySelector) {
+        var el = document.querySelector('[data-feed="' + name + '"]');
+        var slot = el && el.querySelector ? el.querySelector("[data-feed-value]") : null;
+        var text = data && typeof data.label === "string" ? data.label : "";
+        if (slot && text) slot.textContent = text;
+      }
+    } catch (e) {}
+    try {
+      if (typeof CustomEvent === "function") g.dispatchEvent(new CustomEvent("wardos:feed", { detail: { name: name, data: data } }));
+    } catch (e2) {}
+  }
+  function armFeedRetry(name, err) {
+    if (!RETRY_FEEDS[name]) return;
+    var code = err && err.status ? err.status : 0;
+    if (code === 401) return;
+    if (code && code < 500) return;
+    var step = retryN[name] || 0;
+    retryN[name] = step + 1;
+    if (retryT[name]) clearTimeout(retryT[name]);
+    retryT[name] = setTimeout(function () {
+      retryT[name] = 0;
+      getFeed(name);
+    }, retryWait(step));
+    if (retryT[name] && retryT[name].unref) retryT[name].unref();
+  }
   function getFeed(name) {
     var cacheKey = CACHE + name;
     function fromCache(why) {
@@ -165,15 +213,19 @@
     return hubBase().then(function (b) {
       if (!b) return fromCache("no hub");
       return tfetch(b + "/api/private/" + name + ".json", { cache: "no-store", headers: { "X-Private-Feed-Token": tok }, credentials: "omit", referrerPolicy: "no-referrer" })
-        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .then(function (r) {
+          if (!r.ok) { var err = new Error("HTTP " + r.status); err.status = r.status; throw err; }
+          return r.json();
+        })
         .then(function (d) {
           var at = Date.now();
           if (!noCache(name)) lsSet(cacheKey, JSON.stringify({ at: at, data: d })); /* PFCACHE1 v3 · money feeds never stored */
           purgeMoneyCache();
           note(name, "live", at);
+          deliverFeed(name, d);
           return { data: d, status: "live", at: at };
         })
-        .catch(function (e) { return fromCache(String(e && e.message || e)); });
+        .catch(function (e) { armFeedRetry(name, e); return fromCache(String(e && e.message || e)); });
     });
   }
 
@@ -257,6 +309,11 @@
   function paintPairing() {
     var root = document.documentElement, ps = pairState();
     try { root.setAttribute("data-pair-state", ps); } catch (_) {}
+    try {
+      var denied = false;
+      for (var fk in state.feeds) if (/401/.test((state.feeds[fk] && state.feeds[fk].why) || "")) denied = true;
+      root.setAttribute("data-pair-banner", (!kidBoard() && (needsPairing() || denied)) ? "1" : "0");
+    } catch (eB) {}
     var on = needsPairing();
     if (!on) { if (pairChip) { pairChip.style.display = "none"; padForChip(false); } return; }
     if (!pairChip) {
@@ -478,5 +535,5 @@
   /* HUBPAIR1 · the pairing notice does not wait for a feed answer */
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { paintPairing(); }, { once: true }); else if (document.body) paintPairing();
 
-  g.PrivateFeed = { hasHub: function () { return !!(g.HouseHub && (g.HouseHub.lights() || (qs("pfBase") && g.HouseHub.okForKey(qs("pfBase"))))); }, get: getJSON, cam: getCam, needsPairing: needsPairing, pairState: pairState, canSnap: function () { return !forceOffline && !!token() && !!origFetch; }, bindSnap: function (img, url) { img.setAttribute("data-pf-snap", url); fixImg(img); }, /* PRIVFEED3 · cam stills never hit the static path */ state: function () { return state; }, names: loadNames, _hubBase: hubBase };
+  g.PrivateFeed = { hasHub: function () { return !!(g.HouseHub && (g.HouseHub.lights() || (qs("pfBase") && g.HouseHub.okForKey(qs("pfBase"))))); }, get: getJSON, cam: getCam, needsPairing: needsPairing, pairState: pairState, canSnap: function () { return !forceOffline && !!token() && !!origFetch; }, bindSnap: function (img, url) { img.setAttribute("data-pf-snap", url); fixImg(img); }, /* PRIVFEED3 · cam stills never hit the static path */ state: function () { return state; }, names: loadNames, _hubBase: hubBase, retrySteps: RETRY_STEPS };
 })(window);

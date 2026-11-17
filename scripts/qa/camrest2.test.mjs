@@ -124,7 +124,7 @@ test("CAMREST3 · State D (paired, hub camera data stale, its old stills still l
 test("Prism spec · computed pill, art and dot (wall), reduced motion stops the pulse, phone dots stay calm", SKIP, async () => {
   const r = await all();
   const s = r.still5xx.style;
-  assert.equal(s.fontPx, 16); assert.equal(s.color, "rgb(255, 226, 176)"); assert.equal(s.radius, "999px");
+  assert.equal(s.fontPx, 24); assert.equal(s.color, "rgb(255, 226, 176)"); assert.equal(s.radius, "999px");
   assert.match(s.border, /^rgb\(232, 163, 61\)/); assert.equal(s.bg, "rgba(28, 18, 8, 0.82)");
   assert.ok(s.contrastWorst >= 4.5, "AA even over white art " + s.contrastWorst);
   assert.equal(s.artFilter, "brightness(0.8) saturate(1.05) blur(2px)");
@@ -144,7 +144,7 @@ test("static · spec values in the CSS, outage word unchanged, no LOCKED · PAIR
   assert.ok(js.includes('"Camera resting"'));
   assert.ok(!js.includes("LOCKED · PAIR"));
   const g = read("sheet-google-home.html");
-  assert.ok(g.includes("tokens-hub-cams.css?v=CAMREST5") /* CAMREST4 · tokens-hub-cams.css changed (rest clip); CAMREST5 · cam label 14px */ && g.includes("house-nest.js?v=CAMREST3") /* CAMREST3 · house-nest.js changed again */ && /private-feed\.js\?v=(?:CAMREST2|HALLOWEEN1|HUBPAIR1|HUBPAIR1B|HUBPAIR1D)"/.test(g)); /* H1-CB: halloween1 changed private-feed.js and re-tokens it */
+  assert.ok(g.includes("tokens-hub-cams.css?v=CAMREST5") /* CAMREST4 · tokens-hub-cams.css changed (rest clip); CAMREST5 · cam label 14px */ && g.includes("house-nest.js?v=CAMREST3") /* CAMREST3 · house-nest.js changed again */ && /private-feed\.js\?v=(?:CAMREST2|HALLOWEEN1|HUBPAIR1|HUBPAIR1B|HUBPAIR1D|R53AR1)"/.test(g)); /* H1-CB: halloween1 changed private-feed.js and re-tokens it */
   /* sheet-index.html keeps its CAMREST1 busters in this commit: its inherited Atlas deep-link id trips PIIGUARD2 on any
      edit; the bump is a separate one-line change once that line is cleared. The page still loads these same files. */
   assert.ok(/tokens-hub-cams\.css\?v=CAMREST\d/.test(read("sheet-index.html")));

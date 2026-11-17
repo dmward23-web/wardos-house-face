@@ -1,0 +1,26 @@
+{
+  "title": "KID-FEED-SAFETY pin candidate, not an installation",
+  "base": "7cfa6b20bce85ef58e0543fe60a222c32cad1ee7",
+  "note": "This manifest does not copy, restart, or install anything on the hub. Alfred must gate a new pin before any operational file is replaced.",
+  "repoCandidate": {
+    "scripts/calendar-refresh.mjs": {
+      "before": "cb49ae34c8277418fc48fecb26bfc7e184c7bc6bdc994479b646df321e29e43b",
+      "after": "f31a91a3f1d0e66fe9be9094a372c6d607ee32fb0924b0dd61d7a4406a69efa0"
+    },
+    "scripts/cal-from-events.mjs": {
+      "before": "9298954dc6e44ae6bc018fd583917fdf0aaf31136c2795e56d9deb37ecfb0979",
+      "after": "5c16af106eef6b58daa08eeb0ff98c7d08140362dade97177b6a773bacf581cd"
+    }
+  },
+  "operationalPinsNotChanged": {
+    "scripts/calendar-refresh.mjs": "c9bea289c2dcb5cc3ff5e220eb46179aff2da4be1d7377c75e8911400f5286b9",
+    "scripts/cal-from-events.mjs": "577b1869fdecbbfd928a8476cc1abec117e98616c448bcd4928ab32776cca392",
+    "wrapper": "34de320e2bd9c2b900ef4656a6a436bdc28ec0db6bf0ded00385e60e902654fe"
+  },
+  "behavior": [
+    "Provider and therapy titles are dropped before school or other classification.",
+    "There is no provider opt-in. A clinical source item is dropped whole, never renamed.",
+    "Embedded clock ranges are removed from child titles. The row clock stays the source start.",
+    "cal-from-events shortPlace returns empty for a denied title and does not keep the raw sentence."
+  ]
+}

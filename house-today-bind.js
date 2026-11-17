@@ -8,6 +8,18 @@
     } catch (e) { return ""; }
   }
   function faceDash(s) { return String(s == null ? "" : s).replace(/\bMOVED\s*[\u2192\u21d2\u27a1]\s*/gi, "moved to ").replace(/\s*[\u2192\u21d2\u27a1]\s*/g, " to ").replace(/\s*\u2014\s*/g, " \u00b7 ").replace(/(\s*\u00b7\s*){2,}/g, " \u00b7 ").replace(/^\s*\u00b7\s*|\s*\u00b7\s*$/g, ""); } /* NODATA3 · no em dashes or arrows on the face */
+  function showLines(el, lines) {
+    if (!el) return;
+    while (el.firstChild) el.removeChild(el.firstChild);
+    if (!lines || !lines.length) { el.setAttribute("hidden", ""); return; }
+    el.removeAttribute("hidden");
+    lines.forEach(function (line) {
+      var row = document.createElement("div");
+      row.className = "kid-what-line";
+      row.textContent = line;
+      el.appendChild(row);
+    });
+  }
   function show(el, text) {
     if (!el) return;
     text = faceDash((typeof window !== "undefined" && window.AwayFilter ? window.AwayFilter.glass(text || "") : text || "")); /* AWAYLAW1 glass */
@@ -34,9 +46,10 @@
       });
       var times = rows.map(function (r) { return timeOf(r.when); }).filter(Boolean)
         .filter(function (t, i, a) { return a.indexOf(t) === i; }); /* P1FIX B74 · "All day · All day" reads once */
-      var whats = rows.map(function (r) { return String(r.what || "").trim(); }).filter(Boolean);
+      var whats = rows.map(function (r) { return String(r.what || "").trim(); }).filter(Boolean)
+        .filter(function (t, i, a) { return a.indexOf(t) === i; });
       show(document.querySelector("[data-today-kid-when='" + id + "']"), times.join(" · "));
-      show(document.querySelector("[data-today-kid-what='" + id + "']"), whats.join(" · "));
+      showLines(document.querySelector("[data-today-kid-what='" + id + "']"), whats);
     });
   }
   function load() {

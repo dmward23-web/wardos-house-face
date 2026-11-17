@@ -8,8 +8,13 @@ test("Dad week carries dentist, party, tutor, pack night, HOA, grocery and the f
   for (const re of [/Wed 28 · 7:40 \| Hayes dentist/, /Sat 24 · 3:15 \| Hayes Smith's 9th birthday party/, /Ainsley & Mrs\. Jones/, /Thu 29 · 7:40 \| pack sports/, /Large Item Pickup/, /Grocery curbside/, /Fri 30 · 9:00 \| .*flight MCI/])
     assert.match(wk, re);
 });
-test("Hayes dentist is an appointment on his board", () => {
-  assert.ok(rows(W(), "hayes", "appointments").some((r) => /dentist/.test(r.what)));
+test("Hayes dentist is absent from his board and the hub", () => {
+  const w = W();
+  assert.equal(rows(w, "hayes", "appointments").some((r) => /dentist/i.test(r.what || r.summary || "")), false);
+  assert.equal(rows(w, "hayes", "upcoming").some((r) => /dentist/i.test(r.what || "")), false);
+  assert.equal(rows(w, "hayes", "today").some((r) => /dentist/i.test(r.what || "")), false);
+  const hub = JSON.stringify(w.boardStrip || {});
+  assert.doesNotMatch(hub, /dentist/i);
 });
 test("the flight is a leave-by in Next Up", () => {
   const q = refresh(null, "2026-10-30T08:30:00-05:00").boardStrip.queue;
@@ -18,7 +23,7 @@ test("the flight is a leave-by in Next Up", () => {
 });
 test("each kid has an upcoming list with his own rows", () => {
   const w = W();
-  assert.ok(rows(w, "hayes", "upcoming").some((r) => /dentist/.test(r.what)));
+  assert.equal(rows(w, "hayes", "upcoming").some((r) => /dentist/i.test(r.what)), false);
   assert.ok(rows(w, "hayes", "upcoming").some((r) => /birthday party/.test(r.what)));
   assert.ok(rows(w, "harris", "upcoming").some((r) => /Halloween parade/.test(r.what)));
   assert.ok(rows(w, "ainsley", "upcoming").some((r) => /Mrs\. Jones/.test(r.what)));

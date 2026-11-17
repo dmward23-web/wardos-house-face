@@ -1,7 +1,8 @@
 /* Shared marker layout for the painter and scripts/check-kid-layout.mjs.
    Boxes are CSS pixels. Phone 440×956 at 3× and the 1080×1920 wall
-   use the same fractions; labels stay 16px. Advances match Chrome's
-   600 16px system-ui so a wrapped line here is the line that is drawn. */
+   use the same fractions. Labels are 24px so they stay at least 18px
+   after the 0.756 stage scale. Advances match Chrome's 600 16px
+   system-ui and are scaled with the font size. */
 (function (root) {
   "use strict";
 
@@ -60,12 +61,9 @@
   }
 
   function metrics(text, maxW) {
-    var size = 16;
+    var size = 24;
     var lines = wrap(text, maxW, size);
-    if (lines.length > 2) {
-      size = 15;
-      lines = wrap(text, maxW, size);
-    }
+    if (lines.length > 2) lines = lines.slice(0, 2);
     var tw = 0;
     for (var i = 0; i < lines.length; i++) tw = Math.max(tw, textWidth(lines[i], size));
     return {

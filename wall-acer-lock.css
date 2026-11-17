@@ -5,14 +5,19 @@
    Hub window 900x864 at 48,168. Roster 438x420 at 972/1434, 168/612. */
 html, body,
 html[data-month-theme] body:not([data-kid-world]) {
+  margin: 0 !important;
+  overflow: hidden !important;
+  background-color: #07080b !important;
+  background-image: none !important;
+}
+html body .wardos-stage,
+html body .panel.panel {
   width: 1920px !important;
   height: 1080px !important;
-  min-width: 1920px !important;
+  min-width: 0 !important;
   min-height: 0 !important;
   max-width: 1920px !important;
   max-height: 1080px !important;
-  margin: 0 !important;
-  overflow: hidden !important;
   background-color: #07080b !important;
   background-image: var(--wg-hubbg, url("month-theme/november/wall-dusk.webp")) !important;
   background-repeat: no-repeat !important;
@@ -43,7 +48,7 @@ html body .panel.panel > header.hdr {
   margin: 0 !important;
   z-index: 5;
   display: grid !important;
-  grid-template-columns: 284px 438px minmax(0, 1fr) 284px !important;
+  grid-template-columns: 284px 284px 592px 592px !important;
   column-gap: 24px !important;
   align-items: center !important;
   padding: 0 !important;
@@ -56,22 +61,44 @@ html body .hub-home {
   top: auto !important;
   grid-column: 1 !important;
   justify-self: start !important;
-  width: 64px !important;
-  height: 64px !important;
-  min-width: 64px !important;
-  min-height: 64px !important;
+  width: 96px !important;
+  height: 96px !important;
+  min-width: 96px !important;
+  min-height: 96px !important;
+  border-radius: 16px !important;
+  background: #1c2430 !important;
+  border: 2px solid #c4b49a !important;
+  box-shadow: none !important;
+}
+html body .hub-home:focus-visible {
+  outline: 3px solid #f4efe6 !important;
+  outline-offset: -6px !important;
 }
 html body .panel.panel > header.hdr .hdr-date {
   position: relative !important;
   left: auto !important;
   top: auto !important;
   grid-column: 2 !important;
-  width: 438px !important;
-  max-width: 438px !important;
+  width: 284px !important;
+  max-width: 284px !important;
   margin: 0 !important;
-  overflow: visible !important;
+  overflow: hidden !important;
   z-index: 2;
 }
+html body .panel.panel > header.hdr .hdr-date-time {
+  font-size: 48px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  color: #f4efe6 !important;
+}
+html body .panel.panel > header.hdr .hdr-date-long {
+  font-size: 30px !important;
+  line-height: 1.15 !important;
+  white-space: nowrap !important;
+  color: #f4efe6 !important;
+}
+html body .panel.panel > header.hdr .hdr-date-kicker,
+html body .panel.panel > header.hdr .hdr-date-dow { display: none !important; }
 html body .panel.panel > header.hdr .hdr-brand,
 html body .panel.panel > header.hdr h1.name {
   position: relative !important;
@@ -90,7 +117,8 @@ html body .panel.panel > header.hdr .hdr-ovals {
   min-height: 64px !important;
   margin: 0 !important;
 }
-html body .hub-home img {
+html body .hub-home img,
+html body .hub-home picture {
   width: 64px !important;
   height: 64px !important;
   min-width: 64px !important;
@@ -134,18 +162,6 @@ html body .tile.dan {
 }
 html body .grid-hdr { display: none !important; }
 html body .tile-grid.tile-grid--cams { display: block !important; height: auto !important; }
-html body .tile-grid.tile-grid--cams > .tile:not(.ainsley):not(.hayes):not(.harris):not(.dan) {
-  display: block !important;
-  position: absolute !important;
-  left: -3200px !important;
-  top: 0 !important;
-  width: 720px !important;
-  height: auto !important;
-  min-height: 640px !important;
-  max-height: none !important;
-  overflow: visible !important;
-  pointer-events: none !important;
-}
 html body .tile-micro span.md { font-size: 14px !important; }
 html body .tile.ainsley .tile-micro,
 html body .tile.hayes .tile-micro,
@@ -204,28 +220,31 @@ html body .tile.dan {
 }
 html body .tile.dan [data-dad-stage] {
   position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  height: 140px !important;
+  left: 16px !important;
+  right: auto !important;
+  bottom: 16px !important;
+  width: 406px !important;
+  height: 160px !important;
   margin: 0 !important;
-  padding: 16px 20px !important;
+  padding: 12px !important;
   box-sizing: border-box !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-end !important;
   color: #f4efe6 !important;
+  background: #101820 !important;
   overflow: hidden !important;
+  border-radius: 12px !important;
 }
 html body .panel.panel > .hub-upper {
   position: absolute !important;
   left: 48px !important;
-  top: 928px !important;
+  top: 392px !important;
   width: 900px !important;
-  height: 104px !important;
-  max-height: 104px !important;
+  height: 304px !important;
+  max-height: none !important;
   margin: 0 !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   z-index: 4;
 }
 html body .panel.panel > .hub-upper .leaveby { display: block !important; min-height: 48px !important; }
@@ -235,12 +254,12 @@ html body .panel.panel > #hub-cam-deck {
   left: 48px !important;
   top: 168px !important;
   width: 900px !important;
-  height: 128px !important;
+  height: 200px !important;
   margin: 0 !important;
   z-index: 4;
   display: grid !important;
-  grid-template-columns: repeat(3, minmax(64px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(80px, 1fr));
+  gap: 20px;
 }
 html body .panel.panel > #hub-cam-deck[hidden],
 html body .panel.panel > #hub-lights-panel[hidden] { display: none !important; }
@@ -258,22 +277,11 @@ html body .hub-home,
 html body a.tile { touch-action: manipulation; }
 html body .pf-flag--pair { display: none !important; }
 /* Roster sublines sit on the art and do not read. The name stays on a scrim. Off-canvas tiles keep their micro line for the cold-load check. */
-html body .tile.ainsley .tile-sub,
-html body .tile.hayes .tile-sub,
-html body .tile.harris .tile-sub,
-html body .tile.dan .tile-sub,
-html body .tile.ainsley .tile-micro,
-html body .tile.hayes .tile-micro,
-html body .tile.harris .tile-micro,
-html body .tile.dan .tile-micro,
-html body .tile.ainsley .kf-title,
-html body .tile.hayes .kf-title,
-html body .tile.harris .kf-title { display: none !important; }
 html body .tile.ainsley .tile-label,
 html body .tile.hayes .tile-label,
 html body .tile.harris .tile-label,
 html body .tile.dan .tile-label {
-  font-size: 28px !important;
+  font-size: 32px !important;
   line-height: 1.15 !important;
   color: #f4efe6 !important;
   background: rgba(8, 10, 14, 0.78) !important;
@@ -288,13 +296,13 @@ html body .tile.dan [data-dad-stage] .tile-label {
 /* Sound sits beside the home key, in the home cell, so it does not cover the clock. */
 html.night52 body > .night52-snd {
   position: absolute !important;
-  left: 128px !important;
-  right: auto !important;
-  top: 64px !important;
-  width: 64px !important;
-  height: 64px !important;
-  min-width: 64px !important;
-  min-height: 64px !important;
+      left: 160px !important;
+      right: auto !important;
+      top: 52px !important;
+      width: 88px !important;
+      height: 88px !important;
+      min-width: 88px !important;
+      min-height: 88px !important;
   border-radius: 32px !important;
   z-index: 6 !important;
 }
@@ -316,24 +324,59 @@ html.night52 body > .night52-snd::before {
 }
 html body #house-wx,
 html body #index-sensi-chip {
-  min-width: 64px !important;
-  min-height: 64px !important;
-  width: auto !important;
-  height: 64px !important;
-  font-size: 24px !important;
-  line-height: 64px !important;
-  display: inline-flex !important;
-  align-items: center !important;
+  width: 284px !important;
+  min-width: 284px !important;
+  max-width: 284px !important;
+  height: 80px !important;
+  min-height: 80px !important;
+  font-size: 30px !important;
+  line-height: 1.15 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
   justify-content: center !important;
-  padding: 0 16px !important;
+  padding: 8px 16px !important;
   box-sizing: border-box !important;
+  overflow: hidden !important;
   color: #f4efe6 !important;
-  background: rgba(8, 10, 14, 0.78) !important;
-  border-radius: 32px !important;
+  background: #101820 !important;
+  border-radius: 16px !important;
 }
-html body #index-sensi-chip::before {
-  content: "Sensi";
+html body #house-wx .wx-sub,
+html body #house-wx .wx-rain,
+html body #house-wx .wx-hdr-ico,
+html body #house-wx .wx-kicker,
+html body #house-wx .wx-mode,
+html body #index-sensi-chip .sensi-hdr-ico,
+html body #index-sensi-chip svg { display: none !important; }
+html body #house-wx,
+html body #index-sensi-chip {
+  display: grid !important;
+  grid-template-rows: 22px 34px !important;
+  align-content: center !important;
+  align-items: start !important;
+  justify-content: start !important;
+}
+html body .status-kicker {
+  grid-row: 1 !important;
   font-size: 24px !important;
-  font-weight: 700;
-  color: #f4efe6;
+  line-height: 28px !important;
+  font-weight: 700 !important;
+  color: #f4efe6 !important;
+}
+html body .status-temp {
+  grid-row: 2 !important;
+  font-size: 30px !important;
+  line-height: 34px !important;
+  font-weight: 700 !important;
+  color: #f4efe6 !important;
+  white-space: nowrap !important;
+}
+html body .status-note {
+  grid-row: 2 !important;
+  justify-self: end !important;
+  align-self: center !important;
+  font-size: 24px !important;
+  line-height: 22px !important;
+  color: #f4efe6 !important;
 }

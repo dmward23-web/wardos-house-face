@@ -10,20 +10,22 @@ html, body { margin: 0; height: 100%; background: #070b10; color: #f4fbff; overf
   color: inherit;
   border-radius: 999px;
   padding: 12px 16px;
-  min-height: 48px;
-  font: inherit;
+  min-height: 64px;
+  min-width: 64px;
+  font-size: 24px;
+  font-family: inherit;
   font-weight: 700;
   text-decoration: none;
   margin: 8px;
 }
-.hud { position: absolute; left: 12px; right: 12px; top: max(12px, env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; }
+.hud { position: absolute; left: 64px; right: 48px; top: 64px; display: flex; justify-content: space-between; align-items: center; }
 .gather {
   position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
   padding-bottom: 8vh; pointer-events: none;
 }
 .gather .je-host, .gather a, .gather button { pointer-events: auto; }
 .je-host { width: min(280px, 70vw); height: 320px; }
-.hint { position: absolute; bottom: max(16px, env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center; opacity: 0.7; font-size: 14px; letter-spacing: 0.04em; }
+.hint { position: absolute; bottom: max(16px, env(safe-area-inset-bottom)); left: 48px; right: 48px; text-align: center; opacity: 0.7; font-size: 24px; letter-spacing: 0.04em; }
 @media (prefers-reduced-motion: reduce) { .hint { opacity: 0.85; } }
 /* POWERUPS1 · quiet chips, no counts */
 .hud .pw { font-style: normal; margin: 0 10px; opacity: .9; font-size: 14px; }
@@ -35,7 +37,7 @@ html, body { margin: 0; height: 100%; background: #070b10; color: #f4fbff; overf
 .zones { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; display: flex; pointer-events: none; }
 .zones .zone { flex: 1; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 14px; border-left: 1px solid rgba(255,255,255,.07); }
 .zones .zone:first-child { border-left: 0; }
-.zones .zone span { font-size: 15px; color: rgba(255,248,230,.55); text-shadow: 0 0 10px rgba(0,0,0,.6); }
+.zones .zone span { font-size: 24px; color: rgba(255,248,230,.55); text-shadow: 0 0 10px rgba(0,0,0,.6); }
 .hint { bottom: 76px; }
 
 /* POWERUPS2 · power-ups are drawn in-world; the old text pills stay in the DOM for a11y only */
@@ -51,9 +53,15 @@ html, body { margin: 0; height: 100%; background: #070b10; color: #f4fbff; overf
 .merc-win { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 8vh; pointer-events: none; }
 .merc-win p { font-size: 28px; font-weight: 700; text-align: center; margin: 0 16px 12px; text-shadow: 0 0 18px #fff; }
 .merc-win.merc-finale p { font-size: 34px; text-shadow: 0 0 22px #ffe2a8, 0 0 40px #ffb870; }
+.merc-home, #run-ui .wardos-home {
+  width: 64px !important; height: 64px !important; min-width: 64px !important; min-height: 64px !important;
+  display: inline-flex !important; align-items: center; justify-content: center; padding: 0 !important; margin: 0 !important;
+  border-radius: 16px !important; background: #0f1a22 !important;
+}
+.merc-home img, #run-ui .wardos-home img { width: 64px; height: 64px; display: block; }
 .merc-win a { pointer-events: auto; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1.1 !important; box-sizing: border-box; }
 /* ORI1 · the "Needs pairing" chip (private-feed.js) sat centred at the bottom over the phone's play area and hint.
    On the run it is a small corner chip, no explanation line, below the world (it stays readable and tappable). */
 .pf-flag.pf-flag--pair { left: 8px !important; right: auto !important; top: auto !important; bottom: max(8px, env(safe-area-inset-bottom)) !important;
-  transform: none !important; max-width: 44vw !important; font-size: 11px !important; padding: 4px 8px !important; opacity: .8; }
+  transform: none !important; max-width: 44vw !important; font-size: 24px !important; min-height: 64px !important; padding: 8px 12px !important; opacity: .8; }
 .pf-flag.pf-flag--pair [data-pair-why] { display: none !important; }

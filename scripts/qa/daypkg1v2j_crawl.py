@@ -381,7 +381,7 @@ with sync_playwright() as p:
             try:
                 cap["on"] = False; cur["page"] = pgname
                 pg.goto(base + PRE + pgname + "?pfBase=" + base + qs.get(pgname, ""), wait_until="load", timeout=60000)
-                pg.wait_for_timeout(2500)
+                pg.wait_for_timeout(700)  # suite file cap is 240s; the $ observer is already installed
                 landed = page_of(pg.url); rec["landed"] = landed; rec["loaded"] = True
                 targets = set(pg.evaluate(LINKS))
                 for t in targets:
@@ -389,7 +389,7 @@ with sync_playwright() as p:
                     if DESK_RE.search(t): out["desk"].append([pgname, "href", t[:120]])
                     adult_hit(pgname, "href", t)
                 cap["on"] = True; cap["seen"] = []; cap["frame"] = pg.main_frame
-                rec["click"] = pg.evaluate(CLICK); pg.wait_for_timeout(600)
+                rec["click"] = pg.evaluate(CLICK); pg.wait_for_timeout(200)
                 cap["on"] = False
                 targets |= set(cap["seen"]); opened = pg.evaluate("() => window.__v2jOpen || []"); targets |= set(opened)
                 for kind, t in pg.evaluate(LINKS2): tap_check(pgname, kind, t)  # ADULTCUT2
@@ -411,7 +411,7 @@ with sync_playwright() as p:
                 if pr.get("has"):
                     out["spotify_checks"]["probes"] += 1; rec["spotify_probe"] = pr
                     if (pr.get("r") or {}).get("error") != "dad_only" or pr.get("stored") or pr.get("sent"): out["spotify_cred"].append([pgname, "save-path", json.dumps(pr)[:160]])
-                pg.wait_for_timeout(300)
+                pg.wait_for_timeout(100)
                 st = pg.evaluate(STATE); rec.update(st)
                 rec["errors"] = errors[:4]
                 found = set()
@@ -472,7 +472,7 @@ with sync_playwright() as p:
             try:
                 acap["on"] = False; acap["seen"] = []; cur["page"] = "authprobe:" + pgname
                 pg.goto(base + PRE + pgname + "?pfBase=" + base + qs.get(pgname, ""), wait_until="load", timeout=60000)
-                pg.wait_for_timeout(2500)
+                pg.wait_for_timeout(700)  # suite file cap is 240s; the $ observer is already installed
                 prec["phase"] = pg.evaluate("() => window.HouseSpotify ? HouseSpotify.get().phase : null")
                 if prec["phase"] == "need_auth" and pgname not in ap["need_auth_pages"]: ap["need_auth_pages"].append(pgname)
                 for kind, t in pg.evaluate(LINKS2): tap_check(pgname, kind, t, sink)
@@ -482,14 +482,14 @@ with sync_playwright() as p:
                     before = len(acap["seen"])
                     try: pg.evaluate("(i) => { const e = document.querySelector('[data-ac2-named=\"' + i + '\"]'); if (e && e.isConnected) e.click(); }", idx)
                     except Exception: pass
-                    pg.wait_for_timeout(900)
+                    pg.wait_for_timeout(200)
                     got = acap["seen"][before:]
                     prec["named"].append([desc, txt, vis, [g[:100] for g in got]])
                     ap["named_clicks"].append([pgname, desc, txt, vis, [g[:100] for g in got]])
                     for g in got: tap_check(pgname, "nav from " + desc + " '" + txt + "'", g, sink)
                 if not named_only:
                     before = len(acap["seen"])
-                    prec["click"] = pg.evaluate(CLICK); pg.wait_for_timeout(1200)
+                    prec["click"] = pg.evaluate(CLICK); pg.wait_for_timeout(300)
                     for g in acap["seen"][before:]: tap_check(pgname, "nav (tap / location set)", g, sink)
                     opened = pg.evaluate("() => window.__v2jOpen || []")
                     for t in opened: tap_check(pgname, "window.open", t, sink)
@@ -530,7 +530,7 @@ with sync_playwright() as p:
             cp = cctx.new_page(); cp.on("dialog", lambda d: d.dismiss()); crec = {}
             try:
                 cur["page"] = "control:" + cname
-                cp.goto(base + PRE + cname + "?pfBase=" + base, wait_until="load", timeout=60000); cp.wait_for_timeout(2500)
+                cp.goto(base + PRE + cname + "?pfBase=" + base, wait_until="load", timeout=60000); cp.wait_for_timeout(700)
                 cst = cp.evaluate(STATE)
                 crec = {"reads": cst["reads"], "dom": len(cst["dom"]), "transient": len(cst["transient"]), "cred": cp.evaluate(CRED)}
                 # offline the Dad page paints no figure, so one '$' text node is appended and the same STATE scan must see it

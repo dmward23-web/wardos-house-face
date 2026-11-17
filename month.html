@@ -2,14 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<link rel="preload" href="prism-face.css" as="style" />
+<link rel="preload" href="prism-face.js" as="script" />
+<link rel="preload" href="assets/icons/home-key-light.svg" as="image" />
 <script src="house-hub.js?v=HUBPAIR1"></script>
-<script src="private-feed.js?v=HUBPAIR1D"></script>
+<script src="private-feed.js?v=R53AR1"></script>
 <script src="school-names.js?v=SUNHOME1"></script>
 <script src="house-face-law.js?v=FACESTRIP1"></script>
 <script src="house-pair.js?v=HUBPAIR1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-<meta name="viewport" content="width=1080" id="hf-viewport" />
+<meta name="viewport" content="width=device-width, initial-scale=1" id="hf-viewport" />
 <script src="away-filter.js?v=SUNHOME1" data-away-install></script>
 <script>/* Phones get the agenda. The wall keeps 1080. */(function(){try{var w=Math.min(screen.width,screen.height);if(w&&w<=600){var v=document.getElementById("hf-viewport");if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="manifest" href="manifest.webmanifest" />
@@ -404,8 +407,14 @@
 </style>
 <link rel="stylesheet" href="house-wall-frame.css?v=P1FIX" />
 <link rel="stylesheet" href="wg-glass.css?v=HOTFIX1" />
+<link rel="stylesheet" href="wardos-stage.css?v=ACERFIX1" data-wardos-stage-css="1" />
+<script src="house-scene.js?v=ACERFIX1"></script>
+<script src="house-event-display.js?v=ACERFIX1"></script>
+<script src="wardos-stage.js?v=ACERFIX1"></script>
+<link id="prism-face-css" rel="stylesheet" href="prism-face.css">
 </head>
 <body data-glass="ovals month-today">
+<a class="wardos-home" href="sheet-index.html" data-kw-home aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
   <defs>
     <!-- Shared paints · HEAT v3 cyan+gold -->
@@ -665,7 +674,8 @@
  </div>
  </header>
 
- <a class="leaveby" href="sheet-today.html" aria-label="Next leave-by">
+ <style>html body a.leaveby { display: none !important; } html body .live-clock, html body [data-live-clock] { text-shadow: none !important; box-shadow: none !important; filter: none !important; background: #101820 !important; border: 2px solid #c4b49a !important; }</style>
+ <a class="leaveby" href="sheet-today.html" aria-label="Next leave-by" hidden>
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
  <div class="leaveby-label" data-live="leaveby-label"></div>
@@ -730,8 +740,21 @@
   var MS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   var grid = document.querySelector(".month-grid");
   var DATA = null, cur = null;
+  function pinnedNow() {
+    try {
+      if (window.HouseScene && typeof HouseScene.now === "function") return HouseScene.now();
+    } catch (e) { /* */ }
+    try {
+      var q = new URLSearchParams(location.search).get("now");
+      if (q) {
+        var d = new Date(q);
+        if (!isNaN(+d)) return d;
+      }
+    } catch (e2) { /* */ }
+    return new Date();
+  }
   function ctToday() {
-    var p = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+    var p = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" }).format(pinnedNow());
     return { y: +p.slice(0, 4), m: +p.slice(5, 7), d: +p.slice(8, 10), iso: p };
   }
   function pad(n) { return (n < 10 ? "0" : "") + n; }
@@ -748,11 +771,26 @@
     s = s.replace(/\(\s*\)/g, " ");
     return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
   }
+  function testMode() {
+    try { return /[?&]wardos-test=1(?:&|$)/.test(String(location.search || "")); } catch (e) { return false; }
+  }
   function plainWords(s) {
     s = cleanCal(s);
+    var extra = arguments.length > 1 ? arguments[1] : null;
     s = faceDash(s.replace(/\bMOVED\s*(?:→|->|➔|➜)\s*/gi, "moved to ").replace(/\s*(?:→|->|➔|➜)\s*/g, " to "));
     s = s.replace(/\bDRIVE\b/g, "drives");
-    return s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
+    s = s.replace(/\s+/g, " ").replace(/\s+·/g, " ·").replace(/\s*·\s*$/g, "").trim();
+    var D = window.HouseEventDisplay;
+    if (!D || typeof D.summarize !== "function") return "";
+    var ev = { summary: s, title: s, what: s };
+    if (extra && typeof extra === "object") {
+      Object.keys(extra).forEach(function (k) {
+        if (k === "l") return;
+        if (extra[k] != null) ev[k] = extra[k];
+      });
+    }
+    var view = D.summarize(ev, "shared");
+    return view && view.title ? view.title : "";
   }
   /* P1FIX B29 · Month is shared glass: a row whose title names a household split never paints here (the shared
      house-face-law.js phrase list, the same one the board test sweeps for); nothing is put in its place. */
@@ -820,7 +858,7 @@
     if (!DATA || !DATA.days) return counts;
     Object.keys(DATA.days).forEach(function (k) {
       (DATA.days[k].items || []).forEach(function (it) {
-        var label = plainWords(it.l);
+        var label = plainWords(it.l, it);
         if (clockMinutes(label) != null) return;
         var key = chipKey(label) || label.toLowerCase();
         if (!key) return;
@@ -834,7 +872,7 @@
     var monthDay = DATA && DATA.days && DATA.days[iso];
     ((LIVE && LIVE.upcomingLeaves) || []).forEach(function (ev) {
       if (!eventCovers(ev, iso)) return;
-      var label = plainWords(ev.summary);
+      var label = plainWords(ev.summary, ev);
       if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label)) || ownerRow(label)) return; /* LIVELAW1 · P1FIX B29 · colour / dress-up days are never rows */
       if (eventSpans(ev)) {
         chips[chipKey(label) || label.toLowerCase()] = label;
@@ -846,7 +884,7 @@
     var inLive = !!(LIVE && LIVE.windowStart && iso >= LIVE.windowStart && iso <= (LIVE.windowEnd || LIVE.windowStart));
     if (monthDay && (!inLive || !rows.length)) {
       (monthDay.items || []).forEach(function (it) {
-        var label = plainWords(it.l);
+        var label = plainWords(it.l, it);
         if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label)) || ownerRow(label)) return; /* LIVELAW1 · P1FIX B29 */
         var key = chipKey(label);
         if (key && chips[key]) return;
@@ -895,10 +933,15 @@
     cur = { y: y, m: m };
     var t = ctToday();
     grid.setAttribute("data-year", y); grid.setAttribute("data-month", m);
-    document.querySelector("[data-month-title]").textContent = MN[m - 1] + " " + y;
+    var titleEl = document.querySelector("[data-month-title]");
+    if (titleEl) titleEl.textContent = MN[m - 1] + " " + y;
     var first = new Date(y, m - 1, 1).getDay(), dim = new Date(y, m, 0).getDate();
     var weeks = Math.ceil((first + dim) / 7);
     var html = "", start = new Date(y, m - 1, 1 - first);
+    var endCell = new Date(start.getTime());
+    endCell.setDate(start.getDate() + weeks * 7 - 1);
+    var SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    if (titleEl) titleEl.textContent = SHORT[start.getMonth()] + " " + start.getDate() + " \u2013 " + SHORT[endCell.getMonth()] + " " + endCell.getDate();
     var phone = narrow();
     var dows = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     if (phone) {
@@ -934,8 +977,12 @@
         html += '<a class="day' + (isToday2 ? " today" : "") + (wkPast ? " wf-past" : "") + '" data-away-day="' + k2 + '" href="sheet-today.html' + (isToday2 ? "" : "?d=" + k2) + '">' + '<div class="day-top"><span class="dom">' + dn + "</span>" + (isToday2 ? '<span class="day-tag">today</span>' : "") + "</div>";
         html += '<div class="blocks">';
         /* P1FIX B32 · wall cells show at most 3 items at 15 px, then one "+N" line (the day opens Today for the rest) */
-        var shown2 = (day2 ? day2.items : []).filter(function (it) { return !((window.HouseFaceLaw && HouseFaceLaw.isDressDay(it.l)) || ownerRow(it.l)); /* LIVELAW1 · P1FIX B29 */ });
-        shown2.slice(0, 3).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '">' + esc(cleanCal(it.l)) + "</div>"; });
+        var shown2 = (day2 ? day2.items : []).map(function (it) {
+          var label = plainWords(it.l, it);
+          if (!label || (window.HouseFaceLaw && HouseFaceLaw.isDressDay(label)) || ownerRow(label)) return null;
+          return { c: it.c, l: label };
+        }).filter(Boolean);
+        shown2.slice(0, 3).forEach(function (it) { html += '<div class="blk ' + esc(it.c) + '">' + esc(it.l) + "</div>"; });
         if (shown2.length > 3) html += '<div class="blk more">+' + (shown2.length - 3) + " more</div>";
         html += "</div></a>";
       }
@@ -944,8 +991,8 @@
     var sp = spans(y, m);
     var ban = document.querySelector("[data-month-banner]"); if (ban) { ban.textContent = ""; ban.hidden = true; } /* NOCUSTODY1 · banner hidden (sp unused) */
     var list = months(), idx = list.findIndex(function (x) { return x.y === y && x.m === m; });
-    document.querySelector('[data-mnav="-1"]').disabled = idx <= 0;
-    document.querySelector('[data-mnav="1"]').disabled = idx < 0 || idx >= list.length - 1;
+    document.querySelector('[data-mnav="-1"]').disabled = false;
+    document.querySelector('[data-mnav="1"]').disabled = false;
     document.querySelector("[data-month-pills]").innerHTML = list.map(function (x) {
       return '<button type="button" class="mpill' + (x.y === y && x.m === m ? " on" : "") + '" data-ym="' + x.y + "-" + x.m + '">' + MS[x.m - 1] + (x.y !== t.y ? " " + x.y : "") + "</button>";
     }).join("");
@@ -955,7 +1002,16 @@
   }
   document.addEventListener("click", function (e) {
     var b = e.target.closest("[data-mnav]");
-    if (b && cur) { var list = months(), i = list.findIndex(function (x) { return x.y === cur.y && x.m === cur.m; }) + +b.getAttribute("data-mnav"); if (list[i]) render(list[i].y, list[i].m); return; }
+    if (b && cur) {
+      var list = months(), step = +b.getAttribute("data-mnav");
+      var i = list.findIndex(function (x) { return x.y === cur.y && x.m === cur.m; }) + step;
+      if (list[i]) { render(list[i].y, list[i].m); return; }
+      var ny = cur.y, nm = cur.m + step;
+      if (nm < 1) { nm = 12; ny--; }
+      if (nm > 12) { nm = 1; ny++; }
+      render(ny, nm);
+      return;
+    }
     var p = e.target.closest("[data-ym]");
     if (p) { var v = p.getAttribute("data-ym").split("-"); render(+v[0], +v[1]); }
   });
@@ -964,7 +1020,13 @@
     return h ? { y: +h[1], m: +h[2] } : { y: t.y, m: t.m };
   }
   var s0 = initial(); render(s0.y, s0.m);
-  Promise.all([
+  if (testMode() && window.__wardosFixture) {
+    var fx = window.__wardosFixture;
+    if (fx.days) DATA = fx;
+    if (fx.upcomingLeaves) LIVE = fx;
+    else if (fx.cal && fx.cal.upcomingLeaves) LIVE = fx.cal;
+    render(cur.y, cur.m);
+  } else Promise.all([
     fetch("data/cal-months.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
     fetch("data/cal-live.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
   ]).then(function (pair) {
@@ -1014,7 +1076,7 @@
   if (hero && window.MutationObserver) new MutationObserver(once).observe(hero, { childList: true, subtree: true, characterData: true });
 })();
 </script>
-<script src="livewx-core.js?v=LIVEWX2B"></script><script src="house-weather.js?v=LIVEWX2"></script>
+<script src="livewx-core.js?v=R53AR1"></script><script src="house-weather.js?v=R53AR1"></script>
 <script src="house-sensi.js?v=SUNHOME1"></script>
 <script src="house-glass-bind.js?v=MERGE1C"></script>
 <script src="house-zoom.js"></script>
@@ -1026,5 +1088,6 @@
 <script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
 <link rel="stylesheet" href="wall-board-sheets.css?v=WALLSHEET1" />
+<script id="prism-face-js" src="prism-face.js"></script>
 </body>
 </html>

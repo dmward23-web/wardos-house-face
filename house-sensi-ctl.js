@@ -97,7 +97,7 @@
   function load() {
     msg("Checking the thermostat…");
     return api("/api/sensi").then(function (j) { st = j.thermostat; pending = null; paint(); msg(st.online ? "" : "Thermostat is offline", st.online ? "" : "err"); })
-      .catch(function (e) { st = null; msg(e.message === "nokey" ? "This screen needs the key before it can change the thermostat." : "Can't reach the thermostat right now.", "err"); });
+      .catch(function (e) { st = null; msg(e.message === "nokey" ? "Ask Dad to connect the thermostat." : "Can't reach the thermostat right now.", "err"); });
   }
 
   function send(body, okText) {

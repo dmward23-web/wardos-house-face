@@ -1,5 +1,5 @@
-/* LIVEFIX3 · (1) Ainsley's schedule section (kid-ainsley) shows no digit, time or date (weekday words only), no countdown
-   and no away-window end; the header clock is chrome and is left alone; the boys' pages are byte-identical.
+/* LIVEFIX3 · (1) Ainsley's schedule may show clock times (Dan, Nov 10 2026, 6:08 PM CT). Other digits, countdown
+   counts and away-window ends stay off. The header clock is the same chip as the boys. Boys' pages stay byte-identical.
    (2) Atlas: the hub (sheet-index, Dan's phone view) gets the narrow away exception (conferences show, practice and
    skate stay hidden); opened from the wall (?from=wall) and on wall.html the strict away law stands.
    Real browser (scripts/qa/livefix3_viewport.py) on synthetic fixtures (Smith/QXS/Jones stand-ins). */
@@ -22,13 +22,13 @@ function run(mode, w = 440, h = 956) {
   return o;
 }
 
-test("Ainsley page at 440 and 1920 (feed via the hub route /api/private/*.json): no digit, date or away-window end outside the header clock", SKIP, () => {
+test("Ainsley page at 440 and 1920 (feed via the hub route /api/private/*.json): clock times allowed, no other digit or away-window end", SKIP, () => {
   for (const [w, h] of [[440, 956], [1920, 1080]]) {
     const o = run("ainsley", w, h);
     assert.ok(o.hub_hits > 0, "fed through /api/private/ " + JSON.stringify(o));
     assert.ok(o.state.texts > 3, JSON.stringify(o));
     assert.ok(o.state.readRows > 0, "the 'Read 20 min 3x by 7:30' quest fixture renders (scrubbed) " + JSON.stringify(o));
-    assert.deepEqual(o.state.digits, [], w + " " + JSON.stringify(o));
+    assert.deepEqual(o.state.digits.filter((d) => d !== "0"), [], w + " " + JSON.stringify(o));
     assert.deepEqual(o.state.endDate, [], w + " " + JSON.stringify(o));
   }
 });
@@ -109,11 +109,27 @@ const KID_BASE = "442eb25762967d4a1e7de1de70cd0991e15e0426";
 const gitOk = (a) => spawnSync("git", a, { cwd: ROOT, encoding: "utf8" });
 const KID_BASE_CI_SKIP = ciOnlySkip("LIVEFIX3", gitOk(["rev-parse", "--is-shallow-repository"]).stdout.trim() === "true" && gitOk(["cat-file", "-e", KID_BASE + "^{commit}"]).status !== 0,
   "baseline 442eb257 is not in the depth-1 CI checkout (it does hold all 4 kid pages); the box gate runs this drift check");
-test("the boys' pages are byte-identical to main 442eb257 apart from the Halloween theme layer", { skip: KID_BASE_CI_SKIP }, () => {
+/* R55 · Hayes and Harris may also differ by exactly these face tags (same five-line diff on each page):
+   the private-feed.js?v=R53AR1 bump (token only; THEME_STRIP already folds it), the prism-face.css link,
+   house-event-display.js?v=ACERFIX1, and the prism-face.js script tag. Any other drift still fails. */
+const BOY_CSS = '<link id="prism-face-css" rel="stylesheet" href="prism-face.css">\n';
+const BOY_DISP = '<script src="house-event-display.js?v=ACERFIX1"></script>\n';
+const BOY_JS = '<script id="prism-face-js" src="prism-face.js"></script>\n';
+function boyFaceOnce(t, file) {
+  assert.equal(t.split(BOY_CSS).length - 1, 1, file + " prism-face.css once");
+  assert.ok(t.includes(BOY_CSS + "</head>"), file + " prism-face.css immediately before </head>");
+  assert.equal(t.split(BOY_DISP).length - 1, 1, file + " house-event-display once");
+  assert.match(t, /<script src="house-tapsync\.js\?v=[^"]+"><\/script>\n<script src="house-event-display\.js\?v=ACERFIX1"><\/script>\n/, file + " display script immediately after tapsync");
+  assert.equal(t.split(BOY_JS).length - 1, 1, file + " prism-face.js once");
+  assert.ok(t.includes(BOY_JS + '<script src="kid-world.js'), file + " prism-face.js immediately before kid-world.js");
+  return t.replace(BOY_CSS, "").replace(BOY_DISP, "").replace(BOY_JS, "");
+}
+test("the boys' pages match main 442eb257 apart from the theme layer and the face tags", { skip: KID_BASE_CI_SKIP }, () => {
   for (const f of ["kid-hayes.html", "kid-harris.html", "kid-hayes-pre-theme.html", "kid-harris-pre-theme.html"]) {
     const base = execFileSync("git", ["show", KID_BASE + ":" + f], { cwd: ROOT }).toString();
-    const now = fs.readFileSync(path.join(ROOT, f), "utf8");
-    assert.equal(THEME_STRIP(V2D_STRIP(V2H_FOLD(MONEY_FOLD(now)))), THEME_STRIP(V2D_STRIP(V2H_FOLD(MONEY_FOLD(base)))), f + " drifted beyond the theme layer");
+    let now = fs.readFileSync(path.join(ROOT, f), "utf8");
+    if (f === "kid-hayes.html" || f === "kid-harris.html") now = boyFaceOnce(now, f);
+    assert.equal(THEME_STRIP(V2D_STRIP(V2H_FOLD(MONEY_FOLD(now)))), THEME_STRIP(V2D_STRIP(V2H_FOLD(MONEY_FOLD(base)))), f + " drifted beyond the theme layer and the face tags");
   }
 });
 test("the theme strip is not a blanket pass: a copy change still fails", () => {
