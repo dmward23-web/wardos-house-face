@@ -213,7 +213,7 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
       var opt = row[3] ? ' data-optional="1"' : "";
       var cadence = row[3] ? "addon" : (/weekly/.test(row[2]) ? "weekly" : "daily");
       return '<div class="chore open ' + kid() + '" data-check="' + escMust(row[0]) + '" data-cadence="' + cadence + '"' + opt + ' role="button" tabindex="0">' +
-        '<span class="chore-ico" aria-hidden="true">' + choreIcon(row[0]) + '</span><div class="txt"><div class="what">' + escMust(row[1]) + '</div></div><span class="ring" aria-hidden="true"></span></div>';
+        '<span class="chore-ico" aria-hidden="true">' + choreIcon(row[0]) + '</span><div class="txt"><div class="what">' + escMust(plainLabel(row[0])) + '</div></div><span class="ring" aria-hidden="true"></span></div>';
     }).join("");
     var empty = document.querySelector("[data-kw-must-empty]");
     if (empty) empty.remove();
