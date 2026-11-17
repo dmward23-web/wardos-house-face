@@ -1328,8 +1328,8 @@ document.addEventListener("DOMContentLoaded", function () {
         card.style.removeProperty("max-height");
         card.style.removeProperty("display");
       });
-      var showAll = col.getAttribute("data-show-all") === "1";
-      var n = Math.min(5, cards.length);
+      var showAll = true;
+      var n = cards.length;
       if (!cards.length) return;
       list.style.setProperty("gap", "16px", "important");
       list.style.setProperty("scrollbar-gutter", "auto", "important");
@@ -1411,7 +1411,8 @@ document.addEventListener("DOMContentLoaded", function () {
         var ico = card.querySelector(".chore-ico");
         if (ico) {
           ico.style.setProperty("grid-column", "2", "important");
-          ico.style.setProperty("grid-row", "2", "important");
+          ico.style.setProperty("grid-row", "1", "important");
+          ico.style.setProperty("align-self", "center", "important");
           ico.style.setProperty("width", iconW + "px", "important");
           ico.style.setProperty("height", iconW + "px", "important");
           ico.style.setProperty("min-width", iconW + "px", "important");
@@ -1440,6 +1441,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (what) {
           what.style.setProperty("grid-column", "4", "important");
           what.style.setProperty("grid-row", "1", "important");
+          what.style.setProperty("align-self", "center", "important");
           what.style.setProperty("justify-self", "start", "important");
           what.style.setProperty("width", "100%", "important");
           what.style.setProperty("padding-left", "0", "important");
@@ -1481,7 +1483,17 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         }
         var ring = card.querySelector(".ring");
-        if (ring) ring.style.setProperty("display", "none", "important");
+        if (ring) {
+          ring.style.setProperty("display", "flex", "important");
+          ring.style.setProperty("grid-column", "1", "important");
+          ring.style.setProperty("grid-row", "1", "important");
+          ring.style.setProperty("width", "48px", "important");
+          ring.style.setProperty("height", "48px", "important");
+          ring.style.setProperty("min-width", "48px", "important");
+          ring.style.setProperty("min-height", "48px", "important");
+          ring.style.setProperty("align-self", "center", "important");
+          ring.style.setProperty("justify-self", "center", "important");
+        }
         var hint = card.querySelector(".hint");
         if (hint) hint.style.setProperty("display", "none", "important");
       });

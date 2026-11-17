@@ -526,12 +526,13 @@ packDay(iso);var dd=day(iso),lab=dd.toLocaleDateString("en-US",{weekday:"short",
 q("label").textContent=lab+" · load day";q("ftr").textContent="LOAD DAY · "+lab.toUpperCase();
 q("stamp").textContent=dd.toLocaleDateString("en-US",{weekday:"short"})+" "+dd.getDate();
 var t=document.querySelector(".loadband-title"),sb=document.querySelector(".loadband-sub");
-if(t)t.innerHTML=rows.length?e(rows[0].summary.split(" · ")[0])+' · <span class="time">'+hm(rows[0].start)+'</span>':"Nothing on the calendar";
+if(t)t.innerHTML=rows.length?e(rows[0].summary.split(" · ")[0])+' · <span class="time">'+hm(rows[0].start)+'</span>':"No trip loaded today";
 if(sb)sb.innerHTML=rows.slice(1,5).map(function(x){return e(x.summary.split(" · ")[0])+" <strong>"+hm(x.start)+"</strong>"}).join(" · ");
-q("timeline").innerHTML=rows.map(function(x,i){return '<article class="beat leave"><span class="pill">'+(i+1)+'</span><div class="clock">'+hm(x.start)+'</div><div class="what">'+e(x.summary)+'</div><div class="detail">'+e((x.location||"").split(",")[0])+'</div></article>'}).join("")||'<article class="beat"><div class="what">No leaves</div></article>';
+q("timeline").innerHTML=rows.map(function(x,i){return '<article class="beat leave"><span class="pill">'+(i+1)+'</span><div class="clock">'+hm(x.start)+'</div><div class="what">'+e(x.summary)+'</div><div class="detail">'+e((x.location||"").split(",")[0])+'</div></article>'}).join("")||'<article class="beat"><div class="what">No trip loaded today</div></article>';
+if(!rows.length){var box=document.querySelector(".bag-card");if(box)box.style.display="none";}
 q("glance").innerHTML=rows.slice(0,3).map(function(x){return '<div class="glance-row"><span class="t">'+hm(x.start)+'</span><span class="w">'+e(x.summary.split(" · ")[0])+'</span></div>'}).join("");
 var sb=q("sub");if(sb)sb.textContent=rows.length+" on the calendar · "+lab;
-}).catch(function(){q("label").textContent="Load day · calendar offline"});})();</script>
+}).catch(function(){q("label").textContent="Load day";var t=document.querySelector(".loadband-title");if(t)t.textContent="No trip loaded today";var box=document.querySelector(".bag-card");if(box)box.style.display="none";});})();</script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
 <script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
 </body>

@@ -273,7 +273,7 @@
     }
     var banner = document.querySelector(".banner-title");
     if (banner) {
-      banner.textContent = offline ? "Lights offline \u00b7 tap to retry" : "Lights";
+      banner.textContent = offline ? "Lights not connected" : "Lights";
       if (!banner._lightsRetry) {
         banner._lightsRetry = true;
         banner.addEventListener("click", function () {
@@ -292,10 +292,10 @@
       title.textContent = "Lights · Live";
       sub.textContent = "";
     } else if (g.needToken || g.kind === "need_token") {
-      title.textContent = "Lights offline";
+      title.textContent = "Lights not connected";
       sub.textContent = "Tap to retry";
     } else {
-      title.textContent = "Lights offline";
+      title.textContent = "Lights not connected";
       sub.textContent = "Tap to retry";
     }
     var ftr = document.getElementById("lights-ftr-status");

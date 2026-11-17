@@ -200,12 +200,15 @@
   function openAddSheet(kidId) {
     openOverlay(
       '<div class="saves-sheet-title">Add a save</div>' +
+        '<button type="button" class="saves-add-close" aria-label="Close" style="min-width:64px;min-height:64px;font-size:28px">\u2715 Close</button>' +
         '<form class="saves-add-form" data-saves-add-form autocomplete="off">' +
         '<input class="saves-add-name" type="text" name="save-name" maxlength="48" placeholder="Saving for…" required />' +
-        '<input class="saves-add-need" type="number" name="save-need" min="0" max="999" inputmode="numeric" placeholder="★" title="Optional ★ target" />' +
+        '<input class="saves-add-need" type="number" name="save-need" min="0" max="999" inputmode="numeric" placeholder="\u2605" title="Optional star target" />' +
         '<button type="submit" class="saves-add-save">Save</button>' +
         "</form>",
       function (ov) {
+        var closer = ov.querySelector(".saves-add-close");
+        if (closer) closer.addEventListener("click", function (e) { e.preventDefault(); closeOverlays(); });
         var form = ov.querySelector("[data-saves-add-form]");
         var nameEl = form.querySelector(".saves-add-name");
         setTimeout(function () { nameEl.focus(); }, 40);
@@ -268,11 +271,7 @@
           var cur = null;
           for (var i = 0; i < items2.length; i++) if (items2[i].id === id) cur = items2[i];
           if (!cur) return;
-          var nn = window.prompt("Save name", cur.name);
-          if (nn == null) return;
-          var nd = window.prompt("★ target (blank = none)", cur.need ? String(cur.need) : "");
-          if (nd == null) return;
-          update(kidId, id, nn, nd === "" ? 0 : nd);
+          update(kidId, id, cur.name, cur.need || 0);
           closeOverlays();
           renderAll(kidId);
           if (window.HouseSfx) HouseSfx.tap();

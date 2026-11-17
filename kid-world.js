@@ -3,6 +3,9 @@
    Musts are things in that world: islands, ore, lanterns.
    The week is a compact strip. The jar is the creature.
    Original drawing only. Theme notes stay in comments. */
+if (typeof document !== "undefined" && document.write && document.readyState === "loading" && !document.querySelector('script[src*="house-home.js"]')) {
+  document.write('<script src="house-home.js?v=R58HOME"><\/script>');
+}
 (function (global) {
   "use strict";
 
@@ -210,7 +213,7 @@
       var opt = row[3] ? ' data-optional="1"' : "";
       var cadence = row[3] ? "addon" : (/weekly/.test(row[2]) ? "weekly" : "daily");
       return '<div class="chore open ' + kid() + '" data-check="' + escMust(row[0]) + '" data-cadence="' + cadence + '"' + opt + ' role="button" tabindex="0">' +
-        '<span class="chore-ico" aria-hidden="true">' + choreIcon(row[0]) + '</span><div class="txt"><div class="what">' + escMust(plainLabel(row[0])) + '</div></div><span class="ring" aria-hidden="true"></span></div>';
+        '<span class="chore-ico" aria-hidden="true">' + choreIcon(row[0]) + '</span><div class="txt"><div class="what">' + escMust(row[1]) + '</div></div><span class="ring" aria-hidden="true"></span></div>';
     }).join("");
     var empty = document.querySelector("[data-kw-must-empty]");
     if (empty) empty.remove();

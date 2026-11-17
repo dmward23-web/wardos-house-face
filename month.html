@@ -930,10 +930,15 @@
     cur = { y: y, m: m };
     var t = ctToday();
     grid.setAttribute("data-year", y); grid.setAttribute("data-month", m);
-    document.querySelector("[data-month-title]").textContent = MN[m - 1] + " " + y;
+    var titleEl = document.querySelector("[data-month-title]");
+    if (titleEl) titleEl.textContent = MN[m - 1] + " " + y;
     var first = new Date(y, m - 1, 1).getDay(), dim = new Date(y, m, 0).getDate();
     var weeks = Math.ceil((first + dim) / 7);
     var html = "", start = new Date(y, m - 1, 1 - first);
+    var endCell = new Date(start.getTime());
+    endCell.setDate(start.getDate() + weeks * 7 - 1);
+    var SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    if (titleEl) titleEl.textContent = SHORT[start.getMonth()] + " " + start.getDate() + " \u2013 " + SHORT[endCell.getMonth()] + " " + endCell.getDate();
     var phone = narrow();
     var dows = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     if (phone) {
@@ -983,8 +988,8 @@
     var sp = spans(y, m);
     var ban = document.querySelector("[data-month-banner]"); if (ban) { ban.textContent = ""; ban.hidden = true; } /* NOCUSTODY1 · banner hidden (sp unused) */
     var list = months(), idx = list.findIndex(function (x) { return x.y === y && x.m === m; });
-    document.querySelector('[data-mnav="-1"]').disabled = idx <= 0;
-    document.querySelector('[data-mnav="1"]').disabled = idx < 0 || idx >= list.length - 1;
+    document.querySelector('[data-mnav="-1"]').disabled = false;
+    document.querySelector('[data-mnav="1"]').disabled = false;
     document.querySelector("[data-month-pills]").innerHTML = list.map(function (x) {
       return '<button type="button" class="mpill' + (x.y === y && x.m === m ? " on" : "") + '" data-ym="' + x.y + "-" + x.m + '">' + MS[x.m - 1] + (x.y !== t.y ? " " + x.y : "") + "</button>";
     }).join("");
@@ -994,7 +999,16 @@
   }
   document.addEventListener("click", function (e) {
     var b = e.target.closest("[data-mnav]");
-    if (b && cur) { var list = months(), i = list.findIndex(function (x) { return x.y === cur.y && x.m === cur.m; }) + +b.getAttribute("data-mnav"); if (list[i]) render(list[i].y, list[i].m); return; }
+    if (b && cur) {
+      var list = months(), step = +b.getAttribute("data-mnav");
+      var i = list.findIndex(function (x) { return x.y === cur.y && x.m === cur.m; }) + step;
+      if (list[i]) { render(list[i].y, list[i].m); return; }
+      var ny = cur.y, nm = cur.m + step;
+      if (nm < 1) { nm = 12; ny--; }
+      if (nm > 12) { nm = 1; ny++; }
+      render(ny, nm);
+      return;
+    }
     var p = e.target.closest("[data-ym]");
     if (p) { var v = p.getAttribute("data-ym").split("-"); render(+v[0], +v[1]); }
   });

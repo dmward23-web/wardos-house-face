@@ -4,8 +4,9 @@
    Scale is not clamped. A 0.8 floor would paint 864px into an 816px work area and clip.
    Touch targets are 88 stage px (66.5 CSS px at 0.7556) and type is 24 stage px (18.1 CSS px).
    Home is 96 stage px (72.5 CSS px at 0.7556). ?diag=1 is a local overlay only. */
-if (typeof document !== "undefined" && typeof document.write === "function" && !window.HouseAudit && document.readyState === "loading") {
-  document.write('<script src="house-audit.js?v=AUDIT1"><\/script>');
+if (typeof document !== "undefined" && typeof document.write === "function" && document.readyState === "loading") {
+  if (!window.HouseAudit) document.write('<script src="house-audit.js?v=AUDIT1"><\/script>');
+  if (!document.querySelector('script[src*="house-home.js"]')) document.write('<script src="house-home.js?v=R58HOME"><\/script>');
 }
 (function (global) {
   "use strict";
@@ -74,7 +75,7 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
       try { src = getComputedStyle(node).backgroundImage || ""; } catch (e1) { src = ""; }
     }
     var m = /url\(["']?([^"')]+)/.exec(src);
-    var url = m ? m[1] : coverUrl;
+    var url = m ? m[1] : (coverUrl || "month-theme/november/wall-day.webp");
     [document.documentElement, document.body].forEach(function (el) {
       el.style.setProperty("background-image", "none", "important");
       el.style.setProperty("background-color", "#07080b", "important");
@@ -282,23 +283,10 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     btn.href = global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html";
     btn.setAttribute("data-kw-home", "");
     btn.setAttribute("aria-label", "Home");
-    btn.style.position = "fixed";
-    btn.style.left = "48px";
-    btn.style.top = "48px";
-    btn.style.width = "64px";
-    btn.style.height = "64px";
-    btn.style.zIndex = "5";
-    btn.style.display = "flex";
-    btn.style.alignItems = "center";
-    btn.style.justifyContent = "center";
-    btn.style.boxSizing = "border-box";
     var img = document.createElement("img");
     img.src = "assets/icons/home-key-light.svg";
     img.alt = "";
-    img.width = 64;
-    img.height = 64;
-    img.style.width = "64px";
-    img.style.height = "64px";
+    img.setAttribute("draggable", "false");
     btn.appendChild(img);
     node.appendChild(btn);
     document.querySelectorAll(".live-clock, .live-clock-host").forEach(function (el) {

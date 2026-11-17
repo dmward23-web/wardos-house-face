@@ -327,6 +327,16 @@
       el.textContent = stats.pct + "%";
     });
 
+    document.querySelectorAll("section.col").forEach(function (col) {
+      var rows = col.querySelectorAll(".chore[data-check]:not([data-optional='1'])");
+      var nDone = 0;
+      rows.forEach(function (row) { if (row.classList.contains("done")) nDone += 1; });
+      var head = col.querySelector(".col-name");
+      if (!head || !rows.length) return;
+      var tag = head.querySelector(".col-count");
+      if (!tag) { tag = document.createElement("span"); tag.className = "col-count"; head.appendChild(tag); }
+      tag.textContent = nDone >= rows.length ? " ALL CLEAR" : " " + nDone + " of " + rows.length;
+    });
     document.body.classList.toggle("house-progress-full", stats.total > 0 && stats.left === 0);
     document.body.setAttribute("data-checks-done", String(stats.done));
     document.body.setAttribute("data-checks-total", String(stats.total));

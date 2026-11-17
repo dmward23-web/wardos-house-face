@@ -320,8 +320,12 @@ html.kw-root body.kw-on #sec-musts .chore-ico {
   flex: none !important;
 }
 html.kw-root body.kw-on #sec-musts .chore-ico svg { width: 40px !important; height: 40px !important; }
+html.kw-root body.kw-on #sec-musts .chore { display: flex !important; flex-direction: row !important; align-items: center !important; }
+html.kw-root body.kw-on #sec-musts .chore-ico { order: 0 !important; }
+html.kw-root body.kw-on #sec-musts .ring { order: 1 !important; margin-right: 12px !important; }
+html.kw-root body.kw-on #sec-musts .chore .txt { order: 2 !important; }
 html.kw-root body.kw-on #sec-musts .ring {
-  margin-left: auto !important;
+  margin-left: 0 !important;
   width: 64px !important;
   height: 64px !important;
   min-width: 64px !important;
@@ -1326,6 +1330,77 @@ html:not(#hf-wall-off) body .panel.weekend-cmd .hdr.hdr--clockfirst [data-live-c
   white-space: nowrap !important;
   overflow: hidden !important;
 }
+html body a.wardos-home,
+html body a.kw-home.wardos-home,
+html body a.hub-home.wardos-home {
+  position: fixed !important;
+  left: 48px !important;
+  top: 48px !important;
+  width: 96px !important;
+  height: 96px !important;
+  min-width: 96px !important;
+  min-height: 96px !important;
+  max-width: 96px !important;
+  max-height: 96px !important;
+  z-index: 2147483646 !important;
+  touch-action: manipulation !important;
+  -webkit-touch-callout: none !important;
+  user-select: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+html body a.wardos-home img { pointer-events: none !important; width: 64px !important; height: 64px !important; }
+html[data-wardos-stage] .ftr-chip,
+html[data-wardos-stage] .cheer-badge { pointer-events: none !important; }
+html.ori-nogl,
+html.ori-nogl body {
+  background-color: #101820 !important;
+  background-image: url("month-theme/november/wall-day.webp") !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+html[data-wardos-stage] .hdr .live-clock-host,
+html[data-wardos-stage] .live-clock-host {
+  position: fixed !important;
+  right: 64px !important;
+  top: 48px !important;
+  left: auto !important;
+  width: auto !important;
+  max-width: 420px !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  z-index: 40 !important;
+}
+html[data-wardos-stage] .live-clock,
+html[data-wardos-stage] .board-clock {
+  font-size: 32px !important;
+  line-height: 64px !important;
+  height: 64px !important;
+  color: #f4efe6 !important;
+  -webkit-text-fill-color: #f4efe6 !important;
+  background: #101820 !important;
+  padding: 0 16px !important;
+  border-radius: 16px !important;
+  text-shadow: none !important;
+}
+html[data-wardos-stage] header.hdr { padding-right: 420px !important; box-sizing: border-box !important; }
+html body .mbtn { min-width: 64px !important; min-height: 64px !important; font-size: 32px !important; }
+html body .chore.done { opacity: 0.45 !important; }
+html body .chore.done .ring {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+}
+html body .chore.done .ring::after { content: "\2713"; font-size: 28px !important; color: #fff !important; }
+html body .panel.lights-cmd { width: 900px !important; min-height: 600px !important; }
+html body .panel.lights-cmd .light-pad,
+html body .panel.lights-cmd .hub-sw { min-width: 96px !important; min-height: 96px !important; }
+html body .cmd-panel,
+html body .climate-hero { background: #101820 !important; }
+html body .pack-note { color: #f4efe6 !important; }
+html body .tab { min-height: 64px !important; }
 html:not(#hf-wall-off) body .panel.weekend-cmd > section.cheer {
   position: relative !important;
   left: auto !important;

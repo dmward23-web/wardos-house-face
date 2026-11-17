@@ -102,7 +102,7 @@
       title.textContent = "";
       plate.classList.add("roster-empty");
     } else {
-      title.textContent = document.documentElement.getAttribute("data-pair-banner") === "1" ? "" : "Calendar unavailable";
+      title.textContent = "";
       plate.classList.remove("roster-empty");
     }
     plate.appendChild(time);
@@ -153,7 +153,7 @@
     if (!week) {
       card.hidden = !!hubDown;
       if (time) time.textContent = "";
-      if (title) title.textContent = hubDown || document.documentElement.getAttribute("data-pair-banner") === "1" ? "" : "Calendar unavailable";
+      if (title) title.textContent = "";
       return;
     }
     var shown = false;

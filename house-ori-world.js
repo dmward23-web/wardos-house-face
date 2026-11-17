@@ -1085,7 +1085,7 @@
     if (el) el.classList.add("ori-portal-hot");
     var gone = false;
     function go() { if (gone) return; gone = true; location.href = url; }
-    if (REDUCED) { go(); return; }
+    if (REDUCED || document.documentElement.hasAttribute("data-wardos-stage")) { go(); return; }
     try {
       var pre = document.createElement("link");
       pre.rel = "prefetch";
@@ -1102,8 +1102,8 @@
       try { world.camPush(1.26, 0.6, x / Math.max(1, innerWidth), y / Math.max(1, innerHeight), 0.25); } catch (e) {}
       try { world.exit({ to: [x, y], dur: 0.6 }).then(go); } catch (e) {}
     }
-    fadeCover(iris, 0, 1, 540, go);
-    setTimeout(go, 800);
+    fadeCover(iris, 0, 1, 200, go);
+    setTimeout(go, 250);
   }
 
   var SKIP = "button,input,select,textarea,label,summary,[data-sp-act],[data-sp-tile],[data-layout],.leaveby-chip,[data-check],.hub-sw,.hub-sw-rocker,.hub-sw-track,.hub-sw-dim,[data-hub-key-entry],[data-mute-toggle],.sctl,.quest,.chore,[contenteditable=true]";
