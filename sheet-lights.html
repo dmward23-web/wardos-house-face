@@ -216,6 +216,7 @@
  <button type="button" class="cmd-chip cmd-chip--loud" id="lights-all-on">All on</button>
  <button type="button" class="cmd-chip" id="lights-all-off">All off</button>
  </section>
+ <div id="lights-offline-say" role="status" hidden></div>
 
  <section class="pad-grid" id="lights-pad-grid" aria-label="Per-light pads"></section>
  <section class="pad-grid" id="lights-stub-grid" aria-label="Need connect stubs"></section>
@@ -467,12 +468,15 @@
     min-height: 64px !important;
     flex: 0 0 64px !important;
   }
-  html body.lights-offline .panel.lights-cmd #lights-all-on,
-  html body.lights-offline .panel.lights-cmd #lights-all-off,
   html body.lights-offline .panel.lights-cmd .cmd-rocker,
   html body.lights-offline .panel.lights-cmd .light-bright {
     opacity: 0.5 !important;
     pointer-events: none !important;
+  }
+  html:not(#hf-wall-off) body.lights-offline .panel.lights-cmd #lights-all-on,
+  html:not(#hf-wall-off) body.lights-offline .panel.lights-cmd #lights-all-off {
+    opacity: 1 !important;
+    pointer-events: auto !important;
   }
   html body.lights-offline .panel.lights-cmd .banner-title {
     opacity: 1 !important;

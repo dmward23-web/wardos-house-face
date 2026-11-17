@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -165,9 +166,18 @@ test("r30 mercury home sits inside the inset and the visible type is 24px", () =
   assert.match(read("mercury-run.html"), /house-hub\.js/);
 });
 
+function stripComments(src) {
+  return src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/[^\n]*/g, "$1");
+}
+
 test("r30 the save sheet has a Home control and the floor sizes", () => {
-  const js = read("house-saves.js");
-  assert.match(js, /class="saves-home wardos-home" href="sheet-index\.html"/);
+  const js = stripComments(read("house-home.js"));
+  assert.match(js, /className = "wardos-home"/);
+  assert.match(js, /left: "48px"/);
+  assert.match(js, /top: "48px"/);
+  assert.match(js, /width: "96px"/);
+  assert.match(js, /height: "96px"/);
+  assert.match(js, /home-key-light\.svg/);
   const css = read("house-engage.css");
   assert.match(css, /\.saves-home \{[\s\S]*min-height: 64px/);
   assert.match(css, /\.saves-add-name \{[\s\S]*min-height: 64px[\s\S]*font-size: 24px/);
@@ -222,4 +232,26 @@ test("r30 month uses the pinned clock and a flat chip", () => {
 test("r30 Ainsley has no jar add control", () => {
   const js = read("prism-face.js");
   assert.match(js, /data-kid"\) === "ainsley"\) \? "" : '<button type="button" class="prism-jar-plus"/);
+});
+
+const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
+
+test("r30 the open saves sheet keeps one shared home that a real tap can reach", { skip: browser ? false : "SKIP no playwright (QA_NO_BROWSER)" }, () => {
+  const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/acer_r30_saves_home.py")], { encoding: "utf8", timeout: 120000 });
+  assert.equal(r.status, 0, (r.stderr || "").slice(-800) + (r.stdout || "").slice(-400));
+  const row = JSON.parse(r.stdout.trim().split("\n").pop());
+  assert.equal(row.modal, true, JSON.stringify(row));
+  assert.equal(row.shared, 1, JSON.stringify(row.homes));
+  const home = row.home;
+  assert.ok(home.left >= 48 && home.top >= 48, JSON.stringify(home));
+  assert.ok(Math.abs(home.w - 96) <= 1 && Math.abs(home.h - 96) <= 1, JSON.stringify(home));
+  assert.equal(home.hit, true, JSON.stringify(home));
+  assert.equal(home.covered, false, JSON.stringify(home));
+  assert.equal(row.reached, true, row.url);
+  for (const extra of row.extras) {
+    assert.ok(extra.left >= 48 && extra.top >= 48 && extra.right <= 1872 && extra.bottom <= 1032, JSON.stringify(extra));
+    assert.equal(extra.hit, true, JSON.stringify(extra));
+    assert.equal(extra.overlap, false, JSON.stringify(extra));
+    assert.equal(extra.reached, true, JSON.stringify(extra));
+  }
 });

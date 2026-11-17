@@ -2196,6 +2196,50 @@
     return out;
   }
 
+  /* A row that sticks out of the ahead box is replaced by a visible count. Names stay one line. */
+  function fitAhead(ahead) {
+    if (!ahead) return;
+    var old = ahead.querySelector(".consume-ahead-more");
+    if (old) old.remove();
+    var rows = [].slice.call(ahead.querySelectorAll(".consume-ahead-row"));
+    rows.forEach(function (row) { row.style.removeProperty("display"); });
+    function past(el) {
+      var box = ahead.getBoundingClientRect();
+      var r = el.getBoundingClientRect();
+      return r.height > 1 && (r.bottom > box.bottom + 0.5 || r.right > box.right + 0.5);
+    }
+    var hidden = 0;
+    var guard = 0;
+    while (guard < 80) {
+      guard += 1;
+      var bad = null;
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i].style.display === "none") continue;
+        if (past(rows[i])) bad = rows[i];
+      }
+      if (!bad) break;
+      bad.style.setProperty("display", "none", "important");
+      hidden += 1;
+    }
+    if (!hidden) return;
+    var cue = document.createElement("div");
+    cue.className = "consume-ahead-more";
+    cue.textContent = "+" + hidden + " more";
+    ahead.appendChild(cue);
+    guard = 0;
+    while (past(cue) && guard < 40) {
+      guard += 1;
+      var last = null;
+      for (var j = rows.length - 1; j >= 0; j--) {
+        if (rows[j].style.display !== "none") { last = rows[j]; break; }
+      }
+      if (!last) break;
+      last.style.setProperty("display", "none", "important");
+      hidden += 1;
+      cue.textContent = "+" + hidden + " more";
+    }
+  }
+
   function renderConsumeSchedule(kidId, data) {
     var root = document.querySelector(".sec-schedule.consume-sched");
     if (!root || !data || !data.kids || !data.kids[kidId]) return;
@@ -2441,6 +2485,9 @@
             '<span class="consume-ahead-time">' + esc(time || (r.p.allDay ? "All day" : "")) + "</span>" + /* ALLDAY1 */
             "</div>";
         }).join("");
+        fitAhead(ahead);
+        setTimeout(function () { fitAhead(ahead); }, 60);
+        setTimeout(function () { fitAhead(ahead); }, 400);
       }
     }
     if (kidId === "ainsley") consumeAinsleyScrub(root);   /* LIVEFIX3 */

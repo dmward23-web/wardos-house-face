@@ -1049,6 +1049,102 @@
     el.setAttribute("data-layout", mode);
     syncChipUI(mode);
     paintLists(strip); /* keep legacy nodes in sync if present */
+    fitStripRows();
+    setTimeout(fitStripRows, 60);
+  }
+
+  /* Rows that would paint under Music are replaced by a visible count. */
+  function fitStripRows() {
+    var host = document.querySelector(".leaveby.leaveby--hot");
+    var canvas = document.querySelector("[data-live='leaveby-layouts']");
+    if (!host || !canvas) return;
+    var label = host.querySelector(".leaveby-mode-label");
+    if (label) label.style.setProperty("font-size", "24px", "important");
+    [].forEach.call(host.querySelectorAll(".leaveby-chip"), function (chip) {
+      chip.style.setProperty("font-size", "24px", "important");
+      chip.style.setProperty("min-width", "64px", "important");
+      chip.style.setProperty("min-height", "64px", "important");
+      chip.style.setProperty("height", "64px", "important");
+    });
+    var old = canvas.querySelector(".lb-more");
+    if (old) old.remove();
+    var rows = [].slice.call(canvas.querySelectorAll(".lb-day-stop, .lb-list-row, .lb-day-tchip"));
+    rows.forEach(function (row) { row.style.removeProperty("display"); });
+    var limit = host.getBoundingClientRect().bottom - 4;
+    function past(el) {
+      var r = el.getBoundingClientRect();
+      return r.height > 1 && r.bottom > limit + 0.5;
+    }
+    var hidden = 0;
+    var guard = 0;
+    while (guard < 60) {
+      guard += 1;
+      var bad = null;
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i].style.display === "none") continue;
+        if (past(rows[i])) bad = rows[i];
+      }
+      if (!bad) break;
+      bad.style.setProperty("display", "none", "important");
+      hidden += 1;
+    }
+    var anyWhat = false;
+    for (var w = 0; w < rows.length; w++) {
+      if (rows[w].style.display === "none") continue;
+      if (rows[w].querySelector && rows[w].querySelector(".lb-day-what")) anyWhat = true;
+    }
+    if (!anyWhat) {
+      var src = canvas.querySelector(".lb-day-what");
+      var kept = host.querySelector(".lb-kept");
+      if (!kept) {
+        kept = document.createElement("div");
+        kept.className = "lb-day-what lb-kept";
+        host.appendChild(kept);
+      }
+      kept.textContent = src ? (src.textContent || "").trim() : "Today";
+      kept.style.setProperty("display", "block", "important");
+      kept.style.setProperty("position", "absolute", "important");
+      kept.style.setProperty("left", "16px", "important");
+      kept.style.setProperty("right", "16px", "important");
+      kept.style.setProperty("bottom", "36px", "important");
+      kept.style.setProperty("top", "auto", "important");
+      kept.style.setProperty("height", "24px", "important");
+      kept.style.setProperty("line-height", "24px", "important");
+      kept.style.setProperty("font-size", "24px", "important");
+      kept.style.setProperty("white-space", "nowrap", "important");
+      kept.style.setProperty("overflow", "hidden", "important");
+      kept.style.setProperty("background", "#101820", "important");
+      kept.style.setProperty("color", "#f4efe6", "important");
+      kept.style.setProperty("z-index", "3", "important");
+    }
+    if (!hidden) return;
+    var cue = host.querySelector(".lb-more");
+    if (!cue) {
+      cue = document.createElement("div");
+      cue.className = "lb-more";
+      host.appendChild(cue);
+    }
+    cue.textContent = "+" + hidden + " more";
+    cue.style.setProperty("position", "absolute", "important");
+    cue.style.setProperty("left", "8px", "important");
+    cue.style.setProperty("right", "8px", "important");
+    cue.style.setProperty("bottom", "8px", "important");
+    cue.style.setProperty("top", "auto", "important");
+    cue.style.setProperty("height", "24px", "important");
+    cue.style.setProperty("display", "block", "important");
+    cue.style.setProperty("z-index", "3", "important");
+    guard = 0;
+    while (past(cue) && guard < 30) {
+      guard += 1;
+      var last = null;
+      for (var j = rows.length - 1; j >= 0; j--) {
+        if (rows[j].style.display !== "none") { last = rows[j]; break; }
+      }
+      if (!last) break;
+      last.style.setProperty("display", "none", "important");
+      hidden += 1;
+      cue.textContent = "+" + hidden + " more";
+    }
   }
 
   function applyStrip(strip, clock) {

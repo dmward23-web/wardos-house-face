@@ -705,18 +705,16 @@
     var allOn = doc.getElementById("lights-all-on");
     var allOff = doc.getElementById("lights-all-off");
     var armed = canWrite();
-    if (allOn) {
-      allOn.disabled = !armed;
-      allOn.style.pointerEvents = armed ? "auto" : "none";
-      allOn.style.opacity = "1";
-      allOn.style.cursor = armed ? "pointer" : "not-allowed";
+    var offline = doc.body && doc.body.classList.contains("lights-offline");
+    function armBtn(btn) {
+      if (!btn) return;
+      btn.disabled = offline ? false : !armed;
+      btn.style.setProperty("pointer-events", "auto", "important");
+      btn.style.opacity = "1";
+      btn.style.cursor = "pointer";
     }
-    if (allOff) {
-      allOff.disabled = !armed;
-      allOff.style.pointerEvents = armed ? "auto" : "none";
-      allOff.style.opacity = "1";
-      allOff.style.cursor = armed ? "pointer" : "not-allowed";
-    }
+    armBtn(allOn);
+    armBtn(allOff);
     var grid = doc.getElementById("lights-pad-grid");
     if (grid) {
       var html = "";
@@ -808,15 +806,28 @@
     }
     var onB = doc.getElementById("lights-all-on");
     var offB = doc.getElementById("lights-all-off");
+    function offlineTap(ev) {
+      if (!doc.body || !doc.body.classList.contains("lights-offline")) return false;
+      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+      var say = doc.getElementById("lights-offline-say");
+      if (say) {
+        say.textContent = "Lights are offline";
+        say.classList.add("is-on");
+        say.hidden = false;
+      }
+      return true;
+    }
     if (onB && !onB._lightsWired) {
       onB._lightsWired = true;
-      onB.addEventListener("click", function () {
+      onB.addEventListener("click", function (ev) {
+        if (offlineTap(ev)) return;
         tap(); setAll(true); paintPads(doc); paintHubPanel(doc); paintChip(doc.getElementById("index-lights-chip"));
       });
     }
     if (offB && !offB._lightsWired) {
       offB._lightsWired = true;
-      offB.addEventListener("click", function () {
+      offB.addEventListener("click", function (ev) {
+        if (offlineTap(ev)) return;
         tap(); setAll(false); paintPads(doc); paintHubPanel(doc); paintChip(doc.getElementById("index-lights-chip"));
       });
     }

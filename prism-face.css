@@ -1575,5 +1575,40 @@ html body section.col .chore .chore-ico svg {
     padding: 0 8px !important;
     margin: 0 !important;
     overflow: hidden !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 8px !important;
   }
+  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days .consume-ahead-what,
+  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days .consume-ahead-day,
+  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days .consume-ahead-time {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 24px !important;
+    height: 24px !important;
+    max-height: 24px !important;
+    font-size: 24px !important;
+  }
+  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days .consume-ahead-more {
+    display: block !important;
+    height: 32px !important;
+    line-height: 32px !important;
+    font-size: 24px !important;
+    color: #f4efe6 !important;
+    grid-column: 1 / -1 !important;
+  }
+}
+html:not(#hf-wall-off) body.lights-offline .panel.lights-cmd {
+  position: fixed !important;
+  left: 48px !important;
+  top: 160px !important;
+  width: 1824px !important;
+  height: 824px !important;
+  min-height: 824px !important;
+  max-width: none !important;
+  max-height: none !important;
+  background: #101820 !important;
 }

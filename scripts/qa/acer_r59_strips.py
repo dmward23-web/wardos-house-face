@@ -20,26 +20,41 @@ start = now.replace(hour=18, minute=0, second=0, microsecond=0).strftime("%Y-%m-
 start2 = now.replace(hour=19, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%S-06:00")
 
 
-def ev(summary, iso=None):
+def at(hour, minute):
+    return now.replace(hour=hour, minute=minute, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%S-06:00")
+
+
+def ev(summary, iso):
+    stamp = datetime.fromisoformat(iso)
+    h12 = stamp.hour % 12 or 12
+    label = "%d:%02d%s" % (h12, stamp.minute, "am" if stamp.hour < 12 else "pm")
     return {
-        "summary": summary, "title": summary, "what": summary, "when": "Tue · 6:00",
-        "startIso": iso or start, "start": iso or start, "location": "gym",
+        "summary": summary, "title": summary, "what": summary, "when": "Tue · " + label,
+        "startIso": iso, "start": iso, "time": label, "location": "gym",
     }
 
 
+hayes_at = at(18, 10)
+ainsley_at = at(19, 25)
+harris_at = at(20, 40)
 WEEK = {
     "asOfIso": day,
     "kids": {
-        "hayes": {"id": "hayes", "name": "Hayes", "today": [ev("Skate City Night"), ev("costume parade", start2)], "quests": []},
-        "ainsley": {"id": "ainsley", "name": "Ainsley", "today": [ev("Picture day"), ev("Soccer")], "quests": []},
-        "harris": {"id": "harris", "name": "Harris", "today": [ev("Art club"), ev("basketball")], "quests": []},
+        "hayes": {"id": "hayes", "name": "Hayes", "today": [ev("Hayes Skate City Night", hayes_at), ev("costume parade", at(18, 50))], "quests": []},
+        "ainsley": {"id": "ainsley", "name": "Ainsley", "today": [ev("Ainsley Picture day", ainsley_at), ev("Soccer", at(19, 50))], "quests": []},
+        "harris": {"id": "harris", "name": "Harris", "today": [ev("Harris Art club", harris_at), ev("basketball", at(20, 55))], "quests": []},
     },
+    "boardStrip": {"queue": [
+        {"summary": "Hayes Skate City Night", "place": "Skate City Night", "time": "6:10 PM", "startIso": hayes_at, "endIso": at(21, 30)},
+        {"summary": "Ainsley Picture day", "place": "Picture day", "time": "7:25 PM", "startIso": ainsley_at, "endIso": at(21, 30)},
+        {"summary": "Harris Art club", "place": "Art club", "time": "8:40 PM", "startIso": harris_at, "endIso": at(21, 30)},
+    ]},
 }
 CAL = {
     "status": "live", "fetchedAt": datetime.now(CT).isoformat(), "asOfIso": day,
     "upcomingLeaves": [
-        {"summary": "Skate City Night", "title": "Skate City Night", "start": start, "end": start2, "allDay": False},
-        {"summary": "Picture day", "title": "Picture day", "start": start2, "end": start2, "allDay": False},
+        {"summary": "Skate City Night", "title": "Skate City Night", "start": hayes_at, "end": at(21, 30), "allDay": False},
+        {"summary": "Picture day", "title": "Picture day", "start": ainsley_at, "end": at(21, 30), "allDay": False},
     ],
 }
 
@@ -157,9 +172,22 @@ def main():
             bottom: r ? Math.round(r.bottom) : 0
           };
         }""")
+        page.goto(base + "/sheet-index.html?pfBase=" + base, wait_until="domcontentloaded", timeout=30000)
+        page.wait_for_timeout(800)
+        tiles = page.evaluate("""() => {
+          const grab = (sel) => {
+            const el = document.querySelector(sel);
+            return el ? (el.innerText || "").replace(/\\s+/g, " ").trim() : "";
+          };
+          return {
+            hayes: grab(".tile.hayes"),
+            ainsley: grab(".tile.ainsley"),
+            harris: grab(".tile.harris")
+          };
+        }""")
         browser.close()
     httpd.shutdown()
-    print(json.dumps({"pages": out, "clock": clock_ok, "day": day}), flush=True)
+    print(json.dumps({"pages": out, "clock": clock_ok, "day": day, "tiles": tiles}), flush=True)
 
 
 if __name__ == "__main__":
