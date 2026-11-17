@@ -80,7 +80,7 @@
 
   var R = [
     /* Google Home hub (+ retired Sensi redirect) */
-    ["sheet-google-home.html", ".cam-path, .note", CAMS],
+    ["sheet-google-home.html", ".cam-path, .note", HUBHOME],
 
     /* Lights · garage / door pads that aren't lights → Google Home pads */
     ["sheet-lights.html", "article.light-pad.is-need-connect", HUBHOME],
@@ -138,7 +138,7 @@
 
     /* Us */
     ["sheet-us.html", ".log-card", byText([[/calendar/i, MONTH]], US)],
-    ["sheet-us.html", ".safe-note", DESK],
+    ["sheet-us.html", ".safe-note", US],
 
     /* Countdowns */
     ["sheet-countdowns.html", "section.cheer, .flame-row", kid(MONTH)],
@@ -153,7 +153,7 @@
 
     /* Load day */
     ["sheet-load-day.html", "section.loadband", MONTH],
-    ["sheet-load-day.html", "article.beat", byText([[/House\+Desk/i, DESK]], kid(TODAY))],
+    ["sheet-load-day.html", "article.beat", byText([[/House\+Desk/i, TODAY]], kid(TODAY))],
     ["sheet-load-day.html", ".kchip", kid(null)],
     ["sheet-load-day.html", "section.sec[aria-label*='glance' i], .bag-card, .glance-row", TODAY],
 

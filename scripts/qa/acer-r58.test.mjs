@@ -10,14 +10,15 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 const read = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
 
-const FAMILY = ["sheet-index.html", "sheet-today.html", "sheet-weekend.html", "sheet-pack.html", "sheet-google-home.html", "sheet-chores.html", "sheet-groceries.html", "sheet-win.html", "sheet-load-day.html", "kid-hayes.html", "kid-harris.html", "kid-ainsley.html"];
-const BANNED = ["LIVE EMPTY JAR", "LIVE · EMPTY", "LIVE jar", "Empty LIVE jar", "checklist · no money", "Elo · Nest", "Sensi live · Nest", "Calendar unavailable", "MUSTS OPEN"];
+const FAMILY = ["sheet-index.html", "sheet-today.html", "sheet-weekend.html", "sheet-pack.html", "sheet-google-home.html", "sheet-chores.html", "sheet-groceries.html", "sheet-win.html", "sheet-load-day.html", "sheet-us.html", "kid-hayes.html", "kid-harris.html", "kid-ainsley.html"];
+const BANNED = ["LIVE EMPTY JAR", "LIVE · EMPTY", "LIVE jar", "Empty LIVE jar", "checklist · no money", "Elo · Nest", "Sensi live · Nest", "Calendar unavailable", "MUSTS OPEN", "JAR OPEN", "DAYS OPEN", "Harbor display lock"];
 
 test("r58 family screens do not show internal copy", () => {
   for (const f of FAMILY) {
     const html = read(f);
     for (const s of BANNED) assert.equal(html.includes(s), false, f + " " + s);
   }
+  assert.equal(read("wall-board-sheets.css").includes('content: "Open"'), false);
 });
 
 test("r58 no wall route leads to the dev status page", () => {
@@ -25,12 +26,20 @@ test("r58 no wall route leads to the dev status page", () => {
   assert.doesNotMatch(links, /\["\*",[^\]]*STATUS\]/);
   assert.doesNotMatch(links, /\["nest-webrtc\.html", "\.hud \.pill", STATUS\]/);
   assert.doesNotMatch(links, /\["sheet-weekend\.html", "\.cheer-badge", STATUS\]/);
+  assert.doesNotMatch(links, /\["sheet-google-home\.html"[^\]]*nest-webrtc/);
+  assert.doesNotMatch(links, /\["sheet-us\.html", "\.safe-note", DESK\]/);
+  assert.doesNotMatch(links, /\["sheet-load-day\.html", "article\.beat"[^\]]*DESK\]/);
+  assert.equal(read("house-nest.js").includes('location.href = url'), false);
+  assert.equal(read("nest-webrtc.html").includes("Cannot reach nest-webrtc-proxy"), false);
+  assert.equal(read("nest-webrtc.html").includes("NEED PROXY"), false);
   const pages = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html") && !f.startsWith("kid-") || f.startsWith("kid-") && !f.includes("pre-theme"));
   for (const f of fs.readdirSync(ROOT)) {
     if (!f.endsWith(".html") || f.includes("pre-theme")) continue;
-    if (f === "sheet-status.html") continue;
+    if (f === "sheet-status.html" || f === "sheet-desk-gate.html" || f === "nest-webrtc.html") continue;
     const html = read(f);
     assert.equal(html.includes('href="sheet-status.html"'), false, f);
+    assert.equal(html.includes('href="sheet-desk-gate.html"'), false, f);
+    assert.equal(html.includes('href="nest-webrtc.html"'), false, f);
   }
   void pages;
 });

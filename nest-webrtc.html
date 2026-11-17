@@ -164,7 +164,7 @@
       new URLSearchParams(location.search).get("name");
     try {
       if (N.ensureProxyFromLive) await N.ensureProxyFromLive();
-      proxyMeta.textContent = "proxy " + (N.proxyBase() || "NEED PROXY") + (N.proxyToken() ? " · authed" : "");
+      proxyMeta.textContent = "Cameras aren't connected yet.";
       /* AUDIT1 · no key on this screen → don't call the proxy; say NEED KEY and show the still */
       if (!N.proxyToken()) { showLocked(want); return; } /* CAMLOCK1 */
       var data = await N.fetchCameras();
@@ -195,17 +195,15 @@
       if (stageEl) stageEl.classList.add("fail");
       var msg = (e && e.message) ? e.message : String(e);
       var base = N.proxyBase() || "(none, Pages/phone)";
-      showErr(
-        "Cannot reach nest-webrtc-proxy at " + base + "\n\n" + msg
-      );
-      setStatus("NEED PROXY · loading still if any…");
+      showErr("Cameras aren't connected yet.");
+      setStatus("Cameras aren't connected yet.");
       showStillFallback(want).then(function (hit) {
         if (hit) {
-          setPill("dim", "STILL · NEED PROXY");
+          setPill("dim", "Still");
           setStatus("Showing Nest still · live video needs nestProxy (baked in nest-live.json)");
         } else {
-          setPill("err", "NEED PROXY");
-          setStatus("NEED PROXY · open sheet-google-home for stills · Atlas: nest-fetch + nest-webrtc-proxy");
+          setPill("err", "Offline");
+          setStatus("Cameras aren't connected yet.");
         }
       });
     }

@@ -112,15 +112,23 @@ const KID_BASE_CI_SKIP = ciOnlySkip("LIVEFIX3", gitOk(["rev-parse", "--is-shallo
 /* R55 · Hayes and Harris may also differ by exactly these face tags (same five-line diff on each page):
    the private-feed.js?v=R53AR1 bump (token only; THEME_STRIP already folds it), the prism-face.css link,
    house-event-display.js?v=ACERFIX1, and the prism-face.js script tag. Any other drift still fails. */
-const BOY_FACE = (t) => t
-  .replace(/<link id="prism-face-css" rel="stylesheet" href="prism-face\.css">\n?/g, "")
-  .replace(/<script src="house-event-display\.js\?v=ACERFIX1"><\/script>\n?/g, "")
-  .replace(/<script id="prism-face-js" src="prism-face\.js"><\/script>\n?/g, "");
+const BOY_CSS = '<link id="prism-face-css" rel="stylesheet" href="prism-face.css">\n';
+const BOY_DISP = '<script src="house-event-display.js?v=ACERFIX1"></script>\n';
+const BOY_JS = '<script id="prism-face-js" src="prism-face.js"></script>\n';
+function boyFaceOnce(t, file) {
+  assert.equal(t.split(BOY_CSS).length - 1, 1, file + " prism-face.css once");
+  assert.ok(t.includes(BOY_CSS + "</head>"), file + " prism-face.css immediately before </head>");
+  assert.equal(t.split(BOY_DISP).length - 1, 1, file + " house-event-display once");
+  assert.match(t, /<script src="house-tapsync\.js\?v=[^"]+"><\/script>\n<script src="house-event-display\.js\?v=ACERFIX1"><\/script>\n/, file + " display script immediately after tapsync");
+  assert.equal(t.split(BOY_JS).length - 1, 1, file + " prism-face.js once");
+  assert.ok(t.includes(BOY_JS + '<script src="kid-world.js'), file + " prism-face.js immediately before kid-world.js");
+  return t.replace(BOY_CSS, "").replace(BOY_DISP, "").replace(BOY_JS, "");
+}
 test("the boys' pages match main 442eb257 apart from the theme layer and the face tags", { skip: KID_BASE_CI_SKIP }, () => {
   for (const f of ["kid-hayes.html", "kid-harris.html", "kid-hayes-pre-theme.html", "kid-harris-pre-theme.html"]) {
     const base = execFileSync("git", ["show", KID_BASE + ":" + f], { cwd: ROOT }).toString();
     let now = fs.readFileSync(path.join(ROOT, f), "utf8");
-    if (f === "kid-hayes.html" || f === "kid-harris.html") now = BOY_FACE(now);
+    if (f === "kid-hayes.html" || f === "kid-harris.html") now = boyFaceOnce(now, f);
     assert.equal(THEME_STRIP(V2D_STRIP(V2H_FOLD(MONEY_FOLD(now)))), THEME_STRIP(V2D_STRIP(V2H_FOLD(MONEY_FOLD(base)))), f + " drifted beyond the theme layer and the face tags");
   }
 });

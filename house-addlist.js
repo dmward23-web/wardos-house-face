@@ -93,7 +93,20 @@
         x.type = "button"; x.textContent = "\u2715"; x.setAttribute("aria-label", "Remove");
         x.style.cssText = "min-width:64px;min-height:64px;margin-left:8px";
         x.hidden = true; b.appendChild(x);
-        x.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); put(KF, get(KF).filter(function (n) { return n !== f; })); draw(); });
+        x.addEventListener("click", function (e) {
+          e.preventDefault(); e.stopPropagation();
+          var left = get(KF).filter(function (n) { return n !== f; });
+          put(KF, left);
+          var toast = document.querySelector(".fav-undo");
+          if (!toast) {
+            toast = document.createElement("button");
+            toast.type = "button"; toast.className = "fav-undo"; toast.style.cssText = "position:fixed;left:160px;bottom:64px;min-height:64px;min-width:160px;z-index:40;font-size:24px";
+            document.body.appendChild(toast);
+          }
+          toast.textContent = "Undo";
+          toast.onclick = function (ev) { ev.preventDefault(); ev.stopPropagation(); var back = get(KF); if (back.indexOf(f) < 0) back.push(f); put(KF, back); toast.remove(); draw(); };
+          draw();
+        });
         favWrap.insertBefore(b, favAdd);
       });
       if (favEmpty) favEmpty.style.display = favs.length ? "none" : "";

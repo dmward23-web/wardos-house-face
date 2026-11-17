@@ -97,10 +97,11 @@ def main():
             page.goto(base + "kid-hayes.html?now=%s&freeze=1" % DAY, wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(1000)
             page_home = page.evaluate("""() => {
-              const el = document.querySelector('.kw-hud > .kw-home');
+              const el = document.querySelector('a.wardos-home');
+              if (!el) return null;
               const b = el.getBoundingClientRect();
               const img = el.querySelector('img');
-              const ib = img.getBoundingClientRect();
+              const ib = img ? img.getBoundingClientRect() : {x:0,y:0,width:0,height:0};
               return {x:b.x,y:b.y,w:b.width,h:b.height, imgs: el.querySelectorAll('img').length, ix:ib.x, iy:ib.y, iw:ib.width, ih:ib.height};
             }""")
             page.evaluate("""() => { var b = document.querySelector('.prism-jar-plus, .saves-plus, [data-saves-plus]'); if (b) b.click(); }""")
@@ -266,6 +267,42 @@ def main():
               return {lines, clock: {x:cb.x,y:cb.y,w:cb.width,h:cb.height,b:cb.bottom}};
             }""")
             out["r33"] = {"chores": {"folded": ch_fold, "more": ch_more}, "today": today_hdr, "month": month_line}
+            homes = {}
+            for route in ("kid-hayes.html", "kid-harris.html", "kid-ainsley.html", "sheet-google-home.html", "sheet-index.html", "sheet-today.html", "month.html"):
+                page.goto(base + route + "?now=%s&freeze=1" % DAY, wait_until="domcontentloaded", timeout=30000)
+                page.wait_for_timeout(500)
+                before = page.evaluate("""() => {
+                  const all = [...document.querySelectorAll('a.wardos-home, a.kw-home, a.hub-home')];
+                  const el = document.querySelector('a.wardos-home');
+                  const cs = el ? getComputedStyle(el) : null;
+                  const b = el ? el.getBoundingClientRect() : null;
+                  const hidden = !el || el.hasAttribute('hidden') || (cs && (cs.display === 'none' || cs.visibility === 'hidden'));
+                  let hit = false;
+                  if (el && b && b.width > 1 && b.height > 1) {
+                    const top = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2);
+                    hit = !!(top && (top === el || el.contains(top)));
+                  }
+                  return {n: all.length, hidden: hidden, w: b ? b.width : 0, h: b ? b.height : 0, left: b ? b.left : 0, top: b ? b.top : 0, right: b ? b.right : 0, bottom: b ? b.bottom : 0, hit: hit};
+                }""")
+                page.set_viewport_size({"width": 1280, "height": 720})
+                page.wait_for_timeout(80)
+                page.set_viewport_size({"width": 1920, "height": 1080})
+                page.wait_for_timeout(80)
+                after = page.evaluate("""() => {
+                  const el = document.querySelector('a.wardos-home');
+                  const b = el ? el.getBoundingClientRect() : null;
+                  return b ? {left: b.left, top: b.top, w: b.width, h: b.height} : null;
+                }""")
+                reached = None
+                if route != "sheet-index.html":
+                    page.mouse.click(before["left"] + before["w"] / 2, before["top"] + before["h"] / 2)
+                    try:
+                        page.wait_for_url("**/sheet-index.html**", timeout=4000)
+                        reached = True
+                    except Exception:
+                        reached = "sheet-index" in page.url
+                homes[route] = {"before": before, "after": after, "reached": reached}
+            out["homes"] = homes
             browser.close()
     finally:
         httpd.shutdown()

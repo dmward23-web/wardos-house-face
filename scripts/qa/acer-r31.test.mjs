@@ -91,6 +91,26 @@ test("r33 Month night header has no hairline across the band", SKIP, () => {
   assert.ok(clock.h >= 64, "clock " + clock.h);
 });
 
+test("r59 one shared home is 96px, inside the safe edge, hit-testable, and a tap returns home", SKIP, () => {
+  const homes = data.homes;
+  for (const route of ["kid-hayes.html", "kid-harris.html", "kid-ainsley.html", "sheet-google-home.html", "sheet-index.html", "sheet-today.html", "month.html"]) {
+    const row = homes[route];
+    assert.ok(row, route);
+    const box = row.before;
+    assert.equal(box.n, 1, route + " homes " + box.n);
+    if (route === "sheet-index.html") {
+      assert.equal(box.hidden, true, "hub home stays hidden");
+      continue;
+    }
+    assert.equal(box.hidden, false, route);
+    assert.ok(box.w >= 96 && box.h >= 96, route + " " + box.w + "x" + box.h);
+    assert.ok(box.left >= 48 && box.top >= 48 && box.right <= 1920 && box.bottom <= 1080, route + " " + JSON.stringify(box));
+    assert.equal(box.hit, true, route + " elementFromPoint");
+    assert.ok(row.after && Math.abs(row.after.left - box.left) <= 1 && Math.abs(row.after.top - box.top) <= 1, route + " moved " + JSON.stringify(row.after));
+    assert.equal(row.reached, true, route + " tap");
+  }
+});
+
 test("r33 chore icons are 64 and day circles stay inside the card", SKIP, () => {
   for (const [name, set] of [["folded", data.r33.chores.folded], ["more", data.r33.chores.more]]) {
     assert.ok(set.rows.length >= 3, name + " " + JSON.stringify(set.cols));

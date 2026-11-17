@@ -480,12 +480,18 @@
     var proxy = proxyBaseGuess();
     var token = proxyTokenGuess();
     // Pages + loopback/missing proxy → NEED PROXY + still (not silent black).
-    var url = "nest-webrtc.html?cam=" + id + "&v=NESTVID1";
-    /* HUBPIN1 · the viewer finds the camera host itself (HouseHub); no proxy address in the URL */
+    /* The wall stays on this page. A missed camera is one calm line, with no address and no status code. */
+    var note = document.querySelector("[data-cam-calm]");
+    if (!note) {
+      note = document.createElement("div");
+      note.setAttribute("data-cam-calm", "1");
+      note.textContent = "Cameras aren't connected yet.";
+      note.style.cssText = "position:fixed;left:160px;top:176px;right:64px;z-index:30;background:#101820;color:#f4efe6;font-size:32px;line-height:1.3;padding:28px 32px;border-radius:16px";
+      document.body.appendChild(note);
+    }
     try {
       if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap();
     } catch (e) {}
-    location.href = url;
   }
 
   function wirePadClicks(root) {
@@ -876,11 +882,7 @@
   function viewerHref(cam) {
     ingestProxyFromLive(cachedData());
     var id = cam && (cam.id || cam.name) ? encodeURIComponent(cam.id || cam.name) : "";
-    var url = "nest-webrtc.html?cam=" + id + "&v=CAMLIVE2";
-    var proxy = proxyBaseGuess();
-    var token = proxyTokenGuess();
-    /* HUBPIN1 · the viewer finds the camera host itself (HouseHub); no proxy address in the URL */
-    return url;
+    return "sheet-google-home.html";
   }
 
   /* CAMLIVE2 · sessions keyed by cam id — never restart a healthy stream on poll */

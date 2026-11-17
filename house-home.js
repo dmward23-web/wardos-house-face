@@ -125,14 +125,37 @@
       "html[data-wall-page=sheet-groceries] .body{max-height:900px!important;overflow:auto!important}",
       "html body .mbtn{min-width:64px!important;min-height:64px!important;font-size:32px!important}",
       "html[data-wardos-stage] .live-clock-host{position:fixed!important;right:64px!important;top:48px!important;left:auto!important;width:auto!important;max-width:420px!important;overflow:visible!important;z-index:40!important}",
+      "html[data-wall-page=sheet-google-home] .panel.cams-cmd{padding-top:112px!important;box-sizing:border-box!important}",
+      "html[data-wall-page=sheet-google-home] .panel.cams-cmd>.hdr.gh-top,html[data-wall-page=sheet-google-home] .panel.cams-cmd>section.banner{margin-left:112px!important;width:calc(100% - 112px)!important;box-sizing:border-box!important}",
+      "html[data-wall-page=sheet-google-home] .panel.cams-cmd .live-clock-host{position:relative!important;right:auto!important;top:auto!important;left:auto!important;width:auto!important;max-width:none!important;z-index:auto!important}",
+      "html[data-wall-page=sheet-index] header.hdr{left:48px!important;padding-left:0!important}",
+      "html body.lights-offline .panel.lights-cmd{position:fixed!important;left:48px!important;top:160px!important;width:1824px!important;height:824px!important;min-height:824px!important;max-width:none!important;background:#101820!important;display:flex!important;align-items:center!important;justify-content:center!important;z-index:4!important}",
+      "html body.lights-offline .panel.lights-cmd .pad-grid,html body.lights-offline .panel.lights-cmd .bulk,html body.lights-offline .panel.lights-cmd .cmd-chip,html body.lights-offline .panel.lights-cmd .light-pad{display:none!important}",
+      "html body.lights-offline .panel.lights-cmd .banner-title,html body.lights-offline #lights-connect-title{font-size:40px!important;color:#f4efe6!important}",
+      "html:not(#hf-wall-off) body .panel .tap-rail a::after{content:none!important}",
+      "html:not(#hf-wall-off) body .panel .kids-col{position:relative!important;top:-48px!important}",
+      "html:not(#hf-wall-off) body .panel .kids-col .kid-card{overflow:visible!important;height:auto!important;min-height:72px!important}",
+      "html body .kid-what,html body .kid-what-line{overflow:visible!important;max-height:none!important;color:#f4efe6!important;-webkit-text-fill-color:#f4efe6!important}",
+      "html body .panel.panel>.hub-upper>section.leaveby.leaveby--hot{position:relative!important;height:auto!important;min-height:160px!important;max-height:320px!important;width:900px!important;overflow:hidden!important;z-index:3!important;background:rgba(16,24,32,.92)!important;pointer-events:auto!important}",
+      "html body .panel.panel>.hub-upper .leaveby>.leaveby-body{display:flex!important;flex-direction:column!important;min-height:120px!important}",
+      "html body .panel.panel>.hub-upper .leaveby [data-live=leaveby-layouts],html body .panel.panel>.hub-upper .leaveby .lb-day,html body .panel.panel>.hub-upper .leaveby .lb-day-col,html body .panel.panel>.hub-upper .leaveby .lb-day-stop{display:block!important;visibility:visible!important}",
+      "html body .lb-day-what,html body .lb-day-tchip,html body .leaveby-row-title,html body .kid-what-line{color:#f4efe6!important;-webkit-text-fill-color:#f4efe6!important;background:#101820!important;opacity:1!important;font-size:24px!important;line-height:1.2!important}",
       "html[data-wardos-stage] .live-clock,html[data-wardos-stage] .board-clock{font-size:32px!important;line-height:64px!important;height:64px!important;color:#f4efe6!important;-webkit-text-fill-color:#f4efe6!important;background:#101820!important;padding:0 16px!important;border-radius:16px!important;text-shadow:none!important}",
       "html[data-wardos-stage] .ftr-chip,html[data-wardos-stage] .cheer-badge{pointer-events:none!important}",
       "html.ori-nogl,html.ori-nogl body{background-color:#101820!important;background-image:url('month-theme/november/wall-day.webp')!important;background-size:cover!important;background-position:center!important}"
     ].join("");
     document.head.appendChild(s);
   }
+  function parkHubTitle() {
+    if (!onHub()) return;
+    var name = document.querySelector(".name-accent, h1.name");
+    if (!name) return;
+    var r = name.getBoundingClientRect();
+    if (r.width < 1) return;
+    if (r.left < 48) name.style.setProperty("margin-left", (48 - r.left) + "px", "important");
+  }
   function parkClock() {
-    if (onHub() || /sheet-weekend\.html$/i.test(file())) return;
+    if (onHub() || /sheet-weekend\.html$/i.test(file()) || /sheet-google-home\.html$/i.test(file())) return;
     document.querySelectorAll(".live-clock-host").forEach(function (host) {
       if (document.body && host.parentNode !== document.body) document.body.appendChild(host);
       ["position", "fixed", "right", "64px", "top", "48px", "left", "auto", "width", "auto", "max-width", "420px", "z-index", "40"].forEach(function (v, i, a) {
@@ -156,11 +179,12 @@
     wallCss();
     mount();
     parkClock();
+    parkHubTitle();
     kick();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
-  function again() { mount(); parkClock(); }
+  function again() { mount(); parkClock(); parkHubTitle(); }
   window.addEventListener("load", again);
   setTimeout(again, 400);
   setTimeout(again, 650);

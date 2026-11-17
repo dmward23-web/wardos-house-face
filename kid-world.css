@@ -796,7 +796,22 @@ body.kw-on #tapsync-badge { display: none !important; }
     min-height: 100% !important;
     margin: 0 !important;
   }
-  html.kw-root body.kw-on #sec-days { grid-column: 2 !important; grid-row: 2 !important; overflow: auto !important; color: #1a1814 !important; font-size: 24px !important; }
+  html.kw-root body.kw-on #sec-days {
+    grid-column: 2 !important; grid-row: 2 !important;
+    position: fixed !important; left: 972px !important; top: 168px !important;
+    width: 840px !important; height: 420px !important; max-height: 864px !important;
+    overflow: hidden !important; z-index: 6 !important;
+    display: flex !important; flex-direction: column !important;
+    color: #f4efe6 !important; font-size: 24px !important;
+  }
+  html.kw-root body.kw-on #sec-days > .consume-ahead {
+    flex: 1 1 auto !important; min-height: 0 !important; max-height: 240px !important; overflow: hidden !important;
+  }
+  html.kw-root body.kw-on #sec-days .consume-hero,
+  html.kw-root body.kw-on #sec-days .consume-hero-title,
+  html.kw-root body.kw-on #sec-days .consume-hero-name {
+    width: 100% !important; min-width: 420px !important; max-width: none !important;
+  }
   html.kw-root body.kw-on #sec-days:not(:has(.consume-hero, .kw-offline)) {
     align-items: center !important;
     justify-content: center !important;

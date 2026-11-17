@@ -1040,6 +1040,8 @@
       }
       var kidId = KID_FROM_CHECK[id];
       var meta = questMeta(kidId, id, data);
+      var whatElEarly = el.querySelector(".what");
+      if (whatElEarly) whatElEarly.textContent = plainChoreLabel(id, whatElEarly.textContent);
       el.setAttribute("data-cadence", meta.cadence);
       var nDays = dadWeekLen();
       el.setAttribute("data-stars", String(meta.optional ? 0 : (meta.cadence === "daily" ? meta.stars * nDays : meta.stars)));
@@ -2412,7 +2414,7 @@
       if (!rows.length) {
         ahead.innerHTML = '<div class="consume-ahead-empty">No unique events ahead · routines collapsed above</div>';
       } else {
-        ahead.innerHTML = rows.slice(0, 8).map(function (r) {
+        ahead.innerHTML = rows.slice(0, 3).map(function (r) {
           var dow = CONSUME_DOW[dowIndexFromIso(r.iso)].toUpperCase();
           var dn = String(Number(r.iso.split("-")[2]));
           var what = consumeStripKidName(r.e.what, kid);
