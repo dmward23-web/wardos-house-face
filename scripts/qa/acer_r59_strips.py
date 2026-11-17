@@ -120,9 +120,46 @@ def main():
             page.goto(base + "/" + name + "?pfBase=" + base, wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(1200)
             out[name] = page.evaluate(PROBE)
+        page.goto(base + "/sheet-index.html?pfBase=" + base, wait_until="domcontentloaded", timeout=30000)
+        page.wait_for_timeout(600)
+        clock = page.evaluate("""() => {
+          const el = document.querySelector('.hdr-date-time');
+          if (!el) return null;
+          const r = el.getBoundingClientRect();
+          return { x: r.x + r.width / 2, y: r.y + r.height / 2, w: r.width, h: r.height };
+        }""")
+        clock_ok = False
+        if clock and clock["w"] > 8:
+            page.mouse.click(clock["x"], clock["y"])
+            try:
+                page.wait_for_url("**/sheet-today.html**", timeout=4000)
+                clock_ok = True
+            except Exception:
+                clock_ok = "sheet-today" in page.url
+        page.goto(base + "/sheet-today.html?d=2026-11-15&pfBase=" + base, wait_until="domcontentloaded", timeout=30000)
+        page.wait_for_timeout(800)
+        day = page.evaluate("""() => {
+          const panel = document.querySelector('.day-view');
+          const grid = document.querySelector('.kids-col, .today-day, .kid-card');
+          const gs = grid ? getComputedStyle(grid) : null;
+          const row = panel && (panel.querySelector('.dv-row') || panel);
+          const r = row ? row.getBoundingClientRect() : null;
+          let hit = false;
+          if (r && r.width > 1 && r.height > 1) {
+            const top = document.elementFromPoint(r.left + r.width / 2, r.top + Math.min(20, r.height / 2));
+            hit = !!(top && panel.contains(top));
+          }
+          return {
+            panel: !!panel,
+            gridHidden: !grid || gs.display === 'none' || gs.visibility === 'hidden',
+            hit: hit,
+            top: r ? Math.round(r.top) : 0,
+            bottom: r ? Math.round(r.bottom) : 0
+          };
+        }""")
         browser.close()
     httpd.shutdown()
-    print(json.dumps(out), flush=True)
+    print(json.dumps({"pages": out, "clock": clock_ok, "day": day}), flush=True)
 
 
 if __name__ == "__main__":

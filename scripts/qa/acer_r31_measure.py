@@ -110,7 +110,7 @@ def main():
               const r = (el) => { if (!el) return null; const b = el.getBoundingClientRect(); const cs = getComputedStyle(el); return {x:b.x,y:b.y,w:b.width,h:b.height,r:b.right,b:b.bottom, vis:cs.visibility, disp:cs.display}; };
               const homes = [...document.querySelectorAll('.kw-home, .saves-home, .wardos-home')].map(el => Object.assign({c: el.className.toString()}, r(el), {imgs: el.querySelectorAll('img').length}));
               const visible = homes.filter(h => h.vis !== 'hidden' && h.disp !== 'none' && h.w > 1 && h.h > 1);
-              const home = document.querySelector('.saves-home');
+              const home = document.querySelector('a.wardos-home');
               const img = home && home.querySelector('img');
               let text = null;
               if (home) {
@@ -268,7 +268,22 @@ def main():
             }""")
             out["r33"] = {"chores": {"folded": ch_fold, "more": ch_more}, "today": today_hdr, "month": month_line}
             homes = {}
-            for route in ("kid-hayes.html", "kid-harris.html", "kid-ainsley.html", "sheet-google-home.html", "sheet-index.html", "sheet-today.html", "month.html"):
+            ctx2 = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+            ctx2.route("**/*", handle)
+            routes = [
+                "kid-hayes.html", "kid-harris.html", "kid-ainsley.html", "mercury-run.html",
+                "sheet-index.html", "index.html", "month.html", "month-chat.html", "sheet-chores.html",
+                "sheet-today.html", "sheet-lights.html", "sheet-google-home.html", "sheet-groceries.html",
+                "sheet-spotify.html", "sheet-weekend.html", "sheet-win.html", "sheet-status.html",
+                "sheet-us.html", "sheet-load-day.html", "sheet-pack.html", "nest-webrtc.html",
+                "sheet-desk-gate.html", "sheet-dinner.html", "sheet-gallery-hero.html", "sheet-gallery.html",
+                "sheet-countdowns.html",
+            ]
+            for route in routes:
+                if not (ROOT / route).is_file() and route != "index.html":
+                    continue
+                hop = ctx2.new_page()
+                page = hop
                 page.goto(base + route + "?now=%s&freeze=1" % DAY, wait_until="domcontentloaded", timeout=30000)
                 page.wait_for_timeout(500)
                 before = page.evaluate("""() => {
@@ -287,22 +302,28 @@ def main():
                 page.set_viewport_size({"width": 1280, "height": 720})
                 page.wait_for_timeout(80)
                 page.set_viewport_size({"width": 1920, "height": 1080})
-                page.wait_for_timeout(80)
+                page.wait_for_timeout(200)
                 after = page.evaluate("""() => {
                   const el = document.querySelector('a.wardos-home');
                   const b = el ? el.getBoundingClientRect() : null;
                   return b ? {left: b.left, top: b.top, w: b.width, h: b.height} : null;
                 }""")
                 reached = None
-                if route != "sheet-index.html":
-                    page.mouse.click(before["left"] + before["w"] / 2, before["top"] + before["h"] / 2)
+                if route not in ("sheet-index.html", "index.html") and not before.get("hidden"):
                     try:
-                        page.wait_for_url("**/sheet-index.html**", timeout=4000)
-                        reached = True
+                        spot = after or before
+                        page.mouse.click(spot["left"] + spot["w"] / 2, spot["top"] + spot["h"] / 2, delay=20)
                     except Exception:
-                        reached = "sheet-index" in page.url
+                        pass
+                    for _ in range(20):
+                        if "sheet-index" in page.url:
+                            reached = True
+                            break
+                        page.wait_for_timeout(100)
                 homes[route] = {"before": before, "after": after, "reached": reached}
+                hop.close()
             out["homes"] = homes
+            ctx2.close()
             browser.close()
     finally:
         httpd.shutdown()

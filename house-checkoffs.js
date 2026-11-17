@@ -328,7 +328,7 @@
     });
 
     document.querySelectorAll("section.col").forEach(function (col) {
-      var rows = col.querySelectorAll(".chore[data-check]");
+      var rows = col.querySelectorAll(".chore[data-check]:not([data-optional='1'])");
       var nDone = 0;
       rows.forEach(function (row) { if (row.classList.contains("done")) nDone += 1; });
       var head = col.querySelector(".col-name");

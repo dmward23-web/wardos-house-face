@@ -390,12 +390,9 @@
 
     if (bannerSub) {
       if (g.live && g.hasSnaps) {
-        bannerSub.textContent = "Sensi + Nest stills · Elo 3202L";
+        bannerSub.textContent = "Cameras are on";
       } else if (g.live) {
-        bannerSub.textContent =
-          "Sensi live · Nest · " +
-          g.deviceCount +
-          " cameras · tap a pad for video";
+        bannerSub.textContent = "Tap a camera to watch";
       } else {
         bannerSub.textContent =
           "Cameras offline";

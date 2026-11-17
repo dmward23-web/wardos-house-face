@@ -26,6 +26,9 @@
     var st = document.createElement("style");
     st.textContent = "html.day-view-on .panel > *:not(header):not(.day-view){display:none!important} html.day-view-on:not(#hf-wall-off) body .panel>.body,html.day-view-on body .panel .kids-col,html.day-view-on body .panel .today-day,html.day-view-on body .panel .where-card,html.day-view-on body .panel nav.tap-rail{display:none!important} html.day-view-on .panel>section.day-view{display:flex!important;position:fixed!important;left:160px!important;top:160px!important;right:48px!important;bottom:48px!important;z-index:2!important;margin:0!important;padding:16px 24px!important;width:auto!important;box-sizing:border-box!important;background:#101820!important;color:#f4efe6!important} html.day-view-on .dv-nav{min-width:64px!important;min-height:64px!important;font-size:32px!important}";
     document.head.appendChild(st); document.documentElement.classList.add("day-view-on");
+    document.querySelectorAll(".panel .body, .panel .kids-col, .panel .today-day, .panel nav.tap-rail, .panel .quick, .panel .where-card, .panel .kid-card").forEach(function (el) {
+      el.style.setProperty("display", "none", "important");
+    });
     var chip = document.querySelector("[data-sheet-chip]"); if (chip) chip.textContent = "Day";
     var day = months && months.days && months.days[iso];
     var rows = [];

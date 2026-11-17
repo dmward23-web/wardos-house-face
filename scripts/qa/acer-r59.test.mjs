@@ -11,7 +11,8 @@ const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { enc
 test("r59 hub, Today and kid strips are 24px, one line each, inside the safe area", { skip: browser ? false : "SKIP no playwright" }, () => {
   const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/acer_r59_strips.py")], { encoding: "utf8", timeout: 120000 });
   assert.equal(r.status, 0, (r.stderr || "").slice(-800) + (r.stdout || "").slice(-400));
-  const o = JSON.parse(r.stdout.trim().split("\n").pop());
+  const raw = JSON.parse(r.stdout.trim().split("\n").pop());
+  const o = raw.pages || raw;
   for (const name of ["sheet-index.html", "sheet-today.html", "kid-hayes.html", "kid-harris.html", "kid-ainsley.html"]) {
     const page = o[name];
     assert.ok(page && page.n >= 1, name + " has no visible strip text");
@@ -24,5 +25,12 @@ test("r59 hub, Today and kid strips are 24px, one line each, inside the safe are
       assert.ok(row.lines <= 2, name + " wraps " + row.lines + " " + row.t);
       assert.equal(row.over, false, name + " overlaps home " + row.t);
     }
+  }
+  if (raw.pages) {
+    assert.equal(raw.clock, true, "hub clock tap " + JSON.stringify(raw.clock));
+    assert.equal(raw.day.panel, true, JSON.stringify(raw.day));
+    assert.equal(raw.day.gridHidden, true, JSON.stringify(raw.day));
+    assert.equal(raw.day.hit, true, JSON.stringify(raw.day));
+    assert.ok(raw.day.bottom <= 1032 && raw.day.top >= 48, JSON.stringify(raw.day));
   }
 });

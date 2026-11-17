@@ -93,13 +93,15 @@ test("r33 Month night header has no hairline across the band", SKIP, () => {
 
 test("r59 one shared home is 96px, inside the safe edge, hit-testable, and a tap returns home", SKIP, () => {
   const homes = data.homes;
-  for (const route of ["kid-hayes.html", "kid-harris.html", "kid-ainsley.html", "sheet-google-home.html", "sheet-index.html", "sheet-today.html", "month.html"]) {
+  const routes = Object.keys(homes);
+  assert.ok(routes.length >= 20, "routes " + routes.length);
+  for (const route of routes) {
     const row = homes[route];
     assert.ok(row, route);
     const box = row.before;
     assert.equal(box.n, 1, route + " homes " + box.n);
-    if (route === "sheet-index.html") {
-      assert.equal(box.hidden, true, "hub home stays hidden");
+    if (route === "sheet-index.html" || route === "index.html") {
+      assert.equal(box.hidden, true, route + " hub home stays hidden");
       continue;
     }
     assert.equal(box.hidden, false, route);

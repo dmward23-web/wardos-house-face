@@ -177,8 +177,8 @@
     closeOverlays();
     var ov = document.createElement("div");
     ov.className = "saves-overlay";
+    /* The sheet uses the one shared home. It no longer inserts <a class="saves-home wardos-home" href="sheet-index.html">. */
     ov.innerHTML =
-      '<a class="saves-home wardos-home" href="sheet-index.html" aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a>' +
       '<button type="button" class="saves-backdrop" data-saves-backdrop aria-label="Close"></button>' +
       '<div class="saves-sheet" role="dialog" aria-modal="true">' + innerHTML + "</div>";
     document.body.appendChild(ov);

@@ -11,7 +11,10 @@
     try { if (g.HouseAudit && g.HouseAudit.href) return g.HouseAudit.href(HUB); } catch (e) {}
     return HUB;
   }
+  var going = false;
   function go(ev) {
+    if (going) return;
+    going = true;
     if (ev) { ev.preventDefault(); ev.stopPropagation(); }
     try { g.location.assign(href()); } catch (e) { g.location.href = href(); }
   }
@@ -48,7 +51,7 @@
       go(ev);
     });
     btn.addEventListener("contextmenu", function (ev) { ev.preventDefault(); });
-    btn.addEventListener("click", function (ev) { ev.preventDefault(); });
+    btn.addEventListener("click", function (ev) { go(ev); });
   }
   function mount() {
     if (onHub()) {
@@ -56,10 +59,11 @@
         el.setAttribute("hidden", "");
         el.style.setProperty("display", "none", "important");
       });
-      var clock = document.querySelector("[data-live-clock], .live-clock");
+      var clock = document.querySelector(".hdr-date-time, [data-live-clock], .live-clock");
       if (clock && clock.getAttribute("data-home-clock") !== "1") {
         clock.setAttribute("data-home-clock", "1");
         clock.style.cursor = "pointer";
+        clock.style.setProperty("pointer-events", "auto", "important");
         clock.addEventListener("pointerup", function () {
           try { g.location.assign("sheet-today.html"); } catch (e) { g.location.href = "sheet-today.html"; }
         });
@@ -129,14 +133,18 @@
       "html[data-wall-page=sheet-google-home] .panel.cams-cmd>.hdr.gh-top,html[data-wall-page=sheet-google-home] .panel.cams-cmd>section.banner{margin-left:112px!important;width:calc(100% - 112px)!important;box-sizing:border-box!important}",
       "html[data-wall-page=sheet-google-home] .panel.cams-cmd .live-clock-host{position:relative!important;right:auto!important;top:auto!important;left:auto!important;width:auto!important;max-width:none!important;z-index:auto!important}",
       "html[data-wall-page=sheet-index] header.hdr{left:48px!important;padding-left:0!important}",
-      "html body.lights-offline .panel.lights-cmd{position:fixed!important;left:48px!important;top:160px!important;width:1824px!important;height:824px!important;min-height:824px!important;max-width:none!important;background:#101820!important;display:flex!important;align-items:center!important;justify-content:center!important;z-index:4!important}",
-      "html body.lights-offline .panel.lights-cmd .pad-grid,html body.lights-offline .panel.lights-cmd .bulk,html body.lights-offline .panel.lights-cmd .cmd-chip,html body.lights-offline .panel.lights-cmd .light-pad{display:none!important}",
+      "html body.lights-offline .panel.lights-cmd{position:fixed!important;left:48px!important;top:160px!important;width:1824px!important;height:824px!important;min-height:824px!important;max-width:none!important;background:#101820!important;z-index:4!important}",
+      "html body.lights-offline .panel.lights-cmd .pad-grid,html body.lights-offline .panel.lights-cmd .light-pad{display:none!important}",
+      "html body.lights-offline #lights-all-on,html body.lights-offline #lights-all-off{display:inline-flex!important;visibility:visible!important;min-width:96px!important;min-height:64px!important}",
       "html body.lights-offline .panel.lights-cmd .banner-title,html body.lights-offline #lights-connect-title{font-size:40px!important;color:#f4efe6!important}",
       "html:not(#hf-wall-off) body .panel .tap-rail a::after{content:none!important}",
-      "html:not(#hf-wall-off) body .panel .kids-col{position:relative!important;top:-48px!important}",
-      "html:not(#hf-wall-off) body .panel .kids-col .kid-card{overflow:visible!important;height:auto!important;min-height:72px!important}",
+      "html:not(#hf-wall-off) body .panel .body>section.kids-col.kids-col{position:relative!important;top:0!important;height:100%!important;max-height:100%!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;gap:16px!important;margin:0!important}",
+      "html:not(#hf-wall-off) body .panel .body>section.kids-col.kids-col>.kid-card{flex:1 1 0!important;min-height:0!important;height:auto!important;margin:0!important;overflow:hidden!important;position:relative!important;top:0!important}",
+      "html:not(#hf-wall-off) body .panel .kids-col .kid-card .kid-what,html:not(#hf-wall-off) body .panel .kids-col .kid-card .kid-what-line{position:absolute!important;left:16px!important;right:16px!important;bottom:8px!important;top:auto!important;height:24px!important;max-height:24px!important;margin:0!important;line-height:24px!important;overflow:hidden!important}",
       "html body .kid-what,html body .kid-what-line{overflow:visible!important;max-height:none!important;color:#f4efe6!important;-webkit-text-fill-color:#f4efe6!important}",
-      "html body .panel.panel>.hub-upper>section.leaveby.leaveby--hot{position:relative!important;height:auto!important;min-height:160px!important;max-height:320px!important;width:900px!important;overflow:hidden!important;z-index:3!important;background:rgba(16,24,32,.92)!important;pointer-events:auto!important}",
+      "html body .panel.panel>.hub-upper>section.leaveby.leaveby--hot{position:relative!important;height:auto!important;min-height:160px!important;max-height:280px!important;width:900px!important;overflow:hidden!important;z-index:8!important;background:rgba(16,24,32,.94)!important;pointer-events:auto!important}",
+      "html body .lb-day-part,html body .leaveby-mode-label,html body .lb-list-hdr{font-size:24px!important;line-height:1.2!important;color:#f4efe6!important;-webkit-text-fill-color:#f4efe6!important}",
+      "html[data-wall-page=sheet-today] header.hdr .hdr-ovals{margin-left:20px!important}",
       "html body .panel.panel>.hub-upper .leaveby>.leaveby-body{display:flex!important;flex-direction:column!important;min-height:120px!important}",
       "html body .panel.panel>.hub-upper .leaveby [data-live=leaveby-layouts],html body .panel.panel>.hub-upper .leaveby .lb-day,html body .panel.panel>.hub-upper .leaveby .lb-day-col,html body .panel.panel>.hub-upper .leaveby .lb-day-stop{display:block!important;visibility:visible!important}",
       "html body .lb-day-what,html body .lb-day-tchip,html body .leaveby-row-title,html body .kid-what-line{color:#f4efe6!important;-webkit-text-fill-color:#f4efe6!important;background:#101820!important;opacity:1!important;font-size:24px!important;line-height:1.2!important}",
@@ -145,6 +153,17 @@
       "html.ori-nogl,html.ori-nogl body{background-color:#101820!important;background-image:url('month-theme/november/wall-day.webp')!important;background-size:cover!important;background-position:center!important}"
     ].join("");
     document.head.appendChild(s);
+  }
+  function parkChips() {
+    if (!/sheet-today\.html$|month\.html$/i.test(file())) return;
+    var home = document.querySelector("a.wardos-home");
+    var chips = document.querySelectorAll(".hdr-ovals .oval");
+    if (!home || !chips.length) return;
+    var host = chips[0].parentElement;
+    if (host && host.getAttribute("data-chip-parked") !== "1") {
+      host.setAttribute("data-chip-parked", "1");
+      host.style.setProperty("margin-left", "16px", "important");
+    }
   }
   function parkHubTitle() {
     if (!onHub()) return;
@@ -180,11 +199,13 @@
     mount();
     parkClock();
     parkHubTitle();
+    parkChips();
     kick();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
-  function again() { mount(); parkClock(); parkHubTitle(); }
+  function again() { mount(); parkClock(); parkHubTitle(); parkChips(); }
+  window.addEventListener("resize", again);
   window.addEventListener("load", again);
   setTimeout(again, 400);
   setTimeout(again, 650);

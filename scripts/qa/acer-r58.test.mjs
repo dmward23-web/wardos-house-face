@@ -11,7 +11,7 @@ const read = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
 
 const FAMILY = ["sheet-index.html", "sheet-today.html", "sheet-weekend.html", "sheet-pack.html", "sheet-google-home.html", "sheet-chores.html", "sheet-groceries.html", "sheet-win.html", "sheet-load-day.html", "sheet-us.html", "kid-hayes.html", "kid-harris.html", "kid-ainsley.html"];
-const BANNED = ["LIVE EMPTY JAR", "LIVE · EMPTY", "LIVE jar", "Empty LIVE jar", "checklist · no money", "Elo · Nest", "Sensi live · Nest", "Calendar unavailable", "MUSTS OPEN", "JAR OPEN", "DAYS OPEN", "Harbor display lock"];
+const BANNED = ["LIVE EMPTY JAR", "LIVE · EMPTY", "LIVE jar", "Empty LIVE jar", "checklist · no money", "Elo · Nest", "Sensi live · Nest", "Sensi live", "Elo 3202L", "Calendar unavailable", "MUSTS OPEN", "JAR OPEN", "DAYS OPEN", "Harbor display lock"];
 
 test("r58 family screens do not show internal copy", () => {
   for (const f of FAMILY) {
@@ -19,6 +19,8 @@ test("r58 family screens do not show internal copy", () => {
     for (const s of BANNED) assert.equal(html.includes(s), false, f + " " + s);
   }
   assert.equal(read("wall-board-sheets.css").includes('content: "Open"'), false);
+  assert.equal(read("house-nest.js").includes("Elo 3202L"), false);
+  assert.equal(read("house-nest.js").includes("Sensi live"), false);
 });
 
 test("r58 no wall route leads to the dev status page", () => {

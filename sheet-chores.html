@@ -1337,11 +1337,33 @@ document.addEventListener("DOMContentLoaded", function () {
       list.style.setProperty("padding-right", "0", "important");
       list.style.setProperty("overflow", "hidden", "important");
       var gap = 16;
+      col.style.setProperty("padding", "0", "important");
+      col.style.setProperty("gap", "0", "important");
+      var name = col.querySelector(".col-name, .col-hdr");
+      if (name) name.style.setProperty("margin", "0", "important");
+      list.style.setProperty("margin", "0", "important");
+      list.style.setProperty("padding", "0", "important");
       var cs = getComputedStyle(list);
       var padY = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
       var H = list.clientHeight - padY;
       var rowH = Math.floor((H - gap * Math.max(0, n - 1)) / n);
-      if (!isFinite(rowH) || rowH < 96) rowH = 96;
+      if (!isFinite(rowH) || rowH < 64) rowH = 64;
+      var listTop = list.getBoundingClientRect().top;
+      var room = Math.floor(1032 - listTop);
+      if (room > 200 && cards.length) {
+        var packed = 64 * n + gap * Math.max(0, n - 1);
+        if (packed > room && name) {
+          var spare = room - packed;
+          var nameH = Math.max(32, name.getBoundingClientRect().height + spare);
+          name.style.setProperty("height", nameH + "px", "important");
+          name.style.setProperty("overflow", "hidden", "important");
+          listTop = list.getBoundingClientRect().top;
+          room = Math.floor(1032 - listTop);
+        }
+        rowH = 64;
+        list.style.setProperty("gap", gap + "px", "important");
+        list.style.setProperty("max-height", Math.max(64, room) + "px", "important");
+      }
       if (showAll && cards.length > n) {
         var windowH = rowH * n + gap * Math.max(0, n - 1);
         list.style.setProperty("max-height", windowH + "px", "important");
@@ -1394,7 +1416,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         card.style.setProperty("display", "grid", "important");
         card.style.setProperty("grid-template-columns", left + "px " + iconW + "px " + mid + "px " + daysW + "px " + right + "px", "important");
-        card.style.setProperty("grid-template-rows", "24px " + row2 + "px", "important");
+        card.style.setProperty("grid-template-rows", Math.max(64, rowH) + "px", "important");
         card.style.setProperty("column-gap", "0", "important");
         card.style.setProperty("row-gap", "4px", "important");
         card.style.setProperty("align-content", "center", "important");
@@ -1402,10 +1424,10 @@ document.addEventListener("DOMContentLoaded", function () {
         card.style.setProperty("position", "relative", "important");
         card.style.setProperty("align-items", "center", "important");
         card.style.setProperty("box-sizing", "border-box", "important");
-          card.style.setProperty("height", rowH + "px", "important");
-          card.style.setProperty("min-height", "0", "important");
-          card.style.setProperty("max-height", "none", "important");
-          card.style.setProperty("overflow", "visible", "important");
+          card.style.setProperty("height", Math.max(64, rowH) + "px", "important");
+          card.style.setProperty("min-height", Math.max(64, rowH) + "px", "important");
+          card.style.setProperty("max-height", Math.max(64, rowH) + "px", "important");
+          card.style.setProperty("overflow", "hidden", "important");
         card.style.setProperty("padding", "0", "important");
         card.style.setProperty("margin", "0", "important");
         var ico = card.querySelector(".chore-ico");
@@ -1455,7 +1477,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var taps = card.querySelector(".quest-days");
         if (taps) {
           taps.style.setProperty("grid-column", "4", "important");
-          taps.style.setProperty("grid-row", "2", "important");
+          taps.style.setProperty("grid-row", "1", "important");
           taps.style.setProperty("display", "grid", "important");
           taps.style.setProperty("grid-template-columns", "repeat(7, " + circle + "px)", "important");
           taps.style.setProperty("gap", dayGap + "px", "important");
@@ -1492,7 +1514,7 @@ document.addEventListener("DOMContentLoaded", function () {
           ring.style.setProperty("min-width", "48px", "important");
           ring.style.setProperty("min-height", "48px", "important");
           ring.style.setProperty("align-self", "center", "important");
-          ring.style.setProperty("justify-self", "center", "important");
+          ring.style.setProperty("justify-self", "start", "important");
         }
         var hint = card.querySelector(".hint");
         if (hint) hint.style.setProperty("display", "none", "important");

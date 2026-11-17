@@ -1535,3 +1535,45 @@ html body section.col .chore .chore-ico svg {
   max-width: 64px !important;
   max-height: 64px !important;
 }
+/* The next card sits on the stage, left of the must list, so it never covers a chore. */
+@media (min-width: 1400px) and (min-height: 700px) {
+  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days {
+    position: fixed !important;
+    left: 48px !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 48px !important;
+    width: 900px !important;
+    height: auto !important;
+    min-height: 64px !important;
+    max-height: 280px !important;
+    overflow: hidden !important;
+    z-index: 4 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days > .consume-hero,
+  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days > .kw-offline {
+    flex: 0 0 48px !important;
+    height: 48px !important;
+    min-height: 0 !important;
+    max-height: 48px !important;
+    overflow: hidden !important;
+  }
+  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days > .consume-ahead {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    align-content: start !important;
+    overflow: hidden !important;
+    max-height: 200px !important;
+  }
+  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days .consume-ahead-row {
+    height: 32px !important;
+    min-height: 0 !important;
+    max-height: 32px !important;
+    padding: 0 8px !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+}

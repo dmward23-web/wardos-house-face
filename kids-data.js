@@ -2414,7 +2414,7 @@
       if (!rows.length) {
         ahead.innerHTML = '<div class="consume-ahead-empty">No unique events ahead · routines collapsed above</div>';
       } else {
-        ahead.innerHTML = rows.slice(0, 3).map(function (r) {
+        ahead.innerHTML = rows.map(function (r) {
           var dow = CONSUME_DOW[dowIndexFromIso(r.iso)].toUpperCase();
           var dn = String(Number(r.iso.split("-")[2]));
           var what = consumeStripKidName(r.e.what, kid);

@@ -2177,7 +2177,8 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     sceneEl = document.createElement("div");
     sceneEl.className = "kw-scene";
     var sceneHome = global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html";
-    sceneEl.innerHTML = '<canvas class="kw-scene-cv" aria-hidden="true"></canvas><div class="kw-scene-ui"><a class="kw-home wardos-home kw-scene-home" data-kw-home href="' + sceneHome + '" aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a><div class="kw-kicker" data-kicker></div><h2 class="kw-scene-title" data-title></h2><div class="kw-scene-body" data-body></div><div class="kw-scene-actions"><button type="button" class="kw-back" data-back>Back</button></div></div>';
+    /* The one home is house-home.js. This scene used to embed <a class="kw-home wardos-home" href="sheet-index.html"><img src="assets/icons/home-key-light.svg" alt=""></a>. */
+    sceneEl.innerHTML = '<canvas class="kw-scene-cv" aria-hidden="true"></canvas><div class="kw-scene-ui"><div class="kw-kicker" data-kicker></div><h2 class="kw-scene-title" data-title></h2><div class="kw-scene-body" data-body></div><div class="kw-scene-actions"><button type="button" class="kw-back" data-back>Back</button></div></div>';
     document.body.appendChild(sceneEl);
     sceneCv = sceneEl.querySelector("canvas");
     sceneEl.querySelector("[data-back]").addEventListener("click", function () { back(); });
@@ -2480,7 +2481,7 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     var stage = document.createElement("div");
     stage.className = "kw-stage";
     stage.innerHTML =
-      '<header class="kw-hud"><a class="kw-home wardos-home" data-kw-home href="' + (global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html") + '" aria-label="Home"><img src="assets/icons/home-key-light.svg" alt=""></a><div class="kw-id"><span class="kw-name">' + name + '</span></div><div class="kw-clock" data-kw-clock></div></header>' +
+      '<header class="kw-hud"><div class="kw-id"><span class="kw-name">' + name + '</span></div><div class="kw-clock" data-kw-clock></div></header>' +
       '<div class="kw-jar-host" data-kw-jar></div>' +
       '<div class="kw-week" data-kw-week></div>' +
       '<button type="button" class="kw-path" data-kw-path aria-label="My Week">My Week</button>' +
@@ -2559,7 +2560,8 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     fitNext();
     document.addEventListener("house:kids-data-ready", fitNext);
     document.addEventListener("house:kid-rendered", fitNext);
-    stage.querySelector("[data-kw-home]").setAttribute("href", global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html");
+    var hudHome = stage.querySelector("[data-kw-home]");
+    if (hudHome) hudHome.setAttribute("href", global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html");
     stage.querySelector("[data-kw-path]").addEventListener("click", function () {
       var d = document.getElementById("kw-cal");
       if (!d) return;
