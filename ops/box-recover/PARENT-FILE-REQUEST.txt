@@ -1,0 +1,13 @@
+No further source files are requested.
+
+The ten files in runtime bundle 46bc87d451344e3c0c1c66748236bea0a36946175ed5df58558acef03752b4d1
+are pinned. Static imports and spawns from those files stay in that set, plus
+scripts/sensi-control.mjs.
+
+scripts/sensi-control.mjs is not a missing file. Do not send it.
+Its opaque pin is sha256 54f8715454d1e4e851ffd2ead6d87ddbaed204368b63c7d74e2b4c4fe0c58ffc.
+An independent gate may accept that existing hash. This recovery does not
+rewrite the box file and does not lift the security review.
+
+scripts/text_law.py is named only in a comment in private-dir.mjs. The lights
+process does not load it.
