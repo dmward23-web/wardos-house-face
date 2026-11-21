@@ -352,6 +352,16 @@ if (typeof document !== "undefined" && typeof document.write === "function" && !
     global.addEventListener("resize", function () { place(); paintDiag(); });
     if (global.visualViewport) global.visualViewport.addEventListener("resize", function () { place(); paintDiag(); });
     document.addEventListener("fullscreenchange", function () { place(); paintDiag(); });
+    /* COVERSYNC1: the cover canvas is painted on place() (load/resize). A board
+       left open overnight kept the night plate after HouseScene flipped --wg-hubbg
+       and the hub-window tile to day. Repaint whenever the solar scene notifies. */
+    if (global.HouseScene && typeof HouseScene.subscribe === "function") {
+      HouseScene.subscribe(function () {
+        if (document.documentElement.getAttribute("data-wardos-stage") !== "1") return;
+        var node = stage || document.querySelector(".wardos-stage");
+        if (node) extendCover(node, viewport());
+      });
+    }
   }
 
   global.WardosStage = {
