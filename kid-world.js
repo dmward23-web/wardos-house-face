@@ -222,6 +222,7 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     }
     function paintTitle(row) {
       row.style.setProperty("box-sizing", "border-box", "important");
+      row.style.setProperty("padding", "0", "important");
       row.style.setProperty("height", "64px", "important");
       row.style.setProperty("min-height", "64px", "important");
       row.style.setProperty("max-height", "64px", "important");
