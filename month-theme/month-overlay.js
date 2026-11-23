@@ -4,8 +4,24 @@
    ?now=<iso> pins the coat the same way the living house clock does. Photoreal layers only, calm motion, never takes taps. */
 (function () {
   var q = new URLSearchParams(location.search);
-  if (q.get("month") === "0") return;
   var base = ((document.currentScript && document.currentScript.src) || "month-theme/month-overlay.js").replace(/month-theme\/month-overlay\.js.*$/, "");
+  /* NOSPOOK1 (Atlas + Prism, Nov 23): the v5.2 porch engine on wall.html is Halloween art (graves, skeletons, jack-o'-lanterns,
+     bats, witches, ghosts, spooky one-shot sounds). It belongs to October only. In any other month (by the real date, or a
+     ?now= / ?month= pin) the engine's layers are hidden (month-overlay.css, html[data-halloween=off]), its loop video is paused,
+     its sound bank stays silent, and the November harvest plate sits underneath. Runs even with ?month=0. */
+  (function noSpook() {
+    if (!(window.VID && document.getElementById("bg") && document.getElementById("gl"))) return;
+    if (ctDate(seasonDate())[1] === 10) return;
+    var html = document.documentElement;
+    html.setAttribute("data-halloween", "off");
+    var phone = (window.innerWidth || 0) < 700;
+    html.style.setProperty("--km-bg", "url(\"" + base + "month-theme/november/" + (phone ? "phone-" : "wall-") + novPhase(seasonDate()) + ".webp\")");
+    try { var V = document.getElementById("bg"); if (V && V.pause) V.pause(); } catch (eV) { /* already quiet */ }
+    /* the engine's sound bank (night bed, owl, howl, moan, whisper, bone, bats, caw) is Halloween, so off-season it stays silent */
+    if (typeof window.sndInit === "function") window.sndInit = function () {};
+    if (typeof window.snd === "function") window.snd = function () {};
+  })();
+  if (q.get("month") === "0") return;
   var RM = matchMedia("(prefers-reduced-motion: reduce)");
   var THEMES = {
     10: { cls: "km-oct", vids: [["km-bats", "night/media/bats-matte.mp4"], ["km-fog", "night/media/smoke-black.mp4"], ["km-embers", "night/media/embers-black.mp4"]], glow: true, grade: true }
@@ -65,6 +81,7 @@
   }
   function mountNovember() {
     function go() {
+      var html0 = document.documentElement;
       var when = seasonDate();
       var phase = novPhase(when);
       var phone = (window.innerWidth || 0) < 700;
@@ -100,19 +117,26 @@
           location.reload();
         }, 60000);
       }
+      /* CINELEAF1 (Prism ruling via Atlas, Nov 23): under ?look=cinema the plate plus the window snow is the whole look, so the
+         November coat's leaves (the km-fall leaf sheet, the 14 km-leaf sprites) and its warm glow are suppressed, not masked: the
+         layer is mounted empty (data-cinema-bare) and nothing is drawn. Off cinema this layer is unchanged. */
+      var bare = html0.getAttribute("data-look") === "cinema";
       if (!document.getElementById("km-nov")) {
         var L = document.createElement("div");
         L.id = "km-nov";
         L.className = "km-layer km-nov" + (document.querySelector(".kw-canvas") ? " km-kid" : "");
         L.setAttribute("aria-hidden", "true");
         L.style.zIndex = "1";
-        var fall = document.createElement("div");
-        fall.className = "km-fall";
-        L.appendChild(fall);
-        var glow = document.createElement("div");
-        glow.className = "km-glow r";
-        L.appendChild(glow);
-        if (!RM.matches) {
+        if (bare) L.setAttribute("data-cinema-bare", "1");
+        var fall = bare ? null : document.createElement("div");
+        if (fall) {
+          fall.className = "km-fall";
+          L.appendChild(fall);
+          var glow = document.createElement("div");
+          glow.className = "km-glow r";
+          L.appendChild(glow);
+        }
+        if (!bare && !RM.matches) {
           for (var i = 0; i < 14; i++) {
             var leaf = document.createElement("i");
             leaf.className = "km-leaf b0";

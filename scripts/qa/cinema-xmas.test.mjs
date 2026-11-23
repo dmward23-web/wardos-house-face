@@ -189,8 +189,76 @@ test("default wall does not reference cinema files outside the flag hook", () =>
   assert.doesNotMatch(html, /<script[^>]+src="wardos-scene\.js"/);
   assert.doesNotMatch(html, /<link[^>]+wardos-scene\.css"/);
   assert.match(html, /season-math\.js\?v=SUNHOME1/);
-  assert.match(html, /month-theme\/month-overlay\.js\?v=SILLFLAT1/); /* PANEMASK1 + SILLFLAT1 changed month-overlay.js (cinema coat = pane-mask snow + sill only), so its token moved on purpose */
+  assert.match(html, /month-theme\/month-overlay\.js\?v=NOSPOOK1/); /* NOSPOOK1 + CINELEAF1 (Nov 23) moved it again; before that PANEMASK1 + SILLFLAT1 changed month-overlay.js (cinema coat = pane-mask snow + sill only), so its token moved on purpose */
 });
+
+/* CINELEAF1 + NOSPOOK1 · boot month-overlay.js in a vm with motion on (so leaves would be made), an optional cinema look and an
+   optional v5.2 wall engine (window.VID + #bg + #gl), and report what it mounted. */
+function bootOverlayVm({ iso, look, wallEngine, width }) {
+  const attrs = {};
+  const props = {};
+  const made = [];
+  const byId = {};
+  const html = {
+    attrs,
+    style: { setProperty(k, v) { props[k] = v; } },
+    setAttribute(k, v) { attrs[k] = String(v); },
+    getAttribute(k) { return Object.prototype.hasOwnProperty.call(attrs, k) ? attrs[k] : null; },
+    hasAttribute(k) { return Object.prototype.hasOwnProperty.call(attrs, k); }
+  };
+  if (look) attrs["data-look"] = look;
+  const body = { kids: [], firstChild: null, hasAttribute: () => false, getAttribute: () => null, insertBefore(c) { this.kids.push(c); }, appendChild(c) { this.kids.push(c); } };
+  const video = { paused: false, pause() { this.paused = true; } };
+  if (wallEngine) { byId.bg = video; byId.gl = {}; }
+  function el(tag) {
+    const e = {
+      tag, id: "", className: "", style: {}, attrs: {}, kids: [],
+      classList: { add() {}, toggle() {} },
+      setAttribute(k, v) { this.attrs[k] = String(v); if (k === "id") this.id = v; },
+      getAttribute(k) { return this.attrs[k]; },
+      appendChild(c) { this.kids.push(c); return c; },
+      getContext() { return null; }
+    };
+    made.push(e);
+    return e;
+  }
+  const document = {
+    documentElement: html, body, readyState: "complete", hidden: false,
+    currentScript: { src: "http://hub.local/month-theme/month-overlay.js" },
+    createElement: el,
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    getElementById: (id) => byId[id] || made.find((e) => e.id === id) || null,
+    addEventListener() {}
+  };
+  const fixed = Date.parse(iso);
+  class FakeDate extends Date {
+    constructor(...a) { super(...(a.length ? a : [fixed])); }
+    static now() { return fixed; }
+  }
+  const sounds = [];
+  const ctx = vm.createContext({
+    document, Date: FakeDate, Intl, URLSearchParams, console,
+    location: { search: "", pathname: "/wall.html", href: "http://hub.local/wall.html", origin: "http://hub.local" },
+    innerWidth: width || 1920, innerHeight: 1080, devicePixelRatio: 1,
+    matchMedia: () => ({ matches: false, addEventListener() {} }),
+    requestAnimationFrame() { return 1; }, cancelAnimationFrame() {},
+    setInterval() { return 1; }, clearInterval() {}, setTimeout() { return 1; }, clearTimeout() {},
+    performance: { now: () => 0 },
+    addEventListener() {}
+  });
+  ctx.window = ctx;
+  if (wallEngine) {
+    ctx.VID = { night: "night/media/v52/x.mp4" };
+    ctx.snd = (n) => { sounds.push(n); };
+    ctx.sndInit = () => { sounds.push("init"); };
+  }
+  vm.runInContext(fs.readFileSync(path.join(ROOT, "month-theme/season-math.js"), "utf8") + "\n" + fs.readFileSync(path.join(ROOT, "month-theme/month-overlay.js"), "utf8"), ctx, { filename: "month-overlay.js" });
+  const all = [];
+  const walk = (n) => { all.push(n); for (const c of n.kids || []) walk(c); };
+  for (const k of body.kids) walk(k);
+  return { attrs, props, all, video, sounds, ctx };
+}
 
 test("November and Thanksgiving stay on the season coat, and December still snows, with the cinema flag in the query", () => {
   const nov = Season.decide(new Date("2026-11-23T15:00:00-06:00"));
@@ -203,6 +271,17 @@ test("November and Thanksgiving stay on the season coat, and December still snow
   assert.equal(dec.flakes, 1);
   assert.match(fs.readFileSync(path.join(ROOT, "mercury-run.js"), "utf8"), /"2026-11": \{ id: "turkey"/);
   assert.match(fs.readFileSync(path.join(ROOT, "kid-world.js"), "utf8"), /assets\/ori\/creature\//);
+  /* CINELEAF1 (Prism ruling via Atlas, Nov 23): with the cinema flag, November mounts zero coat leaves (no km-leaf sprites, no km-fall
+     leaf sheet, no glow); the plate plus the window snow is the whole look. Showing leaves under cinema is RED. */
+  for (const iso of ["2026-11-23T15:00:00-06:00", "2026-11-26T15:00:00-06:00"]) {
+    const cine = bootOverlayVm({ iso, look: "cinema" });
+    assert.equal(cine.attrs["data-month-theme"], "11", iso);
+    const layer = cine.all.find((e) => e.id === "km-nov");
+    assert.ok(layer, iso + ": the November layer still mounts under cinema");
+    assert.equal(layer.attrs["data-cinema-bare"], "1", iso);
+    assert.equal(cine.all.filter((e) => /\bkm-leaf\b/.test(e.className)).length, 0, iso + ": coat leaves under cinema");
+    assert.equal(cine.all.filter((e) => /\bkm-(fall|glow)\b/.test(e.className)).length, 0, iso + ": leaf sheet or glow under cinema");
+  }
 });
 
 test("Hearthlings hatch still paints under a cinema query", () => {
@@ -939,4 +1018,89 @@ test("PANEMASK1 · Prism's pane alpha ships pinned, and the scene samples it as 
   const src = fs.readFileSync(path.join(ROOT, "wardos-scene.js"), "utf8");
   assert.doesNotMatch(src, /WINDOW_PX|500 \/ 960/, "an inline window rect is back");
   assert.equal(Scene.inPane(600, 300), false, "inPane must be false until the mask loads (fail closed)");
+});
+
+test("CINELEAF1 control: without the cinema flag November still mounts the leaf sheet, the glow and 14 leaves", () => {
+  const plain = bootOverlayVm({ iso: "2026-11-23T15:00:00-06:00" });
+  const layer = plain.all.find((e) => e.id === "km-nov");
+  assert.ok(layer);
+  assert.equal(layer.attrs["data-cinema-bare"], undefined);
+  assert.equal(plain.all.filter((e) => /\bkm-leaf\b/.test(e.className)).length, 14);
+  assert.equal(plain.all.filter((e) => /\bkm-fall\b/.test(e.className)).length, 1);
+  assert.equal(plain.all.filter((e) => /\bkm-glow\b/.test(e.className)).length, 1);
+});
+
+/* NOSPOOK1 (Atlas P1 via Prism, Nov 23): production wall.html showed the v5.2 Halloween porch (graves, skeletons, jack-o'-lanterns)
+   on Nov 23 and in December. Halloween belongs to October only. */
+test("NOSPOOK1: the wall's Halloween engine is off in every month but October, quiet, and the harvest plate sits underneath", () => {
+  const months = ["2026-11-01T00:30:00-05:00", "2026-11-23T12:00:00-06:00", "2026-11-23T21:00:00-06:00", "2026-12-10T12:00:00-06:00",
+    "2026-12-25T18:00:00-06:00", "2027-01-15T12:00:00-06:00", "2027-03-20T12:00:00-05:00", "2027-07-04T12:00:00-05:00", "2027-09-30T23:30:00-05:00"];
+  for (const iso of months) {
+    for (const width of [1920, 390]) {
+      const b = bootOverlayVm({ iso, wallEngine: true, width });
+      assert.equal(b.attrs["data-halloween"], "off", iso + " " + width);
+      assert.match(String(b.props["--km-bg"]), width < 700 ? /month-theme\/november\/phone-(morning|dusk|night)\.webp/ : /month-theme\/november\/wall-(morning|dusk|night)\.webp/, iso + " " + width);
+      assert.equal(b.video.paused, true, iso + ": the porch loop is still playing");
+      b.ctx.sndInit(); b.ctx.snd("howl"); b.ctx.snd("whisper"); b.ctx.snd("bone");
+      assert.deepEqual(b.sounds, [], iso + ": a Halloween sound played");
+    }
+  }
+  /* October control: the porch stays exactly as it was. */
+  for (const iso of ["2026-10-01T00:30:00-05:00", "2026-10-31T23:30:00-05:00"]) {
+    const oct = bootOverlayVm({ iso, wallEngine: true });
+    assert.equal(oct.attrs["data-halloween"], undefined, iso);
+    assert.equal(oct.video.paused, false, iso);
+    oct.ctx.snd("howl");
+    assert.deepEqual(oct.sounds, ["howl"], iso);
+  }
+  /* Only the v5.2 wall engine is touched: a board without it never gets the flag. */
+  assert.equal(bootOverlayVm({ iso: "2026-12-10T12:00:00-06:00" }).attrs["data-halloween"], undefined);
+  const css = fs.readFileSync(path.join(ROOT, "month-theme/month-overlay.css"), "utf8");
+  for (const id of ["bg", "gl", "fx", "poster"]) assert.match(css, new RegExp('html\\[data-halloween="off"\\] #' + id + "[,{]"), id);
+  assert.match(css, /html\[data-halloween="off"\] body:not\(\[data-kid-world\]\)\{background-image:var\(--km-bg\)!important/);
+});
+
+test("browser NOSPOOK1: no Halloween layer is visible or hit on the real wall after October 31, and October still shows it", { timeout: 180000 }, async () => {
+  assert.ok(CHROME, "chrome is required");
+  const srv = await serve();
+  const base = "http://127.0.0.1:" + srv.address().port;
+  const chrome = await launchChrome();
+  const pages = [];
+  const probe = `new Promise((res) => setTimeout(() => {
+    const ids = ["bg", "gl", "fx", "poster"];
+    const vis = ids.filter((id) => { const e = document.getElementById(id); if (!e) return false; const s = getComputedStyle(e);
+      return s.display !== "none" && s.visibility !== "hidden" && Number(s.opacity) > 0; });
+    const hits = [];
+    for (let x = 1; x < 6; x++) for (let y = 1; y < 6; y++) {
+      const e = document.elementFromPoint(x * 320, y * 180);
+      if (e && ids.includes(e.id)) hits.push(e.id + "@" + x * 320 + "," + y * 180);
+    }
+    const v = document.getElementById("bg");
+    res({ flag: document.documentElement.getAttribute("data-halloween"), vis, hits,
+      bodyBg: getComputedStyle(document.body).backgroundImage, paused: v ? v.paused : null });
+  }, 1500))`;
+  try {
+    /* the in-page clock is pinned to Nov 23 2026 (FREEZE); the others pin the season with ?now=. Reduced motion (as the cinema
+       default-wall capture uses) keeps a --disable-gpu runner's load event inside the 30 s wait; the layer checks do not depend on it. */
+    const calm = [{ name: "prefers-reduced-motion", value: "reduce" }];
+    for (const q of ["", "?now=2026-12-10T12:00:00-06:00", "?now=2027-01-15T12:00:00-06:00", "?now=2027-06-15T12:00:00-05:00"]) {
+      const p = await openPage(chrome.port, base + "/wall.html" + q, "", calm);
+      pages.push(p);
+      const r = await p.eval(probe);
+      assert.equal(r.flag, "off", q + " " + JSON.stringify(r));
+      assert.deepEqual(r.vis, [], q + ": Halloween layer visible " + JSON.stringify(r));
+      assert.deepEqual(r.hits, [], q + ": Halloween layer on top " + JSON.stringify(r));
+      assert.match(r.bodyBg, /month-theme\/november\/wall-(morning|dusk|night)\.webp/, q);
+      assert.equal(r.paused, true, q);
+    }
+    const oct = await openPage(chrome.port, base + "/wall.html?now=2026-10-20T20:00:00-05:00", "", calm);
+    pages.push(oct);
+    const o = await oct.eval(probe);
+    assert.equal(o.flag, null, JSON.stringify(o));
+    assert.ok(o.vis.length > 0, "October control lost the porch " + JSON.stringify(o));
+  } finally {
+    for (const p of pages) p.close();
+    chrome.proc.kill("SIGKILL");
+    srv.close();
+  }
 });
