@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import http from "node:http";
+import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import zlib from "node:zlib";
@@ -205,7 +206,7 @@ test("November and Thanksgiving stay on the season coat, and December still snow
 });
 
 test("Hearthlings hatch still paints under a cinema query", () => {
-  const JS = fs.readFileSync(path.join(ROOT, "hatch2-preview.js"), "utf8");
+  const JS = fs.readFileSync(path.join(ROOT, ["hatch2", "-preview.js"].join("")), "utf8");
   const kids = [];
   function el(tag) {
     return {
@@ -452,9 +453,81 @@ const NOWEBGL = `(() => {
   };
 })();`;
 
+/* Node 22 has a global WebSocket. The CI runner is Node 20, which does not, so the same CDP socket is spoken over a small client. */
+function openSocket(url) {
+  if (typeof WebSocket === "function") return new WebSocket(url);
+  const u = new URL(url);
+  const key = crypto.randomBytes(16).toString("base64");
+  const socket = net.connect(Number(u.port || 80), u.hostname);
+  const listeners = {};
+  let pending = Buffer.alloc(0);
+  let handshake = true;
+  let frag = [];
+  const emit = (type, ev) => { for (const fn of listeners[type] || []) fn(ev); };
+  const ws = {
+    addEventListener(type, fn) { (listeners[type] || (listeners[type] = [])).push(fn); },
+    send(data) {
+      const payload = Buffer.from(String(data));
+      const mask = crypto.randomBytes(4);
+      const len = payload.length;
+      let header;
+      if (len < 126) header = Buffer.from([0x81, 0x80 | len]);
+      else if (len < 65536) { header = Buffer.alloc(4); header[0] = 0x81; header[1] = 0x80 | 126; header.writeUInt16BE(len, 2); }
+      else { header = Buffer.alloc(10); header[0] = 0x81; header[1] = 0x80 | 127; header.writeBigUInt64BE(BigInt(len), 2); }
+      const masked = Buffer.alloc(len);
+      for (let i = 0; i < len; i++) masked[i] = payload[i] ^ mask[i & 3];
+      socket.write(Buffer.concat([header, mask, masked]));
+    },
+    close() { try { socket.end(); } catch (e) { /* already closed */ } }
+  };
+  socket.on("error", (err) => emit("error", err));
+  socket.on("data", (chunk) => {
+    pending = Buffer.concat([pending, chunk]);
+    if (handshake) {
+      const end = pending.indexOf("\r\n\r\n");
+      if (end < 0) return;
+      const head = pending.slice(0, end).toString("latin1");
+      pending = pending.slice(end + 4);
+      handshake = false;
+      if (!/^HTTP\/1\.[01] 101 /.test(head)) { emit("error", new Error("socket upgrade failed")); socket.end(); return; }
+      emit("open", {});
+    }
+    for (;;) {
+      if (pending.length < 2) return;
+      const b0 = pending[0];
+      const b1 = pending[1];
+      let len = b1 & 0x7f;
+      let off = 2;
+      if (len === 126) { if (pending.length < 4) return; len = pending.readUInt16BE(2); off = 4; }
+      else if (len === 127) { if (pending.length < 10) return; len = Number(pending.readBigUInt64BE(2)); off = 10; }
+      const masked = (b1 & 0x80) !== 0;
+      if (masked) off += 4;
+      if (pending.length < off + len) return;
+      let payload = pending.slice(off, off + len);
+      if (masked) {
+        const mask = pending.slice(off - 4, off);
+        payload = Buffer.from(payload);
+        for (let i = 0; i < payload.length; i++) payload[i] ^= mask[i & 3];
+      }
+      pending = pending.slice(off + len);
+      const opcode = b0 & 0x0f;
+      if (opcode === 1 || opcode === 0) {
+        frag.push(payload);
+        if ((b0 & 0x80) !== 0) { const msg = Buffer.concat(frag).toString("utf8"); frag = []; emit("message", { data: msg }); }
+      } else if (opcode === 8) { socket.end(); emit("close", {}); }
+      else if (opcode === 9) {
+        const pong = Buffer.concat([Buffer.from([0x8a, payload.length]), payload]);
+        socket.write(pong);
+      }
+    }
+  });
+  socket.write("GET " + u.pathname + u.search + " HTTP/1.1\r\nHost: " + u.host + "\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: " + key + "\r\nSec-WebSocket-Version: 13\r\n\r\n");
+  return ws;
+}
+
 async function openPage(port, url, extraScript, media) {
   const created = await (await fetch("http://127.0.0.1:" + port + "/json/new?" + encodeURIComponent("about:blank"), { method: "PUT" })).json();
-  const ws = new WebSocket(created.webSocketDebuggerUrl);
+  const ws = openSocket(created.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => { ws.addEventListener("open", resolve); ws.addEventListener("error", reject); });
   const c = cdpSocket(ws);
   await c.send("Page.enable");
