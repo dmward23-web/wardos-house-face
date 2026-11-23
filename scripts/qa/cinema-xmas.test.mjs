@@ -128,7 +128,7 @@ test("asset pin list is the r3 set plus the r2 palette pin, in one file", () => 
     "xmas-hero-fallback-1920x1080-graded.png",
     "wardos-xmas.cube",
     "palette.json",
-    "glass-card-9slice-192.png"
+    "glass-card-9slice-192.png", "window-pane-alpha-1920x1080.png" /* PANEMASK1 · Prism's pane alpha */
   ]);
   for (const pin of Pins.pins) {
     assert.match(pin.sha256, /^[0-9a-f]{64}$/);
@@ -189,7 +189,7 @@ test("default wall does not reference cinema files outside the flag hook", () =>
   assert.doesNotMatch(html, /<script[^>]+src="wardos-scene\.js"/);
   assert.doesNotMatch(html, /<link[^>]+wardos-scene\.css"/);
   assert.match(html, /season-math\.js\?v=SUNHOME1/);
-  assert.match(html, /month-theme\/month-overlay\.js\?v=SUNHOME2/);
+  assert.match(html, /month-theme\/month-overlay\.js\?v=PANEMASK1/); /* PANEMASK1 changed month-overlay.js (cinema coat = pane-mask snow + sill only), so its token moved on purpose */
 });
 
 test("November and Thanksgiving stay on the season coat, and December still snows, with the cinema flag in the query", () => {
@@ -670,9 +670,65 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     assert.equal(fps2, true);
     /* P2-5: snow only in the window panes (plate x 500..765, y 0..690), none over the tree or lamp, after it has fallen a while. */
     const snow = await high.eval(`window.__wardosScene && window.__wardosScene.snowBox()`);
-    assert.ok(snow && snow.n === 1200, "high tier keeps its 1200 flakes");
+    assert.ok(snow && snow.n === 600, "high tier keeps its 600 flakes" /* PANEMASK1 v8 · Prism Nov 23: 1200 read as static on a 4% pane */);
     assert.equal(snow.out, 0, "snow flake outside the window panes");
+    /* PANEMASK1: the GL flakes that are drawn all sit on Prism's glass (checked per flake against the mask), and some are drawn */
+    assert.equal(snow.mask, true, "pane mask never loaded");
+    assert.ok(snow.vis > 0, "no GL snow on the glass at all");
     assert.ok(snow.px.x0 >= 480 && snow.px.x1 <= 800 && snow.px.y0 >= 0 && snow.px.y1 <= 700, "snow box drifted off the window: " + JSON.stringify(snow.px));
+    /* COATWIN1 + COATWIN2 + PANEMASK1: at the Dec freeze under cinema the December coat paints ONLY snow on Prism's glass and the sill bank.
+       The test loads the pinned pane mask itself (white = glass) and checks real coat pixels against it:
+       - every painted coat pixel is on the glass or in WardosScene.PANE_SILL (no glow orb, stick trees or lit windows over the room);
+       - flakes move between two reads 500 ms apart, and every moved pixel is on the glass (none on a mullion, muntin or the garland);
+       - the sill row is painted across at least 80% of the window, and the coat is still its one canvas. */
+    const decw = await page("/wall.html?look=cinema&q=still&now=2026-12-04T18:00:00-06:00");
+    await decw.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => { if (document.querySelector("#km-coat canvas") && window.WardosScene && window.WardosScene.paneMask && window.WardosScene.paneMask()) return res(true); if (performance.now() - t0 > 8000) return res(false); setTimeout(step, 50); }; step(); })`);
+    await decw.eval(`new Promise((r) => setTimeout(r, 800))`);
+    const coat = await decw.eval(`new Promise((res) => {
+      const img = new Image();
+      img.onload = () => {
+        const cv = document.querySelector("#km-coat canvas"), S = window.WardosScene, l = S.PANE_SILL;
+        const m = document.createElement("canvas"); m.width = 1920; m.height = 1080;
+        const mg = m.getContext("2d"); mg.drawImage(img, 0, 0); const md = mg.getImageData(0, 0, 1920, 1080).data;
+        const kx = cv.width / 1920, ky = cv.height / 1080, g = cv.getContext("2d");
+        const glass = (x, y) => { const X = Math.floor(x / kx), Y = Math.floor(y / ky); return X >= 0 && Y >= 0 && X < 1920 && Y < 1080 && md[(Y * 1920 + X) * 4] > 127; };
+        const onSill = (x, y) => x >= l.x0 * kx && x < l.x1 * kx && y >= l.y0 * ky && y < l.y1 * ky;
+        const sillY = Math.floor((l.y1 - 2) * ky);
+        const a = g.getImageData(0, 0, cv.width, cv.height).data;
+        let paintGlass = 0, paintSill = 0, paintOut = 0, sillRow = 0;
+        for (let i = 3; i < a.length; i += 4) {
+          if (!a[i]) continue;
+          const p = (i - 3) / 4, x = p % cv.width, y = (p / cv.width) | 0;
+          if (glass(x, y)) paintGlass++; else if (onSill(x, y)) paintSill++; else paintOut++;
+          if (y === sillY && onSill(x, y)) sillRow++;
+        }
+        setTimeout(() => {
+          const z = g.getImageData(0, 0, cv.width, cv.height).data;
+          let inside = 0, outside = 0;
+          for (let i = 0; i < a.length; i += 4) {
+            if (a[i] === z[i] && a[i + 1] === z[i + 1] && a[i + 2] === z[i + 2] && a[i + 3] === z[i + 3]) continue;
+            const p = i / 4, x = p % cv.width, y = (p / cv.width) | 0;
+            if (glass(x, y)) inside++; else outside++;
+          }
+          res({ theme: document.documentElement.getAttribute("data-month-theme"), bbox: S.PANE_BBOX, sill: l, loaded: S.paneMask().bbox,
+            inside, outside, paintGlass, paintSill, paintOut, sillRow, sillMin: Math.ceil(0.8 * (l.x1 - l.x0) * kx), kids: cv.parentNode.children.length });
+        }, 500);
+      };
+      img.onerror = () => res(null);
+      img.src = "art/cinema/xmas-2026/window-pane-alpha-1920x1080.png";
+    })`);
+    assert.ok(coat, "the pinned pane mask did not load in the page");
+    assert.equal(coat.theme, "12", "Dec freeze did not put the December coat up");
+    assert.deepEqual(coat.bbox, { x0: 482, x1: 765, y0: 0, y1: 696 });
+    assert.deepEqual(coat.loaded, coat.bbox, "PANE_BBOX is not the loaded mask's glass box");
+    assert.deepEqual(coat.sill, { x0: 482, x1: 765, y0: 694, y1: 706 });
+    assert.ok(coat.inside > 0, "December still snows, on the glass: no coat flake moved on the window");
+    assert.equal(coat.outside, 0, "December coat snow is falling off the glass under cinema (room, mullion, muntin or garland)");
+    assert.equal(coat.paintOut, 0, "December coat paints off the glass and sill under cinema (glow, trees or lit windows over the room)");
+    assert.ok(coat.paintGlass > 0, "no coat snow painted on the glass");
+    assert.ok(coat.sillRow >= coat.sillMin, "the sill bank is missing: " + JSON.stringify({ sillRow: coat.sillRow, sillMin: coat.sillMin }));
+    assert.equal(coat.kids, 1, "the cinema coat grew extra nodes");
+    fs.writeFileSync(path.join(ART, "cinema-dec-coat.png"), await decw.shot());
 
     const live = await page("/wall.html");
     await live.eval(`new Promise((r) => setTimeout(r, 400))`);
@@ -816,4 +872,15 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     chrome.proc.kill("SIGKILL");
     srv.close();
   }
+});
+
+test("PANEMASK1 · Prism's pane alpha ships pinned, and the scene samples it as the one glass source", () => {
+  const pin = Pins.pins.find((p) => p.role === "paneMask");
+  assert.equal(pin && pin.file, "window-pane-alpha-1920x1080.png");
+  assert.equal(pin.sha256, "sha256:41280f2f4ff3f6731ecf270193339638a0d5b8bff15c5d94e557ff0a3322829c".slice(7));
+  assert.equal(sha256(fs.readFileSync(path.join(ROOT, Pins.dir, pin.file))), pin.sha256);
+  assert.ok(Scene.FILES.paneMask.endsWith(pin.file));
+  const src = fs.readFileSync(path.join(ROOT, "wardos-scene.js"), "utf8");
+  assert.doesNotMatch(src, /WINDOW_PX|500 \/ 960/, "an inline window rect is back");
+  assert.equal(Scene.inPane(600, 300), false, "inPane must be false until the mask loads (fail closed)");
 });

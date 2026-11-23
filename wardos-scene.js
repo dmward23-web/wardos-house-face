@@ -15,8 +15,55 @@
     fallback: DIR + "xmas-hero-fallback-1920x1080-graded.png",
     lut: DIR + "wardos-xmas.cube",
     palette: DIR + "palette.json",
-    glass: DIR + "glass-card-9slice-192.png"
+    glass: DIR + "glass-card-9slice-192.png",
+    paneMask: DIR + "window-pane-alpha-1920x1080.png"
   };
+  /* PANEMASK1 (Atlas Nov 23 10:26 + Prism P2-5): the window glass is Prism's pane alpha, art/cinema/xmas-2026/window-pane-alpha-1920x1080.png
+     (1920x1080 8-bit L, white = glass; mullions, transom, muntins and the garland over the lower-right pane are black; sha pinned in pins.js).
+     It is the ONE source for where cinema snow may be: GL snow and the December coat's snow both sample it. PANE_BBOX is that mask's
+     white bounding box and PANE_SILL the sill line under it (Prism: y ~695-705, x 482-764); the test checks the loaded mask against both. */
+  var PANE_BBOX = Object.freeze({ x0: 482, x1: 765, y0: 0, y1: 696 });
+  var PANE_SILL = Object.freeze({ x0: 482, x1: 765, y0: 694, y1: 706 });
+  var PANE = { w: 1920, h: 1080, ready: false, bits: null, bbox: null, canvas: null, loading: null };
+  function loadPaneMask() {
+    if (PANE.loading) return PANE.loading;
+    PANE.loading = loadImage(FILES.paneMask).then(function (img) {
+      if (!img) return PANE; /* fail closed: no mask, no cinema snow */
+      var c = document.createElement("canvas");
+      c.width = PANE.w; c.height = PANE.h;
+      var g = c.getContext("2d", { willReadFrequently: true });
+      g.drawImage(img, 0, 0, PANE.w, PANE.h);
+      var d = g.getImageData(0, 0, PANE.w, PANE.h), px = d.data, bits = new Uint8Array(PANE.w * PANE.h);
+      var x0 = PANE.w, x1 = -1, y0 = PANE.h, y1 = -1, i, x, y;
+      for (i = 0; i < bits.length; i++) {
+        if (px[i * 4] > 127) {
+          bits[i] = 1; x = i % PANE.w; y = (i / PANE.w) | 0;
+          if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+          px[i * 4] = px[i * 4 + 1] = px[i * 4 + 2] = 255; px[i * 4 + 3] = 255;
+        } else { px[i * 4 + 3] = 0; }
+      }
+      if (x1 < 0) return PANE;
+      g.putImageData(d, 0, 0);
+      PANE.bits = bits;
+      PANE.canvas = c;
+      PANE.bbox = Object.freeze({ x0: x0, x1: x1 + 1, y0: y0, y1: y1 + 1 });
+      PANE.ready = true;
+      try { global.dispatchEvent(new Event("wardos-panemask")); } catch (e) { /* no window */ }
+      return PANE;
+    });
+    return PANE.loading;
+  }
+  /* true only for a plate pixel on the glass; false until the mask is loaded */
+  function inPane(px, py) {
+    if (!PANE.ready) return false;
+    var x = Math.floor(px), y = Math.floor(py);
+    if (x < 0 || y < 0 || x >= PANE.w || y >= PANE.h) return false;
+    return PANE.bits[y * PANE.w + x] === 1;
+  }
+  /* a 3px GL flake is drawn only when its whole footprint (centre and +-2 px) is on the glass */
+  function flakeOnGlass(px, py) {
+    return inPane(px, py) && inPane(px - 2, py) && inPane(px + 2, py) && inPane(px, py - 2) && inPane(px, py + 2);
+  }
   var KID_LEGEND = {
     Ainsley: "#8a6394",
     Hayes: "#3f8b71",
@@ -531,26 +578,27 @@
       plateMesh.position.z = 0;
       plateMesh.visible = source !== "loop";
       scene.add(plateMesh);
-      var n = q === "low" ? 300 : 1200;
+      var n = q === "low" ? 300 : 600;
       var arr = new Float32Array(n * 3);
       var sp = new Float32Array(n);
       var i;
-      /* P2-5 (Prism, Nov 23): snow lives ONLY in the window panes, behind the glass.
-         WIN is the pane box in plate pixels (x 500..765, y 0..690 of 1920x1080), as NDC. */
-      var WIN = { x0: 500 / 960 - 1, x1: 765 / 960 - 1, y0: 1 - 690 / 540, y1: 1 };
+      /* P2-5 (Prism, Nov 23): snow lives ONLY on the window glass. Flakes fall inside PANE_BBOX (as NDC); PANEMASK1: each frame a flake
+         is drawn only where Prism's pane mask is white (sim keeps the motion, arr is what the GPU draws; off-glass flakes park off-screen). */
+      var WIN = { x0: PANE_BBOX.x0 / 960 - 1, x1: PANE_BBOX.x1 / 960 - 1, y0: 1 - PANE_BBOX.y1 / 540, y1: 1 - PANE_BBOX.y0 / 540 };
       for (i = 0; i < n; i++) {
         arr[i * 3] = WIN.x0 + Math.random() * (WIN.x1 - WIN.x0);
         arr[i * 3 + 1] = WIN.y0 + Math.random() * (WIN.y1 - WIN.y0);
         arr[i * 3 + 2] = 0.2;
         sp[i] = 0.12 + Math.random() * 0.4;
       }
+      var sim = new Float32Array(arr);
       var geo = new T.BufferGeometry();
       geo.setAttribute("position", new T.BufferAttribute(arr, 3));
       var pts = new T.Points(geo, new T.PointsMaterial({
         color: 0xfff6ee,
         size: 3,
         transparent: true,
-        opacity: 0.9,
+        opacity: 0.72,
         depthWrite: false,
         sizeAttenuation: false
       }));
@@ -611,26 +659,39 @@
         pts: pts,
         arr: arr,
         sp: sp,
+        sim: sim,
         win: WIN,
         n: n,
         gradeMat: gradeMat,
         gradeScene: gradeScene,
         rt: rt
       };
+      maskSnow();
       reflect();
+    }
+
+    function maskSnow() {
+      var g = glState, k;
+      for (k = 0; k < g.n; k++) {
+        var x = g.sim[k * 3], y = g.sim[k * 3 + 1];
+        var on = flakeOnGlass((x + 1) * 960, (1 - y) * 540);
+        g.arr[k * 3] = on ? x : -9;
+        g.arr[k * 3 + 1] = on ? y : -9;
+      }
+      g.pts.geometry.attributes.position.needsUpdate = true;
     }
 
     function renderFrame(dt, now) {
       if (!glState || q === "still") return;
-      var arr = glState.arr;
+      var sim = glState.sim;
       var sp = glState.sp;
       var n = glState.n;
       var i;
       for (i = 0; i < n; i++) {
-        arr[i * 3 + 1] -= sp[i] * dt * 0.00012;
-        if (arr[i * 3 + 1] < glState.win.y0) arr[i * 3 + 1] = glState.win.y1;
+        sim[i * 3 + 1] -= sp[i] * dt * 0.00012;
+        if (sim[i * 3 + 1] < glState.win.y0) sim[i * 3 + 1] = glState.win.y1;
       }
-      glState.pts.geometry.attributes.position.needsUpdate = true;
+      maskSnow();
       glState.plateMesh.visible = source !== "loop";
       glState.plateTex.needsUpdate = true;
       var w = glCanvas.clientWidth || el.clientWidth || 1920;
@@ -770,12 +831,14 @@
       quality: function () { return q; },
       snowBox: function () {
         if (!glState) return null;
-        var g = glState, out = 0, k;
+        var g = glState, out = 0, vis = 0, k;
         for (k = 0; k < g.n; k++) {
           var x = g.arr[k * 3], y = g.arr[k * 3 + 1];
-          if (x < g.win.x0 || x > g.win.x1 || y < g.win.y0 || y > g.win.y1) out++;
+          if (x === -9 && y === -9) continue;
+          vis++;
+          if (x < g.win.x0 || x > g.win.x1 || y < g.win.y0 || y > g.win.y1 || !flakeOnGlass((x + 1) * 960, (1 - y) * 540)) out++;
         }
-        return { n: g.n, out: out, px: { x0: (g.win.x0 + 1) * 960, x1: (g.win.x1 + 1) * 960, y0: (1 - g.win.y1) * 540, y1: (1 - g.win.y0) * 540 } };
+        return { n: g.n, vis: vis, out: out, mask: PANE.ready, px: { x0: (g.win.x0 + 1) * 960, x1: (g.win.x1 + 1) * 960, y0: (1 - g.win.y1) * 540, y1: (1 - g.win.y0) * 540 } };
       },
       source: function () { return source; },
       gradeOn: function () { return !!(grade && !gradeBypassed(source)); }
@@ -785,6 +848,7 @@
   function bootPage() {
     if (!document.body || document.getElementById("wardos-scene")) return;
     if (document.documentElement.getAttribute("data-look") !== "cinema") return;
+    loadPaneMask();
     var params = new URLSearchParams(location.search);
     var q = params.get("q");
     var root = document.createElement("div");
@@ -813,7 +877,11 @@
     contrastRatio: contrastRatio,
     parseHex: parseHex,
     parseCube: parseCube,
-    paintProcedural: paintProcedural
+    paintProcedural: paintProcedural,
+    PANE_BBOX: PANE_BBOX,
+    PANE_SILL: PANE_SILL,
+    inPane: inPane,
+    paneMask: function () { return PANE.ready ? { w: PANE.w, h: PANE.h, bbox: PANE.bbox, canvas: PANE.canvas } : null; }
   };
   global.WardosScene = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;

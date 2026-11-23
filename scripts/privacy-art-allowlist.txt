@@ -1132,3 +1132,5 @@ art/cinema/xmas-2026/glass-card-9slice-192.png
 art/cinema/xmas-2026/xmas-hero-fallback-1920x1080-graded.png
 art/cinema/xmas-2026/xmas-hero-loop-1920x1080-25s.mp4
 art/cinema/xmas-2026/xmas-hero-plate-1920x1080-ungraded.png
+# window-pane-alpha 41280f2f (Prism pane mask, Nov 23 2026: black and white shapes only, opened by Wright on the box)
+art/cinema/xmas-2026/window-pane-alpha-1920x1080.png

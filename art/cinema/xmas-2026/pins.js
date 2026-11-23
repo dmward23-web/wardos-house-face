@@ -44,6 +44,13 @@
       sha256: "c630f43eec72e392634d936dc55283de4fb997affc5db8c1e59f6f3c0f9d1a39",
       role: "glass",
       state: "verified"
+    },
+    {
+      file: "window-pane-alpha-1920x1080.png",
+      sha256: "41280f2f4ff3f6731ecf270193339638a0d5b8bff15c5d94e557ff0a3322829c",
+      role: "paneMask",
+      state: "verified",
+      note: "Prism pane alpha (white = glass), Nov 23 2026; drives cinema GL and coat snow"
     }
   ];
   var api = { dir: "art/cinema/xmas-2026", status: "verified", pins: PINS };

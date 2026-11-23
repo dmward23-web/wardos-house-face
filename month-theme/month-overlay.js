@@ -212,6 +212,7 @@
       RM.addEventListener && RM.addEventListener("change", start);
       document.addEventListener("visibilitychange", function () { if (!document.hidden) start(); });
       window.addEventListener("resize", start);
+      window.addEventListener("wardos-panemask", start); /* PANEMASK1: redraw once the glass mask is in */
       start();
     }
     function hostReady() { return document.querySelector(".kw-canvas,iframe.night52-scene,#fx"); }
@@ -223,9 +224,25 @@
     else kick();
   }
 
+  /* COATWIN1 (P2-5, Atlas rule A + Alfred conditions, Nov 23) + PANEMASK1 (Atlas Nov 23 10:26, Prism): under ?look=cinema the coat's
+     snow lives ONLY on the window glass of Prism's pane mask (WardosScene.paneMask, art/cinema/xmas-2026/window-pane-alpha-1920x1080.png),
+     and its snowbank only on the sill line WardosScene.PANE_SILL. Until the mask is loaded (or with no scene), cinema gets no coat snow. */
+  var coatLayer = null;
+  function cinemaWin(W, H) {
+    if (document.documentElement.getAttribute("data-look") !== "cinema") return false;
+    var S = window.WardosScene, m = S && S.paneMask && S.paneMask();
+    if (!m || !S.PANE_SILL) return null;
+    var kx = W / 1920, ky = H / 1080, b = m.bbox, l = S.PANE_SILL;
+    return { x0: b.x0 * kx, y0: b.y0 * ky, w: (b.x1 - b.x0) * kx, h: (b.y1 - b.y0) * ky, mask: m.canvas,
+      sill: { x0: l.x0 * kx, y0: l.y0 * ky, w: (l.x1 - l.x0) * kx, h: (l.y1 - l.y0) * ky } };
+  }
   function drawCoat(ctx, W, H, sp, t, mode) {
+    var cw = cinemaWin(W, H);
     var veil = mode === "scene" ? 0.42 : mode === "kid" ? 0.62 : 1;
     ctx.clearRect(0, 0, W, H);
+    /* COATWIN2 (P2-6, Atlas Nov 23 10:22 + Alfred ADDENDUM-2): under cinema Prism's graded plate IS the look, so the coat paints
+       nothing but the window-boxed snow and its sill: no sky veil, no glow orb, no stick trees, no lit windows. Off cinema: unchanged. */
+    if (cw === false) {
     var sky = ctx.createLinearGradient(0, 0, 0, H);
     if (sp.id === "december") {
       sky.addColorStop(0, "rgba(6,12,28," + (0.16 * veil) + ")");
@@ -282,15 +299,25 @@
       ctx.stroke();
     }
     ctx.restore();
+    }
 
     var depth = sp.id === "december" ? (sp.snow || 0.35) : (sp.cold || 0) * 0.45;
     var packH = H * (0.045 + depth * (mode === "kid" ? 0.06 : 0.11));
     var frost = ctx.createLinearGradient(0, H - packH, 0, H);
     frost.addColorStop(0, "rgba(255,255,255,0)");
     frost.addColorStop(1, "rgba(236,242,250," + (0.18 + depth * 0.55) + ")");
-    ctx.fillStyle = frost;
-    ctx.fillRect(0, H - packH, W, packH);
+    if (cw === false) {
+      ctx.fillStyle = frost;
+      ctx.fillRect(0, H - packH, W, packH);
+    } else if (cw) {
+      var sill = ctx.createLinearGradient(0, cw.sill.y0, 0, cw.sill.y0 + cw.sill.h);
+      sill.addColorStop(0, "rgba(255,255,255,0)");
+      sill.addColorStop(1, "rgba(236,242,250," + (0.18 + depth * 0.55) + ")");
+      ctx.fillStyle = sill;
+      ctx.fillRect(cw.sill.x0, cw.sill.y0, cw.sill.w, cw.sill.h);
+    }
 
+    if (cw === false) {
     var nWin = sp.id === "december" ? 8 : 2;
     var litN = sp.id === "december" ? Math.max(0, Math.round(((sp.lit || 0) / 25) * 8)) : 2;
     if (sp.id === "december" && (sp.lit || 0) > 0 && litN < 1) litN = 1;
@@ -311,6 +338,7 @@
       ctx.fillStyle = wg;
       ctx.beginPath(); ctx.arc(x + ww / 2, yW + ww, ww * 3, 0, Math.PI * 2); ctx.fill();
     }
+    }
 
     var flakes = sp.flakes || 0;
     if (sp.id === "november" && flakes < 0.04) {
@@ -325,11 +353,21 @@
         ctx.beginPath(); ctx.ellipse(0, 0, 7, 3, 0, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
       }
-    } else if (flakes > 0) {
+    } else if (flakes > 0 && cw !== null) {
       var count = Math.round(flakes * (sp.id === "december" ? (mode === "kid" ? 46 : 90) : 40));
+      var out = ctx;
+      if (cw) {
+        /* paint flakes on a scratch layer, keep only the glass (destination-in the pane mask), then lay it on the coat */
+        if (!coatLayer) coatLayer = document.createElement("canvas");
+        if (coatLayer.width !== W || coatLayer.height !== H) { coatLayer.width = W; coatLayer.height = H; }
+        ctx = coatLayer.getContext("2d");
+        ctx.clearRect(0, 0, W, H);
+      }
       for (var s = 0; s < count; s++) {
-        var sx = ((s * 131 + t * (16 + (s % 5) * 7) * (0.35 + flakes)) % (W + 24)) - 12;
-        var sy = ((s * 77 + t * (26 + (s % 4) * 11) * (0.35 + flakes)) % (H + 16)) - 8;
+        var sx = cw ? cw.x0 + 3 + ((s * 131 + t * (16 + (s % 5) * 7) * (0.35 + flakes)) % (cw.w - 6))
+          : ((s * 131 + t * (16 + (s % 5) * 7) * (0.35 + flakes)) % (W + 24)) - 12;
+        var sy = cw ? cw.y0 + ((s * 77 + t * (26 + (s % 4) * 11) * (0.35 + flakes)) % (cw.h - 3))
+          : ((s * 77 + t * (26 + (s % 4) * 11) * (0.35 + flakes)) % (H + 16)) - 8;
         if (mode === "kid" && sy < H * 0.55 && s % 3 !== 0) continue;
         ctx.globalAlpha = 0.35 + (s % 5) * 0.1;
         ctx.fillStyle = "#f4f7fb";
@@ -338,6 +376,14 @@
         ctx.fill();
       }
       ctx.globalAlpha = 1;
+      if (cw) {
+        ctx.globalCompositeOperation = "destination-in";
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(cw.mask, 0, 0, W, H);
+        ctx.globalCompositeOperation = "source-over";
+        ctx = out;
+        ctx.drawImage(coatLayer, 0, 0);
+      }
     }
   }
 })();
