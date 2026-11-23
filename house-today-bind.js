@@ -4,6 +4,7 @@
   "use strict";
   function ctIso() {
     try {
+      if (window.HouseClock && typeof HouseClock.iso === "function") return HouseClock.iso();
       return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     } catch (e) { return ""; }
   }

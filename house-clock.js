@@ -5,11 +5,33 @@
   var TZ = "America/Chicago";
   /* LIVEWX2 · one clock per page: when livinghouse/clock.js is loaded the header follows LHClock (so a ?now= still never shows two
      different times); absent = real time */
+  /* B6 · ?now= holds when freeze=1 (or rec=1). Pages with no HouseScene and no LHClock still follow it. */
+  var pinBase = null, pinWall = Date.now(), pinFreeze = false;
+  try {
+    var pinQ = new URLSearchParams(global.location && global.location.search || "");
+    var pinRaw = pinQ.get("now");
+    if (pinRaw) {
+      var pinDate = new Date(pinRaw);
+      if (!isNaN(+pinDate)) {
+        pinBase = +pinDate;
+        pinFreeze = pinQ.get("freeze") === "1" || pinQ.get("rec") === "1";
+      }
+    }
+  } catch (ePin) { /* no location: the live clock */ }
+  function pinnedDate() {
+    if (pinBase == null) return null;
+    return new Date(pinFreeze ? pinBase : Date.now() + (pinBase - pinWall));
+  }
   function cur() {
     var S = global.HouseScene;
-    if (S && typeof S.now === "function") return S.now();
+    if (S && typeof S.now === "function") {
+      try { var sd = S.now(); if (sd && !isNaN(+sd)) return new Date(+sd); } catch (e0) { /* fall through */ }
+    }
     var L = global.LHClock;
-    return L && typeof L.now === "function" ? L.now() : new Date();
+    if (L && typeof L.now === "function") {
+      try { var ld = L.now(); if (ld && !isNaN(+ld)) return new Date(+ld); } catch (e1) { /* fall through */ }
+    }
+    return pinnedDate() || new Date();
   }
 
   function parts(date) {

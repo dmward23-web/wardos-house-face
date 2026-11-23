@@ -14,7 +14,8 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(os.environ.get("WARDOS_ROOT") or Path(__file__).resolve().parents[2])
 CT = ZoneInfo("America/Chicago")
-now = datetime.now(CT)
+now = datetime(2026, 11, 18, 16, 0, tzinfo=CT)
+PIN = "now=2026-11-18T16:00:00-06:00&freeze=1"
 day = now.strftime("%Y-%m-%d")
 start = now.replace(hour=18, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%S-06:00")
 start2 = now.replace(hour=19, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%S-06:00")
@@ -132,10 +133,10 @@ def main():
         ctx.add_init_script("try { localStorage.setItem('wardos-private-feed-token', 'qaSyntheticDeviceKey0000'); } catch (e) {}")
         page = ctx.new_page()
         for name in ("sheet-index.html", "sheet-today.html", "kid-hayes.html", "kid-harris.html", "kid-ainsley.html"):
-            page.goto(base + "/" + name + "?pfBase=" + base, wait_until="domcontentloaded", timeout=30000)
+            page.goto(base + "/" + name + "?pfBase=" + base + "&" + PIN, wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(1200)
             out[name] = page.evaluate(PROBE)
-        page.goto(base + "/sheet-index.html?pfBase=" + base, wait_until="domcontentloaded", timeout=30000)
+        page.goto(base + "/sheet-index.html?pfBase=" + base + "&" + PIN, wait_until="domcontentloaded", timeout=30000)
         page.wait_for_timeout(600)
         clock = page.evaluate("""() => {
           const el = document.querySelector('.hdr-date-time');
@@ -151,7 +152,7 @@ def main():
                 clock_ok = True
             except Exception:
                 clock_ok = "sheet-today" in page.url
-        page.goto(base + "/sheet-today.html?d=2026-11-15&pfBase=" + base, wait_until="domcontentloaded", timeout=30000)
+        page.goto(base + "/sheet-today.html?d=2026-11-15&pfBase=" + base + "&" + PIN, wait_until="domcontentloaded", timeout=30000)
         page.wait_for_timeout(800)
         day = page.evaluate("""() => {
           const panel = document.querySelector('.day-view');
@@ -172,7 +173,7 @@ def main():
             bottom: r ? Math.round(r.bottom) : 0
           };
         }""")
-        page.goto(base + "/sheet-index.html?pfBase=" + base, wait_until="domcontentloaded", timeout=30000)
+        page.goto(base + "/sheet-index.html?pfBase=" + base + "&" + PIN, wait_until="domcontentloaded", timeout=30000)
         page.wait_for_timeout(800)
         tiles = page.evaluate("""() => {
           const grab = (sel) => {

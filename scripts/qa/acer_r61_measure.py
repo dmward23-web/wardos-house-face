@@ -14,7 +14,8 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(os.environ.get("WARDOS_ROOT") or Path(__file__).resolve().parents[2])
 CT = ZoneInfo("America/Chicago")
-now = datetime.now(CT)
+now = datetime(2026, 11, 18, 16, 0, tzinfo=CT)
+PIN = "now=2026-11-18T16:00:00-06:00&freeze=1"
 day = now.strftime("%Y-%m-%d")
 start = now.replace(hour=18, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%S-06:00")
 start2 = now.replace(hour=19, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%S-06:00")
@@ -44,7 +45,7 @@ WEEK = {
     },
 }
 CAL = {
-    "status": "live", "fetchedAt": now.isoformat(), "asOfIso": day,
+    "status": "live", "fetchedAt": datetime.now(CT).isoformat(), "asOfIso": day,
     "upcomingLeaves": [
         {"summary": "Skate City Night", "title": "Skate City Night", "start": start, "end": start2, "allDay": False},
         {"summary": "Art club", "title": "Art club", "start": start, "end": start2, "allDay": False},
@@ -198,12 +199,12 @@ def main():
         ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
         ctx.add_init_script("try { localStorage.setItem('wardos-private-feed-token', 'qaSyntheticDeviceKey0000'); } catch (e) {}")
         page = ctx.new_page()
-        page.goto(base + "/sheet-index.html?pfBase=" + base, wait_until="domcontentloaded", timeout=30000)
+        page.goto(base + "/sheet-index.html?pfBase=" + base + "&" + PIN, wait_until="domcontentloaded", timeout=30000)
         page.wait_for_timeout(1400)
         out["hub"] = page.evaluate(HUB)
         writes = []
         page.on("request", lambda req: writes.append(req.url) if req.method == "POST" and "lights" in req.url else None)
-        page.goto(base + "/sheet-lights.html?pfBase=" + base, wait_until="domcontentloaded", timeout=30000)
+        page.goto(base + "/sheet-lights.html?pfBase=" + base + "&" + PIN, wait_until="domcontentloaded", timeout=30000)
         page.wait_for_timeout(800)
         card = page.evaluate("""() => {
           const el = document.querySelector('.panel.lights-cmd');
@@ -226,10 +227,10 @@ def main():
         on = tap("#lights-all-on")
         off = tap("#lights-all-off")
         out["lights"] = {"card": card, "on": on, "off": off, "writes": len(writes)}
-        page.goto(base + "/sheet-today.html?pfBase=" + base, wait_until="domcontentloaded", timeout=30000)
+        page.goto(base + "/sheet-today.html?pfBase=" + base + "&" + PIN, wait_until="domcontentloaded", timeout=30000)
         page.wait_for_timeout(1200)
         out["today"] = page.evaluate(TODAY)
-        page.goto(base + "/kid-hayes.html?pfBase=" + base, wait_until="domcontentloaded", timeout=30000)
+        page.goto(base + "/kid-hayes.html?pfBase=" + base + "&" + PIN, wait_until="domcontentloaded", timeout=30000)
         page.wait_for_timeout(1400)
         out["ahead"] = page.evaluate(AHEAD)
         out["hayesCount"] = len(HAYES) + len(AHEAD_ROWS)

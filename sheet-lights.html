@@ -272,9 +272,15 @@
       hdr.style.setProperty("padding", "0", "important");
       hdr.style.setProperty("margin", "0", "important");
     }
+    var say = document.getElementById("lights-offline-say");
+    if (say && offline) {
+      say.textContent = "Lights are offline";
+      say.hidden = false;
+      say.classList.add("is-on");
+    }
     var banner = document.querySelector(".banner-title");
     if (banner) {
-      banner.textContent = offline ? "Lights not connected" : "Lights";
+      banner.textContent = offline ? "" : "Lights";
       if (!banner._lightsRetry) {
         banner._lightsRetry = true;
         banner.addEventListener("click", function () {

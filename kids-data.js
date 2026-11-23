@@ -1773,7 +1773,8 @@
           space.push({ when: "Room", what: done ? "Room is clear" : "Room still open", hint: "Your room", tone: done ? "fun" : "act" });
         }
       });
-      her.innerHTML = space.length ? space.map(cardHTML).join("") : quietHTML("Nothing else today");
+      var realToday = (kid.today || []).some(function (ev) { return ev && (ev.what || ev.summary); });
+      her.innerHTML = space.length ? space.map(cardHTML).join("") : (realToday ? "" : quietHTML("Nothing else today"));
     }
   }
 
@@ -1914,9 +1915,9 @@
     try {
       var p = {};
       new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", hour: "numeric", minute: "2-digit", hourCycle: "h23" })
-        .formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; });
+        .formatToParts(clockNow()).forEach(function (x) { p[x.type] = x.value; });
       return (+p.hour % 24) * 60 + (+p.minute);
-    } catch (e) { var d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+    } catch (e) { var d = clockNow(); return d.getHours() * 60 + d.getMinutes(); }
   }
 
   function consumeIsoForParsed(parsed, weekIsos) {

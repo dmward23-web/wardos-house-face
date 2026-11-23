@@ -1320,7 +1320,16 @@ html.kw-reduce .kw-iris::before { animation: none; transform: scale(1); }
 html, body { overflow-x: hidden !important; overscroll-behavior-x: none; }
 .quest-days { min-width: 0; }
 html.kw-root body.kw-on .quest-days .day-tap,
-html body .quest-days .day-tap { flex: 0 0 88px !important; min-width: 88px !important; width: 88px !important; min-height: 88px !important; height: 88px !important; font-size: 24px !important; }
+html body .quest-days .day-tap { flex: 0 0 64px !important; min-width: 64px !important; width: 64px !important; min-height: 64px !important; height: 64px !important; max-height: 64px !important; font-size: 24px !important; }
+@media (min-width: 1400px) {
+  html.kw-root body.kw-on .quest.daily-week,
+  html body .chore.daily-week { min-height: 128px !important; margin: 0 0 12px !important; overflow: hidden !important; box-sizing: border-box !important; }
+  html.kw-root body.kw-on .quest-body { display: flex !important; flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; position: relative !important; }
+  html.kw-root body.kw-on .quest .what { position: static !important; width: auto !important; max-width: 100% !important; height: auto !important; max-height: 48px !important; overflow: hidden !important; pointer-events: none !important; }
+  html.kw-root body.kw-on .quest-days { position: relative !important; z-index: 2 !important; display: flex !important; flex-wrap: nowrap !important; gap: 8px !important; }
+  html.kw-root body.kw-on .live-clock-host { display: none !important; }
+  html.kw-root body.kw-on #sec-days > .consume-hero { height: 56px !important; max-height: 56px !important; overflow: hidden !important; }
+}
 .kw-stage, .kw-canvas, .hl-layer { max-width: 100vw !important; }
 /* LANDFIT1 · landscape: PATH moves up out of the label field; HUD clock stays on screen */
 @media (orientation: landscape) and (max-height: 600px) {

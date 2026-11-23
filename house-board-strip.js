@@ -924,7 +924,17 @@
   }
 
   function nowCtHour() {
-    return ctHour(new Date().toISOString());
+    var d = new Date();
+    try {
+      if (global.HouseScene && typeof HouseScene.now === "function") d = HouseScene.now();
+      else if (global.LHClock && typeof LHClock.now === "function") d = LHClock.now();
+      else if (global.HouseClock && typeof HouseClock.iso === "function") {
+        var q = new URLSearchParams(global.location.search || "");
+        if (q.get("now")) d = new Date(q.get("now"));
+      }
+    } catch (e) { /* live hour */ }
+    if (!d || isNaN(+d)) d = new Date();
+    return ctHour(d.toISOString());
   }
 
   function dayTitle(ev) {
@@ -1058,6 +1068,9 @@
     var host = document.querySelector(".leaveby.leaveby--hot");
     var canvas = document.querySelector("[data-live='leaveby-layouts']");
     if (!host || !canvas) return;
+    host.style.setProperty("pointer-events", "auto", "important");
+    host.style.setProperty("z-index", "40", "important");
+    host.style.setProperty("position", "fixed", "important");
     var label = host.querySelector(".leaveby-mode-label");
     if (label) label.style.setProperty("font-size", "24px", "important");
     [].forEach.call(host.querySelectorAll(".leaveby-chip"), function (chip) {
@@ -1068,7 +1081,7 @@
     });
     var old = canvas.querySelector(".lb-more");
     if (old) old.remove();
-    var rows = [].slice.call(canvas.querySelectorAll(".lb-day-stop, .lb-list-row, .lb-day-tchip"));
+    var rows = [].slice.call(canvas.querySelectorAll(".lb-day-stop, .lb-list-row, .lb-day-tchip, .lb-day-part, .lb-day-tmr"));
     rows.forEach(function (row) { row.style.removeProperty("display"); });
     var limit = host.getBoundingClientRect().bottom - 4;
     function past(el) {
@@ -1095,44 +1108,45 @@
     }
     if (!anyWhat) {
       var src = canvas.querySelector(".lb-day-what");
-      var kept = host.querySelector(".lb-kept");
+      var kept = canvas.querySelector(".lb-kept");
       if (!kept) {
         kept = document.createElement("div");
         kept.className = "lb-day-what lb-kept";
-        host.appendChild(kept);
+        canvas.appendChild(kept);
       }
       kept.textContent = src ? (src.textContent || "").trim() : "Today";
       kept.style.setProperty("display", "block", "important");
-      kept.style.setProperty("position", "absolute", "important");
-      kept.style.setProperty("left", "16px", "important");
-      kept.style.setProperty("right", "16px", "important");
-      kept.style.setProperty("bottom", "36px", "important");
-      kept.style.setProperty("top", "auto", "important");
+      kept.style.setProperty("position", "static", "important");
       kept.style.setProperty("height", "24px", "important");
       kept.style.setProperty("line-height", "24px", "important");
       kept.style.setProperty("font-size", "24px", "important");
-      kept.style.setProperty("white-space", "nowrap", "important");
+      kept.style.setProperty("white-space", "normal", "important");
       kept.style.setProperty("overflow", "hidden", "important");
       kept.style.setProperty("background", "#101820", "important");
       kept.style.setProperty("color", "#f4efe6", "important");
-      kept.style.setProperty("z-index", "3", "important");
+      kept.style.setProperty("z-index", "1", "important");
     }
     if (!hidden) return;
-    var cue = host.querySelector(".lb-more");
+    var cueParent = canvas.parentElement || host;
+    var cue = cueParent.querySelector(".lb-more");
     if (!cue) {
       cue = document.createElement("div");
       cue.className = "lb-more";
-      host.appendChild(cue);
+      cueParent.appendChild(cue);
     }
     cue.textContent = "+" + hidden + " more";
     cue.style.setProperty("position", "absolute", "important");
-    cue.style.setProperty("left", "8px", "important");
     cue.style.setProperty("right", "8px", "important");
-    cue.style.setProperty("bottom", "8px", "important");
+    cue.style.setProperty("left", "auto", "important");
+    cue.style.setProperty("width", "140px", "important");
+    cue.style.setProperty("bottom", "4px", "important");
     cue.style.setProperty("top", "auto", "important");
     cue.style.setProperty("height", "24px", "important");
+    cue.style.setProperty("line-height", "24px", "important");
     cue.style.setProperty("display", "block", "important");
-    cue.style.setProperty("z-index", "3", "important");
+    cue.style.setProperty("z-index", "2", "important");
+    cue.style.setProperty("background", "#101820", "important");
+    cue.style.setProperty("text-align", "right", "important");
     guard = 0;
     while (past(cue) && guard < 30) {
       guard += 1;

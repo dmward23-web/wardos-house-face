@@ -178,8 +178,9 @@ test("r30 the save sheet has a Home control and the floor sizes", () => {
   assert.match(js, /width: "96px"/);
   assert.match(js, /height: "96px"/);
   assert.match(js, /home-key-light\.svg/);
+  const saves = read("house-saves.js");
+  assert.doesNotMatch(saves, /saves-home/);
   const css = read("house-engage.css");
-  assert.match(css, /\.saves-home \{[\s\S]*min-height: 64px/);
   assert.match(css, /\.saves-add-name \{[\s\S]*min-height: 64px[\s\S]*font-size: 24px/);
   assert.match(css, /\.saves-add-save \{[\s\S]*min-height: 64px[\s\S]*font-size: 24px/);
   assert.match(css, /\.saves-list-del \{[\s\S]*width: 64px/);
@@ -188,9 +189,14 @@ test("r30 the save sheet has a Home control and the floor sizes", () => {
 
 test("r30 a kid subscene Home is not the hud rule at the origin", () => {
   const css = read("prism-face.css");
-  assert.match(css, /html\.kw-root body\.kw-on \.kw-hud \.kw-home/);
-  assert.match(css, /html\.kw-root body\.kw-on \.kw-scene \.kw-scene-home \{[\s\S]*left: 64px !important;[\s\S]*top: 64px !important;/);
   assert.doesNotMatch(css, /html\.kw-root body\.kw-on \.kw-home \{/);
+  const home = read("house-home.js");
+  const paint = home.slice(home.indexOf("function paint"), home.indexOf("function mount"));
+  const box = paint.slice(paint.indexOf("var box = {"), paint.indexOf("};"));
+  assert.match(box, /left: "48px"/);
+  assert.match(box, /top: "48px"/);
+  assert.match(box, /width: "96px"/);
+  assert.match(box, /height: "96px"/);
 });
 
 test("r30 expanded chores keep the option D day strip", () => {

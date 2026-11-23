@@ -126,6 +126,7 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     var rows = [].filter.call(list.children, function (row) {
       return row.classList && row.classList.contains("chore");
     });
+    var days = document.getElementById("sec-days");
     list.style.setProperty("box-sizing", "border-box", "important");
     list.style.setProperty("height", "100%", "important");
     list.style.setProperty("min-height", "0", "important");
@@ -142,14 +143,20 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     rows.forEach(function (row) { row.style.setProperty("display", "flex", "important"); });
     var oldMore = list.querySelector(".more-chip");
     if (oldMore) oldMore.style.setProperty("display", "none", "important");
-    var H = list.clientHeight;
+    list.style.setProperty("overflow", "hidden", "important");
+    list.style.setProperty("overflow-y", "hidden", "important");
     var n = rows.length;
-    var show = n;
     var gap = 16;
-    var need = n * 64 + Math.max(0, n - 1) * gap;
-    if (H > 0 && need > H) {
-      list.style.setProperty("overflow-y", "auto", "important");
-      list.style.setProperty("scrollbar-width", "thin", "important");
+    var show = n;
+    var dayTop = days ? days.getBoundingClientRect().top : 0;
+    var listTop = list.getBoundingClientRect().top;
+    if (dayTop > listTop + 64) {
+      var avail = dayTop - listTop - 8;
+      var rowSlot = 64 + gap;
+      var cueH = 40;
+      var fit = Math.floor((avail - cueH) / rowSlot);
+      if (fit < 1) fit = 1;
+      if (fit < n) show = fit;
     }
     rows.forEach(function (row, i) {
       var on = i < show;
@@ -179,15 +186,48 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
       }
     });
     list.style.setProperty("gap", (gap < 0 ? 0 : gap) + "px", "important");
+    var quests = [].filter.call(list.querySelectorAll(".quest"), function (row) { return list.contains(row); });
+    if (quests.length > 1) {
+      var jar = document.querySelector(".prism-jar, #sec-jar");
+      var listBox = list.getBoundingClientRect();
+      var limit = listBox.top + Math.max(list.clientHeight, 640);
+      if (jar) {
+        var jb = jar.getBoundingClientRect();
+        var overlapX = Math.min(listBox.right, jb.right) - Math.max(listBox.left, jb.left);
+        if (overlapX > 8 && jb.top > listBox.top) limit = Math.min(limit, jb.top - 8);
+      }
+      var qShow = quests.length;
+      quests.forEach(function (row, i) {
+        row.style.removeProperty("display");
+        if (row.getBoundingClientRect().bottom > limit && i > 0) qShow = Math.min(qShow, i);
+      });
+      if (qShow < 1) qShow = 1;
+      quests.forEach(function (row, i) { row.style.setProperty("display", i < qShow ? "" : "none", "important"); });
+      if (qShow < quests.length) {
+        var qCue = list.parentElement && list.parentElement.querySelector(".quest-more");
+        if (!qCue && list.parentElement) {
+          qCue = document.createElement("div");
+          qCue.className = "quest-more";
+          list.parentElement.appendChild(qCue);
+        }
+        if (qCue) {
+          qCue.textContent = "+" + (quests.length - qShow) + " more";
+          qCue.style.setProperty("display", "block", "important");
+          qCue.style.setProperty("font-size", "24px", "important");
+          qCue.style.setProperty("color", "#f4efe6", "important");
+        }
+      }
+    }
     if (show < n) {
       var chip = oldMore;
       if (!chip) {
         chip = document.createElement("button");
         chip.type = "button";
         chip.className = "more-chip";
-        chip.textContent = "More";
+        chip.textContent = "+" + (n - show) + " more";
         list.appendChild(chip);
       }
+      chip.textContent = "+" + (n - show) + " more";
       chip.style.setProperty("display", "flex", "important");
       chip.style.setProperty("align-items", "center", "important");
       chip.style.setProperty("justify-content", "center", "important");
@@ -2177,7 +2217,7 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     sceneEl = document.createElement("div");
     sceneEl.className = "kw-scene";
     var sceneHome = global.HouseAudit && HouseAudit.href ? HouseAudit.href("sheet-index.html") : "sheet-index.html";
-    /* The one home is house-home.js. This scene used to embed <a class="kw-home wardos-home" href="sheet-index.html"><img src="assets/icons/home-key-light.svg" alt=""></a>. */
+    /* The one home is house-home.js. This scene does not embed its own home link. */
     sceneEl.innerHTML = '<canvas class="kw-scene-cv" aria-hidden="true"></canvas><div class="kw-scene-ui"><div class="kw-kicker" data-kicker></div><h2 class="kw-scene-title" data-title></h2><div class="kw-scene-body" data-body></div><div class="kw-scene-actions"><button type="button" class="kw-back" data-back>Back</button></div></div>';
     document.body.appendChild(sceneEl);
     sceneCv = sceneEl.querySelector("canvas");
