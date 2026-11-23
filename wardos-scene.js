@@ -246,25 +246,41 @@
     ctx.fillRect(w - 262, h * 0.46, 34, 40);
   }
 
+  /* PLATERETRY1: Chrome cancels any request still in flight when the wall document finishes loading
+     (net::ERR_ABORTED, canceled, seen ~50% of cold loads on the test Chrome). A cancelled probe used to read
+     as "file missing" and pinned the wall to the procedural paint for the whole session. Only a real HTTP
+     answer counts as missing now; a network error retries (3 tries, 0.4 s / 0.8 s apart). */
+  function retry(job, tries, gap) {
+    return job().then(function (v) {
+      if (v !== RETRY || tries <= 1) return v === RETRY ? false : v;
+      return new Promise(function (r) { setTimeout(r, gap); }).then(function () { return retry(job, tries - 1, gap * 2); });
+    });
+  }
+  function RETRY() { /* sentinel: hoisted so the early pane-mask load can use it */ }
+
   function probe(url) {
-    return fetch(url, { method: "HEAD" }).then(function (r) {
-      if (r.ok) return true;
-      if (r.status === 405 || r.status === 501) {
-        return fetch(url, { method: "GET", headers: { Range: "bytes=0-0" } }).then(function (g) {
-          return g.ok;
-        });
-      }
-      return false;
-    }).catch(function () { return false; });
+    return retry(function () {
+      return fetch(url, { method: "HEAD" }).then(function (r) {
+        if (r.ok) return true;
+        if (r.status === 405 || r.status === 501) {
+          return fetch(url, { method: "GET", headers: { Range: "bytes=0-0" } }).then(function (g) {
+            return g.ok;
+          });
+        }
+        return false;
+      }).catch(function () { return RETRY; });
+    }, 3, 400);
   }
 
   function loadImage(url) {
-    return new Promise(function (resolve) {
-      var img = new Image();
-      img.onload = function () { resolve(img); };
-      img.onerror = function () { resolve(null); };
-      img.src = url;
-    });
+    return retry(function () {
+      return new Promise(function (resolve) {
+        var img = new Image();
+        img.onload = function () { resolve(img); };
+        img.onerror = function () { resolve(RETRY); };
+        img.src = url;
+      });
+    }, 3, 400).then(function (v) { return v || null; });
   }
 
   function mount(el, opts) {
@@ -295,6 +311,7 @@
     var glState = null;
     var watchdog = createWatchdog(q);
     var fpsEl = null;
+    var plateW = 0; /* PLATEREADY1: width of the plate image the poster last drew (0 = procedural paint) */
 
     el.id = el.id || "wardos-scene";
     el.setAttribute("data-layer", "ground");
@@ -341,6 +358,10 @@
       el.setAttribute("data-source", source);
       el.setAttribute("data-grade", grade && !gradeBypassed(source) ? "on" : "off");
       el.setAttribute("data-renderer", q === "still" ? "poster" : rendererName);
+      /* PLATEREADY1 (Alfred ADDENDUM-6): data-plate is the width of the plate actually on screen: the loop's decoded frame
+         while the video shows, else the image the poster drew. 0 means the procedural paint, i.e. no Prism plate yet. */
+      var onVideo = source === "loop" && q !== "still";
+      el.setAttribute("data-plate", String(onVideo ? (video.readyState >= 2 ? video.videoWidth : 0) : plateW));
       video.style.display = source === "loop" && q !== "still" ? "block" : "none";
       glCanvas.style.display = q === "still" ? "none" : "block";
       poster.style.display = "block";
@@ -351,6 +372,7 @@
       var img = null;
       if ((source === "fallback" || q === "still") && images.fallback) img = images.fallback;
       else if (source === "ungraded" && images.ungraded) img = images.ungraded;
+      plateW = img ? (img.naturalWidth || img.width || 0) : 0;
       if (img) {
         var s = Math.max(1920 / img.width, 1080 / img.height);
         var dw = img.width * s;
@@ -450,6 +472,8 @@
       par.y = y;
     }
 
+    video.addEventListener("loadeddata", function () { reflect(); });
+    video.addEventListener("playing", function () { reflect(); });
     video.addEventListener("error", function () {
       if (source === "loop") goStill("video-error");
     });

@@ -189,7 +189,7 @@ test("default wall does not reference cinema files outside the flag hook", () =>
   assert.doesNotMatch(html, /<script[^>]+src="wardos-scene\.js"/);
   assert.doesNotMatch(html, /<link[^>]+wardos-scene\.css"/);
   assert.match(html, /season-math\.js\?v=SUNHOME1/);
-  assert.match(html, /month-theme\/month-overlay\.js\?v=PANEMASK1/); /* PANEMASK1 changed month-overlay.js (cinema coat = pane-mask snow + sill only), so its token moved on purpose */
+  assert.match(html, /month-theme\/month-overlay\.js\?v=SILLFLAT1/); /* PANEMASK1 + SILLFLAT1 changed month-overlay.js (cinema coat = pane-mask snow + sill only), so its token moved on purpose */
 });
 
 test("November and Thanksgiving stay on the season coat, and December still snows, with the cinema flag in the query", () => {
@@ -341,6 +341,27 @@ function groundStats(png, x, y, w, h) {
   const variance = sum2 / n - mean * mean;
   return { mean, variance, n };
 }
+
+/* PLATEREADY1 (Alfred ADDENDUM-6, Nov 23): mean > 12 and variance > 8 also pass on the procedural paint, so a run with no Prism
+   plate went green (cloud-run5 cinema-high/low/still/nowebgl). The look is judged against the pinned graded plate itself:
+   centre luma (x160-1760, y140-900, Rec.709, every pixel) of cinema-high must sit between LUMA_LO and LUMA_HI times the
+   plate's own centre luma, read from the pinned file (46.21 today, so 42.98..48.52). Veil-on, the default wall and a dark or
+   blown-out frame all leave the band. */
+const LUMA_LO = 0.93; /* Atlas 11:35 + Alfred 11:36 Nov 23: one band; replaces the >= 44.0 floor */
+const LUMA_HI = 1.05;
+function centreLuma(png) {
+  let sum = 0;
+  let n = 0;
+  for (let y = 140; y < 900; y++) {
+    for (let x = 160; x < 1760; x++) {
+      const i = (y * png.w + x) * 4;
+      sum += 0.2126 * png.data[i] + 0.7152 * png.data[i + 1] + 0.0722 * png.data[i + 2];
+      n += 1;
+    }
+  }
+  return sum / n;
+}
+const PLATE_SOURCES = ["loop", "ungraded", "fallback"];
 
 function serve() {
   const baseWall = spawnSync("git", ["show", "cbd117a94662b515e7e1f2298ce81922af806e46:wall.html"], { cwd: ROOT, encoding: "buffer" }).stdout;
@@ -588,6 +609,20 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     })()`;
 
     const reduce = [{ name: "prefers-reduced-motion", value: "reduce" }];
+    /* PLATEREADY1: wait until a Prism plate is what the scene shows (data-plate = its decoded width), then assert it. A shot taken
+       before that is the procedural paint, which is what cloud-run5 captured. Blocking the plate URLs must turn this RED. */
+    async function plated(p, label) {
+      const st = await p.eval(`new Promise((res) => {
+        const t0 = performance.now();
+        const read = () => { const s = document.getElementById("wardos-scene"); return s ? { source: s.getAttribute("data-source"), plate: s.getAttribute("data-plate"), q: s.getAttribute("data-q") } : null; };
+        const step = () => { const r = read(); if (r && r.plate === "1920" && ${JSON.stringify(PLATE_SOURCES)}.includes(r.source)) return res(r); if (performance.now() - t0 > 15000) return res(read()); setTimeout(step, 50); };
+        step();
+      })`);
+      assert.ok(st && PLATE_SOURCES.includes(st.source), label + ": no Prism plate source " + JSON.stringify(st));
+      assert.equal(st && st.plate, "1920", label + ": the plate on screen is not the 1920 Prism plate " + JSON.stringify(st));
+      await p.eval(`new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(r, 120))))`);
+      return st;
+    }
     async function settled(p) {
       await p.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => { if (document.documentElement.getAttribute("data-scene-mode") === "poster") return res(true); if (performance.now() - t0 > 8000) return res(false); setTimeout(step, 50); }; step(); })`);
       let prev = null;
@@ -645,7 +680,15 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
       };
       step();
     })`);
+    await plated(high, "high");
     await high.eval(`new Promise((r) => setTimeout(r, 1200))`);
+    /* FPSWAIT1: __wardosFps.frames counts rAF frames in the last published 1 s window. On a slow headless runner
+       the GL boot (three.js import + shader compile) can eat a whole window, so one fixed sample read 0 (CI
+       67be327a :667). Poll up to 10 s for a window with frames; the assert below is unchanged and still fails
+       if the render loop never runs (mutation: kick() no-op goes RED). */
+    await high.eval(`new Promise((r) => { const t0 = performance.now(); (function step() {
+      if ((window.__wardosFps && window.__wardosFps.frames > 0) || performance.now() - t0 > 10000) return r(true);
+      setTimeout(step, 100); })(); })`);
     const highState = await high.eval(`({
       q: document.getElementById("wardos-scene").getAttribute("data-q"),
       source: document.getElementById("wardos-scene").getAttribute("data-source"),
@@ -704,14 +747,14 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
         }
         setTimeout(() => {
           const z = g.getImageData(0, 0, cv.width, cv.height).data;
-          let inside = 0, outside = 0;
+          let inside = 0, outside = 0, sillMoved = 0;
           for (let i = 0; i < a.length; i += 4) {
             if (a[i] === z[i] && a[i + 1] === z[i + 1] && a[i + 2] === z[i + 2] && a[i + 3] === z[i + 3]) continue;
             const p = i / 4, x = p % cv.width, y = (p / cv.width) | 0;
-            if (glass(x, y)) inside++; else outside++;
+            if (glass(x, y)) inside++; else { outside++; if (onSill(x, y)) sillMoved++; }
           }
           res({ theme: document.documentElement.getAttribute("data-month-theme"), bbox: S.PANE_BBOX, sill: l, loaded: S.paneMask().bbox,
-            inside, outside, paintGlass, paintSill, paintOut, sillRow, sillMin: Math.ceil(0.8 * (l.x1 - l.x0) * kx), kids: cv.parentNode.children.length });
+            inside, outside, sillMoved, paintGlass, paintSill, paintOut, sillRow, sillMin: Math.ceil(0.8 * (l.x1 - l.x0) * kx), kids: cv.parentNode.children.length });
         }, 500);
       };
       img.onerror = () => res(null);
@@ -723,6 +766,8 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     assert.deepEqual(coat.loaded, coat.bbox, "PANE_BBOX is not the loaded mask's glass box");
     assert.deepEqual(coat.sill, { x0: 482, x1: 765, y0: 694, y1: 706 });
     assert.ok(coat.inside > 0, "December still snows, on the glass: no coat flake moved on the window");
+    /* SILLFLAT1: the sill bank must be byte-stable between reads; a canvas gradient re-dithered on a GPU canvas and moved a whole sill row (cloud 67be327a: outside 283) */
+    assert.equal(coat.sillMoved, 0, "the sill bank changed between two reads (gradient re-dither or an animated sill)");
     assert.equal(coat.outside, 0, "December coat snow is falling off the glass under cinema (room, mullion, muntin or garland)");
     assert.equal(coat.paintOut, 0, "December coat paints off the glass and sill under cinema (glow, trees or lit windows over the room)");
     assert.ok(coat.paintGlass > 0, "no coat snow painted on the glass");
@@ -802,6 +847,12 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     const ground = groundStats(highPng, 200, 180, 1400, 700);
     assert.ok(ground.mean > 12, "ground mean " + ground.mean);
     assert.ok(ground.variance > 8, "ground variance " + ground.variance);
+    const plateLuma = centreLuma(decodePng(fs.readFileSync(path.join(ROOT, Pins.dir, Pins.pins.find((p) => p.role === "fallback").file))));
+    const highLuma = centreLuma(highPng);
+    const lumaNote = "high centre luma " + highLuma.toFixed(2) + " vs graded plate " + plateLuma.toFixed(2);
+    const lumaLo = LUMA_LO * plateLuma, lumaHi = LUMA_HI * plateLuma;
+    assert.ok(highLuma >= lumaLo, lumaNote + " is under " + LUMA_LO + "x plate (" + lumaLo.toFixed(2) + ")");
+    assert.ok(highLuma <= lumaHi, lumaNote + " is over " + LUMA_HI + "x plate (" + lumaHi.toFixed(2) + ")");
     const clockBg = sample(highPng, 60, 160);
     const timeRgb = Scene.parseHex("#FFF6EE");
     assert.ok(Scene.contrastRatio(timeRgb, clockBg) >= 4.5, "clock contrast " + Scene.contrastRatio(timeRgb, clockBg) + " bg " + clockBg.join(","));
@@ -823,10 +874,12 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     const lowState = await low.eval(`({ q: document.getElementById("wardos-scene").getAttribute("data-q"), grade: document.getElementById("wardos-scene").getAttribute("data-grade"), source: document.getElementById("wardos-scene").getAttribute("data-source") })`);
     assert.equal(lowState.q, "low");
     assert.equal(lowState.grade, "off");
+    await plated(low, "low");
     fs.writeFileSync(path.join(ART, "cinema-low.png"), await low.shot());
 
     const still = await page("/wall.html?look=cinema&q=still");
     await still.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => { const s = document.getElementById("wardos-scene"); if (s && s.getAttribute("data-q") === "still") return res(true); if (performance.now() - t0 > 6000) return res(false); setTimeout(step, 40); }; step(); })`);
+    await plated(still, "still");
     const stillBuf = await still.shot();
     fs.writeFileSync(path.join(ART, "cinema-still.png"), stillBuf);
     const stillPng = decodePng(stillBuf);
@@ -841,9 +894,11 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
 
     const lost = await page("/wall.html?look=cinema&q=high");
     await lost.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => { if (window.__wardosScene) return res(true); if (performance.now() - t0 > 6000) return res(false); setTimeout(step, 40); }; step(); })`);
+    await plated(lost, "before context loss");
     await lost.eval(`window.__wardosScene.debugForce("context")`);
     const lostState = await lost.eval(`document.getElementById("wardos-scene").getAttribute("data-fallback")`);
     assert.equal(lostState, "context-lost");
+    await plated(lost, "context-lost");
     const lostPng = decodePng(await lost.shot());
     const gLost = groundStats(lostPng, 200, 200, 1000, 500);
     assert.ok(gLost.mean > 12 && gLost.variance > 8, JSON.stringify(gLost));
@@ -857,6 +912,7 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     await noGl.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => { const s = document.getElementById("wardos-scene"); if (s && s.getAttribute("data-fallback")) return res(s.getAttribute("data-fallback")); if (performance.now() - t0 > 8000) return res(""); setTimeout(step, 40); }; step(); })`);
     const why = await noGl.eval(`document.getElementById("wardos-scene").getAttribute("data-fallback")`);
     assert.equal(why, "no-webgl");
+    await plated(noGl, "nowebgl");
     const noBuf = await noGl.shot();
     fs.writeFileSync(path.join(ART, "cinema-nowebgl.png"), noBuf);
     const gNo = groundStats(decodePng(noBuf), 200, 200, 1000, 500);

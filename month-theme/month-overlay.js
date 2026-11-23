@@ -310,11 +310,13 @@
       ctx.fillStyle = frost;
       ctx.fillRect(0, H - packH, W, packH);
     } else if (cw) {
-      var sill = ctx.createLinearGradient(0, cw.sill.y0, 0, cw.sill.y0 + cw.sill.h);
-      sill.addColorStop(0, "rgba(255,255,255,0)");
-      sill.addColorStop(1, "rgba(236,242,250," + (0.18 + depth * 0.55) + ")");
-      ctx.fillStyle = sill;
-      ctx.fillRect(cw.sill.x0, cw.sill.y0, cw.sill.w, cw.sill.h);
+      /* SILLFLAT1: the sill bank is flat per-row bands, not a canvas gradient. A GPU 2D canvas dithers gradients differently
+         frame to frame (and after a readback), which moved a whole sill row between reads (cloud run 67be327a, outside 283). */
+      var sTop = Math.round(cw.sill.y0), sBot = Math.round(cw.sill.y0 + cw.sill.h), sA = 0.18 + depth * 0.55, sy0;
+      for (sy0 = sTop; sy0 < sBot; sy0++) {
+        ctx.fillStyle = "rgba(236,242,250," + (sA * (sy0 - sTop + 0.5) / (sBot - sTop)).toFixed(3) + ")";
+        ctx.fillRect(Math.round(cw.sill.x0), sy0, Math.round(cw.sill.w), 1);
+      }
     }
 
     if (cw === false) {
