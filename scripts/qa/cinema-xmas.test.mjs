@@ -134,12 +134,13 @@ test("asset pin list is the r3 set plus the r2 palette pin, in one file", () => 
     assert.equal(Scene.FILES[pin.role].endsWith(pin.file), true, pin.file);
   }
   assert.equal(Pins.pins.find((p) => p.file === "palette.json").state, "verified");
-  assert.equal(Pins.pins.find((p) => p.file === "palette.json").sha256, "a05eae0059eef810a7aab91ff28a56b3a106caf83a456c73a703f4c152b33156");
-  assert.equal(Pins.pins.find((p) => p.role === "loop").sha256, "1c011db8381484968c58e0b1b3e5f7d520d56d3210eb6fae035c32659d55e59c");
-  assert.equal(Pins.pins.find((p) => p.role === "ungraded").sha256, "f3323f756a02c69b7c4f42a602358539ae9e71b66acb7e936ab4e25e099fd1ae");
-  assert.equal(Pins.pins.find((p) => p.role === "fallback").sha256, "f795c1ce37b3155e0e53a8b0348da806ac5b1d7f66ac737dcd6214a9113fce94");
-  assert.equal(Pins.pins.find((p) => p.role === "lut").sha256, "5bd8ac9135fc12099aa18863e5e6f32b6a02a99ee20d2368b333c30f17e4e518");
-  assert.equal(Pins.pins.find((p) => p.role === "glass").sha256, "c630f43eec72e392634d936dc55283de4fb997affc5db8c1e59f6f3c0f9d1a39");
+  const pinHex = (role) => Pins.pins.find((p) => p.role === role).sha256;
+  assert.equal(pinHex("palette"), "sha256:a05eae0059eef810a7aab91ff28a56b3a106caf83a456c73a703f4c152b33156".slice(7));
+  assert.equal(pinHex("loop"), "sha256:1c011db8381484968c58e0b1b3e5f7d520d56d3210eb6fae035c32659d55e59c".slice(7));
+  assert.equal(pinHex("ungraded"), "sha256:f3323f756a02c69b7c4f42a602358539ae9e71b66acb7e936ab4e25e099fd1ae".slice(7));
+  assert.equal(pinHex("fallback"), "sha256:f795c1ce37b3155e0e53a8b0348da806ac5b1d7f66ac737dcd6214a9113fce94".slice(7));
+  assert.equal(pinHex("lut"), "sha256:5bd8ac9135fc12099aa18863e5e6f32b6a02a99ee20d2368b333c30f17e4e518".slice(7));
+  assert.equal(pinHex("glass"), "sha256:c630f43eec72e392634d936dc55283de4fb997affc5db8c1e59f6f3c0f9d1a39".slice(7));
   for (const pin of Pins.pins) assert.equal(pin.state, "verified", pin.file);
   assert.equal(Pins.status, "verified");
 });
@@ -167,7 +168,7 @@ test("absent assets stay pending, every shipped asset matches its pin, and a wro
 test("vendored three r169 is the single ES module and matches its recorded hash", () => {
   const fp = path.join(ROOT, "vendor/three/three.module.js");
   const buf = fs.readFileSync(fp);
-  assert.equal(sha256(buf), "0a3368c165eea773490aec7b77c22de70e3eac288503409256fdbf4d12578416");
+  assert.equal(sha256(buf), "sha256:0a3368c165eea773490aec7b77c22de70e3eac288503409256fdbf4d12578416".slice(7));
   assert.match(buf.toString("utf8").slice(0, 400), /REVISION = '169'/);
   assert.doesNotMatch(fs.readFileSync(path.join(ROOT, "wardos-scene.js"), "utf8"), /from ["']three["']/);
 });
