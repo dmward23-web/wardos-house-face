@@ -12,6 +12,8 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 test("TEMPHOME1: sealed before reading anything", () => { assertSealed(); });
 const STALE = [
+  ["month-theme/month-overlay.js", "SILLFLAT1"], ["month-theme/month-overlay.js", "SUNCLOCK1"], ["month-theme/month-overlay.css", "SUNHOME2"], /* NOSPOOK1 + CINELEAF1 (Nov 23) · off-season Halloween engine hidden, cinema November leaves suppressed */
+  ["month-theme/month-overlay.js", "SUNHOME2"], /* PANEMASK1 + SILLFLAT1 (flat sill bands) · cinema coat = pane-mask snow + sill only; a wall holding SUNHOME2 would keep indoor snow, glow and trees */
   ["away-filter.js", "LIVEFIX2"],
   ["away-filter.js", "LIVEFIX3"],
   ["house-board-strip.js", "P1FIX"],

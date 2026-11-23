@@ -63,6 +63,19 @@ Relative paths only. Visual lock: soft glass, kids-first, zero homework vibe.
 
 Reference week plate: `/workspace/board-os-house-face.png`.
 
+## Cinema look (Phase 1, Christmas)
+
+The 1920x1080 wall (`wall.html`) keeps its current cards and tiles. Add `?look=cinema` to put a Christmas ground behind them.
+
+- `?q=high` ungraded plate plus a live grade and 1200 snowflakes, when that plate file is present. Until then the page paints a procedural still in the page and grades that stand-in.
+- `?q=low` uses the baked loop or the fallback still, 300 flakes, half-resolution post. The grade stays off on the loop and the fallback.
+- `?q=still` is the graded fallback still and the glass cards. Reduced motion uses this tier.
+- `?fps=1` shows the frame stats. `window.__wardosFps` is always set while the look is on.
+
+Prism's plates are in `art/cinema/xmas-2026/`. `pins.js` in that folder is the only hash list, and every pin there is verified. A later plate is still a file replace plus a hash edit in that one file. If a plate is missing, the page paints a procedural ground, and that stand-in is not a camo texture.
+
+Glass cards are scoped to `html[data-look=cinema]`. The default wall, with no flag, does not load the cinema script, the grade, or those asset paths. The locked kid legend stays Ainsley `#8a6394`, Hayes `#3f8b71`, Harris `#42679a`, Shared `#c4b49a`.
+
 ## Sensi thermostat (live gate)
 
 - Climate hero: `sheet-google-home.html` · full panel: `sheet-sensi.html`

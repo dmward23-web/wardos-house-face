@@ -138,7 +138,7 @@ test("Acer wall spec report lists asset dimensions and does not resize them", { 
   assert.deepEqual(report.pendingArt, []);
   assert.equal(layout.dadStage.h, 140);
   assert.equal(layout.dadStage.gap, 0);
-  assert.ok(sha256.some((line) => line.startsWith("b02d87273eaf09ecd755a27d8ccd9e0986a7bdd0bc25b73b5839f4952f2c8105  month-theme/hub/kidtile-dad.webp")));
+  assert.ok(sha256.some((line) => line.startsWith("sha256:b02d87273eaf09ecd755a27d8ccd9e0986a7bdd0bc25b73b5839f4952f2c8105".slice(7) + "  month-theme/hub/kidtile-dad.webp")));
   assert.doesNotMatch(fs.readFileSync(path.join(ROOT, "month-theme/month-overlay.js"), "utf8"), /40x40|leaf-[^"']*-40/);
   assert.deepEqual(report.offSpecAssets, []);
 });
