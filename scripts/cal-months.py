@@ -160,12 +160,17 @@ def hm(t):
     return f"{h}:{t.minute:02d}"
 
 days, withdan = {}, {}
+house_away = []   # HOUSEAWAY1 · one timed "Atlas: House away" event on Dan's calendar -> [startIso, endIso]; never a row
+HOUSE_AWAY = re.compile(r"^(?:Atlas:\s*)?House away\b", re.I)
 _label_of = {}
 _label_keys = list(ev.keys())
 _label_out = allow_labels([(ev[i][0], scrub(ev[i][1])) for i in _label_keys])
 for _k, _lab in zip(_label_keys, _label_out):
     _label_of[_k] = _lab
 for i, (raw, summ, s, e, allday) in ev.items():
+    if summ and HOUSE_AWAY.match(summ):   # HOUSEAWAY1 · before SKIP: "Atlas:" titles are a stub everywhere else (cal-live drops them too)
+        if not allday: house_away.append([dt.datetime.fromisoformat(s).astimezone(TZ).isoformat(timespec="seconds"), dt.datetime.fromisoformat(e).astimezone(TZ).isoformat(timespec="seconds")])
+        continue
     if not summ or SKIP.search(summ): continue
     if allday:
         d0 = dt.date.fromisoformat(s[:10]); d1 = dt.date.fromisoformat(e[:10])
@@ -221,5 +226,6 @@ json.dump({
     "rangeStart": keys[0] if keys else None,
     "rangeEnd": THROUGH or (keys[-1] if keys else None),
     "days": outdays,
+    "houseAwayIso": sorted(house_away),
 }, open(out, "w"), ensure_ascii=False, separators=(",", ":"))
 print(f"cal-months: {len(ev)} events -> {len(outdays)} days {keys[0] if keys else ''}..{keys[-1] if keys else ''}")
