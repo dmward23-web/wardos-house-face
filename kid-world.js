@@ -190,11 +190,6 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     n = use.length;
     show = n;
     use.forEach(function (row) { row.style.setProperty("display", "flex", "important"); });
-    list.style.setProperty("height", "auto", "important");
-    list.style.setProperty("max-height", "none", "important");
-    list.style.setProperty("overflow", "visible", "important");
-    list.style.setProperty("overflow-y", "visible", "important");
-    panel.style.setProperty("overflow", "visible", "important");
     function blocksOf(el) {
       var out = [];
       var jar = document.getElementById("sec-jar");
@@ -227,12 +222,41 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     }
     function paintTitle(row) {
       row.style.setProperty("box-sizing", "border-box", "important");
-      row.style.setProperty("height", "auto", "important");
-      row.style.setProperty("min-height", "0", "important");
-      row.style.setProperty("max-height", "none", "important");
-      row.style.setProperty("flex", "0 0 auto", "important");
-      row.style.setProperty("overflow", "visible", "important");
-      row.style.setProperty("align-items", "flex-start", "important");
+      row.style.setProperty("height", "64px", "important");
+      row.style.setProperty("min-height", "64px", "important");
+      row.style.setProperty("max-height", "64px", "important");
+      row.style.setProperty("flex", "0 0 64px", "important");
+      row.style.setProperty("overflow", "hidden", "important");
+      row.style.setProperty("flex-direction", "row", "important");
+      row.style.setProperty("align-items", "center", "important");
+      var body = row.querySelector(".quest-body");
+      if (body) {
+        body.style.setProperty("display", "flex", "important");
+        body.style.setProperty("flex-direction", "row", "important");
+        body.style.setProperty("align-items", "center", "important");
+        body.style.setProperty("height", "64px", "important");
+        body.style.setProperty("max-height", "64px", "important");
+        body.style.setProperty("overflow", "hidden", "important");
+        body.style.setProperty("position", "static", "important");
+      }
+      var days = row.querySelector(".quest-days");
+      if (days) {
+        days.style.setProperty("position", "static", "important");
+        days.style.setProperty("height", "48px", "important");
+        days.style.setProperty("max-height", "48px", "important");
+        days.style.setProperty("overflow", "hidden", "important");
+        days.style.setProperty("flex", "0 0 auto", "important");
+      }
+      var taps = row.querySelectorAll(".day-tap");
+      for (var ti = 0; ti < taps.length; ti++) {
+        taps[ti].style.setProperty("width", "48px", "important");
+        taps[ti].style.setProperty("height", "48px", "important");
+        taps[ti].style.setProperty("min-width", "48px", "important");
+        taps[ti].style.setProperty("min-height", "48px", "important");
+        taps[ti].style.setProperty("max-width", "48px", "important");
+        taps[ti].style.setProperty("max-height", "48px", "important");
+        taps[ti].style.setProperty("flex", "0 0 48px", "important");
+      }
       var title = row.querySelector(".what");
       if (!title) return;
       title.style.setProperty("display", "block", "important");
@@ -247,7 +271,8 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
       title.style.setProperty("opacity", "1", "important");
       title.style.setProperty("white-space", "normal", "important");
     }
-    use.forEach(function (row) { paintTitle(row); });
+    rows.forEach(function (row) { paintTitle(row); });
+    quests.forEach(function (row) { paintTitle(row); });
     show = use.length;
     for (var i = 0; i < use.length; i++) {
       if (clashes(use[i])) { show = i; break; }
