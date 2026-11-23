@@ -20,7 +20,7 @@ const Scene = require(path.join(ROOT, "wardos-scene.js"));
 const Pins = require(path.join(ROOT, "art/cinema/xmas-2026/pins.js"));
 const Season = require(path.join(ROOT, "month-theme/season-math.js"));
 const CHROME = ["/usr/bin/google-chrome", "/usr/local/bin/google-chrome"].find((p) => fs.existsSync(p));
-const ART = "/opt/cursor/artifacts";
+const ART = process.env.CINEMA_ART_DIR || "/opt/cursor/artifacts";
 
 function sha256(buf) {
   return crypto.createHash("sha256").update(buf).digest("hex");
@@ -133,23 +133,25 @@ test("asset pin list is the r3 set plus the r2 palette pin, in one file", () => 
     assert.match(pin.sha256, /^[0-9a-f]{64}$/);
     assert.equal(Scene.FILES[pin.role].endsWith(pin.file), true, pin.file);
   }
-  assert.equal(Pins.pins.find((p) => p.file === "palette.json").state, "pending-confirm");
+  assert.equal(Pins.pins.find((p) => p.file === "palette.json").state, "verified");
   assert.equal(Pins.pins.find((p) => p.file === "palette.json").sha256, "a05eae0059eef810a7aab91ff28a56b3a106caf83a456c73a703f4c152b33156");
   assert.equal(Pins.pins.find((p) => p.role === "loop").sha256, "1c011db8381484968c58e0b1b3e5f7d520d56d3210eb6fae035c32659d55e59c");
   assert.equal(Pins.pins.find((p) => p.role === "ungraded").sha256, "f3323f756a02c69b7c4f42a602358539ae9e71b66acb7e936ab4e25e099fd1ae");
   assert.equal(Pins.pins.find((p) => p.role === "fallback").sha256, "f795c1ce37b3155e0e53a8b0348da806ac5b1d7f66ac737dcd6214a9113fce94");
-  assert.equal(Pins.pins.find((p) => p.role === "lut").sha256, "6c0f149a15f0ca2e71d845e4c730c9ba59b1376f407eb5618dc0f13af4f74e0d");
+  assert.equal(Pins.pins.find((p) => p.role === "lut").sha256, "5bd8ac9135fc12099aa18863e5e6f32b6a02a99ee20d2368b333c30f17e4e518");
   assert.equal(Pins.pins.find((p) => p.role === "glass").sha256, "c630f43eec72e392634d936dc55283de4fb997affc5db8c1e59f6f3c0f9d1a39");
-  for (const pin of Pins.pins) if (pin.file !== "palette.json") assert.equal(pin.state, "pending-assets");
+  for (const pin of Pins.pins) assert.equal(pin.state, "verified", pin.file);
+  assert.equal(Pins.status, "verified");
 });
 
-test("pending assets pass, a wrong hash fails, and an unconfirmed palette hash stays pending", () => {
+test("absent assets stay pending, every shipped asset matches its pin, and a wrong hash fails", () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "cinema-pins-"));
   const absent = checkPins(dir, Pins.pins);
   assert.deepEqual(absent.bad, []);
   assert.equal(absent.pending.length, Pins.pins.length);
   const live = checkPins(path.join(ROOT, Pins.dir), Pins.pins);
   assert.deepEqual(live.bad, [], "a shipped plate must match its pin");
+  assert.equal(live.matched.length, Pins.pins.length, "every pinned asset ships and matches");
   const loop = Pins.pins.find((p) => p.role === "loop");
   fs.writeFileSync(path.join(dir, loop.file), "not the plate");
   const wrong = checkPins(dir, Pins.pins);
@@ -158,8 +160,8 @@ test("pending assets pass, a wrong hash fails, and an unconfirmed palette hash s
   const palette = Pins.pins.find((p) => p.role === "palette");
   fs.writeFileSync(path.join(dir, palette.file), "{ }\n");
   const held = checkPins(dir, Pins.pins);
-  assert.equal(held.bad.length, 1, "palette mismatch does not add a second hard failure while confirm is pending");
-  assert.ok(held.pending.includes(palette.file));
+  assert.equal(held.bad.length, 2, "a verified palette with the wrong hash is a hard failure");
+  assert.ok(held.bad.some((b) => /palette/.test(b)));
 });
 
 test("vendored three r169 is the single ES module and matches its recorded hash", () => {
@@ -431,6 +433,9 @@ const FREEZE = `(() => {
   F.parse = R.parse;
   F.UTC = R.UTC;
   window.Date = F;
+  /* Seeded Math.random so particle layers (default-wall leaves, cinema snow) paint the same on every run. */
+  let seed = 20261204;
+  Math.random = () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   window.__net = [];
   try {
     const o = new PerformanceObserver((list) => { for (const e of list.getEntries()) window.__net.push(e.name); });
@@ -589,6 +594,11 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     assert.equal(highState.fps.q, "high");
     const fps2 = await high.eval(`new Promise((r) => { const a = window.__wardosFps.frames; setTimeout(() => r(window.__wardosFps.frames !== a || window.__wardosFps.frames > 0), 1100); })`);
     assert.equal(fps2, true);
+    /* P2-5: snow only in the window panes (plate x 500..765, y 0..690), none over the tree or lamp, after it has fallen a while. */
+    const snow = await high.eval(`window.__wardosScene && window.__wardosScene.snowBox()`);
+    assert.ok(snow && snow.n === 1200, "high tier keeps its 1200 flakes");
+    assert.equal(snow.out, 0, "snow flake outside the window panes");
+    assert.ok(snow.px.x0 >= 480 && snow.px.x1 <= 800 && snow.px.y0 >= 0 && snow.px.y1 <= 700, "snow box drifted off the window: " + JSON.stringify(snow.px));
 
     const live = await page("/wall.html");
     await live.eval(`new Promise((r) => setTimeout(r, 400))`);

@@ -72,7 +72,7 @@ The 1920x1080 wall (`wall.html`) keeps its current cards and tiles. Add `?look=c
 - `?q=still` is the graded fallback still and the glass cards. Reduced motion uses this tier.
 - `?fps=1` shows the frame stats. `window.__wardosFps` is always set while the look is on.
 
-Assets belong in `art/cinema/xmas-2026/` under the names in `art/cinema/xmas-2026/pins.js`. That file is the only hash list. Dropping Prism's bytes in place and editing a hash there is the whole swap. This build does not include those bytes (`UNVERIFIED-ASSETS`). The procedural ground is the stand-in, and it is not a camo texture.
+Prism's plates are in `art/cinema/xmas-2026/`. `pins.js` in that folder is the only hash list, and every pin there is verified. A later plate is still a file replace plus a hash edit in that one file. If a plate is missing, the page paints a procedural ground, and that stand-in is not a camo texture.
 
 Glass cards are scoped to `html[data-look=cinema]`. The default wall, with no flag, does not load the cinema script, the grade, or those asset paths. The locked kid legend stays Ainsley `#8a6394`, Hayes `#3f8b71`, Harris `#42679a`, Shared `#c4b49a`.
 

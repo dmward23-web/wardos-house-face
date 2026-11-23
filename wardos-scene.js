@@ -384,9 +384,13 @@
       return q;
     }
 
+    /* Parallax lives inside the GL frame (camera-space shift of a 16px-overscanned plate), so the canvas
+       stays exactly 1920x1080 and #wardos-scene never has a scroll box larger than its client box. */
+    var par = { x: 0, y: 0 };
     function onMove(ev) {
       if (reduced || q === "still" || stopped) {
-        glCanvas.style.transform = "none";
+        par.x = 0;
+        par.y = 0;
         return;
       }
       var cx = (global.innerWidth || 1920) / 2;
@@ -395,7 +399,8 @@
       var dy = cy ? (ev.clientY - cy) / cy : 0;
       var x = Math.max(-8, Math.min(8, dx * 8));
       var y = Math.max(-8, Math.min(8, dy * 8));
-      glCanvas.style.transform = "translate(" + x.toFixed(2) + "px," + y.toFixed(2) + "px)";
+      par.x = x;
+      par.y = y;
     }
 
     video.addEventListener("error", function () {
@@ -521,7 +526,7 @@
       var camera = new T.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
       camera.position.z = 2;
       var plateTex = new T.CanvasTexture(poster);
-      if (T.SRGBColorSpace) plateTex.colorSpace = T.SRGBColorSpace;
+      /* Plate bytes stay sRGB end to end: the grade pass samples them raw for the LUT and writes them straight out. Tagging the map SRGB linearised it with no re-encode and halved scene luminance. */
       var plateMesh = new T.Mesh(new T.PlaneGeometry(2, 2), new T.MeshBasicMaterial({ map: plateTex, depthWrite: false }));
       plateMesh.position.z = 0;
       plateMesh.visible = source !== "loop";
@@ -530,9 +535,12 @@
       var arr = new Float32Array(n * 3);
       var sp = new Float32Array(n);
       var i;
+      /* P2-5 (Prism, Nov 23): snow lives ONLY in the window panes, behind the glass.
+         WIN is the pane box in plate pixels (x 500..765, y 0..690 of 1920x1080), as NDC. */
+      var WIN = { x0: 500 / 960 - 1, x1: 765 / 960 - 1, y0: 1 - 690 / 540, y1: 1 };
       for (i = 0; i < n; i++) {
-        arr[i * 3] = Math.random() * 2 - 1;
-        arr[i * 3 + 1] = Math.random() * 2 - 1;
+        arr[i * 3] = WIN.x0 + Math.random() * (WIN.x1 - WIN.x0);
+        arr[i * 3 + 1] = WIN.y0 + Math.random() * (WIN.y1 - WIN.y0);
         arr[i * 3 + 2] = 0.2;
         sp[i] = 0.12 + Math.random() * 0.4;
       }
@@ -603,6 +611,7 @@
         pts: pts,
         arr: arr,
         sp: sp,
+        win: WIN,
         n: n,
         gradeMat: gradeMat,
         gradeScene: gradeScene,
@@ -619,7 +628,7 @@
       var i;
       for (i = 0; i < n; i++) {
         arr[i * 3 + 1] -= sp[i] * dt * 0.00012;
-        if (arr[i * 3 + 1] < -1.05) arr[i * 3 + 1] = 1.05;
+        if (arr[i * 3 + 1] < glState.win.y0) arr[i * 3 + 1] = glState.win.y1;
       }
       glState.pts.geometry.attributes.position.needsUpdate = true;
       glState.plateMesh.visible = source !== "loop";
@@ -627,6 +636,11 @@
       var w = glCanvas.clientWidth || el.clientWidth || 1920;
       var h = glCanvas.clientHeight || el.clientHeight || 1080;
       var pr = q === "low" ? 0.5 : 1;
+      glState.plateMesh.scale.set(1 + 16 / w, 1 + 16 / h, 1);
+      glState.plateMesh.position.x = (par.x * 2) / w;
+      glState.plateMesh.position.y = (-par.y * 2) / h;
+      glState.pts.position.x = glState.plateMesh.position.x;
+      glState.pts.position.y = glState.plateMesh.position.y;
       glState.renderer.setPixelRatio(pr);
       glState.renderer.setSize(w, h, false);
       if (glState.rt && grade && !gradeBypassed(source)) {
@@ -754,6 +768,15 @@
       stop: stop,
       debugForce: debugForce,
       quality: function () { return q; },
+      snowBox: function () {
+        if (!glState) return null;
+        var g = glState, out = 0, k;
+        for (k = 0; k < g.n; k++) {
+          var x = g.arr[k * 3], y = g.arr[k * 3 + 1];
+          if (x < g.win.x0 || x > g.win.x1 || y < g.win.y0 || y > g.win.y1) out++;
+        }
+        return { n: g.n, out: out, px: { x0: (g.win.x0 + 1) * 960, x1: (g.win.x1 + 1) * 960, y0: (1 - g.win.y1) * 540, y1: (1 - g.win.y0) * 540 } };
+      },
       source: function () { return source; },
       gradeOn: function () { return !!(grade && !gradeBypassed(source)); }
     };
