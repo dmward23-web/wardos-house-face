@@ -1325,8 +1325,10 @@ html body .quest-days .day-tap { flex: 0 0 88px !important; min-width: 88px !imp
   html.kw-root body.kw-on .quest.daily-week,
   html body .chore.daily-week { min-height: 128px !important; margin: 0 0 12px !important; overflow: hidden !important; box-sizing: border-box !important; }
   html.kw-root body.kw-on .quest-body { display: flex !important; flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; position: relative !important; }
-  html.kw-root body.kw-on .quest .what { position: static !important; width: auto !important; max-width: 100% !important; height: auto !important; max-height: 48px !important; overflow: hidden !important; pointer-events: none !important; }
+  html.kw-root body.kw-on .quest .what { position: static !important; width: auto !important; max-width: 100% !important; height: auto !important; max-height: none !important; overflow: visible !important; font-size: 24px !important; line-height: 32px !important; color: #f4efe6 !important; -webkit-text-fill-color: #f4efe6 !important; opacity: 1 !important; pointer-events: none !important; }
   html.kw-root body.kw-on .quest-days { position: relative !important; z-index: 2 !important; display: flex !important; flex-wrap: nowrap !important; gap: 8px !important; }
+  html.kw-root body.kw-on .live-clock,
+  html.kw-root body.kw-on .live-clock-lab,
   html.kw-root body.kw-on .live-clock-host { display: none !important; }
   html.kw-root body.kw-on #sec-days > .consume-hero { height: 56px !important; max-height: 56px !important; overflow: hidden !important; }
 }

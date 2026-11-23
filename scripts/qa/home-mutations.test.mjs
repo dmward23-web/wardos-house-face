@@ -3,6 +3,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -18,6 +19,7 @@ function pins(home, world, saves) {
   assert.match(box, /width: "96px"/);
   assert.match(box, /height: "96px"/);
   assert.equal(home.split("\n")[21].trim(), 'btn.classList.add("wardos-home");');
+  assert.match(box, /String\(2 \*\* 31 - 1\)/);
   assert.doesNotMatch(box, /2147483646/);
   assert.doesNotMatch(world, /kw-home wardos-home/);
   assert.match(world, /document\.write\('<script src="house-home\.js/);
@@ -38,7 +40,7 @@ const MUT = {
   M4: (h, w) => [boxSwap(h, "width", "64px"), w],
   M5: (h, w) => [boxSwap(h, "height", "64px"), w],
   M6: (h, w) => [h, w.replace('src="house-home.js?v=R58HOME"', 'src="house-gone.js?v=R58HOME"')],
-  M7: (h, w) => [h.replace('"z-index": "30000000000"', '"z-index": "2147483646"'), w],
+  M7: (h, w) => [h.replace("String(2 ** 31 - 1)", '"2147483646"'), w],
   M8: (h, w) => [boxSwap(boxSwap(boxSwap(boxSwap(h, "left", "0px"), "top", "0px"), "width", "0px"), "height", "0px"), w],
   M9: (h, w) => {
     const lines = h.split("\n");
@@ -55,5 +57,11 @@ for (const id of Object.keys(MUT)) {
   test(id + " fails the home pins", () => {
     const [home, world] = MUT[id](homeSrc, worldSrc);
     assert.throws(() => pins(home, world, savesSrc), id);
+    if (id !== "M7") return;
+    const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
+    if (!browser) return;
+    const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/home_zindex.py")], { encoding: "utf8", timeout: 60000 });
+    assert.equal(r.status, 0, (r.stderr || "") + (r.stdout || ""));
+    assert.equal(JSON.parse(r.stdout.trim().split("\n").pop()).z, "2147483647");
   });
 }

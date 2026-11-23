@@ -122,16 +122,19 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     panel.style.setProperty("height", "100%", "important");
     panel.style.setProperty("align-self", "stretch", "important");
     panel.style.setProperty("background", "#0f1a22", "important");
-    panel.style.setProperty("overflow", "visible", "important");
+    panel.style.setProperty("overflow", "hidden", "important");
     var rows = [].filter.call(list.children, function (row) {
       return row.classList && row.classList.contains("chore");
     });
-    var days = document.getElementById("sec-days");
+    var quests = [].filter.call(list.querySelectorAll(".quest"), function (row) {
+      return row.classList && row.classList.contains("quest");
+    });
+    var use = quests.length ? quests : rows;
     list.style.setProperty("box-sizing", "border-box", "important");
     list.style.setProperty("height", "100%", "important");
     list.style.setProperty("min-height", "0", "important");
     list.style.setProperty("max-height", "100%", "important");
-    list.style.setProperty("overflow", "visible", "important");
+    list.style.setProperty("overflow", "hidden", "important");
     list.style.setProperty("scrollbar-width", "none", "important");
     list.style.setProperty("background", "#0f1a22", "important");
     list.style.setProperty("padding", "0", "important");
@@ -140,80 +143,162 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     list.style.setProperty("display", "flex", "important");
     list.style.setProperty("flex-direction", "column", "important");
     list.style.setProperty("justify-content", "flex-start", "important");
-    rows.forEach(function (row) { row.style.setProperty("display", "flex", "important"); });
     var oldMore = list.querySelector(".must-more, .more-chip");
     if (oldMore) oldMore.style.setProperty("display", "none", "important");
-    list.style.setProperty("overflow", "visible", "important");
-    list.style.setProperty("overflow-y", "visible", "important");
+    var wall = window.matchMedia && window.matchMedia("(min-width: 1400px)").matches;
     var n = rows.length;
     var gap = 16;
     var show = n;
-    var dayTop = days ? days.getBoundingClientRect().top : 0;
-    var listTop = list.getBoundingClientRect().top;
-    show = n;
-    rows.forEach(function (row, i) {
-      var on = i < show;
-      row.style.setProperty("display", on ? "flex" : "none", "important");
-      if (!on) return;
-      row.style.setProperty("box-sizing", "border-box", "important");
-      row.style.setProperty("height", "64px", "important");
-      row.style.setProperty("min-height", "64px", "important");
-      row.style.setProperty("max-height", "64px", "important");
-      row.style.setProperty("flex", "0 0 64px", "important");
-      row.style.setProperty("margin", "0", "important");
-      row.style.setProperty("padding", "0 12px", "important");
-      row.style.setProperty("border", "0", "important");
-      row.style.setProperty("border-radius", "0", "important");
-      row.style.setProperty("background", "#0f1a22", "important");
-      row.style.setProperty("overflow", "visible", "important");
-      row.style.setProperty("align-items", "center", "important");
-      row.style.setProperty("transform", "none", "important");
-      var ring = row.querySelector(".ring");
-      if (ring) {
-        ring.style.setProperty("width", "64px", "important");
-        ring.style.setProperty("height", "64px", "important");
-        ring.style.setProperty("min-width", "64px", "important");
-        ring.style.setProperty("min-height", "64px", "important");
-        ring.style.setProperty("flex", "none", "important");
-        ring.style.setProperty("margin", "0 0 0 auto", "important");
+    if (!wall) {
+      rows.forEach(function (row) { row.style.setProperty("display", "flex", "important"); });
+      var H = list.clientHeight;
+      var need = n * 64 + Math.max(0, n - 1) * gap;
+      if (H > 0 && need > H) {
+        list.style.setProperty("overflow-y", "auto", "important");
+        list.style.setProperty("scrollbar-width", "thin", "important");
       }
-    });
-    list.style.setProperty("gap", (gap < 0 ? 0 : gap) + "px", "important");
-    var jarHit = document.querySelector(".prism-jar, #sec-jar");
-    if (jarHit) {
-      var jb = jarHit.getBoundingClientRect();
-      list.querySelectorAll(".quest").forEach(function (row) {
-        var r = row.getBoundingClientRect();
-        var x = Math.min(r.right, jb.right) - Math.max(r.left, jb.left);
-        var y = Math.min(r.bottom, jb.bottom) - Math.max(r.top, jb.top);
-        if (x > 8 && y > 8) row.style.setProperty("display", "none", "important");
+      rows.forEach(function (row, i) {
+        var on = i < show;
+        row.style.setProperty("display", on ? "flex" : "none", "important");
+        if (!on) return;
+        row.style.setProperty("box-sizing", "border-box", "important");
+        row.style.setProperty("height", "64px", "important");
+        row.style.setProperty("min-height", "64px", "important");
+        row.style.setProperty("max-height", "64px", "important");
+        row.style.setProperty("flex", "0 0 64px", "important");
+        row.style.setProperty("margin", "0", "important");
+        row.style.setProperty("padding", "0 12px", "important");
+        row.style.setProperty("border", "0", "important");
+        row.style.setProperty("border-radius", "0", "important");
+        row.style.setProperty("background", "#0f1a22", "important");
+        row.style.setProperty("overflow", "visible", "important");
+        row.style.setProperty("align-items", "center", "important");
+        row.style.setProperty("transform", "none", "important");
+        var ring = row.querySelector(".ring");
+        if (ring) {
+          ring.style.setProperty("width", "64px", "important");
+          ring.style.setProperty("height", "64px", "important");
+          ring.style.setProperty("min-width", "64px", "important");
+          ring.style.setProperty("min-height", "64px", "important");
+          ring.style.setProperty("flex", "none", "important");
+          ring.style.setProperty("margin", "0 0 0 auto", "important");
+        }
+      });
+      list.style.setProperty("gap", gap + "px", "important");
+      return;
+    }
+    n = use.length;
+    show = n;
+    use.forEach(function (row) { row.style.setProperty("display", "flex", "important"); });
+    list.style.setProperty("height", "auto", "important");
+    list.style.setProperty("max-height", "none", "important");
+    list.style.setProperty("overflow", "visible", "important");
+    list.style.setProperty("overflow-y", "visible", "important");
+    panel.style.setProperty("overflow", "visible", "important");
+    function blocksOf(el) {
+      var out = [];
+      var jar = document.getElementById("sec-jar");
+      var prism = document.querySelector(".prism-jar");
+      var days = document.getElementById("sec-days");
+      if (jar) out.push(jar);
+      if (prism && prism !== jar) out.push(prism);
+      if (days) out.push(days);
+      var taps = document.querySelectorAll(".day-tap");
+      for (var ti = 0; ti < taps.length; ti++) {
+        if (!el.contains(taps[ti]) && !list.contains(taps[ti])) out.push(taps[ti]);
+      }
+      return out;
+    }
+    function clashes(el) {
+      if (!el) return false;
+      var r = el.getBoundingClientRect();
+      if (r.width < 1 || r.height < 1) return false;
+      var blocks = blocksOf(el);
+      for (var bi = 0; bi < blocks.length; bi++) {
+        var other = blocks[bi];
+        if (!other || el.contains(other) || other.contains(el)) continue;
+        var b = other.getBoundingClientRect();
+        if (b.width < 1 || b.height < 1) continue;
+        var x = Math.min(r.right, b.right) - Math.max(r.left, b.left);
+        var y = Math.min(r.bottom, b.bottom) - Math.max(r.top, b.top);
+        if (x > 8 && y > 8) return true;
+      }
+      return false;
+    }
+    function paintTitle(row) {
+      row.style.setProperty("box-sizing", "border-box", "important");
+      row.style.setProperty("height", "auto", "important");
+      row.style.setProperty("min-height", "0", "important");
+      row.style.setProperty("max-height", "none", "important");
+      row.style.setProperty("flex", "0 0 auto", "important");
+      row.style.setProperty("overflow", "visible", "important");
+      row.style.setProperty("align-items", "flex-start", "important");
+      var title = row.querySelector(".what");
+      if (!title) return;
+      title.style.setProperty("display", "block", "important");
+      title.style.setProperty("position", "static", "important");
+      title.style.setProperty("height", "auto", "important");
+      title.style.setProperty("max-height", "none", "important");
+      title.style.setProperty("overflow", "visible", "important");
+      title.style.setProperty("font-size", "24px", "important");
+      title.style.setProperty("line-height", "32px", "important");
+      title.style.setProperty("color", "#f4efe6", "important");
+      title.style.setProperty("-webkit-text-fill-color", "#f4efe6", "important");
+      title.style.setProperty("opacity", "1", "important");
+      title.style.setProperty("white-space", "normal", "important");
+    }
+    use.forEach(function (row) { paintTitle(row); });
+    show = use.length;
+    for (var i = 0; i < use.length; i++) {
+      if (clashes(use[i])) { show = i; break; }
+    }
+    function applyShow() {
+      use.forEach(function (row, i) {
+        row.style.setProperty("display", i < show ? "flex" : "none", "important");
       });
     }
-    if (show < n) {
-      var chip = oldMore;
+    applyShow();
+    var chip = list.querySelector(".must-more");
+    var hiddenN = n - show;
+    if (hiddenN > 0) {
       if (!chip) {
-        chip = document.createElement("div");
+        chip = document.createElement("button");
+        chip.type = "button";
         chip.className = "must-more";
-        chip.textContent = document.body.getAttribute("data-kid") === "ainsley" ? "More" : ("+" + (n - show) + " more");
         list.appendChild(chip);
       }
-      chip.textContent = document.body.getAttribute("data-kid") === "ainsley" ? "More" : ("+" + (n - show) + " more");
       chip.style.setProperty("display", "flex", "important");
       chip.style.setProperty("align-items", "center", "important");
       chip.style.setProperty("justify-content", "center", "important");
-      chip.style.setProperty("height", "40px", "important");
-      chip.style.setProperty("flex", "0 0 40px", "important");
-      chip.style.setProperty("margin", "0", "important");
+      chip.style.setProperty("min-height", "48px", "important");
+      chip.style.setProperty("height", "48px", "important");
+      chip.style.setProperty("flex", "0 0 48px", "important");
+      chip.style.setProperty("align-self", "flex-start", "important");
+      chip.style.setProperty("margin", "8px 0 0", "important");
+      chip.style.setProperty("padding", "0 16px", "important");
       chip.style.setProperty("border", "0", "important");
-      chip.style.setProperty("background", "transparent", "important");
+      chip.style.setProperty("border-radius", "12px", "important");
+      chip.style.setProperty("background", "#243044", "important");
       chip.style.setProperty("color", "#f4efe6", "important");
+      chip.style.setProperty("-webkit-text-fill-color", "#f4efe6", "important");
       chip.style.setProperty("font-size", "24px", "important");
-      var hidden = rows.slice(show);
-      chip.onclick = function () {
-        hidden.forEach(function (row) { row.style.setProperty("display", "flex", "important"); });
-        chip.style.setProperty("display", "none", "important");
-      };
+      chip.style.setProperty("line-height", "32px", "important");
+      chip.style.setProperty("position", "relative", "important");
+      chip.style.setProperty("z-index", "5", "important");
+      chip.style.setProperty("pointer-events", "auto", "important");
+      chip.textContent = document.body.getAttribute("data-kid") === "ainsley" ? "More" : ("+" + hiddenN + " more");
+      var guard = 0;
+      while (show > 0 && clashes(chip) && guard < n) {
+        show -= 1;
+        hiddenN = n - show;
+        applyShow();
+        chip.textContent = document.body.getAttribute("data-kid") === "ainsley" ? "More" : ("+" + hiddenN + " more");
+        guard += 1;
+      }
+    } else if (chip) {
+      chip.style.setProperty("display", "none", "important");
     }
+    list.style.setProperty("gap", gap + "px", "important");
   }
   function paintPublicMusts() {
     var host = document.querySelector("[data-mount-quests]");

@@ -31,6 +31,9 @@ html[data-wardos-stage] .wardos-stage {
   background-position: 0 0;
   background-size: auto;
 }
+@media (min-width: 1400px) {
+  html[data-wardos-stage] .wardos-stage.wardos-stage { overflow: visible !important; }
+}
 html[data-wardos-stage] .km-leaf,
 html[data-wardos-stage] .km-glow,
 html[data-wardos-stage] .km-fall,
@@ -72,6 +75,10 @@ html body .wardos-stage:has(.chore-shortcuts) header .live-clock-host {
   html body .wardos-stage > .panel {
     overflow-x: hidden !important;
     overflow-y: auto !important;
+  }
+  html:not(#hf-wall-off):not(#hf-scroll-off) body .wardos-stage > .panel:has(.month-grid) {
+    overflow: visible !important;
+    max-height: none !important;
   }
 }
 #wardos-diag {

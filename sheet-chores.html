@@ -1396,6 +1396,21 @@ document.addEventListener("DOMContentLoaded", function () {
       var side = 12;
       var circle = Math.floor((content - side * 2 - iconW - dayGap * 7) / 7);
       if (!(circle > 0)) circle = 1;
+      var wall = window.matchMedia && window.matchMedia("(min-width: 1400px)").matches;
+      var labelH = 32;
+      if (wall && col.getAttribute("data-show-all") !== "1") {
+        var cardNeed = labelH + 8 + circle;
+        var fit = 0;
+        var used = 0;
+        for (var fi = 0; fi < cards.length; fi++) {
+          var next = used + cardNeed + (fit ? gap : 0);
+          if (room > 80 && next > room && fit > 0) break;
+          fit += 1;
+          used = next;
+        }
+        n = fit;
+        showAll = false;
+      }
       var daysW = circle * 7 + dayGap * 6;
       var spare = content - iconW - dayGap - daysW;
       if (spare < side * 2) spare = side * 2;
@@ -1416,7 +1431,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         card.style.setProperty("display", "grid", "important");
         card.style.setProperty("grid-template-columns", left + "px " + iconW + "px " + mid + "px " + daysW + "px " + right + "px", "important");
-        card.style.setProperty("grid-template-rows", Math.max(64, rowH) + "px", "important");
+        card.style.setProperty("grid-template-rows", (wall ? (labelH + "px " + circle + "px") : (Math.max(64, rowH) + "px")), "important");
         card.style.setProperty("column-gap", "0", "important");
         card.style.setProperty("row-gap", "4px", "important");
         card.style.setProperty("align-content", "center", "important");
@@ -1424,16 +1439,17 @@ document.addEventListener("DOMContentLoaded", function () {
         card.style.setProperty("position", "relative", "important");
         card.style.setProperty("align-items", "center", "important");
         card.style.setProperty("box-sizing", "border-box", "important");
-          card.style.setProperty("height", Math.max(64, rowH) + "px", "important");
-          card.style.setProperty("min-height", Math.max(64, rowH) + "px", "important");
-          card.style.setProperty("max-height", Math.max(64, rowH) + "px", "important");
+          var cardH = wall ? (labelH + 8 + circle) : Math.max(64, rowH);
+          card.style.setProperty("height", cardH + "px", "important");
+          card.style.setProperty("min-height", cardH + "px", "important");
+          card.style.setProperty("max-height", cardH + "px", "important");
           card.style.setProperty("overflow", "hidden", "important");
         card.style.setProperty("padding", "0", "important");
         card.style.setProperty("margin", "0", "important");
         var ico = card.querySelector(".chore-ico");
         if (ico) {
           ico.style.setProperty("grid-column", "2", "important");
-          ico.style.setProperty("grid-row", "1", "important");
+          ico.style.setProperty("grid-row", wall ? "1 / 3" : "1", "important");
           ico.style.setProperty("align-self", "center", "important");
           ico.style.setProperty("width", iconW + "px", "important");
           ico.style.setProperty("height", iconW + "px", "important");
@@ -1463,7 +1479,17 @@ document.addEventListener("DOMContentLoaded", function () {
         if (what) {
           what.style.setProperty("grid-column", "4", "important");
           what.style.setProperty("grid-row", "1", "important");
-          what.style.setProperty("align-self", "center", "important");
+          what.style.setProperty("align-self", wall ? "end" : "center", "important");
+          what.style.setProperty("z-index", "auto", "important");
+          what.style.setProperty("pointer-events", "none", "important");
+          if (wall) {
+            what.style.setProperty("height", labelH + "px", "important");
+            what.style.setProperty("max-height", labelH + "px", "important");
+            what.style.setProperty("line-height", labelH + "px", "important");
+            what.style.setProperty("overflow", "hidden", "important");
+            what.style.setProperty("color", "#f4efe6", "important");
+            what.style.setProperty("-webkit-text-fill-color", "#f4efe6", "important");
+          }
           what.style.setProperty("justify-self", "start", "important");
           what.style.setProperty("width", "100%", "important");
           what.style.setProperty("padding-left", "0", "important");
@@ -1477,7 +1503,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var taps = card.querySelector(".quest-days");
         if (taps) {
           taps.style.setProperty("grid-column", "4", "important");
-          taps.style.setProperty("grid-row", "1", "important");
+          taps.style.setProperty("grid-row", wall ? "2" : "1", "important");
           taps.style.setProperty("display", "grid", "important");
           taps.style.setProperty("grid-template-columns", "repeat(7, " + circle + "px)", "important");
           taps.style.setProperty("gap", dayGap + "px", "important");
@@ -1508,7 +1534,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (ring) {
           ring.style.setProperty("display", "flex", "important");
           ring.style.setProperty("grid-column", "1", "important");
-          ring.style.setProperty("grid-row", "1", "important");
+          ring.style.setProperty("grid-row", wall ? "1 / 3" : "1", "important");
           ring.style.setProperty("width", "48px", "important");
           ring.style.setProperty("height", "48px", "important");
           ring.style.setProperty("min-width", "48px", "important");
@@ -1526,21 +1552,49 @@ document.addEventListener("DOMContentLoaded", function () {
       if (more && !chip) {
         chip = document.createElement("div");
         chip.className = "more-chip";
-        chip.textContent = "More";
+        chip.textContent = wall ? ("+" + (cards.length - n) + " more") : "More";
         col.appendChild(chip);
       }
       if (chip && !more) chip.remove();
     });
   }
   window.fitChoreColumns = fitChoreColumns;
-  window.setTimeout(fitChoreColumns, 400);
-  window.setTimeout(fitChoreColumns, 1000);
-  window.setTimeout(fitChoreColumns, 1500);
+  [0, 200, 600, 1200, 2000, 2800, 3400].forEach(function (ms) { window.setTimeout(fitChoreColumns, ms); });
   document.addEventListener("house:kids-data-ready", function () {
     window.setTimeout(fitChoreColumns, 0);
   });
 });
 </script>
 <script id="prism-face-js" src="prism-face.js"></script>
+<style id="pass1-r2-chores-wall">
+@media (min-width: 1400px) and (min-height: 700px) {
+  html:not(#hf-wall-off):not(#hf-scroll-off) body .panel .body > section.col .chore {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    height: auto !important;
+    min-height: 112px !important;
+    overflow: visible !important;
+  }
+  html:not(#hf-wall-off):not(#hf-scroll-off) body .panel .body > section.col .chore .txt,
+  html:not(#hf-wall-off):not(#hf-scroll-off) body .panel .body > section.col .chore .what {
+    position: static !important;
+    order: 0 !important;
+    width: auto !important;
+    max-width: 100% !important;
+    height: 32px !important;
+    max-height: 32px !important;
+    pointer-events: none !important;
+    z-index: auto !important;
+  }
+  html:not(#hf-wall-off):not(#hf-scroll-off) body .panel .body > section.col .chore .quest-days {
+    position: static !important;
+    order: 1 !important;
+    width: 100% !important;
+    margin-top: 4px !important;
+  }
+}
+</style>
 </body>
 </html>

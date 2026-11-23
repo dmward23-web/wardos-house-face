@@ -4617,6 +4617,37 @@ html body .tile.dan [data-dad-stage] .tile-label {
   font-size: 32px !important;
 }
 </style>
+<style id="pass1-r2-hub-wall">
+@media (min-width: 1400px) {
+  html:not(#hf-wall-off) body .panel .leaveby.leaveby--hot,
+  html:not(#hf-wall-off) body .panel.panel > .hub-upper > section.leaveby.leaveby--hot {
+    position: fixed !important; left: 652px !important; top: 400px !important; width: 520px !important;
+    height: 200px !important; max-height: 200px !important; z-index: 40 !important; gap: 4px !important;
+    overflow: hidden !important; background: #101820 !important;
+  }
+  html:not(#hf-wall-off) body .leaveby-switch {
+    position: relative !important; z-index: 6 !important; display: flex !important; flex-direction: column !important;
+    align-items: flex-start !important; gap: 4px !important; background: #101820 !important;
+  }
+  html:not(#hf-wall-off) body .leaveby-chips {
+    flex-wrap: nowrap !important; position: relative !important; z-index: 6 !important; background: #101820 !important;
+  }
+  html:not(#hf-wall-off) body .leaveby-chip { width: 64px !important; min-width: 64px !important; max-width: 64px !important; }
+  html:not(#hf-wall-off) body .leaveby [data-live=leaveby-layouts],
+  html:not(#hf-wall-off) body .lb-day,
+  html:not(#hf-wall-off) body .lb-day-cols,
+  html:not(#hf-wall-off) body .lb-day-col,
+  html:not(#hf-wall-off) body .lb-day-stop,
+  html:not(#hf-wall-off) body .lb-day-what { max-width: 100% !important; box-sizing: border-box !important; }
+  html:not(#hf-wall-off) body .lb-day-cols { display: block !important; width: 100% !important; min-width: 0 !important; }
+  html:not(#hf-wall-off) body .lb-day-what,
+  html:not(#hf-wall-off) body .lb-day-t { min-width: 0 !important; white-space: normal !important; }
+  html:not(#hf-wall-off) body .hub-next { width: 560px !important; max-width: 560px !important; overflow: hidden !important; }
+  html:not(#hf-wall-off) body .hub-cam { height: 200px !important; min-height: 200px !important; overflow: hidden !important; }
+  html:not(#hf-wall-off) body a.hub-cam { overflow: visible !important; height: auto !important; }
+  html:not(#hf-wall-off) body .wardos-stage { overflow: visible !important; }
+}
+</style>
 <script src="hub-compose.js?v=ACERFIX1"></script>
 <script id="prism-face-js" src="prism-face.js"></script>
 </body>

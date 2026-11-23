@@ -20,16 +20,48 @@ out="$(mktemp -t wardos-qa-XXXXXX)"
 trap 'rm -f "$out"' EXIT
 set +e
 # QUARANTINE · acer-r50 and acer-r53-music report on a serial lane. They do not block. acer-r53-f7 stays blocking.
+# SERIAL · spawnSync 120s playwright measures run after the parallel batch and still count toward rc.
+serial=(
+  scripts/qa/acer-r30.test.mjs
+  scripts/qa/acer-r31.test.mjs
+  scripts/qa/acer-r53-kids.test.mjs
+  scripts/qa/acer-r55-dom.test.mjs
+  scripts/qa/acer-r55-show.test.mjs
+  scripts/qa/acer-r59.test.mjs
+  scripts/qa/acer-r61.test.mjs
+  scripts/qa/contentgate.test.mjs
+  scripts/qa/coversync1.test.mjs
+  scripts/qa/nowfreeze1.test.mjs
+)
 block=()
 for f in scripts/qa/*.test.mjs; do
   base=$(basename "$f")
   if [ "$base" = "acer-r50.test.mjs" ] || [ "$base" = "acer-r53-music.test.mjs" ]; then continue; fi
+  skip_serial=0
+  for s in "${serial[@]}"; do
+    if [ "$f" = "$s" ]; then skip_serial=1; break; fi
+  done
+  if [ "$skip_serial" -eq 1 ]; then continue; fi
   block+=("$f")
 done
 NODE_PATH="$DEPS" node --test "${conc[@]}" "${block[@]}" 2>&1 | tee "$out"
 rc=${PIPESTATUS[0]}
+present=()
+for s in "${serial[@]}"; do
+  if [ -f "$s" ]; then present+=("$s"); fi
+done
+if [ "${#present[@]}" -gt 0 ]; then
+  echo "BLOCKING serial lane (spawnSync 120s playwright measures; counts toward rc)"
+  serial_out="$(mktemp -t wardos-qa-serial-XXXXXX)"
+  NODE_PATH="$DEPS" node --test --test-concurrency=1 "${present[@]}" 2>&1 | tee "$serial_out"
+  serial_rc=${PIPESTATUS[0]}
+  cat "$serial_out" >> "$out"
+  rm -f "$serial_out"
+  if [ "$rc" -eq 0 ] && [ "$serial_rc" -ne 0 ]; then rc=$serial_rc; fi
+fi
 set -e
-skipped="$(sed -n 's/^# skipped \([0-9]*\)$/\1/p' "$out" | tail -1)"
+skipped=0
+while read -r n; do skipped=$((skipped + n)); done < <(sed -n 's/^# skipped \([0-9]*\)$/\1/p' "$out")
 allowed=0
 [ "${QA_NO_BROWSER:-}" = "1" ] && allowed="$(grep -c 'SKIP.*QA_NO_BROWSER' "$out" || true)"
 # RUNTESTS1 · on the GitHub runner only, a skip whose TAP reason starts "CI-ONLY <id>:" is allowed too. Those reasons come only
