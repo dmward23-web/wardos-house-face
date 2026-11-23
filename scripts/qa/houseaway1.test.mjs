@@ -2,12 +2,14 @@
    Atlas Nov 19: the house is empty from Sun Nov 22 8:00 AM until the Fri Dec 4 pickup leave, even on days the day flag
    is a Dan day. One source stays: away-filter.js over cal-months (withDan + houseAwayIso). Synthetic fixture; the
    pickup leave here is a fixture value (2:40 PM CT, the pickup event start on the calendar Nov 19), the real one is the end of the calendar event. Both directions. */
+import { assertSealed } from "./temp-home.mjs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
 
+assertSealed();
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
 const require = createRequire(import.meta.url);
 const AF = require(path.join(ROOT, "away-filter.js"));

@@ -1320,7 +1320,7 @@ html.kw-reduce .kw-iris::before { animation: none; transform: scale(1); }
 html, body { overflow-x: hidden !important; overscroll-behavior-x: none; }
 .quest-days { min-width: 0; }
 html.kw-root body.kw-on .quest-days .day-tap,
-html body .quest-days .day-tap { flex: 0 0 64px !important; min-width: 64px !important; width: 64px !important; min-height: 64px !important; height: 64px !important; max-height: 64px !important; font-size: 24px !important; }
+html body .quest-days .day-tap { flex: 0 0 88px !important; min-width: 88px !important; width: 88px !important; min-height: 88px !important; height: 88px !important; font-size: 24px !important; }
 @media (min-width: 1400px) {
   html.kw-root body.kw-on .quest.daily-week,
   html body .chore.daily-week { min-height: 128px !important; margin: 0 0 12px !important; overflow: hidden !important; box-sizing: border-box !important; }

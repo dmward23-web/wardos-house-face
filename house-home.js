@@ -27,7 +27,7 @@
     var box = {
       position: "fixed", left: "48px", top: "48px", width: "96px", height: "96px",
       "min-width": "96px", "min-height": "96px", "max-width": "96px", "max-height": "96px",
-      "z-index": "1000000", display: "flex", "align-items": "center", "justify-content": "center",
+      display: "flex", "align-items": "center", "justify-content": "center",
       "touch-action": "manipulation", "-webkit-touch-callout": "none", "user-select": "none",
       "pointer-events": "auto", margin: "0", padding: "0"
     };
@@ -177,7 +177,7 @@
       "html:not(#hf-wall-off) body .panel:has(.month-grid){height:1080px!important;max-height:1080px!important;overflow:hidden!important}",
       "html:not(#hf-wall-off) body .month-grid{grid-auto-rows:88px!important;max-height:700px!important;overflow:hidden!important}",
       "html:not(#hf-wall-off) body .month-wrap{overflow:visible!important;max-height:none!important;height:auto!important}",
-      "html:not(#hf-wall-off) body .chore.daily-week,html:not(#hf-wall-off) body .quest.daily-week{display:flex!important;flex-direction:column!important;align-items:flex-start!important;min-height:140px!important;margin:0 0 16px!important;overflow:hidden!important;box-sizing:border-box!important;position:relative!important}",
+      "html:not(#hf-wall-off) body .chore.daily-week,html:not(#hf-wall-off) body .quest.daily-week{display:flex!important;flex-direction:column!important;align-items:flex-start!important;min-height:168px!important;margin:0 0 16px!important;overflow:visible!important;box-sizing:border-box!important;position:relative!important}",
       "html:not(#hf-wall-off) body .chore .what,html:not(#hf-wall-off) body .quest .what{position:static!important;height:32px!important;max-height:32px!important;overflow:hidden!important}",
       "html:not(#hf-wall-off) body .panel.panel>.hub-upper>section.leaveby.leaveby--hot{position:fixed!important;left:652px!important;top:400px!important;width:520px!important;height:200px!important;max-height:200px!important;margin:0!important;padding:8px!important;overflow:hidden!important;z-index:40!important;background:#101820!important;pointer-events:auto!important;display:flex!important;flex-direction:column!important;gap:4px!important}",
       "html:not(#hf-wall-off) body .leaveby-chips{flex-wrap:nowrap!important}",
@@ -188,7 +188,7 @@
       "html:not(#hf-wall-off) body .lb-day-what,html:not(#hf-wall-off) body .lb-day-t{min-width:0!important;max-width:100%!important;white-space:normal!important}",
       "html:not(#hf-wall-off) body .hub-cam{height:200px!important;min-height:200px!important;overflow:hidden!important}",
       "html.kw-root body.kw-on .live-clock,html.kw-root body.kw-on .live-clock-lab{display:none!important}",
-      "html.kw-root body.kw-on #sec-musts .sec-list{max-height:640px!important;overflow:hidden!important}",
+      "html.kw-root body.kw-on #sec-musts .sec-list{max-height:none!important;overflow:visible!important}",
       "html:not(#hf-wall-off) body .wardos-stage{overflow:visible!important}",
       "html:not(#hf-wall-off) body .month-grid{overflow:visible!important;max-height:none!important;height:auto!important}",
       "html:not(#hf-wall-off) body .link-banner{overflow:visible!important;min-height:104px!important;height:auto!important}",

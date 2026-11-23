@@ -122,7 +122,7 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     panel.style.setProperty("height", "100%", "important");
     panel.style.setProperty("align-self", "stretch", "important");
     panel.style.setProperty("background", "#0f1a22", "important");
-    panel.style.setProperty("overflow", "hidden", "important");
+    panel.style.setProperty("overflow", "visible", "important");
     var rows = [].filter.call(list.children, function (row) {
       return row.classList && row.classList.contains("chore");
     });
@@ -131,7 +131,7 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     list.style.setProperty("height", "100%", "important");
     list.style.setProperty("min-height", "0", "important");
     list.style.setProperty("max-height", "100%", "important");
-    list.style.setProperty("overflow", "hidden", "important");
+    list.style.setProperty("overflow", "visible", "important");
     list.style.setProperty("scrollbar-width", "none", "important");
     list.style.setProperty("background", "#0f1a22", "important");
     list.style.setProperty("padding", "0", "important");
@@ -141,23 +141,16 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
     list.style.setProperty("flex-direction", "column", "important");
     list.style.setProperty("justify-content", "flex-start", "important");
     rows.forEach(function (row) { row.style.setProperty("display", "flex", "important"); });
-    var oldMore = list.querySelector(".more-chip");
+    var oldMore = list.querySelector(".must-more, .more-chip");
     if (oldMore) oldMore.style.setProperty("display", "none", "important");
-    list.style.setProperty("overflow", "hidden", "important");
-    list.style.setProperty("overflow-y", "hidden", "important");
+    list.style.setProperty("overflow", "visible", "important");
+    list.style.setProperty("overflow-y", "visible", "important");
     var n = rows.length;
     var gap = 16;
     var show = n;
     var dayTop = days ? days.getBoundingClientRect().top : 0;
     var listTop = list.getBoundingClientRect().top;
-    if (dayTop > listTop + 64) {
-      var avail = dayTop - listTop - 8;
-      var rowSlot = 64 + gap;
-      var cueH = 40;
-      var fit = Math.floor((avail - cueH) / rowSlot);
-      if (fit < 1) fit = 1;
-      if (fit < n) show = fit;
-    }
+    show = n;
     rows.forEach(function (row, i) {
       var on = i < show;
       row.style.setProperty("display", on ? "flex" : "none", "important");
@@ -186,48 +179,25 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
       }
     });
     list.style.setProperty("gap", (gap < 0 ? 0 : gap) + "px", "important");
-    var quests = [].filter.call(list.querySelectorAll(".quest"), function (row) { return list.contains(row); });
-    if (quests.length > 1) {
-      var jar = document.querySelector(".prism-jar, #sec-jar");
-      var listBox = list.getBoundingClientRect();
-      var limit = listBox.top + Math.max(list.clientHeight, 640);
-      if (jar) {
-        var jb = jar.getBoundingClientRect();
-        var overlapX = Math.min(listBox.right, jb.right) - Math.max(listBox.left, jb.left);
-        if (overlapX > 8 && jb.top > listBox.top) limit = Math.min(limit, jb.top - 8);
-      }
-      var qShow = quests.length;
-      quests.forEach(function (row, i) {
-        row.style.removeProperty("display");
-        if (row.getBoundingClientRect().bottom > limit && i > 0) qShow = Math.min(qShow, i);
+    var jarHit = document.querySelector(".prism-jar, #sec-jar");
+    if (jarHit) {
+      var jb = jarHit.getBoundingClientRect();
+      list.querySelectorAll(".quest").forEach(function (row) {
+        var r = row.getBoundingClientRect();
+        var x = Math.min(r.right, jb.right) - Math.max(r.left, jb.left);
+        var y = Math.min(r.bottom, jb.bottom) - Math.max(r.top, jb.top);
+        if (x > 8 && y > 8) row.style.setProperty("display", "none", "important");
       });
-      if (qShow < 1) qShow = 1;
-      quests.forEach(function (row, i) { row.style.setProperty("display", i < qShow ? "" : "none", "important"); });
-      if (qShow < quests.length) {
-        var qCue = list.parentElement && list.parentElement.querySelector(".quest-more");
-        if (!qCue && list.parentElement) {
-          qCue = document.createElement("div");
-          qCue.className = "quest-more";
-          list.parentElement.appendChild(qCue);
-        }
-        if (qCue) {
-          qCue.textContent = "+" + (quests.length - qShow) + " more";
-          qCue.style.setProperty("display", "block", "important");
-          qCue.style.setProperty("font-size", "24px", "important");
-          qCue.style.setProperty("color", "#f4efe6", "important");
-        }
-      }
     }
     if (show < n) {
       var chip = oldMore;
       if (!chip) {
-        chip = document.createElement("button");
-        chip.type = "button";
-        chip.className = "more-chip";
-        chip.textContent = "+" + (n - show) + " more";
+        chip = document.createElement("div");
+        chip.className = "must-more";
+        chip.textContent = document.body.getAttribute("data-kid") === "ainsley" ? "More" : ("+" + (n - show) + " more");
         list.appendChild(chip);
       }
-      chip.textContent = "+" + (n - show) + " more";
+      chip.textContent = document.body.getAttribute("data-kid") === "ainsley" ? "More" : ("+" + (n - show) + " more");
       chip.style.setProperty("display", "flex", "important");
       chip.style.setProperty("align-items", "center", "important");
       chip.style.setProperty("justify-content", "center", "important");
