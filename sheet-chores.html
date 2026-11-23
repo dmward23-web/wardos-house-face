@@ -1494,11 +1494,13 @@ document.addEventListener("DOMContentLoaded", function () {
           what.style.setProperty("width", "100%", "important");
           what.style.setProperty("padding-left", "0", "important");
           what.style.setProperty("font-size", "24px", "important");
-          what.style.setProperty("line-height", "24px", "important");
-          what.style.setProperty("height", "24px", "important");
           what.style.setProperty("margin", "0", "important");
-          what.style.setProperty("overflow", "visible", "important");
           what.style.setProperty("white-space", "nowrap", "important");
+          if (!wall) {
+            what.style.setProperty("line-height", "24px", "important");
+            what.style.setProperty("height", "24px", "important");
+            what.style.setProperty("overflow", "visible", "important");
+          }
         }
         var taps = card.querySelector(".quest-days");
         if (taps) {
@@ -1508,7 +1510,7 @@ document.addEventListener("DOMContentLoaded", function () {
           taps.style.setProperty("grid-template-columns", "repeat(7, " + circle + "px)", "important");
           taps.style.setProperty("gap", dayGap + "px", "important");
           taps.style.setProperty("justify-content", "start", "important");
-          taps.style.setProperty("align-self", "center", "important");
+          taps.style.setProperty("align-self", wall ? "start" : "center", "important");
           taps.style.setProperty("width", daysW + "px", "important");
           taps.style.setProperty("height", circle + "px", "important");
           taps.style.setProperty("min-height", circle + "px", "important");
@@ -1577,7 +1579,6 @@ document.addEventListener("DOMContentLoaded", function () {
     min-height: 112px !important;
     overflow: visible !important;
   }
-  html:not(#hf-wall-off):not(#hf-scroll-off) body .panel .body > section.col .chore .txt,
   html:not(#hf-wall-off):not(#hf-scroll-off) body .panel .body > section.col .chore .what {
     position: static !important;
     order: 0 !important;
@@ -1585,8 +1586,11 @@ document.addEventListener("DOMContentLoaded", function () {
     max-width: 100% !important;
     height: 32px !important;
     max-height: 32px !important;
-    pointer-events: none !important;
     z-index: auto !important;
+    pointer-events: none !important;
+  }
+  html:not(#hf-wall-off):not(#hf-scroll-off) body .panel .body > section.col .chore .day-tap {
+    pointer-events: auto !important;
   }
   html:not(#hf-wall-off):not(#hf-scroll-off) body .panel .body > section.col .chore .quest-days {
     position: static !important;
