@@ -27,7 +27,7 @@
     var box = {
       position: "fixed", left: "48px", top: "48px", width: "96px", height: "96px",
       "min-width": "96px", "min-height": "96px", "max-width": "96px", "max-height": "96px",
-      display: "flex", "align-items": "center", "justify-content": "center",
+      "z-index": "30000000000", display: "flex", "align-items": "center", "justify-content": "center",
       "touch-action": "manipulation", "-webkit-touch-callout": "none", "user-select": "none",
       "pointer-events": "auto", margin: "0", padding: "0"
     };
