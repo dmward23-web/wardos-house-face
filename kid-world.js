@@ -310,7 +310,7 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
       chip.style.setProperty("min-width", "64px", "important");
       chip.style.setProperty("flex", "0 0 64px", "important");
       chip.style.setProperty("align-self", "flex-start", "important");
-      chip.style.setProperty("margin", "8px 0 0", "important");
+      chip.style.setProperty("margin", "0", "important");
       chip.style.setProperty("padding", "0 16px", "important");
       chip.style.setProperty("border", "0", "important");
       chip.style.setProperty("border-radius", "12px", "important");

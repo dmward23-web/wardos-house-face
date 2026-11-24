@@ -1553,7 +1553,7 @@ html body section.col .chore .chore-ico svg {
     height: auto !important;
     min-height: 64px !important;
     max-height: 280px !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     z-index: 4 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -1571,8 +1571,8 @@ html body section.col .chore .chore-ico svg {
     display: grid !important;
     grid-template-columns: 1fr 1fr 1fr !important;
     align-content: start !important;
-    overflow: hidden !important;
-    max-height: 200px !important;
+    overflow: visible !important;
+    max-height: none !important;
   }
   html.kw-root:not(#hf-wall-off) body.kw-on #sec-days .consume-ahead-row {
     height: auto !important;

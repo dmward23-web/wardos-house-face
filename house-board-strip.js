@@ -1138,13 +1138,14 @@
     cue.style.setProperty("position", "absolute", "important");
     cue.style.setProperty("right", "8px", "important");
     cue.style.setProperty("left", "auto", "important");
-    cue.style.setProperty("width", "140px", "important");
+    cue.style.setProperty("width", "auto", "important");
     cue.style.setProperty("bottom", "4px", "important");
     cue.style.setProperty("top", "auto", "important");
     cue.style.setProperty("height", "24px", "important");
     cue.style.setProperty("line-height", "24px", "important");
     cue.style.setProperty("display", "block", "important");
-    cue.style.setProperty("z-index", "2", "important");
+    cue.style.setProperty("z-index", "8", "important");
+    cue.style.setProperty("pointer-events", "auto", "important");
     cue.style.setProperty("background", "#101820", "important");
     cue.style.setProperty("text-align", "right", "important");
     guard = 0;
