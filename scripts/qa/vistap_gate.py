@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """WardOS VISTAP gate (Alfred Tier 1, Nov 22 2026). One script, box or cloud, no repo edits.
 usage: vistap_gate.py <tree> <feed_dir with feed-*.json> <out_dir> [--now ISO] [--routes a,b] [--shots]
-Checks every beta-minimum route at 1920x1080 DPR1 (frozen ?now):
+Checks every beta-minimum route at 1920x1080 DPR1 (frozen ?now).
+Overflow chips: pass scripts/qa/fixtures/overflow-r3 as the feed dir (Day-0 plus six extra musts per kid).
   TXT   visible own text < 24px
   TGT   interactive target < 64px (kid boards: < 96px)
   CLIP  overflow container clips content with no '+N more' cue
   TRUNC text cut by ellipsis (scrollWidth > clientWidth)
-  COVER centre of a target or text line is hit by an unrelated element (overlap)
+  COVER centre or an inset edge of a target or text line is hit by an unrelated element.
+        A nested control covering its own card's label counts (VISTAP-SAMECARD1, VISTAP-EDGE1).
   DEAD  visible control that is disabled / aria-disabled / pointer-events:none (dead offline control)
 Exit 0 only if 0 findings. Exit 1 = findings. Exit 2 = harness error (route failed to load)."""
 import json, sys, re, threading, hashlib, argparse
@@ -15,6 +17,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 ap = argparse.ArgumentParser(); ap.add_argument("tree"); ap.add_argument("feed"); ap.add_argument("out")
 ap.add_argument("--now", default="2026-11-17T07:30:00-06:00"); ap.add_argument("--routes", default="")
 ap.add_argument("--shots", action="store_true")
+ap.add_argument("--self-test", action="store_true", help="synthetic same-card and edge COVER check")
 ap.add_argument("--block", default="TXT,TGT,CLIP,TRUNC,COVER,DEAD", help="classes that fail the gate; beta bar (Atlas Nov 22): COVER,TRUNC,DEAD,CLIP")
 a = ap.parse_args(); BLOCK = set(a.block.split(","))
 T, FEED, OUT = Path(a.tree).resolve(), Path(a.feed).resolve(), Path(a.out); OUT.mkdir(parents=True, exist_ok=True)
@@ -51,18 +54,24 @@ J = r"""(kid) => {
  const all = [...document.querySelectorAll('body *')].filter(vis);
  const ctl = all.filter(e => e.matches('a[href],button,[role=button],[data-check],input,select,textarea,[onclick],[tabindex]:not([tabindex="-1"])'));
  const ctlTop = ctl.filter(e => !ctl.some(o => o !== e && o.contains(e)));
- const hitOk = (e) => { const r = e.getBoundingClientRect(); const x = Math.min(W - 1, Math.max(0, r.left + r.width / 2)), y = Math.min(Hh - 1, Math.max(0, r.top + r.height / 2));
-   const h = document.elementFromPoint(x, y); if (!h) return 'nothing';
+ const ctrlSel = 'a[href],button,[role=button],[data-check],label,[onclick]';
+ const pointsOf = (el) => { const r = el.getBoundingClientRect(); const ix = Math.min(8, Math.max(1, r.width / 4)), iy = Math.min(8, Math.max(1, r.height / 4));
+   return [[r.left + r.width / 2, r.top + r.height / 2], [r.left + ix, r.top + r.height / 2], [r.right - ix, r.top + r.height / 2], [r.left + r.width / 2, r.top + iy], [r.left + r.width / 2, r.bottom - iy]]
+     .map(([x, y]) => [Math.min(W - 1, Math.max(0, x)), Math.min(Hh - 1, Math.max(0, y))]); };
+ const hitAt = (e, x, y) => { const h = document.elementFromPoint(x, y); if (!h) return 'nothing';
    if (h === e || e.contains(h)) return null;
-   const c = e.closest('a[href],button,[role=button],[data-check],label,[onclick]'); if (c && (c === h || c.contains(h))) return null;
+   const ownCtrl = e.closest(ctrlSel), hitCtrl = h.closest(ctrlSel);
+   if (hitCtrl && ownCtrl && hitCtrl !== ownCtrl) return h;
+   if (ownCtrl && (ownCtrl === h || ownCtrl.contains(h)) && (!hitCtrl || hitCtrl === ownCtrl)) return null;
    if (h.contains(e) && getComputedStyle(h).pointerEvents !== 'none' && !h.matches('a[href],button,[role=button],[onclick]')) return null;
-   return id(h); };
+   return h; };
+ const hitOk = (e) => { for (const [x, y] of pointsOf(e)) { const h = hitAt(e, x, y); if (!h) continue; if (h === 'nothing') return 'nothing';
+   const hc = getComputedStyle(h); const clear = /rgba\(0, 0, 0, 0\)|transparent/.test(hc.backgroundColor) && hc.backgroundImage === 'none' && !own(h) && !(hc.backdropFilter || '').match(/blur/);
+   if (!clear) return id(h); } return null; };
  for (const e of all) { const t = own(e); if (!t) continue; const fs = parseFloat(getComputedStyle(e).fontSize);
    if (fs < 24) add('TXT', e, fs + 'px');
    const c = getComputedStyle(e); if (c.textOverflow === 'ellipsis' && e.scrollWidth > e.clientWidth + 1) add('TRUNC', e, e.scrollWidth + '>' + e.clientWidth);
-   const by = hitOk(e); if (by) { const r = e.getBoundingClientRect(); const h = document.elementFromPoint(Math.min(W-1, r.left + r.width/2), Math.min(Hh-1, r.top + r.height/2));
-     const hc = h ? getComputedStyle(h) : null; const clear = hc && /rgba\(0, 0, 0, 0\)|transparent/.test(hc.backgroundColor) && hc.backgroundImage === 'none' && !own(h) && !hc.backdropFilter.match(/blur/);
-     if (!clear) add('COVER', e, 'text hit by ' + by); } }
+   const by = hitOk(e); if (by) add('COVER', e, 'text hit by ' + by); }
  for (const e of ctlTop) { const r = e.getBoundingClientRect(), m = Math.min(r.width, r.height), floor = kid ? 96 : 64;
    if (m < floor) add('TGT', e, Math.round(r.width) + 'x' + Math.round(r.height) + ' <' + floor);
    const c = getComputedStyle(e);
@@ -74,6 +83,24 @@ J = r"""(kid) => {
    const scope = e.parentElement || e; if (/\+\s*\d+\s*more/i.test(scope.innerText || '')) continue;
    add('CLIP', e, 'scroll ' + e.scrollWidth + 'x' + e.scrollHeight + ' > ' + e.clientWidth + 'x' + e.clientHeight); }
  const seen = new Set(); return F.filter(f => { const k = f.k + f.el + f.box.join(','); if (seen.has(k)) return false; seen.add(k); return true; }); }"""
+if a.self_test:
+    html = """<!DOCTYPE html><meta charset="utf-8"><body style="margin:0;background:#111;color:#fff">
+<div role="button" style="position:relative;width:420px;height:96px;margin:48px;background:#222">
+<div class="what" style="position:absolute;left:24px;top:28px;width:220px;height:40px;font-size:24px">Make bed</div>
+<button class="day-tap" type="button" style="position:absolute;left:48px;top:16px;width:180px;height:64px;font-size:24px;background:#345">Fr</button>
+</div>
+<div class="edge" style="position:absolute;left:40px;top:220px;width:220px;height:80px;font-size:24px;background:#333">Edge label</div>
+<div style="position:absolute;left:40px;top:268px;width:220px;height:40px;font-size:24px;background:#900">cover</div>
+</body>"""
+    with sync_playwright() as p:
+        br = p.chromium.launch(**launch_kw(p, headless=True))
+        pg = br.new_page(viewport={"width": 800, "height": 600})
+        pg.set_content(html)
+        found = pg.evaluate(J, False)
+        br.close()
+    cover = sum(1 for f in found if f["k"] == "COVER")
+    print("SAMECARD COVER=%d" % cover)
+    sys.exit(0 if cover >= 2 else 1)
 res, err, shots = {}, {}, {}
 with sync_playwright() as p:
     br = p.chromium.launch(**launch_kw(p, headless=True))
