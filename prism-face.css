@@ -1587,18 +1587,28 @@ html body section.col .chore .chore-ico svg {
     align-items: center !important;
     gap: 8px !important;
   }
-  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days .consume-ahead-time { display: none !important; }
-  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days .consume-ahead-what,
-  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days .consume-ahead-day {
-    white-space: normal !important;
-    overflow: hidden !important;
+  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days .consume-ahead-day { display: none !important; }
+  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days .consume-ahead-time {
+    display: block !important;
+    order: 0 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
     text-overflow: clip !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2 !important;
-    -webkit-box-orient: vertical !important;
-    line-height: 24px !important;
+    font-size: 24px !important;
+    line-height: 32px !important;
     height: auto !important;
-    max-height: 48px !important;
+    max-height: none !important;
+  }
+  html.kw-root:not(#hf-wall-off) body.kw-on #sec-days .consume-ahead-what {
+    order: 1 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    display: block !important;
+    -webkit-line-clamp: unset !important;
+    line-height: 32px !important;
+    height: auto !important;
+    max-height: none !important;
     font-size: 24px !important;
   }
   html.kw-root:not(#hf-wall-off) body.kw-on #sec-days .consume-ahead-more {

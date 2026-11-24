@@ -2,7 +2,7 @@
 import json
 import os
 import threading
-from datetime import datetime, timedelta
+from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -15,9 +15,9 @@ from playwright.sync_api import sync_playwright
 ROOT = Path(os.environ.get("WARDOS_ROOT") or Path(__file__).resolve().parents[2])
 OUT = Path(os.environ.get("WARDOS_ARTIFACT_DIR") or "/opt/cursor/artifacts/r57")
 CT = ZoneInfo("America/Chicago")
-now = datetime.now(CT)
-if now.hour >= 17:
-    now = now + timedelta(days=1)
+# Frozen Wednesday afternoon so Today still holds the evening rows at any real hour.
+now = datetime(2026, 11, 18, 16, 0, tzinfo=CT)
+PIN = "now=2026-11-18T16:00:00-06:00&freeze=1"
 day = now.strftime("%Y-%m-%d")
 start = now.replace(hour=18, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%S-06:00")
 start2 = now.replace(hour=19, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%S-06:00")
@@ -171,7 +171,7 @@ def main():
         page = ctx.new_page()
 
         def open_page(path):
-            page.goto(base + path + ("&" if "?" in path else "?") + "pfBase=" + base, wait_until="load", timeout=60000)
+            page.goto(base + path + ("&" if "?" in path else "?") + "pfBase=" + base + "&" + PIN, wait_until="load", timeout=60000)
             page.wait_for_timeout(1200)
             page.evaluate("() => { if (window.HouseBoardStrip && window.HouseBoardStrip.boot) window.HouseBoardStrip.boot(); }")
             page.wait_for_timeout(800)

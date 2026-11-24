@@ -9,7 +9,7 @@ from pw_chrome import launch_kw
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[2]
-FEED = ROOT / "scripts" / "qa" / "fixtures" / "day0-dec4"
+STATE = {"feed": ROOT / "scripts" / "qa" / "fixtures" / "day0-dec4"}
 TYPES = {".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml",
          ".png": "image/png", ".json": "application/json", ".woff2": "font/woff2", ".webp": "image/webp"}
 
@@ -19,7 +19,7 @@ class H(BaseHTTPRequestHandler):
     def do_GET(self):
         p = self.path.split("?", 1)[0].lstrip("/") or "index.html"
         m = re.match(r"api/private/([a-z-]+)\.json$", p)
-        f = (FEED / ("feed-%s.json" % m.group(1))) if m else (ROOT / p).resolve()
+        f = (STATE["feed"] / ("feed-%s.json" % m.group(1))) if m else (ROOT / p).resolve()
         if not f.is_file() or (not m and ROOT not in f.parents and f != ROOT):
             self.send_error(404)
             return
@@ -85,29 +85,73 @@ JS = r"""() => {
     if (!t) continue;
     if (t.scrollWidth > t.clientWidth + 1 || t.scrollHeight > t.clientHeight + 1) trunc.push(t.innerText.slice(0, 24));
   }
+  const home = document.querySelector('a.wardos-home');
+  let homeHit = false;
+  if (home) {
+    const hr = home.getBoundingClientRect();
+    const hh = document.elementFromPoint(hr.left + hr.width / 2, hr.top + hr.height / 2);
+    homeHit = !!(hh && (hh === home || home.contains(hh)));
+  }
   return {
     kid: document.body.getAttribute('data-kid'),
     total: rows.length,
     visible: shown.length,
     hidden: hidden.length,
+    titles: shown.map(e => ((e.querySelector('.what') || e).innerText || '').replace(/\s+/g, ' ').trim()).slice(0, 12),
     chip: chipOn ? (chip.textContent || '').replace(/\s+/g, ' ').trim() : '',
+    chipH: chipOn ? Math.round(chip.getBoundingClientRect().height) : 0,
     rowHits: hits.every(Boolean),
     chipHit: chipOn ? hit(chip) : hidden.length === 0,
     overlaps: overs,
     chipOver,
-    trunc
+    trunc,
+    homeHit
   };
 }"""
-out = {}
+
+def shoot(pg, drop=False):
+    if drop:
+        pg.evaluate("() => { const r = document.querySelector('#sec-musts .quest'); if (r) r.remove(); }")
+    return pg.evaluate(JS)
+
+def boards(pg, drop=False):
+    out = {}
+    for kid in ("kid-ainsley", "kid-hayes", "kid-harris"):
+        pg.goto("%s/%s.html?pfBase=%s&now=2026-12-04T07:30:00-06:00&freeze=1" % (base, kid, base), wait_until="domcontentloaded", timeout=30000)
+        pg.wait_for_timeout(3500)
+        out[kid] = shoot(pg, drop)
+    return out
+
+out = {"day0": {}, "overflow": {}, "tap": {}}
 with sync_playwright() as p:
     br = p.chromium.launch(**launch_kw(p, headless=True))
     ctx = br.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
     ctx.add_init_script("try{localStorage.setItem('wardos-private-feed-token','r58-box-fixture-key')}catch(e){}")
     pg = ctx.new_page()
-    for kid in ("kid-ainsley", "kid-hayes", "kid-harris"):
-        pg.goto("%s/%s.html?pfBase=%s&now=2026-12-04T07:30:00-06:00&freeze=1" % (base, kid, base), wait_until="domcontentloaded", timeout=30000)
-        pg.wait_for_timeout(3500)
-        out[kid] = pg.evaluate(JS)
+    STATE["feed"] = ROOT / "scripts" / "qa" / "fixtures" / "day0-dec4"
+    out["day0"] = boards(pg, os.environ.get("KIDMUST_DROP") == "1")
+    STATE["feed"] = ROOT / "scripts" / "qa" / "fixtures" / "overflow-r3"
+    out["overflow"] = boards(pg, False)
+    pg.goto("%s/kid-hayes.html?pfBase=%s&now=2026-12-04T07:30:00-06:00&freeze=1" % (base, base), wait_until="domcontentloaded", timeout=30000)
+    pg.wait_for_timeout(2500)
+    before = pg.evaluate(JS)
+    hidden_title = ""
+    pg.evaluate("""() => {
+      const vis = (e) => getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().height > 1;
+      const rows = [...document.querySelectorAll('#sec-musts .quest')];
+      const hid = rows.find(e => !vis(e));
+      window.__hid = hid ? ((hid.querySelector('.what') || hid).innerText || '').replace(/\s+/g, ' ').trim() : '';
+    }""")
+    hidden_title = pg.evaluate("() => window.__hid || ''")
+    pg.click("#sec-musts .must-more")
+    pg.wait_for_timeout(400)
+    mid = pg.evaluate(JS)
+    pg.click("#sec-musts .must-more")
+    pg.wait_for_timeout(400)
+    after = pg.evaluate(JS)
+    out["tap"] = {"before": before.get("chip"), "mid": mid.get("chip"), "after": after.get("chip"),
+                  "hid": hidden_title, "midTitles": mid.get("titles"), "home": mid.get("homeHit"),
+                  "chipH": before.get("chipH")}
     br.close()
 srv.shutdown()
 print(json.dumps(out))

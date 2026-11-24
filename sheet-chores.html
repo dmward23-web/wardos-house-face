@@ -1548,14 +1548,56 @@ document.addEventListener("DOMContentLoaded", function () {
         if (hint) hint.style.setProperty("display", "none", "important");
       });
       if (col.getAttribute("data-show-all") === "1") n = cards.length;
-      var more = cards.length > n;
+      var paging = col.getAttribute("data-chore-page") === "more";
+      var windowN = n;
+      if (paging) {
+        cards.forEach(function (card, i) {
+          card.style.setProperty("display", i >= windowN ? "grid" : "none", "important");
+        });
+      }
+      var more = paging || cards.length > windowN;
       col.classList.toggle("has-more", more);
       var chip = col.querySelector(".more-chip");
-      if (more && !chip) {
-        chip = document.createElement("div");
+      if (more && (!chip || chip.tagName !== "BUTTON")) {
+        if (chip) chip.remove();
+        chip = document.createElement("button");
+        chip.type = "button";
         chip.className = "more-chip";
-        chip.textContent = wall ? ("+" + (cards.length - n) + " more") : "More";
         col.appendChild(chip);
+      }
+      if (chip && more) {
+        chip.style.setProperty("height", "64px", "important");
+        chip.style.setProperty("min-height", "64px", "important");
+        chip.style.setProperty("min-width", "64px", "important");
+        chip.style.setProperty("pointer-events", "auto", "important");
+        chip.setAttribute("data-r3-wired", "1");
+        if (wall) {
+          var guard = 0;
+          while (guard < cards.length) {
+            var visNow = cards.filter(function (card) { return card.style.display !== "none"; });
+            if (visNow.length < 1) break;
+            var hiddenNow = cards.length - visNow.length;
+            chip.textContent = paging ? "Back" : ("+" + hiddenNow + " more");
+            var chipTop = chip.getBoundingClientRect().top;
+            var lastCard = visNow[visNow.length - 1];
+            if (lastCard.getBoundingClientRect().bottom <= chipTop + 0.5) break;
+            lastCard.style.setProperty("display", "none", "important");
+            guard += 1;
+          }
+        }
+        var shown = cards.filter(function (card) { return card.style.display !== "none"; }).length;
+        chip.textContent = paging ? "Back" : (wall ? ("+" + (cards.length - shown) + " more") : "More");
+        if (chip.getAttribute("data-r3-click") !== "1") {
+          chip.setAttribute("data-r3-click", "1");
+          chip.addEventListener("click", function (ev) {
+            ev.preventDefault();
+            ev.stopImmediatePropagation();
+            if (col.getAttribute("data-chore-page") === "more") col.removeAttribute("data-chore-page");
+            else col.setAttribute("data-chore-page", "more");
+            col.removeAttribute("data-show-all");
+            fitChoreColumns();
+          }, true);
+        }
       }
       if (chip && !more) chip.remove();
     });

@@ -283,9 +283,18 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
         row.style.setProperty("display", i < show ? "flex" : "none", "important");
       });
     }
-    applyShow();
+    var firstCount = show;
+    var pageMore = list.getAttribute("data-must-page") === "more";
+    if (pageMore) firstCount = parseInt(list.getAttribute("data-must-window") || String(show), 10) || show;
+    if (pageMore && firstCount < n) {
+      use.forEach(function (row, i) {
+        row.style.setProperty("display", (i >= firstCount && i < n) ? "flex" : "none", "important");
+      });
+    } else {
+      applyShow();
+    }
     var chip = list.querySelector(".must-more");
-    var hiddenN = n - show;
+    var hiddenN = n - firstCount;
     if (hiddenN > 0) {
       if (!chip) {
         chip = document.createElement("button");
@@ -296,9 +305,10 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
       chip.style.setProperty("display", "flex", "important");
       chip.style.setProperty("align-items", "center", "important");
       chip.style.setProperty("justify-content", "center", "important");
-      chip.style.setProperty("min-height", "48px", "important");
-      chip.style.setProperty("height", "48px", "important");
-      chip.style.setProperty("flex", "0 0 48px", "important");
+      chip.style.setProperty("min-height", "64px", "important");
+      chip.style.setProperty("height", "64px", "important");
+      chip.style.setProperty("min-width", "64px", "important");
+      chip.style.setProperty("flex", "0 0 64px", "important");
       chip.style.setProperty("align-self", "flex-start", "important");
       chip.style.setProperty("margin", "8px 0 0", "important");
       chip.style.setProperty("padding", "0 16px", "important");
@@ -312,15 +322,29 @@ if (typeof document !== "undefined" && document.write && document.readyState ===
       chip.style.setProperty("position", "relative", "important");
       chip.style.setProperty("z-index", "5", "important");
       chip.style.setProperty("pointer-events", "auto", "important");
-      chip.textContent = document.body.getAttribute("data-kid") === "ainsley" ? "More" : ("+" + hiddenN + " more");
-      var guard = 0;
-      while (show > 0 && clashes(chip) && guard < n) {
-        show -= 1;
-        hiddenN = n - show;
-        applyShow();
-        chip.textContent = document.body.getAttribute("data-kid") === "ainsley" ? "More" : ("+" + hiddenN + " more");
-        guard += 1;
+      function chipLabel() {
+        if (list.getAttribute("data-must-page") === "more") return "Back";
+        return document.body.getAttribute("data-kid") === "ainsley" ? "More" : ("+" + (n - firstCount) + " more");
       }
+      chip.textContent = chipLabel();
+      if (!pageMore) {
+        var guard = 0;
+        while (show > 0 && clashes(chip) && guard < n) {
+          show -= 1;
+          firstCount = show;
+          applyShow();
+          chip.textContent = chipLabel();
+          guard += 1;
+        }
+        list.setAttribute("data-must-window", String(firstCount));
+      }
+      chip.onclick = function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (list.getAttribute("data-must-page") === "more") list.removeAttribute("data-must-page");
+        else list.setAttribute("data-must-page", "more");
+        fitMustRows();
+      };
     } else if (chip) {
       chip.style.setProperty("display", "none", "important");
     }

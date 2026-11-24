@@ -2479,7 +2479,8 @@
             }
           }
           var time = r.p.time || "";
-          if (r.p.leave && time) time = time; /* already leave-aware in when */
+          var clock = time.match(/^(\d{1,2}:\d{2})\s*(am|pm)$/i);
+          if (clock) time = clock[1] + " " + clock[2].toUpperCase();
           return '<div class="consume-ahead-row">' +
             '<span class="consume-ahead-day">' + esc(kidId === "ainsley" ? dow : (dow + " " + dn)) + "</span>" +   /* LIVEFIX3 */
             '<div class="consume-ahead-what">' + esc(what) + dim + "</div>" +
