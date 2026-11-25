@@ -7,6 +7,7 @@ import path from "node:path";
 import { spawnSync, execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const read = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
@@ -24,7 +25,18 @@ test("P1 · no camera stills or page screenshots anywhere; every tracked image i
     assert.ok(allow.has(f), "image not on the art allow-list: " + f);
   }
   for (const f of allow) assert.ok(files.includes(f), "allow-list names a file that is not tracked: " + f);
-  for (const f of allow) assert.match(f, /^[A-Za-z0-9_./@-]+\.(png|jpe?g|webp|gif|svg)$/, "allow-list holds art file paths only");
+  for (const f of allow) assert.match(f, /^[A-Za-z0-9_./@-]+\.(png|jpe?g|webp|gif|svg|mp4)$/, "allow-list holds art file paths only");
+  /* Video is allowed ONLY as hash-pinned cinema art: every listed .mp4 sits under art/cinema/ and is named, with a sha256, in that folder's pins.js. */
+  for (const f of allow) {
+    if (!/\.mp4$/i.test(f)) continue;
+    assert.match(f, /^art\/cinema\/[a-z0-9-]+\/[A-Za-z0-9_.-]+\.mp4$/, "video on the allow-list outside art/cinema: " + f);
+    const pins = read(f.replace(/[^/]+$/, "pins.js"));
+    const name = f.split("/").pop();
+    const pin = pins.match(new RegExp('file: "' + name.replace(/[.]/g, "\\.") + '",\\s*sha256: "([0-9a-f]{64})"'));
+    assert.ok(pin, "video not hash-pinned in pins.js: " + f);
+    const got = createHash("sha256").update(fs.readFileSync(path.join(ROOT, f))).digest("hex");
+    assert.equal(got, pin[1], "video bytes do not match the sha pinned in pins.js: " + f);
+  }
 });
 
 test("P1 · privacy-scan flags ANY image or video outside the allow-list (tree, and --images --rev for pre-push)", () => {

@@ -1,0 +1,30 @@
+{
+ "sun": "#FFB36B",
+ "sunWarm": "#FF9347",
+ "coral": "#FF726A",
+ "magenta_accent_lt5pct": "#F143A2",
+ "violet": "#6C43C2",
+ "deep_glass_base": "#1B1430",
+ "teal": "#5FB3B0",
+ "cream_text": "#FFF6EE",
+ "snow": "#EEF3FA",
+ "kids_LOCKED_legend": {
+  "Ainsley": "#8a6394",
+  "Hayes": "#3f8b71",
+  "Harris": "#42679a",
+  "Dad_Shared": "#c4b49a"
+ },
+ "kids_bible_v0_PROPOSED_not_locked": {
+  "Ainsley": "#B48CFF",
+  "Hayes": "#62E39A",
+  "Harris": "#6CC4FF"
+ },
+ "glass": {
+  "fill": "rgba(27,20,48,0.55)",
+  "border": "rgba(255,230,200,0.22)",
+  "blur_px": 18,
+  "radius_px": 24,
+  "text": "#FFF6EE",
+  "muted": "rgba(255,246,238,0.72)"
+ }
+}

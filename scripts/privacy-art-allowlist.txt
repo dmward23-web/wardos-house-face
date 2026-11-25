@@ -1154,3 +1154,13 @@ assets/ori/ainsley/wall-1920x1080/far.webp
 assets/ori/ainsley/wall-1920x1080/mid.webp
 assets/ori/ainsley/wall-1920x1080/near.webp
 assets/ori/ainsley/wall-1920x1080/fg.webp
+
+# --- art/cinema/xmas-2026/ (Prism FINAL, Nov 23 2026; original rendered scene and a plain glass tile, no people, no screens, no text).
+# Opened and reviewed by Wright on the box. sha256 per file is pinned in art/cinema/xmas-2026/pins.js and checked by cinema-xmas.test.mjs.
+# glass c630f43e, fallback f795c1ce, loop 1c011db8, ungraded f3323f75
+art/cinema/xmas-2026/glass-card-9slice-192.png
+art/cinema/xmas-2026/xmas-hero-fallback-1920x1080-graded.png
+art/cinema/xmas-2026/xmas-hero-loop-1920x1080-25s.mp4
+art/cinema/xmas-2026/xmas-hero-plate-1920x1080-ungraded.png
+# window-pane-alpha 41280f2f (Prism pane mask, Nov 23 2026: black and white shapes only, opened by Wright on the box)
+art/cinema/xmas-2026/window-pane-alpha-1920x1080.png

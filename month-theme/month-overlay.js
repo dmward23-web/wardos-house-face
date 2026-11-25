@@ -4,8 +4,31 @@
    ?now=<iso> pins the coat the same way the living house clock does. Photoreal layers only, calm motion, never takes taps. */
 (function () {
   var q = new URLSearchParams(location.search);
-  if (q.get("month") === "0") return;
   var base = ((document.currentScript && document.currentScript.src) || "month-theme/month-overlay.js").replace(/month-theme\/month-overlay\.js.*$/, "");
+  /* NOSPOOK1 (Atlas + Prism, Nov 23): the v5.2 porch engine on wall.html is Halloween art (graves, skeletons, jack-o'-lanterns,
+     bats, witches, ghosts, spooky one-shot sounds). It belongs to October only. In any other month (by the real date, or a
+     ?now= / ?month= pin) the engine's layers are hidden (month-overlay.css, html[data-halloween=off]), its loop video is paused,
+     its sound bank stays silent, and a season plate sits underneath. December (DECPLATE1) uses the pinned Dec plate, not the harvest plate. Runs even with ?month=0. */
+  (function noSpook() {
+    if (!(window.VID && document.getElementById("bg") && document.getElementById("gl"))) return;
+    var when = seasonDate();
+    if (ctDate(when)[1] === 10) return;
+    var html = document.documentElement;
+    html.setAttribute("data-halloween", "off");
+    var phone = (window.innerWidth || 0) < 700;
+    var month = ctDate(when)[1];
+    var plate = month === 12
+      ? base + "assets/month-theme/december/bg-wall-dec-" + novPhase(when) + ".webp"
+      : base + "month-theme/november/" + (phone ? "phone-" : "wall-") + novPhase(when) + ".webp";
+    html.style.setProperty("--km-bg", "url(\"" + plate + "\")");
+    var held = document.getElementById("pass1-nov-plate");
+    if (held) held.src = plate;
+    try { var V = document.getElementById("bg"); if (V && V.pause) V.pause(); } catch (eV) { /* already quiet */ }
+    /* the engine's sound bank (night bed, owl, howl, moan, whisper, bone, bats, caw) is Halloween, so off-season it stays silent */
+    if (typeof window.sndInit === "function") window.sndInit = function () {};
+    if (typeof window.snd === "function") window.snd = function () {};
+  })();
+  if (q.get("month") === "0") return;
   var RM = matchMedia("(prefers-reduced-motion: reduce)");
   var THEMES = {
     10: { cls: "km-oct", vids: [["km-bats", "night/media/bats-matte.mp4"], ["km-fog", "night/media/smoke-black.mp4"], ["km-embers", "night/media/embers-black.mp4"]], glow: true, grade: true }
@@ -99,26 +122,35 @@
           location.reload();
         }, 60000);
       }
-      if (wall && !document.getElementById("km-nov")) {
+      /* CINELEAF1 (Prism ruling via Atlas, Nov 23): under ?look=cinema the plate plus the window snow is the whole look, so the
+         November coat's leaves (the km-fall leaf sheet, the 14 km-leaf sprites) and its warm glow are suppressed, not masked: the
+         layer is mounted empty (data-cinema-bare) and nothing is drawn. Off cinema this layer is unchanged.
+         Pass 1 mounts this layer on the hub. The porch (wall.html) mounts it too so the same rule holds there. */
+      var leafHost = wall || /\/wall\.html$/.test(location.pathname || "");
+      var bare = document.documentElement.getAttribute("data-look") === "cinema";
+      if (leafHost && !document.getElementById("km-nov")) {
         var L = document.createElement("div");
         L.id = "km-nov";
         L.className = "km-layer km-nov" + (document.querySelector(".kw-canvas") ? " km-kid" : "");
         L.setAttribute("aria-hidden", "true");
         L.style.zIndex = "1";
-        var fall = document.createElement("div");
-        fall.className = "km-fall";
-        L.appendChild(fall);
-        var glow = document.createElement("div");
-        glow.className = "km-glow r";
-        L.appendChild(glow);
-        if (!RM.matches) {
-          for (var i = 0; i < 14; i++) {
-            var leaf = document.createElement("i");
-            leaf.className = "km-leaf b0";
-            leaf.style.left = ((i * 7.1) % 100) + "%";
-            leaf.style.animationDelay = (-i * 2.4) + "s";
-            leaf.style.backgroundImage = "url(\"" + base + "month-theme/november/leaves/leaf-nov-" + (i % 8) + "-24x24.webp\")";
-            L.appendChild(leaf);
+        if (bare) L.setAttribute("data-cinema-bare", "1");
+        if (!bare) {
+          var fall = document.createElement("div");
+          fall.className = "km-fall";
+          L.appendChild(fall);
+          var glow = document.createElement("div");
+          glow.className = "km-glow r";
+          L.appendChild(glow);
+          if (!RM.matches) {
+            for (var i = 0; i < 14; i++) {
+              var leaf = document.createElement("i");
+              leaf.className = "km-leaf b0";
+              leaf.style.left = ((i * 7.1) % 100) + "%";
+              leaf.style.animationDelay = (-i * 2.4) + "s";
+              leaf.style.backgroundImage = "url(\"" + base + "month-theme/november/leaves/leaf-nov-" + (i % 8) + "-24x24.webp\")";
+              L.appendChild(leaf);
+            }
           }
         }
         if (document.body) document.body.insertBefore(L, document.body.firstChild);
@@ -197,6 +229,14 @@
       document.documentElement.setAttribute("data-season-id", sp.id);
       document.documentElement.setAttribute("data-season-lit", String(sp.lit || 0));
       document.documentElement.setAttribute("data-season-cold", String(sp.cold || 0));
+      /* DECPLATE1: cinema off in December, the hub background is the pinned plate for this phase. Never a November plate. */
+      if (sp.id === "december" && document.documentElement.getAttribute("data-look") !== "cinema") {
+        var decPhase = novPhase(seasonDate());
+        var decFile = base + "assets/month-theme/december/bg-wall-dec-" + decPhase + ".webp";
+        if (/sheet-index\.html$/.test(location.pathname || "")) document.documentElement.style.setProperty("--wg-hubbg", "url(\"" + decFile + "\")");
+        var heldPlate = document.getElementById("pass1-nov-plate");
+        if (heldPlate) heldPlate.src = decFile;
+      }
       var ctx = cv.getContext("2d");
       var raf = 0, t0 = 0;
       function size() {
@@ -218,6 +258,7 @@
       RM.addEventListener && RM.addEventListener("change", start);
       document.addEventListener("visibilitychange", function () { if (!document.hidden) start(); });
       window.addEventListener("resize", start);
+      window.addEventListener("wardos-panemask", start); /* PANEMASK1: redraw once the glass mask is in */
       start();
     }
     function hostReady() { return document.querySelector(".kw-canvas,iframe.night52-scene,#fx"); }
@@ -229,9 +270,25 @@
     else kick();
   }
 
+  /* COATWIN1 (P2-5, Atlas rule A + Alfred conditions, Nov 23) + PANEMASK1 (Atlas Nov 23 10:26, Prism): under ?look=cinema the coat's
+     snow lives ONLY on the window glass of Prism's pane mask (WardosScene.paneMask, art/cinema/xmas-2026/window-pane-alpha-1920x1080.png),
+     and its snowbank only on the sill line WardosScene.PANE_SILL. Until the mask is loaded (or with no scene), cinema gets no coat snow. */
+  var coatLayer = null;
+  function cinemaWin(W, H) {
+    if (document.documentElement.getAttribute("data-look") !== "cinema") return false;
+    var S = window.WardosScene, m = S && S.paneMask && S.paneMask();
+    if (!m || !S.PANE_SILL) return null;
+    var kx = W / 1920, ky = H / 1080, b = m.bbox, l = S.PANE_SILL;
+    return { x0: b.x0 * kx, y0: b.y0 * ky, w: (b.x1 - b.x0) * kx, h: (b.y1 - b.y0) * ky, mask: m.canvas,
+      sill: { x0: l.x0 * kx, y0: l.y0 * ky, w: (l.x1 - l.x0) * kx, h: (l.y1 - l.y0) * ky } };
+  }
   function drawCoat(ctx, W, H, sp, t, mode) {
+    var cw = cinemaWin(W, H);
     var veil = mode === "scene" ? 0.42 : mode === "kid" ? 0.62 : 1;
     ctx.clearRect(0, 0, W, H);
+    /* COATWIN2 (P2-6, Atlas Nov 23 10:22 + Alfred ADDENDUM-2): under cinema Prism's graded plate IS the look, so the coat paints
+       nothing but the window-boxed snow and its sill: no sky veil, no glow orb, no stick trees, no lit windows. Off cinema: unchanged. */
+    if (cw === false) {
     var sky = ctx.createLinearGradient(0, 0, 0, H);
     if (sp.id === "december") {
       sky.addColorStop(0, "rgba(6,12,28," + (0.16 * veil) + ")");
@@ -288,15 +345,27 @@
       ctx.stroke();
     }
     ctx.restore();
+    }
 
     var depth = sp.id === "december" ? (sp.snow || 0.35) : (sp.cold || 0) * 0.45;
     var packH = H * (0.045 + depth * (mode === "kid" ? 0.06 : 0.11));
     var frost = ctx.createLinearGradient(0, H - packH, 0, H);
     frost.addColorStop(0, "rgba(255,255,255,0)");
     frost.addColorStop(1, "rgba(236,242,250," + (0.18 + depth * 0.55) + ")");
-    ctx.fillStyle = frost;
-    ctx.fillRect(0, H - packH, W, packH);
+    if (cw === false) {
+      ctx.fillStyle = frost;
+      ctx.fillRect(0, H - packH, W, packH);
+    } else if (cw) {
+      /* SILLFLAT1: the sill bank is flat per-row bands, not a canvas gradient. A GPU 2D canvas dithers gradients differently
+         frame to frame (and after a readback), which moved a whole sill row between reads (cloud run 67be327a, outside 283). */
+      var sTop = Math.round(cw.sill.y0), sBot = Math.round(cw.sill.y0 + cw.sill.h), sA = 0.18 + depth * 0.55, sy0;
+      for (sy0 = sTop; sy0 < sBot; sy0++) {
+        ctx.fillStyle = "rgba(236,242,250," + (sA * (sy0 - sTop + 0.5) / (sBot - sTop)).toFixed(3) + ")";
+        ctx.fillRect(Math.round(cw.sill.x0), sy0, Math.round(cw.sill.w), 1);
+      }
+    }
 
+    if (cw === false) {
     var nWin = sp.id === "december" ? 8 : 2;
     var litN = sp.id === "december" ? Math.max(0, Math.round(((sp.lit || 0) / 25) * 8)) : 2;
     if (sp.id === "december" && (sp.lit || 0) > 0 && litN < 1) litN = 1;
@@ -317,6 +386,7 @@
       ctx.fillStyle = wg;
       ctx.beginPath(); ctx.arc(x + ww / 2, yW + ww, ww * 3, 0, Math.PI * 2); ctx.fill();
     }
+    }
 
     var flakes = sp.flakes || 0;
     if (sp.id === "november" && flakes < 0.04) {
@@ -331,11 +401,21 @@
         ctx.beginPath(); ctx.ellipse(0, 0, 7, 3, 0, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
       }
-    } else if (flakes > 0) {
+    } else if (flakes > 0 && cw !== null) {
       var count = Math.round(flakes * (sp.id === "december" ? (mode === "kid" ? 46 : 90) : 40));
+      var out = ctx;
+      if (cw) {
+        /* paint flakes on a scratch layer, keep only the glass (destination-in the pane mask), then lay it on the coat */
+        if (!coatLayer) coatLayer = document.createElement("canvas");
+        if (coatLayer.width !== W || coatLayer.height !== H) { coatLayer.width = W; coatLayer.height = H; }
+        ctx = coatLayer.getContext("2d");
+        ctx.clearRect(0, 0, W, H);
+      }
       for (var s = 0; s < count; s++) {
-        var sx = ((s * 131 + t * (16 + (s % 5) * 7) * (0.35 + flakes)) % (W + 24)) - 12;
-        var sy = ((s * 77 + t * (26 + (s % 4) * 11) * (0.35 + flakes)) % (H + 16)) - 8;
+        var sx = cw ? cw.x0 + 3 + ((s * 131 + t * (16 + (s % 5) * 7) * (0.35 + flakes)) % (cw.w - 6))
+          : ((s * 131 + t * (16 + (s % 5) * 7) * (0.35 + flakes)) % (W + 24)) - 12;
+        var sy = cw ? cw.y0 + ((s * 77 + t * (26 + (s % 4) * 11) * (0.35 + flakes)) % (cw.h - 3))
+          : ((s * 77 + t * (26 + (s % 4) * 11) * (0.35 + flakes)) % (H + 16)) - 8;
         if (mode === "kid" && sy < H * 0.55 && s % 3 !== 0) continue;
         ctx.globalAlpha = 0.35 + (s % 5) * 0.1;
         ctx.fillStyle = "#f4f7fb";
@@ -344,6 +424,14 @@
         ctx.fill();
       }
       ctx.globalAlpha = 1;
+      if (cw) {
+        ctx.globalCompositeOperation = "destination-in";
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(cw.mask, 0, 0, W, H);
+        ctx.globalCompositeOperation = "source-over";
+        ctx = out;
+        ctx.drawImage(coatLayer, 0, 0);
+      }
     }
   }
 })();

@@ -35,3 +35,8 @@ html[data-ains-quiet="1"] .km-leaf, html[data-leaf-quiet="1"] .km-leaf{animation
 .km-kid .km-fog{height:14%;bottom:-3%}
 .km-kid .km-embers{height:12%}
 .km-kid .km-glow{height:26vmin;bottom:-14vmin}
+
+/* NOSPOOK1 · the v5.2 Halloween porch engine (wall.html #bg video, #gl, #fx, #poster) shows in October only; any other month the
+   harvest plate (--km-bg, set by month-overlay.js) is the wall background instead. */
+html[data-halloween="off"] #bg,html[data-halloween="off"] #gl,html[data-halloween="off"] #fx,html[data-halloween="off"] #poster{visibility:hidden!important;opacity:0!important}
+html[data-halloween="off"] body:not([data-kid-world]){background-image:var(--km-bg)!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}

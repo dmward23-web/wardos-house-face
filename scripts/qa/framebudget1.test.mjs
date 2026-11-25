@@ -49,10 +49,18 @@ const state = (g) => g.evaluate(() => ({ mode: document.documentElement.getAttri
   po: getComputedStyle(document.getElementById("poster")).opacity, gl: getComputedStyle(document.getElementById("gl")).visibility,
   ink: (() => { const c = document.getElementById("poster"); if (!c.width) return 0; const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 64) if (Math.abs(d[i] - 4) + Math.abs(d[i + 1] - 6) + Math.abs(d[i + 2] - 10) > 12) n++; return n; })() }));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+/* NOSPOOK1 · wall.html's porch engine (and so its governor and poster) is October-only; every other month month-overlay hides
+   #poster/#gl. The wall.html legs pin the in-page clock (ticking, offset) to Oct 20 so the porch governor stays under test all
+   year; the off-season leg below pins Nov 23 and checks the engine stays hidden and quiet. */
+const PIN = (iso) => { const R = Date, off = R.parse(iso) - R.now();
+  function D(...a) { if (!new.target) return new R(R.now() + off).toString(); return a.length ? new R(...a) : new R(R.now() + off); }
+  D.prototype = R.prototype; D.now = () => R.now() + off; D.parse = R.parse; D.UTC = R.UTC; window.Date = D; };
+const OCT = "2026-10-20T18:00:00Z", OFF = "2026-11-23T18:00:00Z";
 
 test("browser: a forced slow frame falls back to the poster and no rAF runs after the fallback", { skip: SKIP, timeout: 120000 }, async () => {
   await withScene(async (b, base) => { for (const f of ["night/scene.html", "wall.html"]) {
     const g = await b.newPage(); await g.setViewport({ width: 440, height: 956 }); await g.evaluateOnNewDocument(HOOK);
+    if (f === "wall.html") await g.evaluateOnNewDocument(PIN, OCT);
     /* SOFTGL1 · this runner is software WebGL, where scene.html now shows the poster at once; ?gl=soft keeps its live scene so the governor is still the thing under test */
     await g.goto(base + "/" + f + (f === "night/scene.html" ? "?gl=soft" : ""), { waitUntil: "load" });
     await g.waitForFunction(() => window.__fb && document.documentElement.getAttribute("data-scene-mode"), { timeout: 30000, polling: 100 });
@@ -71,11 +79,30 @@ test("browser: a forced slow frame falls back to the poster and no rAF runs afte
 test("browser: prefers-reduced-motion goes straight to the poster with no render loop", { skip: SKIP, timeout: 120000 }, async () => {
   await withScene(async (b, base) => { for (const f of ["night/scene.html", "wall.html"]) {
     const g = await b.newPage(); await g.setViewport({ width: 440, height: 956 }); await g.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
-    await g.evaluateOnNewDocument(HOOK); await g.goto(base + "/" + f, { waitUntil: "load" });
+    await g.evaluateOnNewDocument(HOOK); if (f === "wall.html") await g.evaluateOnNewDocument(PIN, OCT);
+    await g.goto(base + "/" + f, { waitUntil: "load" });
     await g.waitForFunction(() => document.documentElement.getAttribute("data-scene-mode") === "poster", { timeout: 30000, polling: 100 });
     await sleep(800); const s0 = await state(g); await sleep(1500); const s1 = await state(g);
     assert.equal(s0.why, "reduced-motion", f); assert.equal(s1.raf, s0.raf, f + " no rAF in reduced motion");
     assert.equal(s1.po, "1", f + " poster shown"); assert.ok(s1.ink > 50, f + " poster painted (" + s1.ink + ")");
+    await g.close();
+  } });
+});
+
+test("browser: off-season (Nov 23) wall.html keeps the porch engine hidden, poster and WebGL invisible, no rAF after load", { skip: SKIP, timeout: 120000 }, async () => {
+  await withScene(async (b, base) => { for (const rm of [false, true]) {
+    const g = await b.newPage(); await g.setViewport({ width: 440, height: 956 });
+    if (rm) await g.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+    await g.evaluateOnNewDocument(HOOK); await g.evaluateOnNewDocument(PIN, OFF); await g.goto(base + "/wall.html", { waitUntil: "load" });
+    await g.waitForFunction(() => window.__fb && document.documentElement.getAttribute("data-scene-mode"), { timeout: 30000, polling: 100 });
+    await sleep(2500); const s0 = await state(g); await sleep(1500); const s1 = await state(g);
+    const hide = await g.evaluate(() => ({ hw: document.documentElement.getAttribute("data-halloween"), pov: getComputedStyle(document.getElementById("poster")).visibility,
+      glo: getComputedStyle(document.getElementById("gl")).opacity, y: new Date().getMonth() + 1 }));
+    const tag = "wall.html Nov 23" + (rm ? " reduced-motion" : "");
+    assert.equal(hide.y, 11, tag + " clock pinned to November");
+    assert.equal(hide.hw, "off", tag + " NOSPOOK1 flag set"); assert.equal(s1.po, "0", tag + " poster not shown"); assert.equal(hide.pov, "hidden", tag + " poster hidden");
+    assert.equal(s1.gl, "hidden", tag + " WebGL scene hidden"); assert.equal(hide.glo, "0", tag + " WebGL scene transparent");
+    assert.equal(s1.raf, s0.raf, tag + " no rAF after load (" + s0.why + ")");
     await g.close();
   } });
 });
