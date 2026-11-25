@@ -527,13 +527,19 @@ def main():
         check(base_soft is False and len(base_blob) > 1000, "base control did not serve bf976526")
         check(report["baseSoak"]["maxGap"] > 500, "base control stall %.1f ms" % report["baseSoak"]["maxGap"])
 
-        browser.close()
-    httpd.shutdown()
-    report["fails"] = FAILS
-    (OUT / "pass2-report.json").write_text(json.dumps(report, indent=2))
-    print("STILLS", len(report["stills"]), "CONTRAST", len(report["contrast"]), "FAILS", len(FAILS))
-    if FAILS:
-        raise SystemExit(1)
+        report["fails"] = FAILS
+        (OUT / "pass2-report.json").write_text(json.dumps(report, indent=2))
+        print("STILLS", len(report["stills"]), "CONTRAST", len(report["contrast"]), "FAILS", len(FAILS), flush=True)
+        # browser.close() can sit past the suite's existing 400s budget after the checks have already passed.
+        try:
+            proc = browser.process
+            if proc:
+                proc.kill()
+        except Exception:
+            pass
+        if FAILS:
+            raise SystemExit(1)
+        os._exit(0)
 
 if __name__ == "__main__":
     if "--self-test" in sys.argv:
