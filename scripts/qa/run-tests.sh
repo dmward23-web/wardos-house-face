@@ -14,8 +14,6 @@ if [ ! -f "$DEPS/ws/package.json" ]; then
   echo "QA1: ws not found in $DEPS. Install it once:  npm install --no-save --prefix \"$(dirname "$DEPS")\" ws@8" >&2
   exit 2
 fi
-conc=()
-[ "${1:-}" = "--serial" ] && conc=(--test-concurrency=1)
 out="$(mktemp -t wardos-qa-XXXXXX)"
 trap 'rm -f "$out"' EXIT
 set +e
@@ -45,7 +43,18 @@ for f in scripts/qa/*.test.mjs; do
   if [ "$skip_serial" -eq 1 ]; then continue; fi
   block+=("$f")
 done
-NODE_PATH="$DEPS" node --test "${conc[@]}" "${block[@]}" 2>&1 | tee "$out"
+# LEAKCAP · each file is its own process. A server left open used to pass the
+# assertions and hold the one shared node until an outer kill. 960s sits above
+# the longest test's own timeout (900s) and does not raise that timeout.
+export FILE_DEADLINE=960
+export DEPS
+run_files() {
+  local jobs="$1"; shift
+  printf '%s\n' "$@" | xargs -r -P "$jobs" -I{} bash -c 'timeout -k 10 "$FILE_DEADLINE" env NODE_PATH="$DEPS" node --test "$1"' _ {}
+}
+jobs="$(nproc)"
+[ "${1:-}" = "--serial" ] && jobs=1
+run_files "$jobs" "${block[@]}" 2>&1 | tee "$out"
 rc=${PIPESTATUS[0]}
 present=()
 for s in "${serial[@]}"; do
@@ -54,7 +63,7 @@ done
 if [ "${#present[@]}" -gt 0 ]; then
   echo "BLOCKING serial lane (spawnSync 120s playwright measures; counts toward rc)"
   serial_out="$(mktemp -t wardos-qa-serial-XXXXXX)"
-  NODE_PATH="$DEPS" node --test --test-concurrency=1 "${present[@]}" 2>&1 | tee "$serial_out"
+  run_files 1 "${present[@]}" 2>&1 | tee "$serial_out"
   serial_rc=${PIPESTATUS[0]}
   cat "$serial_out" >> "$out"
   rm -f "$serial_out"
@@ -76,7 +85,7 @@ fi
 set +e
 for n in 1 2 3; do
   echo "QUARANTINE lane run $n (acer-r50, acer-r53-music; serial; does not block)"
-  NODE_PATH="$DEPS" node --test --test-concurrency=1 scripts/qa/acer-r50.test.mjs scripts/qa/acer-r53-music.test.mjs
+  run_files 1 scripts/qa/acer-r50.test.mjs scripts/qa/acer-r53-music.test.mjs
   echo "QUARANTINE lane run $n exit $?"
 done
 set -e

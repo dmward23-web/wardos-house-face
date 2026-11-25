@@ -499,11 +499,9 @@ def main():
                             check(card["right"] <= 440 or ratio >= 4.5, "hub card edge/tint %s" % json.dumps(row))
                         check(ratio >= 4.5, "contrast %s %s %.2f" % (route, card["id"], ratio))
 
-        # 60s soak on a fresh browser so the route crawl's GL work is not in this process
-        browser.close()
-        browser = p.chromium.launch(**launch_kw(p, headless=True, args=[
-            "--enable-precise-memory-info", "--disable-gpu-sandbox", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--disable-background-timer-throttling", "--disable-renderer-backgrounding"
-        ]))
+        # Same browser, new page. A second Chromium launch under suite load hits
+        # Playwright's 180s launch timeout before this soak starts.
+        context.close()
         context = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
         page = context.new_page()
         page.goto(base + "/wall.html?q=high&fps=1&now=2026-12-04T16:45:00-06:00", wait_until="domcontentloaded", timeout=30000)

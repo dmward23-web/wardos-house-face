@@ -10,17 +10,17 @@ import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import zlib from "node:zlib";
-import { spawn, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import vm from "node:vm";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
+import { serve, launchChrome, BASE_SHA, CHROME } from "./cinema-launch-guard.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const require = createRequire(import.meta.url);
 const Scene = require(path.join(ROOT, "wardos-scene.js"));
 const Pins = require(path.join(ROOT, "art/cinema/xmas-2026/pins.js"));
 const Season = require(path.join(ROOT, "month-theme/season-math.js"));
-const CHROME = ["/usr/bin/google-chrome", "/usr/local/bin/google-chrome"].find((p) => fs.existsSync(p));
 function artDir() {
   const preferred = process.env.ARTIFACT_DIR || process.env.CINEMA_ART_DIR || "/opt/cursor/artifacts";
   try {
@@ -497,77 +497,6 @@ function centreLuma(png) {
 }
 const PLATE_SOURCES = ["loop", "ungraded", "fallback"];
 
-const BASE_SHA = "bf976526d4072113732340853fe37a41e725803f";
-function baseBlob(rel) {
-  const r = spawnSync("git", ["show", BASE_SHA + ":" + rel], { cwd: ROOT, encoding: "buffer" });
-  return r.status === 0 ? r.stdout : null;
-}
-function serve() {
-  const types = {
-    ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
-    ".png": "image/png", ".webp": "image/webp", ".svg": "image/svg+xml", ".woff2": "font/woff2",
-    ".mp4": "video/mp4", ".cube": "text/plain"
-  };
-  const cache = new Map();
-  const srv = http.createServer((q, res) => {
-    const u = new URL(q.url, "http://127.0.0.1");
-    const rel = decodeURIComponent(u.pathname).replace(/^\/+/, "");
-    if (rel.includes("..")) { res.writeHead(403); res.end(); return; }
-    const send = (buf, ext) => {
-      res.writeHead(200, { "Content-Type": types[ext] || "application/octet-stream", "Cache-Control": "no-store", "Content-Length": buf.length });
-      res.end(buf);
-    };
-    if (String(q.headers["x-wall-bytes"] || "") === "base") {
-      if (!cache.has(rel)) cache.set(rel, baseBlob(rel));
-      const blob = cache.get(rel);
-      if (!blob) { res.writeHead(404); res.end(); return; }
-      send(blob, path.extname(rel));
-      return;
-    }
-    const fp = path.join(ROOT, path.normalize(rel));
-    if (!fp.startsWith(ROOT + path.sep) && fp !== ROOT) { res.writeHead(403); res.end(); return; }
-    fs.readFile(fp, (err, buf) => {
-      if (err) { res.writeHead(404); res.end(); return; }
-      send(buf, path.extname(fp));
-    });
-  });
-  return new Promise((resolve) => srv.listen(0, "127.0.0.1", () => resolve(srv)));
-}
-
-function launchChrome(bin) {
-  return new Promise((resolve, reject) => {
-    const proc = spawn(bin || CHROME, [
-      "--headless=new", "--no-sandbox", "--disable-dev-shm-usage",
-      "--remote-debugging-port=0", "--remote-allow-origins=*",
-      "--window-size=1920,1080", "--force-device-scale-factor=1", "--force-color-profile=srgb",
-      "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
-      "--hide-scrollbars", "--mute-audio", "--disable-gpu-sandbox",
-      "--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows",
-      "about:blank"
-    ], { stdio: ["ignore", "pipe", "pipe"] });
-    let buf = "";
-    let settled = false;
-    const finish = (err, value) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      if (err) {
-        try { proc.kill("SIGKILL"); } catch (e) { /* already gone */ }
-        reject(err);
-      } else resolve(value);
-    };
-    const timer = setTimeout(() => finish(new Error("chrome did not open a devtools port")), 20000);
-    const on = (chunk) => {
-      buf += chunk.toString();
-      const m = buf.match(/DevTools listening on ws:\/\/127\.0\.0\.1:(\d+)\//);
-      if (m) finish(null, { proc, port: Number(m[1]) });
-    };
-    proc.stdout.on("data", on);
-    proc.stderr.on("data", on);
-    proc.on("error", (err) => finish(err));
-    proc.on("exit", (code) => finish(new Error("chrome exit " + code)));
-  });
-}
 
 function cdpSocket(ws) {
   let n = 0;
@@ -703,7 +632,7 @@ function openSocket(url) {
   return ws;
 }
 
-async function openPage(port, url, extraScript, media) {
+async function openPage(port, url, extraScript, media, headers) {
   const created = await (await fetch("http://127.0.0.1:" + port + "/json/new?" + encodeURIComponent("about:blank"), { method: "PUT" })).json();
   const ws = openSocket(created.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => { ws.addEventListener("open", resolve); ws.addEventListener("error", reject); });
@@ -714,9 +643,10 @@ async function openPage(port, url, extraScript, media) {
   await c.send("Emulation.setDeviceMetricsOverride", { width: 1920, height: 1080, deviceScaleFactor: 1, mobile: false });
   if (media) await c.send("Emulation.setEmulatedMedia", { features: media });
   if (extraScript === "base-bytes") {
-    await c.send("Network.setExtraHTTPHeaders", { headers: { "X-Wall-Bytes": "base" } });
+    headers = Object.assign({ "X-Wall-Bytes": "base" }, headers || {});
     extraScript = "";
   }
+  if (headers) await c.send("Network.setExtraHTTPHeaders", { headers });
   await c.send("Page.addScriptToEvaluateOnNewDocument", { source: FREEZE + (extraScript || "") });
   const loaded = c.wait("Page.loadEventFired", 30000);
   await c.send("Page.navigate", { url });
@@ -1334,15 +1264,29 @@ test("base header serves every bf976526 path, not only wall.html", async () => {
   }
 });
 
-test("a failed Chrome launch still lets the test exit", async () => {
-  let srv = null;
-  try {
-    srv = await serve();
-    await assert.rejects(() => launchChrome("/bin/true"), /chrome exit|devtools port/);
-    await launchChrome("/bin/true").then(() => { throw new Error("launch returned"); }, (err) => console.log("forced launch failure:", err.message));
-  } finally {
-    if (srv) srv.close();
-  }
+test("a failed Chrome launch still lets the test exit", () => {
+  const file = fileURLToPath(new URL("./cinema-launch-guard.mjs", import.meta.url));
+  const run = (mode) => {
+    const t0 = Date.now();
+    const r = spawnSync(process.execPath, [file, mode], { encoding: "utf8", timeout: 30000 });
+    return { status: r.status, signal: r.signal, stdout: r.stdout || "", stderr: r.stderr || "", elapsed: Date.now() - t0 };
+  };
+  const ok = run("close");
+  assert.equal(ok.status, 0, ok.stdout + ok.stderr);
+  assert.equal(ok.signal, null);
+  assert.match(ok.stdout, /forced launch failure: chrome exit/);
+  assert.ok(ok.elapsed < 10000, "launch guard took " + ok.elapsed + "ms");
+  const leak = run("leak");
+  assert.notEqual(leak.status, 0, "a leaked server still exited 0");
+  assert.ok(leak.signal === "SIGTERM" || leak.status !== 0, "a leaked server hung past the parent instead of failing");
+  console.log("forced launch failure child", ok.elapsed + "ms", ok.stdout.trim());
+});
+
+test("run-tests.sh gives each file a deadline so a leak fails red", () => {
+  const sh = fs.readFileSync(path.join(ROOT, "scripts/qa/run-tests.sh"), "utf8");
+  assert.match(sh, /timeout -k 10 "\$FILE_DEADLINE"/);
+  const hung = spawnSync("timeout", ["-k", "2", "2", process.execPath, "-e", "setInterval(() => {}, 1000)"], { encoding: "utf8", timeout: 10000 });
+  assert.notEqual(hung.status, 0, "a process that never exits still returned 0");
 });
 
 test("browser: ?gl=soft live loop returns to the poster within 3 frames and then stays quiet", { timeout: 120000, skip: process.env.QA_NO_BROWSER === "1" ? "SKIP QA_NO_BROWSER=1" : false }, async () => {
@@ -1354,19 +1298,34 @@ test("browser: ?gl=soft live loop returns to the poster within 3 frames and then
     srv = await serve();
     chrome = await launchChrome();
     const origin = "http://127.0.0.1:" + srv.address().port;
-    const hook = `(() => { const raf = window.requestAnimationFrame.bind(window); window.__rafN = 0; window.__gap = 0; window.__retryFrames = 0; let last = 0;
+    const hook = `(() => {
+      const raf = window.requestAnimationFrame.bind(window);
+      const origTimeout = window.setTimeout.bind(window);
+      window.__rafN = 0; window.__gap = 0; window.__retryFrames = 0; window.__burstGap = 0; window.__burstLast = 0; window.__inBurst = false;
+      let last = 0;
+      window.setTimeout = (fn, ms, ...rest) => {
+        const delay = (ms === 60000 && typeof fn === "function" && /fbRetry/.test(Function.prototype.toString.call(fn))) ? 250 : ms;
+        return origTimeout(fn, delay, ...rest);
+      };
       window.requestAnimationFrame = (cb) => {
         window.__rafN++;
         return raf((t) => {
+          const fb = window.__fb;
+          const live = !!(fb && fb.tries >= 1 && document.documentElement.getAttribute("data-scene-mode") === "live");
+          if (live) {
+            if (window.__inBurst && window.__burstLast) { const g = t - window.__burstLast; window.__burstGap = Math.max(window.__burstGap, g); (window.__burstGaps || (window.__burstGaps = [])).push(Math.round(g)); }
+            window.__inBurst = true;
+            window.__burstLast = t;
+          }
           if (last) window.__gap = Math.max(window.__gap, t - last);
           last = t;
-          const fb = window.__fb;
           const n = fb && fb.ft ? fb.ft.length : 0;
           cb(t);
           const now = window.__fb;
           if (now && now.tries >= 1 && now.ft && now.ft.length > n) window.__retryFrames++;
         });
-      }; })();`;
+      };
+    })();`;
     const p = await openPage(chrome.port, origin + "/wall.html?look=classic&gl=soft&now=2026-10-20T20:00:00-05:00", hook);
     pages.push(p);
     const first = await p.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => {
@@ -1384,6 +1343,9 @@ test("browser: ?gl=soft live loop returns to the poster within 3 frames and then
       setTimeout(step, 100);
     }; step(); })`, 90000);
     const frames = await p.eval(`window.__retryFrames`);
+    const burstGap = await p.eval(`window.__burstGap`);
+    const burstGaps = await p.eval(`window.__burstGaps || []`);
+    console.log("retry why", quiet.why, "frames", frames, "burst", JSON.stringify(burstGaps));
     assert.ok(quiet.why === "3x150ms" || quiet.why === "median>50ms", "retry poster why " + quiet.why);
     assert.ok(frames <= 3 && frames >= 1, "the retry used " + frames + " frames (" + quiet.why + ")");
     await p.eval(`new Promise((r) => { window.__gap = 0; setTimeout(r, 800); })`);
@@ -1391,10 +1353,66 @@ test("browser: ?gl=soft live loop returns to the poster within 3 frames and then
     assert.equal(after.n, quiet.n, "rAF kept running after the poster returned");
     assert.equal(after.mode, "poster");
     assert.ok(after.gap <= 500, "gap after the poster returned " + after.gap);
+    const baseHook = `(() => { const raf = window.requestAnimationFrame.bind(window); window.__baseGaps = []; let last = 0;
+      window.requestAnimationFrame = (cb) => raf((t) => { if (last) window.__baseGaps.push(t - last); last = t; cb(t); }); })();`;
+    const basePage = await openPage(chrome.port, origin + "/wall.html?look=classic&now=2026-10-20T20:00:00-05:00", baseHook, null, { "X-Wall-Bytes": "base" });
+    pages.push(basePage);
+    const baseGaps = await basePage.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => {
+      const g = window.__baseGaps || [];
+      if ((g.length >= 2 && Math.max.apply(null, g) > 500) || performance.now() - t0 > 12000) return res(g);
+      setTimeout(step, 100);
+    }; step(); })`, 20000);
+    const baseGap = baseGaps.length ? Math.max(...baseGaps) : 0;
+    /* The 60s idle is not this gap: __burstGap only counts frames while the retry is live.
+       A software draw inside that burst is the frame the governor stops, so it can exceed 500.
+       Once the poster is back, no later gap may. The pass-1 wall never posters, so the same
+       cap fails there. */
+    assert.ok(burstGap > 0 && burstGap < 10000, "retry burst gap " + burstGap);
+    assert.ok(after.gap <= 500, "gap after the poster returned " + after.gap);
+    assert.ok(baseGap > 500, "base wall inter-frame gap " + baseGap + " did not fail the 500 ms cap");
     fs.mkdirSync(ART, { recursive: true });
-    fs.writeFileSync(path.join(ART, "gl-soft-retry.json"), JSON.stringify({ first, quiet, frames, after }, null, 2));
+    fs.writeFileSync(path.join(ART, "gl-soft-retry.json"), JSON.stringify({ first, quiet, frames, burstGap, after, baseGap, baseGaps }, null, 2));
   } finally {
     for (const p of pages) { try { p.close(); } catch (e) { /* already closed */ } }
+    if (chrome) { try { chrome.proc.kill("SIGKILL"); } catch (e) { /* already gone */ } }
+    if (srv) { try { srv.close(); } catch (e) { /* already closed */ } }
+  }
+});
+
+test("browser: reduced motion paints no arrive iris on month, home, or lights", { timeout: 120000, skip: process.env.QA_NO_BROWSER === "1" ? "SKIP QA_NO_BROWSER=1" : false }, async () => {
+  assert.ok(CHROME, "chrome is required");
+  let srv = null;
+  let chrome = null;
+  const pages = [];
+  try {
+    srv = await serve();
+    chrome = await launchChrome();
+    const origin = "http://127.0.0.1:" + srv.address().port;
+    const watch = `(() => { window.__irisSeen = 0; const note = () => { if (document.querySelector && document.querySelector(".ori-iris")) window.__irisSeen++; };
+      const mo = new MutationObserver(note); const arm = () => { try { mo.observe(document.documentElement || document, { childList: true, subtree: true }); } catch (e) {} note(); };
+      arm(); document.addEventListener("DOMContentLoaded", arm); })();`;
+    const reduce = [{ name: "prefers-reduced-motion", value: "reduce" }];
+    const p = await openPage(chrome.port, origin + "/sheet-index.html", watch, reduce);
+    pages.push(p);
+    async function arrived(clickJs, pathRe) {
+      const loaded = p.c.wait("Page.loadEventFired", 20000);
+      p.eval(clickJs).catch(() => {});
+      await loaded;
+      const seen = await p.eval(`({ seen: window.__irisSeen || 0, n: document.querySelectorAll(".ori-iris").length, path: location.pathname })`);
+      assert.match(seen.path, pathRe, JSON.stringify(seen));
+      return seen;
+    }
+    const month = await arrived(`document.querySelector("a.tile.month").click()`, /month\.html/);
+    assert.equal(month.n, 0, "month arrive iris " + JSON.stringify(month));
+    assert.equal(month.seen, 0, "month arrive iris was created " + JSON.stringify(month));
+    const home = await arrived(`history.back()`, /sheet-index\.html/);
+    assert.equal(home.n, 0, "back-home arrive iris " + JSON.stringify(home));
+    assert.equal(home.seen, 0, "back-home arrive iris was created " + JSON.stringify(home));
+    const lights = await arrived(`document.querySelector("a.hub-lights-more").click()`, /sheet-lights\.html/);
+    assert.equal(lights.n, 0, "lights arrive iris " + JSON.stringify(lights));
+    assert.equal(lights.seen, 0, "lights arrive iris was created " + JSON.stringify(lights));
+  } finally {
+    for (const pg of pages) { try { pg.close(); } catch (e) { /* already closed */ } }
     if (chrome) { try { chrome.proc.kill("SIGKILL"); } catch (e) { /* already gone */ } }
     if (srv) { try { srv.close(); } catch (e) { /* already closed */ } }
   }
