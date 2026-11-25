@@ -791,8 +791,21 @@ async function main() {
             return;
           }
           return page.evaluate(() => new Promise((res) => {
-            const t0 = performance.now();
-            const step = (now) => { if (now - t0 < 700) requestAnimationFrame(step); else res(window.__veilLog || []); };
+            /* Count frames, not wall-clock milliseconds. On a throttled runner the first animation
+               callback can already be later than 700 ms, which used to return the log while the iris
+               was still in its 160 ms hold. The fade is the later sample. */
+            let n = 0;
+            const faded = () => {
+              const log = window.__veilLog || [];
+              const held = log.find((r) => r.present && r.op >= 0.35 && r.veil === "1" && r.calm == null);
+              if (!held) return false;
+              return log.some((r) => r.t > held.t && (!r.present || r.op < held.op - 0.15));
+            };
+            const step = () => {
+              n += 1;
+              if (faded() || n >= 40) return res(window.__veilLog || []);
+              requestAnimationFrame(step);
+            };
             requestAnimationFrame(step);
           })).then((log) => {
             /* data-calm stays null. That attribute is the leave iris from house-ori-calm.js, and location.replace
