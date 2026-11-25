@@ -49,6 +49,7 @@ test("PAIRUI1 · unpaired hub hides cameras, lights, and the pairing chip; the s
       assert.deepEqual(s.camWords, [], k + " " + t + " cameras stay unmounted " + J(s));
       assert.equal(s.pairWord, 0, k + " " + t);
       assert.equal(s.panel, null, k + " " + t);
+      assert.equal(s.barAbsent, true, k + " " + t + " lights bar absent");
     }
   }
 });
@@ -75,9 +76,12 @@ test("PAIRUI1 · paired state unchanged: strip card shows, cams keep Camera rest
     assert.deepEqual(r[k].errors, [], k);
     assert.equal(s.needs.length, 0, k + " " + J(s));
     assert.equal(s.leavebyVisible, 1, k + " " + J(s));
-    assert.deepEqual(s.camWords, ["Camera resting", "Camera resting", "Camera resting"], k + " " + J(s));
+    /* Prism B7: the wall collapses resting tiles to one strip. Every visible word is still Camera resting. */
+    assert.ok(s.camWords.length >= 1 && s.camWords.every((w) => w === "Camera resting"), k + " " + J(s));
     assert.equal(s.pairWord, 0, k);
-    assert.equal(s.bulkVisible, 1, k);
+    assert.equal(s.bulkVisible, 0, k + " lights bar absent");
+    assert.equal(s.panel, null, k + " lights bar absent");
+    assert.equal(s.barAbsent, true, k + " lights bar absent");
   }
   assert.equal(r.paired.t1.pairState, "paired");
 });
@@ -112,8 +116,7 @@ test("PAIRUI1b · desk: the unpaired lights panel is one compact row sized to th
     assert.equal(r[k].t1.panel, null, k + " unpaired lights panel stays hidden " + J(r[k].t1));
   }
   for (const k of ["paired@1280@800", "paired@1920@1080"]) {
-    const p = r[k].t1.panel;
-    assert.ok(p && p.h > 100 && p.pillH === 0, k + " full lights panel " + J(p));
+    assert.equal(r[k].t1.panel, null, k + " lights bar absent");
   }
 });
 

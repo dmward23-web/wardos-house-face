@@ -379,7 +379,8 @@ test("DAYPKG1 v2e (Alfred 5, D4), v2g P2: sheet-chores (kid-reachable) fetches n
   assert.match(FEED._synthetic, /SYNTHETIC/);
   async function row(page) {
     const h = rd("sheet-chores.html");
-    const m = h.match(/<div class="chore open hayes" data-check="hay-bed">[\s\S]*?<span class="star-earn" data-stars="(\d+)" data-money-suffix="([^"]*)"><\/span>/);
+    /* data-cadence sits on the same row so the kid board and this sheet share one chore id. The money chip is unchanged. */
+    const m = h.match(/<div class="chore open hayes"[^>]*data-check="hay-bed"[^>]*>[\s\S]*?<span class="star-earn" data-stars="(\d+)" data-money-suffix="([^"]*)"><\/span>/);
     assert.ok(m);
     const attrs = (o) => o;
     const mk = (cls, a = {}, kids = [], text = "") => {

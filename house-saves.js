@@ -24,13 +24,60 @@
   }
 
   /* DAYPKG1 v2d · a kid-typed save name never keeps a dollar sign: stripped on save and on read (an old one is rewritten) */
-  function noDollar(name) { return String(name == null ? "" : name).replace(/\$/g, ""); }
+  function noDollar(name) {
+    var raw = String(name == null ? "" : name);
+    var widened = false;
+    var s = raw;
+    try { s = raw.normalize("NFKC"); widened = s !== raw; } catch (e) { s = raw; }
+    var moneyLabel = /\b(?:allowance|income|salary|balance|budget|payment|pennies|cash|usd|dollars?|bucks|money|cents?|euros?|pounds|gbp|eur|jar)\b/gi;
+    if (moneyLabel.test(s) && /\d/.test(s)) {
+      moneyLabel.lastIndex = 0;
+      s = s.replace(moneyLabel, " ").replace(/\d[\d,.]*/g, " ");
+    }
+    s = s.replace(/[€£¥₩₹]\s*\d[\d,.]*/g, "");
+    s = s.replace(/\b(?:usd|eur|gbp)\s*\d[\d,.]*/gi, "");
+    s = s.replace(/\$/g, "");
+    if (widened) s = s.replace(/\d[\d,.]*/g, "");
+    s = s.replace(/\b(?:salary|balance|budget|payment|pennies|cash|usd|dollars?|bucks|money|cents?|euros?|pounds|gbp|eur)\b/gi, "");
+    s = s.replace(/[★☆]/g, "");
+    s = s.replace(/\b(\d[\d,.]*)\s+(toy)\b/gi, "$2").replace(/\b(toy)\s+(\d[\d,.]*)\b/gi, "$1");
+    s = s.replace(/\s+/g, " ").replace(/^[\s·\-]+|[\s·\-]+$/g, "").trim();
+    if (/\b(?:allowance|income|jar)\b/i.test(s) && /\d/.test(s)) return "";
+    if (/^\d[\d,.]*\s+toy$/i.test(s)) return "";
+    return s;
+  }
+
+  function wholeMoney(name) {
+    var s = String(name == null ? "" : name);
+    try { s = s.normalize("NFKC"); } catch (e) { /* */ }
+    return /\b(?:allowance|income|salary|balance|budget|payment|pennies|cash|usd|dollars?|bucks|money|cents?|euros?|pounds|gbp|eur|jar)\b/i.test(s) && /\d/.test(s);
+  }
 
   function list(kidId) {
     var root = loadRoot();
-    if (root[kidId] && root[kidId].some(function (x) { return x && /\$/.test(String(x.name || "")); })) {
-      root[kidId].forEach(function (x) { if (x && x.name != null) x.name = noDollar(x.name).trim() || "Save"; });
-      saveRoot(root);
+    if (root[kidId]) {
+      var src = root[kidId];
+      var keep = [];
+      var dirty = false;
+      for (var i = 0; i < src.length; i++) {
+        var x = src[i];
+        if (!x) { dirty = true; continue; }
+        var cleaned = noDollar(x.name);
+        if (!cleaned) {
+          dirty = true;
+          if (wholeMoney(x.name)) continue;
+          x.name = "Save";
+        } else if (cleaned !== String(x.name || "").trim()) {
+          x.name = cleaned;
+          dirty = true;
+        }
+        keep.push(x);
+      }
+      if (dirty || keep.length !== src.length) {
+        src.length = 0;
+        for (var j = 0; j < keep.length; j++) src.push(keep[j]);
+        saveRoot(root);
+      }
     }
     if (root[kidId] && root[kidId].some(function (x) { return x && /^seed-/.test(String(x.id || "")); })) {
       root[kidId] = root[kidId].filter(function (x) { return x && !/^seed-/.test(String(x.id || "")); });
@@ -67,7 +114,10 @@
     var arr = root[kidId] || [];
     for (var i = 0; i < arr.length; i++) {
       if (arr[i].id === id) {
-        if (name != null) arr[i].name = noDollar(name).trim() || noDollar(arr[i].name).trim() || "Save";
+        if (name != null) {
+          var cleaned = noDollar(name).trim();
+          if (cleaned) arr[i].name = cleaned;
+        }
         if (need != null) {
           var n = parseInt(need, 10);
           arr[i].need = isNaN(n) || n < 0 ? 0 : n;
@@ -127,6 +177,7 @@
     closeOverlays();
     var ov = document.createElement("div");
     ov.className = "saves-overlay";
+    /* The sheet uses the one shared home control. It does not insert a second home link. */
     ov.innerHTML =
       '<button type="button" class="saves-backdrop" data-saves-backdrop aria-label="Close"></button>' +
       '<div class="saves-sheet" role="dialog" aria-modal="true">' + innerHTML + "</div>";
@@ -149,12 +200,15 @@
   function openAddSheet(kidId) {
     openOverlay(
       '<div class="saves-sheet-title">Add a save</div>' +
+        '<button type="button" class="saves-add-close" aria-label="Close" style="min-width:64px;min-height:64px;font-size:28px">\u2715 Close</button>' +
         '<form class="saves-add-form" data-saves-add-form autocomplete="off">' +
         '<input class="saves-add-name" type="text" name="save-name" maxlength="48" placeholder="Saving for…" required />' +
-        '<input class="saves-add-need" type="number" name="save-need" min="0" max="999" inputmode="numeric" placeholder="★" title="Optional ★ target" />' +
+        '<input class="saves-add-need" type="number" name="save-need" min="0" max="999" inputmode="numeric" placeholder="\u2605" title="Optional star target" />' +
         '<button type="submit" class="saves-add-save">Save</button>' +
         "</form>",
       function (ov) {
+        var closer = ov.querySelector(".saves-add-close");
+        if (closer) closer.addEventListener("click", function (e) { e.preventDefault(); closeOverlays(); });
         var form = ov.querySelector("[data-saves-add-form]");
         var nameEl = form.querySelector(".saves-add-name");
         setTimeout(function () { nameEl.focus(); }, 40);
@@ -217,11 +271,7 @@
           var cur = null;
           for (var i = 0; i < items2.length; i++) if (items2[i].id === id) cur = items2[i];
           if (!cur) return;
-          var nn = window.prompt("Save name", cur.name);
-          if (nn == null) return;
-          var nd = window.prompt("★ target (blank = none)", cur.need ? String(cur.need) : "");
-          if (nd == null) return;
-          update(kidId, id, nn, nd === "" ? 0 : nd);
+          update(kidId, id, cur.name, cur.need || 0);
           closeOverlays();
           renderAll(kidId);
           if (window.HouseSfx) HouseSfx.tap();

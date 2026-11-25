@@ -152,6 +152,76 @@ test("DAYPKG1 v2i guard (b): order in source: carry copy (blind move) before the
   assert.match(s, /var LEDGER_PURGE_FROM = Date\.parse\("2026-11-06T00:00:00-06:00"\);/);
 });
 
-test("DAYPKG1 v2i main port: private-feed.js is main 021bb0f2's PFCACHE1 v3 bytes, untouched", () => {
-  assert.equal(crypto.createHash("sha256").update(fs.readFileSync(path.join(ROOT, "private-feed.js"))).digest("hex").slice(0, 16), "7c0bfe6212a83448");
+/* Pin is 510a193b's private-feed.js (hash16 576921a0d706ca06). The three intended changes inside those bytes:
+   law() fails closed; R53AR feed retry with status on error; data-pair-banner 401 flag. */
+test("DAYPKG1 v2i main port: private-feed.js is 510a193b's bytes, untouched", () => {
+  assert.equal(crypto.createHash("sha256").update(fs.readFileSync(path.join(ROOT, "private-feed.js"))).digest("hex").slice(0, 16), "576921a0d706ca06");
+});
+
+function feedBox(fetchImpl) {
+  const sets = [];
+  const timers = [];
+  const store = {};
+  const ls = {
+    getItem: (k) => (k in store ? store[k] : null),
+    setItem: (k, v) => { sets.push([k, String(v)]); store[k] = String(v); },
+    removeItem: (k) => { delete store[k]; },
+    key: (i) => Object.keys(store)[i] ?? null,
+    get length() { return Object.keys(store).length; }
+  };
+  ls.setItem("wardos-private-feed-token", "wall-key-wall-key-01");
+  const node = () => ({ appendChild() {}, setAttribute() {}, textContent: "", classList: { toggle() {} } });
+  const document = { readyState: "complete", head: node(), body: node(), addEventListener() {}, createElement: node, documentElement: node(), querySelector: () => null, querySelectorAll: () => [] };
+  const ctx = vm.createContext({
+    Intl, Date, URL, Promise, console: { log() {}, warn() {}, error() {} },
+    setTimeout: (fn, ms) => { timers.push(ms); return timers.length; }, clearTimeout() {},
+    localStorage: ls, document,
+    location: { href: "https://house.test/sheet-index.html", origin: "https://house.test", pathname: "/sheet-index.html" },
+    HouseHub: { lights: () => "https://hub.test", okForKey: () => true },
+    fetch: fetchImpl, CustomEvent: class { constructor(t, o) { this.type = t; this.detail = o && o.detail; } },
+    addEventListener() {}
+  });
+  ctx.window = ctx; ctx.globalThis = ctx;
+  vm.runInContext(rd("private-feed.js"), ctx, { filename: "private-feed.js" });
+  return { ctx, sets, timers, store };
+}
+const okJson = (status, body) => Promise.resolve({ ok: status >= 200 && status < 300, status, json: () => Promise.resolve(body || { ok: 1 }) });
+
+test("r55 private-feed law() returns null for calendar feeds when HouseFaceLaw is missing or throws", async () => {
+  for (const name of ["cal-live", "cal-months", "kids-week"]) {
+    const missing = feedBox(() => okJson(200, { marker: name }));
+    const gone = await missing.ctx.PrivateFeed.get(name);
+    assert.equal(gone.data, null, name + " missing law");
+    const throwing = feedBox(() => okJson(200, { marker: name }));
+    throwing.ctx.HouseFaceLaw = { cleanFeed: () => { throw new Error("law"); } };
+    const blew = await throwing.ctx.PrivateFeed.get(name);
+    assert.equal(blew.data, null, name + " throwing law");
+  }
+});
+
+test("r55 private-feed skips retry on 401 and other 4xx, backs off on 5xx and network errors, and stops after a success", async () => {
+  /* Abort timers are 6000. Retry steps start at 15000 and jitter down to about 13500. */
+  const denied = feedBox(() => okJson(401, {}));
+  const retries = (box) => box.timers.filter((ms) => ms >= 10000);
+  await denied.ctx.PrivateFeed.get("cal-live");
+  assert.equal(retries(denied).length, 0, "401");
+  const other = feedBox(() => okJson(404, {}));
+  await other.ctx.PrivateFeed.get("cal-live");
+  assert.equal(retries(other).length, 0, "404");
+  let status = 500;
+  const flaky = feedBox(() => okJson(status, { ok: 1 }));
+  await flaky.ctx.PrivateFeed.get("lights-live");
+  assert.equal(retries(flaky).length, 1, "5xx schedules one backoff");
+  status = 200;
+  await flaky.ctx.PrivateFeed.get("lights-live");
+  assert.equal(retries(flaky).length, 1, "success does not schedule another retry");
+  const down = feedBox(() => Promise.reject(new Error("offline")));
+  await down.ctx.PrivateFeed.get("sensi-live");
+  assert.equal(retries(down).length, 1, "network error schedules one backoff");
+});
+
+test("r55 private-feed never stores a money feed in localStorage on the retry path", async () => {
+  const box = feedBox(() => okJson(500, { fee: 1 }));
+  await box.ctx.PrivateFeed.get("cal-live");
+  assert.equal(box.sets.some((pair) => /cal-live|cal-months|kids-week/.test(pair[0])), false, JSON.stringify(box.sets));
 });

@@ -1,0 +1,18 @@
+{
+  "items": [
+    {
+      "id": "kit",
+      "calendar": "primary",
+      "summary": "Hayes robot kit",
+      "start": {"dateTime": "2026-12-04T15:00:00-06:00"},
+      "end": {"dateTime": "2026-12-04T16:00:00-06:00"}
+    },
+    {
+      "id": "away",
+      "calendar": "primary",
+      "summary": "House away",
+      "start": {"dateTime": "2026-11-22T08:00:00-06:00"},
+      "end": {"dateTime": "2026-12-04T14:40:00-06:00"}
+    }
+  ]
+}

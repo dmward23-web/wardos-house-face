@@ -8,9 +8,38 @@ import path from "node:path";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const ROOT = process.env.WARDOS_ROOT
+  ? path.resolve(process.env.WARDOS_ROOT)
+  : path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const rd = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 const OVERLAY = rd("month-theme/season-math.js") + "\n" + rd("month-theme/month-overlay.js");
+const SHEET = rd("sheet-index.html");
+const TILES = ["ainsley", "hayes", "harris", "dan"];
+const TILE_RULES = [];
+{
+  const re = /([^{}]+)\{([^{}]*)\}/g;
+  let m;
+  while ((m = re.exec(SHEET))) {
+    if (!/background-image/.test(m[2])) continue;
+    if (!/\.tile\.(ainsley|hayes|harris|dan)\b/.test(m[1])) continue;
+    const url = (m[2].match(/url\("([^"]+)"\)/) || [])[1] || "";
+    if (url) TILE_RULES.push({ sel: m[1], url });
+  }
+}
+function tileUrl(phase, id) {
+  const hits = TILE_RULES.filter((r) => {
+    if (!new RegExp("\\.tile\\." + id + "\\b").test(r.sel)) return false;
+    const attr = r.sel.match(/\[data-nov-phase="([^"]+)"\]/);
+    return attr ? attr[1] === phase : true;
+  });
+  return hits.length ? hits[hits.length - 1].url : "";
+}
+function heroKind(src) {
+  if (/hub-window-night-/.test(src)) return "night";
+  if (/hub-window-dusk-/.test(src)) return "dusk";
+  if (/hub-window-day-/.test(src)) return "day";
+  return "none:" + src;
+}
 
 let sunPhase = null;
 function boot(iso) {
@@ -20,12 +49,13 @@ function boot(iso) {
   const html = { setAttribute(k, v) { attrs[k] = String(v); }, getAttribute: (k) => attrs[k], style: { setProperty(k, v) { props[k] = v; } } };
   const body = { hasAttribute: () => false, firstChild: null, insertBefore() {}, appendChild() {} };
   const mk = () => ({ id: "", className: "", style: {}, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, appendChild() {} });
+  const people = TILES.map((id) => ({ id, className: "tile " + id, style: {}, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; } }));
   const document = {
     documentElement: html, body, readyState: "complete",
     currentScript: { src: "http://hub.local/month-theme/month-overlay.js?v=SUNCLOCK1" },
     createElement: mk,
     querySelector: (s) => (s === ".hub-window" ? hero : null),
-    querySelectorAll: () => [],
+    querySelectorAll: (s) => (String(s).includes(".tile") ? people : []),
     getElementById: () => null,
     addEventListener() {}
   };
@@ -46,11 +76,18 @@ function boot(iso) {
   vm.runInContext(OVERLAY, ctx, { filename: "month-overlay.js" });
   sunPhase = ctx.WardSunPhase;
   const phase = attrs["data-nov-phase"];
+  for (const el of people) el.style.backgroundImage = 'url("' + tileUrl(phase, el.id) + '")';
+  const tileSrcs = people.map((el) => (el.style.backgroundImage.match(/url\("([^"]+)"\)/) || [])[1] || "");
+  const nightTile = (src) => /-night/.test(src);
+  const tiles = tileSrcs.length === 4 && tileSrcs.every(nightTile) ? "night" : tileSrcs.length === 4 && tileSrcs.every((src) => src && !nightTile(src)) ? "day" : "mixed:" + tileSrcs.join(",");
   return {
     phase,
-    hero: /hub-window-night-/.test(img.src) ? "night" : /hub-window-dusk-/.test(img.src) ? "day" : "none:" + img.src,
+    heroSrc: img.src,
+    hero: heroKind(img.src),
+    bgSrc: props["--wg-hubbg"] || "",
     bg: /wall-night\.webp/.test(props["--wg-hubbg"] || "") ? "night" : "day",
-    tiles: phase === "night" ? "night" : "day"
+    tiles,
+    tileSrcs
   };
 }
 const layers = (r) => [r.hero, r.bg, r.tiles];
@@ -88,9 +125,66 @@ test("every layer agrees at every 5 min of Nov 15 and Nov 29 (one clock)", () =>
   for (const day0 of [Date.parse("2026-11-15T00:00:00-06:00"), Date.parse("2026-11-29T00:00:00-06:00")]) {
     for (let t = day0; t < day0 + 864e5; t += 5 * 6e4) {
       const r = boot(new Date(t).toISOString());
-      assert.equal(new Set(layers(r)).size, 1, ct(t) + " " + JSON.stringify(r));
+      const wantHero = r.phase === "night" ? "night" : r.phase === "dusk" ? "dusk" : "day";
+      const wantRest = r.phase === "night" ? "night" : "day";
+      assert.equal(r.hero, wantHero, ct(t) + " " + JSON.stringify(r));
+      assert.equal(r.bg, wantRest, ct(t) + " " + JSON.stringify(r));
+      assert.equal(r.tiles, wantRest, ct(t) + " " + JSON.stringify(r));
+      assert.equal(r.tileSrcs.length, 4, ct(t));
+      if (r.phase === "night") assert.match(r.bgSrc, /wall-night\.webp/, ct(t) + " " + r.bgSrc);
+      else if (r.phase === "dusk") assert.match(r.bgSrc, /wall-dusk\.webp/, ct(t) + " " + r.bgSrc);
+      else assert.match(r.bgSrc, /wall-day\.webp/, ct(t) + " " + r.bgSrc);
+      for (const src of r.tileSrcs) {
+        if (r.phase === "night") assert.match(src, /-night/, ct(t) + " " + src);
+        else if (r.phase === "dusk") {
+          assert.doesNotMatch(src, /-night/, ct(t) + " " + src);
+          assert.doesNotMatch(src, /-day-/, ct(t) + " " + src);
+        } else assert.match(src, /-day-438x420\.webp$/, ct(t) + " " + src);
+      }
     }
   }
+});
+
+test("r53b4 noon and 7:05 AM use day plates, 4:55 PM dusk plates, 7:30 PM night plates", () => {
+  const dayTiles = (r) => {
+    assert.equal(r.tileSrcs.length, 4, JSON.stringify(r.tileSrcs));
+    for (const src of r.tileSrcs) assert.match(src, /-day-438x420\.webp$/, src);
+    assert.match(r.bgSrc, /wall-day\.webp/, r.bgSrc);
+    assert.match(r.heroSrc, /hub-window-day-/);
+  };
+  const noon = boot("2026-11-15T12:30:00-06:00");
+  assert.equal(noon.phase, "morning");
+  dayTiles(noon);
+  const am = boot("2026-11-16T07:05:00-06:00");
+  assert.equal(am.phase, "morning");
+  dayTiles(am);
+  const dusk = boot("2026-11-15T16:55:00-06:00");
+  assert.equal(dusk.phase, "dusk");
+  assert.match(dusk.heroSrc, /hub-window-dusk-/);
+  assert.match(dusk.bgSrc, /wall-dusk\.webp/);
+  assert.match(dusk.tileSrcs[0], /kidtile-ainsley-438x420\.webp$/);
+  assert.match(dusk.tileSrcs[1], /kidtile-hayes-438x420\.webp$/);
+  assert.match(dusk.tileSrcs[2], /kidtile-harris-438x420\.webp$/);
+  assert.match(dusk.tileSrcs[3], /kidtile-dad\.webp$/);
+  const night = boot("2026-11-15T19:30:00-06:00");
+  assert.equal(night.phase, "night");
+  assert.match(night.heroSrc, /hub-window-night-/);
+  assert.match(night.bgSrc, /wall-night\.webp/);
+  for (const src of night.tileSrcs) assert.match(src, /-night/, src);
+});
+
+test("noon uses the day hero file and 4:55 PM uses the dusk hero file", () => {
+  const noon = boot("2026-11-15T12:30:00-06:00");
+  assert.equal(noon.phase, "morning");
+  assert.match(noon.heroSrc, /hub-window-day-/);
+  assert.equal(noon.hero, "day");
+  assert.equal(noon.tiles, "day");
+  const dusk = boot("2026-11-15T16:55:00-06:00");
+  assert.equal(dusk.phase, "dusk");
+  assert.match(dusk.heroSrc, /hub-window-dusk-/);
+  assert.equal(dusk.hero, "dusk");
+  assert.equal(dusk.tiles, "day");
+  for (const src of dusk.tileSrcs) assert.doesNotMatch(src, /-night/);
 });
 
 /* Reference: published Overland Park almanac (NOAA method), Nov 15 2026 sunrise 7:01:39 AM, sunset 5:05:05 PM CST;
@@ -107,7 +201,9 @@ test("night starts at sunset and ends at sunrise, within 3 min of the NOAA value
   assert.ok(rise && Math.abs(rise - Date.parse("2026-11-15T07:01:39-06:00")) <= 3 * 6e4, "Nov 15 sunrise " + (rise && ct(rise)));
   const sset = firstFlip(Date.parse("2026-06-21T20:15:00-05:00"), Date.parse("2026-06-21T21:15:00-05:00"), true);
   assert.ok(sset && Math.abs(sset - Date.parse("2026-06-21T20:47:00-05:00")) <= 3 * 6e4, "Jun 21 sunset " + (sset && ct(sset)));
-  assert.equal(boot("2026-11-15T16:50:00-06:00").phase, "dusk", "dusk = the last 20 min before sunset");
-  assert.deepEqual(layers(boot("2026-11-15T16:50:00-06:00")), ["day", "day", "day"], "dusk keeps the day hero, plate and tiles");
+  const dusk = boot("2026-11-15T16:50:00-06:00");
+  assert.equal(dusk.phase, "dusk", "dusk = the last 20 min before sunset");
+  assert.match(dusk.heroSrc, /hub-window-dusk-/, "dusk hero is the dusk file");
+  assert.deepEqual([dusk.hero, dusk.bg, dusk.tiles], ["dusk", "day", "day"], "dusk hero, day plate, non-night tiles");
   assert.equal(boot("2026-11-15T16:40:00-06:00").phase, "morning", "dusk = the last 20 min before sunset");
 });

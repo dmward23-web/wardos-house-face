@@ -516,9 +516,22 @@
     var hud = document.querySelector(".kw-hud");
     if (!hud) return setTimeout(mountMute, 300);
     if (muteBtn) return;
+    /* The header already has the 64px sound control. A second .hl-mute gets the landscape
+       right-offset and its centre leaves the 1280 viewport, so the tap misses. */
+    var existing = hud.querySelector(".kw-mute");
+    if (!existing) {
+      mountMute.tries = (mountMute.tries || 0) + 1;
+      if (mountMute.tries < 12) return setTimeout(mountMute, 100);
+    }
+    if (existing) {
+      muteBtn = existing;
+      muteBtn.classList.add("hl-mute");
+      syncMute();
+      return;
+    }
     muteBtn = document.createElement("button");
     muteBtn.type = "button"; muteBtn.className = "hl-mute";
-    if (global.HouseSound) { muteBtn.style.cssText = "pointer-events:auto;margin-left:auto;margin-right:8px;flex:none"; HouseSound.icon(muteBtn); }   /* LAW8C3 · same icon as the hub */
+    if (global.HouseSound) { muteBtn.style.cssText = "pointer-events:auto;margin-left:auto;margin-right:8px;flex:none"; HouseSound.icon(muteBtn); }
     else muteBtn.style.cssText = "pointer-events:auto;min-width:44px;min-height:44px;margin-left:auto;margin-right:8px;border:0;border-radius:22px;background:rgba(14,22,26,.72);color:#fff6e4;font:700 20px/1 system-ui,sans-serif";
     muteBtn.addEventListener("click", function (e) {
       e.preventDefault(); e.stopPropagation();

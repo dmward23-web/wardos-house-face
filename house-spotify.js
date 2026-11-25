@@ -250,6 +250,16 @@
       el.innerHTML = TILE_HTML;
       el.setAttribute("role", "link"); el.setAttribute("tabindex", "0");
       el.setAttribute("aria-label", "Music and home audio · open the player");
+      if (el.id === "hub-spotify-tile" && !el.querySelector(".sp-speaker")) {
+        var ctrls = el.querySelector(".sp-ctrls");
+        var spk = document.createElement("button");
+        spk.type = "button";
+        spk.className = "sp-btn sp-speaker";
+        spk.setAttribute("data-sp-act", "rooms");
+        spk.setAttribute("aria-label", "Speaker");
+        spk.textContent = "Speaker";
+        if (ctrls) ctrls.appendChild(spk);
+      }
       el.addEventListener("click", function (ev) { onTileClick(el, ev); });
       el.addEventListener("keydown", function (ev) { if (ev.key === "Enter" && ev.target === el) openPlayer(el, null); });
       el.addEventListener("pointerdown", function () { try { if (window.HouseSfx && HouseSfx.tap) HouseSfx.tap(); } catch (e) { /* */ } }, { passive: true });
@@ -339,7 +349,19 @@
     setTxt(el, ".sp-title", title); setTxt(el, ".sp-artist", artist); setTxt(el, ".sp-dev", dev);
     /* NODATA1 · never show broken copy: when the house box is down or Spotify errors, the card hides until it answers again */
     var nod = ph === "offline" || ph === "error" || ph === "no_key" || ph === "bad_key", /* NODATA3 · a key-less 401 is operator copy (NEED KEY), never a face card */ host = (el.closest && el.closest(".tile")) || el;
-    if (host !== document.body && !/sheet-spotify/.test(location.pathname)) { if (nod) host.style.setProperty("display", "none", "important"); else host.style.removeProperty("display"); } /* NODATA2 · beats the phone strip's display:grid !important */
+    if (el.id === "hub-spotify-tile") {
+      el.style.removeProperty("display");
+      if (nod) {
+        setTxt(el, ".sp-title", "Music offline");
+        setTxt(el, ".sp-artist", "");
+        setTxt(el, ".sp-dev", "");
+        var wallCtrls = el.querySelector(".sp-ctrls");
+        if (wallCtrls) wallCtrls.hidden = false;
+        el.querySelectorAll(".sp-btn").forEach(function (b) { b.disabled = true; b.setAttribute("aria-disabled", "true"); });
+        return;
+      }
+      el.querySelectorAll(".sp-btn").forEach(function (b) { b.removeAttribute("aria-disabled"); });
+    } else if (host !== document.body && !/sheet-spotify/.test(location.pathname)) { if (nod) host.style.setProperty("display", "none", "important"); else host.style.removeProperty("display"); } /* NODATA2 · beats the phone strip's display:grid !important */
     var c = el.querySelector(".sp-ctrls"); if (c) c.hidden = !showCtl;
     var cb = el.querySelector(".sp-connect"); if (cb) { cb.hidden = !connectTxt; if (connectTxt) cb.textContent = connectTxt; }
     var img = el.querySelector(".sp-art"), src = it && (it.art || it.artSmall) || "";

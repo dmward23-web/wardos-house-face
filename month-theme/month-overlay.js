@@ -67,25 +67,24 @@
     function go() {
       var when = seasonDate();
       var phase = novPhase(when);
-      var phone = (window.innerWidth || 0) < 700;
-      /* CSS consumes --km-bg from month-overlay.css, so a page-relative url doubles month-theme/. Leaves already use base. */
-      var plate = base + "month-theme/november/" + (phone ? "phone-" : "wall-") + phase + ".webp";
+      var phone = document.documentElement.getAttribute("data-wardos-stage") !== "1" && (window.innerWidth || 0) < 700;
+      var art = phase === "night" ? "night" : phase === "dusk" ? "dusk" : "morning";
+      var wallArt = phase === "night" ? "night" : phase === "dusk" ? "dusk" : "day";
+      var plate = base + "month-theme/november/" + (phone ? "phone-" + art : "wall-" + wallArt) + ".webp";
       var kidPage = /\/kid-[a-z]+/.test(location.pathname || "") || !!(document.body && document.body.hasAttribute("data-kid-world"));
+      var wall = /sheet-index\.html$/.test(location.pathname || "");
       document.documentElement.setAttribute("data-month-theme", "11");
       document.documentElement.setAttribute("data-nov-phase", phase);
-      document.querySelectorAll("iframe.night52-scene").forEach(function (fr) {
+      document.documentElement.setAttribute("data-scene-phase", phase);
+      document.documentElement.setAttribute("data-sun-phase", phase);
+      if (wall) document.querySelectorAll("iframe.night52-scene").forEach(function (fr) {
         fr.removeAttribute("src");
         fr.style.display = "none";
       });
-      if (!kidPage) document.documentElement.style.setProperty("--km-bg", "url(\"" + plate + "\")");
-      /* NIGHTHUB1 · the hub wall plate (--wg-hubbg in wg-wall-land.css / wall-acer-lock.css) follows this same novPhase clock as the
-         hero window below: night swaps in wall-night. Morning and dusk keep the dusk fallback, so the day board is unchanged. */
-      if (!kidPage && !phone && phase === "night") document.documentElement.style.setProperty("--wg-hubbg", "url(\"" + base + "month-theme/november/wall-night.webp\")");
-      /* NIGHTHUB3 · go() runs once per load, so a board left on kept its load-time phase (18:50 never flipped at 19:00; the 00:0x
-         house-fresh reload kept night all day). Same novPhase clock, checked each minute: reload once when it changes. Not when
-         ?now= or ?month= pins the date, not on kid pages; phones on sheet-index see the wall board and follow the same clock. Shares house-fresh's 45 s session guard, so no reload loop.
-         Idle guard (Atlas): only after 60 s with no touch/pointer/key and with no dialog/sheet open; otherwise retry next minute. */
-      if (!kidPage && !phone && !q.get("now") && !q.has("month") && typeof setInterval === "function") {
+      if (wall && !kidPage) document.documentElement.style.setProperty("--km-bg", "url(\"" + plate + "\")");
+      /* Wall plate follows novPhase: morning is wall-day, dusk is wall-dusk, night is wall-night. */
+      if (wall && !kidPage && !phone) document.documentElement.style.setProperty("--wg-hubbg", "url(\"" + base + "month-theme/november/wall-" + wallArt + ".webp\")");
+      if (wall && !kidPage && !phone && !q.get("now") && !q.has("month") && typeof setInterval === "function") {
         var lastTouch = Date.now();
         ["pointerdown", "touchstart", "keydown"].forEach(function (t) { document.addEventListener(t, function () { lastTouch = Date.now(); }, { capture: true, passive: true }); });
         setInterval(function () {
@@ -100,7 +99,7 @@
           location.reload();
         }, 60000);
       }
-      if (!document.getElementById("km-nov")) {
+      if (wall && !document.getElementById("km-nov")) {
         var L = document.createElement("div");
         L.id = "km-nov";
         L.className = "km-layer km-nov" + (document.querySelector(".kw-canvas") ? " km-kid" : "");
@@ -126,13 +125,20 @@
       }
       var fig = document.querySelector(".hub-window");
       if (fig) {
-        var winPhase = phase === "night" ? "night" : "dusk";   /* SUNCLOCK1 · same clock; the hero has no morning plate, so day shows its dusk plate */
+        var winPhase = phase === "night" ? "night" : phase === "dusk" ? "dusk" : "day";
+        if (fig.setAttribute) fig.setAttribute("data-sun-phase", phase);
         var img = fig.querySelector("img");
-        if (!img) { img = document.createElement("img"); img.alt = ""; fig.appendChild(img); }
-        img.src = "month-theme/november/hub-window-" + winPhase + "-900x864.webp";
+        if (!img) { img = document.createElement("img"); img.alt = ""; img.width = 900; img.height = 864; fig.appendChild(img); }
+        var hub = "month-theme/november/hub-window-" + winPhase + "-900x864.webp";
+        var cur = img.getAttribute ? img.getAttribute("src") : img.src;
+        if (cur !== hub) img.src = hub;
       }
+      document.querySelectorAll(".tile, #house-wx, #hub-spotify-tile, #index-sensi-chip, .hub-cam, #hub-offline-line").forEach(function (el) {
+        if (el && el.setAttribute) el.setAttribute("data-sun-phase", phase);
+      });
     }
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
+    function arm() { go(); }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", arm); else arm();
   }
   var m = q.has("month") ? parseInt(q.get("month"), 10) : new Date().getMonth() + 1;
   var t = THEMES[m]; if (!t) return;

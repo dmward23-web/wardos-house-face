@@ -33,8 +33,13 @@
     var book = window.HousePlates;
     var man = book && book.mercury;
     if (!man) { runPlatesReady = true; return; }
+    var nativeWall = innerWidth >= 1920 && innerHeight >= 1080;
     var jobs = (man.layers || []).map(function (layer) {
-      var urls = book.urlFor(kid, layer.id, "landscape", layer.standin).concat(book.urlFor("mercury", layer.id, "landscape", layer.standin));
+      var urls = [];
+      if (nativeWall) {
+        urls = book.urlFor(kid, layer.id, "wall-1920x1080", layer.standin).concat(book.urlFor("mercury", layer.id, "wall-1920x1080", layer.standin));
+      }
+      urls = urls.concat(book.urlFor(kid, layer.id, "landscape", layer.standin)).concat(book.urlFor("mercury", layer.id, "landscape", layer.standin));
       return new Promise(function (res) {
         var i = 0;
         function next() {
@@ -456,6 +461,27 @@
   }
   function drawRunPlate(g, img, W, H, oxOff, parallax) {
     if (!img) return;
+    /* 1920 plates are already the stage size. Draw them 1:1. A shifted copy stays at the same size. */
+    if (img.width === W && img.height === H) {
+      var x0 = Math.round(-cam * parallax + (oxOff || 0));
+      g.drawImage(img, x0, 0);
+      /* Mirror the wrap so the edge meets itself. A straight repeat jumps by the left/right column delta. */
+      if (x0 > 0) {
+        g.save();
+        g.translate(x0, 0);
+        g.scale(-1, 1);
+        g.drawImage(img, 0, 0);
+        g.restore();
+      }
+      if (x0 < 0) {
+        g.save();
+        g.translate(x0 + img.width, 0);
+        g.scale(-1, 1);
+        g.drawImage(img, -img.width, 0);
+        g.restore();
+      }
+      return;
+    }
     var tr = trimFor(img);
     if (!tr.opaque) {
       var fi = feathered(img), sc = Math.max(W / img.width, H / img.height) * 1.08;
@@ -525,10 +551,13 @@
     return d;
   }
   function floorDpr(w) { return Math.min(1.35, devicePixelRatio || 1, 1400 / w); }
+  function wallNative(w, h) { return w >= 1920 && h >= 1080; }
   function adapt(dtMs) {
     if (!ADAPT) return;
+    var w0 = innerWidth, h0 = innerHeight;
+    if (wallNative(w0, h0)) return;
     adaptT += dtMs; adaptN++; adaptSum += dtMs;
-    var avg = adaptSum / adaptN, w = innerWidth, h = innerHeight;
+    var avg = adaptSum / adaptN, w = w0, h = h0;
     var lo = floorDpr(w) / targetDpr(w, h);
     if (adaptT > 2000 && avg > 20 && dprScale > lo + 0.001) { dprScale = Math.max(lo, dprScale * 0.85); resize(); }
     else if (adaptT > 4000 && avg < 13 && dprScale < 1) { dprScale = Math.min(1, dprScale / 0.85); resize(); }
@@ -537,7 +566,7 @@
   }
   function resize() {
     var w = innerWidth, h = innerHeight;
-    var dpr = Math.max(floorDpr(w), targetDpr(w, h) * dprScale);
+    var dpr = wallNative(w, h) ? 1 : Math.max(floorDpr(w), targetDpr(w, h) * dprScale);
     cv.width = off.width = Math.round(w * dpr);
     cv.height = off.height = Math.round(h * dpr);
     cv.style.width = w + "px";
@@ -555,7 +584,7 @@
     var x = 40;
     var y = 420;
     for (var i = 0; i < 16; i++) {
-      var w = 150 + (i % 3) * 40;
+      var w = 80 + Math.max(1, Math.round((150 + (i % 3) * 40 - 80) / 128)) * 128;
       var gap = 70 + (i % 4) * 28;
       if (i === 0) gap = 0;
       x += gap;
@@ -565,7 +594,7 @@
       x += w;
     }
     goalX = x + 40;
-    plats.push({ x: goalX, y: 300, w: 180, h: 26, cp: true, vx: 0, phase: 0, grove: true });
+    plats.push({ x: goalX, y: 300, w: 80 + Math.max(1, Math.round((180 - 80) / 128)) * 128, h: 26, cp: true, vx: 0, phase: 0, grove: true });
   })();
 
   /* SUNHOME1 · warm lamps along the run. Collecting one lights it for this sitting.
@@ -1092,7 +1121,7 @@
         var im = new Image();
         im.onload = function () { set[part] = im; if (--left === 0) { platImg[t + "-" + v] = set; platCache = {}; } };
         im.onerror = function () { left = -99; };
-        im.src = PLAT_ART.dir + ((devicePixelRatio || 1) > 1 || innerWidth >= 2400 ? "2x/" : "1x/") + t + "-" + v + "-" + part + ".png?v=PLATFORMS3";
+        im.src = PLAT_ART.dir + ((devicePixelRatio || 1) > 1 || innerWidth >= 2400 ? "2x/" : "1x/") + t + "-" + v + "-" + part + ".png?v=PLATSEAM1";
       });
     });
   });
@@ -1120,11 +1149,31 @@
   }
   function paintPlatArt(g, set, w, grove) {
     var cap = 40, tile = 128, y0 = -PLAT_ART.walk;
+    function noteDraw(sw, sh, dw, dh) {
+      var log = window.__platDrawLog;
+      if (!log || typeof log.push !== "function") return;
+      var dpr = view.dpr || 1;
+      log.push({
+        sw: sw, sh: sh, dw: dw, dh: dh,
+        scaleX: Math.round((dw * dpr) / sw * 1000) / 1000,
+        scaleY: Math.round((dh * dpr) / sh * 1000) / 1000
+      });
+    }
     function strip(pre, y, h) {
-      var mw = Math.max(0, w - cap * 2);
-      for (var x = 0; x < mw; x += tile) { var tw = Math.min(tile, mw - x); var im = set[pre + "mid"]; g.drawImage(im, 0, 0, im.width * (tw / tile), im.height, cap + x, y, tw, h); }
-      g.drawImage(set[pre + "capL"], 0, y, cap, h);
-      g.drawImage(set[pre + "capR"], w - cap, y, cap, h);
+      var span = Math.max(0, w - cap * 2);
+      var im = set[pre + "mid"];
+      var n = Math.max(1, Math.round(span / tile));
+      var i;
+      for (i = 0; i < n; i++) {
+        g.drawImage(im, 0, 0, im.width, im.height, cap + i * tile, y, tile, h);
+        noteDraw(im.width, im.height, tile, h);
+      }
+      var cl = set[pre + "capL"];
+      var cr = set[pre + "capR"];
+      g.drawImage(cl, 0, 0, cl.width, cl.height, 0, y, cap, h);
+      g.drawImage(cr, 0, 0, cr.width, cr.height, w - cap, y, cap, h);
+      noteDraw(cl.width, cl.height, cap, h);
+      noteDraw(cr.width, cr.height, cap, h);
     }
     strip("shadow-", PLAT_ART.shY, PLAT_ART.sh);
     strip("", y0, PLAT_ART.h);
@@ -1674,7 +1723,9 @@
     setInterval(refreshPowers, 15000); /* heartbeat: a chore closed mid-run shows within 15 s even with no event */
     var coop = blobs.length > 1;
     var hint = coop ? "Each of you has a part of the wall. Slide to roll. Tap to jump." : "Slide to roll. Tap to jump. Every full day makes you bigger.";
-    ui.innerHTML = '<div class="hud"><a href="' + THEME.back + '">Back</a><span></span><div class="je-mini" id="je" aria-hidden="true"></div></div><div class="hint">' + hint + '</div>' +
+    var home = (window.HouseAudit && HouseAudit.href) ? HouseAudit.href("sheet-index.html") : "sheet-index.html";
+    var homeBtn = '<a class="wardos-home merc-home" data-kw-home href="' + home + '" aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a>';
+    ui.innerHTML = '<div class="hud">' + homeBtn + '<span></span><div class="je-mini" id="je" aria-hidden="true"></div></div><div class="hint">' + hint + '</div>' +
       (coop ? '<div class="zones">' + blobs.map(function (b) { return '<div class="zone"><span>' + NAMES[b.kid] + '</span></div>'; }).join("") + '</div>' : "");
     if (window.JarEngine) {
       try {
@@ -1694,7 +1745,8 @@
     var w = document.createElement("div");
     w.className = "merc-win" + (finale ? " merc-finale" : "");
     var msg = finale ? "The grove holds everyone." : "You made it to the grove. Fill your jar to light it up.";
-    w.innerHTML = '<p>' + msg + '</p><a href="' + THEME.back + '">Back</a>';
+    var winHome = (window.HouseAudit && HouseAudit.href) ? HouseAudit.href("sheet-index.html") : "sheet-index.html";
+    w.innerHTML = '<p>' + msg + '</p><a class="wardos-home merc-home" data-kw-home href="' + winHome + '" aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a>';
     ui.appendChild(w);
   }
 

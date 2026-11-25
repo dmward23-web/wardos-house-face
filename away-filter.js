@@ -36,6 +36,10 @@
   var TZ = "America/Chicago";
   var CHANGE_MIN = null;   /* from the feed (changeMin); null = no intra-day switch */
   var MONTHS = null, readyP = null, origFetch = null;
+  /* HOUSEAWAY1 · whole-house away windows [startMs, endMs) from the feed's houseAwayIso (cal-months.py, one timed
+     "House away" event on Dan's calendar). Inside one, the house reads away whatever withDan says (Atlas Nov 19:
+     everyone gone Sun 8:00 AM through the Fri pickup). Same one source (cal-months), no new path. */
+  var HOUSE_AWAY = [];
   var KID_RE = /\b(Ainsley|Hayes|Harris|Boys|Kids)\b|\bLKMS\b|\bschool\b|\b(No School|Early Release|Half Day|1\/2 Day)\b/i;   /* TEXTLAW3 (main): school-day words mark a kid item */   /* privacy-scan:allow calendar_string */
   function notOurs(s) { /* someone else who shares a kid's first name: matched in livinghouse/lh-rules.js against names read at run time, never by a name in git.
      Without lh-rules the text stays kid text, so the item stays hidden on away days (the safe side). */
@@ -70,21 +74,34 @@
   function withDan(iso) { var d = day(iso); return d ? !!d.withDan : null; }
 
   function setMonths(j) {   /* every call replaces the state: a missing, empty or junk feed resets to UNKNOWN */
-    MONTHS = null; CHANGE_MIN = null; api.CHANGE_MIN = null;
+    MONTHS = null; CHANGE_MIN = null; api.CHANGE_MIN = null; HOUSE_AWAY = [];
     if (!j || typeof j !== "object" || !j.days || typeof j.days !== "object" || Array.isArray(j.days)) return;
     var days = {}, n = 0;
     Object.keys(j.days).forEach(function (k) { var d = j.days[k];
       if (/^\d{4}-\d{2}-\d{2}$/.test(k) && d && typeof d === "object" && typeof d.withDan === "boolean") { days[k] = { withDan: d.withDan }; n++; } });
     if (!n) return;
     MONTHS = { days: days };
+    if (Array.isArray(j.houseAwayIso)) j.houseAwayIso.forEach(function (w) {   /* HOUSEAWAY1 · [startIso, endIso] pairs; junk is dropped */
+      if (!Array.isArray(w) || w.length !== 2) return;
+      var a = Date.parse(w[0]), b = Date.parse(w[1]);
+      if (isFinite(a) && isFinite(b) && b > a) HOUSE_AWAY.push([a, b]);
+    });
     var cm = j.changeMin; if (typeof cm === "number" && isFinite(cm) && cm === Math.floor(cm) && cm >= 0 && cm < 1440) CHANGE_MIN = cm;
     api.CHANGE_MIN = CHANGE_MIN;
   }
   function hasMonths() { return !!MONTHS; }
 
+  function houseAwayAt(ms) {   /* HOUSEAWAY1 · the window holding ms, or null */
+    for (var i = 0; i < HOUSE_AWAY.length; i++) if (ms >= HOUSE_AWAY[i][0] && ms < HOUSE_AWAY[i][1]) return HOUSE_AWAY[i];
+    return null;
+  }
   /* away at a clock moment; an unknown state (no calendar or day out of range) is not away */
   function isAwayAt(ms) {
     if (!MONTHS || !ms) return false;
+    if (houseAwayAt(ms)) return true;   /* HOUSEAWAY1 */
+    return flagAwayAt(ms);
+  }
+  function flagAwayAt(ms) {
     var c = ct(ms), w = withDan(c.iso);
     if (w === null) return false;
     if (!w) return true;
@@ -102,13 +119,24 @@
   /* no change minute in the feed: kid items on a switch day are hidden all day (Atlas); with it, isAwayAt decides */
   function hiddenSwitch(iso) { return !!MONTHS && CHANGE_MIN === null && isSwitchDay(iso); }
   /* an untimed (all-day) item on this date: away only when the whole day is away */
-  function isAwayDay(iso) { return withDan(iso) === false; }
+  function isAwayDay(iso) {
+    if (withDan(iso) === false) return true;
+    if (!MONTHS || !HOUSE_AWAY.length) return false;
+    var a = msAt(iso, 0), b = msAt(addDays(iso, 1), 0);   /* HOUSEAWAY1 · a whole day inside one window */
+    return HOUSE_AWAY.some(function (w) { return a >= w[0] && b <= w[1]; });
+  }
   function isAwayNow() { return isAwayAt(now()); }
   /* AWAYONE1 · when the away window that holds ms ends: the feed's change minute on the first home day after it (or that
      day's midnight when the feed gives none), or 0 when ms is not away or the calendar does not reach the end of the window.
      The hub reads it only as "away now". No hour is assumed here. */
   function awayUntil(ms) {
     if (!isAwayAt(ms)) return 0;
+    var hw = houseAwayAt(ms);   /* HOUSEAWAY1 · the window's end, or the day-flag away that carries on after it */
+    if (hw) { var seen = 0; while (hw && seen++ < 8) { var e = hw[1]; hw = houseAwayAt(e); if (!hw) return flagAwayAt(e) ? (flagUntil(e) || 0) : e; } return 0; }
+    return flagUntil(ms);
+  }
+  function flagUntil(ms) {
+    if (!flagAwayAt(ms)) return 0;
     var c = ct(ms), at = CHANGE_MIN === null ? 0 : CHANGE_MIN;
     if (withDan(c.iso) === true && CHANGE_MIN !== null && c.min < CHANGE_MIN) return msAt(c.iso, CHANGE_MIN);
     for (var i = 1; i <= 62; i++) {

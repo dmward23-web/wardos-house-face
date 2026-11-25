@@ -5,7 +5,34 @@
   var TZ = "America/Chicago";
   /* LIVEWX2 · one clock per page: when livinghouse/clock.js is loaded the header follows LHClock (so a ?now= still never shows two
      different times); absent = real time */
-  function cur() { var L = global.LHClock; return L && typeof L.now === "function" ? L.now() : new Date(); }
+  /* B6 · ?now= holds when freeze=1 (or rec=1). Pages with no HouseScene and no LHClock still follow it. */
+  var pinBase = null, pinWall = Date.now(), pinFreeze = false;
+  try {
+    var pinQ = new URLSearchParams(global.location && global.location.search || "");
+    var pinRaw = pinQ.get("now");
+    if (pinRaw) {
+      var pinDate = new Date(pinRaw);
+      if (!isNaN(+pinDate)) {
+        pinBase = +pinDate;
+        pinFreeze = pinQ.get("freeze") === "1" || pinQ.get("rec") === "1";
+      }
+    }
+  } catch (ePin) { /* no location: the live clock */ }
+  function pinnedDate() {
+    if (pinBase == null) return null;
+    return new Date(pinFreeze ? pinBase : Date.now() + (pinBase - pinWall));
+  }
+  function cur() {
+    var S = global.HouseScene;
+    if (S && typeof S.now === "function") {
+      try { var sd = S.now(); if (sd && !isNaN(+sd)) return new Date(+sd); } catch (e0) { /* fall through */ }
+    }
+    var L = global.LHClock;
+    if (L && typeof L.now === "function") {
+      try { var ld = L.now(); if (ld && !isNaN(+ld)) return new Date(+ld); } catch (e1) { /* fall through */ }
+    }
+    return pinnedDate() || new Date();
+  }
 
   function parts(date) {
     var d = date || cur();
@@ -122,8 +149,12 @@
     root = root || (typeof document !== "undefined" ? document : null);
     if (!root || !root.querySelectorAll) return stamp(cur());
     var s = stamp(cur());
-    root.querySelectorAll("[data-live-clock], [data-live='time'], [data-live='clock-time']").forEach(function (el) {
-      el.textContent = s.time || "";
+    root.querySelectorAll("[data-live-clock], [data-live='time'], [data-live='clock-time'], [data-kw-clock]").forEach(function (el) {
+      var dow = String(s.dow || "").replace(/\./g, "");
+      if (dow) dow = dow.charAt(0).toUpperCase() + dow.slice(1, 3).toLowerCase();
+      el.textContent = dow && s.time ? dow + " \u00b7 " + s.time : (s.time || "");
+      el.setAttribute("data-dow", s.dow || "");
+      el.setAttribute("data-date", s.dateLine || s.iso || "");
       if (el.tagName === "TIME") el.setAttribute("datetime", s.iso + "T" + (s.time || "").replace(" ", ""));
       el.setAttribute("title", "America/Chicago · " + s.long + " · " + (s.time || ""));
     });
@@ -134,7 +165,7 @@
     });
     root.querySelectorAll("[data-live='date-long']").forEach(function (el) {
       if (!el.closest || !el.closest(".hdr-date, .live-clock-host, header, footer, .ftr, .sec-hdr, .sec-meta")) return;
-      el.textContent = s.long || s.dateLine;
+      el.textContent = (el.closest(".hdr-date") && s.dateLine) ? s.dateLine : (s.long || s.dateLine);
     });
     /* DADFIX1 · always refresh date-short (Dad Today meta was stuck on Sun Sep 27) */
     root.querySelectorAll("[data-live='date-short']").forEach(function (el) {
@@ -148,9 +179,20 @@
     return s;
   }
 
+  function wakeLive() {
+    if (typeof document === "undefined") return;
+    paintLive(document);
+  }
+
   function startLive(ms) {
     if (typeof document === "undefined") return;
     paintLive(document);
+    if (typeof window !== "undefined" && !startLive.armed) {
+      startLive.armed = true;
+      document.addEventListener("visibilitychange", function () { if (!document.hidden) wakeLive(); });
+      window.addEventListener("focus", wakeLive);
+      window.addEventListener("pageshow", wakeLive);
+    }
     if (_liveTimer) return;
     _liveTimer = setInterval(function () { paintLive(document); }, ms || 1000);
   }
