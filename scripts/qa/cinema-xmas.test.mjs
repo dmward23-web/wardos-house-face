@@ -792,9 +792,10 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
       const r = el.getBoundingClientRect();
       return { x: r.x, y: r.y, w: r.width, h: r.height };
     }))()`);
-    /* The plate fills the viewport. Compare this classic frame to the next one outside that plate. */
+    /* The plate fills the viewport. The header band is the mark sweep. Compare the frame below that band. */
     const plate = (x, y) => !ui.some((r) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h);
-    const ignore = (x, y) => plate(x, y) || markPhase(x, y);
+    const header = (x, y) => y <= 220;
+    const ignore = (x, y) => plate(x, y) || header(x, y);
     let baseBuf = null;
     let defBuf = null;
     let basePng = null;
