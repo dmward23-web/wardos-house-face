@@ -15,8 +15,13 @@ for (const f of NINE) test("QA_NO_BROWSER=1 guard: " + f + ".test.mjs", () => {
   const lines = src.split("\n");
   assert.equal(lines.filter((l) => l.startsWith('const NO_BROWSER = process.env.QA_NO_BROWSER === "1";')).length, 1, "one NO_BROWSER flag");
   const req = lines.filter((l) => /puppeteer/.test(l) && /createRequire|require\(|import\(/.test(l));
-  assert.equal(req.length, 1, "one puppeteer load site");
-  assert.match(req[0], /^let pp = null; if \(!NO_BROWSER\) for \(/, "puppeteer-core load is behind !NO_BROWSER");
+  if (f === "framebudget1") {
+    assert.equal(req.length, 0, "framebudget launches through the CDP helper, not puppeteer");
+    assert.match(src, /import \{ launchChrome, openPage \} from "\.\/cdp-lite\.mjs"/);
+  } else {
+    assert.equal(req.length, 1, "one puppeteer load site");
+    assert.match(req[0], /^let pp = null; if \(!NO_BROWSER\) for \(/, "puppeteer-core load is behind !NO_BROWSER");
+  }
   assert.doesNotMatch(src, /^\s*import[^;\n]*["'](puppeteer|puppeteer-core|playwright)[^"']*["']/m, "no static browser import");
   assert.doesNotMatch(src, /(spawn|exec|execFile|spawnSync|execSync|execFileSync)\s*\([^)]*(chrom|puppeteer|playwright)/i, "no spawn/exec of a browser");
   assert.equal(lines.filter((l) => /^const CHROME = NO_BROWSER \? null : \(/.test(l)).length, 1, "CHROME is null under QA_NO_BROWSER=1");
@@ -24,7 +29,7 @@ for (const f of NINE) test("QA_NO_BROWSER=1 guard: " + f + ".test.mjs", () => {
   if (skipDecl) assert.match(skipDecl, /^const SKIP = NO_BROWSER \? "SKIP QA_NO_BROWSER=1 \(no Chrome launch\)" : /);
   /* every launch / dynamic page work sits inside a test whose options carry that skip */
   const starts = [...src.matchAll(/^(?:for \([^\n]*?\) )?test\(/gm)].map((m) => m.index);
-  const launches = [...src.matchAll(/\bpp\.launch\(|\.launch\(\{/g)].map((m) => m.index);
+  const launches = [...src.matchAll(f === "framebudget1" ? /\blaunchChrome\(/g : /\bpp\.launch\(|\.launch\(\{/g)].map((m) => m.index);
   assert.ok(launches.length >= 1, "file does launch Chrome when allowed");
   const gated = (at, why) => {
     const st = starts.filter((s) => s < at).pop();
