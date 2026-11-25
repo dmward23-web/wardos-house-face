@@ -31,6 +31,7 @@ serial=(
   scripts/qa/contentgate.test.mjs
   scripts/qa/coversync1.test.mjs
   scripts/qa/nowfreeze1.test.mjs
+  scripts/qa/pass2-dec4.test.mjs
 )
 block=()
 for f in scripts/qa/*.test.mjs; do
@@ -56,6 +57,9 @@ jobs="$(nproc)"
 [ "${1:-}" = "--serial" ] && jobs=1
 run_files "$jobs" "${block[@]}" 2>&1 | tee "$out"
 rc=${PIPESTATUS[0]}
+# xargs reports 123 when a file's node --test exits non-zero. The suite's own
+# contract, checked by the runner guard, is that a failing test exits 1.
+[ "$rc" -eq 123 ] && rc=1
 present=()
 for s in "${serial[@]}"; do
   if [ -f "$s" ]; then present+=("$s"); fi
@@ -65,6 +69,7 @@ if [ "${#present[@]}" -gt 0 ]; then
   serial_out="$(mktemp -t wardos-qa-serial-XXXXXX)"
   run_files 1 "${present[@]}" 2>&1 | tee "$serial_out"
   serial_rc=${PIPESTATUS[0]}
+  [ "$serial_rc" -eq 123 ] && serial_rc=1
   cat "$serial_out" >> "$out"
   rm -f "$serial_out"
   if [ "$rc" -eq 0 ] && [ "$serial_rc" -ne 0 ]; then rc=$serial_rc; fi
