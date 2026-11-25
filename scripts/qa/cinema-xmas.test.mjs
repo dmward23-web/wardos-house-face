@@ -477,6 +477,7 @@ function launchChrome() {
       "--window-size=1920,1080", "--force-device-scale-factor=1",
       "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
       "--hide-scrollbars", "--mute-audio", "--disable-gpu-sandbox",
+      "--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows",
       "about:blank"
     ], { stdio: ["ignore", "pipe", "pipe"] });
     let buf = "";
@@ -655,6 +656,20 @@ async function openPage(port, url, extraScript, media) {
       const r = await c.send("Page.captureScreenshot", { format: "png" });
       return Buffer.from(r.data, "base64");
     },
+    async goto(url, extra, media) {
+      if (this._nowebgl) {
+        await c.send("Page.removeScriptToEvaluateOnNewDocument", { identifier: this._nowebgl });
+        this._nowebgl = "";
+      }
+      if (extra) {
+        const added = await c.send("Page.addScriptToEvaluateOnNewDocument", { source: extra });
+        this._nowebgl = added.identifier;
+      }
+      await c.send("Emulation.setEmulatedMedia", media ? { features: media } : { media: "", features: [] });
+      const loaded = c.wait("Page.loadEventFired", 30000);
+      await c.send("Page.navigate", { url });
+      await loaded;
+    },
     close() { try { ws.close(); } catch (e) { /* closed */ } }
   };
 }
@@ -667,10 +682,16 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
   const chrome = await launchChrome();
   const pages = [];
   try {
+    let shared = null;
     async function page(path, extra, media) {
-      const p = await openPage(chrome.port, base + path, extra, media);
-      pages.push(p);
-      return p;
+      const url = base + path;
+      if (!shared) {
+        shared = await openPage(chrome.port, url, extra, media);
+        pages.push(shared);
+        return shared;
+      }
+      await shared.goto(url, extra, media);
+      return shared;
     }
     const snapExpr = `(() => {
       function hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(16); }
@@ -740,7 +761,6 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     const defNet = await def.eval(`(performance.getEntriesByType("resource").map((e) => e.name).concat(window.__net || [])).join("\\n")`);
     assert.doesNotMatch(defNet, /wardos-scene|vendor\/three|art\/cinema/i);
     assert.equal(await def.eval(`document.documentElement.getAttribute("data-look")`), null);
-    def.close();
 
     const high = await page("/wall.html?look=cinema&fps=1&q=high&now=2026-11-26T18:00:00-06:00");
     await high.eval(`new Promise((res) => {
@@ -793,76 +813,6 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     assert.equal(snow.mask, true, "pane mask never loaded");
     assert.ok(snow.vis > 0, "no GL snow on the glass at all");
     assert.ok(snow.px.x0 >= 480 && snow.px.x1 <= 800 && snow.px.y0 >= 0 && snow.px.y1 <= 700, "snow box drifted off the window: " + JSON.stringify(snow.px));
-    /* COATWIN1 + COATWIN2 + PANEMASK1: at the Dec freeze under cinema the December coat paints ONLY snow on Prism's glass and the sill bank.
-       The test loads the pinned pane mask itself (white = glass) and checks real coat pixels against it:
-       - every painted coat pixel is on the glass or in WardosScene.PANE_SILL (no glow orb, stick trees or lit windows over the room);
-       - flakes move between two reads 500 ms apart, and every moved pixel is on the glass (none on a mullion, muntin or the garland);
-       - the sill row is painted across at least 80% of the window, and the coat is still its one canvas. */
-    await high.eval(`window.__rafKeep = window.requestAnimationFrame; window.requestAnimationFrame = function () { return 0; };`);
-    const decw = await page("/wall.html?look=cinema&q=still&now=2026-12-04T18:00:00-06:00");
-    await decw.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => { if (document.querySelector("#km-coat canvas") && window.WardosScene && window.WardosScene.paneMask && window.WardosScene.paneMask()) return res(true); if (performance.now() - t0 > 8000) return res(false); setTimeout(step, 50); }; step(); })`);
-    await decw.eval(`new Promise((r) => setTimeout(r, 800))`);
-    const coat = await decw.eval(`new Promise((res) => {
-      const img = new Image();
-      img.onload = () => {
-        const cv = document.querySelector("#km-coat canvas"), S = window.WardosScene, l = S.PANE_SILL;
-        const m = document.createElement("canvas"); m.width = 1920; m.height = 1080;
-        const mg = m.getContext("2d"); mg.drawImage(img, 0, 0); const md = mg.getImageData(0, 0, 1920, 1080).data;
-        const kx = cv.width / 1920, ky = cv.height / 1080, g = cv.getContext("2d");
-        const glass = (x, y) => { const X = Math.floor(x / kx), Y = Math.floor(y / ky); return X >= 0 && Y >= 0 && X < 1920 && Y < 1080 && md[(Y * 1920 + X) * 4] > 127; };
-        const onSill = (x, y) => x >= l.x0 * kx && x < l.x1 * kx && y >= l.y0 * ky && y < l.y1 * ky;
-        const sillY = Math.floor((l.y1 - 2) * ky);
-        const a = g.getImageData(0, 0, cv.width, cv.height).data;
-        const au = new Uint32Array(a.buffer, a.byteOffset, a.length >> 2);
-        let paintGlass = 0, paintSill = 0, paintOut = 0, sillRow = 0;
-        for (let p = 0; p < au.length; p++) {
-          if ((au[p] >>> 24) === 0) continue;
-          const x = p % cv.width, y = (p / cv.width) | 0;
-          if (glass(x, y)) paintGlass++; else if (onSill(x, y)) paintSill++; else paintOut++;
-          if (y === sillY && onSill(x, y)) sillRow++;
-        }
-        setTimeout(() => {
-          const z = g.getImageData(0, 0, cv.width, cv.height).data;
-          const zu = new Uint32Array(z.buffer, z.byteOffset, z.length >> 2);
-          let inside = 0, outside = 0, sillMoved = 0;
-          for (let p = 0; p < au.length; p++) {
-            if (au[p] === zu[p]) continue;
-            const x = p % cv.width, y = (p / cv.width) | 0;
-            if (glass(x, y)) inside++; else { outside++; if (onSill(x, y)) sillMoved++; }
-          }
-          res({ theme: document.documentElement.getAttribute("data-month-theme"), bbox: S.PANE_BBOX, sill: l, loaded: S.paneMask().bbox,
-            inside, outside, sillMoved, paintGlass, paintSill, paintOut, sillRow, sillMin: Math.ceil(0.8 * (l.x1 - l.x0) * kx), kids: cv.parentNode.children.length });
-        }, 500);
-      };
-      img.onerror = () => res(null);
-      img.src = "art/cinema/xmas-2026/window-pane-alpha-1920x1080.png";
-    })`, 40000);
-    assert.ok(coat, "the pinned pane mask did not load in the page");
-    assert.equal(coat.theme, "12", "Dec freeze did not put the December coat up");
-    assert.deepEqual(coat.bbox, { x0: 482, x1: 765, y0: 0, y1: 696 });
-    assert.deepEqual(coat.loaded, coat.bbox, "PANE_BBOX is not the loaded mask's glass box");
-    assert.deepEqual(coat.sill, { x0: 482, x1: 765, y0: 694, y1: 706 });
-    assert.ok(coat.inside > 0, "December still snows, on the glass: no coat flake moved on the window");
-    /* SILLFLAT1: the sill bank must be byte-stable between reads; a canvas gradient re-dithered on a GPU canvas and moved a whole sill row (cloud 67be327a: outside 283) */
-    assert.equal(coat.sillMoved, 0, "the sill bank changed between two reads (gradient re-dither or an animated sill)");
-    assert.equal(coat.outside, 0, "December coat snow is falling off the glass under cinema (room, mullion, muntin or garland)");
-    assert.equal(coat.paintOut, 0, "December coat paints off the glass and sill under cinema (glow, trees or lit windows over the room)");
-    assert.ok(coat.paintGlass > 0, "no coat snow painted on the glass");
-    assert.ok(coat.sillRow >= coat.sillMin, "the sill bank is missing: " + JSON.stringify({ sillRow: coat.sillRow, sillMin: coat.sillMin }));
-    assert.equal(coat.kids, 1, "the cinema coat grew extra nodes");
-    fs.writeFileSync(path.join(ART, "cinema-dec-coat.png"), await decw.shot());
-    decw.close();
-    await high.eval(`window.requestAnimationFrame = window.__rafKeep;`);
-
-    const live = await page("/wall.html");
-    await live.eval(`new Promise((r) => setTimeout(r, 400))`);
-    const liveSnap = await live.eval(snapExpr);
-    const highSnap = await high.eval(snapExpr);
-    const missing = liveSnap.rows.filter((row) => !highSnap.rows.includes(row));
-    assert.deepEqual(missing, [], "cinema dropped visible rows");
-    assert.deepEqual(highSnap.more, liveSnap.more);
-    assert.ok(highSnap.rows.some((r) => r.startsWith("wardos-scene|")));
-    live.close();
 
     const layout = await high.eval(`(() => {
       const tap = [];
@@ -951,6 +901,76 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     })()`);
     assert.deepEqual(camoCss, []);
 
+    const highSnap = await high.eval(snapExpr);
+    /* COATWIN1 + COATWIN2 + PANEMASK1: at the Dec freeze under cinema the December coat paints ONLY snow on Prism's glass and the sill bank.
+       The test loads the pinned pane mask itself (white = glass) and checks real coat pixels against it:
+       - every painted coat pixel is on the glass or in WardosScene.PANE_SILL (no glow orb, stick trees or lit windows over the room);
+       - flakes move between two reads 500 ms apart, and every moved pixel is on the glass (none on a mullion, muntin or the garland);
+       - the sill row is painted across at least 80% of the window, and the coat is still its one canvas. */
+    const decw = await page("/wall.html?look=cinema&q=still&now=2026-12-04T18:00:00-06:00");
+    await decw.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => { if (document.querySelector("#km-coat canvas") && window.WardosScene && window.WardosScene.paneMask && window.WardosScene.paneMask()) return res(true); if (performance.now() - t0 > 8000) return res(false); setTimeout(step, 50); }; step(); })`);
+    await decw.eval(`new Promise((r) => setTimeout(r, 800))`);
+    const coat = await decw.eval(`new Promise((res) => {
+      const img = new Image();
+      img.onload = () => {
+        const cv = document.querySelector("#km-coat canvas"), S = window.WardosScene, l = S.PANE_SILL;
+        const m = document.createElement("canvas"); m.width = 1920; m.height = 1080;
+        const mg = m.getContext("2d"); mg.drawImage(img, 0, 0); const md = mg.getImageData(0, 0, 1920, 1080).data;
+        const kx = cv.width / 1920, ky = cv.height / 1080, g = cv.getContext("2d");
+        const glass = (x, y) => { const X = Math.floor(x / kx), Y = Math.floor(y / ky); return X >= 0 && Y >= 0 && X < 1920 && Y < 1080 && md[(Y * 1920 + X) * 4] > 127; };
+        const onSill = (x, y) => x >= l.x0 * kx && x < l.x1 * kx && y >= l.y0 * ky && y < l.y1 * ky;
+        const sillY = Math.floor((l.y1 - 2) * ky);
+        const keepRAF = window.requestAnimationFrame;
+        window.requestAnimationFrame = function () { return 0; };
+        const a = g.getImageData(0, 0, cv.width, cv.height).data;
+        const au = new Uint32Array(a.buffer, a.byteOffset, a.length >> 2);
+        let paintGlass = 0, paintSill = 0, paintOut = 0, sillRow = 0;
+        for (let p = 0; p < au.length; p++) {
+          if ((au[p] >>> 24) === 0) continue;
+          const x = p % cv.width, y = (p / cv.width) | 0;
+          if (glass(x, y)) paintGlass++; else if (onSill(x, y)) paintSill++; else paintOut++;
+          if (y === sillY && onSill(x, y)) sillRow++;
+        }
+        window.requestAnimationFrame = keepRAF;
+        window.dispatchEvent(new Event("resize"));
+        setTimeout(() => {
+          window.requestAnimationFrame = function () { return 0; };
+          const z = g.getImageData(0, 0, cv.width, cv.height).data;
+          const zu = new Uint32Array(z.buffer, z.byteOffset, z.length >> 2);
+          let inside = 0, outside = 0, sillMoved = 0;
+          for (let p = 0; p < au.length; p++) {
+            if (au[p] === zu[p]) continue;
+            const x = p % cv.width, y = (p / cv.width) | 0;
+            if (glass(x, y)) inside++; else { outside++; if (onSill(x, y)) sillMoved++; }
+          }
+          res({ theme: document.documentElement.getAttribute("data-month-theme"), bbox: S.PANE_BBOX, sill: l, loaded: S.paneMask().bbox,
+            inside, outside, sillMoved, paintGlass, paintSill, paintOut, sillRow, sillMin: Math.ceil(0.8 * (l.x1 - l.x0) * kx), kids: cv.parentNode.children.length });
+        }, 500);
+      };
+      img.onerror = () => res(null);
+      img.src = "art/cinema/xmas-2026/window-pane-alpha-1920x1080.png";
+    })`, 40000);
+    assert.ok(coat, "the pinned pane mask did not load in the page");
+    assert.equal(coat.theme, "12", "Dec freeze did not put the December coat up");
+    assert.deepEqual(coat.bbox, { x0: 482, x1: 765, y0: 0, y1: 696 });
+    assert.deepEqual(coat.loaded, coat.bbox, "PANE_BBOX is not the loaded mask's glass box");
+    assert.deepEqual(coat.sill, { x0: 482, x1: 765, y0: 694, y1: 706 });
+    assert.ok(coat.inside > 0, "December still snows, on the glass: no coat flake moved on the window");
+    /* SILLFLAT1: the sill bank must be byte-stable between reads; a canvas gradient re-dithered on a GPU canvas and moved a whole sill row (cloud 67be327a: outside 283) */
+    assert.equal(coat.sillMoved, 0, "the sill bank changed between two reads (gradient re-dither or an animated sill)");
+    assert.equal(coat.outside, 0, "December coat snow is falling off the glass under cinema (room, mullion, muntin or garland)");
+    assert.equal(coat.paintOut, 0, "December coat paints off the glass and sill under cinema (glow, trees or lit windows over the room)");
+    assert.ok(coat.paintGlass > 0, "no coat snow painted on the glass");
+    assert.ok(coat.sillRow >= coat.sillMin, "the sill bank is missing: " + JSON.stringify({ sillRow: coat.sillRow, sillMin: coat.sillMin }));
+    assert.equal(coat.kids, 1, "the cinema coat grew extra nodes");
+    fs.writeFileSync(path.join(ART, "cinema-dec-coat.png"), await decw.shot());
+    const live = await page("/wall.html");
+    await live.eval(`new Promise((r) => setTimeout(r, 400))`);
+    const liveSnap = await live.eval(snapExpr);
+    const missing = liveSnap.rows.filter((row) => !highSnap.rows.includes(row));
+    assert.deepEqual(missing, [], "cinema dropped visible rows");
+    assert.deepEqual(highSnap.more, liveSnap.more);
+    assert.ok(highSnap.rows.some((r) => r.startsWith("wardos-scene|")));
     const low = await page("/wall.html?look=cinema&q=low");
     await low.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => { const s = document.getElementById("wardos-scene"); if (s && s.getAttribute("data-q") === "low") return res(true); if (performance.now() - t0 > 6000) return res(false); setTimeout(step, 40); }; step(); })`);
     const lowState = await low.eval(`({ q: document.getElementById("wardos-scene").getAttribute("data-q"), grade: document.getElementById("wardos-scene").getAttribute("data-grade"), source: document.getElementById("wardos-scene").getAttribute("data-source") })`);
@@ -961,7 +981,6 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     assert.equal(lowSnow && lowSnow.opacity, 0.72);
     await plated(low, "low");
     fs.writeFileSync(path.join(ART, "cinema-low.png"), await low.shot());
-    low.close();
 
     const still = await page("/wall.html?look=cinema&q=still");
     await still.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => { const s = document.getElementById("wardos-scene"); if (s && s.getAttribute("data-q") === "still") return res(true); if (performance.now() - t0 > 6000) return res(false); setTimeout(step, 40); }; step(); })`);
@@ -993,7 +1012,6 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     await lost.eval(`window.__wardosScene.debugForce("video")`);
     assert.equal(await lost.eval(`document.getElementById("wardos-scene").getAttribute("data-q")`), "still");
     assert.equal(await lost.eval(`!!document.querySelector("#ui .chip")`), true);
-    lost.close();
 
     const noGl = await page("/wall.html?look=cinema&q=high", NOWEBGL);
     await noGl.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => { const s = document.getElementById("wardos-scene"); if (s && s.getAttribute("data-fallback")) return res(s.getAttribute("data-fallback")); if (performance.now() - t0 > 8000) return res(""); setTimeout(step, 40); }; step(); })`);
@@ -1005,15 +1023,11 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     const gNo = groundStats(decodePng(noBuf), 200, 200, 1000, 500);
     assert.ok(gNo.mean > 12 && gNo.variance > 8, JSON.stringify(gNo));
     assert.equal(await noGl.eval(`!!document.getElementById("chip-kids")`), true);
-    noGl.close();
 
     const dec = await page("/wall.html?look=cinema&now=2026-12-25T18:00:00-06:00&q=still");
     const decTheme = await dec.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => { const v = document.documentElement.getAttribute("data-month-theme"); if (v) return res(v); if (performance.now() - t0 > 5000) return res(""); setTimeout(step, 40); }; step(); })`);
     assert.equal(decTheme, "12");
     assert.equal(await dec.eval(`!!document.querySelector(".km-layer")`), true);
-    dec.close();
-    still.close();
-    high.close();
   } finally {
     for (const p of pages) p.close();
     chrome.proc.kill("SIGKILL");
