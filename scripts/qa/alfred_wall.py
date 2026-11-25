@@ -425,7 +425,7 @@ try:
                     except Exception:
                         pass
                     home = pg.url
-            hits.append({"at": [x, y], "dest": dest, "url": url, "hit": hit, "home": home, "homeBox": home_box, "money": any(bad in url for bad in ("sheet-dan", "sheet-allowance.html"))})
+            hits.append({"kind": spot["kind"], "at": [x, y], "dest": dest, "url": url, "hit": hit, "home": home, "homeBox": home_box, "money": any(bad in url for bad in ("sheet-dan", "sheet-allowance.html"))})
         out["doors"] = hits
     elif MODE == "census":
         pages = []

@@ -29,6 +29,7 @@ test("hub doors take real clicks at the four tile centers and home returns", SKI
   const r = await run("doors");
   for (const door of r.doors) {
     assert.ok(door.hit.door, JSON.stringify(door));
+    if (door.kind === "center") assert.doesNotMatch(door.hit.cls || "", /roster-plate/, JSON.stringify(door));
     assert.equal(door.hit.panel, false, JSON.stringify(door.hit));
     assert.ok(door.url.includes(door.dest), JSON.stringify(door));
     assert.equal(door.money, false, JSON.stringify(door));

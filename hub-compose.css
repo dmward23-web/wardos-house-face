@@ -59,6 +59,7 @@ html body .tile.dan .roster-plate[data-dad-stage] {
   height: 160px !important;
 }
 html body .roster-plate {
+  pointer-events: none;
   position: absolute !important;
   left: 16px !important;
   bottom: 16px !important;

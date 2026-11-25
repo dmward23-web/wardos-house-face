@@ -51,9 +51,17 @@ export FILE_DEADLINE=960
 export DEPS
 run_files() {
   local jobs="$1"; shift
-  printf '%s\n' "$@" | xargs -r -P "$jobs" -I{} bash -c 'timeout -k 10 "$FILE_DEADLINE" env NODE_PATH="$DEPS" node --test "$1"' _ {}
+  # Node's own default is nproc-1. One full nproc of files at once is what
+  # made the poster-timing browser tests miss their existing budgets.
+  printf '%s\n' "$@" | xargs -r -P "$jobs" -I{} bash -c '
+    timeout -k 10 "$FILE_DEADLINE" env NODE_PATH="$DEPS" node --test "$1"
+    status=$?
+    if [ "$status" -eq 124 ]; then echo "DEADLINE $1" >&2; fi
+    exit "$status"
+  ' _ {}
 }
-jobs="$(nproc)"
+jobs=$(( $(nproc) - 1 ))
+[ "$jobs" -lt 1 ] && jobs=1
 [ "${1:-}" = "--serial" ] && jobs=1
 run_files "$jobs" "${block[@]}" 2>&1 | tee "$out"
 rc=${PIPESTATUS[0]}

@@ -1285,6 +1285,8 @@ test("a failed Chrome launch still lets the test exit", () => {
 test("run-tests.sh gives each file a deadline so a leak fails red", () => {
   const sh = fs.readFileSync(path.join(ROOT, "scripts/qa/run-tests.sh"), "utf8");
   assert.match(sh, /timeout -k 10 "\$FILE_DEADLINE"/);
+  assert.match(sh, /echo "DEADLINE \$1"/);
+  assert.match(sh, /nproc\) - 1/);
   const hung = spawnSync("timeout", ["-k", "2", "2", process.execPath, "-e", "setInterval(() => {}, 1000)"], { encoding: "utf8", timeout: 10000 });
   assert.notEqual(hung.status, 0, "a process that never exits still returned 0");
 });
@@ -1301,11 +1303,12 @@ test("browser: ?gl=soft live loop returns to the poster within 3 frames and then
     const hook = `(() => {
       const raf = window.requestAnimationFrame.bind(window);
       const origTimeout = window.setTimeout.bind(window);
-      window.__rafN = 0; window.__gap = 0; window.__retryFrames = 0; window.__burstGap = 0; window.__burstLast = 0; window.__inBurst = false;
+      window.__rafN = 0; window.__gap = 0; window.__retryFrames = 0; window.__burstGap = 0; window.__burstLast = 0; window.__inBurst = false; window.__fbRetryShort = 0;
       let last = 0;
       window.setTimeout = (fn, ms, ...rest) => {
-        const delay = (ms === 60000 && typeof fn === "function" && /fbRetry/.test(Function.prototype.toString.call(fn))) ? 250 : ms;
-        return origTimeout(fn, delay, ...rest);
+        const shorten = ms === 60000 && typeof fn === "function" && /fbRetry/.test(Function.prototype.toString.call(fn));
+        if (shorten) window.__fbRetryShort++;
+        return origTimeout(fn, shorten ? 250 : ms, ...rest);
       };
       window.requestAnimationFrame = (cb) => {
         window.__rafN++;
@@ -1363,11 +1366,11 @@ test("browser: ?gl=soft live loop returns to the poster within 3 frames and then
       setTimeout(step, 100);
     }; step(); })`, 20000);
     const baseGap = baseGaps.length ? Math.max(...baseGaps) : 0;
-    /* The 60s idle is not this gap: __burstGap only counts frames while the retry is live.
-       A software draw inside that burst is the frame the governor stops, so it can exceed 500.
-       Once the poster is back, no later gap may. The pass-1 wall never posters, so the same
-       cap fails there. */
-    assert.ok(burstGap > 0 && burstGap < 10000, "retry burst gap " + burstGap);
+    /* __burstGap is only the live retry frames, not the idle minute. Those draws
+       stay within 2500 ms. After the poster returns, no gap may exceed 500 ms.
+       The pass-1 wall never posters, so that 500 ms cap fails there. */
+    assert.ok((await p.eval(`window.__fbRetryShort`)) >= 1, "the fbRetry hook never shortened the 60 s timer");
+    assert.ok(burstGap > 0 && burstGap <= 2500, "retry burst gap " + burstGap);
     assert.ok(after.gap <= 500, "gap after the poster returned " + after.gap);
     assert.ok(baseGap > 500, "base wall inter-frame gap " + baseGap + " did not fail the 500 ms cap");
     fs.mkdirSync(ART, { recursive: true });
