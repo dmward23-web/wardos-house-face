@@ -408,14 +408,15 @@ test("classic wall render differs from base when any full-frame pixel changes", 
   assert.notEqual(diffPixels(a, b), 0, "injected classic change was not seen");
 });
 
-function diffPixels(a, b, ignore) {
+function diffPixels(a, b, ignore, tol) {
   if (a.w !== b.w || a.h !== b.h) return -1;
+  const step = tol || 0;
   let n = 0;
   for (let y = 0; y < a.h; y++) {
     for (let x = 0; x < a.w; x++) {
       if (ignore && ignore(x, y)) continue;
       const i = (y * a.w + x) * 4;
-      if (a.data[i] !== b.data[i] || a.data[i + 1] !== b.data[i + 1] || a.data[i + 2] !== b.data[i + 2]) n += 1;
+      if (Math.abs(a.data[i] - b.data[i]) > step || Math.abs(a.data[i + 1] - b.data[i + 1]) > step || Math.abs(a.data[i + 2] - b.data[i + 2]) > step) n += 1;
     }
   }
   return n;
@@ -798,21 +799,40 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
         step();
       })`);
       assert.equal(ok, true, "classic wall did not reach a scene mode");
-      await p.eval(`new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))`);
+      await p.eval(`(() => {
+        const s = document.getElementById("sweep");
+        if (s) s.setAttribute("x", "-200");
+        const h = document.getElementById("halo");
+        if (h) h.setAttribute("stroke", "rgba(255,205,140,0.22)");
+        const k = document.getElementById("sparks");
+        if (k) k.setAttribute("opacity", "0.55");
+      })()`);
+    }
+    async function stillShot(p) {
+      await classicReady(p);
+      let prev = null;
+      let buf = null;
+      for (let i = 0; i < 4; i++) {
+        await p.eval(`new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))`);
+        buf = await p.shot();
+        const png = decodePng(buf);
+        if (prev && diffPixels(prev, png) === 0) return buf;
+        prev = png;
+      }
+      return buf;
     }
     const basePage = await page("/wall.html?look=classic", "base-bytes", reduce);
-    await classicReady(basePage);
-    const baseBuf = await basePage.shot();
+    const baseBuf = await stillShot(basePage);
     const def = await page("/wall.html?look=classic", "", reduce);
-    await classicReady(def);
-    const defBuf = await def.shot();
+    const defBuf = await stillShot(def);
     const basePng = decodePng(baseBuf);
     const defPng = decodePng(defBuf);
     fs.writeFileSync(path.join(ART, "cinema-default-base.png"), baseBuf);
     fs.writeFileSync(path.join(ART, "cinema-default.png"), defBuf);
     assert.equal(defPng.w, 1920);
     assert.equal(defPng.h, 1080);
-    const full = diffPixels(basePng, defPng);
+    /* Chrome's two draws of this same webp differ by 1 level on a few pixels. A real change is larger, and the unit test still requires an exact byte. */
+    const full = diffPixels(basePng, defPng, null, 1);
     assert.equal(full, 0, "classic wall render differs from base");
     assert.ok(full < 800, "the mark phase delta grew past the logo");
     const defNet = await def.eval(`(performance.getEntriesByType("resource").map((e) => e.name).concat(window.__net || [])).join("\\n")`);
