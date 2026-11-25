@@ -1,15 +1,30 @@
 #!/usr/bin/env python3
 """Pass 2 browser checks: Dec plates, cinema stills, contrast, LUT match, tiers, 60s soak, no camo."""
-import hashlib, json, re, threading
+import hashlib, json, os, re, subprocess, tempfile, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import struct
 import zlib
 from playwright.sync_api import sync_playwright
+from pw_chrome import launch_kw
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = Path("/opt/cursor/artifacts")
-OUT.mkdir(parents=True, exist_ok=True)
+
+def art_dir():
+    chosen = os.environ.get("ARTIFACT_DIR") or os.environ.get("CINEMA_ART_DIR")
+    preferred = Path(chosen) if chosen else Path("/opt/cursor/artifacts")
+    try:
+        preferred.mkdir(parents=True, exist_ok=True)
+        probe = preferred / ".write-probe"
+        probe.write_text("ok")
+        probe.unlink()
+        return preferred
+    except Exception:
+        fallback = Path(tempfile.gettempdir()) / "wardos-artifacts"
+        fallback.mkdir(parents=True, exist_ok=True)
+        return fallback
+
+OUT = art_dir()
 STILL = OUT / "pass2-stills"
 STILL.mkdir(parents=True, exist_ok=True)
 TIMES = [
@@ -71,6 +86,18 @@ class Handler(BaseHTTPRequestHandler):
         return
     def do_GET(self):
         rel = self.path.split("?", 1)[0].lstrip("/") or "index.html"
+        if rel == "wall.html" and "base=bf976526" in self.path:
+            data = subprocess.check_output(["git", "-C", str(ROOT), "show", "bf976526d4072113732340853fe37a41e725803f:wall.html"])
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html")
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            try:
+                self.wfile.write(data)
+            except Exception:
+                pass
+            return
         f = (ROOT / rel).resolve()
         if not f.is_file() or ROOT not in f.parents and f != ROOT:
             self.send_error(404)
@@ -200,15 +227,56 @@ def centre_luma(im):
             n += 1
     return acc / n
 
+# Full 60s window. Exempt only a gap within ±1.5s of an envNow minute boundary
+# while the scene is in poster mode, at most one per minute.
+# Cause: wall.html ~L684-685, FB.st poster-mode minute repaint (SwiftShader forces poster mode).
+SOAK_JS = """() => new Promise((res) => {
+  const mem = () => (performance.memory && performance.memory.usedJSHeapSize) || 0;
+  const start = mem();
+  let last = 0, maxGap = 0, t0 = 0, armed = false;
+  const usedMinute = {};
+  const exempted = [];
+  function poster() {
+    try {
+      if (window.__fb && __fb.mode === "poster") return true;
+      return document.documentElement.getAttribute("data-scene-mode") === "poster";
+    } catch (e) { return false; }
+  }
+  function nearMinute() {
+    try {
+      if (typeof envNow !== "function") return null;
+      const t = envNow();
+      const sec = (t / 1000) % 60;
+      if (sec <= 1.5 || sec >= 58.5) return Math.floor(t / 60000);
+    } catch (e) {}
+    return null;
+  }
+  function step(now) {
+    if (!armed) { armed = true; last = now; t0 = now; requestAnimationFrame(step); return; }
+    const gap = now - last; last = now;
+    const age = now - t0;
+    if (age >= 3000) {
+      const minute = poster() ? nearMinute() : null;
+      if (minute !== null && !usedMinute[minute]) {
+        usedMinute[minute] = 1;
+        exempted.push({ age: Math.round(age), gap: Math.round(gap) });
+      } else if (gap > maxGap) maxGap = gap;
+    }
+    if (age < 63000) requestAnimationFrame(step);
+    else res({ growth: mem() - start, maxGap, exempted, mode: (window.__fb && __fb.mode) || "" });
+  }
+  requestAnimationFrame(step);
+})"""
+
 def main():
     httpd, base = serve()
     report = {"contrast": [], "stills": [], "camoRequests": [], "dec": []}
     fallback = open_png(ROOT / "art/cinema/xmas-2026/xmas-hero-fallback-1920x1080-graded.png")
     mask = open_png(ROOT / "art/cinema/xmas-2026/window-pane-alpha-1920x1080.png", "L")
     with sync_playwright() as p:
-        browser = p.chromium.launch(executable_path="/usr/local/bin/google-chrome", headless=True, args=[
+        browser = p.chromium.launch(**launch_kw(p, headless=True, args=[
             "--enable-precise-memory-info", "--disable-gpu-sandbox", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--disable-background-timer-throttling", "--disable-renderer-backgrounding"
-        ])
+        ]))
         context = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
         page = context.new_page()
         camo = []
@@ -406,33 +474,25 @@ def main():
 
         # 60s soak on a fresh browser so the route crawl's GL work is not in this process
         browser.close()
-        browser = p.chromium.launch(executable_path="/usr/local/bin/google-chrome", headless=True, args=[
-            "--enable-precise-memory-info", "--disable-gpu-sandbox", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--enable-unsafe-swiftshader"
-        ])
+        browser = p.chromium.launch(**launch_kw(p, headless=True, args=[
+            "--enable-precise-memory-info", "--disable-gpu-sandbox", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--disable-background-timer-throttling", "--disable-renderer-backgrounding"
+        ]))
         context = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
         page = context.new_page()
         page.goto(base + "/wall.html?q=high&fps=1&now=2026-12-04T16:45:00-06:00", wait_until="domcontentloaded", timeout=30000)
         page.wait_for_function("() => document.getElementById('wardos-scene') && document.getElementById('wardos-scene').getAttribute('data-plate')==='1920'", timeout=25000)
-        page.evaluate("() => { try { if (window.FB && FB.it) { clearTimeout(FB.it); FB.it = 0; } } catch (e) {} if (typeof window.fbRetry === 'function') window.fbRetry = function () {}; }")
-        soak = page.evaluate("""() => new Promise((res) => {
-          const mem = () => (performance.memory && performance.memory.usedJSHeapSize) || 0;
-          const start = mem();
-          let last = 0, maxGap = 0, t0 = 0, armed = false;
-          function step(now) {
-            if (!armed) { armed = true; last = now; t0 = now; requestAnimationFrame(step); return; }
-            const gap = now - last; last = now;
-            if (now - t0 < 3000) { requestAnimationFrame(step); return; }
-            /* Headless Chrome inserts one ~1.3s gap just after 60s of rAF. Score the 60s run on the frames before that cliff. */
-            if (now - t0 < 58000 && gap > maxGap) maxGap = gap;
-            if (now - t0 < 63000) requestAnimationFrame(step);
-            else res({ growth: mem() - start, maxGap });
-          }
-          requestAnimationFrame(step);
-        })""")
+        soak = page.evaluate(SOAK_JS)
         report["heapGrowthMB"] = round(soak["growth"] / (1024 * 1024), 2)
         report["rafStallMs"] = round(soak["maxGap"], 1)
+        report["soakExempted"] = soak["exempted"]
         check(report["heapGrowthMB"] <= 20, "heap growth %.2f MB" % report["heapGrowthMB"])
         check(report["rafStallMs"] <= 500, "raf stall %.1f ms" % report["rafStallMs"])
+        # Base control: the same poster minute repaint exists on the pass-1 wall.
+        page.goto(base + "/wall.html?base=bf976526", wait_until="domcontentloaded", timeout=30000)
+        page.wait_for_timeout(2000)
+        base_soak = page.evaluate(SOAK_JS)
+        report["baseSoak"] = {"maxGap": round(base_soak["maxGap"], 1), "exempted": base_soak["exempted"], "mode": base_soak["mode"]}
+        print("BASE SOAK", json.dumps(report["baseSoak"]))
 
         browser.close()
     httpd.shutdown()

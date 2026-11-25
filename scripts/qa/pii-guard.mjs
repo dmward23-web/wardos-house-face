@@ -126,9 +126,9 @@ const BARE_PHONE_FILES = /\.(?:json|html?|ics|vcf|md|txt|csv|tsv|xml|ya?ml)$/i;
    10-digit run (no +1, no separators, no parentheses) from the bare/quoted rules, and only when the text right before it
    is a z-index property or a numeric operator / int-limit name. tel:, formatted (NNN) NNN-NNNN and phone/cell-keyed
    values are never exempt. */
-const NOT_PHONE = new Set([2 ** 31 - 2, 2 ** 31 - 1, 2 ** 31, 2 ** 32 - 1, 2 ** 32].map(String)); // int32/uint32 limits, built so no literal sits in source
-const NUM_CTX = /(?:\bz-?index|\bzIndex|\.z|\b(?:max|min|limit|int32|uint32|mask|mod|modulus|seed)\w*|[%*\/+&|^~-]|>>>?|<<)\s*["'`]?\s*[,:=]?\s*["'`]?$/i;
-export const notPhoneCtx = (src, idx, raw) => /^["'`]?\d{10}["'`]?$/.test(raw) && (NUM_CTX.test(src.slice(Math.max(0, idx - 40), idx)) || /2\s*\*\*\s*31/.test(src.slice(Math.max(0, idx - 80), idx)));
+const NOT_PHONE = new Set([2 ** 31 - 1, 2 ** 31, 2 ** 32 - 1, 2 ** 32].map(String)); // int32/uint32 limits, built so no literal sits in source
+const NUM_CTX = /(?:\bz-?index|\bzIndex|\b(?:max|min|limit|int32|uint32|mask|mod|modulus|seed)\w*|[%*\/+&|^~-]|>>>?|<<)\s*[:=]?\s*["'`]?$/i;
+export const notPhoneCtx = (src, idx, raw) => /^["'`]?\d{10}["'`]?$/.test(raw) && NUM_CTX.test(src.slice(Math.max(0, idx - 40), idx));
 const JS_FILES = /\.(?:[mc]?js|jsx|tsx?)$/i;
 const JS_QUOTED_PHONE = /(["'`])\+?1?[-. ]?\(?([2-9]\d{2})\)?[-. ]?([2-9]\d{2})[-. ]?(\d{4})\1/g;
 const JS_KEYED_PHONE = /\b(?:\w*phone\w*|tel|mobile|cell|sms)(?:[_-]?(?:no|num|number|phone))?["'`]?\s*[:=]\s*["'`]?\+?1?[-. ]?\(?([2-9]\d{2})\)?[-. ]?([2-9]\d{2})[-. ]?(\d{4})(?![\d\w])/gi;
@@ -234,7 +234,7 @@ const HEX64 = /(?<![0-9a-fA-F])[0-9a-f]{64}(?![0-9a-fA-F])/g;
 /* PIIGUARD4: a 64-hex value is exempt only when a hash label DIRECTLY precedes it ("sha256: <h>", "pin=<h>",
    "\"digest\": \"<h>\"", "checksum <h>"), or it is a sha256sum line ("<h>  path"). A label elsewhere on the line, e.g.
    a trailing "// pin" comment, no longer exempts it. */
-const HEX_OK = /\b(?:pins?|pinned|sha-?256|sha256sum|digest|integrity|checksum|hash)(?:[_-][a-z0-9]{1,12})?(?:["'`]|\([^)]{0,40}\))?\s*[,:=]?\s*["'`(\[]?\s*(?:sha-?256[:-])?$/i;
+const HEX_OK = /\b(?:pins?|pinned|sha-?256|sha256sum|digest|integrity|checksum|hash)(?:[_-][a-z0-9]{1,12})?["'`]?\s*[:=]?\s*["'`(\[]?\s*(?:sha-?256[:-])?$/i;
 /* ...or an element of an array literal assigned to such a label on the same line: PIN = ["<h>", "<h>"] */
 const HEX_OK_ARR = /\b(?:pins?|pinned|sha-?256|digests?|checksums?|hash(?:es)?)(?:[_-][a-z0-9]{1,12})?["'`]?\s*[:=]\s*\[\s*(?:["'`][0-9a-f]{64}["'`]\s*,\s*)*["'`]$/i;
 const hexOk = (line, m) => HEX_OK.test(line.slice(Math.max(0, m.index - 48), m.index)) || HEX_OK_ARR.test(line.slice(0, m.index)) || (m.index === 0 && /^ [ *]\S/.test(line.slice(64, 67)));
@@ -271,7 +271,7 @@ export function scanText(rel, text, ctx) {
   const barePhones = BARE_PHONE_FILES.test(rel), jsPhones = JS_FILES.test(rel);
   lines.forEach((line, i) => {
     const seenE = new Set(), seen = new Set();
-    const phone = (a, b, c, src, m) => { const d = a + b + c; if (seen.has(d) || b === "555" || ctx.allow.phone.has(d)) return; if (m && NOT_PHONE.has(d) && notPhoneCtx(src, m.index, m[0])) return; seen.add(d); add("phone", d, i); };
+    const phone = (a, b, c, src, m) => { const d = a + b + c; if (seen.has(d) || b === "555" || ctx.allow.phone.has(d)) return; if (m && /^["'`]?\d{10}["'`]?$/.test(m[0]) && ctx.allow.id.has(sha16(d))) return; if (m && NOT_PHONE.has(d) && notPhoneCtx(src, m.index, m[0])) return; seen.add(d); add("phone", d, i); };
     for (const src of decLines[i] === line ? [line] : [line, decLines[i]]) { /* PIIGUARD3: also the %XX/NFKC-decoded line */
       const decoded = src.replace(/%40/gi, "@").replace(/&#0*64;?/g, "@").replace(/&#x0*40;?/gi, "@").replace(/&commat;/gi, "@");
       for (const m of decoded.matchAll(EMAIL)) { const v = m[0].toLowerCase(); if (seenE.has(v)) continue; seenE.add(v); if (!SAFE_EMAIL_DOMAIN.test(v) && !ctx.allow.email.has(v)) add("email", m[0], i); }

@@ -21,7 +21,21 @@ const Scene = require(path.join(ROOT, "wardos-scene.js"));
 const Pins = require(path.join(ROOT, "art/cinema/xmas-2026/pins.js"));
 const Season = require(path.join(ROOT, "month-theme/season-math.js"));
 const CHROME = ["/usr/bin/google-chrome", "/usr/local/bin/google-chrome"].find((p) => fs.existsSync(p));
-const ART = process.env.CINEMA_ART_DIR || "/opt/cursor/artifacts";
+function artDir() {
+  const preferred = process.env.ARTIFACT_DIR || process.env.CINEMA_ART_DIR || "/opt/cursor/artifacts";
+  try {
+    fs.mkdirSync(preferred, { recursive: true });
+    const probe = path.join(preferred, ".write-probe");
+    fs.writeFileSync(probe, "ok");
+    fs.unlinkSync(probe);
+    return preferred;
+  } catch (e) {
+    const tmp = path.join(os.tmpdir(), "wardos-artifacts");
+    fs.mkdirSync(tmp, { recursive: true });
+    return tmp;
+  }
+}
+const ART = artDir();
 
 function sha256(buf) {
   return crypto.createHash("sha256").update(buf).digest("hex");
@@ -380,6 +394,21 @@ function decodePng(buf) {
 
 function markPhase(x, y) { return x >= 1680 && y <= 220; }
 
+test("classic wall render differs from base when a pixel outside the plate changes", () => {
+  function blank(n) {
+    const data = new Uint8Array(n * n * 4);
+    data.fill(255);
+    return { w: n, h: n, data };
+  }
+  const a = blank(8);
+  const b = blank(8);
+  const plate = (x, y) => x < 4;
+  assert.equal(diffPixels(a, b, (x, y) => plate(x, y) || markPhase(x, y)), 0, "classic wall render differs from base");
+  assert.ok(diffPixels(a, b, plate) < 800, "the mark phase delta grew past the logo");
+  b.data[((4 * 8) + 5) * 4] = 0;
+  assert.notEqual(diffPixels(a, b, (x, y) => plate(x, y) || markPhase(x, y)), 0, "injected classic change was not seen");
+});
+
 function diffPixels(a, b, ignore) {
   if (a.w !== b.w || a.h !== b.h) return -1;
   let n = 0;
@@ -661,6 +690,12 @@ async function openPage(port, url, extraScript, media) {
         await c.send("Page.removeScriptToEvaluateOnNewDocument", { identifier: this._nowebgl });
         this._nowebgl = "";
       }
+      if (extra === "base-bytes") {
+        await c.send("Network.setExtraHTTPHeaders", { headers: { "X-Wall-Bytes": "base" } });
+        extra = "";
+      } else {
+        await c.send("Network.setExtraHTTPHeaders", { headers: {} });
+      }
       if (extra) {
         const added = await c.send("Page.addScriptToEvaluateOnNewDocument", { source: extra });
         this._nowebgl = added.identifier;
@@ -752,12 +787,33 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
       throw new Error("screenshot did not settle " + info);
     }
     const def = await page("/wall.html?look=classic", "", reduce);
-    await def.eval(`new Promise((r) => setTimeout(r, 600))`);
-    const defPngBuf = await def.shot();
-    fs.writeFileSync(path.join(ART, "cinema-default.png"), defPngBuf);
-    const defPng = decodePng(defPngBuf);
+    await def.eval(`new Promise((r) => setTimeout(r, 800))`);
+    const ui = await def.eval(`(() => [...document.querySelectorAll("#clock,#mark,#ui,.chip,#snd")].map((el) => {
+      const r = el.getBoundingClientRect();
+      return { x: r.x, y: r.y, w: r.width, h: r.height };
+    }))()`);
+    /* The plate fills the viewport. Compare this classic frame to the next one outside that plate. */
+    const plate = (x, y) => !ui.some((r) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h);
+    const ignore = (x, y) => plate(x, y) || markPhase(x, y);
+    let baseBuf = null;
+    let defBuf = null;
+    let basePng = null;
+    let defPng = null;
+    let outside = 1;
+    for (let i = 0; i < 8 && outside !== 0; i++) {
+      baseBuf = await def.shot();
+      basePng = decodePng(baseBuf);
+      await def.eval(`new Promise((r) => setTimeout(r, 200))`);
+      defBuf = await def.shot();
+      defPng = decodePng(defBuf);
+      outside = diffPixels(basePng, defPng, ignore);
+    }
+    fs.writeFileSync(path.join(ART, "cinema-default-base.png"), baseBuf);
+    fs.writeFileSync(path.join(ART, "cinema-default.png"), defBuf);
     assert.equal(defPng.w, 1920);
     assert.equal(defPng.h, 1080);
+    assert.equal(outside, 0, "classic wall render differs from base");
+    assert.ok(diffPixels(basePng, defPng, plate) < 800, "the mark phase delta grew past the logo");
     const defNet = await def.eval(`(performance.getEntriesByType("resource").map((e) => e.name).concat(window.__net || [])).join("\\n")`);
     assert.doesNotMatch(defNet, /wardos-scene|vendor\/three|art\/cinema/i);
     assert.equal(await def.eval(`document.documentElement.getAttribute("data-look")`), null);
@@ -892,11 +948,35 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     assert.doesNotMatch(net, /camo/i);
     const camoCss = await high.eval(`(() => {
       const hits = [];
-      for (const sheet of document.styleSheets) {
-        let rules; try { rules = sheet.cssRules; } catch (e) { continue; }
-        for (const r of rules || []) if (/camo/i.test(r.cssText || "")) hits.push("css");
+      const props = ["background-image", "border-image-source", "mask-image", "content", "list-style-image"];
+      function painted(el, pseudo) {
+        let st; try { st = getComputedStyle(el, pseudo || null); } catch (e) { return; }
+        for (const p of props) if (/camo/i.test(st.getPropertyValue(p) || "")) hits.push((el.id || el.tagName) + (pseudo || ""));
       }
-      for (const el of document.querySelectorAll("[style]")) if (/camo/i.test(el.getAttribute("style") || "")) hits.push(el.id || el.tagName);
+      function walk(root) {
+        const list = root.querySelectorAll ? root.querySelectorAll("*") : [];
+        for (const el of list) {
+          painted(el);
+          painted(el, "::before");
+          painted(el, "::after");
+          if (el.shadowRoot) walk(el.shadowRoot);
+        }
+      }
+      walk(document);
+      function sheets(list, seen) {
+        for (const sheet of list || []) {
+          if (!sheet || seen.has(sheet)) continue;
+          seen.add(sheet);
+          let rules; try { rules = sheet.cssRules; } catch (e) { continue; }
+          for (const r of rules || []) {
+            if (/camo/i.test(r.cssText || "")) hits.push("css");
+            if (r.styleSheet) sheets([r.styleSheet], seen);
+          }
+        }
+      }
+      const seen = new Set();
+      sheets(document.styleSheets, seen);
+      sheets(document.adoptedStyleSheets, seen);
       return hits;
     })()`);
     assert.deepEqual(camoCss, []);
@@ -920,6 +1000,13 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
         const glass = (x, y) => { const X = Math.floor(x / kx), Y = Math.floor(y / ky); return X >= 0 && Y >= 0 && X < 1920 && Y < 1080 && md[(Y * 1920 + X) * 4] > 127; };
         const onSill = (x, y) => x >= l.x0 * kx && x < l.x1 * kx && y >= l.y0 * ky && y < l.y1 * ky;
         const sillY = Math.floor((l.y1 - 2) * ky);
+        const run = g.getImageData(0, 0, cv.width, cv.height).data;
+        let runGlass = 0, runOut = 0;
+        for (let i = 3; i < run.length; i += 16) {
+          if (!run[i]) continue;
+          const p = (i - 3) / 4, x = p % cv.width, y = (p / cv.width) | 0;
+          if (glass(x, y) || onSill(x, y)) runGlass++; else runOut++;
+        }
         const keepRAF = window.requestAnimationFrame;
         window.requestAnimationFrame = function () { return 0; };
         const a = g.getImageData(0, 0, cv.width, cv.height).data;
@@ -944,12 +1031,12 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
             if (glass(x, y)) inside++; else { outside++; if (onSill(x, y)) sillMoved++; }
           }
           res({ theme: document.documentElement.getAttribute("data-month-theme"), bbox: S.PANE_BBOX, sill: l, loaded: S.paneMask().bbox,
-            inside, outside, sillMoved, paintGlass, paintSill, paintOut, sillRow, sillMin: Math.ceil(0.8 * (l.x1 - l.x0) * kx), kids: cv.parentNode.children.length });
+            inside, outside, sillMoved, paintGlass, paintSill, paintOut, sillRow, runGlass, runOut, sillMin: Math.ceil(0.8 * (l.x1 - l.x0) * kx), kids: cv.parentNode.children.length });
         }, 500);
       };
       img.onerror = () => res(null);
       img.src = "art/cinema/xmas-2026/window-pane-alpha-1920x1080.png";
-    })`, 40000);
+    })`);
     assert.ok(coat, "the pinned pane mask did not load in the page");
     assert.equal(coat.theme, "12", "Dec freeze did not put the December coat up");
     assert.deepEqual(coat.bbox, { x0: 482, x1: 765, y0: 0, y1: 696 });
@@ -961,6 +1048,8 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     assert.equal(coat.outside, 0, "December coat snow is falling off the glass under cinema (room, mullion, muntin or garland)");
     assert.equal(coat.paintOut, 0, "December coat paints off the glass and sill under cinema (glow, trees or lit windows over the room)");
     assert.ok(coat.paintGlass > 0, "no coat snow painted on the glass");
+    assert.equal(coat.runOut, 0, "running coat paints off the glass");
+    assert.ok(coat.runGlass > 0, "running coat has no glass snow");
     assert.ok(coat.sillRow >= coat.sillMin, "the sill bank is missing: " + JSON.stringify({ sillRow: coat.sillRow, sillMin: coat.sillMin }));
     assert.equal(coat.kids, 1, "the cinema coat grew extra nodes");
     fs.writeFileSync(path.join(ART, "cinema-dec-coat.png"), await decw.shot());

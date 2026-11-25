@@ -152,6 +152,30 @@ test("DECPLATE1: December classic hub names the pinned plate for 07:30, 16:45 an
   }
 });
 
+test("P2: a real December clock picks the December plate when ?now is absent", () => {
+  const wall = fs.readFileSync(path.join(ROOT, "wall.html"), "utf8");
+  const body = wall.match(/<script>if\(document\.documentElement\.getAttribute\("data-look"\)!=="cinema"\)\{([\s\S]*?)\}var wallUi/)[1];
+  function chosen(search, iso) {
+    const Fixed = class extends Date {
+      constructor(...a) { super(...(a.length ? a : [Date.parse(iso)])); }
+      static now() { return Date.parse(iso); }
+    };
+    const style = {};
+    let plate = "";
+    const document = {
+      documentElement: { getAttribute: () => null, style },
+      createElement() { return { style: {} }; },
+      body: { insertBefore(node) { plate = node.src; }, firstChild: null },
+      getElementById() { return null; }
+    };
+    vm.runInNewContext(body, { URLSearchParams, Intl, Date: Fixed, location: { search }, document });
+    return plate;
+  }
+  assert.match(chosen("", "2026-12-04T18:00:00Z"), /bg-wall-dec-dusk\.webp$/);
+  assert.match(chosen("", "2026-11-04T18:00:00Z"), /november\/wall-dusk\.webp$/);
+  assert.match(chosen("?now=2026-11-04T12:00:00-06:00", "2026-12-04T18:00:00Z"), /november\/wall-dusk\.webp$/);
+});
+
 test("CINELEAF1: December creates no November leaf in either look", () => {
   for (const look of [undefined, "cinema"]) {
     const b = bootOverlay({ iso: "2026-12-04T16:45:00-06:00", look, pathname: "/wall.html" });
@@ -193,18 +217,32 @@ test("NOCAMO1: December package files do not name camo, and an injected token is
   assert.equal(camoHits(".hero{background-image:url(camo-plate.webp)}").length, 1);
 });
 
-const PASS2_BROWSER = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
-test("PASS2 browser: plates, contrast, LUT match, tiers, soak, stills", { timeout: 420000, skip: PASS2_BROWSER ? false : "SKIP no playwright (QA_NO_BROWSER)" }, () => {
+function artDir() {
+  const preferred = process.env.ARTIFACT_DIR || process.env.CINEMA_ART_DIR || "/opt/cursor/artifacts";
+  try {
+    fs.mkdirSync(preferred, { recursive: true });
+    const probe = path.join(preferred, ".write-probe");
+    fs.writeFileSync(probe, "ok");
+    fs.unlinkSync(probe);
+    return preferred;
+  } catch (e) {
+    const tmp = path.join(os.tmpdir(), "wardos-artifacts");
+    fs.mkdirSync(tmp, { recursive: true });
+    return tmp;
+  }
+}
+test("PASS2 browser: plates, contrast, LUT match, tiers, soak, stills", { timeout: 420000, skip: process.env.QA_NO_BROWSER === "1" ? "SKIP QA_NO_BROWSER=1" : false }, () => {
+  const art = artDir();
   const r = spawnSync("python3", ["scripts/qa/pass2_browser.py"], {
     cwd: ROOT,
     encoding: "utf8",
     timeout: 400000,
-    env: { ...process.env, TZ: "America/Chicago" }
+    env: { ...process.env, TZ: "America/Chicago", ARTIFACT_DIR: art }
   });
   if (r.status !== 0) {
     assert.fail((r.stdout || "") + "\n" + (r.stderr || ""));
   }
-  const report = JSON.parse(fs.readFileSync(path.join("/opt/cursor/artifacts", "pass2-report.json"), "utf8"));
+  const report = JSON.parse(fs.readFileSync(path.join(art, "pass2-report.json"), "utf8"));
   assert.ok(report.deltaE <= 3, "deltaE " + report.deltaE);
   assert.ok(report.luma >= 42.98 && report.luma <= 48.52, "luma " + report.luma);
   assert.equal(report.heapGrowthMB <= 20, true, "heap " + report.heapGrowthMB);

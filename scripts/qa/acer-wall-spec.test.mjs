@@ -8,7 +8,8 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const OUT = "/opt/cursor/artifacts/acer-wall-spec.json";
+const ART = process.env.ARTIFACT_DIR || "/opt/cursor/artifacts";
+const OUT = path.join(ART, "acer-wall-spec.json");
 
 function dims(buf) {
   if (buf.length > 24 && buf[0] === 0x89 && buf[1] === 0x50) return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20), kind: "png" };
@@ -110,7 +111,8 @@ test("Acer wall spec report lists asset dimensions and does not resize them", { 
     assets,
     offSpecAssets: assets.filter((a) => a.offSpec).map((a) => a.path + " " + a.width + "x" + a.height + " required " + a.required)
   };
-  fs.writeFileSync("/opt/cursor/artifacts/prism-slot-art-sha256.txt", sha256.join("\n") + "\n");
+  fs.mkdirSync(ART, { recursive: true });
+  fs.writeFileSync(path.join(ART, "prism-slot-art-sha256.txt"), sha256.join("\n") + "\n");
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
   assert.equal(layout.panel.w, 1920);

@@ -14,5 +14,14 @@ id sha16:1f53ad31b8e6a33b  # scripts/qa/kid-feed-pin-manifest.json fixture pin
 id sha16:99c6caf81f60b34a  # scripts/qa/kid-feed-pin-manifest.json fixture pin
 id sha16:4d8604c337cef80d  # scripts/qa/kid-feed-pin-manifest.json fixture pin
 id sha16:e9636a07090cc4b1  # scripts/qa/acer-wall-spec.test.mjs dad tile pin
+id sha16:9435e6405cad7bc2  # scripts/qa/cinema-xmas.test.mjs art pin
+id sha16:0da07fcf82944f9f  # scripts/qa/cinema-xmas.test.mjs art pin
+id sha16:4289671ec2e2ac6e  # scripts/qa/cinema-xmas.test.mjs art pin
+id sha16:8a6fe1faafd7f1f2  # scripts/qa/cinema-xmas.test.mjs art pin
+id sha16:f2e6b48402a00f37  # scripts/qa/cinema-xmas.test.mjs art pin
+id sha16:7716b76c89fc34b9  # scripts/qa/cinema-xmas.test.mjs art pin
+id sha16:494e6c91c0c4f705  # scripts/qa/cinema-xmas.test.mjs art pin
+id sha16:db00de51dc7df4f6  # scripts/qa/cinema-xmas.test.mjs art pin
+id sha16:e999faef67425098  # historical int-limit fixture, not a phone
 # PIIGUARD2 · the ONLY files allowed to carry inline pii-guard allow markers (each marker is printed every run):
 marker scripts/qa/pii-guard.test.mjs
