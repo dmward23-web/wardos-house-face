@@ -391,7 +391,12 @@ try:
         }""")
         for spot in spots:
             x, y, dest = spot["x"], spot["y"], spot["dest"]
-            pg.goto(BASE + "sheet-index.html", wait_until="load")
+            try:
+                pg.goto(BASE + "sheet-index.html", wait_until="load", timeout=60000)
+            except Exception as e:
+                if "interrupted by another navigation" not in str(e):
+                    raise
+                pg.wait_for_load_state("load", timeout=60000)
             pg.wait_for_timeout(700)
             hit = pg.evaluate("""([x, y]) => {
               const el = document.elementFromPoint(x, y);
