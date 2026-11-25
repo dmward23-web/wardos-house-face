@@ -247,8 +247,11 @@ test("FOLLOWUP2 privacy-scan email: the one allowed address only as an exact who
   for (const sep of ["%" + "40", "%" + "40", "&#" + "64;", "&#" + "064;", "&#" + "x40;", "&" + "commat;"]) {
     assert.equal(emailHit("README.md", "bob" + sep + "example.org"), true, "encoded @ must hit: " + sep.length);
   }
-  assert.equal(emailHit("scripts/qa/acer-r42.test.mjs @" + "d4290224", 'email:"' + ["x", ["example", "test"].join(".")].join("@") + '"'), false);
-  assert.equal(emailHit("scripts/qa/acer-r42.test.mjs", 'email:"' + ["x", ["example", "test"].join(".")].join("@") + '"'), true);
+  const oldTok = ["x", ["example", "test"].join(".")].join("@");
+  assert.equal(emailHit("scripts/qa/acer-r42.test.mjs @" + "d4290224", 'email:"' + oldTok + '"'), false);
+  assert.equal(emailHit("scripts/qa/privfeed.test.mjs @" + "c9a1e223", 'email:"' + oldTok + '"'), false);
+  assert.equal(emailHit("scripts/qa/acer-r42.test.mjs", 'email:"' + oldTok + '"'), true);
+  assert.equal(emailHit("scripts/qa/injected.test.mjs", 'email:"' + oldTok + '"'), true);
   assert.equal(emailHit("README.md", "bob" + "%" + "40" + "EXAMPLE.org"), true);
   assert.equal(emailHit("privacy.html", A.replace("@", "%" + "40")), false, "the allowed address encoded on its own page stays allowed");
   assert.equal(emailHit("about.html", A.replace("@", "&#" + "64;")), true);

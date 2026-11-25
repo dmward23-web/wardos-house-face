@@ -142,13 +142,16 @@ const EMAIL_SRC = GENERIC.find(([c]) => c === "email")[1].source;
 export function decodeAt(line) {
   return String(line).replace(/%40/gi, "@").replace(/&#0*64;?/g, "@").replace(/&#x0*40;?/gi, "@").replace(/&commat;/gi, "@");
 }
-/* One historical fixture, and only that blob. The address is assembled so this file has no email-shaped literal. */
-const HIST_EMAIL_REL = "scripts/qa/acer-r42.test.mjs @d4290224";
+/* Two historical blobs, and only those blobs. The address is assembled so this file has no email-shaped literal. */
+const HIST_EMAIL_RELS = new Set([
+  "scripts/qa/acer-r42.test.mjs @d4290224",
+  "scripts/qa/privfeed.test.mjs @c9a1e223"
+]);
 const HIST_EMAIL_TOKEN = ["x", ["example", "test"].join(".")].join("@");
 export function emailHit(rel, line) {
   const pathOnly = String(rel).replace(/ @[0-9a-f]{8}$/, "");
   const allow = new Set(PUBLIC_EMAIL_ALLOW[pathOnly] || []);
-  if (rel === HIST_EMAIL_REL) allow.add(HIST_EMAIL_TOKEN);
+  if (HIST_EMAIL_RELS.has(rel)) allow.add(HIST_EMAIL_TOKEN);
   const dec = decodeAt(line);
   for (const v of dec === line ? [line] : [line, dec]) {
     for (const m of v.matchAll(new RegExp(EMAIL_SRC, "g"))) if (!allow.has(m[0])) return true;
