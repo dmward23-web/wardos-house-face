@@ -10,7 +10,7 @@ const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { enc
 const SKIP = browser ? {} : { skip: "SKIP no playwright (QA_NO_BROWSER)" };
 
 function measure() {
-  const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/choresfit1_render.py")], { encoding: "utf8", timeout: 90000 });
+  const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/choresfit1_render.py")], { encoding: "utf8", timeout: 150000 });
   assert.equal(r.status, 0, (r.stderr || "").slice(-600) + (r.stdout || "").slice(-400));
   return JSON.parse(r.stdout.trim().split("\n").pop());
 }

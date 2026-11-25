@@ -38,7 +38,7 @@ base = "http://127.0.0.1:%d" % srv.server_address[1]
 JS = r"""() => {
   const vis = (e) => getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().height > 1;
   const cols = [...document.querySelectorAll('section.col')].map(col => {
-    const name = ((col.querySelector('.col-name, .col-hdr') || {}).innerText || '').replace(/\s+/g, ' ').trim();
+    const name = (col.getAttribute('aria-label') || ((col.querySelector('.col-name, .col-hdr') || {}).innerText || '')).replace(/\s+/g, ' ').trim();
     const labelOf = (card) => ((card.querySelector('.what') || {}).innerText || '').replace(/\s+/g, ' ').trim();
     const every = [...col.querySelectorAll(':scope .chore-list > .chore')];
     const rows = every.filter(vis);
@@ -78,6 +78,10 @@ JS = r"""() => {
 def open_chores(pg):
     pg.goto(base + "/sheet-chores.html?pfBase=" + base + "&now=2026-12-04T07:30:00-06:00&freeze=1", wait_until="domcontentloaded", timeout=30000)
     pg.wait_for_timeout(3500)
+    pg.wait_for_function("""() => {
+      var whats = Array.prototype.map.call(document.querySelectorAll('section.col .chore .what'), function (el) { return el.textContent || ''; });
+      return whats.length >= 9 && whats.every(function (t) { return t.indexOf('\u00b7') < 0 && t.indexOf('stage') < 0; });
+    }""", timeout=45000)
 
 def reset_pages(pg):
     pg.evaluate("""() => {
@@ -127,7 +131,7 @@ def walk(pg):
             break
         pg.evaluate("""(names) => {
           document.querySelectorAll('section.col').forEach(function (col) {
-            const name = ((col.querySelector('.col-name, .col-hdr') || {}).innerText || '').replace(/\\s+/g, ' ').trim();
+            const name = (col.getAttribute('aria-label') || '').replace(/\\s+/g, ' ').trim();
             if (names.indexOf(name) < 0) return;
             const chip = col.querySelector('.more-chip');
             if (chip) chip.click();

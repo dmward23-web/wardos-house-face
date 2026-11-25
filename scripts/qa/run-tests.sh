@@ -29,6 +29,7 @@ serial=(
   scripts/qa/acer-r55-show.test.mjs
   scripts/qa/acer-r59.test.mjs
   scripts/qa/acer-r61.test.mjs
+  scripts/qa/choresfit1.test.mjs
   scripts/qa/contentgate.test.mjs
   scripts/qa/coversync1.test.mjs
   scripts/qa/nowfreeze1.test.mjs
