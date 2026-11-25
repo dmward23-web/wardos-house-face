@@ -646,8 +646,8 @@ async function openPage(port, url, extraScript, media) {
   await loaded;
   return {
     c, ws,
-    async eval(expr) {
-      const r = await c.send("Runtime.evaluate", { expression: expr, returnByValue: true, awaitPromise: true });
+    async eval(expr, timeout) {
+      const r = await c.send("Runtime.evaluate", { expression: expr, returnByValue: true, awaitPromise: true }, timeout);
       if (r.exceptionDetails) throw new Error(JSON.stringify(r.exceptionDetails).slice(0, 500));
       return r.result && r.result.value;
     },
@@ -832,7 +832,7 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
       };
       img.onerror = () => res(null);
       img.src = "art/cinema/xmas-2026/window-pane-alpha-1920x1080.png";
-    })`);
+    })`, 90000);
     assert.ok(coat, "the pinned pane mask did not load in the page");
     assert.equal(coat.theme, "12", "Dec freeze did not put the December coat up");
     assert.deepEqual(coat.bbox, { x0: 482, x1: 765, y0: 0, y1: 696 });

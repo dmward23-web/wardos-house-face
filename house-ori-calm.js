@@ -29,7 +29,24 @@
      4s and the held motion resumes, so the board is never left behind a blank veil. */
   var RMQ = typeof matchMedia === "function" ? matchMedia("(prefers-reduced-motion: reduce)") : null, DROP_MS = 4000;
   function leave(href) { location.href = href; setTimeout(clear, DROP_MS); }
-  function clear() { document.querySelectorAll(".ori-iris[data-calm]").forEach(function (el) { el.remove(); }); held.splice(0).forEach(function (an) { try { an.play(); } catch (e) {} }); }
+  function clear() {
+    /* A restored page still has the leave iris. Hold it long enough for the return read, then fade it off. */
+    document.querySelectorAll(".ori-iris[data-calm]").forEach(function (el) {
+      if (el.getAttribute("data-calm-fade") === "1") return;
+      el.setAttribute("data-calm-fade", "1");
+      var start = 0;
+      function step(now) {
+        if (!start) start = now;
+        var t = now - start;
+        var op = t < 220 ? 1 : Math.max(0, 1 - (t - 220) / 420);
+        el.style.opacity = String(op);
+        if (op > 0.001) requestAnimationFrame(step);
+        else el.remove();
+      }
+      requestAnimationFrame(step);
+    });
+    held.splice(0).forEach(function (an) { try { an.play(); } catch (e) {} });
+  }
   addEventListener("pageshow", clear);
   document.addEventListener("click", function (ev) {
     if (ev.defaultPrevented || ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;

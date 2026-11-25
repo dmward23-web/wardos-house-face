@@ -193,7 +193,8 @@ test("NOCAMO1: December package files do not name camo, and an injected token is
   assert.equal(camoHits(".hero{background-image:url(camo-plate.webp)}").length, 1);
 });
 
-test("PASS2 browser: plates, contrast, LUT match, tiers, soak, stills", { timeout: 420000 }, () => {
+const PASS2_BROWSER = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
+test("PASS2 browser: plates, contrast, LUT match, tiers, soak, stills", { timeout: 420000, skip: PASS2_BROWSER ? false : "SKIP no playwright (QA_NO_BROWSER)" }, () => {
   const r = spawnSync("python3", ["scripts/qa/pass2_browser.py"], {
     cwd: ROOT,
     encoding: "utf8",

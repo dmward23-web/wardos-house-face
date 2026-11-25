@@ -6,5 +6,13 @@ email atlasward@mail.grokbot.com  # privacy-scan:allow email
 id sha16:cd372fb85148700f  # scripts/qa/accesslog.test.mjs cleanPath fixture (synthetic 64-hex path segment)
 id sha16:7e771013da36cd5b  # scripts/qa/privfeed.test.mjs content pin (sha256 of about.html)
 id sha16:def6e21acf7fdcb8  # scripts/qa/privfeed.test.mjs content pin (sha256 of privacy.html)
+id sha16:d6351ccb6d7b8a0e  # scripts/qa/kid-feed-pin-manifest.json fixture pin
+id sha16:990f5e04a1df7343  # scripts/qa/kid-feed-pin-manifest.json fixture pin
+id sha16:e7c9d12bccbcd1ca  # scripts/qa/kid-feed-pin-manifest.json fixture pin
+id sha16:f7853855d9c72efc  # scripts/qa/kid-feed-pin-manifest.json fixture pin
+id sha16:1f53ad31b8e6a33b  # scripts/qa/kid-feed-pin-manifest.json fixture pin
+id sha16:99c6caf81f60b34a  # scripts/qa/kid-feed-pin-manifest.json fixture pin
+id sha16:4d8604c337cef80d  # scripts/qa/kid-feed-pin-manifest.json fixture pin
+id sha16:e9636a07090cc4b1  # scripts/qa/acer-wall-spec.test.mjs dad tile pin
 # PIIGUARD2 · the ONLY files allowed to carry inline pii-guard allow markers (each marker is printed every run):
 marker scripts/qa/pii-guard.test.mjs

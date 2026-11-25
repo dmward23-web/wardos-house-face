@@ -142,11 +142,13 @@ const EMAIL_SRC = GENERIC.find(([c]) => c === "email")[1].source;
 export function decodeAt(line) {
   return String(line).replace(/%40/gi, "@").replace(/&#0*64;?/g, "@").replace(/&#x0*40;?/gi, "@").replace(/&commat;/gi, "@");
 }
+/* RFC 2606 documentation domains are fixtures, not mailboxes. example.org stays a hit (it is not reserved). */
+const RESERVED_EMAIL = /@(?:[a-z0-9-]+\.)*(?:example\.(?:com|net|invalid)|example\.test|localhost)$/i;
 export function emailHit(rel, line) {
   const allow = PUBLIC_EMAIL_ALLOW[rel] || new Set();
   const dec = decodeAt(line);
   for (const v of dec === line ? [line] : [line, dec]) {
-    for (const m of v.matchAll(new RegExp(EMAIL_SRC, "g"))) if (!allow.has(m[0])) return true;
+    for (const m of v.matchAll(new RegExp(EMAIL_SRC, "g"))) if (!allow.has(m[0]) && !RESERVED_EMAIL.test(m[0])) return true;
   }
   return false;
 }
