@@ -515,6 +515,7 @@ def main():
         report["soakExempted"] = tip_ex
         report["soakWhy"] = soak.get("why")
         check(report["heapGrowthMB"] <= 20, "heap growth %.2f MB" % report["heapGrowthMB"])
+        check(soak.get("mode") == "poster" and soak.get("why") == "software-gl", "main soak mode/why " + json.dumps({"mode": soak.get("mode"), "why": soak.get("why")}))
         check(report["rafStallMs"] <= 500, "raf stall %.1f ms" % report["rafStallMs"])
         # Base control: bf976526 wall.html has no SOFTGL1, so the same window still stalls.
         base_blob = subprocess.check_output(["git", "-C", str(ROOT), "show", "bf976526d4072113732340853fe37a41e725803f:wall.html"])

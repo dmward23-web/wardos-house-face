@@ -406,20 +406,45 @@ test("classic wall render differs from base when any full-frame pixel changes", 
   assert.ok(diffPixels(a, b) < 800, "the mark phase delta grew past the logo");
   b.data[((1 * 8) + 2) * 4] = 0;
   assert.notEqual(diffPixels(a, b), 0, "injected classic change was not seen");
+  const noisy = blank(8);
+  noisy.data[0] = 254;
+  const one = pixelDelta(a, noisy);
+  assert.equal(one.exact, 1);
+  assert.equal(one.tolerated, 1);
+  assert.equal(one.over, 0, "a one-level step is noise, not a real change");
+  const real = pixelDelta(a, b);
+  assert.ok(real.over > 0, "a real pixel change must stay outside the one-level band");
 });
 
-function diffPixels(a, b, ignore, tol) {
-  if (a.w !== b.w || a.h !== b.h) return -1;
-  const step = tol || 0;
-  let n = 0;
+test("arrive veil holds 160 ms and is skipped under reduced motion", () => {
+  for (const rel of ["sheet-index.html", "month.html", "sheet-lights.html"]) {
+    const s = fs.readFileSync(path.join(ROOT, rel), "utf8");
+    assert.match(s, /if\(veil&&!matchMedia\("\(prefers-reduced-motion: reduce\)"\)\.matches\)\{/, rel);
+    assert.match(s, /var op=t<160\?1:Math\.max\(0,1-\(t-160\)\/420\)/, rel);
+    assert.doesNotMatch(s, /t<900/, rel);
+  }
+});
+
+function diffPixels(a, b, ignore) {
+  return pixelDelta(a, b, ignore).exact;
+}
+/* tol 1 is one-level redraw noise. exact counts every changed pixel. tolerated is the subset within one level.
+   over is a real change. A frame-wide one-level shift makes tolerated huge and fails the <= 1000 cap. */
+function pixelDelta(a, b, ignore) {
+  if (a.w !== b.w || a.h !== b.h) return { exact: -1, tolerated: -1, over: -1 };
+  let exact = 0, tolerated = 0, over = 0;
   for (let y = 0; y < a.h; y++) {
     for (let x = 0; x < a.w; x++) {
       if (ignore && ignore(x, y)) continue;
       const i = (y * a.w + x) * 4;
-      if (Math.abs(a.data[i] - b.data[i]) > step || Math.abs(a.data[i + 1] - b.data[i + 1]) > step || Math.abs(a.data[i + 2] - b.data[i + 2]) > step) n += 1;
+      const d = Math.max(Math.abs(a.data[i] - b.data[i]), Math.abs(a.data[i + 1] - b.data[i + 1]), Math.abs(a.data[i + 2] - b.data[i + 2]));
+      if (!d) continue;
+      exact += 1;
+      if (d <= 1) tolerated += 1;
+      else over += 1;
     }
   }
-  return n;
+  return { exact, tolerated, over };
 }
 
 function sample(png, x, y) {
@@ -472,53 +497,75 @@ function centreLuma(png) {
 }
 const PLATE_SOURCES = ["loop", "ungraded", "fallback"];
 
+const BASE_SHA = "bf976526d4072113732340853fe37a41e725803f";
+function baseBlob(rel) {
+  const r = spawnSync("git", ["show", BASE_SHA + ":" + rel], { cwd: ROOT, encoding: "buffer" });
+  return r.status === 0 ? r.stdout : null;
+}
 function serve() {
-  const baseWall = spawnSync("git", ["show", "bf976526d4072113732340853fe37a41e725803f:wall.html"], { cwd: ROOT, encoding: "buffer" }).stdout;
   const types = {
     ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
     ".png": "image/png", ".webp": "image/webp", ".svg": "image/svg+xml", ".woff2": "font/woff2",
     ".mp4": "video/mp4", ".cube": "text/plain"
   };
+  const cache = new Map();
   const srv = http.createServer((q, res) => {
     const u = new URL(q.url, "http://127.0.0.1");
-    if (u.pathname === "/wall.html" && String(q.headers["x-wall-bytes"] || "") === "base") {
-      res.writeHead(200, { "Content-Type": "text/html", "Cache-Control": "no-store" });
-      res.end(baseWall);
+    const rel = decodeURIComponent(u.pathname).replace(/^\/+/, "");
+    if (rel.includes("..")) { res.writeHead(403); res.end(); return; }
+    const send = (buf, ext) => {
+      res.writeHead(200, { "Content-Type": types[ext] || "application/octet-stream", "Cache-Control": "no-store", "Content-Length": buf.length });
+      res.end(buf);
+    };
+    if (String(q.headers["x-wall-bytes"] || "") === "base") {
+      if (!cache.has(rel)) cache.set(rel, baseBlob(rel));
+      const blob = cache.get(rel);
+      if (!blob) { res.writeHead(404); res.end(); return; }
+      send(blob, path.extname(rel));
       return;
     }
-    const rel = decodeURIComponent(u.pathname).replace(/^\/+/, "");
     const fp = path.join(ROOT, path.normalize(rel));
     if (!fp.startsWith(ROOT + path.sep) && fp !== ROOT) { res.writeHead(403); res.end(); return; }
     fs.readFile(fp, (err, buf) => {
       if (err) { res.writeHead(404); res.end(); return; }
-      res.writeHead(200, { "Content-Type": types[path.extname(fp)] || "application/octet-stream", "Cache-Control": "no-store" });
-      res.end(buf);
+      send(buf, path.extname(fp));
     });
   });
   return new Promise((resolve) => srv.listen(0, "127.0.0.1", () => resolve(srv)));
 }
 
-function launchChrome() {
+function launchChrome(bin) {
   return new Promise((resolve, reject) => {
-    const proc = spawn(CHROME, [
+    const proc = spawn(bin || CHROME, [
       "--headless=new", "--no-sandbox", "--disable-dev-shm-usage",
       "--remote-debugging-port=0", "--remote-allow-origins=*",
-      "--window-size=1920,1080", "--force-device-scale-factor=1",
+      "--window-size=1920,1080", "--force-device-scale-factor=1", "--force-color-profile=srgb",
       "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
       "--hide-scrollbars", "--mute-audio", "--disable-gpu-sandbox",
       "--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows",
       "about:blank"
     ], { stdio: ["ignore", "pipe", "pipe"] });
     let buf = "";
-    const timer = setTimeout(() => { proc.kill("SIGKILL"); reject(new Error("chrome did not open a devtools port")); }, 20000);
+    let settled = false;
+    const finish = (err, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (err) {
+        try { proc.kill("SIGKILL"); } catch (e) { /* already gone */ }
+        reject(err);
+      } else resolve(value);
+    };
+    const timer = setTimeout(() => finish(new Error("chrome did not open a devtools port")), 20000);
     const on = (chunk) => {
       buf += chunk.toString();
       const m = buf.match(/DevTools listening on ws:\/\/127\.0\.0\.1:(\d+)\//);
-      if (m) { clearTimeout(timer); resolve({ proc, port: Number(m[1]) }); }
+      if (m) finish(null, { proc, port: Number(m[1]) });
     };
     proc.stdout.on("data", on);
     proc.stderr.on("data", on);
-    proc.on("exit", (code) => { clearTimeout(timer); reject(new Error("chrome exit " + code)); });
+    proc.on("error", (err) => finish(err));
+    proc.on("exit", (code) => finish(new Error("chrome exit " + code)));
   });
 }
 
@@ -715,11 +762,13 @@ async function openPage(port, url, extraScript, media) {
 test("browser: cinema wall keeps every control, stays graded off the cards, and falls back to a poster", { timeout: 180000 }, async () => {
   assert.ok(CHROME, "chrome is required");
   fs.mkdirSync(ART, { recursive: true });
-  const srv = await serve();
-  const base = "http://127.0.0.1:" + srv.address().port;
-  const chrome = await launchChrome();
+  let srv = null;
+  let chrome = null;
   const pages = [];
   try {
+  srv = await serve();
+  const base = "http://127.0.0.1:" + srv.address().port;
+  chrome = await launchChrome();
     let current = null;
     async function page(path, extra, media) {
       if (current) { await current.close(); current = null; }
@@ -758,83 +807,71 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
       await p.eval(`new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(r, 120))))`);
       return st;
     }
-    async function settled(p) {
-      await p.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => { if (document.documentElement.getAttribute("data-scene-mode") === "poster") return res(true); if (performance.now() - t0 > 8000) return res(false); setTimeout(step, 50); }; step(); })`);
-      let prev = null;
-      let prevBuf = null;
-      for (let i = 0; i < 8; i++) {
-        await p.eval(`new Promise((r) => setTimeout(r, 450))`);
-        const buf = await p.shot();
-        const now = decodePng(buf);
-        if (prev && diffPixels(prev, now, markPhase) === 0) {
-          await p.eval(`(() => {
-            const s = document.getElementById("sweep");
-            if (s) s.setAttribute("x", "-200");
-            const h = document.getElementById("halo");
-            if (h) h.setAttribute("stroke", "rgba(255,205,140,0.22)");
-            const k = document.getElementById("sparks");
-            if (k) k.setAttribute("opacity", "0.55");
-          })()`);
-          await p.eval(`new Promise((r) => setTimeout(r, 80))`);
-          return p.shot();
-        }
-        prev = now;
-        prevBuf = buf;
-      }
-      fs.writeFileSync(path.join(ART, "cinema-unstable-a.png"), prevBuf);
-      const info = await p.eval(`JSON.stringify({ mode: document.documentElement.getAttribute("data-scene-mode"), why: window.__fb && __fb.why, rm: matchMedia("(prefers-reduced-motion: reduce)").matches, look: document.documentElement.getAttribute("data-look") })`);
-      throw new Error("screenshot did not settle " + info);
-    }
-    async function classicReady(p) {
+    async function freezePaint(p) {
+      try {
+        await p.c.send("Animation.enable");
+        await p.c.send("Animation.setPlaybackRate", { playbackRate: 0 });
+      } catch (e) { /* the page can still pause its own animations */ }
       const ok = await p.eval(`new Promise((res) => {
         const t0 = performance.now();
-        const step = () => {
+        const stop = () => {
+          for (const a of document.getAnimations()) {
+            try { a.pause(); a.currentTime = 0; } catch (err) {}
+          }
+        };
+        const ready = () => {
           const clock = document.getElementById("clock");
           const img = document.querySelector("body > img");
-          const plate = img && img.complete && img.naturalWidth > 0;
-          if (clock && clock.textContent && plate) return res(true);
-          if (performance.now() - t0 > 8000) return res(false);
+          return !!(clock && clock.textContent && img && img.complete && img.naturalWidth > 0);
+        };
+        const step = () => {
+          stop();
+          if (ready() || performance.now() - t0 > 8000) return res(ready());
           setTimeout(step, 50);
         };
-        step();
+        const fonts = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+        fonts.then(() => step());
       })`);
-      assert.equal(ok, true, "classic wall did not reach a scene mode");
-      await p.eval(`(() => {
-        const s = document.getElementById("sweep");
-        if (s) s.setAttribute("x", "-200");
-        const h = document.getElementById("halo");
-        if (h) h.setAttribute("stroke", "rgba(255,205,140,0.22)");
-        const k = document.getElementById("sparks");
-        if (k) k.setAttribute("opacity", "0.55");
-      })()`);
+      assert.equal(ok, true, "classic wall did not reach a frozen plate");
     }
     async function stillShot(p) {
-      await classicReady(p);
+      await freezePaint(p);
       let prev = null;
       let buf = null;
+      let last = null;
       for (let i = 0; i < 4; i++) {
         await p.eval(`new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))`);
         buf = await p.shot();
         const png = decodePng(buf);
-        if (prev && diffPixels(prev, png) === 0) return buf;
+        if (prev) {
+          last = pixelDelta(prev, png);
+          if (last.over === 0 && last.tolerated <= 1000) return { buf, png };
+        }
         prev = png;
       }
-      return buf;
+      assert.fail("classic frame did not converge, over=" + (last ? last.over : "none") + " exact=" + (last ? last.exact : "none") + " tolerated=" + (last ? last.tolerated : "none"));
     }
-    const basePage = await page("/wall.html?look=classic", "base-bytes", reduce);
-    const baseBuf = await stillShot(basePage);
-    const def = await page("/wall.html?look=classic", "", reduce);
-    const defBuf = await stillShot(def);
-    const basePng = decodePng(baseBuf);
-    const defPng = decodePng(defBuf);
-    fs.writeFileSync(path.join(ART, "cinema-default-base.png"), baseBuf);
-    fs.writeFileSync(path.join(ART, "cinema-default.png"), defBuf);
-    assert.equal(defPng.w, 1920);
-    assert.equal(defPng.h, 1080);
-    /* Chrome's two draws of this same webp differ by 1 level on a few pixels. A real change is larger, and the unit test still requires an exact byte. */
-    const full = diffPixels(basePng, defPng, null, 1);
-    assert.equal(full, 0, "classic wall render differs from base");
-    assert.ok(full < 800, "the mark phase delta grew past the logo");
+    let def = null;
+    const counts = [];
+    const warm = await page("/wall.html?look=classic", "", reduce);
+    await stillShot(warm);
+    for (let run = 1; run <= 3; run++) {
+      const basePage = await page("/wall.html?look=classic", "base-bytes", reduce);
+      const baseShot = await stillShot(basePage);
+      def = await page("/wall.html?look=classic", "", reduce);
+      const defShot = await stillShot(def);
+      fs.writeFileSync(path.join(ART, "cinema-default-base-" + run + ".png"), baseShot.buf);
+      fs.writeFileSync(path.join(ART, "cinema-default-" + run + ".png"), defShot.buf);
+      assert.equal(defShot.png.w, 1920);
+      assert.equal(defShot.png.h, 1080);
+      const delta = pixelDelta(baseShot.png, defShot.png);
+      counts.push({ run, exact: delta.exact, tolerated: delta.tolerated, over: delta.over });
+      console.log("classic run " + run + " exact " + delta.exact + " tolerated " + delta.tolerated + " over " + delta.over);
+      assert.equal(delta.over, 0, "classic wall render differs from base, run " + run + " over " + delta.over);
+      assert.ok(delta.tolerated <= 1000, "one-level shift too wide, run " + run + " tolerated " + delta.tolerated);
+      assert.ok(delta.over < 800, "the mark phase delta grew past the logo, run " + run);
+    }
+    fs.writeFileSync(path.join(ART, "cinema-classic-diff.json"), JSON.stringify(counts, null, 2));
     const defNet = await def.eval(`(performance.getEntriesByType("resource").map((e) => e.name).concat(window.__net || [])).join("\\n")`);
     assert.doesNotMatch(defNet, /wardos-scene|vendor\/three|art\/cinema/i);
     assert.equal(await def.eval(`document.documentElement.getAttribute("data-look")`), null);
@@ -1139,9 +1176,9 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
     assert.equal(decTheme, "12");
     assert.equal(await dec.eval(`!!document.querySelector(".km-layer")`), true);
   } finally {
-    for (const p of pages) p.close();
-    chrome.proc.kill("SIGKILL");
-    srv.close();
+    for (const p of pages) { try { p.close(); } catch (e) { /* already closed */ } }
+    if (chrome) { try { chrome.proc.kill("SIGKILL"); } catch (e) { /* already gone */ } }
+    if (srv) { try { srv.close(); } catch (e) { /* already closed */ } }
   }
 });
 
@@ -1210,10 +1247,14 @@ test("NOSPOOK1: the wall's Halloween engine is off in every month but October, q
 
 test("browser NOSPOOK1: no Halloween layer is visible or hit on the real wall after October 31, and October still shows it", { timeout: 180000 }, async () => {
   assert.ok(CHROME, "chrome is required");
-  const srv = await serve();
-  const base = "http://127.0.0.1:" + srv.address().port;
-  const chrome = await launchChrome();
+  let srv = null;
+  let chrome = null;
   const pages = [];
+  let base = "";
+  try {
+  srv = await serve();
+  base = "http://127.0.0.1:" + srv.address().port;
+  chrome = await launchChrome();
   const probe = `new Promise((res) => {
     const t0 = performance.now();
     const read = () => {
@@ -1238,7 +1279,6 @@ test("browser NOSPOOK1: no Halloween layer is visible or hit on the real wall af
     };
     step();
   })`;
-  try {
     /* the in-page clock is pinned to Nov 23 2026 (FREEZE); the others pin the season with ?now=. Reduced motion (as the cinema
        default-wall capture uses) keeps a --disable-gpu runner's load event inside the 30 s wait; the layer checks do not depend on it. */
     const calm = [{ name: "prefers-reduced-motion", value: "reduce" }];
@@ -1272,8 +1312,90 @@ test("browser NOSPOOK1: no Halloween layer is visible or hit on the real wall af
     assert.equal(o.flag, null, JSON.stringify(o));
     assert.ok(o.vis.length > 0, "October control lost the porch " + JSON.stringify(o));
   } finally {
-    for (const p of pages) p.close();
-    chrome.proc.kill("SIGKILL");
+    for (const p of pages) { try { p.close(); } catch (e) { /* already closed */ } }
+    if (chrome) { try { chrome.proc.kill("SIGKILL"); } catch (e) { /* already gone */ } }
+    if (srv) { try { srv.close(); } catch (e) { /* already closed */ } }
+  }
+});
+
+test("base header serves every bf976526 path, not only wall.html", async () => {
+  const srv = await serve();
+  try {
+    const origin = "http://127.0.0.1:" + srv.address().port;
+    for (const rel of ["wall.html", "month-theme/month-overlay.js", "month-theme/month-overlay.css"]) {
+      const want = spawnSync("git", ["show", BASE_SHA + ":" + rel], { cwd: ROOT, encoding: "buffer" }).stdout;
+      const got = Buffer.from(await (await fetch(origin + "/" + rel, { headers: { "X-Wall-Bytes": "base" } })).arrayBuffer());
+      assert.equal(got.equals(want), true, rel + " was not the pass-1 blob");
+      const tip = fs.readFileSync(path.join(ROOT, rel));
+      if (!tip.equals(want)) assert.equal(got.equals(tip), false, rel + " base response matched the tip file");
+    }
+  } finally {
     srv.close();
+  }
+});
+
+test("a failed Chrome launch still lets the test exit", async () => {
+  let srv = null;
+  try {
+    srv = await serve();
+    await assert.rejects(() => launchChrome("/bin/true"), /chrome exit|devtools port/);
+    await launchChrome("/bin/true").then(() => { throw new Error("launch returned"); }, (err) => console.log("forced launch failure:", err.message));
+  } finally {
+    if (srv) srv.close();
+  }
+});
+
+test("browser: ?gl=soft live loop returns to the poster within 3 frames and then stays quiet", { timeout: 120000, skip: process.env.QA_NO_BROWSER === "1" ? "SKIP QA_NO_BROWSER=1" : false }, async () => {
+  assert.ok(CHROME, "chrome is required");
+  let srv = null;
+  let chrome = null;
+  const pages = [];
+  try {
+    srv = await serve();
+    chrome = await launchChrome();
+    const origin = "http://127.0.0.1:" + srv.address().port;
+    const hook = `(() => { const raf = window.requestAnimationFrame.bind(window); window.__rafN = 0; window.__gap = 0; window.__retryFrames = 0; let last = 0;
+      window.requestAnimationFrame = (cb) => {
+        window.__rafN++;
+        return raf((t) => {
+          if (last) window.__gap = Math.max(window.__gap, t - last);
+          last = t;
+          const fb = window.__fb;
+          const n = fb && fb.ft ? fb.ft.length : 0;
+          cb(t);
+          const now = window.__fb;
+          if (now && now.tries >= 1 && now.ft && now.ft.length > n) window.__retryFrames++;
+        });
+      }; })();`;
+    const p = await openPage(chrome.port, origin + "/wall.html?look=classic&gl=soft&now=2026-10-20T20:00:00-05:00", hook);
+    pages.push(p);
+    const first = await p.eval(`new Promise((res) => { const t0 = performance.now(); const step = () => {
+      const mode = document.documentElement.getAttribute("data-scene-mode");
+      if (mode === "poster" && window.__fb) return res({ mode, why: __fb.why, tries: __fb.tries, n: window.__rafN });
+      if (performance.now() - t0 > 20000) return res(null);
+      setTimeout(step, 50);
+    }; step(); })`, 25000);
+    assert.ok(first && first.mode === "poster", "the live loop never reached the poster " + JSON.stringify(first));
+    assert.notEqual(first.why, "software-gl", "gl=soft must keep the live loop");
+    const quiet = await p.eval(`new Promise((res) => { const step = () => {
+      const fb = window.__fb;
+      const mode = document.documentElement.getAttribute("data-scene-mode");
+      if (fb && fb.tries >= 1 && mode === "poster") return res({ n: window.__rafN, gap: window.__gap, why: fb.why, tries: fb.tries });
+      setTimeout(step, 100);
+    }; step(); })`, 90000);
+    const frames = await p.eval(`window.__retryFrames`);
+    assert.ok(quiet.why === "3x150ms" || quiet.why === "median>50ms", "retry poster why " + quiet.why);
+    assert.ok(frames <= 3 && frames >= 1, "the retry used " + frames + " frames (" + quiet.why + ")");
+    await p.eval(`new Promise((r) => { window.__gap = 0; setTimeout(r, 800); })`);
+    const after = await p.eval(`({ n: window.__rafN, gap: window.__gap, mode: document.documentElement.getAttribute("data-scene-mode") })`);
+    assert.equal(after.n, quiet.n, "rAF kept running after the poster returned");
+    assert.equal(after.mode, "poster");
+    assert.ok(after.gap <= 500, "gap after the poster returned " + after.gap);
+    fs.mkdirSync(ART, { recursive: true });
+    fs.writeFileSync(path.join(ART, "gl-soft-retry.json"), JSON.stringify({ first, quiet, frames, after }, null, 2));
+  } finally {
+    for (const p of pages) { try { p.close(); } catch (e) { /* already closed */ } }
+    if (chrome) { try { chrome.proc.kill("SIGKILL"); } catch (e) { /* already gone */ } }
+    if (srv) { try { srv.close(); } catch (e) { /* already closed */ } }
   }
 });
