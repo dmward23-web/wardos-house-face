@@ -226,6 +226,9 @@ assets/kids-grow/grow-ainsley-tour-bg.jpg
 assets/kids-grow/grow-harris-gem-bg.jpg
 assets/kids-grow/grow-hayes-victory-bg.jpg
 assets/kids-grow/grow-pattern-bg.jpg
+assets/month-theme/december/bg-wall-dec-dusk.webp
+assets/month-theme/december/bg-wall-dec-morning.webp
+assets/month-theme/december/bg-wall-dec-night.webp
 assets/ori/ainsley/landscape/far.webp
 assets/ori/ainsley/landscape/fg.webp
 assets/ori/ainsley/landscape/mid.webp
