@@ -23,9 +23,9 @@ const PINS = {
   "wardos-xmas.cube": "5bd8ac91"
 };
 const DEC = {
-  morning: "e7c63fd77f5b2e6598dac1ae480d78bf0582f7a307cea9ad044092e44f449b0e",
-  dusk: "4c408da52f8a2fdad7c6afc0cf5741a645e796d6218b5932407b551db0be5435",
-  night: "d40b9a23b4abec32cc7b347e4c03eb90e66dd2a22dc232a7f46dfe0eb18f16cc"
+  morning: "sha256:e7c63fd77f5b2e6598dac1ae480d78bf0582f7a307cea9ad044092e44f449b0e".slice(7),
+  dusk: "sha256:4c408da52f8a2fdad7c6afc0cf5741a645e796d6218b5932407b551db0be5435".slice(7),
+  night: "sha256:d40b9a23b4abec32cc7b347e4c03eb90e66dd2a22dc232a7f46dfe0eb18f16cc".slice(7)
 };
 
 function sha256(buf) {

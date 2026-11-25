@@ -424,6 +424,8 @@
     if (!document.documentElement.getAttribute("data-prism-nav")) {
       document.documentElement.setAttribute("data-prism-nav", "1");
       document.addEventListener("click", function (ev) {
+        /* The hub's own leave handler paints the iris before it navigates. Stealing the click here skips that veil. */
+        if (document.documentElement.classList.contains("ori-calm")) return;
         var a = ev.target && ev.target.closest && ev.target.closest("a.tile[href]");
         if (!a) return;
         var href = a.getAttribute("href");

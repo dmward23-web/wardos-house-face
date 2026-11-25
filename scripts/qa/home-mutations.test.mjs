@@ -40,7 +40,7 @@ const MUT = {
   M4: (h, w) => [boxSwap(h, "width", "64px"), w],
   M5: (h, w) => [boxSwap(h, "height", "64px"), w],
   M6: (h, w) => [h, w.replace('src="house-home.js?v=R58HOME"', 'src="house-gone.js?v=R58HOME"')],
-  M7: (h, w) => [h.replace("String(2 ** 31 - 1)", '"2147483646"'), w],
+  M7: (h, w) => [h.replace("String(2 ** 31 - 1)", '"' + (2 ** 31 - 2) + '"'), w],
   M8: (h, w) => [boxSwap(boxSwap(boxSwap(boxSwap(h, "left", "0px"), "top", "0px"), "width", "0px"), "height", "0px"), w],
   M9: (h, w) => {
     const lines = h.split("\n");
@@ -62,6 +62,6 @@ for (const id of Object.keys(MUT)) {
     if (!browser) return;
     const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/home_zindex.py")], { encoding: "utf8", timeout: 60000 });
     assert.equal(r.status, 0, (r.stderr || "") + (r.stdout || ""));
-    assert.equal(JSON.parse(r.stdout.trim().split("\n").pop()).z, "2147483647");
+    assert.equal(JSON.parse(r.stdout.trim().split("\n").pop()).z, String(2 ** 31 - 1));
   });
 }
