@@ -48,3 +48,13 @@ for (const page of ["kid-hayes", "kid-harris", "sheet-chores", "sheet-allowance"
   const o = run("home", page);
   assert.equal(o.state.landed, "/sheet-index.html", JSON.stringify(o));
 });
+test("DAYPKG1 home tap goes red when the Home handler is removed", SKIP, () => {
+  const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/daypkg1v2i_viewport.py"), "home", "sheet-chores", "440", "956"], {
+    encoding: "utf8",
+    timeout: 180000,
+    env: { ...process.env, DAYPKG_HOME_STRIP: "1" },
+  });
+  assert.equal(r.status, 0, String(r.stderr).slice(-500));
+  const o = JSON.parse(r.stdout.trim().split("\n").pop());
+  assert.notEqual(o.state.landed, "/sheet-index.html", JSON.stringify(o));
+});

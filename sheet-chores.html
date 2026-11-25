@@ -1548,56 +1548,70 @@ document.addEventListener("DOMContentLoaded", function () {
         if (hint) hint.style.setProperty("display", "none", "important");
       });
       if (col.getAttribute("data-show-all") === "1") n = cards.length;
-      var paging = col.getAttribute("data-chore-page") === "more";
-      var windowN = n;
-      if (paging) {
+      if (wall && col.getAttribute("data-show-all") !== "1") {
+        var start = parseInt(col.getAttribute("data-chore-start") || "0", 10);
+        if (!(start >= 0) || start >= cards.length) start = 0;
         cards.forEach(function (card, i) {
-          card.style.setProperty("display", i >= windowN ? "grid" : "none", "important");
+          card.style.setProperty("display", i >= start ? "grid" : "none", "important");
         });
-      }
-      var more = paging || cards.length > windowN;
-      col.classList.toggle("has-more", more);
-      var chip = col.querySelector(".more-chip");
-      if (more && (!chip || chip.tagName !== "BUTTON")) {
-        if (chip) chip.remove();
-        chip = document.createElement("button");
-        chip.type = "button";
-        chip.className = "more-chip";
-        col.appendChild(chip);
-      }
-      if (chip && more) {
-        chip.style.setProperty("height", "64px", "important");
-        chip.style.setProperty("min-height", "64px", "important");
-        chip.style.setProperty("min-width", "64px", "important");
-        chip.style.setProperty("pointer-events", "auto", "important");
-        chip.setAttribute("data-r3-wired", "1");
-        if (wall) {
-          var guard = 0;
-          while (guard < cards.length) {
-            var visNow = cards.filter(function (card) { return card.style.display !== "none"; });
-            if (visNow.length < 1) break;
-            var hiddenNow = cards.length - visNow.length;
-            chip.textContent = paging ? "Back" : ("+" + hiddenNow + " more");
-            var chipTop = chip.getBoundingClientRect().top;
-            var lastCard = visNow[visNow.length - 1];
-            if (lastCard.getBoundingClientRect().bottom <= chipTop + 0.5) break;
-            lastCard.style.setProperty("display", "none", "important");
-            guard += 1;
-          }
+        var chipW = col.querySelector(".more-chip");
+        if (!chipW || chipW.tagName !== "BUTTON") {
+          if (chipW) chipW.remove();
+          chipW = document.createElement("button");
+          chipW.type = "button";
+          chipW.className = "more-chip";
+          col.appendChild(chipW);
+        }
+        chipW.style.setProperty("height", "64px", "important");
+        chipW.style.setProperty("min-height", "64px", "important");
+        chipW.style.setProperty("min-width", "64px", "important");
+        chipW.style.setProperty("pointer-events", "auto", "important");
+        var guard = 0;
+        while (guard < cards.length) {
+          var visNow = cards.filter(function (card) { return card.style.display !== "none"; });
+          if (visNow.length <= 1) break;
+          var lastCard = visNow[visNow.length - 1];
+          chipW.textContent = "+" + (cards.length - visNow.length) + " more";
+          var chipTop = chipW.getBoundingClientRect().top;
+          if (lastCard.getBoundingClientRect().bottom <= chipTop + 0.5) break;
+          lastCard.style.setProperty("display", "none", "important");
+          guard += 1;
         }
         var shown = cards.filter(function (card) { return card.style.display !== "none"; }).length;
-        chip.textContent = paging ? "Back" : (wall ? ("+" + (cards.length - shown) + " more") : "More");
-        if (chip.getAttribute("data-r3-click") !== "1") {
-          chip.setAttribute("data-r3-click", "1");
-          chip.addEventListener("click", function (ev) {
+        if (start === 0) col.setAttribute("data-chore-window", String(shown));
+        var notHere = cards.length - shown;
+        col.classList.toggle("has-more", notHere > 0);
+        if (notHere <= 0) {
+          chipW.remove();
+          return;
+        }
+        chipW.textContent = "+" + notHere + " more";
+        if (chipW.getAttribute("data-r3-click") !== "1") {
+          chipW.setAttribute("data-r3-click", "1");
+          chipW.addEventListener("click", function (ev) {
             ev.preventDefault();
             ev.stopImmediatePropagation();
-            if (col.getAttribute("data-chore-page") === "more") col.removeAttribute("data-chore-page");
-            else col.setAttribute("data-chore-page", "more");
+            var list = col.querySelector(".chore-list");
+            var all = list ? [].slice.call(list.querySelectorAll(":scope > .chore")) : [];
+            var st = parseInt(col.getAttribute("data-chore-start") || "0", 10) || 0;
+            var win = all.filter(function (card) { return card.style.display !== "none"; }).length;
+            var next = st + win;
+            col.setAttribute("data-chore-start", next < all.length ? String(next) : "0");
             col.removeAttribute("data-show-all");
+            col.removeAttribute("data-chore-page");
             fitChoreColumns();
           }, true);
         }
+        return;
+      }
+      var more = cards.length > n;
+      col.classList.toggle("has-more", more);
+      var chip = col.querySelector(".more-chip");
+      if (more && !chip) {
+        chip = document.createElement("div");
+        chip.className = "more-chip";
+        chip.textContent = "More";
+        col.appendChild(chip);
       }
       if (chip && !more) chip.remove();
     });

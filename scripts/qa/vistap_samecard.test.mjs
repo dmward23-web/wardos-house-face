@@ -11,6 +11,7 @@ const SKIP = browser ? {} : { skip: "SKIP no playwright (QA_NO_BROWSER)" };
 
 test("VISTAP same-card nested control and an inset edge both count as COVER", SKIP, () => {
   const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/vistap_gate.py"), ROOT, ROOT, "/tmp/vistap-samecard", "--self-test"], { encoding: "utf8", timeout: 60000 });
-  assert.match(r.stdout || "", /SAMECARD COVER=[2-9]/, (r.stdout || "") + (r.stderr || ""));
+  assert.match(r.stdout || "", /DIV\.what/, (r.stdout || "") + (r.stderr || ""));
+  assert.match(r.stdout || "", /DIV\.edge/, (r.stdout || "") + (r.stderr || ""));
   assert.equal(r.status, 0);
 });

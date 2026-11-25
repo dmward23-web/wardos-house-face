@@ -98,9 +98,9 @@ if a.self_test:
         pg.set_content(html)
         found = pg.evaluate(J, False)
         br.close()
-    cover = sum(1 for f in found if f["k"] == "COVER")
-    print("SAMECARD COVER=%d" % cover)
-    sys.exit(0 if cover >= 2 else 1)
+    cover = [f["el"] for f in found if f["k"] == "COVER"]
+    print("SAMECARD COVER=%d %s" % (len(cover), " ".join(cover)))
+    sys.exit(0 if any(el.startswith("DIV.what") for el in cover) and any(el.startswith("DIV.edge") for el in cover) else 1)
 res, err, shots = {}, {}, {}
 with sync_playwright() as p:
     br = p.chromium.launch(**launch_kw(p, headless=True))

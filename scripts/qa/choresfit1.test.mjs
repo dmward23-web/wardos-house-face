@@ -17,9 +17,13 @@ function measure() {
 
 const data = browser ? measure() : null;
 
+function kids(set) {
+  return set.cols.filter((c) => /Ainsley|Hayes|Harris/.test(c.name));
+}
+
 test("R3 chores rows end above the more chip and every day-tap hits at centre, top, and bottom", SKIP, () => {
-  const cols = data.cols.filter((c) => /Ainsley|Hayes|Harris/.test(c.name));
-  assert.equal(cols.length, 3, JSON.stringify(data.cols));
+  const cols = kids(data.day0);
+  assert.equal(cols.length, 3, JSON.stringify(data.day0.cols));
   for (const col of cols) {
     assert.equal(col.low, 0, col.name + " " + JSON.stringify(col));
     assert.equal(col.misses, 0, col.name + " misses");
@@ -30,4 +34,18 @@ test("R3 chores rows end above the more chip and every day-tap hits at centre, t
   const harris = cols.find((c) => /Harris/.test(c.name));
   assert.equal(hayes.chip, "+4 more", JSON.stringify(hayes));
   assert.equal(harris.chip, "+4 more", JSON.stringify(harris));
+});
+
+test("R3 chores pages cover every card once, and +K is the cards not on page 1", SKIP, () => {
+  for (const [label, set] of [["day0", data.day0], ["overflow", data.overflow]]) {
+    const cols = kids(set);
+    assert.equal(cols.length, 3, label);
+    for (const col of cols) {
+      const flat = col.pages.flat();
+      assert.deepEqual(flat.slice().sort(), col.all.slice().sort(), label + " " + col.name + " union " + JSON.stringify(col.pages));
+      assert.equal(new Set(flat).size, flat.length, label + " " + col.name + " duplicate");
+      const k = col.all.length - col.pages[0].length;
+      assert.equal(col.chip, "+" + k + " more", label + " " + col.name + " chip " + JSON.stringify({ chip: col.chip, k, pages: col.pages.map((p) => p.length) }));
+    }
+  }
 });

@@ -112,6 +112,30 @@ with sync_playwright() as p:
             pg.clock.install(time=NOW)
             pg.goto(base + "/" + page + ".html" + q, wait_until="load", timeout=120000)
             pg.wait_for_timeout(3500); pg.clock.fast_forward(61000); pg.wait_for_timeout(1500)
+            if mode == "home":
+                for _ in range(12):
+                    mark = len(navs)
+                    pg.wait_for_timeout(1500)
+                    try:
+                        pg.wait_for_load_state("load", timeout=5000)
+                    except Exception:
+                        pass
+                    if len(navs) == mark:
+                        break
+                if os.environ.get("DAYPKG_HOME_STRIP") == "1":
+                    pg.evaluate("""() => {
+                      document.querySelectorAll('[data-kw-home], a.hub-home, a.wardos-home, button.wardos-home').forEach(function (el) {
+                        const bare = el.cloneNode(true);
+                        bare.removeAttribute('href');
+                        bare.onclick = null;
+                        if (el.parentNode) el.parentNode.replaceChild(bare, el);
+                      });
+                    }""")
+                # The route interceptor aborts the document navigation the Home handler starts.
+                try:
+                    ctx.unroute("**/*", gate)
+                except Exception:
+                    pass
             if mode == "kidobs":
                 out["state"] = pg.evaluate(PARSED)
             elif mode == "allowance":
@@ -133,8 +157,9 @@ with sync_playwright() as p:
                 if spot:
                     try:
                         with pg.expect_navigation(timeout=8000):
-                            if mob: pg.touchscreen.tap(spot[0], spot[1])
-                            else: pg.mouse.click(spot[0], spot[1])
+                            # A settled mouse click at the home point. Touch taps abort the
+                            # navigation that pointerup already started.
+                            pg.mouse.click(spot[0], spot[1])
                     except Exception as e: out["tapErr"] = str(e)[:80]
                 out["state"] = {"landed": urlparse(pg.url).path, "spot": spot}
         out["errors"] = errors[:6]; out["feedHits"] = sorted(set(hits)); out["navs"] = [n.replace(base, "") for n in navs][:6]
