@@ -49,3 +49,25 @@ test("R3 chores pages cover every card once, and +K is the cards not on page 1",
     }
   }
 });
+
+test("R5 every shown chore card has 7 day taps, the page-1 columns, and clears the chip", SKIP, () => {
+  for (const [label, set] of [["day0", data.day0], ["overflow", data.overflow]]) {
+    const cols = kids(set);
+    assert.equal(cols.length, 3, label);
+    for (const col of cols) {
+      const fit = col.pageFit || [];
+      assert.ok(fit.length >= 1, label + " " + col.name + " pages");
+      const grid0 = fit[0].cards.length ? fit[0].cards[0].grid : "";
+      assert.ok(grid0, label + " " + col.name + " grid");
+      for (let pi = 0; pi < fit.length; pi++) {
+        const page = fit[pi];
+        assert.equal(page.low, 0, label + " " + col.name + " p" + (pi + 1) + " overlap");
+        assert.equal(page.misses, 0, label + " " + col.name + " p" + (pi + 1) + " hits");
+        for (const card of page.cards) {
+          assert.equal(card.taps, 7, label + " " + col.name + " p" + (pi + 1) + " " + card.name + " taps " + card.taps);
+          assert.equal(card.grid, grid0, label + " " + col.name + " p" + (pi + 1) + " " + card.name + " grid");
+        }
+      }
+    }
+  }
+});

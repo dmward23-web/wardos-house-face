@@ -156,10 +156,18 @@ with sync_playwright() as p:
                   for (let y = r.top + 6; y < r.bottom - 2; y += 6) for (let x = r.left + 8; x < r.right - 8; x += 10) { const e = document.elementFromPoint(x, y); if (e && !e.closest(C)) return [x, y, 'hdr-overlay']; } return null; }""")
                 if spot:
                     try:
-                        with pg.expect_navigation(timeout=8000):
-                            # A settled mouse click at the home point. Touch taps abort the
-                            # navigation that pointerup already started.
-                            pg.mouse.click(spot[0], spot[1])
+                        if mob:
+                            # pointerup starts a navigation that the following click supersedes.
+                            # wait_for_url reports that first navigation as ERR_ABORTED.
+                            pg.touchscreen.tap(spot[0], spot[1])
+                            try:
+                                pg.wait_for_url("**/sheet-index.html", timeout=8000)
+                            except Exception:
+                                if "sheet-index.html" not in pg.url:
+                                    pg.wait_for_url("**/sheet-index.html", timeout=8000)
+                        else:
+                            with pg.expect_navigation(timeout=8000):
+                                pg.mouse.click(spot[0], spot[1])
                     except Exception as e: out["tapErr"] = str(e)[:80]
                 out["state"] = {"landed": urlparse(pg.url).path, "spot": spot}
         out["errors"] = errors[:6]; out["feedHits"] = sorted(set(hits)); out["navs"] = [n.replace(base, "") for n in navs][:6]

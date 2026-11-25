@@ -112,9 +112,49 @@ with sync_playwright() as p:
             resp = pg.goto("%s/%s.html?pfBase=%s&now=%s&freeze=1" % (base, r, base, a.now.replace("+", "%2B")), wait_until="domcontentloaded", timeout=30000)
             if not resp or resp.status != 200: raise RuntimeError("HTTP %s" % (resp.status if resp else None))
             pg.wait_for_timeout(3500)
-            res[r] = pg.evaluate(J, r.startswith("kid-"))
+            if r == "sheet-chores":
+                try:
+                    pg.wait_for_function("""() => {
+                      var whats = Array.prototype.map.call(document.querySelectorAll('section.col .chore .what'), function (el) { return el.textContent || ''; });
+                      var taps = document.querySelectorAll('section.col .chore .day-tap').length;
+                      return whats.length >= 9 && taps >= 63 && whats.every(function (t) { return t.indexOf('\u00b7') < 0 && t.indexOf('stage') < 0; });
+                    }""", timeout=15000)
+                except Exception:
+                    pass
+                pg.wait_for_timeout(400)
+            pages = [pg.evaluate(J, r.startswith("kid-"))]
             if a.shots:
                 f = OUT / ("golden-%s.png" % r); pg.screenshot(path=str(f)); shots[r] = hashlib.sha256(f.read_bytes()).hexdigest()
+            if r == "sheet-chores":
+                first = pg.evaluate("""() => [...document.querySelectorAll('section.col .chore')].filter(e => getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().height > 1).map(e => ((e.querySelector('.what') || {}).innerText || '').replace(/\\s+/g, ' ').trim()).join('|')""")
+                for pi in range(1, 6):
+                    moved = pg.evaluate("""() => {
+                      let n = 0;
+                      document.querySelectorAll('section.col').forEach(function (col) {
+                        const chip = col.querySelector('.more-chip');
+                        if (!chip) return;
+                        const s = getComputedStyle(chip);
+                        if (s.display === 'none' || chip.getBoundingClientRect().height < 1) return;
+                        chip.click();
+                        n += 1;
+                      });
+                      return n;
+                    }""")
+                    if not moved:
+                        break
+                    pg.wait_for_timeout(300)
+                    now = pg.evaluate("""() => [...document.querySelectorAll('section.col .chore')].filter(e => getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().height > 1).map(e => ((e.querySelector('.what') || {}).innerText || '').replace(/\\s+/g, ' ').trim()).join('|')""")
+                    if now == first:
+                        break
+                    found = pg.evaluate(J, False)
+                    for fnd in found:
+                        fnd["d"] = "p%d %s" % (pi + 1, fnd.get("d") or "")
+                    pages.append(found)
+                    if a.shots:
+                        f = OUT / ("golden-%s-p%d.png" % (r, pi + 1))
+                        pg.screenshot(path=str(f))
+                        shots["%s-p%d" % (r, pi + 1)] = hashlib.sha256(f.read_bytes()).hexdigest()
+            res[r] = [fnd for page in pages for fnd in page]
         except Exception as e:
             err[r] = str(e)[:200]
         c.close()

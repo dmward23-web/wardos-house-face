@@ -46,30 +46,42 @@ JS = r"""() => {
     const chipOn = chip && vis(chip);
     const chipTop = chipOn ? chip.getBoundingClientRect().top : 1e9;
     const low = rows.filter(row => row.getBoundingClientRect().bottom > chipTop + 0.5).length;
-    const taps = rows.flatMap(row => [...row.querySelectorAll('.day-tap')].filter(vis));
-    const misses = [];
-    for (const tap of taps) {
-      const r = tap.getBoundingClientRect();
-      const pts = [
-        [r.left + r.width / 2, r.top + r.height / 2],
-        [r.left + r.width / 2, r.top + 4],
-        [r.left + r.width / 2, r.bottom - 4]
-      ];
-      for (const [x, y] of pts) {
-        const h = document.elementFromPoint(Math.min(innerWidth - 1, x), Math.min(innerHeight - 1, y));
-        if (!(h && (h === tap || tap.contains(h)))) misses.push((tap.innerText || '').trim());
+    const cards = rows.map(row => {
+      const taps = [...row.querySelectorAll('.day-tap')].filter(vis);
+      let cardMiss = 0;
+      for (const tap of taps) {
+        const r = tap.getBoundingClientRect();
+        const pts = [
+          [r.left + r.width / 2, r.top + r.height / 2],
+          [r.left + 4, r.top + r.height / 2],
+          [r.right - 4, r.top + r.height / 2],
+          [r.left + r.width / 2, r.top + 4],
+          [r.left + r.width / 2, r.bottom - 4]
+        ];
+        for (const [x, y] of pts) {
+          const h = document.elementFromPoint(Math.min(innerWidth - 1, Math.max(0, x)), Math.min(innerHeight - 1, Math.max(0, y)));
+          if (!(h && (h === tap || tap.contains(h)))) cardMiss += 1;
+        }
       }
-    }
+      return {
+        name: labelOf(row),
+        taps: taps.length,
+        grid: getComputedStyle(row).gridTemplateColumns,
+        misses: cardMiss
+      };
+    });
+    const misses = cards.reduce((n, card) => n + card.misses, 0);
     return {
       name,
       rows: rows.length,
       all: every.map(labelOf),
       page: rows.map(labelOf),
+      cards,
       chip: chipOn ? (chip.textContent || '').replace(/\s+/g, ' ').trim() : '',
       chipTag: chip ? chip.tagName : '',
       chipH: chipOn ? Math.round(chip.getBoundingClientRect().height) : 0,
       low,
-      misses: misses.length
+      misses
     };
   });
   return { cols };
@@ -94,7 +106,7 @@ def reset_pages(pg):
 
 def shot_pages(pg, tag):
     reset_pages(pg)
-    pg.screenshot(path=str(SHOTS / ("chores-r4-" + tag + "-p1.png")))
+    pg.screenshot(path=str(SHOTS / ("chores-r5-" + tag + "-p1.png")))
     for kid in ("Ainsley", "Hayes", "Harris"):
         reset_pages(pg)
         pg.evaluate("""(kid) => {
@@ -106,7 +118,16 @@ def shot_pages(pg, tag):
           });
         }""", kid)
         pg.wait_for_timeout(200)
-        pg.screenshot(path=str(SHOTS / ("chores-r4-" + tag + "-" + kid.lower() + "-p2.png")))
+        pg.screenshot(path=str(SHOTS / ("chores-r5-" + tag + "-" + kid.lower() + "-p2.png")))
+    reset_pages(pg)
+    pg.evaluate("""() => {
+      document.querySelectorAll('section.col').forEach(function (col) {
+        const chip = col.querySelector('.more-chip');
+        if (chip) chip.click();
+      });
+    }""")
+    pg.wait_for_timeout(200)
+    pg.screenshot(path=str(SHOTS / ("chores-r5-" + tag + "-p2.png")))
 
 def walk(pg):
     reset_pages(pg)
@@ -124,7 +145,7 @@ def walk(pg):
                 continue
             if not seen:
                 chips[key] = {"chip": col["chip"], "chipTag": col["chipTag"], "chipH": col["chipH"], "low": col["low"], "misses": col["misses"], "rows": col["rows"], "all": col["all"]}
-            seen.append({"page": col["page"], "chip": col["chip"]})
+            seen.append({"page": col["page"], "chip": col["chip"], "cards": col["cards"], "low": col["low"], "misses": col["misses"]})
             if col["chip"]:
                 pending.append(key)
         if not pending:
@@ -151,6 +172,7 @@ def walk(pg):
             "misses": meta["misses"],
             "all": meta["all"],
             "pages": [p["page"] for p in pages],
+            "pageFit": [{"low": p["low"], "misses": p["misses"], "cards": p["cards"]} for p in pages],
         })
     return {"cols": cols}
 

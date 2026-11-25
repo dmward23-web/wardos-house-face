@@ -1317,6 +1317,50 @@ html:not(#hf-wall-off) body .panel .cheer {
 </style>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+  var DOW_SHORT = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  var DOW_LONG = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  function ensureChoreWeekTaps(card) {
+    if (card.querySelectorAll(".day-tap").length === 7) return false;
+    if (!card.hasAttribute("data-stars")) return false;
+    var WK = window.WardKids;
+    if (!WK || typeof WK.weekDayIsos !== "function" || typeof WK.dowIndexFromIso !== "function" || !WK.DAY_ISO) return false;
+    var id = card.getAttribute("data-check") || card.getAttribute("data-quest-id") || "";
+    if (!id) return false;
+    var days = WK.weekDayIsos(WK.DAY_ISO).slice().sort(function (a, b) {
+      return ((WK.dowIndexFromIso(a) + 6) % 7) - ((WK.dowIndexFromIso(b) + 6) % 7);
+    });
+    if (days.length !== 7) return false;
+    var whatEl = card.querySelector(".what");
+    var what = whatEl ? whatEl.textContent : "";
+    var taps = card.querySelector(".quest-days");
+    if (!taps) {
+      taps = document.createElement("div");
+      taps.className = "quest-days";
+      taps.setAttribute("role", "group");
+      taps.setAttribute("aria-label", "Days this week");
+      var host = card.querySelector(".txt") || card;
+      host.appendChild(taps);
+    }
+    taps.textContent = "";
+    for (var di = 0; di < days.length; di++) {
+      var iso = days[di];
+      var dow = WK.dowIndexFromIso(iso);
+      var on = typeof WK.getCheck === "function" ? !!WK.getCheck(id, WK._data, iso) : false;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "day-tap" + (on ? " done" : "") + (iso === WK.DAY_ISO ? " is-today" : "") + (iso !== WK.DAY_ISO && iso < WK.DAY_ISO ? " is-past" : "") + (dow === 0 || dow === 6 ? " is-off" : "");
+      btn.setAttribute("data-check", id);
+      btn.setAttribute("data-day-iso", iso);
+      btn.setAttribute("data-kid-quest", "1");
+      btn.setAttribute("data-cadence", "daily");
+      btn.setAttribute("aria-label", DOW_LONG[dow] + " · " + what);
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.textContent = DOW_SHORT[dow];
+      taps.appendChild(btn);
+    }
+    card.classList.add("daily-week");
+    return true;
+  }
   function fitChoreColumns() {
     document.querySelectorAll("section.col").forEach(function (col) {
       var list = col.querySelector(".chore-list");
@@ -1424,12 +1468,14 @@ document.addEventListener("DOMContentLoaded", function () {
       col.setAttribute("data-r33-circle", String(circle));
       col.setAttribute("data-r33-gap", String(dayGap));
       col.setAttribute("data-r33-content", String(content));
+      var wallPaging = wall && col.getAttribute("data-show-all") !== "1";
       cards.forEach(function (card, i) {
-        if (!showAll && i >= n) {
+        if (!wallPaging && !showAll && i >= n) {
           card.style.setProperty("display", "none", "important");
           return;
         }
-        card.style.setProperty("display", "grid", "important");
+        if (wallPaging) ensureChoreWeekTaps(card);
+        if (!wallPaging) card.style.setProperty("display", "grid", "important");
         card.style.setProperty("grid-template-columns", left + "px " + iconW + "px " + mid + "px " + daysW + "px " + right + "px", "important");
         card.style.setProperty("grid-template-rows", (wall ? (labelH + "px " + circle + "px") : (Math.max(64, rowH) + "px")), "important");
         card.style.setProperty("column-gap", "0", "important");
@@ -1615,6 +1661,9 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       if (chip && !more) chip.remove();
     });
+    if (window.HouseCheckoffs && typeof HouseCheckoffs.rewire === "function") {
+      try { HouseCheckoffs.rewire(); } catch (eRewire) { /* taps still paint if wiring is late */ }
+    }
   }
   window.fitChoreColumns = fitChoreColumns;
   [0, 200, 600, 1200, 2000, 2800, 3400].forEach(function (ms) { window.setTimeout(fitChoreColumns, ms); });
