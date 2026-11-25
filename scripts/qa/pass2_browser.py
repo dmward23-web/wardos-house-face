@@ -5,8 +5,6 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import struct
 import zlib
-from playwright.sync_api import sync_playwright
-from pw_chrome import launch_kw
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -296,6 +294,8 @@ SOAK_JS = """() => new Promise((res) => {
 })"""
 
 def main():
+    from playwright.sync_api import sync_playwright
+    from pw_chrome import launch_kw
     httpd, base = serve()
     report = {"contrast": [], "stills": [], "camoRequests": [], "dec": []}
     fallback = open_png(ROOT / "art/cinema/xmas-2026/xmas-hero-fallback-1920x1080-graded.png")
