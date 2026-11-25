@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Pass 2 browser checks: Dec plates, cinema stills, contrast, LUT match, tiers, 60s soak, no camo."""
-import hashlib, json, os, re, subprocess, tempfile, threading
+import hashlib, json, os, re, subprocess, sys, tempfile, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import struct
@@ -227,24 +227,57 @@ def centre_luma(im):
             n += 1
     return acc / n
 
-# Full 60s window. Exempt only a gap within ±1.5s of an envNow minute boundary
-# while the scene is in poster mode, at most one per minute.
-# Cause: wall.html ~L684-685, FB.st poster-mode minute repaint (SwiftShader forces poster mode).
+# Full 60s window. A poster-mode gap within ±1.5s of an envNow minute boundary
+# may be dropped only when it is at most two frames (1000/60 ms), and only one
+# such gap per minute. A multi-second freeze at that boundary still counts.
+# wall.html FB.st (the poster minute repaint) is the boundary; the stall itself
+# is the software-GL live loop, which SOFTGL1 no longer starts.
+FRAME_MS = 1000.0 / 60.0
+EXEMPT_CAP = 2 * FRAME_MS
+
+def score_soak(frames):
+    used = set()
+    max_gap = 0.0
+    exempted = []
+    for f in frames:
+        gap = float(f["gap"])
+        minute = f.get("minute")
+        if minute is not None and gap <= EXEMPT_CAP and minute not in used:
+            used.add(minute)
+            exempted.append(f)
+        elif gap > max_gap:
+            max_gap = gap
+    return max_gap, exempted
+
+def self_test():
+    quiet, _ = score_soak([{"gap": EXEMPT_CAP, "minute": 10}])
+    if quiet != 0:
+        raise SystemExit("a two-frame boundary gap was scored " + str(quiet))
+    stall, _ = score_soak([{"gap": 2000.0, "minute": 10}])
+    if stall < 2000:
+        raise SystemExit("injected boundary stall was exempted " + str(stall))
+    sneak, _ = score_soak([{"gap": 20.0, "minute": 10}, {"gap": 2000.0, "minute": 10}])
+    if sneak < 2000:
+        raise SystemExit("a small boundary frame hid the stall " + str(sneak))
+    plain, _ = score_soak([{"gap": 800.0, "minute": None}])
+    if plain < 800:
+        raise SystemExit("an off-boundary stall was dropped " + str(plain))
+    print("SOAK SELF-TEST ok cap %.2f" % EXEMPT_CAP)
+
 SOAK_JS = """() => new Promise((res) => {
   const mem = () => (performance.memory && performance.memory.usedJSHeapSize) || 0;
   const start = mem();
-  let last = 0, maxGap = 0, t0 = 0, armed = false;
-  const usedMinute = {};
-  const exempted = [];
+  let last = 0, t0 = 0, armed = false;
+  const frames = [];
   function poster() {
     try {
       if (window.__fb && __fb.mode === "poster") return true;
       return document.documentElement.getAttribute("data-scene-mode") === "poster";
     } catch (e) { return false; }
   }
-  function nearMinute() {
+  function minute() {
     try {
-      if (typeof envNow !== "function") return null;
+      if (!poster() || typeof envNow !== "function") return null;
       const t = envNow();
       const sec = (t / 1000) % 60;
       if (sec <= 1.5 || sec >= 58.5) return Math.floor(t / 60000);
@@ -255,15 +288,9 @@ SOAK_JS = """() => new Promise((res) => {
     if (!armed) { armed = true; last = now; t0 = now; requestAnimationFrame(step); return; }
     const gap = now - last; last = now;
     const age = now - t0;
-    if (age >= 3000) {
-      const minute = poster() ? nearMinute() : null;
-      if (minute !== null && !usedMinute[minute]) {
-        usedMinute[minute] = 1;
-        exempted.push({ age: Math.round(age), gap: Math.round(gap) });
-      } else if (gap > maxGap) maxGap = gap;
-    }
+    if (age >= 3000) frames.push({ gap: gap, minute: minute() });
     if (age < 63000) requestAnimationFrame(step);
-    else res({ growth: mem() - start, maxGap, exempted, mode: (window.__fb && __fb.mode) || "" });
+    else res({ growth: mem() - start, frames: frames, mode: (window.__fb && __fb.mode) || "", why: (window.__fb && __fb.why) || "" });
   }
   requestAnimationFrame(step);
 })"""
@@ -482,17 +509,24 @@ def main():
         page.goto(base + "/wall.html?q=high&fps=1&now=2026-12-04T16:45:00-06:00", wait_until="domcontentloaded", timeout=30000)
         page.wait_for_function("() => document.getElementById('wardos-scene') && document.getElementById('wardos-scene').getAttribute('data-plate')==='1920'", timeout=25000)
         soak = page.evaluate(SOAK_JS)
+        tip_gap, tip_ex = score_soak(soak["frames"])
         report["heapGrowthMB"] = round(soak["growth"] / (1024 * 1024), 2)
-        report["rafStallMs"] = round(soak["maxGap"], 1)
-        report["soakExempted"] = soak["exempted"]
+        report["rafStallMs"] = round(tip_gap, 1)
+        report["soakExempted"] = tip_ex
+        report["soakWhy"] = soak.get("why")
         check(report["heapGrowthMB"] <= 20, "heap growth %.2f MB" % report["heapGrowthMB"])
         check(report["rafStallMs"] <= 500, "raf stall %.1f ms" % report["rafStallMs"])
-        # Base control: the same poster minute repaint exists on the pass-1 wall.
+        # Base control: bf976526 wall.html has no SOFTGL1, so the same window still stalls.
+        base_blob = subprocess.check_output(["git", "-C", str(ROOT), "show", "bf976526d4072113732340853fe37a41e725803f:wall.html"])
         page.goto(base + "/wall.html?base=bf976526", wait_until="domcontentloaded", timeout=30000)
         page.wait_for_timeout(2000)
         base_soak = page.evaluate(SOAK_JS)
-        report["baseSoak"] = {"maxGap": round(base_soak["maxGap"], 1), "exempted": base_soak["exempted"], "mode": base_soak["mode"]}
-        print("BASE SOAK", json.dumps(report["baseSoak"]))
+        base_gap, base_ex = score_soak(base_soak["frames"])
+        base_soft = page.evaluate("() => /const SOFTGL=/.test(document.documentElement.innerHTML)")
+        report["baseSoak"] = {"maxGap": round(base_gap, 1), "exempted": base_ex, "mode": base_soak["mode"], "why": base_soak.get("why"), "sha256": sha256(base_blob), "softgl": bool(base_soft)}
+        print("BASE SOAK", json.dumps({k: report["baseSoak"][k] for k in ("maxGap", "mode", "why", "softgl")}))
+        check(base_soft is False and len(base_blob) > 1000, "base control did not serve bf976526")
+        check(report["baseSoak"]["maxGap"] > 500, "base control stall %.1f ms" % report["baseSoak"]["maxGap"])
 
         browser.close()
     httpd.shutdown()
@@ -503,4 +537,7 @@ def main():
         raise SystemExit(1)
 
 if __name__ == "__main__":
-    main()
+    if "--self-test" in sys.argv:
+        self_test()
+    else:
+        main()

@@ -1,9 +1,10 @@
 /* FRAMEBUDGET1 · the night scene's frame-budget governor (night/scene.html and wall.html). A slow scene pauses, crossfades to the
    LHVID1 still poster and stops its render loop (no rAF after the fallback); prefers-reduced-motion goes straight to the poster;
-   the back layer is uploaded only when it changes. Static half always runs; the browser half needs puppeteer-core + chrome
-   (skips cleanly otherwise). No frames are stored. */
+   the back layer is uploaded only when it changes. Static half always runs; the browser half uses the CDP helper
+   (scripts/qa/cdp-lite.mjs) and skips only when QA_NO_BROWSER=1. No frames are stored. */
 import test from "node:test"; import assert from "node:assert/strict"; import fs from "node:fs"; import path from "node:path"; import http from "node:http";
-import { fileURLToPath } from "node:url"; import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
+import { launchChrome, openPage } from "./cdp-lite.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const SC = ["night/scene.html", "wall.html"].map((f) => [f, fs.readFileSync(path.join(ROOT, f), "utf8")]);
 const block = (s) => { const a = s.indexOf("// FRAMEBUDGET1 · frame-budget governor"), b = s.indexOf("function fbStart()"); return a > 0 && b > a ? s.slice(a, s.indexOf("\n", b)) : null; };
@@ -28,10 +29,9 @@ test("static: one governor, same in both scenes, thresholds and poster wiring", 
   }
 });
 
-const NO_BROWSER = process.env.QA_NO_BROWSER === "1";   /* DAYPKG1 item 3 · QA_NO_BROWSER=1: puppeteer-core is never loaded and no Chrome path is resolved, so nothing below can launch */
-let pp = null; if (!NO_BROWSER) for (const base of [import.meta.url, (process.env.WARDOS_DEPS || "/nonexistent") + "/", "/tmp/h1-deps/node_modules/", "/tmp/ori-qa/node_modules/"]) { try { pp = createRequire(base)("puppeteer-core"); break; } catch (_) {} }
+const NO_BROWSER = process.env.QA_NO_BROWSER === "1";   /* DAYPKG1 item 3 · QA_NO_BROWSER=1: Chrome is never launched */
 const CHROME = NO_BROWSER ? null : (process.env.CHROME_PATH || ["/usr/local/bin/google-chrome", "/usr/bin/google-chrome"].find((c) => fs.existsSync(c)) || null);
-const SKIP = NO_BROWSER ? "SKIP QA_NO_BROWSER=1 (no Chrome launch)" : (!(pp && CHROME) && "needs puppeteer-core + chrome");
+const SKIP = NO_BROWSER ? "SKIP QA_NO_BROWSER=1 (no Chrome launch)" : false;
 /* counts every rAF request; with __slow set each frame callback busy-waits 200 ms (a forced slow frame) */
 const HOOK = () => { const raf = window.requestAnimationFrame.bind(window); window.__rafN = 0; window.__slow = false;
   window.requestAnimationFrame = (cb) => { window.__rafN++; return raf((t) => { if (window.__slow) { const e = performance.now() + 200; while (performance.now() < e); } cb(t); }); }; };
@@ -42,7 +42,9 @@ async function withScene(fn) {
     const f = path.join(ROOT, path.normalize(rel).replace(/^(\.\.(\/|\\|$))+/, ""));
     fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); r.end(); return; } r.writeHead(200, { "Content-Type": types[path.extname(f)] || "application/octet-stream" }); r.end(b); }); });
   await new Promise((ok) => srv.listen(0, "127.0.0.1", ok)); const base = "http://127.0.0.1:" + srv.address().port;   /* loopback only */
-  const b = await pp.launch({ executablePath: CHROME, args: ["--no-sandbox", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--disable-background-timer-throttling", "--disable-renderer-backgrounding"] });
+  assert.ok(CHROME, "chrome is required");
+  const b = await launchChrome(CHROME);
+  b.newPage = () => openPage(b.port);
   try { await fn(b, base); } finally { await b.close(); srv.close(); }
 }
 const state = (g) => g.evaluate(() => ({ mode: document.documentElement.getAttribute("data-scene-mode"), why: window.__fb && __fb.why, raf: window.__rafN,
@@ -62,7 +64,8 @@ test("browser: a forced slow frame falls back to the poster and no rAF runs afte
     const g = await b.newPage(); await g.setViewport({ width: 440, height: 956 }); await g.evaluateOnNewDocument(HOOK);
     if (f === "wall.html") await g.evaluateOnNewDocument(PIN, OCT);
     /* SOFTGL1 · this runner is software WebGL, where scene.html now shows the poster at once; ?gl=soft keeps its live scene so the governor is still the thing under test */
-    await g.goto(base + "/" + f + (f === "night/scene.html" ? "?gl=soft" : ""), { waitUntil: "load" });
+    /* ?gl=soft on both files: this runner is software WebGL, and wall.html now takes the still poster at once unless asked to keep the live scene. */
+    await g.goto(base + "/" + f + (f === "wall.html" ? "?gl=soft&look=classic" : "?gl=soft"), { waitUntil: "load" });
     await g.waitForFunction(() => window.__fb && document.documentElement.getAttribute("data-scene-mode"), { timeout: 30000, polling: 100 });
     await g.evaluate(() => { window.__slow = true; });
     await g.waitForFunction(() => document.documentElement.getAttribute("data-scene-mode") === "poster", { timeout: 30000, polling: 100 });
@@ -80,7 +83,7 @@ test("browser: prefers-reduced-motion goes straight to the poster with no render
   await withScene(async (b, base) => { for (const f of ["night/scene.html", "wall.html"]) {
     const g = await b.newPage(); await g.setViewport({ width: 440, height: 956 }); await g.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
     await g.evaluateOnNewDocument(HOOK); if (f === "wall.html") await g.evaluateOnNewDocument(PIN, OCT);
-    await g.goto(base + "/" + f, { waitUntil: "load" });
+    await g.goto(base + "/" + f + (f === "wall.html" ? "?look=classic" : ""), { waitUntil: "load" });
     await g.waitForFunction(() => document.documentElement.getAttribute("data-scene-mode") === "poster", { timeout: 30000, polling: 100 });
     await sleep(800); const s0 = await state(g); await sleep(1500); const s1 = await state(g);
     assert.equal(s0.why, "reduced-motion", f); assert.equal(s1.raf, s0.raf, f + " no rAF in reduced motion");
@@ -93,7 +96,7 @@ test("browser: off-season (Nov 23) wall.html keeps the porch engine hidden, post
   await withScene(async (b, base) => { for (const rm of [false, true]) {
     const g = await b.newPage(); await g.setViewport({ width: 440, height: 956 });
     if (rm) await g.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
-    await g.evaluateOnNewDocument(HOOK); await g.evaluateOnNewDocument(PIN, OFF); await g.goto(base + "/wall.html", { waitUntil: "load" });
+    await g.evaluateOnNewDocument(HOOK); await g.evaluateOnNewDocument(PIN, OFF); await g.goto(base + "/wall.html?look=classic", { waitUntil: "load" });
     await g.waitForFunction(() => window.__fb && document.documentElement.getAttribute("data-scene-mode"), { timeout: 30000, polling: 100 });
     await sleep(2500); const s0 = await state(g); await sleep(1500); const s1 = await state(g);
     const hide = await g.evaluate(() => ({ hw: document.documentElement.getAttribute("data-halloween"), pov: getComputedStyle(document.getElementById("poster")).visibility,

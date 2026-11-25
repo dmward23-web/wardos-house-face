@@ -231,6 +231,12 @@ function artDir() {
     return tmp;
   }
 }
+test("PASS2 soak scorer: a boundary stall longer than two frames fails", () => {
+  const r = spawnSync("python3", ["scripts/qa/pass2_browser.py", "--self-test"], { cwd: ROOT, encoding: "utf8", timeout: 30000 });
+  assert.equal(r.status, 0, (r.stdout || "") + (r.stderr || ""));
+  assert.match(r.stdout, /SOAK SELF-TEST ok/);
+});
+
 test("PASS2 browser: plates, contrast, LUT match, tiers, soak, stills", { timeout: 420000, skip: process.env.QA_NO_BROWSER === "1" ? "SKIP QA_NO_BROWSER=1" : false }, () => {
   const art = artDir();
   const r = spawnSync("python3", ["scripts/qa/pass2_browser.py"], {

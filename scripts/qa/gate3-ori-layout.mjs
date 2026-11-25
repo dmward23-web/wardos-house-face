@@ -638,6 +638,8 @@ async function prepare(page, file) {
 }
 
 async function main() {
+  const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../.."), encoding: "utf8" });
+  console.log("GATE3 head", (head.stdout || "").trim());
   const server = await startServer();
   const browser = await puppeteer.launch({
     executablePath: chromePath(),
@@ -767,7 +769,7 @@ async function main() {
           }
           return veilRead().then((mid) => {
             if (!veilOk(mid)) failures.push("phone veil missing " + where + " " + JSON.stringify(mid));
-            else console.log("  veil", where, mid.op.toFixed(2));
+            else console.log("  veil", where, mid.op.toFixed(2), "iris hold/fade (e)", "calm=" + (mid && mid.calm), "fade=" + (mid && mid.fade));
           });
         }
         function veilRead() {
@@ -779,7 +781,7 @@ async function main() {
               const s = getComputedStyle(el);
               const op = parseFloat(s.opacity) || 0;
               const r = el.getBoundingClientRect();
-              if (!best || op > best.op) best = { op: op, w: r.width, h: r.height, display: s.display, name: el.className };
+              if (!best || op > best.op) best = { op: op, w: r.width, h: r.height, display: s.display, name: el.className, fade: el.getAttribute("data-calm-fade"), calm: el.getAttribute("data-calm") };
             });
             if (best && best.op >= 0.35) return best;
             if (held) return { op: 1, w: innerWidth, h: innerHeight, display: "pseudo", name: "held" };

@@ -158,8 +158,10 @@ export function emailHit(rel, line) {
   }
   return false;
 }
-function scanText(rel, text, deny, hits) {
-  const isJson = /\.json$/i.test(rel);
+export function scanText(rel, text, deny, hits, filePath) {
+  /* Range mode labels a blob "path @commit". JSON and fixture allows follow the bare path; the label stays on the hit. */
+  const file = filePath || String(rel).replace(/ @[0-9a-f]{8}$/, "");
+  const isJson = /\.json$/i.test(file);
   const lines = text.split("\n");
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -167,10 +169,10 @@ function scanText(rel, text, deny, hits) {
     const allow = /privacy-scan:allow\s+([a-z_]+)/.exec(line);
     for (const [cat, rx] of GENERIC) {
       if (allow && allow[1] === cat) continue;
-      if (FIXTURE_ALLOW[cat] && FIXTURE_ALLOW[cat].test(rel)) continue;
+      if (FIXTURE_ALLOW[cat] && FIXTURE_ALLOW[cat].test(file)) continue;
       if (cat === "email" ? emailHit(rel, line) : rx.test(line)) hits.push({ rel, line: i + 1, cat });
     }
-    if (BDAY.test(line) && (isJson || DATEISH.test(line)) && !(allow && allow[1] === "birthday_dated") && !FIXTURE_ALLOW.birthday_dated.test(rel)) hits.push({ rel, line: i + 1, cat: "birthday_dated" });
+    if (BDAY.test(line) && (isJson || DATEISH.test(line)) && !(allow && allow[1] === "birthday_dated") && !FIXTURE_ALLOW.birthday_dated.test(file)) hits.push({ rel, line: i + 1, cat: "birthday_dated" });
     for (const rx of deny.pats) if (rx.test(line)) { hits.push({ rel, line: i + 1, cat: "denylist" }); break; }
     if (CAL_STRINGS && CAL_STRINGS.test(line) && !(allow && allow[1] === "calendar_string")) hits.push({ rel, line: i + 1, cat: "calendar_string" });
   }
@@ -226,7 +228,7 @@ function main() {
     let buf; try { buf = b.read(); } catch { continue; }
     if (buf.includes(0)) continue;
     const sub = [];
-    scanText(b.rel, buf.toString("utf8"), deny, sub);
+    scanText(b.rel, buf.toString("utf8"), deny, sub, b.path || b.rel);
     for (const h of sub) hits.push({ ...h, rel: b.rel });
   }
   const byCat = {};

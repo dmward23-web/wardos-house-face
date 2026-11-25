@@ -394,7 +394,7 @@ function decodePng(buf) {
 
 function markPhase(x, y) { return x >= 1680 && y <= 220; }
 
-test("classic wall render differs from base when a pixel outside the plate changes", () => {
+test("classic wall render differs from base when any full-frame pixel changes", () => {
   function blank(n) {
     const data = new Uint8Array(n * n * 4);
     data.fill(255);
@@ -402,11 +402,10 @@ test("classic wall render differs from base when a pixel outside the plate chang
   }
   const a = blank(8);
   const b = blank(8);
-  const plate = (x, y) => x < 4;
-  assert.equal(diffPixels(a, b, (x, y) => plate(x, y) || markPhase(x, y)), 0, "classic wall render differs from base");
-  assert.ok(diffPixels(a, b, plate) < 800, "the mark phase delta grew past the logo");
-  b.data[((4 * 8) + 5) * 4] = 0;
-  assert.notEqual(diffPixels(a, b, (x, y) => plate(x, y) || markPhase(x, y)), 0, "injected classic change was not seen");
+  assert.equal(diffPixels(a, b), 0, "classic wall render differs from base");
+  assert.ok(diffPixels(a, b) < 800, "the mark phase delta grew past the logo");
+  b.data[((1 * 8) + 2) * 4] = 0;
+  assert.notEqual(diffPixels(a, b), 0, "injected classic change was not seen");
 });
 
 function diffPixels(a, b, ignore) {
@@ -473,7 +472,7 @@ function centreLuma(png) {
 const PLATE_SOURCES = ["loop", "ungraded", "fallback"];
 
 function serve() {
-  const baseWall = spawnSync("git", ["show", "cbd117a94662b515e7e1f2298ce81922af806e46:wall.html"], { cwd: ROOT, encoding: "buffer" }).stdout;
+  const baseWall = spawnSync("git", ["show", "bf976526d4072113732340853fe37a41e725803f:wall.html"], { cwd: ROOT, encoding: "buffer" }).stdout;
   const types = {
     ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
     ".png": "image/png", ".webp": "image/webp", ".svg": "image/svg+xml", ".woff2": "font/woff2",
@@ -675,7 +674,7 @@ async function openPage(port, url, extraScript, media) {
   await c.send("Page.navigate", { url });
   await loaded;
   return {
-    c, ws,
+    c, ws, id: created.id,
     async eval(expr, timeout) {
       const r = await c.send("Runtime.evaluate", { expression: expr, returnByValue: true, awaitPromise: true }, timeout);
       if (r.exceptionDetails) throw new Error(JSON.stringify(r.exceptionDetails).slice(0, 500));
@@ -705,7 +704,10 @@ async function openPage(port, url, extraScript, media) {
       await c.send("Page.navigate", { url });
       await loaded;
     },
-    close() { try { ws.close(); } catch (e) { /* closed */ } }
+    async close() {
+      try { await c.send("Target.closeTarget", { targetId: created.id }); } catch (e) { /* already gone */ }
+      try { ws.close(); } catch (e) { /* closed */ }
+    }
   };
 }
 
@@ -717,16 +719,12 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
   const chrome = await launchChrome();
   const pages = [];
   try {
-    let shared = null;
+    let current = null;
     async function page(path, extra, media) {
-      const url = base + path;
-      if (!shared) {
-        shared = await openPage(chrome.port, url, extra, media);
-        pages.push(shared);
-        return shared;
-      }
-      await shared.goto(url, extra, media);
-      return shared;
+      if (current) { await current.close(); current = null; }
+      current = await openPage(chrome.port, base + path, extra, media);
+      pages.push(current);
+      return current;
     }
     const snapExpr = `(() => {
       function hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(16); }
@@ -786,35 +784,37 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
       const info = await p.eval(`JSON.stringify({ mode: document.documentElement.getAttribute("data-scene-mode"), why: window.__fb && __fb.why, rm: matchMedia("(prefers-reduced-motion: reduce)").matches, look: document.documentElement.getAttribute("data-look") })`);
       throw new Error("screenshot did not settle " + info);
     }
-    const def = await page("/wall.html?look=classic", "", reduce);
-    await def.eval(`new Promise((r) => setTimeout(r, 800))`);
-    const ui = await def.eval(`(() => [...document.querySelectorAll("#clock,#mark,#ui,.chip,#snd")].map((el) => {
-      const r = el.getBoundingClientRect();
-      return { x: r.x, y: r.y, w: r.width, h: r.height };
-    }))()`);
-    /* The plate fills the viewport. The header band is the mark sweep. Compare the frame below that band. */
-    const plate = (x, y) => !ui.some((r) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h);
-    const header = (x, y) => y <= 220;
-    const ignore = (x, y) => plate(x, y) || header(x, y);
-    let baseBuf = null;
-    let defBuf = null;
-    let basePng = null;
-    let defPng = null;
-    let outside = 1;
-    for (let i = 0; i < 8 && outside !== 0; i++) {
-      baseBuf = await def.shot();
-      basePng = decodePng(baseBuf);
-      await def.eval(`new Promise((r) => setTimeout(r, 200))`);
-      defBuf = await def.shot();
-      defPng = decodePng(defBuf);
-      outside = diffPixels(basePng, defPng, ignore);
+    async function classicReady(p) {
+      const ok = await p.eval(`new Promise((res) => {
+        const t0 = performance.now();
+        const step = () => {
+          const clock = document.getElementById("clock");
+          const img = document.querySelector("body > img");
+          const plate = img && img.complete && img.naturalWidth > 0;
+          if (clock && clock.textContent && plate) return res(true);
+          if (performance.now() - t0 > 8000) return res(false);
+          setTimeout(step, 50);
+        };
+        step();
+      })`);
+      assert.equal(ok, true, "classic wall did not reach a scene mode");
+      await p.eval(`new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))`);
     }
+    const basePage = await page("/wall.html?look=classic", "base-bytes", reduce);
+    await classicReady(basePage);
+    const baseBuf = await basePage.shot();
+    const def = await page("/wall.html?look=classic", "", reduce);
+    await classicReady(def);
+    const defBuf = await def.shot();
+    const basePng = decodePng(baseBuf);
+    const defPng = decodePng(defBuf);
     fs.writeFileSync(path.join(ART, "cinema-default-base.png"), baseBuf);
     fs.writeFileSync(path.join(ART, "cinema-default.png"), defBuf);
     assert.equal(defPng.w, 1920);
     assert.equal(defPng.h, 1080);
-    assert.equal(outside, 0, "classic wall render differs from base");
-    assert.ok(diffPixels(basePng, defPng, plate) < 800, "the mark phase delta grew past the logo");
+    const full = diffPixels(basePng, defPng);
+    assert.equal(full, 0, "classic wall render differs from base");
+    assert.ok(full < 800, "the mark phase delta grew past the logo");
     const defNet = await def.eval(`(performance.getEntriesByType("resource").map((e) => e.name).concat(window.__net || [])).join("\\n")`);
     assert.doesNotMatch(defNet, /wardos-scene|vendor\/three|art\/cinema/i);
     assert.equal(await def.eval(`document.documentElement.getAttribute("data-look")`), null);
@@ -1194,19 +1194,30 @@ test("browser NOSPOOK1: no Halloween layer is visible or hit on the real wall af
   const base = "http://127.0.0.1:" + srv.address().port;
   const chrome = await launchChrome();
   const pages = [];
-  const probe = `new Promise((res) => setTimeout(() => {
-    const ids = ["bg", "gl", "fx", "poster"];
-    const vis = ids.filter((id) => { const e = document.getElementById(id); if (!e) return false; const s = getComputedStyle(e);
-      return s.display !== "none" && s.visibility !== "hidden" && Number(s.opacity) > 0; });
-    const hits = [];
-    for (let x = 1; x < 6; x++) for (let y = 1; y < 6; y++) {
-      const e = document.elementFromPoint(x * 320, y * 180);
-      if (e && ids.includes(e.id)) hits.push(e.id + "@" + x * 320 + "," + y * 180);
-    }
-    const v = document.getElementById("bg");
-    res({ flag: document.documentElement.getAttribute("data-halloween"), vis, hits,
-      bodyBg: getComputedStyle(document.body).backgroundImage, paused: v ? v.paused : null });
-  }, 1500))`;
+  const probe = `new Promise((res) => {
+    const t0 = performance.now();
+    const read = () => {
+      const ids = ["bg", "gl", "fx", "poster"];
+      const vis = ids.filter((id) => { const e = document.getElementById(id); if (!e) return false; const s = getComputedStyle(e);
+        return s.display !== "none" && s.visibility !== "hidden" && Number(s.opacity) > 0; });
+      const hits = [];
+      for (let x = 1; x < 6; x++) for (let y = 1; y < 6; y++) {
+        const e = document.elementFromPoint(x * 320, y * 180);
+        if (e && ids.includes(e.id)) hits.push(e.id + "@" + x * 320 + "," + y * 180);
+      }
+      const v = document.getElementById("bg");
+      return { flag: document.documentElement.getAttribute("data-halloween"), vis, hits,
+        bodyBg: getComputedStyle(document.body).backgroundImage, paused: v ? v.paused : null,
+        clock: !!(document.getElementById("clock") && document.getElementById("clock").textContent) };
+    };
+    const step = () => {
+      const r = read();
+      const decided = r.clock && (r.flag === "off" || (r.flag === null && r.vis.length > 0));
+      if (decided || performance.now() - t0 > 8000) return res(r);
+      setTimeout(step, 50);
+    };
+    step();
+  })`;
   try {
     /* the in-page clock is pinned to Nov 23 2026 (FREEZE); the others pin the season with ?now=. Reduced motion (as the cinema
        default-wall capture uses) keeps a --disable-gpu runner's load event inside the 30 s wait; the layer checks do not depend on it. */
@@ -1215,6 +1226,7 @@ test("browser NOSPOOK1: no Halloween layer is visible or hit on the real wall af
       const p = await openPage(chrome.port, base + "/wall.html" + q, "", calm);
       pages.push(p);
       const r = await p.eval(probe);
+      await p.close();
       assert.equal(r.flag, "off", q + " " + JSON.stringify(r));
       assert.deepEqual(r.vis, [], q + ": Halloween layer visible " + JSON.stringify(r));
       assert.deepEqual(r.hits, [], q + ": Halloween layer on top " + JSON.stringify(r));
@@ -1225,6 +1237,7 @@ test("browser NOSPOOK1: no Halloween layer is visible or hit on the real wall af
       const p = await openPage(chrome.port, base + "/wall.html" + q, "", calm);
       pages.push(p);
       const r = await p.eval(probe);
+      await p.close();
       assert.equal(r.flag, "off", q + " " + JSON.stringify(r));
       assert.deepEqual(r.vis, [], q);
       assert.deepEqual(r.hits, [], q);
@@ -1235,6 +1248,7 @@ test("browser NOSPOOK1: no Halloween layer is visible or hit on the real wall af
     const oct = await openPage(chrome.port, base + "/wall.html?now=2026-10-20T20:00:00-05:00", "", calm);
     pages.push(oct);
     const o = await oct.eval(probe);
+    await oct.close();
     assert.equal(o.flag, null, JSON.stringify(o));
     assert.ok(o.vis.length > 0, "October control lost the porch " + JSON.stringify(o));
   } finally {
