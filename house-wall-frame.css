@@ -224,7 +224,9 @@ html:not(#hf-glass-off) body .panel .hdr .oval[hidden] { display: none !importan
 }
 
 /* TODAYSLAB1 · the global leaveby ink keeps its #101820 slab, including the kid
-   boards. On Today the row chip is the title background, and +N more uses the
-   row's left padding so it starts with the row text. */
+   boards. On Today the title is clear and the row chip itself is the dark
+   surface, and +N more uses the row's left padding so it starts with the row text. */
 .today-day .leaveby-row-title { background: transparent !important; }
+.today-day .leaveby-row { background-color: #241f18 !important; }
+.today-day .leaveby-row.is-next { background-color: #3a3220 !important; }
 .today-day .leaveby-more { padding-left: 10px; }
