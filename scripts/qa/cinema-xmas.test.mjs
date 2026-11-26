@@ -698,7 +698,7 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
   try {
   srv = await serve();
   const base = "http://127.0.0.1:" + srv.address().port;
-  chrome = await launchChrome();
+  chrome = await launchChrome(CHROME, { stableRaster: true });
     let current = null;
     async function page(path, extra, media) {
       if (current) { await current.close(); current = null; }
@@ -1262,6 +1262,16 @@ test("base header serves every bf976526 path, not only wall.html", async () => {
   } finally {
     srv.close();
   }
+});
+
+test("CLASSICRASTER1 the classic compare uses one software raster thread", () => {
+  const src = fs.readFileSync(fileURLToPath(new URL("./cinema-launch-guard.mjs", import.meta.url)), "utf8");
+  for (const flag of ["--disable-gpu-rasterization", "--disable-gpu-compositing", "--num-raster-threads=1", "--disable-lcd-text", "--font-render-hinting=none", "--disable-font-subpixel-positioning", "--disable-skia-runtime-opts", "--force-color-profile=srgb"]) {
+    assert.match(src, new RegExp(flag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+  assert.match(src, /opts\.stableRaster/);
+  const testSrc = fs.readFileSync(fileURLToPath(new URL("./cinema-xmas.test.mjs", import.meta.url)), "utf8");
+  assert.equal((testSrc.match(/launchChrome\(CHROME, \{ stableRaster: true \}\)/g) || []).length, 1, "stable raster is only the classic-compare chrome");
 });
 
 test("a failed Chrome launch still lets the test exit", () => {

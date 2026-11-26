@@ -47,17 +47,36 @@ export function serve() {
   return new Promise((resolve) => srv.listen(0, "127.0.0.1", () => resolve(srv)));
 }
 
-export function launchChrome(bin) {
-  return new Promise((resolve, reject) => {
-    const proc = spawn(bin || CHROME, [
+export function launchChrome(bin, opts) {
+  /* CLASSICRASTER1: two screenshots of the same classic plate were not the same blit.
+     Skia's GPU raster path, a multi-thread CPU raster, and the GPU compositor quantize
+     the cover-scaled webp and the header gradients a level or two apart between
+     navigations in one browser. CI run 1 on 7e35c464 was 831231 pixels at exactly one
+     level and 122 at two or more. The classic compare opts in (stableRaster). One
+     software raster thread, software compositing, portable Skia, grayscale text, and
+     no font hinting make that blit stable. WebGL stays on swiftshader. These flags
+     stay off the other chromes: software compositing stretched a ?gl=soft retry
+     burst past the 2500 ms cap. */
+  const args = [
       "--headless=new", "--no-sandbox", "--disable-dev-shm-usage",
       "--remote-debugging-port=0", "--remote-allow-origins=*",
-      "--window-size=1920,1080", "--force-device-scale-factor=1", "--force-color-profile=srgb",
+      "--window-size=1920,1080", "--force-device-scale-factor=1", "--force-color-profile=srgb"
+  ];
+  if (opts && opts.stableRaster) {
+    args.push(
+      "--disable-gpu-rasterization", "--disable-gpu-compositing", "--num-raster-threads=1",
+      "--disable-lcd-text", "--font-render-hinting=none", "--disable-font-subpixel-positioning",
+      "--disable-skia-runtime-opts"
+    );
+  }
+  args.push(
       "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
       "--hide-scrollbars", "--mute-audio", "--disable-gpu-sandbox",
       "--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows",
       "about:blank"
-    ], { stdio: ["ignore", "pipe", "pipe"] });
+  );
+  return new Promise((resolve, reject) => {
+    const proc = spawn(bin || CHROME, args, { stdio: ["ignore", "pipe", "pipe"] });
     let buf = "";
     let settled = false;
     const finish = (err, value) => {
