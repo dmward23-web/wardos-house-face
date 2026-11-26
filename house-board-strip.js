@@ -656,6 +656,81 @@
       "</li>";
   }
 
+  /* TODAYFIT1 · the Today header stays off the kid chips, and only whole rows that sit
+     inside the panel and above Musts/Jar/Days stay up. The rest are one "+N more" line. */
+  function scheduleTodayFit() {
+    fitTodayPanel();
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(function () { fitTodayPanel(); requestAnimationFrame(fitTodayPanel); });
+    }
+    if (document.fonts && document.fonts.ready && document.fonts.ready.then) document.fonts.ready.then(fitTodayPanel);
+  }
+  function fitTodayPanel() {
+    var todayEl = document.querySelector("[data-live='leaveby-today']");
+    if (!todayEl || !/sheet-today\.html$/i.test(String(location.pathname || ""))) return;
+    var panel = todayEl.closest("section.today-day") || todayEl.closest("section");
+    if (!panel) return;
+    var rows = [].slice.call(todayEl.querySelectorAll("li.leaveby-row"));
+    var total = rows.length;
+    var stale = todayEl.querySelector(".leaveby-more");
+    if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
+    for (var i = 0; i < rows.length; i++) rows[i].hidden = false;
+    panel.style.marginTop = "0px";
+    var chips = document.querySelectorAll("a.kchip");
+    var hdr = panel.querySelector(".sec-hdr");
+    function rect(el) { return el.getBoundingClientRect(); }
+    function over(a, b) {
+      return a.width > 0 && b.width > 0 && a.left < b.right - 0.5 && a.right > b.left + 0.5 && a.top < b.bottom - 0.5 && a.bottom > b.top + 0.5;
+    }
+    if (hdr && chips.length) {
+      var push = 0;
+      var hr = rect(hdr);
+      for (var c = 0; c < chips.length; c++) {
+        var cr = rect(chips[c]);
+        if (over(hr, cr)) push = Math.max(push, cr.bottom - hr.top + 8);
+      }
+      if (push) panel.style.marginTop = push + "px";
+    }
+    var rail = document.querySelector("nav[aria-label='Musts Jar Days']");
+    function setMore(n) {
+      var more = todayEl.querySelector(".leaveby-more");
+      if (!n) { if (more && more.parentNode) more.parentNode.removeChild(more); return; }
+      if (!more) {
+        more = document.createElement("li");
+        more.className = "leaveby-more";
+        todayEl.appendChild(more);
+      }
+      more.textContent = "+" + n + " more";
+    }
+    function crosses() {
+      var railTop = rail ? rect(rail).top : Infinity;
+      var pb = rect(panel);
+      var lb = rect(todayEl);
+      if (lb.height > 0 && (lb.bottom > pb.bottom + 0.5 || lb.top < pb.top - 0.5)) return true;
+      if (lb.bottom > railTop + 0.5 || pb.bottom > railTop + 0.5) return true;
+      var h2 = panel.querySelector(".sec-hdr");
+      if (h2) {
+        var hr2 = rect(h2);
+        for (var k = 0; k < chips.length; k++) if (over(hr2, rect(chips[k]))) return true;
+      }
+      return false;
+    }
+    var hidden = 0;
+    var guard = 0;
+    setMore(0);
+    while (crosses() && hidden < total && guard < 30) {
+      guard++;
+      hidden++;
+      rows[total - hidden].hidden = true;
+      setMore(hidden);
+    }
+    todayEl.setAttribute("data-today-total", String(total));
+    todayEl.setAttribute("data-today-more", String(hidden));
+  }
+  if (!fitTodayPanel.bound) {
+    fitTodayPanel.bound = true;
+    window.addEventListener("resize", scheduleTodayFit);
+  }
   function paintLists(strip) {
     var todayEl = document.querySelector("[data-live='leaveby-today']");
     var tmrEl = document.querySelector("[data-live='leaveby-tomorrow']");
@@ -676,6 +751,7 @@
         }
         todayEl.innerHTML = html;
       }
+      scheduleTodayFit();
     }
 
     if (tmrLab) {

@@ -670,8 +670,10 @@ document.addEventListener('visibilitychange',()=>{fbReset();if(!document.hidden&
    redrawn on the clock's minute tick and the moment the phase changes. */
 function fbKey(ph){return PHK[ph.A].vid+(ph.m>0?'+'+PHK[ph.B].vid+'@'+Math.round(ph.m*20):'')}
 function fbPlateOk(){const ph=ENV.phase;return imOk(poster('night'))&&[ph.A,ph.m>0?ph.B:ph.A].every(n=>PHK[n].vid==='night'||imOk(poster(PHK[n].vid)))}
-function fbStillDraw(why){if(FB.why!==why||FB.mode!=='poster')return true;try{envStep(2);step(0)}catch(e){}if(!ready||!fbPlateOk())return false;fbDraw();FB.plate=fbKey(ENV.phase);FB.drawAt=envNow();FB.draws=(FB.draws||0)+1;return true}
+function fbStillDraw(why){if(FB.why!==why||FB.mode!=='poster')return true;try{envStep(2);step(0)}catch(e){}if(imOk(poster('night')))ready=1;if(!ready||!fbPlateOk())return false;fbDraw();FB.plate=fbKey(ENV.phase);FB.drawAt=envNow();FB.draws=(FB.draws||0)+1;return true}
+function fbStillWatch(img,why){if(!img||imOk(img))return;img.addEventListener('load',function(){if(imOk(poster('night')))ready=1;fbStillDraw(why)},{once:true})}
 function fbStill(why){try{envStep(2)}catch(e){}if(PO&&!fbPlateOk()){const c=PO.getContext('2d');c.setTransform(1,0,0,1,0,0);c.fillStyle='#04060a';c.fillRect(0,0,PO.width,PO.height)}/* same task as fbPoster's draw: no night stand-in paints */
+ fbStillWatch(poster('night'),why);try{const ph=ENV.phase;[ph.A,ph.m>0?ph.B:ph.A].forEach(function(n){if(PHK[n].vid!=='night')fbStillWatch(poster(PHK[n].vid),why)})}catch(e){}
  const go=()=>{const w=()=>{if(FB.why===why&&!fbStillDraw(why))setTimeout(w,120)};w()};go();clearInterval(FB.st);let mk=Math.floor(envNow()/6e4);
  FB.st=setInterval(()=>{if(FB.why!==why||FB.mode!=='poster'){clearInterval(FB.st);FB.st=0;return}const k=Math.floor(envNow()/6e4);let pk=FB.plate;try{pk=fbKey(QP&&PHK[QP]?{A:QP,B:QP,m:0}:phaseAt(envNow()))}catch(e){}if(k!==mk||pk!==FB.plate){mk=k;go()}},1000)}
 function fbRM(){if(RM.matches){fbPoster('reduced-motion');fbStill('reduced-motion')}

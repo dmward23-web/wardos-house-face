@@ -127,11 +127,16 @@ class H(BaseHTTPRequestHandler):
             self.send_error(404)
             return
         data = file.read_bytes()
-        kind = "text/html" if file.suffix == ".html" else "application/octet-stream"
-        if file.suffix == ".js":
-            kind = "text/javascript"
-        elif file.suffix == ".css":
-            kind = "text/css"
+        kind = {
+            ".html": "text/html",
+            ".js": "text/javascript",
+            ".css": "text/css",
+            ".svg": "image/svg+xml",
+            ".png": "image/png",
+            ".webp": "image/webp",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+        }.get(file.suffix, "application/octet-stream")
         self.send_response(200)
         self.send_header("Content-Type", kind)
         self.send_header("Content-Length", str(len(data)))
@@ -200,7 +205,39 @@ def main():
 
         open_page("/sheet-today.html")
         page.screenshot(path=str(OUT / shots["sheet-today.html"]))
-        out["today"] = text_of(page)
+        out["today"] = page.evaluate("() => document.body ? document.body.textContent : ''")
+        out["todayFit"] = page.evaluate("""() => {
+          const panel = document.querySelector('section.today-day');
+          const hdr = panel && panel.querySelector('.sec-hdr');
+          const list = document.querySelector("[data-live='leaveby-today']");
+          const rail = document.querySelector("nav[aria-label='Musts Jar Days']");
+          const box = (el) => {
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            return { l: r.left, t: r.top, r: r.right, b: r.bottom, w: r.width, h: r.height };
+          };
+          const hit = (a, b) => !!(a && b && a.w > 0 && b.w > 0 && a.l < b.r - 0.5 && a.r > b.l + 0.5 && a.t < b.b - 0.5 && a.b > b.t + 0.5);
+          const chips = [...document.querySelectorAll('a.kchip')].map((el) => ({ name: (el.textContent || '').replace(/\\s+/g, ' ').trim(), ...box(el) }));
+          const hb = box(hdr);
+          const rows = list ? [...list.querySelectorAll('li.leaveby-row:not([hidden])')] : [];
+          const moreEl = list && list.querySelector('.leaveby-more');
+          const moreText = moreEl ? moreEl.textContent.trim() : '';
+          const more = moreText ? parseInt(moreText.replace(/[^0-9]/g, ''), 10) : 0;
+          const texts = list ? [...list.querySelectorAll('.leaveby-row-title, .leaveby-row-time, .leaveby-more')].filter((el) => !el.closest('[hidden]')).map((el) => ({
+            t: (el.textContent || '').trim().slice(0, 48), sw: el.scrollWidth, cw: el.clientWidth
+          })) : [];
+          const imgs = [...document.querySelectorAll('img')].map((img) => ({ src: img.getAttribute('src') || '', w: img.naturalWidth || 0, h: img.naturalHeight || 0 }));
+          const lb = box(list), pb = box(panel), rb = box(rail);
+          return {
+            overlaps: chips.filter((c) => hit(hb, c)).map((c) => c.name),
+            listInside: !!(lb && pb && lb.t >= pb.t - 0.5 && lb.l >= pb.l - 0.5 && lb.r <= pb.r + 0.5 && lb.b <= pb.b + 0.5),
+            aboveRail: !!(lb && rb && lb.b <= rb.t + 0.5 && pb && pb.b <= rb.t + 0.5),
+            rows: rows.length,
+            more: Number.isFinite(more) ? more : null,
+            total: list ? list.getAttribute('data-today-total') : null,
+            texts, imgs, hb, lb, pb, rb
+          };
+        }""")
 
         open_page("/kid-hayes.html")
         page.screenshot(path=str(OUT / shots["kid-hayes.html"]))

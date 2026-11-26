@@ -412,17 +412,23 @@ try:
             home = None
             home_box = None
             if dest in url:
-                pg.wait_for_timeout(400)
-                home_box = pg.evaluate("""() => {
-                  const els = [...document.querySelectorAll('[data-kw-home], a.hub-home, header[data-hdr-home]')];
-                  for (const el of els) {
-                    const r = el.getBoundingClientRect();
-                    const c = getComputedStyle(el);
-                    if (r.width >= 32 && r.height >= 32 && c.display !== 'none' && c.visibility !== 'hidden')
+                # The door URL commits before the wall finishes painting. A click at the
+                # Home box while the world is still the top hit is swallowed. Wait, within
+                # the same 8s budget, until Home is armed and is the element under the tap.
+                try:
+                    home_box = pg.wait_for_function("""() => {
+                      const el = document.querySelector('a[data-kw-home][data-home-armed="1"]');
+                      if (!el) return null;
+                      const r = el.getBoundingClientRect();
+                      const c = getComputedStyle(el);
+                      if (r.width < 32 || r.height < 32 || c.display === 'none' || c.visibility === 'hidden') return null;
+                      const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+                      if (!(hit && (hit === el || el.contains(hit)))) return null;
                       return { x: r.x, y: r.y, w: r.width, h: r.height };
-                  }
-                  return null;
-                }""")
+                    }""", timeout=8000)
+                    home_box = home_box.json_value() if hasattr(home_box, "json_value") else home_box
+                except Exception:
+                    home_box = None
                 if home_box:
                     pg.mouse.click(home_box["x"] + home_box["w"] / 2, home_box["y"] + home_box["h"] / 2)
                     try:

@@ -46,12 +46,15 @@
     img.style.setProperty("height", "64px", "important");
     if (btn.getAttribute("data-home-armed") === "1") return;
     btn.setAttribute("data-home-armed", "1");
-    btn.addEventListener("pointerup", function (ev) {
-      if (ev.button > 0) return;
+    btn.addEventListener("contextmenu", function (ev) { ev.preventDefault(); });
+    /* HOMEONCE1 · pointerup called go() (preventDefault + location.assign) and the click
+       then started the anchor's own navigation. On a busy wall those two trips abort
+       each other and the Home tap never leaves. The href is the one navigation. */
+    btn.addEventListener("click", function (ev) {
+      if (going) { ev.preventDefault(); return; }
+      if (btn.getAttribute("href")) return;
       go(ev);
     });
-    btn.addEventListener("contextmenu", function (ev) { ev.preventDefault(); });
-    btn.addEventListener("click", function (ev) { go(ev); });
   }
   function mount() {
     if (onHub()) {

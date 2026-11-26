@@ -20,6 +20,14 @@ function lawOnly() {
   return box.HouseFaceLaw;
 }
 
+test("r57 the fixture serves svg and photos as their image types", () => {
+  const src = read("scripts/qa/acer_r57_board.py");
+  assert.match(src, /\.svg": "image\/svg\+xml"/);
+  assert.match(src, /\.png": "image\/png"/);
+  assert.match(src, /\.webp": "image\/webp"/);
+  assert.match(src, /\.jpg": "image\/jpeg"/);
+});
+
 test("r57 the law drops mediation and the probes when the display script is absent", () => {
   const L = lawOnly();
   assert.equal(L && typeof L.cleanFeed, "function");
@@ -56,6 +64,19 @@ test("r57 a row with three title fields renders one title", { skip: browser ? fa
   assert.equal(/Skate City Night Skate City Night/.test(o.same), false);
   assert.equal(o.different, "Lantern walk");
   assert.equal(/Other title|Third title/.test(o.page), false, o.page.slice(0, 400));
+});
+
+test("TODAYFIT1 the Today header, list, and photos stay inside the panel", { skip: browser ? false : "SKIP no playwright" }, () => {
+  const fit = board().todayFit;
+  assert.ok(fit, "today layout was not measured");
+  assert.deepEqual(fit.overlaps, [], "TODAY calendar overlaps the kid chips " + JSON.stringify(fit));
+  assert.equal(fit.listInside, true, "the list leaves its panel " + JSON.stringify(fit.lb) + " panel " + JSON.stringify(fit.pb));
+  assert.equal(fit.aboveRail, true, "the list crosses Musts/Jar/Days " + JSON.stringify(fit.lb) + " rail " + JSON.stringify(fit.rb));
+  const total = Number(fit.total);
+  assert.equal(fit.rows + fit.more, total, "visible rows + N is not the event total " + JSON.stringify({ rows: fit.rows, more: fit.more, total: fit.total }));
+  for (const t of fit.texts) assert.ok(t.sw <= t.cw + 1, "text is cut " + JSON.stringify(t));
+  assert.ok(fit.imgs.length > 0, "sheet-today has no images");
+  for (const img of fit.imgs) assert.ok(img.w > 0, "image did not decode " + JSON.stringify(img));
 });
 
 test("r57 hub, Today, and kid boards show the allowed rows and hide the probes", { skip: browser ? false : "SKIP no playwright" }, () => {

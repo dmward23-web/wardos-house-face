@@ -133,6 +133,22 @@
   }
   html:not(#hf-wall-off) body .panel .body > section.kids-col > .kid-card:last-child { margin-bottom: 0 !important; }
   html:not(#hf-wall-off) body .panel .body > section.kids-col .kid-hint { display: none !important; }
+  /* TODAYFIT1 · Today stays one panel: header clear of the kid chips, list above Musts/Jar/Days.
+     Whole rows only. Titles wrap, they are not cut with an ellipsis. */
+  html:not(#hf-wall-off) body .panel section.sec.today-day {
+    position: relative !important; z-index: 1 !important; overflow: hidden !important;
+    display: flex !important; flex-direction: column !important; min-height: 0 !important;
+    break-inside: auto !important; -webkit-column-break-inside: auto !important;
+  }
+  html:not(#hf-wall-off) body .panel section.sec.today-day .sec-hdr { position: relative !important; z-index: 2 !important; }
+  html:not(#hf-wall-off) body .panel section.sec.today-day .today-day-list { min-height: 0 !important; overflow: hidden !important; }
+  html:not(#hf-wall-off) body .panel section.sec.today-day :is(.leaveby-row, .leaveby-more) {
+    flex: none !important; height: auto !important; max-height: none !important; overflow: visible !important;
+  }
+  html:not(#hf-wall-off) body .panel section.sec.today-day :is(.leaveby-row-title, .leaveby-row-time, .leaveby-more) {
+    white-space: normal !important; overflow-wrap: anywhere !important; text-overflow: clip !important;
+    overflow: visible !important; height: auto !important; max-height: none !important;
+  }
 }
 
 /* P1FIX Prism · Month chevrons are controls, not text arrows: 48 px or bigger tap area on the wall too */

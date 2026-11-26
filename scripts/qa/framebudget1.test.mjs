@@ -23,6 +23,7 @@ test("static: one governor, same in both scenes, thresholds and poster wiring", 
     assert.match(s, /#poster\{opacity:0;pointer-events:none;transition:opacity \.4s ease\}/, f + " soft 400 ms crossfade");
     assert.match(s, /if\(fbWatch\(now,d\)\)return;RAF=requestAnimationFrame\(loop\)/, f + " loop asks the governor before every rAF");
     assert.match(s, /\nelse fbStart\(\);/, f + " start goes through the governor");
+    assert.match(x, /function fbStillWatch/, f + " the still poster redraws when its plate loads");
     assert.equal((s.match(/requestAnimationFrame\(loop\)/g) || []).length, 3, f + " rAF(loop) only in loop, fbLive and fbStart");
     assert.match(s, /if\(SBup\)\{gl\.activeTexture\(gl\.TEXTURE1\);gl\.texImage2D\([^)]*sB\)\}/, f + " back layer uploaded only on change");
     assert.doesNotMatch(s, /gl\.activeTexture\(gl\.TEXTURE1\);gl\.texImage2D\(gl\.TEXTURE_2D,0,gl\.RGBA,gl\.RGBA,gl\.UNSIGNED_BYTE,sB\);gl/, f + " no unconditional back-layer upload");
@@ -85,7 +86,16 @@ test("browser: prefers-reduced-motion goes straight to the poster with no render
     await g.evaluateOnNewDocument(HOOK); if (f === "wall.html") await g.evaluateOnNewDocument(PIN, OCT);
     await g.goto(base + "/" + f + (f === "wall.html" ? "?look=classic" : ""), { waitUntil: "load" });
     await g.waitForFunction(() => document.documentElement.getAttribute("data-scene-mode") === "poster", { timeout: 30000, polling: 100 });
-    await sleep(800); const s0 = await state(g); await sleep(1500); const s1 = await state(g);
+    /* The plate paints on its load event. An 800 ms sleep returned while that decode was still queued, so the poster was the blank fill. */
+    await g.waitForFunction(() => {
+      const c = document.getElementById("poster");
+      if (!c || !c.width) return false;
+      const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data;
+      let n = 0;
+      for (let i = 0; i < d.length; i += 64) if (Math.abs(d[i] - 4) + Math.abs(d[i + 1] - 6) + Math.abs(d[i + 2] - 10) > 12) n++;
+      return n > 50;
+    }, { timeout: 30000, polling: 100 });
+    const s0 = await state(g); await sleep(1500); const s1 = await state(g);
     assert.equal(s0.why, "reduced-motion", f); assert.equal(s1.raf, s0.raf, f + " no rAF in reduced motion");
     assert.equal(s1.po, "1", f + " poster shown"); assert.ok(s1.ink > 50, f + " poster painted (" + s1.ink + ")");
     await g.close();

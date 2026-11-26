@@ -797,6 +797,7 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
       const delta = pixelDelta(baseShot.png, defShot.png);
       counts.push({ run, exact: delta.exact, tolerated: delta.tolerated, over: delta.over });
       console.log("classic run " + run + " exact " + delta.exact + " tolerated " + delta.tolerated + " over " + delta.over);
+      console.log("classic-compare over " + delta.over + " tolerated " + delta.tolerated);
       assert.equal(delta.over, 0, "classic wall render differs from base, run " + run + " over " + delta.over);
       assert.ok(delta.tolerated <= 1000, "one-level shift too wide, run " + run + " tolerated " + delta.tolerated);
       assert.ok(delta.over < 800, "the mark phase delta grew past the logo, run " + run);
@@ -1297,6 +1298,7 @@ test("run-tests.sh gives each file a deadline so a leak fails red", () => {
   assert.match(sh, /timeout -k 10 "\$FILE_DEADLINE"/);
   assert.match(sh, /echo "DEADLINE \$1"/);
   assert.match(sh, /nproc\) - 1/);
+  assert.match(sh, /scripts\/qa\/cinema-xmas\.test\.mjs/);
   const hung = spawnSync("timeout", ["-k", "2", "2", process.execPath, "-e", "setInterval(() => {}, 1000)"], { encoding: "utf8", timeout: 10000 });
   assert.notEqual(hung.status, 0, "a process that never exits still returned 0");
 });
