@@ -32,6 +32,8 @@ serial=(
   scripts/qa/coversync1.test.mjs
   scripts/qa/nowfreeze1.test.mjs
   scripts/qa/pass2-dec4.test.mjs
+  scripts/qa/framebudget1.test.mjs
+  scripts/qa/alfred-wall.test.mjs
   scripts/qa/cinema-xmas.test.mjs
 )
 block=()

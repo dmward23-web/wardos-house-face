@@ -2,6 +2,7 @@
 import json
 import os
 import threading
+from PIL import Image
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -233,6 +234,17 @@ def main():
             t: (el.textContent || '').trim().slice(0, 48), sw: el.scrollWidth, cw: el.clientWidth
           })) : [];
           const imgs = [...document.querySelectorAll('img')].map((img) => ({ src: img.getAttribute('src') || '', w: img.naturalWidth || 0, h: img.naturalHeight || 0 }));
+          const textBox = (el) => {
+            if (!el) return null;
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            const r = range.getBoundingClientRect();
+            return { l: r.left, t: r.top, r: r.right, b: r.bottom, w: r.width, h: r.height };
+          };
+          const title = list && list.querySelector('li.leaveby-row:not([hidden]) .leaveby-row-title');
+          const time = list && list.querySelector('li.leaveby-row:not([hidden]) .leaveby-row-time');
+          const row = title && title.closest('li');
+          const titleCs = title ? getComputedStyle(title) : null;
           const lb = box(list), pb = box(panel), rb = box(rail);
           const clipped = shown.filter((el) => {
             const r = box(el);
@@ -252,9 +264,44 @@ def main():
             scrollHeight: list ? list.scrollHeight : 0,
             clientHeight: list ? list.clientHeight : 0,
             clipped,
-            texts, imgs, hb, lb, pb, rb
+            texts, imgs, hb, lb, pb, rb,
+            slab: {
+              titleBg: titleCs ? titleCs.backgroundColor : "",
+              titleBox: box(title),
+              rowBox: box(row),
+              timeX: textBox(time) ? textBox(time).l : null,
+              moreX: textBox(moreEl) ? textBox(moreEl).l : null,
+              rowX: box(row) ? box(row).l : null,
+              padL: row ? getComputedStyle(row).paddingLeft : ""
+            }
           };
         }""")
+        fit = out["todayFit"]
+        slab = fit.get("slab") or {}
+        im = Image.open(OUT / shots["sheet-today.html"]).convert("RGB")
+        iw, ih = im.size
+
+        def at(x, y):
+            xi = max(0, min(iw - 1, int(round(x))))
+            yi = max(0, min(ih - 1, int(round(y))))
+            return list(im.getpixel((xi, yi)))
+
+        tb = slab.get("titleBox") or {}
+        rb = slab.get("rowBox") or {}
+        ink = None
+        ink_l = -1
+        x0, x1 = int(tb.get("l") or 0), int(tb.get("r") or 0)
+        y0, y1 = int(tb.get("t") or 0), int(tb.get("b") or 0)
+        for y in range(max(0, y0), min(ih, max(y0, y1) + 1)):
+            for x in range(max(0, x0), min(iw, max(x0, x1) + 1), 2):
+                p = im.getpixel((x, y))
+                L = 0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2]
+                if L > ink_l:
+                    ink_l = L
+                    ink = list(p)
+        slab["ink"] = ink
+        slab["chip"] = at((rb.get("l") or 0) + 6, ((rb.get("t") or 0) + (rb.get("b") or 0)) / 2)
+        fit["slab"] = slab
 
         open_page("/kid-hayes.html")
         page.screenshot(path=str(OUT / shots["kid-hayes.html"]))

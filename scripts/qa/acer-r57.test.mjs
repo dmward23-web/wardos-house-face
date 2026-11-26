@@ -82,6 +82,27 @@ test("TODAYFIT1 the Today header, list, and photos stay inside the panel", { ski
   for (const img of fit.imgs) assert.ok(img.w > 0, "image did not decode " + JSON.stringify(img));
 });
 
+function channel(c) {
+  const x = c / 255;
+  return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+}
+function contrast(a, b) {
+  const L = (rgb) => 0.2126 * channel(rgb[0]) + 0.7152 * channel(rgb[1]) + 0.0722 * channel(rgb[2]);
+  const hi = Math.max(L(a), L(b));
+  const lo = Math.min(L(a), L(b));
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+test("TODAYSLAB1 Today titles sit on the row chip and +N more lines up with the row text", { skip: browser ? false : "SKIP no playwright" }, () => {
+  const globalInk = read("house-home.js").split("\n")[177];
+  assert.match(globalInk, /html body \.lb-day-what,html body \.lb-day-tchip,html body \.leaveby-row-title,html body \.kid-what-line\{color:#f4efe6!important;-webkit-text-fill-color:#f4efe6!important;background:#101820!important/);
+  const slab = board().todayFit.slab;
+  assert.match(slab.titleBg, /^rgba\(0,\s*0,\s*0,\s*0\)$/, "title background is not transparent " + slab.titleBg);
+  const ratio = contrast(slab.ink, slab.chip);
+  assert.ok(ratio >= 4.5, "title-to-row-chip contrast " + ratio.toFixed(2) + " " + JSON.stringify({ ink: slab.ink, chip: slab.chip }));
+  assert.ok(Math.abs(slab.moreX - slab.timeX) <= 2, "+N more is off the row text " + JSON.stringify({ moreX: slab.moreX, timeX: slab.timeX, rowX: slab.rowX }));
+});
+
 test("r57 hub, Today, and kid boards show the allowed rows and hide the probes", { skip: browser ? false : "SKIP no playwright" }, () => {
   const o = board();
   for (const title of ["Skate City Night", "costume parade", "Friends Club", "basketball", "partner dinner", "Picture day", "Soccer", "Art club"]) {

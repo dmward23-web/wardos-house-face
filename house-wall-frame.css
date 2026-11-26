@@ -222,3 +222,9 @@ html:not(#hf-glass-off) body .panel .hdr .oval[hidden] { display: none !importan
      columns; before, the footer line fell into a third, clipped column (main.ds measured 1328 px wide). */
   html:not(#hf-wall-off) body .panel .ds-tl > .ds-stop:nth-child(n+3) { display: none !important; }
 }
+
+/* TODAYSLAB1 · the global leaveby ink keeps its #101820 slab, including the kid
+   boards. On Today the row chip is the title background, and +N more uses the
+   row's left padding so it starts with the row text. */
+.today-day .leaveby-row-title { background: transparent !important; }
+.today-day .leaveby-more { padding-left: 10px; }

@@ -1299,6 +1299,8 @@ test("run-tests.sh gives each file a deadline so a leak fails red", () => {
   assert.match(sh, /echo "DEADLINE \$1"/);
   assert.match(sh, /nproc\) - 1/);
   assert.match(sh, /scripts\/qa\/cinema-xmas\.test\.mjs/);
+  assert.match(sh, /scripts\/qa\/framebudget1\.test\.mjs/);
+  assert.match(sh, /scripts\/qa\/alfred-wall\.test\.mjs/);
   const hung = spawnSync("timeout", ["-k", "2", "2", process.execPath, "-e", "setInterval(() => {}, 1000)"], { encoding: "utf8", timeout: 10000 });
   assert.notEqual(hung.status, 0, "a process that never exits still returned 0");
 });
