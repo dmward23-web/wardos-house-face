@@ -63,16 +63,32 @@
     el.setAttribute("data-calm", "1");
     el.setAttribute("aria-hidden", "true");
     el.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#062018;opacity:1;pointer-events:none";
+    /* .ori-iris fades in from 0 over 420ms. That animation overrides this inline
+       opacity, and on a stalled thread it finishes on the compositor before any
+       sample. The calm veil is already opaque; it does not use that fade. */
+    el.style.setProperty("animation", "none", "important");
     try { document.getAnimations().forEach(function (an) { if (an.playState === "running") { an.pause(); held.push(an); } }); } catch (e) {}
     root.appendChild(el);
     void getComputedStyle(el).opacity;
     el.style.opacity = "1";
     if (root.classList.contains("ori-reduced") || (RMQ && RMQ.matches)) { setTimeout(function () { leave(u.href); }, 0); return; }
     /* Opacity is set, not transitioned, so a paused animation cannot pin it at 0.
-       Leave on the frame after it has been painted at >= .9 for 320ms, and never later than 1.5s. */
-    var t0 = Date.now(), gone = false, shown = false;
+       The 320ms starts at the first opaque frame. Counting from the click let a
+       stalled thread spend the hold before the iris was readable, then leave on
+       the next frame. Leave on the frame after it has been painted at >= .9 for
+       320ms, and never later than 1.5s. */
+    var t0 = Date.now(), gone = false, shown = false, hold = 0;
     function go() { if (gone) return; gone = true; leave(u.href); }
-    function tick() { if (gone) return; if (shown) return go(); if (Date.now() - t0 >= 320 && (parseFloat(getComputedStyle(el).opacity) || 0) >= 0.9) shown = true; requestAnimationFrame(tick); }
+    function tick() {
+      if (gone) return;
+      /* Until the iris is actually opaque, keep the clock at this frame so a
+         stall cannot satisfy the 320ms before a readable paint. */
+      if (!hold) {
+        t0 = Date.now();
+        if ((parseFloat(getComputedStyle(el).opacity) || 0) >= 0.9) hold = 1;
+      }
+      if (shown) return go(); if (Date.now() - t0 >= 320 && (parseFloat(getComputedStyle(el).opacity) || 0) >= 0.9) shown = true; requestAnimationFrame(tick);
+    }
     requestAnimationFrame(tick);
     setTimeout(go, 1500);
   }, false);
