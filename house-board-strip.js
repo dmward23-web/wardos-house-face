@@ -727,7 +727,7 @@
     todayEl.setAttribute("data-today-total", String(total));
     todayEl.setAttribute("data-today-more", String(hidden));
   }
-  if (!fitTodayPanel.bound) {
+  if (!fitTodayPanel.bound && window.addEventListener) {
     fitTodayPanel.bound = true;
     window.addEventListener("resize", scheduleTodayFit);
   }
