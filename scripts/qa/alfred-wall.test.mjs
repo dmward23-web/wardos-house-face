@@ -34,6 +34,7 @@ test("hub doors take real clicks at the four tile centers and home returns", SKI
     assert.ok(door.url.includes(door.dest), JSON.stringify(door));
     assert.equal(door.money, false, JSON.stringify(door));
     assert.ok(door.home && door.home.includes("sheet-index.html"), JSON.stringify(door));
+    assert.ok(typeof door.armedMs === "number" && door.armedMs <= 1000, "Home was not the hit target within 1 s of load " + JSON.stringify(door));
   }
 });
 

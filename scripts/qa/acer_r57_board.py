@@ -223,11 +223,24 @@ def main():
           const moreEl = list && list.querySelector('.leaveby-more');
           const moreText = moreEl ? moreEl.textContent.trim() : '';
           const more = moreText ? parseInt(moreText.replace(/[^0-9]/g, ''), 10) : 0;
+          const fully = (el, edge) => {
+            const r = box(el);
+            if (!r || r.h < 1 || !edge) return false;
+            return r.t >= edge.t - 0.5 && r.b <= edge.b + 0.5 && r.l >= edge.l - 0.5 && r.r <= edge.r + 0.5;
+          };
+          const shown = list ? [...list.querySelectorAll('li.leaveby-row:not([hidden]), li.leaveby-more')] : [];
           const texts = list ? [...list.querySelectorAll('.leaveby-row-title, .leaveby-row-time, .leaveby-more')].filter((el) => !el.closest('[hidden]')).map((el) => ({
             t: (el.textContent || '').trim().slice(0, 48), sw: el.scrollWidth, cw: el.clientWidth
           })) : [];
           const imgs = [...document.querySelectorAll('img')].map((img) => ({ src: img.getAttribute('src') || '', w: img.naturalWidth || 0, h: img.naturalHeight || 0 }));
           const lb = box(list), pb = box(panel), rb = box(rail);
+          const clipped = shown.filter((el) => {
+            const r = box(el);
+            const inList = fully(el, lb);
+            const inPanel = fully(el, pb);
+            const above = !rb || (r && r.b <= rb.t + 0.5);
+            return !(inList && inPanel && above);
+          }).map((el) => (el.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 40));
           return {
             overlaps: chips.filter((c) => hit(hb, c)).map((c) => c.name),
             listInside: !!(lb && pb && lb.t >= pb.t - 0.5 && lb.l >= pb.l - 0.5 && lb.r <= pb.r + 0.5 && lb.b <= pb.b + 0.5),
@@ -235,6 +248,10 @@ def main():
             rows: rows.length,
             more: Number.isFinite(more) ? more : null,
             total: list ? list.getAttribute('data-today-total') : null,
+            scrollOk: !!(list && list.scrollHeight <= list.clientHeight + 1),
+            scrollHeight: list ? list.scrollHeight : 0,
+            clientHeight: list ? list.clientHeight : 0,
+            clipped,
             texts, imgs, hb, lb, pb, rb
           };
         }""")

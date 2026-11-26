@@ -74,6 +74,9 @@ test("TODAYFIT1 the Today header, list, and photos stay inside the panel", { ski
   assert.equal(fit.aboveRail, true, "the list crosses Musts/Jar/Days " + JSON.stringify(fit.lb) + " rail " + JSON.stringify(fit.rb));
   const total = Number(fit.total);
   assert.equal(fit.rows + fit.more, total, "visible rows + N is not the event total " + JSON.stringify({ rows: fit.rows, more: fit.more, total: fit.total }));
+  assert.ok(fit.more >= 1, "the 10-row fixture must hide at least one row " + JSON.stringify({ rows: fit.rows, more: fit.more, scrollHeight: fit.scrollHeight, clientHeight: fit.clientHeight }));
+  assert.equal(fit.scrollOk, true, "the list scrolls inside its box " + fit.scrollHeight + " > " + fit.clientHeight);
+  assert.deepEqual(fit.clipped, [], "a shown row is cut by the list, the panel, or the rail " + JSON.stringify(fit.clipped));
   for (const t of fit.texts) assert.ok(t.sw <= t.cw + 1, "text is cut " + JSON.stringify(t));
   assert.ok(fit.imgs.length > 0, "sheet-today has no images");
   for (const img of fit.imgs) assert.ok(img.w > 0, "image did not decode " + JSON.stringify(img));

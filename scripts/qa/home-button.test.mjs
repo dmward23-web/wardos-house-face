@@ -3,6 +3,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -69,6 +70,15 @@ test("every non-hub route loads the stage or the kid world that paints .wardos-h
   assert.match(game, /home-key-light\.svg/);
   assert.match(game, /aria-label="Home"/);
   assert.match(game, /merc-home/);
+});
+
+test("HOMEONCE1 pointerup then click starts one navigation", { skip: spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1" ? false : "SKIP no playwright" }, () => {
+  const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/homeonce1.py")], { encoding: "utf8", timeout: 60000 });
+  assert.equal(r.status, 0, (r.stderr || "").slice(-600) + (r.stdout || "").slice(-400));
+  const o = JSON.parse(r.stdout.trim().split("\n").pop());
+  assert.equal(o.navs, 1, JSON.stringify(o));
+  assert.equal(o.pointerPrevented, true, JSON.stringify(o));
+  assert.equal(o.clickPrevented, true, JSON.stringify(o));
 });
 
 test("the header is not a second Home control", () => {

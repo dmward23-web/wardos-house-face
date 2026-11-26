@@ -702,16 +702,32 @@
       }
       more.textContent = "+" + n + " more";
     }
-    function crosses() {
-      var railTop = rail ? rect(rail).top : Infinity;
+    function rowOut(el) {
+      if (!el || el.hidden) return false;
+      var r = rect(el);
+      if (r.height < 1) return false;
+      var list = rect(todayEl);
       var pb = rect(panel);
-      var lb = rect(todayEl);
-      if (lb.height > 0 && (lb.bottom > pb.bottom + 0.5 || lb.top < pb.top - 0.5)) return true;
-      if (lb.bottom > railTop + 0.5 || pb.bottom > railTop + 0.5) return true;
+      var railTop = rail ? rect(rail).top : 1e9;
+      if (r.top < list.top - 0.5 || r.bottom > list.bottom + 0.5) return true;
+      if (r.top < pb.top - 0.5 || r.bottom > pb.bottom + 0.5) return true;
+      if (r.bottom > railTop + 0.5) return true;
+      return false;
+    }
+    function crosses() {
+      /* The list box is already the clipped viewport. A row past that edge, or
+         scrollHeight past clientHeight, is the overflow. The list rect is not. */
+      if (todayEl.scrollHeight > todayEl.clientHeight + 1) return true;
+      var nodes = todayEl.querySelectorAll("li.leaveby-row:not([hidden]), li.leaveby-more");
+      for (var n = 0; n < nodes.length; n++) if (rowOut(nodes[n])) return true;
       var h2 = panel.querySelector(".sec-hdr");
       if (h2) {
         var hr2 = rect(h2);
         for (var k = 0; k < chips.length; k++) if (over(hr2, rect(chips[k]))) return true;
+      }
+      if (rail) {
+        var pb2 = rect(panel);
+        if (pb2.bottom > rect(rail).top + 0.5) return true;
       }
       return false;
     }

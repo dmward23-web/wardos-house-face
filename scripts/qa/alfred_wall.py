@@ -1,6 +1,6 @@
 """Alfred wall checks: hub doors, painted-asset census, cubby rows, safe-area spacing.
    Real Chrome. Viewport 1920x1080. Prints one JSON object."""
-import functools, json, os, sys, threading
+import functools, json, os, sys, threading, time
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from playwright.sync_api import sync_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -411,10 +411,15 @@ try:
             url = pg.url
             home = None
             home_box = None
+            armed_ms = None
             if dest in url:
-                # The door URL commits before the wall finishes painting. A click at the
-                # Home box while the world is still the top hit is swallowed. Wait, within
-                # the same 8s budget, until Home is armed and is the element under the tap.
+                try:
+                    pg.wait_for_load_state("load", timeout=8000)
+                except Exception:
+                    pass
+                # Home must be the hit target within 1 s of load. Waiting the old 8 s
+                # let a control that was covered at first paint pass once the cover left.
+                t_armed = time.perf_counter()
                 try:
                     home_box = pg.wait_for_function("""() => {
                       const el = document.querySelector('a[data-kw-home][data-home-armed="1"]');
@@ -425,10 +430,12 @@ try:
                       const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
                       if (!(hit && (hit === el || el.contains(hit)))) return null;
                       return { x: r.x, y: r.y, w: r.width, h: r.height };
-                    }""", timeout=8000)
+                    }""", timeout=1000)
                     home_box = home_box.json_value() if hasattr(home_box, "json_value") else home_box
+                    armed_ms = int((time.perf_counter() - t_armed) * 1000)
                 except Exception:
                     home_box = None
+                    armed_ms = None
                 if home_box:
                     pg.mouse.click(home_box["x"] + home_box["w"] / 2, home_box["y"] + home_box["h"] / 2)
                     try:
@@ -436,7 +443,7 @@ try:
                     except Exception:
                         pass
                     home = pg.url
-            hits.append({"kind": spot["kind"], "at": [x, y], "dest": dest, "url": url, "hit": hit, "home": home, "homeBox": home_box, "money": any(bad in url for bad in ("sheet-dan", "sheet-allowance.html"))})
+            hits.append({"kind": spot["kind"], "at": [x, y], "dest": dest, "url": url, "hit": hit, "home": home, "homeBox": home_box, "armedMs": armed_ms, "money": any(bad in url for bad in ("sheet-dan", "sheet-allowance.html"))})
         out["doors"] = hits
     elif MODE == "census":
         pages = []

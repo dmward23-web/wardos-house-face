@@ -52,6 +52,94 @@ const state = (g) => g.evaluate(() => ({ mode: document.documentElement.getAttri
   po: getComputedStyle(document.getElementById("poster")).opacity, gl: getComputedStyle(document.getElementById("gl")).visibility,
   ink: (() => { const c = document.getElementById("poster"); if (!c.width) return 0; const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 64) if (Math.abs(d[i] - 4) + Math.abs(d[i + 1] - 6) + Math.abs(d[i + 2] - 10) > 12) n++; return n; })() }));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const PLATE_MARK = `(() => {
+  const desc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src");
+  Object.defineProperty(HTMLImageElement.prototype, "src", {
+    configurable: true,
+    get() { return desc.get.call(this); },
+    set(v) {
+      if (typeof v === "string" && v.indexOf("/poster/") !== -1) {
+        this.addEventListener("load", function () {
+          const now = performance.now();
+          (window.__plateLoads = window.__plateLoads || []).push(now);
+          if (!window.__plateLoadAt) window.__plateLoadAt = now;
+        }, { once: true });
+      }
+      desc.set.call(this, v);
+    }
+  });
+})()`;
+/* RMSTILL1 · hold the plate, and stretch the 120 ms still-poster poll, so only a load listener paints inside 500 ms. */
+const PLATE_DELAY = `(() => {
+  const orig = window.setTimeout.bind(window);
+  const origInterval = window.setInterval.bind(window);
+  window.__stretch = 0;
+  window.setTimeout = function (fn, ms, ...rest) {
+    if (ms === 120 && typeof fn === "function" && /fbStillDraw/.test(Function.prototype.toString.call(fn))) {
+      window.__stretch++;
+      ms = 30000;
+    }
+    return orig(fn, ms, ...rest);
+  };
+  window.setInterval = function (fn, ms, ...rest) {
+    if (ms === 1000 && typeof fn === "function" && /FB\.plate/.test(Function.prototype.toString.call(fn))) {
+      window.__stretch++;
+      ms = 30000;
+    }
+    return origInterval(fn, ms, ...rest);
+  };
+  const desc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src");
+  Object.defineProperty(HTMLImageElement.prototype, "src", {
+    configurable: true,
+    get() { return desc.get.call(this); },
+    set(v) {
+      if (typeof v === "string" && v.indexOf("/poster/") !== -1 && !this.__plateHeld) {
+        this.__plateHeld = true;
+        const img = this;
+        orig(() => {
+          img.addEventListener("load", function () {
+            const now = performance.now();
+            (window.__plateLoads = window.__plateLoads || []).push(now);
+            if (!window.__plateLoadAt) window.__plateLoadAt = now;
+          }, { once: true });
+          desc.set.call(img, v);
+        }, 700);
+        return;
+      }
+      desc.set.call(this, v);
+    }
+  });
+})()`;
+async function inkSoon(g, label, fromLoad) {
+  if (fromLoad) await g.waitForFunction(() => window.__plateLoadAt > 0, { timeout: 8000, polling: 50 });
+  const got = await g.evaluate((fromLoad) => new Promise((res) => {
+    const t0 = performance.now();
+    function ink() {
+      const c = document.getElementById("poster");
+      if (!c || !c.width) return 0;
+      const w = 80, h = 45;
+      const x = Math.max(0, (c.width - w) / 2), y = Math.max(0, (c.height - h) / 2);
+      const d = c.getContext("2d").getImageData(x, y, w, h).data;
+      let n = 0;
+      for (let i = 0; i < d.length; i += 16) if (Math.abs(d[i] - 4) + Math.abs(d[i + 1] - 6) + Math.abs(d[i + 2] - 10) > 12) n++;
+      return n;
+    }
+    function step() {
+      const n = ink();
+      const loads = window.__plateLoads || [];
+      const last = loads.length ? loads[loads.length - 1] : t0;
+      const since = fromLoad ? performance.now() - last : performance.now() - t0;
+      const cap = fromLoad ? 500 : 2300;
+      if (n > 50 || since > cap) return res({ ink: n, since: since });
+      requestAnimationFrame(step);
+    }
+    step();
+  }), fromLoad);
+  const cap = fromLoad ? 500 : 2300;
+  console.log(label + " ink " + got.ink + " at " + Math.round(got.since) + " ms");
+  assert.ok(got.ink > 50, label + " poster ink " + got.ink + " at " + Math.round(got.since) + " ms");
+  assert.ok(got.since <= cap, label + " ink landed " + Math.round(got.since) + " ms after " + (fromLoad ? "the plate load" : "poster mode"));
+}
 /* NOSPOOK1 · wall.html's porch engine (and so its governor and poster) is October-only; every other month month-overlay hides
    #poster/#gl. The wall.html legs pin the in-page clock (ticking, offset) to Oct 20 so the porch governor stays under test all
    year; the off-season leg below pins Nov 23 and checks the engine stays hidden and quiet. */
@@ -84,22 +172,29 @@ test("browser: prefers-reduced-motion goes straight to the poster with no render
   await withScene(async (b, base) => { for (const f of ["night/scene.html", "wall.html"]) {
     const g = await b.newPage(); await g.setViewport({ width: 440, height: 956 }); await g.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
     await g.evaluateOnNewDocument(HOOK); if (f === "wall.html") await g.evaluateOnNewDocument(PIN, OCT);
+    await g.evaluateOnNewDocument(PLATE_MARK);
     await g.goto(base + "/" + f + (f === "wall.html" ? "?look=classic" : ""), { waitUntil: "load" });
     await g.waitForFunction(() => document.documentElement.getAttribute("data-scene-mode") === "poster", { timeout: 30000, polling: 100 });
-    /* The plate paints on its load event. An 800 ms sleep returned while that decode was still queued, so the poster was the blank fill. */
-    await g.waitForFunction(() => {
-      const c = document.getElementById("poster");
-      if (!c || !c.width) return false;
-      const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data;
-      let n = 0;
-      for (let i = 0; i < d.length; i += 64) if (Math.abs(d[i] - 4) + Math.abs(d[i + 1] - 6) + Math.abs(d[i + 2] - 10) > 12) n++;
-      return n > 50;
-    }, { timeout: 30000, polling: 100 });
+    await inkSoon(g, f, false);
     const s0 = await state(g); await sleep(1500); const s1 = await state(g);
     assert.equal(s0.why, "reduced-motion", f); assert.equal(s1.raf, s0.raf, f + " no rAF in reduced motion");
     assert.equal(s1.po, "1", f + " poster shown"); assert.ok(s1.ink > 50, f + " poster painted (" + s1.ink + ")");
     await g.close();
   } });
+});
+
+test("RMSTILL1 a delayed plate stays blank unless the load event redraws it", { skip: SKIP, timeout: 120000 }, async () => {
+  await withScene(async (b, base) => {
+    const g = await b.newPage();
+    await g.setViewport({ width: 440, height: 956 });
+    await g.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+    await g.evaluateOnNewDocument(HOOK);
+    await g.evaluateOnNewDocument(PLATE_DELAY);
+    await g.goto(base + "/night/scene.html", { waitUntil: "load" });
+    await g.waitForFunction(() => document.documentElement.getAttribute("data-scene-mode") === "poster", { timeout: 30000, polling: 100 });
+    await inkSoon(g, "delayed plate stretch " + (await g.evaluate(() => window.__stretch || 0)), true);
+    await g.close();
+  });
 });
 
 test("browser: off-season (Nov 23) wall.html keeps the porch engine hidden, poster and WebGL invisible, no rAF after load", { skip: SKIP, timeout: 120000 }, async () => {
