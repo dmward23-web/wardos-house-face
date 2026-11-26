@@ -50,8 +50,8 @@ test("every non-hub route loads the stage or the kid world that paints .wardos-h
   assert.equal(home.split("\n")[21].trim(), 'btn.classList.add("wardos-home");');
   assert.doesNotMatch(box, /2147483646/);
   assert.match(home, /home-key-light\.svg/);
-  assert.match(paint, /if \(btn\.getAttribute\("href"\)\) return/);
-  assert.doesNotMatch(paint, /addEventListener\("pointerup"/);
+  assert.match(paint, /addEventListener\("pointerup"/);
+  assert.match(paint, /if \(!going\) go\(ev\)/);
   const world = fs.readFileSync(path.join(ROOT, "kid-world.js"), "utf8");
   assert.doesNotMatch(world, /kw-home wardos-home/);
   assert.match(world, /document\.write\('<script src="house-home\.js/);

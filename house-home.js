@@ -47,13 +47,15 @@
     if (btn.getAttribute("data-home-armed") === "1") return;
     btn.setAttribute("data-home-armed", "1");
     btn.addEventListener("contextmenu", function (ev) { ev.preventDefault(); });
-    /* HOMEONCE1 · pointerup called go() (preventDefault + location.assign) and the click
-       then started the anchor's own navigation. On a busy wall those two trips abort
-       each other and the Home tap never leaves. The href is the one navigation. */
-    btn.addEventListener("click", function (ev) {
-      if (going) { ev.preventDefault(); return; }
-      if (btn.getAttribute("href")) return;
+    /* HOMEONCE1 · pointerup assigns the hub. The click that follows must not start a
+       second navigation: on a busy wall the two trips abort each other and Home stays. */
+    btn.addEventListener("pointerup", function (ev) {
+      if (ev.button > 0) return;
       go(ev);
+    });
+    btn.addEventListener("click", function (ev) {
+      ev.preventDefault();
+      if (!going) go(ev);
     });
   }
   function mount() {
