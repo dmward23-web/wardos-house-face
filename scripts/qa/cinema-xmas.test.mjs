@@ -151,9 +151,9 @@ test("asset pin list is the r3 set plus the r2 palette pin, in one file", () => 
   assert.equal(Pins.pins.find((p) => p.file === "palette.json").state, "verified");
   const pinHex = (role) => Pins.pins.find((p) => p.role === role).sha256;
   assert.equal(pinHex("palette"), "sha256:a05eae0059eef810a7aab91ff28a56b3a106caf83a456c73a703f4c152b33156".slice(7));
-  assert.equal(pinHex("loop"), "sha256:1c011db8381484968c58e0b1b3e5f7d520d56d3210eb6fae035c32659d55e59c".slice(7));
-  assert.equal(pinHex("ungraded"), "sha256:f3323f756a02c69b7c4f42a602358539ae9e71b66acb7e936ab4e25e099fd1ae".slice(7));
-  assert.equal(pinHex("fallback"), "sha256:f795c1ce37b3155e0e53a8b0348da806ac5b1d7f66ac737dcd6214a9113fce94".slice(7));
+  assert.equal(pinHex("loop"), "sha256:18780c39c33c2521a4dd50f64dcf0c00a7996709315dbdd8d0b28ed05b4f0ee3".slice(7));
+  assert.equal(pinHex("ungraded"), "sha256:681b3098cc4a72a9eb6f1f94f42103c15c1abb7b12656a04e3327d816bd490d3".slice(7));
+  assert.equal(pinHex("fallback"), "sha256:de2da59741e8283d8882b0949ed18d25f81fe284ad188a74ade4db1313bb4155".slice(7));
   assert.equal(pinHex("lut"), "sha256:5bd8ac9135fc12099aa18863e5e6f32b6a02a99ee20d2368b333c30f17e4e518".slice(7));
   assert.equal(pinHex("glass"), "sha256:c630f43eec72e392634d936dc55283de4fb997affc5db8c1e59f6f3c0f9d1a39".slice(7));
   for (const pin of Pins.pins) assert.equal(pin.state, "verified", pin.file);
@@ -479,7 +479,7 @@ function groundStats(png, x, y, w, h) {
 /* PLATEREADY1 (Alfred ADDENDUM-6, Nov 23): mean > 12 and variance > 8 also pass on the procedural paint, so a run with no Prism
    plate went green (cloud-run5 cinema-high/low/still/nowebgl). The look is judged against the pinned graded plate itself:
    centre luma (x160-1760, y140-900, Rec.709, every pixel) of cinema-high must sit between LUMA_LO and LUMA_HI times the
-   plate's own centre luma, read from the pinned file (46.21 today, so 42.98..48.52). Veil-on, the default wall and a dark or
+   plate's own centre luma, read from the pinned file (45.68 on the Cycles plate, was 46.21; the absolute band stays 42.98..48.52). Veil-on, the default wall and a dark or
    blown-out frame all leave the band. */
 const LUMA_LO = 0.93; /* Atlas 11:35 + Alfred 11:36 Nov 23: one band; replaces the >= 44.0 floor */
 const LUMA_HI = 1.05;

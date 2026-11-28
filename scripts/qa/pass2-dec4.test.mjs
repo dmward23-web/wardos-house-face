@@ -14,9 +14,9 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const ART = path.join(ROOT, "art/cinema/xmas-2026");
 const PINS = {
-  "xmas-hero-plate-1920x1080-ungraded.png": "f3323f75",
-  "xmas-hero-fallback-1920x1080-graded.png": "f795c1ce",
-  "xmas-hero-loop-1920x1080-25s.mp4": "1c011db8",
+  "xmas-hero-plate-1920x1080-ungraded.png": "681b3098",
+  "xmas-hero-fallback-1920x1080-graded.png": "de2da597",
+  "xmas-hero-loop-1920x1080-25s.mp4": "18780c39",
   "window-pane-alpha-1920x1080.png": "41280f2f",
   "palette.json": "a05eae00",
   "glass-card-9slice-192.png": "c630f43e",
@@ -57,8 +57,8 @@ test("PLATEPIN2: every cinema art file matches pins.js and the Prism prefix list
   const plate = fs.readFileSync(path.join(ART, "xmas-hero-plate-1920x1080-ungraded.png"));
   const flipped = Buffer.from(plate);
   flipped[64] ^= 0x01;
-  assert.notEqual(sha256(flipped).slice(0, 8), "f3323f75");
-  assert.ok(sha256(plate).startsWith("f3323f75"));
+  assert.notEqual(sha256(flipped).slice(0, 8), "681b3098");
+  assert.ok(sha256(plate).startsWith("681b3098"));
 });
 
 test("LUTMATCH1: the shipped cube is the 4-decimal requantize, not the float source", () => {

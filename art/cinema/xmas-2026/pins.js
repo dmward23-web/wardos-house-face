@@ -10,19 +10,19 @@
   var PINS = [
     {
       file: "xmas-hero-loop-1920x1080-25s.mp4",
-      sha256: "1c011db8381484968c58e0b1b3e5f7d520d56d3210eb6fae035c32659d55e59c",
+      sha256: "18780c39c33c2521a4dd50f64dcf0c00a7996709315dbdd8d0b28ed05b4f0ee3",
       role: "loop",
       state: "verified"
     },
     {
       file: "xmas-hero-plate-1920x1080-ungraded.png",
-      sha256: "f3323f756a02c69b7c4f42a602358539ae9e71b66acb7e936ab4e25e099fd1ae",
+      sha256: "681b3098cc4a72a9eb6f1f94f42103c15c1abb7b12656a04e3327d816bd490d3",
       role: "ungraded",
       state: "verified"
     },
     {
       file: "xmas-hero-fallback-1920x1080-graded.png",
-      sha256: "f795c1ce37b3155e0e53a8b0348da806ac5b1d7f66ac737dcd6214a9113fce94",
+      sha256: "de2da59741e8283d8882b0949ed18d25f81fe284ad188a74ade4db1313bb4155",
       role: "fallback",
       state: "verified"
     },
